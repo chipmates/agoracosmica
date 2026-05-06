@@ -1,10 +1,11 @@
 // ForewordModal.tsx - Modal to display figure's foreword with audio
-import React, { FC, useRef, useState, useEffect } from 'react';
+import React, { FC, ChangeEvent } from 'react';
 import { createPortal } from 'react-dom';
 import { CloseButton } from '../Button';
 import { useForeword } from '../../hooks/useForeword';
 import { useTranslation } from '../../hooks/useTranslation';
 import { useFocusTrap } from '../../hooks/useFocusTrap';
+import useAudio from '../../hooks/useAudio';
 import { Play, Pause, SpeakerSimpleHigh, Info, Scroll } from '@phosphor-icons/react';
 import './ForewordModal.css';
 
@@ -26,76 +27,29 @@ export const ForewordModal: FC<ForewordModalProps> = ({
   const { tString } = useTranslation();
   const trapRef = useFocusTrap({ onClose });
   const { foreword, loading, error } = useForeword(figureId);
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
 
-  // Handle audio events
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
+  // useAudio (rather than a declarative <audio> tag) — iOS Safari produces
+  // silent playback on the first tap unless audio data is preloaded and
+  // load() is called explicitly. The hook handles both, and matches how
+  // StoryAudioPlayer drives playback for stories from the same R2 bucket.
+  const {
+    isPlaying,
+    progress,
+    currentTime,
+    duration,
+    togglePlay,
+    seek,
+  } = useAudio(foreword?.audioUrl ?? null, {
+    autoplay: false,
+    initialVolume: 1.0,
+  });
 
-    const handleTimeUpdate = () => setCurrentTime(audio.currentTime);
-    const handleLoadedMetadata = () => setDuration(audio.duration);
-    const handleEnded = () => setIsPlaying(false);
-    const handlePlay = () => setIsPlaying(true);
-    const handlePause = () => setIsPlaying(false);
-
-    audio.addEventListener('timeupdate', handleTimeUpdate);
-    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
-    audio.addEventListener('ended', handleEnded);
-    audio.addEventListener('play', handlePlay);
-    audio.addEventListener('pause', handlePause);
-
-    return () => {
-      audio.removeEventListener('timeupdate', handleTimeUpdate);
-      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
-      audio.removeEventListener('ended', handleEnded);
-      audio.removeEventListener('play', handlePlay);
-      audio.removeEventListener('pause', handlePause);
-    };
-  }, [foreword]);
-
-  // Stop audio when modal closes
-  useEffect(() => {
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-      }
-    };
-  }, []);
-
-  const togglePlayback = () => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    if (isPlaying) {
-      audio.pause();
-    } else {
-      audio.play();
-    }
+  const handleSeek = (e: ChangeEvent<HTMLInputElement>): void => {
+    seek(parseFloat(e.target.value));
   };
 
-  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    const time = parseFloat(e.target.value);
-    audio.currentTime = time;
-    setCurrentTime(time);
-  };
-
-  const formatTime = (seconds: number): string => {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  // Helper to render content via portal
-  const renderModal = (content: React.ReactNode) => {
-    return createPortal(content, document.body);
-  };
+  const renderModal = (content: React.ReactNode): React.ReactPortal =>
+    createPortal(content, document.body);
 
   if (loading) {
     return renderModal(
@@ -145,12 +99,10 @@ export const ForewordModal: FC<ForewordModalProps> = ({
         {/* Audio Player */}
         {foreword.audioUrl && (
           <div className="foreword-modal__player">
-            <audio ref={audioRef} src={foreword.audioUrl} preload="metadata" />
-
             <button
               className="foreword-modal__play-btn"
-              onClick={togglePlayback}
-              aria-label={isPlaying ? 'Pause' : 'Play'}
+              onClick={togglePlay}
+              aria-label={isPlaying ? tString('audioLibrary.controls.pause', 'Pause') : tString('audioLibrary.controls.play', 'Play')}
             >
               {isPlaying ? (
                 <Pause size={20} weight="fill" />
@@ -163,14 +115,16 @@ export const ForewordModal: FC<ForewordModalProps> = ({
               <input
                 type="range"
                 min={0}
-                max={duration || 100}
-                value={currentTime}
+                max={100}
+                step={0.1}
+                value={isNaN(progress) ? 0 : progress}
                 onChange={handleSeek}
                 className="foreword-modal__slider"
+                aria-label={tString('audioLibrary.controls.progress', 'Progress')}
               />
               <div className="foreword-modal__time">
-                <span>{formatTime(currentTime)}</span>
-                <span>{formatTime(duration)}</span>
+                <span>{currentTime}</span>
+                <span>{duration}</span>
               </div>
             </div>
 
