@@ -219,6 +219,12 @@ export default defineConfig(({ command, mode }) => {
     minify: 'esbuild',
     target: 'es2020',
     rollupOptions: {}
-  }
+  },
+  // Strip debug-noise console calls from production bundles only.
+  // Keeps console.warn / console.error so legitimate runtime errors still
+  // surface in users' devtools. Dev server keeps everything.
+  esbuild: command === 'build'
+    ? { pure: ['console.log', 'console.debug', 'console.info'] }
+    : {}
 })
 })
