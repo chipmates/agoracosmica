@@ -1,0 +1,936 @@
+/* src/components/CosmicCouncil/CosmicCouncilHeader.css */
+
+/* ===== COSMIC COUNCIL HEADER - 2025 PERFORMANCE OPTIMIZED ===== */
+
+.cosmic-council-header {
+  /* Core layout with CSS Grid for perfect alignment */
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: 0;
+  
+  /* Flexible dimensions to prevent clipping */
+  min-height: 100px;
+  height: auto;
+  width: 100%;
+  position: relative;
+  overflow: visible; /* Allow glow effects to extend without clipping */
+  
+  /* Layer management */
+  z-index: var(--z-base); /* 10 */
+  
+  /* Clean background with project color */
+  background: var(--bg-primary);
+  
+  /* Reduced containment to prevent clipping */
+  contain: layout style;
+  will-change: opacity, transform;
+  
+  /* Smooth entrance */
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cosmic-council-header.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ===== SUBTLE BACKGROUND EFFECTS (Simplified) ===== */
+
+.cosmic-background {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: var(--z-base); /* 1 */
+  
+  /* Performance optimization */
+  contain: strict;
+}
+
+.cosmic-gradient {
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  /* Gradient effects removed for consistent primary background color */
+}
+
+.stellar-particles {
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  /* Stellar particle effects removed for consistent primary background color */
+}
+
+/* ===== MAIN HEADER CONTENT ===== */
+
+.header-content {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  align-items: center;
+  justify-items: center;
+  gap: clamp(16px, 4vw, 32px);
+  padding: 16px clamp(30px, 4vw, 50px); /* Increased horizontal padding for glow effects */
+  position: relative;
+  z-index: var(--z-base); /* 2 */
+  min-height: 100px;
+  height: auto;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Hide mobile elements on desktop */
+.mobile-avatars-row,
+.mobile-controls-row {
+  display: none;
+}
+
+/* ===== LEFT: MODERATOR ===== */
+
+.header-moderator {
+  display: flex;
+  align-items: center;
+  justify-self: center;
+  width: 100%;
+  justify-content: center;
+  position: relative;
+  padding: 8px 20px; /* Horizontal padding for moderator glow */
+}
+
+.moderator-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Back to center alignment */
+  gap: 4px;
+  position: relative;
+}
+
+.moderator-sun-container {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  
+  /* No circle by default - same as participants */
+  background: transparent;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.moderator-sun-container.speaking {
+  /* Gold shining circle when moderator is speaking */
+  background: transparent;
+  border: 3px solid color-mix(in srgb, var(--gold-subtle) 80%, transparent);
+  box-shadow: 
+    0 0 20px color-mix(in srgb, var(--gold-subtle) 60%, transparent),
+    inset 0 1px 3px color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+  transform: scale(1.05);
+}
+
+.moderator-avatar {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.moderator-crown {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  background: linear-gradient(135deg, var(--gold-subtle), var(--gold-primary));
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--bg-primary);
+  border: 1px solid var(--gold-subtle);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--gold-subtle) 50%, transparent);
+  z-index: var(--z-base); /* 10 */
+}
+
+.moderator-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: color-mix(in srgb, white 80%, transparent);
+  white-space: nowrap;
+  text-align: center;
+  transition: color 0.3s ease;
+}
+
+/* Moderator name golden when speaking - same as participants */
+.moderator-label.speaking {
+  color: var(--gold-subtle);
+  text-shadow: 0 0 8px color-mix(in srgb, var(--gold-subtle) 60%, transparent);
+}
+
+/* ===== LEFT-CENTER: PARTICIPANTS SHOWCASE ===== */
+
+.header-participants {
+  display: flex;
+  align-items: center;
+  justify-self: center;
+  width: 100%;
+  justify-content: center;
+  overflow: visible; /* Ensure glow effects aren't clipped */
+}
+
+.participants-showcase {
+  display: flex;
+  align-items: center;
+  gap: clamp(20px, 4vw, 32px); /* Increased gap for glow space */
+  overflow: visible; /* Changed from overflow-x: auto to visible for glow effects */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 8px 24px; /* Increased horizontal padding for glow room */
+}
+
+.participants-showcase::-webkit-scrollbar {
+  display: none;
+}
+
+/* ===== CENTER: PHASE NAME ===== */
+
+.header-phase {
+  display: flex;
+  align-items: center;
+  justify-self: center;
+  width: 100%;
+  justify-content: center;
+}
+
+.phase-name {
+  font-size: clamp(14px, 2.5vw, 18px);
+  font-weight: 600;
+  color: color-mix(in srgb, white 95%, transparent);
+  text-shadow: 0 0 12px color-mix(in srgb, white 30%, transparent);
+  white-space: nowrap;
+}
+
+/* ===== CENTER-RIGHT: PROGRESS DOTS ===== */
+
+.header-progress {
+  display: flex;
+  align-items: center;
+  justify-self: center;
+  width: 100%;
+  justify-content: center;
+}
+
+.progress-dots {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.progress-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: color-mix(in srgb, white 20%, transparent);
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.progress-dot.completed {
+  background: var(--color-info);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--mode-freetalk) 40%, transparent);
+}
+
+.progress-dot.current {
+  background: var(--gold-star);
+  transform: scale(1.3);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--gold-star) 60%, transparent);
+}
+
+/* ===== PARTICIPANT AVATARS ===== */
+
+.participant-avatar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  margin: 0 12px; /* Increased horizontal margin for glow space */
+  position: relative; /* Ensure glow effects can extend properly */
+  
+  /* Transform animations only */
+  transform: scale(1);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.participant-avatar.speaking {
+  transform: scale(1.1);
+}
+
+.avatar-container {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  
+  /* No circle by default for participants */
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.avatar-image {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: none;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: var(--z-base); /* 1 */
+}
+
+/* Gold shining circle for participants when speaking */
+.participant-avatar.speaking .avatar-container {
+  background: transparent;
+  border: 3px solid color-mix(in srgb, var(--gold-subtle) 80%, transparent);
+  box-shadow: 
+    0 0 20px color-mix(in srgb, var(--gold-subtle) 60%, transparent),
+    inset 0 1px 3px color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+  transform: scale(1.05);
+}
+
+/* Speaking indicator removed - using white circle system instead */
+
+.avatar-name {
+  font-size: 10px;
+  font-weight: 500;
+  color: color-mix(in srgb, white 80%, transparent);
+  white-space: nowrap;
+  text-align: center;
+  transition: color 0.3s ease;
+}
+
+.participant-avatar.speaking .avatar-name {
+  color: var(--gold-subtle);
+  text-shadow: 0 0 8px color-mix(in srgb, var(--gold-subtle) 60%, transparent);
+}
+
+/* ===== RIGHT: COUNCIL CONTROLS ===== */
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  justify-self: center;
+  width: 100%;
+  justify-content: center;
+  overflow: visible; /* Ensure controls don't clip glow effects */
+}
+
+.control-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.council-control-button {
+  min-width: 32px;
+  height: 32px;
+  padding: 4px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--gold-subtle) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+/* Virtual 44px touch target for council control buttons */
+.council-control-button::after {
+  content: '';
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  z-index: 1;
+  /* Debug: uncomment to see touch targets */
+  /* background: rgba(255, 0, 0, 0.1); */
+}
+
+.council-control-button:hover {
+  background: color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+  border-color: color-mix(in srgb, var(--gold-subtle) 50%, transparent);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+}
+
+/* ===== STANDARD HEADER DIVIDER ===== */
+
+.cosmic-council-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 500px;
+  height: 2px;
+  background: linear-gradient(90deg, 
+    transparent,
+    var(--gold-subtle),
+    color-mix(in srgb, var(--mode-quest) 60%, transparent),
+    transparent
+  );
+  z-index: var(--z-base); /* 3 */
+}
+
+/* ===== ANIMATIONS ===== */
+
+
+@keyframes crown-sparkle {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  25% { transform: rotate(-5deg) scale(1.1); }
+  75% { transform: rotate(5deg) scale(1.1); }
+}
+
+/* speaking-pulse animation removed - using white circle system instead */
+
+/* ===== COMPLETION INDICATOR ===== */
+
+.completed-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 8px;
+}
+
+.completed-badge {
+  background: linear-gradient(135deg, var(--color-info), var(--mode-wisdom-active));
+  color: white;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: 1px solid color-mix(in srgb, var(--mode-freetalk) 30%, transparent);
+  box-shadow: 
+    0 2px 8px color-mix(in srgb, var(--mode-freetalk) 20%, transparent),
+    inset 0 1px 0 color-mix(in srgb, white 10%, transparent);
+  animation: completion-glow 2s ease-in-out infinite alternate;
+  animation-play-state: paused;
+}
+
+/* Activate when header is visible */
+.cosmic-council-header .council-completion-badge {
+  animation-play-state: running;
+}
+
+@keyframes completion-glow {
+  0% { box-shadow: 0 2px 8px color-mix(in srgb, var(--mode-freetalk) 20%, transparent), inset 0 1px 0 color-mix(in srgb, white 10%, transparent); }
+  100% { box-shadow: 0 2px 12px color-mix(in srgb, var(--mode-freetalk) 40%, transparent), inset 0 1px 0 color-mix(in srgb, white 20%, transparent); }
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+
+/* Tablet adaptations */
+@media (max-width: 768px) {
+  .cosmic-council-header {
+    min-height: 85px;
+    height: auto;
+    overflow: visible;
+  }
+  
+  .header-content {
+    grid-template-columns: 1fr 2fr 1fr;
+    gap: 12px;
+    padding: 12px 24px;
+    min-height: 70px;
+    height: auto;
+    max-width: none;
+  }
+  
+  .moderator-sun-container {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .moderator-avatar {
+    width: 42px;
+    height: 42px;
+  }
+  
+  .moderator-crown {
+    width: 14px;
+    height: 14px;
+    top: -2px;
+    right: -2px;
+  }
+  
+  .moderator-label {
+    font-size: 11px;
+  }
+
+  /* Tablet speaking state enhancements */
+  .moderator-sun-container.speaking {
+    /* Gold shining circle when tablet moderator is speaking */
+    background: transparent;
+    border: 3px solid color-mix(in srgb, var(--gold-subtle) 80%, transparent);
+    box-shadow: 
+      0 0 18px color-mix(in srgb, var(--gold-subtle) 60%, transparent),
+      inset 0 1px 3px color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+    transform: scale(1.05);
+  }
+  
+  .participant-avatar.speaking .avatar-container {
+    /* Gold shining circle for tablet participants when speaking */
+    background: transparent;
+    border: 3px solid color-mix(in srgb, var(--gold-subtle) 80%, transparent);
+    box-shadow: 
+      0 0 18px color-mix(in srgb, var(--gold-subtle) 60%, transparent),
+      inset 0 1px 3px color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+    transform: scale(1.05);
+  }
+  
+  .participants-showcase {
+    gap: 8px;
+  }
+  
+  .avatar-container {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .avatar-image {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .phase-name {
+    font-size: 14px;
+  }
+  
+  .progress-dot {
+    width: 6px;
+    height: 6px;
+  }
+  
+  .control-buttons {
+    gap: 6px;
+  }
+  
+  .council-control-button {
+    min-width: 28px;
+    height: 28px;
+  }
+  
+}
+
+/* Mobile adaptations */
+@media (max-width: 480px) {
+  .cosmic-council-header {
+    min-height: 75px;
+    height: auto;
+    overflow: visible;
+  }
+  
+  .header-content {
+    grid-template-columns: 1fr 2fr 1fr;
+    gap: 8px;
+    padding: 10px 16px;
+    min-height: 60px;
+    height: auto;
+    max-width: none;
+  }
+  
+  .participants-showcase {
+    gap: 6px;
+  }
+  
+  .avatar-container {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .avatar-image {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .phase-name {
+    font-size: 12px;
+  }
+  
+  .progress-dot {
+    width: 5px;
+    height: 5px;
+  }
+  
+  .moderator-sun-container {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .moderator-avatar {
+    width: 34px;
+    height: 34px;
+  }
+  
+  .moderator-crown {
+    width: 12px;
+    height: 12px;
+    top: -1px;
+    right: -1px;
+  }
+  
+  .moderator-label {
+    font-size: 10px;
+  }
+
+  .control-buttons {
+    gap: 4px;
+  }
+  
+  .council-control-button {
+    min-width: 24px;
+    height: 24px;
+  }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .cosmic-council-header,
+  .cosmic-council-header .participant-avatar,
+  .cosmic-council-header .progress-dot {
+    transition: none;
+  }
+  
+  /* speaking-pulse animation removed - using circle system instead */
+
+  .council-completion-badge {
+    animation: none;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .cosmic-council-header {
+    background: color-mix(in srgb, var(--utility-pure-black) 95%, transparent);
+    border-bottom: 2px solid var(--text-primary);
+  }
+  
+  .cosmic-council-header .cosmic-background {
+    display: none;
+  }
+  
+  .cosmic-council-header .avatar-name,
+  .cosmic-council-header .phase-name {
+    color: var(--text-primary);
+    text-shadow: none;
+  }
+}
+
+/* =============================================================================
+   MOBILE OPTIMIZATION: Clean Single-Row Layout
+   ============================================================================= */
+
+@media (max-width: 768px) {
+  .cosmic-council-header {
+    min-height: 80px;
+    height: auto;
+    padding: 8px 0;
+    overflow: visible; /* Prevent clipping of scaled avatars */
+  }
+  
+  /* Single row mobile layout: All elements in one line */
+  .header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 0 16px;
+    min-height: 80px;
+    height: auto;
+    max-width: none;
+    margin: 0;
+  }
+  
+  /* Show mobile elements on mobile */
+  .mobile-avatars-row {
+    display: flex;
+    align-items: center;
+    gap: 18px; /* Further increased gap for mobile glow space */
+    flex: 1;
+    justify-content: flex-start;
+    padding: 8px 16px; /* Increased horizontal padding for glow effects */
+    overflow: visible; /* Ensure mobile glow effects aren't clipped */
+  }
+  
+  .mobile-controls-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+  
+  /* Hide desktop layout elements on mobile */
+  .header-moderator,
+  .header-participants,
+  .header-controls {
+    display: none;
+  }
+  
+  /* Mobile moderator styling - Same as participants (no default circle) */
+  .mobile-moderator {
+    position: relative;
+    flex-shrink: 0;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: transparent;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+  }
+  
+  .mobile-moderator-avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: none;
+    position: relative;
+    z-index: var(--z-base); /* 1 */
+  }
+  
+  .mobile-moderator.speaking {
+    /* Gold shining circle when mobile moderator is speaking */
+    background: transparent;
+    border: 2px solid color-mix(in srgb, var(--gold-subtle) 80%, transparent);
+    box-shadow: 
+      0 0 16px color-mix(in srgb, var(--gold-subtle) 60%, transparent),
+      inset 0 1px 3px color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+    transform: scale(1.05);
+  }
+  
+  .mobile-moderator-crown {
+    position: absolute;
+    top: -3px;
+    right: -3px;
+    background: linear-gradient(135deg, var(--gold-subtle), var(--gold-primary));
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--bg-primary);
+    border: 1px solid var(--gold-subtle);
+    box-shadow: 0 0 6px color-mix(in srgb, var(--gold-subtle) 50%, transparent);
+  }
+  
+  /* Mobile participants styling */
+  .mobile-participants {
+    display: flex;
+    align-items: center;
+    gap: 16px; /* Further increased gap for mobile glow space */
+    flex: 1;
+    justify-content: flex-start;
+    max-width: 220px; /* Wider for glow room */
+    padding: 0 12px; /* Increased horizontal padding for glow effects */
+    overflow: visible; /* Ensure mobile glow effects aren't clipped */
+  }
+  
+  .mobile-participant {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: transparent;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+  }
+  
+  .mobile-participant.speaking {
+    /* Gold shining circle for mobile participants when speaking */
+    background: transparent;
+    border: 2px solid color-mix(in srgb, var(--gold-subtle) 80%, transparent);
+    box-shadow: 
+      0 0 16px color-mix(in srgb, var(--gold-subtle) 60%, transparent),
+      inset 0 1px 3px color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+    transform: scale(1.05);
+  }
+  
+  .mobile-participant-avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: none;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: var(--z-base); /* 1 */
+  }
+  
+  /* Mobile progress dots - Clean alignment */
+  .mobile-progress-dots {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  
+  .mobile-progress-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: color-mix(in srgb, white 30%, transparent);
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+  }
+  
+  .mobile-progress-dot.completed {
+    background: var(--color-info);
+    box-shadow: 0 0 10px color-mix(in srgb, var(--mode-freetalk) 60%, transparent);
+  }
+  
+  .mobile-progress-dot.current {
+    background: var(--gold-star);
+    transform: scale(1.4);
+    box-shadow: 0 0 12px color-mix(in srgb, var(--gold-star) 80%, transparent);
+  }
+  
+  /* Mobile close button - Clean alignment */
+  .mobile-close-button {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Hide all text labels on mobile */
+  .phase-name,
+  .avatar-name,
+  .moderator-label,
+  .council-control-button {
+    display: none;
+  }
+  
+  /* Completion indicator for mobile */
+  .mobile-completed-badge {
+    background: linear-gradient(135deg, var(--color-info), var(--mode-wisdom-active));
+    color: white;
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-size: 0.8125rem; /* 13px */
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+}
+
+/* Extra small screens - further optimization */
+@media (max-width: 480px) {
+  .cosmic-council-header {
+    min-height: 75px;
+    height: auto;
+    overflow: visible;
+  }
+  
+  .header-content {
+    min-height: 75px;
+    height: auto;
+    gap: 12px;
+    padding: 0 12px;
+  }
+  
+  .mobile-avatars-row {
+    gap: 8px;
+  }
+  
+  /* Smaller golden circles for very small screens */
+  .mobile-moderator {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .mobile-moderator.speaking {
+    /* Gold shining circle for very small mobile moderator when speaking */
+    background: transparent;
+    border: 2px solid color-mix(in srgb, var(--gold-subtle) 80%, transparent);
+    box-shadow: 
+      0 0 14px color-mix(in srgb, var(--gold-subtle) 60%, transparent),
+      inset 0 1px 3px color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+    transform: scale(1.05);
+  }
+  
+  .mobile-moderator-avatar {
+    width: 44px;
+    height: 44px;
+    border: none;
+  }
+  
+  .mobile-moderator-crown {
+    width: 15px;
+    height: 15px;
+    top: -2px;
+    right: -2px;
+  }
+  
+  .mobile-participant {
+    width: 50px;
+    height: 50px;
+    /* No circle by default */
+    border: none;
+    background: transparent;
+  }
+  
+  .mobile-participant.speaking {
+    /* Gold shining circle for very small mobile participants when speaking */
+    background: transparent;
+    border: 2px solid color-mix(in srgb, var(--gold-subtle) 80%, transparent);
+    box-shadow: 
+      0 0 14px color-mix(in srgb, var(--gold-subtle) 60%, transparent),
+      inset 0 1px 3px color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+    transform: scale(1.05);
+  }
+  
+  .mobile-participant-avatar {
+    width: 44px;
+    height: 44px;
+    border: none;
+  }
+  
+  .mobile-participants {
+    gap: 8px;
+    max-width: 150px;
+  }
+  
+  .mobile-progress-dots {
+    gap: 8px;
+  }
+  
+  .mobile-progress-dot {
+    width: 10px;
+    height: 10px;
+  }
+  
+  .mobile-controls-row {
+    gap: 10px;
+  }
+  
+  .mobile-completed-badge {
+    font-size: 0.6875rem; /* 11px */
+    padding: 4px 8px;
+  }
+}

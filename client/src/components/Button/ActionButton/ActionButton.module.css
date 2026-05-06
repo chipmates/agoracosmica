@@ -1,0 +1,269 @@
+/* ActionButton.module.css - STANDARD ACTION BUTTON
+ * 
+ * DESIGN STANDARD: Minimal elegance over flashy effects
+ * - Single colors, clean transitions, perfect typography
+ * - NO cosmic themes, NO multicolor gradients, NO rainbow effects
+ * - Always use: enhanced={false}, glowEffect={false}, theme=undefined
+ * - Pure palette compliance with CSS custom properties
+ */
+@import '../button-tokens.css';
+
+.actionButton {
+  /* Enhanced base styles for CTAs */
+  position: relative;
+  font-weight: 500; /* Lighter weight for more elegance */
+  text-transform: none; /* Remove uppercase for modern feel */
+  letter-spacing: 0.02em; /* Subtle letter spacing */
+  transition: all 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  
+  /* Modern glass effect */
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+}
+
+/* Content wrapper for advanced effects */
+.content {
+  position: relative;
+  z-index: var(--z-base); /* 1 */
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+/* Size variations - Lighter, more elegant, responsive */
+.size-small {
+  padding: 0.5em 1.2em;
+  font-size: clamp(0.8125rem, 0.8125rem + 0.25vw, 0.9375rem); /* 13px to 15px */
+  min-height: 36px;
+}
+
+.size-medium {
+  padding: 0.6em 1.5em;
+  font-size: clamp(0.8125rem, 0.8125rem + 0.5vw, 1.1875rem); /* 13px to 19px - responsive with mobile optimization */
+  min-height: 40px;
+}
+
+.size-large {
+  padding: 0.7em 1.8em;
+  font-size: clamp(0.875rem, 0.875rem + 0.5vw, 1.1875rem); /* 14px to 19px - better mobile fit */
+  min-height: 44px;
+}
+
+/* Full width variant */
+.fullWidth {
+  width: 100%;
+  justify-content: center;
+}
+
+/* Elevated effect - Subtle depth */
+.elevated {
+  /* Elevation is now handled by the variant-specific box-shadows */
+}
+
+.elevated:hover {
+  /* Hover elevation is now handled by the variant-specific hover states */
+}
+
+/* Glow effect base - Simple and elegant */
+.glow {
+  position: relative;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  transition: filter 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Variant: Gold (Primary CTA) - Clean with glow effect */
+.variant-gold {
+  background: var(--gold-subtle); /* Story Mode CTA - Use brighter gold */
+  color: var(--primary-deep); /* Consistent dark blue text */
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-40), transparent);
+  box-shadow: 
+    0 2px 6px color-mix(in srgb, var(--gold-subtle) var(--a-15), transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--gold-primary) var(--a-20), transparent);
+}
+
+.variant-gold.glow:hover {
+  background: var(--gold-primary); /* Story Mode hover - brighter gold */
+  transform: translateY(-1px);
+  box-shadow: 
+    0 6px 20px color-mix(in srgb, var(--gold-primary) var(--a-20), transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--gold-primary) var(--a-25), transparent);
+  
+  /* Simple, elegant glow - one color only */
+  filter: drop-shadow(0 0 clamp(12px, 1.5vw, 20px) color-mix(in srgb, var(--gold-primary) var(--a-50), transparent));
+}
+
+/* Variant: Coral (Secondary CTA) - Clean with glow effect */
+.variant-coral {
+  background: var(--mode-quest-active); /* Quest Mode CTA */
+  color: var(--primary-deep); /* Consistent dark blue text */
+  border: 1px solid color-mix(in srgb, var(--mode-quest-active) var(--a-30), transparent);
+  box-shadow: 
+    0 2px 6px color-mix(in srgb, var(--mode-quest-active) var(--a-10), transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--mode-quest) var(--a-15), transparent);
+}
+
+.variant-coral.glow:hover {
+  background: var(--mode-quest); /* Quest Mode hover */
+  transform: translateY(-1px);
+  box-shadow: 
+    0 6px 20px color-mix(in srgb, var(--mode-quest-active) var(--a-15), transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--mode-quest-hover) var(--a-25), transparent);
+  
+  /* Simple, elegant glow - one color only */
+  filter: drop-shadow(0 0 clamp(12px, 1.5vw, 20px) color-mix(in srgb, var(--mode-quest) var(--a-50), transparent));
+}
+
+/* Variant: Deep (Tertiary CTA) */
+.variant-deep {
+  background: linear-gradient(135deg, var(--bg-astral) 0%, var(--bg-highlight) 100%);
+  color: var(--text-primary);
+  border: 1px solid color-mix(in srgb, var(--bg-highlight) var(--a-30), transparent);
+}
+
+.variant-deep.glow::before {
+  background: linear-gradient(135deg, var(--bg-astral), var(--bg-highlight), var(--bg-astral));
+  filter: blur(16px);
+}
+
+.variant-deep:hover {
+  background: linear-gradient(135deg, var(--bg-highlight) 0%, var(--bg-highlight) 100%);
+  border-color: color-mix(in srgb, var(--bg-highlight) var(--a-50), transparent);
+  transform: translateY(-2px) scale(1.02);
+}
+
+.variant-deep.glow:hover::before {
+  opacity: 0.5;
+}
+
+/* Pulse effect removed - too much visual noise */
+
+/* Active/pressed state - More subtle */
+.actionButton:active:not(:disabled) {
+  transform: scale(0.98) translateY(0);
+  transition-duration: 0.1s;
+}
+
+/* Focus state - Enhanced for accessibility */
+.actionButton:focus-visible {
+  outline: 3px solid currentColor;
+  outline-offset: 4px;
+}
+
+.variant-gold:focus-visible {
+  outline-color: var(--gold-subtle);
+}
+
+.variant-coral:focus-visible {
+  outline-color: var(--mode-quest-hover);
+}
+
+.variant-deep:focus-visible {
+  outline-color: var(--bg-highlight);
+}
+
+/* Disabled state */
+.actionButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none; /* Enhanced specificity ensures disabled buttons don't transform */
+}
+
+/* Loading state override */
+.actionButton[aria-busy="true"] {
+  color: transparent;
+}
+
+/* Responsive adjustments - Lighter on mobile */
+@media (max-width: 768px) {
+  .size-small {
+    padding: 0.4em 1em;
+    font-size: 0.8rem;
+    min-height: 32px;
+  }
+  
+  .size-medium {
+    padding: 0.5em 1.2em;
+    font-size: 0.85rem;
+    min-height: 36px;
+  }
+  
+  .size-large {
+    padding: 0.6em 1.4em;
+    font-size: 0.9rem;
+    min-height: 40px;
+  }
+  
+  /* Reduce effects on mobile for performance */
+  .actionButton {
+    backdrop-filter: blur(var(--glass-blur-light));
+    -webkit-backdrop-filter: blur(var(--glass-blur-light));
+  }
+  
+  /* Simpler glow on mobile */
+  .variant-gold.glow:hover {
+    filter: drop-shadow(0 0 8px color-mix(in srgb, var(--gold-subtle) var(--a-40), transparent));
+  }
+  
+  .variant-coral.glow:hover {
+    filter: drop-shadow(0 0 8px color-mix(in srgb, var(--mode-quest) var(--a-40), transparent));
+  }
+}
+
+/* Touch optimization */
+@media (hover: none) and (pointer: coarse) {
+  .actionButton {
+    min-height: 48px;
+  }
+  
+  .size-small {
+    min-height: 44px;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .actionButton,
+  .glow::before {
+    transition: none !important;
+  }
+  
+  .pulse {
+    animation: none !important;
+  }
+}
+
+/* Mobile optimizations for better text fit */
+@media (max-width: 480px) {
+  .size-small {
+    padding: 0.5em 0.8em; /* Reduced horizontal padding */
+  }
+  
+  .size-medium {
+    padding: 0.6em 1.2em; /* Balanced padding without icons */
+  }
+  
+  .size-large {
+    padding: 0.7em 1.2em; /* Reduced from 1.8em */
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .actionButton {
+    border-width: 2px;
+    font-weight: 700;
+  }
+  
+  .glow::before {
+    display: none;
+  }
+}
+
+/* Print styles */
+@media print {
+  .actionButton {
+    background: none !important;
+    color: black !important;
+    border: 2px solid black !important;
+  }
+}

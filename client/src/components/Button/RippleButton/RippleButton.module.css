@@ -1,0 +1,288 @@
+/* RippleButton.module.css - State-of-the-Art 2025 Ripple Effects */
+@import '../button-tokens.css';
+
+/* Base ripple container */
+.rippleButton {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* Ripple effect base */
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  transform: scale(0);
+  animation: rippleEffect 600ms ease-out;
+  background-color: color-mix(in srgb, white var(--a-70), transparent);
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+@keyframes rippleEffect {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+/* Enhanced button effects */
+.enhanced {
+  --button-hover-y: -3px;
+  --button-hover-scale: 1.02;
+  --button-transition-duration: 280ms;
+  --button-transition-easing: cubic-bezier(0.34, 1.56, 0.64, 1);
+  
+  transition: 
+    transform var(--button-transition-duration) var(--button-transition-easing),
+    box-shadow var(--button-transition-duration) var(--button-transition-easing),
+    background-color var(--button-transition-duration) ease,
+    border-color var(--button-transition-duration) ease,
+    filter var(--button-transition-duration) ease;
+  
+  will-change: transform, box-shadow;
+  contain: layout style;
+}
+
+/* Enhanced hover states */
+.enhanced:hover:not(:disabled) {
+  transform: translateY(var(--button-hover-y)) scale(var(--button-hover-scale));
+}
+
+/* Glow effects */
+.glow {
+  position: relative;
+}
+
+.glow::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: var(--glow-gradient, linear-gradient(45deg, var(--gold-base), var(--gold-light), var(--gold-base)));
+  border-radius: inherit;
+  opacity: 0;
+  filter: blur(12px);
+  transition: opacity 480ms ease;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.glow:hover::before {
+  opacity: 0.6;
+}
+
+.glow:active::before {
+  opacity: 0.8;
+}
+
+/* Loading state */
+.loading {
+  position: relative;
+  color: transparent; /* Enhanced specificity ensures loading state text invisibility */
+  pointer-events: none;
+}
+
+.loadingSpinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  border: 2px solid color-mix(in srgb, white var(--a-30), transparent);
+  border-top-color: color-mix(in srgb, white var(--a-90), transparent);
+  border-radius: 50%;
+  animation: spin 800ms linear infinite;
+  will-change: transform;
+}
+
+@keyframes spin {
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+/* Cosmic theme removed - not used in Agora Cosmica standard */
+
+/* Theme: Nature (Freetalk Mode) */
+.nature {
+  --glow-gradient: linear-gradient(
+    135deg,
+    var(--mint-deep) 0%,
+    var(--mint-base) 50%,
+    var(--mint-light) 100%
+  );
+}
+
+.nature.enhanced {
+  background-image: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--mode-freetalk) var(--a-10), transparent),
+    color-mix(in srgb, var(--mode-freetalk-hover) var(--a-05), transparent)
+  );
+}
+
+.nature .ripple {
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--mode-freetalk) var(--a-80), transparent),
+    color-mix(in srgb, var(--mode-freetalk-hover) var(--a-40), transparent)
+  );
+}
+
+/* Theme: Ocean (Primary Mode) */
+.ocean {
+  --glow-gradient: linear-gradient(
+    135deg,
+    var(--primary-deep) 0%,
+    var(--primary-base) 50%,
+    var(--primary-light) 100%
+  );
+}
+
+.ocean.enhanced {
+  background-image: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--bg-primary) var(--a-10), transparent),
+    color-mix(in srgb, var(--bg-highlight) var(--a-05), transparent)
+  );
+}
+
+.ocean .ripple {
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--bg-primary) var(--a-80), transparent),
+    color-mix(in srgb, var(--bg-highlight) var(--a-40), transparent)
+  );
+}
+
+/* Theme: Quest (Coral Mode) */
+.quest {
+  --glow-gradient: linear-gradient(
+    135deg,
+    var(--coral-deep) 0%,
+    var(--coral-base) 50%,
+    var(--coral-light) 100%
+  );
+}
+
+.quest.enhanced {
+  background-image: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--mode-quest) var(--a-10), transparent),
+    color-mix(in srgb, var(--mode-quest-hover) var(--a-05), transparent)
+  );
+}
+
+.quest .ripple {
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--mode-quest) var(--a-80), transparent),
+    color-mix(in srgb, var(--mode-quest-hover) var(--a-40), transparent)
+  );
+}
+
+/* Advanced shadow effects */
+.enhanced {
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 0 color-mix(in srgb, white var(--a-10), transparent);
+}
+
+.enhanced:hover:not(:disabled) {
+  box-shadow: 
+    0 20px 25px -5px rgba(0, 0, 0, 0.15),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04),
+    0 0 0 1px color-mix(in srgb, white var(--a-10), transparent),
+    inset 0 1px 0 0 color-mix(in srgb, white var(--a-20), transparent);
+}
+
+.enhanced:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06),
+    inset 0 2px 4px 0 color-mix(in srgb, black var(--a-10), transparent);
+}
+
+/* Disabled state enhancements */
+.enhanced:disabled {
+  filter: grayscale(0.5) opacity(0.6);
+  transform: none;
+}
+
+/* Focus visible enhancements */
+.enhanced:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--mode-wisdom) var(--a-50), transparent);
+  outline-offset: 3px;
+  box-shadow: 
+    0 20px 25px -5px rgba(0, 0, 0, 0.15),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04),
+    0 0 0 1px color-mix(in srgb, white var(--a-10), transparent),
+    0 0 0 4px color-mix(in srgb, var(--mode-wisdom) var(--a-20), transparent);
+}
+
+/* Pulse animation for CTAs */
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 
+      0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+  50% {
+    transform: scale(1.02);
+    box-shadow: 
+      0 20px 25px -5px rgba(0, 0, 0, 0.15),
+      0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+}
+
+.pulse {
+  animation: pulse 2s ease-in-out infinite;
+  animation-play-state: paused;
+}
+
+.pulse:hover,
+.pulse:focus-visible {
+  animation-play-state: running;
+}
+
+/* Responsive adjustments */
+@media (prefers-reduced-motion: reduce) {
+  .ripple,
+  .enhanced,
+  .loadingSpinner,
+  .pulse {
+    animation: none !important;
+    transition: none !important;
+  }
+  
+  .enhanced:hover:not(:disabled) {
+    transform: none;
+  }
+}
+
+/* Container query support */
+@container (max-width: 300px) {
+  .loadingSpinner {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .enhanced {
+    border: 2px solid currentColor;
+  }
+  
+  .enhanced:hover:not(:disabled) {
+    border-color: Highlight;
+  }
+  
+  .enhanced:focus-visible {
+    outline: 3px solid Highlight;
+  }
+}

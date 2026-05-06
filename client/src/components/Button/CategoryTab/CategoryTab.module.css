@@ -1,0 +1,199 @@
+/* CategoryTab.module.css - STANDARD CATEGORY BUTTON
+ * 
+ * DESIGN STANDARD: Minimal elegance, unified with ActionButton
+ * - Golden fine border for category recognition  
+ * - Single-color glow effects (no gradients/multicolor)
+ * - Consistent interaction patterns with ActionButton
+ * - Clean, readable typography
+ * - Pure palette compliance with CSS custom properties
+ */
+@import '../button-tokens.css';
+
+.categoryTab {
+  /* Layout - Standard button foundation */
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px; /* ✅ Accessibility: Ensure 44px minimum touch target */
+  padding: 0 20px;
+  
+  /* Visual Design - Clean and minimal */
+  background: color-mix(in srgb, white var(--a-02), transparent);
+  border: 1px solid color-mix(in srgb, var(--gold-base), transparent 80%); /* Fine golden border */
+  border-radius: 12px;
+  backdrop-filter: blur(var(--glass-blur-light));
+  -webkit-backdrop-filter: blur(var(--glass-blur-light));
+  
+  /* Typography - Consistent with ActionButton */
+  font-family: 'Space Grotesk', var(--font-primary, sans-serif);
+  font-size: clamp(0.875rem, 0.875rem + 0.5vw, 1.1875rem); /* 14px to 19px - responsive for all screens */
+  font-weight: 450;
+  letter-spacing: 0.02em;
+  color: color-mix(in srgb, white var(--a-75), transparent);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  
+  /* Interaction */
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  
+  /* Unified glow effect - matches ActionButton pattern */
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  
+  /* Performance */
+  will-change: transform, filter;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Hover on idle tab: subtle border brighten only. No bg fill, no glow — the
+   gold fill is reserved for the selected state and must not be previewed on
+   hover, or it reads as "already selected". */
+.categoryTab:hover:not(.active):not(.questActive):not(.wisdomActive) {
+  border-color: color-mix(in srgb, var(--gold-base) var(--a-40), transparent);
+  color: var(--text-primary);
+}
+
+/* Hover on the active tab: no brightening, no extra glow — the selection
+   is already communicated; extra hover affordance is noise. */
+.categoryTab.active:hover {
+  /* intentionally empty — keep the active appearance on hover */
+}
+
+/* Active state - Matches ActionButton default gold for consistency */
+.active {
+  background: var(--gold-subtle); /* Same as ActionButton default */
+  border-color: var(--gold-subtle);
+  color: var(--bg-card); /* Deep blue text for perfect contrast on gold */
+  font-weight: 550;
+  
+  /* Stronger glow for active state - matches ActionButton */
+  filter: drop-shadow(0 0 clamp(12px, 1.5vw, 20px) color-mix(in srgb, var(--gold-subtle) var(--a-50), transparent));
+}
+
+/* Quest mode variant - Orange with deep blue text */
+.questActive {
+  background: var(--mode-quest);
+  border-color: var(--mode-quest-hover);
+  color: var(--bg-card); /* Deep blue text for contrast */
+  font-weight: 550;
+  filter: drop-shadow(0 0 clamp(12px, 1.5vw, 20px) color-mix(in srgb, var(--mode-quest) var(--a-50), transparent));
+}
+
+/* Quest mode hover - no extra affordance, selection already communicated */
+.categoryTab.questActive:hover {
+  /* intentionally empty */
+}
+
+/* Wisdom mode variant - Purple with light text */
+.wisdomActive {
+  background: var(--mode-wisdom);
+  border-color: var(--mode-wisdom-hover);
+  color: var(--text-primary);
+  font-weight: 550;
+  filter: drop-shadow(0 0 clamp(12px, 1.5vw, 20px) color-mix(in srgb, var(--mode-wisdom) var(--a-50), transparent));
+}
+
+/* Wisdom mode hover - no extra affordance, selection already communicated */
+.categoryTab.wisdomActive:hover {
+  /* intentionally empty */
+}
+
+/* Press state - Tactile feedback */
+.categoryTab:active:not(:disabled) {
+  transform: scale(0.98);
+  transition-duration: 0.1s;
+}
+
+/* Focus state - Accessibility */
+.categoryTab:focus-visible {
+  outline: 2px solid var(--gold-subtle);
+  outline-offset: 2px;
+}
+
+/* Disabled state */
+.categoryTab:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+  filter: none;
+}
+
+/* Responsive - Mobile optimization */
+@media (max-width: 768px) {
+  .categoryTab {
+    min-height: 44px; /* ✅ Accessibility: Maintain 44px touch target on mobile */
+    padding: 0 16px;
+    font-size: 13px;
+    border-radius: 10px;
+  }
+}
+
+/* Large screens */
+@media (min-width: 1024px) {
+  .categoryTab {
+    min-height: 44px;
+    padding: 0 24px;
+    font-size: 15px;
+  }
+}
+
+/* Touch optimization */
+@media (hover: none) and (pointer: coarse) {
+  .categoryTab {
+    min-height: 44px; /* iOS touch target */
+  }
+  
+  /* Touch devices: no phantom hover state at all — the selected state
+     carries the whole signal. */
+  .categoryTab:hover:not(.active):not(.questActive):not(.wisdomActive) {
+    background: transparent;
+    border-color: color-mix(in srgb, var(--gold-base), transparent 80%);
+    color: inherit;
+    transform: none;
+    filter: none;
+  }
+  
+  /* Active hover states should also be disabled on touch */
+  .categoryTab.active:hover,
+  .categoryTab.questActive:hover,
+  .categoryTab.wisdomActive:hover {
+    transform: none;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .categoryTab {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* Mobile optimizations for better text fit */
+@media (max-width: 480px) {
+  .categoryTab {
+    padding: 0 18px; /* Optimized for text-only display */
+    font-size: clamp(0.8125rem, 0.8125rem + 0.5vw, 1.1875rem); /* Start even smaller at 13px */
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .categoryTab {
+    border: 2px solid ButtonText;
+    background: ButtonFace;
+    color: ButtonText;
+    filter: none;
+  }
+  
+  .active {
+    background: Highlight;
+    color: HighlightText;
+    border-color: Highlight;
+  }
+}

@@ -1,0 +1,100 @@
+/**
+ * OptimizedImage Component Styles
+ * 
+ * Modern optimized image handling with progressive loading effects
+ * and responsive display handling.
+ */
+
+.optimized-image {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: transparent; /* Prevent white flash during loading */
+}
+
+/* Placeholder blur-up effect */
+.optimized-image__placeholder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  filter: blur(20px);
+  transform: scale(1.1); /* Slightly larger to cover blur edges */
+  opacity: 0; /* Hide placeholder */
+  object-fit: cover;
+  z-index: var(--z-base); /* 1 */
+}
+
+/* Main image styling */
+.optimized-image__img {
+  width: 100%;
+  height: 100%;
+  opacity: 1; /* Always visible */
+  position: relative;
+  z-index: var(--z-base); /* 2 */
+
+  /* 2025 ARCHITECTURE: Parent components control display strategy (object-fit)
+   * OptimizedImage only handles loading, formats, and progressive enhancement
+   * This prevents specificity wars and keeps concerns separated */
+}
+
+/* Loading state */
+.optimized-image::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--gold-subtle) 5%, transparent), /* Changed to gold color to match theme */
+    transparent
+  );
+  background-size: 200% 100%;
+  /* Animation is added only when needed via the not-loaded state */
+  z-index: var(--z-base); /* 0 */
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* Show shimmer when image is not loaded */
+.optimized-image:not(.optimized-image--loaded)::before {
+  opacity: 1;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Missing image state */
+.optimized-image--missing {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 1rem;
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  border-radius: 8px;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .optimized-image__placeholder,
+  .optimized-image__img {
+    transition: none;
+  }
+  
+  .optimized-image::before {
+    animation: none;
+  }
+}

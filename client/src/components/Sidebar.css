@@ -1,0 +1,1267 @@
+/* Sidebar.css - Cleaned and Optimized with Liquid Glass Integration */
+
+/* Import liquid glass system */
+@import url('../styles/liquid-glass.css');
+
+/* Base Variables */
+:root {
+  /* Core Colors */
+  --primary-color: var(--bg-card);
+  --frame-color: var(--gold-primary);
+  /* --gold-hover already defined in design system */
+  /* --gold-active already defined in design system */
+  --text-color: var(--text-secondary);
+  
+  /* Transitions */
+  --menu-transition: 0.3s ease-in-out;
+  --button-transition: 0.2s ease;
+  
+  /* Spacing */
+  --spacing: 20px;
+  
+  /* Button shadows */
+  --button-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.3),
+    0 2px 4px rgba(0, 0, 0, 0.2);
+  --button-hover-shadow:
+    0 6px 15px color-mix(in srgb, var(--gold-primary) var(--a-40), transparent),
+    0 0 20px color-mix(in srgb, var(--gold-primary) var(--a-20), transparent),
+    0 0 0 2px color-mix(in srgb, var(--gold-primary) 10%, transparent);
+  --button-active-glow:
+    0 0 15px color-mix(in srgb, var(--gold-primary) var(--a-50), transparent),
+    0 0 30px color-mix(in srgb, var(--gold-primary) var(--a-30), transparent);
+  
+  /* Sidebar widths */
+  --sidebar-width-desktop: 300px;
+  --sidebar-width-tablet: 400px;
+  --sidebar-width-mobile: 92%;
+  
+  /* Dynamic button sizing system */
+  --button-base-size: 125px;
+  --figure-button-scale: 1.333; /* Perfect Fourth (4:3) musical ratio */
+  --figure-button-size: calc(var(--button-base-size) * var(--figure-button-scale));
+  
+  /* Dynamic spacing based on available height */
+  --available-height: calc(100vh - 60px);
+  --total-buttons: 5;
+  --total-button-height: calc(var(--figure-button-size) + (var(--button-base-size) * 4));
+  --remaining-height: calc(var(--available-height) - var(--total-button-height) - 40px);
+  --dynamic-spacing: max(12px, calc(var(--remaining-height) / 8));
+  
+  /* Typography */
+  --label-font-size: 0.9rem;
+  --label-font-size-mobile: 0.85rem;
+  --label-font-size-tablet: 0.95rem;
+  
+  /* Frame properties */
+  --frame-border: 2px;
+  --frame-radius: 15px;
+  
+  /* Mobile header */
+  --mobile-header-height: 60px;
+}
+
+/* Base Sidebar Styles */
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--text-color);
+  font-family: var(--body-font);
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--sidebar-width-desktop);
+  z-index: var(--z-sticky); /* 200 */
+  overflow: hidden;
+}
+
+/* Desktop sidebar - no transitions */
+.sidebar.desktop {
+  /* No transitions on desktop */
+}
+
+/* Desktop sidebar - NO liquid glass, seamless integration */
+.sidebar.desktop {
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: none;
+  box-shadow: none;
+}
+
+/* Remove liquid glass from desktop completely */
+.sidebar.desktop.liquid-glass-container {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Battery optimization */
+.sidebar[data-visibility="hidden"] .cosmic-particle,
+.sidebar[data-visibility="hidden"] .content-container::before,
+.sidebar[data-visibility="hidden"] .content-container::after,
+.sidebar[data-visibility="hidden"] .sidebar-header .nav-button-container::after {
+  animation-play-state: paused;
+}
+
+/* Hide sidebar on desktop when figure carousel is open */
+.sidebar.desktop.hide-on-desktop {
+  transform: translateX(-100%);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  /* No transitions on desktop */
+}
+
+/* Ensure smooth re-entry */
+.sidebar.desktop:not(.hide-on-desktop) {
+  transform: translateX(0);
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+/* Content Container */
+.content-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 40px 30px 20px 30px;
+  box-sizing: border-box;
+  position: relative;
+  z-index: var(--z-base); /* 1 */
+  gap: var(--dynamic-spacing);
+}
+
+/* Remove liquid glass from desktop content container */
+.sidebar.desktop .content-container {
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-radius: 0;
+  box-shadow: none;
+  border: none;
+}
+
+/* Enhanced cosmic container for mobile/tablet */
+.sidebar.mobile .content-container::before {
+  content: '';
+  position: absolute;
+  top: 15%;
+  right: -30%;
+  width: 70%;
+  height: 70%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--bg-highlight) 20%, transparent) 0%, transparent 70%);
+  opacity: 0.7;
+  border-radius: 50%;
+  filter: blur(20px);
+  animation: cosmic-pulse 10s infinite alternate ease-in-out;
+  animation-play-state: paused;
+  z-index: -1;
+}
+
+.sidebar.mobile .content-container::after {
+  content: '';
+  position: absolute;
+  bottom: 20%;
+  left: -20%;
+  width: 50%;
+  height: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--gold-primary) 15%, transparent) 0%, transparent 70%);
+  opacity: 0.5;
+  border-radius: 50%;
+  filter: blur(30px);
+  animation: cosmic-pulse 15s infinite alternate-reverse ease-in-out;
+  animation-play-state: paused;
+  z-index: -1;
+}
+
+/* Play cosmic effects when sidebar is open and visible */
+.sidebar.mobile.open[data-visibility="visible"] .content-container::before,
+.sidebar.mobile.open[data-visibility="visible"] .content-container::after {
+  animation-play-state: running;
+}
+
+@keyframes cosmic-pulse {
+  0% { transform: scale(0.8); opacity: 0.3; }
+  50% { transform: scale(1.1); opacity: 0.5; }
+  100% { transform: scale(0.9); opacity: 0.4; }
+}
+
+/* Sidebar Header */
+.sidebar-header {
+  flex-shrink: 0;
+  margin-bottom: calc(var(--dynamic-spacing) * 1.618);
+}
+
+.sidebar-header .nav-button-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  position: relative;
+}
+
+.sidebar-header .nav-button {
+  width: var(--figure-button-size);
+  height: var(--figure-button-size);
+}
+
+.sidebar-header .button-frame {
+  border-width: 3px;
+  background: linear-gradient(165deg, color-mix(in srgb, var(--bg-astral) 80%, transparent) 0%, color-mix(in srgb, var(--bg-cosmic-void) 80%, transparent) 100%);
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.4),
+    0 0 20px color-mix(in srgb, var(--gold-primary) var(--a-15), transparent);
+}
+
+/* Refined ambient glow behind figure */
+.sidebar-header .nav-button-container::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 200px;
+  height: 200px;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, color-mix(in srgb, var(--gold-primary) 10%, transparent) 0%, transparent 70%);
+  z-index: -1;
+  pointer-events: none;
+  animation: subtle-pulse 5s infinite ease-in-out alternate;
+  animation-play-state: paused;
+}
+
+/* Play ambient glow on hover */
+.sidebar:hover .sidebar-header .nav-button-container::after,
+.sidebar-header .nav-button-container:hover::after {
+  animation-play-state: running;
+}
+
+@keyframes subtle-pulse {
+  0% { opacity: 0.08; }
+  100% { opacity: 0.2; }
+}
+
+/* 2025 DISCOVERABILITY: Pulse hint for new users */
+@keyframes discoverability-pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--gold-primary) var(--a-70), transparent);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px 8px color-mix(in srgb, var(--gold-primary) var(--a-40), transparent);
+  }
+}
+
+/* Apply pulse to figure button for first-time users - clean, no tooltip */
+.nav-button.figure-preview-container.pulse-hint {
+  animation: discoverability-pulse 2s ease-in-out 3; /* Pulse 3 times, then done */
+}
+
+/* Navigation Grid */
+.navigation-grid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--dynamic-spacing);
+  flex: 1;
+  justify-content: space-between;
+  position: relative;
+  width: 100%;
+  padding: var(--dynamic-spacing) 0;
+}
+
+/* Navigation labels container */
+.nav-button-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  position: relative;
+  width: 100%;
+  justify-content: center;
+}
+
+/* Button labels */
+.nav-button-label {
+  position: absolute;
+  left: calc(50% + var(--button-base-size) / 2 + 16px);
+  font-family: var(--heading-font);
+  font-size: var(--label-font-size);
+  color: var(--text-color);
+  letter-spacing: 0.1em;
+  opacity: 0.85;
+  transition: opacity 0.3s ease, transform 0.3s ease, color 0.3s ease;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  text-transform: uppercase;
+  text-shadow: 0 0 10px color-mix(in srgb, var(--bg-card) var(--a-40), transparent);
+  white-space: nowrap;
+}
+
+/* Enhanced contrast for liquid glass - ULTRATHINK 2025: Golden for maximum visibility */
+.sidebar.mobile .nav-button-label {
+  color: var(--gold-primary); /* Golden for better contrast against liquid glass */
+  opacity: 1; /* Full opacity for maximum readability */
+  font-weight: 600; /* Bold for small screens */
+  text-shadow: 0 2px 4px color-mix(in srgb, black var(--a-60), transparent), /* Dark shadow for depth */
+               0 0 12px color-mix(in srgb, var(--gold-primary) var(--a-40), transparent); /* Golden glow */
+}
+
+/* Hover state maintains golden accent */
+.sidebar.mobile .nav-button-container:hover .nav-button-label {
+  color: var(--frame-color);
+  opacity: 1;
+  text-shadow: 0 0 15px color-mix(in srgb, var(--gold-primary) var(--a-40), transparent), 
+               0 0 20px color-mix(in srgb, var(--gold-primary) var(--a-20), transparent);
+}
+
+/* When liquid glass is disabled, use standard colors */
+.sidebar.mobile.liquid-glass--disabled .nav-button-label {
+  color: var(--text-color);
+  text-shadow: 0 0 10px color-mix(in srgb, var(--bg-card) var(--a-40), transparent); /* Original shadow */
+}
+
+/* Adjust label position for figure button */
+.sidebar-header .nav-button-label {
+  left: calc(50% + var(--figure-button-size) / 2 + 16px);
+}
+
+.nav-button-container:hover .nav-button-label {
+  opacity: 1;
+  transform: rotate(180deg) translateX(-2px);
+  color: var(--frame-color);
+  text-shadow: 0 0 15px color-mix(in srgb, var(--gold-primary) var(--a-40), transparent), 0 0 20px color-mix(in srgb, var(--gold-primary) var(--a-20), transparent);
+}
+
+/* Standard Navigation Buttons */
+.nav-button {
+  width: var(--button-base-size);
+  height: var(--button-base-size);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: all var(--menu-transition);
+  position: relative;
+  perspective: 800px;
+  transform-style: preserve-3d;
+}
+
+/* Focus styles */
+.nav-button:focus-visible {
+  outline: none;
+  position: relative;
+}
+
+.nav-button:focus-visible::after {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  border-radius: var(--frame-radius);
+  background: transparent;
+  border: 2px solid var(--frame-color);
+  box-shadow: 0 0 15px var(--frame-color);
+  animation: focus-pulse 1.5s infinite;
+  pointer-events: none;
+}
+
+@keyframes focus-pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+/* Button Frame Styles */
+.button-frame {
+  width: 100%;
+  height: 100%;
+  border: 2px solid var(--frame-color);
+  border-radius: var(--frame-radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary-color);
+  backdrop-filter: blur(var(--glass-blur));
+  box-shadow: var(--button-shadow);
+  overflow: hidden; /* Clip content to frame boundaries */
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  transform-style: preserve-3d;
+  transform: translateZ(0);
+  padding: 0; /* Ensure no internal padding */
+}
+
+/* Desktop buttons - solid backgrounds, no liquid glass */
+.sidebar.desktop .button-frame {
+  background: var(--primary-color);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: 2px solid var(--frame-color);
+  box-shadow: var(--button-shadow);
+}
+
+/* Enhanced golden star-like glow effect for buttons */
+.nav-button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 140px;
+  height: 140px;
+  transform: translate(-50%, -50%) scale(0.8);
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--gold-primary) 30%, transparent) 0%,
+    color-mix(in srgb, var(--gold-primary) 15%, transparent) 30%,
+    color-mix(in srgb, var(--gold-primary) 8%, transparent) 60%,
+    transparent 80%
+  );
+  opacity: 0;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+  pointer-events: none;
+  filter: blur(3px);
+}
+
+/* Unified Button Icon & Image Styles */
+.button-icon {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: calc(var(--frame-radius) - 3px); /* Simplified to avoid gaps */
+  transition: transform var(--button-transition), filter 0.3s ease;
+  position: relative;
+  z-index: var(--z-base); /* 3 */
+  filter: brightness(0.95);
+  will-change: transform;
+  /* Remove scale transform to prevent off-center positioning */
+  transform: none;
+  overflow: hidden; /* Ensure content doesn't leak */
+}
+
+/* For figure images (thumbnails) - ensure proper filling */
+.button-icon.main-figure-image {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
+
+/* Target the actual img inside figure buttons */
+.button-icon.main-figure-image .optimized-image__img {
+  object-fit: cover;
+  object-position: center;
+  position: static; /* Override position: relative from OptimizedImage.css */
+  display: block; /* Ensure block display */
+  width: 100%;
+  height: 100%;
+}
+
+/* For UI icons (paths, settings, etc.) - slightly smaller for visual balance */
+.nav-button:not(.figure-preview-container) .button-icon {
+  transform: scale(0.94); /* Increased slightly for better visual centering */
+}
+
+/* Fix icon image positioning */
+.nav-button:not(.figure-preview-container) .optimized-image__img {
+  position: static; /* Override position: relative */
+  display: block;
+}
+
+/* Hover effect for figure images */
+.nav-button.figure-preview-container:hover .button-icon {
+  transform: scale(1.05);
+  filter: brightness(1.08);
+}
+
+/* Hover effect for UI icons */
+.nav-button:not(.figure-preview-container):hover .button-icon {
+  transform: scale(0.98); /* Adjusted proportionally to new base scale */
+  filter: brightness(1.08);
+}
+
+/* Phosphor icon styling for sidebar buttons (e.g. Wisdom) */
+.phosphor-sidebar-icon {
+  color: var(--gold-subtle);
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--gold-subtle) 30%, transparent));
+  transition: filter 0.3s ease, transform 0.3s ease;
+}
+
+.phosphor-sidebar-icon.hover {
+  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--gold-subtle) 50%, transparent)) brightness(1.1);
+}
+
+/* Ensure child images scale properly */
+.button-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Ensure OptimizedImage wrapper fills button properly */
+.button-icon.optimized-image {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent; /* Override default background */
+}
+
+/* Fix picture element default spacing */
+.button-icon picture {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0; /* Remove any line-height gaps */
+}
+
+/* Hover Effects */
+.nav-button:hover {
+  transform: translateY(-2px) scale(1.02);
+}
+
+.nav-button:hover::before {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1.2);
+  animation: star-pulse 2s infinite alternate ease-in-out;
+  animation-play-state: running;
+}
+
+@keyframes star-pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(1.1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.3);
+    opacity: 0.9;
+  }
+}
+
+.nav-button:hover .button-frame {
+  border-color: var(--gold-hover);
+  box-shadow: 
+    0 0 15px color-mix(in srgb, var(--gold-primary) var(--a-40), transparent),
+    0 0 30px color-mix(in srgb, var(--gold-primary) var(--a-20), transparent),
+    0 4px 6px color-mix(in srgb, black var(--a-10), transparent);
+  background: var(--primary-color);
+}
+
+/* Desktop hover - no liquid glass */
+.sidebar.desktop .nav-button:hover .button-frame {
+  background: var(--primary-color);
+  border-color: var(--gold-hover);
+  box-shadow: var(--button-hover-shadow);
+}
+
+/* Removed - now handled by unified hover effect above */
+
+/* Active state with enhanced touch feedback - 2025 DISCOVERABILITY */
+.nav-button:active {
+  transform: translateY(1px) scale(0.95); /* More pronounced scale for better feedback */
+  transition: transform 0.1s ease;
+}
+
+.nav-button:active .button-frame {
+  border-color: var(--gold-active);
+  box-shadow:
+    0 0 20px color-mix(in srgb, var(--gold-primary) var(--a-50), transparent),
+    0 0 40px color-mix(in srgb, var(--gold-primary) var(--a-30), transparent);
+  transition: all 0.1s ease;
+}
+
+/* Touch-specific feedback for mobile (hover doesn't work on touch) */
+@media (hover: none) and (pointer: coarse) {
+  .nav-button:active {
+    transform: scale(0.92); /* Even more pronounced on touch devices */
+  }
+
+  .nav-button:active .button-frame {
+    box-shadow:
+      0 0 25px color-mix(in srgb, var(--gold-primary) var(--a-60), transparent),
+      0 0 45px color-mix(in srgb, var(--gold-primary) var(--a-40), transparent);
+  }
+}
+
+/* Figure Preview Styles */
+.figure-preview-container {
+  position: relative;
+  overflow: visible;
+}
+
+.main-figure-image {
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+  backface-visibility: hidden;
+}
+
+.figure-preview-container:hover .main-figure-image {
+  transform: scale(0.95);
+  filter: brightness(0.9);
+}
+
+.preview-figure {
+  position: absolute;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid var(--frame-color);
+  box-shadow: 0 3px 8px color-mix(in srgb, black var(--a-30), transparent), 0 0 15px color-mix(in srgb, var(--gold-primary) var(--a-30), transparent);
+  opacity: 1;
+  transform: scale(1);
+  z-index: var(--z-base); /* 10 */
+  transition: none;
+  background: var(--primary-color);
+}
+
+.preview-figure-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Position each preview figure */
+.preview-position-0 {
+  top: 5%;
+  right: -8%;
+  transition-delay: 0.05s;
+}
+
+.preview-position-1 {
+  bottom: 5%;
+  right: 20%;
+  transition-delay: 0.1s;
+}
+
+.preview-position-2 {
+  bottom: 5%;
+  left: -8%;
+  transition-delay: 0.15s;
+}
+
+/* Adjust positions for smaller screens */
+@media (max-width: 1366px) {
+  .preview-position-0 {
+    right: -5%;
+  }
+  
+  .preview-position-2 {
+    left: -5%;
+  }
+}
+
+/* Preview hover animation */
+.figure-preview-container:hover .preview-position-0 {
+  transform: scale(1) translateY(-5px) translateX(-5px);
+}
+
+.figure-preview-container:hover .preview-position-1 {
+  transform: scale(1) translateY(8px);
+}
+
+.figure-preview-container:hover .preview-position-2 {
+  transform: scale(1) translateY(-5px) translateX(5px);
+}
+
+/* Individual preview figure hover */
+.preview-figure:hover {
+  transform: scale(1.15);
+  z-index: var(--z-base); /* 11 */
+  border-color: var(--gold-hover);
+  box-shadow: 
+    0 0 15px color-mix(in srgb, var(--gold-primary) var(--a-40), transparent),
+    0 0 25px color-mix(in srgb, var(--gold-primary) var(--a-20), transparent),
+    0 4px 8px color-mix(in srgb, black var(--a-20), transparent);
+}
+
+/* Navigation Button Labels - Enhanced for readability */
+.nav-button-label {
+  display: block;
+  margin-top: 8px;
+  font-size: clamp(0.85rem, 0.8rem + 0.3vw, 0.95rem); /* Responsive: 13.6px → 15.2px */
+  font-weight: 600; /* Increased from default 400 for better contrast */
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  opacity: 0.85; /* Slightly more visible by default */
+  transition: all 0.3s ease;
+  text-align: center;
+  /* Add text shadow for better contrast */
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  /* Ensure readability on mobile */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Hover state for better visibility */
+.nav-button-container:hover .nav-button-label {
+  opacity: 1;
+  font-weight: 700; /* Even bolder on hover */
+  color: var(--gold-primary);
+  text-shadow: 
+    1px 1px 3px rgba(0, 0, 0, 0.7),
+    0 0 10px color-mix(in srgb, var(--gold-primary) var(--a-30), transparent);
+}
+
+/* Active class for the nav-button-label */
+.nav-button-label.active {
+  opacity: 1;
+  color: var(--frame-color);
+  font-weight: 700;
+  text-shadow: 
+    1px 1px 3px rgba(0, 0, 0, 0.7),
+    0 0 15px color-mix(in srgb, var(--gold-primary) var(--a-40), transparent);
+}
+
+/* Mobile-specific label adjustments + shortened text for long labels */
+@media (max-width: 480px) {
+  .nav-button-label {
+    font-size: 0.85rem; /* Slightly smaller on very small screens */
+    font-weight: 700; /* Extra bold for tiny screens */
+  }
+
+  /* 2025 RESPONSIVE LABELS: Language-aware shortened text on small screens */
+  /* Use data attributes to identify which labels to shorten */
+
+  /* Audiolibrary → Stories (universal, works in all languages) */
+  .nav-button-label[data-label="audiolibrary"] {
+    font-size: 0; /* Hide original text */
+  }
+
+  .nav-button-label[data-label="audiolibrary"]::after {
+    content: "Stories"; /* Universal - used in Instagram, TikTok, etc. */
+    font-size: 0.85rem; /* Show shortened text */
+  }
+
+  /* Settings - Language-aware */
+  .nav-button-label[data-label="settings"] {
+    font-size: 0; /* Hide original text */
+  }
+
+  /* English: Keep "Settings" (8 letters = short enough, industry standard) */
+  :lang(en) .nav-button-label[data-label="settings"]::after,
+  .nav-button-label[data-label="settings"]::after {
+    content: "Settings"; /* Default to English */
+    font-size: 0.85rem;
+  }
+
+  /* German: Shorten "Einstellungen" (14 letters) → "Optionen" (8 letters) */
+  :lang(de) .nav-button-label[data-label="settings"]::after {
+    content: "Optionen";
+    font-size: 0.85rem;
+  }
+}
+
+/* Tablet-specific label adjustments */
+@media (min-width: 481px) and (max-width: 1023px) {
+  .nav-button-label {
+    font-size: 0.95rem; /* Comfortable tablet size */
+    font-weight: 600;
+  }
+}
+
+/* Desktop-specific label adjustments */
+@media (min-width: 1024px) {
+  .nav-button-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+}
+
+/* Cosmic Particles */
+.cosmic-particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: var(--z-base); /* 0 */
+}
+
+.cosmic-particle {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: var(--frame-color);
+  border-radius: 50%;
+  opacity: 0;
+  animation: particle-fade var(--animation-duration-cosmic, 12s) ease-out infinite;
+  animation-play-state: paused;
+}
+
+/* Play particles only when sidebar is hovered or has focus */
+.sidebar:hover .cosmic-particle,
+.sidebar:focus-within .cosmic-particle {
+  animation-play-state: running;
+}
+
+/* Enhanced cosmic particles for mobile glass effect */
+.sidebar.mobile .cosmic-particles {
+  opacity: 0.5;
+}
+
+.sidebar.mobile .cosmic-particle {
+  box-shadow: 0 0 3px color-mix(in srgb, var(--gold-primary) var(--a-30), transparent);
+  animation-play-state: paused;
+}
+
+/* Play animations only when sidebar is open and visible */
+.sidebar.mobile.open[data-visibility="visible"] .cosmic-particle {
+  animation-play-state: running;
+}
+
+/* Additional battery optimizations */
+.sidebar[data-visibility="hidden"] .nav-button::before,
+.sidebar[data-visibility="hidden"] .preview-figure,
+.sidebar[data-visibility="hidden"] .cosmic-particles::before,
+.sidebar[data-visibility="hidden"] .cosmic-particles::after {
+  animation-play-state: paused;
+}
+
+/* Pause hover animations on hidden pages */
+.sidebar[data-visibility="hidden"] .nav-button:hover::before {
+  animation: none;
+}
+
+/* Add some stars with different sizes and colors for mobile */
+.sidebar.mobile .cosmic-particles::before,
+.sidebar.mobile .cosmic-particles::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(1px 1px at 25% 15%, color-mix(in srgb, white 80%, transparent), transparent),
+    radial-gradient(1px 1px at 50% 40%, color-mix(in srgb, white 60%, transparent), transparent),
+    radial-gradient(1.5px 1.5px at 75% 75%, color-mix(in srgb, white 70%, transparent), transparent),
+    radial-gradient(2px 2px at 20% 65%, color-mix(in srgb, var(--gold-primary) 70%, transparent), transparent),
+    radial-gradient(2.5px 2.5px at 90% 25%, color-mix(in srgb, var(--gold-primary) 50%, transparent), transparent);
+  opacity: 0.1;
+}
+
+.sidebar.mobile .cosmic-particles::after {
+  background-image: 
+    radial-gradient(1px 1px at 10% 90%, color-mix(in srgb, white 70%, transparent), transparent),
+    radial-gradient(1px 1px at 35% 25%, color-mix(in srgb, white 60%, transparent), transparent),
+    radial-gradient(1.5px 1.5px at 60% 80%, color-mix(in srgb, var(--gold-primary) 60%, transparent), transparent),
+    radial-gradient(2px 2px at 85% 40%, color-mix(in srgb, var(--gold-primary) 60%, transparent), transparent);
+  opacity: 0.07;
+  animation: cosmic-twinkle 8s infinite alternate ease-in-out;
+  animation-play-state: paused;
+}
+
+/* Play twinkle animation when sidebar is open and visible */
+.sidebar.mobile.open[data-visibility="visible"] .cosmic-particles::after {
+  animation-play-state: running;
+}
+
+@keyframes cosmic-twinkle {
+  0% { opacity: 0.04; transform: translateY(-2px); }
+  50% { opacity: 0.1; }
+  100% { opacity: 0.06; transform: translateY(2px); }
+}
+
+@keyframes particle-fade {
+  0% { opacity: 0; transform: translateY(0); }
+  50% { opacity: 0.7; }
+  100% { opacity: 0; transform: translateY(-20px); }
+}
+
+/* Mobile Menu Styles */
+.sidebar.mobile {
+  transform: translateX(-100%);
+  display: none;
+  
+  /* World-class standard: Start from top 0, full height */
+  top: 0;
+  height: 100vh;
+  height: 100dvh; /* Dynamic viewport height for 2025 */
+}
+
+/* Apply transition only after initial render to prevent flash on page load */
+.sidebar.mobile.transition-enabled {
+  transition: transform var(--menu-transition);
+}
+
+/* Liquid glass effect for mobile/tablet sidebar ONLY */
+.sidebar.mobile.liquid-glass {
+  /* Override dark mode to use light glass tint for neutral appearance */
+  --glass-tint-dark: color-mix(in srgb, white 8%, transparent);  /* Same as light tint */
+  --glass-border-dark: color-mix(in srgb, white 15%, transparent);  /* Light border */
+  --glass-highlight-dark: color-mix(in srgb, white 40%, transparent);  /* Light highlight */
+  
+  /* Enhanced shadow for depth when open */
+  box-shadow: 
+    4px 0 24px color-mix(in srgb, black var(--a-30), transparent),
+    2px 0 12px color-mix(in srgb, black var(--a-25), transparent),
+    0 0 40px color-mix(in srgb, black var(--a-20), transparent);
+}
+
+/* Force light tint even in dark mode for the sidebar variant */
+@media (prefers-color-scheme: dark) {
+  .sidebar.mobile.liquid-glass--sidebar {
+    background: color-mix(in srgb, white var(--a-10), transparent) !important;  /* Light glass tint */
+    border-color: color-mix(in srgb, white var(--a-15), transparent) !important;
+  }
+}
+
+/* Remove fallback - let liquid-glass.css handle all fallbacks */
+/* The liquid glass system already includes proper fallbacks */
+
+/* Show and animate when open */
+.sidebar.mobile.open {
+  display: flex;
+  transform: translateX(0);
+}
+
+/* Remove glass effect from mobile content container to avoid double glass */
+.sidebar.mobile .content-container {
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
+  border: none;
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 767px) {
+  :root {
+    --button-base-size: 120px;
+    --figure-button-scale: 1.2;
+    --spacing: 14px;
+  }
+
+  .sidebar.mobile {
+    width: var(--sidebar-width-mobile);
+  }
+  
+  .sidebar.mobile .content-container {
+    padding: 20px 25px;
+  }
+  
+  .nav-button-label {
+    font-size: 0.85rem;
+    margin-left: 18px;
+  }
+  
+  /* Adjust preview figures for mobile */
+  .preview-figure {
+    width: 40px;
+    height: 40px;
+  }
+  
+  /* Button frames maintain their solid backgrounds on mobile */
+  .sidebar.mobile .button-frame {
+    background: var(--primary-color);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+/* Tablet Styles */
+@media (min-width: 768px) and (max-width: 1023px) {
+  :root {
+    --button-base-size: 150px;
+    --figure-button-scale: 1.3;
+    --spacing: 16px;
+  }
+
+  .sidebar.mobile {
+    width: var(--sidebar-width-tablet);
+  }
+  
+  .sidebar.mobile .content-container {
+    padding: 20px 35px;
+  }
+  
+  .nav-button-label {
+    font-size: 0.9rem;
+    margin-left: 14px;
+  }
+  
+  /* Button frames maintain their solid backgrounds on tablet */
+  .sidebar.mobile .button-frame {
+    background: var(--primary-color);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+/* Desktop Styles */
+@media (min-width: 1024px) {
+  .sidebar {
+    width: var(--sidebar-width-desktop);
+    transform: none;
+  }
+}
+
+/* Base desktop styles */
+@media (min-width: 1024px) {
+  :root {
+    --dynamic-spacing: max(12px, calc(var(--remaining-height) / 8));
+  }
+}
+
+/* Desktop viewport-specific refinements */
+@media (min-width: 1280px) and (max-width: 1365px) {
+  :root {
+    --button-base-size: 120px;
+    --dynamic-spacing: max(10px, calc(var(--remaining-height) / 8));
+  }
+}
+
+@media (min-width: 1366px) and (max-width: 1499px) {
+  :root {
+    --button-base-size: 115px;
+    --available-height: calc(100vh - 60px);
+    --dynamic-spacing: max(8px, calc(var(--remaining-height) / 8));
+  }
+}
+
+@media (min-width: 1500px) and (max-width: 1919px) {
+  :root {
+    --button-base-size: 125px;
+    --available-height: calc(100vh - 40px);
+    --dynamic-spacing: max(10px, calc(var(--remaining-height) / 8));
+  }
+}
+
+@media (min-width: 1920px) {
+  :root {
+    --sidebar-width-desktop: 320px;
+    --button-base-size: 130px;
+    --available-height: calc(100vh - 60px);
+  }
+}
+
+@media (min-width: 2560px) {
+  :root {
+    --sidebar-width-desktop: 340px;
+    --button-base-size: 140px;
+    --figure-button-scale: 1.4;
+    --available-height: calc(100vh - 60px);
+  }
+}
+
+/* Height-based Adjustments */
+@media (max-height: 800px) {
+  :root {
+    --button-base-size: 115px;
+    --spacing: 14px;
+  }
+}
+
+@media (max-height: 700px) {
+  :root {
+    --button-base-size: 105px;
+    --spacing: 12px;
+  }
+
+  /* 2025 MOBILE: Keep labels visible - golden + shortened text optimized for discoverability */
+  /* Labels now provide critical navigation context on mobile */
+}
+
+/* Tighten desktop sidebar at very short viewports (e.g. 1280x650 — the
+   1366x768 Windows laptop minus taskbar + browser chrome + bookmarks bar).
+   Scoped to min-width: 1024px so phones and small tablets are untouched. */
+@media (max-height: 670px) and (min-width: 1024px) {
+  :root {
+    --button-base-size: 95px;
+    --figure-button-scale: 1.2;
+    --spacing: 10px;
+  }
+}
+
+@media (max-height: 600px) {
+  :root {
+    --button-base-size: 95px;
+    --figure-button-scale: 1.2;
+    --spacing: 10px;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+  
+  .nav-button:hover,
+  .nav-button:active,
+  .button-frame,
+  .button-icon {
+    transform: none !important;
+  }
+  
+  .nav-button::before,
+  .sidebar::before,
+  .sidebar-header::after {
+    display: none;
+  }
+  
+  .preview-figure {
+    transition: none !important;
+  }
+}
+
+/* High Contrast Mode */
+@media (forced-colors: active) {
+  .button-frame {
+    border: 2px solid ButtonText;
+  }
+  
+  .nav-button-label {
+    color: ButtonText;
+  }
+  
+  .nav-button:focus-visible::after {
+    border: 2px solid Highlight;
+    box-shadow: none;
+  }
+}
+
+/* ===== COSMIC COUNCIL MODE ===== */
+
+.council-mode-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  gap: 12px;
+  padding: 12px;
+}
+
+.council-title-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  height: 100%;
+}
+
+.council-title-icon-large {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 12px color-mix(in srgb, var(--gold-primary) var(--a-60), transparent));
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.council-title-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--frame-color);
+  text-align: center;
+  line-height: 1.2;
+  text-shadow: 0 0 8px color-mix(in srgb, var(--gold-primary) var(--a-40), transparent);
+  max-width: 90%;
+  word-wrap: break-word;
+}
+
+/* Hover effect for the icon */
+.nav-button:hover .council-title-icon-large {
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 16px color-mix(in srgb, var(--gold-hover) var(--a-70), transparent));
+}
+
+/* Legacy styles for backwards compatibility */
+.council-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--frame-color);
+  text-align: center;
+  line-height: 1.2;
+  margin-bottom: 8px;
+  text-shadow: 0 0 8px color-mix(in srgb, var(--gold-primary) var(--a-40), transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.council-title-icon {
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--gold-primary) var(--a-40), transparent));
+}
+
+.council-image {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  border-radius: 8px;
+  filter: drop-shadow(0 4px 8px color-mix(in srgb, black var(--a-30), transparent));
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.nav-button:hover .council-image {
+  transform: scale(1.05);
+  filter: drop-shadow(0 6px 12px color-mix(in srgb, var(--gold-primary) var(--a-40), transparent));
+}
+
+/* Responsive adjustments for council mode */
+@media (max-width: 1024px) {
+  .council-title-icon-large {
+    width: 56px;
+    height: 56px;
+  }
+  
+  .council-title-text {
+    font-size: 12px;
+  }
+  
+  .council-title-container {
+    gap: 10px;
+  }
+  
+  /* Legacy responsive */
+  .council-title {
+    font-size: 12px;
+  }
+  
+  .council-image {
+    width: 70px;
+    height: 70px;
+  }
+}
+
+@media (max-width: 768px) {
+  .council-title-icon-large {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .council-title-text {
+    font-size: 11px;
+  }
+  
+  .council-title-container {
+    gap: 8px;
+  }
+  
+  /* Legacy responsive */
+  .council-title {
+    font-size: 11px;
+  }
+  
+  .council-image {
+    width: 60px;
+    height: 60px;
+  }
+}

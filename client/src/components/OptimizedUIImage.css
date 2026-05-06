@@ -1,0 +1,80 @@
+/**
+ * OptimizedUIImage Component Styles
+ * 
+ * Styling for the UI image optimization component.
+ */
+
+/* Base container */
+.optimized-ui-image {
+  position: relative;
+  display: inline-block;
+  line-height: 0;
+}
+
+/* Image styles */
+.optimized-ui-image__img {
+  max-width: 100%;
+  width: auto;
+  height: 100%;
+  opacity: 1; /* Always visible */
+  object-position: center; /* Center the object instead of bottom center */
+  vertical-align: middle; /* Ensure proper vertical alignment */
+}
+
+/* When image is loaded class - no longer needed for fade effect */
+.optimized-ui-image__img--loaded {
+  opacity: 1;
+}
+
+/* Special styling for historical figures */
+.figure-image .optimized-ui-image__img {
+  object-fit: contain;
+  height: 100%; /* Use full height */
+  width: auto; /* Let width adjust proportionally */
+  display: block;
+  margin: 0 auto;
+}
+
+/* Default object-fit for figure images (parent CSS can override via cascade) */
+.optimized-figure-image img {
+  object-fit: cover;
+  object-position: center 40%;
+}
+
+/* Missing image state */
+.optimized-ui-image--missing {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(28, 36, 92, 0.4);
+  border-radius: 4px;
+  color: rgba(255, 255, 255, 0.8);
+  font-family: var(--font-sans, sans-serif);
+  font-size: 12px;
+  line-height: 1.4;
+  padding: 8px;
+  text-align: center;
+  min-height: 40px;
+  min-width: 40px;
+}
+
+/* Legacy image state (fallback) */
+.optimized-ui-image--legacy .optimized-ui-image__img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Responsive styling */
+@media (max-width: 768px) {
+  .optimized-ui-image--missing {
+    font-size: 10px;
+    padding: 4px;
+  }
+}
+
+/* Reduced motion preferences - no transitions needed */
+@media (prefers-reduced-motion: reduce) {
+  .optimized-ui-image__img {
+    /* No transitions */
+  }
+}

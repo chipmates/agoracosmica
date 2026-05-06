@@ -1,0 +1,643 @@
+/* SettingsModal.css - Card-Based Visual Layout */
+:root {
+  --scale-hover: 1.05;
+  --scale-small-hover: 1.03;
+  --transition-fast: 0.2s;
+  --transition-medium: 0.3s;
+  --transition-slow: 0.5s;
+  --modal-gold: var(--gold-subtle);
+  --modal-gold-rgb: 212, 165, 57;
+  --modal-coral: var(--mode-quest);
+  --modal-coral-rgb: 233, 116, 81;
+  --modal-bg-primary: var(--bg-primary);
+  --modal-bg-secondary: var(--bg-card);
+  --modal-card-bg: rgba(30, 40, 100, 0.6);
+  --modal-border-radius: 20px;
+  --card-border-radius: 16px;
+  --modal-padding: 28px;
+  --card-padding: 24px;
+  --content-gap: 24px;
+}
+
+/* Modal Container - now uses the standardized modal styling from MicroInteractions.css */
+.settings-modal {
+  /* Adjustments to complement the windowed-modal class from MicroInteractions.css */
+  padding: var(--modal-padding);
+  color: var(--cosmic-text-primary);  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+  backdrop-filter: blur(var(--glass-blur-heavy));
+  max-width: 780px; /* Custom width specifically for settings modal - wider than default */
+}
+
+/* Scrollbar styling now handled by global design system */
+/* Use data-scrollbar="gold" on container to switch to gold theme */
+
+/* Modal header styles NOW HANDLED BY ModalHeader COMPONENT */
+/* REMOVED to prevent CSS conflicts with the new unified system */
+/*
+.settings-modal .modal-header {
+  OLD STYLES REMOVED - Now using ModalHeader component
+}
+*/
+
+.back-button {
+  /* No absolute positioning - handled by grid layout */
+  position: static;
+  background: transparent;
+  border: none;
+  color: var(--modal-gold);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-medium) ease;
+}
+
+.back-button:hover {
+  background: rgba(var(--modal-gold-rgb), 0.1);
+  transform: scale(1.1); /* Removed translateY(-50%) which was breaking position */
+}
+
+/* Categories Navigation */
+.settings-categories {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.category-button {
+  background: rgba(var(--modal-gold-rgb), 0.08);
+  border: 1px solid rgba(var(--modal-gold-rgb), 0.2);
+  color: var(--cosmic-text-primary);  padding: 14px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: all var(--transition-medium) ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.category-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: .8s;
+}
+
+.category-button:hover::before {
+  left: 100%;
+}
+
+.category-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2), 0 0 12px rgba(var(--modal-gold-rgb), 0.2);
+  background: rgba(var(--modal-gold-rgb), 0.12);
+}
+
+.category-button.active {
+  background: rgba(var(--modal-gold-rgb), 0.18);
+  border-color: var(--modal-gold);
+  box-shadow: 0 0 15px rgba(var(--modal-gold-rgb), 0.3), inset 0 0 8px rgba(var(--modal-gold-rgb), 0.2);
+}
+
+.category-icon {
+  background: rgba(var(--modal-gold-rgb), 0.15);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+  color: var(--modal-gold);
+  transition: all var(--transition-medium) ease;
+}
+
+.category-button.active .category-icon {
+  background: var(--modal-gold);
+  color: var(--modal-bg-primary);
+  box-shadow: 0 0 15px rgba(var(--modal-gold-rgb), 0.4);
+}
+
+.category-label {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.category-description {
+  font-size: 12px;
+  color: var(--cosmic-text-secondary);  text-align: center;
+  line-height: 1.4;
+  height: 34px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  padding: 0 6px;
+}
+
+/* Setting Card */
+.setting-card {
+  padding: var(--card-padding);
+  margin-bottom: 20px;
+  transition: all var(--transition-medium) ease;
+  border: 1px solid rgba(var(--modal-gold-rgb), 0.15);
+  backdrop-filter: blur(var(--glass-blur-light));
+}
+
+.setting-card:hover {
+  transform: translateY(-2px);
+}
+
+.setting-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  position: relative;
+  z-index: var(--z-base); /* 20 */
+}
+
+.setting-card-icon {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(var(--modal-gold-rgb), 0.15);
+  border-radius: 50%;
+  color: var(--modal-gold);
+}
+
+.setting-card-title {
+  margin: 0;
+  flex: 1;
+}
+
+.setting-card-description {
+  margin-bottom: 20px;
+  color: var(--cosmic-text-secondary);
+}
+
+.setting-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Option Buttons */
+.settings-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.settings-options-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.option-button {
+  background: rgba(var(--modal-gold-rgb), 0.08);
+  border: 1px solid rgba(var(--modal-gold-rgb), 0.2);
+  border-radius: 10px;
+  color: var(--cosmic-text-primary);  padding: 12px 16px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all var(--transition-medium) ease;
+  flex: 1;
+  min-width: 120px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.option-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: .5s;
+}
+
+.option-button:hover::before {
+  left: 100%;
+}
+
+.option-button:hover {
+  background: rgba(var(--modal-gold-rgb), 0.12);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15), 0 0 8px rgba(var(--modal-gold-rgb), 0.2);
+}
+
+.option-button.active {
+  background: var(--modal-gold);
+  color: var(--modal-bg-primary);
+  font-weight: 600;
+  box-shadow: 0 0 15px rgba(var(--modal-gold-rgb), 0.3);
+  border-color: var(--modal-gold);
+}
+
+.option-button-icon {
+  margin-bottom: 8px;
+}
+
+.option-button-label {
+  font-weight: 500;
+  font-size: 15px;
+  margin-bottom: 4px;
+}
+
+.option-button-description {
+  font-size: 12px;
+  opacity: 0.8;
+  margin-top: 4px;
+}
+
+.option-selected-indicator {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--modal-bg-primary);
+  color: var(--modal-gold);
+  animation: scaleIn 0.2s ease;
+}
+
+/* Setting Label */
+.setting-label {
+  margin-bottom: 8px;
+  color: var(--modal-gold);
+}
+
+/* Voice Settings */
+.voice-service-selector, 
+.voice-speed-control,
+.voice-preview {
+  padding: 12px 0;
+}
+
+.speed-slider-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px; /* meta floor — was 12px */
+  color: var(--cosmic-text-secondary);  margin-bottom: 6px;
+}
+
+.speed-control {
+  display: flex;
+  flex-direction: column;
+}
+
+.speed-slider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.slider {
+  flex: 1;
+  -webkit-appearance: none;
+  height: 6px;
+  background: rgba(var(--modal-gold-rgb), 0.2);
+  border-radius: 3px;
+  position: relative;
+}
+
+.slider:focus-visible {
+  outline: 2px solid var(--modal-gold);
+  outline-offset: 2px;
+}
+
+.slider::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, var(--modal-gold), rgba(var(--modal-gold-rgb), 0.3));
+  border-radius: 3px;
+  opacity: 0.5;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--modal-gold);
+  cursor: pointer;
+  transition: all var(--transition-medium) ease;
+  box-shadow: 0 0 10px rgba(var(--modal-gold-rgb), 0.3);
+  position: relative;
+  z-index: var(--z-base); /* 2 */
+}
+
+.slider::-webkit-slider-thumb:hover,
+.slider::-webkit-slider-thumb:active {
+  transform: scale(1.1);
+  box-shadow: 0 0 15px rgba(var(--modal-gold-rgb), 0.4);
+}
+
+.slider::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--modal-gold);
+  cursor: pointer;
+  border: none;
+  transition: all var(--transition-medium) ease;
+  box-shadow: 0 0 10px rgba(var(--modal-gold-rgb), 0.3);
+}
+
+.slider::-moz-range-thumb:hover,
+.slider::-moz-range-thumb:active {
+  transform: scale(1.1);
+  box-shadow: 0 0 15px rgba(var(--modal-gold-rgb), 0.4);
+}
+
+.speed-value {
+  min-width: 54px;
+  color: var(--modal-gold);
+  font-family: 'Orbitron', sans-serif;
+  font-size: 16px;
+  text-shadow: 0 0 8px rgba(var(--modal-gold-rgb), 0.3);
+  text-align: center;
+  background: rgba(var(--modal-gold-rgb), 0.1);
+  padding: 6px 10px;
+  border-radius: 6px;
+}
+
+.preview-button {
+  align-self: flex-start;
+}
+
+/* Model Settings */
+.model-provider-selector,
+.model-version-selector {
+  padding: 12px 0;
+}
+
+/* Locked settings styles */
+.locked-setting-info {
+  background: rgba(42, 51, 116, 0.3);
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+}
+
+.locked-setting-value {
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+  color: var(--gold-subtle);
+  margin-bottom: 8px;
+}
+
+.locked-icon {
+  margin-right: 8px;
+  font-size: 16px;
+}
+
+.locked-setting-message {
+  font-size: 14px;
+  color: var(--cosmic-text-secondary);  font-style: italic;
+}
+
+/* Settings Footer - updated to match the new modal header style */
+.settings-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid color-mix(in srgb, var(--gold-subtle) 30%, transparent); /* Same subtle border as header */
+  position: relative;
+}
+
+.settings-actions {
+  display: flex;
+  gap: 12px;
+}
+
+/* Changes Alert Overlay */
+.settings-alert-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(var(--glass-blur-light));
+  z-index: var(--z-dropdown); /* 100 */
+  animation: fadeIn 0.3s ease;
+}
+
+.settings-alert {
+  background: linear-gradient(135deg, var(--modal-bg-primary), var(--modal-bg-secondary));
+  border: 2px solid var(--modal-coral);
+  border-radius: 16px;
+  padding: 24px;
+  width: 90%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 0 0 15px rgba(var(--modal-coral-rgb), 0.2);
+  animation: scaleIn 0.3s ease;
+}
+
+.settings-alert-icon {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(var(--modal-coral-rgb), 0.15);
+  border-radius: 50%;
+  color: var(--modal-coral);
+  margin-bottom: 6px;
+}
+
+.settings-alert-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+  width: 100%;
+  justify-content: center;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .settings-modal {
+    width: 95%;
+    padding: 20px;
+    max-height: 85vh;
+  }
+
+  .settings-categories {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .settings-options-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Hide setting descriptions on mobile - Clean iOS/Android style */
+  /* Icon + Title + Badge is sufficient - follows 2025 mobile standards */
+  .setting-card-description {
+    display: none;
+  }
+
+  /* Hide option button descriptions on mobile - Keep interface clean */
+  .option-button-description {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --modal-padding: 16px;
+    --card-padding: 16px;
+  }
+  
+  .settings-modal {
+    width: 98%;
+    padding: 16px;
+  }
+  
+  /* Hide category descriptions on mobile with enhanced specificity */
+  .settings-modal .settings-categories .category-button .category-description {
+    display: none; /* Enhanced specificity prevents description display on mobile */
+  }
+  
+  /* .modal-header styles removed - handled by ModalHeader component */
+  
+  .settings-categories {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  
+  .category-button {
+    flex-direction: row;
+    padding: 14px 20px;
+    align-items: center;
+    justify-content: center;
+    min-height: 56px;
+  }
+  
+  .category-icon {
+    width: 28px;
+    height: 28px;
+    margin-bottom: 0;
+    margin-right: 10px;
+    background: transparent;
+    flex-shrink: 0;
+  }
+  
+  .category-label {
+    font-size: 15px;
+    font-weight: 500;
+    white-space: nowrap;
+    line-height: 1;
+  }
+  
+  /* Category descriptions are hidden on mobile - see rule above */
+
+  /* Hide the SettingCard internal header on mobile. The CollapsibleSection
+     above already shows icon + title; the inner duplicate at 25px feels
+     heroic and out of proportion with the 15px collapsed header. */
+  .setting-card-header {
+    display: none;
+  }
+  
+  .settings-footer {
+    flex-direction: column-reverse;
+    gap: 16px;
+  }
+  
+  .settings-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .logout-button {
+    width: 100%;
+  }
+  
+  /* 2025 CloseButton mobile - Grid handles positioning */
+  .settings-modal-close {
+    /* Grid layout handles positioning - no overrides needed */
+  }
+}
+
+/* ================== TABLET ADJUSTMENTS ================== */
+
+@media (max-width: 1024px) and (min-width: 601px) {
+  /* 2025 CloseButton tablet - Grid handles positioning */
+  .settings-modal-close {
+    /* Grid layout handles positioning - no overrides needed */
+  }
+}
+
+/* ================== CLOSE BUTTON POSITIONING ================== */
+
+/* 2025 CloseButton - Now uses grid positioning from modal-header */
+.settings-modal-close {
+  /* No absolute positioning needed - handled by grid layout */
+  position: static;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

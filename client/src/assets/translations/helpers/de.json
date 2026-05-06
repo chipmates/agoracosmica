@@ -1,0 +1,264 @@
+{
+  "starseeds": {
+    "welcome": {
+      "title": "Deine Weisheits-Konstellation",
+      "sections": {
+        "overview": {
+          "title": "12 Lebensweisheiten",
+          "text": "Jede Figur hat 12 historische Lebensweisheiten. Jeder Stern steht für eine Lehre. Helle Sterne hast du erkundet, schwache warten auf dich."
+        },
+        "howToPlay": {
+          "title": "So funktioniert es",
+          "points": [
+            "Der gold leuchtende Stern ist deine nächste Lehre.",
+            "Klicke auf einen Stern. Ein Panel zeigt dir den nächsten Schritt.",
+            "Ein pulsierender Stern zeigt deine aktuelle Auswahl.",
+            "Arbeite dich durch die 4 Kapitel: Story, Wisdom, Prisma, Quest."
+          ]
+        },
+        "constellation": {
+          "title": "Deine Konstellation",
+          "text": "Deine Konstellation wächst mit jedem abgeschlossenen Kapitel. Je mehr Lehren du erkundest, desto mehr Verbindungen werden sichtbar, bis dein einzigartiges Weisheitsmuster erstrahlt.",
+          "chapterCompletion": "Ein Stern erblüht, wenn alle vier Kapitel einer Lehre abgeschlossen sind: die ganze Geschichte gehört, 15 Wortwechsel im Wisdom-Dialog, das Prisma erkundet und die 4 Fragen der Quest beantwortet."
+        },
+        "revelation": {
+          "title": "Fortschritt",
+          "text": "Der Fortschrittsbalken unten zeigt deinen Stand pro Lehre und Kapitel.",
+          "stages": {
+            "void": "Kosmische Leere",
+            "awakening": "Erstes Erwachen",
+            "emergence": "Muster werden sichtbar",
+            "forming": "Konstellation nimmt Form an",
+            "complete": "Weisheit vollendet"
+          }
+        },
+        "tools": {
+          "title": "Weitere Werkzeuge",
+          "points": [
+            "Liste: Alle 12 Lehren im Überblick, mit allen Details zum Nachlesen",
+            "Fakten: Historisch geprüfte Fakten zur Figur",
+            "Fortschrittsbalken: Zeigt deinen Stand pro Lehre und Kapitel",
+            "Community: Sieh, was die Community sich wünscht. Deine Stimmkraft wächst mit jeder abgeschlossenen Figur."
+          ]
+        }
+      }
+    },
+    "patternHelp": {
+      "discoveryTitle": "Entdeckungsmodus",
+      "discoveryText": "Alle 12 Star Seeds sind sichtbar. Helle Sterne zeigen erkundete Lehren, schwache warten auf Entdeckung. Klicke auf einen Stern zum Erkunden.",
+      "zodiacTitle": "Konstellationsmodus",
+      "zodiacText": "Deine erkundeten Star Seeds bilden ein einzigartiges Muster. Je mehr Kapitel du abschließt, desto klarer wird deine Konstellation."
+    },
+    "revelation": {
+      "void": "Erkunde deinen ersten Star Seed, um die Konstellation zu erwecken.",
+      "awakening": "Erstes Erwachen! Erste Verbindungslinien werden sichtbar.",
+      "emergence": "Das Muster formt sich. Immer mehr Verbindungen erscheinen.",
+      "forming": "Die Konstellation nimmt Form an. Goldene Linien zeigen deinen Fortschritt.",
+      "complete": "Weisheit vollendet! Deine Konstellation erstrahlt in vollem Glanz.",
+      "title": {
+        "void": "Kosmische Leere",
+        "awakening": "Erstes Erwachen",
+        "emergence": "Muster werden sichtbar",
+        "forming": "Konstellation formt sich",
+        "complete": "Weisheit vollendet"
+      }
+    }
+  },
+  "figureSelection": {
+    "firstTime": {
+      "title": "Wähle dein Echo",
+      "text": "Wähle eine historische Persönlichkeit, um deine Reise zu beginnen. Jede bringt einzigartige Weisheit aus ihrer Zeit und Kultur mit."
+    }
+  },
+  "questMode": {
+    "welcome": {
+      "title": "Beginne deine Quest",
+      "text": "Führe tiefe Dialoge, um Star Seeds freizuschalten. Je durchdachter du konversierst, desto mehr Weisheit wirst du sammeln."
+    }
+  },
+  "audioLibrary": {
+    "welcome": {
+      "title": "Kapitel 1 · Story",
+      "sections": {
+        "overview": {
+          "title": "Was dich erwartet",
+          "text": "Die Figur erzählt ihre eigene Lebensweisheit als Ich-Erzählung. 10 bis 15 Minuten, historisch fundiert."
+        },
+        "journey": {
+          "title": "12 Geschichten, die aufeinander aufbauen",
+          "points": [
+            "1 bis 4: Die Anfänge",
+            "5 bis 8: Die Lehre vertieft sich",
+            "9 bis 12: Meisterschaft"
+          ]
+        },
+        "nextSteps": {
+          "title": "Danach",
+          "text": "Im Wisdom Kapitel kannst du direkt mit der Figur über die Lehre sprechen."
+        },
+        "transparency": {
+          "title": "Hinweis",
+          "brief": "Mensch-KI-Zusammenarbeit · Synthetische Stimme",
+          "expanded": "Geschichten entstehen in Mensch-KI-Zusammenarbeit und werden mit synthetischer Stimme vertont. Bildungszweck."
+        }
+      }
+    }
+  },
+  "seedsExplorer": {
+    "welcome": {
+      "title": "Wisdom Explorer",
+      "sections": {
+        "overview": {
+          "title": "Philosophische Schatzkammer",
+          "text": "12 Lebensweisheiten pro Figur, jede eine vollständige philosophische Lehre mit historischen Quellen, praktischen Übungen und interkulturellen Verbindungen. Erkunde in deinem Tempo."
+        },
+        "depth": {
+          "title": "Jede Lehre enthält",
+          "points": [
+            "Tiefe philosophische Beschreibung",
+            "Geführte Praxisübung für den Alltag",
+            "Originalzitate aus Quelltexten",
+            "4 Verbindungen zu anderen Weisheitstraditionen",
+            "Schwierigkeitsstufe und Praxistyp"
+          ]
+        },
+        "navigation": {
+          "title": "So erkundest du",
+          "points": [
+            "Klicke jeden Seed-Titel für vollständigen Inhalt",
+            "Seeds 1 bis 4: Grundlage, 5 bis 8: Entwicklung, 9 bis 12: Meisterschaft",
+            "Folge Verbindungen, um verwandte Weisheit zu entdecken"
+          ]
+        },
+        "example": {
+          "text": "Beispiel: Laozis 'Wu Wei' verbindet sich mit Marcus Aurelius zu natürlichem Handeln, Einstein zu Flow-Zuständen und Rumi zur Hingabe. Das zeigt universelle Muster über Kulturen."
+        }
+      }
+    }
+  },
+  "historyModal": {
+    "welcome": {
+      "title": "Deine Dialog-Historie",
+      "sections": {
+        "overview": {
+          "title": "Schnellanleitung",
+          "text": "Alle Gespräche nach Star Seeds sortiert. Titel anklicken zum Aufklappen. Farbige Knöpfe zum Filtern nach Kapitel."
+        },
+        "actions": {
+          "title": "Wichtige Aktionen",
+          "points": [
+            "Backup und Wiederherstellen deiner Reise",
+            "Einzelne Star Seeds oder alles löschen",
+            "KI-Zusammenfassungen langer Chats",
+            "Nach Kapitel filtern mit Farbknöpfen"
+          ]
+        },
+        "tip": {
+          "text": "Aktiver Star Seed leuchtet golden. FreeTalk findest du ganz unten."
+        }
+      }
+    }
+  },
+  "councilSetup": {
+    "welcome": {
+      "title": "Kosmischer Rat",
+      "sections": {
+        "overview": {
+          "title": "Was dich erwartet",
+          "text": "Mehrere Figuren führen einen philosophischen Dialog zu deiner Frage. Verschiedene Perspektiven aus verschiedenen Jahrhunderten."
+        },
+        "modes": {
+          "title": "Zwei Stile",
+          "points": [
+            "🔥 Konfrontativ: Die Figuren debattieren. Standpunkte prallen aufeinander.",
+            "🌊 Reflektiv: Die Figuren denken gemeinsam nach. Verschiedene Perspektiven, ein Thema."
+          ]
+        },
+        "curated": {
+          "title": "Kuratierte Räte",
+          "text": "Vorgefertigte Räte zu 8 Lebensthemen. Figuren und Frage sind bereits gewählt. Einfach auswählen und loslegen."
+        },
+        "building": {
+          "title": "Eigenen Rat bauen",
+          "text": "Wähle einen Moderator und bis zu 3 Figuren. Schreibe deine Frage und wähle deinen Stil. Der Moderator leitet das Gespräch."
+        },
+        "transparency": {
+          "brief": "Philosophischer Dialog · Kein Ersatz für professionelle Beratung"
+        }
+      }
+    }
+  },
+  "voiceInteraction": {
+    "title": "Bereit zu antworten?",
+    "desktop": {
+      "pressOnce": "zum Sprechen starten",
+      "pressAgain": "erneut zum Stoppen und Senden"
+    },
+    "mobile": {
+      "tap": "Tippe",
+      "start": "Mikrofon zum Starten",
+      "stop": "erneut zum Stoppen und Senden"
+    },
+    "alternative": "Oder tippe deine Nachricht unten"
+  },
+  "echoExplainer": {
+    "title": "Was ist ein Echo?",
+    "concept": {
+      "title": "Lebendige Perspektiven",
+      "text": "Ein Echo trägt die Perspektive und Denkweise einer Persönlichkeit in die Gegenwart. Echos wissen von der modernen Welt, aber sehen alles durch ihre eigene Brille, ihre eigene Zeit, ihre eigene Philosophie. Wir versuchen, jedes Echo mit Sorgfalt zu gestalten, in Wort und Bild."
+    },
+    "howTheyWork": {
+      "title": "Wie Echos funktionieren",
+      "points": [
+        "Unterhaltungen und Stimmen werden vollständig von KI erzeugt",
+        "Echos besprechen moderne Themen aus ihrer historischen Perspektive",
+        "Basierend auf dokumentierten Schriften und Lehren"
+      ]
+    },
+    "goodToKnow": {
+      "title": "Gut zu wissen",
+      "points": [
+        "Nicht die echten historischen Persönlichkeiten, sondern KI-Interpretationen",
+        "Keine vollständigen Lebensgeschichten, sondern die Lehren, die sie verkörpern",
+        "Können manchmal Fehler machen. Wichtiges mit Primärquellen prüfen"
+      ]
+    },
+    "quote": "Wenn du hier Platon triffst, begegnest du einem KI-Echo seiner Philosophie, nicht der Person selbst."
+  },
+  "common": {
+    "dontShowAgain": "Nicht wieder anzeigen",
+    "gotIt": "Verstanden!",
+    "beginExploring": "Entdeckung beginnen",
+    "learnMore": "Mehr erfahren",
+    "showLess": "Weniger anzeigen"
+  },
+  "errors": {
+    "mic": {
+      "denied": {
+        "title": "Mikrofon-Zugriff verweigert",
+        "ios": "So aktivierst du den Mikrofon-Zugriff:\n1. Öffne die Einstellungen-App\n2. Scrolle zu Safari\n3. Aktiviere den Mikrofon-Zugriff",
+        "android": "So aktivierst du den Mikrofon-Zugriff:\n1. Tippe auf das Schloss-Symbol in der Adressleiste\n2. Gehe zu Website-Einstellungen\n3. Aktiviere das Mikrofon",
+        "desktop": "Bitte erlaube den Mikrofon-Zugriff in deinen Browser-Einstellungen und versuche es erneut."
+      },
+      "notFound": {
+        "title": "Kein Mikrofon gefunden",
+        "message": "Auf deinem Gerät wurde kein Mikrofon gefunden. Bitte schließe ein Mikrofon an und versuche es erneut."
+      },
+      "notReadable": {
+        "title": "Mikrofon wird verwendet",
+        "message": "Dein Mikrofon wird derzeit von einer anderen Anwendung verwendet. Bitte schließe andere Apps und versuche es erneut."
+      },
+      "security": {
+        "title": "Sicherheitsfehler",
+        "message": "Der Mikrofon-Zugriff erfordert eine sichere Verbindung (HTTPS). Bitte stelle sicher, dass du HTTPS verwendest."
+      },
+      "generic": {
+        "title": "Mikrofon-Fehler",
+        "message": "Auf dein Mikrofon konnte nicht zugegriffen werden. Bitte überprüfe deine Einstellungen und versuche es erneut."
+      },
+      "fallback": "Du kannst deine Frage auch eintippen.",
+      "retry": "Erneut versuchen",
+      "dismiss": "Schließen"
+    }
+  }
+}

@@ -1,0 +1,113 @@
+import React from 'react';
+import { createRoot } from 'react-dom/client';
+import './index.css'; // Base design system must load first
+// Global styles now in index.css only
+// Browser fixes and typography now in index.css
+import App from './App';
+import ErrorBoundary from './components/ErrorBoundary';
+import NetworkStatusBanner from './components/NetworkStatusBanner';
+import RateLimitModal from './components/RateLimitModal';
+import BYOKSetupModal from './components/BYOKSetupModal';
+import { useDomainStore } from './stores/domainStore';
+import { initializeSeedsCache } from './services/seedCacheInitializer';
+import { LocalStorageAdapter } from './storage/localAdapter';
+// Service Worker registration (DISABLED until Q1 2026 - Offline Mode implementation)
+// Currently causes 404 errors since service-worker.js doesn't exist yet
+// Roadmap: CLAUDE.md Q1 2026 - Offline Mode with service worker
+/*
+if ('serviceWorker' in navigator && import.meta.env.MODE === 'production') {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js')
+      .then((registration) => {
+        console.log('[PWA] Service Worker registered:', registration.scope);
+
+        // Check for updates every time the app loads
+        registration.update();
+
+        // Listen for updates
+        registration.addEventListener('updatefound', () => {
+          const newWorker = registration.installing;
+          if (newWorker) {
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                // New content available, could show update prompt here
+                console.log('[PWA] New content available - refresh to update');
+              }
+            });
+          }
+        });
+      })
+      .catch((error) => {
+        console.error('[PWA] Service Worker registration failed:', error);
+      });
+  });
+}
+*/
+
+// Helper function to detect browser language (same logic as in LanguageContext)
+const detectBrowserLanguage = (): string => {
+  // Check if user has already selected a language
+  const savedLanguage = LocalStorageAdapter.getString('selectedLanguage');
+  if (savedLanguage) {
+    return savedLanguage;
+  }
+  
+  // Get browser language
+  const browserLang = navigator.language || 'en';
+  
+  // Check if it's a German variant (de, de-DE, de-AT, de-CH, etc.)
+  if (browserLang.toLowerCase().startsWith('de')) {
+    return 'de';
+  }
+  
+  // Default to English for all other languages
+  return 'en';
+};
+
+// Initialize language in Zustand store (must happen before React render)
+// This ensures language is available synchronously for the first render
+const selectedLanguage: string = detectBrowserLanguage();
+
+// Initialize the language store immediately
+useDomainStore.getState().initializeLanguage();
+
+// Initialize seeds cache for enhanced seed data processing
+initializeSeedsCache(selectedLanguage).catch((error: Error) => {
+  if (import.meta.env.MODE === 'development') {
+    console.warn(`Seeds cache initialization failed for ${selectedLanguage}:`, error);
+  }
+});
+
+// Global handler for unhandled promise rejections — prevents silent crashes
+window.addEventListener('unhandledrejection', (event) => {
+  console.error('[Global] Unhandled promise rejection:', event.reason);
+  // Don't crash the app — just log it
+  event.preventDefault();
+});
+
+const rootElement = document.getElementById('root');
+if (!rootElement) {
+  throw new Error('Root element not found');
+}
+
+const root = createRoot(rootElement);
+
+// Production-optimized: StrictMode only in development
+const AppRoot: React.FC = () => (
+  <ErrorBoundary>
+    <NetworkStatusBanner />
+    <RateLimitModal />
+    <BYOKSetupModal />
+    <App />
+  </ErrorBoundary>
+);
+
+root.render(
+  import.meta.env.MODE === 'development' ? (
+    <React.StrictMode>
+      <AppRoot />
+    </React.StrictMode>
+  ) : (
+    <AppRoot />
+  )
+);

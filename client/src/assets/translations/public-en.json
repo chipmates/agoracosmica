@@ -1,0 +1,210 @@
+{
+  "nav": {
+    "figures": "Figures",
+    "themes": "Themes",
+    "about": "About",
+    "contact": "Contact",
+    "startExploring": "Start Exploring",
+    "menu": "Menu",
+    "closeMenu": "Close menu"
+  },
+  "footer": {
+    "impressum": "Imprint",
+    "datenschutz": "Privacy Policy",
+    "cookiePolicy": "Cookie Policy",
+    "terms": "Terms of Use",
+    "copyright": "ChipMates gemeinn\u00fctzige GmbH",
+    "projectOf": "A project of ChipMates gemeinn\u00fctzige GmbH \u00b7 Freiburg, Germany",
+    "trustSignals": "Non-Profit \u00b7 Open Source \u00b7 No Tracking",
+    "tagline": "A Living Library You Can Talk To"
+  },
+  "breadcrumbs": {
+    "home": "Home",
+    "figures": "Figures",
+    "themes": "Themes",
+    "about": "About",
+    "contact": "Contact"
+  },
+  "cta": {
+    "startConversation": "Start a conversation with {name}",
+    "exploreQuestion": "Explore this question",
+    "startFree": "Start exploring",
+    "listenDebate": "Listen to this debate",
+    "exploreTeaching": "Explore this teaching",
+    "showAllTeachings": "Show all 12 teachings",
+    "showLess": "Show less"
+  },
+  "figures": {
+    "pageTitle": "30 Remarkable People You Can Talk To",
+    "pageDescription": "Discover wisdom from 30 remarkable people of history, from Marcus Aurelius to Frida Kahlo. Audio life stories, teachings, prisms, councils, and conversations you can join.",
+    "searchPlaceholder": "Search by name or tradition...",
+    "teachings": "Teachings",
+    "councilAppearances": "Council Appearances",
+    "keyConcepts": "Key Concepts",
+    "relatedFigures": "Related Figures",
+    "themes": "Themes",
+    "audioSample": "Listen to a sample",
+    "life": "Life",
+    "tradition": "Tradition",
+    "period": "Period",
+    "primaryWorks": "Primary Works"
+  },
+  "themes": {
+    "pageTitle": "Life's Biggest Questions",
+    "pageDescription": "Explore the questions that have shaped human thought for centuries. From the meaning of life to the nature of creativity, hear history's greatest minds debate.",
+    "councils": "councils",
+    "relatedThemes": "Related Themes",
+    "curatedWisdom": "Curated Wisdom",
+    "meaning-purpose": {
+      "name": "Meaning and Purpose",
+      "tagline": "What makes a life worth living?",
+      "description": "What makes a life worth living? How do you find purpose when the world offers none? For thousands of years, thinkers have wrestled with these questions. Some found answers in duty, others in love, still others in the simple act of paying attention. Here, the greatest minds across history explore what it means to live with clarity and depth.",
+      "intro": "What makes a life worth living? What turns days into a life worth waking up for?\n\nSome thinkers answer this from above — the cosmic perspective, the long view, the indifferent stars. Marcus Aurelius wrote his Meditations late at night between military campaigns, reminding himself daily that he and the empire he ruled would all be forgotten — and that this remembering, paradoxically, was where dignity began. Stoicism does not promise meaning; it promises the courage to make some yourself.\n\nOthers find meaning in awakening rather than achievement. Siddhartha Gautama walked away from a palace because comfort was not the answer. He spent years on the question, and what came back was a quieter claim: most of our suffering is not from what happens but from how we cling to wanting it otherwise. The Four Noble Truths are not abstract theology — they are a practice, a way of being.\n\nJoseph Campbell looked at the myths the world has told itself across cultures and found a single recurring shape: the hero leaves the familiar, faces the dragon within, and brings something useful home. Your life, Campbell said, has this shape too — even when it feels formless.\n\nAnd Rumi, drunk on what he called the Beloved, wrote that purpose is not something to find but something to remember. The reed flute cries because it has been cut from the reed bed. Meaning is the homesickness — and the way home is through love.\n\nFour very different answers. Stoic clarity, Buddhist release, mythic narrative, mystical longing. Start with whichever voice feels closest tonight — the conversation will lead you to the others."
+    },
+    "loss-grief": {
+      "name": "Loss and Grief",
+      "tagline": "How do we carry what we've lost?",
+      "description": "Loss touches every life. A person you loved, a future you planned, a version of yourself you had to leave behind. Philosophy has never shied away from grief. The voices gathered here sat with suffering and found something honest to say about it. Not to fix it, but to help you carry it.",
+      "intro": "How do we carry what we've lost? Not get over it, not move past it — carry it. That distinction matters. Grief is not a problem to solve; it is a country we move into when someone or something we loved is gone.\n\nNelson Mandela spent twenty-seven years in a cell smaller than most bathrooms. He lost youth, marriage, his mother's funeral, his son's funeral. When he came out, he did not perform forgiveness — he understood that bitterness was a second prison. Reconciliation, in his hands, was not soft. It was the harder discipline.\n\nMartin Luther King Jr. lived inside an unfinished mourning for a country that kept killing his friends. He preached love at funerals. Not because the love was easy. Because it was the only weapon stronger than what had taken them. Grief, for King, was raw material for a moral imagination.\n\nCarl Jung sat with patients whose grief had become symptoms — depression, anxiety, dreams that would not let them rest. He came to believe that the soul does its own work in the dark, and that what feels like breakdown is often unfinished mourning trying to become integration. Don't run from the shadow, he said. Sit with it. Listen.\n\nMeister Eckhart, six centuries earlier, said something kindred from inside Christian mysticism: you cannot carry the new while clutching the old. Detachment is not coldness — it is the willingness to let what is gone be gone, so what is here can find you.\n\nFour different vocabularies for the same hard truth. Loss is not a detour from life — it is one of life's deepest teachers. Start where the language sounds true to you tonight."
+    },
+    "who-am-i": {
+      "name": "Who Am I?",
+      "tagline": "The question beneath every question.",
+      "description": "Before you can decide what to believe or how to live, you face a more basic puzzle: who is the one deciding? Identity is not fixed. It shifts with experience, culture, and the stories you tell yourself. The thinkers here explored the boundaries of the self and came back with maps worth studying.",
+      "intro": "Who am I, beneath the roles I play? When the job, the relationship, the body, the country — all the things we use to identify ourselves — when those are stripped away, what remains?\n\nSimone de Beauvoir made a sharp distinction between what we are given and what we make. We are born into a body, a language, a class, a gender — a situation. But we are not those things finally. We become through choice. Her book The Second Sex was not just feminism; it was a careful study of how identity calcifies into role, and what it costs to step out.\n\nCarl Jung went the other direction — inward. He said the self is much larger than the ego thinks. Below the surface live shadow figures, animal energies, ancestors, archetypes. Individuation, his lifelong work, is the patient labor of meeting all of these and letting them be part of you. Not the persona, but the whole.\n\nFrida Kahlo answered the question with paint. Fifty-five self-portraits across her short life — each one a different angle, a different mood, a different mask. She understood that a self is not one thing but a constellation, and that pain has a face, and that face is yours.\n\nVirginia Woolf, in the long sentences of Mrs Dalloway and To the Lighthouse, traced consciousness as it actually moves: not in straight lines but in flickers, half-thoughts, sensations that bloom and fade. The self for Woolf is more like weather than statue — and learning to sit with that weather is its own kind of freedom.\n\nFour ways into the question. Becoming, integrating, painting, observing. Pick the door that opens for you tonight."
+    },
+    "mind-creativity": {
+      "name": "Mind and Creativity",
+      "tagline": "Where do ideas come from?",
+      "description": "Creativity is not magic. It is attention meeting craft, curiosity meeting courage. Some of history's most inventive minds explored how ideas form, why inspiration strikes, and what blocks it. Their insights apply whether you paint, write, build, or simply want to think more clearly.",
+      "intro": "Where do ideas come from? Not the small ones — the kind that makes you change your life, redirect a project, see what was always there.\n\nAlbert Einstein insisted he was not a man of formulas but of pictures. He thought in images: a person riding alongside a beam of light, an elevator falling through space. The mathematics came later, sometimes years later. Imagination, he said, is more important than knowledge. For him, this was not a slogan. It was a method.\n\nLeonardo da Vinci kept notebooks across forty years. Not just sketches — questions. Why is the sky blue? How does a bird turn in flight? What is the heart actually doing? He never finished most of his projects. He died with the Mona Lisa unfinished in his studio, painting and repainting the smile. Mastery, for him, was not completion. It was attention.\n\nWolfgang Amadeus Mozart, asked where his music came from, gave answers that contradicted each other: sometimes hard work, sometimes pure flow, sometimes a melody that simply arrived. The truth seems to have been all three. He composed by ear and pen, by play and discipline, by listening to silence until the silence had a shape.\n\nVirginia Woolf wrote of moments of being — sudden, vivid clarity in the middle of an ordinary day. These were the seeds of her novels. Not invented from nothing, but caught from the texture of a Wednesday afternoon.\n\nWilliam Blake claimed he saw angels in trees as a boy and never stopped seeing them. His poetry and printmaking treat imagination as the most real thing — more real than the world it interprets.\n\nFive very different relationships with the creative source. Imagination, observation, play, attention, vision. Whichever is calling you, start there."
+    },
+    "love-connection": {
+      "name": "Love and Connection",
+      "tagline": "What binds us to each other?",
+      "description": "Love takes many forms: romantic, familial, the bond between teacher and student, the quiet solidarity between strangers. What draws people together, and what pulls them apart? The answers here are honest enough to still resonate centuries later.",
+      "intro": "What binds us to each other? The question sounds simple until you sit with it. Romance is not the same as friendship is not the same as the love between parent and child is not the same as the strange tenderness for a stranger glimpsed on a train. All of these are called love. They are not the same thing.\n\nRumi, the thirteenth-century Sufi poet, wrote thousands of verses on this single subject. For him, romantic love was not the destination but a door — the place where the heart finally learns to be undone. Beyond it, he insisted, was something larger: divine love, the love that was always already loving us. The reed flute cries because it has been cut from the reed. We long because we are made of longing.\n\nJane Austen had a less mystical but no less precise eye. Her novels are sociology with a heart. She studied how love is filtered, distorted, and sometimes purified by money, class, manners, and self-deception. Pride, she showed, blocks love. Prejudice blinds it. The slow work of becoming someone who can be loved well — that is the real plot.\n\nMeister Eckhart described love in still-stranger terms. Not affection, not even devotion — but a kind of mutual unselfing. The eye through which I see God, he wrote, is the same eye through which God sees me. Love, for him, was the dissolution of the boundary between two.\n\nHildegard von Bingen, writing music in a twelfth-century convent, heard love as cosmic music — the green vitality (viriditas) running through every living thing, binding stones to angels.\n\nFour very different angles on the same mystery. Yearning, perception, mutuality, vitality. Listen for the one that resonates."
+    },
+    "freedom-justice": {
+      "name": "Freedom and Justice",
+      "tagline": "What does it mean to be free?",
+      "description": "Freedom is never just personal. Your liberty touches mine. Each voice here fought for freedom in their own life and thought deeply about what justice requires, not as abstract theory, but as lived practice.",
+      "intro": "What does it mean to be free? Not the political abstraction — the lived question. The kind that wakes you up at three in the morning and asks whether the life you are inside is yours.\n\nNelson Mandela understood that freedom is two stories braided together. The first is structural: laws, borders, the right to vote, the right not to be killed for your skin. The second is interior: the discipline of refusing to be the thing your captors want you to be. He spent twenty-seven years on a small island making sure neither story collapsed into the other.\n\nMartin Luther King Jr. argued that freedom is never a private possession. An injustice anywhere, he wrote, is a threat to justice everywhere. His nonviolence was not weakness; it was a way of forcing the moral question onto people who would otherwise look away. Love, in his hands, was a strategy.\n\nMahatma Gandhi developed the same logic from the other side of the world. Satyagraha — truth-force — was the method of changing power not by matching it but by exposing it. He went on hunger strikes in cells and led salt marches in the open. Both were, for him, the same act: making oppression visible to itself.\n\nHarriet Tubman walked into slave-holding states nineteen times to lead others north. She is reported to have said she would have freed thousands more if they had known they were slaves. The hardest chains, she understood, were the ones that had been internalized as normal.\n\nSimone de Beauvoir made the philosophical companion to all this: freedom is not a state, it is a practice. We are doomed to be free, she wrote — meaning every day demands new choices, and bad faith is the refusal to make them.\n\nFive voices, one demanding question. Where is freedom asking something of you tonight?"
+    },
+    "faith-death-mystery": {
+      "name": "Faith, Death, and Mystery",
+      "tagline": "What lies beyond what we know?",
+      "description": "Some questions have no final answers. What happens when we die? Is there something greater than ourselves? The minds gathered here approached mystery with honesty rather than certainty, finding meaning not in answers but in the asking itself.",
+      "intro": "What lies beyond what we know? The question is older than language. Every culture has answered it with rituals, songs, names. The voices gathered here did not promise certainty. They promised something rarer: an honest relationship with the unknown.\n\nMarcus Aurelius, ruling an empire in the second century, kept reminding himself: you will be dead soon. Memento mori. Not as morbid theatre, but as a lens. Knowing the day will end, what is worth doing right now? The Stoics turned mortality into clarity.\n\nSiddhartha Gautama spent his life on the same question from the other end. He did not deny death; he asked what dies. Through long sitting, he came to a strange answer: the self that fears dying is itself a kind of fiction, a process mistaking itself for a thing. Liberation is not avoiding the end — it is seeing through the one who fears it.\n\nLaozi, in eighty-one short chapters of the Tao Te Ching, wrote of a force older than the gods. It cannot be named. It does not strive. It moves like water — finding the lowest place, wearing down stone without effort. Wu wei, non-doing, is not passivity. It is alignment with what is already moving.\n\nHildegard von Bingen, in twelfth-century Germany, had visions she called the Living Light. Not metaphor — she saw colors and heard voices and wrote it all down. Her writing on the cosmos and the soul reads less like religion than like reportage from an open frontier.\n\nMeister Eckhart, in another century of German mysticism, said something even more vertiginous: God and the soul are not two. The detachment he taught — letting go of letting go — was not asceticism. It was the doorway to what cannot be doored.\n\nFive angles on the unknown. Stoic clarity, Buddhist insight, Taoist flow, visionary witness, mystical union. None promises an answer. Each offers a way of holding the question."
+    },
+    "moral-life": {
+      "name": "The Moral Life",
+      "tagline": "How should we live?",
+      "description": "Ethics is not about rules. It is about the kind of person you become through your choices. The thinkers here disagreed about almost everything, but they shared one conviction: how you live matters, and it deserves serious thought.",
+      "intro": "How should we live? Every philosophy worth its name has tried to answer this. The voices here disagreed sharply about almost everything else, but they shared one conviction: that the question deserves a serious life of attention.\n\nMarcus Aurelius, in the journal he never meant to publish, asked it daily. His answer was the four virtues — wisdom, justice, courage, temperance — practiced in the small frictions of an ordinary morning. Not heroic gestures. Reactions to a slow servant, an annoying meeting, a piece of bad news. Ethics, for the Stoics, is a craft you practice every day or not at all.\n\nMahatma Gandhi made it more concrete and more demanding. Truth is not something you have; it is something you do. He believed that means and ends are inseparable: you cannot reach a peaceful future through violent means, because the means become the end. Every choice, however small, is a sentence in the story you are writing about what is possible.\n\nMartin Luther King Jr. inherited Gandhi's logic and pushed it further into the church and the streets. The arc of the moral universe, he said, bends toward justice — but it doesn't bend on its own. Each generation either bends it or lets it slacken. There is no neutral.\n\nPlato, twenty-three centuries earlier, started the conversation in the West. The Republic asks what justice is and answers: not a transaction, not a contract, but a kind of inner harmony. The just person is not the one who follows the rules — it is the one in whom the parts of the soul are properly ordered. Outer justice mirrors inner justice or it is hollow.\n\nSiddhartha Gautama proposed an Eightfold Path: right view, right intention, right speech, right action, right livelihood, right effort, right mindfulness, right concentration. Not commandments — descriptions. Of what a life that is no longer at war with itself looks like.\n\nFive answers, all alive, all demanding. Pick the one that asks something of you."
+    }
+  },
+  "about": {
+    "pageTitle": "About Agora Cosmica",
+    "pageDescription": "A non-profit, open-source wisdom platform with 30 remarkable people from history. Agora Cosmica brings their voices into dialogue.",
+    "mission": "A Living Library You Can Talk To",
+    "missionTitle": "Our Mission",
+    "missionStatement": "Agora Cosmica is a project of ChipMates gemeinnützige GmbH, a small German nonprofit based in Freiburg im Breisgau. We work to make wisdom from history accessible to everyone, freed from academic barriers, paywalls, and ads.\n\nThe platform brings together 30 remarkable people from philosophy, science, mysticism, art, and activism — opening a doorway for anyone to begin their own journey with wisdom traditions.",
+    "organizationTitle": "About the Organization",
+    "organizationStatement": "ChipMates was founded as a GmbH in 2023 and received its gemeinnützige (charitable nonprofit) status in 2025. Registered with HRB 728848 at Amtsgericht Freiburg. Charitable purpose: advancement of education. The platform Agora Cosmica is available worldwide and open source under AGPL-3.0.",
+    "valuesTitle": "Our Values",
+    "valueGratitude": "Gratitude: Every era and tradition has something to teach us.",
+    "valueCuriosity": "Curiosity: We learn with you, not about you.",
+    "valueOpenness": "Openness: Nonprofit. Open source. Built for the community.",
+    "valueTransformation": "Transformation: Inner growth ripples outward.",
+    "promiseTitle": "Our Promise",
+    "promiseStatement": "We're early in this journey and we'll make mistakes. When we oversimplify, misrepresent, or miss the mark, tell us at agoracosmica@chipmates.ai. We're not building for you, but with you.",
+    "barriersTitle": "Breaking Down Barriers",
+    "barriersIntro": "The ideas of history's greatest minds belong to everyone.",
+    "barrierGeographic": "Geographic: Available worldwide, around the clock.",
+    "barrierAcademic": "Academic: No prerequisites needed.",
+    "barrierAge": "Age: Welcoming readers 16 and up.",
+    "barrierEconomic": "Economic: Open source, nonprofit, no paywalls, no ads.",
+    "successTitle": "Our Definition of Success",
+    "successStatement": "We celebrate when people outgrow us — moving from our introductions to primary texts, from AI conversations to human teachers, from curiosity to their own deeper exploration. That is the mission.",
+    "closingQuote": "Sell your cleverness and buy bewilderment. Cleverness is mere opinion, bewilderment is intuition.",
+    "closingAttribution": "Rumi",
+    "whatYoullFind": {
+      "title": "What You'll Find",
+      "p1": "30 remarkable people from history, each with their own voice. From Marcus Aurelius to Frida Kahlo, from Rumi to Virginia Woolf. When they speak, they draw on their actual philosophy, their real-life experiences, and the ideas they spent their lives developing.",
+      "p2": "Every voice is grounded in primary works, historical context, and cross-checked sources. The Echoes are AI-rendered, so what they say will vary. The source material does not. When the prose extends beyond documented record, the factcheck names what is recreated.",
+      "p3": "360 narrated story chapters, 360 core teachings, 360 multi-perspective prism dialogues, 110 crafted council debates, a complete audio library, and custom councils where you choose the participants. With free daily turns to get started."
+    },
+    "howItWorks": {
+      "title": "How It Works",
+      "subtitle": "Each figure offers a structured learning journey through multiple modes.",
+      "story": "Listen to a 12-chapter narrated life story. Every story is fact-checked and covers the moments that shaped their thinking.",
+      "wisdom": "Pick one of 12 core teachings and have a guided conversation about it. The response is grounded in their actual philosophy.",
+      "prism": "Hear four different voices discuss a single topic from their unique perspectives. A multi-angle dialogue you can listen to like a podcast.",
+      "quest": "Test your understanding in a Socratic challenge. Four questions that go deeper than surface knowledge.",
+      "freetalk": "Ask anything. Open conversation drawing on their full philosophy and personality.",
+      "council": "Listen to crafted debates between remarkable people on life's biggest questions. 55 pre-produced debates across 8 themes. Or create your own council with the participants you choose.",
+      "audioLibrary": "Every story, prism, and council debate is available in a full audio library. Listen on the go, pick up where you left off."
+    },
+    "figures": {
+      "title": "The 30 Remarkable People",
+      "description": "From ancient philosophers to modern artists, from Eastern sages to Western scientists. Each with their own voice, their own story, and 12 core teachings you can explore."
+    },
+    "builtDifferent": {
+      "title": "Built Different",
+      "nonprofit": "Non-profit and open source. Built by ChipMates gemeinn\u00fctzige GmbH in Freiburg, Germany.",
+      "factChecked": "Every story cross-checked against primary sources. Created through AI collaboration. Carefully refined.",
+      "noTracking": "No tracking, no ads, no data collection. Your conversations stay on your device, encrypted.",
+      "freeTurns": "Free daily turns to explore. Bring your own API key for unlimited access.",
+      "github": "The code is open source on GitHub."
+    }
+  },
+  "contact": {
+    "pageTitle": "Contact Us",
+    "pageDescription": "Get in touch with the Agora Cosmica team. Questions, feedback, or collaboration ideas welcome. A German non-profit building open-source philosophy tools.",
+    "heading": "Get in Touch",
+    "description": "Have a question, feedback, or an idea? We'd love to hear from you.",
+    "email": "Email",
+    "address": "Address",
+    "social": "Find Us Online"
+  },
+  "audio": {
+    "play": "Play audio sample",
+    "pause": "Pause",
+    "loading": "Loading audio..."
+  },
+  "journey": {
+    "title": "Your Journey with {name}",
+    "chapters": "chapters",
+    "narrated": "narrated story",
+    "teachings": "core teachings",
+    "debates": "council debates",
+    "audioLibrary": "Audio Library",
+    "customCouncils": "Custom Councils",
+    "multiPerspective": "4 voices, 1 topic",
+    "socraticChallenge": "4-question challenge",
+    "listen": "listen",
+    "talk": "talk",
+    "freetalk": "Freetalk",
+    "modeStory": "Story",
+    "modeWisdom": "Wisdom",
+    "modePrism": "Prism",
+    "modeQuest": "Quest",
+    "modeCouncil": "Cosmic Council"
+  },
+  "search": {
+    "noResults": "No figures found matching \"{query}\"."
+  },
+  "story": {
+    "title": "The Story of {name}",
+    "subtitle": "{count} narrated chapters, ~{minutes} minutes total"
+  },
+  "topics": {
+    "title": "Topics Explored with {name}"
+  },
+  "volume": {
+    "stories": "narrated story chapters",
+    "teachings": "core teachings",
+    "debates": "council debates"
+  }
+}

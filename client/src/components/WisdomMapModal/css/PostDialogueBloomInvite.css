@@ -1,0 +1,111 @@
+/* ================================================================
+   PostDialogueBloomInvite — Gentle invite card at bottom of HomePage
+   "A star bloomed in your sky"
+   Liquid glass style, slide-up entrance, tap to open WisdomMapModal.
+   ================================================================ */
+
+.bloom-invite {
+  position: fixed;
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  z-index: 1500;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  padding: 14px 28px;
+  min-height: 48px;
+  border-radius: 24px;
+  cursor: pointer;
+
+  /* Liquid glass */
+  background: color-mix(in srgb, var(--bg-cosmic-void, #060614) 80%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid color-mix(in srgb, var(--gold-star, #FFD700) 20%, transparent);
+  box-shadow:
+    0 0 24px color-mix(in srgb, var(--gold-star, #FFD700) 10%, transparent),
+    0 8px 32px color-mix(in srgb, black 30%, transparent);
+
+  /* Entrance animation */
+  opacity: 0;
+  animation: bloomInviteEnter 0.5s ease-out 0.3s forwards;
+
+  /* Touch */
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.bloom-invite:active {
+  transform: translateX(-50%) translateY(0) scale(0.97);
+}
+
+@keyframes bloomInviteEnter {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* Subtle glow dot */
+.bloom-invite-glow {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gold-star, #FFD700);
+  box-shadow:
+    0 0 6px 2px color-mix(in srgb, var(--gold-star, #FFD700) 60%, transparent),
+    0 0 12px 4px color-mix(in srgb, var(--gold-star, #FFD700) 25%, transparent);
+  animation: bloomInviteGlow 3s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+@keyframes bloomInviteGlow {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+
+/* Text */
+.bloom-invite-text {
+  color: color-mix(in srgb, var(--gold-star, #FFD700) 85%, white);
+  font-family: 'Crimson Text', 'Georgia', serif;
+  font-size: 0.95rem;
+  font-style: italic;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+
+/* ── Mobile ── */
+@media (max-width: 768px) {
+  .bloom-invite {
+    padding: 12px 22px;
+    max-width: calc(100vw - 48px);
+  }
+
+  .bloom-invite-text {
+    font-size: 0.88rem;
+  }
+}
+
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .bloom-invite {
+    animation: none;
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .bloom-invite-glow {
+    animation: none;
+    opacity: 0.8;
+  }
+}

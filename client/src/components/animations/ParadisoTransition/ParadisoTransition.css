@@ -1,0 +1,312 @@
+/* ParadisoTransition.css — Celestial Rose animation (Doré Paradiso XXXI) */
+
+/* ====== KEYFRAMES ====== */
+
+@keyframes pt-spin {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+@keyframes pt-spin-reverse {
+  from { transform: translate(-50%, -50%) rotate(360deg); }
+  to { transform: translate(-50%, -50%) rotate(0deg); }
+}
+
+@keyframes pt-wobble {
+  0%, 100% { transform: scaleX(1) scaleY(1); }
+  50% { transform: scaleX(1.01) scaleY(0.99); }
+}
+
+@keyframes pt-dot-pulse {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+@keyframes pt-core-pulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.08); }
+}
+
+@keyframes pt-ray-flicker {
+  0%, 100% { opacity: 0.5; }
+  30% { opacity: 1; }
+  70% { opacity: 0.65; }
+}
+
+@keyframes pt-wisp-flicker {
+  0%, 100% { opacity: 0.15; }
+  25% { opacity: 0.6; }
+  50% { opacity: 0.25; }
+  75% { opacity: 0.75; }
+}
+
+@keyframes pt-burst {
+  from { opacity: 0; transform: scale(0.3); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes pt-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes pt-fade-slide-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ====== LAYOUT ====== */
+
+.paradiso-transition {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  opacity: 0;
+  animation: pt-fade-in 2.5s ease forwards;
+}
+
+.pt-background {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 1.5s ease;
+}
+
+.pt-background.pt-visible {
+  opacity: 1;
+}
+
+.pt-center-anchor {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+}
+
+/* ====== RINGS ====== */
+
+.pt-ring-wrapper {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border-radius: 50%;
+  will-change: transform;
+}
+
+.pt-ring-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+.pt-ring-dot {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    rgba(248, 235, 205, 0.6) 0%,
+    rgba(248, 235, 205, 0) 70%
+  );
+}
+
+/* ====== WISPS ====== */
+
+.pt-wisp-orbit {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border-radius: 50%;
+  will-change: transform;
+}
+
+.pt-wisp-glow {
+  position: absolute;
+  top: 1%;
+  left: 50%;
+  transform: translate(-50%, 0);
+}
+
+/* ====== RAYS ====== */
+
+.pt-ray {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform-origin: 0% 50%;
+}
+
+/* ====== CORE ====== */
+
+.pt-core-inner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8vmin;
+  height: 7.5vmin;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(ellipse,
+    rgba(255, 255, 253, 1) 0%,
+    rgba(255, 252, 242, 0.9) 25%,
+    rgba(255, 245, 225, 0.3) 55%,
+    transparent 100%
+  );
+  animation: pt-core-pulse 3.5s ease-in-out infinite;
+  animation-play-state: var(--pt-core-anim, running);
+  box-shadow:
+    0 0 20px rgba(255, 250, 230, 0.4),
+    0 0 60px rgba(248, 235, 200, 0.2),
+    0 0 120px rgba(240, 220, 180, 0.1);
+}
+
+.pt-core-outer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 24vmin;
+  height: 23vmin;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(ellipse,
+    rgba(255, 250, 235, 0.3) 0%,
+    rgba(245, 235, 210, 0.06) 40%,
+    transparent 70%
+  );
+  animation: pt-core-pulse 5s ease-in-out infinite;
+  animation-play-state: var(--pt-core-anim, running);
+}
+
+/* ====== VIGNETTE ====== */
+
+.pt-vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  background: radial-gradient(ellipse at 50% 50%,
+    transparent 10%,
+    transparent 25%,
+    rgba(50, 38, 5, 0.1) 40%,
+    rgba(40, 28, 3, 0.3) 60%,
+    rgba(20, 14, 2, 0.55) 80%,
+    rgba(10, 7, 1, 0.75) 100%
+  );
+}
+
+/* ====== GRAIN ====== */
+
+.pt-grain {
+  position: absolute;
+  inset: 0;
+  z-index: 25;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='0.07'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  opacity: 0.35;
+  mix-blend-mode: overlay;
+}
+
+/* ====== WELCOME TEXT ====== */
+
+.pt-welcome {
+  position: fixed;
+  top: 8%;
+  left: 0;
+  width: 100%;
+  padding: 0 24px;
+  box-sizing: border-box;
+  text-align: center;
+  z-index: 60;
+  pointer-events: none;
+  animation: pt-fade-slide-up 2s ease 1s both;
+}
+
+.pt-welcome-line {
+  font-size: clamp(0.9rem, 1.8vw, 1.2rem);
+  font-weight: 300;
+  font-style: italic;
+  letter-spacing: 0.2em;
+  color: rgba(245, 210, 120, 0.8);
+  text-shadow: 0 0 30px rgba(220, 180, 60, 0.25);
+  margin: 0;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+}
+
+.pt-welcome-sub {
+  font-size: clamp(1rem, 2vw, 1.35rem);
+  font-weight: 300;
+  letter-spacing: 0.1em;
+  color: rgba(245, 210, 120, 0.85);
+  text-shadow: 0 0 30px rgba(220, 180, 60, 0.25);
+  margin: 0;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+}
+
+.pt-welcome-ref {
+  font-size: clamp(0.75rem, 1.1vw, 0.875rem);
+  font-weight: 300;
+  font-style: italic;
+  letter-spacing: 0.08em;
+  color: rgba(200, 170, 90, 0.6);
+  margin: 14px 0 0 0;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+}
+
+/* ====== BURST CONTAINERS ====== */
+
+.pt-rings-burst {
+  animation: pt-burst 1.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.pt-wisps-burst {
+  animation: pt-burst 2s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+}
+
+/* ====== VARIANT OVERRIDES ====== */
+
+/* All variants — steady core, no pulsing (divine light doesn't breathe) */
+.paradiso-transition {
+  --pt-core-anim: paused;
+}
+
+/* V11 — streak dots need no border-radius override */
+
+/* ====== MOBILE SCALE ====== */
+
+@media (max-width: 768px) and (orientation: portrait) {
+  .paradiso-transition {
+    /* vmin = viewport width on portrait phones, so everything is small.
+       Scale up the entire animation to fill more of the screen. */
+    transform: scale(1.6);
+    transform-origin: 50% 50%;
+  }
+
+  /* Quote below top bar + safe area on mobile */
+  .pt-welcome {
+    top: calc(14% + env(safe-area-inset-top, 0px));
+    padding: 0 20px;
+  }
+}
+
+/* Android Chrome compositor bug: mix-blend-mode descendants of a
+   transformed position:fixed ancestor flatten the layer to opaque black.
+   The vignette + grain are decorative — drop them on mobile so the rose
+   stays visible. */
+@media (max-width: 768px) {
+  .pt-vignette,
+  .pt-grain {
+    display: none;
+  }
+}
+
+/* ====== REDUCED MOTION ====== */
+
+@media (prefers-reduced-motion: reduce) {
+  .paradiso-transition,
+  .paradiso-transition *,
+  .paradiso-transition *::before,
+  .paradiso-transition *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

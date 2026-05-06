@@ -1,0 +1,384 @@
+{
+  "figures": {
+    "angelou": {
+      "main": [
+        2400,
+        2903
+      ],
+      "thumbnail": [
+        640,
+        640
+      ]
+    },
+    "aurelius": {
+      "main": [
+        2400,
+        2903
+      ],
+      "thumbnail": [
+        640,
+        640
+      ]
+    },
+    "austen": {
+      "main": [
+        2400,
+        2903
+      ],
+      "thumbnail": [
+        640,
+        640
+      ]
+    },
+    "beauvoir": {
+      "main": [
+        2400,
+        3186
+      ],
+      "thumbnail": [
+        640,
+        640
+      ]
+    },
+    "bingen": {
+      "main": [
+        2400,
+        2903
+      ],
+      "thumbnail": [
+        640,
+        640
+      ]
+    },
+    "blake": {
+      "main": [
+        2400,
+        2904
+      ],
+      "thumbnail": [
+        640,
+        640
+      ]
+    },
+    "campbell": {
+      "main": [
+        2400,
+        3186
+      ],
+      "thumbnail": [
+        640,
+        640
+      ]
+    },
+    "dickinson": {
+      "main": [
+        2400,
+        2881
+      ],
+      "thumbnail": [
+        640,
+        640
+      ]
+    },
+    "eckhart": {
+      "main": [
+        2400,
+        2903
+      ],
+      "thumbnail": [
+        640,
+        640
+      ]
+    },
+    "einstein": {
+      "main": [
+        2400,
+        2903
+      ],
+      "thumbnail": [
+        640,
+        640
+      ]
+    },
+    "galilei": {
+      "main": [
+        2400,
+        2903
+      ],
+      "thumbnail": [
+        640,
+        640
+      ]
+    },
+    "gandhi": {
+      "main": [
+        2400,
+        3187
+      ],
+      "thumbnail": [
+        640,
+        640
+      ]
+    },
+    "gautama": {
+      "main": [
+        2400,
+        3190
+      ],
+      "thumbnail": [
+        640,
+        640
+      ]
+    },
+    "goethe": {
+      "main": [
+        2400,
+        3186
+      ],
+      "thumbnail": [
+        640,
+        640
+      ]
+    },
+    "jung": {
+      "main": [
+        2400,
+        2904
+      ],
+      "thumbnail": [
+        640,
+        640
+      ]
+    },
+    "kahlo": {
+      "main": [
+        2400,
+        2903
+      ],
+      "thumbnail": [
+        640,
+        640
+      ]
+    },
+    "king": {
+      "main": [
+        2400,
+        2903
+      ],
+      "thumbnail": [
+        640,
+        640
+      ]
+    },
+    "laozi": {
+      "main": [
+        2400,
+        2904
+      ],
+      "thumbnail": [
+        640,
+        640
+      ]
+    },
+    "lovelace": {
+      "main": [
+        2400,
+        2903
+      ],
+      "thumbnail": [
+        640,
+        640
+      ]
+    },
+    "mandela": {
+      "main": [
+        2400,
+        2903
+      ],
+      "thumbnail": [
+        640,
+        640
+      ]
+    },
+    "mozart": {
+      "main": [
+        2400,
+        3186
+      ],
+      "thumbnail": [
+        640,
+        640
+      ]
+    },
+    "nietzsche": {
+      "main": [
+        2400,
+        2903
+      ],
+      "thumbnail": [
+        640,
+        640
+      ]
+    },
+    "plato": {
+      "main": [
+        2400,
+        2903
+      ],
+      "thumbnail": [
+        640,
+        640
+      ]
+    },
+    "rumi": {
+      "main": [
+        2400,
+        2903
+      ],
+      "thumbnail": [
+        640,
+        640
+      ]
+    },
+    "schopenhauer": {
+      "main": [
+        2400,
+        2903
+      ],
+      "thumbnail": [
+        640,
+        640
+      ]
+    },
+    "shakespeare": {
+      "main": [
+        2400,
+        2903
+      ],
+      "thumbnail": [
+        640,
+        640
+      ]
+    },
+    "tubman": {
+      "main": [
+        2400,
+        2897
+      ],
+      "thumbnail": [
+        640,
+        640
+      ]
+    },
+    "vinci": {
+      "main": [
+        2400,
+        2904
+      ],
+      "thumbnail": [
+        640,
+        640
+      ]
+    },
+    "woolf": {
+      "main": [
+        2400,
+        2903
+      ],
+      "thumbnail": [
+        640,
+        640
+      ]
+    },
+    "zenji": {
+      "main": [
+        2400,
+        3148
+      ],
+      "thumbnail": [
+        640,
+        640
+      ]
+    },
+    "user": {
+      "thumbnail": [
+        640,
+        640
+      ]
+    }
+  },
+  "ui": {
+    "beatrice": [
+      1440,
+      1440
+    ],
+    "dante": [
+      1440,
+      1440
+    ],
+    "figure": [
+      1440,
+      2507
+    ],
+    "figure2": [
+      1440,
+      3720
+    ],
+    "figure3": [
+      1440,
+      3142
+    ],
+    "figure4": [
+      1440,
+      3548
+    ],
+    "figure5": [
+      1440,
+      3589
+    ],
+    "figure6": [
+      1440,
+      3661
+    ],
+    "figure7": [
+      1440,
+      4370
+    ],
+    "figure8": [
+      1440,
+      2228
+    ],
+    "figure9": [
+      1440,
+      4234
+    ],
+    "figure_2": [
+      1440,
+      2507
+    ]
+  },
+  "backgrounds": {
+    "starry-background": [
+      3840,
+      2152
+    ]
+  },
+  "icons": {
+    "library": [
+      512,
+      512
+    ],
+    "council": [
+      512,
+      513
+    ],
+    "paths": [
+      512,
+      512
+    ],
+    "settings": [
+      512,
+      512
+    ]
+  }
+}

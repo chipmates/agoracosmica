@@ -1,0 +1,380 @@
+/* ===== LIQUID GLASS SYSTEM 2025 ===== */
+/* Apple-inspired glass effects for Agora Cosmica */
+/* Progressive enhancement with cosmic theme integration */
+
+:root {
+  /* === Adaptive Blur Strategy === */
+  --glass-blur-subtle: 2px;        /* Overlay dimming, very light blur */
+  --glass-blur-light: 6px;         /* Minimal for small elements */
+  --glass-blur: 8px;               /* Standard glass effect - aligned with dark-mode team */
+  --glass-blur-heavy: 10px;        /* Heavy blur - aligned with dark-mode standard (was 20px) */
+  --glass-blur-max: 12px;          /* Maximum blur - reduced from 24px */
+  --glass-saturation: 120%;        /* Subtle color enhancement */
+  --glass-brightness: 105%;        /* Slight luminosity boost */
+  
+  /* === Cosmic Theme Integration === */
+  /* Light mode glass */
+  --glass-tint-light: color-mix(in srgb, white 8%, transparent);
+  --glass-border-light: color-mix(in srgb, white 15%, transparent);
+  --glass-highlight-light: color-mix(in srgb, white 40%, transparent);
+  
+  /* Dark mode glass - Cosmic blue base */
+  --glass-tint-dark: color-mix(in srgb, var(--bg-cosmic-void) 15%, transparent);          /* Cosmic primary background - more transparent */
+  --glass-border-dark: color-mix(in srgb, var(--gold-primary) 12%, transparent);      /* Golden accent border */
+  --glass-highlight-dark: color-mix(in srgb, var(--gold-primary) 25%, transparent);   /* Golden inner highlight */
+  
+  /* Audio premium variant - Enhanced cosmic glass */
+  --glass-audio-tint: color-mix(in srgb, var(--bg-cosmic-void) 35%, transparent);         /* Deeper cosmic background */
+  --glass-audio-border: color-mix(in srgb, var(--gold-primary) 18%, transparent);     /* More visible golden border */
+  --glass-audio-highlight: color-mix(in srgb, var(--gold-primary) 35%, transparent);  /* Prominent golden highlight */
+  --glass-audio-shadow: 0 8px 32px color-mix(in srgb, var(--utility-pure-black) 40%, transparent), 0 0 20px color-mix(in srgb, var(--bg-cosmic-void) 30%, transparent);
+  
+  /* === Universal Effects === */
+  --glass-shadow-standard: 0 8px 32px color-mix(in srgb, var(--utility-pure-black) 25%, transparent);
+  --glass-transition: backdrop-filter 0.3s ease, background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* ===== BASE LIQUID GLASS EFFECT ===== */
+.liquid-glass {
+  /* === Solid Fallback First === */
+  background: color-mix(in srgb, white 90%, transparent);
+  border: 1px solid color-mix(in srgb, var(--utility-pure-black) 10%, transparent);
+  transition: var(--glass-transition);
+  
+  /* GPU acceleration for performance */
+  transform: translateZ(0);
+  will-change: backdrop-filter, background-color;
+}
+
+/* === Progressive Enhancement for Supporting Browsers === */
+@supports (backdrop-filter: blur(1px)) {
+  .liquid-glass {
+    background: var(--glass-tint-light);
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness));
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation)) brightness(var(--glass-brightness));
+    border: 1px solid var(--glass-border-light);
+    box-shadow: 
+      inset 0 1px 0 var(--glass-highlight-light),  /* Inner highlight */
+      var(--glass-shadow-standard);                /* Drop shadow */
+  }
+}
+
+/* ===== DARK MODE ADAPTATION ===== */
+@media (prefers-color-scheme: dark) {
+  .liquid-glass {
+    /* Solid fallback for dark mode */
+    background: color-mix(in srgb, var(--utility-pure-black) 85%, transparent);
+    border: 1px solid color-mix(in srgb, white 10%, transparent);
+  }
+  
+  @supports (backdrop-filter: blur(1px)) {
+    .liquid-glass {
+      background: var(--glass-tint-dark);
+      border-color: var(--glass-border-dark);
+      box-shadow: 
+        inset 0 1px 0 var(--glass-highlight-dark),
+        var(--glass-shadow-standard);
+    }
+  }
+}
+
+/* ===== COMPONENT VARIANTS ===== */
+
+/* === Sidebar Variant - Performance Optimized === */
+.liquid-glass--sidebar {
+  --glass-blur: 10px;              /* Lighter blur for large surfaces */
+  --glass-tint-dark: color-mix(in srgb, var(--bg-cosmic-void) 12%, transparent);  /* Even more transparent for sidebar */
+  border-radius: 0;                /* Sidebar geometry */
+}
+
+/* === Audio Premium Variant - Minimal Blur Experiment === */
+.liquid-glass--audio {
+  --glass-blur: var(--glass-blur-light);    /* Experimental 8px minimal blur */
+  --glass-saturation: 130%;                 /* Enhanced color saturation */
+  border-radius: 16px;                      /* Smooth corners */
+}
+
+@supports (backdrop-filter: blur(1px)) {
+  .liquid-glass--audio {
+    /* Enhanced audio glass in dark mode */
+    background: var(--glass-audio-tint);
+    border: 1px solid var(--glass-audio-border);
+    box-shadow: 
+      inset 0 1px 0 var(--glass-audio-highlight),  /* Golden inner highlight */
+      var(--glass-audio-shadow);                   /* Enhanced depth shadow */
+  }
+}
+
+/* === Mini Variant - Maximum Readability === */
+.liquid-glass--mini {
+  --glass-blur: var(--glass-blur-max);      /* Maximum blur for text readability */
+  border-radius: 12px;                      /* Compact corner radius */
+}
+
+/* ===== ACCESSIBILITY & FALLBACKS ===== */
+
+/* === Respect Reduced Transparency Preference === */
+@media (prefers-reduced-transparency: reduce) {
+  .liquid-glass,
+  .liquid-glass--sidebar,
+  .liquid-glass--audio,
+  .liquid-glass--mini {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: color-mix(in srgb, white 95%, transparent) !important;
+    border: 1px solid color-mix(in srgb, var(--utility-pure-black) 20%, transparent) !important;
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--utility-pure-black) 15%, transparent) !important;
+  }
+  
+  @media (prefers-color-scheme: dark) {
+    .liquid-glass,
+    .liquid-glass--sidebar,
+    .liquid-glass--audio,
+    .liquid-glass--mini {
+      background: color-mix(in srgb, var(--utility-pure-black) 90%, transparent) !important;
+      border-color: color-mix(in srgb, white 20%, transparent) !important;
+    }
+  }
+}
+
+/* === Browser Compatibility Fallback === */
+@supports not (backdrop-filter: blur(2px)) {
+  .liquid-glass {
+    background: color-mix(in srgb, white 85%, transparent);
+    border: 1px solid color-mix(in srgb, var(--utility-pure-black) 15%, transparent);
+  }
+  
+  .liquid-glass--audio {
+    background: color-mix(in srgb, white 90%, transparent);
+    border: 1px solid color-mix(in srgb, var(--utility-pure-black) 20%, transparent);
+  }
+  
+  @media (prefers-color-scheme: dark) {
+    .liquid-glass {
+      background: color-mix(in srgb, var(--utility-pure-black) 80%, transparent);
+      border: 1px solid color-mix(in srgb, white 15%, transparent);
+    }
+    
+    .liquid-glass--audio {
+      background: color-mix(in srgb, var(--bg-cosmic-void) 85%, transparent);
+      border: 1px solid color-mix(in srgb, var(--gold-primary) 30%, transparent);
+    }
+  }
+}
+
+/* ===== PERFORMANCE OPTIMIZATIONS ===== */
+
+/* === Clean up will-change after interactions === */
+.liquid-glass:not(:hover):not(:focus):not(:active) {
+  will-change: auto;
+}
+
+/* === Performance-Adaptive Blur === */
+/* Reduce blur on older/smaller devices for performance */
+@media (max-width: 414px) and (max-height: 736px) {
+  :root {
+    --glass-blur-max: 10px;          /* Reduced max blur for older phones */
+    --glass-blur-heavy: 8px;         /* Reduced audio blur */
+  }
+}
+
+/* Disable glass effects on very small/old screens */
+@media (max-width: 320px) and (max-height: 568px) {
+  .liquid-glass,
+  .liquid-glass--sidebar,
+  .liquid-glass--audio,
+  .liquid-glass--mini {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: color-mix(in srgb, var(--utility-pure-black) 85%, transparent);
+  }
+}
+
+/* ===== ENHANCED INTERACTIONS ===== */
+
+/* === Subtle hover enhancement for interactive glass === */
+.liquid-glass--interactive:hover {
+  background: var(--glass-tint-light);
+  border-color: var(--glass-border-light);
+}
+
+@media (prefers-color-scheme: dark) {
+  .liquid-glass--interactive:hover {
+    background: var(--glass-tint-dark);
+    border-color: var(--glass-border-dark);
+  }
+}
+
+/* ===== POPUP VARIANTS (August 2025) ===== */
+
+/* === Popup Variant - Balanced Performance === */
+.liquid-glass--popup {
+  --glass-blur: var(--glass-blur-light); /* 6px - lighter for overlays */
+  --glass-tint-dark: color-mix(in srgb, var(--bg-cosmic-void) 25%, transparent); /* Slightly more opaque for popups */
+  --glass-tint-light: color-mix(in srgb, white 12%, transparent); /* Light mode popup tint */
+  border-radius: 1rem;
+  
+  /* Enhanced shadow for floating effect */
+  box-shadow: 
+    inset 0 1px 0 var(--glass-highlight-light),
+    0 20px 60px color-mix(in srgb, var(--utility-pure-black) 40%, transparent),
+    0 0 40px color-mix(in srgb, var(--bg-cosmic-void) 30%, transparent);
+}
+
+@media (prefers-color-scheme: dark) {
+  .liquid-glass--popup {
+    background: var(--glass-tint-dark);
+    box-shadow: 
+      inset 0 1px 0 var(--glass-highlight-dark),
+      0 20px 60px color-mix(in srgb, var(--utility-pure-black) 50%, transparent),
+      0 0 40px color-mix(in srgb, var(--bg-cosmic-void) 40%, transparent);
+  }
+}
+
+/* === Cosmic Variant - Special Moments === */
+.liquid-glass--cosmic {
+  --glass-blur: var(--glass-blur); /* 8px standard for special moments */
+  --glass-saturation: 140%; /* Enhanced cosmic feel */
+  --glass-brightness: 110%; /* Slightly brighter */
+  border-radius: 1.5rem;
+  
+  /* Cosmic gradient overlay */
+  background: 
+    radial-gradient(
+      ellipse at center,
+      color-mix(in srgb, var(--gold-primary) 5%, transparent) 0%,
+      color-mix(in srgb, var(--gold-primary) 2%, transparent) 40%,
+      transparent 70%
+    ),
+    var(--glass-tint-light);
+}
+
+@media (prefers-color-scheme: dark) {
+  .liquid-glass--cosmic {
+    background: 
+      radial-gradient(
+        ellipse at center,
+        color-mix(in srgb, var(--gold-primary) 8%, transparent) 0%,
+        color-mix(in srgb, var(--gold-primary) 3%, transparent) 40%,
+        transparent 70%
+      ),
+      var(--glass-tint-dark);
+    
+    /* Golden cosmic glow */
+    box-shadow: 
+      inset 0 1px 0 var(--glass-highlight-dark),
+      0 20px 60px color-mix(in srgb, var(--utility-pure-black) 40%, transparent),
+      0 0 80px color-mix(in srgb, var(--gold-primary) 10%, transparent),
+      0 0 120px color-mix(in srgb, var(--bg-cosmic-void) 20%, transparent);
+  }
+}
+
+/* === Compact Variant - Tooltips === */
+.liquid-glass--compact {
+  --glass-blur: 4px; /* Minimal blur for small elements */
+  --glass-tint-light: color-mix(in srgb, white 20%, transparent); /* More opaque for readability */
+  --glass-tint-dark: color-mix(in srgb, var(--bg-cosmic-void) 35%, transparent); /* Dark mode compact */
+  border-radius: 0.5rem;
+  
+  /* Subtle shadow for tooltips */
+  box-shadow: 
+    inset 0 1px 0 color-mix(in srgb, white 20%, transparent),
+    0 4px 12px color-mix(in srgb, var(--utility-pure-black) 20%, transparent);
+}
+
+/* === Performance-Based Variants === */
+
+/* Reduced effects for medium performance devices */
+.liquid-glass--reduced {
+  --glass-blur: 2px !important;
+  --glass-saturation: 100% !important;
+  --glass-brightness: 100% !important;
+}
+
+/* Battery saver mode */
+.liquid-glass--battery-saver {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: color-mix(in srgb, white 85%, transparent) !important;
+  border: 1px solid color-mix(in srgb, var(--utility-pure-black) 15%, transparent) !important;
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--utility-pure-black) 15%, transparent) !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  .liquid-glass--battery-saver {
+    background: color-mix(in srgb, var(--bg-cosmic-void) 90%, transparent) !important;
+    border: 1px solid color-mix(in srgb, var(--gold-primary) 20%, transparent) !important;
+  }
+}
+
+/* ===== UTILITY CLASSES ===== */
+
+/* === Elegant Solid Fallback (Not "Fake" Glass) === */
+.liquid-glass--disabled {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  
+  /* Elegant gradient fallback instead of flat color */
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, white 92%, transparent) 0%,
+    color-mix(in srgb, white 88%, transparent) 100%
+  ) !important;
+  
+  /* Subtle shadow for depth */
+  box-shadow: 
+    0 4px 20px color-mix(in srgb, var(--utility-pure-black) 8%, transparent),
+    inset 0 1px 0 color-mix(in srgb, white 50%, transparent) !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  .liquid-glass--disabled {
+    /* Premium dark gradient */
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--bg-cosmic-void) 95%, transparent) 0%,
+      color-mix(in srgb, var(--bg-cosmic-void) 90%, transparent) 100%
+    ) !important;
+    
+    /* Cosmic-aligned shadows */
+    box-shadow: 
+      0 4px 20px color-mix(in srgb, var(--utility-pure-black) 30%, transparent),
+      inset 0 1px 0 color-mix(in srgb, var(--gold-primary) 10%, transparent) !important;
+  }
+}
+
+/* Specific elegant fallbacks for each variant */
+.liquid-glass--sidebar.liquid-glass--disabled {
+  border-right: 1px solid color-mix(in srgb, var(--gold-primary) 15%, transparent) !important;
+}
+
+.liquid-glass--audio.liquid-glass--disabled {
+  /* Music player needs extra polish */
+  background: radial-gradient(
+    ellipse at center,
+    color-mix(in srgb, var(--bg-cosmic-void) 98%, transparent) 0%,
+    color-mix(in srgb, var(--bg-cosmic-void) 92%, transparent) 100%
+  ) !important;
+  border: 1px solid color-mix(in srgb, var(--gold-primary) 20%, transparent) !important;
+}
+
+.liquid-glass--popup.liquid-glass--disabled {
+  /* Popups need to float even without blur */
+  box-shadow: 
+    0 10px 40px color-mix(in srgb, var(--utility-pure-black) 20%, transparent),
+    0 2px 10px color-mix(in srgb, var(--utility-pure-black) 10%, transparent) !important;
+}
+
+/* ===== DEBUG HELPERS (Development Only) ===== */
+/* Uncomment for development debugging */
+/*
+.liquid-glass {
+  outline: 1px dashed red;
+}
+.liquid-glass--audio {
+  outline: 1px dashed gold;
+}
+.liquid-glass--sidebar {
+  outline: 1px dashed blue;
+}
+*/

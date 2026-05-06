@@ -1,0 +1,139 @@
+/* viewport-browser-only.css - Clean viewport handling without PWA complexity */
+/* Created as part of 2025 design system migration */
+
+/* ===== CORE VIEWPORT SETUP ===== */
+:root {
+  /* Simple viewport variables */
+  --app-height: 100vh;
+  --app-height: 100dvh; /* Modern override — adapts to mobile browser chrome */
+  --modal-padding: 16px;
+  --modal-margin: 16px;
+  --content-max-width: 1400px;
+  
+  /* Responsive spacing */
+  --mobile-padding: 12px;
+  --tablet-padding: 16px;
+  --desktop-padding: 40px;
+}
+
+/* ===== BASE STYLES ===== */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100vh;
+  height: 100dvh; /* Mobile Safari: adapts to URL bar visibility */
+  margin: 0;
+  padding: 0;
+  overflow: hidden; /* Prevent body scroll, components handle their own */
+}
+
+#root {
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+/* ===== APP CONTAINER ===== */
+.App {
+  display: flex;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  /* Border removed for cleaner look - was causing issues */
+}
+
+/* ===== SAFARI-SPECIFIC FIXES ===== */
+@supports (-webkit-touch-callout: none) {
+  /* iOS Safari viewport fix */
+  html, body {
+    height: -webkit-fill-available;
+  }
+  
+  /* Prevent elastic scrolling */
+  body {
+    position: fixed;
+    width: 100%;
+  }
+}
+
+/* ===== RESPONSIVE BREAKPOINTS ===== */
+/* Mobile: < 768px */
+@media (max-width: 767px) {
+  :root {
+    --modal-padding: var(--mobile-padding);
+    --content-padding: 0; /* Edge-to-edge on mobile */
+  }
+}
+
+/* Tablet: 768px - 1023px */
+@media (min-width: 768px) and (max-width: 1023px) {
+  :root {
+    --modal-padding: var(--tablet-padding);
+    --content-padding: var(--tablet-padding);
+  }
+}
+
+/* Desktop: ≥ 1024px */
+@media (min-width: 1024px) {
+  :root {
+    --modal-padding: 24px;
+    --content-padding: var(--desktop-padding);
+  }
+}
+
+/* ===== MODAL HANDLING (SIMPLIFIED) ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal, 300);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--modal-margin);
+}
+
+.modal-container {
+  max-height: calc(100dvh - 2 * var(--modal-margin));
+  max-width: calc(100% - 2 * var(--modal-margin));
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-content {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
+
+/* ===== UTILITY CLASSES ===== */
+.overflow-hidden {
+  overflow: hidden !important;
+}
+
+.overflow-auto {
+  overflow: auto !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+.height-full {
+  height: 100% !important;
+}
+
+.height-screen {
+  height: 100vh !important;
+  height: 100dvh !important;
+}
+
+/* ===== KEYBOARD HANDLING ===== */
+.keyboard-visible {
+  /* Let the browser handle keyboard naturally */
+  /* No complex height calculations needed */
+}
+
+/* ===== SCROLLBAR STYLING ===== */
+/* Scrollbars are now handled by the centralized design system in index.css */
+/* See /client/src/styles/scrollbar-themes.css to switch between themes */

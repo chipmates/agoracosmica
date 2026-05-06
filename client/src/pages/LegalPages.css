@@ -1,0 +1,479 @@
+/* ================================================== */
+/* LEGAL PAGES - FULL SCREEN MINIMALIST 2025        */
+/* ================================================== */
+
+/* Proper component isolation: Enhanced specificity for legal pages */
+body.legal-page-active {
+  background-color: var(--bg-primary); /* Component-specific background */
+}
+
+/* Component isolation: Enhanced specificity for legal page context */
+html:has(.legal-page) {
+  background: var(--bg-primary); /* Component-specific background */
+  overflow: visible; /* Component overflow control */
+  height: auto; /* Natural height for legal content */
+}
+
+body:has(.legal-page) {
+  background: var(--bg-primary); /* Component-specific background */
+  margin: 0;
+  padding: 0;
+  overflow: visible; /* Component overflow control */
+  height: auto; /* Natural height for legal content */
+}
+
+/* Component isolation: App container reset for legal pages */
+body:has(.legal-page) .App {
+  border: none; /* Clean border for legal page context */
+  border-radius: 0; /* No rounded corners for full-page legal */
+  height: auto; /* Natural height for legal content */
+  display: block; /* Block layout for legal page flow */
+}
+
+/* Fallback for older browsers without :has() support */
+@supports not selector(:has(*)) {
+  .legal-page {
+    /* Ensure it covers the entire viewport */
+    min-width: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+}
+
+/* Full page container - seamless blue background */
+.legal-page {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  background: var(--bg-primary); /* Deep blue background */
+  color: var(--text-primary); /* White text on blue background */
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: var(--z-overlay); /* 9999 */ /* Ensure it's on top of everything */
+}
+
+/* Content container - simple centered column */
+.legal-container {
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto; /* Simple horizontal centering */
+  padding: 80px 24px 120px;
+  position: relative;
+}
+
+/* Page header - clean and minimal */
+.legal-header {
+  margin-bottom: 60px;
+  text-align: center;
+}
+
+/* Main title */
+.legal-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(32px, 5vw, 48px);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  margin: 0 0 12px 0;
+  color: var(--text-primary);
+}
+
+/* Last updated date */
+.legal-date {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  color: color-mix(in srgb, white 70%, transparent);
+  margin: 0;
+}
+
+/* Simple title underline */
+.legal-header::after {
+  content: '';
+  display: block;
+  width: 60px;
+  height: 1px;
+  background: color-mix(in srgb, white 30%, transparent);
+  margin: 32px auto 0;
+}
+
+/* German-only notice for English users */
+.legal-notice {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 16px;
+  font-style: italic;
+  color: color-mix(in srgb, white 60%, transparent);
+  text-align: center;
+  margin: 24px 0 48px;
+  padding: 16px 24px;
+  background: color-mix(in srgb, white 5%, transparent);
+  /* No rounded corners */
+}
+
+/* Section styling - minimal with clear hierarchy */
+.legal-section {
+  margin-bottom: 48px;
+}
+
+/* Section headers */
+.legal-section h2 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(20px, 3vw, 24px);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  margin: 0 0 16px 0;
+  color: var(--text-primary);
+}
+
+/* Body text - optimized for reading */
+.legal-section p {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.7;
+  margin: 0 0 20px 0;
+  color: color-mix(in srgb, white 90%, transparent);
+  hyphens: auto;
+  -webkit-hyphens: auto;
+  -ms-hyphens: auto;
+}
+
+/* Lists */
+.legal-section ul {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 18px;
+  line-height: 1.7;
+  color: color-mix(in srgb, white 90%, transparent);
+  margin: 0 0 20px 0;
+  padding-left: 24px;
+  list-style: disc;
+}
+
+.legal-section ul li {
+  margin-bottom: 8px;
+}
+
+/* Links - simple underline */
+.legal-section a {
+  color: var(--text-primary);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  transition: opacity 0.2s ease;
+}
+
+.legal-section a:hover {
+  opacity: 0.8;
+}
+
+/* CloseButton positioning - fixed to viewport (2025 UPDATED) */
+.legal-close-btn {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: var(--z-dropdown); /* 100 */
+  /* Keep default gold color for visibility on blue background */
+}
+
+/* Reading progress indicator */
+.legal-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: color-mix(in srgb, white 10%, transparent);
+  z-index: var(--z-dropdown); /* 99 */
+}
+
+.legal-progress-bar {
+  height: 100%;
+  background: color-mix(in srgb, var(--gold-subtle) 60%, transparent); /* Gold accent for progress */
+  width: 0%;
+  transition: width 0.1s linear;
+}
+
+/* Custom scrollbar styling */
+html:has(.legal-page) {
+  scrollbar-color: color-mix(in srgb, white 30%, transparent) color-mix(in srgb, white 10%, transparent);
+  scrollbar-width: thin;
+}
+
+html:has(.legal-page)::-webkit-scrollbar {
+  width: 12px;
+}
+
+html:has(.legal-page)::-webkit-scrollbar-track {
+  background: color-mix(in srgb, white 10%, transparent);
+}
+
+html:has(.legal-page)::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, white 30%, transparent);
+  /* No rounded corners */
+  border: 2px solid var(--bg-primary);
+}
+
+html:has(.legal-page)::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, white 40%, transparent);
+}
+
+/* Mobile optimizations - full width usage */
+@media (max-width: 768px) {
+  .legal-container {
+    max-width: 100%; /* Use full width on mobile */
+    padding: 60px 20px 80px;
+  }
+  
+  .legal-header {
+    margin-bottom: 40px;
+  }
+  
+  .legal-title {
+    font-size: 28px;
+  }
+  
+  .legal-date {
+    font-size: 14px;
+  }
+  
+  .legal-notice {
+    font-size: 14px;
+    margin: 20px 0 32px;
+  }
+  
+  .legal-section {
+    margin-bottom: 32px;
+  }
+  
+  .legal-section h2 {
+    font-size: 20px;
+    margin-bottom: 12px;
+  }
+  
+  .legal-section p {
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+  
+  .legal-section ul {
+    font-size: 16px;
+    line-height: 1.6;
+  }
+  
+  /* Adjust close button for mobile */
+  .legal-page .cosmic-close-minimal {
+    top: 16px;
+    right: 16px;
+  }
+}
+
+/* Small mobile devices */
+@media (max-width: 375px) {
+  .legal-container {
+    max-width: 100%; /* Full width for small devices */
+    padding: 48px 16px 60px;
+  }
+  
+  .legal-section p,
+  .legal-section ul {
+    font-size: 15px;
+  }
+}
+
+/* Tablet screens - 90% width or max 600px */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .legal-container {
+    max-width: min(90%, 600px);
+    padding: 80px 40px 120px;
+  }
+}
+
+/* Desktop screens - just adjust width and padding */
+@media (min-width: 1024px) {
+  .legal-container {
+    max-width: 720px;
+    padding: 100px 40px 120px; /* Comfortable padding on desktop */
+  }
+}
+
+/* Large screens - slightly wider for better readability */
+@media (min-width: 1200px) {
+  .legal-container {
+    max-width: 800px;
+  }
+}
+
+/* Focus styles for accessibility */
+.legal-section a:focus-visible {
+  outline: 2px solid color-mix(in srgb, white 80%, transparent);
+  outline-offset: 4px;
+  /* No rounded corners */
+}
+
+/* Print styles - clean black on white */
+@media print {
+  .legal-page {
+    background: white;
+    color: black;
+    min-height: auto;
+  }
+  
+  .legal-container {
+    max-width: 100%;
+    padding: 0;
+  }
+  
+  .legal-title {
+    color: black;
+  }
+  
+  .legal-date {
+    color: var(--text-dim);
+  }
+  
+  .legal-notice {
+    background: var(--text-primary);
+    color: var(--text-dim);
+    border: 1px solid var(--text-secondary);
+    /* No rounded corners */
+  }
+  
+  .legal-section h2 {
+    color: black;
+    page-break-after: avoid;
+  }
+  
+  .legal-section p,
+  .legal-section ul {
+    color: black;
+  }
+  
+  .legal-section a {
+    color: black;
+    text-decoration: underline;
+  }
+  
+  /* Hide UI elements */
+  .cosmic-close-minimal,
+  .legal-progress {
+    display: none;
+  }
+  
+  /* Prevent page breaks inside sections */
+  .legal-section {
+    page-break-inside: avoid;
+  }
+}
+
+/* Smooth scrolling */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .legal-section p,
+  .legal-section ul {
+    color: var(--text-primary);
+  }
+  
+  .legal-date,
+  .legal-notice {
+    color: color-mix(in srgb, white 85%, transparent);
+  }
+}
+
+/* System font stack fallback for performance */
+.legal-page {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+/* Ensure fonts are loaded before applying */
+.fonts-loaded .legal-title,
+.fonts-loaded .legal-section h2 {
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.fonts-loaded .legal-date,
+.fonts-loaded .legal-notice,
+.fonts-loaded .legal-section p,
+.fonts-loaded .legal-section ul {
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+/* Legal footer links */
+.legal-footer {
+  margin-top: 60px;
+  padding-top: 30px;
+  border-top: 1px solid color-mix(in srgb, white 10%, transparent);
+  text-align: center;
+}
+
+.legal-links {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.legal-link {
+  color: var(--gold-subtle);
+  text-decoration: none;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  transition: opacity 0.2s ease;
+}
+
+.legal-link:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.legal-separator {
+  color: color-mix(in srgb, white 30%, transparent);
+  font-size: 12px;
+}
+
+/* Table styles for cookie policy */
+.legal-table {
+  width: 100%;
+  margin: 20px 0;
+  border-collapse: collapse;
+  background: color-mix(in srgb, var(--bg-card) 30%, transparent);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.legal-table th,
+.legal-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+}
+
+.legal-table th {
+  background: color-mix(in srgb, var(--gold-subtle) 10%, transparent);
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 500;
+  color: var(--gold-subtle);
+}
+
+.legal-table tr:last-child td {
+  border-bottom: none;
+}
+
+.legal-highlight {
+  color: var(--gold-subtle);
+  font-weight: 500;
+}

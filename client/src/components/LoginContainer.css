@@ -1,0 +1,379 @@
+/* src/components/LoginContainer.css */
+
+/* Login Page Specific Scaling Variables */
+:root {
+  /* Mobile baseline */
+  --login-title-scale: 0.92;  /* Slightly bigger for "Agora Cosmica" text */
+  --login-logo-scale: 0.8;   /* Proportionally sized logo */
+  --login-title-top-position: 12%;  /* Raised to clear portal at top: 50% on mobile */
+  --login-logo-top: 13%;
+}
+
+/* Android baseline (360px+) */
+@media (min-width: 360px) {
+  :root {
+    --login-title-scale: 1.0;   /* Increased from 0.9 */
+    --login-logo-scale: 0.85;   /* Increased from 0.75 */
+  }
+}
+
+/* Larger mobile devices (390px+) - iPhone 14/15, Large Android */
+@media (min-width: 390px) and (max-width: 767px) {
+  :root {
+    --login-title-scale: 1.05;  /* Even bigger for larger phones */
+    --login-logo-scale: 0.9;
+  }
+}
+
+/* XL mobile devices (430px+) - iPhone Pro Max */
+@media (min-width: 430px) and (max-width: 767px) {
+  :root {
+    --login-title-scale: 1.1;   /* Biggest for Pro Max phones */
+    --login-logo-scale: 0.95;
+  }
+}
+
+/* Tablet Portrait (768px+) */
+@media (min-width: 768px) {
+  :root {
+    --login-title-scale: 1.1;
+    --login-logo-scale: 1.3;
+    --login-title-top-position: 9%;  /* Raised for tagline room */
+  }
+}
+
+/* Tablet Only (768px-1023px) - More specific override */
+@media (min-width: 768px) and (max-width: 1023px) {
+  :root {
+    --login-title-scale: 1.15;      /* Slightly bigger for tablets */
+    --login-logo-scale: 1.4;        /* Bigger logo for tablet space */
+    --login-title-top-position: 8%; /* Raised for tagline room */
+  }
+}
+
+/* Desktop (1024px+) */
+@media (min-width: 1024px) {
+  :root {
+    --login-title-scale: 1.2;
+    --login-logo-scale: 1.5;
+    --login-title-top-position: 5%;  /* Raised higher to clear portal */
+  }
+}
+
+/* Small Desktop (1280px+) */
+@media (min-width: 1280px) {
+  :root {
+    --login-title-scale: 1.25;
+    --login-logo-scale: 1.55;
+    --login-title-top-position: 4%;  /* Raised higher */
+  }
+}
+
+/* Component Styles */
+.login-content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: var(--z-base); /* 2 */
+}
+
+/* BULLETPROOF LOGO POSITIONING - Best Practice Implementation */
+:root {
+  /* Logo positioning variables for easy adjustment */
+  --logo-size: 2.5em;        /* Bigger default size */
+  --logo-top: -1.6em;      /* Slightly higher up */
+  --logo-right: -0.6em;    /* Adjust for bigger size */
+}
+
+
+/* Small phones (≤375px): hide logo — no room beside audio button */
+@media (max-width: 375px) {
+  .headline-logo {
+    display: none;
+  }
+}
+
+/* Main title with integrated logo */
+.app-title {
+  display: inline-block;
+  position: relative;
+  white-space: nowrap; /* Prevent text wrapping */
+  line-height: 1.2;
+}
+
+/* Logo positioned as child of text - bulletproof approach */
+.headline-logo {
+  position: absolute;
+  top: var(--logo-top);
+  right: var(--logo-right);
+  width: var(--logo-size);
+  height: var(--logo-size);
+
+  /* Ensure logo doesn't affect text layout */
+  pointer-events: none;
+
+  /* Subtle glow */
+  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--gold-subtle) 40%, transparent));
+
+  /* Smooth transitions */
+  transition: all 0.3s ease-in-out;
+
+  /* Ensure crisp rendering */
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+
+}
+
+/* Larger phones (376-767px): original logo positioning */
+@media (max-width: 767px) and (min-height: 668px), (max-width: 767px) and (min-width: 376px) {
+  :root {
+    --logo-size: 1.5em;
+    --logo-top: -1.0em;
+    --logo-right: -1em;
+  }
+}
+
+
+/* iPad Portrait and similar tablets (common viewport widths) */
+@media screen and (min-width: 768px) and (max-width: 834px) and (orientation: portrait) {
+  :root {
+    --logo-size: 1.34em !important;    /* Tablet sizing */
+    --logo-top: -0.7em !important;     /* Closer to title text */
+    --logo-right: -1em !important;     /* More to the right */
+  }
+
+}
+
+/* Tablet (both orientations) - 768 to 1024 width INCLUSIVE */
+@media only screen and (min-width: 768px) and (max-width: 1024px) {
+  :root {
+    --logo-size: 1.85em !important;    /* Bigger logo for tablets */
+    --logo-top: -0.7em !important;     /* Closer to title text */
+    --logo-right: -1.2em !important;   /* Slight adjustment */
+  }
+
+}
+
+/* Desktop (wider than 1024px) */
+@media screen and (min-width: 1025px) {
+  :root {
+    --logo-size: 1.76em !important;    /* Desktop sizing */
+    --logo-top: -0.5em !important;     /* Sits at top-right of title, not above it */
+    --logo-right: -1.3em !important;   /* Further right — gives header room */
+  }
+
+}
+
+/* iPhone SE specific positioning - bulletproof approach */
+@media screen and (max-width: 375px) and (max-height: 667px) {
+  :root {
+    --logo-size: 1.4em !important;    /* Bigger for iPhone SE too */
+    --logo-top: -1.6em !important;    /* Slightly higher */
+    --logo-right: -0.95em !important; /* Adjusted for size */
+  }
+}
+
+/* Login component container */
+.login-content {
+  /* contain: style layout; - removed, not needed with new structure */
+}
+
+/* Header group - simplified for bulletproof positioning */
+.login-header-group {
+  position: absolute;
+  top: calc(var(--login-title-top-position) + env(safe-area-inset-top, 0px));
+  left: 50%;
+  transform: translateX(-50%) scale(var(--login-title-scale));
+  text-align: center;
+  transition: transform 0.3s ease-in-out;
+}
+
+
+/* Main title styling - now includes logo positioning */
+.headline {
+  margin: 0;
+  padding: 0;
+  position: relative;
+  display: inline-block;
+  /* Container for text and logo */
+  white-space: nowrap;
+}
+
+.headline-text {
+  font-family: var(--font-ui);
+  font-size: clamp(2.1rem, 6.5vw, 3.5rem); /* Tiny bit bigger for mobile */
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-tight);
+  letter-spacing: 0.12em; /* Balanced spacing */
+  font-variation-settings: 'wght' 700;
+  color: var(--gold-subtle);
+  text-shadow: 0 0 15px color-mix(in srgb, var(--gold-subtle) 40%, transparent);
+  animation: title-glow 4s infinite alternate ease-in-out;
+  animation-play-state: paused; /* Battery: only animate when visible */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Activate glow when container is visible */
+.login-header-group .headline-text {
+  animation-play-state: running;
+}
+
+@keyframes title-glow {
+  0% { text-shadow: 0 0 10px color-mix(in srgb, var(--gold-subtle) 30%, transparent); }
+  100% { text-shadow: 0 0 20px color-mix(in srgb, var(--gold-subtle) 50%, transparent); }
+}
+
+/* Mobile-specific optimizations for "Agora Cosmica" */
+@media (max-width: 767px) {
+  .headline-text {
+    letter-spacing: 0.1em; /* Slightly tighter for mobile */
+  }
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .headline-text {
+    animation: none;
+  }
+}
+
+/* Brand Tagline — slides up and fades in after title */
+.brand-tagline {
+  margin: 0.5rem 0 0;
+  padding: 0;
+  font-family: var(--font-ui);
+  font-size: clamp(0.72rem, 2vw, 0.92rem);
+  font-weight: 300;
+  letter-spacing: 0.12em;
+  color: var(--gold-subtle);
+  opacity: 0;
+  text-align: center;
+  text-shadow: 0 0 8px color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+  white-space: normal;
+  animation: tagline-reveal 1.6s cubic-bezier(0.16, 1, 0.3, 1) 0.8s forwards;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@keyframes tagline-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 0.8;
+    transform: translateY(0);
+  }
+}
+
+/* Tagline responsive — slightly smaller on mobile */
+@media (max-width: 767px) {
+  .brand-tagline {
+    letter-spacing: 0.08em;
+    margin-top: 0.35rem;
+    max-width: 90vw;
+  }
+}
+
+/* Hide tagline on very short viewports (landscape phones, short laptops with browser chrome) */
+@media (max-height: 580px) {
+  .brand-tagline {
+    display: none;
+  }
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .brand-tagline {
+    animation: none;
+    opacity: 0.8;
+  }
+}
+
+/* ===== 5-BREAKPOINT RESPONSIVE SYSTEM ===== */
+
+/* Tablet Portrait (768px+) */
+@media (min-width: 768px) {
+  .headline-text {
+    font-size: clamp(2.8rem, 6vw, 3.5rem);
+  }
+}
+
+/* Specific fix for iPad portrait */
+@media (min-width: 768px) and (max-width: 1023px) and (orientation: portrait) {
+  .headline-text {
+    font-size: clamp(3rem, 6.5vw, 3.8rem);
+  }
+}
+
+/* Desktop Start (1024px+) */
+@media (min-width: 1024px) {
+  .headline-text {
+    font-size: clamp(3rem, 5vw, 4rem);
+  }
+}
+
+/* Laptop Standard (1366px+) */
+@media (min-width: 1366px) {
+  :root {
+    --login-title-scale: 1.35;
+    --login-logo-scale: 1.65;
+    --login-title-top-position: 5%;  /* Raised higher */
+  }
+  
+  .headline-text {
+    font-size: clamp(3.2rem, 4.5vw, 4.2rem);
+  }
+}
+
+/* Full Desktop (1920px+) */
+@media (min-width: 1920px) {
+  .login-content {
+    padding-top: 4vh;
+  }
+  
+  .headline-text {
+    font-size: clamp(3.5rem, 4vw, 5rem); /* Allow bigger max */
+  }
+}
+
+/* 2K/QHD (2560px+) */
+@media (min-width: 2560px) {
+  .headline-text {
+    font-size: clamp(4rem, 4vw, 5.5rem);
+  }
+}
+
+/* 4K uses same scaling as 2K - no additional breakpoint needed */
+
+/* Merged with max-height: 700px above for simplicity */
+
+/* Short device handling (landscape orientation) — excludes iPhone SE */
+@media (max-height: 700px) and (min-width: 376px) {
+  :root {
+    --logo-size: 1.5em;     /* Double even in landscape */
+    --logo-top: -0.9em;     /* Adjust for bigger logo */
+    --logo-right: -0.35em;  /* Much more right */
+  }
+  
+  .headline-text {
+    font-size: 2.4rem; /* Smaller for short devices */
+  }
+}
+
+/* Base styles handle 320-359px for accessibility */
+/* No special breakpoint needed */
+
+/* Header fade-out during Paradiso transition */
+.header-to-quote {
+  animation: headerFadeOut 1.2s ease-out forwards;
+}
+
+@keyframes headerFadeOut {
+  to { opacity: 0; }
+}

@@ -1,0 +1,2205 @@
+/* CouncilSetupModal.css - Moebius Starwatcher Inspired Design */
+
+/* Moebius Color Palette */
+:root {
+  /* Cosmic Deep Blues (from Starwatcher) */
+  --cosmic-deep-blue: var(--bg-primary); /* Changed to primary blue for better contrast */
+  --cosmic-blue-primary: var(--bg-highlight);
+  --cosmic-blue-light: var(--bg-highlight); /* Similar to primary */
+  --cosmic-blue-gradient: linear-gradient(135deg, var(--bg-astral) 0%, var(--bg-highlight) 50%, var(--bg-highlight) 100%);
+
+  /* Starwatcher Golds & Ambers */
+  --starwatcher-gold: var(--gold-subtle);
+  --starwatcher-amber: var(--gold-primary);
+  --starwatcher-bronze: var(--gold-deep);
+  --starwatcher-warm: var(--gold-hover);
+
+  /* Mystical Accents */
+  --mystic-purple: var(--mode-wisdom);
+  --mystic-teal: var(--mode-freetalk);
+  --mystic-pink: var(--color-error);
+  --cosmic-white: var(--text-primary);
+  --cosmic-silver: var(--text-secondary);
+
+  /* Moebius Signature Gradients */
+  --moebius-cosmic-gradient: linear-gradient(135deg,
+    var(--cosmic-deep-blue) 0%,
+    var(--cosmic-blue-primary) 30%,
+    var(--mystic-purple) 60%,
+    var(--cosmic-blue-light) 100%
+  );
+
+  --moebius-gold-gradient: linear-gradient(135deg,
+    var(--starwatcher-bronze) 0%,
+    var(--starwatcher-gold) 50%,
+    var(--starwatcher-amber) 100%
+  );
+
+  /* Atmospheric Effects */
+  --cosmic-glow: 0 0 30px color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+  --starwatcher-shadow: 0 8px 32px color-mix(in srgb, var(--bg-card) 40%, transparent);
+  --mystic-shimmer: 0 0 20px color-mix(in srgb, var(--mode-wisdom) 20%, transparent);
+
+  /* New Tiered System Colors */
+  --featured-glow: 0 0 25px color-mix(in srgb, var(--gold-star) 40%, transparent);
+  --debate-accent: var(--mode-quest); /* Quest mode coral */
+  --advisory-accent: var(--mode-prism); /* Prism blue — 🌊 water = blue */
+  --custom-accent: var(--mode-wisdom);
+
+  /* Council Theme Accent Colors — proven brand palette (revision 1, 2026-05-02)
+     All colors sourced from existing brand tokens. Adjacent themes in catalog order
+     (who-am-i → loss-grief) read distinct at a glance. */
+  --council-who-am-i: var(--gold-primary);                 /* Gold (#E6BC5C) — brand signature, identity as inner mirror */
+  --council-love-connection: var(--mode-quest);            /* Coral (#E97451) — love runs warm */
+  --council-meaning-purpose: var(--mode-freetalk-hover);   /* Mint (#7FD4AA) — forward, fresh */
+  --council-mind-creativity: var(--star-blue-light);       /* Silver-blue (#B4C8FF) — intellectual ether */
+  --council-moral-life: var(--gold-deep);                  /* Deep gold (#B38B30) — earned, grounded ethics */
+  --council-freedom-justice: var(--gold-subtle);           /* Subtle gold (#D4A539) — dignity, NOT alarm red */
+  --council-faith-death-mystery: var(--mode-wisdom);       /* Wisdom purple (#9D83CD) — mystical, cosmic */
+  --council-loss-grief: var(--mode-prism);                 /* Prism blue (#5B8BD4) — mourning blue, depth, dusk */
+}
+
+/* Main Modal Overlay - Fullscreen */
+.council-setup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--moebius-cosmic-gradient);
+  backdrop-filter: blur(var(--glass-blur-max));
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: var(--z-modal-overlay); /* 3000 */
+  padding: 0;
+  overflow: hidden;
+}
+
+/* Modal Container - Fullscreen with Scrollable Content */
+.council-setup-modal {
+  background: var(--bg-primary);
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+  border-radius: 0;
+  width: 100%;
+  height: 100vh; /* Fallback */
+  height: 100dvh; /* Safari-compatible - adapts to dynamic address bar */
+  max-width: none;
+  max-height: none;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-shadow:
+    var(--starwatcher-shadow),
+    var(--cosmic-glow),
+    inset 0 1px 0 color-mix(in srgb, white 10%, transparent);
+  backdrop-filter: blur(var(--glass-blur-max));
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Scrollbar Styling */
+.council-setup-modal::-webkit-scrollbar {
+  width: 8px;
+}
+
+.council-setup-modal::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+  border-radius: 4px;
+}
+
+.council-setup-modal::-webkit-scrollbar-thumb {
+  background: var(--moebius-gold-gradient);
+  border-radius: 4px;
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 50%, transparent);
+}
+
+/* Header Section - Smart Dynamic Layout */
+.council-setup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem 0.5rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+  position: relative;
+  flex-shrink: 0;
+  gap: 1rem;
+}
+
+.council-setup-header::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 1px;
+  background: var(--moebius-gold-gradient);
+  box-shadow: var(--cosmic-glow);
+}
+
+/* Dynamic Title Section */
+.council-setup-title-section {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+}
+
+.council-setup-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  font-family: 'Space Grotesk Variable', 'Orbitron Variable', sans-serif;
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 700;
+  color: var(--starwatcher-gold);
+  text-shadow: var(--cosmic-glow);
+  margin: 0 0 0.5rem 0;
+  line-height: 1.2;
+}
+
+.council-setup-title-icon {
+  font-size: 1.5rem;
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--gold-subtle) 50%, transparent));
+}
+
+.council-setup-subtitle {
+  font-size: 1rem;
+  color: var(--cosmic-silver);
+  margin: 0;
+  opacity: 0.9;
+  line-height: 1.4;
+  text-align: center;
+}
+
+/* =============================================================================
+   HERO SECTION — 2 curated heroes + custom builder
+   ============================================================================= */
+
+.council-hero-section {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 1.25rem 2rem 0.5rem;
+}
+
+/* Hero cards use same width as theme row cards */
+.council-hero-section > .council-card--hero,
+.council-hero-section > .council-hero-custom {
+  flex-shrink: 0;
+  width: calc(100vw - 4rem);
+  height: auto;
+}
+
+.council-hero-card {
+  position: relative;
+  overflow: hidden;
+  padding: 1.25rem;
+  min-height: 180px;
+  background: color-mix(in srgb, var(--bg-highlight) 40%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 25%, transparent);
+  border-radius: 16px;
+  cursor: pointer;
+  outline: none;
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+/* Hero card content sits above artwork */
+.council-hero-card__header,
+.council-hero-card__question,
+.council-hero-card .council-progress-track {
+  position: relative;
+  z-index: 1;
+}
+
+/* Hero cards use their council's theme color (set via data-theme attribute) */
+.council-hero-card--confrontational,
+.council-hero-card--reflective {
+  border-left: 4px solid var(--starwatcher-gold);
+}
+
+/* Theme-colored hero backgrounds + borders */
+.council-hero-card[data-theme="loss-grief"] {
+  border-left-color: var(--council-loss-grief);
+  background: color-mix(in srgb, var(--council-loss-grief) 22%, var(--bg-card));
+  box-shadow: inset 0 0 40px color-mix(in srgb, var(--council-loss-grief) 15%, transparent);
+}
+.council-hero-card[data-theme="meaning-purpose"] {
+  border-left-color: var(--council-meaning-purpose);
+  background: color-mix(in srgb, var(--council-meaning-purpose) 22%, var(--bg-card));
+  box-shadow: inset 0 0 40px color-mix(in srgb, var(--council-meaning-purpose) 15%, transparent);
+}
+/* Fallback for any other theme */
+.council-hero-card[data-theme="love-connection"] { border-left-color: var(--council-love-connection); background: color-mix(in srgb, var(--council-love-connection) 22%, var(--bg-card)); }
+.council-hero-card[data-theme="who-am-i"] { border-left-color: var(--council-who-am-i); background: color-mix(in srgb, var(--council-who-am-i) 22%, var(--bg-card)); }
+.council-hero-card[data-theme="freedom-justice"] { border-left-color: var(--council-freedom-justice); background: color-mix(in srgb, var(--council-freedom-justice) 22%, var(--bg-card)); }
+.council-hero-card[data-theme="faith-death-mystery"] { border-left-color: var(--council-faith-death-mystery); background: color-mix(in srgb, var(--council-faith-death-mystery) 22%, var(--bg-card)); }
+.council-hero-card[data-theme="moral-life"] { border-left-color: var(--council-moral-life); background: color-mix(in srgb, var(--council-moral-life) 22%, var(--bg-card)); }
+.council-hero-card[data-theme="mind-creativity"] { border-left-color: var(--council-mind-creativity); background: color-mix(in srgb, var(--council-mind-creativity) 22%, var(--bg-card)); }
+
+.council-hero-card:focus-visible {
+  box-shadow: 0 0 0 2px var(--starwatcher-gold);
+}
+
+.council-hero-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.council-hero-card__title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--starwatcher-gold);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.council-hero-card__type-badge {
+  font-size: 1rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.council-hero-card__question {
+  font-size: 0.85rem;
+  color: var(--cosmic-silver);
+  line-height: 1.5;
+  margin: 0;
+  opacity: 0.9;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* Custom builder hero card — visually distinct */
+.council-hero-custom {
+  padding: 1.25rem;
+  background: color-mix(in srgb, var(--gold-subtle) 6%, transparent);
+  border: 1px dashed color-mix(in srgb, var(--gold-subtle) 40%, transparent);
+  border-radius: 16px;
+  cursor: pointer;
+  outline: none;
+  transition: background 0.2s ease, border-color 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 100px;
+}
+
+.council-hero-custom:focus-visible {
+  box-shadow: 0 0 0 2px var(--starwatcher-gold);
+}
+
+.council-hero-custom__icon {
+  color: var(--starwatcher-gold);
+  margin-bottom: 0.5rem;
+  opacity: 0.8;
+}
+
+.council-hero-custom__title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--starwatcher-gold);
+  margin: 0 0 0.25rem 0;
+  line-height: 1.3;
+}
+
+.council-hero-custom__subtitle {
+  font-size: 0.8rem;
+  color: var(--cosmic-silver);
+  margin: 0;
+  opacity: 0.8;
+  line-height: 1.4;
+}
+
+/* =============================================================================
+   THEME ROW — Carousel with dot indicators
+   ============================================================================= */
+
+.council-theme-row {
+  padding: 0.75rem 0 0.25rem;
+}
+
+/* Header row — label left, Netflix-style bars right */
+.council-theme-row__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem 0.5rem;
+  gap: 0.75rem;
+}
+
+.council-theme-row__label {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  padding: 0;
+  margin: 0;
+}
+
+/* Section line extending from theme label */
+.council-theme-row__header::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  opacity: 0.12;
+  background: var(--text-secondary);
+  margin-left: 0.5rem;
+}
+
+/* Theme-colored section lines */
+.council-theme-row[data-theme="loss-grief"] .council-theme-row__header::after { background: var(--council-loss-grief); }
+.council-theme-row[data-theme="love-connection"] .council-theme-row__header::after { background: var(--council-love-connection); }
+.council-theme-row[data-theme="who-am-i"] .council-theme-row__header::after { background: var(--council-who-am-i); }
+.council-theme-row[data-theme="meaning-purpose"] .council-theme-row__header::after { background: var(--council-meaning-purpose); }
+.council-theme-row[data-theme="freedom-justice"] .council-theme-row__header::after { background: var(--council-freedom-justice); }
+.council-theme-row[data-theme="faith-death-mystery"] .council-theme-row__header::after { background: var(--council-faith-death-mystery); }
+.council-theme-row[data-theme="moral-life"] .council-theme-row__header::after { background: var(--council-moral-life); }
+.council-theme-row[data-theme="mind-creativity"] .council-theme-row__header::after { background: var(--council-mind-creativity); }
+
+/* Theme-colored row labels */
+.council-theme-row[data-theme="loss-grief"] .council-theme-row__label { color: var(--council-loss-grief); }
+.council-theme-row[data-theme="love-connection"] .council-theme-row__label { color: var(--council-love-connection); }
+.council-theme-row[data-theme="who-am-i"] .council-theme-row__label { color: var(--council-who-am-i); }
+.council-theme-row[data-theme="meaning-purpose"] .council-theme-row__label { color: var(--council-meaning-purpose); }
+.council-theme-row[data-theme="freedom-justice"] .council-theme-row__label { color: var(--council-freedom-justice); }
+.council-theme-row[data-theme="faith-death-mystery"] .council-theme-row__label { color: var(--council-faith-death-mystery); }
+.council-theme-row[data-theme="moral-life"] .council-theme-row__label { color: var(--council-moral-life); }
+.council-theme-row[data-theme="mind-creativity"] .council-theme-row__label { color: var(--council-mind-creativity); }
+
+/* Netflix-style bar indicators */
+.council-theme-row__bars {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.council-theme-row__bar {
+  width: 16px;
+  height: 2px;
+  border-radius: 1px;
+  background: color-mix(in srgb, var(--cosmic-silver) 25%, transparent);
+  transition: background 0.2s ease;
+}
+
+.council-theme-row__bar--active {
+  background: var(--starwatcher-gold); /* fallback */
+}
+
+/* Theme-colored active bars */
+.council-theme-row[data-theme="loss-grief"] .council-theme-row__bar--active { background: var(--council-loss-grief); }
+.council-theme-row[data-theme="love-connection"] .council-theme-row__bar--active { background: var(--council-love-connection); }
+.council-theme-row[data-theme="who-am-i"] .council-theme-row__bar--active { background: var(--council-who-am-i); }
+.council-theme-row[data-theme="meaning-purpose"] .council-theme-row__bar--active { background: var(--council-meaning-purpose); }
+.council-theme-row[data-theme="freedom-justice"] .council-theme-row__bar--active { background: var(--council-freedom-justice); }
+.council-theme-row[data-theme="faith-death-mystery"] .council-theme-row__bar--active { background: var(--council-faith-death-mystery); }
+.council-theme-row[data-theme="moral-life"] .council-theme-row__bar--active { background: var(--council-moral-life); }
+.council-theme-row[data-theme="mind-creativity"] .council-theme-row__bar--active { background: var(--council-mind-creativity); }
+
+/* Scroll container — positions arrows relative to it */
+.council-theme-row__scroll-container {
+  position: relative;
+}
+
+.council-theme-row__scroll {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  padding: 0.25rem 2rem 0.5rem;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.council-theme-row__scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.council-theme-row__card-wrapper {
+  flex-shrink: 0;
+  scroll-snap-align: center;
+  /* Mobile: one card at a time (nearly full width) */
+  width: calc(100vw - 4rem);
+}
+
+/* Netflix-style scroll arrows — tall edge strips with bare chevrons */
+.council-theme-row__arrow {
+  display: flex;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 2;
+  width: 2.5rem;
+  min-height: 44px;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  color: var(--cosmic-silver);
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease, opacity 0.2s ease;
+  opacity: 0.5;
+}
+
+.council-theme-row__arrow--left {
+  left: 0;
+  background: linear-gradient(to right, color-mix(in srgb, var(--bg-primary) 85%, transparent), transparent);
+}
+
+.council-theme-row__arrow--right {
+  right: 0;
+  background: linear-gradient(to left, color-mix(in srgb, var(--bg-primary) 85%, transparent), transparent);
+}
+
+/* =============================================================================
+   COUNCIL CARD
+   ============================================================================= */
+
+.council-card {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-card); /* Overridden by data-theme selectors below */
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 15%, transparent);
+  border-radius: 16px;
+  padding: 1.25rem;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  outline: none;
+  min-height: 180px;
+  height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Hero card modifier — same min-height as regular cards */
+.council-card--hero {
+  min-height: 180px;
+}
+
+/* Left border = theme accent color (type shown by emoji instead) */
+.council-card--confrontational,
+.council-card--reflective {
+  border-left: 4px solid var(--starwatcher-gold); /* fallback, overridden by data-theme */
+}
+
+.council-card[data-theme="loss-grief"] { border-left-color: var(--council-loss-grief); }
+.council-card[data-theme="love-connection"] { border-left-color: var(--council-love-connection); }
+.council-card[data-theme="who-am-i"] { border-left-color: var(--council-who-am-i); }
+.council-card[data-theme="meaning-purpose"] { border-left-color: var(--council-meaning-purpose); }
+.council-card[data-theme="freedom-justice"] { border-left-color: var(--council-freedom-justice); }
+.council-card[data-theme="faith-death-mystery"] { border-left-color: var(--council-faith-death-mystery); }
+.council-card[data-theme="moral-life"] { border-left-color: var(--council-moral-life); }
+.council-card[data-theme="mind-creativity"] { border-left-color: var(--council-mind-creativity); }
+
+/* Theme-colored card backgrounds: 25% theme tint on dark card + inner glow */
+.council-card[data-theme="loss-grief"] {
+  background: color-mix(in srgb, var(--council-loss-grief) 22%, var(--bg-card));
+  box-shadow: inset 0 0 40px color-mix(in srgb, var(--council-loss-grief) 15%, transparent);
+}
+.council-card[data-theme="love-connection"] {
+  background: color-mix(in srgb, var(--council-love-connection) 22%, var(--bg-card));
+  box-shadow: inset 0 0 40px color-mix(in srgb, var(--council-love-connection) 15%, transparent);
+}
+.council-card[data-theme="who-am-i"] {
+  background: color-mix(in srgb, var(--council-who-am-i) 22%, var(--bg-card));
+  box-shadow: inset 0 0 40px color-mix(in srgb, var(--council-who-am-i) 15%, transparent);
+}
+.council-card[data-theme="meaning-purpose"] {
+  background: color-mix(in srgb, var(--council-meaning-purpose) 22%, var(--bg-card));
+  box-shadow: inset 0 0 40px color-mix(in srgb, var(--council-meaning-purpose) 15%, transparent);
+}
+.council-card[data-theme="freedom-justice"] {
+  background: color-mix(in srgb, var(--council-freedom-justice) 22%, var(--bg-card));
+  box-shadow: inset 0 0 40px color-mix(in srgb, var(--council-freedom-justice) 15%, transparent);
+}
+.council-card[data-theme="faith-death-mystery"] {
+  background: color-mix(in srgb, var(--council-faith-death-mystery) 22%, var(--bg-card));
+  box-shadow: inset 0 0 40px color-mix(in srgb, var(--council-faith-death-mystery) 15%, transparent);
+}
+.council-card[data-theme="moral-life"] {
+  background: color-mix(in srgb, var(--council-moral-life) 22%, var(--bg-card));
+  box-shadow: inset 0 0 40px color-mix(in srgb, var(--council-moral-life) 15%, transparent);
+}
+.council-card[data-theme="mind-creativity"] {
+  background: color-mix(in srgb, var(--council-mind-creativity) 22%, var(--bg-card));
+  box-shadow: inset 0 0 40px color-mix(in srgb, var(--council-mind-creativity) 15%, transparent);
+}
+
+.council-card:focus-visible {
+  box-shadow: 0 0 0 2px var(--starwatcher-gold);
+}
+
+.council-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.council-card__title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--starwatcher-gold); /* fallback, overridden by theme */
+  margin: 0;
+  line-height: 1.3;
+}
+
+/* Theme-colored card titles */
+.council-card[data-theme="loss-grief"] .council-card__title { color: var(--council-loss-grief); }
+.council-card[data-theme="love-connection"] .council-card__title { color: var(--council-love-connection); }
+.council-card[data-theme="who-am-i"] .council-card__title { color: var(--council-who-am-i); }
+.council-card[data-theme="meaning-purpose"] .council-card__title { color: var(--council-meaning-purpose); }
+.council-card[data-theme="freedom-justice"] .council-card__title { color: var(--council-freedom-justice); }
+.council-card[data-theme="faith-death-mystery"] .council-card__title { color: var(--council-faith-death-mystery); }
+.council-card[data-theme="moral-life"] .council-card__title { color: var(--council-moral-life); }
+.council-card[data-theme="mind-creativity"] .council-card__title { color: var(--council-mind-creativity); }
+
+.council-card__type-badge {
+  font-size: 1rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+/* Hook question: personal, punchy, large enough to read at a glance */
+.council-card__hook {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  line-height: 1.5;
+  margin: 0;
+  opacity: 0.85;
+  flex: 1;
+}
+
+/* =============================================================================
+   COUNCIL CARD — Theme-colored accents + figure watermark + footer + badges
+   ============================================================================= */
+
+/* Theme-colored left border (replaces type-only coloring) */
+.council-card[data-theme="loss-grief"] { border-left-color: var(--council-loss-grief); }
+.council-card[data-theme="love-connection"] { border-left-color: var(--council-love-connection); }
+.council-card[data-theme="who-am-i"] { border-left-color: var(--council-who-am-i); }
+.council-card[data-theme="meaning-purpose"] { border-left-color: var(--council-meaning-purpose); }
+.council-card[data-theme="freedom-justice"] { border-left-color: var(--council-freedom-justice); }
+.council-card[data-theme="faith-death-mystery"] { border-left-color: var(--council-faith-death-mystery); }
+.council-card[data-theme="moral-life"] { border-left-color: var(--council-moral-life); }
+.council-card[data-theme="mind-creativity"] { border-left-color: var(--council-mind-creativity); }
+
+/* Card artwork layer (SVG art or generative sigil) */
+.council-card__art {
+  position: absolute;
+  inset: 0.75rem;
+  pointer-events: none;
+  opacity: 0.7;
+  transition: opacity 0.4s ease, filter 0.4s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.council-card__art > svg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.council-card:hover .council-card__art {
+  opacity: 1;
+  filter: brightness(1.4) saturate(1.2);
+}
+
+/* Generative sigil fallback */
+.council-card__sigil {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Card content sits above the sigil */
+.council-card__content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+/* Moderator portrait watermark (disabled, kept for future use) */
+.council-card__watermark {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 50%;
+  opacity: 0.08;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: 0 16px 16px 0;
+}
+
+.council-card__watermark img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  filter: grayscale(100%) brightness(1.5);
+}
+
+/* Card footer with figures + duration */
+.council-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 0.75rem;
+  border-top: 1px solid color-mix(in srgb, var(--cosmic-silver) 10%, transparent);
+}
+
+.council-card__figures-text {
+  font-size: 0.8rem;
+  color: color-mix(in srgb, var(--cosmic-silver) 60%, transparent);
+  letter-spacing: 0.3px;
+  line-height: 1.4;
+}
+
+.council-card__duration {
+  font-size: 0.8rem;
+  color: color-mix(in srgb, var(--cosmic-silver) 50%, transparent);
+  letter-spacing: 0.3px;
+  flex-shrink: 0;
+}
+
+/* Progression badges */
+.council-card__badge {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.council-card__badge-check {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--starwatcher-gold) 20%, transparent);
+  color: var(--starwatcher-gold);
+  font-size: 10px;
+}
+
+.council-card__badge-check--gold {
+  background: var(--starwatcher-gold);
+  color: var(--cosmic-deep-blue);
+}
+
+/* Accent bar on hover (theme-colored bottom strip) */
+.council-card__accent-bar {
+  position: absolute;
+  bottom: 0;
+  left: 1.25rem;
+  right: 1.25rem;
+  height: 2px;
+  border-radius: 2px;
+  opacity: 0;
+  transform: scaleX(0.5);
+  transform-origin: left;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.council-card:hover .council-card__accent-bar {
+  opacity: 0.7;
+  transform: scaleX(1);
+}
+
+/* =============================================================================
+   THEME JUMP BAR — Horizontal tab bar for quick navigation
+   ============================================================================= */
+
+.council-theme-jumpbar {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.5rem 2rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--gold-subtle) 10%, transparent);
+  flex-shrink: 0;
+}
+
+.council-theme-jumpbar::-webkit-scrollbar {
+  display: none;
+}
+
+.council-theme-jumpbar__item {
+  padding: 0.5rem 0.75rem;
+  min-height: 44px;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--cosmic-silver);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.2s ease, border-color 0.2s ease;
+  display: flex;
+  align-items: center;
+}
+
+.council-theme-jumpbar__item:hover {
+  color: var(--text-primary);
+}
+
+.council-theme-jumpbar__item--active {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* Active underline uses theme color via inline style */
+
+/* =============================================================================
+   FIGURE CHIPS — Pill badges for participants
+   ============================================================================= */
+
+.council-figure-chips {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+
+.council-figure-chip {
+  padding: 0.25rem 0.65rem;
+  border-radius: 100px;
+  font-size: 0.8rem;
+  border: 1px solid color-mix(in srgb, var(--cosmic-silver) 15%, transparent);
+  background: color-mix(in srgb, var(--cosmic-silver) 5%, transparent);
+  color: color-mix(in srgb, var(--cosmic-silver) 80%, transparent);
+  letter-spacing: 0.2px;
+}
+
+.council-figure-chip--moderator {
+  border-color: color-mix(in srgb, var(--starwatcher-gold) 30%, transparent);
+  background: color-mix(in srgb, var(--starwatcher-gold) 8%, transparent);
+  color: var(--starwatcher-gold);
+  font-weight: 500;
+}
+
+/* =============================================================================
+   QUESTION ACCENT BAR — Vertical colored bar next to question
+   ============================================================================= */
+
+.council-detail-sheet__question--accented {
+  padding-left: 1rem;
+  position: relative;
+}
+
+.council-detail-sheet__question-bar {
+  position: absolute;
+  left: 0;
+  top: 0.2rem;
+  bottom: 0.2rem;
+  width: 2px;
+  border-radius: 2px;
+  opacity: 0.6;
+}
+
+/* =============================================================================
+   OPENING LINE PREVIEW — Italic teaser from manifest
+   ============================================================================= */
+
+.council-detail-sheet__preview {
+  font-size: 0.85rem;
+  font-style: italic;
+  color: color-mix(in srgb, var(--cosmic-silver) 60%, transparent);
+  line-height: 1.55;
+  margin: 0 0 1.25rem 0;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* =============================================================================
+   LEVEL 2 REVEAL — "Go Deeper" section appears after L1 completion
+   ============================================================================= */
+
+.council-level2-section {
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px dashed color-mix(in srgb, var(--cosmic-silver) 15%, transparent);
+  transition: opacity 0.4s ease;
+}
+
+/* Locked state: visible but muted */
+.council-level2-section--locked {
+  opacity: 0.35;
+}
+
+.council-level2-section--locked .council-level2-icon,
+.council-level2-section--locked .council-level2-title {
+  color: var(--cosmic-silver);
+}
+
+.council-level2-locked-hint {
+  font-size: 0.8rem;
+  color: var(--cosmic-silver);
+  margin: 0;
+  opacity: 0.9;
+  font-style: italic;
+}
+
+/* Unlocked state: gold shimmer on first appearance */
+@keyframes level2-reveal {
+  0% { opacity: 0; transform: translateY(6px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.council-level2-section--unlocked {
+  animation: level2-reveal 0.5s ease-out;
+}
+
+.council-level2-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.council-level2-icon {
+  font-size: 1rem;
+  color: var(--starwatcher-gold);
+}
+
+.council-level2-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--starwatcher-gold);
+  margin: 0;
+}
+
+.council-level2-description {
+  font-size: 0.85rem;
+  color: var(--cosmic-silver);
+  line-height: 1.5;
+  margin: 0 0 1rem 0;
+  opacity: 0.8;
+}
+
+.council-level2-play {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0.65rem 2rem;
+  margin: 0 auto;
+  background: color-mix(in srgb, var(--starwatcher-gold) 15%, transparent);
+  border: 1px solid color-mix(in srgb, var(--starwatcher-gold) 40%, transparent);
+  border-radius: 12px;
+  color: var(--starwatcher-gold);
+  font-weight: 500;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.council-level2-play:hover {
+  background: color-mix(in srgb, var(--starwatcher-gold) 25%, transparent);
+  transform: translateY(-1px);
+}
+
+/* =============================================================================
+   SAFETY INDICATOR — Subtle footer text for Sensitive/Deep councils
+   ============================================================================= */
+
+.council-safety-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid color-mix(in srgb, var(--cosmic-silver) 8%, transparent);
+  font-size: 0.75rem;
+  color: color-mix(in srgb, var(--cosmic-silver) 50%, transparent);
+  letter-spacing: 0.3px;
+}
+
+/* =============================================================================
+   POST-PLAYBACK INTERSTITIAL — Gentle screen after Deep-tier councils
+   ============================================================================= */
+
+.council-postplay {
+  position: fixed;
+  inset: 0;
+  z-index: 3100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+  background: var(--bg-primary);
+  opacity: 0;
+  animation: fadeIn 0.8s ease 0.5s forwards;
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+
+.council-postplay__text {
+  font-size: 1.1rem;
+  color: var(--cosmic-silver);
+  line-height: 1.6;
+  max-width: 320px;
+  margin-bottom: 2rem;
+}
+
+.council-postplay__continue {
+  min-height: 44px;
+  padding: 0.75rem 2.5rem;
+  background: color-mix(in srgb, var(--starwatcher-gold) 15%, transparent);
+  border: 1px solid color-mix(in srgb, var(--starwatcher-gold) 40%, transparent);
+  border-radius: 12px;
+  color: var(--starwatcher-gold);
+  font-weight: 500;
+  font-size: 0.95rem;
+  cursor: pointer;
+  margin-bottom: 1.5rem;
+  transition: background 0.2s ease;
+}
+
+.council-postplay__help-link {
+  font-size: 0.8rem;
+  color: color-mix(in srgb, var(--cosmic-silver) 50%, transparent);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.council-postplay__help-link:hover {
+  color: var(--cosmic-silver);
+}
+
+/* =============================================================================
+   DETAIL SHEET — Bottom sheet overlay for council details
+   ============================================================================= */
+
+.council-detail-sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 3050;
+  background: color-mix(in srgb, var(--bg-primary) 60%, transparent);
+  backdrop-filter: blur(var(--glass-blur-light));
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.council-detail-sheet {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  background: var(--bg-primary);
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+  border-bottom: none;
+  border-radius: 20px 20px 0 0;
+  padding: 1.5rem;
+  padding-top: 1.25rem;
+  box-shadow: 0 -8px 32px color-mix(in srgb, var(--bg-card) 60%, transparent);
+  border-top: 3px solid var(--starwatcher-gold); /* overridden by inline style */
+}
+
+/* Artwork background in detail sheet */
+.council-detail-sheet__art {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.8;
+  overflow: hidden;
+  border-radius: 20px 20px 0 0;
+}
+
+/* All detail sheet content above artwork */
+.council-detail-sheet__header,
+.council-detail-sheet__question,
+.council-detail-sheet__preview,
+.council-figure-chips,
+.council-detail-sheet__play,
+.council-level2-section,
+.council-safety-indicator {
+  position: relative;
+  z-index: 1;
+}
+
+.council-detail-sheet--confrontational {
+  border-top-color: var(--debate-accent);
+}
+
+.council-detail-sheet--reflective {
+  border-top-color: var(--advisory-accent);
+}
+
+.council-detail-sheet__close {
+  flex-shrink: 0;
+}
+
+.council-detail-sheet__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.council-detail-sheet__title-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.council-detail-sheet__title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--starwatcher-gold);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.council-detail-sheet__type-badge {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  line-height: 1.3;
+}
+
+.council-detail-sheet__description {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  line-height: 1.5;
+  margin: 0 0 1rem 0;
+  opacity: 0.85;
+}
+
+.council-detail-sheet__question {
+  font-size: 0.95rem;
+  color: var(--cosmic-silver);
+  line-height: 1.6;
+  margin: 0 0 1.25rem 0;
+  opacity: 0.9;
+  font-style: italic;
+}
+
+.council-detail-sheet__figures {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1.5rem;
+}
+
+.council-detail-sheet__moderator {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  color: var(--cosmic-white);
+  font-weight: 500;
+}
+
+.council-detail-sheet__moderator svg {
+  color: var(--starwatcher-gold);
+  flex-shrink: 0;
+}
+
+/* Type-specific moderator accent */
+.council-detail-sheet--confrontational .council-detail-sheet__moderator {
+  color: var(--mode-quest-hover);
+}
+
+.council-detail-sheet--reflective .council-detail-sheet__moderator {
+  color: var(--mode-prism-hover);
+}
+
+.council-detail-sheet__participants {
+  font-size: 0.85rem;
+  color: var(--cosmic-silver);
+  line-height: 1.4;
+}
+
+.council-detail-sheet__play {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0.75rem 2.5rem;
+  margin: 0 auto;
+  background: var(--moebius-gold-gradient);
+  border: 1px solid var(--starwatcher-gold);
+  border-radius: 12px;
+  color: var(--cosmic-deep-blue);
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: var(--cosmic-glow);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Shimmer sweep on play button */
+.council-detail-sheet__play::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, white 20%, transparent), transparent);
+  animation: council-shimmer 3.5s ease-in-out infinite;
+  animation-play-state: paused;
+}
+
+.council-detail-sheet__play:hover::after {
+  animation-play-state: running;
+}
+
+@keyframes council-shimmer {
+  0% { left: -100%; }
+  100% { left: 200%; }
+}
+
+.council-detail-sheet__duration {
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+
+/* Build Your Own removed — now part of hero section */
+
+/* =============================================================================
+   BACK BUTTON (Custom view -> Catalog)
+   ============================================================================= */
+
+.council-back-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  min-height: 44px;
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+  border-radius: 12px;
+  color: var(--starwatcher-gold);
+  font-weight: 500;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+/* =============================================================================
+   CUSTOM BUILDER VIEW (existing styles kept)
+   ============================================================================= */
+
+/* Content Sections - Optimized for Fullscreen */
+.council-setup-carousel-section {
+  padding: 1rem 2rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--gold-subtle) 10%, transparent);
+  flex-shrink: 0;
+}
+
+.council-setup-solar-section {
+  padding: 1rem 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--gold-subtle) 10%, transparent);
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.council-setup-question-section {
+  padding: 1rem 2rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--gold-subtle) 10%, transparent);
+  flex-shrink: 0;
+}
+
+.council-setup-question-label {
+  display: block;
+  font-weight: 600;
+  color: var(--starwatcher-gold);
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+}
+
+.council-setup-question-input {
+  width: 100%;
+  background: var(--bg-primary);
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+  border-radius: 12px;
+  padding: 1rem;
+  color: var(--cosmic-white);
+  font-family: inherit;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  resize: vertical;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.council-setup-question-input:focus {
+  outline: none;
+  border-color: var(--starwatcher-gold);
+  box-shadow:
+    var(--cosmic-glow),
+    inset 0 0 0 1px color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+}
+
+.council-setup-question-input::placeholder {
+  color: color-mix(in srgb, var(--text-primary) 60%, transparent);
+  font-style: italic;
+}
+
+.council-setup-question-counter {
+  text-align: right;
+  font-size: 0.8rem;
+  color: color-mix(in srgb, white 60%, transparent);
+  margin-top: 0.5rem;
+}
+
+/* Actions Section - Compact */
+.council-setup-actions {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem 2rem;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.council-setup-action-secondary {
+  background: color-mix(in srgb, white 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+  border-radius: 12px;
+  padding: 0.75rem 1.5rem;
+  color: var(--cosmic-silver);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.council-setup-action-secondary:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--gold-subtle) 15%, transparent);
+  border-color: var(--starwatcher-gold);
+  color: var(--starwatcher-gold);
+  transform: translateY(-1px);
+}
+
+.council-setup-action-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.council-setup-action-primary {
+  background: var(--moebius-gold-gradient);
+  border: 1px solid var(--starwatcher-gold);
+  border-radius: 12px;
+  padding: 0.75rem 2rem;
+  min-height: 44px; /* Ensure 44px touch target */
+  color: var(--cosmic-deep-blue);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  text-shadow: none;
+  box-shadow: var(--cosmic-glow);
+}
+
+.council-setup-action-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow:
+    var(--cosmic-glow),
+    0 12px 24px color-mix(in srgb, var(--gold-subtle) 40%, transparent);
+}
+
+.council-setup-action-primary:disabled,
+.council-setup-action-primary.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Quota exhausted: button stays clickable so it can route to the rate-limit modal. */
+.council-setup-action-primary[data-quota-exhausted="true"] {
+  opacity: 0.55;
+  cursor: pointer;
+  transform: none;
+}
+.council-setup-action-primary[data-quota-exhausted="true"]:hover {
+  opacity: 0.75;
+  transform: none;
+}
+
+.loading-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--cosmic-deep-blue);
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+}
+
+/* Summary Section */
+.council-setup-summary {
+  padding: 1rem 2rem;
+  background: var(--bg-primary);
+  border-radius: 0 0 24px 24px;
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.council-setup-summary-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--cosmic-silver);
+}
+
+.council-setup-summary-item svg {
+  color: var(--starwatcher-gold);
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--gold-subtle) 30%, transparent));
+}
+
+/* =============================================================================
+   QUESTION HEADER — label + pill toggle inline
+   ============================================================================= */
+
+.council-setup-question-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.council-setup-question-header .council-setup-question-label {
+  margin-bottom: 0;
+}
+
+/* =============================================================================
+   COMPACT PILL TOGGLE — Debate / Advisory
+   ============================================================================= */
+
+.council-type-pill {
+  display: flex;
+  background: color-mix(in srgb, var(--bg-highlight) 40%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+  border-radius: 20px;
+  padding: 3px;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.council-type-pill__option {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.85rem;
+  min-height: 36px;
+  border: none;
+  border-radius: 17px;
+  background: transparent;
+  color: var(--cosmic-silver);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+}
+
+.council-type-pill__option:hover:not(.council-type-pill__option--active) {
+  color: var(--starwatcher-gold);
+  background: color-mix(in srgb, var(--gold-subtle) 8%, transparent);
+}
+
+.council-type-pill__option--active {
+  background: var(--moebius-gold-gradient);
+  color: var(--cosmic-deep-blue);
+  font-weight: 600;
+  box-shadow: 0 0 12px color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+}
+
+@media (max-width: 480px) {
+  .council-setup-question-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .council-type-pill__option {
+    padding: 0.3rem 0.65rem;
+    font-size: 0.75rem;
+    min-height: 32px;
+  }
+}
+
+/* =============================================================================
+   CURATED COUNCIL STYLES (kept for custom view)
+   ============================================================================= */
+
+.council-setup-curated-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  padding: 0.5rem 0.75rem;
+  background: color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+  border-radius: 6px;
+  color: var(--starwatcher-gold);
+  font-size: 0.85rem;
+  font-weight: 600;
+  width: fit-content;
+}
+
+/* Read-only Question Input for Curated Councils */
+.council-setup-question-input.read-only {
+  background: color-mix(in srgb, var(--bg-primary) 50%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+  color: color-mix(in srgb, var(--text-primary) 80%, transparent);
+  cursor: not-allowed;
+  resize: none;
+}
+
+.council-setup-question-input.read-only:focus {
+  border-color: color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+  box-shadow: none;
+}
+
+/* =============================================================================
+   RESPONSIVE DESIGN
+   ============================================================================= */
+
+/* Tablet: wider cards, multiple visible */
+@media (min-width: 768px) {
+  .council-theme-row__card-wrapper {
+    width: 360px;
+  }
+
+
+  /* Hero cards match theme row card width on tablet */
+  .council-hero-section > .council-card--hero,
+  .council-hero-section > .council-hero-custom {
+    width: 360px;
+  }
+
+  /* Detail sheet: centered dialog on tablet+ */
+  .council-detail-sheet-backdrop {
+    align-items: center;
+  }
+
+  .council-detail-sheet {
+    max-width: 500px;
+    border-radius: 20px;
+    border-bottom: 1px solid color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+    max-height: 85vh;
+  }
+}
+
+/* Desktop: even wider + max-width constraints */
+@media (min-width: 1200px) {
+  .council-theme-row__card-wrapper {
+    width: 400px;
+  }
+
+
+  .council-hero-section > .council-card--hero,
+  .council-hero-section > .council-hero-custom {
+    width: 400px;
+  }
+
+  .council-detail-sheet {
+    max-width: 560px;
+  }
+}
+
+/* Hover effects — only on pointer devices */
+@media (hover: hover) {
+  .council-card:hover {
+    border-color: color-mix(in srgb, var(--gold-subtle) 50%, transparent);
+    filter: brightness(1.15);
+    transform: translateY(-2px);
+  }
+
+  .council-hero-card:hover {
+    background: color-mix(in srgb, var(--gold-subtle) 12%, transparent);
+    border-color: var(--starwatcher-gold);
+    box-shadow: var(--cosmic-glow), 0 4px 20px color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+    transform: translateY(-2px);
+  }
+
+  .council-hero-custom:hover {
+    background: color-mix(in srgb, var(--gold-subtle) 12%, transparent);
+    border-color: var(--starwatcher-gold);
+    border-style: solid;
+  }
+
+  .council-back-button:hover {
+    background: color-mix(in srgb, var(--gold-subtle) 10%, transparent);
+    border-color: var(--starwatcher-gold);
+  }
+
+  .council-detail-sheet__play:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--cosmic-glow), 0 6px 16px color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+  }
+
+
+  /* Desktop: disable user scroll on theme rows, use arrows instead.
+     Prevents trackpad/Magic Mouse vertical scroll from being captured
+     by the horizontal scroll container. scrollBy() still works.
+     Wheel events are forwarded to the modal via JS. */
+  .council-theme-row__scroll {
+    overflow-x: hidden;
+    scroll-snap-type: none;
+  }
+
+  /* Desktop: arrows appear on row hover */
+  .council-theme-row__arrow {
+    opacity: 0;
+    width: 3rem;
+  }
+
+  .council-theme-row__scroll-container:hover .council-theme-row__arrow {
+    opacity: 0.7;
+  }
+
+  .council-theme-row__arrow:hover {
+    opacity: 1;
+    color: var(--starwatcher-gold);
+  }
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .council-setup-modal {
+    width: 100%;
+    height: 100vh; /* Fallback */
+    height: 100dvh; /* Safari-compatible */
+    max-width: none;
+    max-height: none;
+    border-radius: 0;
+  }
+
+  .council-setup-overlay {
+    padding: 0;
+  }
+
+  .council-setup-header {
+    padding: 1rem;
+  }
+
+  .council-setup-header::before {
+    display: none;
+  }
+
+  .desktop-close-button {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 1100;
+  }
+
+  .council-hero-section {
+    padding: 1rem 1rem 0.5rem;
+  }
+
+  .council-theme-row__header {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .council-theme-row__scroll {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .council-theme-row__card-wrapper {
+    /* One card at a time — adjusted for 1rem padding on each side */
+    width: calc(100vw - 2rem);
+  }
+
+  .council-setup-title {
+    font-size: 1.2rem;
+  }
+
+  .council-setup-subtitle {
+    font-size: 0.9rem;
+  }
+
+  .council-setup-carousel-section {
+    padding: 1rem;
+  }
+
+  .council-setup-solar-section {
+    padding: 0.5rem 0;
+  }
+
+  .council-setup-question-section {
+    padding: 1rem;
+  }
+
+  .council-setup-actions {
+    padding: 1rem;
+    justify-content: center;
+  }
+
+  .council-setup-action-primary {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .council-setup-summary {
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .council-detail-sheet {
+    padding: 1.25rem;
+    padding-top: 2.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .council-setup-overlay {
+    padding: 0;
+  }
+
+  .council-setup-modal {
+    width: 100%;
+    height: 100vh; /* Fallback */
+    height: 100dvh; /* Safari-compatible */
+    max-width: none;
+    max-height: none;
+    border-radius: 0;
+  }
+
+  .council-setup-header {
+    padding: 0.5rem;
+  }
+
+  .desktop-close-button {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    z-index: 1100;
+  }
+
+  .council-hero-section {
+    padding: 0.75rem 0.5rem 0.25rem;
+    gap: 0.5rem;
+  }
+
+  .council-theme-row__header {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+
+  .council-theme-row__label {
+    font-size: 0.85rem;
+  }
+
+  .council-theme-row__scroll {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    gap: 0.5rem;
+  }
+
+  .council-theme-row__card-wrapper {
+    /* One card at a time — adjusted for 0.5rem padding on each side */
+    width: calc(100vw - 1rem);
+  }
+
+  .council-theme-row__bar {
+    width: 12px;
+  }
+
+  .council-setup-title {
+    font-size: 1.1rem;
+  }
+
+  .council-setup-subtitle {
+    font-size: 0.85rem;
+  }
+
+  .council-setup-carousel-section {
+    padding: 0.5rem;
+  }
+
+  .council-setup-solar-section {
+    padding: 0.25rem 0;
+  }
+
+  .council-setup-question-section {
+    padding: 0.5rem;
+  }
+
+  .council-setup-actions {
+    padding: 0.5rem;
+    justify-content: center;
+  }
+
+  .council-setup-action-primary {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .council-setup-summary {
+    padding: 0.5rem;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .council-detail-sheet {
+    padding: 1rem;
+    padding-top: 2.25rem;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .council-setup-modal,
+  .council-setup-action-primary,
+  .council-setup-action-secondary,
+  .council-card,
+  .council-hero-card,
+  .council-hero-custom,
+  .council-back-button,
+  .council-detail-sheet__play,
+  .council-detail-sheet__close,
+  .council-theme-row__arrow,
+  .council-theme-row__bar {
+    transition: none !important;
+  }
+}
+
+@media (prefers-contrast: high) {
+  .council-setup-modal {
+    background: color-mix(in srgb, var(--utility-pure-black) 95%, transparent);
+    border: 2px solid var(--starwatcher-gold);
+  }
+
+  .council-setup-title,
+  .council-setup-subtitle,
+  .council-setup-question-label {
+    color: var(--cosmic-white) !important;
+  }
+
+  .council-card {
+    border-width: 2px;
+  }
+
+  .council-hero-card {
+    border-width: 2px;
+  }
+
+  .council-detail-sheet {
+    border-width: 2px;
+  }
+}
+
+/* Desktop optimizations - Maintain Fullscreen */
+@media (min-width: 1024px) {
+  .council-setup-modal {
+    width: 100%;
+    height: 100vh; /* Fallback */
+    height: 100dvh; /* Safari-compatible */
+    max-width: none;
+    max-height: none;
+    border-radius: 0;
+  }
+
+  .council-setup-overlay {
+    padding: 0;
+  }
+}
+
+/* =============================================================================
+   PROGRESS BAR + COMPLETION BADGE
+   ============================================================================= */
+
+/* Cards with progress need relative positioning for the absolute bar */
+.council-card--has-progress,
+.council-hero-card--has-progress {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Progress track — thin bar at card bottom */
+.council-progress-track {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: color-mix(in srgb, var(--gold-subtle) 15%, transparent);
+  border-radius: 0 0 16px 16px;
+}
+
+/* Progress fill — gold gradient */
+.council-progress-fill {
+  height: 100%;
+  background: var(--moebius-gold-gradient);
+  border-radius: 0 0 0 16px;
+  transition: width 0.3s ease;
+}
+
+/* Completed fill — solid gold with subtle glow */
+.council-progress-fill--completed {
+  background: var(--starwatcher-gold);
+  border-radius: 0 0 16px 16px;
+  box-shadow: 0 0 6px color-mix(in srgb, var(--gold-subtle) 40%, transparent);
+}
+
+/* Type badge group — flex container for badge + emoji */
+.council-card__type-badge-group,
+.council-hero-card__type-badge-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* Completion badge — small mint circle with checkmark */
+.council-progress-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--color-success);
+  border: 1.5px solid color-mix(in srgb, var(--color-success) 70%, white);
+  color: var(--bg-primary);
+  pointer-events: none;
+  flex-shrink: 0;
+}
+
+/* Accessibility: reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  .council-progress-fill {
+    transition: none !important;
+  }
+}
+
+/* ============================== */
+/* Helper Popup Content Styles    */
+/* ============================== */
+
+.council-setup-help-content {
+  font-size: 0.95rem;
+}
+
+.council-setup-help-overview {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--gold-subtle) 8%, transparent), color-mix(in srgb, var(--gold-subtle) 3%, transparent));
+  border-radius: 8px;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 15%, transparent);
+}
+
+.council-setup-help-heading {
+  color: var(--gold-subtle);
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+}
+
+.council-setup-help-heading-icon {
+  color: var(--gold-subtle);
+}
+
+.council-setup-help-text {
+  margin: 0;
+  opacity: 0.9;
+  padding-left: 26px;
+  line-height: 1.5;
+}
+
+.council-setup-help-section {
+  margin-bottom: 1rem;
+}
+
+.council-setup-help-list {
+  margin: 0;
+  padding-left: 26px;
+  opacity: 0.9;
+  font-size: 0.9rem;
+  list-style: none;
+}
+
+.council-setup-help-list-item {
+  margin-bottom: 0.35rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.council-setup-help-list-item-icon {
+  color: var(--gold-subtle);
+  opacity: 0.7;
+  flex-shrink: 0;
+}
+
+.council-setup-help-bullet-list {
+  margin: 0;
+  padding-left: 26px;
+  opacity: 0.9;
+  font-size: 0.9rem;
+  list-style: none;
+}
+
+.council-setup-help-bullet-item {
+  margin-bottom: 0.25rem;
+  padding-left: 1rem;
+  text-indent: -1rem;
+}
+
+.council-setup-help-modes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: color-mix(in srgb, var(--gold-subtle) 5%, transparent);
+  border-radius: 6px;
+}
+
+.council-setup-help-modes-heading {
+  color: var(--gold-subtle);
+  margin: 0;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+}
+
+.council-setup-help-modes-list {
+  margin: 0;
+  padding-left: 26px;
+  opacity: 0.9;
+  font-size: 0.85rem;
+  list-style: none;
+}
+
+.council-setup-help-modes-item {
+  margin-bottom: 0.25rem;
+}
+
+.council-setup-help-modes-item:last-child {
+  margin-bottom: 0;
+}
+
+/* Accessibility: high contrast */
+@media (prefers-contrast: high) {
+  .council-progress-track {
+    height: 4px;
+    background: color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+  }
+
+  .council-progress-badge {
+    border-width: 2px;
+    border-color: var(--cosmic-white);
+  }
+}
+
+/* ============================================
+   Crisis Resources Overlay
+   ============================================ */
+
+.council-crisis-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--bg-primary) 85%, transparent);
+  backdrop-filter: blur(8px);
+  padding: 24px;
+}
+
+.council-crisis-card {
+  max-width: 480px;
+  width: 100%;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  padding: 32px 28px;
+  text-align: left;
+}
+
+.council-crisis-message {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+  margin: 0 0 24px;
+}
+
+.council-crisis-resources {
+  list-style: none;
+  margin: 0 0 24px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.council-crisis-resource {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 14px;
+  background: color-mix(in srgb, var(--bg-highlight) 40%, transparent);
+  border-radius: 10px;
+  border: 1px solid var(--border-subtle);
+}
+
+.council-crisis-resource strong {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.council-crisis-contact {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--gold-subtle);
+  letter-spacing: 0.02em;
+}
+
+.council-crisis-description {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.council-crisis-close {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--bg-highlight) 30%, transparent);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  min-height: 44px;
+}
+
+.council-crisis-close:hover {
+  background: color-mix(in srgb, var(--bg-highlight) 50%, transparent);
+}
+
+/* =============================================================================
+   MOBILE REVISION (2026-04-20) — typography floor + spacing
+   Applies only to ≤768px (with ≤480px refinement). Desktop unchanged.
+   ============================================================================= */
+@media (max-width: 768px) {
+  /* Hero custom card — title reads as card primary, subtitle as meta */
+  .council-hero-custom__title {
+    font-size: 1rem; /* 16px */
+  }
+  .council-hero-custom__subtitle {
+    font-size: 0.8125rem; /* 13px */
+  }
+
+  /* Theme row label — stronger hierarchy above the carousel */
+  .council-theme-row__label {
+    font-size: 0.9375rem; /* 15px */
+  }
+
+  /* Question input — 16px prevents iOS from auto-zooming on focus */
+  .council-setup-question-input {
+    font-size: 1rem; /* 16px */
+    scroll-margin-bottom: 20vh; /* keep textarea visible above mobile keyboard */
+  }
+  .council-setup-question-counter {
+    font-size: 0.8125rem; /* 13px */
+  }
+
+  /* Debate / Advisory pill — readable meta, was 12.8px */
+  .council-type-pill__option {
+    font-size: 0.8125rem; /* 13px */
+  }
+
+  /* Theme jumpbar chips + figure chips + summary items — shared meta floor */
+  .council-theme-jumpbar__item,
+  .council-figure-chip {
+    font-size: 0.8125rem; /* 13px */
+  }
+  .council-setup-summary-item {
+    font-size: 0.8125rem; /* 13px */
+  }
+
+  /* Hero + theme row cards — give the content breathing room from screen edges */
+  .council-theme-row__card-wrapper {
+    width: calc(100vw - 2rem); /* was calc(100vw - 1rem), now 8px each side */
+  }
+}
+
+@media (max-width: 480px) {
+  /* Compact summary bar — wrap to a second row when long German labels don't fit */
+  .council-setup-summary {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem 1rem;
+    padding: 0.5rem 0.75rem;
+  }
+  .council-setup-summary-item {
+    min-width: 0;
+    gap: 0.35rem;
+    white-space: nowrap;
+  }
+
+  /* Keep the pill readable at the smallest viewport */
+  .council-type-pill__option {
+    font-size: 0.8125rem; /* 13px — overrides the earlier 12px rule */
+  }
+}
+
+/* Ultra-narrow phones: hide the Balance indicator so the row doesn't collide */
+@media (max-width: 380px) {
+  .council-setup-summary-item:nth-child(3) {
+    display: none;
+  }
+}

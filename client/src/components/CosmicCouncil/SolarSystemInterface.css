@@ -1,0 +1,664 @@
+/* SolarSystemInterface.css - Moebius Cosmic Solar System */
+
+/* Solar System Container - Fixed Height Under Carousel */
+.solar-system-container {
+  position: relative;
+  width: 100%;
+  height: 500px; /* Fixed height for consistent layout */
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-primary); /* Standard project background color */
+}
+
+/* Circular Orbit System */
+.solar-system-orbit {
+  position: relative;
+  width: 400px;
+  height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Visible Orbit Circle - Like Logo */
+.orbit-circle {
+  position: absolute;
+  width: 320px;
+  height: 320px;
+  border: 2px solid color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent);
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: var(--z-base); /* 1 */
+}
+
+/* Solar System Grid Layout - Replaced with Circular Positioning */
+.solar-system-grid {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Moderator Sun - Centered in Orbit */
+.moderator-sun {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 120px;
+  height: 120px;
+  z-index: var(--z-base); /* 20 */
+}
+
+.sun-corona {
+  display: none; /* Removed for minimal design */
+}
+
+.sun-core {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--moebius-gold-gradient);
+  border-radius: 50%;
+  border: 3px solid var(--starwatcher-gold);
+  box-shadow: 
+    0 0 20px color-mix(in srgb, var(--gold-subtle) var(--a-40), transparent),
+    inset 0 2px 4px color-mix(in srgb, white var(--a-30), transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-base); /* 21 */
+}
+
+.sun-pulse {
+  display: none; /* Removed for minimal design */
+}
+
+.moderator-image {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  border: 2px solid color-mix(in srgb, white var(--a-80), transparent);
+  object-fit: cover;
+}
+
+.moderator-sun .moderator-crown {
+  position: absolute;
+  /* Positioned at the IMAGE top-right corner rather than the sun-core corner,
+     so it hugs the face no matter how much bigger the sun halo is. */
+  top: -1px;
+  right: -1px;
+  background: var(--moebius-gold-gradient);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cosmic-deep-blue);
+  border: 1px solid var(--starwatcher-gold);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--gold-subtle) var(--a-50), transparent);
+  z-index: var(--z-base); /* 22 */
+}
+
+/* Moderator Remove Button — anchored to the IMAGE corner, not the sun-core
+   corner, and sized generously so the X is legible. */
+.moderator-remove {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 26px;
+  height: 26px;
+  background: color-mix(in srgb, var(--mode-quest-active) var(--a-90), transparent);
+  border: 1px solid var(--mode-quest-active);
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: var(--z-base); /* 23 - Above crown */
+}
+
+/* Virtual touch target for moderator remove - WCAG 44px */
+.moderator-remove::after {
+  content: '';
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  z-index: -1; /* Behind button but captures clicks */
+  /* Debug: uncomment to see touch target */
+  /* background: rgba(255, 0, 0, 0.1); */
+}
+
+.moderator-remove:hover {
+  background: var(--mode-quest-active);
+  transform: scale(1.15);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--mode-quest-active) var(--a-60), transparent);
+}
+
+.moderator-remove:active {
+  transform: scale(1.05);
+}
+
+/* Pulsing dashed border on empty moderator sun */
+@keyframes moderator-pulse {
+  0%, 100% {
+    border-color: color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent);
+  }
+  50% {
+    border-color: var(--starwatcher-gold);
+  }
+}
+
+.moderator-sun:not(.has-moderator) .sun-core {
+  border: 3px dashed color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent);
+  background: color-mix(in srgb, var(--bg-astral) var(--a-30), transparent);
+  animation: moderator-pulse 2s ease-in-out infinite;
+  animation-play-state: paused; /* CLAUDE.md: paused by default */
+}
+
+/* Only animate when the solar system is in editing mode (not read-only) */
+.solar-system-container:not(.read-only) .moderator-sun:not(.has-moderator) .sun-core {
+  animation-play-state: running;
+}
+
+.moderator-title {
+  position: absolute;
+  bottom: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.8125rem; /* 13px — was 11px, below readability floor */
+  color: var(--starwatcher-gold);
+  font-weight: 600;
+  white-space: nowrap;
+  text-shadow: 0 0 4px color-mix(in srgb, var(--gold-subtle) var(--a-50), transparent);
+}
+
+/* Orbital Slot Positions - Dynamic Layout using CSS Custom Properties */
+.orbit-slot {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  top: calc(50% + var(--orbit-y) * 160px);
+  left: calc(50% + var(--orbit-x) * 160px);
+  transform: translate(-50%, -50%);
+}
+
+/* Dynamic positioning using CSS custom properties */
+/* nth-child fallbacks removed to prevent conflicts in read-only mode */
+
+/* Occupied Orbit Slot */
+.orbit-slot.occupied {
+  z-index: var(--z-base); /* 15 */
+}
+
+.orbit-figure {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.orbit-figure-container {
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+
+.orbit-figure-image {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 2px solid color-mix(in srgb, var(--gold-subtle) var(--a-50), transparent);
+  object-fit: cover;
+}
+
+.orbit-figure-glow {
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  background: radial-gradient(circle,
+    color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent) 0%,
+    color-mix(in srgb, var(--gold-subtle) var(--a-10), transparent) 50%,
+    transparent 70%
+  );
+  border-radius: 50%;
+  opacity: 0;
+  z-index: -1;
+}
+
+.orbit-figure-remove {
+  position: absolute;
+  /* Sit at the image top-right corner. Slot is 100–140px, image 80–110px, so
+     the X center lands on the image corner with a small positive inset. */
+  top: 2px;
+  right: 2px;
+  width: 26px;
+  height: 26px;
+  background: color-mix(in srgb, var(--mode-quest-active) var(--a-90), transparent);
+  border: 1px solid var(--mode-quest-active);           /* Quest mode active */
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: var(--z-base); /* 16 */
+}
+
+/* Virtual touch target for orbit remove - WCAG 44px */
+.orbit-figure-remove::after {
+  content: '';
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  z-index: -1; /* Behind button but captures clicks */
+  /* Debug: uncomment to see touch target */
+  /* background: rgba(255, 0, 0, 0.1); */
+}
+
+.orbit-figure-remove:hover {
+  background: var(--mode-quest-active);                 /* Quest mode active solid */
+  transform: scale(1.15); /* Unified hover scale with moderator */
+  box-shadow: 0 0 12px color-mix(in srgb, var(--mode-quest-active) var(--a-60), transparent);
+}
+
+.orbit-figure-name {
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.8125rem; /* 13px — was 11px, below readability floor */
+  color: var(--cosmic-silver);
+  font-weight: 500;
+  white-space: nowrap;
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+}
+
+/* Empty Orbit Slot - Fixed Static */
+.orbit-slot.empty {
+  border: 2px dashed color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--bg-astral) var(--a-30), transparent);
+}
+
+.orbit-slot.empty.highlighted {
+  border-color: var(--starwatcher-gold);
+  background: color-mix(in srgb, var(--gold-subtle) var(--a-10), transparent);
+  box-shadow: 0 0 20px color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent);
+}
+
+.orbit-empty {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.orbit-empty-icon {
+  color: var(--starwatcher-gold);
+  opacity: 0.6;
+}
+
+.orbit-empty-text {
+  font-size: 0.75rem; /* 12px */
+  color: var(--cosmic-silver);
+  text-align: center;
+  opacity: 0.7;
+  line-height: 1.2;
+}
+
+/* Desktop Design */
+@media (min-width: 1024px) {
+  .solar-system-container {
+    height: 600px;
+    max-width: 1000px;
+    padding: 3rem;
+  }
+  
+  .solar-system-orbit {
+    width: 500px;
+    height: 500px;
+  }
+  
+  .orbit-circle {
+    width: 400px;
+    height: 400px;
+  }
+  
+  .moderator-sun {
+    width: 180px;
+    height: 180px;
+  }
+  
+  .sun-core {
+    width: 150px;
+    height: 150px;
+  }
+  
+  .moderator-image {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .orbit-slot {
+    width: 140px;
+    height: 140px;
+    /* Use CSS custom properties for dynamic positioning on desktop */
+    top: calc(50% + var(--orbit-y) * 200px);
+    left: calc(50% + var(--orbit-x) * 200px);
+  }
+  
+  .orbit-figure-container {
+    width: 110px;
+    height: 110px;
+  }
+  
+  .orbit-figure-image {
+    width: 110px;
+    height: 110px;
+  }
+}
+
+/* Tablet Design */
+@media (max-width: 768px) {
+  .solar-system-container {
+    height: 440px; /* extra room for larger orbit avatars + labels */
+    max-width: 600px;
+    padding: 1rem;
+  }
+  
+  .solar-system-orbit {
+    width: 350px;
+    height: 350px;
+  }
+  
+  .orbit-circle {
+    width: 280px;
+    height: 280px;
+  }
+  
+  .moderator-sun {
+    width: 108px;
+    height: 108px;
+  }
+
+  .sun-core {
+    width: 86px;
+    height: 86px;
+  }
+
+  .moderator-image {
+    width: 68px; /* bigger than an orbit participant — reads as the center */
+    height: 68px;
+  }
+
+  .moderator-sun .moderator-crown {
+    width: 30px;
+    height: 30px;
+    top: -5px;
+    right: -5px;
+  }
+
+  .moderator-sun .moderator-crown svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .moderator-remove {
+    width: 24px;
+    height: 24px;
+    top: -3px;
+    left: -3px;
+  }
+
+  .moderator-remove svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  .orbit-slot {
+    width: 78px;
+    height: 78px;
+  }
+
+  .orbit-figure-container {
+    width: 64px;
+    height: 64px;
+  }
+
+  .orbit-figure-image {
+    width: 64px;
+    height: 64px;
+  }
+
+  .orbit-figure-remove {
+    width: 24px;
+    height: 24px;
+    top: -5px;
+    right: -5px;
+  }
+
+  .orbit-figure-remove svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  /* Use CSS custom properties for dynamic positioning on tablet */
+  .orbit-slot {
+    top: calc(50% + var(--orbit-y) * 140px);
+    left: calc(50% + var(--orbit-x) * 140px);
+  }
+}
+
+/* Mobile Design */
+@media (max-width: 480px) {
+  .solar-system-container {
+    height: 400px; /* +40px for larger orbit avatars + labels */
+    max-width: 360px;
+    padding: 0.5rem;
+  }
+
+  .solar-system-orbit {
+    width: 320px; /* +40px (14% larger) */
+    height: 320px;
+  }
+
+  .orbit-circle {
+    width: 260px; /* +40px (18% larger) */
+    height: 260px;
+  }
+
+  .moderator-sun {
+    width: 100px;
+    height: 100px;
+  }
+
+  .sun-core {
+    width: 80px;
+    height: 80px;
+  }
+
+  .moderator-image {
+    width: 64px; /* matches orbit participants; sun halo keeps it dominant */
+    height: 64px;
+  }
+
+  .moderator-sun .moderator-crown {
+    width: 22px; /* matches the remove-X circle below for visual symmetry */
+    height: 22px;
+    top: -3px;
+    right: -3px;
+  }
+
+  .moderator-sun .moderator-crown svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .moderator-remove {
+    width: 22px;
+    height: 22px;
+    top: -3px;
+    left: -3px;
+  }
+
+  .moderator-remove svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .moderator-title {
+    font-size: 0.8125rem; /* 13px floor */
+    bottom: -22px;
+  }
+
+  .orbit-slot {
+    width: 76px;
+    height: 76px;
+  }
+
+  .orbit-figure-container {
+    width: 62px; /* matches the carousel avatar scale at this breakpoint */
+    height: 62px;
+  }
+
+  .orbit-figure-image {
+    width: 62px;
+    height: 62px;
+  }
+
+  .orbit-figure-remove {
+    width: 22px;
+    height: 22px;
+    top: -3px;
+    right: -3px;
+  }
+
+  .orbit-figure-remove svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .orbit-figure-name {
+    font-size: 0.8125rem; /* 13px floor */
+    bottom: -20px;
+  }
+
+  /* Use CSS custom properties for dynamic positioning on mobile */
+  .orbit-slot {
+    top: calc(50% + var(--orbit-y) * 130px); /* +20px for larger orbit radius */
+    left: calc(50% + var(--orbit-x) * 130px);
+  }
+}
+
+/* Optimized for instant UI - no animations needed */
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .orbital-ring,
+  .sun-corona,
+  .sun-pulse,
+  .cosmic-star,
+  .moderator-sun:not(.has-moderator) .sun-core {
+    animation: none !important;
+  }
+  
+  .orbit-slot,
+  .orbit-figure-container,
+  .orbit-figure-image,
+  .orbit-figure-glow {
+    transition: none !important;
+  }
+}
+
+@media (prefers-contrast: high) {
+  .orbit-slot.empty {
+    border-color: var(--starwatcher-gold);
+    background: color-mix(in srgb, black var(--a-50), transparent);
+  }
+  
+  .orbit-figure-image {
+    border-color: var(--starwatcher-gold);
+  }
+  
+  .orbital-ring {
+    border-color: var(--starwatcher-gold) !important;
+  }
+}
+
+/* =============================================================================
+   READ-ONLY MODE STYLES
+   ============================================================================= */
+
+/* Read-only container adjustments */
+.solar-system-container.read-only {
+  pointer-events: none;
+  user-select: none;
+}
+
+.solar-system-container.read-only .orbit-slot {
+  cursor: default;
+}
+
+.solar-system-container.read-only .orbit-slot.empty {
+  display: none;
+}
+
+.solar-system-container.read-only .orbit-figure-remove,
+.solar-system-container.read-only .moderator-remove {
+  display: none;
+}
+
+.solar-system-container.read-only .moderator-sun {
+  cursor: default;
+}
+
+/* Adjust orbit slots for read-only mode */
+.solar-system-container.read-only .orbit-slot {
+  transition: all 0.5s ease;
+}
+
+/* Re-enable pointer events for the container itself */
+.solar-system-container.read-only {
+  pointer-events: auto;
+}
+
+/* But disable for interactive elements */
+.solar-system-container.read-only .orbit-slot,
+.solar-system-container.read-only .moderator-sun {
+  pointer-events: none;
+}

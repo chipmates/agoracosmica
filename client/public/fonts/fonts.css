@@ -1,0 +1,35 @@
+/* Font declarations for Agora Cosmica - 2025 Optimized */
+
+/* Space Grotesk Variable Font - UI Elements & Headings */
+@font-face {
+  font-family: 'Space Grotesk';
+  src: url('./SpaceGrotesk[wght].woff2') format('woff2-variations');
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+  font-feature-settings: 'liga' 1, 'kern' 1; /* Enable ligatures and kerning */
+}
+
+/* Libre Caslon Text - Long-Form Reading Content */
+@font-face {
+  font-family: 'Libre Caslon Text';
+  src: url('./libre-caslon-text-v5-latin-regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  font-feature-settings: 'liga' 1, 'kern' 1; /* Enable ligatures and kerning */
+}
+
+@font-face {
+  font-family: 'Libre Caslon Text';
+  src: url('./libre-caslon-text-v5-latin-italic.woff2') format('woff2');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+  font-feature-settings: 'liga' 1, 'kern' 1; /* Enable ligatures and kerning */
+}
+
+/* Typography System:
+   Space Grotesk (48KB) - Modern UI & navigation
+   Libre Caslon Text (51KB) - Classical reading experience
+   Total: 99KB - Optimized for Agora Cosmica's hybrid mission */

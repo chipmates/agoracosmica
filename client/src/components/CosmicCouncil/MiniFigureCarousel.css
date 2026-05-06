@@ -1,0 +1,445 @@
+/* MiniFigureCarousel.css - Cosmic Council Figure Selection */
+
+/* Main Carousel Container */
+.mini-figure-carousel {
+  width: 100%;
+  padding: 0;
+}
+
+.mini-carousel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.mini-carousel-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--starwatcher-gold);
+  margin: 0;
+  text-shadow: 0 0 4px color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent);
+}
+
+.mini-carousel-counter {
+  font-size: 0.9rem;
+  color: var(--cosmic-silver);
+  background: var(--bg-primary);
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-20), transparent);
+}
+
+/* Carousel Container */
+.mini-carousel-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.mini-carousel-grid {
+  flex: 1;
+  overflow: hidden;
+  background: transparent;
+}
+
+.mini-carousel-track {
+  display: flex;
+  gap: 0.5rem;
+  padding: 1rem 0.7rem;
+  transition: transform 0.3s ease;
+}
+
+/* Navigation Buttons */
+.mini-carousel-nav {
+  position: relative;
+  background: var(--bg-primary);
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent);
+  border-radius: 12px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--starwatcher-gold);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+/* WCAG 44px virtual touch target */
+.mini-carousel-nav::after {
+  content: '';
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  z-index: -1;
+}
+
+.mini-carousel-nav:hover {
+  background: color-mix(in srgb, var(--gold-subtle) var(--a-20), transparent);
+  border-color: var(--starwatcher-gold);
+  transform: scale(1.05);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent);
+}
+
+/* Figure Cards - Borderless Design (Audio Library Pattern) */
+.mini-figure-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--bg-primary) var(--a-30), transparent);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 95px;
+  position: relative;
+  user-select: none;
+}
+
+.mini-figure-card:hover:not(.disabled) {
+  background: color-mix(in srgb, var(--bg-highlight) var(--a-30), transparent);
+  transform: translateY(-3px);
+}
+
+.mini-figure-card.selected {
+  background: color-mix(in srgb, var(--gold-subtle) var(--a-10), transparent);
+}
+
+.mini-figure-card.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.mini-figure-card.dragging {
+  opacity: 0.6;
+  transform: rotate(3deg) scale(1.05);
+  z-index: var(--z-sidebar);
+}
+
+/* Figure Image Container - Larger images from saved border space */
+.mini-figure-image-container {
+  position: relative;
+  width: 72px;
+  height: 72px;
+}
+
+.mini-figure-image {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid transparent;
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--utility-pure-black) var(--a-20), transparent);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* Hover and selected: border only, no gold aura. Matches the cleaned figure
+   carousel + category-tab pattern — selection affordance is the gold border,
+   not a flaming glow around the face. */
+.mini-figure-card:hover:not(.disabled) .mini-figure-image {
+  border-color: var(--starwatcher-gold);
+}
+
+.mini-figure-card.selected .mini-figure-image {
+  border-color: var(--starwatcher-gold);
+}
+
+/* Status Indicators */
+.mini-figure-crown {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: var(--moebius-gold-gradient);
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cosmic-deep-blue);
+  border: 1px solid var(--starwatcher-gold);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--gold-subtle) var(--a-50), transparent);
+  z-index: var(--z-base);
+}
+
+.mini-figure-check {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: color-mix(in srgb, var(--mode-freetalk) var(--a-90), transparent);
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  border: 1px solid var(--mode-freetalk);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--mode-freetalk) 50%, transparent);
+  z-index: var(--z-base);
+}
+
+/* Gender limit badge */
+.mini-figure-limit-badge {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  font-size: 0.6875rem; /* 11px — was 8.8px, too small to read */
+  font-weight: 600;
+  color: var(--cosmic-silver);
+  background: color-mix(in srgb, var(--bg-primary) var(--a-90), transparent);
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent);
+  border-radius: 6px;
+  padding: 1px 4px;
+  line-height: 1.2;
+  z-index: var(--z-base);
+}
+
+.mini-figure-glow {
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  background: radial-gradient(circle,
+    color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent) 0%,
+    color-mix(in srgb, var(--gold-subtle) var(--a-10), transparent) 50%,
+    transparent 70%
+  );
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: -1;
+}
+
+/* Glow disabled — the gold border communicates selection clearly enough.
+   Keeping the element so the DOM stays stable; never made visible. */
+.mini-figure-glow.active {
+  opacity: 0;
+}
+
+/* Figure Name */
+.mini-figure-name {
+  font-size: 0.75rem;
+  color: var(--cosmic-silver);
+  text-align: center;
+  font-weight: 500;
+  line-height: 1.2;
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mini-figure-card:hover:not(.disabled) .mini-figure-name,
+.mini-figure-card.selected .mini-figure-name {
+  color: var(--starwatcher-gold);
+}
+
+/* Drag Hint - Borderless Design */
+.mini-figure-drag-hint {
+  position: absolute;
+  bottom: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.75rem; /* 12px */
+  color: var(--cosmic-silver);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  white-space: nowrap;
+  background: color-mix(in srgb, var(--bg-primary) var(--a-95), transparent);
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--utility-pure-black) var(--a-40), transparent);
+  backdrop-filter: blur(var(--glass-blur));
+  z-index: var(--z-base);
+}
+
+.mini-figure-card:hover .mini-figure-drag-hint {
+  opacity: 1;
+}
+
+/* Page Dot Indicators (Netflix-style) */
+.mini-carousel-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  margin-top: 0.75rem;
+}
+
+.mini-carousel-dot {
+  width: 16px;
+  height: 2px;
+  border-radius: 1px;
+  background: color-mix(in srgb, var(--cosmic-silver) 25%, transparent);
+  transition: background 0.2s ease;
+}
+
+.mini-carousel-dot--active {
+  background: var(--starwatcher-gold);
+}
+
+/* Instructions */
+.mini-carousel-instructions {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.mini-carousel-instructions p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--cosmic-silver);
+  opacity: 0.8;
+  line-height: 1.4;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .mini-carousel-container {
+    gap: 0.5rem;
+  }
+
+  .mini-carousel-track {
+    gap: 0.4rem;
+    padding: 1rem 0.5rem;
+  }
+
+  .mini-carousel-nav {
+    width: 36px;
+    height: 36px;
+  }
+
+  .mini-figure-card {
+    min-width: 90px;
+    padding: 0.5rem;
+  }
+
+  .mini-figure-image-container {
+    width: 70px;
+    height: 70px;
+  }
+
+  .mini-figure-image {
+    width: 70px;
+    height: 70px;
+  }
+
+  .mini-figure-crown,
+  .mini-figure-check {
+    width: 18px;
+    height: 18px;
+    top: -3px;
+    right: -3px;
+  }
+
+  .mini-figure-name {
+    font-size: 0.8125rem; /* 13px — matches AudioLibrary carousel label */
+    max-width: 82px;
+  }
+
+  .mini-carousel-header {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
+  }
+
+  .mini-carousel-title {
+    font-size: 1rem;
+  }
+
+  .mini-carousel-counter {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .mini-carousel-container {
+    gap: 0.5rem;
+  }
+
+  .mini-carousel-track {
+    gap: 0.5rem;
+    padding: 0.75rem 0.4rem;
+  }
+
+  .mini-figure-card {
+    min-width: 82px;
+    padding: 0.4rem;
+  }
+
+  .mini-figure-image-container {
+    width: 64px;
+    height: 64px;
+  }
+
+  .mini-figure-image {
+    width: 64px;
+    height: 64px;
+  }
+
+  .mini-figure-crown,
+  .mini-figure-check {
+    width: 16px;
+    height: 16px;
+  }
+
+  .mini-figure-name {
+    font-size: 0.8125rem; /* 13px — matches AudioLibrary carousel label */
+    max-width: 74px;
+  }
+
+  .mini-carousel-nav {
+    width: 32px;
+    height: 32px;
+  }
+
+  .mini-carousel-instructions p {
+    font-size: 0.8125rem; /* 13px meta floor */
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .mini-figure-card,
+  .mini-figure-image,
+  .mini-figure-glow,
+  .mini-figure-drag-hint,
+  .mini-carousel-nav {
+    transition: none !important;
+  }
+
+  .mini-figure-card:hover,
+  .mini-figure-card.selected {
+    transform: none !important;
+  }
+}
+
+@media (prefers-contrast: high) {
+  .mini-figure-card {
+    background: color-mix(in srgb, black var(--a-80), transparent);
+    border: 2px solid var(--starwatcher-gold);
+  }
+
+  .mini-figure-card.selected {
+    background: color-mix(in srgb, var(--gold-subtle) var(--a-20), transparent);
+    border: 2px solid var(--starwatcher-gold);
+  }
+
+  .mini-figure-image {
+    border: 2px solid var(--starwatcher-gold);
+  }
+
+  .mini-figure-name {
+    color: var(--cosmic-white) !important;
+  }
+}

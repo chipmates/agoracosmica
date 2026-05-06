@@ -1,0 +1,407 @@
+/* ========================================
+   MODAL HEADER MODULE - 2025 Best Practice
+   Self-Contained, Zero Dependencies
+   ======================================== */
+
+/* Local Variables - No Global Dependencies */
+:root {
+  --header-gold-primary: var(--gold-primary);     /* Main UI elements */
+  --header-gold-subtle: var(--gold-subtle);      /* Headers, titles */
+  --header-gold-deep: var(--gold-deep);        /* Darker variant */
+  --header-text-primary: var(--text-primary);     /* Main text */
+  --header-font-family: 'Space Grotesk', sans-serif;
+}
+
+/* ============================================
+   BASE STYLES
+   ============================================ */
+.header {
+  display: flex;
+  align-items: center;
+  position: relative;
+  padding: 20px 24px 24px;
+  margin-bottom: 0;
+  border: none;
+  background: transparent;
+  min-height: 72px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+  overflow: hidden;
+  
+  /* Clean, minimal design */
+}
+
+/* Enhanced header on hover */
+.header:hover {
+  background: transparent;
+}
+
+/* ============================================
+   LAYOUT VARIANTS
+   ============================================ */
+
+/* Three-Column Layout */
+.threeColumn {
+  composes: header;
+  justify-content: space-between;
+}
+
+.left {
+  flex: 0 0 60px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  z-index: var(--z-base); /* 2 */
+}
+
+.center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 0;
+  padding: 0 16px;
+  z-index: var(--z-base); /* 2 */
+}
+
+/* Title Styling - Matching "Kosmischer Rat" Size */
+.title {
+  margin: 0;
+  font-family: var(--header-font-family);
+  font-size: clamp(1.5rem, 3vw, 2rem); /* Much larger to match "Kosmischer Rat" */
+  font-weight: 600;
+  color: var(--header-gold-primary);
+  text-align: center;
+  letter-spacing: 2px;
+  line-height: 1.2;
+  text-transform: uppercase;
+  position: relative;
+  
+  /* Beautiful glow effect */
+  text-shadow: 0 0 12px color-mix(in srgb, var(--gold-primary) var(--a-60), transparent);
+  
+  /* No animation - direct appearance */
+}
+
+/* Title has no animations - static appearance */
+
+/* High contrast fallback - matches Cosmic Council */
+@media (prefers-contrast: high) {
+  .title {
+    color: var(--header-gold-primary);
+    text-shadow: none;
+    font-weight: 700; /* Increase weight for better visibility */
+  }
+}
+
+/* No title animations to disable for reduced motion */
+
+.right {
+  flex: 0 0 60px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  z-index: var(--z-base); /* 2 */
+}
+
+/* Simple Layout */
+.simple {
+  composes: header;
+  justify-content: center;
+  position: relative;
+}
+
+.simpleClose {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: var(--z-base); /* 3 */
+}
+
+/* Immersive Layout */
+.immersive {
+  composes: header;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: transparent;
+  border: none;
+  padding: 20px;
+  z-index: var(--z-base); /* 10 */
+  min-height: auto;
+}
+
+.immersiveClose {
+  position: absolute;
+  right: 20px;
+  top: 20px;
+}
+
+/* Custom Layout */
+.custom {
+  composes: header;
+  padding: 0;
+  border: none;
+  min-height: auto;
+  background: transparent;
+}
+
+/* ============================================
+   COSMIC STARS
+   ============================================ */
+/* Position parent containers across full header width */
+.star1 {
+  position: absolute;
+  top: 25%;
+  left: 15%; /* Left area */
+  color: color-mix(in srgb, white var(--a-80), transparent);
+  opacity: 0.4;
+  pointer-events: none;
+  animation-play-state: paused;
+  will-change: transform;
+  z-index: var(--z-base); /* 1 */
+  font-size: 10px;
+  display: block;
+  text-shadow: 
+    0 0 2px color-mix(in srgb, white var(--a-50), transparent),
+    0 0 4px color-mix(in srgb, var(--gold-primary) var(--a-30), transparent);
+  filter: drop-shadow(0 0 1px color-mix(in srgb, white var(--a-20), transparent));
+}
+
+.star2 {
+  position: absolute;
+  top: 70%;
+  left: 50%; /* Center area */
+  color: color-mix(in srgb, white var(--a-80), transparent);
+  opacity: 0.4;
+  pointer-events: none;
+  animation-play-state: paused;
+  will-change: transform;
+  z-index: var(--z-base); /* 1 */
+  font-size: 10px;
+  display: block;
+  text-shadow: 
+    0 0 2px color-mix(in srgb, white var(--a-50), transparent),
+    0 0 4px color-mix(in srgb, var(--gold-primary) var(--a-30), transparent);
+  filter: drop-shadow(0 0 1px color-mix(in srgb, white var(--a-20), transparent));
+}
+
+.star3 {
+  position: absolute;
+  top: 40%;
+  right: 15%; /* Right area */
+  color: color-mix(in srgb, white var(--a-80), transparent);
+  opacity: 0.4;
+  pointer-events: none;
+  animation-play-state: paused;
+  will-change: transform;
+  z-index: var(--z-base); /* 1 */
+  font-size: 10px;
+  display: block;
+  text-shadow: 
+    0 0 2px color-mix(in srgb, white var(--a-50), transparent),
+    0 0 4px color-mix(in srgb, var(--gold-primary) var(--a-30), transparent);
+  filter: drop-shadow(0 0 1px color-mix(in srgb, white var(--a-20), transparent));
+}
+
+.star1::before {
+  content: '✨';
+  display: block;
+  position: relative; /* Relative to parent */
+  animation: starFloat1 45s infinite ease-in-out;
+  color: inherit;
+}
+
+.star2::before {
+  content: '✨';
+  display: block;
+  position: relative; /* Relative to parent */
+  animation: starFloat2 50s infinite ease-in-out;
+  animation-delay: -15s;
+  color: inherit;
+}
+
+.star3::before {
+  content: '✨';
+  display: block;
+  position: relative; /* Relative to parent */
+  animation: starFloat3 42s infinite ease-in-out;
+  animation-delay: -25s;
+  color: inherit;
+}
+
+/* Activate stars on hover or when enabled */
+.cosmicActive .star1::before,
+.cosmicActive .star2::before,
+.cosmicActive .star3::before,
+.header:hover .star1::before,
+.header:hover .star2::before,
+.header:hover .star3::before {
+  animation-play-state: running;
+}
+
+.cosmicActive .star1,
+.cosmicActive .star2,
+.cosmicActive .star3,
+.header:hover .star1,
+.header:hover .star2,
+.header:hover .star3 {
+  opacity: 0.8;
+  color: var(--gold-primary); /* Golden on activation */
+  text-shadow: 
+    0 0 6px color-mix(in srgb, var(--gold-primary) var(--a-80), transparent),
+    0 0 12px color-mix(in srgb, var(--gold-primary) var(--a-50), transparent);
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--gold-primary) var(--a-60), transparent));
+}
+
+/* Very slow, subtle floating across header width */
+@keyframes starFloat1 {
+  0% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+  }
+  50% {
+    transform: translate(-80px, -3px) rotate(180deg) scale(1.05);
+  }
+  100% {
+    transform: translate(0, 0) rotate(360deg) scale(1);
+  }
+}
+
+@keyframes starFloat2 {
+  0% {
+    transform: translate(0, 0) rotate(0deg) scale(0.98);
+  }
+  50% {
+    transform: translate(60px, 4px) rotate(180deg) scale(1.02);
+  }
+  100% {
+    transform: translate(0, 0) rotate(360deg) scale(0.98);
+  }
+}
+
+@keyframes starFloat3 {
+  0% {
+    transform: translate(0, 0) rotate(0deg) scale(1.01);
+  }
+  50% {
+    transform: translate(-40px, -2px) rotate(180deg) scale(0.97);
+  }
+  100% {
+    transform: translate(0, 0) rotate(360deg) scale(1.01);
+  }
+}
+
+/* ============================================
+   THEME VARIANTS
+   ============================================ */
+.gold .title {
+  color: var(--header-gold-primary);
+}
+
+.story .title {
+  color: var(--header-gold-primary);
+}
+
+.wisdom .title {
+  color: var(--mode-wisdom);
+}
+
+.wisdom .star1,
+.wisdom .star2,
+.wisdom .star3 {
+  color: var(--mode-wisdom);
+  filter: drop-shadow(0 0 3px color-mix(in srgb, var(--mode-wisdom) var(--a-30), transparent));
+}
+
+.quest .title {
+  color: var(--mode-quest);
+}
+
+.quest .star1,
+.quest .star2,
+.quest .star3 {
+  color: var(--mode-quest);
+  filter: drop-shadow(0 0 3px color-mix(in srgb, var(--mode-quest) var(--a-30), transparent));
+}
+
+.freetalk .title {
+  color: var(--mode-freetalk);
+}
+
+.freetalk .star1,
+.freetalk .star2,
+.freetalk .star3 {
+  color: var(--mode-freetalk);
+  filter: drop-shadow(0 0 3px color-mix(in srgb, var(--mode-freetalk) var(--a-30), transparent));
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+/* Responsive sizing to match "Kosmischer Rat" prominence */
+@media (max-width: 1024px) {
+  .title {
+    font-size: clamp(1.25rem, 2.5vw, 1.5rem); /* Proportionally smaller but still prominent */
+  }
+}
+
+@media (max-width: 768px) {
+  /* 2025 MOBILE OPTIMIZATION: Ultra-tight spacing for Audio Library */
+  .header {
+    padding: 8px 12px; /* Ultra-tight - reduced from 12px 15px */
+    min-height: 48px; /* Slightly reduced */
+  }
+
+  .left,
+  .right {
+    flex: 0 0 44px;
+  }
+
+  .center {
+    padding: 0 8px; /* Ultra-tight - reduced from 12px */
+  }
+  
+  .title {
+    font-size: clamp(1.125rem, 2vw, 1.25rem); /* Still readable and prominent on mobile */
+    letter-spacing: 1px; /* Reduce letter spacing on smaller screens */
+  }
+  
+  /* Hide third star on mobile */
+  .star3 {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  /* 2025 MOBILE OPTIMIZATION: Even tighter spacing for small screens */
+  .header {
+    padding: 6px 10px; /* Ultra-tight - reduced from 10px 12px */
+    min-height: 44px; /* Minimal WCAG-compliant height */
+  }
+}
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  .star1,
+  .star2,
+  .star3 {
+    animation: none;
+    opacity: 0.15;
+  }
+}
+
+@media (prefers-contrast: high) {
+  .header {
+    border-bottom-width: 3px;
+  }
+  
+  .star1,
+  .star2,
+  .star3 {
+    display: none;
+  }
+}

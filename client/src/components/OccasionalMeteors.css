@@ -1,0 +1,140 @@
+/* OccasionalMeteors.css — Photorealistic + Calm (v3.0) */
+/* Combines realistic meteor physics with Agora Cosmica's contemplative pace */
+
+.meteor-shower {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: var(--z-base); /* 1 */
+  /* Subtle screen blend for luxurious glow on dark backgrounds */
+  mix-blend-mode: screen;
+}
+
+.meteor {
+  position: absolute;
+  /* Point element - visuals created by ::before and ::after */
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+
+  /* Calm, contemplative timing */
+  animation-name: meteor-flight;
+  animation-timing-function: ease-out; /* Natural deceleration */
+  animation-iteration-count: infinite;
+  animation-duration: var(--duration);
+  animation-delay: var(--delay);
+  will-change: transform, opacity;
+  animation-play-state: paused; /* Battery: only animate when visible */
+}
+
+/* Activate when parent is in viewport */
+.meteor-shower .meteor {
+  animation-play-state: running;
+}
+
+/* Smooth fade-in, long visible plateau, gentle fade-out */
+@keyframes meteor-flight {
+  0% {
+    opacity: 0;
+    transform: rotate(var(--angle)) translateX(0);
+  }
+  8% {
+    opacity: 1; /* Gentle ignition */
+  }
+  92% {
+    opacity: 1; /* Long visible journey */
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--angle)) translateX(150vmax); /* Always offscreen */
+  }
+}
+
+/* The soft white-gold head (::before) - Subtle, not harsh */
+.meteor::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  /* Subtle size for calm aesthetic */
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+
+  /* Soft radial gradient - white core transitioning to warm gold */
+  background: radial-gradient(circle,
+    color-mix(in srgb, var(--text-primary) 95%, transparent) 0%,     /* Soft white core */
+    color-mix(in srgb, var(--gold-subtle) 80%, transparent) 40%,     /* Warm gold */
+    color-mix(in srgb, var(--gold-primary) 30%, transparent) 70%,    /* Fading gold */
+    transparent 100%
+  );
+
+  /* Gentle glow - luxurious but not aggressive */
+  box-shadow:
+    0 0 4px color-mix(in srgb, var(--text-primary) 60%, transparent),
+    0 0 8px color-mix(in srgb, var(--gold-subtle) 40%, transparent),
+    0 0 12px color-mix(in srgb, var(--gold-primary) 20%, transparent);
+}
+
+/* The feathering golden tail (::after) */
+.meteor::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+
+  /* Position tail behind the movement direction */
+  /* Meteor moves along positive X, tail extends along negative X */
+  right: 0;
+
+  /* Contemplative proportions - not emphasizing speed */
+  height: 2px;
+  width: 150px; /* Shorter tail for calm aesthetic */
+
+  /* Gradient from bright near head to transparent at end */
+  background: linear-gradient(to left,
+    color-mix(in srgb, var(--gold-subtle) 90%, transparent) 0%,      /* Bright near head */
+    color-mix(in srgb, var(--gold-primary) 70%, transparent) 25%,    /* Rich gold */
+    color-mix(in srgb, var(--gold-hover) 40%, transparent) 60%,      /* Fading */
+    color-mix(in srgb, var(--gold-hover) 15%, transparent) 85%,      /* Nearly gone */
+    transparent 100%                                                 /* Feather out */
+  );
+
+  /* Soft blur for organic burning matter effect */
+  filter: blur(0.8px);
+  border-radius: 50% / 100%; /* Elliptical softening */
+}
+
+/* Mobile: Shorter tail, smaller head */
+@media (max-width: 768px) {
+  .meteor::before {
+    width: 5px;
+    height: 5px;
+  }
+
+  .meteor::after {
+    width: 120px;
+    height: 1.5px;
+  }
+}
+
+/* Tablet rendering optimization */
+@media (max-width: 1024px) and (orientation: portrait) {
+  .meteor {
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-perspective: 1000;
+    perspective: 1000;
+  }
+}
+
+/* Respect user preferences */
+@media (prefers-reduced-motion: reduce) {
+  .meteor {
+    animation: none;
+    opacity: 0.15;
+  }
+}

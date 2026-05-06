@@ -1,0 +1,8 @@
+node_modules
+npm-debug.log
+pnpm-debug.log
+build
+.git/
+.DS_Store
+node_modules
+.env

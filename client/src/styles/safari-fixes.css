@@ -1,0 +1,292 @@
+/* Safari-specific CSS Fixes */
+
+/* Global scrollbar styling for Safari */
+/* Safari requires more specific selectors and webkit prefixes */
+
+/* Base scrollbar styles for all scrollable elements */
+*::-webkit-scrollbar {
+  width: var(--scrollbar-width);
+  height: var(--scrollbar-width);
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+  border-radius: var(--scrollbar-border-radius);
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb);
+  border-radius: var(--scrollbar-border-radius);
+  transition: background-color 0.3s ease;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: var(--scrollbar-thumb-hover);
+}
+
+*::-webkit-scrollbar-thumb:active {
+  background-color: var(--scrollbar-thumb-active);
+}
+
+/* Specific fixes for problem components */
+
+/* History Modal - Updated to match actual classes */
+.history-modal-content::-webkit-scrollbar,
+.history-messages-container::-webkit-scrollbar,
+.fullscreen-modal::-webkit-scrollbar {
+  width: 8px;
+}
+
+.history-modal-content::-webkit-scrollbar-track,
+.history-messages-container::-webkit-scrollbar-track,
+.fullscreen-modal::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+  border-radius: var(--scrollbar-border-radius, 4px);
+}
+
+.history-modal-content::-webkit-scrollbar-thumb,
+.history-messages-container::-webkit-scrollbar-thumb,
+.fullscreen-modal::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb);
+  border-radius: var(--scrollbar-border-radius, 4px);
+}
+
+/* Seed Explorer - Updated to match actual classes */
+.accordion-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.accordion-content::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+  border-radius: var(--scrollbar-border-radius, 4px);
+}
+
+.accordion-content::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb);
+  border-radius: var(--scrollbar-border-radius, 4px);
+}
+
+/* Instruction Modal - Updated to match actual classes */
+.im-content::-webkit-scrollbar,
+.im-section-container::-webkit-scrollbar,
+.tab-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.im-content::-webkit-scrollbar-track,
+.im-section-container::-webkit-scrollbar-track,
+.tab-content::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+  border-radius: var(--scrollbar-border-radius, 4px);
+}
+
+.im-content::-webkit-scrollbar-thumb,
+.im-section-container::-webkit-scrollbar-thumb,
+.tab-content::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb);
+  border-radius: var(--scrollbar-border-radius, 4px);
+}
+
+/* Audio Library - Removed gold override, now uses default purple theme */
+/* Scrollbar styles are inherited from global theme in index.css */
+
+/* Mini Figure Carousel in Audio Library */
+.mini-figure-carousel::-webkit-scrollbar {
+  height: 6px;
+}
+
+.mini-figure-carousel::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+  border-radius: var(--scrollbar-border-radius, 4px);
+}
+
+.mini-figure-carousel::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb);
+  border-radius: var(--scrollbar-border-radius, 4px);
+}
+
+/* Safari-specific image sizing fixes for Mini Player */
+@supports (-webkit-touch-callout: none) {
+  /* Mini Player container fix */
+  .mini-player {
+    -webkit-transform: translateZ(0);
+  }
+  
+  /* Mini Player thumbnail container fix */
+  .mini-player__thumbnail {
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    min-height: 42px !important;
+    max-width: 42px !important;
+    max-height: 42px !important;
+    position: relative;
+    overflow: hidden !important;
+    flex-shrink: 0;
+    -webkit-transform: translateZ(0);
+    border-radius: 50%;
+    display: block;
+  }
+  
+  /* Mini Player image fix - target img element directly */
+  .mini-player__thumbnail img,
+  .mini-player__figure-image {
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    min-height: 42px !important;
+    max-width: 42px !important;
+    max-height: 42px !important;
+    object-fit: cover !important;
+    object-position: center center !important;
+    -webkit-transform: translateZ(0); /* Force GPU acceleration */
+    display: block !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    border-radius: 50% !important;
+  }
+  
+  /* Additional fix for OptimizedFigureImage component */
+  .mini-player__thumbnail .optimized-figure-image {
+    width: 42px !important;
+    height: 42px !important;
+    object-fit: cover !important;
+    object-position: center center !important;
+  }
+}
+
+/* Safari-specific hover overlay fix for Audio Library */
+@supports (-webkit-touch-callout: none) {
+  /* Fix for story item hover states */
+  .story-item {
+    -webkit-transform: translateZ(0); /* Force GPU layer */
+    transition: all 0.2s ease !important;
+  }
+  
+  .story-item:hover {
+    /* Use standard rgba instead of color-mix for Safari */
+    background: rgba(30, 40, 100, 0.6) !important;
+    transform: translateY(-2px) scale(1.01) !important;
+    -webkit-transform: translateY(-2px) scale(1.01) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 0 20px color-mix(in srgb, var(--gold-subtle) 15%, transparent) !important;
+    border-color: color-mix(in srgb, var(--gold-subtle) 30%, transparent) !important;
+  }
+  
+  /* Remove any default Safari highlight colors */
+  .story-item,
+  .story-collection,
+  .stories-list {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+  }
+  
+  /* Fix for the light blue overlay issue - remove any background highlights */
+  .story-collection {
+    -webkit-transform: translateZ(0);
+    background: transparent !important;
+  }
+  
+  .stories-list {
+    -webkit-transform: translateZ(0);
+    background: transparent !important;
+  }
+  
+  /* Ensure story items current state works properly */
+  .story-item.current {
+    background: color-mix(in srgb, var(--gold-subtle) 15%, transparent) !important;
+    border-color: color-mix(in srgb, var(--gold-subtle) 40%, transparent) !important;
+  }
+}
+
+/* Force Safari to use custom scrollbars on specific elements */
+.history-modal-content,
+.im-content,
+.audio-library-modal,
+.fullscreen-modal,
+.stories-list {
+  /* Force custom scrollbar rendering */
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+}
+
+/* Additional Safari-specific fixes for better scrolling performance */
+.history-modal-content,
+.im-content,
+.audio-library-modal,
+.modal-content {
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+}
+
+/* Safari-specific scrollbar fix using the lesson from image fix */
+@supports (-webkit-touch-callout: none) {
+  /* Audio Library - Target ALL possible scrolling elements with maximum specificity */
+  .audio-library-modal .stories-list::-webkit-scrollbar,
+  .audio-library-modal-content .stories-list::-webkit-scrollbar,
+  .story-collection .stories-list::-webkit-scrollbar,
+  div.stories-list::-webkit-scrollbar {
+    width: 8px !important;
+    height: 8px !important;
+  }
+  
+  .audio-library-modal .stories-list::-webkit-scrollbar-track,
+  .audio-library-modal-content .stories-list::-webkit-scrollbar-track,
+  .story-collection .stories-list::-webkit-scrollbar-track,
+  div.stories-list::-webkit-scrollbar-track {
+    background: color-mix(in srgb, var(--gold-subtle) 10%, transparent) !important; /* Gold base 10% opacity */
+    border-radius: 4px !important;
+  }
+  
+  .audio-library-modal .stories-list::-webkit-scrollbar-thumb,
+  .audio-library-modal-content .stories-list::-webkit-scrollbar-thumb,
+  .story-collection .stories-list::-webkit-scrollbar-thumb,
+  div.stories-list::-webkit-scrollbar-thumb {
+    background-color: color-mix(in srgb, var(--gold-subtle) 60%, transparent) !important; /* Gold base 60% opacity */
+    border-radius: 4px !important;
+    border: none !important;
+  }
+  
+  .audio-library-modal .stories-list::-webkit-scrollbar-thumb:hover,
+  .audio-library-modal-content .stories-list::-webkit-scrollbar-thumb:hover,
+  .story-collection .stories-list::-webkit-scrollbar-thumb:hover,
+  div.stories-list::-webkit-scrollbar-thumb:hover {
+    background-color: color-mix(in srgb, var(--gold-subtle) 80%, transparent) !important; /* Gold base 80% opacity */
+  }
+  
+  /* Force Safari to apply styles to dynamically loaded content */
+  .stories-list {
+    /* Force repaint */
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    
+    /* Ensure scrollbar is visible */
+    &::-webkit-scrollbar {
+      opacity: 1 !important;
+      visibility: visible !important;
+    }
+  }
+  
+  /* NowPlayingView - Override global scrollbar styles to hide ALL scrollbars */
+  .now-playing-view,
+  .now-playing-view *,
+  .now-playing-view__content,
+  .now-playing-view__content *,
+  .audio-library-modal .now-playing-view,
+  .audio-library-modal .now-playing-view * {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+  
+  .now-playing-view::-webkit-scrollbar,
+  .now-playing-view *::-webkit-scrollbar,
+  .now-playing-view__content::-webkit-scrollbar,
+  .now-playing-view__content *::-webkit-scrollbar,
+  .audio-library-modal .now-playing-view::-webkit-scrollbar,
+  .audio-library-modal .now-playing-view *::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    background: transparent !important;
+    -webkit-appearance: none !important;
+  }
+}

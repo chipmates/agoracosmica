@@ -1,0 +1,84 @@
+{
+  "skipTour": "Skip Tour",
+  "continue": "Continue",
+  "back": "Back",
+  "finalButton": "Ignite Your Stars",
+  "mobileVoiceNotice": {
+    "title": "Voice on Mobile",
+    "message": "Voice features work best on desktop. You can still use the keyboard to chat!",
+    "okButton": "Got it"
+  },
+  "welcome": {
+    "title": "Welcome to Agora Cosmica",
+    "tagline": "Explore a universe of wisdom through the voices of remarkable thinkers throughout history.",
+    "quote": "Follow your bliss and the universe will open doors where there were only walls.",
+    "attribution": "― Joseph Campbell"
+  },
+  "guides": {
+    "title": "Find Your Echo",
+    "titleFull": "Discover the Echo of Your Sage Mentor",
+    "description": "Explore 30 extraordinary minds across three wisdom traditions, each offering unique historical perspectives.",
+    "traditions": {
+      "sages": {
+        "title": "Sages",
+        "description": "Timeless wisdom guides"
+      },
+      "reformers": {
+        "title": "Reformers",
+        "description": "Visionaries who changed society"
+      },
+      "creators": {
+        "title": "Creators",
+        "description": "Artists and innovators"
+      }
+    },
+    "steps": {
+      "browse": "Discover",
+      "explore": "Explore",
+      "select": "Choose"
+    }
+  },
+  "journey": {
+    "title": "Your Journey, Your Discovery",
+    "description": "Choose your path: Each offers a distinct window into ageless knowledge.",
+    "modes": {
+      "story": {
+        "title": "Story Mode",
+        "description": "Narrative journeys introducing the sage's wisdom"
+      },
+      "wisdom": {
+        "title": "Star Seed Mode",
+        "description": "Deep wisdom exploration through structured conversations"
+      },
+      "freetalk": {
+        "title": "Freetalk Mode",
+        "description": "Open dialogue on any aspect of the sage's wisdom"
+      },
+      "quest": {
+        "title": "Quest Mode",
+        "description": "Challenges that test knowledge and illuminate your stars"
+      }
+    }
+  },
+  "conversation": {
+    "title": "Speak with the Echoes",
+    "description": "Engage with historical figures using voice commands. Their wisdom comes alive through natural dialogue.",
+    "steps": {
+      "holdSpace": "Hold Space to start recording",
+      "speak": "Speak naturally to the historical figure",
+      "release": "Release Space when finished",
+      "keyboard": "Or tap keyboard icon for typing"
+    }
+  },
+  "constellation": {
+    "title": "Star Seeds & Cosmic Constellations",
+    "description": "Discover and collect Star Seeds of wisdom to form unique cosmic constellations. Each figure's teachings are mapped in the stars.",
+    "progress": "5 of 12 Star Seeds gathered",
+    "constellationName": "The Hero's Journey",
+    "stats": {
+      "figures": "historical figures to explore",
+      "seeds": "Star Seeds of wisdom",
+      "constellation": "unique cosmic constellations"
+    }
+  }
+}

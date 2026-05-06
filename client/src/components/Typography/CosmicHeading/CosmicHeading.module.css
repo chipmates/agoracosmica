@@ -1,0 +1,213 @@
+/* CosmicHeading.module.css - Modern heading component styles */
+
+/* Base heading styles */
+.heading {
+  font-family: var(--font-primary, 'Space Grotesk', sans-serif);
+  line-height: 1.375;
+  color: var(--gold-primary);
+  font-weight: 700;
+  margin: 0.5em 0;
+  transition: all 0.3s ease;
+  
+  /* Performance optimization */
+  contain: layout style;
+  
+  /* Prevent text selection issues */
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+/* Heading levels with fluid typography */
+.level1 {
+  font-size: var(--font-size-3xl, 2.441rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.level2 {
+  font-size: var(--font-size-2xl, 1.953rem);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.level3 {
+  font-size: var(--font-size-xl, 1.5625rem);
+  font-weight: 600;
+}
+
+.level4 {
+  font-size: var(--font-size-lg, 1.25rem);
+  font-weight: 500;
+}
+
+.level5 {
+  font-size: var(--font-size-md, 1rem);
+  font-weight: 500;
+}
+
+.level6 {
+  font-size: var(--font-size-base, 1rem);
+  font-weight: 500;
+}
+
+/* Cosmic title variant */
+.cosmic {
+  font-size: clamp(2.5rem, 4vw, 3.5rem);
+  font-weight: 700;
+  background: linear-gradient(135deg, 
+    var(--gold-primary) 0%, 
+    var(--gold-subtle) 50%, 
+    var(--gold-primary) 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-align: center;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  position: relative;
+  
+  /* Subtle glow effect */
+  filter: drop-shadow(0 0 20px color-mix(in srgb, var(--gold-primary) 30%, transparent));
+}
+
+/* Modal header variant */
+.modalHeader {
+  margin: 0;
+  font-size: var(--font-size-xl, 1.5rem);
+  animation: modalTitleEntrance 0.3s ease-out;
+  animation-play-state: paused; /* Performance: only play when needed */
+}
+
+.modalHeader:global(.animate) {
+  animation-play-state: running;
+}
+
+@keyframes modalTitleEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Gradient variants */
+.gradientGold {
+  background: linear-gradient(135deg, 
+    var(--gold-primary) 0%, 
+    var(--gold-subtle) 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+
+.gradientGoldSubtle {
+  background: linear-gradient(135deg, 
+    var(--gold-deep) 0%, 
+    var(--gold-subtle) 50%, 
+    var(--gold-primary) 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+
+.gradientCoral {
+  background: linear-gradient(135deg, 
+    var(--mode-quest) 0%, 
+    var(--mode-quest) 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+
+.gradientCosmic {
+  background: linear-gradient(135deg, 
+    var(--gold-primary) 0%, 
+    var(--gold-subtle) 50%, 
+    var(--gold-primary) 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+
+.gradientNebula {
+  background: linear-gradient(135deg, 
+    var(--mode-wisdom) 0%, 
+    var(--mode-wisdom) 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+
+.gradientVoid {
+  background: linear-gradient(135deg,
+    var(--bg-cosmic-void) 0%,
+    var(--bg-astral) 50%,
+    var(--bg-primary) 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+
+/* Focus styles for accessibility */
+.heading:focus-visible {
+  outline: 2px solid var(--gold-primary);
+  outline-offset: 4px;
+  border-radius: var(--radius-sm);
+}
+
+/* Hover effects for interactive headings */
+.heading[href]:hover,
+.heading[onclick]:hover,
+.heading[role="button"]:hover {
+  color: var(--gold-hover);
+  transform: translateX(2px);
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .heading {
+    transition: none;
+  }
+  
+  .modalHeader {
+    animation: none;
+  }
+  
+  .cosmic {
+    filter: none;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .heading {
+    font-weight: var(--weight-bold);
+  }
+  
+  .gradientGold,
+  .gradientGoldSubtle,
+  .gradientCoral,
+  .gradientCosmic,
+  .gradientNebula,
+  .gradientVoid {
+    background: none;
+    -webkit-text-fill-color: unset;
+    color: var(--gold-primary);
+  }
+}
+
+/* Container query support (future-ready) */
+@container (min-width: 768px) {
+  .cosmic {
+    font-size: clamp(3rem, 5vw, 4rem);
+  }
+}

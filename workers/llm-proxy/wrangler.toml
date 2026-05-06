@@ -1,0 +1,60 @@
+# Cloudflare Worker — Free-Tier LLM Proxy (WP6)
+# Proxies chat requests to Nebius Token Factory (Finland, EU)
+
+name = "agora-cosmica-llm"
+main = "src/index.ts"
+compatibility_date = "2025-01-06"
+workers_dev = false
+preview_urls = false
+
+# KV Namespace for rate limiting
+[[kv_namespaces]]
+binding = "RATE_LIMITS"
+id = "91fd179912ef4c9a8776b86b7adaa449"
+preview_id = "6b37dd0647b44e12827522088a1ca039"
+
+# KV Namespace for compliance event logging (90-day retention)
+[[kv_namespaces]]
+binding = "COMPLIANCE_LOG"
+id = "12c8d284d4ee4131a6ee838208feaf7a"
+preview_id = "10fb01f0552a46cf98c644a206b726cd"
+
+# Environment Variables
+[vars]
+ALLOWED_ORIGINS = "https://agoracosmica.org,https://www.agoracosmica.org"
+NEBIUS_MODEL = "Qwen/Qwen3-235B-A22B-Instruct-2507"
+NEBIUS_BASE_URL = "https://api.studio.nebius.com/v1"
+
+# Secrets (set via wrangler secret put):
+# - NEBIUS_API_KEY
+# - TURNSTILE_SECRET_KEY
+# - JWT_SIGNING_KEY (openssl rand -hex 32)
+
+# Routes (uncomment after DNS setup)
+# [[routes]]
+# pattern = "llm.agoracosmica.org/*"
+# zone_name = "agoracosmica.org"
+
+[dev]
+port = 8788
+local_protocol = "http"
+
+# Dev-only secrets (wrangler dev uses .dev.vars for local secrets)
+# Create cloudflare-worker-api/.dev.vars with:
+#   NEBIUS_API_KEY=your-nebius-key
+#   JWT_SIGNING_KEY=dev-signing-key-not-for-production
+#   DEV_RATE_LIMIT=1     (optional: forces all per-IP caps to this value for BYOK testing)
+# TURNSTILE_SECRET_KEY is optional in dev (dev-test-token bypasses it)
+# DEV_RATE_LIMIT is read by src/config.ts:getEffectiveLimit — never define it here or in prod.
+
+[build]
+command = ""
+
+# Analytics Engine for anonymous usage tracking (STATS-1)
+# Zero PII: only endpoint, figure, mode, language, latency. "Ohne Tracking" compliant.
+[[analytics_engine_datasets]]
+binding = "ANALYTICS"
+dataset = "agora_llm"
+
+[observability]
+enabled = true

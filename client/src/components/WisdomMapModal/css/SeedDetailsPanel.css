@@ -1,0 +1,144 @@
+/* Seed details panel - matches HelperPopup gold standard */
+.seed-details-panel {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 24px;
+  border-radius: 1rem;
+  width: 90%;
+  max-width: 600px;
+  z-index: 60; /* Above stars (2-10) and their glow layers */
+
+  /* Near-solid background — blocks star glow bleed-through */
+  background: color-mix(in srgb, var(--bg-cosmic-void) var(--a-95), transparent);
+
+  /* Soft golden accent border */
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-25), transparent);
+
+  /* Triple-layer glow (HelperPopup standard) */
+  box-shadow:
+    0 0 40px color-mix(in srgb, var(--gold-subtle) var(--a-15), transparent),
+    0 0 80px color-mix(in srgb, var(--gold-subtle) var(--a-08), transparent),
+    0 20px 60px color-mix(in srgb, black var(--a-40), transparent);
+
+  /* Compact height for summary-only content */
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+/* Decorative golden accent line at top */
+.seed-details-panel::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 2px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--gold-subtle) 30%,
+    var(--gold-subtle) 70%,
+    transparent 100%);
+  border-radius: 1px;
+  opacity: 0.7;
+}
+
+.seed-details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 15px;
+  margin-bottom: 15px;
+  border-bottom: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent);
+  position: relative;
+}
+
+.seed-details-close {
+  position: relative;
+  top: -3px;
+  right: -3px;
+}
+
+.seed-details-content {
+  margin-bottom: 18px;
+}
+
+/* Summary - optimized for readability against nebula */
+.seed-preview-summary {
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-size: clamp(0.9375rem, 2vw, 1.0625rem); /* Slightly larger since it's the only content */
+  line-height: 1.65;
+  color: color-mix(in srgb, var(--text-primary) var(--a-95), transparent);
+  margin: 0;
+
+  /* Enhanced text legibility against cosmic background */
+  text-shadow:
+    0 0 3px color-mix(in srgb, var(--utility-pure-black) var(--a-40), transparent),
+    0 1px 2px color-mix(in srgb, var(--utility-pure-black) var(--a-20), transparent);
+}
+
+.seed-details-panel h3 {
+  color: var(--gold-subtle);
+  margin: 0 0 16px;
+  font-size: 1.375rem;
+  font-weight: 600;
+  text-shadow:
+    0 0 12px color-mix(in srgb, var(--gold-subtle) var(--a-35), transparent),
+    0 2px 4px color-mix(in srgb, var(--utility-pure-black) var(--a-30), transparent);
+  letter-spacing: 0.02em;
+  line-height: 1.3;
+  word-wrap: break-word;
+  hyphens: auto;
+}
+
+.seed-details-footer {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 0;
+  min-height: 36px;
+}
+
+/* More Paths link */
+.more-paths-link-container {
+  text-align: center;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-15), transparent);
+}
+
+.more-paths-link {
+  background: none;
+  border: none;
+  color: var(--gold-subtle);
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.more-paths-link:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 480px) {
+  .seed-details-panel {
+    width: 95%;
+    bottom: 20px;
+    padding: 20px 16px;
+    max-height: 55vh; /* Slightly more space on mobile */
+  }
+
+  .seed-details-panel h3 {
+    font-size: 1.25rem;
+  }
+
+  .seed-preview-summary {
+    font-size: clamp(0.875rem, 2.2vw, 1rem);
+  }
+}

@@ -1,0 +1,56 @@
+/* Button Design Tokens - 2025 Standard
+ * Pure palette compliance with semantic naming
+ */
+
+:root {
+  /* Primary Colors (Deep Blue) */
+  --primary-deep: var(--bg-primary);    /* PRIMARY APPLICATION BACKGROUND */
+  --primary-base: var(--bg-card);    /* Card and container backgrounds */
+  --primary-light: var(--bg-highlight);   /* Accents, highlights within blue spectrum */
+  --astral: var(--bg-astral);          /* Secondary container backgrounds */
+  --deep-indigo: var(--bg-highlight);     /* Tertiary backgrounds, distant nebulae */
+  
+  /* Accent Colors (Mode-specific) */
+  /* --gold-deep already defined in design system */
+  --gold-base: var(--gold-subtle);       /* Story Mode (main accent) */
+  --gold-light: var(--gold-primary);      /* Story Mode (highlights, hover states) */
+  --gold-shine: var(--gold-hover);      /* Story Mode (active states) */
+  
+  --coral-deep: var(--mode-quest-active);      /* Quest Mode (warning actions) */
+  --coral-base: var(--mode-quest);      /* Quest Mode (secondary accent) */
+  --coral-light: var(--mode-quest-hover);     /* Quest Mode (highlights, hover states) */
+  
+  --purple-deep: var(--mode-wisdom-active);     /* Seedtalk Mode (dark accents) */
+  --purple-base: var(--mode-wisdom);     /* Seedtalk Mode (main color) */
+  --purple-light: var(--mode-wisdom-hover);    /* Seedtalk Mode (highlights) */
+  
+  --mint-deep: var(--mode-freetalk-active);       /* Freetalk Mode (dark accents) */
+  --mint-base: var(--mode-freetalk);       /* Freetalk Mode (main color) */
+  --mint-light: var(--mode-freetalk-hover);      /* Freetalk Mode (highlights) */
+
+  /* Button-specific semantic tokens */
+  --button-bg-primary: var(--gold-subtle);  /* Golden background for primary buttons */
+  --button-bg-primary-hover: var(--gold-primary);  /* Brighter gold on hover */
+  --button-bg-secondary: var(--mode-quest-active);  /* Direct reference to avoid indirection */
+  --button-bg-secondary-hover: var(--mode-quest);  /* Direct reference for hover */
+  
+  --button-text-primary: var(--primary-deep);
+  --button-text-secondary: color-mix(in srgb, white 90%, transparent);
+  --button-text-muted: color-mix(in srgb, white 75%, transparent);
+  
+  --button-border-primary: var(--gold-base);
+  --button-border-secondary: var(--coral-base);
+  
+  --button-glow-primary: var(--gold-base);
+  --button-glow-secondary: var(--coral-base);
+  
+  --button-shadow-ambient: color-mix(in srgb, black 10%, transparent);
+  --button-bg-glass: color-mix(in srgb, white 2%, transparent);
+  
+  /* Ripple effect colors for different variants */
+  --ripple-gold: color-mix(in srgb, var(--bg-primary) 20%, transparent);
+  --ripple-coral: color-mix(in srgb, var(--bg-primary) 20%, transparent);
+  --ripple-light: color-mix(in srgb, var(--bg-primary) 10%, transparent);
+  --ripple-ghost: color-mix(in srgb, var(--gold-subtle) 15%, transparent);
+  --ripple-default: color-mix(in srgb, white 20%, transparent);
+}

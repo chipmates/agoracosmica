@@ -1,0 +1,73 @@
+{
+  "name": "agoracosmica-client",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "@phosphor-icons/react": "^2.1.10",
+    "dompurify": "^3.4.2",
+    "idb": "^7.1.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.30.3",
+    "react-swipeable": "^7.0.2",
+    "zustand": "^5.0.13"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/node": "^24.12.2",
+    "@types/react": "^18.3.28",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-basic-ssl": "^2.3.0",
+    "@vitejs/plugin-react": "^4.7.0",
+    "@vitest/coverage-v8": "^3.2.4",
+    "@vitest/ui": "^3.2.4",
+    "eslint": "^8.57.1",
+    "eslint-plugin-react": "^7.37.5",
+    "fake-indexeddb": "^6.2.5",
+    "jsdom": "^26.1.0",
+    "rollup": "4.60.3",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.2",
+    "vitest": "^3.2.4"
+  },
+  "scripts": {
+    "dev": "vite",
+    "start": "vite",
+    "build": "node scripts/extract-public-data.mjs && vite build && node scripts/prerender.mjs && node scripts/generate-sitemap.mjs",
+    "build:extract": "node scripts/extract-public-data.mjs",
+    "build:client": "vite build",
+    "build:prerender": "node scripts/prerender.mjs && node scripts/generate-sitemap.mjs",
+    "preview": "vite preview",
+    "lint": "eslint .",
+    "preinstall": "node check-pkgmgr.js",
+    "setup:assets": "node scripts/setup-assets.mjs",
+    "test": "vitest",
+    "test:unit": "vitest run"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "packageManager": "pnpm@8.15.5",
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "nth-check": "^2.0.1",
+      "form-data": ">=4.0.4",
+      "@remix-run/router": ">=1.23.2"
+    }
+  }
+}

@@ -1,0 +1,810 @@
+/* HomePage.css */
+:root {
+  --max-desktop-width: 2250px;
+  --sidebar-width-desktop: 300px;  /* Base desktop width */
+  --primary-color: var(--bg-primary);
+  --secondary-color: var(--gold-subtle);
+  --accent-color: var(--mode-quest);
+  --header-height: 70px; /* Desktop header reference */
+  /* Mobile header removed - using full viewport space */
+  --header-bg: color-mix(in srgb, var(--bg-primary) 85%, transparent);
+  --header-blur: 10px;
+  --z-index-header: 200;
+  
+  /* Safe area handling - now directly in chat-header */
+  --header-safe-area-top: env(safe-area-inset-top, 0px);
+  
+  /* Dynamic font sizing for headers */
+  --chat-header-font-size: clamp(1.25rem, 4vw, 2.5rem); /* 20-40px range */
+  --seed-name-font-size: clamp(0.875rem, 2vw, 1.25rem); /* 14-20px range */
+  --mode-indicator-font-size: clamp(0.75rem, 1.5vw, 1rem); /* 12-16px range */
+  
+  /* 2025 Dynamic viewport support */
+  --viewport-height-dynamic: 100dvh; /* Dynamic viewport height - 2025 standard */
+  --viewport-height-fallback: 100vh; /* Fallback for older browsers */
+  --available-viewport-height: var(--viewport-height-dynamic, var(--viewport-height-fallback));
+  
+  /* State-of-the-art 2025 unified layout system - defaults for mobile */
+  --content-inline-padding: 1rem; /* Mobile default */
+  --content-max-width: 100%;      /* Mobile full width */
+}
+ 
+* {
+  box-sizing: border-box;
+}
+ 
+.homepage {
+  display: flex;
+  width: 100%;
+  height: 100dvh; /* State-of-the-art 2025: Dynamic viewport height */
+  height: 100vh; /* Fallback for older browsers */
+  overflow: hidden;
+  position: relative;
+  background-color: var(--page-bg); /* Standardized page background */
+}
+
+/* Mobile Header */
+.mobile-header {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--header-total-height);
+  background: var(--header-bg);
+  border-bottom: 1px solid color-mix(in srgb, var(--gold-subtle) 15%, transparent);
+  z-index: var(--z-index-header);
+  padding: var(--header-safe-area-top) 15px 0 15px;
+  align-items: center;
+  justify-content: space-between;
+  
+  /* Ensure content doesn't get cut off */
+  box-sizing: border-box;
+  contain: layout style;
+  
+  /* Isolation layer to prevent sidebar backdrop bleeding */
+  isolation: isolate;
+}
+
+/* Additional backdrop protection for mobile header */
+.mobile-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: color-mix(in srgb, var(--utility-pure-black) 2%, transparent);
+  backdrop-filter: blur(var(--glass-blur-subtle));
+  z-index: -1;
+  pointer-events: none;
+}
+ 
+.homepage .main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--primary-color);
+  position: relative;
+  overflow: visible; /* Changed from hidden to visible to prevent cutoff */
+  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* State-of-the-art 2025: Proper height management */
+  height: 100%;
+  max-height: 100dvh; /* Dynamic viewport height */
+  max-height: 100vh; /* Fallback */
+  
+  /* Ensure no top padding/margin */
+  padding-top: 0;
+  margin-top: 0;
+}
+ 
+/* Chat header styles */
+.chat-header {
+  height: auto;
+  min-height: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--primary-color);
+  /* Base padding with safe area support */
+  padding: calc(0.5rem + env(safe-area-inset-top, 0px)) 20px 0 20px;
+  position: relative;
+  margin: 0; /* No margins */
+}
+
+.chat-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 500px;
+  height: 2px;
+  background: linear-gradient(90deg, 
+    transparent,
+    var(--gold-subtle),
+    var(--mode-quest),
+    transparent
+  );
+}
+ 
+.figure-name {
+  color: var(--gold-subtle); /* Golden color, unchanged */
+  font-family: 'Space Grotesk', sans-serif; /* Updated to match unified system */
+  font-size: var(--chat-header-font-size);
+  margin: 0;
+  width: 100%;
+  text-align: center;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-shadow: 0 0 20px color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+  line-height: 1.1;
+  
+  /* Text overflow handling */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 90%; /* Leave room for potential side elements */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.seed-name {
+  font-family: 'Space Grotesk', sans-serif; /* Updated to match unified system */
+  font-size: var(--seed-name-font-size);
+  margin: 5px auto 2px auto; /* Center with auto margins */
+  text-align: center;
+  max-width: 90%; /* Responsive max width */
+  width: fit-content; /* Contain to content width */
+  padding: 0; /* Removed padding since no background */
+  position: relative;
+  z-index: var(--z-base); /* 1 */ /* Component internal - keep as-is */
+  background-color: transparent;
+  
+  /* Multi-line truncation for long seed names */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.4;
+}
+
+/* White seed name text */
+.seed-name-text {
+  color: var(--cosmic-text-primary);
+  text-shadow: 0 0 10px color-mix(in srgb, white 30%, transparent); /* Subtle white glow */
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+}
+
+/* Mode Indicator */
+.mode-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Space Grotesk', sans-serif; /* Updated to match unified system */
+  font-size: var(--mode-indicator-font-size);
+  margin: 6px 0 8px 0;
+  font-weight: 400;
+  letter-spacing: 0.01em; /* Match seed-name letter spacing */
+  opacity: 0.9;
+  background-color: transparent;
+  padding: 0; /* Removed padding since no background */
+  max-width: 90%;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+  
+  /* Prevent wrapping */
+  flex-shrink: 0;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+/* Desktop-only chatbox container styles - mobile handles its own margins */
+@media (min-width: 769px) {
+  .chatbox-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--text-tertiary);
+    overflow: hidden;
+    margin: 5px 1rem 16px; /* Top, sides, bottom margins combined - DESKTOP ONLY */
+    width: calc(100% - 2rem); /* Calculated width - DESKTOP ONLY */
+  }
+}
+
+/* Error Message Styles */
+.error-message {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: color-mix(in srgb, var(--mode-quest) 90%, transparent);
+  color: var(--cosmic-text-primary);
+  padding: 15px 20px;
+  border-radius: 8px;
+  z-index: var(--z-modal); /* 2000 */
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.error-message button {
+  background: transparent;
+  border: 1px solid white;
+  color: var(--cosmic-text-primary);
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.error-message button:hover {
+  background: white;
+  color: var(--accent-color);
+}
+ 
+/* Desktop styles - CONSOLIDATED */
+@media (min-width: 1024px) {
+  :root {
+    /* Override header font sizes for desktop - Slightly smaller to save space */
+    --chat-header-font-size: 1.75rem; /* 28px - reduced from 30px */
+    --seed-name-font-size: 1.375rem; /* 22px - reduced from 24px */
+    --mode-indicator-font-size: 1rem; /* 16px - reduced from 18px */
+    
+    /* Compact spacing for bookmark compensation */
+    --header-spacing-unit: 4px; /* Reduced from 8px */
+    
+    /* State-of-the-art 2025 unified layout system */
+    --content-inline-padding: 40px; /* Consistent horizontal padding */
+    --content-max-width: 1400px;    /* Maximum content width */
+    --content-area-width: calc(100% - var(--sidebar-width-desktop)); /* Available content area */
+  }
+  
+  /* Align chat header with sidebar figure button */
+  .chat-header {
+    /* Compact vertical spacing for bookmarks - override safe area on desktop */
+    padding-top: 8px; /* Fixed desktop padding, no safe area needed */
+    padding-bottom: 0; /* No bottom padding */
+    margin-top: 0; /* Reset margin */
+    padding-left: var(--content-inline-padding);
+    padding-right: var(--content-inline-padding);
+    margin-bottom: 12px; /* Reduced from 16px */
+    z-index: var(--z-sticky); /* 200 - Above sidebar context */
+    
+    /* Flexbox child behavior */
+    flex-shrink: 0; /* Don't shrink */
+    width: 100%; /* Full width to inherit padding */
+    
+    /* Ensure it's always visible */
+    min-height: auto;
+    background-color: var(--primary-color);
+  }
+  
+  /* Typography hierarchy refinements - Tighter spacing */
+  .figure-name {
+    font-size: var(--chat-header-font-size);
+    font-weight: 450; /* Slightly lighter for elegance */
+    opacity: 0.95; /* Subtle reduction in dominance */
+    margin-bottom: 3px; /* Much tighter - reduced from 8px */
+  }
+  
+  .seed-name {
+    font-size: var(--seed-name-font-size);
+    font-weight: 400; /* Space Grotesk regular */
+    line-height: 1.2; /* Tighter line height */
+    margin-top: 2px; /* Override default margin */
+    margin-bottom: 3px; /* Much tighter - reduced from 6px */
+  }
+  
+  .mode-indicator {
+    font-size: var(--mode-indicator-font-size);
+    opacity: 1; /* Full opacity for importance */
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px; /* Override default margin */
+    margin-bottom: 6px; /* Reduced from 8px */
+  }
+  
+  /* Refined gradient separator - matches content width */
+  .chat-header::after {
+    width: calc(100% - 2 * var(--content-inline-padding)); /* Match content width */
+    max-width: var(--content-max-width); /* Constrain like other components */
+    height: 2px; /* More visible */
+    background: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in srgb, var(--gold-subtle) 40%, transparent),
+      color-mix(in srgb, var(--mode-quest) 30%, transparent),
+      transparent
+    );
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  /* State-of-the-art 2025 Bulletproof Layout System */
+  .homepage .main-content {
+    margin-left: var(--sidebar-width-desktop);
+    width: var(--content-area-width);
+    
+    /* Back to flexbox but with proper handling */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    
+    /* Ensure consistent content boundaries */
+    padding-inline: 0; /* Padding handled by individual components */
+    position: relative;
+    isolation: isolate; /* Create new stacking context */
+  }
+  
+  /* Fix wrapper divs from React conditional rendering */
+  .homepage .main-content > div[style*="position: relative"] {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    width: 100%;
+    /* Ensure wrapper doesn't add extra spacing */
+    padding: 0;
+    margin: 0;
+  }
+  
+  /* Additional fix for nested flex containers */
+  .homepage .main-content > div > div[style*="position: relative"] {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+  }
+
+  .mobile-header {
+    display: none;
+  }
+  
+  /* When carousel is open, remove sidebar space with smooth transition */
+  .homepage .main-content.carousel-open {
+    margin-left: 0;
+    /* Remove width override to allow natural full width */
+    transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  /* Message input styles moved to component CSS files for better encapsulation */
+}
+
+/* Mobile layout handled in component CSS files */
+ 
+/* Message input styles removed - handled in component CSS */
+
+/* Desktop styles consolidated into main desktop media query above */
+ 
+/* Modal styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: color-mix(in srgb, var(--bg-primary) 95%, transparent);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: var(--z-modal); /* 2000 */;
+}
+ 
+.modal-content {
+  background-color: var(--primary-color);
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 90%;
+  max-height: 90%;
+  overflow-y: auto;
+}
+ 
+/* Select seed button styles */
+.select-seed-button {
+  background: var(--mode-quest);
+  color: var(--cosmic-text-primary);
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-family: 'Space Grotesk', sans-serif; /* Updated to match unified system */
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 20px;
+  width: 100%;
+}
+ 
+.select-seed-button:hover:not(:disabled) {
+  background: var(--mode-quest);
+  transform: scale(1.02);
+  box-shadow: 0 0 15px color-mix(in srgb, var(--mode-quest) 30%, transparent);
+}
+ 
+.select-seed-button:disabled {
+  background: var(--text-dim);
+  cursor: not-allowed;
+}
+ 
+/* World-class mobile menu overlay */
+.mobile-menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* Temporarily disabled for clean approach */
+  /* background-color: rgba(0, 0, 0, 0.5); */
+  /* Temporarily disabled for clean Apple liquid glass approach */
+  /* backdrop-filter: blur(4px); */
+  /* -webkit-backdrop-filter: blur(4px); */
+  z-index: var(--z-sticky); /* 200 - Below sidebar */
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* Mobile Styles */
+/* Tablet and Mobile Styles - State-of-the-art 2025 */
+@media (max-width: 1023px) {
+  .mobile-menu-overlay {
+    display: none; /* No mobile menu needed anymore */
+  }
+  .homepage {
+    padding-top: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+  }
+
+  .mobile-header {
+    display: none; /* Mobile header is removed - no hamburger menu */
+  }
+
+  .homepage .main-content {
+    margin-left: 0;
+    width: 100%;
+    flex: 1;
+    margin-top: 0; /* No header anymore - use full space */
+    height: 100dvh; /* Full viewport height */
+    overflow: hidden;
+  }
+
+  .chat-header {
+    padding: 1rem 1.5rem 0 1.5rem;
+    margin-top: 0;
+    min-height: auto;
+  }
+
+  .chat-header::after {
+    width: min(80%, 400px);
+  }
+
+  .error-message {
+    width: 90%;
+    max-width: none;
+    bottom: 10px;
+  }
+}
+
+/* Mobile Styles */
+@media (max-width: 767px) {
+  :root {
+    /* Mobile header - proportionally increased font sizes for readability */
+    --chat-header-font-size: clamp(1.25rem, 4.5vw, 1.625rem); /* 20-26px - moderate increase */
+    --seed-name-font-size: clamp(1.0625rem, 3.5vw, 1.375rem); /* 17-22px - proportional to figure name */
+    --mode-indicator-font-size: clamp(1rem, 3vw, 1.25rem); /* 16-20px - more prominent */
+  }
+
+  .chat-header {
+    /* Minimal top padding for mobile, using safe area if present */
+    padding: calc(0.5rem + env(safe-area-inset-top, 0px)) 1rem 0 1rem; /* Safe area + small padding */
+    margin-top: 0; /* No margin needed */
+  }
+  
+  /* Handle very long names on mobile */
+  .figure-name {
+    max-width: 95%; /* Good balance for long names like Goethe */
+    margin-bottom: 4px; /* Tighter spacing on mobile */
+  }
+  
+  .seed-name {
+    margin: 3px auto 2px auto; /* Tighter vertical spacing */
+  }
+  
+  .mode-indicator {
+    margin: 3px 0 5px 0; /* Compact spacing */
+  }
+
+  /* Chatbox spacing handled by ChatBox.css mobile rules */
+
+  /* Hide gradient separator on mobile to save space */
+  .chat-header::after {
+    display: none;
+  }
+}
+ 
+/* Small Mobile Adjustments */
+@media (max-width: 480px) {
+  :root {
+    /* Font sizes for small mobile - proportionally sized for iPhone SE */
+    --chat-header-font-size: clamp(1.0625rem, 3.5vw, 1.25rem); /* 17-20px - slightly smaller */
+    --seed-name-font-size: clamp(0.9375rem, 3vw, 1.125rem); /* 15-18px - proportional to figure */
+    --mode-indicator-font-size: clamp(0.875rem, 2.75vw, 1.0625rem); /* 14-17px - better visibility */
+  }
+
+  /* Mobile header and hamburger removed - no longer needed */
+
+  .chat-header {
+    /* Minimal padding for small screens with safe area */
+    padding: calc(0.4rem + env(safe-area-inset-top, 0px)) 0.75rem 0 0.75rem;
+    margin-top: 0;
+  }
+
+  /* Removed chatbox-container margin-top override - ChatBox.css handles mobile spacing */
+
+  .error-message {
+    padding: 10px 15px;
+    font-size: 14px;
+  }
+}
+
+/* Very small screens - stack mode indicator */
+@media (max-width: 400px) {
+  .chat-header {
+    /* Allow wrapping for very long content */
+    flex-wrap: wrap;
+  }
+  
+  .figure-name {
+    width: 100%;
+    margin-bottom: 0.25rem;
+  }
+  
+  .mode-indicator {
+    margin-top: 0.25rem;
+    font-size: 0.75rem; /* Smaller on very small screens */
+  }
+}
+ 
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .homepage .main-content, 
+  .select-seed-button,
+  .seed-name,
+  .error-message {
+    transition: none;
+  }
+}
+
+/* High Contrast Mode */
+@media (forced-colors: active) {
+  .chat-header::after {
+    background: CanvasText;
+  }
+  
+  .seed-name, .mode-indicator {
+    -webkit-background-clip: unset;
+    background-clip: unset;
+    color: CanvasText;
+  }
+
+  .error-message {
+    border: 2px solid ButtonText;
+  }
+
+  /* Mobile header removed */
+}
+
+/* PWA rules removed - no longer needed */
+
+/* iOS-specific safe area handling */
+@supports (padding: env(safe-area-inset-top)) {
+  /* Safe area is already handled by the chat-header padding */
+}
+
+/* Container queries ready for future */
+@container (min-width: 320px) {
+  .chat-header {
+    container-type: inline-size;
+  }
+}
+/* Removed duplicate desktop media query - consolidated above */
+
+/* Large desktop refinements */
+@media (min-width: 1440px) {
+  :root {
+    /* Scale up slightly for larger displays */
+    --chat-header-font-size: 2rem; /* 32px */
+    --seed-name-font-size: 1.625rem; /* 26px */
+    --mode-indicator-font-size: 1.25rem; /* 20px */
+  }
+}
+
+@media (min-width: 1920px) {
+  :root {
+    --content-inline-padding: 60px; /* Increased padding for XL displays */
+  }
+  
+  .chat-header {
+    padding-top: 48px; /* More generous top spacing */
+    /* Horizontal padding inherited from --content-inline-padding */
+  }
+}
+
+/* Floating Button Container styles */
+.mobile-header-buttons {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+/* Hide floating buttons during cosmic council mode */
+.cosmic-council-header ~ .desktop-floating-buttons,
+.homepage:has(.cosmic-council-header) .desktop-floating-buttons,
+.homepage:has(.cosmic-council-header) .mobile-header-buttons {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.desktop-floating-buttons {
+  display: block;
+}
+
+@media (max-width: 1024px) {
+  .desktop-floating-buttons {
+    display: none; /* Hide desktop buttons on mobile */
+  }
+}
+
+/* Cosmic Council Conversation Interface */
+.council-conversation-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  min-height: 60vh;
+}
+
+.council-active-indicator {
+  background: linear-gradient(135deg, 
+    color-mix(in srgb, var(--gold-base) 10%, transparent) 0%, 
+    color-mix(in srgb, var(--gold-base) 5%, transparent) 100%);
+  border: 1px solid color-mix(in srgb, var(--gold-base) 20%, transparent);
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 600px;
+  width: 100%;
+  text-align: center;
+  backdrop-filter: blur(var(--glass-blur-heavy));
+}
+
+.council-listening-message {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.council-speaker-display {
+  border-bottom: 1px solid rgba(196, 151, 44, 0.2);
+  padding-bottom: 1rem;
+  margin-bottom: 0.5rem;
+  width: 100%;
+}
+
+.current-speaker {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.speaker-label {
+  font-size: 0.9rem;
+  color: color-mix(in srgb, var(--gold-base) 80%, transparent);
+  font-weight: 500;
+}
+
+.speaker-name {
+  font-size: 1.4rem;
+  color: var(--gold-base);
+  font-weight: 600;
+  text-shadow: 0 0 10px color-mix(in srgb, var(--gold-base) 30%, transparent);
+}
+
+.council-phase-display {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.phase-label {
+  font-size: 0.9rem;
+  color: color-mix(in srgb, var(--gold-base) 80%, transparent);
+  font-weight: 500;
+}
+
+.phase-name {
+  font-size: 1.2rem;
+  color: var(--gold-light);
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.council-listening-text {
+  font-size: 1.1rem;
+  color: var(--text-light);
+  line-height: 1.6;
+  opacity: 0.9;
+  font-style: italic;
+}
+
+.council-current-message {
+  background: color-mix(in srgb, white 5%, transparent);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 1rem;
+  border-left: 3px solid var(--gold-base);
+}
+
+.council-message-content {
+  font-size: 1rem;
+  color: var(--text-primary);
+  line-height: 1.7;
+  font-style: normal;
+  opacity: 1;
+  white-space: pre-wrap;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+/* Responsive design for council interface */
+@media (max-width: 768px) {
+  .council-conversation-container {
+    padding: 1rem;
+    min-height: 50vh;
+  }
+  
+  .council-active-indicator {
+    padding: 1.5rem;
+  }
+  
+  .speaker-name {
+    font-size: 1.2rem;
+  }
+  
+  .phase-name {
+    font-size: 1.1rem;
+  }
+  
+  .council-listening-text {
+    font-size: 1rem;
+  }
+  
+  .council-current-message {
+    padding: 1rem;
+    margin-top: 0.75rem;
+  }
+  
+  .council-message-content {
+    font-size: 0.9rem;
+    max-height: 150px;
+  }
+}

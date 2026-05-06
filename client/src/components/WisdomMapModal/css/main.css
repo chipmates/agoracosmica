@@ -1,0 +1,879 @@
+/* Main styles for WisdomMapModal */
+
+/* Standard animation values */
+:root {
+  /* Base interactions */
+  --scale-hover: 1.05;
+  --scale-small-hover: 1.03;
+  --scale-modal-entry: 1.02;
+  --y-offset-entry: 8px;
+  --transition-fast: 0.2s;
+  --transition-medium: 0.3s;
+  --transition-slow: 0.5s;
+  --overlay-duration: 0.5s;
+  --content-duration: 0.6s;
+  --content-delay: 0.05s;
+}
+
+/* Nebula glow colors */
+:root {
+  --star-core: color-mix(in srgb, white 90%, transparent);
+  --star-inner: color-mix(in srgb, var(--gold-star) 85%, transparent);
+  --star-middle: color-mix(in srgb, var(--gold-subtle) 70%, transparent);
+  --star-outer: color-mix(in srgb, var(--mode-quest) 30%, transparent);
+  
+  --gathered-core: color-mix(in srgb, white 100%, transparent);
+  --gathered-inner: color-mix(in srgb, var(--gold-star) 95%, transparent);
+  --gathered-middle: color-mix(in srgb, var(--gold-subtle) 90%, transparent);
+  --gathered-outer: color-mix(in srgb, var(--mode-quest) 70%, transparent);
+  --gathered-aura: color-mix(in srgb, var(--gold-star) 40%, transparent);
+  
+  --ungathered-core: color-mix(in srgb, var(--text-dim) 90%, transparent);
+  --ungathered-inner: color-mix(in srgb, var(--mode-wisdom) 70%, transparent);
+  --ungathered-middle: color-mix(in srgb, var(--mode-wisdom) 40%, transparent);
+  --ungathered-outer: color-mix(in srgb, var(--mode-wisdom) 20%, transparent);
+  
+  /* Animation durations */
+  --pulse-duration: 3s;
+  --glow-shift-duration: 8s;
+  --sparkle-duration: 1.5s;
+  --ripple-duration: 1.2s;
+  --celebration-duration: 5s;
+  
+  /* Safe area support for PWA/Capacitor */
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-left: env(safe-area-inset-left, 0px);
+  --safe-area-right: env(safe-area-inset-right, 0px);
+  
+  /* Responsive spacing system */
+  --modal-padding: 20px;
+  --modal-padding-mobile: 15px;
+  --modal-padding-small: 12px;
+  
+  /* Dynamic header heights */
+  --header-height: 76px;
+  --header-height-mobile: 60px;
+  --header-height-small: 52px;
+  
+  /* Control bar heights */
+  --controls-height: 58px;
+  --controls-height-mobile: 48px;
+  --controls-height-small: 44px;
+  
+  /* Progress bar section heights */
+  --progress-section-padding: 20px;
+  --progress-section-padding-mobile: 15px;
+  --progress-section-padding-small: 12px;
+}
+
+/* Basic animations - Disabled fade-in for instant appearance */
+@keyframes fadeInOverlay {
+  0% {opacity:1}
+  100% {opacity:1}
+}
+@keyframes fadeInContent {
+  0% {
+    opacity:1;
+    transform:scale(1) translateY(0)
+  }
+  100% {
+    opacity:1;
+    transform:scale(1) translateY(0)
+  }
+}
+@keyframes slideUp {
+  from {
+    transform:translate(-50%,0);
+    opacity:1
+  }
+  to {
+    transform:translate(-50%,0);
+    opacity:1
+  }
+}
+@keyframes shimmer {
+  100% {left:100%}
+}
+@keyframes pulse-animation {
+  0% {transform: scale(1);}
+  50% {
+    transform: scale(1.03);
+    background-color: color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+  }
+  100% {transform: scale(1);}
+}
+
+/* Special class for full-window modal styling */
+.wisdom-map-overlay {
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  max-width: 100%;
+  max-height: 100vh;
+  max-height: 100dvh;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+  border-radius: 0;
+  background: var(--page-bg); /* Use standardized page background color (var(--bg-primary)) */
+  align-items: center; /* Override align-top setting */
+  justify-content: center; /* Ensure centered vertically */
+  position: fixed; /* Fix position to prevent scrolling outside */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* Safe area support */
+  padding-top: var(--safe-area-top);
+  padding-bottom: var(--safe-area-bottom);
+  padding-left: var(--safe-area-left);
+  padding-right: var(--safe-area-right);
+}
+
+/* PWA-specific safe area overrides */
+@media (display-mode: standalone) {
+  .wisdom-map-overlay {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+}
+
+/* Prevent body scrolling when modal is open */
+body.wisdom-map-open {
+  overflow: hidden;
+  height: 100vh;
+  height: 100dvh;
+}
+
+/* ============================================
+   FULL-SCREEN DETAIL VIEW OVERLAY
+   Opens SeedDetailView as overlay - reading-optimized full-page view
+   ============================================ */
+
+.detail-view-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2000; /* Above WisdomMapModal (z-index: 1000) */
+  background: var(--bg-primary);
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  /* Smooth entry animation */
+  animation: slideInFromRight 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Safe area support for PWA/Capacitor */
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Prevent body scroll when detail view open */
+body.detail-view-open {
+  overflow: hidden;
+}
+
+/* Mobile: Optimize detail view for maximum content space */
+@media (max-width: 768px) {
+  .detail-view-overlay .segmented-control {
+    display: none;
+  }
+
+  .detail-view-overlay .cosmic-header {
+    display: none !important;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .detail-view-overlay {
+    animation: none;
+  }
+}
+
+/* Container layout */
+.wisdom-map-content {
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  max-width: 100%;
+  max-height: 100vh;
+  max-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  color: var(--cosmic-text-primary);
+  border-radius: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: var(--page-bg); /* Use standardized page background color (var(--bg-primary)) */
+  /* Prevent layout shift while background loads */
+  min-height: 100vh;
+  min-height: 100dvh;
+  /* Removed isolation: isolate to prevent stacking context trap */
+}
+
+/* IMPORTANT: Scope header overrides to desktop three-column only
+   Let ModalHeader component handle its own simple layout styling */
+
+/* Desktop header specific styles (three-column layout only) */
+.wisdom-map-content .desktop-controls:first-child,
+.wisdom-map-content > *:has(.desktop-controls) {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Center the cosmic title for the desktop three-column layout */
+.wisdom-map-content > div:not(.detail-view-overlay) > .modal-header .cosmic-header {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+}
+
+/* Desktop controls - managed by JavaScript */
+.desktop-controls {
+  display: flex;
+}
+
+/* Desktop close button positioning */
+.desktop-close-button {
+  position: relative;
+  top: auto; /* Override default absolute positioning */
+  right: auto; /* Override default absolute positioning */
+  height: 42px; /* Match height with other controls */
+  width: 42px; /* Keep it square */
+  margin-left: auto; /* Push to the right */
+  align-self: center; /* Center vertically */
+}
+
+/* ModalHeader component handles close button positioning - no overrides needed */
+
+/* ============================================
+   WISDOM HUB HEADER ELEMENTS
+   ============================================ */
+
+/* Title wrapper for wisdom hub */
+.wisdom-modal-title-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.wisdom-modal-title {
+  white-space: nowrap;
+}
+
+/* True-center the title by making the center column span the full header */
+.wisdom-map-content [role="group"] > div:has(.wisdom-modal-title) {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.wisdom-modal-subtitle {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  color: color-mix(in srgb, var(--gold-subtle) 60%, transparent);
+  text-transform: none;
+}
+
+/* Header button group — row of buttons */
+.header-button-group {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Header action buttons — unified gold glass aesthetic */
+.header-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--gold-subtle) 8%, transparent);
+  color: var(--gold-subtle);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+  min-height: 42px;
+  white-space: nowrap;
+}
+
+.header-action-btn:hover {
+  background: color-mix(in srgb, var(--gold-subtle) 15%, transparent);
+  border-color: color-mix(in srgb, var(--gold-subtle) 50%, transparent);
+}
+
+.header-action-btn.active {
+  background: color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+  border-color: var(--gold-subtle);
+}
+
+.header-action-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.header-action-btn span {
+  pointer-events: none;
+}
+
+/* Neutral variant for Info button — whitegrey, slightly larger, spaced from CloseButton */
+.header-action-btn.info-btn {
+  border-color: color-mix(in srgb, var(--text-secondary) 30%, transparent);
+  background: color-mix(in srgb, var(--text-secondary) 8%, transparent);
+  color: var(--text-secondary);
+  padding: 10px;
+  min-height: 42px;
+  min-width: 42px;
+  margin-right: 16px;
+}
+
+.header-action-btn.info-btn:hover {
+  background: color-mix(in srgb, var(--text-secondary) 18%, transparent);
+  border-color: color-mix(in srgb, var(--text-secondary) 50%, transparent);
+}
+
+.header-action-btn.info-btn.active {
+  background: color-mix(in srgb, var(--text-secondary) 22%, transparent);
+  border-color: var(--text-secondary);
+  color: var(--text-primary);
+}
+
+/* Make ListButton match gold style when inside the header */
+.header-button-group .list-view-button {
+  background: color-mix(in srgb, var(--gold-subtle) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+  color: var(--gold-subtle);
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  font-size: 0.9rem;
+  min-height: 42px;
+  padding: 10px 16px;
+}
+
+.header-button-group .list-view-button:hover {
+  background: color-mix(in srgb, var(--gold-subtle) 15%, transparent);
+  border-color: color-mix(in srgb, var(--gold-subtle) 50%, transparent);
+  color: var(--gold-subtle);
+  box-shadow: none;
+}
+
+.header-button-group .list-view-button.active {
+  background: color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+  border-color: var(--gold-subtle);
+  color: var(--gold-subtle);
+  box-shadow: none;
+}
+
+/* ============================================
+   MOBILE BOTTOM TOOLBAR
+   ============================================ */
+
+.mobile-bottom-toolbar {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--bg-primary) 90%, transparent),
+    var(--bg-primary));
+  border-top: none; /* Border rendered by the progress hairline sitting on top */
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  padding: 4px 16px;
+  padding-bottom: calc(4px + env(safe-area-inset-bottom, 0px));
+}
+
+.toolbar-buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  gap: 4px;
+}
+
+.toolbar-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--gold-subtle);
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.toolbar-btn:hover,
+.toolbar-btn:focus-visible {
+  background: color-mix(in srgb, var(--gold-subtle) 12%, transparent);
+}
+
+.toolbar-btn.active {
+  background: color-mix(in srgb, var(--gold-subtle) 18%, transparent);
+  color: var(--gold-star);
+}
+
+.toolbar-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.toolbar-btn.toolbar-info-btn {
+  color: var(--text-secondary);
+}
+
+.toolbar-btn.toolbar-info-btn.active {
+  color: var(--text-primary);
+}
+
+/* Modal title styling - kept for backwards compatibility */
+.modal-title {
+  font-size: 1.75rem; /* Reduced font size to match cosmic-header */
+  color: var(--gold-subtle);
+  margin: 0; /* No margin */
+  text-align: center;
+  text-shadow: 0 0 10px color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+  width: 100%;
+  padding: 0; /* No padding for maximum space efficiency */
+}
+
+/* Map Container */
+.map-container {
+  flex: 1;
+  position: relative;
+  border-radius: 0;
+  overflow: hidden;
+  margin: 0;
+  z-index: 10; /* Above header (5) to allow star tooltips to show properly */
+  contain: layout paint;
+  will-change: contents;
+  width: 100%;
+  height: 100%;
+  min-height: 300px; /* Reduced for small viewports */
+  box-shadow: none; /* Removed inner shadow for crystal clear background */
+  margin-top: 0; /* No margin - container sits directly below header border */
+  padding-top: 0; /* No padding - start content immediately */
+  border-top: none; /* No border */
+}
+
+/* Add styling for gathered icon */
+.gathered-icon {
+  color: var(--gold-subtle);
+  filter: drop-shadow(0 0 3px color-mix(in srgb, var(--gold-subtle) 50%, transparent));
+}
+
+/* Animation for newly gathered seeds */
+.pulse-animation {
+  animation: pulse-animation 1.5s ease-in-out;
+}
+
+/* Global purple scrollbar will be inherited automatically */
+
+/* Loading/Error */
+.loading-state {
+  text-align: center;
+  padding: 20px;
+  color: var(--gold-subtle)
+}
+.error-state {
+  text-align: center;
+  padding: 20px
+}
+
+/* List View */
+.seed-list-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* Important for flexbox children to be scrollable */
+  overflow: hidden; /* Let the child component handle scrolling */
+  position: relative;
+  z-index: var(--z-base); /* 1 */ /* Ensure it's above any floating elements */
+  background: var(--page-bg); /* Solid background to block elements behind */
+  margin-top: 16px; /* Add spacing for list view to maintain visual balance */
+}
+
+/* Mobile responsiveness */
+@media (max-width: 500px) {
+  .segmented-view-control {
+    width: 120px;
+    height: 44px; /* Slightly reduced from desktop but still taller than before */
+    left: 0; /* Remove left positioning */
+    top: 0; /* Remove top positioning */
+  }
+  
+  .segment-option {
+    padding: 0 6px;
+    gap: 4px;
+    height: 40px; /* Increased to be closer to 44px minimum while fitting container */
+  }
+  
+  .segment-label {
+    display: none; /* Hide text on very small screens */
+  }
+  
+  .segment-highlighter {
+    height: 40px; /* Match mobile segment option height */
+  }
+}
+
+/* Mobile/Tablet adjustments - screen sizes under 1024px */
+@media(max-width:1023px) {
+  /* Switch layouts for mobile/tablet */
+  .controls-top-bar {
+    display: flex; /* Show on mobile/tablet */
+    padding: 8px 15px;
+    height: 54px; /* Slightly reduced for more content space */
+    align-items: center; /* Ensure vertical centering */
+    border-bottom: 2px solid color-mix(in srgb, var(--gold-subtle) 30%, transparent); /* Match desktop header border */
+  }
+  
+  /* Hide desktop close button on mobile */
+  .desktop-close-button {
+    display: none;
+  }
+  
+  /* Map container adjusts when no header on mobile */
+  .map-container {
+    margin-top: 0; /* Direct connection to controls bar */
+  }
+  
+  /* Reset absolute positioning of title for mobile */
+  .modal-header .cosmic-header {
+    position: static;
+    transform: none;
+    text-align: center; /* Center-aligned on mobile */
+  }
+  
+  .modal-title { 
+    font-size: 1.7rem;
+    margin: 0;
+    padding-bottom: 3px;
+  }
+  
+  /* Center title on tablets while keeping it left-aligned on phones */
+  @media(min-width: 768px) {
+    .modal-header .cosmic-header {
+      text-align: center;
+    }
+  }
+  
+  /* Adjust control button sizes */
+  .view-toggle, .close-button { 
+    width: 44px; /* Increased to meet Apple's 44px minimum touch target */
+    height: 44px; /* Consistent 44px for both dimensions */
+  }
+  
+  /* Keep header close button position consistent */
+  .header-close-button {
+    width: 44px; /* Increased to meet Apple's 44px minimum touch target */
+    height: 44px;
+    top: 12px;
+    right: 15px;
+  }
+  
+  /* Ensure modal fills entire screen on mobile */
+  .wisdom-map-overlay,
+  .wisdom-map-content {
+    height: 100%;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+}
+
+/* Further optimize for small mobile screens */
+@media(max-width:480px) {
+  .modal-title {
+    font-size: 1.5rem;
+  }
+  
+  /* Adjust help message for small screens */
+  .initial-pattern-help {
+    top: 120px;
+  }
+  
+  .help-content {
+    padding: 12px 15px;
+    max-width: 90%;
+  }
+  
+  .help-content p {
+    font-size: 0.9rem;
+  }
+}
+
+@media(max-width:1023px) {
+  .wisdom-map-content {
+    max-height: 98vh;
+  }
+}
+
+/* Accessibility - respect reduced motion preferences */
+@media(prefers-reduced-motion:reduce) {
+  *,*::before,*::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ========================================
+   HEIGHT-BASED RESPONSIVE BREAKPOINTS
+   ======================================== */
+
+/* Smart positioning for constrained heights (600-700px) - iPhone SE and similar */
+@media (max-height: 700px) {
+  /* Reduce chrome heights to save space */
+  .modal-header { 
+    min-height: var(--header-height-mobile);
+    padding: 10px var(--modal-padding-mobile);
+    margin-bottom: 0; /* No margin - direct connection */
+  }
+  
+  /* Remove border on mobile with constrained height */
+  @media (max-width: 1023px) {
+    .modal-header {
+      border-bottom: none;
+    }
+  }
+  
+  .controls-top-bar {
+    height: var(--controls-height-mobile);
+    padding: 6px var(--modal-padding-mobile);
+  }
+  
+  .modal-title {
+    font-size: 1.5rem; /* Reduced from 1.75rem */
+  }
+  
+  /* Compact mode for progress section */
+  .progress-section {
+    padding: var(--progress-section-padding-mobile);
+  }
+  
+  /* Reduce minimum height for map container */
+  .map-container {
+    min-height: 200px;
+  }
+}
+
+/* Emergency mode for extreme heights (≤600px) */
+@media (max-height: 600px) {
+  /* Ultra-compact chrome */
+  .modal-header { 
+    min-height: var(--header-height-small);
+    padding: 8px var(--modal-padding-small);
+    margin-bottom: 0; /* No margin - direct connection */
+  }
+  
+  /* Remove border on mobile with extreme height constraint */
+  @media (max-width: 1023px) {
+    .modal-header {
+      border-bottom: none;
+    }
+  }
+  
+  .controls-top-bar { 
+    height: var(--controls-height-small);
+    padding: 4px var(--modal-padding-small);
+  }
+  
+  /* Hide constellation title to save ~40px */
+  .constellation-title { 
+    display: none;
+  }
+  
+  /* Further reduce title size */
+  .modal-title {
+    font-size: 1.25rem;
+  }
+  
+  /* Enable scrolling for map content if needed */
+  .map-container {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* ========================================
+   MODERN 6-BREAKPOINT STRATEGY
+   ======================================== */
+
+/* Android baseline (360px+) */
+@media (min-width: 360px) {
+  /* Base mobile styles already applied */
+}
+
+/* Tablet portrait (768px+) */
+@media (min-width: 768px) {
+  .modal-header {
+    padding: 12px var(--modal-padding);
+  }
+  
+  /* Center title on tablets while still in mobile layout */
+  .modal-header .cosmic-header {
+    text-align: center;
+  }
+}
+
+/* iPad Portrait specific */
+@media (min-width: 768px) and (max-width: 800px) and (min-height: 1000px) {
+  .wisdom-map-content {
+    max-height: 825px;
+  }
+}
+
+/* Tablet landscape (1024px+) */
+@media (min-width: 1024px) {
+  /* Desktop layout already applied */
+}
+
+/* iPad Landscape specific */
+@media (min-width: 1000px) and (max-width: 1100px) and (max-height: 800px) {
+  .wisdom-map-content {
+    height: calc(99vh - var(--safe-area-top) - var(--safe-area-bottom));
+  }
+}
+
+/* Small desktop (1280px+) */
+@media (min-width: 1280px) {
+  .wisdom-map-content {
+    height: calc(100vh - var(--safe-area-top) - var(--safe-area-bottom));
+  }
+}
+
+/* Standard laptop (1366px+) */
+@media (min-width: 1366px) {
+  .wisdom-map-content {
+    height: calc(100vh - var(--safe-area-top) - var(--safe-area-bottom));
+  }
+}
+
+/* Full HD (1920px+) */
+@media (min-width: 1920px) {
+  .wisdom-map-content {
+    height: calc(90vh - var(--safe-area-top) - var(--safe-area-bottom));
+    max-height: 850px;
+  }
+}
+
+/* ========================================
+   IPHONE SE SPECIFIC ADJUSTMENTS
+   ======================================== */
+
+/* iPhone SE and similar small devices (375×667) */
+@media (max-width: 420px) and (max-height: 680px) {
+  /* Ultra-compact mode */
+  .wisdom-map-content {
+    padding: 0; /* Remove all padding to maximize space */
+  }
+  
+  .modal-header {
+    margin-bottom: 0; /* No margin - direct connection */
+    padding: 8px 12px; /* Further reduced padding */
+    border-bottom: none; /* Remove border on mobile */
+  }
+  
+  /* Smaller fonts for descriptions */
+  .constellation-info p {
+    font-size: 0.875rem; /* 14px */
+    line-height: 1.3;
+  }
+  
+  /* Compact seed details panel */
+  .seed-details-panel {
+    padding: 12px;
+    font-size: 0.875rem;
+  }
+  
+  /* Reduce star sizes in constellation */
+  .star {
+    transform: scale(0.85);
+  }
+  
+  /* Adjust close button sizes */
+  .mobile-close-button,
+  .desktop-close-button {
+    width: 44px; /* Maintain 44px minimum touch target even on small devices */
+    height: 44px;
+  }
+}
+
+/* Extreme case - iPhone SE Safari with minimal viewport */
+@media (max-width: 375px) and (max-height: 574px) {
+  /* Hide all non-essential elements */
+  .constellation-title {
+    display: none;
+  }
+  
+  /* Enable emergency scrolling */
+  .map-container {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Ultra-minimal chrome */
+  .modal-header {
+    min-height: 44px;
+    padding: 6px 10px;
+    border-bottom: none; /* Remove border on mobile */
+  }
+  
+  .controls-top-bar {
+    height: 44px; /* Increased to accommodate 44px minimum button height */
+    padding: 4px 10px;
+  }
+  
+  /* Tiny progress bar */
+  .progress-section {
+    padding: 8px;
+  }
+  
+  .modal-title {
+    font-size: 1.125rem; /* 18px */
+  }
+}

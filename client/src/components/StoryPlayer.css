@@ -1,0 +1,635 @@
+/* src/components/StoryPlayer.css */
+
+:root {
+  --story-bg: color-mix(in srgb, var(--bg-astral) var(--a-25), transparent); /* Match chatbox background */
+  --story-glass-blur: 10px;
+  --story-text: var(--cosmic-text-primary); /* Use cosmic white */
+  --story-accent: color-mix(in srgb, var(--gold-subtle) var(--a-90), transparent);
+  --story-accent-glow: color-mix(in srgb, var(--gold-subtle) var(--a-40), transparent);
+  --story-border: color-mix(in srgb, var(--gold-subtle) var(--a-15), transparent);
+  --story-hover: color-mix(in srgb, var(--mode-quest) var(--a-90), transparent);
+  --story-shadow: color-mix(in srgb, var(--utility-pure-black) var(--a-30), transparent);
+  --story-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --scrollbar-track: color-mix(in srgb, var(--bg-card) var(--a-50), transparent);
+  --scrollbar-thumb: color-mix(in srgb, var(--gold-subtle) var(--a-50), transparent);
+  --scrollbar-thumb-hover: color-mix(in srgb, var(--gold-subtle) var(--a-80), transparent);
+}
+
+/* Streamlined story player container - match chatbox width */
+.elegant-story-player {
+  position: relative;
+  width: calc(100% - 2 * var(--content-inline-padding, 1rem)); /* Match chatbox width calculation */
+  max-width: var(--content-max-width, 100%); /* Use same max-width as chatbox */
+  margin: 0 auto 16px; /* Same bottom margin as chatbox */
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem; /* Minimal gap */
+  flex: 1; /* Let it flow naturally within parent container */
+  overflow: hidden; /* Changed to hidden to contain scrollbar */
+  max-height: calc(100vh - 120px); /* Desktop: header (~60px) + bottom margin (20px) + buffer */
+  height: 100%; /* Take full height from parent */
+}
+
+/* Unified container for both controls and content */
+.story-container {
+  background: color-mix(in srgb, var(--bg-astral) var(--a-25), transparent); /* Match chatbox background */
+  backdrop-filter: blur(var(--story-glass-blur));
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-15), transparent); /* Match chatbox border */
+  border-radius: 16px; /* Match chatbox border radius */
+  padding: 0.8rem 1.75rem 0.75rem; /* Slightly more breathing room */
+  box-shadow: 
+    0 8px 32px color-mix(in srgb, var(--utility-pure-black) var(--a-20), transparent),
+    0 2px 8px color-mix(in srgb, var(--utility-pure-black) var(--a-10), transparent);
+  transition: var(--story-transition);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem; /* Tight gap — maximize reading area */
+  flex: 1; /* Grow to fill available space */
+  min-height: 0; /* Allow shrinking */
+  overflow: hidden; /* Contain the scrollbar within border radius */
+  height: 100%; /* Take full height */
+}
+
+/* Story header - minimized */
+.story-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.3rem; /* Slightly more space below header */
+  flex-shrink: 0; /* Prevent header from shrinking */
+  height: auto; /* Auto height */
+}
+
+.story-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 500;
+  font-size: 1.1rem; /* Slightly smaller */
+  color: var(--story-accent);
+  text-shadow: 0 0 8px var(--story-accent-glow);
+  margin: 0;
+  flex: 1;
+}
+
+/* Story intro container with button */
+.story-intro-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0 0 0.25rem;
+}
+
+.story-intro {
+  font-family: var(--font-content, 'Libre Caslon Text', Georgia, serif);
+  font-style: italic;
+  color: var(--story-text);
+  opacity: 0.85;
+  margin: 0; /* No margin needed in flex container */
+  font-size: 0.85rem; /* Smaller text */
+}
+
+/* New flexbox row for intro + facts chip */
+.story-intro-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.story-help-link {
+  background: none;
+  border: none;
+  color: var(--gold-subtle);
+  cursor: pointer;
+  padding: 0;
+  font-size: 0.85rem;
+  font-family: var(--font-content, 'Libre Caslon Text', Georgia, serif);
+  font-style: italic;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: color 0.2s;
+}
+
+.story-help-link svg {
+  flex-shrink: 0;
+}
+
+.story-help-link__text {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.story-help-link:hover {
+  color: var(--gold-hover);
+}
+
+.story-help-link:focus-visible {
+  outline: 2px solid var(--gold-subtle);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Facts link - minimal style with icon, underline only on text */
+.story-facts-link {
+  background: none;
+  border: none;
+  color: var(--gold-subtle);
+  cursor: pointer;
+  padding: 0;
+  font-size: 0.85rem;
+  font-family: var(--font-content, 'Libre Caslon Text', Georgia, serif);
+  font-style: italic;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: color 0.2s;
+  flex-shrink: 0;
+}
+
+.story-facts-link svg {
+  flex-shrink: 0;
+}
+
+.story-facts-link__text {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.story-facts-link:hover {
+  color: var(--gold-hover);
+}
+
+.story-facts-link:focus-visible {
+  outline: 2px solid var(--gold-subtle);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Foreword link - quest color to distinguish from other links */
+.story-foreword-link {
+  --foreword-color: var(--mode-quest);
+  --foreword-hover: var(--mode-quest-hover);
+
+  background: none;
+  border: none;
+  color: var(--foreword-color);
+  cursor: pointer;
+  padding: 0;
+  font-size: 0.85rem;
+  font-family: var(--font-content, 'Libre Caslon Text', Georgia, serif);
+  font-style: italic;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: color 0.2s;
+  flex-shrink: 0;
+}
+
+.story-foreword-link svg {
+  flex-shrink: 0;
+}
+
+.story-foreword-link__text {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.story-foreword-link:hover {
+  color: var(--foreword-hover);
+}
+
+.story-foreword-link:focus-visible {
+  outline: 2px solid var(--foreword-color);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Story content area - enhanced typography */
+.story-content {
+  color: var(--story-text);
+  overflow: hidden; /* Changed to hidden for scrollable container */
+  padding-left: 0.2rem; /* Small left padding */
+  margin: 0.3rem 0; /* Add margins */
+  padding-bottom: 0;
+  display: flex; /* Use flex to fill available height */
+  flex-direction: column;
+  flex: 1; /* Grow to fill available space */
+  position: relative;
+  min-height: 200px; /* Minimum height to ensure scrollbar appears */
+}
+
+/* Fade edges for scrollable content */
+.story-content::before,
+.story-content::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 30px;
+  pointer-events: none;
+  z-index: var(--z-base); /* 1 */
+}
+
+.story-content::before {
+  top: 0;
+  background: linear-gradient(to bottom, var(--story-bg), transparent);
+}
+
+.story-content::after {
+  bottom: 0;
+  background: linear-gradient(to top, var(--story-bg), transparent);
+}
+
+/* Scrollable container for SimpleBar */
+.story-scrollable {
+  width: 100%;
+  height: 100%;
+  /* Remove fixed max-height - use available space */
+}
+
+/* Add padding to SimpleBar content */
+.story-scrollable .simplebar-content {
+  padding-right: 15px; /* Enhanced specificity ensures space between text and scrollbar */
+}
+
+/* Native scrollable container (non-Safari) */
+.story-scrollable-native {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  width: 100%;
+  /* Global purple scrollbar will be inherited automatically */
+  padding-right: 8px; /* Less padding needed for native scrollbar */
+}
+
+/* SimpleBar custom styling */
+.story-scrollable .simplebar-scrollbar::before {
+  background-color: var(--scrollbar-thumb);
+  opacity: 1;
+  border-radius: 4px;
+}
+
+.story-scrollable .simplebar-track {
+  background-color: var(--scrollbar-track);
+  opacity: 0.5;
+  border-radius: 4px;
+}
+
+.story-scrollable .simplebar-track.simplebar-vertical {
+  right: 0; /* Position scrollbar at edge */
+  width: 12px; /* Slightly wider track */
+}
+
+.story-scrollable .simplebar-scrollbar {
+  width: 8px; /* Scrollbar thumb width */
+}
+
+.story-scrollable .simplebar-scrollbar.simplebar-visible:before {
+  opacity: 1;
+}
+
+.story-scrollable .simplebar-scrollbar:hover::before {
+  background-color: var(--scrollbar-thumb-hover);
+}
+
+/* Global purple scrollbar will be inherited automatically */
+
+.story-text {
+  /* Libre Caslon Text for literary reading experience */
+  font-family: var(--font-content, 'Libre Caslon Text', Georgia, serif);
+  white-space: pre-wrap;
+  font-size: clamp(1.0625rem, 1rem + 0.4vw, 1.25rem); /* 17px to 20px - Optimized for serif */
+  line-height: 1.75; /* Paris Review-style generous spacing for editorial feel */
+  letter-spacing: 0.01em;
+  font-weight: 400; /* Regular weight for reading comfort */
+  font-feature-settings: 'liga' 1, 'kern' 1, 'calt' 1;
+  text-rendering: optimizeLegibility;
+  color: var(--cosmic-text-primary); /* Explicit white text like StoryViewer */
+  padding-bottom: 20px; /* Padding for last line visibility */
+  width: 100%;
+  max-width: 65ch; /* Optimal line length for reading comprehension */
+  margin: 0 auto; /* Center the text block */
+  display: inline-block; /* Changed from flex to ensure proper text flow */
+  text-align: left; /* Override global justify - editorial standard */
+  hyphens: none; /* Disable hyphenation for cleaner look */
+
+  /* StoryViewer typography enhancements */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Enhanced paragraph styling - Paris Review editorial standard */
+.story-text p {
+  margin-bottom: 2rem; /* Generous spacing like Paris Review */
+  text-align: left; /* Editorial standard - NOT justified */
+  transition: opacity 0.4s ease, border-left-color 0.4s ease, padding-left 0.4s ease;
+  border-left: 2px solid transparent;
+  padding-left: 0.75rem;
+}
+
+.story-text p:last-child {
+  margin-bottom: 0;
+}
+
+/* Paragraph highlighting — active paragraph */
+.story-paragraph--active {
+  opacity: 1 !important;
+  border-left-color: color-mix(in srgb, var(--gold-subtle) 40%, transparent);
+}
+
+/* Paragraph highlighting — inactive paragraphs (dimmed) */
+.story-paragraph--inactive {
+  opacity: 0.35;
+}
+
+/* Tap-to-seek — clickable paragraphs when timestamps available */
+.story-text p[role="button"] {
+  cursor: pointer;
+}
+
+.story-text p[role="button"]:hover {
+  opacity: 0.7;
+}
+
+.story-text p[role="button"]:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--gold-subtle) 50%, transparent);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+/* Section separator — replaces literal "---" lines in source text */
+.story-paragraph-separator {
+  border: 0;
+  border-top: 1px solid color-mix(in srgb, var(--gold-subtle) 25%, transparent);
+  width: 30%;
+  margin: 2.5rem auto;
+}
+
+/* Paragraph progress indicator */
+.story-paragraph-progress {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.75rem;
+  color: color-mix(in srgb, var(--gold-subtle) 60%, transparent);
+  padding: 0 0.25rem;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.story-paragraph-progress__current {
+  font-weight: 600;
+  color: var(--gold-subtle);
+}
+
+.story-paragraph-progress__separator {
+  opacity: 0.5;
+  margin: 0 0.1rem;
+}
+
+.story-paragraph-progress__total {
+  opacity: 0.7;
+}
+
+/* Resume banner — continue where you left off */
+.story-resume-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: color-mix(in srgb, var(--gold-subtle) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+  border-radius: 8px;
+  flex-shrink: 0;
+  animation: fadeIn 0.3s ease;
+}
+
+.story-resume-banner__text {
+  font-family: var(--font-content, 'Libre Caslon Text', Georgia, serif);
+  font-size: 0.85rem;
+  color: var(--cosmic-text-primary);
+  opacity: 0.9;
+  flex: 1;
+}
+
+.story-resume-banner__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+  border-radius: 6px;
+  color: var(--gold-subtle);
+  padding: 0.35rem 0.65rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 44px;
+  transition: background 0.2s ease;
+}
+
+.story-resume-banner__btn:hover {
+  background: color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+}
+
+.story-resume-banner__dismiss {
+  background: none;
+  border: none;
+  color: var(--cosmic-text-primary);
+  opacity: 0.5;
+  cursor: pointer;
+  font-size: 1.1rem;
+  padding: 0.25rem;
+  min-height: 44px;
+  min-width: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s;
+}
+
+.story-resume-banner__dismiss:hover {
+  opacity: 0.8;
+}
+
+/* Editorial Drop Cap - First paragraph only */
+.story-text p:first-of-type::first-letter {
+  font-family: var(--font-content, 'Libre Caslon Text', Georgia, serif);
+  float: left;
+  font-size: 3.5em; /* ~3-4 lines tall */
+  line-height: 0.85; /* Tight line-height for proper alignment */
+  margin-right: 0.1em; /* Space between drop cap and text */
+  margin-top: 0.05em; /* Fine-tune vertical alignment */
+  font-weight: 400; /* Regular weight - elegant, not heavy */
+  color: color-mix(in srgb, var(--gold-subtle) 85%, var(--text-primary) 15%); /* Subtle gold tint */
+  text-shadow: 0 0 12px color-mix(in srgb, var(--gold-subtle) 20%, transparent); /* Gentle glow */
+  font-feature-settings: 'liga' 0; /* Disable ligatures for single letter */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Ensure proper text flow around drop cap */
+.story-text p:first-of-type {
+  margin-top: 0; /* Remove top margin for clean alignment */
+}
+
+/* Divider between controls and content */
+.story-divider {
+  height: 1px;
+  background: linear-gradient(
+    90deg, 
+    transparent, 
+    var(--story-border), 
+    transparent
+  );
+  margin: 0.05rem 0; /* Minimal spacing — maximize reading area */
+  flex-shrink: 0; /* Prevent divider from shrinking */
+}
+
+/* Loading indicator */
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--bg-card) var(--a-80), transparent);
+  backdrop-filter: blur(var(--glass-blur));
+  z-index: var(--z-dropdown); /* 100 */
+  border-radius: 16px;
+}
+
+.loading-text {
+  color: var(--story-accent);
+  font-family: 'Space Grotesk', sans-serif;
+  text-shadow: 0 0 8px var(--story-accent-glow);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.loading-dot {
+  width: 8px;
+  height: 8px;
+  background-color: var(--story-accent);
+  border-radius: 50%;
+  display: inline-block;
+  animation: loadingPulse 1.4s infinite ease-in-out both;
+}
+
+.loading-dot:nth-child(1) { animation-delay: 0s; }
+.loading-dot:nth-child(2) { animation-delay: 0.2s; }
+.loading-dot:nth-child(3) { animation-delay: 0.4s; }
+
+/* Custom scrollbar styles removed - content no longer scrolls independently */
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes loadingPulse {
+  0%, 80%, 100% { 
+    transform: scale(0);
+    opacity: 0.3;
+  }
+  40% { 
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Desktop layout adjustments */
+@media (min-width: 1024px) {
+  .elegant-story-player {
+    /* Use same width constraints as chatbox for alignment */
+    width: calc(100% - 2 * var(--content-inline-padding));
+    max-width: var(--content-max-width);
+  }
+  
+  .story-text {
+    padding-bottom: 60px; /* Extra padding for desktop */
+  }
+}
+
+/* Mobile layout adjustments - 2025 best practice: Optimize for reading space */
+@media (max-width: 767px) {
+  .elegant-story-player {
+    width: 100%; /* Full width on mobile to match chatbox */
+    max-width: 100%; /* Full width on mobile */
+    margin: 0; /* No margins on mobile — full bleed to viewport edge */
+    max-height: calc(100dvh - 60px); /* Mobile: header only, content runs to viewport bottom */
+  }
+
+  .story-container {
+    padding: 0.6rem 1.25rem 0.6rem; /* Reduced padding for mobile */
+    gap: 0.25rem; /* Tighter gap between sections - more reading space */
+    /* Square the bottom on mobile — pill against viewport edge */
+    border-radius: 16px 16px 0 0;
+    /* Drop the downward shadow (no visible space below); keep top lift */
+    box-shadow:
+      0 -4px 16px color-mix(in srgb, var(--utility-pure-black) var(--a-15), transparent),
+      0 -2px 6px color-mix(in srgb, var(--utility-pure-black) var(--a-10), transparent);
+  }
+
+  /* Compact header on mobile */
+  .story-header {
+    margin-bottom: 0.15rem; /* Tighter spacing */
+  }
+
+  /* Compact metadata on mobile */
+  .story-intro-container {
+    margin: 0 0 0.15rem; /* Tighter spacing */
+  }
+
+  /* Compact divider on mobile */
+  .story-divider {
+    margin: 0.25rem 0; /* Reduced from 0.4rem - tighter spacing */
+  }
+
+  /* Adjust text padding on mobile — respect iOS home indicator so last lines stay readable */
+  .story-text {
+    padding-bottom: calc(30px + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* Smaller drop cap on mobile - better proportion */
+  .story-text p:first-of-type::first-letter {
+    font-size: 2.5em; /* Smaller on mobile (vs 3.5em desktop) */
+    margin-right: 0.08em; /* Tighter spacing */
+  }
+}
+
+/* Tablet layout adjustments */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .elegant-story-player {
+    width: calc(100% - 2 * var(--chat-margin-tablet, 16px)); /* Match chatbox width on tablet */
+    max-width: 100%; /* Use full available width */
+    max-height: calc(100vh - 105px); /* Tablet: header (~55px) + bottom margin (15px) + buffer */
+    margin: var(--chat-margin-tablet, 16px); /* Same margins as chatbox */
+    margin-bottom: 15px; /* Medium bottom margin on tablet */
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .story-container,
+  .loading-dot {
+    transition: none;
+    animation: none !important;
+  }
+}

@@ -1,0 +1,264 @@
+{
+  "starseeds": {
+    "welcome": {
+      "title": "Your Wisdom Constellation",
+      "sections": {
+        "overview": {
+          "title": "12 Teachings of Wisdom",
+          "text": "Each figure has 12 historical teachings of wisdom. Each star represents one teaching. Bright stars you've explored, dim ones are waiting for you."
+        },
+        "howToPlay": {
+          "title": "How it works",
+          "points": [
+            "The glowing gold star is your next teaching.",
+            "Click a star. A panel shows your next step.",
+            "A pulsing star shows your current selection.",
+            "Work through the 4 chapters: Story, Wisdom, Prism, Quest."
+          ]
+        },
+        "constellation": {
+          "title": "Your Constellation",
+          "text": "Your constellation grows with every completed chapter. The more teachings you explore, the more connections become visible, until your unique wisdom pattern shines.",
+          "chapterCompletion": "A star blooms when all four chapters of one teaching are complete: the full story listened to, 15 exchanges in Wisdom dialogue, the prism explored, and the 4 questions of Quest answered."
+        },
+        "revelation": {
+          "title": "Progress",
+          "text": "The progress bar at the bottom shows your status per teaching and chapter.",
+          "stages": {
+            "void": "Cosmic void",
+            "awakening": "First awakening",
+            "emergence": "Patterns become visible",
+            "forming": "Constellation taking shape",
+            "complete": "Wisdom complete"
+          }
+        },
+        "tools": {
+          "title": "More tools",
+          "points": [
+            "List: All 12 teachings at a glance, with full details to read",
+            "Facts: Historically verified facts about the figure",
+            "Progress bar: Shows your status per teaching and chapter",
+            "Community: Browse what others want next. Your voting power grows with every completed figure."
+          ]
+        }
+      }
+    },
+    "patternHelp": {
+      "discoveryTitle": "Discovery Mode",
+      "discoveryText": "All 12 Star Seeds are visible. Bright stars show explored teachings, dim ones await discovery. Click any star to explore.",
+      "zodiacTitle": "Constellation Mode",
+      "zodiacText": "Your explored Star Seeds form a unique pattern. The more chapters you complete, the clearer your constellation becomes."
+    },
+    "revelation": {
+      "void": "Explore your first Star Seed to awaken the constellation.",
+      "awakening": "First awakening! Faint connection lines become visible.",
+      "emergence": "The pattern is forming. More and more connections appear.",
+      "forming": "The constellation is taking shape. Golden lines show your progress.",
+      "complete": "Wisdom complete! Your constellation shines in full glory.",
+      "title": {
+        "void": "Cosmic Void",
+        "awakening": "First Awakening",
+        "emergence": "Patterns Emerging",
+        "forming": "Constellation Forming",
+        "complete": "Wisdom Complete"
+      }
+    }
+  },
+  "figureSelection": {
+    "firstTime": {
+      "title": "Choose Your Echo",
+      "text": "Select a historical figure to begin your journey. Each brings unique wisdom from their time and culture."
+    }
+  },
+  "questMode": {
+    "welcome": {
+      "title": "Begin Your Quest",
+      "text": "Engage in deep dialogue to unlock Star Seeds. The more thoughtfully you converse, the more wisdom you'll gather."
+    }
+  },
+  "audioLibrary": {
+    "welcome": {
+      "title": "Chapter 1 · Story",
+      "sections": {
+        "overview": {
+          "title": "What to expect",
+          "text": "The figure narrates their own wisdom as a first-person story. 10 to 15 minutes, historically grounded."
+        },
+        "journey": {
+          "title": "12 stories that build on each other",
+          "points": [
+            "1 to 4: The beginnings",
+            "5 to 8: The teaching deepens",
+            "9 to 12: Mastery"
+          ]
+        },
+        "nextSteps": {
+          "title": "After that",
+          "text": "In the Wisdom chapter, you can talk directly with the figure about the teaching."
+        },
+        "transparency": {
+          "title": "Notice",
+          "brief": "Human-AI collaboration · Synthetic voice",
+          "expanded": "Stories are created through human-AI collaboration and narrated with synthetic voice. Educational purpose."
+        }
+      }
+    }
+  },
+  "seedsExplorer": {
+    "welcome": {
+      "title": "Wisdom Explorer",
+      "sections": {
+        "overview": {
+          "title": "Philosophical Treasury",
+          "text": "12 teachings of wisdom per figure, each a complete philosophical teaching with historical sources, practical exercises, and cross-cultural connections. Explore at your own pace."
+        },
+        "depth": {
+          "title": "Each Teaching Contains",
+          "points": [
+            "Deep philosophical description",
+            "Guided practice exercise for daily life",
+            "Original quotes from source texts",
+            "4 connections to other wisdom traditions",
+            "Difficulty level and practice type"
+          ]
+        },
+        "navigation": {
+          "title": "How to Explore",
+          "points": [
+            "Click any seed title to expand full content",
+            "Seeds 1 to 4: Foundation, 5 to 8: Development, 9 to 12: Mastery",
+            "Follow connections to discover related wisdom"
+          ]
+        },
+        "example": {
+          "text": "Example: Laozi's 'Wu Wei' connects to Marcus Aurelius on natural action, Einstein on flow states, and Rumi on surrender. Showing universal patterns across cultures."
+        }
+      }
+    }
+  },
+  "historyModal": {
+    "welcome": {
+      "title": "Your Dialogue History",
+      "sections": {
+        "overview": {
+          "title": "Quick Guide",
+          "text": "All conversations organized by Star Seed. Click titles to expand. Use colored buttons to filter by chapter."
+        },
+        "actions": {
+          "title": "Key Actions",
+          "points": [
+            "Backup and restore your complete journey",
+            "Clear individual seeds or all history",
+            "Generate AI summaries of long chats",
+            "Filter by chapter using colored buttons"
+          ]
+        },
+        "tip": {
+          "text": "Active seed has golden glow. FreeTalk at bottom."
+        }
+      }
+    }
+  },
+  "councilSetup": {
+    "welcome": {
+      "title": "Cosmic Council",
+      "sections": {
+        "overview": {
+          "title": "What to expect",
+          "text": "Multiple figures engage in a philosophical dialogue about your question. Different perspectives from different centuries."
+        },
+        "modes": {
+          "title": "Two styles",
+          "points": [
+            "🔥 Confrontational: The figures debate. Viewpoints collide.",
+            "🌊 Reflective: The figures think together. Different perspectives, one topic."
+          ]
+        },
+        "curated": {
+          "title": "Curated councils",
+          "text": "Pre-built councils on 8 life themes. Figures and question are already chosen. Just pick one and go."
+        },
+        "building": {
+          "title": "Build your own",
+          "text": "Choose a moderator and up to 3 figures. Write your question and pick your style. The moderator leads the conversation."
+        },
+        "transparency": {
+          "brief": "Philosophical dialogue · Not a substitute for professional counseling"
+        }
+      }
+    }
+  },
+  "voiceInteraction": {
+    "title": "Ready to respond?",
+    "desktop": {
+      "pressOnce": "to start speaking",
+      "pressAgain": "again to stop and send"
+    },
+    "mobile": {
+      "tap": "Tap",
+      "start": "microphone to start",
+      "stop": "again to stop and send"
+    },
+    "alternative": "Or type your message below"
+  },
+  "echoExplainer": {
+    "title": "What is an Echo?",
+    "concept": {
+      "title": "Living Perspectives",
+      "text": "An echo carries a figure's perspective and way of thinking into the present. They know about the modern world, but see everything through their own lens, their own era, their own philosophy. We try to shape each echo with care, in word and image."
+    },
+    "howTheyWork": {
+      "title": "How Echoes Work",
+      "points": [
+        "Conversations and voices are generated entirely by AI",
+        "Echoes discuss modern topics through their historical perspective",
+        "Grounded in documented writings and teachings"
+      ]
+    },
+    "goodToKnow": {
+      "title": "Good to Know",
+      "points": [
+        "Not the real historical figures, but AI interpretations",
+        "Not full biographies, but the teachings they represent",
+        "May sometimes get things wrong. Verify with primary sources"
+      ]
+    },
+    "quote": "When you meet Plato here, you engage with an AI echo of his philosophy, not the person himself."
+  },
+  "common": {
+    "dontShowAgain": "Don't show this again",
+    "gotIt": "Got it!",
+    "beginExploring": "Begin My Journey",
+    "learnMore": "Learn More",
+    "showLess": "Show Less"
+  },
+  "errors": {
+    "mic": {
+      "denied": {
+        "title": "Microphone Access Denied",
+        "ios": "To enable microphone access:\n1. Open Settings app\n2. Scroll to Safari\n3. Enable Microphone access",
+        "android": "To enable microphone access:\n1. Tap the lock icon in the address bar\n2. Go to Site Settings\n3. Enable Microphone",
+        "desktop": "Please allow microphone access in your browser settings and try again."
+      },
+      "notFound": {
+        "title": "No Microphone Detected",
+        "message": "No microphone was found on your device. Please connect a microphone and try again."
+      },
+      "notReadable": {
+        "title": "Microphone In Use",
+        "message": "Your microphone is currently being used by another application. Please close other apps and try again."
+      },
+      "security": {
+        "title": "Security Error",
+        "message": "Microphone access requires a secure connection (HTTPS). Please ensure you are using HTTPS."
+      },
+      "generic": {
+        "title": "Microphone Error",
+        "message": "Could not access your microphone. Please check your settings and try again."
+      },
+      "fallback": "You can also type your question instead.",
+      "retry": "Try Again",
+      "dismiss": "Dismiss"
+    }
+  }
+}

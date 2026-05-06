@@ -1,0 +1,489 @@
+/* ColorContrastTest.module.css */
+
+.container {
+  padding: 2rem;
+  max-width: 1600px;
+  margin: 0 auto;
+  font-family: var(--font-primary, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+  background: var(--bg-cosmic-void);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.title {
+  font-size: 2.5rem;
+  text-align: center;
+  color: var(--gold-primary);
+  margin-bottom: 0.5rem;
+  font-family: var(--font-secondary, 'Crimson Text', Georgia, serif);
+}
+
+.subtitle {
+  text-align: center;
+  color: var(--text-secondary);
+  margin-bottom: 3rem;
+  font-size: 1.125rem;
+}
+
+.section {
+  margin-bottom: 3rem;
+  background: color-mix(in srgb, var(--bg-primary) 30%, transparent);
+  padding: 2rem;
+  border-radius: 1rem;
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 10%, transparent);
+}
+
+.section h2 {
+  color: var(--gold-primary);
+  margin-bottom: 1.5rem;
+  font-size: 1.75rem;
+}
+
+/* Background Color Grid */
+.colorGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.colorButton {
+  padding: 1.5rem;
+  border: 2px solid transparent;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.colorButton.selected {
+  border-color: var(--gold-primary);
+  box-shadow: 0 0 20px rgba(230, 188, 92, 0.3);
+}
+
+.colorButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.colorName {
+  font-weight: 600;
+  color: var(--text-primary); /* Astigmatism-safe primary text */
+  font-size: 0.875rem;
+}
+
+.colorValue {
+  font-family: monospace;
+  font-size: 0.75rem;
+  color: color-mix(in srgb, var(--text-secondary) 70%, transparent); /* Astigmatism-safe secondary text */
+}
+
+/* Contrast Grid */
+.contrastGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+.contrastCard {
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  border: 1px solid color-mix(in srgb, var(--text-dim) 10%, transparent); /* Astigmatism-safe borders */
+  transition: all 0.2s ease;
+}
+
+.contrastCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.colorSample h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.sampleText {
+  font-size: 1rem;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+  margin-bottom: 0.5rem;
+}
+
+.largeText {
+  font-size: 1.25rem;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+}
+
+.contrastInfo {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid color-mix(in srgb, var(--text-dim) 10%, transparent); /* Astigmatism-safe borders */
+}
+
+.colorMeta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--text-dim);
+}
+
+.usage {
+  font-style: italic;
+  font-size: 0.75rem;
+}
+
+.ratio {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ratioValue {
+  font-size: 1.5rem;
+  font-weight: 600;
+  font-family: monospace;
+  color: var(--text-primary); /* Astigmatism-safe primary text */
+}
+
+.wcagBadges {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.wcagBadge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--bg-cosmic-void);
+}
+
+/* Text Colors Section */
+.textCard {
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid color-mix(in srgb, var(--text-dim) 10%, transparent); /* Astigmatism-safe borders */
+}
+
+.textCard h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.125rem;
+}
+
+.textCard p {
+  margin: 0;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+}
+
+.textMeta {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid color-mix(in srgb, var(--text-dim) 10%, transparent); /* Astigmatism-safe borders */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.875rem;
+  color: var(--text-dim);
+  font-family: monospace;
+}
+
+/* Filter Section */
+.filterSection {
+  background: color-mix(in srgb, var(--bg-primary) 30%, transparent);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  border-radius: 0.5rem;
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 10%, transparent);
+}
+
+.filterLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--gold-primary);
+  font-size: 1.125rem;
+  cursor: pointer;
+}
+
+.filterLabel input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
+/* Color Sections Container */
+.colorSections {
+  margin-bottom: 2rem;
+}
+
+/* Color Preview */
+.colorPreview {
+  width: 100%;
+  height: 40px;
+  border-radius: 0.5rem 0.5rem 0 0;
+  margin: -1.5rem -1.5rem 1rem -1.5rem;
+  border-bottom: 2px solid color-mix(in srgb, var(--text-dim) 10%, transparent); /* Astigmatism-safe borders */
+}
+
+/* Hex Value */
+.hexValue {
+  font-family: monospace;
+  font-weight: 600;
+  color: var(--gold-primary);
+}
+
+/* No Results */
+.noResults {
+  text-align: center;
+  color: var(--text-dim);
+  font-style: italic;
+  padding: 2rem;
+}
+
+/* Comparison Section */
+.selectorGroup {
+  margin-bottom: 2rem;
+}
+
+.selectorGroup label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--gold-primary);
+  font-weight: 600;
+}
+
+.selector {
+  width: 100%;
+  max-width: 500px;
+  padding: 0.75rem;
+  background: var(--bg-card);
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+  border-radius: 0.5rem;
+  color: var(--gold-primary);
+  font-size: 1rem;
+  font-family: inherit;
+}
+
+.selector optgroup {
+  background: var(--bg-astral);
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.selector option {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  padding: 0.5rem;
+}
+
+.comparisonGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.comparisonCard {
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid color-mix(in srgb, var(--text-dim) 10%, transparent); /* Astigmatism-safe borders */
+  text-align: center;
+}
+
+.comparisonCard h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.125rem;
+}
+
+.comparisonCard p {
+  margin: 0 0 1rem 0;
+  line-height: 1.5;
+}
+
+.ratioDisplay {
+  font-size: 1.25rem;
+  font-weight: 600;
+  font-family: monospace;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.wcagIndicator {
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  color: var(--bg-cosmic-void);
+}
+
+/* Recommendations */
+.recommendations {
+  background: color-mix(in srgb, var(--bg-primary) 50%, transparent);
+  padding: 2rem;
+  border-radius: 1rem;
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+}
+
+.recommendations h2 {
+  color: var(--gold-primary);
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.recommendationGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.recommendation {
+  background: var(--bg-card);
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+}
+
+.recommendation h3 {
+  color: var(--gold-primary);
+  margin: 0 0 0.75rem 0;
+  font-family: monospace;
+}
+
+.recommendation p {
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Color Categories */
+.colorCategory {
+  margin-bottom: 3rem;
+}
+
+.colorCategory h3 {
+  color: var(--gold-primary);
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+}
+
+/* Color Chip Preview */
+.colorChip {
+  width: 60px;
+  height: 60px;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+  border: 2px solid color-mix(in srgb, var(--text-dim) 20%, transparent); /* Astigmatism-safe borders */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.recommendation h4 {
+  color: var(--gold-hover);
+  margin: 0 0 0.5rem 0;
+  font-family: monospace;
+  font-size: 1.125rem;
+}
+
+.astigmatismNote {
+  background: color-mix(in srgb, var(--gold-subtle) 10%, transparent);
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+}
+
+.astigmatismNote h3 {
+  color: var(--gold-hover);
+  margin: 0 0 1rem 0;
+}
+
+.astigmatismNote p {
+  color: var(--text-primary);
+  margin: 0 0 0.75rem 0;
+}
+
+.astigmatismNote ul {
+  margin: 0;
+  padding-left: 1.5rem;
+  color: var(--text-secondary);
+}
+
+.astigmatismNote li {
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+/* Special Note */
+.specialNote {
+  background: color-mix(in srgb, var(--mode-wisdom) 10%, transparent);
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid color-mix(in srgb, var(--mode-wisdom) 30%, transparent);
+  margin-top: 1.5rem;
+}
+
+.specialNote h3 {
+  color: var(--mode-wisdom);
+  margin: 0 0 1rem 0;
+}
+
+.specialNote p {
+  color: var(--text-primary);
+  margin: 0 0 0.75rem 0;
+}
+
+.specialNote ul {
+  margin: 0;
+  padding-left: 1.5rem;
+  color: var(--text-secondary);
+}
+
+.specialNote li {
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+.specialNote code {
+  background: color-mix(in srgb, var(--text-dim) 10%, transparent); /* Astigmatism-safe backgrounds */
+  padding: 0.2rem 0.5rem;
+  border-radius: 0.25rem;
+  font-family: monospace;
+  color: var(--gold-primary);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+  
+  .title {
+    font-size: 2rem;
+  }
+  
+  .section {
+    padding: 1.5rem;
+  }
+  
+  .contrastGrid,
+  .colorGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .comparisonGrid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+}

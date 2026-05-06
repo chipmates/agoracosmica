@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <radialGradient id="dotGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#f8e696"/>
+      <stop offset="40%" stop-color="#e6bc5c"/>
+      <stop offset="100%" stop-color="#be9b37"/>
+    </radialGradient>
+    <filter id="ringGlow" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur stdDeviation="2"/>
+    </filter>
+    <filter id="dotGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+  </defs>
+  <circle cx="100" cy="100" r="76" fill="none" stroke="#e6bc5c" stroke-width="7" opacity="0.15" filter="url(#ringGlow)"/>
+  <circle cx="100" cy="100" r="76" fill="none" stroke="#e6bc5c" stroke-width="3.5"/>
+  <circle cx="100" cy="100" r="31" fill="#e6bc5c" opacity="0.12" filter="url(#dotGlow)"/>
+  <circle cx="100" cy="100" r="31" fill="url(#dotGrad)"/>
+</svg>

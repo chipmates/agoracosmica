@@ -1,0 +1,675 @@
+/* ================================================================
+   BloomTransformationCard — Contemplative star transformation popup
+   Shows the real platform star at large scale morphing between
+   bloom levels. Uses actual .star CSS classes from Star.css.
+   Stays visible until tapped away.
+   ================================================================ */
+
+/* ── Overlay ── */
+.bloom-card-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100000; /* Above HelperPopup (99999) */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--bg-cosmic-void, #060614) 75%, transparent);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.bloom-card-overlay.visible {
+  opacity: 1;
+}
+
+.bloom-card-overlay.mastery {
+  background: color-mix(in srgb, var(--bg-cosmic-void, #060614) 85%, transparent);
+}
+
+
+/* ── Card ── */
+.bloom-card {
+  position: relative;
+  background: color-mix(in srgb, var(--bg-cosmic-void, #060614) 95%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gold-star, #FFD700) 20%, transparent);
+  border-radius: 1.25rem;
+  padding: 2.5rem 2rem 2rem;
+  text-align: center;
+  max-width: 340px;
+  width: 88%;
+  cursor: pointer;
+
+  box-shadow:
+    0 0 40px color-mix(in srgb, var(--gold-star, #FFD700) 12%, transparent),
+    0 0 80px color-mix(in srgb, var(--gold-star, #FFD700) 6%, transparent),
+    0 20px 60px color-mix(in srgb, black 40%, transparent);
+
+  opacity: 0;
+  transform: scale(0.88) translateY(16px);
+  transition: opacity 0.5s ease 0.1s, transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s;
+}
+
+.bloom-card.visible {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
+
+/* ── Decorative accent line ── */
+.bloom-card-accent {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50%;
+  height: 2px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--gold-star, #FFD700) 30%,
+    var(--gold-star, #FFD700) 70%,
+    transparent 100%);
+  border-radius: 1px;
+  opacity: 0.5;
+}
+
+
+/* ── Star stage ──
+   Override the real .star positioning so it sits centered in our stage
+   instead of being absolutely positioned with negative margins. */
+.bloom-card-stage {
+  width: 160px;
+  height: 160px;
+  margin: 0 auto 1.25rem;
+  background: radial-gradient(circle, #0c0c28 0%, #060614 70%, #040410 100%);
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--gold-star, #FFD700) 8%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: visible;
+  transition: background 0.8s ease;
+}
+
+/* Override real Star.css absolute positioning inside the popup stage */
+.bloom-card-stage .star {
+  position: relative !important;
+  margin: 0 !important;
+  transform: scale(4);
+  transform-origin: center;
+}
+
+/* Force scintillation to run inside the popup (Star.css pauses by default) */
+.bloom-card-stage .star.bloom-level {
+  animation-play-state: running !important;
+}
+
+.bloom-card-stage.mastery-dimmed {
+  background: radial-gradient(circle, #080818 0%, #030308 70%, #020206 100%);
+}
+
+/* ── Refined rings for zoomed-in view ──
+   Star.css box-shadows are designed for 12-21px stars.
+   At 4x scale they become thick blobs. These overrides use
+   thinner spreads and lower opacities for a delicate look. */
+
+.bloom-card-stage .star.bloom-level-1 {
+  box-shadow:
+    0 0 2px 0.5px white,
+    0 0 4px 1px var(--mode-story),
+    0 0 7px 1.5px color-mix(in srgb, var(--mode-story) 35%, transparent),
+    0 0 11px 2.5px color-mix(in srgb, var(--mode-story) 12%, transparent) !important;
+}
+
+.bloom-card-stage .star.bloom-level-2 {
+  box-shadow:
+    0 0 2px 0.5px white,
+    0 0 3px 1px var(--mode-story),
+    0 0 6px 1.5px color-mix(in srgb, var(--mode-story) 30%, transparent),
+    0 0 9px 2px color-mix(in srgb, var(--mode-wisdom) 35%, transparent),
+    0 0 13px 3px color-mix(in srgb, var(--mode-wisdom) 12%, transparent) !important;
+}
+
+.bloom-card-stage .star.bloom-level-3 {
+  box-shadow:
+    0 0 2px 0.5px white,
+    0 0 3px 1px var(--mode-story),
+    0 0 5px 1.5px color-mix(in srgb, var(--mode-story) 25%, transparent),
+    0 0 8px 1.5px color-mix(in srgb, var(--mode-wisdom) 30%, transparent),
+    0 0 11px 2px color-mix(in srgb, var(--mode-wisdom) 15%, transparent),
+    0 0 14px 2.5px color-mix(in srgb, var(--mode-prism) 30%, transparent),
+    0 0 18px 3.5px color-mix(in srgb, var(--mode-prism) 10%, transparent) !important;
+}
+
+.bloom-card-stage .star.bloom-level-4 {
+  box-shadow:
+    0 0 2px 0.5px white,
+    0 0 3px 1px var(--mode-story),
+    0 0 5px 1.5px color-mix(in srgb, var(--mode-story) 25%, transparent),
+    0 0 7px 1.5px color-mix(in srgb, var(--mode-wisdom) 30%, transparent),
+    0 0 10px 2px color-mix(in srgb, var(--mode-wisdom) 15%, transparent),
+    0 0 13px 2.5px color-mix(in srgb, var(--mode-prism) 25%, transparent),
+    0 0 16px 3px color-mix(in srgb, var(--mode-prism) 12%, transparent),
+    0 0 19px 3.5px color-mix(in srgb, var(--mode-quest) 25%, transparent),
+    0 0 23px 4.5px color-mix(in srgb, var(--mode-quest) 8%, transparent) !important;
+}
+
+/* Refine the ::before halos too */
+.bloom-card-stage .star.bloom-level-1::before {
+  opacity: 0.2 !important;
+}
+.bloom-card-stage .star.bloom-level-2::before {
+  opacity: 0.18 !important;
+}
+.bloom-card-stage .star.bloom-level-3::before {
+  opacity: 0.15 !important;
+}
+.bloom-card-stage .star.bloom-level-4::before {
+  opacity: 0.12 !important;
+}
+
+
+/* ── Header ── */
+.bloom-card-header {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--gold-star, #FFD700) 70%, white);
+  margin: 0 0 0.6rem;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.bloom-card-header.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+
+/* ── Seed title ── */
+.bloom-card-seed-title {
+  color: var(--gold-star, #FFD700);
+  font-family: 'Crimson Text', 'Georgia', serif;
+  font-size: 1.35rem;
+  font-weight: 600;
+  font-style: italic;
+  margin: 0 0 0.3rem;
+  letter-spacing: 0.02em;
+  text-shadow: 0 0 16px color-mix(in srgb, var(--gold-star, #FFD700) 30%, transparent);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.6s ease 0.1s, transform 0.6s ease 0.1s;
+}
+
+.bloom-card-seed-title.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+
+/* ── Figure name ── */
+.bloom-card-figure {
+  color: color-mix(in srgb, white 70%, transparent);
+  font-size: 0.9rem;
+  font-weight: 400;
+  margin: 0 0 1rem;
+  letter-spacing: 0.02em;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.5s ease 0.2s, transform 0.5s ease 0.2s;
+}
+
+.bloom-card-figure.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+
+/* ── Reflection text ── */
+.bloom-card-reflection {
+  color: color-mix(in srgb, white 50%, transparent);
+  font-size: 0.82rem;
+  font-style: italic;
+  line-height: 1.5;
+  margin: 0;
+  padding-top: 0.75rem;
+  border-top: 1px solid color-mix(in srgb, var(--gold-star, #FFD700) 12%, transparent);
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.5s ease 0.35s, transform 0.5s ease 0.35s;
+}
+
+.bloom-card-reflection.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+
+/* ================================================================
+   FIRST-MASTERY COMMUNITY REWARD
+   Renders only on the user's very first Level-4 mastery.
+   Surfaces +1 voting power and the Listener → Voice transition.
+   Detection happens in WisdomMapModal via hasAnyWitnessedMastery().
+   ================================================================ */
+
+.bloom-card-first-mastery {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  align-items: center;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.6s ease 0.6s, transform 0.6s ease 0.6s;
+}
+
+.bloom-card-first-mastery.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.bloom-card-first-mastery-divider {
+  width: 60%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--gold-star, #FFD700) 30%, transparent) 50%,
+    transparent 100%
+  );
+}
+
+.bloom-card-first-mastery-reward {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.5rem 0.9rem;
+  border-radius: 0.65rem;
+  background: color-mix(in srgb, var(--gold-star, #FFD700) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gold-star, #FFD700) 25%, transparent);
+}
+
+.bloom-card-first-mastery-icon {
+  width: 18px;
+  height: 18px;
+  color: var(--gold-star, #FFD700);
+  filter: drop-shadow(
+    0 0 5px color-mix(in srgb, var(--gold-star, #FFD700) 40%, transparent)
+  );
+  flex-shrink: 0;
+}
+
+.bloom-card-first-mastery-reward-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, white 70%, transparent);
+}
+
+.bloom-card-first-mastery-reward-value {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--gold-star, #FFD700);
+  text-shadow: 0 0 8px color-mix(in srgb, var(--gold-star, #FFD700) 30%, transparent);
+  font-feature-settings: "tnum";
+}
+
+.bloom-card-first-mastery-tier {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  text-align: center;
+  max-width: 280px;
+}
+
+.bloom-card-first-mastery-tier-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.92rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--gold-star, #FFD700);
+  text-shadow: 0 0 10px color-mix(in srgb, var(--gold-star, #FFD700) 25%, transparent);
+}
+
+.bloom-card-first-mastery-tier-desc {
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: color-mix(in srgb, white 65%, transparent);
+}
+
+
+/* ================================================================
+   MASTERY EFFECT VARIANTS
+   Three options for the L3→L4 moment.
+   ================================================================ */
+
+/* ── Shared pulse ring base ── */
+.bloom-card-pulse-ring {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid var(--gold-star, #FFD700);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.bloom-card-pulse-ring.active {
+  animation: bloomCardPulseRing 2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+@keyframes bloomCardPulseRing {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+    border-width: 2px;
+  }
+  40% {
+    opacity: 0.3;
+    border-width: 1.5px;
+  }
+  100% {
+    transform: scale(12);
+    opacity: 0;
+    border-width: 0.5px;
+  }
+}
+
+/* --- Variant 1: Gold ring --- */
+.bloom-card-pulse-ring.gold {
+  border-color: var(--gold-star, #FFD700);
+}
+
+/* --- Variant 2: Four sequential mode-colored rings --- */
+.bloom-card-pulse-ring.story {
+  border-color: var(--mode-story, #D4A539);
+}
+.bloom-card-pulse-ring.wisdom {
+  border-color: var(--mode-wisdom, #9D83CD);
+}
+.bloom-card-pulse-ring.prism {
+  border-color: var(--mode-prism, #5B8BD4);
+}
+.bloom-card-pulse-ring.quest {
+  border-color: var(--mode-quest, #E97451);
+}
+
+/* --- Variant 3: Light burst (no ring, glow via pseudo-element) --- */
+.bloom-card-stage.light-burst-active::after {
+  content: '';
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    color-mix(in srgb, var(--gold-star, #FFD700) 40%, white) 0%,
+    color-mix(in srgb, var(--gold-star, #FFD700) 25%, transparent) 40%,
+    transparent 70%);
+  animation: lightBurst 2.5s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes lightBurst {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  40% {
+    opacity: 0.6;
+    transform: scale(2.5);
+  }
+  70% {
+    opacity: 0.25;
+    transform: scale(3.5);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(4);
+  }
+}
+
+
+/* ================================================================
+   STAR TRANSFORMATION KEYFRAMES
+   Applied via classes on the real .star element
+   ================================================================ */
+
+/* L0→L1: egg hatching into first star.
+   The star class switches from ungathered (egg) to gathered+bloom-level-1.
+   CSS handles the shape change. We add a slow glow and gentle scale. */
+.bloom-card-stage .star.bloom-transform-hatch {
+  animation: bloomHatch 3s ease-out forwards !important;
+}
+
+@keyframes bloomHatch {
+  0% {
+    filter: brightness(1);
+    transform: scale(4);
+    opacity: 0.7;
+  }
+  20% {
+    filter: brightness(1.6);
+    transform: scale(4);
+    opacity: 1;
+  }
+  45% {
+    filter: brightness(1.4);
+    transform: scale(4.5);
+  }
+  70% {
+    filter: brightness(1.15);
+    transform: scale(3.9);
+  }
+  85% {
+    filter: brightness(1.08);
+    transform: scale(4.08);
+  }
+  100% {
+    filter: brightness(1.05);
+    transform: scale(4);
+  }
+}
+
+/* L1→L2, L2→L3: a new ring appears. Gentle expansion, soft settle. */
+.bloom-card-stage .star.bloom-transform-grow {
+  animation: bloomGrow 2s ease-out forwards !important;
+}
+
+@keyframes bloomGrow {
+  0% {
+    filter: brightness(1);
+    transform: scale(4);
+  }
+  20% {
+    filter: brightness(1.4);
+    transform: scale(4.1);
+  }
+  50% {
+    filter: brightness(1.25);
+    transform: scale(4.4);
+  }
+  75% {
+    filter: brightness(1.08);
+    transform: scale(3.92);
+  }
+  90% {
+    transform: scale(4.05);
+  }
+  100% {
+    filter: brightness(1.05);
+    transform: scale(4);
+  }
+}
+
+/* L3→L4: mastery. Slow, graceful expansion. Holds at the peak.
+   Impressive through stillness, not speed. The star breathes open. */
+.bloom-card-stage .star.bloom-transform-mastery {
+  animation: bloomMastery 3s ease-in-out forwards !important;
+}
+
+@keyframes bloomMastery {
+  0% {
+    filter: brightness(1.1);
+    transform: scale(4);
+  }
+  15% {
+    filter: brightness(1.5);
+    transform: scale(4.2);
+  }
+  35% {
+    filter: brightness(1.4);
+    transform: scale(4.8);
+  }
+  55% {
+    /* Hold at peak, let the moment breathe */
+    filter: brightness(1.35);
+    transform: scale(4.8);
+  }
+  75% {
+    filter: brightness(1.2);
+    transform: scale(4.15);
+  }
+  90% {
+    filter: brightness(1.12);
+    transform: scale(4.05);
+  }
+  100% {
+    filter: brightness(1.1);
+    transform: scale(4);
+  }
+}
+
+
+/* ================================================================
+   REDUCED MOTION
+   ================================================================ */
+.bloom-card-overlay.reduced-motion .bloom-card {
+  transform: none !important;
+  transition: opacity 0.3s ease !important;
+}
+
+.bloom-card-overlay.reduced-motion .star.bloom-transform-hatch,
+.bloom-card-overlay.reduced-motion .star.bloom-transform-grow,
+.bloom-card-overlay.reduced-motion .star.bloom-transform-mastery {
+  animation: bloomReducedFade 0.8s ease forwards !important;
+}
+
+.bloom-card-overlay.reduced-motion .bloom-card-pulse-ring.active {
+  animation: none;
+  opacity: 0;
+}
+
+@keyframes bloomReducedFade {
+  0% { filter: brightness(1); opacity: 0.6; }
+  50% { filter: brightness(1.3); opacity: 1; }
+  100% { filter: brightness(1); opacity: 1; }
+}
+
+
+/* ================================================================
+   MOBILE
+   ================================================================ */
+@media (max-width: 768px) {
+  .bloom-card {
+    max-width: 300px;
+    padding: 2rem 1.5rem 1.5rem;
+  }
+
+  .bloom-card-stage {
+    width: 130px;
+    height: 130px;
+    margin-bottom: 1rem;
+  }
+
+  .bloom-card-stage .star {
+    transform: scale(3) !important;
+  }
+
+  .bloom-card-stage .star.bloom-transform-hatch {
+    animation-name: bloomHatchMobile !important;
+  }
+  .bloom-card-stage .star.bloom-transform-grow {
+    animation-name: bloomGrowMobile !important;
+  }
+  .bloom-card-stage .star.bloom-transform-mastery {
+    animation-name: bloomMasteryMobile !important;
+  }
+
+  .bloom-card-seed-title { font-size: 1.15rem; }
+  .bloom-card-figure { font-size: 0.82rem; }
+  .bloom-card-reflection { font-size: 0.78rem; }
+}
+
+/* Mobile keyframes with scale(3) base instead of scale(4) */
+@keyframes bloomHatchMobile {
+  0% { filter: brightness(1); transform: scale(3); opacity: 0.7; }
+  20% { filter: brightness(1.6); transform: scale(3); opacity: 1; }
+  45% { filter: brightness(1.4); transform: scale(3.35); }
+  70% { filter: brightness(1.15); transform: scale(2.92); }
+  85% { filter: brightness(1.08); transform: scale(3.06); }
+  100% { filter: brightness(1.05); transform: scale(3); }
+}
+
+@keyframes bloomGrowMobile {
+  0% { filter: brightness(1); transform: scale(3); }
+  20% { filter: brightness(1.4); transform: scale(3.08); }
+  50% { filter: brightness(1.25); transform: scale(3.3); }
+  75% { filter: brightness(1.08); transform: scale(2.94); }
+  90% { transform: scale(3.04); }
+  100% { filter: brightness(1.05); transform: scale(3); }
+}
+
+@keyframes bloomMasteryMobile {
+  0% { filter: brightness(1.1); transform: scale(3); }
+  15% { filter: brightness(1.5); transform: scale(3.15); }
+  35% { filter: brightness(1.4); transform: scale(3.6); }
+  55% { filter: brightness(1.35); transform: scale(3.6); }
+  75% { filter: brightness(1.2); transform: scale(3.1); }
+  90% { filter: brightness(1.12); transform: scale(3.04); }
+  100% { filter: brightness(1.1); transform: scale(3); }
+}
+
+
+/* ================================================================
+   PREFERS-REDUCED-MOTION (system level)
+   ================================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .bloom-card-overlay {
+    transition: opacity 0.3s ease;
+  }
+
+  .bloom-card {
+    transition: opacity 0.3s ease !important;
+    transform: none !important;
+  }
+
+  .bloom-card-stage .star.bloom-transform-hatch,
+  .bloom-card-stage .star.bloom-transform-grow,
+  .bloom-card-stage .star.bloom-transform-mastery {
+    animation: bloomReducedFade 0.8s ease forwards !important;
+  }
+
+  .bloom-card-pulse-ring.active {
+    animation: none;
+    opacity: 0;
+  }
+
+  .bloom-card-header,
+  .bloom-card-seed-title,
+  .bloom-card-figure,
+  .bloom-card-reflection,
+  .bloom-card-first-mastery {
+    transition-duration: 0.2s !important;
+    transition-delay: 0s !important;
+  }
+}

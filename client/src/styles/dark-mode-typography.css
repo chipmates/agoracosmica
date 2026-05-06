@@ -1,0 +1,32 @@
+/* Dark Mode Typography Optimization
+ * Reduces eye strain and improves readability
+ * Based on research for 47% with astigmatism
+ */
+
+/* Global font smoothing for all elements */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Optimize reading text elements (scoped, not global) */
+.message-content, .seed-content, .modal-content {
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+}
+
+/* Ensure cosmic colors are used everywhere */
+body, .app, .modal, .overlay {
+  color: var(--text-primary);
+}
+
+/* Specific optimizations for reading areas */
+.chatbox-container .message-content,
+.seeds-modal .detail-section,
+.history-modal-content,
+.instruction-content {
+  line-height: 1.5 !important;
+  letter-spacing: 0.02em;
+  font-weight: 400; /* Don't increase weight */
+}

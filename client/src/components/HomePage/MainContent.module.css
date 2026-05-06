@@ -1,0 +1,40 @@
+/* MainContent.module.css */
+
+.container {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.contentWrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.header {
+  /* Header styles defined in component-specific files */
+}
+
+.chatArea {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.messagesContainer {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-md);
+}
+
+.inputArea {
+  padding: var(--space-md);
+  border-top: 1px solid var(--utility-border);
+  background: var(--bg-primary);
+}

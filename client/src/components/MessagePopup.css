@@ -1,0 +1,71 @@
+/* src/components/MessagePopup.css */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: color-mix(in srgb, var(--bg-cosmic-void) var(--a-60), transparent);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: var(--z-dropdown); /* 100 */
+}
+
+.popup-content {
+  position: relative;
+  background: color-mix(in srgb, var(--bg-cosmic-void) var(--a-95), transparent);
+  padding: 2rem;
+  border-radius: 1.25rem;
+  max-width: 400px;
+  text-align: center;
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-25), transparent);
+  box-shadow:
+    0 0 40px color-mix(in srgb, var(--gold-subtle) var(--a-15), transparent),
+    0 0 80px color-mix(in srgb, var(--gold-subtle) var(--a-08), transparent),
+    0 20px 60px color-mix(in srgb, black var(--a-40), transparent);
+}
+
+/* Decorative golden accent line at top */
+.popup-content::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 2px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--gold-subtle) 30%,
+    var(--gold-subtle) 70%,
+    transparent 100%);
+  border-radius: 1px;
+  opacity: 0.7;
+}
+
+.popup-content.error {
+  border-color: color-mix(in srgb, var(--mode-quest) var(--a-40), transparent);
+}
+
+.popup-content.info {
+  border-color: color-mix(in srgb, var(--gold-subtle) var(--a-40), transparent);
+}
+
+.popup-content p {
+  margin-bottom: 0;
+  line-height: 1.5;
+  color: var(--cosmic-text-primary);
+  font-family: inherit;
+  font-size: 0.95rem;
+  letter-spacing: 0.03em;
+  padding-right: 2rem; /* Space for close button */
+}
+
+/* 2025 Close Button Positioning */
+.message-popup-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 1; /* Component internal - close button */
+}

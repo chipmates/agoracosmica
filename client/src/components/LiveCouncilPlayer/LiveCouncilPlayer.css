@@ -1,0 +1,199 @@
+/* LiveCouncilPlayer — cinematic overlay for custom (live) councils */
+/* Reuses PrismPlayer CSS classes for figure images. Top/bottom bars
+   bracket the figure; subtitle lives inside the bottom bar. */
+
+.live-council-player {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: var(--bg-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.live-council-player__stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg-cosmic-void);
+  /* Bracket dimensions exposed as vars so figure-bg can clamp to them. */
+  --top-bar-h: calc(env(safe-area-inset-top, 0px) + 56px);
+  --bottom-bar-h: calc(env(safe-area-inset-bottom, 0px) + 140px);
+}
+
+@media (min-width: 768px) {
+  .live-council-player__stage {
+    --bottom-bar-h: calc(env(safe-area-inset-bottom, 0px) + 160px);
+  }
+}
+
+/* Figure sits strictly between the two bars — no cropping by the bars. */
+.live-council-player .prism-player .prism-player__figure-bg {
+  top: var(--top-bar-h);
+  bottom: var(--bottom-bar-h);
+}
+
+/* Mobile: cover with face-safe positioning */
+.live-council-player .prism-player .prism-player__figure-bg img {
+  object-fit: cover;
+  object-position: center 15%;
+}
+
+/* Desktop: contain (no cropping, dark letterbox sides) */
+@media (min-width: 768px) {
+  .live-council-player .prism-player .prism-player__figure-bg img {
+    object-fit: contain;
+    object-position: center center;
+  }
+}
+
+/* ── Top bar ── speaker name + close. Solid navy, always visible. */
+.live-council-player__top-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--top-bar-h);
+  z-index: 25;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 0.75rem;
+  padding: env(safe-area-inset-top, 0px) 0.75rem 0 1rem;
+  background: var(--bg-cosmic-void);
+  border-bottom: 1px solid color-mix(in srgb, var(--gold-subtle) 18%, transparent);
+}
+
+.live-council-player__top-bar-title {
+  justify-self: center;
+  /* Visually center the title across the bar by offsetting for the
+     close button on the right (~44px touch target). */
+  margin-left: 44px;
+  font-family: var(--font-display, 'Cormorant Garamond', Georgia, serif);
+  font-size: clamp(0.95rem, 1.5vw, 1.1rem);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--gold-subtle);
+  text-transform: capitalize;
+  text-shadow: 0 1px 4px color-mix(in srgb, black var(--a-50), transparent);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: calc(100% - 1rem);
+  /* Soft fade when the speaker key changes (re-mount) — mirrors the
+     figure crossfade so identity transitions feel cohesive. */
+  animation: live-council-speaker-fade 0.3s ease-out;
+}
+
+@keyframes live-council-speaker-fade {
+  from { opacity: 0; transform: translateY(-2px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Bottom bar ── dedicated subtitle area. Solid navy, always rendered
+   so the figure layout doesn't jump when the first sentence arrives. */
+.live-council-player__bottom-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: var(--bottom-bar-h);
+  z-index: 15;
+  padding: 0.5rem 1rem env(safe-area-inset-bottom, 0px);
+  background: var(--bg-cosmic-void);
+  border-top: 1px solid color-mix(in srgb, var(--gold-subtle) 18%, transparent);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  pointer-events: none;
+}
+
+/* ── Subtitle zone ── inside the bottom bar. Bottom-anchored, grows up,
+   oldest lines fade at top via mask. No chip background — the bar
+   itself is the dedicated backdrop. */
+.live-council-player .live-council-player__subtitle-zone {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  height: 100%;
+  overflow: hidden;
+  text-align: center;
+  /* Fade oldest lines at top of the strip */
+  mask-image: linear-gradient(to bottom, transparent 0%, black 25%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 25%);
+}
+
+.live-council-player .live-council-player__subtitle-text {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 0.25rem 0.6rem;
+  text-align: center;
+  hyphens: manual;
+  word-break: break-word; /* Safety net for long German compounds */
+  /* Match PrismPlayer .prism-player__sentence sizing so live councils
+     read at the same scale as curated councils. */
+  font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--text-primary);
+  /* No chip — strong text-shadow as defensive fallback if ever rendered
+     against an inconsistent backdrop. */
+  text-shadow:
+    0 1px 4px color-mix(in srgb, black var(--a-70), transparent),
+    0 0 12px color-mix(in srgb, black var(--a-50), transparent);
+  background: transparent;
+}
+
+@media (min-width: 768px) {
+  .live-council-player .live-council-player__subtitle-zone {
+    max-width: min(55%, 480px);
+  }
+
+  .live-council-player .live-council-player__subtitle-text {
+    font-size: clamp(1.3rem, 2vw, 1.6rem);
+  }
+}
+
+/* Completion badge */
+.live-council-player__completed {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: color-mix(in srgb, var(--bg-primary) 85%, transparent);
+  backdrop-filter: blur(var(--glass-blur-max));
+  -webkit-backdrop-filter: blur(var(--glass-blur-max));
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+  border-radius: 12px;
+  color: var(--gold-subtle);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  animation: live-subtitle-in 0.3s ease-out;
+}
+
+@keyframes live-subtitle-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .live-council-player .prism-player__figure-bg {
+    transition: none;
+  }
+
+  .live-council-player__completed {
+    animation: none;
+  }
+}

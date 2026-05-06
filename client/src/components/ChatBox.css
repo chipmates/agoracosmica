@@ -1,0 +1,805 @@
+/* src/components/ChatBox.css */
+:root {
+  --primary-color: var(--bg-primary); /* Updated to Primary Deep */
+  --primary-base: var(--bg-card);  /* Added for contexts that need the original blue */
+  --secondary-color: var(--gold-subtle);
+  --accent-color: var(--mode-quest-active);
+  --coral-base: var(--mode-quest-active);    /* Deeper coral for user messages */
+  --text-color: var(--text-primary); /* Cosmic white - reduces halation for 47% with astigmatism */
+  --glass-blur: 10px; /* Increased for better background separation and readability */
+  --transition-bezier: cubic-bezier(0.4, 0, 0.2, 1);
+  --gold-base: var(--gold-subtle);     /* Gold color for review mode */
+  
+  /* PHASE 1: Responsive avatar system - Optimized for mobile, standard for larger screens */
+  --avatar-mobile: 36px;    /* Reduced for more message space on mobile */
+  --avatar-tablet: 56px;    /* Comfortable tablet size */
+  --avatar-desktop: 64px;   /* Optimal for historical figures */
+  
+  /* PHASE 1: Optimized spacing */
+  --chat-margin-mobile: 8px;
+  --chat-margin-tablet: 16px;
+  --chat-margin-desktop: max(16px, 2vw);
+  
+  /* 2025 Best Practice Font Sizes for Chat Messages */
+  /* Mobile: 16px minimum (WCAG), Tablet: 17px, Desktop: 18px */
+  --ui-font-size-chat: clamp(1rem, 0.95rem + 0.3vw, 1.125rem); /* 16px → 18px */
+}
+
+/* Review Mode Indicator */
+.review-mode-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: color-mix(in srgb, var(--gold-subtle) var(--a-15), transparent);
+  border-radius: 6px;
+  font-size: 14px;
+  color: var(--gold-base);
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: var(--z-base); /* 10 */
+  backdrop-filter: blur(var(--glass-blur-light));
+  -webkit-backdrop-filter: blur(var(--glass-blur-light));
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent);
+  font-weight: 500;
+  box-shadow: 0 2px 8px color-mix(in srgb, black var(--a-15), transparent);
+  transition: all 0.3s var(--transition-bezier);
+}
+
+.review-mode-indicator:hover {
+  background: color-mix(in srgb, var(--gold-subtle) var(--a-25), transparent);
+  transform: translateY(-2px);
+}
+
+/* Base Container - State-of-the-art 2025 Mobile-First Full Width */
+.chatbox-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: color-mix(in srgb, var(--bg-astral) var(--a-25), transparent); /* Increased opacity from 0.08 for better contrast */
+  backdrop-filter: blur(var(--glass-blur));
+  position: relative;
+  overflow: hidden;
+  
+  /* Mobile-first: Full width by default */
+  margin: 0 0 0.5rem 0; /* Only bottom margin on mobile */
+  width: 100%;
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-15), transparent);
+  border-radius: 0; /* No radius on mobile for full width */
+  border-left: none; /* Remove side borders on mobile */
+  border-right: none;
+  
+  /* Subtle shadow on mobile */
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--bg-primary) var(--a-08), transparent);
+  
+  /* Performance optimization */
+  contain: layout style;
+  
+  /* Ensure proper sizing */
+  box-sizing: border-box;
+  min-height: 0; /* Allow flex shrinking */
+}
+
+/* Tablet styles - restore proper spacing and borders */
+@media (min-width: 768px) {
+  .chatbox-container {
+    margin: var(--chat-margin-tablet);
+    width: calc(100% - 2 * var(--chat-margin-tablet)); /* Account for margins */
+    border-radius: 12px;
+    border: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-15), transparent); /* Restore full border */
+    box-shadow: 
+      0 8px 32px color-mix(in srgb, var(--bg-primary) var(--a-10), transparent),
+      0 2px 8px color-mix(in srgb, var(--bg-primary) var(--a-05), transparent);
+  }
+}
+
+/* Note: Tablet-specific rules moved after base .message rules for proper cascade */
+
+/* Desktop alignment - State-of-the-art 2025 Bulletproof Centered Layout */
+@media (min-width: 1024px) {
+  /* Use descendant selector to work regardless of wrapper divs */
+  .homepage .main-content .chatbox-container {
+    /* Force proper centering */
+    margin: 0 auto 16px auto; /* Center with bottom margin */
+    width: calc(100% - 2 * var(--content-inline-padding)); /* Match header width */
+    max-width: var(--content-max-width); /* Constrain maximum width */
+    border-radius: 16px;
+    
+    /* Reset any positioning from wrapper divs */
+    position: relative;
+    left: auto;
+    transform: none;
+    
+    /* Flexbox child behavior */
+    flex: 1;
+    min-height: 0; /* Allow proper flex shrinking */
+    
+    /* Ensure consistent behavior */
+    box-sizing: border-box;
+  }
+  
+  /* Desktop font sizes are handled by the clamp() function */
+  /* No need for overrides - responsive system handles it */
+}
+
+@media (min-width: 1200px) {
+  .chatbox-container {
+    /* Inherit all settings from 1024px breakpoint */
+  }
+}
+
+/* Extra large displays handled in HomePage.css root variables */
+
+/* Decorative Background Pattern */
+.chatbox-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    radial-gradient(circle at top right,
+      color-mix(in srgb, var(--mode-quest-active) var(--a-05), transparent) 0%,
+      transparent 60%),
+    radial-gradient(circle at bottom left,
+      color-mix(in srgb, var(--gold-subtle) var(--a-05), transparent) 0%,
+      transparent 60%);
+  pointer-events: none;
+}
+
+/* Main Chat Area - State-of-the-art 2025 Optimized */
+.chatbox {
+  flex: 1;
+  min-height: 0; /* Critical for flex child scrolling */
+  padding: var(--chat-margin-mobile); /* PHASE 1: Optimized padding */
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 1rem, 16px); /* PHASE 1: Responsive gap */
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary-purple, #9370DB) color-mix(in srgb, var(--primary-purple, #9370DB) var(--a-10), transparent);
+  position: relative;
+  z-index: var(--z-base); /* 1 */
+  
+  /* PHASE 1: Performance optimizations */
+  scroll-behavior: smooth;
+  scrollbar-gutter: stable;
+  -webkit-overflow-scrolling: touch;
+  transform: translateZ(0); /* GPU acceleration */
+  contain: strict;
+  
+  /* 2025: Ensure chatbox doesn't push input off screen */
+  max-height: calc(100% - var(--input-visibility-buffer));
+  overscroll-behavior-y: contain; /* Prevent scroll chaining */
+}
+
+/* PHASE 1: Responsive chat area padding */
+@media (min-width: 768px) {
+  .chatbox {
+    padding: var(--chat-margin-tablet);
+    gap: 1rem;
+  }
+}
+
+@media (min-width: 1200px) {
+  .chatbox {
+    padding: var(--chat-margin-desktop);
+    gap: 1.25rem;
+  }
+}
+
+/* Purple Scrollbar Styling - Webkit browsers (Chrome, Safari) */
+.chatbox::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.chatbox::-webkit-scrollbar-track {
+  background: color-mix(in srgb, var(--primary-purple, #9370DB) var(--a-10), transparent);
+  border-radius: 4px;
+}
+
+.chatbox::-webkit-scrollbar-thumb {
+  background: var(--primary-purple, #9370DB);
+  border-radius: 4px;
+  transition: background 0.3s ease;
+}
+
+.chatbox::-webkit-scrollbar-thumb:hover {
+  background: var(--purple-light, #A688E8);
+}
+
+/* Message Bubbles - PHASE 1: Optimized for 85% screen usage */
+.message {
+  position: relative;
+  padding: clamp(14px, 1rem + 0.2vw, 20px); /* PHASE 1: Responsive padding */
+  border-radius: clamp(12px, 1rem, 16px);
+  word-break: break-word;
+  max-width: min(85%, 700px); /* PHASE 1: Increased from 80% */
+  min-width: min(200px, 60%);
+  line-height: 1.5; /* PHASE 1: Optimized from 1.6 for density */
+  letter-spacing: 0.01em; /* PHASE 1: Reduced for better readability */
+  font-size: var(--ui-font-size-chat); /* 🎯 Use responsive variable instead of fixed 16px */
+  transition: all 0.3s var(--transition-bezier);
+  animation: messageAppear 0.3s ease forwards;
+  
+  /* PHASE 1: Performance optimization */
+  contain: layout style paint;
+  will-change: transform;
+}
+
+/* User Message */
+.message.user {
+  align-self: flex-end;
+  background: color-mix(in srgb, var(--mode-quest-active) var(--a-90), transparent); /* Deeper coral - nearly solid for consistency with record button */
+  border: 1px solid color-mix(in srgb, var(--mode-quest-active) var(--a-40), transparent);
+  color: var(--text-primary); /* Cosmic white instead of pure white */
+  margin-left: 20%;
+  backdrop-filter: blur(var(--glass-blur));
+  box-shadow:
+    0 4px 12px color-mix(in srgb, var(--mode-quest-active) var(--a-10), transparent),
+    0 2px 4px color-mix(in srgb, var(--mode-quest-active) var(--a-05), transparent);
+}
+
+/* Assistant Message */
+.message.assistant {
+  align-self: flex-start;
+  background: var(--bg-primary); /* Solid deep blue - matches sidebar/header */
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-25), transparent);
+  color: var(--text-primary);
+  margin-right: 20%;
+  box-shadow:
+    0 4px 12px color-mix(in srgb, var(--gold-subtle) var(--a-10), transparent),
+    0 2px 4px color-mix(in srgb, var(--gold-subtle) var(--a-05), transparent);
+}
+
+/* Message Wrapper - Contains Avatar + Message */
+.message-wrapper {
+  display: flex;
+  align-items: flex-start;
+  position: relative;
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+/* Avatar Container - PHASE 1: Responsive sizing system */
+.avatar-container {
+  flex-shrink: 0;
+  width: var(--avatar-mobile); /* PHASE 1: 44px on mobile */
+  height: var(--avatar-mobile);
+  border-radius: 50%;
+  overflow: hidden;
+  position: relative;
+  z-index: var(--z-base); /* 2 */
+  
+  /* PHASE 1: Performance optimization */
+  contain: strict;
+  transition: transform 0.3s ease;
+}
+
+/* PHASE 1: Responsive avatar sizing */
+@media (min-width: 768px) {
+  .avatar-container {
+    width: var(--avatar-tablet); /* 56px on tablet */
+    height: var(--avatar-tablet);
+  }
+}
+
+@media (min-width: 1200px) {
+  .avatar-container {
+    width: var(--avatar-desktop); /* 64px on desktop */
+    height: var(--avatar-desktop);
+  }
+}
+
+.figure-avatar {
+  margin-right: 4px; /* Ultra-compact for maximum bubble space */
+  border: 3px solid var(--gold-base);
+  box-shadow: 0 0 20px color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent);
+}
+
+.user-avatar {
+  margin-left: 4px; /* Ultra-compact for maximum bubble space */
+  border: 3px solid var(--gold-deep); /* Gold border for user avatar */
+  box-shadow: 0 0 20px color-mix(in srgb, var(--gold-deep) var(--a-30), transparent);
+  background-color: var(--bg-primary); /* Deep blue background - matches sidebar/header */
+}
+
+/* Avatar Image */
+.avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Message Layout Adjustments - PHASE 1: Space Recovery from 20% to 5% */
+.message-wrapper.assistant {
+  padding-right: 5%; /* PHASE 1: Reduced from 20% - HUGE space recovery */
+  padding-left: 0;
+  margin-bottom: clamp(12px, 1rem, 20px); /* PHASE 1: Responsive spacing */
+  margin-left: -1rem; /* Ultra-aggressive: move avatar closer to edge for maximum bubble space */
+}
+
+.message-wrapper.user {
+  padding-left: 5%; /* PHASE 1: Reduced from 20% - HUGE space recovery */
+  padding-right: 0;
+  justify-content: flex-end;
+  margin-bottom: clamp(12px, 1rem, 20px); /* PHASE 1: Responsive spacing */
+  margin-right: -1rem; /* Ultra-aggressive: move avatar closer to edge for maximum bubble space */
+}
+
+/* PHASE 1: Responsive margin adjustments */
+@media (min-width: 768px) {
+  .message-wrapper.assistant {
+    padding-right: 3%; /* Even more space recovery on larger screens */
+  }
+  
+  .message-wrapper.user {
+    padding-left: 3%; /* Even more space recovery on larger screens */
+  }
+}
+
+/* Message Headers */
+.message-header {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(0.875rem, 0.85rem + 0.2vw, 1rem); /* 14px → 16px - slightly smaller than content */
+  font-weight: 500; /* Medium weight for headers */
+  margin-bottom: 0.75rem;
+  opacity: 0.9;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.message.assistant .message-header {
+  color: color-mix(in srgb, var(--gold-subtle) var(--a-90), transparent); /* Golden color */
+}
+
+/* User message header - use deep blue */
+.message.user .message-header {
+  color: color-mix(in srgb, var(--bg-primary) var(--a-90), transparent); /* Primary Deep color */
+}
+
+/* Message Content - 2025 Best Practice Typography */
+.message-content {
+  font-family: var(--ui-font-family, 'Space Grotesk', 'Roboto', var(--fallback-fonts));
+  white-space: pre-wrap;
+  font-size: var(--ui-font-size-chat); /* 16px → 18px responsive */
+  line-height: 1.6; /* Best practice for readability (1.4-1.6 recommended) */
+  letter-spacing: 0.01em;
+  font-variation-settings: 'wght' 400;
+  font-feature-settings: 'liga', 'kern', 'calt', 'pnum';
+  text-rendering: optimizeLegibility;
+  
+  /* Performance optimization */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Mobile-specific optimizations for accessibility */
+@media (max-width: 480px) {
+  .message-content {
+    /* Ensure minimum 16px on small mobile devices (WCAG AA) */
+    font-size: max(1rem, var(--ui-font-size-chat));
+  }
+}
+
+/* Tablet optimization */
+@media (min-width: 481px) and (max-width: 1023px) {
+  .message-content {
+    /* Slightly larger for tablet comfort */
+    font-size: clamp(1.0625rem, 1rem + 0.3vw, 1.125rem); /* 17px → 18px */
+  }
+}
+
+.message-paragraph {
+  margin-bottom: 1rem;
+  transition: opacity 0.3s ease;
+}
+
+.message-paragraph:last-child {
+  margin-bottom: 0;
+}
+
+/* Avatar-Message Connection */
+.figure-avatar::after {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 3px;
+  background: linear-gradient(to right, var(--gold-base), transparent);
+  top: 50%;
+  right: -10px;
+  transform: translateY(-50%);
+}
+
+.user-avatar::before {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 3px;
+  background: linear-gradient(to left, var(--gold-deep), transparent); /* Gold connecting line */
+  top: 50%;
+  left: -10px;
+  transform: translateY(-50%);
+}
+
+/* Connection Animation on Hover */
+.message-wrapper:hover .figure-avatar::after,
+.message-wrapper:hover .user-avatar::before {
+  width: 14px;
+  opacity: 0.8;
+  transition: all 0.3s var(--transition-bezier);
+}
+
+/* Hover Effects */
+.message:hover {
+  transform: translateY(-2px);
+}
+
+.message.user:hover {
+  box-shadow:
+    0 6px 16px color-mix(in srgb, var(--mode-quest-active) var(--a-15), transparent),
+    0 2px 4px color-mix(in srgb, var(--mode-quest-active) var(--a-10), transparent);
+}
+
+.message.assistant:hover {
+  box-shadow:
+    0 6px 16px color-mix(in srgb, var(--gold-subtle) var(--a-15), transparent),
+    0 2px 4px color-mix(in srgb, var(--gold-subtle) var(--a-10), transparent);
+}
+
+/* Avatar hover effects */
+.message-wrapper:hover .avatar-container {
+  transform: scale(1.1);
+  transition: all 0.3s var(--transition-bezier);
+}
+
+.message-wrapper.assistant:hover .avatar-container {
+  box-shadow: 0 0 20px color-mix(in srgb, var(--gold-subtle) var(--a-60), transparent);
+}
+
+.message-wrapper.user:hover .avatar-container {
+  box-shadow: 0 0 20px color-mix(in srgb, var(--gold-deep) var(--a-60), transparent); /* Gold glow on hover */
+}
+
+/* Spinner Container */
+.processing-spinner-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: var(--z-base); /* 10 */
+}
+
+/* Message Appearance Animation */
+@keyframes messageAppear {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* PHASE 1: Mobile Optimization - Full width usage */
+/* If changes don't apply:
+   1. Hard refresh: Cmd+Shift+R (Mac) / Ctrl+Shift+R (Windows)
+   2. Clear cache: rm -rf node_modules/.cache
+   3. Restart dev server: Ctrl+C then pnpm start */
+@media (max-width: 768px) {
+  .chatbox-container {
+    /* Match StoryPlayer mobile pattern exactly - simple and effective */
+    width: 100%; /* Full width on mobile to match story player */
+    max-width: 100%; /* Full width on mobile */
+    margin: 0 0 8px 0; /* Tablet: No top pull, gap at bottom for input */
+    border-radius: 0;
+    height: 100vh;
+    height: 100dvh; /* Dynamic viewport height */
+    background-color: var(--text-tertiary); /* Gray background like desktop */
+  }
+
+  /* Edge-to-edge mobile with minimal internal spacing for avatar safety */
+  .chatbox {
+    padding: 8px 4px; /* 4px horizontal protects avatar from cutoff */
+  }
+
+  /* High specificity selector to override base styles */
+  .chatbox-container .chatbox .message-wrapper .message {
+    max-width: 80%; /* WhatsApp/Signal standard: balanced, scannable conversations */
+    width: auto; /* Let content determine width naturally */
+    min-width: auto; /* Remove forced minimum */
+    font-size: 15.5px; /* 🎯 Slightly reduced for mobile density (0.5px smaller) */
+    line-height: 1.45; /* PHASE 1: Slightly tighter on mobile */
+  }
+}
+
+/* Mobile-only (≤767px) - Test with no pull */
+@media (max-width: 767px) {
+  .chatbox-container {
+    margin: 0 0 8px 0; /* TEST: No pull - maybe PWA rules were the issue */
+  }
+  
+  /* 🎯 CRITICAL: Use same specificity as width overrides for consistency */
+  .chatbox-container .chatbox .message-wrapper .message.user {
+    margin-left: 0; /* Remove 20% left margin */
+    margin-right: 0;
+  }
+  
+  .chatbox-container .chatbox .message-wrapper .message.assistant {
+    margin-left: 0;
+    margin-right: 0; /* Remove 20% right margin */
+  }
+
+  .message-header {
+    font-size: var(--ui-font-size-header); /* 🎯 Use responsive variable */
+  }
+  
+  .message-content {
+    font-size: 15.5px; /* 🎯 Slightly reduced for mobile density (0.5px smaller) */
+    line-height: 1.45; /* PHASE 1: Mobile optimized */
+  }
+  
+  .message-paragraph {
+    margin-bottom: 0.75rem; /* PHASE 1: Tighter spacing */
+  }
+  
+  /* Avatar sizes handled by CSS custom properties */
+  .figure-avatar {
+    margin-right: 2px; /* Ultra-compact on mobile for maximum bubble space */
+  }
+
+  .user-avatar {
+    margin-left: 2px; /* Ultra-compact on mobile for maximum bubble space */
+  }
+
+  .message-wrapper.assistant {
+    padding: 0; /* No padding - edge-to-edge gray */
+    margin-left: 0;
+  }
+
+  .message-wrapper.user {
+    padding: 0; /* No padding - edge-to-edge gray */
+    margin-right: 0;
+  }
+}
+
+/* PHASE 1: Small mobile optimization */
+@media (max-width: 480px) {
+  :root {
+    --glass-blur: 6px; /* Reduced from 10px but still better than 2px */
+  }
+
+  .chatbox-container {
+    background-color: var(--text-tertiary); /* Gray background like desktop */
+    margin: 0 0 8px 0; /* TEST: No pull - maybe PWA rules were the issue */
+  }
+
+  /* Edge-to-edge mobile with minimal internal spacing for avatar safety */
+  .chatbox {
+    padding: 8px 4px; /* 4px horizontal protects avatar from cutoff */
+  }
+
+  /* High specificity selector to override base styles */
+  .chatbox-container .chatbox .message-wrapper .message {
+    max-width: 80%; /* WhatsApp/Signal standard: balanced, scannable conversations */
+    width: auto; /* Let content determine width naturally */
+    min-width: auto; /* Remove forced minimum */
+    font-size: 15px; /* 🎯 Even more compact for small screens */
+    line-height: 1.4; /* PHASE 1: Tighter for density */
+  }
+  
+  /* 🎯 CRITICAL: Use same specificity as width overrides for consistency */
+  .chatbox-container .chatbox .message-wrapper .message.user,
+  .chatbox-container .chatbox .message-wrapper .message.assistant {
+    margin: 0; /* Remove ALL margins for maximum width */
+  }
+  
+  .message-content {
+    font-size: 15px; /* 🎯 Even more compact for small screens */
+    line-height: 1.4; /* PHASE 1: Optimal for small screens */
+    letter-spacing: 0.005em;
+  }
+  
+  .message-paragraph {
+    margin-bottom: 0.5rem; /* PHASE 1: Tighter for small screens */
+  }
+  
+  .message-wrapper.assistant {
+    padding: 0; /* No padding - edge-to-edge gray */
+    margin-left: 0;
+  }
+
+  .message-wrapper.user {
+    padding: 0; /* No padding - edge-to-edge gray */
+    margin-right: 0;
+  }
+
+  /* Avatar sizes handled by CSS custom properties */
+  .figure-avatar {
+    margin-right: 2px; /* Ultra-compact on small screens for maximum bubble space */
+  }
+
+  .user-avatar {
+    margin-left: 2px; /* Ultra-compact on small screens for maximum bubble space */
+  }
+
+  /* PHASE 1: Improve contrast and performance on small screens */
+  .message.assistant {
+    background: var(--bg-primary); /* Solid deep blue - matches sidebar/header */
+    border: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-25), transparent);
+  }
+
+  .message.user {
+    background: color-mix(in srgb, var(--mode-quest-active) var(--a-90), transparent); /* Deeper coral - nearly solid for consistency */
+    border: 1px solid color-mix(in srgb, var(--mode-quest-active) var(--a-40), transparent);
+    backdrop-filter: blur(var(--glass-blur-subtle)); /* Lighter for performance */
+  }
+}
+
+/* PHASE 1: Tablet-specific message width - MUST come after base .message rules for CSS cascade */
+/* VERSION: 2025-02-TABLET-70-PERCENT - If you see this in DevTools, CSS is loading correctly */
+@media (min-width: 768px) and (max-width: 1023px) {
+  /* Ultra-high specificity to force override of any base styles */
+  body .chatbox-container .chatbox .message-wrapper .message {
+    max-width: min(70%, 550px); /* 🎯 Tablet: more centered and elegant than mobile */
+    width: auto; /* Let content determine width naturally */
+    min-width: auto; /* Remove forced minimum */
+    font-size: var(--ui-font-size-chat); /* Use responsive sizing */
+    line-height: 1.5; /* Standard line height for tablet */
+  }
+  
+  /* Remove margins on tablet for consistent spacing - high specificity */
+  .chatbox-container .chatbox .message-wrapper .message.user {
+    margin-left: 0;
+    margin-right: 0;
+  }
+  
+  .chatbox-container .chatbox .message-wrapper .message.assistant {
+    margin-left: 0;
+    margin-right: 0;
+  }
+  
+  /* Tablet-specific wrapper adjustments */
+  .message-wrapper.assistant {
+    padding-right: 3%; /* Even more space recovery on tablet */
+    padding-left: 0;
+  }
+  
+  .message-wrapper.user {
+    padding-left: 3%; /* Even more space recovery on tablet */
+    padding-right: 0;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .message,
+  .message:hover,
+  .message-wrapper:hover .avatar-container,
+  .message-wrapper.assistant:hover .avatar-container,
+  .message-wrapper.user:hover .avatar-container,
+  .message-wrapper:hover .figure-avatar::after,
+  .message-wrapper:hover .user-avatar::before {
+    animation: none;
+    transition: none;
+    transform: none;
+    width: initial;
+  }
+}
+
+/* High Contrast Mode */
+@media (forced-colors: active) {
+  .message {
+    border: 2px solid CanvasText;
+  }
+  
+  .avatar-container {
+    border: 2px solid CanvasText;
+  }
+  
+  .figure-avatar::after,
+  .user-avatar::before {
+    background: CanvasText;
+  }
+}
+
+/* Loading Spinner Container for Chat */
+.loading-spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100px;
+  width: 100%;
+  padding: 20px 0;
+  margin: 20px 0;
+  opacity: 0.8;
+}
+
+/* Initial loading message styling */
+.initial-loading-message {
+  text-align: center;
+  color: var(--gold-base);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.5px;
+  opacity: 0.7;
+  padding: 10px 0;
+  animation: fadeInOut 1.5s infinite alternate;
+}
+
+@keyframes fadeInOut {
+  from { opacity: 0.4; }
+  to { opacity: 0.8; }
+}
+
+/* SimpleBar custom styling for Safari - Gold theme for ChatBox */
+.chatbox.simplebar-scrollable-y .simplebar-scrollbar::before {
+  background-color: var(--gold-subtle); /* Gold base */
+  border-radius: 4px;
+  opacity: 1;
+}
+
+.chatbox.simplebar-scrollable-y .simplebar-track {
+  background: color-mix(in srgb, var(--gold-subtle) var(--a-10), transparent); /* Gold base 10% opacity */
+}
+
+.chatbox.simplebar-scrollable-y .simplebar-scrollbar.simplebar-visible:before {
+  opacity: 1;
+}
+
+.chatbox.simplebar-scrollable-y .simplebar-scrollbar:hover::before {
+  background-color: var(--gold-primary); /* Gold light on hover */
+}
+
+/* Ensure SimpleBar content matches the chatbox styling */
+.chatbox.simplebar-content-wrapper {
+  overflow-x: hidden;
+}
+
+.chatbox .simplebar-content {
+  padding: 1.5rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Report content button */
+.report-content-btn {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 0.15s;
+  color: var(--text-tertiary);
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.message:hover .report-content-btn,
+.report-content-btn:focus-visible {
+  opacity: 0.5;
+}
+
+.report-content-btn:hover {
+  opacity: 1;
+  color: var(--warning-subtle, #b8860b);
+}
+
+/* Ensure message has relative positioning for the report button */
+.message.assistant,
+.message.council {
+  position: relative;
+}

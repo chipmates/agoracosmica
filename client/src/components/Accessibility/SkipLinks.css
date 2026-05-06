@@ -1,0 +1,262 @@
+/* SkipLinks.css - 2025 State-of-the-Art Accessibility Navigation */
+
+/* Core Design Tokens */
+:root {
+  --skip-link-bg: var(--gold-subtle);           /* Gold base for visibility */
+  --skip-link-text: var(--bg-primary);         /* Dark blue for contrast */
+  --skip-link-hover: var(--gold-hover);        /* Gold luminous on hover */
+  --skip-link-focus: var(--gold-primary);        /* Gold light for focus ring */
+  --skip-link-shadow: color-mix(in srgb, var(--utility-pure-black) var(--a-25), transparent);
+  --skip-link-radius: 8px;
+  --skip-link-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Skip Links Container */
+.skip-links {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: var(--z-overlay); /* 9999 */
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  
+  /* Ensure skip links are above all other content */
+  pointer-events: none;
+  
+  /* Container queries for responsive design */
+  container-type: inline-size;
+  container-name: skip-links;
+}
+
+/* Individual Skip Link */
+.skip-link {
+  /* Positioning - Hidden by default */
+  position: absolute;
+  top: -100px;
+  left: 0;
+  
+  /* Visual Design */
+  background: var(--skip-link-bg);
+  color: var(--skip-link-text);
+  padding: 12px 16px;
+  border-radius: var(--skip-link-radius);
+  font-family: var(--font-primary, 'Space Grotesk', sans-serif);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-decoration: none;
+  white-space: nowrap;
+  
+  /* Shadows and borders */
+  box-shadow: 
+    0 4px 12px var(--skip-link-shadow),
+    0 2px 4px var(--skip-link-shadow);
+  border: 2px solid transparent;
+  
+  /* Transitions */
+  transition: var(--skip-link-transition);
+  
+  /* Enable pointer events when focused */
+  pointer-events: auto;
+  
+  /* Ensure proper stacking */
+  z-index: var(--z-critical); /* 10000 */
+  
+  /* GPU acceleration for smooth animations */
+  transform: translateZ(0);
+  will-change: transform, top, box-shadow;
+}
+
+/* Skip Link Focus State - Slide Down */
+.skip-link:focus {
+  top: 8px;
+  outline: 2px solid var(--skip-link-focus);
+  outline-offset: 2px;
+  transform: translateY(0);
+  
+  /* Enhanced shadow on focus */
+  box-shadow: 
+    0 6px 20px var(--skip-link-shadow),
+    0 3px 8px var(--skip-link-shadow),
+    0 0 0 4px color-mix(in srgb, var(--gold-subtle) var(--a-20), transparent);
+}
+
+/* Skip Link Hover State */
+.skip-link:hover {
+  background: var(--skip-link-hover);
+  transform: translateY(-2px);
+  
+  /* Subtle animation */
+  box-shadow: 
+    0 6px 16px var(--skip-link-shadow),
+    0 3px 6px var(--skip-link-shadow);
+}
+
+/* Skip Link Active State */
+.skip-link:active {
+  transform: translateY(0);
+  box-shadow: 
+    0 2px 8px var(--skip-link-shadow),
+    0 1px 3px var(--skip-link-shadow);
+}
+
+/* Multiple Skip Links Layout */
+.skip-links .skip-link:nth-child(1) {
+  left: 8px;
+}
+
+.skip-links .skip-link:nth-child(2) {
+  left: calc(8px + 150px + 8px); /* Offset for second link */
+}
+
+.skip-links .skip-link:nth-child(3) {
+  left: calc(8px + 300px + 16px); /* Offset for third link */
+}
+
+/* Responsive Design with Container Queries */
+@container skip-links (max-width: 480px) {
+  .skip-link {
+    padding: 14px 18px;
+    font-size: 16px;
+    border-radius: 10px;
+  }
+  
+  /* Stack links vertically on small screens */
+  .skip-links .skip-link:nth-child(1) {
+    left: 8px;
+    top: -100px;
+  }
+  
+  .skip-links .skip-link:nth-child(2) {
+    left: 8px;
+    top: -150px;
+  }
+  
+  .skip-links .skip-link:nth-child(3) {
+    left: 8px;
+    top: -200px;
+  }
+  
+  /* Focused state positioning for mobile */
+  .skip-links .skip-link:focus:nth-child(1) {
+    top: 8px;
+  }
+  
+  .skip-links .skip-link:focus:nth-child(2) {
+    top: 58px; /* Below first link */
+  }
+  
+  .skip-links .skip-link:focus:nth-child(3) {
+    top: 108px; /* Below second link */
+  }
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+  .skip-link {
+    background: ButtonFace;
+    color: ButtonText;
+    border: 2px solid ButtonText;
+    box-shadow: none;
+  }
+  
+  .skip-link:focus {
+    outline: 3px solid Highlight;
+    outline-offset: 2px;
+    background: Highlight;
+    color: HighlightText;
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .skip-link {
+    transition: none;
+    transform: none;
+    will-change: auto;
+  }
+  
+  .skip-link:focus {
+    transform: none;
+  }
+  
+  .skip-link:hover {
+    transform: none;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --skip-link-bg: var(--gold-primary);         /* Lighter gold for dark mode */
+    --skip-link-text: var(--bg-primary);       /* Keep dark text for contrast */
+    --skip-link-hover: var(--gold-hover);      /* Brighter hover in dark mode */
+    --skip-link-shadow: color-mix(in srgb, var(--utility-pure-black) var(--a-40), transparent);
+  }
+}
+
+/* Force Colors Mode (Windows High Contrast) */
+@media (forced-colors: active) {
+  .skip-link {
+    background: ButtonFace;
+    color: ButtonText;
+    border: 1px solid ButtonText;
+    box-shadow: none;
+  }
+  
+  .skip-link:focus {
+    background: Highlight;
+    color: HighlightText;
+    outline: 2px solid Highlight;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .skip-links {
+    display: none;
+  }
+}
+
+/* Animation for Skip Link Appearance */
+@keyframes skipLinkSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.skip-link:focus {
+  animation: skipLinkSlideIn 0.2s ease-out;
+}
+
+/* Utility Classes */
+.skip-links--center {
+  justify-content: center;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.skip-links--right {
+  right: 0;
+  left: auto;
+}
+
+/* Screen Reader Announcements */
+.skip-links[aria-label]::before {
+  content: attr(aria-label);
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

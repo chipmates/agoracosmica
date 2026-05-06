@@ -1,0 +1,91 @@
+/* SettingCard.module.css */
+
+.container {
+  /* Card container styles */
+  margin-bottom: var(--space-lg);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  color: var(--gold-primary);
+}
+
+.title {
+  flex: 1;
+  margin: 0;
+}
+
+.infoIcon {
+  cursor: pointer;
+  color: var(--text-tertiary);
+  transition: color var(--transition-base);
+  position: relative;
+}
+
+.infoIcon:hover {
+  color: var(--text-secondary);
+}
+
+.tooltip {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--bg-card);
+  border: 1px solid var(--utility-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  z-index: var(--z-tooltip);
+  white-space: nowrap;
+  font-size: var(--text-sm);
+}
+
+.description {
+  margin-bottom: var(--space-md);
+  color: var(--text-secondary);
+  line-height: var(--leading-relaxed);
+}
+
+.content {
+  /* Content area for children */
+}
+
+/* Temporary component styles - will be removed when proper components exist */
+.cosmicCard {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  transition: all var(--transition-base);
+}
+
+.cosmicCard.glass {
+  background: rgba(28, 36, 92, 0.8);
+  backdrop-filter: blur(var(--glass-blur-heavy));
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 10%, transparent);
+}
+
+.cosmicCard.elevate {
+  box-shadow: var(--shadow-xl);
+}
+
+.cosmicText {
+  font-family: var(--font-ui);
+  color: var(--text-primary);
+}
+
+.cosmicText.body {
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+}

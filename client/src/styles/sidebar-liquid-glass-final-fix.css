@@ -1,0 +1,62 @@
+/* Sidebar Liquid Glass Final Fix - January 2025 */
+/* This fix ensures liquid glass works properly without cascade conflicts */
+
+/* Import liquid glass system at top level */
+@import url('./liquid-glass.css');
+
+/* ===== Override Conflicting Styles ===== */
+/* Use higher specificity to override Sidebar.css without !important */
+
+/* Reset any background overrides from Sidebar.css */
+.sidebar.mobile.liquid-glass-container.liquid-glass--sidebar {
+  /* Remove ALL background declarations to let liquid glass work */
+  background-color: unset;
+  background: unset;
+}
+
+/* Ensure liquid glass variables are properly applied */
+.sidebar.mobile.liquid-glass--sidebar {
+  /* Use the sidebar variant settings */
+  --glass-blur: var(--glass-blur-heavy, 20px);
+  --glass-tint: var(--glass-tint-dark);
+  --glass-border: var(--glass-border-dark);
+  
+  /* Let liquid glass CSS handle the actual implementation */
+}
+
+/* Apply correct styles through liquid glass system */
+@supports (backdrop-filter: blur(1px)) {
+  .sidebar.mobile.liquid-glass--sidebar {
+    /* These will use the CSS variables from liquid glass */
+    background: var(--glass-tint-dark);
+    backdrop-filter: blur(var(--glass-blur-heavy)) saturate(var(--glass-saturation));
+    -webkit-backdrop-filter: blur(var(--glass-blur-heavy)) saturate(var(--glass-saturation));
+    border-right: 1px solid var(--glass-border-dark);
+  }
+}
+
+/* Fallback for non-supporting browsers */
+@supports not (backdrop-filter: blur(1px)) {
+  .sidebar.mobile.liquid-glass--sidebar {
+    background: rgba(13, 19, 56, 0.95);
+    border-right: 1px solid rgba(230, 188, 92, 0.2);
+  }
+}
+
+/* Keep the shadow enhancement from Sidebar.css */
+.sidebar.mobile.liquid-glass--sidebar {
+  box-shadow: 
+    4px 0 20px rgba(0, 0, 0, 0.3),
+    2px 0 10px rgba(0, 0, 0, 0.2),
+    0 0 30px rgba(28, 36, 92, 0.25);
+}
+
+/* ===== Prevent Double Glass on Content ===== */
+/* Use higher specificity to override Sidebar.css as intended */
+.sidebar.mobile.liquid-glass--sidebar .content-container {
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
+  border: none;
+}

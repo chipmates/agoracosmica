@@ -1,0 +1,868 @@
+/* FactCheckModal.css - Figure-level factcheck modal styles */
+/* Follows Liquid Glass design system */
+
+.factcheck-modal {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-critical); /* 10000 - Above sidebar */
+  background: var(--bg-primary);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Header */
+.factcheck-modal__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+  background: color-mix(in srgb, var(--bg-secondary) 80%, transparent);
+  backdrop-filter: blur(var(--glass-blur-heavy));
+  flex-shrink: 0;
+}
+
+.factcheck-modal__title-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  flex: 1;
+  text-align: center;
+}
+
+.factcheck-modal__title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--gold-subtle);
+  margin: 0;
+  letter-spacing: 0.05em;
+}
+
+.factcheck-modal__subtitle {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* Content area */
+.factcheck-modal__content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Loading state */
+.factcheck-modal__loading {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.factcheck-modal__spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+  border-top-color: var(--gold-subtle);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Error state */
+.factcheck-modal__error {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  color: var(--text-secondary);
+}
+
+/* Sections */
+.factcheck-section {
+  background: color-mix(in srgb, var(--bg-secondary) 50%, transparent);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 15%, transparent);
+}
+
+.factcheck-section--highlight {
+  background: color-mix(in srgb, var(--gold-subtle) 8%, var(--bg-secondary));
+  border-color: color-mix(in srgb, var(--gold-subtle) 25%, transparent);
+}
+
+.factcheck-section--note {
+  background: color-mix(in srgb, var(--gold-subtle) 8%, var(--bg-secondary));
+  border-color: color-mix(in srgb, var(--gold-subtle) 25%, transparent);
+}
+
+.factcheck-section__title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--gold-subtle);
+  margin: 0 0 0.75rem 0;
+}
+
+.factcheck-section__text {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+/* Collapsible toggle */
+.factcheck-section__toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0;
+  background: none;
+  border: none;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--gold-subtle);
+  cursor: pointer;
+  text-align: left;
+  min-height: 44px; /* WCAG touch target */
+}
+
+.factcheck-section__toggle:hover {
+  color: var(--gold-hover);
+}
+
+.factcheck-section__toggle:focus-visible {
+  outline: 2px solid var(--gold-subtle);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.factcheck-section__count {
+  font-weight: 400;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.factcheck-section__toggle svg:last-child {
+  margin-left: auto;
+}
+
+/* Lists */
+.factcheck-list {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.factcheck-list__item {
+  padding: 0.75rem 1rem;
+  background: color-mix(in srgb, var(--bg-primary) 50%, transparent);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.factcheck-list__item strong {
+  color: var(--text-primary);
+}
+
+.factcheck-list__note {
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.factcheck-list__stories {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.8rem;
+  color: var(--text-tertiary);
+}
+
+.factcheck-list__represents {
+  color: var(--text-secondary);
+}
+
+/* Quotes */
+.factcheck-quotes {
+  margin-top: 1rem;
+}
+
+.factcheck-quotes__list {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.factcheck-quotes__item {
+  padding: 1rem;
+  background: color-mix(in srgb, var(--bg-primary) 60%, transparent);
+  border-radius: 8px;
+  border-left: 3px solid var(--gold-subtle);
+}
+
+.factcheck-quotes__item blockquote {
+  margin: 0 0 0.5rem 0;
+  font-style: italic;
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+.factcheck-quotes__item cite {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-style: normal;
+}
+
+/* Sources */
+.factcheck-sources {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.factcheck-sources__group h3 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 0 0 0.5rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Source group color accents */
+.factcheck-sources__group--foreword h3 { color: var(--gold-subtle); }
+.factcheck-sources__group--primary h3 { color: var(--mode-freetalk); }
+.factcheck-sources__group--scholarly h3 { color: var(--mode-wisdom); }
+.factcheck-sources__group--archives h3 { color: var(--text-secondary); }
+.factcheck-sources__group--shadow h3 { color: var(--gold-deep); }
+
+.factcheck-sources__group ul {
+  list-style: none;
+  padding-left: 1.25rem;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.factcheck-sources__group li {
+  position: relative;
+  padding-left: 0.75rem;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.factcheck-sources__group li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.55rem;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--text-secondary);
+}
+
+.factcheck-sources__group--foreword li::before { background: var(--gold-subtle); }
+.factcheck-sources__group--primary li::before { background: var(--mode-freetalk); }
+.factcheck-sources__group--scholarly li::before { background: var(--mode-wisdom); }
+.factcheck-sources__group--archives li::before { background: var(--text-secondary); }
+.factcheck-sources__group--shadow li::before { background: var(--gold-deep); }
+
+/* Stories Section */
+.factcheck-stories {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.factcheck-story-card {
+  background: color-mix(in srgb, var(--bg-primary) 60%, transparent);
+  border-radius: 10px;
+  padding: 1rem;
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 12%, transparent);
+}
+
+/* Story card toggle */
+.factcheck-story-card__toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  min-height: 44px;
+  color: inherit;
+}
+
+.factcheck-story-card__toggle:hover .factcheck-story-card__title {
+  color: var(--gold-subtle);
+}
+
+.factcheck-story-card__toggle:focus-visible {
+  outline: 2px solid var(--gold-subtle);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.factcheck-story-card__toggle > svg {
+  flex-shrink: 0;
+  color: var(--text-secondary);
+  margin-left: auto;
+}
+
+.factcheck-story-card__toggle .factcheck-story-card__header {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.factcheck-story-card__header {
+  margin-bottom: 0.75rem;
+}
+
+.factcheck-story-card__number {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--gold-subtle);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
+}
+
+.factcheck-story-card__title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.factcheck-story-card__meta {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.factcheck-story-card__meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.factcheck-story-card__meta-item svg {
+  color: var(--gold-subtle);
+}
+
+.factcheck-story-card__setting {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  padding: 0.5rem 0.75rem;
+  background: color-mix(in srgb, var(--bg-secondary) 50%, transparent);
+  border-radius: 8px;
+}
+
+.factcheck-story-card__setting svg {
+  color: var(--gold-subtle);
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+}
+
+.factcheck-story-card__section {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.factcheck-story-card__section h4 {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* Section title icon colors - matching StoryFactCheckPanel */
+.factcheck-story-card__section--documented h4 svg {
+  color: var(--mode-freetalk);
+}
+
+.factcheck-story-card__section--recreated h4 svg {
+  color: var(--mode-wisdom);
+}
+
+.factcheck-story-card__section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.factcheck-story-card__section li {
+  position: relative;
+  padding-left: 1.1rem;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+/* Circular bullet dots - matching StoryFactCheckPanel */
+.factcheck-story-card__section li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.55rem;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+}
+
+.factcheck-story-card__section--documented li::before {
+  background: var(--mode-freetalk);
+}
+
+.factcheck-story-card__section--recreated li::before {
+  background: var(--mode-wisdom);
+}
+
+.factcheck-story-card__note {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: color-mix(in srgb, var(--gold-subtle) 10%, var(--bg-secondary));
+  border-radius: 8px;
+  border-left: 3px solid var(--gold-subtle);
+}
+
+.factcheck-story-card__note svg {
+  color: var(--gold-subtle);
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.factcheck-story-card__note p {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.factcheck-story-card__note--no-icon {
+  padding-left: 1rem;
+}
+
+/* Shadow Section — gold frame, purple content */
+.factcheck-section--shadow {
+  background: color-mix(in srgb, var(--gold-deep) 6%, var(--bg-secondary));
+  border-color: color-mix(in srgb, var(--gold-deep) 25%, transparent);
+}
+
+.factcheck-section--shadow .factcheck-section__toggle {
+  color: var(--gold-deep);
+}
+
+.factcheck-shadow {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.factcheck-shadow__intro {
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--gold-subtle);
+  font-style: italic;
+  margin: 0 0 0.5rem 0;
+}
+
+.factcheck-shadow__group h3 {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--mode-wisdom);
+}
+
+.factcheck-shadow__group ul {
+  list-style: none;
+  padding-left: 1.25rem;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.factcheck-shadow__group li {
+  position: relative;
+  padding-left: 0.75rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.factcheck-shadow__group li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.6rem;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--mode-wisdom);
+  opacity: 0.6;
+}
+
+/* Historical shadow uses a muted tone */
+.factcheck-shadow__group:nth-child(2) li::before {
+  background: var(--mode-wisdom);
+  opacity: 0.35;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Mobile revision (≤768px): typography floor at 15px for body copy, 13px
+   for meta, 18px for story titles. Spacing tightened so the card chrome
+   doesn't eat horizontal room on narrow viewports. Desktop untouched.
+   ───────────────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  /* ── Header ── */
+  .factcheck-modal__header {
+    padding: 0.75rem 1rem;
+  }
+
+  .factcheck-modal__title {
+    font-size: 1.25rem; /* 20px */
+  }
+
+  .factcheck-modal__subtitle {
+    font-size: 0.9375rem; /* 15px */
+  }
+
+  /* ── Outer content — tighter so inner cards keep more width ── */
+  .factcheck-modal__content {
+    padding: 0.75rem;
+    gap: 0.875rem;
+  }
+
+  .factcheck-section {
+    padding: 0.75rem 0.875rem;
+  }
+
+  .factcheck-section__title {
+    font-size: 1rem; /* 16px */
+  }
+
+  .factcheck-section__text {
+    font-size: 0.9375rem; /* 15px */
+    line-height: 1.6;
+  }
+
+  .factcheck-section__toggle {
+    font-size: 1rem;
+  }
+
+  .factcheck-section__count {
+    font-size: 0.8125rem; /* 13px */
+  }
+
+  .factcheck-list__item {
+    font-size: 0.9375rem; /* 15px */
+    line-height: 1.55;
+  }
+
+  /* ── Story cards — recover width by trimming padding + tightening the
+        meta row. Title bumped for clear hierarchy over the STORY N label. ── */
+  .factcheck-story-card {
+    padding: 0.625rem 0.75rem;
+  }
+
+  .factcheck-story-card__number {
+    font-size: 0.75rem; /* 12px — meta label, stays compact */
+  }
+
+  .factcheck-story-card__title {
+    font-size: 1.125rem; /* 18px — clear primary */
+    line-height: 1.3;
+  }
+
+  .factcheck-story-card__meta {
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+  }
+
+  .factcheck-story-card__meta-item {
+    font-size: 0.8125rem; /* 13px */
+  }
+
+  .factcheck-story-card__setting {
+    font-size: 0.9375rem; /* 15px */
+  }
+
+  .factcheck-story-card__section {
+    margin-top: 0.875rem;
+    gap: 0.625rem;
+  }
+
+  .factcheck-story-card__section h4 {
+    font-size: 0.9375rem; /* 15px — body-weight heading */
+  }
+
+  .factcheck-story-card__section li {
+    font-size: 0.9375rem; /* 15px */
+    line-height: 1.5;
+  }
+
+  .factcheck-story-card__note p {
+    font-size: 0.9375rem; /* 15px */
+    line-height: 1.5;
+  }
+
+  /* ── Quotes ── */
+  .factcheck-quotes__item blockquote {
+    font-size: 0.9375rem;
+    line-height: 1.55;
+  }
+
+  .factcheck-quotes__item cite {
+    font-size: 0.8125rem; /* 13px — meta */
+  }
+
+  /* ── Sources — less cramped list, larger type ── */
+  .factcheck-sources__group h3 {
+    font-size: 0.9375rem; /* 15px */
+  }
+
+  .factcheck-sources__group ul {
+    gap: 0.5rem;
+  }
+
+  .factcheck-sources__group li {
+    font-size: 0.9375rem; /* 15px */
+    line-height: 1.45;
+  }
+
+  /* ── Shadow section ── */
+  .factcheck-shadow__intro {
+    font-size: 0.9375rem; /* 15px */
+    line-height: 1.55;
+  }
+
+  .factcheck-shadow__group h3 {
+    font-size: 0.9375rem; /* 15px */
+  }
+
+  .factcheck-shadow__group li {
+    font-size: 0.9375rem; /* 15px */
+    line-height: 1.5;
+  }
+}
+
+/* Ultra-narrow phones: pull the card padding in one more step so bullets
+   aren't pushed off the readable column. */
+@media (max-width: 380px) {
+  .factcheck-modal__content {
+    padding: 0.5rem;
+  }
+
+  .factcheck-section,
+  .factcheck-story-card {
+    padding: 0.5rem 0.625rem;
+  }
+}
+
+/* ─── Dialogue fact-check sections — added 2026-04-23 ─────────────────
+   Dramatic License, Councils, Prisms sections. Pattern cards + kind pills
+   + risk-dot rating. Additive; reuses existing tokens only. */
+
+/* Mode group headers — small-caps divider between content-type groups */
+.factcheck-mode-header {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold-subtle);
+  margin: 1.5rem 0 0.625rem 0;
+  padding-bottom: 0.375rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--gold-subtle) 25%, transparent);
+}
+
+.factcheck-mode-header:first-of-type {
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .factcheck-mode-header {
+    font-size: 0.75rem;
+    margin: 1.25rem 0 0.5rem 0;
+  }
+
+  /* Pattern card titles — default h3 size was too large on mobile.
+     Listener-facing pattern labels should sit at 15px (body tier),
+     since pills above already carry the weight/color emphasis. */
+  .factcheck-story-card--pattern .factcheck-story-card__title {
+    font-size: 0.9375rem;
+    line-height: 1.35;
+    font-weight: 600;
+  }
+}
+
+.factcheck-section--dramatic-license {
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 40%, transparent);
+  background: color-mix(in srgb, var(--gold-subtle) 4%, var(--bg-secondary));
+}
+
+.factcheck-section__text--intro {
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+  margin-bottom: 0.875rem;
+}
+
+.factcheck-story-card--pattern .factcheck-story-card__header {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.375rem;
+}
+
+.factcheck-story-card--documented-list {
+  background: color-mix(in srgb, var(--mode-freetalk) 6%, var(--bg-secondary));
+  padding: 0.75rem 0.875rem;
+  border-radius: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.factcheck-story-card--documented-list h4 {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  margin: 0 0 0.5rem 0;
+  font-weight: 600;
+}
+
+.factcheck-story-card--documented-list ul {
+  list-style: disc;
+  padding-left: 1.25rem;
+  margin: 0;
+}
+
+.factcheck-story-card--documented-list li {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin-bottom: 0.25rem;
+  color: var(--text-primary);
+}
+
+.factcheck-pattern__pill {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  border-radius: 999px;
+  line-height: 1.4;
+}
+
+.factcheck-pattern__pill--composite-scene,
+.factcheck-pattern__pill--dramatized-quote,
+.factcheck-pattern__pill--invented-detail {
+  background: color-mix(in srgb, var(--mode-wisdom) 15%, transparent);
+  color: var(--mode-wisdom);
+}
+
+.factcheck-pattern__pill--compressed-timeline,
+.factcheck-pattern__pill--paraphrased-source {
+  background: color-mix(in srgb, var(--mode-freetalk) 15%, transparent);
+  color: var(--mode-freetalk);
+}
+
+.factcheck-pattern__pill--parable-attribution {
+  background: color-mix(in srgb, var(--gold-subtle) 18%, transparent);
+  color: var(--gold-subtle);
+}
+
+.factcheck-pattern__appearances {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.factcheck-pattern__appearance {
+  padding: 0.25rem 0;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--text-primary);
+  border-bottom: 1px solid color-mix(in srgb, var(--text-secondary) 10%, transparent);
+}
+
+.factcheck-pattern__appearance:last-child {
+  border-bottom: none;
+}
+
+.factcheck-pattern__appearance-title {
+  font-weight: 500;
+}
+
+.factcheck-pattern__appearance-meta {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 768px) {
+  .factcheck-pattern__pill {
+    font-size: 0.6875rem;
+    padding: 0.125rem 0.4375rem;
+  }
+
+  .factcheck-pattern__appearance {
+    font-size: 0.9375rem;
+  }
+
+  .factcheck-pattern__appearance-meta {
+    font-size: 0.8125rem;
+  }
+
+  .factcheck-story-card--documented-list li {
+    font-size: 0.9375rem;
+  }
+}

@@ -1,0 +1,590 @@
+/* src/components/LoginForm.css */
+
+/* ❌ REMOVED: Duplicate color definitions (use index.css design system) */
+
+/* =======================================
+   INVISIBLE TOUCH TARGETS (WCAG 2.2 AAA)
+   All interactive elements have 44px minimum
+   touch targets using ::before pseudo-elements
+   WITHOUT changing visual appearance
+   ======================================= */
+
+/* Form styling */
+form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+label {
+  color: var(--gold-primary);  /* Softer gold #E6BC5C - much better than bright hover */
+  margin-bottom: 0.15rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+}
+
+input {
+  background-color: rgba(255, 255, 255, 0.08);
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+  border-radius: 5px;
+  padding: 0.4rem; /* Original padding restored */
+  margin-bottom: 0.7rem;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.85rem;
+  position: relative;
+}
+
+/* Invisible touch target for inputs */
+input::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  min-height: 44px;
+  pointer-events: none;
+}
+
+input:focus {
+  border-color: var(--gold-subtle);
+  box-shadow: 0 0 5px color-mix(in srgb, var(--gold-subtle) 50%, transparent);
+}
+
+input:focus-visible {
+  outline: 2px solid var(--gold-subtle);
+  outline-offset: 2px;
+}
+
+/* Form actions container */
+.form-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 0.4rem;
+}
+
+/* Login submit button - Clean, specific styling */
+.login-submit-button {
+  background-color: color-mix(in srgb, var(--gold-subtle) 85%, transparent);
+  color: var(--bg-primary);
+  border: none;
+  padding: 0.4rem 1.3rem; /* Original padding restored */
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  letter-spacing: 0.05em;
+  backdrop-filter: blur(var(--glass-blur-subtle));
+  font-size: 0.85rem;
+  position: relative;
+}
+
+/* Invisible touch target for submit button */
+.login-submit-button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: calc(100% + 16px);
+  height: 44px;
+  cursor: pointer;
+}
+
+.login-submit-button:hover {
+  background-color: rgba(230, 188, 92, 0.9);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.login-submit-button:focus {
+  outline: 2px solid var(--gold-subtle);
+  outline-offset: 2px;
+}
+
+.login-submit-button:active {
+  transform: translateY(0);
+}
+
+/* Dropdown styling */
+.dropdown {
+  margin-top: 0.6rem;
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.dropdown-toggle {
+  background: none;
+  border: none;
+  color: var(--gold-subtle);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 2px; /* Original minimal padding restored */
+  line-height: 1;
+  position: relative;
+}
+
+/* Invisible touch target for dropdown toggle */
+.dropdown-toggle::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+}
+
+.dropdown-toggle:hover {
+  color: var(--gold-hover);  /* Bright gold on hover - correct usage */
+}
+
+.gear-icon {
+  display: inline-block;
+  transition: transform 0.3s ease;
+  color: inherit; /* Inherit color from parent */
+  fill: currentColor; /* Ensure SVG fill uses current color */
+  vertical-align: middle;
+  /* Remove font-size as size is controlled by component prop */
+}
+
+.dropdown-toggle:hover .gear-icon {
+  transform: rotate(90deg);
+}
+
+.dropdown-content {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(20, 25, 60, 0.6);
+  backdrop-filter: blur(var(--glass-blur-heavy));
+  min-width: 180px;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  z-index: var(--z-base); /* 20 */
+  margin-top: 0.5rem;
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 25%, transparent);
+  padding: 0.5rem 0;
+}
+
+.dropdown-content button {
+  width: 100%;
+  text-align: left;
+  padding: 0.6rem 1rem; /* Original padding restored */
+  background: none;
+  border: none;
+  color: var(--gold-primary);  /* Softer gold for better readability */
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  font-size: 0.9rem;
+  letter-spacing: 0.05em;
+  position: relative;
+}
+
+/* Invisible touch target for dropdown items */
+.dropdown-content button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  min-height: 44px;
+  cursor: pointer;
+}
+
+.dropdown-content button:hover {
+  background-color: color-mix(in srgb, var(--gold-subtle) 10%, transparent);
+  color: var(--gold-hover);  /* Bright gold on hover */
+  transform: translateY(-1px);
+}
+
+/* Mobile-specific styling for gear icon - enhanced specificity */
+@media (max-width: 768px) {
+  .dropdown .dropdown-toggle .gear-icon {
+    color: var(--gold-subtle); /* Mobile-specific color without forcing */
+    fill: var(--gold-subtle); /* SVG fill treatment */
+    -webkit-transform: translateZ(0); /* Force GPU acceleration on iOS */
+    transform: translateZ(0);
+  }
+
+  .dropdown .dropdown-toggle:hover .gear-icon {
+    color: var(--gold-hover); /* Mobile hover state */
+    fill: var(--gold-hover); /* SVG hover fill */
+  }
+}
+
+/* =======================================
+   ENTRY PAGE STYLES (Avatar + Name)
+   Used when LoginForm becomes entry form
+   ======================================= */
+
+/* Entry poem styling - MINIMAL SPACING */
+.entry-poem {
+  text-align: center;
+  margin-bottom: 0.15rem; /* Aggressive reduction from 0.3rem */
+  color: var(--gold-subtle);
+  font-style: italic;
+  font-size: 0.8rem;
+  line-height: 1.2; /* Tighter from 1.3 */
+}
+
+.poem-line-1,
+.poem-line-2 {
+  display: block;
+  opacity: 0;
+  animation: fadeIn 1s ease-in forwards;
+}
+
+.poem-line-2 {
+  animation-delay: 0.5s;
+  margin-top: -0.05rem; /* Pull lines closer together */
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .poem-line-1,
+  .poem-line-2 {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+/* Avatar upload section - MINIMAL SPACING */
+.avatar-section {
+  display: flex;
+  justify-content: center;
+  margin: 0.25rem 0; /* Aggressive reduction from 0.4rem */
+}
+
+.avatar-upload {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.avatar-input {
+  display: none;
+}
+
+.avatar-upload-label {
+  cursor: pointer;
+  position: relative;
+  display: block;
+}
+
+.avatar-preview {
+  width: 80px; /* Reduced from 120px to match original compact design */
+  height: 80px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid var(--gold-subtle);
+  transition: all 0.3s ease;
+  position: relative;
+  pointer-events: none; /* Allow clicks to pass through to label */
+}
+
+.avatar-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: opacity 0.3s ease;
+  pointer-events: none; /* Allow clicks to pass through to label */
+}
+
+/* Hover overlay with camera icon */
+.avatar-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.camera-icon {
+  color: var(--gold-primary);
+  width: 24px;
+  height: 24px;
+}
+
+/* Hover state */
+.avatar-upload-label:hover .avatar-preview {
+  border-color: var(--gold-hover);
+  transform: scale(1.05);
+}
+
+.avatar-upload-label:hover .avatar-overlay {
+  opacity: 1;
+}
+
+.avatar-upload-label:hover .avatar-preview img {
+  opacity: 0.7;
+}
+
+/* Focus state for accessibility */
+.avatar-upload-label:focus-within .avatar-preview {
+  outline: 2px solid var(--gold-primary);
+  outline-offset: 2px;
+}
+
+/* Name input section - MINIMAL SPACING */
+.name-section {
+  margin: 0.3rem 0; /* Aggressive reduction from 0.5rem */
+}
+
+.name-input {
+  width: 100%;
+  padding: 0.3rem; /* Aggressive reduction from 0.35rem */
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+  border-radius: 5px;
+  color: white;
+  text-align: center;
+  font-size: 0.85rem;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.name-input:focus {
+  outline: none;
+  border-color: var(--gold-subtle);
+  box-shadow: 0 0 5px color-mix(in srgb, var(--gold-subtle) 50%, transparent); /* Match original */
+}
+
+.name-input:focus-visible {
+  outline: 2px solid var(--gold-subtle);
+  outline-offset: 2px;
+}
+
+.name-input::placeholder {
+  color: rgba(230, 188, 92, 0.5);
+}
+
+/* Enter button - Glowing lantern design with invisible touch target */
+.enter-button {
+  width: auto;
+  padding: 0.3rem 1.1rem; /* Aggressive reduction from 0.35rem 1.2rem */
+
+  /* Pure ethereal - no background, only border + glow */
+  background-color: transparent;
+  border: 1.5px solid var(--gold-subtle);
+
+  color: var(--text-primary);
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  letter-spacing: 0.05em;
+
+  /* Enhanced glass blur + inner lantern glow */
+  backdrop-filter: blur(var(--glass-blur));
+  box-shadow:
+    inset 0 0 20px color-mix(in srgb, var(--gold-primary) 40%, transparent),  /* Inner glow */
+    0 4px 12px color-mix(in srgb, var(--gold-subtle) 30%, transparent);       /* Outer halo */
+
+  position: relative;
+  display: inline-block;
+  margin: 0 auto;
+}
+
+/* Invisible touch target for enter button - WCAG 44px compliance */
+.enter-button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: calc(100% + 20px); /* Extra space on sides */
+  height: 44px; /* WCAG minimum */
+  cursor: pointer;
+}
+
+.enter-button:hover:not(:disabled) {
+  /* Brighten lantern on hover */
+  background-color: color-mix(in srgb, var(--gold-subtle) 35%, transparent);
+  border-color: var(--gold-hover);
+  transform: translateY(-2px);
+
+  /* Intensify lantern glow */
+  box-shadow:
+    inset 0 0 30px color-mix(in srgb, var(--gold-primary) 60%, transparent),  /* Brighter inner glow */
+    0 6px 20px color-mix(in srgb, var(--gold-hover) 50%, transparent);        /* Stronger halo */
+}
+
+.enter-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.enter-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.enter-button:focus {
+  outline: 2px solid var(--gold-subtle);
+  outline-offset: 2px;
+}
+
+/* Center button in form-actions - MINIMAL SPACING */
+.form-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 0.2rem; /* Aggressive reduction from 0.3rem */
+}
+
+/* =======================================
+   RESPONSIVE SCALING FOR LARGE DISPLAYS
+   Scale up for Full HD and 4K to better fill the circle
+   ======================================= */
+
+/* Large Laptop/Desktop (1366px) - MacBook Pro 14"/16" and similar */
+/* Only scale up when there's enough vertical space too */
+@media (min-width: 1366px) and (min-height: 800px) {
+  .entry-poem {
+    font-size: 0.9rem; /* Up from 0.8rem */
+    margin-bottom: 0.4rem;
+    line-height: 1.35;
+  }
+
+  .avatar-section {
+    margin: 0.5rem 0; /* Up from 0.25rem */
+  }
+
+  .avatar-preview {
+    width: 100px; /* Up from 80px - bigger for premium laptops */
+    height: 100px;
+  }
+
+  .camera-icon {
+    width: 26px;
+    height: 26px;
+  }
+
+  .name-section {
+    margin: 0.5rem 0; /* Up from 0.3rem */
+  }
+
+  .name-input {
+    padding: 0.4rem; /* Up from 0.3rem */
+    font-size: 0.9rem; /* Up from 0.85rem */
+  }
+
+  .enter-button {
+    padding: 0.4rem 1.25rem; /* Up from 0.3rem 1.1rem */
+    font-size: 0.85rem; /* Up from 0.8rem */
+  }
+
+  .form-actions {
+    margin-top: 0.35rem; /* Up from 0.2rem */
+  }
+}
+
+/* Full HD (1920px) - Scale up significantly for square proportions */
+@media (min-width: 1920px) {
+  .entry-poem {
+    font-size: 1rem; /* Up from 0.8rem - more prominent */
+    margin-bottom: 0.5rem; /* More space */
+    line-height: 1.4;
+  }
+
+  .avatar-section {
+    margin: 0.7rem 0; /* Up from 0.25rem - more breathing room */
+  }
+
+  .avatar-preview {
+    width: 120px; /* Up from 80px - much larger for square form */
+    height: 120px;
+  }
+
+  .camera-icon {
+    width: 28px; /* Scale camera icon */
+    height: 28px;
+  }
+
+  .name-section {
+    margin: 0.7rem 0; /* Up from 0.3rem */
+  }
+
+  .name-input {
+    padding: 0.5rem; /* Up from 0.3rem */
+    font-size: 1rem; /* Up from 0.85rem */
+  }
+
+  .enter-button {
+    padding: 0.5rem 1.5rem; /* Up from 0.3rem 1.1rem */
+    font-size: 0.95rem; /* Up from 0.8rem */
+  }
+
+  .form-actions {
+    margin-top: 0.5rem; /* Up from 0.2rem */
+  }
+}
+
+/* 4K (2560px+) - Scale up dramatically for square proportions */
+@media (min-width: 2560px) {
+  .entry-poem {
+    font-size: 1.15rem; /* Up from 0.8rem - very prominent */
+    margin-bottom: 0.7rem;
+    line-height: 1.5;
+  }
+
+  .avatar-section {
+    margin: 0.9rem 0; /* Up from 0.25rem - generous spacing */
+  }
+
+  .avatar-preview {
+    width: 150px; /* Up from 80px - very large for 4K */
+    height: 150px;
+  }
+
+  .camera-icon {
+    width: 32px; /* Larger camera icon */
+    height: 32px;
+  }
+
+  .name-section {
+    margin: 0.9rem 0; /* Up from 0.3rem */
+  }
+
+  .name-input {
+    padding: 0.6rem; /* Up from 0.3rem */
+    font-size: 1.1rem; /* Up from 0.85rem */
+  }
+
+  .enter-button {
+    padding: 0.55rem 1.6rem; /* Up from 0.3rem 1.1rem */
+    font-size: 1rem; /* Up from 0.8rem */
+  }
+
+  .form-actions {
+    margin-top: 0.6rem; /* Up from 0.2rem */
+  }
+}

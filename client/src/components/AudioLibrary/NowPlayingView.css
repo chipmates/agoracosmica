@@ -1,0 +1,921 @@
+/* src/components/AudioLibrary/NowPlayingView.css */
+/* Using BEM-style naming to avoid conflicts */
+
+/* Import liquid glass effects */
+@import '../../styles/liquid-glass.css';
+
+/* Root container for the now playing view */
+.now-playing-view {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh; /* Fallback for older browsers */
+  height: 100dvh; /* Dynamic viewport height - Safari-compatible */
+  display: flex;
+  z-index: var(--z-sidebar); /* 1100 */
+  color: var(--cosmic-text-primary);
+  overflow: hidden;
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer; /* Indicates the clickable nature for showing/hiding controls */
+}
+
+/* Loading indicator styles */
+.now-playing-view__loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--bg-primary) 95%, transparent); /* Increased opacity */
+  /* backdrop-filter: blur(8px); */ /* Removed to prevent Safari artifacts */
+  /* -webkit-backdrop-filter: blur(8px); */
+  z-index: 30; /* Component internal */
+  color: var(--cosmic-text-primary);
+}
+
+.now-playing-view__loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid color-mix(in srgb, white 30%, transparent);
+  border-top-color: var(--gold-subtle);
+  border-radius: 50%;
+  animation: spinner 1s infinite linear;
+  margin-bottom: 16px;
+}
+
+.now-playing-view__loading-text {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 16px;
+  letter-spacing: 0.02em;
+  color: color-mix(in srgb, white 90%, transparent);
+  text-shadow: 0 2px 4px color-mix(in srgb, var(--utility-pure-black) 50%, transparent);
+}
+
+@keyframes spinner {
+  to { transform: rotate(360deg); }
+}
+
+/* Cosmic background that matches AudioLibraryModal */
+.now-playing-view__cosmic-background {
+  position: absolute;
+  inset: 0;
+  background: var(--bg-primary); /* Matches the AudioLibrary background */
+  z-index: -2;
+  overflow: hidden;
+}
+
+/* Star effect removed - was too distracting on main page */
+.now-playing-view__stars {
+  display: none;
+}
+
+/* ================== CLOSE BUTTON POSITIONING ================== */
+
+/* 2025 CloseButton Container - Responsive positioning */
+.now-playing-view__close-container {
+  position: absolute;
+  top: env(safe-area-inset-top, 20px); /* Moved down significantly for better balance */
+  right: 12px;                         /* Tighter margin */
+  z-index: 50; /* Component internal - close button must be on top */
+  /* No transition - instant show/hide for clean on/off */
+}
+
+/* 2025 CloseButton Positioning - Aligned with header */
+.now-playing-close {
+  position: relative;  /* Let container handle absolute positioning */
+  z-index: 10; /* Component internal */
+}
+
+/* ================== TABLET ADJUSTMENTS ================== */
+
+@media (max-width: 1024px) and (min-width: 601px) {
+  .now-playing-view__close-container {
+    top: env(safe-area-inset-top, 18px); /* Moved down significantly for tablet */
+    right: 10px;
+  }
+}
+
+/* ================== MOBILE ADJUSTMENTS ================== */
+
+@media (max-width: 600px) {
+  .now-playing-view__close-container {
+    top: env(safe-area-inset-top, 16px); /* Moved down significantly for mobile */
+    right: 8px;
+  }
+}
+
+/* Full-screen figure container - Safari-compatible like FigureCarousel */
+.now-playing-view__figure-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: flex-start; /* Changed to match FigureCarousel for Safari */
+  justify-content: center;
+  overflow: hidden;
+  background-color: var(--bg-primary);
+}
+
+/* Figure image styling - Safari-compatible like FigureCarousel */
+.now-playing-view__figure-image {
+  /* Match FigureCarousel approach - no absolute positioning */
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  -webkit-object-fit: contain; /* Safari vendor prefix */
+  object-position: top; /* Top alignment like FigureCarousel */
+  -webkit-object-position: top; /* Safari vendor prefix */
+  filter: drop-shadow(0 8px 30px color-mix(in srgb, var(--utility-pure-black) 70%, transparent));
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), filter 0.5s ease;
+  /* animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1); */ /* Removed to prevent opacity flash */
+  transform-origin: center center;
+}
+
+/* 2025 ARCHITECTURE: Control OptimizedImage display - high specificity */
+.now-playing-view .now-playing-view__figure-container .optimized-image__img,
+.now-playing-view .now-playing-view__figure-container img {
+  width: 100%;
+  height: 100%;
+  /* Show complete figure without stretching */
+  object-fit: contain;
+  -webkit-object-fit: contain;
+  object-position: center;
+  -webkit-object-position: center;
+}
+
+/* Glow effect around the image */
+.now-playing-view__image-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at center 40%, /* Match the object-position */
+    color-mix(in srgb, var(--gold-subtle) 15%, transparent) 0%,
+    color-mix(in srgb, var(--gold-subtle) 8%, transparent) 30%,
+    transparent 70%
+  );
+  opacity: 0;
+  z-index: 0; /* Component internal */
+  transition: opacity 1s ease;
+  pointer-events: none;
+}
+
+/* Title container within controls overlay */
+.now-playing-view__title-container {
+  text-align: center;
+  margin-bottom: 10px; /* Reduced margin */
+  opacity: 1;
+  /* No transition - instant show/hide */
+}
+
+/* Controls overlay at bottom - Apple-style Liquid Glass */
+.now-playing-view__controls-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 16px 24px calc(env(safe-area-inset-bottom, 14px) + 24px);
+  
+  /* Apply Apple-style liquid glass effect */
+  border-top: 1px solid transparent; /* Will be overridden by liquid glass */
+  border-radius: 16px 16px 0 0; /* Rounded top corners only */
+  z-index: 20; /* Component internal */
+  
+  /* Simple on/off - no opacity or transform */
+  display: none;
+  cursor: default;
+}
+
+/* === LIQUID GLASS INTEGRATION === */
+/* Ensure liquid glass works seamlessly with existing controls */
+
+/* Override liquid glass border-radius for controls overlay */
+.now-playing-view__controls-overlay.liquid-glass--audio {
+  border-radius: 16px 16px 0 0; /* Keep only top corners rounded */
+  border-bottom: none; /* Remove bottom border since overlay extends to bottom */
+}
+
+/* === 2025 BATTERY OPTIMIZATION === */
+/* Controls are now hidden with display:none, so no GPU usage at all when hidden */
+
+
+/* Glass effects are automatically handled by display:none/block - no special rules needed */
+
+/* === 2025 LOCK SCREEN ULTIMATE BATTERY OPTIMIZATION === */
+/* When page is hidden (screen locked/app backgrounded), disable ALL visual processing */
+.now-playing-view[data-visibility="hidden"] {
+  /* Stop all animations and transitions for maximum battery savings */
+  animation-play-state: paused !important;
+  transition: none !important;
+}
+
+.now-playing-view[data-visibility="hidden"] * {
+  /* Disable all child animations and transitions */
+  animation-play-state: paused !important;
+  transition: none !important;
+  /* Remove all will-change hints to free GPU resources */
+  will-change: auto !important;
+}
+
+/* Controls are hidden with display:none when screen is locked, so no special rules needed */
+
+/* Stars have been removed - no longer needed */
+
+/* Disable glow effects when screen locked */
+.now-playing-view[data-visibility="hidden"] .now-playing-view__image-glow {
+  animation: none !important;
+  background: none !important;
+  opacity: 0 !important;
+}
+
+/* Stop all button animations and effects when screen locked */
+.now-playing-view[data-visibility="hidden"] .now-playing-view__play-button,
+.now-playing-view[data-visibility="hidden"] .now-playing-view__control-button,
+.now-playing-view[data-visibility="hidden"] .now-playing-view__skip-button,
+.now-playing-view[data-visibility="hidden"] .now-playing-view__track-button {
+  animation: none !important;
+  box-shadow: none !important;
+  transform: none !important;
+  will-change: auto !important;
+}
+
+/* Performance optimization: Minimal repaints when screen locked */
+.now-playing-view[data-visibility="hidden"] {
+  /* Contain layout changes for better performance */
+  contain: layout style paint;
+  /* Reduce browser workload to absolute minimum */
+  pointer-events: none;
+}
+
+/* Restore interactivity when page becomes visible */
+.now-playing-view[data-visibility="visible"] {
+  pointer-events: auto;
+  contain: none;
+}
+
+/* Safari fallback integration handled by liquid-glass.css system */
+
+.now-playing-view__controls-overlay--visible {
+  /* Simple on - just show it */
+  display: block;
+}
+
+/* Figure name styling - Matched gold gradient with AudioLibraryModal */
+.now-playing-view__figure-name {
+  font-family: 'Space Grotesk', sans-serif;
+  /* For screens ≤ 400px: Use 16px */
+  font-size: 16px;
+  background-image: var(--text-gradient-gold-subtle, linear-gradient(to right, var(--gold-deep), var(--gold-hover)));
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  margin: 0 0 8px;
+  font-weight: 500;
+  text-shadow: 0 0 15px color-mix(in srgb, var(--gold-subtle) 15%, transparent);
+  letter-spacing: 0.02em;
+  /* No transition - instant show/hide */
+}
+
+/* Title styling */
+.now-playing-view__title {
+  font-family: 'Space Grotesk', sans-serif;
+  /* For screens ≤ 400px: Also use 16px to match figure name */
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+  text-shadow: 0 2px 8px color-mix(in srgb, var(--utility-pure-black) 50%, transparent);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  /* No transition - instant show/hide */
+}
+
+.now-playing-view__seed-number {
+  color: color-mix(in srgb, white 90%, transparent);
+  font-weight: 500;
+}
+
+.now-playing-view__seed-title {
+  color: var(--cosmic-text-primary);
+  text-shadow: 0 0 10px color-mix(in srgb, white 20%, transparent);
+}
+
+/* Progress bar */
+.now-playing-view__progress {
+  width: 100%;
+  margin-bottom: 12px; /* Reduced margin */
+  position: relative;
+}
+
+.now-playing-view__progress-slider {
+  width: 100%;
+  height: 6px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: color-mix(in srgb, white 15%, transparent);
+  border-radius: 6px;
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.now-playing-view__progress-slider:focus-visible {
+  outline: 2px solid var(--gold-subtle);
+  outline-offset: 2px;
+}
+
+/* Custom track styling for progress bar */
+.now-playing-view__progress-slider::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 6px;
+}
+
+.now-playing-view__progress-slider::-moz-range-track {
+  height: 6px;
+  border-radius: 6px;
+  background: color-mix(in srgb, white 15%, transparent);
+}
+
+/* Custom thumb styling for progress bar */
+.now-playing-view__progress-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--gold-subtle);
+  cursor: pointer;
+  box-shadow: 0 0 10px color-mix(in srgb, var(--gold-subtle) 50%, transparent);
+  transition: all 0.2s ease;
+  border: 2px solid color-mix(in srgb, white 90%, transparent);
+  margin-top: -5px; /* Centers thumb on track */
+  position: relative;
+  z-index: 10; /* Component internal */
+}
+
+.now-playing-view__progress-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--gold-subtle);
+  cursor: pointer;
+  box-shadow: 0 0 10px color-mix(in srgb, var(--gold-subtle) 50%, transparent);
+  border: 2px solid color-mix(in srgb, white 90%, transparent);
+  transition: all 0.2s ease;
+  position: relative;
+  z-index: 10; /* Component internal */
+}
+
+/* Hover and focus states for thumb */
+.now-playing-view__progress-slider:hover::-webkit-slider-thumb,
+.now-playing-view__progress-slider:focus::-webkit-slider-thumb {
+  transform: scale(1.2);
+  box-shadow: 0 0 15px color-mix(in srgb, var(--gold-subtle) 80%, transparent);
+}
+
+.now-playing-view__progress-slider:hover::-moz-range-thumb,
+.now-playing-view__progress-slider:focus::-moz-range-thumb {
+  transform: scale(1.2);
+  box-shadow: 0 0 15px color-mix(in srgb, var(--gold-subtle) 80%, transparent);
+}
+
+/* Progress fill effect */
+.now-playing-view__progress-slider::before {
+  content: '';
+  position: absolute;
+  height: 6px;
+  width: var(--progress-percent, 0%);
+  background: linear-gradient(to right, var(--gold-subtle), var(--gold-primary));
+  border-radius: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  left: 0;
+  z-index: 1; /* Component internal */
+  pointer-events: none;
+}
+
+/* Time display */
+.now-playing-view__time-display {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px; /* Reduced font size */
+  color: color-mix(in srgb, white 80%, transparent);
+  margin-top: 6px; /* Reduced margin */
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+/* Playback controls */
+.now-playing-view__playback-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(12px, 3vw, 20px); /* Reduced gap */
+  width: 100%;
+  position: relative;
+  margin-top: 4px; /* Tight to progress bar */
+  /* Symmetric padding reserves space on both sides for the absolute-positioned
+     speed control (right) and keeps the 5-button transport group — and the play
+     button at its center — aligned to the true row center. */
+  padding: 0 80px;
+  box-sizing: border-box;
+}
+
+@media (max-width: 480px) {
+  .now-playing-view__playback-controls {
+    padding: 0 60px;
+  }
+}
+
+/* Base control button styling - Liquid Glass design */
+.now-playing-view__control-button {
+  /* Liquid Glass base */
+  background: color-mix(in srgb, white 8%, transparent);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid color-mix(in srgb, white 12%, transparent);
+  color: color-mix(in srgb, white 90%, transparent);
+  cursor: pointer;
+  padding: 8px; /* Reduced padding */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 50%;
+  position: relative;
+  overflow: hidden;
+  /* Safari optimization */
+  transform: translateZ(0);
+  will-change: transform, background-color;
+}
+
+.now-playing-view__control-button:hover {
+  background: color-mix(in srgb, white 12%, transparent);
+  transform: translateY(-2px);
+  color: var(--gold-primary);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--utility-pure-black) 20%, transparent);
+}
+
+.now-playing-view__control-button:active {
+  transform: translateY(1px);
+  background: color-mix(in srgb, white 5%, transparent);
+}
+
+/* Track prev/next buttons — secondary, subtle */
+.now-playing-view__track-button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: color-mix(in srgb, white 50%, transparent);
+  cursor: pointer;
+  padding: 0;
+  width: 28px;
+  height: 28px;
+  transition: color 0.2s ease, transform 0.15s ease;
+}
+
+/* 44px touch target */
+.now-playing-view__track-button::after {
+  content: '';
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.now-playing-view__track-button:hover {
+  color: color-mix(in srgb, white 90%, transparent);
+  transform: scale(1.1);
+}
+
+.now-playing-view__track-button:active {
+  transform: scale(0.9);
+}
+
+/* Skip ±15s buttons */
+.now-playing-view__skip-button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: color-mix(in srgb, white 90%, transparent);
+  cursor: pointer;
+  padding: 8px;
+  width: 36px;
+  height: 36px;
+  transition: color 0.2s ease, transform 0.15s ease;
+}
+
+/* 44px touch target */
+.now-playing-view__skip-button::after {
+  content: '';
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.now-playing-view__skip-button:hover {
+  color: var(--gold-primary);
+  transform: scale(1.1);
+}
+
+.now-playing-view__skip-button:active {
+  transform: scale(0.95);
+}
+
+.now-playing-view__skip-label {
+  position: absolute;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.55rem;
+  font-weight: 700;
+  bottom: 4px;
+  right: 4px;
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+/* Main play/pause button — translucent gold liquid-glass circle. Enforced
+   1:1 aspect ratio so the flex row can't squish it into an egg. */
+.now-playing-view__play-button {
+  background: color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+  backdrop-filter: blur(var(--glass-blur-max)) saturate(130%);
+  -webkit-backdrop-filter: blur(var(--glass-blur-max)) saturate(130%);
+  width: 46px;
+  height: 46px;
+  aspect-ratio: 1 / 1;
+  flex: 0 0 46px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 40%, transparent);
+  box-shadow:
+    inset 0 0 0 0.5px color-mix(in srgb, var(--gold-subtle) 30%, transparent),
+    0 8px 20px color-mix(in srgb, var(--utility-pure-black) 30%, transparent),
+    0 0 15px color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+  color: var(--cosmic-text-primary);
+  z-index: 2;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateZ(0);
+  will-change: transform, box-shadow;
+}
+
+/* Fallback for browsers without backdrop-filter */
+@supports not (backdrop-filter: blur(2px)) {
+  .now-playing-view__control-button {
+    background: color-mix(in srgb, white 15%, transparent);
+    border-color: color-mix(in srgb, white 20%, transparent);
+  }
+
+  .now-playing-view__play-button {
+    background: color-mix(in srgb, var(--gold-subtle) 35%, transparent);
+  }
+}
+
+.now-playing-view__play-button:hover {
+  background: color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+  box-shadow: 0 12px 24px color-mix(in srgb, var(--utility-pure-black) 40%, transparent), 0 0 20px color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+  transform: translateY(-3px) scale(1.05);
+  color: var(--cosmic-text-primary);
+}
+
+.now-playing-view__play-button:active {
+  transform: translateY(1px) scale(0.98);
+  box-shadow: 0 6px 12px color-mix(in srgb, var(--utility-pure-black) 30%, transparent), 0 0 10px color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+}
+
+/* Enhanced play button states */
+.now-playing-view__play-button[data-state="playing"],
+.now-playing-view__play-button[data-state="paused"] {
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.now-playing-view__play-button[data-state="pausing"] {
+  transform: scale(0.95);
+  opacity: 0.9;
+}
+
+.now-playing-view__play-button[data-state="playing"] {
+  transform: scale(1.02);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--utility-pure-black) 40%, transparent), 0 0 20px color-mix(in srgb, var(--gold-subtle) 40%, transparent);
+}
+
+/* Speed Control - Matches StoryAudioPlayer */
+/* Round speed stepper: circular readout (1.00×) with chevrons peeking above
+   and below. Replaces the old horizontal pill. No overlap with the transport
+   row — self-contained 44px footprint with chevrons overflowing visually. */
+.now-playing-view__speed-control {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  display: block;
+}
+
+.now-playing-view__speed-label {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  color: color-mix(in srgb, white 90%, transparent);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+/* Chevron buttons: full-width tap zones floating above/below the round
+   readout. 20px visible area, full 44px width for touch compliance. */
+.now-playing-view__speed-arrow-small {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 44px;
+  height: 20px;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: color-mix(in srgb, white 65%, transparent);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: color 0.2s ease, transform 0.15s ease;
+}
+
+.now-playing-view__speed-arrow-small.now-playing-view__increase {
+  top: -6px; /* chevron sits close above the 1.00× readout */
+}
+
+.now-playing-view__speed-arrow-small.now-playing-view__decrease {
+  bottom: -6px; /* chevron sits close below the 1.00× readout */
+}
+
+.now-playing-view__speed-arrow-small:hover {
+  color: var(--gold-primary);
+}
+
+.now-playing-view__speed-arrow-small.now-playing-view__increase:active {
+  transform: translateX(-50%) translateY(-1px);
+}
+
+.now-playing-view__speed-arrow-small.now-playing-view__decrease:active {
+  transform: translateX(-50%) translateY(1px);
+}
+
+.now-playing-view__speed-arrow-small:active {
+  transform: scale(0.95);
+}
+
+/* Repeat button removed - not needed for audio stories */
+
+/* Removed pulsing animation - clean static design preferred */
+
+/* Image glow reduced to prevent flashing */
+.now-playing-view--playing .now-playing-view__image-glow {
+  opacity: 0.3; /* Reduced from 0.5 */
+  transition: opacity 1.5s ease; /* Slower transition */
+}
+
+/* Hide close button when playing and inactive - using display for clean on/off */
+.now-playing-view[data-state="playing"][data-controls="hidden"] .now-playing-view__close-container {
+  display: none;
+}
+
+/* Removed hover-based control showing to prevent intermediate states
+   Controls are now managed entirely by JavaScript for consistent behavior */
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Animations removed for cleaner, static design */
+
+/* Commented out to prevent flashing
+@keyframes twinkle {
+  0% { opacity: 0.2; }
+  100% { opacity: 0.4; }
+}
+*/
+
+/* Media queries for responsive design */
+/* For screens > 400px: Use consistent 20px text size for both elements */
+@media (min-width: 401px) {
+  /* Increase both to exactly 20px for screens > 400px */
+  .now-playing-view__figure-name {
+    font-size: 20px;
+  }
+  
+  .now-playing-view__title {
+    font-size: 20px;
+  }
+}
+
+/* Tablet styles */
+@media (min-width: 768px) {
+  .now-playing-view__controls-overlay {
+    padding: 16px 40px calc(env(safe-area-inset-bottom, 20px) + 24px);
+  }
+  
+  .now-playing-view__play-button {
+    width: 54px;
+    height: 54px;
+    flex-basis: 54px;
+  }
+  
+  /* Safari-compatible approach for tablet */
+  .now-playing-view__figure-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    -webkit-object-fit: contain;
+    object-position: top;
+    -webkit-object-position: top;
+  }
+  
+  /* Tablet: slightly larger readout text inside the round speed button. */
+  .now-playing-view__speed-label {
+    font-size: 0.7rem;
+  }
+}
+
+/* Desktop styles - Maximize height to show full figure */
+@media (min-width: 1024px) {
+  /* Direct implementation of FigureCarousel approach */
+  .now-playing-view__figure-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    background-color: var(--bg-primary);
+  }
+  
+  /* Safari-compatible approach for desktop */
+  .now-playing-view__figure-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    -webkit-object-fit: contain;
+    object-position: top;
+    -webkit-object-position: top;
+  }
+  
+  /* Controls overlay - transparent overlay that doesn't affect image sizing */
+  .now-playing-view__controls-overlay {
+    padding: 14px 30px calc(env(safe-area-inset-bottom, 20px) + 24px);
+  }
+  
+  /* Desktop-specific button sizes */
+  .now-playing-view__play-button {
+    width: 60px;
+    height: 60px;
+    flex-basis: 60px;
+  }
+  
+  /* Adjust icon sizes for desktop */
+  .now-playing-view__control-button svg {
+    transform: scale(1); /* Reduced from 1.2 */
+  }
+  
+  .now-playing-view__progress-slider {
+    height: 4px; /* Reduced from 8px */
+  }
+  
+  .now-playing-view__progress-slider::before {
+    height: 4px; /* Reduced from 8px */
+  }
+  
+  /* Desktop: slightly larger readout text inside the round speed button. */
+  .now-playing-view__speed-label {
+    font-size: 0.75rem;
+  }
+}
+
+/* Mobile optimization: Use cover to fill height by cropping sides */
+@media (max-width: 767px) {
+  .now-playing-view__figure-container {
+    /* Keep centered positioning for balanced look */
+    justify-content: center;
+    align-items: center;
+    /* Safe space at top for close button visibility */
+    padding-top: 60px;
+  }
+
+  /* Fill container height by cropping sides (10-15%) - high specificity */
+  .now-playing-view .now-playing-view__figure-container .optimized-image__img,
+  .now-playing-view .now-playing-view__figure-container img {
+    width: 100%;
+    height: 100%;
+    /* Cover fills height completely, crops sides proportionally */
+    object-fit: cover;
+    -webkit-object-fit: cover;
+    object-position: center;
+    -webkit-object-position: center;
+  }
+
+  /* Controls naturally overlay bottom of image - liquid glass shines here */
+  .now-playing-view__controls-overlay {
+    /* Already positioned absolute bottom:0 - perfect for overlay */
+    /* Liquid glass will blur the larger image behind it */
+  }
+}
+
+/* For smaller screens in landscape orientation */
+@media (orientation: landscape) and (max-height: 600px) {
+  /* Remove title-overlay styles since it's no longer used */
+  
+  .now-playing-view__figure-name {
+    font-size: 16px;
+    margin-bottom: 4px;
+  }
+  
+  .now-playing-view__title {
+    font-size: 16px;
+  }
+  
+  /* Improved spacing in title container for landscape */
+  .now-playing-view__title-container {
+    margin-bottom: 10px;
+  }
+  
+  .now-playing-view__play-button {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .now-playing-view__controls-overlay {
+    padding: 12px 16px calc(env(safe-area-inset-bottom, 12px) + 20px);
+  }
+  
+  .now-playing-view__progress {
+    margin-bottom: 12px;
+  }
+  
+  .now-playing-view__playback-controls {
+    margin-top: 4px;
+    gap: 12px;
+  }
+  
+  /* Landscape-specific speed control adjustments */
+  .now-playing-view__speed-control-inline {
+    height: 44px;
+    padding: 0 0.4rem 0 0.7rem;
+  }
+  
+  .now-playing-view__speed-label {
+    font-size: 0.85rem;
+    min-width: 3rem;
+  }
+  
+  .now-playing-view__speed-arrow-small {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .now-playing-view__speed-arrow-small svg {
+    width: 10px;
+    height: 10px;
+  }
+}
+
+/* For ultra-wide screens - center image with max width constraint */
+@media (min-width: 1600px) {
+  .now-playing-view__figure-container {
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+}

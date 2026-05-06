@@ -1,0 +1,557 @@
+/* src/components/AudioLibrary/MiniPlayer.css */
+@import '../../styles/liquid-glass.css';
+
+/* Loading indicator for MiniPlayer - glass simulation */
+.mini-player__loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Glass simulation for loading state */
+  background: 
+    /* Subtle highlight layer */
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--gold-primary) 6%, transparent) 0%,
+      color-mix(in srgb, var(--gold-primary) 2%, transparent) 20%,
+      transparent 40%
+    ),
+    /* Main cosmic blue glass layer */
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--bg-primary) 92%, transparent) 0%,
+      color-mix(in srgb, var(--bg-cosmic-void) 96%, transparent) 50%,
+      color-mix(in srgb, var(--bg-cosmic-void) 98%, transparent) 100%
+    );
+  border-radius: 0; /* Sharp edges for mini player */
+  z-index: var(--z-base); /* 5 */
+}
+
+.mini-player__loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid color-mix(in srgb, white 30%, transparent);
+  border-top-color: var(--gold-subtle);
+  border-radius: 50%;
+  animation: mini-spinner 1s infinite linear;
+}
+
+@keyframes mini-spinner {
+  to { transform: rotate(360deg); }
+}
+
+.mini-player {
+  position: relative;
+  height: 70px;
+  width: 100%; /* Back to 100% since parent should be 100vw */
+  display: flex;
+  align-items: center;
+  padding: 0 12px; /* Reduced padding for more content space */
+  cursor: pointer;
+  z-index: var(--z-base); /* 10 */
+  overflow: hidden;
+  transition: all 0.3s ease;
+  /* Ensure full width alignment */
+  margin: 0;
+  box-sizing: border-box;
+}
+
+/* Backdrop with glass simulation - resource efficient */
+.mini-player__backdrop {
+  position: absolute;
+  inset: 0;
+  /* Multi-layer glass simulation without blur */
+  background: 
+    /* Top highlight layer - simulates inner glass reflection */
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--gold-primary) 8%, transparent) 0%,
+      color-mix(in srgb, var(--gold-primary) 3%, transparent) 20%,
+      transparent 40%
+    ),
+    /* Main glass layer - cosmic blue tint */
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--bg-primary) 88%, transparent) 0%,
+      color-mix(in srgb, var(--bg-cosmic-void) 92%, transparent) 50%,
+      color-mix(in srgb, var(--bg-cosmic-void) 95%, transparent) 100%
+    );
+  
+  border-top: 2px solid color-mix(in srgb, var(--gold-subtle) 40%, transparent); /* Golden accent border */
+  border-radius: 0; /* Sharp edges for mini player */
+  box-shadow: 
+    0 -4px 20px color-mix(in srgb, var(--utility-pure-black) 50%, transparent), /* Depth shadow */
+    inset 0 1px 0 color-mix(in srgb, var(--gold-subtle) 15%, transparent), /* Golden inner highlight */
+    inset 0 0 20px color-mix(in srgb, var(--bg-primary) 30%, transparent); /* Inner glow simulation */
+  z-index: -1;
+  transition: all 0.3s ease;
+}
+
+/* Enhanced playing state - enhanced glass simulation */
+.mini-player--playing .mini-player__backdrop {
+  /* Enhanced multi-layer glass for playing state */
+  background: 
+    /* Enhanced top highlight - brighter when playing */
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--gold-primary) 12%, transparent) 0%,
+      color-mix(in srgb, var(--gold-primary) 6%, transparent) 20%,
+      transparent 40%
+    ),
+    /* Enhanced main glass layer - deeper cosmic blue */
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--bg-card) 90%, transparent) 0%,
+      color-mix(in srgb, var(--bg-primary) 95%, transparent) 50%,
+      color-mix(in srgb, var(--bg-cosmic-void) 98%, transparent) 100%
+    );
+  
+  border-top-color: color-mix(in srgb, var(--gold-subtle) 60%, transparent); /* Brighter golden border when playing */
+  box-shadow: 
+    0 -4px 25px color-mix(in srgb, var(--utility-pure-black) 60%, transparent), /* Stronger shadow when playing */
+    inset 0 1px 0 color-mix(in srgb, var(--gold-subtle) 25%, transparent), /* Enhanced golden inner highlight */
+    inset 0 0 25px color-mix(in srgb, var(--bg-card) 40%, transparent); /* Enhanced inner glow when playing */
+}
+
+/* Progress bar */
+.mini-player__progress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 2px;
+  background: linear-gradient(to right, var(--gold-deep), var(--gold-subtle));
+  transition: width 0.2s linear;
+  /* Removed glow effect from progress bar */
+  z-index: var(--z-base); /* 1 */
+}
+
+.mini-player--playing .mini-player__progress {
+  height: 3px; /* Slightly thicker when playing */
+  /* Removed enhanced glow when playing */
+}
+
+/* Player content layout */
+.mini-player__content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+  /* Remove min-width: 100vw as it's not needed and might cause issues */
+  box-sizing: border-box;
+}
+
+/* Thumbnail */
+.mini-player__thumbnail {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  filter: drop-shadow(0 2px 8px color-mix(in srgb, var(--utility-pure-black) 20%, transparent));
+  transition: all 0.3s ease;
+}
+
+.mini-player--playing .mini-player__thumbnail {
+  filter: drop-shadow(0 2px 12px color-mix(in srgb, var(--gold-subtle) 30%, transparent));
+}
+
+.mini-player__figure-image {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+/* Story info */
+.mini-player__info {
+  flex: 1;
+  padding: 0 12px; /* Reduced padding to match container */
+  min-width: 0; /* For text truncation */
+  transition: transform 0.3s ease;
+}
+
+.mini-player:hover .mini-player__info {
+  transform: translateX(3px);
+}
+
+.mini-player__figure-name {
+  color: var(--gold-primary);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.3s ease;
+  opacity: 0.9;
+  margin-bottom: 2px;
+}
+
+.mini-player__title {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: 'Space Grotesk', sans-serif;
+  display: flex;
+  gap: 4px;
+}
+
+.mini-player__seed-number {
+  color: var(--cosmic-text-primary);
+  font-weight: 400;
+}
+
+.mini-player__seed-title {
+  color: var(--cosmic-text-primary);
+  text-shadow: 0 0 8px color-mix(in srgb, white 40%, transparent);
+}
+
+.mini-player--playing .mini-player__figure-name {
+  color: var(--gold-primary);
+  opacity: 1;
+}
+
+/* Controls */
+.mini-player__controls {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Reduced gap for more info space */
+  flex-shrink: 0; /* Prevent controls from shrinking */
+}
+
+.mini-player__play-button,
+.mini-player__expand-button {
+  background: none;
+  border: none;
+  padding: 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.mini-player__play-button {
+  color: var(--gold-subtle);
+  background: color-mix(in srgb, var(--gold-subtle) 10%, transparent);
+  width: 36px;
+  height: 36px;
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+}
+
+/* Virtual 44px touch target for play button */
+.mini-player__play-button::before {
+  content: '';
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  z-index: 1;
+  /* Debug: uncomment to see touch target */
+  /* background: color-mix(in srgb, red 10%, transparent); */
+}
+
+.mini-player__play-button:hover {
+  background: color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+  transform: scale(1.05);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--gold-subtle) 30%, transparent); /* Restored hover glow */
+}
+
+.mini-player__play-button:active {
+  transform: scale(0.95);
+}
+
+.mini-player--playing .mini-player__play-button {
+  background: color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+  border-color: color-mix(in srgb, var(--gold-subtle) 50%, transparent);
+  /* Removed glow effect (box-shadow) as it was distracting */
+}
+
+.mini-player__expand-button {
+  color: color-mix(in srgb, white 70%, transparent);
+  background: color-mix(in srgb, white 5%, transparent);
+  border: 1px solid transparent;
+  /* Ensure button has minimum 44px touch target */
+  min-width: 44px;
+  min-height: 44px;
+  padding: 14px; /* (44-16)/2 = 14px padding to reach 44px with icon */
+}
+
+.mini-player__expand-button:hover {
+  color: var(--cosmic-text-primary);
+  background: color-mix(in srgb, white 10%, transparent);
+  transform: translateY(-2px);
+}
+
+/* Ripple effect for buttons */
+.mini-player__play-button::after,
+.mini-player__expand-button::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  background: color-mix(in srgb, var(--gold-subtle) 40%, transparent);
+  opacity: 0;
+  border-radius: 100%;
+  transform: scale(1, 1) translate(-50%, -50%);
+  transform-origin: 50% 50%;
+}
+
+.mini-player__play-button:active::after,
+.mini-player__expand-button:active::after {
+  animation: mp-ripple 0.4s ease-out;
+}
+
+/* Base mobile (0-359px) - For accessibility and edge cases */
+@media (max-width: 359px) {
+  .mini-player {
+    padding: 0 10px;
+    height: calc(60px + env(safe-area-inset-bottom, 0px)); /* Account for safe area */
+    padding-bottom: env(safe-area-inset-bottom, 0px); /* Add safe area padding */
+  }
+  
+  .mini-player__backdrop {
+    /* Ensure backdrop covers safe area */
+    bottom: calc(-1 * env(safe-area-inset-bottom, 0px));
+  }
+  
+  /* Hide thumbnail on small phones — figure identity is clear from context,
+     and the reclaimed ~46px goes to title + figure name. */
+  .mini-player__thumbnail {
+    display: none;
+  }
+
+  .mini-player__play-button {
+    width: 32px;
+    height: 32px;
+  }
+
+  .mini-player__title {
+    font-size: 12px;
+    max-width: none;
+  }
+
+  .mini-player__figure-name {
+    font-size: 12px;
+  }
+
+  .mini-player__controls {
+    gap: 6px;
+  }
+}
+
+/* Android baseline (360px-767px) - Aligned with master guide */
+@media (min-width: 360px) and (max-width: 767px) {
+  .mini-player {
+    padding: 0 10px; /* Even less padding on mobile for more content space */
+    height: calc(64px + env(safe-area-inset-bottom, 0px)); /* Account for safe area */
+    padding-bottom: env(safe-area-inset-bottom, 0px); /* Add safe area padding */
+  }
+
+  .mini-player__backdrop {
+    /* Ensure backdrop covers safe area */
+    bottom: calc(-1 * env(safe-area-inset-bottom, 0px));
+  }
+
+  /* Hide thumbnail on mobile — the story context already tells you whose voice
+     it is. Reclaimed width flows to the title and figure name. */
+  .mini-player__thumbnail {
+    display: none;
+  }
+
+  .mini-player__controls {
+    gap: 8px; /* Tighter gap on small screens */
+  }
+
+  .mini-player__play-button {
+    width: 36px;
+    height: 36px;
+    background: color-mix(in srgb, var(--gold-subtle) 15%, transparent);
+  }
+
+  .mini-player__title {
+    max-width: none;
+    font-size: 12px;
+  }
+
+  .mini-player__figure-name {
+    font-size: 12px;
+  }
+}
+
+/* Tablet portrait (768px-1023px) - Aligned with master guide */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .mini-player {
+    height: 72px;
+  }
+  
+  .mini-player__thumbnail {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .mini-player__play-button {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .mini-player__controls {
+    gap: 16px; /* More space on tablets */
+  }
+  
+  .mini-player__title {
+    font-size: 15px;
+  }
+  
+  .mini-player__figure-name {
+    font-size: 12px;
+  }
+}
+
+/* Tablet landscape & Desktop (1024px+) - Aligned with master guide */
+@media (min-width: 1024px) {
+  .mini-player {
+    height: 76px;
+  }
+  
+  .mini-player__thumbnail {
+    width: 52px;
+    height: 52px;
+  }
+  
+  .mini-player__title {
+    font-size: 16px;
+  }
+  
+  .mini-player__figure-name {
+    font-size: 13px;
+  }
+  
+  .mini-player__play-button {
+    width: 42px;
+    height: 42px;
+  }
+}
+
+/* Hover effect */
+.mini-player:hover .mini-player__backdrop {
+  background: color-mix(in srgb, var(--bg-primary) 80%, transparent);
+}
+
+/* === 2025 LOCK SCREEN ULTIMATE BATTERY OPTIMIZATION === */
+/* When page is hidden (screen locked/app backgrounded), disable ALL visual processing */
+.mini-player[data-visibility="hidden"] {
+  /* Stop all animations and transitions for maximum battery savings */
+  animation-play-state: paused !important;
+  transition: none !important;
+}
+
+.mini-player[data-visibility="hidden"] * {
+  /* Disable all child animations and transitions */
+  animation-play-state: paused !important;
+  transition: none !important;
+  /* Remove all will-change hints to free GPU resources */
+  will-change: auto !important;
+}
+
+/* Completely eliminate glass simulation when screen is locked */
+.mini-player[data-visibility="hidden"] .mini-player__backdrop {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  /* GPU can completely shutdown visual processing */
+  will-change: auto !important;
+  transform: none !important;
+}
+
+/* Disable loading overlay effects when screen locked */
+.mini-player[data-visibility="hidden"] .mini-player__loading {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Stop all button animations and effects when screen locked */
+.mini-player[data-visibility="hidden"] .mini-player__play-button,
+.mini-player[data-visibility="hidden"] .mini-player__expand-button {
+  animation: none !important;
+  box-shadow: none !important;
+  transform: none !important;
+  will-change: auto !important;
+  background: transparent !important;
+  border: none !important;
+}
+
+/* Disable thumbnail effects when screen locked */
+.mini-player[data-visibility="hidden"] .mini-player__thumbnail {
+  filter: none !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* Disable text shadows and effects when screen locked */
+.mini-player[data-visibility="hidden"] .mini-player__seed-title,
+.mini-player[data-visibility="hidden"] .mini-player__figure-name {
+  text-shadow: none !important;
+  background: none !important;
+  filter: none !important;
+}
+
+/* Disable progress bar effects when screen locked */
+.mini-player[data-visibility="hidden"] .mini-player__progress {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Performance optimization: Minimal repaints when screen locked */
+.mini-player[data-visibility="hidden"] {
+  /* Contain layout changes for better performance */
+  contain: layout style paint;
+  /* Reduce browser workload to absolute minimum */
+  pointer-events: none;
+}
+
+/* Restore interactivity when page becomes visible */
+.mini-player[data-visibility="visible"] {
+  pointer-events: auto;
+  contain: none;
+}
+
+/* Animation */
+@keyframes slideUp {
+  from { transform: translateY(70px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes mp-ripple {
+  0% {
+    opacity: 1;
+    transform: scale(0, 0);
+  }
+  20% {
+    transform: scale(25, 25);
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(40, 40);
+  }
+}
+
+.mini-player {
+  animation: slideUp 0.3s ease-out forwards;
+}

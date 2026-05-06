@@ -1,0 +1,60 @@
+name: Feature Request
+description: Suggest an idea or improvement
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        We'd love to hear your ideas. Please describe what you'd like to see in Agora Cosmica.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What would you like to happen?
+      placeholder: "It would be great if..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation
+      description: Why is this important? What problem does it solve?
+      placeholder: "Currently I have to... but it would be better if..."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Conversations (Wisdom, Quest, Free Talk)
+        - Content (Stories, Councils, Prisms)
+        - Figures (new figures, corrections)
+        - Audio (TTS, STT)
+        - UI / Navigation
+        - Accessibility
+        - Translations / Localization
+        - Security / Privacy
+        - Self-hosting / Infrastructure
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Have you considered any alternative solutions or workarounds?
+    validations:
+      required: false
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Screenshots, mockups, links, or anything else that helps explain the request.
+    validations:
+      required: false

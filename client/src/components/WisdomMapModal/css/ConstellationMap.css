@@ -1,0 +1,164 @@
+/* Constellation container */
+.constellation-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: var(--z-base); /* 2 */
+  overflow: visible;
+}
+
+/* Pattern hint container */
+.constellation-hint-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: var(--z-base); /* 1 */
+  overflow: visible;
+}
+
+/* Pattern hint lines */
+.constellation-hint-line {
+  stroke: color-mix(in srgb, var(--gold-subtle) 35%, transparent); /* Increased opacity for better visibility */
+  stroke-width: 1px; /* Slightly thicker */
+  stroke-dasharray: 4,4; /* Tighter dash pattern */
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  z-index: var(--z-base); /* 5 */ /* Ensure line is below star */
+}
+
+/* Pattern hint points - REMOVED for visual clarity */
+.constellation-hint-point {
+  display: none; /* Eliminated to prevent confusion with interactive stars */
+}
+
+/* Simple line fade in animation */
+@keyframes lineFadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 0.5; }
+}
+
+/* Constellation line - refined, minimal styling */
+.constellation-line {
+  stroke: color-mix(in srgb, var(--gold-subtle) 50%, transparent);
+  stroke-width: 1.0px;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  animation: lineFadeIn 1.5s forwards cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+/* Progressive Revelation Stages */
+
+/* Awakening stage - First cosmic awakening (1-25%) */
+.constellation-line.awakening-stage {
+  stroke: var(--gold-subtle);
+  stroke-width: 0.8px;
+  opacity: 0.3;
+  stroke-dasharray: 6,6;
+  animation: awakeningPulse 4s ease-in-out infinite;
+  animation-play-state: paused; /* Battery: only animate when modal visible */
+}
+
+/* Emergence stage - Pattern emerges (26-50%) */
+.constellation-line.emergence-stage {
+  stroke: var(--gold-subtle);
+  stroke-width: 1px;
+  opacity: 0.6;
+  filter: drop-shadow(0 0 2px color-mix(in srgb, var(--gold-subtle) 40%, transparent));
+  animation: emergenceGlow 3s ease-in-out infinite alternate;
+  animation-play-state: paused;
+}
+
+/* Forming stage - Constellation forms (51-75%) */
+.constellation-line.forming-stage {
+  stroke: var(--gold-subtle);
+  stroke-width: 1.2px;
+  opacity: 0.8;
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--gold-subtle) 60%, transparent));
+  animation: formingBrilliance 2.5s ease-in-out infinite alternate;
+  animation-play-state: paused;
+}
+
+/* Complete stage - Full golden glory (76-100%) */
+.constellation-line.complete-stage {
+  stroke: var(--gold-subtle);
+  stroke-width: 1.4px;
+  opacity: 1;
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--gold-subtle) 90%, transparent)) drop-shadow(0 0 12px color-mix(in srgb, var(--gold-subtle) 40%, transparent));
+  animation: completeCelebration 2s ease-in-out infinite alternate;
+  animation-play-state: paused;
+}
+
+/* Activate constellation animations when map is visible */
+.constellation-map .constellation-line.awakening-stage,
+.constellation-map .constellation-line.emergence-stage,
+.constellation-map .constellation-line.forming-stage,
+.constellation-map .constellation-line.complete-stage {
+  animation-play-state: running;
+}
+
+/* Revelation stage animations */
+@keyframes awakeningPulse {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.4; }
+}
+
+@keyframes emergenceGlow {
+  0% { filter: drop-shadow(0 0 2px color-mix(in srgb, var(--gold-subtle) 30%, transparent)); }
+  100% { filter: drop-shadow(0 0 3px color-mix(in srgb, var(--gold-subtle) 50%, transparent)); }
+}
+
+@keyframes formingBrilliance {
+  0% { filter: drop-shadow(0 0 4px color-mix(in srgb, var(--gold-subtle) 50%, transparent)); }
+  100% { filter: drop-shadow(0 0 6px color-mix(in srgb, var(--gold-subtle) 70%, transparent)); }
+}
+
+@keyframes completeCelebration {
+  0% { 
+    filter: drop-shadow(0 0 6px color-mix(in srgb, var(--gold-subtle) 80%, transparent)) drop-shadow(0 0 12px color-mix(in srgb, var(--gold-subtle) 30%, transparent));
+  }
+  100% { 
+    filter: drop-shadow(0 0 8px var(--gold-subtle)) drop-shadow(0 0 16px color-mix(in srgb, var(--gold-subtle) 50%, transparent));
+  }
+}
+
+/* Accessibility - respect reduced motion preferences */
+@media(prefers-reduced-motion: reduce) {
+  /* Disable all line animations */
+  .constellation-line,
+  .constellation-line.awakening-stage,
+  .constellation-line.emergence-stage,
+  .constellation-line.forming-stage,
+  .constellation-line.complete-stage {
+    animation: none;
+    filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.3));
+  }
+  
+  /* Static states for revelation stages */
+  .constellation-line.awakening-stage {
+    opacity: 0.3;
+    stroke-width: 0.8px;
+  }
+  
+  .constellation-line.emergence-stage {
+    opacity: 0.6;
+    stroke-width: 1px;
+  }
+  
+  .constellation-line.forming-stage {
+    opacity: 0.8;
+    stroke-width: 1.2px;
+  }
+  
+  .constellation-line.complete-stage {
+    opacity: 1;
+    stroke-width: 1.4px;
+  }
+}

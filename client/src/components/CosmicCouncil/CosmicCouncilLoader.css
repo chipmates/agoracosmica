@@ -1,0 +1,109 @@
+/* Council-specific loader styles with liquid glass background */
+
+/* Override cosmic overlay with solid dark background */
+.council-loader-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh; /* Fallback */
+  height: 100dvh; /* Safari-compatible - adapts to dynamic address bar */
+  z-index: var(--z-loader); /* 99999 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-cosmic-void);
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Liquid glass background layer */
+.council-loader-background {
+  position: absolute;
+  inset: 0;
+  /* Background comes from liquid-glass--audio class */
+}
+
+/* Enhanced content container with blue background for spinner area */
+.council-loader-overlay .cosmic-processing-content {
+  position: relative;
+  z-index: var(--z-base); /* 2 */
+  /* Blue background specifically for the spinner content area */
+  background: color-mix(in srgb, var(--bg-primary) var(--a-95), transparent); /* Enhanced specificity ensures cosmic blue background for council loader */
+  border-radius: 20px;
+  padding: 2rem;
+  backdrop-filter: blur(var(--glass-blur-light));
+  -webkit-backdrop-filter: blur(var(--glass-blur-light));
+  box-shadow: 
+    0 8px 32px color-mix(in srgb, var(--utility-pure-black) var(--a-30), transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--text-primary) var(--a-10), transparent);
+  border: 1px solid color-mix(in srgb, var(--text-primary) var(--a-10), transparent);
+}
+
+.council-participants {
+  background: linear-gradient(135deg, var(--mode-wisdom) 0%, var(--mode-wisdom-active) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 600;
+  font-size: 1.1em;
+}
+
+.council-question-preview {
+  margin: 0.75rem 0;
+  padding: 0.5rem 0.75rem;
+  background: color-mix(in srgb, var(--mode-wisdom) var(--a-10), transparent);
+  border-left: 3px solid color-mix(in srgb, var(--mode-wisdom) var(--a-40), transparent);
+  border-radius: 0 6px 6px 0;
+  backdrop-filter: blur(var(--glass-blur-heavy));
+}
+
+.question-text {
+  font-size: 0.85em;
+  font-style: italic;
+  color: color-mix(in srgb, var(--text-primary) var(--a-80), transparent);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.council-progress .cosmic-progress-fill {
+  background: linear-gradient(90deg, 
+    var(--mode-wisdom) 0%, 
+    var(--mode-wisdom-active) 25%, 
+    var(--mode-wisdom-hover) 50%, 
+    var(--mode-quest) 75%, 
+    var(--mode-freetalk) 100%
+  );
+  animation: councilProgress 4s ease-in-out infinite;
+}
+
+@keyframes councilProgress {
+  0%, 100% { 
+    background-position: 0% 50%; 
+  }
+  50% { 
+    background-position: 100% 50%; 
+  }
+}
+
+.progress-stage-indicator {
+  text-align: center;
+  font-size: 0.75em;
+  color: color-mix(in srgb, var(--text-primary) var(--a-60), transparent);
+  margin-top: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 500;
+}
+
+/* Extra circle for council energy */
+.spinning-circles .circle-4 {
+  border: 2px solid color-mix(in srgb, var(--mode-wisdom) var(--a-20), transparent);
+  border-top-color: color-mix(in srgb, var(--mode-wisdom) var(--a-60), transparent);
+  animation: spin 3s linear infinite;
+}
+
+/* Enhanced sparkle for council wisdom */
+.sparkle-4 {
+  color: color-mix(in srgb, var(--mode-wisdom) var(--a-70), transparent);
+  animation: sparkle 2.5s ease-in-out infinite;
+}

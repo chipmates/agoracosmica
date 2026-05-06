@@ -1,0 +1,18 @@
+{
+  "name": "Agora Cosmica",
+  "short_name": "Agora",
+  "description": "A Living Library You Can Talk To. Philosophical dialogue with 30 historical figures across 6 conversation modes, fully bilingual in English and German.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#151C47",
+  "theme_color": "#151C47",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -1,0 +1,371 @@
+/* ForewordModal.css - Foreword/Listener's Guide modal styles */
+/* Follows StoryFactCheckPanel design pattern for consistency */
+/* Title in quest red, audio player in gold to match app theme */
+
+/* Color scheme: quest color for title, gold for audio player */
+.foreword-modal-container {
+  --foreword-accent: var(--mode-quest);
+  --foreword-accent-hover: var(--mode-quest-hover);
+  --foreword-accent-subtle: color-mix(in srgb, var(--mode-quest) var(--a-30), transparent);
+  /* Gold colors for audio player */
+  --foreword-gold: var(--gold-subtle);
+  --foreword-gold-hover: var(--gold-primary);
+  --foreword-gold-subtle: color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent);
+  --foreword-gold-glow: color-mix(in srgb, var(--gold-subtle) var(--a-15), transparent);
+}
+
+/* Container - matches StoryFactCheckPanel positioning */
+.foreword-modal-container {
+  position: fixed;
+  top: 80px;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  z-index: var(--z-critical);
+  max-width: 550px;
+  width: 90%;
+  animation: forewordSlideIn 0.3s ease-out;
+  display: flex;
+  justify-content: center;
+}
+
+/* Panel - matches HelperPopup gold standard */
+.foreword-modal {
+  position: relative;
+  background: color-mix(in srgb, var(--bg-cosmic-void) var(--a-95), transparent);
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-25), transparent);
+  border-radius: 1rem;
+  box-shadow:
+    0 0 40px color-mix(in srgb, var(--gold-subtle) var(--a-15), transparent),
+    0 0 80px color-mix(in srgb, var(--gold-subtle) var(--a-08), transparent),
+    0 20px 60px color-mix(in srgb, black var(--a-40), transparent);
+  max-height: calc(100vh - 160px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Decorative golden accent line at top */
+.foreword-modal::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 2px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--gold-subtle) 30%,
+    var(--gold-subtle) 70%,
+    transparent 100%);
+  border-radius: 1px;
+  opacity: 0.7;
+}
+
+@keyframes forewordSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Header */
+.foreword-modal__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-20), transparent);
+  flex-shrink: 0;
+}
+
+.foreword-modal__title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.foreword-modal__title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--foreword-accent);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.foreword-modal__title svg {
+  flex-shrink: 0;
+}
+
+.foreword-modal__subtitle {
+  font-size: 0.8rem;
+  color: var(--gold-subtle);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+/* Audio Player - compact inline design with gold theme */
+.foreword-modal__player {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  background: var(--foreword-gold-glow);
+  border-bottom: 1px solid var(--foreword-gold-subtle);
+  flex-shrink: 0;
+}
+
+.foreword-modal__play-btn {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  border-radius: 50%;
+  background: var(--foreword-gold);
+  color: var(--bg-primary);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.foreword-modal__play-btn:hover {
+  background: var(--foreword-gold-hover);
+  transform: scale(1.05);
+}
+
+.foreword-modal__play-btn:active {
+  transform: scale(0.95);
+}
+
+.foreword-modal__progress {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.foreword-modal__slider {
+  width: 100%;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: color-mix(in srgb, var(--foreword-gold) var(--a-30), transparent);
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.foreword-modal__slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  background: var(--foreword-gold);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.foreword-modal__slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.foreword-modal__slider::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  background: var(--foreword-gold);
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+}
+
+.foreword-modal__time {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.foreword-modal__speaker {
+  color: var(--foreword-gold);
+  animation: pulse-speaker 1s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+@keyframes pulse-speaker {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* Content area */
+.foreword-modal__content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem 1.25rem 1.5rem;
+}
+
+.foreword-modal__text {
+  font-family: var(--font-content, 'Libre Caslon Text', Georgia, serif);
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--text-primary);
+}
+
+.foreword-modal__text p {
+  margin: 0 0 1rem 0;
+}
+
+.foreword-modal__text p:last-child {
+  margin-bottom: 0;
+}
+
+/* Loading state */
+.foreword-modal__loading {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.foreword-modal__spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--foreword-gold-subtle);
+  border-top-color: var(--foreword-gold);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Error state */
+.foreword-modal__error {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  color: var(--text-secondary);
+  text-align: center;
+  padding: 2rem;
+}
+
+.foreword-modal__error svg {
+  color: var(--foreword-gold);
+}
+
+/* ============================================
+   MOBILE FULLSCREEN MODE
+   ============================================ */
+@media (max-width: 768px) {
+  .foreword-modal-container {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-critical);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    max-width: 100%;
+    width: 100%;
+    top: 0;
+    animation: forewordFadeIn 0.3s ease-out;
+  }
+
+  .foreword-modal {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 0;
+    border: none;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    background: color-mix(in srgb, var(--bg-cosmic-void) var(--a-98), transparent);
+    box-shadow: none;
+  }
+
+  .foreword-modal__header {
+    padding: 20px 20px 15px;
+    border-bottom: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-20), transparent);
+  }
+
+  .foreword-modal__title {
+    font-size: 1.25rem;
+  }
+
+  .foreword-modal__player {
+    padding: 0.75rem 20px;
+  }
+
+  .foreword-modal__content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    max-width: 600px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .foreword-modal__text {
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+}
+
+/* Fullscreen fade animation */
+@keyframes forewordFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Safe area support for mobile fullscreen */
+@supports (padding: env(safe-area-inset-bottom)) {
+  @media (max-width: 768px) {
+    .foreword-modal {
+      padding-bottom: env(safe-area-inset-bottom);
+      padding-top: env(safe-area-inset-top);
+    }
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .foreword-modal__spinner,
+  .foreword-modal__speaker,
+  .foreword-modal__play-btn {
+    animation: none;
+    transition: none;
+  }
+
+  .foreword-modal-container {
+    animation: none;
+  }
+}
+
+.foreword-modal__play-btn:focus-visible {
+  outline: 2px solid var(--foreword-gold);
+  outline-offset: 2px;
+}

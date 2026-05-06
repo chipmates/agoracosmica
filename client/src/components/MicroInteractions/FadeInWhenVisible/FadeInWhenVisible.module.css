@@ -1,0 +1,86 @@
+/* FadeInWhenVisible.module.css - Viewport-triggered fade animation */
+
+.fadeInElement {
+  /* Initial state - hidden */
+  opacity: 0;
+  transform: translateY(20px);
+  
+  /* Smooth transition using design system timing */
+  transition: 
+    opacity var(--transition-slow) ease-out,
+    transform var(--transition-slow) ease-out;
+  
+  /* Custom delay support */
+  transition-delay: var(--fade-delay, 0ms);
+  
+  /* Performance optimization */
+  will-change: opacity, transform;
+  contain: layout style;
+}
+
+/* Visible state */
+.fadeInElement.isVisible {
+  opacity: 1;
+  transform: translateY(0);
+  
+  /* Remove will-change after animation */
+  will-change: auto;
+}
+
+/* Reduced motion support */
+.fadeInElement.reducedMotion {
+  transition: none;
+  transform: none;
+}
+
+.fadeInElement.reducedMotion.isVisible {
+  opacity: 1;
+}
+
+/* Additional animation variants (optional classes) */
+.fadeInElement:global(.fade-up) {
+  transform: translateY(30px);
+}
+
+.fadeInElement:global(.fade-down) {
+  transform: translateY(-20px);
+}
+
+.fadeInElement:global(.fade-left) {
+  transform: translateX(20px);
+}
+
+.fadeInElement:global(.fade-right) {
+  transform: translateX(-20px);
+}
+
+.fadeInElement:global(.fade-scale) {
+  transform: scale(0.95);
+}
+
+/* All variants reset to default when visible */
+.fadeInElement.isVisible:global(.fade-up),
+.fadeInElement.isVisible:global(.fade-down),
+.fadeInElement.isVisible:global(.fade-left),
+.fadeInElement.isVisible:global(.fade-right),
+.fadeInElement.isVisible:global(.fade-scale) {
+  transform: translateY(0) translateX(0) scale(1);
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .fadeInElement {
+    /* Ensure content is always visible in high contrast */
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Print styles */
+@media print {
+  .fadeInElement {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

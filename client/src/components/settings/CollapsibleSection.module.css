@@ -1,0 +1,319 @@
+/* CollapsibleSection.module.css - Beautiful accordion styling */
+
+.section {
+  margin-bottom: 12px;
+  background: color-mix(in srgb, var(--bg-card) 30%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 12%, transparent);
+  border-radius: 14px;
+  overflow: hidden;
+  backdrop-filter: blur(var(--glass-blur-heavy));
+  -webkit-backdrop-filter: blur(var(--glass-blur-heavy));
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.section:hover {
+  border-color: color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+  background: color-mix(in srgb, var(--bg-card) 35%, transparent);
+  transform: translateY(-1px);
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.1),
+    0 0 40px color-mix(in srgb, var(--gold-subtle) 8%, transparent);
+}
+
+.header {
+  width: 100%;
+  padding: 18px 20px;
+  background: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  color: var(--text-primary);
+  font-family: inherit;
+  position: relative;
+  min-height: 72px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.header::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 3px;
+  height: 100%;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    var(--gold-subtle) 50%,
+    transparent 100%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.header.expanded::before {
+  opacity: 1;
+}
+
+.header:hover {
+  background: color-mix(in srgb, var(--gold-subtle) 5%, transparent);
+}
+
+.header:focus-visible {
+  outline: 2px solid var(--gold-subtle);
+  outline-offset: -2px;
+  border-radius: 14px 14px 0 0;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+  min-width: 0;
+}
+
+.iconWrapper {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--gold-subtle) 12%, transparent);
+  border-radius: 12px;
+  color: var(--gold-subtle);
+  flex-shrink: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.header.expanded .iconWrapper {
+  background: color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+  transform: scale(1.05);
+  box-shadow: 
+    0 0 20px color-mix(in srgb, var(--gold-subtle) 30%, transparent),
+    inset 0 0 10px color-mix(in srgb, var(--gold-subtle) 10%, transparent);
+}
+
+.titleWrapper {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+}
+
+.title {
+  margin: 0;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: 0.3px;
+  transition: color 0.3s ease;
+  line-height: 1.25;
+  /* Wrap to 2 lines before truncating so long titles like "Männliche Stimme"
+     stay fully readable without colliding with the badge on the right. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
+}
+
+.header.expanded .title {
+  color: var(--gold-primary);
+}
+
+.description {
+  margin: 4px 0 0 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  opacity: 0.8;
+  font-family: 'Space Grotesk', sans-serif;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: opacity 0.3s ease;
+}
+
+.header:hover .description {
+  opacity: 1;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.badge {
+  padding: 4px 10px;
+  background: color-mix(in srgb, var(--gold-subtle) 15%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 25%, transparent);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gold-primary);
+  font-family: 'Space Grotesk', sans-serif;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.chevron {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gold-subtle);
+  background: color-mix(in srgb, var(--gold-subtle) 8%, transparent);
+  border-radius: 50%;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.chevron.rotated {
+  transform: rotate(0deg);
+  background: color-mix(in srgb, var(--gold-subtle) 15%, transparent);
+  color: var(--gold-primary);
+}
+
+.chevron:not(.rotated) {
+  transform: rotate(0deg);
+}
+
+.header:hover .chevron {
+  background: color-mix(in srgb, var(--gold-subtle) 12%, transparent);
+  transform: scale(1.1);
+}
+
+.contentWrapper {
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: height, opacity;
+}
+
+.content {
+  padding: 0 20px 20px 20px;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Separator line between header and content when expanded */
+.header.expanded::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 20px;
+  right: 20px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--gold-subtle) 20%, transparent) 20%,
+    color-mix(in srgb, var(--gold-subtle) 20%, transparent) 80%,
+    transparent 100%
+  );
+}
+
+/* Collapsed state optimizations */
+.header:not(.expanded) {
+  min-height: 68px; /* Slightly smaller when collapsed */
+}
+
+.header:not(.expanded):hover {
+  background: color-mix(in srgb, var(--gold-subtle) 8%, transparent);
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  /* Break out of the SettingsModal content padding so the collapsible rows
+     run edge-to-edge. Inner .content keeps its own padding for controls. */
+  .section {
+    margin-left: -14px;
+    margin-right: -14px;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
+
+  .header {
+    padding: 14px 16px;
+    min-height: 64px;
+  }
+
+  .iconWrapper {
+    width: 36px;
+    height: 36px;
+  }
+
+  .title {
+    font-size: 15px;
+  }
+
+  /* Hide description on mobile - Clean iOS/Android style */
+  .description {
+    display: none;
+  }
+
+  .content {
+    padding: 0 16px 16px 16px;
+  }
+
+  .chevron {
+    width: 28px;
+    height: 28px;
+  }
+
+  .badge {
+    font-size: 13px; /* meta floor — was 11px */
+    padding: 3px 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Match the ≤480px content padding (10px) so rows still break out to edge */
+  .section {
+    margin-left: -10px;
+    margin-right: -10px;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .section,
+  .header,
+  .iconWrapper,
+  .chevron,
+  .contentWrapper {
+    transition: none !important;
+  }
+  
+  .content {
+    animation: none !important;
+  }
+  
+  .badge {
+    animation: none !important;
+  }
+}

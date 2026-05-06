@@ -1,0 +1,1961 @@
+{
+  "app": {
+    "name": "Agora Cosmica",
+    "brandTagline": "A Living Library You Can Talk To",
+    "attribution": "Agora Cosmica · A project of ChipMates gemeinnützige GmbH · Freiburg, Germany"
+  },
+  "questVerdict": {
+    "notEarned": {
+      "title": "Not yet, but the path remains open",
+      "body": "The figure's reflection above shows what's there and what could grow. Spend more time in Wisdom, then return when you're ready.",
+      "tryAgain": "Try again",
+      "deepenWisdom": "Deepen Wisdom",
+      "later": "Later"
+    }
+  },
+  "common": {
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "loading": "Loading...",
+    "search": "Search",
+    "select": "Select",
+    "error": "Error",
+    "success": "Success",
+    "warning": "Warning",
+    "info": "Information",
+    "confirm": "Confirm",
+    "continue": "Continue",
+    "dismiss": "Dismiss",
+    "beginExploring": "Begin Exploring",
+    "gotIt": "Got it!",
+    "welcome": "Welcome",
+    "dontShowAgain": "Don't show this again",
+    "review": "Review",
+    "help": "Help",
+    "disabled": "Disabled"
+  },
+  "categories": {
+    "sage": "SAGE",
+    "reformer": "REFORMER",
+    "creator": "CREATOR"
+  },
+  "firstTime": {
+    "title": "Choose Your First Echo",
+    "select": "Select",
+    "selectWithName": "Journey with {name}",
+    "selectGeneric": "Journey with Echo",
+    "exploreAll": "Meet Others",
+    "readMore": "Read About {name}",
+    "tapToRead": "Tap to read about this Echo",
+    "hearStory": "Begin the Journey",
+    "hearStoryHint": "A guided learning journey, from story to quest",
+    "talkTo": "or chat with Echo of {name} about anything →"
+  },
+  "storyViewer": {
+    "title": "Story",
+    "loading": "Loading story...",
+    "skip": "Skip to Discussion",
+    "skipToDiscussion": "Skip to Star Seed discussion",
+    "noContent": "Story content is loading...",
+    "continueToDiscussion": "Continue to Star Seed Discussion",
+    "discussionHint": "Ready to explore the wisdom within this story?",
+    "listening": "Listening to story..."
+  },
+  "about": {
+    "title": "{figureName}",
+    "disclaimer": "Note: This is a fictive AI character inspired by the historical figure."
+  },
+  "orientation": {
+    "title": "Please Rotate Your Device",
+    "message": "This app is optimized for portrait mode"
+  },
+  "entry": {
+    "poem": {
+      "line1": "Questions, like stars,",
+      "line2": "shine within you."
+    },
+    "motto": {
+      "dante": "Through dark woods, into the light of the stars.",
+      "beatrice": "Knowledge, like light, illuminates the way.",
+      "custom": "Your image, your name, your story."
+    },
+    "namePlaceholder": "Your name",
+    "button": "Enter",
+    "saving": "Saving...",
+    "changeAvatar": "Choose image",
+    "avatarTooLarge": "Image must be under 1MB",
+    "invalidFileType": "Please select an image file",
+    "avatarAlt": "Your avatar",
+    "nameLabel": "Your name",
+    "saveFailed": "Couldn't save your profile. Please try again.",
+    "defaultName": "Seeker",
+    "formReady": "Profile form is now available"
+  },
+  "login": {
+    "title": "Welcome Back",
+    "username": "Username",
+    "password": "Password",
+    "loginButton": "Log In",
+    "forgotPassword": "Forgot Password?",
+    "createAccount": "Create Account",
+    "rememberMe": "Remember Me",
+    "orContinueWith": "Or continue with",
+    "invalidCredentials": "Invalid username or password",
+    "invalidCredentialsError": "Invalid credentials. Please try again.",
+    "loginError": "An error occurred during login. Please try again.",
+    "fieldValidation": "Welcome to the Agora Cosmica Beta Program. This early access is available exclusively to our invited testers. Please sign in with your beta credentials.",
+    "betaAccountCreation": "Agora Cosmica is currently in beta. Account creation is limited to invited beta testers. Thank you for your interest!",
+    "betaPasswordRecovery": "Password recovery is currently available only for beta testers. If you are a beta tester, please contact our support team.",
+    "loading": "Loading your cosmic journey...",
+    "tapToSkip": "Tap to skip"
+  },
+  "settings": {
+    "title": "Settings",
+    "save": "Save Changes",
+    "cancel": "Cancel",
+    "tabs": {
+      "legal": "Legal & Privacy",
+      "preferences": "Preferences",
+      "info": "Info"
+    },
+    "preferences": {
+      "hint": "Click any section below to expand and modify settings",
+      "manageKeys": "Manage Keys",
+      "selfHosted": "Self-hosted",
+      "aiModelBadgeFree": "Qwen3 235B · Free",
+      "aiModelBadgeByok": "Qwen3 235B · Your key"
+    },
+    "tooltips": {
+      "voice": "Configure text-to-speech settings for spoken responses. Different services offer various voice qualities.",
+      "speech": "Configure speech recognition for voice input. This allows you to speak to the AI instead of typing.",
+      "model": "Advanced settings for the underlying language model. These options are limited during beta testing.",
+      "language": "Interface language setting. Conversations are available in 12 languages regardless of this setting.",
+      "privacy": "Manage your privacy preferences and cookie settings. You can change your consent choices at any time.",
+      "help": "Manage help tips and tutorial preferences. Reset hidden tips to see them again."
+    },
+    "unsavedChanges": {
+      "title": "Unsaved Changes",
+      "message": "You have unsaved changes. What would you like to do?",
+      "discard": "Discard Changes",
+      "save": "Save Changes"
+    },
+    "language": {
+      "title": "Display Language",
+      "description": "Choose your preferred interface language",
+      "selectLabel": "Select Language",
+      "conversationNote": "Note: Conversations support 12 languages regardless of display language setting."
+    },
+    "voice": {
+      "title": "Voice",
+      "description": "Voice for live conversations with the figures",
+      "enabled": "Text-to-Speech Enabled",
+      "service": "Voice Service",
+      "speed": "Voice Speed",
+      "speedSlower": "Slower",
+      "speedFaster": "Faster",
+      "privacyNote": "Voices generated on our servers in Falkenstein and Nuremberg. Audio held in RAM only and deleted after each request.",
+      "smartRouting": "Auto-selected based on your language: German → OpenAI, English → Kokoro",
+      "gpt4oNote": "GPT-4o TTS works best with English content. For non-English languages, the standard OpenAI TTS may provide better quality.",
+      "kokoroNote": "Self-hosted Kokoro TTS on EU servers. Zero data retention. All audio processing stays in Germany.",
+      "voiceSelection": {
+        "title": "Voice Selection",
+        "femaleVoices": "Female Voices",
+        "maleVoices": "Male Voices",
+        "femaleDescription": "Choose voice for female Echoes",
+        "maleDescription": "Choose voice for male Echoes",
+        "preview": "Preview",
+        "playing": "Playing...",
+        "select": "Select",
+        "selected": "Selected",
+        "scopeNote": "These voices power live conversations with the figures. Stories, prisms and councils come with their own handpicked narrators.",
+        "openaiPreviewCost": "Preview uses OpenAI API and costs credits (~$0.015 per preview). Use sparingly."
+      }
+    },
+    "speech": {
+      "title": "Voice Input",
+      "description": "Select which service processes your voice input",
+      "enabled": "Enable Voice Input",
+      "service": "Speech-to-Text Service",
+      "privacyTitle": "Whisper · Self-hosted in Germany",
+      "privacyNote": "Speech recognition runs on our own servers. Your voice is held in RAM only and deleted after each request.",
+      "shortcut": "You can quickly toggle between text and voice input with",
+      "shortcutTip": "You can quickly toggle between text and voice input with",
+      "mobileNotice": "Beta Voice Input: Speech recognition has limited support on mobile browsers. For reliable voice input, we recommend waiting for our mobile app.",
+      "ios": {
+        "title": "Safari Microphone Setup",
+        "intro": "For persistent microphone permissions in Safari on iPhone/iPad:",
+        "step1": "Tap the text size",
+        "step1b": "button (left side in Safari address bar)",
+        "step2": "Tap the three dots",
+        "step2b": "menu",
+        "step3": "Select \"Website Settings\"",
+        "step4": "Set Microphone → \"Allow\"",
+        "benefit": "After this one-time setup, no permission prompts! (Note: Chrome on iOS already works without this)"
+      }
+    },
+    "model": {
+      "title": "Language Model",
+      "description": "AI model powering your wisdom conversations",
+      "currentModel": "Current Model:",
+      "poweredBy": "Powered by OpenRouter",
+      "aboutTitle": "About OpenRouter",
+      "aboutText": "OpenRouter provides access to Qwen3 235B and other leading models with automatic fallback and competitive pricing.",
+      "privacyTitle": "Privacy & Performance",
+      "privacyZDR": "Zero Retention:",
+      "privacyZDRDesc": "Data stored in memory only during inference, deleted immediately after",
+      "privacyGDPR": "SOC 2 & ISO 27001:",
+      "privacyGDPRDesc": "Enterprise-grade security certifications and compliance",
+      "privacyRouting": "No Training:",
+      "privacyRoutingDesc": "Your data is never used to train models",
+      "privacyFailover": "Model Choice:",
+      "privacyFailoverDesc": "Access to multiple leading AI models through a single key",
+      "learnMore": "Learn more about OpenRouter"
+    },
+    "apiKeys": {
+      "title": "API Keys",
+      "description": "Manage your API keys for AI services.",
+      "securityNotice": "Your API keys are stored securely in your browser and never sent to our servers. They're only used to make requests directly to the respective services on your behalf.",
+      "openRouterTitle": "OpenRouter API Key",
+      "openRouterDesc": "For AI conversations (LLM). Voice & speech are self-hosted.",
+      "openRouterPlaceholder": "sk-or-v1-...",
+      "openRouterGetKey": "Get OpenRouter API Key",
+      "openAITitle": "OpenAI API Key",
+      "openAIDesc": "For voice features (TTS/STT)",
+      "openAIPlaceholder": "sk-proj-... or sk-...",
+      "openAIGetKey": "Get your OpenAI key",
+      "privacyGuarantee": "Zero Retention.",
+      "privacyText": "Audio is processed on our self-hosted servers in Germany with zero retention. Free-tier conversations use EU servers with zero retention. With your own OpenRouter key, the ZDR toggle below controls whether requests can be logged.",
+      "privacyLearnMore": "Learn more",
+      "statusNotConfigured": "Not configured",
+      "statusNotTested": "Not tested",
+      "statusTesting": "Testing...",
+      "statusValid": "Valid",
+      "statusInvalid": "Invalid",
+      "buttonTest": "Test Key",
+      "buttonSave": "Save",
+      "buttonClear": "Clear",
+      "errorEmpty": "Cannot save empty key",
+      "errorInvalid": "Invalid API key. Please check and try again.",
+      "errorValidate": "Failed to validate key. Please try again.",
+      "errorSave": "Failed to save key. Please try again.",
+      "errorClear": "Failed to clear key. Please try again.",
+      "confirmClear": "Are you sure you want to remove your {provider} API key?",
+      "hideKey": "Hide API key",
+      "showKey": "Show API key",
+      "openAIPrivacyTitle": "OpenAI Data Policy:",
+      "openAIPrivacyNoTraining": "No training:",
+      "openAIPrivacyNoTrainingDesc": "Your audio data is not used for training",
+      "openAIPrivacy30Day": "30-day retention:",
+      "openAIPrivacy30DayDesc": "Data kept for abuse monitoring (default)",
+      "openAIPrivacyZDR": "ZDR available:",
+      "openAIPrivacyZDRDesc": "Request Zero Data Retention for eligible accounts",
+      "openAIPrivacyLearnMore": "Learn more",
+      "zdrLabel": "Zero Data Retention",
+      "zdrDescription": "On by default. Routes only to providers that don't log your requests (typically US-based). Turning off allows any provider, some may store data."
+    },
+    "aiModelKey": {
+      "title": "Your Key & AI Model",
+      "description": "Your optional OpenRouter key and the model that powers your conversations",
+      "currentlyUsing": "Currently using",
+      "modelTagline": "Frontier-class. Same model on free tier and with your own key.",
+      "statusFree": "Free tier active. 30 conversations per day.",
+      "statusByok": "Your OpenRouter key is active. No daily limit.",
+      "keySectionTitle": "Use your own key (optional)",
+      "keySectionIntro": "Add an OpenRouter key to bypass the free-tier limit. You see and control your usage.",
+      "aboutOpenRouter": {
+        "title": "About OpenRouter",
+        "body1": "OpenRouter is a neutral routing service that forwards your request to the AI model you choose. We use it because it lets you bring your own account, billing, and quota.",
+        "body2": "Your key stays in your browser. We never see it.",
+        "learnMore": "Learn more"
+      },
+      "encryptionNote": "Your key is encrypted in your browser (AES-256-GCM) and never sent to our servers.",
+      "learnMoreLink": "Privacy details under Legal & Privacy"
+    },
+    "privacy": {
+      "title": "Privacy",
+      "description": "Your privacy is protected by default",
+      "intro": "We respect your privacy and have designed Agora Cosmica to work without tracking cookies or analytics.",
+      "manageCookies": "Manage Cookie Preferences",
+      "viewPrivacyPolicy": "View Privacy Policy",
+      "viewCookiePolicy": "View Cookie Policy",
+      "cookieToggleInfo": "To manage cookie preferences directly, please visit our privacy policy page where you can adjust your consent settings.",
+      "dataInfo": "We use no tracking cookies. Your language preference and display settings are saved locally on your device and never sent to any server."
+    },
+    "help": {
+      "title": "Help & Tips",
+      "description": "Manage tutorial and help preferences",
+      "intro": "Agora Cosmica provides helpful tips and guidance throughout your journey. If you've hidden any tips, you can reset them here.",
+      "resetDescription": "Click the button below to show all help tips again. This will reset any \"Don't show again\" choices you've made.",
+      "resetButton": "Reset Help Tips",
+      "resetConfirmation": "Are you sure you want to reset all help tips? They will appear again throughout the app.",
+      "resetSuccess": "Help tips have been reset successfully!",
+      "tipInfo": "Help tips appear when you first encounter new features or need guidance. You can always hide them again using \"Don't show this again\".",
+      "mission": {
+        "title": "Building Bridges to the Wisdom of Remarkable People",
+        "text": "Agora Cosmica is a project of ChipMates gemeinnützige GmbH, a small German nonprofit based in Freiburg im Breisgau. We work to make wisdom from history accessible to everyone, freed from academic barriers, paywalls, and ads.\n\nThe platform brings together 30 remarkable people from philosophy, science, mysticism, art, and activism — opening a doorway for anyone to begin their own journey with wisdom traditions."
+      },
+      "values": {
+        "title": "Our Values",
+        "gratitude": "Gratitude: Every era and tradition has something to teach us.",
+        "curiosity": "Curiosity: We learn with you, not about you.",
+        "openness": "Openness: Nonprofit. Open source. Built for the community.",
+        "transformation": "Transformation: Inner growth ripples outward."
+      },
+      "barriers": {
+        "title": "Breaking Down Barriers",
+        "intro": "The ideas of history's greatest minds shouldn't be locked behind academic barriers. They belong to everyone.",
+        "geographic": "Geographic: Available worldwide, around the clock",
+        "economic": "Economic: Open source, nonprofit. No paywalls, no ads",
+        "academic": "Academic: No prerequisites needed",
+        "age": "Age: Welcoming readers 16 and up"
+      },
+      "vision": {
+        "title": "Our Definition of Success",
+        "text": "We celebrate when people outgrow us — moving from our introductions to primary texts, from AI conversations to human teachers, from curiosity to their own deeper exploration. That is the mission."
+      },
+      "community": {
+        "title": "Our Promise",
+        "text": "We're early in this journey and we'll make mistakes. When we oversimplify, misrepresent, or miss the mark, tell us at agoracosmica@chipmates.ai. We're not building for you, but with you."
+      },
+      "established": "Founded 2023 as GmbH · gemeinnützige status since 2025 · HRB 728848 Amtsgericht Freiburg",
+      "broughtBy": "A project of ChipMates gemeinnützige GmbH · Freiburg, Germany",
+      "viewSourceOnGithub": "View source on GitHub",
+      "viewSourceOnGithubAria": "View Agora Cosmica source code on GitHub. Opens in a new tab."
+    },
+    "legal": {
+      "title": "Legal",
+      "description": "Access legal documents and policies",
+      "tooltip": "View important legal information including imprint, privacy policy, cookie policy, and terms of service",
+      "aiDisclosure": {
+        "title": "AI Disclosure"
+      },
+      "rights": {
+        "title": "Your Rights",
+        "noDataSelling": "We never sell your data",
+        "noTracking": "No tracking or analytics",
+        "nonprofit": "We're a nonprofit organization",
+        "dsgvo": "Full GDPR compliance"
+      },
+      "documents": {
+        "title": "Legal Documents",
+        "about": {
+          "description": "Mission, organization, and how we work"
+        },
+        "imprint": {
+          "description": "Legal imprint and company information"
+        },
+        "privacy": {
+          "description": "How we protect your privacy"
+        },
+        "cookie": {
+          "description": "Our cookie-free approach"
+        },
+        "terms": {
+          "description": "Terms of service for the chat service"
+        }
+      },
+      "dataProtection": {
+        "title": "Privacy by Design"
+      },
+      "privacyByDesign": {
+        "trustNonprofit": "Gemeinnützig",
+        "trustOpenSource": "Open Source (AGPL-3.0)",
+        "trustOpenSourceAria": "Open Source under AGPL-3.0. Read the source code on GitHub. Opens in a new tab.",
+        "trustNoTracking": "Without Tracking",
+        "trustProof": "We never keep your data. Servers in Germany and Finland, automatically checked every day.",
+        "clearAllButton": "Clear all my data",
+        "clearAllConfirm": "This deletes all your conversations, your OpenRouter key, and every setting on this device. The app will reload. Continue?"
+      },
+      "subProcessors": {
+        "title": "Sub-processors",
+        "intro": "We work with three EU or DPF-certified vendors. With your own OpenRouter key, you also become controller for that traffic.",
+        "hetzner": {
+          "name": "Hetzner Online",
+          "region": "Germany",
+          "purpose": "Voice and speech servers",
+          "status": "AVV in place"
+        },
+        "nebius": {
+          "name": "Nebius",
+          "region": "Finland (EU)",
+          "purpose": "Free-tier LLM",
+          "status": "DPA + ZDR enabled"
+        },
+        "cloudflare": {
+          "name": "Cloudflare",
+          "region": "DPF certified",
+          "purpose": "CDN, Worker, bot defense",
+          "status": "DPA in place"
+        },
+        "openrouter": {
+          "name": "OpenRouter",
+          "region": "Your key only",
+          "purpose": "Optional BYOK gateway",
+          "status": "ZDR routing on"
+        }
+      }
+    },
+    "categoriesDescription": {
+      "legal": "View imprint, privacy policy, cookie policy, and terms of service",
+      "voice": "{serviceText} voices with {speed}x speed.",
+      "speech": "Using {service} for speech recognition.",
+      "model": "Frontier Model during beta testing",
+      "help": "Manage help tips and tutorials"
+    },
+    "logout": "Logout"
+  },
+  "messages": {
+    "sendMessage": "Send Message",
+    "typeMessage": "Type your message...",
+    "sendingMessage": "Sending...",
+    "thinking": "Thinking...",
+    "processing": "Processing your request",
+    "tryAgain": "Try Again",
+    "errorOccurred": "An error occurred",
+    "sessionExpired": "Your session has expired. Please log in again."
+  },
+  "input": {
+    "placeholder": "Type your message...",
+    "switchToVoice": "Switch to voice input",
+    "switchToText": "Switch to text input",
+    "sendMessage": "Send message",
+    "startRecording": "Start recording",
+    "stopRecording": "Stop recording",
+    "tapToRecord": "Tap to Record",
+    "clickToRecord": "Click or Space to Record",
+    "tapToStop": "Tap to Stop",
+    "clickToStop": "Click or Space to Stop"
+  },
+  "quota": {
+    "remaining": "left",
+    "limitReached": "Daily limit reached",
+    "resetsAt": "Resets at {{time}} UTC",
+    "addKey": "Add API key for unlimited",
+    "modal": {
+      "chatTitle": "Message limit reached",
+      "councilTitle": "Council limit reached",
+      "summaryTitle": "Summary limit reached",
+      "chatBody": "You've used today's free messages.",
+      "councilBody": "You've used today's free council.",
+      "summaryBody": "You've used today's free summaries.",
+      "availableAgain": "Available again {{when}}.",
+      "setupKey": "Add OpenRouter Key",
+      "dismiss": "Maybe later",
+      "unlimitedNote": "With your own OpenRouter key, there are no daily limits."
+    }
+  },
+  "pii": {
+    "warning": "Your message appears to contain personal data (email, phone, or bank details). Please do not enter personal information in the chat.",
+    "sendAnyway": "Send anyway",
+    "edit": "Edit message"
+  },
+  "chat": {
+    "emptyState": "Choose a topic to begin your conversation.",
+    "reviewMode": "Summary",
+    "seeker": "Seeker"
+  },
+  "history": {
+    "title": "{figure}'s Dialogues",
+    "actions": {
+      "backup": "Backup",
+      "restore": "Restore",
+      "clear": "Clear",
+      "clearAll": "Clear All",
+      "generateSummary": "Summarize"
+    },
+    "summary": {
+      "title": "Conversation Summary"
+    },
+    "alerts": {
+      "backupSuccess": "Backup of all figures created successfully",
+      "backupFailed": "Failed to create backup",
+      "restoreSuccess": "Data restored successfully",
+      "restoreFailed": "Failed to restore backup",
+      "invalidBackup": "Invalid backup file",
+      "clearFailed": "Failed to clear history",
+      "clearAllSuccess": "Successfully cleared history for all figures",
+      "clearAllFailed": "Failed to clear all histories",
+      "summaryFailed": "Failed to generate summary"
+    },
+    "confirmations": {
+      "restoreAll": "This will replace all existing data. Continue?",
+      "clearSeed": "Are you sure you want to clear the history for this Star Seed?",
+      "clearFreeTalk": "Are you sure you want to clear the FreeTalk history?",
+      "clearAll": "Are you sure you want to clear the history for ALL FIGURES across all Star Seeds? This action cannot be undone."
+    }
+  },
+  "navigation": {
+    "home": "Home",
+    "explore": "Explore",
+    "journey": "Journey",
+    "settings": "Settings",
+    "audioLibrary": "Audio Library",
+    "profile": "Profile",
+    "help": "Help",
+    "closeMenu": "Close menu",
+    "toggleMenu": "Toggle menu",
+    "openMenu": "Open navigation menu",
+    "modes": "Chapters",
+    "wisdom": "Wisdom",
+    "history": "History",
+    "guide": "Guide",
+    "curatedDebates": "Curated Debates",
+    "swipeForMenu": "Swipe for menu →",
+    "userProfile": "User profile",
+    "logout": "Logout",
+    "tabs": {
+      "cosmos": "Cosmos",
+      "echoes": "Echoes",
+      "journeys": "Journeys",
+      "dialogue": "Dialogue",
+      "starseeds": "Star Seeds",
+      "tour": "Tour"
+    }
+  },
+  "quickLinks": {
+    "navigationBar": "Quick navigation bar",
+    "exploreSeeds": "Explore Star Seeds",
+    "startQuest": "Start Quest",
+    "backToSeeds": "Back to Seeds",
+    "discoverSeeds": "Discover Seeds",
+    "exploreModes": "Explore Modes",
+    "viewHistory": "View History",
+    "freeConversation": "Free Conversation",
+    "seeds": "Seeds",
+    "quest": "Quest",
+    "discover": "Discover",
+    "modes": "Modes",
+    "freetalk": "Talk",
+    "listenPrism": "Listen to Prism",
+    "startFreetalk": "Freetalk",
+    "listenToStory": "Listen to Story"
+  },
+  "figures": {
+    "explore": "Explore Figures",
+    "selectFigure": "Select a Figure",
+    "learnMore": "Learn More",
+    "viewAll": "Sages",
+    "about": "About",
+    "select": "Select",
+    "wisdom": "Wisdom",
+    "echoOf": "Echo of",
+    "echoOfName": "Echo of {name}",
+    "categories": {
+      "sages": "Sages",
+      "reformers": "Reformers",
+      "creators": "Creators"
+    }
+  },
+  "bloom": {
+    "header": {
+      "firstLight": "First Light",
+      "deepening": "Deepening",
+      "expanding": "Expanding",
+      "fullyBloomed": "Fully Bloomed"
+    },
+    "reflection": {
+      "0-1": "A teaching heard for the first time.",
+      "1-2": "Deepened through conversation.",
+      "2-3": "Seen through new eyes.",
+      "3-4": "Tested and understood. This teaching is yours."
+    },
+    "with": "with {figureName}",
+    "invite": {
+      "singular": "A star has bloomed",
+      "plural": "Stars have bloomed"
+    }
+  },
+  "seeds": {
+    "title": "Star Seeds",
+    "titleWithFigure": "{figure}'s Wisdom",
+    "explore": "Explore Star Seeds",
+    "difficulty": "Difficulty",
+    "navigation": {
+      "jumpTo": "Jump to:"
+    },
+    "beginner": "Beginner",
+    "intermediate": "Intermediate",
+    "advanced": "Advanced",
+    "gathered": "Star Seeds gathered",
+    "constellationComplete": "Constellation Complete!",
+    "constellationMastered": "Constellation Mastered",
+    "allStarsGathered": "You've gathered all {count} stars of \"{name}\"",
+    "allSeedsMastered": "All {count} seeds fully explored across every mode",
+    "votingPowerLabel": "Community Voting Power",
+    "votingPowerTotal": "Total: {total}",
+    "tierTransitionVoice": "You're now a Voice",
+    "tierTransitionVoiceDesc": "Your voice in the agora is growing.",
+    "tierTransitionCouncil": "Welcome to the Council",
+    "tierTransitionCouncilDesc": "When voting opens, you can propose new figures and features.",
+    "votingOpensNote": "Voting opens in the near future.",
+    "openCommunity": "View Community",
+    "loadError": "Failed to load wisdom seeds.",
+    "noSeedsFound": "No Star Seeds Found",
+    "noSeedsForFigure": "No StarSeed data is available for this figure.",
+    "seedTitle": "{title}",
+    "seedSubtitle": "{subtitle}",
+    "constellation": {
+      "elements": {
+        "items": {
+          "gathered": {
+            "title": "Gathered"
+          },
+          "future": {
+            "title": "Not yet gathered"
+          }
+        }
+      }
+    },
+    "viewModes": {
+      "list": "List",
+      "map": "Map",
+      "switchToList": "Switch to list view",
+      "switchToMap": "Switch to map view"
+    },
+    "sections": {
+      "summary": "Summary",
+      "overview": "Overview",
+      "overviewConcept": "The Concept",
+      "overviewContext": "Historical Context",
+      "overviewRelevance": "Why It Matters",
+      "coreInsights": "Key Insights",
+      "outcomes": "What You'll Gain",
+      "featuredConnection": "Featured Connection",
+      "relatedConnections": "Related Connections",
+      "moreConnectedWisdom": "More Connected Wisdom",
+      "sourcesVerification": "Sources & Verification",
+      "primarySources": "Primary Sources",
+      "secondarySources": "Secondary Sources",
+      "furtherReading": "Further Reading",
+      "importance": "Importance",
+      "practice": "Practice",
+      "quotesAndSources": "Quotes & Sources",
+      "originalSource": "Original Source",
+      "wisdomConnections": "Wisdom Connections",
+      "whySelected": "Why Selected",
+      "details": "Details",
+      "noDetails": "No detailed information available for this StarSeed yet."
+    },
+    "connectionTypes": {
+      "parallel": "Parallel",
+      "historical": "Historical",
+      "complement": "Complement",
+      "contrast": "Contrast"
+    },
+    "practiceDisclaimer": "This practice is outside Agora Cosmica's scope. Explore on your own if interested.",
+    "actions": {
+      "focusOnSeed": "Focus on This StarSeed",
+      "revisitSeed": "Revisit This StarSeed",
+      "viewFullDetails": "View Full Details",
+      "listenToStory": "Listen to Story",
+      "exploreWisdom": "Explore Wisdom",
+      "hearPrism": "Hear Prism",
+      "startQuest": "Start Quest",
+      "revisit": "Revisit",
+      "morePaths": "More Chapters"
+    }
+  },
+  "audio": {
+    "playBackground": "Play Music",
+    "mute": "Mute",
+    "unmute": "Unmute",
+    "browserNotSupported": "Your browser does not support the audio element."
+  },
+  "audioLibrary": {
+    "title": "Stories",
+    "floatingButton": "Audio Library",
+    "openLibrary": "Open Audio Library",
+    "loading": "Loading stories...",
+    "loadingAudio": "Loading audio...",
+    "noStories": "No stories available for {figureName}",
+    "availableStories": "Available Stories",
+    "stories": "stories",
+    "notAvailable": "not available",
+    "availableLanguages": "Available languages",
+    "nowPlayingLabel": "Now Playing",
+    "foreword": "Foreword",
+    "playAll": "Play All",
+    "shuffle": "Shuffle",
+    "storyTypes": {
+      "seed": "Wisdom Seeds"
+    },
+    "languages": {
+      "english": "English",
+      "german": "German"
+    },
+    "audioAvailable": "{language} Audio Available",
+    "controls": {
+      "play": "Play",
+      "pause": "Pause",
+      "playStory": "Play story",
+      "previousFigure": "Previous figure",
+      "nextFigure": "Next figure",
+      "previousTrack": "Previous track",
+      "nextTrack": "Next track",
+      "toggleRepeat": "Toggle repeat",
+      "expandPlayer": "Expand player",
+      "backToCollection": "Back to collection",
+      "increaseSpeed": "Increase speed by 0.05",
+      "decreaseSpeed": "Decrease speed by 0.05",
+      "progress": "Progress"
+    },
+    "carousel": {
+      "selectFigure": "Select {figureName}",
+      "figureCarousel": "Figure carousel",
+      "thumbnailOf": "Thumbnail of {figureName}"
+    },
+    "nowPlaying": {
+      "imageOf": "Image of {figureName}",
+      "defaultTitle": "Introduction",
+      "figure": "Figure"
+    }
+  },
+  "foreword": {
+    "notAvailable": "Foreword not available for this figure."
+  },
+  "cosmicCouncil": {
+    "title": "Cosmic Council",
+    "subtitle": "Assemble wisdom from across time",
+    "floatingButton": "Cosmic Council",
+    "openCouncil": "Open Cosmic Council",
+    "loading": "Assembling cosmic council...",
+    "crisis": {
+      "dialogLabel": "Support resources"
+    },
+    "categories": {
+      "greatDebate": "The Great Debate",
+      "mysticsVsScientists": "Mystics vs Scientists",
+      "rebelsVsSages": "Rebels vs Sages",
+      "eastMeetsWest": "East Meets West"
+    },
+    "categoryDescriptions": {
+      "greatDebate": "Transcendent Truth vs Empirical Reality",
+      "mysticsVsScientists": "Faith vs Reason",
+      "rebelsVsSages": "Revolution vs Acceptance",
+      "eastMeetsWest": "Ancient Wisdom Traditions"
+    },
+    "setup": {
+      "selectCategory": "Select a philosophical tension",
+      "chooseFigures": "Choose up to 5 figures for your council",
+      "moderator": "Moderator",
+      "startCouncil": "Open the Council",
+      "charCounter": "{used} of {max}",
+      "questionPlaceholder": "What philosophical question would you like to explore?",
+      "title": "Cosmic Council Setup",
+      "subtitle": "Configure your philosophical gathering",
+      "questionLabel": "Your Philosophical Question",
+      "starting": "Assembling Council...",
+      "quotaExhaustedHelp": "Free-tier daily council limit reached. Opening this will show how to use your own AI key for unlimited councils.",
+      "reset": "Reset",
+      "participants": "Participants",
+      "selected": "selected",
+      "selectFigures": "Select Figures",
+      "dragToOrbit": "Drag to orbit",
+      "dropHere": "Drop here",
+      "dragInstructions": "Drag figures to orbital positions or click to select",
+      "clickInstructions": "Tap a figure to choose your moderator, then add up to 3 participants",
+      "councilType": "Discussion Style",
+      "debate": "Debate",
+      "advisory": "Reflection",
+      "debateDescription": "Explore clashing viewpoints",
+      "advisoryDescription": "Explore harmonizing perspectives",
+      "debatePlaceholder": "What philosophical question should they debate? (e.g., \"Is free will real or an illusion?\")",
+      "advisoryPlaceholder": "What question should they reflect on together? (e.g., \"How do I find meaning after losing someone close?\")",
+      "selectModerator": "Select a Moderator",
+      "selectParticipants": "Add Participants",
+      "moderatorNeeded": "Choose who leads",
+      "maxReached": "Council is full",
+      "noModerator": "Not chosen yet",
+      "balance": "Balance",
+      "emptySlot": "Empty",
+      "customConfrontational": "Custom Confrontational",
+      "customReflective": "Custom Reflective",
+      "customConfrontationalSubtitle": "Your philosophical council",
+      "customReflectiveSubtitle": "Your reflective council"
+    },
+    "phases": {
+      "opening": "Opening",
+      "perspectives": "Perspectives",
+      "examination": "Inquiry",
+      "synthesis": "Synthesis",
+      "conclusion": "Resolution"
+    },
+    "endCouncil": "End Council",
+    "debateComplete": "Council Complete",
+    "closeReview": "Close Review",
+    "quickSelection": {
+      "title": "Quick Start",
+      "selectTension": "Select a philosophical tension",
+      "moderatedBy": "Moderated by",
+      "participants": "Participants",
+      "coreQuestion": "Core Question",
+      "councilOf": "Council of {count} Minds",
+      "chooseCouncil": "Choose a philosophical council",
+      "featured": "Featured",
+      "curatedDebates": "Curated Confrontational",
+      "curatedAdvisory": "Curated Reflective",
+      "customCouncil": "Custom Council",
+      "buildYourOwnDebate": "Build your own debate"
+    },
+    "curated": {
+      "qualityScore": "Quality Score",
+      "estimatedDuration": "Estimated Duration",
+      "minutes": "minutes",
+      "featured": "Featured",
+      "curatedDebates": "Curated Confrontational",
+      "curatedAdvisory": "Curated Reflective",
+      "customCouncil": "Custom Council",
+      "buildYourOwn": "Build your own council",
+      "preWritten": "Pre-written",
+      "customizeNote": "To customize, please choose custom council"
+    },
+    "cardFeed": {
+      "play": "Begin Council",
+      "listenAgain": "Listen Again",
+      "backToCatalog": "Back",
+      "figures": "Figures",
+      "moderator": "Moderator",
+      "tapToExpand": "Tap to expand",
+      "buildYourOwn": "Build Your Own Council",
+      "buildYourOwnSubtitle": "Choose figures, set the question"
+    },
+    "level2": {
+      "title": "Go Deeper",
+      "description": "The same figures, the same question. Denser ideas, richer metaphors, less guidance. For listeners ready to sit with the full philosophical weight.",
+      "listen": "Go Deeper",
+      "locked": "Complete this council to unlock"
+    },
+    "safety": {
+      "deep": "Contains difficult themes",
+      "sensitive": "Sensitive topic"
+    },
+    "type": {
+      "confrontational": "Confrontational",
+      "reflective": "Reflective"
+    },
+    "themes": {
+      "loss": "Loss & Suffering",
+      "love": "Love & Loneliness",
+      "identity": "Who Am I?",
+      "freedom": "Freedom & Power",
+      "faith": "Faith & Doubt",
+      "creativity": "Creativity & Play",
+      "mind": "Mind & Perception",
+      "lossGrief": "Loss & Grief",
+      "loveConnection": "Love & Connection",
+      "whoAmI": "Who Am I?",
+      "meaningPurpose": "Meaning & Purpose",
+      "freedomJustice": "Freedom & Justice",
+      "faithDeathMystery": "Faith, Death & Mystery",
+      "moralLife": "The Moral Life",
+      "mindCreativity": "Mind & Creativity"
+    },
+    "conversation": {
+      "phases": {
+        "opening": "Opening",
+        "perspectives": "Perspectives",
+        "examination": "Examination",
+        "synthesis": "Synthesis",
+        "conclusion": "Conclusion"
+      },
+      "stopCouncil": "Stop Council",
+      "councilInProgress": "Council in Progress"
+    },
+    "councils": {
+      "meaningAndPurpose": {
+        "title": "Finding Meaning & Purpose",
+        "subtitle": "Individual Purpose, Service, and Authentic Choice - Enhanced Voices",
+        "question": "How do we find meaning and purpose in our lives?"
+      },
+      "violenceAndChange": {
+        "title": "Violence & Social Change",
+        "subtitle": "Ahimsa, Strategic Resistance, Christian Non-Violence, Liberation Analysis",
+        "question": "Is violence ever justifiable to achieve social change?"
+      },
+      "godReligionFlourishing": {
+        "title": "God, Religion & Human Flourishing",
+        "subtitle": "No-God Buddhism, Mystical Devotion, Christian Visionary, \"God is Dead\"",
+        "question": "Can humanity thrive without God or traditional religion?"
+      },
+      "freedomVsHarmony": {
+        "title": "Individual Freedom vs Social Harmony",
+        "subtitle": "Radical Individualism, Harmonious Flow, Situated Freedom, Duty to Whole",
+        "question": "Should we pursue individual freedom or social harmony?"
+      },
+      "moralCourageHostileWorld": {
+        "title": "Moral Courage in Hostile World",
+        "subtitle": "Principled Resistance, Dangerous Courage, Truth vs Authority",
+        "question": "How do I find courage to act on my values in a hostile world?"
+      },
+      "livingWithIllness": {
+        "title": "Living Fully with Serious Illness",
+        "subtitle": "Stoic Acceptance, Transforming Pain into Art, Trauma Transcendence",
+        "question": "How do I live fully with a serious illness like cancer or Parkinson's?"
+      },
+      "healingDeepBetrayal": {
+        "title": "Healing from Deep Betrayal",
+        "subtitle": "Radical Forgiveness, Trauma Transcendence, Strength from Wounds",
+        "question": "How do I forgive someone who betrayed me deeply?"
+      }
+    }
+  },
+  "languageWheel": {
+    "title": "Choose Your Language",
+    "selectLanguage": "Select {language}",
+    "currentLanguage": "current",
+    "recent": "Recent",
+    "allLanguages": "All Languages",
+    "close": "Close language selector"
+  },
+  "constellations": {
+    "symbolizes": "Symbolizes"
+  },
+  "device": {
+    "landscapeWarning": "Screen size not supported. Please rotate your device."
+  },
+  "conversation": {
+    "start": "Begin Journey",
+    "stop": "Stop",
+    "selectLanguage": "Select {language}",
+    "ariaLabel": "Begin your wisdom journey",
+    "preparingConversation": "Preparing conversation...",
+    "preparingJourney": "Preparing your journey..."
+  },
+  "modes": {
+    "mode": "Mode",
+    "story": "Story",
+    "wisdom": "Wisdom",
+    "prism": "Prism",
+    "quest": "Quest",
+    "freetalk": "Freetalk",
+    "selector": {
+      "title": "Choose Your Chapter",
+      "description": "How would you like to meet {figureName} today?",
+      "descriptionWithSeed": "How would you like to explore '{seedTitle}' with {figureName}?",
+      "freetalkCta": "Talk freely",
+      "freetalkCtaSub": "about whatever you want.",
+      "chapterDivider": "or choose your learning chapter",
+      "listen": "listen",
+      "interact": "interact",
+      "talk": "talk",
+      "chapterLabel": "Chapter",
+      "story": {
+        "title": "Story",
+        "description": "15-min narrated biography • Start here for context"
+      },
+      "prism": {
+        "title": "Prism",
+        "description": "Multi-perspective dialogue • 4 figures discuss the topic"
+      },
+      "wisdom": {
+        "title": "Wisdom",
+        "description": "Guided wisdom dialogue • Deep wisdom exploration"
+      },
+      "freetalk": {
+        "title": "Freetalk",
+        "description": "Open conversation • Ask anything you're curious about"
+      },
+      "quest": {
+        "title": "Quest",
+        "description": "5-question challenge • Test your understanding"
+      }
+    }
+  },
+  "processing": {
+    "title": "Processing Your Message",
+    "is": "is",
+    "contemplating": "contemplating your question...",
+    "crafting": "crafting a thoughtful response...",
+    "considering": "considering your perspective...",
+    "exploring": "exploring wisdom to share...",
+    "reflecting": "reflecting on your inquiry...",
+    "connecting": "connecting with ancient insights...",
+    "normal": {
+      "preparing": {
+        "a": "One moment.",
+        "b": "The question has arrived.",
+        "c": "One breath."
+      },
+      "hearing": {
+        "a": "Listening to you.",
+        "b": "Taking in your words."
+      },
+      "contemplating": {
+        "a": "Thinking.",
+        "b": "Finding the thread.",
+        "c": "Weighing the words.",
+        "d": "Finding where to start.",
+        "e": "Connecting ideas.",
+        "f": "Looking at the question.",
+        "g": "Gathering the answer.",
+        "h": "Letting the picture come."
+      },
+      "shaping": {
+        "a": "Shaping the voice.",
+        "b": "Almost ready."
+      }
+    },
+    "highDemand": {
+      "preparing": {
+        "a": "Many voices today. Just a moment.",
+        "b": "Full house today."
+      },
+      "hearing": {
+        "a": "Many voices today. Your words are heard."
+      },
+      "contemplating": {
+        "a": "Many voices today. The answer is coming.",
+        "b": "Full house today. Just a moment more.",
+        "c": "A little busier than usual today."
+      },
+      "shaping": {
+        "a": "The voice is finding its way."
+      }
+    },
+    "optOut": "Read text instead",
+    "takingLonger": "Takes longer today. Wait a moment for the voice, or read now and skip the wait."
+  },
+  "councilProcessing": {
+    "title": "Convening Cosmic Council",
+    "assembling": "assembling the philosophical council...",
+    "inviting": "the participants are arriving...",
+    "preparing": "the room is being prepared...",
+    "initiating": "the dialogue begins...",
+    "dialogueFlowing": "dialogue flowing between minds...",
+    "wisdomEmerging": "wisdom emerging from debate...",
+    "conversationUnfolding": "conversation unfolding organically...",
+    "insightsForming": "insights forming through exchange...",
+    "finalizing": "finalizing philosophical positions...",
+    "polishing": "polishing the discourse...",
+    "completing": "completing the council session...",
+    "philosophers": "the Philosophers",
+    "andOthers": "& others",
+    "stageGenerating": "Generating Council",
+    "stageStreaming": "Streaming Dialogue",
+    "stageProcessing": "Processing Wisdom",
+    "highDemand": {
+      "generating": {
+        "a": "A lively gathering today. The voices are coming together.",
+        "b": "Full chamber today. The council takes its time."
+      },
+      "streaming": {
+        "a": "Many voices weaving today. The dialogue flows carefully.",
+        "b": "The council is in full discourse today."
+      },
+      "processing": {
+        "a": "The council needs a little more time today."
+      }
+    },
+    "optOut": "Read dialogue instead",
+    "takingLonger": "Takes longer today. Wait a moment for the voices, or read the dialogue now."
+  },
+  "summary": {
+    "generatingTitle": "Generating Summary",
+    "distilling": "distilling wisdom from your conversation",
+    "gathering": "gathering insights from your dialogue",
+    "extracting": "extracting the essence of your journey",
+    "crystallizing": "crystallizing the knowledge shared",
+    "weaving": "weaving threads of understanding",
+    "mapping": "mapping the constellation of ideas"
+  },
+  "errors": {
+    "somethingWentWrong": "Something went wrong",
+    "retry": "Retry",
+    "errorDetails": "Error Details",
+    "network": {
+      "offline": "You are offline. Some features may not work.",
+      "reconnected": "Connection restored",
+      "timeout": "The request took too long. Please try again.",
+      "ttsUnavailable": "Voice output paused for a moment. You can still read all responses as text.",
+      "sttUnavailable": "Voice input is not available right now. You can type your message instead.",
+      "gpuCapacityGerman": "German audio is briefly at capacity. Switch to English to keep hearing responses.",
+      "gpuCapacityAll": "Audio is briefly at capacity. Your conversation continues with text while it recovers.",
+      "audioRateLimited": "Audio is taking a short break. Your conversation continues with text."
+    },
+    "mic": {
+      "generic": {
+        "title": "Microphone Error",
+        "message": "Could not access your microphone. Please check your settings and try again."
+      },
+      "denied": {
+        "title": "Microphone Access Denied",
+        "ios": "To enable microphone access:\n1. Open Settings app\n2. Scroll to Safari\n3. Enable Microphone access",
+        "android": "To enable microphone access:\n1. Tap the 🔒 icon in the address bar\n2. Go to Site Settings\n3. Enable Microphone",
+        "desktop": "Please allow microphone access in your browser settings and try again."
+      },
+      "notFound": {
+        "title": "No Microphone Detected",
+        "message": "No microphone was found on your device. Please connect a microphone and try again."
+      },
+      "notReadable": {
+        "title": "Microphone In Use",
+        "message": "Your microphone is currently being used by another application. Please close other apps and try again."
+      },
+      "security": {
+        "title": "Security Error",
+        "message": "Microphone access requires a secure connection (HTTPS). Please ensure you are using HTTPS."
+      },
+      "retry": "Try Again",
+      "dismiss": "Dismiss",
+      "fallback": "You can also type your question instead."
+    },
+    "conversation": {
+      "messageTooLong": "Your message is a bit long. Try shortening it, or add your OpenRouter key in Settings for unlimited length.",
+      "tooManyMessages": "This conversation has reached its maximum length. Start a new one to continue.",
+      "contentSafety": "I can't engage with that. Please rephrase.",
+      "contentSafetyCrisis": "This conversation needs support beyond what a philosophical dialogue can offer. Please reach out to a crisis helpline.",
+      "freeTierAtCapacity": "Free tier is at capacity right now. Add your OpenRouter key in Settings for uninterrupted access.",
+      "dailyLimit": "Daily message limit reached. Your conversations resume tomorrow.",
+      "llmDown": "Briefly unavailable. Please try again in a moment.",
+      "llmRateLimited": "The AI service is busy. Please try again in a moment.",
+      "byokInvalidKey": "Your OpenRouter key was rejected. Please check it in Settings.",
+      "byokInsufficientCredits": "Your OpenRouter account is out of credits. Please top it up to continue.",
+      "timeout": "The request took too long. Please try again.",
+      "network": "Connection issue. Please check your network and try again.",
+      "generic": "We could not complete that conversation. Please try again."
+    }
+  },
+  "search": {
+    "placeholder": "Search seeds... (Ctrl+F)",
+    "ariaLabel": "Search seeds",
+    "clear": "Clear search"
+  },
+  "confirmations": {
+    "changeModeTitle": "Change Chapter?",
+    "changeModeMessage": "Changing chapters will start a new conversation context. Are you sure?"
+  },
+  "badges": {
+    "mp3": "MP3"
+  },
+  "storyPlayer": {
+    "loadingStory": "Loading story",
+    "prerecordedIntro": "About",
+    "learnMoreLink": "Learn more",
+    "continueListening": "Continue where you left off?",
+    "resume": "Resume",
+    "jumpToParagraph": "Jump to paragraph {number}"
+  },
+  "prismPlayer": {
+    "loading": "Loading prism...",
+    "loadError": "Could not load this prism. Please try again.",
+    "nowSpeaking": "Now speaking",
+    "transcript": "Transcript",
+    "hideTranscript": "Hide transcript",
+    "showTranscript": "Show transcript",
+    "continueListening": "Continue where you left off?",
+    "resume": "Resume",
+    "seedTitle": "Seed: {title}",
+    "figuresDiscussing": "{count} figures discussing",
+    "skipBack": "Back 15s",
+    "skipForward": "Forward 15s",
+    "speed": "Speed",
+    "prismComplete": "Prism complete",
+    "tapToSeek": "Tap to jump to this part",
+    "preview": {
+      "back": "Back",
+      "listen": "Listen",
+      "continue": "Continue",
+      "hostedBy": "Hosted by",
+      "duration": "~{minutes} min",
+      "foundation": "Foundation",
+      "expansion": "Expansion",
+      "tension": "Tension",
+      "perspectives": "Perspectives in this Prism"
+    }
+  },
+  "legal": {
+    "privacy": {
+      "title": "Privacy Policy",
+      "lastUpdated": "Last updated: March 29, 2026"
+    },
+    "imprint": {
+      "title": "Impressum",
+      "lastUpdated": "Last updated: March 29, 2026"
+    },
+    "terms": {
+      "title": "Terms of Service",
+      "lastUpdated": "Last updated: April 27, 2026"
+    },
+    "links": {
+      "privacy": "Privacy Policy",
+      "imprint": "Impressum",
+      "cookiePolicy": "Cookie Policy",
+      "terms": "Terms of Service",
+      "about": "About Us",
+      "github": "Source code"
+    },
+    "consent": {
+      "heading": "Before you begin",
+      "aiNotice": "This application is fully operated by artificial intelligence (AI). You are NOT interacting with real historical figures. All content is generated automatically by an AI system and may be inaccurate, incomplete, or misleading. Always verify important information with primary sources.",
+      "ageCheckbox": "I confirm that I am at least 16 years old or have the consent of a parent or guardian.",
+      "termsCheckbox": "I have read and accept the",
+      "termsLink": "Terms of Service",
+      "privacyNote": "Privacy Policy",
+      "jsbNote": "Youth Protection Officer",
+      "startButton": "Start exploring",
+      "termsCheckboxSuffix": "."
+    },
+    "cookiePolicy": {
+      "title": "Cookie Policy",
+      "lastUpdated": "Last updated: April 2026",
+      "intro": "At Agora Cosmica, we respect your privacy and are committed to being transparent about our use of cookies and similar technologies.",
+      "whatAreCookies": {
+        "title": "What Are Cookies?",
+        "description": "Cookies are small text files that are placed on your device when you visit a website. They help the website function properly and provide a better user experience."
+      },
+      "cookieFreeApproach": {
+        "title": "Our Cookie-Free Approach",
+        "description": "We have designed Agora Cosmica to operate without the use of tracking cookies, analytics cookies, or marketing cookies. This means you can use our application without being tracked or profiled."
+      },
+      "essentialStorage": {
+        "title": "Essential Technical Storage",
+        "description": "We only use essential technical storage that is strictly necessary for the application to function:",
+        "table": {
+          "type": "Type",
+          "purpose": "Purpose",
+          "duration": "Duration"
+        },
+        "sessionStorage": "Session Storage",
+        "sessionPurpose": "Maintains your session state while using the application",
+        "sessionDuration": "Until you close your browser",
+        "localStorage": "Local Storage",
+        "localPurpose": "Saves your language preference (selectedLanguage, lastAppliedLanguage)",
+        "localDuration": "Until manually cleared"
+      },
+      "securityCookie": {
+        "title": "Security Cookie (__cf_bm)",
+        "description": "We use one technically necessary cookie set by Cloudflare for bot protection and firewall (WAF). It does not track you across sites, contains no personal information, and is required for the application to defend against automated abuse.",
+        "table": {
+          "name": "Name",
+          "purpose": "Purpose",
+          "duration": "Duration",
+          "legalBasis": "Legal Basis"
+        },
+        "name": "__cf_bm",
+        "purpose": "Bot protection and firewall (Cloudflare)",
+        "duration": "30 minutes",
+        "legalBasis": "Technically necessary, § 25 (2) Nr. 2 TDDDG (no consent required)"
+      },
+      "whatWeDontUse": {
+        "title": "What We Don't Use",
+        "description": "Apart from the security cookie above, we do NOT use:",
+        "analytics": "Analytics cookies or tracking (e.g., Google Analytics, Facebook Pixel)",
+        "marketing": "Marketing or advertising cookies",
+        "social": "Social media tracking cookies",
+        "thirdParty": "Third-party tracking cookies",
+        "tracking": "Cross-site tracking technologies"
+      },
+      "privacyRights": {
+        "title": "Your Privacy Rights",
+        "description": "Since we don't use tracking cookies, there are no cookie preferences to manage. Your privacy is protected by default. The minimal technical storage we use is essential for the application to remember your basic preferences like language selection."
+      },
+      "privacyAnalytics": {
+        "title": "Privacy-Preserving Analytics",
+        "description": "We use Cloudflare's cookieless Web Analytics to understand site performance. This privacy-focused service does not use cookies, track individuals, or collect personal data. It only provides aggregated insights about page views and site performance."
+      },
+      "changes": {
+        "title": "Changes to This Policy",
+        "description": "If we make any changes to our cookie practices, we will update this policy and notify users appropriately."
+      },
+      "contact": {
+        "title": "Contact Us",
+        "description": "If you have any questions about our cookie policy or privacy practices, please contact us through our main website."
+      }
+    },
+    "menuLabel": "Open legal menu"
+  },
+  "pwaInstall": {
+    "title": "Mobile Browser Not Supported",
+    "subtitle": "Desktop Offers Best Experience",
+    "nativeAppNote": "For mobile use: Add as PWA to home screen. Native app with full features coming soon.",
+    "instructionTitle": "Installation Guide",
+    "installNow": "Install PWA",
+    "showInstructions": "Show Installation",
+    "maybeLater": "Remind Later",
+    "chrome": {
+      "title": "Chrome / Edge",
+      "step1": "1. Click the three dots in the top-right",
+      "step2": "2. Select \"Install Agora Cosmica\"",
+      "step3": "3. Click \"Install\" in the popup"
+    },
+    "safari": {
+      "title": "Safari",
+      "step1": "1. Tap the share button",
+      "step2": "2. Scroll down and tap \"Add to Home Screen\"",
+      "step3": "3. Tap \"Add\" in the top-right"
+    },
+    "firefox": {
+      "title": "Firefox",
+      "step1": "1. Click the address bar",
+      "step2": "2. Look for the install icon",
+      "step3": "3. Click to install"
+    },
+    "iosChrome": {
+      "notice": "iOS Chrome cannot install PWAs directly",
+      "step1": "1. Copy this URL",
+      "step2": "2. Open Safari browser",
+      "step3": "3. Paste the URL and follow Safari instructions"
+    },
+    "androidChrome": {
+      "step1": "1. Tap the menu button",
+      "step2": "2. Tap \"Install app\" or \"Add to Home screen\"",
+      "step3": "3. Follow the prompts"
+    },
+    "samsung": {
+      "step1": "1. Tap the menu button",
+      "step2": "2. Tap \"Add page to\"",
+      "step3": "3. Select \"Home screen\""
+    },
+    "default": {
+      "instruction": "Look for \"Install\" or \"Add to Home Screen\" in your browser menu"
+    },
+    "deviceMessages": {
+      "tablet": "Mobile browser doesn't work. Install Agora Cosmica as PWA for basic functionality.",
+      "phone": "Mobile browser doesn't work. Install Agora Cosmica as PWA for basic functionality."
+    }
+  },
+  "onboarding": {
+    "skipTour": "Skip Tour",
+    "continue": "Continue",
+    "back": "Back",
+    "finalButton": "Begin My Journey",
+    "welcome": {
+      "title": "Welcome to Agora Cosmica",
+      "tagline": "Where timeless wisdom meets modern conversation",
+      "quote": "The privilege of a lifetime is to become who you truly are",
+      "attribution": "Carl Jung"
+    },
+    "guides": {
+      "title": "Meet Your Echoes",
+      "description": "30 remarkable figures from history, each offering unique perspectives and profound insights",
+      "traditions": {
+        "sages": {
+          "title": "Ancient Wisdom",
+          "description": "Timeless teachings from wisdom traditions"
+        },
+        "reformers": {
+          "title": "Changemakers",
+          "description": "Visionaries who transformed society through courage and conviction"
+        },
+        "creators": {
+          "title": "Creative Genius",
+          "description": "Artists and innovators who expanded human imagination"
+        }
+      },
+      "steps": {
+        "browse": "Browse figures",
+        "explore": "Explore their wisdom",
+        "select": "Choose your Echo"
+      }
+    },
+    "journey": {
+      "title": "Your Journey Awaits",
+      "description": "Four unique paths to explore wisdom and meaning",
+      "modes": {
+        "story": {
+          "title": "Story",
+          "description": "Immersive tales that bring wisdom to life"
+        },
+        "wisdom": {
+          "title": "Wisdom",
+          "description": "Deep insights on life's essential questions"
+        },
+        "freetalk": {
+          "title": "FreeTalk",
+          "description": "Open conversations about anything on your mind"
+        },
+        "quest": {
+          "title": "Quest",
+          "description": "Personal growth through guided exploration"
+        }
+      }
+    },
+    "conversation": {
+      "title": "Natural Conversation",
+      "description": "Speak naturally, as you would with a wise friend",
+      "steps": {
+        "holdSpace": "Hold spacebar to activate voice",
+        "speak": "Speak your thoughts naturally",
+        "release": "Release to send your message",
+        "keyboard": "Prefer typing? Click the input field instead"
+      }
+    },
+    "constellation": {
+      "title": "Star Seeds & Constellations",
+      "description": "Collect wisdom Star Seeds to unlock deeper insights and reveal your unique constellation of understanding",
+      "constellationName": "The Hero's Journey",
+      "progress": "5 of 12 Star Seeds collected",
+      "stats": {
+        "figures": "Echoes",
+        "seeds": "Star Seeds to collect",
+        "constellation": "Unique constellations"
+      }
+    },
+    "mobileVoiceNotice": {
+      "title": "Mobile & Tablet Notice",
+      "message": "Voice features are currently limited in mobile browsers. For the full experience, please use desktop. Our native app with full voice support is coming soon!",
+      "okButton": "OK, Got it!"
+    }
+  },
+  "quickHelp": {
+    "title": "Guide",
+    "aiDisclosure": "AI Echoes are AI-generated portrayals inspired by historical teachings. Pre-written stories involve human-AI collaboration. Live conversations and voices are generated entirely by AI.",
+    "learnMore": "Learn more",
+    "showLess": "Show less",
+    "footer": "Need more details? Full instructions coming after beta!",
+    "tabs": {
+      "start": "Start",
+      "aiInfo": "AI Info",
+      "privacy": "Privacy",
+      "tour": "Tour"
+    },
+    "start": {
+      "title": "Getting Started",
+      "proTip": {
+        "label": "Pro tip:",
+        "text": "Start with Story Mode to get introduced to your chosen Echo!"
+      },
+      "step1": {
+        "title": "Choose an Echo",
+        "description": "30 historical figures in 3 traditions:",
+        "traditions": {
+          "sages": "Sages (wisdom guides & spiritual teachers)",
+          "reformers": "Reformers (social changemakers)",
+          "creators": "Creators (artists & innovators)"
+        }
+      },
+      "step2": {
+        "title": "Pick a Journey Mode",
+        "modes": {
+          "story": {
+            "name": "Story",
+            "description": "- Start here! Narrative intro"
+          },
+          "wisdom": {
+            "name": "Wisdom",
+            "description": "- Explore Star Seeds"
+          },
+          "freetalk": {
+            "name": "Freetalk",
+            "description": "- Open conversation"
+          },
+          "quest": {
+            "name": "Quest",
+            "description": "- Test understanding"
+          }
+        }
+      },
+      "step3": {
+        "title": "Start Talking",
+        "voice": {
+          "label": "Voice:",
+          "description": "Hold SPACE bar while speaking"
+        },
+        "text": {
+          "label": "Text:",
+          "description": "Type in the input field"
+        },
+        "techNote": "Voice works best on desktop Chrome/Edge/Safari"
+      },
+      "step4": {
+        "title": "Collect Star Seeds",
+        "description": "Discover wisdom insights through dialogue",
+        "constellation": "Build constellations of connected ideas"
+      }
+    },
+    "echoes": {
+      "title": "About AI Echoes",
+      "whatTheyAre": {
+        "title": "What AI Echoes Are",
+        "description": "AI-generated educational portrayals of historical figures:",
+        "points": [
+          "Inspired by their documented writings and teachings",
+          "Pre-written stories produced with human-AI collaboration",
+          "Live conversations and voices generated entirely by AI",
+          "Educational interpretations, not authentic historical representations"
+        ]
+      },
+      "whatTheyAreNot": {
+        "title": "What They Are Not",
+        "points": [
+          "Not the real historical figures",
+          "Not attempts to recreate the actual person",
+          "Not comprehensive biographies, but representations of each figure's teachings and tradition",
+          "Cannot accurately represent everything they thought or wrote",
+          "May misinterpret questions or provide inaccurate responses"
+        ]
+      },
+      "quote": "When you meet Plato here, you are engaging with an AI interpretation inspired by his philosophy. A digital echo of his wisdom, not the person himself.",
+      "note": "Always verify important information with primary sources. AI Echoes are designed for educational exploration, not as authoritative historical sources."
+    },
+    "privacy": {
+      "title": "Your Privacy Matters",
+      "nonprofit": {
+        "label": "We're a nonprofit:",
+        "text": "Our mission is sharing wisdom, not collecting data. Clear your data anytime in Settings."
+      },
+      "dataStorage": {
+        "title": "On Your Device",
+        "description": "Stories, settings, and your API key never leave your browser",
+        "points": [
+          "Encrypted with AES-256-GCM in IndexedDB",
+          "Encryption key locked to this device, never transmitted",
+          "One click to clear everything"
+        ]
+      },
+      "voice": {
+        "title": "Voice & Speech",
+        "description": "Self-hosted in Germany. No third-party audio processing.",
+        "points": [
+          "Two servers in Falkenstein and Nuremberg (Hetzner)",
+          "Audio held in RAM only, deleted after each request",
+          "Daily check confirms nothing is logged or stored"
+        ]
+      },
+      "tracking": {
+        "title": "Zero Tracking",
+        "description": "No analytics scripts, no user profiles, no third-party trackers.",
+        "points": [
+          "Nothing from Google, Meta, or anyone else",
+          "One technical cookie that helps block bots",
+          "Just anonymous error counts so we can fix bugs"
+        ]
+      },
+      "aiModels": {
+        "title": "AI Models",
+        "description": "Same model on both paths. Your choice of provider.",
+        "points": [
+          "Qwen3 235B for free tier and your-own-key alike",
+          "Free: via Nebius (Finland, EU). DPA signed, ZDR enabled.",
+          "Your key: via OpenRouter. ZDR routing on by default."
+        ]
+      }
+    },
+    "tour": {
+      "title": "Interactive Tour",
+      "description": "Take a 2-3 minute guided journey through all features:",
+      "highlights": [
+        "Discover 30 historical Echoes",
+        "Explore 4 journey modes",
+        "Listen to unique wisdom stories",
+        "Master voice interaction",
+        "Understand Star Seeds & constellations"
+      ],
+      "button": "Start Interactive Tour",
+      "note": "Perfect for new users or showing the app to others!"
+    }
+  },
+  "welcome": {
+    "title": "Agora Cosmica",
+    "tagline": {
+      "line1": "Questions shine within you",
+      "line2": "Voices awaken across Time",
+      "line3": "This is the Agora"
+    },
+    "explainer": {
+      "tagline": "A Living Library You Can Talk To",
+      "bodyPart1": "Welcome. Thirty remarkable people from philosophy, science, art, and activism, brought to life in first-person portraits you can",
+      "listenLabel": "listen to",
+      "bodyPart2": ",",
+      "talkLabel": "talk with",
+      "bodyPart3": ", and watch",
+      "councilLabel": "debate each other",
+      "bodyPart4": " in the Cosmic Council.",
+      "mission": "A doorway to wisdom. Accessible for everyone."
+    },
+    "quote": "Follow your bliss and the universe will open doors where there were only walls.",
+    "quoteAttribution": "— Joseph Campbell",
+    "trustSignals": "Non-profit · Open Source · No Tracking",
+    "button": "Ignite Your Stars",
+    "seekerText": "Questions, like stars, shine within you.",
+    "seekerAlt": "The Seeker - your cosmic self with infinite potential within"
+  },
+  "accessibility": {
+    "skipLinks": {
+      "skip_to_main_content": "Skip to main content",
+      "skip_to_navigation": "Skip to navigation",
+      "skip_to_figure_selection": "Skip to figure selection",
+      "skip_navigation_label": "Skip navigation"
+    },
+    "liveRegion": {
+      "status": "Status updates",
+      "announcements": "Announcements"
+    },
+    "focus": {
+      "focused": "Focused",
+      "selected": "Selected",
+      "expanded": "Expanded",
+      "collapsed": "Collapsed"
+    },
+    "actions": {
+      "loading": "Loading",
+      "loaded": "Loaded",
+      "error": "Error occurred",
+      "success": "Success",
+      "new_message": "New message",
+      "figure_changed": "Figure changed",
+      "mode_changed": "Chapter changed",
+      "audio_playing": "Audio playing",
+      "audio_paused": "Audio paused",
+      "audio_stopped": "Audio stopped"
+    }
+  },
+  "factCheck": {
+    "facts": "Facts",
+    "storyDetails": "Story Details",
+    "documented": "Documented",
+    "recreated": "Recreated",
+    "realPeople": "Historical Figures",
+    "compositeCharacters": "Composite Characters",
+    "sources": "Sources",
+    "primarySources": "Primary Sources",
+    "scholarlySources": "Scholarly Sources",
+    "archives": "Archives",
+    "quotesApproach": "Quote Handling",
+    "commitment": "Our Approach",
+    "year": "Year",
+    "age": "Age",
+    "setting": "Setting",
+    "note": "Note",
+    "basis": "Basis",
+    "basisDocumented": "Documented",
+    "basisMixed": "Mixed",
+    "basisRecreated": "Recreated",
+    "bio": "Biography",
+    "specialNote": "Special Note",
+    "backToStories": "Back to Stories",
+    "storyNumber": "Story {number}",
+    "figureOverview": "Sources & Bio",
+    "aboutFigure": "About {name}",
+    "allStories": "All Stories",
+    "notes": "Notes",
+    "forewordSection": "Foreword",
+    "shadow": "Shadow",
+    "shadowIntro": "Every figure here was chosen for what they gave to the world. Our Echos follow the light, they don't tell the whole story. What they leave out, we share here.",
+    "shadowPersonal": "Personal Shadow",
+    "shadowHistorical": "Historical Shadow",
+    "shadowContext": "Historical Context",
+    "acknowledgments": "Acknowledgments",
+    "dramaticLicense": "Recurring Patterns",
+    "councilsSection": "Councils",
+    "prismsSection": "Prisms",
+    "groupStories": "Stories",
+    "groupPrisms": "Prisms",
+    "groupCouncils": "Councils",
+    "groupAcrossModes": "Across All Modes",
+    "groupReference": "Reference",
+    "basisLabel": "What is documented",
+    "appearancesLabel": "Appears in",
+    "documentedUsedLabel": "Documented events used",
+    "turn": "turn",
+    "kind": {
+      "composite-scene": "Composite scene",
+      "dramatized-quote": "Dramatized quote",
+      "compressed-timeline": "Compressed timeline",
+      "paraphrased-source": "Paraphrased source",
+      "invented-detail": "Invented detail",
+      "parable-attribution": "Parable attribution"
+    },
+    "role": {
+      "moderator": "moderator",
+      "participant": "participant",
+      "host": "host",
+      "guest": "guest"
+    }
+  },
+  "byok": {
+    "welcome": {
+      "figureSpoke": "{figureName} just spoke to you.",
+      "readyToRespond": "Ready to respond?",
+      "setupTime": "~5 minutes to set up your AI services,",
+      "unlimitedConversations": "then unlimited conversations.",
+      "getStarted": "Get Started →",
+      "exploreFirst": "I'll explore first"
+    },
+    "language": {
+      "title": "Which language should figures speak?",
+      "english": "English",
+      "german": "Deutsch",
+      "localAudio": "Zero logging, full privacy",
+      "cloudAudio": "Full German support (cheaper TTS not yet available)",
+      "costEnglish": "~17 hours for $1",
+      "costGerman": "~$0.9 per hour",
+      "recommended": "● Recommended",
+      "select": "Select",
+      "back": "← Back",
+      "continue": "Continue →"
+    },
+    "voice": {
+      "title": "Voice Input (Optional)",
+      "description": "Enable voice input to speak your philosophical questions instead of typing.",
+      "ios": {
+        "title": "For iPhone/iPad Safari:",
+        "intro": "To enable persistent microphone permission in Safari:",
+        "step1": "Tap the text size",
+        "step1b": "button (left side in the Safari address bar)",
+        "step2": "Tap the three dots",
+        "step2b": "menu icon",
+        "step3": "Select \"Website Settings\"",
+        "step4": "Set Microphone → \"Allow\"",
+        "benefit": "After this setup, Safari will never ask for permission again!"
+      },
+      "fallback": "You can also type your questions - both work great! (Chrome on iOS works without this setup)",
+      "back": "← Back",
+      "continue": "Continue →"
+    },
+    "guide": {
+      "title": "Get Your OpenRouter API Key",
+      "whatIsKey": "An API key is like a password that lets you use AI services. You only need to set this up once.",
+      "step1": "Click the button below to open OpenRouter in a new tab",
+      "step2": "Create a free account (Google, GitHub, or email)",
+      "step3": "Add credits in 'Credits' ($1 pays for ~100 hours!)",
+      "step4": "Go to 'Keys' and create a new key, then copy it",
+      "createAccount": "Create Free Account",
+      "reassurance": "Don't worry - we'll guide you through each step. This usually takes 2-3 minutes.",
+      "alreadyHaveKey": "I already have my key"
+    },
+    "deepInfraKey": {
+      "title": "Connect DeepInfra",
+      "pasteTitle": "Paste Your DeepInfra API Key",
+      "pasteInstructions": "Copy your API key from the DeepInfra website and paste it in the field below.",
+      "description": "Your DeepInfra API key powers all AI services: conversations, voice, and speech recognition.",
+      "whyTitle": "Why DeepInfra?",
+      "benefit1": "All-in-one: LLM + Text-to-Speech + Speech Recognition",
+      "benefit2": "96% cheaper than alternatives ($0.62/1M characters)",
+      "benefit3": "Zero data retention (SOC 2 & ISO 27001 certified)",
+      "keyLabel": "🔑 DeepInfra API Key",
+      "placeholder": "Paste your API key here...",
+      "needKeyQuestion": "Need a key?",
+      "getKeyButton": "Get API Key →",
+      "whereFindKey": "Where do I find my API key? →",
+      "security": "🔒 Your key is encrypted and stored only in your browser. We never see or access it.",
+      "validating": "Validating... ⟳",
+      "invalidKey": "Invalid API key. Please check and try again.",
+      "emptyKey": "Please enter your DeepInfra API key"
+    },
+    "openRouterKey": {
+      "title": "Connect OpenRouter",
+      "description": "To chat with historical figures, you'll need an API key.",
+      "whyTitle": "Why OpenRouter?",
+      "benefit1": "100 hours of dialogue for ~$1",
+      "benefit2": "Complete privacy: No logging",
+      "benefit3": "Your data stays yours",
+      "keyLabel": "🔑 OpenRouter API Key",
+      "placeholder": "sk-or-...",
+      "needKeyQuestion": "Need a key?",
+      "getKeyButton": "Get API Key →",
+      "security": "🔒 Your key is encrypted and stored only in your browser. We never see or access it.",
+      "validating": "Validating... ⟳",
+      "invalidKey": "Invalid API key. Please check and try again.",
+      "emptyKey": "Please enter your OpenRouter API key"
+    },
+    "openAIKey": {
+      "title": "Connect OpenAI for German Audio",
+      "description": "For German text-to-speech, you need an OpenAI API key.",
+      "whyTitle": "Why OpenAI for German?",
+      "reason1": "Few AI models support high-quality German TTS",
+      "reason2": "OpenAI offers the best German audio quality today",
+      "reason3": "We'll integrate cheaper alternatives as soon as available",
+      "costNote": "Audio cost: ~$0.9 per hour",
+      "openRouterNote": "(Conversations use your DeepInfra key you just set up)",
+      "keyLabel": "🔑 OpenAI API Key",
+      "placeholder": "sk-proj-...",
+      "needKeyQuestion": "Need a key?",
+      "getKeyButton": "Get API Key →",
+      "security": "🔒 Your key is encrypted and stored only in your browser. We never see or access it.",
+      "validating": "Validating... ⟳",
+      "invalidKey": "Invalid API key. Please check and try again.",
+      "emptyKey": "Please enter your OpenAI API key"
+    },
+    "downloading": {
+      "title": "🚀 Setting Up AI Services",
+      "settingUp": "Configuring your AI services...",
+      "cloudReady": "All services ready instantly (cloud-based)",
+      "whileYouWait": "💡 What you get:",
+      "deviceInfo": "DeepInfra cloud services provide:",
+      "benefit1": "✓ All-in-one: LLM + Voice + Speech Recognition",
+      "benefit2": "✓ Zero data retention (SOC 2 & ISO 27001)",
+      "benefit3": "✓ 96% cheaper than alternatives",
+      "benefit4": "✓ Instant availability (no downloads)",
+      "llmNote": "Your DeepInfra key handles conversations, voice, and speech recognition."
+    },
+    "success": {
+      "celebration": "✨ 🎉 ✨",
+      "title": "All Set, Seeker!",
+      "subtitle": "Your sanctuary is ready.",
+      "englishCheck1": "Zero logging - full privacy (SOC 2 & ISO 27001)",
+      "englishCheck2": "~17 hours of conversation for just $1",
+      "englishCheck3": "All services ready - start chatting now!",
+      "germanCheck1": "Secure & encrypted - your keys stay on your device",
+      "germanCheck2": "High-quality German audio (~$0.9 per hour)",
+      "germanCheck3": "All services ready - start chatting now!",
+      "startButton": "Start Conversations →"
+    },
+    "wizard": {
+      "ariaLabel": "Set up your API key",
+      "valueTitle": "Add your OpenRouter key",
+      "valueBody": "Use your own OpenRouter key. You pay OpenRouter directly, we take no cut.",
+      "benefit1": "No daily limits on messages, councils, or summaries",
+      "benefit2": "Same AI as the free tier",
+      "benefit3": "Zero data retention by default",
+      "benefit4": "Over 25 hours of conversation for $1",
+      "getStarted": "Get Started",
+      "maybeLater": "Maybe later",
+      "guideTitle": "Set Up Your Key",
+      "step1": "Create a free account at OpenRouter",
+      "step2": "Add credit ($5 lasts for months of daily use)",
+      "step3": "Create an API key and paste it below",
+      "openRouterLink": "Open OpenRouter Keys Page",
+      "keyPlaceholder": "sk-or-v1-...",
+      "validating": "Validating your key...",
+      "validateButton": "Save & Continue",
+      "back": "Back",
+      "errorEmpty": "Please enter an API key.",
+      "errorInvalid": "Invalid key. Please check and try again.",
+      "errorFailed": "Validation failed. Please try again.",
+      "zdrLabel": "Zero Data Retention",
+      "zdrNote": "On by default. Routes only to providers that don't store your data (typically US-based). Turning off allows any provider, some may log.",
+      "whyOpenRouter": "Why OpenRouter? Easy sign-up, one key for many models, automatic failover if a provider goes down.",
+      "successTitle": "You're All Set!",
+      "successBody": "No more daily limits. Your conversations, councils, and summaries are now unlimited.",
+      "successZdr": "Zero Data Retention is enabled.",
+      "startButton": "Start Chatting"
+    }
+  },
+  "community": {
+    "modalTitle": "Community",
+    "lockedBadge": "Voting unlocks soon",
+    "votingPower": {
+      "label": "voting power",
+      "formulaShort": "Earn your voice through engagement",
+      "formulaDetail": "Complete all 4 chapters of one teaching to earn +1. Every fully completed figure (all 12 teachings mastered) adds another +1.",
+      "breakdown": "{earned} earned",
+      "breakdownEmpty": "no voice yet",
+      "encourageZero": "Complete all 4 chapters of one teaching to earn your first voice.",
+      "encourageMid": "Your voice is growing.",
+      "encourageStrong": "Your voice carries weight."
+    },
+    "tier": {
+      "listener": "Listener",
+      "voice": "Voice",
+      "council": "Council",
+      "listenerDesc": "Vote when voting opens.",
+      "voiceDesc": "Vote and co-sign others' ideas.",
+      "councilDesc": "Vote, co-sign, and propose new ideas.",
+      "nextListener": "Complete a figure to become a Voice.",
+      "nextVoice": "Complete {remaining} more to join the Council.",
+      "nextCouncil": "Every 3 figures grants a new suggestion slot."
+    },
+    "threshold": {
+      "label": "Support threshold",
+      "current": "{n} community backers brings a suggestion to ChipMates review.",
+      "explainer": "Council members submit ideas. Once submitted, every suggestion is visible to the community, and members back the ones they want. At {n} backers, ChipMates reviews it for the roadmap. The threshold scales as the community grows.",
+      "phaseLaunch": "Launch phase",
+      "phaseGrowing": "Growing community",
+      "phaseEstablished": "Established community",
+      "phaseLarge": "Large community",
+      "phaseGlobal": "Global community"
+    },
+    "stats": {
+      "joined": "Joined",
+      "totalPower": "Total community power",
+      "voices": "voices",
+      "loading": "—",
+      "tagline": "We listen before we open the vote."
+    },
+    "section": {
+      "title": "What should we build next?",
+      "subtitle": "Browse what's on the table.",
+      "notice": "Voting opens in the near future. Your voting power is already counted."
+    },
+    "howSection": {
+      "title": "How governance works",
+      "subtitle": "Tiers, slots, and the co-sign threshold."
+    },
+    "dataCard": {
+      "title": "Save & restore your progress",
+      "hint": "Your voting power and conversations live on this device. Save them to a file you keep, or restore from one.",
+      "backup": "Back up",
+      "backupAria": "Back up your progress to a file",
+      "restore": "Restore",
+      "restoreAria": "Restore your progress from a file"
+    },
+    "category": {
+      "languages": "New languages",
+      "languagesHint": "Each new language means full translation, native voice casting, and audio production.",
+      "apps": "Mobile apps",
+      "appsHint": "Native apps for iOS and Android, alongside the web platform.",
+      "books": "Books from each figure",
+      "booksHint": "Every figure's stories and prisms collected into a book.",
+      "figures": "New figure suggestions",
+      "figuresHint": "Voices we haven't yet invited to the agora.",
+      "imageUpgrade": "Hand-illustrated portraits",
+      "imageUpgradeHint": "Replace the AI-generated portrait with one drawn by a dedicated illustrator.",
+      "voiceUpgrade": "Voice actor upgrades",
+      "voiceUpgradeHint": "A dedicated voice actor for this figure. One recognizable voice, unified across every language and mode."
+    },
+    "futureSectionHeader": "Future · time-intensive",
+    "futureBadge": "Future · time-intensive",
+    "lockedHint": "Voting opens soon",
+    "languages": {
+      "es": "Spanish",
+      "fr": "French",
+      "it": "Italian",
+      "pt": "Portuguese",
+      "zh": "Chinese",
+      "ja": "Japanese",
+      "ko": "Korean",
+      "ru": "Russian"
+    },
+    "apps": {
+      "ios": "iOS app",
+      "android": "Android app"
+    },
+    "books": {
+      "freePdf": "Free PDF download per figure",
+      "printOnDemand": "Print-on-demand at cost, no markup"
+    },
+    "figureSuggestions": {
+      "confucius": "Confucius",
+      "hypatia": "Hypatia of Alexandria",
+      "augustine": "Augustine of Hippo",
+      "avicenna": "Ibn Sina (Avicenna)",
+      "maimonides": "Maimonides",
+      "mirabai": "Mirabai",
+      "spinoza": "Baruch Spinoza",
+      "wollstonecraft": "Mary Wollstonecraft",
+      "darwin": "Charles Darwin",
+      "douglass": "Frederick Douglass",
+      "tolstoy": "Leo Tolstoy",
+      "curie": "Marie Curie",
+      "arendt": "Hannah Arendt",
+      "carson": "Rachel Carson",
+      "morrison": "Toni Morrison",
+      "maathai": "Wangari Maathai"
+    },
+    "suggestPanel": {
+      "title": "Your suggestion slots",
+      "subtitle": "Earn 1 slot per 3 fully completed figures.",
+      "earned": "Earned",
+      "earnedOf": "{used} of {total}",
+      "earnedNext": "Next slot at {next} completed figures",
+      "earnedMax": "All slots earned",
+      "lockedZero": "Complete your first figure to start earning suggestion slots.",
+      "lockedSlots": "When voting opens, you'll be able to suggest a new figure or feature here.",
+      "comingSoon": "Opens with voting"
+    },
+    "submit": {
+      "lockedLabel": "Voting unlocks soon",
+      "lockedHelper": "We'll open voting once the community is large enough for every vote to carry weight. Your voting power is already counted.",
+      "openLabel": "Submit my voice"
+    },
+    "footer": {
+      "disclaimer": "Non-binding signal. ChipMates is gemeinnützig. Your voice shapes the platform.",
+      "privacy": "Anonymous. No tracking. Per-device only."
+    }
+  }
+}

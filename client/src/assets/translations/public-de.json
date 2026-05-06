@@ -1,0 +1,210 @@
+{
+  "nav": {
+    "figures": "Denker",
+    "themes": "Themen",
+    "about": "\u00dcber uns",
+    "contact": "Kontakt",
+    "startExploring": "Jetzt entdecken",
+    "menu": "Men\u00fc",
+    "closeMenu": "Men\u00fc schlie\u00dfen"
+  },
+  "footer": {
+    "impressum": "Impressum",
+    "datenschutz": "Datenschutz",
+    "cookiePolicy": "Cookie-Richtlinie",
+    "terms": "Nutzungsbedingungen",
+    "copyright": "ChipMates gemeinn\u00fctzige GmbH",
+    "projectOf": "Ein Projekt der ChipMates gemeinn\u00fctzige GmbH \u00b7 Freiburg",
+    "trustSignals": "Gemeinn\u00fctzig \u00b7 Open Source \u00b7 Ohne Tracking",
+    "tagline": "Eine lebendige Bibliothek, mit der du sprechen kannst"
+  },
+  "breadcrumbs": {
+    "home": "Start",
+    "figures": "Denker",
+    "themes": "Themen",
+    "about": "\u00dcber uns",
+    "contact": "Kontakt"
+  },
+  "cta": {
+    "startConversation": "Sprich mit {name}",
+    "exploreQuestion": "Erkunde diese Frage",
+    "startFree": "Jetzt entdecken",
+    "listenDebate": "H\u00f6re diese Debatte",
+    "exploreTeaching": "Erkunde diese Lehre",
+    "showAllTeachings": "Alle 12 Lehren anzeigen",
+    "showLess": "Weniger anzeigen"
+  },
+  "figures": {
+    "pageTitle": "30 besondere Pers\u00f6nlichkeiten, mit denen du sprechen kannst",
+    "pageDescription": "Entdecke Weisheit von 30 besonderen Pers\u00f6nlichkeiten der Geschichte, von Marcus Aurelius bis Frida Kahlo. Lebensgeschichten in Audio, Lehren, Prismen, Councils und Gespr\u00e4che zum Mitmachen.",
+    "searchPlaceholder": "Nach Name oder Tradition suchen...",
+    "teachings": "Lehren",
+    "councilAppearances": "Council-Auftritte",
+    "keyConcepts": "Kernkonzepte",
+    "relatedFigures": "Verwandte Denker",
+    "themes": "Themen",
+    "audioSample": "H\u00f6rprobe",
+    "life": "Leben",
+    "tradition": "Tradition",
+    "period": "Zeitraum",
+    "primaryWorks": "Hauptwerke"
+  },
+  "themes": {
+    "pageTitle": "Die gro\u00dfen Fragen des Lebens",
+    "pageDescription": "Erkunde die Fragen, die das menschliche Denken seit Jahrhunderten pr\u00e4gen. Vom Sinn des Lebens bis zur Natur der Kreativit\u00e4t, die gr\u00f6\u00dften Denker der Geschichte im Gespr\u00e4ch.",
+    "councils": "Debatten",
+    "relatedThemes": "Verwandte Themen",
+    "curatedWisdom": "Ausgew\u00e4hlte Weisheiten",
+    "meaning-purpose": {
+      "name": "Sinn und Bestimmung",
+      "tagline": "Was macht das Leben lebenswert?",
+      "description": "Was macht ein Leben lebenswert? Wie findest du Sinn, wenn die Welt keinen anbietet? Seit Jahrtausenden ringen Denker mit diesen Fragen. Manche fanden Antworten in der Pflicht, andere in der Liebe, wieder andere im einfachen Akt der Aufmerksamkeit. Hier erkunden die gr\u00f6\u00dften Geister der Geschichte, was es hei\u00dft, mit Klarheit und Tiefe zu leben.",
+      "intro": "Was macht ein Leben lebenswert? Was verwandelt Tage in ein Leben, f\u00fcr das es sich zu erwachen lohnt?\n\nManche Denker antworten von oben \u2014 aus der kosmischen Perspektive, dem langen Blick, den gleichg\u00fcltigen Sternen. Marcus Aurelius schrieb seine Selbstbetrachtungen sp\u00e4t in der Nacht zwischen Feldz\u00fcgen und erinnerte sich t\u00e4glich daran, dass er und das Reich, das er regierte, vergessen sein w\u00fcrden \u2014 und dass paradoxerweise genau dieses Erinnern der Beginn von W\u00fcrde war. Stoizismus verspricht keinen Sinn; er verspricht den Mut, sich selbst einen zu machen.\n\nAndere finden Sinn im Erwachen statt im Erreichen. Siddhartha Gautama verlie\u00df einen Palast, weil Bequemlichkeit nicht die Antwort war. Er verbrachte Jahre mit dieser Frage, und was zur\u00fcckkam, war eine leisere Behauptung: Das meiste Leiden kommt nicht aus dem, was geschieht, sondern aus unserem Festhalten am Anderen-wollen. Die Vier Edlen Wahrheiten sind keine abstrakte Theologie \u2014 sie sind eine Praxis, eine Art zu sein.\n\nJoseph Campbell betrachtete die Mythen, die sich die Welt \u00fcber alle Kulturen hinweg erz\u00e4hlt hat, und fand eine einzige wiederkehrende Gestalt: Der Held verl\u00e4sst das Vertraute, stellt sich dem inneren Drachen und bringt etwas N\u00fctzliches zur\u00fcck. Dein Leben, sagte Campbell, hat diese Gestalt ebenso \u2014 auch wenn es sich formlos anf\u00fchlt.\n\nUnd Rumi, trunken von dem, was er den Geliebten nannte, schrieb, dass Bestimmung nichts ist, das man findet, sondern etwas, an das man sich erinnert. Die Rohrfl\u00f6te weint, weil sie aus dem Schilfbeet geschnitten wurde. Sinn ist das Heimweh \u2014 und der Weg nach Hause f\u00fchrt durch die Liebe.\n\nVier sehr verschiedene Antworten. Stoische Klarheit, buddhistische Losl\u00f6sung, mythische Erz\u00e4hlung, mystische Sehnsucht. Beginne mit der Stimme, die dir heute Abend am n\u00e4chsten ist \u2014 das Gespr\u00e4ch wird dich zu den anderen f\u00fchren."
+    },
+    "loss-grief": {
+      "name": "Verlust und Trauer",
+      "tagline": "Wie tragen wir, was wir verloren haben?",
+      "description": "Verlust ber\u00fchrt jedes Leben. Ein Mensch, den du geliebt hast, eine Zukunft, die du geplant hattest, eine Version von dir selbst, die du zur\u00fccklassen musstest. Philosophie ist der Trauer nie ausgewichen. Die Stimmen hier sa\u00dfen mit dem Leid und fanden etwas Ehrliches dar\u00fcber zu sagen. Nicht um den Schmerz zu reparieren, sondern um dir zu helfen, ihn zu tragen.",
+      "intro": "Wie tragen wir, was wir verloren haben? Nicht: dar\u00fcber hinwegkommen, nicht: weitergehen \u2014 sondern: tragen. Diese Unterscheidung ist wichtig. Trauer ist kein Problem, das gel\u00f6st werden will; sie ist ein Land, in das wir einziehen, wenn jemand oder etwas, das wir geliebt haben, fort ist.\n\nNelson Mandela verbrachte siebenundzwanzig Jahre in einer Zelle, die kleiner war als die meisten Badezimmer. Er verlor Jugend, Ehe, die Beerdigung seiner Mutter, die Beerdigung seines Sohnes. Als er herauskam, inszenierte er keine Vergebung \u2014 er verstand, dass Bitterkeit ein zweites Gef\u00e4ngnis ist. Vers\u00f6hnung, in seinen H\u00e4nden, war nicht weich. Sie war die schwerere Disziplin.\n\nMartin Luther King Jr. lebte in einer unvollendeten Trauer um ein Land, das seine Freunde immer wieder t\u00f6tete. Er predigte Liebe bei Beerdigungen. Nicht, weil die Liebe leicht war. Sondern weil sie die einzige Waffe war, die st\u00e4rker war als das, was sie genommen hatte. Trauer war f\u00fcr King Rohstoff f\u00fcr eine moralische Vorstellungskraft.\n\nCarl Gustav Jung sa\u00df bei Patienten, deren Trauer zu Symptomen geworden war \u2014 Depression, Angst, Tr\u00e4ume, die sie nicht ruhen lie\u00dfen. Er kam zu der \u00dcberzeugung, dass die Seele im Dunkeln ihre eigene Arbeit verrichtet, und dass das, was wie Zusammenbruch aussieht, oft unvollendete Trauer ist, die Integration werden m\u00f6chte. Lauf nicht vor dem Schatten weg, sagte er. Setz dich zu ihm. H\u00f6r zu.\n\nMeister Eckhart, sechs Jahrhunderte fr\u00fcher, sagte aus der christlichen Mystik etwas Verwandtes: Du kannst das Neue nicht tragen, wenn du am Alten festh\u00e4ltst. Gelassenheit ist nicht K\u00e4lte \u2014 sie ist die Bereitschaft, das Vergangene vergangen sein zu lassen, damit das, was hier ist, dich finden kann.\n\nVier verschiedene Sprachen f\u00fcr dieselbe schwere Wahrheit. Verlust ist kein Umweg vom Leben \u2014 er ist einer der tiefsten Lehrer des Lebens. Beginne dort, wo die Sprache heute Abend f\u00fcr dich wahr klingt."
+    },
+    "who-am-i": {
+      "name": "Wer bin ich?",
+      "tagline": "Die Frage unter jeder Frage.",
+      "description": "Bevor du entscheiden kannst, was du glaubst oder wie du lebst, stehst du vor einem grundlegenderen R\u00e4tsel: Wer ist es, der entscheidet? Identit\u00e4t ist nicht fest. Sie ver\u00e4ndert sich mit Erfahrung, Kultur und den Geschichten, die du dir selbst erz\u00e4hlst. Die Denker hier erforschten die Grenzen des Selbst und brachten Karten mit, die einen genaueren Blick verdienen.",
+      "intro": "Wer bin ich unter den Rollen, die ich spiele? Wenn die Arbeit, die Beziehung, der K\u00f6rper, das Land \u2014 all die Dinge, mit denen wir uns identifizieren \u2014 wenn das alles abgestreift wird, was bleibt?\n\nSimone de Beauvoir traf eine scharfe Unterscheidung zwischen dem, was uns gegeben ist, und dem, was wir machen. Wir werden in einen K\u00f6rper hineingeboren, in eine Sprache, eine Klasse, ein Geschlecht \u2014 in eine Situation. Aber wir sind diese Dinge nicht endg\u00fcltig. Wir werden durch Wahl. Ihr Buch Das andere Geschlecht war nicht nur Feminismus; es war eine sorgf\u00e4ltige Studie dar\u00fcber, wie Identit\u00e4t zur Rolle erstarrt, und was es kostet, herauszutreten.\n\nCarl Gustav Jung ging die andere Richtung \u2014 nach innen. Er sagte, das Selbst sei viel gr\u00f6\u00dfer, als das Ich sich vorstelle. Unter der Oberfl\u00e4che leben Schattenfiguren, tierische Energien, Ahnen, Archetypen. Individuation, sein lebenslanges Werk, ist die geduldige Arbeit, all diesen zu begegnen und sie als Teil von dir zuzulassen. Nicht die Persona, sondern das Ganze.\n\nFrida Kahlo beantwortete die Frage mit Farbe. F\u00fcnfundf\u00fcnfzig Selbstportr\u00e4ts in ihrem kurzen Leben \u2014 jedes ein anderer Winkel, eine andere Stimmung, eine andere Maske. Sie verstand, dass ein Selbst nicht eine Sache ist, sondern eine Konstellation, und dass Schmerz ein Gesicht hat, und dass dieses Gesicht dein eigenes ist.\n\nVirginia Woolf zeichnete in den langen S\u00e4tzen von Mrs Dalloway und Zum Leuchtturm das Bewusstsein nach, wie es sich tats\u00e4chlich bewegt: nicht in geraden Linien, sondern in Flackern, Halbgedanken, Empfindungen, die aufbl\u00fchen und vergehen. Das Selbst ist f\u00fcr Woolf eher Wetter als Statue \u2014 und zu lernen, mit diesem Wetter zu sein, ist eine eigene Art von Freiheit.\n\nVier Wege in die Frage hinein. Werden, integrieren, malen, beobachten. W\u00e4hle die T\u00fcr, die sich heute Abend f\u00fcr dich \u00f6ffnet."
+    },
+    "mind-creativity": {
+      "name": "Geist und Kreativit\u00e4t",
+      "tagline": "Woher kommen Ideen?",
+      "description": "Kreativit\u00e4t ist keine Magie. Sie entsteht, wenn Aufmerksamkeit auf Handwerk trifft, Neugier auf Mut. Einige der erfinderischsten Geister der Geschichte erforschten, wie Ideen entstehen, warum Inspiration kommt und was sie blockiert. Ihre Erkenntnisse gelten, ob du malst, schreibst, baust oder einfach klarer denken m\u00f6chtest.",
+      "intro": "Woher kommen Ideen? Nicht die kleinen \u2014 sondern die Art, die dich dein Leben \u00e4ndern l\u00e4sst, ein Projekt umlenkt, dir zeigt, was immer schon da war.\n\nAlbert Einstein bestand darauf, dass er kein Mann der Formeln sei, sondern der Bilder. Er dachte in Bildern: ein Mensch, der neben einem Lichtstrahl herreitet, ein Aufzug, der durch den Raum f\u00e4llt. Die Mathematik kam sp\u00e4ter, manchmal Jahre sp\u00e4ter. Vorstellungskraft, sagte er, ist wichtiger als Wissen. F\u00fcr ihn war das kein Slogan. Es war eine Methode.\n\nLeonardo da Vinci f\u00fchrte vierzig Jahre lang Notizb\u00fccher. Nicht nur Skizzen \u2014 Fragen. Warum ist der Himmel blau? Wie dreht sich ein Vogel im Flug? Was tut das Herz eigentlich? Die meisten seiner Projekte beendete er nie. Er starb mit der Mona Lisa unvollendet in seinem Atelier, malte und \u00fcbermalte das L\u00e4cheln. Meisterschaft war f\u00fcr ihn nicht Vollendung. Sie war Aufmerksamkeit.\n\nWolfgang Amadeus Mozart, gefragt, woher seine Musik komme, gab Antworten, die einander widersprachen: manchmal harte Arbeit, manchmal reines Flie\u00dfen, manchmal eine Melodie, die einfach ankam. Die Wahrheit scheint alle drei zu sein. Er komponierte mit Ohr und Feder, mit Spiel und Disziplin, indem er der Stille zuh\u00f6rte, bis sie eine Gestalt hatte.\n\nVirginia Woolf schrieb von Augenblicken des Seins \u2014 pl\u00f6tzlicher, lebendiger Klarheit mitten an einem gew\u00f6hnlichen Tag. Diese waren die Samen ihrer Romane. Nicht aus dem Nichts erfunden, sondern aus der Textur eines Mittwochnachmittags eingefangen.\n\nWilliam Blake behauptete, als Junge Engel in B\u00e4umen gesehen zu haben, und h\u00f6rte nie auf, sie zu sehen. Seine Dichtung und seine Druckkunst behandeln die Vorstellungskraft als das Wirklichste \u2014 wirklicher als die Welt, die sie deutet.\n\nF\u00fcnf sehr verschiedene Beziehungen zur sch\u00f6pferischen Quelle. Vorstellungskraft, Beobachtung, Spiel, Aufmerksamkeit, Vision. Welche dich ruft \u2014 dort beginne."
+    },
+    "love-connection": {
+      "name": "Liebe und Verbundenheit",
+      "tagline": "Was verbindet uns miteinander?",
+      "description": "Liebe nimmt viele Formen an: romantisch, famili\u00e4r, die Bindung zwischen Lehrer und Sch\u00fcler, die stille Solidarit\u00e4t zwischen Fremden. Was bringt Menschen zusammen, und was treibt sie auseinander? Die Antworten hier sind ehrlich genug, um Jahrhunderte sp\u00e4ter noch nachzuhallen.",
+      "intro": "Was verbindet uns miteinander? Die Frage klingt einfach, bis du dich auf sie einl\u00e4sst. Romantik ist nicht dasselbe wie Freundschaft, ist nicht dasselbe wie die Liebe zwischen Eltern und Kind, ist nicht dasselbe wie die seltsame Z\u00e4rtlichkeit f\u00fcr einen Fremden, der einem im Zug begegnet. All das nennen wir Liebe. Es ist nicht dasselbe.\n\nRumi, der Sufi-Dichter des dreizehnten Jahrhunderts, schrieb tausende Verse zu diesem einen Thema. F\u00fcr ihn war romantische Liebe nicht das Ziel, sondern eine T\u00fcr \u2014 der Ort, an dem das Herz endlich lernt, sich entwaffnen zu lassen. Dahinter, beharrte er, lag etwas Gr\u00f6\u00dferes: g\u00f6ttliche Liebe, die uns immer schon liebt. Die Rohrfl\u00f6te weint, weil sie aus dem Schilf geschnitten wurde. Wir sehnen uns, weil wir aus Sehnsucht gemacht sind.\n\nJane Austen hatte einen weniger mystischen, aber nicht weniger pr\u00e4zisen Blick. Ihre Romane sind Soziologie mit Herz. Sie untersuchte, wie Liebe gefiltert, verzerrt und manchmal gel\u00e4utert wird durch Geld, Klasse, Manieren und Selbstt\u00e4uschung. Stolz, zeigte sie, blockiert die Liebe. Vorurteil verblendet sie. Die langsame Arbeit, jemand zu werden, der gut geliebt werden kann \u2014 das ist der eigentliche Plot.\n\nMeister Eckhart beschrieb Liebe in noch fremderen Begriffen. Nicht Zuneigung, nicht einmal Hingabe \u2014 sondern eine Art gegenseitiges Entselbsten. Das Auge, mit dem ich Gott sehe, schrieb er, ist dasselbe Auge, mit dem Gott mich sieht. Liebe war f\u00fcr ihn die Aufl\u00f6sung der Grenze zwischen zweien.\n\nHildegard von Bingen, die im zw\u00f6lften Jahrhundert in einem Kloster Musik schrieb, h\u00f6rte Liebe als kosmische Musik \u2014 die gr\u00fcne Lebenskraft (viriditas), die durch alles Lebendige flie\u00dft und Steine an Engel bindet.\n\nVier sehr verschiedene Blickwinkel auf dasselbe Geheimnis. Sehnsucht, Wahrnehmung, Gegenseitigkeit, Lebenskraft. H\u00f6re, welche bei dir nachklingt."
+    },
+    "freedom-justice": {
+      "name": "Freiheit und Gerechtigkeit",
+      "tagline": "Was bedeutet es, frei zu sein?",
+      "description": "Freiheit ist nie nur pers\u00f6nlich. Deine Freiheit ber\u00fchrt meine. Jede Stimme hier k\u00e4mpfte im eigenen Leben f\u00fcr Freiheit und dachte tief dar\u00fcber nach, was Gerechtigkeit erfordert, nicht als abstrakte Theorie, sondern als gelebte Praxis.",
+      "intro": "Was bedeutet es, frei zu sein? Nicht die politische Abstraktion \u2014 die gelebte Frage. Die Art, die dich um drei Uhr morgens weckt und fragt, ob das Leben, in dem du steckst, deines ist.\n\nNelson Mandela verstand, dass Freiheit zwei ineinander geflochtene Geschichten sind. Die erste ist strukturell: Gesetze, Grenzen, das Recht zu w\u00e4hlen, das Recht, nicht wegen deiner Hautfarbe get\u00f6tet zu werden. Die zweite ist innerlich: die Disziplin, nicht das zu werden, was deine Gefangenenw\u00e4rter aus dir machen wollen. Er verbrachte siebenundzwanzig Jahre auf einer kleinen Insel und sorgte daf\u00fcr, dass keine der beiden Geschichten in der anderen zusammenbrach.\n\nMartin Luther King Jr. argumentierte, dass Freiheit nie privater Besitz ist. Eine Ungerechtigkeit irgendwo, schrieb er, ist eine Bedrohung f\u00fcr Gerechtigkeit \u00fcberall. Seine Gewaltlosigkeit war keine Schw\u00e4che; sie war eine Art, die moralische Frage Menschen aufzuzwingen, die sonst weggesehen h\u00e4tten. Liebe war in seinen H\u00e4nden eine Strategie.\n\nMahatma Gandhi entwickelte dieselbe Logik von der anderen Seite der Welt. Satyagraha \u2014 Wahrheits-Kraft \u2014 war die Methode, Macht nicht durch Gegenmacht zu ver\u00e4ndern, sondern durch ihre Sichtbarmachung. Er trat in Zellen in den Hungerstreik und f\u00fchrte Salzm\u00e4rsche unter freiem Himmel an. Beides war f\u00fcr ihn dieselbe Handlung: Unterdr\u00fcckung sich selbst sichtbar zu machen.\n\nHarriet Tubman ging neunzehn Mal in Sklavenstaaten, um andere nach Norden zu f\u00fchren. Sie soll gesagt haben, sie h\u00e4tte tausende mehr befreien k\u00f6nnen, h\u00e4tten sie gewusst, dass sie Sklaven waren. Die h\u00e4rtesten Ketten, verstand sie, waren die, die als normal verinnerlicht worden waren.\n\nSimone de Beauvoir lieferte das philosophische Gegenst\u00fcck zu all dem: Freiheit ist kein Zustand, sie ist eine Praxis. Wir sind zur Freiheit verurteilt, schrieb sie \u2014 was bedeutet, jeder Tag fordert neue Entscheidungen, und schlechter Glaube ist die Weigerung, sie zu treffen.\n\nF\u00fcnf Stimmen, eine fordernde Frage. Wo verlangt Freiheit heute Abend etwas von dir?"
+    },
+    "faith-death-mystery": {
+      "name": "Glaube, Tod und Mysterium",
+      "tagline": "Was liegt jenseits dessen, was wir wissen?",
+      "description": "Manche Fragen haben keine endg\u00fcltige Antwort. Was passiert, wenn wir sterben? Gibt es etwas Gr\u00f6\u00dferes als uns selbst? Die Stimmen hier n\u00e4herten sich dem Geheimnis mit Ehrlichkeit statt mit Gewissheit und fanden Sinn nicht in Antworten, sondern im Fragen selbst.",
+      "intro": "Was liegt jenseits dessen, was wir wissen? Die Frage ist \u00e4lter als Sprache. Jede Kultur hat sie mit Ritualen, Liedern, Namen beantwortet. Die Stimmen, die hier versammelt sind, versprachen keine Gewissheit. Sie versprachen etwas Selteneres: eine ehrliche Beziehung zum Unbekannten.\n\nMarcus Aurelius, der im zweiten Jahrhundert ein Reich regierte, erinnerte sich immer wieder: Du wirst bald tot sein. Memento mori. Nicht als morbide Inszenierung, sondern als Linse. Wenn du wei\u00dft, dass der Tag enden wird \u2014 was lohnt sich gerade jetzt? Die Stoiker verwandelten Sterblichkeit in Klarheit.\n\nSiddhartha Gautama verbrachte sein Leben mit derselben Frage vom anderen Ende her. Er leugnete den Tod nicht; er fragte, was stirbt. Durch langes Sitzen kam er zu einer seltsamen Antwort: Das Selbst, das das Sterben f\u00fcrchtet, ist selbst eine Art Fiktion, ein Prozess, der sich f\u00fcr ein Ding h\u00e4lt. Befreiung bedeutet nicht, dem Ende auszuweichen \u2014 sondern denjenigen zu durchschauen, der es f\u00fcrchtet.\n\nLaozi schrieb in einundachtzig kurzen Kapiteln des Tao Te Ching von einer Kraft, \u00e4lter als die G\u00f6tter. Sie kann nicht benannt werden. Sie strebt nicht. Sie bewegt sich wie Wasser \u2014 sie findet den niedrigsten Ort, w\u00e4scht Stein m\u00fchelos ab. Wu Wei, Nicht-Tun, ist keine Passivit\u00e4t. Es ist \u00dcbereinstimmung mit dem, was sich ohnehin bewegt.\n\nHildegard von Bingen hatte im zw\u00f6lften Jahrhundert in Deutschland Visionen, die sie das lebendige Licht nannte. Keine Metapher \u2014 sie sah Farben und h\u00f6rte Stimmen und schrieb alles auf. Ihr Schreiben \u00fcber Kosmos und Seele liest sich weniger wie Religion und mehr wie Berichte von einer offenen Grenze.\n\nMeister Eckhart sagte in einem anderen Jahrhundert deutscher Mystik etwas noch Schwindelerregenderes: Gott und Seele sind nicht zwei. Die Gelassenheit, die er lehrte \u2014 das Lassen des Lassens \u2014 war nicht Askese. Sie war die T\u00fcr zu dem, was keine T\u00fcr kennt.\n\nF\u00fcnf Blickwinkel auf das Unbekannte. Stoische Klarheit, buddhistische Einsicht, taoistisches Flie\u00dfen, vision\u00e4res Zeugnis, mystische Einheit. Keine verspricht eine Antwort. Jede bietet einen Weg, die Frage zu halten."
+    },
+    "moral-life": {
+      "name": "Das moralische Leben",
+      "tagline": "Wie sollen wir leben?",
+      "description": "Ethik handelt nicht von Regeln, sondern davon, was f\u00fcr ein Mensch du durch deine Entscheidungen wirst. Die Denker hier waren sich \u00fcber fast alles uneinig, aber sie teilten eine \u00dcberzeugung: Wie du lebst, ist wichtig. Und es verdient, dass du dar\u00fcber nachdenkst.",
+      "intro": "Wie sollen wir leben? Jede Philosophie, die ihren Namen verdient, hat versucht, das zu beantworten. Die Stimmen hier waren sich \u00fcber fast alles andere uneinig, aber sie teilten eine \u00dcberzeugung: dass die Frage ein ernsthaftes Leben der Aufmerksamkeit verdient.\n\nMarcus Aurelius stellte sie sich t\u00e4glich, in dem Tagebuch, das er nie zu ver\u00f6ffentlichen gedachte. Seine Antwort waren die vier Tugenden \u2014 Weisheit, Gerechtigkeit, Mut, M\u00e4\u00dfigung \u2014 ge\u00fcbt in den kleinen Reibungen eines gew\u00f6hnlichen Morgens. Keine heroischen Gesten. Reaktionen auf einen langsamen Diener, eine nervige Sitzung, eine schlechte Nachricht. Ethik ist f\u00fcr die Stoiker ein Handwerk, das du t\u00e4glich \u00fcbst oder gar nicht.\n\nMahatma Gandhi machte es konkreter und fordernder. Wahrheit ist nichts, das man hat; sie ist etwas, das man tut. Er glaubte, dass Mittel und Zweck untrennbar sind: Du kannst eine friedliche Zukunft nicht durch gewaltsame Mittel erreichen, weil die Mittel zum Zweck werden. Jede Entscheidung, wie klein auch immer, ist ein Satz in der Geschichte, die du dar\u00fcber schreibst, was m\u00f6glich ist.\n\nMartin Luther King Jr. erbte Gandhis Logik und trieb sie weiter \u2014 in die Kirche und auf die Stra\u00dfe. Der Bogen des moralischen Universums, sagte er, biegt sich zur Gerechtigkeit hin \u2014 aber er biegt sich nicht von selbst. Jede Generation biegt ihn oder l\u00e4sst ihn erschlaffen. Neutralit\u00e4t gibt es nicht.\n\nPlaton begann das Gespr\u00e4ch im Westen vor dreiundzwanzig Jahrhunderten. Der Staat fragt, was Gerechtigkeit ist, und antwortet: kein Tauschgesch\u00e4ft, kein Vertrag, sondern eine Art innerer Harmonie. Der gerechte Mensch ist nicht der, der die Regeln befolgt \u2014 sondern der, in dem die Teile der Seele richtig geordnet sind. \u00c4u\u00dfere Gerechtigkeit spiegelt innere Gerechtigkeit, oder sie ist hohl.\n\nSiddhartha Gautama schlug einen Achtfachen Pfad vor: rechte Ansicht, rechte Absicht, rechte Rede, rechte Handlung, rechter Lebenserwerb, rechte Anstrengung, rechte Achtsamkeit, rechte Konzentration. Keine Gebote \u2014 Beschreibungen. Davon, wie ein Leben aussieht, das nicht mehr im Krieg mit sich selbst ist.\n\nF\u00fcnf Antworten, alle lebendig, alle fordernd. W\u00e4hle die, die etwas von dir verlangt."
+    }
+  },
+  "about": {
+    "pageTitle": "\u00dcber Agora Cosmica",
+    "pageDescription": "Eine gemeinn\u00fctzige Open-Source-Weisheitsplattform mit 30 besonderen Pers\u00f6nlichkeiten der Geschichte. Agora Cosmica bringt ihre Stimmen in den Dialog.",
+    "mission": "Eine lebendige Bibliothek, mit der du sprechen kannst",
+    "missionTitle": "Unsere Mission",
+    "missionStatement": "Agora Cosmica ist ein Projekt der ChipMates gemeinnützige GmbH, einer kleinen gemeinnützigen Organisation aus Freiburg im Breisgau. Wir arbeiten daran, Weisheit aus der Geschichte für alle zugänglich zu machen, befreit von akademischen Barrieren, Bezahlschranken und Werbung.\n\nDie Plattform bringt 30 besondere Persönlichkeiten aus Philosophie, Wissenschaft, Mystik, Kunst und Aktivismus zusammen — und öffnet eine Tür für jeden, mit Weisheitstraditionen die eigene Reise zu beginnen.",
+    "organizationTitle": "Über die Organisation",
+    "organizationStatement": "ChipMates wurde 2023 als GmbH gegründet und erhielt 2025 den gemeinnützigen Status. Eingetragen mit HRB 728848 beim Amtsgericht Freiburg. Satzungsmäßiger Zweck: Förderung der Bildung. Die Plattform Agora Cosmica ist weltweit verfügbar und Open Source unter der AGPL-3.0.",
+    "valuesTitle": "Unsere Werte",
+    "valueGratitude": "Dankbarkeit: Jede Epoche und Tradition hat uns etwas zu lehren.",
+    "valueCuriosity": "Neugier: Wir lernen mit dir, nicht über dich.",
+    "valueOpenness": "Offenheit: Gemeinnützig. Open Source. Für die Gemeinschaft gebaut.",
+    "valueTransformation": "Wandlung: Was innen wächst, wirkt nach außen.",
+    "promiseTitle": "Unser Versprechen",
+    "promiseStatement": "Wir stehen am Anfang dieser Reise und wir werden Fehler machen. Wenn wir vereinfachen, falsch darstellen oder das Wesentliche verfehlen, schreib uns an agoracosmica@chipmates.ai. Wir bauen das nicht für dich, sondern mit dir.",
+    "barriersTitle": "Barrieren abbauen",
+    "barriersIntro": "Die Ideen der größten Denker der Geschichte gehören allen.",
+    "barrierGeographic": "Geografisch: Weltweit verfügbar, rund um die Uhr.",
+    "barrierAcademic": "Akademisch: Keine Vorkenntnisse erforderlich.",
+    "barrierAge": "Alter: Willkommen für alle ab 16 Jahren.",
+    "barrierEconomic": "Wirtschaftlich: Open Source, gemeinnützig, ohne Bezahlschranken, ohne Werbung.",
+    "successTitle": "Unsere Definition von Erfolg",
+    "successStatement": "Wir feiern, wenn Menschen über uns hinauswachsen — von unseren Einführungen zu Primärtexten, von KI-Gesprächen zu menschlichen Lehrern, von Neugier zu ihrer eigenen tieferen Erkundung. Das ist die Mission.",
+    "closingQuote": "Verkaufe deine Klugheit und kaufe Verwunderung. Klugheit ist bloße Meinung, Verwunderung ist Intuition.",
+    "closingAttribution": "Rumi",
+    "whatYoullFind": {
+      "title": "Was dich erwartet",
+      "p1": "30 besondere Pers\u00f6nlichkeiten aus der Geschichte, jede mit eigener Stimme. Von Marcus Aurelius bis Frida Kahlo, von Rumi bis Virginia Woolf. Wenn sie sprechen, sch\u00f6pfen sie aus ihrer echten Philosophie, ihren realen Lebenserfahrungen und den Ideen, die sie ihr ganzes Leben lang entwickelt haben.",
+      "p2": "Jede Stimme basiert auf Hauptwerken, historischem Kontext und gegengepr\u00fcften Quellen. Die Echos sind KI-erzeugt, ihre Worte variieren. Das Quellmaterial bleibt. Wo die Erz\u00e4hlung \u00fcber das Dokumentierte hinausgeht, benennt der Faktencheck, was nachgebildet ist.",
+      "p3": "360 erz\u00e4hlte Geschichtskapitel, 360 Kernlehren, 360 Prisma-Dialoge aus mehreren Perspektiven, 110 produzierte Council-Debatten, eine vollst\u00e4ndige Audiothek und eigene Councils, bei denen du die Teilnehmer w\u00e4hlst. Mit kostenlosen t\u00e4glichen Gespr\u00e4chen zum Einstieg."
+    },
+    "howItWorks": {
+      "title": "So funktioniert es",
+      "subtitle": "Jede Pers\u00f6nlichkeit bietet einen strukturierten Lernweg \u00fcber verschiedene Modi.",
+      "story": "H\u00f6re eine 12-teilige erz\u00e4hlte Lebensgeschichte. Jede Geschichte ist faktengepr\u00fcft und behandelt die Momente, die ihr Denken gepr\u00e4gt haben.",
+      "wisdom": "W\u00e4hle eine von 12 Kernlehren und f\u00fchre ein gef\u00fchrtes Gespr\u00e4ch dar\u00fcber. Die Antwort ist in ihrer echten Philosophie verankert.",
+      "prism": "H\u00f6re vier verschiedene Stimmen, die ein einzelnes Thema aus ihren jeweiligen Perspektiven besprechen. Ein Dialog aus mehreren Blickwinkeln, den du wie einen Podcast h\u00f6ren kannst.",
+      "quest": "Teste dein Verst\u00e4ndnis in einer sokratischen Herausforderung. Vier Fragen, die tiefer gehen als Oberfl\u00e4chenwissen.",
+      "freetalk": "Frage alles. Offenes Gespr\u00e4ch, das aus der gesamten Philosophie und Pers\u00f6nlichkeit sch\u00f6pft.",
+      "council": "H\u00f6re produzierte Debatten zwischen besonderen Pers\u00f6nlichkeiten \u00fcber die gr\u00f6\u00dften Fragen des Lebens. 55 vorproduzierte Debatten zu 8 Themen. Oder erstelle deinen eigenen Council mit den Teilnehmern deiner Wahl.",
+      "audioLibrary": "Jede Geschichte, jedes Prisma und jede Council-Debatte ist in einer vollst\u00e4ndigen Audiothek verf\u00fcgbar. H\u00f6re unterwegs, mach weiter, wo du aufgeh\u00f6rt hast."
+    },
+    "figures": {
+      "title": "Die 30 Pers\u00f6nlichkeiten",
+      "description": "Von antiken Philosophen bis zu modernen K\u00fcnstlern, von \u00f6stlichen Weisen bis zu westlichen Wissenschaftlern. Jede mit eigener Stimme, eigener Geschichte und 12 Kernlehren, die du entdecken kannst."
+    },
+    "builtDifferent": {
+      "title": "Anders gebaut",
+      "nonprofit": "Gemeinn\u00fctzig und Open Source. Gebaut von der ChipMates gemeinn\u00fctzige GmbH in Freiburg.",
+      "factChecked": "Jede Geschichte gegengepr\u00fcft anhand von Prim\u00e4rquellen. Entstanden durch KI-Kollaboration. Sorgf\u00e4ltig \u00fcberarbeitet.",
+      "noTracking": "Kein Tracking, keine Werbung, keine Datensammlung. Deine Gespr\u00e4che bleiben auf deinem Ger\u00e4t, verschl\u00fcsselt.",
+      "freeTurns": "Kostenlose t\u00e4gliche Gespr\u00e4che zum Entdecken. Bring deinen eigenen API-Schl\u00fcssel f\u00fcr unbegrenzten Zugang.",
+      "github": "Der Code ist Open Source auf GitHub."
+    }
+  },
+  "contact": {
+    "pageTitle": "Kontakt",
+    "pageDescription": "Nimm Kontakt mit dem Agora Cosmica Team auf. Fragen, Feedback oder Ideen f\u00fcr Zusammenarbeit sind willkommen. Eine gemeinn\u00fctzige Open-Source-Philosophie-Plattform.",
+    "heading": "Kontakt aufnehmen",
+    "description": "Hast du eine Frage, Feedback oder eine Idee? Wir freuen uns, von dir zu h\u00f6ren.",
+    "email": "E-Mail",
+    "address": "Adresse",
+    "social": "Finde uns online"
+  },
+  "audio": {
+    "play": "Audioprobe abspielen",
+    "pause": "Pause",
+    "loading": "Audio wird geladen..."
+  },
+  "journey": {
+    "title": "Dein Weg mit {name}",
+    "chapters": "Kapitel",
+    "narrated": "erz\u00e4hlte Geschichte",
+    "teachings": "Kernlehren",
+    "debates": "Council-Debatten",
+    "audioLibrary": "Audiothek",
+    "customCouncils": "Eigene Councils",
+    "multiPerspective": "4 Stimmen, 1 Thema",
+    "socraticChallenge": "4-Fragen-Challenge",
+    "listen": "h\u00f6ren",
+    "talk": "sprechen",
+    "freetalk": "Freitalk",
+    "modeStory": "Story",
+    "modeWisdom": "Weisheit",
+    "modePrism": "Prisma",
+    "modeQuest": "Quest",
+    "modeCouncil": "Cosmic Council"
+  },
+  "search": {
+    "noResults": "Keine Pers\u00f6nlichkeiten gefunden f\u00fcr \"{query}\"."
+  },
+  "story": {
+    "title": "Die Geschichte von {name}",
+    "subtitle": "{count} erz\u00e4hlte Kapitel, ca. {minutes} Minuten"
+  },
+  "topics": {
+    "title": "Themen mit {name}"
+  },
+  "volume": {
+    "stories": "erz\u00e4hlte Geschichtskapitel",
+    "teachings": "Kernlehren",
+    "debates": "Council-Debatten"
+  }
+}

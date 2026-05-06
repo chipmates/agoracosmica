@@ -1,0 +1,1163 @@
+/**
+ * WisdomGalleryModal - Premium Liquid Glass Portrait Gallery
+ * Museum-quality full-screen experience with cosmic breathing animations
+ * Following CLAUDE.md CSS Modules and liquid glass design principles
+ */
+
+/* CSS Custom Properties - Cosmic Council Inspired Palette */
+.modal {
+  /* Cosmic Council Color System */
+  --cosmic-background: var(--bg-primary); /* Your standard cosmic background */
+  --cosmic-deep-blue: var(--bg-cosmic-void); /* Deep cosmic blue for contrast */
+  --cosmic-blue-primary: var(--bg-astral); /* Primary cosmic blue */
+  --starwatcher-gold: var(--gold-subtle); /* Beautiful starwatcher gold */
+  --starwatcher-amber: var(--gold-primary); /* Light amber accent */
+  --starwatcher-bronze: var(--gold-deep); /* Deep bronze accent */
+  --cosmic-silver: var(--text-secondary); /* Cosmic silver text */
+  --cosmic-white: var(--text-primary); /* Pure cosmic white */
+  
+  /* Text colors using cosmic system */
+  --text-primary: var(--cosmic-white);
+  --text-secondary: var(--cosmic-silver);
+  --text-accent: var(--starwatcher-gold);
+  
+  /* Moebius-inspired gradients */
+  --moebius-gold-gradient: linear-gradient(135deg,
+    var(--starwatcher-bronze) 0%,
+    var(--starwatcher-gold) 50%,
+    var(--starwatcher-amber) 100%);
+  
+  --cosmic-blue-gradient: linear-gradient(135deg, 
+    var(--cosmic-deep-blue) 0%, 
+    var(--cosmic-blue-primary) 50%, 
+    var(--bg-highlight) 100%);
+  
+  /* Optimized liquid glass variables */
+  --glass-bg: color-mix(in srgb, var(--bg-card) 15%, transparent); /* Cosmic deep blue with transparency */
+  --glass-bg-fallback: color-mix(in srgb, var(--bg-card) 85%, transparent); /* Cosmic deep blue fallback */
+  --glass-border: color-mix(in srgb, var(--gold-subtle) 40%, transparent); /* Starwatcher gold border */
+  --glass-border-hover: color-mix(in srgb, var(--gold-subtle) 70%, transparent); /* Starwatcher gold hover */
+  --glass-blur: blur(8px); /* Optimized for performance */
+  --glass-shadow: 0 4px 16px color-mix(in srgb, var(--bg-card) 40%, transparent); /* Cosmic deep blue shadows */
+  --glass-shadow-hover: 0 6px 24px color-mix(in srgb, var(--bg-card) 50%, transparent), 0 0 20px color-mix(in srgb, var(--gold-subtle) 30%, transparent); /* Cosmic glow */
+  
+  /* Animation timing */
+  --timing-fast: 0.2s;
+  --timing-medium: 0.4s;
+  --timing-slow: 0.6s;
+  --timing-breath: 4s;
+  --easing-cosmic: cubic-bezier(0.23, 1, 0.320, 1);
+  --easing-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  
+  /* Portrait dimensions - True image ratio 1984:2400 (0.827:1) - PORTRAIT orientation */
+  --portrait-width: clamp(320px, 25vw, 500px);
+  --portrait-height: clamp(387px, 30.2vw, 604px); /* Fallback for aspect-ratio - maintains 0.827:1 ratio */
+  --portrait-gap: clamp(2rem, 4vw, 3rem);
+  --portrait-aspect-ratio: 1984 / 2400; /* Native portrait image ratio - used by aspect-ratio property */
+  
+  /* Safe areas */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+}
+
+/* Main Modal Container - True Fullscreen */
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-gallery); /* 2100 */ /* Above figure carousel (z-index: 2000) */
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* No padding - true fullscreen experience */
+
+  /* Visible state - @starting-style handles entrance animation */
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: all;
+  transition: opacity var(--timing-slow) var(--easing-cosmic),
+              transform var(--timing-slow) var(--easing-cosmic);
+
+  /* 2026: CSS-native entrance animation - no JS setTimeout needed */
+  @starting-style {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+}
+
+/* Backdrop Overlay - Cosmic Council Inspired Background */
+.cosmicBackground {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  
+  /* Premium cosmic background using your standard color */
+  background: 
+    radial-gradient(ellipse at center 30%, 
+      var(--cosmic-blue-primary) 0%,
+      var(--cosmic-deep-blue) 40%,
+      var(--cosmic-background) 80%,
+      color-mix(in srgb, var(--bg-primary) 98%, transparent) 100%),
+    linear-gradient(135deg, 
+      var(--cosmic-background) 0%,
+      var(--cosmic-deep-blue) 50%,
+      var(--cosmic-blue-primary) 100%);
+}
+
+/* Gallery Content Container - Fullscreen */
+.galleryContent {
+  box-sizing: border-box; /* Include padding in width — no global box-sizing rule in project */
+  width: 100%;
+  height: 100vh; /* Fallback for older browsers */
+  height: 100dvh; /* Dynamic viewport height - accounts for Safari chrome */
+
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+
+  /* No frame - pure fullscreen experience */
+  padding: calc(var(--safe-top) + 2rem)
+           calc(var(--safe-right) + 2rem)
+           calc(var(--safe-bottom) + 2rem)
+           calc(var(--safe-left) + 2rem);
+}
+
+/* Gallery Header */
+.galleryHeader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.galleryTitle {
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 0;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  
+  /* Starwatcher gold accent with cosmic glow */
+  background: var(--moebius-gold-gradient);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  
+  /* Cosmic text shadows for depth */
+  text-shadow: 
+    0 2px 10px color-mix(in srgb, var(--gold-subtle) 60%, transparent),  /* Starwatcher gold glow */
+    0 0 20px color-mix(in srgb, var(--gold-subtle) 40%, transparent),    /* Extended starwatcher glow */
+    0 1px 2px color-mix(in srgb, var(--bg-card) 80%, transparent);     /* Cosmic deep blue depth */
+}
+
+/* No close button - user must commit to a choice! */
+
+/* Gallery Main Content */
+.galleryMain {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+}
+
+/* Desktop Gallery - Triptych Layout */
+.desktopGallery {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.portraitGrid {
+  display: grid;
+  grid-template-columns: repeat(3, var(--portrait-width));
+  justify-content: center; /* Center the grid tracks within the container */
+  gap: var(--portrait-gap);
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  max-height: 600px;
+}
+
+/* Name/Action Row — 3 columns matching portrait grid */
+.nameActionRow {
+  display: grid;
+  grid-template-columns: repeat(3, var(--portrait-width));
+  justify-content: center; /* Center the grid tracks — matches portrait grid */
+  gap: var(--portrait-gap);
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.nameActionCell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 3.5rem;
+}
+
+/* Figure name in action row (no margin-top like in PortraitFrame) */
+.nameLabel {
+  text-align: center;
+  font-size: clamp(1.1rem, 2vw, 1.4rem);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  color: var(--cosmic-white);
+  text-shadow:
+    0 2px 8px color-mix(in srgb, var(--bg-card) 80%, transparent),
+    0 0 12px color-mix(in srgb, var(--bg-card) 40%, transparent),
+    0 1px 2px color-mix(in srgb, var(--utility-pure-black) 90%, transparent);
+}
+
+/* Portrait Frame - Liquid Glass */
+.portraitFrame {
+  position: relative;
+  cursor: pointer;
+
+  /* GPU compositing hint for Chrome production mode */
+  transform: translateZ(0);
+
+  /* Entrance animation */
+  opacity: 0;
+  transform: translateY(40px) scale(0.9) translateZ(0);
+  animation: portrait-enter var(--timing-slow) var(--easing-cosmic) var(--stagger-delay) forwards;
+
+  transition: transform var(--timing-medium) var(--easing-cosmic);
+}
+
+@keyframes portrait-enter {
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1) translateZ(0);
+  }
+}
+
+.portraitFrame:hover {
+  transform: translateY(-8px) scale(1.02) translateZ(0);
+}
+
+.portraitFrame:focus {
+  outline: 2px solid var(--secondary-gold);
+  outline-offset: 4px;
+  border-radius: 16px;
+}
+
+/* Liquid Glass Frame */
+.glassFrame {
+  position: relative;
+  width: var(--portrait-width);
+  height: var(--portrait-height);
+
+  /* Modern aspect ratio with fallback */
+  aspect-ratio: var(--portrait-aspect-ratio);
+
+  /* GPU compositing hint for backdrop-filter in Chrome */
+  transform: translateZ(0);
+
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  
+  box-shadow: 
+    var(--glass-shadow),
+    inset 0 1px 0 color-mix(in srgb, white 20%, transparent);
+  
+  overflow: hidden;
+  
+  transition: border-color var(--timing-medium) var(--easing-cosmic), 
+              box-shadow var(--timing-medium) var(--easing-cosmic); /* Specific transitions only */
+}
+
+/* Desktop optimization - Premium cosmic gradient backgrounds */
+@media (min-width: 1024px) {
+  .glassFrame {
+    background: var(--cosmic-blue-gradient); /* Beautiful cosmic gradient */
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: 2px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    
+    /* Premium desktop frame with subtle inner glow */
+    box-shadow: 
+      var(--glass-shadow),
+      inset 0 1px 0 color-mix(in srgb, var(--gold-subtle) 30%, transparent),
+      0 0 30px color-mix(in srgb, var(--gold-subtle) 15%, transparent); /* Cosmic glow */
+  }
+}
+
+/* Fallback for browsers without backdrop-filter support */
+@supports not (backdrop-filter: blur(2px)) {
+  .glassFrame {
+    background: var(--cosmic-blue-gradient); /* Beautiful cosmic gradient fallback */
+    border-color: var(--starwatcher-gold); /* Strong starwatcher gold border */
+    box-shadow: 
+      0 4px 16px color-mix(in srgb, var(--bg-card) 60%, transparent),
+      0 0 25px color-mix(in srgb, var(--gold-subtle) 25%, transparent); /* Starwatcher glow */
+  }
+}
+
+/* Mobile-only liquid glass (tablets and phones) */
+@media (max-width: 1023px) {
+  .glassFrame {
+    /* Keep liquid glass on mobile/tablet where it's more appreciated */
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+  }
+}
+
+.portraitFrame:hover .glassFrame {
+  border-color: color-mix(in srgb, var(--gold-subtle) var(--a-80), transparent); /* Stronger on hover */
+  box-shadow: 
+    0 0 30px color-mix(in srgb, var(--gold-subtle) var(--a-15), transparent),
+    0 10px 40px color-mix(in srgb, black var(--a-35), transparent);
+}
+
+/* Portrait Container */
+.portraitContainer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+/* Portrait Image */
+.portraitImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  
+  opacity: 0;
+  transform: scale(1.1);
+  transition: all var(--timing-slow) var(--easing-cosmic);
+}
+
+.portraitImage.loaded {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Horizontal flip for figures facing the wrong direction (e.g. Da Vinci) */
+.portraitImage.flipped {
+  transform: scale(1.1) scaleX(-1);
+}
+
+.portraitImage.flipped.loaded {
+  transform: scale(1) scaleX(-1);
+}
+
+/* Museum Spotlight Effect */
+.spotlight {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 60% 40% at center 30%,
+    color-mix(in srgb, white 10%, transparent) 0%,
+    color-mix(in srgb, white 5%, transparent) 40%,
+    transparent 70%
+  );
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* Starwatcher Breathing Glow - Cosmic Council Inspired */
+.breathingGlow {
+  position: absolute;
+  inset: -4px;
+  border-radius: 24px;
+  
+  /* Moebius-inspired starwatcher gold gradient */
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--gold-deep) 30%, transparent) 0%,     /* Starwatcher bronze */
+    color-mix(in srgb, var(--gold-subtle) 40%, transparent) 50%,    /* Starwatcher gold */
+    color-mix(in srgb, var(--gold-primary) 30%, transparent) 100%    /* Starwatcher amber */
+  );
+  
+  opacity: 0;
+  animation: cosmic-breath var(--timing-breath) ease-in-out infinite var(--breath-delay);
+  animation-play-state: paused; /* Paused by default for battery optimization */
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Play animation on hover - following Sidebar pattern */
+.portraitFrame:hover .breathingGlow {
+  animation-play-state: running;
+}
+
+@keyframes cosmic-breath {
+  0%, 100% { 
+    opacity: 0; 
+    transform: scale(1); 
+  }
+  50% { 
+    opacity: 0.6; 
+    transform: scale(1.02); 
+  }
+}
+
+/* Essence Overlay */
+.essenceOverlay {
+  position: absolute;
+  inset: 0;
+  
+  /* Enhanced gradient with better top contrast for text readability */
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--bg-cosmic-void) 95%, transparent) 0%,     /* Solid dark bottom */
+    color-mix(in srgb, var(--bg-cosmic-void) 85%, transparent) 30%,    /* Strong middle */
+    color-mix(in srgb, var(--bg-cosmic-void) 75%, transparent) 60%,    /* Darker middle-top */
+    color-mix(in srgb, var(--bg-cosmic-void) 85%, transparent) 100%    /* Dark top for contrast */
+  );
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  
+  opacity: 0;
+  animation: essence-appear var(--timing-medium) var(--easing-cosmic) forwards;
+}
+
+
+@keyframes essence-appear {
+  to { opacity: 1; }
+}
+
+.essenceText {
+  color: var(--cosmic-silver);
+  font-size: clamp(1.0625rem, 1.7vw, 1.2rem); /* 17px floor → 19.2px desktop cap */
+  line-height: 1.5;
+  font-style: italic;
+  text-align: center;
+  font-weight: 500;
+
+  /* Cosmic text shadows with starwatcher gold accent */
+  text-shadow:
+    0 2px 8px color-mix(in srgb, var(--bg-card) 80%, transparent),   /* Cosmic deep blue depth */
+    0 0 12px color-mix(in srgb, var(--gold-subtle) 30%, transparent),  /* Subtle starwatcher gold glow */
+    0 1px 2px color-mix(in srgb, var(--utility-pure-black) 90%, transparent);      /* Sharp definition */
+}
+
+/* Mobile Info Icon - Indicates text is available (mobile only) */
+.mobileInfoIcon {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 36px;
+  height: 36px;
+  
+  background: color-mix(in srgb, var(--gold-subtle) 90%, transparent);
+  border-radius: 50%;
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  color: var(--cosmic-deep-blue);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--gold-subtle) 40%, transparent);
+  
+  /* Subtle pulse animation to draw attention */
+  animation: info-pulse 2s ease-in-out infinite;
+  animation-play-state: paused; /* Paused by default for battery optimization */
+  
+  /* Only show on mobile/tablet - hidden on desktop where hover works */
+  display: none;
+}
+
+/* Show on mobile/tablet devices */
+@media (max-width: 1023px) {
+  .mobileInfoIcon {
+    display: flex;
+  }
+}
+
+@keyframes info-pulse {
+  0%, 100% { 
+    opacity: 0.9; 
+    transform: scale(1); 
+  }
+  50% { 
+    opacity: 1; 
+    transform: scale(1.05); 
+  }
+}
+
+/* Play animation when parent frame is visible */
+.portraitFrame:hover .mobileInfoIcon,
+.portraitFrame.visible .mobileInfoIcon {
+  animation-play-state: running;
+}
+
+/* Mobile Hint - Shows after first tap */
+.mobileHint {
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  
+  background: color-mix(in srgb, var(--gold-subtle) 95%, transparent);
+  color: var(--cosmic-deep-blue);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
+  
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--gold-subtle) 40%, transparent);
+  
+  /* Gentle bounce animation */
+  animation: hint-bounce 0.6s ease-out;
+}
+
+@keyframes hint-bounce {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(10px) scale(0.9);
+  }
+  60% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-2px) scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+/* Category Badge - Beautiful Floating Glass Label */
+.categoryBadge {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  
+  padding: 0.5rem 1rem;
+  
+  /* Semi-transparent cosmic glass effect */
+  background: color-mix(in srgb, var(--bg-card) 70%, transparent);
+  backdrop-filter: blur(var(--glass-blur-max));
+  -webkit-backdrop-filter: blur(var(--glass-blur-max));
+  
+  /* Starwatcher gold border */
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 40%, transparent);
+  border-radius: 20px;
+  
+  /* Subtle shadow and glow */
+  box-shadow: 
+    0 4px 12px color-mix(in srgb, var(--utility-pure-black) 30%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--gold-subtle) 20%, transparent),
+    0 0 20px color-mix(in srgb, var(--gold-subtle) 10%, transparent);
+  
+  /* Smooth entrance */
+  opacity: 0;
+  transform: translateY(-10px);
+  animation: badge-float-in 0.6s ease-out 0.8s forwards;
+  animation-fill-mode: both;
+  
+  /* Ensure it's above other elements */
+  z-index: var(--z-base); /* 10 */
+  
+  /* Smooth hide transition */
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Auto-hide badge when text is shown */
+.portraitFrame.showingEssence .categoryBadge {
+  opacity: 0;
+  transform: translateY(-20px);
+  pointer-events: none;
+  animation: none;
+}
+
+@keyframes badge-float-in {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Category Icon - Glowing effect */
+.categoryIcon {
+  font-size: 1.1rem;
+  line-height: 1;
+  
+  /* Golden glow effect */
+  color: var(--starwatcher-gold);
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--gold-subtle) 60%, transparent));
+  
+  /* Subtle animation */
+  animation: icon-pulse 3s ease-in-out infinite;
+  animation-play-state: paused; /* Battery optimization */
+}
+
+/* Play animation on hover */
+.portraitFrame:hover .categoryIcon {
+  animation-play-state: running;
+}
+
+@keyframes icon-pulse {
+  0%, 100% { 
+    filter: drop-shadow(0 0 4px color-mix(in srgb, var(--gold-subtle) 60%, transparent)); 
+  }
+  50% { 
+    filter: drop-shadow(0 0 8px color-mix(in srgb, var(--gold-subtle) 80%, transparent)); 
+  }
+}
+
+/* Category Label - Clean uppercase text */
+.categoryLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  
+  /* Cosmic white with subtle gold tint */
+  color: var(--cosmic-white);
+  text-shadow: 0 1px 3px color-mix(in srgb, var(--utility-pure-black) 50%, transparent);
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .categoryBadge {
+    top: 0.75rem;
+    left: 0.75rem;
+    padding: 0.4rem 0.8rem;
+    gap: 0.3rem;
+  }
+  
+  .categoryIcon {
+    font-size: 1rem;
+  }
+  
+  .categoryLabel {
+    font-size: 0.7rem;
+  }
+}
+
+/* Figure Name - Clean White Text */
+.figureName {
+  margin-top: 1.5rem;
+  text-align: center;
+  
+  font-size: clamp(1.1rem, 2vw, 1.4rem);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  
+  /* Clean white text as before */
+  color: var(--cosmic-white);
+  
+  /* Enhanced cosmic text shadows for depth */
+  text-shadow: 
+    0 2px 8px color-mix(in srgb, var(--bg-card) 80%, transparent),   /* Cosmic deep blue depth */
+    0 0 12px color-mix(in srgb, var(--bg-card) 40%, transparent),    /* Subtle cosmic blue glow */
+    0 1px 2px color-mix(in srgb, var(--utility-pure-black) 90%, transparent);      /* Sharp definition */
+}
+
+/* Mobile Carousel */
+.mobileCarousel {
+  position: relative;
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.mobilePortrait {
+  width: auto;
+  height: auto;
+  max-width: 90vw;
+}
+
+.mobilePortrait .glassFrame {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 5 / 6; /* Proper mobile aspect ratio */
+  max-width: min(85vw, 400px); /* Limit width */
+  max-height: 55vh; /* Reduced to leave room for intent buttons */
+}
+
+/* Bar Indicators — Netflix style (from Cosmic Council) */
+.barIndicators {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.bar {
+  width: 24px;
+  height: 3px;
+  border-radius: 1.5px;
+  background: color-mix(in srgb, white 30%, transparent);
+  transition: background 0.2s ease;
+  cursor: pointer;
+  position: relative;
+  border: none;
+  padding: 0;
+}
+
+/* Virtual 44px touch target */
+.bar::before {
+  content: '';
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.activeBar {
+  background: var(--starwatcher-gold);
+}
+
+/* Legacy Navigation Dots (kept for reference) */
+.navigationDots {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border: none;
+  border-radius: 50%;
+  background: color-mix(in srgb, white 30%, transparent);
+  cursor: pointer;
+  position: relative;
+  
+  transition: all var(--timing-fast) ease;
+}
+
+/* Virtual 44px touch target for navigation dots */
+.dot::before {
+  content: '';
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  z-index: 1;
+  /* Debug: uncomment to see touch target */
+  /* background: color-mix(in srgb, red 10%, transparent); */
+}
+
+.activeDot {
+  background: var(--starwatcher-gold);
+  transform: scale(1.2);
+}
+
+.navButton {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  
+  width: 48px;
+  height: 48px;
+  border: none;
+  border-radius: 50%;
+  background: color-mix(in srgb, white 10%, transparent);
+  color: var(--text-secondary);
+  cursor: pointer;
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  transition: all var(--timing-fast) ease;
+}
+
+.prevButton {
+  left: -60px;
+}
+
+.nextButton {
+  right: -60px;
+}
+
+.navButton:hover,
+.navButton:focus {
+  background: color-mix(in srgb, white 20%, transparent);
+  color: var(--text-primary);
+  transform: translateY(-50%) scale(1.1);
+}
+
+/* Gallery Actions */
+.galleryActions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+  padding: 0 1rem;
+}
+
+/* Mobile Split Actions */
+@media (max-width: 768px) {
+  .galleryActions {
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    gap: 0.5rem;
+  }
+
+  /* Compact buttons with 44px virtual touch targets - 2025 best practice */
+  .actionButton {
+    padding: 0.5rem 1rem; /* Visually compact */
+    font-size: 0.875rem; /* 14px - more elegant */
+    min-height: 44px; /* Ensures WCAG touch target */
+    position: relative; /* For virtual touch area */
+  }
+
+  /* Virtual touch area extension using pseudo-element */
+  .actionButton::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    bottom: -4px;
+    left: -8px;
+    right: -8px;
+    /* Extends touch area without visual change */
+  }
+
+  .exploreButton {
+    padding: 0.5rem 1rem; /* Match compact sizing */
+    font-size: 0.875rem;
+    min-height: 44px;
+  }
+}
+
+/* Action Buttons - Used for split layout */
+.actionButton {
+  flex: 1;
+  min-width: 0;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+
+/* Selected portrait frame - stronger gold glow */
+.selected .glassFrame {
+  border-color: var(--starwatcher-gold);
+  box-shadow:
+    0 0 20px color-mix(in srgb, var(--gold-subtle) 40%, transparent),
+    0 0 40px color-mix(in srgb, var(--gold-subtle) 20%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+}
+
+.selected .breathingGlow {
+  animation-play-state: running;
+}
+
+/* Single Explore Button */
+.exploreButton {
+  min-width: 200px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  
+  /* Starwatcher gold text color */
+  color: var(--starwatcher-gold);
+  
+  /* Premium cosmic button styling */
+  background: color-mix(in srgb, var(--bg-card) 60%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 40%, transparent);
+  
+  transition: all var(--timing-medium) var(--easing-cosmic);
+}
+
+.exploreButton:hover {
+  transform: translateY(-2px);
+  background: color-mix(in srgb, var(--bg-card) 80%, transparent);
+  border-color: var(--starwatcher-gold);
+  box-shadow: 0 0 20px color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+  color: var(--starwatcher-amber);
+}
+
+/* Responsive Design */
+
+/* Large Desktop */
+@media (min-width: 1600px) {
+  .modal {
+    --portrait-width: 550px;
+    --portrait-height: 665px; /* Maintains 0.827:1 ratio */
+    --portrait-gap: 3rem;
+  }
+  
+  .galleryContent {
+    padding: 3rem;
+  }
+}
+
+/* Desktop */
+@media (max-width: 1200px) {
+  .modal {
+    --portrait-width: clamp(280px, 22vw, 420px);
+    --portrait-height: clamp(339px, 26.6vw, 508px); /* Maintains 0.827:1 ratio */
+    --portrait-gap: clamp(1.5rem, 3vw, 2.5rem);
+  }
+}
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .portraitGrid {
+    gap: 2rem;
+    max-height: 600px; /* Increased for taller portraits */
+  }
+
+  .modal {
+    --portrait-width: clamp(240px, 20vw, 350px);
+    --portrait-height: clamp(290px, 24.2vw, 423px); /* Maintains 0.827:1 ratio */
+  }
+}
+
+/* Short laptop viewports (e.g. 1280x720, 1366x708) — keep portraits proportional
+   to available height so header + name row + action buttons all fit. */
+@media (max-height: 750px) and (min-width: 1025px) {
+  .modal {
+    --portrait-width: clamp(280px, 22vw, 380px);
+    --portrait-height: clamp(338px, 26.6vw, 459px); /* Maintains 0.827:1 aspect */
+  }
+  .galleryContent {
+    gap: 1.5rem; /* tighter vertical breathing room */
+  }
+
+  /* Smaller portraits = less room for the about-text overlay.
+     Scale the whole text down so the full DE figure.about paragraph
+     (~430 chars) fits inside the frame without truncation. */
+  .essenceOverlay {
+    padding: 0.875rem;
+  }
+  .essenceText {
+    font-size: 0.875rem; /* 14px — readable italic at hover scale */
+    line-height: 1.35;
+  }
+}
+
+/* Mobile Layout */
+@media (max-width: 768px) {
+  .galleryContent {
+    padding: calc(var(--safe-top) + 1.5rem) 1.5rem 
+             calc(var(--safe-bottom) + 1.5rem) 1.5rem;
+    gap: 1.5rem;
+  }
+  
+  .galleryTitle {
+    font-size: clamp(1.5rem, 6vw, 2rem);
+  }
+  
+  .navButton {
+    width: 44px;
+    height: 44px;
+  }
+  
+  .prevButton {
+    left: -50px;
+  }
+  
+  .nextButton {
+    right: -50px;
+  }
+  
+  .exploreButton {
+    width: 100%;
+    min-width: auto;
+  }
+}
+
+/* Small Mobile */
+/* iPhone SE and smaller - Scrollable approach (2025 best practice) */
+/* Optimize for 90% (larger phones), accommodate 10% (SE) with scroll */
+@media (max-width: 375px) {
+  .galleryContent {
+    padding: calc(var(--safe-top) + 1rem) 1rem
+             calc(var(--safe-bottom) + 1rem) 1rem;
+    overflow-y: auto; /* Allow scrolling on small screens */
+    -webkit-overflow-scrolling: touch; /* Smooth iOS scrolling */
+  }
+
+  .mobilePortrait .glassFrame {
+    height: 350px;
+  }
+
+  .navButton {
+    width: 40px;
+    height: 40px;
+  }
+
+  .prevButton {
+    left: -45px;
+  }
+
+  .nextButton {
+    right: -45px;
+  }
+
+  /* iPhone SE: tighten overlay padding + shrink essence text so it still fits */
+  .essenceOverlay {
+    padding: 1rem 0.875rem;
+  }
+
+  .essenceText {
+    font-size: 1rem; /* 16px — between original 14.4 and bigger-phone 17 */
+    line-height: 1.45;
+  }
+}
+
+/* Accessibility Enhancements */
+
+/* High contrast mode - Cosmic Council colors */
+@media (prefers-contrast: high) {
+  .modal {
+    --glass-bg: color-mix(in srgb, var(--bg-card) 95%, transparent); /* Cosmic deep blue for high contrast */
+    --glass-bg-fallback: color-mix(in srgb, var(--bg-card) 98%, transparent);
+    --glass-border: var(--starwatcher-gold); /* Strong starwatcher gold border */
+  }
+  
+  .cosmicBackground {
+    background: var(--cosmic-background); /* Standard cosmic background */
+    backdrop-filter: none;
+  }
+  
+  .galleryTitle {
+    background: none;
+    -webkit-background-clip: unset;
+    background-clip: unset;
+    color: var(--starwatcher-gold);
+    font-weight: 700;
+    text-shadow: 0 1px 2px color-mix(in srgb, var(--bg-card) 80%, transparent);
+  }
+  
+  .figureName {
+    color: var(--cosmic-white);
+    font-weight: 600;
+    text-shadow: 0 1px 2px color-mix(in srgb, var(--bg-card) 80%, transparent);
+  }
+  
+  .essenceText {
+    color: var(--cosmic-white);
+    font-weight: 600;
+    text-shadow: 0 1px 2px color-mix(in srgb, var(--bg-card) 80%, transparent);
+  }
+  
+  .breathingGlow {
+    display: none;
+  }
+}
+
+/* === BATTERY OPTIMIZATION - Following NowPlaying/Sidebar Patterns === */
+
+/* When modal is hidden (screen locked/backgrounded), disable all GPU-intensive effects */
+.modal[data-visibility="hidden"] {
+  /* Stop all animations and transitions for maximum battery savings */
+  animation-play-state: paused !important;
+  transition: none !important;
+}
+
+.modal[data-visibility="hidden"] * {
+  /* Disable all child animations and transitions */
+  animation-play-state: paused !important;
+  transition: none !important;
+  /* Remove all will-change hints to free GPU resources */
+  will-change: auto !important;
+}
+
+/* Disable liquid glass effects when hidden - use deep blue fallback */
+.modal[data-visibility="hidden"] .glassFrame {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: var(--glass-bg-fallback) !important; /* Use deep blue fallback for consistency */
+}
+
+/* Disable breathing glow when hidden */
+.modal[data-visibility="hidden"] .breathingGlow {
+  animation: none !important;
+  background: none !important;
+  opacity: 0 !important;
+}
+
+/* Performance optimization: Minimal repaints when screen locked */
+.modal[data-visibility="hidden"] {
+  contain: layout style paint;
+  pointer-events: none;
+}
+
+/* Restore interactivity when page becomes visible */
+.modal[data-visibility="visible"] {
+  pointer-events: auto;
+  contain: none;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .modal {
+    transition: opacity var(--timing-fast) ease;
+    /* No transform transition — only fade for reduced motion */
+  }
+  
+  .portraitFrame {
+    animation: portrait-enter-simple var(--timing-fast) ease var(--stagger-delay) forwards;
+  }
+  
+  @keyframes portrait-enter-simple {
+    to { opacity: 1; }
+  }
+  
+  .portraitFrame:hover {
+    transform: none;
+  }
+  
+  .breathingGlow {
+    animation: none !important;
+    animation-play-state: paused !important;
+  }
+  
+  .portraitImage {
+    transition: opacity var(--timing-fast) ease;
+  }
+}
+
+/* Focus indicators */
+.portraitFrame:focus-visible,
+.navButton:focus-visible,
+.dot:focus-visible,
+.exploreButton:focus-visible {
+  outline: 2px solid var(--starwatcher-gold);
+  outline-offset: 2px;
+}
+
+/* Print styles */
+@media print {
+  .modal {
+    display: none;
+  }
+}

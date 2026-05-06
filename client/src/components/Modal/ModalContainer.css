@@ -1,0 +1,493 @@
+/* ModalContainer.css - Extracted from MicroInteractions.css for better modularity */
+
+/* ============================================
+   MODAL-SPECIFIC CSS VARIABLES
+   ============================================ */
+:root {
+  /* Modal background variable */
+  --modal-bg: var(--modal-gradient-subtle);
+  
+  /* Modal-specific colors and gradients */
+  --modal-gradient-subtle: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--bg-primary) 97%, transparent) 0%,  /* Based on --primary-deep */
+    color-mix(in srgb, var(--bg-card) 97%, transparent) 100%
+  );
+  
+  --modal-gradient-depth: linear-gradient(
+    135deg,
+    var(--bg-primary) 0%,    /* Based on --primary-deep */
+    color-mix(in srgb, var(--bg-card) 98%, transparent) 50%,
+    color-mix(in srgb, var(--bg-highlight) 97%, transparent) 100%
+  );
+  
+  --modal-gradient-cosmic: radial-gradient(
+    ellipse at center,
+    color-mix(in srgb, var(--bg-highlight) 95%, transparent) 0%,
+    color-mix(in srgb, var(--bg-primary) 98%, transparent) 60%,
+    var(--bg-cosmic-void) 100%
+  );
+  
+  --modal-gradient-onboarding: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--bg-primary) 98%, transparent) 0%,   /* Primary deep */
+    color-mix(in srgb, var(--mode-wisdom) 98%, transparent) 100%  /* With purple tint */
+  );
+  
+  /* Modal-specific transition variables */
+  --modal-overlay-duration: 0.5s;
+  --modal-content-duration: 0.75s;
+  --modal-content-delay: 0.05s;
+  --modal-scale-start: 1.03;
+  --modal-y-offset: 10px;
+  --modal-transition-easing: var(--animation-entrance);
+  
+  /* Modal z-index */
+  --z-index-modal: 2000;
+}
+
+/* ============================================
+   MODAL OVERLAY BASE STYLES
+   ============================================ */
+.enhanced-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: var(--z-index-modal);
+  background: color-mix(in srgb, var(--bg-primary) 97%, transparent); /* Based on --primary-deep */
+  backdrop-filter: blur(var(--glass-blur));
+  will-change: opacity;
+}
+
+/* Fullscreen variant should not have blur or gradient */
+.enhanced-modal-overlay.modal-fullscreen-bg {
+  background: var(--bg-primary); /* Solid background */
+  backdrop-filter: none; /* No blur for fullscreen */
+}
+
+/* ============================================
+   MODAL HEADER STYLES - MOVED TO ModalHeader.css
+   ============================================ */
+/* 
+   All modal header styles are now handled by the ModalHeader component
+   and its dedicated stylesheet (ModalHeader.css) for better separation
+   of concerns and reusability.
+   
+   Import ModalHeader from '../Modal' to use the new component.
+*/
+
+/* ============================================
+   MODAL TYPE VARIANTS
+   ============================================ */
+
+/* ============================================
+   2025 ULTRATHINK MODAL SYSTEM
+   ============================================ */
+
+/* Compact Modal - For simple content */
+.compact-modal,
+.windowed-modal /* Legacy alias */ {
+  width: 90%;
+  max-width: 500px;
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent);
+  box-shadow: 0 0 40px color-mix(in srgb, var(--gold-subtle) var(--a-20), transparent), 0 0 80px color-mix(in srgb, black var(--a-40), transparent);
+  border-radius: 20px;
+}
+
+/* Content Modal - NEW DEFAULT for rich content */
+.content-modal {
+  /* Mobile: True fullscreen */
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* Tablet: Near-fullscreen with breathing room */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .content-modal {
+    width: 92vw;
+    height: 90vh;
+    border-radius: 12px;
+    border: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-20), transparent);
+    box-shadow: 0 0 60px color-mix(in srgb, black var(--a-30), transparent);
+  }
+}
+
+/* Desktop: Intelligent scaling */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .content-modal {
+    width: 85vw;
+    height: 85vh;
+    border-radius: 16px;
+    border: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-25), transparent);
+    box-shadow: 0 0 80px color-mix(in srgb, black var(--a-40), transparent);
+  }
+}
+
+/* Large Desktop: Optimal window size */
+@media (min-width: 1280px) and (max-width: 1919px) {
+  .content-modal {
+    width: 80vw;
+    height: 80vh;
+    border-radius: 20px;
+    border: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent);
+    box-shadow: 0 0 100px color-mix(in srgb, black var(--a-50), transparent);
+  }
+}
+
+/* Ultra-wide: Prevent excessive width */
+@media (min-width: 1920px) {
+  .content-modal {
+    width: 75vw;
+    height: 80vh;
+    max-width: 1400px;
+    border-radius: 24px;
+    border: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent);
+    box-shadow: 0 0 120px color-mix(in srgb, black var(--a-60), transparent);
+  }
+}
+
+/* Header-Overlay Modal - Revolutionary space optimization */
+.header-overlay-modal {
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  
+  /* Overlay main header */
+  z-index: var(--z-modal-overlay); /* 3000 */ /* Higher than main header */
+}
+
+/* Immersive Modal - True fullscreen experience */
+.immersive-modal {
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* Fullscreen Modal - For main application views */
+.fullscreen-modal {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: 100dvh;
+  border-radius: 0;
+  margin: 0;
+  border: none;
+  box-shadow: none;
+}
+
+/* 2025 Full-Screen Modal - True fullscreen across all devices */
+@media (min-width: 768px) {
+  .fullscreen-modal {
+    width: 100%;      /* Full width on desktop */
+    height: 100%;     /* Full height on desktop */
+    max-width: none;  /* No width constraints */
+    max-height: 100dvh; /* Full viewport height */
+    border-radius: 0; /* No border radius for true fullscreen */
+  }
+  
+  /* Modal header styles now handled by ModalHeader component */
+}
+
+/* Modal Footer - Standardized styling to match header */
+.settings-footer, .modal-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent); /* Same subtle border as header */
+  position: relative;
+}
+
+/* ============================================
+   MODAL THEME VARIANTS
+   ============================================ */
+.enhanced-modal-overlay.cosmic-theme {
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--bg-primary) 97%, transparent) 0%, /* Based on --primary-deep */
+    color-mix(in srgb, var(--bg-highlight) 97%, transparent) 100%
+  );
+}
+
+.enhanced-modal-overlay.nebula-theme {
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--bg-primary) 97%, transparent) 0%, /* Based on --primary-deep */
+    color-mix(in srgb, var(--mode-wisdom) 97%, transparent) 100%
+  );
+}
+
+/* Transparent background version - for custom themed modals */
+.enhanced-modal-overlay.transparent-bg {
+  background: transparent;
+}
+
+/* ============================================
+   MODAL ALIGNMENT & SCROLLBAR
+   ============================================ */
+.enhanced-modal-overlay.align-top {
+  align-items: flex-start;
+  padding-top: 2vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS devices */
+}
+
+/* Scrollbar styling */
+.enhanced-modal-overlay::-webkit-scrollbar {
+  width: 8px;
+}
+
+.enhanced-modal-overlay::-webkit-scrollbar-track {
+  background: color-mix(in srgb, var(--gold-subtle) var(--a-15), transparent);
+  border-radius: 4px;
+}
+
+.enhanced-modal-overlay::-webkit-scrollbar-thumb {
+  background-color: var(--gold-base);
+  border-radius: 4px;
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-60), transparent);
+}
+
+/* Firefox scrollbar */
+.enhanced-modal-overlay {
+  scrollbar-color: var(--gold-base) color-mix(in srgb, var(--gold-subtle) var(--a-15), transparent);
+  scrollbar-width: thin;
+}
+
+/* ============================================
+   MODAL CONTENT BASE
+   ============================================ */
+.enhanced-modal-content {
+  position: relative;
+  will-change: transform, opacity;
+}
+
+/* Ensure fullscreen modal content fills container */
+.enhanced-modal-content.fullscreen-modal {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ============================================
+   MODAL ANIMATIONS
+   ============================================ */
+@keyframes modalFadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes modalFadeScaleIn {
+  0% { 
+    opacity: 0; 
+    transform: scale(var(--modal-scale-start)) translateY(var(--modal-y-offset)); 
+  }
+  100% { 
+    opacity: 1; 
+    transform: scale(1) translateY(0); 
+  }
+}
+
+@keyframes modalSlideIn {
+  0% { 
+    opacity: 0; 
+    transform: translateY(30px); 
+  }
+  100% { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+@keyframes modalCosmicReveal {
+  0% { 
+    opacity: 0; 
+    transform: scale(0.8) rotate(5deg); 
+    filter: blur(10px);
+  }
+  50% {
+    transform: scale(1.02) rotate(-1deg);
+    filter: blur(2px);
+  }
+  100% { 
+    opacity: 1; 
+    transform: scale(1) rotate(0deg); 
+    filter: blur(0);
+  }
+}
+
+/* Apply animations based on variant class */
+.modal-fade-only {
+  animation: modalFadeIn var(--modal-overlay-duration) var(--modal-transition-easing);
+}
+
+.modal-fade-only .enhanced-modal-content {
+  animation: modalFadeIn var(--modal-content-duration) var(--modal-transition-easing);
+}
+
+.modal-fade-scale {
+  animation: modalFadeIn var(--modal-overlay-duration) var(--modal-transition-easing);
+}
+
+.modal-fade-scale .enhanced-modal-content {
+  animation: modalFadeScaleIn var(--modal-content-duration) var(--modal-content-delay) var(--modal-transition-easing) both;
+}
+
+.modal-fade-slide {
+  animation: modalFadeIn var(--modal-overlay-duration) var(--modal-transition-easing);
+}
+
+.modal-fade-slide .enhanced-modal-content {
+  animation: modalSlideIn var(--modal-content-duration) var(--modal-content-delay) var(--modal-transition-easing) both;
+}
+
+.modal-cosmic-reveal {
+  animation: modalFadeIn var(--modal-overlay-duration) var(--modal-transition-easing);
+}
+
+.modal-cosmic-reveal .enhanced-modal-content {
+  animation: modalCosmicReveal 1.2s var(--animation-orbital) both;
+}
+
+/* ============================================
+   MODAL BACKGROUND UTILITY CLASSES
+   ============================================ */
+.modal-subtle-bg {
+  background: var(--modal-gradient-subtle);
+}
+
+.modal-solid-bg {
+  background: color-mix(in srgb, var(--bg-primary) 99%, transparent); /* Nearly opaque --primary-deep */
+}
+
+.modal-depth-bg {
+  background: var(--modal-gradient-depth);
+}
+
+.modal-cosmic-bg {
+  background: var(--modal-gradient-cosmic);
+}
+
+.modal-onboarding-bg {
+  background: var(--modal-gradient-onboarding);
+}
+
+/* Fullscreen modal background - applied to both overlay and content */
+.modal-fullscreen-bg {
+  background: var(--bg-primary); /* Solid background for fullscreen modals */
+}
+
+/* ============================================
+   MOBILE RESPONSIVE ADJUSTMENTS (2025 STANDARDS)
+   ============================================ */
+
+/* Mobile baseline (360px+) */
+@media (min-width: 360px) and (max-width: 767px) {
+  .compact-modal,
+  .windowed-modal /* Legacy alias */ {
+    width: 95%;
+    max-width: none;
+    margin: 20px 10px;
+    border-radius: 12px;
+  }
+  
+  .content-modal,
+  .immersive-modal,
+  .header-overlay-modal {
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    border-radius: 0;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+/* Legacy support for very small screens */
+@media (max-width: 359px) {
+  .compact-modal,
+  .windowed-modal /* Legacy alias */ {
+    width: 98%;
+    margin: 10px 4px;
+    border-radius: 8px;
+  }
+
+  .content-modal,
+  .immersive-modal,
+  .header-overlay-modal {
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    border-radius: 0;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+/* ============================================
+   HIGH-SPECIFICITY OVERRIDES FOR DETAIL MODAL
+   ============================================ */
+/* Ensure InstructionsModal detail modals are truly fullscreen */
+.im-overlay.enhanced-modal-overlay {
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  padding: 0;
+  margin: 0;
+}
+
+.im-content.fullscreen-modal {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: 100dvh;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* ============================================
+   REDUCED MOTION
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  .modal-fade-only,
+  .modal-fade-scale,
+  .modal-fade-slide,
+  .modal-cosmic-reveal,
+  .modal-fade-only .enhanced-modal-content,
+  .modal-fade-scale .enhanced-modal-content,
+  .modal-fade-slide .enhanced-modal-content,
+  .modal-cosmic-reveal .enhanced-modal-content {
+    animation: none;
+  }
+}

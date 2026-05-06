@@ -1,0 +1,576 @@
+/* src/components/AudioLibrary/StoryCollection.css */
+/* Spotify-inspired design using Agora Cosmica Design System 2025 */
+
+/* ===================================
+   BASE CONTAINER
+   =================================== */
+.story-collection {
+  /* 2025 CLEAN ARCHITECTURE: Allow content to flow into parent scroll container */
+  display: flex;
+  flex-direction: column;
+  min-height: 100%; /* Use min-height instead of height to allow natural expansion */
+  background: var(--bg-primary);
+  position: relative;
+  overflow: visible; /* Allow content to flow - parent handles scrolling */
+  padding: 0;
+  margin: 0;
+}
+
+/* Loading state with skeleton screens */
+.story-collection.loading {
+  padding: var(--space-lg);
+}
+
+.story-collection__skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-header {
+  height: 80px;
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  opacity: 0.5;
+}
+
+.skeleton-item {
+  height: 56px;
+  background: var(--bg-card);
+  border-radius: var(--radius-sm);
+  opacity: 0.3;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+}
+
+/* Empty state */
+.story-collection.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-3xl);
+  color: var(--text-secondary);
+  font-size: var(--text-base);
+  text-align: center;
+}
+
+/* ===================================
+   HEADER SECTION - Figure Info
+   =================================== */
+.story-collection__header {
+  /* 2025 CLEAN: Minimal header, no sticky (parent scrolls cleanly) */
+  background: var(--bg-primary);
+  padding: var(--space-sm) 0 var(--space-xs) 0; /* Vertical only - parent provides horizontal */
+  border-bottom: 1px solid color-mix(in srgb, var(--gold-primary) var(--a-15), transparent);
+  width: 100%;
+  margin: 0;
+}
+
+.story-collection__figure-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs); /* Tight gap */
+  width: 100%;
+  padding: 0; /* No padding - parent modal-content provides horizontal */
+}
+
+/* Desktop layout optimization */
+@media (min-width: 768px) {
+  .story-collection__figure-info {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  
+  .story-collection__text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    align-items: center;
+  }
+}
+
+.story-collection__figure-name {
+  /* 2025 MOBILE UX: Hide redundant figure name (carousel above shows same info) */
+  display: none; /* Figure visible in carousel - no repetition needed */
+  font-family: var(--font-display);
+  font-size: clamp(var(--text-lg), 2.5vw, var(--text-xl));
+  font-weight: var(--weight-bold);
+  color: var(--gold-primary);
+  margin: 0;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  
+  /* Subtle glow effect */
+  text-shadow: 0 0 20px color-mix(in srgb, var(--gold-primary) var(--a-20), transparent);
+}
+
+.story-collection__metadata {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  color: var(--text-secondary);
+  font-size: var(--text-base); /* 2025 MINIMALISM: Same size as story titles (Notion/Linear pattern) */
+  font-family: var(--font-ui);
+  opacity: 0.9;
+}
+
+
+.story-collection__separator {
+  opacity: 0.3;
+}
+
+.story-collection__duration {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.story-collection__facts-link {
+  position: relative; /* host for the invisible tap-zone pseudo element */
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  background: none;
+  border: none;
+  color: var(--gold-subtle);
+  font-size: inherit;
+  font-family: inherit;
+  cursor: pointer;
+  padding: 4px 6px;
+  justify-content: center;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.2s;
+}
+
+/* Invisible 44×44 touch target — keeps WCAG tap size without inflating the
+   visible row height. */
+.story-collection__facts-link::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 44px;
+  height: 44px;
+  transform: translate(-50%, -50%);
+}
+
+.story-collection__facts-link:hover {
+  color: var(--gold-hover);
+}
+
+.story-collection__facts-link:focus-visible {
+  outline: 2px solid var(--gold-subtle);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.story-collection__lang-warning {
+  color: var(--semantic-warning);
+  font-weight: var(--weight-medium);
+}
+
+/* Removed unused Play All and Shuffle button styles */
+/* These features are no longer available in the AudioLibrary */
+
+/* ===================================
+   STORIES LIST - Spotify Style
+   =================================== */
+.story-collection__list {
+  /* 2025 CLEAN ARCHITECTURE: No internal scrolling - parent .modal-content scrolls */
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  max-width: 900px;
+  margin: 0 auto;
+
+  /* Note: Scrolling handled by parent .modal-content for clean single-scroll UX */
+}
+
+/* Global purple scrollbar will be inherited automatically */
+
+/* ===================================
+   STORY ITEM - Track Row
+   =================================== */
+.story-item {
+  /* 2025 CLEAN: Simple grid, parent provides horizontal padding */
+  display: grid;
+  grid-template-columns: 40px 1fr 60px 40px;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-sm) 0; /* Vertical only - parent provides horizontal */
+  margin: 0;
+  border-radius: 0;
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  position: relative;
+  box-sizing: border-box;
+  
+  /* Hover effect with better contrast */
+  &:hover {
+    background: color-mix(in srgb, var(--bg-card) var(--a-40), transparent); /* var(--bg-card) equivalent */
+  }
+}
+
+/* States */
+.story-item--playing {
+  background: linear-gradient(90deg, 
+    color-mix(in srgb, var(--gold-primary) var(--a-15), transparent) 0%,    /* --gold-primary with opacity */
+    color-mix(in srgb, var(--gold-primary) var(--a-05), transparent) 100%);
+  border-left: 3px solid var(--gold-primary);
+  
+  /* Playing state styling moved to .story-item__title rules above for better specificity */
+}
+
+.story-item--played {
+  /* Played state styling moved to individual element rules for better control */
+  .story-item__duration {
+    opacity: 0.7;
+  }
+}
+
+.story-item--disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+
+  &:hover {
+    background: transparent;
+  }
+}
+
+/* Foreword item - subtle distinction */
+.story-item--foreword {
+  border-bottom: 1px solid color-mix(in srgb, var(--gold-primary) var(--a-15), transparent);
+  margin-bottom: var(--space-xs);
+  padding-bottom: var(--space-sm);
+}
+
+.story-item__foreword-icon {
+  color: var(--gold-subtle);
+}
+
+/* ===================================
+   TRACK NUMBER / PLAY BUTTON
+   =================================== */
+.story-item__number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  font-family: var(--font-mono);
+}
+
+.story-item__index {
+  font-variant-numeric: tabular-nums;
+}
+
+.story-item__play-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  background: var(--gold-primary);
+  color: var(--bg-primary);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  position: relative;
+  
+  &:hover {
+    transform: scale(1.1);
+    background: var(--gold-hover);
+  }
+  
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+/* Virtual 44px touch target for play button */
+.story-item__play-btn::before {
+  content: '';
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  z-index: 1;
+  /* Debug: uncomment to see touch target */
+  /* background: color-mix(in srgb, green 10%, transparent); */
+}
+
+.story-item__check {
+  color: var(--semantic-success);
+}
+
+.story-item__in-progress {
+  color: var(--gold-subtle);
+  opacity: 0.7;
+}
+
+/* Animated equalizer for playing state */
+.story-item__equalizer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  .equalizer-icon {
+    color: var(--gold-hover); /* Bright gold for visibility */
+    filter: drop-shadow(0 0 8px color-mix(in srgb, var(--gold-primary) var(--a-50), transparent));
+    animation: equalizer 1s ease-in-out infinite;
+  }
+}
+
+@keyframes equalizer {
+  0%, 100% { transform: scaleY(0.7); }
+  50% { transform: scaleY(1); }
+}
+
+/* ===================================
+   TRACK INFO
+   =================================== */
+.story-item__info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.story-item__title {
+  font-size: var(--text-base);
+  font-weight: var(--weight-medium);
+  /* Default: Use gray for unplayed stories (astigmatism-friendly) */
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color var(--transition-fast);
+}
+
+/* Hover state: Increase contrast when user is interacting */
+.story-item:hover .story-item__title {
+  color: var(--text-primary);
+}
+
+/* Playing state: Gold color (already handled in .story-item--playing) */
+.story-item--playing .story-item__title {
+  color: var(--gold-primary);
+  font-weight: var(--weight-semibold);
+}
+
+/* Played state: Maintain gray but with reduced opacity for visual hierarchy */
+.story-item--played .story-item__title {
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
+.story-item__subtitle {
+  font-size: var(--text-xs);
+  color: var(--gold-hover); /* Brighter gold for "Now Playing" */
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: var(--weight-medium);
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===================================
+   DURATION
+   =================================== */
+.story-item__duration {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+
+/* ===================================
+   STORY PROGRESS BAR
+   =================================== */
+.story-progress-track {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: color-mix(in srgb, var(--gold-subtle) 15%, transparent);
+}
+
+.story-progress-fill {
+  height: 100%;
+  background: var(--gold-gradient);
+  transition: width 0.3s ease;
+}
+
+.story-progress-fill--completed {
+  background: var(--gold-subtle);
+  box-shadow: 0 0 6px color-mix(in srgb, var(--gold-subtle) 40%, transparent);
+}
+
+/* ===================================
+   RESPONSIVE DESIGN
+   =================================== */
+@media (max-width: 768px) {
+  /* 2025 MOBILE REBUILD: Clean, simple, no hacks */
+
+  /* Header: breathing room so the figure info feels like content, not a data row */
+  .story-collection__header {
+    padding: 8px 0 6px;
+  }
+
+  .story-collection__figure-info {
+    gap: 4px;
+    padding: 0;
+  }
+
+  .story-collection__figure-name {
+    font-size: var(--text-lg);
+  }
+
+  .story-collection__metadata {
+    flex-wrap: wrap;
+  }
+
+  .story-collection__actions {
+    width: 100%;
+  }
+
+  .story-collection__play-all {
+    flex: 1;
+  }
+
+  /* Story items: keep the compact grid but give each row clearer vertical breathing. */
+  .story-item {
+    grid-template-columns: 32px 1fr 45px; /* Compact mobile grid */
+    gap: var(--space-sm);
+    padding: 8px 0;
+    margin: 0;
+  }
+
+  /* Hide action button on mobile */
+  .story-item__action {
+    display: none;
+  }
+
+  /* Make play button always visible on mobile */
+  .story-item__play-btn {
+    width: 24px;
+    height: 24px;
+  }
+
+  .story-item__number {
+    width: 32px;
+    height: 32px;
+    font-size: 0.9375rem; /* 15px — matched to title + duration */
+  }
+
+  .story-item__title {
+    font-size: 0.9375rem; /* 15px — matched to number + duration */
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    line-height: 1.4;
+  }
+
+  .story-item__duration {
+    font-size: 0.9375rem; /* 15px — matched to number + title */
+  }
+}
+
+/* Small mobile devices */
+@media (max-width: 380px) {
+  .story-collection__figure-name {
+    font-size: var(--text-lg);
+  }
+
+  .story-item {
+    grid-template-columns: 28px 1fr 40px;
+    gap: var(--space-xs);
+    padding: 8px 0;
+    margin: 0;
+  }
+
+  .story-item__title {
+    font-size: 0.9375rem; /* 15px — matched to number + duration */
+  }
+
+  .story-item__duration {
+    font-size: 0.9375rem; /* 15px — matched to number + title */
+  }
+}
+
+/* ===================================
+   DARK MODE ENHANCEMENTS
+   =================================== */
+@media (prefers-color-scheme: dark) {
+  .story-item:hover {
+    background: color-mix(in srgb, var(--text-primary) var(--a-05), transparent);
+  }
+  
+  .story-item--playing {
+    background: color-mix(in srgb, var(--gold-primary) var(--a-10), transparent);
+  }
+}
+
+/* ===================================
+   ACCESSIBILITY
+   =================================== */
+@media (prefers-reduced-motion: reduce) {
+  .story-item,
+  .story-item__play-btn,
+  .story-item__action,
+  .equalizer-icon,
+  .story-progress-fill {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Focus states for keyboard navigation */
+.story-item:focus-within {
+  outline: 2px solid var(--gold-primary);
+  outline-offset: 2px;
+}
+
+.story-item__play-btn:focus-visible,
+.story-item__action:focus-visible {
+  outline: 2px solid var(--gold-primary);
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .story-item {
+    border: 1px solid var(--border-default);
+  }
+  
+  .story-item--playing {
+    border-color: var(--gold-primary);
+    border-width: 2px;
+  }
+}

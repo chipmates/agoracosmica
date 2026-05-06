@@ -1,0 +1,1817 @@
+[
+  {
+    "id": "the-story-you-keep-telling",
+    "title": "The Story You Keep Telling",
+    "titleDe": "Die Geschichte, die du immer erzählst",
+    "tagline": "On the script running your life, and what happens when you rewrite it",
+    "taglineDe": "Über das Skript, das dein Leben schreibt, und was passiert, wenn du es änderst",
+    "type": "reflective",
+    "theme": "who-am-i",
+    "safety": "standard",
+    "sortOrder": 1,
+    "question": "You have told yourself the same story about who you are for years. What if the story is the problem?",
+    "questionDe": "Du erzählst dir seit Jahren dieselbe Geschichte darüber, wer du bist. Was, wenn die Geschichte das Problem ist?",
+    "moderator": {
+      "id": "campbell",
+      "name": "Joseph Campbell"
+    },
+    "participants": [
+      {
+        "id": "woolf",
+        "name": "Virginia Woolf"
+      },
+      {
+        "id": "jung",
+        "name": "Carl Gustav Jung"
+      },
+      {
+        "id": "angelou",
+        "name": "Maya Angelou"
+      }
+    ],
+    "hook": "What if your story about yourself is the problem?",
+    "hookDe": "Was, wenn deine Geschichte über dich das Problem ist?"
+  },
+  {
+    "id": "the-mask-that-speaks",
+    "title": "The Mask That Speaks",
+    "titleDe": "Die Maske, die spricht",
+    "tagline": "On whether the real you is just another performance",
+    "taglineDe": "Über das wahre Selbst — und ob es nur die letzte Maske ist",
+    "type": "confrontational",
+    "theme": "who-am-i",
+    "safety": "standard",
+    "sortOrder": 2,
+    "question": "If every self is a performance, is authenticity a noble aspiration or the most dangerous illusion of all?",
+    "questionDe": "Wenn jedes Selbst eine Inszenierung ist, ist Authentizität dann ein edles Ziel oder die gefährlichste Illusion von allen?",
+    "moderator": {
+      "id": "shakespeare",
+      "name": "William Shakespeare"
+    },
+    "participants": [
+      {
+        "id": "jung",
+        "name": "Carl Gustav Jung"
+      },
+      {
+        "id": "woolf",
+        "name": "Virginia Woolf"
+      },
+      {
+        "id": "nietzsche",
+        "name": "Friedrich Nietzsche"
+      }
+    ],
+    "hook": "Are you being real or just performing better?",
+    "hookDe": "Bist du echt, oder spielst du nur besser?"
+  },
+  {
+    "id": "the-self-that-isnt-there",
+    "title": "The Self That Isn't There",
+    "titleDe": "Das Ich, das nicht da ist",
+    "tagline": "On the search for the real you, and what happens when you don't find it",
+    "taglineDe": "Über die Suche nach dem Ich — und die Entdeckung, dass niemand zu Hause ist",
+    "type": "confrontational",
+    "theme": "who-am-i",
+    "safety": "standard",
+    "sortOrder": 3,
+    "question": "If you go looking for the self behind all your roles, opinions, and habits, what do you actually find?",
+    "questionDe": "Wenn du hinter all deinen Rollen, Meinungen und Gewohnheiten nach dem Selbst suchst, was findest du dann tatsächlich?",
+    "moderator": {
+      "id": "gautama",
+      "name": "Siddhartha Gautama"
+    },
+    "participants": [
+      {
+        "id": "jung",
+        "name": "Carl Gustav Jung"
+      },
+      {
+        "id": "nietzsche",
+        "name": "Friedrich Nietzsche"
+      },
+      {
+        "id": "woolf",
+        "name": "Virginia Woolf"
+      }
+    ],
+    "hook": "Who do you find when you look for yourself?",
+    "hookDe": "Wen findest du, wenn du nach dir selbst suchst?"
+  },
+  {
+    "id": "the-gilded-cage-you-built-yourself",
+    "title": "The Gilded Cage You Built Yourself",
+    "titleDe": "Der goldene Käfig",
+    "tagline": "On being successful, responsible, and suffocating",
+    "taglineDe": "Über Erfolg, Verantwortung — und das Ersticken daran",
+    "type": "confrontational",
+    "theme": "who-am-i",
+    "safety": "sensitive",
+    "sortOrder": 4,
+    "question": "Every wall around you is one you built, the career, the mortgage, the reputation, the family role, the version of yourself everyone relies on. You are successful, responsible, and suffocating. How do you escape a prison you designed without destroying everyone who lives inside it with you?",
+    "questionDe": "Jede Wand um dich herum hast du selbst gebaut, die Karriere, die Hypothek, den Ruf, die Familienrolle, die Version von dir, auf die alle zählen. Du bist erfolgreich, verantwortungsvoll und erstickst. Wie entkommst du einem Gefängnis, das du selbst entworfen hast, ohne alle zu zerstören, die mit dir darin leben?",
+    "moderator": {
+      "id": "campbell",
+      "name": "Joseph Campbell"
+    },
+    "participants": [
+      {
+        "id": "tubman",
+        "name": "Harriet Tubman"
+      },
+      {
+        "id": "blake",
+        "name": "William Blake"
+      },
+      {
+        "id": "kahlo",
+        "name": "Frida Kahlo"
+      }
+    ],
+    "hook": "What if the prison is one you designed?",
+    "hookDe": "Was, wenn du dein eigenes Gefängnis gebaut hast?"
+  },
+  {
+    "id": "the-body-that-carried-you",
+    "title": "The Body That Carried You",
+    "titleDe": "Der Körper, der dich getragen hat",
+    "tagline": "On living in a body that is changing the rules",
+    "taglineDe": "Über das Leben in einem Körper, der die Regeln neu schreibt",
+    "type": "reflective",
+    "theme": "who-am-i",
+    "safety": "sensitive",
+    "sortOrder": 5,
+    "question": "The body you relied on is becoming someone else's. Not through illness, but through time. Where is the self when the vessel changes?",
+    "questionDe": "Der Körper, auf den du dich verlassen hast, wird zu einem anderen. Nicht durch Krankheit, sondern durch die Zeit. Wo ist das Selbst, wenn sich das Gefäß verändert?",
+    "moderator": {
+      "id": "beauvoir",
+      "name": "Simone de Beauvoir"
+    },
+    "participants": [
+      {
+        "id": "aurelius",
+        "name": "Marcus Aurelius"
+      },
+      {
+        "id": "gautama",
+        "name": "Siddhartha Gautama"
+      },
+      {
+        "id": "goethe",
+        "name": "J.W. von Goethe"
+      }
+    ],
+    "hook": "Where is the self when your body changes?",
+    "hookDe": "Wo ist das Ich, wenn sich dein Körper verändert?"
+  },
+  {
+    "id": "the-weight-of-things",
+    "title": "The Weight of Things",
+    "titleDe": "Das Gewicht der Dinge",
+    "tagline": "On why certain things won't let go of you",
+    "taglineDe": "Über die Dinge, die dich festhalten — und was von dir bliebe ohne sie",
+    "type": "reflective",
+    "theme": "who-am-i",
+    "safety": "standard",
+    "sortOrder": 6,
+    "question": "Why do certain objects hold us captive, and what would remain of you if everything you owned were taken away?",
+    "questionDe": "Warum halten bestimmte Dinge uns gefangen, und was bliebe von dir, wenn alles, was du besitzt, weggenommen würde?",
+    "moderator": {
+      "id": "woolf",
+      "name": "Virginia Woolf"
+    },
+    "participants": [
+      {
+        "id": "austen",
+        "name": "Jane Austen"
+      },
+      {
+        "id": "goethe",
+        "name": "J.W. von Goethe"
+      },
+      {
+        "id": "laozi",
+        "name": "Laozi"
+      }
+    ],
+    "hook": "Who are you without everything you own?",
+    "hookDe": "Wer bist du ohne alles, was du besitzt?"
+  },
+  {
+    "id": "the-stain-that-stays",
+    "title": "The Stain That Stays",
+    "titleDe": "Der Fleck, der bleibt",
+    "tagline": "On the choice you made and the person who can't unfeel it",
+    "taglineDe": "Über die Schuld, die bleibt, wenn die Tat längst vorbei ist",
+    "type": "confrontational",
+    "theme": "who-am-i",
+    "safety": "deep",
+    "sortOrder": 7,
+    "question": "You did something you cannot undo to someone who cannot unfeel it. Not an accident, a choice, made with enough awareness to own it. How do you live as the person who did that?",
+    "questionDe": "Du hast etwas getan, das du nicht rückgängig machen kannst, einem Menschen, der es nicht ungeschehen fühlen kann. Kein Unfall, sondern eine Entscheidung, bewusst genug getroffen, um sie zu verantworten. Wie lebst du als der Mensch, der das getan hat?",
+    "moderator": {
+      "id": "angelou",
+      "name": "Maya Angelou"
+    },
+    "participants": [
+      {
+        "id": "aurelius",
+        "name": "Marcus Aurelius"
+      },
+      {
+        "id": "gandhi",
+        "name": "Mahatma Gandhi"
+      },
+      {
+        "id": "beauvoir",
+        "name": "Simone de Beauvoir"
+      }
+    ],
+    "hook": "How do you live as the person who did that?",
+    "hookDe": "Wie lebst du als der Mensch, der das getan hat?"
+  },
+  {
+    "id": "alone-in-the-room-full-of-people",
+    "title": "Alone in the Room Full of People",
+    "titleDe": "Allein im vollen Raum",
+    "tagline": "On loneliness that has nothing to do with being alone",
+    "taglineDe": "Über Einsamkeit, die nichts mit Alleinsein zu tun hat",
+    "type": "reflective",
+    "theme": "love-connection",
+    "safety": "sensitive",
+    "sortOrder": 8,
+    "question": "You are surrounded by others and fundamentally unseen. The loneliness is not circumstantial, it follows you into crowds, into beds, into conversations. Is this a wound to be healed, a truth to be faced, or a door you haven't yet learned to open?",
+    "questionDe": "Du bist umgeben von anderen und grundlegend ungesehen. Die Einsamkeit ist keine Frage der Umstände, sie folgt dir in Menschenmengen, ins Bett, in Gespräche. Ist das eine Wunde, die geheilt werden muss, eine Wahrheit, der du dich stellen musst, oder eine Tür, die du noch nicht gelernt hast zu öffnen?",
+    "moderator": {
+      "id": "rumi",
+      "name": "Rumi"
+    },
+    "participants": [
+      {
+        "id": "dickinson",
+        "name": "Emily Dickinson"
+      },
+      {
+        "id": "nietzsche",
+        "name": "Friedrich Nietzsche"
+      },
+      {
+        "id": "woolf",
+        "name": "Virginia Woolf"
+      }
+    ],
+    "hook": "Why are you lonely even when surrounded?",
+    "hookDe": "Warum bist du einsam, selbst wenn du umgeben bist?"
+  },
+  {
+    "id": "where-do-you-belong",
+    "title": "Where Do You Belong?",
+    "titleDe": "Wo gehörst du hin?",
+    "tagline": "On friendship, home, and the places that hold you",
+    "taglineDe": "Über Freundschaft, Heimat und die Orte, die dich tragen",
+    "type": "reflective",
+    "theme": "love-connection",
+    "safety": "standard",
+    "sortOrder": 9,
+    "question": "You have been a guest in many rooms. Where is the one where you do not have to explain yourself?",
+    "questionDe": "Du warst Gast in vielen Räumen. Wo ist der eine, in dem du dich nicht erklären musst?",
+    "moderator": {
+      "id": "angelou",
+      "name": "Maya Angelou"
+    },
+    "participants": [
+      {
+        "id": "rumi",
+        "name": "Rumi"
+      },
+      {
+        "id": "austen",
+        "name": "Jane Austen"
+      },
+      {
+        "id": "mandela",
+        "name": "Nelson Mandela"
+      }
+    ],
+    "hook": "Is there a place where you never have to explain yourself?",
+    "hookDe": "Gibt es einen Ort, an dem du dich nie erklären musst?"
+  },
+  {
+    "id": "the-green-eyed-god",
+    "title": "The Green-Eyed God",
+    "titleDe": "Der grünäugige Gott",
+    "tagline": "On jealousy, possession, and when love becomes a cage",
+    "taglineDe": "Über Eifersucht, Besitz und wenn Liebe zum Käfig wird",
+    "type": "confrontational",
+    "theme": "love-connection",
+    "safety": "sensitive",
+    "sortOrder": 10,
+    "question": "Is jealousy a warning that something precious is at risk, or a confession that you believe love is something you can own?",
+    "questionDe": "Ist Eifersucht eine Warnung, dass etwas Kostbares in Gefahr ist, oder ein Eingeständnis, dass du glaubst, Liebe sei etwas, das man besitzen kann?",
+    "moderator": {
+      "id": "shakespeare",
+      "name": "William Shakespeare"
+    },
+    "participants": [
+      {
+        "id": "schopenhauer",
+        "name": "Arthur Schopenhauer"
+      },
+      {
+        "id": "beauvoir",
+        "name": "Simone de Beauvoir"
+      },
+      {
+        "id": "rumi",
+        "name": "Rumi"
+      }
+    ],
+    "hook": "Do you love them or just need to own them?",
+    "hookDe": "Liebst du sie, oder willst du sie nur besitzen?"
+  },
+  {
+    "id": "the-undoing-of-two",
+    "title": "The Undoing of Two",
+    "titleDe": "Das Ende zu zweit",
+    "tagline": "On leaving someone without losing who you became with them",
+    "taglineDe": "Über das Ende einer gemeinsamen Welt — und was von dir darin bleibt",
+    "type": "reflective",
+    "theme": "love-connection",
+    "safety": "sensitive",
+    "sortOrder": 11,
+    "question": "You are about to dismantle a life that two people built together, brick by brick, year by year. The life is no longer working, but it is yours. How do you leave a shared world without losing the self that was formed inside it?",
+    "questionDe": "Du bist dabei, ein Leben abzubauen, das zwei Menschen gemeinsam aufgebaut haben, Stein für Stein, Jahr für Jahr. Das Leben funktioniert nicht mehr, aber es ist deines. Wie verlässt du eine gemeinsame Welt, ohne das Selbst zu verlieren, das in ihr entstanden ist?",
+    "moderator": {
+      "id": "jung",
+      "name": "Carl Gustav Jung"
+    },
+    "participants": [
+      {
+        "id": "beauvoir",
+        "name": "Simone de Beauvoir"
+      },
+      {
+        "id": "rumi",
+        "name": "Rumi"
+      },
+      {
+        "id": "austen",
+        "name": "Jane Austen"
+      }
+    ],
+    "hook": "How do you leave without losing who you became?",
+    "hookDe": "Wie gehst du, ohne zu verlieren, wer du geworden bist?"
+  },
+  {
+    "id": "the-mask-behind-the-face",
+    "title": "The Mask Behind the Face",
+    "titleDe": "Die Maske hinter dem Gesicht",
+    "tagline": "On discovering someone you loved was never real",
+    "taglineDe": "Über die Liebe zu einem Menschen, den es nie gab",
+    "type": "confrontational",
+    "theme": "love-connection",
+    "safety": "sensitive",
+    "sortOrder": 12,
+    "question": "When someone you trusted completely reveals they were never who you believed them to be, what exactly has been destroyed, and is it something you should want rebuilt?",
+    "questionDe": "Wenn jemand, dem du völlig vertraut hast, sich als jemand entpuppt, der er nie war, was genau ist dann zerstört worden, und solltest du es wieder aufbauen wollen?",
+    "moderator": {
+      "id": "shakespeare",
+      "name": "William Shakespeare"
+    },
+    "participants": [
+      {
+        "id": "aurelius",
+        "name": "Marcus Aurelius"
+      },
+      {
+        "id": "beauvoir",
+        "name": "Simone de Beauvoir"
+      },
+      {
+        "id": "jung",
+        "name": "Carl Gustav Jung"
+      }
+    ],
+    "hook": "What if the person you loved never existed?",
+    "hookDe": "Was, wenn es den Menschen nie gab, den du geliebt hast?"
+  },
+  {
+    "id": "the-trouble-with-desire",
+    "title": "The Trouble with Desire",
+    "titleDe": "Das Problem mit dem Begehren",
+    "tagline": "On wanting, and whether it leads you home or away",
+    "taglineDe": "Über Eros — Falle, Wahrheit, oder etwas, das keinen Namen hat",
+    "type": "confrontational",
+    "theme": "love-connection",
+    "safety": "sensitive",
+    "sortOrder": 13,
+    "question": "Is love a biological trap, a cosmic force, or a moral achievement?",
+    "questionDe": "Ist Liebe eine biologische Falle, eine kosmische Kraft oder eine moralische Leistung?",
+    "moderator": {
+      "id": "woolf",
+      "name": "Virginia Woolf"
+    },
+    "participants": [
+      {
+        "id": "schopenhauer",
+        "name": "Arthur Schopenhauer"
+      },
+      {
+        "id": "rumi",
+        "name": "Rumi"
+      },
+      {
+        "id": "austen",
+        "name": "Jane Austen"
+      }
+    ],
+    "hook": "Is what you want the truest thing about you?",
+    "hookDe": "Ist das, was du willst, das Ehrlichste an dir?"
+  },
+  {
+    "id": "choosing-to-be-alone",
+    "title": "Choosing to Be Alone",
+    "titleDe": "Allein sein wollen",
+    "tagline": "On what solitude gives that no relationship can",
+    "taglineDe": "Über die Einsamkeit — und was sie gibt, das kein Mensch geben kann",
+    "type": "reflective",
+    "theme": "love-connection",
+    "safety": "standard",
+    "sortOrder": 14,
+    "question": "What does solitude make possible that no communion can, and what does it cost?",
+    "questionDe": "Was macht Einsamkeit möglich, das keine Gemeinschaft kann, und was kostet sie?",
+    "moderator": {
+      "id": "woolf",
+      "name": "Virginia Woolf"
+    },
+    "participants": [
+      {
+        "id": "dickinson",
+        "name": "Emily Dickinson"
+      },
+      {
+        "id": "eckhart",
+        "name": "Meister Eckhart"
+      },
+      {
+        "id": "laozi",
+        "name": "Laozi"
+      }
+    ],
+    "hook": "What does solitude give that no one else can?",
+    "hookDe": "Was gibt dir das Alleinsein, das kein Mensch geben kann?"
+  },
+  {
+    "id": "the-calling-that-wont-shut-up",
+    "title": "The Calling That Won't Shut Up",
+    "titleDe": "Die Stimme, die nicht schweigt",
+    "tagline": "On work, vocation, and the voice that says you were meant for something else",
+    "taglineDe": "Über Arbeit, Berufung und die Stimme, die sagt, du seist für mehr gemacht",
+    "type": "confrontational",
+    "theme": "meaning-purpose",
+    "safety": "standard",
+    "sortOrder": 15,
+    "question": "There is a voice inside you that insists you are not doing what you were made for. Is it wisdom or is it vanity?",
+    "questionDe": "Es gibt eine Stimme in dir, die darauf besteht, dass du nicht tust, wofür du gemacht bist. Ist das Weisheit oder Eitelkeit?",
+    "moderator": {
+      "id": "goethe",
+      "name": "J.W. von Goethe"
+    },
+    "participants": [
+      {
+        "id": "campbell",
+        "name": "Joseph Campbell"
+      },
+      {
+        "id": "lovelace",
+        "name": "Ada Lovelace"
+      },
+      {
+        "id": "gandhi",
+        "name": "Mahatma Gandhi"
+      }
+    ],
+    "hook": "Am I wasting my life?",
+    "hookDe": "Verschwende ich mein Leben?"
+  },
+  {
+    "id": "why-do-i-keep-going-back",
+    "title": "Why Do I Keep Going Back?",
+    "titleDe": "Warum gehe ich immer zurück?",
+    "tagline": "On the pull of what harms you, and the will that cannot seem to win",
+    "taglineDe": "Über den Sog des Schädlichen und den Willen, der nicht zu siegen scheint",
+    "type": "confrontational",
+    "theme": "meaning-purpose",
+    "safety": "deep",
+    "sortOrder": 16,
+    "question": "You know it is destroying you. You have promised yourself a hundred times. And yet you go back. What does the part of you that returns know that the part that promises does not?",
+    "questionDe": "Du weißt, dass es dich zerstört. Du hast es dir hundertmal versprochen. Und trotzdem gehst du zurück. Was weiß der Teil von dir, der zurückkehrt, das der Teil, der verspricht, nicht weiß?",
+    "moderator": {
+      "id": "jung",
+      "name": "Carl Gustav Jung"
+    },
+    "participants": [
+      {
+        "id": "gautama",
+        "name": "Siddhartha Gautama"
+      },
+      {
+        "id": "nietzsche",
+        "name": "Friedrich Nietzsche"
+      },
+      {
+        "id": "schopenhauer",
+        "name": "Arthur Schopenhauer"
+      }
+    ],
+    "hook": "Why do you keep returning to what destroys you?",
+    "hookDe": "Warum kehrst du immer zu dem zurück, was dich zerstört?"
+  },
+  {
+    "id": "the-question-behind-every-question",
+    "title": "The Question Behind Every Question",
+    "titleDe": "Die Frage hinter jeder Frage",
+    "tagline": "On the one question that hides inside every other",
+    "taglineDe": "Über die Frage, auf die dein ganzes Leben eine Antwort ist",
+    "type": "reflective",
+    "theme": "meaning-purpose",
+    "safety": "standard",
+    "sortOrder": 17,
+    "question": "If your life is an answer, what was the question, and who asked it?",
+    "questionDe": "Wenn dein Leben eine Antwort ist, was war die Frage, und wer hat sie gestellt?",
+    "moderator": {
+      "id": "campbell",
+      "name": "Joseph Campbell"
+    },
+    "participants": [
+      {
+        "id": "nietzsche",
+        "name": "Friedrich Nietzsche"
+      },
+      {
+        "id": "beauvoir",
+        "name": "Simone de Beauvoir"
+      },
+      {
+        "id": "rumi",
+        "name": "Rumi"
+      }
+    ],
+    "hook": "What is the question your whole life answers?",
+    "hookDe": "Was ist die Frage, auf die dein ganzes Leben antwortet?"
+  },
+  {
+    "id": "the-life-you-think-you-want",
+    "title": "The Life You Think You Want",
+    "titleDe": "Das Leben, das du zu wollen glaubst",
+    "tagline": "On happiness, and the chance that everything you believe about it is wrong",
+    "taglineDe": "Über Glück — und warum es nie dort wartet, wo du es suchst",
+    "type": "confrontational",
+    "theme": "meaning-purpose",
+    "safety": "standard",
+    "sortOrder": 18,
+    "question": "You've spent your whole life chasing happiness. What if you caught the wrong thing?",
+    "questionDe": "Du hast dein ganzes Leben dem Glück hinterhergejagt. Was, wenn du das Falsche erwischt hast?",
+    "moderator": {
+      "id": "austen",
+      "name": "Jane Austen"
+    },
+    "participants": [
+      {
+        "id": "schopenhauer",
+        "name": "Arthur Schopenhauer"
+      },
+      {
+        "id": "nietzsche",
+        "name": "Friedrich Nietzsche"
+      },
+      {
+        "id": "gautama",
+        "name": "Siddhartha Gautama"
+      }
+    ],
+    "hook": "What if you caught the wrong thing?",
+    "hookDe": "Was, wenn du das Falsche erwischt hast?"
+  },
+  {
+    "id": "the-price-of-everything",
+    "title": "The Price of Everything",
+    "titleDe": "Der Preis von allem",
+    "tagline": "On whether money reveals who you are, or replaces it",
+    "taglineDe": "Über Geld — und die Frage, ob es dich zeigt oder ersetzt",
+    "type": "confrontational",
+    "theme": "meaning-purpose",
+    "safety": "standard",
+    "sortOrder": 19,
+    "question": "Does money reveal who we truly are, or does it replace who we were with something else entirely?",
+    "questionDe": "Zeigt Geld, wer wir wirklich sind, oder ersetzt es, wer wir waren, durch etwas völlig anderes?",
+    "moderator": {
+      "id": "austen",
+      "name": "Jane Austen"
+    },
+    "participants": [
+      {
+        "id": "tubman",
+        "name": "Harriet Tubman"
+      },
+      {
+        "id": "schopenhauer",
+        "name": "Arthur Schopenhauer"
+      },
+      {
+        "id": "gandhi",
+        "name": "Mahatma Gandhi"
+      }
+    ],
+    "hook": "Does money reveal who you are or replace it?",
+    "hookDe": "Zeigt Geld, wer du bist, oder ersetzt es dich?"
+  },
+  {
+    "id": "the-blank-page",
+    "title": "The Blank Page",
+    "titleDe": "Das leere Blatt",
+    "tagline": "On starting over when everything you built is gone",
+    "taglineDe": "Über Neuanfänge, wenn alles, was du aufgebaut hast, verschwunden ist",
+    "type": "reflective",
+    "theme": "meaning-purpose",
+    "safety": "sensitive",
+    "sortOrder": 20,
+    "question": "Everything you were is behind you. The page ahead is blank. Is this the worst moment of your life, or the first honest one?",
+    "questionDe": "Alles, was du warst, liegt hinter dir. Die Seite vor dir ist leer. Ist das der schlimmste Moment deines Lebens oder der erste ehrliche?",
+    "moderator": {
+      "id": "angelou",
+      "name": "Maya Angelou"
+    },
+    "participants": [
+      {
+        "id": "mandela",
+        "name": "Nelson Mandela"
+      },
+      {
+        "id": "tubman",
+        "name": "Harriet Tubman"
+      },
+      {
+        "id": "gautama",
+        "name": "Siddhartha Gautama"
+      }
+    ],
+    "hook": "How do you start over when everything is gone?",
+    "hookDe": "Wie fängst du neu an, wenn alles weg ist?"
+  },
+  {
+    "id": "what-you-leave-behind",
+    "title": "What You Leave Behind",
+    "titleDe": "Was du hinterlässt",
+    "tagline": "On the marks you make that outlast you",
+    "taglineDe": "Über die Spuren, die du hinterlässt und die dich überdauern",
+    "type": "reflective",
+    "theme": "meaning-purpose",
+    "safety": "standard",
+    "sortOrder": 21,
+    "question": "When you are gone, what remains? Not what you intended to leave, but what actually survives.",
+    "questionDe": "Wenn du nicht mehr da bist, was bleibt? Nicht was du hinterlassen wolltest, sondern was tatsächlich überlebt.",
+    "moderator": {
+      "id": "aurelius",
+      "name": "Marcus Aurelius"
+    },
+    "participants": [
+      {
+        "id": "plato",
+        "name": "Plato"
+      },
+      {
+        "id": "dickinson",
+        "name": "Emily Dickinson"
+      },
+      {
+        "id": "vinci",
+        "name": "Leonardo da Vinci"
+      }
+    ],
+    "hook": "When you are gone, what actually survives?",
+    "hookDe": "Was überlebt tatsächlich, wenn du gehst?"
+  },
+  {
+    "id": "the-mind-that-wont-be-quiet",
+    "title": "The Mind That Won't Be Quiet",
+    "titleDe": "Der Kopf, der nicht still wird",
+    "tagline": "On anxiety, overthinking, and the racing mind",
+    "taglineDe": "Über Angst, Grübeln und den Gedanken, der nicht zur Ruhe kommt",
+    "type": "reflective",
+    "theme": "mind-creativity",
+    "safety": "sensitive",
+    "sortOrder": 22,
+    "question": "Your mind will not stop. It replays the past, rehearses the future, and invents catastrophes that have not happened. Is this a malfunction, or is your mind trying to protect you from something it cannot name?",
+    "questionDe": "Dein Verstand hört nicht auf. Er spielt die Vergangenheit nach, probt die Zukunft und erfindet Katastrophen, die nicht passiert sind. Ist das ein Defekt, oder versucht dein Verstand, dich vor etwas zu schützen, das er nicht benennen kann?",
+    "moderator": {
+      "id": "aurelius",
+      "name": "Marcus Aurelius"
+    },
+    "participants": [
+      {
+        "id": "gautama",
+        "name": "Siddhartha Gautama"
+      },
+      {
+        "id": "woolf",
+        "name": "Virginia Woolf"
+      },
+      {
+        "id": "jung",
+        "name": "Carl Gustav Jung"
+      }
+    ],
+    "hook": "Why won't your mind stop?",
+    "hookDe": "Warum wird dein Kopf nicht still?"
+  },
+  {
+    "id": "the-ghost-in-the-engine",
+    "title": "The Ghost in the Engine",
+    "titleDe": "Der Geist in der Maschine",
+    "tagline": "On whether a machine could ever truly think, and how we'd know",
+    "taglineDe": "Über die Frage, ob eine Maschine denken kann — und ob wir den Unterschied erkennen würden",
+    "type": "confrontational",
+    "theme": "mind-creativity",
+    "safety": "standard",
+    "sortOrder": 23,
+    "question": "Is there something about consciousness that will forever exceed what any machine can replicate, and how would we know if we were wrong?",
+    "questionDe": "Gibt es etwas am Bewusstsein, das für immer jenseits dessen liegt, was eine Maschine nachahmen kann, und wie würden wir merken, wenn wir uns irren?",
+    "moderator": {
+      "id": "lovelace",
+      "name": "Ada Lovelace"
+    },
+    "participants": [
+      {
+        "id": "einstein",
+        "name": "Albert Einstein"
+      },
+      {
+        "id": "zenji",
+        "name": "Dōgen Zenji"
+      },
+      {
+        "id": "blake",
+        "name": "William Blake"
+      }
+    ],
+    "hook": "Is there something about you a machine can never have?",
+    "hookDe": "Gibt es etwas an dir, das eine Maschine nie haben kann?"
+  },
+  {
+    "id": "the-discipline-of-seeing",
+    "title": "The Discipline of Seeing",
+    "titleDe": "Die Kunst des Hinsehens",
+    "tagline": "On attention as the rarest form of generosity",
+    "taglineDe": "Über das Hinsehen — und alles, was du dabei übersiehst",
+    "type": "reflective",
+    "theme": "mind-creativity",
+    "safety": "standard",
+    "sortOrder": 24,
+    "question": "You look at the world a thousand times a day and see almost nothing. What would change if you actually looked?",
+    "questionDe": "Du siehst die Welt tausendmal am Tag und bemerkst fast nichts. Was würde sich ändern, wenn du wirklich hinsehen würdest?",
+    "moderator": {
+      "id": "vinci",
+      "name": "Leonardo da Vinci"
+    },
+    "participants": [
+      {
+        "id": "gautama",
+        "name": "Siddhartha Gautama"
+      },
+      {
+        "id": "goethe",
+        "name": "J.W. von Goethe"
+      },
+      {
+        "id": "dickinson",
+        "name": "Emily Dickinson"
+      }
+    ],
+    "hook": "What would change if you actually looked?",
+    "hookDe": "Was ändert sich, wenn du wirklich hinsiehst?"
+  },
+  {
+    "id": "the-serious-work-of-play",
+    "title": "The Serious Work of Play",
+    "titleDe": "Der Ernst des Spielens",
+    "tagline": "On what we lost when we decided to grow up",
+    "taglineDe": "Über das Kind, das du warst — und die Frage, wohin es gegangen ist",
+    "type": "reflective",
+    "theme": "mind-creativity",
+    "safety": "standard",
+    "sortOrder": 25,
+    "question": "Is play the opposite of seriousness, or the highest form of it, and what did we lose when we decided to grow up?",
+    "questionDe": "Ist Spielen das Gegenteil von Ernst, oder seine höchste Form, und was haben wir verloren, als wir beschlossen haben, erwachsen zu werden?",
+    "moderator": {
+      "id": "mozart",
+      "name": "W.A. Mozart"
+    },
+    "participants": [
+      {
+        "id": "blake",
+        "name": "William Blake"
+      },
+      {
+        "id": "angelou",
+        "name": "Maya Angelou"
+      },
+      {
+        "id": "laozi",
+        "name": "Laozi"
+      }
+    ],
+    "hook": "What did you lose when you decided to grow up?",
+    "hookDe": "Was hast du verloren, als du erwachsen wurdest?"
+  },
+  {
+    "id": "when-words-arent-enough",
+    "title": "When Words Aren't Enough",
+    "titleDe": "Wenn Worte nicht reichen",
+    "tagline": "On the deepest truths that resist language",
+    "taglineDe": "Über die Wahrheiten jenseits der Worte — und die Stille, die sie trägt",
+    "type": "reflective",
+    "theme": "mind-creativity",
+    "safety": "standard",
+    "sortOrder": 26,
+    "question": "The most important things in your life have no adequate words. Love, death, beauty, pain. Why do we keep speaking toward what cannot be said?",
+    "questionDe": "Die wichtigsten Dinge in deinem Leben haben keine angemessenen Worte. Liebe, Tod, Schönheit, Schmerz. Warum sprechen wir immer weiter auf das zu, was sich nicht sagen lässt?",
+    "moderator": {
+      "id": "eckhart",
+      "name": "Meister Eckhart"
+    },
+    "participants": [
+      {
+        "id": "laozi",
+        "name": "Laozi"
+      },
+      {
+        "id": "dickinson",
+        "name": "Emily Dickinson"
+      },
+      {
+        "id": "zenji",
+        "name": "Dōgen Zenji"
+      }
+    ],
+    "hook": "Why do the deepest truths resist language?",
+    "hookDe": "Warum lassen sich die tiefsten Wahrheiten nicht sagen?"
+  },
+  {
+    "id": "the-freedom-of-less",
+    "title": "The Freedom of Less",
+    "titleDe": "Die Freiheit des Weniger",
+    "tagline": "On why limits make better art, better work, and better lives",
+    "taglineDe": "Über den Käfig, der das Lied macht — und die Stille, wenn er sich öffnet",
+    "type": "reflective",
+    "theme": "mind-creativity",
+    "safety": "standard",
+    "sortOrder": 27,
+    "question": "Does creative genius require limitation, and if the cage is opened, does the song die?",
+    "questionDe": "Braucht kreatives Genie Begrenzung, und wenn der Käfig sich öffnet, stirbt dann das Lied?",
+    "moderator": {
+      "id": "vinci",
+      "name": "Leonardo da Vinci"
+    },
+    "participants": [
+      {
+        "id": "mozart",
+        "name": "W.A. Mozart"
+      },
+      {
+        "id": "dickinson",
+        "name": "Emily Dickinson"
+      },
+      {
+        "id": "angelou",
+        "name": "Maya Angelou"
+      }
+    ],
+    "hook": "Do limits make better art, better work, better lives?",
+    "hookDe": "Machen Grenzen bessere Kunst, bessere Arbeit, besseres Leben?"
+  },
+  {
+    "id": "the-vessel-and-the-flame",
+    "title": "The Vessel and the Flame",
+    "titleDe": "Das Gefäß und die Flamme",
+    "tagline": "On unconventional minds, creative fire, and the cost of seeing differently",
+    "taglineDe": "Über den Wahnsinn, der Wahrheit sieht — und die Vernunft, die darüber richtet",
+    "type": "confrontational",
+    "theme": "mind-creativity",
+    "safety": "deep",
+    "sortOrder": 28,
+    "question": "Some of the people who saw the world most clearly were the same people the world called broken. Is there a connection, or is that a dangerous story?",
+    "questionDe": "Einige der Menschen, die die Welt am klarsten sahen, waren dieselben, die die Welt als zerbrochen bezeichnete. Gibt es da einen Zusammenhang, oder ist das eine gefährliche Geschichte?",
+    "moderator": {
+      "id": "blake",
+      "name": "William Blake"
+    },
+    "participants": [
+      {
+        "id": "woolf",
+        "name": "Virginia Woolf"
+      },
+      {
+        "id": "dickinson",
+        "name": "Emily Dickinson"
+      },
+      {
+        "id": "jung",
+        "name": "Carl Gustav Jung"
+      }
+    ],
+    "hook": "Can the ones who see differently also be the broken ones?",
+    "hookDe": "Können die, die anders sehen, auch die Zerbrochenen sein?"
+  },
+  {
+    "id": "what-does-your-anger-want",
+    "title": "What Does Your Anger Want?",
+    "titleDe": "Was will deine Wut?",
+    "tagline": "On rage, justice, and the fire that builds or burns",
+    "taglineDe": "Über Wut, Gerechtigkeit und das Feuer, das aufbaut oder verbrennt",
+    "type": "confrontational",
+    "theme": "moral-life",
+    "safety": "sensitive",
+    "sortOrder": 29,
+    "question": "Your anger is not asking to be calmed. It is asking to be heard. What is it trying to tell you, and what does it want you to do?",
+    "questionDe": "Deine Wut will nicht beruhigt werden. Sie will gehört werden. Was versucht sie dir zu sagen, und was will sie, dass du tust?",
+    "moderator": {
+      "id": "king",
+      "name": "Martin Luther King Jr."
+    },
+    "participants": [
+      {
+        "id": "angelou",
+        "name": "Maya Angelou"
+      },
+      {
+        "id": "aurelius",
+        "name": "Marcus Aurelius"
+      },
+      {
+        "id": "nietzsche",
+        "name": "Friedrich Nietzsche"
+      }
+    ],
+    "hook": "What is your anger asking you to do?",
+    "hookDe": "Was verlangt deine Wut von dir?"
+  },
+  {
+    "id": "the-examined-life",
+    "title": "The Examined Life",
+    "titleDe": "Das untersuchte Leben",
+    "tagline": "On whether all this thinking about yourself actually helps",
+    "taglineDe": "Über die Frage, ob all das Nachdenken über dich selbst wirklich hilft",
+    "type": "reflective",
+    "theme": "moral-life",
+    "safety": "standard",
+    "sortOrder": 30,
+    "question": "Socrates said the unexamined life is not worth living. But what if the over-examined life is not worth living either? When does reflection become a trap?",
+    "questionDe": "Sokrates sagte, das unreflektierte Leben sei nicht lebenswert. Aber was, wenn das überreflektierte Leben auch nicht lebenswert ist? Ab wann wird Nachdenken zur Falle?",
+    "moderator": {
+      "id": "plato",
+      "name": "Plato"
+    },
+    "participants": [
+      {
+        "id": "nietzsche",
+        "name": "Friedrich Nietzsche"
+      },
+      {
+        "id": "laozi",
+        "name": "Laozi"
+      },
+      {
+        "id": "jung",
+        "name": "Carl Gustav Jung"
+      }
+    ],
+    "hook": "Does all this self-reflection actually help?",
+    "hookDe": "Hilft dir all diese Selbstreflexion wirklich?"
+  },
+  {
+    "id": "how-do-you-forgive",
+    "title": "How Do You Forgive?",
+    "titleDe": "Wie verzeihst du?",
+    "tagline": "On releasing someone who hurt you, and releasing yourself",
+    "taglineDe": "Über das Loslassen dessen, der dich verletzt hat, und das Loslassen deiner selbst",
+    "type": "reflective",
+    "theme": "moral-life",
+    "safety": "deep",
+    "sortOrder": 31,
+    "question": "Someone did something to you that cannot be undone. You carry it every day. Is forgiveness a gift to them, a gift to yourself, or a lie you tell to survive?",
+    "questionDe": "Jemand hat dir etwas angetan, das nicht rückgängig zu machen ist. Du trägst es jeden Tag. Ist Vergebung ein Geschenk an den anderen, ein Geschenk an dich selbst, oder eine Lüge, die du zum Überleben brauchst?",
+    "moderator": {
+      "id": "mandela",
+      "name": "Nelson Mandela"
+    },
+    "participants": [
+      {
+        "id": "angelou",
+        "name": "Maya Angelou"
+      },
+      {
+        "id": "aurelius",
+        "name": "Marcus Aurelius"
+      },
+      {
+        "id": "eckhart",
+        "name": "Meister Eckhart"
+      }
+    ],
+    "hook": "Can you let go of what they did to you?",
+    "hookDe": "Kannst du loslassen, was man dir angetan hat?"
+  },
+  {
+    "id": "the-fear-you-feed",
+    "title": "The Fear You Feed",
+    "titleDe": "Die Angst, die du fütterst",
+    "tagline": "On courage, cowardice, and when fear is the right response",
+    "taglineDe": "Über Mut, Feigheit und wann Angst die richtige Antwort ist",
+    "type": "confrontational",
+    "theme": "moral-life",
+    "safety": "sensitive",
+    "sortOrder": 32,
+    "question": "You have a choice you need to make, and fear is standing in the doorway. Is fear protecting you from disaster, or protecting you from your life?",
+    "questionDe": "Du musst eine Entscheidung treffen, und die Angst steht in der Tür. Schützt sie dich vor einer Katastrophe, oder schützt sie dich vor deinem Leben?",
+    "moderator": {
+      "id": "tubman",
+      "name": "Harriet Tubman"
+    },
+    "participants": [
+      {
+        "id": "aurelius",
+        "name": "Marcus Aurelius"
+      },
+      {
+        "id": "gandhi",
+        "name": "Mahatma Gandhi"
+      },
+      {
+        "id": "kahlo",
+        "name": "Frida Kahlo"
+      }
+    ],
+    "hook": "Is fear protecting you or trapping you?",
+    "hookDe": "Schützt deine Angst dich, oder fängt sie dich?"
+  },
+  {
+    "id": "the-letting-go",
+    "title": "The Letting Go",
+    "titleDe": "Das Loslassen",
+    "tagline": "On releasing a person, a dream, the past, control",
+    "taglineDe": "Über das Loslassen eines Menschen, eines Traums, der Vergangenheit, der Kontrolle",
+    "type": "reflective",
+    "theme": "moral-life",
+    "safety": "sensitive",
+    "sortOrder": 33,
+    "question": "You are holding on to something that is already gone. Your fingers know this. Your heart does not. How do you open your hand?",
+    "questionDe": "Du hältst an etwas fest, das schon gegangen ist. Deine Finger wissen es. Dein Herz nicht. Wie öffnest du die Hand?",
+    "moderator": {
+      "id": "gautama",
+      "name": "Siddhartha Gautama"
+    },
+    "participants": [
+      {
+        "id": "laozi",
+        "name": "Laozi"
+      },
+      {
+        "id": "rumi",
+        "name": "Rumi"
+      },
+      {
+        "id": "aurelius",
+        "name": "Marcus Aurelius"
+      }
+    ],
+    "hook": "How do you open your hand around something gone?",
+    "hookDe": "Wie öffnest du die Hand um etwas, das schon fort ist?"
+  },
+  {
+    "id": "the-intelligence-of-wounds",
+    "title": "The Intelligence of Wounds",
+    "titleDe": "Die Intelligenz der Wunden",
+    "tagline": "On what your body knows that your mind refuses to learn",
+    "taglineDe": "Über das, was dein Körper weiß — und dein Verstand sich weigert zu lernen",
+    "type": "confrontational",
+    "theme": "moral-life",
+    "safety": "sensitive",
+    "sortOrder": 34,
+    "question": "What does the body understand that the mind refuses to learn, and why has philosophy spent two millennia trying not to listen?",
+    "questionDe": "Was versteht der Körper, das der Verstand sich weigert zu lernen, und warum hat die Philosophie zwei Jahrtausende lang versucht, nicht hinzuhören?",
+    "moderator": {
+      "id": "kahlo",
+      "name": "Frida Kahlo"
+    },
+    "participants": [
+      {
+        "id": "zenji",
+        "name": "Dōgen Zenji"
+      },
+      {
+        "id": "nietzsche",
+        "name": "Friedrich Nietzsche"
+      },
+      {
+        "id": "angelou",
+        "name": "Maya Angelou"
+      }
+    ],
+    "hook": "What does your body know that your mind won't hear?",
+    "hookDe": "Was weiß dein Körper, das dein Verstand nicht hören will?"
+  },
+  {
+    "id": "raising-the-next-one",
+    "title": "Raising the Next One",
+    "titleDe": "Ein Leben großziehen",
+    "tagline": "On parenting, legacy, and the anxiety of shaping a life",
+    "taglineDe": "Über Elternschaft, Erbe und die Last, ein Leben zu formen",
+    "type": "reflective",
+    "theme": "moral-life",
+    "safety": "standard",
+    "sortOrder": 35,
+    "question": "You are responsible for a human being who did not ask to exist. Everything you do and fail to do will echo through their life. How do you carry that weight without being crushed by it?",
+    "questionDe": "Du bist verantwortlich für einen Menschen, der nicht darum gebeten hat zu existieren. Alles, was du tust und nicht tust, wird durch sein Leben hallen. Wie trägst du dieses Gewicht, ohne daran zerdrückt zu werden?",
+    "moderator": {
+      "id": "angelou",
+      "name": "Maya Angelou"
+    },
+    "participants": [
+      {
+        "id": "beauvoir",
+        "name": "Simone de Beauvoir"
+      },
+      {
+        "id": "gautama",
+        "name": "Siddhartha Gautama"
+      },
+      {
+        "id": "goethe",
+        "name": "J.W. von Goethe"
+      }
+    ],
+    "hook": "How do you shape a life without crushing it?",
+    "hookDe": "Wie formst du ein Leben, ohne es zu erdrücken?"
+  },
+  {
+    "id": "four-freedoms",
+    "title": "Four Freedoms",
+    "titleDe": "Vier Freiheiten",
+    "tagline": "On being free in chains, and chained while free",
+    "taglineDe": "Über die Freiheit in Ketten — und die Ketten in der Freiheit",
+    "type": "confrontational",
+    "theme": "freedom-justice",
+    "safety": "standard",
+    "sortOrder": 36,
+    "question": "Can you be free in chains, and can you be chained while free?",
+    "questionDe": "Kannst du in Ketten frei sein, und kannst du in Freiheit gefesselt sein?",
+    "moderator": {
+      "id": "beauvoir",
+      "name": "Simone de Beauvoir"
+    },
+    "participants": [
+      {
+        "id": "tubman",
+        "name": "Harriet Tubman"
+      },
+      {
+        "id": "aurelius",
+        "name": "Marcus Aurelius"
+      },
+      {
+        "id": "mandela",
+        "name": "Nelson Mandela"
+      }
+    ],
+    "hook": "Can you be free in chains?",
+    "hookDe": "Kannst du in Ketten frei sein?"
+  },
+  {
+    "id": "the-inner-citadel",
+    "title": "The Inner Citadel",
+    "titleDe": "Die innere Festung",
+    "tagline": "On finding freedom when you cannot change your situation",
+    "taglineDe": "Über innere Freiheit, wenn du deine Lage nicht ändern kannst",
+    "type": "reflective",
+    "theme": "freedom-justice",
+    "safety": "standard",
+    "sortOrder": 37,
+    "question": "The walls will not move. The sentence will not shorten. The body will not heal. And yet something inside you remains untouched. What is it?",
+    "questionDe": "Die Mauern werden sich nicht bewegen. Das Urteil wird nicht kürzer. Der Körper wird nicht heilen. Und doch bleibt etwas in dir unberührt. Was ist es?",
+    "moderator": {
+      "id": "aurelius",
+      "name": "Marcus Aurelius"
+    },
+    "participants": [
+      {
+        "id": "mandela",
+        "name": "Nelson Mandela"
+      },
+      {
+        "id": "gandhi",
+        "name": "Mahatma Gandhi"
+      },
+      {
+        "id": "gautama",
+        "name": "Siddhartha Gautama"
+      }
+    ],
+    "hook": "What part of you stays untouched no matter what?",
+    "hookDe": "Was in dir bleibt unberührt, egal was passiert?"
+  },
+  {
+    "id": "the-emperor-and-the-fugitive",
+    "title": "The Emperor and the Fugitive",
+    "titleDe": "Der Kaiser und die Flüchtige",
+    "tagline": "On the moment obedience becomes complicity",
+    "taglineDe": "Über den Moment, in dem Gehorsam zur Mittäterschaft wird",
+    "type": "confrontational",
+    "theme": "freedom-justice",
+    "safety": "standard",
+    "sortOrder": 38,
+    "question": "When does obedience become complicity, and who bears the cost when someone finally refuses?",
+    "questionDe": "Ab wann wird Gehorsam zu Mittäterschaft, und wer zahlt den Preis, wenn jemand endlich nein sagt?",
+    "moderator": {
+      "id": "king",
+      "name": "Martin Luther King Jr."
+    },
+    "participants": [
+      {
+        "id": "galilei",
+        "name": "Galileo Galilei"
+      },
+      {
+        "id": "tubman",
+        "name": "Harriet Tubman"
+      },
+      {
+        "id": "aurelius",
+        "name": "Marcus Aurelius"
+      }
+    ],
+    "hook": "When does following orders make you responsible?",
+    "hookDe": "Ab wann macht Gehorsam dich mitverantwortlich?"
+  },
+  {
+    "id": "the-virtue-of-surrender",
+    "title": "The Virtue of Surrender",
+    "titleDe": "Die Tugend des Nachgebens",
+    "tagline": "On the courage it takes to stop fighting",
+    "taglineDe": "Über den Mut, der im Nachgeben liegt",
+    "type": "reflective",
+    "theme": "freedom-justice",
+    "safety": "standard",
+    "sortOrder": 39,
+    "question": "You have been fighting for so long that fighting feels like breathing. What if the bravest thing you could do is put down the sword?",
+    "questionDe": "Du hast so lange gekämpft, dass Kämpfen sich anfühlt wie Atmen. Was, wenn das Mutigste wäre, das Schwert niederzulegen?",
+    "moderator": {
+      "id": "laozi",
+      "name": "Laozi"
+    },
+    "participants": [
+      {
+        "id": "gandhi",
+        "name": "Mahatma Gandhi"
+      },
+      {
+        "id": "gautama",
+        "name": "Siddhartha Gautama"
+      },
+      {
+        "id": "kahlo",
+        "name": "Frida Kahlo"
+      }
+    ],
+    "hook": "What if the bravest thing is to stop fighting?",
+    "hookDe": "Was, wenn das Mutigste ist, aufzuhören zu kämpfen?"
+  },
+  {
+    "id": "when-silence-becomes-complicity",
+    "title": "When Silence Becomes Complicity",
+    "titleDe": "Wenn Schweigen Mittäterschaft wird",
+    "tagline": "On the moment going along becomes going wrong",
+    "taglineDe": "Über den Moment, in dem Schweigen zur Mittäterschaft wird",
+    "type": "confrontational",
+    "theme": "freedom-justice",
+    "safety": "standard",
+    "sortOrder": 40,
+    "question": "Democracy doesn't die with a bang. It dies with a shrug. When you notice the shrug in yourself, what do you do next?",
+    "questionDe": "Demokratie stirbt nicht mit einem Knall. Sie stirbt mit einem Achselzucken. Wenn du das Achselzucken in dir selbst bemerkst, was tust du dann?",
+    "moderator": {
+      "id": "mandela",
+      "name": "Nelson Mandela"
+    },
+    "participants": [
+      {
+        "id": "king",
+        "name": "Martin Luther King Jr."
+      },
+      {
+        "id": "gandhi",
+        "name": "Mahatma Gandhi"
+      },
+      {
+        "id": "tubman",
+        "name": "Harriet Tubman"
+      }
+    ],
+    "hook": "When does staying quiet make you guilty?",
+    "hookDe": "Ab wann macht dich dein Schweigen schuldig?"
+  },
+  {
+    "id": "the-debt-you-didnt-sign",
+    "title": "The Debt You Didn't Sign",
+    "titleDe": "Schuld ohne Unterschrift",
+    "tagline": "On what you owe people you have never met",
+    "taglineDe": "Über das, was du Menschen schuldest, die du nie getroffen hast",
+    "type": "confrontational",
+    "theme": "freedom-justice",
+    "safety": "standard",
+    "sortOrder": 41,
+    "question": "You did not choose to be born into a world of strangers. And yet their suffering follows you home. What, if anything, do you owe them?",
+    "questionDe": "Du hast dir nicht ausgesucht, in eine Welt voller Fremder geboren zu werden. Und doch folgt dir ihr Leid nach Hause. Was, wenn überhaupt etwas, schuldest du ihnen?",
+    "moderator": {
+      "id": "king",
+      "name": "Martin Luther King Jr."
+    },
+    "participants": [
+      {
+        "id": "mandela",
+        "name": "Nelson Mandela"
+      },
+      {
+        "id": "gandhi",
+        "name": "Mahatma Gandhi"
+      },
+      {
+        "id": "gautama",
+        "name": "Siddhartha Gautama"
+      }
+    ],
+    "hook": "What do you owe people you will never meet?",
+    "hookDe": "Was schuldest du Menschen, die du nie treffen wirst?"
+  },
+  {
+    "id": "the-problem-of-evil",
+    "title": "The Problem of Evil",
+    "titleDe": "Das Problem des Bösen",
+    "tagline": "On why bad things happen to good people, and whether there is an answer",
+    "taglineDe": "Über das Leiden der Unschuldigen und ob es darauf eine Antwort gibt",
+    "type": "confrontational",
+    "theme": "faith-death-mystery",
+    "safety": "sensitive",
+    "sortOrder": 42,
+    "question": "A child suffers. An earthquake buries thousands. A kind person is destroyed by random cruelty. If reality is meaningful, how do you explain this?",
+    "questionDe": "Ein Kind leidet. Ein Erdbeben begräbt Tausende. Ein guter Mensch wird durch blinde Grausamkeit zerstört. Wenn die Wirklichkeit einen Sinn hat, wie erklärst du das?",
+    "moderator": {
+      "id": "campbell",
+      "name": "Joseph Campbell"
+    },
+    "participants": [
+      {
+        "id": "eckhart",
+        "name": "Meister Eckhart"
+      },
+      {
+        "id": "gautama",
+        "name": "Siddhartha Gautama"
+      },
+      {
+        "id": "nietzsche",
+        "name": "Friedrich Nietzsche"
+      }
+    ],
+    "hook": "Why do bad things happen to good people?",
+    "hookDe": "Warum geschehen guten Menschen schlimme Dinge?"
+  },
+  {
+    "id": "the-cathedral-without-walls",
+    "title": "The Cathedral Without Walls",
+    "titleDe": "Die Kathedrale ohne Wände",
+    "tagline": "On nature, awe, and whether the world is trying to tell you something",
+    "taglineDe": "Über die Sprache der Natur — und die Frage, ob sie rechnet, rätselt oder singt",
+    "type": "reflective",
+    "theme": "faith-death-mystery",
+    "safety": "standard",
+    "sortOrder": 43,
+    "question": "You stand in a forest, or beside the ocean, or under a night sky, and something in you drops to its knees. Is this a message, or just chemistry?",
+    "questionDe": "Du stehst im Wald, am Meer oder unter dem Nachthimmel, und etwas in dir fällt auf die Knie. Ist das eine Botschaft oder nur Chemie?",
+    "moderator": {
+      "id": "bingen",
+      "name": "Hildegard von Bingen"
+    },
+    "participants": [
+      {
+        "id": "blake",
+        "name": "William Blake"
+      },
+      {
+        "id": "laozi",
+        "name": "Laozi"
+      },
+      {
+        "id": "einstein",
+        "name": "Albert Einstein"
+      }
+    ],
+    "hook": "When nature drops you to your knees, is that real?",
+    "hookDe": "Wenn die Natur dich in die Knie zwingt, ist das echt?"
+  },
+  {
+    "id": "right-here-right-now",
+    "title": "Right Here, Right Now",
+    "titleDe": "Genau hier, genau jetzt",
+    "tagline": "On the impossibility of staying in this moment",
+    "taglineDe": "Über den Augenblick — und die Frage, ob er alles ist oder ob er uns immer entgleitet",
+    "type": "reflective",
+    "theme": "faith-death-mystery",
+    "safety": "standard",
+    "sortOrder": 44,
+    "question": "Every tradition tells you to be present. And yet your mind has already left this sentence. Why is the simplest instruction the hardest to follow?",
+    "questionDe": "Jede Tradition sagt dir, gegenwärtig zu sein. Und doch hat dein Geist diesen Satz schon verlassen. Warum ist die einfachste Anweisung die schwerste?",
+    "moderator": {
+      "id": "gautama",
+      "name": "Siddhartha Gautama"
+    },
+    "participants": [
+      {
+        "id": "aurelius",
+        "name": "Marcus Aurelius"
+      },
+      {
+        "id": "laozi",
+        "name": "Laozi"
+      },
+      {
+        "id": "zenji",
+        "name": "Dōgen Zenji"
+      }
+    ],
+    "hook": "Why can you never stay in this moment?",
+    "hookDe": "Warum kannst du nie in diesem Moment bleiben?"
+  },
+  {
+    "id": "the-unfinished-life",
+    "title": "The Unfinished Life",
+    "titleDe": "Das unvollendete Leben",
+    "tagline": "On living fully while knowing it will end",
+    "taglineDe": "Über den Tod — und was er lehrt, wenn man aufhört, vor ihm zu fliehen",
+    "type": "reflective",
+    "theme": "faith-death-mystery",
+    "safety": "deep",
+    "sortOrder": 45,
+    "question": "You will die. Not as a concept, but as a fact that is waiting for you. How does knowing this change the way you walk through a single ordinary morning?",
+    "questionDe": "Du wirst sterben. Nicht als Konzept, sondern als Tatsache, die auf dich wartet. Wie verändert dieses Wissen die Art, wie du durch einen einzigen gewöhnlichen Morgen gehst?",
+    "moderator": {
+      "id": "aurelius",
+      "name": "Marcus Aurelius"
+    },
+    "participants": [
+      {
+        "id": "dickinson",
+        "name": "Emily Dickinson"
+      },
+      {
+        "id": "gautama",
+        "name": "Siddhartha Gautama"
+      },
+      {
+        "id": "kahlo",
+        "name": "Frida Kahlo"
+      }
+    ],
+    "hook": "Does knowing you will die change how you live today?",
+    "hookDe": "Verändert das Wissen um deinen Tod, wie du heute lebst?"
+  },
+  {
+    "id": "the-silent-altar",
+    "title": "The Silent Altar",
+    "titleDe": "Der stumme Altar",
+    "tagline": "On the day your prayers hit the ceiling, and what's left",
+    "taglineDe": "Über das Gebet, das nicht mehr ankommt — und was danach noch trägt",
+    "type": "confrontational",
+    "theme": "faith-death-mystery",
+    "safety": "sensitive",
+    "sortOrder": 46,
+    "question": "The God or framework that held your world together has gone silent. You prayed and the ceiling answered. Is what remains after faith rubble, or a foundation you couldn't see while the building was standing?",
+    "questionDe": "Der Gott oder das Weltbild, das deine Welt zusammengehalten hat, ist verstummt. Du hast gebetet und die Decke hat geantwortet. Ist das, was nach dem Glauben bleibt, Trümmer, oder ein Fundament, das du nicht sehen konntest, solange das Gebäude stand?",
+    "moderator": {
+      "id": "campbell",
+      "name": "Joseph Campbell"
+    },
+    "participants": [
+      {
+        "id": "nietzsche",
+        "name": "Friedrich Nietzsche"
+      },
+      {
+        "id": "eckhart",
+        "name": "Meister Eckhart"
+      },
+      {
+        "id": "bingen",
+        "name": "Hildegard von Bingen"
+      }
+    ],
+    "hook": "What is left when your faith goes silent?",
+    "hookDe": "Was bleibt, wenn dein Glaube verstummt?"
+  },
+  {
+    "id": "the-god-after-god",
+    "title": "The God After God",
+    "titleDe": "Der Gott nach Gott",
+    "tagline": "On what remains when the framework that held your world together collapses",
+    "taglineDe": "Über den Gott jenseits des Gottes, den man dir gegeben hat",
+    "type": "reflective",
+    "theme": "faith-death-mystery",
+    "safety": "standard",
+    "sortOrder": 47,
+    "question": "You no longer believe what you once believed. The structure is gone. What, if anything, is still standing?",
+    "questionDe": "Du glaubst nicht mehr, was du einst geglaubt hast. Das Gebäude ist weg. Was, wenn überhaupt etwas, steht noch?",
+    "moderator": {
+      "id": "eckhart",
+      "name": "Meister Eckhart"
+    },
+    "participants": [
+      {
+        "id": "nietzsche",
+        "name": "Friedrich Nietzsche"
+      },
+      {
+        "id": "gautama",
+        "name": "Siddhartha Gautama"
+      },
+      {
+        "id": "campbell",
+        "name": "Joseph Campbell"
+      }
+    ],
+    "hook": "What still stands after you stopped believing?",
+    "hookDe": "Was steht noch, nachdem du aufgehört hast zu glauben?"
+  },
+  {
+    "id": "is-this-all-there-is",
+    "title": "Is This All There Is?",
+    "titleDe": "Ist das alles?",
+    "tagline": "On the moments when ordinary life cracks open into something larger",
+    "taglineDe": "Über das, was die Liebe weiß — und der Verstand nie begreifen wird",
+    "type": "reflective",
+    "theme": "faith-death-mystery",
+    "safety": "standard",
+    "sortOrder": 48,
+    "question": "You have felt it. A moment when the world thinned and something behind it showed through. Was it real, or was your mind playing tricks?",
+    "questionDe": "Du hast es gespürt. Einen Moment, in dem die Welt dünn wurde und etwas dahinter durchschien. War das echt, oder hat dein Verstand dich getäuscht?",
+    "moderator": {
+      "id": "rumi",
+      "name": "Rumi"
+    },
+    "participants": [
+      {
+        "id": "eckhart",
+        "name": "Meister Eckhart"
+      },
+      {
+        "id": "blake",
+        "name": "William Blake"
+      },
+      {
+        "id": "bingen",
+        "name": "Hildegard von Bingen"
+      }
+    ],
+    "hook": "Have you ever felt something beyond all this?",
+    "hookDe": "Hast du je etwas jenseits von all dem gespürt?"
+  },
+  {
+    "id": "laughing-at-the-abyss",
+    "title": "Laughing at the Abyss",
+    "titleDe": "Lachen am Abgrund",
+    "tagline": "On comedy's secret, that it knows something tragedy won't admit",
+    "taglineDe": "Über das Lachen — und warum es Dinge weiß, die der Ernst nicht zugeben will",
+    "type": "confrontational",
+    "theme": "loss-grief",
+    "safety": "sensitive",
+    "sortOrder": 49,
+    "question": "Why do humans laugh at what terrifies them, and what does comedy understand about existence that tragedy refuses to admit?",
+    "questionDe": "Warum lachen Menschen über das, was sie in Angst versetzt, und was versteht die Komödie über das Dasein, das die Tragödie sich weigert zuzugeben?",
+    "moderator": {
+      "id": "shakespeare",
+      "name": "William Shakespeare"
+    },
+    "participants": [
+      {
+        "id": "nietzsche",
+        "name": "Friedrich Nietzsche"
+      },
+      {
+        "id": "angelou",
+        "name": "Maya Angelou"
+      },
+      {
+        "id": "aurelius",
+        "name": "Marcus Aurelius"
+      }
+    ],
+    "hook": "Why do you laugh at the things that terrify you?",
+    "hookDe": "Warum lachst du über das, was dich am meisten erschreckt?"
+  },
+  {
+    "id": "the-meaning-of-pain",
+    "title": "The Meaning of Pain",
+    "titleDe": "Der Sinn des Schmerzes",
+    "tagline": "On whether suffering had to mean something, or whether meaning is the bigger lie",
+    "taglineDe": "Über die Frage, ob Schmerz einen Sinn braucht — oder ob der Sinn die größere Lüge ist",
+    "type": "confrontational",
+    "theme": "loss-grief",
+    "safety": "deep",
+    "sortOrder": 50,
+    "question": "Is suffering the price of meaning, or the illusion that meaning demands a price?",
+    "questionDe": "Ist Leiden der Preis von Bedeutung, oder die Illusion, dass Bedeutung einen Preis verlangt?",
+    "moderator": {
+      "id": "kahlo",
+      "name": "Frida Kahlo"
+    },
+    "participants": [
+      {
+        "id": "nietzsche",
+        "name": "Friedrich Nietzsche"
+      },
+      {
+        "id": "schopenhauer",
+        "name": "Arthur Schopenhauer"
+      },
+      {
+        "id": "rumi",
+        "name": "Rumi"
+      }
+    ],
+    "hook": "Does your suffering have to mean something?",
+    "hookDe": "Muss dein Leiden einen Sinn haben?"
+  },
+  {
+    "id": "the-empty-room",
+    "title": "The Empty Room",
+    "titleDe": "Der leere Raum",
+    "tagline": "On grief, not the years, but the next hour",
+    "taglineDe": "Über Trauer — nicht die Jahre, die nächste Stunde",
+    "type": "reflective",
+    "theme": "loss-grief",
+    "safety": "deep",
+    "sortOrder": 51,
+    "question": "How do you survive the hours, not the years, the next hour, when the person who made the world make sense is gone and every room still holds their shape?",
+    "questionDe": "Wie überlebst du die Stunden, nicht die Jahre, die nächste Stunde, wenn der Mensch, der die Welt zusammengehalten hat, fort ist und jeder Raum noch seine Form trägt?",
+    "moderator": {
+      "id": "jung",
+      "name": "Carl Gustav Jung"
+    },
+    "participants": [
+      {
+        "id": "rumi",
+        "name": "Rumi"
+      },
+      {
+        "id": "dickinson",
+        "name": "Emily Dickinson"
+      },
+      {
+        "id": "angelou",
+        "name": "Maya Angelou"
+      }
+    ],
+    "hook": "How do you survive the next hour when they are gone?",
+    "hookDe": "Wie überlebst du die nächste Stunde ohne sie?"
+  },
+  {
+    "id": "the-uninvited-guest",
+    "title": "The Uninvited Guest",
+    "titleDe": "Der ungebetene Gast",
+    "tagline": "On the life that begins when the body you trusted betrays you",
+    "taglineDe": "Über das Leben, das beginnt, wenn der Körper, dem du vertraut hast, dich verrät",
+    "type": "reflective",
+    "theme": "loss-grief",
+    "safety": "sensitive",
+    "sortOrder": 52,
+    "question": "The body you woke up in today is not the one you were promised. Five people who know this firsthand sit with you now. What did they learn that the doctors couldn't tell them?",
+    "questionDe": "Der Körper, in dem du heute aufgewacht bist, ist nicht der, der dir versprochen wurde. Fünf Menschen, die das aus eigener Erfahrung kennen, sitzen jetzt bei dir. Was haben sie gelernt, das kein Arzt ihnen sagen konnte?",
+    "moderator": {
+      "id": "kahlo",
+      "name": "Frida Kahlo"
+    },
+    "participants": [
+      {
+        "id": "nietzsche",
+        "name": "Friedrich Nietzsche"
+      },
+      {
+        "id": "aurelius",
+        "name": "Marcus Aurelius"
+      },
+      {
+        "id": "bingen",
+        "name": "Hildegard von Bingen"
+      }
+    ],
+    "hook": "What do you do when your body stops being yours?",
+    "hookDe": "Was tust du, wenn dein Körper nicht mehr deiner ist?"
+  },
+  {
+    "id": "what-carried-you-through",
+    "title": "What Carried You Through",
+    "titleDe": "Was dich getragen hat",
+    "tagline": "On the things that kept you going when everything said stop",
+    "taglineDe": "Über die Dunkelheit — und was dich hindurchgetragen hat",
+    "type": "reflective",
+    "theme": "loss-grief",
+    "safety": "deep",
+    "sortOrder": 53,
+    "question": "When the darkness comes, and it comes for everyone, what do you do with it?",
+    "questionDe": "Wenn die Dunkelheit kommt, und sie kommt für jeden, was machst du dann damit?",
+    "moderator": {
+      "id": "laozi",
+      "name": "Laozi"
+    },
+    "participants": [
+      {
+        "id": "aurelius",
+        "name": "Marcus Aurelius"
+      },
+      {
+        "id": "woolf",
+        "name": "Virginia Woolf"
+      },
+      {
+        "id": "dickinson",
+        "name": "Emily Dickinson"
+      }
+    ],
+    "hook": "What kept you going when everything said stop?",
+    "hookDe": "Was hat dich weitergetragen, als alles Stopp gesagt hat?"
+  },
+  {
+    "id": "becoming-the-parent",
+    "title": "Becoming the Parent",
+    "titleDe": "Wenn du zum Halt wirst",
+    "tagline": "On caring for the person who always cared for you",
+    "taglineDe": "Über den Menschen, der dich gehalten hat — und den du jetzt halten musst",
+    "type": "reflective",
+    "theme": "loss-grief",
+    "safety": "sensitive",
+    "sortOrder": 54,
+    "question": "The person who made you feel safe in the world is dying, and now you must be their safety. Where do you find what you need to give when the source of what you've always been given is disappearing?",
+    "questionDe": "Der Mensch, der dir Sicherheit gegeben hat, stirbt, und jetzt musst du seine Sicherheit sein. Woher nimmst du, was du geben musst, wenn die Quelle dessen, was du immer bekommen hast, verschwindet?",
+    "moderator": {
+      "id": "woolf",
+      "name": "Virginia Woolf"
+    },
+    "participants": [
+      {
+        "id": "aurelius",
+        "name": "Marcus Aurelius"
+      },
+      {
+        "id": "eckhart",
+        "name": "Meister Eckhart"
+      },
+      {
+        "id": "kahlo",
+        "name": "Frida Kahlo"
+      }
+    ],
+    "hook": "How do you become safety for someone who always kept you safe?",
+    "hookDe": "Wie wirst du Halt für den, der immer dein Halt war?"
+  },
+  {
+    "id": "the-public-wreckage",
+    "title": "The Public Wreckage",
+    "titleDe": "Scheitern vor aller Augen",
+    "tagline": "On who you are when the thing you were known for is gone",
+    "taglineDe": "Über die Trümmer deines Rufs — und wer darunter noch steht",
+    "type": "confrontational",
+    "theme": "loss-grief",
+    "safety": "deep",
+    "sortOrder": 55,
+    "question": "Everything you built in public has collapsed in public. The reputation, the work, the identity others knew you by, gone. Who are you now that the thing you were known for has been taken?",
+    "questionDe": "Alles, was du öffentlich aufgebaut hast, ist öffentlich zusammengebrochen. Der Ruf, das Werk, die Identität, die andere mit dir verbanden. Wer bist du jetzt, da das, wofür man dich kannte, genommen wurde?",
+    "moderator": {
+      "id": "mandela",
+      "name": "Nelson Mandela"
+    },
+    "participants": [
+      {
+        "id": "galilei",
+        "name": "Galileo Galilei"
+      },
+      {
+        "id": "woolf",
+        "name": "Virginia Woolf"
+      },
+      {
+        "id": "nietzsche",
+        "name": "Friedrich Nietzsche"
+      }
+    ],
+    "hook": "Who are you after everything you built collapses?",
+    "hookDe": "Wer bist du, nachdem alles, was du aufgebaut hast, zerfällt?"
+  }
+]

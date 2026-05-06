@@ -1,0 +1,123 @@
+/* VoiceInteractionHelper.css - Voice interaction helper specific styles */
+
+/* Voice interaction specific customizations */
+.voice-interaction-helper {
+  /* Position at bottom instead of top for contextual appearance */
+  top: auto;
+  bottom: 100px;
+  animation: slideUpFade 0.4s ease-out;
+}
+
+/* Smooth entrance animation from bottom */
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Exit animation */
+.voice-interaction-helper.animating-out {
+  animation: slideDownFade 0.3s ease-in forwards;
+}
+
+@keyframes slideDownFade {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+}
+
+/* Mobile adjustments */
+@media (max-width: 767px) {
+  .voice-interaction-helper {
+    bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+    width: calc(100% - 16px); /* Add padding from edges */
+    max-width: calc(100vw - 16px);
+    left: 8px;
+    right: 8px;
+    margin: 0;
+  }
+  
+  /* Ensure the popup doesn't overflow */
+  .voice-interaction-helper .helper-popup {
+    max-width: 100%;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  /* Adjust content padding for mobile */
+  .voice-interaction-helper .helper-content {
+    padding-right: 4px; /* Less padding for scrollbar on mobile */
+    max-height: calc(100vh - 300px); /* Ensure content fits in viewport */
+  }
+  
+  /* Ensure text doesn't overflow */
+  .voice-interaction-helper .helper-content p {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+}
+
+/* Small mobile screens (iPhone SE, etc.) */
+@media (max-width: 380px) {
+  .voice-interaction-helper {
+    bottom: calc(70px + env(safe-area-inset-bottom, 0px));
+  }
+  
+  .voice-interaction-helper .helper-popup {
+    padding: 1rem;
+    font-size: 0.9rem;
+  }
+  
+  .voice-interaction-helper .helper-title {
+    font-size: 1.1rem;
+  }
+  
+  .voice-interaction-helper .helper-content {
+    font-size: 0.85rem;
+  }
+  
+  .voice-interaction-helper .helper-dismiss-btn {
+    padding: 0.4rem 1rem;
+    font-size: 0.85rem;
+  }
+}
+
+/* Tablet adjustments */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .voice-interaction-helper {
+    bottom: 90px;
+  }
+}
+
+/* Landscape mobile */
+@media (max-height: 500px) and (max-width: 900px) {
+  .voice-interaction-helper {
+    bottom: 60px;
+  }
+  
+  .voice-interaction-helper .helper-content {
+    max-height: calc(100vh - 200px);
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .voice-interaction-helper {
+    animation: none;
+  }
+  
+  .voice-interaction-helper.animating-out {
+    animation: none;
+    opacity: 0;
+  }
+}

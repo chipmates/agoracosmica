@@ -1,0 +1,84 @@
+{
+  "skipTour": "Überspringen",
+  "continue": "Weiter",
+  "back": "Zurück",
+  "finalButton": "Entzünde deine Sterne",
+  "mobileVoiceNotice": {
+    "title": "Spracheingabe auf Mobilgeräten",
+    "message": "Sprachfunktionen funktionieren am besten auf Desktop-Geräten. Du kannst aber trotzdem die Tastatur zum Chatten verwenden!",
+    "okButton": "Verstanden"
+  },
+  "welcome": {
+    "title": "Willkommen bei Agora Cosmica",
+    "tagline": "Erkunde ein Universum der Weisheit durch die Stimmen bemerkenswerter Denker der Geschichte.",
+    "quote": "Folge deiner Freude, und das Universum wird Türen öffnen, wo vorher nur Wände waren.",
+    "attribution": "― Joseph Campbell"
+  },
+  "guides": {
+    "title": "Finde dein Echo",
+    "titleFull": "Entdecke das Echo deines Sage-Mentors",
+    "description": "Erkunde 30 außergewöhnliche Persönlichkeiten aus drei Weisheitstraditionen, jede mit einzigartigen historischen Perspektiven.",
+    "traditions": {
+      "sages": {
+        "title": "Sages",
+        "description": "Zeitlose Persönlichkeiten"
+      },
+      "reformers": {
+        "title": "Reformer",
+        "description": "Visionäre, die die Gesellschaft veränderten"
+      },
+      "creators": {
+        "title": "Schöpfer",
+        "description": "Künstler und Innovatoren"
+      }
+    },
+    "steps": {
+      "browse": "Entdecken",
+      "explore": "Erkunden",
+      "select": "Wählen"
+    }
+  },
+  "journey": {
+    "title": "Deine Reise, deine Entdeckung",
+    "description": "Wähle deinen Weg: Jeder bietet ein einzigartiges Fenster zu zeitloser Weisheit.",
+    "modes": {
+      "story": {
+        "title": "Story-Modus",
+        "description": "Erzählende Reisen, die die Weisheit des Sage vorstellen"
+      },
+      "wisdom": {
+        "title": "Star Seed-Modus",
+        "description": "Tiefe Weisheitserkundung durch strukturierte Gespräche"
+      },
+      "freetalk": {
+        "title": "Freetalk-Modus",
+        "description": "Offener Dialog über jeden Aspekt der Weisheit des Sage"
+      },
+      "quest": {
+        "title": "Quest-Modus",
+        "description": "Herausforderungen, die Wissen testen und deine Sterne erhellen"
+      }
+    }
+  },
+  "conversation": {
+    "title": "Sprich mit den Echos",
+    "description": "Führe Gespräche mit historischen Persönlichkeiten durch Sprachbefehle. Deren Weisheit erwacht durch natürlichen Dialog zum Leben.",
+    "steps": {
+      "holdSpace": "Halte die Leertaste zum Aufnehmen",
+      "speak": "Sprich natürlich mit der historischen Persönlichkeit",
+      "release": "Lasse die Leertaste los, wenn du fertig bist",
+      "keyboard": "Oder tippe auf das Tastatur-Symbol zum Schreiben"
+    }
+  },
+  "constellation": {
+    "title": "Star Seeds & kosmische Konstellationen",
+    "description": "Entdecke und sammle Star Seeds der Weisheit, um einzigartige kosmische Konstellationen zu bilden. Die Lehren jeder Persönlichkeit sind in den Sternen abgebildet.",
+    "progress": "5 von 12 Star Seeds gesammelt",
+    "constellationName": "Die Heldenreise",
+    "stats": {
+      "figures": "historische Persönlichkeiten zu erkunden",
+      "seeds": "Star Seeds der Weisheit",
+      "constellation": "einzigartige kosmische Konstellationen"
+    }
+  }
+}

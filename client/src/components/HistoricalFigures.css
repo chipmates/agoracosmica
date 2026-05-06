@@ -1,0 +1,244 @@
+/* HistoricalFigures.css - Silhouettes and cosmic figures */
+
+/* Container for all figures */
+.historical-figures-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  z-index: var(--z-base); /* 3 */
+  pointer-events: none;
+  overflow: visible; /* Ensure overflow is visible */
+}
+
+/* Main hooded figure (1) */
+.historical-figure {
+  position: absolute;
+  pointer-events: none;
+  transform-origin: bottom center;
+  background: none; /* Remove any background */
+  border: none; /* Remove any border */
+  outline: none; /* Remove any outline */
+  box-shadow: none; /* Remove any box-shadow */
+  -webkit-tap-highlight-color: transparent; /* Remove iOS tap highlight */
+  bottom: 0; /* Default position at bottom */
+  display: flex;
+  align-items: flex-end; /* Align items to bottom of container */
+}
+
+.figure-image {
+  width: auto; /* Let width be calculated from aspect ratio */
+  max-width: 100%; /* Don't exceed container */
+  height: 100%;
+  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--gold-subtle) 20%, transparent))
+          drop-shadow(0 0 5px color-mix(in srgb, var(--gold-subtle) 10%, transparent));
+  background: none; /* Ensure no background */
+  border: none; /* Remove any border */
+  outline: none; /* Remove any outline */
+  box-shadow: none; /* Remove any box-shadow (separate from filter) */
+  -webkit-tap-highlight-color: transparent; /* Remove iOS tap highlight */
+  display: block; /* Make sure the image behaves as a block */
+  max-height: 100%; /* Constrain height */
+}
+
+/* object-fit targets the <img> inside OptimizedImage wrapper (2025 best practice:
+   Next.js, Astro, MDN all apply object-fit to <img>, never the wrapper div) */
+.figure-image img {
+  object-fit: contain;
+  object-position: bottom center;
+}
+
+.figure-1 {
+  left: 50%;
+  transform: translateX(-50%) scale(0.55); /* Smaller scale */
+  width: 15vh;
+  height: 30vh;
+  z-index: var(--z-base); /* 10 */
+  bottom: 2.5vh; /* Position central figure higher */
+}
+
+/* Left side figures - tier 1 */
+.figure-2 {
+  left: 40%;
+  transform: translateX(-50%) scale(0.60); /* Slightly larger than center */
+  width: 15vh;
+  height: 30vh;
+  z-index: var(--z-base); /* 8 */
+  bottom: 1.5vh; /* Lower than central figure */
+}
+
+/* Right side figures - tier 1 */
+.figure-3 {
+  left: 60%;
+  transform: translateX(-50%) scale(0.60); /* Slightly larger than center */
+  width: 15vh;
+  height: 30vh;
+  z-index: var(--z-base); /* 8 */
+  bottom: 1.5vh; /* Lower than central figure */
+}
+
+/* Left side figures - tier 2 */
+.figure-4 {
+  left: 30%;
+  transform: translateX(-50%) scale(0.675); /* Larger than tier 1 */
+  width: 15vh;
+  height: 30vh;
+  z-index: var(--z-base); /* 7 */
+  opacity: 1;
+  bottom: 0.5vh; /* Lower than tier 1 */
+}
+
+/* Right side figures - tier 2 */
+.figure-5 {
+  left: 70%;
+  transform: translateX(-50%) scale(0.675); /* Larger than tier 1 */
+  width: 15vh;
+  height: 30vh;
+  z-index: var(--z-base); /* 7 */
+  opacity: 1;
+  bottom: 0.5vh; /* Lower than tier 1 */
+}
+
+/* Left side figures - tier 3 */
+.figure-6 {
+  left: 20%;
+  transform: translateX(-50%) scale(0.75); /* Larger than tier 2 */
+  width: 15vh;
+  height: 30vh;
+  z-index: var(--z-base); /* 6 */
+  opacity: 1;
+  bottom: 0; /* Changed from -1.5vh to 0 */
+}
+
+/* Right side figures - tier 3 */
+.figure-7 {
+  left: 80%;
+  transform: translateX(-50%) scale(0.75); /* Larger than tier 2 */
+  width: 15vh;
+  height: 30vh;
+  z-index: var(--z-base); /* 6 */
+  opacity: 1;
+  bottom: 0; /* Changed from -1.5vh to 0 */
+}
+
+/* Left side figures - tier 4 */
+.figure-8 {
+  left: 10%;
+  transform: translateX(-50%) scale(0.85); /* Largest scale */
+  width: 25vh;
+  height: 30vh;
+  z-index: var(--z-base); /* 5 */
+  opacity: 1;
+  bottom: 0; /* Changed from -3vh to 0 */
+}
+
+/* Right side figures - tier 4 */
+.figure-9 {
+  left: 90%;
+  transform: translateX(-50%) scale(0.8); /* Largest scale */
+  width: 15vh;
+  height: 30vh;
+  z-index: var(--z-base); /* 5 */
+  opacity: 1;
+  bottom: 0; /* Changed from -3vh to 0 */
+}
+
+
+/* PWA mode removed - August 2025 cleanup decision */
+
+/* Portal light rays on figures */
+.historical-figures-container::before {
+  content: '';
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80%;
+  height: 60vh;
+  background: radial-gradient(
+    ellipse at center,
+    color-mix(in srgb, var(--gold-subtle) 8%, transparent) 0%,
+    color-mix(in srgb, var(--gold-subtle) 4%, transparent) 40%,
+    transparent 70%
+  );
+  filter: blur(20px);
+  z-index: var(--z-base); /* 1 */
+  pointer-events: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  /* Only show central figure and first tier on mobile */
+  .figure-4, .figure-5, .figure-6, .figure-7, .figure-8, .figure-9 {
+    display: none;
+  }
+
+  /* Central figure positioning for mobile */
+  .figure-1 {
+    left: 50%;
+    transform: translateX(-50%) scale(0.55);
+    width: 15dvh;
+    height: 28dvh;
+    bottom: 0;
+  }
+
+  /* Tier 1 figures — dvh matches the 100dvh container,
+     preventing overlap with portal on browsers with visible address bar */
+  .figure-2 {
+    left: 20%;
+    transform: translateX(-50%) scale(0.60);
+    width: 15dvh;
+    height: 28dvh;
+    bottom: 0;
+  }
+
+  .figure-3 {
+    left: 80%;
+    transform: translateX(-50%) scale(0.60);
+    width: 15dvh;
+    height: 28dvh;
+    bottom: 0;
+  }
+}
+
+@media (max-width: 1024px) and (min-width: 481px) {
+  /* Show only 5 figures on tablets with evenly distributed spacing */
+  .figure-6, .figure-7, .figure-8, .figure-9 {
+    display: none;
+  }
+  
+  /* Adjust figure positions for even distribution */
+  .figure-1 {
+    left: 50%; /* Center figure */
+    transform: translateX(-50%) scale(0.45); /* Exactly as specified */
+    bottom: 2vh; /* Exactly as specified */
+  }
+  
+  .figure-2 {
+    left: 30%; /* Moved from 40% to 30% */
+    transform: translateX(-50%) scale(0.5); /* Exactly as specified */
+    bottom: 0vh; /* Exactly as specified */
+  }
+  
+  .figure-3 {
+    left: 70%; /* Moved from 60% to 70% */
+    transform: translateX(-50%) scale(0.5); /* Exactly as specified */
+    bottom: 0vh; /* Exactly as specified */
+  }
+  
+  .figure-4 {
+    left: 10%; /* Moved from 30% to 15% */
+    transform: translateX(-50%) scale(0.55); /* Same as tier 1 figures */
+    bottom: 0; /* Changed from -2vh to 0 to prevent cutoff */
+  }
+  
+  .figure-5 {
+    left: 90%; /* Moved from 70% to 85% */
+    transform: translateX(-50%) scale(0.55); /* Same as tier 1 figures */
+    bottom: 0; /* Changed from -2vh to 0 to prevent cutoff */
+  }
+}
+
+/* Height constraints handled by viewport-fixes.css */

@@ -1,0 +1,636 @@
+/* PerfectPortal.css - Interactive cosmic portal with animations */
+
+/* ====== PORTAL STYLING ====== */
+.portal-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  /* Fixed sizing for better control */
+  width: 320px; /* Base mobile size */
+  height: 320px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  perspective: 1000px;
+  z-index: var(--z-base); /* 5 */ /* Ensure portal is above other elements */
+  /* Ensure circular shape is maintained */
+  aspect-ratio: 1 / 1;
+  box-sizing: border-box;
+}
+
+.portal {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  overflow: visible;
+  transform-style: preserve-3d;
+  /* Ensure circular shape */
+  aspect-ratio: 1 / 1;
+  box-sizing: border-box;
+}
+
+/* Fine outer circle */
+.portal-rim {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 2px solid var(--gold-subtle);
+  box-shadow: 
+    0 0 30px color-mix(in srgb, var(--gold-subtle) var(--a-40), transparent), 
+    inset 0 0 20px color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent);
+  opacity: 0.7;
+  animation: rim-pulse 4s infinite alternate ease-in-out;
+  animation-play-state: paused; /* Battery: only animate when portal visible */
+}
+
+@keyframes rim-pulse {
+  0% { 
+    opacity: 0.6;
+    box-shadow: 
+      0 0 20px color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent), 
+      inset 0 0 15px color-mix(in srgb, var(--gold-subtle) var(--a-20), transparent);
+  }
+  100% { 
+    opacity: 0.9;
+    box-shadow: 
+      0 0 35px color-mix(in srgb, var(--gold-subtle) var(--a-50), transparent), 
+      inset 0 0 25px color-mix(in srgb, var(--gold-subtle) var(--a-40), transparent);
+  }
+}
+
+/* Zodiac ring */
+.zodiac-ring {
+  position: absolute;
+  width: 90%;
+  height: 90%;
+  border-radius: 50%;
+  animation: rotate-zodiac 60s linear infinite;
+  animation-play-state: paused;
+  transform-style: preserve-3d;
+}
+
+@keyframes rotate-zodiac {
+  0% { transform: rotateZ(0deg); }
+  100% { transform: rotateZ(360deg); }
+}
+
+/* Zodiac symbols */
+.zodiac-symbol {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  transform-origin: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.zodiac-symbol svg {
+  width: 100%;
+  height: 100%;
+  color: var(--gold-subtle);
+  fill: var(--gold-subtle);
+  filter: drop-shadow(0 0 3px color-mix(in srgb, var(--gold-subtle) var(--a-50), transparent));
+  opacity: 0.9;
+}
+
+/* Rift distortion */
+.rift-distortion {
+  position: absolute;
+  width: 75%;
+  height: 75%;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    color-mix(in srgb, var(--gold-subtle) var(--a-10), transparent) 0%,
+    color-mix(in srgb, var(--bg-card) var(--a-50), transparent) 40%,
+    color-mix(in srgb, var(--bg-primary) var(--a-70), transparent) 70%
+  );
+  transform-style: preserve-3d;
+  animation: distortion-morph 8s infinite alternate ease-in-out;
+  animation-play-state: paused;
+}
+
+@keyframes distortion-morph {
+  0% { transform: scale(0.95) rotate(0deg); filter: blur(1px); }
+  25% { transform: scale(0.98) rotate(1deg); filter: blur(0.5px); }
+  50% { transform: scale(0.96) rotate(-1deg); filter: blur(1.5px); }
+  75% { transform: scale(0.97) rotate(0.5deg); filter: blur(1px); }
+  100% { transform: scale(0.99) rotate(-0.5deg); filter: blur(0px); }
+}
+
+/* Vortex center */
+.vortex-center {
+  position: absolute;
+  width: 65%;
+  height: 65%;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    color-mix(in srgb, var(--bg-highlight) var(--a-10), transparent),
+    color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent),
+    color-mix(in srgb, var(--bg-highlight) var(--a-10), transparent),
+    color-mix(in srgb, var(--gold-subtle) var(--a-20), transparent),
+    color-mix(in srgb, var(--bg-highlight) var(--a-10), transparent)
+  );
+  box-shadow: 0 0 30px color-mix(in srgb, var(--gold-subtle) var(--a-20), transparent), inset 0 0 20px color-mix(in srgb, var(--gold-subtle) var(--a-20), transparent);
+  animation: vortex-spin 10s linear infinite;
+  animation-play-state: paused;
+}
+
+@keyframes vortex-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Vortex inner core */
+.vortex-core {
+  position: absolute;
+  width: 40%;
+  height: 40%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at center,
+    color-mix(in srgb, var(--gold-subtle) var(--a-40), transparent) 0%,
+    color-mix(in srgb, var(--bg-highlight) var(--a-20), transparent) 70%
+  );
+  box-shadow: 0 0 20px color-mix(in srgb, var(--gold-subtle) var(--a-40), transparent);
+  animation: core-pulse 5s infinite alternate ease-in-out;
+  animation-play-state: paused;
+}
+
+@keyframes core-pulse {
+  0% { transform: scale(0.9); opacity: 0.6; }
+  100% { transform: scale(1.1); opacity: 0.9; }
+}
+
+/* Energy particles */
+.particle-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.particle {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: var(--gold-primary);
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+  box-shadow: 0 0 4px 1px color-mix(in srgb, var(--gold-subtle) var(--a-40), transparent);
+}
+
+/* SVG Filters */
+.svg-filters {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+/* Portal Reveal Animation */
+.portal-revealed .portal-rim {
+  animation: rim-expand 1s forwards ease-out;
+}
+
+.portal-revealed .zodiac-ring {
+  animation: zodiac-expand 1.2s forwards ease-out;
+}
+
+.portal-revealed .zodiac-symbol svg {
+  animation: symbol-glow 1.5s forwards;
+}
+
+.portal-revealed .rift-distortion {
+  animation: distortion-collapse 0.8s forwards ease-out;
+}
+
+.portal-revealed .vortex-center, 
+.portal-revealed .vortex-core {
+  animation: vortex-dissolve 0.7s forwards ease-out;
+}
+
+/* Portal Unrevealing (Reverse) Animation */
+.portal-unrevealing .portal-rim {
+  animation: rim-contract 1s forwards ease-in;
+}
+
+.portal-unrevealing .zodiac-ring {
+  animation: zodiac-contract 1.2s forwards ease-in;
+}
+
+.portal-unrevealing .zodiac-symbol svg {
+  animation: symbol-fade 1.5s forwards;
+}
+
+.portal-unrevealing .rift-distortion {
+  animation: distortion-restore 0.8s forwards ease-in;
+}
+
+.portal-unrevealing .vortex-center, 
+.portal-unrevealing .vortex-core {
+  animation: vortex-restore 0.7s forwards ease-in;
+}
+
+/* Hide login form during unrevealing */
+.portal-unrevealing .login-form {
+  opacity: 0;
+  transform: scale(0.6) translateY(-15px);
+  transition: opacity 0.4s ease-out 0.1s, transform 0.4s ease-out 0.1s, visibility 0s linear 0.5s;
+  visibility: hidden;
+}
+
+@keyframes rim-expand {
+  0% { 
+    transform: scale(1);
+    border-color: var(--gold-subtle);
+    opacity: 0.7;
+  }
+  50% { 
+    transform: scale(1.2);
+    border-color: var(--gold-hover);
+    box-shadow: 0 0 40px color-mix(in srgb, var(--gold-subtle) var(--a-70), transparent), inset 0 0 30px color-mix(in srgb, var(--gold-subtle) var(--a-50), transparent);
+    opacity: 0.9;
+  }
+  100% { 
+    transform: scale(1.05);
+    border-color: var(--gold-subtle);
+    box-shadow: 0 0 15px color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent), inset 0 0 10px color-mix(in srgb, var(--gold-subtle) var(--a-20), transparent);
+    opacity: 0.7;
+  }
+}
+
+@keyframes zodiac-expand {
+  0% { transform: rotate(var(--current-rotation)); }
+  20% { transform: rotate(0deg); }
+  100% { 
+    transform: rotate(0deg) scale(1.4);
+    opacity: 0;
+  }
+}
+
+@keyframes symbol-glow {
+  0% { 
+    fill: var(--gold-subtle);
+    filter: drop-shadow(0 0 3px color-mix(in srgb, var(--gold-subtle) var(--a-50), transparent));
+    opacity: 0.9;
+  }
+  40% { 
+    fill: var(--gold-hover);
+    filter: drop-shadow(0 0 10px color-mix(in srgb, var(--gold-subtle) var(--a-80), transparent));
+    opacity: 1;
+  }
+  100% { 
+    fill: transparent;
+    filter: drop-shadow(0 0 0 transparent);
+    opacity: 0;
+  }
+}
+
+/* Reverse animation keyframes */
+@keyframes rim-contract {
+  0% { 
+    transform: scale(1.05);
+    border-color: var(--gold-subtle);
+    box-shadow: 0 0 15px color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent), inset 0 0 10px color-mix(in srgb, var(--gold-subtle) var(--a-20), transparent);
+    opacity: 0.7;
+  }
+  50% { 
+    transform: scale(1.2);
+    border-color: var(--gold-hover);
+    box-shadow: 0 0 40px color-mix(in srgb, var(--gold-subtle) var(--a-70), transparent), inset 0 0 30px color-mix(in srgb, var(--gold-subtle) var(--a-50), transparent);
+    opacity: 0.9;
+  }
+  100% { 
+    transform: scale(1);
+    border-color: var(--gold-subtle);
+    opacity: 0.7;
+  }
+}
+
+@keyframes zodiac-contract {
+  0% { 
+    transform: rotate(0deg) scale(1.4);
+    opacity: 0;
+  }
+  80% { transform: rotate(0deg); }
+  100% { transform: rotate(var(--current-rotation)); }
+}
+
+@keyframes symbol-fade {
+  0% { 
+    fill: transparent;
+    filter: drop-shadow(0 0 0 transparent);
+    opacity: 0;
+  }
+  60% { 
+    fill: var(--gold-hover);
+    filter: drop-shadow(0 0 10px color-mix(in srgb, var(--gold-subtle) var(--a-80), transparent));
+    opacity: 1;
+  }
+  100% { 
+    fill: var(--gold-subtle);
+    filter: drop-shadow(0 0 3px color-mix(in srgb, var(--gold-subtle) var(--a-50), transparent));
+    opacity: 0.9;
+  }
+}
+
+@keyframes distortion-restore {
+  0% { transform: scale(0.1); opacity: 0; }
+  60% { 
+    transform: scale(1.4); 
+    opacity: 0.8;
+    background: radial-gradient(
+      ellipse at center,
+      color-mix(in srgb, var(--gold-subtle) var(--a-60), transparent) 0%,
+      color-mix(in srgb, var(--bg-card) var(--a-40), transparent) 50%,
+      color-mix(in srgb, var(--bg-primary) 0%, transparent) 100%
+    );
+  }
+  100% { transform: scale(0.95); opacity: 1; }
+}
+
+@keyframes vortex-restore {
+  0% { opacity: 0; transform: scale(0) rotate(calc(var(--rotation, 0deg) + 360deg)); }
+  50% { opacity: 0.8; transform: scale(1.3) rotate(calc(var(--rotation, 0deg) + 180deg)); }
+  100% { opacity: 1; transform: scale(1) rotate(var(--rotation, 0deg)); }
+}
+
+@keyframes distortion-collapse {
+  0% { transform: scale(0.95); opacity: 1; }
+  40% { 
+    transform: scale(1.4); 
+    opacity: 0.8;
+    background: radial-gradient(
+      ellipse at center,
+      color-mix(in srgb, var(--gold-subtle) var(--a-60), transparent) 0%,
+      color-mix(in srgb, var(--bg-card) var(--a-40), transparent) 50%,
+      color-mix(in srgb, var(--bg-primary) 0%, transparent) 100%
+    );
+  }
+  100% { transform: scale(0.1); opacity: 0; }
+}
+
+@keyframes vortex-dissolve {
+  0% { opacity: 1; transform: scale(1) rotate(var(--rotation, 0deg)); }
+  50% { opacity: 0.8; transform: scale(1.3) rotate(calc(var(--rotation, 0deg) + 180deg)); }
+  100% { opacity: 0; transform: scale(0) rotate(calc(var(--rotation, 0deg) + 360deg)); }
+}
+
+/* Flash effect for reveal */
+.reveal-flash {
+  position: absolute;
+  width: 0%;
+  height: 0%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at center,
+    color-mix(in srgb, white var(--a-90), transparent) 0%,
+    color-mix(in srgb, var(--gold-subtle) var(--a-70), transparent) 30%,
+    color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent) 70%,
+    transparent 100%
+  );
+  opacity: 0;
+  z-index: var(--z-base); /* 10 */
+  pointer-events: none;
+}
+
+.portal-revealed .reveal-flash {
+  animation: flash-pulse 1s forwards ease-out;
+}
+
+@keyframes flash-pulse {
+  0% { width: 0%; height: 0%; opacity: 0; }
+  50% { width: 100%; height: 100%; opacity: 1; }
+  100% { width: 120%; height: 120%; opacity: 0; }
+}
+
+/* Login form styling */
+.login-form {
+  position: absolute;
+  width: 72%; /* Slightly smaller to ensure fit */
+  max-width: 240px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease 0.5s, visibility 0.3s ease 0.5s, transform 0.3s ease 0.5s;
+  z-index: var(--z-base); /* 10 */
+  background-color: rgba(20, 25, 60, 0.6);
+  backdrop-filter: blur(var(--glass-blur-heavy));
+  padding: 1.1rem; /* Slightly less padding */
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 25%, transparent);
+  transform: translateY(20px);
+}
+
+.portal-revealed .login-form {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  transition: opacity 0.5s ease 0.4s, visibility 0.5s ease 0.4s, transform 0.5s ease 0.4s;
+}
+
+/* Activate animations when portal is visible */
+.portal-container .portal-rim,
+.portal-container .zodiac-ring,
+.portal-container .rift-distortion,
+.portal-container .vortex-center,
+.portal-container .vortex-core {
+  animation-play-state: running;
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .portal-rim,
+  .zodiac-ring,
+  .rift-distortion,
+  .vortex-center,
+  .vortex-core {
+    animation: none;
+  }
+
+  .portal-revealed .portal-rim,
+  .portal-revealed .zodiac-ring,
+  .portal-revealed .zodiac-symbol svg,
+  .portal-revealed .rift-distortion,
+  .portal-revealed .vortex-center,
+  .portal-revealed .vortex-core,
+  .portal-revealed .reveal-flash {
+    animation: none;
+  }
+}
+
+/* ===== 5-BREAKPOINT RESPONSIVE SYSTEM ===== */
+
+/* Mobile baseline (360px+) - base styles above */
+
+/* Tablet Portrait (768px+) */
+@media (min-width: 768px) {
+  .portal-container {
+    width: 340px;
+    height: 340px;
+  }
+  
+  /* Make login form fit better */
+  .login-form {
+    width: 68%;
+    max-width: 230px;
+    padding: 1rem;
+  }
+  
+  /* Slightly smaller input fields */
+  .login-form input {
+    padding: 0.4rem;
+    margin-bottom: 0.7rem;
+    font-size: 0.85rem;
+  }
+  
+  /* Slightly smaller labels */
+  .login-form label {
+    font-size: 0.8rem;
+    margin-bottom: 0.15rem;
+  }
+  
+  /* Slightly more compact button */
+  .login-form button {
+    padding: 0.4rem 1.2rem;
+    font-size: 0.85rem;
+  }
+}
+
+/* Desktop Start (1024px+) */
+@media (min-width: 1024px) {
+  .portal-container {
+    /* Height-aware scaling */
+    width: min(35vw, min(400px, 50vh));  /* Constrained by height too */
+    height: min(35vw, min(400px, 50vh));
+  }
+  
+  .login-form {
+    width: 70%; /* Slightly less cramped on desktop */
+    max-width: 260px;
+  }
+}
+
+/* Height constraints for browser chrome/taskbars */
+@media (max-height: 650px) {
+  .portal-container {
+    top: 45%; /* Move up on short viewports */
+    width: min(320px, 40vh);  /* More aggressive on very short screens */
+    height: min(320px, 40vh);
+  }
+}
+
+/* Mobile adjustments for title/portal spacing */
+@media (max-width: 767px) {
+  .portal-container {
+    top: 50%; /* Centered — was 54% which overlapped figures on Chrome (shorter dvh viewport) */
+  }
+}
+
+/* Small mobile adjustments */
+@media (max-width: 399px) {
+  .portal-container {
+    width: 300px;
+    height: 300px;
+  }
+}
+
+/* iPhone SE specific fix */
+@media (min-width: 375px) and (max-width: 400px) and (max-height: 600px) {
+  .portal-container {
+    width: 310px;
+    height: 310px;
+    top: 52%;
+  }
+}
+
+/* Very small screens override */
+@media (max-width: 359px) {
+  .portal-container {
+    width: 280px;
+    height: 280px;
+  }
+  
+  .login-form {
+    width: 64%;
+    max-width: 190px;
+    padding: 0.8rem;
+  }
+}
+
+/* Laptop Standard (1366px+) */
+@media (min-width: 1366px) {
+  .portal-container {
+    /* Height-aware scaling for laptops */
+    width: min(32vw, min(420px, 50vh));  /* Won't exceed 50% of viewport height */
+    height: min(32vw, min(420px, 50vh));
+  }
+}
+
+/* Full Desktop (1920px+) */
+@media (min-width: 1920px) {
+  .portal-container {
+    width: min(30vw, min(460px, 50vh));  /* Height-aware */
+    height: min(30vw, min(460px, 50vh));
+  }
+  
+  .login-form {
+    max-width: min(280px, 70%); /* Constrained form size */
+  }
+}
+
+/* 2K/QHD (2560px+) */
+@media (min-width: 2560px) {
+  .portal-container {
+    width: min(28vw, min(480px, 50vh));  /* Height-aware */
+    height: min(28vw, min(480px, 50vh));
+  }
+  
+  .login-form {
+    max-width: 290px;
+  }
+}
+
+/* 4K (3840px+) */
+@media (min-width: 3840px) {
+  .portal-container {
+    width: min(26vw, min(500px, 50vh));  /* Height-aware */
+    height: min(26vw, min(500px, 50vh));
+  }
+  
+  .login-form {
+    max-width: 300px;
+  }
+}
+
+/* Additional height constraints for short screens */
+@media (min-width: 1024px) and (max-height: 800px) {
+  .portal-container {
+    /* More aggressive constraint for laptop screens */
+    width: min(45vh, 400px);  /* 45% of height max */
+    height: min(45vh, 400px);
+  }
+}
+
+@media (min-width: 1366px) and (max-height: 768px) {
+  .portal-container {
+    /* Even more constrained for typical laptop resolution */
+    width: min(42vh, 380px);  /* ~42% of height */
+    height: min(42vh, 380px);
+  }
+}

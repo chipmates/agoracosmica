@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 590" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Agora Cosmica architecture diagram. Three tiers: your browser holds all user data and the encrypted BYOK key. Cloudflare Workers act as thin proxies with no user data and no per-request logs. Backends include Nebius in Finland for the free tier, OpenRouter for BYOK inference with ZDR providers available, Hetzner GPUs in Germany for self-hosted live audio, and Cloudflare R2 in EU storage for pre-recorded media.">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="35%" r="80%">
+      <stop offset="0%" stop-color="#1c2452"/>
+      <stop offset="100%" stop-color="#151c48"/>
+    </radialGradient>
+    <style>
+      .label { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; fill: #e6bc5c; }
+      .tier-label { font-size: 15px; letter-spacing: 3.5px; fill: #e6bc5c; opacity: 0.6; font-weight: 600; }
+      .box-title { font-size: 23px; font-weight: 600; fill: #f8e696; }
+      .box-sub { font-size: 17px; fill: #e6bc5c; opacity: 0.88; }
+      .note { font-size: 15px; fill: #e6bc5c; opacity: 0.6; letter-spacing: 0.5px; font-style: italic; }
+      .footer { font-size: 14px; fill: #e6bc5c; opacity: 0.55; letter-spacing: 1.5px; font-weight: 500; }
+      .badge-text { font-size: 12px; fill: #e6bc5c; opacity: 0.95; letter-spacing: 1px; font-weight: 600; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="590" fill="url(#bg)" rx="14"/>
+
+  <!-- ===== TIER 1: YOUR DEVICE ===== -->
+  <text x="48" y="50" class="tier-label">YOUR DEVICE</text>
+
+  <g>
+    <rect x="48" y="64" width="1104" height="96" rx="12" fill="#151c48" stroke="#e6bc5c" stroke-width="1.5" opacity="0.95"/>
+    <text x="76" y="100" class="label box-title">Browser</text>
+    <text x="76" y="132" class="label box-sub">React 18 · TypeScript · Vite · Zustand · IndexedDB encrypted with AES-256-GCM</text>
+
+    <!-- Lock badge right side -->
+    <g transform="translate(1024, 86)">
+      <rect x="0" y="0" width="100" height="52" rx="8" fill="#1c2452" stroke="#e6bc5c" stroke-width="0.9" opacity="0.9"/>
+      <path d="M 44 16 a 6 6 0 0 1 12 0 v 6" stroke="#e6bc5c" stroke-width="1.7" fill="none" stroke-linecap="round"/>
+      <rect x="40" y="22" width="20" height="14" rx="2" fill="none" stroke="#e6bc5c" stroke-width="1.7"/>
+      <circle cx="50" cy="29" r="1.6" fill="#e6bc5c"/>
+      <text x="50" y="48" class="label badge-text" text-anchor="middle">YOUR DATA</text>
+    </g>
+  </g>
+
+  <!-- Connector tier 1 → tier 2 -->
+  <line x1="600" y1="160" x2="600" y2="195" stroke="#e6bc5c" stroke-width="1" opacity="0.5" stroke-dasharray="4 5"/>
+  <circle cx="600" cy="195" r="3" fill="#e6bc5c" opacity="0.7"/>
+
+  <!-- ===== TIER 2: EDGE ===== -->
+  <text x="48" y="222" class="tier-label">EDGE · CLOUDFLARE WORKERS</text>
+
+  <g>
+    <!-- LLM Proxy -->
+    <rect x="48" y="236" width="350" height="106" rx="12" fill="#151c48" stroke="#e6bc5c" stroke-width="1.3" opacity="0.95"/>
+    <text x="76" y="273" class="label box-title">LLM Proxy</text>
+    <text x="76" y="304" class="label box-sub">Rate limit · safety screening</text>
+    <text x="76" y="328" class="label box-sub">Per-identity quotas</text>
+
+    <!-- Audio Proxy -->
+    <rect x="425" y="236" width="350" height="106" rx="12" fill="#151c48" stroke="#e6bc5c" stroke-width="1.3" opacity="0.95"/>
+    <text x="453" y="273" class="label box-title">Audio Proxy</text>
+    <text x="453" y="304" class="label box-sub">Authenticated at the edge</text>
+    <text x="453" y="328" class="label box-sub">Server failover</text>
+
+    <!-- Media Gateway -->
+    <rect x="802" y="236" width="350" height="106" rx="12" fill="#151c48" stroke="#e6bc5c" stroke-width="1.3" opacity="0.95"/>
+    <text x="830" y="273" class="label box-title">Media Gateway</text>
+    <text x="830" y="304" class="label box-sub">Streams pre-recorded audio</text>
+    <text x="830" y="328" class="label box-sub">From EU storage</text>
+  </g>
+
+  <!-- Note under workers tier -->
+  <text x="600" y="370" class="label note" text-anchor="middle">Thin proxies. No per-request logs. No user data at rest.</text>
+
+  <!-- Connector tier 2 → tier 3 -->
+  <line x1="223" y1="382" x2="223" y2="418" stroke="#e6bc5c" stroke-width="0.8" opacity="0.4" stroke-dasharray="4 5"/>
+  <line x1="600" y1="382" x2="600" y2="418" stroke="#e6bc5c" stroke-width="0.8" opacity="0.4" stroke-dasharray="4 5"/>
+  <line x1="977" y1="382" x2="977" y2="418" stroke="#e6bc5c" stroke-width="0.8" opacity="0.4" stroke-dasharray="4 5"/>
+
+  <!-- ===== TIER 3: BACKENDS ===== -->
+  <text x="48" y="446" class="tier-label">BACKENDS</text>
+
+  <g>
+    <!-- OpenRouter (BYOK) -->
+    <rect x="48" y="460" width="262" height="100" rx="12" fill="#151c48" stroke="#e6bc5c" stroke-width="1.3" opacity="0.95"/>
+    <text x="76" y="498" class="label box-title">OpenRouter</text>
+    <text x="76" y="529" class="label box-sub">BYOK · your provider</text>
+    <text x="76" y="553" class="label box-sub">ZDR available</text>
+
+    <!-- Nebius (free tier) -->
+    <rect x="329" y="460" width="262" height="100" rx="12" fill="#151c48" stroke="#e6bc5c" stroke-width="1.3" opacity="0.95"/>
+    <text x="357" y="498" class="label box-title">Nebius</text>
+    <text x="357" y="529" class="label box-sub">Free tier · 30 msg/day</text>
+    <text x="357" y="553" class="label box-sub">EU (Finland)</text>
+
+    <!-- Hetzner GEX130 GPUs -->
+    <rect x="610" y="460" width="262" height="100" rx="12" fill="#151c48" stroke="#e6bc5c" stroke-width="1.3" opacity="0.95"/>
+    <text x="638" y="498" class="label box-title">Hetzner GPUs</text>
+    <text x="638" y="529" class="label box-sub">Self-hosted live audio</text>
+    <text x="638" y="553" class="label box-sub">EU (Germany)</text>
+
+    <!-- Cloudflare R2 -->
+    <rect x="891" y="460" width="261" height="100" rx="12" fill="#151c48" stroke="#e6bc5c" stroke-width="1.3" opacity="0.95"/>
+    <text x="919" y="498" class="label box-title">Cloudflare R2</text>
+    <text x="919" y="529" class="label box-sub">Pre-recorded audio</text>
+    <text x="919" y="553" class="label box-sub">EU storage</text>
+  </g>
+
+</svg>

@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /test/
+Disallow: /diagnostic/
+Disallow: /bench/
+Sitemap: https://agoracosmica.org/sitemap.xml

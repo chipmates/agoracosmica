@@ -1,0 +1,5 @@
+/* CosmicLogo.css — Base styling only. Each parent controls its own glow/animation. */
+
+.cosmic-logo {
+  color: var(--gold-subtle);
+}

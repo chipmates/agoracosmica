@@ -1,0 +1,3 @@
+# SPA fallback — serve index.html for all client-side routes
+# CF Pages serves existing static files first (JS, CSS, images, fonts)
+/* /index.html 200

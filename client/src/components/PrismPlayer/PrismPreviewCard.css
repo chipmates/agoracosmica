@@ -1,0 +1,235 @@
+/* PrismPreviewCard.css - Preview overlay before prism playback */
+/* Reuses HelperPopup base classes for glass morphism styling */
+
+/* Host subtitle below title */
+.prism-preview__host {
+  color: color-mix(in srgb, white var(--a-60), transparent);
+  font-size: 0.9rem;
+  margin: 0.35rem 0 0;
+  text-align: center;
+  font-weight: 400;
+}
+
+/* Quote block */
+.prism-preview__quote {
+  margin: 0 0 1rem;
+  padding: 0.75rem 1rem;
+  border-left: 3px solid color-mix(in srgb, var(--gold-subtle) var(--a-50), transparent);
+  background: color-mix(in srgb, var(--gold-subtle) var(--a-05), transparent);
+  border-radius: 0 0.5rem 0.5rem 0;
+  color: color-mix(in srgb, white var(--a-80), transparent);
+  font-style: italic;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  font-family: var(--font-secondary, 'Crimson Text', Georgia, serif);
+}
+
+/* Connections section */
+.prism-preview__connections {
+  margin-bottom: 0.25rem;
+}
+
+.prism-preview__connections h4 {
+  color: var(--gold-subtle);
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0 0 0.75rem;
+  font-family: var(--font-primary, 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif);
+  text-shadow: 0 0 12px color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent);
+}
+
+/* Single connection row */
+.prism-preview__connection {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+}
+
+.prism-preview__connection + .prism-preview__connection {
+  border-top: 1px solid color-mix(in srgb, white var(--a-08), transparent);
+}
+
+/* Colored dot for connection type */
+.prism-preview__type-dot {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-top: 0.45rem;
+}
+
+.prism-preview__type-dot--foundation {
+  background: var(--gold-subtle);
+  box-shadow: 0 0 6px color-mix(in srgb, var(--gold-subtle) var(--a-40), transparent);
+}
+
+.prism-preview__type-dot--expansion {
+  background: var(--mode-prism, #7B8CDE);
+  box-shadow: 0 0 6px color-mix(in srgb, var(--mode-prism, #7B8CDE) var(--a-40), transparent);
+}
+
+.prism-preview__type-dot--tension {
+  background: var(--mode-quest, #E07A5F);
+  box-shadow: 0 0 6px color-mix(in srgb, var(--mode-quest, #E07A5F) var(--a-40), transparent);
+}
+
+.prism-preview__connection-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.prism-preview__connection-header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.prism-preview__connection-header strong {
+  color: color-mix(in srgb, white var(--a-90), transparent);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.prism-preview__type-label {
+  color: color-mix(in srgb, white var(--a-45), transparent);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 500;
+}
+
+.prism-preview__connection-summary {
+  color: color-mix(in srgb, white var(--a-65), transparent);
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+/* Actions: two-button layout, ALWAYS single row.
+   Buttons may shrink padding/font on narrow screens to fit, never wrap to
+   two rows (saves vertical space, especially on mobile fullscreen view). */
+.prism-preview__actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: nowrap;
+}
+
+/* Shared button base */
+.prism-preview__btn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-radius: 2rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  min-height: 44px;
+  padding: 0.5rem 1rem;
+  /* Keep label + duration on one line, German "Schließen" / "Anhören"
+     were splitting mid-word inside narrow flex layout. */
+  white-space: nowrap;
+  /* Allow shrinking on narrow screens so both fit one row */
+  min-width: 0;
+}
+
+/* Back button - ghost style */
+.prism-preview__btn--back {
+  background: color-mix(in srgb, white var(--a-08), transparent);
+  border: 1px solid color-mix(in srgb, white var(--a-15), transparent);
+  color: color-mix(in srgb, white var(--a-70), transparent);
+}
+
+.prism-preview__btn--back:hover {
+  background: color-mix(in srgb, white var(--a-12), transparent);
+  color: color-mix(in srgb, white var(--a-90), transparent);
+  transform: translateY(-1px);
+}
+
+.prism-preview__btn--back:active {
+  transform: translateY(0);
+}
+
+/* Listen/Continue button - primary gold */
+.prism-preview__btn--listen {
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--gold-subtle) var(--a-25), transparent) 0%,
+    color-mix(in srgb, var(--gold-subtle) var(--a-15), transparent) 100%);
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-40), transparent);
+  color: var(--gold-subtle);
+}
+
+.prism-preview__btn--listen:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--gold-subtle) var(--a-35), transparent) 0%,
+    color-mix(in srgb, var(--gold-subtle) var(--a-25), transparent) 100%);
+  box-shadow:
+    0 0 20px color-mix(in srgb, var(--gold-subtle) var(--a-20), transparent),
+    0 6px 20px color-mix(in srgb, black var(--a-25), transparent);
+}
+
+.prism-preview__btn--listen:active {
+  transform: translateY(0);
+}
+
+/* Duration label inside listen button */
+.prism-preview__duration {
+  font-size: 0.8rem;
+  font-weight: 400;
+  opacity: 0.7;
+  margin-left: 0.25rem;
+}
+
+/* Mobile fullscreen adjustments */
+.helper-popup.fullscreen-mobile .prism-preview__host {
+  font-size: 1rem;
+  margin-top: 0.5rem;
+}
+
+.helper-popup.fullscreen-mobile .prism-preview__quote {
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.helper-popup.fullscreen-mobile .prism-preview__connections h4 {
+  font-size: 1.05rem;
+}
+
+.helper-popup.fullscreen-mobile .prism-preview__connection-header strong {
+  font-size: 0.95rem;
+}
+
+.helper-popup.fullscreen-mobile .prism-preview__connection-summary {
+  font-size: 0.9rem;
+}
+
+/* Mobile fullscreen: keep buttons compact so they fit one row.
+   Padding tightened so "Schließen" + "Anhören ~10 Min." fit side-by-side
+   on the narrowest phones (320px). */
+.helper-popup.fullscreen-mobile .prism-preview__btn {
+  font-size: 0.875rem;
+  min-height: 44px;
+  padding: 0.5rem 0.875rem;
+  gap: 0.35rem;
+}
+
+.helper-popup.fullscreen-mobile .prism-preview__duration {
+  font-size: 0.75rem;
+  margin-left: 0.2rem;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .prism-preview__btn {
+    transition: none;
+  }
+
+  .prism-preview__btn:hover {
+    transform: none;
+  }
+}

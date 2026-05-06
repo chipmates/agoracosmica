@@ -1,0 +1,409 @@
+/* ================================================================
+   CompletionCelebration — Premium achievement overlay
+   Triggers when all seeds have all 4 modes completed.
+   ================================================================ */
+
+/* ── Overlay ── */
+.completion-celebration-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--bg-cosmic-void) var(--a-60), transparent);
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.completion-celebration-overlay.visible {
+  opacity: 1;
+}
+
+/* ── Sparkle particles ── */
+.celebration-sparkles {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.sparkle-particle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--size);
+  height: var(--size);
+  background: var(--gold-star);
+  border-radius: 50%;
+  opacity: 0;
+  animation: sparkleFloat var(--duration) var(--delay) ease-out infinite;
+  box-shadow: 0 0 4px 1px color-mix(in srgb, var(--gold-star) var(--a-60), transparent);
+}
+
+@keyframes sparkleFloat {
+  0% {
+    transform: translate(-50%, -50%) rotate(var(--angle)) translateY(0) scale(0);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+    transform: translate(-50%, -50%) rotate(var(--angle)) translateY(calc(var(--distance) * -0.3)) scale(1);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(var(--angle)) translateY(calc(var(--distance) * -1)) scale(0);
+    opacity: 0;
+  }
+}
+
+/* ── Main card ── */
+.celebration-card {
+  position: relative;
+  background: color-mix(in srgb, var(--bg-cosmic-void) var(--a-95), transparent);
+  border: 1px solid color-mix(in srgb, var(--gold-star) var(--a-25), transparent);
+  border-radius: 1.25rem;
+  padding: 2.5rem 2rem 2rem;
+  text-align: center;
+  max-width: 380px;
+  width: 90%;
+  cursor: default;
+
+  /* Triple-layer golden glow */
+  box-shadow:
+    0 0 40px color-mix(in srgb, var(--gold-star) var(--a-15), transparent),
+    0 0 80px color-mix(in srgb, var(--gold-star) var(--a-08), transparent),
+    0 20px 60px color-mix(in srgb, black var(--a-40), transparent);
+
+  /* Entrance animation */
+  opacity: 0;
+  transform: scale(0.85) translateY(20px);
+  transition: opacity 0.5s ease 0.15s, transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s;
+}
+
+.celebration-card.visible {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
+/* ── Decorative top accent line ── */
+.celebration-accent {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 2px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--gold-star) 30%,
+    var(--gold-star) 70%,
+    transparent 100%);
+  border-radius: 1px;
+  opacity: 0.7;
+}
+
+/* ── Achievement icon ── */
+.celebration-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 1.25rem;
+  color: var(--gold-star);
+  filter: drop-shadow(0 0 12px color-mix(in srgb, var(--gold-star) var(--a-50), transparent));
+  animation: iconGlow 3s ease-in-out infinite;
+}
+
+.celebration-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes iconGlow {
+  0%, 100% { filter: drop-shadow(0 0 12px color-mix(in srgb, var(--gold-star) var(--a-50), transparent)); }
+  50% { filter: drop-shadow(0 0 20px color-mix(in srgb, var(--gold-star) var(--a-70), transparent)); }
+}
+
+/* ── Typography ── */
+.celebration-card h2 {
+  color: var(--gold-star);
+  margin: 0 0 0.5rem;
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-shadow: 0 0 20px color-mix(in srgb, var(--gold-star) var(--a-40), transparent);
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+}
+
+.celebration-constellation-name {
+  color: color-mix(in srgb, white var(--a-95), transparent);
+  font-size: 1.15rem;
+  margin: 0 0 0.5rem;
+  font-weight: 500;
+  font-style: italic;
+  letter-spacing: 0.02em;
+}
+
+.celebration-description {
+  color: color-mix(in srgb, white var(--a-60), transparent);
+  font-size: 0.9rem;
+  margin: 0 0 1.25rem;
+  line-height: 1.5;
+}
+
+/* ── Divider ── */
+.celebration-divider {
+  width: 40%;
+  height: 1px;
+  margin: 0 auto 1.25rem;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--gold-star) var(--a-30), transparent) 50%,
+    transparent 100%);
+}
+
+/* ── Voting power reward ── */
+.celebration-reward {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  margin: 0 auto 1.5rem;
+  background: color-mix(in srgb, var(--gold-star) var(--a-08), transparent);
+  border: 1px solid color-mix(in srgb, var(--gold-star) var(--a-20), transparent);
+  border-radius: 0.75rem;
+  max-width: 280px;
+  animation: rewardAppear 0.5s ease 0.6s both;
+}
+
+@keyframes rewardAppear {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.reward-icon {
+  width: 28px;
+  height: 28px;
+  color: var(--gold-star);
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--gold-star) var(--a-40), transparent));
+}
+
+.reward-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.reward-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1rem;
+}
+
+.reward-label {
+  font-size: 0.78rem;
+  color: color-mix(in srgb, white var(--a-60), transparent);
+  letter-spacing: 0.03em;
+}
+
+.reward-value-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.reward-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--gold-star);
+  text-shadow: 0 0 10px color-mix(in srgb, var(--gold-star) var(--a-30), transparent);
+}
+
+.reward-total {
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, white var(--a-50), transparent);
+  font-feature-settings: "tnum";
+}
+
+/* ── Tier transition (Listener → Voice, Voice → Council) ── */
+.celebration-tier-transition {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.85rem 1.25rem;
+  margin: 0 auto 1.25rem;
+  max-width: 320px;
+  border-radius: 0.75rem;
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--gold-star) var(--a-12), transparent) 0%,
+    color-mix(in srgb, var(--gold-star) var(--a-06), transparent) 100%);
+  border: 1px solid color-mix(in srgb, var(--gold-star) var(--a-30), transparent);
+  text-align: center;
+  animation: rewardAppear 0.6s ease 0.85s both;
+}
+
+.celebration-tier-transition.tier-council {
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--gold-star) var(--a-22), transparent) 0%,
+    color-mix(in srgb, var(--gold-star) var(--a-10), transparent) 100%);
+  border-color: color-mix(in srgb, var(--gold-star) var(--a-45), transparent);
+  box-shadow: 0 0 24px color-mix(in srgb, var(--gold-star) var(--a-15), transparent);
+}
+
+.tier-transition-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--gold-star);
+  text-shadow: 0 0 12px color-mix(in srgb, var(--gold-star) var(--a-30), transparent);
+}
+
+.tier-transition-desc {
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: color-mix(in srgb, white var(--a-65), transparent);
+  max-width: 280px;
+}
+
+/* ── Voting opens note ── */
+.celebration-voting-note {
+  margin: 0 auto 1.1rem;
+  font-size: 0.78rem;
+  font-style: italic;
+  color: color-mix(in srgb, white var(--a-50), transparent);
+  text-align: center;
+  max-width: 320px;
+}
+
+/* ── Action group ── */
+.celebration-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.celebration-link {
+  background: transparent;
+  border: 0;
+  padding: 0.45rem 1rem;
+  color: color-mix(in srgb, var(--gold-star) var(--a-80), white);
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--gold-star) var(--a-30), transparent);
+  text-underline-offset: 3px;
+  transition: color 0.2s ease, text-decoration-color 0.2s ease;
+  min-height: 44px;
+}
+
+.celebration-link:hover {
+  color: var(--gold-star);
+  text-decoration-color: var(--gold-star);
+}
+
+.celebration-link:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--gold-star) var(--a-60), transparent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ── Button ── */
+.celebration-button {
+  padding: 0.65rem 2rem;
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--gold-star) var(--a-20), transparent) 0%,
+    color-mix(in srgb, var(--gold-star) var(--a-12), transparent) 100%);
+  border: 1px solid color-mix(in srgb, var(--gold-star) var(--a-35), transparent);
+  border-radius: 2rem;
+  color: var(--gold-star);
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  letter-spacing: 0.02em;
+}
+
+/* 44px touch target */
+.celebration-button::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 44px;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.celebration-button:hover {
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--gold-star) var(--a-30), transparent) 0%,
+    color-mix(in srgb, var(--gold-star) var(--a-18), transparent) 100%);
+  box-shadow: 0 0 16px color-mix(in srgb, var(--gold-star) var(--a-20), transparent);
+}
+
+/* ── Mobile ── */
+@media (max-width: 768px) {
+  .celebration-card {
+    padding: 2rem 1.5rem 1.5rem;
+    max-width: 320px;
+  }
+
+  .celebration-card h2 {
+    font-size: 1.35rem;
+  }
+
+  .celebration-constellation-name {
+    font-size: 1rem;
+  }
+
+  .celebration-icon {
+    width: 52px;
+    height: 52px;
+  }
+
+  .celebration-light-burst {
+    width: 350px;
+    height: 350px;
+  }
+
+  .celebration-reward {
+    padding: 0.6rem 1rem;
+  }
+}
+
+/* ── Accessibility ── */
+@media (prefers-reduced-motion: reduce) {
+  .completion-celebration-overlay {
+    transition: opacity 0.3s ease;
+  }
+
+  .celebration-card {
+    transition: opacity 0.3s ease;
+    transform: none !important;
+  }
+
+  .sparkle-particle {
+    animation: none;
+    display: none;
+  }
+
+  .celebration-icon {
+    animation: none;
+  }
+
+  .celebration-reward {
+    animation: none;
+  }
+}

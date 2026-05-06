@@ -1,0 +1,51 @@
+name: Content Suggestion
+description: Suggest a new figure, council topic, factcheck correction, or content improvement
+labels: ["content"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Help us improve the content in Agora Cosmica. Whether it's a new figure suggestion, a historical correction, or a council topic idea, we appreciate your input.
+
+  - type: dropdown
+    id: type
+    attributes:
+      label: Type of Suggestion
+      options:
+        - New figure suggestion
+        - Historical correction (factcheck)
+        - Council topic idea
+        - Story improvement
+        - Translation correction
+        - Other content
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Describe your suggestion in detail.
+      placeholder: "I noticed that... / It would be great to add..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: sources
+    attributes:
+      label: Sources
+      description: If suggesting a correction or new figure, please include academic or authoritative sources.
+      placeholder: "According to [Book/Paper/Source]..."
+    validations:
+      required: false
+
+  - type: dropdown
+    id: language
+    attributes:
+      label: Which language does this apply to?
+      options:
+        - English
+        - German
+        - Both
+    validations:
+      required: true

@@ -1,0 +1,32 @@
+# Cloudflare Worker — Community Tally
+# Anonymous heartbeat for voting power. Aggregates community size + total power.
+# No PII, no analytics. Privacy-aligned with "Ohne Tracking" promise.
+
+name = "agora-cosmica-community"
+main = "src/index.ts"
+compatibility_date = "2026-01-06"
+workers_dev = false
+preview_urls = false
+
+# KV Namespace for device records, aggregate snapshot, and IP rate-limit.
+# Create with:  wrangler kv:namespace create COMMUNITY_KV
+# Then paste the IDs below.
+[[kv_namespaces]]
+binding = "COMMUNITY_KV"
+id = "b7358aa6fab34491a9aaabbeeb6c1952"
+preview_id = "982ed34aa62941d4ac1081813f04ab32"
+
+[vars]
+ALLOWED_ORIGINS = "https://agoracosmica.org,https://www.agoracosmica.org"
+
+# Secrets (set via wrangler secret put):
+# - IP_SALT      (openssl rand -hex 32) — rotated quarterly to prevent long-term tracking
+
+# Routes (uncomment after DNS setup)
+# [[routes]]
+# pattern = "community.agoracosmica.org/*"
+# zone_name = "agoracosmica.org"
+
+[dev]
+port = 8789
+local_protocol = "http"

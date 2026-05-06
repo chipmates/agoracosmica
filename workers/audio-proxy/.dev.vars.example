@@ -1,0 +1,7 @@
+# Copy to .dev.vars and fill in real values
+AUDIO_API_KEY=your-bearer-token-here
+
+# Origin verification token (must match nginx X-Origin-Verify check on FSN1+NBG1).
+# Generate with: openssl rand -hex 32
+# Set on Worker: wrangler secret put ORIGIN_VERIFY_KEY
+ORIGIN_VERIFY_KEY=your-origin-verify-token-here

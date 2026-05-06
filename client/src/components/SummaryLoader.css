@@ -1,0 +1,438 @@
+/* Enhanced Cosmic Loader with premium design elements from the Cosmic Design System */
+
+/* Main overlay container - fixed position that covers entire viewport */
+.cosmic-loader-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: var(--z-overlay); /* 9999 */
+  pointer-events: all;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--bg-primary) var(--a-97), transparent), color-mix(in srgb, var(--bg-card) var(--a-95), transparent));
+  backdrop-filter: blur(var(--glass-blur-heavy));
+  animation: fadeIn 0.5s var(--animation-entrance);
+  overflow: hidden;
+}
+
+/* Floating cosmic particles */
+.cosmic-particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.cosmic-particle {
+  position: absolute;
+  border-radius: 50%;
+  background-color: color-mix(in srgb, var(--text-primary) var(--a-70), transparent);
+  box-shadow: 0 0 10px 2px color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent);
+  animation: floatParticle var(--transition-cosmic) var(--animation-orbital) infinite;
+  transform: scale(0);
+}
+
+/* Nebula background effects */
+.cosmic-nebula {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.cosmic-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(40px);
+  opacity: 0.2;
+  animation: pulseOrb 15s ease-in-out infinite;
+}
+
+.orb-1 {
+  background: radial-gradient(circle at center, var(--gold-light), var(--gold-base));
+  width: 300px;
+  height: 300px;
+  top: 30%;
+  left: 20%;
+  animation-delay: 0s;
+}
+
+.orb-2 {
+  background: radial-gradient(circle at center, var(--coral-light), var(--coral-base));
+  width: 250px;
+  height: 250px;
+  bottom: 20%;
+  right: 25%;
+  animation-delay: 5s;
+}
+
+.orb-3 {
+  background: radial-gradient(circle at center, var(--nebula-teal), var(--ethereal-purple));
+  width: 200px;
+  height: 200px;
+  top: 15%;
+  right: 20%;
+  animation-delay: 8s;
+}
+
+/* Main content card */
+.cosmic-loader-content {
+  position: relative;
+  z-index: var(--z-base); /* 10 */
+  width: 90%;
+  max-width: 500px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  animation: appearScale 0.6s var(--animation-entrance) backwards;
+  border-width: 1px;
+  border-style: solid;
+  border-image: linear-gradient(
+    to bottom right, 
+    color-mix(in srgb, var(--gold-subtle) var(--a-60), transparent), 
+    color-mix(in srgb, var(--mode-quest) var(--a-10), transparent)
+  ) 1;
+  box-shadow: 
+    0 10px 30px color-mix(in srgb, var(--utility-pure-black) var(--a-20), transparent),
+    0 0 15px color-mix(in srgb, var(--gold-subtle) var(--a-15), transparent);
+}
+
+/* Icon container with complex animations */
+.cosmic-loader-icon-container {
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+
+.cosmic-loader-icon {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.book-icon {
+  position: relative;
+  color: var(--gold-base);
+  filter: drop-shadow(0 0 5px color-mix(in srgb, var(--gold-subtle) var(--a-50), transparent));
+  animation: pulseIcon 2s ease-in-out infinite;
+  z-index: var(--z-base); /* 2 */
+}
+
+.spinning-circles {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+
+.circle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  box-sizing: border-box;
+}
+
+.circle-1 {
+  border-top-color: var(--gold-base);
+  animation: spinCircle 3s linear infinite;
+}
+
+.circle-2 {
+  width: 75%;
+  height: 75%;
+  top: 12.5%;
+  left: 12.5%;
+  border-right-color: var(--coral-base);
+  animation: spinCircle 2s linear infinite reverse;
+}
+
+.circle-3 {
+  width: 50%;
+  height: 50%;
+  top: 25%;
+  left: 25%;
+  border-bottom-color: var(--nebula-teal);
+  animation: spinCircle 1.5s linear infinite;
+}
+
+/* Decorative sparkles */
+.cosmic-sparkles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.sparkle {
+  position: absolute;
+  color: var(--gold-light);
+  filter: drop-shadow(0 0 3px color-mix(in srgb, var(--gold-subtle) var(--a-80), transparent));
+}
+
+.sparkle-1 {
+  top: -5px;
+  right: 0px;
+  animation: twinkle 2s ease-in-out infinite;
+}
+
+.sparkle-2 {
+  bottom: 10px;
+  left: -5px;
+  animation: twinkle 2.3s ease-in-out infinite 0.7s;
+}
+
+.sparkle-3 {
+  top: 50%;
+  right: -8px;
+  animation: twinkle 2.5s ease-in-out infinite 1.3s;
+}
+
+/* Text content styles */
+.cosmic-loader-text {
+  text-align: center;
+  width: 100%;
+}
+
+.cosmic-loader-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.2rem;
+  margin: 0 0 16px 0;
+  color: var(--gold-base);
+  text-shadow: 0 0 10px color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent);
+  letter-spacing: 0.5px;
+}
+
+.cosmic-loader-subtitle-container {
+  position: relative;
+}
+
+.cosmic-loader-subtitle {
+  font-size: 0.9rem;
+  margin: 0 0 14px 0;
+  line-height: 1.5;
+  color: var(--space-white);
+  opacity: 0.9;
+  animation: fadeTextChange 4s ease-in-out infinite;
+  min-height: 3em;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+.cosmic-loader-overlay .figure-name {
+  color: var(--coral-light);
+  font-weight: 500;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  margin-right: 0.3em;
+  display: inline-block;
+  max-width: 90%;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+/* Progress bar */
+.cosmic-progress-bar {
+  width: 100%;
+  margin-top: 16px;
+}
+
+.cosmic-progress-track {
+  height: 4px;
+  width: 100%;
+  background: color-mix(in srgb, var(--text-primary) var(--a-10), transparent);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+
+.cosmic-progress-fill {
+  position: absolute;
+  height: 100%;
+  width: 30%;
+  background: linear-gradient(to right, var(--gold-base), var(--coral-base));
+  border-radius: 2px;
+  animation: progressMove 2.5s ease-in-out infinite;
+}
+
+/* Animation keyframes */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes appearScale {
+  from { 
+    opacity: 0; 
+    transform: scale(0.9);
+  }
+  to { 
+    opacity: 1; 
+    transform: scale(1);
+  }
+}
+
+@keyframes spinCircle {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulseIcon {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+@keyframes twinkle {
+  0%, 100% { 
+    opacity: 0.2; 
+    transform: scale(0.8);
+  }
+  50% { 
+    opacity: 1; 
+    transform: scale(1.2);
+  }
+}
+
+@keyframes floatParticle {
+  0% {
+    transform: scale(0) translate(0, 0);
+  }
+  25% {
+    transform: scale(1) translate(10px, -10px);
+  }
+  50% {
+    transform: scale(0.8) translate(20px, 0);
+  }
+  75% {
+    transform: scale(0.6) translate(10px, 10px);
+  }
+  100% {
+    transform: scale(0) translate(0, 0);
+  }
+}
+
+@keyframes progressMove {
+  0% {
+    left: -30%;
+  }
+  50% {
+    left: 100%;
+  }
+  100% {
+    left: -30%;
+  }
+}
+
+@keyframes pulseOrb {
+  0%, 100% {
+    opacity: 0.15;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.25;
+    transform: scale(1.2);
+  }
+}
+
+@keyframes fadeTextChange {
+  0%, 20% {
+    opacity: 1;
+  }
+  25%, 30% {
+    opacity: 0.7;
+  }
+  35%, 100% {
+    opacity: 1;
+  }
+}
+
+/* Mobile optimization */
+@media (max-width: 600px) {
+  .cosmic-loader-content {
+    width: 95%;
+    padding: 20px;
+    gap: 16px;
+  }
+
+  .cosmic-loader-icon-container {
+    width: 60px;
+    height: 60px;
+  }
+
+  .cosmic-loader-title {
+    font-size: 1rem;
+    margin-bottom: 12px;
+  }
+
+  .cosmic-loader-subtitle {
+    font-size: 0.9rem;
+    min-height: 4em;
+  }
+}
+
+/* Accessibility considerations */
+@media (prefers-reduced-motion: reduce) {
+  .cosmic-loader-overlay,
+  .cosmic-loader-content,
+  .cosmic-particle,
+  .cosmic-orb,
+  .circle,
+  .sparkle,
+  .book-icon,
+  .cosmic-progress-fill {
+    animation: none !important;
+    transition: none !important;
+  }
+  
+  .cosmic-progress-fill {
+    width: 70%;
+    left: 0;
+  }
+  
+  .cosmic-loader-subtitle {
+    min-height: auto;
+  }
+}
+
+@media (forced-colors: active) {
+  .cosmic-loader-content {
+    border: 2px solid ButtonText;
+  }
+  
+  .book-icon,
+  .sparkle,
+  .cosmic-loader-title {
+    color: Highlight;
+  }
+  
+  .circle-1,
+  .circle-2,
+  .circle-3 {
+    border-color: ButtonText;
+  }
+  
+  .cosmic-progress-fill {
+    background: Highlight;
+  }
+}

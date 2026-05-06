@@ -1,0 +1,1165 @@
+/* Star - balanced size for refined look */
+.star {
+  position: absolute;
+  /* Standard base star size for desktop */
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background: color-mix(in srgb, white 95%, transparent);
+  will-change: transform, box-shadow;
+  z-index: var(--z-base); /* 2 */
+  box-shadow: 0 0 4px 1px color-mix(in srgb, var(--gold-star) 50%, transparent);
+  /* Add new properties for all stars */
+  border: 1px solid transparent;
+  /* Ensure stars are properly centered */
+  margin-left: -4px; /* Negative half of width */
+  margin-top: -4px; /* Negative half of height */
+}
+
+/* Enhanced touch target for all stars - invisible but clickable */
+.star::after {
+  content: '';
+  position: absolute;
+  width: 44px; /* Apple's minimum touch target */
+  height: 44px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  z-index: 1; /* Just above star itself */
+  /* Debug: uncomment to see touch targets */
+  /* background: color-mix(in srgb, red 10%, transparent); */
+}
+
+/* Ripple animation */
+@keyframes ripple {
+  0% {
+    transform: scale(0.1);
+    opacity: 0.8;
+  }
+  70% {
+    transform: scale(3);
+    opacity: 0.2;
+  }
+  100% {
+    transform: scale(5);
+    opacity: 0;
+  }
+}
+
+/* Simple hover effect with high z-index to bring tooltip above everything */
+.star:hover {
+  transform: scale(1.15);
+  z-index: 3000; /* Explicit high value above header and other elements */
+  position: relative; /* Maintain positioning context */
+}
+
+/* Gathered main star styling - golden white with crisp edges */
+.star.gathered {
+  /* Instead of scaling, use absolute sizing */
+  width: 10px; /* Slightly larger gathered stars */
+  height: 10px;
+  background: var(--gold-star); /* Solid gold core */
+  border: 1px solid white; /* White border */
+  box-shadow: 
+    0 0 4px 1px var(--gold-star),
+    0 0 8px 3px color-mix(in srgb, var(--gold-star) 95%, transparent),
+    0 0 12px 5px color-mix(in srgb, var(--gold-star) 80%, transparent);
+  animation: none;
+  /* Improved rendering quality */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* No transform - it causes positioning issues */
+  transform: none;
+  /* Lower z-index to prevent overlapping with content */
+  z-index: var(--z-base); /* 5 */
+  /* Critical positioning adjustments for perfect centering */
+  position: absolute;
+  /* Center it perfectly on the point */
+  margin-left: -5px; /* Negative half of width */
+  margin-top: -5px; /* Negative half of height */
+}
+
+/* Special styling for constellation points - now matching non-constellation gathered stars */
+.star.constellation-point.gathered {
+  /* Inherit all properties from .star.gathered for consistency */
+  width: 8px ; /* Same as all gathered stars */
+  height: 8px ;
+  background: var(--gold-star);
+  border: 1px solid var(--text-primary);
+  box-shadow: 
+    0 0 6px 2px var(--gold-star),      /* Pure gold */
+    0 0 12px 5px color-mix(in srgb, var(--gold-star) 95%, transparent),  /* Slightly lighter gold */
+    0 0 20px 8px color-mix(in srgb, var(--gold-deep) 90%, transparent),  /* Goldenrod */
+    0 0 35px 15px color-mix(in srgb, var(--gold-deep) 80%, transparent); /* Dark goldenrod */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  animation: gentleGlow var(--pulse-duration) infinite ease-in-out;
+  transform: none;
+  z-index: var(--z-base); /* 5 */
+  position: absolute;
+  margin-left: -4px ; /* Negative half of width */
+  margin-top: -4px ; /* Negative half of height */
+  filter: brightness(1.2);
+}
+
+/* Cosmic Eggs - Large and unmistakable against cosmic background */
+.star:not(.gathered) {
+  /* Much larger for clear visibility and egg recognition */
+  width: 18px;      /* Significantly larger for visibility */
+  height: 24px;     /* 1:1.33 ratio - dramatic egg proportions */
+  margin-left: -9px;
+  margin-top: -12px;
+  
+  /* True egg curvature - wider bottom, tapered top */
+  border-radius: 40% 40% 60% 60% / 35% 35% 65% 65%;
+  
+  /* High-contrast egg lighting for visibility against cosmic background */
+  background: 
+    /* Bright surface highlight - much more prominent */
+    radial-gradient(ellipse 35% 25% at 35% 25%, 
+      rgba(255,255,255,1) 0%, rgba(255,255,255,0.7) 40%, transparent 80%),
+    /* Enhanced shell volume with stronger contrast */
+    radial-gradient(ellipse 85% 90% at 40% 30%,
+      color-mix(in srgb, white 95%, var(--star-blue-light)) 0%,
+      color-mix(in srgb, white 80%, var(--star-blue-medium)) 30%,
+      color-mix(in srgb, white 40%, var(--star-blue-medium)) 60%,
+      color-mix(in srgb, var(--star-blue-medium) 60%, transparent) 100%),
+    /* Stronger shadow base */
+    linear-gradient(135deg, transparent 50%, 
+      color-mix(in srgb, var(--star-blue-dark) 50%, transparent));
+  
+  /* Enhanced dimensional shadows and tighter, more visible outer glow */
+  box-shadow: 
+    inset -3px -4px 6px color-mix(in srgb, var(--star-blue-dark) 35%, transparent), /* Deeper shell depth */
+    inset 2px 2px 4px rgba(255,255,255,0.7),                                        /* Brighter highlight */
+    0 3px 8px color-mix(in srgb, black 25%, transparent),                           /* Stronger drop shadow */
+    0 0 8px 2px color-mix(in srgb, var(--star-blue-light) 70%, transparent);       /* Smaller but much more opaque outer glow */
+  
+  /* No animation - beautiful static cosmic eggs */
+  
+  opacity: 0.95;
+  z-index: var(--z-base); /* 2 */
+}
+
+/* Disable the white glow overlay for the golden next-seed egg */
+.star.next-seed:not(.gathered)::before {
+  display: none;
+}
+
+/* Next ungathered seed - solid golden egg to stand out from white ones */
+.star.next-seed:not(.gathered) {
+  width: 12px;
+  height: 14px;
+  margin-left: -6px;
+  margin-top: -7px;
+  border-radius: 45% 45% 50% 50%;
+  background: var(--gold-subtle);
+  border: 1px solid rgba(212, 175, 55, 0.6);
+  opacity: 1;
+  z-index: var(--z-base);
+  box-shadow:
+    0 0 8px 2px rgba(212, 175, 55, 0.5),
+    0 0 16px 5px rgba(212, 175, 55, 0.2);
+  animation: none;
+}
+
+/* Radiating rings container */
+.radiate-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: -1; /* Behind the star */
+}
+
+/* Individual radiating rings */
+.radiate-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 30px;
+  height: 30px;
+  border: 2px solid rgba(212, 175, 55, 0.85);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  animation: radiate-golden 8s ease-in-out infinite;
+  animation-play-state: paused;
+}
+
+/* Stagger the rings for gentle wave effect */
+.radiate-ring:nth-child(1) { 
+  animation-delay: 0s; 
+}
+.radiate-ring:nth-child(2) { 
+  animation-delay: 2s; /* Increased from 1s */
+}
+.radiate-ring:nth-child(3) { 
+  animation-delay: 4s; /* Increased from 2s */
+}
+
+/* Calm radiating animation - 8 second cycle */
+@keyframes radiate-golden {
+  0% {
+    transform: translate(-50%, -50%) scale(0.3);
+    opacity: 0;
+    border-width: 3px;
+    border-color: rgba(212, 175, 55, 0.9);
+  }
+  15% {
+    opacity: 0.8;
+  }
+  60% {
+    transform: translate(-50%, -50%) scale(2.2);
+    opacity: 0.4;
+    border-width: 2px;
+    border-color: rgba(212, 175, 55, 0.7);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(3);
+    opacity: 0;
+    border-width: 1px;
+    border-color: rgba(212, 175, 55, 0.3);
+  }
+}
+
+/* Performance optimization: only add will-change when animating */
+.map-container.visible .radiate-ring {
+  will-change: transform, opacity;
+}
+
+/* Battery saver mode - reduce animation complexity */
+@media (prefers-reduced-motion: reduce), 
+       (prefers-reduced-data: reduce) {
+  .radiate-ring {
+    animation: radiate-simple 8s ease-in-out infinite;
+  }
+  
+  @keyframes radiate-simple {
+    0%, 100% { opacity: 0; }
+    50% { opacity: 0.4; }
+  }
+}
+
+/* Low battery mode - disable non-essential animations */
+body.low-battery .radiate-ring {
+  animation: none;
+  display: none;
+}
+
+/* Activate animations when map is visible */
+.map-container.visible .star.next-seed:not(.gathered) {
+  animation-play-state: running;
+}
+
+.map-container.visible .radiate-ring {
+  animation-play-state: running;
+}
+
+/* Breathing animation for next seed */
+@keyframes breathe {
+  0%, 100% { 
+    transform: scale(1); 
+    box-shadow: 
+      0 0 20px 5px color-mix(in srgb, white 30%, transparent),
+      0 0 40px 10px color-mix(in srgb, var(--gold-star) 20%, transparent);
+  }
+  50% { 
+    transform: scale(1.15); 
+    box-shadow: 
+      0 0 30px 8px color-mix(in srgb, white 50%, transparent),
+      0 0 50px 15px color-mix(in srgb, var(--gold-star) 30%, transparent);
+  }
+}
+
+/* Activate animation only when map is visible */
+.map-container.visible .star.next-seed:not(.gathered) {
+  animation-play-state: running;
+}
+
+/* Star container for additional effects */
+.star::before {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Create additional glow layer for depth */
+.star::before {
+  width: 300%;
+  height: 300%;
+  top: -100%;
+  left: -100%;
+  opacity: 0.5;
+  background: radial-gradient(
+    circle at center,
+    color-mix(in srgb, white 90%, transparent) 0%,
+    color-mix(in srgb, var(--gold-star) 60%, transparent) 20%,
+    color-mix(in srgb, var(--gold-subtle) 30%, transparent) 40%,
+    transparent 80%
+  );
+  pointer-events: none;
+}
+
+/* Solid centered glow for gathered stars */
+.star.gathered::before {
+  opacity: 1;
+  background: radial-gradient(
+    circle at center,
+    var(--gold-star) 25%,      /* Solid gold center - larger solid area */
+    color-mix(in srgb, var(--gold-star) 90%, transparent) 50%,    /* Almost solid gold middle */
+    color-mix(in srgb, var(--gold-star) 70%, transparent) 75%,    /* Slightly fading gold */
+    transparent 100%               /* Transparent edge */
+  );
+  filter: none;                    /* No blur filter for crisp edges */
+  width: 250%;                     /* Smaller, more contained glow */
+  height: 250%;
+  top: -75%;
+  left: -75%;
+  /* Remove any animation */
+  animation: none;
+}
+
+/* Star ripple container for feedback animation */
+.star-ripple-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.star.gathered:active .star-ripple-container::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: color-mix(in srgb, var(--gold-subtle) 40%, transparent);
+  animation: ripple var(--ripple-duration) ease-out forwards;
+}
+
+/* Main stars with gathered state */
+.star.gathered.main-star {
+  /* Match styling for all gathered stars */
+  width: 8px ;
+  height: 8px ;
+  background: var(--gold-star);
+  border: 1px solid var(--text-primary);
+  box-shadow: 
+    0 0 6px 2px var(--gold-star),      /* Pure gold */
+    0 0 12px 5px color-mix(in srgb, var(--gold-star) 95%, transparent),  /* Slightly lighter gold */
+    0 0 20px 8px color-mix(in srgb, var(--gold-deep) 90%, transparent),  /* Goldenrod */
+    0 0 35px 15px color-mix(in srgb, var(--gold-deep) 80%, transparent); /* Dark goldenrod */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  animation: gentleGlow var(--pulse-duration) infinite ease-in-out;
+  transform: none;
+  z-index: var(--z-base); /* 5 */
+  position: absolute;
+  margin-left: -4px ; /* Negative half of width */
+  margin-top: -4px ; /* Negative half of height */
+  filter: brightness(1.2);
+}
+
+/* Make sure all gathered stars have the same animation */
+.star.gathered {
+  animation: gentleGlow var(--pulse-duration) infinite ease-in-out;
+  animation-play-state: paused; /* Battery optimization */
+}
+
+/* Activate gathered star animations only when visible */
+.map-container.visible .star.gathered {
+  animation-play-state: running;
+}
+
+/* Activate radiating rays animation when visible */
+.map-container.visible .star.gathered::before {
+  animation-play-state: running;
+}
+
+/* Inner cosmic essence - MUCH larger golden yolk */
+.star:not(.gathered)::before {
+  content: '';
+  position: absolute;
+  width: 14px;      /* Much larger - dominates the egg interior */
+  height: 18px;     /* Proportionally larger */
+  left: 50%;
+  top: 55%;         /* Slightly lower - yolk settles in real eggs */
+  transform: translate(-50%, -50%);
+  
+  /* Inner egg-yolk shape */
+  border-radius: 45% 45% 55% 55% / 40% 40% 60% 60%;
+  
+  /* White/gray cosmic essence - elegant and non-competing */
+  background: radial-gradient(ellipse 80% 90% at 40% 35%,
+    color-mix(in srgb, white 95%, var(--text-primary)) 0%,       /* Bright white-gray center */
+    color-mix(in srgb, white 80%, transparent) 30%,              /* Strong white core */
+    color-mix(in srgb, white 50%, transparent) 60%,              /* Extended white body */
+    color-mix(in srgb, white 20%, transparent) 80%,              /* White aura */
+    color-mix(in srgb, white 5%, transparent) 95%,               /* Gentle fade edge */
+    transparent 100%
+  );
+  
+  /* Static inner essence - no animation */
+  opacity: 0.9;
+  z-index: -1; /* Behind the shell */
+}
+
+/* Static cosmic eggs - no animations needed */
+
+/* Animation keyframes removed - static cosmic eggs preferred */
+
+/* Future position highlight removed - cosmic eggs are clear enough */
+
+/* pulse-future animation removed - static dotted lines preferred */
+
+/* Hover effect for cosmic eggs - dramatic awakening energy */
+.star:hover:not(.gathered) {
+  transform: scale(1.1); /* More noticeable scale for larger eggs */
+  z-index: 3000; /* Explicit high value above header and other elements */
+  position: relative; /* Maintain positioning context */
+  
+  /* Enhanced shell luminosity - no golden hints */
+  box-shadow: 
+    inset -4px -5px 8px color-mix(in srgb, var(--star-blue-dark) 40%, transparent), /* Much deeper shell depth */
+    inset 3px 3px 6px rgba(255,255,255,0.8),                                        /* Very bright highlight */
+    0 4px 12px color-mix(in srgb, black 30%, transparent),                          /* Strong drop shadow */
+    0 0 12px 4px color-mix(in srgb, var(--star-blue-light) 80%, transparent);      /* Clean blue-white glow only */
+}
+
+/* Inner essence becomes more prominent on hover */
+.star:hover:not(.gathered)::before {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1.05);
+  
+  /* Enhanced white brightness on hover */
+  background: radial-gradient(ellipse 80% 90% at 40% 35%,
+    white 0%,                                                     /* Pure white center */
+    color-mix(in srgb, white 90%, transparent) 25%,              /* Very bright white core */
+    color-mix(in srgb, white 60%, transparent) 55%,              /* Enhanced white body */
+    color-mix(in srgb, white 25%, transparent) 75%,              /* Stronger white aura */
+    color-mix(in srgb, white 8%, transparent) 90%,               /* Enhanced fade edge */
+    transparent 100%
+  );
+}
+
+/* Organic Sunburst - Gathered stars as living cosmic light sources */
+.star.gathered {
+  /* Core sunburst appearance */
+  width: 10px;
+  height: 10px;
+  margin-left: -5px;
+  margin-top: -5px;
+  
+  /* Radial gradient creating inner light */
+  background: radial-gradient(circle,
+    white 0%,                                                    /* Pure brilliant center */
+    var(--gold-star) 20%,                                       /* Golden core */
+    color-mix(in srgb, var(--gold-star) 80%, transparent) 60%,  /* Fading gold */
+    transparent 100%);
+  
+  border-radius: 50%;
+  border: none; /* Remove any border artifacts */
+  
+  /* Multi-layer warmth and depth */
+  box-shadow: 
+    0 0 4px 1px white,                                          /* White core brilliance */
+    0 0 8px 2px var(--gold-star),                              /* Golden inner glow */
+    0 0 16px 4px color-mix(in srgb, var(--gold-star) 70%, transparent),  /* Warm middle */
+    0 0 24px 8px color-mix(in srgb, var(--gold-star) 40%, transparent),  /* Outer warmth */
+    0 0 32px 12px color-mix(in srgb, var(--gold-star) 20%, transparent); /* Gentle aura */
+  
+  /* Very subtle gentle glow - no breathing animation */
+  animation: gentleGlow 8s ease-in-out infinite;
+  animation-play-state: paused; /* Battery optimization */
+  
+  z-index: var(--z-base); /* 5 */
+  filter: brightness(1.1) saturate(1.1);
+}
+
+/* Very subtle gentle glow - stable and peaceful */
+@keyframes gentleGlow {
+  0%, 100% { 
+    filter: brightness(1.1) saturate(1.1);
+    opacity: 1;
+  }
+  50% { 
+    filter: brightness(1.15) saturate(1.05);
+    opacity: 0.95;
+  }
+}
+
+/* Radiating light rays - subtle cosmic energy */
+.star.gathered::before {
+  content: '';
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  
+  /* Subtle radiating rays using conic gradient */
+  background: 
+    conic-gradient(from 0deg, 
+      transparent 0deg, 
+      color-mix(in srgb, var(--gold-star) 25%, transparent) 30deg,
+      transparent 60deg,
+      color-mix(in srgb, var(--gold-star) 20%, transparent) 90deg,
+      transparent 120deg,
+      color-mix(in srgb, var(--gold-star) 25%, transparent) 150deg,
+      transparent 180deg,
+      color-mix(in srgb, var(--gold-star) 20%, transparent) 210deg,
+      transparent 240deg,
+      color-mix(in srgb, var(--gold-star) 25%, transparent) 270deg,
+      transparent 300deg,
+      color-mix(in srgb, var(--gold-star) 20%, transparent) 330deg,
+      transparent 360deg);
+  
+  border-radius: 50%;
+  animation: slowRotate 25s linear infinite;
+  animation-play-state: paused; /* Battery optimization */
+  opacity: 0.3; /* Much more subtle */
+  z-index: -1; /* Behind the main star */
+}
+
+/* Gentle rotation for radiating rays */
+@keyframes slowRotate {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Subtle hover effect for gathered stars */
+.star.gathered:hover {
+  transform: scale(1.08);
+  filter: brightness(1.2) saturate(1.15);
+  z-index: 3000; /* Explicit high value above header and other elements */
+  position: relative; /* Maintain positioning context */
+  
+  /* Gentle enhanced glow on hover */
+  box-shadow: 
+    0 0 5px 1px white,
+    0 0 10px 2px var(--gold-star),
+    0 0 18px 5px color-mix(in srgb, var(--gold-star) 65%, transparent),
+    0 0 26px 8px color-mix(in srgb, var(--gold-star) 35%, transparent),
+    0 0 34px 12px color-mix(in srgb, var(--gold-star) 15%, transparent);
+}
+
+/* Star tooltip - matches HelperPopup gold standard */
+.star-tooltip {
+  position: absolute;
+  bottom: 150%;
+  left: 50%;
+  transform: translateX(-50%);
+
+  /* Near-solid background — blocks star glow bleed-through */
+  background: color-mix(in srgb, var(--bg-cosmic-void) var(--a-95), transparent);
+
+  /* Consistent padding and shape */
+  padding: 20px;
+  border-radius: 1rem;
+
+  /* Text handling */
+  white-space: normal;
+  pointer-events: none;
+  opacity: 0;
+
+  /* Smooth transition without pulsing */
+  transition: opacity 0.25s ease-out, transform 0.25s ease-out;
+
+  /* Soft golden accent border */
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-25), transparent);
+
+  /* Consistent font */
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.9rem;
+  color: color-mix(in srgb, white var(--a-90), transparent);
+
+  /* High z-index to ensure visibility */
+  z-index: 3001; /* Above everything including header */
+
+  /* Triple-layer glow (HelperPopup standard) */
+  box-shadow:
+    0 0 40px color-mix(in srgb, var(--gold-subtle) var(--a-15), transparent),
+    0 0 80px color-mix(in srgb, var(--gold-subtle) var(--a-08), transparent),
+    0 20px 60px color-mix(in srgb, black var(--a-40), transparent);
+
+  /* Size constraints */
+  min-width: 220px;
+  max-width: 350px;
+  text-align: left;
+  word-wrap: break-word;
+}
+
+/* Tooltip sections */
+.star-tooltip strong {
+  display: block;
+  color: var(--gold-subtle);
+  margin: 0 0 8px;
+  font-size: 1.1rem;
+  letter-spacing: 0.02em;
+  text-shadow: 0 0 10px color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent);
+  font-weight: 600;
+}
+
+.tooltip-symbolism {
+  margin-top: 8px;
+  line-height: 1.4;
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  color: color-mix(in srgb, white var(--a-90), transparent);
+  font-size: 0.9rem;
+  text-shadow: 0 0 2px color-mix(in srgb, black var(--a-30), transparent);
+}
+
+.tooltip-status {
+  margin-top: 8px;
+  font-size: 0.85rem;
+  color: color-mix(in srgb, white var(--a-70), transparent);
+  font-style: italic;
+  text-shadow: 0 0 2px color-mix(in srgb, black var(--a-30), transparent);
+}
+
+/* Tooltip arrow matching solid background */
+.star-tooltip::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid color-mix(in srgb, var(--bg-cosmic-void) var(--a-95), transparent);
+  filter: drop-shadow(0 2px 4px color-mix(in srgb, black var(--a-20), transparent));
+}
+
+.star:hover .star-tooltip {
+  opacity: 1;
+  transform: translateX(-50%) scale(1) translateY(-8px); /* Clean lift without pulsing */
+}
+
+/* Portal-based tooltip - Same design but rendered at document root */
+.star-tooltip-portal {
+  /* Near-solid background — blocks star glow bleed-through */
+  background: color-mix(in srgb, var(--bg-cosmic-void) var(--a-95), transparent);
+
+  /* Consistent padding and shape */
+  padding: 20px;
+  border-radius: 1rem;
+
+  /* Soft golden accent border */
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-25), transparent);
+
+  /* Consistent font */
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.9rem;
+  color: color-mix(in srgb, white var(--a-90), transparent);
+
+  /* Triple-layer glow (HelperPopup standard) */
+  box-shadow:
+    0 0 40px color-mix(in srgb, var(--gold-subtle) var(--a-15), transparent),
+    0 0 80px color-mix(in srgb, var(--gold-subtle) var(--a-08), transparent),
+    0 20px 60px color-mix(in srgb, black var(--a-40), transparent);
+
+  /* Size constraints */
+  min-width: 220px;
+  max-width: 350px;
+  text-align: left;
+  word-wrap: break-word;
+  white-space: normal;
+
+  /* Pointer events for portal */
+  pointer-events: none;
+}
+
+/* Portal tooltip sections */
+.star-tooltip-portal strong {
+  display: block;
+  color: var(--gold-subtle);
+  margin: 0 0 8px;
+  font-size: 1.1rem;
+  letter-spacing: 0.02em;
+  text-shadow: 0 0 10px color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent);
+  font-weight: 600;
+}
+
+.star-tooltip-portal .tooltip-symbolism {
+  margin-top: 8px;
+  line-height: 1.4;
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  color: color-mix(in srgb, white var(--a-90), transparent);
+  font-size: 0.9rem;
+  text-shadow: 0 0 2px color-mix(in srgb, black var(--a-30), transparent);
+}
+
+.star-tooltip-portal .tooltip-status {
+  margin-top: 8px;
+  font-size: 0.85rem;
+  color: color-mix(in srgb, white var(--a-70), transparent);
+  font-style: italic;
+  text-shadow: 0 0 2px color-mix(in srgb, black var(--a-30), transparent);
+}
+
+/* Portal tooltip arrow */
+.star-tooltip-portal::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid color-mix(in srgb, var(--bg-cosmic-void) var(--a-95), transparent);
+  filter: drop-shadow(0 2px 4px color-mix(in srgb, black var(--a-20), transparent));
+}
+
+/* Gathered star tooltips inherit the same solid background */
+
+/* Mobile responsiveness */
+@media(max-width:1023px) {
+  /* Tablet cosmic eggs - maintain strong visibility */
+  .star:not(.gathered) { 
+    width: 15px;      /* Still large enough to be clearly visible as eggs */
+    height: 20px;     /* Maintain 1:1.33 egg ratio */
+    margin-left: -7.5px;
+    margin-top: -10px;
+  }
+  
+  /* Inner cosmic essence for tablet - larger yolk */
+  .star:not(.gathered)::before {
+    width: 12px;
+    height: 15px;
+    top: 55%; /* Maintain yolk position */
+  }
+  
+  /* Next seed on tablet */
+  .star.next-seed:not(.gathered) {
+    width: 10px ;
+    height: 10px ;
+    margin-left: -5px ;
+    margin-top: -5px ;
+    border-width: 1.5px;
+  }
+  
+  /* Adjust radiating rings for tablet */
+  .radiate-ring {
+    width: 25px;
+    height: 25px;
+  }
+  
+  /* Organic Sunburst for tablet - slightly smaller but same design */
+  .star.gathered,
+  .star.gathered.main-star,
+  .star.constellation-point.gathered {
+    width: 8px;
+    height: 8px;
+    margin-left: -4px;
+    margin-top: -4px;
+    
+    /* Maintain radial gradient on tablet */
+    background: radial-gradient(circle,
+      white 0%,
+      var(--gold-star) 22%,
+      color-mix(in srgb, var(--gold-star) 75%, transparent) 65%,
+      transparent 100%);
+    
+    /* Slightly reduced glow for tablet */
+    box-shadow: 
+      0 0 3px 1px white,
+      0 0 6px 2px var(--gold-star),
+      0 0 12px 4px color-mix(in srgb, var(--gold-star) 65%, transparent),
+      0 0 18px 6px color-mix(in srgb, var(--gold-star) 35%, transparent),
+      0 0 24px 8px color-mix(in srgb, var(--gold-star) 15%, transparent);
+  }
+  
+  /* Tablet radiating rays */
+  .star.gathered::before,
+  .star.gathered.main-star::before,
+  .star.constellation-point.gathered::before {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+@media(max-width:768px) {
+  /* Mobile cosmic eggs - maintain visibility even on small screens */
+  .star:not(.gathered) {
+    width: 12px;      /* Large enough to clearly read as egg on mobile */
+    height: 16px;     /* Maintain 1:1.33 egg ratio */
+    margin-left: -6px;
+    margin-top: -8px;
+  }
+  
+  /* Inner cosmic essence for mobile - larger yolk */
+  .star:not(.gathered)::before {
+    width: 10px;
+    height: 13px;
+    top: 55%; /* Maintain yolk position */
+  }
+  
+  /* Next seed on mobile - more prominent */
+  .star.next-seed:not(.gathered) {
+    width: 8px ;
+    height: 8px ;
+    margin-left: -4px ;
+    margin-top: -4px ;
+    border-width: 1px;
+    /* Simplify glow for mobile performance */
+    box-shadow: 
+      0 0 15px 4px color-mix(in srgb, white 40%, transparent),
+      0 0 25px 8px color-mix(in srgb, var(--gold-star) 25%, transparent);
+  }
+  
+  /* Adjust radiating rings for mobile */
+  .radiate-ring {
+    width: 20px;
+    height: 20px;
+    border-width: 1.5px;
+  }
+  
+  /* Override with simpler animation for mobile - same calm 8s timing */
+  .radiate-ring {
+    animation-duration: 8s; /* Keep same calm timing */
+  }
+  
+  /* Only 2 rings on mobile for better performance */
+  .radiate-ring:nth-child(3) {
+    display: none;
+  }
+  
+  /* Organic Sunburst for mobile - compact but beautiful */
+  .star.gathered,
+  .star.gathered.main-star,
+  .star.constellation-point.gathered {
+    width: 7px;
+    height: 7px;
+    margin-left: -3.5px;
+    margin-top: -3.5px;
+    
+    /* Maintain organic radial gradient on mobile */
+    background: radial-gradient(circle,
+      white 0%,
+      var(--gold-star) 25%,
+      color-mix(in srgb, var(--gold-star) 70%, transparent) 70%,
+      transparent 100%);
+    
+    /* Optimized glow for mobile performance */
+    box-shadow: 
+      0 0 2px 1px white,
+      0 0 4px 1px var(--gold-star),
+      0 0 8px 3px color-mix(in srgb, var(--gold-star) 60%, transparent),
+      0 0 14px 5px color-mix(in srgb, var(--gold-star) 30%, transparent);
+  }
+  
+  /* Mobile radiating rays - smaller and more efficient */
+  .star.gathered::before,
+  .star.gathered.main-star::before,
+  .star.constellation-point.gathered::before {
+    width: 16px;
+    height: 16px;
+    opacity: 0.2; /* Very subtle for mobile */
+  }
+  
+  /* Adjust tooltip for touch */
+  .star-tooltip {
+    padding: 8px 10px;
+    font-size: 0.8rem;
+    min-width: 140px;
+  }
+}
+
+/* Celestial eggs complete - twinkle animation replaced with innerLife */
+
+/* Accessibility - cosmic eggs are already static, no changes needed */
+@media(prefers-reduced-motion:reduce) {
+  /* Cosmic eggs are already static by default - no motion to reduce */
+  
+  /* Static gathered stars */
+  .star.gathered {
+    animation: none;
+    box-shadow: 
+      0 0 4px 1px white,
+      0 0 8px 2px var(--gold-star),
+      0 0 16px 4px color-mix(in srgb, var(--gold-star) 70%, transparent),
+      0 0 24px 8px color-mix(in srgb, var(--gold-star) 40%, transparent);
+  }
+  
+  /* Disable radiating rays animation */
+  .star.gathered::before {
+    animation: none;
+    opacity: 0.2;
+  }
+
+  /* Disable bloom scintillation */
+  .star.bloom-level {
+    animation: none !important;
+  }
+}
+
+
+/* ================================================================
+   SELECTED STAR — Pulsing ring indicator for active selection.
+   Uses outline so it doesn't override bloom box-shadow or size.
+   ================================================================ */
+
+.star.star-selected {
+  z-index: 10;
+}
+
+/* Bloom stars keep their scintillation, selected adds the ring pulse */
+.star.bloom-level.star-selected {
+  z-index: 10;
+}
+
+@keyframes selectedPulse {
+  0%, 100% {
+    outline-color: color-mix(in srgb, var(--gold-star) 70%, transparent);
+    outline-offset: 4px;
+  }
+  50% {
+    outline-color: color-mix(in srgb, var(--gold-star) 40%, transparent);
+    outline-offset: 7px;
+  }
+}
+
+/* Activate selected pulse when map is visible */
+.map-container.visible .star.star-selected {
+  animation-play-state: running;
+}
+
+/* ================================================================
+   PRISMATIC BLOOM — Multi-Level Star Gamification
+   Level = count of completed modes (Story, Wisdom, Prism, Quest).
+   Each level adds a colored glow ring. Scintillation animation.
+   Sizes kept small to preserve constellation readability.
+   ================================================================ */
+
+/* L1: Story ring only — first awakening */
+.star.bloom-level-1,
+.star.main-star.bloom-level-1,
+.star.constellation-point.bloom-level-1 {
+  width: 12px;
+  height: 12px;
+  margin-left: -6px;
+  margin-top: -6px;
+  border-radius: 50%;
+  border: none;
+  background: radial-gradient(circle,
+    white 0%, var(--gold-star) 35%, transparent 100%);
+  box-shadow:
+    0 0 3px 1px white,
+    0 0 5px 2px var(--mode-story),
+    0 0 10px 3px color-mix(in srgb, var(--mode-story) 50%, transparent),
+    0 0 16px 5px color-mix(in srgb, var(--mode-story) 20%, transparent);
+  animation: none; /* L1 stays static */
+  filter: brightness(1.05);
+}
+.star.bloom-level-1::before,
+.star.main-star.bloom-level-1::before,
+.star.constellation-point.bloom-level-1::before {
+  width: 180%;
+  height: 180%;
+  top: -40%;
+  left: -40%;
+  background: radial-gradient(circle,
+    color-mix(in srgb, var(--mode-story) 30%, transparent) 0%,
+    transparent 70%);
+  opacity: 0.35;
+  animation: none;
+}
+
+/* L2: +Wisdom ring */
+.star.bloom-level-2,
+.star.main-star.bloom-level-2,
+.star.constellation-point.bloom-level-2 {
+  width: 15px;
+  height: 15px;
+  margin-left: -7.5px;
+  margin-top: -7.5px;
+  border-radius: 50%;
+  border: none;
+  background: radial-gradient(circle,
+    white 0%, var(--gold-star) 30%, transparent 100%);
+  box-shadow:
+    0 0 3px 1px white,
+    0 0 5px 2px var(--mode-story),
+    0 0 8px 3px color-mix(in srgb, var(--mode-story) 45%, transparent),
+    0 0 12px 4px color-mix(in srgb, var(--mode-wisdom) 50%, transparent),
+    0 0 18px 6px color-mix(in srgb, var(--mode-wisdom) 20%, transparent);
+  animation: bloomScintillate 18s linear infinite;
+  animation-play-state: paused;
+  filter: brightness(1.05);
+}
+.star.bloom-level-2::before,
+.star.main-star.bloom-level-2::before,
+.star.constellation-point.bloom-level-2::before {
+  width: 200%;
+  height: 200%;
+  top: -50%;
+  left: -50%;
+  background: radial-gradient(circle,
+    color-mix(in srgb, var(--mode-story) 22%, transparent) 0%,
+    color-mix(in srgb, var(--mode-wisdom) 15%, transparent) 50%,
+    transparent 75%);
+  opacity: 0.3;
+  animation: none;
+}
+
+/* L3: +Prism ring */
+.star.bloom-level-3,
+.star.main-star.bloom-level-3,
+.star.constellation-point.bloom-level-3 {
+  width: 18px;
+  height: 18px;
+  margin-left: -9px;
+  margin-top: -9px;
+  border-radius: 50%;
+  border: none;
+  background: radial-gradient(circle,
+    white 0%, var(--gold-star) 25%, transparent 100%);
+  box-shadow:
+    0 0 3px 1px white,
+    0 0 5px 2px var(--mode-story),
+    0 0 8px 3px color-mix(in srgb, var(--mode-story) 40%, transparent),
+    0 0 11px 3px color-mix(in srgb, var(--mode-wisdom) 45%, transparent),
+    0 0 15px 4px color-mix(in srgb, var(--mode-wisdom) 25%, transparent),
+    0 0 19px 5px color-mix(in srgb, var(--mode-prism) 45%, transparent),
+    0 0 24px 7px color-mix(in srgb, var(--mode-prism) 18%, transparent);
+  animation: bloomScintillate 15s linear infinite;
+  animation-play-state: paused;
+  filter: brightness(1.08);
+}
+.star.bloom-level-3::before,
+.star.main-star.bloom-level-3::before,
+.star.constellation-point.bloom-level-3::before {
+  width: 220%;
+  height: 220%;
+  top: -60%;
+  left: -60%;
+  background: radial-gradient(circle,
+    color-mix(in srgb, var(--mode-story) 18%, transparent) 0%,
+    color-mix(in srgb, var(--mode-wisdom) 12%, transparent) 35%,
+    color-mix(in srgb, var(--mode-prism) 10%, transparent) 60%,
+    transparent 80%);
+  opacity: 0.25;
+  animation: none;
+}
+
+/* L4: Complete — all 4 color rings, chromatic halo */
+.star.bloom-level-4,
+.star.main-star.bloom-level-4,
+.star.constellation-point.bloom-level-4 {
+  width: 21px;
+  height: 21px;
+  margin-left: -10.5px;
+  margin-top: -10.5px;
+  border-radius: 50%;
+  border: none;
+  background: radial-gradient(circle,
+    white 0%, white 10%, var(--gold-star) 28%, transparent 100%);
+  box-shadow:
+    0 0 3px 1px white,
+    0 0 6px 2px var(--mode-story),
+    0 0 9px 3px color-mix(in srgb, var(--mode-story) 40%, transparent),
+    0 0 12px 3px color-mix(in srgb, var(--mode-wisdom) 45%, transparent),
+    0 0 16px 4px color-mix(in srgb, var(--mode-wisdom) 25%, transparent),
+    0 0 20px 5px color-mix(in srgb, var(--mode-prism) 40%, transparent),
+    0 0 24px 6px color-mix(in srgb, var(--mode-prism) 20%, transparent),
+    0 0 28px 7px color-mix(in srgb, var(--mode-quest) 40%, transparent),
+    0 0 34px 9px color-mix(in srgb, var(--mode-quest) 14%, transparent);
+  animation: bloomScintillateRadiant 15s linear infinite;
+  animation-play-state: paused;
+  filter: brightness(1.1);
+}
+.star.bloom-level-4::before,
+.star.main-star.bloom-level-4::before,
+.star.constellation-point.bloom-level-4::before {
+  width: 250%;
+  height: 250%;
+  top: -75%;
+  left: -75%;
+  background: radial-gradient(circle,
+    color-mix(in srgb, var(--mode-story) 15%, transparent) 0%,
+    color-mix(in srgb, var(--mode-wisdom) 10%, transparent) 30%,
+    color-mix(in srgb, var(--mode-prism) 8%, transparent) 55%,
+    color-mix(in srgb, var(--mode-quest) 6%, transparent) 75%,
+    transparent 90%);
+  opacity: 0.2;
+  animation: none;
+}
+
+/* Activate bloom animations when map is visible */
+.map-container.visible .star.bloom-level {
+  animation-play-state: running;
+}
+
+/* Bloom scintillation — irregular micro-brightness like a real star */
+@keyframes bloomScintillate {
+  0%   { filter: brightness(1.05); }
+  7%   { filter: brightness(1.14); }
+  13%  { filter: brightness(1.06); }
+  22%  { filter: brightness(1.18); }
+  30%  { filter: brightness(1.07); }
+  38%  { filter: brightness(1.15); }
+  47%  { filter: brightness(1.05); }
+  55%  { filter: brightness(1.12); }
+  63%  { filter: brightness(1.19); }
+  71%  { filter: brightness(1.06); }
+  80%  { filter: brightness(1.16); }
+  88%  { filter: brightness(1.07); }
+  95%  { filter: brightness(1.15); }
+  100% { filter: brightness(1.05); }
+}
+
+/* Stronger scintillation for L4 — fully complete star */
+@keyframes bloomScintillateRadiant {
+  0%   { filter: brightness(1.1); }
+  7%   { filter: brightness(1.22); }
+  13%  { filter: brightness(1.11); }
+  22%  { filter: brightness(1.26); }
+  30%  { filter: brightness(1.12); }
+  38%  { filter: brightness(1.24); }
+  47%  { filter: brightness(1.1); }
+  55%  { filter: brightness(1.18); }
+  63%  { filter: brightness(1.28); }
+  71%  { filter: brightness(1.11); }
+  80%  { filter: brightness(1.22); }
+  88%  { filter: brightness(1.12); }
+  95%  { filter: brightness(1.24); }
+  100% { filter: brightness(1.1); }
+}
+
+/* Bloom responsive — tablet */
+@media(max-width:1023px) {
+  .star.bloom-level-1 { width: 10px; height: 10px; margin-left: -5px; margin-top: -5px; }
+  .star.bloom-level-2 { width: 12px; height: 12px; margin-left: -6px; margin-top: -6px; }
+  .star.bloom-level-3 { width: 14px; height: 14px; margin-left: -7px; margin-top: -7px; }
+  .star.bloom-level-4 { width: 16px; height: 16px; margin-left: -8px; margin-top: -8px; }
+}
+
+/* Bloom responsive — mobile */
+@media(max-width:768px) {
+  .star.bloom-level-1 { width: 7px; height: 7px; margin-left: -3.5px; margin-top: -3.5px; }
+  .star.bloom-level-2 { width: 8px; height: 8px; margin-left: -4px; margin-top: -4px; }
+  .star.bloom-level-3 { width: 10px; height: 10px; margin-left: -5px; margin-top: -5px; }
+  .star.bloom-level-4 { width: 11px; height: 11px; margin-left: -5.5px; margin-top: -5.5px; }
+}

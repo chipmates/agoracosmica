@@ -1,0 +1,83 @@
+# ─────────────────────────────────────────────────────────────
+#  Agora Cosmica
+#  Conventions: lowercase paths; one rule per line; sectioned;
+#  negations only where strictly needed.
+# ─────────────────────────────────────────────────────────────
+
+# ── OS & editor ────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
+*.swo
+**/.claude/settings.local.json
+
+# ── Dependencies ───────────────────────────────────────────
+node_modules/
+.pnpm-store/
+
+# ── Build output ───────────────────────────────────────────
+dist/
+build/
+out/
+.vite/
+*.tsbuildinfo
+
+# ── Test artifacts ─────────────────────────────────────────
+coverage/
+.nyc_output/
+playwright-report/
+test-results/
+*.test.log
+
+# ── Logs & runtime ─────────────────────────────────────────
+*.log
+logs/
+*.pid
+*.pid.lock
+
+# ── Cache ──────────────────────────────────────────────────
+.cache/
+.eslintcache
+.stylelintcache
+.turbo/
+
+# ── Cloudflare Wrangler ────────────────────────────────────
+.wrangler/
+
+# ── Environment & secrets ──────────────────────────────────
+.env
+.env.*
+!.env.example
+!.env.*.example
+.dev.vars
+*.pem
+*.key
+secrets/
+
+# ── Local-only media (served from R2 in production) ────────
+# Pull with: pnpm setup:assets
+# Note: use /* (glob) not / (directory) where negations are needed below,
+# so git can traverse into the directory and re-include specific files.
+client/src/assets/audio/
+client/src/assets/stories/*
+client/src/assets/councils/*
+client/src/assets/prisms/*
+client/src/assets/initial-messages/
+client/src/assets/figures/originals/
+client/src/assets/figures/full/
+client/src/assets/figures/thumbnails/
+client/src/assets/backgrounds/originals/
+client/src/assets/backgrounds/processed/
+client/src/assets/icons/originals/
+client/src/assets/icons/processed/
+client/src/assets/ui/originals/
+client/src/assets/ui/processed/
+client/src/assets/music*.webm
+client/public/assets/
+
+# ── Keep manifest stubs even when parent is ignored ────────
+!**/.gitkeep
+!client/src/assets/councils/councilCatalog.json

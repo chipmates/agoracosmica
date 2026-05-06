@@ -1,0 +1,270 @@
+/* PeekingFAB.css - Revolutionary mobile navigation */
+
+.peeking-fab {
+  position: fixed;
+  left: 0;
+  top: 50%;
+  width: 48px;
+  height: 48px;
+  z-index: var(--z-sidebar); /* 1000 */
+
+  /* Liquid glass aesthetic */
+  background: color-mix(in srgb, var(--glass-bg-light) 85%, var(--gold-subtle) 15%);
+  backdrop-filter: blur(var(--glass-blur-max));
+  -webkit-backdrop-filter: blur(var(--glass-blur-max));
+  border: 1px solid var(--glass-border-light);
+  border-radius: 0 24px 24px 0; /* Flat left edge */
+
+  box-shadow:
+    4px 0 12px rgba(0, 0, 0, 0.1),
+    inset 1px 0 1px rgba(255, 255, 255, 0.2);
+
+  /* Spring physics for natural movement */
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  will-change: transform;
+
+  /* Prevent selection during interaction */
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+
+  /* Initial hidden state — partially visible (about half the pill) */
+  transform: translateX(-24px) translateY(-50%);
+}
+
+/* Invisible hit-area extension — generous tap zone since the left strip
+   has no other UI. Visible pill stays small; touch target stays comfortable. */
+.peeking-fab::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  right: -28px;
+  bottom: -10px;
+  left: 0;
+}
+
+/* Profile content container */
+.peeking-fab-content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 0 24px 24px 0;
+  position: relative;
+}
+
+/* User avatar */
+.peeking-fab-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
+
+/* User initial fallback (kept for avatar variants) */
+.peeking-fab-initial {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: linear-gradient(135deg, var(--gold-subtle), var(--gold-vibrant));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Hamburger icon (default) — universal "menu" cue for older users */
+.peeking-fab-icon {
+  color: var(--gold-primary);
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.25));
+  /* Nudge right so the peek-translated pill doesn't clip the icon's left edge */
+  transform: translateX(3px);
+}
+
+/* State: Peeking (idle discovery) */
+.peeking-fab.peeking {
+  transform: translateX(-16px) translateY(-50%);
+}
+
+/* State: Attention (bouncing animation) */
+.peeking-fab.attention {
+  animation: fab-bounce 2s ease-in-out infinite;
+  animation-play-state: paused; /* Controlled via JS */
+}
+
+.peeking-fab.attention:not(.dragging) {
+  animation-play-state: running;
+}
+
+@keyframes fab-bounce {
+  0%, 100% {
+    transform: translateX(-16px) translateY(-50%);
+    box-shadow:
+      4px 0 12px rgba(0, 0, 0, 0.1),
+      inset 1px 0 1px rgba(255, 255, 255, 0.2);
+  }
+  50% {
+    transform: translateX(-8px) translateY(-50%);
+    box-shadow:
+      6px 0 16px rgba(0, 0, 0, 0.15),
+      inset 1px 0 2px rgba(255, 255, 255, 0.3);
+  }
+}
+
+/* State: Visible (fully revealed) */
+.peeking-fab.visible {
+  transform: translateX(0) translateY(-50%);
+}
+
+/* State: Dragging (user interaction) */
+.peeking-fab.dragging {
+  transition: none;
+  cursor: grabbing;
+}
+
+/* Hover state for non-touch devices */
+@media (hover: hover) {
+  .peeking-fab:hover {
+    transform: translateX(4px) translateY(-50%);
+    box-shadow:
+      0 0 16px color-mix(in srgb, var(--gold-subtle) 20%, transparent),
+      6px 0 16px rgba(0, 0, 0, 0.15),
+      inset 1px 0 2px rgba(255, 255, 255, 0.3);
+  }
+  
+  .peeking-fab:hover .peeking-fab-content {
+    transform: scale(1.05);
+  }
+}
+
+/* Active/pressed state */
+.peeking-fab:active {
+  transform: translateX(-2px) translateY(-50%) scale(0.95);
+}
+
+/* One-time discovery hint */
+.peeking-fab-hint {
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-left: 8px;
+  padding: 6px 12px;
+  background: var(--glass-bg-dark);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border-light);
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.peeking-fab-hint.visible {
+  opacity: 1;
+}
+
+/* Focus state for accessibility */
+.peeking-fab:focus {
+  outline: none;
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--gold-subtle) 40%, transparent),
+    4px 0 12px rgba(0, 0, 0, 0.1),
+    inset 1px 0 1px rgba(255, 255, 255, 0.2);
+}
+
+/* Accessibility: Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .peeking-fab {
+    animation: none !important;
+    transition: transform 0.2s ease !important;
+  }
+  
+  .peeking-fab-content {
+    transition: none !important;
+  }
+  
+  @keyframes fab-bounce {
+    0%, 100% { 
+      transform: translateX(-16px) translateY(-50%);
+    }
+  }
+}
+
+/* Battery saver mode */
+[data-battery-saver="true"] .peeking-fab.attention {
+  animation-play-state: paused;
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .peeking-fab {
+    border: 2px solid ButtonText;
+    background: ButtonFace;
+  }
+  
+  .peeking-fab-initial {
+    color: ButtonText;
+    -webkit-text-fill-color: ButtonText;
+  }
+  
+  .peeking-fab-hint {
+    border: 2px solid ButtonText;
+    background: Canvas;
+    color: CanvasText;
+  }
+}
+
+/* Bottom position variant (for thumb reach optimization) */
+.peeking-fab.bottom-position {
+  top: auto;
+  bottom: 80px;
+  transform: translateX(-24px) translateY(0);
+}
+
+.peeking-fab.bottom-position.peeking {
+  transform: translateX(-16px) translateY(0);
+}
+
+.peeking-fab.bottom-position.visible {
+  transform: translateX(0) translateY(0);
+}
+
+/* Landscape orientation adjustments */
+@media (orientation: landscape) and (max-height: 500px) {
+  .peeking-fab {
+    top: 30%;
+    height: 48px;
+    width: 48px;
+  }
+  
+  .peeking-fab-initial {
+    font-size: 20px;
+  }
+}
+
+/* iOS safe area handling */
+@supports (left: env(safe-area-inset-left)) {
+  .peeking-fab {
+    margin-left: env(safe-area-inset-left);
+  }
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+  .peeking-fab {
+    background: color-mix(in srgb, var(--glass-bg-dark) 95%, var(--gold-subtle) 5%);
+    border-color: var(--glass-border-dark);
+  }
+
+  .peeking-fab-hint {
+    background: var(--glass-bg-darker);
+    border-color: var(--glass-border-dark);
+  }
+}

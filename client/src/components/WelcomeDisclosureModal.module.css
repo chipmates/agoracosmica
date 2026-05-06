@@ -1,0 +1,1030 @@
+/* WelcomeDisclosureModal.module.css - Welcome modal with cosmic scene and AI disclosure */
+
+.welcomeOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: color-mix(in srgb, var(--bg-cosmic-void) var(--a-95), transparent);
+  backdrop-filter: blur(var(--glass-blur-heavy));
+  z-index: var(--z-overlay); /* 9999 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.welcomeModal {
+  position: relative;
+  background: linear-gradient(135deg,
+    var(--bg-cosmic-void) 0%,
+    var(--bg-card) 50%,
+    var(--bg-highlight) 100%);
+  border-radius: 1.5rem;
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-60), transparent);
+  box-shadow:
+    0 0 20px color-mix(in srgb, var(--gold-subtle) var(--a-10), transparent),
+    0 10px 40px color-mix(in srgb, black var(--a-30), transparent);
+  max-width: 700px;
+  width: 100%;
+  max-height: 90vh;
+  overflow: hidden;
+  animation: slideIn 0.4s ease-out;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Subtle top highlight for depth */
+.welcomeModal::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: linear-gradient(to bottom,
+    color-mix(in srgb, white var(--a-08), transparent) 0%,
+    transparent 100%);
+  border-radius: 1.5rem 1.5rem 0 0;
+  pointer-events: none;
+  z-index: var(--z-base);
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modalHeader {
+  padding: 1.75rem 2rem 0.5rem;
+  text-align: center;
+  position: relative;
+  z-index: var(--z-base);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.125rem;
+  flex-shrink: 0;
+}
+
+/* Title row — title with logo floating top-right */
+.titleRow {
+  position: relative;
+  display: inline-block;
+}
+
+/* Logo container — positioned above-right of title, like login page */
+.logoContainer {
+  position: absolute;
+  top: -20px;
+  right: -28px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 32px;
+  height: 32px;
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--gold-subtle) var(--a-50), transparent));
+  animation: logoGlow 4s ease-in-out 3 alternate;
+}
+
+@keyframes logoGlow {
+  0% {
+    filter: drop-shadow(0 0 10px color-mix(in srgb, var(--gold-subtle) var(--a-40), transparent));
+    transform: scale(1);
+  }
+  100% {
+    filter: drop-shadow(0 0 20px color-mix(in srgb, var(--gold-subtle) var(--a-60), transparent));
+    transform: scale(1.05);
+  }
+}
+
+.welcomeLogo {
+  width: 100%;
+  height: 100%;
+}
+
+/* DESIGN SYSTEM: 3 sizes only
+   Hero:  1.875rem  — title
+   Body:  1rem — all readable text
+   Meta:  0.8125rem — trust signals, attribution
+*/
+
+.modalTitle {
+  color: var(--gold-subtle);
+  font-size: 1.875rem;
+  font-weight: 600;
+  margin: 0;
+  font-family: 'Space Grotesk', var(--font-ui);
+  letter-spacing: 1px;
+  text-shadow:
+    0 0 15px color-mix(in srgb, var(--gold-subtle) var(--a-50), transparent),
+    0 2px 4px color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent);
+  background: linear-gradient(to right,
+    var(--gold-subtle),
+    color-mix(in srgb, var(--gold-subtle) 80%, white),
+    var(--gold-subtle));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 200% 100%;
+  animation: shineText 4s linear 1;
+}
+
+@keyframes shineText {
+  0% { background-position: -100% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Subtitle — platform tagline, tight to title, gold like login page */
+.modalSubtitle {
+  color: color-mix(in srgb, var(--gold-subtle) var(--a-80), transparent);
+  font-size: 1.125rem;
+  font-style: italic;
+  margin: 0;
+  line-height: 1.4;
+  font-family: var(--font-secondary, 'Crimson Text', Georgia, serif);
+  letter-spacing: 0.3px;
+}
+
+.modalContent {
+  padding: 1rem 2rem 2rem;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+.modalContent:focus-visible {
+  outline: 2px solid var(--gold-subtle);
+  outline-offset: -2px;
+}
+
+.modalActions {
+  padding: 1.5rem 0 0.5rem;
+  display: flex;
+  justify-content: center;
+}
+
+.welcomeContent {
+  text-align: center;
+}
+
+/* Explainer — flowing prose with warm glow */
+.explainer {
+  position: relative;
+  text-align: center;
+  margin: 0 auto 1.25rem;
+  max-width: 440px;
+  padding: 0.75rem 0.5rem;
+  opacity: 0;
+  animation: fadeInExplainer 0.8s ease-out 0.3s forwards;
+}
+
+@keyframes fadeInExplainer {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Warm radial glow behind the text block */
+.explainerGlow {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  width: 130%;
+  height: 160%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(
+    ellipse at center,
+    color-mix(in srgb, var(--gold-subtle) var(--a-12), transparent) 0%,
+    color-mix(in srgb, var(--gold-subtle) var(--a-05), transparent) 40%,
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+.explainerBody {
+  position: relative;
+  z-index: 1;
+  color: color-mix(in srgb, white var(--a-75), transparent);
+  font-size: 1rem;
+  line-height: 1.7;
+  margin: 0 0 0.625rem;
+}
+
+.highlight {
+  color: var(--gold-subtle);
+  font-weight: 600;
+}
+
+.explainerMission {
+  position: relative;
+  z-index: 1;
+  color: var(--mode-wisdom);
+  font-size: 1rem;
+  font-style: italic;
+  margin: 0 0 0.5rem;
+  line-height: 1.4;
+  font-family: var(--font-secondary, 'Crimson Text', Georgia, serif);
+}
+
+/* Campbell reveal - Pure CSS animation with delay (after value prop items) */
+.campbellReveal {
+  opacity: 0;
+  animation: fadeInCampbell 0.8s ease-out forwards;
+  animation-delay: 1.5s;
+}
+
+@keyframes fadeInCampbell {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Campbell Scene */
+.cosmicScene {
+  position: relative;
+  height: 180px;
+  margin: 0 0 1rem;
+  overflow: hidden;
+  border-radius: 16px;
+  box-shadow: none;
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--bg-cosmic-void) var(--a-95), transparent) 0%,
+    color-mix(in srgb, var(--bg-card) var(--a-85), transparent) 50%,
+    color-mix(in srgb, var(--bg-highlight) var(--a-80), transparent) 100%);
+}
+
+.nebulaBackground {
+  position: absolute;
+  inset: 0;
+  will-change: transform, opacity;
+  contain: strict;
+  background:
+    radial-gradient(circle at 40% 50%,
+      color-mix(in srgb, var(--gold-subtle) var(--a-20), transparent),
+      transparent 60%),
+    radial-gradient(circle at 60% 50%,
+      color-mix(in srgb, var(--mode-wisdom) var(--a-15), transparent),
+      transparent 60%);
+  filter: blur(15px);
+  opacity: 0.8;
+  transform-origin: center;
+  animation: guideNebulaBreathing 10s ease-in-out infinite alternate;
+}
+
+@keyframes guideNebulaBreathing {
+  0% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1.1);
+    opacity: 0.7;
+  }
+}
+
+.figureContainer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: var(--z-base);
+}
+
+.silhouetteWrapper {
+  flex: 0 0 auto;
+  width: 145px;
+  height: 145px;
+  position: relative;
+  margin-right: 15px;
+}
+
+.silhouette {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 125px;
+  height: 125px;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 0 10px color-mix(in srgb, black var(--a-20), transparent);
+  border: 2px solid var(--gold-subtle);
+  z-index: var(--z-base);
+  animation: wisdomBreathing 6s ease-in-out infinite;
+  animation-delay: 3s;
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.silhouette:hover {
+  border-color: color-mix(in srgb, var(--gold-subtle) 80%, white);
+  box-shadow:
+    0 0 25px color-mix(in srgb, var(--mode-wisdom) var(--a-50), transparent),
+    inset 0 0 20px color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent);
+}
+
+.silhouette:hover .guideImage {
+  filter: brightness(1.15) saturate(1.1);
+}
+
+@keyframes wisdomBreathing {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+    filter: brightness(0.9);
+    box-shadow: 0 0 10px color-mix(in srgb, black var(--a-20), transparent);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.03);
+    filter: brightness(1.05);
+    box-shadow: 0 0 15px color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent);
+  }
+}
+
+.guideImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.1);
+  transition: filter 0.3s ease;
+}
+
+/* Campbell Quote Section */
+.campbellQuote {
+  flex: 1;
+  color: var(--text-primary);
+  padding: 12px 15px;
+  margin: 0;
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--bg-cosmic-void) var(--a-70), transparent) 0%,
+    color-mix(in srgb, black var(--a-60), transparent) 100%);
+  border-radius: 12px;
+  border-left: 3px solid var(--gold-subtle);
+  backdrop-filter: blur(var(--glass-blur-light));
+  max-width: 65%;
+  box-shadow: 0 2px 8px color-mix(in srgb, black var(--a-15), transparent);
+}
+
+.quoteContent {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 5px;
+}
+
+.quoteMark {
+  color: var(--gold-subtle);
+  font-size: 24px;
+  line-height: 1;
+  margin-right: 3px;
+  font-family: Georgia, serif;
+}
+
+.quoteMark.closing {
+  margin-left: 3px;
+  margin-right: 0;
+}
+
+.quoteText {
+  font-size: 1rem;
+  font-style: italic;
+  line-height: 1.5;
+  color: var(--text-primary);
+  font-family: var(--font-secondary, 'Crimson Text', Georgia, serif);
+}
+
+.quoteAttribution {
+  font-size: 0.8125rem;
+  text-align: right;
+  color: var(--gold-subtle);
+  margin-top: 8px;
+  font-weight: 500;
+}
+
+.quoteAttribution cite {
+  font-style: normal;
+}
+
+/* Trust Signals — meta size, gold tint */
+.trustSignals {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: color-mix(in srgb, var(--gold-subtle) var(--a-70), transparent);
+  font-size: 0.875rem; /* 14px — one step above meta/caption floor */
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+
+.trustIcon {
+  color: color-mix(in srgb, var(--gold-subtle) var(--a-70), transparent);
+}
+
+/* Begin Button */
+.beginButton {
+  padding: 1rem 3rem;
+  min-height: 44px;
+  background: linear-gradient(135deg,
+    var(--gold-subtle) 0%,
+    var(--gold-primary) 50%,
+    var(--gold-hover) 100%);
+  border: none;
+  color: var(--bg-primary);
+  border-radius: 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  font-family: var(--font-primary, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 16px color-mix(in srgb, black var(--a-20), transparent);
+}
+
+/* Premium shimmer effect */
+.beginButton::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle,
+    color-mix(in srgb, white 40%, transparent) 0%,
+    transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.beginButton:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow:
+    0 0 20px color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent),
+    0 6px 20px color-mix(in srgb, black var(--a-25), transparent);
+}
+
+.beginButton:hover::after {
+  opacity: 1;
+  animation: ripple 1s ease-out;
+}
+
+@keyframes ripple {
+  from {
+    transform: scale(0.3);
+    opacity: 0.3;
+  }
+  to {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+.beginButton:active {
+  transform: translateY(0);
+}
+
+/* ========================================
+   GOLDEN DISSOLVE EXIT
+   ======================================== */
+
+/* Phase 1: Button fades */
+.beginButton.animating {
+  animation: buttonFade 0.3s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes buttonFade {
+  to {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+/* Phase 2: Modal content fades, then card dissolves (compositor-only: opacity + transform) */
+.transitioning {
+  animation: cardDissolve 0.7s cubic-bezier(0.4, 0, 0.2, 1) 0.15s forwards;
+  will-change: opacity, transform;
+}
+
+@keyframes cardDissolve {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.02);
+  }
+}
+
+/* Overlay during animation */
+.animatingOverlay {
+  pointer-events: none;
+}
+
+/* Dissolve overlay — warm golden bloom behind the fading card (compositor-only) */
+.dissolveOverlay {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 400px;
+  height: 400px;
+  transform: translate(-50%, -50%) scale(0.6);
+  background: radial-gradient(circle,
+    color-mix(in srgb, var(--gold-subtle) var(--a-25), transparent) 0%,
+    color-mix(in srgb, var(--gold-subtle) var(--a-08), transparent) 40%,
+    transparent 70%
+  );
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: var(--z-overlay);
+  will-change: opacity, transform;
+  animation: glowBloom 0.9s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes glowBloom {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.6);
+  }
+  35% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(2.2);
+  }
+}
+
+/* ========================================
+   BATTERY OPTIMIZATION
+   ======================================== */
+
+.welcomeOverlay[data-visibility="hidden"] {
+  contain: layout style paint;
+}
+
+.welcomeOverlay[data-visibility="hidden"] * {
+  animation-play-state: paused !important;
+  transition: none !important;
+}
+
+.welcomeOverlay[data-visibility="hidden"] .nebulaBackground,
+.welcomeOverlay[data-visibility="hidden"] .silhouette {
+  animation: none !important;
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+
+/* Mobile */
+@media (max-width: 768px) {
+  .dissolveOverlay {
+    width: 200px;
+    height: 200px;
+  }
+
+  .welcomeOverlay {
+    padding: 0;
+  }
+
+  .welcomeModal {
+    max-width: 100%;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    max-height: 100vh;
+    max-height: 100dvh;
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+  }
+
+  .modalHeader {
+    padding: calc(1.75rem + env(safe-area-inset-top, 0px)) 1.5rem 0.75rem;
+  }
+
+  .logoContainer {
+    width: 28px;
+    height: 28px;
+    top: -16px;
+    right: -22px;
+  }
+
+  .modalTitle {
+    font-size: 1.375rem;
+  }
+
+  .modalSubtitle {
+    font-size: 1rem; /* 16px */
+  }
+
+  .cosmicScene {
+    height: auto;
+    min-height: 200px;
+    margin: 0.5rem 0 1rem;
+    padding: 1rem;
+  }
+
+  .figureContainer {
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 0;
+  }
+
+  .silhouetteWrapper {
+    width: 110px;
+    height: 110px;
+    margin-right: 0;
+    margin-bottom: 0.5rem;
+  }
+
+  .silhouette {
+    width: 90px;
+    height: 90px;
+    border-width: 1.5px;
+  }
+
+  .campbellQuote {
+    max-width: 100%;
+    padding: 10px;
+    margin: 0;
+  }
+
+  .quoteContent {
+    justify-content: center;
+  }
+
+  .quoteText {
+    font-size: 1.0625rem; /* 17px — leads the explainer body (15px) */
+    line-height: 1.4;
+  }
+
+  .quoteMark {
+    font-size: 1.25rem;
+  }
+
+  .quoteAttribution {
+    font-size: 0.875rem; /* 14px */
+  }
+
+  .explainer {
+    padding: 0.75rem 0;
+    margin: 0 auto 0.75rem;
+  }
+
+  .explainerTagline {
+    font-size: 1.0625rem; /* 17px */
+  }
+
+  .explainerBody {
+    font-size: 1.0625rem; /* 17px — comfortable read on mid-large phones */
+    line-height: 1.6;
+  }
+
+  .explainerMission {
+    font-size: 1rem; /* 16px */
+  }
+
+  .beginButton {
+    padding: 0.625rem 1.25rem;
+    font-size: 0.875rem;
+    letter-spacing: 0.02em;
+    border-radius: 1.5rem;
+    min-height: 44px;
+  }
+
+  .modalActions {
+    padding: 1rem 2rem calc(2rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  .consentHeading {
+    font-size: 1.25rem; /* 20px */
+  }
+
+  .aiNotice {
+    font-size: 1.1875rem; /* 19px — leads consent block as safety-critical */
+    line-height: 1.55;
+  }
+
+  .checkboxLabel {
+    font-size: 0.9375rem; /* 15px */
+    line-height: 1.55;
+  }
+
+  .consentLinks {
+    font-size: 0.875rem; /* 14px */
+  }
+}
+
+/* Ultra-small screens (iPhone SE) */
+@media (max-width: 375px) {
+  .cosmicScene {
+    min-height: 180px;
+    padding: 0.75rem;
+  }
+
+  .silhouetteWrapper {
+    width: 110px;
+    height: 110px;
+  }
+
+  .silhouette {
+    width: 90px;
+    height: 90px;
+  }
+
+  .campbellQuote {
+    padding: 8px;
+  }
+
+  .quoteText {
+    font-size: 0.9375rem; /* 15px — iOS readability floor */
+    line-height: 1.4;
+  }
+
+  .quoteMark {
+    font-size: 1.125rem;
+  }
+
+  .quoteAttribution {
+    font-size: 0.8125rem; /* 13px */
+  }
+
+  .explainer {
+    padding: 0.5rem 0.25rem;
+  }
+
+  .explainerBody {
+    font-size: 0.9375rem;
+  }
+
+  .modalTitle {
+    font-size: 1.25rem;
+  }
+
+  .modalSubtitle {
+    font-size: 0.875rem;
+  }
+
+  .beginButton {
+    padding: 0.5rem 1rem;
+    font-size: 0.8125rem;
+    letter-spacing: 0.01em;
+    border-radius: 1.25rem;
+  }
+
+  .aiNotice {
+    font-size: 1.0625rem; /* 17px — SE has less width, scale safety notice down from 19px */
+  }
+}
+
+/* Landscape orientation */
+@media (max-height: 500px) and (orientation: landscape) {
+  .cosmicScene {
+    height: 140px;
+    padding: 0.5rem;
+  }
+
+  .figureContainer {
+    flex-direction: row;
+  }
+
+  .silhouetteWrapper {
+    width: 90px;
+    height: 90px;
+  }
+
+  .silhouette {
+    width: 70px;
+    height: 70px;
+  }
+
+  .campbellQuote {
+    padding: 8px;
+  }
+
+  .quoteText {
+    font-size: 0.75rem;
+  }
+}
+
+/* ========================================
+   ACCESSIBILITY
+   ======================================== */
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .welcomeModal {
+    background: var(--bg-cosmic-void);
+    border: 2px solid var(--gold-subtle);
+  }
+
+  .welcomeModal::before {
+    display: none;
+  }
+
+  .modalTitle {
+    background: none;
+    -webkit-background-clip: unset;
+    -webkit-text-fill-color: unset;
+    color: var(--gold-subtle);
+    font-weight: 700;
+    text-shadow: none;
+  }
+
+  .nebulaBackground {
+    display: none;
+  }
+
+  .silhouette {
+    animation: none;
+  }
+
+  .logoContainer {
+    animation: none;
+    filter: none;
+  }
+
+  .explainerBody {
+    color: var(--text-primary);
+  }
+
+  .explainerGlow {
+    display: none;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .welcomeOverlay {
+    animation: none;
+  }
+
+  .welcomeModal {
+    animation: none;
+  }
+
+  .explainer {
+    animation: none;
+    opacity: 1;
+  }
+
+  .campbellReveal {
+    animation: none;
+    opacity: 1;
+  }
+
+  .logoContainer {
+    animation: none;
+  }
+
+  .transitioning .logoContainer {
+    animation: none;
+  }
+
+  .modalTitle {
+    animation: none;
+  }
+
+  .nebulaBackground {
+    animation: none;
+  }
+
+  .silhouette {
+    animation: none;
+  }
+
+  /* Simplified exit: fade only, no glow effects */
+  .transitioning {
+    animation: reducedFadeOut 0.4s ease-out forwards;
+  }
+
+  .beginButton.animating {
+    animation: none;
+    opacity: 0;
+  }
+
+  .dissolveOverlay {
+    display: none;
+  }
+
+  @keyframes reducedFadeOut {
+    to { opacity: 0; }
+  }
+}
+
+/* Focus indicators */
+.beginButton:focus-visible {
+  outline: 2px solid var(--gold-subtle);
+  outline-offset: 2px;
+}
+
+/* === Legal consent section === */
+
+.consentSection {
+  padding: 1.5rem 0 0;
+  margin-top: 1.5rem;
+  border-top: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-20), transparent);
+}
+
+.consentHeading {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: var(--gold-subtle);
+  text-align: center;
+  margin: 0 0 1rem;
+  font-weight: 500;
+}
+
+.aiNotice {
+  background: color-mix(in srgb, var(--warning-subtle, #b8860b) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--warning-subtle, #b8860b) 25%, transparent);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+.aiNotice p {
+  margin: 0;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  cursor: pointer;
+  min-height: 44px;
+  padding: 4px 0;
+}
+
+.checkbox {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+  accent-color: var(--gold-subtle, #d4a539);
+  cursor: pointer;
+}
+
+.consentLink {
+  color: var(--gold-subtle, #d4a539);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.consentLink:hover {
+  opacity: 0.8;
+}
+
+.consentLinks {
+  font-size: 0.8rem;
+  color: var(--text-tertiary);
+  margin: 0.5rem 0 0;
+  text-align: center;
+}
+
+/* Print styles */
+@media print {
+  .welcomeOverlay {
+    display: none;
+  }
+}

@@ -1,0 +1,762 @@
+/* ========================================
+   AGORA COSMICA GLOBAL STYLES
+   2025 Optimized - Single Source of Truth
+   ======================================== */
+
+/* Fonts loaded via <link> in index.html from /fonts/fonts.css */
+
+/* Style imports - must come first */
+@import './styles/context-aware-text.css';
+@import './styles/liquid-glass.css';
+@import './styles/dark-mode-typography.css';
+@import './styles/safari-fixes.css';
+@import './styles/viewport-browser-only.css';
+@import './styles/sidebar-liquid-glass-final-fix.css'; /* Must be last */
+
+/* Base Reset & Typography */
+html {
+  height: 100%;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-ui, 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  background-color: var(--bg-primary, #151C47);
+  color: var(--text-primary, #D2D2D2);
+  height: 100%;
+  overflow: auto;
+}
+
+/* Root container */
+#root {
+  height: 100vh;
+  height: 100dvh; /* Dynamic viewport height - better mobile support */
+  overflow: hidden;
+}
+
+/* App container */
+.App {
+  display: flex;
+  height: 100vh;
+  height: 100dvh; /* Dynamic viewport height - better mobile support */
+}
+
+/* Typography defaults */
+h1, h2, h3, h4, h5, h6, button {
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+}
+
+/* Modern text wrapping for better line breaks (progressive enhancement) */
+@supports (text-wrap: balance) {
+  h1, h2, h3 {
+    text-wrap: balance; /* Better-looking headings */
+  }
+}
+
+@supports (text-wrap: pretty) {
+  p {
+    text-wrap: pretty; /* Prettier paragraph wrapping (Safari 18+) */
+  }
+}
+
+button {
+  font-size: var(--text-base, 1rem);
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+}
+
+/* Justified text styles for main content and history modal */
+.main-content p, 
+.main-content div:not(.no-justify), 
+.main-content span:not(.no-justify),
+.history-modal-content p,
+.history-modal-content div:not(.no-justify),
+.history-modal-content span:not(.no-justify) {
+  text-align: justify;
+  hyphens: auto;
+  word-break: break-word;
+}
+
+/* Class for elements that shouldn't be justified */
+.no-justify {
+  text-align: left;
+}
+
+/* iPhone SE Auto-scroll for limited height */
+@media (max-height: 700px) {
+  .scrollable-content,
+  .modal-content {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* ========================================
+   AGORA COSMICA COLOR SYSTEM 2025
+   Single Source of Truth - DO NOT DUPLICATE
+   ======================================== */
+
+:root {
+  /* =================
+     SCROLLBAR SYSTEM
+     ================= */
+  --scrollbar-width: 8px;
+  --scrollbar-border-radius: var(--radius-sm);
+  
+  /* =================
+     TYPOGRAPHY SYSTEM (Hybrid: Modern UI + Classical Content)
+     ================= */
+  --font-ui: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-content: 'Libre Caslon Text', Georgia, 'Times New Roman', serif; /* Long-form reading */
+  --font-mono: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  
+  /* =================
+     FLUID TYPE SCALE (2025)
+     Responsive typography that scales smoothly
+     ================= */
+  /* Static fallbacks for older browsers */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-md: 1.125rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.5rem;
+  --text-2xl: 1.875rem;
+  --text-3xl: 2.25rem;
+  
+  /* Fluid typography with clamp() - 2025 best practice */
+  --text-xs: clamp(0.69rem, 0.66rem + 0.2vw, 0.75rem);      /* 11px → 12px */
+  --text-sm: clamp(0.81rem, 0.78rem + 0.2vw, 0.875rem);     /* 13px → 14px */
+  --text-base: clamp(0.875rem, 0.8rem + 0.4vw, 1rem);       /* 14px → 16px */
+  --text-md: clamp(1rem, 0.95rem + 0.5vw, 1.125rem);        /* 16px → 18px */
+  --text-lg: clamp(1.125rem, 1.05rem + 0.6vw, 1.25rem);     /* 18px → 20px */
+  --text-xl: clamp(1.25rem, 1.1rem + 0.8vw, 1.5rem);        /* 20px → 24px */
+  --text-2xl: clamp(1.5rem, 1.3rem + 1.2vw, 1.875rem);      /* 24px → 30px */
+  --text-3xl: clamp(1.875rem, 1.5rem + 1.8vw, 2.25rem);     /* 30px → 36px */
+  
+  /* Line Height System */
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.6;
+  --leading-loose: 1.75;
+  
+  /* Font Weights (Variable Font) */
+  --weight-light: 300;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  
+  /* =================
+     BACKGROUNDS (5)
+     ================= */
+  --bg-cosmic-void: #0D1338;    /* Standard cosmic background */
+  --bg-primary: #151C47;        /* Main app background - perfect balance */
+  --bg-astral: #1A1B4B;         /* Secondary containers */
+  --bg-card: #1C245C;           /* Cards, modals, elevated surfaces */
+  --bg-highlight: #2A3374;      /* Hover states, subtle accents */
+  
+  /* =================
+     DEEP SPACE SYSTEM (Login & Cosmic Scenes)
+     LESSON LEARNED: Login page uses exact RGBA values
+     that were carefully tuned. Don't migrate these to
+     CSS variables - preserve as-is in component files.
+     
+     Key Login Page Colors (DO NOT CHANGE):
+     - Deep space bg: #0C1133
+     - Form/dropdown bg: rgba(20, 25, 60, 0.6)
+     - Gold borders: color-mix(in srgb, var(--gold-subtle) 25%, transparent)
+     - Button bg: color-mix(in srgb, var(--gold-subtle) 85%, transparent)
+     - Legal/audio buttons: rgba(21, 28, 71, 0.4)
+     ================= */
+  --bg-deep-space: #0C1133;     /* TRUE deep space - darker than cosmic-void */
+  --bg-deep-space-darker: #080B20; /* Even deeper for gradients */
+  --star-white-bright: rgba(255, 255, 255, 0.8);  /* Bright white stars */
+  --star-white-medium: rgba(255, 255, 255, 0.6);  /* Medium white stars */
+  --star-white-dim: rgba(255, 255, 255, 0.4);     /* Dim white stars */
+  --star-gold-bright: rgba(255, 215, 0, 0.6);     /* Bright golden stars */
+  --star-gold-medium: rgba(255, 215, 0, 0.4);     /* Medium golden stars */
+  --cosmic-glow: color-mix(in srgb, var(--gold-subtle) 15%, transparent);        /* Portal glow effect */
+  
+  /* =================
+     GOLDEN PALETTE (4+2)
+     ================= */
+  --gold-primary: #E6BC5C;      /* Main UI text, labels, buttons (7.21:1) - softer gold */
+  --gold-subtle: #D4A539;       /* Headers, titles (5.89:1) - deeper gold */
+  --gold-hover: #F6D55C;        /* ONLY for hover states (8.52:1) - bright, use sparingly */
+  --gold-deep: #B38B30;         /* Borders, shadows (4.72:1) - darkest gold */
+  
+  /* Special Purpose (not for text) */
+  --gold-star: #FFD700;         /* Decorative stars only */
+  --gold-active: #FFD280;       /* Sidebar active states only */
+  
+  /* =================
+     MODE COLORS (4)
+     LESSON LEARNED: Coral (#E97451) > Orange (#E07438)
+     The original coral is more elegant and sophisticated,
+     fitting better with philosophical discourse than bright orange.
+     ================= */
+  --mode-story: var(--gold-primary);     /* Story mode uses gold */
+  --mode-quest: #E97451;                  /* Elegant coral - refined, not loud */
+  --mode-quest-hover: #F2917A;            /* Soft coral hover */
+  --mode-quest-active: #C86344;           /* Deep coral - pressed state */
+  
+  --mode-wisdom: #9D83CD;                 /* Purple base - softer blend */
+  --mode-wisdom-hover: #B099DD;           /* Purple hover - gentle lift */
+  --mode-wisdom-active: #8A71BA;          /* Purple active - deeper tone */
+  
+  --mode-freetalk: #68C397;               /* Mint base - balanced sage-mint */
+  --mode-freetalk-hover: #7FD4AA;         /* Mint hover - soft lift */
+  --mode-freetalk-active: #51B285;        /* Mint active - grounded green */
+
+  --mode-prism: #5B8BD4;                  /* Blue base - crystalline sapphire */
+  --mode-prism-hover: #7BA3E0;            /* Blue hover - soft lift */
+  --mode-prism-active: #4A78C0;           /* Blue active - deeper tone */
+  
+  /* =================
+     TEXT COLORS (4)
+     NO PURE WHITE!
+     ================= */
+  --text-primary: #D2D2D2;      /* Main text (10.8:1 contrast) */
+  --text-secondary: #CACACA;    /* Secondary text (9.2:1) */
+  --text-tertiary: #9E9E9E;     /* Tertiary text (5.8:1) */
+  --text-dim: #8A8A8A;           /* Dim text for low-emphasis content (4.5:1) */
+  --text-disabled: #6B7BA3;     /* Disabled text (3.2:1) */
+  
+  /* =================
+     SEMANTIC COLORS
+     ================= */
+  --color-success: var(--mode-freetalk);  /* Reuses mint */
+  --color-warning: var(--mode-quest);     /* Reuses orange */
+  --color-error: #EF4444;                 /* Distinct red */
+  --color-error-hover: #F87171;           /* Red hover */
+  --color-info: var(--mode-wisdom);       /* Reuses purple */
+  
+  /* Star colors - carefully designed, DO NOT change values */
+  --star-blue-light: #b4c8ff;    /* For star shadow effects */
+  --star-blue-medium: #d2ebff;   /* For star highlights */
+  --star-blue-glow: #b4d2ff;     /* For star glow effects */
+  
+  /* =================
+     UTILITY COLORS
+     ================= */
+  --utility-pure-black: #000000;  /* OLED optimization only */
+  --utility-shadow: rgba(0, 0, 0, 0.25);
+  --utility-border: rgba(158, 158, 158, 0.1);
+
+  /* =================
+     BYOK MODAL COLORS (2025)
+     ================= */
+  --byok-overlay-bg: rgb(0, 0, 0);          /* Overlay background */
+  --byok-card-primary: rgb(20, 28, 58);     /* Modal card background */
+  --byok-card-secondary: rgb(20, 28, 58);   /* Input/card backgrounds */
+  --byok-error-bg: rgb(233, 116, 81);       /* Error background */
+
+  /* =================
+     ALPHA VALUE TOKENS (2025)
+     Use these instead of hardcoding percentages
+     ================= */
+  --a-00: 0%;
+  --a-03: 3%;
+  --a-05: 5%;
+  --a-08: 8%;
+  --a-10: 10%;
+  --a-12: 12%;
+  --a-15: 15%;
+  --a-18: 18%;
+  --a-20: 20%;
+  --a-25: 25%;
+  --a-30: 30%;
+  --a-35: 35%;
+  --a-40: 40%;
+  --a-45: 45%;
+  --a-50: 50%;
+  --a-60: 60%;
+  --a-70: 70%;
+  --a-80: 80%;
+  --a-85: 85%;
+  --a-90: 90%;
+  --a-95: 95%;
+  --a-97: 97%;
+  --a-98: 98%;
+  
+  /* Example usage: color-mix(in srgb, var(--gold-primary) var(--a-30), transparent) */
+  
+  /* =================
+     SPACING SYSTEM (8px Grid)
+     ================= */
+  --space-xs: 0.25rem;   /* 4px */
+  --space-sm: 0.5rem;    /* 8px */
+  --space-md: 1rem;      /* 16px */
+  --space-lg: 1.5rem;    /* 24px */
+  --space-xl: 2rem;      /* 32px */
+  --space-2xl: 3rem;     /* 48px */
+  --space-3xl: 4rem;     /* 64px */
+  
+  /* =================
+     SAFE AREA INSETS (Mobile/PWA)
+     Handles device notches & rounded corners
+     ================= */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px)
+  
+  /* =================
+     TRANSITIONS
+     ================= */
+  --transition-fast: 150ms ease;
+  --transition-base: 200ms ease;
+  --transition-slow: 300ms ease;
+  --transition-bezier: cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* =================
+     SHADOWS
+     ================= */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.25);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.25);
+  --shadow-xl: 0 16px 32px rgba(0, 0, 0, 0.25);
+  --shadow-glow: 0 0 20px rgba(230, 188, 92, 0.3);
+  
+  /* =================
+     BORDER RADIUS
+     ================= */
+  --radius-sm: 0.25rem;  /* 4px */
+  --radius-md: 0.5rem;   /* 8px */
+  --radius-lg: 0.75rem;  /* 12px */
+  --radius-xl: 1rem;     /* 16px */
+  --radius-full: 9999px; /* Pills */
+  
+  /* =================
+     Z-INDEX SCALE SYSTEM
+     Standardized values for consistent stacking
+     ================= */
+  --z-base: 0;              /* Base elements, backgrounds */
+  --z-dropdown: 100;        /* Dropdowns, tooltips, message popups */
+  --z-sticky: 200;          /* Sticky headers, floating elements */
+  --z-sidebar: 1000;        /* Sidebar, landscape warning */
+  --z-modal: 2000;          /* Standard modals, figure carousel */
+  --z-gallery: 2100;        /* Wisdom gallery (above modals) */
+  --z-modal-overlay: 3000;  /* Special modals (council setup, modal container) */
+  --z-about: 4000;          /* About overlay */
+  --z-overlay: 9999;        /* Critical overlays (audio player, history modal) */
+  --z-critical: 10000;      /* Critical UI (helper popup, close buttons) */
+  --z-maximum: 10002;       /* Absolute maximum (special close buttons) */
+  --z-loader: 99999;        /* Loading overlays (cosmic council loader) */
+  
+  /* MIGRATION MAP (for reference during transition):
+     OLD VALUES → NEW VARIABLES
+     0 → var(--z-base)
+     1,2,10 → keep as-is (component internal)
+     99,100 → var(--z-dropdown)
+     150,199,200 → var(--z-sticky)
+     1000 → var(--z-sidebar)
+     2000 → var(--z-modal)
+     2100 → var(--z-gallery)
+     3000 → var(--z-modal-overlay)
+     4000 → var(--z-about)
+     9999 → var(--z-overlay)
+     10000+ → var(--z-critical) or var(--z-maximum)
+     99999 → var(--z-loader) */
+  
+  /* =================
+     COMMON LAYOUT CALCULATIONS
+     Extracted from existing CSS - use for consistency
+     ================= */
+  --modal-max-height: calc(100vh - 160px);         /* Common modal height */
+  --modal-max-height-mobile: calc(100vh - 90px);   /* Mobile modal height */
+  --sidebar-height-desktop: calc(100vh - 60px);    /* Desktop sidebar */
+  --sidebar-height-mobile: calc(100vh - 40px);     /* Mobile sidebar */
+  --story-player-height: calc(100vh - 120px);      /* Story player desktop */
+  --story-player-height-mobile: calc(100vh - 90px); /* Story player mobile */
+  --safe-content-padding: 20px;                    /* Standard content padding */
+  --modal-margin: 2rem;                             /* Modal margin from viewport edge */
+  
+  /* =================
+     LEGACY MAPPINGS
+     (For backward compatibility)
+     ================= */
+  --gold-base: var(--gold-subtle);
+  --gold-light: var(--gold-primary);
+  --primary-deep: var(--bg-primary);
+  --primary-base: var(--bg-card);
+  --primary-light: var(--bg-highlight);
+  --cosmic-text-primary: var(--text-primary);
+  --cosmic-text-secondary: var(--text-secondary);
+  --cosmic-text-tertiary: var(--text-tertiary);
+  --cosmic-text-disabled: var(--text-disabled);
+  --coral-deep: var(--mode-quest-active);
+  --coral-base: var(--mode-quest);
+  --coral-light: var(--mode-quest-hover);
+  --prism-base: var(--mode-prism);
+  --prism-light: var(--mode-prism-hover);
+  --prism-rgb: 91, 139, 212;
+  
+  /* =================
+     GRADIENTS (Updated)
+     ================= */
+  --cosmic-gradient: linear-gradient(135deg, 
+    var(--bg-primary) 0%, 
+    var(--bg-card) 50%, 
+    var(--bg-highlight) 100%);
+    
+  --gold-gradient: linear-gradient(135deg, 
+    var(--gold-deep) 0%, 
+    var(--gold-subtle) 50%, 
+    var(--gold-primary) 100%);
+    
+  --coral-gradient: linear-gradient(135deg, 
+    var(--mode-quest-active) 0%, 
+    var(--mode-quest) 50%, 
+    var(--mode-quest-hover) 100%);
+    
+  --accent-gradient: linear-gradient(135deg, 
+    var(--gold-subtle) 0%, 
+    var(--mode-quest) 100%);
+}
+
+/* Dark color-scheme for system integration */
+:root {
+  color-scheme: dark;
+  
+  /* Native form control accent color (checkboxes, radios, etc.) */
+  accent-color: var(--gold-primary);
+}
+
+/* =================
+   COSMIC PARTICLES (Battery Optimized)
+   Paused by default - activate only when needed
+   ================= */
+.cosmic-particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: var(--z-base); /* 0 */
+}
+
+.particle {
+  position: absolute;
+  background: color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+  border-radius: 50%;
+  filter: blur(1px);
+  opacity: 0.2;
+  will-change: transform;
+  animation-play-state: paused; /* Critical for battery efficiency */
+}
+
+/* Activate particles only on hover or when explicitly enabled */
+.cosmic-particles:hover .particle,
+.cosmic-particles.active .particle {
+  animation-play-state: running;
+}
+
+/* Generate multiple particle animations */
+@keyframes float1 {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(10px, 10px); }
+  50% { transform: translate(5px, -5px); }
+  75% { transform: translate(-8px, 8px); }
+}
+
+@keyframes float2 {
+  0%, 100% { transform: translate(0, 0); }
+  20% { transform: translate(-15px, 8px); }
+  45% { transform: translate(8px, 15px); }
+  70% { transform: translate(15px, -8px); }
+}
+
+@keyframes float3 {
+  0%, 100% { transform: translate(0, 0); }
+  30% { transform: translate(12px, -12px); }
+  55% { transform: translate(-10px, -5px); }
+  85% { transform: translate(8px, 10px); }
+}
+
+@keyframes pulsate {
+  0%, 100% { opacity: 0.1; }
+  50% { opacity: 0.3; }
+}
+
+.particle:nth-child(3n+1) {
+  animation: float1 20s infinite ease-in-out, pulsate 10s infinite ease-in-out;
+  animation-play-state: inherit; /* Inherit from parent */
+}
+
+.particle:nth-child(3n+2) {
+  animation: float2 25s infinite ease-in-out, pulsate 8s infinite ease-in-out;
+  animation-play-state: inherit;
+}
+
+.particle:nth-child(3n) {
+  animation: float3 30s infinite ease-in-out, pulsate 12s infinite ease-in-out;
+  animation-play-state: inherit;
+}
+
+/* Ripple effect for interactions */
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  transform: scale(0);
+  animation: ripple 0.8s linear;
+  background-color: rgba(210, 210, 210, 0.15); /* Astigmatism-safe, no pure white */
+  pointer-events: none;
+}
+
+@keyframes ripple {
+  to {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .particle, .ripple {
+    animation: none !important;
+  }
+}
+
+/* =================
+   PERFORMANCE TIER OVERRIDES
+   Set via data-perf-tier attribute on <html> by performanceDetector.ts
+   Catches ALL hard-coded backdrop-filter values globally
+   ================= */
+
+/* Low-tier devices: disable all backdrop-filter for battery/GPU savings */
+html[data-perf-tier="low"] * {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Medium-tier devices: cap blur for better performance */
+html[data-perf-tier="medium"] {
+  --glass-blur-subtle: 1px;
+  --glass-blur-light: 4px;
+  --glass-blur: 6px;
+  --glass-blur-heavy: 8px;
+  --glass-blur-max: 8px;
+}
+
+/* =================
+   FOCUS STYLES (Accessibility)
+   ================= */
+:focus-visible {
+  outline: 2px solid var(--gold-primary);
+  outline-offset: 2px;
+}
+
+/* Remove outline for mouse users */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* =================
+   SELECTION STYLES
+   ================= */
+::selection {
+  background-color: var(--gold-primary);
+  color: var(--bg-primary);
+}
+
+/* =================
+   SCROLLBAR DESIGN SYSTEM 2025
+   Context-aware, themeable scrollbars
+   ================= */
+
+/* Scrollbar theme tokens - for context-aware overrides */
+:root {
+  /* Alternative theme tokens (for opt-in use) */
+  --scrollbar-gold-base: var(--gold-primary);
+  --scrollbar-gold-hover: var(--gold-hover);
+  --scrollbar-gold-active: var(--gold-deep);
+}
+
+/* Base scrollbar styles - applies globally to all scrollable elements */
+*::-webkit-scrollbar {
+  width: var(--scrollbar-width, 8px);
+  height: var(--scrollbar-width, 8px);
+}
+
+*::-webkit-scrollbar-track {
+  background: color-mix(in srgb, var(--mode-wisdom) var(--a-10), transparent);
+  border-radius: var(--scrollbar-border-radius, var(--radius-sm));
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--mode-wisdom);
+  border-radius: var(--scrollbar-border-radius, var(--radius-sm));
+  transition: background-color 0.2s ease;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--mode-wisdom-hover);
+}
+
+*::-webkit-scrollbar-thumb:active {
+  background: var(--mode-wisdom-active);
+}
+
+/* Firefox scrollbar support */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--mode-wisdom) color-mix(in srgb, var(--mode-wisdom) var(--a-10), transparent);
+}
+
+/* Context-aware scrollbar themes - Override purple default when needed */
+[data-scrollbar="gold"] *::-webkit-scrollbar-thumb,
+.scrollbar-gold *::-webkit-scrollbar-thumb {
+  background: var(--gold-primary);
+}
+
+[data-scrollbar="gold"] *::-webkit-scrollbar-thumb:hover,
+.scrollbar-gold *::-webkit-scrollbar-thumb:hover {
+  background: var(--gold-hover);
+}
+
+[data-scrollbar="gold"] *::-webkit-scrollbar-thumb:active,
+.scrollbar-gold *::-webkit-scrollbar-thumb:active {
+  background: var(--gold-deep);
+}
+
+[data-scrollbar="gold"] *::-webkit-scrollbar-track,
+.scrollbar-gold *::-webkit-scrollbar-track {
+  background: color-mix(in srgb, var(--gold-primary) var(--a-10), transparent);
+}
+
+/* Firefox support for gold theme */
+[data-scrollbar="gold"] *,
+.scrollbar-gold * {
+  scrollbar-color: var(--gold-primary) color-mix(in srgb, var(--gold-primary) var(--a-10), transparent);
+}
+
+/* Subtle scrollbar theme */
+[data-scrollbar="subtle"] *::-webkit-scrollbar-thumb,
+.scrollbar-subtle *::-webkit-scrollbar-thumb {
+  background: var(--bg-highlight);
+}
+
+[data-scrollbar="subtle"] *::-webkit-scrollbar-thumb:hover,
+.scrollbar-subtle *::-webkit-scrollbar-thumb:hover {
+  background: var(--text-tertiary);
+}
+
+[data-scrollbar="subtle"] *::-webkit-scrollbar-track,
+.scrollbar-subtle *::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Firefox support for subtle theme */
+[data-scrollbar="subtle"] *,
+.scrollbar-subtle * {
+  scrollbar-color: var(--bg-highlight) transparent;
+}
+
+/* Invisible scrollbar theme */
+[data-scrollbar="invisible"] *,
+.scrollbar-invisible * {
+  scrollbar-width: none;
+}
+
+[data-scrollbar="invisible"] *::-webkit-scrollbar,
+.scrollbar-invisible *::-webkit-scrollbar {
+  display: none;
+}
+
+/* =================
+   UTILITY CLASSES
+   ================= */
+
+/* Screen reader only (hide visually but keep for screen readers) */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Becomes visible when focused (e.g., skip links) */
+.sr-only-focusable:active,
+.sr-only-focusable:focus,
+.sr-only-focusable:focus-within {
+  position: static;
+  width: auto;
+  height: auto;
+  margin: 0;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+/* Container */
+.container {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 var(--space-md);
+}
+
+/* Scrollbar gutter to prevent layout shifts when scrollbars appear */
+@supports (scrollbar-gutter: stable) {
+  .modal-content,
+  .overflow-auto,
+  .scrollable-content {
+    scrollbar-gutter: stable both-edges;
+  }
+}
+
+/* Safe area padding helpers for mobile devices */
+.pad-safe {
+  padding: var(--safe-top) var(--safe-right) var(--safe-bottom) var(--safe-left);
+}
+
+.pad-safe-inline {
+  padding-inline-start: var(--safe-left);
+  padding-inline-end: var(--safe-right);
+}
+
+.pad-safe-block {
+  padding-block-start: var(--safe-top);
+  padding-block-end: var(--safe-bottom);
+}
+
+/* =================
+   MODERN CSS FEATURES
+   ================= */
+
+/* Container queries support */
+@supports (container-type: inline-size) {
+  .responsive-container {
+    container-type: inline-size;
+  }
+}
+
+/* Subgrid support for advanced layouts */
+@supports (grid-template-rows: subgrid) {
+  .grid-parent {
+    display: grid;
+  }
+  .grid-child {
+    grid-row: 1 / -1;
+    display: grid;
+    grid-template-rows: subgrid;
+  }
+}
+
+/* =================
+   STYLE IMPORTS MOVED TO TOP
+   See lines 6-9 for import statements
+   ================= */

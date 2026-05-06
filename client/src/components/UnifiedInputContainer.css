@@ -1,0 +1,787 @@
+/* UnifiedInputContainer.css - State-of-the-art 2025 input interface */
+
+/* Core variables */
+:root {
+  --input-height-desktop: 50px;
+  --input-height-tablet: 52px; /* Reduced from 60px - aggressive mobile optimization */
+  --input-height-mobile: 56px; /* Reduced from 70px - maximize chat content space */
+  /* Use design system colors for input field - darker coral base */
+  --coral-base: var(--mode-quest-active);   /* Base: deeper coral for grounding */
+  --coral-hover: var(--mode-quest);         /* Hover: brighter coral */
+  --coral-active: var(--mode-quest-active); /* Active: same as base */
+  --coral-hover-bg: color-mix(in srgb, var(--mode-quest) var(--a-10), transparent); /* Transparent overlay for button hovers */
+  --gold-base: var(--gold-subtle);        /* Uses design system gold */
+  --gold-light: var(--gold-primary);      /* Uses design system gold primary */
+  --gold-hover-bg: color-mix(in srgb, var(--gold-subtle) var(--a-10), transparent); /* Gold transparent overlay */
+  --deep-blue: color-mix(in srgb, var(--bg-primary) var(--a-80), transparent);
+  --border-radius: 22px;
+  --transition-bezier: cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* 2025 State-of-the-art responsive variables */
+  --keyboard-height: 0px; /* Set dynamically by Capacitor */
+  --available-viewport-height: 100dvh; /* Dynamic viewport height */
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-left: env(safe-area-inset-left, 0px);
+  --safe-area-right: env(safe-area-inset-right, 0px);
+  
+  /* Hug the safe area on mobile — Claude-style. Home indicator clearance only,
+     no extra buffer above it. */
+  --safe-margin-bottom: max(4px, var(--safe-area-bottom));
+  --input-bottom-spacing: var(--safe-margin-bottom);
+  
+  /* 2025 Viewport-aware spacing */
+  --input-visibility-buffer: 20px; /* Ensure input is always visible */
+  
+  /* Match ChatBox margins */
+  --chat-margin-tablet: 16px;
+  
+  /* Desktop layout variables - defaults that will be overridden by HomePage.css */
+  --content-inline-padding: 1rem; /* Mobile default */
+  --content-max-width: 100%;      /* Mobile full width */
+}
+
+/* Main container - State-of-the-art 2025 Mobile-First Full Width */
+.unified-input-container {
+  /* Mobile-first: Full width to match chatbox */
+  width: 100%;
+  margin: 0 0 var(--input-bottom-spacing);
+  border-radius: 0; /* No radius on mobile for consistency */
+  position: relative;
+  overflow: visible;
+  
+  /* Ensure input is below sidebar (sidebar uses --z-sticky: 200) */
+  z-index: var(--z-dropdown); /* 100 - below sidebar but above base elements */
+  
+  /* 2025 Container Query Setup - Future-Proof Responsive Design */
+  container-type: inline-size;
+  container-name: input-container;
+  
+  /* Keyboard-aware positioning for mobile */
+  transform: translateY(calc(-1 * var(--keyboard-height) * 0.1)); /* Subtle lift when keyboard appears */
+  transition: transform 0.3s var(--transition-bezier);
+  
+  /* Ensure proper sizing */
+  box-sizing: border-box;
+  
+  /* Safe area padding for mobile */
+  padding-left: calc(1rem + var(--safe-area-left));
+  padding-right: calc(1rem + var(--safe-area-right));
+}
+
+/* Ensures the PulseElement wrapper takes full width */
+.pulse-element-wrapper {
+  width: 100%;
+}
+
+/* Shared styles for both input types */
+.text-input-area,
+.voice-input-area {
+  width: 100%;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  transition: all 0.2s var(--transition-bezier);
+}
+
+/* Text input: one solid dark pill — no visible border, just background contrast.
+   Focus adds a soft gold glow without a crisp rectangle stroke. */
+.text-input-area {
+  background-color: var(--deep-blue);
+  border: 1px solid transparent;
+}
+
+/* Voice input is transparent - the coral record button provides color */
+.voice-input-area {
+  background-color: transparent;
+  border: none;
+}
+
+/* Text input area */
+.text-input-area {
+  display: flex;
+  align-items: center;
+  padding: 0 15px;
+}
+
+.text-input-area.focused {
+  border-color: color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--gold-subtle) var(--a-15), transparent);
+}
+
+/* The textarea itself */
+.text-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: white;
+  font-family: var(--ui-font-family, 'Space Grotesk', sans-serif);
+  padding: 12px 0;
+  resize: none;
+  min-height: var(--input-height-desktop);
+  max-height: 150px;
+  font-size: var(--ui-font-size-chat); /* 16px → 18px responsive */
+  line-height: 1.4;
+}
+
+/* Focus ring lives on the outer container (see .text-input-area.focused).
+   Suppress the inner outline so we don't render a nested gold rectangle. */
+.text-input:focus,
+.text-input:focus-visible {
+  outline: none;
+}
+
+.text-input::placeholder {
+  color: color-mix(in srgb, var(--text-primary) var(--a-50), transparent);
+}
+
+/* Free-tier turn counter (between textarea and buttons / below record button) */
+.turn-counter {
+  font-size: 0.9rem;
+  font-family: var(--ui-font-family);
+  white-space: nowrap;
+  padding: 0 8px;
+  transition: color 0.3s ease;
+  user-select: none;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+.turn-counter[data-urgency="normal"] { color: var(--text-dim); }
+.turn-counter[data-urgency="warning"] { color: var(--color-warning, #E97451); }
+.turn-counter[data-urgency="critical"] { color: var(--color-error, #EF4444); font-weight: 500; }
+.turn-counter[data-urgency="exhausted"] { color: var(--color-error, #EF4444); font-weight: 600; }
+.record-button { position: relative; }
+.turn-counter.voice-mode {
+  grid-column: 1;
+  grid-row: 1;
+  justify-self: start;
+  align-self: center;
+  padding-left: 12px;
+  font-size: 0.85rem;
+  color: var(--bg-primary, #151C47);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  z-index: 1;
+  white-space: nowrap;
+}
+.turn-counter.voice-mode[data-urgency="normal"],
+.turn-counter.voice-mode[data-urgency="warning"] { color: var(--bg-primary, #151C47); }
+.turn-counter.voice-mode[data-urgency="critical"] { color: var(--color-error, #EF4444); }
+/* Exhausted on the coral record-button: red on red is unreadable. White on coral
+   has WCAG-AA contrast and reads as a clear "this is the limit" badge. */
+.turn-counter.voice-mode[data-urgency="exhausted"] {
+  color: var(--utility-pure-white, #FFFFFF);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+/* Input action buttons container */
+.input-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Common button styling */
+.action-button {
+  background: transparent;
+  border: none;
+  color: var(--gold-base);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s var(--transition-bezier);
+  position: relative;
+}
+
+/* Virtual 44px touch target for action buttons */
+.action-button::before {
+  content: '';
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  z-index: 1;
+  /* Debug: uncomment to see touch target */
+  /* background: color-mix(in srgb, blue 10%, transparent); */
+}
+
+.action-button:hover {
+  background-color: var(--gold-hover-bg); /* Uses design system gold with opacity */
+  transform: translateY(-1px);
+}
+
+.action-button:active {
+  transform: scale(0.95);
+}
+
+.action-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Quota exhausted: button stays clickable so it can route to the rate-limit modal,
+   but visually communicates "not your normal action" via reduced opacity. */
+.action-button[data-quota-exhausted="true"] {
+  opacity: 0.55;
+  cursor: pointer;
+}
+.action-button[data-quota-exhausted="true"]:hover {
+  opacity: 0.85;
+  transform: none;
+  background-color: transparent;
+}
+
+/* Special styling for send button */
+.send-button {
+  color: var(--coral-base);
+}
+
+.send-button:hover {
+  background-color: var(--coral-hover-bg); /* Uses design system color with opacity */
+}
+
+/* Voice input area */
+.voice-input-area {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+}
+
+/* Record button */
+.record-button {
+  width: 100%;
+  background-color: var(--mode-quest-active); /* Deeper coral - same as seeker message */
+  border: none;
+  color: white;
+  font-family: 'Space Grotesk', sans-serif;
+  cursor: pointer;
+  padding: 0;
+  border-radius: var(--border-radius);
+  transition: all 0.2s var(--transition-bezier);
+  overflow: hidden;
+  position: relative;
+  height: var(--input-height-desktop);
+  /* Add box-shadow for depth */
+  box-shadow: 0 2px 5px color-mix(in srgb, var(--utility-pure-black) var(--a-20), transparent);
+}
+
+.record-button:hover {
+  background-color: var(--mode-quest); /* Brighter coral on hover */
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px color-mix(in srgb, var(--utility-pure-black) var(--a-30), transparent);
+}
+
+/* Quota exhausted: dimmer, no lift on hover. Click routes to rate-limit modal. */
+.record-button[data-quota-exhausted="true"] {
+  opacity: 0.7;
+  cursor: pointer;
+}
+.record-button[data-quota-exhausted="true"]:hover {
+  opacity: 0.9;
+  background-color: var(--mode-quest-active);
+  transform: none;
+  box-shadow: 0 2px 5px color-mix(in srgb, var(--utility-pure-black) var(--a-20), transparent);
+}
+
+.record-button:active {
+  background-color: var(--coral-active); /* Deeper coral when pressed */
+  transform: scale(0.98);
+}
+
+.record-button.recording {
+  background-color: var(--coral-active); /* Deeper coral when recording */
+  animation: pulse-frame 2s infinite;
+}
+
+/* Content layout within record button */
+.record-button-content {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+.record-icon-container {
+  grid-column: 1;
+  margin-left: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.record-text {
+  grid-column: 2;
+  justify-self: center;
+  text-align: center;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.mic-icon {
+  color: white;
+  width: 20px;
+  height: 20px;
+}
+
+/* Waveform area */
+.waveform {
+  justify-self: center;
+  display: flex;
+  align-items: center;
+  gap: 3px; /* Increased gap between bars */
+  height: 24px; /* Increased height */
+  overflow: hidden; /* Prevent overflow */
+  position: relative;
+  left: -20px; /* Move left */
+}
+
+.waveform.inactive {
+  opacity: 0.5;
+  left: 0; /* Override -20px from .waveform — center dots between text and keyboard */
+}
+
+.control-area {
+  grid-column: 3;
+  justify-self: center;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.waveform-bar {
+  width: 4px; /* Slightly wider */
+  background-color: color-mix(in srgb, var(--text-primary) var(--a-90), transparent);
+  border-radius: 2px;
+  height: 6px; /* Slightly taller */
+  box-shadow: 0 0 2px color-mix(in srgb, var(--text-primary) var(--a-50), transparent);
+  transform-origin: bottom;
+}
+
+.record-button.recording .waveform-bar {
+  animation: waveform 0.8s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
+}
+
+.record-button.recording .waveform-bar:nth-child(2) { animation-delay: 0.1s; }
+.record-button.recording .waveform-bar:nth-child(3) { animation-delay: 0.2s; }
+.record-button.recording .waveform-bar:nth-child(4) { animation-delay: 0.3s; }
+.record-button.recording .waveform-bar:nth-child(5) { animation-delay: 0.4s; }
+.record-button.recording .waveform-bar:nth-child(6) { animation-delay: 0.5s; }
+
+/* Toggle input button inside voice UI */
+.toggle-input {
+  background-color: transparent;
+  border: none;
+  width: 36px;
+  height: 36px;
+  position: relative;
+}
+
+/* Virtual 44px touch target for desktop toggle input */
+.toggle-input::before {
+  content: '';
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  z-index: 1;
+  /* Debug: uncomment to see touch target */
+  /* background: color-mix(in srgb, red 10%, transparent); */
+}
+
+.toggle-input:hover {
+  background-color: color-mix(in srgb, var(--bg-primary) var(--a-10), transparent);
+}
+
+/* Animations */
+@keyframes waveform {
+  0% { 
+    transform: scaleY(1);
+  }
+  50% { 
+    transform: scaleY(2.2);
+  }
+  100% { 
+    transform: scaleY(1);
+  }
+}
+
+@keyframes pulse-frame {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--gold-subtle) var(--a-70), transparent); }
+  70% { box-shadow: 0 0 0 5px color-mix(in srgb, var(--gold-subtle) var(--a-70), transparent); }
+  100% { box-shadow: 0 0 0 0 var(--gold-subtle); }
+}
+
+@keyframes touch-feedback {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--text-primary) var(--a-50), transparent); }
+  50% { box-shadow: 0 0 0 15px color-mix(in srgb, var(--text-primary) var(--a-00), transparent); }
+  100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--text-primary) var(--a-00), transparent); }
+}
+
+/* Mobile styles with enhanced safe area and keyboard support */
+@media (max-width: 480px) {
+  .unified-input-container {
+    /* Enhanced mobile spacing with safe area awareness */
+    margin-bottom: var(--input-bottom-spacing);
+    
+    /* Stronger keyboard response on mobile */
+    transform: translateY(calc(-1 * var(--keyboard-height) * 0.15));
+    
+    /* Ensure input stays visible above keyboard */
+    min-height: var(--input-height-mobile);
+    z-index: 150; /* Between dropdown (100) and sidebar (200) - stays below sidebar */
+  }
+  
+  /* Keyboard-aware container adjustments */
+  .unified-input-container:focus-within {
+    /* When input is focused and keyboard might appear */
+    transform: translateY(calc(-1 * var(--keyboard-height) * 0.2));
+    transition: transform 0.4s var(--transition-bezier);
+  }
+  
+  .record-button {
+    height: var(--input-height-mobile);
+  }
+
+  /* Mobile text input: two-row layout so the textarea gets the full width
+     instead of competing with the counter + buttons in a 56px strip. */
+  .text-input-area {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "input   input"
+      "counter actions";
+    align-items: center;
+    padding: 6px 14px;
+    column-gap: 6px;
+    row-gap: 0;
+    height: auto;
+    min-height: var(--input-height-mobile);
+  }
+
+  .text-input-area .text-input {
+    grid-area: input;
+    width: 100%;
+    min-height: 32px;
+    padding: 2px 0;
+  }
+
+  .text-input-area .turn-counter {
+    grid-area: counter;
+    justify-self: start;
+    padding: 0;
+  }
+
+  .text-input-area .input-actions {
+    grid-area: actions;
+    justify-self: end;
+  }
+
+  /* When no counter is rendered, let the buttons occupy the full bottom row. */
+  .text-input-area .input-actions:only-of-type {
+    grid-column: 1 / -1;
+  }
+
+  .record-icon-container {
+    margin-left: 15px;
+  }
+
+  .record-button {
+    background-color: var(--mode-quest-active); /* Deeper coral - consistent across devices */
+    box-shadow: 0 3px 10px color-mix(in srgb, var(--utility-pure-black) var(--a-20), transparent);
+  }
+  
+  .mic-icon {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .waveform-bar {
+    width: 3px;
+    height: 6px;
+    margin: 0 1px;
+  }
+  
+  .toggle-input {
+    width: 44px;
+    height: 44px;
+  }
+  
+  .action-button {
+    width: 44px;
+    height: 44px;
+  }
+  
+  /* Better touch feedback for mobile */
+  .record-button:active {
+    animation: touch-feedback 0.6s ease;
+  }
+}
+
+/* Tablet styles */
+@media (min-width: 481px) and (max-width: 768px) {
+  .unified-input-container {
+    margin-bottom: 4px; /* Ultra-aggressive: 12px → 8px → 4px */
+  }
+  
+  .record-button,
+  .text-input-area {
+    height: var(--input-height-tablet);
+  }
+  
+  .record-icon-container {
+    margin-left: 18px;
+  }
+  
+  .record-button {
+    background-color: var(--mode-quest-active); /* Deeper coral - consistent across devices */
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--utility-pure-black) var(--a-15), transparent);
+  }
+  
+  .mic-icon {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .toggle-input {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* Desktop styles */
+@media (min-width: 769px) {
+  .unified-input-container {
+    margin-bottom: 16px;
+  }
+  
+  .record-icon-container {
+    margin-left: 20px;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .text-input-area,
+  .record-button,
+  .action-button,
+  .toggle-input {
+    transition: none;
+  }
+
+  .record-button.recording {
+    animation: none;
+  }
+
+  .record-button.recording .waveform-bar {
+    animation: none;
+    height: 10px;
+  }
+  
+  .pulse,
+  .pulse-element {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
+/* High contrast mode */
+@media (forced-colors: active) {
+  .record-button,
+  .text-input-area {
+    border: 2px solid ButtonText;
+  }
+  
+  .toggle-input {
+    border: none;
+    outline: 1px solid ButtonText;
+  }
+  
+  .action-button {
+    outline: 1px solid ButtonText;
+  }
+}
+
+/* For devices that don't support hover - prevent sticky :hover on mobile */
+@media (hover: none) {
+  .record-button:hover {
+    background-color: var(--mode-quest-active); /* Keep coral, don't go transparent */
+    transform: none;
+    box-shadow: 0 2px 5px color-mix(in srgb, var(--utility-pure-black) var(--a-20), transparent);
+  }
+
+  .action-button:hover {
+    background-color: transparent;
+    transform: none;
+  }
+
+  .toggle-input:hover {
+    background-color: transparent;
+    transform: none;
+  }
+}
+
+/* 2025 Container Queries - Future-Proof Component Responsiveness */
+@container input-container (max-width: 300px) {
+  /* Ultra-compact mode - adjust for very narrow containers */
+  .text-input-area {
+    padding: 0 10px;
+  }
+  
+  .action-button {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .record-text {
+    font-size: 0.85rem;
+  }
+}
+
+@container input-container (min-width: 400px) {
+  /* Enhanced mode - more space available */
+  .text-input-area {
+    padding: 0 20px;
+  }
+  
+  .action-button {
+    width: 44px;
+    height: 44px;
+  }
+  
+  .record-text {
+    font-size: 1rem;
+  }
+}
+
+@container input-container (min-width: 600px) {
+  /* Desktop-like mode - generous spacing */
+  .text-input-area {
+    padding: 0 25px;
+  }
+  
+  .input-actions {
+    gap: 12px;
+  }
+  
+  .record-button-content {
+    grid-template-columns: auto 1fr auto; /* Balanced layout with counter column */
+  }
+}
+
+/* Tablet styles - restore margins to match chatbox */
+@media (min-width: 768px) {
+  .unified-input-container {
+    width: calc(100% - 2 * var(--chat-margin-tablet));
+    margin: 0 var(--chat-margin-tablet) var(--input-bottom-spacing);
+    border-radius: var(--border-radius);
+    padding-left: 0; /* Remove mobile padding */
+    padding-right: 0;
+  }
+}
+
+/* State-of-the-art 2025 Desktop Unified Layout - Proper Specificity */
+@media (min-width: 1024px) {
+  /* Higher specificity selector for proper cascade control */
+  .homepage .main-content .unified-input-container {
+    /* Proper centering using established CSS cascade */
+    width: calc(100% - 2 * var(--content-inline-padding)); /* Match other components */
+    max-width: var(--content-max-width); /* Constrain maximum width */
+    margin-left: auto; /* Center horizontally */
+    margin-right: auto; /* Center horizontally */
+    margin-bottom: var(--input-bottom-spacing); /* Keep bottom spacing */
+    
+    /* Proper positioning reset through specificity */
+    position: relative;
+    left: auto;
+    transform: none;
+    
+    /* Ensure proper flex behavior */
+    flex-shrink: 0; /* Don't shrink */
+  }
+  
+  /* Enhanced specificity for padding control */
+  .homepage .main-content .unified-input-container {
+    padding-left: 0; /* Remove mobile padding */
+    padding-right: 0; /* Remove mobile padding */
+  }
+}
+
+/* 🎯 Desktop and Tablet centering for record text */
+@media (min-width: 481px) {
+  .record-button-content {
+    /* Adjust grid to give more space to text column */
+    grid-template-columns: auto 1fr auto;
+  }
+
+  .record-text {
+    /* Shift text slightly right to appear visually centered */
+    position: relative;
+    left: 15px; /* Compensate for the control area on the right */
+  }
+}
+
+/* Fine-tune for larger screens */
+@media (min-width: 1024px) {
+  .record-text {
+    left: 20px;
+    font-size: var(--ui-font-size-chat);
+  }
+}
+
+/* PII Warning */
+.pii-warning {
+  background: color-mix(in srgb, var(--warning-subtle, #b8860b) 15%, var(--bg-primary));
+  border: 1px solid color-mix(in srgb, var(--warning-subtle, #b8860b) 30%, transparent);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  margin: 0 1rem 0.5rem;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+.pii-warning p {
+  margin: 0 0 0.5rem;
+}
+
+.pii-warning-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.pii-send-anyway,
+.pii-edit {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  border: 1px solid color-mix(in srgb, var(--text-secondary) 30%, transparent);
+  background: transparent;
+  color: var(--text-secondary);
+  min-height: 44px;
+  min-width: 44px;
+}
+
+.pii-edit {
+  background: color-mix(in srgb, var(--gold-subtle, #d4a539) 15%, transparent);
+  color: var(--text-primary);
+  border-color: color-mix(in srgb, var(--gold-subtle, #d4a539) 40%, transparent);
+}

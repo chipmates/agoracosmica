@@ -1,0 +1,1216 @@
+:root {
+  --primary-color: var(--bg-card); --secondary-color: var(--gold-subtle); --accent-color: var(--mode-quest);
+  --text-color: var(--cosmic-text-primary); --max-desktop-width:2250px;
+  
+  /* Safe area variables handled globally in viewport-fixes.css */
+
+  /* Desktop dynamic sizing */
+  --desktop-sidebar-width: clamp(280px, 18vw, 380px); /* Increased min width for button text */
+  --desktop-miniature-size: clamp(80px, min(6.5vw, 12vh), 112px); /* Reduced by 20% for more spacing */
+  --desktop-miniature-gap: clamp(4px, 0.5vw, 8px); /* Deprecated - using row/column gap now */
+  --desktop-action-gap: clamp(12px, 1.5vw, 20px);
+
+  /* Action button sizing - Golden ratio based */
+  --desktop-button-height: clamp(44px, 5vh, 56px);
+  --desktop-button-gap: clamp(12px, 1.5vh, 20px);
+  --desktop-button-padding-x: clamp(24px, 2.5vw, 36px); /* Increased for text space */
+  --desktop-button-font-size: clamp(0.9375rem, 0.9375rem + 0.2vw, 1.0625rem); /* 15px to 17px for better fit */
+  --desktop-icon-size: clamp(18px, 1.5vw, 22px); /* Slightly smaller max icon */
+  
+  /* 2025 STATE-OF-THE-ART: Dynamic viewport height for complete screen usage */
+  --figure-container-height: 100dvh;
+  --figure-container-fallback: 100vh;
+  
+  /* Advanced image optimization variables */
+  --image-aspect-preference: auto; /* Dynamic based on container */
+  --image-scale-factor: 1;
+  --image-priority-loading: high;
+}
+
+/* FIXED: Renamed class from .main-content to .carousel-content-area to avoid CSS namespace collision with HomePage */
+
+/* FADE/ZOOM KEYFRAMES */
+/* Removed fade animations */
+@keyframes fadeInOverlay {
+  0% { opacity:1; }
+  100%{ opacity:1; }
+}
+@keyframes fadeInContent {
+  0% {
+    opacity:1; transform:scale(1);
+  }
+  100% {
+    opacity:1; transform:scale(1);
+  }
+}
+
+.figure-carousel {
+  position:fixed; top:0; left:0; width:100%;
+  height: var(--figure-container-fallback); /* Fallback for older browsers */
+  height: var(--figure-container-height); /* Dynamic viewport height (100dvh) */
+  background: var(--primary-deep);
+  display:flex; flex-direction:column; overflow:hidden;
+  z-index: var(--z-modal); /* 2000 - Above sidebar */
+  color:var(--text-color);
+  margin: 0;
+  border: 0;
+
+  /* 2025 ULTRATHINK: Ultra-tight responsive gaps for maximum portrait space */
+  gap: clamp(6px, 0.8vh, 12px);
+
+  /* 2025 APPROACH: Direct env() usage bypasses Safari PWA bug */
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+  box-sizing: border-box;
+
+  animation: none;
+}
+.figure-carousel.extra-large-screen { 
+  background: var(--primary-deep);
+}
+
+/* Blurred background for liquid glass overlay effect */
+.figure-carousel.blurred-background {
+  filter: blur(3px);
+  transform: scale(1.02);
+  transition: all 0.6s cubic-bezier(0.23, 1, 0.320, 1);
+}
+
+/* Prevent interaction when blurred */
+.figure-carousel.blurred-background * {
+  pointer-events: none;
+}
+
+.categories-section {
+  display:flex; 
+  justify-content:center; 
+  align-items: center;
+  padding: 16px 0;
+  background-color: var(--primary-deep);
+  gap: 10px; /* Golden ratio inspired spacing */
+  width: 100%;
+  max-width: 340px; /* Increased from 320px for 6% more width on mobile */
+  margin: 0 auto; /* Center the container */
+}
+
+/* CategoryTab specific styles */
+.figure-category-tab {
+  /* Buttons use flex: 1 from CategoryTab.module.css */
+  /* This ensures equal width distribution */
+}
+/* Old category-button styles - no longer used */
+
+/* MINIATURES - Mobile: Single horizontal scroll row (2025 pattern) */
+.miniatures-section {
+  display: flex;
+  flex-wrap: nowrap; /* Single row - all miniatures in one line */
+  overflow-x: auto; /* Horizontal scrolling */
+  overflow-y: hidden;
+  justify-content: flex-start; /* Align to start for scroll */
+  align-items: center; /* Vertically center miniatures */
+  padding: 8px 12px; /* Horizontal padding for edge breathing room */
+  gap: 6px; /* Consistent spacing between miniatures */
+  background-color: var(--primary-deep);
+
+  /* Explicit height to contain miniatures fully */
+  height: 86px; /* 70px miniature + 16px padding (8px top + 8px bottom) */
+  min-height: 86px; /* Ensure minimum height */
+
+  /* Modern scroll behavior */
+  scroll-snap-type: x mandatory; /* Snap to miniatures */
+  -webkit-overflow-scrolling: touch; /* Smooth iOS scrolling */
+  scrollbar-width: none; /* Hide scrollbar on Firefox */
+  -ms-overflow-style: none; /* Hide scrollbar on IE/Edge */
+
+  /* Relative positioning for fade gradient */
+  position: relative;
+}
+
+/* Hide scrollbar on WebKit browsers */
+.miniatures-section::-webkit-scrollbar {
+  display: none;
+}
+
+/* Subtle fade gradient at right edge - indicates more content */
+.miniatures-section::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 40px; /* Subtle fade width */
+  height: 100%;
+  background: linear-gradient(to right, transparent 0%, var(--primary-deep) 85%);
+  pointer-events: none; /* Don't block clicks */
+  z-index: var(--z-base); /* 2 - Above miniatures */
+}
+.miniature {
+  width: 70px; /* Increased from 65px - we have more space now */
+  height: 70px;
+  margin: 0; /* Use gap instead for consistent spacing */
+  border-radius: 15px;
+  overflow: hidden;
+  cursor: pointer;
+  position: relative;
+
+  /* Prevent compression in horizontal scroll */
+  flex-shrink: 0;
+
+  /* Scroll snap alignment */
+  scroll-snap-align: start;
+
+  /* Minimal Quantum Glow - State-of-the-art 2025 hover effect */
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* Minimal Quantum Glow effect - State-of-the-art 2025 */
+.miniature::after {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), 
+    color-mix(in srgb, var(--gold-subtle) var(--a-70), transparent) 0%, 
+    color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent) 40%,
+    transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: 20px;
+  pointer-events: none;
+  z-index: var(--z-base); /* 1 */
+}
+
+/* Touch-friendly: scale-only feedback on mobile tap — no gold glow. */
+@media (hover: none) and (pointer: coarse) {
+  .miniature:active {
+    transform: scale(1.05) translateZ(0);
+  }
+}
+
+/* Desktop hover: scale only, no box-shadow and no radial ::after glow. */
+.miniature:hover {
+  transform: scale(1.05) translateZ(0);
+}
+
+/* Miniature thumbnail display control - high specificity */
+.figure-carousel .miniature img,
+.figure-carousel .miniature .optimized-image,
+.figure-carousel .miniature .optimized-image__img {
+  width:100%;
+  height:100%;
+  /* Thumbnails always use cover to fill circular containers */
+  object-fit: cover;
+  object-position: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: var(--z-base); /* 2 */ /* Above the glow effect */
+  transition: transform 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+}
+/* REMOVED: All hover and active effects */
+.miniature.active {
+  /* Simple visual indicator without effects */
+  border: 2px solid var(--accent-color);
+  z-index:1;
+}
+
+/* ULTRATHINK: COMPLETE HEIGHT USAGE - MOBILE/TABLET */
+.main-image-section { 
+  flex: 1 1 auto; /* Take ALL remaining space */
+  position: relative; 
+  background-color: var(--primary-deep);
+  display: block; /* Simplified */
+  overflow: hidden;
+  /* ZERO GAPS */
+  padding: 0;
+  margin: 0;
+  border: 0;
+  /* ABSOLUTE FILL */
+  width: 100%;
+  height: 100%;
+}
+
+.figure-image-container {
+  /* ABSOLUTE POSITIONING FOR COMPLETE FILL */
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* ZERO GAPS */
+  padding: 0;
+  margin: 0;
+  border: 0;
+  /* PERFECT FILL */
+  width: 100%;
+  height: 100%;
+  display: block;
+  background-color: var(--primary-deep);
+}
+
+/* 2025 ARCHITECTURE: FigureCarousel controls its own image display strategy */
+/* High specificity selector (0,4,1) naturally overrides component defaults */
+.figure-carousel .main-image-section .figure-image-container .optimized-image__img,
+.figure-carousel .main-image-section .figure-image-container .figure-image,
+.figure-carousel .main-image-section .optimized-image__img,
+.figure-carousel .main-image-section img {
+  /* MOBILE: Fill height completely, crop sides adaptively */
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  /* Force minimum height to ensure complete fill */
+  min-height: 100%;
+  /* ZERO EFFECTS - NO ZOOM, NO GLOW */
+  transform: none;
+  transition: none;
+  box-shadow: none;
+  filter: none;
+  /* PERFORMANCE OPTIMIZATION */
+  content-visibility: auto;
+  contain: layout style;
+  /* LOADING OPTIMIZATION */
+  loading: eager;
+  fetchpriority: "high";
+  decoding: "sync";
+}
+.info-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  /* COLLAPSED STATE: Solid uniform background - clean and simple */
+  background: rgba(21, 28, 71, 0.45); /* 45% opacity - good text support, portrait still visible */
+  padding: 15px;
+  text-align: center;
+  /* Smooth transition for background change */
+  transition: background 0.3s cubic-bezier(0.23, 1, 0.320, 1);
+  /* ENSURE IT DOESN'T INTERFERE WITH IMAGE HEIGHT */
+  pointer-events: auto;
+  z-index: var(--z-base); /* 10 */
+}
+
+/* EXPANDED STATE: Full background when about text is visible */
+.info-overlay:has(.figure-about-text) {
+  background: rgba(21, 28, 71, 0.85); /* 85% opacity for readability */
+  /* Optional: Liquid glass effect for depth separation */
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+}
+.info-overlay h2 {
+  margin: 0;
+  font-size: clamp(1.0625rem, 1.0625rem + 1.2vw, 2rem); /* 17px mobile to 32px desktop - restored to readable size */
+  text-align: center;
+  font-family: var(--font-primary); /* Space Grotesk for figure names */
+  color: var(--text-primary); /* Lightest gray #D2D2D2 - soft on eyes, excellent contrast */
+  font-weight: 600;
+  /* Enhanced multi-layer text-shadow for readability on any background */
+  text-shadow:
+    0 2px 8px color-mix(in srgb, var(--utility-pure-black) 60%, transparent),
+    0 0 16px color-mix(in srgb, var(--utility-pure-black) 40%, transparent),
+    0 0 24px color-mix(in srgb, var(--utility-pure-black) 30%, transparent);
+  letter-spacing: 0.5px;
+  /* Smooth color transition when expanding */
+  transition: color 0.3s cubic-bezier(0.23, 1, 0.320, 1);
+}
+
+/* EXPANDED STATE: Gold color when about text is visible */
+.info-overlay:has(.figure-about-text) h2 {
+  color: var(--secondary-color); /* Gold for expanded state - beautiful against dark background */
+  text-shadow:
+    0 2px 8px color-mix(in srgb, var(--utility-pure-black) 60%, transparent),
+    0 0 16px color-mix(in srgb, var(--utility-pure-black) 40%, transparent),
+    0 0 24px color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent);
+}
+/* Figure about text - elegant serif for biographical narrative */
+.figure-about-text {
+  margin-top: 10px;
+  font-family: var(--font-content, 'Libre Caslon Text', Georgia, serif); /* Classical serif for wisdom content */
+  font-size: clamp(0.9375rem, 0.9375rem + 0.75vw, 1.375rem); /* 15px mobile to 22px desktop */
+  text-align: center;
+  line-height: 1.75; /* More generous for serif readability */
+  font-weight: 400;
+  font-feature-settings: 'liga' 1, 'kern' 1, 'onum' 1; /* Ligatures, kerning, old-style numerals */
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  white-space: pre-line;
+
+  /* Enhanced legibility for serif on dark background */
+  text-shadow: 0 1px 2px color-mix(in srgb, var(--utility-pure-black) var(--a-40), transparent);
+}
+
+/* Golden tags styling - enhanced specificity for centering */
+.figure-carousel .golden-tags {
+  color: var(--secondary-color); /* Golden color */
+  font-family: var(--ui-font-family); /* Space Grotesk for tags */
+  font-size: 0.8125rem; /* 13px - balanced base size */
+  font-weight: 500;
+  letter-spacing: 0.04em; /* Slightly reduced for better fit */
+  text-transform: uppercase;
+  text-shadow: 0 0 8px color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent);
+  margin-top: 0.5rem;
+  text-align: center; /* Component-specific centering without forcing */
+}
+
+/* Small mobile optimization (iPhone SE, etc.) - balanced approach */
+@media (max-width: 375px) {
+  .figure-about-text {
+    font-size: 0.9375rem; /* 15px - readable serif on small screens */
+    line-height: 1.72; /* Balanced between 1.7 and 1.75 */
+    padding: 0 8px; /* Breathing room */
+  }
+
+  .figure-carousel .golden-tags {
+    font-size: 0.75rem; /* 12px - fits better without being cramped */
+    letter-spacing: 0.03em;
+  }
+}
+
+/* ACTIONS */
+.actions-section {
+  display: flex;
+  justify-content: space-around;
+  padding: 12px;
+  gap: 10px; /* Reduced gap to provide more space for buttons */
+  background-color: var(--primary-deep);
+}
+
+/* REMOVED: All glow effects and hover states */
+
+/* Ensure button content stays on one line */
+.actions-section .ripple-button .ripple-button-content {
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: clamp(6px, 0.8vw, 10px);
+}
+
+/* ACTIONS - Base styles for mobile/tablet */
+@media (max-width: 1023px) {
+  .actions-section {
+    display: flex;
+    justify-content: space-around;
+    padding: 12px;
+    padding-bottom: 12px;
+    gap: 10px; /* Reduced gap to provide more space for buttons */
+    background-color: var(--primary-deep);
+    margin-bottom: 0;
+  }
+}
+
+/* Tablet and Desktop category adjustments */
+@media (min-width: 768px) {
+  .categories-section {
+    max-width: 400px; /* Slightly wider on larger screens */
+    padding: 20px 0;
+  }
+}
+
+/* TABLET - ADAPTIVE HEIGHT SYSTEM */
+@media(min-width:768px) and (max-width:1024px){
+  /* Ensure full height usage with Grid layout for guaranteed button visibility */
+  .figure-carousel {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    height: var(--figure-container-height);
+    overflow: hidden;
+    /* Maintain ultra-tight gaps for tablets */
+    gap: clamp(8px, 1vh, 14px);
+  }
+  
+  /* Center categories above image for all tablets */
+  .categories-section {
+    max-width: 600px; /* Match image/button width */
+    margin: 0 auto;
+    padding: 16px 20px;
+  }
+  
+  .tablet-layout { 
+    display: flex; 
+    flex-grow: 1;
+    width: 100%;
+    height: 100%;
+    overflow: hidden; /* Prevent any overflow */
+  }
+  
+  .miniatures-section {
+    width: 140px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto; /* Allow scroll if needed */
+    overflow-x: hidden;
+    padding: 8px 4px;
+    background-color: var(--primary-deep);
+    /* Adaptive miniature container */
+    container-type: size;
+  }
+  
+  /* ADAPTIVE MINIATURE SIZING */
+  .miniature {
+    /* Dynamic sizing based on available height */
+    --available-height: calc(100vh - 200px); /* Rough estimate: categories + actions + padding */
+    --miniature-size: min(92px, calc(var(--available-height) / 11.5)); /* Bigger miniatures, still fits 10 */
+    
+    width: var(--miniature-size);
+    height: var(--miniature-size);
+    aspect-ratio: 1;
+    margin: 5px auto; /* Balanced spacing */
+    border-radius: 16px;
+    flex-shrink: 0; /* Prevent shrinking */
+    /* Minimal Quantum Glow works on tablet too */
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+    transform-style: preserve-3d;
+  }
+  
+  /* Fallback for browsers without CSS custom properties */
+  @supports not (width: var(--miniature-size)) {
+    .miniature {
+      width: 85px;
+      height: 85px;
+    }
+  }
+  /* Simple active state for tablet */
+  .miniature.active {
+    border: 2px solid var(--accent-color);
+  }
+  .tablet-main-content { 
+    flex-grow: 1; 
+    display: flex; 
+    flex-direction: column;
+    background-color: var(--primary-deep);
+    width: calc(100% - 140px); /* Full width minus sidebar width */
+    padding: 0; /* Remove padding */
+    margin: 0; /* Remove margins */
+  }
+  /* ULTRATHINK: TABLET 100% HEIGHT OPTIMIZATION */
+  .main-image-section { 
+    flex: 1 1 auto; /* Take ALL remaining space */
+    position: relative;
+    /* ZERO GAPS */
+    padding: 0;
+    margin: 0;
+    border: 0;
+    /* ABSOLUTE FILL */
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+  
+  /* Tablet-specific: NO PADDING/MARGINS */
+  .tablet-main-content {
+    width: calc(100% - 140px);
+    /* ZERO GAPS */
+    padding: 0;
+    margin: 0;
+    border: 0;
+    /* FULL HEIGHT */
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* TABLET: Absolute positioning for perfect fill */
+  .main-image-section .figure-image-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    width: 100%;
+    height: 100%;
+  }
+  
+  /* TABLET: Override mobile cover with contain - show complete images */
+  .figure-carousel .main-image-section .figure-image-container .optimized-image__img,
+  .figure-carousel .main-image-section .figure-image-container .figure-image,
+  .figure-carousel .main-image-section .optimized-image__img,
+  .figure-carousel .main-image-section img {
+    width: 100%;
+    height: 100%;
+    /* TABLET: Show complete image - NO CROPPING */
+    object-fit: contain;
+    object-position: center;
+    /* NO EFFECTS */
+    transform: none;
+    transition: none;
+  }
+  .actions-section { 
+    flex-direction: row;
+    justify-content: center;
+    padding: 12px 16px;
+    padding-bottom: 12px;
+    gap: 12px;
+    flex-shrink: 0; /* Never shrink - always visible */
+    /* Center buttons for all tablets */
+    max-width: 600px;
+    margin: 0 auto;
+    width: 100%;
+  }
+  
+  /* Height-based adaptations for tablets */
+  /* Short tablets (iPad landscape) */
+  @container (max-height: 800px) {
+    .miniature {
+      --miniature-size: min(78px, calc(var(--available-height) / 12.5));
+    }
+  }
+  
+  /* Very short tablets */
+  @container (max-height: 700px) {
+    .miniature {
+      --miniature-size: min(68px, calc(var(--available-height) / 13.5));
+    }
+    
+    .miniatures-section {
+      padding: 4px 2px;
+    }
+  }
+}
+
+/* Special handling for landscape tablets - Grid layout for miniatures */
+@media (min-width:768px) and (max-width:1024px) and (max-height:800px) {
+  /* Use CSS Grid for proper centering */
+  .tablet-layout {
+    display: grid;
+    grid-template-columns: 180px 1fr 180px; /* Sidebar | Content | Balance */
+    width: 100%;
+    height: 100%;
+  }
+  
+  .miniatures-section {
+    width: 180px; /* Wider for 2x5 grid */
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(5, 1fr);
+    gap: 6px; /* Balanced spacing */
+    padding: 8px;
+    overflow-y: hidden; /* No scroll in grid mode */
+  }
+  
+  .miniature {
+    --miniature-size: min(75px, calc((100vh - 220px) / 5.5));
+    margin: 0; /* Use gap instead */
+  }
+  
+  /* Main content in center column */
+  .tablet-main-content {
+    grid-column: 2; /* Middle column only */
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Ensure image fills available space */
+  .main-image-section {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+/* Desktop category adjustments */
+@media (min-width: 1025px) {
+  .categories-section {
+    max-width: 420px; /* Optimal width for desktop */
+    gap: 12px; /* Slightly more spacing on desktop */
+  }
+}
+
+/* ULTRATHINK: DESKTOP HEIGHT-FIRST IMPLEMENTATION */
+/* DESKTOP ONLY (>1024px) - Mobile/tablet behavior unchanged */
+@media (min-width: 1025px) {
+  .figure-carousel {
+    display: flex;
+    justify-content: center; /* ULTRATHINK: Perfect centering after fixing namespace collision */
+    align-items: stretch; /* Changed from center to stretch */
+    height: var(--figure-container-height);
+
+    /* Desktop: no safe areas needed */
+    padding: 0;
+
+    /* Desktop: no gap needed - horizontal layout with sidebars */
+    gap: 0;
+  }
+  
+  .desktop-layout {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    /* ULTRATHINK: Remove max-width to allow image-driven expansion */
+    /* max-width: var(--max-desktop-width); - REMOVED for height-first scaling */
+    min-width: 100%; /* Use full available width, not viewport width */
+    /* Container for height-first image scaling */
+    position: relative;
+  }
+  
+  /* Dynamic sidebars */
+  .left-sidebar,
+  .right-sidebar {
+    width: var(--desktop-sidebar-width);
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .left-sidebar {
+    background-color: var(--primary-deep);
+    /* Grid-based layout for self-healing behavior */
+    display: grid;
+    grid-template-rows: auto 1fr; /* Categories auto-size, miniatures fill remaining */
+    height: 100%;
+    overflow: hidden;
+  }
+  
+  /* Categories with dynamic sizing for desktop sidebar */
+  .categories-section {
+    flex-direction: column;
+    align-items: center; /* Center the container */
+    padding: clamp(12px, 1.5vw, 20px) 0;
+    flex-shrink: 0; /* Prevent categories from shrinking too much */
+    width: 100%; /* Full width of sidebar */
+    max-width: none; /* Override the general max-width */
+  }
+  
+  /* CategoryTab specific overrides for desktop vertical layout */
+  .figure-category-tab {
+    width: 80%; /* Match miniature proportions in sidebar */
+    margin-bottom: 8px; /* Space between vertical buttons */
+  }
+  
+  .figure-category-tab:last-child {
+    margin-bottom: 0;
+  }
+  
+  /* Dynamic miniatures grid - Self-healing full height distribution */
+  .miniatures-section {
+    flex-grow: 1;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(5, minmax(0, 1fr)); /* minmax ensures proper distribution */
+    height: 100%;
+    /* Simple responsive gaps */
+    row-gap: clamp(8px, 1.5vh, 20px);
+    column-gap: clamp(6px, 0.8vw, 12px); /* Reduced for tighter spacing */
+    padding: clamp(6px, 0.8vw, 12px);
+    overflow: hidden; /* No scrolling - all items visible */
+    align-content: stretch; /* Distribute rows evenly */
+    justify-items: center; /* Center items horizontally */
+    align-items: center; /* Center items vertically */
+  }
+  
+  .miniature {
+    /* Aspect ratio lock - ensures perfect squares */
+    aspect-ratio: 1 / 1;
+    width: min(100%, var(--desktop-miniature-size));
+    height: auto;
+    margin: 0; /* Remove margin, use gap instead */
+    border-radius: clamp(15px, 1.5vw, 20px);
+    justify-self: center;
+    align-self: center;
+    /* REMOVED: All transitions and shadows */
+    transition: none;
+    box-shadow: none;
+    /* Ensure the image inside also maintains aspect ratio */
+    overflow: hidden;
+    position: relative;
+  }
+  
+  /* ULTRATHINK: Main content expands to accommodate full-height image */
+  .carousel-content-area {
+    flex: 1 1 auto; /* Take remaining space after sidebars */
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    /* CRITICAL: Allow horizontal expansion for wide images */
+    min-width: 0;
+    max-width: none; /* Remove any width constraints */
+    /* SAFARI FIX: Prevent unwanted scrollbars */
+    overflow-x: hidden;
+    overflow-y: hidden;
+    /* Safari-specific fix for layout issues */
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* ULTRATHINK: HEIGHT-FIRST IMAGE CONTAINER (DESKTOP ONLY) */
+  .main-image-section {
+    flex: 1 1 auto; /* Take ALL remaining vertical space */
+    position: relative;
+    background-color: var(--primary-deep);
+    display: flex; /* Flex for image positioning */
+    align-items: center; /* Center vertically */
+    justify-content: center; /* Perfect centering of figure image */
+    /* ZERO GAPS */
+    padding: 0;
+    margin: 0;
+    border: 0;
+    /* HEIGHT FIRST - width expands as needed */
+    height: 100%;
+    width: auto; /* Let width expand for full-height image */
+    min-width: 100%; /* At least full width */
+    overflow: visible; /* Allow image to expand */
+  }
+  
+  .figure-image-container {
+    /* ULTRATHINK: HEIGHT-FIRST CONTAINER (DESKTOP) */
+    position: relative;
+    display: inline-flex; /* Shrink to content width */
+    align-items: center;
+    justify-content: center; /* Center figure in available space */
+    /* HEIGHT PRIORITY - full available height */
+    height: 100%;
+    width: auto; /* Width expands to accommodate image */
+    /* ZERO GAPS */
+    padding: 0;
+    margin: 0;
+    border: 0;
+    /* Allow image to determine container width */
+    flex-shrink: 0; /* Don't compress if image is wide */
+  }
+  
+  /* ULTRATHINK: PERFECT HEIGHT-FIRST SCALING (DESKTOP ONLY) */
+  /* ⚠️ CRITICAL: DO NOT CHANGE height: 100% below - breaks entire carousel layout */
+  .figure-carousel .carousel-content-area .main-image-section .figure-image-container .optimized-image__img,
+  .figure-carousel .carousel-content-area .main-image-section .figure-image-container .figure-image,
+  .figure-carousel .carousel-content-area .main-image-section .optimized-image__img,
+  .figure-carousel .carousel-content-area .main-image-section img {
+    /* ULTRATHINK CORE: Height first, width scales proportionally */
+    height: 100%; /* Use full available height - NO CROPPING - DO NOT CHANGE */
+    width: auto;  /* Width scales to maintain aspect ratio */
+    /* DESKTOP: Show complete image - contain strategy */
+    object-fit: contain;
+    object-position: center;
+    /* DESKTOP ONLY: This ensures images use complete height without cutting */
+    max-height: 100%;
+    max-width: 100%; /* Safari fix: prevent overflow */
+    /* ZERO EFFECTS */
+    transform: none;
+    transition: none;
+    /* PERFORMANCE */
+    content-visibility: auto;
+    contain: layout style;
+    /* LOADING */
+    loading: eager;
+    fetchpriority: "high";
+    decoding: "sync";
+    /* IMAGE QUALITY */
+    image-rendering: high-quality;
+    /* Safari-specific image fixes */
+    -webkit-backface-visibility: hidden;
+    -webkit-transform: translateZ(0);
+    /* Ensure crisp display */
+    image-rendering: -webkit-optimize-contrast;
+  }
+  
+  /* Loading state for images */
+  .figure-image.loading,
+  .optimized-image.loading {
+    opacity: 0;
+  }
+  
+  /* REMOVED: All hover zoom effects */
+  
+  /* ULTRATHINK: Info overlay for height-first layout */
+  .info-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%; /* Full width of image */
+    transform: none;
+    z-index: var(--z-base); /* 10 */
+    /* Inherits gradient background from base rule - subtle vignette when collapsed */
+    /* Transitions to solid background when expanded via :has() selector */
+    padding: 20px 30px; /* Better padding for desktop */
+  }
+  
+  /* Constrain text width for readability on large screens */
+  .info-overlay h2 {
+    max-width: 800px; /* Reasonable reading width */
+    margin: 0 auto; /* Center the text block */
+  }
+  
+  .info-overlay p {
+    max-width: 700px; /* Slightly narrower for better readability */
+    margin: 10px auto 0; /* Center the text block */
+  }
+  
+  /* Right sidebar with dynamic spacing */
+  .right-sidebar {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: clamp(15px, 2vw, 30px); /* Reduced padding for more button space */
+    background-color: var(--primary-deep);
+  }
+  
+  .actions-section {
+    flex-direction: column;
+    background-color: transparent;
+    gap: var(--desktop-button-gap);
+    padding: 0; /* Remove padding, handled by sidebar */
+    align-items: stretch;
+  }
+
+  /* Responsive button styling */
+  .actions-section .ripple-button {
+    height: var(--desktop-button-height);
+    min-height: 44px; /* Accessibility minimum */
+    padding: 0 var(--desktop-button-padding-x);
+    /* Font size handled by Button component's responsive sizing */
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  
+  /* Icon sizing within buttons */
+  .actions-section .ripple-button svg {
+    width: var(--desktop-icon-size);
+    height: var(--desktop-icon-size);
+  }
+  
+  /* REMOVED: All hover and active scaling effects */
+  
+  /* Font sizes now handled by responsive clamp() values in base styles */
+  .info-overlay {
+    /* Desktop-specific positioning adjustments only */
+  }
+}
+
+/* 2025 STATE-OF-THE-ART: Container-based optimizations */
+@container figure-carousel (max-height: 750px) {
+  /* Use container queries instead of viewport for better precision */
+  .categories-section {
+    padding: 6px 8px;
+  }
+  
+  .miniatures-section {
+    --base-gap: 4px;
+    padding: 4px;
+  }
+  
+  /* Intelligent size reduction for constrained containers */
+  :root {
+    --desktop-miniature-size: clamp(64px, min(5.6vw, 10vh), 88px);
+    --desktop-button-height: clamp(36px, 4vh, 44px);
+    --desktop-button-gap: clamp(8px, 1vh, 14px);
+    /* Button font sizes handled by component responsive sizing */
+    --desktop-icon-size: clamp(16px, 1.3vw, 20px);
+    --image-scale-factor: 0.98; /* Slightly smaller for tight spaces */
+  }
+}
+
+/* Legacy media query fallback */
+@media (min-width: 1025px) and (max-height: 750px) {
+  /* Fallback for browsers without container query support */
+  .categories-section {
+    padding: 6px 8px;
+  }
+  
+  .miniatures-section {
+    --base-gap: 4px;
+    padding: 4px;
+  }
+}
+
+/* Breakpoint-specific refinements */
+@media (min-width: 1280px) {
+  :root {
+    --desktop-sidebar-width: clamp(270px, 18vw, 342px); /* Reduced by 10% */
+    --desktop-miniature-size: clamp(88px, min(7.2vw, 13vh), 112px);
+    --desktop-button-height: clamp(46px, 5.2vh, 58px);
+    /* Button font sizes handled by component responsive sizing */
+  }
+}
+
+@media (min-width: 1366px) {
+  :root {
+    --desktop-sidebar-width: clamp(288px, 20vw, 360px); /* Reduced by 10% */
+    --desktop-miniature-size: clamp(92px, min(7.6vw, 14vh), 116px);
+    --desktop-button-height: clamp(48px, 5.5vh, 60px);
+    /* Button font sizes handled by component responsive sizing */
+  }
+}
+
+@media (min-width: 1920px) {
+  :root {
+    --desktop-sidebar-width: clamp(306px, 18vw, 405px); /* Reduced by 10% */
+    --desktop-miniature-size: clamp(96px, min(6.4vw, 14.5vh), 128px);
+    --desktop-button-height: clamp(50px, 5.8vh, 64px);
+    /* Button font sizes handled by component responsive sizing */
+    --desktop-icon-size: clamp(20px, 1.6vw, 26px);
+  }
+
+  /* Old category-button styles removed - using CategoryTab component */
+}
+
+@media (min-width: 2560px) {
+  :root {
+    --desktop-sidebar-width: clamp(342px, 16vw, 450px); /* Reduced by 10% */
+    --desktop-miniature-size: clamp(104px, min(5.6vw, 15vh), 144px);
+    --desktop-button-height: clamp(54px, 6vh, 68px);
+    /* Button font sizes handled by component responsive sizing */
+    --desktop-icon-size: clamp(22px, 1.8vw, 28px);
+    /* 2025 optimization: Scale factor for ultra-high resolution displays */
+    /* REMOVED: Image scaling variables */
+  }
+  
+  /* ULTRATHINK: Enhanced ultra-wide handling for height-first images */
+  .figure-image,
+  .optimized-image {
+    image-rendering: high-quality;
+    /* SAFETY: Prevent extreme horizontal expansion */
+    max-width: calc(100vw - var(--desktop-sidebar-width) * 2);
+  }
+  
+  /* ULTRA-WIDE OPTIMIZATION: Very wide images get horizontal scroll */
+  .carousel-content-area {
+    /* Enable smooth horizontal scrolling for very wide images */
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+  }
+  
+  /* Global purple scrollbar will be inherited automatically */
+}
+
+/* ULTRATHINK: EXTRA LARGE DESKTOP - HEIGHT-FIRST OPTIMIZATION */
+@media(min-width:1601px) {
+  .figure-carousel.extra-large-screen { 
+    background-color:var(--primary-deep); 
+  }
+  .extra-large-screen .desktop-layout {
+    border-radius:15px; 
+    overflow:hidden; 
+    box-shadow: 0 0 50px color-mix(in srgb, var(--utility-pure-black) var(--a-40), transparent), 0 0 0 1px color-mix(in srgb, var(--gold-subtle) var(--a-15), transparent);
+    /* ENSURE HEIGHT-FIRST SCALING EVEN ON MASSIVE SCREENS */
+    max-width: none; /* Allow unlimited width for full-height images */
+  }
+  
+  /* Ultra-wide image handling for massive displays */
+  .figure-image,
+  .optimized-image {
+    /* On ultra-large screens, remove width constraints entirely */
+    max-width: none;
+  }
+}
+
+/* SAFARI-SPECIFIC FIXES */
+/* Target Safari using multiple methods for better coverage */
+@supports (-webkit-appearance: none) and (stroke-color: transparent) {
+  @media (min-width: 1025px) {
+    /* Safari-specific sidebar width adjustment */
+    .figure-carousel {
+      --desktop-sidebar-width: 300px; /* Increased for button text space */
+    }
+    
+    /* Fix desktop layout compression issues on Safari */
+    .desktop-layout {
+      display: flex;
+      flex-shrink: 0; /* Prevent compression */
+      width: 100vw; /* Use viewport width */
+      gap: 0; /* Ensure no unexpected gaps */
+    }
+    
+    /* Ensure sidebars maintain their width */
+    .left-sidebar,
+    .right-sidebar {
+      flex: 0 0 var(--desktop-sidebar-width); /* Fixed width, no grow/shrink */
+      width: var(--desktop-sidebar-width);
+      max-width: var(--desktop-sidebar-width);
+      min-width: var(--desktop-sidebar-width);
+    }
+    
+    /* Fix main content area */
+    .carousel-content-area {
+      flex: 1 1 0; /* Better flex basis for Safari */
+      min-width: 0;
+      overflow: hidden !important; /* Force no scrollbars */
+    }
+    
+    /* Fix image container sizing */
+    .main-image-section {
+      overflow: hidden; /* Prevent overflow */
+      width: 100%;
+    }
+    
+    /* Ensure figure image respects container bounds - Safari specific */
+    .figure-carousel .carousel-content-area .main-image-section .figure-image-container .optimized-image__img,
+    .figure-carousel .carousel-content-area .main-image-section .figure-image-container .figure-image,
+    .figure-carousel .carousel-content-area .main-image-section .optimized-image__img,
+    .figure-carousel .carousel-content-area .main-image-section img {
+      max-width: 100%;
+      object-fit: contain; /* Safari uses contain on desktop */
+    }
+    
+    /* Fix miniatures grid */
+    .miniatures-section {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-rows: repeat(5, minmax(0, 1fr));
+      gap: 10px; /* Consistent gap */
+      padding: 10px;
+      overflow: hidden;
+    }
+    
+    /* Fix miniature sizing on Safari */
+    .miniature {
+      width: 100%; /* Use full grid cell */
+      max-width: 100px; /* Cap the size */
+      aspect-ratio: 1;
+      margin: 0;
+    }
+    
+    /* Ensure action buttons don't compress */
+    .right-sidebar .actions-section {
+      flex-direction: column;
+      gap: clamp(15px, 2vh, 25px); /* Responsive gap */
+      padding: 15px; /* Less padding for more button width */
+      height: 100%;
+      justify-content: center;
+    }
+    
+    .right-sidebar .actions-section .ripple-button {
+      width: 100%; /* Full width in sidebar */
+      flex: 0 0 auto; /* Don't flex, maintain natural height */
+      min-height: var(--desktop-button-height);
+      padding: 0 clamp(16px, 1.5vw, 24px); /* Responsive padding */
+      font-size: clamp(0.9375rem, 0.9375rem + 0.2vw, 1.0625rem); /* Slightly smaller font if needed */
+    }
+    
+    /* Ensure button text stays on one line */
+    .right-sidebar .ripple-button-content {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      gap: 8px; /* Smaller gap between icon and text */
+    }
+  }
+}
+
+/* SMALL < 400px */
+@media(min-width:1px) and (max-width:400px){
+  /* Small mobile adjustments - safe areas handled by base rule */
+  .figure-carousel {
+    /* Small mobile styling handled by base rule */
+  }
+
+  .miniature {
+    width: 65px; /* Slightly smaller on very small screens */
+    height: 65px;
+    margin: 0; /* Use gap instead */
+    border-radius: 15px;
+    flex-shrink: 0; /* Prevent compression */
+    scroll-snap-align: start; /* Snap behavior */
+    /* Minimal Quantum Glow preserved on small screens */
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+  }
+  .miniatures-section {
+    padding: 8px 10px; /* Horizontal padding for edge spacing */
+    gap: 5px; /* Slightly tighter gap on small screens */
+    height: 81px; /* 65px miniature + 16px padding */
+    min-height: 81px;
+    align-items: center; /* Vertically center miniatures */
+  }
+  /* Font sizes now handled by responsive clamp() values */
+  .actions-section {
+    padding: 6px 6px; /* Reduced from 8px - tighter spacing */
+    padding-bottom: 6px;
+    gap: 4px; /* Further reduced gap for small screens */
+    flex-direction: row;
+    margin-bottom: 0;
+  }
+  /* Old category-button styles removed - using CategoryTab component */
+  .categories-section {
+    padding: 8px 0 4px 0; /* Ultra-tight bottom padding - closer to miniatures */
+    max-width: 100%; /* Allow full width on very small screens */
+  }
+  /* Ensure buttons have minimum width to fit content properly */
+  .actions-section .ripple-button {
+    min-width: 90px; /* Minimum width for buttons to prevent text wrapping */
+  }
+  
+  /* Ensure button content (text) doesn't wrap */
+  .actions-section .ripple-button-content {
+    white-space: nowrap;
+  }
+  
+  /* Optimize info-overlay spacing for mobile to fit longer German descriptions */
+  .info-overlay {
+    padding: 8px 10px 4px 10px; /* Significantly reduced all padding */
+  }
+  
+  .info-overlay h2 {
+    margin-bottom: 0; /* Remove any default margin */
+  }
+  
+  .info-overlay p {
+    margin-top: 4px; /* Minimal gap between title and description */
+    margin-bottom: 0; /* Remove bottom margin */
+    line-height: 1.5; /* Maintain readability */
+    /* Ensure efficient use of space without sacrificing readability */
+  }
+  
+  /* ULTRATHINK: Reduce gap between image and buttons to give more space for content */
+  .actions-section {
+    margin-top: -6px; /* Moderate pull to avoid overlapping buttons */
+  }
+
+  /* iPhone SE and iPhone mini: Graceful scrolling (optimize for 90%, accommodate 10%) */
+  @media (max-width: 375px) {
+    .figure-carousel {
+      overflow-y: auto; /* Allow scrolling if needed */
+      -webkit-overflow-scrolling: touch; /* Smooth iOS scrolling */
+    }
+  }
+}
+
+/* MEDIUM MOBILE 401-768px */
+@media(min-width:401px) and (max-width:768px){
+  /* Mobile-specific adjustments - safe areas handled by base rule */
+  .figure-carousel {
+    /* Mobile styling handled by base rule */
+  }
+
+  /* Ultra-tight spacing for maximum portrait space - 2025 mobile-first pattern */
+  .categories-section {
+    padding: 10px 0 6px 0; /* Ultra-tight bottom padding - closer to miniatures */
+  }
+
+  .miniatures-section {
+    padding: 8px 12px; /* Horizontal padding for edge spacing */
+    gap: 6px; /* Consistent spacing */
+    height: 86px; /* 70px miniature + 16px padding */
+    min-height: 86px;
+    align-items: center; /* Vertically center miniatures */
+  }
+
+  .actions-section {
+    padding: 8px 8px; /* Reduced from 12px - tighter spacing */
+    padding-bottom: 8px;
+  }
+
+  /* Optimize info-overlay spacing for tablets and larger phones */
+  .info-overlay {
+    padding: 14px 14px 10px 14px; /* Slightly less aggressive than small mobile */
+  }
+
+  .info-overlay p {
+    margin-top: 8px; /* Between desktop (10px) and small mobile (6px) */
+    line-height: 1.55; /* Slightly more comfortable than small mobile */
+  }
+}
+
+/* REMOVED: Complex container queries - using simple 100% fill approach */
+
+/* REMOVED: All view transitions and complex effects */
+
+/* REDUCE MOTION - ALL EFFECTS ALREADY REMOVED */
+@media(prefers-reduced-motion:reduce){
+  .figure-carousel *{
+    transition:none!important; 
+    animation:none!important;
+    transform: none!important;
+  }
+}

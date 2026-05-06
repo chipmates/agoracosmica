@@ -1,0 +1,143 @@
+/* Context-Aware Text System - Enhanced Gray Implementation */
+
+:root {
+  /* Base gray system (VS Code calibrated) */
+  --cosmic-text-primary: var(--text-primary);   /* From design system */
+  --cosmic-text-secondary: var(--text-secondary); /* From design system */
+  --cosmic-text-tertiary: var(--text-dim);  /* From design system */
+  
+  /* Context-specific text colors for special backgrounds */
+  --cosmic-text-on-light: var(--text-dim);     /* Darker for white overlays */
+  --cosmic-text-on-dark: var(--text-primary);      /* Brighter for high-opacity backgrounds */
+  --cosmic-text-on-golden: var(--text-primary);    /* Optimized for golden borders */
+  --cosmic-text-disabled: var(--text-disabled);     /* Keep cosmic accent for disabled */
+}
+
+/* Default text - applies to standard cosmic blue backgrounds */
+.cosmic-text {
+  color: var(--cosmic-text-primary);
+}
+
+.cosmic-text-secondary {
+  color: var(--cosmic-text-secondary);
+}
+
+.cosmic-text-tertiary {
+  color: var(--cosmic-text-tertiary);
+}
+
+/* Context-specific overrides */
+
+/* For containers with white/light overlays (20-30% white) */
+.text-on-light-overlay,
+.seed-list-item,
+.detail-section,
+.progress-section {
+  --text-primary: var(--cosmic-text-on-light);
+  --text-secondary: var(--text-dim);
+  --text-tertiary: var(--text-dim);
+}
+
+.text-on-light-overlay,
+.text-on-light-overlay .cosmic-text,
+.seed-list-item,
+.detail-section,
+.progress-section {
+  color: var(--text-primary, var(--cosmic-text-on-light));
+}
+
+/* For high-opacity dark backgrounds (85%+) */
+.text-on-dark-overlay,
+.seed-details-panel,
+.summary-content,
+.im-content-card {
+  --text-primary: var(--cosmic-text-on-dark);
+  --text-secondary: var(--text-primary);
+  --text-tertiary: var(--text-secondary);
+}
+
+.text-on-dark-overlay,
+.text-on-dark-overlay .cosmic-text,
+.seed-details-panel,
+.summary-content,
+.im-content-card {
+  color: var(--text-primary, var(--cosmic-text-on-dark));
+}
+
+/* For golden/warm background contexts */
+.text-on-golden,
+.setting-card,
+.category-button,
+.seed-header {
+  --text-primary: var(--cosmic-text-on-golden);
+  --text-secondary: var(--text-secondary);
+  --text-tertiary: var(--text-dim);
+}
+
+.text-on-golden,
+.text-on-golden .cosmic-text,
+.setting-card,
+.category-button,
+.seed-header {
+  color: var(--text-primary, var(--cosmic-text-on-golden));
+}
+
+/* Gradient background containers */
+.text-on-gradient,
+.im-unified-card,
+.seed-history-section {
+  --text-primary: var(--cosmic-text-on-dark);
+  color: var(--text-primary);
+}
+
+/* Chat messages - context-specific */
+.message.user {
+  /* Coral background - use standard gray */
+  color: var(--cosmic-text-primary);
+}
+
+.message.assistant {
+  /* Deep blue background - slightly brighter */
+  color: var(--cosmic-text-on-dark);
+}
+
+/* Ensure consistent secondary text across contexts */
+.text-on-light-overlay .secondary-text,
+.seed-list-item .secondary-text,
+.detail-section .secondary-text {
+  color: var(--text-secondary, var(--text-dim));
+}
+
+.text-on-dark-overlay .secondary-text,
+.seed-details-panel .secondary-text,
+.summary-content .secondary-text {
+  color: var(--text-secondary, var(--text-primary));
+}
+
+.text-on-golden .secondary-text,
+.setting-card .secondary-text,
+.category-button .secondary-text {
+  color: var(--text-secondary, var(--text-secondary));
+}
+
+/* Debug mode - add colored backgrounds to see context application */
+.debug-text-contexts .text-on-light-overlay {
+  background: rgba(255, 0, 0, 0.1) !important; /* Red tint */
+}
+
+.debug-text-contexts .text-on-dark-overlay {
+  background: rgba(0, 255, 0, 0.1) !important; /* Green tint */
+}
+
+.debug-text-contexts .text-on-golden {
+  background: rgba(255, 255, 0, 0.1) !important; /* Yellow tint */
+}
+
+/* Accessibility - ensure minimum contrast ratios are maintained */
+@media (prefers-contrast: high) {
+  :root {
+    --cosmic-text-on-light: var(--text-dim);  /* Higher contrast for light overlays */
+    --cosmic-text-on-dark: var(--text-primary);   /* Higher contrast for dark overlays */
+    --cosmic-text-on-golden: var(--text-primary); /* Higher contrast for golden contexts */
+  }
+}

@@ -1,0 +1,1038 @@
+/* ============================================
+   SEED DETAIL VIEW - v3.0 READING MODE
+   All styles scoped under .seed-detail-view
+   to avoid conflicts with other components
+   ============================================ */
+
+/* ========================================
+   COMPONENT ROOT - Self-Contained Scroll Context
+   ======================================== */
+
+.seed-detail-view {
+  /* Make this the scroll container (not detail-view-overlay) */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2001; /* Above detail-view-overlay */
+
+  /* This element scrolls */
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+
+  /* Styling */
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Mobile safe areas */
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+.seed-detail-view .container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-top: 2rem;
+}
+
+.seed-detail-view .content-wrapper {
+  padding: 4rem 2rem;
+}
+
+/* ========================================
+   COSMIC HEADER (Desktop Only)
+   ======================================== */
+
+.seed-detail-view .cosmic-header {
+  position: relative;
+  text-align: center;
+  padding: 2rem 1.5rem;
+  min-height: 76px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 2px solid color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+  background: linear-gradient(
+    180deg,
+    rgba(21, 28, 71, 0.8) 0%,
+    rgba(21, 28, 71, 0.4) 100%
+  );
+  backdrop-filter: blur(var(--glass-blur-heavy));
+}
+
+.seed-detail-view .figure-name-cosmic {
+  font-family: var(--font-ui);
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  background: linear-gradient(
+    135deg,
+    var(--gold-primary) 0%,
+    var(--gold-subtle) 50%,
+    var(--gold-primary) 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 20px rgba(230, 188, 92, 0.3));
+  margin: 0;
+}
+
+/* ========================================
+   STICKY NAVIGATION BAR
+   ======================================== */
+
+.seed-detail-view .seed-navigator {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--bg-astral);
+  border-bottom: 1px solid color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+  padding: 1rem 1.5rem;
+  backdrop-filter: blur(var(--glass-blur-heavy));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Navigation button container for organized layout */
+.seed-detail-view .nav-buttons-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.seed-detail-view .seed-nav-label {
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  margin-right: 0.5rem;
+}
+
+.seed-detail-view .seed-nav-button {
+  min-width: 44px;
+  height: 44px;
+  padding: 0;
+  background: color-mix(in srgb, var(--gold-subtle) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 25%, transparent);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-family: var(--font-ui);
+  font-size: var(--text-base);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.seed-detail-view .seed-nav-button:hover {
+  background: color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+  border-color: color-mix(in srgb, var(--gold-subtle) 40%, transparent);
+  color: var(--gold-primary);
+  transform: translateY(-1px);
+}
+
+.seed-detail-view .seed-nav-button.active {
+  background: var(--gold-subtle);
+  border-color: var(--gold-primary);
+  color: var(--bg-primary);
+  font-weight: 700;
+}
+
+.seed-detail-view .seed-nav-button:focus-visible {
+  outline: 2px solid var(--gold-primary);
+  outline-offset: 2px;
+}
+
+/* ========================================
+   CLOSE BUTTON (Using standard CloseButton component)
+   ======================================== */
+
+/* Close button styling - different per breakpoint */
+.seed-detail-view .close-nav-button {
+  font-size: 1.75rem; /* Larger × symbol */
+  line-height: 1;
+  color: var(--gold-primary); /* Yellow/gold color */
+  font-weight: 300; /* Thinner weight for × */
+}
+
+/* Desktop: Standard CloseButton component in fixed position */
+@media (min-width: 769px) {
+  .seed-detail-view .detail-view-close {
+    position: fixed;
+    top: 16px;
+    right: 24px;
+    z-index: 1000;
+  }
+
+  /* Hide the nav bar close button on desktop */
+  .seed-detail-view .close-nav-button {
+    display: none;
+  }
+}
+
+/* Mobile: Close button in nav bar, styled like seed buttons */
+@media (max-width: 768px) {
+  .seed-detail-view .cosmic-header {
+    display: none !important;
+  }
+
+  /* Desktop close button not rendered on mobile (handled in component) */
+
+  /* Navigation: Two-row grid layout for balanced distribution */
+  .seed-detail-view .seed-navigator {
+    padding: 0.75rem 0.75rem;
+    gap: 0.5rem;
+    justify-content: flex-start;
+  }
+
+  .seed-detail-view .seed-nav-label {
+    display: none; /* Hide "Jump to:" on mobile to save space */
+  }
+
+  .seed-detail-view .nav-buttons-container {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr); /* 7 columns for balanced rows */
+    gap: 0.375rem;
+    width: 100%;
+  }
+
+  .seed-detail-view .seed-nav-button {
+    min-width: 40px;
+    height: 40px;
+    font-size: 0.875rem;
+  }
+
+  /* Close button styling on mobile - bigger and yellow */
+  .seed-detail-view .close-nav-button {
+    font-size: 2rem; /* Even larger on mobile for easy tap */
+    color: var(--gold-primary);
+    grid-column: 7; /* Position at end of second row */
+  }
+
+  .seed-detail-view .close-nav-button:hover {
+    background: color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+    border-color: var(--gold-primary);
+    color: var(--gold-star);
+  }
+
+  .seed-detail-view .content-wrapper {
+    padding: 3rem 1.5rem;
+  }
+
+  .seed-detail-view .figure-name-cosmic {
+    font-size: var(--text-xl);
+  }
+}
+
+/* Desktop: Show cosmic header */
+@media (min-width: 769px) {
+  .seed-detail-view .cosmic-header {
+    display: flex !important;
+  }
+}
+
+/* ========================================
+   SEED ARTICLE STRUCTURE
+   ======================================== */
+
+.seed-detail-view .seed {
+  margin-bottom: 6rem;
+  padding-bottom: 6rem;
+}
+
+.seed-detail-view .seed:not(:last-child) {
+  border-bottom: 2px solid color-mix(in srgb, var(--gold-subtle) 10%, transparent);
+}
+
+.seed-detail-view .seed-separator {
+  margin: 6rem 0;
+  text-align: center;
+}
+
+.seed-detail-view .separator-ornament {
+  color: var(--gold-subtle);
+  opacity: 0.3;
+  font-size: 1.5rem;
+  letter-spacing: 1rem;
+}
+
+/* ========================================
+   QUOTE CONTAINER - Enhanced Visual Framing
+   ======================================== */
+
+.seed-detail-view .quote-container {
+  text-align: center;
+  margin: 0 auto 3rem;
+  max-width: 800px;
+  padding: 3rem 2.5rem; /* Slightly less horizontal padding */
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--gold-subtle) 3%, transparent),
+    color-mix(in srgb, var(--gold-subtle) 6%, transparent)
+  );
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 12%, transparent);
+}
+
+.seed-detail-view .quote-mark {
+  font-size: 4rem;
+  color: var(--gold-primary);
+  opacity: 0.4;
+  line-height: 0.5;
+}
+
+.seed-detail-view .quote-text {
+  font-family: var(--font-content, 'Libre Caslon Text', Georgia, serif);
+  font-size: var(--text-2xl);
+  font-style: italic;
+  line-height: 1.7; /* More generous for serif italic */
+  color: color-mix(in srgb, var(--gold-primary) 40%, var(--text-primary) 60%);
+  margin: 1.5rem 0;
+  font-weight: 400; /* Regular weight for serif */
+  letter-spacing: 0.01em;
+}
+
+.seed-detail-view .quote-attribution {
+  font-family: var(--font-content, 'Libre Caslon Text', Georgia, serif);
+  font-size: var(--text-sm);
+  font-style: italic;
+  color: var(--text-secondary);
+  margin-top: 2rem; /* Increased from 1.5rem - better breathing room */
+  opacity: 0.7; /* Slightly lighter - less competing with quote */
+  line-height: 1.6; /* Better readability for long citations */
+}
+
+.seed-detail-view .quote-attribution::before {
+  content: '— ';
+  color: var(--gold-subtle);
+}
+
+/* ========================================
+   SEED HEADER - CRITICAL: Override conflicts!
+   ======================================== */
+
+.seed-detail-view .detail-seed-header {
+  /* Clean vertical layout - no conflicts with unique class name */
+  display: block;
+  text-align: center;
+  margin-top: 1rem; /* Breathing room from quote */
+  margin-bottom: 3rem;
+  background: none;
+  cursor: default;
+  padding: 0;
+  gap: 0;
+}
+
+.seed-detail-view .detail-seed-number {
+  display: block;
+  font-size: clamp(0.8rem, 0.75rem + 0.35vw, 0.9rem); /* Slightly larger for impact */
+  color: var(--gold-primary);
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem; /* Increased from 0.5rem */
+  text-align: center;
+  opacity: 0.95; /* Subtle luminance */
+  text-shadow: 0 0 12px rgba(230, 188, 92, 0.25); /* Subtle cosmic glow */
+}
+
+.seed-detail-view .detail-seed-title {
+  display: block;
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  color: var(--text-primary);
+  margin-bottom: 1.75rem; /* Increased from 1.5rem - more breathing room */
+  margin-top: 0;
+  text-align: center;
+}
+
+/* ========================================
+   TAGS VISUAL SYSTEM
+   ======================================== */
+
+.seed-detail-view .detail-seed-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-top: 1.5rem;
+  margin-bottom: 2.5rem; /* Increased from 2rem - clearer transition to content */
+}
+
+.seed-detail-view .detail-tag {
+  display: inline-block;
+  padding: 0.35rem 0.75rem;
+  background: color-mix(in srgb, var(--gold-subtle) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+  border-radius: 16px;
+  font-size: var(--text-xs);
+  color: var(--gold-primary);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); /* Subtle depth */
+}
+
+.seed-detail-view .detail-tag:hover {
+  background: color-mix(in srgb, var(--gold-subtle) 18%, transparent);
+  border-color: color-mix(in srgb, var(--gold-subtle) 45%, transparent);
+  color: var(--gold-hover);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Enhanced depth on hover */
+  transform: translateY(-1px); /* Subtle lift */
+}
+
+/* ========================================
+   CONTENT SECTIONS
+   ======================================== */
+
+.seed-detail-view .seed-content {
+  max-width: 65ch;
+  margin: 0 auto;
+}
+
+.seed-detail-view .section {
+  margin-bottom: 3rem;
+}
+
+.seed-detail-view .section-divider {
+  margin: 3rem 0;
+  border: none;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--gold-subtle) 30%, transparent),
+    transparent
+  );
+}
+
+/* ========================================
+   TYPOGRAPHY - Reading Optimized
+   ======================================== */
+
+.seed-detail-view .summary {
+  font-family: var(--font-content, 'Libre Caslon Text', Georgia, serif);
+  font-size: clamp(1.0625rem, 1rem + 0.4vw, 1.25rem); /* Match StoryPlayer: 17-20px */
+  line-height: 1.75; /* Paris Review spacing for serif */
+  color: color-mix(in srgb, var(--gold-primary) 25%, var(--text-primary) 75%);
+  font-weight: 400; /* Regular weight for serif reading */
+  margin-bottom: 2rem; /* More breathing room */
+  margin-top: 0.5rem; /* Micro-spacing from tags */
+  max-width: 60ch; /* Slightly narrower for emphasis */
+  margin-left: auto;
+  margin-right: auto;
+  text-align: left; /* Left-aligned, not justified */
+}
+
+/* Editorial Drop Cap - Paris Review Style (matches StoryPlayer) */
+.seed-detail-view .summary::first-letter {
+  font-family: var(--font-content, 'Libre Caslon Text', Georgia, serif);
+  float: left;
+  font-size: 3.5em; /* Dramatic 3-4 line drop cap */
+  line-height: 0.85; /* Tight for proper alignment */
+  margin-right: 0.1em; /* Clean spacing */
+  margin-top: 0.05em; /* Fine-tune vertical position */
+  font-weight: 400; /* Regular weight - elegant */
+  color: color-mix(in srgb, var(--gold-subtle) 85%, var(--text-primary) 15%); /* Subtle gold */
+  text-shadow: 0 0 12px color-mix(in srgb, var(--gold-subtle) 20%, transparent); /* Cosmic glow */
+  font-feature-settings: 'liga' 0; /* Disable ligatures for single letter */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.seed-detail-view .overview-section {
+  margin-bottom: 2rem;
+}
+
+.seed-detail-view .overview-section:last-of-type {
+  margin-bottom: 0;
+}
+
+.seed-detail-view .overview-section p::first-line {
+  font-weight: 500;
+  letter-spacing: 0.01em; /* Subtle openness for first line */
+}
+
+.seed-detail-view .overview-text {
+  font-family: var(--font-content, 'Libre Caslon Text', Georgia, serif);
+  font-size: clamp(1.0625rem, 1rem + 0.4vw, 1.25rem); /* Match StoryPlayer: 17-20px */
+  line-height: 1.75; /* Paris Review spacing for serif */
+  color: var(--text-primary);
+  margin-bottom: 2rem; /* More breathing room between paragraphs */
+  text-align: left; /* Left-aligned, not justified */
+}
+
+/* ========================================
+   SECTION HEADINGS
+   ======================================== */
+
+.seed-detail-view .section-heading {
+  font-size: var(--text-xl);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1.75rem; /* Increased from 1.5rem */
+  margin-top: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem; /* Tighter icon-to-text gap */
+  letter-spacing: 0.01em; /* Subtle openness */
+}
+
+.seed-detail-view .section-icon {
+  font-size: 1.3em;
+  color: var(--gold-primary);
+  opacity: 0.95; /* Subtle luminance */
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1)); /* Micro-depth */
+}
+
+/* ========================================
+   LISTS - Insights & Outcomes
+   ======================================== */
+
+.seed-detail-view .insight-list,
+.seed-detail-view .outcome-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.seed-detail-view .insight-list li,
+.seed-detail-view .outcome-list li {
+  font-family: var(--font-content, 'Libre Caslon Text', Georgia, serif);
+  font-size: clamp(0.95rem, 0.9rem + 0.4vw, 1.05rem);
+  line-height: 1.75; /* Paris Review spacing for serif */
+  padding-left: 2rem;
+  margin-bottom: 1.75rem; /* More breathing room */
+  position: relative;
+  color: var(--text-primary);
+  text-align: left; /* Left-aligned, not justified */
+}
+
+.seed-detail-view .insight-list li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: var(--gold-primary);
+  font-weight: bold;
+  font-size: 1.5em;
+  line-height: 1;
+}
+
+.seed-detail-view .outcome-list li::before {
+  content: "→";
+  position: absolute;
+  left: 0;
+  color: var(--mode-wisdom);
+  font-weight: bold;
+  font-size: 1.2em;
+}
+
+/* ========================================
+   FEATURED CONNECTION - Elevated
+   ======================================== */
+
+.seed-detail-view .featured-connection {
+  background: color-mix(in srgb, var(--gold-subtle) 12%, transparent);
+  border-radius: 12px;
+  padding: 2rem;
+  margin: 3rem 0;
+  border: 2px solid color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+  transition: all 0.3s ease;
+}
+
+.seed-detail-view .featured-connection:hover {
+  box-shadow: 0 12px 32px color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+  transform: translateY(-2px);
+}
+
+.seed-detail-view .connection-header {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.seed-detail-view .connection-star {
+  color: var(--gold-star);
+  font-size: 1.75em; /* Slightly larger for prominence */
+  filter: drop-shadow(0 2px 6px rgba(255, 215, 0, 0.4)); /* Stronger glow */
+  margin-right: 0.25rem; /* Micro-spacing */
+  line-height: 1;
+}
+
+.seed-detail-view .connection-type-badge {
+  display: inline-block;
+  padding: 0.25rem 0.6rem;
+  background: color-mix(in srgb, var(--gold-subtle) 15%, transparent);
+  border: 1.5px solid color-mix(in srgb, var(--gold-subtle) 35%, transparent);
+  border-radius: 4px;
+  font-size: 0.75rem;
+  color: var(--gold-primary);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-right: 0.5rem;
+}
+
+.seed-detail-view .connection-type-badge.parallel::before { content: '⟷ '; }
+.seed-detail-view .connection-type-badge.historical::before { content: '→ '; }
+.seed-detail-view .connection-type-badge.complement::before { content: '+ '; }
+.seed-detail-view .connection-type-badge.contrast::before { content: '⟡ '; }
+
+.seed-detail-view .connection-figure {
+  font-weight: 600;
+  color: var(--gold-primary);
+}
+
+.seed-detail-view .connection-seed-title {
+  color: var(--text-secondary);
+  font-size: 0.95em;
+}
+
+.seed-detail-view .connection-explanation {
+  font-family: var(--font-content, 'Libre Caslon Text', Georgia, serif);
+  color: var(--text-primary);
+  margin-top: 1rem;
+  font-size: clamp(1.0625rem, 1rem + 0.4vw, 1.25rem); /* Match StoryPlayer: 17-20px */
+  line-height: 1.75; /* Paris Review spacing for serif */
+  text-align: left; /* Left-aligned, not justified */
+}
+
+/* ========================================
+   SOURCES SECTION - Academic Formatting
+   ======================================== */
+
+.seed-detail-view .sources-section {
+  background: color-mix(in srgb, var(--bg-highlight) 30%, transparent);
+  border-radius: 12px;
+  padding: 2rem;
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 20%, transparent);
+}
+
+.seed-detail-view .source-category {
+  margin-bottom: 2rem;
+}
+
+.seed-detail-view .source-category:last-child {
+  margin-bottom: 0;
+}
+
+.seed-detail-view .source-category-title {
+  font-size: var(--text-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--gold-primary);
+  margin-bottom: 1rem;
+  margin-top: 0;
+  font-weight: 700;
+}
+
+.seed-detail-view .source-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.seed-detail-view .source-list li {
+  font-family: var(--font-content, 'Libre Caslon Text', Georgia, serif);
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+  position: relative;
+  line-height: 1.6; /* Slightly tighter for academic citations */
+  font-size: 0.95em;
+  text-align: left;
+}
+
+.seed-detail-view .source-list li::before {
+  content: "→";
+  position: absolute;
+  left: 0;
+  color: var(--gold-primary);
+  opacity: 0.5;
+}
+
+/* ========================================
+   MOBILE OPTIMIZATIONS
+   ======================================== */
+
+@media (max-width: 768px) {
+  .seed-detail-view .content-wrapper {
+    padding: 3rem 1.5rem;
+  }
+
+  .seed-detail-view .seed {
+    margin-bottom: 4rem;
+    padding-bottom: 4rem;
+  }
+
+  /* Quote: Mobile-first redesign - Remove box, use left border (Paris Review style) */
+  .seed-detail-view .quote-container {
+    background: none; /* Remove background box */
+    border: none; /* Remove rounded border */
+    border-left: 3px solid var(--gold-subtle); /* Clean left accent */
+    border-radius: 0; /* No rounded corners */
+    padding: 1rem 0 1rem 1.5rem; /* Minimal - just offset from left border */
+    max-width: 100%; /* Full width available */
+  }
+
+  /* Quote mark stays visible but doesn't need as much space */
+  .seed-detail-view .quote-mark {
+    font-size: 3rem; /* Slightly smaller on mobile */
+  }
+
+  .seed-detail-view .section {
+    margin-bottom: 2rem;
+  }
+
+  .seed-detail-view .quote-text {
+    font-size: var(--text-xl);
+  }
+
+  .seed-detail-view .detail-seed-title {
+    font-size: var(--text-2xl);
+  }
+
+  .seed-detail-view .section-divider {
+    margin: 1.5rem 0;
+  }
+
+  .seed-detail-view .detail-tag {
+    padding: 0.25rem 0.6rem;
+    font-size: 0.6875rem; /* 11px — legibility floor for keyword tags */
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12); /* Lighter shadow on mobile */
+  }
+
+  /* Smaller drop cap on mobile - better proportion */
+  .seed-detail-view .summary::first-letter {
+    font-size: 2.5em; /* Smaller on mobile (vs 3.5em desktop) */
+    margin-right: 0.08em; /* Tighter spacing */
+  }
+
+  /* Featured connection: Full width with left accent */
+  .seed-detail-view .featured-connection {
+    background: none;
+    border: none;
+    border-left: 3px solid var(--gold-subtle);
+    border-radius: 0;
+    padding: 0 0 0 1.5rem;
+    box-shadow: none;
+    margin: 2rem 0;
+  }
+
+  .seed-detail-view .featured-connection:hover {
+    box-shadow: none;
+    transform: none;
+  }
+
+  .seed-detail-view .connection-type-badge {
+    padding: 0.2rem 0.5rem;
+    font-size: 0.65rem;
+  }
+
+  .seed-detail-view .sources-section {
+    background: none;
+    border: none;
+    padding: 0;
+  }
+}
+
+/* ========================================
+   ACCESSIBILITY & PERFORMANCE
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .seed-detail-view .detail-tag,
+  .seed-detail-view .seed-nav-button,
+  .seed-detail-view .featured-connection {
+    transition: none;
+    animation: none;
+  }
+
+  .seed-detail-view .detail-tag:hover,
+  .seed-detail-view .featured-connection:hover {
+    transform: none;
+  }
+}
+
+/* Print optimization */
+@media print {
+  .seed-detail-view .seed-navigator {
+    display: none;
+  }
+
+  .seed-detail-view {
+    background: white;
+    color: black;
+  }
+
+  .seed-detail-view .tag,
+  .seed-detail-view .connection-type-badge {
+    border: 1px solid #000;
+    background: transparent;
+    color: #000;
+  }
+
+  .seed-detail-view .featured-connection {
+    border: 2px solid #000;
+    box-shadow: none;
+    background: transparent;
+  }
+}
+
+/* ========================================
+   PHOSPHOR ICONS SUPPORT
+   ======================================== */
+
+.seed-detail-view .section-heading .section-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gold-primary);
+  flex-shrink: 0;
+}
+
+/* Ensure Phosphor SVGs render at correct size */
+.seed-detail-view .section-heading svg {
+  width: 24px;
+  height: 24px;
+  color: var(--gold-primary);
+}
+
+/* ========================================
+   SCROLL CONTAINER FIX
+   ======================================== */
+
+.seed-detail-view {
+  width: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+/* ========================================
+   COLLAPSIBLE SECTIONS
+   ======================================== */
+
+.seed-detail-view .collapsible-section {
+  margin: 3rem 0;
+}
+
+.seed-detail-view .section-toggle {
+  width: 100%;
+  background: color-mix(in srgb, var(--bg-highlight) 30%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+  border-radius: 12px;
+  padding: 1.5rem 2rem;
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  font-size: var(--text-base);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.25s ease;
+  text-align: left;
+  min-height: 44px;
+}
+
+.seed-detail-view .section-toggle:hover {
+  background: color-mix(in srgb, var(--bg-highlight) 50%, transparent);
+  border-color: color-mix(in srgb, var(--gold-subtle) 40%, transparent);
+  transform: scale(1.01);
+}
+
+.seed-detail-view .section-toggle:focus-visible {
+  outline: 2px solid var(--gold-primary);
+  outline-offset: 2px;
+}
+
+.seed-detail-view .toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: 600;
+}
+
+.seed-detail-view .toggle-count {
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  margin-left: 0.5rem;
+  font-weight: 500;
+}
+
+.seed-detail-view .toggle-icon {
+  transition: transform 0.3s ease;
+  color: var(--gold-primary);
+  font-size: 1.2em;
+  line-height: 1;
+}
+
+.seed-detail-view .section-toggle[aria-expanded="true"] .toggle-icon {
+  transform: rotate(90deg);
+}
+
+.seed-detail-view .collapsible-content {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.3s ease;
+}
+
+.seed-detail-view .collapsible-content.expanded {
+  max-height: 3000px; /* Large enough for content */
+  opacity: 1;
+  padding-top: 1.5rem;
+}
+
+/* ========================================
+   RELATED CONNECTIONS
+   ======================================== */
+
+.seed-detail-view .related-connections-inner {
+  background: color-mix(in srgb, var(--gold-subtle) 5%, transparent);
+  border-radius: 12px;
+  padding: 2rem;
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 15%, transparent);
+}
+
+.seed-detail-view .related-heading {
+  font-size: var(--text-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+  margin-top: 0;
+  font-weight: 700;
+}
+
+.seed-detail-view .related-connection {
+  margin-bottom: 1.5rem;
+  padding-left: 1.5rem;
+  border-left: 2px solid color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+}
+
+.seed-detail-view .related-connection:last-child {
+  margin-bottom: 0;
+}
+
+.seed-detail-view .related-connection-title {
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+  font-size: var(--text-base);
+}
+
+.seed-detail-view .related-connection-summary {
+  font-family: var(--font-content, 'Libre Caslon Text', Georgia, serif);
+  font-size: 0.95em;
+  color: var(--text-secondary);
+  line-height: 1.7; /* More generous for serif */
+  margin: 0;
+  text-align: left;
+}
+
+/* ========================================
+   SOURCES INNER CONTAINER
+   ======================================== */
+
+.seed-detail-view .sources-inner {
+  background: color-mix(in srgb, var(--bg-highlight) 30%, transparent);
+  border-radius: 12px;
+  padding: 2rem;
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 20%, transparent);
+}
+
+/* ========================================
+   SOURCE TYPE BADGES
+   ======================================== */
+
+.seed-detail-view .source-type-badge {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  background: color-mix(in srgb, var(--mode-wisdom) 18%, transparent);
+  border: 1.5px solid color-mix(in srgb, var(--mode-wisdom) 35%, transparent);
+  border-radius: 4px;
+  font-size: 0.7rem;
+  color: var(--mode-wisdom);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-left: 0.5rem;
+}
+
+/* ========================================
+   PRACTICE SECTION
+   ======================================== */
+
+.seed-detail-view .practice-disclaimer {
+  font-family: var(--font-content, 'Libre Caslon Text', Georgia, serif);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  font-style: italic;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background: color-mix(in srgb, var(--gold-subtle) 5%, transparent);
+  border-radius: 8px;
+  line-height: 1.6;
+  text-align: left;
+}
+
+.seed-detail-view .practice-text {
+  font-family: var(--font-content, 'Libre Caslon Text', Georgia, serif);
+  color: var(--text-primary);
+  font-size: clamp(1.0625rem, 1rem + 0.4vw, 1.25rem); /* Match StoryPlayer: 17-20px */
+  line-height: 1.75; /* Paris Review spacing for serif */
+  margin: 0;
+  text-align: left;
+}
+
+/* ========================================
+   MOBILE: COLLAPSIBLE OPTIMIZATIONS
+   ======================================== */
+
+@media (max-width: 768px) {
+  .seed-detail-view .section-toggle {
+    min-height: 48px;
+    padding: 1rem 1.5rem;
+  }
+
+  .seed-detail-view .related-connections-inner,
+  .seed-detail-view .sources-inner {
+    background: none;
+    border: none;
+    padding: 0;
+  }
+
+  .seed-detail-view .related-connection {
+    padding-left: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .seed-detail-view .source-type-badge {
+    padding: 0.15rem 0.4rem;
+    font-size: 0.65rem;
+  }
+}

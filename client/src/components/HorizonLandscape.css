@@ -1,0 +1,330 @@
+/* HorizonLandscape.css - Mountain silhouettes and cosmic horizon */
+
+/* Container for horizon */
+.horizon-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 28vh;
+  z-index: var(--z-base); /* 2 */
+  /* Removed overflow: hidden to allow the glow to extend */
+  overflow: visible;
+  pointer-events: none;
+}
+
+/* Portal reflection glow */
+.horizon-glow {
+  position: absolute;
+  bottom: 6vh;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 10vh; /* Much taller to extend past the container */
+  background: radial-gradient(
+    ellipse at center,
+    color-mix(in srgb, var(--gold-subtle) 25%, transparent) 0%,
+    color-mix(in srgb, var(--gold-subtle) 15%, transparent) 40%,
+    color-mix(in srgb, var(--gold-subtle) 5%, transparent) 70%,
+    rgba(42, 51, 116, 0) 100%
+  );
+  /* Removed the border-radius to prevent the half-circle shape */
+  filter: blur(15px);
+  /* Create a subtle oval shape naturally */
+  transform-origin: bottom center;
+  transform: translateX(-50%) scaleY(1.2) scaleX(1.1);
+}
+
+/* Mountain layers for depth */
+.mountains {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 22vh;
+  /* Keep overflow hidden for the mountains to maintain clean edge silhouettes */
+  overflow: hidden;
+}
+
+/* Farthest mountain layer */
+.mountain-layer-3 {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 18vh;
+  background: linear-gradient(
+    180deg, 
+    rgba(10, 15, 40, 0) 0%,
+    rgba(10, 15, 40, 0.7) 40%,
+    rgba(8, 10, 30, 0.9) 100%
+  );
+  clip-path: polygon(
+    0% 100%,
+    0% 55%,
+    5% 60%,
+    10% 53%,
+    15% 58%,
+    20% 50%,
+    25% 55%,
+    30% 45%,
+    35% 50%,
+    40% 40%,
+    45% 45%,
+    50% 35%,
+    55% 48%,
+    60% 40%,
+    65% 52%,
+    70% 45%,
+    75% 58%,
+    80% 50%,
+    85% 60%,
+    90% 52%,
+    95% 62%,
+    100% 50%,
+    100% 100%
+  );
+  opacity: 0.7;
+}
+
+/* Middle mountain layer */
+.mountain-layer-2 {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 20vh;
+  background: linear-gradient(
+    180deg, 
+    rgba(8, 12, 35, 0) 0%,
+    rgba(8, 12, 35, 0.8) 45%,
+    rgba(6, 8, 25, 1) 100%
+  );
+  clip-path: polygon(
+    0% 100%,
+    0% 65%,
+    4% 68%,
+    8% 62%,
+    12% 69%,
+    16% 60%,
+    20% 70%,
+    24% 65%,
+    28% 72%,
+    32% 62%,
+    36% 67%,
+    40% 58%,
+    44% 64%,
+    48% 56%,
+    52% 70%,
+    56% 62%,
+    60% 68%,
+    64% 58%,
+    68% 66%,
+    72% 60%,
+    76% 70%,
+    80% 62%,
+    84% 67%,
+    88% 60%,
+    92% 66%,
+    96% 60%,
+    100% 65%,
+    100% 100%
+  );
+  opacity: 0.85;
+}
+
+/* Closest mountain layer */
+.mountain-layer-1 {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 22vh;
+  background: linear-gradient(
+    180deg, 
+    rgba(6, 10, 30, 0) 0%,
+    rgba(6, 10, 30, 0.9) 50%,
+    rgba(4, 6, 20, 1) 100%
+  );
+  clip-path: polygon(
+    0% 100%,
+    0% 75%,
+    3% 78%,
+    6% 73%,
+    9% 80%,
+    12% 75%,
+    15% 82%,
+    18% 77%,
+    21% 83%,
+    24% 75%,
+    27% 80%,
+    30% 72%,
+    33% 78%,
+    36% 73%,
+    39% 80%,
+    42% 75%,
+    45% 83%,
+    48% 78%,
+    51% 85%,
+    54% 78%,
+    57% 82%,
+    60% 76%,
+    63% 80%,
+    66% 75%,
+    69% 82%,
+    72% 77%,
+    75% 84%,
+    78% 79%,
+    81% 85%,
+    84% 80%,
+    87% 85%,
+    90% 78%,
+    93% 83%,
+    96% 77%,
+    100% 82%,
+    100% 100%
+  );
+}
+
+/* Portal reflection on mountains */
+.mountain-highlight {
+  position: absolute;
+  bottom: 5vh;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40%;
+  height: 12vh;
+  background: radial-gradient(
+    ellipse at center,
+    color-mix(in srgb, var(--gold-subtle) 15%, transparent) 0%,
+    color-mix(in srgb, var(--gold-subtle) 10%, transparent) 30%,
+    color-mix(in srgb, var(--gold-subtle) 6%, transparent) 50%,
+    color-mix(in srgb, var(--gold-subtle) 0%, transparent) 80%
+  );
+  filter: blur(10px);
+  /* Removed mix-blend-mode: screen — Safari 26 WebKit regression renders
+     filter + blend-mode on transparent backgrounds as flat opaque color.
+     Slightly increased gradient opacity above to compensate. */
+}
+
+/* ===== 5-BREAKPOINT RESPONSIVE SYSTEM ===== */
+
+/* Mobile baseline (360px+) - base styles above */
+
+/* Tablet Portrait (768px+) */
+@media (min-width: 768px) {
+  .horizon-container {
+    height: 24vh;
+  }
+  
+  .horizon-glow {
+    width: 70%;
+    bottom: 4vh;
+    height: 12vh;
+  }
+  
+  .mountain-layer-3 {
+    height: 15vh;
+  }
+  
+  .mountain-layer-2 {
+    height: 17vh;
+  }
+  
+  .mountain-layer-1 {
+    height: 19vh;
+  }
+  
+  .mountain-highlight {
+    width: 50%;
+    height: 10vh;
+  }
+}
+
+/* Desktop Start (1024px+) */
+@media (min-width: 1024px) {
+  .horizon-container {
+    height: 26vh;
+  }
+  
+  .mountain-layer-3 {
+    height: 16vh;
+  }
+  
+  .mountain-layer-2 {
+    height: 18vh;
+  }
+  
+  .mountain-layer-1 {
+    height: 20vh;
+  }
+}
+
+/* Laptop Standard (1366px+) */
+@media (min-width: 1366px) {
+  .horizon-container {
+    height: 28vh; /* Original height restored */
+  }
+  
+  .mountain-layer-3 {
+    height: 18vh;
+  }
+  
+  .mountain-layer-2 {
+    height: 20vh;
+  }
+  
+  .mountain-layer-1 {
+    height: 22vh;
+  }
+}
+
+/* Height constraints for browser chrome */
+@media (max-height: 650px) {
+  .horizon-container {
+    height: 20vh; /* Reduced for short viewports */
+  }
+  
+  .mountain-layer-3 {
+    height: 12vh;
+  }
+  
+  .mountain-layer-2 {
+    height: 14vh;
+  }
+  
+  .mountain-layer-1 {
+    height: 16vh;
+  }
+}
+
+/* Mobile overrides — shorter mountains free space for portal + figures.
+   Uses dvh to match the 100dvh container (accounts for browser chrome). */
+@media (max-width: 767px) {
+  .horizon-container {
+    height: 16dvh;
+  }
+
+  .horizon-glow {
+    width: 80%;
+    bottom: 2dvh;
+    height: 8dvh;
+  }
+
+  .mountain-layer-3 {
+    height: 9dvh;
+  }
+
+  .mountain-layer-2 {
+    height: 11dvh;
+  }
+
+  .mountain-layer-1 {
+    height: 13dvh;
+  }
+
+  .mountain-highlight {
+    width: 60%;
+    height: 6dvh;
+  }
+}

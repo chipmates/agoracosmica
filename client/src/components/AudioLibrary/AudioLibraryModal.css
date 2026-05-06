@@ -1,0 +1,473 @@
+/**
+ * AudioLibraryModal Styles - 2025 Production
+ *
+ * Optimized architecture with:
+ * - Full-width content (no padding issues)
+ * - Premium centered layout
+ * - Mobile-first responsive design
+ * - Spotify-style one-click playback
+ * - Elegant navigation controls
+ */
+
+/* ========================================
+   FULLSCREEN BODY LOCK
+   ======================================== */
+
+body.audio-library-open {
+  overflow: hidden;
+}
+
+/* ========================================
+   MAIN CONTAINER
+   ======================================== */
+
+.audio-library {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+/* ========================================
+   COSMIC HEADER (Uses standard ModalHeader)
+   ======================================== */
+
+/* Header styling is handled by ModalHeader component with cosmic stars */
+
+/* ========================================
+   FIGURE CAROUSEL SECTION
+   ======================================== */
+
+.audio-library__carousel-section {
+  flex-shrink: 0;
+  padding: 0.75rem 0 0.75rem;
+  background: linear-gradient(
+    180deg,
+    var(--bg-primary) 0%,
+    color-mix(in srgb, var(--bg-primary) 95%, var(--gold-vibrant)) 100%
+  );
+  border-bottom: 1px solid color-mix(in srgb, var(--gold-subtle) 10%, transparent);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Edge fade gradients - subtle fade at edges of fixed carousel window */
+.audio-library__carousel-section::before,
+.audio-library__carousel-section::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 30px;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.audio-library__carousel-section::before {
+  left: 0;
+  background: linear-gradient(to right, var(--bg-primary), transparent);
+}
+
+.audio-library__carousel-section::after {
+  right: 0;
+  background: linear-gradient(to left, var(--bg-primary), transparent);
+}
+
+/* ========================================
+   NAVIGATION BUTTONS
+   ======================================== */
+
+.audio-library__nav-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--gold-subtle) 3%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 12%, transparent);
+  border-radius: 50%;
+  color: var(--gold-base, var(--gold-vibrant));
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(var(--glass-blur-subtle));
+  -webkit-backdrop-filter: blur(var(--glass-blur-subtle));
+  box-shadow: none;
+  z-index: 10;
+  touch-action: manipulation;
+  will-change: transform, background, box-shadow;
+}
+
+.audio-library__nav-button:hover {
+  background: color-mix(in srgb, var(--gold-subtle) 15%, transparent);
+  border-color: var(--gold-light, var(--gold-vibrant));
+  transform: translateY(-50%) scale(1.05);
+  box-shadow: 0 0 6px color-mix(in srgb, var(--gold-soft, var(--gold-subtle)) 30%, transparent);
+}
+
+/* Ripple effect on hover */
+.audio-library__nav-button:hover::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  background: radial-gradient(circle, transparent 70%, color-mix(in srgb, var(--gold-soft, var(--gold-subtle)) 30%, transparent) 100%);
+  opacity: 0.7;
+  animation: buttonPulse 2s infinite;
+}
+
+@keyframes buttonPulse {
+  0%, 100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.2;
+    transform: scale(1.15);
+  }
+}
+
+.audio-library__nav-button:active {
+  transform: translateY(-50%) scale(0.95);
+  transition: transform 0.1s ease;
+}
+
+.audio-library__nav-button:focus-visible {
+  box-shadow:
+    0 0 0 2px var(--gold-light, var(--gold-vibrant)),
+    0 0 0 4px color-mix(in srgb, var(--gold-soft, var(--gold-subtle)) 50%, transparent);
+  outline: 2px solid var(--gold-base, var(--gold-vibrant));
+  outline-offset: 2px;
+}
+
+/* Nav buttons are always active (carousel loops) */
+
+.audio-library__nav-button--left {
+  left: clamp(15px, 3vw, 20px);
+}
+
+.audio-library__nav-button--right {
+  right: clamp(15px, 3vw, 20px);
+}
+
+/* Touch target extension */
+.audio-library__nav-button::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  z-index: -1;
+}
+
+/* Smaller buttons on small mobile */
+@media (max-width: 480px) {
+  .audio-library__nav-button {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
+  }
+
+  .audio-library__nav-button svg {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+/* ========================================
+   CAROUSEL
+   ======================================== */
+
+.audio-library__carousel {
+  display: flex;
+  gap: 0.75rem;
+  overflow: hidden;
+  padding: 0 0.25rem;
+  width: 100%;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+/* ========================================
+   FIGURE ITEMS
+   ======================================== */
+
+.audio-library__figure-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.375rem;
+  min-width: 70px;
+  padding: 0.25rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition:
+    transform 0.3s ease,
+    opacity 0.3s ease,
+    filter 0.3s ease;
+  transform-style: preserve-3d;
+
+  /* WCAG 2.2 - 44px minimum touch target */
+  min-height: 44px;
+  justify-content: flex-start;
+  touch-action: manipulation;
+}
+
+/* Hover effects */
+@media (hover: hover) {
+  .audio-library__figure-item:hover .audio-library__figure-avatar {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+  }
+
+  .audio-library__figure-item:hover .audio-library__figure-image {
+    transform: scale(1.05);
+    filter: brightness(1.05);
+  }
+
+  .audio-library__figure-item:hover .audio-library__figure-name {
+    color: var(--text-primary);
+    transform: translateY(-2px);
+  }
+}
+
+/* Active (press) state */
+.audio-library__figure-item:active .audio-library__figure-avatar {
+  transform: scale(0.95);
+  filter: brightness(0.95);
+  transition: transform 0.1s ease, filter 0.1s ease;
+}
+
+.audio-library__figure-item:focus {
+  outline: 2px solid var(--gold-vibrant);
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+
+.audio-library__figure-item:not(.audio-library__figure-item--selected) {
+  opacity: 0.6;
+}
+
+.audio-library__figure-item--selected {
+  opacity: 1;
+  z-index: 5;
+}
+
+.audio-library__figure-avatar {
+  position: relative;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  aspect-ratio: 1 / 1;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  background-color: rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
+.audio-library__figure-item--selected .audio-library__figure-avatar {
+  border: 2px solid var(--gold-subtle);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--gold-base, var(--gold-subtle)) 40%, transparent);
+}
+
+.audio-library__figure-item--playing .audio-library__figure-avatar {
+  animation: pulse-playing 2s ease-in-out infinite;
+}
+
+@keyframes pulse-playing {
+  0%, 100% {
+    box-shadow:
+      0 0 0 3px var(--gold-vibrant),
+      0 0 20px color-mix(in srgb, var(--gold-vibrant) 40%, transparent);
+  }
+  50% {
+    box-shadow:
+      0 0 0 3px var(--gold-vibrant),
+      0 0 30px color-mix(in srgb, var(--gold-vibrant) 60%, transparent);
+  }
+}
+
+.audio-library__figure-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  object-position: center;
+  image-rendering: high-quality;
+}
+
+.audio-library__figure-name {
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.8125rem; /* 13px meta floor — was 11px, below iOS floor */
+  font-weight: 500;
+  text-align: center;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 90px;
+  line-height: 1.3;
+  min-height: 18px;
+  transition: all 0.3s ease;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+.audio-library__figure-item--selected .audio-library__figure-name {
+  color: var(--gold-light, var(--gold-vibrant));
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  text-shadow: 0 0 5px color-mix(in srgb, var(--gold-soft, var(--gold-subtle)) 50%, transparent);
+}
+
+/* ========================================
+   CONTENT SECTION (Story List)
+   ======================================== */
+
+.audio-library__content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 1rem clamp(1rem, 3vw, 2rem) 80px;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ========================================
+   MINI PLAYER CONTAINER
+   ======================================== */
+
+.mobile-mini-player-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 70px;
+  z-index: var(--z-overlay, 9999);
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  transform: translateZ(0);
+  will-change: transform;
+  contain: layout style;
+  overflow: visible;
+  display: block;
+  isolation: isolate;
+}
+
+.mobile-mini-player-container .mini-player {
+  width: 100%;
+  min-width: 100%;
+  margin: 0;
+  max-width: none;
+  position: relative;
+  left: 0;
+  right: 0;
+  transform: translateZ(0);
+  will-change: auto;
+  box-sizing: border-box;
+}
+
+/* ========================================
+   TABLET & DESKTOP OPTIMIZATIONS
+   ======================================== */
+
+@media (min-width: 768px) {
+  .audio-library__title {
+    font-size: 1.75rem;
+  }
+
+  .audio-library__carousel-section {
+    padding: 1rem 0;
+  }
+
+  .audio-library__carousel {
+    gap: 1.25rem;
+  }
+
+  .audio-library__figure-item {
+    min-width: 90px;
+  }
+
+  .audio-library__figure-avatar {
+    width: 90px;
+    height: 90px;
+  }
+
+  .audio-library__figure-name {
+    font-size: 0.8125rem;
+    max-width: 110px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .audio-library__carousel {
+    gap: 1.5rem;
+  }
+
+  .audio-library__figure-item {
+    min-width: 100px;
+  }
+
+  .audio-library__figure-avatar {
+    width: 100px;
+    height: 100px;
+  }
+
+  .audio-library__figure-name {
+    font-size: 0.875rem;
+  }
+}
+
+/* ========================================
+   REDUCED MOTION
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .audio-library__figure-item,
+  .audio-library__nav-button {
+    transition: none;
+  }
+
+  .audio-library__title {
+    animation: none !important;
+  }
+
+  .audio-library__figure-item--playing .audio-library__figure-avatar {
+    animation: none;
+  }
+}
+
+/* ========================================
+   HIGH CONTRAST MODE
+   ======================================== */
+
+@media (prefers-contrast: high) {
+  .audio-library__figure-item:focus {
+    outline-width: 3px;
+  }
+
+  .audio-library__figure-item--selected .audio-library__figure-avatar {
+    box-shadow: 0 0 0 4px var(--gold-vibrant);
+  }
+
+  .audio-library__nav-button {
+    border-width: 2px;
+  }
+}

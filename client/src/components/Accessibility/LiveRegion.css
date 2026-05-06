@@ -1,0 +1,191 @@
+/* LiveRegion.css - Screen Reader Only Announcements */
+
+/**
+ * Live Region - Completely invisible to sighted users
+ * Only accessible to screen readers for dynamic announcements
+ * 
+ * Uses the "screen reader only" pattern with absolute positioning
+ * and clipping to hide visual content while preserving accessibility
+ */
+.live-region {
+  /* Position absolutely and move off-screen */
+  position: absolute !important;
+  left: -10000px !important;
+  top: auto !important;
+  width: 1px !important;
+  height: 1px !important;
+  
+  /* Clip the element to hide it visually */
+  clip: rect(0, 0, 0, 0) !important;
+  -webkit-clip-path: inset(50%) !important;
+  clip-path: inset(50%) !important;
+  
+  /* Hide overflow */
+  overflow: hidden !important;
+  
+  /* Prevent line breaks */
+  white-space: nowrap !important;
+  
+  /* Remove visual styling */
+  border: 0 !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  
+  /* Ensure it's not focusable */
+  outline: none !important;
+  
+  /* Prevent any visual impact */
+  background: transparent !important;
+  color: transparent !important;
+  
+  /* Remove from document flow */
+  z-index: -1 !important;
+}
+
+/**
+ * Alternative screen reader only implementation
+ * Using the sr-only pattern from modern accessibility libraries
+ */
+.live-region.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/**
+ * Utility class for debugging (temporarily makes live region visible)
+ * Only use during development - never in production
+ */
+.live-region.debug {
+  position: fixed !important;
+  top: 10px !important;
+  right: 10px !important;
+  left: auto !important;
+  width: auto !important;
+  height: auto !important;
+  clip: auto !important;
+  clip-path: none !important;
+  background: rgba(255, 0, 0, 0.8) !important;
+  color: white !important;
+  padding: 8px !important;
+  border-radius: 4px !important;
+  font-size: 12px !important;
+  font-family: monospace !important;
+  z-index: 9999 !important;
+  max-width: 300px !important;
+  white-space: normal !important;
+}
+
+/**
+ * Additional hiding for non-debug mode.
+ * IMPORTANT: Do NOT use visibility:hidden or display:none — these remove
+ * the element from the accessibility tree, defeating the purpose of aria-live.
+ * The sr-only pattern (clip + position + 1px) above handles visual hiding.
+ */
+.live-region:not(.debug) {
+  pointer-events: none !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+}
+
+/**
+ * Print styles - hide live regions in print
+ */
+@media print {
+  .live-region {
+    display: none !important;
+  }
+}
+
+/**
+ * High contrast mode - ensure live region remains hidden
+ */
+@media (forced-colors: active) {
+  .live-region:not(.debug) {
+    color: transparent !important;
+    background: transparent !important;
+    border: none !important;
+  }
+}
+
+/**
+ * Screen reader specific - some screen readers may need additional hiding
+ */
+.live-region[aria-hidden="true"] {
+  display: none !important;
+}
+
+/**
+ * Ensure live region doesn't interfere with layout
+ */
+.live-region:not(.debug) {
+  contain: layout style paint !important;
+  will-change: auto !important;
+  transform: none !important;
+}
+
+/**
+ * Alternative positioning method for specific screen readers
+ * Some screen readers work better with this approach
+ */
+.live-region.alternative {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  overflow: hidden !important;
+  z-index: -1 !important;
+}
+
+/**
+ * Voice-over specific optimizations (Safari/iOS)
+ */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  .live-region:not(.debug) {
+    -webkit-appearance: none !important;
+    -webkit-user-select: none !important;
+  }
+}
+
+/**
+ * JAWS specific optimizations (Windows)
+ */
+@media screen and (min-width: 0\0) {
+  .live-region:not(.debug) {
+    font-size: 0 !important;
+    line-height: 0 !important;
+  }
+}
+
+/**
+ * NVDA specific optimizations (Windows)
+ */
+.live-region:not(.debug)[role="status"] {
+  speak: literal !important;
+}
+
+/**
+ * Ensure live region content is properly announced
+ * These styles help screen readers process the content correctly
+ */
+.live-region {
+  /* Use system fonts for better screen reader compatibility */
+  font-family: system-ui, -apple-system, sans-serif !important;
+  
+  /* Ensure proper text direction */
+  direction: ltr !important;
+  
+  /* Ensure proper language inheritance */
+  lang: inherit !important;
+}

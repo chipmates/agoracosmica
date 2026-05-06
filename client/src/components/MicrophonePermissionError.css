@@ -1,0 +1,184 @@
+/* MicrophonePermissionError.css */
+
+.mic-error-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(var(--glass-blur-light));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 20px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.mic-error-toast {
+  background: var(--bg-primary);
+  border: 1px solid var(--gold-subtle);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  max-width: 480px;
+  width: 100%;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.mic-error-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+}
+
+.mic-error-icon {
+  flex-shrink: 0;
+  color: var(--coral-base);
+}
+
+.mic-error-title {
+  flex: 1;
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.mic-error-close {
+  flex-shrink: 0;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mic-error-close:hover {
+  background: color-mix(in srgb, var(--gold-subtle) 10%, transparent);
+  color: var(--gold-base);
+}
+
+.mic-error-content {
+  padding: 20px;
+}
+
+.mic-error-message {
+  margin: 0 0 12px;
+  color: var(--text-primary);
+  line-height: 1.6;
+  white-space: pre-line;
+  font-size: 15px;
+}
+
+.mic-error-fallback {
+  margin: 12px 0 0;
+  padding: 12px;
+  background: rgba(233, 116, 81, 0.1);
+  border-left: 3px solid var(--coral-base);
+  border-radius: 4px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.mic-error-actions {
+  display: flex;
+  gap: 8px;
+  padding: 16px 20px 20px;
+  border-top: 1px solid color-mix(in srgb, var(--gold-subtle) 10%, transparent);
+}
+
+.mic-error-button {
+  flex: 1;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.mic-error-button.primary {
+  background: var(--gold-base);
+  color: var(--bg-primary);
+}
+
+.mic-error-button.primary:hover {
+  background: var(--gold-bright);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+}
+
+.mic-error-button.secondary {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+}
+
+.mic-error-button.secondary:hover {
+  background: color-mix(in srgb, var(--gold-subtle) 10%, transparent);
+  border-color: var(--gold-subtle);
+  color: var(--gold-base);
+}
+
+.mic-error-button:active {
+  transform: scale(0.98);
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .mic-error-toast {
+    max-width: 100%;
+    margin: 0 8px;
+  }
+
+  .mic-error-actions {
+    flex-direction: column;
+  }
+
+  .mic-error-button {
+    width: 100%;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .mic-error-overlay,
+  .mic-error-toast {
+    animation: none;
+  }
+
+  .mic-error-button {
+    transition: none;
+  }
+}

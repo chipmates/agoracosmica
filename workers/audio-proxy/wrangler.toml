@@ -1,0 +1,55 @@
+# Cloudflare Worker — Audio Proxy with Load-Aware Routing + Failover
+# Routes TTS/STT requests to 2 GEX130 servers (FSN1 + NBG1)
+
+name = "agora-cosmica-audio"
+main = "src/index.ts"
+compatibility_date = "2025-01-06"
+workers_dev = false
+preview_urls = false
+
+# KV Namespace for health cache
+[[kv_namespaces]]
+binding = "HEALTH_CACHE"
+id = "d038eefec57840488a3e316037949b03"
+preview_id = "ab898349850d40b9bd8f86ce08d79851"
+
+# KV Namespace for rate limiting (separate from health — different TTLs, many keys)
+[[kv_namespaces]]
+binding = "RATE_LIMITS"
+id = "276f721cc5ca4ff9aa3a8c01cda4494a"
+preview_id = "e8ab36271a3046759a07bdc0a7a2dba2"
+
+# Environment Variables
+[vars]
+ALLOWED_ORIGINS = "https://agoracosmica.org,https://www.agoracosmica.org"
+SERVER_FSN1_URL = "https://fsn1.agoracosmica.org"
+SERVER_NBG1_URL = "https://nbg1.agoracosmica.org"
+
+# Secrets (set via wrangler secret put):
+# - AUDIO_API_KEY      (Bearer token for both GEX130 servers)
+# - ORIGIN_VERIFY_KEY  (X-Origin-Verify header injected on every upstream call;
+#                       nginx on FSN1+NBG1 rejects requests missing/wrong value.
+#                       Defense against direct-to-origin abuse with leaked AUDIO_API_KEY.
+#                       Generate: openssl rand -hex 32)
+# - LOAD_TEST_BYPASS_KEY  (optional; if set, X-Load-Test-Auth header skips rate limits)
+
+# Routes
+[[routes]]
+pattern = "audio.agoracosmica.org/*"
+zone_name = "agoracosmica.org"
+
+[dev]
+port = 8789
+local_protocol = "http"
+
+[build]
+command = ""
+
+# Analytics Engine for anonymous usage tracking (STATS-1/3)
+# Zero PII: only language, model, server, status, latency. "Ohne Tracking" compliant.
+[[analytics_engine_datasets]]
+binding = "ANALYTICS"
+dataset = "agora_audio"
+
+[observability]
+enabled = true

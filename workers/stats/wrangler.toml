@@ -1,0 +1,40 @@
+# Cloudflare Worker — Internal Analytics Dashboard (STATS-2)
+# Serves HTML dashboard, queries Analytics Engine SQL API
+# Protected by Cloudflare Access (configure in CF dashboard)
+
+name = "agora-cosmica-stats"
+main = "src/index.ts"
+compatibility_date = "2025-01-06"
+workers_dev = false
+preview_urls = false
+
+# Environment Variables
+[vars]
+SERVER_FSN1_URL = "https://fsn1.agoracosmica.org"
+SERVER_NBG1_URL = "https://nbg1.agoracosmica.org"
+# Unix epoch (seconds) of public launch. When > 0, every Analytics Engine query
+# is floored at this timestamp and the sidebar shows "Stats since: <date>".
+# Leave at "0" to disable (shows full AE history, no label).
+# Set 2026-05-06 05:18:40 UTC — public launch.
+LAUNCH_EPOCH_SECONDS = "1778044720"
+
+# Secrets (set via wrangler secret put):
+# - CF_API_TOKEN       (API token with Analytics Engine read permission)
+# - CF_ACCOUNT_ID      (Cloudflare account ID for Analytics Engine queries)
+# - AUDIO_API_KEY      (Bearer token for GEX130 servers — same as audio worker)
+# - ORIGIN_VERIFY_KEY  (X-Origin-Verify header — same value as audio worker;
+#                       required once nginx on FSN1+NBG1 enforces the check)
+
+[[routes]]
+pattern = "stats.agoracosmica.org/*"
+zone_name = "agoracosmica.org"
+
+[dev]
+port = 8790
+local_protocol = "http"
+
+[build]
+command = ""
+
+[observability]
+enabled = true

@@ -1,0 +1,505 @@
+/* Enhanced Cosmic Processing Loader with premium design elements */
+
+/* Main overlay container with liquid glass background */
+.cosmic-processing-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  z-index: var(--z-overlay); /* 9999 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Liquid glass background layer */
+.processing-loader-background {
+  position: absolute;
+  inset: 0;
+  /* Background comes from liquid-glass--audio class */
+}
+
+
+/* Main content card with blue background for spinner area */
+.cosmic-processing-content {
+  position: relative;
+  z-index: var(--z-base); /* 2 */
+  width: 90%;
+  max-width: 500px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  animation: appearScale 0.6s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  /* Blue background specifically for the spinner content area */
+  background: color-mix(in srgb, var(--bg-primary) var(--a-95), transparent); /* Enhanced specificity ensures proper cosmic blue background */
+  border-radius: 20px;
+  backdrop-filter: blur(var(--glass-blur-light));
+  -webkit-backdrop-filter: blur(var(--glass-blur-light));
+  box-shadow: 
+    0 8px 32px color-mix(in srgb, var(--utility-pure-black) var(--a-30), transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--text-primary) var(--a-10), transparent);
+  border: 1px solid color-mix(in srgb, var(--text-primary) var(--a-10), transparent);
+}
+
+/* Icon container with complex animations */
+.cosmic-processing-icon-container {
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+
+.cosmic-processing-icon {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.brain-icon {
+  position: relative;
+  color: var(--gold-base);
+  filter: drop-shadow(0 0 5px color-mix(in srgb, var(--gold-subtle) var(--a-50), transparent));
+  animation: pulseIcon 2s ease-in-out infinite;
+  z-index: var(--z-base); /* 2 */
+}
+
+.spinning-circles {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+
+.circle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  box-sizing: border-box;
+}
+
+.circle-1 {
+  border-top-color: var(--gold-base);
+  animation: spinCircle 3s linear infinite;
+}
+
+.circle-2 {
+  width: 75%;
+  height: 75%;
+  top: 12.5%;
+  left: 12.5%;
+  border-right-color: var(--coral-base);
+  animation: spinCircle 2s linear infinite reverse;
+}
+
+.circle-3 {
+  width: 50%;
+  height: 50%;
+  top: 25%;
+  left: 25%;
+  border-bottom-color: var(--nebula-teal);
+  animation: spinCircle 1.5s linear infinite;
+}
+
+/* Decorative sparkles */
+.cosmic-sparkles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.sparkle {
+  position: absolute;
+  color: var(--gold-light);
+  filter: drop-shadow(0 0 3px color-mix(in srgb, var(--gold-subtle) var(--a-80), transparent));
+}
+
+.sparkle-1 {
+  top: -5px;
+  right: 0px;
+  animation: twinkle 2s ease-in-out infinite;
+}
+
+.sparkle-2 {
+  bottom: 10px;
+  left: -5px;
+  animation: twinkle 2.3s ease-in-out infinite 0.7s;
+}
+
+.sparkle-3 {
+  top: 50%;
+  right: -8px;
+  animation: twinkle 2.5s ease-in-out infinite 1.3s;
+}
+
+/* Text content styles */
+.cosmic-processing-text {
+  text-align: center;
+  width: 100%;
+}
+
+.cosmic-processing-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.2rem;
+  margin: 0 0 16px 0;
+  color: var(--gold-base);
+  text-shadow: 0 0 10px color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent);
+  letter-spacing: 0.5px;
+}
+
+.cosmic-processing-subtitle-container {
+  position: relative;
+}
+
+.cosmic-processing-subtitle {
+  font-size: 0.9rem;
+  margin: 0 0 14px 0;
+  line-height: 1.5;
+  color: var(--space-white);
+  opacity: 0.9;
+  animation: fadeTextChange 4s ease-in-out infinite;
+  min-height: 3em;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+.cosmic-processing-overlay .figure-name {
+  color: var(--gold-subtle);
+  font-weight: 500;
+  font-size: 1.15rem;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  margin-right: 0.3em;
+  display: inline-block;
+  max-width: 90%;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+/* Stage-aware variant has the figure on its own line — make it a bit larger still
+ * since it's now the titular element, not inline with the verb. */
+.cosmic-processing-overlay .cosmic-processing-figure .figure-name {
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+/* Progress bar */
+.cosmic-progress-bar {
+  width: 100%;
+  margin-top: 16px;
+}
+
+.cosmic-progress-track {
+  height: 4px;
+  width: 100%;
+  background: color-mix(in srgb, var(--text-primary) var(--a-25), transparent);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+
+.cosmic-progress-fill {
+  position: absolute;
+  height: 100%;
+  width: 30%;
+  background: linear-gradient(to right, var(--gold-base), var(--coral-base));
+  border-radius: 2px;
+  animation: progressMove 2.5s ease-in-out infinite;
+}
+
+/* Animation keyframes */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes appearScale {
+  from { 
+    opacity: 0; 
+    transform: scale(0.9);
+  }
+  to { 
+    opacity: 1; 
+    transform: scale(1);
+  }
+}
+
+@keyframes spinCircle {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulseIcon {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+@keyframes twinkle {
+  0%, 100% { 
+    opacity: 0.2; 
+    transform: scale(0.8);
+  }
+  50% { 
+    opacity: 1; 
+    transform: scale(1.2);
+  }
+}
+
+
+@keyframes progressMove {
+  0% {
+    left: -30%;
+  }
+  50% {
+    left: 100%;
+  }
+  100% {
+    left: -30%;
+  }
+}
+
+
+@keyframes fadeTextChange {
+  0%, 20% {
+    opacity: 1;
+  }
+  25%, 30% {
+    opacity: 0.7;
+  }
+  35%, 100% {
+    opacity: 1;
+  }
+}
+
+/* Mobile optimization */
+@media (max-width: 600px) {
+  .cosmic-processing-content {
+    width: 95%;
+    padding: 20px;
+    gap: 16px;
+  }
+
+  .cosmic-processing-icon-container {
+    width: 60px;
+    height: 60px;
+  }
+
+  .cosmic-processing-title {
+    font-size: 1rem;
+    margin-bottom: 12px;
+  }
+
+  .cosmic-processing-subtitle {
+    font-size: 0.85rem; /* Reduced from 0.9rem */
+    min-height: 4em;
+  }
+  
+  .figure-name {
+    font-size: 1rem;
+    max-width: 80%; /* Slightly reduced width to ensure ellipsis appears */
+  }
+
+  .cosmic-processing-overlay .cosmic-processing-figure .figure-name {
+    font-size: 1.15rem;
+  }
+}
+
+/* Accessibility considerations */
+@media (prefers-reduced-motion: reduce) {
+  .cosmic-processing-overlay,
+  .cosmic-processing-content,
+  .circle,
+  .sparkle,
+  .brain-icon,
+  .cosmic-progress-fill {
+    animation: none !important;
+    transition: none !important;
+  }
+  
+  .cosmic-progress-fill {
+    width: 70%;
+    left: 0;
+  }
+  
+  .cosmic-processing-subtitle {
+    min-height: auto;
+  }
+}
+
+@media (forced-colors: active) {
+  .cosmic-processing-content {
+    border: 2px solid ButtonText;
+  }
+
+  .brain-icon,
+  .sparkle,
+  .cosmic-processing-title {
+    color: Highlight;
+  }
+
+  .circle-1,
+  .circle-2,
+  .circle-3 {
+    border-color: ButtonText;
+  }
+
+  .cosmic-progress-fill {
+    background: Highlight;
+  }
+}
+
+/* ============================================================
+ * Stage-aware + capacity-aware enhancements
+ * ============================================================ */
+
+/* Standalone figure+quote rendering (used when `stage` prop is provided,
+ * so quotes are complete sentences rather than continuations of "is"). */
+.cosmic-processing-figure {
+  text-align: center;
+  opacity: 0.85;
+  margin-bottom: 0.25rem;
+}
+
+.cosmic-processing-quote {
+  text-align: center;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+  margin: 0;
+  min-height: 2.5em;
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Inline note shown when wait passes takingLonger threshold (~25s). */
+.cosmic-processing-note {
+  margin-top: 0.75rem;
+  text-align: center;
+  font-size: 0.875rem;
+  font-style: italic;
+  color: color-mix(in srgb, var(--text-secondary) 80%, transparent);
+}
+
+/* "Read text instead" opt-out action — appears at ~10s. */
+.cosmic-processing-opt-out {
+  margin-top: 1.25rem;
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 40%, transparent);
+  color: var(--text-secondary);
+  padding: 0.5rem 1.25rem;
+  min-height: 44px; /* WCAG touch target */
+  border-radius: 1rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  align-self: center;
+}
+
+.cosmic-processing-opt-out:hover,
+.cosmic-processing-opt-out:focus-visible {
+  background: color-mix(in srgb, var(--gold-subtle) 10%, transparent);
+  border-color: var(--gold-subtle);
+  color: var(--text-primary);
+  outline: none;
+}
+
+.cosmic-processing-opt-out:focus-visible {
+  outline: 2px solid var(--gold-subtle);
+  outline-offset: 2px;
+}
+
+/* Prominent variant — used when capacity hits takingLonger (~25s).
+ * Shifts from outline to soft-filled so the recommendation reads as
+ * an actual call-to-action rather than an ambient option. */
+.cosmic-processing-opt-out.prominent {
+  background: color-mix(in srgb, var(--gold-subtle) 15%, transparent);
+  border-color: var(--gold-subtle);
+  color: var(--text-primary);
+  font-weight: 500;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.95rem;
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+}
+
+.cosmic-processing-opt-out.prominent:hover,
+.cosmic-processing-opt-out.prominent:focus-visible {
+  background: color-mix(in srgb, var(--gold-subtle) 25%, transparent);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+}
+
+/* Capacity-state visual cues. Subtle — the quotes carry most of the signal. */
+.cosmic-processing-overlay.capacity-highDemand .cosmic-sparkles {
+  opacity: 0.55;
+}
+
+.cosmic-processing-overlay.capacity-takingLonger .cosmic-sparkles {
+  opacity: 0.35;
+}
+
+/* takingLonger (~25s+): shift the warning signals to coral. Figure stays gold
+ * (see .cosmic-processing-overlay .figure-name above) so coral reads as pure
+ * urgency, not just "another accent in the spinner UI". */
+.cosmic-processing-overlay.capacity-takingLonger .cosmic-processing-note {
+  color: var(--coral-light);
+  font-style: normal;
+  font-weight: 500;
+  opacity: 1;
+}
+
+.cosmic-processing-overlay.capacity-takingLonger .cosmic-processing-opt-out.prominent {
+  background: color-mix(in srgb, var(--coral-base) 15%, transparent);
+  border-color: var(--coral-base);
+  color: var(--coral-light);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--coral-base) 25%, transparent);
+}
+
+.cosmic-processing-overlay.capacity-takingLonger .cosmic-processing-opt-out.prominent:hover,
+.cosmic-processing-overlay.capacity-takingLonger .cosmic-processing-opt-out.prominent:focus-visible {
+  background: color-mix(in srgb, var(--coral-base) 28%, transparent);
+  border-color: var(--coral-light);
+  color: var(--text-primary);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--coral-base) 35%, transparent);
+}
+
+.cosmic-processing-overlay.capacity-takingLonger .cosmic-processing-opt-out.prominent:focus-visible {
+  outline-color: var(--coral-base);
+}
+
+/* Subtle coral tint on the progress bar fill too — one more cue that state shifted. */
+.cosmic-processing-overlay.capacity-takingLonger .cosmic-progress-fill {
+  background: color-mix(in srgb, var(--coral-base) 80%, var(--gold-subtle));
+}
+
+/* Respect user preference for reduced motion — disable spinning and sparkles. */
+@media (prefers-reduced-motion: reduce) {
+  .cosmic-processing-overlay .spinning-circles .circle {
+    animation: none;
+  }
+  .cosmic-processing-overlay .cosmic-sparkles .sparkle {
+    animation: none;
+  }
+  .cosmic-processing-overlay .cosmic-progress-fill {
+    animation: none;
+  }
+  .cosmic-processing-overlay {
+    animation: none;
+  }
+  .cosmic-processing-content {
+    animation: none;
+  }
+}

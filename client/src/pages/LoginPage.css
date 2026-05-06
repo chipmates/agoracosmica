@@ -1,0 +1,415 @@
+/* src/pages/LoginPage.css */
+
+/* Import all component styles - must come first */
+@import url('../components/CosmicBackground.css');
+@import url('../components/LoginContainer.css');
+@import url('../components/LoginForm.css');
+@import url('../components/MessagePopup.css');
+@import url('../components/LandscapeWarning.css');
+
+/* ❌ REMOVED: Duplicate color definitions (use index.css design system) */
+
+/* Base Styles */
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  font-family: var(--font-ui);
+}
+
+/* PWA mode - ensure full viewport with enhanced specificity */
+@media (display-mode: standalone) {
+  body, html {
+    height: 100vh; /* Enhanced specificity ensures PWA fullscreen behavior */
+  }
+}
+
+/* Component styles imported at top of file (lines 3-8) */
+
+/* Site attribution — ChipMates / ad grant compliance.
+   Sits at the very top of the splash, fades during post-login animation. */
+.site-attribution {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100; /* below top-bar buttons (z-sticky: 200) */
+  margin: 0;
+  padding: 12px 20px;
+  text-align: center;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: color-mix(in srgb, var(--gold-primary) 55%, transparent);
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+}
+
+.site-attribution--hidden {
+  opacity: 0;
+}
+
+@media (min-width: 768px) {
+  .site-attribution {
+    font-size: 12px;
+    padding: 14px 30px;
+  }
+}
+
+/* Split Top Bar Styles */
+.top-bar-left,
+.top-bar-right {
+  position: fixed;
+  top: 20px;
+  z-index: var(--z-sticky); /* 200 — above skip overlay */
+}
+
+.top-bar-left {
+  left: 20px;
+}
+
+.top-bar-right {
+  right: 20px;
+}
+
+/* Legal Menu Button - Premium 2025 Animation System */
+.legal-menu-button {
+  background: color-mix(in srgb, var(--bg-primary) var(--a-40), transparent);
+  backdrop-filter: blur(var(--glass-blur-heavy));
+  -webkit-backdrop-filter: blur(var(--glass-blur-heavy));
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-20), transparent);
+  border-radius: var(--radius-lg);
+  padding: 10px 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  transition: all var(--transition-base);
+  font-family: var(--font-ui);
+  color: color-mix(in srgb, var(--gold-subtle) var(--a-90), transparent);
+  position: relative;
+  overflow: hidden;
+  will-change: transform;
+
+  /* Clean initial pulse (3 times), then stop completely for battery efficiency */
+  animation: initialLegalPulse 1.618s cubic-bezier(0.4, 0, 0.2, 1) 3;
+}
+
+/* Clean border pulse animation */
+@keyframes initialLegalPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--gold-subtle) 0%, transparent);
+    border-color: var(--utility-border);
+  }
+  50% {
+    transform: scale(1.008);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent);
+    border-color: color-mix(in srgb, var(--gold-subtle) var(--a-80), transparent);
+  }
+}
+
+
+.legal-menu-button:hover {
+  background: color-mix(in srgb, var(--bg-primary) var(--a-60), transparent);
+  border-color: color-mix(in srgb, var(--gold-subtle) var(--a-40), transparent);
+  color: var(--gold-hover);
+  text-shadow: 0 0 10px color-mix(in srgb, var(--gold-subtle) var(--a-50), transparent);
+}
+
+.legal-menu-icon {
+  display: flex;
+  align-items: center;
+  line-height: 1;
+}
+
+.legal-menu-chevron {
+  display: flex;
+  align-items: center;
+  line-height: 1;
+  transition: transform 0.3s ease;
+  margin-left: 2px;
+}
+
+.legal-menu-chevron.rotate {
+  transform: rotate(180deg);
+}
+
+/* Legal Dropdown - Unified with login form dropdown style */
+.legal-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: var(--space-sm);
+  background: rgba(20, 25, 60, 0.6); /* Unique shade — no exact variable match */
+  backdrop-filter: blur(var(--glass-blur-heavy));
+  -webkit-backdrop-filter: blur(var(--glass-blur-heavy));
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-25), transparent);
+  border-radius: 10px;
+  padding: var(--space-sm);
+  min-width: 180px;
+  box-shadow: 0 0 20px color-mix(in srgb, black var(--a-30), transparent);
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.legal-dropdown-link {
+  display: block;
+  padding: 10px 16px;
+  color: color-mix(in srgb, var(--gold-subtle) var(--a-90), transparent);
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-base);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  letter-spacing: 0.05em;
+  position: relative;
+}
+
+/* Invisible touch target for dropdown links */
+.legal-dropdown-link::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  min-height: 44px;
+}
+
+.legal-dropdown-link:hover {
+  background: color-mix(in srgb, var(--gold-subtle) var(--a-10), transparent);
+  color: var(--gold-hover);
+  text-shadow: 0 0 10px color-mix(in srgb, var(--gold-subtle) var(--a-50), transparent);
+}
+
+.legal-dropdown-link:not(:last-child) {
+  margin-bottom: var(--space-xs);
+}
+
+/* Audio Toggle Button */
+.audio-toggle-button {
+  background: color-mix(in srgb, var(--bg-primary) var(--a-40), transparent);
+  backdrop-filter: blur(var(--glass-blur-heavy));
+  -webkit-backdrop-filter: blur(var(--glass-blur-heavy));
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-20), transparent);
+  border-radius: var(--radius-lg);
+  color: color-mix(in srgb, var(--gold-subtle) var(--a-90), transparent);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-base);
+  padding: 10px 14px; /* Original padding restored */
+  font-family: var(--font-ui);
+  position: relative;
+}
+
+/* Invisible touch target extension */
+.legal-menu-button::before,
+.audio-toggle-button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: max(100%, 44px);
+  height: 44px;
+  cursor: pointer;
+}
+
+.audio-toggle-button:hover {
+  background: color-mix(in srgb, var(--bg-primary) var(--a-60), transparent);
+  border-color: color-mix(in srgb, var(--gold-subtle) var(--a-40), transparent);
+  color: var(--gold-hover);
+  text-shadow: 0 0 10px color-mix(in srgb, var(--gold-subtle) var(--a-50), transparent);
+}
+
+.audio-icon {
+  display: flex;
+  align-items: center;
+  line-height: 1;
+}
+
+/* Audio button is always icon-only for consistency */
+
+/* Skip animation overlay — full-screen tap/click target */
+.skip-animation-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-dropdown); /* 100 — above animations, below top-bar (200) */
+  cursor: pointer;
+  background: transparent;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: env(safe-area-inset-bottom, 2rem);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Reduced motion handled in component styles */
+}
+
+/* Loading overlay — React-managed replacement for imperative DOM */
+.loading-overlay {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  z-index: 9999;
+}
+
+/* Screen reader only utility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Focus-visible for top bar buttons */
+.legal-menu-button:focus-visible,
+.audio-toggle-button:focus-visible {
+  outline: 2px solid var(--gold-subtle);
+  outline-offset: 2px;
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .legal-menu-button {
+    animation: none;
+  }
+
+  .legal-dropdown {
+    animation: none;
+  }
+}
+
+/* ===== RESPONSIVE BREAKPOINTS ===== */
+
+/* Mobile baseline (< 360px) */
+@media (max-width: 359px) {
+  .top-bar-left,
+  .top-bar-right {
+    top: 10px;
+  }
+  
+  .top-bar-left {
+    left: 10px;
+  }
+  
+  .top-bar-right {
+    right: 10px;
+  }
+  
+  .legal-menu-button,
+  .audio-toggle-button {
+    padding: 8px 12px; /* Original small device padding */
+  }
+  
+  
+  .legal-menu-icon svg,
+  .audio-icon svg,
+  .legal-menu-chevron svg {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .legal-dropdown {
+    min-width: 150px;
+  }
+}
+
+/* Android baseline (360px+) */
+@media (min-width: 360px) and (max-width: 767px) {
+  
+  .legal-menu-button,
+  .audio-toggle-button {
+    padding: 8px 14px; /* Original padding */
+  }
+}
+
+/* Tablet Portrait (768px+) */
+@media (min-width: 768px) {
+  
+  .top-bar-left,
+  .top-bar-right {
+    top: 30px;
+  }
+  
+  .top-bar-left {
+    left: 30px;
+  }
+  
+  .top-bar-right {
+    right: 30px;
+  }
+  
+  .legal-dropdown {
+    min-width: 220px;
+  }
+}
+
+/* Desktop (1024px+) */
+@media (min-width: 1024px) {
+  .legal-menu-button,
+  .audio-toggle-button {
+    padding: 12px 20px;
+    font-size: 16px;
+  }
+  
+  .legal-menu-icon svg,
+  .audio-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .legal-menu-chevron svg {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .legal-dropdown-link {
+    font-size: 16px;
+  }
+}
+
+/* Landscape Mode - Compact version */
+@media (max-height: 500px) and (orientation: landscape) {
+  .top-bar-left,
+  .top-bar-right {
+    top: 10px;
+  }
+  
+  
+  .legal-menu-button,
+  .audio-toggle-button {
+    padding: 6px 12px; /* Original compact landscape padding */
+  }
+  
+  .legal-menu-icon svg,
+  .audio-icon svg,
+  .legal-menu-chevron svg {
+    width: 16px;
+    height: 16px;
+  }
+}
