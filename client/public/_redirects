@@ -1,3 +1,10 @@
+# Spotify campaign shortcuts — short URLs for Ad Studio creatives.
+# Apply utm_source server-side so the final URL the user lands on still has the
+# UTM tag for our analytics, but the URL the ad shows is short and clean.
+/sp/de  /de/?utm_source=spotify  302
+/sp/en  /?utm_source=spotify     302
+/sp     /?utm_source=spotify     302
+
 # SPA fallback — serve index.html for all client-side routes
 # CF Pages serves existing static files first (JS, CSS, images, fonts)
 /* /index.html 200
