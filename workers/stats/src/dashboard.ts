@@ -842,6 +842,20 @@ function chartCard(title, body, cls) {
   return '<div class="card ' + (cls || '') + '"><div class="kpi-label" style="margin-bottom:6px">' + title + '</div>' + body + '</div>';
 }
 
+// Merge same-label rows (e.g. empty-string rows that fall back to a default
+// label like 'direct' or 'XX' would otherwise collide with rows that already
+// have that exact value, producing duplicate bars). Sorts by count desc.
+function aggregateByLabel(items) {
+  if (!items || items.length === 0) return [];
+  var map = {};
+  items.forEach(function(r) {
+    if (!r.label) return;
+    map[r.label] = (map[r.label] || 0) + r.c;
+  });
+  return Object.keys(map).map(function(k) { return { label: k, c: map[k] }; })
+    .sort(function(a, b) { return b.c - a.c; });
+}
+
 // Horizontal bar chart
 function barsHtml(items, color) {
   if (!items || items.length === 0) return '<div class="empty-state">No data for this period</div>';
@@ -1251,27 +1265,27 @@ async function loadOverview() {
   }
 
   // Channel Sources panel (Phase 1 — marketing attribution)
-  var channelItems = channelSources.map(function(r) {
+  var channelItems = aggregateByLabel(channelSources.map(function(r) {
     return { label: r.source || 'direct', c: r.c };
-  }).filter(function(r) { return r.label && r.c > 0; });
+  }));
   html += chartCard('Channel Sources', barsHtml(channelItems, '#E6BC5C'), 'card-half');
 
   // Geographic Breakdown panel (Phase 0d — country dimension)
-  var countryItems = topCountries.map(function(r) {
-    return { label: r.country || 'XX', c: r.c };
-  }).filter(function(r) { return r.label && r.c > 0; });
+  var countryItems = aggregateByLabel(topCountries.map(function(r) {
+    return { label: r.country || 'Unknown', c: r.c };
+  }));
   html += chartCard('Top Countries', barsHtml(countryItems, '#9D83CD'), 'card-half');
 
   // Content Completions by Type — playback beacons (real consumption events)
-  var contentTypeItems = contentByType.map(function(r) {
+  var contentTypeItems = aggregateByLabel(contentByType.map(function(r) {
     return { label: r.type || 'unknown', c: r.c };
-  }).filter(function(r) { return r.label && r.c > 0; });
+  }));
   html += chartCard('Content Completed', barsHtml(contentTypeItems, '#68C397'), 'card-half');
 
   // Top figures by content completion
-  var topFiguresContentItems = topFiguresByContent.map(function(r) {
+  var topFiguresContentItems = aggregateByLabel(topFiguresByContent.map(function(r) {
     return { label: cap(r.figure), c: r.c };
-  }).filter(function(r) { return r.label && r.c > 0; });
+  }).filter(function(r) { return r.label; }));
   html += chartCard('Top Figures by Completion', barsHtml(topFiguresContentItems, '#5B8BD4'), 'card-half');
 
   // Computed insight
@@ -1723,45 +1737,45 @@ async function loadAdGrants() {
   });
 
   // Phase 1 channel attribution — Conversations by Source
-  var convoChannelItems = convoByChannel.map(function(r) {
+  var convoChannelItems = aggregateByLabel(convoByChannel.map(function(r) {
     return { label: r.source || 'direct', c: r.c };
-  }).filter(function(r) { return r.label && r.c > 0; });
+  }));
   html += chartCard('Conversations by Channel',
     barsHtml(convoChannelItems, '#E6BC5C'),
     'card-half'
   );
 
   // Channel attribution — Sessions by Source
-  var sessionChannelItems = sessionsByChannel.map(function(r) {
+  var sessionChannelItems = aggregateByLabel(sessionsByChannel.map(function(r) {
     return { label: r.source || 'direct', c: r.c };
-  }).filter(function(r) { return r.label && r.c > 0; });
+  }));
   html += chartCard('Sessions by Channel',
     barsHtml(sessionChannelItems, '#9D83CD'),
     'card-half'
   );
 
   // Phase 0d — Top countries
-  var countryItemsAdgrants = topCountriesAdgrants.map(function(r) {
-    return { label: r.country || 'XX', c: r.c };
-  }).filter(function(r) { return r.label && r.c > 0; });
+  var countryItemsAdgrants = aggregateByLabel(topCountriesAdgrants.map(function(r) {
+    return { label: r.country || 'Unknown', c: r.c };
+  }));
   html += chartCard('Top Countries (Conversations)',
     barsHtml(countryItemsAdgrants, '#5B8BD4'),
     'card-half'
   );
 
   // Content Completions by Type (real consumption — story/teaching/prism/council)
-  var playbackTypeItems = playbackByType.map(function(r) {
+  var playbackTypeItems = aggregateByLabel(playbackByType.map(function(r) {
     return { label: r.type || 'unknown', c: r.c };
-  }).filter(function(r) { return r.label && r.c > 0; });
+  }));
   html += chartCard('Content Completions by Type',
     barsHtml(playbackTypeItems, '#68C397'),
     'card-half'
   );
 
   // Content Completions by Channel
-  var playbackChannelItems = playbackByChannel.map(function(r) {
+  var playbackChannelItems = aggregateByLabel(playbackByChannel.map(function(r) {
     return { label: r.source || 'direct', c: r.c };
-  }).filter(function(r) { return r.label && r.c > 0; });
+  }));
   html += chartCard('Content Completions by Channel',
     barsHtml(playbackChannelItems, '#E6BC5C'),
     'card-half'
