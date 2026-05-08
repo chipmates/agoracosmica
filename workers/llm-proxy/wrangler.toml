@@ -19,6 +19,14 @@ binding = "COMPLIANCE_LOG"
 id = "12c8d284d4ee4131a6ee838208feaf7a"
 preview_id = "10fb01f0552a46cf98c644a206b726cd"
 
+# KV Namespace for session-freshness gating (Phase 0a — Sessions metric truthing)
+# Tracks last-seen timestamp per clientId so trackSession only counts beyond a
+# 30-min idle window. Entries TTL 1h; the metric only cares about ~30-min gaps.
+[[kv_namespaces]]
+binding = "SESSION_LAST_SEEN"
+id = "5735cd6b042143988cb731b8e3d9a64b"
+preview_id = "85c3e8f1fbab465ca47e3775d67278a5"
+
 # Environment Variables
 [vars]
 ALLOWED_ORIGINS = "https://agoracosmica.org,https://www.agoracosmica.org"

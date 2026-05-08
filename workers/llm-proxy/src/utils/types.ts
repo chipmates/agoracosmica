@@ -3,6 +3,7 @@
 export interface Env {
   RATE_LIMITS: KVNamespace;
   COMPLIANCE_LOG: KVNamespace;
+  SESSION_LAST_SEEN: KVNamespace;
   ANALYTICS: AnalyticsEngineDataset;
   NEBIUS_API_KEY: string;
   TURNSTILE_SECRET_KEY: string;
