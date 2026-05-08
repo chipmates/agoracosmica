@@ -1,10 +1,15 @@
 // JWT session lifecycle for free-tier users
-// Creates session via Turnstile → Worker, stores JWT in memory, auto-refreshes.
+// Creates session via Turnstile → Worker, stores JWT in memory, lazily refreshes
+// on the next getSessionToken() call when the cached token is within 5min of expiry.
 //
 // Identity: a UUID v4 ("clientId") is persisted in localStorage and sent with
 // every /v1/session call so the server's daily quota stays bound to this device
 // across tabs, page reloads, and JWT refreshes — independent of the public IP.
 // Cleared localStorage → fresh quota; that's a known and accepted trade-off.
+//
+// Refresh policy is LAZY (no setTimeout). An open-but-idle tab does not burn
+// Turnstile + JWT issuance every 5min. Sessions analytics only fire on real
+// engagement, not background timers.
 
 import { getTurnstileToken } from './turnstile';
 import { fetchWithTimeout } from '../../utils/fetchWithTimeout';
@@ -17,7 +22,6 @@ const UUID_V4_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9
 // In-memory storage (never persisted — session = per-tab)
 let currentToken: string | null = null;
 let tokenExpiresAt: number = 0; // Unix ms
-let refreshTimeout: ReturnType<typeof setTimeout> | null = null;
 let pendingSession: Promise<string> | null = null; // Deduplication mutex
 
 /** Read the persisted clientId. Returns null if missing, malformed, or storage is unavailable. */
@@ -94,26 +98,7 @@ async function createSession(): Promise<string> {
     writeStoredClientId(data.clientId);
   }
 
-  // Schedule refresh 5 minutes before expiry
-  scheduleRefresh();
-
   return currentToken;
-}
-
-function scheduleRefresh(): void {
-  if (refreshTimeout) {
-    clearTimeout(refreshTimeout);
-  }
-
-  const refreshIn = tokenExpiresAt - Date.now() - 5 * 60 * 1000;
-  if (refreshIn > 0) {
-    refreshTimeout = setTimeout(() => {
-      createSession().catch(err => {
-        console.warn('[SessionManager] Auto-refresh failed:', err instanceof Error ? err.message : 'unknown error');
-        // Will retry on next getSessionToken() call
-      });
-    }, refreshIn);
-  }
 }
 
 /**
@@ -121,10 +106,6 @@ function scheduleRefresh(): void {
  * Next getSessionToken() call will create a fresh session.
  */
 export function invalidateToken(): void {
-  if (refreshTimeout) {
-    clearTimeout(refreshTimeout);
-    refreshTimeout = null;
-  }
   currentToken = null;
   tokenExpiresAt = 0;
 }
@@ -142,8 +123,4 @@ export function hasActiveSession(): boolean {
 export function clearSession(): void {
   currentToken = null;
   tokenExpiresAt = 0;
-  if (refreshTimeout) {
-    clearTimeout(refreshTimeout);
-    refreshTimeout = null;
-  }
 }
