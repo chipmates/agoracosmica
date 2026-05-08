@@ -586,11 +586,15 @@ html { scrollbar-color: var(--bg-highlight) transparent; scrollbar-width: thin; 
     </button>
     <button class="nav-item" data-tab="product">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-      <span class="nav-label">Product</span>
+      <span class="nav-label">Engagement</span>
+    </button>
+    <button class="nav-item" data-tab="audio">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h3l3-9 4 18 3-9h5"/></svg>
+      <span class="nav-label">Audio</span>
     </button>
     <button class="nav-item" data-tab="adgrants">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 11 12 6 7 11"/><line x1="12" y1="6" x2="12" y2="18"/><path d="M5 21h14"/></svg>
-      <span class="nav-label">Ad Grants</span>
+      <span class="nav-label">Marketing</span>
     </button>
   </div>
   <div class="sidebar-section">
@@ -629,10 +633,10 @@ html { scrollbar-color: var(--bg-highlight) transparent; scrollbar-width: thin; 
   <div id="content-servers"><div class="empty-state">Loading server data...</div></div>
 </section>
 
-<!-- Tab: Product -->
+<!-- Tab: Engagement (internal id 'product' preserved for bookmark stability) -->
 <section class="tab-section" id="tab-product" aria-labelledby="title-product">
   <div class="tab-header">
-    <h2 class="tab-title" id="title-product">Product</h2>
+    <h2 class="tab-title" id="title-product">Engagement</h2>
     <span class="tab-updated" id="updated-product"></span>
   </div>
   <div id="alerts-product"></div>
@@ -643,10 +647,23 @@ html { scrollbar-color: var(--bg-highlight) transparent; scrollbar-width: thin; 
   </div>
 </section>
 
-<!-- Tab: Ad Grants -->
+<!-- Tab: Audio -->
+<section class="tab-section" id="tab-audio" aria-labelledby="title-audio">
+  <div class="tab-header">
+    <h2 class="tab-title" id="title-audio">Audio</h2>
+    <span class="tab-updated" id="updated-audio"></span>
+  </div>
+  <div id="alerts-audio"></div>
+  <div id="grid-audio">
+    <div class="card card-hero"><div class="skel-label skeleton"></div><div class="skel-value skeleton"></div><div class="skel-sub skeleton"></div></div>
+    <div class="card"><div class="skel-label skeleton"></div><div class="skel-value skeleton"></div><div class="skel-sub skeleton"></div></div>
+  </div>
+</section>
+
+<!-- Tab: Marketing (internal id 'adgrants' preserved for bookmark stability) -->
 <section class="tab-section" id="tab-adgrants" aria-labelledby="title-adgrants">
   <div class="tab-header">
-    <h2 class="tab-title" id="title-adgrants">Ad Grants Conversions</h2>
+    <h2 class="tab-title" id="title-adgrants">Marketing</h2>
   </div>
   <div id="alerts-adgrants" class="alerts"></div>
   <div class="grid" id="grid-adgrants"></div>
@@ -668,11 +685,15 @@ html { scrollbar-color: var(--bg-highlight) transparent; scrollbar-width: thin; 
   </button>
   <button class="mob-tab" data-tab="product">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-    Product
+    Engagement
+  </button>
+  <button class="mob-tab" data-tab="audio">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 12h3l3-9 4 18 3-9h5"/></svg>
+    Audio
   </button>
   <button class="mob-tab" data-tab="adgrants">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="17 11 12 6 7 11"/><line x1="12" y1="6" x2="12" y2="18"/><path d="M5 21h14"/></svg>
-    Ad Grants
+    Marketing
   </button>
 </div>
 </nav>
@@ -1181,10 +1202,6 @@ async function loadOverview() {
     { sql: "SELECT blob2 as figure, COUNT() as c FROM agora_llm WHERE blob1 = 'chat' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY figure ORDER BY c DESC LIMIT 1", dataset: 'agora_llm' },
     // Language split (for insight)
     { sql: "SELECT blob4 as lang, COUNT() as c FROM agora_llm WHERE blob1 = 'chat' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY lang ORDER BY c DESC", dataset: 'agora_llm' },
-    // Channel sources — Phase 1 marketing attribution (blob6 = marketing_source)
-    { sql: "SELECT blob6 as source, COUNT() as c FROM agora_llm WHERE blob1 IN ('chat','council','summary') AND blob5 = '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY source ORDER BY c DESC", dataset: 'agora_llm' },
-    // Top countries — Phase 0d geographic breakdown (blob7 = country)
-    { sql: "SELECT blob7 as country, COUNT() as c FROM agora_llm WHERE blob1 IN ('chat','council','summary') AND blob5 = '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY country ORDER BY c DESC LIMIT 8", dataset: 'agora_llm' },
     // Content completions by type — Phase 0e' content tracking (blob5 = type for blob1='playback' rows)
     { sql: "SELECT blob5 as type, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY type ORDER BY c DESC", dataset: 'agora_llm' },
     // Top figures by content completion (blob2 = figureId for playback rows)
@@ -1264,19 +1281,9 @@ async function loadOverview() {
     html += chartCard('Chat Activity', '<div class="empty-state" style="padding:40px 0">No chat data yet ' + RANGE_LABEL[S.range] + '</div>', 'card-wide');
   }
 
-  // Channel Sources panel (Phase 1 — marketing attribution)
-  var channelItems = aggregateByLabel(channelSources.map(function(r) {
-    return { label: r.source || 'direct', c: r.c };
-  }));
-  html += chartCard('Channel Sources', barsHtml(channelItems, '#E6BC5C'), 'card-half');
-
-  // Geographic Breakdown panel (Phase 0d — country dimension)
-  var countryItems = aggregateByLabel(topCountries.map(function(r) {
-    return { label: r.country || 'Unknown', c: r.c };
-  }));
-  html += chartCard('Top Countries', barsHtml(countryItems, '#9D83CD'), 'card-half');
-
   // Content Completions by Type — playback beacons (real consumption events)
+  // Marketing-channel attribution lives on the Marketing tab; Overview keeps
+  // engagement-signal panels only.
   var contentTypeItems = aggregateByLabel(contentByType.map(function(r) {
     return { label: r.type || 'unknown', c: r.c };
   }));
@@ -1498,16 +1505,19 @@ async function loadProduct() {
     // Rate limits
     { sql: "SELECT blob3 as reason, COUNT() as c FROM agora_llm WHERE blob1 = 'ratelimit' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY reason ORDER BY c DESC", dataset: 'agora_llm' },
     { sql: "SELECT blob4 as reason, COUNT() as c FROM agora_audio WHERE blob5 = 'ratelimit' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY reason ORDER BY c DESC", dataset: 'agora_audio' },
-    // Content completions by type — playback beacons
-    { sql: "SELECT blob5 as type, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY type ORDER BY c DESC", dataset: 'agora_llm' },
+    // Content completions by type — playback beacons (event='completed' or empty for legacy rows)
+    { sql: "SELECT blob5 as type, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND (blob8 = '' OR blob8 = 'completed') AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY type ORDER BY c DESC", dataset: 'agora_llm' },
     // Content completions by figure
-    { sql: "SELECT blob2 as figure, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND blob2 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY figure ORDER BY c DESC LIMIT 10", dataset: 'agora_llm' },
+    { sql: "SELECT blob2 as figure, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND (blob8 = '' OR blob8 = 'completed') AND blob2 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY figure ORDER BY c DESC LIMIT 10", dataset: 'agora_llm' },
     // Content completions by language
-    { sql: "SELECT blob4 as lang, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY lang ORDER BY c DESC", dataset: 'agora_llm' },
-    // Content completions sparkline
-    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
+    { sql: "SELECT blob4 as lang, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND (blob8 = '' OR blob8 = 'completed') AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY lang ORDER BY c DESC", dataset: 'agora_llm' },
+    // Completions sparkline
+    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND (blob8 = '' OR blob8 = 'completed') AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
     // Total completions previous period for delta
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND (blob8 = '' OR blob8 = 'completed') AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    // Started events — total + sparkline (Phase 1 Option 1)
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND blob8 = 'started' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND blob8 = 'started' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
   ];
 
   var r = await batch(queries);
@@ -1538,8 +1548,12 @@ async function loadProduct() {
   var playbackByFigure = rows(r[28]);
   var playbackByLang = rows(r[29]);
   var sparkPlayback = rows(r[30]).map(function(x) { return x.c; });
+  var sparkPlaybackRows = rows(r[30]);
   var playbackPrev = val(r[31]);
+  var playbackStarted = val(r[32]);
+  var sparkStartedRows = rows(r[33]);
   var totalPlayback = playbackByType.reduce(function(s, x) { return s + x.c; }, 0);
+  var completionRate = playbackStarted > 0 ? Math.round((totalPlayback / playbackStarted) * 100) : null;
   var totalLlm = chats + councils + summaries;
   var chatsPerSession = sessions > 0 ? (chats / sessions).toFixed(1) : '-';
   var totalRlLlm = rlLlm.reduce(function(s, r) { return s + r.c; }, 0);
@@ -1596,9 +1610,52 @@ async function loadProduct() {
   // === CONTENT CONSUMPTION SECTION ===
   // Real consumption signal — fires when a user completes a story/teaching/
   // prism/council in localStorage (same trigger as the gamification star).
+  // 'started' fires from useAudio on first play; 'completed' from mark*Completed.
   html += '<div class="section-divider">Content Consumption</div>';
   html += '<div class="grid">';
+  html += kpi('Content Started', playbackStarted, { hero: true, sub: 'audio first-play (story/prism/council/foreword)' });
   html += kpi('Content Completed', totalPlayback, { hero: true, spark: sparkPlayback, sparkColor: '#68C397', delta: playbackPrev, sub: 'stories, teachings, prisms, councils' });
+  html += kpi('Completion Rate',
+    completionRate === null ? '--' : (completionRate + '%'),
+    { sub: completionRate === null ? 'awaiting first start' : (totalPlayback + ' / ' + playbackStarted),
+      valColor: completionRate === null ? 'var(--dim)' : (completionRate >= 50 ? '#68C397' : completionRate >= 25 ? '#F5A623' : '#E97451') }
+  );
+
+  // Started vs Completed over time (the funnel signal)
+  if (sparkPlaybackRows.length > 1 || sparkStartedRows.length > 1) {
+    var startedMap = {};
+    sparkStartedRows.forEach(function(row) { startedMap[row.t] = row.c; });
+    var allBuckets = new Set();
+    sparkPlaybackRows.forEach(function(row) { allBuckets.add(row.t); });
+    sparkStartedRows.forEach(function(row) { allBuckets.add(row.t); });
+    var bucketArr = Array.from(allBuckets).sort();
+    var completedMap = {};
+    sparkPlaybackRows.forEach(function(row) { completedMap[row.t] = row.c; });
+    var graphItems = bucketArr.map(function(t) {
+      var d = new Date(t);
+      var label = S.range <= 1
+        ? d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        : d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+      return { label: label, started: startedMap[t] || 0, completed: completedMap[t] || 0 };
+    });
+    // Render as a stacked-style summary inline (vanilla bar pair per bucket)
+    var maxBucket = Math.max(1, ...graphItems.map(function(g) { return Math.max(g.started, g.completed); }));
+    var graphHtml = '<div style="display:flex;align-items:flex-end;gap:4px;height:120px;padding:8px 0">';
+    graphItems.slice(-24).forEach(function(g) {
+      var h1 = Math.round((g.started / maxBucket) * 100);
+      var h2 = Math.round((g.completed / maxBucket) * 100);
+      graphHtml += '<div style="flex:1;display:flex;flex-direction:column;gap:1px;justify-content:flex-end;min-width:0" title="' + g.label + ': ' + g.started + ' started / ' + g.completed + ' completed">';
+      graphHtml += '<div style="background:#5B8BD4;height:' + h1 + '%;border-radius:2px 2px 0 0;min-height:1px;opacity:0.85"></div>';
+      graphHtml += '<div style="background:#68C397;height:' + h2 + '%;border-radius:2px 2px 0 0;min-height:1px"></div>';
+      graphHtml += '</div>';
+    });
+    graphHtml += '</div>';
+    graphHtml += '<div style="display:flex;gap:16px;font-size:0.75rem;margin-top:6px;color:var(--dim)">';
+    graphHtml += '<span><span style="display:inline-block;width:10px;height:10px;background:#5B8BD4;border-radius:2px;margin-right:4px;vertical-align:middle"></span>Started</span>';
+    graphHtml += '<span><span style="display:inline-block;width:10px;height:10px;background:#68C397;border-radius:2px;margin-right:4px;vertical-align:middle"></span>Completed</span>';
+    graphHtml += '</div>';
+    html += chartCard('Started vs Completed Over Time', graphHtml, 'card-full');
+  }
 
   // By type — story / teaching / prism / council / foreword
   var pbTypeItems = aggregateByLabel(playbackByType.map(function(r) {
@@ -1626,26 +1683,88 @@ async function loadProduct() {
   }
   html += '</div>';
 
-  // === AUDIO SECTION ===
-  html += '<div class="section-divider">Audio</div>';
+  // === LLM CAPACITY (chat-side rate limits + global config) ===
+  // Audio rate limits + audio activity moved to the dedicated Audio tab.
+  html += '<div class="section-divider">Capacity</div>';
+  html += '<div class="grid">';
+
+  if (totalRlLlm > 0) {
+    var llmDonut = donutSvg(rlLlm.map(function(r) { return { key: r.reason, c: r.c }; }), COLORS.rl, function(r) { return r === 'daily' ? 'Daily' : r === 'global' ? 'Global' : cap(r); }, 60);
+    html += chartCard('LLM Rate Limits (' + totalRlLlm + ')', llmDonut, '');
+  } else {
+    html += '<div class="card"><div class="kpi-label">LLM Rate Limits</div><div style="margin-top:8px;font-size:0.8125rem;color:var(--ok)">No rate limit hits ' + RANGE_LABEL[S.range] + '</div></div>';
+  }
+
+  html += '<div class="card card-wide"><div class="kpi-label">LLM Limits</div><div class="limits-grid">' +
+    '<div><span class="lim-val">30</span><span class="lim-key">Chat / day / IP</span></div>' +
+    '<div><span class="lim-val">1</span><span class="lim-key">Council / day</span></div>' +
+    '<div><span class="lim-val">2</span><span class="lim-key">Summary / day</span></div>' +
+    '<div><span class="lim-val">15K</span><span class="lim-key">LLM global / day</span></div>' +
+    '</div></div>';
+  html += '</div>';
+
+  grid.innerHTML = html;
+  alertsEl.innerHTML = '';
+  document.getElementById('updated-product').textContent = 'Updated ' + now();
+}
+
+// --- Audio Tab ---
+
+async function loadAudio() {
+  var grid = document.getElementById('grid-audio');
+  var alertsEl = document.getElementById('alerts-audio');
+
+  var queries = [
+    // TTS volume (current + previous)
+    { sql: "SELECT COUNT() as c FROM agora_audio WHERE blob5 = 'speech' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_audio' },
+    { sql: "SELECT COUNT() as c FROM agora_audio WHERE blob5 = 'speech' AND timestamp " + prevRange(), dataset: 'agora_audio' },
+    // STT volume (current + previous)
+    { sql: "SELECT COUNT() as c FROM agora_audio WHERE blob5 = 'transcriptions' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_audio' },
+    { sql: "SELECT COUNT() as c FROM agora_audio WHERE blob5 = 'transcriptions' AND timestamp " + prevRange(), dataset: 'agora_audio' },
+    // TTS sparkline
+    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_audio WHERE blob5 = 'speech' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_audio' },
+    // Avg TTS latency
+    { sql: "SELECT AVG(double1) as avg_ms FROM agora_audio WHERE blob5 = 'speech' AND blob4 = '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_audio' },
+    // Audio errors
+    { sql: "SELECT COUNT() as c FROM agora_audio WHERE blob5 IN ('speech','transcriptions') AND blob4 != '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_audio' },
+    // TTS models
+    { sql: "SELECT blob2 as model, COUNT() as c, AVG(double1) as avg_ms FROM agora_audio WHERE blob5 = 'speech' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY model ORDER BY c DESC", dataset: 'agora_audio' },
+    // Server distribution
+    { sql: "SELECT blob3 as server, COUNT() as c FROM agora_audio WHERE blob5 IN ('speech','transcriptions') AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY server ORDER BY c DESC", dataset: 'agora_audio' },
+    // Audio language split
+    { sql: "SELECT blob1 as lang, COUNT() as c FROM agora_audio WHERE blob5 = 'speech' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY lang ORDER BY c DESC", dataset: 'agora_audio' },
+    // Audio rate limits
+    { sql: "SELECT blob4 as reason, COUNT() as c FROM agora_audio WHERE blob5 = 'ratelimit' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY reason ORDER BY c DESC", dataset: 'agora_audio' },
+  ];
+
+  var r = await batch(queries);
+  S.lastAnalytics = Date.now();
+
+  var tts = val(r[0]), ttsPrev = val(r[1]);
+  var stt = val(r[2]), sttPrev = val(r[3]);
+  var sparkTts = rows(r[4]).map(function(x) { return x.c; });
+  var sparkTtsRows = rows(r[4]);
+  var avgLatency = r[5] && r[5].data && r[5].data[0] ? Number(r[5].data[0].avg_ms) : 0;
+  var audioErrors = val(r[6]);
+  var ttsModels = rows(r[7]);
+  var serverDist = rows(r[8]);
+  var audioLangs = rows(r[9]);
+  var rlAudio = rows(r[10]);
+  var totalRlAudio = rlAudio.reduce(function(s, x) { return s + x.c; }, 0);
+
+  var html = '';
+
+  // === ACTIVITY ===
+  html += '<div class="section-divider">Audio Activity</div>';
   html += '<div class="grid">';
   html += kpi('TTS Requests', tts, { hero: true, spark: sparkTts, sparkColor: '#68C397', delta: ttsPrev });
   html += kpi('STT Requests', stt, { delta: sttPrev });
   html += kpi('Avg TTS Latency', fmtMs(avgLatency), {});
   html += kpi('Audio Errors', audioErrors, { sub: audioErrors > 0 ? 'non-200 responses' : 'all clear', valColor: audioErrors > 0 ? '#E97451' : '#68C397' });
 
-  // TTS models table
-  if (ttsModels.length > 0) {
-    var mRows = ttsModels.map(function(r) {
-      var mc = COLORS.models[r.model] || 'var(--dim)';
-      return ['<span style="color:' + mc + '">' + r.model + '</span>', fmt(r.c), fmtMs(r.avg_ms)];
-    });
-    html += chartCard('TTS Models', tableHtml(['Model', 'Requests', 'Avg Latency'], mRows), 'card-wide');
-  }
-
-  // TTS latency area graph
-  if (sparkTts.length > 1) {
-    var ttsGraphItems = rows(r[19]).map(function(row) {
+  // TTS volume over time
+  if (sparkTtsRows.length > 1) {
+    var ttsGraphItems = sparkTtsRows.map(function(row) {
       var d = new Date(row.t);
       var label = S.range <= 1
         ? d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
@@ -1654,52 +1773,51 @@ async function loadProduct() {
     });
     html += chartCard('TTS Volume Over Time', svgAreaGraph(ttsGraphItems, { color: '#68C397', height: 130, ariaLabel: 'TTS requests over time' }), 'card-full');
   }
+  html += '</div>';
 
-  // Server distribution + audio language donuts
+  // === BACKEND ===
+  html += '<div class="section-divider">Backend Distribution</div>';
+  html += '<div class="grid">';
+
+  if (ttsModels.length > 0) {
+    var mRows = ttsModels.map(function(r) {
+      var mc = COLORS.models[r.model] || 'var(--dim)';
+      return ['<span style="color:' + mc + '">' + r.model + '</span>', fmt(r.c), fmtMs(r.avg_ms)];
+    });
+    html += chartCard('TTS Models', tableHtml(['Model', 'Requests', 'Avg Latency'], mRows), 'card-wide');
+  }
+
   if (serverDist.length > 0) {
     html += chartCard('Server Distribution', donutSvg(serverDist.map(function(r) { return { key: r.server, c: r.c }; }), COLORS.servers, function(s) { return s.toUpperCase(); }), '');
   }
   if (audioLangs.length > 0) {
     html += chartCard('Audio Language', donutSvg(audioLangs.map(function(r) { return { key: r.lang, c: r.c }; }), COLORS.lang, function(l) { return l === 'de' ? 'Deutsch' : 'English'; }), '');
   }
-  // TTS backend distribution — visual at-a-glance split of Qwen3-TTS / F5-TTS / Kokoro.
-  // Qwen vs F5 split is the load-balancing signal for DE session-sticky routing.
   if (ttsModels.length > 0) {
     var modelLabels = { 'qwen3-tts': 'Qwen3', 'qwen-tts': 'Qwen', 'kokoro': 'Kokoro', 'f5-tts': 'F5' };
     html += chartCard('TTS Backend', donutSvg(ttsModels.map(function(r) { return { key: r.model, c: r.c }; }), COLORS.models, function(m) { return modelLabels[m] || m; }), '');
   }
   html += '</div>';
 
-  // === CAPACITY SECTION ===
-  html += '<div class="section-divider">Capacity</div>';
+  // === RATE LIMITS ===
+  html += '<div class="section-divider">Audio Rate Limits</div>';
   html += '<div class="grid">';
-
-  // Rate limit KPIs with donuts
-  if (totalRlLlm > 0 || totalRlAudio > 0) {
-    var llmDonut = totalRlLlm > 0 ? donutSvg(rlLlm.map(function(r) { return { key: r.reason, c: r.c }; }), COLORS.rl, function(r) { return r === 'daily' ? 'Daily' : r === 'global' ? 'Global' : cap(r); }, 60) : '<span style="color:var(--ok);font-size:0.8125rem">None</span>';
-    html += chartCard('LLM Rate Limits (' + totalRlLlm + ')', llmDonut, '');
-
+  if (totalRlAudio > 0) {
     var audioRlLabels = { gpu_capacity_german: 'GPU RED (DE)', daily_limit: 'Daily cap', burst_limit: 'Burst' };
-    var audioDonut = totalRlAudio > 0 ? donutSvg(rlAudio.map(function(r) { return { key: r.reason, c: r.c }; }), COLORS.rl, function(r) { return audioRlLabels[r] || r; }, 60) : '<span style="color:var(--ok);font-size:0.8125rem">None</span>';
+    var audioDonut = donutSvg(rlAudio.map(function(r) { return { key: r.reason, c: r.c }; }), COLORS.rl, function(r) { return audioRlLabels[r] || r; }, 60);
     html += chartCard('Audio Rate Limits (' + totalRlAudio + ')', audioDonut, '');
   } else {
-    html += '<div class="card"><div class="kpi-label">Rate Limits</div><div style="margin-top:8px;font-size:0.8125rem;color:var(--ok)">No rate limit hits ' + RANGE_LABEL[S.range] + '</div></div>';
+    html += '<div class="card"><div class="kpi-label">Audio Rate Limits</div><div style="margin-top:8px;font-size:0.8125rem;color:var(--ok)">No rate limit hits ' + RANGE_LABEL[S.range] + '</div></div>';
   }
-
-  // Config reference (horizontal layout on desktop)
-  html += '<div class="card card-wide"><div class="kpi-label">Current Limits</div><div class="limits-grid">' +
-    '<div><span class="lim-val">30</span><span class="lim-key">Chat / day / IP</span></div>' +
-    '<div><span class="lim-val">1</span><span class="lim-key">Council / day</span></div>' +
-    '<div><span class="lim-val">2</span><span class="lim-key">Summary / day</span></div>' +
+  html += '<div class="card card-wide"><div class="kpi-label">Audio Limits</div><div class="limits-grid">' +
     '<div><span class="lim-val">500</span><span class="lim-key">Audio / day / IP</span></div>' +
     '<div><span class="lim-val">60</span><span class="lim-key">Audio burst / min</span></div>' +
-    '<div><span class="lim-val">15K</span><span class="lim-key">LLM global / day</span></div>' +
     '</div></div>';
   html += '</div>';
 
   grid.innerHTML = html;
   alertsEl.innerHTML = '';
-  document.getElementById('updated-product').textContent = 'Updated ' + now();
+  document.getElementById('updated-audio').textContent = 'Updated ' + now();
 }
 
 // --- Navigation ---
@@ -1737,9 +1855,13 @@ async function loadAdGrants() {
     // Phase 0d geographic — top countries on conversations
     { sql: "SELECT blob7 as country, COUNT() as c FROM agora_llm WHERE blob1 IN ('chat','council','summary') AND blob5 = '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY country ORDER BY c DESC LIMIT 10", dataset: 'agora_llm' },
     // Content completions by channel (real consumption attributed to marketing source)
-    { sql: "SELECT blob6 as source, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY source ORDER BY c DESC", dataset: 'agora_llm' },
+    { sql: "SELECT blob6 as source, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND (blob8 = '' OR blob8 = 'completed') AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY source ORDER BY c DESC", dataset: 'agora_llm' },
     // Content completions by type
-    { sql: "SELECT blob5 as type, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY type ORDER BY c DESC", dataset: 'agora_llm' },
+    { sql: "SELECT blob5 as type, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND (blob8 = '' OR blob8 = 'completed') AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY type ORDER BY c DESC", dataset: 'agora_llm' },
+    // Sources over time — hourly/daily channel attribution sparkline (Conversations) for the trend graph
+    { sql: "SELECT blob6 as source, toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE blob1 IN ('chat','council','summary') AND blob5 = '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY source, t ORDER BY t", dataset: 'agora_llm' },
+    // Top figures by channel — figure x source cross-tab on chat events
+    { sql: "SELECT blob2 as figure, blob6 as source, COUNT() as c FROM agora_llm WHERE blob1 = 'chat' AND blob5 = '200' AND blob2 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY figure, source ORDER BY c DESC LIMIT 30", dataset: 'agora_llm' },
   ];
 
   var r = await batch(queries);
@@ -1757,96 +1879,123 @@ async function loadAdGrants() {
   var topCountriesAdgrants = rows(r[11]);
   var playbackByChannel = rows(r[12]);
   var playbackByType = rows(r[13]);
+  var sourcesOverTime = rows(r[14]);
+  var figureByChannel = rows(r[15]);
 
   // Alerts
   var alerts = '';
-  if (profileConv === 0 && audioConv === 0) {
-    alerts += '<div class="hint-banner">No Ad Grants conversions yet ' + RANGE_LABEL[S.range] + '. This is normal before campaigns go live.</div>';
+  if (profileConv === 0 && audioConv === 0 && convoByChannel.length === 0) {
+    alerts += '<div class="hint-banner">No marketing activity yet ' + RANGE_LABEL[S.range] + '. Channel breakdowns populate as visitors arrive with utm_source tags.</div>';
   }
   alertsEl.innerHTML = alerts;
 
   var html = '';
 
-  // Hero KPIs
-  html += kpi('Profile Conversions', profileConv, {
-    hero: true, spark: sparkProfile, sparkColor: '#68C397',
-    delta: profilePrev, sub: 'from Google Ads clicks'
-  });
-  html += kpi('Audio Engagement', audioConv, {
-    hero: true, spark: sparkAudio, sparkColor: '#5B8BD4',
-    delta: audioPrev, sub: 'listened 30s+'
-  });
+  // ────────────────────────────────────────────────────────────
+  // SECTION 1 — CHANNEL ATTRIBUTION
+  // Where visits + conversations come from (Spotify / Grants / Paid / etc).
+  // ────────────────────────────────────────────────────────────
+  html += '<div class="section-divider">Channel Attribution</div>';
+  html += '<div class="grid">';
 
-  // Secondary KPIs
-  html += kpi('Conversion Rate', convRate + '%', {
-    sub: profileConv + ' conversions / ' + fmt(totalSessions) + ' sessions'
-  });
-  html += kpi('Total Ad Events', profileConv + audioConv, {
-    sub: 'profile + audio combined'
-  });
+  var convoChannelItems = aggregateByLabel(convoByChannel.map(function(r) { return { label: r.source || 'direct', c: r.c }; }));
+  html += chartCard('Conversations by Channel', barsHtml(convoChannelItems, '#E6BC5C'), 'card-half');
 
-  // Phase 1 channel attribution — Conversations by Source
-  var convoChannelItems = aggregateByLabel(convoByChannel.map(function(r) {
-    return { label: r.source || 'direct', c: r.c };
-  }));
-  html += chartCard('Conversations by Channel',
-    barsHtml(convoChannelItems, '#E6BC5C'),
-    'card-half'
-  );
+  var sessionChannelItems = aggregateByLabel(sessionsByChannel.map(function(r) { return { label: r.source || 'direct', c: r.c }; }));
+  html += chartCard('Sessions by Channel', barsHtml(sessionChannelItems, '#9D83CD'), 'card-half');
 
-  // Channel attribution — Sessions by Source
-  var sessionChannelItems = aggregateByLabel(sessionsByChannel.map(function(r) {
-    return { label: r.source || 'direct', c: r.c };
-  }));
-  html += chartCard('Sessions by Channel',
-    barsHtml(sessionChannelItems, '#9D83CD'),
-    'card-half'
-  );
+  // Sources over time — stacked-style trend per channel
+  if (sourcesOverTime.length > 1) {
+    var sourceMap = {};
+    var allBuckets = new Set();
+    sourcesOverTime.forEach(function(row) {
+      var src = row.source || 'direct';
+      if (!sourceMap[src]) sourceMap[src] = {};
+      sourceMap[src][row.t] = (sourceMap[src][row.t] || 0) + row.c;
+      allBuckets.add(row.t);
+    });
+    var bucketArr = Array.from(allBuckets).sort();
+    var sourceColors = { spotify: '#1DB954', grants: '#4285F4', paid: '#E97451', organic: '#9D83CD', direct: '#E6BC5C', unknown: '#8A8A8A' };
+    var maxBucket = 1;
+    bucketArr.forEach(function(t) {
+      var stack = 0;
+      Object.keys(sourceMap).forEach(function(src) { stack += sourceMap[src][t] || 0; });
+      if (stack > maxBucket) maxBucket = stack;
+    });
+    var sotHtml = '<div style="display:flex;align-items:flex-end;gap:4px;height:120px;padding:8px 0">';
+    bucketArr.slice(-24).forEach(function(t) {
+      var d = new Date(t);
+      var label = S.range <= 1 ? d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+      sotHtml += '<div style="flex:1;display:flex;flex-direction:column-reverse;justify-content:flex-start;gap:1px;min-width:0" title="' + label + '">';
+      Object.keys(sourceMap).forEach(function(src) {
+        var v = sourceMap[src][t] || 0;
+        if (v === 0) return;
+        var h = Math.round((v / maxBucket) * 100);
+        sotHtml += '<div style="background:' + (sourceColors[src] || '#8A8A8A') + ';height:' + h + '%;min-height:1px"></div>';
+      });
+      sotHtml += '</div>';
+    });
+    sotHtml += '</div>';
+    sotHtml += '<div style="display:flex;flex-wrap:wrap;gap:12px;font-size:0.75rem;margin-top:6px;color:var(--dim)">';
+    Object.keys(sourceMap).forEach(function(src) {
+      sotHtml += '<span><span style="display:inline-block;width:10px;height:10px;background:' + (sourceColors[src] || '#8A8A8A') + ';border-radius:2px;margin-right:4px;vertical-align:middle"></span>' + src + '</span>';
+    });
+    sotHtml += '</div>';
+    html += chartCard('Sources Over Time', sotHtml, 'card-full');
+  }
+  html += '</div>';
 
-  // Phase 0d — Top countries
-  var countryItemsAdgrants = aggregateByLabel(topCountriesAdgrants.map(function(r) {
-    return { label: r.country || 'Unknown', c: r.c };
-  }));
-  html += chartCard('Top Countries (Conversations)',
-    barsHtml(countryItemsAdgrants, '#5B8BD4'),
-    'card-half'
-  );
+  // ────────────────────────────────────────────────────────────
+  // SECTION 2 — GEOGRAPHIC REACH
+  // Where conversations physically come from (CF edge country code).
+  // ────────────────────────────────────────────────────────────
+  html += '<div class="section-divider">Geographic Reach</div>';
+  html += '<div class="grid">';
+  var countryItemsAdgrants = aggregateByLabel(topCountriesAdgrants.map(function(r) { return { label: r.country || 'Unknown', c: r.c }; }));
+  html += chartCard('Top Countries', barsHtml(countryItemsAdgrants, '#5B8BD4'), 'card-wide');
+  html += '</div>';
 
-  // Content Completions by Type (real consumption — story/teaching/prism/council)
-  var playbackTypeItems = aggregateByLabel(playbackByType.map(function(r) {
-    return { label: r.type || 'unknown', c: r.c };
-  }));
-  html += chartCard('Content Completions by Type',
-    barsHtml(playbackTypeItems, '#68C397'),
-    'card-half'
-  );
+  // ────────────────────────────────────────────────────────────
+  // SECTION 3 — CONTENT REACH BY CHANNEL
+  // Which content types each channel actually drives users to finish.
+  // ────────────────────────────────────────────────────────────
+  html += '<div class="section-divider">Content Reach by Channel</div>';
+  html += '<div class="grid">';
 
-  // Content Completions by Channel
-  var playbackChannelItems = aggregateByLabel(playbackByChannel.map(function(r) {
-    return { label: r.source || 'direct', c: r.c };
-  }));
-  html += chartCard('Content Completions by Channel',
-    barsHtml(playbackChannelItems, '#E6BC5C'),
-    'card-half'
-  );
+  var playbackTypeItems = aggregateByLabel(playbackByType.map(function(r) { return { label: r.type || 'unknown', c: r.c }; }));
+  html += chartCard('Content Completions by Type', barsHtml(playbackTypeItems, '#68C397'), 'card-half');
 
-  // Conversions by figure
+  var playbackChannelItems = aggregateByLabel(playbackByChannel.map(function(r) { return { label: r.source || 'direct', c: r.c }; }));
+  html += chartCard('Content Completions by Channel', barsHtml(playbackChannelItems, '#E6BC5C'), 'card-half');
+
+  // Top Figures by Channel — figure × source cross-tab table
+  if (figureByChannel.length > 0) {
+    var fbcRows = figureByChannel.slice(0, 15).map(function(r) {
+      return ['<span>' + cap(r.figure) + '</span>', '<span>' + (r.source || 'direct') + '</span>', r.c];
+    });
+    html += chartCard('Top Figures by Channel', tableHtml(['Figure', 'Channel', 'Chats'], fbcRows), 'card-wide');
+  }
+  html += '</div>';
+
+  // ────────────────────────────────────────────────────────────
+  // SECTION 4 — GOOGLE ADS CONVERSIONS
+  // Existing gclid path: profile_created + audio_played_30s events.
+  // ────────────────────────────────────────────────────────────
+  html += '<div class="section-divider">Google Ads Conversions</div>';
+  html += '<div class="grid">';
+
+  html += kpi('Profile Conversions', profileConv, { hero: true, spark: sparkProfile, sparkColor: '#68C397', delta: profilePrev, sub: 'from Google Ads clicks' });
+  html += kpi('Audio Engagement', audioConv, { hero: true, spark: sparkAudio, sparkColor: '#5B8BD4', delta: audioPrev, sub: 'listened 30s+' });
+  html += kpi('Conversion Rate', convRate + '%', { sub: profileConv + ' conversions / ' + fmt(totalSessions) + ' sessions' });
+  html += kpi('Total Ad Events', profileConv + audioConv, { sub: 'profile + audio combined' });
+
   if (profileByFigure.length > 0) {
-    html += chartCard('Top Converting Figures',
-      barsHtml(profileByFigure.map(function(r) { return { label: cap(r.figure), c: r.c }; }), '#68C397'),
-      'card-wide'
-    );
+    html += chartCard('Top Converting Figures', barsHtml(profileByFigure.map(function(r) { return { label: cap(r.figure), c: r.c }; }), '#68C397'), 'card-wide');
   }
-
-  // Audio engagement by figure
   if (audioByFigure.length > 0) {
-    html += chartCard('Audio Engagement by Figure',
-      barsHtml(audioByFigure.map(function(r) { return { label: cap(r.figure), c: r.c }; }), '#5B8BD4'),
-      'card-wide'
-    );
+    html += chartCard('Audio Engagement by Figure', barsHtml(audioByFigure.map(function(r) { return { label: cap(r.figure), c: r.c }; }), '#5B8BD4'), 'card-wide');
   }
 
-  // Pipeline status
   html += chartCard('Conversion Pipeline',
     '<div style="display:flex;flex-direction:column;gap:8px;font-size:0.875rem">' +
     '<div style="display:flex;justify-content:space-between"><span style="color:var(--dim)">gclid Capture</span><span style="color:var(--ok)">Active</span></div>' +
@@ -1857,6 +2006,7 @@ async function loadAdGrants() {
     '</div>',
     ''
   );
+  html += '</div>';
 
   grid.innerHTML = html;
 }
@@ -1891,6 +2041,7 @@ function loadTab(tab) {
   if (tab === 'overview') loadOverview();
   else if (tab === 'servers') renderServers();
   else if (tab === 'product') loadProduct();
+  else if (tab === 'audio') loadAudio();
   else if (tab === 'adgrants') loadAdGrants();
 }
 
@@ -1938,7 +2089,7 @@ function init() {
 
   // Read hash
   var hash = location.hash.replace('#', '');
-  if (['overview', 'servers', 'product', 'adgrants'].indexOf(hash) >= 0) {
+  if (['overview', 'servers', 'product', 'audio', 'adgrants'].indexOf(hash) >= 0) {
     S.tab = hash;
   }
 
@@ -1964,7 +2115,7 @@ function init() {
   // Hash change
   window.addEventListener('hashchange', function() {
     var h = location.hash.replace('#', '');
-    if (h && h !== S.tab && ['overview', 'servers', 'product', 'adgrants'].indexOf(h) >= 0) {
+    if (h && h !== S.tab && ['overview', 'servers', 'product', 'audio', 'adgrants'].indexOf(h) >= 0) {
       switchTab(h);
     }
   });
