@@ -110,8 +110,8 @@ async function handleBatchQuery(request: Request, env: Env): Promise<Response> {
     const body = (await request.json()) as BatchQueryRequest;
     const queries = body?.queries;
 
-    if (!Array.isArray(queries) || queries.length === 0 || queries.length > 30) {
-      return Response.json({ error: 'queries must be an array (1-30)' }, { status: 400 });
+    if (!Array.isArray(queries) || queries.length === 0 || queries.length > 64) {
+      return Response.json({ error: 'queries must be an array (1-64)' }, { status: 400 });
     }
 
     for (const q of queries) {
