@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState, FC } from 'react';
 import OptimizedImage from './OptimizedImage';
 import OptimizedFigureImage from './OptimizedFigureImage';
 import { sanitizeContent } from '../utils/sanitizeContent';
+import { getDisplayShortName } from '../utils/figureDisplayName';
 import { useTranslation } from '../hooks/useTranslation';
 import { getSpeakerId } from '../services/council/speakerRegistry';
 import VoiceInteractionHelper from './VoiceInteractionHelper';
@@ -265,8 +266,8 @@ const ChatBox: FC<ChatBoxProps> = ({
                 <div className="message-header">
                   {(() => {
                     const headerText = message.role === 'user' ? (userProfile?.name || tString('chat.seeker', 'Seeker')) :
-                                     message.role === 'council' ? message.speakerName :
-                                     selectedFigureName; // Display full name with Echo prefix
+                                     message.role === 'council' ? getDisplayShortName(message.speakerName) :
+                                     getDisplayShortName(selectedFigureName);
 
                     return headerText;
                   })()}

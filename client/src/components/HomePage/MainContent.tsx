@@ -14,6 +14,7 @@ import ErrorBoundary from '../ErrorBoundary';
 import { BookmarkQuickLinks } from '../Navigation';
 import styles from './MainContent.module.css';
 import { Figure, Seed, ConversationMode } from '../../types/global';
+import { getDisplayShortName } from '../../utils/figureDisplayName';
 
 // Type definitions
 interface ServiceConfig {
@@ -200,7 +201,7 @@ const MainContent: FC<MainContentProps> = ({
               />
             ) : (
               <div className="chat-header" key={`header-${selectedFigure?.id || 'none'}-${selectedSeed?.id || 'none'}-${selectedMode || 'none'}`}>
-                <h1 className="figure-name">{getTranslatedFigureName()}</h1>
+                <h1 className="figure-name">{getDisplayShortName(getTranslatedFigureName())}</h1>
                 {selectedSeed && selectedMode !== 'free_conversation' && (
                   <div className="seed-name" key={`seed-${selectedMode || 'default'}-${selectedSeed.id}`}>
                     <span className="seed-name-text">{getCurrentSeedName()}</span>
