@@ -1,13 +1,43 @@
 // Anonymous usage analytics via Cloudflare Analytics Engine
 // Zero PII: no IP, no user ID, no message content. Only structural labels.
-// "Ohne Tracking" compliant — aggregate event counters only.
+// "No User Tracking" compliant — aggregate event counters only, no per-user
+// dimension. See README "What we measure (and why)" for the full list.
 
 import type { Env } from './types';
+
+// Closed allowlist for marketing source labels. Validated server-side to
+// guarantee the dashboard never sees free-text values, even if the client
+// header is malformed or hostile.
+const ALLOWED_MARKETING_SOURCES = new Set([
+  'spotify', 'grants', 'paid', 'organic', 'direct', 'unknown',
+]);
+
+/**
+ * Read X-Marketing-Source header from a request and validate against the closed
+ * allowlist. Returns 'direct' on missing, 'unknown' on invalid.
+ * Brand-line guarantee: never combine with any per-user dimension.
+ */
+export function readMarketingSource(request: Request): string {
+  const raw = request.headers.get('X-Marketing-Source');
+  if (!raw) return 'direct';
+  const lower = raw.toLowerCase();
+  return ALLOWED_MARKETING_SOURCES.has(lower) ? lower : 'unknown';
+}
+
+/**
+ * Read the country code from request.cf (Cloudflare-derived, coarser than IP).
+ * Returns 'XX' if unknown. Two-letter ISO 3166-1 alpha-2 code on success.
+ */
+export function readCountry(request: Request): string {
+  const country = (request as Request & { cf?: { country?: string } }).cf?.country;
+  if (typeof country === 'string' && country.length === 2) return country;
+  return 'XX';
+}
 
 /**
  * Track an LLM proxy event (chat/council/summary).
  * dataset: agora_llm
- * blobs: [endpoint, figureId, mode, language, status]
+ * blobs: [endpoint, figureId, mode, language, status, marketing_source, country]
  * doubles: [durationMs]
  * indexes: [endpoint]
  */
@@ -20,6 +50,8 @@ export function trackLlmEvent(
     language: string;
     status: number;
     durationMs: number;
+    marketingSource: string;
+    country: string;
   }
 ): void {
   try {
@@ -30,6 +62,8 @@ export function trackLlmEvent(
         data.mode,
         data.language.startsWith('de') ? 'de' : 'en',
         String(data.status),
+        data.marketingSource,
+        data.country,
       ],
       doubles: [data.durationMs],
       indexes: [data.endpoint],
@@ -42,13 +76,18 @@ export function trackLlmEvent(
 /**
  * Track a session creation (DAU proxy).
  * dataset: agora_llm
- * blobs: ['session', '', '', '', status]
+ * blobs: ['session', '', '', '', status, marketing_source, country]
  * indexes: ['session']
  */
-export function trackSession(env: Env, status: number): void {
+export function trackSession(
+  env: Env,
+  status: number,
+  marketingSource: string,
+  country: string,
+): void {
   try {
     env.ANALYTICS.writeDataPoint({
-      blobs: ['session', '', '', '', String(status)],
+      blobs: ['session', '', '', '', String(status), marketingSource, country],
       doubles: [0],
       indexes: ['session'],
     });
@@ -60,17 +99,19 @@ export function trackSession(env: Env, status: number): void {
 /**
  * Track a rate limit hit (429).
  * dataset: agora_llm
- * blobs: ['ratelimit', endpoint, reason, '', '429']
+ * blobs: ['ratelimit', endpoint, reason, '', '429', marketing_source, country]
  * indexes: ['ratelimit']
  */
 export function trackRateLimit(
   env: Env,
   endpoint: string,
-  reason: 'daily' | 'global' | 'council' | 'summary'
+  reason: 'daily' | 'global' | 'council' | 'summary',
+  marketingSource: string,
+  country: string,
 ): void {
   try {
     env.ANALYTICS.writeDataPoint({
-      blobs: ['ratelimit', endpoint, reason, '', '429'],
+      blobs: ['ratelimit', endpoint, reason, '', '429', marketingSource, country],
       doubles: [0],
       indexes: ['ratelimit'],
     });

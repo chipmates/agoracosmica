@@ -8,7 +8,7 @@ import { proxyToNebius } from '../services/nebius';
 import { screenCouncilContent } from '../utils/contentScreen';
 import { createSafetyFilteredStream } from '../services/streamFilter';
 import { logComplianceEvent, getSeverity } from '../utils/complianceLog';
-import { trackLlmEvent, trackRateLimit } from '../utils/analytics';
+import { trackLlmEvent, trackRateLimit, readMarketingSource, readCountry } from '../utils/analytics';
 import { LLM_CONFIG } from '../config';
 import type { Env } from '../utils/types';
 
@@ -67,7 +67,7 @@ export async function handleChat(request: Request, env: Env, ctx: ExecutionConte
   // 3. Check rate limits (increments counter; see rateLimit.ts for race caveats)
   const rateLimit = await checkAndIncrementRateLimit(request, env, authResult.payload);
   if (!rateLimit.allowed) {
-    trackRateLimit(env, 'chat', rateLimit.reason === 'global' ? 'global' : 'daily');
+    trackRateLimit(env, 'chat', rateLimit.reason === 'global' ? 'global' : 'daily', readMarketingSource(request), readCountry(request));
     const errorMsg = rateLimit.reason === 'global'
       ? 'Free tier is temporarily at capacity. Set up your own API key for unlimited access.'
       : 'Daily message limit reached. Your conversations will resume tomorrow.';
@@ -133,6 +133,8 @@ export async function handleChat(request: Request, env: Env, ctx: ExecutionConte
       language,
       status: nebiusResponse.status,
       durationMs: Date.now() - startMs,
+      marketingSource: readMarketingSource(request),
+      country: readCountry(request),
     });
   }));
 

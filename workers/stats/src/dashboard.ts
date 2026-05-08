@@ -1167,6 +1167,10 @@ async function loadOverview() {
     { sql: "SELECT blob2 as figure, COUNT() as c FROM agora_llm WHERE blob1 = 'chat' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY figure ORDER BY c DESC LIMIT 1", dataset: 'agora_llm' },
     // Language split (for insight)
     { sql: "SELECT blob4 as lang, COUNT() as c FROM agora_llm WHERE blob1 = 'chat' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY lang ORDER BY c DESC", dataset: 'agora_llm' },
+    // Channel sources — Phase 1 marketing attribution (blob6 = marketing_source)
+    { sql: "SELECT blob6 as source, COUNT() as c FROM agora_llm WHERE blob1 IN ('chat','council','summary') AND blob5 = '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY source ORDER BY c DESC", dataset: 'agora_llm' },
+    // Top countries — Phase 0d geographic breakdown (blob7 = country)
+    { sql: "SELECT blob7 as country, COUNT() as c FROM agora_llm WHERE blob1 IN ('chat','council','summary') AND blob5 = '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY country ORDER BY c DESC LIMIT 8", dataset: 'agora_llm' },
   ];
 
   var r = await batch(queries);
@@ -1191,6 +1195,8 @@ async function loadOverview() {
   var dailyTrend = S.range > 1 ? rows(r[17]) : [];
   var topFigure = rows(r[18]);
   var langSplit = rows(r[19]);
+  var channelSources = rows(r[20]);
+  var topCountries = rows(r[21]);
 
   // Alerts
   var alerts = '';
@@ -1212,8 +1218,10 @@ async function loadOverview() {
   var html = '';
 
   // Hero KPIs
-  html += kpi('Sessions', sessions, { hero: true, spark: sparkSessions, delta: sessionsPrev, sub: S.range === 1 ? 'users today' : 'unique sessions' });
-  html += kpi('LLM Requests', totalLlm, { hero: true, spark: sparkChats, sparkColor: '#5B8BD4', delta: chatsPrev, sub: sessions > 0 ? (chats / sessions).toFixed(1) + ' chats/session' : '' });
+  // "Sessions" counts JWT issuance events (free-tier path only, post-lazy-refresh = roughly per real engagement window).
+  // Phase 0a (SESSION_LAST_SEEN KV gating, deferred) will tighten this to "fresh devices".
+  html += kpi('Sessions', sessions, { hero: true, spark: sparkSessions, delta: sessionsPrev, sub: 'engagement windows' });
+  html += kpi('Conversations', totalLlm, { hero: true, spark: sparkChats, sparkColor: '#5B8BD4', delta: chatsPrev, sub: chats + ' chat · ' + councils + ' council · ' + summaries + ' summary' });
 
   // Secondary KPIs
   html += kpi('Chat Messages', chats, { spark: sparkChats, delta: chatsPrev });
@@ -1235,6 +1243,18 @@ async function loadOverview() {
   } else {
     html += chartCard('Chat Activity', '<div class="empty-state" style="padding:40px 0">No chat data yet ' + RANGE_LABEL[S.range] + '</div>', 'card-wide');
   }
+
+  // Channel Sources panel (Phase 1 — marketing attribution)
+  var channelItems = channelSources.map(function(r) {
+    return { label: r.source || 'direct', c: r.c };
+  }).filter(function(r) { return r.label && r.c > 0; });
+  html += chartCard('Channel Sources', barsHtml(channelItems, '#E6BC5C'), 'card-half');
+
+  // Geographic Breakdown panel (Phase 0d — country dimension)
+  var countryItems = topCountries.map(function(r) {
+    return { label: r.country || 'XX', c: r.c };
+  }).filter(function(r) { return r.label && r.c > 0; });
+  html += chartCard('Top Countries', barsHtml(countryItems, '#9D83CD'), 'card-half');
 
   // Computed insight
   var insights = [];
@@ -1629,6 +1649,12 @@ async function loadAdGrants() {
     { sql: "SELECT blob2 as figure, COUNT() as c FROM agora_llm WHERE index1 = 'audio_played_30s' AND blob2 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY figure ORDER BY c DESC LIMIT 10", dataset: 'agora_llm' },
     // Total sessions for conversion rate calculation
     { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'session' AND blob5 = '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    // Phase 1 channel attribution — conversations by marketing_source (blob6)
+    { sql: "SELECT blob6 as source, COUNT() as c FROM agora_llm WHERE blob1 IN ('chat','council','summary') AND blob5 = '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY source ORDER BY c DESC", dataset: 'agora_llm' },
+    // Channel attribution — sessions by marketing_source
+    { sql: "SELECT blob6 as source, COUNT() as c FROM agora_llm WHERE blob1 = 'session' AND blob5 = '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY source ORDER BY c DESC", dataset: 'agora_llm' },
+    // Phase 0d geographic — top countries on conversations
+    { sql: "SELECT blob7 as country, COUNT() as c FROM agora_llm WHERE blob1 IN ('chat','council','summary') AND blob5 = '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY country ORDER BY c DESC LIMIT 10", dataset: 'agora_llm' },
   ];
 
   var r = await batch(queries);
@@ -1641,6 +1667,9 @@ async function loadAdGrants() {
   var audioByFigure = rows(r[7]);
   var totalSessions = val(r[8]);
   var convRate = totalSessions > 0 ? ((profileConv / totalSessions) * 100).toFixed(1) : '--';
+  var convoByChannel = rows(r[9]);
+  var sessionsByChannel = rows(r[10]);
+  var topCountriesAdgrants = rows(r[11]);
 
   // Alerts
   var alerts = '';
@@ -1668,6 +1697,33 @@ async function loadAdGrants() {
   html += kpi('Total Ad Events', profileConv + audioConv, {
     sub: 'profile + audio combined'
   });
+
+  // Phase 1 channel attribution — Conversations by Source
+  var convoChannelItems = convoByChannel.map(function(r) {
+    return { label: r.source || 'direct', c: r.c };
+  }).filter(function(r) { return r.label && r.c > 0; });
+  html += chartCard('Conversations by Channel',
+    barsHtml(convoChannelItems, '#E6BC5C'),
+    'card-half'
+  );
+
+  // Channel attribution — Sessions by Source
+  var sessionChannelItems = sessionsByChannel.map(function(r) {
+    return { label: r.source || 'direct', c: r.c };
+  }).filter(function(r) { return r.label && r.c > 0; });
+  html += chartCard('Sessions by Channel',
+    barsHtml(sessionChannelItems, '#9D83CD'),
+    'card-half'
+  );
+
+  // Phase 0d — Top countries
+  var countryItemsAdgrants = topCountriesAdgrants.map(function(r) {
+    return { label: r.country || 'XX', c: r.c };
+  }).filter(function(r) { return r.label && r.c > 0; });
+  html += chartCard('Top Countries (Conversations)',
+    barsHtml(countryItemsAdgrants, '#5B8BD4'),
+    'card-half'
+  );
 
   // Conversions by figure
   if (profileByFigure.length > 0) {

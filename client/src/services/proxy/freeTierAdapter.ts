@@ -10,8 +10,19 @@ import {
 } from '../audio/llm/llmUtils';
 import type { Message, LLMResponse } from '../audio/llm/index';
 import { useDomainStore } from '../../stores/domainStore';
+import { getMarketingSource } from '../../utils/public/gclidCapture';
 
 const FREE_TIER_API_URL = import.meta.env.VITE_FREE_TIER_API_URL || '';
+
+/** Build request headers including JSON content-type, bearer auth, and marketing source label. */
+function buildAuthHeaders(token: string, includeContentType = true): Record<string, string> {
+  const headers: Record<string, string> = {
+    'Authorization': `Bearer ${token}`,
+    'X-Marketing-Source': getMarketingSource(),
+  };
+  if (includeContentType) headers['Content-Type'] = 'application/json';
+  return headers;
+}
 
 /**
  * Structured error from the free-tier worker. Preserves HTTP status, the
@@ -85,7 +96,7 @@ function updateSummaryQuotaFromHeaders(response: Response): void {
 export async function fetchQuota(): Promise<void> {
   const doFetch = async (token: string) => fetchWithTimeout(`${FREE_TIER_API_URL}/v1/quota`, {
     method: 'GET',
-    headers: { 'Authorization': `Bearer ${token}` },
+    headers: buildAuthHeaders(token, false),
     timeoutMs: 10_000,
   });
 
@@ -155,10 +166,7 @@ async function fetchWithSessionRetry(
 
   const response = await fetchWithTimeout(url, {
     method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
+    headers: buildAuthHeaders(token),
     body: JSON.stringify(body),
     signal,
     timeoutMs: 30_000,
@@ -171,10 +179,7 @@ async function fetchWithSessionRetry(
 
     const retryResponse = await fetchWithTimeout(url, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${freshToken}`,
-        'Content-Type': 'application/json',
-      },
+      headers: buildAuthHeaders(freshToken),
       body: JSON.stringify(body),
       signal,
       timeoutMs: 30_000,

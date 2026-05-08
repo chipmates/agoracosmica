@@ -4,6 +4,7 @@
 
 import { getVoiceForNormalMode } from '../voices/voiceResolver';
 import { fetchWithTimeout } from '../../../utils/fetchWithTimeout';
+import { getMarketingSource } from '../../../utils/public/gclidCapture';
 import type { AudioFile } from './index';
 import type { VoiceMapping } from '../voices/voiceResolver';
 
@@ -71,7 +72,8 @@ export async function selfHostedTTS(
     };
 
     const headers: Record<string, string> = {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'X-Marketing-Source': getMarketingSource(),
     };
     if (sessionId) {
       // Gateway uses this for session-sticky Qwen3-TTS / F5-TTS routing (DE).

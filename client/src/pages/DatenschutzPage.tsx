@@ -350,6 +350,19 @@ const DatenschutzPage: FC = () => {
         </section>
 
         <section className="legal-section">
+          <h2>Reichweitenmessung (Kanal-Attribution)</h2>
+          <p>
+            Wir messen aggregiert, über welchen Kanal (z. B. eine Suchmaschine, eine Werbeanzeige, ein Direktzugriff) Besuche unsere Website erreichen. Dazu werten wir, sofern vorhanden, die UTM-Parameter (utm_source, utm_medium) der aufgerufenen URL aus. Die Werte werden ausschließlich im Arbeitsspeicher Ihres Browsers gehalten (kein Cookie, kein localStorage) und beim Schließen des Browser-Tabs gelöscht.
+          </p>
+          <p>
+            Pro serverseitig gezählter Aktivität wird ein Kanal-Etikett aus einer geschlossenen Liste von sechs Werten (spotify, grants, paid, organic, direct, unknown) als anonymer Zähler erfasst. Es werden keine IP-Adressen in Analyse-Datensätzen gespeichert, keine Nutzer-Profile gebildet, keine Cookies gesetzt. Es findet keine Wiedererkennung über Sitzungen hinweg statt.
+          </p>
+          <p>
+            <strong>Rechtsgrundlage:</strong> Berechtigtes Interesse (Art. 6 Abs. 1 lit. f DSGVO) an der Messung der Wirksamkeit unserer gemeinnützigen Öffentlichkeitsarbeit. Die rein aggregierte, anonyme Messung liegt unterhalb der Schwelle personenbezogener Daten gemäß Erwägungsgrund 26 DSGVO. § 25 TDDDG ist auf diese Messung nicht einschlägig, da im Rahmen der Zählung keine Speicherung oder Auslesung von Informationen auf Ihrem Endgerät stattfindet. Die für den Betrieb der App technisch notwendige lokale Speicherung (z. B. Spracheinstellung, Sitzungs-UUID für Ratelimiting) ist gemäß § 25 Abs. 2 TDDDG ausgenommen.
+          </p>
+        </section>
+
+        <section className="legal-section">
           <h2>Hinweis zu verwendeter Musik</h2>
           <p>
             Einige der auf dieser Webseite verwendeten Musikstücke wurden mit der KI-basierten Musikgenerationsplattform Udio erstellt. Die Musikdateien werden als statische Dateien von unseren Servern ausgeliefert. Es findet keine Datenübermittlung an Udio oder andere Dritte beim Abspielen statt. Weitere Musikstücke sind ordnungsgemäß lizenziert (siehe <a href="/impressum">Impressum</a> für Musik-Credits).

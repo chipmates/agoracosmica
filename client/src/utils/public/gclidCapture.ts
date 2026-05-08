@@ -1,11 +1,42 @@
-// gclid capture for Google Ads conversion tracking
-// Captures gclid from URL params, stores in memory only (no cookies, no localStorage)
+// Marketing tracking: gclid (Google Ads conversion) + utm_source (channel attribution)
+// Captures from URL params, stores in memory only (no cookies, no localStorage)
 // Remove this file when stripping marketing pages from a fork
 
 // Same pattern as freeTierAdapter: empty in dev (Vite proxy), full URL in prod
 const API_BASE = import.meta.env.VITE_FREE_TIER_API_URL || '';
 
 let capturedGclid: string | null = null;
+let capturedMarketingSource: MarketingSource = 'direct';
+
+// Closed allowlist for marketing source labels written to analytics blobs.
+// Server side validates against the same allowlist; unknown values become 'unknown'.
+export type MarketingSource = 'spotify' | 'grants' | 'paid' | 'organic' | 'direct' | 'unknown';
+
+const ALLOWED_SOURCES: ReadonlySet<MarketingSource> = new Set([
+  'spotify', 'grants', 'paid', 'organic', 'direct', 'unknown',
+]);
+
+/**
+ * Normalize raw utm_source + utm_medium into the closed allowlist bucket.
+ * Distinguishes Grants from Paid Google by utm_medium.
+ */
+function normalizeMarketingSource(utmSource: string | null, utmMedium: string | null): MarketingSource {
+  if (!utmSource) return 'direct';
+  const source = utmSource.toLowerCase();
+  const medium = (utmMedium || '').toLowerCase();
+
+  if (source === 'spotify') return 'spotify';
+
+  if (source === 'google' || source === 'googleads') {
+    if (medium === 'grants' || medium === 'adgrants') return 'grants';
+    if (medium === 'cpc' || medium === 'ppc' || medium === 'paid') return 'paid';
+    return 'paid';
+  }
+
+  if (['organic', 'referral', 'email', 'social'].includes(source)) return 'organic';
+
+  return 'unknown';
+}
 
 /**
  * Capture gclid from URL on page load.
@@ -18,8 +49,31 @@ export function captureGclid(): void {
     if (gclid && gclid.length > 10 && gclid.length < 200) {
       capturedGclid = gclid;
     }
+    // Capture utm alongside gclid in the same call site (PublicLayout useEffect).
+    captureMarketingSource(params);
   } catch {
     // Silently fail in SSR or restricted environments
+  }
+}
+
+/**
+ * Capture utm_source/utm_medium from URL params and normalize to closed allowlist.
+ * If no utm_source present, leaves the default 'direct'. If gclid present without utm,
+ * defaults to 'paid' (gclid implies a Google Ads click).
+ */
+function captureMarketingSource(params: URLSearchParams): void {
+  const utmSource = params.get('utm_source');
+  const utmMedium = params.get('utm_medium');
+
+  // Hard length cap to prevent header injection if a malicious URL is ever crafted.
+  const safeSource = utmSource && utmSource.length <= 50 ? utmSource : null;
+  const safeMedium = utmMedium && utmMedium.length <= 50 ? utmMedium : null;
+
+  if (safeSource) {
+    capturedMarketingSource = normalizeMarketingSource(safeSource, safeMedium);
+  } else if (capturedGclid) {
+    // gclid present without utm_source — Google Ads click without UTM tag
+    capturedMarketingSource = 'paid';
   }
 }
 
@@ -28,6 +82,15 @@ export function captureGclid(): void {
  */
 export function getGclid(): string | null {
   return capturedGclid;
+}
+
+/**
+ * Get the captured marketing source bucket.
+ * Defaults to 'direct' if no utm_source or gclid was captured.
+ * Always returns one of the closed allowlist values, safe for header forwarding.
+ */
+export function getMarketingSource(): MarketingSource {
+  return ALLOWED_SOURCES.has(capturedMarketingSource) ? capturedMarketingSource : 'unknown';
 }
 
 /**
