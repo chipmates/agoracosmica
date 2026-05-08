@@ -101,6 +101,9 @@ export function PrismPlayer({ figure, seed, councilId, councilLevel = 1, languag
   } = useAudio(prismData?.audioUrl ?? null, {
     onPlaybackComplete: handlePlaybackComplete,
     initialPlaybackRate: loadServiceConfig().ttsSettings.speed,
+    playbackBeacon: isCouncilMode
+      ? { type: 'council', mode: 'council' }
+      : { type: 'prism', figureId: figure, mode: 'prism' },
   });
 
   // --- Recompute segment offsets accounting for inter-segment gaps in combined MP3 ---

@@ -678,6 +678,7 @@ const StoryPlayer: FC<StoryPlayerProps> = ({
               onPlayStateChange={handlePlayStateChange}
               seekToTime={seekTarget}
               togglePlayRequest={togglePlayRequest}
+              playbackBeacon={{ type: 'story', figureId: figure, mode: 'story' }}
             />
 
             {/* Paragraph progress indicator */}

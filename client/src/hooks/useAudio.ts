@@ -1,8 +1,16 @@
 import { useState, useEffect, useRef } from 'react';
+import { sendPlaybackBeacon, detectCurrentLanguage } from '../utils/playbackBeacon';
+import type { PlaybackContentType } from '../utils/playbackBeacon';
 
 // ============================================
 // Type Definitions
 // ============================================
+
+interface PlaybackBeaconContext {
+  type: PlaybackContentType;
+  figureId?: string;
+  mode?: string;
+}
 
 interface UseAudioOptions {
   autoplay?: boolean;
@@ -10,6 +18,14 @@ interface UseAudioOptions {
   initialPlaybackRate?: number;
   onPlaybackComplete?: () => void;
   onError?: (error: Event) => void;
+  /**
+   * Optional content-playback beacon context. When provided, a fire-and-forget
+   * 'started' beacon is sent on the first `play` event after each URL change,
+   * for engagement-funnel analytics. Idempotent per URL — pause/resume does
+   * not refire. The 'completed' beacon is sent separately by the mark*Completed
+   * helpers in storageKeysV2.ts (same trigger as the gamification star award).
+   */
+  playbackBeacon?: PlaybackBeaconContext;
 }
 
 interface UseAudioResult {
@@ -39,7 +55,8 @@ const useAudio = (audioUrl: string | null | undefined, options: UseAudioOptions 
     initialVolume = 1.0,
     initialPlaybackRate = 1.0,
     onPlaybackComplete,
-    onError
+    onError,
+    playbackBeacon
   } = options;
 
   // State
@@ -55,12 +72,17 @@ const useAudio = (audioUrl: string | null | undefined, options: UseAudioOptions 
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const loadedUrlRef = useRef<string>(''); // Track already loaded URLs
   const listenerAbortRef = useRef<AbortController | null>(null); // Cleanup signal for event listeners
+  // Tracks whether the 'started' beacon has fired for the current URL — reset
+  // each time a new URL loads so subsequent stories/prisms each get one beacon.
+  const startedBeaconSentRef = useRef<string>('');
 
   // Callback refs to avoid stale closures in event listeners
   const onPlaybackCompleteRef = useRef(onPlaybackComplete);
   const onErrorRef = useRef(onError);
+  const playbackBeaconRef = useRef(playbackBeacon);
   onPlaybackCompleteRef.current = onPlaybackComplete;
   onErrorRef.current = onError;
+  playbackBeaconRef.current = playbackBeacon;
 
   // Initialize or update audio element when URL changes
   useEffect(() => {
@@ -122,7 +144,23 @@ const useAudio = (audioUrl: string | null | undefined, options: UseAudioOptions 
       onPlaybackCompleteRef.current?.();
     }, { signal });
 
-    audioEl.addEventListener('play', () => setIsPlaying(true), { signal });
+    audioEl.addEventListener('play', () => {
+      setIsPlaying(true);
+      // Fire 'started' beacon once per URL for the engagement funnel.
+      // Idempotent: pause+resume on the same URL does not refire; URL change
+      // resets the ref so the next track gets its own beacon.
+      const ctx = playbackBeaconRef.current;
+      if (ctx && audioUrl && startedBeaconSentRef.current !== audioUrl) {
+        startedBeaconSentRef.current = audioUrl;
+        sendPlaybackBeacon({
+          type: ctx.type,
+          event: 'started',
+          figureId: ctx.figureId,
+          mode: ctx.mode,
+          language: detectCurrentLanguage(),
+        });
+      }
+    }, { signal });
     audioEl.addEventListener('pause', () => setIsPlaying(false), { signal });
 
     audioEl.addEventListener('error', (e: Event) => {

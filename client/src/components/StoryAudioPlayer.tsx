@@ -3,6 +3,7 @@ import { FC, useState, useRef, useEffect, useCallback, ChangeEvent } from 'react
 import { Play, Pause, ClockCounterClockwise, ClockClockwise } from '@phosphor-icons/react';
 import './StoryAudioPlayer.css';
 import useAudio from '../hooks/useAudio';
+import type { PlaybackContentType } from '../utils/playbackBeacon';
 import { useTranslation } from '../hooks/useTranslation';
 
 interface StoryAudioPlayerProps {
@@ -15,6 +16,10 @@ interface StoryAudioPlayerProps {
   onPlayStateChange?: (isPlaying: boolean) => void;
   seekToTime?: number | null;
   togglePlayRequest?: number;
+  /** Engagement-funnel beacon context — forwarded to useAudio for the
+   *  'started' event on first play. Caller must provide content type +
+   *  optional figureId. */
+  playbackBeacon?: { type: PlaybackContentType; figureId?: string; mode?: string };
 }
 
 const StoryAudioPlayer: FC<StoryAudioPlayerProps> = ({
@@ -26,7 +31,8 @@ const StoryAudioPlayer: FC<StoryAudioPlayerProps> = ({
   onTimeUpdate,
   onPlayStateChange,
   seekToTime,
-  togglePlayRequest
+  togglePlayRequest,
+  playbackBeacon
 }) => {
   const { tString } = useTranslation();
   const {
@@ -45,7 +51,8 @@ const StoryAudioPlayer: FC<StoryAudioPlayerProps> = ({
     autoplay: false,
     initialVolume: 1.0,
     onPlaybackComplete,
-    onError: onError ? (error) => onError(error instanceof Error ? error : new Error(String(error))) : undefined
+    onError: onError ? (error) => onError(error instanceof Error ? error : new Error(String(error))) : undefined,
+    playbackBeacon
   });
 
   // Forward time updates and play state to parent for highlighting

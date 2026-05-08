@@ -12,12 +12,14 @@ import type { Env } from '../utils/types';
 
 interface PlaybackPayload {
   type: 'story' | 'teaching' | 'prism' | 'council' | 'foreword';
+  event?: 'started' | 'completed';
   figureId?: string;
   mode?: string;
   language?: string;
 }
 
 const VALID_TYPES = new Set(['story', 'teaching', 'prism', 'council', 'foreword']);
+const VALID_EVENTS = new Set(['started', 'completed']);
 const VALID_MODES = new Set(['story', 'wisdom', 'prism', 'quest', 'freetalk', 'council', 'foreword']);
 const VALID_LANGS = new Set(['en', 'de']);
 const FIGURE_ID_RE = /^[a-z0-9-]{1,40}$/;
@@ -67,6 +69,12 @@ export async function handlePlayback(request: Request, env: Env): Promise<Respon
     ? payload.language.slice(0, 2).toLowerCase()
     : '';
 
+  // Default to 'completed' for backward compat with clients on the previous
+  // schema; new clients always send the event explicitly.
+  const event = (typeof payload.event === 'string' && VALID_EVENTS.has(payload.event))
+    ? payload.event
+    : 'completed';
+
   trackPlayback(env, {
     type: payload.type,
     figureId,
@@ -74,6 +82,7 @@ export async function handlePlayback(request: Request, env: Env): Promise<Respon
     language: lang,
     marketingSource: readMarketingSource(request),
     country: readCountry(request),
+    event,
   });
 
   return new Response(null, { status: 204 });

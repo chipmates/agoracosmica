@@ -42,6 +42,7 @@ export const ForewordModal: FC<ForewordModalProps> = ({
   } = useAudio(foreword?.audioUrl ?? null, {
     autoplay: false,
     initialVolume: 1.0,
+    playbackBeacon: { type: 'foreword', figureId, mode: 'foreword' },
   });
 
   const handleSeek = (e: ChangeEvent<HTMLInputElement>): void => {

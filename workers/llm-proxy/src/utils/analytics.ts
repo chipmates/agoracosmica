@@ -97,14 +97,19 @@ export function trackSession(
 }
 
 /**
- * Track an anonymous content-completion playback event (story / teaching /
- * prism / council / foreword). Fires from the client when a content item is
- * marked completed (same trigger as the gamification star award), so each
- * row represents a real consumption, not a click-and-bail.
+ * Track an anonymous content-playback event (story / teaching / prism /
+ * council / foreword). Fires from the client either when content STARTS
+ * (audio first-play) or when it COMPLETES (gamification star award). The
+ * event field distinguishes the two so the dashboard can compute completion
+ * rate and funnel over time.
  *
  * dataset: agora_llm
- * blobs: ['playback', figureId, mode, language, type, marketing_source, country]
+ * blobs: ['playback', figureId, mode, language, type, marketing_source, country, event]
  * indexes: ['playback']
+ *
+ * Backward compat: rows written before 2026-05-08 evening have empty blob8.
+ * Treat empty blob8 as 'completed' in queries (the only event type that
+ * existed before the started/completed split).
  */
 export function trackPlayback(
   env: Env,
@@ -115,6 +120,7 @@ export function trackPlayback(
     language: string;
     marketingSource: string;
     country: string;
+    event: string;
   }
 ): void {
   try {
@@ -127,6 +133,7 @@ export function trackPlayback(
         data.type,
         data.marketingSource,
         data.country,
+        data.event,
       ],
       doubles: [0],
       indexes: ['playback'],
