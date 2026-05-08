@@ -92,6 +92,11 @@ export async function getTurnstileToken(): Promise<string> {
       container.style.zIndex = '1';
       document.body.appendChild(container);
     }
+    // Reset visibility — a prior successful challenge sets display:none on
+    // the container, which would silently break re-renders for subsequent
+    // session refreshes (Turnstile's iframe can't communicate from a hidden
+    // parent and times out at TURNSTILE_TIMEOUT_MS).
+    container.style.display = '';
 
     // Timeout: if Turnstile fails silently (Safari edge cases), don't hang forever
     const timeout = setTimeout(() => {
