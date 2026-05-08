@@ -10,13 +10,15 @@ Per anonymous request, written to Cloudflare Analytics Engine:
 
 | Counter | Example values | Why |
 |---|---|---|
-| Endpoint | `chat`, `council`, `summary`, `session`, `speech`, `transcriptions` | See which features are used |
+| Endpoint | `chat`, `council`, `summary`, `session`, `speech`, `transcriptions`, `playback` | See which features are used |
 | Figure | `aurelius`, `kahlo`, `rumi`, ... | See which figures resonate |
 | Mode | `story`, `wisdom`, `prism`, `quest`, `freetalk`, `council` | See which chapters land |
 | Language | `en` or `de` | See bilingual reach |
 | HTTP status | `200`, `429`, `502`, ... | Detect outages and rate-limit pressure |
 | Country | 2-letter ISO code from Cloudflare edge (`DE`, `US`, `XX` for unknown) | Demonstrate geographic reach to grant funders |
 | Marketing source | One of `spotify`, `grants`, `paid`, `organic`, `direct`, `unknown` (closed allowlist) | See if our nonprofit outreach is working |
+| Playback event | `started` (audio first play) or `completed` (content marked finished, gamification star awarded) | Distinguish click-and-bail from real consumption — completion-rate funnel |
+| Content type | `story`, `teaching`, `prism`, `council`, `foreword` (closed allowlist; only set on playback events) | Know which content type was started/completed |
 | Duration (ms) | Latency of the request | Find slow paths, fix them |
 
 ## What we don't count, ever
