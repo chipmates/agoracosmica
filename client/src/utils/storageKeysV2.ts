@@ -3,6 +3,7 @@
 
 import { ConversationMode } from '../types/global';
 import { LocalStorageAdapter } from '../storage/localAdapter';
+import { sendPlaybackBeacon, detectCurrentLanguage } from './playbackBeacon';
 
 /**
  * Storage key generators for different conversation contexts
@@ -107,13 +108,18 @@ export const isStoryCompleted = (figureId: string, seedId: string | number): boo
 };
 
 /**
- * Helper to mark a story as completed
+ * Helper to mark a story as completed.
+ * Idempotent — safe to call repeatedly; only the first completion mutates state,
+ * fires the gamification event, and emits the analytics beacon.
  */
 export const markStoryCompleted = (figureId: string, seedId: string | number): void => {
+  if (isStoryCompleted(figureId, seedId)) return;
   const key = STORAGE_KEYS.getStoryCompleted(figureId, seedId);
   LocalStorageAdapter.setString(key, 'true');
   // Prismatic Bloom: notify that a mode was completed
   window.dispatchEvent(new CustomEvent('bloomModeCompleted', { detail: { figureId } }));
+  // Anonymous content-completion analytics beacon
+  sendPlaybackBeacon({ type: 'story', figureId, mode: 'story', language: detectCurrentLanguage() });
 };
 
 /**
@@ -135,6 +141,8 @@ export const markWisdomCompleted = (figureId: string, seedId: string | number): 
   const key = STORAGE_KEYS.getWisdomCompleted(figureId, seedId);
   LocalStorageAdapter.setString(key, 'true');
   window.dispatchEvent(new CustomEvent('bloomModeCompleted', { detail: { figureId } }));
+  // Anonymous content-completion analytics beacon
+  sendPlaybackBeacon({ type: 'teaching', figureId, mode: 'wisdom', language: detectCurrentLanguage() });
 };
 
 /**
@@ -244,13 +252,18 @@ export const isPrismCompleted = (figureId: string, seedId: string | number): boo
 };
 
 /**
- * Helper to mark a prism as completed
+ * Helper to mark a prism as completed.
+ * Idempotent — only the first call mutates state, fires gamification, and emits
+ * the analytics beacon.
  */
 export const markPrismCompleted = (figureId: string, seedId: string | number): void => {
+  if (isPrismCompleted(figureId, seedId)) return;
   const key = STORAGE_KEYS.getPrismCompleted(figureId, seedId);
   LocalStorageAdapter.setString(key, 'true');
   // Prismatic Bloom: notify that a mode was completed
   window.dispatchEvent(new CustomEvent('bloomModeCompleted', { detail: { figureId } }));
+  // Anonymous content-completion analytics beacon
+  sendPlaybackBeacon({ type: 'prism', figureId, mode: 'prism', language: detectCurrentLanguage() });
 };
 
 /**
@@ -316,11 +329,16 @@ export const isCouncilCompleted = (councilId: string): boolean => {
 };
 
 /**
- * Helper to mark a council as completed
+ * Helper to mark a council as completed.
+ * Idempotent — only the first call mutates state and emits the analytics beacon.
  */
 export const markCouncilCompleted = (councilId: string): void => {
+  if (isCouncilCompleted(councilId)) return;
   const key = STORAGE_KEYS.getCouncilCompleted(councilId);
   LocalStorageAdapter.setString(key, 'true');
+  // Anonymous content-completion analytics beacon. Council has no figure dimension
+  // (multi-figure debate) — leave figureId empty.
+  sendPlaybackBeacon({ type: 'council', mode: 'council', language: detectCurrentLanguage() });
 };
 
 /**

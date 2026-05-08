@@ -1171,6 +1171,10 @@ async function loadOverview() {
     { sql: "SELECT blob6 as source, COUNT() as c FROM agora_llm WHERE blob1 IN ('chat','council','summary') AND blob5 = '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY source ORDER BY c DESC", dataset: 'agora_llm' },
     // Top countries — Phase 0d geographic breakdown (blob7 = country)
     { sql: "SELECT blob7 as country, COUNT() as c FROM agora_llm WHERE blob1 IN ('chat','council','summary') AND blob5 = '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY country ORDER BY c DESC LIMIT 8", dataset: 'agora_llm' },
+    // Content completions by type — Phase 0e' content tracking (blob5 = type for blob1='playback' rows)
+    { sql: "SELECT blob5 as type, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY type ORDER BY c DESC", dataset: 'agora_llm' },
+    // Top figures by content completion (blob2 = figureId for playback rows)
+    { sql: "SELECT blob2 as figure, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND blob2 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY figure ORDER BY c DESC LIMIT 8", dataset: 'agora_llm' },
   ];
 
   var r = await batch(queries);
@@ -1197,6 +1201,8 @@ async function loadOverview() {
   var langSplit = rows(r[19]);
   var channelSources = rows(r[20]);
   var topCountries = rows(r[21]);
+  var contentByType = rows(r[22]);
+  var topFiguresByContent = rows(r[23]);
 
   // Alerts
   var alerts = '';
@@ -1255,6 +1261,18 @@ async function loadOverview() {
     return { label: r.country || 'XX', c: r.c };
   }).filter(function(r) { return r.label && r.c > 0; });
   html += chartCard('Top Countries', barsHtml(countryItems, '#9D83CD'), 'card-half');
+
+  // Content Completions by Type — playback beacons (real consumption events)
+  var contentTypeItems = contentByType.map(function(r) {
+    return { label: r.type || 'unknown', c: r.c };
+  }).filter(function(r) { return r.label && r.c > 0; });
+  html += chartCard('Content Completed', barsHtml(contentTypeItems, '#68C397'), 'card-half');
+
+  // Top figures by content completion
+  var topFiguresContentItems = topFiguresByContent.map(function(r) {
+    return { label: cap(r.figure), c: r.c };
+  }).filter(function(r) { return r.label && r.c > 0; });
+  html += chartCard('Top Figures by Completion', barsHtml(topFiguresContentItems, '#5B8BD4'), 'card-half');
 
   // Computed insight
   var insights = [];
@@ -1655,6 +1673,10 @@ async function loadAdGrants() {
     { sql: "SELECT blob6 as source, COUNT() as c FROM agora_llm WHERE blob1 = 'session' AND blob5 = '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY source ORDER BY c DESC", dataset: 'agora_llm' },
     // Phase 0d geographic — top countries on conversations
     { sql: "SELECT blob7 as country, COUNT() as c FROM agora_llm WHERE blob1 IN ('chat','council','summary') AND blob5 = '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY country ORDER BY c DESC LIMIT 10", dataset: 'agora_llm' },
+    // Content completions by channel (real consumption attributed to marketing source)
+    { sql: "SELECT blob6 as source, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY source ORDER BY c DESC", dataset: 'agora_llm' },
+    // Content completions by type
+    { sql: "SELECT blob5 as type, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY type ORDER BY c DESC", dataset: 'agora_llm' },
   ];
 
   var r = await batch(queries);
@@ -1670,6 +1692,8 @@ async function loadAdGrants() {
   var convoByChannel = rows(r[9]);
   var sessionsByChannel = rows(r[10]);
   var topCountriesAdgrants = rows(r[11]);
+  var playbackByChannel = rows(r[12]);
+  var playbackByType = rows(r[13]);
 
   // Alerts
   var alerts = '';
@@ -1722,6 +1746,24 @@ async function loadAdGrants() {
   }).filter(function(r) { return r.label && r.c > 0; });
   html += chartCard('Top Countries (Conversations)',
     barsHtml(countryItemsAdgrants, '#5B8BD4'),
+    'card-half'
+  );
+
+  // Content Completions by Type (real consumption — story/teaching/prism/council)
+  var playbackTypeItems = playbackByType.map(function(r) {
+    return { label: r.type || 'unknown', c: r.c };
+  }).filter(function(r) { return r.label && r.c > 0; });
+  html += chartCard('Content Completions by Type',
+    barsHtml(playbackTypeItems, '#68C397'),
+    'card-half'
+  );
+
+  // Content Completions by Channel
+  var playbackChannelItems = playbackByChannel.map(function(r) {
+    return { label: r.source || 'direct', c: r.c };
+  }).filter(function(r) { return r.label && r.c > 0; });
+  html += chartCard('Content Completions by Channel',
+    barsHtml(playbackChannelItems, '#E6BC5C'),
     'card-half'
   );
 

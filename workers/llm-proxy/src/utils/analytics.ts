@@ -97,6 +97,46 @@ export function trackSession(
 }
 
 /**
+ * Track an anonymous content-completion playback event (story / teaching /
+ * prism / council / foreword). Fires from the client when a content item is
+ * marked completed (same trigger as the gamification star award), so each
+ * row represents a real consumption, not a click-and-bail.
+ *
+ * dataset: agora_llm
+ * blobs: ['playback', figureId, mode, language, type, marketing_source, country]
+ * indexes: ['playback']
+ */
+export function trackPlayback(
+  env: Env,
+  data: {
+    type: string;
+    figureId: string;
+    mode: string;
+    language: string;
+    marketingSource: string;
+    country: string;
+  }
+): void {
+  try {
+    env.ANALYTICS.writeDataPoint({
+      blobs: [
+        'playback',
+        data.figureId,
+        data.mode,
+        data.language,
+        data.type,
+        data.marketingSource,
+        data.country,
+      ],
+      doubles: [0],
+      indexes: ['playback'],
+    });
+  } catch {
+    // Analytics must never break the request path
+  }
+}
+
+/**
  * Track a rate limit hit (429).
  * dataset: agora_llm
  * blobs: ['ratelimit', endpoint, reason, '', '429', marketing_source, country]

@@ -8,6 +8,7 @@ import { handleCouncil } from './routes/council';
 import { handleQuota } from './routes/quota';
 import { handleSummary } from './routes/summary';
 import { handleConversions, handleConversionStats } from './routes/conversions';
+import { handlePlayback } from './routes/playback';
 import type { Env } from './utils/types';
 
 function getCorsHeaders(request: Request, env: Env): Record<string, string> {
@@ -88,6 +89,8 @@ export default {
         response = await handleConversions(request, env);
       } else if (path === '/api/conversions/stats' && request.method === 'GET') {
         response = await handleConversionStats(request, env);
+      } else if (path === '/v1/playback' && request.method === 'POST') {
+        response = await handlePlayback(request, env);
       } else {
         response = new Response(
           JSON.stringify({ error: 'Not found' }),
