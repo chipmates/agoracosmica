@@ -13,7 +13,7 @@ Anonymous voting-power heartbeat + co-sign threshold authority for the Community
 
 - Device IDs are SHA-256 hashed with a rotating `IP_SALT` before persistence. We never store the raw client UUID.
 - IPs are SHA-256 hashed with the same salt and only used for a 6-hour write rate-limit. Not persisted long-term.
-- No PII, no cookies, no analytics. Aligned with the "Ohne Tracking" brand promise.
+- No PII, no cookies, no third-party analytics. Aligned with the "No User Tracking" posture (aggregate event counters only).
 - **Rotate `IP_SALT` quarterly** to make hashes uncorrelatable across rotations.
 
 ## Endpoints

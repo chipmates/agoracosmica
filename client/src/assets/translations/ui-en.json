@@ -278,7 +278,7 @@
     "privacy": {
       "title": "Privacy",
       "description": "Your privacy is protected by default",
-      "intro": "We respect your privacy and have designed Agora Cosmica to work without tracking cookies or analytics.",
+      "intro": "We respect your privacy and have designed Agora Cosmica to work without tracking cookies or third-party analytics.",
       "manageCookies": "Manage Cookie Preferences",
       "viewPrivacyPolicy": "View Privacy Policy",
       "viewCookiePolicy": "View Cookie Policy",
@@ -1568,7 +1568,7 @@
     },
     "quote": "Follow your bliss and the universe will open doors where there were only walls.",
     "quoteAttribution": "— Joseph Campbell",
-    "trustSignals": "Non-profit · Open Source · No Tracking",
+    "trustSignals": "Non-profit · Open Source · No User Tracking",
     "button": "Ignite Your Stars",
     "seekerText": "Questions, like stars, shine within you.",
     "seekerAlt": "The Seeker - your cosmic self with infinite potential within"

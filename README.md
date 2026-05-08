@@ -6,7 +6,7 @@
 
 <p align="center">
   <strong>A Living Library You Can Talk To</strong><br/>
-  <sub>Nonprofit · Open Source · No Tracking</sub>
+  <sub>Nonprofit · Open Source · No User Tracking</sub>
 </p>
 
 <p align="center">
@@ -61,7 +61,7 @@ Each interaction in Agora Cosmica orbits one figure. The four educational chapte
 **Private by design**
 - **BYOK encryption**: bring your own OpenRouter key, encrypted locally with AES-256-GCM, never stored on our servers.
 - **Free tier without signup**: 30 messages a day via our Cloudflare Worker, no account required.
-- **Zero personal tracking**: no tracking cookies, no third-party analytics, no per-request server logs, no IP or user ID stored. We do collect anonymous structural counters (which figure, which mode, response times, error counts) to keep the service running.
+- **No user tracking**: no tracking cookies, no third-party analytics, no per-request server logs, no IP retention, no cross-session profiles. We do collect anonymous aggregate counters to keep the service running and improve it — [docs/MEASUREMENT.md](docs/MEASUREMENT.md) lists exactly what and why.
 - **Self-hosted speech**: live text-to-speech and speech-to-text run on our own GPU servers in Germany.
 - **EU-first hosting**: live audio in Germany, pre-recorded audio on Cloudflare R2.
 
@@ -136,5 +136,5 @@ We're early in this journey and we'll make mistakes. When we oversimplify, misre
 ---
 
 <p align="center">
-  <em>Nonprofit · Open Source · No Tracking</em>
+  <em>Nonprofit · Open Source · No User Tracking</em>
 </p>

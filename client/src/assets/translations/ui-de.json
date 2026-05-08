@@ -276,7 +276,7 @@
     "privacy": {
       "title": "Datenschutz",
       "description": "Deine Privatsphäre ist standardmäßig geschützt",
-      "intro": "Wir respektieren deine Privatsphäre und haben Agora Cosmica so entwickelt, dass es ohne Tracking-Cookies oder Analysen funktioniert.",
+      "intro": "Wir respektieren deine Privatsphäre und haben Agora Cosmica so entwickelt, dass es ohne Tracking-Cookies oder Drittanbieter-Analysen funktioniert.",
       "manageCookies": "Cookie-Einstellungen verwalten",
       "viewPrivacyPolicy": "Datenschutzerklärung anzeigen",
       "viewCookiePolicy": "Cookie-Richtlinie anzeigen",
@@ -363,7 +363,7 @@
         "trustNonprofit": "Gemeinnützig",
         "trustOpenSource": "Open Source (AGPL-3.0)",
         "trustOpenSourceAria": "Open Source unter AGPL-3.0. Quellcode auf GitHub ansehen. Öffnet in neuem Tab.",
-        "trustNoTracking": "Ohne Tracking",
+        "trustNoTracking": "Kein Nutzer-Tracking",
         "trustProof": "Wir speichern deine Daten nie. Server in Deutschland und Finnland, täglich automatisch geprüft.",
         "clearAllButton": "Alle meine Daten löschen",
         "clearAllConfirm": "Dies löscht alle deine Gespräche, deinen OpenRouter-Key und alle Einstellungen auf diesem Gerät. Die App wird neu geladen. Fortfahren?"
@@ -1570,7 +1570,7 @@
     },
     "quote": "Folge deiner Freude, und das Universum wird Türen öffnen, wo vorher nur Wände waren.",
     "quoteAttribution": "— Joseph Campbell",
-    "trustSignals": "Gemeinnützig · Open Source · Ohne Tracking",
+    "trustSignals": "Gemeinnützig · Open Source · Kein Nutzer-Tracking",
     "button": "Entzünde deine Sterne",
     "seekerText": "Fragen, wie Sterne, leuchten in dir.",
     "seekerAlt": "Der Suchende - dein kosmisches Selbst mit unendlichem Potenzial"

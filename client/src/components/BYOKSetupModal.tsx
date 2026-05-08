@@ -20,7 +20,7 @@ const BYOKSetupModal: FC = () => {
   const [keyValue, setKeyValue] = useState('');
   const [showKey, setShowKey] = useState(false);
   const [status, setStatus] = useState<ValidationStatus>('idle');
-  // ZDR defaults ON — privacy-first, matches the brand's "Ohne Tracking" promise.
+  // ZDR defaults ON — privacy-first, matches the brand's "No User Tracking" posture.
   // Free tier is already zero-retention via Nebius DPA; BYOK should match that posture.
   // Users who prefer EU routing / lower latency can opt out in the toggle.
   const [zdrEnabled, setZdrEnabled] = useState(true);

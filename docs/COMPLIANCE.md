@@ -47,7 +47,7 @@ Legitimate interest (Art. 6(1)(f) GDPR) for providing philosophical dialogue ser
 
 **No tracking cookies.** Cloudflare sets strictly-necessary cookies (`__cf_bm`, `cf_clearance`, `__cflb`) for bot detection and load balancing. These are exempt from consent under ePrivacy Directive Article 5(3) and §25(2) TDDDG.
 
-All other client-side storage uses IndexedDB and localStorage, both technically necessary for app functionality and not cookies under the ePrivacy framework. No analytics, no marketing, no tracking.
+All other client-side storage uses IndexedDB and localStorage, both technically necessary for app functionality and not cookies under the ePrivacy framework. No third-party analytics, no marketing trackers, no cross-session user profiling. Aggregate, anonymous event counters are written server-side to support service operation and nonprofit reach measurement; see the README's "What we measure (and why)" section for the exact list.
 
 ---
 

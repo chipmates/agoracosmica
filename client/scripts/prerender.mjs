@@ -447,8 +447,8 @@ function homeNoscript(lang) {
     ? '30 historische Persönlichkeiten erzählen ihre Lebensgeschichten in der ersten Person. Höre ihre Geschichten, lerne aus ihren Lehren, stelle ihnen Fragen. Von Marcus Aurelius bis Frida Kahlo, von Laozi bis Ada Lovelace.'
     : '30 historical figures speak in first-person portraits. Listen to their life stories, learn from their teachings, ask them questions. From Marcus Aurelius to Frida Kahlo, from Laozi to Ada Lovelace.';
   const trustLine = isDe
-    ? 'Gemeinnützig, Open Source, ohne Tracking. Gebaut von ChipMates gemeinnützige GmbH, einem deutschen Non-Profit für Bildung in Freiburg.'
-    : 'Nonprofit, open source, no tracking. Built by ChipMates gemeinnützige GmbH, a German educational nonprofit in Freiburg.';
+    ? 'Gemeinnützig, Open Source, kein Nutzer-Tracking. Gebaut von ChipMates gemeinnützige GmbH, einem deutschen Non-Profit für Bildung in Freiburg.'
+    : 'Nonprofit, open source, no user tracking. Built by ChipMates gemeinnützige GmbH, a German educational nonprofit in Freiburg.';
   const figuresHeading = isDe ? '30 Persönlichkeiten der Geschichte' : '30 Figures from history';
   const themesHeading = isDe ? '8 Themen des Lebens' : '8 Life Themes';
   const learnMoreHeading = isDe ? 'Mehr erfahren' : 'Learn more';
@@ -525,8 +525,8 @@ function figureNoscript(id, slug, lang) {
     ? `${name} auf Agora Cosmica`
     : `${name} on Agora Cosmica`;
   const connectCopy = isDe
-    ? `Höre die 12-Kapitel-Lebensgeschichte, erkunde 12 Lehren mit Audio, stelle Fragen im Dialog. Gemeinnützig, Open Source, ohne Tracking.`
-    : `Listen to the 12-chapter life story, explore 12 teachings with audio, ask questions in dialogue. Nonprofit, open source, no tracking.`;
+    ? `Höre die 12-Kapitel-Lebensgeschichte, erkunde 12 Lehren mit Audio, stelle Fragen im Dialog. Gemeinnützig, Open Source, kein Nutzer-Tracking.`
+    : `Listen to the 12-chapter life story, explore 12 teachings with audio, ask questions in dialogue. Nonprofit, open source, no user tracking.`;
   const relatedHeading = isDe ? 'Verwandte Persönlichkeiten' : 'Related Figures';
   const browseHeading = isDe ? 'Stöbern' : 'Browse';
 
@@ -614,8 +614,8 @@ function aboutNoscript(lang) {
   const prefix = lang === 'de' ? '/de' : '';
   const isDe = lang === 'de';
   const intro = isDe
-    ? 'Agora Cosmica ist eine lebendige Bibliothek mit 30 historischen Persönlichkeiten. Höre ihre Lebensgeschichten, lerne aus ihren Lehren, sprich mit ihnen im Dialog. Gemeinnützig, Open Source, ohne Tracking.'
-    : 'Agora Cosmica is a living library of 30 historical figures. Listen to their life stories, learn from their teachings, talk with them in dialogue. Nonprofit, open source, no tracking.';
+    ? 'Agora Cosmica ist eine lebendige Bibliothek mit 30 historischen Persönlichkeiten. Höre ihre Lebensgeschichten, lerne aus ihren Lehren, sprich mit ihnen im Dialog. Gemeinnützig, Open Source, kein Nutzer-Tracking.'
+    : 'Agora Cosmica is a living library of 30 historical figures. Listen to their life stories, learn from their teachings, talk with them in dialogue. Nonprofit, open source, no user tracking.';
   const grounded = isDe
     ? 'Jede Stimme basiert auf Hauptwerken, historischem Kontext und gegengeprüften Quellen. Die Echos sind KI-erzeugt, ihre Worte variieren. Das Quellmaterial bleibt. Wo die Erzählung über das Dokumentierte hinausgeht, benennt der Faktencheck, was nachgebildet ist.'
     : 'Every voice is grounded in primary works, historical context, and cross-checked sources. The Echoes are AI-rendered, so what they say will vary. The source material does not. When the prose extends beyond documented record, the factcheck names what is recreated.';
@@ -1137,7 +1137,7 @@ function generateLlmsTxt() {
   push('> A Living Library You Can Talk To.');
   push('> Nonprofit, open source. Built by ChipMates gemeinnützige GmbH (Freiburg, Germany).');
   push();
-  push('Agora Cosmica is a wisdom platform with 30 historical figures, fully bilingual in English and German. The platform runs in the browser, requires no account beyond a chosen name, and stores no tracking data.');
+  push('Agora Cosmica is a wisdom platform with 30 historical figures, fully bilingual in English and German. The platform runs in the browser, requires no account beyond a chosen name, and stores no per-user tracking data — only anonymous aggregate event counters for service operation.');
   push();
   push('The platform offers six modes: four educational chapters (Story / Wisdom / Prism / Quest) plus two open formats (Free Talk and Council).');
   push();

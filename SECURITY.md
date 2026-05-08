@@ -149,7 +149,7 @@ As a nonprofit, we do not currently offer a paid bug bounty. We can offer:
 - **Edge auth on origins.** Two-token defense (X-Origin-Verify Worker secret + X-Admin-Token) on FSN1+NBG1 nginx. Protects against direct-to-origin abuse with leaked bearers.
 - **Data residency.** EU only. Nebius (Finland), Hetzner (Germany, Falkenstein and Nürnberg).
 - **Zero Data Retention.** Verified by daily cron audits. No conversation, audio, or text is persisted server-side.
-- **No per-request server logging.** Diagnostic windows are bounded and wiped after. Standing nginx access-log capture is disabled in production. Aligned with the *Ohne Tracking* brand promise.
+- **No per-request server logging.** Diagnostic windows are bounded and wiped after. Standing nginx access-log capture is disabled in production. Aligned with our *No User Tracking* posture: aggregate event counters only, no per-user dimension.
 - **Access control on staging.** All non-production URLs are gated by Cloudflare Access.
 
 For the full architecture: [docs/SECURITY-ARCHITECTURE.md](docs/SECURITY-ARCHITECTURE.md).
