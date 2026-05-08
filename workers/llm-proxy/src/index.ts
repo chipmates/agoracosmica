@@ -28,7 +28,7 @@ function getCorsHeaders(request: Request, env: Env): Record<string, string> {
   return {
     'Access-Control-Allow-Origin': isAllowed ? origin : '',
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Marketing-Source',
     'Access-Control-Expose-Headers': 'X-Quota-Daily-Used, X-Quota-Daily-Limit, X-Quota-Resets-At, X-Council-Daily-Used, X-Council-Daily-Limit, X-Council-Resets-At, X-Summary-Daily-Used, X-Summary-Daily-Limit, X-Summary-Resets-At, X-AI-Generated, X-AI-Model, X-AI-Provider',
     'Access-Control-Max-Age': '86400',
   };

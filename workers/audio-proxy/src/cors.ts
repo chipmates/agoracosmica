@@ -36,7 +36,7 @@ export function handlePreflight(request: Request, env: Env): Response {
     headers: {
       'Access-Control-Allow-Origin': origin,
       'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, X-Session-Id',
+      'Access-Control-Allow-Headers': 'Content-Type, X-Session-Id, X-Marketing-Source',
       'Access-Control-Expose-Headers': EXPOSE_HEADERS,
       'Access-Control-Max-Age': '86400',
       Vary: 'Origin',
