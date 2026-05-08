@@ -1502,11 +1502,11 @@ async function loadProduct() {
   // === ENGAGEMENT SECTION ===
   html += '<div class="section-divider">Engagement</div>';
   html += '<div class="grid">';
-  html += kpi('Sessions', sessions, { hero: true, spark: sparkSessions, delta: sessionsPrev });
+  html += kpi('Sessions', sessions, { hero: true, spark: sparkSessions, delta: sessionsPrev, sub: 'engagement windows' });
   html += kpi('Chat Messages', chats, { spark: sparkChats, sparkColor: '#5B8BD4', delta: chatsPrev });
   html += kpi('Councils', councils, { delta: councilsPrev });
   html += kpi('Summaries', summaries, { delta: summariesPrev });
-  html += kpi('Chats / Session', chatsPerSession, { sub: 'avg engagement depth' });
+  html += kpi('Chats / Session', chatsPerSession, { sub: 'avg depth per window' });
 
   // Figure popularity
   if (figures.length > 0) {
