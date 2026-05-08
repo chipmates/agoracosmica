@@ -262,7 +262,7 @@ export async function generateFreeTierResponse({
     // Build request body — no instructions/systemMessage sent from client
     // Truncate long assistant messages to stay under worker's 8000-char limit
     const truncatedCount = messages.filter(m => m.role === 'assistant' && m.content.length > 7500).length;
-    if (truncatedCount > 0) {
+    if (truncatedCount > 0 && import.meta.env.DEV) {
       console.warn(`[FreeTier] Truncated ${truncatedCount} assistant message(s) to 7500 chars`);
     }
 
