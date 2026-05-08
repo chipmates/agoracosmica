@@ -1498,6 +1498,16 @@ async function loadProduct() {
     // Rate limits
     { sql: "SELECT blob3 as reason, COUNT() as c FROM agora_llm WHERE blob1 = 'ratelimit' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY reason ORDER BY c DESC", dataset: 'agora_llm' },
     { sql: "SELECT blob4 as reason, COUNT() as c FROM agora_audio WHERE blob5 = 'ratelimit' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY reason ORDER BY c DESC", dataset: 'agora_audio' },
+    // Content completions by type — playback beacons
+    { sql: "SELECT blob5 as type, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY type ORDER BY c DESC", dataset: 'agora_llm' },
+    // Content completions by figure
+    { sql: "SELECT blob2 as figure, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND blob2 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY figure ORDER BY c DESC LIMIT 10", dataset: 'agora_llm' },
+    // Content completions by language
+    { sql: "SELECT blob4 as lang, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY lang ORDER BY c DESC", dataset: 'agora_llm' },
+    // Content completions sparkline
+    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
+    // Total completions previous period for delta
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND timestamp " + prevRange(), dataset: 'agora_llm' },
   ];
 
   var r = await batch(queries);
@@ -1524,6 +1534,12 @@ async function loadProduct() {
   var audioLangs = rows(r[24]);
   var rlLlm = rows(r[25]);
   var rlAudio = rows(r[26]);
+  var playbackByType = rows(r[27]);
+  var playbackByFigure = rows(r[28]);
+  var playbackByLang = rows(r[29]);
+  var sparkPlayback = rows(r[30]).map(function(x) { return x.c; });
+  var playbackPrev = val(r[31]);
+  var totalPlayback = playbackByType.reduce(function(s, x) { return s + x.c; }, 0);
   var totalLlm = chats + councils + summaries;
   var chatsPerSession = sessions > 0 ? (chats / sessions).toFixed(1) : '-';
   var totalRlLlm = rlLlm.reduce(function(s, r) { return s + r.c; }, 0);
@@ -1574,6 +1590,39 @@ async function loadProduct() {
     html += chartCard('Chat Activity', svgBarGraph(timeItems, { color: '#5B8BD4', ariaLabel: 'Chat messages over time' }), 'card-full');
   } else {
     html += chartCard('Chat Activity', '<div class="empty-state" style="padding:30px 0">No chat data yet ' + RANGE_LABEL[S.range] + '</div>', 'card-full');
+  }
+  html += '</div>';
+
+  // === CONTENT CONSUMPTION SECTION ===
+  // Real consumption signal — fires when a user completes a story/teaching/
+  // prism/council in localStorage (same trigger as the gamification star).
+  html += '<div class="section-divider">Content Consumption</div>';
+  html += '<div class="grid">';
+  html += kpi('Content Completed', totalPlayback, { hero: true, spark: sparkPlayback, sparkColor: '#68C397', delta: playbackPrev, sub: 'stories, teachings, prisms, councils' });
+
+  // By type — story / teaching / prism / council / foreword
+  var pbTypeItems = aggregateByLabel(playbackByType.map(function(r) {
+    return { label: r.type || 'unknown', c: r.c };
+  }));
+  if (pbTypeItems.length > 0) {
+    html += chartCard('By Type', barsHtml(pbTypeItems, '#68C397'), 'card-half');
+  } else {
+    html += chartCard('By Type', '<div class="empty-state" style="padding:30px 0">No completions yet ' + RANGE_LABEL[S.range] + '</div>', 'card-half');
+  }
+
+  // By figure — which figures users actually finish
+  var pbFigItems = aggregateByLabel(playbackByFigure.map(function(r) {
+    return { label: cap(r.figure), c: r.c };
+  }).filter(function(r) { return r.label; }));
+  if (pbFigItems.length > 0) {
+    html += chartCard('Top Figures by Completion', barsHtml(pbFigItems, '#5B8BD4'), 'card-half');
+  } else {
+    html += chartCard('Top Figures by Completion', '<div class="empty-state" style="padding:30px 0">No completions yet ' + RANGE_LABEL[S.range] + '</div>', 'card-half');
+  }
+
+  // By language
+  if (playbackByLang.length > 0) {
+    html += chartCard('Completion Language', donutSvg(playbackByLang.map(function(r) { return { key: r.lang || 'unknown', c: r.c }; }), COLORS.lang, function(l) { return l === 'de' ? 'Deutsch' : (l === 'en' ? 'English' : 'Unknown'); }), '');
   }
   html += '</div>';
 
