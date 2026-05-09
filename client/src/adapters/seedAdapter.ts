@@ -1,7 +1,6 @@
 import { useCallback, useMemo } from 'react';
 import {
   useModeActions,
-  useModeState,
   useSeedsActions,
   useSeedsState,
 } from '../stores';
@@ -13,7 +12,6 @@ import { getFromStore } from '../storage';
 import seedStateManager from '../services/SeedStateManager';
 import { cleanupAudioResources } from '../services/audioService';
 import { processSeedAcquisition } from '../services/seedAcquisition';
-import { storyIntegrationManager } from '../services/StoryIntegrationManager';
 import { modeStateManager } from '../utils/modeStateManager';
 
 // Types for seed management (moved from deprecated useSeedManager hook)
@@ -98,34 +96,6 @@ const ensureModePersistence = (
   }
 };
 
-const loadStoryIfNeeded = async (
-  figureId: string,
-  seed: Seed,
-  setStoryData?: (data: Record<string, any> | null) => void,
-  setError?: (error: string | null) => void,
-  setConversationStarted?: (started: boolean) => void
-) => {
-  try {
-    const langCode = LocalStorageAdapter.getString('selectedLanguage') || 'en';
-    const normalizedSeedId = seed.id?.toString() ?? '';
-    const result = await storyIntegrationManager.startStory({
-      figure: figureId,
-      seedId: normalizedSeedId,
-      language: langCode,
-      seedData: seed,
-      onComplete: () => undefined,
-      onError: (err: Error) => setError?.(err.message),
-    });
-
-    setStoryData?.(result);
-    if (result && result.text) {
-      setConversationStarted?.(true);
-    }
-  } catch (error) {
-    console.error('Error reloading story for seed', seed.id, error);
-  }
-};
-
 export const useSeedManagerAdapter = (params: SeedManagerParams): SeedManagerResult => {
   const {
     selectedFigure,
@@ -142,23 +112,12 @@ export const useSeedManagerAdapter = (params: SeedManagerParams): SeedManagerRes
   } = params;
 
   const { byFigure, selectedId: selectedSeedId } = useSeedsState();
-  const {
-    selectSeed: setStoreSelectedSeedId,
-    cacheSeedsForFigure,
-    setSeedLoading,
-    setSeedError,
-  } = useSeedsActions();
+  const { selectSeed: setStoreSelectedSeedId } = useSeedsActions();
 
-  const { selected: storeMode } = useModeState();
   const { setMode: setStoreMode } = useModeActions();
   const { resetConversationState, setConversationMessages, setConversationStarted: setConversationStartedAction } = useConversationActions();
 
   const figureId = selectedFigure?.id ?? null;
-
-  const seedsForFigure = useMemo(
-    () => (figureId ? byFigure[figureId] ?? [] : []),
-    [byFigure, figureId]
-  );
 
   const selectedSeed = useMemo(
     () => getSeedFromCache(figureId, selectedSeedId, byFigure),

@@ -225,7 +225,7 @@ const OptimizedFigureImage: FC<OptimizedFigureImageProps> = ({
 }) => {
   const calculatedSize = useResponsiveImageSize(type, size);
   const { imageData, loading: pathsLoading } = useImagePaths(figure, type, calculatedSize, format);
-  const { loaded, error, handleLoad, handleError } = useImageLoading({ onLoad, onError });
+  const { loaded, handleLoad, handleError } = useImageLoading({ onLoad, onError });
   
   // Show loading state while paths are being resolved
   if (pathsLoading) {

@@ -220,7 +220,7 @@ export const useDomainStore = create<DomainSlices>()(
             return { conversation: { ...state.conversation, processingStage } };
           }),
         resetConversationState: () =>
-          set((state: DomainSlices) => {
+          set((_state: DomainSlices) => {
             debugLog('resetConversationState');
             return { conversation: { ...createInitialState().conversation, messages: [] } };
           }),
@@ -301,7 +301,7 @@ export const useDomainStore = create<DomainSlices>()(
       {
         name: 'agora-cosmica-store',
         version: 1, // Increment when persisted schema changes — triggers migration
-        migrate: (persistedState: any, version: number) => {
+        migrate: (persistedState: any, _version: number) => {
           // Future migrations go here:
           // if (version === 0) { /* migrate v0 → v1 */ }
           return persistedState;

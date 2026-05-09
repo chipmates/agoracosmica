@@ -95,7 +95,7 @@ interface Mode {
 }
 
 const HomePage: FC<HomePageProps> = ({ onLogout, onSelectFigure }) => {
-  const { t, tString, tNode, language } = useTranslation();
+  const { tString, tNode, language } = useTranslation();
 
   // Wait for Zustand persist to hydrate before initialization
   const { isHydrated } = useStoreHydration();

@@ -3,7 +3,6 @@ import { modeStateManager } from '../utils/modeStateManager';
 import { storyIntegrationManager } from '../services/StoryIntegrationManager';
 import {
   saveStoryContent,
-  markStoryCompleted,
   getStorageKeyForMode
 } from '../utils/storageKeysV2';
 import { initiateConversation } from '../services/audioService';
@@ -11,13 +10,6 @@ import { Figure, Seed, ConversationMode, Language } from '../types/global';
 import { LocalStorageAdapter } from '../storage/localAdapter';
 import { getFromStore } from '../storage';
 import { useDomainStore, useModeActions, useConversationActions } from '../stores';
-
-interface StoryData {
-  text?: string;
-  type?: string;
-  needsTranslation?: boolean;
-  [key: string]: any;
-}
 
 interface CouncilConfig {
   [key: string]: any;
@@ -56,8 +48,6 @@ interface ModeManagerResult {
  * @returns Mode management state and functions
  */
 export function useModeManager({
-  selectedFigure,
-  selectedSeed,
   fetchHistory,
   isCouncilMode,
   setIsCouncilMode,

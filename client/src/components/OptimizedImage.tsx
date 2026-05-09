@@ -311,7 +311,7 @@ const OptimizedImage: FC<OptimizedImageProps> = ({
   const effectiveSize = isVhHeight ? null : typeof sizeValue === 'number' ? sizeValue : null;
   const size = useResponsiveSize(purpose, effectiveSize, type);
   const { imageData, loading: pathsLoading } = useOptimizedImages(imageName, type, size, format, purpose);
-  const { loaded, error, handleLoad, handleError } = useImageLoading({ onLoad, onError });
+  const { loaded, handleLoad, handleError } = useImageLoading({ onLoad, onError });
   
   // Show loading state while images are being loaded
   if (pathsLoading) {

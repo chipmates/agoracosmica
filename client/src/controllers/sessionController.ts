@@ -71,7 +71,6 @@ export const createSessionController = (options: SessionControllerOptions = {}) 
 
     // Don't auto-restore state for brand new users
     // If user has a figure but no history AND no onboarding completed, they're mid-flow
-    const hasSelectedFigure = useDomainStore.getState().figures.selectedId;
     const onboardingStatus = useDomainStore.getState().onboarding;
     const hasVisited = useDomainStore.getState().hasVisitedBefore;
 

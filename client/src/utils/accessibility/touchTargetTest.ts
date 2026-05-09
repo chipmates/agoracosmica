@@ -228,7 +228,7 @@ export function runComprehensiveValidation(): ComprehensiveValidationResult {
   const fullValidation = runTouchTargetValidation();
   
   console.log('\n3️⃣ Implementation Summary:');
-  Object.entries(TOUCH_TARGET_FIXES).forEach(([key, fix]) => {
+  Object.entries(TOUCH_TARGET_FIXES).forEach(([, fix]) => {
     console.log(`✅ ${fix.component}: ${fix.fix}`);
   });
   

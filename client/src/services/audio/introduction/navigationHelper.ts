@@ -51,7 +51,7 @@ export async function getNextStory(currentPlayback: CurrentPlayback, currentFigu
   
   // Check if audio exists for next seed
   const preferredLanguage = currentPlayback.language || 'en';
-  const { audioPath, audioLanguage, error } = findAvailableAudioPath(
+  const { audioLanguage, error } = findAvailableAudioPath(
     normalizedFigureName,
     nextSeedId.toString(),
     preferredLanguage
@@ -105,7 +105,7 @@ export async function getPreviousStory(currentPlayback: CurrentPlayback, current
   
   // Check if audio exists for previous seed
   const preferredLanguage = currentPlayback.language || 'en';
-  const { audioPath, audioLanguage, error } = findAvailableAudioPath(
+  const { audioLanguage, error } = findAvailableAudioPath(
     normalizedFigureName,
     prevSeedId.toString(),
     preferredLanguage
@@ -140,7 +140,7 @@ export async function getPreviousStory(currentPlayback: CurrentPlayback, current
 /**
  * Get story metadata (title and figure name)
  */
-async function getStoryMetadata(currentFigure: string, normalizedFigureName: string, seedId: number, language: string): Promise<StoryMetadata> {
+async function getStoryMetadata(currentFigure: string, _normalizedFigureName: string, seedId: number, language: string): Promise<StoryMetadata> {
   let title = `Seed ${seedId}`;
   let figureName = currentFigure;
 

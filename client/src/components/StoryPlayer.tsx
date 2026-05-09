@@ -172,7 +172,7 @@ const StoryPlayer: FC<StoryPlayerProps> = ({
 
   // Use reducer for complex state management
   const [state, dispatch] = useReducer(storyPlayerReducer, initialState);
-  const { status, hasStoredStory, isAudioPlaying, playerKey } = state;
+  const { status, hasStoredStory, playerKey } = state;
   
   // Reference to avoid triggering effects unnecessarily
   const refreshRequestedRef = useRef<boolean>(false);
@@ -193,21 +193,6 @@ const StoryPlayer: FC<StoryPlayerProps> = ({
     }
   }, []); // Only run once on mount
 
-  // Check if audio is available in current language
-  const hasAudioInCurrentLanguage = React.useMemo(() => {
-    // Special case: If we have storyData with audio, trust it
-    if (storyData?.audioUrl && storyData.type === 'prerecorded') {
-      return true;
-    }
-    
-    // All pre-created stories have audio for EN/DE
-    if (!figure || !selectedSeed?.id) return false;
-    
-    // Check if language is supported (only EN/DE have pre-created stories)
-    const supportedLanguages = ['en', 'de'];
-    return supportedLanguages.includes(language.toLowerCase());
-  }, [figure, selectedSeed?.id, language, storyData]);
-  
   // Determine if we should show audio player based on data and language
   const shouldShowAudioPlayer = storyData?.audioUrl &&
                              storyData.type === 'prerecorded' &&
@@ -598,7 +583,7 @@ const StoryPlayer: FC<StoryPlayerProps> = ({
     return null;
   }
 
-  const { audioUrl, text } = storyData;
+  const { audioUrl } = storyData;
 
   // Don't show loading if we have valid story data
   const isLoading = status === 'loading' && (!storyData || !storyData.text);

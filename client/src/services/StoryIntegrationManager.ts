@@ -1,16 +1,11 @@
 import { eventEmitter } from './EventEmitter';
 import { cleanupAudioResources } from './audioService';
 import storyService from './StoryService';
-import { loadServiceConfig } from './audio/config/serviceConfig';
 import { getSeedById } from './seedCacheInitializer';
 import { Seed, Language } from '../types/global';
 import { useDomainStore } from '../stores/domainStore';
 import { createRequestGate } from '../utils/async/requestGate';
 import { abortable, AbortableTask } from '../utils/async/abortable';
-
-interface ServiceConfig {
-  [key: string]: any;
-}
 
 interface ActiveStory {
   figure: string;
@@ -45,13 +40,11 @@ interface StartStoryParams {
 
 class StoryIntegrationManager {
   private activeStory: ActiveStory | null;
-  private config: ServiceConfig;
   private storyGate = createRequestGate();
   private activeStoryTask: AbortableTask<StoryResult> | null = null;
 
   constructor() {
     this.activeStory = null;
-    this.config = loadServiceConfig();
   }
 
   /**

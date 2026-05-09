@@ -33,14 +33,6 @@ interface FigureMeta {
   primaryWorks?: string[];
 }
 
-interface ProcessedSeedData {
-  mode?: string;
-  targetSeed?: SeedData;
-  seedsOverview?: Array<{ title: string }>;
-  figureMeta?: FigureMeta;
-  [key: string]: any;
-}
-
 type WindowWithCache = Window & {
   seedsCache?: {
     [key: string]: {

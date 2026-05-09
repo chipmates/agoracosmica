@@ -48,7 +48,6 @@ const ParticleEffect: FC = () => {
 
   // Safari detection
   const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-  const isMobileSafari = isSafari && /iPad|iPhone|iPod/.test(navigator.userAgent);
 
   // Respect prefers-reduced-motion (reactive to OS setting changes)
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(
@@ -87,7 +86,6 @@ const ParticleEffect: FC = () => {
 
     let animationFrameId: number;
     let isVisible = !document.hidden; // Track tab visibility
-    let frameCount = 0;
 
     const resizeCanvas = () => {
       canvas.width = window.innerWidth;

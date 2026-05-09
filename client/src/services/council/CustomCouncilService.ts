@@ -720,7 +720,7 @@ export class CustomCouncilService {
    * 🚀 SMART TTS BUFFERING - Core buffer management with cost optimization
    * Maintains rolling 7-segment window, reducing typical costs by 85%
    */
-  private async _maintainSmartTTSBuffer(segment: ExtendedSegment, currentPlaybackIndex: number): Promise<string> {
+  private async _maintainSmartTTSBuffer(_segment: ExtendedSegment, currentPlaybackIndex: number): Promise<string> {
     if (!this.progressiveState) return '+0';
     
     // Initialize buffer if needed
@@ -912,8 +912,7 @@ export class CustomCouncilService {
       
       // Import TTS function and services
       const { convertTextToSpeech } = await import('../audio/tts');
-      const { TTS_SERVICES } = await import('../audio/config/serviceConfig');
-      
+
       // Get user's TTS settings from configuration
       const ttsSettings = this.mainService._getUserTTSSettings();
       const ttsService = ttsSettings.provider;
@@ -1165,7 +1164,7 @@ export class CustomCouncilService {
     text: string,
     fileBaseName: string,
     voice: string,
-    ttsService: string,
+    _ttsService: string,
     speed: number,
     language: string = 'en',
     sessionId?: string

@@ -52,7 +52,6 @@ const ConstellationMap: FC<ConstellationMapProps> = ({
   revelationStage,
   lineSegments,
   constellation,
-  boundingBox,
   seeds,
   seedPositions,
   seedLevels,
@@ -60,7 +59,7 @@ const ConstellationMap: FC<ConstellationMapProps> = ({
   onSeedClick
 }) => {
   // Add state to track mobile status for responsive adjustments
-  const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth <= 768);
+  const [, setIsMobile] = useState<boolean>(window.innerWidth <= 768);
   
   // Find the next seed with no progress (level 0) — the suggested "start here" seed
   const findNextSeed = (): Seed | null => {

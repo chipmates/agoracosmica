@@ -13,13 +13,10 @@ import {
   Lightning,
   Meteor,
   Atom,
-  Microphone,
-  Cloud,
   ShieldCheck,
   Info,
   Compass,
   Globe,
-  Eye,
   Bird,
   Sun,
   Fire
@@ -143,11 +140,10 @@ const PREVIEW_BASE_URL = 'https://media.agoracosmica.org/voice-previews';
 const VoicePanel: FC<VoicePanelProps> = ({
   SettingCard,
   CATEGORY_ICONS,
-  OptionButtons,
   config,
   onChange
 }) => {
-  const { t, tString, tNode } = useTranslation();
+  const { tString, tNode } = useTranslation();
   const [previewingVoice, setPreviewingVoice] = useState<string | null>(null);
   const [previewAudio, setPreviewAudio] = useState<HTMLAudioElement | null>(null);
 
@@ -545,7 +541,6 @@ const CosmicVoiceCard: FC<CosmicVoiceCardProps> = ({
   onSelect,
   showPreview = true
 }) => {
-  const isMobile = isMobileOrTablet();
   const { tNode } = useTranslation();
 
   return (

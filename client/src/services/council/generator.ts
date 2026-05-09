@@ -22,11 +22,6 @@ import { councilLog, councilWarn, councilError } from './logger';
 import { cleanCouncilTextForTts } from '../../utils/ttsTextCleaner';
 import { screenContent } from '../../utils/contentSafety';
 
-// Council voice mapping type
-interface VoiceMapping {
-  [figureId: string]: string;
-}
-
 // ─── Voice profile fetch — module-level cache + language-aware ─────────────
 //
 // Audit Change #14: parallel voice-profile fetches via Promise.all + module-
@@ -218,23 +213,12 @@ export interface PartialSegment {
   id?: number;
 }
 
-interface ParticipantData {
-  id: string;
-  name: string;
-  displayName: string;
-  gender: 'male' | 'female' | 'unknown';
-  profile?: VoiceProfile;
-  isModerator: boolean;
-  characteristics?: string[];
-}
-
 class CustomCouncilGenerator {
   private debugMode: boolean;
   private validationErrors: string[];
   private generationLog: LogEntry[];
   private onProgressiveSegment: ((segment: Segment | PartialSegment) => void) | null;
   private streamStartTime?: number;
-  private lastChunkTime?: number;
   private signal?: AbortSignal;
 
   constructor() {
@@ -460,7 +444,7 @@ class CustomCouncilGenerator {
     
     // Format voice profiles
     const profileTexts: string[] = [];
-    for (const [id, profile] of Object.entries(voiceProfiles)) {
+    for (const [, profile] of Object.entries(voiceProfiles)) {
       if (profile.essence) {
         // Full profile available
         profileTexts.push(this.formatVoiceProfile(profile));
@@ -579,7 +563,6 @@ Begin the council now. Remember to use the EXACT format specified in your instru
     
     // Track streaming start time
     this.streamStartTime = Date.now();
-    this.lastChunkTime = 0;
     const originalSelectedFigure = useDomainStore.getState().figures.selectedId;
     const originalSelectedSeedId = useDomainStore.getState().seeds.selectedId;
     const originalSeedData = originalSelectedFigure && originalSelectedSeedId

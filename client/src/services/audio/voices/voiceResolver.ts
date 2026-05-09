@@ -63,7 +63,7 @@ function resolveVoiceLanguage(langHint?: string): 'german' | 'english' {
  */
 export function getVoiceForNormalMode(
   figureName: string,
-  ttsEngine: 'openai' | 'kokoro' | string = 'kokoro',
+  _ttsEngine: 'openai' | 'kokoro' | string = 'kokoro',
   councilMapping?: VoiceMapping | null,
   language?: string
 ): string {
@@ -143,7 +143,7 @@ export function isUsingDefaultVoice(figureId: string, language?: string): boolea
  */
 export function getVoicesForCouncil(
   participants: string[],
-  ttsEngine: 'openai' | 'kokoro' | string = 'kokoro',
+  _ttsEngine: 'openai' | 'kokoro' | string = 'kokoro',
   language?: string
 ): VoiceMapping {
   const voiceLang = resolveVoiceLanguage(language);

@@ -176,9 +176,9 @@ export const processSeedConversationData = (
  * @returns {ProcessedFreeConversationData} - Processed data structured for free conversation mode
  */
 export const processFreeConversationData = (
-  allSeeds: Seed[] = [], 
-  figureMeta: FigureMetadata | null = null, 
-  language: Language | string = 'en'
+  allSeeds: Seed[] = [],
+  figureMeta: FigureMetadata | null = null,
+  _language: Language | string = 'en'
 ): ProcessedFreeConversationData => {
   try {
     // Handle minimal or missing allSeeds

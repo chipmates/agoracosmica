@@ -51,7 +51,6 @@ const TYPE_LABELS: Record<string, string> = {
 const PrismPreviewCard: FC<PrismPreviewCardProps> = ({
   seedTitle,
   seedQuote,
-  hostName,
   hostFigureId,
   connections,
   totalDuration,

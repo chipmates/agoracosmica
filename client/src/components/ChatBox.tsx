@@ -37,11 +37,9 @@ const ChatBox: FC<ChatBoxProps> = ({
   messages,
   selectedFigureName,
   isLoading = false,
-  firstTextArrived = false,
   isReviewMode = false,
-  isAudioPlaying = false
 }) => {
-  const { t, tString, tNode } = useTranslation();
+  const { tString, tNode } = useTranslation();
   const chatBoxRef = useRef<HTMLDivElement>(null);
   const [showVoiceHelper, setShowVoiceHelper] = useState<boolean>(false);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);

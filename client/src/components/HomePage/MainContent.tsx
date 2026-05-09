@@ -119,7 +119,6 @@ const MainContent: FC<MainContentProps> = ({
   isReviewMode,
   isAudioPlaying,
   storyData,
-  config,
   cosmicCouncilService,
   
   // Translations

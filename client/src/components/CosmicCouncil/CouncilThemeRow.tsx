@@ -13,8 +13,8 @@ interface CouncilThemeRowProps {
 const CouncilThemeRow: FC<CouncilThemeRowProps> = ({ theme, councils, onSelect }) => {
   const { tString } = useTranslation();
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(false);
+  const [, setCanScrollLeft] = useState(false);
+  const [, setCanScrollRight] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
 
   // Cache layout measurements — only recalculated on resize, not on scroll

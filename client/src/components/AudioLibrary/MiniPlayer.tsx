@@ -39,7 +39,7 @@ interface MiniPlayerProps {
 }
 
 const MiniPlayer: FC<MiniPlayerProps> = ({ story, figure, onExpand, audioService }) => {
-  const { t, tString } = useTranslation();
+  const { tString } = useTranslation();
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentStory, setCurrentStory] = useState<Story | undefined>(story);

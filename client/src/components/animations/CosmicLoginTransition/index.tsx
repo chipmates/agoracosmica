@@ -42,13 +42,12 @@ const CosmicLoginTransition: FC<CosmicLoginTransitionProps> = ({
 }) => {
   const [formVisible, setFormVisible] = useState(true);
   const [successVisible, setSuccessVisible] = useState(false);
-  const [portalVisible, setPortalVisible] = useState(false);
+  const [portalVisible] = useState(false);
   const [beamsActive, setBeamsActive] = useState(false);
-  const [figurePositions, setFigurePositions] = useState<FigurePosition[]>([]);
+  const [, setFigurePositions] = useState<FigurePosition[]>([]);
   const [completedBeams, setCompletedBeams] = useState(0);
-  
+
   const transitionRef = useRef<HTMLDivElement>(null);
-  const portalRef = useRef<HTMLDivElement>(null);
   
   // Initialize figure positions and portal center
   useEffect(() => {
@@ -154,7 +153,7 @@ const CosmicLoginTransition: FC<CosmicLoginTransitionProps> = ({
   
   
   // Handle beam completion
-  const handleBeamComplete = (index: number): void => {
+  const handleBeamComplete = (_index: number): void => {
     setCompletedBeams(prev => prev + 1);
   };
   
@@ -359,7 +358,7 @@ const CosmicLoginTransition: FC<CosmicLoginTransitionProps> = ({
   };
 
   // Handle click to skip animation
-  const handleSkipAnimation = (e: MouseEvent<HTMLDivElement>): void => {
+  const handleSkipAnimation = (_e: MouseEvent<HTMLDivElement>): void => {
     if (onAnimationComplete) {
       // Clean up any overlay elements before redirecting
       const cleanupOverlays = (): void => {

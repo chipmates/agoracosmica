@@ -184,7 +184,7 @@ const safeRevokeUrl = (url: string): void => {
  * @param audioFile - Audio file to estimate
  * @returns Estimated size in bytes
  */
-const estimateAudioSize = (audioFile: AudioFile): number => {
+const estimateAudioSize = (_audioFile: AudioFile): number => {
   // Rough estimate: MP3 @ 128kbps = ~16KB per second
   // Assuming average chunk is ~5 seconds of audio
   // This is conservative - actual size varies

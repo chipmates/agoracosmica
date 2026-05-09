@@ -51,7 +51,6 @@ interface SpeechPanelProps {
 const SpeechPanel: FC<SpeechPanelProps> = ({
   SettingCard,
   CATEGORY_ICONS,
-  OptionButtons,
   config,
   onChange
 }) => {

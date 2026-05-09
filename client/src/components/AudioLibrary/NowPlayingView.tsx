@@ -54,7 +54,7 @@ const NowPlayingView: FC<NowPlayingViewProps> = ({ story, figure, audioService, 
   const [currentTime, setCurrentTime] = useState('0:00');
   const [duration, setDuration] = useState('0:00');
   const [playbackRate, setPlaybackRate] = useState(1.0);
-  const { t, tString, tNode } = useTranslation();
+  const { tString, tNode } = useTranslation();
   const { glassClasses } = useLiquidGlass('audio');
   
   // Helper function to get figure display name with proper Echo translation

@@ -64,7 +64,7 @@ const bootstrapPreferences = (): PreferencesState => {
 
 export const createPreferencesSlice = (
   set: any,
-  get: any
+  _get: any
 ): PreferencesSlice => {
   // Bootstrap from localStorage ONCE on init
   const initial = bootstrapPreferences();
@@ -78,24 +78,24 @@ export const createPreferencesSlice = (
 
     // Onboarding actions (persist middleware handles storage automatically)
     setOnboardingStatus: (status: OnboardingStatus) => {
-      set((state: any) => ({
+      set(() => ({
         onboarding: status
       }));
     },
 
     completeOnboarding: () => {
       const status: OnboardingStatus = { complete: true, skipped: false, forceShow: false };
-      set((state: any) => ({ onboarding: status }));
+      set(() => ({ onboarding: status }));
     },
 
     skipOnboarding: () => {
       const status: OnboardingStatus = { complete: false, skipped: true, forceShow: false };
-      set((state: any) => ({ onboarding: status }));
+      set(() => ({ onboarding: status }));
     },
 
     resetOnboarding: () => {
       const status: OnboardingStatus = { complete: false, skipped: false, forceShow: false };
-      set((state: any) => ({ onboarding: status }));
+      set(() => ({ onboarding: status }));
     },
 
     setForceOnboarding: (value: boolean) => {
@@ -106,7 +106,7 @@ export const createPreferencesSlice = (
 
     // First visit tracking (persist middleware handles storage automatically)
     markVisited: () => {
-      set((state: any) => ({ hasVisitedBefore: true }));
+      set(() => ({ hasVisitedBefore: true }));
       // Sync to localStorage so figureAdapter.ts and other direct readers see it
       preferencesAdapter.markVisited();
     },
@@ -136,7 +136,7 @@ export const createPreferencesSlice = (
 
     // Service config actions (persist middleware handles storage automatically)
     setServiceConfig: (config: { raw: string | null; parsed: Record<string, any> | null }) => {
-      set((state: any) => ({ serviceConfig: config }));
+      set(() => ({ serviceConfig: config }));
     },
   };
 };

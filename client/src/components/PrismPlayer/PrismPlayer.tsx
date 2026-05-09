@@ -16,7 +16,6 @@ import { useDomainStore } from '../../stores/domainStore';
 import { loadServiceConfig } from '../../services/audio/config/serviceConfig';
 import prismService, {
   type PrismData,
-  type PrismSegmentWithOffset,
   type PrismTimestamps,
 } from '../../services/prism/PrismService';
 import councilPlayerService from '../../services/council/CouncilPlayerService';
@@ -97,7 +96,6 @@ export function PrismPlayer({ figure, seed, councilId, councilLevel = 1, languag
     togglePlay,
     seek,
     changePlaybackRate,
-    audioRef,
   } = useAudio(prismData?.audioUrl ?? null, {
     onPlaybackComplete: handlePlaybackComplete,
     initialPlaybackRate: loadServiceConfig().ttsSettings.speed,

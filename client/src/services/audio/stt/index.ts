@@ -53,7 +53,7 @@ const sleep = (ms: number): Promise<void> => new Promise(resolve => setTimeout(r
 
 export const transcribeAudio = async (
   audioBlob: Blob,
-  service: string = STT_SERVICES.SELF_HOSTED,
+  _service: string = STT_SERVICES.SELF_HOSTED,
   language: string = 'en'
 ): Promise<TranscriptionResponse> => {
   if (isCircuitOpen()) {

@@ -13,7 +13,7 @@ type ValidationStatus = 'idle' | 'testing' | 'valid' | 'invalid';
 
 const BYOKSetupModal: FC = () => {
   const { tString } = useTranslation();
-  const { isOpen, triggerEndpoint } = useDomainStore((s) => s.byokModal);
+  const { isOpen } = useDomainStore((s) => s.byokModal);
   const closeByokModal = useDomainStore((s) => s.closeByokModal);
 
   const [step, setStep] = useState<WizardStep>(0);

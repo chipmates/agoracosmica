@@ -80,9 +80,6 @@ export async function pausePlayback(audioControls: AudioControl | null, progress
   if (!audioControls) return currentState;
   
   try {
-    // First, update state immediately for responsive UI
-    const wasPlaying = currentState.isPlaying;
-    
     // Stop progress tracking early
     progressTracking.stop();
     
@@ -118,9 +115,6 @@ export async function resumePlayback(audioControls: AudioControl | null, progres
   if (!audioControls) return currentState;
   
   try {
-    // First, update state immediately for responsive UI
-    const wasPlaying = currentState.isPlaying;
-    
     // Start progress tracking early
     progressTracking.start();
     

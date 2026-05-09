@@ -9,7 +9,7 @@ import { generateResponse } from '../services/audio/llm';
 import { convertTextToSpeech } from '../services/audio/tts';
 import { getOrRollConversationSessionId, touchConversationSession } from '../services/audio/tts/ttsSessions';
 import { TTSScheduler } from '../services/audio/ttsScheduler';
-import type { TTSJob, TTSResult } from '../services/audio/ttsScheduler';
+import type { TTSResult } from '../services/audio/ttsScheduler';
 import { addToAudioQueue, setCurrentSession, cleanupAudioResources, getBufferDurationSeconds } from '../services/audio/audioQueueManager';
 import { ConversationMode, type Message, type Seed } from '../types/global';
 import { initialMessageService } from '../services/audio/initialMessageService';

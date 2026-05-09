@@ -38,7 +38,7 @@ const CosmicCouncilLoader: FC<CosmicCouncilLoaderProps> = ({
   stage = 'generating',
   onSwitchToText,
 }) => {
-  const { t, tString, tNode } = useTranslation();
+  const { tString, tNode } = useTranslation();
   const { glassClasses } = useLiquidGlass('audio');
 
   // Legacy quote pool — used when capacity is 'normal'. Keeps the original council tone.

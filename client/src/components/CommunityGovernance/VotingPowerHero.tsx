@@ -26,7 +26,6 @@ const STAR_VISIBLE_CAP = 12;
 const COUNT_UP_MS = 800;
 
 export const VotingPowerHero: FC<VotingPowerHeroProps> = ({
-  base,
   earned,
   total,
   totalFigures: _totalFigures,

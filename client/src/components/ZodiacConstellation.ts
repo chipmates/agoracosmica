@@ -1051,7 +1051,6 @@ export function calculateConstellationPaths(
     return [];
   }
   
-  const { width: containerW, height: containerH } = containerDimensions;
   const { xMin, yMin, scale, offsetX, offsetY } = boundingBox;
 
   // Helper: pattern coords -> absolute pixel

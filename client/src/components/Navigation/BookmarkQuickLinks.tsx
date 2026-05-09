@@ -57,7 +57,7 @@ export const BookmarkQuickLinks: FC<BookmarkQuickLinksProps> = ({
   isVisible = true,
   className = ''
 }) => {
-  const { t, tString } = useTranslation();
+  const { tString } = useTranslation();
   const [hoveredBookmark, setHoveredBookmark] = useState<string | null>(null);
   const isMobile = window.innerWidth <= 767;
   const iconSize = isMobile ? 14 : 16;

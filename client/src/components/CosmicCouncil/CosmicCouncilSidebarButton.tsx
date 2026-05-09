@@ -31,16 +31,15 @@ interface CosmicCouncilSidebarButtonProps {
  * Replaces the floating button in the new navigation system
  * Opens the council setup modal, then triggers council start
  */
-export const CosmicCouncilSidebarButton: FC<CosmicCouncilSidebarButtonProps> = ({ 
-  selectedFigure,
+export const CosmicCouncilSidebarButton: FC<CosmicCouncilSidebarButtonProps> = ({
   onCouncilStart,
   isHovered,
   onMouseMove,
   onMouseLeave,
   buttonRef,
-  onButtonClick 
+  onButtonClick
 }) => {
-  const { t, tString } = useTranslation();
+  const { tString } = useTranslation();
   // Modal-open state lives in uiStore so handleCouncilEnd in HomePage can
   // re-open the catalog after the council ends (returns user to council page,
   // not main page).

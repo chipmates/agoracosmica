@@ -104,7 +104,7 @@ class StoryService {
     figure: string,
     seedId: string | number,
     language: Language | string,
-    seedData: Seed | null = null,
+    _seedData: Seed | null = null,
     options: { signal?: AbortSignal } = {}
   ): Promise<StoryData> {
     const { signal } = options;

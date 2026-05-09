@@ -24,7 +24,6 @@ interface StoryAudioPlayerProps {
 
 const StoryAudioPlayer: FC<StoryAudioPlayerProps> = ({
   audioUrl,
-  isPrerecorded = true,
   onPlaybackComplete,
   onError,
   triggerPlayHighlight = false,

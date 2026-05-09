@@ -10,12 +10,6 @@ import './CosmicCouncilHeader.css';
 type CouncilType = 'debate' | 'advisory';
 type PhaseId = 'foundations' | 'confrontation' | 'resolution' | 'understanding' | 'guidance' | 'integration' | 'inquiry';
 
-interface Phase {
-  id: PhaseId;
-  label: string;
-  step: number;
-}
-
 interface Figure {
   id: string;
   name?: string;
@@ -61,26 +55,6 @@ const normalizeSpeakerId = (speakerId: Speaker): string | null => {
   return null;
 };
 
-// Council phases for different modes
-const DEBATE_PHASES: Phase[] = [
-  { id: 'foundations', label: 'Foundations', step: 1 },
-  { id: 'confrontation', label: 'Confrontation', step: 2 },
-  { id: 'resolution', label: 'Resolution', step: 3 }
-];
-
-const ADVISORY_PHASES: Phase[] = [
-  { id: 'understanding', label: 'Understanding', step: 1 },
-  { id: 'guidance', label: 'Guidance', step: 2 },
-  { id: 'integration', label: 'Integration', step: 3 }
-];
-
-// Fallback phases (maintains compatibility with existing system)
-const LEGACY_PHASES: Phase[] = [
-  { id: 'foundations', label: 'Foundations', step: 1 },
-  { id: 'inquiry', label: 'Inquiry', step: 2 },
-  { id: 'integration', label: 'Integration', step: 3 }
-];
-
 const ParticipantAvatar: FC<ParticipantAvatarProps> = ({ figure, isSpeaking, isActive }) => {
   const { tString } = useTranslation();
   const figureId = typeof figure === 'string' ? figure : figure?.id;
@@ -114,14 +88,10 @@ const CosmicCouncilHeader: FC<CosmicCouncilHeaderProps> = ({
   moderator,
   participants = [],
   currentSpeaker = null,
-  currentPhase = 'foundations',
-  councilTitle = 'Cosmic Council',
-  councilType = 'debate', // NEW: 'debate' or 'advisory'
-  isActive = true,
   isCompleted = false, // NEW: Track if debate has completed naturally
   onEndCouncil
 }) => {
-  const { t, tString, tNode } = useTranslation();
+  const { tString, tNode } = useTranslation();
   const [isVisible, setIsVisible] = useState(false);
 
 
@@ -137,17 +107,6 @@ const CosmicCouncilHeader: FC<CosmicCouncilHeaderProps> = ({
     }
   };
 
-  // Get the appropriate phase array based on council type
-  const getPhaseArray = (): Phase[] => {
-    if (councilType === 'advisory') return ADVISORY_PHASES;
-    if (councilType === 'debate') return DEBATE_PHASES;
-    return LEGACY_PHASES; // Fallback for compatibility
-  };
-
-  const currentPhaseArray = getPhaseArray();
-  const currentPhaseData = currentPhaseArray.find(p => p.id === currentPhase);
-  const currentPhaseLabel = currentPhaseData?.label || 'Opening';
-  const currentPhaseStep = currentPhaseData?.step || 1;
 
   return (
     <div className={`cosmic-council-header ${isVisible ? 'visible' : ''}`}>

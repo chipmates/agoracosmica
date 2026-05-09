@@ -61,15 +61,12 @@ interface TouchPoint {
   y: number;
 }
 
-const Sidebar: FC<SidebarProps> = ({ 
-  selectedFigure, 
-  onSelectFigure, 
-  onOpenHistoryModal,
-  onLogout, 
-  onSelectSeed,
+const Sidebar: FC<SidebarProps> = ({
+  selectedFigure,
+  onSelectFigure,
+  onLogout,
   isOpen,
   onClose,
-  onOpenModeSelector,
   hideOnDesktop = false,
   isCouncilMode = false,
   councilConfig = null,
@@ -85,7 +82,6 @@ const Sidebar: FC<SidebarProps> = ({
   const [isMobileOrTablet, setIsMobileOrTablet] = useState<boolean>(window.innerWidth < 1024);
   const [showFigurePreview, setShowFigurePreview] = useState<boolean>(false);
   const [previewFigures, setPreviewFigures] = useState<Figure[]>([]);
-  const [hasTaskbar, setHasTaskbar] = useState<boolean>(false);
   const [isPageVisible, setIsPageVisible] = useState<boolean>(!document.hidden);
   const [transitionEnabled, setTransitionEnabled] = useState<boolean>(false);
   
@@ -189,8 +185,8 @@ const Sidebar: FC<SidebarProps> = ({
       
       // Taskbar typically takes 40-100px depending on OS and settings
       const hasVisibleTaskbar = heightDifference > 50;
-      setHasTaskbar(hasVisibleTaskbar);
-      
+
+
       // Update CSS variable for dynamic calculations
       const taskbarHeight = hasVisibleTaskbar ? Math.min(heightDifference, 100) : 0;
       document.documentElement.style.setProperty('--taskbar-height', `${taskbarHeight}px`);

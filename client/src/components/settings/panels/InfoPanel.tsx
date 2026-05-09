@@ -13,7 +13,7 @@ import { useTranslation } from '../../../hooks/useTranslation';
 import styles from '../../SettingsModal.module.css';
 
 const InfoPanel: FC = () => {
-  const { t, tNode, tArray, tString } = useTranslation();
+  const { tNode, tArray, tString } = useTranslation();
   
   return (
     <div className={styles.tabPanel}>

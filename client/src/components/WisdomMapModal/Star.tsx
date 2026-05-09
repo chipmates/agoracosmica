@@ -65,7 +65,6 @@ const Star: FC<StarProps> = ({
 
       // Viewport boundaries
       const viewportWidth = window.innerWidth;
-      const viewportHeight = window.innerHeight;
 
       // Calculate initial position (centered above)
       let x = rect.left + rect.width / 2;
@@ -75,7 +74,6 @@ const Star: FC<StarProps> = ({
 
       // Check vertical bounds - if tooltip would go off top OR overlap with header, place it below
       const spaceAbove = rect.top - headerHeight;
-      const spaceBelow = viewportHeight - rect.bottom;
 
       if (spaceAbove < tooltipHeight + gap || rect.top - tooltipHeight - gap < headerHeight) {
         // Not enough space above or would overlap header - place below

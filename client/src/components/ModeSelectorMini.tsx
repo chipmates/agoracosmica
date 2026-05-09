@@ -34,7 +34,7 @@ const ModeSelectorMini: FC<ModeSelectorMiniProps> = ({
   selectedFigure,
   selectedSeed
 }) => {
-  const { t, tString, tNode } = useTranslation();
+  const { tString } = useTranslation();
 
   // Track window width for responsive icon sizes
   const [windowWidth, setWindowWidth] = useState<number>(window.innerWidth);

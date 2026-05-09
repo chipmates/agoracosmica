@@ -34,7 +34,7 @@ export const MicrophonePermissionError: FC<MicrophonePermissionErrorProps> = ({
   onDismiss,
   onRetry
 }) => {
-  const { t, tString } = useTranslation();
+  const { tString } = useTranslation();
 
   const getErrorMessage = (): { title: string; message: string; canRetry: boolean } => {
     switch (errorType) {

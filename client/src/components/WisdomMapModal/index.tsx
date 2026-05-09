@@ -178,7 +178,7 @@ const WisdomMapModal: FC<WisdomMapModalProps> = ({
   // Access language and selected seed from Zustand store
   const language = useDomainStore((state) => state.language.current);
   const appSelectedSeedId = useDomainStore((state) => state.seeds.selectedId);
-  const { t, tString, tNode, tArray } = useTranslation();
+  const { tString, tNode, tArray } = useTranslation();
   const { isMobile } = useResponsive();
 
   // Help preferences from Zustand

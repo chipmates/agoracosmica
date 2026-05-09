@@ -44,8 +44,6 @@ export function useHelperFunctions({
   handleOnboardingClose,
   handleWisdomGalleryOpen,
   handleWisdomGalleryCloseComplete,
-  handleModeSelectorOpen,
-  handleModeSelect,
   handleFigureCarouselOpen,
   handleSelectFigure
 }: HelperFunctionsParams): HelperFunctionsResult {

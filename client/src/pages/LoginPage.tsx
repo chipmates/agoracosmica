@@ -35,8 +35,8 @@ const LoginPage: FC<LoginPageProps> = ({ onComplete }) => {
   const [isFormVisible, setIsFormVisible] = useState<boolean>(false);
   const [isLandscape, setIsLandscape] = useState<boolean>(false);
   const [showPopup, setShowPopup] = useState<boolean>(false);
-  const [popupMessage, setPopupMessage] = useState<string>('');
-  const [popupType, setPopupType] = useState<PopupType>('');
+  const [popupMessage] = useState<string>('');
+  const [popupType] = useState<PopupType>('');
   const [loginSuccessful, setLoginSuccessful] = useState<boolean>(false);
   const [showLegalMenu, setShowLegalMenu] = useState<boolean>(false);
   // React-managed overlays — replaces imperative document.createElement approach
@@ -46,7 +46,7 @@ const LoginPage: FC<LoginPageProps> = ({ onComplete }) => {
   const [figureIndices, setFigureIndices] = useState<number[]>([]);
   const [portalAnimActive, setPortalAnimActive] = useState(false);
 
-  const { t, tString, tNode } = useTranslation();
+  const { tString, tNode } = useTranslation();
 
   const audioRef = useRef<HTMLAudioElement>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -256,12 +256,6 @@ const LoginPage: FC<LoginPageProps> = ({ onComplete }) => {
       }
       revealForm();
     }
-  };
-
-  const showPopupMessage = (message: string, type: PopupType) => {
-    setPopupMessage(message);
-    setPopupType(type);
-    setShowPopup(true);
   };
 
   const closePopup = () => {

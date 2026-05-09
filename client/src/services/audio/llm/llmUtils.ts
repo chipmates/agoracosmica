@@ -14,13 +14,6 @@ import type { Message, LLMResponse } from './index';
 // Type Definitions
 // ============================================
 
-interface LanguageGroup {
-  ids: string[];
-  avgWordLength: number;
-  avgSentenceLength?: number;
-  initialTokens: number;
-}
-
 interface ChunkParams {
   minWords: number;
   minChars: number;

@@ -6,7 +6,7 @@ import { useTranslation } from '../hooks/useTranslation';
 
 const DatenschutzPage: FC = () => {
   const navigate = useNavigate();
-  const { t, tNode } = useTranslation();
+  const { tNode } = useTranslation();
 
   const handleClose = () => {
     if (window.history.length > 1) {

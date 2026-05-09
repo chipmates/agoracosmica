@@ -13,8 +13,6 @@ const ONBOARDING_COMPLETE_KEY = 'onboardingComplete';
 const ONBOARDING_SKIPPED_KEY = 'onboardingSkipped';
 const HAS_VISITED_BEFORE_KEY = 'hasVisitedBefore';
 const FORCE_ONBOARDING_KEY = 'forceOnboarding';
-const USER_NAME_KEY = 'userName';
-const USER_EMAIL_KEY = 'userEmail';
 const VOICE_PREFERENCES_KEY = 'voicePreferences';
 
 export interface StoredSeed<T = unknown> {

@@ -137,10 +137,6 @@ function buildPrismTimestampPath(
   return `prisms/${figure}/seed-${seed}/audio/seg-${paddedIndex}-${figureId}-${lang}.timestamps.json`;
 }
 
-function buildPrismMetadataPath(figure: string, seed: number): string {
-  return `prisms/${figure}/seed-${seed}/metadata.json`;
-}
-
 // --- Service ---
 
 class PrismService {

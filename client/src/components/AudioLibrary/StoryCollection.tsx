@@ -75,12 +75,12 @@ const markStoryAsPlayed = (storyId: string): void => {
 };
 
 const StoryCollection: FC<StoryCollectionProps> = ({ figure, currentStory, onPlayStory }) => {
-  const { t, tString, tNode } = useTranslation();
+  const { tString, tNode } = useTranslation();
   const language = useDomainStore((state) => state.language.current);
   const { getTranslatedSeedTitle } = useSeedTranslation();
   const [stories, setStories] = useState<Story[]>([]);
   const [loading, setLoading] = useState(true);
-  const [playedStories, setPlayedStories] = useState<Record<string, PlayedStory>>({});
+  const [, setPlayedStories] = useState<Record<string, PlayedStory>>({});
   const [hoveredStory, setHoveredStory] = useState<string | null>(null);
   const [showFactCheck, setShowFactCheck] = useState(false);
 
@@ -119,17 +119,6 @@ const StoryCollection: FC<StoryCollectionProps> = ({ figure, currentStory, onPla
     
     // Return with translated Echo prefix
     return tString('figures.echoOfName', `Echo of ${baseName}`).replace('{name}', baseName);
-  };
-  
-  // Get just the figure's last name for compact display
-  const getFigureLastName = (fullName?: string): string => {
-    if (!fullName) return '';
-    const baseName = fullName
-      .replace(/^Echo of /i, '')
-      .replace(/^Echo von /i, '')
-      .replace(/^Echo de /i, '')
-      .trim();
-    return baseName.split(' ').pop() || '';
   };
   
   // Load played stories on mount
@@ -245,9 +234,7 @@ const StoryCollection: FC<StoryCollectionProps> = ({ figure, currentStory, onPla
     );
   }
 
-  const hasAudioSupport = AUDIO_SUPPORTED_LANGUAGES.includes(language);
   const isCurrentlyPlaying = (storyId: string): boolean => currentStory?.id === storyId;
-  const isPlayed = (storyId: string): boolean => Boolean(playedStories[storyId]);
 
   return (
     <div className="story-collection">
@@ -288,7 +275,6 @@ const StoryCollection: FC<StoryCollectionProps> = ({ figure, currentStory, onPla
       <div className="story-collection__list">
         {stories.map((story, index) => {
           const isPlaying = isCurrentlyPlaying(story.id);
-          const hasBeenPlayed = isPlayed(story.id);
           const isHovered = hoveredStory === story.id;
           const canPlay = story.hasAudio;
           const isForeword = story.type === 'foreword';

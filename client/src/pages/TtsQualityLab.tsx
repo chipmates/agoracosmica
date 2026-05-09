@@ -222,8 +222,6 @@ async function playSequence(
 
 const langLabel = (l: Lang): 'English' | 'German' => l === 'en' ? 'English' : 'German';
 
-const sumRenderMs = (chunks: RenderedChunk[]) => chunks.reduce((s, c) => s + c.renderMs, 0);
-
 const chunkSizeStr = (chunks: RenderedChunk[]) => chunks.map(c => c.text.length).join(', ');
 
 const countWords = (text: string): number =>
@@ -256,66 +254,6 @@ async function measureAudioDuration(url: string): Promise<number> {
     setTimeout(() => { cleanup(); resolve(0); }, 5000); // safety timeout
     audio.src = url;
   });
-}
-
-/**
- * Decode a compressed audio blob to PCM, append `silenceMs` of zero samples
- * at the end, re-encode as WAV. WAV stores sample count explicitly in the
- * header so the browser plays every sample — no encoder-padding clip on
- * `<audio>` element 'ended'. Use this to fix the "last word cut" problem
- * inherent to Opus/MP3 + HTMLAudioElement playback.
- */
-async function appendSilenceAsWav(blob: Blob, silenceMs: number): Promise<Blob> {
-  const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-  if (!AudioCtx) throw new Error('AudioContext unavailable');
-  const ctx = new AudioCtx();
-  try {
-    const arrayBuffer = await blob.arrayBuffer();
-    // decodeAudioData copies the buffer; safe to reuse arrayBuffer afterwards
-    const decoded = await ctx.decodeAudioData(arrayBuffer.slice(0));
-    const sampleRate = decoded.sampleRate;
-    const channels = decoded.numberOfChannels;
-    const silenceSamples = Math.max(0, Math.floor((sampleRate * silenceMs) / 1000));
-    const newLength = decoded.length + silenceSamples;
-
-    // Build interleaved PCM16 directly to skip an intermediate AudioBuffer alloc.
-    const dataBytes = newLength * channels * 2;
-    const wav = new ArrayBuffer(44 + dataBytes);
-    const view = new DataView(wav);
-    let pos = 0;
-    const ws = (s: string) => { for (let i = 0; i < s.length; i++) view.setUint8(pos++, s.charCodeAt(i)); };
-
-    ws('RIFF');
-    view.setUint32(pos, 36 + dataBytes, true); pos += 4;
-    ws('WAVE');
-    ws('fmt ');
-    view.setUint32(pos, 16, true); pos += 4;          // subchunk1Size
-    view.setUint16(pos, 1, true); pos += 2;            // PCM
-    view.setUint16(pos, channels, true); pos += 2;
-    view.setUint32(pos, sampleRate, true); pos += 4;
-    view.setUint32(pos, sampleRate * channels * 2, true); pos += 4; // byteRate
-    view.setUint16(pos, channels * 2, true); pos += 2; // blockAlign
-    view.setUint16(pos, 16, true); pos += 2;           // bitsPerSample
-    ws('data');
-    view.setUint32(pos, dataBytes, true); pos += 4;
-
-    // Pull channels once, then interleave + clamp + scale to int16 in one pass
-    const chData: Float32Array[] = [];
-    for (let c = 0; c < channels; c++) chData.push(decoded.getChannelData(c));
-    for (let i = 0; i < decoded.length; i++) {
-      for (let c = 0; c < channels; c++) {
-        const s = Math.max(-1, Math.min(1, chData[c][i]));
-        view.setInt16(pos, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
-        pos += 2;
-      }
-    }
-    // Trailing silence — int16 zeros, just advance pos (already zero-initialised)
-    pos += silenceSamples * channels * 2;
-
-    return new Blob([wav], { type: 'audio/wav' });
-  } finally {
-    if (ctx.close) await ctx.close().catch(() => { /* noop */ });
-  }
 }
 
 /** Engine label colour-coded for the variant card. */

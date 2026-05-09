@@ -105,7 +105,7 @@ function flushGroupedWarnings(): void {
   
   console.groupCollapsed(`🛡️ Content Sanitization Summary (${SANITIZATION_LOG.groupedWarnings.size} unique patterns)`);
   
-  SANITIZATION_LOG.groupedWarnings.forEach((warning, hash) => {
+  SANITIZATION_LOG.groupedWarnings.forEach((warning, _hash) => {
     if (warning.count === 1) {
       console.warn(`${warning.profile}: Content sanitized`, {
         original: warning.original,

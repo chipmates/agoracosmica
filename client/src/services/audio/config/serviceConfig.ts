@@ -33,12 +33,6 @@ interface LLMServiceDefinition {
   displayNames: Record<string, string>;
 }
 
-interface AvailableServices {
-  tts: string[];
-  stt: string[];
-  llm: string[];
-}
-
 // ============================================
 // Constants
 // ============================================

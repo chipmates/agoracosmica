@@ -72,7 +72,6 @@ const ModalsContainer: FC<ModalsContainerProps> = ({
 
   // Wisdom Gallery props
   showWisdomGallery,
-  handleWisdomGalleryClose,
   handleWisdomGallerySelect,
   handleWisdomGalleryExploreAll,
 

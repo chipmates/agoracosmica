@@ -5,13 +5,7 @@ import useSeedTranslation from '../../hooks/useSeedTranslation';
 import { useHapticFeedback } from '../../hooks/useHapticFeedback';
 import { useUIStore } from '../../stores/uiStore';
 import SummaryService from '../../services/SummaryService';
-import {
-  STORAGE_KEYS,
-  getStoredStoryContent,
-  isStoryCompleted,
-  getStoredPrismContent,
-  isPrismCompleted
-} from '../../utils/storageKeysV2';
+import { STORAGE_KEYS } from '../../utils/storageKeysV2';
 import { createRequestGate } from '../../utils/async/requestGate';
 import { abortable, AbortableTask } from '../../utils/async/abortable';
 import { LocalStorageAdapter } from '../../storage/localAdapter';
@@ -29,7 +23,6 @@ export function useHistoryModalData({
   onSummaryGenerated,
   onHistoryCleared
 }: HistoryModalProps) {
-  const language = useDomainStore((state) => state.language.current);
   const { t, tString, tNode, tArray } = useTranslation();
   const { getTranslatedSeedTitle } = useSeedTranslation();
   const { triggerHaptic } = useHapticFeedback();

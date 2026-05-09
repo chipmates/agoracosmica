@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, FC, MouseEvent, KeyboardEvent 
 import { useSwipeable } from 'react-swipeable';
 import { getHistoricalFigures } from '../api/figures';
 import { CategoryTab, ActionButton } from './Button';
-import { BookOpen, Check, Sparkle, BookOpenText, Lightbulb, PaintBrush } from "@phosphor-icons/react";
+import { BookOpen, Check, Sparkle } from "@phosphor-icons/react";
 import OptimizedImage from './OptimizedImage';
 import { useTranslation } from '../hooks/useTranslation';
 import WisdomMapModal from './WisdomMapModal';
@@ -25,10 +25,6 @@ interface CategoryIDs {
   CREATORS: string;
 }
 
-interface CategoryIcons {
-  [key: string]: React.ElementType;
-}
-
 interface BaseFigureNames {
   [categoryId: string]: string[];
 }
@@ -44,12 +40,6 @@ const CATEGORY_IDS: CategoryIDs = {
   CREATORS: 'creators'
 };
 
-const CATEGORY_ICONS: CategoryIcons = {
-  sages: BookOpenText,
-  reformers: Lightbulb,
-  creators: PaintBrush
-};
-
 const FigureCarousel: FC<FigureCarouselProps> = ({
   isOpen,
   onClose,
@@ -57,7 +47,7 @@ const FigureCarousel: FC<FigureCarouselProps> = ({
   selectedFigure,
   setShowHamburgerMenu = () => {}
 }) => {
-  const { t, tString, tNode, language } = useTranslation();
+  const { tString, tNode, language } = useTranslation();
 
   // Echo explainer helper — show once for users who haven't seen it
   const shouldShowHelp = useUIStore((state) => state.shouldShowHelp);
@@ -375,8 +365,7 @@ const FigureCarousel: FC<FigureCarouselProps> = ({
         {categoryKeys.map((categoryKey) => {
           const categoryId = CATEGORY_IDS[categoryKey];
           const isActive = currentCategory === categoryId;
-          const count = translatedFigures.filter(f => figureIdToCategory[f.id] === categoryId).length;
-          
+
           return (
             <CategoryTab
               key={categoryId}

@@ -72,7 +72,7 @@ export const convertTextToSpeech = async (
   text: string,
   responseIndex: number | string,
   figureName: string,
-  service: string = TTS_SERVICES.SELF_HOSTED,
+  _service: string = TTS_SERVICES.SELF_HOSTED,
   speed: number | string = 1.0,
   language: string = 'en',
   sessionId?: string,

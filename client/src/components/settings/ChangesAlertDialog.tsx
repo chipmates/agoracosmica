@@ -35,7 +35,7 @@ const ChangesAlertDialog: FC<ChangesAlertDialogProps> = ({
   onDiscard, 
   onSave 
 }) => {
-  const { t, tNode } = useTranslation();
+  const { tNode } = useTranslation();
   const trapRef = useFocusTrap({ onClose: onDiscard, enabled: isVisible });
 
   if (!isVisible) return null;

@@ -25,7 +25,7 @@ interface LoginFormProps {
  * even though it's now an entry form, not authentication.
  */
 const LoginForm: FC<LoginFormProps> = ({ onComplete }) => {
-  const { t, tString, tNode, language } = useTranslation();
+  const { tString, tNode, language } = useTranslation();
 
   const [name, setName] = useState<string>(() => tString('entry.defaultName', 'Seeker'));
   const [avatar, setAvatar] = useState<string | null>(null);

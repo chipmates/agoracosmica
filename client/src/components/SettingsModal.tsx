@@ -3,7 +3,6 @@ import {
   Shield,
   Gear,
   Info,
-  Question,
   SignOut,
   Monitor,
   Globe,
@@ -34,7 +33,6 @@ import InfoPanel from './settings/panels/InfoPanel';
 import {
   handleConfigChange,
   saveConfiguration,
-  getCategoryDescription,
   loadServiceConfig
 } from '../services/settings/settingsService';
 // TTS/STT fully self-hosted on GEX130 — no provider selection needed
@@ -97,7 +95,7 @@ const SettingsModal: FC<SettingsModalProps> = ({ isOpen, onClose, onLogout, init
   const [isDirty, setIsDirty] = useState<boolean>(false);
   const [showChangesAlert, setShowChangesAlert] = useState<boolean>(false);
   
-  const { t, tString, tNode } = useTranslation();
+  const { tString, tNode } = useTranslation();
   const language = useDomainStore((state) => state.language.current);
   const setLanguage = useDomainStore((state) => state.setLanguage);
   const [selectedLanguage, setSelectedLanguage] = useState<string>(language);

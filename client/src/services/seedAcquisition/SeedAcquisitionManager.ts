@@ -238,8 +238,7 @@ function findMatchingSeed(seedTitle: string, figureId: string): { id: string | n
   // Find the best match by searching in both languages
   let bestMatch: { id: string | number; name: string; score: number } | null = null;
   let highestScore = 0;
-  let bestMatchLanguage: string | null = null;
-  
+
   // Search through all available languages for the best match
   for (const lang of languages) {
     const data = getFigureSeedData(figureId, lang);
@@ -266,7 +265,6 @@ function findMatchingSeed(seedTitle: string, figureId: string): { id: string | n
           name: seedTitle,
           score
         };
-        bestMatchLanguage = lang;
       }
     }
   }

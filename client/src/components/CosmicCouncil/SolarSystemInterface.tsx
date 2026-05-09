@@ -112,7 +112,7 @@ const OrbitSlot: FC<OrbitSlotProps> = ({
   readOnly = false
 }) => {
   const { tNode } = useTranslation();
-  const [isHovered, setIsHovered] = useState(false);
+  const [, setIsHovered] = useState(false);
 
   const handleDragOver = useCallback((e: DragEvent<HTMLDivElement>) => {
     if (!readOnly) {
@@ -199,7 +199,7 @@ const OrbitSlot: FC<OrbitSlotProps> = ({
 
 const ModeratorSun: FC<ModeratorSunProps> = ({ moderator, onModeratorChange, onModeratorRemove, readOnly = false }) => {
   const { tNode } = useTranslation();
-  const [isHovered, setIsHovered] = useState(false);
+  const [, setIsHovered] = useState(false);
 
   const handleDragOver = useCallback((e: DragEvent<HTMLDivElement>) => {
     if (!readOnly) {
@@ -279,7 +279,6 @@ const SolarSystemInterface: FC<SolarSystemInterfaceProps> = ({
   readOnly = false,
   isCustomCouncil = false
 }) => {
-  const { t } = useTranslation();
 
   // Use dynamic positions for readOnly mode, fixed positions for editing
   const positions = readOnly && participants.length > 0 
@@ -302,7 +301,7 @@ const SolarSystemInterface: FC<SolarSystemInterfaceProps> = ({
     }
   }, [moderator, onFigureRemove]);
 
-  const handleDrop = useCallback((figure: Figure, orbitId: string) => {
+  const handleDrop = useCallback((figure: Figure, _orbitId: string) => {
     // Check if figure is already in participants or is the moderator
     const isAlreadyParticipant = participants.find(p => p.id === figure.id);
     const isModerator = moderator?.id === figure.id;

@@ -46,7 +46,7 @@ export const handleConfigChange = (config: ServiceConfig, section: string, value
 /**
  * Get model options based on selected provider
  */
-export const getModelOptions = (config: ServiceConfig): ModelOption[] => {
+export const getModelOptions = (_config: ServiceConfig): ModelOption[] => {
   const models = Object.values(LLM_SERVICES.OPENROUTER.models);
 
   return models.map((m) => ({

@@ -658,7 +658,7 @@ export class CosmicCouncilService {
   _notifyCouncilLoaderChange(loaderState: LoaderState): void {
     councilLog('🔄 Council loader state:', loaderState.isVisible ? `${loaderState.stage} (visible)` : 'hidden');
     
-    this.listeners.onCouncilLoaderChange.forEach((callback, index) => {
+    this.listeners.onCouncilLoaderChange.forEach((callback, _index) => {
       try {
         callback(loaderState);
       } catch (error) {

@@ -1,17 +1,5 @@
 import { getMediaUrl } from './mediaConfig';
 
-interface SignedUrlResponse {
-  url: string;
-}
-
-interface BatchSignedUrlsResponse {
-  urls: Record<string, string>;
-}
-
-interface ErrorResponse {
-  error?: string;
-}
-
 /**
  * 🎉 Updated October 20, 2025 - BYOK Architecture Complete
  *

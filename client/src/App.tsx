@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { 
-  createBrowserRouter, 
-  RouterProvider, 
-  Route, 
+import {
+  createBrowserRouter,
+  RouterProvider,
   Navigate,
   Outlet
 } from 'react-router-dom';
@@ -65,12 +64,6 @@ declare global {
   interface Window {
     openSettingsModal: (tab?: string) => void;
   }
-}
-
-interface ServiceConfig {
-  ttsEnabled: boolean;
-  sttEnabled: boolean;
-  [key: string]: any; // Allow other properties
 }
 
 function App(): React.ReactElement {

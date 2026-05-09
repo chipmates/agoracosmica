@@ -25,8 +25,8 @@ interface UnifiedInputContainerProps {
 }
 
 const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure, onSubmitMessage }) => {
-  const { t, tString, tNode } = useTranslation();
-  const { getContext, unlock, unlocked } = useAutoplayGate();
+  const { tString, tNode } = useTranslation();
+  const { getContext, unlock } = useAutoplayGate();
 
   // Detect if we're on a mobile device for UI optimizations
   const isMobile = typeof window !== 'undefined' &&
@@ -36,7 +36,7 @@ const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure,
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [audioLevel, setAudioLevel] = useState<number>(0);
-  const [shouldPulse, setShouldPulse] = useState<boolean>(false);
+  const [, setShouldPulse] = useState<boolean>(false);
   const [micError, setMicError] = useState<MicrophoneErrorType | null>(null);
   
   // Text input state
@@ -46,7 +46,7 @@ const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure,
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   
   // Keyboard height state for mobile responsive behavior
-  const [keyboardHeight, setKeyboardHeight] = useState<number>(0);
+  const [, setKeyboardHeight] = useState<number>(0);
   
   // Input method state - checks settings and user preference
   const [useTextInput, setUseTextInput] = useState<boolean>(() => {

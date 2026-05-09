@@ -43,15 +43,6 @@ export const useConversationEffects = (params: UseConversationEffectsParams) => 
 
   // Event handlers for audio and conversation events
   useEffect(() => {
-    const handleTextReady = (textMessage: any) => {
-      // Only set firstTextArrived=true and loading=false for assistant messages
-      if (textMessage.role === 'assistant') {
-        setFirstTextArrived(true);
-        setLoading(false);
-      }
-      addMessage(textMessage);
-    };
-
     const handleAudioStart = () => {
       setTranslationInProgress(false);
       setIsAudioPlaying(true);

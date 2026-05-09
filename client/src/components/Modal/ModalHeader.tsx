@@ -57,7 +57,6 @@ const ModalHeader: FC<ModalHeaderProps> = ({
   
   // Content
   title = '',
-  titleLevel = 2,
   leftContent = null,
   rightContent = null,
   centerContent = null,

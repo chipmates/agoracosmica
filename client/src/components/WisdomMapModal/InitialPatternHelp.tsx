@@ -18,7 +18,7 @@ const InitialPatternHelp: FC<InitialPatternHelpProps> = ({
   revelationStage,
   isFirstTime = true
 }) => {
-  const { t, tString, tNode, tArray } = useTranslation();
+  const { tString, tNode, tArray } = useTranslation();
 
   // Help preferences from Zustand
   const dismissHelp = useUIStore((state) => state.dismissHelp);

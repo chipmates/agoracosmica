@@ -26,7 +26,7 @@ export const AudioLibrarySidebarButton: FC<AudioLibrarySidebarButtonProps> = ({
   buttonRef,
   onButtonClick 
 }) => {
-  const { t, tString } = useTranslation();
+  const { tString } = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleClick = (): void => {

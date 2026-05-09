@@ -129,7 +129,7 @@ export const initialMessagePathBuilder = {
    * hasInitialMessage('plato', 'freetalk', null) // → true
    */
   hasInitialMessage(
-    figure: string,
+    _figure: string,
     mode: ConversationMode,
     seedId: number | null
   ): boolean {

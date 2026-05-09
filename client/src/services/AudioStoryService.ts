@@ -3,15 +3,6 @@
 // StoryTextProcessor not needed for Audio Library (only for dynamic TTS)
 // import { storyTextProcessor } from './StoryTextProcessor';
 // import { convertTextToSpeech } from './audio/tts';
-import { loadServiceConfig } from './audio/config/serviceConfig';
-
-interface AudioConfig {
-  tts?: any;
-  ttsSettings?: {
-    speed?: number;
-  };
-  [key: string]: any;
-}
 
 interface AudioObject {
   url: string;
@@ -46,16 +37,12 @@ interface PlaybackStatus {
 }
 
 class AudioStoryService {
-  private config: AudioConfig;
   private currentAudio: HTMLAudioElement | null;
-  private audioQueue: any[];
   private isPlaying: boolean;
   private listenerAbort: AbortController | null; // Cleanup signal for audio event listeners
 
   constructor() {
-    this.config = loadServiceConfig();
     this.currentAudio = null;
-    this.audioQueue = [];
     this.isPlaying = false;
     this.listenerAbort = null;
   }
