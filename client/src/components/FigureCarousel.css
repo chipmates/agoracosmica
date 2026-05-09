@@ -256,11 +256,16 @@
 .figure-carousel .main-image-section .figure-image-container .figure-image,
 .figure-carousel .main-image-section .optimized-image__img,
 .figure-carousel .main-image-section img {
-  /* MOBILE: Fill height completely, crop sides adaptively */
+  /* MOBILE: Fill height completely, crop sides adaptively.
+     object-position: center top anchors the image to the top so when
+     the container shrinks (e.g. Chrome iOS with its larger bottom
+     toolbar reducing viewport height) the bottom crops first and the
+     head stays visible — for portraits, losing torso/hands is
+     dramatically better than losing the face. */
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center;
+  object-position: center top;
   /* Force minimum height to ensure complete fill */
   min-height: 100%;
   /* ZERO EFFECTS - NO ZOOM, NO GLOW */
