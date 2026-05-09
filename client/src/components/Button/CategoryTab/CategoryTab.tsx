@@ -1,5 +1,4 @@
 import React, { useCallback, forwardRef, ReactNode, KeyboardEvent, MouseEvent } from 'react';
-import RippleButton from '../RippleButton/RippleButton';
 import styles from './CategoryTab.module.css';
 
 interface CategoryTabProps {
@@ -9,31 +8,18 @@ interface CategoryTabProps {
   onSelect?: (category: string) => void;
   onKeyNavigate?: (key: string, category: string) => void;
   className?: string;
-  [key: string]: any; // For additional props passed to RippleButton
+  [key: string]: any;
 }
 
 /**
- * CategoryTab Component - STANDARD CATEGORY BUTTON
- * 
- * Simplified category navigation button with unified design language.
- * Features golden border recognition and matching glow effects.
- * 
- * DESIGN STANDARD: Minimal elegance, unified with ActionButton
- * - Golden fine border for category recognition
- * - Single-color glow effects (no gradients/multicolor)
- * - Consistent with ActionButton interaction patterns
- * 
- * @component
- * @example
- * <CategoryTab
- *   category="sages"
- *   isActive={true}
- *   onSelect={handleSelect}
- * >
- *   Sages
- * </CategoryTab>
+ * CategoryTab — pill-shaped tablist button.
+ *
+ * Plain <button>, no RippleButton wrapper. Drops backdrop-filter and
+ * filter: drop-shadow (both glitched on iOS WebKit when the chip is
+ * re-composited after tap). Hover is gated to (hover: hover) so iOS
+ * sticky :hover doesn't leave a tinted/lifted state behind.
  */
-const CategoryTab = forwardRef<HTMLElement, CategoryTabProps>(({
+const CategoryTab = forwardRef<HTMLButtonElement, CategoryTabProps>(({
   children,
   isActive = false,
   category,
@@ -42,46 +28,42 @@ const CategoryTab = forwardRef<HTMLElement, CategoryTabProps>(({
   className = '',
   ...props
 }, ref) => {
-  
-  // Handle keyboard navigation
-  const handleKeyDown = useCallback((e: KeyboardEvent<HTMLElement>) => {
+
+  const handleKeyDown = useCallback((e: KeyboardEvent<HTMLButtonElement>) => {
     const navigationKeys = ['ArrowLeft', 'ArrowRight', 'Home', 'End'];
     if (navigationKeys.includes(e.key)) {
       e.preventDefault();
       onKeyNavigate?.(e.key, category);
     }
   }, [category, onKeyNavigate]);
-  
-  // Handle selection
-  const handleClick = useCallback((e: MouseEvent<HTMLElement> | KeyboardEvent<HTMLElement>) => {
+
+  const handleClick = useCallback((_e: MouseEvent<HTMLButtonElement>) => {
     onSelect?.(category);
   }, [category, onSelect]);
-  
-  // Combine classes
+
   const classes = [
     styles.categoryTab,
     isActive && styles.active,
-    className
+    className,
   ].filter(Boolean).join(' ');
-  
+
   return (
-    <RippleButton
+    <button
       ref={ref}
+      type="button"
       role="tab"
       aria-selected={isActive}
       aria-controls={`tabpanel-${category}`}
-      aria-label={children as string}
+      aria-label={typeof children === 'string' ? children : undefined}
       id={`tab-${category}`}
       tabIndex={isActive ? 0 : -1}
       className={classes}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
-      variant="ghost"
-      enhanced={false}
       {...props}
     >
       {children}
-    </RippleButton>
+    </button>
   );
 });
 
