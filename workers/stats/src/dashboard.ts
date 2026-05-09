@@ -1206,6 +1206,14 @@ async function loadOverview() {
     { sql: "SELECT blob5 as type, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY type ORDER BY c DESC", dataset: 'agora_llm' },
     // Top figures by content completion (blob2 = figureId for playback rows)
     { sql: "SELECT blob2 as figure, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND blob2 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY figure ORDER BY c DESC LIMIT 8", dataset: 'agora_llm' },
+    // Page arrivals (true visit count, fires on every cold load)
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    // Page arrivals previous period (for delta)
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    // Entry transitions (LoginPage → HomePage; closes the "did they decide to enter" stage)
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'entry' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    // Page arrivals sparkline
+    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
   ];
 
   var r = await batch(queries);
@@ -1234,6 +1242,12 @@ async function loadOverview() {
   var topCountries = rows(r[21]);
   var contentByType = rows(r[22]);
   var topFiguresByContent = rows(r[23]);
+  var arrivals = val(r[24]);
+  var arrivalsPrev = val(r[25]);
+  var entries = val(r[26]);
+  var sparkArrivals = rows(r[27]).map(function(r) { return r.c; });
+  var bouncePct = arrivals > 0 ? Math.round((1 - entries / arrivals) * 100) : 0;
+  var bounceSub = arrivals > 0 ? bouncePct + '% bounced before entry' : 'no arrivals yet';
 
   // Alerts
   var alerts = '';
@@ -1255,6 +1269,9 @@ async function loadOverview() {
   var html = '';
 
   // Hero KPIs
+  // "Arrivals" counts page-load beacons — true visit count regardless of engagement.
+  // Sub-line shows the bounce rate at the very first stage (page → entry transition).
+  html += kpi('Arrivals', arrivals, { hero: true, spark: sparkArrivals, sparkColor: '#5B8BD4', delta: arrivalsPrev, sub: bounceSub });
   // "Sessions" counts JWT issuance events (free-tier path only, post-lazy-refresh = roughly per real engagement window).
   // Phase 0a (SESSION_LAST_SEEN KV gating, deferred) will tighten this to "fresh devices".
   html += kpi('Sessions', sessions, { hero: true, spark: sparkSessions, delta: sessionsPrev, sub: 'engagement windows' });
@@ -1862,6 +1879,11 @@ async function loadAdGrants() {
     { sql: "SELECT blob6 as source, toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE blob1 IN ('chat','council','summary') AND blob5 = '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY source, t ORDER BY t", dataset: 'agora_llm' },
     // Top figures by channel — figure x source cross-tab on chat events
     { sql: "SELECT blob2 as figure, blob6 as source, COUNT() as c FROM agora_llm WHERE blob1 = 'chat' AND blob5 = '200' AND blob2 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY figure, source ORDER BY c DESC LIMIT 30", dataset: 'agora_llm' },
+    // Funnel by channel — page → entry → session → chat counts per source.
+    // Single query so we can render the per-channel conversion table AND the
+    // standalone "Arrivals by Channel" / "Entries by Channel" bar charts from
+    // the same dataset (avoids three separate round-trips).
+    { sql: "SELECT blob6 as source, countIf(blob1='page') as arrivals, countIf(blob1='entry') as entries, countIf(blob1='session' AND blob5='200') as sessions, countIf(blob1='chat' AND blob5='200') as chats FROM agora_llm WHERE blob1 IN ('page','entry','session','chat') AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY source ORDER BY arrivals DESC", dataset: 'agora_llm' },
   ];
 
   var r = await batch(queries);
@@ -1881,6 +1903,7 @@ async function loadAdGrants() {
   var playbackByType = rows(r[13]);
   var sourcesOverTime = rows(r[14]);
   var figureByChannel = rows(r[15]);
+  var funnelByChannel = rows(r[16]);
 
   // Alerts
   var alerts = '';
@@ -1943,7 +1966,50 @@ async function loadAdGrants() {
     sotHtml += '</div>';
     html += chartCard('Sources Over Time', sotHtml, 'card-full');
   }
+
+  // Page Arrivals + Entries by Channel — derived from the funnel-by-channel
+  // query so we get them without a separate round-trip. Arrivals = page beacon
+  // (every load), Entries = LoginPage→HomePage transition. The two together
+  // show how channel quality decays at the very top of the funnel.
+  var arrivalsItems = aggregateByLabel(funnelByChannel.map(function(r) { return { label: r.source || 'direct', c: r.arrivals }; }));
+  html += chartCard('Page Arrivals by Channel', barsHtml(arrivalsItems, '#5B8BD4'), 'card-half');
+  var entriesItems = aggregateByLabel(funnelByChannel.map(function(r) { return { label: r.source || 'direct', c: r.entries }; }));
+  html += chartCard('Entries by Channel', barsHtml(entriesItems, '#68C397'), 'card-half');
+
   html += '</div>';
+
+  // ────────────────────────────────────────────────────────────
+  // SECTION 1b — FUNNEL BY CHANNEL
+  // Arrivals → entries → sessions → chats per source, with the per-stage
+  // conversion rate that tells you which channel actually converts.
+  // ────────────────────────────────────────────────────────────
+  if (funnelByChannel.length > 0) {
+    html += '<div class="section-divider">Funnel by Channel</div>';
+    html += '<div class="grid">';
+    var pct = function(n, d) { return d > 0 ? ((n / d) * 100).toFixed(0) + '%' : '—'; };
+    var funnelRows = funnelByChannel.slice(0, 12).map(function(r) {
+      var src = r.source || 'direct';
+      return [
+        '<span>' + src + '</span>',
+        r.arrivals,
+        r.entries,
+        r.sessions,
+        r.chats,
+        pct(r.entries, r.arrivals),
+        pct(r.sessions, r.entries),
+        pct(r.chats, r.sessions),
+      ];
+    });
+    html += chartCard(
+      'Funnel by Channel',
+      tableHtml(
+        ['Channel', 'Arrivals', 'Entries', 'Sessions', 'Chats', 'Arrive→Enter', 'Enter→Session', 'Session→Chat'],
+        funnelRows,
+      ),
+      'card-full',
+    );
+    html += '</div>';
+  }
 
   // ────────────────────────────────────────────────────────────
   // SECTION 2 — GEOGRAPHIC REACH

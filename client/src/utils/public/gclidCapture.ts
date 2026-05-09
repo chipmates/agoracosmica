@@ -5,6 +5,15 @@
 // Same pattern as freeTierAdapter: empty in dev (Vite proxy), full URL in prod
 const API_BASE = import.meta.env.VITE_FREE_TIER_API_URL || '';
 
+// sessionStorage keys: persist source + gclid across reloads of the same tab.
+// Without this, a user who clicks an ad → lands at /?utm_source=spotify_a →
+// reloads (URL no longer carries the param) → would re-resolve to 'direct'
+// and every subsequent event would be mis-attributed. Tab-scoped on purpose:
+// a new tab without the URL params should default to 'direct', not inherit
+// some stale source from a previous tab.
+const SS_SOURCE_KEY = 'agc_marketing_source';
+const SS_GCLID_KEY = 'agc_gclid';
+
 let capturedGclid: string | null = null;
 let capturedMarketingSource: MarketingSource = 'direct';
 
@@ -21,6 +30,34 @@ const ALLOWED_SOURCES: ReadonlySet<MarketingSource> = new Set([
   'spotify', 'spotify_a', 'spotify_b',
   'grants', 'paid', 'organic', 'direct', 'unknown',
 ]);
+
+// Hydrate from sessionStorage on module load (cheap, runs once). If the URL
+// later carries fresh params, captureGclid() overwrites these. Hydration
+// happens AFTER ALLOWED_SOURCES is declared so the validation works.
+try {
+  if (typeof sessionStorage !== 'undefined') {
+    const storedSource = sessionStorage.getItem(SS_SOURCE_KEY);
+    const storedGclid = sessionStorage.getItem(SS_GCLID_KEY);
+    if (storedSource && (ALLOWED_SOURCES as ReadonlySet<string>).has(storedSource)) {
+      capturedMarketingSource = storedSource as MarketingSource;
+    }
+    if (storedGclid && storedGclid.length > 10 && storedGclid.length < 200) {
+      capturedGclid = storedGclid;
+    }
+  }
+} catch {
+  // sessionStorage unavailable (Safari private mode, SSR) — no-op
+}
+
+function persistSource(): void {
+  try {
+    if (typeof sessionStorage === 'undefined') return;
+    sessionStorage.setItem(SS_SOURCE_KEY, capturedMarketingSource);
+    if (capturedGclid) sessionStorage.setItem(SS_GCLID_KEY, capturedGclid);
+  } catch {
+    // sessionStorage write blocked (quota, private mode) — no-op
+  }
+}
 
 /**
  * Normalize raw utm_source + utm_medium into the closed allowlist bucket.
@@ -57,8 +94,11 @@ export function captureGclid(): void {
     if (gclid && gclid.length > 10 && gclid.length < 200) {
       capturedGclid = gclid;
     }
-    // Capture utm alongside gclid in the same call site (PublicLayout useEffect).
+    // Capture utm alongside gclid in the same call site.
     captureMarketingSource(params);
+    // Persist whatever was just captured so a reload (where the URL no longer
+    // carries the params) keeps the same attribution within this tab.
+    persistSource();
   } catch {
     // Silently fail in SSR or restricted environments
   }
