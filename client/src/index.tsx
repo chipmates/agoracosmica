@@ -12,12 +12,19 @@ import { useDomainStore } from './stores/domainStore';
 import { initializeSeedsCache } from './services/seedCacheInitializer';
 import { LocalStorageAdapter } from './storage/localAdapter';
 import { captureGclid } from './utils/public/gclidCapture';
+import { sendPageBeacon } from './utils/pageBeacon';
 
 // Capture utm_source / gclid from the landing URL before any router redirect
 // can strip them. Must run synchronously at module load — running inside a
 // React effect is too late, because the catch-all <Navigate> in App.tsx
 // rewrites the URL before App's effect fires.
 captureGclid();
+
+// Page-load beacon: count this arrival in analytics with the marketing source
+// captureGclid just resolved. Anonymous, fire-and-forget. Closes the gap
+// between landing-page render and the existing engagement events (chat,
+// playback) so we can measure true bounce rate per channel.
+sendPageBeacon();
 // Service Worker registration (DISABLED until Q1 2026 - Offline Mode implementation)
 // Currently causes 404 errors since service-worker.js doesn't exist yet
 // Roadmap: CLAUDE.md Q1 2026 - Offline Mode with service worker

@@ -147,6 +147,34 @@ export function trackPlayback(
 }
 
 /**
+ * Track a page-load beacon. Fires once on App mount in the client, before any
+ * user interaction. Lets the dashboard show arrivals per channel, not just
+ * post-engagement events.
+ * dataset: agora_llm
+ * blobs: ['page', path, '', language, '200', marketing_source, country]
+ * indexes: ['page']
+ */
+export function trackPageView(
+  env: Env,
+  data: {
+    path: string;
+    language: string;
+    marketingSource: string;
+    country: string;
+  }
+): void {
+  try {
+    env.ANALYTICS.writeDataPoint({
+      blobs: ['page', data.path, '', data.language, '200', data.marketingSource, data.country],
+      doubles: [0],
+      indexes: ['page'],
+    });
+  } catch {
+    // Analytics must never break the request path
+  }
+}
+
+/**
  * Track a rate limit hit (429).
  * dataset: agora_llm
  * blobs: ['ratelimit', endpoint, reason, '', '429', marketing_source, country]
