@@ -255,7 +255,7 @@ const MainContent: FC<MainContentProps> = ({
             )}
 
             {/* Content section */}
-            {selectedMode === 'prism' && selectedFigure && selectedSeed && conversationStartedFinal && !showFigureCarousel ? (
+            {selectedMode === 'prism' && selectedFigure && selectedSeed && conversationStartedFinal ? (
               <ErrorBoundary>
                 <Suspense fallback={null}>
                   <PrismPlayer

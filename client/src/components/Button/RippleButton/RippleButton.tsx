@@ -151,7 +151,7 @@ const RippleButton = forwardRef<HTMLElement, RippleButtonProps>(({
     // The animation starts automatically when the ripple is added to DOM
     
     // Call the provided onClick handler if provided
-    if (onClick && !disabled && !loading) {
+    if (onClick) {
       onClick(event);
     }
   }, [onClick, disabled, loading, variant, rippleColor]);
