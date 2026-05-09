@@ -1202,10 +1202,13 @@ async function loadOverview() {
     { sql: "SELECT blob2 as figure, COUNT() as c FROM agora_llm WHERE blob1 = 'chat' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY figure ORDER BY c DESC LIMIT 1", dataset: 'agora_llm' },
     // Language split (for insight)
     { sql: "SELECT blob4 as lang, COUNT() as c FROM agora_llm WHERE blob1 = 'chat' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY lang ORDER BY c DESC", dataset: 'agora_llm' },
-    // Content completions by type — Phase 0e' content tracking (blob5 = type for blob1='playback' rows)
-    { sql: "SELECT blob5 as type, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY type ORDER BY c DESC", dataset: 'agora_llm' },
-    // Top figures by content completion (blob2 = figureId for playback rows)
-    { sql: "SELECT blob2 as figure, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND blob2 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY figure ORDER BY c DESC LIMIT 8", dataset: 'agora_llm' },
+    // Content STARTED by type — playback first-play events (blob8='started').
+    // Filter intentional: matches the Engagement tab's "Content Started" KPI
+    // exactly. Including completed events would over-count by the small number
+    // of completions, breaking cross-tab consistency.
+    { sql: "SELECT blob5 as type, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND blob8 = 'started' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY type ORDER BY c DESC", dataset: 'agora_llm' },
+    // Top figures by content first-plays (same blob8='started' filter)
+    { sql: "SELECT blob2 as figure, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND blob8 = 'started' AND blob2 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY figure ORDER BY c DESC LIMIT 8", dataset: 'agora_llm' },
     // Page arrivals (true visit count, fires on every cold load)
     { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
     // Page arrivals previous period (for delta)
@@ -1526,8 +1529,10 @@ async function loadProduct() {
     { sql: "SELECT COUNT() as c FROM agora_audio WHERE blob5 IN ('speech','transcriptions') AND blob4 != '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_audio' },
     // TTS models
     { sql: "SELECT blob2 as model, COUNT() as c, AVG(double1) as avg_ms FROM agora_audio WHERE blob5 = 'speech' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY model ORDER BY c DESC", dataset: 'agora_audio' },
-    // Server distribution
-    { sql: "SELECT blob3 as server, COUNT() as c FROM agora_audio WHERE blob5 IN ('speech','transcriptions') AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY server ORDER BY c DESC", dataset: 'agora_audio' },
+    // Server distribution — TTS-only so it sums to the TTS Requests count.
+    // STT (small relative volume) has its own counter; combining was producing
+    // mismatched totals (e.g. 67 vs 60) in adjacent panels.
+    { sql: "SELECT blob3 as server, COUNT() as c FROM agora_audio WHERE blob5 = 'speech' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY server ORDER BY c DESC", dataset: 'agora_audio' },
     // Audio language split
     { sql: "SELECT blob1 as lang, COUNT() as c FROM agora_audio WHERE blob5 = 'speech' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY lang ORDER BY c DESC", dataset: 'agora_audio' },
     // Rate limits
@@ -1757,8 +1762,10 @@ async function loadAudio() {
     { sql: "SELECT COUNT() as c FROM agora_audio WHERE blob5 IN ('speech','transcriptions') AND blob4 != '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_audio' },
     // TTS models
     { sql: "SELECT blob2 as model, COUNT() as c, AVG(double1) as avg_ms FROM agora_audio WHERE blob5 = 'speech' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY model ORDER BY c DESC", dataset: 'agora_audio' },
-    // Server distribution
-    { sql: "SELECT blob3 as server, COUNT() as c FROM agora_audio WHERE blob5 IN ('speech','transcriptions') AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY server ORDER BY c DESC", dataset: 'agora_audio' },
+    // Server distribution — TTS-only so it sums to the TTS Requests count.
+    // STT (small relative volume) has its own counter; combining was producing
+    // mismatched totals (e.g. 67 vs 60) in adjacent panels.
+    { sql: "SELECT blob3 as server, COUNT() as c FROM agora_audio WHERE blob5 = 'speech' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY server ORDER BY c DESC", dataset: 'agora_audio' },
     // Audio language split
     { sql: "SELECT blob1 as lang, COUNT() as c FROM agora_audio WHERE blob5 = 'speech' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY lang ORDER BY c DESC", dataset: 'agora_audio' },
     // Audio rate limits
