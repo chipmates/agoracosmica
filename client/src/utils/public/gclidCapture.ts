@@ -10,10 +10,16 @@ let capturedMarketingSource: MarketingSource = 'direct';
 
 // Closed allowlist for marketing source labels written to analytics blobs.
 // Server side validates against the same allowlist; unknown values become 'unknown'.
-export type MarketingSource = 'spotify' | 'grants' | 'paid' | 'organic' | 'direct' | 'unknown';
+// spotify_a / spotify_b are A/B variants of the Spotify campaign — short URLs in
+// `client/public/_redirects` (e.g. /sp/de1, /sp/de2) split the channel so the
+// dashboard renders them as separate rows for variant comparison.
+export type MarketingSource =
+  | 'spotify' | 'spotify_a' | 'spotify_b'
+  | 'grants' | 'paid' | 'organic' | 'direct' | 'unknown';
 
 const ALLOWED_SOURCES: ReadonlySet<MarketingSource> = new Set([
-  'spotify', 'grants', 'paid', 'organic', 'direct', 'unknown',
+  'spotify', 'spotify_a', 'spotify_b',
+  'grants', 'paid', 'organic', 'direct', 'unknown',
 ]);
 
 /**
@@ -26,6 +32,8 @@ function normalizeMarketingSource(utmSource: string | null, utmMedium: string | 
   const medium = (utmMedium || '').toLowerCase();
 
   if (source === 'spotify') return 'spotify';
+  if (source === 'spotify_a') return 'spotify_a';
+  if (source === 'spotify_b') return 'spotify_b';
 
   if (source === 'google' || source === 'googleads') {
     if (medium === 'grants' || medium === 'adgrants') return 'grants';

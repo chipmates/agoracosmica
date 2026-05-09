@@ -7,9 +7,12 @@ import type { Env } from './types';
 
 // Closed allowlist for marketing source labels. Validated server-side to
 // guarantee the dashboard never sees free-text values, even if the client
-// header is malformed or hostile.
+// header is malformed or hostile. spotify_a / spotify_b are A/B variants
+// of the Spotify campaign — see client/public/_redirects for the shortcut
+// rules and gclidCapture.ts for the matching client-side allowlist.
 const ALLOWED_MARKETING_SOURCES = new Set([
-  'spotify', 'grants', 'paid', 'organic', 'direct', 'unknown',
+  'spotify', 'spotify_a', 'spotify_b',
+  'grants', 'paid', 'organic', 'direct', 'unknown',
 ]);
 
 /**

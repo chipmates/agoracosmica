@@ -1915,7 +1915,7 @@ async function loadAdGrants() {
       allBuckets.add(row.t);
     });
     var bucketArr = Array.from(allBuckets).sort();
-    var sourceColors = { spotify: '#1DB954', grants: '#4285F4', paid: '#E97451', organic: '#9D83CD', direct: '#E6BC5C', unknown: '#8A8A8A' };
+    var sourceColors = { spotify: '#1DB954', spotify_a: '#3DD27A', spotify_b: '#0E8A3F', grants: '#4285F4', paid: '#E97451', organic: '#9D83CD', direct: '#E6BC5C', unknown: '#8A8A8A' };
     var maxBucket = 1;
     bucketArr.forEach(function(t) {
       var stack = 0;

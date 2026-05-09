@@ -8,7 +8,8 @@ import type { Env } from './types';
 // Closed allowlist for marketing source labels — mirrors llm-proxy/utils/analytics.ts.
 // Validated server-side so the dashboard never sees free-text values.
 const ALLOWED_MARKETING_SOURCES = new Set([
-  'spotify', 'grants', 'paid', 'organic', 'direct', 'unknown',
+  'spotify', 'spotify_a', 'spotify_b',
+  'grants', 'paid', 'organic', 'direct', 'unknown',
 ]);
 
 function readMarketingSource(request: Request): string {

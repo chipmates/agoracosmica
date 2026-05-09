@@ -3,7 +3,8 @@ import {
   createBrowserRouter,
   RouterProvider,
   Navigate,
-  Outlet
+  Outlet,
+  useLocation
 } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
@@ -64,6 +65,14 @@ declare global {
   interface Window {
     openSettingsModal: (tab?: string) => void;
   }
+}
+
+// Catch-all redirect that preserves the current URL's search string. Default
+// <Navigate to="/" /> drops query params, which would lose utm tags from
+// shortcut redirects (e.g. /sp/de1 → /de/?utm_source=spotify_a → catch-all).
+function NavigateKeepingSearch({ to }: { to: string }): React.ReactElement {
+  const { search } = useLocation();
+  return <Navigate to={{ pathname: to, search }} replace />;
 }
 
 function App(): React.ReactElement {
@@ -422,7 +431,7 @@ function App(): React.ReactElement {
         },
         {
           path: "*",
-          element: <Navigate to="/" replace />
+          element: <NavigateKeepingSearch to="/" />
         }
       ]
     }
