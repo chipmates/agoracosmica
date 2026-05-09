@@ -1229,7 +1229,12 @@ async function loadOverview() {
   var rlLlm = val(r[11]), rlAudio = val(r[12]);
   var totalRl = rlLlm + rlAudio;
   var totalLlm = chats + councils + summaries;
-  var voicePct = totalLlm > 0 ? Math.round(tts / totalLlm * 100) : 0;
+  // TTS-per-chat as a multiplier, not as a percentage. A single LLM response
+  // typically chunks into 4-6 TTS calls (one per sentence), and the figure
+  // carousel on LoginPage plays voice samples that don't correspond to any
+  // LLM call. Both push TTS > LLM, so a "% adoption" framing hits 400-500%
+  // and reads as broken. Multiplier is interpretable at any value.
+  var voiceRatio = chats > 0 ? (tts / chats) : 0;
 
   var sparkSessions = rows(r[13]).map(function(r) { return r.c; });
   var sparkChats = rows(r[14]).map(function(r) { return r.c; });
@@ -1238,14 +1243,16 @@ async function loadOverview() {
   var dailyTrend = S.range > 1 ? rows(r[17]) : [];
   var topFigure = rows(r[18]);
   var langSplit = rows(r[19]);
-  var channelSources = rows(r[20]);
-  var topCountries = rows(r[21]);
-  var contentByType = rows(r[22]);
-  var topFiguresByContent = rows(r[23]);
-  var arrivals = val(r[24]);
-  var arrivalsPrev = val(r[25]);
-  var entries = val(r[26]);
-  var sparkArrivals = rows(r[27]).map(function(r) { return r.c; });
+  // r[20]=content type, r[21]=top figures by content (these were already correct
+  // before this commit). The pre-existing channelSources/topCountries variables
+  // were dead code; removed. The new arrivals/entries vars are at the actual
+  // array positions of the queries appended at the end of the batch.
+  var contentByType = rows(r[20]);
+  var topFiguresByContent = rows(r[21]);
+  var arrivals = val(r[22]);
+  var arrivalsPrev = val(r[23]);
+  var entries = val(r[24]);
+  var sparkArrivals = rows(r[25]).map(function(r) { return r.c; });
   var bouncePct = arrivals > 0 ? Math.round((1 - entries / arrivals) * 100) : 0;
   var bounceSub = arrivals > 0 ? bouncePct + '% bounced before entry' : 'no arrivals yet';
 
@@ -1280,9 +1287,9 @@ async function loadOverview() {
   // Secondary KPIs
   html += kpi('Chat Messages', chats, { spark: sparkChats, delta: chatsPrev });
   html += kpi('TTS Requests', tts, { spark: sparkTts, sparkColor: '#68C397', delta: ttsPrev });
-  var voiceDisplay = totalLlm > 0 ? voicePct + '%' : '--';
-  var voiceSub = totalLlm > 0 ? tts + ' TTS / ' + totalLlm + ' LLM' : 'no LLM sessions yet';
-  html += kpi('Voice Adoption', voiceDisplay, { sub: voiceSub });
+  var voiceDisplay = chats > 0 ? voiceRatio.toFixed(1) + '×' : '--';
+  var voiceSub = chats > 0 ? tts + ' TTS / ' + chats + ' chat msg' : 'no chats yet';
+  html += kpi('TTS per Chat', voiceDisplay, { sub: voiceSub });
   html += kpi('Errors', totalErrors, { sub: totalErrors > 0 ? llmErrors + ' LLM + ' + audioErrors + ' audio' : 'all clear', valColor: totalErrors > 0 ? '#E97451' : '#68C397' });
 
   // Mini server health
