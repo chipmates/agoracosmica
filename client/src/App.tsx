@@ -15,6 +15,7 @@ import NutzungsbedingungenPage from './pages/NutzungsbedingungenPage';
 // Public SEO pages - remove this import and the pages/public + components/public dirs to strip marketing pages
 import { publicRouteObjects } from './routes/publicRoutes';
 import { sendConversion } from './utils/public/gclidCapture';
+import { sendEntryBeacon } from './utils/entryBeacon';
 // Dev/test pages — only imported in dev mode so Vite excludes them from production build.
 // Kept lean: contributor-facing diagnostics and benchmarks only. Internal A/B harnesses
 // and visual-design experiments live in the private workspace.
@@ -340,6 +341,10 @@ function App(): React.ReactElement {
     // Set login state (persist hint for page refresh)
     LocalStorageAdapter.setString('isLoggedIn', 'true');
     setIsLoggedIn(true);
+
+    // Anonymous entry beacon — closes the bounce stage between page-load
+    // beacon (arrival) and session row (first Turnstile-gated interaction).
+    sendEntryBeacon();
 
     // Send conversion event if user came from a Google Ad
     sendConversion('profile_created');

@@ -175,6 +175,35 @@ export function trackPageView(
 }
 
 /**
+ * Track an entry beacon. Fires when the user transitions from LoginPage into
+ * the app (handleEntryComplete in App.tsx). Sits between the page-load beacon
+ * (every arrival) and the session row (Turnstile-gated). Closes the most
+ * informative bounce stage in the funnel.
+ * dataset: agora_llm
+ * blobs: ['entry', path, '', language, '200', marketing_source, country]
+ * indexes: ['entry']
+ */
+export function trackEntry(
+  env: Env,
+  data: {
+    path: string;
+    language: string;
+    marketingSource: string;
+    country: string;
+  }
+): void {
+  try {
+    env.ANALYTICS.writeDataPoint({
+      blobs: ['entry', data.path, '', data.language, '200', data.marketingSource, data.country],
+      doubles: [0],
+      indexes: ['entry'],
+    });
+  } catch {
+    // Analytics must never break the request path
+  }
+}
+
+/**
  * Track a rate limit hit (429).
  * dataset: agora_llm
  * blobs: ['ratelimit', endpoint, reason, '', '429', marketing_source, country]

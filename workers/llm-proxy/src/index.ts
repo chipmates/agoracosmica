@@ -10,6 +10,7 @@ import { handleSummary } from './routes/summary';
 import { handleConversions, handleConversionStats } from './routes/conversions';
 import { handlePlayback } from './routes/playback';
 import { handlePage } from './routes/page';
+import { handleEntry } from './routes/entry';
 import type { Env } from './utils/types';
 
 function getCorsHeaders(request: Request, env: Env): Record<string, string> {
@@ -94,6 +95,8 @@ export default {
         response = await handlePlayback(request, env);
       } else if (path === '/v1/page' && request.method === 'POST') {
         response = await handlePage(request, env);
+      } else if (path === '/v1/entry' && request.method === 'POST') {
+        response = await handleEntry(request, env);
       } else {
         response = new Response(
           JSON.stringify({ error: 'Not found' }),

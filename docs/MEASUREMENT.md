@@ -10,8 +10,8 @@ Per anonymous request, written to Cloudflare Analytics Engine:
 
 | Counter | Example values | Why |
 |---|---|---|
-| Endpoint | `chat`, `council`, `summary`, `session`, `speech`, `transcriptions`, `playback`, `page` | See which features are used |
-| Path | Sanitized landing path on `page` events (`/`, `/de/`, `/figures/<slug>`, ...) | Distinguish home arrivals from deep-link arrivals |
+| Endpoint | `chat`, `council`, `summary`, `session`, `speech`, `transcriptions`, `playback`, `page`, `entry` | See which features are used |
+| Path | Sanitized landing path on `page` and `entry` events (`/`, `/de/`, `/figures/<slug>`, ...) | Distinguish home arrivals from deep-link arrivals |
 | Figure | `aurelius`, `kahlo`, `rumi`, ... | See which figures resonate |
 | Mode | `story`, `wisdom`, `prism`, `quest`, `freetalk`, `council` | See which chapters land |
 | Language | `en` or `de` | See bilingual reach |
