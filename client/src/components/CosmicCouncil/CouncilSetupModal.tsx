@@ -16,7 +16,6 @@ import ProcessingLoader from '../ProcessingLoader';
 import CouncilThemeRow from './CouncilThemeRow';
 import CouncilCard from './CouncilCard';
 import CouncilDetailSheet from './CouncilDetailSheet';
-import { useCouncilProgress } from '../../hooks/useCouncilProgress';
 import { screenContent, type CrisisResources } from '../../utils/contentSafety';
 import {
   THEMES,
@@ -25,10 +24,7 @@ import {
   heroReflective,
   typeToInternal,
   getShortDisplayName,
-  getLocalizedTitle,
-  getLocalizedQuestion,
-  CatalogCouncil,
-  ESTIMATED_DURATION
+  CatalogCouncil
 } from '../../data/councilCatalog';
 import './CouncilSetupModal.css';
 
@@ -117,10 +113,6 @@ const CouncilSetupModal: FC<CouncilSetupModalProps> = ({
 
   // Scroll lock via ref-counted hook
   useBodyScrollLock(isOpen);
-
-  // Progress indicators for hero cards
-  const heroConfProgress = useCouncilProgress(heroConfrontational.id, language);
-  const heroReflProgress = useCouncilProgress(heroReflective.id, language);
 
   // Reset state when modal is closed
   useEffect(() => {

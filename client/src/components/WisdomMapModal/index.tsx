@@ -23,7 +23,6 @@ import { CloseButton, RippleButton } from '../Button';
 import SeedDetailView from '../SeedDetailView';
 import { useDomainStore } from '../../stores/domainStore';
 import useTranslation from '../../hooks/useTranslation';
-import useResponsive from '../../hooks/useResponsive';
 import {
   getConstellationForFigure,
   calculateConstellationPositions,
@@ -170,27 +169,22 @@ const WisdomMapModal: FC<WisdomMapModalProps> = ({
   isOpen,
   onClose,
   selectedFigure,
-  defaultView = 'map',
   onSeedSelect,
-  showSelectButton = false,
-  isForSeedConversation = false  // New prop to indicate if this is for seed conversation mode
+  showSelectButton = false
 }) => {
   // Access language and selected seed from Zustand store
   const language = useDomainStore((state) => state.language.current);
   const appSelectedSeedId = useDomainStore((state) => state.seeds.selectedId);
-  const { tString, tNode, tArray } = useTranslation();
-  const { isMobile } = useResponsive();
+  const { tString, tNode } = useTranslation();
 
   // Help preferences from Zustand
   const shouldShowHelp = useUIStore((state) => state.shouldShowHelp);
-  const dismissHelp = useUIStore((state) => state.dismissHelp);
 
   // Main state management (remains in the parent component)
   const [showDetailView, setShowDetailView] = useState<boolean>(false); // Full-screen detail overlay
   const [initialSeedNumber, setInitialSeedNumber] = useState<number>(1); // Which seed to scroll to in detail view
   const [seeds, setSeeds] = useState<Seed[]>([]);
   const [selectedSeed, setSelectedSeed] = useState<Seed | null>(null);
-  const [expandedSeeds, setExpandedSeeds] = useState<{ [key: string]: boolean }>({});
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [showConstellationInfo, setShowConstellationInfo] = useState<boolean>(false);
@@ -404,9 +398,8 @@ const WisdomMapModal: FC<WisdomMapModalProps> = ({
       }
     })();
     
-    return () => { 
-      setSelectedSeed(null); 
-      setExpandedSeeds({});
+    return () => {
+      setSelectedSeed(null);
     };
   }, [selectedFigure, isOpen, language]); // Removed 't' from dependencies as it causes double loading
   
@@ -660,9 +653,6 @@ const WisdomMapModal: FC<WisdomMapModalProps> = ({
     }
   };
 
-  // Helper functions
-  const toggleSeed = (id: string | number): void => setExpandedSeeds(prev => ({ ...prev, [id]: !prev[id] }));
-  
   const handleSeedSelect = (s: Seed, mode?: string): void => {
     onSeedSelect && onSeedSelect(s, mode);
     onClose();

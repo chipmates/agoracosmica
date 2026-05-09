@@ -27,21 +27,13 @@ import ModalsContainer from '../components/HomePage/ModalsContainer';
 // New navigation components
 import { PeekingFAB } from '../components/Navigation';
 
-import {
-  eventEmitter,
-  initiateConversation,
-  cleanupAudioResources,
-  processTextMessage,
-} from '../services/audioService';
+import { processTextMessage } from '../services/audioService';
 import seedStateManager from '../services/SeedStateManager';
 import { modeStateManager } from '../utils/modeStateManager';
 import { screenContent } from '../utils/contentSafety';
 import { isNewUser, HISTORY_PREFIXES } from '../utils/userState';
 import {
-  getStoredStoryContent,
-  saveStoryContent,
   markStoryCompleted,
-  isStoryCompleted,
   getStorageKeyForMode,
   backfillWisdomMarkers,
   STORAGE_KEYS
@@ -122,8 +114,6 @@ const HomePage: FC<HomePageProps> = ({ onLogout, onSelectFigure }) => {
   // HomePage no longer initializes queue - App.tsx handles it on first user gesture
   // This prevents duplicate initialization and ensures promise barrier stays intact
 
-  const modalShownRef = useRef(false); // Prevent duplicate shows
-
   // Touch gesture refs for swipe-to-open
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const touchEndRef = useRef<{ x: number; y: number } | null>(null);
@@ -173,10 +163,7 @@ const HomePage: FC<HomePageProps> = ({ onLogout, onSelectFigure }) => {
   // Use the new figure manager hook
   const {
     selectedFigure,
-    figureSeeds,
-    seedsLoading,
     selectFigure,
-    setSelectedFigure,
     loadFigureSeeds
   } = useFigureManager(language, onSelectFigure);
 
@@ -192,8 +179,7 @@ const HomePage: FC<HomePageProps> = ({ onLogout, onSelectFigure }) => {
       storyData,
       firstTextArrived,
       translationInProgress,
-      isAudioPlaying,
-      languageSelected
+      isAudioPlaying
     },
     actions: {
       setConfig,
@@ -202,8 +188,7 @@ const HomePage: FC<HomePageProps> = ({ onLogout, onSelectFigure }) => {
       setStoryData,
       setFirstTextArrived,
       setTranslationInProgress,
-      setIsAudioPlaying,
-      setLanguageSelected
+      setIsAudioPlaying
     }
   } = useAppStateVM();
 
@@ -267,7 +252,6 @@ const HomePage: FC<HomePageProps> = ({ onLogout, onSelectFigure }) => {
 
   // UI handlers (event handlers for modals)
   const {
-    handleMenuToggle,
     handleMenuClose,
     handleHistoryModalOpen,
     handleHistoryModalClose,
@@ -276,11 +260,9 @@ const HomePage: FC<HomePageProps> = ({ onLogout, onSelectFigure }) => {
     handleModeSelectorOpen,
     handleModeSelectorClose,
     handleFigureCarouselOpen,
-    handleFigureCarouselClose,
     handleWisdomGalleryClose,
     handleWisdomGalleryOpen,
     handleWisdomGalleryCloseComplete,
-    handleOnboardingOpen,
     handleOnboardingClose,
   } = useUIHandlers({
     setIsMenuOpen: setMenuOpen,
@@ -432,7 +414,7 @@ const HomePage: FC<HomePageProps> = ({ onLogout, onSelectFigure }) => {
   const conversationStartedRef = useRef(false);
 
   // Council state and actions (direct Zustand - removed councilAdapter)
-  const { config: councilConfig, speaker: currentSpeaker, phase: councilPhase, currentMessage: councilCurrentMessage } = useCouncilState();
+  const { config: councilConfig, speaker: currentSpeaker, phase: councilPhase } = useCouncilState();
   const {
     setCouncilConfig: setCouncilConfigAction,
     setCouncilSpeaker,
@@ -456,14 +438,6 @@ const HomePage: FC<HomePageProps> = ({ onLogout, onSelectFigure }) => {
 
   const councilEnd = useCallback(async () => {
     await councilControllerApi.endCouncil();
-  }, [councilControllerApi]);
-
-  const handleCouncilPause = useCallback(async () => {
-    await councilControllerApi.pauseCouncil();
-  }, [councilControllerApi]);
-
-  const handleCouncilResume = useCallback(async () => {
-    await councilControllerApi.resumeCouncil();
   }, [councilControllerApi]);
 
   const resetCouncilMode = useCallback(() => {
@@ -504,14 +478,6 @@ const HomePage: FC<HomePageProps> = ({ onLogout, onSelectFigure }) => {
       setCouncilPhaseAction(resolved ?? null);
     },
     [councilPhase, setCouncilPhaseAction]
-  );
-
-  const setCouncilCurrentMessage = useCallback(
-    (next: any) => {
-      const resolved = typeof next === 'function' ? next(councilCurrentMessage ?? '') : next;
-      setCouncilCurrentMessageAction(resolved ?? '');
-    },
-    [councilCurrentMessage, setCouncilCurrentMessageAction]
   );
 
   // Create a ref for fetchHistory that will be populated after hooks
@@ -661,7 +627,6 @@ const HomePage: FC<HomePageProps> = ({ onLogout, onSelectFigure }) => {
     modeManager.handleModeSelect(mode as ConversationMode, force);
   }, [modeManager]);
   handleModeSelectRef.current = handleModeSelect;
-  const handleLanguageAutoSelect = modeManager.handleLanguageAutoSelect;
 
   const setPendingRequestId = useDomainStore((state) => state.setPendingRequestId);
 
@@ -695,7 +660,7 @@ const HomePage: FC<HomePageProps> = ({ onLogout, onSelectFigure }) => {
     setConversationStarted
   } = conversationActions;
 
-  const { mergeChunks, getHistoryKey } = conversationHelpers;
+  const { getHistoryKey } = conversationHelpers;
 
   // Conversation effects hook (event listeners, story restoration, etc.)
   useConversationEffects({
@@ -740,7 +705,7 @@ const HomePage: FC<HomePageProps> = ({ onLogout, onSelectFigure }) => {
     setConversationStarted(false);
     setModeSelectorVisible(true);
     // Clear Zustand mode so prism doesn't leak to a different figure+seed
-    useDomainStore.getState().setMode(null);
+    useDomainStore.getState().resetMode();
   }, [setConversationStarted, setModeSelectorVisible]);
 
   // Ref to store pre-council state
@@ -1158,7 +1123,7 @@ const HomePage: FC<HomePageProps> = ({ onLogout, onSelectFigure }) => {
   // Subscribe to seed state changes to update UI when seeds are acquired
   useEffect(() => {
     // This ensures the UI updates when a seed is gathered from any source
-    const handleSeedStateChange = (data: any) => {
+    const handleSeedStateChange = (_data: any) => {
       // We don't need to do anything specific here since this component
       // doesn't directly display seed states, but it ensures the next time
       // the user opens the SeedsModal, it will show the updated state

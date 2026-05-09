@@ -5,16 +5,11 @@ import { loadFigureImageV2, getBestImageFromMetadata } from '../utils/imageLoade
 // Import extracted modules
 import { normalizeManifestFigureName } from './audio/introduction/figureNameNormalizer';
 import { audioPathBuilder, AUDIO_SUPPORTED_LANGUAGES } from './audio/introduction/audioPathBuilder';
-import { 
-  stopPlayback, 
-  togglePlayback as togglePlaybackControl, 
-  pausePlayback, 
-  resumePlayback, 
-  seekToPosition, 
-  setPlaybackRate as setRate,
-  restartPlayback 
+import {
+  stopPlayback,
+  togglePlayback as togglePlaybackControl,
+  restartPlayback
 } from './audio/introduction/playbackControls';
-import { QueueManager } from './audio/introduction/queueManager';
 import { HistoryManager } from './audio/introduction/historyManager';
 import { ProgressTracker } from './audio/introduction/progressTracker';
 import { getNextStory, getPreviousStory, getFullFigureName } from './audio/introduction/navigationHelper';
@@ -78,7 +73,6 @@ interface NavigationResult {
 }
 
 class IntroductionAudioService {
-  private queueManager: QueueManager;
   private historyManager: HistoryManager;
   private progressTracker: ProgressTracker;
   private currentPlayback: CurrentPlayback | null;
@@ -95,7 +89,6 @@ class IntroductionAudioService {
 
   constructor() {
     // Initialize managers
-    this.queueManager = new QueueManager();
     this.historyManager = new HistoryManager();
     this.progressTracker = new ProgressTracker((data: PlaybackData) => {
       if (this.audioControls && this.isPlaying) {
@@ -518,10 +511,9 @@ class IntroductionAudioService {
   // Pause playback - optimized for reliability
   async pause(): Promise<void> {
     if (!this.audioControls) return;
-    
+
     try {
       // First, update state immediately for responsive UI
-      const wasPlaying = this.isPlaying;
       this.isPlaying = false;
       
       // Stop progress tracking early
@@ -562,10 +554,9 @@ class IntroductionAudioService {
   // Resume playback - optimized for reliability
   async resume(): Promise<void> {
     if (!this.audioControls) return;
-    
+
     try {
       // First, update state immediately for responsive UI
-      const wasPlaying = this.isPlaying;
       this.isPlaying = true;
       
       // Start progress tracking early

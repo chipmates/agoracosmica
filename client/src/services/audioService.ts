@@ -4,24 +4,12 @@ import { transcribeAudio } from './audio/stt';
 import { convertTextToSpeech } from './audio/tts';
 import { generateResponse } from './audio/llm';
 import { loadServiceConfig } from './audio/config/serviceConfig';
-import { 
-  getStorageKeyForMode, 
-  getStoredStoryContent,
-  saveStoryContent,
-  STORAGE_KEYS 
-} from '../utils/storageKeysV2';
-import { MODE_FRAME_MESSAGES, LANGUAGE_FRAME_MESSAGES } from './audio/llm/llmUtils';
-import { processPlaceholders } from '../utils/placeholderUtils';
+import { getStorageKeyForMode } from '../utils/storageKeysV2';
 import { getContextForMode, INSTRUCTION_MODES } from './audio/conversationContext';
 import { initialMessageService } from './audio/initialMessageService';
 import type { ConversationMode as InitialMessageMode } from './audio/initialMessagePathBuilder';
 import { fetchInstructions } from './audio/instructionProcessor';
-import { 
-  addToAudioQueue, 
-  cleanupAudioResources, 
-  getAudioQueueStatus,
-  setCurrentSession 
-} from './audio/audioQueueManager';
+import { cleanupAudioResources } from './audio/audioQueueManager';
 import { Seed, Message, ConversationMode } from '../types/global';
 import { LocalStorageAdapter } from '../storage/localAdapter';
 
@@ -30,12 +18,6 @@ import { useDomainStore } from '../stores';
 let responseCounter = 0;
 
 // Types for audio service
-interface AudioFile {
-  url: string;
-  duration?: number;
-  timestamp?: number;
-}
-
 interface AudioProcessResult {
   transcription: string;
   responseText: string;
@@ -60,19 +42,6 @@ interface PlaybackCallbacks {
   onProgress?: (data: { currentTime: number; duration: number; progress: number }) => void;
   onComplete?: () => void;
   onError?: (error: any) => void;
-}
-
-interface ServiceConfig {
-  llm: {
-    provider: string;
-    model: string;
-    [key: string]: any;
-  };
-  stt: any;
-  tts: any;
-  ttsSettings?: {
-    speed?: number;
-  };
 }
 
 interface TranscriptionResult {
@@ -409,7 +378,6 @@ export const initiateConversation = async (
       console.warn(`[initiateConversation] Language mismatch: current=${currentLang}, expected=${langCode}`);
     }
 
-    let seedTitle = '';
     let seedId: number | null = null;
     if (selectedMode !== INSTRUCTION_MODES.FREE_CONVERSATION) {
       const selectedSeedId = useDomainStore.getState().seeds.selectedId;
@@ -417,17 +385,9 @@ export const initiateConversation = async (
         ? useDomainStore.getState().seeds.byFigure[figureId]?.find(s => s.id.toString() === selectedSeedId) ?? null
         : null;
       if (selectedSeed) {
-        seedTitle = selectedSeed.title ||
-                   ((selectedSeed as any).name && (selectedSeed as any).name.split(' - ')[1]) ||
-                   (selectedSeed as any).name ||
-                   '';
         seedId = selectedSeed.id ? Number(selectedSeed.id) : null;
       }
     }
-
-    // 🎯 NEW: Check if we have a pre-created initial message
-    // If yes, use simple placeholder instead of detailed LLM prompt
-    let initialMessage: string;
 
     const modeToInitialMode: Record<string, InitialMessageMode | null> = {
       [INSTRUCTION_MODES.SEED_CONVERSATION]: 'wisdom',
@@ -436,49 +396,8 @@ export const initiateConversation = async (
     };
 
     const initialMsgMode = modeToInitialMode[selectedMode!] || null;
-    const hasPreCreated = initialMsgMode &&
-                         initialMessageService.hasInitialMessage(figureId, initialMsgMode, seedId);
-
-    if (hasPreCreated) {
-      // Use simple placeholder - the pre-created message will be used in streamDriver
-      initialMessage = 'Start conversation';
-
-      if (import.meta.env.DEV) {
-        console.log('[Init] Using simple placeholder - pre-created message available', {
-          figure: figureId,
-          mode: initialMsgMode,
-          seedId
-        });
-      }
-    } else {
-      // No pre-created message - use detailed LLM prompt (fallback)
-      const languageFrame = LANGUAGE_FRAME_MESSAGES[langCode] || LANGUAGE_FRAME_MESSAGES.en;
-      let modeFrame = MODE_FRAME_MESSAGES[selectedMode!][langCode] ||
-                      MODE_FRAME_MESSAGES[selectedMode!].en;
-
-      // Create a replacements object with all potential placeholder values
-      const replacements = {
-        SEED_TITLE: seedTitle || '',
-        FIGURE: figureId || '',
-        MODE: selectedMode || '',
-        LANGUAGE: language || ''
-      };
-
-      // Process all placeholders in the mode frame
-      if (selectedMode !== INSTRUCTION_MODES.FREE_CONVERSATION) {
-        modeFrame = processPlaceholders(modeFrame, replacements);
-      }
-
-      initialMessage = processPlaceholders(`${languageFrame} ${modeFrame}`, replacements);
-
-      if (import.meta.env.DEV) {
-        console.log('[Init] Using LLM prompt - no pre-created message', {
-          figure: figureId,
-          mode: selectedMode,
-          seedId
-        });
-      }
-    }
+    const hasPreCreated = !!(initialMsgMode &&
+                         initialMessageService.hasInitialMessage(figureId, initialMsgMode, seedId));
 
     // Story mode is now handled by StoryService with pre-created S3 stories
     // LLM generation path removed - all stories are pre-created for EN/DE
