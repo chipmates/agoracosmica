@@ -202,9 +202,13 @@ const MainContent: FC<MainContentProps> = ({
             ) : (
               <div className="chat-header" key={`header-${selectedFigure?.id || 'none'}-${selectedSeed?.id || 'none'}-${selectedMode || 'none'}`}>
                 <h1 className="figure-name">{getDisplayShortName(getTranslatedFigureName())}</h1>
-                {selectedSeed && selectedMode !== 'free_conversation' && (
+                {selectedSeed && selectedMode !== 'free_conversation' ? (
                   <div className="seed-name" key={`seed-${selectedMode || 'default'}-${selectedSeed.id}`}>
                     <span className="seed-name-text">{getCurrentSeedName()}</span>
+                  </div>
+                ) : (
+                  <div className="seed-name" aria-hidden="true" style={{ visibility: 'hidden' }}>
+                    <span className="seed-name-text">{' '}</span>
                   </div>
                 )}
                 {conversationStartedFinal && selectedMode && (
