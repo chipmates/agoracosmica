@@ -1305,19 +1305,23 @@ async function loadOverview() {
     html += chartCard('Chat Activity', '<div class="empty-state" style="padding:40px 0">No chat data yet ' + RANGE_LABEL[S.range] + '</div>', 'card-wide');
   }
 
-  // Content Completions by Type — playback beacons (real consumption events)
-  // Marketing-channel attribution lives on the Marketing tab; Overview keeps
-  // engagement-signal panels only.
+  // Content STARTED by Type — playback beacons (audio first-play events).
+  // The Overview chart historically showed both started + completed mixed
+  // and was labelled "Completed", which is misleading because completed
+  // events are rare (a single completed story today vs 24 starts). The
+  // engagement-quality cut (started vs completed, completion rate) lives
+  // on the Engagement tab; Overview just surfaces what content gets
+  // first-played.
   var contentTypeItems = aggregateByLabel(contentByType.map(function(r) {
     return { label: r.type || 'unknown', c: r.c };
   }));
-  html += chartCard('Content Completed', barsHtml(contentTypeItems, '#68C397'), 'card-half');
+  html += chartCard('Content Started by Type', barsHtml(contentTypeItems, '#68C397'), 'card-half');
 
-  // Top figures by content completion
+  // Top figures by content first-play (same data, grouped by figure)
   var topFiguresContentItems = aggregateByLabel(topFiguresByContent.map(function(r) {
     return { label: cap(r.figure), c: r.c };
   }).filter(function(r) { return r.label; }));
-  html += chartCard('Top Figures by Completion', barsHtml(topFiguresContentItems, '#5B8BD4'), 'card-half');
+  html += chartCard('Top Figures by Plays', barsHtml(topFiguresContentItems, '#5B8BD4'), 'card-half');
 
   // Computed insight
   var insights = [];
