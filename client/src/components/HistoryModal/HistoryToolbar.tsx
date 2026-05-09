@@ -1,4 +1,4 @@
-import React, { FC, ReactNode, ChangeEvent } from 'react';
+import { FC, ReactNode, ChangeEvent } from 'react';
 import { Download, Upload, FileText, Broom } from '@phosphor-icons/react';
 import { RippleButton } from '../Button';
 import { isMobileOrTablet } from '../../utils/deviceDetection';

@@ -1,5 +1,5 @@
 // ConstellationInfo.tsx - Displays information about a constellation
-import React, { FC } from 'react';
+import { FC } from 'react';
 import './css/ConstellationInfo.css';
 import useTranslation from '../../hooks/useTranslation';
 import { getConstellationTranslationKey } from '../../utils/constellationTranslationHelper';

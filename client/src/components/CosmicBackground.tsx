@@ -1,5 +1,5 @@
 // src/components/CosmicBackground.tsx
-import React, { FC } from 'react';
+import { FC } from 'react';
 import './CosmicBackground.css';
 import OccasionalMeteors from './OccasionalMeteors';
 import ParticleEffect from './ParticleEffect';

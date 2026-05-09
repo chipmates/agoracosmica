@@ -1,5 +1,5 @@
 // ConstellationMap.js - Renders the constellation map with stars and lines
-import React, { FC, useState, useEffect, CSSProperties } from 'react';
+import { FC, useState, useEffect, CSSProperties } from 'react';
 import Star from './Star';
 import './css/ConstellationMap.css';
 import { getConstellationTranslationKey } from '../../utils/constellationTranslationHelper';

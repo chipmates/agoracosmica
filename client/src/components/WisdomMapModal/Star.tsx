@@ -1,5 +1,5 @@
 // Star.tsx - Individual star component for the constellation map
-import React, { FC, CSSProperties, useState, useRef, useEffect } from 'react';
+import { FC, CSSProperties, useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import './css/Star.css';
 import useTranslation from '../../hooks/useTranslation';

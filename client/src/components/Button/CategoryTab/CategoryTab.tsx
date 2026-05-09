@@ -1,4 +1,4 @@
-import React, { useCallback, forwardRef, ReactNode, KeyboardEvent, MouseEvent } from 'react';
+import { useCallback, forwardRef, ReactNode, KeyboardEvent, MouseEvent } from 'react';
 import styles from './CategoryTab.module.css';
 
 interface CategoryTabProps {

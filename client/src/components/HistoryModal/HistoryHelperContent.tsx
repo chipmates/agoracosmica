@@ -1,4 +1,4 @@
-import React, { FC, CSSProperties, ReactNode } from 'react';
+import { FC, CSSProperties, ReactNode } from 'react';
 import { Download, Trash, Funnel, Archive, BookOpen, Lightbulb, Sparkle as SparklePhosphor } from '@phosphor-icons/react';
 import HelperPopup from '../HelperPopup/HelperPopup';
 

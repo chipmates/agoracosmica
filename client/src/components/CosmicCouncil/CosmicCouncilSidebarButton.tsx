@@ -1,4 +1,4 @@
-import React, { FC, MouseEvent as ReactMouseEvent, RefObject } from 'react';
+import { FC, MouseEvent as ReactMouseEvent, RefObject } from 'react';
 import OptimizedImage from '../OptimizedImage';
 import useTranslation from '../../hooks/useTranslation';
 import CosmicCouncilIntegration from './CosmicCouncilIntegration';

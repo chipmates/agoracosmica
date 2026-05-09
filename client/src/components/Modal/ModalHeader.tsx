@@ -15,7 +15,7 @@
  * />
  */
 
-import React, { FC, ReactNode } from 'react';
+import { FC, ReactNode } from 'react';
 import { CloseButton } from '../Button';
 import styles from './ModalHeader.module.css';
 

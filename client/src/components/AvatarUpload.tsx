@@ -1,5 +1,5 @@
 // src/components/AvatarUpload.tsx
-import React, { useState, ChangeEvent, FC } from 'react';
+import { useState, ChangeEvent, FC } from 'react';
 import { useTranslation } from '../hooks/useTranslation';
 
 interface AvatarUploadProps {

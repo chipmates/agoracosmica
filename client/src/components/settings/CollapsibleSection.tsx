@@ -1,4 +1,4 @@
-import React, { FC, ReactNode, useState, useRef, useEffect } from 'react';
+import { FC, ReactNode, useState, useRef, useEffect } from 'react';
 import { CaretDown, CaretRight } from '@phosphor-icons/react';
 import styles from './CollapsibleSection.module.css';
 

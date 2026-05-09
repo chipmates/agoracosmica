@@ -1,5 +1,5 @@
 // src/components/LandscapeWarning.tsx
-import React, { FC } from 'react';
+import { FC } from 'react';
 import './LandscapeWarning.css';
 import { useTranslation } from '../hooks/useTranslation';
 

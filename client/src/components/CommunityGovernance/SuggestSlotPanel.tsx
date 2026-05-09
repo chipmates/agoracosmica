@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import { FC } from 'react';
 import { Sparkle, Hourglass } from '@phosphor-icons/react';
 import useTranslation from '../../hooks/useTranslation';
 import type { SuggestionSlots } from './computeVotingPower';

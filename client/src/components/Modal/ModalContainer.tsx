@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, FC, ReactNode, KeyboardEvent, MouseEvent } from 'react';
+import { useEffect, useRef, FC, ReactNode, KeyboardEvent, MouseEvent } from 'react';
 import { useBodyScrollLock } from '../../hooks/useBodyScrollLock';
 import './ModalContainer.css'; // Dedicated modal CSS
 

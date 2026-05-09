@@ -7,7 +7,7 @@
  * - Optimized for both thumbnail and full-size images
  * - Uses Vite's import.meta.glob() for dynamic image loading
  */
-import React, { FC, useState, useEffect, useCallback, useMemo, CSSProperties } from 'react';
+import React, { FC, useState, useEffect, useCallback, CSSProperties } from 'react';
 import { normalizeFigureKey } from '../utils/imagePathUtils';
 import { loadFigureImageV2, getBestImageFromMetadata, type ImageResult } from '../utils/imageLoaderV2';
 import './OptimizedUIImage.css'; // Reuse the base styles

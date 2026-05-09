@@ -1,6 +1,6 @@
 // SeedDetailView.tsx - Beautiful full-page reading view for seeds
 // Replaces accordion view with reading-optimized design from test page
-import React, { FC, useEffect, useRef, useState } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 import { Seed } from '../../types/global';
 import useTranslation from '../../hooks/useTranslation';
 import useResponsive from '../../hooks/useResponsive';

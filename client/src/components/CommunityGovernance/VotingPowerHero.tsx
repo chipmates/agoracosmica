@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useRef, useState } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 import { Info } from '@phosphor-icons/react';
 import useTranslation from '../../hooks/useTranslation';
 import {

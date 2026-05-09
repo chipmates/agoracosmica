@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { 
   createBrowserRouter, 
   RouterProvider, 
@@ -35,7 +35,7 @@ import { OrientationLock } from './components/OrientationLock';
 const FigureTestModal = import.meta.env.DEV
   ? React.lazy(() => import('./components/FigureTestModal').then(m => ({ default: m.FigureTestModal })))
   : null;
-import { isMobileOrTablet, initBatteryMonitoring } from './utils/deviceDetection';
+import { initBatteryMonitoring } from './utils/deviceDetection';
 import { createSessionController, createConversationController, createCouncilController } from './controllers';
 import type { SessionController, ConversationController, CouncilControllerInstance } from './controllers';
 import { subscribeSessionControllerHandlers } from './controllers/sessionControllerRegistry';

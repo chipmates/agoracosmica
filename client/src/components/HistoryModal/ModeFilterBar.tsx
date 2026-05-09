@@ -1,4 +1,4 @@
-import React, { FC, CSSProperties, ReactElement } from 'react';
+import { FC, CSSProperties, ReactElement } from 'react';
 import { isMobileOrTablet } from '../../utils/deviceDetection';
 import { MODES } from './historyModalConstants';
 

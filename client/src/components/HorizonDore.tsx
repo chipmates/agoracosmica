@@ -4,7 +4,7 @@
  * Two hooded figures on a rocky outcrop gazing up at the celestial portal.
  * Shape 2 (sharp crags) frozen as the production variant.
  */
-import React, { FC } from 'react';
+import { FC } from 'react';
 import './HorizonLandscape.css';
 import OptimizedImage from './OptimizedImage';
 

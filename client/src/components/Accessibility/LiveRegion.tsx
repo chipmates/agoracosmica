@@ -1,5 +1,5 @@
 // src/components/Accessibility/LiveRegion.tsx
-import React, { FC } from 'react';
+import { FC } from 'react';
 import useLiveRegion from '../../hooks/accessibility/useLiveRegion';
 import './LiveRegion.css';
 

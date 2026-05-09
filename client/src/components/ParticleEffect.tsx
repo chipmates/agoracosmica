@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useRef, useState } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 import { getCachedPerformanceTier } from '../utils/performanceDetector';
 
 interface Particle {

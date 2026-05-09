@@ -1,4 +1,4 @@
-import React, { FC, ReactNode, ReactElement, useState, useEffect, useRef, MouseEvent } from 'react';
+import { FC, ReactNode, ReactElement, useState, useEffect, useRef, MouseEvent } from 'react';
 import './styles.css';
 import FigureController from './FigureController';
 

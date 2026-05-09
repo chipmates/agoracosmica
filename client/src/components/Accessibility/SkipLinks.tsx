@@ -1,5 +1,5 @@
 // src/components/Accessibility/SkipLinks.tsx
-import React, { FC, MouseEvent, useState, useEffect, useMemo } from 'react';
+import { FC, MouseEvent, useState, useEffect, useMemo } from 'react';
 import { useTranslation } from '../../hooks/useTranslation';
 import './SkipLinks.css';
 

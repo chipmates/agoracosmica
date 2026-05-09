@@ -1,5 +1,5 @@
 // src/components/CosmicCouncil/CosmicCouncilLoaderIntegration.tsx
-import React, { FC, useState, useEffect, useLayoutEffect } from 'react';
+import { FC, useState, useEffect, useLayoutEffect } from 'react';
 import CosmicCouncilLoader, { LoaderStage } from './CosmicCouncilLoader';
 import { sendSessionEndBeacon } from '../../services/audio/tts/ttsSessions';
 

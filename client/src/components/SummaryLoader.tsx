@@ -1,5 +1,5 @@
 // src/components/SummaryLoader.tsx
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import { BookOpen, Star, Sparkle } from '@phosphor-icons/react';
 import { useTranslation } from '../hooks/useTranslation';
 import './SummaryLoader.css';

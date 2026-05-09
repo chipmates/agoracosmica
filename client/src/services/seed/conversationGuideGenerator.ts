@@ -5,7 +5,6 @@
 
 import { truncateAtWordBoundary } from './textUtils';
 import { normalizeSeedData } from './seedNormalizer';
-import { Seed } from '../../types/global';
 
 /**
  * Generate seeds overview for free conversation mode

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import { FC } from 'react';
 import useTranslation from '../../hooks/useTranslation';
 import type { TopicItem } from './topicCatalog';
 import styles from './CommunityGovernanceModal.module.css';

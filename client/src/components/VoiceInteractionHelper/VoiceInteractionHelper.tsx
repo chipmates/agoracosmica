@@ -1,5 +1,5 @@
 // src/components/VoiceInteractionHelper/VoiceInteractionHelper.tsx
-import React, { FC, useState, useEffect, ChangeEvent } from 'react';
+import { FC, useState, useEffect, ChangeEvent } from 'react';
 import { Microphone, Keyboard } from '@phosphor-icons/react';
 import useTranslation from '../../hooks/useTranslation';
 import { useUIStore } from '../../stores/uiStore';

@@ -3,7 +3,7 @@
  * Shown once on first WisdomGallery visit. Combines the ECHO-CONCEPT
  * philosophy (modern knowledge, historical lens) with transparent AI disclosure.
  */
-import React, { FC, CSSProperties, ReactNode } from 'react';
+import { FC, CSSProperties, ReactNode } from 'react';
 import HelperPopup from './HelperPopup/HelperPopup';
 import useTranslation from '../hooks/useTranslation';
 import { useUIStore } from '../stores/uiStore';

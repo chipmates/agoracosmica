@@ -1,5 +1,5 @@
 // src/components/AudioLibrary/MiniPlayer.tsx
-import React, { FC, useState, useEffect, useRef, MouseEvent as ReactMouseEvent } from 'react';
+import { FC, useState, useEffect, useRef, MouseEvent as ReactMouseEvent } from 'react';
 import { Play, Pause, CaretUp } from '@phosphor-icons/react';
 import OptimizedFigureImage from '../OptimizedFigureImage';
 import { useTranslation } from '../../hooks/useTranslation';

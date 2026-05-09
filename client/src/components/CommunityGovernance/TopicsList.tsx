@@ -1,4 +1,4 @@
-import React, { FC, Fragment, useState, useCallback } from 'react';
+import { FC, Fragment, useState, useCallback } from 'react';
 import {
   CaretDown,
   Translate,

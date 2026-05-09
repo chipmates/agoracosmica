@@ -1,6 +1,6 @@
 // src/components/UnifiedInputContainer.tsx
-import React, { useState, useRef, useEffect, useCallback, FC, KeyboardEvent, ChangeEvent, MouseEvent } from 'react';
-import { Microphone, MicrophoneSlash, Keyboard, PaperPlaneTilt, Sparkle } from '@phosphor-icons/react';
+import { useState, useRef, useEffect, useCallback, FC, KeyboardEvent, ChangeEvent, MouseEvent } from 'react';
+import { Microphone, Keyboard, PaperPlaneTilt, Sparkle } from '@phosphor-icons/react';
 import { processAudio, processTextMessage } from '../services/audioService';
 import ProcessingLoader from './ProcessingLoader';
 import { ttsScheduler } from '../controllers/conversationStreamDriver';

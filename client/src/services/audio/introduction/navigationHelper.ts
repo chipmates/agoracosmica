@@ -1,7 +1,7 @@
 // Navigation helper for playing next/previous stories
 import { getSeedById, getFigureSeedDataAsync } from '../../seedCacheInitializer';
 import { normalizeManifestFigureName, isKingJrVariant } from './figureNameNormalizer';
-import { audioPathBuilder, AUDIO_SUPPORTED_LANGUAGES, findAvailableAudioPath } from './audioPathBuilder';
+import { findAvailableAudioPath } from './audioPathBuilder';
 
 interface Story {
   id: string;

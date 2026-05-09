@@ -25,10 +25,8 @@ import MainContentContainer from '../components/HomePage/MainContentContainer';
 import ModalsContainer from '../components/HomePage/ModalsContainer';
 
 // New navigation components
-import { PeekingFAB, BookmarkQuickLinks } from '../components/Navigation';
-import HelperPopup from '../components/HelperPopup/HelperPopup';
+import { PeekingFAB } from '../components/Navigation';
 
-import { storyIntegrationManager } from '../services/StoryIntegrationManager';
 import {
   eventEmitter,
   initiateConversation,
@@ -61,7 +59,6 @@ import { createLegacyConversationStream } from '../controllers/conversationStrea
 import { mapErrorToUserMessage } from '../services/llm/errorMessages';
 import { useDomainStore } from '../stores';
 import { ConversationMode, Seed } from '../types/global';
-import { addToAudioQueue } from '../services/audio/audioQueueManager';
 import './HomePage.css';
 
 declare global {

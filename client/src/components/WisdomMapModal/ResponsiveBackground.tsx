@@ -1,5 +1,5 @@
 // ResponsiveBackground.tsx - Uses Vite's on-demand image optimization
-import React, { FC, CSSProperties } from 'react';
+import { FC, CSSProperties } from 'react';
 import OptimizedImage from '../OptimizedImage';
 import './css/ResponsiveBackground.css';
 

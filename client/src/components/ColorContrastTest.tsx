@@ -1,4 +1,4 @@
-import React, { useState, useEffect, FC, ChangeEvent, MouseEvent } from 'react';
+import { useState, useEffect, FC, ChangeEvent, MouseEvent } from 'react';
 import styles from './ColorContrastTest.module.css';
 
 // Type definitions

@@ -1,5 +1,5 @@
 // ProgressBar.tsx - Segmented progress bar showing per-seed, per-mode completion
-import React, { FC } from 'react';
+import { FC } from 'react';
 import './css/ProgressBar.css';
 
 export interface SeedSliceStatus {

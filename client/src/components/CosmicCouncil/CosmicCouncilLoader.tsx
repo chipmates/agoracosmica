@@ -1,5 +1,5 @@
 // src/components/CosmicCouncil/CosmicCouncilLoader.tsx
-import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
+import { FC, useEffect, useMemo, useRef, useState } from 'react';
 import { Brain, Sparkle, Star, Users } from '@phosphor-icons/react';
 import ReactDOM from 'react-dom';
 import '../ProcessingLoader.css'; // Reuse existing cosmic styles

@@ -9,7 +9,7 @@
  * Built according to CLAUDE.md principles and design system.
  */
 
-import React, { FC, useState, useEffect, useRef } from 'react';
+import { FC, useState, useEffect, useRef } from 'react';
 import { ModalContainer, ModalHeader } from '../Modal';
 import OptimizedFigureImage from '../OptimizedFigureImage';
 import { historicalFiguresBase } from '../../api/figures';

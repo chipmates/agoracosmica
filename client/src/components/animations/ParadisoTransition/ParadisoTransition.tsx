@@ -14,7 +14,7 @@
  *
  * Adapted from paradiso-three-act.jsx Act 3.
  */
-import React, { useState, useEffect, useMemo, useRef, FC } from 'react';
+import { useState, useEffect, useMemo, useRef, FC } from 'react';
 import { useTranslation } from '../../../hooks/useTranslation';
 import './ParadisoTransition.css';
 

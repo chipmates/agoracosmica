@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState, memo, CSSProperties } from 'react';
+import { FC, useEffect, useState, memo, CSSProperties } from 'react';
 import './OccasionalMeteors.css';
 
 interface MeteorOriginStyle extends CSSProperties {

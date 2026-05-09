@@ -1,4 +1,4 @@
-import React, { FC, ReactNode, useState, ChangeEvent } from 'react';
+import { FC, ReactNode, useState, ChangeEvent } from 'react';
 import { createPortal } from 'react-dom';
 import useResponsive from '../../hooks/useResponsive';
 import { useTranslation } from '../../hooks/useTranslation';

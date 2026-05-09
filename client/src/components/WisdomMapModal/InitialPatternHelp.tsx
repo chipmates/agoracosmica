@@ -1,5 +1,5 @@
 // InitialPatternHelp_NEW.js - Using the global HelperPopup component
-import React, { FC, CSSProperties, ReactNode } from 'react';
+import { FC, CSSProperties, ReactNode } from 'react';
 import HelperPopup from '../HelperPopup/HelperPopup';
 import useTranslation from '../../hooks/useTranslation';
 import { useUIStore } from '../../stores/uiStore';

@@ -1,5 +1,5 @@
 // src/components/MessagePopup.tsx
-import React, { FC } from 'react';
+import { FC } from 'react';
 import './MessagePopup.css';
 import { useTranslation } from '../hooks/useTranslation';
 import { useFocusTrap } from '../hooks/useFocusTrap';

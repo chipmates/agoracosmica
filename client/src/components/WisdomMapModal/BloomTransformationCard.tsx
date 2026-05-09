@@ -2,7 +2,7 @@
 // Shows the real platform star at large scale morphing between bloom levels.
 // Stays visible until the user taps to dismiss.
 
-import React, { useEffect, useState, useRef, FC } from 'react';
+import { useEffect, useState, useRef, FC } from 'react';
 import './css/BloomTransformationCard.css';
 // Import real Star.css so we get the actual platform star visuals
 import './css/Star.css';

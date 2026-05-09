@@ -5,7 +5,6 @@ import OptimizedFigureImage from './OptimizedFigureImage';
 import { sanitizeContent } from '../utils/sanitizeContent';
 import { getDisplayShortName } from '../utils/figureDisplayName';
 import { useTranslation } from '../hooks/useTranslation';
-import { getSpeakerId } from '../services/council/speakerRegistry';
 import VoiceInteractionHelper from './VoiceInteractionHelper';
 import { Flag } from '@phosphor-icons/react';
 import { preferencesIndexedDbAdapter } from '../storage/preferencesIndexedDbAdapter';

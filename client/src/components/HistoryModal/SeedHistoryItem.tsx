@@ -1,4 +1,4 @@
-import React, { FC, ReactNode } from 'react';
+import { FC, ReactNode } from 'react';
 import { CaretDown, CaretRight, Trash } from '@phosphor-icons/react';
 import { RippleButton } from '../Button';
 import { isMobileOrTablet } from '../../utils/deviceDetection';

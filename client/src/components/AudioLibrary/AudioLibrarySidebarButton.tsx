@@ -1,4 +1,4 @@
-import React, { FC, useState, MouseEvent as ReactMouseEvent, RefObject } from 'react';
+import { FC, useState, MouseEvent as ReactMouseEvent, RefObject } from 'react';
 import AudioLibraryModal from './AudioLibraryModal';
 import OptimizedImage from '../OptimizedImage';
 import useTranslation from '../../hooks/useTranslation';

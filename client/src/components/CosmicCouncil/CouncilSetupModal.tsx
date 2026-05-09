@@ -1,7 +1,7 @@
 // src/components/CosmicCouncil/CouncilSetupModal.tsx
 import React, { useState, useEffect, useRef, FC, ReactNode, MouseEvent } from 'react';
 import { useBodyScrollLock } from '../../hooks/useBodyScrollLock';
-import { Play, Crown, Sparkle, Gear, MoonStars, Lightning as Zap, Users, Wrench, Star, Heart, Globe, ChatText as MessageSquare, PuzzlePiece, Check } from '@phosphor-icons/react';
+import { Play, Crown, Sparkle, MoonStars, Lightning as Zap, Users, Wrench, Star, Globe, PuzzlePiece } from '@phosphor-icons/react';
 import { createPortal } from 'react-dom';
 import HelperPopup from '../HelperPopup/HelperPopup';
 import { useUIStore } from '../../stores/uiStore';
@@ -30,8 +30,6 @@ import {
   CatalogCouncil,
   ESTIMATED_DURATION
 } from '../../data/councilCatalog';
-import { getCouncilArtwork } from './CouncilArtwork';
-import { getThemeAccentVar } from '../../data/councilCatalog';
 import './CouncilSetupModal.css';
 
 // Type definitions

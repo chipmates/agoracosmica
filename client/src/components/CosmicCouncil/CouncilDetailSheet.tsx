@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import { FC } from 'react';
 import { createPortal } from 'react-dom';
 import { Play, Crown, ArrowsClockwise, Lock } from '@phosphor-icons/react';
 import { CloseButton } from '../Button';
@@ -14,7 +14,6 @@ import {
   getThemeAccentVar,
   ESTIMATED_DURATION,
 } from '../../data/councilCatalog';
-import { getCouncilArtwork } from './CouncilArtwork';
 
 interface CouncilDetailSheetProps {
   council: CatalogCouncil | null;

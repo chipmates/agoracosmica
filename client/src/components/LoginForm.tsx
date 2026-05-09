@@ -1,5 +1,5 @@
 // src/components/LoginForm.tsx
-import React, { useState, FormEvent, FC } from 'react';
+import { useState, FormEvent, FC } from 'react';
 import { useTranslation } from '../hooks/useTranslation';
 import { preferencesIndexedDbAdapter } from '../storage/preferencesIndexedDbAdapter';
 import AvatarUpload from './AvatarUpload';

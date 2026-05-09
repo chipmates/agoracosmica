@@ -1,4 +1,4 @@
-import React, { FC, useRef, useState, useEffect, useCallback } from 'react';
+import { FC, useRef, useState, useEffect, useCallback } from 'react';
 import { CaretLeft, CaretRight } from '@phosphor-icons/react';
 import useTranslation from '../../hooks/useTranslation';
 import { CatalogCouncil, CatalogTheme } from '../../data/councilCatalog';

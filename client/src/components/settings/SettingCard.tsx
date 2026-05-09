@@ -1,7 +1,6 @@
-import React, { FC, ReactNode } from 'react';
+import { FC, ReactNode } from 'react';
 import { CosmicHeading } from '../Typography';
 import { FadeInWhenVisible } from '../MicroInteractions';
-import styles from './SettingCard.module.css';
 
 interface CosmicCardProps {
   children: ReactNode;

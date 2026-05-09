@@ -1,5 +1,5 @@
 // src/components/LoginContainer.tsx
-import React, { forwardRef, ReactNode } from 'react';
+import { forwardRef, ReactNode } from 'react';
 import './LoginContainer.css';
 import CosmicLogo from './CosmicLogo';
 import PerfectPortal from './PerfectPortal';

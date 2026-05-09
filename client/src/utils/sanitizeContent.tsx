@@ -7,7 +7,7 @@
  * Will be refactored to TypeScript in Week 2 as per roadmap
  */
 
-import React, { FC, ReactNode } from 'react';
+import { FC, ReactNode } from 'react';
 import DOMPurify from 'dompurify';
 
 interface SanitizationWarning {

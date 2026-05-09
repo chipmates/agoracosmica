@@ -3,7 +3,7 @@
 import React, { FC, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { CloseButton } from '../Button';
-import { useFactCheck, FactCheckStory } from '../../hooks/useFactCheck';
+import { useFactCheck } from '../../hooks/useFactCheck';
 import { useTranslation } from '../../hooks/useTranslation';
 import {
   CheckCircle,

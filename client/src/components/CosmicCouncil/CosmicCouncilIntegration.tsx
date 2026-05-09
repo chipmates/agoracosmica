@@ -1,5 +1,5 @@
 // src/components/CosmicCouncil/CosmicCouncilIntegration.tsx
-import React, { FC } from 'react';
+import { FC } from 'react';
 import CouncilSetupModal from './CouncilSetupModal';
 
 interface CouncilConfig {

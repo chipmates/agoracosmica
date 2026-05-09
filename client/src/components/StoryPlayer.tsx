@@ -3,7 +3,7 @@ import React, { useReducer, useEffect, useRef, useState, useCallback, FC } from 
 import { useDomainStore } from '../stores/domainStore';
 import { useUIStore } from '../stores/uiStore';
 import { useTranslation } from '../hooks/useTranslation';
-import { Headphones, Info, SpeakerSimpleHigh, CaretDown, CaretUp, Play, TrendUp, Trophy, Sparkle, BookOpen, BookBookmark, CheckCircle, Scroll } from '@phosphor-icons/react';
+import { Headphones, Info, CaretDown, CaretUp, Play, TrendUp, Trophy, Sparkle, BookOpen, BookBookmark, CheckCircle, Scroll } from '@phosphor-icons/react';
 import StoryAudioPlayer from './StoryAudioPlayer';
 import AudioLibraryModal from './AudioLibrary/AudioLibraryModal';
 import HelperPopup from './HelperPopup/HelperPopup';

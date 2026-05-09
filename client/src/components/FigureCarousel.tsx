@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, FC, MouseEvent, KeyboardEvent } from 'react';
 import { useSwipeable } from 'react-swipeable';
-import { historicalFigures, getHistoricalFigures } from '../api/figures';
+import { getHistoricalFigures } from '../api/figures';
 import { CategoryTab, ActionButton } from './Button';
 import { BookOpen, Check, Sparkle, BookOpenText, Lightbulb, PaintBrush } from "@phosphor-icons/react";
 import OptimizedImage from './OptimizedImage';

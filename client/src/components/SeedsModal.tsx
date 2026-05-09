@@ -1,5 +1,5 @@
 // SeedsModal.tsx - Modal wrapper for wisdom seeds display
-import React, { FC } from 'react';
+import { FC } from 'react';
 import WisdomMapModal from './WisdomMapModal'; // Integrated modal with map + detail views
 import { Figure } from '../types/global';
 

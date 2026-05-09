@@ -5,8 +5,8 @@
  * ULTRATHINK 2025 - Holistic Approach
  */
 
-import React, { useState, useEffect, useMemo } from 'react';
-import { getCachedPerformanceTier, shouldEnableLiquidGlass, PerformanceTier } from '../utils/performanceDetector';
+import { useState, useEffect, useMemo } from 'react';
+import { shouldEnableLiquidGlass, PerformanceTier } from '../utils/performanceDetector';
 import { useAdaptiveEffects } from './useBatteryAwareGlass';
 
 type GlassVariant = 'default' | 'sidebar' | 'audio' | 'popup' | 'cosmic' | 'compact';

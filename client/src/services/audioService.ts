@@ -10,10 +10,8 @@ import {
   saveStoryContent,
   STORAGE_KEYS 
 } from '../utils/storageKeysV2';
-import { LLM_SERVICES } from './audio/config/serviceConfig';
-import { MODE_FRAME_MESSAGES, LANGUAGE_FRAME_MESSAGES, getLanguageParameters } from './audio/llm/llmUtils';
+import { MODE_FRAME_MESSAGES, LANGUAGE_FRAME_MESSAGES } from './audio/llm/llmUtils';
 import { processPlaceholders } from '../utils/placeholderUtils';
-import { isMobileOrTablet } from '../utils/deviceDetection';
 import { getContextForMode, INSTRUCTION_MODES } from './audio/conversationContext';
 import { initialMessageService } from './audio/initialMessageService';
 import type { ConversationMode as InitialMessageMode } from './audio/initialMessagePathBuilder';
@@ -24,7 +22,7 @@ import {
   getAudioQueueStatus,
   setCurrentSession 
 } from './audio/audioQueueManager';
-import { Seed, Language, Message, ConversationMode } from '../types/global';
+import { Seed, Message, ConversationMode } from '../types/global';
 import { LocalStorageAdapter } from '../storage/localAdapter';
 
 import { useDomainStore } from '../stores';

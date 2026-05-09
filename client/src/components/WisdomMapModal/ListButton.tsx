@@ -1,5 +1,5 @@
 // ListButton.tsx - Simple button to open SeedDetailView (List view)
-import React, { FC } from 'react';
+import { FC } from 'react';
 import { ListBullets } from '@phosphor-icons/react';
 import './css/ListButton.css';
 import { useTranslation } from '../../hooks/useTranslation';

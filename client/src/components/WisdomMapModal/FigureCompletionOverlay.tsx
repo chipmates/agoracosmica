@@ -2,7 +2,7 @@
 // Slow Illumination: stars light up one by one over 3s synced to choir sound,
 // then CompletionCelebration card fades in on top.
 
-import React, { useEffect, useState, useCallback, FC } from 'react';
+import { useEffect, useState, useCallback, FC } from 'react';
 import CompletionCelebration from './CompletionCelebration';
 import './css/FigureCompletionOverlay.css';
 import type { CommunityTier } from '../CommunityGovernance/computeVotingPower';

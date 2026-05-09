@@ -1,7 +1,7 @@
 // src/components/MicrophonePermissionError.tsx
 // User-facing microphone permission error component with recovery instructions
 
-import React, { FC } from 'react';
+import { FC } from 'react';
 import { useTranslation } from '../hooks/useTranslation';
 import { isIOS, isAndroid } from '../utils/deviceDetection';
 import { X, Warning } from '@phosphor-icons/react';

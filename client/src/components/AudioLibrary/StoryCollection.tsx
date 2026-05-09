@@ -1,6 +1,6 @@
 // src/components/AudioLibrary/StoryCollection.tsx
 // Spotify-inspired modern design - 2025 best practices
-import React, { FC, useState, useEffect, useMemo, useCallback } from 'react';
+import { FC, useState, useEffect, useMemo } from 'react';
 import { Play, Check, Clock, SpeakerSimpleHigh, BookOpen } from '@phosphor-icons/react';
 import { AUDIO_SUPPORTED_LANGUAGES } from '../../constants/languages';
 import { getSeedById } from '../../services/seedCacheInitializer';

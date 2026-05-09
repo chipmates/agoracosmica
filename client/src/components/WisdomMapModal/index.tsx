@@ -1,10 +1,9 @@
 // WisdomMapModal/index.js - Main export for the WisdomMapModal component
-import React, { FC, useState, useEffect, useMemo, useRef, CSSProperties } from 'react';
+import { FC, useState, useEffect, useMemo, useRef, CSSProperties } from 'react';
 // Removed direct import from seedsdata.js (replaced with multilingual seed loading)
 // Using direct seed loader to avoid merging issues
 import { loadSeedsDirectly } from '../../services/directSeedLoader';
 import seedStateManager from '../../services/SeedStateManager';
-import { isStoryCompleted, isPrismCompleted, STORAGE_KEYS } from '../../utils/storageKeysV2';
 import { computeSeedSlices, computeSeedLevels } from '../../utils/seedLevelComputation';
 import {
   computePendingBlooms,
@@ -43,7 +42,6 @@ import SeedDetailsPanel from './SeedDetailsPanel';
 import ProgressBar, { SeedSliceStatus } from './ProgressBar';
 import CompletionCelebration from './CompletionCelebration';
 import InitialPatternHelp from './InitialPatternHelp';
-import HelperPopup from '../HelperPopup/HelperPopup';
 import { FactCheckModal } from '../FactCheck/FactCheckModal';
 import CommunityGovernanceModal from '../CommunityGovernance/CommunityGovernanceModal';
 import {
@@ -52,8 +50,7 @@ import {
   type CommunityTier,
 } from '../CommunityGovernance/computeVotingPower';
 import { useUIStore } from '../../stores/uiStore';
-import { MagnifyingGlass, BookOpen, Graph, ListBullets, Stack, NavigationArrow, TrendUp, Lightbulb, Info, SealCheck, Users } from '@phosphor-icons/react';
-import { getConstellationTranslationKey } from '../../utils/constellationTranslationHelper';
+import { ListBullets, Info, SealCheck, Users } from '@phosphor-icons/react';
 import type { Figure, Seed } from '../../types/global';
 
 // We now use the modular CSS files in the css directory

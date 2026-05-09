@@ -1,5 +1,5 @@
 // src/components/ProcessingLoader.tsx
-import React, { useEffect, useMemo, useRef, useState, FC } from 'react';
+import { useEffect, useMemo, useRef, useState, FC } from 'react';
 import { Brain, Sparkle, Star } from '@phosphor-icons/react';
 import ReactDOM from 'react-dom';
 import './ProcessingLoader.css';

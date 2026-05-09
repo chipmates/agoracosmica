@@ -1,4 +1,4 @@
-import React, { FC, useState, MouseEvent as ReactMouseEvent, RefObject } from 'react';
+import { FC, useState, MouseEvent as ReactMouseEvent, RefObject } from 'react';
 import { createPortal } from 'react-dom';
 import WisdomMapModal from './index';
 import OptimizedImage from '../OptimizedImage';

@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import type { DomainSlices, ConversationMessage, CouncilConfig } from './slices/domainTypes';
-import { ConversationMode, type User, type Language, type Figure, type Seed, type Message } from '../types/global';
+import { ConversationMode, type User, type Language, type Figure, type Seed } from '../types/global';
 import { createLanguageSlice } from './slices/languageSlice';
 import { createPreferencesSlice } from './slices/preferencesSlice';
 import { createFirstVisitSlice } from './slices/firstVisitSlice';

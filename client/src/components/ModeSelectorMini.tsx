@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, FC, CSSProperties } from 'react';
+import { useState, useEffect, useRef, FC, CSSProperties } from 'react';
 import ReactDOM from 'react-dom';
 import { Bird, Books, Sparkle, Mountains, DiamondsFour } from '@phosphor-icons/react';
 import { CloseButton } from './Button';

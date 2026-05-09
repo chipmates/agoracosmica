@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import { FC } from 'react';
 import { ToggleLeft, ToggleRight } from '@phosphor-icons/react';
 
 interface ToggleSwitchProps {

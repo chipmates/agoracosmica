@@ -5,7 +5,6 @@
 
 import { LANGUAGE_CODES, LanguageCode } from '../../constants/languages';
 import type { Language, Translation } from '../../types/global';
-import { preferencesAdapter } from '../../storage/preferencesAdapter';
 import { LocalStorageAdapter } from '../../storage/localAdapter';
 
 // ============================================================================

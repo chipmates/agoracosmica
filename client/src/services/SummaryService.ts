@@ -4,7 +4,7 @@ import { loadServiceConfig } from './audio/config/serviceConfig';
 import { generateResponse } from './audio/llm';
 import { generateFreeTierSummary } from './proxy/freeTierAdapter';
 import { keyStorage } from './storage/keyStorageService';
-import { Seed, Language, Message } from '../types/global';
+import { Seed, Language } from '../types/global';
 
 import { useDomainStore } from '../stores/domainStore';
 

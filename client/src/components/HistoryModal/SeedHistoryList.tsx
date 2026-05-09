@@ -1,4 +1,4 @@
-import React, { FC, CSSProperties, ReactNode } from 'react';
+import { FC, CSSProperties, ReactNode } from 'react';
 import SeedHistoryItem from './SeedHistoryItem';
 import type { HistoryData, Message, Seed } from './historyModalTypes';
 

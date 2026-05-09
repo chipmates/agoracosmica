@@ -1,4 +1,4 @@
-import React, { FC, useEffect } from 'react';
+import { FC, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import CloseButton from '../components/Button/CloseButton';
 import './LegalPages.css';

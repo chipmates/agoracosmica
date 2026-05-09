@@ -3,7 +3,7 @@
 import { STORAGE_KEYS, getStoredStoryContent, isStoryCompleted, getStoredPrismContent, isPrismCompleted } from '../../utils/storageKeysV2';
 import { LocalStorageAdapter } from '../../storage/localAdapter';
 import { readIndexedDbConversationEntries } from './historyStorageUtils';
-import { Figure, Message } from '../../types/global';
+import { Figure } from '../../types/global';
 
 interface LoadHistoryOptions {
   signal?: AbortSignal;

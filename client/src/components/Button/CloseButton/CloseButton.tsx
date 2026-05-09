@@ -1,4 +1,4 @@
-import React, { useState, useEffect, forwardRef, MouseEvent, CSSProperties } from 'react';
+import { useState, useEffect, forwardRef, MouseEvent, CSSProperties } from 'react';
 import { X } from '@phosphor-icons/react';
 
 interface CloseButtonProps {

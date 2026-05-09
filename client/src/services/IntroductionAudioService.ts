@@ -1,11 +1,10 @@
 // src/services/IntroductionAudioService.ts
 import { audioStoryService } from './AudioStoryService';
-import { getSeedById } from './seedCacheInitializer';
 import { loadFigureImageV2, getBestImageFromMetadata } from '../utils/imageLoaderV2';
 
 // Import extracted modules
-import { normalizeManifestFigureName, isKingJrVariant } from './audio/introduction/figureNameNormalizer';
-import { audioPathBuilder, AUDIO_SUPPORTED_LANGUAGES, findAvailableAudioPath } from './audio/introduction/audioPathBuilder';
+import { normalizeManifestFigureName } from './audio/introduction/figureNameNormalizer';
+import { audioPathBuilder, AUDIO_SUPPORTED_LANGUAGES } from './audio/introduction/audioPathBuilder';
 import { 
   stopPlayback, 
   togglePlayback as togglePlaybackControl, 

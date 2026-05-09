@@ -1,5 +1,5 @@
 // src/components/CosmicCouncil/CosmicCouncilHeader.tsx
-import React, { FC, useState, useEffect } from 'react';
+import { FC, useState, useEffect } from 'react';
 import { Crown } from '@phosphor-icons/react';
 import OptimizedFigureImage from '../OptimizedFigureImage';
 import useTranslation from '../../hooks/useTranslation';

@@ -1,5 +1,5 @@
 // src/components/CosmicCouncil/SolarSystemInterface.tsx
-import React, { FC, useState, useCallback, DragEvent, CSSProperties } from 'react';
+import { FC, useState, useCallback, DragEvent, CSSProperties } from 'react';
 // Removed Framer Motion for instant UI response
 import { Crown, X, Plus } from '@phosphor-icons/react';
 import OptimizedFigureImage from '../OptimizedFigureImage';
