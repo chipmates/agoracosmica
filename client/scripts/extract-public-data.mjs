@@ -4,8 +4,8 @@
 // Reads full seed data, voice profiles, figure translations, and story files
 // Outputs lightweight summaries for prerendering and client display
 
-import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from 'fs';
-import { join, basename } from 'path';
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs';
+import { join } from 'path';
 
 const CLIENT_DIR = join(import.meta.dirname, '..');
 const SEEDS_DIR = join(CLIENT_DIR, 'src/assets/translations/seeds');

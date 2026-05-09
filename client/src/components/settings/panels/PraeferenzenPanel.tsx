@@ -175,7 +175,6 @@ const PraeferenzenPanel: FC<PraeferenzenPanelProps> = ({
         <SpeechPanel
           SettingCard={SettingCard}
           CATEGORY_ICONS={CATEGORY_ICONS}
-          OptionButtons={OptionButtons}
           config={config}
           onChange={onChange}
         />

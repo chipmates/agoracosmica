@@ -44,7 +44,7 @@ const PostQuestVerdictCard: FC<PostQuestVerdictCardProps> = ({
 
   return (
     <div
-      className={`quest-verdict-card ${visible ? 'visible' : ''}`}
+      className="quest-verdict-card visible"
       role="status"
       aria-live="polite"
       onTouchStart={handleTouchStart}

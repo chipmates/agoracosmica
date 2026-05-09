@@ -632,7 +632,7 @@ const NowPlayingView: FC<NowPlayingViewProps> = ({ story, figure, audioService, 
             priority={true}
             withBlurUp={true}
             className="now-playing-view__figure-image"
-            alt={tString('audioLibrary.nowPlaying.imageOf', `Image of ${currentFigure && currentFigure.name ? getFigureDisplayName(currentFigure.name) : ''}`).replace('{{figureName}}', currentFigure && currentFigure.name ? getFigureDisplayName(currentFigure.name) : '')}
+            alt={tString('audioLibrary.nowPlaying.imageOf', `Image of ${currentFigure.name ? getFigureDisplayName(currentFigure.name) : ''}`).replace('{{figureName}}', currentFigure.name ? getFigureDisplayName(currentFigure.name) : '')}
           />
         )}
         

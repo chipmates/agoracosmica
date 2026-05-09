@@ -31,19 +31,9 @@ interface SpeechConfig {
   [key: string]: any;
 }
 
-interface OptionButton {
-  label: string;
-  value: string;
-}
-
 interface SpeechPanelProps {
   SettingCard: React.ComponentType<any>;
   CATEGORY_ICONS: Record<string, any>;
-  OptionButtons: React.ComponentType<{
-    options: OptionButton[];
-    selected: string | undefined;
-    onChange: (value: string) => void;
-  }>;
   config: SpeechConfig;
   onChange: (key: string, value: any) => void;
 }

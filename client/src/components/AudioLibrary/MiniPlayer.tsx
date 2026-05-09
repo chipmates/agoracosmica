@@ -63,9 +63,9 @@ const MiniPlayer: FC<MiniPlayerProps> = ({ story, figure, onExpand, audioService
       if (playback.figureName) {
         // Extract imageKey from figure name for image loading
         const figureNameLower = playback.figureName.toLowerCase();
-        let imageKey = 'default';
-        
-        // Extract the key from the figure name
+        // Extract the key from the figure name. All branches below assign,
+        // so no initial fallback is needed.
+        let imageKey: string;
         if (figureNameLower.includes('leonardo') || figureNameLower.includes('vinci')) {
           imageKey = 'vinci';
         } else if (figureNameLower.includes('king jr')) {

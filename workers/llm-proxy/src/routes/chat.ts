@@ -38,7 +38,7 @@ export async function handleChat(request: Request, env: Env, ctx: ExecutionConte
     );
   }
 
-  const { figureId, mode, language, messages, seedId, seedData, tools } = validation.data;
+  const { figureId, mode, language, messages, seedData, tools } = validation.data;
 
   // 2b. Content safety screen on user messages
   const contentCheck = screenCouncilContent('', messages);

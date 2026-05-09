@@ -211,7 +211,8 @@ const CouncilSetupModal: FC<CouncilSetupModalProps> = ({
     }
 
     if (selectedFigures.length < 3) {
-      const allFigures = moderator ? [moderator, ...selectedFigures] : selectedFigures;
+      // moderator is non-null here — the !moderator branch above returned.
+      const allFigures = [moderator, ...selectedFigures];
       const genderCheck = checkGenderLimit(allFigures, figure);
       if (!genderCheck.canAdd) {
         console.warn(genderCheck.reason);

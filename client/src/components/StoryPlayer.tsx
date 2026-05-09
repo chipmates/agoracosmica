@@ -586,7 +586,7 @@ const StoryPlayer: FC<StoryPlayerProps> = ({
   const { audioUrl } = storyData;
 
   // Don't show loading if we have valid story data
-  const isLoading = status === 'loading' && (!storyData || !storyData.text);
+  const isLoading = status === 'loading' && !storyData.text;
   
   // Don't show the story player at all if we're in translation mode
   if (storyData.needsTranslation) {

@@ -13,7 +13,6 @@ interface ErrorBoundaryProps extends ErrorBoundaryWrapperProps {
 interface ErrorBoundaryState {
   hasError: boolean;
   error: Error | null;
-  errorInfo: ErrorInfo | null;
 }
 
 // Wrapper component to use hooks with class component
@@ -23,10 +22,9 @@ function ErrorBoundaryWrapper(props: ErrorBoundaryWrapperProps): React.ReactElem
 }
 
 class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  state: ErrorBoundaryState = { 
-    hasError: false, 
-    error: null, 
-    errorInfo: null 
+  state: ErrorBoundaryState = {
+    hasError: false,
+    error: null
   };
 
   static getDerivedStateFromError(): Partial<ErrorBoundaryState> {
@@ -35,7 +33,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
     console.error('Story Mode Error:', error, errorInfo);
-    this.setState({ error, errorInfo });
+    this.setState({ error });
   }
 
   render(): ReactNode {

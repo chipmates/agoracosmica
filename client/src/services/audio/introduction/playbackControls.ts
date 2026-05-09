@@ -96,12 +96,11 @@ export async function pausePlayback(audioControls: AudioControl | null, progress
     
     return newState;
   } catch (error) {
-    // Attempt recovery if pause fails
+    // Attempt recovery if pause fails. audioControls is non-null here — the
+    // top-of-function guard above already returned otherwise.
     try {
-      if (audioControls) {
-        audioControls.pause();
-      }
-    } catch (recoveryError) {
+      audioControls.pause();
+    } catch {
       // Recovery failed
     }
     throw error;
@@ -131,14 +130,13 @@ export async function resumePlayback(audioControls: AudioControl | null, progres
     
     return newState;
   } catch (error) {
-    // Attempt recovery if resume fails by trying again
+    // Attempt recovery if resume fails by trying again. audioControls is
+    // non-null here — the top-of-function guard above already returned otherwise.
     try {
-      if (audioControls) {
-        setTimeout(() => {
-          audioControls.resume();
-        }, 100);
-      }
-    } catch (recoveryError) {
+      setTimeout(() => {
+        audioControls.resume();
+      }, 100);
+    } catch {
       // Recovery failed
     }
     throw error;

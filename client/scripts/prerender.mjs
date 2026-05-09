@@ -4,8 +4,8 @@
 // Phase 1: HTML shell pages with meta tags + JSON-LD for crawlers
 // Phase 2 (future): Full React SSR rendering with react-dom/server
 
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs';
-import { join, dirname } from 'path';
+import { readFileSync, writeFileSync, mkdirSync } from 'fs';
+import { join } from 'path';
 
 const BUILD_DIR = join(import.meta.dirname, '..', 'build');
 const SITE_URL = 'https://agoracosmica.org';

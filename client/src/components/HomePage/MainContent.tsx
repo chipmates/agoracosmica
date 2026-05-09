@@ -284,14 +284,6 @@ const MainContent: FC<MainContentProps> = ({
                   isReviewMode={isReviewMode}
                   isAudioPlaying={isAudioPlaying}
                 />
-
-                {/* Hide input field during council mode - autonomous conversation doesn't need user input */}
-                {!isCouncilMode && (
-                  <UnifiedInputContainer
-                    selectedFigure={selectedFigure?.name || 'Unknown'}
-                    onSubmitMessage={onSubmitMessage}
-                  />
-                )}
               </>
             ) : !conversationStartedFinal ? (
               // Show empty state while mode selector or language wheel should appear

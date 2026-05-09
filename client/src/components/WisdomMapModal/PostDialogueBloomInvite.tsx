@@ -67,7 +67,7 @@ const PostDialogueBloomInvite: FC<PostDialogueBloomInviteProps> = ({ count, onTa
 
   return (
     <div
-      className={`bloom-invite ${visible ? 'visible' : ''}`}
+      className="bloom-invite visible"
       onClick={handleTap}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
