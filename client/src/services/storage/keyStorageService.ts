@@ -296,7 +296,7 @@ class KeyStorageService {
    * @param salt - Random salt (16 bytes)
    * @returns CryptoKey for AES-256-GCM
    */
-  private async deriveKey(deviceKey: string, salt: Uint8Array): Promise<CryptoKey> {
+  private async deriveKey(deviceKey: string, salt: Uint8Array<ArrayBuffer>): Promise<CryptoKey> {
     const encoder = new TextEncoder();
     const keyMaterial = await crypto.subtle.importKey(
       'raw',

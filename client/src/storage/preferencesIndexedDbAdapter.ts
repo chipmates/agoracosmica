@@ -67,7 +67,7 @@ interface EncryptedData {
  */
 const PBKDF2_ITERATIONS = 600000; // OWASP 2025 standard
 
-async function deriveKey(deviceKey: string, salt: Uint8Array): Promise<CryptoKey> {
+async function deriveKey(deviceKey: string, salt: Uint8Array<ArrayBuffer>): Promise<CryptoKey> {
   const keyMaterial = await crypto.subtle.importKey(
     'raw',
     new TextEncoder().encode(deviceKey),
