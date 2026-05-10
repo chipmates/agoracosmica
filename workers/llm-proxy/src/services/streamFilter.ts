@@ -21,6 +21,11 @@ export function createSafetyFilteredStream(source: ReadableStream<Uint8Array>): 
   const decoder = new TextDecoder();
   const encoder = new TextEncoder();
 
+  // CodeQL's standard JS model flags the transformer arg as "superfluous"
+  // against an older TransformStream signature. @cloudflare/workers-types and
+  // the Web Streams spec define three optional args (transformer,
+  // writableStrategy, readableStrategy); one transformer is correct. Dismissed
+  // as false positive in the Code Quality dashboard.
   return source.pipeThrough(new TransformStream<Uint8Array, Uint8Array>({
     transform(chunk, controller) {
       if (scanner.isBlocked()) return; // Already blocked, drop remaining chunks
