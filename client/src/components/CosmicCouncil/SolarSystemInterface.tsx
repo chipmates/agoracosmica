@@ -4,7 +4,6 @@ import { FC, useState, useCallback, DragEvent, CSSProperties } from 'react';
 import { Crown, X, Plus } from '@phosphor-icons/react';
 import OptimizedFigureImage from '../OptimizedFigureImage';
 import useTranslation from '../../hooks/useTranslation';
-import { checkGenderLimit } from '../../utils/figureGender';
 import { getShortDisplayName } from '../../data/councilCatalog';
 import './SolarSystemInterface.css';
 
@@ -73,7 +72,6 @@ interface SolarSystemInterfaceProps {
   onModeratorChange?: (figure: Figure) => void;
   maxParticipants?: number;
   readOnly?: boolean;
-  isCustomCouncil?: boolean;
 }
 
 const ORBITAL_POSITIONS: OrbitalPosition[] = [
@@ -277,7 +275,6 @@ const SolarSystemInterface: FC<SolarSystemInterfaceProps> = ({
   onModeratorChange,
   maxParticipants = 3,
   readOnly = false,
-  isCustomCouncil = false
 }) => {
 
   // Use dynamic positions for readOnly mode, fixed positions for editing
@@ -308,19 +305,9 @@ const SolarSystemInterface: FC<SolarSystemInterfaceProps> = ({
     
     // Only add if not already participating and not the moderator and under max limit
     if (!isAlreadyParticipant && !isModerator && participants.length < maxParticipants && onFigureAdd) {
-      // For custom councils, check gender limits - INCLUDE MODERATOR IN COUNT!
-      if (isCustomCouncil) {
-        // Build complete figure list including moderator
-        const allFigures = moderator ? [moderator, ...participants] : participants;
-        const genderCheck = checkGenderLimit(allFigures, figure);
-        if (!genderCheck.canAdd) {
-          console.warn(genderCheck.reason);
-          return;
-        }
-      }
       onFigureAdd(figure);
     }
-  }, [participants, moderator, maxParticipants, onFigureAdd, isCustomCouncil]);
+  }, [participants, moderator, maxParticipants, onFigureAdd]);
 
   return (
     <div className={`solar-system-container ${readOnly ? 'read-only' : ''}`}>

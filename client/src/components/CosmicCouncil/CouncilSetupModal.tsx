@@ -11,7 +11,7 @@ import useTranslation from '../../hooks/useTranslation';
 import SolarSystemInterface from './SolarSystemInterface';
 import MiniFigureCarousel from './MiniFigureCarousel';
 import { CloseButton } from '../Button';
-import { checkGenderLimit, countGenderBalance } from '../../utils/figureGender';
+import { countGenderBalance } from '../../utils/figureGender';
 import ProcessingLoader from '../ProcessingLoader';
 import CouncilThemeRow from './CouncilThemeRow';
 import CouncilCard from './CouncilCard';
@@ -201,23 +201,11 @@ const CouncilSetupModal: FC<CouncilSetupModalProps> = ({
     }
 
     if (!moderator) {
-      const genderCheck = checkGenderLimit(selectedFigures, figure);
-      if (!genderCheck.canAdd) {
-        console.warn(genderCheck.reason);
-        return;
-      }
       setModerator(figure);
       return;
     }
 
     if (selectedFigures.length < 3) {
-      // moderator is non-null here — the !moderator branch above returned.
-      const allFigures = [moderator, ...selectedFigures];
-      const genderCheck = checkGenderLimit(allFigures, figure);
-      if (!genderCheck.canAdd) {
-        console.warn(genderCheck.reason);
-        return;
-      }
       setSelectedFigures([...selectedFigures, figure]);
     }
   };
@@ -450,7 +438,6 @@ const CouncilSetupModal: FC<CouncilSetupModalProps> = ({
                   onFigureSelect={handleFigureSelect}
                   selectedFigures={selectedFigures}
                   moderator={moderator ?? undefined}
-                  isCustomCouncil={true}
                   hasModerator={!!moderator}
                 />
               </div>
@@ -464,7 +451,6 @@ const CouncilSetupModal: FC<CouncilSetupModalProps> = ({
                   onFigureRemove={handleFigureRemove}
                   onModeratorChange={setModerator}
                   maxParticipants={3}
-                  isCustomCouncil={true}
                 />
               </div>
 

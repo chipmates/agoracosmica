@@ -4,7 +4,6 @@ import React, { FC, useState, useRef, useEffect, DragEvent, KeyboardEvent as Rea
 import { CaretLeft, CaretRight, Crown, CheckCircle } from '@phosphor-icons/react';
 import OptimizedFigureImage from '../OptimizedFigureImage';
 import useTranslation from '../../hooks/useTranslation';
-import { checkGenderLimit } from '../../utils/figureGender';
 import { getShortDisplayName } from '../../data/councilCatalog';
 import './MiniFigureCarousel.css';
 
@@ -22,13 +21,6 @@ interface FigureCardProps {
   onDragStart?: (figure: Figure) => void;
   disabled: boolean;
   disabledReason?: string;
-  /**
-   * True when this figure is disabled specifically because the gender limit
-   * (3 of any single gender) has been reached. Drives the "3/3" badge.
-   * Kept separate from `disabledReason` (a translated user-facing string)
-   * so the visual indicator does not depend on parsing localized text.
-   */
-  isAtGenderLimit?: boolean;
 }
 
 interface MiniFigureCarouselProps {
@@ -37,7 +29,6 @@ interface MiniFigureCarouselProps {
   selectedFigures?: Figure[];
   moderator?: Figure;
   maxSelection?: number;
-  isCustomCouncil?: boolean;
   hasModerator?: boolean;
 }
 
@@ -49,7 +40,6 @@ const FigureCard: FC<FigureCardProps> = ({
   onDragStart,
   disabled,
   disabledReason,
-  isAtGenderLimit = false
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -135,12 +125,6 @@ const FigureCard: FC<FigureCardProps> = ({
           </div>
         )}
 
-        {/* Gender limit badge — driven by structured prop, not by parsing
-            the translated reason string (DE/EN/etc. differ literally). */}
-        {disabled && isAtGenderLimit && (
-          <div className="mini-figure-limit-badge">3/3</div>
-        )}
-
         {/* Glow Effect */}
         <div className={`mini-figure-glow ${isSelected ? 'active' : ''}`} />
       </div>
@@ -158,7 +142,6 @@ const MiniFigureCarousel: FC<MiniFigureCarouselProps> = ({
   selectedFigures = [],
   moderator,
   maxSelection = 4,
-  isCustomCouncil = false,
   hasModerator = false
 }) => {
   const { tString, tNode } = useTranslation();
@@ -335,30 +318,10 @@ const MiniFigureCarousel: FC<MiniFigureCarouselProps> = ({
               const isSelected = selectedFigures.find(f => f.id === figure.id);
               const isModerator = moderator?.id === figure.id;
 
-              // Check if disabled due to max selection or gender limits
-              let isDisabled = selectedFigures.length >= maxSelection && !isSelected && !isModerator;
-
-              // Track gender-limit state separately from the user-facing reason
-              // so the "3/3" badge is driven by data, not by parsing localized text.
-              let isAtGenderLimit = false;
-
-              // For custom councils, also check gender limits - INCLUDE MODERATOR!
-              let disabledReason: string | undefined;
-              if (isCustomCouncil && !isSelected && !isModerator) {
-                if (isDisabled) {
-                  disabledReason = tString('cosmicCouncil.setup.maxReached', 'Council is full');
-                } else {
-                  const allFigures = moderator ? [moderator, ...selectedFigures] : selectedFigures;
-                  const genderCheck = checkGenderLimit(allFigures, figure);
-                  if (!genderCheck.canAdd) {
-                    isDisabled = true;
-                    disabledReason = genderCheck.reason ?? undefined;
-                    isAtGenderLimit = true;
-                  }
-                }
-              } else if (isDisabled) {
-                disabledReason = tString('cosmicCouncil.setup.maxReached', 'Council is full');
-              }
+              const isDisabled = selectedFigures.length >= maxSelection && !isSelected && !isModerator;
+              const disabledReason = isDisabled
+                ? tString('cosmicCouncil.setup.maxReached', 'Council is full')
+                : undefined;
 
               return (
                 <FigureCard
@@ -369,7 +332,6 @@ const MiniFigureCarousel: FC<MiniFigureCarouselProps> = ({
                   onSelect={handleFigureSelect}
                   disabled={isDisabled}
                   disabledReason={disabledReason}
-                  isAtGenderLimit={isAtGenderLimit}
                 />
               );
             })}

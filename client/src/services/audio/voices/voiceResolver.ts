@@ -136,7 +136,7 @@ export function isUsingDefaultVoice(figureId: string, language?: string): boolea
 /**
  * Get voices for council (fixed rotation for variety)
  *
- * @param participants - Array of figure IDs (max 6: 3 male + 3 female)
+ * @param participants - Array of figure IDs (max 4 total: 1 moderator + 3 participants)
  * @param ttsEngine - Legacy param. Language used instead.
  * @param language - Optional language hint
  * @returns Voice mapping object { figureId: technicalVoiceId }
@@ -154,10 +154,12 @@ export function getVoicesForCouncil(
 
   councilLog(`🏛️ [VoiceResolver] Council composition: ${males.length} males, ${females.length} females (${voiceLang})`);
 
-  // Get voice arrays (use first 3 for councils — max distinction)
+  // Use the full pool of 5 voices per gender. Council size is capped at 4
+  // figures, so even an all-same-gender council gets 4 distinct voices with
+  // one in reserve.
   const councilVoices = voiceLang === 'german'
-    ? { male: GERMAN_VOICES.male.slice(0, 3), female: GERMAN_VOICES.female.slice(0, 3) }
-    : { male: ENGLISH_VOICES.male.slice(0, 3), female: ENGLISH_VOICES.female.slice(0, 3) };
+    ? { male: GERMAN_VOICES.male, female: GERMAN_VOICES.female }
+    : { male: ENGLISH_VOICES.male, female: ENGLISH_VOICES.female };
 
   const getTechnical = voiceLang === 'german' ? getGermanTechnicalVoice : getKokoroTechnicalVoice;
 

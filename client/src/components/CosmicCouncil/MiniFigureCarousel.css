@@ -188,22 +188,6 @@
   z-index: var(--z-base);
 }
 
-/* Gender limit badge */
-.mini-figure-limit-badge {
-  position: absolute;
-  bottom: -2px;
-  right: -2px;
-  font-size: 0.6875rem; /* 11px — was 8.8px, too small to read */
-  font-weight: 600;
-  color: var(--cosmic-silver);
-  background: color-mix(in srgb, var(--bg-primary) var(--a-90), transparent);
-  border: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent);
-  border-radius: 6px;
-  padding: 1px 4px;
-  line-height: 1.2;
-  z-index: var(--z-base);
-}
-
 .mini-figure-glow {
   position: absolute;
   top: -4px;

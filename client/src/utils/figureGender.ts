@@ -14,7 +14,7 @@ type GenderMap = {
 
 /**
  * Gender mapping for historical figures
- * Used for voice assignment and enforcing gender balance in custom councils
+ * Used for voice assignment in councils
  */
 export const figureGenderMap: GenderMap = {
   // Female figures
@@ -90,14 +90,6 @@ export interface FigureWithId {
 }
 
 /**
- * Gender limit check result
- */
-export interface GenderLimitResult {
-  canAdd: boolean;
-  reason: string | null;
-}
-
-/**
  * Get the gender of a figure by ID
  * @param figureId - The figure ID
  * @returns 'male', 'female', or 'unknown'
@@ -122,32 +114,3 @@ export function countGenderBalance(figures: FigureWithId[]): GenderCounts {
   return counts;
 }
 
-/**
- * Check if adding a figure would exceed gender limits
- * @param currentFigures - Current selected figures
- * @param newFigure - Figure to add
- * @param maxPerGender - Maximum allowed per gender (default: 3)
- * @returns Object with canAdd boolean and optional reason string
- */
-export function checkGenderLimit(
-  currentFigures: FigureWithId[], 
-  newFigure: FigureWithId, 
-  maxPerGender: number = 3
-): GenderLimitResult {
-  const newFigureGender = getFigureGender(newFigure.id);
-  
-  if (newFigureGender === 'unknown') {
-    return { canAdd: true, reason: null };
-  }
-  
-  const currentCounts = countGenderBalance(currentFigures);
-  
-  if (currentCounts[newFigureGender] >= maxPerGender) {
-    return {
-      canAdd: false,
-      reason: `Maximum of ${maxPerGender} ${newFigureGender} figures allowed due to voice constraints`
-    };
-  }
-  
-  return { canAdd: true, reason: null };
-}
