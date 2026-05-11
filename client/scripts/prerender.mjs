@@ -456,7 +456,7 @@ function homeNoscript(lang) {
   const figuresHtml = TRADITION_GROUPS.map(group => {
     const groupLabel = TRADITION_LABELS[group.key][lang];
     const items = group.ids
-      .map(id => `<a href="${prefix}/figures/${ID_TO_SLUG[id]}">${getFigureName(id, lang)}</a>`)
+      .map(id => `<a href="${prefix}/figures/${ID_TO_SLUG[id]}/">${getFigureName(id, lang)}</a>`)
       .join(', ');
     return `<p><strong>${groupLabel}:</strong> ${items}</p>`;
   }).join('\n      ');
@@ -464,7 +464,7 @@ function homeNoscript(lang) {
   const themesHtml = THEME_IDS.map(themeId => {
     const tname = t(lang, `themes.${themeId}.name`);
     const ttagline = t(lang, `themes.${themeId}.tagline`);
-    return `<li><a href="${prefix}/themes/${themeId}">${tname}</a> (${ttagline})</li>`;
+    return `<li><a href="${prefix}/themes/${themeId}/">${tname}</a> (${ttagline})</li>`;
   }).join('\n        ');
 
   return `
@@ -483,8 +483,8 @@ function homeNoscript(lang) {
 
       <h2>${learnMoreHeading}</h2>
       <ul>
-        <li><a href="${prefix}/about">${isDe ? 'Über Agora Cosmica' : 'About Agora Cosmica'}</a></li>
-        <li><a href="${prefix}/contact">${isDe ? 'Kontakt' : 'Contact'}</a></li>
+        <li><a href="${prefix}/about/">${isDe ? 'Über Agora Cosmica' : 'About Agora Cosmica'}</a></li>
+        <li><a href="${prefix}/contact/">${isDe ? 'Kontakt' : 'Contact'}</a></li>
       </ul>
     `;
 }
@@ -510,13 +510,13 @@ function figureNoscript(id, slug, lang) {
   }
   const relatedIds = [...connectionsSet].slice(0, 4);
   const relatedHtml = relatedIds
-    .map(rid => `<li><a href="${prefix}/figures/${ID_TO_SLUG[rid]}">${getFigureName(rid, lang)}</a></li>`)
+    .map(rid => `<li><a href="${prefix}/figures/${ID_TO_SLUG[rid]}/">${getFigureName(rid, lang)}</a></li>`)
     .join('\n        ');
 
   // Themes this figure speaks to (bidirectional internal linking for SEO topic clusters)
   const themeIds = FIGURE_THEMES[id] || [];
   const themesHtml = themeIds
-    .map(themeId => `<li><a href="${prefix}/themes/${themeId}">${t(lang, `themes.${themeId}.name`)}</a> (${t(lang, `themes.${themeId}.tagline`)})</li>`)
+    .map(themeId => `<li><a href="${prefix}/themes/${themeId}/">${t(lang, `themes.${themeId}.name`)}</a> (${t(lang, `themes.${themeId}.tagline`)})</li>`)
     .join('\n        ');
 
   const meta = [tradition, period].filter(Boolean).join(', ');
@@ -555,8 +555,8 @@ function figureNoscript(id, slug, lang) {
 
       <h2>${browseHeading}</h2>
       <ul>
-        <li><a href="${prefix}/figures">${isDe ? 'Alle 30 Persönlichkeiten' : 'All 30 Figures'}</a></li>
-        <li><a href="${prefix}/themes">${isDe ? 'Alle 8 Themen' : 'All 8 Life Themes'}</a></li>
+        <li><a href="${prefix}/figures/">${isDe ? 'Alle 30 Persönlichkeiten' : 'All 30 Figures'}</a></li>
+        <li><a href="${prefix}/themes/">${isDe ? 'Alle 8 Themen' : 'All 8 Life Themes'}</a></li>
         <li><a href="${prefix}/">Agora Cosmica</a></li>
       </ul>
     `;
@@ -576,12 +576,12 @@ function themeNoscript(themeId, lang) {
 
   const figureIds = THEME_FIGURE_HINTS[themeId] || [];
   const figuresHtml = figureIds
-    .map(id => `<li><a href="${prefix}/figures/${ID_TO_SLUG[id]}">${getFigureName(id, lang)}</a></li>`)
+    .map(id => `<li><a href="${prefix}/figures/${ID_TO_SLUG[id]}/">${getFigureName(id, lang)}</a></li>`)
     .join('\n        ');
 
   const otherThemes = THEME_IDS.filter(id => id !== themeId).slice(0, 3);
   const otherThemesHtml = otherThemes
-    .map(id => `<li><a href="${prefix}/themes/${id}">${t(lang, `themes.${id}.name`)}</a></li>`)
+    .map(id => `<li><a href="${prefix}/themes/${id}/">${t(lang, `themes.${id}.name`)}</a></li>`)
     .join('\n        ');
 
   return `
@@ -603,8 +603,8 @@ function themeNoscript(themeId, lang) {
 
       <h2>${isDe ? 'Stöbern' : 'Browse'}</h2>
       <ul>
-        <li><a href="${prefix}/figures">${isDe ? 'Alle 30 Persönlichkeiten' : 'All 30 Figures'}</a></li>
-        <li><a href="${prefix}/themes">${isDe ? 'Alle 8 Themen' : 'All 8 Life Themes'}</a></li>
+        <li><a href="${prefix}/figures/">${isDe ? 'Alle 30 Persönlichkeiten' : 'All 30 Figures'}</a></li>
+        <li><a href="${prefix}/themes/">${isDe ? 'Alle 8 Themen' : 'All 8 Life Themes'}</a></li>
         <li><a href="${prefix}/">Agora Cosmica</a></li>
       </ul>
     `;
@@ -688,9 +688,9 @@ function aboutNoscript(lang) {
 
       <h2>${isDe ? 'Stöbern' : 'Browse'}</h2>
       <ul>
-        <li><a href="${prefix}/figures">${isDe ? '30 Persönlichkeiten' : '30 Figures'}</a></li>
-        <li><a href="${prefix}/themes">${isDe ? '8 Themen des Lebens' : '8 Life Themes'}</a></li>
-        <li><a href="${prefix}/contact">${isDe ? 'Kontakt' : 'Contact'}</a></li>
+        <li><a href="${prefix}/figures/">${isDe ? '30 Persönlichkeiten' : '30 Figures'}</a></li>
+        <li><a href="${prefix}/themes/">${isDe ? '8 Themen des Lebens' : '8 Life Themes'}</a></li>
+        <li><a href="${prefix}/contact/">${isDe ? 'Kontakt' : 'Contact'}</a></li>
         <li><a href="https://github.com/chipmates/agoracosmica">GitHub</a></li>
       </ul>
     `;
@@ -720,8 +720,8 @@ function contactNoscript(lang) {
 
       <h2>${isDe ? 'Stöbern' : 'Browse'}</h2>
       <ul>
-        <li><a href="${prefix}/about">${isDe ? 'Über uns' : 'About'}</a></li>
-        <li><a href="${prefix}/figures">${isDe ? '30 Persönlichkeiten' : '30 Figures'}</a></li>
+        <li><a href="${prefix}/about/">${isDe ? 'Über uns' : 'About'}</a></li>
+        <li><a href="${prefix}/figures/">${isDe ? '30 Persönlichkeiten' : '30 Figures'}</a></li>
         <li><a href="${prefix}/">Agora Cosmica</a></li>
       </ul>
     `;
@@ -737,7 +737,7 @@ function figuresCatalogNoscript(lang) {
   const figuresHtml = TRADITION_GROUPS.map(group => {
     const groupLabel = TRADITION_LABELS[group.key][lang];
     const items = group.ids
-      .map(id => `<li><a href="${prefix}/figures/${ID_TO_SLUG[id]}">${getFigureName(id, lang)}</a></li>`)
+      .map(id => `<li><a href="${prefix}/figures/${ID_TO_SLUG[id]}/">${getFigureName(id, lang)}</a></li>`)
       .join('\n          ');
     return `<h2>${groupLabel}</h2>
       <ul>
@@ -753,8 +753,8 @@ function figuresCatalogNoscript(lang) {
 
       <h2>${isDe ? 'Stöbern' : 'Browse'}</h2>
       <ul>
-        <li><a href="${prefix}/themes">${isDe ? '8 Themen des Lebens' : '8 Life Themes'}</a></li>
-        <li><a href="${prefix}/about">${isDe ? 'Über Agora Cosmica' : 'About Agora Cosmica'}</a></li>
+        <li><a href="${prefix}/themes/">${isDe ? '8 Themen des Lebens' : '8 Life Themes'}</a></li>
+        <li><a href="${prefix}/about/">${isDe ? 'Über Agora Cosmica' : 'About Agora Cosmica'}</a></li>
         <li><a href="${prefix}/">Agora Cosmica</a></li>
       </ul>
     `;
@@ -770,7 +770,7 @@ function themesCatalogNoscript(lang) {
   const themesHtml = THEME_IDS.map(themeId => {
     const name = t(lang, `themes.${themeId}.name`);
     const tagline = t(lang, `themes.${themeId}.tagline`);
-    return `<li><a href="${prefix}/themes/${themeId}">${name}</a>. ${tagline}</li>`;
+    return `<li><a href="${prefix}/themes/${themeId}/">${name}</a>. ${tagline}</li>`;
   }).join('\n        ');
 
   return `
@@ -783,8 +783,8 @@ function themesCatalogNoscript(lang) {
 
       <h2>${isDe ? 'Stöbern' : 'Browse'}</h2>
       <ul>
-        <li><a href="${prefix}/figures">${isDe ? '30 Persönlichkeiten' : '30 Figures'}</a></li>
-        <li><a href="${prefix}/about">${isDe ? 'Über Agora Cosmica' : 'About Agora Cosmica'}</a></li>
+        <li><a href="${prefix}/figures/">${isDe ? '30 Persönlichkeiten' : '30 Figures'}</a></li>
+        <li><a href="${prefix}/about/">${isDe ? 'Über Agora Cosmica' : 'About Agora Cosmica'}</a></li>
         <li><a href="${prefix}/">Agora Cosmica</a></li>
       </ul>
     `;
@@ -847,10 +847,10 @@ function legalFooterLinks(lang) {
       ${projectAttribution(lang)}
       <h2>${label}</h2>
       <ul>
-        <li><a href="/impressum">Impressum</a></li>
-        <li><a href="/datenschutz">Datenschutz</a></li>
-        <li><a href="/cookie-policy">Cookie Policy</a></li>
-        <li><a href="/nutzungsbedingungen">Nutzungsbedingungen</a></li>
+        <li><a href="/impressum/">Impressum</a></li>
+        <li><a href="/datenschutz/">Datenschutz</a></li>
+        <li><a href="/cookie-policy/">Cookie Policy</a></li>
+        <li><a href="/nutzungsbedingungen/">Nutzungsbedingungen</a></li>
       </ul>`;
 }
 
