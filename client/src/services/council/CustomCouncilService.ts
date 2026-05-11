@@ -135,6 +135,9 @@ export class CustomCouncilService {
   private councilSessionId: string | null;
   private councilVoiceMappings: Record<string, string> | null;
   private abortController: AbortController | null;
+  // Reference to the BufferSource currently feeding the speakers, so cleanup
+  // can call .stop() on user-close instead of letting the segment play out.
+  private activeSource: AudioBufferSourceNode | null;
 
   constructor(mainService: MainService) {
     this.mainService = mainService;
@@ -150,6 +153,8 @@ export class CustomCouncilService {
 
     // Abort controller for cancellation
     this.abortController = null;
+
+    this.activeSource = null;
     
     // Loader state management
     this.loaderState = {
@@ -696,6 +701,9 @@ export class CustomCouncilService {
 
       source.onended = () => {
         councilLog(`🎵 Finished playing segment ${segment.id}`);
+        if (this.activeSource === source) {
+          this.activeSource = null;
+        }
         resolve();
       };
 
@@ -712,6 +720,8 @@ export class CustomCouncilService {
         duration: audioBuffer.duration
       });
 
+      // Set BEFORE start() so a same-tick cleanup still has the ref to stop.
+      this.activeSource = source;
       source.start();
     });
   }
@@ -1180,6 +1190,28 @@ export class CustomCouncilService {
    */
   cleanup(): void {
     councilLog('🧹 Cleaning up CustomCouncilService resources');
+
+    // Cut the currently-playing segment so closing the council silences audio
+    // immediately. .stop() throws if the source never started or already
+    // stopped — that's fine, ignore.
+    if (this.activeSource) {
+      councilLog('🛑 Stopping active audio segment');
+      try {
+        this.activeSource.stop();
+      } catch (err) {
+        councilWarn('activeSource.stop() failed:', err);
+      }
+      this.activeSource = null;
+    }
+
+    // Abort any in-flight LLM stream so further segments stop arriving.
+    // Without this, the streaming callback keeps queueing TTS work in the
+    // background even after the user has closed the council.
+    if (this.abortController) {
+      councilLog('🛑 Aborting in-flight LLM stream');
+      this.abortController.abort();
+      this.abortController = null;
+    }
 
     // 🔄 Hide loader if still visible
     this._hideLoader();
