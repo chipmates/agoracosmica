@@ -89,6 +89,7 @@ const BYOKSetupModal: FC = () => {
       onClose={handleClose}
       modalType="compact"
       animationType="fade-scale"
+      overlayClassName="modal-priority"
       ariaLabel={tString('byok.wizard.ariaLabel', 'Set up your API key')}
     >
       <div style={{

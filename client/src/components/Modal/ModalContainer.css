@@ -64,6 +64,14 @@
   will-change: opacity;
 }
 
+/* Priority overlay — for modals triggered from inside other modals
+   (rate-limit, BYOK wizard). Without this, the standard z-index 2000
+   sits beneath fullscreen overlays at --z-modal-overlay (3000) like
+   the Council Setup modal, and the user sees nothing happen on click. */
+.enhanced-modal-overlay.modal-priority {
+  z-index: var(--z-critical); /* 10000 */
+}
+
 /* Fullscreen variant should not have blur or gradient */
 .enhanced-modal-overlay.modal-fullscreen-bg {
   background: var(--bg-primary); /* Solid background */

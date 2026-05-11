@@ -59,6 +59,7 @@ const RateLimitModal: FC = () => {
       onClose={closeRateLimitModal}
       modalType="compact"
       animationType="fade-scale"
+      overlayClassName="modal-priority"
       ariaLabel={tString(titleKey, titleFallbacks[endpoint])}
     >
       <div style={{
