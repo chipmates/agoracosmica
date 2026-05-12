@@ -2,11 +2,73 @@
 // Renders a managed challenge, returns a token for session creation
 
 const TURNSTILE_SCRIPT_URL = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
-const TURNSTILE_TIMEOUT_MS = 15_000;
+// 30s, not 15s: mobile Safari resuming from bfcache or a long backgrounded tab
+// often needs more than 15s for the cross-origin iframe to wake up enough to
+// post its callback back. The user-facing toast on hit is the generic
+// "request took too long" — better to wait a bit longer than to surface that
+// to a user who is already actively trying to send a message.
+const TURNSTILE_TIMEOUT_MS = 30_000;
+// After this much hidden time, the cross-origin Turnstile iframe is likely
+// frozen/stale on iOS Safari; reset module state on return so the next call
+// reloads the script and container fresh. 5 min mirrors the JWT refresh
+// threshold — if the tab was hidden longer, getSessionToken would re-issue
+// anyway, and a fresh re-issue is what we're protecting.
+const STALE_HIDDEN_THRESHOLD_MS = 5 * 60 * 1000;
 
 let scriptLoaded = false;
 let scriptLoading = false;
 let widgetId: string | null = null;
+
+/**
+ * Drop all cached Turnstile state so the next getTurnstileToken() rebuilds
+ * everything from scratch: re-injects the script, re-creates the container,
+ * re-mounts the widget. Used on bfcache restore and on long-hide return,
+ * where the cross-origin iframe may have been suspended by the browser.
+ */
+function resetTurnstileState(): void {
+  if (widgetId !== null) {
+    try { (window as any).turnstile?.remove(widgetId); } catch { /* ignore */ }
+    widgetId = null;
+  }
+  scriptLoaded = false;
+  scriptLoading = false;
+
+  // Drop the existing script tag — re-injection on next call gives us a fresh
+  // window.turnstile bound to a fresh execution context.
+  const scriptOrigin = TURNSTILE_SCRIPT_URL.split('?')[0];
+  document.querySelectorAll(`script[src^="${scriptOrigin}"]`).forEach((s) => s.remove());
+  try { delete (window as any).turnstile; } catch { /* ignore */ }
+
+  // Drop the container — a stale display:none container with a dead iframe
+  // can't be reused. createContainer() in getTurnstileToken() will re-create.
+  document.getElementById('turnstile-container')?.remove();
+}
+
+// Page lifecycle wiring — runs once on module import.
+// Two reset triggers:
+//   1. pageshow with event.persisted === true (bfcache restore on iOS Safari)
+//   2. visibilitychange returning visible after STALE_HIDDEN_THRESHOLD_MS hidden
+if (typeof window !== 'undefined') {
+  let hiddenSinceMs = 0;
+
+  window.addEventListener('pageshow', (event) => {
+    if ((event as PageTransitionEvent).persisted) {
+      resetTurnstileState();
+    }
+  });
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') {
+      hiddenSinceMs = Date.now();
+    } else if (document.visibilityState === 'visible' && hiddenSinceMs > 0) {
+      const hiddenMs = Date.now() - hiddenSinceMs;
+      hiddenSinceMs = 0;
+      if (hiddenMs > STALE_HIDDEN_THRESHOLD_MS) {
+        resetTurnstileState();
+      }
+    }
+  });
+}
 
 /**
  * Ensure the Turnstile script is loaded (lazy, one-time)
