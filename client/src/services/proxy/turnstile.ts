@@ -82,6 +82,8 @@ export async function getTurnstileToken(): Promise<string> {
   return new Promise<string>((resolve, reject) => {
     // Container must be visible and rendered for cross-browser iframe communication.
     // Position fixed bottom-right, small footprint.
+    // z-index must sit above the entire app z-scale (top token is --z-loader: 99999)
+    // so the challenge is reachable while modals, loaders, and the chat input bar are present.
     let container = document.getElementById('turnstile-container');
     if (!container) {
       container = document.createElement('div');
@@ -89,7 +91,7 @@ export async function getTurnstileToken(): Promise<string> {
       container.style.position = 'fixed';
       container.style.bottom = '0';
       container.style.right = '0';
-      container.style.zIndex = '1';
+      container.style.zIndex = '100000';
       document.body.appendChild(container);
     }
     // Reset visibility — a prior successful challenge sets display:none on
