@@ -162,14 +162,8 @@ export function useConversationVM(params: ConversationVMParams): UseConversation
           content: updatedContent,
           timestamp: new Date().toISOString(),
         };
-      } else if (lastMessage && lastMessage.role === message.role && message.role === 'user') {
-        updatedContent = `${lastMessage.content ?? ''}${message.content ?? ''}`;
-        nextMessages[nextMessages.length - 1] = {
-          ...lastMessage,
-          content: updatedContent,
-          timestamp: new Date().toISOString(),
-        };
       } else {
+        // user submissions are atomic; never merge user-after-user (post-failed-send case)
         nextMessages.push({
           role: (message.role ?? 'assistant') as ConversationMessage['role'],
           content: message.content ?? '',
