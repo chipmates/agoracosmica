@@ -484,8 +484,8 @@
     "confirmations": {
       "restoreAll": "This will replace all existing data. Continue?",
       "clearSeed": "Are you sure you want to clear the history for this Star Seed?",
-      "clearFreeTalk": "Are you sure you want to clear the FreeTalk history?",
-      "clearAll": "Are you sure you want to clear the history for ALL FIGURES across all Star Seeds? This action cannot be undone."
+      "clearFree Talk": "Are you sure you want to clear the Free Talk history?",
+      "clearAll": "Are you sure you want to clear the history for ALL FIGURES across all Stars? This action cannot be undone."
     }
   },
   "navigation": {
@@ -511,13 +511,13 @@
       "echoes": "Echoes",
       "journeys": "Journeys",
       "dialogue": "Dialogue",
-      "starseeds": "Star Seeds",
+      "starseeds": "Stars",
       "tour": "Tour"
     }
   },
   "quickLinks": {
     "navigationBar": "Quick navigation bar",
-    "exploreSeeds": "Explore Star Seeds",
+    "exploreSeeds": "Explore Stars",
     "startQuest": "Start Quest",
     "backToSeeds": "Back to Seeds",
     "discoverSeeds": "Discover Seeds",
@@ -530,7 +530,7 @@
     "modes": "Modes",
     "freetalk": "Talk",
     "listenPrism": "Listen to Prism",
-    "startFreetalk": "Freetalk",
+    "startFree Talk": "Free Talk",
     "listenToStory": "Listen to Story"
   },
   "figures": {
@@ -569,9 +569,9 @@
     }
   },
   "seeds": {
-    "title": "Star Seeds",
+    "title": "Stars",
     "titleWithFigure": "{figure}'s Wisdom",
-    "explore": "Explore Star Seeds",
+    "explore": "Explore Stars",
     "difficulty": "Difficulty",
     "navigation": {
       "jumpTo": "Jump to:"
@@ -579,7 +579,7 @@
     "beginner": "Beginner",
     "intermediate": "Intermediate",
     "advanced": "Advanced",
-    "gathered": "Star Seeds gathered",
+    "gathered": "Stars gathered",
     "constellationComplete": "Constellation Complete!",
     "constellationMastered": "Constellation Mastered",
     "allStarsGathered": "You've gathered all {count} stars of \"{name}\"",
@@ -593,7 +593,7 @@
     "votingOpensNote": "Voting opens in the near future.",
     "openCommunity": "View Community",
     "loadError": "Failed to load wisdom seeds.",
-    "noSeedsFound": "No Star Seeds Found",
+    "noSeedsFound": "No Stars Found",
     "noSeedsForFigure": "No StarSeed data is available for this figure.",
     "seedTitle": "{title}",
     "seedSubtitle": "{subtitle}",
@@ -930,7 +930,7 @@
     "wisdom": "Wisdom",
     "prism": "Prism",
     "quest": "Quest",
-    "freetalk": "Freetalk",
+    "freetalk": "Free Talk",
     "selector": {
       "title": "Choose Your Chapter",
       "description": "How would you like to meet {figureName} today?",
@@ -955,7 +955,7 @@
         "description": "Guided wisdom dialogue • Deep wisdom exploration"
       },
       "freetalk": {
-        "title": "Freetalk",
+        "title": "Free Talk",
         "description": "Open conversation • Ask anything you're curious about"
       },
       "quest": {
@@ -1364,7 +1364,7 @@
           "description": "Deep insights on life's essential questions"
         },
         "freetalk": {
-          "title": "FreeTalk",
+          "title": "Free Talk",
           "description": "Open conversations about anything on your mind"
         },
         "quest": {
@@ -1384,13 +1384,13 @@
       }
     },
     "constellation": {
-      "title": "Star Seeds & Constellations",
-      "description": "Collect wisdom Star Seeds to unlock deeper insights and reveal your unique constellation of understanding",
+      "title": "Stars & Constellations",
+      "description": "Collect wisdom Stars to unlock deeper insights and reveal your unique constellation of understanding",
       "constellationName": "The Hero's Journey",
-      "progress": "5 of 12 Star Seeds collected",
+      "progress": "5 of 12 Stars collected",
       "stats": {
         "figures": "Echoes",
-        "seeds": "Star Seeds to collect",
+        "seeds": "Stars to collect",
         "constellation": "Unique constellations"
       }
     },
@@ -1436,10 +1436,10 @@
           },
           "wisdom": {
             "name": "Wisdom",
-            "description": "- Explore Star Seeds"
+            "description": "- Explore Stars"
           },
           "freetalk": {
-            "name": "Freetalk",
+            "name": "Free Talk",
             "description": "- Open conversation"
           },
           "quest": {
@@ -1461,7 +1461,7 @@
         "techNote": "Voice works best on desktop Chrome/Edge/Safari"
       },
       "step4": {
-        "title": "Collect Star Seeds",
+        "title": "Collect Stars",
         "description": "Discover wisdom insights through dialogue",
         "constellation": "Build constellations of connected ideas"
       }
@@ -1542,7 +1542,7 @@
         "Explore 4 journey modes",
         "Listen to unique wisdom stories",
         "Master voice interaction",
-        "Understand Star Seeds & constellations"
+        "Understand Stars & constellations"
       ],
       "button": "Start Interactive Tour",
       "note": "Perfect for new users or showing the app to others!"

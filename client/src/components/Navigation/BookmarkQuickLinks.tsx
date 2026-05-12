@@ -70,8 +70,8 @@ export const BookmarkQuickLinks: FC<BookmarkQuickLinksProps> = ({
       case 'introduction':
         return {
           icon: Sparkle,
-          label: tString('quickLinks.exploreSeeds', 'Explore Seeds'),
-          shortLabel: 'Wisdom',
+          label: tString('quickLinks.exploreSeeds', 'Explore Stars'),
+          shortLabel: tString('modes.wisdom', 'Wisdom'),
           action: 'seeds',
           color: 'purple'
         };
@@ -80,7 +80,7 @@ export const BookmarkQuickLinks: FC<BookmarkQuickLinksProps> = ({
         return {
           icon: DiamondsFour,
           label: tString('quickLinks.listenPrism', 'Listen to Prism'),
-          shortLabel: 'Prism',
+          shortLabel: tString('modes.prism', 'Prism'),
           action: 'prism',
           color: 'blue'
         };
@@ -88,7 +88,7 @@ export const BookmarkQuickLinks: FC<BookmarkQuickLinksProps> = ({
         return {
           icon: Mountains,
           label: tString('quickLinks.startQuest', 'Start Quest'),
-          shortLabel: 'Quest',
+          shortLabel: tString('modes.quest', 'Quest'),
           action: 'quest',
           color: 'orange'
         };
@@ -96,8 +96,8 @@ export const BookmarkQuickLinks: FC<BookmarkQuickLinksProps> = ({
       case 'challenge':
         return {
           icon: Bird,
-          label: tString('quickLinks.startFreetalk', 'Freetalk'),
-          shortLabel: 'Freetalk',
+          label: tString('quickLinks.startFreetalk', 'Free Talk'),
+          shortLabel: tString('modes.freetalk', 'Free Talk'),
           action: 'freetalk',
           color: 'green'
         };
@@ -106,7 +106,7 @@ export const BookmarkQuickLinks: FC<BookmarkQuickLinksProps> = ({
         return {
           icon: BookOpen,
           label: tString('quickLinks.listenToStory', 'Listen to Story'),
-          shortLabel: 'Story',
+          shortLabel: tString('modes.story', 'Story'),
           action: 'story',
           color: 'gold'
         };

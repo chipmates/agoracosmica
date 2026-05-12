@@ -175,7 +175,7 @@ const WisdomMapModal: FC<WisdomMapModalProps> = ({
   // Access language and selected seed from Zustand store
   const language = useDomainStore((state) => state.language.current);
   const appSelectedSeedId = useDomainStore((state) => state.seeds.selectedId);
-  const { tString, tNode } = useTranslation();
+  const { t, tString, tNode } = useTranslation();
 
   // Help preferences from Zustand
   const shouldShowHelp = useUIStore((state) => state.shouldShowHelp);
@@ -733,7 +733,7 @@ const WisdomMapModal: FC<WisdomMapModalProps> = ({
       {(() => {
         const lastName = selectedFigure ? getLastNameForDisplay(selectedFigure.name, tString('figures.echoOf', 'Echo of')) : '';
         const titleContent = (
-          <span className="wisdom-modal-title">{lastName}'S WISDOM</span>
+          <span className="wisdom-modal-title">{String(t('seeds.titleWithFigure', { figure: lastName }))}</span>
         );
 
         if (isMobileHub) {

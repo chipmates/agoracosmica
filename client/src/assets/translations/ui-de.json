@@ -7,9 +7,9 @@
   "questVerdict": {
     "notEarned": {
       "title": "Noch nicht, aber der Weg bleibt offen",
-      "body": "Die Rückmeldung der Figur oben zeigt dir, was schon da ist und was noch wachsen kann. Vertiefe das Wisdom-Kapitel und komm zurück, wenn du bereit bist.",
+      "body": "Die Rückmeldung der Figur oben zeigt dir, was schon da ist und was noch wachsen kann. Vertiefe das Weisheits-Kapitel und komm zurück, wenn du bereit bist.",
       "tryAgain": "Erneut versuchen",
-      "deepenWisdom": "Wisdom vertiefen",
+      "deepenWisdom": "Weisheit vertiefen",
       "later": "Später"
     }
   },
@@ -488,8 +488,8 @@
     "confirmations": {
       "restoreAll": "Dadurch werden alle vorhandenen Daten ersetzt. Fortfahren?",
       "clearSeed": "Bist du sicher, dass du den Verlauf für diesen Star Seed löschen möchtest?",
-      "clearFreeTalk": "Bist du sicher, dass du den FreeTalk-Verlauf löschen möchtest?",
-      "clearAll": "Bist du sicher, dass du den Verlauf für ALLE PERSÖNLICHKEITEN über alle Star Seeds hinweg löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden."
+      "clearFree Talk": "Bist du sicher, dass du den Free Talk-Verlauf löschen möchtest?",
+      "clearAll": "Bist du sicher, dass du den Verlauf für ALLE PERSÖNLICHKEITEN über alle Sterne hinweg löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden."
     }
   },
   "navigation": {
@@ -515,13 +515,13 @@
       "echoes": "Echos",
       "journeys": "Reisen",
       "dialogue": "Dialog",
-      "starseeds": "Star Seeds",
+      "starseeds": "Sterne",
       "tour": "Tour"
     }
   },
   "quickLinks": {
     "navigationBar": "Schnellnavigationsleiste",
-    "exploreSeeds": "Star Seeds erkunden",
+    "exploreSeeds": "Sterne erkunden",
     "startQuest": "Quest starten",
     "backToSeeds": "Zurück zu Seeds",
     "discoverSeeds": "Seeds entdecken",
@@ -532,7 +532,7 @@
     "discover": "Entdecken",
     "modes": "Modi",
     "listenPrism": "Prisma anhören",
-    "startFreetalk": "Freitalk",
+    "startFree Talk": "Free Talk",
     "listenToStory": "Geschichte anhören"
   },
   "figures": {
@@ -571,9 +571,9 @@
     }
   },
   "seeds": {
-    "title": "Star Seeds",
-    "titleWithFigure": "{figure}'s Wisdom",
-    "explore": "Star Seeds erkunden",
+    "title": "Sterne",
+    "titleWithFigure": "Weisheit von {figure}",
+    "explore": "Sterne erkunden",
     "difficulty": "Schwierigkeit",
     "navigation": {
       "jumpTo": "Springen zu:"
@@ -581,7 +581,7 @@
     "beginner": "Anfänger",
     "intermediate": "Fortgeschritten",
     "advanced": "Experte",
-    "gathered": "Star Seeds gesammelt",
+    "gathered": "Sterne gesammelt",
     "constellationComplete": "Konstellation vollständig!",
     "constellationMastered": "Konstellation gemeistert",
     "allStarsGathered": "Du hast alle {count} Sterne von \"{name}\" gesammelt",
@@ -594,8 +594,8 @@
     "tierTransitionCouncilDesc": "Wenn die Abstimmung öffnet, kannst du neue Figuren und Features vorschlagen.",
     "votingOpensNote": "Die Abstimmung öffnet in naher Zukunft.",
     "openCommunity": "Community ansehen",
-    "loadError": "Fehler beim Laden der Star Seeds.",
-    "noSeedsFound": "Keine Star Seeds gefunden",
+    "loadError": "Fehler beim Laden der Sterne.",
+    "noSeedsFound": "Keine Sterne gefunden",
     "noSeedsForFigure": "Für diese Persönlichkeit sind keine Star Seed-Daten verfügbar.",
     "seedTitle": "{title}",
     "seedSubtitle": "{subtitle}",
@@ -682,7 +682,7 @@
     "playAll": "Alle abspielen",
     "shuffle": "Zufällig",
     "storyTypes": {
-      "seed": "Star Seeds"
+      "seed": "Sterne"
     },
     "languages": {
       "english": "Englisch",
@@ -929,10 +929,10 @@
   "modes": {
     "mode": "Modus",
     "story": "Story",
-    "wisdom": "Star Seeds",
+    "wisdom": "Weisheit",
     "prism": "Prisma",
     "quest": "Quest",
-    "freetalk": "Freetalk",
+    "freetalk": "Free Talk",
     "selector": {
       "title": "Wähle dein Kapitel",
       "description": "Wie möchtest du {figureName} heute begegnen?",
@@ -953,11 +953,11 @@
         "description": "Dialog aus mehreren Perspektiven • 4 Persönlichkeiten diskutieren"
       },
       "wisdom": {
-        "title": "Wisdom",
+        "title": "Weisheit",
         "description": "Geführter Weisheitsdialog • Tiefe Erkundung"
       },
       "freetalk": {
-        "title": "Freetalk",
+        "title": "Free Talk",
         "description": "Offenes Gespräch • Stelle alle deine Fragen"
       },
       "quest": {
@@ -1121,8 +1121,8 @@
     }
   },
   "search": {
-    "placeholder": "Star Seeds suchen... (Strg+F)",
-    "ariaLabel": "Star Seeds suchen",
+    "placeholder": "Sterne suchen... (Strg+F)",
+    "ariaLabel": "Sterne suchen",
     "clear": "Suche löschen"
   },
   "confirmations": {
@@ -1362,11 +1362,11 @@
           "description": "Fesselnde Geschichten, die Weisheit zum Leben erwecken"
         },
         "wisdom": {
-          "title": "Wisdom",
+          "title": "Weisheit",
           "description": "Tiefe Einsichten zu den wesentlichen Fragen des Lebens"
         },
         "freetalk": {
-          "title": "FreeTalk",
+          "title": "Free Talk",
           "description": "Offene Gespräche über alles, was dich bewegt"
         },
         "quest": {
@@ -1386,13 +1386,13 @@
       }
     },
     "constellation": {
-      "title": "Star Seeds & Konstellationen",
-      "description": "Sammle Weisheits-Star Seeds, um tiefere Einsichten freizuschalten und deine einzigartige Konstellation des Verstehens zu enthüllen",
+      "title": "Sterne & Konstellationen",
+      "description": "Sammle Weisheits-Sterne, um tiefere Einsichten freizuschalten und deine einzigartige Konstellation des Verstehens zu enthüllen",
       "constellationName": "Die Heldenreise",
-      "progress": "5 von 12 Star Seeds gesammelt",
+      "progress": "5 von 12 Sternen gesammelt",
       "stats": {
         "figures": "Echos",
-        "seeds": "Star Seeds zu sammeln",
+        "seeds": "Sterne zu sammeln",
         "constellation": "Einzigartige Konstellationen"
       }
     },
@@ -1438,7 +1438,7 @@
           },
           "wisdom": {
             "name": "Weisheit",
-            "description": "- Star Seeds erkunden"
+            "description": "- Sterne erkunden"
           },
           "freetalk": {
             "name": "Freies Gespräch",
@@ -1463,7 +1463,7 @@
         "techNote": "Sprache funktioniert am besten auf Desktop"
       },
       "step4": {
-        "title": "Sammle Star Seeds",
+        "title": "Sammle Sterne",
         "description": "Entdecke Weisheitseinsichten durch Dialog",
         "constellation": "Baue Konstellationen verbundener Ideen"
       }
@@ -1544,7 +1544,7 @@
         "Erkunde 4 Reisemodi",
         "Lausche einzigartigen Weisheitsgeschichten",
         "Meistere die Sprachinteraktion",
-        "Verstehe Star Seeds & Konstellationen"
+        "Verstehe Sterne & Konstellationen"
       ],
       "button": "Interaktive Tour starten",
       "note": "Perfekt für neue Nutzer oder um die App anderen zu zeigen!"
