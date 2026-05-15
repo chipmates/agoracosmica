@@ -1,20 +1,34 @@
 // Ad Grants conversion tracking endpoint
-// Receives gclid + event from client, stores in KV, writes to Analytics Engine
+// Receives gclid + event from client, stores in KV, writes to Analytics Engine.
+// Forwarding to Google Ads CAPI is gated behind GOOGLE_ADS_DEVELOPER_TOKEN
+// being set as a worker secret — see services/googleAdsCapi.ts.
 
 import type { Env } from '../utils/types';
+import { forwardConversionToGoogleAds } from '../services/googleAdsCapi';
+import { trackRateLimit, readCountry } from '../utils/analytics';
+
+type ConversionEvent = 'profile_created' | 'start_exploring' | 'mode_selected';
 
 interface ConversionPayload {
   gclid: string;
-  event: 'profile_created' | 'audio_played_30s';
+  event: ConversionEvent;
   timestamp: number;
   figureId?: string;
 }
 
-const VALID_EVENTS = new Set(['profile_created', 'audio_played_30s']);
+const VALID_EVENTS = new Set<ConversionEvent>([
+  'profile_created',
+  'start_exploring',
+  'mode_selected',
+]);
 
-// Rate limit: 100 conversion events per IP per hour
+// Rate limit: 500 conversion events per IP per hour. Generous on purpose:
+// a single legit user fires at most 3 events per session (client-deduped),
+// so 500/hr supports a NATted network (school, office, conference WiFi,
+// carrier-grade NAT) without false positives. Abuse protection still
+// bounded since each excess request gets 429.
 const RATE_LIMIT_WINDOW = 3600;
-const RATE_LIMIT_MAX = 100;
+const RATE_LIMIT_MAX = 500;
 
 export async function handleConversions(
   request: Request,
@@ -37,7 +51,7 @@ export async function handleConversions(
   }
 
   // Validate event type
-  if (!VALID_EVENTS.has(payload.event)) {
+  if (!VALID_EVENTS.has(payload.event as ConversionEvent)) {
     return Response.json({ error: 'Invalid event type' }, { status: 400 });
   }
 
@@ -52,6 +66,9 @@ export async function handleConversions(
   const rateLimitKey = `conv_rl:${ip}`;
   const currentCount = parseInt(await env.RATE_LIMITS.get(rateLimitKey) || '0', 10);
   if (currentCount >= RATE_LIMIT_MAX) {
+    // Track the hit so the dashboard sees when this fires. Fire-and-forget
+    // (we don't await), so it never delays the 429 response.
+    trackRateLimit(env, 'conversions', 'conversions', readCountry(request));
     return Response.json({ error: 'Rate limited' }, { status: 429 });
   }
   await env.RATE_LIMITS.put(rateLimitKey, String(currentCount + 1), { expirationTtl: RATE_LIMIT_WINDOW });
@@ -80,6 +97,17 @@ export async function handleConversions(
     });
   }
 
+  // Forward to Google Ads Conversion API (dual-upload to both accounts).
+  // No-ops if developer token isn't configured. Fire-and-forget — never
+  // blocks the response, never surfaces errors to the client.
+  forwardConversionToGoogleAds(env, {
+    gclid: payload.gclid,
+    event: payload.event,
+    timestamp: payload.timestamp,
+  }).catch(() => {
+    // Forwarding errors are logged inside the service; never propagate
+  });
+
   return Response.json({ ok: true });
 }
 
@@ -90,7 +118,10 @@ export async function handleConversionStats(
 ): Promise<Response> {
   const url = new URL(request.url);
   const days = parseInt(url.searchParams.get('days') || '30', 10);
-  const results: Record<string, { profile_created: number; audio_played_30s: number }> = {};
+  const results: Record<
+    string,
+    { profile_created: number; start_exploring: number; mode_selected: number }
+  > = {};
 
   const now = new Date();
   for (let i = 0; i < Math.min(days, 90); i++) {
@@ -99,10 +130,15 @@ export async function handleConversionStats(
     const dateKey = date.toISOString().split('T')[0];
 
     const profileCount = parseInt(await env.RATE_LIMITS.get(`conv_count:${dateKey}:profile_created`) || '0', 10);
-    const audioCount = parseInt(await env.RATE_LIMITS.get(`conv_count:${dateKey}:audio_played_30s`) || '0', 10);
+    const startCount = parseInt(await env.RATE_LIMITS.get(`conv_count:${dateKey}:start_exploring`) || '0', 10);
+    const modeCount = parseInt(await env.RATE_LIMITS.get(`conv_count:${dateKey}:mode_selected`) || '0', 10);
 
-    if (profileCount > 0 || audioCount > 0) {
-      results[dateKey] = { profile_created: profileCount, audio_played_30s: audioCount };
+    if (profileCount > 0 || startCount > 0 || modeCount > 0) {
+      results[dateKey] = {
+        profile_created: profileCount,
+        start_exploring: startCount,
+        mode_selected: modeCount,
+      };
     }
   }
 

@@ -14,6 +14,14 @@ export interface Env {
   // Dev-only: when set in .dev.vars, overrides every per-IP daily cap (chat/council/summary)
   // to this integer. Never defined in production wrangler.toml. See config.ts:getEffectiveLimit.
   DEV_RATE_LIMIT?: string;
+  // Google Ads Conversion API auth chain. All optional — when GOOGLE_ADS_DEVELOPER_TOKEN
+  // is absent, the worker no-ops on CAPI forwarding (events still get captured to KV +
+  // Analytics Engine, just not pushed to Google). See services/googleAdsCapi.ts.
+  GOOGLE_ADS_DEVELOPER_TOKEN?: string;
+  GOOGLE_ADS_OAUTH_CLIENT_ID?: string;
+  GOOGLE_ADS_OAUTH_CLIENT_SECRET?: string;
+  GOOGLE_ADS_OAUTH_REFRESH_TOKEN?: string;
+  GOOGLE_ADS_LOGIN_CUSTOMER_ID?: string; // MCC customer ID for the login-customer-id header, digits only, no dashes
 }
 
 export interface ChatRequest {
