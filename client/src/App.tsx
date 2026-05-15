@@ -69,8 +69,9 @@ declare global {
 }
 
 // Catch-all redirect that preserves the current URL's search string. Default
-// <Navigate to="/" /> drops query params, which would lose utm tags from
-// shortcut redirects (e.g. /sp/de1 → /de/?utm_source=spotify_a → catch-all).
+// <Navigate to="/" /> drops query params, which would lose the gclid on
+// landings that fall through to the catch-all (e.g. unknown sub-path with
+// ?gclid=… should still arrive at / with gclid intact).
 function NavigateKeepingSearch({ to }: { to: string }): React.ReactElement {
   const { search } = useLocation();
   return <Navigate to={{ pathname: to, search }} replace />;

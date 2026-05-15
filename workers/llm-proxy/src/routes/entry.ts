@@ -9,7 +9,7 @@
 // Privacy: aggregate counter only. No user dimension. No IP retention.
 // Same legal posture as the rest of analytics — see docs/MEASUREMENT.md.
 
-import { trackEntry, readMarketingSource, readCountry } from '../utils/analytics';
+import { trackEntry, readCountry } from '../utils/analytics';
 import type { Env } from '../utils/types';
 
 interface EntryPayload {
@@ -56,7 +56,6 @@ export async function handleEntry(request: Request, env: Env): Promise<Response>
   trackEntry(env, {
     path,
     language: lang,
-    marketingSource: readMarketingSource(request),
     country: readCountry(request),
   });
 

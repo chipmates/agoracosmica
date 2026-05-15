@@ -10,15 +10,13 @@ import {
 } from '../audio/llm/llmUtils';
 import type { Message, LLMResponse } from '../audio/llm/index';
 import { useDomainStore } from '../../stores/domainStore';
-import { getMarketingSource } from '../../utils/public/gclidCapture';
 
 const FREE_TIER_API_URL = import.meta.env.VITE_FREE_TIER_API_URL || '';
 
-/** Build request headers including JSON content-type, bearer auth, and marketing source label. */
+/** Build request headers including JSON content-type and bearer auth. */
 function buildAuthHeaders(token: string, includeContentType = true): Record<string, string> {
   const headers: Record<string, string> = {
     'Authorization': `Bearer ${token}`,
-    'X-Marketing-Source': getMarketingSource(),
   };
   if (includeContentType) headers['Content-Type'] = 'application/json';
   return headers;

@@ -3,7 +3,6 @@
 // Server runs Whisper large-v3-turbo via speaches container
 
 import { fetchWithTimeout } from '../../../utils/fetchWithTimeout';
-import { getMarketingSource } from '../../../utils/public/gclidCapture';
 
 // In dev, empty base → requests go through Vite proxy (avoids mixed-content + COEP)
 // In prod, empty base → requests go through CF Worker proxy (adds auth server-side)
@@ -37,7 +36,6 @@ export const selfHostedSTT = async (audioBlob: Blob, language?: string): Promise
 
     const response = await fetchWithTimeout(`${AUDIO_API_BASE}/v1/audio/transcriptions`, {
       method: 'POST',
-      headers: { 'X-Marketing-Source': getMarketingSource() },
       body: formData,
       timeoutMs: 30_000,
     });

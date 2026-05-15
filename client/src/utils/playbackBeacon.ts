@@ -6,8 +6,6 @@
 // Privacy: aggregate counter only. No user dimension. No IP retention.
 // See docs/MEASUREMENT.md for the full disclosure.
 
-import { getMarketingSource } from './public/gclidCapture';
-
 const API_BASE = import.meta.env.VITE_FREE_TIER_API_URL || '';
 
 export type PlaybackContentType = 'story' | 'teaching' | 'prism' | 'council' | 'foreword';
@@ -48,7 +46,6 @@ export function sendPlaybackBeacon(payload: PlaybackPayload): void {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-Marketing-Source': getMarketingSource(),
       },
       body,
       keepalive: true,

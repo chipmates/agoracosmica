@@ -6,7 +6,7 @@
 // Privacy: aggregate counter only. No user dimension. No IP retention.
 // Same legal posture as the rest of analytics — see docs/MEASUREMENT.md.
 
-import { trackPageView, readMarketingSource, readCountry } from '../utils/analytics';
+import { trackPageView, readCountry } from '../utils/analytics';
 import type { Env } from '../utils/types';
 
 interface PagePayload {
@@ -57,7 +57,6 @@ export async function handlePage(request: Request, env: Env): Promise<Response> 
   trackPageView(env, {
     path,
     language: lang,
-    marketingSource: readMarketingSource(request),
     country: readCountry(request),
   });
 

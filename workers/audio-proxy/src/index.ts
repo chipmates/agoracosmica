@@ -5,20 +5,6 @@ import { proxyWithFailover, proxyWithFailoverFromBuffer } from './proxy';
 import { checkAudioRateLimit, buildRateLimitResponse } from './rateLimit';
 import type { Env } from './types';
 
-// Closed allowlist for marketing source labels — mirrors llm-proxy/utils/analytics.ts.
-// Validated server-side so the dashboard never sees free-text values.
-const ALLOWED_MARKETING_SOURCES = new Set([
-  'spotify', 'spotify_a', 'spotify_b',
-  'grants', 'paid', 'organic', 'direct', 'unknown',
-]);
-
-function readMarketingSource(request: Request): string {
-  const raw = request.headers.get('X-Marketing-Source');
-  if (!raw) return 'direct';
-  const lower = raw.toLowerCase();
-  return ALLOWED_MARKETING_SOURCES.has(lower) ? lower : 'unknown';
-}
-
 function readCountry(request: Request): string {
   const country = (request as Request & { cf?: { country?: string } }).cf?.country;
   if (typeof country === 'string' && country.length === 2) return country;
@@ -86,11 +72,10 @@ export default {
         const rateResult = await checkAudioRateLimit(request, env, language, 'tts');
         if (!rateResult.allowed) {
           // Track rate limit event (fire-and-forget)
-          const rlMarketingSource = readMarketingSource(request);
           const rlCountry = readCountry(request);
           ctx.waitUntil(Promise.resolve().then(() => {
             env.ANALYTICS.writeDataPoint({
-              blobs: [language === 'German' ? 'de' : 'en', model, '', rateResult.code || 'unknown', 'ratelimit', rlMarketingSource, rlCountry],
+              blobs: [language === 'German' ? 'de' : 'en', model, '', rateResult.code || 'unknown', 'ratelimit', '', rlCountry],
               doubles: [0],
               indexes: ['ratelimit'],
             });
@@ -106,7 +91,6 @@ export default {
       // Anonymous analytics (fire-and-forget, never blocks response)
       const server = response.headers.get('X-Audio-Server') || 'unknown';
       const upstreamModel = response.headers.get('x-model') || model;
-      const marketingSource = readMarketingSource(request);
       const country = readCountry(request);
       ctx.waitUntil(Promise.resolve().then(() => {
         env.ANALYTICS.writeDataPoint({
@@ -116,7 +100,7 @@ export default {
             server,
             String(response.status),
             'speech',
-            marketingSource,
+            '',
             country,
           ],
           doubles: [Date.now() - startMs],
@@ -186,11 +170,10 @@ export default {
       if (!sttSkipRateLimit) {
         const rateResult = await checkAudioRateLimit(request, env, 'English', 'stt');
         if (!rateResult.allowed) {
-          const sttRlMarketingSource = readMarketingSource(request);
           const sttRlCountry = readCountry(request);
           ctx.waitUntil(Promise.resolve().then(() => {
             env.ANALYTICS.writeDataPoint({
-              blobs: ['any', 'whisper', '', rateResult.code || 'unknown', 'ratelimit', sttRlMarketingSource, sttRlCountry],
+              blobs: ['any', 'whisper', '', rateResult.code || 'unknown', 'ratelimit', '', sttRlCountry],
               doubles: [0],
               indexes: ['ratelimit'],
             });
@@ -205,11 +188,10 @@ export default {
 
       // Anonymous analytics (fire-and-forget)
       const server = response.headers.get('X-Audio-Server') || 'unknown';
-      const sttMarketingSource = readMarketingSource(request);
       const sttCountry = readCountry(request);
       ctx.waitUntil(Promise.resolve().then(() => {
         env.ANALYTICS.writeDataPoint({
-          blobs: ['any', 'whisper', server, String(response.status), 'transcriptions', sttMarketingSource, sttCountry],
+          blobs: ['any', 'whisper', server, String(response.status), 'transcriptions', '', sttCountry],
           doubles: [Date.now() - startMs],
           indexes: ['stt'],
         });

@@ -7,8 +7,6 @@
 // Privacy: aggregate counter only. No user dimension. No IP retention.
 // Disclosed in docs/MEASUREMENT.md alongside the other event counters.
 
-import { getMarketingSource } from './public/gclidCapture';
-
 const API_BASE = import.meta.env.VITE_FREE_TIER_API_URL || '';
 
 function detectLanguage(): 'en' | 'de' {
@@ -29,7 +27,6 @@ function detectLanguage(): 'en' | 'de' {
  * caller, never breaks the login flow on network failure. Captures only:
  *   - path (no query string, validated server-side against a regex)
  *   - language (en/de)
- *   - marketing source (X-Marketing-Source header, closed allowlist)
  *   - country (CF-edge two-letter code, server-side)
  *
  * No user dimension, no message content, no fingerprint. Same posture as
@@ -47,7 +44,6 @@ export function sendEntryBeacon(): void {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-Marketing-Source': getMarketingSource(),
       },
       body,
       keepalive: true,

@@ -14,7 +14,7 @@
 
 import { verifyTurnstileToken } from '../services/turnstile';
 import { signJWT, createJWTPayload } from '../utils/jwt';
-import { trackSession, readMarketingSource, readCountry } from '../utils/analytics';
+import { trackSession, readCountry } from '../utils/analytics';
 import type { Env } from '../utils/types';
 
 const UUID_V4_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -96,7 +96,7 @@ export async function handleSession(request: Request, env: Env): Promise<Respons
   }
 
   if (isFresh) {
-    trackSession(env, 200, readMarketingSource(request), readCountry(request));
+    trackSession(env, 200, readCountry(request));
   }
 
   // Always extend the freshness window for this clientId. TTL 1h is plenty

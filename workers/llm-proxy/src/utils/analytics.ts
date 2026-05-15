@@ -5,28 +5,6 @@
 
 import type { Env } from './types';
 
-// Closed allowlist for marketing source labels. Validated server-side to
-// guarantee the dashboard never sees free-text values, even if the client
-// header is malformed or hostile. spotify_a / spotify_b are A/B variants
-// of the Spotify campaign — see client/public/_redirects for the shortcut
-// rules and gclidCapture.ts for the matching client-side allowlist.
-const ALLOWED_MARKETING_SOURCES = new Set([
-  'spotify', 'spotify_a', 'spotify_b',
-  'grants', 'paid', 'organic', 'direct', 'unknown',
-]);
-
-/**
- * Read X-Marketing-Source header from a request and validate against the closed
- * allowlist. Returns 'direct' on missing, 'unknown' on invalid.
- * Brand-line guarantee: never combine with any per-user dimension.
- */
-export function readMarketingSource(request: Request): string {
-  const raw = request.headers.get('X-Marketing-Source');
-  if (!raw) return 'direct';
-  const lower = raw.toLowerCase();
-  return ALLOWED_MARKETING_SOURCES.has(lower) ? lower : 'unknown';
-}
-
 /**
  * Read the country code from request.cf (Cloudflare-derived, coarser than IP).
  * Returns 'XX' if unknown. Two-letter ISO 3166-1 alpha-2 code on success.
@@ -40,9 +18,12 @@ export function readCountry(request: Request): string {
 /**
  * Track an LLM proxy event (chat/council/summary).
  * dataset: agora_llm
- * blobs: [endpoint, figureId, mode, language, status, marketing_source, country]
+ * blobs: [endpoint, figureId, mode, language, status, '', country]
  * doubles: [durationMs]
  * indexes: [endpoint]
+ *
+ * blob6 is reserved as an empty slot to preserve schema position for blob7
+ * (country). Legacy rows have channel labels here; new rows write empty.
  */
 export function trackLlmEvent(
   env: Env,
@@ -53,7 +34,6 @@ export function trackLlmEvent(
     language: string;
     status: number;
     durationMs: number;
-    marketingSource: string;
     country: string;
   }
 ): void {
@@ -65,7 +45,7 @@ export function trackLlmEvent(
         data.mode,
         data.language.startsWith('de') ? 'de' : 'en',
         String(data.status),
-        data.marketingSource,
+        '',
         data.country,
       ],
       doubles: [data.durationMs],
@@ -79,18 +59,17 @@ export function trackLlmEvent(
 /**
  * Track a session creation (DAU proxy).
  * dataset: agora_llm
- * blobs: ['session', '', '', '', status, marketing_source, country]
+ * blobs: ['session', '', '', '', status, '', country]
  * indexes: ['session']
  */
 export function trackSession(
   env: Env,
   status: number,
-  marketingSource: string,
   country: string,
 ): void {
   try {
     env.ANALYTICS.writeDataPoint({
-      blobs: ['session', '', '', '', String(status), marketingSource, country],
+      blobs: ['session', '', '', '', String(status), '', country],
       doubles: [0],
       indexes: ['session'],
     });
@@ -107,7 +86,7 @@ export function trackSession(
  * rate and funnel over time.
  *
  * dataset: agora_llm
- * blobs: ['playback', figureId, mode, language, type, marketing_source, country, event]
+ * blobs: ['playback', figureId, mode, language, type, '', country, event]
  * indexes: ['playback']
  *
  * Backward compat: rows written before 2026-05-08 evening have empty blob8.
@@ -121,7 +100,6 @@ export function trackPlayback(
     figureId: string;
     mode: string;
     language: string;
-    marketingSource: string;
     country: string;
     event: string;
   }
@@ -134,7 +112,7 @@ export function trackPlayback(
         data.mode,
         data.language,
         data.type,
-        data.marketingSource,
+        '',
         data.country,
         data.event,
       ],
@@ -148,10 +126,9 @@ export function trackPlayback(
 
 /**
  * Track a page-load beacon. Fires once on App mount in the client, before any
- * user interaction. Lets the dashboard show arrivals per channel, not just
- * post-engagement events.
+ * user interaction. Lets the dashboard show arrivals over time.
  * dataset: agora_llm
- * blobs: ['page', path, '', language, '200', marketing_source, country]
+ * blobs: ['page', path, '', language, '200', '', country]
  * indexes: ['page']
  */
 export function trackPageView(
@@ -159,13 +136,12 @@ export function trackPageView(
   data: {
     path: string;
     language: string;
-    marketingSource: string;
     country: string;
   }
 ): void {
   try {
     env.ANALYTICS.writeDataPoint({
-      blobs: ['page', data.path, '', data.language, '200', data.marketingSource, data.country],
+      blobs: ['page', data.path, '', data.language, '200', '', data.country],
       doubles: [0],
       indexes: ['page'],
     });
@@ -180,7 +156,7 @@ export function trackPageView(
  * (every arrival) and the session row (Turnstile-gated). Closes the most
  * informative bounce stage in the funnel.
  * dataset: agora_llm
- * blobs: ['entry', path, '', language, '200', marketing_source, country]
+ * blobs: ['entry', path, '', language, '200', '', country]
  * indexes: ['entry']
  */
 export function trackEntry(
@@ -188,13 +164,12 @@ export function trackEntry(
   data: {
     path: string;
     language: string;
-    marketingSource: string;
     country: string;
   }
 ): void {
   try {
     env.ANALYTICS.writeDataPoint({
-      blobs: ['entry', data.path, '', data.language, '200', data.marketingSource, data.country],
+      blobs: ['entry', data.path, '', data.language, '200', '', data.country],
       doubles: [0],
       indexes: ['entry'],
     });
@@ -206,19 +181,18 @@ export function trackEntry(
 /**
  * Track a rate limit hit (429).
  * dataset: agora_llm
- * blobs: ['ratelimit', endpoint, reason, '', '429', marketing_source, country]
+ * blobs: ['ratelimit', endpoint, reason, '', '429', '', country]
  * indexes: ['ratelimit']
  */
 export function trackRateLimit(
   env: Env,
   endpoint: string,
-  reason: 'daily' | 'global' | 'council' | 'summary',
-  marketingSource: string,
+  reason: 'daily' | 'global' | 'council' | 'summary' | 'conversions',
   country: string,
 ): void {
   try {
     env.ANALYTICS.writeDataPoint({
-      blobs: ['ratelimit', endpoint, reason, '', '429', marketingSource, country],
+      blobs: ['ratelimit', endpoint, reason, '', '429', '', country],
       doubles: [0],
       indexes: ['ratelimit'],
     });
