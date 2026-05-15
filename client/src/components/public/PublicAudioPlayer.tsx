@@ -4,7 +4,6 @@
 
 import { useState, useRef, useCallback } from 'react';
 import { usePublicLang } from './PublicLangContext';
-import { sendConversion } from '../../utils/public/gclidCapture';
 
 interface PublicAudioPlayerProps {
   audioUrl: string;
@@ -18,7 +17,6 @@ export default function PublicAudioPlayer({ audioUrl, label }: PublicAudioPlayer
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
   const [error, setError] = useState(false);
-  const conversionSent = useRef(false);
 
   const togglePlay = useCallback(() => {
     const audio = audioRef.current;
@@ -35,11 +33,6 @@ export default function PublicAudioPlayer({ audioUrl, label }: PublicAudioPlayer
     const audio = audioRef.current;
     if (!audio || !audio.duration) return;
     setProgress((audio.currentTime / audio.duration) * 100);
-    // Send micro-conversion after 30s of playback
-    if (audio.currentTime >= 30 && !conversionSent.current) {
-      conversionSent.current = true;
-      sendConversion('audio_played_30s');
-    }
   }, []);
 
   const handleSeek = useCallback((e: React.MouseEvent<HTMLDivElement>) => {

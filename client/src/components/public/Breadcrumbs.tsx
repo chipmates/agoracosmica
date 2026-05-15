@@ -19,7 +19,7 @@ export default function Breadcrumbs({ items }: BreadcrumbsProps) {
   const { lang, t } = usePublicLang();
 
   const allItems = [
-    { label: t('breadcrumbs.home'), path: '/' },
+    { label: t('breadcrumbs.home'), path: '/figures' },
     ...items,
   ];
 

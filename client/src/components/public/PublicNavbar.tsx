@@ -5,6 +5,7 @@ import { useState, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { usePublicLang } from './PublicLangContext';
 import { publicUrl, stripLangPrefix } from '../../utils/public/publicSeo';
+import { sendConversion } from '../../utils/public/gclidCapture';
 
 export default function PublicNavbar() {
   const { lang, t } = usePublicLang();
@@ -13,6 +14,16 @@ export default function PublicNavbar() {
 
   const toggleMenu = useCallback(() => setMenuOpen(prev => !prev), []);
   const closeMenu = useCallback(() => setMenuOpen(false), []);
+
+  // The "Start Exploring" CTA in the navbar is the explicit entry into the
+  // funnel. Fire the conversion synchronously inside the click; sendConversion
+  // is idempotent per tab and no-ops if no gclid was captured. The link is a
+  // hard <a href> that navigates away, so the fetch uses keepalive to survive
+  // page unload.
+  const handleStartExploring = useCallback((): void => {
+    sendConversion('start_exploring');
+    closeMenu();
+  }, [closeMenu]);
 
   const basePath = stripLangPrefix(location.pathname);
   const otherLang = lang === 'de' ? 'en' : 'de';
@@ -30,7 +41,7 @@ export default function PublicNavbar() {
   return (
     <header className="pub-navbar liquid-glass--sidebar">
       <div className="pub-navbar__inner">
-        <Link to={publicUrl(lang, '/')} className="pub-navbar__logo" onClick={closeMenu}>
+        <Link to={publicUrl(lang, '/figures')} className="pub-navbar__logo" onClick={closeMenu}>
           <span className="pub-navbar__logo-name">Agora Cosmica</span>
           <span className="pub-navbar__logo-tagline">{t('footer.tagline')}</span>
         </Link>
@@ -59,7 +70,7 @@ export default function PublicNavbar() {
             {otherLang.toUpperCase()}
           </Link>
 
-          <a href="/" className="pub-navbar__cta" onClick={closeMenu}>
+          <a href="/" className="pub-navbar__cta" onClick={handleStartExploring}>
             {t('nav.startExploring')}
           </a>
         </nav>

@@ -4,6 +4,7 @@ import { Bird, Books, Sparkle, Mountains, DiamondsFour } from '@phosphor-icons/r
 import { CloseButton } from './Button';
 import OptimizedFigureImage from './OptimizedFigureImage';
 import { isStoryCompleted, isPrismCompleted, STORAGE_KEYS } from '../utils/storageKeysV2';
+import { sendConversion } from '../utils/public/gclidCapture';
 import useTranslation from '../hooks/useTranslation';
 import type { Figure, Seed } from '../types/global';
 import './ModeSelector-Mini.css';
@@ -178,6 +179,17 @@ const ModeSelectorMini: FC<ModeSelectorMiniProps> = ({
   const handleModeSelect = (mode: string) => {
     if (import.meta.env.DEV) console.log('[ModeSelectorMini] handleModeSelect called with:', mode);
     if (isClosingRef.current) return;
+
+    // Fire mode_selected conversion (gclid CAPI). Idempotent per tab via
+    // sessionStorage flag — only the first mode pick in this session counts.
+    // Covers all 5 mode paths (introduction, seed_conversation, prism,
+    // challenge, free_conversation) since each one is a real engagement
+    // commitment. Pass selectedFigure.id as metadata so the dashboard can
+    // show "Top Figures by Mode Selection". No-ops if no gclid was captured.
+    sendConversion(
+      'mode_selected',
+      selectedFigure?.id ? { figureId: selectedFigure.id } : undefined,
+    );
 
     saveVisitedMode(mode);
 

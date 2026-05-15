@@ -303,7 +303,7 @@ export default function FigureDetailPage() {
       )}
 
       {/* CTA */}
-      <PublicCTA figureName={getShortDisplayName(figureId)} variant="sticky" />
+      <PublicCTA figureName={getShortDisplayName(figureId)} figureId={figureId} variant="sticky" />
     </div>
   );
 }
