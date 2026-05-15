@@ -1,0 +1,55 @@
+# Copy to .dev.vars and fill in real values.
+# `.dev.vars` is gitignored (see repo .gitignore).
+
+# Nebius (the LLM inference provider for free-tier chat/council/summary).
+# Get a key at https://studio.nebius.com after sign-up.
+NEBIUS_API_KEY=your-nebius-api-key-here
+
+# JWT signing key for session tokens. For local dev, any random string works.
+# Generate with: openssl rand -hex 32
+# In production, set via: wrangler secret put JWT_SIGNING_KEY
+JWT_SIGNING_KEY=dev-signing-key-not-for-production-use-only
+
+# Cloudflare Turnstile secret key (anti-bot challenge on /v1/session).
+# Get one at https://dash.cloudflare.com/?to=/:account/turnstile.
+# Production uses real key; dev can leave empty if not testing the Turnstile path.
+TURNSTILE_SECRET_KEY=
+
+# DEV_RATE_LIMIT (optional): local override for all per-IP daily caps.
+# Set to a small integer so BYOK triggers after N successful messages instead of 30.
+# Production wrangler.toml never defines this var (production uses real RATE_LIMITS KV).
+# Comment out to go back to normal dev limits (30 chat / 1 council / 2 summary).
+# Nuke local KV counters between tests: rm -rf .wrangler/state/v3/kv
+DEV_RATE_LIMIT=1
+
+# ─── Google Ads Conversion API (optional) ───
+# The worker forwards conversion events (profile_created, start_exploring,
+# mode_selected) server-to-server to Google Ads via their Conversion API.
+# All 5 secrets below must be set together; if GOOGLE_ADS_DEVELOPER_TOKEN is
+# absent, the worker no-ops CAPI forwarding (events still capture to KV +
+# Analytics Engine, just don't reach Google). See:
+# - services/googleAdsCapi.ts                       (the forwarding code)
+# - ../../internal/docs/client-docs/ad-grants/      (setup runbook + rotation)
+#
+# In production, set each via:
+#   wrangler secret put GOOGLE_ADS_DEVELOPER_TOKEN
+#   wrangler secret put GOOGLE_ADS_OAUTH_CLIENT_ID
+#   wrangler secret put GOOGLE_ADS_OAUTH_CLIENT_SECRET
+#   wrangler secret put GOOGLE_ADS_OAUTH_REFRESH_TOKEN
+#   wrangler secret put GOOGLE_ADS_LOGIN_CUSTOMER_ID
+#
+# Never commit real values to source. Verify with: wrangler secret list
+
+# 22-char alphanumeric, MCC-level token from Google Ads API Center.
+GOOGLE_ADS_DEVELOPER_TOKEN=
+
+# OAuth 2.0 client ID + secret (Desktop type) from Google Cloud Console.
+GOOGLE_ADS_OAUTH_CLIENT_ID=
+GOOGLE_ADS_OAUTH_CLIENT_SECRET=
+
+# OAuth refresh token captured once via internal/ops/google-ads-oauth-flow.js.
+# Long-lived. Rotate by re-running the OAuth flow.
+GOOGLE_ADS_OAUTH_REFRESH_TOKEN=
+
+# Manager (MCC) customer ID in xxxxxxxxxx format (digits only, no dashes).
+GOOGLE_ADS_LOGIN_CUSTOMER_ID=

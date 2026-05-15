@@ -17,7 +17,6 @@ Per anonymous request, written to Cloudflare Analytics Engine:
 | Language | `en` or `de` | See bilingual reach |
 | HTTP status | `200`, `429`, `502`, ... | Detect outages and rate-limit pressure |
 | Country | 2-letter ISO code from Cloudflare edge (`DE`, `US`, `XX` for unknown) | Demonstrate geographic reach to grant funders |
-| Marketing source | One of `spotify`, `grants`, `paid`, `organic`, `direct`, `unknown` (closed allowlist) | See if our nonprofit outreach is working |
 | Playback event | `started` (audio first play) or `completed` (content marked finished, gamification star awarded) | Distinguish click-and-bail from real consumption — completion-rate funnel |
 | Content type | `story`, `teaching`, `prism`, `council`, `foreword` (closed allowlist; only set on playback events) | Know which content type was started/completed |
 | Duration (ms) | Latency of the request | Find slow paths, fix them |
@@ -33,7 +32,7 @@ Per anonymous request, written to Cloudflare Analytics Engine:
 
 ## Why this is honest, not a loophole
 
-Aggregate counters of the form `chat events from Germany via organic referral, last 24h: 47` cannot be reassembled into individual visits. There is no key by which to join across rows.
+Aggregate counters of the form `chat events from Germany, last 24h: 47` cannot be reassembled into individual visits. There is no key by which to join across rows.
 
 This sits below the personal-data threshold of DSGVO Art. 4 per Erwägungsgrund 26 (anonymous information). TDDDG §25 doesn't apply to the measurement itself: no information is read from or written to your device as part of the counting. Browser localStorage that the app uses for its own functionality (clientId for rate limiting, language preference, BYOK key encryption) is technically necessary and exempt under §25(2).
 
@@ -45,7 +44,9 @@ All analytics writes are in:
 - [`workers/llm-proxy/src/utils/analytics.ts`](../workers/llm-proxy/src/utils/analytics.ts) — chat, council, summary, session, rate-limit events
 - [`workers/audio-proxy/src/index.ts`](../workers/audio-proxy/src/index.ts) — speech (TTS), transcriptions (STT) events
 
-Marketing source values are validated against a closed allowlist server-side ([analytics.ts](../workers/llm-proxy/src/utils/analytics.ts)) — the database never sees free-text. Country values come from `request.cf.country` (a 2-letter ISO code), never from a stored IP.
+Country values come from `request.cf.country` (a 2-letter ISO code), never from a stored IP.
+
+Separately, Google Ads click tracking captures a gclid URL parameter (when a visitor arrives via a Google ad) in sessionStorage and relays it server-side only when the visitor creates a profile, so the ad can be matched to a conversion. The gclid is a Google-issued click identifier, not a user identifier, and lives only for the lifetime of the tab. See [`client/src/utils/public/gclidCapture.ts`](../client/src/utils/public/gclidCapture.ts) and [`workers/llm-proxy/src/routes/conversions.ts`](../workers/llm-proxy/src/routes/conversions.ts).
 
 Your privacy posture is what the code does, not what we promise.
 
