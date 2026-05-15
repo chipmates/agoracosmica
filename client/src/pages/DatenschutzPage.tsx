@@ -345,20 +345,20 @@ const DatenschutzPage: FC = () => {
             Falls Sie sich während derselben Sitzung registrieren, wird der gclid-Parameter einmalig an unseren Server übermittelt, um die Wirksamkeit der Werbeanzeige zu messen (Conversion-Messung). Es werden dabei keine personenbezogenen Daten übertragen. Der gclid ist eine anonyme Klick-Kennung von Google, die keinen Rückschluss auf Ihre Person zulässt.
           </p>
           <p>
+            Die Weiterleitung an Google Ads erfolgt server-seitig über die Google Ads Conversion API (kein JavaScript-Tracker auf der Website).
+          </p>
+          <p>
             <strong>Rechtsgrundlage:</strong> Berechtigtes Interesse (Art. 6 Abs. 1 lit. f DSGVO) an der Messung der Werbewirksamkeit.
           </p>
         </section>
 
         <section className="legal-section">
-          <h2>Reichweitenmessung (Kanal-Attribution)</h2>
+          <h2>Reichweitenmessung</h2>
           <p>
-            Wir messen aggregiert, über welchen Kanal (z. B. eine Suchmaschine, eine Werbeanzeige, ein Direktzugriff) Besuche unsere Website erreichen. Dazu werten wir, sofern vorhanden, die UTM-Parameter (utm_source, utm_medium) der aufgerufenen URL aus. Die Werte werden ausschließlich im Arbeitsspeicher Ihres Browsers gehalten (kein Cookie, kein localStorage) und beim Schließen des Browser-Tabs gelöscht.
+            Wir messen pro serverseitig gezählter Aktivität (zum Beispiel ein gestarteter Chat, eine begonnene oder abgeschlossene Inhalts-Wiedergabe einer Geschichte, Lehre, eines Prismas oder Konzils, ein Seitenaufruf) einen anonymen Zähler. Erfasst werden ausschließlich strukturelle Etiketten: der genutzte Endpunkt, die ausgewählte Persönlichkeit, der gewählte Modus, die Sprache (en oder de) und das vom Cloudflare-Edge ermittelte Länder-Kürzel (zweistelliger ISO-Code, zum Beispiel DE oder XX bei Unbekannt). Es werden keine IP-Adressen in Analyse-Datensätzen gespeichert, keine Nutzer-Profile gebildet, keine Cookies gesetzt, kein Quell- oder Kanal-Etikett hinterlegt. Es findet keine Wiedererkennung über Sitzungen hinweg statt.
           </p>
           <p>
-            Pro serverseitig gezählter Aktivität wird ein Kanal-Etikett aus einer geschlossenen Liste von sechs Werten (spotify, grants, paid, organic, direct, unknown) als anonymer Zähler erfasst. Zusätzlich erfassen wir, wenn eine Inhalts-Wiedergabe (Geschichte, Lehre, Prisma, Konzil) startet beziehungsweise abgeschlossen wird, um die Abschlussrate aggregiert zu messen. Es werden keine IP-Adressen in Analyse-Datensätzen gespeichert, keine Nutzer-Profile gebildet, keine Cookies gesetzt. Es findet keine Wiedererkennung über Sitzungen hinweg statt.
-          </p>
-          <p>
-            <strong>Rechtsgrundlage:</strong> Berechtigtes Interesse (Art. 6 Abs. 1 lit. f DSGVO) an der Messung der Wirksamkeit unserer gemeinnützigen Öffentlichkeitsarbeit. Die rein aggregierte, anonyme Messung liegt unterhalb der Schwelle personenbezogener Daten gemäß Erwägungsgrund 26 DSGVO. § 25 TDDDG ist auf diese Messung nicht einschlägig, da im Rahmen der Zählung keine Speicherung oder Auslesung von Informationen auf Ihrem Endgerät stattfindet. Die für den Betrieb der App technisch notwendige lokale Speicherung (z. B. Spracheinstellung, Sitzungs-UUID für Ratelimiting) ist gemäß § 25 Abs. 2 TDDDG ausgenommen.
+            <strong>Rechtsgrundlage:</strong> Berechtigtes Interesse (Art. 6 Abs. 1 lit. f DSGVO) an der Messung der Wirksamkeit unserer gemeinnützigen Öffentlichkeitsarbeit. Die rein aggregierte, anonyme Messung liegt unterhalb der Schwelle personenbezogener Daten gemäß Erwägungsgrund 26 DSGVO. § 25 TDDDG ist auf diese Messung nicht einschlägig, da im Rahmen der Zählung keine Speicherung oder Auslesung von Informationen auf Ihrem Endgerät stattfindet. Die für den Betrieb der App technisch notwendige lokale Speicherung (zum Beispiel Spracheinstellung, Sitzungs-UUID für Ratelimiting) ist gemäß § 25 Abs. 2 TDDDG ausgenommen.
           </p>
         </section>
 
