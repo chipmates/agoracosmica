@@ -1863,171 +1863,102 @@ async function loadAdGrants() {
   var grid = document.getElementById('grid-adgrants');
   var alertsEl = document.getElementById('alerts-adgrants');
 
-  // Query Analytics Engine for conversion events
+  // Query Analytics Engine for conversion events (3-event ladder)
   var queries = [
-    // Total profile_created conversions
+    // Profile Creation — current period count
     { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'profile_created' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    // Previous period profile_created
+    // Profile Creation — previous period for delta
     { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'profile_created' AND timestamp " + prevRange(), dataset: 'agora_llm' },
-    // Total audio_played_30s conversions
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'audio_played_30s' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    // Previous period audio
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'audio_played_30s' AND timestamp " + prevRange(), dataset: 'agora_llm' },
-    // Daily conversions sparkline
+    // Profile Creation — sparkline
     { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE index1 = 'profile_created' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
-    // Daily audio sparkline
-    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE index1 = 'audio_played_30s' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
-    // Conversions by figure (which pages drive signups)
-    { sql: "SELECT blob2 as figure, COUNT() as c FROM agora_llm WHERE index1 = 'profile_created' AND blob2 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY figure ORDER BY c DESC LIMIT 10", dataset: 'agora_llm' },
-    // Audio plays by figure
-    { sql: "SELECT blob2 as figure, COUNT() as c FROM agora_llm WHERE index1 = 'audio_played_30s' AND blob2 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY figure ORDER BY c DESC LIMIT 10", dataset: 'agora_llm' },
-    // Total sessions for conversion rate calculation
+    // Start Exploring by figure (which figure detail pages drive most CTA clicks).
+    // Note: profile_created has no figureId by design (fires before figure pick).
+    { sql: "SELECT blob2 as figure, COUNT() as c FROM agora_llm WHERE index1 = 'start_exploring' AND blob2 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY figure ORDER BY c DESC LIMIT 10", dataset: 'agora_llm' },
+    // Total sessions for conversion rate
     { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'session' AND blob5 = '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    // Phase 1 channel attribution — conversations by marketing_source (blob6)
-    { sql: "SELECT blob6 as source, COUNT() as c FROM agora_llm WHERE blob1 IN ('chat','council','summary') AND blob5 = '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY source ORDER BY c DESC", dataset: 'agora_llm' },
-    // Channel attribution — sessions by marketing_source
-    { sql: "SELECT blob6 as source, COUNT() as c FROM agora_llm WHERE blob1 = 'session' AND blob5 = '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY source ORDER BY c DESC", dataset: 'agora_llm' },
-    // Phase 0d geographic — top countries on conversations
+    // Top countries on conversations (geographic reach)
     { sql: "SELECT blob7 as country, COUNT() as c FROM agora_llm WHERE blob1 IN ('chat','council','summary') AND blob5 = '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY country ORDER BY c DESC LIMIT 10", dataset: 'agora_llm' },
-    // Content completions by channel (real consumption attributed to marketing source)
-    { sql: "SELECT blob6 as source, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND (blob8 = '' OR blob8 = 'completed') AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY source ORDER BY c DESC", dataset: 'agora_llm' },
     // Content completions by type
     { sql: "SELECT blob5 as type, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND (blob8 = '' OR blob8 = 'completed') AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY type ORDER BY c DESC", dataset: 'agora_llm' },
-    // Sources over time — hourly/daily channel attribution sparkline (Conversations) for the trend graph
-    { sql: "SELECT blob6 as source, toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE blob1 IN ('chat','council','summary') AND blob5 = '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY source, t ORDER BY t", dataset: 'agora_llm' },
-    // Top figures by channel — figure x source cross-tab on chat events
-    { sql: "SELECT blob2 as figure, blob6 as source, COUNT() as c FROM agora_llm WHERE blob1 = 'chat' AND blob5 = '200' AND blob2 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY figure, source ORDER BY c DESC LIMIT 30", dataset: 'agora_llm' },
-    // Funnel by channel — page → entry → session → chat counts per source.
-    // Single query so we can render the per-channel conversion table AND the
-    // standalone "Arrivals by Channel" / "Entries by Channel" bar charts from
-    // the same dataset (avoids three separate round-trips).
-    { sql: "SELECT blob6 as source, countIf(blob1='page') as arrivals, countIf(blob1='entry') as entries, countIf(blob1='session' AND blob5='200') as sessions, countIf(blob1='chat' AND blob5='200') as chats FROM agora_llm WHERE blob1 IN ('page','entry','session','chat') AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY source ORDER BY arrivals DESC", dataset: 'agora_llm' },
+    // Start Exploring — current period count
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'start_exploring' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    // Start Exploring — sparkline
+    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE index1 = 'start_exploring' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
+    // Mode Selected — current period count
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'mode_selected' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    // Mode Selected — sparkline
+    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE index1 = 'mode_selected' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
+    // Mode Selected by figure (which figures drive engagement past signup)
+    { sql: "SELECT blob2 as figure, COUNT() as c FROM agora_llm WHERE index1 = 'mode_selected' AND blob2 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY figure ORDER BY c DESC LIMIT 10", dataset: 'agora_llm' },
   ];
 
   var r = await batch(queries);
 
   var profileConv = val(r[0]), profilePrev = val(r[1]);
-  var audioConv = val(r[2]), audioPrev = val(r[3]);
-  var sparkProfile = rows(r[4]).map(function(r) { return r.c; });
-  var sparkAudio = rows(r[5]).map(function(r) { return r.c; });
-  var profileByFigure = rows(r[6]);
-  var audioByFigure = rows(r[7]);
-  var totalSessions = val(r[8]);
+  var sparkProfile = rows(r[2]).map(function(r) { return r.c; });
+  var startByFigure = rows(r[3]);
+  var totalSessions = val(r[4]);
   var convRate = totalSessions > 0 ? ((profileConv / totalSessions) * 100).toFixed(1) : '--';
-  var convoByChannel = rows(r[9]);
-  var sessionsByChannel = rows(r[10]);
-  var topCountriesAdgrants = rows(r[11]);
-  var playbackByChannel = rows(r[12]);
-  var playbackByType = rows(r[13]);
-  var sourcesOverTime = rows(r[14]);
-  var figureByChannel = rows(r[15]);
-  var funnelByChannel = rows(r[16]);
+  var topCountriesAdgrants = rows(r[5]);
+  var playbackByType = rows(r[6]);
+  var startExpConv = val(r[7]);
+  var sparkStartExp = rows(r[8]).map(function(r) { return r.c; });
+  var modeSelConv = val(r[9]);
+  var sparkModeSel = rows(r[10]).map(function(r) { return r.c; });
+  var modeByFigure = rows(r[11]);
+
+  // Funnel ratios — quality signals across the 3-event ladder
+  var profileFromStartPct = startExpConv > 0
+    ? ((profileConv / startExpConv) * 100).toFixed(0) + '%'
+    : '--';
+  var modeFromProfilePct = profileConv > 0
+    ? ((modeSelConv / profileConv) * 100).toFixed(0) + '%'
+    : '--';
 
   // Alerts
   var alerts = '';
-  if (profileConv === 0 && audioConv === 0 && convoByChannel.length === 0) {
-    alerts += '<div class="hint-banner">No marketing activity yet ' + RANGE_LABEL[S.range] + '. Channel breakdowns populate as visitors arrive with utm_source tags.</div>';
+  if (profileConv === 0 && startExpConv === 0 && modeSelConv === 0) {
+    alerts += '<div class="hint-banner">No conversion events yet ' + RANGE_LABEL[S.range] + '. The 3-event ladder (Start Exploring → Profile Creation → Mode Selected) populates here when Google Ads visitors arrive with a gclid.</div>';
   }
   alertsEl.innerHTML = alerts;
 
   var html = '';
 
   // ────────────────────────────────────────────────────────────
-  // SECTION 1 — CHANNEL ATTRIBUTION
-  // Where visits + conversations come from (Spotify / Grants / Paid / etc).
+  // SECTION 1 — GOOGLE ADS CONVERSIONS (3-event ladder)
+  // gclid-captured events forwarded to Google Ads CAPI.
+  // Start Exploring → Profile Creation → Mode Selected.
   // ────────────────────────────────────────────────────────────
-  html += '<div class="section-divider">Channel Attribution</div>';
+  html += '<div class="section-divider">Google Ads Conversions</div>';
   html += '<div class="grid">';
 
-  var convoChannelItems = aggregateByLabel(convoByChannel.map(function(r) { return { label: r.source || 'direct', c: r.c }; }));
-  html += chartCard('Conversations by Channel', barsHtml(convoChannelItems, '#E6BC5C'), 'card-half');
+  html += kpi('Start Exploring', startExpConv, { spark: sparkStartExp, sparkColor: '#5B8BD4', sub: 'CTA click on theme/figure pages' });
+  html += kpi('Profile Conversions', profileConv, { hero: true, spark: sparkProfile, sparkColor: '#68C397', delta: profilePrev, sub: 'Enter button after character + name picked' });
+  html += kpi('Mode Selected', modeSelConv, { spark: sparkModeSel, sparkColor: '#E6BC5C', sub: 'first mode pick (Story / Wisdom / Talk / Quest / Freetalk)' });
+  html += kpi('Conversion Rate', convRate + '%', { sub: profileConv + ' profiles / ' + fmt(totalSessions) + ' sessions' });
+  html += kpi('Signup → Engaged', modeFromProfilePct, { sub: modeSelConv + ' modes picked / ' + profileConv + ' profiles' });
+  html += kpi('CTA → Signup', profileFromStartPct, { sub: profileConv + ' profiles / ' + startExpConv + ' CTA clicks' });
 
-  var sessionChannelItems = aggregateByLabel(sessionsByChannel.map(function(r) { return { label: r.source || 'direct', c: r.c }; }));
-  html += chartCard('Sessions by Channel', barsHtml(sessionChannelItems, '#9D83CD'), 'card-half');
-
-  // Sources over time — stacked-style trend per channel
-  if (sourcesOverTime.length > 1) {
-    var sourceMap = {};
-    var allBuckets = new Set();
-    sourcesOverTime.forEach(function(row) {
-      var src = row.source || 'direct';
-      if (!sourceMap[src]) sourceMap[src] = {};
-      sourceMap[src][row.t] = (sourceMap[src][row.t] || 0) + row.c;
-      allBuckets.add(row.t);
-    });
-    var bucketArr = Array.from(allBuckets).sort();
-    var sourceColors = { spotify: '#1DB954', spotify_a: '#3DD27A', spotify_b: '#0E8A3F', grants: '#4285F4', paid: '#E97451', organic: '#9D83CD', direct: '#E6BC5C', unknown: '#8A8A8A' };
-    var maxBucket = 1;
-    bucketArr.forEach(function(t) {
-      var stack = 0;
-      Object.keys(sourceMap).forEach(function(src) { stack += sourceMap[src][t] || 0; });
-      if (stack > maxBucket) maxBucket = stack;
-    });
-    var sotHtml = '<div style="display:flex;align-items:flex-end;gap:4px;height:120px;padding:8px 0">';
-    bucketArr.slice(-24).forEach(function(t) {
-      var d = new Date(t);
-      var label = S.range <= 1 ? d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : d.toLocaleDateString([], { month: 'short', day: 'numeric' });
-      sotHtml += '<div style="flex:1;display:flex;flex-direction:column-reverse;justify-content:flex-start;gap:1px;min-width:0" title="' + label + '">';
-      Object.keys(sourceMap).forEach(function(src) {
-        var v = sourceMap[src][t] || 0;
-        if (v === 0) return;
-        var h = Math.round((v / maxBucket) * 100);
-        sotHtml += '<div style="background:' + (sourceColors[src] || '#8A8A8A') + ';height:' + h + '%;min-height:1px"></div>';
-      });
-      sotHtml += '</div>';
-    });
-    sotHtml += '</div>';
-    sotHtml += '<div style="display:flex;flex-wrap:wrap;gap:12px;font-size:0.75rem;margin-top:6px;color:var(--dim)">';
-    Object.keys(sourceMap).forEach(function(src) {
-      sotHtml += '<span><span style="display:inline-block;width:10px;height:10px;background:' + (sourceColors[src] || '#8A8A8A') + ';border-radius:2px;margin-right:4px;vertical-align:middle"></span>' + src + '</span>';
-    });
-    sotHtml += '</div>';
-    html += chartCard('Sources Over Time', sotHtml, 'card-full');
+  if (startByFigure.length > 0) {
+    html += chartCard('Top Figures by CTA Click', barsHtml(startByFigure.map(function(r) { return { label: cap(r.figure), c: r.c }; }), '#5B8BD4'), 'card-half');
   }
 
-  // Page Arrivals + Entries by Channel — derived from the funnel-by-channel
-  // query so we get them without a separate round-trip. Arrivals = page beacon
-  // (every load), Entries = LoginPage→HomePage transition. The two together
-  // show how channel quality decays at the very top of the funnel.
-  var arrivalsItems = aggregateByLabel(funnelByChannel.map(function(r) { return { label: r.source || 'direct', c: r.arrivals }; }));
-  html += chartCard('Page Arrivals by Channel', barsHtml(arrivalsItems, '#5B8BD4'), 'card-half');
-  var entriesItems = aggregateByLabel(funnelByChannel.map(function(r) { return { label: r.source || 'direct', c: r.entries }; }));
-  html += chartCard('Entries by Channel', barsHtml(entriesItems, '#68C397'), 'card-half');
+  if (modeByFigure.length > 0) {
+    html += chartCard('Top Figures by Engagement', barsHtml(modeByFigure.map(function(r) { return { label: cap(r.figure), c: r.c }; }), '#E6BC5C'), 'card-half');
+  }
 
+  html += chartCard('Conversion Pipeline',
+    '<div style="display:flex;flex-direction:column;gap:8px;font-size:0.875rem">' +
+    '<div style="display:flex;justify-content:space-between"><span style="color:var(--dim)">gclid Capture</span><span style="color:var(--ok)">Active</span></div>' +
+    '<div style="display:flex;justify-content:space-between"><span style="color:var(--dim)">Start Exploring Event</span><span style="color:var(--ok)">Active</span></div>' +
+    '<div style="display:flex;justify-content:space-between"><span style="color:var(--dim)">Profile Creation Event</span><span style="color:var(--ok)">Active</span></div>' +
+    '<div style="display:flex;justify-content:space-between"><span style="color:var(--dim)">Mode Selected Event</span><span style="color:var(--ok)">Active</span></div>' +
+    '<div style="display:flex;justify-content:space-between"><span style="color:var(--dim)">CF Worker Endpoint</span><span style="color:var(--ok)">Active</span></div>' +
+    '<div style="display:flex;justify-content:space-between"><span style="color:var(--dim)">Google Ads CAPI Forwarding</span><span style="color:var(--warn)">Pending (action IDs + dev token)</span></div>' +
+    '</div>',
+    ''
+  );
   html += '</div>';
-
-  // ────────────────────────────────────────────────────────────
-  // SECTION 1b — FUNNEL BY CHANNEL
-  // Arrivals → entries → sessions → chats per source, with the per-stage
-  // conversion rate that tells you which channel actually converts.
-  // ────────────────────────────────────────────────────────────
-  if (funnelByChannel.length > 0) {
-    html += '<div class="section-divider">Funnel by Channel</div>';
-    html += '<div class="grid">';
-    var pct = function(n, d) { return d > 0 ? ((n / d) * 100).toFixed(0) + '%' : '—'; };
-    var funnelRows = funnelByChannel.slice(0, 12).map(function(r) {
-      var src = r.source || 'direct';
-      return [
-        '<span>' + src + '</span>',
-        r.arrivals,
-        r.entries,
-        r.sessions,
-        r.chats,
-        pct(r.entries, r.arrivals),
-        pct(r.sessions, r.entries),
-        pct(r.chats, r.sessions),
-      ];
-    });
-    html += chartCard(
-      'Funnel by Channel',
-      tableHtml(
-        ['Channel', 'Arrivals', 'Entries', 'Sessions', 'Chats', 'Arrive→Enter', 'Enter→Session', 'Session→Chat'],
-        funnelRows,
-      ),
-      'card-full',
-    );
-    html += '</div>';
-  }
 
   // ────────────────────────────────────────────────────────────
   // SECTION 2 — GEOGRAPHIC REACH
@@ -2040,56 +1971,13 @@ async function loadAdGrants() {
   html += '</div>';
 
   // ────────────────────────────────────────────────────────────
-  // SECTION 3 — CONTENT REACH BY CHANNEL
-  // Which content types each channel actually drives users to finish.
+  // SECTION 3 — CONTENT REACH
+  // Which content types users actually finish.
   // ────────────────────────────────────────────────────────────
-  html += '<div class="section-divider">Content Reach by Channel</div>';
+  html += '<div class="section-divider">Content Reach</div>';
   html += '<div class="grid">';
-
   var playbackTypeItems = aggregateByLabel(playbackByType.map(function(r) { return { label: r.type || 'unknown', c: r.c }; }));
-  html += chartCard('Content Completions by Type', barsHtml(playbackTypeItems, '#68C397'), 'card-half');
-
-  var playbackChannelItems = aggregateByLabel(playbackByChannel.map(function(r) { return { label: r.source || 'direct', c: r.c }; }));
-  html += chartCard('Content Completions by Channel', barsHtml(playbackChannelItems, '#E6BC5C'), 'card-half');
-
-  // Top Figures by Channel — figure × source cross-tab table
-  if (figureByChannel.length > 0) {
-    var fbcRows = figureByChannel.slice(0, 15).map(function(r) {
-      return ['<span>' + cap(r.figure) + '</span>', '<span>' + (r.source || 'direct') + '</span>', r.c];
-    });
-    html += chartCard('Top Figures by Channel', tableHtml(['Figure', 'Channel', 'Chats'], fbcRows), 'card-wide');
-  }
-  html += '</div>';
-
-  // ────────────────────────────────────────────────────────────
-  // SECTION 4 — GOOGLE ADS CONVERSIONS
-  // Existing gclid path: profile_created + audio_played_30s events.
-  // ────────────────────────────────────────────────────────────
-  html += '<div class="section-divider">Google Ads Conversions</div>';
-  html += '<div class="grid">';
-
-  html += kpi('Profile Conversions', profileConv, { hero: true, spark: sparkProfile, sparkColor: '#68C397', delta: profilePrev, sub: 'from Google Ads clicks' });
-  html += kpi('Audio Engagement', audioConv, { hero: true, spark: sparkAudio, sparkColor: '#5B8BD4', delta: audioPrev, sub: 'listened 30s+' });
-  html += kpi('Conversion Rate', convRate + '%', { sub: profileConv + ' conversions / ' + fmt(totalSessions) + ' sessions' });
-  html += kpi('Total Ad Events', profileConv + audioConv, { sub: 'profile + audio combined' });
-
-  if (profileByFigure.length > 0) {
-    html += chartCard('Top Converting Figures', barsHtml(profileByFigure.map(function(r) { return { label: cap(r.figure), c: r.c }; }), '#68C397'), 'card-wide');
-  }
-  if (audioByFigure.length > 0) {
-    html += chartCard('Audio Engagement by Figure', barsHtml(audioByFigure.map(function(r) { return { label: cap(r.figure), c: r.c }; }), '#5B8BD4'), 'card-wide');
-  }
-
-  html += chartCard('Conversion Pipeline',
-    '<div style="display:flex;flex-direction:column;gap:8px;font-size:0.875rem">' +
-    '<div style="display:flex;justify-content:space-between"><span style="color:var(--dim)">gclid Capture</span><span style="color:var(--ok)">Active</span></div>' +
-    '<div style="display:flex;justify-content:space-between"><span style="color:var(--dim)">Profile Event</span><span style="color:var(--ok)">Active</span></div>' +
-    '<div style="display:flex;justify-content:space-between"><span style="color:var(--dim)">Audio Event</span><span style="color:var(--ok)">Active</span></div>' +
-    '<div style="display:flex;justify-content:space-between"><span style="color:var(--dim)">CF Worker Endpoint</span><span style="color:var(--ok)">Active</span></div>' +
-    '<div style="display:flex;justify-content:space-between"><span style="color:var(--dim)">Google Ads API</span><span style="color:var(--warn)">Pending (manual setup)</span></div>' +
-    '</div>',
-    ''
-  );
+  html += chartCard('Content Completions by Type', barsHtml(playbackTypeItems, '#68C397'), 'card-wide');
   html += '</div>';
 
   grid.innerHTML = html;
