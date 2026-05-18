@@ -20,6 +20,15 @@ html:has(.public-page) #root {
   flex-direction: column;
 }
 
+/* iOS Safari pins body with position:fixed to block elastic scroll.
+   That also stops public pages scrolling, so undo it for them. */
+@supports (-webkit-touch-callout: none) {
+  html:has(.public-page) body {
+    position: static;
+    width: auto;
+  }
+}
+
 /* Main layout */
 .public-page {
   min-height: 100vh;
