@@ -6,6 +6,8 @@ import { Link, useLocation } from 'react-router-dom';
 import { usePublicLang } from './PublicLangContext';
 import { publicUrl, stripLangPrefix } from '../../utils/public/publicSeo';
 import { sendConversion } from '../../utils/public/gclidCapture';
+import { captureEntryIntent } from '../../utils/public/entryIntent';
+import { figureSlugToId } from '../../data/public/slugMap';
 
 export default function PublicNavbar() {
   const { lang, t } = usePublicLang();
@@ -16,14 +18,19 @@ export default function PublicNavbar() {
   const closeMenu = useCallback(() => setMenuOpen(false), []);
 
   // The "Start Exploring" CTA in the navbar is the explicit entry into the
-  // funnel. Fire the conversion synchronously inside the click; sendConversion
-  // is idempotent per tab and no-ops if no gclid was captured. The link is a
-  // hard <a href> that navigates away, so the fetch uses keepalive to survive
-  // page unload.
+  // funnel. On a figure detail page it records that figure, and on every page
+  // it records the language, so the header CTA deep-links the same way the
+  // in-page CTA does instead of dropping that intent. sendConversion is
+  // idempotent per tab and no-ops without a gclid; the link is a hard <a href>,
+  // so the keepalive fetch survives page unload.
   const handleStartExploring = useCallback((): void => {
-    sendConversion('start_exploring');
+    const parts = stripLangPrefix(location.pathname).split('/');
+    const slug = parts[1] === 'figures' && !parts[3] ? parts[2] : undefined;
+    const figureId = slug ? figureSlugToId[slug] : undefined;
+    captureEntryIntent(figureId, lang);
+    sendConversion('start_exploring', figureId ? { figureId } : undefined);
     closeMenu();
-  }, [closeMenu]);
+  }, [location.pathname, lang, closeMenu]);
 
   const basePath = stripLangPrefix(location.pathname);
   const otherLang = lang === 'de' ? 'en' : 'de';
