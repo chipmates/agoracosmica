@@ -28,37 +28,6 @@ body, html {
 
 /* Component styles imported at top of file (lines 3-8) */
 
-/* Site attribution — ChipMates / ad grant compliance.
-   Sits at the very top of the splash, fades during post-login animation. */
-.site-attribution {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 100; /* below top-bar buttons (z-sticky: 200) */
-  margin: 0;
-  padding: 6px 20px;
-  text-align: center;
-  font-family: var(--font-ui);
-  font-size: 10px;
-  font-weight: 400;
-  letter-spacing: 0.02em;
-  color: color-mix(in srgb, var(--gold-primary) 55%, transparent);
-  pointer-events: none;
-  transition: opacity 0.6s ease;
-}
-
-.site-attribution--hidden {
-  opacity: 0;
-}
-
-@media (min-width: 768px) {
-  .site-attribution {
-    font-size: 13px;
-    padding: 14px 30px;
-  }
-}
-
 /* Split Top Bar Styles */
 .top-bar-left,
 .top-bar-right {
