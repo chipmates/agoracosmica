@@ -440,7 +440,7 @@
 
 .essenceText {
   color: var(--cosmic-silver);
-  font-size: clamp(1.0625rem, 1.7vw, 1.2rem); /* 17px floor → 19.2px desktop cap */
+  font-size: clamp(0.9375rem, 1.4vw, 1.0625rem); /* 15px floor → 17px cap — trimmed so the longer revised bios fit the frame */
   line-height: 1.5;
   font-style: italic;
   text-align: center;
@@ -1159,5 +1159,122 @@
 @media print {
   .modal {
     display: none;
+  }
+}
+
+/* ============================================================
+   Figure page revision — golden "you will learn" line + trailer
+   play control. Desktop: in the name row. Mobile: under the portrait.
+   ============================================================ */
+
+.figureHook {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.learnLine {
+  margin: 0;
+  max-width: 32ch;
+  text-align: center;
+  color: var(--gold-subtle);
+  font-size: clamp(0.9375rem, 0.875rem + 0.4vw, 1.125rem);
+  font-weight: 500;
+  line-height: 1.4;
+  text-shadow:
+    0 1px 4px color-mix(in srgb, var(--utility-pure-black) 70%, transparent),
+    0 0 12px color-mix(in srgb, var(--gold-subtle) 25%, transparent);
+}
+
+.trailerBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px; /* WCAG touch target */
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 40%, transparent);
+  background: color-mix(in srgb, var(--gold-subtle) 14%, transparent);
+  color: var(--gold-subtle);
+  font-family: var(--ui-font-family);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.trailerBtn:hover {
+  background: color-mix(in srgb, var(--gold-subtle) 26%, transparent);
+  border-color: color-mix(in srgb, var(--gold-subtle) 70%, transparent);
+}
+
+.trailerBtnActive {
+  background: color-mix(in srgb, var(--gold-subtle) 26%, transparent);
+  border-color: var(--gold-subtle);
+}
+
+.trailerBtn:focus-visible {
+  outline: 2px solid var(--gold-subtle);
+  outline-offset: 2px;
+}
+
+.trailerBtn svg {
+  flex-shrink: 0;
+}
+
+.trailerLabel {
+  white-space: nowrap;
+}
+
+/* The learn line + trailer button add height below the portrait. On phones
+   that cannot fit the whole modal, scroll it as one block: galleryMain holds
+   its natural height (flex: 1 0 auto, no shrink) rather than collapsing and
+   letting the carousel overlap the action button below it. */
+@media (max-width: 768px) {
+  .galleryContent {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .galleryMain {
+    flex: 1 0 auto;
+  }
+
+  .mobileCarousel {
+    height: auto;
+  }
+}
+
+/* Desktop triptych: keep each portrait inside its grid row so it can never
+   overlap the name + golden line beneath it. The portrait scales to the
+   space the row leaves, instead of holding a fixed height. */
+@media (min-width: 768px) {
+  .portraitGrid {
+    grid-template-rows: minmax(0, 1fr);
+  }
+
+  /* Centering the frame lets the portrait shrink (keeping its aspect ratio)
+     instead of stretching. width: auto only follows aspect-ratio inside a
+     flex/grid parent — a plain block would just fill the column. */
+  .portraitFrame {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+  }
+
+  /* Height drives the size, width follows from the portrait aspect ratio set
+     on the base .glassFrame rule. Capped at the fixed design dimensions. */
+  .glassFrame {
+    height: 100%;
+    width: auto;
+    max-height: var(--portrait-height);
+    max-width: var(--portrait-width);
   }
 }

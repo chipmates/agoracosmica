@@ -8,7 +8,8 @@
 import React, { useState, useEffect, useCallback, useRef, FC, KeyboardEvent, CSSProperties } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from '../hooks/useTranslation';
-import { getHistoricalFigures } from '../api/figures';
+import { getHistoricalFigures, historicalFiguresBase } from '../api/figures';
+import { loadFigureTranslation } from '../utils/figureTranslations';
 import { useDomainStore } from '../stores/domainStore';
 import OptimizedImage from './OptimizedImage';
 import Button from './Button/Button';
@@ -16,6 +17,8 @@ import { ModalHeader } from './Modal';
 import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
 import { useUIStore } from '../stores/uiStore';
 import EchoExplainerHelp, { ECHO_EXPLAINER_HELP_ID } from './EchoExplainerHelp';
+import { Play, Pause } from '@phosphor-icons/react';
+import { useFigureTrailer, type FigureTrailerControls } from '../hooks/useFigureTrailer';
 
 // CSS Modules
 import styles from './WisdomGalleryModal.module.css';
@@ -35,7 +38,42 @@ interface Figure {
   id: string;
   name: string;
   about: string;
+  learn?: string;
 }
+
+/**
+ * Golden "you will learn" line + trailer play control.
+ * Shared by the desktop name row and the mobile portrait frame.
+ */
+interface FigureHookProps {
+  figure: Figure;
+  language: string;
+  trailer: FigureTrailerControls;
+}
+
+const FigureHook: FC<FigureHookProps> = ({ figure, language, trailer }) => {
+  const { tString } = useTranslation();
+  const status = trailer.activeId === figure.id ? trailer.status : 'idle';
+  const engaged = status === 'loading' || status === 'playing';
+  const label = engaged
+    ? tString('figures.trailerPause', 'Pause')
+    : tString('figures.trailerPlay', 'Play intro');
+
+  return (
+    <div className={styles.figureHook}>
+      {figure.learn && <p className={styles.learnLine}>{figure.learn}</p>}
+      <button
+        type="button"
+        className={`${styles.trailerBtn} ${engaged ? styles.trailerBtnActive : ''}`}
+        onClick={(e) => { e.stopPropagation(); trailer.toggle(figure.id, language); }}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') e.stopPropagation(); }}
+      >
+        {engaged ? <Pause size={15} weight="fill" /> : <Play size={15} weight="fill" />}
+        <span className={styles.trailerLabel}>{label}</span>
+      </button>
+    </div>
+  );
+};
 
 interface PortraitFrameProps {
   figure: Figure;
@@ -49,6 +87,9 @@ interface PortraitFrameProps {
   className?: string;
   isMobile?: boolean;
   showName?: boolean;
+  language?: string;
+  trailer?: FigureTrailerControls;
+  onDeselect?: () => void;
 }
 
 /**
@@ -64,7 +105,10 @@ const PortraitFrame: FC<PortraitFrameProps> = ({
   onTextShown,
   className = '',
   isMobile = false,
-  showName = true
+  showName = true,
+  language = 'en',
+  trailer,
+  onDeselect
 }) => {
   const { t } = useTranslation();  // Used for aria-label
   const mountedRef = useRef(false);
@@ -102,18 +146,22 @@ const PortraitFrame: FC<PortraitFrameProps> = ({
   }, [onLeave, isMobile]);
 
   const handleClick = useCallback(() => {
-    // Both mobile and desktop: show text and set selected
-    setShowEssence(true);
-    onTextShown?.(figure);
-  }, [figure, onTextShown]);
+    if (isSelected) {
+      // Second click/tap on the already-selected figure → revert.
+      setShowEssence(false);
+      onDeselect?.();
+    } else {
+      setShowEssence(true);
+      onTextShown?.(figure);
+    }
+  }, [figure, isSelected, onTextShown, onDeselect]);
 
   const handleKeyDown = useCallback((event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
-      setShowEssence(true);
-      onTextShown?.(figure);
+      handleClick();
     }
-  }, [figure, onTextShown]);
+  }, [handleClick]);
 
   const shouldShowEssence = showEssence || isSelected;
 
@@ -179,6 +227,11 @@ const PortraitFrame: FC<PortraitFrameProps> = ({
           {figure.name}
         </div>
       )}
+
+      {/* Golden line + trailer — mobile only (desktop renders it in the name row) */}
+      {showName && trailer && (
+        <FigureHook figure={figure} language={language} trailer={trailer} />
+      )}
     </div>
   );
 };
@@ -200,6 +253,9 @@ const WisdomGalleryModal: FC<WisdomGalleryModalProps> = ({
   const { t, tNode, language } = useTranslation();
   const modalRef = useRef<HTMLDivElement>(null);
 
+  // Figure page trailer — standalone audio player (play-on-tap, never autoplay)
+  const trailer = useFigureTrailer();
+
   // First visit tracking from Zustand
   const markAsVisited = useDomainStore((state) => state.markAsVisited);
 
@@ -220,29 +276,54 @@ const WisdomGalleryModal: FC<WisdomGalleryModalProps> = ({
 
   /**
    * Initialize figures data
+   *
+   * Figure translations load async from R2, but getHistoricalFigures is
+   * synchronous. On a cold cache (a fresh reload that reaches the gallery
+   * before anything warmed it) it hands back "Loading…" placeholders. Build
+   * once for an instant paint, then warm the cache and rebuild with the real
+   * about + learn text.
    */
   useEffect(() => {
-    const allFigures = getHistoricalFigures(language);
-    
-    const galleryFigures = GALLERY_FIGURES.map((figureId) => {
-      const baseFigure = allFigures.find((f: any) => f.id === figureId);
-      
-      if (!baseFigure) {
-        console.error(`Gallery figure not found: ${figureId}`);
+    let cancelled = false;
+
+    const buildFigures = () => {
+      const allFigures = getHistoricalFigures(language);
+
+      const galleryFigures = GALLERY_FIGURES.map((figureId) => {
+        const baseFigure = allFigures.find((f: any) => f.id === figureId);
+
+        if (!baseFigure) {
+          console.error(`Gallery figure not found: ${figureId}`);
+          return {
+            id: figureId,
+            name: `Missing: ${figureId}`,
+            about: 'Figure data not available'
+          };
+        }
+
         return {
-          id: figureId,
-          name: `Missing: ${figureId}`,
-          about: 'Figure data not available'
+          ...baseFigure,
+          id: figureId
         };
-      }
+      });
 
-      return {
-        ...baseFigure,
-        id: figureId
-      };
-    });
+      if (!cancelled) setFigures(galleryFigures);
+    };
 
-    setFigures(galleryFigures);
+    buildFigures();
+
+    Promise.all(
+      GALLERY_FIGURES.map((figureId) => {
+        const base = historicalFiguresBase.find((f) => f.id === figureId);
+        return base
+          ? loadFigureTranslation(base.baseNameEn, language)
+          : Promise.resolve();
+      })
+    )
+      .then(() => buildFigures())
+      .catch(() => { /* placeholders stay shown — nothing else we can do */ });
+
+    return () => { cancelled = true; };
   }, [language]);
 
   /**
@@ -257,6 +338,11 @@ const WisdomGalleryModal: FC<WisdomGalleryModalProps> = ({
 
   // Scroll lock via ref-counted hook
   useBodyScrollLock(true);
+
+  // Stop any trailer when the mobile carousel moves to another figure.
+  useEffect(() => {
+    trailer.stop();
+  }, [currentIndex, trailer.stop]);
 
   /**
    * Battery optimization - Track page visibility for performance
@@ -362,6 +448,13 @@ const WisdomGalleryModal: FC<WisdomGalleryModalProps> = ({
   }, []);
 
   /**
+   * Revert selection — second click/tap on the chosen figure
+   */
+  const handleDeselect = useCallback(() => {
+    setSelectedFigure(null);
+  }, []);
+
+  /**
    * No close function - user must commit to a choice!
    */
 
@@ -422,6 +515,7 @@ const WisdomGalleryModal: FC<WisdomGalleryModalProps> = ({
             index={index}
             isSelected={selectedFigure?.id === figure.id}
             onTextShown={handleTextShown}
+            onDeselect={handleDeselect}
             className={styles.desktopPortrait}
             isMobile={false}
             showName={false}
@@ -429,11 +523,12 @@ const WisdomGalleryModal: FC<WisdomGalleryModalProps> = ({
         ))}
       </div>
 
-      {/* Name Row — always shows all 3 names */}
+      {/* Name Row — name + golden line + trailer for each of the 3 figures */}
       <div className={styles.nameActionRow}>
         {figures.map((figure) => (
           <div key={figure.id} className={styles.nameActionCell}>
             <span className={styles.nameLabel}>{figure.name}</span>
+            <FigureHook figure={figure} language={language} trailer={trailer} />
           </div>
         ))}
       </div>
@@ -475,8 +570,11 @@ const WisdomGalleryModal: FC<WisdomGalleryModalProps> = ({
           isActive={true}
           isSelected={selectedFigure?.id === currentFigure.id}
           onTextShown={handleTextShown}
+          onDeselect={handleDeselect}
           className={styles.mobilePortrait}
           isMobile={true}
+          language={language}
+          trailer={trailer}
         />
       </div>
     );
@@ -525,8 +623,8 @@ const WisdomGalleryModal: FC<WisdomGalleryModalProps> = ({
               {tNode('figures.select')}
             </Button>
           )}
-          {/* Hide "Meet Others" on mobile when figure selected */}
-          {!(isMobile && selectedFigure) && (
+          {/* "Meet Others" gives way to "Select" once a figure is picked */}
+          {!selectedFigure && (
             <Button
               variant="ghost"
               onClick={handleExploreAll}
