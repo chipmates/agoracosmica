@@ -136,6 +136,15 @@ const CharacterLoginForm: FC<CharacterLoginFormProps> = ({ onComplete, beatriceI
         }
         .cs-fade { opacity: 0; }
 
+        .cs-identity-label {
+          text-align: center;
+          color: color-mix(in srgb, var(--text-primary) 52%, transparent);
+          font-size: 0.72rem;
+          letter-spacing: 0.04em;
+          line-height: 1;
+          margin: 0 0 0.45rem;
+        }
+
         .cs-selector {
           display: flex;
           align-items: center;
@@ -229,6 +238,9 @@ const CharacterLoginForm: FC<CharacterLoginFormProps> = ({ onComplete, beatriceI
           }
         }
       `}</style>
+
+      {/* Carousel label — card header, frames name + image as the user's own identity */}
+      <div className="cs-identity-label">{tNode('entry.identityLabel')}</div>
 
       {/* Tagline — same style for all, Wanderer uses translated poem */}
       <div className={`cs-tagline ${transitioning ? 'cs-fade' : ''}`}>

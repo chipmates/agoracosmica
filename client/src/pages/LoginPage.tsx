@@ -105,7 +105,7 @@ const LoginPage: FC<LoginPageProps> = ({ onComplete }) => {
     if (prefersReducedMotion.current) {
       revealForm();
     } else {
-      timerRef.current = setTimeout(revealForm, 6000);
+      timerRef.current = setTimeout(revealForm, 2500);
     }
 
     const handleOrientation = () => {
@@ -364,10 +364,6 @@ const LoginPage: FC<LoginPageProps> = ({ onComplete }) => {
         )}
       </div>
       
-      <footer className={`site-attribution ${loginSuccessful ? 'site-attribution--hidden' : ''}`}>
-        {tNode('app.attribution')}
-      </footer>
-
       <div className="top-bar-right">
         <button
           className="audio-toggle-button"
