@@ -3,6 +3,7 @@ import { getHistoricalFigures } from '../api/figures';
 import { completeOnboarding, skipOnboarding } from '../utils/userState';
 import { Figure, Seed, Language, ConversationMode } from '../types/global';
 import { useDomainStore } from '../stores';
+import { readFigureIntent, clearFigureIntent } from '../utils/public/entryIntent';
 
 interface HelperFunctionsParams {
   selectedFigure: Figure | null;
@@ -17,6 +18,7 @@ interface HelperFunctionsParams {
   handleModeSelect: (mode: ConversationMode, force?: boolean) => void;
   handleFigureCarouselOpen: () => void;
   handleSelectFigure: (figure: Figure) => void;
+  getFigureById: (id: string) => Figure | undefined;
 }
 
 interface HelperFunctionsResult {
@@ -45,7 +47,8 @@ export function useHelperFunctions({
   handleWisdomGalleryOpen,
   handleWisdomGalleryCloseComplete,
   handleFigureCarouselOpen,
-  handleSelectFigure
+  handleSelectFigure,
+  getFigureById
 }: HelperFunctionsParams): HelperFunctionsResult {
   // Translation helper for figure name
   const getTranslatedFigureName = useCallback((): string => {
@@ -103,25 +106,37 @@ export function useHelperFunctions({
     return `${numericId}. ${t('seeds.seedTitle', { title: seedTitle })}`;
   }, [selectedSeed, selectedFigure, getTranslatedSeedTitle, t]);
 
+  // After the welcome step closes, route the visitor on. If they picked a
+  // figure on a public page, deep-link straight to it (lands on the mode
+  // selector for that figure). Otherwise open the WisdomGallery as before.
+  const routeAfterOnboarding = useCallback((): void => {
+    const intendedId = readFigureIntent();
+    if (intendedId) {
+      clearFigureIntent();
+      const figure = getFigureById(intendedId);
+      if (figure) {
+        handleSelectFigure(figure);
+        return;
+      }
+    }
+    handleWisdomGalleryOpen();
+  }, [getFigureById, handleSelectFigure, handleWisdomGalleryOpen]);
+
   // Handle onboarding completion
   const handleOnboardingComplete = useCallback((): void => {
     completeOnboarding();
     useDomainStore.getState().markVisited();
-
-    // Update component state - show WisdomGallery instead of FigureCarousel
     handleOnboardingClose();
-    handleWisdomGalleryOpen();
-  }, [handleOnboardingClose, handleWisdomGalleryOpen]);
+    routeAfterOnboarding();
+  }, [handleOnboardingClose, routeAfterOnboarding]);
 
   // Handle onboarding skip
   const handleOnboardingSkip = useCallback((): void => {
     skipOnboarding();
     useDomainStore.getState().markVisited();
-
-    // Update component state - show WisdomGallery instead of FigureCarousel
     handleOnboardingClose();
-    handleWisdomGalleryOpen();
-  }, [handleOnboardingClose, handleWisdomGalleryOpen]);
+    routeAfterOnboarding();
+  }, [handleOnboardingClose, routeAfterOnboarding]);
 
   // Handle WisdomGallery selection
   const handleWisdomGallerySelect = useCallback((figure: Figure): void => {
