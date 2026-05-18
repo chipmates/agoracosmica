@@ -2,13 +2,14 @@ import React, { useState, useEffect, useCallback, FC, MouseEvent, KeyboardEvent 
 import { useSwipeable } from 'react-swipeable';
 import { getHistoricalFigures } from '../api/figures';
 import { CategoryTab, ActionButton } from './Button';
-import { BookOpen, Check, Sparkle } from "@phosphor-icons/react";
+import { BookOpen, Check, Sparkle, Play, Pause } from "@phosphor-icons/react";
 import OptimizedImage from './OptimizedImage';
 import { useTranslation } from '../hooks/useTranslation';
 import WisdomMapModal from './WisdomMapModal';
 import type { Figure, Seed } from '../types/global';
 import { useUIStore } from '../stores/uiStore';
 import EchoExplainerHelp, { ECHO_EXPLAINER_HELP_ID } from './EchoExplainerHelp';
+import { useFigureTrailer } from '../hooks/useFigureTrailer';
 import './FigureCarousel.css';
 
 interface FigureCarouselProps {
@@ -48,6 +49,9 @@ const FigureCarousel: FC<FigureCarouselProps> = ({
   setShowHamburgerMenu = () => {}
 }) => {
   const { tString, tNode, language } = useTranslation();
+
+  // Figure page trailer — standalone audio player (play-on-tap, never autoplay)
+  const trailer = useFigureTrailer();
 
   // Echo explainer helper — show once for users who haven't seen it
   const shouldShowHelp = useUIStore((state) => state.shouldShowHelp);
@@ -300,6 +304,12 @@ const FigureCarousel: FC<FigureCarouselProps> = ({
     return () => clearTimeout(preloadTimer);
   }, [currentIndex, figures, hasNavigated, preloadedImages]);
 
+  // Stop any trailer when the figure changes or the carousel closes — never
+  // leave audio playing behind a swipe, a category switch, or a close.
+  useEffect(() => {
+    trailer.stop();
+  }, [currentFigure?.id, isOpen, trailer.stop]);
+
   const handleSelect = () => {
     if (onSelectFigure) onSelectFigure(currentFigure);
     else console.error('onSelectFigure is not defined');
@@ -460,6 +470,18 @@ const FigureCarousel: FC<FigureCarouselProps> = ({
     const handleInfoOverlayClick = () => {
       setShowFullInfo(!showFullInfo);
     };
+
+    const trailerStatus = trailer.activeId === currentFigure.id ? trailer.status : 'idle';
+    const trailerEngaged = trailerStatus === 'loading' || trailerStatus === 'playing';
+
+    const handleTrailerClick = (e: MouseEvent<HTMLButtonElement>) => {
+      e.stopPropagation(); // don't toggle the about overlay
+      trailer.toggle(currentFigure.id, language);
+    };
+    // Keep Enter/Space on the trailer button from also toggling the overlay.
+    const handleTrailerKeyDown = (e: KeyboardEvent<HTMLButtonElement>) => {
+      if (e.key === 'Enter' || e.key === ' ') e.stopPropagation();
+    };
     
     return (
       <div className="main-image-section">
@@ -486,15 +508,32 @@ const FigureCarousel: FC<FigureCarouselProps> = ({
             aria-label={tString('carousel.toggleInfo', 'Toggle figure information')}
           >
             <h2>{getDisplayName(currentFigure)}</h2>
+
+            {currentFigure.learn && (
+              <p className="figure-learn">{currentFigure.learn}</p>
+            )}
+
+            <button
+              type="button"
+              className={`figure-trailer-btn ${trailerEngaged ? 'is-active' : ''}`}
+              onClick={handleTrailerClick}
+              onKeyDown={handleTrailerKeyDown}
+            >
+              {trailerEngaged
+                ? <Pause size={16} weight="fill" />
+                : <Play size={16} weight="fill" />}
+              <span className="figure-trailer-label">
+                {trailerEngaged
+                  ? tString('figures.trailerPause', 'Pause')
+                  : tString('figures.trailerPlay', 'Play intro')}
+              </span>
+            </button>
+
             {showFullInfo && currentFigure.about && (
               <div className="figure-about-text">
-                {currentFigure.about.split('\n\n').map((line, index) => {
-                  // Check if this line contains bullet points (tags)
-                  if (line.includes('•')) {
-                    return <div key={index} className="golden-tags no-justify">{line}</div>;
-                  }
-                  return <div key={index}>{line}</div>;
-                })}
+                {currentFigure.about.split('\n\n').map((para, index) => (
+                  <div key={index}>{para}</div>
+                ))}
               </div>
             )}
           </div>

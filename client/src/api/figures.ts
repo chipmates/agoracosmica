@@ -15,6 +15,7 @@ export interface FigureBase {
 export interface TranslatedFigure {
   name: string;
   about: string;
+  learn?: string; // Golden line: "You will learn to ..."
   id: string;
 }
 
@@ -24,6 +25,7 @@ export interface TranslatedFigure {
 interface FigureTranslation {
   name?: string;
   about?: string;
+  learn?: string;
 }
 
 /**
@@ -83,6 +85,7 @@ export function getHistoricalFigures(language: string = 'en'): TranslatedFigure[
         return {
             name: translation.name || figure.baseNameEn,
             about: translation.about || `Information about ${figure.baseNameEn} is not available.`,
+            learn: translation.learn,
             id: figure.id
         };
     });
