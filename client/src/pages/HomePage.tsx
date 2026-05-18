@@ -164,7 +164,8 @@ const HomePage: FC<HomePageProps> = ({ onLogout, onSelectFigure }) => {
   const {
     selectedFigure,
     selectFigure,
-    loadFigureSeeds
+    loadFigureSeeds,
+    getFigureById
   } = useFigureManager(language, onSelectFigure);
 
   // Note: selectedSeed state now managed by useSeedManager hook
@@ -1404,7 +1405,8 @@ const HomePage: FC<HomePageProps> = ({ onLogout, onSelectFigure }) => {
     handleModeSelectorOpen,
     handleModeSelect,
     handleFigureCarouselOpen,
-    handleSelectFigure
+    handleSelectFigure,
+    getFigureById
   });
   
   const {
