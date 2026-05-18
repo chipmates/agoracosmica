@@ -34,6 +34,10 @@
     "showAllTeachings": "Show all 12 teachings",
     "showLess": "Show less"
   },
+  "echo": {
+    "figureNote": "{name} here is what we call an echo. It's an AI voice shaped by their own writing and ideas, brought into a conversation you can have today. It draws on their philosophy, and it stays an interpretation, not the real person and not a recording.",
+    "themeNote": "A council is a conversation between several echoes. Each echo is an AI voice shaped by a historical figure's writing and ideas. They draw on real philosophy, and they stay interpretations, not the real people."
+  },
   "figures": {
     "pageTitle": "30 Remarkable People You Can Talk To",
     "pageDescription": "Discover wisdom from 30 remarkable people of history, from Marcus Aurelius to Frida Kahlo. Audio life stories, teachings, prisms, councils, and conversations you can join.",

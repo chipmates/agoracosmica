@@ -34,6 +34,10 @@
     "showAllTeachings": "Alle 12 Lehren anzeigen",
     "showLess": "Weniger anzeigen"
   },
+  "echo": {
+    "figureNote": "{name} begegnet dir hier als Echo. Das ist eine KI-Stimme, geprägt von den eigenen Schriften und Gedanken dieser Persönlichkeit und in ein Gespräch gebracht, das du heute führen kannst. Sie schöpft aus ihrer Philosophie und bleibt doch eine Interpretation, nicht die reale Person und keine Aufnahme.",
+    "themeNote": "Ein Council ist ein Gespräch zwischen mehreren Echos. Jedes Echo ist eine KI-Stimme, geprägt von den Schriften und Gedanken einer historischen Persönlichkeit. Sie schöpfen aus echter Philosophie und bleiben doch Interpretationen, nicht die realen Menschen."
+  },
   "figures": {
     "pageTitle": "30 besondere Pers\u00f6nlichkeiten, mit denen du sprechen kannst",
     "pageDescription": "Entdecke Weisheit von 30 besonderen Pers\u00f6nlichkeiten der Geschichte, von Marcus Aurelius bis Frida Kahlo. Lebensgeschichten in Audio, Lehren, Prismen, Councils und Gespr\u00e4che zum Mitmachen.",

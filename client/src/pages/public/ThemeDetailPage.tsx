@@ -10,6 +10,7 @@ import JsonLd, { articleSchema } from '../../components/public/JsonLd';
 import CouncilPreview from '../../components/public/CouncilPreview';
 import WisdomQuote from '../../components/public/WisdomQuote';
 import PublicCTA from '../../components/public/PublicCTA';
+import EchoNote from '../../components/public/EchoNote';
 import StaticImage from '../../components/public/StaticImage';
 import {
   THEMES,
@@ -130,6 +131,8 @@ export default function ThemeDetailPage() {
           <p>{themeDescription}</p>
         </div>
       </section>
+
+      <EchoNote variant="theme" />
 
       {/* Long-form intro essay (200-400 words, per-theme) */}
       {themeIntro && (

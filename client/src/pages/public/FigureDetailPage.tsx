@@ -12,6 +12,7 @@ import SeedPreview from '../../components/public/SeedPreview';
 import CouncilPreview from '../../components/public/CouncilPreview';
 import PublicAudioPlayer from '../../components/public/PublicAudioPlayer';
 import PublicCTA from '../../components/public/PublicCTA';
+import EchoNote from '../../components/public/EchoNote';
 import JourneyOverview from '../../components/public/JourneyOverview';
 import TopicBadges from '../../components/public/TopicBadges';
 import CollapsibleSection from '../../components/public/CollapsibleSection';
@@ -159,6 +160,8 @@ export default function FigureDetailPage() {
           ))}
         </div>
       </section>
+
+      <EchoNote variant="figure" name={figure.name} />
 
       {/* Journey Overview */}
       <JourneyOverview
