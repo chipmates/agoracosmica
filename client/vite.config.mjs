@@ -174,6 +174,11 @@ export default defineConfig(({ command, mode }) => {
         target: env.VITE_MEDIA_BASE_URL || 'https://media.agoracosmica.org',
         changeOrigin: true,
         secure: true
+      },
+      '/trailers': {
+        target: env.VITE_MEDIA_BASE_URL || 'https://media.agoracosmica.org',
+        changeOrigin: true,
+        secure: true
       }
     },
 

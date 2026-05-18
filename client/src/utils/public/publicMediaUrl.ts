@@ -41,6 +41,16 @@ export function getPublicAudioUrl(
   return `${MEDIA_BASE}/stories/${figureId}/${lang}/${figureId}_${segment}_${lang}.webm`;
 }
 
+export type TrailerFormat = 'webm' | 'mp3';
+
+export function getPublicTrailerUrl(
+  figureId: string,
+  lang: string,
+  format: TrailerFormat = 'webm'
+): string {
+  return `${MEDIA_BASE}/trailers/figures/${figureId}/${lang}/${figureId}_trailer_${lang}.${format}`;
+}
+
 export function getAvailableSizes(type: ImageType): number[] {
   return SIZES[type];
 }
