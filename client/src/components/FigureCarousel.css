@@ -1219,3 +1219,84 @@
     transform: none!important;
   }
 }
+
+/* ============================================================
+   Figure page revision — golden "you will learn" line + trailer
+   play control inside the info-overlay. Additive, existing tokens.
+   ============================================================ */
+
+/* Golden line — the "what you will learn" hook. Always visible. */
+.figure-carousel .figure-learn {
+  margin: 7px auto 0;
+  max-width: 540px;
+  color: var(--secondary-color);
+  font-family: var(--font-content, 'Libre Caslon Text', Georgia, serif);
+  font-size: clamp(0.9375rem, 0.875rem + 0.5vw, 1.25rem);
+  font-weight: 500;
+  line-height: 1.4;
+  text-align: center;
+  text-shadow:
+    0 1px 4px color-mix(in srgb, var(--utility-pure-black) 70%, transparent),
+    0 0 12px color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent);
+}
+
+/* Trailer play control — paired with the golden line, always visible. */
+.figure-carousel .figure-trailer-btn {
+  display: flex;
+  width: fit-content;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin: 9px auto 2px;
+  min-height: 44px; /* WCAG touch target */
+  padding: 0 18px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-40), transparent);
+  background: color-mix(in srgb, var(--gold-subtle) var(--a-15), transparent);
+  color: var(--secondary-color);
+  font-family: var(--ui-font-family);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.25s ease, border-color 0.25s ease;
+}
+
+.figure-carousel .figure-trailer-btn:hover {
+  background: color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent);
+  border-color: color-mix(in srgb, var(--gold-subtle) var(--a-70), transparent);
+}
+
+.figure-carousel .figure-trailer-btn.is-active {
+  background: color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent);
+  border-color: var(--secondary-color);
+}
+
+.figure-carousel .figure-trailer-btn:focus-visible {
+  outline: 2px solid var(--secondary-color);
+  outline-offset: 2px;
+}
+
+.figure-carousel .figure-trailer-btn svg {
+  flex-shrink: 0;
+}
+
+.figure-carousel .figure-trailer-label {
+  white-space: nowrap;
+}
+
+/* Small mobile (iPhone SE etc.) — keep the overlay compact. */
+@media (max-width: 375px) {
+  .figure-carousel .figure-learn {
+    font-size: 0.9375rem;
+    line-height: 1.35;
+    margin-top: 5px;
+    padding: 0 6px;
+  }
+
+  .figure-carousel .figure-trailer-btn {
+    margin: 7px auto 0;
+    padding: 0 15px;
+  }
+}

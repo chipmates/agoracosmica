@@ -12,6 +12,7 @@ export interface Figure {
   id: string; // e.g., 'plato', 'aurelius'
   name: string; // Display name
   about?: string; // Description
+  learn?: string; // Golden line: "You will learn to ..." (figure page revision)
   image?: string; // Avatar path
   topic?: string; // Main topics/themes
   metadata?: FigureMetadata;

@@ -545,6 +545,8 @@
     "about": "About",
     "select": "Select",
     "wisdom": "Wisdom",
+    "trailerPlay": "Play intro",
+    "trailerPause": "Pause",
     "echoOf": "Echo of",
     "echoOfName": "Echo of {name}",
     "categories": {

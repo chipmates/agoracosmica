@@ -547,6 +547,8 @@
     "about": "Über",
     "select": "Wählen",
     "wisdom": "Weisheit",
+    "trailerPlay": "Intro abspielen",
+    "trailerPause": "Pause",
     "echoOf": "Echo von",
     "echoOfName": "Echo von {name}",
     "categories": {
