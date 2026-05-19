@@ -34,11 +34,12 @@
     "listenDebate": "H\u00f6re diese Debatte",
     "exploreTeaching": "Erkunde diese Lehre",
     "showAllTeachings": "Alle 12 Lehren anzeigen",
-    "showLess": "Weniger anzeigen"
+    "showLess": "Weniger anzeigen",
+    "enterCouncil": "Betritt den kosmischen Council"
   },
   "echo": {
     "figureNote": "{name} begegnet dir hier als Echo. Das ist eine KI-Stimme, geprägt von den eigenen Schriften und Gedanken dieser Persönlichkeit und in ein Gespräch gebracht, das du heute führen kannst. Sie schöpft aus ihrer Philosophie und bleibt doch eine Interpretation, nicht die reale Person und keine Aufnahme.",
-    "themeNote": "Ein Council ist ein Gespräch zwischen mehreren Echos. Jedes Echo ist eine KI-Stimme, geprägt von den Schriften und Gedanken einer historischen Persönlichkeit. Sie schöpfen aus echter Philosophie und bleiben doch Interpretationen, nicht die realen Menschen."
+    "themeNote": "Die Stimmen hier nennen wir Echos. Jede ist eine KI-Stimme, geprägt von den eigenen Schriften und Gedanken einer historischen Persönlichkeit und in ein Gespräch gebracht, das du heute führen kannst. Sie schöpfen aus echter Philosophie und bleiben doch Interpretationen, nicht die realen Menschen und keine Aufnahmen."
   },
   "figures": {
     "pageTitle": "30 besondere Pers\u00f6nlichkeiten, von denen du lernen kannst",
@@ -65,6 +66,8 @@
     "pageDescription": "Erkunde die Fragen, die das menschliche Denken seit Jahrhunderten pr\u00e4gen. Vom Sinn des Lebens bis zur Natur der Kreativit\u00e4t, die gr\u00f6\u00dften Denker der Geschichte im Gespr\u00e4ch.",
     "councils": "Debatten",
     "relatedThemes": "Verwandte Themen",
+    "detailEyebrow": "Eine Lebensfrage",
+    "councilDebates": "Council-Debatten",
     "curatedWisdom": "Ausgew\u00e4hlte Weisheiten",
     "meaning-purpose": {
       "name": "Sinn und Bestimmung",
