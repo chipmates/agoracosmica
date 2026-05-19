@@ -37,7 +37,7 @@
 
 .pub-hero__title {
   font-family: var(--font-content, 'Libre Caslon Text', serif);
-  font-size: var(--text-3xl, 1.875rem);
+  font-size: clamp(2.1rem, 1.6rem + 2.2vw, 2.75rem);
   color: var(--gold-subtle, #B8973A);
   margin: 0 0 0.5rem;
   line-height: 1.2;
@@ -562,10 +562,6 @@
 
   .pub-hero__meta {
     justify-content: center;
-  }
-
-  .pub-hero__title {
-    font-size: var(--text-2xl, 1.5rem);
   }
 
   .pub-grid--3 {
