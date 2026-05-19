@@ -82,6 +82,7 @@ const createInitialState = () => ({
   byokModal: {
     isOpen: false,
     triggerEndpoint: null,
+    required: false,
   },
 });
 
@@ -289,13 +290,13 @@ export const useDomainStore = create<DomainSlices>()(
           set(() => ({
             rateLimitModal: { isOpen: false, endpoint: null, resetsAt: null, limit: null },
           })),
-        openByokModal: (endpoint?: 'chat' | 'council' | 'summary') =>
+        openByokModal: (endpoint?: 'chat' | 'council' | 'summary', required = false) =>
           set(() => ({
-            byokModal: { isOpen: true, triggerEndpoint: endpoint ?? null },
+            byokModal: { isOpen: true, triggerEndpoint: endpoint ?? null, required },
           })),
         closeByokModal: () =>
           set(() => ({
-            byokModal: { isOpen: false, triggerEndpoint: null },
+            byokModal: { isOpen: false, triggerEndpoint: null, required: false },
           })),
       }),
       {

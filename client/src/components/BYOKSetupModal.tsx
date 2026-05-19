@@ -11,9 +11,13 @@ import { Key, ShieldCheck, CheckCircle, Eye, EyeSlash, ArrowRight, Warning } fro
 type WizardStep = 0 | 1 | 2;
 type ValidationStatus = 'idle' | 'testing' | 'valid' | 'invalid';
 
+// Stable no-op for the locked self-host gate: disables Escape and
+// overlay-click dismissal until a valid key is saved.
+const NOOP = (): void => {};
+
 const BYOKSetupModal: FC = () => {
   const { tString } = useTranslation();
-  const { isOpen } = useDomainStore((s) => s.byokModal);
+  const { isOpen, required } = useDomainStore((s) => s.byokModal);
   const closeByokModal = useDomainStore((s) => s.closeByokModal);
 
   const [step, setStep] = useState<WizardStep>(0);
@@ -27,6 +31,10 @@ const BYOKSetupModal: FC = () => {
   const [errorMessage, setErrorMessage] = useState('');
 
   if (!isOpen) return null;
+
+  // When opened as the self-host key gate, the modal is a hard requirement:
+  // no dismissal until a valid key is saved (which advances to step 2).
+  const isLocked = required && step !== 2;
 
   const handleClose = () => {
     // Reset state for next open
@@ -86,7 +94,7 @@ const BYOKSetupModal: FC = () => {
   return (
     <ModalContainer
       isOpen={isOpen}
-      onClose={handleClose}
+      onClose={isLocked ? NOOP : handleClose}
       modalType="compact"
       animationType="fade-scale"
       overlayClassName="modal-priority"
@@ -165,21 +173,23 @@ const BYOKSetupModal: FC = () => {
                 {tString('byok.wizard.getStarted', 'Get Started')}
                 <ArrowRight size={16} weight="bold" style={{ marginLeft: 6 }} />
               </RippleButton>
-              <button
-                onClick={handleClose}
-                style={{
-                  padding: '10px 24px',
-                  fontSize: 'var(--ui-font-size-small)',
-                  color: 'var(--text-dim)',
-                  background: 'transparent',
-                  border: '1px solid color-mix(in srgb, var(--text-dim) 30%, transparent)',
-                  borderRadius: '10px',
-                  cursor: 'pointer',
-                  minHeight: '44px',
-                }}
-              >
-                {tString('byok.wizard.maybeLater', 'Maybe later')}
-              </button>
+              {!isLocked && (
+                <button
+                  onClick={handleClose}
+                  style={{
+                    padding: '10px 24px',
+                    fontSize: 'var(--ui-font-size-small)',
+                    color: 'var(--text-dim)',
+                    background: 'transparent',
+                    border: '1px solid color-mix(in srgb, var(--text-dim) 30%, transparent)',
+                    borderRadius: '10px',
+                    cursor: 'pointer',
+                    minHeight: '44px',
+                  }}
+                >
+                  {tString('byok.wizard.maybeLater', 'Maybe later')}
+                </button>
+              )}
             </div>
           </div>
         )}

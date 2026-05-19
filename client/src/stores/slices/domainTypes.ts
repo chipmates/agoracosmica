@@ -211,6 +211,9 @@ export interface QuotaSliceState {
   byokModal: {
     isOpen: boolean;
     triggerEndpoint: RateLimitEndpoint | null;
+    // required: true when opened as the self-host key gate. The modal then
+    // hides its dismiss controls until a valid key is saved.
+    required: boolean;
   };
 }
 
@@ -220,7 +223,7 @@ export interface QuotaSliceActions {
   setIsFreeTier: (isFreeTier: boolean) => void;
   openRateLimitModal: (endpoint: RateLimitEndpoint, resetsAt: string | null, limit?: number | null) => void;
   closeRateLimitModal: () => void;
-  openByokModal: (endpoint?: RateLimitEndpoint) => void;
+  openByokModal: (endpoint?: RateLimitEndpoint, required?: boolean) => void;
   closeByokModal: () => void;
 }
 

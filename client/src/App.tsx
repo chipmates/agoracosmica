@@ -46,6 +46,7 @@ import { LocalStorageAdapter } from './storage/localAdapter';
 import { preferencesIndexedDbAdapter } from './storage/preferencesIndexedDbAdapter';
 import { useAutoplayGate } from './hooks/useAutoplayGate';
 import { initAudioQueue } from './services/audio/audioQueueManager';
+import { useSelfHostKeyGate } from './hooks/useSelfHostKeyGate';
 
 // Touch target utilities — only in development
 if (import.meta.env.DEV) {
@@ -89,6 +90,10 @@ function App(): React.ReactElement {
 
   // ✅ Production-grade audio gate (resettable promise barrier + muted priming)
   const { unlock, waitUntilReady, getContext, getAudioElement, state } = useAutoplayGate();
+
+  // Self-host builds gate the app behind BYOK key setup once the user is
+  // logged in. No-op in the hosted build.
+  useSelfHostKeyGate(isLoggedIn);
 
   useEffect(() => {
     // Dev helpers to inspect Zustand state quickly
