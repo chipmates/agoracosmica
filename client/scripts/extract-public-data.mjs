@@ -336,6 +336,7 @@ function buildFiguresCatalog(tagsByFigure) {
         id,
         name,
         about: figTrans?.about || '',
+        learn: figTrans?.learn || '',
         tradition: SHORT_TRADITIONS[id]?.[lang] || seedData?.metadata?.tradition?.split(',')[0]?.trim() || '',
         category: lang === 'de' ? CATEGORY_DE[seedData?.metadata?.category] || '' : seedData?.metadata?.category || '',
         period: lang === 'de'
@@ -356,6 +357,7 @@ export interface PublicFigure {
   id: string;
   name: string;
   about: string;
+  learn: string;
   tradition: string;
   category: string;
   period: string;
