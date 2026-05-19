@@ -15,7 +15,7 @@
 
 import type { Env } from '../utils/types';
 
-type ConversionEvent = 'profile_created' | 'start_exploring' | 'mode_selected';
+type ConversionEvent = 'profile_created' | 'start_exploring' | 'mode_selected' | 'council_engaged';
 type AccountKey = 'grants' | 'paid';
 
 interface AccountConfig {
@@ -46,6 +46,7 @@ const ACCOUNTS: Record<AccountKey, AccountConfig> = {
       profile_created: '7608272394', // gtag label 2t5rCIqM9KscELfN0stD
       start_exploring: '7609132235', // gtag label n70GCMvJqKwcELfN0stD
       mode_selected: '7609132238',   // gtag label 4AWSCM7JqKwcELfN0stD
+      council_engaged: 'TODO_PENDING', // pending the Council Engaged action ID
     },
   },
   paid: {
@@ -55,6 +56,7 @@ const ACCOUNTS: Record<AccountKey, AccountConfig> = {
       profile_created: '7609550802', // gtag label zBsvCNKPwqwcEMOryN9C
       start_exploring: '7609550805', // gtag label PFnxCNWPwqwcEMOryN9C
       mode_selected: '7609550808',   // gtag label dlmRCNiPwqwcEMOryN9C
+      council_engaged: 'TODO_PENDING', // pending the Council Engaged action ID
     },
   },
 };
@@ -67,6 +69,7 @@ const VALUES: Record<ConversionEvent, number> = {
   profile_created: 15,
   start_exploring: 1,
   mode_selected: 4,
+  council_engaged: 4, // provisional
 };
 
 const API_VERSION = 'v24';
@@ -179,6 +182,13 @@ async function uploadToAccount(
   const account = ACCOUNTS[accountKey];
   const actionId = account.actions[input.event];
   const customerId = account.customerId;
+
+  // A conversion action still on a placeholder ID (not yet set up in Google
+  // Ads) is skipped, rather than sent with an invalid resource name.
+  if (actionId === 'TODO_PENDING') {
+    console.log(`[capi] ${accountKey} ${input.event} skipped: action id not configured`);
+    return;
+  }
 
   const conversion = {
     gclid: input.gclid,

@@ -60,7 +60,12 @@ export function getGclid(): string | null {
   return capturedGclid;
 }
 
-export type ConversionEvent = 'profile_created' | 'start_exploring' | 'mode_selected';
+export type ConversionEvent = 'profile_created' | 'start_exploring' | 'mode_selected' | 'council_engaged';
+
+// Council Engaged fires once a visitor has heard this many seconds of council
+// audio (curated or custom), measured as audio actually played. One number,
+// shared by both council players.
+export const COUNCIL_ENGAGED_THRESHOLD_S = 60;
 
 /**
  * Send a conversion event to the CF Worker endpoint. Only fires if a gclid was

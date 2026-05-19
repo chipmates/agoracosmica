@@ -7,7 +7,7 @@ import type { Env } from '../utils/types';
 import { forwardConversionToGoogleAds } from '../services/googleAdsCapi';
 import { trackRateLimit, readCountry } from '../utils/analytics';
 
-type ConversionEvent = 'profile_created' | 'start_exploring' | 'mode_selected';
+type ConversionEvent = 'profile_created' | 'start_exploring' | 'mode_selected' | 'council_engaged';
 
 interface ConversionPayload {
   gclid: string;
@@ -20,6 +20,7 @@ const VALID_EVENTS = new Set<ConversionEvent>([
   'profile_created',
   'start_exploring',
   'mode_selected',
+  'council_engaged',
 ]);
 
 // Rate limit: 500 conversion events per IP per hour. Generous on purpose:
