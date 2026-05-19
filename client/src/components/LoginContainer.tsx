@@ -4,6 +4,7 @@ import './LoginContainer.css';
 import CosmicLogo from './CosmicLogo';
 import PerfectPortal from './PerfectPortal';
 import { useTranslation } from '../hooks/useTranslation';
+import { isSelfHost } from '../config/deployment';
 
 interface LoginContainerProps {
   isFormVisible: boolean;
@@ -34,7 +35,7 @@ const LoginContainer = forwardRef<HTMLDivElement, LoginContainerProps>(
         {/* Working-state value statement — fills the band the wordmark vacates */}
         <div className={`intro-clarity${loginSuccessful ? ' header-to-quote' : ''}`}>
           <p className="intro-explainer">{tNode('entry.explainer')}</p>
-          <p className="intro-access">{tNode('entry.access')}</p>
+          {!isSelfHost && <p className="intro-access">{tNode('entry.access')}</p>}
           <p className="intro-trust">{tNode('entry.trustLine')}</p>
         </div>
 

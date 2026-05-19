@@ -5,9 +5,18 @@ import { useEffect } from 'react';
 import { useDomainStore } from '../stores/domainStore';
 import { keyStorage } from '../services/storage/keyStorageService';
 import { fetchQuota } from '../services/proxy/freeTierAdapter';
+import { isSelfHost } from '../config/deployment';
 
 export function useQuotaSync(): void {
   useEffect(() => {
+    // A self-host build has no free tier. Treat the user as BYOK and skip the
+    // quota fetch. Every free-tier widget (turn counter, council and summary
+    // limits, rate-limit modal) keys off isFreeTier, so this keeps them hidden.
+    if (isSelfHost) {
+      useDomainStore.getState().setIsFreeTier(false);
+      return;
+    }
+
     let cancelled = false;
 
     async function init() {
