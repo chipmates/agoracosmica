@@ -32,7 +32,8 @@ const RATE_LIMIT_MAX = 500;
 
 export async function handleConversions(
   request: Request,
-  env: Env
+  env: Env,
+  ctx: ExecutionContext
 ): Promise<Response> {
   if (request.method !== 'POST') {
     return new Response('Method not allowed', { status: 405 });
@@ -100,13 +101,15 @@ export async function handleConversions(
   // Forward to Google Ads Conversion API (dual-upload to both accounts).
   // No-ops if developer token isn't configured. Fire-and-forget — never
   // blocks the response, never surfaces errors to the client.
-  forwardConversionToGoogleAds(env, {
-    gclid: payload.gclid,
-    event: payload.event,
-    timestamp: payload.timestamp,
-  }).catch(() => {
-    // Forwarding errors are logged inside the service; never propagate
-  });
+  ctx.waitUntil(
+    forwardConversionToGoogleAds(env, {
+      gclid: payload.gclid,
+      event: payload.event,
+      timestamp: payload.timestamp,
+    }).catch(() => {
+      // Forwarding errors are logged inside the service; never propagate
+    }),
+  );
 
   return Response.json({ ok: true });
 }

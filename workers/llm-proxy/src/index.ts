@@ -88,7 +88,7 @@ export default {
       } else if (path === '/v1/quota' && request.method === 'GET') {
         response = await handleQuota(request, env);
       } else if (path === '/api/conversions' && request.method === 'POST') {
-        response = await handleConversions(request, env);
+        response = await handleConversions(request, env, ctx);
       } else if (path === '/api/conversions/stats' && request.method === 'GET') {
         response = await handleConversionStats(request, env);
       } else if (path === '/v1/playback' && request.method === 'POST') {

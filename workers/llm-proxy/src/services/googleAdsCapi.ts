@@ -233,6 +233,8 @@ async function uploadToAccount(
       `[capi] ${accountKey} partial-failure (expected for non-matching account):`,
       json.partial_failure_error.message.slice(0, 200),
     );
+  } else {
+    console.log(`[capi] ${accountKey} upload ok (http ${res.status})`);
   }
 }
 
