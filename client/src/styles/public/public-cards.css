@@ -64,6 +64,15 @@
   overflow: hidden;
 }
 
+/* Golden learn line, the card's promise. Mirrors the figure page hero. */
+.pub-figure-card__learn {
+  font-family: var(--font-content, 'Libre Caslon Text', serif);
+  font-size: var(--text-sm, 0.875rem);
+  line-height: 1.45;
+  color: var(--gold-subtle, #D4A539);
+  margin: 0;
+}
+
 /* ─── Theme Card ─── */
 
 .pub-theme-card {
