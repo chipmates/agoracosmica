@@ -1,4 +1,4 @@
-// Theme card for catalog grid
+// Theme tile for the themes catalog grid
 // Remove this file when stripping marketing pages from a fork
 
 import { Link } from 'react-router-dom';
@@ -16,15 +16,15 @@ export default function ThemeCard({ themeId, councilCount }: ThemeCardProps) {
   return (
     <Link
       to={publicUrl(lang, `/themes/${themeId}`)}
-      className="pub-theme-card"
+      className="pub-theme-tile"
     >
-      <h2 className="pub-theme-card__name">
+      <h2 className="pub-theme-tile__name">
         {t(`themes.${themeId}.name`)}
       </h2>
-      <p className="pub-theme-card__tagline">
+      <p className="pub-theme-tile__question">
         {t(`themes.${themeId}.tagline`)}
       </p>
-      <p className="pub-theme-card__count">
+      <p className="pub-theme-tile__count">
         {councilCount} {t('themes.councils')}
       </p>
     </Link>

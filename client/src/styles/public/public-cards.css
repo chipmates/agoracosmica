@@ -114,6 +114,53 @@
   margin-top: auto;
 }
 
+/* ─── Theme Tile (themes catalog, leads with the life question) ─── */
+
+.pub-theme-tile {
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid var(--border-subtle, rgba(255,255,255,0.1));
+  background: color-mix(in srgb, var(--bg-card, #1a2050) 60%, transparent);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.2s, transform 0.15s;
+  min-height: 180px;
+}
+
+.pub-theme-tile:hover {
+  border-color: color-mix(in srgb, var(--gold-subtle) 40%, transparent);
+  transform: translateY(-2px);
+}
+
+/* The theme name reads as a small category label above the question. */
+.pub-theme-tile__name {
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--gold-subtle, #B8973A);
+  margin: 0 0 0.6rem;
+}
+
+/* The life question is the tile's hook, the question the detail hero opens with. */
+.pub-theme-tile__question {
+  font-family: var(--font-content, 'Libre Caslon Text', serif);
+  font-size: var(--text-lg, 1.125rem);
+  line-height: 1.4;
+  color: var(--text-primary, #fff);
+  margin: 0 0 1rem;
+}
+
+.pub-theme-tile__count {
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: var(--text-xs, 0.75rem);
+  color: var(--text-tertiary, rgba(255,255,255,0.4));
+  margin-top: auto;
+}
+
 /* ─── Seed Preview Card ─── */
 
 .pub-seed {
