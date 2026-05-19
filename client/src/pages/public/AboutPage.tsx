@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import { usePublicLang } from '../../components/public/PublicLangContext';
 import Breadcrumbs from '../../components/public/Breadcrumbs';
 import MetaTags from '../../components/public/MetaTags';
-import JsonLd, { organizationSchema, webSiteSchema } from '../../components/public/JsonLd';
+import JsonLd, { agoraCosmicaSchema, organizationSchema, webSiteSchema } from '../../components/public/JsonLd';
 import PublicCTA from '../../components/public/PublicCTA';
 import ContentVolume from '../../components/public/ContentVolume';
 import { getFiguresCatalog } from '../../data/public/figuresCatalog';
@@ -58,6 +58,7 @@ export default function AboutPage() {
         canonicalPath="/about"
         lang={lang}
       />
+      <JsonLd data={agoraCosmicaSchema()} />
       <JsonLd data={organizationSchema()} />
       <JsonLd data={webSiteSchema()} />
 

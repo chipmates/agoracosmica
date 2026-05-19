@@ -58,12 +58,36 @@ export function organizationSchema() {
       addressCountry: 'DE',
     },
     email: 'agoracosmica@chipmates.ai',
-    sameAs: ['https://github.com/chipmates/agoracosmica'],
     contactPoint: {
       '@type': 'ContactPoint',
       email: 'agoracosmica@chipmates.ai',
       contactType: 'customer support',
       availableLanguage: ['English', 'German'],
+    },
+  };
+}
+
+export function agoraCosmicaSchema() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    '@id': 'https://agoracosmica.org/#agora-cosmica',
+    name: 'Agora Cosmica',
+    url: 'https://agoracosmica.org',
+    logo: 'https://media.agoracosmica.org/images/ui/logo/512.webp',
+    description: 'A nonprofit, open source wisdom platform and podcast. Listen to life stories, learn from teachings, and talk with 30 figures from history, in English and German.',
+    slogan: 'A Living Library You Can Talk To',
+    sameAs: [
+      'https://github.com/chipmates/agoracosmica',
+      'https://www.youtube.com/@agoracosmica',
+      'https://www.youtube.com/@agoracosmicade',
+      'https://open.spotify.com/show/3V02q5c8NAnFD1W2kQBYzd',
+      'https://open.spotify.com/show/5i63mEKJuCVniSIViXbEP8',
+      'https://podcasts.apple.com/us/podcast/agora-cosmica/id1871505788',
+      'https://podcasts.apple.com/us/podcast/agora-cosmica-deutsch/id1871505945',
+    ],
+    parentOrganization: {
+      '@id': 'https://agoracosmica.org/#organization',
     },
   };
 }
@@ -77,7 +101,7 @@ export function webSiteSchema() {
     url: 'https://agoracosmica.org',
     description: 'A Living Library You Can Talk To',
     publisher: {
-      '@id': 'https://agoracosmica.org/#organization',
+      '@id': 'https://agoracosmica.org/#agora-cosmica',
     },
     inLanguage: ['en', 'de'],
   };

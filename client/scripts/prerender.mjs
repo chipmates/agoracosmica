@@ -10,6 +10,7 @@ import { join } from 'path';
 const BUILD_DIR = join(import.meta.dirname, '..', 'build');
 const SITE_URL = 'https://agoracosmica.org';
 const ORG_ID = `${SITE_URL}/#organization`;
+const AGORA_ID = `${SITE_URL}/#agora-cosmica`;
 const ORG_LOGO = 'https://media.agoracosmica.org/images/ui/logo/512.webp';
 const MEDIA_URL = 'https://media.agoracosmica.org';
 const TODAY = new Date().toISOString().split('T')[0];
@@ -211,13 +212,35 @@ function organizationSchema() {
       addressCountry: 'DE',
     },
     email: 'agoracosmica@chipmates.ai',
-    sameAs: ['https://github.com/chipmates/agoracosmica'],
     contactPoint: {
       '@type': 'ContactPoint',
       email: 'agoracosmica@chipmates.ai',
       contactType: 'customer support',
       availableLanguage: ['English', 'German'],
     },
+  };
+}
+
+function agoraCosmicaSchema() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    '@id': AGORA_ID,
+    name: 'Agora Cosmica',
+    url: SITE_URL,
+    logo: ORG_LOGO,
+    description: 'A nonprofit, open source wisdom platform and podcast. Listen to life stories, learn from teachings, and talk with 30 figures from history, in English and German.',
+    slogan: 'A Living Library You Can Talk To',
+    sameAs: [
+      'https://github.com/chipmates/agoracosmica',
+      'https://www.youtube.com/@agoracosmica',
+      'https://www.youtube.com/@agoracosmicade',
+      'https://open.spotify.com/show/3V02q5c8NAnFD1W2kQBYzd',
+      'https://open.spotify.com/show/5i63mEKJuCVniSIViXbEP8',
+      'https://podcasts.apple.com/us/podcast/agora-cosmica/id1871505788',
+      'https://podcasts.apple.com/us/podcast/agora-cosmica-deutsch/id1871505945',
+    ],
+    parentOrganization: { '@id': ORG_ID },
   };
 }
 
@@ -229,7 +252,7 @@ function webSiteSchema() {
     name: 'Agora Cosmica',
     url: SITE_URL,
     description: 'A Living Library You Can Talk To',
-    publisher: { '@id': ORG_ID },
+    publisher: { '@id': AGORA_ID },
     inLanguage: ['en', 'de'],
   };
 }
@@ -314,7 +337,7 @@ function softwareApplicationSchema() {
     description: 'An open source wisdom platform with 30 historical figures, fully bilingual in English and German.',
     inLanguage: ['en', 'de'],
     license: 'https://www.gnu.org/licenses/agpl-3.0.html',
-    publisher: { '@id': ORG_ID },
+    publisher: { '@id': AGORA_ID },
     featureList: [
       '30 historical figures with audio life stories',
       '12 teachings per figure',
@@ -356,7 +379,7 @@ function podcastSeriesSchema(lang) {
     webFeed: p.feedUrl,
     image: p.coverUrl,
     inLanguage: lang,
-    publisher: { '@id': ORG_ID },
+    publisher: { '@id': AGORA_ID },
   };
 }
 
@@ -931,6 +954,7 @@ for (const lang of ['en', 'de']) {
     lang,
     ogType: 'website',
     schemas: [
+      agoraCosmicaSchema(),
       organizationSchema(),
       webSiteSchema(),
       podcastSeriesSchema(lang),
@@ -947,6 +971,7 @@ for (const lang of ['en', 'de']) {
     path: '/about',
     lang,
     schemas: [
+      agoraCosmicaSchema(),
       organizationSchema(),
       webSiteSchema(),
       softwareApplicationSchema(),
