@@ -7,6 +7,7 @@ import { keyStorage } from './storage/keyStorageService';
 import { Seed, Language } from '../types/global';
 
 import { useDomainStore } from '../stores/domainStore';
+import { isSelfHost } from '../config/deployment';
 
 interface ServiceConfig {
   llm: {
@@ -80,6 +81,11 @@ class SummaryService {
         provider = config.llm.provider;
         model = config.llm.model;
       } else {
+        if (isSelfHost) {
+          // No free-tier proxy in a self-host build. The key gate makes a
+          // keyless summary unreachable; this is the defensive backstop.
+          throw new Error('A valid OpenRouter key is required.');
+        }
         // Free-tier path: CF Worker → Nebius (2/day rate limit)
         const response = await generateFreeTierSummary({
           figureId: figureName,

@@ -10,6 +10,7 @@
 
 import { generateResponse } from '../audio/llm';
 import { generateFreeTierCouncilResponse } from '../proxy/freeTierAdapter';
+import { isSelfHost } from '../../config/deployment';
 import { loadServiceConfig, LLM_SERVICES } from '../audio/config/serviceConfig';
 import { preferencesAdapter } from '../../storage/preferencesAdapter';
 import { keyStorage } from '../storage/keyStorageService';
@@ -677,6 +678,11 @@ Begin the council now. Remember to use the EXACT format specified in your instru
           streamingCallback: councilStreamingCallback,
         });
       } else {
+        if (isSelfHost) {
+          // No free-tier proxy in a self-host build. The key gate makes a
+          // keyless council unreachable; this is the defensive backstop.
+          throw new Error('A valid OpenRouter key is required.');
+        }
         await generateFreeTierCouncilResponse({
           systemPrompt: apiRequest.systemMessage,
           messages: [{ role: 'user' as const, content: apiRequest.userMessage }],

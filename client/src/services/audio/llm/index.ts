@@ -14,6 +14,7 @@ import {
   TextChunker
 } from './llmUtils';
 import { loadServiceConfig } from '../config/serviceConfig';
+import { isSelfHost } from '../../../config/deployment';
 
 // ============================================
 // Type Definitions
@@ -153,8 +154,10 @@ export const generateResponse = async ({
         }
       };
       } catch (error: any) {
-        // Mark BYOK key as invalid on auth errors so next request falls through to free-tier
-        if (error?.status === 401 || error?.status === 403) {
+        // Hosted build: a rejected key marks itself invalid and falls through
+        // to the free tier. A self-host build has no free tier, so the BYOK
+        // error surfaces to the user instead.
+        if ((error?.status === 401 || error?.status === 403) && !isSelfHost) {
           console.warn('[LLM] BYOK key rejected (HTTP', error.status, ') — marking invalid, falling through to free-tier');
           await keyStorage.markInvalid('openrouter');
           // Fall through to free-tier path below instead of throwing
@@ -162,6 +165,13 @@ export const generateResponse = async ({
           throw error;
         }
       }
+    }
+
+    // Self-host has no free-tier proxy. Reaching here means there is no
+    // usable BYOK key; surface a clear error rather than calling a worker
+    // that is not deployed. The key gate makes this unreachable in normal use.
+    if (isSelfHost) {
+      throw new Error('A valid OpenRouter key is required.');
     }
 
     // ============================================
