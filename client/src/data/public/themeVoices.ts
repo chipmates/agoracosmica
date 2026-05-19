@@ -55,7 +55,7 @@ export const themeVoices: Record<string, ThemeVoice[]> = {
     { figureId: 'mandela', stance: 'Two freedoms', stanceDe: 'Zwei Freiheiten' },
     { figureId: 'king', stance: 'Love as strategy', stanceDe: 'Liebe als Strategie' },
     { figureId: 'gandhi', stance: 'Truth-force', stanceDe: 'Wahrheitskraft' },
-    { figureId: 'tubman', stance: 'Inner freedom first', stanceDe: 'Innere Freiheit zuerst' },
+    { figureId: 'tubman', stance: 'Freedom for others', stanceDe: 'Freiheit für andere' },
     { figureId: 'beauvoir', stance: 'Freedom as practice', stanceDe: 'Freiheit als Praxis' },
   ],
   'faith-death-mystery': [
