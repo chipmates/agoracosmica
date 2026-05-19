@@ -1,4 +1,5 @@
-// Theme detail page V2 - curated wisdom quotes, figures by theme, councils
+// Theme detail page: a life question, the voices who answer it, the council
+// debates around it. Revised per Theme-Pages-Revision-Plan.md.
 // Remove this file when stripping marketing pages from a fork
 
 import { useMemo } from 'react';
@@ -7,25 +8,25 @@ import { usePublicLang } from '../../components/public/PublicLangContext';
 import Breadcrumbs from '../../components/public/Breadcrumbs';
 import MetaTags from '../../components/public/MetaTags';
 import JsonLd, { articleSchema } from '../../components/public/JsonLd';
-import CouncilPreview from '../../components/public/CouncilPreview';
-import WisdomQuote from '../../components/public/WisdomQuote';
-import PublicCTA from '../../components/public/PublicCTA';
 import EchoNote from '../../components/public/EchoNote';
-import StaticImage from '../../components/public/StaticImage';
+import CollapsibleSection from '../../components/public/CollapsibleSection';
+import ThemeVoice from '../../components/public/ThemeVoice';
+import PublicCTA from '../../components/public/PublicCTA';
 import {
   THEMES,
   councilsByTheme,
+  getLocalizedTitle,
+  getLocalizedHook,
+  getShortDisplayName,
   type ThemeId,
 } from '../../data/councilCatalog';
-import { getThemeSeeds } from '../../data/public/themeSeedCrossRef';
-import { getFigureById } from '../../data/public/figuresCatalog';
-import { figureIdToSlug } from '../../data/public/slugMap';
+import { getThemeVoices } from '../../data/public/themeVoices';
 import { publicUrl, canonicalUrl } from '../../utils/public/publicSeo';
 
 const VALID_THEMES = new Set(THEMES.map(t => t.id));
 
-// One representative figure per theme for OG image. Mirrors prerender.mjs
-// THEME_OG_FIGURE. Each theme gets a distinct social preview.
+// One representative figure per theme for the OG image. Mirrors prerender.mjs
+// THEME_OG_FIGURE.
 const THEME_OG_FIGURE: Record<string, string> = {
   'meaning-purpose': 'aurelius',
   'loss-grief': 'mandela',
@@ -52,30 +53,15 @@ export default function ThemeDetailPage() {
   const { theme } = useParams<{ theme: string }>();
   const { lang, t } = usePublicLang();
 
-  const isValid = theme && VALID_THEMES.has(theme as ThemeId);
+  const isValid = !!theme && VALID_THEMES.has(theme as ThemeId);
 
   const councils = useMemo(() => {
     if (!isValid || !theme) return [];
-    return councilsByTheme[theme as ThemeId] || [];
+    return [...(councilsByTheme[theme as ThemeId] || [])]
+      .sort((a, b) => a.sortOrder - b.sortOrder);
   }, [theme, isValid]);
 
-  // Curated wisdom: seeds matched to this theme by tag overlap
-  const wisdomSeeds = useMemo(() => {
-    if (!theme) return [];
-    return getThemeSeeds(theme, lang);
-  }, [theme, lang]);
-
-  // Figures whose seeds overlap with this theme
-  const themeFigures = useMemo(() => {
-    return wisdomSeeds
-      .map(s => ({ id: s.figureId, figure: getFigureById(s.figureId, lang) }))
-      .filter(f => f.figure)
-      .slice(0, 8);
-  }, [wisdomSeeds, lang]);
-
-  const relatedThemeIds = theme ? (RELATED_THEMES[theme] || []).slice(0, 3) : [];
-
-  if (!isValid) {
+  if (!isValid || !theme) {
     return <Navigate to={publicUrl(lang, '/themes')} replace />;
   }
 
@@ -83,14 +69,34 @@ export default function ThemeDetailPage() {
   const themeTagline = t(`themes.${theme}.tagline`);
   const themeDescription = t(`themes.${theme}.description`);
   const themeIntroRaw = t(`themes.${theme}.intro`);
-  const themeIntro = themeIntroRaw && themeIntroRaw !== `themes.${theme}.intro` ? themeIntroRaw : '';
-  const ogFigureId = theme ? THEME_OG_FIGURE[theme] : undefined;
+  const themeIntro =
+    themeIntroRaw && themeIntroRaw !== `themes.${theme}.intro` ? themeIntroRaw : '';
+
+  // The intro essay reads as a lead paragraph, one paragraph per voice, then a
+  // closing coda. It renders faced when the curated voices line up with the
+  // essay's middle paragraphs, otherwise as plain prose.
+  const paragraphs = themeIntro
+    ? themeIntro.split('\n\n').map(p => p.trim()).filter(Boolean)
+    : [];
+  const voices = getThemeVoices(theme);
+  const faced = voices.length > 0 && paragraphs.length >= voices.length + 2;
+  const lead = faced ? paragraphs[0] : '';
+  const voiceParas = faced ? paragraphs.slice(1, 1 + voices.length) : [];
+  const coda = faced ? paragraphs.slice(1 + voices.length).join(' ') : '';
+
+  const relatedThemeIds = (RELATED_THEMES[theme] || []).slice(0, 3);
+  const ogFigureId = THEME_OG_FIGURE[theme];
   const themeOgImage = ogFigureId
     ? `https://media.agoracosmica.org/images/figures/${ogFigureId}/main/1200.webp`
     : undefined;
 
+  const councilTypeLabel = (type: 'confrontational' | 'reflective'): string =>
+    lang === 'de'
+      ? type === 'confrontational' ? 'konfrontativ' : 'reflektiv'
+      : type;
+
   return (
-    <div className="pub-content">
+    <div className="pub-content pub-theme">
       <MetaTags
         title={`${themeName} - ${themeTagline}`}
         description={themeDescription.slice(0, 160)}
@@ -116,121 +122,92 @@ export default function ThemeDetailPage() {
         ]}
       />
 
-      {/* Theme Introduction */}
-      <section className="pub-section">
-        <h1 className="pub-hero__title">{themeName}</h1>
-        <p style={{
-          fontSize: 'var(--text-lg)',
-          fontStyle: 'italic',
-          color: 'var(--gold-subtle)',
-          margin: '0.5rem 0 1.5rem',
-        }}>
-          {themeTagline}
-        </p>
-        <div className="pub-section__text">
-          <p>{themeDescription}</p>
+      <header className="pub-theme-hero">
+        <div className="pub-theme-hero__eyebrow">
+          {t('themes.detailEyebrow', 'A life question')}
         </div>
-      </section>
+        <h1 className="pub-theme-hero__name">{themeName}</h1>
+        <p className="pub-theme-hero__question">{themeTagline}</p>
+      </header>
 
-      <EchoNote variant="theme" />
+      <div className="pub-theme-body">
+        <EchoNote variant="theme" />
 
-      {/* Long-form intro essay (200-400 words, per-theme) */}
-      {themeIntro && (
-        <section className="pub-section">
-          <div className="pub-section__text">
-            {themeIntro.split('\n\n').map((para, i) => (
-              <p key={i} style={{ marginBottom: '1rem' }}>{para}</p>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Curated Wisdom */}
-      {wisdomSeeds.length > 0 && (
-        <section className="pub-section">
-          <h2 className="pub-section__title">{t('themes.curatedWisdom')}</h2>
-          {wisdomSeeds.slice(0, 6).map((seed, i) => (
-            <WisdomQuote
-              key={`${seed.figureId}-${i}`}
-              figureId={seed.figureId}
-              figureName={seed.figureName}
-              seedTitle={seed.seedTitle}
-              quote={seed.quote}
-            />
-          ))}
-        </section>
-      )}
-
-      {/* Figures in this theme */}
-      {themeFigures.length > 0 && (
-        <section className="pub-section">
-          <h2 className="pub-section__title">{t('figures.relatedFigures')}</h2>
-          <div className="pub-grid pub-grid--2">
-            {themeFigures.map(({ id, figure: fig }) => {
-              if (!fig) return null;
-              const slug = figureIdToSlug[id];
-              return (
-                <Link
-                  key={id}
-                  to={publicUrl(lang, `/figures/${slug}`)}
-                  className="pub-figure-card"
-                  style={{ flexDirection: 'row', gap: '0.75rem' }}
-                >
-                  <StaticImage
-                    figureId={id}
-                    type="thumbnail"
-                    alt={fig.name}
-                    loading="lazy"
-                    width={64}
-                    height={64}
-                  />
-                  <div>
-                    <div className="pub-figure-card__name">{fig.name}</div>
-                    <div className="pub-figure-card__tradition">{fig.tradition}</div>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-        </section>
-      )}
-
-      {/* Council Debates */}
-      {councils.length > 0 && (
-        <section className="pub-section">
-          <h2 className="pub-section__title">
-            {councils.length} {t('themes.councils')}
-          </h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {councils
-              .sort((a, b) => a.sortOrder - b.sortOrder)
-              .map(council => (
-                <CouncilPreview key={council.id} council={council} />
+        {faced ? (
+          <>
+            {lead && <p className="pub-voices__lead">{lead}</p>}
+            <section>
+              {voices.map((voice, i) => (
+                <ThemeVoice
+                  key={voice.figureId}
+                  figureId={voice.figureId}
+                  stance={lang === 'de' ? voice.stanceDe : voice.stance}
+                  paragraph={voiceParas[i] || ''}
+                />
               ))}
-          </div>
-        </section>
-      )}
+            </section>
+            {coda && <p className="pub-theme-coda">{coda}</p>}
+          </>
+        ) : (
+          themeIntro && (
+            <section className="pub-section">
+              <div className="pub-section__text">
+                {paragraphs.map((para, i) => (
+                  <p key={i}>{para}</p>
+                ))}
+              </div>
+            </section>
+          )
+        )}
 
-      {/* Related Themes */}
-      {relatedThemeIds.length > 0 && (
-        <section className="pub-section">
-          <h2 className="pub-section__title">{t('themes.relatedThemes')}</h2>
-          <div className="pub-grid pub-grid--3">
-            {relatedThemeIds.map(relId => (
-              <Link
-                key={relId}
-                to={publicUrl(lang, `/themes/${relId}`)}
-                className="pub-theme-card"
-              >
-                <h3 className="pub-theme-card__name">{t(`themes.${relId}.name`)}</h3>
-                <p className="pub-theme-card__tagline">{t(`themes.${relId}.tagline`)}</p>
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
+        {councils.length > 0 && (
+          <CollapsibleSection
+            title={t('themes.councilDebates', 'Council debates')}
+            count={councils.length}
+          >
+            <div className="pub-council-list">
+              {councils.map(council => (
+                <div key={council.id} className="pub-council-row">
+                  <div className="pub-council-row__head">
+                    <span className="pub-council-row__title">
+                      {getLocalizedTitle(council, lang)}
+                    </span>
+                    <span className="pub-council-row__tag">
+                      {councilTypeLabel(council.type)}
+                    </span>
+                  </div>
+                  <p className="pub-council-row__hook">
+                    {getLocalizedHook(council, lang)}
+                  </p>
+                  <p className="pub-council-row__figures">
+                    {[council.moderator, ...council.participants]
+                      .map(p => getShortDisplayName(p.id))
+                      .join(' · ')}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </CollapsibleSection>
+        )}
 
-      <PublicCTA variant="sticky" />
+        {relatedThemeIds.length > 0 && (
+          <CollapsibleSection title={t('themes.relatedThemes')}>
+            <div className="pub-theme-rel">
+              {relatedThemeIds.map(relId => (
+                <Link
+                  key={relId}
+                  to={publicUrl(lang, `/themes/${relId}`)}
+                  className="pub-theme-rel__link"
+                >
+                  {t(`themes.${relId}.name`)}
+                </Link>
+              ))}
+            </div>
+          </CollapsibleSection>
+        )}
+      </div>
+
+      <PublicCTA variant="sticky" councilCta />
     </div>
   );
 }

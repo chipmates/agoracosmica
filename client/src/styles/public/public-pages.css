@@ -930,3 +930,242 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ═══ Theme detail page (revised) ═══ */
+
+.pub-theme {
+  /* clearance for the fixed CTA bar */
+  padding-bottom: 2.5rem;
+}
+
+/* ─── Hero: the question alone ─── */
+
+.pub-theme-hero {
+  max-width: 42rem;
+  margin: 0 auto 1.25rem;
+  text-align: center;
+}
+
+.pub-theme-hero__eyebrow {
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.6875rem;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--gold-deep, #B38B30);
+  margin: 0 0 0.625rem;
+}
+
+.pub-theme-hero__name {
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-weight: 600;
+  font-size: var(--text-2xl, 1.5rem);
+  letter-spacing: 0.01em;
+  color: var(--text-secondary, #CACACA);
+  margin: 0 0 0.875rem;
+}
+
+.pub-theme-hero__question {
+  font-family: var(--font-content, 'Libre Caslon Text', serif);
+  font-weight: 700;
+  font-size: clamp(2rem, 1.5rem + 2.6vw, 3rem);
+  line-height: 1.16;
+  color: var(--gold-subtle, #D4A539);
+  text-shadow: 0 1px 16px color-mix(in srgb, var(--gold-primary) 30%, transparent);
+  max-width: 16ch;
+  margin: 0 auto;
+}
+
+/* ─── Reading column ─── */
+
+.pub-theme-body {
+  max-width: 39rem;
+  margin: 0 auto;
+}
+
+/* ─── The four voices ─── */
+
+/* The essay's opening paragraph. Length varies by theme, so it reads as a
+   normal standfirst, not a short centered line. */
+.pub-voices__lead {
+  font-family: var(--font-content, 'Libre Caslon Text', serif);
+  font-size: var(--text-md, 1.0625rem);
+  line-height: var(--leading-loose, 1.75);
+  color: var(--text-secondary, #CACACA);
+  margin: 2rem 0 0.5rem;
+}
+
+.pub-voice {
+  display: flex;
+  gap: 1.25rem;
+  padding: 1.75rem 0;
+}
+
+.pub-voice + .pub-voice {
+  border-top: 1px solid var(--border-subtle, rgba(255,255,255,0.1));
+}
+
+.pub-voice__portrait {
+  flex: 0 0 auto;
+  display: block;
+}
+
+.pub-voice__portrait img {
+  display: block;
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid color-mix(in srgb, var(--gold-primary) 32%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--gold-primary) 22%, transparent),
+    0 6px 22px color-mix(in srgb, var(--utility-pure-black) 45%, transparent);
+  background: var(--bg-card);
+  transition: border-color 0.2s, transform 0.15s;
+}
+
+.pub-voice__portrait:hover img {
+  border-color: var(--gold-primary, #E6BC5C);
+  transform: translateY(-2px);
+}
+
+.pub-voice__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.pub-voice__name {
+  font-family: var(--font-content, 'Libre Caslon Text', serif);
+  font-weight: 700;
+  font-size: var(--text-xl, 1.25rem);
+  color: var(--text-primary, #D2D2D2);
+  text-decoration: none;
+}
+
+.pub-voice__name:hover {
+  color: var(--gold-primary, #E6BC5C);
+}
+
+.pub-voice__stance {
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.6875rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gold-deep, #B38B30);
+  margin: 0.25rem 0 0.625rem;
+}
+
+.pub-voice__text {
+  font-family: var(--font-content, 'Libre Caslon Text', serif);
+  font-size: var(--text-md, 1.0625rem);
+  line-height: var(--leading-loose, 1.75);
+  color: var(--text-secondary, #CACACA);
+  margin: 0;
+}
+
+/* ─── Closing coda ─── */
+
+.pub-theme-coda {
+  font-family: var(--font-content, 'Libre Caslon Text', serif);
+  font-size: var(--text-md, 1.0625rem);
+  line-height: var(--leading-loose, 1.75);
+  color: var(--text-secondary, #CACACA);
+  text-align: center;
+  max-width: 44ch;
+  margin: 2rem auto 3rem;
+  padding-top: 1.75rem;
+  border-top: 1px solid var(--border-subtle, rgba(255,255,255,0.1));
+}
+
+.pub-theme-coda__nudge {
+  color: var(--gold-deep, #B38B30);
+  font-style: italic;
+}
+
+/* ─── Council rows (inside the collapsed list) ─── */
+
+.pub-council-row {
+  padding: 0.75rem 0;
+  border-top: 1px solid var(--border-subtle, rgba(255,255,255,0.1));
+}
+
+.pub-council-row:first-child {
+  border-top: none;
+}
+
+.pub-council-row__head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.625rem;
+}
+
+.pub-council-row__title {
+  font-family: var(--font-content, 'Libre Caslon Text', serif);
+  font-size: var(--text-base, 1rem);
+  color: var(--text-primary, #D2D2D2);
+}
+
+.pub-council-row__tag {
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.625rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--gold-deep, #B38B30);
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 38%, transparent);
+  border-radius: var(--radius-full, 9999px);
+  padding: 0.125rem 0.5rem;
+}
+
+.pub-council-row__hook {
+  font-size: var(--text-sm, 0.875rem);
+  line-height: 1.55;
+  color: var(--text-tertiary, #9E9E9E);
+  margin: 0.25rem 0 0;
+}
+
+/* The debate's cast: moderator and participants, short names. Shows that a
+   theme runs wider than its essay voices. */
+.pub-council-row__figures {
+  font-size: var(--text-xs, 0.8125rem);
+  line-height: 1.5;
+  color: color-mix(in srgb, var(--text-tertiary, #9E9E9E) 80%, transparent);
+  margin: 0.4rem 0 0;
+}
+
+/* ─── Related theme links ─── */
+
+.pub-theme-rel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.625rem;
+}
+
+.pub-theme-rel__link {
+  font-family: var(--font-content, 'Libre Caslon Text', serif);
+  font-size: var(--text-sm, 0.875rem);
+  color: var(--text-secondary, #CACACA);
+  text-decoration: none;
+  background: color-mix(in srgb, var(--bg-highlight, #2A3374) 45%, transparent);
+  border: 1px solid var(--border-subtle, rgba(255,255,255,0.1));
+  border-radius: var(--radius-full, 9999px);
+  padding: 0.5rem 0.9375rem;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.pub-theme-rel__link:hover {
+  color: var(--gold-primary, #E6BC5C);
+  border-color: color-mix(in srgb, var(--gold-primary) 38%, transparent);
+}
+
+/* ─── Responsive ─── */
+
+@media (max-width: 480px) {
+  .pub-voice {
+    gap: 0.9375rem;
+  }
+
+  .pub-voice__portrait img {
+    width: 68px;
+    height: 68px;
+  }
+}

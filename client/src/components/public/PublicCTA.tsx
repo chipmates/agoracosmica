@@ -1,6 +1,6 @@
 // Call-to-action for public pages. Sticky bottom bar: the trust signal above
-// one primary action. On figure pages the action is "Learn from Echo of
-// {name}"; elsewhere it is the generic "Start exploring".
+// one primary action. Figure pages say "Learn from Echo of {name}", theme
+// pages "Enter the Cosmic Council", everything else "Start exploring".
 // Remove this file when stripping marketing pages from a fork
 
 import { usePublicLang } from './PublicLangContext';
@@ -16,6 +16,8 @@ interface PublicCTAProps {
    */
   figureId?: string;
   variant?: 'sticky' | 'inline';
+  /** Theme pages: a council-flavoured CTA instead of the generic entry. */
+  councilCta?: boolean;
   className?: string;
 }
 
@@ -23,13 +25,16 @@ export default function PublicCTA({
   figureName,
   figureId,
   variant = 'sticky',
+  councilCta = false,
   className = '',
 }: PublicCTAProps) {
   const { t, lang } = usePublicLang();
 
   const label = figureName
     ? t('cta.learnFrom').replace('{name}', figureName)
-    : t('cta.startFree');
+    : councilCta
+      ? t('cta.enterCouncil', 'Enter the Cosmic Council')
+      : t('cta.startFree');
 
   // Fire start_exploring synchronously inside the click. The link is a hard
   // <a href> that triggers a full navigation, so the fetch uses keepalive to

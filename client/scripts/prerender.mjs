@@ -429,15 +429,16 @@ const THEME_OG_FIGURE = {
   'moral-life': 'gandhi',              // satyagraha, ethics as practice
 };
 
-// 4-5 representative figures per theme (manual curation, themes are stable)
+// The figures whose voices each theme essay walks, in essay order. Mirrors
+// client/src/data/public/themeVoices.ts — keep the two in sync.
 const THEME_FIGURE_HINTS = {
-  'meaning-purpose': ['aurelius', 'gautama', 'campbell', 'rumi', 'nietzsche'],
-  'loss-grief': ['king', 'mandela', 'jung', 'eckhart', 'tubman'],
-  'who-am-i': ['beauvoir', 'jung', 'kahlo', 'woolf', 'nietzsche'],
+  'meaning-purpose': ['aurelius', 'gautama', 'campbell', 'rumi'],
+  'loss-grief': ['mandela', 'king', 'jung', 'eckhart'],
+  'who-am-i': ['beauvoir', 'jung', 'kahlo', 'woolf'],
   'mind-creativity': ['einstein', 'vinci', 'mozart', 'woolf', 'blake'],
-  'love-connection': ['rumi', 'austen', 'shakespeare', 'eckhart', 'bingen'],
+  'love-connection': ['rumi', 'austen', 'eckhart', 'bingen'],
   'freedom-justice': ['mandela', 'king', 'gandhi', 'tubman', 'beauvoir'],
-  'faith-death-mystery': ['laozi', 'gautama', 'eckhart', 'bingen', 'aurelius'],
+  'faith-death-mystery': ['aurelius', 'gautama', 'laozi', 'bingen', 'eckhart'],
   'moral-life': ['aurelius', 'gandhi', 'king', 'plato', 'gautama'],
 };
 
