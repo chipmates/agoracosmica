@@ -22,6 +22,7 @@ import councilPlayerService from '../../services/council/CouncilPlayerService';
 import { loadSeedsDirectly } from '../../services/directSeedLoader';
 import { councilCatalog, getLocalizedTitle, getEchoShortName } from '../../data/councilCatalog';
 import { savePrismContent, markPrismCompleted, saveCouncilContent, markCouncilCompleted } from '../../utils/storageKeysV2';
+import { sendConversion, COUNCIL_ENGAGED_THRESHOLD_S } from '../../utils/public/gclidCapture';
 import { useSubtitleSync } from './useSubtitleSync';
 import { useLiquidGlass } from '../../hooks/useLiquidGlass';
 import OptimizedFigureImage from '../OptimizedFigureImage';
@@ -84,6 +85,10 @@ export function PrismPlayer({ figure, seed, councilId, councilLevel = 1, languag
   const containerRef = useRef<HTMLDivElement>(null);
   const currentTimeRef = useRef(0);
   const currentSegmentRef = useRef(0);
+  // Council Engaged conversion: one-shot fire flag + accumulator of audio heard.
+  const councilEngagedFiredRef = useRef(false);
+  const councilHeardSecondsRef = useRef(0);
+  const lastEngagedTimeRef = useRef(0);
 
   // --- Audio ---
   const {
@@ -401,6 +406,23 @@ export function PrismPlayer({ figure, seed, councilId, councilLevel = 1, languag
       handlePlaybackComplete();
     }
   }, [currentTimeSeconds, subtitleState.currentSegmentIndex, prismData, audioTimelineSegments, isPlaying]);
+
+  // --- Council Engaged conversion ---
+  // Fires once the visitor has heard about 60s of a council. Accumulates
+  // forward playback only. Skip-forward jumps and seeks are large deltas
+  // and are dropped, so this counts audio actually heard, not the playhead.
+  useEffect(() => {
+    if (!isCouncilMode || councilEngagedFiredRef.current) return;
+    const delta = currentTimeSeconds - lastEngagedTimeRef.current;
+    lastEngagedTimeRef.current = currentTimeSeconds;
+    if (delta > 0 && delta < 10) {
+      councilHeardSecondsRef.current += delta;
+      if (councilHeardSecondsRef.current >= COUNCIL_ENGAGED_THRESHOLD_S) {
+        councilEngagedFiredRef.current = true;
+        void sendConversion('council_engaged');
+      }
+    }
+  }, [currentTimeSeconds, isCouncilMode]);
 
   // --- Keyboard shortcuts (disabled during preview card) ---
   useEffect(() => {

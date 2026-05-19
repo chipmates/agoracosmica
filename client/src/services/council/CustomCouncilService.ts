@@ -17,6 +17,7 @@ import { councilLog, councilWarn, councilError } from './logger';
 import { getOrRollCouncilFigureSessionId, touchCouncilFigureSession, clearCouncilSessions } from '../audio/tts/ttsSessions';
 import { getAudioContext } from '../audio/audioQueueManager';
 import { splitForGatewayCap } from '../audio/utils/splitForGatewayCap';
+import { sendConversion, COUNCIL_ENGAGED_THRESHOLD_S } from '../../utils/public/gclidCapture';
 
 // ============================================
 // Type Definitions
@@ -138,6 +139,10 @@ export class CustomCouncilService {
   // Reference to the BufferSource currently feeding the speakers, so cleanup
   // can call .stop() on user-close instead of letting the segment play out.
   private activeSource: AudioBufferSourceNode | null;
+  // Council Engaged conversion: seconds of council audio played so far, plus a
+  // one-shot flag so the conversion fires at most once per council.
+  private councilHeardSeconds = 0;
+  private councilEngagedFired = false;
 
   constructor(mainService: MainService) {
     this.mainService = mainService;
@@ -704,6 +709,12 @@ export class CustomCouncilService {
         if (this.activeSource === source) {
           this.activeSource = null;
         }
+        // Council Engaged conversion: accumulate audio heard, fire once at ~60s.
+        this.councilHeardSeconds += audioBuffer.duration;
+        if (!this.councilEngagedFired && this.councilHeardSeconds >= COUNCIL_ENGAGED_THRESHOLD_S) {
+          this.councilEngagedFired = true;
+          void sendConversion('council_engaged');
+        }
         resolve();
       };
 
@@ -1190,6 +1201,10 @@ export class CustomCouncilService {
    */
   cleanup(): void {
     councilLog('🧹 Cleaning up CustomCouncilService resources');
+
+    // Reset the Council Engaged accumulator so the next council starts fresh.
+    this.councilHeardSeconds = 0;
+    this.councilEngagedFired = false;
 
     // Cut the currently-playing segment so closing the council silences audio
     // immediately. .stop() throws if the source never started or already
