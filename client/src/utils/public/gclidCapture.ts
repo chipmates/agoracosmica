@@ -4,6 +4,8 @@
 // sessionStorage so it survives reloads within the same tab and is gone
 // when the tab closes.
 
+import { isSelfHost } from '../../config/deployment';
+
 const API_BASE = import.meta.env.VITE_FREE_TIER_API_URL || '';
 
 // sessionStorage key: persist gclid across reloads of the same tab. Without
@@ -41,6 +43,7 @@ function persistGclid(): void {
  * Capture gclid from the URL on page load. Call once when the app initializes.
  */
 export function captureGclid(): void {
+  if (isSelfHost) return; // no ad attribution on a self-host instance
   try {
     const params = new URLSearchParams(window.location.search);
     const gclid = params.get('gclid');
@@ -83,6 +86,7 @@ export async function sendConversion(
   event: ConversionEvent,
   metadata?: Record<string, string>
 ): Promise<void> {
+  if (isSelfHost) return; // no ad-conversion reporting on a self-host instance
   if (!capturedGclid) return;
 
   try {

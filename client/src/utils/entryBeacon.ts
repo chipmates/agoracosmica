@@ -7,6 +7,8 @@
 // Privacy: aggregate counter only. No user dimension. No IP retention.
 // Disclosed in docs/MEASUREMENT.md alongside the other event counters.
 
+import { isSelfHost } from '../config/deployment';
+
 const API_BASE = import.meta.env.VITE_FREE_TIER_API_URL || '';
 
 function detectLanguage(): 'en' | 'de' {
@@ -33,6 +35,7 @@ function detectLanguage(): 'en' | 'de' {
  * the page-load and playback beacons.
  */
 export function sendEntryBeacon(): void {
+  if (isSelfHost) return; // self-host instances are analytics-silent
   try {
     const path = typeof window !== 'undefined' ? window.location.pathname : '';
     const body = JSON.stringify({

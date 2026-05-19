@@ -6,6 +6,8 @@
 // Privacy: aggregate counter only. No user dimension. No IP retention.
 // See docs/MEASUREMENT.md for the full disclosure.
 
+import { isSelfHost } from '../config/deployment';
+
 const API_BASE = import.meta.env.VITE_FREE_TIER_API_URL || '';
 
 export type PlaybackContentType = 'story' | 'teaching' | 'prism' | 'council' | 'foreword';
@@ -33,6 +35,7 @@ interface PlaybackPayload {
  * the started/completed split.
  */
 export function sendPlaybackBeacon(payload: PlaybackPayload): void {
+  if (isSelfHost) return; // self-host instances are analytics-silent
   try {
     const body = JSON.stringify({
       type: payload.type,
