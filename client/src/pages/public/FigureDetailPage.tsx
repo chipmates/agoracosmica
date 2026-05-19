@@ -1,4 +1,6 @@
-// Figure detail page V2 - journey, stories, teachings, concepts, councils, topics
+// Figure detail page — revised per Figure-Pages-Revision-Plan.md (Workstream C).
+// Promise-first hero (portrait, golden learn line, trailer intro), the
+// four-step journey, then depth collapsed by default. One sticky CTA.
 // Remove this file when stripping marketing pages from a fork
 
 import { useState, useMemo, useEffect } from 'react';
@@ -8,21 +10,18 @@ import Breadcrumbs from '../../components/public/Breadcrumbs';
 import MetaTags from '../../components/public/MetaTags';
 import JsonLd, { personSchema } from '../../components/public/JsonLd';
 import StaticImage from '../../components/public/StaticImage';
-import SeedPreview from '../../components/public/SeedPreview';
+import FigurePortrait from '../../components/public/FigurePortrait';
+import PublicTrailerButton from '../../components/public/PublicTrailerButton';
 import CouncilPreview from '../../components/public/CouncilPreview';
-import PublicAudioPlayer from '../../components/public/PublicAudioPlayer';
 import PublicCTA from '../../components/public/PublicCTA';
 import EchoNote from '../../components/public/EchoNote';
 import JourneyOverview from '../../components/public/JourneyOverview';
-import TopicBadges from '../../components/public/TopicBadges';
 import CollapsibleSection from '../../components/public/CollapsibleSection';
-import { figureSlugToId } from '../../data/public/slugMap';
+import { figureSlugToId, figureIdToSlug } from '../../data/public/slugMap';
 import { getFigureById } from '../../data/public/figuresCatalog';
 import { getFigureSeo, figureThemes } from '../../data/public/figureSeo';
 import { councilCatalog, getShortDisplayName } from '../../data/councilCatalog';
-import { getPublicAudioUrl } from '../../utils/public/publicMediaUrl';
 import { publicUrl } from '../../utils/public/publicSeo';
-import { figureIdToSlug } from '../../data/public/slugMap';
 
 interface SeedSummary {
   id: number;
@@ -40,37 +39,30 @@ interface SeedFileData {
   seeds: SeedSummary[];
 }
 
-interface StoryFileData {
-  figure: string;
-  chapters: { segment: number; words: number; minutes: number }[];
-  totalWords: number;
-  totalMinutes: number;
+// Strip the markers the locked writing rule forbids from displayed text.
+// Concept definitions come from voice profiles and can carry em-dashes.
+function cleanDisplayText(s: string): string {
+  return s
+    .replace(/\s*[—–]\s*/g, ', ')
+    .replace(/\s*;\s*/g, ', ')
+    .replace(/,\s*,/g, ',')
+    .trim();
 }
 
 export default function FigureDetailPage() {
   const { slug } = useParams<{ slug: string }>();
   const { lang, t } = usePublicLang();
-  const [showAllSeeds, setShowAllSeeds] = useState(false);
   const [seedData, setSeedData] = useState<SeedFileData | null>(null);
-  const [storyData, setStoryData] = useState<StoryFileData | null>(null);
 
   const figureId = slug ? figureSlugToId[slug] : undefined;
   const figure = figureId ? getFigureById(figureId, lang) : undefined;
   const seo = figureId ? getFigureSeo(figureId, lang) : undefined;
 
-  // Dynamic import of seed data
+  // Dynamic import of seed data (teaching titles + figure connections)
   useEffect(() => {
     if (!figureId) return;
     import(`../../data/public/seeds/${lang}/${figureId}.json`)
       .then(mod => setSeedData(mod.default || mod))
-      .catch(() => {});
-  }, [figureId, lang]);
-
-  // Dynamic import of story data
-  useEffect(() => {
-    if (!figureId) return;
-    import(`../../data/public/stories/${lang}/${figureId}.json`)
-      .then(mod => setStoryData(mod.default || mod))
       .catch(() => {});
   }, [figureId, lang]);
 
@@ -83,16 +75,16 @@ export default function FigureDetailPage() {
     );
   }, [figureId]);
 
-  // Related figures from seed connections
+  // Related figures drawn from seed connections
   const relatedFigureIds = useMemo(() => {
     if (!seedData?.seeds) return [];
-    const connectionFigures = new Set<string>();
+    const figs = new Set<string>();
     for (const seed of seedData.seeds) {
       for (const conn of seed.connections || []) {
-        if (conn.figure !== figureId) connectionFigures.add(conn.figure);
+        if (conn.figure !== figureId) figs.add(conn.figure);
       }
     }
-    return Array.from(connectionFigures).slice(0, 4);
+    return Array.from(figs).slice(0, 4);
   }, [seedData, figureId]);
 
   if (!figureId || !figure) {
@@ -100,18 +92,13 @@ export default function FigureDetailPage() {
   }
 
   const seeds = seedData?.seeds || [];
-  const displayedSeeds = showAllSeeds ? seeds : seeds.slice(0, 4);
-  const audioUrl = getPublicAudioUrl(figureId, lang, 0);
-
-  // Clean about text
-  const aboutParagraphs = figure.about.split('\n').filter(p => p.trim() && !p.includes(' \u2022 '));
-
-  // SEO data
-  const metaDescription = seo?.description || aboutParagraphs[0]?.slice(0, 160) || figure.about.slice(0, 160);
-  const teachingsHeading = seo?.teachingsHeading || `${t('figures.teachings')} (${seeds.length})`;
+  const aboutParas = figure.about.split('\n').map(p => p.trim()).filter(Boolean);
+  const metaLine = [figure.tradition, figure.period].filter(Boolean).join('  ·  ');
+  const metaDescription = seo?.description || aboutParas[0]?.slice(0, 160) || '';
+  const shortName = getShortDisplayName(figureId);
 
   return (
-    <div className="pub-content">
+    <div className="pub-content pub-figure">
       <MetaTags
         title={`${figure.name} - ${t('figures.life')} & ${t('figures.teachings')}`}
         fullTitle={seo?.seoTitle}
@@ -123,7 +110,7 @@ export default function FigureDetailPage() {
       <JsonLd
         data={personSchema({
           name: figure.name,
-          about: aboutParagraphs[0] || figure.about,
+          about: aboutParas[0] || figure.about,
           period: figure.period,
           tradition: figure.tradition,
           slug: slug!,
@@ -138,109 +125,68 @@ export default function FigureDetailPage() {
         ]}
       />
 
-      {/* Hero Section */}
-      <section className="pub-hero">
-        <div className="pub-hero__image" style={{ maxWidth: 280 }}>
-          <StaticImage
-            figureId={figureId}
-            type="main"
-            alt={figure.name}
-            loading="eager"
-          />
+      {/* Hero — promise first */}
+      <section className="pub-fig-hero">
+        <div className="pub-fig-hero__portrait">
+          <FigurePortrait figureId={figureId} alt={figure.name} />
         </div>
-        <div className="pub-hero__info">
-          <h1 className="pub-hero__title">{figure.name}</h1>
-          <div className="pub-hero__meta">
-            {figure.period && <span className="pub-hero__badge">{figure.period}</span>}
-            {figure.tradition && <span className="pub-hero__badge">{figure.tradition}</span>}
-            {figure.category && <span className="pub-hero__badge">{figure.category}</span>}
-          </div>
-          {aboutParagraphs.map((p, i) => (
-            <p key={i} className="pub-hero__about">{p}</p>
+        <div className="pub-fig-hero__text">
+          <p className="pub-fig-hero__eyebrow">{t('figures.echoOf')}</p>
+          <h1 className="pub-fig-hero__name">{figure.name}</h1>
+          {metaLine && <p className="pub-fig-hero__meta">{metaLine}</p>}
+          {figure.learn && (
+            <p className="pub-fig-hero__learn">{`“${figure.learn}”`}</p>
+          )}
+          <PublicTrailerButton figureId={figureId} />
+          {aboutParas.map((p, i) => (
+            <p key={i} className="pub-fig-hero__about">{p}</p>
           ))}
         </div>
       </section>
 
       <EchoNote variant="figure" name={figure.name} />
 
-      {/* Journey Overview */}
-      <JourneyOverview
-        figureName={figure.name}
-        storyMinutes={storyData?.totalMinutes || 120}
-        storyChapters={storyData ? storyData.chapters.length - 1 : 12}
-        seedCount={seeds.length || 12}
-        councilCount={relatedCouncils.length}
-      />
+      {/* The four-step journey */}
+      <JourneyOverview figureName={figure.name} />
 
-      {/* Core Teachings (Seeds) with Story intro */}
+      {/* Depth — collapsed by default */}
       {seeds.length > 0 && (
-        <CollapsibleSection title={teachingsHeading} count={seeds.length} defaultOpen>
-          {/* Story intro card */}
-          <div className="pub-seed" style={{ marginBottom: '1rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-              <h3 className="pub-seed__title" style={{ margin: 0 }}>
-                {t('story.title').replace('{name}', figure.name)}
-              </h3>
-              <span className="pub-journey__badge pub-journey__badge--listen">{t('journey.listen')}</span>
-            </div>
-            <p className="pub-seed__summary">
-              {t('story.subtitle')
-                .replace('{count}', String(storyData ? storyData.chapters.length - 1 : 12))
-                .replace('{minutes}', String(storyData?.totalMinutes || 120))}
-            </p>
-            <PublicAudioPlayer
-              audioUrl={audioUrl}
-              label={`${t('figures.audioSample')} - ${figure.name}`}
-            />
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {displayedSeeds.map(seed => (
-              <SeedPreview key={seed.id} seed={seed} />
+        <CollapsibleSection title={t('figures.ideasHeading')}>
+          <ol className="pub-ideas">
+            {seeds.map(seed => (
+              <li key={seed.id} className="pub-ideas__item">{seed.title}</li>
             ))}
-          </div>
-          {seeds.length > 4 && (
-            <div style={{ marginTop: '1rem', textAlign: 'center' }}>
-              <button
-                className="pub-toggle"
-                onClick={() => setShowAllSeeds(!showAllSeeds)}
-              >
-                {showAllSeeds ? t('cta.showLess') : t('cta.showAllTeachings')}
-              </button>
-            </div>
-          )}
+          </ol>
         </CollapsibleSection>
       )}
 
-      {/* Key Concepts */}
       {figure.keyConcepts.length > 0 && (
-        <section className="pub-section">
-          <h2 className="pub-section__title">{t('figures.keyConcepts')}</h2>
-          {figure.essence && (
-            <p className="pub-section__text" style={{ marginBottom: '1.5rem' }}>
-              {figure.essence}
-            </p>
-          )}
+        <CollapsibleSection title={t('figures.keyIdeas')}>
           <div className="pub-concepts">
             {figure.keyConcepts.map(concept => (
               <div key={concept.term} className="pub-concept">
                 <div className="pub-concept__term">{concept.term}</div>
-                <div className="pub-concept__def">{concept.definition}</div>
+                <div className="pub-concept__def">
+                  {cleanDisplayText(concept.definition)}
+                </div>
               </div>
             ))}
           </div>
           {figure.primaryWorks.length > 0 && (
-            <div style={{ marginTop: '1rem' }}>
-              <strong style={{ color: 'var(--gold-subtle)' }}>{t('figures.primaryWorks')}:</strong>{' '}
-              <span className="pub-section__text">{figure.primaryWorks.join(', ')}</span>
-            </div>
+            <p className="pub-concept__works">
+              <strong>{t('figures.primaryWorks')}:</strong>{' '}
+              {figure.primaryWorks.map(cleanDisplayText).join(', ')}
+            </p>
           )}
-        </section>
+        </CollapsibleSection>
       )}
 
-      {/* Council Debates */}
       {relatedCouncils.length > 0 && (
-        <CollapsibleSection title={t('figures.councilAppearances')} count={relatedCouncils.length}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <CollapsibleSection
+          title={t('figures.councilAppearances')}
+          count={relatedCouncils.length}
+        >
+          <div className="pub-council-list">
             {relatedCouncils.map(council => (
               <CouncilPreview key={council.id} council={council} />
             ))}
@@ -248,13 +194,28 @@ export default function FigureDetailPage() {
         </CollapsibleSection>
       )}
 
-      {/* Topics */}
-      <TopicBadges tags={figure.topTags} figureName={figure.name} />
+      {figureThemes[figureId] && figureThemes[figureId].length > 0 && (
+        <CollapsibleSection title={t('figures.themes')}>
+          <div className="pub-grid pub-grid--3">
+            {figureThemes[figureId].map(themeId => (
+              <Link
+                key={themeId}
+                to={publicUrl(lang, `/themes/${themeId}`)}
+                className="pub-theme-card"
+              >
+                <h3 className="pub-theme-card__name">{t(`themes.${themeId}.name`)}</h3>
+                <p className="pub-theme-card__tagline">{t(`themes.${themeId}.tagline`)}</p>
+              </Link>
+            ))}
+          </div>
+        </CollapsibleSection>
+      )}
 
-      {/* Related Figures */}
       {relatedFigureIds.length > 0 && (
-        <section className="pub-section">
-          <h2 className="pub-section__title">{t('figures.relatedFigures')}</h2>
+        <CollapsibleSection
+          title={t('figures.relatedFigures')}
+          count={relatedFigureIds.length}
+        >
           <div className="pub-grid pub-grid--2">
             {relatedFigureIds.map(relId => {
               const relFigure = getFigureById(relId, lang);
@@ -265,7 +226,7 @@ export default function FigureDetailPage() {
                   key={relId}
                   to={publicUrl(lang, `/figures/${relSlug}`)}
                   className="pub-figure-card"
-                  style={{ flexDirection: 'row', gap: '0.75rem' }}
+                  style={{ flexDirection: 'row', gap: '0.75rem', alignItems: 'center', padding: '0.75rem' }}
                 >
                   <StaticImage
                     figureId={relId}
@@ -283,30 +244,10 @@ export default function FigureDetailPage() {
               );
             })}
           </div>
-        </section>
+        </CollapsibleSection>
       )}
 
-      {/* Themes this figure speaks to */}
-      {figureId && figureThemes[figureId] && figureThemes[figureId].length > 0 && (
-        <section className="pub-section">
-          <h2 className="pub-section__title">{t('figures.themes')}</h2>
-          <div className="pub-grid pub-grid--3">
-            {figureThemes[figureId].map(themeId => (
-              <Link
-                key={themeId}
-                to={publicUrl(lang, `/themes/${themeId}`)}
-                className="pub-theme-card"
-              >
-                <h3 className="pub-theme-card__name">{t(`themes.${themeId}.name`)}</h3>
-                <p className="pub-theme-card__tagline">{t(`themes.${themeId}.tagline`)}</p>
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* CTA */}
-      <PublicCTA figureName={getShortDisplayName(figureId)} figureId={figureId} variant="sticky" />
+      <PublicCTA figureName={shortName} figureId={figureId} variant="sticky" />
     </div>
   );
 }

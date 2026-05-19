@@ -312,44 +312,62 @@ html:has(.public-page) #root {
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 0.75rem 1.5rem;
-  padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
-  background: color-mix(in srgb, var(--bg-primary, #151C47) 95%, transparent);
+  padding: 0.625rem 1.5rem;
+  padding-bottom: max(0.625rem, env(safe-area-inset-bottom));
+  background: color-mix(in srgb, var(--bg-deep-space, #0C1133) 92%, transparent);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border-top: 1px solid var(--border-subtle, rgba(255,255,255,0.1));
+  border-top: 1px solid color-mix(in srgb, var(--gold-primary) 16%, transparent);
+  box-shadow: 0 -10px 40px color-mix(in srgb, var(--utility-pure-black) 40%, transparent);
   z-index: 50;
-  text-align: center;
-}
-
-.pub-cta--sticky .pub-cta__button {
-  max-width: 400px;
-  width: 100%;
 }
 
 .pub-cta--inline {
-  text-align: center;
   padding: 2rem 0;
+}
+
+.pub-cta__inner {
+  max-width: 640px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4375rem;
+}
+
+.pub-cta__trust {
+  margin: 0;
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  color: var(--text-dim, #8A8A8A);
 }
 
 .pub-cta__button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 48px;
-  padding: 0.75rem 2rem;
+  min-height: 44px;
+  width: 100%;
+  max-width: 360px;
+  padding: 0.625rem 1.5rem;
   font-family: var(--font-ui, 'Space Grotesk', sans-serif);
-  font-size: var(--text-base, 1rem);
+  font-size: 0.96875rem;
   font-weight: 600;
-  color: var(--bg-cosmic-void, #0D1338);
-  background: var(--gold-primary, #D4A539);
+  line-height: 1.2;
+  white-space: nowrap;
+  color: var(--bg-deep-space, #0C1133);
+  background: linear-gradient(135deg, var(--gold-hover, #F6D55C), var(--gold-subtle, #D4A539));
   text-decoration: none;
-  border-radius: 12px;
-  transition: background 0.2s, transform 0.1s;
+  border-radius: var(--radius-full, 9999px);
+  box-shadow:
+    0 8px 24px color-mix(in srgb, var(--utility-pure-black) 40%, transparent),
+    0 0 40px color-mix(in srgb, var(--gold-primary) 20%, transparent);
+  transition: transform 0.12s;
 }
 
 .pub-cta__button:hover {
-  background: var(--gold-hover, #E8C058);
+  transform: translateY(-1px);
 }
 
 .pub-cta__button:active {

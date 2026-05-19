@@ -586,3 +586,347 @@
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+/* ═══ Figure detail page (revised) ═══ */
+
+.pub-figure {
+  /* clearance for the fixed CTA bar (trust line + button) */
+  padding-bottom: 2.5rem;
+}
+
+/* ─── Hero: promise first ─── */
+
+.pub-fig-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.pub-fig-hero__portrait {
+  position: relative;
+  width: 232px;
+  flex-shrink: 0;
+  aspect-ratio: 1 / 1; /* mobile: square thumbnail */
+}
+
+.pub-fig-hero__portrait::after {
+  content: "";
+  position: absolute;
+  inset: -22px;
+  z-index: -1;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--gold-primary) 20%, transparent),
+    transparent 68%
+  );
+}
+
+.pub-fig-hero__portrait picture,
+.pub-fig-hero__portrait img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.pub-fig-hero__portrait img {
+  object-fit: cover;
+  border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--gold-primary) 32%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--gold-primary) 28%, transparent),
+    0 18px 50px color-mix(in srgb, var(--utility-pure-black) 55%, transparent),
+    0 0 60px color-mix(in srgb, var(--gold-primary) 13%, transparent);
+  background: var(--bg-card);
+}
+
+.pub-fig-hero__text {
+  max-width: 540px;
+}
+
+.pub-fig-hero__eyebrow {
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.6875rem;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--gold-deep, #B38B30);
+  margin: 0 0 0.375rem;
+}
+
+.pub-fig-hero__name {
+  font-family: var(--font-content, 'Libre Caslon Text', serif);
+  font-weight: 700;
+  font-size: clamp(2rem, 1.4rem + 2.8vw, 2.9rem);
+  line-height: 1.08;
+  color: var(--text-primary, #D2D2D2);
+  margin: 0;
+}
+
+.pub-fig-hero__meta {
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: var(--text-sm, 0.875rem);
+  color: var(--text-tertiary, #9E9E9E);
+  letter-spacing: 0.03em;
+  margin: 0.5rem 0 0;
+}
+
+.pub-fig-hero__learn {
+  font-family: var(--font-content, 'Libre Caslon Text', serif);
+  font-weight: 500;
+  font-size: clamp(1.2rem, 1rem + 1vw, 1.55rem);
+  line-height: 1.4;
+  color: var(--gold-subtle, #D4A539);
+  text-shadow: 0 1px 12px color-mix(in srgb, var(--gold-primary) 30%, transparent);
+  max-width: 19ch;
+  margin: 1.4rem auto 1.25rem;
+}
+
+.pub-fig-hero__about {
+  font-family: var(--font-content, 'Libre Caslon Text', serif);
+  font-size: var(--text-md, 1.0625rem);
+  line-height: var(--leading-loose, 1.75);
+  color: var(--text-secondary, #CACACA);
+  max-width: 46ch;
+  margin: 1.25rem auto 0;
+}
+
+/* Hero, desktop: portrait left, promise right */
+@media (min-width: 820px) {
+  .pub-fig-hero {
+    flex-direction: row;
+    align-items: center;
+    text-align: left;
+    gap: 3.5rem;
+  }
+
+  .pub-fig-hero__portrait {
+    width: 340px;
+    aspect-ratio: 1200 / 1452; /* desktop: profile main */
+  }
+
+  .pub-fig-hero__text {
+    max-width: none;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .pub-fig-hero__learn {
+    margin-left: 0;
+    margin-right: 0;
+    max-width: 18ch;
+  }
+
+  .pub-fig-hero__about {
+    margin-left: 0;
+    max-width: 52ch;
+  }
+}
+
+/* ─── Trailer button ─── */
+
+.pub-trailer {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0 1.25rem;
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: var(--text-sm, 0.875rem);
+  font-weight: 600;
+  color: var(--gold-primary, #E6BC5C);
+  background: color-mix(in srgb, var(--gold-primary) 9%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gold-primary) 38%, transparent);
+  border-radius: var(--radius-full, 9999px);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.pub-trailer:hover,
+.pub-trailer--on {
+  background: color-mix(in srgb, var(--gold-primary) 16%, transparent);
+}
+
+.pub-trailer:focus-visible {
+  outline: 2px solid var(--gold-hover, #F6D55C);
+  outline-offset: 3px;
+}
+
+.pub-trailer__icon {
+  display: inline-flex;
+}
+
+.pub-trailer__dur {
+  color: var(--text-dim, #8A8A8A);
+  font-weight: 500;
+}
+
+/* ─── The four-step journey ─── */
+
+.pub-path-intro {
+  font-size: var(--text-base, 1rem);
+  line-height: var(--leading-relaxed, 1.6);
+  color: var(--text-tertiary, #9E9E9E);
+  max-width: 52ch;
+  margin: -0.5rem 0 1.5rem;
+}
+
+.pub-path {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.pub-path__step {
+  display: flex;
+  gap: 1rem;
+  padding-bottom: 1.5rem;
+  position: relative;
+}
+
+.pub-path__step:last-child {
+  padding-bottom: 0;
+}
+
+/* connector line between numbered nodes */
+.pub-path__step:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  left: 17px;
+  top: 38px;
+  bottom: -4px;
+  width: 2px;
+  background: linear-gradient(
+    var(--step-color, var(--gold-primary)),
+    color-mix(in srgb, var(--step-color, var(--gold-primary)) 10%, transparent)
+  );
+}
+
+.pub-path__step--story  { --step-color: var(--mode-story, #E6BC5C); }
+.pub-path__step--wisdom { --step-color: var(--mode-wisdom, #9D83CD); }
+.pub-path__step--prism  { --step-color: var(--mode-prism, #5B8BD4); }
+.pub-path__step--quest  { --step-color: var(--mode-quest, #E97451); }
+
+.pub-path__node {
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-weight: 600;
+  border-radius: 50%;
+  color: var(--step-color);
+  background: color-mix(in srgb, var(--step-color) 15%, transparent);
+  border: 1px solid color-mix(in srgb, var(--step-color) 55%, transparent);
+}
+
+.pub-path__body {
+  padding-top: 0.125rem;
+}
+
+.pub-path__head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.pub-path__name {
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-weight: 600;
+  font-size: var(--text-base, 1rem);
+  color: var(--step-color);
+}
+
+.pub-path__pill {
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.1875rem 0.5rem;
+  border-radius: var(--radius-full, 9999px);
+  color: var(--text-secondary, #CACACA);
+  background: color-mix(in srgb, var(--step-color) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--step-color) 30%, transparent);
+}
+
+.pub-path__line {
+  font-size: var(--text-sm, 0.875rem);
+  line-height: 1.55;
+  color: var(--text-tertiary, #9E9E9E);
+  margin: 0;
+}
+
+.pub-path-aside {
+  margin: 1.5rem 0 0;
+  padding: 0.875rem 1rem;
+  font-size: var(--text-sm, 0.875rem);
+  line-height: 1.6;
+  color: var(--text-tertiary, #9E9E9E);
+  background: color-mix(in srgb, var(--bg-card, #1C245C) 55%, transparent);
+  border: 1px solid var(--utility-border, rgba(158,158,158,0.1));
+  border-radius: var(--radius-lg, 0.75rem);
+}
+
+.pub-path-nudge {
+  margin: 1rem 0 0;
+  text-align: center;
+  font-family: var(--font-content, 'Libre Caslon Text', serif);
+  font-style: italic;
+  font-size: var(--text-base, 1rem);
+  color: var(--gold-deep, #B38B30);
+}
+
+/* ─── The twelve ideas list ─── */
+
+.pub-ideas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem 1.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: idea;
+}
+
+.pub-ideas__item {
+  counter-increment: idea;
+  font-size: var(--text-sm, 0.875rem);
+  color: var(--text-secondary, #CACACA);
+  padding: 0.375rem 0;
+}
+
+.pub-ideas__item::before {
+  content: counter(idea) "  ";
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: var(--text-xs, 0.75rem);
+  color: var(--gold-deep, #B38B30);
+  font-variant-numeric: tabular-nums;
+}
+
+.pub-council-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.pub-concept__works {
+  margin-top: 1rem;
+  font-size: var(--text-sm, 0.875rem);
+  line-height: var(--leading-relaxed, 1.6);
+  color: var(--text-secondary, rgba(255,255,255,0.7));
+}
+
+.pub-concept__works strong {
+  color: var(--gold-subtle, #D4A539);
+}
+
+@media (max-width: 480px) {
+  .pub-ideas {
+    grid-template-columns: 1fr;
+  }
+}

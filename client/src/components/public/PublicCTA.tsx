@@ -1,5 +1,6 @@
-// Call-to-action component for public pages
-// Sticky bottom bar on mobile, inline block on desktop
+// Call-to-action for public pages. Sticky bottom bar: the trust signal above
+// one primary action. On figure pages the action is "Learn from Echo of
+// {name}"; elsewhere it is the generic "Start exploring".
 // Remove this file when stripping marketing pages from a fork
 
 import { usePublicLang } from './PublicLangContext';
@@ -27,13 +28,13 @@ export default function PublicCTA({
   const { t, lang } = usePublicLang();
 
   const label = figureName
-    ? t('cta.startConversation').replace('{name}', figureName)
+    ? t('cta.learnFrom').replace('{name}', figureName)
     : t('cta.startFree');
 
-  // Fire start_exploring conversion synchronously inside the click. The link
-  // is a hard <a href> that triggers a full navigation, so the fetch uses
-  // keepalive to survive the page unload. sendConversion is idempotent per
-  // tab (sessionStorage flag) and no-ops if no gclid was captured.
+  // Fire start_exploring synchronously inside the click. The link is a hard
+  // <a href> that triggers a full navigation, so the fetch uses keepalive to
+  // survive the page unload. sendConversion is idempotent per tab and no-ops
+  // if no gclid was captured.
   const handleClick = (): void => {
     captureEntryIntent(figureId, lang);
     sendConversion('start_exploring', figureId ? { figureId } : undefined);
@@ -41,9 +42,12 @@ export default function PublicCTA({
 
   return (
     <div className={`pub-cta pub-cta--${variant} ${className}`}>
-      <a href="/" onClick={handleClick} className="pub-cta__button liquid-glass--cosmic">
-        {label}
-      </a>
+      <div className="pub-cta__inner">
+        <p className="pub-cta__trust">{t('cta.trust')}</p>
+        <a href="/" onClick={handleClick} className="pub-cta__button">
+          {label}
+        </a>
+      </div>
     </div>
   );
 }
