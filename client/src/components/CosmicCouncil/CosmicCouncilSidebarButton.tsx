@@ -3,6 +3,7 @@ import OptimizedImage from '../OptimizedImage';
 import useTranslation from '../../hooks/useTranslation';
 import CosmicCouncilIntegration from './CosmicCouncilIntegration';
 import { useUIStore } from '../../stores/uiStore';
+import { useDomainStore } from '../../stores/domainStore';
 
 interface Figure {
   name?: string;
@@ -45,6 +46,7 @@ export const CosmicCouncilSidebarButton: FC<CosmicCouncilSidebarButtonProps> = (
   // not main page).
   const isModalOpen = useUIStore((s) => s.modals.councilSetupOpen);
   const setCouncilSetupOpen = useUIStore((s) => s.setCouncilSetupOpen);
+  const openWisdomGallery = useUIStore((s) => s.openWisdomGallery);
 
   const handleClick = (): void => {
     setCouncilSetupOpen(true);
@@ -53,6 +55,17 @@ export const CosmicCouncilSidebarButton: FC<CosmicCouncilSidebarButtonProps> = (
 
   const handleModalClose = (): void => {
     setCouncilSetupOpen(false);
+  };
+
+  // Dismissing the catalog (X, backdrop, Escape). A visitor who never picked
+  // a figure (the theme-to-council deep-link case) is sent to the WisdomGallery
+  // to choose a guide. A visitor who already has one just returns to the app.
+  // Both updates batch in one handler, so no empty screen flashes between.
+  const handleCatalogDismiss = (): void => {
+    setCouncilSetupOpen(false);
+    if (!useDomainStore.getState().figures.selectedId) {
+      openWisdomGallery();
+    }
   };
 
   const handleCouncilStartWithConfig = async (councilConfig: CouncilConfig): Promise<void> => {
@@ -90,7 +103,7 @@ export const CosmicCouncilSidebarButton: FC<CosmicCouncilSidebarButtonProps> = (
       {/* Council Setup Modal */}
       <CosmicCouncilIntegration
         categoryModalOpen={isModalOpen}
-        onCategoryModalClose={handleModalClose}
+        onCategoryModalClose={handleCatalogDismiss}
         onCouncilStart={handleCouncilStartWithConfig}
       />
     </>

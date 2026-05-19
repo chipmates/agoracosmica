@@ -702,6 +702,13 @@ const HomePage: FC<HomePageProps> = ({ onLogout, onSelectFigure }) => {
     useUIStore.getState().setCouncilSetupOpen(true);
   }, []);
 
+  // Deep-link entry point: open a specific curated council by id. Called from
+  // routeAfterOnboarding when a visitor arrives via a theme-page council link.
+  const startCuratedCouncilById = useCallback((councilId: string) => {
+    setCouncilPlayerId(councilId);
+    setCouncilPlayerLevel(1);
+  }, []);
+
   const handlePrismClose = useCallback(() => {
     setConversationStarted(false);
     setModeSelectorVisible(true);
@@ -1406,7 +1413,8 @@ const HomePage: FC<HomePageProps> = ({ onLogout, onSelectFigure }) => {
     handleModeSelect,
     handleFigureCarouselOpen,
     handleSelectFigure,
-    getFigureById
+    getFigureById,
+    startCuratedCouncilById
   });
   
   const {

@@ -3,7 +3,7 @@ import { getHistoricalFigures } from '../api/figures';
 import { completeOnboarding, skipOnboarding } from '../utils/userState';
 import { Figure, Seed, Language, ConversationMode } from '../types/global';
 import { useDomainStore } from '../stores';
-import { readFigureIntent, clearFigureIntent } from '../utils/public/entryIntent';
+import { readFigureIntent, clearFigureIntent, readCouncilIntent, clearCouncilIntent } from '../utils/public/entryIntent';
 
 interface HelperFunctionsParams {
   selectedFigure: Figure | null;
@@ -19,6 +19,7 @@ interface HelperFunctionsParams {
   handleFigureCarouselOpen: () => void;
   handleSelectFigure: (figure: Figure) => void;
   getFigureById: (id: string) => Figure | undefined;
+  startCuratedCouncilById: (councilId: string) => void;
 }
 
 interface HelperFunctionsResult {
@@ -48,7 +49,8 @@ export function useHelperFunctions({
   handleWisdomGalleryCloseComplete,
   handleFigureCarouselOpen,
   handleSelectFigure,
-  getFigureById
+  getFigureById,
+  startCuratedCouncilById
 }: HelperFunctionsParams): HelperFunctionsResult {
   // Translation helper for figure name
   const getTranslatedFigureName = useCallback((): string => {
@@ -106,10 +108,19 @@ export function useHelperFunctions({
     return `${numericId}. ${t('seeds.seedTitle', { title: seedTitle })}`;
   }, [selectedSeed, selectedFigure, getTranslatedSeedTitle, t]);
 
-  // After the welcome step closes, route the visitor on. If they picked a
-  // figure on a public page, deep-link straight to it (lands on the mode
-  // selector for that figure). Otherwise open the WisdomGallery as before.
+  // After the welcome step closes, route the visitor on, based on any intent
+  // captured from the public page they came from. A council intent (theme
+  // page) opens that council; a figure intent (figure page) lands on that
+  // figure's mode selector; otherwise the WisdomGallery opens as before.
   const routeAfterOnboarding = useCallback((): void => {
+    // Council deep-link from a theme page: open that council, skip the gallery.
+    const intendedCouncil = readCouncilIntent();
+    if (intendedCouncil) {
+      clearCouncilIntent();
+      startCuratedCouncilById(intendedCouncil);
+      return;
+    }
+    // Figure deep-link from a figure page: land on that figure's mode selector.
     const intendedId = readFigureIntent();
     if (intendedId) {
       clearFigureIntent();
@@ -120,7 +131,7 @@ export function useHelperFunctions({
       }
     }
     handleWisdomGalleryOpen();
-  }, [getFigureById, handleSelectFigure, handleWisdomGalleryOpen]);
+  }, [getFigureById, handleSelectFigure, handleWisdomGalleryOpen, startCuratedCouncilById]);
 
   // Handle onboarding completion
   const handleOnboardingComplete = useCallback((): void => {
