@@ -97,6 +97,10 @@ function getFigureFullAbout(id, lang) {
     .slice(0, 500);
 }
 
+function getFigureLearn(id, lang) {
+  return getFigureTranslation(id, lang)?.learn || '';
+}
+
 function getFigureTradition(id, lang) {
   return getFigureTranslation(id, lang)?.tradition || '';
 }
@@ -496,6 +500,7 @@ function figureNoscript(id, slug, lang) {
   const period = getFigurePeriod(id, lang);
   const tradition = getFigureTradition(id, lang);
   const fullAbout = getFigureFullAbout(id, lang);
+  const learn = getFigureLearn(id, lang);
   const seeds = getFigureSeeds(id, lang);
 
   const teachingsHtml = seeds.slice(0, 4)
@@ -534,6 +539,7 @@ function figureNoscript(id, slug, lang) {
       <h1>${name}</h1>
       ${meta ? `<p><strong>${meta}</strong></p>` : ''}
       <p>${fullAbout}</p>
+      ${learn ? `<p><em>${learn}</em></p>` : ''}
 
       ${seeds.length > 0 ? `<h2>${teachingsHeading}</h2>
       <ul>
