@@ -1890,6 +1890,10 @@ async function loadAdGrants() {
     { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE index1 = 'mode_selected' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
     // Mode Selected by figure (which figures drive engagement past signup)
     { sql: "SELECT blob2 as figure, COUNT() as c FROM agora_llm WHERE index1 = 'mode_selected' AND blob2 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY figure ORDER BY c DESC LIMIT 10", dataset: 'agora_llm' },
+    // Council Engaged — current period count
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'council_engaged' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    // Council Engaged — sparkline
+    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE index1 = 'council_engaged' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
   ];
 
   var r = await batch(queries);
@@ -1906,6 +1910,8 @@ async function loadAdGrants() {
   var modeSelConv = val(r[9]);
   var sparkModeSel = rows(r[10]).map(function(r) { return r.c; });
   var modeByFigure = rows(r[11]);
+  var councilEngagedConv = val(r[12]);
+  var sparkCouncilEng = rows(r[13]).map(function(r) { return r.c; });
 
   // Funnel ratios — quality signals across the 3-event ladder
   var profileFromStartPct = startExpConv > 0
@@ -1917,17 +1923,18 @@ async function loadAdGrants() {
 
   // Alerts
   var alerts = '';
-  if (profileConv === 0 && startExpConv === 0 && modeSelConv === 0) {
-    alerts += '<div class="hint-banner">No conversion events yet ' + RANGE_LABEL[S.range] + '. The 3-event ladder (Start Exploring → Profile Creation → Mode Selected) populates here when Google Ads visitors arrive with a gclid.</div>';
+  if (profileConv === 0 && startExpConv === 0 && modeSelConv === 0 && councilEngagedConv === 0) {
+    alerts += '<div class="hint-banner">No conversion events yet ' + RANGE_LABEL[S.range] + '. The conversion events (Start Exploring, Profile Creation, Mode Selected, Council Engaged) populate here when Google Ads visitors arrive with a gclid.</div>';
   }
   alertsEl.innerHTML = alerts;
 
   var html = '';
 
   // ────────────────────────────────────────────────────────────
-  // SECTION 1 — GOOGLE ADS CONVERSIONS (3-event ladder)
-  // gclid-captured events forwarded to Google Ads CAPI.
-  // Start Exploring → Profile Creation → Mode Selected.
+  // SECTION 1 — GOOGLE ADS CONVERSIONS
+  // gclid-captured events forwarded to Google Ads CAPI. Figure funnel:
+  // Start Exploring → Profile Creation → Mode Selected. Theme funnel:
+  // Start Exploring → Profile Creation → Council Engaged.
   // ────────────────────────────────────────────────────────────
   html += '<div class="section-divider">Google Ads Conversions</div>';
   html += '<div class="grid">';
@@ -1935,6 +1942,7 @@ async function loadAdGrants() {
   html += kpi('Start Exploring', startExpConv, { spark: sparkStartExp, sparkColor: '#5B8BD4', sub: 'CTA click on theme/figure pages' });
   html += kpi('Profile Conversions', profileConv, { hero: true, spark: sparkProfile, sparkColor: '#68C397', delta: profilePrev, sub: 'Enter button after character + name picked' });
   html += kpi('Mode Selected', modeSelConv, { spark: sparkModeSel, sparkColor: '#E6BC5C', sub: 'first mode pick (Story / Wisdom / Talk / Quest / Freetalk)' });
+  html += kpi('Council Engaged', councilEngagedConv, { spark: sparkCouncilEng, sparkColor: '#9D83CD', sub: '60s of a council heard (curated or custom)' });
   html += kpi('Conversion Rate', convRate + '%', { sub: profileConv + ' profiles / ' + fmt(totalSessions) + ' sessions' });
   html += kpi('Signup → Engaged', modeFromProfilePct, { sub: modeSelConv + ' modes picked / ' + profileConv + ' profiles' });
   html += kpi('CTA → Signup', profileFromStartPct, { sub: profileConv + ' profiles / ' + startExpConv + ' CTA clicks' });
@@ -1953,8 +1961,9 @@ async function loadAdGrants() {
     '<div style="display:flex;justify-content:space-between"><span style="color:var(--dim)">Start Exploring Event</span><span style="color:var(--ok)">Active</span></div>' +
     '<div style="display:flex;justify-content:space-between"><span style="color:var(--dim)">Profile Creation Event</span><span style="color:var(--ok)">Active</span></div>' +
     '<div style="display:flex;justify-content:space-between"><span style="color:var(--dim)">Mode Selected Event</span><span style="color:var(--ok)">Active</span></div>' +
+    '<div style="display:flex;justify-content:space-between"><span style="color:var(--dim)">Council Engaged Event</span><span style="color:var(--warn)">Pending (action ID)</span></div>' +
     '<div style="display:flex;justify-content:space-between"><span style="color:var(--dim)">CF Worker Endpoint</span><span style="color:var(--ok)">Active</span></div>' +
-    '<div style="display:flex;justify-content:space-between"><span style="color:var(--dim)">Google Ads CAPI Forwarding</span><span style="color:var(--warn)">Pending (action IDs + dev token)</span></div>' +
+    '<div style="display:flex;justify-content:space-between"><span style="color:var(--dim)">Google Ads CAPI Forwarding</span><span style="color:var(--ok)">Active</span></div>' +
     '</div>',
     ''
   );
