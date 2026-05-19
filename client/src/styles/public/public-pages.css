@@ -1165,3 +1165,185 @@
     height: 68px;
   }
 }
+
+/* ─── About page ─── */
+
+/* The platform tagline, set as a lead under the page title. */
+.pub-about-lead {
+  font-family: var(--font-content, 'Libre Caslon Text', serif);
+  font-size: var(--text-lg, 1.125rem);
+  font-style: italic;
+  line-height: 1.5;
+  color: var(--gold-subtle, #B8973A);
+  margin: 0.5rem 0 2.75rem;
+}
+
+/* Reading-page sections carry a hairline rule above each title, so the page
+   reads as a sequence of clear movements. Scoped to about and contact. */
+.pub-about .pub-section__title,
+.pub-contact .pub-section__title {
+  border-top: 1px solid var(--border-subtle, rgba(255,255,255,0.1));
+  padding-top: 1.75rem;
+}
+
+/* Values and barriers: hairline-ruled rows, a gold label beside its text. */
+.pub-about-dl {
+  margin: 0;
+  border-top: 1px solid var(--border-subtle, rgba(255,255,255,0.1));
+}
+
+.pub-about-dl__row {
+  display: grid;
+  grid-template-columns: 10rem 1fr;
+  gap: 0.3rem 1.5rem;
+  padding: 1.1rem 0;
+  border-bottom: 1px solid var(--border-subtle, rgba(255,255,255,0.1));
+}
+
+.pub-about-dl dt {
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: var(--text-sm, 0.875rem);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--gold-subtle, #B8973A);
+}
+
+.pub-about-dl dd {
+  margin: 0;
+  font-size: var(--text-base, 1rem);
+  line-height: var(--leading-relaxed, 1.6);
+  color: var(--text-secondary, rgba(255,255,255,0.8));
+}
+
+/* Mode concept card: the name and a listen/talk badge share one row. */
+.pub-concept__head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.375rem;
+}
+
+.pub-concept__head .pub-concept__term {
+  margin-bottom: 0;
+}
+
+/* A tradition group in the figures section. */
+.pub-about-group {
+  margin-bottom: 1.25rem;
+}
+
+.pub-about-group:last-child {
+  margin-bottom: 0;
+}
+
+.pub-about-group__label {
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--gold-subtle, #B8973A);
+  margin: 0 0 0.6rem;
+}
+
+.pub-about-group__figures {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.pub-about-group__figures a {
+  text-decoration: none;
+}
+
+/* Built Different: short feature statements as hairline-ruled rows. */
+.pub-about-points {
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid var(--border-subtle, rgba(255,255,255,0.1));
+}
+
+.pub-about-points p {
+  margin: 0;
+  padding: 1rem 0;
+  border-top: 1px solid var(--border-subtle, rgba(255,255,255,0.1));
+  font-size: var(--text-base, 1rem);
+  line-height: var(--leading-relaxed, 1.6);
+  color: var(--text-secondary, rgba(255,255,255,0.8));
+}
+
+/* The closing quote, a centered breather. */
+.pub-about-quote {
+  margin: 1.5rem 0 3rem;
+  text-align: center;
+}
+
+.pub-about-quote__rule {
+  width: 46px;
+  height: 1px;
+  background: var(--gold-subtle, #B8973A);
+  margin: 0 auto 2rem;
+}
+
+.pub-about-quote blockquote {
+  margin: 0 auto;
+  max-width: 32ch;
+  font-family: var(--font-content, 'Libre Caslon Text', serif);
+  font-style: italic;
+  font-size: clamp(1.3rem, 1.05rem + 1vw, 1.6rem);
+  line-height: 1.5;
+  color: var(--text-primary, #fff);
+}
+
+.pub-about-quote__cite {
+  display: block;
+  margin-top: 1.25rem;
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: 600;
+  font-style: normal;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gold-subtle, #B8973A);
+}
+
+/* ─── Contact page ─── */
+
+/* The intro line under the page title. */
+.pub-contact-intro {
+  font-size: var(--text-lg, 1.125rem);
+  line-height: var(--leading-relaxed, 1.6);
+  color: var(--text-secondary, rgba(255,255,255,0.8));
+  margin: 0.5rem 0 2.5rem;
+}
+
+.pub-contact-address {
+  font-style: normal;
+}
+
+.pub-contact-links {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.6rem;
+}
+
+/* ─── Inline gold text link (about, contact) ─── */
+.pub-textlink {
+  color: var(--gold-primary, #D4A539);
+  text-decoration: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--gold-primary) 40%, transparent);
+  transition: border-color 0.2s;
+}
+
+.pub-textlink:hover {
+  border-bottom-color: var(--gold-primary, #D4A539);
+}
+
+/* ─── About / contact responsive ─── */
+@media (max-width: 480px) {
+  .pub-about-dl__row {
+    grid-template-columns: 1fr;
+    gap: 0.25rem;
+  }
+}

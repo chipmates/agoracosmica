@@ -10,7 +10,7 @@ export default function ContactPage() {
   const { lang, t } = usePublicLang();
 
   return (
-    <div className="pub-content">
+    <div className="pub-content pub-contact">
       <MetaTags
         title={t('contact.pageTitle')}
         description={t('contact.pageDescription')}
@@ -30,7 +30,7 @@ export default function ContactPage() {
       <Breadcrumbs items={[{ label: t('breadcrumbs.contact') }]} />
 
       <h1 className="pub-hero__title">{t('contact.heading')}</h1>
-      <p className="pub-section__text" style={{ marginBottom: '2rem' }}>
+      <p className="pub-contact-intro">
         {t('contact.description')}
       </p>
 
@@ -39,7 +39,7 @@ export default function ContactPage() {
         <p className="pub-section__text">
           <a
             href="mailto:agoracosmica@chipmates.ai"
-            style={{ color: 'var(--gold-primary)', textDecoration: 'none' }}
+            className="pub-textlink"
           >
             agoracosmica@chipmates.ai
           </a>
@@ -48,7 +48,7 @@ export default function ContactPage() {
 
       <section className="pub-section">
         <h2 className="pub-section__title">{t('contact.address')}</h2>
-        <address className="pub-section__text" style={{ fontStyle: 'normal' }}>
+        <address className="pub-section__text pub-contact-address">
           ChipMates gemeinnützige GmbH<br />
           Schusterstr. 50<br />
           79098 Freiburg im Breisgau<br />
@@ -58,14 +58,14 @@ export default function ContactPage() {
 
       <section className="pub-section">
         <h2 className="pub-section__title">{t('contact.social')}</h2>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+        <div className="pub-contact-links">
           <a
             href={lang === 'de'
               ? 'https://open.spotify.com/show/5i63mEKJuCVniSIViXbEP8'
               : 'https://open.spotify.com/show/3V02q5c8NAnFD1W2kQBYzd'}
             target="_blank"
             rel="noopener noreferrer"
-            style={{ color: 'var(--gold-primary)', textDecoration: 'none' }}
+            className="pub-textlink"
           >
             Spotify - Agora Cosmica{lang === 'de' ? ' Deutsch' : ''}
           </a>
@@ -75,7 +75,7 @@ export default function ContactPage() {
               : 'https://www.youtube.com/@agoracosmica'}
             target="_blank"
             rel="noopener noreferrer"
-            style={{ color: 'var(--gold-primary)', textDecoration: 'none' }}
+            className="pub-textlink"
           >
             YouTube - Agora Cosmica{lang === 'de' ? ' Deutsch' : ''}
           </a>
@@ -85,7 +85,7 @@ export default function ContactPage() {
               : 'https://podcasts.apple.com/us/podcast/agora-cosmica/id1871505788'}
             target="_blank"
             rel="noopener noreferrer"
-            style={{ color: 'var(--gold-primary)', textDecoration: 'none' }}
+            className="pub-textlink"
           >
             Apple Podcasts - Agora Cosmica{lang === 'de' ? ' Deutsch' : ''}
           </a>
@@ -93,7 +93,7 @@ export default function ContactPage() {
             href="https://github.com/chipmates/agoracosmica"
             target="_blank"
             rel="noopener noreferrer"
-            style={{ color: 'var(--gold-primary)', textDecoration: 'none' }}
+            className="pub-textlink"
           >
             GitHub - chipmates/agoracosmica
           </a>
