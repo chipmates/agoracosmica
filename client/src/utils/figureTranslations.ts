@@ -1,5 +1,7 @@
 // src/utils/figureTranslations.ts
 
+import { mediaBaseUrl } from '../config/runtime';
+
 /**
  * Utility functions for loading figure translations
  */
@@ -76,8 +78,7 @@ export async function loadFigureTranslation(figureName: string, language: string
   
   try {
     // Fetch from R2 (was dynamic import from bundled assets)
-    const mediaBase = import.meta.env.DEV ? '' : (import.meta.env.VITE_MEDIA_BASE_URL || 'https://media.agoracosmica.org');
-    const response = await fetch(`${mediaBase}/figure-translations/${language}/${figureId}.json`);
+    const response = await fetch(`${mediaBaseUrl}/figure-translations/${language}/${figureId}.json`);
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const translation: FigureTranslation = await response.json();
     

@@ -1,4 +1,5 @@
 import { fetchWithTimeout } from './fetchWithTimeout';
+import { mediaBaseUrl } from '../config/runtime';
 
 /**
  * Media Configuration for Asset Delivery
@@ -27,7 +28,7 @@ const MEDIA_CONFIGS: Record<string, MediaConfig> = {
     useLocalAssets: true
   },
   production: {
-    baseUrl: import.meta.env.VITE_MEDIA_BASE_URL || 'https://media.agoracosmica.org',
+    baseUrl: mediaBaseUrl,
     useWorker: true,
     useLocalAssets: false
   }

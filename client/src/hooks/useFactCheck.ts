@@ -1,6 +1,7 @@
 // useFactCheck.ts - Hook to load factcheck data for figures
 import { useState, useEffect } from 'react';
 import { useDomainStore } from '../stores/domainStore';
+import { mediaBaseUrl } from '../config/runtime';
 
 // TypeScript interfaces matching the JSON schema
 export interface FactCheckStory {
@@ -172,8 +173,7 @@ export function useFactCheck(figureId: string | undefined): UseFactCheckResult {
 
       try {
         // Fetch from R2
-        const mediaBase = import.meta.env.DEV ? '' : (import.meta.env.VITE_MEDIA_BASE_URL || 'https://media.agoracosmica.org');
-        const response = await fetch(`${mediaBase}/factchecks/${dataLanguage}/${figureId}.json`);
+        const response = await fetch(`${mediaBaseUrl}/factchecks/${dataLanguage}/${figureId}.json`);
         if (!response.ok) throw new Error(`Factcheck not found: ${figureId}`);
         const data = await response.json() as FactCheck;
 

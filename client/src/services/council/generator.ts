@@ -11,6 +11,7 @@
 import { generateResponse } from '../audio/llm';
 import { generateFreeTierCouncilResponse } from '../proxy/freeTierAdapter';
 import { isSelfHost } from '../../config/deployment';
+import { mediaBaseUrl } from '../../config/runtime';
 import { loadServiceConfig, LLM_SERVICES } from '../audio/config/serviceConfig';
 import { preferencesAdapter } from '../../storage/preferencesAdapter';
 import { keyStorage } from '../storage/keyStorageService';
@@ -39,7 +40,7 @@ import { screenContent } from '../../utils/contentSafety';
 const _profileCache = new Map<string, VoiceProfile>();
 
 function _resolveMediaBase(): string {
-  return import.meta.env.DEV ? '' : (import.meta.env.VITE_MEDIA_BASE_URL || 'https://media.agoracosmica.org');
+  return mediaBaseUrl;
 }
 
 async function _fetchProfileFromPath(path: string): Promise<VoiceProfile | null> {

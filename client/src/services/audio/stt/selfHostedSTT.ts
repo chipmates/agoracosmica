@@ -3,10 +3,7 @@
 // Server runs Whisper large-v3-turbo via speaches container
 
 import { fetchWithTimeout } from '../../../utils/fetchWithTimeout';
-
-// In dev, empty base → requests go through Vite proxy (avoids mixed-content + COEP)
-// In prod, empty base → requests go through CF Worker proxy (adds auth server-side)
-const AUDIO_API_BASE = import.meta.env.DEV ? '' : (import.meta.env.VITE_AUDIO_API_URL || '');
+import { audioApiUrl as AUDIO_API_BASE } from '../../../config/runtime';
 
 interface SelfHostedSTTResult {
   text: string;

@@ -51,9 +51,7 @@ type WindowWithCache = Window & {
 // Configuration — Instructions served from R2
 // ============================================
 
-const MEDIA_BASE = import.meta.env.DEV
-  ? ''
-  : (import.meta.env.VITE_MEDIA_BASE_URL || 'https://media.agoracosmica.org');
+import { mediaBaseUrl as MEDIA_BASE } from '../../config/runtime';
 
 // In-memory cache: instructions fetched once per figure/mode, then instant
 const instructionCache: Record<string, InstructionModule> = {};

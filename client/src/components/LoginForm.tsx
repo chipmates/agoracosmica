@@ -3,10 +3,10 @@ import { useState, FormEvent, FC } from 'react';
 import { useTranslation } from '../hooks/useTranslation';
 import { preferencesIndexedDbAdapter } from '../storage/preferencesIndexedDbAdapter';
 import AvatarUpload from './AvatarUpload';
+import { mediaBaseUrl as MEDIA_BASE } from '../config/runtime';
 import './LoginForm.css';
 
 // User avatar thumbnail served from R2
-const MEDIA_BASE = import.meta.env.DEV ? '' : (import.meta.env.VITE_MEDIA_BASE_URL || 'https://media.agoracosmica.org');
 const userThumbnail = `${MEDIA_BASE}/images/figures/user/thumbnail/320.webp`;
 
 interface LoginFormProps {

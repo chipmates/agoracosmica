@@ -23,6 +23,7 @@
 // voice shift if gateway load has changed since last session).
 
 import { useDomainStore } from '../../../stores/domainStore';
+import { audioApiUrl } from '../../../config/runtime';
 
 const DEFAULT_TTL_SECONDS = 3600; // Server default per stickiness memo
 const ROLL_BEFORE_EXPIRY_SECONDS = 60; // Proactively re-mint this long before server evicts
@@ -180,14 +181,7 @@ export function newPreviewSessionId(): string {
 export function sendSessionEndBeacon(sessionId: string | null | undefined): void {
   if (!sessionId) return;
 
-  // Resolve base URL same way as selfHostedTTS.ts — empty in dev (proxied by
-  // Vite) and VITE_AUDIO_API_URL in prod (CF Worker).
-  const base =
-    (typeof import.meta !== 'undefined' && (import.meta as any).env?.DEV)
-      ? ''
-      : ((typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_AUDIO_API_URL) || '');
-
-  const url = `${base}/v1/audio/session/end`;
+  const url = `${audioApiUrl}/v1/audio/session/end`;
   const payload = JSON.stringify({ session_id: sessionId });
 
   try {

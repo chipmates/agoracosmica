@@ -34,11 +34,7 @@ interface ImageSrcSet {
   srcSet: string;
 }
 
-// Dev: relative URL (Vite proxy forwards to R2)
-// Prod: absolute URL to R2 via CF Worker
-const MEDIA_BASE = import.meta.env.DEV
-  ? ''
-  : (import.meta.env.VITE_MEDIA_BASE_URL || 'https://media.agoracosmica.org');
+import { mediaBaseUrl as MEDIA_BASE } from '../config/runtime';
 
 // Preset sizes (mirrors vite.config.mjs / process-images-for-r2.mjs)
 const FIGURE_MAIN_WIDTHS = [600, 900, 1200, 1800, 2400] as const;

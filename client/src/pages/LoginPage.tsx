@@ -12,9 +12,9 @@ import ParadisoTransition from '../components/animations/ParadisoTransition';
 import FigureController from '../components/animations/CosmicLoginTransition/FigureController';
 import { useTranslation } from '../hooks/useTranslation';
 import { Gavel, SpeakerSimpleHigh, SpeakerSimpleX, CaretDown, GithubLogo, ArrowSquareOut } from '@phosphor-icons/react';
+import { mediaBaseUrl as MEDIA_BASE } from '../config/runtime';
 
 // Music served from R2 (was bundled via vite import)
-const MEDIA_BASE = import.meta.env.DEV ? '' : (import.meta.env.VITE_MEDIA_BASE_URL || 'https://media.agoracosmica.org');
 const backgroundMusic = `${MEDIA_BASE}/images/music/music.webm`;
 
 // Window extension for loginFlashInProgress guard (was in CosmicLoginTransition)

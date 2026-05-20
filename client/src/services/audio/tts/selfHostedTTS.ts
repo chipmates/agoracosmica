@@ -4,12 +4,9 @@
 
 import { getVoiceForNormalMode } from '../voices/voiceResolver';
 import { fetchWithTimeout } from '../../../utils/fetchWithTimeout';
+import { audioApiUrl as AUDIO_API_BASE } from '../../../config/runtime';
 import type { AudioFile } from './index';
 import type { VoiceMapping } from '../voices/voiceResolver';
-
-// In dev, empty base → requests go through Vite proxy (avoids mixed-content + COEP)
-// In prod, empty base → requests go through CF Worker proxy (adds auth server-side)
-const AUDIO_API_BASE = import.meta.env.DEV ? '' : (import.meta.env.VITE_AUDIO_API_URL || '');
 
 /**
  * iOS WebKit (Safari + Chrome on iOS — both use WebKit) has known issues with

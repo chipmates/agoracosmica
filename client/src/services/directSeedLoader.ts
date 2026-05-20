@@ -5,12 +5,7 @@
  */
 
 import { Language, SeedCollection } from '../types/global';
-
-// Dev: relative URL (Vite proxy forwards to R2)
-// Prod: absolute URL to R2 via CF Worker
-const MEDIA_BASE = import.meta.env.DEV
-  ? ''
-  : (import.meta.env.VITE_MEDIA_BASE_URL || 'https://media.agoracosmica.org');
+import { mediaBaseUrl as MEDIA_BASE } from '../config/runtime';
 
 export const loadSeedsDirectly = async (figure: string, language: Language | string = 'en'): Promise<SeedCollection | null> => {
   try {
