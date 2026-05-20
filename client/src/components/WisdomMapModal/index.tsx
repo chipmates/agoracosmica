@@ -48,6 +48,7 @@ import {
   computeTier,
   type CommunityTier,
 } from '../CommunityGovernance/computeVotingPower';
+import { isSelfHost } from '../../config/deployment';
 import { useUIStore } from '../../stores/uiStore';
 import { ListBullets, Info, SealCheck, Users } from '@phosphor-icons/react';
 import type { Figure, Seed } from '../../types/global';
@@ -768,14 +769,16 @@ const WisdomMapModal: FC<WisdomMapModalProps> = ({
                   <SealCheck size={22} />
                   <span>{tString('factCheck.facts', 'Facts')}</span>
                 </button>
-                <button
-                  className="header-action-btn community-btn"
-                  onClick={() => setShowCommunity(true)}
-                  aria-label={tString('community.modalTitle', 'Community')}
-                >
-                  <Users size={22} />
-                  <span>{tString('community.modalTitle', 'Community')}</span>
-                </button>
+                {!isSelfHost && (
+                  <button
+                    className="header-action-btn community-btn"
+                    onClick={() => setShowCommunity(true)}
+                    aria-label={tString('community.modalTitle', 'Community')}
+                  >
+                    <Users size={22} />
+                    <span>{tString('community.modalTitle', 'Community')}</span>
+                  </button>
+                )}
               </div>
             }
             rightContent={
@@ -962,13 +965,15 @@ const WisdomMapModal: FC<WisdomMapModalProps> = ({
                 >
                   <SealCheck size={22} />
                 </button>
-                <button
-                  className="toolbar-btn"
-                  onClick={() => setShowCommunity(true)}
-                  aria-label={tString('community.modalTitle', 'Community')}
-                >
-                  <Users size={22} />
-                </button>
+                {!isSelfHost && (
+                  <button
+                    className="toolbar-btn"
+                    onClick={() => setShowCommunity(true)}
+                    aria-label={tString('community.modalTitle', 'Community')}
+                  >
+                    <Users size={22} />
+                  </button>
+                )}
                 <button
                   className={`toolbar-btn toolbar-info-btn ${showConstellationInfo ? 'active' : ''}`}
                   onClick={() => setShowConstellationInfo(!showConstellationInfo)}
@@ -1006,7 +1011,7 @@ const WisdomMapModal: FC<WisdomMapModalProps> = ({
       )}
 
       {/* Community governance modal */}
-      {showCommunity && (
+      {!isSelfHost && showCommunity && (
         <CommunityGovernanceModal
           isOpen={showCommunity}
           onClose={() => setShowCommunity(false)}
