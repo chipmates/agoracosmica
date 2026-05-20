@@ -12,6 +12,105 @@ No changes yet. Post-launch development tracks here.
 
 ---
 
+## [1.0.1] - 2026-05-20
+
+Two weeks of polish, analytics groundwork, and the start of self-host plumbing.
+
+### Added
+
+**Marketing analytics**
+- Passive page-arrival, entry-transition, and content-completion beacons.
+- Started/completed split on the playback beacon.
+- Marketing source and country attribution captured from URL params on all landing routes, persisted across sessions.
+- /sp shortcut routes for Spotify campaign URLs.
+- A/B Spotify shortlinks for Phase 4 attribution.
+
+**Conversion tracking**
+- Google Ads conversion forwarding from the llm-proxy worker, wrapped in waitUntil for reliable delivery.
+- Profile Creation, Session-over-60s, and Council Engaged events wired into the public funnel.
+- Council Engaged scoped to the Grants account via a typed event map.
+- Conversion values read from wrangler secrets, not hardcoded.
+- Agora Cosmica organization entity added to JSON-LD with sameAs links.
+
+**Figure trailers and learn lines**
+- Per-figure trailer audio player on figure detail pages.
+- Golden learn line on figure cards, prerender, figure carousel, and wisdom gallery.
+- New learn field in the public figure catalog.
+- Figure choice carried from public pages into the app, including through the navbar CTA.
+
+**Theme detail rebuild**
+- Council hero with cast portraits, theme-accent question bar, and audio preview button.
+- Sticky CTA deep-links into the featured debate.
+- Per-debate rows are now clickable deep-links into their council.
+- Theme catalog cards lead with the question.
+- 16 council audio previews (8 EN, 8 DE) hosted on R2.
+
+**Stats dashboard**
+- Five-tab restructure with four Marketing sections and funnel charts.
+- Conversion panels including Council Engaged.
+- Content Consumption section in the Product tab.
+- Batch query limit raised from 30 to 64.
+- Per-row aggregation so duplicate labels merge.
+
+**Self-host build mode (preview)**
+- Build flag and deployment config for BYOK-only, no-Workers builds.
+- Onboarding gated behind BYOK key setup.
+- Free-tier UI, Community panel, and analytics beacons hidden in self-host builds.
+- Turnstile skipped, LLM calls routed through BYOK only.
+- Copy variants for BYOK and voting power.
+
+### Changed
+
+**Public pages**
+- Figure detail page rebuilt around the editorial template.
+- Theme detail page rebuilt; intro essays revised in EN and DE.
+- /about and /contact pages revised.
+- Public page title enlarged. Navigation now resets scroll to top.
+
+**Login**
+- Header restructured with intro copy.
+- Attribution trimmed to fit the viewport.
+
+**Polish**
+- Menu trigger moved to top-left, long figure names shortened.
+- Brand trust line sharpened to "No User Tracking" / "Kein Nutzer-Tracking".
+- Custom councils render 5% slower for readability.
+- Star Seeds vocabulary and DE mode labels translated.
+- Favicon switched to a filled navy disc with gold ring. Mask-icon split off.
+
+**Tooling and code health**
+- noUnusedLocals + noUnusedParameters enforced in tsconfig.
+- Dead branches, redundant guards, and unused locals removed across client/src.
+- streamFilter TransformStream annotated as a CodeQL false positive.
+- tsc type-clean: fetchPriority casing, PBKDF2 salt type.
+- JWT auto-refresh removed from sessionManager.
+
+### Fixed
+
+- Silent foreword audio on iOS Safari.
+- Public page scrolling on iOS Safari.
+- Turnstile state stale after bfcache restore and after more than five minutes hidden.
+- Turnstile container display reset before re-render.
+- Favicon SVG corners filled with navy to stop white compositing.
+- Playback and TTS counts filtered so cross-tab totals match.
+- noscript hrefs aligned to the canonical trailing-slash form.
+- Portrait top anchored so heads survive Chrome's lazy-load crop.
+- Seed-name slot reserved when hidden in Freetalk.
+- Council audio stops when the player is closed.
+- New conversation bubble pushed per user message, with the user-merge branch dropped.
+- Two factual errors in theme essays corrected.
+- Overview tab index drift and voice metric framing.
+- MiniPlayer imageKey fallback chain.
+- Per-gender cap removed from custom council figures.
+- Build chain fetches CDN content before extracting catalog entries (previously fell back to figure ids as display names on prerendered pages).
+
+### Security
+
+- console.log stripped from production builds.
+- CodeQL findings addressed: dead branches, redundant guards, false-positive annotation.
+
+---
+
 ## [1.0.0] - 2026-05-06
 
 Initial public release. Live at 07:18 CEST (05:18 UTC).
@@ -60,5 +159,6 @@ Initial public release. Live at 07:18 CEST (05:18 UTC).
 
 ---
 
-[Unreleased]: https://github.com/chipmates/agoracosmica/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/chipmates/agoracosmica/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/chipmates/agoracosmica/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/chipmates/agoracosmica/releases/tag/v1.0.0
