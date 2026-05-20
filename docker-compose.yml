@@ -1,0 +1,34 @@
+# Agora Cosmica self-host.
+#
+# Quickstart:
+#   1. cp .env.example .env       (edit values you want to override)
+#   2. docker compose up -d
+#   3. open http://localhost:8080
+#
+# By default the app pulls a prebuilt image from GHCR. To build from source
+# instead, comment the `image:` line and uncomment the `build:` block below.
+
+services:
+  app:
+    image: ghcr.io/chipmates/agoracosmica:latest
+    # build:
+    #   context: ./client
+    #   dockerfile: Dockerfile
+    container_name: agoracosmica
+    restart: unless-stopped
+    ports:
+      - "${AGORA_HOST_PORT:-8080}:8080"
+    environment:
+      AGORA_MEDIA_BASE_URL: ${AGORA_MEDIA_BASE_URL:-https://media.agoracosmica.org}
+      AGORA_AUDIO_API_URL: ${AGORA_AUDIO_API_URL:-}
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1:8080/healthz"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    # Optional same-origin media mirror. Drop a content tree into ./media/
+    # and set AGORA_MEDIA_BASE_URL=/media to serve the catalog from your own
+    # box instead of the public CDN.
+    # volumes:
+    #   - ./media:/usr/share/nginx/html/media:ro

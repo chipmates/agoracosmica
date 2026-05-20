@@ -1,34 +1,56 @@
-# Build stage
-FROM node:20-alpine AS build
+# Multi-stage build for Agora Cosmica self-host.
+# Build stage installs deps + builds the React app with VITE_SELF_HOST=true,
+# fetching content assets from the public CDN as part of `pnpm build`.
+# Runtime stage is unprivileged nginx serving the static output on 8080.
 
-# Use the pnpm version pinned in package.json's "packageManager" field
-RUN corepack enable
+# --- Build stage -----------------------------------------------------------
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Copy lockfile and manifest first for layer caching
-COPY package.json pnpm-lock.yaml ./
+# Enable pnpm via corepack (version is pinned by package.json packageManager)
+RUN corepack enable
 
-# Install with frozen lockfile for reproducible builds
+# Layer cache: install deps before copying the rest of the source
+COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
 
-# Copy source code
+# Source last so edits do not bust the install layer
 COPY . .
 
-# Build the React app (vite outDir = 'build')
+# Build in self-host mode. The build chain runs setup-assets (fetches content
+# from media.agoracosmica.org), then extract-public-data, then vite build,
+# then prerender + sitemap.
+ENV VITE_SELF_HOST=true
 RUN pnpm run build
 
-# Production stage
-FROM nginx:alpine
+# --- Runtime stage ---------------------------------------------------------
+FROM nginxinc/nginx-unprivileged:1.27-alpine
 
-# Copy built assets from build stage
-COPY --from=build /app/build /usr/share/nginx/html
+LABEL org.opencontainers.image.title="Agora Cosmica" \
+      org.opencontainers.image.description="Self-hosted Agora Cosmica web app (AGPL-3.0)" \
+      org.opencontainers.image.source="https://github.com/chipmates/agoracosmica" \
+      org.opencontainers.image.licenses="AGPL-3.0-or-later" \
+      org.opencontainers.image.vendor="ChipMates gemeinnützige GmbH"
 
-# Add your custom nginx.conf
+# Copy nginx config (replaces the default site)
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Expose port 80
-EXPOSE 80
+# Copy the built static site
+COPY --from=builder /app/build /usr/share/nginx/html
 
-# Start Nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Entrypoint generates /usr/share/nginx/html/config.js from container env at
+# startup so one image works for every operator without a rebuild. Scripts
+# placed in /docker-entrypoint.d/ run before nginx execs (per the base image).
+COPY docker-entrypoint.sh /docker-entrypoint.d/00-agora-config.sh
+
+# nginx-unprivileged ships with USER 101 (nginx). The /docker-entrypoint.d/
+# scripts run as root before the final nginx process drops back to 101.
+USER root
+RUN chmod +x /docker-entrypoint.d/00-agora-config.sh
+USER 101
+
+EXPOSE 8080
+
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD wget -q -O - http://127.0.0.1:8080/healthz || exit 1

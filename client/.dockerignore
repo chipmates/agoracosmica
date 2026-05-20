@@ -1,8 +1,36 @@
+# Build artifacts and caches
 node_modules
-npm-debug.log
-pnpm-debug.log
 build
-.git/
-.DS_Store
-node_modules
+dist
+.cache
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Local dev state
 .env
+.env.local
+.env.*.local
+.vite
+.wrangler
+
+# Source control + IDE
+.git
+.gitignore
+.DS_Store
+.idea
+.vscode
+.claude
+
+# Tests + docs that do not need to enter the build context
+tests
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/*.spec.tsx
+coverage
+
+# Docker meta (no point copying into the build context)
+Dockerfile
+.dockerignore
+docker-compose.yml
