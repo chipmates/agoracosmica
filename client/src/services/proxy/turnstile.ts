@@ -1,6 +1,8 @@
 // Cloudflare Turnstile — bot protection for free-tier sessions
 // Renders a managed challenge, returns a token for session creation
 
+import { isSelfHost } from '../../config/deployment';
+
 const TURNSTILE_SCRIPT_URL = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
 // 30s, not 15s: mobile Safari resuming from bfcache or a long backgrounded tab
 // often needs more than 15s for the cross-origin iframe to wake up enough to
@@ -119,6 +121,10 @@ function loadTurnstileScript(): Promise<void> {
  * Includes a timeout so the app never hangs if the challenge fails silently.
  */
 export async function getTurnstileToken(): Promise<string> {
+  if (isSelfHost) {
+    throw new Error('Turnstile is not used in self-host builds');
+  }
+
   const siteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY;
   if (!siteKey) {
     if (import.meta.env.DEV) {
