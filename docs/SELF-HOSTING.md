@@ -1,185 +1,125 @@
 # Self-Hosting Guide
 
-This guide covers running your own instance of Agora Cosmica.
+Run your own Agora Cosmica instance in five minutes with Docker.
 
----
-
-## Quick Start (Frontend Only)
-
-The simplest setup: run the web app locally with the free tier or your own OpenRouter key.
+## Quickstart
 
 ```bash
 git clone https://github.com/chipmates/agoracosmica.git
-cd agoracosmica/client
-pnpm install
-pnpm setup:assets    # download content (~30 MB) from media.agoracosmica.org
-pnpm dev
+cd agoracosmica
+docker compose up -d
 ```
 
-Open [localhost:5173](http://localhost:5173). The app works immediately with the free tier (30 messages/day). For unlimited conversations, add your [OpenRouter](https://openrouter.ai) API key in Settings.
+Open [localhost:8080](http://localhost:8080). On first run, paste your [OpenRouter](https://openrouter.ai/keys) API key into the prompt and you're chatting.
 
-**Requirements:** Node.js 20+, pnpm 8+
-
-### About `setup:assets`
-
-The repository ships the application code (AGPL-3.0). Content (wisdom teachings, factchecks, voice profiles, instructions, figure descriptions) is licensed separately and not bundled in the repo. The setup script fetches it from the production CDN at `media.agoracosmica.org`.
-
-If you want to host an instance with your own content, override the source:
-
-```bash
-AGORACOSMICA_CDN=https://your-cdn.example.com pnpm setup:assets
-```
-
-The script expects the same URL layout as the upstream CDN: `seeds/{en,de}/`, `figure-translations/{en,de}/`, `factchecks/{en,de}/`, `voice-profiles/{en,de}/`, `instructions/<figure>/`. See [CONTENT-LICENSE.md](../CONTENT-LICENSE.md) for licensing.
+**Requirements:** Docker 24+ (Docker Desktop on Mac/Windows, or Docker Engine on Linux). No GPU needed for the v1 image.
 
 ---
 
-## Production Build
+## What works out of the box
 
-```bash
-cd client
-pnpm build
-```
+| Feature | Status |
+|---|---|
+| Six modes: Story, Wisdom, Prism, Quest, Free Talk, Council | Works |
+| 30 historical figures, 360 wisdom teachings | Works |
+| 360 narrative stories, 360 prism dialogues, 110 council debates | Works |
+| Pre-recorded audio (figure trailers, story narration, council previews) | Works |
+| BYOK chat via OpenRouter (browser to OpenRouter direct, no proxy) | Works |
+| Bilingual English and German | Works |
+| Live voice input (microphone to text) | Disabled, needs your own GPU server |
+| Live voice output (text to speech) | Disabled, needs your own GPU server |
+| Free tier (30 messages a day) | N/A, BYOK only in self-host |
+| Community Governance panel | Hidden, single-user instance |
 
-The `build/` directory contains static files that can be served by any web server (nginx, Caddy, Cloudflare Pages, Vercel, Netlify, etc.).
-
-### Example: nginx
-
-```nginx
-server {
-    listen 80;
-    server_name your-domain.org;
-    root /var/www/agoracosmica/build;
-    index index.html;
-
-    location / {
-        try_files $uri $uri/ /index.html;
-    }
-
-    # Cache static assets
-    location /assets/ {
-        expires 1y;
-        add_header Cache-Control "public, immutable";
-    }
-}
-```
+Live voice is the only meaningful gap. The microphone button and live-TTS controls hide cleanly when no audio backend is configured. Pre-recorded narration, council previews, and figure trailers all keep playing.
 
 ---
 
-## Full Stack (With Audio)
+## Configuration
 
-For a complete self-hosted setup including text-to-speech and speech-to-text, you need:
-
-### 1. Frontend (Cloudflare Pages or any static hosting)
+Copy `.env.example` to `.env`:
 
 ```bash
-cd client
-pnpm build
-# Deploy build/ to your hosting provider
+cp .env.example .env
 ```
 
-### 2. LLM Proxy Worker (`workers/llm-proxy/`)
+The defaults work out of the box. The settings you may want to change:
 
-Handles rate limiting, content safety screening, and routing to either OpenRouter (BYOK) or Nebius (free tier).
+| Variable | Default | What it does |
+|---|---|---|
+| `AGORA_HOST_PORT` | `8080` | Host-side port. The container always listens on 8080 inside. |
+| `AGORA_MEDIA_BASE_URL` | `https://media.agoracosmica.org` | Content CDN. The default points at ChipMates' open R2 bucket. |
+| `AGORA_AUDIO_API_URL` | (empty) | Live audio backend. Leave empty unless you operate your own GPU TTS server. |
 
-```bash
-cd workers/llm-proxy
-pnpm install
-# Configure wrangler.toml with your KV namespaces and secrets
-npx wrangler deploy
+After editing `.env`, restart with `docker compose up -d`. The container rewrites `/config.js` from these env vars on every start, so no rebuild is needed.
+
+### Same-origin content mirror
+
+To serve content from your own box instead of the upstream CDN (offline-capable, single-origin), mirror the content tree into a local directory and mount it:
+
+```yaml
+# docker-compose.yml
+services:
+  app:
+    # ...
+    volumes:
+      - ./media:/usr/share/nginx/html/media:ro
 ```
 
-**Required secrets:**
-- `NEBIUS_API_KEY` (for free tier)
-- `TURNSTILE_SECRET_KEY` (for bot protection)
-- `JWT_SECRET` (for session tokens)
+Then set `AGORA_MEDIA_BASE_URL=/media` in `.env` and populate `./media/` matching the upstream layout: `seeds/{en,de}/`, `figure-translations/{en,de}/`, `factchecks/{en,de}/`, `voice-profiles/{en,de}/`, `instructions/<figure>/`, plus `images/`, `stories/`, `trailers/`, etc.
 
-### 3. Audio Proxy Worker (`workers/audio-proxy/`)
+### Custom content domain
 
-Routes TTS/STT requests to your GPU servers with failover support and edge auth.
-
-```bash
-cd workers/audio-proxy
-pnpm install
-# Configure wrangler.toml
-npx wrangler deploy
-```
-
-**Required secrets:**
-- `X_ORIGIN_VERIFY` (Worker-stamped header for origin auth, see SECURITY-ARCHITECTURE.md)
-- `AUDIO_API_KEY` (bearer for GPU server)
-
-### 4. Pre-recorded Media (Cloudflare R2 + custom domain)
-
-Stories, councils, prism dialogues, and forewords are served as static audio from an R2 bucket. No worker needed — point a custom domain at the R2 bucket.
-
-```bash
-# 1. Create an R2 bucket
-npx wrangler r2 bucket create agora-cosmica
-# 2. In the Cloudflare dashboard: R2 → your bucket → Settings → connect custom domain
-# 3. Upload pre-recorded audio (stories, councils, prisms) to matching paths
-```
-
-### 5. (Optional) Community + Stats Workers
-
-If you want the in-app voting / co-sign panel and the internal analytics dashboard:
-
-- `workers/community/` — anonymous voting-power tally (deploy if you run a multi-user instance)
-- `workers/stats/` — operator-only dashboard (gate behind Cloudflare Access)
-
-### 6. TTS/STT Server (GPU Required)
-
-The audio servers run Kokoro TTS and Faster-Whisper STT. You need a machine with an NVIDIA GPU (RTX 4090 or better recommended, 24GB+ VRAM).
-
-We use Hetzner GEX130 servers (RTX 6000 Ada, 48GB VRAM) located in Germany. Any NVIDIA GPU server will work.
-
-**Stack:**
-- Kokoro TTS (20 voices, WebM/Opus output)
-- Faster-Whisper STT (large-v3 model)
-- nginx reverse proxy with TLS
-- Bearer token authentication
-
-Detailed audio server setup documentation is planned for post-v1.
+If you point the app at a content domain that is not `*.agoracosmica.org`, update the Content-Security-Policy in `client/index.html` to allow your origin in `img-src`, `media-src`, and `connect-src`, then rebuild from source (see below). The default CSP already allows `*.agoracosmica.org`, so the upstream CDN works without changes.
 
 ---
 
-## Environment Variables
+## Build from source
 
-The frontend uses no server-side environment variables. All configuration happens client-side:
+The default `docker-compose.yml` pulls a prebuilt image from GHCR. To build locally instead, edit `docker-compose.yml` so the `image:` line is commented and the `build:` block is uncommented:
 
-| Setting | Where | Description |
-|---------|-------|-------------|
-| OpenRouter API Key | App Settings | User's own key, encrypted with AES-256-GCM, stored in IndexedDB |
-| Language | App Settings | EN or DE |
-| Audio Endpoints | Built-in | Configured at build time |
+```yaml
+services:
+  app:
+    # image: ghcr.io/chipmates/agoracosmica:latest
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+```
+
+Then:
+
+```bash
+docker compose up --build -d
+```
+
+First build takes 2 to 3 minutes (pnpm install, pnpm build, a one-time content fetch from the CDN into the build context).
 
 ---
 
-## Architecture Notes
+## Content licensing
 
-- **No database required.** All user data is stored client-side in IndexedDB.
-- **No server-side state.** The Cloudflare Workers are stateless proxies.
-- **No user accounts.** There is no authentication system. BYOK keys are stored locally.
-- **Media is static.** All pre-recorded audio lives in R2 and is served via CDN.
-
-This means self-hosting is primarily about deploying static files and configuring the proxy workers. The heaviest infrastructure component is the GPU server for live audio.
+The code is **[AGPL-3.0](../LICENSE)** — fork freely, copyleft applies to network deployments. The content (stories, prism dialogues, council debates, factchecks, voice profiles, images, audio) is **© ChipMates gemeinnützige GmbH** at launch, transitioning to **CC-BY 4.0 within 6 to 12 months**. See [CONTENT-LICENSE.md](../CONTENT-LICENSE.md) for the full terms. The default self-host config pulls the same content the public app uses; you can also bring your own.
 
 ---
 
-## Cost Estimates
+## Live voice (post-v1)
 
-| Component | Monthly Cost | Notes |
-|-----------|-------------|-------|
-| Cloudflare Pages | Free | Static hosting |
-| Cloudflare Workers | Free (100K req/day) | Proxy layer |
-| Cloudflare R2 | ~$1-5 | Media storage (~10GB at $0.015/GB plus operations) |
-| GPU Server | $200-600 | Depends on provider and GPU |
-| Nebius API | Usage-based | Only if offering free tier |
+Live text-to-speech and speech-to-text need a GPU. The v1 self-host image ships without them on purpose: the GPU server stack is non-trivial (Kokoro TTS, F5-TTS, Qwen3-TTS, Faster-Whisper, nginx reverse proxy with TLS, bearer auth, failover routing) and is a separate post-v1 effort.
 
-A minimal self-hosted setup (frontend + BYOK, no free tier, no audio) costs $0/month.
+If you already operate an audio backend that speaks the OpenAI-compatible `/v1/audio/speech` and `/v1/audio/transcriptions` endpoints, set `AGORA_AUDIO_API_URL=https://your-audio.example.com` in `.env` and live voice unhides itself.
+
+---
+
+## Architecture notes
+
+- **No database.** Chats, settings, completion progress, and voting power all live in IndexedDB inside your browser.
+- **No server-side state.** The container is stateless: pull, run, restart, no migrations, no data dir to back up.
+- **No accounts.** BYOK keys are stored client-side, encrypted with AES-256-GCM.
+- **No telemetry.** Self-host disables every analytics, page-view, session, ad-attribution, and conversion beacon. The container talks to OpenRouter (your BYOK key, browser-direct) and the content CDN you configure. Nothing else.
 
 ---
 
 ## Questions?
 
-Open a [GitHub Discussion](https://github.com/chipmates/agoracosmica/discussions) or read the [Security architecture](SECURITY-ARCHITECTURE.md) and [README architecture overview](../README.md#architecture) for technical detail.
+Open a [GitHub Discussion](https://github.com/chipmates/agoracosmica/discussions) or file an issue. For security reports, see [SECURITY.md](../SECURITY.md).

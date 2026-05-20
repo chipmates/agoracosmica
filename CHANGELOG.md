@@ -8,7 +8,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
-No changes yet. Post-launch development tracks here.
+### Added
+
+- **Docker self-host.** `docker compose up` from the repo root brings up a working instance in five minutes: BYOK chat, all six modes, the full pre-recorded audio catalog, both languages. The image is BYOK-only (no free tier), runs no Cloudflare Workers, and hides live voice and the Community Governance panel cleanly. See [SELF-HOSTING.md](docs/SELF-HOSTING.md).
+- **`VITE_SELF_HOST` build flag.** Self-host build path: required BYOK key gate on first run, free-tier UI hidden, LLM routing forced to BYOK, Turnstile skipped, live TTS/STT disabled (pre-recorded audio still works), analytics and ad-attribution beacons silenced, Community Governance panel hidden, copy variants for BYOK setup and voting power that drop the "free tier" framing. The hosted build at agoracosmica.org is unchanged.
+- **Runtime configuration layer.** New `src/config/runtime.ts` reads `window.__AGORA_CONFIG__` (written by `/config.js` at container start) → `import.meta.env.VITE_*` → hardcoded default. One published image works for any operator with no rebuild.
+
+### Changed
+
+- **Dockerfile, .dockerignore, nginx.conf.** Multi-stage build (`node:20-alpine` builder → `nginxinc/nginx-unprivileged:1.27-alpine` runtime on port 8080), OCI labels, HEALTHCHECK against `/healthz`, server-scope security headers, `expires`-based cache control, optional `/media` location for same-origin content mirrors.
 
 ---
 

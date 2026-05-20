@@ -15,6 +15,7 @@
   <a href="docs/ACCESSIBILITY.md"><img src="https://img.shields.io/badge/WCAG-2.2%20AA-green?style=flat-square" alt="WCAG 2.2 AA" /></a>
   <a href="docs/COMPLIANCE.md"><img src="https://img.shields.io/badge/EU-Compliant-blue?style=flat-square" alt="EU Compliant" /></a>
   <a href="https://securityheaders.com/?q=https%3A%2F%2Fagoracosmica.org&followRedirects=on"><img src="https://img.shields.io/badge/Security%20Headers-A%2B-brightgreen?style=flat-square" alt="Security Headers: A+" /></a>
+  <a href="docs/SELF-HOSTING.md"><img src="https://img.shields.io/badge/Self--host-Docker-2496ED?style=flat-square&logo=docker&logoColor=white" alt="Self-host with Docker" /></a>
 </p>
 
 <p align="center">
@@ -78,7 +79,7 @@ Most people just visit **[agoracosmica.org](https://agoracosmica.org)**: free, n
 
 **Two licenses, one project.** Code is **[AGPL-3.0](LICENSE)** (fork freely, copyleft applies to public network deployments). Content (stories, voices, factchecks, artwork) is **© ChipMates gemeinnützige GmbH** at launch, transitioning to **CC-BY 4.0 within 6 to 12 months**. See [CONTENT-LICENSE.md](CONTENT-LICENSE.md) for full terms.
 
-**Schools and universities** are welcome to use Agora Cosmica with their students. For **self-hosting on your own infrastructure**, please email **agoracosmica@chipmates.ai** first.
+**Schools and universities** are welcome to use Agora Cosmica with their students. For **self-hosting on your own infrastructure**, `docker compose up` and you're running — see [SELF-HOSTING.md](docs/SELF-HOSTING.md) for the five-minute guide.
 
 ---
 
