@@ -79,16 +79,22 @@ const SCOPED_EVENTS: Partial<Record<ConversionEvent, AccountKey[]>> = {
   council_engaged: ['grants'],
 };
 
-// Conversion values per partner-side recommendations.
-// Asymmetric so the algorithm chases real signups over shallow engagement
-// once Max Conv Value bidding is enabled (initial phase is Max Conversions;
-// values still recorded for later reporting + the bidding switch).
-const VALUES: Record<ConversionEvent, number> = {
-  profile_created: 15,
-  start_exploring: 1,
-  mode_selected: 4,
-  council_engaged: 4,
-};
+// Conversion values are read at runtime from wrangler secrets (env.VALUE_*),
+// not hardcoded — the worker is in a public AGPL repo and the per-event
+// dollar weights are business signal. Values are asymmetric on purpose so
+// Max Conv Value bidding chases real signups over shallow engagement; the
+// exact numbers live in secrets, not here.
+//
+// When a secret is unset, the worker forwards conversion_value: 0. Google Ads
+// accepts a zero value but won't use it for value-based bidding, so an unset
+// secret degrades gracefully into Max Conversions instead of breaking.
+function conversionValue(env: Env, event: ConversionEvent): number {
+  const key = `VALUE_${event.toUpperCase()}` as keyof Env;
+  const raw = env[key];
+  if (typeof raw !== 'string') return 0;
+  const n = parseFloat(raw);
+  return Number.isFinite(n) && n >= 0 ? n : 0;
+}
 
 const API_VERSION = 'v24';
 const OAUTH_TOKEN_URL = 'https://oauth2.googleapis.com/token';
@@ -219,7 +225,7 @@ async function uploadToAccount(
     gclid: input.gclid,
     conversion_action: `customers/${customerId}/conversionActions/${actionId}`,
     conversion_date_time: formatGoogleAdsTimestamp(input.timestamp),
-    conversion_value: VALUES[input.event],
+    conversion_value: conversionValue(env, input.event),
     currency_code: account.currency,
     order_id: `${input.gclid}:${input.event}`, // Server-side dedup key
   };

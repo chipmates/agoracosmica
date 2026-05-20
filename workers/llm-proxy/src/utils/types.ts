@@ -22,6 +22,14 @@ export interface Env {
   GOOGLE_ADS_OAUTH_CLIENT_SECRET?: string;
   GOOGLE_ADS_OAUTH_REFRESH_TOKEN?: string;
   GOOGLE_ADS_LOGIN_CUSTOMER_ID?: string; // MCC customer ID for the login-customer-id header, digits only, no dashes
+
+  // Per-event conversion values. Stored as wrangler secrets, never in the
+  // public repo. When unset, the worker forwards conversion_value: 0 which
+  // Google Ads accepts but won't use for value-based bidding.
+  VALUE_PROFILE_CREATED?: string;
+  VALUE_START_EXPLORING?: string;
+  VALUE_MODE_SELECTED?: string;
+  VALUE_COUNCIL_ENGAGED?: string;
 }
 
 export interface ChatRequest {
