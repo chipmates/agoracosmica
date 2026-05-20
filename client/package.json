@@ -35,7 +35,7 @@
   "scripts": {
     "dev": "vite",
     "start": "vite",
-    "build": "node scripts/extract-public-data.mjs && vite build && node scripts/prerender.mjs && node scripts/generate-sitemap.mjs",
+    "build": "node scripts/setup-assets.mjs && node scripts/extract-public-data.mjs && vite build && node scripts/prerender.mjs && node scripts/generate-sitemap.mjs",
     "build:extract": "node scripts/extract-public-data.mjs",
     "build:client": "vite build",
     "build:prerender": "node scripts/prerender.mjs && node scripts/generate-sitemap.mjs",
