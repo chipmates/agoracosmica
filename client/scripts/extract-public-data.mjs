@@ -16,6 +16,14 @@ const OUTPUT_DIR = join(CLIENT_DIR, 'src/data/public');
 
 const LANGUAGES = ['en', 'de'];
 
+// Self-host build skips all licensed text content (bios, learn lines, seed
+// summaries, story hooks, theme cross-refs, voice essences). The catalog
+// shape is preserved with empty values so the SPA still type-checks; the
+// runtime fetches anything substantive from the operator's mediaBaseUrl.
+// Names and built-in tradition labels stay because they are well-known
+// public-domain identifiers, not authored content.
+const SELF_HOST = process.env.VITE_SELF_HOST === 'true';
+
 const FIGURE_IDS = [
   'laozi', 'angelou', 'austen', 'aurelius', 'beauvoir', 'bingen',
   'campbell', 'zenji', 'dickinson', 'einstein', 'eckhart', 'galilei',
@@ -103,6 +111,21 @@ function wordCount(text) {
 // ─── Seeds Extraction ───
 
 function extractSeedSummary(seed) {
+  if (SELF_HOST) {
+    // Keep id + title (titles are seed identifiers, used as navigation
+    // labels). Strip every authored field: summary, quote, concept,
+    // coreInsights, connection annotations.
+    return {
+      id: seed.id,
+      title: seed.title,
+      summary: '',
+      quote: '',
+      tags: [],
+      concept: '',
+      coreInsights: [],
+      connections: [],
+    };
+  }
   return {
     id: seed.id,
     title: seed.title,
@@ -223,55 +246,66 @@ function buildThemeCrossRef() {
   console.log('Building theme-seed cross-references...');
   const crossRef = {};
 
-  // Collect all seeds with their tags
-  const allSeeds = [];
-  for (const id of FIGURE_IDS) {
-    for (const lang of LANGUAGES) {
-      const data = readJson(join(SEEDS_DIR, lang, `${id}-seeds.json`));
-      if (!data?.seeds) continue;
-      for (const seed of data.seeds) {
-        allSeeds.push({
-          figureId: id,
-          figureName: data.figure,
-          lang,
-          seedId: seed.id,
-          title: seed.title,
-          quote: seed.quote || '',
-          tags: seed.tags || [],
-        });
+  if (SELF_HOST) {
+    // Theme cross-refs surface seed titles + quotes per theme to drive the
+    // public theme landing pages. In self-host these pages exist as routes
+    // but render empty. Emit empty arrays for every theme so the bundled
+    // structure stays a valid Record<theme, Record<lang, ThemeSeedMatch[]>>.
+    for (const themeId of Object.keys(THEME_KEYWORDS)) {
+      crossRef[themeId] = {};
+      for (const lang of LANGUAGES) crossRef[themeId][lang] = [];
+    }
+  } else {
+    // Collect all seeds with their tags
+    const allSeeds = [];
+    for (const id of FIGURE_IDS) {
+      for (const lang of LANGUAGES) {
+        const data = readJson(join(SEEDS_DIR, lang, `${id}-seeds.json`));
+        if (!data?.seeds) continue;
+        for (const seed of data.seeds) {
+          allSeeds.push({
+            figureId: id,
+            figureName: data.figure,
+            lang,
+            seedId: seed.id,
+            title: seed.title,
+            quote: seed.quote || '',
+            tags: seed.tags || [],
+          });
+        }
       }
     }
-  }
 
-  for (const [themeId, keywords] of Object.entries(THEME_KEYWORDS)) {
-    crossRef[themeId] = {};
-    for (const lang of LANGUAGES) {
-      const langSeeds = allSeeds.filter(s => s.lang === lang);
-      // Score each seed by tag overlap with theme keywords
-      const scored = langSeeds.map(s => {
-        const overlap = s.tags.filter(t =>
-          keywords.some(k => t.toLowerCase().includes(k))
-        ).length;
-        return { ...s, overlap };
-      }).filter(s => s.overlap > 0);
+    for (const [themeId, keywords] of Object.entries(THEME_KEYWORDS)) {
+      crossRef[themeId] = {};
+      for (const lang of LANGUAGES) {
+        const langSeeds = allSeeds.filter(s => s.lang === lang);
+        // Score each seed by tag overlap with theme keywords
+        const scored = langSeeds.map(s => {
+          const overlap = s.tags.filter(t =>
+            keywords.some(k => t.toLowerCase().includes(k))
+          ).length;
+          return { ...s, overlap };
+        }).filter(s => s.overlap > 0);
 
-      // Sort by overlap, deduplicate by figure (one best seed per figure)
-      scored.sort((a, b) => b.overlap - a.overlap);
-      const seen = new Set();
-      const best = [];
-      for (const s of scored) {
-        if (seen.has(s.figureId)) continue;
-        seen.add(s.figureId);
-        best.push({
-          figureId: s.figureId,
-          figureName: s.figureName,
-          seedTitle: s.title,
-          quote: s.quote.slice(0, 200),
-          overlap: s.overlap,
-        });
-        if (best.length >= 8) break;
+        // Sort by overlap, deduplicate by figure (one best seed per figure)
+        scored.sort((a, b) => b.overlap - a.overlap);
+        const seen = new Set();
+        const best = [];
+        for (const s of scored) {
+          if (seen.has(s.figureId)) continue;
+          seen.add(s.figureId);
+          best.push({
+            figureId: s.figureId,
+            figureName: s.figureName,
+            seedTitle: s.title,
+            quote: s.quote.slice(0, 200),
+            overlap: s.overlap,
+          });
+          if (best.length >= 8) break;
+        }
+        crossRef[themeId][lang] = best;
       }
-      crossRef[themeId][lang] = best;
     }
   }
 
@@ -332,7 +366,24 @@ function buildFiguresCatalog(tagsByFigure) {
           }))
         : voiceExcerpt?.keyConcepts || [];
 
-      catalog[lang].push({
+      // Self-host strips authored fields and keeps only the identifiers
+      // needed to render a catalog row: id, name, short tradition label
+      // (hardcoded in this script, not licensed content). The runtime
+      // resolves bios/learn lines/essence from the operator's mediaBaseUrl
+      // when the operator wants to surface them.
+      const entry = SELF_HOST ? {
+        id,
+        name,
+        about: '',
+        learn: '',
+        tradition: SHORT_TRADITIONS[id]?.[lang] || '',
+        category: '',
+        period: '',
+        essence: '',
+        keyConcepts: [],
+        primaryWorks: [],
+        topTags: [],
+      } : {
         id,
         name,
         about: figTrans?.about || '',
@@ -346,7 +397,8 @@ function buildFiguresCatalog(tagsByFigure) {
         keyConcepts: langKeyConcepts,
         primaryWorks: lang === 'de' ? [] : (voiceExcerpt?.primaryWorks || []),
         topTags: tagsByFigure[lang]?.[id] || [],
-      });
+      };
+      catalog[lang].push(entry);
     }
   }
 

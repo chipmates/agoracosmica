@@ -20,11 +20,16 @@ RUN pnpm install --frozen-lockfile
 # Source last so edits do not bust the install layer
 COPY . .
 
-# Build in self-host mode. The build chain runs setup-assets (fetches content
-# from media.agoracosmica.org), then extract-public-data, then vite build,
-# then prerender + sitemap.
+# Build in self-host mode. `build:self-host` runs setup-assets (fetches
+# JSON metadata from media.agoracosmica.org) and extract-public-data, then
+# vite build. extract-public-data sees VITE_SELF_HOST=true and emits the
+# figuresCatalog, theme cross-refs, and per-figure seed summaries with the
+# authored text stripped (no bios, no learn lines, no quotes, no essences).
+# The SEO prerender + sitemap steps are deliberately skipped: a personal
+# self-host instance does not need 90 prerendered HTML pages, and those
+# pages would have baked figure bios into the image.
 ENV VITE_SELF_HOST=true
-RUN pnpm run build
+RUN pnpm run build:self-host
 
 # --- Runtime stage ---------------------------------------------------------
 FROM nginxinc/nginx-unprivileged:1.27-alpine
