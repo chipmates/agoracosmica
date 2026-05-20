@@ -35,7 +35,8 @@
     "exploreTeaching": "Explore this teaching",
     "showAllTeachings": "Show all 12 teachings",
     "showLess": "Show less",
-    "enterCouncil": "Enter the Cosmic Council"
+    "enterCouncil": "Enter the Cosmic Council",
+    "listenFeaturedDebate": "Listen to the featured debate"
   },
   "echo": {
     "figureNote": "{name} here is what we call an echo. It's an AI voice shaped by their own writing and ideas, brought into a conversation you can have today. It draws on their philosophy, and it stays an interpretation, not the real person and not a recording.",
@@ -69,6 +70,11 @@
     "curatedWisdom": "Curated Wisdom",
     "detailEyebrow": "A life question",
     "councilDebates": "Council debates",
+    "moreDebates": "More debates in this theme",
+    "featuredDebate": "Featured debate",
+    "moderator": "Moderator",
+    "playPreview": "Play preview",
+    "pausePreview": "Pause",
     "meaning-purpose": {
       "name": "Meaning and Purpose",
       "tagline": "What makes a life worth living?",

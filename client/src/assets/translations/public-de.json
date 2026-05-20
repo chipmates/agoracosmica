@@ -35,7 +35,8 @@
     "exploreTeaching": "Erkunde diese Lehre",
     "showAllTeachings": "Alle 12 Lehren anzeigen",
     "showLess": "Weniger anzeigen",
-    "enterCouncil": "Betritt den kosmischen Council"
+    "enterCouncil": "Betritt den kosmischen Council",
+    "listenFeaturedDebate": "Höre die empfohlene Debatte"
   },
   "echo": {
     "figureNote": "{name} begegnet dir hier als Echo. Das ist eine KI-Stimme, geprägt von den eigenen Schriften und Gedanken dieser Persönlichkeit und in ein Gespräch gebracht, das du heute führen kannst. Sie schöpft aus ihrer Philosophie und bleibt doch eine Interpretation, nicht die reale Person und keine Aufnahme.",
@@ -68,6 +69,11 @@
     "relatedThemes": "Verwandte Themen",
     "detailEyebrow": "Eine Lebensfrage",
     "councilDebates": "Council-Debatten",
+    "moreDebates": "Weitere Debatten zu diesem Thema",
+    "featuredDebate": "Empfohlene Debatte",
+    "moderator": "Moderator",
+    "playPreview": "Hörprobe abspielen",
+    "pausePreview": "Pause",
     "curatedWisdom": "Ausgew\u00e4hlte Weisheiten",
     "meaning-purpose": {
       "name": "Sinn und Bestimmung",

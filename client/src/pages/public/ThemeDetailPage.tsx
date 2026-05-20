@@ -12,6 +12,7 @@ import EchoNote from '../../components/public/EchoNote';
 import CollapsibleSection from '../../components/public/CollapsibleSection';
 import ThemeVoice from '../../components/public/ThemeVoice';
 import PublicCTA from '../../components/public/PublicCTA';
+import CouncilHero from '../../components/public/CouncilHero';
 import {
   THEMES,
   councilsByTheme,
@@ -19,9 +20,12 @@ import {
   getLocalizedHook,
   getShortDisplayName,
   type ThemeId,
+  type CatalogCouncil,
 } from '../../data/councilCatalog';
 import { getThemeVoices } from '../../data/public/themeVoices';
 import { publicUrl, canonicalUrl } from '../../utils/public/publicSeo';
+import { captureCouncilIntent } from '../../utils/public/entryIntent';
+import { sendConversion } from '../../utils/public/gclidCapture';
 
 const VALID_THEMES = new Set(THEMES.map(t => t.id));
 
@@ -60,6 +64,19 @@ export default function ThemeDetailPage() {
     return [...(councilsByTheme[theme as ThemeId] || [])]
       .sort((a, b) => a.sortOrder - b.sortOrder);
   }, [theme, isValid]);
+
+  const heroCouncil: CatalogCouncil | undefined = councils[0];
+  const otherCouncils = councils.slice(1);
+
+  // Per-row deep-link click handler — mirrors PublicCTA. Writes the intent to
+  // sessionStorage, fires the start_exploring conversion inside the click so
+  // its keepalive beacon survives the navigation, then the <a href="/"> does
+  // the hard nav into the app, where routeAfterOnboarding picks up the intent
+  // and opens that specific council.
+  const handleRowClick = (councilId: string) => (): void => {
+    captureCouncilIntent(councilId, lang);
+    sendConversion('start_exploring');
+  };
 
   if (!isValid || !theme) {
     return <Navigate to={publicUrl(lang, '/themes')} replace />;
@@ -160,14 +177,22 @@ export default function ThemeDetailPage() {
           )
         )}
 
-        {councils.length > 0 && (
+        {heroCouncil && <CouncilHero council={heroCouncil} />}
+
+        {otherCouncils.length > 0 && (
           <CollapsibleSection
-            title={t('themes.councilDebates', 'Council debates')}
-            count={councils.length}
+            title={t('themes.moreDebates', 'More debates in this theme')}
+            count={otherCouncils.length}
           >
             <div className="pub-council-list">
-              {councils.map(council => (
-                <div key={council.id} className="pub-council-row">
+              {otherCouncils.map(council => (
+                <a
+                  key={council.id}
+                  href="/"
+                  onClick={handleRowClick(council.id)}
+                  className="pub-council-row pub-council-row--link"
+                  aria-label={`${t('cta.listenDebate', 'Listen to this debate')}: ${getLocalizedTitle(council, lang)}`}
+                >
                   <div className="pub-council-row__head">
                     <span className="pub-council-row__title">
                       {getLocalizedTitle(council, lang)}
@@ -184,7 +209,10 @@ export default function ThemeDetailPage() {
                       .map(p => getShortDisplayName(p.id))
                       .join(' · ')}
                   </p>
-                </div>
+                  <span className="pub-council-row__cta">
+                    {t('cta.listenDebate', 'Listen to this debate')}
+                  </span>
+                </a>
               ))}
             </div>
           </CollapsibleSection>
@@ -207,7 +235,7 @@ export default function ThemeDetailPage() {
         )}
       </div>
 
-      <PublicCTA variant="sticky" councilCta />
+      <PublicCTA variant="sticky" councilCta councilId={heroCouncil?.id} />
     </div>
   );
 }
