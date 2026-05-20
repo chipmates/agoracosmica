@@ -19,6 +19,14 @@ import { getAudioContext } from '../audio/audioQueueManager';
 import { splitForGatewayCap } from '../audio/utils/splitForGatewayCap';
 import { sendConversion, COUNCIL_ENGAGED_THRESHOLD_S } from '../../utils/public/gclidCapture';
 
+// Custom councils render 5% slower than the user's general TTS speed. The
+// debate is denser than a single-figure mode (more voices, more interruption,
+// more arguments to follow), so the slower pace gives the listener room.
+// Applied at the TTS request layer so the gateway adjusts speed correctly
+// (ffmpeg atempo preserves pitch); doing it via Web Audio playbackRate would
+// shift pitch ~1 semitone.
+const COUNCIL_SPEED_MULTIPLIER = 0.95;
+
 // ============================================
 // Type Definitions
 // ============================================
@@ -1033,11 +1041,12 @@ export class CustomCouncilService {
 
       // Per-chunk filename suffix prevents server-side cache collisions when
       // the same segment-id maps to multiple TTS calls.
+      const councilSpeed = ttsSettings.speed * COUNCIL_SPEED_MULTIPLIER;
       const renderChunk = (chunkText: string, idx: number): Promise<AudioFile> => {
         const chunkBaseName = chunks.length > 1 ? `${sessionPrefixedId}_c${idx + 1}` : sessionPrefixedId;
         return explicitVoice
-          ? this._generateTTSWithExplicitVoice(chunkText, chunkBaseName, explicitVoice, ttsService, ttsSettings.speed, language, sessionId)
-          : convertTextToSpeech(chunkText, chunkBaseName, speakerId, ttsService, ttsSettings.speed, language, sessionId);
+          ? this._generateTTSWithExplicitVoice(chunkText, chunkBaseName, explicitVoice, ttsService, councilSpeed, language, sessionId)
+          : convertTextToSpeech(chunkText, chunkBaseName, speakerId, ttsService, councilSpeed, language, sessionId);
       };
 
       // Parallel render for multi-chunk segments — same speaker means same
