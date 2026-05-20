@@ -99,7 +99,17 @@ First build takes 2 to 3 minutes (pnpm install, pnpm build, a one-time content f
 
 ## Content licensing
 
-The code is **[AGPL-3.0](../LICENSE)** — fork freely, copyleft applies to network deployments. The content (stories, prism dialogues, council debates, factchecks, voice profiles, images, audio) is **© ChipMates gemeinnützige GmbH** at launch, transitioning to **CC-BY 4.0 within 6 to 12 months**. See [CONTENT-LICENSE.md](../CONTENT-LICENSE.md) for the full terms. The default self-host config pulls the same content the public app uses; you can also bring your own.
+The code is **[AGPL-3.0](../LICENSE)** — fork freely, copyleft applies to network deployments. The content (stories, prism dialogues, council debates, factchecks, voice profiles, instruction prompts, images, audio) is **© ChipMates gemeinnützige GmbH** at launch, transitioning to **CC-BY 4.0 within 6 to 12 months**. See [CONTENT-LICENSE.md](../CONTENT-LICENSE.md) for the full terms.
+
+**The self-host image deliberately ships no authored text content.** The build sets `VITE_SELF_HOST=true`, which makes `extract-public-data.mjs` emit empty values for every authored field (figure bios, learn lines, seed summaries, seed quotes, voice essences, key concepts, theme cross-refs). The build also skips the SEO prerender step, so no figure HTML pages with bios end up in the image. The SPA still type-checks because the catalog shape is preserved; the fields just hold empty strings.
+
+What this means at runtime:
+
+- **Identifiers ship** — figure ids and names, seed ids and titles, the hardcoded short tradition labels. Enough for navigation.
+- **Pre-recorded audio (figure trailers, story narration, council previews) and figure-specific instruction prompts** are fetched directly from `AGORA_MEDIA_BASE_URL` (default `https://media.agoracosmica.org`) when the app needs them. Your browser talks to the configured CDN; the docker image is not a copy of the content.
+- **One small exception:** the two council master prompts (`council_advisory_master.json` and `council_debate_master.json`, ~48 KB combined) still ship inside the image because the runtime fetches them same-origin. Moving them onto the media CDN is a follow-up; until then, the image carries these two files under the same © ChipMates license as the upstream site.
+
+Default operation is exactly what the public app uses — the same R2 bucket, the same CDN — so a self-host instance is content-equivalent to agoracosmica.org without holding a redistributable copy.
 
 ---
 
