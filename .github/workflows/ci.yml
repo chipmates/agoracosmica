@@ -50,3 +50,27 @@ jobs:
       - name: Build
         working-directory: ./client
         run: pnpm build
+
+  docker-build:
+    name: Docker build (self-host image)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: check
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build (no push) on amd64
+        uses: docker/build-push-action@v6
+        with:
+          context: ./client
+          file: ./client/Dockerfile
+          platforms: linux/amd64
+          push: false
+          tags: agoracosmica:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
