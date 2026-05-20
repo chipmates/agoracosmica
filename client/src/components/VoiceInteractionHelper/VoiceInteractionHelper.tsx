@@ -3,6 +3,7 @@ import { FC, useState, useEffect, ChangeEvent } from 'react';
 import { Microphone, Keyboard } from '@phosphor-icons/react';
 import useTranslation from '../../hooks/useTranslation';
 import { useUIStore } from '../../stores/uiStore';
+import { loadServiceConfig } from '../../services/audio/config/serviceConfig';
 import '../HelperPopup/HelperPopup.css';
 import './VoiceInteractionHelper.css';
 
@@ -41,7 +42,8 @@ const VoiceInteractionHelper: FC<VoiceInteractionHelperProps> = ({
     const shouldDisplay =
       isVisible &&
       messageCount > 0 &&
-      shouldShowHelp('voiceInteractionHelp');
+      shouldShowHelp('voiceInteractionHelp') &&
+      loadServiceConfig().sttEnabled !== false;
     
     if (shouldDisplay) {
       // Small delay to ensure smooth appearance after first message

@@ -48,10 +48,9 @@ const ACCOUNTS: Record<AccountKey, AccountConfig> = {
       start_exploring: '7609132235', // gtag label n70GCMvJqKwcELfN0stD
       mode_selected: '7609132238',   // gtag label 4AWSCM7JqKwcELfN0stD
       // Reusing the existing Session>60s action (gtag label
-      // jjIcCOmB9KscELfN0stD) as Council Engaged: the partner renames the action in
-      // the UI, promotes it to Primary, sets value=4. Awaiting the numeric
-      // conversion action resource ID from the partner.
-      council_engaged: 'TODO_PENDING',
+      // jjIcCOmB9KscELfN0stD), renamed to Council Engaged by the partner on
+      // 2026-05-20.
+      council_engaged: '7608271081',
     },
   },
   paid: {

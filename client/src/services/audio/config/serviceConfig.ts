@@ -2,6 +2,7 @@
 
 // Architecture: Self-hosted audio (GEX130) + OpenRouter BYOK / Nebius free-tier
 import { useDomainStore } from '../../../stores';
+import { isSelfHost } from '../../../config/deployment';
 
 // ============================================
 // Type Definitions
@@ -165,7 +166,9 @@ export const loadServiceConfig = (): ServiceConfig => {
         });
       }
 
-      return config;
+      return isSelfHost
+        ? { ...config, ttsEnabled: false, sttEnabled: false }
+        : config;
     }
   } catch (error) {
     console.error('Error loading service config:', error);
@@ -174,7 +177,9 @@ export const loadServiceConfig = (): ServiceConfig => {
     isLoadingConfig = false;
   }
 
-  return defaultConfig;
+  return isSelfHost
+    ? { ...defaultConfig, ttsEnabled: false, sttEnabled: false }
+    : defaultConfig;
 };
 
 // Save configuration to localStorage
