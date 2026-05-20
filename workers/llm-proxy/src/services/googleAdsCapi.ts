@@ -47,9 +47,8 @@ const ACCOUNTS: Record<AccountKey, AccountConfig> = {
       profile_created: '7608272394', // gtag label 2t5rCIqM9KscELfN0stD
       start_exploring: '7609132235', // gtag label n70GCMvJqKwcELfN0stD
       mode_selected: '7609132238',   // gtag label 4AWSCM7JqKwcELfN0stD
-      // Reusing the existing Session>60s action (gtag label
-      // jjIcCOmB9KscELfN0stD), renamed to Council Engaged by the partner on
-      // 2026-05-20.
+      // The Session>60s action was renamed to Council Engaged on
+      // 2026-05-20 (gtag label jjIcCOmB9KscELfN0stD).
       council_engaged: '7608271081',
     },
   },
