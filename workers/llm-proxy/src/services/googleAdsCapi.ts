@@ -1,8 +1,9 @@
 // Google Ads Conversion API forwarding
-// Receives a gclid-keyed conversion event from /api/conversions, uploads it to
-// both Google Ads customer accounts (Grants + Paid) in parallel. The unmatched
-// account fails the row silently via partial_failure — the account that
-// actually issued the gclid records the conversion.
+// Receives a gclid-keyed conversion event from /api/conversions and uploads
+// it to the Google Ads customer accounts that subscribe to that event. Most
+// events go to both accounts in parallel; the unmatched account fails the row
+// silently via partial_failure — the account that actually issued the gclid
+// records the conversion. Per-event scope overrides live in SCOPED_EVENTS.
 //
 // All CAPI calls are fire-and-forget from the route handler's perspective:
 // errors are logged here but never propagated. If GOOGLE_ADS_DEVELOPER_TOKEN
@@ -46,7 +47,11 @@ const ACCOUNTS: Record<AccountKey, AccountConfig> = {
       profile_created: '7608272394', // gtag label 2t5rCIqM9KscELfN0stD
       start_exploring: '7609132235', // gtag label n70GCMvJqKwcELfN0stD
       mode_selected: '7609132238',   // gtag label 4AWSCM7JqKwcELfN0stD
-      council_engaged: 'TODO_PENDING', // pending the Council Engaged action ID
+      // Reusing the existing Session>60s action (gtag label
+      // jjIcCOmB9KscELfN0stD) as Council Engaged: the partner renames the action in
+      // the UI, promotes it to Primary, sets value=4. Awaiting the numeric
+      // conversion action resource ID from the partner.
+      council_engaged: 'TODO_PENDING',
     },
   },
   paid: {
@@ -56,20 +61,34 @@ const ACCOUNTS: Record<AccountKey, AccountConfig> = {
       profile_created: '7609550802', // gtag label zBsvCNKPwqwcEMOryN9C
       start_exploring: '7609550805', // gtag label PFnxCNWPwqwcEMOryN9C
       mode_selected: '7609550808',   // gtag label dlmRCNiPwqwcEMOryN9C
-      council_engaged: 'TODO_PENDING', // pending the Council Engaged action ID
+      // council_engaged is Grants-only — see SCOPED_EVENTS below.
+      council_engaged: 'NOT_APPLICABLE',
     },
   },
 };
 
-// Conversion values per partner-side recommendation. Asymmetric so the
-// algorithm chases real signups over shallow engagement once Max Conv Value
-// bidding is enabled (initial phase is Max Conversions; values still recorded
-// for later reporting + the bidding switch).
+// Account scope per event. Default (event absent from this map) = both
+// accounts. Listed here = exactly the accounts that receive forwarding for
+// that event.
+//
+// council_engaged: Grants only. The theme→council funnel that triggers this
+// event lives on theme pages, which are the long-tail Grants surface. Paid
+// campaigns are figure-focused (figure pages don't route to councils) and
+// keep Profile Creation as their sole Primary action by deliberate design —
+// shallow engagement events stay off the Paid bidding signal.
+const SCOPED_EVENTS: Partial<Record<ConversionEvent, AccountKey[]>> = {
+  council_engaged: ['grants'],
+};
+
+// Conversion values per partner-side recommendations.
+// Asymmetric so the algorithm chases real signups over shallow engagement
+// once Max Conv Value bidding is enabled (initial phase is Max Conversions;
+// values still recorded for later reporting + the bidding switch).
 const VALUES: Record<ConversionEvent, number> = {
   profile_created: 15,
   start_exploring: 1,
   mode_selected: 4,
-  council_engaged: 4, // provisional
+  council_engaged: 4,
 };
 
 const API_VERSION = 'v24';
@@ -179,6 +198,13 @@ async function uploadToAccount(
   accountKey: AccountKey,
   input: ConversionInput,
 ): Promise<void> {
+  // Event-level account scoping. Events listed in SCOPED_EVENTS only forward
+  // to the accounts in the list — silent skip for the others, no log noise.
+  const scopedAccounts = SCOPED_EVENTS[input.event];
+  if (scopedAccounts && !scopedAccounts.includes(accountKey)) {
+    return;
+  }
+
   const account = ACCOUNTS[accountKey];
   const actionId = account.actions[input.event];
   const customerId = account.customerId;
@@ -186,7 +212,7 @@ async function uploadToAccount(
   // A conversion action still on a placeholder ID (not yet set up in Google
   // Ads) is skipped, rather than sent with an invalid resource name.
   if (actionId === 'TODO_PENDING') {
-    console.log(`[capi] ${accountKey} ${input.event} skipped: action id not configured`);
+    console.log(`[capi] ${accountKey} ${input.event} skipped: action id pending`);
     return;
   }
 
