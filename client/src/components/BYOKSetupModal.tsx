@@ -5,6 +5,7 @@ import { useDomainStore } from '../stores/domainStore';
 import { keyStorage } from '../services/storage/keyStorageService';
 import { llmService } from '../services/llm/llmService';
 import { loadServiceConfig, saveServiceConfig, LLM_SERVICES } from '../services/audio/config/serviceConfig';
+import { isSelfHost } from '../config/deployment';
 import { RippleButton } from './Button';
 import { Key, ShieldCheck, CheckCircle, Eye, EyeSlash, ArrowRight, Warning } from '@phosphor-icons/react';
 
@@ -136,7 +137,9 @@ const BYOKSetupModal: FC = () => {
               color: 'var(--text-secondary)',
               marginBottom: '20px',
             }}>
-              {tString('byok.wizard.valueBody', 'Use your own OpenRouter key. You pay OpenRouter directly, we take no cut.')}
+              {isSelfHost
+                ? tString('byok.wizard.selfHost.valueBody', 'Your key, your data. You pay OpenRouter directly.')
+                : tString('byok.wizard.valueBody', 'Use your own OpenRouter key. You pay OpenRouter directly, we take no cut.')}
             </p>
 
             <div style={{
@@ -150,8 +153,12 @@ const BYOKSetupModal: FC = () => {
               borderRadius: '10px',
             }}>
               {[
-                tString('byok.wizard.benefit1', 'No daily limits on messages, councils, or summaries'),
-                tString('byok.wizard.benefit2', 'Same AI as the free tier'),
+                isSelfHost
+                  ? tString('byok.wizard.selfHost.benefit1', 'No daily limits, set your own pace')
+                  : tString('byok.wizard.benefit1', 'No daily limits on messages, councils, or summaries'),
+                isSelfHost
+                  ? tString('byok.wizard.selfHost.benefit2', 'One key, many models')
+                  : tString('byok.wizard.benefit2', 'Same AI as the free tier'),
                 tString('byok.wizard.benefit3', 'Zero data retention by default'),
                 tString('byok.wizard.benefit4', 'Over 25 hours of conversation for $1'),
               ].map((benefit, i) => (
@@ -440,7 +447,9 @@ const BYOKSetupModal: FC = () => {
               color: 'var(--text-secondary)',
               marginBottom: '24px',
             }}>
-              {tString('byok.wizard.successBody', 'No more daily limits. Your conversations, councils, and summaries are now unlimited.')}
+              {isSelfHost
+                ? tString('byok.wizard.selfHost.successBody', 'Your key is saved. Conversations, councils, and summaries are ready.')
+                : tString('byok.wizard.successBody', 'No more daily limits. Your conversations, councils, and summaries are now unlimited.')}
             </p>
 
             {zdrEnabled && (

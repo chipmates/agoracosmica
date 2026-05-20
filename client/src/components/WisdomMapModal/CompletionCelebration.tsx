@@ -4,6 +4,7 @@ import './css/CompletionCelebration.css';
 import useTranslation from '../../hooks/useTranslation';
 import { useFocusTrap } from '../../hooks/useFocusTrap';
 import { getConstellationTranslationKey } from '../../utils/constellationTranslationHelper';
+import { isSelfHost } from '../../config/deployment';
 import type { CommunityTier } from '../CommunityGovernance/computeVotingPower';
 
 interface CompletionCelebrationProps {
@@ -153,7 +154,9 @@ const CompletionCelebration: FC<CompletionCelebrationProps> = ({
             </svg>
           </div>
           <div className="reward-text">
-            <span className="reward-label">{tString('seeds.votingPowerLabel', 'Community Voting Power')}</span>
+            <span className="reward-label">{isSelfHost
+              ? tString('seeds.selfHostVotingPowerLabel', 'Voting Power')
+              : tString('seeds.votingPowerLabel', 'Community Voting Power')}</span>
             <div className="reward-value-row">
               <span className="reward-value">+1</span>
               {votingPowerTotal !== undefined && votingPowerTotal > 1 && (

@@ -591,6 +591,7 @@
     "allStarsGathered": "You've gathered all {count} stars of \"{name}\"",
     "allSeedsMastered": "All {count} seeds fully explored across every mode",
     "votingPowerLabel": "Community Voting Power",
+    "selfHostVotingPowerLabel": "Voting Power",
     "votingPowerTotal": "Total: {total}",
     "tierTransitionVoice": "You're now a Voice",
     "tierTransitionVoiceDesc": "Your voice in the agora is growing.",
@@ -1828,7 +1829,13 @@
       "successTitle": "You're All Set!",
       "successBody": "No more daily limits. Your conversations, councils, and summaries are now unlimited.",
       "successZdr": "Zero Data Retention is enabled.",
-      "startButton": "Start Chatting"
+      "startButton": "Start Chatting",
+      "selfHost": {
+        "valueBody": "Your key, your data. You pay OpenRouter directly.",
+        "benefit1": "No daily limits, set your own pace",
+        "benefit2": "One key, many models",
+        "successBody": "Your key is saved. Conversations, councils, and summaries are ready."
+      }
     }
   },
   "community": {

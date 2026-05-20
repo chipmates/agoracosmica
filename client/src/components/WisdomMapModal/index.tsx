@@ -858,7 +858,7 @@ const WisdomMapModal: FC<WisdomMapModalProps> = ({
                 onClose={() => setShowCompletionCelebration(false)}
                 votingPowerTotal={completionTierData?.total}
                 newlyUnlockedTier={completionTierData?.newlyUnlockedTier}
-                onOpenCommunity={() => {
+                onOpenCommunity={isSelfHost ? undefined : () => {
                   setShowCompletionCelebration(false);
                   setShowCommunity(true);
                 }}
@@ -876,7 +876,7 @@ const WisdomMapModal: FC<WisdomMapModalProps> = ({
                 onClose={() => setShowFigureCompletion(false)}
                 votingPowerTotal={completionTierData?.total}
                 newlyUnlockedTier={completionTierData?.newlyUnlockedTier}
-                onOpenCommunity={() => {
+                onOpenCommunity={isSelfHost ? undefined : () => {
                   setShowFigureCompletion(false);
                   setShowCommunity(true);
                 }}

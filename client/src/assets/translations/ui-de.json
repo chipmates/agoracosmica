@@ -593,6 +593,7 @@
     "allStarsGathered": "Du hast alle {count} Sterne von \"{name}\" gesammelt",
     "allSeedsMastered": "Alle {count} Seeds vollständig in jedem Modus erkundet",
     "votingPowerLabel": "Community-Stimmrecht",
+    "selfHostVotingPowerLabel": "Stimmgewicht",
     "votingPowerTotal": "Gesamt: {total}",
     "tierTransitionVoice": "Du bist jetzt eine Stimme",
     "tierTransitionVoiceDesc": "Deine Stimme in der Agora wächst.",
@@ -1830,7 +1831,13 @@
       "successTitle": "Alles fertig!",
       "successBody": "Keine täglichen Limits mehr. Deine Gespräche, Councils und Zusammenfassungen sind jetzt unbegrenzt.",
       "successZdr": "Zero Data Retention ist aktiviert.",
-      "startButton": "Loslegen"
+      "startButton": "Loslegen",
+      "selfHost": {
+        "valueBody": "Dein Schlüssel, deine Daten. Du zahlst direkt an OpenRouter.",
+        "benefit1": "Keine Tageslimits, du bestimmst das Tempo",
+        "benefit2": "Ein Schlüssel, viele Modelle",
+        "successBody": "Dein Schlüssel ist gespeichert. Gespräche, Councils und Zusammenfassungen sind einsatzbereit."
+      }
     }
   },
   "community": {
