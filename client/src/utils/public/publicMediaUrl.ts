@@ -51,6 +51,20 @@ export function getPublicTrailerUrl(
   return `${MEDIA_BASE}/trailers/figures/${figureId}/${lang}/${figureId}_trailer_${lang}.${format}`;
 }
 
+// Council preview: a ~50s multi-voice clip on the theme-page hero. Same
+// dual-encoding as figure trailers (webm primary, mp3 fallback for iOS
+// Safari). Sits under the same /trailers/ R2 prefix as figures, just in a
+// councils/ subfolder, with the same {id}_trailer_{lang} file naming — keeps
+// the production pipeline + upload tooling symmetric across both kinds of
+// page-intro audio.
+export function getPublicCouncilPreviewUrl(
+  councilId: string,
+  lang: string,
+  format: TrailerFormat = 'webm'
+): string {
+  return `${MEDIA_BASE}/trailers/councils/${councilId}/${lang}/${councilId}_trailer_${lang}.${format}`;
+}
+
 export function getAvailableSizes(type: ImageType): number[] {
   return SIZES[type];
 }
