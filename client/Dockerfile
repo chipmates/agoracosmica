@@ -11,8 +11,10 @@ WORKDIR /app
 # Enable pnpm via corepack (version is pinned by package.json packageManager)
 RUN corepack enable
 
-# Layer cache: install deps before copying the rest of the source
-COPY package.json pnpm-lock.yaml ./
+# Layer cache: install deps before copying the rest of the source.
+# check-pkgmgr.js is the preinstall hook (refuses npm in favor of pnpm),
+# so it has to land before `pnpm install` runs.
+COPY package.json pnpm-lock.yaml check-pkgmgr.js ./
 RUN pnpm install --frozen-lockfile
 
 # Source last so edits do not bust the install layer
@@ -45,9 +47,11 @@ COPY --from=builder /app/build /usr/share/nginx/html
 COPY docker-entrypoint.sh /docker-entrypoint.d/00-agora-config.sh
 
 # nginx-unprivileged ships with USER 101 (nginx). The /docker-entrypoint.d/
-# scripts run as root before the final nginx process drops back to 101.
+# scripts run as the container's runtime user (not root), so the entrypoint
+# needs write access to the static-root directory to rewrite config.js.
 USER root
-RUN chmod +x /docker-entrypoint.d/00-agora-config.sh
+RUN chmod +x /docker-entrypoint.d/00-agora-config.sh && \
+    chown 101:101 /usr/share/nginx/html /usr/share/nginx/html/config.js
 USER 101
 
 EXPOSE 8080

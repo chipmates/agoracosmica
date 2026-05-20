@@ -34,3 +34,33 @@ coverage
 Dockerfile
 .dockerignore
 docker-compose.yml
+
+# Bulky content fetched inside the container by `pnpm setup:assets`
+# (mirrors client/.gitignore). Shipping these into the build context
+# would inflate it from a few MB to tens of GB.
+src/assets/audio/
+src/assets/stories/*
+src/assets/councils/*
+src/assets/prisms/*
+src/assets/initial-messages/
+src/assets/figures/originals/
+src/assets/figures/full/
+src/assets/figures/thumbnails/
+src/assets/backgrounds/originals/
+src/assets/backgrounds/processed/
+src/assets/icons/originals/
+src/assets/icons/processed/
+src/assets/ui/originals/
+src/assets/ui/processed/
+src/assets/music*.webm
+src/assets/translations/seeds/*
+src/assets/translations/figures/*
+src/assets/factchecks/*
+src/assets/voice_profiles/*
+src/assets/instructions/*
+
+# Tracked exceptions inside the otherwise-ignored directories
+!src/assets/stories/.gitkeep
+!src/assets/councils/.gitkeep
+!src/assets/councils/councilCatalog.json
+!src/assets/prisms/.gitkeep
