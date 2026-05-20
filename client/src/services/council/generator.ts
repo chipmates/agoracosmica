@@ -381,9 +381,12 @@ class CustomCouncilGenerator {
       expectedSpeakers: []
     };
     
-    // Load instruction template
+    // Load instruction template from the media CDN so the bundled image
+    // does not ship a copy of the © ChipMates council master prompts.
+    // Matches how figure-specific instructions are fetched (see
+    // services/audio/instructionProcessor.ts).
     try {
-      const instructionPath = `/assets/instructions/council_${config.type}_master.json`;
+      const instructionPath = `${mediaBaseUrl}/instructions/council_${config.type}_master.json`;
       const response = await fetch(instructionPath);
       if (!response.ok) throw new Error(`Failed to load instruction: ${response.status}`);
       const instructionData = await response.json();
