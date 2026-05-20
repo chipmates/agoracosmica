@@ -106,8 +106,7 @@ The code is **[AGPL-3.0](../LICENSE)** — fork freely, copyleft applies to netw
 What this means at runtime:
 
 - **Identifiers ship** — figure ids and names, seed ids and titles, the hardcoded short tradition labels. Enough for navigation.
-- **Pre-recorded audio (figure trailers, story narration, council previews) and figure-specific instruction prompts** are fetched directly from `AGORA_MEDIA_BASE_URL` (default `https://media.agoracosmica.org`) when the app needs them. Your browser talks to the configured CDN; the docker image is not a copy of the content.
-- **One small exception:** the two council master prompts (`council_advisory_master.json` and `council_debate_master.json`, ~48 KB combined) still ship inside the image because the runtime fetches them same-origin. Moving them onto the media CDN is a follow-up; until then, the image carries these two files under the same © ChipMates license as the upstream site.
+- **Everything authored is runtime-fetched** — pre-recorded audio (figure trailers, story narration, council previews), figure-specific instruction prompts, and council master prompts (advisory/debate templates) all load from `AGORA_MEDIA_BASE_URL` (default `https://media.agoracosmica.org`) when the app needs them. Your browser talks to the configured CDN; the docker image is not a copy of the content.
 
 Default operation is exactly what the public app uses — the same R2 bucket, the same CDN — so a self-host instance is content-equivalent to agoracosmica.org without holding a redistributable copy.
 

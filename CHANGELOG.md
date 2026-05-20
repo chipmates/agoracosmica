@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Changed
+
+- **Council master prompts now load from the media CDN.** `services/council/generator.ts` fetches `council_advisory_master.json` and `council_debate_master.json` from `${mediaBaseUrl}/instructions/...` instead of a same-origin `/assets/instructions/...` path. Matches how figure-specific instructions already load. Removes the last authored-text leak from the self-host docker image.
+
 ### Added
 
 - **Docker self-host.** `docker compose up` from the repo root brings up a working instance in five minutes: BYOK chat, all six modes, the full pre-recorded audio catalog, both languages. The image is BYOK-only (no free tier), runs no Cloudflare Workers, and hides live voice and the Community Governance panel cleanly. See [SELF-HOSTING.md](docs/SELF-HOSTING.md).
