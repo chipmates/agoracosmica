@@ -36,4 +36,26 @@ export default defineConfig({
       },
     }),
   ],
+  // Dev-only proxy. publicMediaUrl returns relative paths in dev (assuming
+  // the host bundler proxies /images, /trailers, etc. to media.agoracosmica.org).
+  // Astro's dev server doesn't know about that arrangement, so without these
+  // rules figure portraits and trailer audio 404 against localhost:4321.
+  //
+  // /fonts/* needs to forward to the production site (client's CF Pages
+  // deploy) because the font files live in client/public/fonts and aren't
+  // copied into marketing/. In production both worlds share a build output.
+  vite: {
+    server: {
+      proxy: {
+        '/fonts': { target: 'https://agoracosmica.org', changeOrigin: true, secure: true },
+        '/images': { target: 'https://media.agoracosmica.org', changeOrigin: true, secure: true },
+        '/trailers': { target: 'https://media.agoracosmica.org', changeOrigin: true, secure: true },
+        '/stories': { target: 'https://media.agoracosmica.org', changeOrigin: true, secure: true },
+        '/seeds': { target: 'https://media.agoracosmica.org', changeOrigin: true, secure: true },
+        '/instructions': { target: 'https://media.agoracosmica.org', changeOrigin: true, secure: true },
+        '/voice-profiles': { target: 'https://media.agoracosmica.org', changeOrigin: true, secure: true },
+        '/councils': { target: 'https://media.agoracosmica.org', changeOrigin: true, secure: true },
+      },
+    },
+  },
 });

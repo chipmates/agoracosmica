@@ -23,6 +23,7 @@ dist/
 build/
 out/
 .vite/
+.astro/
 *.tsbuildinfo
 
 # ── Test artifacts ─────────────────────────────────────────

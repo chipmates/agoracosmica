@@ -1,6 +1,6 @@
 // src/pages/LoginPage.tsx
 
-import React, { useState, useEffect, useRef, useCallback, FC } from 'react';
+import React, { useState, useEffect, useRef, useCallback, FC, Suspense, lazy } from 'react';
 import { Link } from 'react-router-dom';
 import './LoginPage.css';
 import CosmicBackground from '../components/CosmicBackground';
@@ -8,8 +8,13 @@ import LoginContainer from '../components/LoginContainer';
 import CharacterLoginForm from '../components/CharacterLoginForm';
 import MessagePopup from '../components/MessagePopup';
 import LandscapeWarning from '../components/LandscapeWarning';
-import ParadisoTransition from '../components/animations/ParadisoTransition';
-import FigureController from '../components/animations/CosmicLoginTransition/FigureController';
+
+// Post-paint transition chunks. Both gate their visible work on a prop
+// (`active` / `isActive`), so the LoginPage shell renders immediately and
+// these load in the background. Suspense fallback is null because neither
+// shows anything until activated.
+const ParadisoTransition = lazy(() => import('../components/animations/ParadisoTransition'));
+const FigureController = lazy(() => import('../components/animations/CosmicLoginTransition/FigureController'));
 import { useTranslation } from '../hooks/useTranslation';
 import { Gavel, SpeakerSimpleHigh, SpeakerSimpleX, CaretDown, GithubLogo, ArrowSquareOut } from '@phosphor-icons/react';
 import { mediaBaseUrl as MEDIA_BASE } from '../config/runtime';
@@ -293,16 +298,18 @@ const LoginPage: FC<LoginPageProps> = ({ onComplete }) => {
         <CharacterLoginForm onComplete={handleEntryComplete} />
       </LoginContainer>
 
-      {/* Figure fade-out — same sequential disappear as test page */}
-      <FigureController active={figuresActive} figureIndices={figureIndices} />
-
-      {/* Celestial Rose — replaces the old CosmicLoginTransition */}
-      <ParadisoTransition
-        isActive={portalAnimActive}
-        variant={1}
-        onAnimationComplete={handleInitialAnimationComplete}
-        autoCompleteMs={15000}
-      />
+      {/* Figure fade-out + Celestial Rose — both gate their heavy work on a
+          prop, so we lazy-load the chunks. Suspense fallback is null since
+          neither produces visible output until activated. */}
+      <Suspense fallback={null}>
+        <FigureController active={figuresActive} figureIndices={figureIndices} />
+        <ParadisoTransition
+          isActive={portalAnimActive}
+          variant={1}
+          onAnimationComplete={handleInitialAnimationComplete}
+          autoCompleteMs={15000}
+        />
+      </Suspense>
 
       {/* Full-screen skip overlay for post-login animation */}
       {loginSuccessful && showSkipOverlay && (

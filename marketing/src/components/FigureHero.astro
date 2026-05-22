@@ -43,7 +43,7 @@ const aboutParas = figure.about
     {figure.learn && (
       <p class="pub-fig-hero__learn">{`“${figure.learn}”`}</p>
     )}
-    <TrailerButton client:idle figureId={figure.id} lang={lang} />
+    <TrailerButton client:visible figureId={figure.id} lang={lang} />
     {aboutParas.map(p => <p class="pub-fig-hero__about">{p}</p>)}
   </div>
 </section>
