@@ -1,0 +1,30 @@
+---
+import { getT } from '../i18n';
+import type { Lang } from '../i18n';
+
+interface Props {
+  variant: 'figure' | 'theme';
+  name?: string;
+  lang: Lang;
+}
+
+const { variant, name, lang } = Astro.props;
+const t = getT(lang);
+const text =
+  variant === 'figure'
+    ? t('echo.figureNote').replace('{name}', name ?? '')
+    : t('echo.themeNote');
+---
+<section class="pub-section">
+  <p class="pub-section__text pub-echo-note">{text}</p>
+</section>
+
+<style is:global>
+  .pub-echo-note {
+    margin: 0;
+    padding-left: 1rem;
+    border-left: 2px solid color-mix(in srgb, var(--gold-subtle) 50%, transparent);
+    font-style: italic;
+    opacity: 0.85;
+  }
+</style>

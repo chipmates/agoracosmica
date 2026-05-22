@@ -1,0 +1,52 @@
+---
+// Root layout for every public marketing page. Wraps the page slot in the
+// navbar/footer chrome, drops in <BaseHead /> with all the meta + JSON-LD,
+// and pulls in the existing public CSS files so visuals stay identical to
+// the React rendering of the same pages.
+
+import BaseHead from '../components/BaseHead.astro';
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+import PublicScript from '../components/PublicScript.astro';
+import type { Lang } from '../i18n';
+
+import '@client/index.css';
+import '@client/styles/public/public-layout.css';
+import '@client/styles/public/public-pages.css';
+import '@client/styles/public/public-cards.css';
+
+interface Props {
+  title: string;
+  fullTitle?: string;
+  description: string;
+  canonicalPath: string;
+  lang: Lang;
+  ogType?: 'website' | 'article' | 'profile';
+  ogImage?: string;
+  preloadImage?: string;
+  preloadImageSrcset?: string;
+  preloadImageSizes?: string;
+  preloadImageType?: string;
+  schemas?: Array<Record<string, unknown>>;
+  includeRss?: boolean;
+}
+
+const props = Astro.props;
+const currentPath = Astro.url.pathname;
+---
+<!doctype html>
+<html lang={props.lang}>
+  <head>
+    <BaseHead {...props} />
+  </head>
+  <body>
+    <div class="public-page">
+      <Navbar lang={props.lang} currentPath={currentPath} />
+      <main class="pub-main" id="main-content">
+        <slot />
+      </main>
+      <Footer lang={props.lang} />
+    </div>
+    <PublicScript />
+  </body>
+</html>

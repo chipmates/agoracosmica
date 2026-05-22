@@ -1,0 +1,72 @@
+---
+import Public from '../../layouts/Public.astro';
+import ThemeDetailContent from '../../components/ThemeDetailContent.astro';
+
+import { getT } from '../../i18n';
+import { articleSchema, breadcrumbSchema } from '../../lib/schemas';
+import { canonicalUrl, publicUrl, SITE_URL, MEDIA_URL } from '../../lib/urls';
+import { THEMES, type ThemeId } from '@client/data/councilCatalog';
+
+const THEME_OG_FIGURE: Record<string, string> = {
+  'meaning-purpose': 'aurelius',
+  'loss-grief': 'mandela',
+  'who-am-i': 'kahlo',
+  'mind-creativity': 'einstein',
+  'love-connection': 'rumi',
+  'freedom-justice': 'king',
+  'faith-death-mystery': 'bingen',
+  'moral-life': 'gandhi',
+};
+
+const LAUNCH_DATE = '2026-05-06';
+const TODAY = new Date().toISOString().split('T')[0];
+
+export async function getStaticPaths() {
+  return THEMES.map(theme => ({
+    params: { theme: theme.id },
+    props: { themeId: theme.id as ThemeId },
+  }));
+}
+
+const lang = 'en' as const;
+const { themeId } = Astro.props as { themeId: ThemeId };
+
+const t = getT(lang);
+const themeName = t(`themes.${themeId}.name`);
+const themeTagline = t(`themes.${themeId}.tagline`);
+const themeDescription = t(`themes.${themeId}.description`);
+
+const ogFigureId = THEME_OG_FIGURE[themeId];
+const themeOgImage = ogFigureId
+  ? `${MEDIA_URL}/images/figures/${ogFigureId}/main/1200.webp`
+  : undefined;
+const themeUrl = canonicalUrl(publicUrl(lang, `/themes/${themeId}`));
+
+const schemas = [
+  articleSchema({
+    title: themeName,
+    description: themeDescription.slice(0, 200),
+    url: themeUrl,
+    lang,
+    image: themeOgImage,
+    datePublished: LAUNCH_DATE,
+    dateModified: TODAY,
+  }),
+  breadcrumbSchema([
+    { name: t('breadcrumbs.home'), url: `${SITE_URL}/` },
+    { name: t('breadcrumbs.themes'), url: `${SITE_URL}/themes` },
+    { name: themeName, url: themeUrl },
+  ]),
+];
+---
+<Public
+  title={`${themeName} - ${themeTagline}`}
+  description={themeDescription.slice(0, 160)}
+  canonicalPath={`/themes/${themeId}`}
+  lang={lang}
+  ogType="article"
+  ogImage={themeOgImage}
+  schemas={schemas}
+>
+  <ThemeDetailContent themeId={themeId} lang={lang} />
+</Public>

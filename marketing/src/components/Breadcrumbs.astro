@@ -1,0 +1,51 @@
+---
+// Breadcrumb navigation + matching BreadcrumbList JSON-LD. The JSON-LD goes
+// directly under the breadcrumb nav so structured-data validators can scan
+// it alongside the visible markup.
+
+import { getT } from '../i18n';
+import type { Lang } from '../i18n';
+import { publicUrl, canonicalUrl } from '../lib/urls';
+import { breadcrumbSchema } from '../lib/schemas';
+
+export interface BreadcrumbItem {
+  label: string;
+  /** Omit for the current page (last item). */
+  path?: string;
+}
+
+interface Props {
+  items: BreadcrumbItem[];
+  lang: Lang;
+}
+
+const { items, lang } = Astro.props;
+const t = getT(lang);
+
+const allItems: BreadcrumbItem[] = [
+  { label: t('breadcrumbs.home'), path: '/figures' },
+  ...items,
+];
+
+const schemaItems = allItems
+  .filter(item => item.path)
+  .map(item => ({
+    name: item.label,
+    url: canonicalUrl(publicUrl(lang, item.path!)),
+  }));
+---
+<script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema(schemaItems))} />
+<nav aria-label="Breadcrumb" class="pub-breadcrumbs">
+  <ol>
+    {allItems.map((item, i) => (
+      <li>
+        {i > 0 && <span class="pub-breadcrumbs__sep" aria-hidden="true">/</span>}
+        {item.path ? (
+          <a href={publicUrl(lang, item.path)}>{item.label}</a>
+        ) : (
+          <span aria-current="page">{item.label}</span>
+        )}
+      </li>
+    ))}
+  </ol>
+</nav>

@@ -1,6 +1,6 @@
 {
   "name": "agoracosmica-client",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "private": true,
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",
@@ -35,11 +35,11 @@
   "scripts": {
     "dev": "vite",
     "start": "vite",
-    "build": "node scripts/setup-assets.mjs && node scripts/extract-public-data.mjs && vite build && node scripts/prerender.mjs && node scripts/generate-sitemap.mjs",
+    "build": "node scripts/setup-assets.mjs && node scripts/extract-public-data.mjs && vite build && (cd ../marketing && pnpm install --prefer-frozen-lockfile && pnpm build) && node scripts/merge-marketing.mjs && node scripts/generate-sitemap.mjs",
     "build:self-host": "node scripts/setup-assets.mjs && node scripts/extract-public-data.mjs && vite build",
     "build:extract": "node scripts/extract-public-data.mjs",
     "build:client": "vite build",
-    "build:prerender": "node scripts/prerender.mjs && node scripts/generate-sitemap.mjs",
+    "build:marketing": "cd ../marketing && pnpm build && cd ../client && node scripts/merge-marketing.mjs",
     "preview": "vite preview",
     "lint": "eslint .",
     "preinstall": "node check-pkgmgr.js",

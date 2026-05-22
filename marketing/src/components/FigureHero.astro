@@ -1,0 +1,49 @@
+---
+// The hero block at the top of every figure detail page. The piece that
+// must paint immediately for ad clickers — portrait, eyebrow, name, meta,
+// learn line, trailer button (React island), about paragraphs. Pre-static
+// markup, the only client-side bit is the trailer button.
+
+import FigurePortrait from './FigurePortrait.astro';
+import TrailerButton from '../islands/TrailerButton';
+import { getT } from '../i18n';
+import type { Lang } from '../i18n';
+
+interface Figure {
+  id: string;
+  name: string;
+  period?: string;
+  tradition?: string;
+  about: string;
+  learn?: string;
+}
+
+interface Props {
+  figure: Figure;
+  lang: Lang;
+}
+
+const { figure, lang } = Astro.props;
+const t = getT(lang);
+
+const metaLine = [figure.tradition, figure.period].filter(Boolean).join('  ·  ');
+const aboutParas = figure.about
+  .split('\n')
+  .map(p => p.trim())
+  .filter(Boolean);
+---
+<section class="pub-fig-hero">
+  <div class="pub-fig-hero__portrait">
+    <FigurePortrait figureId={figure.id} alt={figure.name} />
+  </div>
+  <div class="pub-fig-hero__text">
+    <p class="pub-fig-hero__eyebrow">{t('figures.echoOf')}</p>
+    <h1 class="pub-fig-hero__name">{figure.name}</h1>
+    {metaLine && <p class="pub-fig-hero__meta">{metaLine}</p>}
+    {figure.learn && (
+      <p class="pub-fig-hero__learn">{`“${figure.learn}”`}</p>
+    )}
+    <TrailerButton client:idle figureId={figure.id} lang={lang} />
+    {aboutParas.map(p => <p class="pub-fig-hero__about">{p}</p>)}
+  </div>
+</section>

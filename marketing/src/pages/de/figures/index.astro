@@ -1,0 +1,38 @@
+---
+import Public from '../../../layouts/Public.astro';
+import FiguresCatalogContent from '../../../components/FiguresCatalogContent.astro';
+import { getT } from '../../../i18n';
+import { itemListSchema, breadcrumbSchema } from '../../../lib/schemas';
+import { canonicalUrl, publicUrl, SITE_URL, MEDIA_URL } from '../../../lib/urls';
+import { getFiguresCatalog } from '@client/data/public/figuresCatalog';
+import { figureIdToSlug } from '@client/data/public/slugMap';
+
+const lang = 'de' as const;
+const t = getT(lang);
+
+const figures = getFiguresCatalog(lang);
+
+const figureItems = figures.map(f => ({
+  name: f.name,
+  url: canonicalUrl(publicUrl(lang, `/figures/${figureIdToSlug[f.id]}`)),
+  description: f.about.split('\n')[0].slice(0, 160),
+  image: `${MEDIA_URL}/images/figures/${f.id}/main/1200.webp`,
+}));
+
+const schemas = [
+  itemListSchema(figureItems),
+  breadcrumbSchema([
+    { name: t('breadcrumbs.home'), url: `${SITE_URL}/de/` },
+    { name: t('breadcrumbs.figures'), url: `${SITE_URL}/de/figures` },
+  ]),
+];
+---
+<Public
+  title={t('figures.pageTitle')}
+  description={t('figures.pageDescription')}
+  canonicalPath="/figures"
+  lang={lang}
+  schemas={schemas}
+>
+  <FiguresCatalogContent lang={lang} />
+</Public>

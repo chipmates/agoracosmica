@@ -1,0 +1,19 @@
+---
+import { getT } from '../i18n';
+import type { Lang } from '../i18n';
+import { publicUrl } from '../lib/urls';
+
+interface Props {
+  themeId: string;
+  councilCount: number;
+  lang: Lang;
+}
+
+const { themeId, councilCount, lang } = Astro.props;
+const t = getT(lang);
+---
+<a href={publicUrl(lang, `/themes/${themeId}`)} class="pub-theme-tile">
+  <h2 class="pub-theme-tile__name">{t(`themes.${themeId}.name`)}</h2>
+  <p class="pub-theme-tile__question">{t(`themes.${themeId}.tagline`)}</p>
+  <p class="pub-theme-tile__count">{councilCount} {t('themes.councils')}</p>
+</a>

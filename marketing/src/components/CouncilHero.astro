@@ -1,0 +1,89 @@
+---
+// Featured-debate hero card on the theme detail page. Mirrors the React
+// CouncilHero.tsx — static portraits, title, question, tagline, cast. The
+// only interactive island is the council preview audio button.
+
+import StaticImage from './StaticImage.astro';
+import CouncilPreviewButton from '../islands/CouncilPreviewButton';
+import { getT } from '../i18n';
+import type { Lang } from '../i18n';
+import {
+  type CatalogCouncil,
+  getLocalizedTitle,
+  getLocalizedQuestion,
+  getLocalizedTagline,
+  getShortDisplayName,
+  getThemeAccentVar,
+} from '@client/data/councilCatalog';
+
+interface Props {
+  council: CatalogCouncil;
+  lang: Lang;
+}
+
+const { council, lang } = Astro.props;
+const t = getT(lang);
+
+const title = getLocalizedTitle(council, lang);
+const question = getLocalizedQuestion(council, lang);
+const tagline = getLocalizedTagline(council, lang);
+const accentVar = getThemeAccentVar(council.theme);
+const typeEmoji = council.type === 'confrontational' ? '🔥' : '🌊';
+const cast = [council.moderator, ...council.participants];
+---
+<section class="pub-council-hero" data-theme={council.theme}>
+  <div class="pub-council-hero__eyebrow">
+    {t('themes.featuredDebate', 'Featured debate')}
+  </div>
+
+  <div class="pub-council-hero__title-row">
+    <span class="pub-council-hero__type" aria-hidden="true">{typeEmoji}</span>
+    <h2 class="pub-council-hero__title">{title}</h2>
+  </div>
+
+  <p class="pub-council-hero__question">
+    <span
+      class="pub-council-hero__question-bar"
+      style={`background: var(${accentVar})`}
+      aria-hidden="true"
+    />
+    <span class="pub-council-hero__question-text">{question}</span>
+  </p>
+
+  {tagline && <p class="pub-council-hero__tagline">{tagline}</p>}
+
+  <div class="pub-council-hero__cast" role="list">
+    {cast.map((figure, idx) => (
+      <div class="pub-council-hero__cast-item" role="listitem">
+        <div class="pub-council-hero__portrait-frame">
+          <StaticImage
+            figureId={figure.id}
+            type="thumbnail"
+            alt={figure.name}
+            loading="lazy"
+            width={96}
+            height={96}
+          />
+          {idx === 0 && (
+            <span
+              class="pub-council-hero__crown"
+              aria-label={t('themes.moderator', 'Moderator')}
+              title={t('themes.moderator', 'Moderator')}
+            >
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" aria-hidden="true">
+                <path d="M2 7l5 5 5-9 5 9 5-5v12H2z" />
+              </svg>
+            </span>
+          )}
+        </div>
+        <span class="pub-council-hero__cast-name">
+          {getShortDisplayName(figure.id)}
+        </span>
+      </div>
+    ))}
+  </div>
+
+  <div class="pub-council-hero__actions">
+    <CouncilPreviewButton client:idle councilId={council.id} lang={lang} />
+  </div>
+</section>

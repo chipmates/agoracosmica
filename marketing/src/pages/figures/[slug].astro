@@ -1,0 +1,67 @@
+---
+import Public from '../../layouts/Public.astro';
+import FigureDetailContent from '../../components/FigureDetailContent.astro';
+
+import { getT } from '../../i18n';
+import { breadcrumbSchema, personSchema } from '../../lib/schemas';
+import { canonicalUrl, publicUrl, SITE_URL, MEDIA_URL } from '../../lib/urls';
+import { figureSlugToId } from '@client/data/public/slugMap';
+import { getFigureById } from '@client/data/public/figuresCatalog';
+import { getFigureSeo } from '@client/data/public/figureSeo';
+
+export async function getStaticPaths() {
+  return Object.entries(figureSlugToId).map(([slug, figureId]) => ({
+    params: { slug },
+    props: { figureId },
+  }));
+}
+
+const lang = 'en' as const;
+const { slug } = Astro.params;
+const { figureId } = Astro.props as { figureId: string };
+
+const t = getT(lang);
+const figure = getFigureById(figureId, lang);
+const seo = getFigureSeo(figureId, lang);
+
+if (!figure) throw new Error(`Unknown figure: ${figureId}`);
+
+const aboutParas = figure.about.split('\n').map(p => p.trim()).filter(Boolean);
+const metaDescription = seo?.description || aboutParas[0]?.slice(0, 160) || '';
+const figureUrl = `${SITE_URL}/figures/${slug}`;
+const figureImage = `${MEDIA_URL}/images/figures/${figureId}/main/1200.webp`;
+const figureImageSrcset = `${MEDIA_URL}/images/figures/${figureId}/thumbnail/320.webp 320w, ${MEDIA_URL}/images/figures/${figureId}/thumbnail/640.webp 640w, ${MEDIA_URL}/images/figures/${figureId}/main/600.webp 600w, ${MEDIA_URL}/images/figures/${figureId}/main/900.webp 900w, ${MEDIA_URL}/images/figures/${figureId}/main/1200.webp 1200w`;
+const figureImageSizes = '(min-width: 820px) 384px, 62vw';
+
+const schemas = [
+  personSchema({
+    name: figure.name,
+    about: aboutParas[0] || figure.about,
+    period: figure.period,
+    tradition: figure.tradition,
+    slug: slug!,
+    lang,
+    image: figureImage,
+  }),
+  breadcrumbSchema([
+    { name: t('breadcrumbs.home'), url: `${SITE_URL}/` },
+    { name: t('breadcrumbs.figures'), url: `${SITE_URL}/figures` },
+    { name: figure.name, url: figureUrl },
+  ]),
+];
+---
+<Public
+  title={`${figure.name} - ${t('figures.life')} & ${t('figures.teachings')}`}
+  fullTitle={seo?.seoTitle}
+  description={metaDescription}
+  canonicalPath={`/figures/${slug}`}
+  lang={lang}
+  ogType="profile"
+  ogImage={figureImage}
+  preloadImage={`${MEDIA_URL}/images/figures/${figureId}/thumbnail/640.webp`}
+  preloadImageSrcset={figureImageSrcset}
+  preloadImageSizes={figureImageSizes}
+  schemas={schemas}
+>
+  <FigureDetailContent figureId={figureId} slug={slug!} lang={lang} />
+</Public>

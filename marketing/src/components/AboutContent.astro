@@ -1,0 +1,216 @@
+---
+import Breadcrumbs from './Breadcrumbs.astro';
+import ContentVolume from './ContentVolume.astro';
+import PublicCTA from './PublicCTA.astro';
+import { getT } from '../i18n';
+import type { Lang } from '../i18n';
+import { publicUrl } from '../lib/urls';
+import { getFiguresCatalog } from '@client/data/public/figuresCatalog';
+import { figureIdToSlug } from '@client/data/public/slugMap';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = getT(lang);
+
+const TRADITION_GROUPS = [
+  { key: 'western', ids: ['aurelius', 'plato', 'nietzsche', 'schopenhauer', 'beauvoir', 'eckhart'] },
+  { key: 'eastern', ids: ['laozi', 'gautama', 'rumi', 'zenji'] },
+  { key: 'literature', ids: ['woolf', 'dickinson', 'shakespeare', 'austen', 'goethe', 'blake'] },
+  { key: 'art', ids: ['kahlo', 'mozart', 'vinci'] },
+  { key: 'science', ids: ['einstein', 'galilei', 'lovelace'] },
+  { key: 'justice', ids: ['king', 'gandhi', 'mandela', 'tubman', 'angelou'] },
+  { key: 'psychology', ids: ['jung', 'campbell'] },
+  { key: 'mysticism', ids: ['bingen'] },
+];
+
+const TRADITION_LABELS: Record<string, Record<Lang, string>> = {
+  western: { en: 'Western Philosophy', de: 'Westliche Philosophie' },
+  eastern: { en: 'Eastern Wisdom', de: 'Östliche Weisheit' },
+  literature: { en: 'Literature & Poetry', de: 'Literatur & Poesie' },
+  art: { en: 'Art & Expression', de: 'Kunst & Ausdruck' },
+  science: { en: 'Science & Innovation', de: 'Wissenschaft & Innovation' },
+  justice: { en: 'Justice & Liberation', de: 'Gerechtigkeit & Befreiung' },
+  psychology: { en: 'Psychology & Myth', de: 'Psychologie & Mythos' },
+  mysticism: { en: 'Mysticism', de: 'Mystik' },
+};
+
+const MODE_CARDS = [
+  { key: 'story', nameKey: 'journey.modeStory', badge: 'listen' },
+  { key: 'wisdom', nameKey: 'journey.modeWisdom', badge: 'talk' },
+  { key: 'prism', nameKey: 'journey.modePrism', badge: 'listen' },
+  { key: 'quest', nameKey: 'journey.modeQuest', badge: 'talk' },
+  { key: 'freetalk', nameKey: 'journey.freetalk', badge: 'talk' },
+  { key: 'council', nameKey: 'journey.modeCouncil', badge: 'listen' },
+];
+
+function splitLabel(value: string): { label: string; text: string } {
+  const idx = value.indexOf(': ');
+  if (idx === -1) return { label: '', text: value };
+  return { label: value.slice(0, idx), text: value.slice(idx + 2) };
+}
+
+const values = (['valueGratitude', 'valueCuriosity', 'valueOpenness', 'valueTransformation'] as const)
+  .map(k => splitLabel(t(`about.${k}`)));
+const barriers = (['barrierGeographic', 'barrierAcademic', 'barrierAge', 'barrierEconomic'] as const)
+  .map(k => splitLabel(t(`about.${k}`)));
+
+const figures = getFiguresCatalog(lang);
+const figureMap = new Map(figures.map(f => [f.id, f]));
+
+const missionParas = t('about.missionStatement').split('\n\n');
+---
+<div class="pub-content pub-about">
+  <Breadcrumbs lang={lang} items={[{ label: t('breadcrumbs.about') }]} />
+
+  <h1 class="pub-hero__title">{t('about.pageTitle')}</h1>
+  <p class="pub-about-lead">{t('about.mission')}</p>
+
+  <section class="pub-section">
+    <h2 class="pub-section__title">{t('about.missionTitle')}</h2>
+    <div class="pub-section__text">
+      {missionParas.map(p => <p>{p}</p>)}
+    </div>
+  </section>
+
+  <section class="pub-section">
+    <h2 class="pub-section__title">{t('about.organizationTitle')}</h2>
+    <div class="pub-section__text">
+      <p>{t('about.organizationStatement')}</p>
+    </div>
+  </section>
+
+  <section class="pub-section">
+    <h2 class="pub-section__title">{t('about.valuesTitle')}</h2>
+    <dl class="pub-about-dl">
+      {values.map(v => (
+        <div class="pub-about-dl__row">
+          <dt>{v.label}</dt>
+          <dd>{v.text}</dd>
+        </div>
+      ))}
+    </dl>
+  </section>
+
+  <section class="pub-section">
+    <h2 class="pub-section__title">{t('about.promiseTitle')}</h2>
+    <div class="pub-section__text">
+      <p>{t('about.promiseStatement')}</p>
+    </div>
+  </section>
+
+  <section class="pub-section">
+    <h2 class="pub-section__title">{t('about.barriersTitle')}</h2>
+    <div class="pub-section__text">
+      <p>{t('about.barriersIntro')}</p>
+    </div>
+    <dl class="pub-about-dl">
+      {barriers.map(b => (
+        <div class="pub-about-dl__row">
+          <dt>{b.label}</dt>
+          <dd>{b.text}</dd>
+        </div>
+      ))}
+    </dl>
+  </section>
+
+  <section class="pub-section">
+    <h2 class="pub-section__title">{t('about.successTitle')}</h2>
+    <div class="pub-section__text">
+      <p>{t('about.successStatement')}</p>
+    </div>
+  </section>
+
+  <ContentVolume lang={lang} />
+
+  <section class="pub-section">
+    <h2 class="pub-section__title">{t('about.whatYoullFind.title')}</h2>
+    <div class="pub-section__text">
+      <p>{t('about.whatYoullFind.p1')}</p>
+      <p>{t('about.whatYoullFind.p2')}</p>
+      <p>{t('about.whatYoullFind.p3')}</p>
+    </div>
+  </section>
+
+  <section class="pub-section">
+    <h2 class="pub-section__title">{t('about.howItWorks.title')}</h2>
+    <div class="pub-section__text">
+      <p>{t('about.howItWorks.subtitle')}</p>
+    </div>
+    <div class="pub-concepts">
+      {MODE_CARDS.map(mode => (
+        <div class="pub-concept">
+          <div class="pub-concept__head">
+            <span class="pub-concept__term">{t(mode.nameKey)}</span>
+            <span class={`pub-journey__badge pub-journey__badge--${mode.badge}`}>
+              {t(`journey.${mode.badge}`)}
+            </span>
+          </div>
+          <div class="pub-concept__def">{t(`about.howItWorks.${mode.key}`)}</div>
+        </div>
+      ))}
+      <div class="pub-concept">
+        <div class="pub-concept__term">{t('journey.audioLibrary')}</div>
+        <div class="pub-concept__def">{t('about.howItWorks.audioLibrary')}</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="pub-section">
+    <h2 class="pub-section__title">{t('about.figures.title')}</h2>
+    <div class="pub-section__text">
+      <p>{t('about.figures.description')}</p>
+    </div>
+    {TRADITION_GROUPS.map(group => (
+      <div class="pub-about-group">
+        <h3 class="pub-about-group__label">
+          {TRADITION_LABELS[group.key]?.[lang] || group.key}
+        </h3>
+        <div class="pub-about-group__figures">
+          {group.ids.map(id => {
+            const fig = figureMap.get(id);
+            if (!fig) return null;
+            return (
+              <a
+                href={publicUrl(lang, `/figures/${figureIdToSlug[id]}`)}
+                class="pub-hero__badge"
+              >
+                {fig.name}
+              </a>
+            );
+          })}
+        </div>
+      </div>
+    ))}
+  </section>
+
+  <section class="pub-section">
+    <h2 class="pub-section__title">{t('about.builtDifferent.title')}</h2>
+    <div class="pub-about-points">
+      {(['nonprofit', 'factChecked', 'noTracking', 'freeTurns'] as const).map(key => (
+        <p>{t(`about.builtDifferent.${key}`)}</p>
+      ))}
+      <p>
+        {t('about.builtDifferent.github')}{' '}
+        <a
+          href="https://github.com/chipmates/agoracosmica"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="pub-textlink"
+        >
+          chipmates/agoracosmica
+        </a>
+      </p>
+    </div>
+  </section>
+
+  <div class="pub-about-quote">
+    <div class="pub-about-quote__rule" aria-hidden="true" />
+    <blockquote>{t('about.closingQuote')}</blockquote>
+    <cite class="pub-about-quote__cite">— {t('about.closingAttribution')}</cite>
+  </div>
+
+  <PublicCTA variant="inline" lang={lang} />
+</div>

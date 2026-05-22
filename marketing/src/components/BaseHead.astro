@@ -1,0 +1,118 @@
+---
+// All <head> metadata for a marketing page. Mirrors the per-page meta block
+// the React MetaTags.tsx component emits + the JSON-LD schema block that
+// JsonLd.tsx renders, but inlined directly into the prerendered HTML so
+// crawlers and social unfurlers see everything without running JS.
+
+import { canonicalUrl, alternateUrls, MEDIA_URL } from '../lib/urls';
+import type { Lang } from '../i18n';
+import { podcastRssLink } from '../lib/schemas';
+
+interface Props {
+  title: string;
+  /** Optional override; otherwise `${title} | Agora Cosmica`. */
+  fullTitle?: string;
+  description: string;
+  /** Path without lang prefix or trailing slash — eg `/figures/marcus-aurelius`. */
+  canonicalPath: string;
+  lang: Lang;
+  ogType?: 'website' | 'article' | 'profile';
+  ogImage?: string;
+  /** Preload the LCP image. Provide srcset + sizes for responsive selection. */
+  preloadImage?: string;
+  preloadImageSrcset?: string;
+  preloadImageSizes?: string;
+  preloadImageType?: string;
+  /** Inline JSON-LD blocks. Each entry becomes one <script type="application/ld+json">. */
+  schemas?: Array<Record<string, unknown>>;
+  /** Emit the podcast feed as <link rel="alternate" type="application/rss+xml">. */
+  includeRss?: boolean;
+}
+
+const {
+  title,
+  fullTitle,
+  description,
+  canonicalPath,
+  lang,
+  ogType = 'website',
+  ogImage,
+  preloadImage,
+  preloadImageSrcset,
+  preloadImageSizes,
+  preloadImageType,
+  schemas = [],
+  includeRss = false,
+} = Astro.props;
+
+const computedFullTitle = fullTitle ?? `${title} | Agora Cosmica`;
+const canonical = canonicalUrl(lang === 'de' ? `/de${canonicalPath}` : canonicalPath);
+const alts = alternateUrls(canonicalPath);
+const image = ogImage ?? `${MEDIA_URL}/images/ui/og-default/1200.webp`;
+const rss = includeRss ? podcastRssLink(lang) : null;
+const ogLocale = lang === 'de' ? 'de_DE' : 'en_US';
+---
+<meta charset="utf-8" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+<link rel="mask-icon" href="/mask-icon.svg" color="#E6BC5C" />
+<meta name="msapplication-TileColor" content="#151C47" />
+<meta name="theme-color" content="#151C47" />
+<link rel="manifest" href="/manifest.json" />
+<link rel="preconnect" href="https://media.agoracosmica.org" crossorigin />
+<link rel="dns-prefetch" href="https://media.agoracosmica.org" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="age-de-meta-label" content="age=16 hash: v=1.0 kind=sl protocol=all" />
+
+<title>{computedFullTitle}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+<link rel="alternate" hreflang="en" href={alts.en} />
+<link rel="alternate" hreflang="de" href={alts.de} />
+<link rel="alternate" hreflang="x-default" href={alts.en} />
+
+<meta property="og:title" content={computedFullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:type" content={ogType} />
+<meta property="og:image" content={image} />
+<meta property="og:site_name" content="Agora Cosmica" />
+<meta property="og:locale" content={ogLocale} />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={computedFullTitle} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={image} />
+
+{rss && (
+  <link rel="alternate" type="application/rss+xml" title={rss.title} href={rss.href} />
+)}
+
+{preloadImage && !preloadImageSrcset && (
+  <link
+    rel="preload"
+    as="image"
+    href={preloadImage}
+    type={preloadImageType ?? 'image/webp'}
+    fetchpriority="high"
+  />
+)}
+{preloadImageSrcset && (
+  <link
+    rel="preload"
+    as="image"
+    href={preloadImage}
+    imagesrcset={preloadImageSrcset}
+    imagesizes={preloadImageSizes}
+    type={preloadImageType ?? 'image/webp'}
+    fetchpriority="high"
+  />
+)}
+
+<link rel="preload" href="/fonts/libre-caslon-text-v5-latin-regular.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="/fonts/SpaceGrotesk[wght].woff2" as="font" type="font/woff2" crossorigin />
+<link rel="stylesheet" href="/fonts/fonts.css" />
+<link rel="prefetch" href="/" as="document" />
+
+{schemas.map(s => (
+  <script type="application/ld+json" set:html={JSON.stringify(s)} />
+))}

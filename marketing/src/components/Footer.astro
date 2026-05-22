@@ -1,0 +1,46 @@
+---
+import { getT } from '../i18n';
+import type { Lang } from '../i18n';
+import { publicUrl } from '../lib/urls';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = getT(lang);
+---
+<footer class="pub-footer">
+  <div class="pub-footer__inner">
+    <div class="pub-footer__brand">
+      <span class="pub-footer__name">Agora Cosmica</span>
+      <p class="pub-footer__tagline">{t('footer.tagline')}</p>
+    </div>
+
+    <div class="pub-footer__links">
+      <div class="pub-footer__col">
+        <a href={publicUrl(lang, '/figures')}>{t('nav.figures')}</a>
+        <a href={publicUrl(lang, '/themes')}>{t('nav.themes')}</a>
+        <a href={publicUrl(lang, '/about')}>{t('nav.about')}</a>
+        <a href={publicUrl(lang, '/contact')}>{t('nav.contact')}</a>
+      </div>
+      <div class="pub-footer__col">
+        <a href="/impressum/">{t('footer.impressum')}</a>
+        <a href="/datenschutz/">{t('footer.datenschutz')}</a>
+        <a href="/cookie-policy/">{t('footer.cookiePolicy')}</a>
+        <a href="/nutzungsbedingungen/">{t('footer.terms')}</a>
+      </div>
+      <div class="pub-footer__col">
+        <a href="https://open.spotify.com/show/3V02q5c8NAnFD1W2kQBYzd" target="_blank" rel="noopener noreferrer">Spotify</a>
+        <a href="https://www.youtube.com/@agoracosmica" target="_blank" rel="noopener noreferrer">YouTube</a>
+        <a href="https://podcasts.apple.com/us/podcast/agora-cosmica/id1871505788" target="_blank" rel="noopener noreferrer">Apple Podcasts</a>
+        <a href="https://github.com/chipmates/agoracosmica" target="_blank" rel="noopener noreferrer">GitHub</a>
+      </div>
+    </div>
+
+    <div class="pub-footer__bottom">
+      <p class="pub-footer__project">{t('footer.projectOf')}</p>
+      <p class="pub-footer__trust">{t('footer.trustSignals')}</p>
+    </div>
+  </div>
+</footer>

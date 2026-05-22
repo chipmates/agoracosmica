@@ -1,0 +1,65 @@
+---
+import Breadcrumbs from './Breadcrumbs.astro';
+import { getT } from '../i18n';
+import type { Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = getT(lang);
+
+const spotifyUrl = lang === 'de'
+  ? 'https://open.spotify.com/show/5i63mEKJuCVniSIViXbEP8'
+  : 'https://open.spotify.com/show/3V02q5c8NAnFD1W2kQBYzd';
+const youtubeUrl = lang === 'de'
+  ? 'https://www.youtube.com/@agoracosmicade'
+  : 'https://www.youtube.com/@agoracosmica';
+const applePodcastUrl = lang === 'de'
+  ? 'https://podcasts.apple.com/us/podcast/agora-cosmica-deutsch/id1871505945'
+  : 'https://podcasts.apple.com/us/podcast/agora-cosmica/id1871505788';
+const podcastSuffix = lang === 'de' ? ' Deutsch' : '';
+const country = lang === 'de' ? 'Deutschland' : 'Germany';
+---
+<div class="pub-content pub-contact">
+  <Breadcrumbs lang={lang} items={[{ label: t('breadcrumbs.contact') }]} />
+
+  <h1 class="pub-hero__title">{t('contact.heading')}</h1>
+  <p class="pub-contact-intro">{t('contact.description')}</p>
+
+  <section class="pub-section">
+    <h2 class="pub-section__title">{t('contact.email')}</h2>
+    <p class="pub-section__text">
+      <a href="mailto:agoracosmica@chipmates.ai" class="pub-textlink">agoracosmica@chipmates.ai</a>
+    </p>
+  </section>
+
+  <section class="pub-section">
+    <h2 class="pub-section__title">{t('contact.address')}</h2>
+    <address class="pub-section__text pub-contact-address">
+      ChipMates gemeinnützige GmbH<br />
+      Schusterstr. 50<br />
+      79098 Freiburg im Breisgau<br />
+      {country}
+    </address>
+  </section>
+
+  <section class="pub-section">
+    <h2 class="pub-section__title">{t('contact.social')}</h2>
+    <div class="pub-contact-links">
+      <a href={spotifyUrl} target="_blank" rel="noopener noreferrer" class="pub-textlink">
+        Spotify - Agora Cosmica{podcastSuffix}
+      </a>
+      <a href={youtubeUrl} target="_blank" rel="noopener noreferrer" class="pub-textlink">
+        YouTube - Agora Cosmica{podcastSuffix}
+      </a>
+      <a href={applePodcastUrl} target="_blank" rel="noopener noreferrer" class="pub-textlink">
+        Apple Podcasts - Agora Cosmica{podcastSuffix}
+      </a>
+      <a href="https://github.com/chipmates/agoracosmica" target="_blank" rel="noopener noreferrer" class="pub-textlink">
+        GitHub - chipmates/agoracosmica
+      </a>
+    </div>
+  </section>
+</div>

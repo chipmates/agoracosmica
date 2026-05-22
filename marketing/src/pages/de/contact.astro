@@ -1,0 +1,28 @@
+---
+import Public from '../../layouts/Public.astro';
+import ContactContent from '../../components/ContactContent.astro';
+import { getT } from '../../i18n';
+import { organizationSchema } from '../../lib/schemas';
+
+const lang = 'de' as const;
+const t = getT(lang);
+
+const contactSchema = {
+  ...organizationSchema(),
+  contactPoint: {
+    '@type': 'ContactPoint',
+    email: 'agoracosmica@chipmates.ai',
+    contactType: 'customer service',
+    availableLanguage: ['English', 'German'],
+  },
+};
+---
+<Public
+  title={t('contact.pageTitle')}
+  description={t('contact.pageDescription')}
+  canonicalPath="/contact"
+  lang={lang}
+  schemas={[contactSchema]}
+>
+  <ContactContent lang={lang} />
+</Public>

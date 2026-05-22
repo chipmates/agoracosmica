@@ -1,0 +1,176 @@
+---
+// Full body for a theme detail page. The voice essay renders faced when the
+// curated voices line up with the essay's middle paragraphs, else as plain
+// prose. CouncilHero embeds the only React island (council preview audio).
+
+import Breadcrumbs from './Breadcrumbs.astro';
+import ThemeHero from './ThemeHero.astro';
+import EchoNote from './EchoNote.astro';
+import ThemeVoice from './ThemeVoice.astro';
+import CouncilHero from './CouncilHero.astro';
+import CollapsibleSection from './CollapsibleSection.astro';
+import PublicCTA from './PublicCTA.astro';
+
+import { getT } from '../i18n';
+import type { Lang } from '../i18n';
+import { publicUrl } from '../lib/urls';
+import {
+  type ThemeId,
+  THEMES,
+  councilsByTheme,
+  getLocalizedTitle,
+  getLocalizedHook,
+  getShortDisplayName,
+} from '@client/data/councilCatalog';
+import { themeVoices } from '@client/data/public/themeVoices';
+
+interface Props {
+  themeId: ThemeId;
+  lang: Lang;
+}
+
+const RELATED_THEMES: Record<string, string[]> = {
+  'meaning-purpose': ['who-am-i', 'moral-life', 'faith-death-mystery'],
+  'loss-grief': ['love-connection', 'faith-death-mystery', 'who-am-i'],
+  'who-am-i': ['meaning-purpose', 'mind-creativity', 'freedom-justice'],
+  'mind-creativity': ['who-am-i', 'meaning-purpose', 'love-connection'],
+  'love-connection': ['loss-grief', 'moral-life', 'who-am-i'],
+  'freedom-justice': ['moral-life', 'who-am-i', 'meaning-purpose'],
+  'faith-death-mystery': ['meaning-purpose', 'loss-grief', 'moral-life'],
+  'moral-life': ['freedom-justice', 'meaning-purpose', 'love-connection'],
+};
+
+const { themeId, lang } = Astro.props;
+const t = getT(lang);
+
+const themeName = t(`themes.${themeId}.name`);
+const themeTagline = t(`themes.${themeId}.tagline`);
+const themeIntroRaw = t(`themes.${themeId}.intro`);
+const themeIntro =
+  themeIntroRaw && themeIntroRaw !== `themes.${themeId}.intro` ? themeIntroRaw : '';
+
+const councils = [...(councilsByTheme[themeId] ?? [])].sort((a, b) => a.sortOrder - b.sortOrder);
+const heroCouncil = councils[0];
+const otherCouncils = councils.slice(1);
+
+const paragraphs = themeIntro
+  ? themeIntro.split('\n\n').map(p => p.trim()).filter(Boolean)
+  : [];
+const voices = themeVoices[themeId] ?? [];
+const faced = voices.length > 0 && paragraphs.length >= voices.length + 2;
+const lead = faced ? paragraphs[0] : '';
+const voiceParas = faced ? paragraphs.slice(1, 1 + voices.length) : [];
+const coda = faced ? paragraphs.slice(1 + voices.length).join(' ') : '';
+
+const relatedThemeIds = (RELATED_THEMES[themeId] ?? []).slice(0, 3);
+
+function councilTypeLabel(type: 'confrontational' | 'reflective'): string {
+  if (lang === 'de') {
+    return type === 'confrontational' ? 'konfrontativ' : 'reflektiv';
+  }
+  return type;
+}
+---
+<div class="pub-content pub-theme">
+  <Breadcrumbs
+    lang={lang}
+    items={[
+      { label: t('breadcrumbs.themes'), path: '/themes' },
+      { label: themeName },
+    ]}
+  />
+
+  <ThemeHero themeName={themeName} themeTagline={themeTagline} lang={lang} />
+
+  <div class="pub-theme-body">
+    <EchoNote variant="theme" lang={lang} />
+
+    {faced ? (
+      <>
+        {lead && <p class="pub-voices__lead">{lead}</p>}
+        <section>
+          {voices.map((voice, i) => (
+            <ThemeVoice
+              figureId={voice.figureId}
+              stance={lang === 'de' ? voice.stanceDe : voice.stance}
+              paragraph={voiceParas[i] ?? ''}
+              lang={lang}
+            />
+          ))}
+        </section>
+        {coda && <p class="pub-theme-coda">{coda}</p>}
+      </>
+    ) : (
+      themeIntro && (
+        <section class="pub-section">
+          <div class="pub-section__text">
+            {paragraphs.map(para => <p>{para}</p>)}
+          </div>
+        </section>
+      )
+    )}
+
+    {heroCouncil && <CouncilHero council={heroCouncil} lang={lang} />}
+
+    {otherCouncils.length > 0 && (
+      <CollapsibleSection
+        title={t('themes.moreDebates', 'More debates in this theme')}
+        count={otherCouncils.length}
+      >
+        <div class="pub-council-list">
+          {otherCouncils.map(council => (
+            <a
+              href="/"
+              data-agc-cta="start-exploring"
+              data-agc-council={council.id}
+              class="pub-council-row pub-council-row--link"
+              aria-label={`${t('cta.listenDebate', 'Listen to this debate')}: ${getLocalizedTitle(council, lang)}`}
+            >
+              <div class="pub-council-row__head">
+                <span class="pub-council-row__title">
+                  {getLocalizedTitle(council, lang)}
+                </span>
+                <span class="pub-council-row__tag">
+                  {councilTypeLabel(council.type)}
+                </span>
+              </div>
+              <p class="pub-council-row__hook">
+                {getLocalizedHook(council, lang)}
+              </p>
+              <p class="pub-council-row__figures">
+                {[council.moderator, ...council.participants]
+                  .map(p => getShortDisplayName(p.id))
+                  .join(' · ')}
+              </p>
+              <span class="pub-council-row__cta">
+                {t('cta.listenDebate', 'Listen to this debate')}
+              </span>
+            </a>
+          ))}
+        </div>
+      </CollapsibleSection>
+    )}
+
+    {relatedThemeIds.length > 0 && (
+      <CollapsibleSection title={t('themes.relatedThemes')}>
+        <div class="pub-theme-rel">
+          {relatedThemeIds.map(relId => (
+            <a
+              href={publicUrl(lang, `/themes/${relId}`)}
+              class="pub-theme-rel__link"
+            >
+              {t(`themes.${relId}.name`)}
+            </a>
+          ))}
+        </div>
+      </CollapsibleSection>
+    )}
+  </div>
+
+  <PublicCTA
+    variant="sticky"
+    councilCta={true}
+    councilId={heroCouncil?.id}
+    lang={lang}
+  />
+</div>

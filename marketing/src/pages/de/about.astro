@@ -1,0 +1,32 @@
+---
+import Public from '../../layouts/Public.astro';
+import AboutContent from '../../components/AboutContent.astro';
+import { getT } from '../../i18n';
+import {
+  agoraCosmicaSchema,
+  organizationSchema,
+  webSiteSchema,
+  softwareApplicationSchema,
+  podcastSeriesSchema,
+} from '../../lib/schemas';
+
+const lang = 'de' as const;
+const t = getT(lang);
+---
+<Public
+  title={t('about.pageTitle')}
+  description={t('about.pageDescription')}
+  canonicalPath="/about"
+  lang={lang}
+  ogType="website"
+  includeRss={true}
+  schemas={[
+    agoraCosmicaSchema(),
+    organizationSchema(),
+    webSiteSchema(),
+    softwareApplicationSchema(),
+    podcastSeriesSchema(lang),
+  ]}
+>
+  <AboutContent lang={lang} />
+</Public>

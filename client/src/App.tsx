@@ -6,14 +6,21 @@ import {
   Outlet,
   useLocation
 } from 'react-router-dom';
-import HomePage from './pages/HomePage';
+// HomePage is the post-login app shell with the audio engine, council suite,
+// chat, modals, and the rest of the in-app surface. Lazy-loaded so first-paint
+// on / doesn't drag the whole bundle down. LoginPage stays eager — it IS the
+// page at / for unauthenticated visitors, so an extra round-trip would be
+// silly.
+const HomePage = React.lazy(() => import('./pages/HomePage'));
 import LoginPage from './pages/LoginPage';
 import ImpressumPage from './pages/ImpressumPage';
 import DatenschutzPage from './pages/DatenschutzPage';
 import CookiePolicyPage from './pages/CookiePolicyPage';
 import NutzungsbedingungenPage from './pages/NutzungsbedingungenPage';
-// Public SEO pages - remove this import and the pages/public + components/public dirs to strip marketing pages
-import { publicRouteObjects } from './routes/publicRoutes';
+// Public marketing pages now ship from the sibling Astro project (../marketing).
+// CF Pages serves the prerendered HTML for /figures/*, /themes/*, /about,
+// /contact directly; this React SPA only handles `/`, `/de/`, and the legal
+// pages (Impressum, Datenschutz, Cookie Policy, Nutzungsbedingungen).
 import { sendConversion } from './utils/public/gclidCapture';
 import { sendEntryBeacon } from './utils/entryBeacon';
 // Dev/test pages — only imported in dev mode so Vite excludes them from production build.
@@ -382,7 +389,6 @@ function App(): React.ReactElement {
 
   // Create router with future flags — memoized to prevent recreation on unrelated re-renders
   const router = useMemo(() => createBrowserRouter([
-    ...publicRouteObjects,
     {
       path: "/",
       element: (
@@ -432,10 +438,12 @@ function App(): React.ReactElement {
         {
           index: true,
           element: isLoggedIn ? (
-            <HomePage 
-              onLogout={handleLogout} 
-              onSelectFigure={() => {}}
-            />
+            <SuspenseWrap>
+              <HomePage
+                onLogout={handleLogout}
+                onSelectFigure={() => {}}
+              />
+            </SuspenseWrap>
           ) : (
             <LoginPage onComplete={handleEntryComplete} />
           )

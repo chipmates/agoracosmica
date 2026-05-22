@@ -1,0 +1,30 @@
+---
+import StaticImage from './StaticImage.astro';
+import type { Lang } from '../i18n';
+import { publicUrl } from '../lib/urls';
+import { figureIdToSlug } from '@client/data/public/slugMap';
+import { getFigureById } from '@client/data/public/figuresCatalog';
+
+interface Props {
+  figureId: string;
+  stance: string;
+  paragraph: string;
+  lang: Lang;
+}
+
+const { figureId, stance, paragraph, lang } = Astro.props;
+const figure = getFigureById(figureId, lang);
+const name = figure?.name || figureId;
+const slug = figureIdToSlug[figureId] || figureId;
+const href = publicUrl(lang, `/figures/${slug}`);
+---
+<div class="pub-voice">
+  <a href={href} class="pub-voice__portrait" tabindex="-1" aria-hidden="true">
+    <StaticImage figureId={figureId} type="thumbnail" alt="" loading="lazy" width={88} height={88} />
+  </a>
+  <div class="pub-voice__body">
+    <a href={href} class="pub-voice__name">{name}</a>
+    <div class="pub-voice__stance">{stance}</div>
+    <p class="pub-voice__text">{paragraph}</p>
+  </div>
+</div>

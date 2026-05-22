@@ -1,0 +1,34 @@
+---
+import Public from '../../../layouts/Public.astro';
+import ThemesCatalogContent from '../../../components/ThemesCatalogContent.astro';
+import { getT } from '../../../i18n';
+import { itemListSchema, breadcrumbSchema } from '../../../lib/schemas';
+import { canonicalUrl, publicUrl, SITE_URL } from '../../../lib/urls';
+import { THEMES } from '@client/data/councilCatalog';
+
+const lang = 'de' as const;
+const t = getT(lang);
+
+const themeItems = THEMES.map(theme => ({
+  name: t(`themes.${theme.id}.name`),
+  url: canonicalUrl(publicUrl(lang, `/themes/${theme.id}`)),
+  description: t(`themes.${theme.id}.tagline`),
+}));
+
+const schemas = [
+  itemListSchema(themeItems),
+  breadcrumbSchema([
+    { name: t('breadcrumbs.home'), url: `${SITE_URL}/de/` },
+    { name: t('breadcrumbs.themes'), url: `${SITE_URL}/de/themes` },
+  ]),
+];
+---
+<Public
+  title={t('themes.pageTitle')}
+  description={t('themes.pageDescription')}
+  canonicalPath="/themes"
+  lang={lang}
+  schemas={schemas}
+>
+  <ThemesCatalogContent lang={lang} />
+</Public>

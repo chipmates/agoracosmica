@@ -1,0 +1,53 @@
+---
+import Breadcrumbs from './Breadcrumbs.astro';
+import FigureCard from './FigureCard.astro';
+import ContentVolume from './ContentVolume.astro';
+import { getT } from '../i18n';
+import type { Lang } from '../i18n';
+import { getFiguresCatalog } from '@client/data/public/figuresCatalog';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = getT(lang);
+
+// Sort by surname (last meaningful name part), with a handful of overrides
+// for figures whose name doesn't map cleanly to a Western surname pattern.
+const surnameOverrides: Record<string, string> = {
+  laozi: 'Laozi',
+  beauvoir: 'Beauvoir',
+  bingen: 'Bingen',
+  vinci: 'Vinci',
+  zenji: 'Dogen',
+  goethe: 'Goethe',
+  king: 'King',
+  gautama: 'Gautama',
+  rumi: 'Rumi',
+  plato: 'Plato',
+};
+
+function getSurname(f: { id: string; name: string }): string {
+  if (surnameOverrides[f.id]) return surnameOverrides[f.id];
+  const parts = f.name.split(' ');
+  return parts[parts.length - 1];
+}
+
+const figures = [...getFiguresCatalog(lang)].sort((a, b) =>
+  getSurname(a).localeCompare(getSurname(b), lang),
+);
+---
+<div class="pub-content">
+  <Breadcrumbs lang={lang} items={[{ label: t('breadcrumbs.figures') }]} />
+
+  <h1 class="pub-hero__title">{t('figures.pageTitle')}</h1>
+  <ContentVolume lang={lang} />
+  <p class="pub-section__text" style="margin-bottom: 2rem">
+    {t('figures.pageDescription')}
+  </p>
+
+  <div class="pub-grid pub-grid--3">
+    {figures.map(figure => <FigureCard figure={figure} lang={lang} />)}
+  </div>
+</div>

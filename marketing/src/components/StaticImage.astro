@@ -1,0 +1,60 @@
+---
+// Reusable figure image with full responsive srcset. Mirrors the React
+// StaticImage component but lazy-loads by default (used in related-figures
+// cards + theme voice portraits — none are LCP).
+
+import {
+  getPublicImageUrl,
+  getPublicImageSrcSet,
+  type ImageType,
+} from '@client/utils/public/publicMediaUrl';
+
+interface Props {
+  figureId: string;
+  type: ImageType;
+  alt: string;
+  class?: string;
+  sizes?: string;
+  loading?: 'lazy' | 'eager';
+  width?: number;
+  height?: number;
+}
+
+const DEFAULT_SIZES: Record<ImageType, string> = {
+  main: '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 600px',
+  thumbnail: '(max-width: 640px) 50vw, 320px',
+};
+
+const DEFAULT_DIMENSIONS: Record<ImageType, { width: number; height: number }> = {
+  main: { width: 600, height: 726 },
+  thumbnail: { width: 320, height: 320 },
+};
+
+const {
+  figureId,
+  type,
+  alt,
+  class: className,
+  sizes,
+  loading = 'lazy',
+  width,
+  height,
+} = Astro.props;
+
+const dims = DEFAULT_DIMENSIONS[type];
+const fallbackSize = type === 'main' ? 600 : 320;
+const resolvedSizes = sizes ?? DEFAULT_SIZES[type];
+---
+<picture>
+  <source type="image/avif" srcset={getPublicImageSrcSet(figureId, type, 'avif')} sizes={resolvedSizes} />
+  <source type="image/webp" srcset={getPublicImageSrcSet(figureId, type, 'webp')} sizes={resolvedSizes} />
+  <img
+    src={getPublicImageUrl(figureId, type, fallbackSize, 'png')}
+    alt={alt}
+    class={className}
+    loading={loading}
+    width={width ?? dims.width}
+    height={height ?? dims.height}
+    decoding="async"
+  />
+</picture>

@@ -1,0 +1,31 @@
+---
+import StaticImage from './StaticImage.astro';
+import type { Lang } from '../i18n';
+import { publicUrl } from '../lib/urls';
+import { figureIdToSlug } from '@client/data/public/slugMap';
+import type { PublicFigure } from '@client/data/public/figuresCatalog';
+
+interface Props {
+  figure: PublicFigure;
+  lang: Lang;
+}
+
+const { figure, lang } = Astro.props;
+const slug = figureIdToSlug[figure.id] || figure.id;
+const learnLine = figure.learn.trim();
+const fallback = figure.about.split('\n')[0].slice(0, 110);
+---
+<a href={publicUrl(lang, `/figures/${slug}`)} class="pub-figure-card">
+  <div class="pub-figure-card__image">
+    <StaticImage figureId={figure.id} type="thumbnail" alt={figure.name} loading="lazy" />
+  </div>
+  <div class="pub-figure-card__body">
+    <h2 class="pub-figure-card__name">{figure.name}</h2>
+    <p class="pub-figure-card__tradition">{figure.tradition}</p>
+    {learnLine ? (
+      <p class="pub-figure-card__learn">{learnLine}</p>
+    ) : (
+      <p class="pub-figure-card__about">{fallback}</p>
+    )}
+  </div>
+</a>

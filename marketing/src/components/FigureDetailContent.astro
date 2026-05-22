@@ -1,0 +1,184 @@
+---
+// Full body for a figure detail page. Static Astro everywhere except the
+// trailer button (React island, inside FigureHero). All data resolves at
+// build time from the existing client/ data files via the @client alias.
+
+import Breadcrumbs from './Breadcrumbs.astro';
+import FigureHero from './FigureHero.astro';
+import EchoNote from './EchoNote.astro';
+import JourneyOverview from './JourneyOverview.astro';
+import CollapsibleSection from './CollapsibleSection.astro';
+import CouncilPreview from './CouncilPreview.astro';
+import StaticImage from './StaticImage.astro';
+import PublicCTA from './PublicCTA.astro';
+
+import { getT } from '../i18n';
+import type { Lang } from '../i18n';
+import { publicUrl } from '../lib/urls';
+import { getSeedsFor } from '../lib/seeds';
+import { getFigureById } from '@client/data/public/figuresCatalog';
+import { figureSlugToId, figureIdToSlug } from '@client/data/public/slugMap';
+import { figureThemes } from '@client/data/public/figureSeo';
+import { councilCatalog, getShortDisplayName } from '@client/data/councilCatalog';
+
+interface Props {
+  figureId: string;
+  slug: string;
+  lang: Lang;
+}
+
+const { figureId, slug, lang } = Astro.props;
+const t = getT(lang);
+const figure = getFigureById(figureId, lang);
+
+if (!figure) {
+  throw new Error(`Unknown figure: ${figureId}`);
+}
+
+const seeds = getSeedsFor(figureId, lang);
+const shortName = getShortDisplayName(figureId);
+
+// Councils where this figure participates (moderator or panelist).
+const relatedCouncils = councilCatalog.filter(c =>
+  c.moderator.id === figureId ||
+  c.participants.some(p => p.id === figureId),
+);
+
+// Related figures drawn from seed connections.
+const connectionSet = new Set<string>();
+for (const seed of seeds) {
+  for (const conn of seed.connections ?? []) {
+    if (conn.figure !== figureId && figureIdToSlug[conn.figure]) {
+      connectionSet.add(conn.figure);
+    }
+  }
+}
+const relatedFigureIds = [...connectionSet].slice(0, 4);
+const themesForFigure = figureThemes[figureId] ?? [];
+
+// Light cleanup for displayed prose: strip em/en dashes + stray semicolons.
+function cleanDisplayText(s: string): string {
+  return s
+    .replace(/\s*[—–]\s*/g, ', ')
+    .replace(/\s*;\s*/g, ', ')
+    .replace(/,\s*,/g, ',')
+    .trim();
+}
+---
+<div class="pub-content pub-figure">
+  <Breadcrumbs
+    lang={lang}
+    items={[
+      { label: t('breadcrumbs.figures'), path: '/figures' },
+      { label: figure.name },
+    ]}
+  />
+
+  <FigureHero figure={figure} lang={lang} />
+
+  <EchoNote variant="figure" name={figure.name} lang={lang} />
+
+  <JourneyOverview figureName={figure.name} lang={lang} />
+
+  {seeds.length > 0 && (
+    <CollapsibleSection title={t('figures.ideasHeading')}>
+      <ol class="pub-ideas">
+        {seeds.map(seed => (
+          <li class="pub-ideas__item">{seed.title}</li>
+        ))}
+      </ol>
+    </CollapsibleSection>
+  )}
+
+  {figure.keyConcepts.length > 0 && (
+    <CollapsibleSection title={t('figures.keyIdeas')}>
+      <div class="pub-concepts">
+        {figure.keyConcepts.map(concept => (
+          <div class="pub-concept">
+            <div class="pub-concept__term">{concept.term}</div>
+            <div class="pub-concept__def">
+              {cleanDisplayText(concept.definition)}
+            </div>
+          </div>
+        ))}
+      </div>
+      {figure.primaryWorks.length > 0 && (
+        <p class="pub-concept__works">
+          <strong>{t('figures.primaryWorks')}:</strong>{' '}
+          {figure.primaryWorks.map(cleanDisplayText).join(', ')}
+        </p>
+      )}
+    </CollapsibleSection>
+  )}
+
+  {relatedCouncils.length > 0 && (
+    <CollapsibleSection
+      title={t('figures.councilAppearances')}
+      count={relatedCouncils.length}
+    >
+      <div class="pub-council-list">
+        {relatedCouncils.map(council => (
+          <CouncilPreview council={council} lang={lang} />
+        ))}
+      </div>
+    </CollapsibleSection>
+  )}
+
+  {themesForFigure.length > 0 && (
+    <CollapsibleSection title={t('figures.themes')}>
+      <div class="pub-grid pub-grid--3">
+        {themesForFigure.map(themeId => (
+          <a
+            href={publicUrl(lang, `/themes/${themeId}`)}
+            class="pub-theme-card"
+          >
+            <h3 class="pub-theme-card__name">{t(`themes.${themeId}.name`)}</h3>
+            <p class="pub-theme-card__tagline">{t(`themes.${themeId}.tagline`)}</p>
+          </a>
+        ))}
+      </div>
+    </CollapsibleSection>
+  )}
+
+  {relatedFigureIds.length > 0 && (
+    <CollapsibleSection
+      title={t('figures.relatedFigures')}
+      count={relatedFigureIds.length}
+    >
+      <div class="pub-grid pub-grid--2">
+        {relatedFigureIds.map(relId => {
+          const relFigure = getFigureById(relId, lang);
+          const relSlug = figureIdToSlug[relId];
+          if (!relFigure || !relSlug) return null;
+          return (
+            <a
+              href={publicUrl(lang, `/figures/${relSlug}`)}
+              class="pub-figure-card"
+              style="flex-direction: row; gap: 0.75rem; align-items: center; padding: 0.75rem"
+            >
+              <StaticImage
+                figureId={relId}
+                type="thumbnail"
+                alt={relFigure.name}
+                loading="lazy"
+                width={64}
+                height={64}
+              />
+              <div>
+                <div class="pub-figure-card__name">{relFigure.name}</div>
+                <div class="pub-figure-card__tradition">{relFigure.tradition}</div>
+              </div>
+            </a>
+          );
+        })}
+      </div>
+    </CollapsibleSection>
+  )}
+
+  <PublicCTA
+    variant="sticky"
+    figureId={figureId}
+    figureName={shortName}
+    lang={lang}
+  />
+</div>

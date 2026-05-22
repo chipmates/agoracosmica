@@ -1,0 +1,35 @@
+---
+// Native HTML5 <details>/<summary> — no JS needed for the collapse behavior.
+// Visual styling matches the existing React CollapsibleSection. Native element
+// is keyboard-accessible by default (Enter/Space toggles it).
+
+interface Props {
+  title: string;
+  count?: number;
+  defaultOpen?: boolean;
+}
+
+const { title, count, defaultOpen = false } = Astro.props;
+---
+<details class="pub-section pub-collapsible" open={defaultOpen}>
+  <summary class="pub-collapsible__header">
+    <h2 class="pub-section__title pub-collapsible__title">
+      {title}
+      {count !== undefined && <span class="pub-collapsible__count"> ({count})</span>}
+    </h2>
+    <span class="pub-collapsible__arrow" aria-hidden="true">▼</span>
+  </summary>
+  <div class="pub-collapsible__body">
+    <slot />
+  </div>
+</details>
+
+<style is:global>
+  /* Glue between native <details> and the existing class-based styles —
+     hides the user-agent triangle and rotates our own arrow on open. */
+  details.pub-collapsible > summary { list-style: none; cursor: pointer; }
+  details.pub-collapsible > summary::-webkit-details-marker { display: none; }
+  details.pub-collapsible[open] .pub-collapsible__arrow {
+    transform: rotate(180deg);
+  }
+</style>

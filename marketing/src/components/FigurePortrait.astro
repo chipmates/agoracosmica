@@ -1,0 +1,49 @@
+---
+// Art-directed hero portrait for the figure detail page. Desktop (>= 820px)
+// serves the profile "main" image (~1200x1452); mobile serves the square
+// "thumbnail" crop (640x640). Each source is shown at its own native ratio
+// (CSS frames per breakpoint), so neither is cropped. AVIF first, WebP next,
+// PNG fallback for older browsers.
+
+import {
+  getPublicImageUrl,
+  getPublicImageSrcSet,
+} from '@client/utils/public/publicMediaUrl';
+
+interface Props {
+  figureId: string;
+  alt: string;
+}
+
+const { figureId, alt } = Astro.props;
+---
+<picture>
+  <source
+    media="(min-width: 820px)"
+    type="image/avif"
+    srcset={getPublicImageSrcSet(figureId, 'main', 'avif')}
+    sizes="384px"
+  />
+  <source
+    media="(min-width: 820px)"
+    type="image/webp"
+    srcset={getPublicImageSrcSet(figureId, 'main', 'webp')}
+    sizes="384px"
+  />
+  <source
+    type="image/avif"
+    srcset={getPublicImageSrcSet(figureId, 'thumbnail', 'avif')}
+    sizes="(max-width: 480px) 62vw, 248px"
+  />
+  <source
+    type="image/webp"
+    srcset={getPublicImageSrcSet(figureId, 'thumbnail', 'webp')}
+    sizes="(max-width: 480px) 62vw, 248px"
+  />
+  <img
+    src={getPublicImageUrl(figureId, 'thumbnail', 320, 'png')}
+    alt={alt}
+    loading="eager"
+    decoding="async"
+  />
+</picture>

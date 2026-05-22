@@ -1,0 +1,26 @@
+---
+import type { Lang } from '../i18n';
+import type { CatalogCouncil } from '@client/data/councilCatalog';
+import { getLocalizedTitle, getLocalizedHook } from '@client/data/councilCatalog';
+
+interface Props {
+  council: CatalogCouncil;
+  lang: Lang;
+}
+
+const { council, lang } = Astro.props;
+const title = getLocalizedTitle(council, lang);
+const hook = getLocalizedHook(council, lang);
+const participants = [council.moderator, ...council.participants].map(p => p.name).join(', ');
+const typeLabel = lang === 'de'
+  ? (council.type === 'confrontational' ? 'konfrontativ' : 'reflektiv')
+  : council.type;
+---
+<div class="pub-council">
+  <h3 class="pub-council__title">{title}</h3>
+  <p class="pub-council__hook">{hook}</p>
+  <div class="pub-council__meta">
+    <span class="pub-council__type">{typeLabel}</span>
+  </div>
+  <p class="pub-council__participants">{participants}</p>
+</div>

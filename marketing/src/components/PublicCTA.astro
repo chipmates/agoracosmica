@@ -1,0 +1,57 @@
+---
+// Sticky bottom CTA. Static HTML — the conversion fire + entry-intent capture
+// happens in PublicScript.astro (vanilla JS event delegation on the
+// data-agc-cta attribute). The label varies: figure pages say "Learn from
+// Echo of {name}", theme pages with a featured council deep-link to that
+// council, everything else "Start exploring".
+
+import { getT } from '../i18n';
+import type { Lang } from '../i18n';
+
+interface Props {
+  variant?: 'sticky' | 'inline';
+  /** Figure-page CTA — adds figureId to the conversion metadata. */
+  figureId?: string;
+  figureName?: string;
+  /** Theme-page CTA — deep-link into the featured council. */
+  councilId?: string;
+  /** Theme-page CTA without a featured council — generic council label. */
+  councilCta?: boolean;
+  lang: Lang;
+  class?: string;
+}
+
+const {
+  variant = 'sticky',
+  figureId,
+  figureName,
+  councilId,
+  councilCta,
+  lang,
+  class: className = '',
+} = Astro.props;
+
+const t = getT(lang);
+
+const label = councilId
+  ? t('cta.listenFeaturedDebate', 'Listen to the featured debate')
+  : figureName
+    ? t('cta.learnFrom').replace('{name}', figureName)
+    : councilCta
+      ? t('cta.enterCouncil', 'Enter the Cosmic Council')
+      : t('cta.startFree');
+---
+<div class={`pub-cta pub-cta--${variant} ${className}`}>
+  <div class="pub-cta__inner">
+    <p class="pub-cta__trust">{t('cta.trust')}</p>
+    <a
+      href="/"
+      class="pub-cta__button"
+      data-agc-cta="start-exploring"
+      data-agc-figure={figureId}
+      data-agc-council={councilId}
+    >
+      {label}
+    </a>
+  </div>
+</div>

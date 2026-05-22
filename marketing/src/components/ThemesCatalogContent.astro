@@ -1,0 +1,32 @@
+---
+import Breadcrumbs from './Breadcrumbs.astro';
+import ThemeCard from './ThemeCard.astro';
+import { getT } from '../i18n';
+import type { Lang } from '../i18n';
+import { THEMES, councilsByTheme } from '@client/data/councilCatalog';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = getT(lang);
+---
+<div class="pub-content">
+  <Breadcrumbs lang={lang} items={[{ label: t('breadcrumbs.themes') }]} />
+
+  <h1 class="pub-hero__title">{t('themes.pageTitle')}</h1>
+  <p class="pub-section__text" style="margin-bottom: 2rem">
+    {t('themes.pageDescription')}
+  </p>
+
+  <div class="pub-grid pub-grid--2">
+    {THEMES.map(theme => (
+      <ThemeCard
+        themeId={theme.id}
+        councilCount={councilsByTheme[theme.id]?.length || 0}
+        lang={lang}
+      />
+    ))}
+  </div>
+</div>

@@ -1,0 +1,7 @@
+---
+// Marketing-page client-side glue. The actual script lives at
+// /agc-public.js as a static asset under marketing/public/, so it satisfies
+// the strict CSP `script-src 'self'` without needing an inline-hash exemption.
+// `defer` lets the parser finish before executing.
+---
+<script src="/agc-public.js" defer></script>

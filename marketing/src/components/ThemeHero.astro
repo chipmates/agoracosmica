@@ -1,0 +1,20 @@
+---
+import { getT } from '../i18n';
+import type { Lang } from '../i18n';
+
+interface Props {
+  themeName: string;
+  themeTagline: string;
+  lang: Lang;
+}
+
+const { themeName, themeTagline, lang } = Astro.props;
+const t = getT(lang);
+---
+<header class="pub-theme-hero">
+  <div class="pub-theme-hero__eyebrow">
+    {t('themes.detailEyebrow', 'A life question')}
+  </div>
+  <h1 class="pub-theme-hero__name">{themeName}</h1>
+  <p class="pub-theme-hero__question">{themeTagline}</p>
+</header>

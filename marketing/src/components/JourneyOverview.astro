@@ -1,0 +1,65 @@
+---
+// The four-step learning path on figure detail pages. Mirrors the React
+// version in client/src/components/public/JourneyOverview.tsx — static prose,
+// no interactivity, perfect Astro fit.
+
+import { getT } from '../i18n';
+import type { Lang } from '../i18n';
+
+interface Props {
+  figureName: string;
+  lang: Lang;
+}
+
+const { figureName, lang } = Astro.props;
+const t = getT(lang);
+
+const steps = [
+  {
+    n: 1, mode: 'story', name: t('journey.modeStory'),
+    label: t('journey.listen'), meta: t('journey.storyDuration'),
+    line: t('journey.storyLine'),
+  },
+  {
+    n: 2, mode: 'wisdom', name: t('journey.modeWisdom'),
+    label: t('journey.talk'), meta: '',
+    line: t('journey.wisdomLine'),
+  },
+  {
+    n: 3, mode: 'prism', name: t('journey.modePrism'),
+    label: t('journey.listen'), meta: '',
+    line: t('journey.prismLine'),
+  },
+  {
+    n: 4, mode: 'quest', name: t('journey.modeQuest'),
+    label: t('journey.talk'), meta: '',
+    line: t('journey.questLine'),
+  },
+];
+---
+<section class="pub-section pub-path-section">
+  <h2 class="pub-section__title">
+    {t('journey.heading').replace('{name}', figureName)}
+  </h2>
+  <p class="pub-path-intro">{t('journey.intro')}</p>
+
+  <ol class="pub-path">
+    {steps.map(step => (
+      <li class={`pub-path__step pub-path__step--${step.mode}`}>
+        <div class="pub-path__node">{step.n}</div>
+        <div class="pub-path__body">
+          <div class="pub-path__head">
+            <span class="pub-path__name">{step.name}</span>
+            <span class="pub-path__pill">
+              {step.meta ? `${step.label} · ${step.meta}` : step.label}
+            </span>
+          </div>
+          <p class="pub-path__line">{step.line}</p>
+        </div>
+      </li>
+    ))}
+  </ol>
+
+  <p class="pub-path-aside">{t('journey.aside')}</p>
+  <p class="pub-path-nudge">{t('journey.nudge')}</p>
+</section>
