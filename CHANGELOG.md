@@ -14,13 +14,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
+- **Marketing pages migrated to Astro for sub-second first paint.** Figure and theme detail pages, catalogs, about, and contact now ship as prerendered static HTML from the sibling `marketing/` Astro project. The hero, journey overview, ideas, and CTA paint immediately, so ad clickers landing on `/figures/<name>/` see the page within a few hundred milliseconds instead of a blank dark screen until the React bundle parses. React islands handle only the trailer audio button and council preview audio. Catalog and about/contact pages ship zero React JS. The React SPA at `/` and `/de/` continues to handle login + post-login app.
 - **Docker self-host.** `docker compose up` from the repo root brings up a working instance in five minutes: BYOK chat, all six modes, the full pre-recorded audio catalog, both languages. The image is BYOK-only (no free tier), runs no Cloudflare Workers, and hides live voice and the Community Governance panel cleanly. See [SELF-HOSTING.md](docs/SELF-HOSTING.md).
 - **`VITE_SELF_HOST` build flag.** Self-host build path: required BYOK key gate on first run, free-tier UI hidden, LLM routing forced to BYOK, Turnstile skipped, live TTS/STT disabled (pre-recorded audio still works), analytics and ad-attribution beacons silenced, Community Governance panel hidden, copy variants for BYOK setup and voting power that drop the "free tier" framing. The hosted build at agoracosmica.org is unchanged.
 - **Runtime configuration layer.** New `src/config/runtime.ts` reads `window.__AGORA_CONFIG__` (written by `/config.js` at container start) → `import.meta.env.VITE_*` → hardcoded default. One published image works for any operator with no rebuild.
 
 ### Changed
 
+- **HomePage is now `React.lazy()` so the eager bundle on unauthenticated `/` drops from 374 KB gzipped to 187 KB gzipped.** Visitors landing on the login page no longer download the audio engine, council suite, modals, and post-login app shell until they actually authenticate.
+- **Client build chain now also builds the sibling Astro project.** `pnpm build` in `client/` runs Vite, then installs and builds `marketing/`, then merges `marketing/dist/` into `client/build/` via `scripts/merge-marketing.mjs`. CF Pages still deploys from the same `client/build/` output. 84 prerendered marketing pages plus the React SPA shell.
+- **Hero image preload on figure pages uses responsive `imagesrcset`** so mobile devices fetch the correct 640px thumbnail instead of the desktop 1200px portrait.
 - **Dockerfile, .dockerignore, nginx.conf.** Multi-stage build (`node:20-alpine` builder → `nginxinc/nginx-unprivileged:1.27-alpine` runtime on port 8080), OCI labels, HEALTHCHECK against `/healthz`, server-scope security headers, `expires`-based cache control, optional `/media` location for same-origin content mirrors.
+
+### Removed
+
+- **`client/scripts/prerender.mjs` and `client/src/{components,pages,routes}/public/` directories.** Replaced by the Astro project under `marketing/`. The React app no longer renders the public marketing surface.
 
 ---
 
