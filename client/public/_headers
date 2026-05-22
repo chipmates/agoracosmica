@@ -5,7 +5,7 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(self), geolocation=()
   Strict-Transport-Security: max-age=31536000; includeSubDomains
-  Content-Security-Policy: default-src 'self'; script-src 'self' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.agoracosmica.org; font-src 'self'; connect-src 'self' blob: https://openrouter.ai https://*.agoracosmica.org wss://*.agoracosmica.org; media-src 'self' blob: https://*.agoracosmica.org; frame-src https://challenges.cloudflare.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.agoracosmica.org; font-src 'self'; connect-src 'self' blob: https://openrouter.ai https://*.agoracosmica.org wss://*.agoracosmica.org; media-src 'self' blob: https://*.agoracosmica.org; frame-src https://challenges.cloudflare.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'
 
 # Immutable cache for hashed assets (Vite adds content hash to filenames)
 /assets/*

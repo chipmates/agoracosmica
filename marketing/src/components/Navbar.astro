@@ -71,3 +71,15 @@ const isActive = (path: string) => currentPath === path || currentPath === path.
     </button>
   </div>
 </header>
+
+<style is:global>
+  /* Bug fix: .pub-navbar had no background in public-layout.css, so the
+     sticky bar showed through to page content on scroll. Same cosmic blue
+     + blur as .pub-cta--sticky for visual consistency. */
+  .pub-navbar {
+    background: color-mix(in srgb, var(--bg-deep-space, #0C1133) 92%, transparent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid color-mix(in srgb, var(--gold-primary) 16%, transparent);
+  }
+</style>
