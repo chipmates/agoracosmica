@@ -39,26 +39,32 @@ interface ConversionInput {
 //
 // Currencies are per-account: the Ad Grants account is USD-denominated, the
 // paid account is billed in EUR.
+//
+// Conversion actions must be created with the "Import from clicks" source.
+// Google Ads silently drops offline uploads to Website-source actions (those
+// expect a gtag fire that we never make), so any numeric ID here has to point
+// at an action set up for offline conversion import specifically.
 const ACCOUNTS: Record<AccountKey, AccountConfig> = {
   grants: {
     customerId: '7266866262',
     currency: 'USD',
     actions: {
-      profile_created: '7608272394', // gtag label 2t5rCIqM9KscELfN0stD
-      start_exploring: '7609132235', // gtag label n70GCMvJqKwcELfN0stD
-      mode_selected: '7609132238',   // gtag label 4AWSCM7JqKwcELfN0stD
-      // The Session>60s action was renamed to Council Engaged on
-      // 2026-05-20 (gtag label jjIcCOmB9KscELfN0stD).
-      council_engaged: '7608271081',
+      profile_created: '7620352761',
+      start_exploring: '7620352758',
+      mode_selected: '7620352752',
+      council_engaged: '7620352755',
     },
   },
   paid: {
     customerId: '3791478447',
     currency: 'EUR',
     actions: {
-      profile_created: '7609550802', // gtag label zBsvCNKPwqwcEMOryN9C
-      start_exploring: '7609550805', // gtag label PFnxCNWPwqwcEMOryN9C
-      mode_selected: '7609550808',   // gtag label dlmRCNiPwqwcEMOryN9C
+      // Paid actions still on the old Website-source IDs. Replace with the
+      // offline-import equivalents once they are configured on the paid
+      // account; uploads to the current IDs are silently dropped by Google.
+      profile_created: 'TODO_PENDING',
+      start_exploring: 'TODO_PENDING',
+      mode_selected: 'TODO_PENDING',
       // council_engaged is Grants-only — see SCOPED_EVENTS below.
       council_engaged: 'NOT_APPLICABLE',
     },
