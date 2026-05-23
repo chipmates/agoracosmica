@@ -1,3 +1,29 @@
+# Trailing-slash canonicalization for static Astro pages.
+# Astro emits /<path>/index.html and the sitemap lists the with-slash form.
+# CF Pages serves matching static files BEFORE consulting these rules, so
+# /themes/who-am-i/ still hits the Astro index.html unaffected. Without
+# explicit 301s, the no-slash form (e.g. /themes/who-am-i) resolved via the
+# SPA fallback below and rendered identical React content, creating
+# duplicate-content entries in Google's index alongside the canonical URL.
+
+# Per-slug Astro pages (EN + DE)
+/figures/:slug    /figures/:slug/    301
+/themes/:slug     /themes/:slug/     301
+/de/figures/:slug /de/figures/:slug/ 301
+/de/themes/:slug  /de/themes/:slug/  301
+
+# Top-level Astro pages (EN + DE)
+/figures   /figures/   301
+/themes    /themes/    301
+/about     /about/     301
+/contact   /contact/   301
+/impressum /impressum/ 301
+/de        /de/        301
+/de/figures /de/figures/ 301
+/de/themes  /de/themes/ 301
+/de/about   /de/about/  301
+/de/contact /de/contact/ 301
+
 # SPA fallback — serve index.html for all client-side routes
 # CF Pages serves existing static files first (JS, CSS, images, fonts)
 /* /index.html 200
