@@ -99,14 +99,17 @@ export async function handleConversions(
     });
   }
 
-  // Forward to Google Ads Conversion API (dual-upload to both accounts).
-  // No-ops if developer token isn't configured. Fire-and-forget — never
-  // blocks the response, never surfaces errors to the client.
+  // Forward to Google Ads Conversion API (dual-upload to both accounts) +
+  // mirror the result to a diagnostic Google Sheet when configured. Both
+  // are no-ops when their respective secrets are absent. Fire-and-forget,
+  // never blocks the response, never surfaces errors to the client.
   ctx.waitUntil(
     forwardConversionToGoogleAds(env, {
       gclid: payload.gclid,
       event: payload.event,
       timestamp: payload.timestamp,
+      figureId: payload.figureId,
+      country: readCountry(request),
     }).catch(() => {
       // Forwarding errors are logged inside the service; never propagate
     }),

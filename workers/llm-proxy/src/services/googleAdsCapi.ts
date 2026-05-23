@@ -15,6 +15,11 @@
 // when Google deprecates, following the API release notes.
 
 import type { Env } from '../utils/types';
+import {
+  appendConversionLog,
+  type ConversionImportRow,
+  type ConversionLogRow,
+} from './googleSheetsLog';
 
 type ConversionEvent = 'profile_created' | 'start_exploring' | 'mode_selected' | 'council_engaged';
 type AccountKey = 'grants' | 'paid';
@@ -29,6 +34,25 @@ interface ConversionInput {
   gclid: string;
   event: ConversionEvent;
   timestamp: number; // ms since epoch
+  figureId?: string;
+  country?: string;
+}
+
+// Outcome of a single per-account upload attempt. Captured so the orchestrator
+// can mirror what Google said into the diagnostic sheet. Status enum stays
+// tight on purpose — filtering the sheet by status should land on a known
+// label without surprises.
+interface UploadResult {
+  status:
+    | 'ok_200'
+    | 'partial_failure'
+    | 'skipped:scoped'
+    | 'skipped:todo_pending'
+    | 'skipped:not_applicable'
+    | 'error:exception'
+    | `http_${number}`;
+  pfMessage: string | null;
+  actionId: string;
 }
 
 // Two-account architecture: each Google Ads account has its own conversion
@@ -84,6 +108,58 @@ const SCOPED_EVENTS: Partial<Record<ConversionEvent, AccountKey[]>> = {
   council_engaged: ['grants'],
 };
 
+// Human-readable conversion action names as they appear in the Google Ads
+// UI. Used only for the "import" sheet tab; the API upload path addresses
+// actions by numeric ID, not name.
+//
+// Two layers:
+//   1. Env override (ADS_CONVERSION_ACTION_NAMES) — JSON of the same shape
+//      as FALLBACK_ACTION_NAMES. The canonical source of truth in
+//      production, since real Ads accounts are usually in a non-English
+//      locale and the names differ. Set as a wrangler secret.
+//   2. Hardcoded fallback below — best-guess English placeholders. Used
+//      only when the env override is unset or malformed.
+//
+// Google Ads matches by EXACT name (case + spacing sensitive) on CSV
+// upload, so any mismatch makes the import tab unusable for that row.
+// The log tab is unaffected.
+const FALLBACK_ACTION_NAMES: Record<AccountKey, Record<ConversionEvent, string>> = {
+  grants: {
+    profile_created: 'Profile Creation',
+    start_exploring: 'Start Exploring',
+    mode_selected: 'Mode Selected',
+    council_engaged: 'Council Engaged',
+  },
+  // Paid placeholders — fill in once the offline-import actions exist on the
+  // paid account. Until then paid uploads are skipped anyway (TODO_PENDING)
+  // and no paid rows reach the import tab.
+  paid: {
+    profile_created: '',
+    start_exploring: '',
+    mode_selected: '',
+    council_engaged: '',
+  },
+};
+
+function resolveActionName(
+  env: Env,
+  accountKey: AccountKey,
+  event: ConversionEvent,
+): string {
+  if (env.ADS_CONVERSION_ACTION_NAMES) {
+    try {
+      const parsed = JSON.parse(env.ADS_CONVERSION_ACTION_NAMES) as Partial<
+        Record<AccountKey, Partial<Record<ConversionEvent, string>>>
+      >;
+      const name = parsed[accountKey]?.[event];
+      if (typeof name === 'string' && name.length > 0) return name;
+    } catch {
+      console.error('[capi] ADS_CONVERSION_ACTION_NAMES failed to parse, using fallback');
+    }
+  }
+  return FALLBACK_ACTION_NAMES[accountKey][event] || '';
+}
+
 // Conversion values are read at runtime from wrangler secrets (env.VALUE_*),
 // not hardcoded — the worker is in a public AGPL repo and the per-event
 // dollar weights are business signal. Values are asymmetric on purpose so
@@ -127,20 +203,113 @@ export async function forwardConversionToGoogleAds(
     accessToken = await getAccessToken(env);
   } catch (err) {
     console.error('[capi] failed to acquire access token', err);
+    // Still record an event row so the sheet shows we received the conversion
+    // but couldn't reach Google. Both accounts get an exception status.
+    await mirrorToSheet(env, input, {
+      grants: tokenFailureResult(ACCOUNTS.grants.actions[input.event]),
+      paid: tokenFailureResult(ACCOUNTS.paid.actions[input.event]),
+    });
     return;
   }
 
   // Dual upload: send to both customer accounts in parallel. The account that
   // didn't issue this gclid will reject the row inside partial_failure — that
-  // is the expected, silent failure path.
-  await Promise.all([
-    uploadToAccount(env, accessToken, 'grants', input).catch((err) =>
-      console.error('[capi] grants upload threw', err),
-    ),
-    uploadToAccount(env, accessToken, 'paid', input).catch((err) =>
-      console.error('[capi] paid upload threw', err),
-    ),
+  // is the expected, silent failure path. Each branch returns an UploadResult
+  // even when the API call is skipped or throws, so the sheet mirror sees a
+  // complete row.
+  const [grantsResult, paidResult] = await Promise.all([
+    uploadToAccount(env, accessToken, 'grants', input).catch((err): UploadResult => {
+      console.error('[capi] grants upload threw', err);
+      return {
+        status: 'error:exception',
+        pfMessage: String(err).slice(0, 200),
+        actionId: ACCOUNTS.grants.actions[input.event],
+      };
+    }),
+    uploadToAccount(env, accessToken, 'paid', input).catch((err): UploadResult => {
+      console.error('[capi] paid upload threw', err);
+      return {
+        status: 'error:exception',
+        pfMessage: String(err).slice(0, 200),
+        actionId: ACCOUNTS.paid.actions[input.event],
+      };
+    }),
   ]);
+
+  await mirrorToSheet(env, input, { grants: grantsResult, paid: paidResult });
+}
+
+function tokenFailureResult(actionId: string): UploadResult {
+  return {
+    status: 'error:exception',
+    pfMessage: 'oauth_token_acquire_failed',
+    actionId,
+  };
+}
+
+/**
+ * Append rows to the diagnostic Google Sheet:
+ *   - LOG tab: one row per event with both accounts' results side-by-side
+ *   - IMPORT tab: one row per real grants upload attempt, in Google's
+ *     exact offline-conversion-upload CSV schema (so the tab is directly
+ *     downloadable + manually uploadable via Conversions → Uploads if
+ *     CAPI attribution ever needs a recovery path)
+ *
+ * Skipped-status rows (scope/TODO/NA) do NOT go to the import tab — there
+ * was no upload to recover. Failed grants attempts DO go to import: order_id
+ * gives Google deduplication if the CAPI path eventually catches up.
+ *
+ * Failures are swallowed: a Sheets outage cannot affect the CAPI path.
+ */
+async function mirrorToSheet(
+  env: Env,
+  input: ConversionInput,
+  results: { grants: UploadResult; paid: UploadResult },
+): Promise<void> {
+  const orderId = `${input.gclid}:${input.event}`;
+  const value = conversionValue(env, input.event);
+
+  const diagnostic: ConversionLogRow = {
+    eventTimestampMs: input.timestamp,
+    event: input.event,
+    gclid: input.gclid,
+    figureId: input.figureId || '',
+    country: input.country || '',
+    value,
+    orderId,
+    grantsActionId: results.grants.actionId,
+    grantsStatus: results.grants.status,
+    grantsPfMessage: results.grants.pfMessage,
+    paidActionId: results.paid.actionId,
+    paidStatus: results.paid.status,
+    paidPfMessage: results.paid.pfMessage,
+  };
+
+  // Build one import-ready row per account that actually attempted an
+  // upload. Skipped-by-scope events were never going to that account.
+  // Skipped-by-TODO_PENDING / NOT_APPLICABLE rows shouldn't be retried
+  // either — those action IDs are placeholders, not real targets. Mixed
+  // currencies (USD grants + EUR paid) coexist fine in the import tab
+  // since Google's CSV format has a per-row currency column.
+  const importRows: ConversionImportRow[] = [];
+  for (const accountKey of ['grants', 'paid'] as const) {
+    const result = results[accountKey];
+    if (result.status.startsWith('skipped:')) continue;
+    importRows.push({
+      gclid: input.gclid,
+      conversionName: resolveActionName(env, accountKey, input.event),
+      conversionTime: formatGoogleAdsTimestamp(input.timestamp),
+      conversionValue: value,
+      currencyCode: ACCOUNTS[accountKey].currency,
+      orderId,
+    });
+  }
+
+  try {
+    await appendConversionLog(env, diagnostic, importRows);
+  } catch (err) {
+    console.error('[sheets] mirror call threw (unexpected, module swallows)', err);
+  }
 }
 
 /**
@@ -207,25 +376,31 @@ async function uploadToAccount(
   accessToken: string,
   accountKey: AccountKey,
   input: ConversionInput,
-): Promise<void> {
+): Promise<UploadResult> {
+  const account = ACCOUNTS[accountKey];
+  const actionId = account.actions[input.event];
+
   // Event-level account scoping. Events listed in SCOPED_EVENTS only forward
   // to the accounts in the list — silent skip for the others, no log noise.
   const scopedAccounts = SCOPED_EVENTS[input.event];
   if (scopedAccounts && !scopedAccounts.includes(accountKey)) {
-    return;
+    return { status: 'skipped:scoped', pfMessage: null, actionId };
   }
-
-  const account = ACCOUNTS[accountKey];
-  const actionId = account.actions[input.event];
-  const customerId = account.customerId;
 
   // A conversion action still on a placeholder ID (not yet set up in Google
   // Ads) is skipped, rather than sent with an invalid resource name.
   if (actionId === 'TODO_PENDING') {
     console.log(`[capi] ${accountKey} ${input.event} skipped: action id pending`);
-    return;
+    return { status: 'skipped:todo_pending', pfMessage: null, actionId };
   }
 
+  // Defensive: if SCOPED_EVENTS is ever broken and a NOT_APPLICABLE id slips
+  // through, surface it as a distinct skip rather than firing at Google.
+  if (actionId === 'NOT_APPLICABLE') {
+    return { status: 'skipped:not_applicable', pfMessage: null, actionId };
+  }
+
+  const customerId = account.customerId;
   const conversion = {
     gclid: input.gclid,
     conversion_action: `customers/${customerId}/conversionActions/${actionId}`,
@@ -263,12 +438,17 @@ async function uploadToAccount(
       `[capi] ${accountKey} upload http ${res.status}:`,
       text.slice(0, 400),
     );
-    return;
+    return {
+      status: `http_${res.status}` as UploadResult['status'],
+      pfMessage: text.slice(0, 200) || null,
+      actionId,
+    };
   }
 
-  // Optional: inspect partial_failure_error to distinguish "wrong account"
-  // (expected, silent) from "actually broken" (worth surfacing). For v1 we
-  // just log all partial failures at debug level; tighten later if needed.
+  // Inspect partial_failure_error to distinguish "wrong account"
+  // (expected, silent) from "actually broken" (worth surfacing). The
+  // sheet mirror records the exact message so we can filter the
+  // expected unmatched-account rows from any real intake errors.
   const json = (await res.json().catch(() => null)) as
     | { partial_failure_error?: { code?: number; message?: string } }
     | null;
@@ -279,9 +459,15 @@ async function uploadToAccount(
       `[capi] ${accountKey} partial-failure (expected for non-matching account):`,
       json.partial_failure_error.message.slice(0, 200),
     );
-  } else {
-    console.log(`[capi] ${accountKey} upload ok (http ${res.status})`);
+    return {
+      status: 'partial_failure',
+      pfMessage: json.partial_failure_error.message,
+      actionId,
+    };
   }
+
+  console.log(`[capi] ${accountKey} upload ok (http ${res.status})`);
+  return { status: 'ok_200', pfMessage: null, actionId };
 }
 
 /**
