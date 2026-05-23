@@ -82,4 +82,69 @@ const isActive = (path: string) => currentPath === path || currentPath === path.
     -webkit-backdrop-filter: blur(12px);
     border-bottom: 1px solid color-mix(in srgb, var(--gold-primary) 16%, transparent);
   }
+
+  /* Background fix for the open mobile menu. public-layout.css sets
+     .pub-navbar__nav { background: var(--bg-primary, #151C47) } inside
+     its mobile media query, and that rule lands AFTER this Astro
+     <style is:global> in the bundled CSS. A plain .pub-navbar__nav--open
+     selector ties on specificity (0,1,0) and loses on source order,
+     leaving the panel painted with whatever var(--bg-primary) resolves
+     to in the marketing-page context (which on iOS Safari rendered
+     effectively transparent). Stack the class selectors so this rule
+     hits specificity 0,3,0 and wins regardless of bundle order, with
+     a solid #0C1133 declaration before the color-mix line so the
+     panel still has a real background if color-mix is unsupported or
+     the declaration is parsed as invalid. Lighter blur(10) on mobile
+     so older phones don't fight a heavy filter. */
+  @media (max-width: 640px) {
+    .pub-navbar,
+    .pub-cta--sticky {
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .pub-navbar .pub-navbar__nav.pub-navbar__nav--open {
+      /* The navbar runs backdrop-filter (via .liquid-glass--sidebar
+         and the inline rule above), and a non-none backdrop-filter
+         makes the element a containing block for descendant
+         position:fixed children. The menu's inset: 64px 0 0 from
+         public-layout.css then resolved relative to the 64px-tall
+         navbar instead of the viewport, collapsing the panel to 0
+         height. Items overflowed downward with overflow:visible and
+         rendered scattered across the page with the page background
+         showing through between them. Pin the menu to the viewport
+         with explicit top + height so its size no longer depends on
+         the containing block. dvh handles iOS browser-chrome
+         retraction; vh is the fallback for older Safari. */
+      top: 64px;
+      right: 0;
+      left: 0;
+      bottom: auto;
+      height: calc(100vh - 64px);
+      height: calc(100dvh - 64px);
+
+      background: #0C1133;
+      background: color-mix(in srgb, var(--bg-deep-space, #0C1133) 90%, transparent);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-top: 1px solid color-mix(in srgb, var(--gold-primary, #E6BC5C) 16%, transparent);
+      box-shadow: 0 16px 40px color-mix(in srgb, #000 45%, transparent);
+      padding-bottom: max(2rem, env(safe-area-inset-bottom));
+    }
+
+    /* Hamburger morphs into a close icon when the panel is open. */
+    .pub-navbar__burger-line {
+      transform-origin: center;
+      transition: transform 0.2s ease, opacity 0.16s ease;
+    }
+    .pub-navbar__burger[aria-expanded="true"] .pub-navbar__burger-line:nth-child(1) {
+      transform: translateY(7px) rotate(45deg);
+    }
+    .pub-navbar__burger[aria-expanded="true"] .pub-navbar__burger-line:nth-child(2) {
+      opacity: 0;
+    }
+    .pub-navbar__burger[aria-expanded="true"] .pub-navbar__burger-line:nth-child(3) {
+      transform: translateY(-7px) rotate(-45deg);
+    }
+  }
 </style>
