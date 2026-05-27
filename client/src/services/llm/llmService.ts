@@ -50,6 +50,28 @@ export class LLMApiError extends Error {
 const isRetriableStatus = (status: number): boolean =>
   status === 429 || status === 503;
 
+// Strict chat templates (LM Studio + Smoffyy Qwen3.6 revised, some llama.cpp
+// variants) reject same-role runs with "No user query found in messages."
+// Story mode legitimately produces assistant+assistant runs (story chunk +
+// prism context + history). Lenient providers tolerate them; we merge here so
+// the wire payload alternates regardless of provider strictness.
+const mergeConsecutiveSameRole = (messages: LLMMessage[]): LLMMessage[] => {
+  if (messages.length < 2) return messages;
+  const merged: LLMMessage[] = [];
+  for (const msg of messages) {
+    const last = merged[merged.length - 1];
+    if (last && last.role === msg.role) {
+      merged[merged.length - 1] = {
+        role: last.role,
+        content: `${last.content}\n\n${msg.content}`,
+      };
+    } else {
+      merged.push({ role: msg.role, content: msg.content });
+    }
+  }
+  return merged;
+};
+
 interface ChatOptions {
   messages: LLMMessage[];
   apiKey: string;
@@ -192,7 +214,7 @@ class LLMService {
 
     const requestBody: LLMRequest = {
       model,
-      messages,
+      messages: mergeConsecutiveSameRole(messages),
       temperature,
       max_tokens: maxTokens,
       stream: !!streamCallback
@@ -311,7 +333,17 @@ class LLMService {
           if (line.startsWith('data: ') && line !== 'data: [DONE]') {
             try {
               const data = JSON.parse(line.slice(6));
-              const delta = data.choices[0]?.delta;
+
+              // Some servers (LM Studio with strict chat templates, Ollama)
+              // stream JSON error payloads with HTTP 200 instead of HTTP error
+              // codes. Surface them on the console rather than letting the
+              // parser blow up on a missing `choices` array.
+              if (data.error) {
+                console.warn('[LLM] Stream error payload:', data.error);
+                continue;
+              }
+
+              const delta = data.choices?.[0]?.delta;
 
               const content = delta?.content || '';
               if (content) {
@@ -340,12 +372,12 @@ class LLMService {
       if (buffer.trim() && buffer.startsWith('data: ') && buffer !== 'data: [DONE]') {
         try {
           const data = JSON.parse(buffer.slice(6));
-          const content = data.choices[0]?.delta?.content || '';
+          const content = data.choices?.[0]?.delta?.content || '';
           if (content) {
             await emit(content);
           }
         } catch {
-          // Incomplete trailing data — ignore
+          // Incomplete trailing data, ignore
         }
       }
       // Flush the think-filter's tail (any non-stripping buffered text).
