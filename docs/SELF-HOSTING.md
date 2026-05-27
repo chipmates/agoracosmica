@@ -77,6 +77,24 @@ launchctl unload ~/Library/LaunchAgents/org.agoracosmica.local-tts.plist
 rm -rf ~/Library/AgoraLocalTTS ~/Library/LaunchAgents/org.agoracosmica.local-tts.plist
 ```
 
+### Speed up transcription on Apple Silicon (recommended)
+
+The Docker Whisper container runs on CPU inside macOS's Linux VM (Metal doesn't pass through to Docker), so short utterances take ~10 seconds to transcribe. Running Whisper natively via MLX on Apple Silicon brings that down to ~0.5 seconds. Same model (large-v3-turbo), same quality, ~20× faster.
+
+```bash
+bash scripts/setup-local-stt-apple.sh
+```
+
+Installs `mlx-whisper` into `~/Library/AgoraLocalSTT/`, downloads ~1.5 GB of weights, registers a launchd plist, and stops the Docker Whisper container so port 8000 stays consistent. The STT toggle from above continues to point at `localhost:8000` and now hits the MLX server.
+
+**Requirement:** ffmpeg on PATH for audio decoding. Install with `brew install ffmpeg` if you don't already have it.
+
+To uninstall:
+```bash
+launchctl unload ~/Library/LaunchAgents/org.agoracosmica.local-stt.plist
+rm -rf ~/Library/AgoraLocalSTT ~/Library/LaunchAgents/org.agoracosmica.local-stt.plist
+```
+
 ### Verify
 
 ```bash
