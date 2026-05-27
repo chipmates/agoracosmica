@@ -45,6 +45,10 @@ logs/
 .stylelintcache
 .turbo/
 
+# ── Python runtime artifacts ───────────────────────────────
+**/__pycache__/
+*.pyc
+
 # ── Cloudflare Wrangler ────────────────────────────────────
 .wrangler/
 
