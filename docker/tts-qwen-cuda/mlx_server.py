@@ -38,6 +38,8 @@ import concurrent.futures
 import io
 import logging
 import os
+import shutil
+import subprocess
 import tempfile
 import wave
 from pathlib import Path
@@ -68,6 +70,12 @@ VOICES_CACHE_DIR = Path(os.environ.get(
 PORT = int(os.environ.get("PORT", "8887"))
 CORS_ORIGINS = os.environ.get("CORS_ALLOW_ORIGINS", "*").split(",")
 REF_TEXT_FALLBACK = os.environ.get("REF_TEXT_FALLBACK", "")
+
+# Lazy-resolved ffmpeg path. iOS Safari can't reliably play WAV from blob URLs,
+# so LAN-deployed Apple Silicon homelabs serving iOS clients need MP3. If
+# ffmpeg isn't on PATH the server still works for WAV — MP3 requests get a
+# clear 503 instead of silently downgrading.
+_FFMPEG = shutil.which("ffmpeg")
 
 logging.basicConfig(
     level=logging.INFO,
@@ -197,7 +205,7 @@ class SpeechRequest(BaseModel):
     model: str = Field(default="qwen3-tts-mlx", description="Accepted-but-ignored for SDK compat")
     input: str = Field(..., description="Text to synthesize")
     voice: str = Field(default="m1_warm_elder_v2", description="Archetype slug")
-    response_format: str = Field(default="wav", description="wav | mp3 — only wav supported in v0.1")
+    response_format: str = Field(default="wav", description="wav | mp3 (mp3 requires ffmpeg on PATH)")
     speed: float = Field(default=1.0, description="Speech speed, 0.5-1.5")
     language: str = Field(default="de", description="ISO 639-1 language code (de, en)")
 
@@ -250,10 +258,15 @@ def voices() -> dict:
 
 @app.post("/v1/audio/speech")
 def speech(req: SpeechRequest) -> Response:
-    if req.response_format not in ("wav", "wave"):
-        # MLX backend emits WAV natively; mp3/opus transcode is a v0.2 task.
+    fmt = req.response_format.lower()
+    if fmt in ("mpeg",):
+        fmt = "mp3"
+    if fmt not in ("wav", "wave", "mp3"):
         raise HTTPException(status_code=400,
-                            detail=f"response_format={req.response_format!r} not supported in v0.1 (use wav)")
+                            detail=f"response_format={req.response_format!r} not supported (use wav or mp3)")
+    if fmt == "mp3" and _FFMPEG is None:
+        raise HTTPException(status_code=503,
+                            detail="MP3 requested but ffmpeg not on PATH; install via `brew install ffmpeg` or request wav")
 
     if not _voices or not _voices.voices:
         raise HTTPException(status_code=503,
@@ -275,7 +288,7 @@ def speech(req: SpeechRequest) -> Response:
     speed = max(0.5, min(1.5, float(req.speed)))
     lang = req.language.lower()[:2] if req.language else "de"
 
-    log.info("synth voice=%s lang=%s len=%d", slug, lang, len(req.input))
+    log.info("synth voice=%s lang=%s len=%d fmt=%s", slug, lang, len(req.input), fmt)
 
     # Submit synth to the dedicated worker thread (model lives there too).
     # Wait synchronously for the result — FastAPI will already be running this
@@ -303,11 +316,39 @@ def speech(req: SpeechRequest) -> Response:
 
         # Concatenate chunks if mlx-audio split the input
         if len(wav_files) == 1:
-            audio_bytes = wav_files[0].read_bytes()
+            wav_bytes = wav_files[0].read_bytes()
         else:
-            audio_bytes = _concat_wavs(wav_files)
+            wav_bytes = _concat_wavs(wav_files)
 
-    return Response(content=audio_bytes, media_type="audio/wav")
+    if fmt == "mp3":
+        try:
+            audio_bytes = _wav_to_mp3(wav_bytes)
+        except Exception as exc:
+            log.exception("MP3 transcode failed")
+            raise HTTPException(status_code=500, detail=f"MP3 transcode failed: {exc}")
+        return Response(content=audio_bytes, media_type="audio/mpeg")
+
+    return Response(content=wav_bytes, media_type="audio/wav")
+
+
+def _wav_to_mp3(wav_bytes: bytes) -> bytes:
+    """Transcode WAV bytes to MP3 via ffmpeg stdin/stdout. iOS Safari plays MP3
+    reliably via HTML5 audio; WAV from blob URLs is flaky on the same path.
+
+    Settings: libmp3lame at 128k CBR, sample rate inherited from WAV. Good
+    enough for voice; opus would be smaller but iOS Safari support is uneven.
+    """
+    if _FFMPEG is None:
+        raise RuntimeError("ffmpeg not available")
+    proc = subprocess.run(
+        [_FFMPEG, "-loglevel", "error", "-f", "wav", "-i", "pipe:0",
+         "-codec:a", "libmp3lame", "-b:a", "128k", "-f", "mp3", "pipe:1"],
+        input=wav_bytes,
+        capture_output=True,
+        check=True,
+        timeout=30,
+    )
+    return proc.stdout
 
 
 def _concat_wavs(paths: list[Path]) -> bytes:
