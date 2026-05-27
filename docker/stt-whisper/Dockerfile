@@ -10,11 +10,11 @@
 #
 # Image: ghcr.io/chipmates/agoracosmica-stt-whisper:1.1.0 (+ :latest)
 
-FROM ghcr.io/speaches-ai/speaches:latest
+FROM ghcr.io/speaches-ai/speaches:latest-cpu
 
 ENV WHISPER__MODEL=Systran/faster-whisper-large-v3
 ENV WHISPER__INFERENCE_DEVICE=auto
-ENV WHISPER__COMPUTE_TYPE=int8_float16
+ENV WHISPER__COMPUTE_TYPE=int8
 
 EXPOSE 8000
 
