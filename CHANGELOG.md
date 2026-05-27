@@ -38,7 +38,7 @@ Local Mode lands. Run the LLM, voice synthesis, and transcription on your own ma
 
 ### Fixed
 
-- **Story mode no longer breaks on strict chat templates.** `mergeConsecutiveSameRole()` in `llmService.ts` joins consecutive same-role messages with `\n\n` before sending. Strict templates (Qwen 3.6 Smoffyy revised, most production-grade) require user/assistant alternation; lenient templates (OpenRouter, OpenAI proxy) tolerated the multi-assistant pattern but local LLMs would error out. Generic normalization, no provider branching.
+- **Story mode no longer breaks on strict chat templates.** `mergeConsecutiveSameRole()` in `llmService.ts` joins consecutive same-role messages with `\n\n` before sending. Strict templates (Qwen 3.6 Smoffyy revised, most production-grade) require user/assistant alternation. Lenient templates (OpenRouter, OpenAI proxy) tolerated the multi-assistant pattern but local LLMs would error out. Generic normalization, no provider branching.
 - **SSE parser tolerates non-stream JSON error payloads.** Streaming responses that come back as a single JSON error envelope (no `choices` array) no longer crash with `TypeError: Cannot read properties of undefined`. Explicit `data.error` check plus optional chaining on the choices access.
 - **Whisper Dockerfile base image tag corrected** from the non-existent `:latest` to `:latest-cpu`. The previous tag caused `docker build` to fail with "manifest unknown" on every host.
 - **Whisper compute type changed from `int8_float16` to `int8`.** The former is CUDA-only and crashed at first transcription on CPU and Apple Silicon. No performance regression for the single-user case.

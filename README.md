@@ -79,7 +79,7 @@ Most people just visit **[agoracosmica.org](https://agoracosmica.org)**: free, n
 
 **Two licenses, one project.** Code is **[AGPL-3.0](LICENSE)** (fork freely, copyleft applies to public network deployments). Content (stories, voices, factchecks, artwork) is **© ChipMates gemeinnützige GmbH** at launch, transitioning to **CC-BY 4.0 within 6 to 12 months**. See [CONTENT-LICENSE.md](CONTENT-LICENSE.md) for full terms.
 
-**Schools and universities** are welcome to use Agora Cosmica with their students. For **self-hosting on your own infrastructure**, `docker compose up` and you're running — see [SELF-HOSTING.md](docs/SELF-HOSTING.md) for the five-minute guide.
+**Schools and universities** are welcome to use Agora Cosmica with their students. For **self-hosting on your own infrastructure**, `docker compose up` and you're running. See [SELF-HOSTING.md](docs/SELF-HOSTING.md) for the five-minute guide.
 
 ---
 
@@ -95,7 +95,7 @@ Boots the React app at [localhost:5173](http://localhost:5173). UI and static co
 
 **Requirements**: Node.js 20+, pnpm 8+.
 
-**Or run everything locally:** Local Mode (v1.1.0) lets you point the app at any OpenAI-compatible LLM endpoint (LM Studio, Ollama, vLLM) and runs the audio stack — Kokoro EN, Qwen3-TTS DE, Whisper STT — in our published docker images. With both Local Mode and docker self-host, no conversation, voice, or text data leaves your machine. See [SELF-HOSTING.md](docs/SELF-HOSTING.md#use-local-mode).
+**Or run everything locally:** Local Mode (v1.1.0) lets you point the app at any OpenAI-compatible LLM endpoint (LM Studio, Ollama, vLLM) and runs the audio stack (Kokoro EN, Qwen3-TTS DE, Whisper STT) in our published docker images. With both Local Mode and docker self-host, no conversation, voice, or text data leaves your machine. See [SELF-HOSTING.md](docs/SELF-HOSTING.md#use-local-mode).
 
 ---
 

@@ -19,7 +19,7 @@ Per anonymous request, written to Cloudflare Analytics Engine:
 | Language | `en` or `de` | See bilingual reach |
 | HTTP status | `200`, `429`, `502`, ... | Detect outages and rate-limit pressure |
 | Country | 2-letter ISO code from Cloudflare edge (`DE`, `US`, `XX` for unknown) | Demonstrate geographic reach to grant funders |
-| Playback event | `started` (audio first play) or `completed` (content marked finished, gamification star awarded) | Distinguish click-and-bail from real consumption — completion-rate funnel |
+| Playback event | `started` (audio first play) or `completed` (content marked finished, gamification star awarded) | Distinguish click-and-bail from real consumption (completion-rate funnel) |
 | Content type | `story`, `teaching`, `prism`, `council`, `foreword` (closed allowlist; only set on playback events) | Know which content type was started/completed |
 | Duration (ms) | Latency of the request | Find slow paths, fix them |
 
@@ -27,7 +27,7 @@ Per anonymous request, written to Cloudflare Analytics Engine:
 
 - **No IP retention.** Cloudflare derives a 2-letter country code at the edge from the request IP; we read and store only the code. The IP itself is used transiently in worker memory for rate-limiting and Turnstile bot-detection, never persisted to disk, never written to analytics.
 - **No user IDs in analytics.** The free-tier `clientId` is a UUID stored in your browser's localStorage (the server hands one out on first session if none exists). It is used server-side for short-lived rate-limit accounting (24-hour KV TTL) and never written to analytics rows, never combined with figure/mode/country/source/any other dimension.
-- **No cookies, no fingerprints, no localStorage exfiltration.** Cloudflare sets strictly-necessary bot-detection cookies (`__cf_bm`, `cf_clearance`) at the edge — exempt under ePrivacy Article 5(3). We add nothing of our own.
+- **No cookies, no fingerprints, no localStorage exfiltration.** Cloudflare sets strictly-necessary bot-detection cookies (`__cf_bm`, `cf_clearance`) at the edge. These are exempt under ePrivacy Article 5(3). We add nothing of our own.
 - **No message content, no prompts, no transcriptions.**
 - **No cross-session linking.** There is no per-event user dimension. The same person counted twice = two anonymous rows with no key to join them.
 - **No third-party trackers.** No Google Analytics, no Meta Pixel, no Mixpanel, no Hotjar, no session replay.
@@ -38,13 +38,13 @@ Aggregate counters of the form `chat events from Germany, last 24h: 47` cannot b
 
 This sits below the personal-data threshold of DSGVO Art. 4 per Erwägungsgrund 26 (anonymous information). TDDDG §25 doesn't apply to the measurement itself: no information is read from or written to your device as part of the counting. Browser localStorage that the app uses for its own functionality (clientId for rate limiting, language preference, BYOK key encryption) is technically necessary and exempt under §25(2).
 
-The same legal model is used by [Plausible](https://plausible.io/data-policy) and [Umami](https://umami.is) — privacy-friendly analytics without consent banners, by design.
+The same legal model is used by [Plausible](https://plausible.io/data-policy) and [Umami](https://umami.is), privacy-friendly analytics without consent banners, by design.
 
 ## You can audit this
 
 All analytics writes are in:
-- [`workers/llm-proxy/src/utils/analytics.ts`](../workers/llm-proxy/src/utils/analytics.ts) — chat, council, summary, session, rate-limit events
-- [`workers/audio-proxy/src/index.ts`](../workers/audio-proxy/src/index.ts) — speech (TTS), transcriptions (STT) events
+- [`workers/llm-proxy/src/utils/analytics.ts`](../workers/llm-proxy/src/utils/analytics.ts): chat, council, summary, session, rate-limit events
+- [`workers/audio-proxy/src/index.ts`](../workers/audio-proxy/src/index.ts): speech (TTS), transcriptions (STT) events
 
 Country values come from `request.cf.country` (a 2-letter ISO code), never from a stored IP.
 
