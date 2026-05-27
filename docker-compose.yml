@@ -70,8 +70,13 @@ services:
     ports:
       - "${AGORA_STT_PORT:-8000}:8000"
     environment:
-      WHISPER__MODEL: ${AGORA_WHISPER_MODEL:-Systran/faster-whisper-large-v3}
+      WHISPER__MODEL: ${AGORA_WHISPER_MODEL:-deepdml/faster-whisper-large-v3-turbo-ct2}
       WHISPER__INFERENCE_DEVICE: ${AGORA_WHISPER_DEVICE:-auto}
+    volumes:
+      # Persist the HuggingFace model cache across restarts so the pre-pull
+      # in entrypoint.sh runs once. Without this, every `docker compose down`
+      # would force a fresh ~1.5 GB download on the next `up`.
+      - whisper-cache:/home/ubuntu/.cache/huggingface
     healthcheck:
       test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1:8000/v1/models"]
       interval: 30s
@@ -104,3 +109,6 @@ services:
       timeout: 5s
       retries: 3
       start_period: 120s
+
+volumes:
+  whisper-cache:

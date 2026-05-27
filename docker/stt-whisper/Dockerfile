@@ -4,15 +4,17 @@
 # OpenAI-compatible HTTP API). Single-user local container — no concurrency
 # tuning, no metrics export, just `/v1/audio/transcriptions` on port 8000.
 #
-# Default model: faster-whisper-large-v3 (DE + EN multilingual, ~2.2 GB VRAM).
-# Override via WHISPER__MODEL env var. CPU users should switch to
-# Systran/faster-whisper-base or Systran/faster-whisper-small for usable speed.
+# Default model: faster-whisper-large-v3-turbo (DE + EN multilingual, ~1.5 GB,
+# ~5x faster than large-v3 on CPU, sub-1% WER cost vs large-v3 on standard
+# benchmarks). Override via WHISPER__MODEL env var. CUDA hosts may prefer
+# `Systran/faster-whisper-large-v3` for the absolute-best quality at the cost
+# of throughput.
 #
 # Image: ghcr.io/chipmates/agoracosmica-stt-whisper:1.1.0 (+ :latest)
 
 FROM ghcr.io/speaches-ai/speaches:latest-cpu
 
-ENV WHISPER__MODEL=Systran/faster-whisper-large-v3
+ENV WHISPER__MODEL=deepdml/faster-whisper-large-v3-turbo-ct2
 ENV WHISPER__INFERENCE_DEVICE=auto
 ENV WHISPER__COMPUTE_TYPE=int8
 
@@ -23,6 +25,15 @@ ENV WHISPER__COMPUTE_TYPE=int8
 #     ALLOW_ORIGINS='["https://example.com","https://homelab.local"]'
 ENV ALLOW_ORIGINS=[\"*\"]
 
+# Pre-pull the configured model on first start so the first transcription
+# request doesn't 404. Skipped on subsequent starts (snapshot_download is
+# idempotent against the HF cache).
+USER root
+COPY entrypoint.sh /usr/local/bin/agora-init.sh
+RUN chmod +x /usr/local/bin/agora-init.sh
+USER ubuntu
+
 EXPOSE 8000
 
-# Upstream entrypoint exposes the FastAPI app on :8000. No override needed.
+ENTRYPOINT ["/usr/local/bin/agora-init.sh"]
+CMD ["uvicorn", "--factory", "speaches.main:create_app"]
