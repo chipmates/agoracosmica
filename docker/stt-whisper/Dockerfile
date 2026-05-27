@@ -16,6 +16,13 @@ ENV WHISPER__MODEL=Systran/faster-whisper-large-v3
 ENV WHISPER__INFERENCE_DEVICE=auto
 ENV WHISPER__COMPUTE_TYPE=int8
 
+# CORS for browser-direct calls (Local Mode panel and LAN-deployment cases
+# where the browser sits on a different origin than the container).
+# Speaches reads the env value as a JSON-encoded list. Override at runtime
+# with a tighter allowlist if needed:
+#     ALLOW_ORIGINS='["https://example.com","https://homelab.local"]'
+ENV ALLOW_ORIGINS=[\"*\"]
+
 EXPOSE 8000
 
 # Upstream entrypoint exposes the FastAPI app on :8000. No override needed.

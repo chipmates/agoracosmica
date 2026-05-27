@@ -42,6 +42,7 @@ from typing import Optional
 import numpy as np
 import soundfile as sf
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 from pydantic import BaseModel, Field
 
@@ -58,6 +59,19 @@ TAIL_SILENCE_MS = int(os.environ.get("TTS_TAIL_SILENCE_MS", "150"))
 DEFAULT_LANGUAGE = os.environ.get("QWEN_DEFAULT_LANGUAGE", "German")
 
 app = FastAPI(title="Agora Cosmica Local Qwen3-TTS")
+
+# CORS for browser-direct calls (Local Mode panel and LAN-deployment cases
+# where the browser sits on a different origin than the container). Override
+# with a tighter allowlist via the CORS_ALLOW_ORIGINS env var:
+#     CORS_ALLOW_ORIGINS=https://example.com,https://homelab.local
+_CORS_ORIGINS = os.environ.get("CORS_ALLOW_ORIGINS", "*").split(",")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=_CORS_ORIGINS,
+    allow_credentials=False,
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["*"],
+)
 voice_loader: Optional[VoiceLoader] = None
 tts_model = None
 
