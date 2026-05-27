@@ -166,7 +166,7 @@ Audio + STT containers add ~5-6 GB across Kokoro, Whisper, and Qwen TTS (on CUDA
 1. Download LM Studio: <https://lmstudio.ai>.
 2. Inside LM Studio, download `Qwen3.6-27B-Instruct-Revised-GGUF` (or any other 27B-class instruction-tuned model).
 3. Open the *Local Server* tab. **Turn on the "Enable CORS" toggle.** Set context length to 32k. Start the server on port 1234.
-4. In Agora Cosmica: Settings → Local Mode → flip the **LLM** toggle. Paste `http://localhost:1234/v1` into the endpoint URL field, type `qwen3.6-27b-instruct` as the model name, click *Test* → green pill, then *Save*.
+4. In Agora Cosmica: Settings → Local Mode → flip the **LLM** toggle. Paste `http://localhost:1234/v1` into the endpoint URL field, type `qwen3.6-27b-instruct` as the model name, click *Test*. You should see "Reachable" in green with a check icon. Click *Save*.
 
 The TTS and STT toggles are independent. You can leave them off (hosted voice/transcription) or flip them on after starting the audio containers below.
 
@@ -179,7 +179,7 @@ The TTS and STT toggles are independent. You can leave them off (hosted voice/tr
    launchctl setenv OLLAMA_ORIGINS "*"
    ```
    Then restart Ollama. On Linux: `OLLAMA_ORIGINS=* ollama serve`.
-4. In Agora Cosmica: Settings → Local Mode → flip the **LLM** toggle. Paste `http://localhost:11434/v1`, type the model name, click *Test* → green pill, then *Save*.
+4. In Agora Cosmica: Settings → Local Mode → flip the **LLM** toggle. Paste `http://localhost:11434/v1`, type the model name, click *Test*. You should see "Reachable" in green with a check icon. Click *Save*.
 
 ### Audio + STT setup (Linux / Windows with NVIDIA)
 
