@@ -1,9 +1,11 @@
 // src/services/audio/stt/index.ts
-// STT routing: All speech recognition self-hosted on GEX130
-// Circuit breaker: after 3 consecutive failures, disable STT for 60s
+// STT routing: hosted by default (GEX130 Whisper) or Local Mode (local
+// Whisper container, port 8000) when the user has enabled it in settings.
+// Circuit breaker: after 3 consecutive failures, disable STT for 60s.
 
-import { STT_SERVICES } from '../config/serviceConfig';
+import { STT_SERVICES, loadServiceConfig } from '../config/serviceConfig';
 import { selfHostedSTT } from './selfHostedSTT';
+import { localModeSTT, LocalModeSttUnavailable } from './localModeSTT';
 import { validateAudioBlob, formatTranscriptionResponse, TranscriptionResponse } from './sttUtils';
 
 // ============================================
@@ -56,13 +58,33 @@ export const transcribeAudio = async (
   _service: string = STT_SERVICES.SELF_HOSTED,
   language: string = 'en'
 ): Promise<TranscriptionResponse> => {
+  validateAudioBlob(audioBlob);
+
+  // Local Mode: route to the local Whisper container, no circuit breaker
+  // (single user, fail fast). On unavailable, fall back to hosted.
+  const config = loadServiceConfig();
+  if (config.localMode?.enabled) {
+    try {
+      const result = await localModeSTT(audioBlob, language);
+      return formatTranscriptionResponse(result, 'local');
+    } catch (error) {
+      if (error instanceof LocalModeSttUnavailable) {
+        console.warn(`[STT] Local Mode unavailable (${error.url}): ${error.message} — falling back to hosted`);
+        window.dispatchEvent(new CustomEvent('local-mode-stt-fallback', {
+          detail: { url: error.url, message: error.message }
+        }));
+        // fall through to hosted
+      } else {
+        throw error;
+      }
+    }
+  }
+
   if (isCircuitOpen()) {
     throw new Error('STT circuit breaker open — speech recognition temporarily unavailable');
   }
 
   try {
-    validateAudioBlob(audioBlob);
-
     let lastError: Error | undefined;
     for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
       try {
