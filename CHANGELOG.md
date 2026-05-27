@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
+- **Marketing pages migrated to Astro for sub-second first paint.** Figure and theme detail pages, catalogs, about, and contact now ship as prerendered static HTML from the sibling `marketing/` Astro project. The hero, journey overview, ideas, and CTA paint immediately, so ad clickers landing on `/figures/<name>/` see the page within a few hundred milliseconds instead of a blank dark screen until the React bundle parses. React islands handle only the trailer audio button and council preview audio. Catalog and about/contact pages ship zero React JS. The React SPA at `/` and `/de/` continues to handle login + post-login app.
 - **Local Mode (v1.1.0).** Run the whole user-facing pipeline on your own machine. A single toggle in Settings routes the LLM to any OpenAI-compatible endpoint you run (LM Studio, Ollama, vLLM, llama.cpp), and audio (Kokoro English, Qwen3-TTS German, Whisper STT) to local containers we ship: `ghcr.io/chipmates/agoracosmica-tts-kokoro`, `agoracosmica-stt-whisper`, `agoracosmica-tts-qwen-cuda`. The hardware-tier banner in Settings detects NVIDIA / Apple Silicon / CPU and surfaces what runs locally and what falls back to cloud.
 - **Apple Silicon support for German TTS.** `scripts/setup-local-tts-apple.sh` installs the kapi2800/qwen3-tts-apple-silicon MLX port into `~/Library/AgoraLocalTTS` and registers a launchd plist so the same `/v1/audio/speech` endpoint runs natively on M-series Macs (Metal doesn't passthrough docker, so this can't be containerised on Mac).
 - **Configurable LLM endpoint in settings.** When Local Mode is on, conversations route to the configured `baseURL` instead of OpenRouter. Validation does a `/models` reachability probe with a 5-second timeout and surfaces detected models in the UI. The `provider: 'custom-openai'` kind suppresses OpenRouter-specific request fields (HTTP-Referer, X-Title, the `provider` envelope, the Qwen3-235B-tuned `presence_penalty`) so smaller local models aren't destabilised.
@@ -18,6 +19,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 
+- **HomePage is now `React.lazy()` so the eager bundle on unauthenticated `/` drops from 374 KB gzipped to 187 KB gzipped.** Visitors landing on the login page no longer download the audio engine, council suite, modals, and post-login app shell until they actually authenticate.
+- **Client build chain now also builds the sibling Astro project.** `pnpm build` in `client/` runs Vite, then installs and builds `marketing/`, then merges `marketing/dist/` into `client/build/` via `scripts/merge-marketing.mjs`. CF Pages still deploys from the same `client/build/` output. 84 prerendered marketing pages plus the React SPA shell.
+- **Hero image preload on figure pages uses responsive `imagesrcset`** so mobile devices fetch the correct 640px thumbnail instead of the desktop 1200px portrait.
 - **`<think>...</think>` blocks are stripped from every LLM response, not just council parser output.** The streaming filter and the non-streaming summary post-process now use a shared util (`utils/thinkingTagStripper.ts`). Thinking-capable models (Qwen3, DeepSeek-R1 distills, QwQ) no longer leak scratchpad into the visible chat or summary.
 - **`docker-compose.yml` adds three sibling services** under the new `nvidia` profile (`tts-qwen`) and the default profile (`tts-kokoro`, `stt-whisper`). `docker compose up` continues to work; `docker compose --profile nvidia up` enables full DE local TTS.
 - **`docker-publish.yml` becomes a matrix workflow** that builds four images on every `v*` tag: `agoracosmica`, `agoracosmica-tts-kokoro`, `agoracosmica-stt-whisper`, `agoracosmica-tts-qwen-cuda`. Each gets SBOM + provenance + Trivy scan.
@@ -25,6 +29,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Security
 
 - **CSP `connect-src` and `media-src` allow `http://localhost:*` and `http://127.0.0.1:*`.** Browsers treat localhost as a secure context so the HTTP-on-HTTPS-page mixed-content case doesn't apply. Lets the app reach a local LLM + audio stack without weakening the rest of the CSP.
+
+### Removed
+
+- **`client/scripts/prerender.mjs` and `client/src/{components,pages,routes}/public/` directories.** Replaced by the Astro project under `marketing/`. The React app no longer renders the public marketing surface.
 
 ---
 
