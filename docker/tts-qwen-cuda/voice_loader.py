@@ -45,8 +45,23 @@ class VoiceLoader:
         self.voices: Dict[str, Voice] = {}
 
     def load(self) -> Dict[str, Voice]:
-        """Fetch the manifest and ensure all referenced files are cached."""
-        manifest = self._fetch_json("manifest.json")
+        """Load the manifest (local cache first, R2 fetch as fallback) and
+        ensure all referenced files are cached.
+
+        This lets the loader work in two deployment shapes:
+          1. Hosted/agoracosmica: empty cache on first start, fetches from
+             VOICES_R2_BASE, persists locally.
+          2. OSS-shipped (chipmates/qwen3-tts-mlx): cache_dir is
+             pre-populated by the install script with bundled voices;
+             VOICES_R2_BASE is irrelevant and never reached.
+        """
+        local_manifest = self.cache_dir / "manifest.json"
+        if local_manifest.exists():
+            log.info("Loading voice manifest from local cache: %s", local_manifest)
+            manifest = json.loads(local_manifest.read_text())
+        else:
+            manifest = self._fetch_json("manifest.json")
+            local_manifest.write_text(json.dumps(manifest))
         for entry in manifest.get("voices", []):
             slug = entry["slug"]
             try:
