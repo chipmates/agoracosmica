@@ -62,7 +62,7 @@ Each interaction in Agora Cosmica orbits one figure. The four educational chapte
 **Private by design**
 - **BYOK encryption**: bring your own OpenRouter key, encrypted locally with AES-256-GCM, never stored on our servers.
 - **Free tier without signup**: 30 messages a day via our Cloudflare Worker, no account required.
-- **No user tracking**: no tracking cookies, no third-party analytics, no per-request server logs, no IP retention, no cross-session profiles. We do collect anonymous aggregate counters to keep the service running and improve it — [docs/MEASUREMENT.md](docs/MEASUREMENT.md) lists exactly what and why.
+- **No user tracking**: no tracking cookies, no third-party analytics, no per-request access logs of our own, no IP retention, no cross-session profiles. We do collect anonymous aggregate counters to keep the service running and improve it. [docs/MEASUREMENT.md](docs/MEASUREMENT.md) lists exactly what gets counted, what never does, and the one exception we name upfront (Google Ads click-ID forwarding for visitors who arrive via a Google ad).
 - **Self-hosted speech**: live text-to-speech and speech-to-text run on our own GPU servers in Germany.
 - **EU-first hosting**: live audio in Germany, pre-recorded audio on Cloudflare R2.
 

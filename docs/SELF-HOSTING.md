@@ -12,7 +12,7 @@ docker compose up -d
 
 Open [localhost:8080](http://localhost:8080). On first run, paste your [OpenRouter](https://openrouter.ai/keys) API key into the prompt and you're chatting.
 
-**Requirements:** Docker 24+ (Docker Desktop on Mac/Windows, or Docker Engine on Linux). No GPU needed for the v1 image.
+**Requirements:** Docker 24+ (Docker Desktop on Mac/Windows, or Docker Engine on Linux). No GPU needed for the default image.
 
 ---
 
@@ -53,21 +53,6 @@ The defaults work out of the box. The settings you may want to change:
 
 After editing `.env`, restart with `docker compose up -d`. The container rewrites `/config.js` from these env vars on every start, so no rebuild is needed.
 
-### Same-origin content mirror
-
-To serve content from your own box instead of the upstream CDN (offline-capable, single-origin), mirror the content tree into a local directory and mount it:
-
-```yaml
-# docker-compose.yml
-services:
-  app:
-    # ...
-    volumes:
-      - ./media:/usr/share/nginx/html/media:ro
-```
-
-Then set `AGORA_MEDIA_BASE_URL=/media` in `.env` and populate `./media/` matching the upstream layout: `seeds/{en,de}/`, `figure-translations/{en,de}/`, `factchecks/{en,de}/`, `voice-profiles/{en,de}/`, `instructions/<figure>/`, plus `images/`, `stories/`, `trailers/`, etc.
-
 ### Custom content domain
 
 If you point the app at a content domain that is not `*.agoracosmica.org`, update the Content-Security-Policy in `client/index.html` to allow your origin in `img-src`, `media-src`, and `connect-src`, then rebuild from source (see below). The default CSP already allows `*.agoracosmica.org`, so the upstream CDN works without changes.
@@ -99,16 +84,16 @@ First build takes 2 to 3 minutes (pnpm install, pnpm build, a one-time content f
 
 ## Content licensing
 
-The code is **[AGPL-3.0](../LICENSE)** — fork freely, copyleft applies to network deployments. The content (stories, prism dialogues, council debates, factchecks, voice profiles, instruction prompts, images, audio) is **© ChipMates gemeinnützige GmbH** at launch, transitioning to **CC-BY 4.0 within 6 to 12 months**. See [CONTENT-LICENSE.md](../CONTENT-LICENSE.md) for the full terms.
+The code is **[AGPL-3.0](../LICENSE)**. Fork freely, copyleft applies to network deployments. The content (stories, prism dialogues, council debates, factchecks, voice profiles, instruction prompts, images, audio) is **© ChipMates gemeinnützige GmbH** at launch, transitioning to **CC-BY 4.0 within 6 to 12 months**. See [CONTENT-LICENSE.md](../CONTENT-LICENSE.md) for the full terms.
 
 **The self-host image deliberately ships no authored text content.** The build sets `VITE_SELF_HOST=true`, which makes `extract-public-data.mjs` emit empty values for every authored field (figure bios, learn lines, seed summaries, seed quotes, voice essences, key concepts, theme cross-refs). The build also skips the SEO prerender step, so no figure HTML pages with bios end up in the image. The SPA still type-checks because the catalog shape is preserved; the fields just hold empty strings.
 
 What this means at runtime:
 
-- **Identifiers ship** — figure ids and names, seed ids and titles, the hardcoded short tradition labels. Enough for navigation.
-- **Everything authored is runtime-fetched** — pre-recorded audio (figure trailers, story narration, council previews), figure-specific instruction prompts, and council master prompts (advisory/debate templates) all load from `AGORA_MEDIA_BASE_URL` (default `https://media.agoracosmica.org`) when the app needs them. Your browser talks to the configured CDN; the docker image is not a copy of the content.
+- **Identifiers ship.** Figure ids and names, seed ids and titles, the hardcoded short tradition labels. Enough for navigation.
+- **Everything authored is runtime-fetched.** Pre-recorded audio (figure trailers, story narration, council previews), figure-specific instruction prompts, and council master prompts (advisory/debate templates) all load from `AGORA_MEDIA_BASE_URL` (default `https://media.agoracosmica.org`) when the app needs them. Your browser talks to the configured CDN. The docker image is not a copy of the content.
 
-Default operation is exactly what the public app uses — the same R2 bucket, the same CDN — so a self-host instance is content-equivalent to agoracosmica.org without holding a redistributable copy.
+Default operation is exactly what the public app uses. The same R2 bucket, the same CDN. A self-host instance is content-equivalent to agoracosmica.org without holding a redistributable copy.
 
 ---
 
@@ -124,7 +109,15 @@ For a single user on their own machine, prefer Local Mode (below) since it's sim
 
 v1.1.0 ships a Local Mode panel that routes the LLM, voice synthesis, and transcription to your own machine. Each piece flips independently. Settings → AI Model → Local Mode.
 
-Honest framing: with Local Mode plus a local LLM, no conversation or voice data leaves your machine. We don't claim "100% private" (the app's static assets still load from agoracosmica.org unless you also serve them locally), we don't claim "fully offline", and we don't claim "anonymous". The property is sharper: the same models we run on our servers run on yours.
+### What this means for your privacy
+
+When you flip on all three Local Mode toggles and point the LLM at your own machine, your conversation never leaves it. Anything you type, anything the figure says back, anything you speak into the mic, anything you hear from the TTS — all of it stays on your hardware.
+
+The browser still fetches catalog content from our CDN at `media.agoracosmica.org` on demand: figure prompts, voice profiles, pre-recorded audio, factchecks. That's the same traffic any visitor to the public site generates. We're not hiding it. **The point is sharper: what you talk about with the figures stays yours.**
+
+Self-host builds also disable every analytics, page, session, ad-attribution, and conversion beacon at build time. Verified in code (`isSelfHost` gates in `pageBeacon.ts`, `entryBeacon.ts`, `playbackBeacon.ts`, `gclidCapture.ts`).
+
+One first-boot note: the audio containers download their model weights from HuggingFace the first time they start (Whisper ~1.5 GB, Kokoro ~300 MB, Qwen3-TTS ~2 GB). Any local LLM endpoint downloads its own model from its own source (LM Studio's catalog, Ollama's registry, etc.). After the one-time pull, runtime is fully local.
 
 ### Two ways to run Local Mode
 
@@ -253,9 +246,9 @@ The audio + STT containers we ship have CORS enabled by default.
 
 ### Self-host licensing reality
 
-If you're self-hosting for commercial use, the F5-TTS German fine-tuning is CC-BY-NC-4.0 (non-commercial only). Our production primary is Qwen3-TTS, which is fine commercially; F5 is the overflow tier and the only piece with the NC restriction. The audio output is in the same legal position as the weights. If your use is non-commercial (personal, research, nonprofit), the NC license doesn't restrict you.
+If you're self-hosting for commercial use, the F5-TTS German fine-tuning is CC-BY-NC-4.0 (non-commercial only). Our production primary is Qwen3-TTS, which is fine commercially. F5 is the overflow tier and the only piece with the NC restriction. The audio output is in the same legal position as the weights. If your use is non-commercial (personal, research, nonprofit), the NC license doesn't restrict you.
 
-Code in this repo is AGPL-3.0. Companion repos (`chipmates/f5-server`, `chipmates/qwen3-tts-mlx`) are MIT. Content is © ChipMates gemeinnützige GmbH transitioning to CC-BY 4.0.
+Code in this repo is AGPL-3.0. The companion `chipmates/f5-server` repo is MIT. Content is © ChipMates gemeinnützige GmbH transitioning to CC-BY 4.0.
 
 ---
 
@@ -264,7 +257,7 @@ Code in this repo is AGPL-3.0. Companion repos (`chipmates/f5-server`, `chipmate
 - **No database.** Chats, settings, completion progress, and voting power all live in IndexedDB inside your browser.
 - **No server-side state.** The container is stateless: pull, run, restart, no migrations, no data dir to back up.
 - **No accounts.** BYOK keys are stored client-side, encrypted with AES-256-GCM.
-- **No telemetry.** Self-host disables every analytics, page-view, session, ad-attribution, and conversion beacon. The container talks to OpenRouter (your BYOK key, browser-direct) and the content CDN you configure. Nothing else.
+- **No telemetry of our own.** The self-host build disables every analytics, page, session, ad-attribution, and conversion beacon at build time. At runtime, your browser talks to: your chosen LLM endpoint (OpenRouter via BYOK, or your local LLM when Local Mode is on), any local audio containers you've started, and our content CDN (`media.agoracosmica.org`) for figure prompts and pre-recorded audio. The audio containers fetch their own model weights from HuggingFace on first start. After that, the audio path is fully local.
 
 ---
 

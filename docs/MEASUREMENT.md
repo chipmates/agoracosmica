@@ -1,6 +1,8 @@
 # What we measure (and why)
 
-We don't track users. We do count aggregate events — that's how we know if the service is working, where it breaks, and whether our nonprofit outreach actually reaches anyone.
+We don't track users. We do count aggregate events. That's how we know if the service is working, where it breaks, and whether our nonprofit outreach actually reaches anyone.
+
+One exception we name upfront: visitors who arrive via a Google ad bring a per-click identifier (`gclid`), which we forward to Google for conversion matching. It lives only for the tab's lifetime, is never combined with our analytics, and the full mechanics are detailed below.
 
 This document lists exactly what gets counted, why, and what never does.
 

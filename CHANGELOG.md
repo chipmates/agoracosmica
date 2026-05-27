@@ -12,7 +12,7 @@ Local Mode lands. Run the LLM, voice synthesis, and transcription on your own ma
 
 ### Added
 
-- **Local Mode panel with per-service toggles for LLM, TTS, and STT.** Each runs independently, so a BYOK-LLM user can still route voice through local containers. Settings → AI Model → Local Mode. The LLM toggle routes to any OpenAI-compatible endpoint (LM Studio, Ollama, vLLM, llama.cpp); the TTS toggle routes to local Kokoro (EN) and Qwen3-TTS (DE); the STT toggle routes to local Whisper. With all three on plus a local LLM, no conversation or voice data leaves your machine.
+- **Local Mode panel with per-service toggles for LLM, TTS, and STT.** Each runs independently, so a BYOK-LLM user can still route voice through local containers. Settings → AI Model → Local Mode. The LLM toggle routes to any OpenAI-compatible endpoint (LM Studio, Ollama, vLLM, llama.cpp). The TTS toggle routes to local Kokoro (EN) and Qwen3-TTS (DE). The STT toggle routes to local Whisper. With all three on plus a local LLM, your conversation stays on your machine.
 - **Docker sibling containers for Local Mode audio.** `tts-kokoro` (English TTS, ~3.3 GB CPU image), `stt-whisper` (Whisper transcription, ~600 MB image plus model cache), `tts-qwen-cuda` (German TTS, NVIDIA-only, behind the `nvidia` compose profile). Single `docker compose up -d` brings up app + Kokoro + Whisper.
 - **Apple Silicon native Qwen3-TTS via MLX.** `scripts/setup-local-tts-apple.sh` installs a FastAPI wrapper around `mlx-audio` that runs the production-equivalent Qwen3-TTS model natively on M-series Macs. Real-time factor 0.92x, peak memory 5.7 GB, voice-clones all 10 production archetype voices. Cold first-synth 1.3s with pre-cached transcripts. Launchd plist starts the server on login.
 - **10 German archetype voices with friendly cosmic names** (Lyra, Astra, Vega, Andromeda, Ceres, Solaris, Umbra, Phoenix, Hyperion, Corvus). Same model as production, voice references hosted on R2 with precomputed speaker embeddings and pre-cached transcripts.
@@ -23,7 +23,7 @@ Local Mode lands. Run the LLM, voice synthesis, and transcription on your own ma
 - **Council master prompts load from the media CDN.** `services/council/generator.ts` fetches `council_advisory_master.json` and `council_debate_master.json` from `${mediaBaseUrl}/instructions/...` instead of a same-origin path. Removes the last authored-text leak from the self-host docker image.
 - **Voice technology credits on `/about`.** New section names the upstream projects we use (Qwen3-TTS, F5-TTS by SWivid et al., the hvoss-techfak German fine-tuning, Kokoro by hexgrad, faster-whisper via Speaches) with their licenses.
 - **MP3 transcoding in the MLX TTS server.** iOS Safari plays MP3 reliably via HTML5 audio while WAV from blob URLs is flaky. The MLX server now transcodes via ffmpeg on request, with a clear 503 if ffmpeg isn't on PATH. Unblocks LAN-deployed Apple Silicon homelabs serving iOS clients.
-- **Companion OSS repos.** [`chipmates/f5-server`](https://github.com/chipmates/f5-server) packages our production F5-TTS deployment as a standalone OpenAI-compatible service (MIT code, bring-your-own-checkpoint). [`chipmates/qwen3-tts-mlx`](https://github.com/chipmates/qwen3-tts-mlx) packages the Apple Silicon MLX Qwen server with the same 10 archetype voices.
+- **Companion OSS repo.** [`chipmates/f5-server`](https://github.com/chipmates/f5-server) packages our production F5-TTS deployment as a standalone OpenAI-compatible service (MIT code, bring-your-own-checkpoint).
 
 ### Changed
 
@@ -43,12 +43,12 @@ Local Mode lands. Run the LLM, voice synthesis, and transcription on your own ma
 - **Whisper compute type changed from `int8_float16` to `int8`.** The former is CUDA-only and crashed at first transcription on CPU and Apple Silicon. No performance regression for the single-user case.
 - **CORS headers on the Whisper container** (`ALLOW_ORIGINS` env var, default `["*"]`). Browser-direct calls from the Local Mode panel or LAN-deployment patterns no longer get blocked.
 - **CORS headers on the Qwen TTS container** (`CORS_ALLOW_ORIGINS` env var, default `*`). Mirrors the Whisper fix.
-- **MLX server runs all inference on a dedicated single-worker thread.** mlx-audio uses per-thread stream/device contexts; FastAPI's default sync-handler thread pool yielded `RuntimeError: There is no Stream(gpu, 0) in current thread.` Fixed with a `ThreadPoolExecutor(max_workers=1)` that owns the model and handles every synth call.
+- **MLX server runs all inference on a dedicated single-worker thread.** mlx-audio uses per-thread stream/device contexts, so FastAPI's default sync-handler thread pool yielded `RuntimeError: There is no Stream(gpu, 0) in current thread.` Fixed with a `ThreadPoolExecutor(max_workers=1)` that owns the model and handles every synth call.
 
 ### Security
 
 - **CSP `connect-src` and `media-src` allow `http://localhost:*` and `http://127.0.0.1:*`.** Browsers treat localhost as a secure context so the HTTP-on-HTTPS-page mixed-content case doesn't apply. Lets the app reach a local LLM and audio stack without weakening the rest of the CSP.
-- **Local Mode enforces on-device privacy when all three toggles are on plus a local LLM.** The only network traffic at runtime is the optional content CDN (`media.agoracosmica.org` for figure prompts and audio assets) and whatever your local LLM does. No analytics, no audio gateway, no LLM proxy.
+- **Local Mode keeps your conversation on your machine.** With all three toggles on and the LLM pointed at your own endpoint, anything you type, say, or hear stays on your hardware. The browser still fetches catalog content (figure prompts, voice profiles, pre-recorded audio) from `media.agoracosmica.org` on demand, same as visiting the public site. No analytics, no audio gateway, no LLM proxy.
 
 ### Removed
 
