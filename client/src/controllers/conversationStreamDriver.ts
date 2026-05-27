@@ -296,12 +296,11 @@ export const createLegacyConversationStream = () => {
             text: trimmed,
             voice: figureId, // Use figure as voice
             speed: 1.0,
-            provider: config.tts as 'kokoro' | 'openai',
+            provider: config.localMode?.ttsEnabled ? 'local-tts' : 'self-hosted',
             sessionId: String(requestId),
             sequenceNumber: currentSequence
           },
-          ttsProvider, // Kokoro provider (we use same provider for both)
-          ttsProvider  // OpenAI provider (provider selection happens in convertTextToSpeech)
+          ttsProvider,
         );
 
         // Guard: reject stale TTS results from previous sessions

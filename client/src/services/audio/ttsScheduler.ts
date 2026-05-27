@@ -12,7 +12,14 @@ export interface TTSJob {
   text: string;
   voice: string;
   speed: number;
-  provider: 'kokoro' | 'openai';
+  /**
+   * Routing label used for dev logs only. Reflects which TTS path the caller
+   * resolved before enqueueing: `self-hosted` for the GEX130 gateway,
+   * `local-tts` when Local Mode is on. The actual backend that produced the
+   * audio (`kokoro-local` / `qwen-local` / `qwen-cloud` / `f5-cloud`) lives
+   * on `TTSResult.backend` because the gateway picks it server-side.
+   */
+  provider: 'self-hosted' | 'local-tts';
   sessionId: string;
   sequenceNumber: number;
 }
@@ -50,22 +57,26 @@ type TTSProviderFunction = (
  * - Error handling with retries
  * - Session-based isolation
  *
+ * The scheduler is provider-agnostic. The single TTS function passed to
+ * `enqueue` already encapsulates the hosted-vs-local routing decision (see
+ * `convertTextToSpeech` in `audio/tts/index.ts`). `TTSJob.provider` is a log
+ * label only; the real backend that produced each chunk surfaces on
+ * `TTSResult.backend`.
+ *
  * @example
  * ```ts
  * const scheduler = new TTSScheduler(2); // max 2 concurrent
  *
- * // Enqueue TTS job
  * scheduler.enqueue({
  *   id: crypto.randomUUID(),
  *   text: "Hello world",
  *   voice: "alloy",
  *   speed: 1.0,
- *   provider: 'kokoro',
+ *   provider: 'self-hosted',
  *   sessionId: 'session_123',
  *   sequenceNumber: 1
- * }, kokoroTTS, openaiTTS);
+ * }, ttsProvider);
  *
- * // Cancel all pending jobs
  * scheduler.cancelAll();
  * ```
  */
@@ -74,8 +85,7 @@ export class TTSScheduler {
   private readonly maxInflight: number;
   private queue: Array<{
     job: TTSJob;
-    kokoroProvider: TTSProviderFunction;
-    openaiProvider: TTSProviderFunction;
+    provider: TTSProviderFunction;
     resolve: (result: TTSResult) => void;
     reject: (error: Error) => void;
   }> = [];
@@ -138,8 +148,7 @@ export class TTSScheduler {
    */
   async enqueue(
     job: TTSJob,
-    kokoroProvider: TTSProviderFunction,
-    openaiProvider: TTSProviderFunction
+    provider: TTSProviderFunction,
   ): Promise<TTSResult> {
     // Validate session
     if (this.currentSessionId && job.sessionId !== this.currentSessionId) {
@@ -154,8 +163,7 @@ export class TTSScheduler {
     return new Promise<TTSResult>((resolve, reject) => {
       this.queue.push({
         job,
-        kokoroProvider,
-        openaiProvider,
+        provider,
         resolve,
         reject
       });
@@ -313,8 +321,7 @@ export class TTSScheduler {
         try {
           const result = await this.synthesize(
             item.job,
-            item.kokoroProvider,
-            item.openaiProvider,
+            item.provider,
             controller.signal,
           );
 
@@ -328,7 +335,8 @@ export class TTSScheduler {
           item.resolve(result);
 
           if (import.meta.env.DEV) {
-            console.log(`[TTSScheduler] Completed job ${item.job.id}`);
+            const backendTag = result.backend ? ` (${result.backend})` : '';
+            console.log(`[TTSScheduler] Completed job ${item.job.id}${backendTag}`);
           }
         } catch (error) {
           item.reject(error as Error);
@@ -349,19 +357,17 @@ export class TTSScheduler {
   }
 
   /**
-   * Synthesize audio using the appropriate provider
+   * Synthesize audio using the provided TTS function. The caller's function
+   * already encapsulates hosted-vs-local routing; the scheduler only manages
+   * concurrency, cancellation, and session isolation.
    */
   private async synthesize(
     job: TTSJob,
-    kokoroProvider: TTSProviderFunction,
-    openaiProvider: TTSProviderFunction,
+    provider: TTSProviderFunction,
     signal?: AbortSignal,
   ): Promise<TTSResult> {
-    const provider = job.provider === 'kokoro' ? kokoroProvider : openaiProvider;
-
     try {
-      const result = await provider(job.text, job.voice, job.speed, signal);
-      return result;
+      return await provider(job.text, job.voice, job.speed, signal);
     } catch (error) {
       if (import.meta.env.DEV) {
         console.error(`[TTSScheduler] ${job.provider} TTS failed:`, error);
