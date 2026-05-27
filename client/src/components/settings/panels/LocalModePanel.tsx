@@ -99,7 +99,7 @@ const LocalModePanel: FC<LocalModePanelProps> = ({ SettingCard, CATEGORY_ICONS }
     config.llm.baseURL || 'http://localhost:1234/v1',
   );
   const [modelName, setModelName] = useState<string>(
-    (config.llm.kind === 'custom-openai' && config.llm.model) || 'qwen3.6-27b-instruct',
+    (config.llm.kind === 'custom-openai' && config.llm.model) || 'qwen3.6-27b-instruct-revised',
   );
   const [apiKey, setApiKey] = useState<string>('');
 
@@ -379,7 +379,7 @@ const LocalModePanel: FC<LocalModePanelProps> = ({ SettingCard, CATEGORY_ICONS }
               type="text"
               value={modelName}
               onChange={(e) => setModelName(e.target.value)}
-              placeholder="qwen3.6-27b-instruct"
+              placeholder="qwen3.6-27b-instruct-revised"
               style={inputStyle}
             />
 
