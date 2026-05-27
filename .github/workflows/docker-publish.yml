@@ -113,7 +113,15 @@ jobs:
         continue-on-error: true
 
       - name: Scan with Trivy
+        # Advisory only. Audio containers track upstream third-party bases
+        # (Speaches, Kokoro, NVIDIA CUDA). We patch what apt/apk can fix
+        # via base-image upgrades in each Dockerfile, but residual CVEs in
+        # distro packages without backported fixes (Debian trixie, Ubuntu
+        # 22.04) flow through. Reporting CVEs as workflow annotations is
+        # the visibility we want; gating the release on them blocks
+        # publishing for issues we can't fix without changing upstream.
         uses: aquasecurity/trivy-action@master
+        continue-on-error: true
         with:
           image-ref: ghcr.io/chipmates/${{ matrix.image.name }}@${{ steps.build.outputs.digest }}
           format: table
