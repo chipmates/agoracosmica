@@ -177,6 +177,10 @@
       "noTracking": "Kein Tracking, keine Werbung, keine Datensammlung. Deine Gespr\u00e4che bleiben auf deinem Ger\u00e4t, verschl\u00fcsselt.",
       "freeTurns": "Kostenlose t\u00e4gliche Gespr\u00e4che zum Entdecken. Bring deinen eigenen API-Schl\u00fcssel f\u00fcr unbegrenzten Zugang.",
       "github": "Der Code ist Open Source auf GitHub."
+    },
+    "voiceCredits": {
+      "title": "Sprachtechnologie",
+      "body": "Die deutsche Sprachsynthese verwendet Qwen3-TTS als prim\u00e4re Engine, mit F5-TTS von SWivid et al. (MIT-Code) als Overflow-Tier. Das deutsche Fine-Tuning f\u00fcr F5-TTS stammt von hvoss-techfak (CC-BY-NC-4.0), trainiert auf Mozilla Common Voice 19.0 (CC-BY-4.0) und dem Emilia-Datensatz. Die englische Sprachsynthese verwendet Kokoro von hexgrad. Die Live-Transkription nutzt faster-whisper, eine CTranslate2-Portierung von OpenAIs Whisper, ausgeliefert \u00fcber Speaches."
     }
   },
   "contact": {

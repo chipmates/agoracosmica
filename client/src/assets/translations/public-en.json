@@ -177,6 +177,10 @@
       "noTracking": "No tracking, no ads, no data collection. Your conversations stay on your device, encrypted.",
       "freeTurns": "Free daily turns to explore. Bring your own API key for unlimited access.",
       "github": "The code is open source on GitHub."
+    },
+    "voiceCredits": {
+      "title": "Voice technology",
+      "body": "German voice synthesis uses Qwen3-TTS as the primary engine, with F5-TTS by SWivid et al. (MIT code) as the overflow tier. The F5-TTS German fine-tuning is by hvoss-techfak (CC-BY-NC-4.0), trained on Mozilla Common Voice 19.0 (CC-BY-4.0) and the Emilia dataset. English voice synthesis uses Kokoro by hexgrad. Live transcription uses faster-whisper, a CTranslate2 port of OpenAI's Whisper, served via Speaches."
     }
   },
   "contact": {
