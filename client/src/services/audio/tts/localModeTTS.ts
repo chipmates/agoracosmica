@@ -59,7 +59,14 @@ export async function localModeTTS(
   const voiceId =
     explicitVoice || getVoiceForNormalMode(figureName, 'kokoro', councilMapping, language);
 
-  const responseFormat = IS_IOS ? 'mp3' : 'wav';
+  // Format choice per backend:
+  //   - MLX Qwen v0.1 (DE) only supports WAV — no choice for DE local on Apple
+  //     Silicon. iOS users may hit reliability issues until mlx_server adds MP3.
+  //   - Kokoro (EN) accepts both. iOS Safari plays MP3 reliably via HTML5
+  //     audio; WAV from blob URLs is flaky (first sample plays then `ended`
+  //     fires early). On non-iOS browsers WAV is fine and lets the
+  //     appendTailSilence path work below.
+  const responseFormat = de ? 'wav' : (IS_IOS ? 'mp3' : 'wav');
   const requestBody: Record<string, unknown> = {
     model: de ? 'Qwen/Qwen3-TTS-12Hz-0.6B-Base' : 'kokoro',
     input: text,
