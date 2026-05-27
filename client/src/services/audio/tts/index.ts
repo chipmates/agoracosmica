@@ -92,9 +92,13 @@ export const convertTextToSpeech = async (
   // touching the hosted gateway. The circuit breaker doesn't apply — single
   // user, local containers, fail fast.
   const config = loadServiceConfig();
-  if (config.localMode?.enabled) {
+  if (config.localMode?.ttsEnabled) {
     try {
-      return await localModeTTS(text, fileBaseName, figureName, validatedSpeed, undefined, undefined, language, signal);
+      return await localModeTTS(
+        text, fileBaseName, figureName, validatedSpeed,
+        undefined, undefined, language, signal,
+        { kokoroUrl: config.localMode.ttsKokoroURL, qwenUrl: config.localMode.ttsQwenURL },
+      );
     } catch (error) {
       // DE local unavailable (no NVIDIA, no Apple Silicon setup script, container
       // crashed): fall back to the hosted DE path. EN local unavailable: also

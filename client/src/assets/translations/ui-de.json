@@ -298,7 +298,7 @@
     },
     "localMode": {
       "title": "Lokaler Modus",
-      "description": "Lasse die ganze Pipeline auf deinem Rechner laufen: LLM, Stimme, Transkription.",
+      "description": "Wähle einzeln aus, welche der drei Dienste auf deinem Rechner laufen: LLM, Stimme, Transkription.",
       "toggleOn": "Lokaler Modus ist an",
       "toggleOff": "Auf lokalen Modus umschalten",
       "toggleHelp": "Wenn aktiv, laufen Gespräche über ein lokales LLM (LM Studio, Ollama, vLLM) und Audio über unsere lokalen Container. Echtzeit-Sprache bleibt vorerst gehostet.",
@@ -306,8 +306,29 @@
         "full": "NVIDIA-GPU erkannt. Die ganze Pipeline (LLM, EN + DE TTS, STT) kann mit docker compose --profile nvidia up lokal laufen.",
         "apple": "Apple-Silicon-Mac erkannt. EN TTS + STT laufen via Docker; für DE TTS lokal einmalig scripts/setup-local-tts-apple.sh ausführen.",
         "reduced": "Eingeschränkte Hardware. EN + STT laufen lokal; DE läuft über unsere Cloud.",
-        "unknown": "Hardware nicht erkannt. Lokaler Modus kann trotzdem funktionieren — probier es.",
+        "unknown": "Hardware nicht erkannt. Lokaler Modus kann trotzdem funktionieren, probier es.",
         "hosted": "Lokaler Modus nicht verfügbar, Cloud wird genutzt."
+      },
+      "sections": {
+        "llm": {
+          "label": "LLM lokal ausführen",
+          "help": "Leite den Chat an einen OpenAI-kompatiblen Endpunkt, den du selbst betreibst (LM Studio, Ollama, vLLM, llama.cpp)."
+        },
+        "tts": {
+          "label": "Sprachsynthese lokal ausführen",
+          "help": "Leite Vorlese-Audio an deinen lokalen Kokoro-Container (Englisch) und Qwen3-TTS-Dienst (Deutsch).",
+          "labelEn": "EN",
+          "labelDe": "DE"
+        },
+        "stt": {
+          "label": "Transkription lokal ausführen",
+          "help": "Leite Mikrofon-Audio an deinen lokalen Whisper-Container statt an unsere Cloud-Transkription."
+        }
+      },
+      "urlOverrides": {
+        "kokoroLabel": "Englisch-Endpunkt (Kokoro)",
+        "qwenLabel": "Deutsch-Endpunkt (Qwen3-TTS)",
+        "whisperLabel": "Whisper-Endpunkt"
       },
       "llmConfig": {
         "title": "Dein LLM-Endpunkt"
@@ -327,7 +348,7 @@
         "hostedFallback": "Cloud wird genutzt"
       },
       "checkButton": "Verbindungen prüfen",
-      "honestPrivacy": "Mit dem lokalen Modus und einem lokalen Modell verlassen weder Gesprächs- noch Sprach- noch Textdaten deinen Rechner. Auf deinem Gerät laufen dieselben Modelle, die auch bei uns auf den Servern laufen.",
+      "honestPrivacy": "Wenn alle drei Dienste unten lokal laufen, verlassen weder Gesprächs- noch Sprach- noch Textdaten deinen Rechner. Auf deinem Gerät können dieselben Modelle laufen wie auf unseren Servern.",
       "learnMore": "Anleitung zum lokalen Modus"
     },
     "privacy": {

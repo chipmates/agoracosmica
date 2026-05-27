@@ -36,6 +36,11 @@ export class LocalModeTtsUnavailable extends Error {
   }
 }
 
+interface LocalModeTTSUrls {
+  kokoroUrl?: string;
+  qwenUrl?: string;
+}
+
 export async function localModeTTS(
   text: string,
   fileBaseName: string,
@@ -45,9 +50,12 @@ export async function localModeTTS(
   councilMapping?: VoiceMapping,
   language?: string,
   signal?: AbortSignal,
+  urlOverrides?: LocalModeTTSUrls,
 ): Promise<AudioFile> {
   const de = isGerman(language);
-  const endpoint = de ? localTtsQwenUrl : localTtsKokoroUrl;
+  const kokoroBase = (urlOverrides?.kokoroUrl?.trim() || localTtsKokoroUrl).replace(/\/+$/, '');
+  const qwenBase = (urlOverrides?.qwenUrl?.trim() || localTtsQwenUrl).replace(/\/+$/, '');
+  const endpoint = de ? qwenBase : kokoroBase;
   const voiceId =
     explicitVoice || getVoiceForNormalMode(figureName, 'kokoro', councilMapping, language);
 

@@ -29,12 +29,18 @@ export interface LLMConfig {
 }
 
 export interface LocalModeConfig {
-  /** Master toggle. When true, TTS + STT route to localhost and `llm.kind === 'custom-openai'`. */
-  enabled: boolean;
-  /** Override URLs (optional — fall back to compose defaults). */
+  /** LLM routes to a custom OpenAI-compatible endpoint instead of OpenRouter. */
+  llmEnabled: boolean;
+  /** TTS routes to local Kokoro (EN) + Qwen (DE) instead of the hosted gateway. */
+  ttsEnabled: boolean;
+  /** STT routes to local Whisper instead of the hosted gateway. */
+  sttEnabled: boolean;
+  /** Override URLs (optional, fall back to compose defaults). */
   ttsKokoroURL?: string;
   ttsQwenURL?: string;
   sttURL?: string;
+  /** Legacy master toggle from v1.1.0-alpha shape, kept for one-pass migration only. */
+  enabled?: boolean;
 }
 
 export interface ServiceConfig {
@@ -106,8 +112,8 @@ export const defaultConfig: ServiceConfig = {
     kind: 'openrouter',
   },
 
-  // Local Mode: off by default. Enabled via settings or first-run modal.
-  localMode: { enabled: false },
+  // Local Mode: per-service toggles, all off by default. Enabled via settings.
+  localMode: { llmEnabled: false, ttsEnabled: false, sttEnabled: false },
 };
 
 // ============================================
@@ -188,9 +194,39 @@ export const loadServiceConfig = (): ServiceConfig => {
         }
       }
 
-      // Local Mode: default to disabled when absent.
-      if (!config.localMode) {
-        config.localMode = { enabled: false };
+      // Local Mode: migrate legacy `{enabled: bool}` master toggle to per-service
+      // flags. Pre-v1.1.0-beta stored a single `enabled` boolean that controlled
+      // LLM + TTS + STT together. From v1.1.0-beta each service flips
+      // independently. Legacy `enabled: true` → expand to all three true.
+      const lm = (config.localMode ?? {}) as Partial<LocalModeConfig> & { enabled?: boolean };
+      const hasPerService =
+        typeof lm.llmEnabled === 'boolean' ||
+        typeof lm.ttsEnabled === 'boolean' ||
+        typeof lm.sttEnabled === 'boolean';
+      let migrated = false;
+      if (hasPerService) {
+        config.localMode = {
+          llmEnabled: !!lm.llmEnabled,
+          ttsEnabled: !!lm.ttsEnabled,
+          sttEnabled: !!lm.sttEnabled,
+          ttsKokoroURL: lm.ttsKokoroURL,
+          ttsQwenURL: lm.ttsQwenURL,
+          sttURL: lm.sttURL,
+        };
+      } else {
+        const legacyOn = lm.enabled === true;
+        config.localMode = {
+          llmEnabled: legacyOn,
+          ttsEnabled: legacyOn,
+          sttEnabled: legacyOn,
+          ttsKokoroURL: lm.ttsKokoroURL,
+          ttsQwenURL: lm.ttsQwenURL,
+          sttURL: lm.sttURL,
+        };
+        migrated = legacyOn || lm.enabled === false;
+      }
+      if (migrated) {
+        queueMicrotask(() => saveServiceConfig(config));
       }
 
       // DEV override: ensure TTS is enabled during development to avoid

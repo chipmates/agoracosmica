@@ -24,7 +24,12 @@ export class LocalModeSttUnavailable extends Error {
   }
 }
 
-export const localModeSTT = async (audioBlob: Blob, language?: string): Promise<LocalSttResult> => {
+export const localModeSTT = async (
+  audioBlob: Blob,
+  language?: string,
+  urlOverride?: string,
+): Promise<LocalSttResult> => {
+  const endpoint = (urlOverride?.trim() || localSttUrl).replace(/\/+$/, '');
   const formData = new FormData();
   formData.append('file', audioBlob, 'audio.webm');
   // Speaches accepts any model identifier; the actual model is set at container
@@ -39,7 +44,7 @@ export const localModeSTT = async (audioBlob: Blob, language?: string): Promise<
 
   let response: Response;
   try {
-    response = await fetchWithTimeout(`${localSttUrl}/v1/audio/transcriptions`, {
+    response = await fetchWithTimeout(`${endpoint}/v1/audio/transcriptions`, {
       method: 'POST',
       body: formData,
       timeoutMs: 30_000,
@@ -47,7 +52,7 @@ export const localModeSTT = async (audioBlob: Blob, language?: string): Promise<
   } catch (err) {
     throw new LocalModeSttUnavailable(
       err instanceof Error ? err.message : 'unknown network error',
-      localSttUrl,
+      endpoint,
     );
   }
 
@@ -55,7 +60,7 @@ export const localModeSTT = async (audioBlob: Blob, language?: string): Promise<
     if (response.status === 404 || response.status === 503) {
       throw new LocalModeSttUnavailable(
         `Local STT endpoint returned ${response.status}`,
-        localSttUrl,
+        endpoint,
       );
     }
     const errorData = await response.json().catch(() => ({}));

@@ -63,9 +63,9 @@ export const transcribeAudio = async (
   // Local Mode: route to the local Whisper container, no circuit breaker
   // (single user, fail fast). On unavailable, fall back to hosted.
   const config = loadServiceConfig();
-  if (config.localMode?.enabled) {
+  if (config.localMode?.sttEnabled) {
     try {
-      const result = await localModeSTT(audioBlob, language);
+      const result = await localModeSTT(audioBlob, language, config.localMode.sttURL);
       return formatTranscriptionResponse(result, 'local');
     } catch (error) {
       if (error instanceof LocalModeSttUnavailable) {

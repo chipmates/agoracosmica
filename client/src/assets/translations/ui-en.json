@@ -300,7 +300,7 @@
     },
     "localMode": {
       "title": "Local Mode",
-      "description": "Run the whole pipeline on your own machine: LLM, voice, transcription.",
+      "description": "Run any combination of the three services on your own machine: LLM, voice, transcription.",
       "toggleOn": "Local Mode is on",
       "toggleOff": "Switch to Local Mode",
       "toggleHelp": "When on, conversations route to a local LLM you run (LM Studio, Ollama, vLLM) and audio routes to our local containers. Live voice remains hosted for now.",
@@ -308,8 +308,29 @@
         "full": "NVIDIA GPU detected. The full pipeline (LLM, EN + DE TTS, STT) can run locally with docker compose --profile nvidia up.",
         "apple": "Apple Silicon Mac detected. EN TTS + STT run via docker; for DE local TTS run scripts/setup-local-tts-apple.sh once.",
         "reduced": "Limited hardware detected. EN + STT run locally; DE will fall back to our cloud.",
-        "unknown": "Hardware not detected. Local Mode may still work — try it.",
+        "unknown": "Hardware not detected. Local Mode may still work, try it.",
         "hosted": "Local Mode not available, using cloud."
+      },
+      "sections": {
+        "llm": {
+          "label": "Run LLM locally",
+          "help": "Route chat to an OpenAI-compatible endpoint you run (LM Studio, Ollama, vLLM, llama.cpp)."
+        },
+        "tts": {
+          "label": "Run voice synthesis locally",
+          "help": "Route read-aloud audio to your local Kokoro container (English) and Qwen3-TTS service (German).",
+          "labelEn": "EN",
+          "labelDe": "DE"
+        },
+        "stt": {
+          "label": "Run transcription locally",
+          "help": "Route microphone audio to your local Whisper container instead of our cloud transcription."
+        }
+      },
+      "urlOverrides": {
+        "kokoroLabel": "English endpoint (Kokoro)",
+        "qwenLabel": "German endpoint (Qwen3-TTS)",
+        "whisperLabel": "Whisper endpoint"
       },
       "llmConfig": {
         "title": "Your LLM Endpoint"
@@ -329,7 +350,7 @@
         "hostedFallback": "Using cloud"
       },
       "checkButton": "Check connections",
-      "honestPrivacy": "With Local Mode and a local model, no conversation, voice, or text data leaves your machine. The same models we run on our servers run on yours.",
+      "honestPrivacy": "When all three services below run locally, no conversation, voice, or text data leaves your machine. The same models we run on our servers can run on yours.",
       "learnMore": "Local Mode setup guide"
     },
     "privacy": {
