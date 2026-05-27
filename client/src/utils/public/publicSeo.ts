@@ -5,21 +5,32 @@ const SITE_URL = 'https://agoracosmica.org';
 
 type Language = 'en' | 'de';
 
+// CF Pages serves directories with a 308 redirect from /foo to /foo/, so every
+// public URL the site emits (links, canonical, hreflang) must already carry the
+// trailing slash. Otherwise crawlers hit a 308 on every internal link and the
+// canonical drifts from the prerendered HTML.
+function withSlash(path: string): string {
+  if (path === '/') return '/';
+  return path.endsWith('/') ? path : `${path}/`;
+}
+
 export function publicUrl(lang: Language, path: string): string {
   const cleanPath = path.startsWith('/') ? path : `/${path}`;
-  return lang === 'de' ? `/de${cleanPath}` : cleanPath;
+  const slashed = withSlash(cleanPath);
+  return lang === 'de' ? `/de${slashed}` : slashed;
 }
 
 export function canonicalUrl(path: string): string {
   const cleanPath = path.startsWith('/') ? path : `/${path}`;
-  return `${SITE_URL}${cleanPath}`;
+  return `${SITE_URL}${withSlash(cleanPath)}`;
 }
 
 export function alternateUrls(basePath: string): { en: string; de: string } {
   const cleanPath = basePath.startsWith('/') ? basePath : `/${basePath}`;
+  const slashed = withSlash(cleanPath);
   return {
-    en: `${SITE_URL}${cleanPath}`,
-    de: `${SITE_URL}/de${cleanPath}`,
+    en: `${SITE_URL}${slashed}`,
+    de: `${SITE_URL}/de${slashed}`,
   };
 }
 
