@@ -17,7 +17,10 @@
 /themes    /themes/    301
 /about     /about/     301
 /contact   /contact/   301
-/impressum /impressum/ 301
+/impressum           /impressum/           301
+/datenschutz         /datenschutz/         301
+/cookie-policy       /cookie-policy/       301
+/nutzungsbedingungen /nutzungsbedingungen/ 301
 /de        /de/        301
 /de/figures /de/figures/ 301
 /de/themes  /de/themes/ 301
