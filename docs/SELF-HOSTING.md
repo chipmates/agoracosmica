@@ -157,7 +157,7 @@ All six modes work with the recommended Qwen 3.6 27B Q4_K_M setup:
 - Custom Council: Qwen 3.6 holds the strict `SPEAKER :: dialogue` format.
 - Quest: Qwen 3.6 supports tool calling, so the `award_seed` event still fires.
 
-The live-interrupt voice mode (two-way streaming) stays hosted in v1.1.0 since it relies on the multi-tenant GPU gateway. Push-to-talk and read-aloud both work locally via Step 2.
+The live-interrupt voice mode (two-way streaming) stays hosted in this release since it relies on the multi-tenant GPU gateway. Push-to-talk and read-aloud both work locally via Step 2.
 
 ---
 
