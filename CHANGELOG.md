@@ -6,9 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ---
 
-## [1.1.0] - 2026-05-27
+## [1.1.1] - 2026-05-27
 
 Local Mode lands. Run the LLM, voice synthesis, and transcription on your own machine, each piece flipping independently. Plus the marketing site migration to Astro for sub-second first paint, plus two companion OSS repos that package the voice servers as standalone projects.
+
+(Version note: v1.1.0 was reserved during the initial tag attempt and could not be reused after rollback. v1.1.1 is the actual launch.)
 
 ### Added
 
