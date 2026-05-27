@@ -51,12 +51,22 @@ const isRetriableStatus = (status: number): boolean =>
   status === 429 || status === 503;
 
 // Strict chat templates (LM Studio + Smoffyy Qwen3.6 revised, some llama.cpp
-// variants) reject same-role runs with "No user query found in messages."
-// Story mode legitimately produces assistant+assistant runs (story chunk +
-// prism context + history). Lenient providers tolerate them; we merge here so
-// the wire payload alternates regardless of provider strictness.
-const mergeConsecutiveSameRole = (messages: LLMMessage[]): LLMMessage[] => {
-  if (messages.length < 2) return messages;
+// variants) reject two payload shapes our context builder can produce:
+//   (a) consecutive messages with the same role (Story mode packs story chunk
+//       + prism context as assistant+assistant before the user reply);
+//   (b) a leading assistant message before any user message (every mode
+//       starts with a stored welcome that getFreeTalkHistory remaps from
+//       role:system to role:assistant).
+// Both shapes surface the same error from Smoffyy's jinja template ("No user
+// query found in messages.") even though shape (b) does have a user message
+// later in the array. We normalize both here so the wire payload always
+// alternates and the first non-system message is always user. Lenient
+// providers tolerate the unnormalized shapes too, so this is safe to apply
+// unconditionally.
+const normalizeMessagesForStrictTemplate = (messages: LLMMessage[]): LLMMessage[] => {
+  if (messages.length === 0) return messages;
+
+  // Step 1: merge consecutive same-role.
   const merged: LLMMessage[] = [];
   for (const msg of messages) {
     const last = merged[merged.length - 1];
@@ -69,6 +79,24 @@ const mergeConsecutiveSameRole = (messages: LLMMessage[]): LLMMessage[] => {
       merged.push({ role: msg.role, content: msg.content });
     }
   }
+
+  // Step 2: if the first non-system message is assistant, inject a minimal
+  // synthetic user message before it. The LLM only needs to *generate* a
+  // reply to the trailing user message; the synthetic "Hello." sets up a
+  // natural user-then-assistant opening turn that satisfies the strict
+  // template's role-order requirement.
+  let firstNonSystem = 0;
+  while (firstNonSystem < merged.length && merged[firstNonSystem].role === 'system') {
+    firstNonSystem++;
+  }
+  if (firstNonSystem < merged.length && merged[firstNonSystem].role === 'assistant') {
+    return [
+      ...merged.slice(0, firstNonSystem),
+      { role: 'user', content: 'Hello.' },
+      ...merged.slice(firstNonSystem),
+    ];
+  }
+
   return merged;
 };
 
@@ -214,7 +242,7 @@ class LLMService {
 
     const requestBody: LLMRequest = {
       model,
-      messages: mergeConsecutiveSameRole(messages),
+      messages: normalizeMessagesForStrictTemplate(messages),
       temperature,
       max_tokens: maxTokens,
       stream: !!streamCallback
