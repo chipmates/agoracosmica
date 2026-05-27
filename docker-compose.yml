@@ -7,6 +7,16 @@
 #
 # By default the app pulls a prebuilt image from GHCR. To build from source
 # instead, comment the `image:` line and uncomment the `build:` block below.
+#
+# Local Mode (v1.1.0+) adds three sibling services:
+#   - tts-kokoro : English TTS (Kokoro, 82M params, CPU or GPU)
+#   - tts-qwen   : German TTS (Qwen3-TTS, CUDA-only) — under the `nvidia` profile
+#   - stt-whisper: Speech-to-text (Whisper, faster-whisper backend)
+#
+# Profiles:
+#   docker compose up                       → app + Kokoro + Whisper
+#   docker compose --profile nvidia up      → adds tts-qwen for full DE local
+#   (Apple Silicon: run scripts/setup-local-tts-apple.sh for native MLX Qwen)
 
 services:
   app:
@@ -21,6 +31,9 @@ services:
     environment:
       AGORA_MEDIA_BASE_URL: ${AGORA_MEDIA_BASE_URL:-https://media.agoracosmica.org}
       AGORA_AUDIO_API_URL: ${AGORA_AUDIO_API_URL:-}
+      AGORA_LOCAL_TTS_KOKORO_URL: ${AGORA_LOCAL_TTS_KOKORO_URL:-http://localhost:8880}
+      AGORA_LOCAL_TTS_QWEN_URL: ${AGORA_LOCAL_TTS_QWEN_URL:-http://localhost:8887}
+      AGORA_LOCAL_STT_URL: ${AGORA_LOCAL_STT_URL:-http://localhost:8000}
     healthcheck:
       test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1:8080/healthz"]
       interval: 30s
@@ -32,3 +45,62 @@ services:
     # box instead of the public CDN.
     # volumes:
     #   - ./media:/usr/share/nginx/html/media:ro
+
+  tts-kokoro:
+    image: ghcr.io/chipmates/agoracosmica-tts-kokoro:latest
+    # build:
+    #   context: ./docker/tts-kokoro
+    container_name: agoracosmica-tts-kokoro
+    restart: unless-stopped
+    ports:
+      - "${AGORA_TTS_KOKORO_PORT:-8880}:8880"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1:8880/v1/models"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+
+  stt-whisper:
+    image: ghcr.io/chipmates/agoracosmica-stt-whisper:latest
+    # build:
+    #   context: ./docker/stt-whisper
+    container_name: agoracosmica-stt-whisper
+    restart: unless-stopped
+    ports:
+      - "${AGORA_STT_PORT:-8000}:8000"
+    environment:
+      WHISPER__MODEL: ${AGORA_WHISPER_MODEL:-Systran/faster-whisper-large-v3}
+      WHISPER__INFERENCE_DEVICE: ${AGORA_WHISPER_DEVICE:-auto}
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1:8000/v1/models"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+
+  tts-qwen:
+    image: ghcr.io/chipmates/agoracosmica-tts-qwen-cuda:latest
+    # build:
+    #   context: ./docker/tts-qwen-cuda
+    container_name: agoracosmica-tts-qwen
+    restart: unless-stopped
+    ports:
+      - "${AGORA_TTS_QWEN_PORT:-8887}:8887"
+    profiles: ["nvidia"]
+    environment:
+      VOICES_R2_BASE: ${AGORA_VOICES_R2_BASE:-https://media.agoracosmica.org/voices}
+      GPU_MEMORY_UTILIZATION: ${AGORA_QWEN_GPU_MEM:-0.4}
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1:8887/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 120s

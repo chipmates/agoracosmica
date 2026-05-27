@@ -1,7 +1,13 @@
-name: Publish Docker Image
+name: Publish Docker Images
 
-# Builds the self-host image for linux/amd64 + linux/arm64, pushes it to
-# ghcr.io/chipmates/agoracosmica, and scans the result with Trivy.
+# Builds the self-host images for linux/amd64 + linux/arm64, pushes them to
+# ghcr.io/chipmates, and scans the results with Trivy.
+#
+# Images (v1.1.0+):
+#   - agoracosmica           : the web app
+#   - agoracosmica-tts-kokoro: Local Mode English TTS
+#   - agoracosmica-stt-whisper: Local Mode Whisper STT
+#   - agoracosmica-tts-qwen-cuda: Local Mode German TTS (NVIDIA-only)
 #
 # Triggers:
 #   - push to a `v*` tag (e.g. v1.1.0) — the canonical release path
@@ -24,14 +30,33 @@ permissions:
   id-token: write
   attestations: write
 
-env:
-  IMAGE: ghcr.io/chipmates/agoracosmica
-
 jobs:
-  build-and-publish:
-    name: Build, push, scan
+  build:
+    name: ${{ matrix.image.name }}
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        image:
+          - name: agoracosmica
+            context: ./client
+            dockerfile: ./client/Dockerfile
+            platforms: linux/amd64,linux/arm64
+          - name: agoracosmica-tts-kokoro
+            context: ./docker/tts-kokoro
+            dockerfile: ./docker/tts-kokoro/Dockerfile
+            platforms: linux/amd64,linux/arm64
+          - name: agoracosmica-stt-whisper
+            context: ./docker/stt-whisper
+            dockerfile: ./docker/stt-whisper/Dockerfile
+            platforms: linux/amd64,linux/arm64
+          - name: agoracosmica-tts-qwen-cuda
+            context: ./docker/tts-qwen-cuda
+            dockerfile: ./docker/tts-qwen-cuda/Dockerfile
+            # CUDA-only — amd64 only. Apple Silicon users use the native
+            # MLX path via scripts/setup-local-tts-apple.sh, not docker.
+            platforms: linux/amd64
 
     steps:
       - name: Checkout
@@ -54,7 +79,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.IMAGE }}
+          images: ghcr.io/chipmates/${{ matrix.image.name }}
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
@@ -66,22 +91,22 @@ jobs:
         id: build
         uses: docker/build-push-action@v6
         with:
-          context: ./client
-          file: ./client/Dockerfile
-          platforms: linux/amd64,linux/arm64
+          context: ${{ matrix.image.context }}
+          file: ${{ matrix.image.dockerfile }}
+          platforms: ${{ matrix.image.platforms }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           sbom: true
           provenance: mode=max
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=${{ matrix.image.name }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.image.name }}
 
       - name: Generate SBOM attestation
         uses: actions/attest-sbom@v1
         if: github.event_name == 'push'
         with:
-          subject-name: ${{ env.IMAGE }}
+          subject-name: ghcr.io/chipmates/${{ matrix.image.name }}
           subject-digest: ${{ steps.build.outputs.digest }}
           sbom-path: ""
           push-to-registry: true
@@ -90,7 +115,7 @@ jobs:
       - name: Scan with Trivy
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ${{ env.IMAGE }}@${{ steps.build.outputs.digest }}
+          image-ref: ghcr.io/chipmates/${{ matrix.image.name }}@${{ steps.build.outputs.digest }}
           format: table
           severity: CRITICAL,HIGH
           ignore-unfixed: true

@@ -1,9 +1,16 @@
 // src/services/audio/tts/index.ts
-// TTS routing: All audio self-hosted on GEX130
-// Circuit breaker: after 3 consecutive failures, skip TTS for 60s (text-only fallback)
+// TTS routing: hosted by default (GEX130 gateway), or Local Mode (Kokoro
+// container for EN, Qwen3-TTS container/native for DE) when the user has
+// enabled it in settings.
+//
+// Circuit breaker: after 3 consecutive failures, skip TTS for 60s
+// (text-only fallback). Local Mode bypasses the circuit breaker — a single
+// user's container is either up or not, no point penalising it for being
+// down briefly.
 
-import { TTS_SERVICES } from '../config/serviceConfig';
+import { TTS_SERVICES, loadServiceConfig } from '../config/serviceConfig';
 import { selfHostedTTS } from './selfHostedTTS';
+import { localModeTTS, LocalModeTtsUnavailable } from './localModeTTS';
 
 // ============================================
 // Type Definitions
@@ -78,13 +85,39 @@ export const convertTextToSpeech = async (
   sessionId?: string,
   signal?: AbortSignal,
 ): Promise<AudioFile> => {
+  const validatedSpeed = validateSpeed(speed);
+  const fileBaseName = typeof responseIndex === 'string' ? responseIndex : String(responseIndex);
+
+  // Local Mode: route directly to localhost Kokoro (EN) / Qwen (DE) without
+  // touching the hosted gateway. The circuit breaker doesn't apply — single
+  // user, local containers, fail fast.
+  const config = loadServiceConfig();
+  if (config.localMode?.enabled) {
+    try {
+      return await localModeTTS(text, fileBaseName, figureName, validatedSpeed, undefined, undefined, language, signal);
+    } catch (error) {
+      // DE local unavailable (no NVIDIA, no Apple Silicon setup script, container
+      // crashed): fall back to the hosted DE path. EN local unavailable: also
+      // fall back. The user sees a small pill in the UI; conversation continues.
+      if (error instanceof LocalModeTtsUnavailable) {
+        console.warn(`[TTS] Local Mode unavailable for ${error.language} (${error.url}): ${error.message} — falling back to hosted`);
+        window.dispatchEvent(new CustomEvent('local-mode-tts-fallback', {
+          detail: { language: error.language, url: error.url, message: error.message }
+        }));
+        // fall through to hosted path
+      } else if (signal?.aborted || (error as Error).name === 'AbortError') {
+        throw error;
+      } else {
+        // Unexpected error from local TTS — surface it.
+        throw error;
+      }
+    }
+  }
+
   // Circuit breaker: skip TTS if server is down (text-only fallback)
   if (isCircuitOpen()) {
     throw new Error('TTS circuit breaker open — text-only mode');
   }
-
-  const validatedSpeed = validateSpeed(speed);
-  const fileBaseName = typeof responseIndex === 'string' ? responseIndex : String(responseIndex);
 
   try {
     const result = await selfHostedTTS(text, fileBaseName, figureName, validatedSpeed, undefined, undefined, language, sessionId, signal);
