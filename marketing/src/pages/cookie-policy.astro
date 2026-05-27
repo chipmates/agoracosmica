@@ -1,0 +1,133 @@
+---
+import Public from '../layouts/Public.astro';
+import LegalDoc from '../components/legal/LegalDoc.astro';
+
+const title = 'Cookie-Richtlinie';
+const lastUpdated = 'Zuletzt aktualisiert: April 2026';
+const description = 'Cookie-Richtlinie von Agora Cosmica. Wir verwenden keine Tracking-, Analyse- oder Marketing-Cookies. Nur technisch notwendige Speicherung gemäß § 25 Abs. 2 Nr. 2 TDDDG.';
+---
+<Public
+  lang="de"
+  title={title}
+  fullTitle="Cookie-Richtlinie | Agora Cosmica"
+  description={description}
+  canonicalPath="/cookie-policy"
+  noHreflang
+>
+  <LegalDoc title={title} lastUpdated={lastUpdated}>
+    <section>
+      <p class="legal-doc__intro">
+        Bei Agora Cosmica respektieren wir deine Privatsphäre und legen Wert auf Transparenz bei der Verwendung von Cookies und ähnlichen Technologien.
+      </p>
+    </section>
+
+    <section>
+      <h2>Was sind Cookies?</h2>
+      <p>
+        Cookies sind kleine Textdateien, die auf deinem Gerät gespeichert werden, wenn du eine Website besuchst. Sie helfen der Website, ordnungsgemäß zu funktionieren und bieten eine bessere Benutzererfahrung.
+      </p>
+    </section>
+
+    <section>
+      <h2>Unser Cookie-freier Ansatz</h2>
+      <p class="legal-doc__highlight">
+        Wir haben Agora Cosmica so entwickelt, dass es ohne Tracking-Cookies, Analyse-Cookies oder Marketing-Cookies funktioniert. Das bedeutet, dass du unsere Anwendung nutzen kannst, ohne verfolgt oder profiliert zu werden.
+      </p>
+    </section>
+
+    <section>
+      <h2>Essenzielle technische Speicherung</h2>
+      <p>
+        Wir verwenden nur essenzielle technische Speicherung, die für das Funktionieren der Anwendung unbedingt erforderlich ist:
+      </p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Typ</th>
+            <th>Zweck</th>
+            <th>Dauer</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Session Storage</td>
+            <td>Erhält deinen Sitzungszustand während der Nutzung der Anwendung</td>
+            <td>Bis du deinen Browser schließt</td>
+          </tr>
+          <tr>
+            <td>Local Storage</td>
+            <td>Speichert deine Spracheinstellung (selectedLanguage, lastAppliedLanguage)</td>
+            <td>Bis zur manuellen Löschung</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Sicherheits-Cookie (__cf_bm)</h2>
+      <p>
+        Wir verwenden ein technisch notwendiges Cookie, das Cloudflare für Bot-Schutz und Firewall (WAF) setzt. Es trackt dich nicht über Websites hinweg, enthält keine personenbezogenen Daten und ist nötig, damit die Anwendung sich vor automatisiertem Missbrauch schützen kann.
+      </p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Zweck</th>
+            <th>Dauer</th>
+            <th>Rechtsgrundlage</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>__cf_bm</code></td>
+            <td>Bot-Schutz und Firewall (Cloudflare)</td>
+            <td>30 Minuten</td>
+            <td>Technisch notwendig, § 25 (2) Nr. 2 TDDDG (keine Einwilligung nötig)</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Was wir NICHT verwenden</h2>
+      <p>Abgesehen vom oben genannten Sicherheits-Cookie verwenden wir KEINE:</p>
+      <ul>
+        <li>Analyse-Cookies oder Tracking (z.B. Google Analytics, Facebook Pixel)</li>
+        <li>Marketing- oder Werbe-Cookies</li>
+        <li>Social Media Tracking-Cookies</li>
+        <li>Tracking-Cookies von Drittanbietern</li>
+        <li>Websiteübergreifende Tracking-Technologien</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Deine Datenschutzrechte</h2>
+      <p>
+        Da wir keine Tracking-Cookies verwenden, gibt es keine Cookie-Einstellungen zu verwalten. Deine Privatsphäre ist standardmäßig geschützt. Die minimale technische Speicherung, die wir verwenden, ist für die Anwendung unerlässlich, um deine grundlegenden Einstellungen wie die Sprachauswahl zu speichern.
+      </p>
+    </section>
+
+    <section>
+      <h2>Datenschutzfreundliche Analyse</h2>
+      <p>
+        Wir verwenden Cloudflares cookie-lose Web Analytics, um die Website-Performance zu verstehen. Dieser datenschutzorientierte Dienst verwendet keine Cookies, verfolgt keine Einzelpersonen und sammelt keine persönlichen Daten. Er liefert nur aggregierte Einblicke über Seitenaufrufe und Website-Performance.
+      </p>
+    </section>
+
+    <section>
+      <h2>Änderungen dieser Richtlinie</h2>
+      <p>
+        Wenn wir Änderungen an unseren Cookie-Praktiken vornehmen, werden wir diese Richtlinie aktualisieren und die Nutzer entsprechend informieren.
+      </p>
+    </section>
+
+    <section>
+      <h2>Kontakt</h2>
+      <p>
+        Wenn du Fragen zu unserer Cookie-Richtlinie oder unseren Datenschutzpraktiken hast, kontaktiere uns bitte über unsere Hauptwebsite.
+      </p>
+    </section>
+  </LegalDoc>
+</Public>

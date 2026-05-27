@@ -1,0 +1,198 @@
+/* Typography and layout for legal pages (Impressum, Datenschutz, Cookie-Richtlinie,
+ * Nutzungsbedingungen). German-only, embedded in the standard Public layout
+ * (navbar + footer chrome), narrower max-width for readability. */
+
+.legal-doc {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.legal-doc__header {
+  margin-bottom: 3rem;
+  text-align: center;
+}
+
+.legal-doc__header::after {
+  content: '';
+  display: block;
+  width: 60px;
+  height: 1px;
+  background: color-mix(in srgb, white 30%, transparent);
+  margin: 2rem auto 0;
+}
+
+.legal-doc__title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.75rem;
+  color: var(--text-primary);
+}
+
+.legal-doc__date {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1rem;
+  color: color-mix(in srgb, white 70%, transparent);
+  margin: 0;
+}
+
+.legal-doc section {
+  margin-bottom: 3rem;
+}
+
+.legal-doc h2 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(1.25rem, 3vw, 1.5rem);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  margin: 0 0 1rem;
+  color: var(--text-primary);
+}
+
+.legal-doc p {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.125rem;
+  line-height: 1.7;
+  margin: 0 0 1.25rem;
+  color: color-mix(in srgb, white 90%, transparent);
+  hyphens: auto;
+}
+
+.legal-doc ul {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.125rem;
+  line-height: 1.7;
+  color: color-mix(in srgb, white 90%, transparent);
+  margin: 0 0 1.25rem;
+  padding-left: 1.5rem;
+  list-style: disc;
+}
+
+.legal-doc li {
+  margin-bottom: 0.5rem;
+}
+
+.legal-doc a {
+  color: var(--text-primary);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  transition: opacity 0.2s ease;
+}
+
+.legal-doc a:hover {
+  opacity: 0.8;
+}
+
+.legal-doc__intro {
+  font-style: italic;
+  color: color-mix(in srgb, white 80%, transparent);
+}
+
+.legal-doc__highlight {
+  color: var(--gold-subtle);
+  font-weight: 500;
+}
+
+.legal-doc__jugendschutz {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.25rem;
+}
+
+.legal-doc__jugendschutz img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.legal-doc__jugendschutz p {
+  margin: 0;
+}
+
+.legal-doc table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.25rem 0;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1rem;
+  color: color-mix(in srgb, white 90%, transparent);
+}
+
+.legal-doc th,
+.legal-doc td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+}
+
+.legal-doc th {
+  background: color-mix(in srgb, var(--gold-subtle) 10%, transparent);
+  font-weight: 500;
+  color: var(--gold-subtle);
+}
+
+.legal-doc tr:last-child td {
+  border-bottom: none;
+}
+
+.legal-doc code {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.95em;
+  background: color-mix(in srgb, white 8%, transparent);
+  padding: 0.1em 0.4em;
+  border-radius: 3px;
+}
+
+.legal-doc__footer {
+  margin-top: 3.75rem;
+  padding-top: 1.875rem;
+  border-top: 1px solid color-mix(in srgb, white 10%, transparent);
+  text-align: center;
+}
+
+.legal-doc__footer-links {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.legal-doc__footer a {
+  color: var(--gold-subtle);
+  text-decoration: none;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 500;
+  font-size: 0.875rem;
+  letter-spacing: 0.02em;
+}
+
+.legal-doc__footer a:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.legal-doc__footer-sep {
+  color: color-mix(in srgb, white 30%, transparent);
+  font-size: 0.75rem;
+}
+
+@media (max-width: 768px) {
+  .legal-doc {
+    max-width: 100%;
+  }
+
+  .legal-doc p,
+  .legal-doc ul {
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
+  .legal-doc table {
+    font-size: 0.875rem;
+  }
+}

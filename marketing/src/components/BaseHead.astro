@@ -27,6 +27,9 @@ interface Props {
   schemas?: Array<Record<string, unknown>>;
   /** Emit the podcast feed as <link rel="alternate" type="application/rss+xml">. */
   includeRss?: boolean;
+  /** German legal pages (Impressum, Datenschutz, etc.) have no EN equivalent —
+   *  use a bare canonical (no /de/ prefix) and skip the hreflang block. */
+  noHreflang?: boolean;
 }
 
 const {
@@ -43,10 +46,13 @@ const {
   preloadImageType,
   schemas = [],
   includeRss = false,
+  noHreflang = false,
 } = Astro.props;
 
 const computedFullTitle = fullTitle ?? `${title} | Agora Cosmica`;
-const canonical = canonicalUrl(lang === 'de' ? `/de${canonicalPath}` : canonicalPath);
+const canonical = noHreflang
+  ? canonicalUrl(canonicalPath)
+  : canonicalUrl(lang === 'de' ? `/de${canonicalPath}` : canonicalPath);
 const alts = alternateUrls(canonicalPath);
 const image = ogImage ?? `${MEDIA_URL}/images/ui/og-default/1200.webp`;
 const rss = includeRss ? podcastRssLink(lang) : null;
@@ -67,9 +73,13 @@ const ogLocale = lang === 'de' ? 'de_DE' : 'en_US';
 <title>{computedFullTitle}</title>
 <meta name="description" content={description} />
 <link rel="canonical" href={canonical} />
-<link rel="alternate" hreflang="en" href={alts.en} />
-<link rel="alternate" hreflang="de" href={alts.de} />
-<link rel="alternate" hreflang="x-default" href={alts.en} />
+{!noHreflang && (
+  <>
+    <link rel="alternate" hreflang="en" href={alts.en} />
+    <link rel="alternate" hreflang="de" href={alts.de} />
+    <link rel="alternate" hreflang="x-default" href={alts.en} />
+  </>
+)}
 
 <meta property="og:title" content={computedFullTitle} />
 <meta property="og:description" content={description} />

@@ -1,0 +1,30 @@
+---
+import '../../styles/legal.css';
+
+interface Props {
+  title: string;
+  lastUpdated: string;
+}
+
+const { title, lastUpdated } = Astro.props;
+---
+<article class="legal-doc">
+  <header class="legal-doc__header">
+    <h1 class="legal-doc__title">{title}</h1>
+    <p class="legal-doc__date">{lastUpdated}</p>
+  </header>
+
+  <slot />
+
+  <div class="legal-doc__footer">
+    <nav class="legal-doc__footer-links" aria-label="Rechtliches">
+      <a href="/impressum/">Impressum</a>
+      <span class="legal-doc__footer-sep">•</span>
+      <a href="/datenschutz/">Datenschutzerklärung</a>
+      <span class="legal-doc__footer-sep">•</span>
+      <a href="/cookie-policy/">Cookie-Richtlinie</a>
+      <span class="legal-doc__footer-sep">•</span>
+      <a href="/nutzungsbedingungen/">Nutzungsbedingungen</a>
+    </nav>
+  </div>
+</article>
