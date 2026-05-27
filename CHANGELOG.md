@@ -19,6 +19,7 @@ Local Mode lands. Run the LLM, voice synthesis, and transcription on your own ma
 - **10 German archetype voices with friendly cosmic names** (Lyra, Astra, Vega, Andromeda, Ceres, Solaris, Umbra, Phoenix, Hyperion, Corvus). Same model as production, voice references hosted on R2 with precomputed speaker embeddings and pre-cached transcripts.
 - **Configurable LLM endpoint with reachability probe.** When the LLM toggle is on, conversations route to the configured `baseURL` instead of OpenRouter. The `Test` button does a `/models` reachability check with a 5-second timeout and lists detected models. The `custom-openai` provider kind suppresses OpenRouter-specific request fields (HTTP-Referer, X-Title, the `provider` envelope, the Qwen3-235B-tuned `presence_penalty`) so smaller local models aren't destabilised.
 - **Marketing pages migrated to Astro for sub-second first paint.** Figure and theme detail pages, catalogs, about, and contact ship as prerendered static HTML from the sibling `marketing/` Astro project. The hero, journey overview, ideas, and CTA paint within a few hundred milliseconds instead of waiting for the React bundle. React islands handle only the trailer audio button and council preview audio. Catalog and about/contact pages ship zero React JS. The React SPA at `/` and `/de/` continues to handle login plus the post-login app.
+- **Legal pages (Impressum, Datenschutzerklärung, Cookie-Richtlinie, Nutzungsbedingungen) now ship as static Astro HTML** with correct canonical URLs, `og:locale=de_DE`, and DE-only language tagging. Replaces orphan prerendered HTML left behind when the old `prerender.mjs` step was removed during the Astro migration. A new `noHreflang` prop on `BaseHead` emits a bare canonical without the `/de/` prefix for pages with no English equivalent.
 - **HomePage is now `React.lazy()` so the eager bundle on unauthenticated `/` drops from 374 KB gzipped to 187 KB gzipped.** Visitors landing on the login page no longer download the audio engine, council suite, modals, and post-login app shell until they actually authenticate.
 - **Voice essences on R2.** The 10 archetype reference WAVs plus precomputed speaker embeddings move to `media.agoracosmica.org/voices/<slug>/...`. The local Qwen TTS container fetches them at startup and caches them. Same content/code separation as the council masters that landed in v1.0.1.
 - **Council master prompts load from the media CDN.** `services/council/generator.ts` fetches `council_advisory_master.json` and `council_debate_master.json` from `${mediaBaseUrl}/instructions/...` instead of a same-origin path. Removes the last authored-text leak from the self-host docker image.
@@ -35,6 +36,8 @@ Local Mode lands. Run the LLM, voice synthesis, and transcription on your own ma
 - **Hero image preload on figure pages uses responsive `imagesrcset`** so mobile devices fetch the correct 640px thumbnail instead of the desktop 1200px portrait.
 - **`<think>...</think>` blocks stripped from every LLM response, not just council parser output.** Streaming filter and non-streaming summary share a util (`utils/thinkingTagStripper.ts`). Thinking-capable models (Qwen3, DeepSeek-R1 distills, QwQ) no longer leak scratchpad into the visible chat or summary.
 - **`docker-publish.yml` becomes a matrix workflow** that builds four images on every `v*` tag (app, Kokoro, Whisper, Qwen). Each image gets SBOM, provenance, and a Trivy scan.
+- **Sitemap `lastmod` sourced per-URL from `git log`** of the relevant content files instead of a single build-date stamp, so crawlers can prioritize re-crawl of pages that actually changed.
+- **Trailing-slash canonical redirects extended** to `/datenschutz/`, `/cookie-policy/`, and `/nutzungsbedingungen/`, matching the convention already in place for `/figures/` and `/themes/`.
 
 ### Fixed
 
@@ -45,6 +48,7 @@ Local Mode lands. Run the LLM, voice synthesis, and transcription on your own ma
 - **CORS headers on the Whisper container** (`ALLOW_ORIGINS` env var, default `["*"]`). Browser-direct calls from the Local Mode panel or LAN-deployment patterns no longer get blocked.
 - **CORS headers on the Qwen TTS container** (`CORS_ALLOW_ORIGINS` env var, default `*`). Mirrors the Whisper fix.
 - **MLX server runs all inference on a dedicated single-worker thread.** mlx-audio uses per-thread stream/device contexts, so FastAPI's default sync-handler thread pool yielded `RuntimeError: There is no Stream(gpu, 0) in current thread.` Fixed with a `ThreadPoolExecutor(max_workers=1)` that owns the model and handles every synth call.
+- **Sitemap no longer emits orphan hreflang pairs for German-only legal pages.** Cookie Policy and Nutzungsbedingungen previously appeared with `en` / `de` / `x-default` annotations pointing to non-existent `/de/cookie-policy/` and `/de/nutzungsbedingungen/` URLs. Now grouped with Impressum and Datenschutz as DE-only legal paths.
 
 ### Security
 
