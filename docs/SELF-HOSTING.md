@@ -120,6 +120,106 @@ If you already operate an audio backend that speaks the OpenAI-compatible `/v1/a
 
 ---
 
+## Use Local Mode
+
+**v1.1.0 ships a Local Mode toggle that runs the whole user-facing pipeline on your machine: LLM, voice synthesis, and transcription.** Settings → AI Model & Your Key → Local Mode → on.
+
+The honest framing line, verbatim: *"With Local Mode and a local model, no conversation, voice, or text data leaves your machine. The same models we run on our servers run on yours."*
+
+### What works
+
+| Mode | Local Mode (full) | Notes |
+|---|---|---|
+| Free Talk (text chat) | ✅ EN + DE | Streams from your LLM |
+| Wisdom | ✅ EN + DE | Same as Free Talk, longer context |
+| Story | ✅ | Pre-rendered audio, LLM optional |
+| Prism | ✅ EN + DE | |
+| Summary | ✅ | Works on 7B+ instruction-tuned models |
+| Custom Council | ⚠️ | Needs a model that follows strict `SPEAKER :: dialogue` format. Qwen2.5-32B / Llama-3.3-70B / Mistral-Large recommended. |
+| Quest | ⚠️ | Needs tool-calling support; without it, dialogue works but `award_seed` won't fire. |
+| Live voice (interrupt-driven) | ❌ | Still hosted in v1.1.0. Push-to-talk + read-aloud work. |
+
+### Hardware
+
+| Tier | Hardware | LLM | TTS EN | TTS DE | STT |
+|---|---|---|---|---|---|
+| Full (NVIDIA) | NVIDIA ≥ 8 GB VRAM + 16 GB RAM | LM Studio / Ollama / vLLM | Kokoro container | Qwen container | Whisper container |
+| Full (Apple) | M-series Mac ≥ 16 GB unified RAM | LM Studio (MLX) | Kokoro container | Native MLX (setup script) | Whisper container |
+| Reduced | M-series Mac < 16 GB, or no GPU | LM Studio (small CPU model) | Kokoro (CPU) | falls back to cloud | Whisper-base CPU |
+
+VRAM math for the NVIDIA full tier: Qwen ~3.8 GB (capped) + Kokoro ~1.7 GB + Whisper ~2.2 GB + LLM (7B Q4) ~5 GB ≈ **13 GB total**.
+
+### LM Studio walkthrough
+
+1. Download LM Studio: <https://lmstudio.ai>.
+2. Inside LM Studio, download a competent instruction-tuned model. Tested first-run choice: `qwen2.5-7b-instruct-q4_k_m` (~5 GB, multilingual, fast).
+3. Open the *Local Server* tab. **Turn on the "Enable CORS" toggle.** Start the server on port 1234.
+4. In the Agora Cosmica settings → Local Mode → paste `http://localhost:1234/v1` as the endpoint URL, type `qwen2.5-7b-instruct` (or whatever LM Studio shows) as the model name, click *Test connection* → green pill, then *Save*.
+
+### Ollama walkthrough
+
+1. Install Ollama: <https://ollama.com>.
+2. Pull a model: `ollama pull llama3.1:8b` (or `qwen2.5:7b`).
+3. Set `OLLAMA_ORIGINS=*` so the browser can reach the server. On macOS:
+   ```bash
+   launchctl setenv OLLAMA_ORIGINS "*"
+   ```
+   Then restart Ollama. On Linux: `OLLAMA_ORIGINS=* ollama serve`.
+4. In Agora Cosmica settings → Local Mode → paste `http://localhost:11434/v1`, type `llama3.1:8b`, click *Test connection* → green pill, then *Save*.
+
+### Audio + STT setup (Linux / Windows with NVIDIA)
+
+The agoracosmica `docker-compose.yml` ships four services. By default it brings up the app + Kokoro EN + Whisper. To add Qwen3-TTS DE, use the `nvidia` profile:
+
+```bash
+docker compose --profile nvidia up -d
+```
+
+That starts:
+- `agoracosmica`   on `:8080` — the app
+- `tts-kokoro`     on `:8880` — English TTS (Kokoro, 82M, single-worker)
+- `tts-qwen`       on `:8887` — German TTS (Qwen3-TTS-12Hz-0.6B-Base via faster-qwen3-tts)
+- `stt-whisper`    on `:8000` — Whisper (faster-whisper-large-v3, auto device)
+
+First boot of `tts-qwen` downloads the Qwen weights (~2 GB) and the 10 archetype voice references from R2 (~11 MB). Subsequent starts are warm.
+
+### Audio + STT setup (Apple Silicon Mac)
+
+vLLM is CUDA-only, so DE TTS on Apple Silicon runs natively via MLX rather than in docker. EN TTS + STT still run in docker.
+
+```bash
+# 1. Start the dockerised stack (app + Kokoro + Whisper)
+docker compose up -d
+
+# 2. Set up the native MLX Qwen TTS server (once)
+bash scripts/setup-local-tts-apple.sh
+```
+
+The script creates a Python venv under `~/Library/AgoraLocalTTS`, installs the kapi2800/qwen3-tts-apple-silicon MLX port, writes a launchd plist so the server starts on login, and brings up an OpenAI-compatible endpoint at `http://localhost:8887/v1/audio/speech` — same shape as the docker container.
+
+Uninstall:
+```bash
+launchctl unload ~/Library/LaunchAgents/org.agoracosmica.local-tts.plist
+rm -rf ~/Library/AgoraLocalTTS ~/Library/LaunchAgents/org.agoracosmica.local-tts.plist
+```
+
+### CORS troubleshooting
+
+If chat fails immediately and the browser console says "blocked by CORS policy", the local LLM server isn't allowing the browser to call it.
+
+- **LM Studio**: open the Local Server tab, find the *Enable CORS* toggle, turn it on, restart the server.
+- **Ollama**: set `OLLAMA_ORIGINS=*` (or a specific origin like `http://localhost:5173` for dev) and restart Ollama.
+- **vLLM**: launch with `--allowed-origins '*'`.
+- **llama.cpp**: usually requires a reverse proxy that adds the `Access-Control-Allow-Origin: *` header.
+
+The audio + STT containers we ship don't need CORS configuration — they bind to localhost and run inside the same docker network as the app.
+
+### Honest framing
+
+Local Mode + a local LLM + no live voice = no conversation or voice data leaves your machine. With docker self-host too, the entire pipeline runs on your hardware. We don't claim "100% private" (the app's static assets still load from agoracosmica.org unless you also serve them locally), we don't claim "fully offline", and we don't claim "anonymous". The actual property is sharper: same models, same voices, running on your machine.
+
+---
+
 ## Architecture notes
 
 - **No database.** Chats, settings, completion progress, and voting power all live in IndexedDB inside your browser.

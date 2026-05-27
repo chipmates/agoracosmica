@@ -275,7 +275,60 @@
         "learnMore": "Mehr erfahren"
       },
       "encryptionNote": "Dein Key wird in deinem Browser verschlüsselt (AES-256-GCM) und niemals an unsere Server gesendet.",
-      "learnMoreLink": "Datenschutz-Details unter Recht & Datenschutz"
+      "learnMoreLink": "Datenschutz-Details unter Recht & Datenschutz",
+      "custom": {
+        "endpointLabel": "Endpunkt-URL",
+        "endpointPlaceholder": "http://localhost:1234/v1",
+        "endpointHelp": "LM Studio: http://localhost:1234/v1, Ollama: http://localhost:11434/v1",
+        "modelLabel": "Modellname",
+        "modelPlaceholder": "qwen2.5-7b-instruct",
+        "modelHelp": "Der Name, den dein lokaler Server anzeigt, zum Beispiel qwen2.5-7b-instruct.",
+        "keyDisclosure": "Mein Endpunkt braucht einen API-Key",
+        "keyLabel": "API-Key (optional)",
+        "keyPlaceholder": "Leer lassen für LM Studio oder Ollama",
+        "testButton": "Verbindung testen",
+        "probing": "Endpunkt wird geprüft...",
+        "probeOk": "Erreichbar. {n} Modell(e) gefunden: {list}",
+        "probeFail": "Nicht erreichbar: {error}",
+        "saveButton": "Speichern",
+        "savedConfirmation": "Gespeichert",
+        "corsHelp": "Vom Browser blockiert? CORS für LM Studio oder Ollama prüfen"
+      },
+      "currentlyUsingCustom": "Eigener Endpunkt"
+    },
+    "localMode": {
+      "title": "Lokaler Modus",
+      "description": "Lasse die ganze Pipeline auf deinem Rechner laufen: LLM, Stimme, Transkription.",
+      "toggleOn": "Lokaler Modus ist an",
+      "toggleOff": "Auf lokalen Modus umschalten",
+      "toggleHelp": "Wenn aktiv, laufen Gespräche über ein lokales LLM (LM Studio, Ollama, vLLM) und Audio über unsere lokalen Container. Echtzeit-Sprache bleibt vorerst gehostet.",
+      "hardwareBanner": {
+        "full": "NVIDIA-GPU erkannt. Die ganze Pipeline (LLM, EN + DE TTS, STT) kann mit docker compose --profile nvidia up lokal laufen.",
+        "apple": "Apple-Silicon-Mac erkannt. EN TTS + STT laufen via Docker; für DE TTS lokal einmalig scripts/setup-local-tts-apple.sh ausführen.",
+        "reduced": "Eingeschränkte Hardware. EN + STT laufen lokal; DE läuft über unsere Cloud.",
+        "unknown": "Hardware nicht erkannt. Lokaler Modus kann trotzdem funktionieren — probier es.",
+        "hosted": "Lokaler Modus nicht verfügbar, Cloud wird genutzt."
+      },
+      "llmConfig": {
+        "title": "Dein LLM-Endpunkt"
+      },
+      "services": {
+        "title": "Service-Status",
+        "llm": "LLM (dein Endpunkt)",
+        "ttsEn": "TTS (Englisch, Kokoro)",
+        "ttsDe": "TTS (Deutsch, Qwen)",
+        "stt": "STT (Whisper)"
+      },
+      "status": {
+        "configured": "Erreichbar",
+        "notConfigured": "Nicht geprüft",
+        "probing": "Wird geprüft…",
+        "unreachable": "Nicht erreichbar",
+        "hostedFallback": "Cloud wird genutzt"
+      },
+      "checkButton": "Verbindungen prüfen",
+      "honestPrivacy": "Mit dem lokalen Modus und einem lokalen Modell verlassen weder Gesprächs- noch Sprach- noch Textdaten deinen Rechner. Auf deinem Gerät laufen dieselben Modelle, die auch bei uns auf den Servern laufen.",
+      "learnMore": "Anleitung zum lokalen Modus"
     },
     "privacy": {
       "title": "Datenschutz",

@@ -95,6 +95,8 @@ Boots the React app at [localhost:5173](http://localhost:5173). UI and static co
 
 **Requirements**: Node.js 20+, pnpm 8+.
 
+**Or run everything locally:** Local Mode (v1.1.0) lets you point the app at any OpenAI-compatible LLM endpoint (LM Studio, Ollama, vLLM) and runs the audio stack — Kokoro EN, Qwen3-TTS DE, Whisper STT — in our published docker images. With both Local Mode and docker self-host, no conversation, voice, or text data leaves your machine. See [SELF-HOSTING.md](docs/SELF-HOSTING.md#use-local-mode).
+
 ---
 
 ## Architecture

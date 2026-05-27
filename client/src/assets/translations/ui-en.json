@@ -277,7 +277,60 @@
         "learnMore": "Learn more"
       },
       "encryptionNote": "Your key is encrypted in your browser (AES-256-GCM) and never sent to our servers.",
-      "learnMoreLink": "Privacy details under Legal & Privacy"
+      "learnMoreLink": "Privacy details under Legal & Privacy",
+      "custom": {
+        "endpointLabel": "Endpoint URL",
+        "endpointPlaceholder": "http://localhost:1234/v1",
+        "endpointHelp": "LM Studio: http://localhost:1234/v1, Ollama: http://localhost:11434/v1",
+        "modelLabel": "Model name",
+        "modelPlaceholder": "qwen2.5-7b-instruct",
+        "modelHelp": "The identifier your local server shows, for example qwen2.5-7b-instruct.",
+        "keyDisclosure": "My endpoint needs an API key",
+        "keyLabel": "API key (optional)",
+        "keyPlaceholder": "Leave empty for LM Studio or Ollama",
+        "testButton": "Test connection",
+        "probing": "Probing endpoint...",
+        "probeOk": "Reachable. {n} model(s) detected: {list}",
+        "probeFail": "Not reachable: {error}",
+        "saveButton": "Save",
+        "savedConfirmation": "Saved",
+        "corsHelp": "Browser blocked? Check CORS for LM Studio or Ollama"
+      },
+      "currentlyUsingCustom": "Custom endpoint"
+    },
+    "localMode": {
+      "title": "Local Mode",
+      "description": "Run the whole pipeline on your own machine: LLM, voice, transcription.",
+      "toggleOn": "Local Mode is on",
+      "toggleOff": "Switch to Local Mode",
+      "toggleHelp": "When on, conversations route to a local LLM you run (LM Studio, Ollama, vLLM) and audio routes to our local containers. Live voice remains hosted for now.",
+      "hardwareBanner": {
+        "full": "NVIDIA GPU detected. The full pipeline (LLM, EN + DE TTS, STT) can run locally with docker compose --profile nvidia up.",
+        "apple": "Apple Silicon Mac detected. EN TTS + STT run via docker; for DE local TTS run scripts/setup-local-tts-apple.sh once.",
+        "reduced": "Limited hardware detected. EN + STT run locally; DE will fall back to our cloud.",
+        "unknown": "Hardware not detected. Local Mode may still work — try it.",
+        "hosted": "Local Mode not available, using cloud."
+      },
+      "llmConfig": {
+        "title": "Your LLM Endpoint"
+      },
+      "services": {
+        "title": "Service Status",
+        "llm": "LLM (your endpoint)",
+        "ttsEn": "TTS (English, Kokoro)",
+        "ttsDe": "TTS (German, Qwen)",
+        "stt": "STT (Whisper)"
+      },
+      "status": {
+        "configured": "Reachable",
+        "notConfigured": "Not checked",
+        "probing": "Checking…",
+        "unreachable": "Unreachable",
+        "hostedFallback": "Using cloud"
+      },
+      "checkButton": "Check connections",
+      "honestPrivacy": "With Local Mode and a local model, no conversation, voice, or text data leaves your machine. The same models we run on our servers run on yours.",
+      "learnMore": "Local Mode setup guide"
     },
     "privacy": {
       "title": "Privacy",

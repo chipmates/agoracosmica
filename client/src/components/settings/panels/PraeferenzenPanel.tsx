@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState } from 'react';
-import { Gear, Globe, SpeakerHigh, Microphone, Brain, ArrowCounterClockwise } from '@phosphor-icons/react';
+import { Gear, Globe, SpeakerHigh, Microphone, Brain, ArrowCounterClockwise, House } from '@phosphor-icons/react';
 import { useTranslation } from '../../../hooks/useTranslation';
 import { keyStorage } from '../../../services/storage/keyStorageService';
 import { useUIStore } from '../../../stores/uiStore';
@@ -10,6 +10,7 @@ import LanguagePanel from './LanguagePanel';
 import VoicePanel from './VoicePanel';
 import SpeechPanel from './SpeechPanel';
 import AiModelPanel from './AiModelPanel';
+import LocalModePanel from './LocalModePanel';
 
 interface Config {
   ttsEnabled?: boolean;
@@ -193,6 +194,22 @@ const PraeferenzenPanel: FC<PraeferenzenPanelProps> = ({
         badgeText={getAiModelBadge()}
       >
         <AiModelPanel
+          SettingCard={SettingCard}
+          CATEGORY_ICONS={CATEGORY_ICONS}
+        />
+      </CollapsibleSection>
+
+      {/* Local Mode — run the whole pipeline on your own machine */}
+      <CollapsibleSection
+        title={tString('settings.localMode.title', 'Local Mode')}
+        icon={<House size={20} />}
+        description={tString(
+          'settings.localMode.description',
+          'Run the whole pipeline on your own machine: LLM, voice, transcription.',
+        )}
+        defaultExpanded={false}
+      >
+        <LocalModePanel
           SettingCard={SettingCard}
           CATEGORY_ICONS={CATEGORY_ICONS}
         />
