@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 # Agora Cosmica — Local Mode Qwen3-TTS native install for Apple Silicon
 #
-# MLX doesn't work in Docker on Mac (no Metal passthrough), so the same
-# Qwen3-TTS-12Hz-0.6B-Lite voice-clone model runs as a native Python venv
-# managed by launchd. After this script completes the server is listening
-# on http://localhost:8887 and will restart on login.
+# MLX doesn't work in Docker on Mac (no Metal passthrough), so the Qwen3-TTS
+# voice-clone model runs natively via the mlx-audio package, served by a
+# FastAPI wrapper (mlx_server.py) managed by launchd. After this script
+# completes the server is listening on http://localhost:8887 and will restart
+# on login.
 #
 # Idempotent — safe to re-run. Updates the venv in place.
 #
@@ -22,14 +23,19 @@ set -euo pipefail
 INSTALL_DIR="${HOME}/Library/AgoraLocalTTS"
 PLIST_PATH="${HOME}/Library/LaunchAgents/org.agoracosmica.local-tts.plist"
 LOG_DIR="${INSTALL_DIR}/logs"
+HF_CACHE="${INSTALL_DIR}/hf-cache"
 PORT="${AGORA_LOCAL_TTS_PORT:-8887}"
 VOICES_R2_BASE="${AGORA_VOICES_R2_BASE:-https://media.agoracosmica.org/voices}"
+MLX_MODEL_ID="${AGORA_QWEN_MLX_MODEL:-mlx-community/Qwen3-TTS-12Hz-0.6B-Base-8bit}"
+CORS_ORIGINS="${AGORA_LOCAL_TTS_CORS:-*}"
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-echo "==> Agora Cosmica Local TTS setup (Apple Silicon)"
+echo "==> Agora Cosmica Local TTS setup (Apple Silicon, MLX backend)"
 echo "    install dir : ${INSTALL_DIR}"
 echo "    port        : ${PORT}"
 echo "    voice base  : ${VOICES_R2_BASE}"
+echo "    MLX model   : ${MLX_MODEL_ID}"
+echo "    HF cache    : ${HF_CACHE}"
 echo "    repo root   : ${REPO_ROOT}"
 
 if [[ "$(uname -s)" != "Darwin" || "$(uname -m)" != "arm64" ]]; then
@@ -45,7 +51,7 @@ fi
 
 echo "==> Using ${PYTHON_BIN}"
 
-mkdir -p "${INSTALL_DIR}" "${LOG_DIR}"
+mkdir -p "${INSTALL_DIR}" "${LOG_DIR}" "${HF_CACHE}"
 
 if [[ ! -d "${INSTALL_DIR}/venv" ]]; then
   echo "==> Creating venv"
@@ -58,47 +64,32 @@ source "${INSTALL_DIR}/venv/bin/activate"
 echo "==> Installing Python dependencies"
 pip install --upgrade pip >/dev/null
 
+# mlx-audio brings mlx + mlx-lm + transformers + huggingface_hub transitively.
+# We add the FastAPI server-side deps explicitly so the versions are pinned.
 pip install --upgrade \
   fastapi==0.115.* \
   "uvicorn[standard]==0.32.*" \
   httpx==0.27.* \
   pydantic==2.* \
   soundfile==0.12.* \
-  numpy
+  numpy \
+  huggingface_hub \
+  mlx mlx-audio
 
-echo "==> Installing MLX audio + the kapi2800 Qwen3-TTS Apple Silicon port"
-# The pip package name may vary as the project matures; we try a few candidates
-# and fall back to git+ install. Adjust if the canonical name changes.
-pip install --upgrade mlx mlx-audio || true
-if ! pip install --upgrade qwen3-tts-mlx 2>/dev/null; then
-  echo "    pip package 'qwen3-tts-mlx' not found, installing from GitHub..."
-  pip install --upgrade "git+https://github.com/kapi2800/qwen3-tts-apple-silicon.git"
-fi
+echo "==> Pre-downloading MLX model (one-time, ~1 GB)"
+HF_HOME="${HF_CACHE}" python3 - <<PY
+from huggingface_hub import snapshot_download
+import os
+path = snapshot_download(
+    repo_id="${MLX_MODEL_ID}",
+    cache_dir="${HF_CACHE}",
+)
+print(f"Model cached at: {path}")
+PY
 
 echo "==> Staging server files"
-cp "${REPO_ROOT}/docker/tts-qwen-cuda/server.py" "${INSTALL_DIR}/server.py"
-cp "${REPO_ROOT}/docker/tts-qwen-cuda/tts_preprocess.py" "${INSTALL_DIR}/tts_preprocess.py"
+cp "${REPO_ROOT}/docker/tts-qwen-cuda/mlx_server.py" "${INSTALL_DIR}/mlx_server.py"
 cp "${REPO_ROOT}/docker/tts-qwen-cuda/voice_loader.py" "${INSTALL_DIR}/voice_loader.py"
-
-# Swap the faster_qwen3_tts import for the MLX equivalent. The kapi2800 port
-# exposes a class with the same public surface (`from_pretrained`,
-# `generate_voice_clone`, `generate_with_embedding`). If the package name
-# differs from `mlx_qwen3_tts`, edit `${INSTALL_DIR}/server.py` manually.
-python3 - <<'PY'
-import re
-from pathlib import Path
-
-server = Path.home() / "Library" / "AgoraLocalTTS" / "server.py"
-text = server.read_text()
-text = text.replace(
-    "from faster_qwen3_tts import FasterQwen3TTS",
-    "from mlx_qwen3_tts import MLXQwen3TTS as FasterQwen3TTS",
-)
-text = re.sub(r"^MODEL_ID = .*$",
-              'MODEL_ID = os.environ.get("QWEN_MODEL_ID", "Qwen/Qwen3-TTS-12Hz-0.6B-Lite-Base")',
-              text, count=1, flags=re.MULTILINE)
-server.write_text(text)
-PY
 
 echo "==> Writing launchd plist"
 cat > "${PLIST_PATH}" <<EOF
@@ -110,14 +101,16 @@ cat > "${PLIST_PATH}" <<EOF
   <key>ProgramArguments</key>
   <array>
     <string>${INSTALL_DIR}/venv/bin/python</string>
-    <string>${INSTALL_DIR}/server.py</string>
+    <string>${INSTALL_DIR}/mlx_server.py</string>
   </array>
   <key>EnvironmentVariables</key>
   <dict>
     <key>VOICES_R2_BASE</key><string>${VOICES_R2_BASE}</string>
     <key>VOICES_CACHE_DIR</key><string>${INSTALL_DIR}/voices-cache</string>
     <key>PORT</key><string>${PORT}</string>
-    <key>QWEN_MODEL_ID</key><string>Qwen/Qwen3-TTS-12Hz-0.6B-Lite-Base</string>
+    <key>QWEN_MODEL_ID</key><string>${MLX_MODEL_ID}</string>
+    <key>CORS_ALLOW_ORIGINS</key><string>${CORS_ORIGINS}</string>
+    <key>HF_HOME</key><string>${HF_CACHE}</string>
   </dict>
   <key>WorkingDirectory</key><string>${INSTALL_DIR}</string>
   <key>RunAtLoad</key><true/>
@@ -134,6 +127,8 @@ launchctl load "${PLIST_PATH}"
 
 echo ""
 echo "==> Done. The local TTS server is starting on http://localhost:${PORT}"
-echo "    First-run model download (~3 GB) can take several minutes; check ${LOG_DIR}/stdout.log"
+echo "    First boot fetches 10 archetype voices from R2 (~5 MB); subsequent starts are warm."
+echo "    Logs:          ${LOG_DIR}/stdout.log"
 echo "    Health check:  curl http://localhost:${PORT}/health"
+echo "    Voice catalog: curl http://localhost:${PORT}/v1/audio/voices"
 echo "    Uninstall:     launchctl unload ${PLIST_PATH} && rm -rf ${INSTALL_DIR} ${PLIST_PATH}"
