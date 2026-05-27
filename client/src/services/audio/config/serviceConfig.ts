@@ -17,6 +17,24 @@ export interface LLMConfig {
   provider: string;
   model: string;
   zdr?: boolean; // Zero Data Retention: routes to ZDR-compliant providers only (OpenRouter BYOK)
+  /**
+   * Local Mode addition: when set, the LLM call uses a configurable OpenAI-compatible
+   * endpoint instead of OpenRouter. `provider` carries the kind ('openrouter' |
+   * 'custom-openai'), `baseURL` is the custom endpoint root (e.g.
+   * 'http://localhost:1234/v1'), and `model` is whatever identifier the local
+   * server reports.
+   */
+  kind?: 'openrouter' | 'custom-openai';
+  baseURL?: string;
+}
+
+export interface LocalModeConfig {
+  /** Master toggle. When true, TTS + STT route to localhost and `llm.kind === 'custom-openai'`. */
+  enabled: boolean;
+  /** Override URLs (optional — fall back to compose defaults). */
+  ttsKokoroURL?: string;
+  ttsQwenURL?: string;
+  sttURL?: string;
 }
 
 export interface ServiceConfig {
@@ -26,6 +44,7 @@ export interface ServiceConfig {
   ttsSettings: TTSSettings;
   ttsEnabled: boolean;
   llm: LLMConfig;
+  localMode?: LocalModeConfig;
 }
 
 interface LLMServiceDefinition {
@@ -83,8 +102,12 @@ export const defaultConfig: ServiceConfig = {
   // Language Model: OpenRouter BYOK, falls back to free-tier proxy
   llm: {
     provider: LLM_SERVICES.OPENROUTER.name,
-    model: LLM_SERVICES.OPENROUTER.models.QWEN3_235B
-  }
+    model: LLM_SERVICES.OPENROUTER.models.QWEN3_235B,
+    kind: 'openrouter',
+  },
+
+  // Local Mode: off by default. Enabled via settings or first-run modal.
+  localMode: { enabled: false },
 };
 
 // ============================================
@@ -134,20 +157,40 @@ export const loadServiceConfig = (): ServiceConfig => {
         sttEnabled: parsedConfig.sttEnabled !== false
       };
 
-      // LLM: Migrate legacy DeepInfra provider to OpenRouter
-      if (config.llm.provider !== LLM_SERVICES.OPENROUTER.name) {
+      // LLM kind: derive from `provider` when not explicitly set on stored config.
+      if (!config.llm.kind) {
+        config.llm.kind = config.llm.provider === 'custom-openai' ? 'custom-openai' : 'openrouter';
+      }
+
+      // LLM provider migration:
+      //   - 'custom-openai': whitelist (Local Mode user-configured endpoint).
+      //   - anything else: revert to OpenRouter (legacy 'deepinfra' / unknown).
+      if (
+        config.llm.provider !== LLM_SERVICES.OPENROUTER.name &&
+        config.llm.provider !== 'custom-openai'
+      ) {
         config.llm.provider = LLM_SERVICES.OPENROUTER.name;
         config.llm.model = LLM_SERVICES.OPENROUTER.models.QWEN3_235B;
+        config.llm.kind = 'openrouter';
         // Defer save to prevent infinite loops during render
         queueMicrotask(() => saveServiceConfig(config));
       }
 
-      // Validate model is a known OpenRouter model
-      const validModels = Object.values(LLM_SERVICES.OPENROUTER.models);
-      if (!validModels.includes(config.llm.model)) {
-        config.llm.model = LLM_SERVICES.OPENROUTER.models.QWEN3_235B;
-        // Defer save to prevent infinite loops during render
-        queueMicrotask(() => saveServiceConfig(config));
+      // Validate model is a known OpenRouter model — only when kind is openrouter.
+      // For custom-openai the model is whatever the local server has loaded; we
+      // accept any string.
+      if (config.llm.kind === 'openrouter') {
+        const validModels = Object.values(LLM_SERVICES.OPENROUTER.models);
+        if (!validModels.includes(config.llm.model)) {
+          config.llm.model = LLM_SERVICES.OPENROUTER.models.QWEN3_235B;
+          // Defer save to prevent infinite loops during render
+          queueMicrotask(() => saveServiceConfig(config));
+        }
+      }
+
+      // Local Mode: default to disabled when absent.
+      if (!config.localMode) {
+        config.localMode = { enabled: false };
       }
 
       // DEV override: ensure TTS is enabled during development to avoid

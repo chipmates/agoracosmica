@@ -4,6 +4,7 @@ import { loadServiceConfig } from './audio/config/serviceConfig';
 import { generateResponse } from './audio/llm';
 import { generateFreeTierSummary } from './proxy/freeTierAdapter';
 import { keyStorage } from './storage/keyStorageService';
+import { stripThinkingTagsFromText } from '../utils/thinkingTagStripper';
 import { Seed, Language } from '../types/global';
 
 import { useDomainStore } from '../stores/domainStore';
@@ -13,6 +14,8 @@ interface ServiceConfig {
   llm: {
     provider: string;
     model: string;
+    kind?: 'openrouter' | 'custom-openai';
+    baseURL?: string;
   };
   [key: string]: any;
 }
@@ -54,9 +57,17 @@ class SummaryService {
       const formattedHistory = this.formatConversationHistory(history);
       const language = useDomainStore.getState().language.current || 'en';
 
-      // Route: BYOK (OpenRouter) or free-tier (CF Worker → Nebius)
-      const keyMeta = await keyStorage.getKeyMetadata('openrouter');
-      const hasValidKey = keyMeta !== null && keyMeta.valid !== false;
+      // Route: BYOK (OpenRouter) / Local Mode (custom-openai) or free-tier (CF Worker → Nebius).
+      // Local Mode wins over the OpenRouter key check — never silently leak to Nebius
+      // when the user explicitly chose to run locally.
+      const _summaryKind = config.llm.kind ?? 'openrouter';
+      let hasValidKey: boolean;
+      if (_summaryKind === 'custom-openai') {
+        hasValidKey = !!config.llm.baseURL?.trim();
+      } else {
+        const keyMeta = await keyStorage.getKeyMetadata('openrouter');
+        hasValidKey = keyMeta !== null && keyMeta.valid !== false;
+      }
 
       let responseText: string;
       let provider: string;
@@ -102,7 +113,10 @@ class SummaryService {
         model = 'Qwen3-235B';
       }
 
-      // Post-process: strip em/en dashes (LLMs ignore the instruction), clean markdown artifacts
+      // Post-process: strip thinking blocks (thinking models in non-streaming mode
+      // can return `<think>...</think>` ahead of the answer), then em/en dashes
+      // (LLMs ignore the instruction), then clean markdown artifacts.
+      responseText = stripThinkingTagsFromText(responseText);
       responseText = responseText
         .replace(/ ?— ?/g, ', ')  // em dash → comma (trim surrounding spaces)
         .replace(/ – /g, ', ')    // en dash → comma

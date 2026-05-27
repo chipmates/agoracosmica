@@ -112,23 +112,34 @@ export const generateResponse = async ({
     }
 
     // ============================================
-    // Routing: BYOK (OpenRouter) → Free-tier (Nebius proxy)
+    // Routing: BYOK (OpenRouter) OR Local Mode (custom-openai) → Free-tier (Nebius proxy)
     // ============================================
 
-    // Check key existence AND validity — an invalid key should fall through to free-tier
-    const keyMeta = await keyStorage.getKeyMetadata('openrouter');
-    const hasValidOpenRouterKey = keyMeta !== null && keyMeta?.valid === true;
+    // Check active provider:
+    //   - 'openrouter': require a valid stored OpenRouter key.
+    //   - 'custom-openai' (Local Mode): require a configured baseURL; key is optional.
+    const serviceConfig = loadServiceConfig();
+    const providerKind = serviceConfig.llm.kind ?? 'openrouter';
 
-    if (hasValidOpenRouterKey) {
-      // BYOK path: user's own OpenRouter key
-      const serviceConfig = loadServiceConfig();
+    let hasUsableProvider = false;
+    if (providerKind === 'custom-openai') {
+      hasUsableProvider = !!serviceConfig.llm.baseURL?.trim();
+    } else {
+      const keyMeta = await keyStorage.getKeyMetadata('openrouter');
+      hasUsableProvider = keyMeta !== null && keyMeta?.valid === true;
+    }
+
+    if (hasUsableProvider) {
+      // BYOK / Local Mode path
       try {
         const result = await generateBYOKResponse({
           messages: processedMessages,
           instructions,
           seedData,
-          model: model || LLM_SERVICES.OPENROUTER.models.QWEN3_235B,
-          zdr: serviceConfig.llm.zdr ?? false,
+          model: model || (providerKind === 'openrouter'
+            ? LLM_SERVICES.OPENROUTER.models.QWEN3_235B
+            : serviceConfig.llm.model),
+          zdr: providerKind === 'openrouter' ? (serviceConfig.llm.zdr ?? false) : false,
           maxTokens,
           temperature,
           languageId: selectedLanguage,
@@ -154,9 +165,14 @@ export const generateResponse = async ({
         }
       };
       } catch (error: any) {
-        // Hosted build: a rejected key marks itself invalid and falls through
-        // to the free tier. A self-host build has no free tier, so the BYOK
-        // error surfaces to the user instead.
+        // Hosted build: a rejected OpenRouter key marks itself invalid and falls
+        // through to the free tier. A custom-openai endpoint failing should NOT
+        // fall through to OpenRouter free-tier — that would silently leak the
+        // conversation to Nebius after the user explicitly chose Local Mode.
+        // Surface the error instead.
+        if (providerKind === 'custom-openai') {
+          throw error;
+        }
         if ((error?.status === 401 || error?.status === 403) && !isSelfHost) {
           console.warn('[LLM] BYOK key rejected (HTTP', error.status, ') — marking invalid, falling through to free-tier');
           await keyStorage.markInvalid('openrouter');
@@ -167,11 +183,15 @@ export const generateResponse = async ({
       }
     }
 
-    // Self-host has no free-tier proxy. Reaching here means there is no
-    // usable BYOK key; surface a clear error rather than calling a worker
+    // Self-host / Local Mode has no free-tier proxy. Reaching here means there
+    // is no usable provider; surface a clear error rather than calling a worker
     // that is not deployed. The key gate makes this unreachable in normal use.
-    if (isSelfHost) {
-      throw new Error('A valid OpenRouter key is required.');
+    if (isSelfHost || providerKind === 'custom-openai') {
+      throw new Error(
+        providerKind === 'custom-openai'
+          ? 'No custom endpoint URL configured. Open settings and set the endpoint.'
+          : 'A valid OpenRouter key is required.'
+      );
     }
 
     // ============================================

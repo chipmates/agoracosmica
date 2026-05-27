@@ -1,9 +1,11 @@
 // client/src/services/audio/llm/llmAdapter.ts
-// Adapter wrapping llmService (OpenRouter BYOK) for the audio pipeline
+// Adapter wrapping llmService for the audio pipeline.
+// Supports both OpenRouter BYOK and Local Mode (custom OpenAI-compatible endpoint).
 
 import { llmService } from '../../llm/llmService';
 import { keyStorage } from '../../storage/keyStorageService';
-import { LLM_SERVICES } from '../config/serviceConfig';
+import { LLM_SERVICES, loadServiceConfig } from '../config/serviceConfig';
+import { defaultOpenRouterConfig, buildCustomOpenAIConfig, type ProviderConfig } from '../../llm/types';
 import {
   TextChunker,
   validateResponse,
@@ -120,13 +122,14 @@ const convertMessages = (
 // ============================================
 
 /**
- * BYOK adapter: uses user's OpenRouter API key
+ * BYOK adapter: routes to OpenRouter (BYOK) or a custom OpenAI-compatible
+ * endpoint (Local Mode), based on `serviceConfig.llm.kind`.
  */
 export const generateBYOKResponse = async ({
   messages,
   instructions,
   seedData = null,
-  model = LLM_SERVICES.OPENROUTER.models.QWEN3_235B,
+  model,
   maxTokens = 16000,
   temperature = 1,
   streamingCallback,
@@ -139,9 +142,30 @@ export const generateBYOKResponse = async ({
   const perfMetrics = performanceMonitor.startRequest();
 
   try {
-    const apiKey = await keyStorage.getKey('openrouter');
-    if (!apiKey) {
-      throw new Error('OpenRouter API key not found. Please add your key in settings.');
+    const config = loadServiceConfig();
+    const kind = config.llm.kind ?? 'openrouter';
+
+    let providerConfig: ProviderConfig;
+    let apiKey: string;
+    let resolvedModel: string;
+
+    if (kind === 'custom-openai') {
+      const baseURL = config.llm.baseURL?.trim();
+      if (!baseURL) {
+        throw new Error('Local Mode is on but no custom endpoint URL is configured. Open settings to set it.');
+      }
+      providerConfig = buildCustomOpenAIConfig(baseURL);
+      // API key is optional for local servers — accept empty.
+      apiKey = (await keyStorage.getKey('custom-llm')) ?? '';
+      resolvedModel = model || config.llm.model || 'local-model';
+    } else {
+      providerConfig = defaultOpenRouterConfig;
+      const k = await keyStorage.getKey('openrouter');
+      if (!k) {
+        throw new Error('OpenRouter API key not found. Please add your key in settings.');
+      }
+      apiKey = k;
+      resolvedModel = model || LLM_SERVICES.OPENROUTER.models.QWEN3_235B;
     }
 
     const systemMessage = createSystemMessage(instructions, seedData);
@@ -153,7 +177,7 @@ export const generateBYOKResponse = async ({
     const result = await llmService.chat({
       messages: formattedMessages,
       apiKey,
-      model,
+      model: resolvedModel,
       temperature,
       maxTokens,
       streamCallback: streamingCallback ? async (chunk: string) => {
@@ -164,7 +188,8 @@ export const generateBYOKResponse = async ({
       tools,
       onToolCall,
       signal,
-      zdr
+      zdr,
+      providerConfig,
     });
 
     if (!streamingCallback) {
@@ -176,8 +201,8 @@ export const generateBYOKResponse = async ({
     const response: LLMResponse = {
       response: responseText,
       metadata: {
-        model,
-        provider: 'openrouter',
+        model: resolvedModel,
+        provider: providerConfig.kind,
         timestamp: new Date().toISOString(),
         performanceMetrics: performanceMonitor.endRequest(perfMetrics, true),
         ...result.metadata

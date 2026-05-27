@@ -11,7 +11,7 @@ interface KeysDB extends DBSchema {
   keys: {
     key: string;
     value: {
-      id: 'openrouter' | 'openai' | 'deepinfra'; // 'deepinfra' kept for migration (legacy keys)
+      id: 'openrouter' | 'openai' | 'deepinfra' | 'custom-llm'; // 'deepinfra' kept for migration (legacy keys)
       value: string;           // Encrypted API key (AES-256-GCM) or base64 fallback
       encrypted: boolean;      // true = AES-256-GCM, false = base64 fallback (insecure context)
       salt: number[];          // Salt for PBKDF2 (empty for fallback)
@@ -68,7 +68,7 @@ class KeyStorageService {
    * @throws Error if encryption fails
    */
   async saveKey(
-    provider: 'openrouter' | 'openai' | 'deepinfra',
+    provider: 'openrouter' | 'openai' | 'deepinfra' | 'custom-llm',
     apiKey: string,
     options?: { provider?: string; lastValidated?: string }
   ): Promise<void> {
@@ -115,7 +115,7 @@ class KeyStorageService {
    * @returns Decrypted API key or null if not found
    * @throws Error if decryption fails
    */
-  async getKey(provider: 'openrouter' | 'openai' | 'deepinfra'): Promise<string | null> {
+  async getKey(provider: 'openrouter' | 'openai' | 'deepinfra' | 'custom-llm'): Promise<string | null> {
     const db = await this.getDB();
     const record = await db.get('keys', provider);
 
@@ -152,7 +152,7 @@ class KeyStorageService {
   /**
    * Check if key exists
    */
-  async hasKey(provider: 'openrouter' | 'openai' | 'deepinfra'): Promise<boolean> {
+  async hasKey(provider: 'openrouter' | 'openai' | 'deepinfra' | 'custom-llm'): Promise<boolean> {
     const db = await this.getDB();
     const record = await db.get('keys', provider);
     return !!record;
@@ -161,7 +161,7 @@ class KeyStorageService {
   /**
    * Get key metadata without retrieving the actual key
    */
-  async getKeyMetadata(provider: 'openrouter' | 'openai' | 'deepinfra'): Promise<{
+  async getKeyMetadata(provider: 'openrouter' | 'openai' | 'deepinfra' | 'custom-llm'): Promise<{
     valid?: boolean;
     lastUsed?: number;
     lastValidated?: string;
@@ -186,7 +186,7 @@ class KeyStorageService {
    * Note: This only deletes the encrypted key from IndexedDB.
    * The device encryption key remains for other keys.
    */
-  async deleteKey(provider: 'openrouter' | 'openai' | 'deepinfra'): Promise<void> {
+  async deleteKey(provider: 'openrouter' | 'openai' | 'deepinfra' | 'custom-llm'): Promise<void> {
     const db = await this.getDB();
     await db.delete('keys', provider);
   }
@@ -204,7 +204,7 @@ class KeyStorageService {
   /**
    * Mark key as invalid (after failed validation)
    */
-  async markInvalid(provider: 'openrouter' | 'openai' | 'deepinfra'): Promise<void> {
+  async markInvalid(provider: 'openrouter' | 'openai' | 'deepinfra' | 'custom-llm'): Promise<void> {
     const db = await this.getDB();
     const record = await db.get('keys', provider);
     if (record) {
@@ -277,7 +277,7 @@ class KeyStorageService {
     });
   }
 
-  private async updateLastUsed(provider: 'openrouter' | 'openai' | 'deepinfra'): Promise<void> {
+  private async updateLastUsed(provider: 'openrouter' | 'openai' | 'deepinfra' | 'custom-llm'): Promise<void> {
     const db = await this.getDB();
     const record = await db.get('keys', provider);
     if (record) {

@@ -23,14 +23,19 @@ import { setPendingQuestVerdict } from '../utils/questVerdict';
 const DEFAULT_LANGUAGE = 'english';
 
 const verifyModelConfig = (config: ServiceConfig): ServiceConfig => {
-  // Ensure LLM config has a valid provider and model
+  // Ensure LLM config has a valid provider and model.
+  // For Local Mode (custom-openai), the model is whatever the user typed in
+  // settings — leave it alone, even if empty, so the local server's default
+  // resolves naturally.
   if (!config.llm || !config.llm.provider) {
     config.llm = {
       provider: LLM_SERVICES.OPENROUTER.name,
-      model: LLM_SERVICES.OPENROUTER.models.QWEN3_235B
+      model: LLM_SERVICES.OPENROUTER.models.QWEN3_235B,
+      kind: 'openrouter',
     };
   }
-  if (!config.llm.model) {
+  const kind = config.llm.kind ?? 'openrouter';
+  if (!config.llm.model && kind === 'openrouter') {
     config.llm.model = LLM_SERVICES.OPENROUTER.models.QWEN3_235B;
   }
   return config;

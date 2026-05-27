@@ -15,6 +15,7 @@ import { mediaBaseUrl } from '../../config/runtime';
 import { loadServiceConfig, LLM_SERVICES } from '../audio/config/serviceConfig';
 import { preferencesAdapter } from '../../storage/preferencesAdapter';
 import { keyStorage } from '../storage/keyStorageService';
+import { stripThinkingTagsFromText } from '../../utils/thinkingTagStripper';
 import { getVoicesForCouncil } from '../audio/voices';
 import { getFullName } from './speakerRegistry';
 import { councilDiagnostics } from './diagnostics';
@@ -576,10 +577,19 @@ Begin the council now. Remember to use the EXACT format specified in your instru
         )
       : null;
 
-    // Determine routing: BYOK key → generateResponse(), otherwise → free-tier council proxy
-    const keyMeta = await keyStorage.getKeyMetadata('openrouter');
-    const hasBYOKKey = keyMeta !== null && keyMeta.valid !== false;
-    councilLog(`🔑 Council routing: ${hasBYOKKey ? 'BYOK (OpenRouter)' : 'Free-tier (Nebius proxy)'}`);
+    // Determine routing: BYOK / Local Mode → generateResponse(), otherwise → free-tier council proxy.
+    // Local Mode (custom-openai) takes precedence over the OpenRouter key check —
+    // a user who explicitly enabled Local Mode must never silently fall through to Nebius.
+    const _councilConfig = loadServiceConfig();
+    const _councilKind = _councilConfig.llm.kind ?? 'openrouter';
+    let hasBYOKKey: boolean;
+    if (_councilKind === 'custom-openai') {
+      hasBYOKKey = !!_councilConfig.llm.baseURL?.trim();
+    } else {
+      const keyMeta = await keyStorage.getKeyMetadata('openrouter');
+      hasBYOKKey = keyMeta !== null && keyMeta.valid !== false;
+    }
+    councilLog(`🔑 Council routing: ${hasBYOKKey ? (_councilKind === 'custom-openai' ? 'Local Mode (custom-openai)' : 'BYOK (OpenRouter)') : 'Free-tier (Nebius proxy)'}`);
 
     try {
       // 🚀 PERFORMANCE FIX: Clear seed data before council generation
@@ -696,8 +706,11 @@ Begin the council now. Remember to use the EXACT format specified in your instru
         });
       }
       
-      // Strip <think>...</think> from fullResponse for fallback parser
-      fullResponse = fullResponse.replace(/<think>[\s\S]*?<\/think>/g, '').trim();
+      // Strip <think>...</think> from fullResponse for fallback parser.
+      // The streaming path through llmService now strips these per-chunk via the
+      // shared util, but the council's own buffered copy of `fullResponse` is
+      // pre-strip — clean it here for the fallback parser path.
+      fullResponse = stripThinkingTagsFromText(fullResponse);
 
       // Flush any remaining content in parser
       const finalParseResult = streamingParser.complete();
