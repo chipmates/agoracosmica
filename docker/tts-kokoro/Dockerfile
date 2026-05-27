@@ -23,6 +23,10 @@
 
 FROM ghcr.io/remsky/kokoro-fastapi-cpu:latest
 
+# Pull latest Debian security patches on top of the upstream base.
+USER root
+RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/*
+
 # Patch logging to WARNING level. Kokoro by default logs incoming request
 # text at DEBUG.
 RUN sed -i 's/"level": "DEBUG"/"level": "WARNING"/' /app/api/src/main.py && \

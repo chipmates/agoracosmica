@@ -14,8 +14,11 @@
 FROM nvidia/cuda:12.4.1-cudnn-runtime-ubuntu22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install -y --no-install-recommends \
-      python3.11 python3.11-venv python3-pip ffmpeg curl ca-certificates \
+# `sox` is required at install time by faster-qwen3-tts (transitive dep
+# `sox` Python package calls the binary during setup.py). `apt upgrade`
+# pulls latest security patches for the Ubuntu 22.04 base.
+RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
+      python3.11 python3.11-venv python3-pip ffmpeg sox curl ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
 RUN python3.11 -m venv /opt/venv
@@ -25,6 +28,13 @@ ENV PATH="/opt/venv/bin:$PATH"
 # faster-qwen3-tts. The README is explicit: torch<=2.5.0 has graph-capture
 # bugs in this path, and Blackwell (RTX 50xx) needs cu128 / 2.7+.
 RUN pip install --no-cache-dir torch==2.5.1 --index-url https://download.pytorch.org/whl/cu124 \
+    # Pre-seed numpy + sox before faster-qwen3-tts pulls them in. The Python
+    # `sox` package's setup.py imports its own module to read __version__,
+    # which transitively imports numpy. Without numpy already installed
+    # pip's metadata-generation step for sox fails before sox itself can
+    # be installed. Splitting the install ensures numpy is on disk when
+    # sox's egg_info runs.
+    && pip install --no-cache-dir numpy \
     && pip install --no-cache-dir \
          faster-qwen3-tts \
          fastapi==0.115.* \

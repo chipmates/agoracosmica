@@ -55,7 +55,10 @@ COPY docker-entrypoint.sh /docker-entrypoint.d/00-agora-config.sh
 # scripts run as the container's runtime user (not root), so the entrypoint
 # needs write access to the static-root directory to rewrite config.js.
 USER root
-RUN chmod +x /docker-entrypoint.d/00-agora-config.sh && \
+# Pull latest Alpine security patches on top of the upstream base
+# (openssl libcrypto3/libssl3, libpng, libexpat, musl, nghttp2, zlib).
+RUN apk upgrade --no-cache && \
+    chmod +x /docker-entrypoint.d/00-agora-config.sh && \
     chown 101:101 /usr/share/nginx/html /usr/share/nginx/html/config.js
 USER 101
 

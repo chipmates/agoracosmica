@@ -29,6 +29,8 @@ ENV ALLOW_ORIGINS=[\"*\"]
 # request doesn't 404. Skipped on subsequent starts (snapshot_download is
 # idempotent against the HF cache).
 USER root
+# Pull latest Ubuntu security patches on top of the upstream Speaches base.
+RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/*
 COPY entrypoint.sh /usr/local/bin/agora-init.sh
 RUN chmod +x /usr/local/bin/agora-init.sh
 USER ubuntu
