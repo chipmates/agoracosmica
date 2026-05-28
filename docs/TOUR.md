@@ -5,7 +5,7 @@ Each interaction in Agora Cosmica orbits one figure. The four educational chapte
 Step through what it feels like to use the Library.
 
 <p align="center">
-  <img src="../.github/assets/screenshots/login-splash.webp" alt="Agora Cosmica welcome screen: cosmic background with historical figures awaiting at the horizon" width="100%" /><br/>
+  <img src="../.github/assets/screenshots/login-splash.webp" alt="Agora Cosmica welcome screen: Learn from 30 remarkable people from history, no signup, 30 free messages a day, with figures awaiting at the cosmic horizon" width="100%" /><br/>
   <em>1. Step into the Library · choose a name and begin</em>
 </p>
 

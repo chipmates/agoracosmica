@@ -25,6 +25,10 @@
   <a href="CONTRIBUTING.md">Contribute</a>
 </p>
 
+<p align="center">
+  <sub>⭐ Star this repo if you believe AI learning tools should be open, private, and public-benefit.</sub>
+</p>
+
 ---
 
 Agora Cosmica is a Living Library for wisdom from history. Thirty extraordinary figures from Marcus Aurelius to Ada Lovelace, Rumi to Frida Kahlo, each with their own researched voice and twelve wisdom teachings. The platform pairs hundreds of pre-recorded narrative episodes and multi-figure dialogues with live AI conversation. Live speech (text-to-speech and speech-to-text) runs on our own GPU servers in Germany. [See all 30 figures →](https://agoracosmica.org/figures)
@@ -32,7 +36,7 @@ Agora Cosmica is a Living Library for wisdom from history. Thirty extraordinary 
 30 free messages a day, no signup required. Bilingual English and German. On the path to community-driven development: anyone can vote on what gets added next, right inside the app.
 
 <p align="center">
-  <img src=".github/assets/screenshots/login-splash.webp" alt="Agora Cosmica welcome screen: cosmic background with historical figures awaiting at the horizon" width="100%" />
+  <img src=".github/assets/screenshots/council-moderator.webp" alt="Cosmic Council composer: select a moderator and three figures from across history to convene in dialogue" width="100%" />
 </p>
 
 ---
@@ -76,6 +80,8 @@ Each interaction in Agora Cosmica orbits one figure. The four educational chapte
 ## Who can use this, and how?
 
 Most people just visit **[agoracosmica.org](https://agoracosmica.org)**: free, no signup, 30 messages a day. This repository is for **auditing the privacy claims** by reading the code, **contributing** (translations, bug fixes, accessibility), or **running a local copy** for personal study.
+
+**Star the repo** to follow privacy-first AI architecture, self-hosted speech tooling, ethical historical-character AI design, and nonprofit alternatives to engagement-driven AI products.
 
 **Two licenses, one project.** Code is **[AGPL-3.0](LICENSE)** (fork freely, copyleft applies to public network deployments). Content (stories, voices, factchecks, artwork) is **© ChipMates gemeinnützige GmbH** at launch, transitioning to **CC-BY 4.0 within 6 to 12 months**. See [CONTENT-LICENSE.md](CONTENT-LICENSE.md) for full terms.
 
