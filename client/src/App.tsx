@@ -23,6 +23,7 @@ import NutzungsbedingungenPage from './pages/NutzungsbedingungenPage';
 // pages (Impressum, Datenschutz, Cookie Policy, Nutzungsbedingungen).
 import { sendConversion } from './utils/public/gclidCapture';
 import { sendEntryBeacon } from './utils/entryBeacon';
+import { sendSignupBeacon } from './utils/signupBeacon';
 // Dev/test pages — only imported in dev mode so Vite excludes them from production build.
 // Kept lean: contributor-facing diagnostics and benchmarks only. Internal A/B harnesses
 // and visual-design experiments live in the private workspace.
@@ -358,6 +359,13 @@ function App(): React.ReactElement {
     // Anonymous entry beacon — closes the bounce stage between page-load
     // beacon (arrival) and session row (first Turnstile-gated interaction).
     sendEntryBeacon();
+
+    // Anonymous signup beacon — fires only for new accounts (isFirstLogin),
+    // so the dashboard can show total signups including organic users (the
+    // gclid-gated profile_created conversion shows ad-attributed ones only).
+    if (isFirstLogin) {
+      sendSignupBeacon();
+    }
 
     // Send conversion event if user came from a Google Ad
     sendConversion('profile_created');

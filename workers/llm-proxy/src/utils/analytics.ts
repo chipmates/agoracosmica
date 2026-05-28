@@ -179,6 +179,36 @@ export function trackEntry(
 }
 
 /**
+ * Track a new-account signup. Fires from the client when handleEntryComplete
+ * runs AND the user is new (no prior profile in IndexedDB). Distinct from
+ * entry (which fires for signup OR sign-in) and from profile_created (which
+ * is gclid-gated, ad-attributed only). Lets the dashboard show total signups
+ * including organic, which neither entry nor profile_created can show alone.
+ *
+ * dataset: agora_llm
+ * blobs: ['signup', path, '', language, '200', '', country]
+ * indexes: ['signup']
+ */
+export function trackSignup(
+  env: Env,
+  data: {
+    path: string;
+    language: string;
+    country: string;
+  }
+): void {
+  try {
+    env.ANALYTICS.writeDataPoint({
+      blobs: ['signup', data.path, '', data.language, '200', '', data.country],
+      doubles: [0],
+      indexes: ['signup'],
+    });
+  } catch {
+    // Analytics must never break the request path
+  }
+}
+
+/**
  * Track a rate limit hit (429).
  * dataset: agora_llm
  * blobs: ['ratelimit', endpoint, reason, '', '429', '', country]

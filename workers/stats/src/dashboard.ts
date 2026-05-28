@@ -301,6 +301,71 @@ body {
   background: color-mix(in srgb, var(--gold-deep) 15%, transparent);
 }
 
+/* Funnel: horizontal flow on desktop, vertical on mobile.
+   Each stage is a tile with label + value + small sub. Between stages,
+   an arrow tile shows the conversion percentage from prev → next. */
+.funnel-row {
+  display: flex; align-items: stretch; gap: 6px;
+  margin-top: 10px; flex-wrap: nowrap;
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.funnel-row::-webkit-scrollbar { display: none; }
+.funnel-stage {
+  flex: 1 1 0; min-width: 110px;
+  padding: 10px 8px;
+  background: color-mix(in srgb, var(--gold) 5%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 12%, transparent);
+  border-radius: var(--radius-sm);
+  text-align: center;
+  display: flex; flex-direction: column; justify-content: center;
+}
+.funnel-stage-label {
+  font-size: 0.625rem; color: var(--dim);
+  text-transform: uppercase; letter-spacing: 0.06em;
+  line-height: 1.2;
+}
+.funnel-stage-value {
+  font-size: 1.375rem; font-weight: 700; color: var(--gold);
+  line-height: 1.1; margin: 4px 0 2px;
+}
+.funnel-stage-sub {
+  font-size: 0.625rem; color: var(--dim); line-height: 1.2;
+}
+.funnel-arrow {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  color: var(--dim); font-size: 0.75rem;
+  min-width: 38px; padding: 0 2px;
+  flex-shrink: 0;
+}
+.funnel-arrow-icon { font-size: 1rem; line-height: 1; }
+.funnel-arrow-pct {
+  font-size: 0.75rem; font-weight: 600;
+  color: var(--tx2); margin-top: 2px; white-space: nowrap;
+}
+.funnel-arrow-pct.weak { color: var(--err); }
+.funnel-arrow-pct.warn { color: var(--warn); }
+.funnel-arrow-pct.ok { color: var(--ok); }
+
+/* Parallel-engagement label sits between the sequential funnel and the
+   parallel branches. Subtle text indicating the flow forks. */
+.funnel-parallel-label {
+  font-size: 0.6875rem; color: var(--dim);
+  text-transform: uppercase; letter-spacing: 0.06em;
+  margin: 12px 0 6px; padding-left: 2px;
+  text-align: center; line-height: 1.3;
+}
+/* Parallel stages get a slightly different visual treatment — softer fill,
+   wider gap — so they're clearly distinct from the sequential funnel. */
+.funnel-row--parallel {
+  gap: 10px;
+}
+.funnel-stage--parallel {
+  background: color-mix(in srgb, var(--gold) 3%, transparent);
+  border-style: dashed;
+  border-color: color-mix(in srgb, var(--gold-deep) 18%, transparent);
+}
+
 /* Limits config grid */
 .limits-grid {
   display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
@@ -538,6 +603,11 @@ html { scrollbar-color: var(--bg-highlight) transparent; scrollbar-width: thin; 
   .tab-header { flex-direction: column; gap: 2px; margin-bottom: 12px; }
   .tab-updated { align-self: flex-start; }
   .corr-bars { height: 70px; }
+  /* Funnel stacks vertically on small screens with arrows pointing down. */
+  .funnel-row { flex-direction: column; gap: 4px; overflow-x: visible; }
+  .funnel-stage { min-width: 0; padding: 12px; }
+  .funnel-arrow { flex-direction: row; gap: 8px; min-width: 0; padding: 2px 0; }
+  .funnel-arrow-icon { transform: rotate(90deg); font-size: 0.875rem; }
 }
 
 /* === PRINT === */
@@ -711,7 +781,7 @@ const COLORS = {
   models: { 'qwen3-tts': '#9D83CD', kokoro: '#68C397', 'f5-tts': '#5B8BD4', whisper: '#E6BC5C' },
   rl: { gpu_capacity_german: '#E97451', daily_limit: '#F5A623', burst_limit: '#9D83CD', daily: '#F5A623', global: '#E97451', council: '#5B8BD4', summary: '#E6BC5C' },
 };
-const MODE_LABELS = { seed_conversation: 'Wisdom', free_conversation: 'Freetalk', seed_challenge: 'Quest' };
+const MODE_LABELS = { introduction: 'Story', seed_conversation: 'Wisdom', prism: 'Prism', challenge: 'Quest', free_conversation: 'Freetalk', seed_challenge: 'Quest' };
 const RANGE_OPTS = [
   { val: 1, label: 'Today' },
   { val: 7, label: '7 days' },
@@ -859,6 +929,65 @@ function kpi(label, value, opts) {
 }
 
 // Chart card wrapper
+// Render a horizontal-on-desktop, vertical-on-mobile funnel of conversion
+// stages. Each stage is { label, value, sub? }. Drop-off % is computed
+// between consecutive stages and color-coded (>=50% ok, 20-50% warn, <20% weak).
+function funnelHtml(stages) {
+  if (!stages || stages.length === 0) return '';
+  var parts = [];
+  for (var i = 0; i < stages.length; i++) {
+    var s = stages[i];
+    var subHtml = s.sub ? '<div class="funnel-stage-sub">' + s.sub + '</div>' : '';
+    parts.push(
+      '<div class="funnel-stage">' +
+        '<div class="funnel-stage-label">' + s.label + '</div>' +
+        '<div class="funnel-stage-value">' + fmt(s.value) + '</div>' +
+        subHtml +
+      '</div>'
+    );
+    if (i < stages.length - 1) {
+      var next = stages[i + 1];
+      var p = s.value > 0 ? Math.round((next.value / s.value) * 100) : 0;
+      var tone = p >= 50 ? 'ok' : (p >= 20 ? 'warn' : 'weak');
+      var pctText = s.value > 0 ? p + '%' : '—';
+      parts.push(
+        '<div class="funnel-arrow">' +
+          '<span class="funnel-arrow-icon" aria-hidden="true">→</span>' +
+          '<span class="funnel-arrow-pct ' + tone + '">' + pctText + '</span>' +
+        '</div>'
+      );
+    }
+  }
+  return '<div class="funnel-row" role="list" aria-label="User funnel">' + parts.join('') + '</div>';
+}
+
+// Render parallel engagement endpoints AFTER a sequential funnel. Each stage
+// shows what fraction of the "from" value (e.g., Sessions) reached this
+// engagement type. No drop-off arrows between parallel stages — they're not
+// sequential, just different ways a sessioned user can engage.
+function parallelEngagementHtml(fromLabel, fromValue, stages) {
+  if (!stages || stages.length === 0) return '';
+  var parts = [];
+  for (var i = 0; i < stages.length; i++) {
+    var s = stages[i];
+    var p = fromValue > 0 ? Math.round((s.value / fromValue) * 100) : 0;
+    var tone = p >= 50 ? 'ok' : (p >= 20 ? 'warn' : 'weak');
+    var pctLine = fromValue > 0
+      ? '<div class="funnel-arrow-pct ' + tone + '" style="margin-top:4px">' + p + '% of ' + fromLabel + '</div>'
+      : '';
+    parts.push(
+      '<div class="funnel-stage funnel-stage--parallel">' +
+        '<div class="funnel-stage-label">' + s.label + '</div>' +
+        '<div class="funnel-stage-value">' + fmt(s.value) + '</div>' +
+        (s.sub ? '<div class="funnel-stage-sub">' + s.sub + '</div>' : '') +
+        pctLine +
+      '</div>'
+    );
+  }
+  return '<div class="funnel-parallel-label">↳ engagement after ' + fromLabel + ' (parallel — a sessioned user can do multiple)</div>' +
+    '<div class="funnel-row funnel-row--parallel" role="list" aria-label="Engagement endpoints">' + parts.join('') + '</div>';
+}
+
 function chartCard(title, body, cls) {
   return '<div class="card ' + (cls || '') + '"><div class="kpi-label" style="margin-bottom:6px">' + title + '</div>' + body + '</div>';
 }
@@ -1217,6 +1346,20 @@ async function loadOverview() {
     { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'entry' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
     // Page arrivals sparkline
     { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
+    // Funnel split: all distinct page paths with counts. Aggregated client-side
+    // into marketing (Astro static figures/themes/about/contact, both langs) vs
+    // app (React SPA). AE SQL does not support LIKE pattern matching, so we
+    // group by path and classify in JS by prefix + exact-match lookup.
+    { sql: "SELECT blob2 as path, COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND blob2 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY path ORDER BY c DESC LIMIT 200", dataset: 'agora_llm' },
+    // Signups (total new-account beacons; distinct from gclid-gated profile_created)
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'signup' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    // Content completed total (blob8='completed' OR legacy empty blob8 — see analytics.ts trackPlayback comment).
+    // Parallel engagement endpoint alongside Chats — a sessioned user can do both.
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND (blob8 = '' OR blob8 = 'completed') AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    // Chat by mode (blob3 holds the mode for chat events). Breaks down chat
+    // activity across the three interactive modes: seed_conversation (Wisdom),
+    // challenge (Quest), free_conversation (Freetalk). MODE_LABELS maps raw → display.
+    { sql: "SELECT blob3 as mode, COUNT() as c FROM agora_llm WHERE blob1 = 'chat' AND blob3 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY mode ORDER BY c DESC", dataset: 'agora_llm' },
   ];
 
   var r = await batch(queries);
@@ -1256,8 +1399,49 @@ async function loadOverview() {
   var arrivalsPrev = val(r[23]);
   var entries = val(r[24]);
   var sparkArrivals = rows(r[25]).map(function(r) { return r.c; });
-  var bouncePct = arrivals > 0 ? Math.round((1 - entries / arrivals) * 100) : 0;
-  var bounceSub = arrivals > 0 ? bouncePct + '% bounced before entry' : 'no arrivals yet';
+  // Funnel: marketing arrivals (Astro static pages) vs app arrivals (React SPA).
+  // We get all page paths grouped + counted from AE in one query (LIKE is not
+  // supported by AE SQL) and classify them here in JS using prefix lookup +
+  // exact-match for the leaf marketing pages.
+  var MARKETING_PREFIXES = ['/figures', '/themes', '/de/figures', '/de/themes'];
+  var MARKETING_EXACT = {
+    '/about': 1, '/about/': 1, '/contact': 1, '/contact/': 1,
+    '/impressum': 1, '/impressum/': 1, '/datenschutz': 1, '/datenschutz/': 1,
+    '/de/about': 1, '/de/about/': 1, '/de/contact': 1, '/de/contact/': 1,
+    '/de/impressum': 1, '/de/impressum/': 1, '/de/datenschutz': 1, '/de/datenschutz/': 1,
+  };
+  var allPaths = rows(r[26]);
+  var marketingArrivals = 0;
+  var topMarketingPages = [];
+  for (var i = 0; i < allPaths.length; i++) {
+    var pathRow = allPaths[i];
+    var p = String(pathRow.path || '');
+    var isMkt = false;
+    for (var j = 0; j < MARKETING_PREFIXES.length; j++) {
+      if (p.indexOf(MARKETING_PREFIXES[j]) === 0) { isMkt = true; break; }
+    }
+    if (!isMkt && MARKETING_EXACT[p]) isMkt = true;
+    if (isMkt) {
+      marketingArrivals += Number(pathRow.c) || 0;
+      // Include every marketing page (figures, themes, about, contact, impressum,
+      // datenschutz + their /de/ variants) so the chart reflects total marketing-
+      // page traffic. Labels are computed in the topMarketingItems map below.
+      topMarketingPages.push(pathRow);
+    }
+  }
+  topMarketingPages.sort(function(a, b) { return b.c - a.c; });
+  topMarketingPages = topMarketingPages.slice(0, 15);
+  var signups = val(r[27]);
+  // Engagement endpoints (parallel from Sessions): content played + chat sent.
+  // Content Started total is derived from the existing contentByType breakdown
+  // (saves one query). Content Completed and Chat-by-Mode are new dedicated queries.
+  var contentStarted = contentByType.reduce(function(acc, row) { return acc + (Number(row.c) || 0); }, 0);
+  var contentCompleted = val(r[28]);
+  var chatByMode = rows(r[29]);
+  var appArrivals = Math.max(0, arrivals - marketingArrivals);
+  // bouncePct/bounceSub removed with the Arrivals hero KPI — the metric mixed
+  // marketing-page bounces and login-page bounces into a single misleading
+  // percentage. Per-stage drop-off lives in the Funnel below.
 
   // Alerts
   var alerts = '';
@@ -1278,14 +1462,34 @@ async function loadOverview() {
 
   var html = '';
 
-  // Hero KPIs
-  // "Arrivals" counts page-load beacons — true visit count regardless of engagement.
-  // Sub-line shows the bounce rate at the very first stage (page → entry transition).
-  html += kpi('Arrivals', arrivals, { hero: true, spark: sparkArrivals, sparkColor: '#5B8BD4', delta: arrivalsPrev, sub: bounceSub });
-  // "Sessions" counts JWT issuance events (free-tier path only, post-lazy-refresh = roughly per real engagement window).
-  // Phase 0a (SESSION_LAST_SEEN KV gating, deferred) will tighten this to "fresh devices".
-  html += kpi('Sessions', sessions, { hero: true, spark: sparkSessions, delta: sessionsPrev, sub: 'engagement windows' });
-  html += kpi('Conversations', totalLlm, { hero: true, spark: sparkChats, sparkColor: '#5B8BD4', delta: chatsPrev, sub: chats + ' chat · ' + councils + ' council · ' + summaries + ' summary' });
+  // Hero KPIs removed 2026-05-25: the previous Arrivals/Sessions/Conversations
+  // trio duplicated what the Funnel below already shows, and "Arrivals" mixed
+  // marketing and app page beacons in a way that double-counted transitions
+  // (a single user landing on /figures then clicking through to / fires both
+  // beacons). The Funnel is the primary view; per-channel KPIs with deltas
+  // live in the secondary row + the Marketing / Engagement / Audio tabs.
+
+  // Funnel: marketing → app → entry → signup → session. Sequential drop-offs.
+  // Then PARALLEL engagement endpoints (content played + chat sent) — these are
+  // not sequential after Sessions, they're parallel choices, so they render
+  // below the main funnel with their own % of Sessions.
+  var funnelStages = [
+    { label: 'Marketing', value: marketingArrivals, sub: 'figures · themes · about' },
+    { label: 'App', value: appArrivals, sub: '/ + SPA routes' },
+    { label: 'Entry', value: entries, sub: 'past LoginPage' },
+    { label: 'Signup', value: signups, sub: 'new accounts' },
+    { label: 'Sessions', value: sessions, sub: 'first chat' },
+  ];
+  var engagementStages = [
+    { label: 'Content Started', value: contentStarted, sub: 'first-play events' },
+    { label: 'Content Completed', value: contentCompleted, sub: 'fully heard' },
+    { label: 'Chats', value: chats, sub: 'LLM messages' },
+  ];
+  html += chartCard(
+    'User Funnel',
+    funnelHtml(funnelStages) + parallelEngagementHtml('Sessions', sessions, engagementStages),
+    'card-full'
+  );
 
   // Secondary KPIs
   html += kpi('Chat Messages', chats, { spark: sparkChats, delta: chatsPrev });
@@ -1320,11 +1524,50 @@ async function loadOverview() {
   }));
   html += chartCard('Content Started by Type', barsHtml(contentTypeItems, '#68C397'), 'card-half');
 
+  // Chat activity by mode — Wisdom (seed_conversation), Quest (challenge),
+  // Freetalk (free_conversation). Sibling to "Content Started by Type" so
+  // users can compare listening vs talking activity at a glance.
+  var chatModeItems = aggregateByLabel(chatByMode.map(function(r) {
+    return { label: modeLabel(r.mode || 'unknown'), c: r.c };
+  }));
+  html += chartCard('Chat by Mode', barsHtml(chatModeItems, '#D8A4C0'), 'card-half');
+
   // Top figures by content first-play (same data, grouped by figure)
   var topFiguresContentItems = aggregateByLabel(topFiguresByContent.map(function(r) {
     return { label: cap(r.figure), c: r.c };
   }).filter(function(r) { return r.label; }));
   html += chartCard('Top Figures by Plays', barsHtml(topFiguresContentItems, '#5B8BD4'), 'card-half');
+
+  // Top marketing pages by arrivals — which figure / theme pages are pulling
+  // the most paid + organic traffic. Strips the path to a short readable
+  // label ("aurelius" not "/figures/marcus-aurelius/"). Empty if no marketing
+  // arrivals yet (typical for first 1-2 days after the page-beacon fix went live).
+  var topMarketingItems = topMarketingPages.map(function(row) {
+    // Strip path to a short readable label without regex — TS template literals
+    // eat regex escape sequences, so we use plain string methods. Distinguishes
+    // EN/DE with a "(de)" suffix and labels the index pages explicitly.
+    var raw = String(row.path || '');
+    var isDe = raw.indexOf('/de/') === 0;
+    var p = isDe ? raw.slice(4) : (raw.charAt(0) === '/' ? raw.slice(1) : raw);
+    var prefix = '';
+    var bucket = '';
+    if (p.indexOf('figures/') === 0) { p = p.slice(8); bucket = 'figures'; }
+    else if (p === 'figures') { p = ''; bucket = 'figures'; }
+    else if (p.indexOf('themes/') === 0) { p = p.slice(7); prefix = '~'; bucket = 'themes'; }
+    else if (p === 'themes') { p = ''; prefix = '~'; bucket = 'themes'; }
+    if (p.length > 0 && p.charAt(p.length - 1) === '/') p = p.slice(0, -1);
+    var label;
+    if (p === '') {
+      if (bucket === 'themes') label = 'all themes';
+      else if (bucket === 'figures') label = 'all figures';
+      else label = raw || '/';
+    } else {
+      label = prefix + p;
+    }
+    if (isDe) label += ' (de)';
+    return { label: label, c: row.c };
+  });
+  html += chartCard('Top Marketing Pages', topMarketingItems.length > 0 ? barsHtml(topMarketingItems, '#9B7BC7') : '<div class="empty-state" style="padding:20px 0">No marketing arrivals yet ' + RANGE_LABEL[S.range] + '</div>', 'card-wide');
 
   // Computed insight
   var insights = [];
