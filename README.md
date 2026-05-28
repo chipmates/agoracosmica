@@ -14,7 +14,7 @@
   <a href="#"><img src="https://img.shields.io/badge/TypeScript-strict-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript: strict" /></a>
   <a href="docs/ACCESSIBILITY.md"><img src="https://img.shields.io/badge/WCAG-2.2%20AA-green?style=flat-square" alt="WCAG 2.2 AA" /></a>
   <a href="docs/COMPLIANCE.md"><img src="https://img.shields.io/badge/EU-Compliant-blue?style=flat-square" alt="EU Compliant" /></a>
-  <a href="https://securityheaders.com/?q=https%3A%2F%2Fagoracosmica.org&followRedirects=on"><img src="https://img.shields.io/badge/Security%20Headers-A-green?style=flat-square" alt="Security Headers: A" /></a>
+  <a href="https://securityheaders.com/?q=https%3A%2F%2Fagoracosmica.org&followRedirects=on"><img src="https://img.shields.io/badge/Security%20Headers-A%2B-brightgreen?style=flat-square" alt="Security Headers: A+" /></a>
   <a href="docs/SELF-HOSTING.md"><img src="https://img.shields.io/badge/Self--host-Docker-2496ED?style=flat-square&logo=docker&logoColor=white" alt="Self-host with Docker" /></a>
 </p>
 
