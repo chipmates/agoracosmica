@@ -20,6 +20,23 @@ export default defineConfig({
   build: {
     format: 'directory',
   },
+  // Auto-generates SHA-256 hashes for every inline <script> Astro emits
+  // (the astro:visible/astro:idle bootstrap blocks and the island runtime)
+  // and injects them into a per-page <meta http-equiv="Content-Security-Policy">.
+  // The hashes are deterministic per Astro version; the unique set is small
+  // enough to also enumerate in client/public/_headers script-src so the
+  // response-header CSP (AND-enforced with meta) allows the same inline blocks.
+  security: {
+    csp: {
+      // Style-src in the meta tag must be at least as permissive as the
+      // response-header style-src ('self' 'unsafe-inline'), otherwise the
+      // AND-merge between meta and header blocks inline styles that React
+      // islands inject at runtime. Script-src stays strict (auto-hashed).
+      styleDirective: {
+        resources: ["'self'", "'unsafe-inline'"],
+      },
+    },
+  },
   i18n: {
     defaultLocale: 'en',
     locales: ['en', 'de'],
