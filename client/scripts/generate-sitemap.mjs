@@ -12,7 +12,6 @@ const SCRIPTS_DIR = import.meta.dirname;
 const CLIENT_DIR = join(SCRIPTS_DIR, '..');
 const REPO_ROOT = join(CLIENT_DIR, '..');
 const BUILD_DIR = join(CLIENT_DIR, 'build');
-const MARKETING_DIR = join(REPO_ROOT, 'marketing');
 
 // Slug mapping (must stay in sync with slugMap.ts)
 const FIGURE_SLUGS = [

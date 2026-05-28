@@ -32,7 +32,6 @@ from __future__ import annotations
 import io
 import logging
 import os
-import struct
 import subprocess
 import tempfile
 import wave
@@ -40,7 +39,6 @@ from pathlib import Path
 from typing import Optional
 
 import numpy as np
-import soundfile as sf
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
@@ -223,6 +221,7 @@ def _encode_mp3(audio: np.ndarray, sr: int) -> bytes:
             try:
                 os.unlink(p)
             except FileNotFoundError:
+                # mp3 may not exist if ffmpeg failed before writing it
                 pass
 
 
