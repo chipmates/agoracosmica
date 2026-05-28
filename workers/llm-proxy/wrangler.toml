@@ -38,7 +38,10 @@ NEBIUS_BASE_URL = "https://api.studio.nebius.com/v1"
 # - TURNSTILE_SECRET_KEY
 # - JWT_SIGNING_KEY (openssl rand -hex 32)
 
-# Routes (uncomment after DNS setup)
+# Routes for llm.agoracosmica.org are configured via the Cloudflare
+# dashboard (Workers > Triggers > Custom Domains), not via wrangler.
+# Kept here for reference. If you ever rebuild routes from this file,
+# also remove the dashboard-side binding first to avoid a conflict.
 # [[routes]]
 # pattern = "llm.agoracosmica.org/*"
 # zone_name = "agoracosmica.org"

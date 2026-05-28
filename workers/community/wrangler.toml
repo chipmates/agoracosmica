@@ -22,7 +22,9 @@ ALLOWED_ORIGINS = "https://agoracosmica.org,https://www.agoracosmica.org"
 # Secrets (set via wrangler secret put):
 # - IP_SALT      (openssl rand -hex 32) — rotated quarterly to prevent long-term tracking
 
-# Routes (uncomment after DNS setup)
+# community.agoracosmica.org is not currently bound to a public route.
+# Uncomment the block below to expose this worker, or configure the
+# binding via the Cloudflare dashboard (Workers > Triggers).
 # [[routes]]
 # pattern = "community.agoracosmica.org/*"
 # zone_name = "agoracosmica.org"
