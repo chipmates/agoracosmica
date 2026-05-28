@@ -56,7 +56,13 @@
           if (Object.prototype.hasOwnProperty.call(metadata, k)) body[k] = metadata[k];
         }
       }
-      fetch('/api/conversions', {
+      // Absolute worker URL on purpose. agoracosmica.org has no /api/* route,
+      // so a relative path falls through the SPA fallback (/* /index.html 200)
+      // and silently returns the React app HTML with 200. The fetch resolves
+      // successfully, .catch() never fires, and the conversion never reaches
+      // the worker. CSP allows https://*.agoracosmica.org in connect-src,
+      // and worker CORS allows this origin explicitly.
+      fetch('https://llm.agoracosmica.org/api/conversions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
@@ -69,7 +75,8 @@
     try {
       var docLang = (document.documentElement.lang || 'en').toLowerCase();
       var language = docLang.indexOf('de') === 0 ? 'de' : 'en';
-      fetch('/v1/page', {
+      // Absolute worker URL for the same reason as fireConversion above.
+      fetch('https://llm.agoracosmica.org/v1/page', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ path: window.location.pathname, language: language }),
