@@ -133,6 +133,15 @@
   gap: clamp(1.5rem, 4vw, 3.5rem);
 }
 
+/* Two-column desktop only: the copy column can run as tall as the orbital
+   system, so its last line lands near the hero's bottom edge. The library
+   section below pulls its background up 5rem to kill the color seam, and that
+   would paint over the last line (most visible in German, where the copy runs
+   longer). Reserve more than 5rem here so the final line always stays clear. */
+@media (min-width: 901px) {
+  .v2-hero-inner { padding-bottom: clamp(6.5rem, 7vw, 7.5rem); }
+}
+
 /* ── copy column ─────────────────────────────────────────────────────── */
 .v2-copy { max-width: 38rem; }
 
