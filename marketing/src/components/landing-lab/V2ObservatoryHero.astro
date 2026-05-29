@@ -1,0 +1,208 @@
+---
+// "The Observatory" cinematic hero for the production homepages (/ and /de/).
+//
+// The golden orbital ring of the login page becomes a living solar system:
+// figure-portrait "planets" ride three concentric gold rings around a glowing
+// central core, while the H1 + CTA sit beside the system. Hover or focus a
+// planet to spotlight it and surface the figure's name.
+//
+// LCP discipline: this whole block is static server HTML. The deep-blue
+// gradient, the core glow, the three rings, the H1, and every portrait paint
+// before any JS. Each planet's resting angle is baked into a CSS custom
+// property at build time, so the arrangement is correct on first paint. The
+// V2ObservatoryMotion island (client:idle) only flips on the orbit keyframes
+// and the pointer-parallax, and it stays off entirely under reduced motion.
+
+import { getFiguresCatalog } from '@client/data/public/figuresCatalog';
+import { figureIdToSlug } from '@client/data/public/slugMap';
+import { MEDIA_URL, publicUrl } from '../../lib/urls';
+import { getT } from '../../i18n';
+import type { Lang } from '../../i18n';
+import './v2-observatory.css';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = getT(lang);
+const figures = getFiguresCatalog(lang);
+const byId = new Map(figures.map(f => [f.id, f]));
+
+// All displayed hero strings, keyed by language, from the repositioned
+// education-first copy. The platform tagline (subhead) and the trust line are
+// LOCKED verbatim per language. The CTA label reuses the navbar's
+// nav.startExploring so the hero and the navbar say the same word.
+type HeroCopy = {
+  eyebrow: string;
+  title: string;
+  subhead: string;
+  lede: string;
+  trust: string;
+  free: string;
+  systemHint: string;
+  scrollCue: string;
+  scrollCueAria: string;
+  systemAria: string;
+};
+
+const COPY: Record<Lang, HeroCopy> = {
+  en: {
+    eyebrow: 'Voices from across history',
+    title: "Learn from 30 of history's remarkable people, Marcus Aurelius to Ada Lovelace",
+    subhead: 'A Living Library You Can Talk To',
+    lede: "Watch them turn in their orbits. Reach toward any one and the teaching begins, a narrated life story, a core idea to think through, four minds circling one question. You can also talk it through with them directly. Every voice here is an AI Echo, shaped by a real person's own writing. An interpretation, not a recording.",
+    trust: 'Nonprofit · Open Source · No User Tracking',
+    free: '30 free messages a day. No signup needed.',
+    systemHint: 'Reach toward anyone',
+    scrollCue: 'The library',
+    scrollCueAria: 'Scroll to the library',
+    systemAria:
+      'An orbital system of thirty remarkable people from history circling a glowing core. Marcus Aurelius, Albert Einstein, and Frida Kahlo ride the inner ring.',
+  },
+  de: {
+    eyebrow: 'Stimmen aus der ganzen Geschichte',
+    title: 'Lerne von 30 bemerkenswerten Menschen, von Marc Aurel bis Ada Lovelace',
+    subhead: 'Eine lebendige Bibliothek, mit der du sprechen kannst',
+    lede: 'Sieh ihnen zu, wie sie ihre Bahnen ziehen. Streck die Hand nach einem aus, und der Unterricht beginnt, eine erzählte Lebensgeschichte, ein zentraler Gedanke zum Durchdenken, vier Köpfe, die eine Frage umkreisen. Du kannst es auch direkt mit ihnen besprechen. Jede Stimme hier ist ein KI-Echo, geformt aus dem, was ein echter Mensch selbst geschrieben hat. Eine Deutung, keine Aufnahme.',
+    trust: 'Gemeinnützig · Open Source · Kein Nutzer-Tracking',
+    free: '30 kostenlose Nachrichten pro Tag. Ohne Anmeldung.',
+    systemHint: 'Streck die Hand nach jemandem aus',
+    scrollCue: 'Die Bibliothek',
+    scrollCueAria: 'Zur Bibliothek scrollen',
+    systemAria:
+      'Ein orbitales System aus dreißig bemerkenswerten Menschen der Geschichte, die einen leuchtenden Kern umkreisen. Marcus Aurelius, Albert Einstein und Frida Kahlo ziehen ihre Bahn auf dem inneren Ring.',
+  },
+};
+
+const copy = COPY[lang];
+// The hero CTA reuses the navbar's label so both surfaces stay in lockstep.
+const ctaLabel = t('nav.startExploring');
+
+// Three rings, recognition-led: the most familiar faces ride the inner ring
+// closest to the core, the rest fan out. Counts: 3 inner, 5 middle, 7 outer.
+const ringPlan: { ids: string[]; spin: number; reverse: boolean }[] = [
+  // inner ring: the three most universally recognized faces, closest to the core
+  { ids: ['aurelius', 'einstein', 'kahlo'], spin: 64, reverse: false },
+  { ids: ['nietzsche', 'vinci', 'jung', 'gandhi', 'angelou'], spin: 92, reverse: true },
+  { ids: ['plato', 'rumi', 'gautama', 'mandela', 'lovelace', 'woolf', 'laozi'], spin: 120, reverse: false },
+];
+
+// The LCP portrait is the innermost, first planet. It is eager + high priority
+// and preloaded in <head> from the page. Everything else lazy-loads.
+const lcpFigureId = ringPlan[0].ids[0];
+
+type Planet = {
+  id: string;
+  name: string;
+  src: string;
+  href: string;
+  ring: number;
+  angle: number;
+  isLcp: boolean;
+};
+
+const planets: Planet[] = ringPlan.flatMap((ring, ringIndex) => {
+  const step = 360 / ring.ids.length;
+  // offset each ring so planets do not stack radially
+  const offset = ringIndex * 18;
+  return ring.ids.map((id, i) => {
+    const fig = byId.get(id);
+    return {
+      id,
+      name: fig ? fig.name : id,
+      src: `${MEDIA_URL}/images/figures/${id}/main/1200.webp`,
+      href: publicUrl(lang, `/figures/${figureIdToSlug[id]}`),
+      ring: ringIndex,
+      angle: offset + i * step,
+      isLcp: ringIndex === 0 && i === 0,
+    };
+  });
+});
+---
+<section class="v2-observatory" id="v2-observatory" aria-labelledby="v2-hero-title">
+  <!-- static cosmic backdrop: gradient + star field + gold specks -->
+  <div class="v2-sky" aria-hidden="true">
+    <div class="v2-stars v2-stars--far"></div>
+    <div class="v2-stars v2-stars--near"></div>
+    <div class="v2-shooting"></div>
+  </div>
+
+  <div class="v2-hero-inner">
+    <!-- copy column -->
+    <div class="v2-copy">
+      <p class="v2-eyebrow">{copy.eyebrow}</p>
+      <h1 class="v2-title" id="v2-hero-title">
+        {copy.title}
+      </h1>
+      <p class="v2-subhead">{copy.subhead}</p>
+      <p class="v2-lede">
+        {copy.lede}
+      </p>
+      <p class="v2-trust">{copy.trust}</p>
+      <div class="v2-actions">
+        <a href="/app" class="pub-cta__button v2-cta" data-agc-cta="start-exploring">
+          {ctaLabel}
+        </a>
+        <p class="v2-free">{copy.free}</p>
+      </div>
+    </div>
+
+    <!-- the living orbital system -->
+    <div class="v2-system" role="img" aria-label={copy.systemAria}>
+      <div class="v2-system-stage">
+        <!-- the three faint gold rings -->
+        <div class="v2-ring v2-ring--0" aria-hidden="true"></div>
+        <div class="v2-ring v2-ring--1" aria-hidden="true"></div>
+        <div class="v2-ring v2-ring--2" aria-hidden="true"></div>
+
+        <!-- glowing central core -->
+        <div class="v2-core" aria-hidden="true">
+          <span class="v2-core__glow"></span>
+          <span class="v2-core__dot"></span>
+        </div>
+
+        <!-- one rotating layer per ring, planets pinned around it -->
+        {ringPlan.map((ring, ringIndex) => (
+          <div
+            class={`v2-orbit v2-orbit--${ringIndex} ${ring.reverse ? 'v2-orbit--rev' : ''}`}
+            style={`--v2-spin:${ring.spin}s`}
+            aria-hidden="true"
+          >
+            {planets
+              .filter(p => p.ring === ringIndex)
+              .map(p => (
+                <a
+                  class={`v2-planet ${p.isLcp ? 'v2-planet--lcp' : ''}`}
+                  href={p.href}
+                  style={`--v2-angle:${p.angle}deg`}
+                  data-figure={p.id}
+                  tabindex="-1"
+                >
+                  <span class="v2-planet__face">
+                    <img
+                      src={p.src}
+                      alt={p.name}
+                      width="96"
+                      height="96"
+                      loading={p.isLcp ? 'eager' : 'lazy'}
+                      fetchpriority={p.isLcp ? 'high' : 'auto'}
+                      decoding="async"
+                    />
+                  </span>
+                  <span class="v2-planet__name">{p.name}</span>
+                </a>
+              ))}
+          </div>
+        ))}
+      </div>
+      <p class="v2-system-hint" aria-hidden="true">{copy.systemHint}</p>
+    </div>
+  </div>
+
+  <!-- scroll cue that hands the hero off to the library below -->
+  <a href="#v2-library" class="v2-scrollcue" aria-label={copy.scrollCueAria}>
+    <span class="v2-scrollcue__text">{copy.scrollCue}</span>
+    <span class="v2-scrollcue__arrow" aria-hidden="true"></span>
+  </a>
+</section>

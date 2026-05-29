@@ -10,3 +10,14 @@
 # Immutable cache for hashed assets (Vite adds content hash to filenames)
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
+
+# Keep the React app (served from the SPA shell at /app) out of search indexes.
+# The marketing landing at / and all static Astro pages stay indexable. The /*
+# security headers above still apply to these paths (CF Pages merges matching
+# rules), so CSP/HSTS are unaffected. Robots.txt stays free of a /app Disallow
+# so crawlers can still fetch /app and see this noindex directive.
+/app
+  X-Robots-Tag: noindex, follow
+
+/app/*
+  X-Robots-Tag: noindex, follow

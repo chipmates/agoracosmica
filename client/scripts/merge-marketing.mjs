@@ -1,11 +1,13 @@
 #!/usr/bin/env node
 
 // Copies the Astro build output from marketing/dist/ into client/build/.
-// Runs after `vite build` in the client build chain. The React SPA at /
-// (and the legal pages it serves via SPA fallback) stay untouched —
-// Astro never emits a top-level /index.html, so there's no overlap.
+// Runs after `vite build` in the client build chain. The React SPA shell that
+// Vite emits at build/index.html is moved to build/app/index.html FIRST, so
+// Astro's new static homepage (marketing/dist/index.html) can take over the
+// top-level build/index.html without clobbering the app shell. Astro now owns
+// the top-level index.html; the React app is served from /app and /app/*.
 
-import { cpSync, existsSync, readdirSync } from 'fs';
+import { cpSync, existsSync, readdirSync, mkdirSync, renameSync } from 'fs';
 import { join } from 'path';
 
 const CLIENT_DIR = join(import.meta.dirname, '..');
@@ -26,6 +28,21 @@ if (!existsSync(CLIENT_BUILD)) {
     `Run \`pnpm build:client\` before invoking this script.`,
   );
   process.exit(1);
+}
+
+// The React SPA shell that Vite emits at build/index.html now lives under
+// /app. Move it to build/app/index.html BEFORE the marketing copy, so the
+// new static Astro homepage (marketing/dist/index.html) can take over
+// build/index.html without clobbering the app shell. The shell references
+// /assets/* and /config.js with absolute paths, so it serves identically
+// from /app/index.html — no Vite `base` change needed. Guarded with
+// existsSync so a self-host build (build:self-host, no marketing) is
+// unaffected and re-runs are idempotent.
+const REACT_SHELL = join(CLIENT_BUILD, 'index.html');
+if (existsSync(REACT_SHELL)) {
+  mkdirSync(join(CLIENT_BUILD, 'app'), { recursive: true });
+  renameSync(REACT_SHELL, join(CLIENT_BUILD, 'app', 'index.html'));
+  console.log('[merge-marketing] moved React shell build/index.html → build/app/index.html');
 }
 
 cpSync(MARKETING_DIST, CLIENT_BUILD, { recursive: true });

@@ -11,7 +11,6 @@
 
 import { defineConfig } from 'astro/config';
 import react from '@astrojs/react';
-import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
   site: 'https://agoracosmica.org',
@@ -44,14 +43,13 @@ export default defineConfig({
       prefixDefaultLocale: false,
     },
   },
+  // Sitemap is hand-written by client/scripts/generate-sitemap.mjs
+  // (build/sitemap.xml), the single authoritative sitemap robots.txt points
+  // to. @astrojs/sitemap removed to avoid a second, conflicting
+  // sitemap-index/sitemap-0 pair that would emit / and /de/ with the wrong
+  // priority and no x-default hreflang once the homepages exist.
   integrations: [
     react(),
-    sitemap({
-      i18n: {
-        defaultLocale: 'en',
-        locales: { en: 'en', de: 'de' },
-      },
-    }),
   ],
   // Dev-only proxy. publicMediaUrl returns relative paths in dev (assuming
   // the host bundler proxies /images, /trailers, etc. to media.agoracosmica.org).

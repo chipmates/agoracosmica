@@ -1,0 +1,17 @@
+---
+// Homepage body partial: one of the eight life-question tiles.
+// Each tile carries the verbatim question phrase from HomepageBody and links
+// to that question's theme page, so the eight questions read as a scannable
+// grid instead of a run-on sentence while keeping every theme link crawlable.
+import { publicUrl } from '../../lib/urls';
+import type { Lang } from '../../i18n';
+interface Props {
+  themeId: string;
+  question: string;
+  lang: Lang;
+}
+const { themeId, question, lang } = Astro.props;
+---
+<a href={publicUrl(lang, `/themes/${themeId}`)} class="ll2-question-tile">
+  <span class="ll2-question-tile__text">{question}</span>
+</a>

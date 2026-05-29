@@ -11,6 +11,7 @@
     <link rel="preconnect" href="https://media.agoracosmica.org" crossorigin />
     <link rel="dns-prefetch" href="https://media.agoracosmica.org" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="robots" content="noindex, follow" />
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.agoracosmica.org; font-src 'self'; connect-src 'self' blob: https://openrouter.ai https://*.agoracosmica.org wss://*.agoracosmica.org http://localhost:* http://127.0.0.1:*; media-src 'self' blob: https://*.agoracosmica.org http://localhost:* http://127.0.0.1:*; frame-src https://challenges.cloudflare.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self';" />
     <!-- PWA specific meta tags -->
     <meta name="mobile-web-app-capable" content="yes">
@@ -21,13 +22,10 @@
         content="Listen to life stories, learn from teachings, and converse with 30 figures from history. Marcus Aurelius to Frida Kahlo. Nonprofit, open source."
     />
     <meta name="age-de-meta-label" content="age=16 hash: v=1.0 kind=sl protocol=all" />
-    <link rel="canonical" href="https://agoracosmica.org/" />
-    <link rel="alternate" hreflang="en" href="https://agoracosmica.org/" />
-    <link rel="alternate" hreflang="de" href="https://agoracosmica.org/de/" />
-    <link rel="alternate" hreflang="x-default" href="https://agoracosmica.org/" />
+    <link rel="canonical" href="https://agoracosmica.org/app" />
     <meta property="og:title" content="Agora Cosmica - A Living Library You Can Talk To" />
     <meta property="og:description" content="Listen to life stories, learn from teachings, and converse with 30 figures from history. Marcus Aurelius to Frida Kahlo. Nonprofit, open source." />
-    <meta property="og:url" content="https://agoracosmica.org/" />
+    <meta property="og:url" content="https://agoracosmica.org/app" />
     <meta property="og:type" content="website" />
     <meta property="og:image" content="https://media.agoracosmica.org/images/ui/og-default/1200.webp" />
     <meta property="og:site_name" content="Agora Cosmica" />
@@ -100,9 +98,11 @@
         margin: 0;
       }
     </style>
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","@id":"https://agoracosmica.org/#agora-cosmica","name":"Agora Cosmica","url":"https://agoracosmica.org","logo":"https://media.agoracosmica.org/images/ui/logo/512.webp","description":"A nonprofit, open source wisdom platform and podcast. Listen to life stories, learn from teachings, and talk with 30 figures from history, in English and German.","slogan":"A Living Library You Can Talk To","sameAs":["https://github.com/chipmates/agoracosmica","https://www.youtube.com/@agoracosmica","https://www.youtube.com/@agoracosmicade","https://open.spotify.com/show/3V02q5c8NAnFD1W2kQBYzd","https://open.spotify.com/show/5i63mEKJuCVniSIViXbEP8","https://podcasts.apple.com/us/podcast/agora-cosmica/id1871505788","https://podcasts.apple.com/us/podcast/agora-cosmica-deutsch/id1871505945"],"parentOrganization":{"@id":"https://agoracosmica.org/#organization"}}</script>
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"EducationalOrganization","@id":"https://agoracosmica.org/#organization","name":"ChipMates gemeinnützige GmbH","url":"https://agoracosmica.org","logo":"https://media.agoracosmica.org/images/ui/logo/512.webp","description":"A small German non-profit building Agora Cosmica, an open source wisdom platform with 30 historical figures.","slogan":"A Living Library You Can Talk To","knowsAbout":["philosophy","history","historical figures","wisdom traditions"],"address":{"@type":"PostalAddress","streetAddress":"Schusterstr. 50","addressLocality":"Freiburg im Breisgau","postalCode":"79098","addressCountry":"DE"},"email":"agoracosmica@chipmates.ai","contactPoint":{"@type":"ContactPoint","email":"agoracosmica@chipmates.ai","contactType":"customer support","availableLanguage":["English","German"]}}</script>
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","@id":"https://agoracosmica.org/#website","name":"Agora Cosmica","url":"https://agoracosmica.org","description":"A Living Library You Can Talk To","publisher":{"@id":"https://agoracosmica.org/#agora-cosmica"},"inLanguage":["en","de"]}</script>
+    <!-- The brand JSON-LD graph (Organization / EducationalOrganization /
+         WebSite) is emitted only by the static homepage at / via
+         marketing/src/lib/schemas.ts. This shell is noindexed and served at
+         /app, so it must not duplicate that graph or claim to be the brand
+         homepage. -->
     <title>Agora Cosmica - A Living Library You Can Talk To</title>
 </head>
 <body>
@@ -110,7 +110,7 @@
     <div id="root">
       <div class="agc-splash" aria-hidden="true">
         <div class="agc-splash__brand">
-          <h1 class="agc-splash__name">Agora Cosmica</h1>
+          <p class="agc-splash__name">Agora Cosmica</p>
           <p class="agc-splash__tag">A Living Library You Can Talk To</p>
         </div>
         <p class="agc-splash__trust">Nonprofit · Open Source · No User Tracking</p>

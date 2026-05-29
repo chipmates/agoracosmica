@@ -1,0 +1,143 @@
+---
+// The static, crawlable English homepage served at /. The React SPA shell now
+// lives at /app (see merge-marketing.mjs + _redirects). This page is plain
+// prerendered HTML: the cinematic Observatory hero owns the single <h1>, and
+// the shared HomepageBody renders the crawlable library below it so a stranger
+// and a crawler both see the full library without running the React app.
+// Exactly one <h1> (the hero); every other heading is h2/h3. The interactive
+// islands are the hero's V2ObservatoryMotion (client:idle, motion only) and
+// the body's CouncilHero audio button (client:visible), both already
+// CSP-hashed, so no new inline-script hash is introduced.
+
+import Public from '../layouts/Public.astro';
+import V2ObservatoryHero from '../components/landing-lab/V2ObservatoryHero.astro';
+import V2ObservatoryMotion from '../islands/V2ObservatoryMotion';
+import HomepageBody from '../components/HomepageBody.astro';
+import {
+  agoraCosmicaSchema,
+  organizationSchema,
+  webSiteSchema,
+  softwareApplicationSchema,
+  faqSchema,
+  itemListSchema,
+  breadcrumbSchema,
+  podcastSeriesSchema,
+} from '../lib/schemas';
+import { getT } from '../i18n';
+import { canonicalUrl, publicUrl, SITE_URL, MEDIA_URL } from '../lib/urls';
+import { getFiguresCatalog } from '@client/data/public/figuresCatalog';
+import { figureIdToSlug } from '@client/data/public/slugMap';
+import { THEMES, heroConfrontational } from '@client/data/councilCatalog';
+
+const lang = 'en' as const;
+const t = getT(lang);
+
+const figures = getFiguresCatalog(lang);
+const heroCouncil = heroConfrontational;
+
+// Repositioned, education-first FAQ (verbatim from the QA'd copy source).
+const enFaq = [
+  {
+    q: 'What is Agora Cosmica?',
+    a: 'An education platform built as a living library you can talk to. Thirty figures from the past teach you through narrated life stories, core teachings, and four-voice debates, and you can talk an idea through with them too, from Marcus Aurelius to Ada Lovelace, in English and German. Nonprofit, open source, and built to be checked.',
+  },
+  {
+    q: 'So it is an AI chatbot?',
+    a: 'Not really. Most of what you learn here is crafted ahead of time, 360 narrated stories, 360 core teachings, 360 prism dialogues, and 110 council debates. Live AI conversation is one of the ways to learn, for talking an idea through or asking anything, not the whole thing.',
+  },
+  {
+    q: 'Is this really the historical person speaking?',
+    a: 'No. Every figure is an AI Echo, a voice shaped by their own writing and ideas. It draws on their real philosophy, and it stays an interpretation. Never a recording, never the actual person.',
+  },
+  {
+    q: 'Does it cost anything?',
+    a: 'You get 30 free messages a day, no signup. Want more? Bring your own OpenRouter key. The platform itself is nonprofit and open source. No ads, no paywalls.',
+  },
+  {
+    q: 'Do I need an account to start?',
+    a: 'No. Open the app and start learning. The free daily messages work right away. No email, no signup.',
+  },
+  {
+    q: 'Who are the 30 figures?',
+    a: 'Philosophers, scientists, mystics, artists, and activists across 2,500 years. Laozi, Plato, Rumi, Hildegard von Bingen, Galileo Galilei, Albert Einstein, Frida Kahlo, Virginia Woolf, Harriet Tubman, Carl Gustav Jung, and twenty more. Browse all 30 on the figures page.',
+  },
+  {
+    q: 'How do I learn from a figure?',
+    a: 'Six ways. Hear a Story from their life. Work through a Wisdom conversation on one of their core teachings. Listen to a four-voice Prism dialogue. Take a short Quest challenge. Ask anything in Free Talk. Or gather a Cosmic Council of four figures to debate one question. The first four form a learning arc shaped by learning research.',
+  },
+  {
+    q: 'What is the Cosmic Council?',
+    a: 'Four figures around one question, with a moderator holding the thread. There are 110 crafted debates with narrated audio. Or build your own, choosing the lineup and the question yourself.',
+  },
+  {
+    q: 'How do you handle my privacy?',
+    a: 'Your conversations stay in your browser, encrypted with AES-256. No tracking cookies, no third-party analytics, no profiles of you. If you bring your own key, it never touches our servers.',
+  },
+  {
+    q: 'Where does the audio come from?',
+    a: 'Live text-to-speech and speech-to-text run on our own GPU servers in Germany. The narrated stories and debates are stored on EU hosting and served worldwide.',
+  },
+  {
+    q: 'Is it open source?',
+    a: 'Yes. The code is open under AGPL-3.0, so anyone can read it, audit the privacy claims, contribute, or run their own copy. The content moves to a CC-BY license within 6 to 12 months.',
+  },
+  {
+    q: 'Is the content accurate?',
+    a: 'Each voice is grounded in primary works and cross-checked sources. Because the Echoes are AI-rendered, what they say will vary, but the source material does not. Where the prose goes beyond the documented record, the factcheck names what was recreated.',
+  },
+  {
+    q: 'Is it available in German?',
+    a: 'Yes. Everything is fully bilingual, English and German, across the content, the interface, and the audio.',
+  },
+];
+
+const canonical = canonicalUrl('/');
+
+const figureItems = figures.map(f => ({
+  name: f.name,
+  url: canonicalUrl(publicUrl(lang, `/figures/${figureIdToSlug[f.id]}`)),
+  description: f.about.split('\n')[0].slice(0, 160),
+  image: `${MEDIA_URL}/images/figures/${f.id}/main/1200.webp`,
+}));
+
+const themeItems = THEMES.map(theme => ({
+  name: t(`themes.${theme.id}.name`),
+  url: canonicalUrl(publicUrl(lang, `/themes/${theme.id}`)),
+  description: t(`themes.${theme.id}.tagline`),
+}));
+
+const schemas = [
+  agoraCosmicaSchema(),
+  organizationSchema(),
+  webSiteSchema(),
+  softwareApplicationSchema(),
+  faqSchema(enFaq, canonical),
+  itemListSchema(figureItems),
+  itemListSchema(themeItems),
+  breadcrumbSchema([{ name: t('breadcrumbs.home'), url: `${SITE_URL}/` }]),
+  podcastSeriesSchema(lang),
+];
+
+// The hero's LCP portrait is the innermost first planet (Marcus Aurelius),
+// matching the ring plan in V2ObservatoryHero. Preload it at high priority.
+const lcpPortrait = `${MEDIA_URL}/images/figures/aurelius/main/1200.webp`;
+---
+<Public
+  title="A Living Library You Can Talk To"
+  fullTitle="Agora Cosmica · A Living Library You Can Talk To"
+  description="Learn from 30 remarkable people of history, Marcus Aurelius to Ada Lovelace. Narrated stories, teachings, and AI conversations. Nonprofit, open source."
+  canonicalPath="/"
+  lang={lang}
+  schemas={schemas}
+  preloadImage={lcpPortrait}
+  preloadImageType="image/webp"
+>
+  <!-- cinematic orbital hero (static first paint; the island only enhances) -->
+  <V2ObservatoryHero lang={lang} />
+  <V2ObservatoryMotion client:idle targetId="v2-observatory" />
+
+  <!-- shared crawlable SEO body -->
+  <div class="pub-content pub-home" id="v2-library">
+    <HomepageBody lang={lang} figures={figures} faq={enFaq} heroCouncil={heroCouncil} />
+  </div>
+</Public>

@@ -1,0 +1,544 @@
+/* ============================================================================
+   landing-lab v2 — "The Observatory"
+   Figure-portrait planets orbiting a glowing gold core. All selectors are
+   v2-prefixed to avoid collisions with the other four parallel variants.
+
+   Motion contract:
+     - First paint is fully static (server HTML). Orbits do NOT move until the
+       V2ObservatoryMotion island adds .is-live AND the user has not asked for
+       reduced motion.
+     - Every @keyframes loop is gated behind .is-live and
+       @media (prefers-reduced-motion: no-preference), per the repo Animation
+       Efficiency rule, and parks via .is-hidden when the tab is backgrounded.
+   Color: brand tokens only, transparency via color-mix.
+   ========================================================================== */
+
+.v2-observatory {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: min(100svh, 920px);
+  display: flex;
+  align-items: center;
+  /* deep cosmic gradient, same language as the login portal */
+  background:
+    radial-gradient(120% 90% at 78% 18%,
+      color-mix(in srgb, var(--gold-subtle) 9%, transparent) 0%,
+      transparent 52%),
+    radial-gradient(140% 120% at 50% 120%,
+      var(--bg-deep-space, #0C1133) 0%,
+      var(--bg-deep-space-darker, #080B20) 70%),
+    linear-gradient(180deg,
+      var(--bg-primary, #151C47) 0%,
+      var(--bg-deep-space-darker, #080B20) 100%);
+  /* parallax planes read these; the island sets them on pointer move */
+  --v2-px: 0;
+  --v2-py: 0;
+}
+
+/* desktop/tablet: break the hero out of the .pub-main 1200px column so the
+   cosmic background is full-bleed edge to edge (no centered "box" on the
+   lighter page background), and pull it up under the sticky 64px navbar by
+   cancelling .pub-main's 6rem top padding. Mobile is left untouched. */
+@media (min-width: 641px) {
+  .v2-observatory {
+    width: 100vw;
+    max-width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+    margin-top: -6rem;
+  }
+}
+
+/* mobile: same full-bleed treatment, pulled up by the mobile .pub-main top
+   padding (5rem) so there is no lighter-navy color gap under the navbar */
+@media (max-width: 640px) {
+  .v2-observatory {
+    width: 100vw;
+    max-width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+    margin-top: -5rem;
+  }
+}
+
+/* ── cosmic backdrop ─────────────────────────────────────────────────── */
+.v2-sky {
+  position: absolute;
+  inset: -8%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.v2-stars {
+  position: absolute;
+  inset: 0;
+  background-repeat: repeat;
+}
+/* far field: small dim stars + a few gold specks */
+.v2-stars--far {
+  background-image:
+    radial-gradient(1px 1px at 12% 22%, var(--star-white-dim) 50%, transparent 51%),
+    radial-gradient(1px 1px at 47% 8%, var(--star-white-medium) 50%, transparent 51%),
+    radial-gradient(1px 1px at 73% 31%, var(--star-white-dim) 50%, transparent 51%),
+    radial-gradient(1px 1px at 88% 14%, var(--star-gold-medium) 50%, transparent 51%),
+    radial-gradient(1px 1px at 28% 54%, var(--star-white-dim) 50%, transparent 51%),
+    radial-gradient(1px 1px at 63% 67%, var(--star-white-medium) 50%, transparent 51%),
+    radial-gradient(1px 1px at 9% 81%, var(--star-white-dim) 50%, transparent 51%),
+    radial-gradient(1px 1px at 91% 76%, var(--star-gold-medium) 50%, transparent 51%),
+    radial-gradient(1px 1px at 38% 92%, var(--star-white-dim) 50%, transparent 51%);
+  background-size: 100% 100%;
+  transform: translate3d(calc(var(--v2-px) * -6px), calc(var(--v2-py) * -6px), 0);
+}
+/* near field: slightly brighter, moves more for depth */
+.v2-stars--near {
+  background-image:
+    radial-gradient(1.6px 1.6px at 20% 35%, var(--star-white-bright) 50%, transparent 51%),
+    radial-gradient(1.6px 1.6px at 55% 20%, var(--star-gold-bright) 50%, transparent 51%),
+    radial-gradient(1.6px 1.6px at 82% 48%, var(--star-white-medium) 50%, transparent 51%),
+    radial-gradient(1.6px 1.6px at 34% 72%, var(--star-white-bright) 50%, transparent 51%),
+    radial-gradient(1.6px 1.6px at 70% 85%, var(--star-gold-medium) 50%, transparent 51%),
+    radial-gradient(1.6px 1.6px at 6% 60%, var(--star-white-medium) 50%, transparent 51%);
+  background-size: 100% 100%;
+  transform: translate3d(calc(var(--v2-px) * -13px), calc(var(--v2-py) * -13px), 0);
+}
+
+/* single diagonal shooting star with a trailing gradient */
+.v2-shooting {
+  position: absolute;
+  top: 12%;
+  left: 8%;
+  width: 140px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--gold-hover) 70%, transparent) 60%,
+    var(--star-white-bright) 100%);
+  opacity: 0;
+  transform: rotate(28deg) translateX(0);
+}
+
+/* ── layout: copy beside the system ──────────────────────────────────── */
+.v2-hero-inner {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: clamp(2rem, 5vw, 4.5rem) clamp(1.25rem, 4vw, 3rem);
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+  align-items: center;
+  gap: clamp(1.5rem, 4vw, 3.5rem);
+}
+
+/* ── copy column ─────────────────────────────────────────────────────── */
+.v2-copy { max-width: 38rem; }
+
+.v2-eyebrow {
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--gold-primary) 80%, transparent);
+  margin: 0 0 1rem;
+}
+
+.v2-title {
+  font-family: 'Libre Caslon Text', Georgia, serif;
+  font-size: clamp(2rem, 4.6vw, 3.4rem);
+  line-height: 1.08;
+  font-weight: 400;
+  color: var(--text-primary);
+  margin: 0 0 1.1rem;
+  text-wrap: balance;
+}
+
+.v2-subhead {
+  font-family: 'Libre Caslon Text', Georgia, serif;
+  font-style: italic;
+  font-size: clamp(1.1rem, 2.6vw, 1.5rem);
+  color: var(--gold-primary);
+  margin: 0 0 1.1rem;
+}
+
+.v2-lede {
+  font-size: clamp(0.98rem, 1.4vw, 1.1rem);
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin: 0 0 1.25rem;
+  max-width: 34rem;
+}
+
+.v2-trust {
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  color: var(--text-tertiary);
+  margin: 0 0 1.5rem;
+}
+
+.v2-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+.v2-cta {
+  width: auto;
+  min-width: 220px;
+}
+.v2-free {
+  font-size: 0.9rem;
+  color: var(--text-tertiary);
+  margin: 0;
+}
+
+/* ── the orbital system ──────────────────────────────────────────────── */
+.v2-system {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-self: center;
+  /* the whole system drifts a touch with the pointer for depth */
+  transform: translate3d(calc(var(--v2-px) * 10px), calc(var(--v2-py) * 10px), 0);
+}
+
+.v2-system-stage {
+  position: relative;
+  --v2-stage: min(46vw, 560px);
+  width: var(--v2-stage);
+  aspect-ratio: 1 / 1;
+  display: grid;
+  place-items: center;
+}
+
+/* concentric ring outlines. radii are percentages of the stage box. */
+.v2-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 22%, transparent);
+  box-shadow:
+    inset 0 0 40px color-mix(in srgb, var(--gold-subtle) 6%, transparent),
+    0 0 30px color-mix(in srgb, var(--gold-subtle) 5%, transparent);
+}
+.v2-ring--0 { width: 44%; height: 44%; }
+.v2-ring--1 { width: 70%; height: 70%; }
+.v2-ring--2 { width: 100%; height: 100%; }
+
+/* glowing central core (the portal heart) */
+.v2-core {
+  position: absolute;
+  width: 22%;
+  height: 22%;
+  display: grid;
+  place-items: center;
+  z-index: 2;
+}
+.v2-core__glow {
+  position: absolute;
+  inset: -60%;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    color-mix(in srgb, var(--gold-hover) 38%, transparent) 0%,
+    color-mix(in srgb, var(--gold-subtle) 16%, transparent) 38%,
+    transparent 70%);
+  filter: blur(2px);
+}
+.v2-core__dot {
+  position: relative;
+  width: 38%;
+  height: 38%;
+  border-radius: 50%;
+  background: var(--gold-gradient, linear-gradient(135deg, #B38B30, #D4A539, #E6BC5C));
+  box-shadow:
+    0 0 22px color-mix(in srgb, var(--gold-hover) 60%, transparent),
+    0 0 50px color-mix(in srgb, var(--gold-subtle) 40%, transparent);
+}
+
+/* one rotating layer per ring; planets are pinned around its center */
+.v2-orbit {
+  position: absolute;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  /* paused by default; .is-live + no-preference turns it on */
+  animation: v2-spin var(--v2-spin, 90s) linear infinite;
+  animation-play-state: paused;
+}
+.v2-orbit--rev { animation-name: v2-spin-rev; }
+.v2-orbit--0 { width: 44%; height: 44%; --v2-radius: calc(var(--v2-stage) * 0.22); }
+.v2-orbit--1 { width: 70%; height: 70%; --v2-radius: calc(var(--v2-stage) * 0.35); }
+.v2-orbit--2 { width: 100%; height: 100%; --v2-radius: calc(var(--v2-stage) * 0.50); }
+
+/* a planet sits on its ring via rotate(angle) -> push out -> the inner face
+   counter-rotates so the portrait + label stay upright as the ring turns. */
+.v2-planet {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: clamp(46px, 6.4vw, 76px);
+  height: clamp(46px, 6.4vw, 76px);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  /* place on the ring: half-stage radius is 50% of the orbit layer */
+  transform:
+    translate(-50%, -50%)
+    rotate(var(--v2-angle))
+    translateY(calc(-1 * var(--v2-radius)))
+    rotate(calc(-1 * var(--v2-angle)));
+  /* keep the upright label readable while the parent ring spins */
+  animation: v2-counter var(--v2-spin, 90s) linear infinite;
+  animation-play-state: paused;
+}
+
+/* Only the planet portraits are interactive. The rings, the core, and the
+   orbit circles are decorative, but a later-in-DOM orbit circle overlaps the
+   inner planets and would otherwise swallow their clicks and hover. Make the
+   decorative layers pass-through, and re-enable pointer events on the planets
+   (a child can opt back in even though its orbit parent is set to none). */
+.v2-ring,
+.v2-core,
+.v2-orbit { pointer-events: none; }
+.v2-planet { pointer-events: auto; }
+
+.v2-orbit--rev .v2-planet { animation-name: v2-counter-rev; }
+
+/* expand the tap target to 44px even at the smallest planet size */
+.v2-planet::before {
+  content: "";
+  position: absolute;
+  inset: 50%;
+  width: 44px;
+  height: 44px;
+  transform: translate(-50%, -50%);
+}
+
+.v2-planet__face {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1.5px solid color-mix(in srgb, var(--gold-subtle) 45%, transparent);
+  box-shadow:
+    0 4px 14px color-mix(in srgb, var(--utility-pure-black, #000) 45%, transparent),
+    0 0 0 4px color-mix(in srgb, var(--bg-deep-space-darker, #080B20) 60%, transparent);
+  background: var(--bg-deep-space-darker, #080B20);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.v2-planet__face img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  /* fade the portrait into the navy at its base, login-style */
+  filter: saturate(0.92) brightness(0.96);
+  transition: filter 0.25s ease;
+}
+
+/* name label, hidden until spotlight */
+.v2-planet__name {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  white-space: nowrap;
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--gold-hover);
+  background: color-mix(in srgb, var(--bg-deep-space-darker, #080B20) 88%, transparent);
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 5;
+}
+
+/* spotlight on hover / keyboard focus */
+.v2-planet:hover .v2-planet__face,
+.v2-planet:focus-visible .v2-planet__face {
+  transform: scale(1.16);
+  border-color: var(--gold-hover);
+  box-shadow:
+    0 8px 26px color-mix(in srgb, var(--utility-pure-black, #000) 55%, transparent),
+    0 0 26px color-mix(in srgb, var(--gold-hover) 55%, transparent),
+    0 0 0 4px color-mix(in srgb, var(--bg-deep-space-darker, #080B20) 55%, transparent);
+}
+.v2-planet:hover .v2-planet__face img,
+.v2-planet:focus-visible .v2-planet__face img {
+  filter: saturate(1.08) brightness(1.05);
+}
+.v2-planet:hover .v2-planet__name,
+.v2-planet:focus-visible .v2-planet__name {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+.v2-planet:focus-visible {
+  outline: none;
+}
+.v2-planet:focus-visible .v2-planet__face {
+  outline: 2px solid var(--gold-hover);
+  outline-offset: 3px;
+}
+
+/* the LCP planet rests with a faint highlight so the static paint feels alive */
+.v2-planet--lcp .v2-planet__face {
+  border-color: color-mix(in srgb, var(--gold-primary) 60%, transparent);
+}
+
+.v2-system-hint {
+  margin: 1.25rem 0 0;
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--gold-primary) 55%, transparent);
+}
+
+/* ── scroll cue ──────────────────────────────────────────────────────── */
+.v2-scrollcue {
+  position: absolute;
+  bottom: 1.4rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 44px;
+  justify-content: center;
+  padding: 0 0.75rem;
+  text-decoration: none;
+  color: var(--text-tertiary);
+}
+.v2-scrollcue__text {
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.v2-scrollcue__arrow {
+  width: 12px;
+  height: 12px;
+  border-right: 1.5px solid color-mix(in srgb, var(--gold-primary) 70%, transparent);
+  border-bottom: 1.5px solid color-mix(in srgb, var(--gold-primary) 70%, transparent);
+  transform: rotate(45deg);
+}
+.v2-scrollcue:hover { color: var(--gold-primary); }
+
+/* ── keyframes ───────────────────────────────────────────────────────── */
+@keyframes v2-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes v2-spin-rev {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(-360deg); }
+}
+/* planets counter-rotate the exact opposite of their ring to stay upright,
+   composed on top of the static rotate/translate placement transform */
+@keyframes v2-counter {
+  from {
+    transform:
+      translate(-50%, -50%) rotate(var(--v2-angle)) translateY(calc(-1 * var(--v2-radius)))
+      rotate(calc(-1 * var(--v2-angle))) rotate(0deg);
+  }
+  to {
+    transform:
+      translate(-50%, -50%) rotate(var(--v2-angle)) translateY(calc(-1 * var(--v2-radius)))
+      rotate(calc(-1 * var(--v2-angle))) rotate(-360deg);
+  }
+}
+@keyframes v2-counter-rev {
+  from {
+    transform:
+      translate(-50%, -50%) rotate(var(--v2-angle)) translateY(calc(-1 * var(--v2-radius)))
+      rotate(calc(-1 * var(--v2-angle))) rotate(0deg);
+  }
+  to {
+    transform:
+      translate(-50%, -50%) rotate(var(--v2-angle)) translateY(calc(-1 * var(--v2-radius)))
+      rotate(calc(-1 * var(--v2-angle))) rotate(360deg);
+  }
+}
+@keyframes v2-shoot {
+  0%   { opacity: 0; transform: rotate(28deg) translateX(0); }
+  6%   { opacity: 1; }
+  18%  { opacity: 0; transform: rotate(28deg) translateX(62vw); }
+  100% { opacity: 0; transform: rotate(28deg) translateX(62vw); }
+}
+@keyframes v2-core-breathe {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%      { transform: scale(1.08); opacity: 0.88; }
+}
+
+/* ── motion is OFF until live AND the user allows motion ──────────────── */
+@media (prefers-reduced-motion: no-preference) {
+  .v2-observatory.is-live .v2-orbit,
+  .v2-observatory.is-live .v2-planet {
+    animation-play-state: running;
+  }
+  .v2-observatory.is-live .v2-shooting {
+    animation: v2-shoot 17s ease-in 4s infinite;
+  }
+  .v2-observatory.is-live .v2-core__glow {
+    animation: v2-core-breathe 6s ease-in-out infinite;
+  }
+  /* park everything while the tab is hidden */
+  .v2-observatory.is-live.is-hidden .v2-orbit,
+  .v2-observatory.is-live.is-hidden .v2-planet,
+  .v2-observatory.is-live.is-hidden .v2-shooting,
+  .v2-observatory.is-live.is-hidden .v2-core__glow {
+    animation-play-state: paused;
+  }
+
+  /* scroll-driven hand-off: the system fades + lifts as the hero scrolls
+     away into the SEO library below. Zero JS, runs on the compositor.
+     Guarded by @supports so non-supporting browsers keep the static layout. */
+  @supports (animation-timeline: view()) {
+    .v2-system {
+      animation: v2-handoff linear both;
+      animation-timeline: view();
+      animation-range: exit 0% exit 90%;
+    }
+    @keyframes v2-handoff {
+      from { opacity: 1; transform: translateY(0) scale(1); }
+      to   { opacity: 0.15; transform: translateY(-40px) scale(0.9); }
+    }
+  }
+}
+
+/* ── responsive: stack copy above the system ─────────────────────────── */
+@media (max-width: 900px) {
+  .v2-hero-inner {
+    grid-template-columns: 1fr;
+    text-align: center;
+    gap: clamp(1.5rem, 6vw, 2.5rem);
+  }
+  .v2-copy { max-width: none; }
+  .v2-actions { align-items: center; }
+  .v2-lede { margin-left: auto; margin-right: auto; }
+  /* drive both the stage size AND the planet radii from the same var so the
+     figures stay ON their rings on mobile instead of clustering at the core */
+  .v2-system-stage { --v2-stage: min(82vw, 440px); }
+}
+
+@media (max-width: 560px) {
+  .v2-observatory { min-height: auto; padding: 1rem 0 3rem; }
+  /* on the smallest screens, thin the outer ring to 6 planets feels crowded,
+     but we keep all of them; just shrink faces and tighten the stage */
+  .v2-planet { width: clamp(38px, 11vw, 52px); height: clamp(38px, 11vw, 52px); }
+  .v2-scrollcue { display: none; }
+}

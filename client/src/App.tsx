@@ -458,11 +458,16 @@ function App(): React.ReactElement {
         },
         {
           path: "*",
-          element: <NavigateKeepingSearch to="/" />
+          element: <NavigateKeepingSearch to="/app" />
         }
       ]
     }
   ], {
+    // The React SPA shell is served from /app (and /app/*) — the static
+    // marketing homepage owns /. basename keeps React Router matching the
+    // index route against location.pathname "/app" instead of bouncing to
+    // the catch-all and redirecting out to the static homepage.
+    basename: "/app",
     // Add future flags to prepare for React Router v7
     future: {
       // v7_startTransition: true, // Not yet in type definitions

@@ -1,7 +1,7 @@
 ---
 // Sticky top navbar for all marketing pages. Static HTML — no React needed.
-// The "Start Exploring" CTA is a plain <a href="/"> that does a hard nav into
-// the React SPA. The conversion + entry-intent fire from a tiny global click
+// The "Start Exploring" CTA is a plain <a href="/app"> that does a hard nav
+// into the React SPA. The conversion + entry-intent fire from a tiny global click
 // handler set up in Public.astro (vanilla JS, no React island for this).
 
 import { getT } from '../i18n';
@@ -31,9 +31,22 @@ const isActive = (path: string) => currentPath === path || currentPath === path.
 ---
 <header class="pub-navbar liquid-glass--sidebar">
   <div class="pub-navbar__inner">
-    <a href={publicUrl(lang, '/figures')} class="pub-navbar__logo">
-      <span class="pub-navbar__logo-name">Agora Cosmica</span>
-      <span class="pub-navbar__logo-tagline">{t('footer.tagline')}</span>
+    <a href={publicUrl(lang, '/')} class="pub-navbar__logo">
+      <svg class="pub-navbar__logo-mark" viewBox="0 0 200 200" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="navLogoDot" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="var(--gold-light, #f8e696)" />
+            <stop offset="40%" stop-color="var(--gold-subtle, #e6bc5c)" />
+            <stop offset="100%" stop-color="var(--gold-deep, #be9b37)" />
+          </radialGradient>
+        </defs>
+        <circle cx="100" cy="100" r="76" fill="none" stroke="var(--gold-subtle, #e6bc5c)" stroke-width="3.5" />
+        <circle cx="100" cy="100" r="31" fill="url(#navLogoDot)" />
+      </svg>
+      <span class="pub-navbar__logo-text">
+        <span class="pub-navbar__logo-name">Agora Cosmica</span>
+        <span class="pub-navbar__logo-tagline">{t('footer.tagline')}</span>
+      </span>
     </a>
 
     <nav class="pub-navbar__nav" aria-label="Main navigation">
@@ -54,7 +67,7 @@ const isActive = (path: string) => currentPath === path || currentPath === path.
         {otherLang.toUpperCase()}
       </a>
 
-      <a href="/" class="pub-navbar__cta" data-agc-cta="start-exploring">
+      <a href="/app" class="pub-navbar__cta" data-agc-cta="start-exploring">
         {t('nav.startExploring')}
       </a>
     </nav>
@@ -81,6 +94,27 @@ const isActive = (path: string) => currentPath === path || currentPath === path.
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border-bottom: 1px solid color-mix(in srgb, var(--gold-primary) 16%, transparent);
+  }
+
+  /* Brand lockup: the CosmicLogo eclipse mark from the login page sits beside
+     the wordmark. Class-stacked (0,2,0) so it beats public-layout.css's
+     .pub-navbar__logo (0,1,0) regardless of bundle order, switching the lockup
+     from a column to an icon + text row. */
+  .pub-navbar .pub-navbar__logo {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .pub-navbar__logo-mark {
+    width: 30px;
+    height: 30px;
+    flex: 0 0 auto;
+  }
+  .pub-navbar__logo-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
   }
 
   /* Background fix for the open mobile menu. public-layout.css sets

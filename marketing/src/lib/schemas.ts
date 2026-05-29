@@ -35,9 +35,11 @@ export function organizationSchema(): Record<string, unknown> {
     '@context': 'https://schema.org',
     '@type': 'EducationalOrganization',
     '@id': ORG_ID,
+    additionalType: 'https://schema.org/NGO',
     name: 'ChipMates gemeinnützige GmbH',
     url: SITE_URL,
     logo: ORG_LOGO,
+    sameAs: ['https://github.com/chipmates/agoracosmica'],
     description:
       'A small German non-profit building Agora Cosmica, an open source wisdom platform with 30 historical figures.',
     slogan: 'A Living Library You Can Talk To',
@@ -142,6 +144,25 @@ export function breadcrumbSchema(
   };
 }
 
+export function faqSchema(
+  items: { q: string; a: string }[],
+  canonical: string,
+): Record<string, unknown> {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    '@id': `${canonical}#faq`,
+    mainEntity: items.map(({ q, a }) => ({
+      '@type': 'Question',
+      name: q,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: a,
+      },
+    })),
+  };
+}
+
 export function itemListSchema(
   items: { name: string; url: string; description?: string; image?: string }[],
 ): Record<string, unknown> {
@@ -209,7 +230,7 @@ export function softwareApplicationSchema(): Record<string, unknown> {
     '@type': 'WebApplication',
     '@id': `${SITE_URL}/#webapp`,
     name: 'Agora Cosmica',
-    url: SITE_URL,
+    url: `${SITE_URL}/app`,
     applicationCategory: 'EducationApplication',
     operatingSystem: 'Web Browser',
     browserRequirements: 'Requires JavaScript',
@@ -218,6 +239,12 @@ export function softwareApplicationSchema(): Record<string, unknown> {
     inLanguage: ['en', 'de'],
     license: 'https://www.gnu.org/licenses/agpl-3.0.html',
     publisher: { '@id': AGORA_ID },
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'EUR',
+      description: '30 free messages a day',
+    },
     featureList: [
       '30 historical figures with audio life stories',
       '12 teachings per figure',

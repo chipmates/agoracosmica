@@ -1,0 +1,14 @@
+---
+// Homepage body partial: one pillar of the "Honest, by design" trust
+// band. The pillar label is a small heading, the body holds the verbatim
+// sentences grouped out of HomepageBody's existing honest paragraph. No copy
+// is reworded, the page passes the exact sentences in via the default slot.
+interface Props {
+  label: string;
+}
+const { label } = Astro.props;
+---
+<div class="ll2-trust-card">
+  <h3 class="ll2-trust-card__label">{label}</h3>
+  <p class="ll2-trust-card__text"><slot /></p>
+</div>

@@ -1,0 +1,143 @@
+---
+// Die statische, crawlbare deutsche Startseite, ausgeliefert unter /de/. Die
+// React-SPA liegt jetzt unter /app. Diese Seite ist reines vorgerendertes
+// HTML: Der cinematische Observatory-Hero trägt das einzige <h1>, und der
+// gemeinsame HomepageBody rendert die crawlbare Bibliothek darunter, sodass
+// Besucher und Crawler die ganze Bibliothek ohne die React-App sehen. Genau
+// ein <h1> (der Hero); alle anderen Überschriften sind h2/h3. Die interaktiven
+// Inseln sind V2ObservatoryMotion des Heros (client:idle, nur Bewegung) und
+// der CouncilHero-Audio-Button im Body (client:visible), beide bereits
+// CSP-gehasht, also kein neuer Inline-Script-Hash.
+
+import Public from '../../layouts/Public.astro';
+import V2ObservatoryHero from '../../components/landing-lab/V2ObservatoryHero.astro';
+import V2ObservatoryMotion from '../../islands/V2ObservatoryMotion';
+import HomepageBody from '../../components/HomepageBody.astro';
+import {
+  agoraCosmicaSchema,
+  organizationSchema,
+  webSiteSchema,
+  softwareApplicationSchema,
+  faqSchema,
+  itemListSchema,
+  breadcrumbSchema,
+  podcastSeriesSchema,
+} from '../../lib/schemas';
+import { getT } from '../../i18n';
+import { canonicalUrl, publicUrl, SITE_URL, MEDIA_URL } from '../../lib/urls';
+import { getFiguresCatalog } from '@client/data/public/figuresCatalog';
+import { figureIdToSlug } from '@client/data/public/slugMap';
+import { THEMES, heroConfrontational } from '@client/data/councilCatalog';
+
+const lang = 'de' as const;
+const t = getT(lang);
+
+const figures = getFiguresCatalog(lang);
+const heroCouncil = heroConfrontational;
+
+// Repositionierte, bildungsorientierte FAQ (verbatim aus der QA-Quelle).
+const deFaq = [
+  {
+    q: 'Was ist Agora Cosmica?',
+    a: 'Eine Bildungsplattform, gebaut als lebendige Bibliothek, mit der du sprechen kannst. Dreißig Persönlichkeiten aus der Vergangenheit bringen dir etwas bei, über erzählte Lebensgeschichten, Kernlehren und vierstimmige Debatten, und du kannst einen Gedanken auch direkt mit ihnen besprechen, von Marc Aurel bis Ada Lovelace, auf Deutsch und Englisch. Gemeinnützig, Open Source und darauf gebaut, überprüfbar zu sein.',
+  },
+  {
+    q: 'Ist das also ein KI-Chatbot?',
+    a: 'Nicht wirklich. Das meiste, was du hier lernst, ist im Voraus gestaltet, 360 erzählte Geschichten, 360 Kernlehren, 360 Prisma-Dialoge und 110 Council-Debatten. Das lebendige KI-Gespräch ist einer der Wege, zu lernen, um einen Gedanken durchzusprechen oder alles zu fragen, nicht das Ganze.',
+  },
+  {
+    q: 'Spricht hier wirklich die historische Person?',
+    a: 'Nein. Jede Persönlichkeit ist ein KI-Echo, eine Stimme, geformt aus ihren eigenen Schriften und Ideen. Sie schöpft aus der echten Philosophie und bleibt eine Deutung. Nie eine Aufnahme, nie der echte Mensch.',
+  },
+  {
+    q: 'Kostet das etwas?',
+    a: 'Du bekommst 30 kostenlose Nachrichten pro Tag, ohne Anmeldung. Du willst mehr? Bring deinen eigenen OpenRouter-Schlüssel mit. Die Plattform selbst ist gemeinnützig und Open Source. Keine Werbung, keine Bezahlschranken.',
+  },
+  {
+    q: 'Brauche ich ein Konto, um anzufangen?',
+    a: 'Nein. Öffne die App und leg einfach los. Die kostenlosen täglichen Nachrichten funktionieren sofort. Keine E-Mail, keine Anmeldung.',
+  },
+  {
+    q: 'Wer sind die 30 Persönlichkeiten?',
+    a: 'Philosophen, Wissenschaftlerinnen, Mystiker, Künstlerinnen und Aktivisten aus 2.500 Jahren. Laozi, Platon, Rumi, Hildegard von Bingen, Galileo Galilei, Albert Einstein, Frida Kahlo, Virginia Woolf, Harriet Tubman, Carl Gustav Jung und zwanzig weitere. Sieh dir alle 30 auf der Persönlichkeiten-Seite an.',
+  },
+  {
+    q: 'Was kann ich hier eigentlich machen?',
+    a: 'Sechs Dinge. Hör dir eine Story aus dem Leben einer Persönlichkeit an. Arbeite dich durch ein Weisheit-Gespräch. Hör einem vierstimmigen Prisma-Dialog zu. Stell dich einer kurzen Quest-Herausforderung. Frag alles im Free Talk. Oder ruf einen Cosmic Council aus vier Persönlichkeiten zusammen, der eine einzige Frage debattiert.',
+  },
+  {
+    q: 'Was ist der Cosmic Council?',
+    a: 'Vier Persönlichkeiten rund um eine Frage, mit einer Moderation, die den Faden hält. Es gibt 110 sorgfältig gebaute Debatten mit erzähltem Audio. Oder bau deinen eigenen und wähle die Besetzung und die Frage selbst.',
+  },
+  {
+    q: 'Wie geht ihr mit meiner Privatsphäre um?',
+    a: 'Deine Gespräche bleiben in deinem Browser, verschlüsselt mit AES-256. Keine Tracking-Cookies, keine Analyse durch Dritte, keine Profile über dich. Wenn du deinen eigenen Schlüssel mitbringst, berührt er nie unsere Server.',
+  },
+  {
+    q: 'Woher kommt das Audio?',
+    a: 'Die Sprachsynthese und Spracherkennung in Echtzeit laufen auf unseren eigenen GPU-Servern in Deutschland. Die erzählten Geschichten und Debatten liegen auf Hosting in der EU und werden weltweit ausgeliefert.',
+  },
+  {
+    q: 'Ist es Open Source?',
+    a: 'Ja. Der Code liegt offen unter der AGPL-3.0, jede und jeder kann ihn lesen, die Datenschutzversprechen prüfen, mitarbeiten oder eine eigene Kopie betreiben. Die Inhalte wechseln innerhalb von 6 bis 12 Monaten zu einer CC-BY-Lizenz.',
+  },
+  {
+    q: 'Sind die Inhalte korrekt?',
+    a: 'Jede Stimme ist in Primärwerken verankert und gegen mehrere Quellen geprüft. Weil die Echos KI-erzeugt sind, variiert das Gesagte, das Quellmaterial aber nicht. Wo der Text über das Dokumentierte hinausgeht, benennt der Faktencheck, was nachgebildet wurde.',
+  },
+  {
+    q: 'Gibt es das auf Deutsch?',
+    a: 'Ja. Alles ist vollständig zweisprachig, Deutsch und Englisch, über die Inhalte, die Oberfläche und das Audio hinweg.',
+  },
+];
+
+const canonical = canonicalUrl('/de/');
+
+const figureItems = figures.map(f => ({
+  name: f.name,
+  url: canonicalUrl(publicUrl(lang, `/figures/${figureIdToSlug[f.id]}`)),
+  description: f.about.split('\n')[0].slice(0, 160),
+  image: `${MEDIA_URL}/images/figures/${f.id}/main/1200.webp`,
+}));
+
+const themeItems = THEMES.map(theme => ({
+  name: t(`themes.${theme.id}.name`),
+  url: canonicalUrl(publicUrl(lang, `/themes/${theme.id}`)),
+  description: t(`themes.${theme.id}.tagline`),
+}));
+
+const schemas = [
+  agoraCosmicaSchema(),
+  organizationSchema(),
+  webSiteSchema(),
+  softwareApplicationSchema(),
+  faqSchema(deFaq, canonical),
+  itemListSchema(figureItems),
+  itemListSchema(themeItems),
+  breadcrumbSchema([{ name: t('breadcrumbs.home'), url: `${SITE_URL}/de/` }]),
+  podcastSeriesSchema(lang),
+];
+
+// Das LCP-Portrait des Heros ist der innerste erste Planet (Marcus Aurelius),
+// passend zum Ring-Plan in V2ObservatoryHero. Mit hoher Priorität vorladen.
+const lcpPortrait = `${MEDIA_URL}/images/figures/aurelius/main/1200.webp`;
+---
+<Public
+  title="Eine lebendige Bibliothek, mit der du sprechen kannst"
+  fullTitle="Agora Cosmica · Eine lebendige Bibliothek, mit der du sprechen kannst"
+  description="Lerne von 30 bemerkenswerten Menschen, von Marc Aurel bis Ada Lovelace. Erzählte Geschichten, Lehren, KI-Gespräche. Gemeinnützig und Open Source."
+  canonicalPath="/"
+  lang={lang}
+  schemas={schemas}
+  preloadImage={lcpPortrait}
+  preloadImageType="image/webp"
+>
+  <!-- cinematischer orbitaler Hero (statischer Erstaufbau; die Insel ergänzt nur) -->
+  <V2ObservatoryHero lang={lang} />
+  <V2ObservatoryMotion client:idle targetId="v2-observatory" />
+
+  <!-- gemeinsamer crawlbarer SEO-Body -->
+  <div class="pub-content pub-home" id="v2-library">
+    <HomepageBody lang={lang} figures={figures} faq={deFaq} heroCouncil={heroCouncil} />
+  </div>
+</Public>

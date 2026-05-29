@@ -27,6 +27,17 @@
 /de/about   /de/about/  301
 /de/contact /de/contact/ 301
 
-# SPA fallback — serve index.html for all client-side routes
-# CF Pages serves existing static files first (JS, CSS, images, fonts)
-/* /index.html 200
+# App SPA — the React app (login + in-app surface) now lives under /app.
+# CF Pages serves build/app/index.html for /app and any sub-path so React
+# Router (basename "/app") handles client-side routing. /app is served bare
+# (no trailing-slash 301) so it matches the manifest start_url, canonical,
+# og:url, and the marketing CTA hrefs. These rules MUST precede the catch-all.
+/app    /app/index.html  200
+/app/*  /app/index.html  200
+
+# SPA fallback — serve the React shell for all unmatched client-side routes.
+# CF Pages serves existing static files first (JS, CSS, images, fonts) and the
+# static Astro pages (build/index.html, /figures/, /themes/, etc.) before
+# consulting these rules. Unknown paths reach the SPA router at /app, NOT the
+# static homepage.
+/* /app/index.html 200

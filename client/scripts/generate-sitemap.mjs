@@ -100,7 +100,12 @@ function deUrl(rawPath, priority, lastmod, changefreq = 'monthly') {
 // Page-type lastmod sources. The Astro page template is one signal; per-page
 // content (figure JSON, theme data) is the other. Take the max via git log
 // across both.
-const HOME_MOD = gitLastModified('client/index.html');
+const HOME_MOD = gitLastModified(
+  'marketing/src/pages/index.astro',
+  'marketing/src/pages/de/index.astro',
+  'marketing/src/components/BaseHead.astro',
+  'marketing/src/lib/schemas.ts',
+);
 const ABOUT_MOD = gitLastModified(
   'marketing/src/pages/about.astro',
   'marketing/src/pages/de/about.astro',

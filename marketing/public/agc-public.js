@@ -10,6 +10,15 @@
 (function () {
   'use strict';
 
+  // Homepage only: the cinematic hero must paint from the top on every reload.
+  // Browsers otherwise restore the prior scroll position, dropping a reloading
+  // visitor halfway down the library. Guarded so it never fights a real anchor
+  // target (e.g. the #v2-library scroll cue) and only touches / and /de/.
+  if ((location.pathname === '/' || location.pathname === '/de/') && !location.hash) {
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    window.scrollTo(0, 0);
+  }
+
   var SS_GCLID = 'agc_gclid';
   var SS_FIGURE = 'agc_intended_figure';
   var SS_COUNCIL = 'agc_intended_council';
