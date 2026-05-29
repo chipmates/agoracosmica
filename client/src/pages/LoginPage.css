@@ -42,9 +42,6 @@ body, html {
 
 .top-bar-right {
   right: 20px;
-  display: flex;
-  align-items: center;
-  gap: var(--space-xs);
 }
 
 /* Legal Menu Button - Premium 2025 Animation System */
@@ -215,13 +212,39 @@ body, html {
   line-height: 1;
 }
 
-/* Language toggle — shares the audio-toggle-button chrome, shows a 2-letter
-   code instead of an icon so a mismatched-language arrival can flip at the gate. */
-.lang-toggle-button {
-  font-size: var(--text-sm);
-  font-weight: var(--weight-medium);
-  letter-spacing: 0.06em;
-  min-width: 40px;
+/* Cinematic Seeker — frameless luminous portrait at the ring's core */
+.cinematic-seeker {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cinematic-seeker img {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  object-fit: cover;
+  filter: drop-shadow(0 0 22px color-mix(in srgb, var(--gold-subtle) 55%, transparent));
+  opacity: 0;
+  transition: opacity 1.2s ease;
+  animation: seeker-breathe 4s ease-in-out infinite;
+}
+/* The Seeker fades in on its own beat, after the portal has ignited alone */
+.cinematic-seeker.is-visible img {
+  opacity: 1;
+}
+@keyframes seeker-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+@media (min-width: 768px) {
+  .cinematic-seeker img { width: 104px; height: 104px; }
+}
+@media (min-width: 1366px) {
+  .cinematic-seeker img { width: 120px; height: 120px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cinematic-seeker img { animation: none; }
 }
 
 /* Audio button is always icon-only for consistency */

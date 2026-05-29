@@ -9,15 +9,19 @@ interface OriginalStyles {
 interface FigureControllerProps {
   active?: boolean;
   figureIndices?: number[];
+  startMs?: number;   // delay before the first figure fades
+  staggerMs?: number; // gap between each figure fading, one by one
 }
 
 /**
  * Controls figure visibility based on beam hits
  * Makes figures fade out when their corresponding beam hits them
  */
-const FigureController: FC<FigureControllerProps> = ({ 
-  active = false, 
-  figureIndices = [] 
+const FigureController: FC<FigureControllerProps> = ({
+  active = false,
+  figureIndices = [],
+  startMs = 800,
+  staggerMs = 750,
 }) => {
   useEffect(() => {
     if (!active || figureIndices.length === 0) return;
@@ -90,15 +94,15 @@ const FigureController: FC<FigureControllerProps> = ({
           } catch (err) {
             // Silent error handling
           }
-        }, 800 + i * 750)); // More distinct timing - 750ms between each figure, starting at 800ms
+        }, startMs + i * staggerMs)); // one by one, starting at startMs
       }
     });
-    
+
     // Cleanup: clear pending timers on unmount
     return () => {
       timerIds.forEach(id => clearTimeout(id));
     };
-  }, [active, figureIndices]);
+  }, [active, figureIndices, startMs, staggerMs]);
   
   // This component doesn't render anything visible
   return null;

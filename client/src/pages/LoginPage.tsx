@@ -1,28 +1,42 @@
 // src/pages/LoginPage.tsx
+//
+// Entry "Vorspann": a short, auto-playing, skippable cosmic cinematic. No card,
+// no button. The wordmark breathes (brand beat), the ring ignites with the
+// frameless Seeker at its core, two verse cards cross-fade, the figures fade
+// one by one, and the core blooms into the Paradiso rose. A tap/click/Esc at
+// any point skips straight to onComplete (the welcome step, where profile
+// creation + consent now live). Returning users never see this page.
 
-import React, { useState, useEffect, useRef, useCallback, FC, Suspense, lazy } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect, useRef, useCallback, FC, Suspense, lazy } from 'react';
 import './LoginPage.css';
 import CosmicBackground from '../components/CosmicBackground';
 import LoginContainer from '../components/LoginContainer';
-import CharacterLoginForm from '../components/CharacterLoginForm';
+import CinematicCards from '../components/CinematicCards';
 import MessagePopup from '../components/MessagePopup';
 import LandscapeWarning from '../components/LandscapeWarning';
 
-// Post-paint transition chunks. Both gate their visible work on a prop
-// (`active` / `isActive`), so the LoginPage shell renders immediately and
-// these load in the background. Suspense fallback is null because neither
-// shows anything until activated.
+// Post-paint transition chunks. Both gate their visible work on a prop, so the
+// shell renders immediately and these load in the background.
 const ParadisoTransition = lazy(() => import('../components/animations/ParadisoTransition'));
 const FigureController = lazy(() => import('../components/animations/CosmicLoginTransition/FigureController'));
 import { useTranslation } from '../hooks/useTranslation';
-import { Gavel, SpeakerSimpleHigh, SpeakerSimpleX, CaretDown, GithubLogo, ArrowSquareOut } from '@phosphor-icons/react';
 import { mediaBaseUrl as MEDIA_BASE } from '../config/runtime';
 
-// Music served from R2 (was bundled via vite import)
+// Music served from R2 (same track as the podcast + landing clips)
 const backgroundMusic = `${MEDIA_BASE}/images/music/music.webm`;
+// The hooded "Seeker" — the frameless protagonist at the ring's core
+const userThumbnail = `${MEDIA_BASE}/images/figures/user/thumbnail/320.webp`;
 
-// Window extension for loginFlashInProgress guard (was in CosmicLoginTransition)
+// Cinematic timeline — distinct beats, each given room to breathe (skippable).
+// All tunable: bump these to make the atmosphere linger.
+const PORTAL_MS = 1200;        // the portal ring circles alone (card 1)
+const SEEKER_MS = 3400;        // let the portal breathe a while before the Seeker (card 2)
+const FIGURES_MS = 2600;       // then the figures begin to fade, one by one (card 3)
+const FADE_MS = 4400;          // let them all fade before the rose appears
+const FIGURE_START_MS = 200;   // first figure's fade delay
+const FIGURE_STAGGER_MS = 460; // gap between figures (atmospheric, one by one)
+const PARADISO_AUTO_MS = 4500; // rose bloom (a touch longer) before handing off
+
 declare global {
   interface Window {
     loginFlashInProgress?: boolean;
@@ -36,22 +50,21 @@ interface LoginPageProps {
 type PopupType = 'error' | 'info' | 'success' | '';
 
 const LoginPage: FC<LoginPageProps> = ({ onComplete }) => {
-  const [isMuted, setIsMuted] = useState<boolean>(false);
   const [isFormVisible, setIsFormVisible] = useState<boolean>(false);
+  const [seekerVisible, setSeekerVisible] = useState<boolean>(false);
+  const [figuresFading, setFiguresFading] = useState<boolean>(false);
   const [isLandscape, setIsLandscape] = useState<boolean>(false);
   const [showPopup, setShowPopup] = useState<boolean>(false);
   const [popupMessage] = useState<string>('');
   const [popupType] = useState<PopupType>('');
   const [loginSuccessful, setLoginSuccessful] = useState<boolean>(false);
-  const [showLegalMenu, setShowLegalMenu] = useState<boolean>(false);
-  // React-managed overlays — replaces imperative document.createElement approach
   const [showSkipOverlay, setShowSkipOverlay] = useState<boolean>(false);
   // Paradiso rose + figure fade orchestration
   const [figuresActive, setFiguresActive] = useState(false);
   const [figureIndices, setFigureIndices] = useState<number[]>([]);
   const [portalAnimActive, setPortalAnimActive] = useState(false);
 
-  const { tString, tNode, language, setLanguage } = useTranslation();
+  const { tNode } = useTranslation();
 
   const audioRef = useRef<HTMLAudioElement>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -62,356 +75,201 @@ const LoginPage: FC<LoginPageProps> = ({ onComplete }) => {
     window.matchMedia('(prefers-reduced-motion: reduce)').matches
   );
 
-  const revealForm = useCallback(() => {
-    setIsFormVisible(true);
-  }, []);
+  // Hand off to the welcome step. Guarded so the skip click, Esc, and the
+  // Paradiso auto-complete timer can't fire onComplete more than once.
+  const finishCinematic = useCallback(() => {
+    if (completingRef.current) return;
+    completingRef.current = true;
+    window.loginFlashInProgress = true;
+    setShowSkipOverlay(false);
+    setTimeout(() => onComplete(), 100);
+  }, [onComplete]);
 
+  // Begin the rose climax (figures fade + Paradiso). Auto-triggered by the
+  // timeline — no click needed. Reduced motion skips straight to the handoff.
+  const beginRose = useCallback(() => {
+    if (loginSuccessful) return;
+    if (prefersReducedMotion.current) {
+      setLoginSuccessful(true);
+      finishCinematic();
+      return;
+    }
+    setShowSkipOverlay(true);
+    setLoginSuccessful(true);
+  }, [loginSuccessful, finishCinematic]);
+
+  // Mount: play the music, set the reveal timer, watch orientation.
   useEffect(() => {
     const audio = audioRef.current;
-    if (!audio) return;
 
-    audio.volume = 0.5;
-
-    // Start with muted appearance until audio plays
-    setIsMuted(true);
-
-    // Attempt to play audio immediately
     const playAudio = () => {
-      audio.play()
-        .then(() => {
-          setIsMuted(false);
-        })
-        .catch(() => {
-          // Autoplay blocked — user can unmute via audio toggle button
-        });
+      audio?.play().catch(() => {
+        // Autoplay blocked — starts on first interaction (listener below).
+      });
     };
-
-    // Play immediately
-    playAudio();
-
-    // Also try to play on user interaction with the page (first click/touch)
+    if (audio) {
+      audio.volume = 0.5;
+      playAudio();
+    }
     const handleFirstInteraction = () => {
       playAudio();
-      document.removeEventListener('click', handleFirstInteraction);
+      document.removeEventListener('pointerdown', handleFirstInteraction);
       document.removeEventListener('touchstart', handleFirstInteraction);
+      document.removeEventListener('mousemove', handleFirstInteraction);
     };
-
-    document.addEventListener('click', handleFirstInteraction);
+    document.addEventListener('pointerdown', handleFirstInteraction);
     document.addEventListener('touchstart', handleFirstInteraction);
+    document.addEventListener('mousemove', handleFirstInteraction);
 
-    // Listen for when audio actually starts playing
-    const handlePlay = () => {
-      setIsMuted(false);
-    };
-
-    audio.addEventListener('play', handlePlay);
-
-    // Skip initial wait if user prefers reduced motion
-    if (prefersReducedMotion.current) {
-      revealForm();
-    } else {
-      timerRef.current = setTimeout(revealForm, 1500);
-    }
+    // Ignite the portal ring first (the Seeker comes a beat later).
+    timerRef.current = setTimeout(
+      () => setIsFormVisible(true),
+      prefersReducedMotion.current ? 0 : PORTAL_MS
+    );
 
     const handleOrientation = () => {
-      // Only block phone landscape (under 768px width and under 500px height)
       setIsLandscape(
-        window.innerWidth > window.innerHeight && 
-        window.innerWidth < 768 &&  // Only phones, not tablets
-        window.innerHeight < 500     // Very short viewport indicating phone
+        window.innerWidth > window.innerHeight &&
+        window.innerWidth < 768 &&
+        window.innerHeight < 500
       );
     };
-
     window.addEventListener('resize', handleOrientation);
     handleOrientation();
 
     return () => {
-      audio.pause();
-      audio.currentTime = 0;
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
-      }
-      document.removeEventListener('click', handleFirstInteraction);
+      audio?.pause();
+      if (audio) audio.currentTime = 0;
+      if (timerRef.current) clearTimeout(timerRef.current);
+      document.removeEventListener('pointerdown', handleFirstInteraction);
       document.removeEventListener('touchstart', handleFirstInteraction);
+      document.removeEventListener('mousemove', handleFirstInteraction);
       window.removeEventListener('resize', handleOrientation);
-      audio.removeEventListener('play', handlePlay);
     };
-  }, [revealForm]);
+  }, []);
 
-  // Handle click outside to close legal menu
+  // Beat 2: the Seeker materializes once the portal has circled alone.
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-      if (!target.closest('.top-bar-left')) {
-        setShowLegalMenu(false);
-      }
-    };
+    if (!isFormVisible || seekerVisible || loginSuccessful) return;
+    const t = setTimeout(() => setSeekerVisible(true), prefersReducedMotion.current ? 0 : SEEKER_MS);
+    return () => clearTimeout(t);
+  }, [isFormVisible, seekerVisible, loginSuccessful]);
 
-    if (showLegalMenu) {
-      document.addEventListener('click', handleClickOutside);
-      return () => document.removeEventListener('click', handleClickOutside);
-    }
-  }, [showLegalMenu]);
+  // Beat 3: the figures begin to fade, one by one.
+  useEffect(() => {
+    if (!seekerVisible || figuresFading || loginSuccessful) return;
+    const t = setTimeout(() => setFiguresFading(true), prefersReducedMotion.current ? 0 : FIGURES_MS);
+    return () => clearTimeout(t);
+  }, [seekerVisible, figuresFading, loginSuccessful]);
 
-  // Post-login: trigger Paradiso rose + figure fade after 500ms
+  // Activate the figure fade, then bloom the rose once they have all gone.
+  useEffect(() => {
+    if (!figuresFading || loginSuccessful) return;
+    const figures = document.querySelectorAll<HTMLElement>('.historical-figure');
+    setFigureIndices(Array.from(figures).map((_, i) => i));
+    setFiguresActive(true);
+    const t = setTimeout(() => beginRose(), prefersReducedMotion.current ? 0 : FADE_MS);
+    return () => clearTimeout(t);
+  }, [figuresFading, loginSuccessful, beginRose]);
+
+  // Beat 4: the rose blooms (the portal + Seeker have handed off).
   useEffect(() => {
     if (!loginSuccessful) return;
-    const timer = setTimeout(() => {
-      setPortalAnimActive(true);
-      const figures = document.querySelectorAll<HTMLElement>('.historical-figure');
-      setFigureIndices(Array.from(figures).map((_, i) => i));
-      setFiguresActive(true);
-    }, 500);
-    return () => clearTimeout(timer);
+    const t = setTimeout(() => setPortalAnimActive(true), prefersReducedMotion.current ? 0 : 200);
+    return () => clearTimeout(t);
   }, [loginSuccessful]);
 
-  // Escape key support for both animation phases
+  // Esc skips the whole cinematic.
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        if (loginSuccessful) {
-          handleInitialAnimationComplete();
-        } else if (!isFormVisible) {
-          handlePortalClick();
-        }
-      }
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') finishCinematic();
     };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [finishCinematic]);
 
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [loginSuccessful, isFormVisible]); // eslint-disable-line react-hooks/exhaustive-deps
+  const closePopup = () => setShowPopup(false);
 
-  const handleEntryComplete = () => {
-    if (loginSuccessful) return; // Prevent double-submit
-
-    // Skip post-login animation entirely if user prefers reduced motion
-    if (prefersReducedMotion.current) {
-      setLoginSuccessful(true);
-      handleInitialAnimationComplete();
-      return;
-    }
-
-    setShowSkipOverlay(true);
-    setLoginSuccessful(true);
-  };
-
-  const handleInitialAnimationComplete = () => {
-    // Guard against double invocation (Escape + click + ParadisoTransition timer)
-    if (completingRef.current) return;
-    completingRef.current = true;
-
-    window.loginFlashInProgress = true;
-
-    setShowSkipOverlay(false);
-
-    setTimeout(() => {
-      onComplete();
-    }, 100);
-  };
-
-  const toggleMute = () => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    
-    // If audio hasn't started playing yet, try to play it
-    if (audio.paused) {
-      playBackgroundSound();
-    } else {
-      // Toggle mute state
-      audio.muted = !audio.muted;
-      setIsMuted(audio.muted);
-    }
-  };
-
-  const playBackgroundSound = () => {
-    const audio = audioRef.current;
-    if (!audio) {
-      console.error('Audio element not found');
-      return;
-    }
-    
-    // Ensure src is set (fallback logic from AudioControls)
-    if (!audio.src || audio.src === window.location.href) {
-      const source = audio.querySelector('source');
-      if (source) {
-        audio.src = source.src || backgroundMusic || '/assets/music.mp3';
-      }
-    }
-    
-    audio.play()
-      .then(() => {
-        setIsMuted(false);
-      })
-      .catch((error) => {
-        console.error('Audio playback error:', error);
-        // Try fallback approach
-        audio.src = backgroundMusic || '/assets/music.mp3';
-        audio.load();
-        audio.play().then(() => {
-          setIsMuted(false);
-        }).catch(e => console.error('Fallback play failed:', e));
-      });
-  };
-
-  const handlePortalClick = () => {
-    if (!isFormVisible) {
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
-        timerRef.current = null;
-      }
-      revealForm();
-    }
-  };
-
-  const closePopup = () => {
-    setShowPopup(false);
+  // A tap/click anywhere skips straight to the welcome step.
+  const handleBackgroundClick = () => {
+    finishCinematic();
   };
 
   if (isLandscape) {
     return <LandscapeWarning />;
   }
 
-  // Full-screen click handler for initial animation skip
-  const handleBackgroundClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    // Don't intercept clicks on top-bar buttons
-    const target = e.target as HTMLElement;
-    if (target.closest('.top-bar-left') || target.closest('.top-bar-right')) return;
-
-    // Only skip during initial animation (before form appears)
-    if (!isFormVisible && !loginSuccessful) {
-      handlePortalClick();
-    }
-  };
-
   return (
     <div className="background" onClick={handleBackgroundClick}>
-      {/* Modular cosmic background — hide meteors once rose takes over */}
+      {/* Cosmic background — hide meteors once the rose takes over */}
       <CosmicBackground hideMeteors={loginSuccessful} />
 
-      {/* Modular login container with portal reference */}
+      {/* Portal + frameless Seeker portrait at its core (no card box) */}
       <LoginContainer
         ref={portalRef}
         isFormVisible={!loginSuccessful && isFormVisible}
         loginSuccessful={loginSuccessful}
-        handlePortalClick={!loginSuccessful ? handlePortalClick : () => {}}
+        handlePortalClick={() => {}}
       >
-        <CharacterLoginForm onComplete={handleEntryComplete} />
+        <div className={`cinematic-seeker ${seekerVisible ? 'is-visible' : ''}`} aria-hidden="true">
+          <img src={userThumbnail} alt="" />
+        </div>
       </LoginContainer>
 
-      {/* Figure fade-out + Celestial Rose — both gate their heavy work on a
-          prop, so we lazy-load the chunks. Suspense fallback is null since
-          neither produces visible output until activated. */}
+      {/* Parallel verse story above the ring (the Dante line lives in the rose) */}
+      <CinematicCards
+        active={!loginSuccessful && isFormVisible}
+        step={figuresFading ? 2 : seekerVisible ? 1 : 0}
+      />
+
+      {/* Figure fade-out + Celestial Rose */}
       <Suspense fallback={null}>
-        <FigureController active={figuresActive} figureIndices={figureIndices} />
+        <FigureController
+          active={figuresActive}
+          figureIndices={figureIndices}
+          startMs={FIGURE_START_MS}
+          staggerMs={FIGURE_STAGGER_MS}
+        />
         <ParadisoTransition
           isActive={portalAnimActive}
           variant={1}
-          onAnimationComplete={handleInitialAnimationComplete}
-          autoCompleteMs={15000}
+          onAnimationComplete={finishCinematic}
+          autoCompleteMs={PARADISO_AUTO_MS}
         />
       </Suspense>
 
-      {/* Full-screen skip overlay for post-login animation */}
+      {/* Full-screen skip target during the rose phase */}
       {loginSuccessful && showSkipOverlay && (
         <div
           className="skip-animation-overlay"
-          onClick={handleInitialAnimationComplete}
+          onClick={finishCinematic}
           role="button"
           tabIndex={0}
           aria-label="Skip animation"
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') {
-              handleInitialAnimationComplete();
+              finishCinematic();
             }
           }}
         />
       )}
 
-      {/* Split top bars - legal left, audio right */}
-      <div className="top-bar-left">
-        <button 
-          className="legal-menu-button"
-          onClick={() => setShowLegalMenu(!showLegalMenu)}
-          aria-label={tString('legal.menuLabel', 'Legal information')}
-          aria-expanded={showLegalMenu}
-        >
-          <Gavel size={18} className="legal-menu-icon" />
-          <CaretDown size={14} className={`legal-menu-chevron ${showLegalMenu ? 'rotate' : ''}`} />
-        </button>
-        
-        {showLegalMenu && (
-          <div className="legal-dropdown">
-            <Link to="/about" className="legal-dropdown-link">
-              {tNode('legal.links.about')}
-            </Link>
-            <Link to="/impressum" className="legal-dropdown-link">
-              {tNode('legal.links.imprint')}
-            </Link>
-            <Link to="/datenschutz" className="legal-dropdown-link">
-              {tNode('legal.links.privacy')}
-            </Link>
-            <Link to="/nutzungsbedingungen" className="legal-dropdown-link">
-              {tNode('legal.links.terms')}
-            </Link>
-            <Link to="/cookie-policy" className="legal-dropdown-link">
-              {tNode('legal.links.cookiePolicy')}
-            </Link>
-            <a
-              href="https://github.com/chipmates/agoracosmica"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="legal-dropdown-link"
-              style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
-            >
-              <GithubLogo size={14} weight="regular" />
-              <span>{tNode('legal.links.github')}</span>
-              <ArrowSquareOut size={11} weight="regular" style={{ marginLeft: 'auto', opacity: 0.6 }} aria-hidden="true" />
-            </a>
-          </div>
-        )}
-      </div>
-      
-      <div className="top-bar-right">
-        <button
-          className="audio-toggle-button lang-toggle-button"
-          onClick={() => setLanguage(language === 'de' ? 'en' : 'de')}
-          aria-label={tString('entry.switchLang', 'Switch language')}
-        >
-          {language === 'de' ? 'EN' : 'DE'}
-        </button>
-        <button
-          className="audio-toggle-button"
-          onClick={toggleMute}
-          aria-label={isMuted ? tString('audio.unmute', 'Unmute') : tString('audio.mute', 'Mute')}
-        >
-          {isMuted ? (
-            <SpeakerSimpleX size={18} className="audio-icon" />
-          ) : (
-            <SpeakerSimpleHigh size={18} className="audio-icon" />
-          )}
-        </button>
-      </div>
-      
       <audio ref={audioRef} loop preload="none">
         <source src={backgroundMusic} type="audio/webm" />
         {tNode('audio.browserNotSupported')}
       </audio>
-      
-      {/* Loading overlay removed — transition is fast enough without it */}
 
-      {/* Screen reader announcements */}
+      {/* Screen reader announcement */}
       <div className="sr-only" aria-live="polite">
         {isFormVisible && tNode('entry.formReady')}
       </div>
 
-      {/* Modular message popup */}
       <MessagePopup
         showPopup={showPopup}
         popupMessage={popupMessage}
         popupType={popupType}
         closePopup={closePopup}
       />
-      
     </div>
   );
 };

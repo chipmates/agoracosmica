@@ -79,7 +79,7 @@
     "explainer": "Lerne von 30 großen Persönlichkeiten der Geschichte.",
     "access": "Ohne Anmeldung. 30 kostenlose Nachrichten pro Tag.",
     "trustLine": "Gemeinnützig · Open Source · Kein Nutzer-Tracking",
-    "identityLabel": "Tritt ein, wie du bist.",
+    "identityLabel": "Nur ein Name, dann los.",
     "motto": {
       "dante": "Durch dunkle Wälder, ans Licht der Sterne.",
       "beatrice": "Erkenntnis, wie Licht, erhellt den Weg.",
@@ -98,7 +98,11 @@
     "formReady": "Das Profilformular ist jetzt verfügbar",
     "reassure": "Dein Name bleibt auf diesem Gerät. Kein Konto, keine E-Mail.",
     "formAria": "Wähle, wie du erscheinst",
-    "switchLang": "Zu Englisch wechseln"
+    "cinematic": {
+      "card1": "Jede Frage beginnt im Dunkeln.",
+      "card2": "Vor dir haben viele gefragt.",
+      "card3": "Sie erheben sich, um dir zu begegnen."
+    }
   },
   "login": {
     "title": "Willkommen zurück",
@@ -1275,7 +1279,7 @@
     },
     "consent": {
       "heading": "Bevor du loslegst",
-      "aiNotice": "Diese Anwendung wird vollständig von künstlicher Intelligenz (KI) betrieben. Du interagierst NICHT mit echten historischen Persönlichkeiten. Alle Inhalte werden automatisch von einem KI-System generiert und können sachlich unrichtig, unvollständig oder irreführend sein. Überprüfe wichtige Informationen immer mit Primärquellen.",
+      "aiNotice": "Die Persönlichkeiten hier sind KI-Interpretationen, nicht die echten historischen Menschen. Alles, was sie sagen, ob im Gespräch oder vorab erstellt, wird von künstlicher Intelligenz (KI) erzeugt und kann ungenau, unvollständig oder irreführend sein. Überprüfe wichtige Informationen immer anhand vertrauenswürdiger Primärquellen.",
       "ageCheckbox": "Ich bestätige, dass ich mindestens 16 Jahre alt bin oder die Zustimmung eines Erziehungsberechtigten habe.",
       "termsCheckbox": "Ich habe die",
       "termsLink": "Nutzungsbedingungen",

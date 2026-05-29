@@ -422,18 +422,15 @@
 /* Login form styling */
 .login-form {
   position: absolute;
-  width: 72%; /* Slightly smaller to ensure fit */
+  width: 72%;
   max-width: 240px;
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.3s ease 0.5s, visibility 0.3s ease 0.5s, transform 0.3s ease 0.5s;
   z-index: var(--z-base); /* 10 */
-  background-color: rgba(20, 25, 60, 0.6);
-  backdrop-filter: blur(var(--glass-blur-heavy));
-  padding: 1.1rem; /* Slightly less padding */
-  border-radius: 10px;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-  border: 1px solid color-mix(in srgb, var(--gold-subtle) 25%, transparent);
+  /* Cinematic entry: the form card is gone. The portal now frames the
+     frameless Seeker portrait, so no box (no background, blur, padding,
+     border, or shadow). */
   transform: translateY(20px);
 }
 

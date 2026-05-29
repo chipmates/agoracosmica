@@ -365,6 +365,15 @@
   color: color-mix(in srgb, var(--gold-subtle) 70%, transparent);
 }
 
+.intro-reassure {
+  margin: 0.3rem 0 0;
+  font-family: var(--font-ui);
+  font-size: clamp(0.7rem, 1.6vw, 0.86rem);
+  font-weight: 400;
+  letter-spacing: 0.015em;
+  color: color-mix(in srgb, var(--gold-subtle) 58%, transparent);
+}
+
 .intro-trust {
   margin: 0.3rem 0 0;
   font-family: var(--font-ui);

@@ -21,9 +21,9 @@ import NutzungsbedingungenPage from './pages/NutzungsbedingungenPage';
 // CF Pages serves the prerendered HTML for /figures/*, /themes/*, /about,
 // /contact directly; this React SPA only handles `/`, `/de/`, and the legal
 // pages (Impressum, Datenschutz, Cookie Policy, Nutzungsbedingungen).
-import { sendConversion } from './utils/public/gclidCapture';
-import { sendEntryBeacon } from './utils/entryBeacon';
-import { sendSignupBeacon } from './utils/signupBeacon';
+// Entry/signup beacons + the profile_created conversion now fire from the
+// WelcomeDisclosureModal "Begin" (where profile + consent complete), not here.
+// captureGclid() still runs in index.tsx; sendConversion reads sessionStorage.
 // Dev/test pages — only imported in dev mode so Vite excludes them from production build.
 // Kept lean: contributor-facing diagnostics and benchmarks only. Internal A/B harnesses
 // and visual-design experiments live in the private workspace.
@@ -335,64 +335,35 @@ function App(): React.ReactElement {
       document.body.style.pointerEvents = 'auto';
     };
     
-    // Check if this is a first-time login
-    const hasAnyHistory = LocalStorageAdapter.keys().some((key) => key.startsWith('history_'));
-    const hasSelectedFigure = LocalStorageAdapter.getString('selectedFigure');
-    const { complete: onboardingCompletedFlag, skipped: onboardingSkippedFlag } = useDomainStore.getState().onboarding;
-    const onboardingCompleted = onboardingCompletedFlag ? 'true' : null;
-    const onboardingSkipped = onboardingSkippedFlag ? 'true' : null;
-    
-    const isFirstLogin = !hasAnyHistory && !hasSelectedFigure && !onboardingCompleted && !onboardingSkipped;
+    // The cinematic only plays for visitors without a stored profile, so they
+    // all need the welcome step next. Profile creation, consent, the entry /
+    // signup beacons, and the profile_created conversion now live there (the
+    // WelcomeDisclosureModal "Begin"); this just opens it.
+    sessionStorage.setItem('showOnboarding', 'true');
 
-    // If this is the first login, force the onboarding to show
-    if (isFirstLogin) {
-      sessionStorage.setItem('showOnboarding', 'true');
-    }
-    
     // Clean up before setting logged in state
     cleanupOverlays();
-    
+
     // Set login state (persist hint for page refresh)
     LocalStorageAdapter.setString('isLoggedIn', 'true');
     setIsLoggedIn(true);
 
-    // Anonymous entry beacon — closes the bounce stage between page-load
-    // beacon (arrival) and session row (first Turnstile-gated interaction).
-    sendEntryBeacon();
-
-    // Anonymous signup beacon — fires only for new accounts (isFirstLogin),
-    // so the dashboard can show total signups including organic users (the
-    // gclid-gated profile_created conversion shows ad-attributed ones only).
-    if (isFirstLogin) {
-      sendSignupBeacon();
-    }
-
-    // Send conversion event if user came from a Google Ad
-    sendConversion('profile_created');
-    
     // Clean up again after a short delay (in case React rerenders add new elements)
     setTimeout(cleanupOverlays, 100);
   };
 
   const handleLogout = (): void => {
-    // For production, we want to preserve user state between sessions
-    // Remove profile from IndexedDB when logging out
-    preferencesIndexedDbAdapter.deleteUserProfile().catch(err => {
-      console.error('Failed to delete profile:', err);
-    });
-    
-    // Update app state (clear localStorage hint)
+    // Clear the session, then send the user back to the public homepage.
+    // The entry page is now a cinematic (no profile form), so dropping back
+    // into it on logout would loop oddly — agoracosmica.org is the right place
+    // to land. Delete the profile first, then navigate.
     LocalStorageAdapter.remove('isLoggedIn');
-    setIsLoggedIn(false);
-    
-    // Note: We intentionally preserve the following between sessions:
-    // - Conversation history
-    // - Selected figure and seeds
-    // - Completed onboarding status
-    // - User preferences and settings
-    
-    // This ensures returning users see their previous conversations
-    // and don't have to redo onboarding when they log back in
+    preferencesIndexedDbAdapter.deleteUserProfile()
+      .catch((err) => console.error('Failed to delete profile:', err))
+      .finally(() => { window.location.href = '/'; });
+
+    // Conversation history, selected figure, onboarding status, and preferences
+    // are intentionally preserved between sessions.
   };
 
   // Create router with future flags — memoized to prevent recreation on unrelated re-renders

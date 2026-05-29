@@ -145,16 +145,6 @@ const CharacterLoginForm: FC<CharacterLoginFormProps> = ({ onComplete, beatriceI
           margin: 0 0 0.45rem;
         }
 
-        .cs-reassure {
-          text-align: center;
-          color: color-mix(in srgb, var(--text-primary) 42%, transparent);
-          font-size: 0.62rem;
-          line-height: 1.35;
-          letter-spacing: 0.02em;
-          margin: 0.3rem auto 0;
-          max-width: 22rem;
-        }
-
         .cs-selector {
           display: flex;
           align-items: center;
@@ -340,11 +330,6 @@ const CharacterLoginForm: FC<CharacterLoginFormProps> = ({ onComplete, beatriceI
           readOnly={!isCustom}
         />
       </div>
-
-      {/* On-device reassurance, right where the "is this a signup?" doubt is
-          born. Resolves the tension with the No User Tracking promise instead
-          of contradicting it. */}
-      <p className="cs-reassure">{tNode('entry.reassure')}</p>
 
       {/* Submit */}
       <div className="form-actions">

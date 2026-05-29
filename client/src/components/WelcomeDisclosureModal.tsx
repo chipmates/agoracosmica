@@ -6,6 +6,11 @@ import { ShieldCheck } from '@phosphor-icons/react';
 import OptimizedImage from './OptimizedImage';
 import CosmicLogo from './CosmicLogo';
 import styles from './WelcomeDisclosureModal.module.css';
+import { preferencesIndexedDbAdapter } from '../storage/preferencesIndexedDbAdapter';
+import { LocalStorageAdapter } from '../storage/localAdapter';
+import { sendEntryBeacon } from '../utils/entryBeacon';
+import { sendSignupBeacon } from '../utils/signupBeacon';
+import { sendConversion } from '../utils/public/gclidCapture';
 
 interface WelcomeDisclosureModalProps {
   isOpen: boolean;
@@ -16,7 +21,7 @@ interface WelcomeDisclosureModalProps {
 const CURRENT_AGB_VERSION = '1.0.0';
 
 const WelcomeDisclosureModal: FC<WelcomeDisclosureModalProps> = ({ isOpen, onComplete, onSkip }) => {
-  const { tString, tNode } = useTranslation();
+  const { tString, tNode, language } = useTranslation();
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
   const [hasAnimated, setHasAnimated] = useState<boolean>(false);
   const [ageConfirmed, setAgeConfirmed] = useState<boolean>(false);
@@ -39,8 +44,26 @@ const WelcomeDisclosureModal: FC<WelcomeDisclosureModalProps> = ({ isOpen, onCom
       minAge: 16,
       timestamp: Date.now(),
     }));
+    // No profile UI at entry — default to the Seeker. The user can rename or
+    // change the avatar later in settings.
+    preferencesIndexedDbAdapter.setUserProfile({
+      name: tString('entry.defaultName', 'Seeker'),
+      avatar: null,
+      locale: language,
+    }).catch((err) => console.error('Failed to save profile:', err));
+
+    // Entry funnel beacons — this is the true "entered the app" moment (profile
+    // created + consent given). isFirstLogin gates the organic-signup beacon;
+    // the profile_created conversion self-gates on a captured gclid (unchanged).
+    const hasAnyHistory = LocalStorageAdapter.keys().some((k) => k.startsWith('history_'));
+    const hasSelectedFigure = LocalStorageAdapter.getString('selectedFigure');
+    const isFirstLogin = !hasAnyHistory && !hasSelectedFigure;
+    sendEntryBeacon();
+    if (isFirstLogin) sendSignupBeacon();
+    sendConversion('profile_created');
+
     setIsAnimating(true);
-  }, [consentGiven]);
+  }, [consentGiven, language, tString]);
 
   const handleSkip = useCallback((): void => {
     onSkip();
@@ -146,32 +169,15 @@ const WelcomeDisclosureModal: FC<WelcomeDisclosureModalProps> = ({ isOpen, onCom
             </div>
           </div>
           <p className={styles.modalSubtitle}>{tNode('welcome.explainer.tagline')}</p>
+          <div className={styles.trustSignals}>
+            <ShieldCheck size={12} weight="duotone" className={styles.trustIcon} />
+            <span>{tNode('welcome.trustSignals')}</span>
+          </div>
         </div>
 
         {/* Content */}
         <div className={styles.modalContent} tabIndex={-1}>
           <div className={styles.welcomeContent}>
-            {/* Explainer — flowing prose with warm glow */}
-            <div className={styles.explainer}>
-              <div className={styles.explainerGlow} aria-hidden="true" />
-              <p className={styles.explainerBody}>
-                {tNode('welcome.explainer.bodyPart1')}{' '}
-                <strong className={styles.highlight}>{tNode('welcome.explainer.listenLabel')}</strong>
-                {tNode('welcome.explainer.bodyPart2')}{' '}
-                <strong className={styles.highlight}>{tNode('welcome.explainer.talkLabel')}</strong>
-                {tNode('welcome.explainer.bodyPart3')}{' '}
-                <strong className={styles.highlight}>{tNode('welcome.explainer.councilLabel')}</strong>
-                {tNode('welcome.explainer.bodyPart4')}
-              </p>
-              <p className={styles.explainerMission}>
-                {tNode('welcome.explainer.mission')}
-              </p>
-              <div className={styles.trustSignals}>
-                <ShieldCheck size={12} weight="duotone" className={styles.trustIcon} />
-                <span>{tNode('welcome.trustSignals')}</span>
-              </div>
-            </div>
-
             {/* Campbell Scene — fades in after value prop */}
             <div
               className={`${styles.cosmicScene} ${!hasAnimated ? styles.campbellReveal : ''}`}
