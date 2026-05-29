@@ -8,6 +8,7 @@ import BaseHead from '../components/BaseHead.astro';
 import Navbar from '../components/Navbar.astro';
 import Footer from '../components/Footer.astro';
 import PublicScript from '../components/PublicScript.astro';
+import { getT } from '../i18n';
 import type { Lang } from '../i18n';
 
 import '@client/index.css';
@@ -30,10 +31,13 @@ interface Props {
   schemas?: Array<Record<string, unknown>>;
   includeRss?: boolean;
   noHreflang?: boolean;
+  /** Set false on pages that render their own dedicated CTA (figure + theme detail). */
+  stickyCta?: boolean;
 }
 
 const props = Astro.props;
 const currentPath = Astro.url.pathname;
+const t = getT(props.lang);
 ---
 <!doctype html>
 <html lang={props.lang}>
@@ -48,6 +52,17 @@ const currentPath = Astro.url.pathname;
       </main>
       <Footer lang={props.lang} />
     </div>
+    <!-- Mobile-only sticky CTA. On mobile the navbar CTA sits inside the
+         hamburger, so this keeps a visible app entry at the bottom. Hidden on
+         desktop, where the navbar CTA is always shown. Suppressed on pages that
+         render their own dedicated CTA (figure + theme detail). -->
+    {props.stickyCta !== false && (
+      <div class="pub-cta pub-cta--sticky">
+        <div class="pub-cta__inner">
+          <a href="/app" class="pub-cta__button" data-agc-cta="start-exploring">{t('nav.startExploring')}</a>
+        </div>
+      </div>
+    )}
     <PublicScript />
   </body>
 </html>

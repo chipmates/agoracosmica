@@ -307,7 +307,9 @@ html:has(.public-page) #root {
 /* ─── CTA ─── */
 
 .pub-cta--sticky {
-  display: block;
+  /* Hidden on desktop (the navbar CTA is visible there); shown only on mobile,
+     where the navbar CTA is tucked inside the hamburger. */
+  display: none;
   position: fixed;
   bottom: 0;
   left: 0;
@@ -424,7 +426,13 @@ html:has(.public-page) #root {
   }
 
   .pub-cta--sticky {
+    display: block;
     padding: 0.75rem 1rem;
+  }
+
+  /* Leave room below the footer so the fixed CTA bar never covers content. */
+  .public-page {
+    padding-bottom: 5rem;
   }
 }
 
