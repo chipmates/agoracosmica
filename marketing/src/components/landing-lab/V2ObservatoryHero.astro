@@ -166,7 +166,6 @@ const planets: Planet[] = ringPlan.flatMap((ring, ringIndex) => {
         {ringPlan.map((ring, ringIndex) => (
           <div
             class={`v2-orbit v2-orbit--${ringIndex} ${ring.reverse ? 'v2-orbit--rev' : ''}`}
-            style={`--v2-spin:${ring.spin}s`}
             aria-hidden="true"
           >
             {planets
@@ -175,7 +174,6 @@ const planets: Planet[] = ringPlan.flatMap((ring, ringIndex) => {
                 <a
                   class={`v2-planet ${p.isLcp ? 'v2-planet--lcp' : ''}`}
                   href={p.href}
-                  style={`--v2-angle:${p.angle}deg`}
                   data-figure={p.id}
                   tabindex="-1"
                 >

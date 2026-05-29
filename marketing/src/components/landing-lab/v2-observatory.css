@@ -269,9 +269,31 @@
   animation-play-state: paused;
 }
 .v2-orbit--rev { animation-name: v2-spin-rev; }
-.v2-orbit--0 { width: 44%; height: 44%; --v2-radius: calc(var(--v2-stage) * 0.22); }
-.v2-orbit--1 { width: 70%; height: 70%; --v2-radius: calc(var(--v2-stage) * 0.35); }
-.v2-orbit--2 { width: 100%; height: 100%; --v2-radius: calc(var(--v2-stage) * 0.50); }
+.v2-orbit--0 { width: 44%; height: 44%; --v2-radius: calc(var(--v2-stage) * 0.22); --v2-spin: 64s; }
+.v2-orbit--1 { width: 70%; height: 70%; --v2-radius: calc(var(--v2-stage) * 0.35); --v2-spin: 92s; }
+.v2-orbit--2 { width: 100%; height: 100%; --v2-radius: calc(var(--v2-stage) * 0.50); --v2-spin: 120s; }
+
+/* Per-planet orbit angle set in the BUNDLED stylesheet (not an inline style=),
+   so the strict production CSP (whose Astro meta hashes nullify style
+   'unsafe-inline') cannot block it. The ringPlan is fixed: 3 inner / 5 middle /
+   7 outer, each ring offset by ringIndex*18deg and evenly spaced. nth-child
+   counts the planets in render order, matching the frontmatter angle math.
+   If the roster or ring counts change, regenerate these values. */
+.v2-orbit--0 .v2-planet:nth-child(1) { --v2-angle: 0deg; }
+.v2-orbit--0 .v2-planet:nth-child(2) { --v2-angle: 120deg; }
+.v2-orbit--0 .v2-planet:nth-child(3) { --v2-angle: 240deg; }
+.v2-orbit--1 .v2-planet:nth-child(1) { --v2-angle: 18deg; }
+.v2-orbit--1 .v2-planet:nth-child(2) { --v2-angle: 90deg; }
+.v2-orbit--1 .v2-planet:nth-child(3) { --v2-angle: 162deg; }
+.v2-orbit--1 .v2-planet:nth-child(4) { --v2-angle: 234deg; }
+.v2-orbit--1 .v2-planet:nth-child(5) { --v2-angle: 306deg; }
+.v2-orbit--2 .v2-planet:nth-child(1) { --v2-angle: 36deg; }
+.v2-orbit--2 .v2-planet:nth-child(2) { --v2-angle: 87.4286deg; }
+.v2-orbit--2 .v2-planet:nth-child(3) { --v2-angle: 138.857deg; }
+.v2-orbit--2 .v2-planet:nth-child(4) { --v2-angle: 190.286deg; }
+.v2-orbit--2 .v2-planet:nth-child(5) { --v2-angle: 241.714deg; }
+.v2-orbit--2 .v2-planet:nth-child(6) { --v2-angle: 293.143deg; }
+.v2-orbit--2 .v2-planet:nth-child(7) { --v2-angle: 344.571deg; }
 
 /* a planet sits on its ring via rotate(angle) -> push out -> the inner face
    counter-rotates so the portrait + label stay upright as the ring turns. */
