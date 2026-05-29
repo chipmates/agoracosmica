@@ -51,7 +51,7 @@ const LoginPage: FC<LoginPageProps> = ({ onComplete }) => {
   const [figureIndices, setFigureIndices] = useState<number[]>([]);
   const [portalAnimActive, setPortalAnimActive] = useState(false);
 
-  const { tString, tNode } = useTranslation();
+  const { tString, tNode, language, setLanguage } = useTranslation();
 
   const audioRef = useRef<HTMLAudioElement>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -110,7 +110,7 @@ const LoginPage: FC<LoginPageProps> = ({ onComplete }) => {
     if (prefersReducedMotion.current) {
       revealForm();
     } else {
-      timerRef.current = setTimeout(revealForm, 2500);
+      timerRef.current = setTimeout(revealForm, 1500);
     }
 
     const handleOrientation = () => {
@@ -372,6 +372,13 @@ const LoginPage: FC<LoginPageProps> = ({ onComplete }) => {
       </div>
       
       <div className="top-bar-right">
+        <button
+          className="audio-toggle-button lang-toggle-button"
+          onClick={() => setLanguage(language === 'de' ? 'en' : 'de')}
+          aria-label={tString('entry.switchLang', 'Switch language')}
+        >
+          {language === 'de' ? 'EN' : 'DE'}
+        </button>
         <button
           className="audio-toggle-button"
           onClick={toggleMute}

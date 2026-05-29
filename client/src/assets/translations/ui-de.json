@@ -79,14 +79,14 @@
     "explainer": "Lerne von 30 großen Persönlichkeiten der Geschichte.",
     "access": "Ohne Anmeldung. 30 kostenlose Nachrichten pro Tag.",
     "trustLine": "Gemeinnützig · Open Source · Kein Nutzer-Tracking",
-    "identityLabel": "Wähle Bild und Namen",
+    "identityLabel": "Tritt ein, wie du bist.",
     "motto": {
       "dante": "Durch dunkle Wälder, ans Licht der Sterne.",
       "beatrice": "Erkenntnis, wie Licht, erhellt den Weg.",
       "custom": "Dein Bild, dein Name, deine Geschichte."
     },
     "namePlaceholder": "Dein Name",
-    "button": "Tritt ein",
+    "button": "Die Reise beginnen",
     "saving": "Speichere...",
     "changeAvatar": "Bild wählen",
     "avatarTooLarge": "Bild muss kleiner als 1MB sein",
@@ -95,7 +95,10 @@
     "nameLabel": "Dein Name",
     "saveFailed": "Dein Profil konnte leider nicht gespeichert werden. Bitte versuche es erneut.",
     "defaultName": "Suchende",
-    "formReady": "Das Profilformular ist jetzt verfügbar"
+    "formReady": "Das Profilformular ist jetzt verfügbar",
+    "reassure": "Dein Name bleibt auf diesem Gerät. Kein Konto, keine E-Mail.",
+    "formAria": "Wähle, wie du erscheinst",
+    "switchLang": "Zu Englisch wechseln"
   },
   "login": {
     "title": "Willkommen zurück",

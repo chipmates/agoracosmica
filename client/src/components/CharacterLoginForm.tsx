@@ -119,7 +119,7 @@ const CharacterLoginForm: FC<CharacterLoginFormProps> = ({ onComplete, beatriceI
   };
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="entry-form">
+    <form onSubmit={handleSubmit} noValidate className="entry-form" aria-label={tString('entry.formAria', 'Choose how you appear')}>
       <style>{`
         .cs-tagline {
           text-align: center;
@@ -141,8 +141,18 @@ const CharacterLoginForm: FC<CharacterLoginFormProps> = ({ onComplete, beatriceI
           color: color-mix(in srgb, var(--text-primary) 52%, transparent);
           font-size: 0.72rem;
           letter-spacing: 0.04em;
-          line-height: 1;
+          line-height: 1.3;
           margin: 0 0 0.45rem;
+        }
+
+        .cs-reassure {
+          text-align: center;
+          color: color-mix(in srgb, var(--text-primary) 42%, transparent);
+          font-size: 0.62rem;
+          line-height: 1.35;
+          letter-spacing: 0.02em;
+          margin: 0.3rem auto 0;
+          max-width: 22rem;
         }
 
         .cs-selector {
@@ -326,11 +336,15 @@ const CharacterLoginForm: FC<CharacterLoginFormProps> = ({ onComplete, beatriceI
           onChange={(e) => { if (isCustom) setCustomName(e.target.value); }}
           placeholder={isCustom ? tString('entry.namePlaceholder', 'Your name') : ''}
           maxLength={50}
-          autoComplete="name"
+          autoComplete="off"
           readOnly={!isCustom}
-          required
         />
       </div>
+
+      {/* On-device reassurance, right where the "is this a signup?" doubt is
+          born. Resolves the tension with the No User Tracking promise instead
+          of contradicting it. */}
+      <p className="cs-reassure">{tNode('entry.reassure')}</p>
 
       {/* Submit */}
       <div className="form-actions">

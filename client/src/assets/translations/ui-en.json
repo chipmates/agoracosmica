@@ -81,14 +81,14 @@
     "explainer": "Learn from 30 remarkable people from history.",
     "access": "No signup. 30 free messages a day.",
     "trustLine": "Nonprofit · Open Source · No User Tracking",
-    "identityLabel": "Choose your image and name",
+    "identityLabel": "Step in as you are.",
     "motto": {
       "dante": "Through dark woods, into the light of the stars.",
       "beatrice": "Knowledge, like light, illuminates the way.",
       "custom": "Your image, your name, your story."
     },
     "namePlaceholder": "Your name",
-    "button": "Enter",
+    "button": "Begin the journey",
     "saving": "Saving...",
     "changeAvatar": "Choose image",
     "avatarTooLarge": "Image must be under 1MB",
@@ -97,7 +97,10 @@
     "nameLabel": "Your name",
     "saveFailed": "Couldn't save your profile. Please try again.",
     "defaultName": "Seeker",
-    "formReady": "Profile form is now available"
+    "formReady": "Profile form is now available",
+    "reassure": "Your name stays on this device. No account, no email.",
+    "formAria": "Choose how you appear",
+    "switchLang": "Switch to German"
   },
   "login": {
     "title": "Welcome Back",
