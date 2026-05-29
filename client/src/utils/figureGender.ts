@@ -49,7 +49,7 @@ export const figureGenderMap: GenderMap = {
   'einstein': 'male',          // Albert Einstein
   'frankl': 'male',            // Viktor Frankl
   'galilei': 'male',           // Galileo Galilei
-  'gandhi': 'male',            // Mahatma Gandhi
+  'gandhi': 'male',            // Mohandas Gandhi
   'gautama': 'male',           // Siddhartha Gautama
   'gibran': 'male',            // Kahlil Gibran
   'goethe': 'male',            // Johann Wolfgang von Goethe

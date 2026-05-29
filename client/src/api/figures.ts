@@ -46,7 +46,7 @@ export const historicalFiguresBase: readonly FigureBase[] = [
     { id: "einstein", baseNameEn: "Echo of Albert Einstein" },
     { id: "eckhart", baseNameEn: "Echo of Meister Eckhart" },
     { id: "galilei", baseNameEn: "Echo of Galileo Galilei" },
-    { id: "gandhi", baseNameEn: "Echo of Mahatma Gandhi" },
+    { id: "gandhi", baseNameEn: "Echo of Mohandas Gandhi" },
     { id: "goethe", baseNameEn: "Echo of Johann Wolfgang von Goethe" },
     { id: "gautama", baseNameEn: "Echo of Siddhartha Gautama" },
     { id: "jung", baseNameEn: "Echo of Carl Gustav Jung" },

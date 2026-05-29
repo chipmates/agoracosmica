@@ -300,7 +300,7 @@ export const CONSTELLATION_PATTERNS: ConstellationPatterns = {
     ]
   },
 
-  "Echo of Mahatma Gandhi": {
+  "Echo of Mohandas Gandhi": {
     name: "The Mandala of Swaraj",
     description: "A mandala-like arrangement of arcs and concentric circles, reflecting Gandhi's principles of self-governance and unity",
     pattern: [

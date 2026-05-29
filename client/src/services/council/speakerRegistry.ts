@@ -90,7 +90,7 @@ export const SPEAKERS: SpeakerRegistry = {
   },
   gandhi: {
     id: 'gandhi',
-    fullName: 'Mahatma Gandhi',
+    fullName: 'Mohandas Gandhi',
     variations: ['GANDHI', 'MAHATMA GANDHI', 'MAHATMA', 'MOHANDAS GANDHI', 'MOHANDAS KARAMCHAND GANDHI', 'MAHATMA KARAMCHAND GANDHI']
   },
   gautama: {

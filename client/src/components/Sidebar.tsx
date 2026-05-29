@@ -214,7 +214,7 @@ const Sidebar: FC<SidebarProps> = ({
         [sagesKey]: ['Echo of Laozi', 'Echo of Siddhartha Gautama', 'Echo of Plato', 'Echo of William Blake',
                   'Echo of Rumi', 'Echo of Marcus Aurelius', 'Echo of Meister Eckhart', 'Echo of Dōgen Zenji',
                   'Echo of Hildegard von Bingen', 'Echo of Joseph Campbell'],
-        [reformersKey]: ['Echo of Mahatma Gandhi', 'Echo of Martin Luther King Jr.', 'Echo of Nelson Mandela',
+        [reformersKey]: ['Echo of Mohandas Gandhi', 'Echo of Martin Luther King Jr.', 'Echo of Nelson Mandela',
                       'Echo of Harriet Tubman', 'Echo of Simone de Beauvoir', 'Echo of Maya Angelou',
                       'Echo of Galileo Galilei', 'Echo of Friedrich Nietzsche',
                       'Echo of Carl Gustav Jung', 'Echo of Albert Einstein'],

@@ -68,7 +68,7 @@ const FigureCarousel: FC<FigureCarouselProps> = ({
       `${echoPrefix} Carl Gustav Jung`, `${echoPrefix} Joseph Campbell`
     ],
     [CATEGORY_IDS.REFORMERS]: [
-      `${echoPrefix} Mahatma Gandhi`, `${echoPrefix} Nelson Mandela`, `${echoPrefix} Martin Luther King Jr.`, `${echoPrefix} Harriet Tubman`,
+      `${echoPrefix} Mohandas Gandhi`, `${echoPrefix} Nelson Mandela`, `${echoPrefix} Martin Luther King Jr.`, `${echoPrefix} Harriet Tubman`,
       `${echoPrefix} Simone de Beauvoir`, `${echoPrefix} Maya Angelou`, `${echoPrefix} Friedrich Nietzsche`, `${echoPrefix} Frida Kahlo`,
       `${echoPrefix} Arthur Schopenhauer`, `${echoPrefix} Ada Lovelace`
     ],

@@ -77,6 +77,7 @@ const ChatBox: FC<ChatBoxProps> = ({
       'albert einstein': 'einstein',
       'meister eckhart': 'eckhart',
       'galileo galilei': 'galilei',
+      'mohandas gandhi': 'gandhi',
       'mahatma gandhi': 'gandhi',
       'johann wolfgang von goethe': 'goethe',
       'siddhartha gautama': 'gautama',
