@@ -111,7 +111,11 @@ const planets: Planet[] = ringPlan.flatMap((ring, ringIndex) => {
     return {
       id,
       name: fig ? fig.name : id,
-      src: `${MEDIA_URL}/images/figures/${id}/main/1200.webp`,
+      // Small face-crop thumbnail: the planets render at ~40-76px, so a 1200px
+      // image is ~16x oversized. Loading 17 of those is fragile on mobile (slow
+      // connections / Chrome time them out and they fail). 320 is sharp at
+      // retina and tiny to fetch.
+      src: `${MEDIA_URL}/images/figures/${id}/thumbnail/320.webp`,
       href: publicUrl(lang, `/figures/${figureIdToSlug[id]}`),
       ring: ringIndex,
       angle: offset + i * step,
