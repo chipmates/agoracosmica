@@ -13,7 +13,6 @@ import {
   getLocalizedQuestion,
   getLocalizedTagline,
   getShortDisplayName,
-  getThemeAccentVar,
 } from '@client/data/councilCatalog';
 
 interface Props {
@@ -27,7 +26,6 @@ const t = getT(lang);
 const title = getLocalizedTitle(council, lang);
 const question = getLocalizedQuestion(council, lang);
 const tagline = getLocalizedTagline(council, lang);
-const accentVar = getThemeAccentVar(council.theme);
 const typeEmoji = council.type === 'confrontational' ? '🔥' : '🌊';
 const cast = [council.moderator, ...council.participants];
 ---
@@ -44,7 +42,6 @@ const cast = [council.moderator, ...council.participants];
   <p class="pub-council-hero__question">
     <span
       class="pub-council-hero__question-bar"
-      style={`background: var(${accentVar})`}
       aria-hidden="true"
     />
     <span class="pub-council-hero__question-text">{question}</span>
@@ -87,3 +84,19 @@ const cast = [council.moderator, ...council.participants];
     <CouncilPreviewButton client:visible councilId={council.id} lang={lang} />
   </div>
 </section>
+
+<style is:global>
+  /* Council question-bar accent color, driven by the section's data-theme
+     instead of an inline style attribute, so the strict production CSP (whose
+     Astro meta hashes nullify style 'unsafe-inline') cannot block it. Bundled
+     to an external stylesheet, served from 'self'. Applies wherever CouncilHero
+     renders (homepage + theme pages). */
+  .pub-council-hero[data-theme='who-am-i'] .pub-council-hero__question-bar { background: var(--council-who-am-i); }
+  .pub-council-hero[data-theme='love-connection'] .pub-council-hero__question-bar { background: var(--council-love-connection); }
+  .pub-council-hero[data-theme='meaning-purpose'] .pub-council-hero__question-bar { background: var(--council-meaning-purpose); }
+  .pub-council-hero[data-theme='mind-creativity'] .pub-council-hero__question-bar { background: var(--council-mind-creativity); }
+  .pub-council-hero[data-theme='moral-life'] .pub-council-hero__question-bar { background: var(--council-moral-life); }
+  .pub-council-hero[data-theme='freedom-justice'] .pub-council-hero__question-bar { background: var(--council-freedom-justice); }
+  .pub-council-hero[data-theme='faith-death-mystery'] .pub-council-hero__question-bar { background: var(--council-faith-death-mystery); }
+  .pub-council-hero[data-theme='loss-grief'] .pub-council-hero__question-bar { background: var(--council-loss-grief); }
+</style>

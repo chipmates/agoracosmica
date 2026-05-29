@@ -39,7 +39,7 @@ const heroCouncil = heroConfrontational;
 const deFaq = [
   {
     q: 'Was ist Agora Cosmica?',
-    a: 'Eine Bildungsplattform, gebaut als lebendige Bibliothek, mit der du sprechen kannst. Dreißig Persönlichkeiten aus der Vergangenheit bringen dir etwas bei, über erzählte Lebensgeschichten, Kernlehren und vierstimmige Debatten, und du kannst einen Gedanken auch direkt mit ihnen besprechen, von Marc Aurel bis Ada Lovelace, auf Deutsch und Englisch. Gemeinnützig, Open Source und darauf gebaut, überprüfbar zu sein.',
+    a: 'Eine Bildungsplattform, gebaut als lebendige Bibliothek, mit der du sprechen kannst. Dreißig Persönlichkeiten aus der Vergangenheit bringen dir etwas bei, über erzählte Lebensgeschichten, Kernlehren und vierstimmige Debatten, und du kannst einen Gedanken auch direkt mit ihnen besprechen, von Marcus Aurelius bis Frida Kahlo, auf Deutsch und Englisch. Gemeinnützig, Open Source und darauf gebaut, überprüfbar zu sein.',
   },
   {
     q: 'Ist das also ein KI-Chatbot?',
@@ -56,6 +56,10 @@ const deFaq = [
   {
     q: 'Brauche ich ein Konto, um anzufangen?',
     a: 'Nein. Öffne die App und leg einfach los. Die kostenlosen täglichen Nachrichten funktionieren sofort. Keine E-Mail, keine Anmeldung.',
+  },
+  {
+    q: 'Kann ich es komplett auf meinem eigenen Rechner laufen lassen?',
+    a: 'Ja. Der Local Mode richtet die App auf jedes OpenAI-kompatible LLM aus, etwa LM Studio, Ollama oder vLLM, und betreibt den Audio-Stack in Docker. Mit Local Mode und Selbst-Hosting verlassen keine Gespräche, keine Stimme und kein Text deinen Rechner. Die ganze Plattform ist Open Source unter der AGPL-3.0, du kannst sie also mit einem einzigen Befehl selbst hosten.',
   },
   {
     q: 'Wer sind die 30 Persönlichkeiten?',
@@ -125,7 +129,7 @@ const lcpPortrait = `${MEDIA_URL}/images/figures/aurelius/main/1200.webp`;
 <Public
   title="Eine lebendige Bibliothek, mit der du sprechen kannst"
   fullTitle="Agora Cosmica · Eine lebendige Bibliothek, mit der du sprechen kannst"
-  description="Lerne von 30 bemerkenswerten Menschen, von Marc Aurel bis Ada Lovelace. Erzählte Geschichten, Lehren, KI-Gespräche. Gemeinnützig und Open Source."
+  description="Lerne von 30 bemerkenswerten Menschen, von Marcus Aurelius bis Frida Kahlo. Erzählte Geschichten, Lehren, KI-Gespräche. Gemeinnützig und Open Source."
   canonicalPath="/"
   lang={lang}
   schemas={schemas}

@@ -41,7 +41,7 @@ const isDe = lang === 'de';
 // eight question tiles). Verbatim from the QA'd copy source. The mode bodies
 // render as scannable cards; the question tiles each link to a theme page.
 const enModes = [
-  { name: 'Story', text: "Story is a narrated scene from a figure's life, told in twelve chapters and checked against the record." },
+  { name: 'Story', text: "Story sets up the teaching, a narrated chapter from a figure's life that opens the idea, twelve chapters, checked against the record." },
   { name: 'Wisdom', text: 'Wisdom is where you take one of their core teachings and think it through, in your own words and your own life.' },
   { name: 'Prism', text: 'Prism lets you hear four connected minds circle a single theme from their own angles, like a podcast you can sit inside.' },
   { name: 'Quest', text: 'Quest is a short Socratic challenge, four questions that go deeper than surface knowledge.' },
@@ -63,7 +63,7 @@ const enQuestions = [
 // The repositioned German six mode cards and eight question tiles, verbatim
 // from the QA'd copy source. Each question tile links to its theme page.
 const deModes = [
-  { name: 'Story', text: 'Story ist eine erzählte Szene aus einem Leben, in zwölf Kapiteln und gegen die Quellen geprüft.' },
+  { name: 'Story', text: 'Story bereitet die Lehre vor, ein erzähltes Kapitel aus dem Leben einer Persönlichkeit, das den Gedanken öffnet, zwölf Kapitel, gegen die Quellen geprüft.' },
   { name: 'Weisheit', text: 'In der Weisheit nimmst du eine ihrer Kernlehren und denkst sie durch, in deinen eigenen Worten und für dein eigenes Leben.' },
   { name: 'Prisma', text: 'Im Prisma hörst du vier verbundene Köpfe ein einziges Thema aus ihren eigenen Blickwinkeln umkreisen, wie ein Podcast, in dem du selbst mitsitzt.' },
   { name: 'Quest', text: 'Die Quest ist eine kurze sokratische Herausforderung, vier Fragen, die tiefer gehen als Oberflächenwissen.' },
@@ -99,16 +99,16 @@ const deQuestions = [
       <p class="pub-section__text">
         Eine Bildungsplattform, auf der dreißig bemerkenswerte Menschen dir beibringen, was sie ein
         Leben lang durchdacht haben. Philosophen, Wissenschaftlerinnen, Mystiker, Künstlerinnen und
-        Aktivisten, von Marc Aurel und Platon bis Ada Lovelace und Frida Kahlo, jede und jeder mit
+        Aktivisten, von Marcus Aurelius und Platon bis Ada Lovelace und Frida Kahlo, jede und jeder mit
         einer eigenen, recherchierten Stimme und zwölf Kernlehren. Du lernst von ihnen über
         sorgfältig gestaltete Inhalte. Hör eine erzählte Szene aus ihrem Leben. Vertiefe dich in
         einen ihrer zentralen Gedanken. Setz dich mitten in einen vierstimmigen Dialog, oder lass
-        einen Council eine Frage ausstreiten. Vier dieser Kapitel bilden einen Lernweg, der auf
-        Lernforschung aufbaut, und wenn du weitergehen willst, kannst du einen Gedanken mit jeder
+        einen Council eine Frage ausstreiten. Vier dieser Kapitel bilden einen Lernweg, und wenn du
+        weitergehen willst, kannst du einen Gedanken mit jeder
         Persönlichkeit besprechen oder einfach alles fragen. Was sie lehren, schöpft aus ihrer
         echten Philosophie und den Ideen, an denen sie ein Leben lang gebaut haben. Das Ganze ist
         von einer kleinen gemeinnützigen Organisation aus Deutschland gebaut, und es ist Open
-        Source. Glaub uns nicht aufs Wort. Lies den Code.
+        Source.
       </p>
       <p class="pub-section__text">
         <a class="pub-textlink" href={publicUrl(lang, '/figures')}>Persönlichkeiten ansehen</a>
@@ -159,7 +159,7 @@ const deQuestions = [
       <h2 class="pub-section__title">Dreißig Lehrende, die großen Fragen des Lebens</h2>
       <p class="pub-section__text">
         Von antiken Philosophen bis zu modernen Künstlerinnen, von östlichen Weisen bis zu
-        westlichen Wissenschaftlern. Laozi und Marc Aurel. Maya Angelou und Jane Austen.
+        westlichen Wissenschaftlern. Laozi und Marcus Aurelius. Maya Angelou und Jane Austen.
         Carl Gustav Jung, Frida Kahlo und Virginia Woolf. Dreißig sind es, jede und jeder mit
         einer eigenen Seite, ihre Lehren rund um acht Fragen versammelt, die Menschen sich schon
         immer gestellt haben. Folge einem Namen, oder folge einer Frage. So oder so kommst du
@@ -212,8 +212,11 @@ const deQuestions = [
         </LabTrustCard>
         <LabTrustCard label="Offen">
           Live gesprochene Sprache läuft auf unseren eigenen GPUs in Deutschland, das übrige Audio
-          auf Hosting in der EU, und der gesamte Code liegt offen unter der AGPL-3.0. Du musst uns
-          also nicht vertrauen. Du kannst nachsehen.
+          auf Hosting in der EU, und der gesamte Code liegt offen unter der AGPL-3.0. Du kannst es
+          auch komplett auf deinem eigenen Rechner laufen lassen. Der Local Mode richtet die App auf
+          jedes OpenAI-kompatible LLM aus, etwa LM Studio, Ollama oder vLLM, und betreibt den
+          Audio-Stack in Docker, sodass keine Gespräche, keine Stimme und kein Text deinen Computer
+          verlassen. Du musst uns also nicht vertrauen. Du kannst nachsehen.
         </LabTrustCard>
       </div>
       <p class="pub-section__text">
@@ -246,8 +249,8 @@ const deQuestions = [
         Agora Cosmica ist ein Projekt der ChipMates gemeinnützigen GmbH, einer kleinen
         gemeinnützigen Organisation in Freiburg. Gemeinnützig heißt, wir sind einer Mission
         verpflichtet, nicht Investoren. Kein Gewinn, keine Anteilseigner, nur die Arbeit. Der Weg,
-        auf dem du von jeder Persönlichkeit lernst, folgt einem vierstufigen Bogen, der auf
-        Lernforschung aufbaut. Eine Idee aufnehmen, sie erkunden, sie verknüpfen und dann zeigen,
+        auf dem du von jeder Persönlichkeit lernst, folgt einem vierstufigen Bogen.
+        Eine Idee aufnehmen, sie erkunden, sie verknüpfen und dann zeigen,
         dass du sie verstanden hast. Keine Voraussetzungen, keine Bezahlschranken. Schulen und
         Hochschulen sind eingeladen, es zu ihren Lernenden zu bringen, und Entwicklerinnen können
         jede Zeile lesen oder die ganze Plattform mit einem einzigen Befehl selbst hosten. Für uns
@@ -279,11 +282,11 @@ const deQuestions = [
         Aurelius and Plato to Ada Lovelace and Frida Kahlo, each with their own researched voice
         and twelve core teachings. You learn from them through crafted content. Hear a narrated
         scene from their life. Study one of their core ideas. Sit inside a four-voice dialogue, or
-        let a council argue a question out. Four of those chapters form a learning arc shaped by
-        learning research, and when you want to go further you can talk an idea through with any
+        let a council argue a question out. Four of those chapters form a learning arc, and when you
+        want to go further you can talk an idea through with any
         figure or just ask anything. What they teach draws on their real philosophy and the ideas
         they built over a lifetime. The whole thing is made by a small German nonprofit, and it is
-        open source. Don't take our word for it. Read the code.
+        open source.
       </p>
       <p class="pub-section__text">
         <a class="pub-textlink" href={publicUrl(lang, '/figures')}>Browse the figures</a>
@@ -383,7 +386,10 @@ const deQuestions = [
         </LabTrustCard>
         <LabTrustCard label="Open">
           Live speech runs on our own GPUs in Germany, the rest of the audio on EU hosting, and
-          the whole codebase is open under AGPL-3.0. So you don't have to trust us. You can check.
+          the whole codebase is open under AGPL-3.0. You can also run it entirely on your own
+          machine. Local Mode points the app at any OpenAI-compatible LLM, like LM Studio, Ollama,
+          or vLLM, and runs the audio stack in docker, so no conversation, voice, or text data ever
+          leaves your computer. So you don't have to trust us. You can check.
         </LabTrustCard>
       </div>
       <p class="pub-section__text">
@@ -415,8 +421,8 @@ const deQuestions = [
       <p class="pub-section__text">
         Agora Cosmica is a project of ChipMates gemeinnützige GmbH, a small German nonprofit in
         Freiburg. Charitable status means we answer to a mission, not to investors. No profits, no
-        shareholders, just the work. The way you learn from each figure follows a four-step arc
-        built on learning research. Receive an idea, explore it, connect it, then prove you have
+        shareholders, just the work. The way you learn from each figure follows a four-step arc.
+        Receive an idea, explore it, connect it, then prove you have
         it. No prerequisites, no paywalls. Schools and universities are welcome to bring it to
         their students, and developers can read every line or self-host the whole platform with one
         command. We count it a success the day you outgrow us, moving from our introductions to the
@@ -481,8 +487,8 @@ const deQuestions = [
         color-mix(in srgb, var(--gold-subtle) 6%, transparent) 0%,
         transparent 46%),
       linear-gradient(180deg,
-        var(--bg-primary, #151C47) 0%,
-        var(--bg-deep-space, #0C1133) 42%,
+        var(--bg-deep-space-darker, #080B20) 0%,
+        var(--bg-deep-space, #0C1133) 50%,
         var(--bg-deep-space-darker, #080B20) 100%);
   }
 
