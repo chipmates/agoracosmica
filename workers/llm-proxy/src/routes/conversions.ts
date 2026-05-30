@@ -90,10 +90,13 @@ export async function handleConversions(
   const count = parseInt(await env.RATE_LIMITS.get(counterKey) || '0', 10);
   await env.RATE_LIMITS.put(counterKey, String(count + 1), { expirationTtl: 90 * 86400 });
 
-  // Write to Analytics Engine (for stats dashboard SQL queries)
+  // Write to Analytics Engine (for stats dashboard SQL queries). The gclid is
+  // never written here — it goes only to Google Ads (for attribution) and the
+  // diagnostic sheet. Keeping it out of our analytics is what makes the
+  // "click ID is not combined with our analytics" claim true.
   if (env.ANALYTICS) {
     env.ANALYTICS.writeDataPoint({
-      blobs: [payload.event, payload.figureId || '', payload.gclid.slice(0, 8)],
+      blobs: [payload.event, payload.figureId || ''],
       doubles: [payload.timestamp],
       indexes: [payload.event],
     });
