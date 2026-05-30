@@ -289,18 +289,21 @@ const description = 'Datenschutzerklärung der ChipMates gemeinnützige GmbH fü
     </section>
 
     <section>
-      <h2>Conversion-Messung (Google Ads)</h2>
+      <h2>Conversion-Messung (Google Ads, nur mit Einwilligung)</h2>
       <p>
-        Wenn Sie über eine Google-Werbeanzeige auf unsere Website gelangen, wird ein sogenannter gclid-Parameter in der URL übertragen. Dieser Parameter wird ausschließlich im Arbeitsspeicher Ihres Browsers gespeichert (kein Cookie, kein localStorage, keine dauerhafte Speicherung auf Ihrem Gerät). Der Parameter wird beim Schließen des Browser-Tabs automatisch gelöscht.
+        Wenn Sie über eine Google-Werbeanzeige auf unsere Website gelangen, enthält die URL einen Klick-Identifikator (gclid). Der gclid ist eine von Google vergebene Kennung pro Klick. Da Google ihn Ihrem Klick und gegebenenfalls Ihrem Google-Konto zuordnen kann, behandeln wir ihn als personenbezogenes Datum, nicht als anonyme Kennung.
       </p>
       <p>
-        Falls Sie sich während derselben Sitzung registrieren, wird der gclid-Parameter einmalig an unseren Server übermittelt, um die Wirksamkeit der Werbeanzeige zu messen (Conversion-Messung). Es werden dabei keine personenbezogenen Daten übertragen. Der gclid ist eine anonyme Klick-Kennung von Google, die keinen Rückschluss auf Ihre Person zulässt.
+        Der gclid wird im sessionStorage Ihres Browsers gespeichert (kein Cookie). Er ist an den Browser-Tab gebunden. Eine Übermittlung an Google findet ausschließlich dann statt, wenn Sie hierzu Ihre ausdrückliche Einwilligung erteilen. Diese Einwilligung wird nur Besuchern angeboten, die über eine Google-Anzeige kommen, und ist optional. Ohne Einwilligung wird nichts an Google übermittelt.
       </p>
       <p>
-        Die Weiterleitung an Google Ads erfolgt server-seitig über die Google Ads Conversion API (kein JavaScript-Tracker auf der Website).
+        Mit Ihrer Einwilligung übermitteln wir den gclid bei bestimmten Ereignissen (Profilerstellung, Auswahl eines Lernmodus, Nutzung eines Konzils) serverseitig über die Google Ads Conversion API, damit die Anzeige einer Conversion zugeordnet werden kann (kein JavaScript-Tracker, kein Pixel auf der Website). Übermittelt werden: der gclid, das ausgelöste Ereignis, gegebenenfalls die gewählte Persönlichkeit, Ihr Länder-Kürzel, ein interner Wert und ein Zeitstempel. Gesprächsinhalte und sonstige personenbezogene Daten werden nicht übermittelt. Auf unseren Systemen speichern wir den gclid nicht dauerhaft.
       </p>
       <p>
-        <strong>Rechtsgrundlage:</strong> Berechtigtes Interesse (Art. 6 Abs. 1 lit. f DSGVO) an der Messung der Werbewirksamkeit.
+        Empfänger ist Google (Google Ireland Limited sowie Google LLC, USA). Eine Übermittlung in die USA kann erfolgen. Google ist unter dem EU-US Data Privacy Framework zertifiziert.
+      </p>
+      <p>
+        <strong>Rechtsgrundlage:</strong> Ihre Einwilligung (Art. 6 Abs. 1 lit. a DSGVO und § 25 Abs. 1 TDDDG). Sie können Ihre Einwilligung jederzeit mit Wirkung für die Zukunft widerrufen, in den Einstellungen unter „Datenschutz" über „Einwilligung zur Werbe-Messung widerrufen". Der Widerruf löscht den gespeicherten gclid.
       </p>
     </section>
 
