@@ -1,8 +1,8 @@
 // Anonymous signup beacon
-// Fires from App.tsx handleEntryComplete IF the user is new (no prior
-// profile/history/onboarding). Distinct from entry (every login or signup)
-// and from profile_created (gclid-gated, ad-attributed only). Lets the
-// dashboard show total signups including organic.
+// Fires from WelcomeDisclosureModal.handleComplete IF the user is new (no
+// prior profile/history/onboarding). Distinct from entry (fires for everyone
+// who completes the welcome step) and from profile_created (gclid-gated,
+// ad-attributed only). Lets the dashboard show total signups including organic.
 //
 // Privacy: aggregate counter only. No user dimension. No IP retention.
 // Same posture as the entry and page-load beacons.
@@ -34,7 +34,7 @@ function detectLanguage(): 'en' | 'de' {
  * No user dimension, no email, no name. Aggregate counter only.
  *
  * Caller is responsible for the "is new user" gate: only fire on first
- * signup, never on returning sign-in. See App.tsx handleEntryComplete
+ * signup, never on returning sign-in. See WelcomeDisclosureModal.handleComplete
  * for the isFirstLogin check.
  */
 export function sendSignupBeacon(): void {

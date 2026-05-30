@@ -1342,7 +1342,9 @@ async function loadOverview() {
     { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
     // Page arrivals previous period (for delta)
     { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND timestamp " + prevRange(), dataset: 'agora_llm' },
-    // Entry transitions (LoginPage → HomePage; closes the "did they decide to enter" stage)
+    // Entry: post-cinematic welcome step where consent is given + profile created
+    // (welcome modal "Begin"). Since 2026-05-29 this fires AFTER consent, not at
+    // the old login card, so windows straddling that date show a step, not a drop.
     { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'entry' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
     // Page arrivals sparkline
     { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
@@ -1405,8 +1407,14 @@ async function loadOverview() {
   // exact-match for the leaf marketing pages.
   var MARKETING_PREFIXES = ['/figures', '/themes', '/de/figures', '/de/themes'];
   var MARKETING_EXACT = {
+    // Homepages: the cinematic Observatory landing. Since the 2026-05-29
+    // relocation, '/' and '/de/' are the STATIC marketing homepage, not the
+    // React app (which moved to /app). They are top-of-funnel marketing, so
+    // they belong here, not in the "everything else = App" bucket below.
+    '/': 1, '/de': 1, '/de/': 1,
     '/about': 1, '/about/': 1, '/contact': 1, '/contact/': 1,
     '/impressum': 1, '/impressum/': 1, '/datenschutz': 1, '/datenschutz/': 1,
+    '/cookie-policy': 1, '/cookie-policy/': 1, '/nutzungsbedingungen': 1, '/nutzungsbedingungen/': 1,
     '/de/about': 1, '/de/about/': 1, '/de/contact': 1, '/de/contact/': 1,
     '/de/impressum': 1, '/de/impressum/': 1, '/de/datenschutz': 1, '/de/datenschutz/': 1,
   };
@@ -1475,8 +1483,8 @@ async function loadOverview() {
   // below the main funnel with their own % of Sessions.
   var funnelStages = [
     { label: 'Marketing', value: marketingArrivals, sub: 'figures · themes · about' },
-    { label: 'App', value: appArrivals, sub: '/ + SPA routes' },
-    { label: 'Entry', value: entries, sub: 'past LoginPage' },
+    { label: 'App', value: appArrivals, sub: '/app + SPA routes' },
+    { label: 'Entry', value: entries, sub: 'consent + enter' },
     { label: 'Signup', value: signups, sub: 'new accounts' },
     { label: 'Sessions', value: sessions, sub: 'first chat' },
   ];
@@ -1485,9 +1493,21 @@ async function loadOverview() {
     { label: 'Content Completed', value: contentCompleted, sub: 'fully heard' },
     { label: 'Chats', value: chats, sub: 'LLM messages' },
   ];
+  // Funnel footnote. Two 2026-05-29 boundaries to keep honest: (1) the entry-
+  // cinematic refactor moved Entry + Signup to the post-consent welcome step,
+  // and returning users skip that step (they appear only in Sessions); (2) the
+  // homepage relocation made '/' + '/de/' the marketing landing (now counted in
+  // Marketing, not App). Surfaced so a multi-day window isn't misread.
+  var funnelNote = '<div style="margin-top:10px;font-size:11px;color:var(--dim);line-height:1.4">' +
+    'Entry &amp; Signup fire at the welcome modal (post-consent) since 2026-05-29. ' +
+    'Entry = everyone who consents + enters; Signup = new accounts only. ' +
+    'Returning users skip the welcome step, so they appear only in Sessions. ' +
+    'Marketing includes the homepages (/ and /de/); App is /app only. ' +
+    'Windows straddling 2026-05-29 show a step at these stages, not a real drop.' +
+    '</div>';
   html += chartCard(
     'User Funnel',
-    funnelHtml(funnelStages) + parallelEngagementHtml('Sessions', sessions, engagementStages),
+    funnelHtml(funnelStages) + parallelEngagementHtml('Sessions', sessions, engagementStages) + funnelNote,
     'card-full'
   );
 

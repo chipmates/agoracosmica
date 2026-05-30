@@ -1,8 +1,9 @@
 // Anonymous entry beacon
-// Fires when the user transitions from the LoginPage into the app
-// (handleEntryComplete in App.tsx). Sits between the page-load beacon
-// (every arrival) and the session row (Turnstile-gated). Closes the most
-// informative bounce stage: arrivals → entries → engagement.
+// Fires from WelcomeDisclosureModal.handleComplete — the post-cinematic
+// welcome step where consent is given and the profile is created (since the
+// 2026-05-29 entry-cinematic refactor; was App.handleEntryComplete before).
+// This is the deliberate "entered the app" moment. Sits between the page-load
+// beacon (every arrival) and the session row (Turnstile-gated).
 //
 // Privacy: aggregate counter only. No user dimension. No IP retention.
 // Disclosed in docs/MEASUREMENT.md alongside the other event counters.

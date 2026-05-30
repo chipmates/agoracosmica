@@ -151,10 +151,10 @@ export function trackPageView(
 }
 
 /**
- * Track an entry beacon. Fires when the user transitions from LoginPage into
- * the app (handleEntryComplete in App.tsx). Sits between the page-load beacon
- * (every arrival) and the session row (Turnstile-gated). Closes the most
- * informative bounce stage in the funnel.
+ * Track an entry beacon. Fires from the client's WelcomeDisclosureModal when
+ * the user consents and the profile is created (the post-cinematic welcome
+ * step; since the 2026-05-29 refactor). Sits between the page-load beacon
+ * (every arrival) and the session row (Turnstile-gated).
  * dataset: agora_llm
  * blobs: ['entry', path, '', language, '200', '', country]
  * indexes: ['entry']
@@ -179,11 +179,11 @@ export function trackEntry(
 }
 
 /**
- * Track a new-account signup. Fires from the client when handleEntryComplete
- * runs AND the user is new (no prior profile in IndexedDB). Distinct from
- * entry (which fires for signup OR sign-in) and from profile_created (which
- * is gclid-gated, ad-attributed only). Lets the dashboard show total signups
- * including organic, which neither entry nor profile_created can show alone.
+ * Track a new-account signup. Fires from the client's WelcomeDisclosureModal
+ * when the user consents AND is new (no prior profile in IndexedDB). Distinct
+ * from entry (which fires for everyone who completes the welcome step) and from
+ * profile_created (which is gclid-gated, ad-attributed only). Lets the
+ * dashboard show total signups including organic.
  *
  * dataset: agora_llm
  * blobs: ['signup', path, '', language, '200', '', country]
