@@ -4,7 +4,8 @@ import { createRequestGate } from '../utils/async/requestGate';
 import { abortable, type AbortableTask } from '../utils/async/abortable';
 import { getStorageKeyForMode, markWisdomCompleted } from '../utils/storageKeysV2';
 import { LocalStorageAdapter } from '../storage/localAdapter';
-import { runWithWal, getFromStore, type WalOperation } from '../storage';
+import { runWithWal, type WalOperation } from '../storage';
+import { encryptHistory, readHistoryMessages } from '../services/history/historyEncryption';
 // Note: avoid runtime enum dependency for isConversationMode checks
 import type { ConversationMode } from '../types/global';
 import { normalizeMode } from '../utils/modeUtils';
@@ -64,7 +65,7 @@ const loadHistoryFromStorage = async (threadKey: string): Promise<ConversationMe
   }
 
   try {
-    const stored = await getFromStore<ConversationMessage[]>('history', threadKey);
+    const stored = await readHistoryMessages<ConversationMessage>(threadKey);
     if (Array.isArray(stored)) {
       return stored;
     }
@@ -77,7 +78,11 @@ const loadHistoryFromStorage = async (threadKey: string): Promise<ConversationMe
 };
 
 const persistHistoryToStorage = async (threadKey: string, messages: ConversationMessage[]) => {
-  const operations: WalOperation[] = [{ type: 'put', store: 'history', key: threadKey, value: messages }];
+  // Encrypt BEFORE building the WAL op so ciphertext (not plaintext) is what
+  // flows into both the wal store and the history store. Encrypting inside
+  // putToStore would leak plaintext into the write-ahead log.
+  const value = await encryptHistory(messages);
+  const operations: WalOperation[] = [{ type: 'put', store: 'history', key: threadKey, value }];
   await runWithWal(operations, async () => undefined);
 };
 

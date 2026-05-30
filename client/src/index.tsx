@@ -13,6 +13,7 @@ import { initializeSeedsCache } from './services/seedCacheInitializer';
 import { LocalStorageAdapter } from './storage/localAdapter';
 import { captureGclid } from './utils/public/gclidCapture';
 import { sendPageBeacon } from './utils/pageBeacon';
+import { migrateHistoryToEncrypted } from './services/history/historyEncryptionMigration';
 
 // Capture gclid from the landing URL before any router redirect can strip it.
 // Must run synchronously at module load. Running inside a React effect is too
@@ -124,3 +125,7 @@ root.render(
     <AppRoot />
   )
 );
+
+// After first paint, encrypt any legacy plaintext conversation histories at
+// rest. Idempotent, non-blocking, and never destroys data.
+void migrateHistoryToEncrypted();

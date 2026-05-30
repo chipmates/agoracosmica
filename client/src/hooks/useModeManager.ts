@@ -8,7 +8,7 @@ import {
 import { initiateConversation } from '../services/audioService';
 import { Figure, Seed, ConversationMode, Language } from '../types/global';
 import { LocalStorageAdapter } from '../storage/localAdapter';
-import { getFromStore } from '../storage';
+import { readHistoryMessages } from '../services/history/historyEncryption';
 import { useDomainStore, useModeActions, useConversationActions } from '../stores';
 
 interface CouncilConfig {
@@ -277,7 +277,7 @@ export function useModeManager({
       if (expectedKey) {
         // Check IndexedDB first
         try {
-          const idbHistory = await getFromStore<unknown>('history', expectedKey);
+          const idbHistory = await readHistoryMessages<unknown>(expectedKey);
           hasExistingHistory = Array.isArray(idbHistory) && idbHistory.length > 0;
         } catch {
           // IndexedDB check failed, falling back to localStorage

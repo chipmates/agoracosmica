@@ -41,7 +41,7 @@ const restoreIndexedDbHistories = async (modeData?: Record<string, string | null
     return;
   }
 
-  const operations = buildWalOperationsFromModeData(modeData);
+  const operations = await buildWalOperationsFromModeData(modeData);
 
   if (operations.length === 0) {
     return;

@@ -1,4 +1,5 @@
-import { getAllKeysFromStore, getFromStore, type WalOperation } from '../../storage';
+import { getAllKeysFromStore, type WalOperation } from '../../storage';
+import { encryptHistory, readHistoryMessages } from './historyEncryption';
 
 export const HISTORY_STORE_NAME = 'history' as const;
 
@@ -69,7 +70,7 @@ export const readIndexedDbConversationEntries = async (): Promise<ConversationHi
     }
 
     try {
-      const rawMessages = await getFromStore<unknown[]>(HISTORY_STORE_NAME, key);
+      const rawMessages = await readHistoryMessages<unknown>(key);
       if (!Array.isArray(rawMessages)) {
         continue;
       }
@@ -91,9 +92,9 @@ export const readIndexedDbConversationEntries = async (): Promise<ConversationHi
   return conversationEntries;
 };
 
-export const buildWalOperationsFromModeData = (
+export const buildWalOperationsFromModeData = async (
   modeData: Record<string, string | null | undefined>
-): WalOperation[] => {
+): Promise<WalOperation[]> => {
   const operations: WalOperation[] = [];
 
   for (const [key, rawValue] of Object.entries(modeData)) {
@@ -107,7 +108,8 @@ export const buildWalOperationsFromModeData = (
         continue;
       }
 
-      operations.push({ type: 'put', store: HISTORY_STORE_NAME, key, value: parsed });
+      // Re-encrypt on import so restored histories land as ciphertext at rest.
+      operations.push({ type: 'put', store: HISTORY_STORE_NAME, key, value: await encryptHistory(parsed) });
     } catch (error) {
       console.warn(`[historyStorageUtils] Failed to parse conversation payload for key ${key}`, error);
     }

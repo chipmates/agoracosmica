@@ -44,7 +44,7 @@ import PostQuestVerdictCard from '../components/QuestVerdictCard/PostQuestVerdic
 import { getPendingQuestVerdict, clearPendingQuestVerdict } from '../utils/questVerdict';
 import { restartQuest } from '../utils/questRestart';
 import { LocalStorageAdapter } from '../storage/localAdapter';
-import { getFromStore } from '../storage';
+import { readHistoryMessages } from '../services/history/historyEncryption';
 import { registerSessionControllerHandlers } from '../controllers/sessionControllerRegistry';
 import { registerConversationControllerHandlers } from '../controllers/conversationControllerRegistry';
 import { createLegacyConversationStream } from '../controllers/conversationStreamDriver';
@@ -599,7 +599,7 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
         if (!isEarned) {
           try {
             const threadKey = STORAGE_KEYS.getChallengeHistory(figureId, seedId);
-            const idbHistory = await getFromStore<any[]>('history', threadKey);
+            const idbHistory = await readHistoryMessages<any>(threadKey);
             if (Array.isArray(idbHistory) && idbHistory.length > 0) {
               const lastAssistant = [...idbHistory]
                 .reverse()
@@ -896,7 +896,7 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
     // Load from IndexedDB; fallback to LocalStorage if not found
     let storedHistory: unknown = null;
     try {
-      storedHistory = await getFromStore<unknown>('history', storageKey);
+      storedHistory = await readHistoryMessages<unknown>(storageKey);
       if (import.meta.env.DEV) {
         console.log('[HomePage] fetchHistory IndexedDB result', {
           storageKey,

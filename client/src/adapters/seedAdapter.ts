@@ -8,7 +8,7 @@ import { useConversationActions } from '../stores/selectors/domainSelectors';
 import type { Seed, Figure } from '../types/global';
 import { ConversationMode } from '../types/global';
 import { LocalStorageAdapter } from '../storage/localAdapter';
-import { getFromStore } from '../storage';
+import { readHistoryMessages } from '../services/history/historyEncryption';
 import seedStateManager from '../services/SeedStateManager';
 import { cleanupAudioResources } from '../services/audioService';
 import { processSeedAcquisition } from '../services/seedAcquisition';
@@ -178,7 +178,7 @@ export const useSeedManagerAdapter = (params: SeedManagerParams): SeedManagerRes
 
         // CRITICAL: Check BOTH IndexedDB and localStorage
         try {
-          const idbHistory = await getFromStore<unknown>('history', historyKey);
+          const idbHistory = await readHistoryMessages<unknown>(historyKey);
           hasExistingHistory = Array.isArray(idbHistory) && idbHistory.length > 0;
         } catch (error) {
           console.warn('[seedAdapter] IndexedDB check failed, falling back to localStorage');

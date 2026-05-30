@@ -14,7 +14,7 @@ This is enforced architecturally, not just stated:
 
 - No user accounts, no email collection, no password
 - No analytics, no marketing cookies
-- Conversations live in your browser's IndexedDB, optionally encrypted
+- Conversations live in your browser's IndexedDB, encrypted at rest with AES-256-GCM
 - BYOK API keys never transit our servers
 - Per-request server logging is disabled in production
 
@@ -130,7 +130,7 @@ Per-identity rate limiting (rather than per-IP) is the post-2026-05-02 design. I
 | Data | Encrypted | User control |
 |------|-----------|--------------|
 | BYOK API keys | AES-256-GCM | Delete from settings |
-| Conversation history | Optional AES-256-GCM | Clear from settings |
+| Conversation history | AES-256-GCM | Clear from settings |
 | Teaching collection progress | No | Reset available |
 | Voice and language preferences | No | Settings |
 
