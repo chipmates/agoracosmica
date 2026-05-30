@@ -30,24 +30,6 @@ export interface Env {
   VALUE_START_EXPLORING?: string;
   VALUE_MODE_SELECTED?: string;
   VALUE_COUNCIL_ENGAGED?: string;
-
-  // Diagnostic Sheets mirror for CAPI conversions. Auth via user OAuth
-  // refresh token (same flow as GOOGLE_ADS_OAUTH_*). All four optional —
-  // when any are unset, the worker no-ops on sheet mirroring and CAPI
-  // uploads still happen. See services/googleSheetsLog.ts.
-  GOOGLE_SHEETS_OAUTH_CLIENT_ID?: string;
-  GOOGLE_SHEETS_OAUTH_CLIENT_SECRET?: string;
-  GOOGLE_SHEETS_OAUTH_REFRESH_TOKEN?: string;
-  SHEETS_LOG_SHEET_ID?: string;
-
-  // Override map for the human-readable conversion action names in the
-  // Google Ads UI. The "import" tab of the diagnostic sheet writes Google's
-  // exact "Conversion Name" column for direct CSV upload, and Google Ads
-  // matches by exact name. When the Ads account is in German (or any
-  // non-English locale), set this secret to a JSON string of shape:
-  //   { "grants": { "profile_created": "...", ... }, "paid": { ... } }
-  // Falls back to the EN hardcoded map in googleAdsCapi.ts when unset.
-  ADS_CONVERSION_ACTION_NAMES?: string;
 }
 
 export interface ChatRequest {
