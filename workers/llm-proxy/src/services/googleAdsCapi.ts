@@ -256,6 +256,16 @@ async function uploadToAccount(
     conversion_value: conversionValue(env, input.event),
     currency_code: account.currency,
     order_id: `${input.gclid}:${input.event}`, // Server-side dedup key
+    // Consent Mode v2 signal. The worker only uploads a conversion after the
+    // visitor opted in to ad measurement (the client gates the send on
+    // adConsentGranted), so ad_user_data is GRANTED. We run no remarketing or
+    // ad personalization, so ad_personalization is DENIED. Field + enum per the
+    // Google Ads API ClickConversion.consent message; confirm against v24 with
+    // a validate_only run before relying on it for bidding.
+    consent: {
+      ad_user_data: 'GRANTED',
+      ad_personalization: 'DENIED',
+    },
   };
 
   const url = `https://googleads.googleapis.com/${API_VERSION}/customers/${customerId}:uploadClickConversions`;
@@ -294,9 +304,9 @@ async function uploadToAccount(
   }
 
   // Inspect partial_failure_error to distinguish "wrong account"
-  // (expected, silent) from "actually broken" (worth surfacing). The
-  // sheet mirror records the exact message so we can filter the
-  // expected unmatched-account rows from any real intake errors.
+  // (expected, silent) from "actually broken" (worth surfacing). We log
+  // the exact message so the expected unmatched-account rows can be told
+  // apart from any real intake errors.
   const json = (await res.json().catch(() => null)) as
     | { partial_failure_error?: { code?: number; message?: string } }
     | null;
