@@ -6,6 +6,34 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ---
 
+## [1.1.2] - 2026-05-30
+
+Privacy claims brought fully in line with the code. Google Ads conversion tracking now happens only after the visitor opts in, the trust wording is precise, conversation history is encrypted at rest, and the public docs and legal pages say exactly what the code does.
+
+### Added
+
+- **Google-ad-only consent for conversion tracking.** Visitors who arrive from a Google ad see one optional checkbox in the welcome dialog. Nothing reaches Google until they tick it. Everyone else sees no change, and there is no site-wide banner. Settings has a control to withdraw the consent at any time, and the conversion upload now carries a Consent Mode v2 signal.
+- **Conversation history is encrypted at rest** in IndexedDB with AES-256-GCM, the same device-key scheme already used for the bring-your-own API key. Existing histories migrate on first launch.
+- **AI crawlers explicitly welcomed** in robots.txt. Our claims are meant to be read and verified, by people and by AI assistants.
+
+### Changed
+
+- **Trust badge reworded** from "No User Tracking" to "No tracking cookies, no profiling", which is provable for every visitor (Cloudflare's strictly necessary __cf_bm is the only cookie, and we build no behavioral profile).
+- **Privacy framing leads with "your conversations stay in your browser, we never store them"** instead of an unqualified "encrypted" claim, since messages are sent to the AI provider over TLS to generate replies.
+- **README, MEASUREMENT, the security docs, and the legal pages** now match the code: the gclid is described as personal data on a consent basis, the click ID is kept out of our analytics, and what reaches Google is listed precisely.
+
+### Removed
+
+- **The diagnostic Google Sheet mirror for conversions**, which was the only place a full click ID was retained without expiry. Conversions still reach Google Ads directly.
+- **The "Start Exploring" conversion**, the shallowest signal, which fired on the landing page before consent could be asked.
+
+### Fixed
+
+- The gclid click-ID fragment is no longer written into Cloudflare Analytics Engine.
+- The privacy policy no longer calls the gclid "anonymous" or "no personal data", and no longer over-states what is forwarded to Google.
+
+---
+
 ## [1.1.1] - 2026-05-27
 
 Local Mode lands. Run the LLM, voice synthesis, and transcription on your own machine, each piece flipping independently. Plus the marketing site migration to Astro for sub-second first paint, plus two companion OSS repos that package the voice servers as standalone projects.
