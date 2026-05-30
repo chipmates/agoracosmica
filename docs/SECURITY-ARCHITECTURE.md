@@ -13,8 +13,8 @@ Your data stays on your device. We do not require accounts, do not track behavio
 This is enforced architecturally, not just stated:
 
 - No user accounts, no email collection, no password
-- No analytics, no marketing cookies
-- Conversations live in your browser's IndexedDB, encrypted at rest with AES-256-GCM
+- No third-party analytics, no marketing cookies
+- Conversation history stays in your browser (IndexedDB, encrypted at rest with AES-256-GCM). Messages are sent to the AI provider over TLS to generate replies, and we never store them
 - BYOK API keys never transit our servers
 - Per-request server logging is disabled in production
 
@@ -27,7 +27,7 @@ This is enforced architecturally, not just stated:
 | **Cloudflare strictly-necessary cookies** (`__cf_bm`, `cf_clearance`, `__cflb`) | Bot detection, load balancing | Required for the site to work. Exempt from cookie banner under ePrivacy Article 5(3). |
 | **Per-identity rate-limit counters** (Cloudflare KV, 24h TTL) | Anonymous UUID from your browser | Free-tier quota enforcement |
 | **Safety screening events** (Cloudflare KV, 90 days) | Anonymized event metadata only | Content safety and abuse review |
-| **No analytics** | (none) | We do not run Google Analytics, Plausible, or any third-party tracker |
+| **No third-party analytics** | (none) | We do not run Google Analytics, Plausible, or any third-party tracker. Our own anonymous aggregate counters are listed in MEASUREMENT.md |
 | **No conversation storage** | (none) | Conversations stay in your browser's IndexedDB |
 | **No PII** | (none) | We have no email, no name, no IP-tied identity |
 

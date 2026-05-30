@@ -33,10 +33,8 @@ interface ConversionInput {
   country?: string;
 }
 
-// Outcome of a single per-account upload attempt. Captured so the orchestrator
-// can mirror what Google said into the diagnostic sheet. Status enum stays
-// tight on purpose — filtering the sheet by status should land on a known
-// label without surprises.
+// Outcome of a single per-account upload attempt. Status enum stays tight on
+// purpose so callers can branch on a known label without surprises.
 interface UploadResult {
   status:
     | 'ok_200'

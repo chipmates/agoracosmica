@@ -91,9 +91,9 @@ export async function handleConversions(
   await env.RATE_LIMITS.put(counterKey, String(count + 1), { expirationTtl: 90 * 86400 });
 
   // Write to Analytics Engine (for stats dashboard SQL queries). The gclid is
-  // never written here — it goes only to Google Ads (for attribution) and the
-  // diagnostic sheet. Keeping it out of our analytics is what makes the
-  // "click ID is not combined with our analytics" claim true.
+  // never written here — it goes only to Google Ads for attribution. Keeping
+  // it out of our analytics is what makes the "click ID is not combined with
+  // our analytics" claim true.
   if (env.ANALYTICS) {
     env.ANALYTICS.writeDataPoint({
       blobs: [payload.event, payload.figureId || ''],
@@ -102,9 +102,8 @@ export async function handleConversions(
     });
   }
 
-  // Forward to Google Ads Conversion API (dual-upload to both accounts) +
-  // mirror the result to a diagnostic Google Sheet when configured. Both
-  // are no-ops when their respective secrets are absent. Fire-and-forget,
+  // Forward to Google Ads Conversion API (dual-upload to both accounts).
+  // A no-op when the developer-token secret is absent. Fire-and-forget,
   // never blocks the response, never surfaces errors to the client.
   ctx.waitUntil(
     forwardConversionToGoogleAds(env, {

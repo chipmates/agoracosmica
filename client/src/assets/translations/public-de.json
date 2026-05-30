@@ -174,7 +174,7 @@
       "title": "Anders gebaut",
       "nonprofit": "Gemeinn\u00fctzig und Open Source. Gebaut von der ChipMates gemeinn\u00fctzige GmbH in Freiburg.",
       "factChecked": "Jede Geschichte gegengepr\u00fcft anhand von Prim\u00e4rquellen. Entstanden durch KI-Kollaboration. Sorgf\u00e4ltig \u00fcberarbeitet.",
-      "noTracking": "Keine Werbung, keine Drittanbieter-Tracker, keine Profile. Deine Gespr\u00e4che bleiben auf deinem Ger\u00e4t, verschl\u00fcsselt mit AES-256-GCM.",
+      "noTracking": "Keine Werbung, keine Drittanbieter-Tracker, keine Profile. Deine Gespr\u00e4che bleiben auf deinem Ger\u00e4t, und wir speichern sie nie auf unseren Servern.",
       "freeTurns": "Kostenlose t\u00e4gliche Gespr\u00e4che zum Entdecken. Bring deinen eigenen API-Schl\u00fcssel f\u00fcr unbegrenzten Zugang.",
       "github": "Der Code ist Open Source auf GitHub."
     },

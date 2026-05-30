@@ -54,7 +54,7 @@
     try {
       var docLang = (document.documentElement.lang || 'en').toLowerCase();
       var language = docLang.indexOf('de') === 0 ? 'de' : 'en';
-      // Absolute worker URL for the same reason as fireConversion above.
+      // Absolute worker URL on purpose (agoracosmica.org has no /v1/* route).
       fetch('https://llm.agoracosmica.org/v1/page', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
