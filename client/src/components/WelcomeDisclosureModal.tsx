@@ -10,7 +10,7 @@ import { preferencesIndexedDbAdapter } from '../storage/preferencesIndexedDbAdap
 import { LocalStorageAdapter } from '../storage/localAdapter';
 import { sendEntryBeacon } from '../utils/entryBeacon';
 import { sendSignupBeacon } from '../utils/signupBeacon';
-import { sendConversion } from '../utils/public/gclidCapture';
+import { sendConversion, getGclid, grantAdConsent, revokeAdConsent } from '../utils/public/gclidCapture';
 
 interface WelcomeDisclosureModalProps {
   isOpen: boolean;
@@ -27,6 +27,10 @@ const WelcomeDisclosureModal: FC<WelcomeDisclosureModalProps> = ({ isOpen, onCom
   const [ageConfirmed, setAgeConfirmed] = useState<boolean>(false);
   const [termsAccepted, setTermsAccepted] = useState<boolean>(false);
   const consentGiven = ageConfirmed && termsAccepted;
+  // Optional ad-measurement consent. Shown only to visitors who arrived from a
+  // Google ad (a gclid is present), defaults off, and never blocks Begin.
+  const [adConsent, setAdConsent] = useState<boolean>(false);
+  const [showAdConsent] = useState<boolean>(() => getGclid() !== null);
 
   const overlayRef = useRef<HTMLDivElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
@@ -60,10 +64,19 @@ const WelcomeDisclosureModal: FC<WelcomeDisclosureModalProps> = ({ isOpen, onCom
     const isFirstLogin = !hasAnyHistory && !hasSelectedFigure;
     sendEntryBeacon();
     if (isFirstLogin) sendSignupBeacon();
+    // Ad-measurement consent applies only to Google-ad arrivals. The conversion
+    // self-gates on a captured gclid + granted consent, so it no-ops otherwise.
+    if (showAdConsent) {
+      if (adConsent) {
+        grantAdConsent();
+      } else {
+        revokeAdConsent();
+      }
+    }
     sendConversion('profile_created');
 
     setIsAnimating(true);
-  }, [consentGiven, language, tString]);
+  }, [consentGiven, language, tString, showAdConsent, adConsent]);
 
   const handleSkip = useCallback((): void => {
     onSkip();
@@ -255,6 +268,18 @@ const WelcomeDisclosureModal: FC<WelcomeDisclosureModalProps> = ({ isOpen, onCom
                 {tNode('legal.consent.termsCheckboxSuffix')}
               </span>
             </label>
+
+            {showAdConsent && (
+              <label className={styles.checkboxLabel}>
+                <input
+                  type="checkbox"
+                  checked={adConsent}
+                  onChange={(e) => setAdConsent(e.target.checked)}
+                  className={styles.checkbox}
+                />
+                <span>{tNode('legal.consent.adMeasurement')}</span>
+              </label>
+            )}
 
             <p className={styles.consentLinks}>
               <a href="/datenschutz" target="_blank" rel="noopener" className={styles.consentLink}>

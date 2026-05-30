@@ -1,4 +1,4 @@
-import { FC, KeyboardEvent } from 'react';
+import { FC, KeyboardEvent, useState } from 'react';
 import {
   Shield,
   Database,
@@ -17,6 +17,7 @@ import {
 } from '@phosphor-icons/react';
 import { useTranslation } from '../../../hooks/useTranslation';
 import { clearAllUserData } from '../../../services/storage/clearAllUserData';
+import { adConsentGranted, revokeAdConsent } from '../../../utils/public/gclidCapture';
 import styles from '../../SettingsModal.module.css';
 
 interface RechtDatenschutzPanelProps {
@@ -34,6 +35,12 @@ const SUB_PROCESSORS: { key: SubProcessorKey; avatar: string }[] = [
 
 const RechtDatenschutzPanel: FC<RechtDatenschutzPanelProps> = ({ onNavigateToAIInfo }) => {
   const { tString, tNode } = useTranslation();
+  const [adConsent, setAdConsent] = useState<boolean>(() => adConsentGranted());
+
+  const handleRevokeAdConsent = (): void => {
+    revokeAdConsent();
+    setAdConsent(false);
+  };
 
   // Navigate to legal pages — allowlist prevents open redirect
   const LEGAL_PATHS = ['/impressum', '/datenschutz', '/cookie-policy', '/nutzungsbedingungen'] as const;
@@ -328,6 +335,34 @@ const RechtDatenschutzPanel: FC<RechtDatenschutzPanelProps> = ({ onNavigateToAII
             </ul>
           </div>
         </div>
+      </div>
+
+      {/* Ad-measurement consent — right to withdraw */}
+      <div style={{ marginTop: '32px', marginBottom: '8px' }}>
+        <h3 style={{
+          fontFamily: 'Space Grotesk, sans-serif',
+          fontSize: '18px',
+          fontWeight: '600',
+          color: 'var(--gold-subtle)',
+          marginBottom: '12px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+        }}>
+          <Eye size={20} weight="regular" />
+          {tNode('settings.legal.adConsent.title')}
+        </h3>
+        <p className={styles.subProcessorIntro}>
+          {adConsent
+            ? tNode('settings.legal.adConsent.activeDescription')
+            : tNode('settings.legal.adConsent.inactiveDescription')}
+        </p>
+        {adConsent && (
+          <button type="button" className={styles.clearAllButton} onClick={handleRevokeAdConsent}>
+            <Trash size={14} weight="regular" />
+            {tNode('settings.legal.adConsent.withdrawButton')}
+          </button>
+        )}
       </div>
 
       {/* Sub-processors — vendor transparency */}

@@ -453,6 +453,12 @@
         "clearAllButton": "Alle meine Daten löschen",
         "clearAllConfirm": "Dies löscht alle deine Gespräche, deinen OpenRouter-Key und alle Einstellungen auf diesem Gerät. Die App wird neu geladen. Fortfahren?"
       },
+      "adConsent": {
+        "title": "Werbe-Messung",
+        "activeDescription": "Du kamst über eine Google-Anzeige und hast erlaubt, Google wissen zu lassen, dass sie funktioniert hat. Wir senden Google die Klick-ID der Anzeige, sobald du einen Conversion-Schritt erreichst. Du kannst das jederzeit widerrufen.",
+        "inactiveDescription": "Die Werbe-Messung ist aus. Wir senden keine Google-Klick-ID. Das betrifft nur Besucher, die über eine Google-Anzeige kommen und zustimmen.",
+        "withdrawButton": "Einwilligung zur Werbe-Messung widerrufen"
+      },
       "subProcessors": {
         "title": "Auftragsverarbeiter",
         "intro": "Wir arbeiten mit drei EU- oder DPF-zertifizierten Anbietern. Mit deinem eigenen OpenRouter-Key wirst du selbst Verantwortlicher für diesen Datenverkehr.",
@@ -1286,7 +1292,8 @@
       "privacyNote": "Datenschutzerklärung",
       "jsbNote": "Jugendschutzbeauftragter",
       "startButton": "Jetzt entdecken",
-      "termsCheckboxSuffix": " gelesen und stimme diesen zu."
+      "termsCheckboxSuffix": " gelesen und stimme diesen zu.",
+      "adMeasurement": "Ich kam über eine Google-Anzeige. Es ist okay, Google wissen zu lassen, dass sie funktioniert hat. Optional, es funktioniert auch ohne."
     },
     "cookiePolicy": {
       "title": "Cookie-Richtlinie",

@@ -3,10 +3,14 @@
 // no hash needed). Cached by CF Pages, one HTTP request per visitor.
 //
 // Responsibilities:
-//   - Capture gclid from URL into sessionStorage (Google Ads attribution)
+//   - Capture gclid from URL into sessionStorage so the app can offer ad-
+//     measurement consent and (only if granted) report the conversion
 //   - Fire the anonymous page-load beacon (/v1/page)
-//   - Click handlers on [data-agc-cta] elements (entry intent + conversion)
+//   - Click handlers on [data-agc-cta] elements (entry intent)
 //   - Mobile burger menu toggle in the navbar
+//
+// No conversion is sent from the marketing pages. The gclid is forwarded to
+// Google only from inside the app, after the visitor opts in.
 (function () {
   'use strict';
 
@@ -34,10 +38,6 @@
     } catch (e) { /* sessionStorage blocked — ignore */ }
   }
 
-  function readGclid() {
-    try { return sessionStorage.getItem(SS_GCLID); } catch (e) { return null; }
-  }
-
   function persistIntent(opts) {
     try {
       if (opts.lang) localStorage.setItem(LS_LANG, opts.lang);
@@ -48,36 +48,6 @@
         sessionStorage.setItem(SS_COUNCIL, opts.councilId);
       }
     } catch (e) { /* storage blocked — app falls back */ }
-  }
-
-  function fireConversion(event, metadata) {
-    var gclid = readGclid();
-    if (!gclid) return;
-    try {
-      var firedKey = 'agc_conv_fired_' + event;
-      if (sessionStorage.getItem(firedKey)) return;
-      sessionStorage.setItem(firedKey, '1');
-    } catch (e) { /* worker dedups via order_id */ }
-    try {
-      var body = { gclid: gclid, event: event, timestamp: Date.now() };
-      if (metadata) {
-        for (var k in metadata) {
-          if (Object.prototype.hasOwnProperty.call(metadata, k)) body[k] = metadata[k];
-        }
-      }
-      // Absolute worker URL on purpose. agoracosmica.org has no /api/* route,
-      // so a relative path falls through the SPA fallback (/* /index.html 200)
-      // and silently returns the React app HTML with 200. The fetch resolves
-      // successfully, .catch() never fires, and the conversion never reaches
-      // the worker. CSP allows https://*.agoracosmica.org in connect-src,
-      // and worker CORS allows this origin explicitly.
-      fetch('https://llm.agoracosmica.org/api/conversions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-        keepalive: true,
-      }).catch(function () { /* never surface */ });
-    } catch (e) { /* same posture */ }
   }
 
   function sendPageBeacon() {
@@ -106,10 +76,6 @@
     var councilId = target.getAttribute('data-agc-council') || undefined;
     var lang = document.documentElement.lang || 'en';
     persistIntent({ figureId: figureId, councilId: councilId, lang: lang });
-    var metadata = {};
-    if (figureId) metadata.figureId = figureId;
-    if (councilId) metadata.councilId = councilId;
-    fireConversion('start_exploring', Object.keys(metadata).length ? metadata : undefined);
   });
 
   var burger = document.querySelector('[data-agc-burger]');

@@ -455,6 +455,12 @@
         "clearAllButton": "Clear all my data",
         "clearAllConfirm": "This deletes all your conversations, your OpenRouter key, and every setting on this device. The app will reload. Continue?"
       },
+      "adConsent": {
+        "title": "Ad measurement",
+        "activeDescription": "You came from a Google ad and allowed us to let Google know it worked. We send Google the ad's click ID when you reach a conversion step. You can withdraw this at any time.",
+        "inactiveDescription": "Ad measurement is off. We send no Google ad click ID. This only ever applies to visitors who arrive from a Google ad and opt in.",
+        "withdrawButton": "Withdraw ad-measurement consent"
+      },
       "subProcessors": {
         "title": "Sub-processors",
         "intro": "We work with three EU or DPF-certified vendors. With your own OpenRouter key, you also become controller for that traffic.",
@@ -1284,7 +1290,8 @@
       "privacyNote": "Privacy Policy",
       "jsbNote": "Youth Protection Officer",
       "startButton": "Start exploring",
-      "termsCheckboxSuffix": "."
+      "termsCheckboxSuffix": ".",
+      "adMeasurement": "I came from a Google ad. It is fine to let Google know it worked. Optional, everything works without it."
     },
     "cookiePolicy": {
       "title": "Cookie Policy",
