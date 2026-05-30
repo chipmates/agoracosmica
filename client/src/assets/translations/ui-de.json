@@ -419,7 +419,7 @@
       "rights": {
         "title": "Deine Rechte",
         "noDataSelling": "Wir verkaufen niemals deine Daten",
-        "noTracking": "Kein Tracking oder Analytik",
+        "noTracking": "Keine Drittanbieter-Tracker, kein Profiling",
         "nonprofit": "Wir sind eine gemeinnützige Organisation",
         "dsgvo": "Vollständige DSGVO-Konformität"
       },
@@ -2057,7 +2057,7 @@
     },
     "footer": {
       "disclaimer": "Unverbindliches Signal. ChipMates ist gemeinnützig. Deine Stimme prägt die Plattform.",
-      "privacy": "Anonym. Kein Tracking. Nur pro Gerät."
+      "privacy": "Anonym. Kein Profiling. Nur pro Gerät."
     }
   }
 }

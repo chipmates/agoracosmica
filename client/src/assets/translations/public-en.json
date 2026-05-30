@@ -174,7 +174,7 @@
       "title": "Built Different",
       "nonprofit": "Non-profit and open source. Built by ChipMates gemeinn\u00fctzige GmbH in Freiburg, Germany.",
       "factChecked": "Every story cross-checked against primary sources. Created through AI collaboration. Carefully refined.",
-      "noTracking": "No tracking, no ads, no data collection. Your conversations stay on your device, encrypted.",
+      "noTracking": "No ads, no third-party trackers, no profiles. Your conversations stay on your device, encrypted at rest with AES-256-GCM.",
       "freeTurns": "Free daily turns to explore. Bring your own API key for unlimited access.",
       "github": "The code is open source on GitHub."
     },
