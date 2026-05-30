@@ -23,12 +23,17 @@ export async function migrateHistoryToEncrypted(): Promise<void> {
     const operations: WalOperation[] = [];
 
     for (const key of keys) {
-      if (!isConversationHistoryKey(key)) continue;
-      const stored = await getFromStore<unknown>('history', key);
-      // Skip rows that are already encrypted, and anything that is not a plain
-      // messages array (nothing to migrate, never destroy it).
-      if (isEncryptedHistory(stored) || !Array.isArray(stored)) continue;
-      operations.push({ type: 'put', store: 'history', key, value: await encryptHistory(stored) });
+      try {
+        if (!isConversationHistoryKey(key)) continue;
+        const stored = await getFromStore<unknown>('history', key);
+        // Skip rows that are already encrypted, and anything that is not a plain
+        // messages array (nothing to migrate, never destroy it).
+        if (isEncryptedHistory(stored) || !Array.isArray(stored)) continue;
+        operations.push({ type: 'put', store: 'history', key, value: await encryptHistory(stored) });
+      } catch (error) {
+        // One bad row must not abort the whole sweep. Plaintext stays readable.
+        console.warn(`[historyEncryptionMigration] skipped ${key} during sweep`, error);
+      }
     }
 
     if (operations.length > 0) {

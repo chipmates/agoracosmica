@@ -68,6 +68,20 @@ export function isEncryptedHistory(value: unknown): value is EncryptedHistory {
   );
 }
 
+// Base64-encode bytes in fixed chunks. A single String.fromCharCode(...bytes)
+// spread throws RangeError once the array exceeds the engine argument-count
+// limit (~110KB on V8, lower on iOS Safari). Conversation histories are
+// unbounded, so chunking is required or long threads fail to encrypt.
+function bytesToBase64(bytes: Uint8Array): string {
+  const CHUNK = 0x8000; // 32KB, safely under the argument-count limit
+  let binary = '';
+  for (let i = 0; i < bytes.length; i += CHUNK) {
+    const slice = bytes.subarray(i, i + CHUNK);
+    binary += String.fromCharCode.apply(null, slice as unknown as number[]);
+  }
+  return btoa(binary);
+}
+
 /**
  * Encrypt a messages array for storage. In a non-secure context (no
  * crypto.subtle) we fall back to storing the plain array so save+load never
@@ -91,7 +105,7 @@ export async function encryptHistory<T>(messages: T): Promise<EncryptedHistory |
   );
 
   return {
-    ciphertext: btoa(String.fromCharCode(...new Uint8Array(encrypted))),
+    ciphertext: bytesToBase64(new Uint8Array(encrypted)),
     iv: Array.from(iv),
     salt: Array.from(salt),
     timestamp: Date.now(),
