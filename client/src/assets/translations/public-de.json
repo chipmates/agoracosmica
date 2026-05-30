@@ -15,7 +15,7 @@
     "terms": "Nutzungsbedingungen",
     "copyright": "ChipMates gemeinn\u00fctzige GmbH",
     "projectOf": "Ein Projekt der ChipMates gemeinn\u00fctzige GmbH \u00b7 Freiburg",
-    "trustSignals": "Gemeinn\u00fctzig \u00b7 Open Source \u00b7 Kein Nutzer-Tracking",
+    "trustSignals": "Gemeinn\u00fctzig \u00b7 Open Source \u00b7 Keine Tracking-Cookies, kein Profiling",
     "tagline": "Eine lebendige Bibliothek, mit der du sprechen kannst"
   },
   "breadcrumbs": {
@@ -28,7 +28,7 @@
   "cta": {
     "startConversation": "Sprich mit {name}",
     "learnFrom": "Lerne vom Echo von {name}",
-    "trust": "Gemeinnützig · Open Source · Kein Nutzer-Tracking",
+    "trust": "Gemeinnützig · Open Source · Keine Tracking-Cookies, kein Profiling",
     "exploreQuestion": "Erkunde diese Frage",
     "startFree": "Jetzt entdecken",
     "listenDebate": "H\u00f6re diese Debatte",

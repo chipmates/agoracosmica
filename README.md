@@ -6,7 +6,7 @@
 
 <p align="center">
   <strong>A Living Library You Can Talk To</strong><br/>
-  <sub>Nonprofit · Open Source · No User Tracking</sub>
+  <sub>Nonprofit · Open Source · No tracking cookies, no profiling</sub>
 </p>
 
 <p align="center">
@@ -145,5 +145,5 @@ We're early in this journey and we'll make mistakes. When we oversimplify, misre
 ---
 
 <p align="center">
-  <em>Nonprofit · Open Source · No User Tracking</em>
+  <em>Nonprofit · Open Source · No tracking cookies, no profiling</em>
 </p>

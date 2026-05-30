@@ -15,7 +15,7 @@
     "terms": "Terms of Use",
     "copyright": "ChipMates gemeinn\u00fctzige GmbH",
     "projectOf": "A project of ChipMates gemeinn\u00fctzige GmbH \u00b7 Freiburg, Germany",
-    "trustSignals": "Non-Profit \u00b7 Open Source \u00b7 No User Tracking",
+    "trustSignals": "Non-Profit \u00b7 Open Source \u00b7 No tracking cookies, no profiling",
     "tagline": "A Living Library You Can Talk To"
   },
   "breadcrumbs": {
@@ -28,7 +28,7 @@
   "cta": {
     "startConversation": "Start a conversation with {name}",
     "learnFrom": "Learn from Echo of {name}",
-    "trust": "Nonprofit · Open Source · No User Tracking",
+    "trust": "Nonprofit · Open Source · No tracking cookies, no profiling",
     "exploreQuestion": "Explore this question",
     "startFree": "Start exploring",
     "listenDebate": "Listen to this debate",

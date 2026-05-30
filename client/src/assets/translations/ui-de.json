@@ -78,7 +78,7 @@
     },
     "explainer": "Lerne von 30 großen Persönlichkeiten der Geschichte.",
     "access": "Ohne Anmeldung. 30 kostenlose Nachrichten pro Tag.",
-    "trustLine": "Gemeinnützig · Open Source · Kein Nutzer-Tracking",
+    "trustLine": "Gemeinnützig · Open Source · Keine Tracking-Cookies, kein Profiling",
     "identityLabel": "Nur ein Name, dann los.",
     "motto": {
       "dante": "Durch dunkle Wälder, ans Licht der Sterne.",
@@ -448,7 +448,7 @@
         "trustNonprofit": "Gemeinnützig",
         "trustOpenSource": "Open Source (AGPL-3.0)",
         "trustOpenSourceAria": "Open Source unter AGPL-3.0. Quellcode auf GitHub ansehen. Öffnet in neuem Tab.",
-        "trustNoTracking": "Kein Nutzer-Tracking",
+        "trustNoTracking": "Keine Tracking-Cookies, kein Profiling",
         "trustProof": "Wir speichern deine Daten nie. Server in Deutschland und Finnland, täglich automatisch geprüft.",
         "clearAllButton": "Alle meine Daten löschen",
         "clearAllConfirm": "Dies löscht alle deine Gespräche, deinen OpenRouter-Key und alle Einstellungen auf diesem Gerät. Die App wird neu geladen. Fortfahren?"
@@ -1665,7 +1665,7 @@
     },
     "quote": "Folge deiner Freude, und das Universum wird Türen öffnen, wo vorher nur Wände waren.",
     "quoteAttribution": "— Joseph Campbell",
-    "trustSignals": "Gemeinnützig · Open Source · Kein Nutzer-Tracking",
+    "trustSignals": "Gemeinnützig · Open Source · Keine Tracking-Cookies, kein Profiling",
     "button": "Entzünde deine Sterne",
     "seekerText": "Fragen, wie Sterne, leuchten in dir.",
     "seekerAlt": "Der Suchende - dein kosmisches Selbst mit unendlichem Potenzial"

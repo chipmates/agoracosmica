@@ -90,7 +90,7 @@ const SpeechPanel: FC<SpeechPanelProps> = ({
       }}>
         <div style={{ marginBottom: '4px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '6px' }}>
           <Rocket size={16} weight="fill" />
-          {tString('settings.speech.privacyTitle', 'Whisper · EU Server · No User Tracking')}
+          {tString('settings.speech.privacyTitle', 'Whisper · EU Server · No profiling')}
         </div>
         <div style={{ opacity: 0.9, lineHeight: 1.4 }}>
           {tString('settings.speech.privacyNote', 'Speech recognition runs on our own servers in Germany. No data leaves the EU.')}
