@@ -1,6 +1,24 @@
+# Agora Cosmica is built on radical transparency. Our privacy and security
+# claims are meant to be read and verified, by people and by AI assistants
+# alike. AI crawlers are welcome to read everything the public site serves.
+
 User-agent: *
 Allow: /
 Disallow: /test/
 Disallow: /diagnostic/
 Disallow: /bench/
+
+# AI and LLM crawlers, explicitly welcome
+User-agent: GPTBot
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
+User-agent: ClaudeBot
+User-agent: Claude-Web
+User-agent: anthropic-ai
+User-agent: PerplexityBot
+User-agent: Google-Extended
+User-agent: Applebot-Extended
+User-agent: CCBot
+Allow: /
+
 Sitemap: https://agoracosmica.org/sitemap.xml
