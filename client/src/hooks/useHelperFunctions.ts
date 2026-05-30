@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { getHistoricalFigures } from '../api/figures';
-import { completeOnboarding, skipOnboarding } from '../utils/userState';
+import { completeOnboarding } from '../utils/userState';
 import { Figure, Seed, Language, ConversationMode } from '../types/global';
 import { useDomainStore } from '../stores';
 import { readFigureIntent, clearFigureIntent, readCouncilIntent, clearCouncilIntent } from '../utils/public/entryIntent';
@@ -141,13 +141,15 @@ export function useHelperFunctions({
     routeAfterOnboarding();
   }, [handleOnboardingClose, routeAfterOnboarding]);
 
-  // Handle onboarding skip
+  // Welcome/consent gate dismissal. The welcome modal is a REQUIRED consent
+  // gate (age 16+ + terms), so dismissing it must NOT enter the app
+  // un-consented. Escape returns the visitor to the public homepage instead
+  // (same as logout), which keeps a keyboard way out of the modal (no focus
+  // trap) without bypassing the age gate. Profile + consent + the entry/signup/
+  // conversion beacons are written only by the "Begin" path (handleComplete).
   const handleOnboardingSkip = useCallback((): void => {
-    skipOnboarding();
-    useDomainStore.getState().markVisited();
-    handleOnboardingClose();
-    routeAfterOnboarding();
-  }, [handleOnboardingClose, routeAfterOnboarding]);
+    window.location.href = '/';
+  }, []);
 
   // Handle WisdomGallery selection
   const handleWisdomGallerySelect = useCallback((figure: Figure): void => {
