@@ -138,17 +138,22 @@ const HorizonDore: FC = () => {
             transform: 'translateX(-50%) scale(0.22)',
           }}
         >
+          {/* The peak twins render at ~32px wide (scale 0.22). A ~70px sizes
+              cap makes the browser fetch the 240w variant (~18-25KB) instead
+              of the 1440w (~270-400KB) the generic full-width default selected. */}
           <OptimizedImage
             name="figure"
             height="calc(25vh)"
             alt=""
             className="figure-image"
+            sizes="(max-width: 640px) 60px, 70px"
           />
           <OptimizedImage
             name="figure_2"
             height="calc(25vh)"
             alt=""
             className="figure-image"
+            sizes="(max-width: 640px) 60px, 70px"
           />
         </div>
       </div>

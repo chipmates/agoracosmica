@@ -68,6 +68,13 @@ interface OptimizedImageProps {
   loading?: 'eager' | 'lazy';
   /** Decoding attribute */
   decoding?: 'async' | 'sync' | 'auto';
+  /**
+   * Responsive `sizes` attribute for the <picture> sources. Overrides the
+   * generic "(max-width: 640px) 100vw, {variantWidth}px" default, which
+   * over-states the slot for small decorative figures and makes the browser
+   * pick oversized variants. Pass the real rendered width (e.g. "170px").
+   */
+  sizes?: string;
   [key: string]: any;
 }
 
@@ -299,6 +306,7 @@ const OptimizedImage: FC<OptimizedImageProps> = ({
   fetchPriority,
   loading,
   decoding,
+  sizes,
   alt = '',
   ...props
 }) => {
@@ -375,19 +383,19 @@ const OptimizedImage: FC<OptimizedImageProps> = ({
       <picture>
         {/* AVIF source */}
         {imageData.avif && (
-          <source 
-            srcSet={imageData.avif.srcSet} 
+          <source
+            srcSet={imageData.avif.srcSet}
             type="image/avif"
-            sizes={`(max-width: 640px) 100vw, ${imageData.avif.width}px`}
+            sizes={sizes ?? `(max-width: 640px) 100vw, ${imageData.avif.width}px`}
           />
         )}
         
         {/* WebP source */}
         {imageData.webp && (
-          <source 
-            srcSet={imageData.webp.srcSet} 
+          <source
+            srcSet={imageData.webp.srcSet}
             type="image/webp"
-            sizes={`(max-width: 640px) 100vw, ${imageData.webp.width}px`}
+            sizes={sizes ?? `(max-width: 640px) 100vw, ${imageData.webp.width}px`}
           />
         )}
         

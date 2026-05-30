@@ -26,6 +26,11 @@ const HistoricalFigures: FC<HistoricalFiguresProps> = ({ className = '' }) => {
 
   const FIGURE_HEIGHT = 'calc(25vh)'; // Critical for maintaining figure composition
 
+  // Figures render at most ~180px wide (much smaller on mobile). Cap the
+  // responsive `sizes` to that so browsers fetch the 480w variant (~60-98KB)
+  // instead of treating them as full-width and grabbing 1440w (~270-400KB).
+  const FIGURE_SIZES = '(max-width: 640px) 30vw, 180px';
+
   return (
     <div className={`historical-figures-container ${className}`}>
       {/* Central hooded figure (numbered as 1) */}
@@ -35,6 +40,7 @@ const HistoricalFigures: FC<HistoricalFiguresProps> = ({ className = '' }) => {
           height={FIGURE_HEIGHT}
           alt=""
           className="figure-image"
+          sizes={FIGURE_SIZES}
           priority={true}
         />
       </div>
@@ -46,7 +52,7 @@ const HistoricalFigures: FC<HistoricalFiguresProps> = ({ className = '' }) => {
           height={FIGURE_HEIGHT}
           alt="" aria-hidden="true" data-figure="2"
           className="figure-image"
-          priority={true}
+          sizes={FIGURE_SIZES}
         />
       </div>
 
@@ -56,7 +62,7 @@ const HistoricalFigures: FC<HistoricalFiguresProps> = ({ className = '' }) => {
           height={FIGURE_HEIGHT}
           alt="" aria-hidden="true" data-figure="4"
           className="figure-image"
-          priority={true}
+          sizes={FIGURE_SIZES}
         />
       </div>
 
@@ -66,7 +72,7 @@ const HistoricalFigures: FC<HistoricalFiguresProps> = ({ className = '' }) => {
           height={FIGURE_HEIGHT}
           alt="" aria-hidden="true" data-figure="6"
           className="figure-image"
-          priority={true}
+          sizes={FIGURE_SIZES}
         />
       </div>
 
@@ -76,7 +82,7 @@ const HistoricalFigures: FC<HistoricalFiguresProps> = ({ className = '' }) => {
           height={FIGURE_HEIGHT}
           alt="" aria-hidden="true" data-figure="8"
           className="figure-image"
-          priority={true}
+          sizes={FIGURE_SIZES}
         />
       </div>
 
@@ -87,7 +93,7 @@ const HistoricalFigures: FC<HistoricalFiguresProps> = ({ className = '' }) => {
           height={FIGURE_HEIGHT}
           alt="" aria-hidden="true" data-figure="3"
           className="figure-image"
-          priority={true}
+          sizes={FIGURE_SIZES}
         />
       </div>
 
@@ -97,7 +103,7 @@ const HistoricalFigures: FC<HistoricalFiguresProps> = ({ className = '' }) => {
           height={FIGURE_HEIGHT}
           alt="" aria-hidden="true" data-figure="5"
           className="figure-image"
-          priority={true}
+          sizes={FIGURE_SIZES}
         />
       </div>
 
@@ -107,7 +113,7 @@ const HistoricalFigures: FC<HistoricalFiguresProps> = ({ className = '' }) => {
           height={FIGURE_HEIGHT}
           alt="" aria-hidden="true" data-figure="7"
           className="figure-image"
-          priority={true}
+          sizes={FIGURE_SIZES}
         />
       </div>
 
@@ -117,7 +123,7 @@ const HistoricalFigures: FC<HistoricalFiguresProps> = ({ className = '' }) => {
           height={FIGURE_HEIGHT}
           alt="" aria-hidden="true" data-figure="9"
           className="figure-image"
-          priority={true}
+          sizes={FIGURE_SIZES}
         />
       </div>
     </div>

@@ -188,6 +188,9 @@ const WelcomeDisclosureModal: FC<WelcomeDisclosureModalProps> = ({ isOpen, onCom
               <div className={styles.figureContainer}>
                 <div className={styles.silhouetteWrapper}>
                   <div className={styles.silhouette}>
+                    {/* Portrait renders at ~125px (<=90px on small phones); the
+                        sizes cap makes mobile fetch 320-480w (~11-37KB) instead
+                        of the generic-100vw 640w (~53-68KB) on the entry screen. */}
                     <OptimizedImage
                       src="campbell"
                       type="ui"
@@ -197,6 +200,7 @@ const WelcomeDisclosureModal: FC<WelcomeDisclosureModalProps> = ({ isOpen, onCom
                       withBlurUp={true}
                       alt="Joseph Campbell"
                       className={styles.guideImage}
+                      sizes="(max-width: 640px) 150px, 145px"
                     />
                   </div>
                 </div>
