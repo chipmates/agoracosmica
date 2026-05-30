@@ -6,7 +6,7 @@ import { useTranslation } from '../hooks/useTranslation';
 
 const CookiePolicyPage: FC = () => {
   const navigate = useNavigate();
-  const { tNode } = useTranslation();
+  const { tNode, language } = useTranslation();
 
   const handleClose = () => {
     if (window.history.length > 1) {
@@ -155,9 +155,9 @@ const CookiePolicyPage: FC = () => {
 
         <div className="legal-footer">
           <div className="legal-links">
-            <Link to="/datenschutz" className="legal-link">
+            <a href={language === 'de' ? '/datenschutz' : '/privacy'} className="legal-link">
               {tNode('legal.links.privacy')}
-            </Link>
+            </a>
             <span className="legal-separator">•</span>
             <Link to="/impressum" className="legal-link">
               {tNode('legal.links.imprint')}

@@ -34,8 +34,9 @@ const SUB_PROCESSORS: { key: SubProcessorKey; avatar: string }[] = [
 ];
 
 const RechtDatenschutzPanel: FC<RechtDatenschutzPanelProps> = ({ onNavigateToAIInfo }) => {
-  const { tString, tNode } = useTranslation();
+  const { tString, tNode, language } = useTranslation();
   const [adConsent, setAdConsent] = useState<boolean>(() => adConsentGranted());
+  const privacyPath = language === 'de' ? '/datenschutz' : '/privacy';
 
   const handleRevokeAdConsent = (): void => {
     revokeAdConsent();
@@ -43,7 +44,7 @@ const RechtDatenschutzPanel: FC<RechtDatenschutzPanelProps> = ({ onNavigateToAII
   };
 
   // Navigate to legal pages — allowlist prevents open redirect
-  const LEGAL_PATHS = ['/impressum', '/datenschutz', '/cookie-policy', '/nutzungsbedingungen'] as const;
+  const LEGAL_PATHS = ['/impressum', '/datenschutz', '/privacy', '/cookie-policy', '/nutzungsbedingungen'] as const;
   const openLegalPage = (path: typeof LEGAL_PATHS[number]): void => {
     if (LEGAL_PATHS.includes(path)) {
       window.location.href = path;
@@ -140,11 +141,11 @@ const RechtDatenschutzPanel: FC<RechtDatenschutzPanelProps> = ({ onNavigateToAII
 
           <div
             className={styles.legalCard}
-            onClick={() => openLegalPage('/datenschutz')}
+            onClick={() => openLegalPage(privacyPath)}
             role="button"
             tabIndex={0}
             aria-label={tString('legal.links.privacy', 'Datenschutz')}
-            onKeyDown={(e: KeyboardEvent<HTMLDivElement>) => (e.key === 'Enter' || e.key === ' ') && openLegalPage('/datenschutz')}
+            onKeyDown={(e: KeyboardEvent<HTMLDivElement>) => (e.key === 'Enter' || e.key === ' ') && openLegalPage(privacyPath)}
           >
             <Shield className={styles.legalCardIcon} />
             <div className={styles.legalCardTitle}>

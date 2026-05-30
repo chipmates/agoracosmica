@@ -4,9 +4,11 @@ import '../../styles/legal.css';
 interface Props {
   title: string;
   lastUpdated: string;
+  lang?: 'de' | 'en';
 }
 
-const { title, lastUpdated } = Astro.props;
+const { title, lastUpdated, lang = 'de' } = Astro.props;
+const isEn = lang === 'en';
 ---
 <article class="legal-doc">
   <header class="legal-doc__header">
@@ -17,14 +19,14 @@ const { title, lastUpdated } = Astro.props;
   <slot />
 
   <div class="legal-doc__footer">
-    <nav class="legal-doc__footer-links" aria-label="Rechtliches">
-      <a href="/impressum/">Impressum</a>
+    <nav class="legal-doc__footer-links" aria-label={isEn ? 'Legal' : 'Rechtliches'}>
+      <a href="/impressum/">{isEn ? 'Imprint' : 'Impressum'}</a>
       <span class="legal-doc__footer-sep">•</span>
-      <a href="/datenschutz/">Datenschutzerklärung</a>
+      <a href={isEn ? '/privacy' : '/datenschutz/'}>{isEn ? 'Privacy Policy' : 'Datenschutzerklärung'}</a>
       <span class="legal-doc__footer-sep">•</span>
-      <a href="/cookie-policy/">Cookie-Richtlinie</a>
+      <a href="/cookie-policy/">{isEn ? 'Cookie Policy' : 'Cookie-Richtlinie'}</a>
       <span class="legal-doc__footer-sep">•</span>
-      <a href="/nutzungsbedingungen/">Nutzungsbedingungen</a>
+      <a href="/nutzungsbedingungen/">{isEn ? 'Terms' : 'Nutzungsbedingungen'}</a>
     </nav>
   </div>
 </article>
