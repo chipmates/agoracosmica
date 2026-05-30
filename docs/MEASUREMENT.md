@@ -23,9 +23,9 @@ Per anonymous request, written to Cloudflare Analytics Engine:
 | Content type | `story`, `teaching`, `prism`, `council`, `foreword` (closed allowlist; only set on playback events) | Know which content type was started/completed |
 | Duration (ms) | Latency of the request | Find slow paths, fix them |
 | Signup | `signup` (fires once when a visitor creates a profile) | Count new profiles, so the funnel has an endpoint |
-| Conversion event | `profile_created`, `mode_selected`, `council_engaged` (fire only for visitors who arrived from a Google ad and opted in) | Measure whether Google ad spend reaches real engagement |
+| Conversion event | `profile_created`, `mode_selected`, `council_engaged` (fire only for visitors who arrived from a Google ad and opted in; a former `start_exploring` event is retired and the app no longer fires it) | Measure whether Google ad spend reaches real engagement |
 
-The conversion rows are written with the event name, an optional figure id, country, and a timestamp. The gclid is never part of this analytics write. It goes only to Google Ads, as described below.
+The conversion rows are written with the event name, an optional figure id, and a timestamp. The gclid is never part of this analytics write. It goes only to Google Ads, as described below.
 
 ## What we don't count, ever
 
@@ -52,7 +52,7 @@ All analytics writes are in:
 
 Country values come from `request.cf.country` (a 2-letter ISO code), never from a stored IP.
 
-Separately, Google Ads click tracking captures a `gclid` URL parameter (only when a visitor arrives via a Google ad) in sessionStorage. If the visitor opts in to ad measurement, our worker relays it to the Google Ads Conversion API when they reach a conversion step. What reaches Google is the `gclid`, the conversion event name (such as `profile_created`), an optional figure id, the 2-letter country, a value, and a timestamp. No message content, no profile, no client id. The `gclid` is a Google-issued click identifier that, in Google's hands, can be linked to a person, so we treat it as personal data. On the browser it lives in sessionStorage (tab-scoped), and it is never written into our analytics dataset. See [`client/src/utils/public/gclidCapture.ts`](../client/src/utils/public/gclidCapture.ts) and [`workers/llm-proxy/src/routes/conversions.ts`](../workers/llm-proxy/src/routes/conversions.ts).
+Separately, Google Ads click tracking captures a `gclid` URL parameter (only when a visitor arrives via a Google ad) in sessionStorage. If the visitor opts in to ad measurement, our worker relays it to the Google Ads Conversion API when they reach a conversion step. What reaches Google is the `gclid`, a conversion action (mapped from the event, such as `profile_created`), a timestamp, a value, a currency, and an order id (the `gclid` plus the event, which Google uses to de-duplicate). No figure, no country, no message content, no profile, no client id. The `gclid` is a Google-issued click identifier that, in Google's hands, can be linked to a person, so we treat it as personal data. On the browser it lives in sessionStorage (tab-scoped), and it is never written into our analytics dataset. See [`client/src/utils/public/gclidCapture.ts`](../client/src/utils/public/gclidCapture.ts) and [`workers/llm-proxy/src/routes/conversions.ts`](../workers/llm-proxy/src/routes/conversions.ts).
 
 Your privacy posture is what the code does, not what we promise.
 

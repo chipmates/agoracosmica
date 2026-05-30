@@ -16,7 +16,7 @@ This is enforced architecturally, not just stated:
 - No third-party analytics, no marketing cookies
 - Conversation history stays in your browser (IndexedDB, encrypted at rest with AES-256-GCM). Messages are sent to the AI provider over TLS to generate replies, and we never store them
 - BYOK API keys never transit our servers
-- Per-request server logging is disabled in production
+- No per-request access logging of request or response content in production
 
 ---
 

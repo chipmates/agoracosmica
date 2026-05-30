@@ -107,7 +107,7 @@ To save you time, these are the recurring reports we close as informational:
 
 We design to protect against:
 
-- **Confidentiality** of conversations and BYOK API keys (encrypted at rest, never transit our servers)
+- **Confidentiality** of your data: BYOK API keys are encrypted at rest and never transit our servers. Conversations stay in your browser and are never stored on our servers (free-tier messages pass through our proxy over TLS to reach the AI provider, never logged or stored there)
 - **Integrity** of LLM responses (output sanitization, prompt-injection screening)
 - **Availability** of the free tier (rate limits, content safety pre-filtering)
 - **Identifiability** of users (no PII collection, no IP tracking, hashed device identifiers only)

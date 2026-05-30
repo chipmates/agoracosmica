@@ -199,7 +199,7 @@ Initial public release. Live at 07:18 CEST (05:18 UTC).
 - 470 KB gzipped JS, 97 KB gzipped CSS.
 
 **Privacy and security**
-- No tracking cookies, no analytics, no per-request server logs.
+- No tracking cookies, no third-party analytics, no per-request server logs.
 - Strict CSP, HSTS with includeSubDomains.
 - HMAC-SHA256 JWT with UUID-bound subjects.
 - Zero-Data-Retention provider routing on by default for BYOK (configurable in settings).
