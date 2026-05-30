@@ -2,7 +2,7 @@
 
 We don't track users. We do count aggregate events. That's how we know if the service is working, where it breaks, and whether our nonprofit outreach actually reaches anyone.
 
-One exception we name upfront: visitors who arrive via a Google ad bring a per-click identifier (`gclid`), which we forward to Google for conversion matching. It lives only for the tab's lifetime, is never combined with our analytics, and the full mechanics are detailed below.
+One exception we name upfront: visitors who arrive via a Google ad carry a per-click identifier (`gclid`) in the URL. If such a visitor opts in, we forward that `gclid` to Google Ads when they reach a conversion step, so the ad can be matched to a conversion. Nothing is sent without that opt-in. On the browser the gclid lives in sessionStorage (tab-scoped) and is never written into our own analytics counters. The full mechanics, including exactly what reaches Google, are below.
 
 This document lists exactly what gets counted, why, and what never does.
 
@@ -22,10 +22,14 @@ Per anonymous request, written to Cloudflare Analytics Engine:
 | Playback event | `started` (audio first play) or `completed` (content marked finished, gamification star awarded) | Distinguish click-and-bail from real consumption (completion-rate funnel) |
 | Content type | `story`, `teaching`, `prism`, `council`, `foreword` (closed allowlist; only set on playback events) | Know which content type was started/completed |
 | Duration (ms) | Latency of the request | Find slow paths, fix them |
+| Signup | `signup` (fires once when a visitor creates a profile) | Count new profiles, so the funnel has an endpoint |
+| Conversion event | `profile_created`, `mode_selected`, `council_engaged` (fire only for visitors who arrived from a Google ad and opted in) | Measure whether Google ad spend reaches real engagement |
+
+The conversion rows are written with the event name, an optional figure id, country, and a timestamp. The gclid is never part of this analytics write. It goes only to Google Ads, as described below.
 
 ## What we don't count, ever
 
-- **No IP retention.** Cloudflare derives a 2-letter country code at the edge from the request IP; we read and store only the code. The IP itself is used transiently in worker memory for rate-limiting and Turnstile bot-detection, never persisted to disk, never written to analytics.
+- **No IP retention in analytics.** Cloudflare derives a 2-letter country code at the edge from the request IP, and the analytics rows store only that code, never the IP. Two operational paths touch the IP outside analytics, and neither feeds the counters: our abuse-protection log stores a salted, one-way SHA-256 hash of the IP (not the IP, and not reversible to it) for 90 days to investigate safety incidents, and the conversion and signup rate limiters hold the plain IP in a short-lived key for up to one hour to stop floods. The IP is never written to the analytics dataset and never joined to any event.
 - **No user IDs in analytics.** The free-tier `clientId` is a UUID stored in your browser's localStorage (the server hands one out on first session if none exists). It is used server-side for short-lived rate-limit accounting (24-hour KV TTL) and never written to analytics rows, never combined with figure/mode/country/source/any other dimension.
 - **No cookies, no fingerprints, no localStorage exfiltration.** Cloudflare sets strictly-necessary bot-detection cookies (`__cf_bm`, `cf_clearance`) at the edge. These are exempt under ePrivacy Article 5(3). We add nothing of our own.
 - **No message content, no prompts, no transcriptions.**
@@ -48,7 +52,7 @@ All analytics writes are in:
 
 Country values come from `request.cf.country` (a 2-letter ISO code), never from a stored IP.
 
-Separately, Google Ads click tracking captures a gclid URL parameter (when a visitor arrives via a Google ad) in sessionStorage and relays it server-side only when the visitor creates a profile, so the ad can be matched to a conversion. The gclid is a Google-issued click identifier, not a user identifier, and lives only for the lifetime of the tab. See [`client/src/utils/public/gclidCapture.ts`](../client/src/utils/public/gclidCapture.ts) and [`workers/llm-proxy/src/routes/conversions.ts`](../workers/llm-proxy/src/routes/conversions.ts).
+Separately, Google Ads click tracking captures a `gclid` URL parameter (only when a visitor arrives via a Google ad) in sessionStorage. If the visitor opts in to ad measurement, our worker relays it to the Google Ads Conversion API when they reach a conversion step. What reaches Google is the `gclid`, the conversion event name (such as `profile_created`), an optional figure id, the 2-letter country, a value, and a timestamp. No message content, no profile, no client id. The `gclid` is a Google-issued click identifier that, in Google's hands, can be linked to a person, so we treat it as personal data. On the browser it lives in sessionStorage (tab-scoped), and it is never written into our analytics dataset. See [`client/src/utils/public/gclidCapture.ts`](../client/src/utils/public/gclidCapture.ts) and [`workers/llm-proxy/src/routes/conversions.ts`](../workers/llm-proxy/src/routes/conversions.ts).
 
 Your privacy posture is what the code does, not what we promise.
 
@@ -56,7 +60,7 @@ Your privacy posture is what the code does, not what we promise.
 
 - **Storage:** Cloudflare Analytics Engine, 90-day retention by default
 - **Access:** internal operator dashboard at `stats.agoracosmica.org`, gated by Cloudflare Access (only the team can read)
-- **Sharing:** never shared with third parties, never sold, never given to advertisers
+- **Sharing:** the measurement data in this document is never shared with third parties, never sold, and never given to advertisers. The one thing that does leave, only with the visitor's opt-in, is the Google click ID (`gclid`) described above, which we forward to Google Ads for conversion matching. It is not part of the analytics data covered here.
 
 ## Related
 
