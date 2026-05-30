@@ -36,7 +36,6 @@ interface SidebarProps {
   selectedFigure: Figure | null;
   onSelectFigure: (figure: Figure) => void;
   onOpenHistoryModal?: () => void;
-  onLogout: () => void;
   onSelectSeed?: (seed: Seed) => void;
   isOpen: boolean;
   onClose: () => void;
@@ -64,7 +63,6 @@ interface TouchPoint {
 const Sidebar: FC<SidebarProps> = ({
   selectedFigure,
   onSelectFigure,
-  onLogout,
   isOpen,
   onClose,
   hideOnDesktop = false,
@@ -670,7 +668,6 @@ const Sidebar: FC<SidebarProps> = ({
           <SettingsModal
             isOpen={isSettingsOpen}
             onClose={() => { setIsSettingsOpen(false); setSettingsInitialTab(undefined); }}
-            onLogout={onLogout}
             initialTab={settingsInitialTab}
           />
         </Suspense>

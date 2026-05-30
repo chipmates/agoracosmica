@@ -75,7 +75,6 @@ const MODE_IDS = {
 } as const;
 
 interface HomePageProps {
-  onLogout: () => void;
   onSelectFigure: () => void;
 }
 
@@ -86,7 +85,7 @@ interface Mode {
   color: string;
 }
 
-const HomePage: FC<HomePageProps> = ({ onLogout, onSelectFigure }) => {
+const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
   const { tString, tNode, language } = useTranslation();
 
   // Wait for Zustand persist to hydrate before initialization
@@ -1554,7 +1553,6 @@ const HomePage: FC<HomePageProps> = ({ onLogout, onSelectFigure }) => {
         selectedFigure={selectedFigure}
         onSelectFigure={handleSelectFigure}
         onOpenHistoryModal={handleHistoryModalOpen}
-        onLogout={onLogout}
         onSelectSeed={handleSeedSelect}
         isOpen={isMenuOpen}
         onClose={handleMenuClose}

@@ -3,7 +3,6 @@ import {
   Shield,
   Gear,
   Info,
-  SignOut,
   Monitor,
   Globe,
   SpeakerHigh,
@@ -54,7 +53,6 @@ interface Config {
 interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onLogout: () => void;
   initialTab?: string;
 }
 
@@ -89,7 +87,7 @@ const TABS: Tab[] = [
   }
 ];
 
-const SettingsModal: FC<SettingsModalProps> = ({ isOpen, onClose, onLogout, initialTab }) => {
+const SettingsModal: FC<SettingsModalProps> = ({ isOpen, onClose, initialTab }) => {
   const [activeTab, setActiveTab] = useState<string>(initialTab || 'legal');
   const [config, setConfig] = useState<Config>(loadServiceConfig());
   const [isDirty, setIsDirty] = useState<boolean>(false);
@@ -262,21 +260,12 @@ const SettingsModal: FC<SettingsModalProps> = ({ isOpen, onClose, onLogout, init
         ))}
       </div>
       
-      {/* Footer — hide Logout while there are unsaved changes (otherwise mobile
-          stacks 3 same-weight buttons and loses hierarchy). User resolves the
-          pending edit first, then Logout reappears. */}
-      <div className={styles.footer}>
-        {!isDirty && (
-          <RippleButton
-            variant="coral"
-            onClick={onLogout}
-            icon={<SignOut size={16} />}
-          >
-            {tNode('settings.logout')}
-          </RippleButton>
-        )}
-
-        {isDirty && activeTab === 'preferences' && (
+      {/* Footer — only the save/discard actions for unsaved preference edits.
+          The Logout button was removed: in a local-first app with no account
+          there is no session to end, and deleting the profile only forced
+          returning visitors back through the first-run entry. */}
+      {isDirty && activeTab === 'preferences' && (
+        <div className={styles.footer}>
           <div className={styles.footerActions}>
             <RippleButton
               variant="coral"
@@ -293,8 +282,8 @@ const SettingsModal: FC<SettingsModalProps> = ({ isOpen, onClose, onLogout, init
               {tNode('settings.save')}
             </RippleButton>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </ModalContainer>
   );
 };

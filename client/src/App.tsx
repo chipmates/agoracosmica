@@ -88,9 +88,13 @@ function NavigateKeepingSearch({ to }: { to: string }): React.ReactElement {
 
 function App(): React.ReactElement {
   // Initialize from localStorage hint (synchronous) to avoid login flash on refresh
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(
-    () => LocalStorageAdapter.getString('isLoggedIn') === 'true'
-  );
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
+    if (LocalStorageAdapter.getString('isLoggedIn') === 'true') return true;
+    // Returning visitor whose profile is gone but who already consented before
+    // (e.g. a profile cleared from storage): treat as logged in so the cinematic
+    // doesn't flash. The mount effect restores the default Seeker profile.
+    try { return localStorage.getItem('agb_consent') !== null; } catch { return false; }
+  });
   const [showTestModal, setShowTestModal] = useState<boolean>(false); // Figure Test Modal
   const sessionControllerRef = useRef<SessionController | null>(null);
   const conversationControllerRef = useRef<ConversationController | null>(null);
@@ -145,6 +149,19 @@ function App(): React.ReactElement {
     preferencesIndexedDbAdapter.hasUserProfile().then(hasProfile => {
       if (hasProfile) {
         setIsLoggedIn(true);
+        return;
+      }
+      // No profile, but a prior consent on record = a returning visitor who lost
+      // only their profile. Restore the default Seeker and go straight in — no
+      // cinematic, no consent re-prompt, no wisdom gallery. A true first-timer
+      // (no consent) still gets the full entry.
+      let consented = false;
+      try { consented = localStorage.getItem('agb_consent') !== null; } catch { /* ignore */ }
+      if (consented) {
+        const locale = document.documentElement.lang?.toLowerCase().startsWith('de') ? 'de' : 'en';
+        preferencesIndexedDbAdapter.setUserProfile({ name: 'Seeker', avatar: null, locale })
+          .catch(() => { /* non-fatal */ })
+          .finally(() => setIsLoggedIn(true));
       }
     });
     
@@ -352,20 +369,6 @@ function App(): React.ReactElement {
     setTimeout(cleanupOverlays, 100);
   };
 
-  const handleLogout = (): void => {
-    // Clear the session, then send the user back to the public homepage.
-    // The entry page is now a cinematic (no profile form), so dropping back
-    // into it on logout would loop oddly — agoracosmica.org is the right place
-    // to land. Delete the profile first, then navigate.
-    LocalStorageAdapter.remove('isLoggedIn');
-    preferencesIndexedDbAdapter.deleteUserProfile()
-      .catch((err) => console.error('Failed to delete profile:', err))
-      .finally(() => { window.location.href = '/'; });
-
-    // Conversation history, selected figure, onboarding status, and preferences
-    // are intentionally preserved between sessions.
-  };
-
   // Create router with future flags — memoized to prevent recreation on unrelated re-renders
   const router = useMemo(() => createBrowserRouter([
     {
@@ -419,7 +422,6 @@ function App(): React.ReactElement {
           element: isLoggedIn ? (
             <SuspenseWrap>
               <HomePage
-                onLogout={handleLogout}
                 onSelectFigure={() => {}}
               />
             </SuspenseWrap>
