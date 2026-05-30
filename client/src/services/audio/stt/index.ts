@@ -6,7 +6,7 @@
 import { STT_SERVICES, loadServiceConfig } from '../config/serviceConfig';
 import { selfHostedSTT } from './selfHostedSTT';
 import { localModeSTT, LocalModeSttUnavailable } from './localModeSTT';
-import { validateAudioBlob, formatTranscriptionResponse, TranscriptionResponse } from './sttUtils';
+import { validateAudioBlob, formatTranscriptionResponse, TranscriptionResponse, EmptyAudioError, SttHttpError } from './sttUtils';
 
 // ============================================
 // Circuit Breaker
@@ -58,7 +58,21 @@ export const transcribeAudio = async (
   _service: string = STT_SERVICES.SELF_HOSTED,
   language: string = 'en'
 ): Promise<TranscriptionResponse> => {
-  validateAudioBlob(audioBlob);
+  // validateAudioBlob runs BEFORE the retry loop. An empty / undecodable blob
+  // throws EmptyAudioError here and propagates straight out, so the doomed
+  // payload is never POSTed (and never re-sent 3x by the loop below). This is
+  // the belt to the recorder's duration-guard suspenders.
+  try {
+    validateAudioBlob(audioBlob);
+  } catch (err) {
+    if (import.meta.env.DEV && err instanceof EmptyAudioError) {
+      // Dev-only, ZDR-safe: metadata only, never audio content.
+      window.dispatchEvent(new CustomEvent('stt-debug', {
+        detail: { event: 'empty-blob-rejected', size: audioBlob.size, type: audioBlob.type },
+      }));
+    }
+    throw err;
+  }
 
   // Local Mode: route to the local Whisper container, no circuit breaker
   // (single user, fail fast). On unavailable, fall back to hosted.
@@ -99,6 +113,12 @@ export const transcribeAudio = async (
       } catch (error) {
         console.error(`[STT] Attempt ${attempt + 1} failed:`, error);
         lastError = error as Error;
+        // Don't retry deterministic client errors (4xx). They fail identically
+        // every attempt, so retrying only amplifies load on the fleet. Transient
+        // failures (network, timeout, 5xx) keep the existing backoff retry.
+        if (error instanceof SttHttpError && error.status >= 400 && error.status < 500) {
+          break;
+        }
       }
     }
 

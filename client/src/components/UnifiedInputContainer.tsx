@@ -2,6 +2,7 @@
 import { useState, useRef, useEffect, useCallback, FC, KeyboardEvent, ChangeEvent, MouseEvent } from 'react';
 import { Microphone, Keyboard, PaperPlaneTilt, Sparkle } from '@phosphor-icons/react';
 import { processAudio, processTextMessage } from '../services/audioService';
+import { EmptyAudioError } from '../services/audio/stt/sttUtils';
 import ProcessingLoader from './ProcessingLoader';
 import { ttsScheduler } from '../controllers/conversationStreamDriver';
 import { getOrRollConversationSessionId, sendSessionEndBeacon } from '../services/audio/tts/ttsSessions';
@@ -18,6 +19,12 @@ import './UnifiedInputContainer.css';
 // CapacitorKeyboard stays null on web; the listeners below are no-ops.
 // The native init lives in the mobile-capacitor branch.
 let CapacitorKeyboard: any = null;
+
+// Minimum recording length. A real spoken word is 400ms or more, so anything
+// shorter is an accidental tap / instant double-toggle that produces an empty
+// or frame-less blob Whisper cannot decode. This duration check is the reliable
+// guard (a Blob has no duration, and decoding a corrupt blob would itself fail).
+const MIN_AUDIO_MS = 300;
 
 interface UnifiedInputContainerProps {
   selectedFigure: string;
@@ -60,6 +67,7 @@ const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure,
   // Media recording references
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[] | null>(null);
+  const recordingStartRef = useRef<number | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
@@ -300,6 +308,7 @@ const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure,
         }
       };
 
+      recordingStartRef.current = Date.now();
       mediaRecorderRef.current.start();
       setIsRecording(true);
       setMicError(null); // Clear any previous errors
@@ -348,10 +357,17 @@ const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure,
   const stopRecording = useCallback(async (): Promise<void> => {
     if (!isRecording || !mediaRecorderRef.current) return;
 
+    const recorder = mediaRecorderRef.current;
     try {
       playAudioFeedback(false);
-      mediaRecorderRef.current.stop();
-      streamRef.current!.getTracks().forEach(track => track.stop());
+
+      // Attach onstop BEFORE calling stop() so we never miss the event for an
+      // instant/empty recording (it used to be assigned after stop(), a race
+      // that could leave the loader spinning forever).
+      const flushed = new Promise<void>(resolve => {
+        recorder.onstop = () => resolve();
+      });
+      recorder.stop();
 
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
@@ -365,18 +381,49 @@ const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure,
       }
 
       setIsRecording(false);
+
+      try {
+        // Wait for the flush, but bound it: if a browser never fires onstop the
+        // race below still resolves so we can never hang the loader.
+        await Promise.race([
+          flushed,
+          new Promise<void>(resolve => setTimeout(resolve, 1500)),
+        ]);
+      } finally {
+        // Release the mic only AFTER the recorder has flushed its final buffer
+        // (stopping tracks earlier can truncate the last frames on some
+        // browsers). finally guarantees release even on the timeout path, so we
+        // never leak the mic / recording indicator.
+        streamRef.current?.getTracks().forEach(track => track.stop());
+      }
+
+      // Use actual recorded MIME type (webm on Chrome/Firefox, mp4 on Safari)
+      const recordedMime = recorder.mimeType || 'audio/webm';
+      const audioBlob = new Blob(audioChunksRef.current ?? [], { type: recordedMime });
+      const chunkCount = audioChunksRef.current?.length ?? 0;
+      const elapsedMs = recordingStartRef.current ? Date.now() - recordingStartRef.current : 0;
+
+      // Guard: a too-short / instant / silent tap yields an empty or frame-less
+      // blob that Whisper cannot decode. It 500s server-side and our retry loop
+      // re-sends the same dead payload. Catch it here, before any network
+      // request, and tell the user instead of failing silently.
+      if (chunkCount === 0 || elapsedMs < MIN_AUDIO_MS) {
+        if (import.meta.env.DEV) {
+          // Dev-only, ZDR-safe: metadata only, never audio content.
+          window.dispatchEvent(new CustomEvent('stt-debug', {
+            detail: { event: 'empty-blob', size: audioBlob.size, type: audioBlob.type, durationMs: elapsedMs, chunkCount },
+          }));
+        }
+        setMicError('no-speech');
+        setIsProcessing(false);
+        setProcessingStage(null);
+        return;
+      }
+
       setIsProcessing(true);
       // Voice path starts in 'preparing'; processAudio will bump it to 'hearing'
       // once the Whisper request actually fires.
       setProcessingStage('preparing');
-
-      await new Promise<void>(resolve => {
-        mediaRecorderRef.current!.onstop = () => resolve();
-      });
-
-      // Use actual recorded MIME type (webm on Chrome/Firefox, mp4 on Safari)
-      const recordedMime = mediaRecorderRef.current?.mimeType || 'audio/webm';
-      const audioBlob = new Blob(audioChunksRef.current!, { type: recordedMime });
 
       const shouldUseController = Boolean(onSubmitMessage);
 
@@ -406,6 +453,12 @@ const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure,
 
     } catch (err) {
       console.error('Error stopping recording:', err);
+      // A sub-floor blob that slipped past the guard above throws EmptyAudioError
+      // from validateAudioBlob (which runs before the retry loop, so it is never
+      // re-sent). Surface the same friendly message instead of a silent reset.
+      if (err instanceof EmptyAudioError) {
+        setMicError('no-speech');
+      }
       setIsProcessing(false);
       setProcessingStage(null);
     }

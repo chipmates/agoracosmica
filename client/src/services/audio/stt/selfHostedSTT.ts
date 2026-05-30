@@ -4,6 +4,7 @@
 
 import { fetchWithTimeout } from '../../../utils/fetchWithTimeout';
 import { audioApiUrl as AUDIO_API_BASE } from '../../../config/runtime';
+import { SttHttpError } from './sttUtils';
 
 interface SelfHostedSTTResult {
   text: string;
@@ -39,7 +40,7 @@ export const selfHostedSTT = async (audioBlob: Blob, language?: string): Promise
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error((errorData as any).error || `STT failed: ${response.status}`);
+      throw new SttHttpError((errorData as any).error || `STT failed: ${response.status}`, response.status);
     }
 
     const data = await response.json();

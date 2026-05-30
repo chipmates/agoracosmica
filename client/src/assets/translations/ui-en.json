@@ -1192,6 +1192,10 @@
         "title": "Security Error",
         "message": "Microphone access requires a secure connection (HTTPS). Please ensure you are using HTTPS."
       },
+      "noSpeech": {
+        "title": "We did not catch that",
+        "message": "That recording was too short to hear. Hold the button a little longer, or type your message instead."
+      },
       "retry": "Try Again",
       "dismiss": "Dismiss",
       "fallback": "You can also type your question instead."

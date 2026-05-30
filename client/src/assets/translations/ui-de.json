@@ -1194,6 +1194,10 @@
         "title": "Sicherheitsfehler",
         "message": "Mikrofonzugriff erfordert eine sichere Verbindung (HTTPS). Bitte stelle sicher, dass du HTTPS verwendest."
       },
+      "noSpeech": {
+        "title": "Das haben wir nicht mitbekommen",
+        "message": "Diese Aufnahme war zu kurz. Halte die Taste etwas länger gedrückt oder tippe deine Nachricht."
+      },
       "retry": "Erneut versuchen",
       "dismiss": "Schließen",
       "fallback": "Du kannst deine Frage auch eintippen."

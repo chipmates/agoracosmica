@@ -7,7 +7,7 @@ import { isIOS, isAndroid } from '../utils/deviceDetection';
 import { X, Warning } from '@phosphor-icons/react';
 import './MicrophonePermissionError.css';
 
-export type MicrophoneErrorType = 'denied' | 'not-found' | 'not-readable' | 'security' | 'generic';
+export type MicrophoneErrorType = 'denied' | 'not-found' | 'not-readable' | 'security' | 'generic' | 'no-speech';
 
 interface MicrophonePermissionErrorProps {
   errorType: MicrophoneErrorType;
@@ -96,6 +96,16 @@ export const MicrophonePermissionError: FC<MicrophonePermissionErrorProps> = ({
             'Microphone access requires a secure connection (HTTPS). Please ensure you are using HTTPS.'
           ),
           canRetry: false
+        };
+
+      case 'no-speech':
+        return {
+          title: tString('errors.mic.noSpeech.title', 'We did not catch that'),
+          message: tString(
+            'errors.mic.noSpeech.message',
+            'That recording was too short to hear. Hold the button a little longer, or type your message instead.'
+          ),
+          canRetry: true
         };
 
       default:
