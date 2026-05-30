@@ -1316,10 +1316,10 @@
           "duration": "Dauer"
         },
         "sessionStorage": "Session Storage",
-        "sessionPurpose": "Erhält deinen Sitzungszustand während der Nutzung der Anwendung",
+        "sessionPurpose": "Erhält deinen Sitzungszustand während der Nutzung der Anwendung. Bei Ankunft über eine Google-Anzeige wird hier der Klick-Identifikator (gclid) gehalten, bis du der Werbe-Messung zustimmst oder der Tab schließt.",
         "sessionDuration": "Bis du deinen Browser schließt",
         "localStorage": "Local Storage",
-        "localPurpose": "Speichert deine Spracheinstellung (selectedLanguage, lastAppliedLanguage)",
+        "localPurpose": "Speichert deine Spracheinstellung sowie deine Einwilligungs-Entscheidungen (zum Beispiel agb_consent, und bei Werbe-Messung agc_ad_consent)",
         "localDuration": "Bis zur manuellen Löschung"
       },
       "securityCookie": {
@@ -1351,7 +1351,7 @@
       },
       "privacyAnalytics": {
         "title": "Datenschutzfreundliche Analyse",
-        "description": "Wir verwenden Cloudflares cookie-lose Web Analytics, um die Website-Performance zu verstehen. Dieser datenschutzorientierte Dienst verwendet keine Cookies, verfolgt keine Einzelpersonen und sammelt keine persönlichen Daten. Er liefert nur aggregierte Einblicke über Seitenaufrufe und Website-Performance."
+        "description": "Wir zählen anonyme, aggregierte Ereignisse über einen eigenen serverseitigen Zähler (kein Drittanbieter-Dienst, kein Cookie, kein Pixel). Erfasst werden nur strukturelle Angaben wie der genutzte Endpunkt, die Sprache und ein vom Cloudflare-Edge ermitteltes Länder-Kürzel. Es werden keine IP-Adressen in der Analyse gespeichert, keine Einzelpersonen verfolgt und keine Profile gebildet."
       },
       "changes": {
         "title": "Änderungen dieser Richtlinie",

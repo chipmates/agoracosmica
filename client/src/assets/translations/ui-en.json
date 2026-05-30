@@ -1314,10 +1314,10 @@
           "duration": "Duration"
         },
         "sessionStorage": "Session Storage",
-        "sessionPurpose": "Maintains your session state while using the application",
+        "sessionPurpose": "Maintains your session state while using the application. If you arrive from a Google ad, the click identifier (gclid) is held here until you consent to ad measurement or the tab closes.",
         "sessionDuration": "Until you close your browser",
         "localStorage": "Local Storage",
-        "localPurpose": "Saves your language preference (selectedLanguage, lastAppliedLanguage)",
+        "localPurpose": "Saves your language preference and your consent decisions (for example agb_consent, and agc_ad_consent for ad measurement)",
         "localDuration": "Until manually cleared"
       },
       "securityCookie": {
@@ -1349,7 +1349,7 @@
       },
       "privacyAnalytics": {
         "title": "Privacy-Preserving Analytics",
-        "description": "We use Cloudflare's cookieless Web Analytics to understand site performance. This privacy-focused service does not use cookies, track individuals, or collect personal data. It only provides aggregated insights about page views and site performance."
+        "description": "We count anonymous, aggregate events with our own server-side counter (no third-party service, no cookie, no pixel). It records only structural labels such as the endpoint used, the language, and a 2-letter country code from the Cloudflare edge. No IP addresses are stored in analytics, no individuals are tracked, and no profiles are built."
       },
       "changes": {
         "title": "Changes to This Policy",
