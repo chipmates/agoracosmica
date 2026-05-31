@@ -80,6 +80,20 @@ function cleanDisplayText(s: string): string {
 
   <JourneyOverview figureName={figure.name} lang={lang} />
 
+  <!-- Desktop-only inline CTA. The sticky bar below is mobile-only
+       (display:none on desktop), so without this a desktop visitor on a figure
+       page had no figure-specific deep-link and fell back to the generic navbar
+       CTA into the gallery. Carries the same /app?figure={slug} deep-link, and
+       is hidden on mobile (the sticky bar covers it there) so each viewport
+       shows exactly one figure CTA. -->
+  <PublicCTA
+    variant="inline"
+    figureId={figureId}
+    figureName={shortName}
+    lang={lang}
+    class="pub-cta--desktop"
+  />
+
   {seeds.length > 0 && (
     <CollapsibleSection title={t('figures.ideasHeading')}>
       <ol class="pub-ideas">
@@ -182,3 +196,15 @@ function cleanDisplayText(s: string): string {
     lang={lang}
   />
 </div>
+
+<style is:global>
+  /* The inline figure CTA above is desktop-only. On mobile (<=640px) the
+     sticky bar at the bottom already carries the figure deep-link, so hide the
+     inline one there to avoid showing two CTAs. Mirrors .pub-cta--sticky,
+     which is the inverse (mobile-only). */
+  @media (max-width: 640px) {
+    .pub-cta--desktop {
+      display: none;
+    }
+  }
+</style>
