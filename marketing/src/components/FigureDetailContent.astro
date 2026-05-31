@@ -198,10 +198,16 @@ function cleanDisplayText(s: string): string {
 </div>
 
 <style is:global>
-  /* The inline figure CTA above is desktop-only. On mobile (<=640px) the
-     sticky bar at the bottom already carries the figure deep-link, so hide the
-     inline one there to avoid showing two CTAs. Mirrors .pub-cta--sticky,
-     which is the inverse (mobile-only). */
+  /* The inline figure CTA above is desktop-only (hidden on mobile, where the
+     sticky bar carries the deep-link). The journey-path section above it has a
+     3rem bottom margin and the inline variant adds 2rem 0 of its own padding,
+     which stacked into a big empty band. Pull the CTA up tight under the
+     "new here, start with the first story" nudge and trim its padding. The
+     double class beats .pub-cta--inline regardless of bundle order. */
+  .pub-cta--inline.pub-cta--desktop {
+    margin-top: -2rem;
+    padding: 0 0 1.5rem;
+  }
   @media (max-width: 640px) {
     .pub-cta--desktop {
       display: none;
