@@ -88,21 +88,22 @@
   }
 
   // Homepage mobile only: the hero already shows a Start Exploring CTA, so the
-  // fixed bottom bar starts hidden (CSS, .pub-home-page) and slides in once the
-  // hero's CTA scrolls out of view, then persists as the reader moves down the
-  // library. Pages without a hero have no .v2-actions, so this is a no-op there
-  // and the bar shows from first paint as before.
+  // fixed bottom bar starts hidden (CSS, .pub-home-page) and slides in on the
+  // first scroll, then stays visible like every other page. A plain scroll
+  // listener is used on purpose: an IntersectionObserver on the hero misfires
+  // on iOS Safari (the hero's parallax transform throws off the intersection
+  // math), leaving the bar stuck off-screen. Pages without the .pub-home-page
+  // class show the bar from first paint, so this whole block is a no-op there.
   var stickyCta = document.querySelector('.pub-cta--sticky');
-  var heroActions = document.querySelector('.v2-actions');
-  if (stickyCta && heroActions) {
-    if ('IntersectionObserver' in window) {
-      var stickyIo = new IntersectionObserver(function (entries) {
-        stickyCta.classList.toggle('is-revealed', !entries[0].isIntersecting);
-      }, { threshold: 0 });
-      stickyIo.observe(heroActions);
-    } else {
-      // No observer support: reveal immediately so the CTA is never stuck off-screen.
-      stickyCta.classList.add('is-revealed');
-    }
+  if (stickyCta && document.body.classList.contains('pub-home-page')) {
+    var revealSticky = function () {
+      if ((window.scrollY || window.pageYOffset || 0) > 24) {
+        stickyCta.classList.add('is-revealed');
+        window.removeEventListener('scroll', revealSticky);
+      }
+    };
+    window.addEventListener('scroll', revealSticky, { passive: true });
+    // In case the page restored a scrolled position before this ran.
+    revealSticky();
   }
 })();
