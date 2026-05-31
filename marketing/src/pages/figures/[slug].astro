@@ -3,7 +3,7 @@ import Public from '../../layouts/Public.astro';
 import FigureDetailContent from '../../components/FigureDetailContent.astro';
 
 import { getT } from '../../i18n';
-import { breadcrumbSchema, personSchema } from '../../lib/schemas';
+import { breadcrumbSchema, personSchema, audioObjectSchema } from '../../lib/schemas';
 import { canonicalUrl, publicUrl, SITE_URL, MEDIA_URL } from '../../lib/urls';
 import { figureSlugToId } from '@client/data/public/slugMap';
 import { getFigureById } from '@client/data/public/figuresCatalog';
@@ -48,6 +48,12 @@ const schemas = [
     { name: t('breadcrumbs.figures'), url: `${SITE_URL}/figures` },
     { name: figure.name, url: figureUrl },
   ]),
+  audioObjectSchema({
+    figureId,
+    name: figure.name,
+    slug: slug!,
+    lang,
+  }),
 ];
 ---
 <Public

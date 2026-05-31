@@ -30,6 +30,36 @@ export function personSchema(figure: {
   };
 }
 
+// AudioObject for a figure's narrated audio introduction (the ~50s trailer on
+// R2). Makes the audio a crawlable, audio-rich-result-eligible entity instead
+// of being hidden behind a React island button, and reinforces the
+// living-library-you-can-talk-to entity. The mp3 form is used so crawlers can
+// read it (webm is the in-app primary). Trailer URLs verified live for all
+// 30 figures in both languages.
+export function audioObjectSchema(figure: {
+  figureId: string;
+  name: string;
+  slug: string;
+  lang: Lang;
+}): Record<string, unknown> {
+  const pageUrl = `${SITE_URL}${figure.lang === 'de' ? '/de' : ''}/figures/${figure.slug}`;
+  const contentUrl = `${MEDIA_URL}/trailers/figures/${figure.figureId}/${figure.lang}/${figure.figureId}_trailer_${figure.lang}.mp3`;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'AudioObject',
+    '@id': `${pageUrl}#audio`,
+    name:
+      figure.lang === 'de'
+        ? `${figure.name}: Audio-Einführung`
+        : `${figure.name}: audio introduction`,
+    contentUrl,
+    encodingFormat: 'audio/mpeg',
+    inLanguage: figure.lang,
+    about: { '@id': `${pageUrl}#person` },
+    mainEntityOfPage: pageUrl,
+  };
+}
+
 export function organizationSchema(): Record<string, unknown> {
   return {
     '@context': 'https://schema.org',
