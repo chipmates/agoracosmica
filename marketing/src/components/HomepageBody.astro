@@ -443,6 +443,29 @@ const deQuestions = [
     </section>
   </>
 )}
+
+  <!-- GitHub star ask. Sits after all the value (the open-source / nonprofit
+       closing beat above), so "if you find this interesting" has something to
+       refer to. Plain repo link, no third-party star widget, so the no-tracking
+       claim stays true. Homepage only (this body renders on / and /de/ only);
+       figure and theme pages get just the subtle footer line, so the app CTA
+       stays their primary action. -->
+  <section class="pub-section ll2-star">
+    <a
+      class="ll2-star__card"
+      href="https://github.com/chipmates/agoracosmica"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <span class="ll2-star__icon" aria-hidden="true">⭐</span>
+      <span class="ll2-star__text">
+        {isDe
+          ? 'Gefällt dir das Projekt? Ein Stern auf GitHub ist der einfachste Weg, uns zu helfen, mehr Menschen zu erreichen.'
+          : 'If you find this interesting, a star is the simplest way to help us reach more people.'}
+      </span>
+      <span class="ll2-star__cta">{isDe ? 'Auf GitHub einen Stern geben →' : 'Star on GitHub →'}</span>
+    </a>
+  </section>
   </div>
 </div>
 
@@ -656,6 +679,51 @@ const deQuestions = [
     line-height: var(--leading-relaxed, 1.6);
     color: var(--text-secondary, #CACACA);
     margin: 0;
+  }
+
+  /* ── github star ask ─────────────────────────────────────────────────── */
+  .ll2-star {
+    text-align: center;
+  }
+  .ll2-star__card {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem 0.85rem;
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 1.1rem 1.4rem;
+    border-radius: var(--radius-lg, 0.75rem);
+    border: 1px solid color-mix(in srgb, var(--gold-subtle) 28%, transparent);
+    background: color-mix(in srgb, var(--bg-deep-space-darker, #080B20) 50%, transparent);
+    text-decoration: none;
+    transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+  }
+  .ll2-star__card:hover,
+  .ll2-star__card:focus-visible {
+    border-color: var(--gold-hover, #F6D55C);
+    background: color-mix(in srgb, var(--bg-deep-space-darker, #080B20) 70%, transparent);
+    transform: translateY(-2px);
+  }
+  .ll2-star__icon {
+    font-size: 1.15rem;
+    line-height: 1;
+  }
+  .ll2-star__text {
+    font-size: var(--text-base, 1rem);
+    line-height: var(--leading-relaxed, 1.6);
+    color: var(--text-secondary, #CACACA);
+  }
+  .ll2-star__cta {
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-weight: 600;
+    white-space: nowrap;
+    color: var(--gold-primary, #E6BC5C);
+  }
+  .ll2-star__card:hover .ll2-star__cta,
+  .ll2-star__card:focus-visible .ll2-star__cta {
+    color: var(--gold-hover, #F6D55C);
   }
 
   /* ── responsive ──────────────────────────────────────────────────────── */

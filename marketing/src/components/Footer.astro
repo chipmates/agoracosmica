@@ -41,6 +41,27 @@ const t = getT(lang);
     <div class="pub-footer__bottom">
       <p class="pub-footer__project">{t('footer.projectOf')}</p>
       <p class="pub-footer__trust">{t('footer.trustSignals')}</p>
+      <p class="pub-footer__star">
+        <a href="https://github.com/chipmates/agoracosmica" target="_blank" rel="noopener noreferrer">{t('footer.starCta')}</a>
+      </p>
     </div>
   </div>
 </footer>
+
+<style>
+  /* Subtle, site-wide star ask. Scoped to the footer so it does not touch the
+     frozen global CSS. Plain repo link, no third-party star widget. */
+  .pub-footer__star {
+    margin-top: 0.75rem;
+    font-size: 0.85rem;
+  }
+  .pub-footer__star a {
+    color: var(--gold-primary, #E6BC5C);
+    text-decoration: none;
+  }
+  .pub-footer__star a:hover,
+  .pub-footer__star a:focus-visible {
+    color: var(--gold-hover, #F6D55C);
+    text-decoration: underline;
+  }
+</style>
