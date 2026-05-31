@@ -7,6 +7,7 @@
 
 import { getT } from '../i18n';
 import type { Lang } from '../i18n';
+import { figureIdToSlug } from '@client/data/public/slugMap';
 
 interface Props {
   variant?: 'sticky' | 'inline';
@@ -40,12 +41,24 @@ const label = councilId
     : councilCta
       ? t('cta.enterCouncil', 'Enter the Cosmic Council')
       : t('cta.startFree');
+
+// Deep-link the CTA so the figure/council survives a new-tab open, a shared
+// link, or blocked JS (the data-agc-* attributes stay as the same-tab fast
+// path; index.tsx reads ?figure=/?council= at boot). Use the public figure
+// slug for a human-meaningful, SEO-aligned URL; councils use their id (the
+// in-app consumer expects the id).
+const figureSlug = figureId ? figureIdToSlug[figureId] : undefined;
+const ctaHref = figureSlug
+  ? `/app?figure=${figureSlug}`
+  : councilId
+    ? `/app?council=${councilId}`
+    : '/app';
 ---
 <div class={`pub-cta pub-cta--${variant} ${className}`}>
   <div class="pub-cta__inner">
     <p class="pub-cta__trust">{t('cta.trust')}</p>
     <a
-      href="/app"
+      href={ctaHref}
       class="pub-cta__button"
       data-agc-cta="start-exploring"
       data-agc-figure={figureId}

@@ -12,6 +12,7 @@ import { useDomainStore } from './stores/domainStore';
 import { initializeSeedsCache } from './services/seedCacheInitializer';
 import { LocalStorageAdapter } from './storage/localAdapter';
 import { captureGclid } from './utils/public/gclidCapture';
+import { captureEntryIntentFromUrl } from './utils/public/entryIntent';
 import { sendPageBeacon } from './utils/pageBeacon';
 import { migrateHistoryToEncrypted } from './services/history/historyEncryptionMigration';
 
@@ -20,6 +21,13 @@ import { migrateHistoryToEncrypted } from './services/history/historyEncryptionM
 // late, because the catch-all Navigate in App.tsx rewrites the URL before
 // App's effect fires.
 captureGclid();
+
+// Capture a figure/council deep-link (?figure=/?council=) from the landing URL
+// before the catch-all router redirect can strip it, for the same reason as
+// gclid above. Writes sessionStorage that the onboarding / returning-visitor
+// consumer reads, so a shared or new-tab /app?figure=marcus-aurelius lands on
+// that figure's mode selector.
+captureEntryIntentFromUrl();
 
 // Page-load beacon: count this arrival in analytics. Anonymous, fire-and-forget.
 // Closes the gap between landing-page render and the existing engagement events

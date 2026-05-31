@@ -8,6 +8,7 @@
 // Language is a real preference and is meant to persist.
 
 import { LocalStorageAdapter } from '../../storage/localAdapter';
+import { figureSlugToId } from '../../data/public/slugMap';
 
 const SS_FIGURE_KEY = 'agc_intended_figure';
 const SS_COUNCIL_KEY = 'agc_intended_council';
@@ -93,5 +94,44 @@ export function clearCouncilIntent(): void {
     }
   } catch {
     // no-op
+  }
+}
+
+/**
+ * Robust, shareable deep-link reader. Run once at app boot (index.tsx), before
+ * React renders. Reads ?figure={slug|id} / ?council={id} from the landing URL
+ * and writes the same sessionStorage keys the click delegate uses, so the
+ * SINGLE consumer (routeAfterOnboarding for first-timers, the returning-visitor
+ * branch in HomePage's init effect) handles all three sources uniformly:
+ * same-tab CTA click, new tab / opened-in-background, and a pasted/shared link.
+ * Unlike the sessionStorage-only click path, this survives no-JS-at-click,
+ * new-tab opens, and copy-paste. The figure param accepts either the public
+ * slug (marcus-aurelius) or the internal id (aurelius). Params are stripped
+ * with replaceState so a reload doesn't re-fire the deep-link.
+ */
+export function captureEntryIntentFromUrl(): void {
+  try {
+    if (typeof window === 'undefined' || typeof sessionStorage === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    const figureParam = params.get('figure');
+    const councilParam = params.get('council');
+    if (!figureParam && !councilParam) return;
+    if (figureParam) {
+      const id = figureSlugToId[figureParam] || figureParam;
+      if (id.length < 64) sessionStorage.setItem(SS_FIGURE_KEY, id);
+    }
+    if (councilParam && councilParam.length < 64) {
+      sessionStorage.setItem(SS_COUNCIL_KEY, councilParam);
+    }
+    params.delete('figure');
+    params.delete('council');
+    const qs = params.toString();
+    window.history.replaceState(
+      {},
+      '',
+      window.location.pathname + (qs ? `?${qs}` : '') + window.location.hash
+    );
+  } catch {
+    // sessionStorage / history unavailable — fall back to the normal flow
   }
 }

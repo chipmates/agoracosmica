@@ -44,6 +44,7 @@ import PostQuestVerdictCard from '../components/QuestVerdictCard/PostQuestVerdic
 import { getPendingQuestVerdict, clearPendingQuestVerdict } from '../utils/questVerdict';
 import { restartQuest } from '../utils/questRestart';
 import { LocalStorageAdapter } from '../storage/localAdapter';
+import { readFigureIntent, clearFigureIntent, readCouncilIntent, clearCouncilIntent } from '../utils/public/entryIntent';
 import { readHistoryMessages } from '../services/history/historyEncryption';
 import { registerSessionControllerHandlers } from '../controllers/sessionControllerRegistry';
 import { registerConversationControllerHandlers } from '../controllers/conversationControllerRegistry';
@@ -372,16 +373,42 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
       // Show onboarding first, then figure selection
       setOnboardingVisible(true);
       setFigureCarousel(false);
-    } else if (!hasHistory && !useDomainStore.getState().figures.selectedId) {
-      // Has no history AND no selected figure - show figure selection
-      // (e.g., returning user who cleared all data)
-      setOnboardingVisible(false);
-      setFigureCarousel(true);
     } else {
-      // Has history OR has selected figure - show main content
-      // Let the session controller restore the previous state
-      setOnboardingVisible(false);
-      setFigureCarousel(false);
+      // Returning visitor: already consented (past every onboarding gate
+      // above), so the welcome modal is NOT shown for them. Honor a figure or
+      // council deep-link captured from a public /figures or /themes page
+      // (sessionStorage, written by agc-public.js on the CTA click, or by the
+      // ?figure=/?council= URL reader at boot) BEFORE falling back to the
+      // gallery or restoring prior state. Commit 9a4ac917 ("recognize
+      // returning visitors") made this path skip the welcome modal, so
+      // routeAfterOnboarding — the other intent consumer — never ran here and
+      // the deep-link silently dropped the visitor into the gallery. This
+      // consumes it without re-showing the consent gate. First-timers are
+      // unaffected: they still consume intent via the welcome "Begin".
+      const intendedCouncil = readCouncilIntent();
+      const intendedFigureId = readFigureIntent();
+      const intendedFigure = intendedFigureId ? getFigureById(intendedFigureId) : undefined;
+      if (intendedCouncil) {
+        clearCouncilIntent();
+        setOnboardingVisible(false);
+        setFigureCarousel(false);
+        startCuratedCouncilById(intendedCouncil);
+      } else if (intendedFigure) {
+        clearFigureIntent();
+        setOnboardingVisible(false);
+        setFigureCarousel(false);
+        void handleSelectFigure(intendedFigure);
+      } else if (!hasHistory && !useDomainStore.getState().figures.selectedId) {
+        // Has no history AND no selected figure - show figure selection
+        // (e.g., returning user who cleared all data)
+        setOnboardingVisible(false);
+        setFigureCarousel(true);
+      } else {
+        // Has history OR has selected figure - show main content
+        // Let the session controller restore the previous state
+        setOnboardingVisible(false);
+        setFigureCarousel(false);
+      }
     }
 
   }, [isHydrated]);
