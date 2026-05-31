@@ -86,4 +86,23 @@
       burger.setAttribute('aria-expanded', String(isOpen));
     });
   }
+
+  // Homepage mobile only: the hero already shows a Start Exploring CTA, so the
+  // fixed bottom bar starts hidden (CSS, .pub-home-page) and slides in once the
+  // hero's CTA scrolls out of view, then persists as the reader moves down the
+  // library. Pages without a hero have no .v2-actions, so this is a no-op there
+  // and the bar shows from first paint as before.
+  var stickyCta = document.querySelector('.pub-cta--sticky');
+  var heroActions = document.querySelector('.v2-actions');
+  if (stickyCta && heroActions) {
+    if ('IntersectionObserver' in window) {
+      var stickyIo = new IntersectionObserver(function (entries) {
+        stickyCta.classList.toggle('is-revealed', !entries[0].isIntersecting);
+      }, { threshold: 0 });
+      stickyIo.observe(heroActions);
+    } else {
+      // No observer support: reveal immediately so the CTA is never stuck off-screen.
+      stickyCta.classList.add('is-revealed');
+    }
+  }
 })();

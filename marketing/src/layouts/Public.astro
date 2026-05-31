@@ -38,13 +38,18 @@ interface Props {
 const props = Astro.props;
 const currentPath = Astro.url.pathname;
 const t = getT(props.lang);
+// The homepage hero already shows a Start Exploring CTA, so the mobile sticky
+// bar starts hidden there and only slides in once the hero scrolls away (see
+// .pub-cta--sticky in public-layout.css + the reveal logic in agc-public.js).
+// Other pages have no hero and keep the bar visible from first paint.
+const isHome = currentPath === '/' || currentPath === '/de/' || currentPath === '/de';
 ---
 <!doctype html>
 <html lang={props.lang}>
   <head>
     <BaseHead {...props} />
   </head>
-  <body>
+  <body class={isHome ? 'pub-home-page' : undefined}>
     <div class="public-page">
       <Navbar lang={props.lang} currentPath={currentPath} />
       <main class="pub-main" id="main-content">

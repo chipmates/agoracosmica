@@ -322,6 +322,11 @@ html:has(.public-page) #root {
   border-top: 1px solid color-mix(in srgb, var(--gold-primary) 16%, transparent);
   box-shadow: 0 -10px 40px color-mix(in srgb, var(--utility-pure-black) 40%, transparent);
   z-index: 50;
+  transition: transform 0.28s ease, opacity 0.28s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pub-cta--sticky { transition: none; }
 }
 
 .pub-cta--inline {
@@ -428,6 +433,21 @@ html:has(.public-page) #root {
   .pub-cta--sticky {
     display: block;
     padding: 0.75rem 1rem;
+  }
+
+  /* Homepage only: the hero owns the first CTA, so the bar starts off-screen
+     and slides up once the hero's CTA scrolls out of view (agc-public.js
+     toggles .is-revealed). Translating keeps it painted for a smooth slide;
+     the pointer-events guard stops taps landing on the hidden bar. */
+  .pub-home-page .pub-cta--sticky {
+    transform: translateY(120%);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .pub-home-page .pub-cta--sticky.is-revealed {
+    transform: none;
+    opacity: 1;
+    pointer-events: auto;
   }
 
   /* Leave room below the footer so the fixed CTA bar never covers content. */
