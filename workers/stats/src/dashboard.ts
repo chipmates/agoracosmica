@@ -597,17 +597,24 @@ html { scrollbar-color: var(--bg-highlight) transparent; scrollbar-width: thin; 
   }
   .grid { grid-template-columns: 1fr; }
   .card-wide, .card-full { grid-column: span 1; }
-  .card-hero .kpi-value { font-size: 1.75rem; }
+  .card { padding: 1rem; }
+  .card-hero .kpi-value { font-size: 1.875rem; }
   .kpi-spark { display: none; }
   .bar-label { min-width: 70px; font-size: 0.6875rem; }
+  .section-divider { margin: 16px 0 10px; }
   .tab-header { flex-direction: column; gap: 2px; margin-bottom: 12px; }
   .tab-updated { align-self: flex-start; }
   .corr-bars { height: 70px; }
-  /* Funnel stacks vertically on small screens with arrows pointing down. */
-  .funnel-row { flex-direction: column; gap: 4px; overflow-x: visible; }
-  .funnel-stage { min-width: 0; padding: 12px; }
+  /* Funnel + activity pool stack vertically on small screens. The sequential
+     funnel keeps down-pointing arrows; the parallel activity pool has none. */
+  .funnel-row { flex-direction: column; gap: 6px; overflow-x: visible; }
+  .funnel-stage { min-width: 0; padding: 12px; flex-direction: row; justify-content: space-between; align-items: center; text-align: left; flex-wrap: wrap; }
+  .funnel-stage-value { margin: 0; font-size: 1.25rem; }
+  .funnel-stage-label { flex: 1; }
+  .funnel-stage-sub { width: 100%; }
   .funnel-arrow { flex-direction: row; gap: 8px; min-width: 0; padding: 2px 0; }
   .funnel-arrow-icon { transform: rotate(90deg); font-size: 0.875rem; }
+  .funnel-parallel-label { text-align: left; }
 }
 
 /* === PRINT === */
@@ -736,7 +743,7 @@ html { scrollbar-color: var(--bg-highlight) transparent; scrollbar-width: thin; 
     <h2 class="tab-title" id="title-adgrants">Marketing</h2>
   </div>
   <div id="alerts-adgrants" class="alerts"></div>
-  <div class="grid" id="grid-adgrants"></div>
+  <div id="grid-adgrants"></div>
 </section>
 
 </main>
@@ -783,13 +790,13 @@ const COLORS = {
 };
 const MODE_LABELS = { introduction: 'Story', seed_conversation: 'Wisdom', prism: 'Prism', challenge: 'Quest', free_conversation: 'Freetalk', seed_challenge: 'Quest' };
 const RANGE_OPTS = [
-  { val: 1, label: 'Today' },
+  { val: 1, label: 'Last 24h' },
   { val: 7, label: '7 days' },
   { val: 30, label: '30 days' },
   { val: 365, label: 'Year' },
   { val: 9999, label: 'All time' },
 ];
-const RANGE_LABEL = { 1: 'today', 7: 'last 7 days', 30: 'last 30 days', 365: 'last year', 9999: 'all time' };
+const RANGE_LABEL = { 1: 'last 24h', 7: 'last 7 days', 30: 'last 30 days', 365: 'last year', 9999: 'all time' };
 
 // Public-launch epoch (Unix seconds). Substituted by the worker at request time
 // from env.LAUNCH_EPOCH_SECONDS. 0 = no floor, no label.
@@ -798,7 +805,7 @@ const LAUNCH_EPOCH_SECONDS = __LAUNCH_EPOCH_SECONDS__;
 // --- State ---
 let S = {
   tab: 'overview',
-  range: 1,
+  range: 7,
   cache: {},
   serverData: null,
   gpuHist: { fsn1: [], nbg1: [] },
@@ -872,17 +879,51 @@ function sparkSvg(pts, w, h, color) {
     '</svg>';
 }
 
-// Delta HTML
+// Delta HTML. At single-digit scale a percentage off a tiny base is Poisson
+// noise (1 -> 0 reads as a terrifying -100%), so below a small base we show the
+// absolute change only, never a dramatic colored percent.
 function deltaHtml(cur, prev) {
-  if (prev == null || prev === 0 && cur === 0) return '<span class="kpi-delta flat">-</span>';
+  if (prev == null || (prev === 0 && cur === 0)) return '<span class="kpi-delta flat">-</span>';
   const diff = cur - prev;
-  const pctVal = prev > 0 ? Math.round((diff / prev) * 100) : (diff > 0 ? 100 : 0);
-  const abs = Math.abs(pctVal);
-  if (abs <= 2 && Math.abs(diff) <= 1) return '<span class="kpi-delta flat">~0</span>';
+  if (diff === 0) return '<span class="kpi-delta flat">~0</span>';
   const cls = diff > 0 ? 'up' : 'down';
   const arrow = diff > 0 ? '&#9650;' : '&#9660;';
   const sign = diff > 0 ? '+' : '';
+  // Small-base guard: with prev under 5, or a change of a single event, the
+  // percentage is meaningless. Show just the absolute delta.
+  if (prev < 5 || Math.abs(diff) <= 1) {
+    return '<span class="kpi-delta ' + cls + '">' + arrow + ' ' + sign + fmt(diff) + '</span>';
+  }
+  const pctVal = Math.round((diff / prev) * 100);
   return '<span class="kpi-delta ' + cls + '">' + arrow + ' ' + sign + fmt(diff) + ' (' + sign + pctVal + '%)</span>';
+}
+
+// Express two comparable app-side counts as a multiplier (e.g. 2.4x), gated at a
+// sample floor. A multiplier is interpretable at any value and structurally
+// cannot render the misleading >100% that a percentage between two different
+// populations can (that was the old "400%" funnel bug).
+function multiplierOrDash(numer, denom, floor) {
+  floor = floor || 20;
+  if (!denom || denom < floor) return '--';
+  return (numer / denom).toFixed(1) + '\\u00d7';
+}
+
+// One auto-composed sentence telling the founder what (if anything) to act on,
+// from a fixed priority ladder over existing counts. Needs zero new events.
+function decisionLine(chats, signups, visits, sessions) {
+  var msg;
+  if (chats === 0 && sessions === 0) {
+    msg = 'No sessions and no conversations this period. Open the app yourself, confirm chat works, then share it in one warm community.';
+  } else if (chats === 0) {
+    msg = 'People open the app but no one has talked to a figure yet. Check the first-chat path on mobile.';
+  } else if (visits > 200 && signups <= 2) {
+    msg = 'Lots of visits, few signups. That is the cold ad traffic (mostly Spotify), which converts near zero by nature. Judge it as awareness, not acquisition, and do not buy more cold clicks.';
+  } else if (signups > 0 && chats > 0) {
+    msg = 'Healthy window: real signups and real conversations. No fire to fight.';
+  } else {
+    msg = 'Quiet, but normal at this stage. The 7-day view is the real read, not any single day.';
+  }
+  return '<div class="card card-full" style="padding:12px 16px"><div style="font-size:0.9375rem;color:var(--tx);line-height:1.45">&#128161; ' + msg + '</div></div>';
 }
 
 // Donut SVG
@@ -947,13 +988,22 @@ function funnelHtml(stages) {
     );
     if (i < stages.length - 1) {
       var next = stages[i + 1];
-      var p = s.value > 0 ? Math.round((next.value / s.value) * 100) : 0;
-      var tone = p >= 50 ? 'ok' : (p >= 20 ? 'warn' : 'weak');
-      var pctText = s.value > 0 ? p + '%' : '—';
+      var arrowText, tone;
+      if (s.value <= 0) {
+        arrowText = '—'; tone = 'flat';
+      } else if (s.value < 20) {
+        // Small base: a percentage off fewer than 20 is Poisson noise. Show the
+        // raw fraction instead of a colored % so 1-of-2 stops reading as a cliff.
+        arrowText = fmt(next.value) + '/' + fmt(s.value); tone = 'flat';
+      } else {
+        var p = Math.round((next.value / s.value) * 100);
+        arrowText = p + '%';
+        tone = p >= 50 ? 'ok' : (p >= 20 ? 'warn' : 'weak');
+      }
       parts.push(
         '<div class="funnel-arrow">' +
           '<span class="funnel-arrow-icon" aria-hidden="true">→</span>' +
-          '<span class="funnel-arrow-pct ' + tone + '">' + pctText + '</span>' +
+          '<span class="funnel-arrow-pct ' + tone + '">' + arrowText + '</span>' +
         '</div>'
       );
     }
@@ -961,31 +1011,27 @@ function funnelHtml(stages) {
   return '<div class="funnel-row" role="list" aria-label="User funnel">' + parts.join('') + '</div>';
 }
 
-// Render parallel engagement endpoints AFTER a sequential funnel. Each stage
-// shows what fraction of the "from" value (e.g., Sessions) reached this
-// engagement type. No drop-off arrows between parallel stages — they're not
-// sequential, just different ways a sessioned user can engage.
-function parallelEngagementHtml(fromLabel, fromValue, stages) {
+// Render the engagement pool that sits below the new-visitor funnel. These are
+// NOT sequential stages and NOT one population: App Sessions includes returning
+// + passive opens, Chats are messages, content events are their own. So we show
+// plain activity tiles with no between-stage percentages and no tone-coloring
+// (a structurally-low ratio must never flash red). An optional honest note
+// carries the key relationship as a sample-gated multiplier.
+function engagementPoolHtml(label, stages, note) {
   if (!stages || stages.length === 0) return '';
-  var parts = [];
-  for (var i = 0; i < stages.length; i++) {
-    var s = stages[i];
-    var p = fromValue > 0 ? Math.round((s.value / fromValue) * 100) : 0;
-    var tone = p >= 50 ? 'ok' : (p >= 20 ? 'warn' : 'weak');
-    var pctLine = fromValue > 0
-      ? '<div class="funnel-arrow-pct ' + tone + '" style="margin-top:4px">' + p + '% of ' + fromLabel + '</div>'
-      : '';
-    parts.push(
-      '<div class="funnel-stage funnel-stage--parallel">' +
-        '<div class="funnel-stage-label">' + s.label + '</div>' +
-        '<div class="funnel-stage-value">' + fmt(s.value) + '</div>' +
-        (s.sub ? '<div class="funnel-stage-sub">' + s.sub + '</div>' : '') +
-        pctLine +
-      '</div>'
-    );
-  }
-  return '<div class="funnel-parallel-label">↳ engagement after ' + fromLabel + ' (parallel — a sessioned user can do multiple)</div>' +
-    '<div class="funnel-row funnel-row--parallel" role="list" aria-label="Engagement endpoints">' + parts.join('') + '</div>';
+  var parts = stages.map(function(s) {
+    return '<div class="funnel-stage funnel-stage--parallel">' +
+      '<div class="funnel-stage-label">' + s.label + '</div>' +
+      '<div class="funnel-stage-value">' + fmt(s.value) + '</div>' +
+      (s.sub ? '<div class="funnel-stage-sub">' + s.sub + '</div>' : '') +
+      '</div>';
+  });
+  var noteHtml = note
+    ? '<div class="funnel-parallel-label" style="margin-top:8px;text-transform:none;letter-spacing:0;color:var(--dim)">' + note + '</div>'
+    : '';
+  return '<div class="funnel-parallel-label">' + label + '</div>' +
+    '<div class="funnel-row funnel-row--parallel" role="list" aria-label="Engagement pool">' + parts.join('') + '</div>' +
+    noteHtml;
 }
 
 function chartCard(title, body, cls) {
@@ -1362,6 +1408,8 @@ async function loadOverview() {
     // activity across the three interactive modes: seed_conversation (Wisdom),
     // challenge (Quest), free_conversation (Freetalk). MODE_LABELS maps raw → display.
     { sql: "SELECT blob3 as mode, COUNT() as c FROM agora_llm WHERE blob1 = 'chat' AND blob3 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY mode ORDER BY c DESC", dataset: 'agora_llm' },
+    // Signups previous period — for the Pulse "new signups" delta.
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'signup' AND timestamp " + prevRange(), dataset: 'agora_llm' },
   ];
 
   var r = await batch(queries);
@@ -1440,6 +1488,7 @@ async function loadOverview() {
   topMarketingPages.sort(function(a, b) { return b.c - a.c; });
   topMarketingPages = topMarketingPages.slice(0, 15);
   var signups = val(r[27]);
+  var signupsPrev = val(r[30]);
   // Engagement endpoints (parallel from Sessions): content played + chat sent.
   // Content Started total is derived from the existing contentByType breakdown
   // (saves one query). Content Completed and Chat-by-Mode are new dedicated queries.
@@ -1462,13 +1511,24 @@ async function loadOverview() {
   }
   alertsEl.innerHTML = alerts;
 
-  // Smart empty state
-  // Hint banner (above grid, not inside)
-  if (S.range === 1 && sessions < 3 && chats < 3) {
-    alertsEl.innerHTML += '<div class="hint-banner">Quiet day so far. <a onclick="setRange(7)">Switch to 7 days</a> for more context.</div>';
+  // Reassurance banner: a quiet 24h window is expected at this scale, so frame
+  // it as normal and point at the 7-day view rather than letting it read as a
+  // failure. Only fires on the 24h window with near-zero conversations.
+  if (S.range === 1 && chats < 3) {
+    alertsEl.innerHTML += '<div class="hint-banner">Quiet 24h is normal at this stage. <a onclick="setRange(7)">The 7-day view</a> is the real read, not any single day.</div>';
   }
 
   var html = '';
+
+  // PULSE — the week in one screen: the three numbers that matter, with an
+  // auto-composed decision line. Conversations (chat) is the North Star: the
+  // only event a click-flood or bot cannot inflate. Raw Visits is shown but
+  // explicitly captioned as mixed/unfiltered so it is never read as success.
+  html += '<div class="section-divider" style="grid-column:1/-1">Pulse &middot; ' + RANGE_LABEL[S.range] + '</div>';
+  html += kpi('Conversations', chats, { hero: true, spark: sparkChats, sparkColor: '#5B8BD4', delta: chatsPrev, sub: 'real chat messages. the one that means it worked' });
+  html += kpi('New Signups', signups, { hero: true, delta: signupsPrev, sub: 'genuinely new accounts' });
+  html += kpi('Raw Visits', arrivals, { sub: 'mixed: ads + bots, no source split yet' });
+  html += decisionLine(chats, signups, arrivals, sessions);
 
   // Hero KPIs removed 2026-05-25: the previous Arrivals/Sessions/Conversations
   // trio duplicated what the Funnel below already shows, and "Arrivals" mixed
@@ -1477,52 +1537,54 @@ async function loadOverview() {
   // beacons). The Funnel is the primary view; per-channel KPIs with deltas
   // live in the secondary row + the Marketing / Engagement / Audio tabs.
 
-  // Funnel: marketing → app → entry → signup → session. Sequential drop-offs.
-  // Then PARALLEL engagement endpoints (content played + chat sent) — these are
-  // not sequential after Sessions, they're parallel choices, so they render
-  // below the main funnel with their own % of Sessions.
+  // NEW-VISITOR FUNNEL — the only clean monotonic chain: a new visitor lands on
+  // marketing, opens the app, reaches the welcome modal (entry), and is recorded
+  // as a new account (signup). Sessions is NOT in this chain: it is a broader,
+  // partly-disjoint population (returning + passive app opens), and chaining it
+  // here is what produced the impossible "400%". Sessions now lives in the
+  // Activity pool below, paired with Chats.
   var funnelStages = [
     { label: 'Marketing', value: marketingArrivals, sub: 'figures · themes · about' },
     { label: 'App', value: appArrivals, sub: '/app + SPA routes' },
     { label: 'Entry', value: entries, sub: 'consent + enter' },
     { label: 'Signup', value: signups, sub: 'new accounts' },
-    { label: 'Sessions', value: sessions, sub: 'first chat' },
   ];
+  // ACTIVITY POOL — App Sessions sits next to Chat Messages (not a funnel). The
+  // relationship is shown as a sample-gated multiplier, never a percentage, so
+  // it cannot reproduce the >100% artifact.
   var engagementStages = [
+    { label: 'App Sessions', value: sessions, sub: 'app opened, incl. returning' },
+    { label: 'Chat Messages', value: chats, sub: 'real LLM messages' },
     { label: 'Content Started', value: contentStarted, sub: 'first-play events' },
     { label: 'Content Completed', value: contentCompleted, sub: 'fully heard' },
-    { label: 'Chats', value: chats, sub: 'LLM messages' },
   ];
-  // Funnel footnote. Two 2026-05-29 boundaries to keep honest: (1) the entry-
-  // cinematic refactor moved Entry + Signup to the post-consent welcome step,
-  // and returning users skip that step (they appear only in Sessions); (2) the
-  // homepage relocation made '/' + '/de/' the marketing landing (now counted in
-  // Marketing, not App). Surfaced so a multi-day window isn't misread.
+  var perSession = multiplierOrDash(chats, sessions, 20);
+  var activityNote = perSession === '--'
+    ? 'Chats per session: too few sessions yet to be meaningful.'
+    : 'Chats per session: ' + perSession + '. Reads low by design, since App Sessions counts passive and returning opens that never intend to chat.';
+  // Footnote keeps the honest definitions a multi-day window needs.
   var funnelNote = '<div style="margin-top:10px;font-size:11px;color:var(--dim);line-height:1.4">' +
-    'Entry &amp; Signup fire at the welcome modal (post-consent) since 2026-05-29. ' +
-    'Entry = everyone who consents + enters; Signup = new accounts only. ' +
-    'Returning users skip the welcome step, so they appear only in Sessions. ' +
-    'Marketing includes the homepages (/ and /de/); App is /app only. ' +
-    'Windows straddling 2026-05-29 show a step at these stages, not a real drop.' +
+    'New-visitor funnel only. Entry &amp; Signup fire at the welcome modal (post-consent). ' +
+    'Returning visitors skip it, so they appear only as App Sessions below, never here. ' +
+    'Marketing = / and /de/ plus figure and theme pages (mixed sources, incl. ads + bots). App = /app.' +
     '</div>';
   html += chartCard(
-    'User Funnel',
-    funnelHtml(funnelStages) + parallelEngagementHtml('Sessions', sessions, engagementStages) + funnelNote,
+    'New-visitor funnel',
+    funnelHtml(funnelStages) +
+    engagementPoolHtml('&#8627; Activity (parallel, a sessioned user can do several)', engagementStages, activityNote) +
+    funnelNote,
     'card-full'
   );
 
-  // Secondary KPIs
-  html += kpi('Chat Messages', chats, { spark: sparkChats, delta: chatsPrev });
-  html += kpi('TTS Requests', tts, { spark: sparkTts, sparkColor: '#68C397', delta: ttsPrev });
-  var voiceDisplay = chats > 0 ? voiceRatio.toFixed(1) + '×' : '--';
-  var voiceSub = chats > 0 ? tts + ' TTS / ' + chats + ' chat msg' : 'no chats yet';
-  html += kpi('TTS per Chat', voiceDisplay, { sub: voiceSub });
+  // Health check: errors + the server mini-card. Chat volume now lives in the
+  // Pulse row above; TTS/voice infra moved to the Audio tab where it belongs.
   html += kpi('Errors', totalErrors, { sub: totalErrors > 0 ? llmErrors + ' LLM + ' + audioErrors + ' audio' : 'all clear', valColor: totalErrors > 0 ? '#E97451' : '#68C397' });
 
   // Mini server health
   html += '<div class="card card-interactive" onclick="switchTab(\\\'servers\\\')" tabindex="0" role="button" id="mini-servers"><div class="kpi-label">Server Health</div><div id="mini-servers-inner" style="margin-top:8px">Loading...</div></div>';
 
   // Chat activity graph (always visible)
+  html += '<div class="section-divider" style="grid-column:1/-1">Activity &amp; content</div>';
   if (hourlyChat.length > 1) {
     var chatItems = hourlyChat.slice(-24).map(function(row) {
       return { label: new Date(row.t).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), c: row.c };
@@ -1851,7 +1913,7 @@ async function loadProduct() {
   var totalPlayback = playbackByType.reduce(function(s, x) { return s + x.c; }, 0);
   var completionRate = playbackStarted > 0 ? Math.round((totalPlayback / playbackStarted) * 100) : null;
   var totalLlm = chats + councils + summaries;
-  var chatsPerSession = sessions > 0 ? (chats / sessions).toFixed(1) : '-';
+  var chatsPerSession = multiplierOrDash(chats, sessions, 20);
   var totalRlLlm = rlLlm.reduce(function(s, r) { return s + r.c; }, 0);
   var totalRlAudio = rlAudio.reduce(function(s, r) { return s + r.c; }, 0);
 
@@ -1860,11 +1922,11 @@ async function loadProduct() {
   // === ENGAGEMENT SECTION ===
   html += '<div class="section-divider">Engagement</div>';
   html += '<div class="grid">';
-  html += kpi('Sessions', sessions, { hero: true, spark: sparkSessions, delta: sessionsPrev, sub: 'engagement windows' });
+  html += kpi('App Sessions', sessions, { hero: true, spark: sparkSessions, delta: sessionsPrev, sub: 'app opened, incl. returning. not a conversation' });
   html += kpi('Chat Messages', chats, { spark: sparkChats, sparkColor: '#5B8BD4', delta: chatsPrev });
   html += kpi('Councils', councils, { delta: councilsPrev });
   html += kpi('Summaries', summaries, { delta: summariesPrev });
-  html += kpi('Chats / Session', chatsPerSession, { sub: 'avg depth per window' });
+  html += kpi('Chats / Session', chatsPerSession, { sub: chatsPerSession === '--' ? 'need 20+ sessions to be meaningful' : 'reads low: sessions incl. passive and returning opens' });
 
   // Figure popularity
   if (figures.length > 0) {
@@ -2091,10 +2153,6 @@ async function loadAudio() {
   if (audioLangs.length > 0) {
     html += chartCard('Audio Language', donutSvg(audioLangs.map(function(r) { return { key: r.lang, c: r.c }; }), COLORS.lang, function(l) { return l === 'de' ? 'Deutsch' : 'English'; }), '');
   }
-  if (ttsModels.length > 0) {
-    var modelLabels = { 'qwen3-tts': 'Qwen3', 'qwen-tts': 'Qwen', 'kokoro': 'Kokoro', 'f5-tts': 'F5' };
-    html += chartCard('TTS Backend', donutSvg(ttsModels.map(function(r) { return { key: r.model, c: r.c }; }), COLORS.models, function(m) { return modelLabels[m] || m; }), '');
-  }
   html += '</div>';
 
   // === RATE LIMITS ===
@@ -2126,126 +2184,87 @@ async function loadAdGrants() {
   var grid = document.getElementById('grid-adgrants');
   var alertsEl = document.getElementById('alerts-adgrants');
 
-  // Query Analytics Engine for conversion events (3-event ladder)
+  // Conversion events are GCLID-GATED: they fire only for visitors who arrive
+  // with a Google Ads gclid AND grant ad consent. With the Ad Grant paused, ~0
+  // is expected and correct. The old "start exploring" event is intentionally
+  // absent: it had no client emitter, so it was removed rather than shown as a
+  // permanent zero.
   var queries = [
-    // Profile Creation — current period count
+    // Profile Creation — current, previous (delta), sparkline
     { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'profile_created' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    // Profile Creation — previous period for delta
     { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'profile_created' AND timestamp " + prevRange(), dataset: 'agora_llm' },
-    // Profile Creation — sparkline
     { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE index1 = 'profile_created' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
-    // Start Exploring by figure (which figure detail pages drive most CTA clicks).
-    // Note: profile_created has no figureId by design (fires before figure pick).
-    { sql: "SELECT blob2 as figure, COUNT() as c FROM agora_llm WHERE index1 = 'start_exploring' AND blob2 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY figure ORDER BY c DESC LIMIT 10", dataset: 'agora_llm' },
-    // Total sessions for conversion rate
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'session' AND blob5 = '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    // Top countries on conversations (geographic reach)
-    { sql: "SELECT blob7 as country, COUNT() as c FROM agora_llm WHERE blob1 IN ('chat','council','summary') AND blob5 = '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY country ORDER BY c DESC LIMIT 10", dataset: 'agora_llm' },
-    // Content completions by type
-    { sql: "SELECT blob5 as type, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND (blob8 = '' OR blob8 = 'completed') AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY type ORDER BY c DESC", dataset: 'agora_llm' },
-    // Start Exploring — current period count
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'start_exploring' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    // Start Exploring — sparkline
-    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE index1 = 'start_exploring' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
-    // Mode Selected — current period count
+    // Mode Selected — current, sparkline, by figure
     { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'mode_selected' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    // Mode Selected — sparkline
     { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE index1 = 'mode_selected' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
-    // Mode Selected by figure (which figures drive engagement past signup)
     { sql: "SELECT blob2 as figure, COUNT() as c FROM agora_llm WHERE index1 = 'mode_selected' AND blob2 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY figure ORDER BY c DESC LIMIT 10", dataset: 'agora_llm' },
-    // Council Engaged — current period count
+    // Council Engaged — current, sparkline
     { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'council_engaged' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    // Council Engaged — sparkline
     { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE index1 = 'council_engaged' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
+    // Geographic reach: where conversations physically come from
+    { sql: "SELECT blob7 as country, COUNT() as c FROM agora_llm WHERE blob1 IN ('chat','council','summary') AND blob5 = '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY country ORDER BY c DESC LIMIT 10", dataset: 'agora_llm' },
+    // Content reach: completions by type
+    { sql: "SELECT blob5 as type, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND (blob8 = '' OR blob8 = 'completed') AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY type ORDER BY c DESC", dataset: 'agora_llm' },
+    // Traffic volume (mixed sources, no attribution yet): page beacons + prev
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    // Top countries by raw page arrivals (geo of all traffic, not just chatters)
+    { sql: "SELECT blob7 as country, COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND blob7 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY country ORDER BY c DESC LIMIT 10", dataset: 'agora_llm' },
   ];
 
   var r = await batch(queries);
 
   var profileConv = val(r[0]), profilePrev = val(r[1]);
-  var sparkProfile = rows(r[2]).map(function(r) { return r.c; });
-  var startByFigure = rows(r[3]);
-  var totalSessions = val(r[4]);
-  var convRate = totalSessions > 0 ? ((profileConv / totalSessions) * 100).toFixed(1) : '--';
-  var topCountriesAdgrants = rows(r[5]);
-  var playbackByType = rows(r[6]);
-  var startExpConv = val(r[7]);
-  var sparkStartExp = rows(r[8]).map(function(r) { return r.c; });
-  var modeSelConv = val(r[9]);
-  var sparkModeSel = rows(r[10]).map(function(r) { return r.c; });
-  var modeByFigure = rows(r[11]);
-  var councilEngagedConv = val(r[12]);
-  var sparkCouncilEng = rows(r[13]).map(function(r) { return r.c; });
+  var sparkProfile = rows(r[2]).map(function(x) { return x.c; });
+  var modeSelConv = val(r[3]);
+  var sparkModeSel = rows(r[4]).map(function(x) { return x.c; });
+  var modeByFigure = rows(r[5]);
+  var councilEngagedConv = val(r[6]);
+  var sparkCouncilEng = rows(r[7]).map(function(x) { return x.c; });
+  var topCountriesChat = rows(r[8]);
+  var playbackByType = rows(r[9]);
+  var visits = val(r[10]), visitsPrev = val(r[11]);
+  var topCountriesAll = rows(r[12]);
 
-  // Funnel ratios — quality signals across the 3-event ladder
-  var profileFromStartPct = startExpConv > 0
-    ? ((profileConv / startExpConv) * 100).toFixed(0) + '%'
-    : '--';
-  var modeFromProfilePct = profileConv > 0
-    ? ((modeSelConv / profileConv) * 100).toFixed(0) + '%'
-    : '--';
+  // Modes picked per ad-profile, within the gclid population only, gated for n.
+  var modeFromProfile = multiplierOrDash(modeSelConv, profileConv, 5);
 
-  // Alerts
-  var alerts = '';
-  if (profileConv === 0 && startExpConv === 0 && modeSelConv === 0 && councilEngagedConv === 0) {
-    alerts += '<div class="hint-banner">No conversion events yet ' + RANGE_LABEL[S.range] + '. The conversion events (Start Exploring, Profile Creation, Mode Selected, Council Engaged) populate here when Google Ads visitors arrive with a gclid.</div>';
-  }
-  alertsEl.innerHTML = alerts;
+  alertsEl.innerHTML = '';
 
   var html = '';
 
-  // ────────────────────────────────────────────────────────────
-  // SECTION 1 — GOOGLE ADS CONVERSIONS
-  // gclid-captured events forwarded to Google Ads CAPI. Figure funnel:
-  // Start Exploring → Profile Creation → Mode Selected. Theme funnel:
-  // Start Exploring → Profile Creation → Council Engaged.
-  // ────────────────────────────────────────────────────────────
+  // ── GOOGLE ADS CONVERSIONS (gclid-gated) ──
   html += '<div class="section-divider">Google Ads Conversions</div>';
+  // Persistent scope banner so a row of zeros never reads as a product failure.
+  html += '<div class="hint-banner">These count only visitors who arrive with a Google Ads gclid and grant ad consent. The Ad Grant is paused, so ~0 here is expected and correct, not a funnel failure. Organic and Spotify traffic never appears in this section.</div>';
   html += '<div class="grid">';
-
-  html += kpi('Start Exploring', startExpConv, { spark: sparkStartExp, sparkColor: '#5B8BD4', sub: 'CTA click on theme/figure pages' });
   html += kpi('Profile Conversions', profileConv, { hero: true, spark: sparkProfile, sparkColor: '#68C397', delta: profilePrev, sub: 'Enter button after character + name picked' });
   html += kpi('Mode Selected', modeSelConv, { spark: sparkModeSel, sparkColor: '#E6BC5C', sub: 'first mode pick (Story / Wisdom / Talk / Quest / Freetalk)' });
   html += kpi('Council Engaged', councilEngagedConv, { spark: sparkCouncilEng, sparkColor: '#9D83CD', sub: '60s of a council heard (curated or custom)' });
-  html += kpi('Conversion Rate', convRate + '%', { sub: profileConv + ' profiles / ' + fmt(totalSessions) + ' sessions' });
-  html += kpi('Signup → Engaged', modeFromProfilePct, { sub: modeSelConv + ' modes picked / ' + profileConv + ' profiles' });
-  html += kpi('CTA → Signup', profileFromStartPct, { sub: profileConv + ' profiles / ' + startExpConv + ' CTA clicks' });
-
-  if (startByFigure.length > 0) {
-    html += chartCard('Top Figures by CTA Click', barsHtml(startByFigure.map(function(r) { return { label: cap(r.figure), c: r.c }; }), '#5B8BD4'), 'card-half');
-  }
+  html += kpi('Modes / Profile', modeFromProfile, { sub: modeFromProfile === '--' ? 'within ad visitors (need 5+ profiles)' : 'modes picked per ad-profile' });
 
   if (modeByFigure.length > 0) {
-    html += chartCard('Top Figures by Engagement', barsHtml(modeByFigure.map(function(r) { return { label: cap(r.figure), c: r.c }; }), '#E6BC5C'), 'card-half');
+    html += chartCard('Top Figures by Engagement', barsHtml(modeByFigure.map(function(r) { return { label: cap(r.figure), c: r.c }; }), '#E6BC5C'), 'card-wide');
   }
-
-  html += chartCard('Conversion Pipeline',
-    '<div style="display:flex;flex-direction:column;gap:8px;font-size:0.875rem">' +
-    '<div style="display:flex;justify-content:space-between"><span style="color:var(--dim)">gclid Capture</span><span style="color:var(--ok)">Active</span></div>' +
-    '<div style="display:flex;justify-content:space-between"><span style="color:var(--dim)">Start Exploring Event</span><span style="color:var(--ok)">Active</span></div>' +
-    '<div style="display:flex;justify-content:space-between"><span style="color:var(--dim)">Profile Creation Event</span><span style="color:var(--ok)">Active</span></div>' +
-    '<div style="display:flex;justify-content:space-between"><span style="color:var(--dim)">Mode Selected Event</span><span style="color:var(--ok)">Active</span></div>' +
-    '<div style="display:flex;justify-content:space-between"><span style="color:var(--dim)">Council Engaged Event</span><span style="color:var(--warn)">Pending (action ID)</span></div>' +
-    '<div style="display:flex;justify-content:space-between"><span style="color:var(--dim)">CF Worker Endpoint</span><span style="color:var(--ok)">Active</span></div>' +
-    '<div style="display:flex;justify-content:space-between"><span style="color:var(--dim)">Google Ads CAPI Forwarding</span><span style="color:var(--ok)">Active</span></div>' +
-    '</div>',
-    ''
-  );
   html += '</div>';
 
-  // ────────────────────────────────────────────────────────────
-  // SECTION 2 — GEOGRAPHIC REACH
-  // Where conversations physically come from (CF edge country code).
-  // ────────────────────────────────────────────────────────────
-  html += '<div class="section-divider">Geographic Reach</div>';
+  // Instrumentation health — demoted from the old all-green status board (which
+  // read as failure next to a row of zeros) to one quiet line. The plumbing
+  // being wired says nothing about whether anyone converted.
+  html += '<div class="insight" style="padding:8px 2px 0">Instrumentation healthy: gclid capture, profile / mode / council events, the CF worker, and Google Ads CAPI forwarding are all wired.</div>';
+
+  // ── TRAFFIC (mixed sources) ──
+  html += '<div class="section-divider">Traffic (mixed sources)</div>';
   html += '<div class="grid">';
-  var countryItemsAdgrants = aggregateByLabel(topCountriesAdgrants.map(function(r) { return { label: r.country || 'Unknown', c: r.c }; }));
-  html += chartCard('Top Countries', barsHtml(countryItemsAdgrants, '#5B8BD4'), 'card-wide');
+  html += kpi('Raw Visits', visits, { hero: true, delta: visitsPrev, sub: 'page loads: ads + organic + bots, no source split yet' });
+  html += '<div class="card card-wide"><div class="kpi-label">Source attribution</div><div style="margin-top:8px;font-size:0.8125rem;color:var(--tx2);line-height:1.5">Not wired yet. The page beacon records path, language, and country, but no traffic source, so Spotify, organic search, and Ad-Grant clicks all land in one number. Splitting them needs a small change to the page beacon to capture utm_source, referrer, and gclid. That is the next instrumentation step before the launch wave.</div></div>';
+  var countryAllItems = aggregateByLabel(topCountriesAll.map(function(r) { return { label: r.country || 'Unknown', c: r.c }; }));
+  html += chartCard('Top Countries (all visits)', barsHtml(countryAllItems, '#9B7BC7'), 'card-wide');
+  var countryChatItems = aggregateByLabel(topCountriesChat.map(function(r) { return { label: r.country || 'Unknown', c: r.c }; }));
+  html += chartCard('Top Countries (conversations)', barsHtml(countryChatItems, '#5B8BD4'), 'card-wide');
   html += '</div>';
 
-  // ────────────────────────────────────────────────────────────
-  // SECTION 3 — CONTENT REACH
-  // Which content types users actually finish.
-  // ────────────────────────────────────────────────────────────
+  // ── CONTENT REACH ──
   html += '<div class="section-divider">Content Reach</div>';
   html += '<div class="grid">';
   var playbackTypeItems = aggregateByLabel(playbackByType.map(function(r) { return { label: r.type || 'unknown', c: r.c }; }));
