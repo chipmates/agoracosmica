@@ -564,6 +564,69 @@ td {
   white-space: nowrap; z-index: 10; opacity: 0; transition: opacity 0.15s;
 }
 
+/* === Ghost funnel bars + status strip + rate cards (period-over-period) === */
+/* Funnel as horizontal bars with a faint previous-period ghost bar behind each
+   stage on a shared axis: a solid bar wider than its ghost means more people
+   reached this step than last period. Population-level only, no per-visitor key. */
+.fbar-list { display: flex; flex-direction: column; gap: 0; margin-top: 8px; }
+.fbar-row { display: flex; align-items: center; gap: 10px; }
+.fbar-labelwrap {
+  min-width: 96px; flex-shrink: 0; text-align: right;
+  display: flex; flex-direction: column; gap: 1px; line-height: 1.15;
+}
+.fbar-label {
+  font-size: 0.6875rem; color: var(--tx2);
+  text-transform: uppercase; letter-spacing: 0.04em;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.fbar-sub2 {
+  font-size: 0.5625rem; color: var(--dim);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.fbar-track {
+  flex: 1; position: relative; height: 30px;
+  background: var(--bg-primary); border-radius: var(--radius-sm); overflow: hidden;
+}
+.fbar-ghost {
+  position: absolute; left: 0; top: 0; height: 100%;
+  background: color-mix(in srgb, var(--gold-deep) 22%, transparent);
+  border-radius: var(--radius-sm); min-width: 1px;
+}
+.fbar-fill {
+  position: absolute; left: 0; top: 0; height: 100%;
+  background: var(--gold-subtle); border-radius: var(--radius-sm); min-width: 2px;
+  transition: width 0.5s ease;
+}
+.fbar-num { min-width: 96px; flex-shrink: 0; display: flex; align-items: baseline; gap: 6px; justify-content: flex-end; }
+.fbar-val { font-size: 1rem; font-weight: 700; color: var(--gold); }
+.fbar-drop {
+  margin: 3px 0 3px 106px; font-size: 0.6875rem; color: var(--dim);
+  display: flex; align-items: center; gap: 6px;
+}
+.fbar-drop .pp { font-weight: 600; }
+.fbar-drop .pp.up { color: var(--ok); }
+.fbar-drop .pp.down { color: var(--err); }
+.fbar-legend { font-size: 0.625rem; color: var(--dim); margin-top: 8px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.fbar-legend .swatch { width: 18px; height: 8px; border-radius: 2px; display: inline-block; }
+
+/* Status strip: health line + momentum verdict at the top of Overview */
+.status-strip { padding: 12px 16px; display: flex; flex-direction: column; gap: 7px; }
+.health-line { display: flex; align-items: center; gap: 8px; font-size: 0.875rem; font-weight: 600; }
+.health-line .dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; background: currentColor; }
+.health-line.ok { color: var(--ok); }
+.health-line.warn { color: var(--warn); }
+.health-line.err { color: var(--err); }
+.momentum-line { font-size: 0.9375rem; color: var(--tx); line-height: 1.4; }
+
+/* Rate card target marker (Growth tab) */
+.rate-target { font-size: 0.6875rem; color: var(--dim); margin-top: 4px; }
+
+@media (max-width: 640px) {
+  .fbar-labelwrap { min-width: 66px; }
+  .fbar-num { min-width: 74px; }
+  .fbar-drop { margin-left: 76px; }
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
@@ -671,7 +734,7 @@ html { scrollbar-color: var(--bg-highlight) transparent; scrollbar-width: thin; 
     </button>
     <button class="nav-item" data-tab="adgrants">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 11 12 6 7 11"/><line x1="12" y1="6" x2="12" y2="18"/><path d="M5 21h14"/></svg>
-      <span class="nav-label">Marketing</span>
+      <span class="nav-label">Growth</span>
     </button>
   </div>
   <div class="sidebar-section">
@@ -737,10 +800,10 @@ html { scrollbar-color: var(--bg-highlight) transparent; scrollbar-width: thin; 
   </div>
 </section>
 
-<!-- Tab: Marketing (internal id 'adgrants' preserved for bookmark stability) -->
+<!-- Tab: Growth (internal id 'adgrants' preserved for bookmark + init stability) -->
 <section class="tab-section" id="tab-adgrants" aria-labelledby="title-adgrants">
   <div class="tab-header">
-    <h2 class="tab-title" id="title-adgrants">Marketing</h2>
+    <h2 class="tab-title" id="title-adgrants">Growth</h2>
   </div>
   <div id="alerts-adgrants" class="alerts"></div>
   <div id="grid-adgrants"></div>
@@ -770,7 +833,7 @@ html { scrollbar-color: var(--bg-highlight) transparent; scrollbar-width: thin; 
   </button>
   <button class="mob-tab" data-tab="adgrants">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="17 11 12 6 7 11"/><line x1="12" y1="6" x2="12" y2="18"/><path d="M5 21h14"/></svg>
-    Marketing
+    Growth
   </button>
 </div>
 </nav>
@@ -1011,6 +1074,138 @@ function funnelHtml(stages) {
   return '<div class="funnel-row" role="list" aria-label="User funnel">' + parts.join('') + '</div>';
 }
 
+// Funnel drawn as horizontal bars with a faint previous-period ghost bar behind
+// each stage on a shared axis. A solid bar wider than its ghost means more people
+// reached this step than last period — improvement you can see, not compute.
+// Between stages we show the conversion to the next step (same honesty rule as
+// funnelHtml: raw fraction under a base of 20, color-free; a % above) plus the
+// percentage-point change vs the same step last period. Stages are
+// { label, value, prev, sub }; population-level only, no per-visitor key.
+function ghostFunnelHtml(stages) {
+  if (!stages || stages.length === 0) return '';
+  var base = 1;
+  for (var k = 0; k < stages.length; k++) {
+    base = Math.max(base, Number(stages[k].value) || 0, Number(stages[k].prev) || 0);
+  }
+  var out = '<div class="fbar-list" role="list" aria-label="New-visitor funnel">';
+  for (var i = 0; i < stages.length; i++) {
+    var s = stages[i];
+    var v = Number(s.value) || 0;
+    var pv = (s.prev == null) ? null : (Number(s.prev) || 0);
+    var wv = (v / base * 100);
+    var ghost = (pv == null) ? '' : '<div class="fbar-ghost" style="width:' + (pv / base * 100).toFixed(1) + '%"></div>';
+    var sub2 = s.sub ? '<span class="fbar-sub2">' + s.sub + '</span>' : '';
+    out += '<div class="fbar-row" role="listitem">' +
+      '<span class="fbar-labelwrap"><span class="fbar-label">' + s.label + '</span>' + sub2 + '</span>' +
+      '<div class="fbar-track">' + ghost + '<div class="fbar-fill" style="width:' + wv.toFixed(1) + '%"></div></div>' +
+      '<span class="fbar-num"><span class="fbar-val">' + fmt(v) + '</span>' + (pv == null ? '' : deltaHtml(v, pv)) + '</span>' +
+      '</div>';
+    if (i < stages.length - 1) {
+      var next = stages[i + 1];
+      var nv = Number(next.value) || 0;
+      var dropText;
+      if (v <= 0) {
+        dropText = '—';
+      } else if (v < 20) {
+        // Small base: a percentage off fewer than 20 is Poisson noise, so show
+        // the raw fraction instead of a colored % (1-of-2 must not read a cliff).
+        dropText = fmt(nv) + '/' + fmt(v) + ' to ' + next.label;
+      } else {
+        dropText = Math.round(nv / v * 100) + '% to ' + next.label;
+      }
+      // Percentage-point change vs the previous period's same step-to-step
+      // conversion. Suppressed when either base is below the small-base floor.
+      var ppHtml = '';
+      var npv = (next.prev == null) ? null : (Number(next.prev) || 0);
+      if (pv != null && npv != null && v >= 20 && pv >= 20) {
+        var pp = Math.round((nv / v * 100) - (npv / pv * 100));
+        if (pp !== 0) {
+          var ppc = pp > 0 ? 'up' : 'down';
+          var ppa = pp > 0 ? '&#9650;' : '&#9660;';
+          ppHtml = '<span class="pp ' + ppc + '">' + ppa + ' ' + (pp > 0 ? '+' : '') + pp + 'pp</span>';
+        }
+      }
+      out += '<div class="fbar-drop"><span aria-hidden="true">&#8595;</span> ' + dropText + ' ' + ppHtml + '</div>';
+    }
+  }
+  out += '</div>';
+  return out;
+}
+
+// One auto-composed sentence answering "are we better than last period", driven
+// off the North Star (Conversations) and the SAME small-base guard as deltaHtml
+// so it never contradicts the delta chip on the Conversations hero.
+function momentumChip(cur, prev) {
+  var msg;
+  if (prev == null || (prev === 0 && cur === 0)) {
+    msg = 'No conversations yet this period or last. Open the app, confirm chat works, then share it in one warm place.';
+  } else {
+    var diff = cur - prev;
+    if (diff === 0) {
+      msg = 'Holding steady at ' + fmt(cur) + ' conversations.';
+    } else if (prev < 5 || Math.abs(diff) <= 1) {
+      msg = 'Small numbers this period, hard to read a trend. The multi-day view is the real signal, not any single day.';
+    } else {
+      var p = Math.round(diff / prev * 100);
+      if (diff > 0) msg = 'Better than last period. Conversations ' + fmt(cur) + ' (&#9650; +' + p + '%).';
+      else msg = 'Down from last period. Conversations ' + fmt(cur) + ' (&#9660; ' + p + '%). Small swings are normal at this stage.';
+    }
+  }
+  return '<div class="momentum-line">&#128161; ' + msg + '</div>';
+}
+
+// Health line for the top of Overview: "is anything on fire" before any metric.
+// Server reachability comes from the (async) server poll; errors and rate limits
+// from this period's analytics. The status bar remains the real-time alarm.
+function healthChipHtml(errors, rl, serverData) {
+  var level = 'ok';
+  var parts = [];
+  if (serverData) {
+    ['fsn1', 'nbg1'].forEach(function(id) {
+      var s = serverData[id];
+      if (!s || s.error) { parts.push(id.toUpperCase() + ' unreachable'); level = 'err'; }
+    });
+  }
+  if (errors > 0) { parts.push(errors + ' error' + (errors === 1 ? '' : 's')); if (level !== 'err') level = 'warn'; }
+  if (rl > 0) { parts.push(rl + ' rate-limited'); if (level !== 'err') level = 'warn'; }
+  var text = parts.length ? parts.join(' &middot; ') : 'All systems operational';
+  return '<div class="health-line ' + level + '"><span class="dot"></span>' + text + '</div>';
+}
+
+// A conversion rate as a card: big %, the percentage-point change vs the previous
+// period's rate (guarded so a tiny base never flashes a dramatic swing), and a
+// modest dashed target shown as a label. den/prevDen are the SAME-population base
+// (e.g. all visits); num is the sequential sub-population (e.g. signups).
+function rateCard(label, num, den, prevNum, prevDen, opts) {
+  opts = opts || {};
+  var floor = opts.floor || 20;
+  var rate = den >= floor ? (num / den * 100) : null;
+  var prevRate = prevDen >= floor ? (prevNum / prevDen * 100) : null;
+  var valStr = rate == null ? '--' : rate.toFixed(1) + '%';
+  var ppHtml;
+  if (rate != null && prevRate != null) {
+    var pp = rate - prevRate;
+    if (Math.abs(pp) < 0.05) {
+      ppHtml = '<span class="kpi-delta flat">~0pp</span>';
+    } else {
+      var cls = pp > 0 ? 'up' : 'down';
+      var arr = pp > 0 ? '&#9650;' : '&#9660;';
+      ppHtml = '<span class="kpi-delta ' + cls + '">' + arr + ' ' + (pp > 0 ? '+' : '') + pp.toFixed(1) + 'pp</span>';
+    }
+  } else {
+    ppHtml = '<span class="kpi-delta flat">-</span>';
+  }
+  var sub = opts.sub ? '<span class="kpi-sub">' + opts.sub + '</span>' : '';
+  var target = (opts.target != null)
+    ? '<div class="rate-target">Goal ' + opts.target + '%' + (rate != null ? ' &middot; now ' + valStr : '') + '</div>'
+    : '';
+  var heroClass = opts.hero ? ' card-hero' : '';
+  return '<div class="card' + heroClass + '">' +
+    '<div class="kpi-top"><span class="kpi-label">' + label + '</span></div>' +
+    '<div class="kpi-value">' + valStr + '</div>' +
+    '<div class="kpi-bottom">' + ppHtml + sub + '</div>' + target + '</div>';
+}
+
 // Render the engagement pool that sits below the new-visitor funnel. These are
 // NOT sequential stages and NOT one population: App Sessions includes returning
 // + passive opens, Chats are messages, content events are their own. So we show
@@ -1146,6 +1341,10 @@ function svgAreaGraph(data, opts) {
   var plotH = h - padT - padB;
   var n = data.length;
   var maxVal = Math.max.apply(null, data.map(function(d) { return d.c; }));
+  if (opts.ghost && opts.ghost.length) {
+    var gmax = Math.max.apply(null, opts.ghost.map(function(d) { return typeof d === 'number' ? d : Number(d.c); }));
+    if (gmax > maxVal) maxVal = gmax;
+  }
   if (maxVal === 0) maxVal = 1;
 
   // Y-axis
@@ -1178,6 +1377,20 @@ function svgAreaGraph(data, opts) {
     if (i > 0) {
       svg += '<text x="' + (padL - 6) + '" y="' + (yPos + 3).toFixed(1) + '" text-anchor="end" fill="#8A8A8A" font-size="9">' + fmt(yVal) + '</text>';
     }
+  }
+
+  // Previous-period ghost line: faint dashed polyline behind the main series, so
+  // the solid line sitting above its ghost reads as "better than last period".
+  if (opts.ghost && opts.ghost.length >= 2) {
+    var gd = opts.ghost.map(function(d) { return typeof d === 'number' ? d : Number(d.c); });
+    var gn = gd.length;
+    var gPath = '';
+    for (var gi = 0; gi < gn; gi++) {
+      var gx = padL + (gi / (gn - 1)) * plotW;
+      var gy = padT + plotH - (gd[gi] / yMax) * plotH;
+      gPath += (gi === 0 ? 'M' : ' L') + gx.toFixed(1) + ',' + gy.toFixed(1);
+    }
+    svg += '<path d="' + gPath + '" fill="none" stroke="' + color + '" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.35"/>';
   }
 
   // Build smooth path (monotone cubic)
@@ -1410,6 +1623,19 @@ async function loadOverview() {
     { sql: "SELECT blob3 as mode, COUNT() as c FROM agora_llm WHERE blob1 = 'chat' AND blob3 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY mode ORDER BY c DESC", dataset: 'agora_llm' },
     // Signups previous period — for the Pulse "new signups" delta.
     { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'signup' AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    // --- D1 period-over-period additions (APPENDED at the end; reads are
+    // positional, so new queries must never be inserted mid-array). r[31..34]. ---
+    // Entry previous period (funnel ghost bar)
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'entry' AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    // Page paths previous period (classified into marketing/app for the ghost)
+    { sql: "SELECT blob2 as path, COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND blob2 != '' AND timestamp " + prevRange() + " GROUP BY path ORDER BY c DESC LIMIT 200", dataset: 'agora_llm' },
+    // Daily Conversations (chat) current + previous period for the ghost trend line
+    S.range > 1
+      ? { sql: "SELECT toStartOfInterval(timestamp, INTERVAL '1' DAY) as t, COUNT() as c FROM agora_llm WHERE blob1 = 'chat' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' }
+      : { sql: "SELECT 1 as c", dataset: 'agora_llm' },
+    S.range > 1
+      ? { sql: "SELECT toStartOfInterval(timestamp, INTERVAL '1' DAY) as t, COUNT() as c FROM agora_llm WHERE blob1 = 'chat' AND timestamp " + prevRange() + " GROUP BY t ORDER BY t", dataset: 'agora_llm' }
+      : { sql: "SELECT 1 as c", dataset: 'agora_llm' },
   ];
 
   var r = await batch(queries);
@@ -1489,6 +1715,25 @@ async function loadOverview() {
   topMarketingPages = topMarketingPages.slice(0, 15);
   var signups = val(r[27]);
   var signupsPrev = val(r[30]);
+  // D1 period-over-period reads (appended queries r[31..34]).
+  var entriesPrev = val(r[31]);
+  var prevPaths = rows(r[32]);
+  var dailyConv = S.range > 1 ? rows(r[33]) : [];
+  var dailyConvPrev = S.range > 1 ? rows(r[34]) : [];
+  // Previous-period marketing-vs-app split (same classification as the current
+  // period) so the funnel can draw a ghost bar behind each stage. MARKETING_*
+  // and arrivalsPrev are already in scope above.
+  var marketingArrivalsPrev = 0;
+  for (var pi = 0; pi < prevPaths.length; pi++) {
+    var pp2 = String(prevPaths[pi].path || '');
+    var isMkt2 = false;
+    for (var pj = 0; pj < MARKETING_PREFIXES.length; pj++) {
+      if (pp2.indexOf(MARKETING_PREFIXES[pj]) === 0) { isMkt2 = true; break; }
+    }
+    if (!isMkt2 && MARKETING_EXACT[pp2]) isMkt2 = true;
+    if (isMkt2) marketingArrivalsPrev += Number(prevPaths[pi].c) || 0;
+  }
+  var appArrivalsPrev = Math.max(0, arrivalsPrev - marketingArrivalsPrev);
   // Engagement endpoints (parallel from Sessions): content played + chat sent.
   // Content Started total is derived from the existing contentByType breakdown
   // (saves one query). Content Completed and Chat-by-Mode are new dedicated queries.
@@ -1520,6 +1765,15 @@ async function loadOverview() {
 
   var html = '';
 
+  // STATUS STRIP — "is anything on fire" (health) + "are we better than last
+  // period" (momentum verdict), the two reads the founder wants first. Both reuse
+  // existing counts; the momentum line shares deltaHtml's small-base guard so it
+  // never contradicts the Conversations delta chip below.
+  html += '<div class="card card-full status-strip">' +
+    healthChipHtml(totalErrors, totalRl, S.serverData) +
+    momentumChip(chats, chatsPrev) +
+    '</div>';
+
   // PULSE — the week in one screen: the three numbers that matter, with an
   // auto-composed decision line. Conversations (chat) is the North Star: the
   // only event a click-flood or bot cannot inflate. Raw Visits is shown but
@@ -1544,10 +1798,10 @@ async function loadOverview() {
   // here is what produced the impossible "400%". Sessions now lives in the
   // Activity pool below, paired with Chats.
   var funnelStages = [
-    { label: 'Marketing', value: marketingArrivals, sub: 'figures · themes · about' },
-    { label: 'App', value: appArrivals, sub: '/app + SPA routes' },
-    { label: 'Entry', value: entries, sub: 'consent + enter' },
-    { label: 'Signup', value: signups, sub: 'new accounts' },
+    { label: 'Marketing', value: marketingArrivals, prev: marketingArrivalsPrev, sub: 'figures · themes · about' },
+    { label: 'App', value: appArrivals, prev: appArrivalsPrev, sub: '/app + SPA routes' },
+    { label: 'Entry', value: entries, prev: entriesPrev, sub: 'consent + enter' },
+    { label: 'Signup', value: signups, prev: signupsPrev, sub: 'new accounts' },
   ];
   // ACTIVITY POOL — App Sessions sits next to Chat Messages (not a funnel). The
   // relationship is shown as a sample-gated multiplier, never a percentage, so
@@ -1562,15 +1816,21 @@ async function loadOverview() {
   var activityNote = perSession === '--'
     ? 'Chats per session: too few sessions yet to be meaningful.'
     : 'Chats per session: ' + perSession + '. Reads low by design, since App Sessions counts passive and returning opens that never intend to chat.';
-  // Footnote keeps the honest definitions a multi-day window needs.
-  var funnelNote = '<div style="margin-top:10px;font-size:11px;color:var(--dim);line-height:1.4">' +
-    'New-visitor funnel only. Entry &amp; Signup fire at the welcome modal (post-consent). ' +
+  // Legend + footnote keep the honest definitions a multi-day window needs.
+  var funnelLegend = '<div class="fbar-legend">' +
+    '<span class="swatch" style="background:var(--gold-subtle)"></span> this ' + RANGE_LABEL[S.range] +
+    '<span class="swatch" style="background:color-mix(in srgb, var(--gold-deep) 22%, transparent);margin-left:10px"></span> previous period (ghost)' +
+    '</div>';
+  var funnelNote = '<div style="margin-top:8px;font-size:11px;color:var(--dim);line-height:1.4">' +
+    'New-visitor funnel only, compared step by step against the previous ' + RANGE_LABEL[S.range] + ' (the faint bars). ' +
+    'Entry &amp; Signup fire at the welcome modal (post-consent). ' +
     'Returning visitors skip it, so they appear only as App Sessions below, never here. ' +
     'Marketing = / and /de/ plus figure and theme pages (mixed sources, incl. ads + bots). App = /app.' +
     '</div>';
   html += chartCard(
     'New-visitor funnel',
-    funnelHtml(funnelStages) +
+    ghostFunnelHtml(funnelStages) +
+    funnelLegend +
     engagementPoolHtml('&#8627; Activity (parallel, a sessioned user can do several)', engagementStages, activityNote) +
     funnelNote,
     'card-full'
@@ -1675,14 +1935,17 @@ async function loadOverview() {
     html += '<div class="card card-full" style="padding:10px 14px"><div class="insight">' + insights.slice(0, 3).join(' · ') + '</div></div>';
   }
 
-  // Daily trend (area graph) or TTS activity graph
-  if (dailyTrend.length > 1) {
-    var trendItems = dailyTrend.map(function(row) {
+  // Daily Conversations trend with a faint previous-period ghost line, so
+  // improvement reads as the solid line sitting above its ghost. Conversations
+  // (chat) is the North Star: the one metric a bot or click flood cannot inflate.
+  if (dailyConv.length > 1) {
+    var convItems = dailyConv.map(function(row) {
       return { label: new Date(row.t).toLocaleDateString([], { month: 'short', day: 'numeric' }), c: row.c };
     });
-    html += chartCard('Daily Sessions', svgAreaGraph(trendItems, { color: '#68C397', ariaLabel: 'Daily sessions trend' }), 'card-full');
+    var convGhost = dailyConvPrev.map(function(row) { return Number(row.c); });
+    html += chartCard('Daily Conversations', svgAreaGraph(convItems, { color: '#5B8BD4', ghost: convGhost.length > 1 ? convGhost : null, ariaLabel: 'Daily conversations trend; the dashed line is the previous period' }), 'card-full');
   } else if (sparkTts.length > 1) {
-    // Show TTS activity as area graph when no daily session trend
+    // Show TTS activity as area graph when there is no multi-day trend yet
     var ttsItems = sparkTts.map(function(v, i) { return { label: String(i), c: v }; });
     html += chartCard('TTS Activity', svgAreaGraph(ttsItems, { color: '#68C397', height: 120, ariaLabel: 'TTS requests over time' }), 'card-full');
   }
@@ -2210,6 +2473,14 @@ async function loadAdGrants() {
     { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND timestamp " + prevRange(), dataset: 'agora_llm' },
     // Top countries by raw page arrivals (geo of all traffic, not just chatters)
     { sql: "SELECT blob7 as country, COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND blob7 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY country ORDER BY c DESC LIMIT 10", dataset: 'agora_llm' },
+    // --- D1: funnel-rate scoreboard (source-free, existing events). r[13..18],
+    // appended at the end so existing positional reads do not shift. ---
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'signup' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'signup' AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'entry' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'entry' AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'chat' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'session' AND blob5 = '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
   ];
 
   var r = await batch(queries);
@@ -2225,6 +2496,10 @@ async function loadAdGrants() {
   var playbackByType = rows(r[9]);
   var visits = val(r[10]), visitsPrev = val(r[11]);
   var topCountriesAll = rows(r[12]);
+  // D1 rate scoreboard inputs (r[13..18]).
+  var gSignups = val(r[13]), gSignupsPrev = val(r[14]);
+  var gEntries = val(r[15]), gEntriesPrev = val(r[16]);
+  var gChats = val(r[17]), gSessions = val(r[18]);
 
   // Modes picked per ad-profile, within the gclid population only, gated for n.
   var modeFromProfile = multiplierOrDash(modeSelConv, profileConv, 5);
@@ -2232,6 +2507,20 @@ async function loadAdGrants() {
   alertsEl.innerHTML = '';
 
   var html = '';
+
+  // ── FUNNEL RATES (source-free, existing events) ──
+  // The new hero of this tab: are the top-of-funnel rates trending up? Rates are
+  // taken over all visits (a conservative floor, since visits include ads + bots
+  // that we never split by source). What matters is the direction, shown as the
+  // percentage-point change vs the previous period. Activation depth stays a
+  // sample-gated multiplier (chats per session), never a cross-population %.
+  html += '<div class="section-divider">Funnel rates</div>';
+  html += '<div class="hint-banner">Rates over all visits, so they read low on purpose (visits include ads and bots, which we never split by source). Watch the direction week over week, not the absolute number.</div>';
+  html += '<div class="grid">';
+  html += rateCard('Signup rate', gSignups, visits, gSignupsPrev, visitsPrev, { hero: true, target: 5, sub: 'new accounts as a share of all visits' });
+  html += rateCard('Entry rate', gEntries, visits, gEntriesPrev, visitsPrev, { target: 10, sub: 'reached welcome and consented, as a share of all visits' });
+  html += kpi('Chats per session', multiplierOrDash(gChats, gSessions, 20), { sub: 'activation depth (a multiplier, not a %). App Sessions include returning and passive opens' });
+  html += '</div>';
 
   // ── GOOGLE ADS CONVERSIONS (gclid-gated) ──
   html += '<div class="section-divider">Google Ads Conversions</div>';
@@ -2256,8 +2545,8 @@ async function loadAdGrants() {
   // ── TRAFFIC (mixed sources) ──
   html += '<div class="section-divider">Traffic (mixed sources)</div>';
   html += '<div class="grid">';
-  html += kpi('Raw Visits', visits, { hero: true, delta: visitsPrev, sub: 'page loads: ads + organic + bots, no source split yet' });
-  html += '<div class="card card-wide"><div class="kpi-label">Source attribution</div><div style="margin-top:8px;font-size:0.8125rem;color:var(--tx2);line-height:1.5">Not wired yet. The page beacon records path, language, and country, but no traffic source, so Spotify, organic search, and Ad-Grant clicks all land in one number. Splitting them needs a small change to the page beacon to capture utm_source, referrer, and gclid. That is the next instrumentation step before the launch wave.</div></div>';
+  html += kpi('Raw Visits', visits, { hero: true, delta: visitsPrev, sub: 'page loads, mixed: ads + organic + bots' });
+  html += '<div class="card card-wide"><div class="kpi-label">No source split, by design</div><div style="margin-top:8px;font-size:0.8125rem;color:var(--tx2);line-height:1.5">We deliberately do not record where a visit came from (no utm tags, no referrer profiling), so this stays inside the no-tracking, no-profiling promise. Channel performance is judged on each platform\\'s own console (Google Ads, Search Console, Spotify, Reddit), not here. This view shows volume and geography only.</div></div>';
   var countryAllItems = aggregateByLabel(topCountriesAll.map(function(r) { return { label: r.country || 'Unknown', c: r.c }; }));
   html += chartCard('Top Countries (all visits)', barsHtml(countryAllItems, '#9B7BC7'), 'card-wide');
   var countryChatItems = aggregateByLabel(topCountriesChat.map(function(r) { return { label: r.country || 'Unknown', c: r.c }; }));
