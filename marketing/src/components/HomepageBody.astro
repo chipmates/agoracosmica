@@ -15,7 +15,6 @@
 
 import FigureCard from './FigureCard.astro';
 import CouncilHero from './CouncilHero.astro';
-import EchoNote from './EchoNote.astro';
 import LabModeCard from './landing-lab/LabModeCard.astro';
 import LabQuestionTile from './landing-lab/LabQuestionTile.astro';
 import LabTrustCard from './landing-lab/LabTrustCard.astro';
@@ -63,12 +62,12 @@ const enQuestions = [
 // The repositioned German six mode cards and eight question tiles, verbatim
 // from the QA'd copy source. Each question tile links to its theme page.
 const deModes = [
-  { name: 'Story', text: 'Story bereitet die Lehre vor, ein erzähltes Kapitel aus dem Leben einer Persönlichkeit, das den Gedanken öffnet, zwölf Kapitel, gegen die Quellen geprüft.' },
+  { name: 'Story', text: 'Story bereitet die Lehre vor, ein erzähltes Kapitel aus dem Leben eines Menschen, das den Gedanken öffnet, zwölf Kapitel, gegen die Quellen geprüft.' },
   { name: 'Weisheit', text: 'In der Weisheit nimmst du eine ihrer Kernlehren und denkst sie durch, in deinen eigenen Worten und für dein eigenes Leben.' },
   { name: 'Prisma', text: 'Im Prisma hörst du vier verbundene Köpfe ein einziges Thema aus ihren eigenen Blickwinkeln umkreisen, wie ein Podcast, in dem du selbst mitsitzt.' },
   { name: 'Quest', text: 'Die Quest ist eine kurze sokratische Herausforderung, vier Fragen, die tiefer gehen als Oberflächenwissen.' },
   { name: 'Free Talk', text: 'Free Talk ist ein offenes Gespräch. Frag alles, und folg ihm, wohin es führt.' },
-  { name: 'Cosmic Council', text: 'Der Cosmic Council bringt vier Persönlichkeiten in einen Raum, die eine einzige Frage debattieren, während du zuhörst.' },
+  { name: 'Cosmic Council', text: 'Der Cosmic Council bringt vier Menschen in einen Raum, die eine einzige Frage debattieren, während du zuhörst.' },
 ];
 const deQuestions = [
   { themeId: 'who-am-i', question: 'Wer bin ich? Die Frage unter jeder Frage.' },
@@ -89,8 +88,6 @@ const deQuestions = [
     <div class="ll2-stars ll2-stars--near"></div>
   </div>
   <div class="ll2-cosmic__inner">
-<EchoNote variant="theme" lang={lang} />
-
 {isDe ? (
   <>
     <!-- Was ist Agora Cosmica? -->
@@ -104,14 +101,13 @@ const deQuestions = [
         sorgfältig gestaltete Inhalte. Hör eine erzählte Szene aus ihrem Leben. Vertiefe dich in
         einen ihrer zentralen Gedanken. Setz dich mitten in einen vierstimmigen Dialog, oder lass
         einen Council eine Frage ausstreiten. Vier dieser Kapitel bilden einen Lernweg, und wenn du
-        weitergehen willst, kannst du einen Gedanken mit jeder
-        Persönlichkeit besprechen oder einfach alles fragen. Was sie lehren, schöpft aus ihrer
+        weitergehen willst, kannst du einen Gedanken mit jedem Menschen besprechen oder einfach alles fragen. Was sie lehren, schöpft aus ihrer
         echten Philosophie und den Ideen, an denen sie ein Leben lang gebaut haben. Das Ganze ist
         von einer kleinen gemeinnützigen Organisation aus Deutschland gebaut, und es ist Open
         Source.
       </p>
       <p class="pub-section__text">
-        <a class="pub-textlink" href={publicUrl(lang, '/figures')}>Persönlichkeiten ansehen</a>
+        <a class="pub-textlink" href={publicUrl(lang, '/figures')}>Menschen ansehen</a>
         {' · '}
         <a class="pub-textlink" href={publicUrl(lang, '/about')}>Über das Projekt</a>
       </p>
@@ -128,9 +124,10 @@ const deQuestions = [
       </div>
     </section>
 
-    <!-- Das Persönlichkeiten-Raster, nach oben gezogen -->
+    <!-- Das Menschen-Raster, nach oben gezogen -->
     <section class="pub-section">
-      <h3 class="pub-section__title pub-home-subhead ll2-grid-head">Die dreißig Persönlichkeiten</h3>
+      <h3 class="pub-section__title pub-home-subhead ll2-grid-head">Entdecke die 30 bemerkenswerten Menschen</h3>
+      <p class="pub-section__text ll2-caption">Öffne einen Namen und entdecke ihr Leben und ihre Ideen.</p>
       <div class="pub-grid pub-grid--3">
         {figures.map(figure => <FigureCard figure={figure} lang={lang} />)}
       </div>
@@ -139,6 +136,10 @@ const deQuestions = [
     <!-- Sechs Wege, als 6-Karten-Raster -->
     <section class="pub-section">
       <h2 class="pub-section__title">Sechs Wege, von einem Menschen zu lernen</h2>
+      <p class="pub-section__text ll2-lead">
+        <strong>Neu hier?</strong> Fang mit einer Geschichte an, einer erzählten Szene aus
+        ihrem Leben. Alles andere baut darauf auf.
+      </p>
       <p class="pub-section__text ll2-lead">
         Verschiedene Fragen verlangen nach verschiedenen Wegen. Das meiste davon ist im Voraus
         gestaltet, gemacht, um dir etwas beizubringen. Zwei sind ein lebendiges Gespräch, für die
@@ -179,7 +180,7 @@ const deQuestions = [
       <h2 class="pub-section__title">Der Cosmic Council</h2>
       <p class="pub-section__text">
         Manche Fragen sind zu groß für eine einzige Stimme. Der Cosmic Council bringt vier
-        Persönlichkeiten rund um eine einzige Frage in einen Raum und lässt sie streiten. Eine
+        Menschen rund um eine einzige Frage in einen Raum und lässt sie streiten. Eine
         Moderation hält den Faden, drei Denkende widersprechen einander, und du hörst zu, wie Ideen
         aufeinanderprallen, wie es zu ihren Lebzeiten nie möglich war. Es gibt 110 sorgfältig
         gebaute Debatten zum Abspielen, jede mit vollständigem erzähltem Audio. Oder bau deinen
@@ -188,7 +189,7 @@ const deQuestions = [
       </p>
       <CouncilHero council={heroCouncil} lang={lang} />
       <div class="pub-home-hero__actions">
-        <a href="/app" class="pub-cta__button" data-agc-cta="start-exploring">
+        <a href={`/app?council=${heroCouncil.id}`} class="pub-cta__button" data-agc-cta="start-exploring" data-agc-council={heroCouncil.id}>
           Den Cosmic Council betreten
         </a>
       </div>
@@ -201,7 +202,7 @@ const deQuestions = [
         <LabTrustCard label="Ehrlich">
           Wir sagen offen, was das hier ist. Jede Persönlichkeit ist ein KI-Echo, eine Deutung,
           verwurzelt in Primärwerken und historischem Kontext. Nie eine Aufnahme, nie der Anspruch,
-          für den echten Menschen zu sprechen. Zu jeder Persönlichkeit gehören Faktenchecks, die
+          für den echten Menschen zu sprechen. Zu jedem Menschen gehören Faktenchecks, die
           benennen, was belegt und was für die Geschichte nachgebildet ist.
         </LabTrustCard>
         <LabTrustCard label="Bei dir">
@@ -220,7 +221,7 @@ const deQuestions = [
         </LabTrustCard>
       </div>
       <p class="pub-section__text">
-        <a class="pub-textlink" href={publicUrl(lang, '/figures')}>Lerne die Persönlichkeiten kennen</a>
+        <a class="pub-textlink" href={publicUrl(lang, '/figures')}>Lerne die Menschen kennen</a>
         {' · '}
         <a class="pub-textlink" href={publicUrl(lang, '/about')}>Wie es funktioniert</a>
       </p>
@@ -249,7 +250,7 @@ const deQuestions = [
         Agora Cosmica ist ein Projekt der ChipMates gemeinnützigen GmbH, einer kleinen
         gemeinnützigen Organisation in Freiburg. Gemeinnützig heißt, wir sind einer Mission
         verpflichtet, nicht Investoren. Kein Gewinn, keine Anteilseigner, nur die Arbeit. Der Weg,
-        auf dem du von jeder Persönlichkeit lernst, folgt einem vierstufigen Bogen.
+        auf dem du von jedem Menschen lernst, folgt einem vierstufigen Bogen.
         Eine Idee aufnehmen, sie erkunden, sie verknüpfen und dann zeigen,
         dass du sie verstanden hast. Keine Voraussetzungen, keine Bezahlschranken. Schulen und
         Hochschulen sind eingeladen, es zu ihren Lernenden zu bringen, und Entwicklerinnen können
@@ -265,7 +266,7 @@ const deQuestions = [
         {' · '}
         <a class="pub-textlink" href={publicUrl(lang, '/contact')}>Kontakt</a>
         {' · '}
-        <a class="pub-textlink" href={publicUrl(lang, '/figures')}>Persönlichkeiten</a>
+        <a class="pub-textlink" href={publicUrl(lang, '/figures')}>Menschen</a>
         {' · '}
         <a class="pub-textlink" href={publicUrl(lang, '/themes')}>Themen</a>
       </p>
@@ -308,7 +309,8 @@ const deQuestions = [
 
     <!-- The figure grid, moved up so faces appear early -->
     <section class="pub-section">
-      <h3 class="pub-section__title pub-home-subhead ll2-grid-head">The thirty figures</h3>
+      <h3 class="pub-section__title pub-home-subhead ll2-grid-head">Explore the 30 remarkable people</h3>
+      <p class="pub-section__text ll2-caption">Open any name to explore their life and ideas.</p>
       <div class="pub-grid pub-grid--3">
         {figures.map(figure => <FigureCard figure={figure} lang={lang} />)}
       </div>
@@ -317,6 +319,10 @@ const deQuestions = [
     <!-- Six ways to learn from a mind, as a 6-card grid -->
     <section class="pub-section">
       <h2 class="pub-section__title">Six ways to learn from a mind</h2>
+      <p class="pub-section__text ll2-lead">
+        <strong>New here?</strong> Start with a Story, a narrated scene from their life.
+        Everything else builds from there.
+      </p>
       <p class="pub-section__text ll2-lead">
         Different questions ask for different paths. Most of it is crafted ahead of time, made to
         teach. Two are live conversation, for when you want to take it further.
@@ -363,7 +369,7 @@ const deQuestions = [
       </p>
       <CouncilHero council={heroCouncil} lang={lang} />
       <div class="pub-home-hero__actions">
-        <a href="/app" class="pub-cta__button" data-agc-cta="start-exploring">
+        <a href={`/app?council=${heroCouncil.id}`} class="pub-cta__button" data-agc-cta="start-exploring" data-agc-council={heroCouncil.id}>
           Enter the Cosmic Council
         </a>
       </div>

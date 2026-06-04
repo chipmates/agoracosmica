@@ -167,8 +167,7 @@ function cleanDisplayText(s: string): string {
           return (
             <a
               href={publicUrl(lang, `/figures/${relSlug}`)}
-              class="pub-figure-card"
-              style="flex-direction: row; gap: 0.75rem; align-items: center; padding: 0.75rem"
+              class="pub-figure-card pub-figure-card--row"
             >
               <StaticImage
                 figureId={relId}
@@ -212,5 +211,13 @@ function cleanDisplayText(s: string): string {
     .pub-cta--desktop {
       display: none;
     }
+  }
+  /* Related-figures rows: horizontal card variant (was an inline style,
+     moved to a class so the strict CSP style-src needs no 'unsafe-inline'). */
+  .pub-figure-card.pub-figure-card--row {
+    flex-direction: row;
+    gap: 0.75rem;
+    align-items: center;
+    padding: 0.75rem;
   }
 </style>

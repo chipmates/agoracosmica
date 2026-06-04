@@ -1,6 +1,7 @@
 ---
 import Breadcrumbs from './Breadcrumbs.astro';
 import ThemeCard from './ThemeCard.astro';
+import PublicCTA from './PublicCTA.astro';
 import { getT } from '../i18n';
 import type { Lang } from '../i18n';
 import { THEMES, councilsByTheme } from '@client/data/councilCatalog';
@@ -16,8 +17,13 @@ const t = getT(lang);
   <Breadcrumbs lang={lang} items={[{ label: t('breadcrumbs.themes') }]} />
 
   <h1 class="pub-hero__title">{t('themes.pageTitle')}</h1>
-  <p class="pub-section__text" style="margin-bottom: 2rem">
+  <p class="pub-section__text">
     {t('themes.pageDescription')}
+  </p>
+  <p class="pub-section__text pub-catalog-lead">
+    {lang === 'de'
+      ? 'Öffne ein Thema und entdecke seine Frage und seine Stimmen.'
+      : 'Open any theme to explore its question and voices.'}
   </p>
 
   <div class="pub-grid pub-grid--2">
@@ -29,4 +35,9 @@ const t = getT(lang);
       />
     ))}
   </div>
+  <PublicCTA variant="inline" lang={lang} />
 </div>
+
+<style>
+  .pub-catalog-lead { margin-bottom: 2rem; }
+</style>

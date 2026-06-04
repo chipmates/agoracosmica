@@ -40,7 +40,7 @@ export const getShortDisplayName = (figureId?: string): string => {
     'aurelius': 'Aurelius',
     'austen': 'Austen',
     'beauvoir': 'de Beauvoir',
-    'bingen': 'von Bingen',
+    'bingen': 'Hildegard von Bingen',
     'blake': 'Blake',
     'campbell': 'Campbell',
     'vinci': 'da Vinci',

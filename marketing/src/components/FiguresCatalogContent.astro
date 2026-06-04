@@ -2,6 +2,7 @@
 import Breadcrumbs from './Breadcrumbs.astro';
 import FigureCard from './FigureCard.astro';
 import ContentVolume from './ContentVolume.astro';
+import PublicCTA from './PublicCTA.astro';
 import { getT } from '../i18n';
 import type { Lang } from '../i18n';
 import { getFiguresCatalog } from '@client/data/public/figuresCatalog';
@@ -43,11 +44,21 @@ const figures = [...getFiguresCatalog(lang)].sort((a, b) =>
 
   <h1 class="pub-hero__title">{t('figures.pageTitle')}</h1>
   <ContentVolume lang={lang} />
-  <p class="pub-section__text" style="margin-bottom: 2rem">
+  <p class="pub-section__text">
     {t('figures.pageDescription')}
+  </p>
+  <p class="pub-section__text pub-catalog-lead">
+    {lang === 'de'
+      ? 'Öffne einen Namen und entdecke ihr Leben und ihre Ideen.'
+      : 'Open any name to explore their life and ideas.'}
   </p>
 
   <div class="pub-grid pub-grid--3">
     {figures.map(figure => <FigureCard figure={figure} lang={lang} />)}
   </div>
+  <PublicCTA variant="inline" lang={lang} />
 </div>
+
+<style>
+  .pub-catalog-lead { margin-bottom: 2rem; }
+</style>

@@ -1,6 +1,6 @@
 {
   "nav": {
-    "figures": "Denker",
+    "figures": "Menschen",
     "themes": "Themen",
     "about": "\u00dcber uns",
     "contact": "Kontakt",
@@ -21,7 +21,7 @@
   },
   "breadcrumbs": {
     "home": "Start",
-    "figures": "Denker",
+    "figures": "Menschen",
     "themes": "Themen",
     "about": "\u00dcber uns",
     "contact": "Kontakt"
@@ -30,32 +30,34 @@
     "startConversation": "Sprich mit {name}",
     "learnFrom": "Lerne vom Echo von {name}",
     "trust": "Gemeinnützig · Open Source · Keine Tracking-Cookies, kein Profiling",
+    "freeNote": "30 kostenlose Nachrichten pro Tag. Ohne Anmeldung.",
     "exploreQuestion": "Erkunde diese Frage",
     "startFree": "Jetzt entdecken",
-    "listenDebate": "H\u00f6re diese Debatte",
+    "listenDebate": "Diese Debatte öffnen",
     "exploreTeaching": "Erkunde diese Lehre",
     "showAllTeachings": "Alle 12 Lehren anzeigen",
     "showLess": "Weniger anzeigen",
     "enterCouncil": "Betritt den kosmischen Council",
-    "listenFeaturedDebate": "Höre die empfohlene Debatte"
+    "listenFeaturedDebate": "Erkunde diese Debatte"
   },
   "echo": {
     "figureNote": "{name} begegnet dir hier als Echo. Das ist eine KI-Stimme, geprägt von den eigenen Schriften und Gedanken dieser Persönlichkeit und in ein Gespräch gebracht, das du heute führen kannst. Sie schöpft aus ihrer Philosophie und bleibt doch eine Interpretation, nicht die reale Person und keine Aufnahme.",
     "themeNote": "Die Stimmen hier nennen wir Echos. Jede ist eine KI-Stimme, geprägt von den eigenen Schriften und Gedanken einer historischen Persönlichkeit und in ein Gespräch gebracht, das du heute führen kannst. Sie schöpfen aus echter Philosophie und bleiben doch Interpretationen, nicht die realen Menschen und keine Aufnahmen."
   },
   "figures": {
-    "pageTitle": "30 besondere Pers\u00f6nlichkeiten, von denen du lernen kannst",
-    "pageDescription": "Entdecke Weisheit von 30 besonderen Pers\u00f6nlichkeiten der Geschichte, von Marcus Aurelius bis Frida Kahlo. Lebensgeschichten in Audio, Lehren, Prismen, Councils und Gespr\u00e4che zum Mitmachen.",
+    "pageTitle": "30 bemerkenswerte Menschen, von denen du lernen kannst",
+    "pageDescription": "Entdecke Weisheit von 30 bemerkenswerten Menschen der Geschichte, von Marcus Aurelius bis Frida Kahlo. Lebensgeschichten in Audio, Lehren, Prismen, Councils und Gespr\u00e4che zum Mitmachen.",
     "searchPlaceholder": "Nach Name oder Tradition suchen...",
     "teachings": "Lehren",
     "echoOf": "Echo von",
+    "echoGloss": "Ein KI-Echo, eine Stimme, gepr\u00e4gt von den eigenen Schriften. Eine Deutung, keine Aufnahme.",
     "playIntro": "Intro abspielen",
     "pauseIntro": "Pause",
     "ideasHeading": "Die zwölf Ideen",
     "keyIdeas": "Kernideen im Detail",
     "councilAppearances": "Council-Auftritte",
     "keyConcepts": "Kernkonzepte",
-    "relatedFigures": "Verwandte Denker",
+    "relatedFigures": "Verwandte Menschen",
     "themes": "Themen",
     "audioSample": "H\u00f6rprobe",
     "life": "Leben",
@@ -65,7 +67,7 @@
   },
   "themes": {
     "pageTitle": "Die gro\u00dfen Fragen des Lebens",
-    "pageDescription": "Erkunde die Fragen, die das menschliche Denken seit Jahrhunderten pr\u00e4gen. Vom Sinn des Lebens bis zur Natur der Kreativit\u00e4t, die gr\u00f6\u00dften Denker der Geschichte im Gespr\u00e4ch.",
+    "pageDescription": "Erkunde die Fragen, die das menschliche Denken seit Jahrhunderten pr\u00e4gen. Vom Sinn des Lebens bis zur Natur der Kreativit\u00e4t, bemerkenswerte Menschen der Geschichte im Gespr\u00e4ch.",
     "councils": "Debatten",
     "relatedThemes": "Verwandte Themen",
     "detailEyebrow": "Eine Lebensfrage",
@@ -79,7 +81,7 @@
     "meaning-purpose": {
       "name": "Sinn und Bestimmung",
       "tagline": "Was macht das Leben lebenswert?",
-      "description": "Was macht ein Leben lebenswert? Wie findest du Sinn, wenn die Welt keinen anbietet? Seit Jahrtausenden ringen Denker mit diesen Fragen. Manche fanden Antworten in der Pflicht, andere in der Liebe, wieder andere im einfachen Akt der Aufmerksamkeit. Hier erkunden die gr\u00f6\u00dften Geister der Geschichte, was es hei\u00dft, mit Klarheit und Tiefe zu leben.",
+      "description": "Was macht ein Leben lebenswert? Wie findest du Sinn, wenn die Welt keinen anbietet? Seit Jahrtausenden ringen Denker mit diesen Fragen. Manche fanden Antworten in der Pflicht, andere in der Liebe, wieder andere im einfachen Akt der Aufmerksamkeit. Hier erkunden bemerkenswerte Menschen der Geschichte, was es hei\u00dft, mit Klarheit und Tiefe zu leben.",
       "intro": "Was verwandelt Tage in ein Leben, f\u00fcr das es sich lohnt zu erwachen?\n\nManche Denker antworten von oben. Die kosmische Perspektive, der weite Blick, die gleichg\u00fcltigen Sterne. Marcus Aurelius schrieb seine Selbstbetrachtungen sp\u00e4t in der Nacht zwischen Feldz\u00fcgen und erinnerte sich Tag f\u00fcr Tag daran, dass er und das Reich, das er regierte, einst vergessen sein w\u00fcrden, und dass paradoxerweise genau dieses Erinnern der Ort war, an dem W\u00fcrde beginnt. Der Stoizismus verspricht keinen Sinn. Er verspricht den Mut, sich selbst einen zu schaffen.\n\nAndere finden Sinn im Erwachen statt im Erreichen. Siddhartha Gautama verlie\u00df einen Palast, weil Bequemlichkeit nicht die Antwort war. Er verbrachte Jahre mit dieser Frage, und was zur\u00fcckkam, war eine leisere Behauptung. Das meiste Leiden kommt nicht aus dem, was geschieht, sondern aus der Art, wie wir uns daran klammern, es anders haben zu wollen. Die Vier Edlen Wahrheiten sind keine abstrakte Theologie. Sie sind eine Praxis, eine Art zu sein.\n\nEr betrachtete die Mythen, die sich die Welt \u00fcber alle Kulturen hinweg erz\u00e4hlt hat, und fand eine einzige wiederkehrende Gestalt. Der Held verl\u00e4sst das Vertraute, stellt sich dem Drachen in sich und bringt etwas N\u00fctzliches nach Hause. Auch dein Leben, sagte Campbell, hat diese Gestalt, selbst wenn es sich formlos anf\u00fchlt.\n\nTrunken von dem, was er den Geliebten nannte, schrieb Rumi, dass Bestimmung nichts ist, was man findet, sondern etwas, woran man sich erinnert. Die Rohrfl\u00f6te weint, weil sie aus dem R\u00f6hricht geschnitten wurde. Sinn ist das Heimweh, und der Weg nach Hause f\u00fchrt durch die Liebe.\n\nVier sehr verschiedene Antworten. Stoische Klarheit, buddhistische Losl\u00f6sung, mythische Erz\u00e4hlung, mystische Sehnsucht. Beginne mit der Stimme, die dir heute Abend am n\u00e4chsten ist. Das Gespr\u00e4ch wird dich zu den anderen f\u00fchren."
     },
     "loss-grief": {
@@ -91,7 +93,7 @@
     "who-am-i": {
       "name": "Wer bin ich?",
       "tagline": "Die Frage unter jeder Frage.",
-      "description": "Bevor du entscheiden kannst, was du glaubst oder wie du lebst, stehst du vor einem grundlegenderen R\u00e4tsel: Wer ist es, der entscheidet? Identit\u00e4t ist nicht fest. Sie ver\u00e4ndert sich mit Erfahrung, Kultur und den Geschichten, die du dir selbst erz\u00e4hlst. Die Denker hier erforschten die Grenzen des Selbst und brachten Karten mit, die einen genaueren Blick verdienen.",
+      "description": "Bevor du entscheiden kannst, was du glaubst oder wie du lebst, stehst du vor einem grundlegenderen R\u00e4tsel: Wer ist es, der entscheidet? Identit\u00e4t ist nicht fest. Sie ver\u00e4ndert sich mit Erfahrung, Kultur und den Geschichten, die du dir selbst erz\u00e4hlst. Die Stimmen hier erforschten die Grenzen des Selbst und brachten Karten mit, die einen genaueren Blick verdienen.",
       "intro": "Wer bin ich, unter all den Rollen, die ich spiele? Der Beruf, die Beziehung, der K\u00f6rper, das Land. All die Dinge, mit denen wir uns identifizieren. Wenn man sie abstreift, was bleibt dann?\n\nSie traf eine scharfe Unterscheidung zwischen dem, was uns gegeben ist, und dem, was wir selbst machen. Wir werden in einen K\u00f6rper hineingeboren, in eine Sprache, eine Klasse, ein Geschlecht. In eine Situation. Doch festgelegt sind wir auf diese Dinge nicht. Wir werden durch Wahl. Ihr Buch Das andere Geschlecht war nicht nur Feminismus. Es war eine sorgf\u00e4ltige Studie dar\u00fcber, wie Identit\u00e4t zur Rolle erstarrt, und was es kostet, aus ihr herauszutreten.\n\nEr ging die andere Richtung. Nach innen. Er sagte, das Selbst sei viel gr\u00f6\u00dfer, als das Ich es sich vorstellt. Unter der Oberfl\u00e4che leben Schattenfiguren, tierische Energien, Ahnen, Archetypen. Individuation, sein lebenslanges Werk, ist die geduldige Arbeit, ihnen allen zu begegnen und sie als Teil von dir zuzulassen. Nicht die Persona, sondern das Ganze.\n\nSie beantwortete die Frage mit Farbe. F\u00fcnfundf\u00fcnfzig Selbstportr\u00e4ts in ihrem kurzen Leben. Jedes ein anderer Winkel, eine andere Stimmung, eine andere Maske. Sie verstand, dass ein Selbst nicht eine Sache ist, sondern eine Konstellation, und dass Schmerz ein Gesicht hat, und dass dieses Gesicht dein eigenes ist.\n\nIn den langen S\u00e4tzen von Mrs Dalloway und Zum Leuchtturm zeichnete Virginia Woolf das Bewusstsein nach, wie es sich tats\u00e4chlich bewegt: nicht in geraden Linien, sondern in einem Flackern, in Halbgedanken, in Empfindungen, die aufbl\u00fchen und vergehen. Das Selbst ist f\u00fcr Woolf eher Wetter als Statue, und zu lernen, mit diesem Wetter zu sitzen, ist eine eigene Art von Freiheit.\n\nVier Wege in die Frage hinein. Werden, integrieren, malen, beobachten. W\u00e4hle die T\u00fcr, die sich heute Abend f\u00fcr dich \u00f6ffnet."
     },
     "mind-creativity": {
@@ -121,16 +123,16 @@
     "moral-life": {
       "name": "Das moralische Leben",
       "tagline": "Wie sollen wir leben?",
-      "description": "Ethik handelt nicht von Regeln, sondern davon, was f\u00fcr ein Mensch du durch deine Entscheidungen wirst. Die Denker hier waren sich \u00fcber fast alles uneinig, aber sie teilten eine \u00dcberzeugung: Wie du lebst, ist wichtig. Und es verdient, dass du dar\u00fcber nachdenkst.",
+      "description": "Ethik handelt nicht von Regeln, sondern davon, was f\u00fcr ein Mensch du durch deine Entscheidungen wirst. Die Stimmen hier waren sich \u00fcber fast alles uneinig, aber sie teilten eine \u00dcberzeugung: Wie du lebst, ist wichtig. Und es verdient, dass du dar\u00fcber nachdenkst.",
       "intro": "Jede Philosophie, die ihren Namen verdient, hat versucht, das zu beantworten. Die Stimmen hier waren sich \u00fcber fast alles andere zutiefst uneinig, aber sie teilten eine \u00dcberzeugung: dass die Frage ein ernsthaftes Leben der Aufmerksamkeit verdient.\n\nIn dem Tagebuch, das er nie zu ver\u00f6ffentlichen gedachte, stellte Marcus Aurelius sie sich t\u00e4glich. Seine Antwort waren die vier Tugenden. Weisheit, Gerechtigkeit, Mut, M\u00e4\u00dfigung, ge\u00fcbt in den kleinen Reibereien eines gew\u00f6hnlichen Morgens. Keine heroischen Gesten. Reaktionen auf einen langsamen Diener, eine nervige Sitzung, eine schlechte Nachricht. Ethik ist f\u00fcr die Stoiker ein Handwerk, das man jeden Tag \u00fcbt oder gar nicht.\n\nEr machte sie konkreter und fordernder. Wahrheit ist nichts, das man hat. Sie ist etwas, das man tut. Er glaubte, dass Mittel und Zweck untrennbar sind: Eine friedliche Zukunft l\u00e4sst sich nicht durch gewaltsame Mittel erreichen, weil die Mittel zum Zweck werden. Jede Entscheidung, wie klein auch immer, ist ein Satz in der Geschichte, die man dar\u00fcber schreibt, was m\u00f6glich ist.\n\nEr erbte Gandhis Logik und trug sie weiter, in die Kirche und auf die Stra\u00dfe. Der Bogen des moralischen Universums, sagte er, biegt sich zur Gerechtigkeit hin, aber er biegt sich nicht von selbst. Jede Generation biegt ihn oder l\u00e4sst ihn erschlaffen. Neutralit\u00e4t gibt es nicht.\n\nDreiundzwanzig Jahrhunderte fr\u00fcher er\u00f6ffnete Platon das Gespr\u00e4ch im Westen. Der Staat fragt, was Gerechtigkeit ist, und antwortet: kein Tauschgesch\u00e4ft, kein Vertrag, sondern eine Art innerer Harmonie. Der gerechte Mensch ist nicht der, der die Regeln befolgt. Es ist der, in dem die Teile der Seele richtig geordnet sind. \u00c4u\u00dfere Gerechtigkeit spiegelt innere Gerechtigkeit, oder sie ist hohl.\n\nEr schlug einen Achtfachen Pfad vor: rechte Ansicht, rechte Absicht, rechte Rede, rechte Handlung, rechter Lebenserwerb, rechte Anstrengung, rechte Achtsamkeit, rechte Konzentration. Keine Gebote, sondern Beschreibungen. Davon, wie ein Leben aussieht, das nicht mehr im Krieg mit sich selbst ist.\n\nF\u00fcnf Antworten, alle lebendig, alle fordernd. W\u00e4hle die, die etwas von dir verlangt."
     }
   },
   "about": {
     "pageTitle": "\u00dcber Agora Cosmica",
-    "pageDescription": "Eine gemeinn\u00fctzige Open-Source-Weisheitsplattform mit 30 besonderen Pers\u00f6nlichkeiten der Geschichte. Agora Cosmica bringt ihre Stimmen in den Dialog.",
+    "pageDescription": "Eine gemeinn\u00fctzige Open-Source-Weisheitsplattform mit 30 bemerkenswerten Menschen der Geschichte. Agora Cosmica bringt ihre Stimmen in den Dialog.",
     "mission": "Eine lebendige Bibliothek, mit der du sprechen kannst",
     "missionTitle": "Unsere Mission",
-    "missionStatement": "Agora Cosmica ist ein Projekt der ChipMates gemeinnützige GmbH, einer kleinen gemeinnützigen Organisation aus Freiburg im Breisgau. Wir arbeiten daran, Weisheit aus der Geschichte für alle zugänglich zu machen, befreit von akademischen Barrieren, Bezahlschranken und Werbung.\n\nDie Plattform bringt 30 besondere Persönlichkeiten aus Philosophie, Wissenschaft, Mystik, Kunst und Aktivismus zusammen und öffnet eine Tür für jeden, mit Weisheitstraditionen die eigene Reise zu beginnen.",
+    "missionStatement": "Agora Cosmica ist ein Projekt der ChipMates gemeinnützige GmbH, einer kleinen gemeinnützigen Organisation aus Freiburg im Breisgau. Wir arbeiten daran, Weisheit aus der Geschichte für alle zugänglich zu machen, befreit von akademischen Barrieren, Bezahlschranken und Werbung.\n\nDie Plattform bringt 30 bemerkenswerte Menschen aus Philosophie, Wissenschaft, Mystik, Kunst und Aktivismus zusammen und öffnet eine Tür für jeden, mit Weisheitstraditionen die eigene Reise zu beginnen.",
     "organizationTitle": "Über die Organisation",
     "organizationStatement": "ChipMates wurde 2023 als GmbH gegründet und erhielt 2025 den gemeinnützigen Status. Eingetragen mit HRB 728848 beim Amtsgericht Freiburg. Satzungsmäßiger Zweck: Förderung der Bildung. Die Plattform Agora Cosmica ist weltweit verfügbar und Open Source unter der AGPL-3.0.",
     "valuesTitle": "Unsere Werte",
@@ -141,7 +143,7 @@
     "promiseTitle": "Unser Versprechen",
     "promiseStatement": "Wir stehen am Anfang dieser Reise und wir werden Fehler machen. Wenn wir vereinfachen, falsch darstellen oder das Wesentliche verfehlen, schreib uns an agoracosmica@chipmates.ai. Wir bauen das nicht für dich, sondern mit dir.",
     "barriersTitle": "Barrieren abbauen",
-    "barriersIntro": "Die Ideen der größten Denker der Geschichte gehören allen.",
+    "barriersIntro": "Die Ideen bemerkenswerter Menschen der Geschichte gehören allen.",
     "barrierGeographic": "Geografisch: Weltweit verfügbar, rund um die Uhr.",
     "barrierAcademic": "Akademisch: Keine Vorkenntnisse erforderlich.",
     "barrierAge": "Alter: Willkommen für alle ab 16 Jahren.",
@@ -152,23 +154,23 @@
     "closingAttribution": "Rumi",
     "whatYoullFind": {
       "title": "Was dich erwartet",
-      "p1": "30 besondere Pers\u00f6nlichkeiten aus der Geschichte, jede mit eigener Stimme. Von Marcus Aurelius bis Frida Kahlo, von Rumi bis Virginia Woolf. Wenn sie sprechen, sch\u00f6pfen sie aus ihrer echten Philosophie, ihren realen Lebenserfahrungen und den Ideen, die sie ihr ganzes Leben lang entwickelt haben.",
+      "p1": "30 bemerkenswerte Menschen aus der Geschichte, jeder mit eigener Stimme. Von Marcus Aurelius bis Frida Kahlo, von Rumi bis Virginia Woolf. Wenn sie sprechen, sch\u00f6pfen sie aus ihrer echten Philosophie, ihren realen Lebenserfahrungen und den Ideen, die sie ihr ganzes Leben lang entwickelt haben.",
       "p2": "Jede Stimme basiert auf Hauptwerken, historischem Kontext und gegengepr\u00fcften Quellen. Die Echos sind KI-erzeugt, ihre Worte variieren. Das Quellmaterial bleibt. Wo die Erz\u00e4hlung \u00fcber das Dokumentierte hinausgeht, benennt der Faktencheck, was nachgebildet ist.",
       "p3": "360 erz\u00e4hlte Geschichtskapitel, 360 Kernlehren, 360 Prisma-Dialoge aus mehreren Perspektiven, 110 produzierte Council-Debatten, eine vollst\u00e4ndige Audiothek und eigene Councils, bei denen du die Teilnehmer w\u00e4hlst. Mit kostenlosen t\u00e4glichen Gespr\u00e4chen zum Einstieg."
     },
     "howItWorks": {
       "title": "So funktioniert es",
-      "subtitle": "Jede Pers\u00f6nlichkeit bietet einen strukturierten Lernweg \u00fcber verschiedene Modi.",
+      "subtitle": "Jeder Mensch bietet einen strukturierten Lernweg \u00fcber verschiedene Modi.",
       "story": "H\u00f6re eine 12-teilige erz\u00e4hlte Lebensgeschichte. Jede Geschichte ist faktengepr\u00fcft und behandelt die Momente, die ihr Denken gepr\u00e4gt haben.",
       "wisdom": "W\u00e4hle eine von 12 Kernlehren und f\u00fchre ein gef\u00fchrtes Gespr\u00e4ch dar\u00fcber. Die Antwort ist in ihrer echten Philosophie verankert.",
       "prism": "H\u00f6re vier verschiedene Stimmen, die ein einzelnes Thema aus ihren jeweiligen Perspektiven besprechen. Ein Dialog aus mehreren Blickwinkeln, den du wie einen Podcast h\u00f6ren kannst.",
       "quest": "Teste dein Verst\u00e4ndnis in einer sokratischen Herausforderung. Vier Fragen, die tiefer gehen als Oberfl\u00e4chenwissen.",
       "freetalk": "Frage alles. Offenes Gespr\u00e4ch, das aus der gesamten Philosophie und Pers\u00f6nlichkeit sch\u00f6pft.",
-      "council": "H\u00f6re produzierte Debatten zwischen besonderen Pers\u00f6nlichkeiten \u00fcber die gr\u00f6\u00dften Fragen des Lebens. 55 vorproduzierte Debatten zu 8 Themen. Oder erstelle deinen eigenen Council mit den Teilnehmern deiner Wahl.",
+      "council": "H\u00f6re produzierte Debatten zwischen bemerkenswerten Menschen \u00fcber die gr\u00f6\u00dften Fragen des Lebens. 55 vorproduzierte Debatten zu 8 Themen. Oder erstelle deinen eigenen Council mit den Teilnehmern deiner Wahl.",
       "audioLibrary": "Jede Geschichte, jedes Prisma und jede Council-Debatte ist in einer vollst\u00e4ndigen Audiothek verf\u00fcgbar. H\u00f6re unterwegs, mach weiter, wo du aufgeh\u00f6rt hast."
     },
     "figures": {
-      "title": "Die 30 Pers\u00f6nlichkeiten",
+      "title": "Die 30 Menschen",
       "description": "Von antiken Philosophen bis zu modernen K\u00fcnstlern, von \u00f6stlichen Weisen bis zu westlichen Wissenschaftlern. Jede mit eigener Stimme, eigener Geschichte und 12 Kernlehren, die du entdecken kannst."
     },
     "builtDifferent": {
@@ -206,7 +208,7 @@
     "prismLine": "Höre, wie vier Stimmen dieselbe Idee wenden.",
     "questLine": "Eine kurze Prüfung. Bestehst du sie, gehört die Idee dir.",
     "storyDuration": "~13 Min",
-    "aside": "Zwölf Ideen, vier Schritte je. Free Talk steht neben dem Weg für offene Fragen, und ein Council bringt vier Persönlichkeiten in eine große Debatte.",
+    "aside": "Zwölf Ideen, vier Schritte je. Free Talk steht neben dem Weg für offene Fragen, und ein Council bringt vier Menschen in eine große Debatte.",
     "nudge": "Neu hier? Beginne mit der ersten Story.",
     "title": "Dein Weg mit {name}",
     "chapters": "Kapitel",
@@ -227,7 +229,7 @@
     "modeCouncil": "Cosmic Council"
   },
   "search": {
-    "noResults": "Keine Pers\u00f6nlichkeiten gefunden f\u00fcr \"{query}\"."
+    "noResults": "Keine Menschen gefunden f\u00fcr \"{query}\"."
   },
   "story": {
     "title": "Die Geschichte von {name}",

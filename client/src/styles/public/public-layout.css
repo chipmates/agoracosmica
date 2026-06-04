@@ -2,14 +2,20 @@
    Uses existing CSS variables from index.css
    Remove this file when stripping marketing pages from a fork */
 
-/* Override SPA's overflow:hidden for public pages */
+/* Override SPA's overflow:hidden for public pages. Clip the horizontal axis so
+   the ~scrollbar-width overflow from 100vw full-bleed breakouts (.ll2-cosmic,
+   the observatory hero) doesn't produce a desktop horizontal scrollbar. `clip`
+   (not `hidden`) keeps the page from becoming a scroll container, so
+   position:sticky still works; overflow-y stays visible for normal scrolling. */
 html:has(.public-page) {
-  overflow: visible;
+  overflow-x: clip;
+  overflow-y: visible;
   height: auto;
 }
 
 html:has(.public-page) body {
-  overflow: visible;
+  overflow-x: clip;
+  overflow-y: visible;
   height: auto;
 }
 
@@ -379,6 +385,17 @@ html:has(.public-page) #root {
 
 .pub-cta__button:active {
   transform: scale(0.98);
+}
+
+/* Narrow phones (iPhone SE class, <=360px): let long CTA labels wrap to two
+   lines instead of overflowing the pill. The button stays >=44px via
+   min-height and tightens its side padding to give the text more room. */
+@media (max-width: 360px) {
+  .pub-cta__button {
+    white-space: normal;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
 }
 
 /* ─── Mobile ─── */

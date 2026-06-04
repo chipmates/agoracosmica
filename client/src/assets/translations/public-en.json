@@ -30,14 +30,15 @@
     "startConversation": "Start a conversation with {name}",
     "learnFrom": "Learn from Echo of {name}",
     "trust": "Nonprofit · Open Source · No tracking cookies, no profiling",
+    "freeNote": "30 free messages a day. No signup needed.",
     "exploreQuestion": "Explore this question",
-    "startFree": "Start exploring",
-    "listenDebate": "Listen to this debate",
+    "startFree": "Start Exploring",
+    "listenDebate": "Open this debate",
     "exploreTeaching": "Explore this teaching",
     "showAllTeachings": "Show all 12 teachings",
     "showLess": "Show less",
     "enterCouncil": "Enter the Cosmic Council",
-    "listenFeaturedDebate": "Listen to the featured debate"
+    "listenFeaturedDebate": "Explore this debate"
   },
   "echo": {
     "figureNote": "{name} here is what we call an echo. It's an AI voice shaped by their own writing and ideas, brought into a conversation you can have today. It draws on their philosophy, and it stays an interpretation, not the real person and not a recording.",
@@ -49,6 +50,7 @@
     "searchPlaceholder": "Search by name or tradition...",
     "teachings": "Teachings",
     "echoOf": "Echo of",
+    "echoGloss": "An AI Echo, a voice shaped from their own writing. An interpretation, not a recording.",
     "playIntro": "Play intro",
     "pauseIntro": "Pause",
     "ideasHeading": "The twelve ideas",
@@ -65,7 +67,7 @@
   },
   "themes": {
     "pageTitle": "Life's Biggest Questions",
-    "pageDescription": "Explore the questions that have shaped human thought for centuries. From the meaning of life to the nature of creativity, hear history's greatest minds debate.",
+    "pageDescription": "Explore the questions that have shaped human thought for centuries. From the meaning of life to the nature of creativity, hear remarkable people across history debate.",
     "councils": "debates",
     "relatedThemes": "Related Themes",
     "curatedWisdom": "Curated Wisdom",
@@ -79,7 +81,7 @@
     "meaning-purpose": {
       "name": "Meaning and Purpose",
       "tagline": "What makes a life worth living?",
-      "description": "What makes a life worth living? How do you find purpose when the world offers none? For thousands of years, thinkers have wrestled with these questions. Some found answers in duty, others in love, still others in the simple act of paying attention. Here, the greatest minds across history explore what it means to live with clarity and depth.",
+      "description": "What makes a life worth living? How do you find purpose when the world offers none? For thousands of years, thinkers have wrestled with these questions. Some found answers in duty, others in love, still others in the simple act of paying attention. Here, remarkable people across history explore what it means to live with clarity and depth.",
       "intro": "What turns days into a life worth waking up for?\n\nSome thinkers answer this from above. The cosmic perspective, the long view, the indifferent stars. Marcus Aurelius wrote his Meditations late at night between military campaigns, reminding himself daily that he and the empire he ruled would all be forgotten, and that this remembering, paradoxically, was where dignity began. Stoicism does not promise meaning. It promises the courage to make some yourself.\n\nOthers find meaning in awakening rather than achievement. Siddhartha Gautama walked away from a palace because comfort was not the answer. He spent years on the question, and what came back was a quieter claim: most of our suffering is not from what happens but from how we cling to wanting it otherwise. The Four Noble Truths are not abstract theology. They are a practice, a way of being.\n\nHe looked at the myths the world has told itself across cultures and found a single recurring shape: the hero leaves the familiar, faces the dragon within, and brings something useful home. Your life, Campbell said, has this shape too, even when it feels formless.\n\nDrunk on what he called the Beloved, Rumi wrote that purpose is not something to find but something to remember. The reed flute cries because it has been cut from the reed bed. Meaning is the homesickness, and the way home is through love.\n\nFour very different answers. Stoic clarity, Buddhist release, mythic narrative, mystical longing. Start with whichever voice feels closest tonight. The conversation will lead you to the others."
     },
     "loss-grief": {
@@ -91,7 +93,7 @@
     "who-am-i": {
       "name": "Who Am I?",
       "tagline": "The question beneath every question.",
-      "description": "Before you can decide what to believe or how to live, you face a more basic puzzle: who is the one deciding? Identity is not fixed. It shifts with experience, culture, and the stories you tell yourself. The thinkers here explored the boundaries of the self and came back with maps worth studying.",
+      "description": "Before you can decide what to believe or how to live, you face a more basic puzzle: who is the one deciding? Identity is not fixed. It shifts with experience, culture, and the stories you tell yourself. The voices here explored the boundaries of the self and came back with maps worth studying.",
       "intro": "Who am I, beneath the roles I play? The job, the relationship, the body, the country. All the things we use to identify ourselves. When those are stripped away, what remains?\n\nShe made a sharp distinction between what we are given and what we make. We are born into a body, a language, a class, a gender. A situation. But we are not those things finally. We become through choice. Her book The Second Sex was not just feminism. It was a careful study of how identity calcifies into role, and what it costs to step out.\n\nHe went the other direction. Inward. He said the self is much larger than the ego thinks. Below the surface live shadow figures, animal energies, ancestors, archetypes. Individuation, his lifelong work, is the patient labor of meeting all of these and letting them be part of you. Not the persona, but the whole.\n\nShe answered the question with paint. Fifty-five self-portraits across her short life. Each one a different angle, a different mood, a different mask. She understood that a self is not one thing but a constellation, and that pain has a face, and that face is yours.\n\nIn the long sentences of Mrs Dalloway and To the Lighthouse, Virginia Woolf traced consciousness as it actually moves: not in straight lines but in flickers, half-thoughts, sensations that bloom and fade. The self for Woolf is more like weather than statue, and learning to sit with that weather is its own kind of freedom.\n\nFour ways into the question. Becoming, integrating, painting, observing. Pick the door that opens for you tonight."
     },
     "mind-creativity": {
@@ -121,7 +123,7 @@
     "moral-life": {
       "name": "The Moral Life",
       "tagline": "How should we live?",
-      "description": "Ethics is not about rules. It is about the kind of person you become through your choices. The thinkers here disagreed about almost everything, but they shared one conviction: how you live matters, and it deserves serious thought.",
+      "description": "Ethics is not about rules. It is about the kind of person you become through your choices. The voices here disagreed about almost everything, but they shared one conviction: how you live matters, and it deserves serious thought.",
       "intro": "Every philosophy worth its name has tried to answer this. The voices here disagreed sharply about almost everything else, but they shared one conviction: that the question deserves a serious life of attention.\n\nIn the journal he never meant to publish, Marcus Aurelius asked it daily. His answer was the four virtues. Wisdom, justice, courage, temperance, practiced in the small frictions of an ordinary morning. Not heroic gestures. Reactions to a slow servant, an annoying meeting, a piece of bad news. Ethics, for the Stoics, is a craft you practice every day or not at all.\n\nHe made it more concrete and more demanding. Truth is not something you have. It is something you do. He believed that means and ends are inseparable: you cannot reach a peaceful future through violent means, because the means become the end. Every choice, however small, is a sentence in the story you are writing about what is possible.\n\nHe inherited Gandhi's logic and pushed it further into the church and the streets. The arc of the moral universe, he said, bends toward justice, but it doesn't bend on its own. Each generation either bends it or lets it slacken. There is no neutral.\n\nTwenty-three centuries earlier, Plato started the conversation in the West. The Republic asks what justice is and answers: not a transaction, not a contract, but a kind of inner harmony. The just person is not the one who follows the rules. It is the one in whom the parts of the soul are properly ordered. Outer justice mirrors inner justice or it is hollow.\n\nHe proposed an Eightfold Path: right view, right intention, right speech, right action, right livelihood, right effort, right mindfulness, right concentration. Not commandments, but descriptions. Of what a life that is no longer at war with itself looks like.\n\nFive answers, all alive, all demanding. Pick the one that asks something of you."
     }
   },
@@ -141,7 +143,7 @@
     "promiseTitle": "Our Promise",
     "promiseStatement": "We're early in this journey and we'll make mistakes. When we oversimplify, misrepresent, or miss the mark, tell us at agoracosmica@chipmates.ai. We're not building for you, but with you.",
     "barriersTitle": "Breaking Down Barriers",
-    "barriersIntro": "The ideas of history's greatest minds belong to everyone.",
+    "barriersIntro": "The ideas of history's most remarkable people belong to everyone.",
     "barrierGeographic": "Geographic: Available worldwide, around the clock.",
     "barrierAcademic": "Academic: No prerequisites needed.",
     "barrierAge": "Age: Welcoming readers 16 and up.",
