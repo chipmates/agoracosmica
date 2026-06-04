@@ -36,7 +36,11 @@ Agora Cosmica is a Living Library for wisdom from history. Thirty extraordinary 
 30 free messages a day, no signup required. Bilingual English and German. On the path to community-driven development: anyone can vote on what gets added next, right inside the app.
 
 <p align="center">
-  <img src=".github/assets/screenshots/council-moderator.webp" alt="Cosmic Council composer: select a moderator and three figures from across history to convene in dialogue" width="100%" />
+  <strong>Try it, no signup: <a href="https://agoracosmica.org">agoracosmica.org</a></strong>
+</p>
+
+<p align="center">
+  <a href="https://agoracosmica.org"><img src=".github/assets/demo.webp" alt="Agora Cosmica in action: choose a figure, move through Story and Wisdom, listen to a narrated chapter, and convene a council of four" width="100%" /></a>
 </p>
 
 ---
@@ -63,7 +67,7 @@ Each interaction in Agora Cosmica orbits one figure. The four educational chapte
 - **Open source under AGPL-3.0**: every claim verifiable by reading the code.
 - **Built on learning science**: the 4-chapter arc is informed by Kolb's experiential cycle, Bloom's taxonomy, and retrieval practice.
 
-**Private by design**
+**Privacy by design**
 - **BYOK encryption**: bring your own OpenRouter key, encrypted locally with AES-256-GCM, never stored on our servers.
 - **Free tier without signup**: 30 messages a day via our Cloudflare Worker, no account required.
 - **No user tracking**: no tracking cookies, no third-party analytics, no per-request access logs of our own, no IP retention in analytics, no cross-session profiles. We do collect anonymous aggregate counters to keep the service running and improve it. [docs/MEASUREMENT.md](docs/MEASUREMENT.md) lists exactly what gets counted, what never does, and the one exception we name upfront: for visitors who arrive from a Google ad and opt in, we forward the Google click ID (gclid) to Google Ads so the ad can be matched to a conversion.
