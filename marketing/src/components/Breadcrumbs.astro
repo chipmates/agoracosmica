@@ -1,12 +1,13 @@
 ---
-// Breadcrumb navigation + matching BreadcrumbList JSON-LD. The JSON-LD goes
-// directly under the breadcrumb nav so structured-data validators can scan
-// it alongside the visible markup.
+// Breadcrumb navigation (visible markup only). The BreadcrumbList JSON-LD is
+// emitted by each page template via the `schemas` prop, so this component must
+// NOT emit its own: doing so produced a second, conflicting BreadcrumbList on
+// every figure/theme/catalog page (the template's was correct and complete;
+// this one dropped the leaf and pointed Home at /figures).
 
 import { getT } from '../i18n';
 import type { Lang } from '../i18n';
-import { publicUrl, canonicalUrl } from '../lib/urls';
-import { breadcrumbSchema } from '../lib/schemas';
+import { publicUrl } from '../lib/urls';
 
 export interface BreadcrumbItem {
   label: string;
@@ -23,18 +24,10 @@ const { items, lang } = Astro.props;
 const t = getT(lang);
 
 const allItems: BreadcrumbItem[] = [
-  { label: t('breadcrumbs.home'), path: '/figures' },
+  { label: t('breadcrumbs.home'), path: '/' },
   ...items,
 ];
-
-const schemaItems = allItems
-  .filter(item => item.path)
-  .map(item => ({
-    name: item.label,
-    url: canonicalUrl(publicUrl(lang, item.path!)),
-  }));
 ---
-<script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema(schemaItems))} />
 <nav aria-label="Breadcrumb" class="pub-breadcrumbs">
   <ol>
     {allItems.map((item, i) => (

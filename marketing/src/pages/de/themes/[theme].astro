@@ -5,6 +5,7 @@ import ThemeDetailContent from '../../../components/ThemeDetailContent.astro';
 import { getT } from '../../../i18n';
 import { articleSchema, breadcrumbSchema } from '../../../lib/schemas';
 import { canonicalUrl, publicUrl, SITE_URL, MEDIA_URL } from '../../../lib/urls';
+import { themeContentLastmod } from '../../../lib/lastmod';
 import { THEMES, type ThemeId } from '@client/data/councilCatalog';
 
 const THEME_OG_FIGURE: Record<string, string> = {
@@ -19,7 +20,6 @@ const THEME_OG_FIGURE: Record<string, string> = {
 };
 
 const LAUNCH_DATE = '2026-05-06';
-const TODAY = new Date().toISOString().split('T')[0];
 
 export async function getStaticPaths() {
   return THEMES.map(theme => ({
@@ -33,7 +33,6 @@ const { themeId } = Astro.props as { themeId: ThemeId };
 
 const t = getT(lang);
 const themeName = t(`themes.${themeId}.name`);
-const themeTagline = t(`themes.${themeId}.tagline`);
 const themeDescription = t(`themes.${themeId}.description`);
 
 const ogFigureId = THEME_OG_FIGURE[themeId];
@@ -50,7 +49,7 @@ const schemas = [
     lang,
     image: themeOgImage,
     datePublished: LAUNCH_DATE,
-    dateModified: TODAY,
+    dateModified: themeContentLastmod(),
   }),
   breadcrumbSchema([
     { name: t('breadcrumbs.home'), url: `${SITE_URL}/de/` },
@@ -60,7 +59,7 @@ const schemas = [
 ];
 ---
 <Public
-  title={`${themeName} - ${themeTagline}`}
+  title={themeName}
   description={themeDescription.slice(0, 160)}
   canonicalPath={`/themes/${themeId}`}
   lang={lang}

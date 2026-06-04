@@ -2,7 +2,8 @@
 import Public from '../../layouts/Public.astro';
 import ContactContent from '../../components/ContactContent.astro';
 import { getT } from '../../i18n';
-import { organizationSchema } from '../../lib/schemas';
+import { organizationSchema, breadcrumbSchema } from '../../lib/schemas';
+import { SITE_URL } from '../../lib/urls';
 
 const lang = 'de' as const;
 const t = getT(lang);
@@ -22,7 +23,13 @@ const contactSchema = {
   description={t('contact.pageDescription')}
   canonicalPath="/contact"
   lang={lang}
-  schemas={[contactSchema]}
+  schemas={[
+    contactSchema,
+    breadcrumbSchema([
+      { name: t('breadcrumbs.home'), url: `${SITE_URL}/de/` },
+      { name: t('breadcrumbs.contact'), url: `${SITE_URL}/de/contact` },
+    ]),
+  ]}
 >
   <ContactContent lang={lang} />
 </Public>

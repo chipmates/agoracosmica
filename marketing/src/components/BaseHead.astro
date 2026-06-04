@@ -57,6 +57,17 @@ const alts = alternateUrls(canonicalPath);
 const image = ogImage ?? `${MEDIA_URL}/images/ui/og-default/1200.webp`;
 const rss = includeRss ? podcastRssLink(lang) : null;
 const ogLocale = lang === 'de' ? 'de_DE' : 'en_US';
+
+// Keep meta/og/twitter descriptions inside the ~160-char SERP + social-card
+// budget. Some hand-written figure descriptions run to 188 chars, which Google
+// truncates anyway, so trim at a word boundary and mark it with an ellipsis.
+function clampDescription(text: string, max = 160): string {
+  if (text.length <= max) return text;
+  const slice = text.slice(0, max - 1);
+  const lastSpace = slice.lastIndexOf(' ');
+  return (lastSpace > 0 ? slice.slice(0, lastSpace) : slice).trimEnd() + '…';
+}
+const metaDescription = clampDescription(description);
 ---
 <meta charset="utf-8" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -71,7 +82,7 @@ const ogLocale = lang === 'de' ? 'de_DE' : 'en_US';
 <meta name="age-de-meta-label" content="age=16 hash: v=1.0 kind=sl protocol=all" />
 
 <title>{computedFullTitle}</title>
-<meta name="description" content={description} />
+<meta name="description" content={metaDescription} />
 <link rel="canonical" href={canonical} />
 {!noHreflang && (
   <>
@@ -82,7 +93,7 @@ const ogLocale = lang === 'de' ? 'de_DE' : 'en_US';
 )}
 
 <meta property="og:title" content={computedFullTitle} />
-<meta property="og:description" content={description} />
+<meta property="og:description" content={metaDescription} />
 <meta property="og:url" content={canonical} />
 <meta property="og:type" content={ogType} />
 <meta property="og:image" content={image} />
@@ -90,7 +101,7 @@ const ogLocale = lang === 'de' ? 'de_DE' : 'en_US';
 <meta property="og:locale" content={ogLocale} />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content={computedFullTitle} />
-<meta name="twitter:description" content={description} />
+<meta name="twitter:description" content={metaDescription} />
 <meta name="twitter:image" content={image} />
 
 {rss && (

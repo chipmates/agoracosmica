@@ -8,7 +8,9 @@ import {
   webSiteSchema,
   softwareApplicationSchema,
   podcastSeriesSchema,
+  breadcrumbSchema,
 } from '../lib/schemas';
+import { SITE_URL } from '../lib/urls';
 
 const lang = 'en' as const;
 const t = getT(lang);
@@ -26,6 +28,10 @@ const t = getT(lang);
     webSiteSchema(),
     softwareApplicationSchema(),
     podcastSeriesSchema(lang),
+    breadcrumbSchema([
+      { name: t('breadcrumbs.home'), url: `${SITE_URL}/` },
+      { name: t('breadcrumbs.about'), url: `${SITE_URL}/about` },
+    ]),
   ]}
 >
   <AboutContent lang={lang} />
