@@ -1694,6 +1694,7 @@ async function loadOverview() {
   };
   var allPaths = rows(r[26]);
   var marketingArrivals = 0;
+  var appArrivalsFromPaths = 0;
   var topMarketingPages = [];
   for (var i = 0; i < allPaths.length; i++) {
     var pathRow = allPaths[i];
@@ -1709,6 +1710,10 @@ async function loadOverview() {
       // datenschutz + their /de/ variants) so the chart reflects total marketing-
       // page traffic. Labels are computed in the topMarketingItems map below.
       topMarketingPages.push(pathRow);
+    } else {
+      // Non-marketing paths (/app + SPA routes) are the App stage, summed from
+      // the SAME query as Marketing so the two are always mutually consistent.
+      appArrivalsFromPaths += Number(pathRow.c) || 0;
     }
   }
   topMarketingPages.sort(function(a, b) { return b.c - a.c; });
@@ -1724,6 +1729,7 @@ async function loadOverview() {
   // period) so the funnel can draw a ghost bar behind each stage. MARKETING_*
   // and arrivalsPrev are already in scope above.
   var marketingArrivalsPrev = 0;
+  var appArrivalsPrev = 0;
   for (var pi = 0; pi < prevPaths.length; pi++) {
     var pp2 = String(prevPaths[pi].path || '');
     var isMkt2 = false;
@@ -1732,15 +1738,21 @@ async function loadOverview() {
     }
     if (!isMkt2 && MARKETING_EXACT[pp2]) isMkt2 = true;
     if (isMkt2) marketingArrivalsPrev += Number(prevPaths[pi].c) || 0;
+    else appArrivalsPrev += Number(prevPaths[pi].c) || 0;
   }
-  var appArrivalsPrev = Math.max(0, arrivalsPrev - marketingArrivalsPrev);
   // Engagement endpoints (parallel from Sessions): content played + chat sent.
   // Content Started total is derived from the existing contentByType breakdown
   // (saves one query). Content Completed and Chat-by-Mode are new dedicated queries.
   var contentStarted = contentByType.reduce(function(acc, row) { return acc + (Number(row.c) || 0); }, 0);
   var contentCompleted = val(r[28]);
   var chatByMode = rows(r[29]);
-  var appArrivals = Math.max(0, arrivals - marketingArrivals);
+  // App arrivals come from the SAME path-breakdown query as Marketing (above),
+  // NOT from subtracting the independent total-arrivals COUNT. Analytics Engine
+  // is eventually consistent across queries, so total-arrivals could briefly read
+  // lower than marketing-arrivals and clamp App to 0 ("Marketing 560, App 0,
+  // Entry 20" — an impossible funnel that self-healed on the next refresh). Same
+  // query in, same query out: Marketing and App can never disagree now.
+  var appArrivals = appArrivalsFromPaths;
   // bouncePct/bounceSub removed with the Arrivals hero KPI — the metric mixed
   // marketing-page bounces and login-page bounces into a single misleading
   // percentage. Per-stage drop-off lives in the Funnel below.
