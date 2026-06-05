@@ -44,25 +44,11 @@ Agora Cosmica is a Living Library for wisdom from history. Thirty extraordinary 
   <a href="https://agoracosmica.org"><img src=".github/assets/demo.webp" alt="Agora Cosmica in action: choose a figure, move through Story and Wisdom, listen to a narrated chapter, and convene a council of four" width="100%" /></a>
 </p>
 
-<details>
-<summary>🔊 <strong>Hear the self-hosted Echo voices</strong> (AI Echoes, about 10 seconds each)</summary>
-
-**Nietzsche** (German, Qwen3-TTS, voice: Solaris)
-
-https://github.com/user-attachments/assets/4dfe6417-9bff-49d2-909e-6ba6c821704a
-
-**Hildegard von Bingen** (German, Qwen3-TTS, voice: Lyra)
-
-https://github.com/user-attachments/assets/a1a33adf-85c2-4d30-8323-21da3165918e
-
-**Shakespeare** (English, Kokoro, voice: Orion, an am_michael + af_heart blend)
-
-https://github.com/user-attachments/assets/b984a440-ba79-48a3-ad06-865bb0052727
-
-**Ada Lovelace** (English, Kokoro, voice: Stella)
-
-https://github.com/user-attachments/assets/138df01e-627f-48e2-9ced-c7c6317a7b4b
-</details>
+<p align="center">
+  <sub>🔊 <strong>Hear the self-hosted Echo voices</strong> (AI Echoes, about 10 seconds each)</sub><br/>
+  <sub>German, Qwen3-TTS: <a href=".github/assets/audio/echo-nietzsche-de.mp3">Nietzsche (Solaris)</a> · <a href=".github/assets/audio/echo-hildegard-de.mp3">Hildegard von Bingen (Lyra)</a></sub><br/>
+  <sub>English, Kokoro: <a href=".github/assets/audio/echo-shakespeare-en.mp3">Shakespeare (Orion blend)</a> · <a href=".github/assets/audio/echo-lovelace-en.mp3">Ada Lovelace (Stella)</a></sub>
+</p>
 
 ---
 
