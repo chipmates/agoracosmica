@@ -44,6 +44,12 @@ Agora Cosmica is a Living Library for wisdom from history. Thirty extraordinary 
   <a href="https://agoracosmica.org"><img src=".github/assets/demo.webp" alt="Agora Cosmica in action: choose a figure, move through Story and Wisdom, listen to a narrated chapter, and convene a council of four" width="100%" /></a>
 </p>
 
+<p align="center">
+  <sub><strong>🔊 Hear the self-hosted Echo voices</strong> (about 10 seconds each)</sub><br/>
+  <sub>German, Qwen3-TTS: <a href=".github/assets/audio/echo-nietzsche-de.webm">Nietzsche (voice: Solaris)</a> · <a href=".github/assets/audio/echo-hildegard-de.webm">Hildegard von Bingen (voice: Lyra)</a></sub><br/>
+  <sub>English, Kokoro: <a href=".github/assets/audio/echo-shakespeare-en.webm">Shakespeare (voice: Orion, an am_michael + af_heart blend)</a> · <a href=".github/assets/audio/echo-lovelace-en.webm">Ada Lovelace (voice: Stella)</a></sub>
+</p>
+
 ---
 
 ## How it works
