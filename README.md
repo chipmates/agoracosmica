@@ -53,7 +53,7 @@ https://github.com/user-attachments/assets/4dfe6417-9bff-49d2-909e-6ba6c821704a
 
 **Hildegard von Bingen** (German, Qwen3-TTS, voice: Lyra)
 
-https://github.com/user-attachments/assets/89aacc4d-3763-4586-a9d3-3c8d1fd1279b
+https://github.com/user-attachments/assets/a1a33adf-85c2-4d30-8323-21da3165918e
 
 **Shakespeare** (English, Kokoro, voice: Orion, an am_michael + af_heart blend)
 
