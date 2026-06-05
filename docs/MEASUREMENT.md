@@ -2,7 +2,7 @@
 
 We don't track users. We do count aggregate events. That's how we know if the service is working, where it breaks, and whether our nonprofit outreach actually reaches anyone.
 
-One exception we name upfront: visitors who arrive via a Google ad carry a per-click identifier (`gclid`) in the URL. If such a visitor opts in, we forward that `gclid` to Google Ads when they reach a conversion step, so the ad can be matched to a conversion. Nothing is sent without that opt-in. On the browser the gclid lives in sessionStorage (tab-scoped) and is never written into our own analytics counters. The full mechanics, including exactly what reaches Google, are below.
+One exception we name upfront: visitors who arrive via one of our free nonprofit (Google Ad Grants) ads carry a per-click identifier (`gclid`) in the URL. If such a visitor opts in, we forward that `gclid` to Google Ads when they reach a conversion step, so the ad can be matched to a conversion. The opt-in is a non-blocking prompt shown on the page (and again in the welcome dialog if not yet answered), default off and revocable in Settings. Nothing is sent without it, and visitors from paid ads are never captured or forwarded at all. On the browser the gclid lives in sessionStorage (tab-scoped) and is never written into our own analytics counters. The full mechanics, including exactly what reaches Google, are below.
 
 This document lists exactly what gets counted, why, and what never does.
 
@@ -23,7 +23,7 @@ Per anonymous request, written to Cloudflare Analytics Engine:
 | Content type | `story`, `teaching`, `prism`, `council`, `foreword` (closed allowlist; only set on playback events) | Know which content type was started/completed |
 | Duration (ms) | Latency of the request | Find slow paths, fix them |
 | Signup | `signup` (fires once when a visitor creates a profile) | Count new profiles, so the funnel has an endpoint |
-| Conversion event | `profile_created`, `mode_selected`, `council_engaged` (fire only for visitors who arrived from a Google ad and opted in; a former `start_exploring` event is retired and the app no longer fires it) | Measure whether Google ad spend reaches real engagement |
+| Conversion event | `start_exploring`, `profile_created`, `mode_selected`, `council_engaged` (fire only for grant-ad visitors who opted in to ad measurement; `start_exploring` is the earliest signal, sent when they accept the on-page consent prompt) | Measure whether Google ad spend reaches real engagement |
 
 The conversion rows are written with the event name, an optional figure id, and a timestamp. The gclid is never part of this analytics write. It goes only to Google Ads, as described below.
 
@@ -52,7 +52,7 @@ All analytics writes are in:
 
 Country values come from `request.cf.country` (a 2-letter ISO code), never from a stored IP.
 
-Separately, Google Ads click tracking captures a `gclid` URL parameter (only when a visitor arrives via a Google ad) in sessionStorage. If the visitor opts in to ad measurement, our worker relays it to the Google Ads Conversion API when they reach a conversion step. What reaches Google is the `gclid`, a conversion action (mapped from the event, such as `profile_created`), a timestamp, a value, a currency, and an order id (the `gclid` plus the event, which Google uses to de-duplicate). No figure, no country, no message content, no profile, no client id. The `gclid` is a Google-issued click identifier that, in Google's hands, can be linked to a person, so we treat it as personal data. On the browser it lives in sessionStorage (tab-scoped), and it is never written into our analytics dataset. See [`client/src/utils/public/gclidCapture.ts`](../client/src/utils/public/gclidCapture.ts) and [`workers/llm-proxy/src/routes/conversions.ts`](../workers/llm-proxy/src/routes/conversions.ts).
+Separately, Google Ads click tracking captures a `gclid` URL parameter (only when a visitor arrives via one of our free nonprofit Google Ad Grants ads, never for paid-ad arrivals, which are dropped on arrival) in sessionStorage. The opt-in is requested by a non-blocking prompt on the page, default off, recorded in localStorage (`agc_ad_consent`) and revocable in Settings. If the visitor opts in to ad measurement, our worker relays it to the Google Ads Conversion API when they reach a conversion step. What reaches Google is the `gclid`, a conversion action (mapped from the event, such as `profile_created`), a timestamp, a value, a currency, and an order id (the `gclid` plus the event, which Google uses to de-duplicate). No figure, no country, no message content, no profile, no client id. The `gclid` is a Google-issued click identifier that, in Google's hands, can be linked to a person, so we treat it as personal data. On the browser it lives in sessionStorage (tab-scoped), and it is never written into our analytics dataset. See [`client/src/utils/public/gclidCapture.ts`](../client/src/utils/public/gclidCapture.ts), the on-page consent prompt at [`marketing/src/islands/AdConsentPrompt.tsx`](../marketing/src/islands/AdConsentPrompt.tsx), and [`workers/llm-proxy/src/routes/conversions.ts`](../workers/llm-proxy/src/routes/conversions.ts).
 
 Your privacy posture is what the code does, not what we promise.
 

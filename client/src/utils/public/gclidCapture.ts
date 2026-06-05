@@ -23,14 +23,23 @@ const SS_GCLID_KEY = 'agc_gclid';
 const LS_AD_CONSENT_KEY = 'agc_ad_consent';
 const AD_CONSENT_VERSION = '1.0.0';
 
+// sessionStorage key: marks a paid-campaign arrival (the ?p=1 Final-URL-suffix
+// Google appends to paid ads). Paid clicks run on clicks only — we never
+// capture or forward their gclid, so they see no consent step and no conversion
+// is ever sent for them. Forwarding a paid gclid without consent would be
+// unlawful and would contradict the privacy policy.
+const SS_PAID_KEY = 'agc_paid';
+
 let capturedGclid: string | null = null;
+let isPaid = false;
 
 // Hydrate from sessionStorage on module load (cheap, runs once). If the URL
-// later carries a fresh gclid, captureGclid() overwrites this.
+// later carries a fresh gclid (or the paid suffix), captureGclid() updates this.
 try {
   if (typeof sessionStorage !== 'undefined') {
+    if (sessionStorage.getItem(SS_PAID_KEY) === '1') isPaid = true;
     const storedGclid = sessionStorage.getItem(SS_GCLID_KEY);
-    if (storedGclid && storedGclid.length > 10 && storedGclid.length < 200) {
+    if (!isPaid && storedGclid && storedGclid.length > 10 && storedGclid.length < 200) {
       capturedGclid = storedGclid;
     }
   }
@@ -54,6 +63,23 @@ export function captureGclid(): void {
   if (isSelfHost) return; // no ad attribution on a self-host instance
   try {
     const params = new URLSearchParams(window.location.search);
+    // Paid-campaign arrivals carry ?p=1. They run on clicks only: we never
+    // capture or forward their gclid, so there is no consent step and no
+    // conversion for them. This guard is what keeps the paid split lawful.
+    if (params.get('p') === '1') {
+      isPaid = true;
+      capturedGclid = null;
+      try {
+        if (typeof sessionStorage !== 'undefined') {
+          sessionStorage.setItem(SS_PAID_KEY, '1');
+          sessionStorage.removeItem(SS_GCLID_KEY);
+        }
+      } catch {
+        // sessionStorage blocked — no-op
+      }
+      return;
+    }
+    if (isPaid) return; // persisted paid flag from earlier in this tab
     const gclid = params.get('gclid');
     if (gclid && gclid.length > 10 && gclid.length < 200) {
       capturedGclid = gclid;
@@ -70,6 +96,29 @@ export function captureGclid(): void {
  */
 export function getGclid(): string | null {
   return capturedGclid;
+}
+
+/**
+ * True if this visitor arrived from a paid campaign (?p=1). Paid arrivals are
+ * never shown the consent step and never have a conversion sent (we run paid on
+ * clicks only), so the consent UI checks this before rendering.
+ */
+export function isPaidVisitor(): boolean {
+  return isPaid;
+}
+
+/**
+ * True once the visitor has made an explicit ad-measurement choice (granted or
+ * declined), recorded in localStorage. Used to avoid re-asking: a landing-page
+ * accept or decline is remembered, so the in-app welcome step does not prompt
+ * again. A passive dismiss writes nothing, so it falls through to the in-app ask.
+ */
+export function adConsentDecided(): boolean {
+  try {
+    return typeof localStorage !== 'undefined' && localStorage.getItem(LS_AD_CONSENT_KEY) !== null;
+  } catch {
+    return false;
+  }
 }
 
 /**
@@ -124,7 +173,7 @@ export function revokeAdConsent(): void {
   try {
     if (typeof sessionStorage !== 'undefined') {
       sessionStorage.removeItem(SS_GCLID_KEY);
-      for (const event of ['profile_created', 'mode_selected', 'council_engaged']) {
+      for (const event of ['start_exploring', 'profile_created', 'mode_selected', 'council_engaged']) {
         sessionStorage.removeItem(`agc_conv_fired_${event}`);
       }
     }
@@ -133,7 +182,7 @@ export function revokeAdConsent(): void {
   }
 }
 
-export type ConversionEvent = 'profile_created' | 'mode_selected' | 'council_engaged';
+export type ConversionEvent = 'start_exploring' | 'profile_created' | 'mode_selected' | 'council_engaged';
 
 // Council Engaged fires once a visitor has heard this many seconds of council
 // audio (curated or custom), measured as audio actually played. One number,
@@ -156,6 +205,7 @@ export async function sendConversion(
   metadata?: Record<string, string>
 ): Promise<void> {
   if (isSelfHost) return; // no ad-conversion reporting on a self-host instance
+  if (isPaid) return; // paid arrivals run on clicks only, never forward a gclid
   if (!capturedGclid) return;
   if (!adConsentGranted()) return; // no send until the visitor opts in
 

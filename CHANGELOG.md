@@ -6,6 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ---
 
+## [Unreleased]
+
+### Added
+
+- **Landing-page ad-measurement consent.** Visitors who arrive from one of our free nonprofit (Ad Grants) ads see a small, non-blocking consent prompt on the page, default off, with an equally easy decline. Declining or dismissing leaves the full library open and sends nothing.
+- **Paid-campaign split.** Visitors from paid ads (a `?p=1` link suffix) never have their click ID captured or forwarded and are not asked for consent. Paid runs on clicks only.
+
+### Changed
+
+- Re-added the `start_exploring` conversion, now gated on the on-page opt-in (it fires when a consenting grant visitor accepts the prompt or clicks a Start Exploring link), not on the bare click ID as before.
+- Ad-measurement consent moved from a checkbox in the welcome dialog to the non-blocking on-page prompt. The welcome dialog now only re-asks if no choice was made on the page.
+
+---
+
 ## [1.1.2] - 2026-05-30
 
 Privacy claims brought fully in line with the code. Google Ads conversion tracking now happens only after the visitor opts in, the trust wording is precise, conversation history is encrypted at rest, and the public docs and legal pages say exactly what the code does.

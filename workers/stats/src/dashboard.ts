@@ -2461,9 +2461,9 @@ async function loadAdGrants() {
 
   // Conversion events are GCLID-GATED: they fire only for visitors who arrive
   // with a Google Ads gclid AND grant ad consent. With the Ad Grant paused, ~0
-  // is expected and correct. The old "start exploring" event is intentionally
-  // absent: it had no client emitter, so it was removed rather than shown as a
-  // permanent zero.
+  // is expected and correct. start_exploring is the earliest signal: it fires
+  // when an opted-in grant visitor accepts the on-page consent prompt or clicks
+  // a Start Exploring CTA, so it leads the conversions row below.
   var queries = [
     // Profile Creation — current, previous (delta), sparkline
     { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'profile_created' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
@@ -2493,6 +2493,11 @@ async function loadAdGrants() {
     { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'entry' AND timestamp " + prevRange(), dataset: 'agora_llm' },
     { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'chat' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
     { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'session' AND blob5 = '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    // --- start_exploring (re-added as the funnel entry). r[19..21], appended at
+    // the end so existing positional reads do not shift. ---
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'start_exploring' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'start_exploring' AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE index1 = 'start_exploring' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
   ];
 
   var r = await batch(queries);
@@ -2512,6 +2517,9 @@ async function loadAdGrants() {
   var gSignups = val(r[13]), gSignupsPrev = val(r[14]);
   var gEntries = val(r[15]), gEntriesPrev = val(r[16]);
   var gChats = val(r[17]), gSessions = val(r[18]);
+  // start_exploring (r[19..21]) — the re-added funnel entry.
+  var startExpConv = val(r[19]), startExpPrev = val(r[20]);
+  var sparkStartExp = rows(r[21]).map(function(x) { return x.c; });
 
   // Modes picked per ad-profile, within the gclid population only, gated for n.
   var modeFromProfile = multiplierOrDash(modeSelConv, profileConv, 5);
@@ -2539,7 +2547,8 @@ async function loadAdGrants() {
   // Persistent scope banner so a row of zeros never reads as a product failure.
   html += '<div class="hint-banner">These count only visitors who arrive with a Google Ads gclid and grant ad consent. The Ad Grant is paused, so ~0 here is expected and correct, not a funnel failure. Organic and Spotify traffic never appears in this section.</div>';
   html += '<div class="grid">';
-  html += kpi('Profile Conversions', profileConv, { hero: true, spark: sparkProfile, sparkColor: '#68C397', delta: profilePrev, sub: 'Enter button after character + name picked' });
+  html += kpi('Start Exploring', startExpConv, { hero: true, spark: sparkStartExp, sparkColor: '#5B8BD4', delta: startExpPrev, sub: 'opted-in ad visitor accepted the consent prompt or clicked a Start Exploring CTA' });
+  html += kpi('Profile Conversions', profileConv, { spark: sparkProfile, sparkColor: '#68C397', delta: profilePrev, sub: 'Enter button after character + name picked' });
   html += kpi('Mode Selected', modeSelConv, { spark: sparkModeSel, sparkColor: '#E6BC5C', sub: 'first mode pick (Story / Wisdom / Talk / Quest / Freetalk)' });
   html += kpi('Council Engaged', councilEngagedConv, { spark: sparkCouncilEng, sparkColor: '#9D83CD', sub: '60s of a council heard (curated or custom)' });
   html += kpi('Modes / Profile', modeFromProfile, { sub: modeFromProfile === '--' ? 'within ad visitors (need 5+ profiles)' : 'modes picked per ad-profile' });

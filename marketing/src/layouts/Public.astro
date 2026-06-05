@@ -8,6 +8,7 @@ import BaseHead from '../components/BaseHead.astro';
 import Navbar from '../components/Navbar.astro';
 import Footer from '../components/Footer.astro';
 import PublicScript from '../components/PublicScript.astro';
+import AdConsentPrompt from '../islands/AdConsentPrompt';
 import { getT } from '../i18n';
 import type { Lang } from '../i18n';
 
@@ -69,5 +70,9 @@ const isHome = currentPath === '/' || currentPath === '/de/' || currentPath === 
       </div>
     )}
     <PublicScript />
+    {/* Ad-measurement consent prompt, shown only to Google ad-grant arrivals
+        (a gclid in the URL, not the paid ?p=1 split). Non-blocking, decides
+        client-side, renders nothing for everyone else. */}
+    <AdConsentPrompt client:idle lang={props.lang} />
   </body>
 </html>

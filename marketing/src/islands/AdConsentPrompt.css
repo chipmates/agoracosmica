@@ -1,0 +1,119 @@
+/* Ad-measurement consent prompt (AdConsentPrompt island). A non-blocking card
+   fixed to the bottom of the viewport, so the figure/theme content stays fully
+   readable behind it (no wall). Tokens come from the page (Public.astro loads
+   index.css); hex fallbacks keep it sane if a token is ever missing. */
+
+.agc-consent {
+  position: fixed;
+  left: 50%;
+  bottom: 1rem;
+  transform: translateX(-50%);
+  width: min(420px, calc(100% - 1.5rem));
+  z-index: 1000;
+  box-sizing: border-box;
+  padding: 1.1rem 1.2rem 1rem;
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--bg-cosmic-void, #0D1338) 92%, transparent);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border: 1px solid color-mix(in srgb, var(--gold-primary, #E6BC5C) 24%, transparent);
+  box-shadow:
+    0 18px 50px color-mix(in srgb, #000 55%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--gold-primary, #E6BC5C) 20%, transparent);
+  color: var(--text-primary, #D2D2D2);
+  font-family: var(--font-ui, system-ui, -apple-system, 'Segoe UI', sans-serif);
+  animation: agc-consent-in 0.28s ease;
+}
+
+@keyframes agc-consent-in {
+  from { opacity: 0; transform: translate(-50%, 14px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .agc-consent { animation: none; }
+}
+
+.agc-consent__x {
+  position: absolute;
+  top: 0.35rem;
+  right: 0.45rem;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  background: none;
+  border: none;
+  border-radius: 0.5rem;
+  color: var(--text-dim, #8A8A8A);
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.agc-consent__x:hover { color: var(--text-primary, #D2D2D2); }
+
+.agc-consent__trust {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.7rem;
+  color: var(--text-dim, #8A8A8A);
+  margin-bottom: 0.55rem;
+  padding-right: 2rem;
+}
+.agc-consent__dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 3px;
+  background: var(--gold-subtle, #D4A539);
+  flex: none;
+}
+
+.agc-consent__h {
+  margin: 0 0 0.4rem;
+  font-size: 1rem;
+  line-height: 1.3;
+  color: var(--gold-subtle, #D4A539);
+}
+.agc-consent__b {
+  margin: 0 0 0.9rem;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--text-secondary, #CACACA);
+}
+
+.agc-consent__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.agc-consent__btn {
+  width: 100%;
+  min-height: 44px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 0.6rem 0.9rem;
+  border-radius: 0.6rem;
+  color: var(--gold-primary, #E6BC5C);
+  background: color-mix(in srgb, var(--gold-primary, #E6BC5C) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gold-primary, #E6BC5C) 38%, transparent);
+  transition: background 0.15s ease;
+}
+.agc-consent__btn:hover {
+  background: color-mix(in srgb, var(--gold-primary, #E6BC5C) 20%, transparent);
+}
+
+.agc-consent__link {
+  display: inline-block;
+  margin-top: 0.65rem;
+  font-size: 0.75rem;
+  color: var(--gold-subtle, #D4A539);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Accept and decline are always stacked full-width and identical (size, weight,
+   colour), so the decline is never demoted. The card is narrow (<=420px) on
+   every screen, so stacking reads cleaner than a cramped side-by-side row. */

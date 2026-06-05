@@ -24,18 +24,75 @@
   }
 
   var SS_GCLID = 'agc_gclid';
+  var SS_PAID = 'agc_paid';
   var SS_FIGURE = 'agc_intended_figure';
   var SS_COUNCIL = 'agc_intended_council';
   var LS_LANG = 'selectedLanguage';
+  var LS_AD_CONSENT = 'agc_ad_consent';
+  var CONV_URL = 'https://llm.agoracosmica.org/api/conversions';
 
   function captureGclidFromUrl() {
     try {
       var params = new URLSearchParams(window.location.search);
+      // Paid-campaign arrivals carry ?p=1. They run on clicks only: we never
+      // capture or forward their gclid. This is the FIRST, unconditional writer
+      // (it runs at parse, before the app island's guard), so it must own the
+      // paid suppression itself and never leave a paid gclid for the SPA to
+      // adopt. Forwarding a paid gclid without consent would be unlawful.
+      if (params.get('p') === '1') {
+        sessionStorage.setItem(SS_PAID, '1');
+        sessionStorage.removeItem(SS_GCLID);
+        return;
+      }
+      if (sessionStorage.getItem(SS_PAID) === '1') return; // persisted paid flag
       var g = params.get('gclid');
       if (g && g.length > 10 && g.length < 200) {
         sessionStorage.setItem(SS_GCLID, g);
       }
     } catch (e) { /* sessionStorage blocked — ignore */ }
+  }
+
+  function adConsentGranted() {
+    try {
+      var raw = localStorage.getItem(LS_AD_CONSENT);
+      return !!raw && JSON.parse(raw).granted === true;
+    } catch (e) { return false; }
+  }
+
+  // Fire a Google Ads conversion from the marketing pages, but ONLY after the
+  // visitor opted in to ad measurement and only for grant arrivals (a gclid is
+  // present and it is not the paid split). This is the re-added start_exploring
+  // signal: unlike the version removed in 1.1.2, it now requires an explicit
+  // opt-in, so the bare gclid alone never sends anything.
+  function fireConversion(event, metadata) {
+    if (sessionStorage.getItem(SS_PAID) === '1') return; // paid: never forward
+    var gclid;
+    try { gclid = sessionStorage.getItem(SS_GCLID); } catch (e) { return; }
+    if (!gclid) return;
+    if (!adConsentGranted()) return; // no opt-in, no send
+    try {
+      var firedKey = 'agc_conv_fired_' + event;
+      if (sessionStorage.getItem(firedKey)) return;
+      sessionStorage.setItem(firedKey, '1');
+    } catch (e) { /* worker dedups via order_id */ }
+    try {
+      var body = { gclid: gclid, event: event, timestamp: Date.now() };
+      if (metadata) {
+        for (var k in metadata) {
+          if (Object.prototype.hasOwnProperty.call(metadata, k)) body[k] = metadata[k];
+        }
+      }
+      // Absolute worker URL on purpose. agoracosmica.org has no /api/* route, so
+      // a relative path falls through the SPA fallback (/* /index.html 200) and
+      // the conversion never reaches the worker. CSP connect-src allows
+      // https://*.agoracosmica.org and the worker CORS allows this origin.
+      fetch(CONV_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+        keepalive: true,
+      }).catch(function () { /* never surface */ });
+    } catch (e) { /* same posture */ }
   }
 
   function persistIntent(opts) {
@@ -76,6 +133,14 @@
     var councilId = target.getAttribute('data-agc-council') || undefined;
     var lang = document.documentElement.lang || 'en';
     persistIntent({ figureId: figureId, councilId: councilId, lang: lang });
+    // Re-added start_exploring, now consent-gated. Fires on any Start Exploring
+    // CTA (navbar, hero, sticky, figure, theme) for an opted-in grant visitor.
+    // This catches returning consenters whose remembered choice means the
+    // landing prompt never re-shows. Deduped with the prompt's own Accept fire.
+    var metadata = {};
+    if (figureId) metadata.figureId = figureId;
+    if (councilId) metadata.councilId = councilId;
+    fireConversion('start_exploring', Object.keys(metadata).length ? metadata : undefined);
   });
 
   var burger = document.querySelector('[data-agc-burger]');
