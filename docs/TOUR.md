@@ -7,13 +7,13 @@ Here is what it feels like to use the Library.
 ## Step into the Library
 
 <p align="center">
-  <img src="../.github/assets/tour/02-cinematic.webp" alt="A cosmic welcome screen, a radiant star above a small figure on a hill, with a line of verse" width="100%" /><br/>
-  <em>A cosmic welcome opens the Library.</em>
+  <img src="../.github/assets/tour/01-landing.webp" alt="Landing page: Learn from 30 of history's remarkable people, with figures orbiting a central light" width="100%" /><br/>
+  <em>Learn from 30 remarkable people across 2,500 years. No signup, 30 free messages a day.</em>
 </p>
 
 <p align="center">
-  <img src="../.github/assets/tour/01-landing.webp" alt="Landing page: Learn from 30 of history's remarkable people, with figures orbiting a central light" width="100%" /><br/>
-  <em>Learn from 30 remarkable people across 2,500 years. No signup, 30 free messages a day.</em>
+  <img src="../.github/assets/tour/02-cinematic.webp" alt="A cosmic welcome screen, a radiant star above a small figure on a hill, with a line of verse" width="100%" /><br/>
+  <em>A cosmic welcome opens the Library.</em>
 </p>
 
 ## Meet your guide
