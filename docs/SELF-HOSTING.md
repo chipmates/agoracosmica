@@ -4,9 +4,9 @@ Run Agora Cosmica on your own hardware in five minutes. Add local voice and a lo
 
 You get all six modes (Story, Wisdom, Prism, Quest, Free Talk, Council), all 30 figures, the full pre-recorded audio library, bilingual EN/DE, push-to-talk voice transcription, and BYOK chat via OpenRouter. The free tier and the Community Governance panel are hosted-only.
 
-**Requirements:** Docker 24+ (Docker Desktop on Mac/Windows, or Docker Engine on Linux). No GPU needed for the default setup.
+**Requirements:** Docker 24+ (Docker Desktop on Mac/Windows, or Docker Engine on Linux). No GPU needed for the default setup. On Docker Desktop, give the VM at least 4 GB of memory (Settings, Resources) so the audio containers have room. The optional local LLM in Step 3 needs a lot more (see its hardware floor).
 
-**How this guide is organised:** Local Mode has three independent toggles in Settings (LLM, TTS, STT). Step 1 brings up the docker stack. Step 2 wires the voice and transcription toggles (no extra hardware). Step 3 runs the LLM locally too (needs 27B-class hardware). Stop at whatever step satisfies you.
+**How this guide is organized:** Local Mode has three independent toggles in Settings (LLM, TTS, STT). Step 1 brings up the docker stack. Step 2 wires the voice and transcription toggles (no extra hardware). Step 3 runs the LLM locally too (needs 27B-class hardware). Stop at whatever step satisfies you.
 
 ---
 
@@ -24,9 +24,11 @@ Open <http://localhost:8080>. On first run, paste your [OpenRouter](https://open
 ```bash
 curl http://localhost:8080/healthz
 ```
-Returns `OK` when healthy.
+Returns `ok` when healthy.
 
 The default `docker compose up` brings up three containers: the app on port 8080, Kokoro (English TTS) on port 8880, and Whisper (transcription) on port 8000. The audio containers are running in the background, ready to use once Step 2 wires them up.
+
+On first boot the audio containers download about 1.8 GB of model weights (Whisper and Kokoro), so they take a few minutes to report healthy. The app itself is ready the moment port 8080 responds, so you can start chatting right away.
 
 ### Configuration
 
@@ -36,8 +38,20 @@ Copy `.env.example` to `.env` and edit if you need to override defaults:
 |---|---|---|
 | `AGORA_HOST_PORT` | `8080` | Host-side port for the app. |
 | `AGORA_MEDIA_BASE_URL` | `https://media.agoracosmica.org` | Content CDN for figure prompts, voice profiles, and pre-recorded audio. |
+| `AGORA_TTS_KOKORO_PORT` | `8880` | Host-side port for Kokoro (English TTS). |
+| `AGORA_STT_PORT` | `8000` | Host-side port for Whisper (transcription). Change it if 8000 is already taken. |
+| `AGORA_TTS_QWEN_PORT` | `8887` | Host-side port for Qwen3-TTS (German, `nvidia` profile). |
+| `AGORA_AUDIO_API_URL` | (empty) | Optional centralized audio backend (see Power users). Empty keeps audio local. |
 
 After editing `.env`, restart with `docker compose up -d`. The container rewrites `/config.js` from these env vars on every start, so no rebuild is needed.
+
+### Stop, remove, update
+
+```bash
+docker compose down                            # stop and remove the containers
+docker compose down -v                         # also drop the cached Whisper model
+docker compose pull && docker compose up -d    # update to the latest published images
+```
 
 ---
 
@@ -67,7 +81,7 @@ Adds Qwen3-TTS on port 8887. First boot downloads ~2 GB of model weights from Hu
 ```bash
 bash scripts/setup-local-tts-apple.sh
 ```
-Installs `mlx-audio` into `~/Library/AgoraLocalTTS/`, downloads ~600 MB of weights, registers a launchd plist that starts on login. Native Metal, no docker (Metal doesn't pass through Docker on Mac).
+Installs `mlx-audio` into `~/Library/AgoraLocalTTS/`, downloads ~1 GB of weights, registers a launchd plist that starts on login. Native Metal, no docker (Metal doesn't pass through Docker on Mac).
 
 Either path exposes Qwen3-TTS at `localhost:8887`. The TTS toggle from above routes to it automatically for German turns.
 
@@ -126,7 +140,7 @@ Below that floor, leave the LLM toggle off. OpenRouter via BYOK handles the chat
 3. Open the Local Server tab (left rail). Load the model. Set Context Length to **32768** (32k). **Toggle "Enable CORS" ON**.
 4. Click *Start Server*. Logs should show `Running on port 1234`.
 5. In Agora Cosmica: Settings → Local Mode. Flip the **LLM** toggle.
-6. Paste `http://localhost:1234/v1` as the endpoint URL. Type `qwen3.6-27b-instruct` as the model name. Click *Test*. You should see "Reachable" in green next to the field. Click *Save*.
+6. Paste `http://localhost:1234/v1` as the endpoint URL. Type `qwen3.6-27b-instruct-revised` as the model name. Click *Test*. You should see "Reachable" in green next to the field. Click *Save*.
 
 > **What changed:** anything you type and anything the figure says back stays on your machine.
 
@@ -146,16 +160,16 @@ should list your loaded model.
 3. Enable CORS for browser access:
    - **macOS:** `launchctl setenv OLLAMA_ORIGINS "*"`, then restart Ollama.
    - **Linux:** start with `OLLAMA_ORIGINS=* ollama serve`.
-4. In Agora Cosmica: Settings → Local Mode. Flip the **LLM** toggle. Paste `http://localhost:11434/v1` as the endpoint. Type the model name (`qwen2.5:32b-instruct`). Click *Test* → "Reachable" → *Save*.
+4. In Agora Cosmica: Settings → Local Mode. Flip the **LLM** toggle. Paste `http://localhost:11434/v1` as the endpoint. Type the model name (`qwen2.5:32b-instruct-q4_K_M`). Click *Test* → "Reachable" → *Save*.
 
 ### What works with a local LLM
 
-All six modes work with the recommended Qwen 3.6 27B Q4_K_M setup:
+Everything works with the recommended 27B-class setup:
 - Free Talk, Wisdom, Prism: stream cleanly in both languages.
 - Story: pre-rendered audio, no LLM call needed.
 - Summary: works on 27B-class models.
-- Custom Council: Qwen 3.6 holds the strict `SPEAKER :: dialogue` format.
-- Quest: Qwen 3.6 supports tool calling, so the `award_seed` event still fires.
+- Council: a 27B-class model holds the strict `SPEAKER :: dialogue` format.
+- Quest: 27B-class models support tool calling, so the `award_seed` event still fires.
 
 The live-interrupt voice mode (two-way streaming) stays hosted in this release since it relies on the multi-tenant GPU gateway. Push-to-talk and read-aloud both work locally via Step 2.
 
@@ -167,7 +181,7 @@ When you flip on all three Local Mode toggles and point the LLM at your own mach
 
 The browser still fetches catalog content from our CDN at `media.agoracosmica.org` on demand: figure prompts, voice profiles, pre-recorded audio, factchecks. That's the same traffic any visitor to the public site generates. We're not hiding it. **The point is sharper: what you talk about with the figures stays yours.**
 
-Self-host builds also disable every analytics, page, session, ad-attribution, and conversion beacon at build time. Verified in code (`isSelfHost` gates in `pageBeacon.ts`, `entryBeacon.ts`, `playbackBeacon.ts`, `gclidCapture.ts`).
+Self-host builds also disable every analytics, page, session, ad-attribution, and conversion beacon at build time. Verified in code (`isSelfHost` gates in `pageBeacon.ts`, `entryBeacon.ts`, `playbackBeacon.ts`, `signupBeacon.ts`, and `utils/public/gclidCapture.ts`).
 
 **First-boot note:** the audio containers download model weights from HuggingFace the first time they start (Whisper ~1.5 GB, Kokoro ~300 MB, Qwen3-TTS ~2 GB). Any local LLM endpoint downloads its own model from its own source (LM Studio's catalog, Ollama's registry, etc.). After the one-time pull, runtime is fully local.
 
@@ -196,7 +210,7 @@ The audio and STT containers ship with CORS enabled by default. The MLX wrapper 
 
 ## 6. Power users
 
-**Custom audio backend.** If you operate a centralised GPU audio server speaking the OpenAI-compatible `/v1/audio/speech` and `/v1/audio/transcriptions` endpoints (e.g. a household or small team server), set `AGORA_AUDIO_API_URL=https://your-audio.example.com` in `.env`. The hosted-style audio path takes over for every user of this instance.
+**Custom audio backend.** If you operate a centralized GPU audio server speaking the OpenAI-compatible `/v1/audio/speech` and `/v1/audio/transcriptions` endpoints (e.g. a household or small team server), set `AGORA_AUDIO_API_URL=https://your-audio.example.com` in `.env`. The hosted-style audio path takes over for every user of this instance.
 
 **Custom content domain.** If you point the app at a content domain other than `*.agoracosmica.org`, update the Content-Security-Policy in `client/index.html` to allow your origin in `img-src`, `media-src`, and `connect-src`, then rebuild from source. The default CSP already allows `*.agoracosmica.org`, so the upstream CDN works without changes.
 
