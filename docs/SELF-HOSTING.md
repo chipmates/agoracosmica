@@ -153,14 +153,14 @@ should list your loaded model.
 ### Ollama
 
 1. Install [Ollama](https://ollama.com).
-2. Pull a 27B-class model:
+2. Pull the same model straight from HuggingFace (Ollama reads GGUF repos directly, no Modelfile needed):
    ```bash
-   ollama pull qwen2.5:32b-instruct-q4_K_M
+   ollama pull hf.co/Smoffyy/Qwen3.6-27B-Instruct-Revised-GGUF:Q4_K_M
    ```
 3. Enable CORS for browser access:
    - **macOS:** `launchctl setenv OLLAMA_ORIGINS "*"`, then restart Ollama.
    - **Linux:** start with `OLLAMA_ORIGINS=* ollama serve`.
-4. In Agora Cosmica: Settings → Local Mode. Flip the **LLM** toggle. Paste `http://localhost:11434/v1` as the endpoint. Type the model name (`qwen2.5:32b-instruct-q4_K_M`). Click *Test* → "Reachable" → *Save*.
+4. In Agora Cosmica: Settings → Local Mode. Flip the **LLM** toggle. Paste `http://localhost:11434/v1` as the endpoint. Type the model name exactly as pulled (`hf.co/Smoffyy/Qwen3.6-27B-Instruct-Revised-GGUF:Q4_K_M`). Click *Test* → "Reachable" → *Save*.
 
 ### What works with a local LLM
 
