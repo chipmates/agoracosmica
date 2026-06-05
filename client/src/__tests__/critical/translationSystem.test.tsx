@@ -85,10 +85,10 @@ describe('Translation System - Critical Path', () => {
     });
 
     const { result } = renderHook(() => useTranslation());
-    const text = result.current.t('welcome.message', { name: 'Michel' });
+    const text = result.current.t('welcome.message', { name: 'Ada' });
 
     expect(typeof text).toBe('string');
-    expect(text).toBe('Hello, Michel!');
+    expect(text).toBe('Hello, Ada!');
   });
 
   it('should handle arrays', () => {

@@ -867,8 +867,7 @@ Begin the council now. Remember to use the EXACT format specified in your instru
    * Utility: Format voice profile for prompt
    *
    * Mirrors the batch generator's shape so custom councils and curated
-   * councils draw from the same biographical diversity source. See
-   * scripts/council-prompt-optimizer/COUNCIL-REPETITION-HANDOVER.md.
+   * councils draw from the same biographical diversity source.
    */
   private formatVoiceProfile(profile: VoiceProfile): string {
     const truncate = (str: string | undefined, maxChars: number): string => {

@@ -7,9 +7,9 @@
 #
 # Prerequisites:
 #   - npx wrangler (Cloudflare CLI) configured with R2 access
-#   - The handover bundle present at sage/internal/agora-local-tts-handover/
+#   - A voice bundle directory (set AGORA_VOICE_BUNDLE, see below)
 #     (10 .wav files in refs/ and 10 .json files in embeddings/)
-#   - Michel's confirmation that the 12 s R1/R2 originals are ChipMates-owned
+#   - Confirmation that the source voice originals are ChipMates-owned
 #     (so the 8 s Qwen-clones are safe to redistribute via our CDN)
 #
 # Usage:
@@ -21,7 +21,7 @@
 set -euo pipefail
 
 BUCKET="${AGORA_R2_BUCKET:-agora-cosmica}"
-HANDOVER_DIR="${AGORA_VOICE_BUNDLE:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../../internal/agora-local-tts-handover" && pwd)}"
+HANDOVER_DIR="${AGORA_VOICE_BUNDLE:-./voice-bundle}"
 GENERATED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 
 if [[ ! -d "${HANDOVER_DIR}" ]]; then

@@ -29,7 +29,6 @@ DEV_RATE_LIMIT=1
 # absent, the worker no-ops CAPI forwarding (events still capture to KV +
 # Analytics Engine, just don't reach Google). See:
 # - services/googleAdsCapi.ts                       (the forwarding code)
-# - ../../internal/docs/client-docs/ad-grants/      (setup runbook + rotation)
 #
 # In production, set each via:
 #   wrangler secret put GOOGLE_ADS_DEVELOPER_TOKEN
@@ -47,7 +46,7 @@ GOOGLE_ADS_DEVELOPER_TOKEN=
 GOOGLE_ADS_OAUTH_CLIENT_ID=
 GOOGLE_ADS_OAUTH_CLIENT_SECRET=
 
-# OAuth refresh token captured once via internal/ops/google-ads-oauth-flow.js.
+# OAuth refresh token captured once via a standard Google OAuth 2.0 flow.
 # Long-lived. Rotate by re-running the OAuth flow.
 GOOGLE_ADS_OAUTH_REFRESH_TOKEN=
 

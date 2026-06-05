@@ -125,7 +125,7 @@ All should return JSON.
 
 This is the heavy step. Running the LLM locally means the conversation itself never reaches any external service, but it needs real hardware.
 
-**The model we recommend:** [`Smoffyy/Qwen3.6-27B-Instruct-Revised-GGUF`](https://huggingface.co/Smoffyy/Qwen3.6-27B-Instruct-Revised-GGUF), **Q4_K_M** variant (~16 GB). It's the same model class we run on our servers. Holds the Custom Council `SPEAKER :: dialogue` format cleanly and supports tool calling so Quest mode's `award_seed` still fires.
+**The model we recommend:** [`Smoffyy/Qwen3.6-27B-Instruct-Revised-GGUF`](https://huggingface.co/Smoffyy/Qwen3.6-27B-Instruct-Revised-GGUF), **Q4_K_M** variant (~16 GB). It's a compact 27B that runs on a single GPU. Our hosted free tier uses a larger model (Qwen3-235B), and in our own tests the two come out about even on these conversations. Holds the Custom Council `SPEAKER :: dialogue` format cleanly and supports tool calling so Quest mode's `award_seed` still fires.
 
 **Hardware floor:**
 - 32 GB unified RAM on Apple Silicon, or

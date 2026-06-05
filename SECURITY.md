@@ -160,7 +160,7 @@ Independent third-party scanners. Run them any time:
 
 - **[SecurityHeaders.com](https://securityheaders.com/?q=https%3A%2F%2Fagoracosmica.org&followRedirects=on)** · HTTP security headers (CSP, HSTS, etc.). Currently **A+**.
 - **[SSL Labs](https://www.ssllabs.com/ssltest/analyze.html?d=agoracosmica.org)** · TLS configuration. Currently **A+**.
-- **[Mozilla Observatory](https://observatory.mozilla.org/analyze/agoracosmica.org)** · comprehensive web security scan.
+- **[Mozilla Observatory](https://observatory.mozilla.org/analyze/agoracosmica.org)** · web security scan.
 - **[Hardenize](https://hardenize.com/report/agoracosmica.org)** · DNS, email, TLS depth audit.
 
 ### Audit transparency

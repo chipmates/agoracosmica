@@ -30,14 +30,14 @@ export type KokoroVoice = EnglishVoice;
  * Server routes to Qwen3-TTS (quality) or F5-TTS (fast) based on load.
  */
 export const GERMAN_TECHNICAL_VOICES = {
-  // Female voices (5 total, ranked by Michel)
+  // Female voices (5 total, ranked by ChipMates)
   lyra: 'f1_warm_wise_v1',              // #1 — Best overall female
   astra: 'f5_deep_commanding_v2',       // #2 — Authoritative
   vega: 'f1_warm_wise_v2',              // #3 — Wise variant
   andromeda: 'f2_commanding_thinker_v1', // #4 — Intellectual (The Expanse spirit)
   ceres: 'f1_warm_mentor_v2',           // #5 — Warm mentor (Ceres Station)
 
-  // Male voices (5 total, ranked by Michel)
+  // Male voices (5 total, ranked by ChipMates)
   solaris: 'm3_rich_narrator_v3',       // #1 — Best overall male, rich narrator
   umbra: 'm5_rich_baritone_v1',         // #2 — Rich baritone
   phoenix: 'm1_warm_elder_v3',          // #3 — Wise elder

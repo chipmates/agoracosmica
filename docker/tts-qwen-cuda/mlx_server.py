@@ -94,13 +94,13 @@ log = logging.getLogger("mlx_server")
 # When this server is extracted as chipmates/qwen3-tts-mlx, this dict moves
 # to a bundled voices.json that ships with the repo.
 FRIENDLY_VOICES: dict[str, dict] = {
-    # Female (ranked by Michel)
+    # Female (ranked by ChipMates)
     "lyra":      {"slug": "f1_warm_wise_v1",        "gender": "female", "character": "warm-wise",   "rank": 1},
     "astra":     {"slug": "f5_deep_commanding_v2",  "gender": "female", "character": "commanding",  "rank": 2},
     "vega":      {"slug": "f1_warm_wise_v2",        "gender": "female", "character": "wise",        "rank": 3},
     "andromeda": {"slug": "f2_commanding_thinker_v1", "gender": "female", "character": "intellectual", "rank": 4},
     "ceres":     {"slug": "f1_warm_mentor_v2",      "gender": "female", "character": "nurturing",   "rank": 5},
-    # Male (ranked by Michel)
+    # Male (ranked by ChipMates)
     "solaris":   {"slug": "m3_rich_narrator_v3",    "gender": "male",   "character": "narrator",    "rank": 1},
     "umbra":     {"slug": "m5_rich_baritone_v1",    "gender": "male",   "character": "baritone",    "rank": 2},
     "phoenix":   {"slug": "m1_warm_elder_v3",       "gender": "male",   "character": "elder",       "rank": 3},
