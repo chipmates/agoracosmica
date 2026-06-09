@@ -32,7 +32,7 @@
 
 ---
 
-Agora Cosmica is a Living Library for wisdom from history. Thirty extraordinary figures from Marcus Aurelius to Ada Lovelace, Rumi to Frida Kahlo, each with their own researched voice and twelve wisdom teachings. The platform pairs hundreds of pre-recorded narrative episodes and multi-figure dialogues with live AI conversation. Live speech (text-to-speech and speech-to-text) runs on our own GPU servers in Germany. [See all 30 figures →](https://agoracosmica.org/figures)
+Agora Cosmica is a Living Library for wisdom from history. Learn from thirty figures, from Marcus Aurelius to Ada Lovelace, Rumi to Frida Kahlo, each with their own researched voice and twelve wisdom teachings. The platform pairs hundreds of pre-recorded narrative episodes and multi-figure dialogues with live AI conversation. Live speech (text-to-speech and speech-to-text) runs on our own GPU servers in Germany. [See all 30 figures →](https://agoracosmica.org/figures)
 
 30 free messages a day, no signup required. Bilingual English and German. On the path to community-driven development: anyone can vote on what gets added next, right inside the app.
 
@@ -64,20 +64,20 @@ Each interaction in Agora Cosmica orbits one figure. The four educational chapte
 
 **Content**
 - **Six ways to engage**: 4 educational chapters (Story, Wisdom, Prism, Quest) plus Free Talk and Council. [How they work](docs/CHAPTERS.md)
-- **Crafted catalog**: 360 stories, 360 prism dialogues, 110 four-figure councils, all with character-level audio timestamps.
+- **Crafted catalog**: 360 stories, 360 prism dialogues, 110 four-figure council debates (55 questions, two depth levels each), all with time-synced audio.
 - **30 figures · 12 teachings each**: 360 wisdom teachings spanning 2,500 years of human thought. [Browse the figures](https://agoracosmica.org/figures)
 - **Fully bilingual**: English and German across all content, UI, and audio.
 
 **Honest by design**
 - **Echo framing**: every figure is presented as an AI Echo (an AI-rendered portrayal), never claimed to be a real recording or to speak for the actual person.
-- **Factcheck transparency**: each figure ships with per-figure factchecks listing what's historically verified versus what's recreated for narrative.
-- **Open source under AGPL-3.0**: every claim verifiable by reading the code.
+- **Factcheck transparency**: each figure has a per-figure factcheck listing what's historically verified versus what's recreated for narrative.
+- **Open source under AGPL-3.0**: the privacy and architecture claims are verifiable by reading the code.
 - **Built on learning science**: the 4-chapter arc is informed by Kolb's experiential cycle, Bloom's taxonomy, and retrieval practice.
 
 **Privacy by design**
 - **BYOK encryption**: bring your own OpenRouter key, encrypted locally with AES-256-GCM, never stored on our servers.
 - **Free tier without signup**: 30 messages a day via our Cloudflare Worker, no account required.
-- **No user tracking**: no tracking cookies, no third-party analytics, no per-request access logs of our own, no IP retention in analytics, no cross-session profiles. We do collect anonymous aggregate counters to keep the service running and improve it. [docs/MEASUREMENT.md](docs/MEASUREMENT.md) lists exactly what gets counted, what never does, and the one exception we name upfront: for visitors who arrive from a Google ad and opt in, we forward the Google click ID (gclid) to Google Ads so the ad can be matched to a conversion.
+- **No behavioral tracking**: no tracking cookies, no third-party analytics, no per-request access logs of our own, no IP retention in analytics, no cross-session profiles. We do collect anonymous aggregate counters to keep the service running and improve it. [docs/MEASUREMENT.md](docs/MEASUREMENT.md) lists exactly what gets counted, what never does, and the one exception we name upfront: for visitors who arrive from a Google ad and opt in, we forward the Google click ID (gclid) to Google Ads so the ad can be matched to a conversion.
 - **Self-hosted speech**: live text-to-speech and speech-to-text run on our own GPU servers in Germany.
 - **EU-first hosting**: live audio in Germany, pre-recorded audio on Cloudflare R2.
 
@@ -121,7 +121,7 @@ Boots the React app at [localhost:5173](http://localhost:5173). UI and static co
 
 ## Architecture
 
-The app runs entirely in your browser. Cloudflare Workers act as thin proxies (rate limiting, safety screening, load routing) and hold no user data or per-request logs. LLM inference uses Qwen3 235B for everyone. The free tier runs on Nebius in Finland. With your own OpenRouter key, requests are auto-routed to the best available provider with zero data retention enabled by default (configurable in settings). Live speech runs on our own GPU servers in Germany: Kokoro TTS for English, F5 and Qwen3-TTS for German, Faster-Whisper for speech-to-text. Pre-recorded audio is stored on Cloudflare R2 in the EU (Western Europe) and served via global CDN.
+Your data stays in your browser. Cloudflare Workers act as thin proxies (rate limiting, safety screening, load routing) and hold no user data or per-request logs. LLM inference uses Qwen3 235B for everyone. The free tier runs on Nebius in Finland. With your own OpenRouter key, requests are auto-routed to the best available provider with zero data retention enabled by default (configurable in settings). Live speech runs on our own GPU servers in Germany: Kokoro TTS for English, F5 and Qwen3-TTS for German, Faster-Whisper for speech-to-text. Pre-recorded audio is stored on Cloudflare R2 in the EU (Western Europe) and served via global CDN.
 
 <p align="center">
   <img src=".github/assets/architecture.svg" alt="Agora Cosmica architecture: browser holds all user data, Cloudflare Workers act as thin proxies, backends include Nebius in Finland, OpenRouter for BYOK, Hetzner GPUs in Germany for live audio, and Cloudflare R2 for pre-recorded media" width="100%" />
