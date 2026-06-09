@@ -393,6 +393,7 @@ button {
   --coral-deep: var(--mode-quest-active);
   --coral-base: var(--mode-quest);
   --coral-light: var(--mode-quest-hover);
+  --success-green: var(--mode-freetalk);   /* reuse the Free Talk mint for valid/reachable/success states */
   --prism-base: var(--mode-prism);
   --prism-light: var(--mode-prism-hover);
   --prism-rgb: 91, 139, 212;
