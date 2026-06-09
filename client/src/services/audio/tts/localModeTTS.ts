@@ -195,6 +195,25 @@ function appendTailSilence(buffer: ArrayBuffer, format: 'wav' | 'mp3'): ArrayBuf
     // Silence is already zero-init from ArrayBuffer.
 
     const outView = new DataView(out);
+
+    // Kokoro emits a single-sample spike out of silence at the very end of each
+    // clip (e.g. ...0,0,0,1374), an audible click between chunks. Linearly fade
+    // the last ~12 ms of real audio to zero so the spike ramps to nothing. The
+    // tail is silence anyway, so no speech is clipped.
+    if (bitsPerSample === 16) {
+      const realAudioEndByte = dataOffset + dataSize;
+      const fadeCount = Math.min(
+        Math.round(0.012 * sampleRate) * channels,
+        Math.floor(dataSize / 2),
+      );
+      const fadeStartByte = realAudioEndByte - fadeCount * 2;
+      for (let k = 0; k < fadeCount; k++) {
+        const pos = fadeStartByte + k * 2;
+        const coeff = 1 - (k + 1) / fadeCount; // 1 → 0 across the fade window
+        outView.setInt16(pos, Math.round(outView.getInt16(pos, true) * coeff), true);
+      }
+    }
+
     // RIFF total size = file size - 8
     outView.setUint32(4, buffer.byteLength + silenceBytes - 8, true);
     // data chunk size
