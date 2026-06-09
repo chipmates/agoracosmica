@@ -157,9 +157,9 @@ should list your loaded model.
    ```bash
    ollama pull hf.co/Smoffyy/Qwen3.6-27B-Instruct-Revised-GGUF:Q4_K_M
    ```
-3. Enable CORS for browser access:
-   - **macOS:** `launchctl setenv OLLAMA_ORIGINS "*"`, then restart Ollama.
-   - **Linux:** start with `OLLAMA_ORIGINS=* ollama serve`.
+3. Enable CORS for browser access and raise the context window. Both are environment variables. Ollama defaults to a 4k (or smaller) context that truncates the figure prompts, so set 32k to match the LM Studio step above:
+   - **macOS:** `launchctl setenv OLLAMA_ORIGINS "*"` and `launchctl setenv OLLAMA_CONTEXT_LENGTH 32768`, then restart Ollama.
+   - **Linux:** start with `OLLAMA_ORIGINS=* OLLAMA_CONTEXT_LENGTH=32768 ollama serve`.
 4. In Agora Cosmica: Settings → Local Mode. Flip the **LLM** toggle. Paste `http://localhost:11434/v1` as the endpoint. Type the model name exactly as pulled (`hf.co/Smoffyy/Qwen3.6-27B-Instruct-Revised-GGUF:Q4_K_M`). Click *Test* → "Reachable" → *Save*.
 
 ### What works with a local LLM
