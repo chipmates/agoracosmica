@@ -176,6 +176,16 @@ function appendTailSilence(buffer: ArrayBuffer, format: 'wav' | 'mp3'): ArrayBuf
     }
     if (dataOffset < 0) return buffer;
 
+    // Kokoro streams its WAV and writes 0xFFFFFFFF as a "length unknown"
+    // placeholder for the RIFF and data chunk sizes. Trust the real byte count
+    // instead. Without this, `dataSize + silenceBytes` below overflows uint32
+    // (0xFFFFFFFF + 7200 wraps to 7199), so the rewritten data chunk claims
+    // ~150 ms and the browser plays only the first syllable of every chunk.
+    const realDataSize = buffer.byteLength - dataOffset;
+    if (dataSize === 0 || dataSize > realDataSize) {
+      dataSize = realDataSize;
+    }
+
     const silenceSamples = Math.round(0.15 * sampleRate);
     const bytesPerSample = (bitsPerSample / 8) * channels;
     const silenceBytes = silenceSamples * bytesPerSample;
