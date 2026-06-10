@@ -41,13 +41,14 @@
 /de/cookie-policy        /cookie-policy/       301
 /de/cookie-policy/       /cookie-policy/       301
 
-# App SPA — the React app (login + in-app surface) now lives under /app.
-# CF Pages serves build/app/index.html for /app and any sub-path so React
-# Router (basename "/app") handles client-side routing. /app is served bare
-# (no trailing-slash 301) so it matches the manifest start_url, canonical,
-# og:url, and the marketing CTA hrefs.
-/app    /app/index.html  200
-/app/*  /app/index.html  200
+# App SPA — the React app (login + in-app surface) lives under /app. The
+# rewrite destination must be the NORMALIZED form /app/ — CF Pages 308s any
+# /app/index.html request to /app/ at the asset layer, and a rewrite that
+# targets the pre-normalization path falls through to the 404 page instead of
+# serving the shell (observed live 2026-06-10 once 404.html existed). The
+# asset layer also 308s bare /app → /app/ on its own, before these rules.
+/app    /app/  200
+/app/*  /app/  200
 
 # No catch-all on purpose (removed 2026-06-10). The old `/* /app/index.html 200`
 # answered every junk URL with a 200 SPA shell whose canonical pointed at the
