@@ -14,8 +14,9 @@
 //              left this session, so keeping the gclid would be purposeless
 //              storage under § 25 TDDDG).
 //
-// Copy is a DRAFT pending the data-protection lawyer's review. Finalize the
-// wording here, or lift it into publicI18n later.
+// Copy finalized 2026-06-10 after legal review (withdrawal notice, privacy
+// link, precise click-ID wording). Lift into publicI18n if it ever needs
+// more languages.
 
 import { useEffect, useState } from 'react';
 import {
