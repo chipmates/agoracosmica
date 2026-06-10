@@ -44,7 +44,10 @@ const themeUrl = canonicalUrl(publicUrl(lang, `/themes/${themeId}`));
 const schemas = [
   articleSchema({
     title: themeName,
-    description: themeDescription.slice(0, 200),
+    // Full text on purpose: JSON-LD has no SERP length budget, and a raw
+    // .slice() cuts mid-word (the meta description below is word-boundary
+    // clamped centrally in BaseHead).
+    description: themeDescription,
     url: themeUrl,
     lang,
     image: themeOgImage,
@@ -60,7 +63,7 @@ const schemas = [
 ---
 <Public
   title={themeName}
-  description={themeDescription.slice(0, 160)}
+  description={themeDescription}
   canonicalPath={`/themes/${themeId}`}
   lang={lang}
   stickyCta={false}

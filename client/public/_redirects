@@ -21,23 +21,37 @@
 /datenschutz         /datenschutz/         301
 /cookie-policy       /cookie-policy/       301
 /nutzungsbedingungen /nutzungsbedingungen/ 301
+/privacy             /privacy/             301
 /de        /de/        301
 /de/figures /de/figures/ 301
 /de/themes  /de/themes/ 301
 /de/about   /de/about/  301
 /de/contact /de/contact/ 301
 
+# Guessable legal URLs that people (and crawlers) try but that live elsewhere.
+# Without these they fell through to the SPA shell as soft-404s.
+/terms                   /nutzungsbedingungen/ 301
+/terms/                  /nutzungsbedingungen/ 301
+/de/impressum            /impressum/           301
+/de/impressum/           /impressum/           301
+/de/datenschutz          /datenschutz/         301
+/de/datenschutz/         /datenschutz/         301
+/de/nutzungsbedingungen  /nutzungsbedingungen/ 301
+/de/nutzungsbedingungen/ /nutzungsbedingungen/ 301
+/de/cookie-policy        /cookie-policy/       301
+/de/cookie-policy/       /cookie-policy/       301
+
 # App SPA — the React app (login + in-app surface) now lives under /app.
 # CF Pages serves build/app/index.html for /app and any sub-path so React
 # Router (basename "/app") handles client-side routing. /app is served bare
 # (no trailing-slash 301) so it matches the manifest start_url, canonical,
-# og:url, and the marketing CTA hrefs. These rules MUST precede the catch-all.
+# og:url, and the marketing CTA hrefs.
 /app    /app/index.html  200
 /app/*  /app/index.html  200
 
-# SPA fallback — serve the React shell for all unmatched client-side routes.
-# CF Pages serves existing static files first (JS, CSS, images, fonts) and the
-# static Astro pages (build/index.html, /figures/, /themes/, etc.) before
-# consulting these rules. Unknown paths reach the SPA router at /app, NOT the
-# static homepage.
-/* /app/index.html 200
+# No catch-all on purpose (removed 2026-06-10). The old `/* /app/index.html 200`
+# answered every junk URL with a 200 SPA shell whose canonical pointed at the
+# homepage, a classic soft-404 that erodes crawl trust. The SPA owns exactly
+# /app and /app/* (rules above). Everything else either matches a static Astro
+# file, a rule here, or gets the real 404.html, which CF Pages serves with
+# HTTP status 404 whenever a root 404.html exists in the build.

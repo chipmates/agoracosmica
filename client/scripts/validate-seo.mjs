@@ -18,8 +18,10 @@ const DIST = join(SCRIPTS_DIR, '..', '..', 'marketing', 'dist');
 // from here once shortened.
 const TITLE_OVER60_OK = new Set(['de/index.html', 'de/figures/index.html']);
 // Legal pages are standalone (no EN/DE twin), so no hreflang block, matching
-// the sitemap generator's deliberate omission.
-const NO_HREFLANG = new Set(['privacy', 'impressum', 'datenschutz', 'cookie-policy', 'nutzungsbedingungen']);
+// the sitemap generator's deliberate omission. The 404 page is excluded too:
+// hreflang annotations belong on indexable 200-status pages only, and CF Pages
+// serves 404.html with HTTP 404.
+const NO_HREFLANG = new Set(['privacy', 'impressum', 'datenschutz', 'cookie-policy', 'nutzungsbedingungen', '404']);
 
 function walk(dir) {
   const out = [];

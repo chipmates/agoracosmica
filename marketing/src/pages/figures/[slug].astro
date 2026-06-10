@@ -27,7 +27,9 @@ const seo = getFigureSeo(figureId, lang);
 if (!figure) throw new Error(`Unknown figure: ${figureId}`);
 
 const aboutParas = figure.about.split('\n').map(p => p.trim()).filter(Boolean);
-const metaDescription = seo?.description || aboutParas[0]?.slice(0, 160) || '';
+// No pre-slice: a raw .slice(0,160) cuts mid-word and then BaseHead's
+// word-boundary clamp sees a "fitting" string and passes it through.
+const metaDescription = seo?.description || aboutParas[0] || '';
 const figureUrl = `${SITE_URL}/figures/${slug}`;
 // (figure-portrait LCP preload removed 2026-06-04: it hinted WebP while the
 // <picture> serves AVIF, so the browser double-downloaded an unused file. The
