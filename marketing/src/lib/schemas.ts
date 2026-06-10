@@ -3,6 +3,7 @@
 
 import { MEDIA_URL, ORG_LOGO, SITE_URL } from './urls';
 import type { Lang } from '../i18n';
+import { figureEntities } from './figureEntities';
 
 const ORG_ID = `${SITE_URL}/#organization`;
 const AGORA_ID = `${SITE_URL}/#agora-cosmica`;
@@ -16,7 +17,16 @@ export function personSchema(figure: {
   lang: string;
   image?: string;
 }): Record<string, unknown> {
-  const url = `${SITE_URL}${figure.lang === 'de' ? '/de' : ''}/figures/${figure.slug}`;
+  // Trailing slash: the canonical URL form. The no-slash form 301s, and
+  // @ids pointing at redirecting URLs weaken entity reconciliation.
+  const url = `${SITE_URL}${figure.lang === 'de' ? '/de' : ''}/figures/${figure.slug}/`;
+  const entity = figureEntities[figure.slug];
+  const sameAs = entity
+    ? [
+        figure.lang === 'de' ? entity.wikipediaDe : entity.wikipediaEn,
+        entity.wikidata,
+      ].filter(Boolean)
+    : [];
   return {
     '@context': 'https://schema.org',
     '@type': 'Person',
@@ -26,6 +36,9 @@ export function personSchema(figure: {
     url,
     knowsAbout: figure.tradition,
     ...(figure.image && { image: figure.image }),
+    ...(entity?.birthDate && { birthDate: entity.birthDate }),
+    ...(entity?.deathDate && { deathDate: entity.deathDate }),
+    ...(sameAs.length && { sameAs }),
     mainEntityOfPage: url,
   };
 }
@@ -42,7 +55,7 @@ export function audioObjectSchema(figure: {
   slug: string;
   lang: Lang;
 }): Record<string, unknown> {
-  const pageUrl = `${SITE_URL}${figure.lang === 'de' ? '/de' : ''}/figures/${figure.slug}`;
+  const pageUrl = `${SITE_URL}${figure.lang === 'de' ? '/de' : ''}/figures/${figure.slug}/`;
   const contentUrl = `${MEDIA_URL}/trailers/figures/${figure.figureId}/${figure.lang}/${figure.figureId}_trailer_${figure.lang}.mp3`;
   return {
     '@context': 'https://schema.org',
@@ -149,6 +162,12 @@ export function articleSchema(article: {
     ...(article.datePublished && { datePublished: article.datePublished }),
     ...(article.dateModified && { dateModified: article.dateModified }),
     mainEntityOfPage: article.url,
+    author: {
+      '@type': 'EducationalOrganization',
+      '@id': ORG_ID,
+      name: 'ChipMates gemeinnützige GmbH',
+      url: SITE_URL,
+    },
     publisher: {
       '@type': 'EducationalOrganization',
       '@id': ORG_ID,

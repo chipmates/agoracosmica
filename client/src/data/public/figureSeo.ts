@@ -17,9 +17,9 @@ export const figureSeo: Record<string, FigureSeoData> = {
       seoTitle: "Marcus Aurelius - Stoicism & Meditations | Agora Cosmica",
     },
     de: {
-      description: "Entdecke stoische Philosophie mit Marcus Aurelius. 12 Kapitel erzählte Lebensgeschichte, Lehren zu emotionaler Klarheit, Memento Mori und Tugendethik.",
-      teachingsHeading: "Stoische Lehren von Marcus Aurelius",
-      seoTitle: "Marcus Aurelius - Stoizismus & Selbstbetrachtungen",
+      description: "Entdecke stoische Philosophie mit Mark Aurel (Marcus Aurelius). 12 Kapitel Lebensgeschichte, Lehren zu emotionaler Klarheit, Memento Mori und Tugendethik.",
+      teachingsHeading: "Stoische Lehren von Mark Aurel",
+      seoTitle: "Mark Aurel - Stoizismus & Selbstbetrachtungen",
     },
   },
   angelou: {
@@ -185,9 +185,9 @@ export const figureSeo: Record<string, FigureSeoData> = {
       seoTitle: "Siddhartha Gautama - Buddhism & Four Noble Truths",
     },
     de: {
-      description: "Lerne buddhistische Philosophie von Siddhartha Gautama. Achtsamkeit, die Vier Edlen Wahrheiten, abhängiges Entstehen. 12 Kapitel Lebensgeschichte und geführte Gespräche.",
-      teachingsHeading: "Buddhistische Lehren von Siddhartha Gautama",
-      seoTitle: "Siddhartha Gautama - Buddhismus & Edle Wahrheiten",
+      description: "Lerne die buddhistische Philosophie des Buddha Siddhartha Gautama. Achtsamkeit, Vier Edle Wahrheiten, abhängiges Entstehen. 12 Kapitel Lebensgeschichte.",
+      teachingsHeading: "Die Lehren des Buddha (Siddhartha Gautama)",
+      seoTitle: "Buddha - Buddhismus & Vier Edle Wahrheiten | Agora Cosmica",
     },
   },
   jung: {
@@ -233,9 +233,9 @@ export const figureSeo: Record<string, FigureSeoData> = {
       seoTitle: "Laozi - Taoism, Wu Wei & Tao Te Ching | Agora Cosmica",
     },
     de: {
-      description: "Entdecke Laozis taoistische Philosophie von Wu Wei, Einfachheit und dem Fließen mit der Natur. 12 Kapitel Lebensgeschichte, Lehren aus dem Tao Te Ching.",
-      teachingsHeading: "Laozi über das Tao, Wu Wei und natürliche Harmonie",
-      seoTitle: "Laozi - Taoismus, Wu Wei & Daodejing | Agora Cosmica",
+      description: "Entdecke die taoistische Philosophie von Laozi (Laotse): Wu Wei, Einfachheit, Fließen mit der Natur. 12 Kapitel Lebensgeschichte, Lehren aus dem Tao Te King.",
+      teachingsHeading: "Laozi (Laotse) über das Tao, Wu Wei und natürliche Harmonie",
+      seoTitle: "Laozi - Taoismus, Wu Wei & Tao Te King | Agora Cosmica",
     },
   },
   lovelace: {
