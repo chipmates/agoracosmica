@@ -2545,7 +2545,7 @@ async function loadAdGrants() {
   // ── GOOGLE ADS CONVERSIONS (gclid-gated) ──
   html += '<div class="section-divider">Google Ads Conversions</div>';
   // Persistent scope banner so a row of zeros never reads as a product failure.
-  html += '<div class="hint-banner">These count only visitors who arrive with a Google Ads gclid and grant ad consent. The Ad Grant is paused, so ~0 here is expected and correct, not a funnel failure. Organic and Spotify traffic never appears in this section.</div>';
+  html += '<div class="hint-banner">These count only visitors who arrive with a Google Ads gclid and grant ad consent. The consent gate caps this at the accept rate, so low numbers are structural, not a funnel failure. Paid campaigns (?p=1) run on clicks only and never appear here. Organic and Spotify traffic never appears in this section.</div>';
   html += '<div class="grid">';
   html += kpi('Start Exploring', startExpConv, { hero: true, spark: sparkStartExp, sparkColor: '#5B8BD4', delta: startExpPrev, sub: 'opted-in ad visitor accepted the consent prompt or clicked a Start Exploring CTA' });
   html += kpi('Profile Conversions', profileConv, { spark: sparkProfile, sparkColor: '#68C397', delta: profilePrev, sub: 'Enter button after character + name picked' });
