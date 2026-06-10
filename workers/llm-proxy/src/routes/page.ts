@@ -37,8 +37,8 @@ export async function handlePage(request: Request, env: Env): Promise<Response> 
     return new Response(null, { status: 204 });
   }
 
-  // Rate limit per IP. The IP itself is hashed via KV key namespace and
-  // never retained beyond the 1-hour window.
+  // Rate limit per IP. The plain IP appears only inside this short-lived KV
+  // key (1-hour TTL, auto-deleted) and never in any stored analytics row.
   const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
   const rateLimitKey = `page_rl:${ip}`;
   const currentCount = parseInt(await env.RATE_LIMITS.get(rateLimitKey) || '0', 10);

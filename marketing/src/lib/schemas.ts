@@ -281,7 +281,7 @@ export function softwareApplicationSchema(): Record<string, unknown> {
       'Multi-perspective dialogues (Prism mode)',
       'Conversation in English and German',
       'Pre-produced council debates',
-      'No tracking, no cookies',
+      'No tracking cookies, no profiling',
     ],
   };
 }

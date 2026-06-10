@@ -8,6 +8,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Changed
+
+- **Privacy wording brought back in line with the code.** The consent prompt names the withdrawal path and links the privacy policy directly, the policies describe rate limiting exactly as implemented (the plain IP lives only in a short-lived one-hour key and never enters analytics), withdrawal instructions point at the Settings section by its real name, and the homepage structured data uses the current trust wording. Policy dates unified.
+- **Dismissing the consent prompt now also clears the stored click ID.** With no consent surface left in the session, there is nothing the ID could be kept for.
+- Cookie policy now lists every ad-related storage key (`agc_paid`, `agc_ad_prompt_dismissed`, `agc_conv_fired_*`) and explains the withdrawal control.
+
+### Fixed
+
+- A consent recorded under an older consent version now counts as undecided, so a future change of consent scope re-prompts instead of silently relying on the old record.
+
+---
+
+## [1.1.3] - 2026-06-08
+
 ### Added
 
 - **Landing-page ad-measurement consent.** Visitors who arrive from one of our free nonprofit (Ad Grants) ads see a small, non-blocking consent prompt on the page, default off, with an equally easy decline. Declining or dismissing leaves the full library open and sends nothing.
@@ -16,7 +30,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Changed
 
 - Re-added the `start_exploring` conversion, now gated on the on-page opt-in (it fires when a consenting grant visitor accepts the prompt or clicks a Start Exploring link), not on the bare click ID as before.
-- Ad-measurement consent moved from a checkbox in the welcome dialog to the non-blocking on-page prompt. The welcome dialog now only re-asks if no choice was made on the page.
+- Ad-measurement consent moved from the checkbox in the welcome dialog to the non-blocking on-page prompt, which is now the single place the question is asked.
 
 ---
 

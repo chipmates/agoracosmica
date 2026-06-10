@@ -19,7 +19,7 @@ Legitimate interest (Art. 6(1)(f) GDPR) for providing philosophical dialogue ser
 
 | Principle | Implementation |
 |-----------|---------------|
-| **No registration** | No email, no password, no personal data collected |
+| **No registration** | No email, no password, no account data. The one personal-data exception is the opt-in Google ad click ID (gclid), see [MEASUREMENT.md](MEASUREMENT.md) |
 | **No tracking** | No analytics cookies, no behavior tracking |
 | **Local storage** | Conversations in IndexedDB on user's device |
 | **Minimal logging** | Safety events only (category + timestamp + IP hash), 90-day retention |
@@ -47,7 +47,7 @@ Legitimate interest (Art. 6(1)(f) GDPR) for providing philosophical dialogue ser
 
 **No tracking cookies.** Cloudflare sets strictly-necessary cookies (`__cf_bm`, `cf_clearance`, `__cflb`) for bot detection and load balancing. These are exempt from consent under ePrivacy Directive Article 5(3) and §25(2) TDDDG.
 
-All other client-side storage uses IndexedDB and localStorage, both technically necessary for app functionality and not cookies under the ePrivacy framework. No third-party analytics, no marketing trackers, no cross-session user profiling. Aggregate, anonymous event counters are written server-side to support service operation and nonprofit reach measurement; see the README's "What we measure (and why)" section for the exact list.
+All other client-side storage uses IndexedDB and localStorage, both technically necessary for app functionality and not cookies under the ePrivacy framework. No third-party analytics, no marketing trackers, no cross-session user profiling. Aggregate, anonymous event counters are written server-side to support service operation and nonprofit reach measurement; see [MEASUREMENT.md](MEASUREMENT.md) for the exact list, including the opt-in ad-click measurement for Google ad arrivals.
 
 ---
 
@@ -64,7 +64,7 @@ Agora Cosmica is a **general-purpose AI system interface** (not high-risk). It d
 | **AI disclosure** | Consent modal clearly states content is AI-generated |
 | **Naming convention** | All figures prefixed with "Echo of" to signal non-human origin |
 | **HTTP headers** | `X-AI-Generated`, `X-AI-Model`, `X-AI-Provider` on all API responses |
-| **Consent flow** | WelcomeDisclosureModal with explicit AI acknowledgment |
+| **Consent flow** | WelcomeDisclosureModal with explicit AI acknowledgment; AdConsentPrompt for opt-in ad-click measurement (Google ad arrivals only) |
 | **Timeline** | Compliant ahead of Aug 2026 enforcement deadline |
 
 ### Content Marking

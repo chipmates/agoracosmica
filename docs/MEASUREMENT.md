@@ -2,7 +2,7 @@
 
 We don't track users. We do count aggregate events. That's how we know if the service is working, where it breaks, and whether our nonprofit outreach actually reaches anyone.
 
-One exception we name upfront: visitors who arrive via one of our free nonprofit (Google Ad Grants) ads carry a per-click identifier (`gclid`) in the URL. If such a visitor opts in, we forward that `gclid` to Google Ads when they reach a conversion step, so the ad can be matched to a conversion. The opt-in is a non-blocking prompt shown on the page (and again in the welcome dialog if not yet answered), default off and revocable in Settings. Nothing is sent without it, and visitors from paid ads are never captured or forwarded at all. On the browser the gclid lives in sessionStorage (tab-scoped) and is never written into our own analytics counters. The full mechanics, including exactly what reaches Google, are below.
+One exception we name upfront: visitors who arrive via one of our free nonprofit (Google Ad Grants) ads carry a per-click identifier (`gclid`) in the URL. If such a visitor opts in, we forward that `gclid` to Google Ads when they reach a conversion step, so the ad can be matched to a conversion. The opt-in is a non-blocking prompt shown once on the landing page (dismissing it clears the stored gclid and means no ask again that session), default off and revocable in Settings under "Legal". Nothing is sent without it, and visitors from paid ads are never captured or forwarded at all. On the browser the gclid lives in sessionStorage (tab-scoped) and is never written into our own analytics counters. The full mechanics, including exactly what reaches Google, are below.
 
 This document lists exactly what gets counted, why, and what never does.
 

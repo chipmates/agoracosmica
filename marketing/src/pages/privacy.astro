@@ -3,7 +3,7 @@ import Public from '../layouts/Public.astro';
 import LegalDoc from '../components/legal/LegalDoc.astro';
 
 const title = 'Privacy Policy';
-const lastUpdated = 'Last updated: 8 April 2026';
+const lastUpdated = 'Last updated: 10 June 2026';
 const description = 'Privacy Policy of ChipMates gemeinnützige GmbH for the Agora Cosmica platform. GDPR-compliant information on data processing, processors, and the rights of data subjects.';
 ---
 <Public
@@ -204,7 +204,7 @@ const description = 'Privacy Policy of ChipMates gemeinnützige GmbH for the Ago
         <li>OpenRouter, Inc. (USA). Purpose: API routing for AI inference in BYOK mode (bring your own key). Users provide their own API key, which is stored exclusively locally in the browser. OpenRouter forwards requests to the selected AI provider. Privacy policy: <a href="https://openrouter.ai/privacy">https://openrouter.ai/privacy</a>.</li>
         <li>Cloudflare, Inc. (USA), processing predominantly in Europe. Purpose: API proxy, security (WAF, bot protection), rate limiting. The data processing agreement is available in the Cloudflare dashboard. EU Cloud Code of Conduct compliance mark.</li>
       </ul>
-      <p><strong>Storage period:</strong> Chat content is NOT stored on our servers. AI responses are streamed directly to your browser. Security logs (only when blocked by the content filter) are retained for up to 90 days in anonymized form (IP hashed). Rate-limit counters are stored for 24 hours (IP hashed).</p>
+      <p><strong>Storage period:</strong> Chat content is NOT stored on our servers. AI responses are streamed directly to your browser. Security logs (only when blocked by the content filter) are retained for up to 90 days in anonymized form (IP hashed). Rate-limit counters hold the IP address in a short-lived key for up to one hour and are then deleted automatically. IP addresses never enter our analytics records.</p>
       <p><strong>Note:</strong> Please do not enter personal data (name, address, phone number, email, bank details) into the chat.</p>
     </section>
 
@@ -310,7 +310,10 @@ const description = 'Privacy Policy of ChipMates gemeinnützige GmbH for the Ago
         The recipient is Google (Google Ireland Limited and Google LLC, USA). A transfer to the USA may take place. Google is certified under the EU-US Data Privacy Framework.
       </p>
       <p>
-        <strong>Legal basis:</strong> Your consent (Art. 6(1)(a) GDPR and Sect. 25(1) TDDDG). You can withdraw your consent at any time with effect for the future, in Settings under "Privacy" via "Withdraw ad-measurement consent". Withdrawal deletes the stored gclid.
+        <strong>Storage period:</strong> On our side, only an event counter without the gclid is kept for 90 days. Storage at Google follows Google's retention policies for advertising data.
+      </p>
+      <p>
+        <strong>Legal basis:</strong> Your consent (Art. 6(1)(a) GDPR and Sect. 25(1) TDDDG). You can withdraw your consent at any time with effect for the future, in Settings under "Legal" via "Withdraw ad-measurement consent". Withdrawal deletes the stored gclid.
       </p>
     </section>
 

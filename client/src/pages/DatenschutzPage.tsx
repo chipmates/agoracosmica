@@ -61,7 +61,7 @@ const DatenschutzPage: FC = () => {
           <p>
             Die verwendeten Begriffe sind nicht geschlechtsspezifisch.
           </p>
-          <p>Stand: 8. April 2026</p>
+          <p>Stand: 10. Juni 2026</p>
           <p>
             <strong>Inhaltsübersicht</strong><br/>
             * Präambel<br/>
@@ -76,6 +76,8 @@ const DatenschutzPage: FC = () => {
             * KI-gestützter Chat-Dienst<br/>
             * Audio-Dienst<br/>
             * Bot-Schutz (Cloudflare Turnstile)<br/>
+            * Conversion-Messung (Google Ads)<br/>
+            * Reichweitenmessung<br/>
             * Auftragsverarbeiter
           </p>
         </section>
@@ -241,7 +243,7 @@ const DatenschutzPage: FC = () => {
             <li>OpenRouter, Inc. (USA). Zweck: API-Routing für KI-Inferenz im BYOK-Modus (Bring Your Own Key). Nutzer stellen ihren eigenen API-Schlüssel bereit, der ausschließlich lokal im Browser gespeichert wird. OpenRouter leitet Anfragen an den gewählten KI-Anbieter weiter. Datenschutzrichtlinie: <a href="https://openrouter.ai/privacy">https://openrouter.ai/privacy</a>.</li>
             <li>Cloudflare, Inc. (USA), Verarbeitung überwiegend in Europa. Zweck: API-Proxy, Sicherheit (WAF, Bot-Schutz), Rate Limiting. Auftragsverarbeitungsvertrag im Cloudflare Dashboard abrufbar. EU Cloud Code of Conduct Compliance Mark.</li>
           </ul>
-          <p><strong>Speicherdauer:</strong> Chat-Inhalte werden serverseitig NICHT gespeichert. KI-Antworten werden per Streaming direkt an Ihren Browser übertragen. Sicherheitslogs (nur bei Blockierung durch Inhaltsfilter) werden bis zu 90 Tage anonymisiert aufbewahrt (IP gehasht). Rate-Limit-Zähler werden 24 Stunden gespeichert (IP gehasht).</p>
+          <p><strong>Speicherdauer:</strong> Chat-Inhalte werden serverseitig NICHT gespeichert. KI-Antworten werden per Streaming direkt an Ihren Browser übertragen. Sicherheitslogs (nur bei Blockierung durch Inhaltsfilter) werden bis zu 90 Tage anonymisiert aufbewahrt (IP gehasht). Rate-Limit-Zähler halten die IP-Adresse für höchstens eine Stunde in einem kurzlebigen Schlüssel und werden danach automatisch gelöscht. IP-Adressen gelangen nie in unsere Analytik.</p>
           <p><strong>Hinweis:</strong> Bitte geben Sie keine personenbezogenen Daten (Name, Adresse, Telefonnummer, E-Mail, Bankdaten) in den Chat ein.</p>
         </section>
 
@@ -351,7 +353,10 @@ const DatenschutzPage: FC = () => {
             Empfänger ist Google (Google Ireland Limited sowie Google LLC, USA). Eine Übermittlung in die USA kann erfolgen. Google ist unter dem EU-US Data Privacy Framework zertifiziert.
           </p>
           <p>
-            <strong>Rechtsgrundlage:</strong> Ihre Einwilligung (Art. 6 Abs. 1 lit. a DSGVO und § 25 Abs. 1 TDDDG). Sie können Ihre Einwilligung jederzeit mit Wirkung für die Zukunft widerrufen, in den Einstellungen unter „Datenschutz" über „Einwilligung zur Werbe-Messung widerrufen". Der Widerruf löscht den gespeicherten gclid.
+            <strong>Speicherdauer:</strong> Auf unserer Seite verbleibt nur ein Ereignis-Zähler ohne gclid für 90 Tage. Die Speicherdauer bei Google richtet sich nach Googles Aufbewahrungsrichtlinien für Werbedaten.
+          </p>
+          <p>
+            <strong>Rechtsgrundlage:</strong> Ihre Einwilligung (Art. 6 Abs. 1 lit. a DSGVO und § 25 Abs. 1 TDDDG). Sie können Ihre Einwilligung jederzeit mit Wirkung für die Zukunft widerrufen, in den Einstellungen unter „Rechtliches" über „Einwilligung zur Werbe-Messung widerrufen". Der Widerruf löscht den gespeicherten gclid.
           </p>
         </section>
 

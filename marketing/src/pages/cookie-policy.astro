@@ -3,7 +3,7 @@ import Public from '../layouts/Public.astro';
 import LegalDoc from '../components/legal/LegalDoc.astro';
 
 const title = 'Cookie-Richtlinie';
-const lastUpdated = 'Zuletzt aktualisiert: April 2026';
+const lastUpdated = 'Zuletzt aktualisiert: Juni 2026';
 const description = 'Cookie-Richtlinie von Agora Cosmica. Wir verwenden keine Tracking-, Analyse- oder Marketing-Cookies. Nur technisch notwendige Speicherung gemäß § 25 Abs. 2 Nr. 2 TDDDG.';
 ---
 <Public
@@ -52,7 +52,22 @@ const description = 'Cookie-Richtlinie von Agora Cosmica. Wir verwenden keine Tr
         <tbody>
           <tr>
             <td>Session Storage</td>
-            <td>Erhält deinen Sitzungszustand während der Nutzung der Anwendung. Bei Ankunft über eine Google-Anzeige wird hier der Klick-Identifikator (gclid) gehalten, bis du der Werbe-Messung zustimmst oder der Tab schließt.</td>
+            <td>Erhält deinen Sitzungszustand während der Nutzung der Anwendung. Bei Ankunft über eine Google-Anzeige wird hier der Klick-Identifikator (gclid) gehalten, bis du der Werbe-Messung zustimmst, das Hinweisfeld schließt oder der Tab endet.</td>
+            <td>Bis du deinen Browser schließt</td>
+          </tr>
+          <tr>
+            <td>Session Storage (agc_paid)</td>
+            <td>Markiert Besuche über bezahlte Anzeigen (?p=1), damit für sie KEINE Messung stattfindet. Reine Unterdrückungs-Markierung, wird nie übertragen.</td>
+            <td>Bis du deinen Browser schließt</td>
+          </tr>
+          <tr>
+            <td>Session Storage (agc_ad_prompt_dismissed)</td>
+            <td>Merkt, dass du das Einwilligungs-Hinweisfeld geschlossen hast, damit es in dieser Sitzung nicht erneut erscheint.</td>
+            <td>Bis du deinen Browser schließt</td>
+          </tr>
+          <tr>
+            <td>Session Storage (agc_conv_fired_*)</td>
+            <td>Verhindert nach erteilter Einwilligung, dass dasselbe Mess-Ereignis doppelt gezählt wird. Wird beim Widerruf gelöscht.</td>
             <td>Bis du deinen Browser schließt</td>
           </tr>
           <tr>
@@ -105,7 +120,7 @@ const description = 'Cookie-Richtlinie von Agora Cosmica. Wir verwenden keine Tr
     <section>
       <h2>Deine Datenschutzrechte</h2>
       <p>
-        Da wir keine Tracking-Cookies verwenden, gibt es keine Cookie-Einstellungen zu verwalten. Deine Privatsphäre ist standardmäßig geschützt. Die minimale technische Speicherung, die wir verwenden, ist für die Anwendung unerlässlich, um deine grundlegenden Einstellungen wie die Sprachauswahl zu speichern.
+        Wir verwenden keine Tracking-Cookies, deine Privatsphäre ist standardmäßig geschützt. Die einzige verwaltbare Einstellung ist die freiwillige Werbe-Messung für Besuche über eine Google-Anzeige. Du kannst diese Einwilligung jederzeit in den Einstellungen unter „Rechtliches" widerrufen. Der Widerruf löscht den gespeicherten Klick-Identifikator. Die übrige minimale technische Speicherung ist für die Anwendung unerlässlich, etwa für deine Sprachauswahl.
       </p>
     </section>
 

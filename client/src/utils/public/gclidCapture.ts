@@ -110,14 +110,37 @@ export function isPaidVisitor(): boolean {
 /**
  * True once the visitor has made an explicit ad-measurement choice (granted or
  * declined), recorded in localStorage. Used to avoid re-asking: a landing-page
- * accept or decline is remembered, so the in-app welcome step does not prompt
- * again. A passive dismiss writes nothing, so it falls through to the in-app ask.
+ * accept or decline is remembered across the session. A passive dismiss writes
+ * nothing and clears the click ID instead (see clearGclid).
+ *
+ * A record written under an older AD_CONSENT_VERSION no longer covers the
+ * current scope, so it counts as undecided and the prompt may ask again.
  */
 export function adConsentDecided(): boolean {
   try {
-    return typeof localStorage !== 'undefined' && localStorage.getItem(LS_AD_CONSENT_KEY) !== null;
+    if (typeof localStorage === 'undefined') return false;
+    const raw = localStorage.getItem(LS_AD_CONSENT_KEY);
+    if (!raw) return false;
+    return (JSON.parse(raw) as { version?: string }).version === AD_CONSENT_VERSION;
   } catch {
     return false;
+  }
+}
+
+/**
+ * Drop the captured gclid from memory and sessionStorage without recording a
+ * consent decision. Used when the consent prompt is dismissed: no surface is
+ * left to grant consent this session, so a stored click ID has no purpose
+ * (§ 25 Abs. 1 TDDDG, storage needs a purpose backed by consent or necessity).
+ */
+export function clearGclid(): void {
+  capturedGclid = null;
+  try {
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.removeItem(SS_GCLID_KEY);
+    }
+  } catch {
+    // no-op
   }
 }
 

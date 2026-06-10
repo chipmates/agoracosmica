@@ -8,9 +8,11 @@
 //              the same conversion the old marketing CTA fired, now gated on a
 //              real opt-in instead of the bare gclid).
 //   Decline -> revokeAdConsent() (records the choice, clears the gclid, sends
-//              nothing). Remembered, so the in-app welcome step does not re-ask.
-//   Dismiss -> hide for this session only (no record), so the in-app welcome
-//              step can still offer the optional checkbox (the fall-through).
+//              nothing). Remembered, so the visitor is not asked again.
+//   Dismiss -> hide for this session AND clear the stored click ID (no record,
+//              no later ask: with the prompt gone there is no consent surface
+//              left this session, so keeping the gclid would be purposeless
+//              storage under § 25 TDDDG).
 //
 // Copy is a DRAFT pending the data-protection lawyer's review. Finalize the
 // wording here, or lift it into publicI18n later.
@@ -18,6 +20,7 @@
 import { useEffect, useState } from 'react';
 import {
   captureGclid,
+  clearGclid,
   getGclid,
   isPaidVisitor,
   adConsentDecided,
@@ -34,19 +37,23 @@ const COPY = {
   en: {
     trust: 'Nonprofit · Open Source · No tracking cookies, no profiling',
     heading: 'About this one Google thing',
-    body: 'You came from a Google ad we get free as a nonprofit. With your okay, Google counts it, and that lets us keep these ads in the future. Just the click ID, nothing about you. Saying no opens the full library too.',
+    body: 'You came from a Google ad we get free as a nonprofit. With your okay, Google counts it, and that lets us keep these ads in the future. Just the ad’s click ID, no name, no browsing data. You can change your mind anytime in Settings under "Legal". Saying no opens the full library too.',
     accept: 'Yes, count the ad',
     decline: 'No, just open the library',
     link: 'See the code',
+    privacy: 'Privacy policy',
+    privacyHref: '/privacy/',
     dismiss: 'Close',
   },
   de: {
     trust: 'Gemeinnützig · Open Source · Keine Tracking-Cookies, kein Profiling',
     heading: 'Zu dieser einen Google-Sache',
-    body: 'Wir bekommen als Nonprofit kostenlose Google Anzeigen. Dein Okay lässt Google sie zählen und erlaubt uns damit diese Anzeigen auch in Zukunft. Nur die Klick-ID, nichts über dich. Ein Nein öffnet die Bibliothek genauso.',
+    body: 'Wir bekommen als Nonprofit kostenlose Google Anzeigen. Dein Okay lässt Google sie zählen und erlaubt uns damit diese Anzeigen auch in Zukunft. Nur die Klick-ID der Anzeige, kein Name, keine Browserdaten. Du kannst das jederzeit in den Einstellungen unter „Rechtliches" ändern. Ein Nein öffnet die Bibliothek genauso.',
     accept: 'Ja, Anzeige zählen',
     decline: 'Nein, einfach öffnen',
     link: 'Code ansehen',
+    privacy: 'Datenschutzerklärung',
+    privacyHref: '/datenschutz/',
     dismiss: 'Schließen',
   },
 } as const;
@@ -90,15 +97,22 @@ export default function AdConsentPrompt({ lang }: Props) {
   const t = COPY[lang] ?? COPY.en;
 
   useEffect(() => {
-    captureGclid(); // reads ?gclid / ?p=1 from the landing URL into storage
-    if (!getGclid() || isPaidVisitor() || adConsentDecided()) return;
     let dismissed = false;
     try {
       dismissed = sessionStorage.getItem(SS_DISMISSED) === '1';
     } catch {
       // sessionStorage blocked — show once
     }
-    if (!dismissed) setShow(true);
+    if (dismissed) {
+      // Prompt was dismissed earlier this session: no consent surface remains,
+      // so make sure no click ID lingers in storage (also catches a reload of
+      // a landing URL that still carries ?gclid).
+      clearGclid();
+      return;
+    }
+    captureGclid(); // reads ?gclid / ?p=1 from the landing URL into storage
+    if (!getGclid() || isPaidVisitor() || adConsentDecided()) return;
+    setShow(true);
   }, []);
 
   if (!show) return null;
@@ -118,6 +132,9 @@ export default function AdConsentPrompt({ lang }: Props) {
     } catch {
       /* no-op */
     }
+    // No consent surface remains this session, so a stored click ID would be
+    // purposeless storage. Drop it.
+    clearGclid();
     setShow(false);
   };
 
@@ -152,6 +169,9 @@ export default function AdConsentPrompt({ lang }: Props) {
         rel="noopener noreferrer"
       >
         {t.link} ›
+      </a>
+      <a className="agc-consent__link" href={t.privacyHref}>
+        {t.privacy} ›
       </a>
     </aside>
   );
