@@ -430,8 +430,11 @@ function App(): React.ReactElement {
           )
         },
         {
+          // Router paths are relative to basename "/app", so the index route is
+          // "/" here. A literal "/app" would resolve to the URL /app/app, match
+          // this catch-all again and loop into a blank page.
           path: "*",
-          element: <NavigateKeepingSearch to="/app" />
+          element: <NavigateKeepingSearch to="/" />
         }
       ]
     }

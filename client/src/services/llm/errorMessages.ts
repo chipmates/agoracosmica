@@ -69,6 +69,12 @@ export function mapErrorToUserMessage(error: unknown, tString: TStringFn): strin
   // ── Plain Error (timeouts, network) ─────────────────────────────────────
   if (error instanceof Error) {
     const msg = error.message.toLowerCase();
+    // Turnstile script blocked (uBlock/Brave-strict block challenges.cloudflare.com).
+    // Must come before the generic timeout branch: a blocked script also times
+    // out, and the generic message sends users into a hopeless retry loop.
+    if (msg.includes('turnstile') && (msg.includes('script') || msg.includes('load'))) {
+      return tString(`${KEY}.securityCheckBlocked`);
+    }
     if (msg.includes('timed out') || msg.includes('timeout')) {
       return tString(`${KEY}.timeout`);
     }

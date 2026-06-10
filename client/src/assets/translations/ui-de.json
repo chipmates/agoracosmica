@@ -95,7 +95,8 @@
     "nameLabel": "Dein Name",
     "saveFailed": "Dein Profil konnte leider nicht gespeichert werden. Bitte versuche es erneut.",
     "defaultName": "Suchende",
-    "formReady": "Das Profilformular ist jetzt verfügbar",
+    "formReady": "Eine Intro-Animation läuft. Tippe, klicke oder drücke Escape, um sie zu überspringen.",
+    "skipHint": "Tippe irgendwohin zum Überspringen",
     "reassure": "Dein Name bleibt auf diesem Gerät. Kein Konto, keine E-Mail.",
     "formAria": "Wähle, wie du erscheinst",
     "cinematic": {
@@ -449,7 +450,7 @@
         "trustOpenSource": "Open Source (AGPL-3.0)",
         "trustOpenSourceAria": "Open Source unter AGPL-3.0. Quellcode auf GitHub ansehen. Öffnet in neuem Tab.",
         "trustNoTracking": "Keine Tracking-Cookies, kein Profiling",
-        "trustProof": "Wir speichern deine Daten nie. Server in Deutschland und Finnland, täglich automatisch geprüft.",
+        "trustProof": "Deine Gespräche werden nie auf unseren Servern gespeichert. Server in Deutschland und Finnland, täglich automatisch geprüft.",
         "clearAllButton": "Alle meine Daten löschen",
         "clearAllConfirm": "Dies löscht alle deine Gespräche, deinen OpenRouter-Key und alle Einstellungen auf diesem Gerät. Die App wird neu geladen. Fortfahren?"
       },
@@ -528,8 +529,6 @@
   "quota": {
     "remaining": "verbleibend",
     "limitReached": "Tageslimit erreicht",
-    "resetsAt": "Wird um {{time}} UTC zurueckgesetzt",
-    "addKey": "API-Key fuer unbegrenzt hinzufuegen",
     "modal": {
       "chatTitle": "Nachrichtenlimit erreicht",
       "councilTitle": "Council-Limit erreicht",
@@ -540,7 +539,8 @@
       "availableAgain": "Wieder verfügbar {{when}}.",
       "setupKey": "OpenRouter-Key hinzufügen",
       "dismiss": "Vielleicht später",
-      "unlimitedNote": "Mit deinem eigenen OpenRouter-Key gibt es keine Tageslimits."
+      "unlimitedNote": "Mit deinem eigenen OpenRouter-Key gibt es keine Tageslimits.",
+      "freeRemains": "Geschichten, Prismen und vorbereitete Konzile bleiben offen. Sie zählen nie gegen das Limit."
     }
   },
   "pii": {
@@ -1018,7 +1018,9 @@
     "selectLanguage": "{language} wählen",
     "ariaLabel": "Beginne deine Weisheitsreise",
     "preparingConversation": "Gespräch wird vorbereitet...",
-    "preparingJourney": "Deine Reise wird vorbereitet..."
+    "preparingJourney": "Deine Reise wird vorbereitet...",
+    "chooseModeCta": "Wähle, wie du beginnen möchtest",
+    "chooseFigureCta": "Wähle eine Persönlichkeit"
   },
   "modes": {
     "mode": "Modus",
@@ -1215,6 +1217,7 @@
       "byokInsufficientCredits": "Deinem OpenRouter-Konto ist das Guthaben ausgegangen. Bitte lade es auf, um weiterzumachen.",
       "timeout": "Die Anfrage hat zu lange gedauert. Bitte versuche es nochmal.",
       "network": "Verbindungsproblem. Bitte prüfe dein Netzwerk und versuche es nochmal.",
+      "securityCheckBlocked": "Die Sicherheitsprüfung konnte nicht geladen werden. Vermutlich blockiert ein Werbeblocker oder strenger Privatsphäre-Schutz challenges.cloudflare.com. Erlaube es für diese Seite und versuche es nochmal.",
       "generic": "Wir konnten diese Unterhaltung nicht abschließen. Bitte versuche es nochmal."
     }
   },
@@ -1269,7 +1272,7 @@
   "legal": {
     "privacy": {
       "title": "Datenschutzerklärung",
-      "lastUpdated": "Stand: 29. März 2026"
+      "lastUpdated": "Stand: 10. Juni 2026"
     },
     "imprint": {
       "title": "Impressum",
@@ -1296,12 +1299,11 @@
       "privacyNote": "Datenschutzerklärung",
       "jsbNote": "Jugendschutzbeauftragter",
       "startButton": "Jetzt entdecken",
-      "termsCheckboxSuffix": " gelesen und stimme diesen zu.",
-      "adMeasurement": "Ich kam über eine Google-Anzeige. Es ist okay, Google wissen zu lassen, dass sie funktioniert hat. Optional, es funktioniert auch ohne."
+      "termsCheckboxSuffix": " gelesen und stimme diesen zu."
     },
     "cookiePolicy": {
       "title": "Cookie-Richtlinie",
-      "lastUpdated": "Zuletzt aktualisiert: April 2026",
+      "lastUpdated": "Zuletzt aktualisiert: Juni 2026",
       "intro": "Bei Agora Cosmica respektieren wir deine Privatsphäre und legen Wert auf Transparenz bei der Verwendung von Cookies und ähnlichen Technologien.",
       "whatAreCookies": {
         "title": "Was sind Cookies?",
@@ -1620,7 +1622,7 @@
         "title": "Null Tracking",
         "description": "Keine Analyse-Skripte, keine Nutzerprofile, keine Dritt-Tracker.",
         "points": [
-          "Nichts von Google, Meta oder anderen",
+          "Keine Tracker von Google, Meta oder anderen",
           "Ein technisches Cookie, das vor Bots schützt",
           "Nur anonyme Fehlerzahlen, damit wir Bugs beheben können"
         ]

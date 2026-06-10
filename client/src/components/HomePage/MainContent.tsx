@@ -97,6 +97,10 @@ interface MainContentProps {
 
   // Prism player close handler
   onPrismClose: () => void;
+
+  // Empty-state escape hatches (reopen the choice the user closed)
+  onChooseMode: () => void;
+  onChooseFigure: () => void;
 }
 
 /**
@@ -145,7 +149,11 @@ const MainContent: FC<MainContentProps> = ({
   onCouncilPlayerClose,
 
   // Prism player close handler
-  onPrismClose
+  onPrismClose,
+
+  // Empty-state escape hatches
+  onChooseMode,
+  onChooseFigure
 }) => {
   return (
     <main
@@ -286,7 +294,9 @@ const MainContent: FC<MainContentProps> = ({
                 />
               </>
             ) : !conversationStartedFinal ? (
-              // Show empty state while mode selector or language wheel should appear
+              // Empty state behind the mode selector / language wheel. If those
+              // were closed without starting anything, this is the only surface
+              // left, so it must offer the way back in instead of dead-ending.
               <div style={{ position: "relative", height: "100%", width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
                 <div style={{ color: 'var(--gold-base)', textAlign: 'center' }}>
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px' }}>
@@ -294,6 +304,25 @@ const MainContent: FC<MainContentProps> = ({
                     <p style={{ fontSize: '18px', fontWeight: '500' }}>
                       {t('conversation.preparingJourney') || 'Preparing your journey...'}
                     </p>
+                    <button
+                      type="button"
+                      onClick={selectedFigure ? onChooseMode : onChooseFigure}
+                      style={{
+                        minHeight: '44px',
+                        padding: '10px 24px',
+                        background: 'transparent',
+                        border: '1px solid color-mix(in srgb, var(--gold-base) 45%, transparent)',
+                        borderRadius: '22px',
+                        color: 'var(--gold-base)',
+                        fontSize: '16px',
+                        fontWeight: 500,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {selectedFigure
+                        ? (t('conversation.chooseModeCta') || 'Choose how to begin')
+                        : (t('conversation.chooseFigureCta') || 'Choose a figure')}
+                    </button>
                   </div>
                 </div>
               </div>

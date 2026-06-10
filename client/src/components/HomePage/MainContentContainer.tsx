@@ -32,6 +32,8 @@ interface SessionSlice {
   councilPlayerLevel: 1 | 2;
   handleCouncilPlayerClose: () => void;
   handlePrismClose: () => void;
+  handleModeSelectorOpen: () => void;
+  handleFigureCarouselOpen: () => void;
 }
 
 interface AppSlice {
@@ -112,6 +114,8 @@ const MainContentContainer: React.FC<MainContentContainerProps> = ({
         councilPlayerLevel={session.councilPlayerLevel}
         onCouncilPlayerClose={session.handleCouncilPlayerClose}
         onPrismClose={session.handlePrismClose}
+        onChooseMode={session.handleModeSelectorOpen}
+        onChooseFigure={session.handleFigureCarouselOpen}
       />
     </>
   );

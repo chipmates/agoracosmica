@@ -1468,7 +1468,9 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
       councilPlayerId,
       councilPlayerLevel,
       handleCouncilPlayerClose,
-      handlePrismClose
+      handlePrismClose,
+      handleModeSelectorOpen,
+      handleFigureCarouselOpen
     }),
     [
       showFigureCarousel,
@@ -1485,7 +1487,9 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
       councilPlayerId,
       councilPlayerLevel,
       handleCouncilPlayerClose,
-      handlePrismClose
+      handlePrismClose,
+      handleModeSelectorOpen,
+      handleFigureCarouselOpen
     ]
   );
 

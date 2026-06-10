@@ -97,7 +97,8 @@
     "nameLabel": "Your name",
     "saveFailed": "Couldn't save your profile. Please try again.",
     "defaultName": "Seeker",
-    "formReady": "Profile form is now available",
+    "formReady": "An intro animation is playing. Tap, click, or press Escape to skip it.",
+    "skipHint": "Tap anywhere to skip",
     "reassure": "Your name stays on this device. No account, no email.",
     "formAria": "Choose how you appear",
     "cinematic": {
@@ -451,7 +452,7 @@
         "trustOpenSource": "Open Source (AGPL-3.0)",
         "trustOpenSourceAria": "Open Source under AGPL-3.0. Read the source code on GitHub. Opens in a new tab.",
         "trustNoTracking": "No tracking cookies, no profiling",
-        "trustProof": "We never keep your data. Servers in Germany and Finland, automatically checked every day.",
+        "trustProof": "Your conversations are never stored on our servers. Servers in Germany and Finland, automatically checked every day.",
         "clearAllButton": "Clear all my data",
         "clearAllConfirm": "This deletes all your conversations, your OpenRouter key, and every setting on this device. The app will reload. Continue?"
       },
@@ -524,8 +525,6 @@
   "quota": {
     "remaining": "left",
     "limitReached": "Daily limit reached",
-    "resetsAt": "Resets at {{time}} UTC",
-    "addKey": "Add API key for unlimited",
     "modal": {
       "chatTitle": "Message limit reached",
       "councilTitle": "Council limit reached",
@@ -536,7 +535,8 @@
       "availableAgain": "Available again {{when}}.",
       "setupKey": "Add OpenRouter Key",
       "dismiss": "Maybe later",
-      "unlimitedNote": "With your own OpenRouter key, there are no daily limits."
+      "unlimitedNote": "With your own OpenRouter key, there are no daily limits.",
+      "freeRemains": "Stories, Prisms, and pre-recorded councils stay open. They never count against the limit."
     }
   },
   "pii": {
@@ -1016,7 +1016,9 @@
     "selectLanguage": "Select {language}",
     "ariaLabel": "Begin your wisdom journey",
     "preparingConversation": "Preparing conversation...",
-    "preparingJourney": "Preparing your journey..."
+    "preparingJourney": "Preparing your journey...",
+    "chooseModeCta": "Choose how to begin",
+    "chooseFigureCta": "Choose a figure"
   },
   "modes": {
     "mode": "Mode",
@@ -1213,6 +1215,7 @@
       "byokInsufficientCredits": "Your OpenRouter account is out of credits. Please top it up to continue.",
       "timeout": "The request took too long. Please try again.",
       "network": "Connection issue. Please check your network and try again.",
+      "securityCheckBlocked": "The security check could not load. An ad blocker or strict privacy setting is likely blocking challenges.cloudflare.com. Allow it for this site, then try again.",
       "generic": "We could not complete that conversation. Please try again."
     }
   },
@@ -1267,7 +1270,7 @@
   "legal": {
     "privacy": {
       "title": "Privacy Policy",
-      "lastUpdated": "Last updated: March 29, 2026"
+      "lastUpdated": "Last updated: June 10, 2026"
     },
     "imprint": {
       "title": "Impressum",
@@ -1294,12 +1297,11 @@
       "privacyNote": "Privacy Policy",
       "jsbNote": "Youth Protection Officer",
       "startButton": "Start exploring",
-      "termsCheckboxSuffix": ".",
-      "adMeasurement": "I came from a Google ad. It is fine to let Google know it worked. Optional, everything works without it."
+      "termsCheckboxSuffix": "."
     },
     "cookiePolicy": {
       "title": "Cookie Policy",
-      "lastUpdated": "Last updated: April 2026",
+      "lastUpdated": "Last updated: June 2026",
       "intro": "At Agora Cosmica, we respect your privacy and are committed to being transparent about our use of cookies and similar technologies.",
       "whatAreCookies": {
         "title": "What Are Cookies?",
@@ -1618,7 +1620,7 @@
         "title": "Zero Tracking",
         "description": "No analytics scripts, no user profiles, no third-party trackers.",
         "points": [
-          "Nothing from Google, Meta, or anyone else",
+          "No trackers from Google, Meta, or anyone else",
           "One technical cookie that helps block bots",
           "Just anonymous error counts so we can fix bugs"
         ]

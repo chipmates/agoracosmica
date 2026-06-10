@@ -59,6 +59,7 @@ const LoginPage: FC<LoginPageProps> = ({ onComplete }) => {
   const [popupType] = useState<PopupType>('');
   const [loginSuccessful, setLoginSuccessful] = useState<boolean>(false);
   const [showSkipOverlay, setShowSkipOverlay] = useState<boolean>(false);
+  const [skipHintVisible, setSkipHintVisible] = useState<boolean>(false);
   // Paradiso rose + figure fade orchestration
   const [figuresActive, setFiguresActive] = useState(false);
   const [figureIndices, setFigureIndices] = useState<number[]>([]);
@@ -97,6 +98,14 @@ const LoginPage: FC<LoginPageProps> = ({ onComplete }) => {
     setShowSkipOverlay(true);
     setLoginSuccessful(true);
   }, [loginSuccessful, finishCinematic]);
+
+  // Warm the post-cinematic chunks while the cinematic plays. Without this the
+  // HomePage bundle and the welcome modal only start downloading AFTER the
+  // skip/handoff, which on slow connections shows a bare "Loading..." seam.
+  useEffect(() => {
+    import('./HomePage').catch(() => {});
+    import('../components/WelcomeDisclosureModal').catch(() => {});
+  }, []);
 
   // Mount: play the music, set the reveal timer, watch orientation.
   useEffect(() => {
@@ -179,6 +188,15 @@ const LoginPage: FC<LoginPageProps> = ({ onComplete }) => {
     return () => clearTimeout(t);
   }, [loginSuccessful]);
 
+  // The skip affordance was invisible: a tap anywhere skips, but nothing said
+  // so. Fade in a quiet hint after a moment, once it's clear this is a
+  // sequence and not the app.
+  useEffect(() => {
+    if (prefersReducedMotion.current) return;
+    const t = setTimeout(() => setSkipHintVisible(true), 3000);
+    return () => clearTimeout(t);
+  }, []);
+
   // Esc skips the whole cinematic.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -253,6 +271,26 @@ const LoginPage: FC<LoginPageProps> = ({ onComplete }) => {
           }}
         />
       )}
+
+      {/* Quiet skip hint, visual only (the SR live region below says the same) */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'fixed',
+          bottom: 'calc(24px + env(safe-area-inset-bottom, 0px))',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          color: 'var(--gold-base)',
+          opacity: skipHintVisible ? 0.65 : 0,
+          transition: 'opacity 1.2s ease',
+          fontSize: '14px',
+          letterSpacing: '0.04em',
+          pointerEvents: 'none',
+          whiteSpace: 'nowrap'
+        }}
+      >
+        {tNode('entry.skipHint')}
+      </div>
 
       <audio ref={audioRef} loop preload="none">
         <source src={backgroundMusic} type="audio/webm" />

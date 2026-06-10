@@ -95,6 +95,16 @@ const RateLimitModal: FC = () => {
           </p>
         )}
 
+        {(endpoint === 'chat' || endpoint === 'council') && (
+          <p style={{
+            fontSize: 'var(--ui-font-size-small)',
+            color: 'var(--text-secondary)',
+            marginBottom: '8px',
+          }}>
+            {tString('quota.modal.freeRemains', 'Stories, Prisms, and pre-recorded councils stay open. They never count against the limit.')}
+          </p>
+        )}
+
         <p style={{
           fontSize: 'var(--ui-font-size-small)',
           color: 'var(--text-tertiary)',
