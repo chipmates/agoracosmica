@@ -7,6 +7,14 @@ export const RATE_LIMITS = {
   GLOBAL_DAILY: 15_000,
   COUNCIL_DAILY_PER_IP: 1,
   SUMMARY_DAILY_PER_IP: 2,
+  // Emergency brakes, not throttles: sized ~1000x current organic volume so no
+  // real user can ever hit them (council is 1/day per identity, so tripping
+  // the brake organically needs 1000 distinct users in one day). They exist
+  // only to bound the spend of identity-rotation abuse on the two most
+  // expensive endpoints. Separate counters so an attack on one endpoint can
+  // never block legitimate users of another.
+  GLOBAL_COUNCIL_DAILY: 1_000,
+  GLOBAL_SUMMARY_DAILY: 2_000,
 } as const;
 
 export type RateLimitEndpoint = 'chat' | 'council' | 'summary';

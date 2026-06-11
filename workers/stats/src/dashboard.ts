@@ -901,6 +901,14 @@ function pct(a, b) { return b > 0 ? Math.round(a / b * 100) : 0; }
 
 function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
 
+// Labels can carry client-supplied strings (figure ids from beacon payloads),
+// so every interpolation into chart/table HTML goes through this.
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function(ch) {
+    return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch];
+  });
+}
+
 function modeLabel(m) { return MODE_LABELS[m] || cap(m); }
 
 function tier(p) { return p >= 90 ? 'err' : p >= 75 ? 'warn' : 'ok'; }
@@ -1274,7 +1282,7 @@ function barsHtml(items, color) {
   let html = '<div class="bar-chart">';
   items.forEach(function(row) {
     const w = max > 0 ? (row.c / max * 100) : 0;
-    html += '<div class="bar-row"><span class="bar-label">' + row.label + '</span>' +
+    html += '<div class="bar-row"><span class="bar-label">' + esc(row.label) + '</span>' +
       '<div class="bar-track"><div class="bar-fill" style="width:' + w.toFixed(1) + '%;background:' + (row.color || color) + '"></div></div>' +
       '<span class="bar-val">' + fmt(row.c) + '</span></div>';
   });
@@ -1289,6 +1297,8 @@ function tableHtml(headers, rows) {
   html += '</tr>';
   rows.forEach(function(r) {
     html += '<tr>';
+    // Cells may carry intentional markup (styled spans); callers escape any
+    // client-supplied value before embedding it.
     r.forEach(function(cell) { html += '<td>' + cell + '</td>'; });
     html += '</tr>';
   });
@@ -2330,7 +2340,7 @@ async function loadProduct() {
   if (figMode.length > 0) {
     var fmRows = figMode.map(function(r) {
       var mc = COLORS.modes[r.mode] || 'var(--dim)';
-      return ['<span>' + cap(r.figure) + '</span>', '<span style="color:' + mc + '">' + modeLabel(r.mode) + '</span>', r.c];
+      return ['<span>' + esc(cap(r.figure)) + '</span>', '<span style="color:' + mc + '">' + esc(modeLabel(r.mode)) + '</span>', r.c];
     });
     html += chartCard('Figure x Mode', tableHtml(['Figure', 'Mode', 'Chats'], fmRows), 'card-wide');
   }
@@ -2527,7 +2537,7 @@ async function loadAudio() {
   if (ttsModels.length > 0) {
     var mRows = ttsModels.map(function(r) {
       var mc = COLORS.models[r.model] || 'var(--dim)';
-      return ['<span style="color:' + mc + '">' + r.model + '</span>', fmt(r.c), fmtMs(r.avg_ms)];
+      return ['<span style="color:' + mc + '">' + esc(r.model) + '</span>', fmt(r.c), fmtMs(r.avg_ms)];
     });
     html += chartCard('TTS Models', tableHtml(['Model', 'Requests', 'Avg Latency'], mRows), 'card-wide');
   }

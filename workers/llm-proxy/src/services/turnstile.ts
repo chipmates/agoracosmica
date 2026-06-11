@@ -9,10 +9,13 @@ interface TurnstileVerifyResponse {
   hostname?: string;
 }
 
+// Production hostnames only. Local dev never reaches this check: session.ts
+// accepts 'dev-test-token' from loopback when TURNSTILE_SECRET_KEY is unset,
+// so verification is bypassed entirely. A 'localhost' entry here would only
+// let an attacker replay tokens solved on their own localhost-bound widget.
 const EXPECTED_HOSTNAMES = [
   'agoracosmica.org',
   'www.agoracosmica.org',
-  'localhost',
 ];
 
 export async function verifyTurnstileToken(

@@ -63,6 +63,16 @@ export async function handleConversions(
     return Response.json({ error: 'Stale timestamp' }, { status: 400 });
   }
 
+  // figureId is stored and later rendered on the stats dashboard, so it must
+  // be slug-shaped, never free text (same rule as the funnel route). Anything
+  // that fails validation is dropped rather than rejected: the event itself
+  // is still real.
+  const FIGURE_RE = /^[A-Za-z0-9_-]{1,64}$/;
+  const figureId =
+    typeof payload.figureId === 'string' && FIGURE_RE.test(payload.figureId)
+      ? payload.figureId
+      : '';
+
   // Rate limiting
   const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
   const rateLimitKey = `conv_rl:${ip}`;
@@ -80,7 +90,7 @@ export async function handleConversions(
   const convKey = `conv:${dateKey}:${payload.event}:${Date.now()}`;
   await env.RATE_LIMITS.put(convKey, JSON.stringify({
     event: payload.event,
-    figureId: payload.figureId || null,
+    figureId: figureId || null,
     timestamp: payload.timestamp,
     date: dateKey,
   }), { expirationTtl: 90 * 86400 }); // Keep 90 days
@@ -96,7 +106,7 @@ export async function handleConversions(
   // our analytics" claim true.
   if (env.ANALYTICS) {
     env.ANALYTICS.writeDataPoint({
-      blobs: [payload.event, payload.figureId || ''],
+      blobs: [payload.event, figureId],
       doubles: [payload.timestamp],
       indexes: [payload.event],
     });
@@ -110,7 +120,7 @@ export async function handleConversions(
       gclid: payload.gclid,
       event: payload.event,
       timestamp: payload.timestamp,
-      figureId: payload.figureId,
+      figureId: figureId || undefined,
       country: readCountry(request),
     }).catch(() => {
       // Forwarding errors are logged inside the service; never propagate

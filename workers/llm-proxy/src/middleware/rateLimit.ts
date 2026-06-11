@@ -98,19 +98,30 @@ export async function checkAndIncrementCouncilRateLimit(
   const subject = payload.sub;
   const dateKey = getDateKey();
   const councilKey = `council:sub:${subject}:${dateKey}`;
+  const globalKey = `global:council:${dateKey}`;
   const limit = getEffectiveLimit(env, 'council');
   const resetsAt = getDailyResetTime();
   const retryAfterSeconds = secondsUntil(resetsAt);
 
-  const countStr = await env.RATE_LIMITS.get(councilKey);
+  const [countStr, globalStr] = await Promise.all([
+    env.RATE_LIMITS.get(councilKey),
+    env.RATE_LIMITS.get(globalKey),
+  ]);
   const used = countStr ? parseInt(countStr, 10) || 0 : 0;
+  const globalUsed = globalStr ? parseInt(globalStr, 10) || 0 : 0;
 
-  if (used >= limit) {
+  // Per-identity caps alone don't bound spend here: /v1/session mints a JWT
+  // for any Turnstile solve with a client-supplied UUID, so identity rotation
+  // resets them. The global brake is the backstop (see config.ts for sizing).
+  if (used >= limit || globalUsed >= RATE_LIMITS.GLOBAL_COUNCIL_DAILY) {
     return { allowed: false, used, limit, resetsAt, retryAfterSeconds };
   }
 
   const count = used + 1;
-  await env.RATE_LIMITS.put(councilKey, count.toString(), { expirationTtl: 86400 });
+  await Promise.all([
+    env.RATE_LIMITS.put(councilKey, count.toString(), { expirationTtl: 86400 }),
+    env.RATE_LIMITS.put(globalKey, (globalUsed + 1).toString(), { expirationTtl: 86400 }),
+  ]);
 
   return { allowed: true, used: count, limit, resetsAt, retryAfterSeconds };
 }
@@ -123,19 +134,28 @@ export async function checkAndIncrementSummaryRateLimit(
   const subject = payload.sub;
   const dateKey = getDateKey();
   const summaryKey = `summary:sub:${subject}:${dateKey}`;
+  const globalKey = `global:summary:${dateKey}`;
   const limit = getEffectiveLimit(env, 'summary');
   const resetsAt = getDailyResetTime();
   const retryAfterSeconds = secondsUntil(resetsAt);
 
-  const countStr = await env.RATE_LIMITS.get(summaryKey);
+  const [countStr, globalStr] = await Promise.all([
+    env.RATE_LIMITS.get(summaryKey),
+    env.RATE_LIMITS.get(globalKey),
+  ]);
   const used = countStr ? parseInt(countStr, 10) || 0 : 0;
+  const globalUsed = globalStr ? parseInt(globalStr, 10) || 0 : 0;
 
-  if (used >= limit) {
+  // Same identity-rotation backstop as council (see comment there).
+  if (used >= limit || globalUsed >= RATE_LIMITS.GLOBAL_SUMMARY_DAILY) {
     return { allowed: false, used, limit, resetsAt, retryAfterSeconds };
   }
 
   const count = used + 1;
-  await env.RATE_LIMITS.put(summaryKey, count.toString(), { expirationTtl: 86400 });
+  await Promise.all([
+    env.RATE_LIMITS.put(summaryKey, count.toString(), { expirationTtl: 86400 }),
+    env.RATE_LIMITS.put(globalKey, (globalUsed + 1).toString(), { expirationTtl: 86400 }),
+  ]);
 
   return { allowed: true, used: count, limit, resetsAt, retryAfterSeconds };
 }

@@ -48,6 +48,17 @@ export default {
     if (path === '/v1/audio/speech' && request.method === 'POST') {
       const startMs = Date.now();
 
+      // Size gate BEFORE buffering: this route is unauthenticated and buffers
+      // the full body below, so an oversized (or length-less chunked) body
+      // must be rejected up front. TTS payloads are small JSON; 64KB is ample.
+      const declaredBytes = parseInt(request.headers.get('Content-Length') || '', 10);
+      if (!Number.isFinite(declaredBytes) || declaredBytes > 64 * 1024) {
+        return new Response(JSON.stringify({ error: 'Request body too large' }), {
+          status: 413,
+          headers: { 'Content-Type': 'application/json', ...corsHeaders(request, env) },
+        });
+      }
+
       // Buffer body once (needed for: language extraction + failover retry)
       const bodyBuffer = await request.arrayBuffer();
 
