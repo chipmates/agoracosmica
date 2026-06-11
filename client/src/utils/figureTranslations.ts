@@ -39,17 +39,19 @@ export function getFigureId(figureName: string): string {
   
   // Handle German translations
   if (figureName === 'Platon') return 'plato';
+  if (figureName.includes('Marc Aurel')) return 'aurelius'; // German for Marcus Aurelius
   if (figureName === 'Leonardo da Vinci') return 'vinci';
-  
+
   // For standard names, extract the last part
   const nameParts = figureName.split(' ');
   const lastName = nameParts[nameParts.length - 1].toLowerCase();
-  
+
   // Handle any remaining special cases
   const specialCases: { [key: string]: string } = {
     'zenji': 'zenji',
     'jr.': 'king',
-    'platon': 'plato'
+    'platon': 'plato',
+    'aurel': 'aurelius'
   };
   
   return specialCases[lastName] || lastName;

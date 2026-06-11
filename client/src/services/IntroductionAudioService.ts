@@ -176,6 +176,8 @@ class IntroductionAudioService {
       'hildegard': 'bingen',
       'marcus aurelius': 'aurelius',
       'marcus': 'aurelius',
+      'marc aurel': 'aurelius',
+      'echo von marc aurel': 'aurelius',
       'johann wolfgang von goethe': 'goethe',
       'wolfgang amadeus mozart': 'mozart',
       'william shakespeare': 'shakespeare',

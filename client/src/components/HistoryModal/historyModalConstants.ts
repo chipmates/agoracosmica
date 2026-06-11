@@ -51,6 +51,7 @@ export const getLastName = (fullName: string): string => {
   if (nameWithoutPrefix.includes('von Bingen')) return 'Hildegard';
   if (nameWithoutPrefix.includes('von Goethe')) return 'Goethe';
   if (nameWithoutPrefix.includes('Luther King')) return 'King';
+  if (nameWithoutPrefix.includes('Marc Aurel')) return 'Marc Aurel';
 
   // For normal cases, just get the last word
   const parts = nameWithoutPrefix.split(' ');

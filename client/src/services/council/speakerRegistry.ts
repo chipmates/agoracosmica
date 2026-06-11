@@ -36,7 +36,7 @@ export const SPEAKERS: SpeakerRegistry = {
   aurelius: {
     id: 'aurelius', 
     fullName: 'Marcus Aurelius',
-    variations: ['AURELIUS', 'MARCUS AURELIUS', 'MARCUS']
+    variations: ['AURELIUS', 'MARCUS AURELIUS', 'MARCUS', 'MARC AUREL', 'MARK AUREL']
   },
   austen: {
     id: 'austen',

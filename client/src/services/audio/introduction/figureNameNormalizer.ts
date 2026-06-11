@@ -96,7 +96,9 @@ export function normalizeManifestFigureName(name: string): string {
     'echo of marie curie': 'curie',
     'echo of albert einstein': 'einstein',
     'echo of carl jung': 'jung',
-    'echo of joseph campbell': 'campbell'
+    'echo of joseph campbell': 'campbell',
+    'marc aurel': 'aurelius',
+    'echo von marc aurel': 'aurelius'
   };
   
   const lowerCleanName = cleanName.toLowerCase();

@@ -310,7 +310,9 @@ export class CosmicCouncilService {
     // Official naming conventions - use canonical IDs only
     const speakerMap: Record<string, string> = {
       'ANGELOU': 'angelou',
-      'AURELIUS': 'aurelius', 
+      'AURELIUS': 'aurelius',
+      'MARC AUREL': 'aurelius',
+      'MARK AUREL': 'aurelius',
       'AVERROES': 'averroes',
       'BEAUVOIR': 'beauvoir',
       'DE BEAUVOIR': 'beauvoir',

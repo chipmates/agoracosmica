@@ -114,7 +114,8 @@ const getFileName = (figureName: string, echoPrefix: string = 'Echo of'): string
     'Dōgen Zenji': 'zenji',
     
     // German translations (only different ones)
-    'Platon': 'plato' // German for Plato
+    'Platon': 'plato', // German for Plato
+    'Marc Aurel': 'aurelius' // German for Marcus Aurelius
   };
   
   // Check for special case match
@@ -160,7 +161,8 @@ const getLastNameForDisplay = (figureName: string, echoPrefix: string): string =
   if (cleanName.includes('de Beauvoir')) return 'de Beauvoir';
   if (cleanName.toLowerCase().includes('zenji')) return 'Zenji';
   if (cleanName.includes('Lao')) return 'Laozi';
-  
+  if (cleanName.includes('Marc Aurel')) return 'Marc Aurel';
+
   // For regular names, return just the last part
   const parts = cleanName.split(' ');
   return parts[parts.length - 1];

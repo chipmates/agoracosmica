@@ -158,7 +158,10 @@ export const FactCheckModal: FC<FactCheckModalProps> = ({
       <div className="factcheck-modal__header">
         <div className="factcheck-modal__title-group">
           <h1 className="factcheck-modal__title">
-            {(figureName || figure.name).split(' ').pop()?.toUpperCase()}'S {tString('factCheck.facts').toUpperCase()}
+            {((figureName || figure.name).includes('Marc Aurel')
+              ? 'Marc Aurel'
+              : (figureName || figure.name).split(' ').pop()
+            )?.toUpperCase()}'S {tString('factCheck.facts').toUpperCase()}
           </h1>
           <p className="factcheck-modal__subtitle">
             {figure.name} ({figure.dates})

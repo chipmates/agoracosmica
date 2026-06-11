@@ -44,7 +44,8 @@ export const normalizeFigureName = (figureName: string | null | undefined): stri
       'Leonardo da Vinci': 'vinci',
       'Leonardo Da Vinci': 'vinci',
       'Dōgen Zenji': 'zenji',
-      'Dogen Zenji': 'zenji'
+      'Dogen Zenji': 'zenji',
+      'Marc Aurel': 'aurelius'
     };
     
     if (specialCases[withoutPrefix]) {

@@ -17,9 +17,9 @@ export const figureSeo: Record<string, FigureSeoData> = {
       seoTitle: "Marcus Aurelius - Stoicism & Meditations | Agora Cosmica",
     },
     de: {
-      description: "Entdecke stoische Philosophie mit Mark Aurel (Marcus Aurelius). 12 Kapitel Lebensgeschichte, Lehren zu emotionaler Klarheit, Memento Mori und Tugendethik.",
-      teachingsHeading: "Stoische Lehren von Mark Aurel",
-      seoTitle: "Mark Aurel - Stoizismus & Selbstbetrachtungen",
+      description: "Entdecke stoische Philosophie mit Marc Aurel (Marcus Aurelius). 12 Kapitel Lebensgeschichte, Lehren zu emotionaler Klarheit, Memento Mori und Tugendethik.",
+      teachingsHeading: "Stoische Lehren von Marc Aurel",
+      seoTitle: "Marc Aurel - Stoizismus & Selbstbetrachtungen",
     },
   },
   angelou: {

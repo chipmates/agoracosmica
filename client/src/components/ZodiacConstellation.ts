@@ -698,6 +698,11 @@ export const CONSTELLATION_PATTERNS: ConstellationPatterns = {
   }
 };
 
+// German exonym alias: the DE catalog name is "Marc Aurel", and
+// "marcus aurelius".includes("marc aurel") is false, so neither the direct
+// lookup nor the fuzzy fallback can resolve it the way they rescue Platon.
+CONSTELLATION_PATTERNS["Echo von Marc Aurel"] = CONSTELLATION_PATTERNS["Echo of Marcus Aurelius"];
+
 /**
  * Gets constellation data for a specific figure
  * @param figureName - The name of the figure

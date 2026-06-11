@@ -2,6 +2,7 @@
 import type { Lang } from '../i18n';
 import type { CatalogCouncil } from '@client/data/councilCatalog';
 import { getLocalizedTitle, getLocalizedHook } from '@client/data/councilCatalog';
+import { getFigureById } from '@client/data/public/figuresCatalog';
 
 interface Props {
   council: CatalogCouncil;
@@ -11,7 +12,17 @@ interface Props {
 const { council, lang } = Astro.props;
 const title = getLocalizedTitle(council, lang);
 const hook = getLocalizedHook(council, lang);
-const participants = [council.moderator, ...council.participants].map(p => p.name).join(', ');
+const participants = [council.moderator, ...council.participants]
+  .map(p => {
+    // Only swap in the catalog name where German uses a true exonym
+    // (Marc Aurel, Platon). Everywhere else keep the council JSON's
+    // deliberately abbreviated names (J.W. von Goethe, W.A. Mozart).
+    if (lang !== 'de') return p.name;
+    const deName = getFigureById(p.id, 'de')?.name;
+    const enName = getFigureById(p.id, 'en')?.name;
+    return deName && deName !== enName ? deName : p.name;
+  })
+  .join(', ');
 const typeLabel = lang === 'de'
   ? (council.type === 'confrontational' ? 'konfrontativ' : 'reflektiv')
   : council.type;

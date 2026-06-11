@@ -61,7 +61,8 @@ export const normalizeFigureKey = (figure: FigureForImage | null | undefined): s
       'king jr': 'king',
       // German translations mapping back to English asset names
       'platon': 'plato',
-      'platons': 'plato'
+      'platons': 'plato',
+      'marc aurel': 'aurelius'
     };
     
     // Check if we have a special case for this key
@@ -82,7 +83,7 @@ export const normalizeFigureKey = (figure: FigureForImage | null | undefined): s
     if (name.includes('gautama')) return 'gautama';
     if (name.includes('galilei')) return 'galilei';
     if (name.includes('bingen')) return 'bingen';
-    if (name.includes('aurelius')) return 'aurelius';
+    if (name.includes('aurel')) return 'aurelius'; // covers both Marcus Aurelius and German Marc Aurel
     if (name.includes('king') || name.includes('martin luther')) return 'king';
     if (name.includes('platon')) return 'plato'; // German translation
     

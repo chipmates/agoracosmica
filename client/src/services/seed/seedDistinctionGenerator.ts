@@ -133,7 +133,9 @@ export const generateSeedDistinction = (targetSeed: any, allSeeds: any[]) => {
         // Special handling for language prefixes - strip them out
         else if (figureName.match(/^echo (of|von|de|del|di|des)\s+/i)) {
           // Remove Echo prefix with various language connectors
-          const cleanedFigureName = figureName.replace(/^echo (of|von|de|del|di|des)\s+/i, '').trim().split(' ').pop()?.toLowerCase() || '';
+          let cleanedFigureName = figureName.replace(/^echo (of|von|de|del|di|des)\s+/i, '').trim().split(' ').pop()?.toLowerCase() || '';
+          // German exonym "Marc Aurel": last-word split yields "aurel"
+          if (cleanedFigureName === 'aurel') cleanedFigureName = 'aurelius';
           if (cleanedFigureName && cleanedFigureName in figureSpecificTitles) {
             const titles = figureSpecificTitles[cleanedFigureName];
             otherSeedTitles = titles.map((title: string, index: number) =>
