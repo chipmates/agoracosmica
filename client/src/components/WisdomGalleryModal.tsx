@@ -15,8 +15,7 @@ import OptimizedImage from './OptimizedImage';
 import Button from './Button/Button';
 import { ModalHeader } from './Modal';
 import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
-import { useUIStore } from '../stores/uiStore';
-import EchoExplainerHelp, { ECHO_EXPLAINER_HELP_ID } from './EchoExplainerHelp';
+import EchoExplainerHelp from './EchoExplainerHelp';
 import { Play, Pause } from '@phosphor-icons/react';
 import { useFigureTrailer, type FigureTrailerControls } from '../hooks/useFigureTrailer';
 
@@ -259,9 +258,11 @@ const WisdomGalleryModal: FC<WisdomGalleryModalProps> = ({
   // First visit tracking from Zustand
   const markAsVisited = useDomainStore((state) => state.markAsVisited);
 
-  // Echo explainer helper — show once on first gallery visit
-  const shouldShowHelp = useUIStore((state) => state.shouldShowHelp);
-  const [showEchoHelp, setShowEchoHelp] = useState<boolean>(() => shouldShowHelp(ECHO_EXPLAINER_HELP_ID));
+  // Echo explainer — opens on demand from the button below the gallery.
+  // The auto-open on first visit was demoted: it duplicated the welcome
+  // dialog's AI notice and interrupted the first figure choice. Permanent
+  // home: Settings → Info, which also links the /echoes essay.
+  const [showEchoHelp, setShowEchoHelp] = useState<boolean>(false);
 
   const [figures, setFigures] = useState<Figure[]>([]);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
@@ -635,10 +636,18 @@ const WisdomGalleryModal: FC<WisdomGalleryModalProps> = ({
               {tNode('firstTime.exploreAll')}
             </Button>
           )}
+          <Button
+            variant="ghost"
+            size="small"
+            onClick={() => setShowEchoHelp(true)}
+            fullWidth={isMobile}
+          >
+            {tNode('helpers.echoExplainer.title')}
+          </Button>
         </div>
       </div>
 
-      {/* Echo explainer — auto-shows on first visit */}
+      {/* Echo explainer — opened on demand via the gallery button */}
       {showEchoHelp && (
         <EchoExplainerHelp onDismiss={() => setShowEchoHelp(false)} />
       )}

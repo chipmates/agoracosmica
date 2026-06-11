@@ -7,8 +7,6 @@ import OptimizedImage from './OptimizedImage';
 import { useTranslation } from '../hooks/useTranslation';
 import WisdomMapModal from './WisdomMapModal';
 import type { Figure, Seed } from '../types/global';
-import { useUIStore } from '../stores/uiStore';
-import EchoExplainerHelp, { ECHO_EXPLAINER_HELP_ID } from './EchoExplainerHelp';
 import { useFigureTrailer } from '../hooks/useFigureTrailer';
 import './FigureCarousel.css';
 
@@ -52,10 +50,6 @@ const FigureCarousel: FC<FigureCarouselProps> = ({
 
   // Figure page trailer — standalone audio player (play-on-tap, never autoplay)
   const trailer = useFigureTrailer();
-
-  // Echo explainer helper — show once for users who haven't seen it
-  const shouldShowHelp = useUIStore((state) => state.shouldShowHelp);
-  const [showEchoHelp, setShowEchoHelp] = useState<boolean>(() => shouldShowHelp(ECHO_EXPLAINER_HELP_ID));
 
   // Format the echo prefix based on current language
   const echoPrefix = tString('figures.echoOf', 'Echo of');
@@ -657,9 +651,6 @@ const FigureCarousel: FC<FigureCarouselProps> = ({
         />
       )}
 
-      {showEchoHelp && (
-        <EchoExplainerHelp onDismiss={() => setShowEchoHelp(false)} />
-      )}
     </>
   );
 };

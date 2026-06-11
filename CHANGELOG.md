@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 
+- **The "What is an Echo?" explainer no longer auto-opens over the figure gallery.** It interrupted the first figure choice and repeated the AI notice every new visitor already confirms in the welcome dialog. It now opens on demand from a button under the gallery and keeps a permanent home in Settings, where it links the full essay.
 - **Privacy wording brought back in line with the code.** The consent prompt names the withdrawal path and links the privacy policy directly, the policies describe rate limiting exactly as implemented (the plain IP lives only in a short-lived one-hour key and never enters analytics), withdrawal instructions point at the Settings section by its real name, and the homepage structured data uses the current trust wording. Policy dates unified.
 - **Dismissing the consent prompt now also clears the stored click ID.** With no consent surface left in the session, there is nothing the ID could be kept for.
 - Cookie policy now lists every ad-related storage key (`agc_paid`, `agc_ad_prompt_dismissed`, `agc_conv_fired_*`) and explains the withdrawal control.
