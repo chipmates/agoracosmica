@@ -28,6 +28,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Fixed
 
+- **The app no longer crashes on a storage-blocked browser.** Five load-bearing paths (the login handoff, the home-page init, the mode selector, the wisdom-map and the sidebar) read storage without a guard, so a browser with localStorage or sessionStorage disabled dropped the whole app to the error screen. Each read now degrades to a sensible default.
+- **German podcast links go to the German show.** The site footer hardcoded the English Spotify, YouTube, and Apple Podcasts links on every page; it now picks the show by language.
+- The English privacy policy is now listed in the sitemap, the homepages advertise their RSS feed for podcast-directory discovery, and the /echoes essay carries Article structured data to match the theme pages.
 - A consent recorded under an older consent version now counts as undecided, so a future change of consent scope re-prompts instead of silently relying on the old record. The same version rule now also guards the grant check itself.
 - A seed the user picked is restored again when returning to a figure (a string-versus-number id mismatch silently reset the choice).
 - Clear-all-history now removes prism transcripts and legacy-format history it used to leave behind, and a reset of help hints stays reset across reloads.
