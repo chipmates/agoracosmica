@@ -20,7 +20,7 @@ const href = publicUrl(lang, `/figures/${slug}`);
 ---
 <div class="pub-voice">
   <a href={href} class="pub-voice__portrait" tabindex="-1" aria-hidden="true">
-    <StaticImage figureId={figureId} type="thumbnail" alt="" loading="lazy" width={88} height={88} />
+    <StaticImage figureId={figureId} type="thumbnail" alt="" loading="lazy" width={88} height={88} sizes="88px" />
   </a>
   <div class="pub-voice__body">
     <a href={href} class="pub-voice__name">{name}</a>

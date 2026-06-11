@@ -42,6 +42,8 @@
 /de/nutzungsbedingungen/ /nutzungsbedingungen/ 301
 /de/cookie-policy        /cookie-policy/       301
 /de/cookie-policy/       /cookie-policy/       301
+/de/privacy              /datenschutz/         301
+/de/privacy/             /datenschutz/         301
 
 # App SPA — the React app (login + in-app surface) lives under /app. The
 # rewrite destination must be the NORMALIZED form /app/ — CF Pages 308s any
