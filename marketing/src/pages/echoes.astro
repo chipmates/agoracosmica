@@ -1,7 +1,7 @@
 ---
 // Tier 3 of the Echo disclosure: the stable, shareable URL for the
-// "isn't this disrespectful" objection (FAQ Tier 1 + unfold Tier 2 live on
-// the homepage). Mirrored in the repo as docs/WHY-WE-SPEAK-FOR-THE-DEAD.md.
+// "isn't this disrespectful" question (FAQ Tier 1 + unfold Tier 2 live on
+// the homepage). Mirrored in the repo as docs/WHY-ECHOES.md.
 import Public from '../layouts/Public.astro';
 import EchoesContent from '../components/EchoesContent.astro';
 import { organizationSchema, breadcrumbSchema, articleSchema } from '../lib/schemas';
@@ -11,10 +11,10 @@ import { SITE_URL, MEDIA_URL } from '../lib/urls';
 const lang = 'en' as const;
 const t = getT(lang);
 const echoesUrl = `${SITE_URL}/echoes/`;
-const description = 'Every figure here is an AI Echo of a real person who cannot consent. We answer the strongest objection to our project, with the tradition and the risks named.';
+const description = 'Every figure here is an AI Echo of a real person who cannot consent. Why we chose that word, what the tradition shows, and where the risks lie.';
 ---
 <Public
-  title="Why We Speak for the Dead"
+  title="Why Echoes?"
   description={description}
   canonicalPath="/echoes"
   lang={lang}
@@ -22,17 +22,17 @@ const description = 'Every figure here is an AI Echo of a real person who cannot
   schemas={[
     organizationSchema(),
     articleSchema({
-      title: 'Why We Speak for the Dead',
+      title: 'Why Echoes?',
       description,
       url: echoesUrl,
       lang,
       image: `${MEDIA_URL}/images/ui/og-default/1200.webp`,
       datePublished: '2026-06-10',
-      dateModified: '2026-06-10',
+      dateModified: '2026-06-11',
     }),
     breadcrumbSchema([
       { name: t('breadcrumbs.home'), url: `${SITE_URL}/` },
-      { name: 'Why we speak for the dead', url: echoesUrl },
+      { name: 'Why Echoes?', url: echoesUrl },
     ]),
   ]}
 >
