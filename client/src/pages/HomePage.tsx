@@ -345,7 +345,13 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
 
     const forceOnboarding = useDomainStore.getState().onboarding.forceShow;
 
-    const sessionOnboarding = sessionStorage.getItem('showOnboarding') === 'true';
+    // Guarded: storage access throws on a privacy-locked browser; a missing
+    // one-shot onboarding flag degrades to "not requested" rather than
+    // dropping the whole app to the error boundary on every load.
+    let sessionOnboarding = false;
+    try {
+      sessionOnboarding = sessionStorage.getItem('showOnboarding') === 'true';
+    } catch { /* storage blocked — treat as not requested */ }
 
     // Let's explicitly check onboarding completion status too
     const onboardingCompleted = useDomainStore.getState().onboarding.complete ? 'true' : null;
@@ -362,7 +368,7 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
     }
 
     if (sessionOnboarding) {
-      sessionStorage.removeItem('showOnboarding');
+      try { sessionStorage.removeItem('showOnboarding'); } catch { /* storage blocked */ }
       // Show onboarding first, then figure selection
       setOnboardingVisible(true);
       setFigureCarousel(false);

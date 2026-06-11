@@ -3,6 +3,7 @@
 // Reusable by pendingBlooms.ts and other consumers without React dependency.
 
 import { isStoryCompleted, isPrismCompleted, isWisdomCompleted, STORAGE_KEYS } from './storageKeysV2';
+import { LocalStorageAdapter } from '../storage/localAdapter';
 
 export interface SeedSliceStatus {
   seedId: string | number;
@@ -31,7 +32,7 @@ export function computeSeedSlices(
     // for users whose seed_conversation was persisted before the marker existed.
     let wisdomDone = isWisdomCompleted(figureId, sId);
     if (!wisdomDone) {
-      const wisdomHistory = localStorage.getItem(STORAGE_KEYS.getStarSeedHistory(figureId, sId));
+      const wisdomHistory = LocalStorageAdapter.getString(STORAGE_KEYS.getStarSeedHistory(figureId, sId));
       if (wisdomHistory) {
         try {
           const arr = JSON.parse(wisdomHistory);
@@ -41,7 +42,7 @@ export function computeSeedSlices(
     }
 
     // Quest: requires seed actually gathered via award_seed tool call (passed: true)
-    const questDone = localStorage.getItem(`completion_${figureId}_${sId}`) === 'true';
+    const questDone = LocalStorageAdapter.getString(`completion_${figureId}_${sId}`) === 'true';
 
     return {
       seedId: sId,

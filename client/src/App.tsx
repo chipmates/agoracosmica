@@ -356,7 +356,14 @@ function App(): React.ReactElement {
     // all need the welcome step next. Profile creation, consent, the entry /
     // signup beacons, and the profile_created conversion now live there (the
     // WelcomeDisclosureModal "Begin"); this just opens it.
-    sessionStorage.setItem('showOnboarding', 'true');
+    // Guarded: a storage-blocked browser (strict privacy mode) must not throw
+    // here and trap the user mid-handoff with no error and no recovery. This
+    // runs in a setTimeout, so the error boundary would not catch it.
+    try {
+      sessionStorage.setItem('showOnboarding', 'true');
+    } catch (err) {
+      console.error('Failed to set onboarding flag:', err);
+    }
 
     // Clean up before setting logged in state
     cleanupOverlays();

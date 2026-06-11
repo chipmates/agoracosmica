@@ -4,6 +4,7 @@ import { Bird, Books, Sparkle, Mountains, DiamondsFour } from '@phosphor-icons/r
 import { CloseButton } from './Button';
 import OptimizedFigureImage from './OptimizedFigureImage';
 import { isStoryCompleted, isPrismCompleted, STORAGE_KEYS } from '../utils/storageKeysV2';
+import { LocalStorageAdapter } from '../storage/localAdapter';
 import { sendConversion } from '../utils/public/gclidCapture';
 import { sendFunnelBeacon } from '../utils/funnelBeacon';
 import useTranslation from '../hooks/useTranslation';
@@ -103,10 +104,13 @@ const ModeSelectorMini: FC<ModeSelectorMiniProps> = ({
         if (isPrismCompleted(fId, sId)) return 'completed';
         break;
       case 'seed_conversation':
-        if (localStorage.getItem(STORAGE_KEYS.getStarSeedHistory(fId, sId))) return 'completed';
+        // Guarded reads (LocalStorageAdapter swallows storage-blocked throws):
+        // getNodeState runs during render, so a raw localStorage throw would
+        // crash the mode selector to the error boundary. Missing = not done.
+        if (LocalStorageAdapter.getString(STORAGE_KEYS.getStarSeedHistory(fId, sId))) return 'completed';
         break;
       case 'challenge':
-        if (localStorage.getItem(STORAGE_KEYS.getChallengeHistory(fId, sId))) return 'completed';
+        if (LocalStorageAdapter.getString(STORAGE_KEYS.getChallengeHistory(fId, sId))) return 'completed';
         break;
     }
 

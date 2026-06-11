@@ -133,7 +133,13 @@ const Sidebar: FC<SidebarProps> = ({
 
   // 2025 DISCOVERABILITY: Pulse hint for first-time users (clean, no tooltip)
   useEffect(() => {
-    const hasSeenFigureGuide = localStorage.getItem('hasSeenFigureGuide');
+    // Guarded: a storage-blocked browser must not crash the app to the error
+    // boundary when the sidebar mounts. Defaulting to "already seen" simply
+    // skips the one-time pulse hint.
+    let hasSeenFigureGuide: string | null = 'seen';
+    try {
+      hasSeenFigureGuide = localStorage.getItem('hasSeenFigureGuide');
+    } catch { /* storage blocked — skip the hint */ }
 
     if (!hasSeenFigureGuide && isMobileOrTablet && isOpen) {
       // Apply pulse animation on first visit (mobile/tablet only)
@@ -142,7 +148,7 @@ const Sidebar: FC<SidebarProps> = ({
       // Stop pulse after 6 seconds (3 pulses × 2s each)
       const pulseTimer = setTimeout(() => {
         setApplyPulseAnimation(false);
-        localStorage.setItem('hasSeenFigureGuide', 'true');
+        try { localStorage.setItem('hasSeenFigureGuide', 'true'); } catch { /* storage blocked */ }
       }, 6000);
 
       return () => {
