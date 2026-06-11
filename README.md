@@ -77,12 +77,9 @@ Each interaction in Agora Cosmica orbits one figure. The four educational chapte
 **Privacy by design**
 - **BYOK encryption**: bring your own OpenRouter key, encrypted locally with AES-256-GCM, never stored on our servers.
 - **Free tier without signup**: 30 messages a day via our Cloudflare Worker, no account required.
-- **No behavioral tracking**: no tracking cookies, no third-party analytics, no per-request access logs of our own, no IP retention in analytics, no cross-session profiles. We do collect anonymous aggregate counters to keep the service running and improve it. [docs/MEASUREMENT.md](docs/MEASUREMENT.md) lists exactly what gets counted, what never does, and the one exception we name upfront: for visitors who arrive from a Google ad and opt in, we forward the Google click ID (gclid) to Google Ads so the ad can be matched to a conversion.
+- **No behavioral tracking**: no tracking cookies, no third-party analytics, no per-request access logs of our own, no IP retention in analytics, no cross-session profiles. We do collect anonymous aggregate counters to keep the service running and improve it. [docs/MEASUREMENT.md](docs/MEASUREMENT.md) lists exactly what gets counted, what never does, and the one exception we name upfront: for visitors who arrive from one of our free nonprofit Google Ad Grants ads and opt in, we forward the Google click ID (gclid) to Google Ads so that ad can be credited with the visit.
 - **Self-hosted speech**: live text-to-speech and speech-to-text run on our own GPU servers in Germany.
 - **EU-first hosting**: live audio in Germany, pre-recorded audio on Cloudflare R2.
-
-> **"But you forward gclids to Google, isn't that tracking?"**
-> Fair question, and we would rather answer it before you find it in the code. If you arrive from a Google ad and opt in, we send Google the ad's click ID so the ad can be credited. It counts as personal data, we forward it server-side only, and we never join it to our own analytics. Everyone else, and anyone who declines, sends Google nothing. See [`gclidCapture.ts`](client/src/utils/public/gclidCapture.ts), [`conversions.ts`](workers/llm-proxy/src/routes/conversions.ts), and [docs/MEASUREMENT.md](docs/MEASUREMENT.md).
 
 **Built for everyone**
 - **WCAG 2.2 AA**: keyboard navigation, screen reader support, 44 px touch targets. [Accessibility](docs/ACCESSIBILITY.md)
