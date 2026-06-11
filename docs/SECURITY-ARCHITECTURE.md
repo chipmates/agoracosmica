@@ -53,7 +53,7 @@ Pre-recorded audio production uses third-party TTS vendors at content-creation t
 The system architecture is shown in the [README diagram](../README.md#architecture). The privacy-relevant boundaries:
 
 - **Browser ↔ Cloudflare Workers**: TLS only. Workers see the request but hold no per-request log.
-- **Workers ↔ LLM backends**: Workers forward chat requests to Nebius (free tier) or to OpenRouter (BYOK, with the user's own key) without persisting them.
+- **Workers ↔ LLM backends**: Workers forward free-tier chat requests to Nebius without persisting them. BYOK requests never pass through the Workers: the browser calls OpenRouter directly with the user's own key (see the BYOK key path below).
 - **Workers ↔ R2**: Internal Cloudflare network. Workers issue range-requests to stream pre-recorded audio.
 - **Workers ↔ Hetzner**: TLS with two-token edge auth (see § Edge protections).
 - **BYOK key path**: The user's OpenRouter API key transits browser → OpenRouter **directly**. Our servers never see it.
