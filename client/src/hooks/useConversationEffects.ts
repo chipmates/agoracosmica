@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { cleanupAudioResources } from '../services/audioService';
 import { LocalStorageAdapter } from '../storage/localAdapter';
+import { sendFunnelBeaconOnce, replyTimeBucketSinceDispatch } from '../utils/funnelBeacon';
 import type { Figure, Seed } from '../types/global';
 
 interface UseConversationEffectsParams {
@@ -147,6 +148,18 @@ export const useConversationEffects = (params: UseConversationEffectsParams) => 
       setFirstTextArrived(true);
       setLoading(false);
       setTranslationInProgress(false);
+
+      // Funnel: first assistant reply this tab. The earliest chunk is the
+      // most reliable "a reply actually arrived" point (works for BYOK too,
+      // which never touches the proxy). One-shot via the shared first_reply
+      // sessionStorage key, so the per-chunk calls after the first are
+      // no-ops and the HomePage dispatch-error variant can never double-
+      // fire. Bucket = coarse time since dispatch start (indices 0-4),
+      // never raw milliseconds.
+      sendFunnelBeaconOnce('first_reply', {
+        outcome: '200',
+        bucket: replyTimeBucketSinceDispatch(),
+      });
     };
 
     window.addEventListener('conversation:assistant-chunk', handleAssistantChunk);

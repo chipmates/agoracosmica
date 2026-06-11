@@ -1670,6 +1670,15 @@ async function loadOverview() {
     { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'welcome_shown' AND timestamp " + prevRange(), dataset: 'agora_llm' },
     { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'first_turn' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
     { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'first_turn' AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    // --- Wave-2 first_reply additions (APPENDED at the end; reads are
+    // positional, so new queries must never be inserted mid-array). r[45..48]:
+    // success (blob5='200') current + previous for the funnel stage and its
+    // ghost, error (blob5='error') current + previous for the reply-success
+    // caption. Batch total after these: 49 of the 64 cap. ---
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'first_reply' AND blob5 = '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'first_reply' AND blob5 = '200' AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'first_reply' AND blob5 = 'error' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'first_reply' AND blob5 = 'error' AND timestamp " + prevRange(), dataset: 'agora_llm' },
   ];
 
   var r = await batch(queries);
@@ -1765,6 +1774,11 @@ async function loadOverview() {
   var cinEnds = val(r[39]), cinEndsPrev = val(r[40]);
   var welcomeShown = val(r[41]), welcomeShownPrev = val(r[42]);
   var firstTurns = val(r[43]), firstTurnsPrev = val(r[44]);
+  // Wave-2 first_reply reads (appended queries r[45..48]). The funnel stage
+  // counts successes only (an errored dispatch is not a reply the user got);
+  // errors feed the reply-success caption under the funnel.
+  var firstReplies = val(r[45]), firstRepliesPrev = val(r[46]);
+  var firstReplyErrors = val(r[47]), firstReplyErrorsPrev = val(r[48]);
   // Previous-period marketing-vs-app split (same classification as the current
   // period) so the funnel can draw a ghost bar behind each stage. MARKETING_*
   // and arrivalsPrev are already in scope above.
@@ -1863,6 +1877,7 @@ async function loadOverview() {
     { label: 'Entry', value: entries, prev: entriesPrev, sub: 'consent + enter' },
     { label: 'Signup', value: signups, prev: signupsPrev, sub: 'new accounts' },
     { label: 'First Message', value: firstTurns, prev: firstTurnsPrev, sub: 'first chat turn, incl. BYOK', pending: 'first_turn' },
+    { label: 'First Reply', value: firstReplies, prev: firstRepliesPrev, sub: 'assistant replied, incl. BYOK', pending: 'first_reply' },
   ];
   // ACTIVITY POOL — App Sessions sits next to Chat Messages (not a funnel). The
   // relationship is shown as a sample-gated multiplier, never a percentage, so
@@ -1882,11 +1897,27 @@ async function loadOverview() {
     '<span class="swatch" style="background:var(--gold-subtle)"></span> this ' + RANGE_LABEL[S.range] +
     '<span class="swatch" style="background:color-mix(in srgb, var(--gold-deep) 22%, transparent);margin-left:10px"></span> previous period (ghost)' +
     '</div>';
+  // Reply-success caption: first_reply 200 vs error, one quiet line under the
+  // funnel. Same honesty rules as everywhere else: an "awaiting first" note
+  // while the beacon has no rows in either period, raw counts (no %) under a
+  // base of 20, a % only above it.
+  var replyTotal = firstReplies + firstReplyErrors;
+  var replyNote;
+  if (replyTotal + firstRepliesPrev + firstReplyErrorsPrev === 0) {
+    replyNote = 'Reply success: -- awaiting first first_reply.';
+  } else if (replyTotal === 0) {
+    replyNote = 'Reply success: no first replies ' + RANGE_LABEL[S.range] + '.';
+  } else if (replyTotal < 20) {
+    replyNote = 'Reply success: ' + firstReplies + ' of ' + replyTotal + ' first replies arrived' + (firstReplyErrors > 0 ? ', ' + firstReplyErrors + ' errored' : '') + ' (small base, raw counts).';
+  } else {
+    replyNote = 'Reply success: ' + Math.round(firstReplies / replyTotal * 100) + '% (' + firstReplies + ' of ' + replyTotal + ' first replies, ' + firstReplyErrors + ' errored).';
+  }
   var funnelNote = '<div style="margin-top:8px;font-size:11px;color:var(--dim);line-height:1.4">' +
     'New-visitor funnel only, compared step by step against the previous ' + RANGE_LABEL[S.range] + ' (the faint bars). ' +
     'Entry &amp; Signup fire at the welcome modal (post-consent). ' +
     'Returning visitors skip it, so they appear only as App Sessions below, never here. ' +
-    'Marketing = / and /de/ plus figure and theme pages (mixed sources, incl. ads + bots). App = /app.' +
+    'Marketing = / and /de/ plus figure and theme pages (mixed sources, incl. ads + bots). App = /app. ' +
+    replyNote +
     '</div>';
   html += chartCard(
     'New-visitor funnel',
@@ -2200,6 +2231,16 @@ async function loadProduct() {
     // Started events — total + sparkline (Phase 1 Option 1)
     { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND blob8 = 'started' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
     { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND blob8 = 'started' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
+    // --- Wave-2 organic-pick additions (APPENDED at the end; reads are
+    // positional, so new queries must never be inserted mid-array). r[34..35].
+    // Batch total after these: 36 of the 64 cap. The gclid CONVERSION rows
+    // share the 'mode_selected' name in blob1/index1 but never set blob3, so
+    // the blob3 != '' guard keeps them out of the mode mix. No conversion is
+    // named 'figure_selected', so that query needs no such guard. ---
+    // Organic mode picks (funnel mode_selected, per-occurrence) by mode
+    { sql: "SELECT blob3 as mode, COUNT() as c FROM agora_llm WHERE blob1 = 'mode_selected' AND blob3 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY mode ORDER BY c DESC", dataset: 'agora_llm' },
+    // Organic figure picks (funnel figure_selected, per-occurrence), top 10
+    { sql: "SELECT blob2 as figure, COUNT() as c FROM agora_llm WHERE blob1 = 'figure_selected' AND blob2 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY figure ORDER BY c DESC LIMIT 10", dataset: 'agora_llm' },
   ];
 
   var r = await batch(queries);
@@ -2234,6 +2275,9 @@ async function loadProduct() {
   var playbackPrev = val(r[31]);
   var playbackStarted = val(r[32]);
   var sparkStartedRows = rows(r[33]);
+  // Wave-2 organic-pick reads (appended queries r[34..35]).
+  var organicModes = rows(r[34]);
+  var organicFigures = rows(r[35]);
   var totalPlayback = playbackByType.reduce(function(s, x) { return s + x.c; }, 0);
   var completionRate = playbackStarted > 0 ? Math.round((totalPlayback / playbackStarted) * 100) : null;
   var totalLlm = chats + councils + summaries;
@@ -2263,6 +2307,23 @@ async function loadProduct() {
   }
   if (langs.length > 0) {
     html += chartCard('Language Split', donutSvg(langs.map(function(r) { return { key: r.lang, c: r.c }; }), COLORS.lang, function(l) { return l === 'de' ? 'Deutsch' : 'English'; }), '');
+  }
+
+  // Organic pick volume (Wave-2 funnel events, per-occurrence counters).
+  // Mode Picks counts every selector pick (mode_selected), the intent-level
+  // twin of the Mode Distribution donut above (which counts chat messages).
+  // Figure Picks counts every figure switch (figure_selected), upstream of
+  // Most Popular Figures (which needs a chat to register). Until the beacons
+  // produce their first row, each card shows a quiet awaiting placeholder.
+  if (organicModes.length > 0) {
+    html += chartCard('Mode Picks (organic)', barsHtml(organicModes.map(function(x) { return { label: modeLabel(x.mode), c: x.c }; }), '#D8A4C0'), 'card-half');
+  } else {
+    html += chartCard('Mode Picks (organic)', '<div class="empty-state" style="padding:30px 0">-- awaiting first mode_selected</div>', 'card-half');
+  }
+  if (organicFigures.length > 0) {
+    html += chartCard('Figure Picks (organic)', barsHtml(organicFigures.map(function(x) { return { label: cap(x.figure), c: x.c }; }), '#E6BC5C'), 'card-half');
+  } else {
+    html += chartCard('Figure Picks (organic)', '<div class="empty-state" style="padding:30px 0">-- awaiting first figure_selected</div>', 'card-half');
   }
 
   // Figure x Mode table
@@ -2518,10 +2579,14 @@ async function loadAdGrants() {
     { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'profile_created' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
     { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'profile_created' AND timestamp " + prevRange(), dataset: 'agora_llm' },
     { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE index1 = 'profile_created' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
-    // Mode Selected — current, sparkline, by figure
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'mode_selected' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE index1 = 'mode_selected' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
-    { sql: "SELECT blob2 as figure, COUNT() as c FROM agora_llm WHERE index1 = 'mode_selected' AND blob2 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY figure ORDER BY c DESC LIMIT 10", dataset: 'agora_llm' },
+    // Mode Selected — current, sparkline, by figure. blob5 = '' keeps these
+    // gclid-only: the Wave-2 ORGANIC funnel beacon reuses the 'mode_selected'
+    // name in index1/blob1 and always writes an outcome into blob5, while the
+    // conversion rows (routes/conversions.ts) never set blob5. Without the
+    // guard, organic picks would silently inflate the paid-conversion counts.
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'mode_selected' AND blob5 = '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE index1 = 'mode_selected' AND blob5 = '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
+    { sql: "SELECT blob2 as figure, COUNT() as c FROM agora_llm WHERE index1 = 'mode_selected' AND blob5 = '' AND blob2 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY figure ORDER BY c DESC LIMIT 10", dataset: 'agora_llm' },
     // Council Engaged — current, sparkline
     { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'council_engaged' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
     { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE index1 = 'council_engaged' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },

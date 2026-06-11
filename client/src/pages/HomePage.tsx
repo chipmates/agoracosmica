@@ -31,7 +31,12 @@ import { processTextMessage } from '../services/audioService';
 import seedStateManager from '../services/SeedStateManager';
 import { modeStateManager } from '../utils/modeStateManager';
 import { screenContent } from '../utils/contentSafety';
-import { sendFunnelBeaconOnce } from '../utils/funnelBeacon';
+import {
+  sendFunnelBeacon,
+  sendFunnelBeaconOnce,
+  markReplyDispatchStart,
+  replyTimeBucketSinceDispatch,
+} from '../utils/funnelBeacon';
 import { isNewUser, HISTORY_PREFIXES } from '../utils/userState';
 import {
   markStoryCompleted,
@@ -854,6 +859,11 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
 
         setPendingRequestId(requestId);
 
+        // Stamp the dispatch start for the first_reply time bucket. The raw
+        // timestamp stays module-scoped in funnelBeacon; only a coarse bucket
+        // index (0-4) ever leaves the browser, with the first_reply beacon.
+        markReplyDispatchStart();
+
         // Funnel: first chat turn this tab (the North Star activation event).
         // Fires for BYOK users too — their chat bypasses the proxy entirely,
         // so this beacon is the only server-visible signal a conversation
@@ -1027,6 +1037,17 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
         }
         if (outcome === 'error') {
           setError(mapErrorToUserMessage(error, tString));
+          // Funnel: the first chat turn errored before any reply chunk
+          // arrived (status is not derivable in the chunk handler, so the
+          // error variant lives here at the dispatch error site). Shares the
+          // first_reply one-shot key with the success beacon in
+          // useConversationEffects, so whichever fires first wins and a later
+          // success or error never double-fires. Bucket = coarse
+          // time-to-failure since dispatch, never raw milliseconds.
+          sendFunnelBeaconOnce('first_reply', {
+            outcome: 'error',
+            bucket: replyTimeBucketSinceDispatch(),
+          });
         }
       },
     });
@@ -1302,6 +1323,14 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
       setFigureCarousel(false);
       return;
     }
+
+    // Funnel: organic figure-pick volume. Per-occurrence on purpose (no
+    // one-shot dedup): this counts how often figures get picked, not whether
+    // one was picked this tab. Every pick path funnels through here (gallery
+    // via handleWisdomGallerySelect, carousel, sidebar, deep-link intent), so
+    // this is the single chokepoint with no double-count. The same-figure
+    // early return above keeps carousel re-closes out of the count.
+    sendFunnelBeacon('figure_selected', { figureId: figure?.id });
 
     // Suppress Effect#14 — we handle mode directly below
     lastSeedSelectTimeRef.current = Date.now();

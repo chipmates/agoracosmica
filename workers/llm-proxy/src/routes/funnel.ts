@@ -1,9 +1,10 @@
 // Anonymous funnel-step beacon
 // Fires from the marketing pages (cta_click via agc-public.js) and from the
-// client app (cinematic_start / cinematic_end / welcome_shown / first_turn via
-// utils/funnelBeacon.ts). Lights up the dark zone between the page-load beacon
-// and the entry/signup beacons: does the intro play, is it watched or skipped,
-// does the consent screen open, does a first conversation start.
+// client app (cinematic_start / cinematic_end / welcome_shown / first_turn /
+// figure_selected / mode_selected / first_reply via utils/funnelBeacon.ts).
+// Lights up the dark zone between the page-load beacon and the entry/signup
+// beacons: does the intro play, is it watched or skipped, does the consent
+// screen open, does a first conversation start, does the first reply arrive.
 //
 // Privacy: keyless aggregate counter only. No user dimension, no IP retention,
 // no join key between funnel steps (the funnel is population-level: compare
@@ -24,15 +25,21 @@ interface FunnelPayload {
   bucket?: number;
 }
 
-// Strict server-side step allowlist (Wave 1). Anything not on this list is
+// Strict server-side step allowlist (Waves 1-2). Anything not on this list is
 // silently dropped — no row is written and the client learns nothing (same
 // fire-and-forget posture as the other beacons).
+// Wave-1 steps are one-shot per tab on the client. The Wave-2 figure_selected
+// and mode_selected are per-occurrence volume counters (same anonymous row
+// shape, no dedup); first_reply is one-shot like Wave 1.
 const VALID_STEPS = new Set([
   'cta_click',
   'cinematic_start',
   'cinematic_end',
   'welcome_shown',
   'first_turn',
+  'figure_selected',
+  'mode_selected',
+  'first_reply',
 ]);
 
 // Outcome slot (blob5): same role as status/type elsewhere. Steps without a
@@ -46,8 +53,9 @@ const FIGURE_RE = /^[A-Za-z0-9_-]{1,64}$/;
 const MODE_RE = /^[a-z_]{1,40}$/;
 const VALID_LANGS = new Set(['en', 'de']);
 
-// Coarse bucket index ceiling (cinematic dwell uses 0-3; headroom to 5 for the
-// Wave-2 reply-time set). Anything else collapses to 0.
+// Coarse bucket index ceiling (cinematic dwell uses 0-3, the first_reply
+// reply-time set uses 0-4; the ceiling keeps one slot of headroom). Anything
+// else collapses to 0.
 const MAX_BUCKET = 5;
 
 // Rate limit: 200 funnel beacons per IP per hour. A single session emits

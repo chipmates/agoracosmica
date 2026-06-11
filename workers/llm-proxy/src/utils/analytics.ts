@@ -210,15 +210,18 @@ export function trackSignup(
 
 /**
  * Track an anonymous funnel-step beacon (Wave 1: cta_click, cinematic_start,
- * cinematic_end, welcome_shown, first_turn). Keyless aggregate counts only:
- * no clientId, no gclid, no IP, no value that lets two rows be tied to the
- * same person. There is no join key between funnel steps, so the funnel is
- * read at the population level (compare totals), never per visitor.
+ * cinematic_end, welcome_shown, first_turn; Wave 2: figure_selected,
+ * mode_selected, first_reply). Keyless aggregate counts only: no clientId,
+ * no gclid, no IP, no value that lets two rows be tied to the same person.
+ * There is no join key between funnel steps, so the funnel is read at the
+ * population level (compare totals), never per visitor. Wave-1 steps and
+ * first_reply are one-shot per tab on the client; figure_selected and
+ * mode_selected count every occurrence (volume counters, same row shape).
  *
  * dataset: agora_llm
  * blobs: [step, figureId|path|'', mode|'', language, outcome, '', country, '']
- * doubles: [bucket]  — a coarse bucket INDEX (e.g. cinematic dwell 0-3),
- *                      never raw milliseconds
+ * doubles: [bucket]  — a coarse bucket INDEX (cinematic dwell 0-3,
+ *                      first_reply reply-time 0-4), never raw milliseconds
  * indexes: [step]
  *
  * blob6 stays reserved-empty (keeps country at blob7 across all event types);

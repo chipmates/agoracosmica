@@ -23,14 +23,16 @@ Per anonymous request, written to Cloudflare Analytics Engine:
 | Content type | `story`, `teaching`, `prism`, `council`, `foreword` (closed allowlist; only set on playback events) | Know which content type was started/completed |
 | Duration (ms) | Latency of the request | Find slow paths, fix them |
 | Signup | `signup` (fires once when a visitor creates a profile) | Count new profiles, so the funnel has an endpoint |
-| Funnel step | `cta_click`, `cinematic_start`, `cinematic_end`, `welcome_shown`, `first_turn` | See where new visitors drop off between landing and a first conversation |
+| Funnel step | `cta_click`, `cinematic_start`, `cinematic_end`, `welcome_shown`, `first_turn`, `figure_selected`, `mode_selected`, `first_reply` | See where new visitors drop off between landing and a first answered conversation, and which figures and modes get picked |
 | Intro outcome | `watched` or `skipped` (only on `cinematic_end`) | Learn whether the intro animation gets watched to the end or skipped |
 | Dwell bucket | `0` (0 to 5s), `1` (5 to 15s), `2` (15 to 30s), `3` (over 30s), only on `cinematic_end` | See how long the intro holds attention. Only the bucket index is stored, the raw milliseconds never leave the browser |
+| Reply outcome | `200` (a first reply arrived) or `error` (the first chat turn failed), only on `first_reply` | Know whether people who send a first message actually get an answer |
+| Reply-time bucket | `0` (under 2s), `1` (2 to 5s), `2` (5 to 10s), `3` (10 to 30s), `4` (over 30s), only on `first_reply` | See how long the first answer takes to start. Only the bucket index is stored, the raw milliseconds never leave the browser |
 | Conversion event | `start_exploring`, `profile_created`, `mode_selected`, `council_engaged` (fire only for grant-ad visitors who opted in to ad measurement; `start_exploring` is the earliest signal, sent when they accept the on-page consent prompt) | Measure whether Google ad spend reaches real engagement |
 
 The conversion rows are written with the event name, an optional figure id, and a timestamp. The gclid is never part of this analytics write. It goes only to Google Ads, as described below.
 
-The funnel steps are keyless aggregate counts like everything else here. There is no join key between funnel steps: a question like "did the person who saw the intro also chat" is answered by comparing two totals, never by following an individual. Each step fires at most once per browser tab, deduped by a flag in tab-scoped sessionStorage that is never transmitted. `first_turn` may carry a figure id and a mode (the same content labels chat events already carry), and `cta_click` carries the sanitized page path. No funnel row ever contains a client id, a gclid, an IP, or a raw duration.
+The funnel steps are keyless aggregate counts like everything else here. There is no join key between funnel steps: a question like "did the person who saw the intro also chat" is answered by comparing two totals, never by following an individual. Most steps fire at most once per browser tab, deduped by a flag in tab-scoped sessionStorage that is never transmitted, and `first_reply` is one of them. Two steps are plain volume counters instead: `figure_selected` and `mode_selected` count every occurrence, so picking three figures writes three rows. They measure how often something gets picked, not whether it happened, and they keep the same anonymous row shape as every other step. `first_turn`, `figure_selected` and `mode_selected` may carry a figure id and a mode (the same content labels chat events already carry), and `cta_click` carries the sanitized page path. No funnel row ever contains a client id, a gclid, an IP, or a raw duration.
 
 ## What we don't count, ever
 

@@ -5,6 +5,7 @@ import { CloseButton } from './Button';
 import OptimizedFigureImage from './OptimizedFigureImage';
 import { isStoryCompleted, isPrismCompleted, STORAGE_KEYS } from '../utils/storageKeysV2';
 import { sendConversion } from '../utils/public/gclidCapture';
+import { sendFunnelBeacon } from '../utils/funnelBeacon';
 import useTranslation from '../hooks/useTranslation';
 import type { Figure, Seed } from '../types/global';
 import './ModeSelector-Mini.css';
@@ -190,6 +191,15 @@ const ModeSelectorMini: FC<ModeSelectorMiniProps> = ({
       'mode_selected',
       selectedFigure?.id ? { figureId: selectedFigure.id } : undefined,
     );
+
+    // Funnel: the organic twin of the gclid-gated conversion above.
+    // Unconditional and per-occurrence (no consent gate, no one-shot): it
+    // counts every mode pick as anonymous volume, which the conversion
+    // (gclid + consent + once per session) structurally cannot.
+    sendFunnelBeacon('mode_selected', {
+      figureId: selectedFigure?.id,
+      mode,
+    });
 
     saveVisitedMode(mode);
 
