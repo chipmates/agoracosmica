@@ -331,13 +331,14 @@ export const useDomainStore = create<DomainSlices>()(
           };
         },
         partialize: (state) => ({
-          // Language preferences and cached translations
+          // Language preference only. The translation maps are bundled assets
+          // reloaded on boot; persisting them rewrote ~100KB+ of JSON on every
+          // store write and re-hydrated stale copies after app updates.
           language: {
             current: state.language.current,
-            uiTranslations: state.language.uiTranslations,
-            seedTitlesTranslations: state.language.seedTitlesTranslations,
-            helpersTranslations: state.language.helpersTranslations,
-            // Exclude: isLoading, error (runtime only)
+            // Exclude: uiTranslations, seedTitlesTranslations,
+            // helpersTranslations (network/bundle cache, reloaded on boot),
+            // isLoading, error (runtime only)
           },
           // Selected figure and seed
           figures: {
@@ -346,8 +347,12 @@ export const useDomainStore = create<DomainSlices>()(
           },
           seeds: {
             selectedId: state.seeds.selectedId,
-            byFigure: state.seeds.byFigure,
-            // Exclude: isLoading, error (runtime only)
+            // Exclude: byFigure (the full seed catalog per visited figure,
+            // ~125-155KB each; persisting it grew the localStorage blob into
+            // the multi-MB range for long-time users and risked quota
+            // exhaustion, which silently disables ALL persistence. It is a
+            // network cache, re-fetched per figure selection),
+            // isLoading, error (runtime only)
           },
           // Conversation mode preferences
           mode: {
