@@ -293,13 +293,7 @@ const OptimizedFigureImage: FC<OptimizedFigureImageProps> = ({
       
       <picture>
         {/* AVIF source */}
-        {imageData.avif && (
-          <source 
-            srcSet={imageData.avif.srcSet} 
-            type="image/avif"
-            sizes={`(max-width: 640px) 100vw, ${imageData.avif.width}px`}
-          />
-        )}
+        {/* AVIF source skipped: CDN avif encodes are larger than webp (DECISIONS item 21) */}
         
         {/* WebP source */}
         {imageData.webp && (

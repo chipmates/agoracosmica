@@ -46,7 +46,10 @@ const fallbackSize = type === 'main' ? 600 : 320;
 const resolvedSizes = sizes ?? DEFAULT_SIZES[type];
 ---
 <picture>
-  <source type="image/avif" srcset={getPublicImageSrcSet(figureId, type, 'avif')} sizes={resolvedSizes} />
+  <!-- AVIF source removed 2026-06: the CDN's avif encodes measure 50-75%
+       LARGER than their webp twins at every width, and browsers pick the
+       first matching source. Restore once the image pipeline re-encodes
+       avif properly (tracked in DECISIONS-FOR-MICHEL-2026-06.md item 21). -->
   <source type="image/webp" srcset={getPublicImageSrcSet(figureId, type, 'webp')} sizes={resolvedSizes} />
   <img
     src={getPublicImageUrl(figureId, type, fallbackSize, 'png')}
