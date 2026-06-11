@@ -23,12 +23,16 @@ const { figureId, alt } = Astro.props;
     type="image/avif"
     srcset={getPublicImageSrcSet(figureId, 'main', 'avif')}
     sizes="384px"
+    width="1200"
+    height="1452"
   />
   <source
     media="(min-width: 820px)"
     type="image/webp"
     srcset={getPublicImageSrcSet(figureId, 'main', 'webp')}
     sizes="384px"
+    width="1200"
+    height="1452"
   />
   <source
     type="image/avif"
@@ -43,7 +47,10 @@ const { figureId, alt } = Astro.props;
   <img
     src={getPublicImageUrl(figureId, 'thumbnail', 320, 'png')}
     alt={alt}
+    width="320"
+    height="320"
     loading="eager"
+    fetchpriority="high"
     decoding="async"
   />
 </picture>

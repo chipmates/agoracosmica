@@ -97,6 +97,18 @@
         color: rgba(210, 210, 210, 0.45);
         margin: 0;
       }
+      .noscript-fallback {
+        max-width: 36rem;
+        margin: 0 auto;
+        padding: 2.5rem 1.5rem 0;
+        text-align: center;
+        font-size: 1rem;
+        line-height: 1.6;
+        color: #D2D2D2;
+      }
+      .noscript-fallback a {
+        color: #E6BC5C;
+      }
     </style>
     <!-- The brand JSON-LD graph (Organization / EducationalOrganization /
          WebSite) is emitted only by the static homepage at / via
@@ -106,7 +118,7 @@
     <title>Agora Cosmica - A Living Library You Can Talk To</title>
 </head>
 <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <noscript><div class="noscript-fallback"><p>Agora Cosmica needs JavaScript for conversation and audio. The library itself is open without it: <a href="/">browse the figures and themes</a>.</p><p lang="de">Die App braucht JavaScript für Gespräch und Audio. Die Bibliothek ist auch ohne offen: <a href="/de/">zur deutschen Startseite</a>.</p></div></noscript>
     <div id="root">
       <div class="agc-splash" aria-hidden="true">
         <div class="agc-splash__brand">

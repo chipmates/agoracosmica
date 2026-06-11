@@ -149,6 +149,19 @@
     burger.addEventListener('click', function () {
       var isOpen = nav.classList.toggle('pub-navbar__nav--open');
       burger.setAttribute('aria-expanded', String(isOpen));
+      if (isOpen) {
+        // Keyboard support: hand focus to the first link in the open panel.
+        var firstLink = nav.querySelector('a');
+        if (firstLink) firstLink.focus();
+      }
+    });
+    // Escape closes the open panel and returns focus to the burger button.
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape') return;
+      if (!nav.classList.contains('pub-navbar__nav--open')) return;
+      nav.classList.remove('pub-navbar__nav--open');
+      burger.setAttribute('aria-expanded', 'false');
+      burger.focus();
     });
   }
 

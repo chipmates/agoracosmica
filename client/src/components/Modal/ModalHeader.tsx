@@ -57,6 +57,7 @@ const ModalHeader: FC<ModalHeaderProps> = ({
   
   // Content
   title = '',
+  titleLevel = 2,
   leftContent = null,
   rightContent = null,
   centerContent = null,
@@ -72,6 +73,9 @@ const ModalHeader: FC<ModalHeaderProps> = ({
   // Children for custom layout
   children = null
 }) => {
+  // Heading tag for the title, driven by titleLevel (default h2)
+  const TitleTag = `h${titleLevel}` as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+
   // Determine which style to use based on layout
   const getHeaderStyle = (): string => {
     switch (layout) {
@@ -135,9 +139,9 @@ const ModalHeader: FC<ModalHeaderProps> = ({
       <div className={headerClasses} role="group" aria-label={ariaLabel}>
         {centerContent || (
           title && (
-            <h2 className={styles.title}>
+            <TitleTag className={styles.title}>
               {title}
-            </h2>
+            </TitleTag>
           )
         )}
         {showCloseButton && onClose && (
@@ -190,9 +194,9 @@ const ModalHeader: FC<ModalHeaderProps> = ({
       <div className={styles.center}>
         {centerContent || (
           title && (
-            <h2 className={styles.title}>
+            <TitleTag className={styles.title}>
               {title}
-            </h2>
+            </TitleTag>
           )
         )}
       </div>

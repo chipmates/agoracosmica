@@ -51,6 +51,9 @@ const isHome = currentPath === '/' || currentPath === '/de/' || currentPath === 
     <BaseHead {...props} />
   </head>
   <body class={isHome ? 'pub-home-page' : undefined}>
+    <a href="#main-content" class="pub-skip-link">
+      {props.lang === 'de' ? 'Zum Inhalt springen' : 'Skip to content'}
+    </a>
     <div class="public-page">
       <Navbar lang={props.lang} currentPath={currentPath} />
       <main class="pub-main" id="main-content">
@@ -76,3 +79,26 @@ const isHome = currentPath === '/' || currentPath === '/de/' || currentPath === 
     <AdConsentPrompt client:idle lang={props.lang} />
   </body>
 </html>
+
+<style is:global>
+  /* Keyboard skip link: visually hidden until it receives keyboard focus,
+     then slides in above the sticky navbar (navbar z-index is 100). */
+  .pub-skip-link {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 200;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0.75rem 1.25rem;
+    background: var(--bg-card);
+    color: var(--gold-primary);
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    text-decoration: underline;
+    transform: translateY(-150%);
+  }
+  .pub-skip-link:focus-visible {
+    transform: translateY(0);
+  }
+</style>

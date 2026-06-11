@@ -134,10 +134,10 @@ const deQuestions = [
 
     <!-- Das Menschen-Raster, nach oben gezogen -->
     <section class="pub-section">
-      <h3 class="pub-section__title pub-home-subhead ll2-grid-head">Entdecke die 30 bemerkenswerten Menschen</h3>
+      <h2 class="pub-section__title pub-home-subhead ll2-grid-head">Entdecke die 30 bemerkenswerten Menschen</h2>
       <p class="pub-section__text ll2-caption">Öffne einen Namen und entdecke dieses Leben und seine Ideen.</p>
       <div class="pub-grid pub-grid--3">
-        {figures.map(figure => <FigureCard figure={figure} lang={lang} />)}
+        {figures.map(figure => <FigureCard figure={figure} lang={lang} headingLevel="h3" />)}
       </div>
     </section>
 
@@ -195,7 +195,7 @@ const deQuestions = [
         eigenen Council zusammen. Wähle die Moderation, wähle die drei Stimmen, wähle die Frage
         und beruf ein Gespräch ein, das es so noch nie gegeben hat.
       </p>
-      <CouncilHero council={heroCouncil} lang={lang} />
+      <CouncilHero council={heroCouncil} lang={lang} headingLevel="h3" />
       <div class="pub-home-hero__actions">
         <a href={`/app?council=${heroCouncil.id}`} class="pub-cta__button" data-agc-cta="start-exploring" data-agc-council={heroCouncil.id}>
           Den Cosmic Council betreten
@@ -238,14 +238,14 @@ const deQuestions = [
     <!-- FAQ -->
     <section class="pub-section pub-home-faq">
       <h2 class="pub-section__title">Fragen, die Menschen uns stellen</h2>
-      <dl class="pub-home-faq__list">
+      <div class="pub-home-faq__list">
         {faq.map(item => (
           <details class="pub-collapsible pub-home-faq__item">
             <summary class="pub-collapsible__header">
-              <dt class="pub-collapsible__title">{item.q}</dt>
+              <span class="pub-collapsible__title">{item.q}</span>
               <span class="pub-collapsible__arrow" aria-hidden="true">▼</span>
             </summary>
-            <dd class="pub-collapsible__body pub-home-faq__answer">
+            <div class="pub-collapsible__body pub-home-faq__answer">
               {item.more ? (
                 <>
                   <p class="pub-home-faq__p">{item.a}</p>
@@ -265,10 +265,10 @@ const deQuestions = [
               ) : (
                 item.a
               )}
-            </dd>
+            </div>
           </details>
         ))}
-      </dl>
+      </div>
     </section>
 
     <!-- Zum Lernen gebaut, offen für alle -->
@@ -337,10 +337,10 @@ const deQuestions = [
 
     <!-- The figure grid, moved up so faces appear early -->
     <section class="pub-section">
-      <h3 class="pub-section__title pub-home-subhead ll2-grid-head">Explore the 30 remarkable people</h3>
+      <h2 class="pub-section__title pub-home-subhead ll2-grid-head">Explore the 30 remarkable people</h2>
       <p class="pub-section__text ll2-caption">Open any name to explore their life and ideas.</p>
       <div class="pub-grid pub-grid--3">
-        {figures.map(figure => <FigureCard figure={figure} lang={lang} />)}
+        {figures.map(figure => <FigureCard figure={figure} lang={lang} headingLevel="h3" />)}
       </div>
     </section>
 
@@ -395,7 +395,7 @@ const deQuestions = [
         narrated audio. Or build your own. Choose the moderator, choose the three voices, choose
         the question, and convene a conversation that has never happened before.
       </p>
-      <CouncilHero council={heroCouncil} lang={lang} />
+      <CouncilHero council={heroCouncil} lang={lang} headingLevel="h3" />
       <div class="pub-home-hero__actions">
         <a href={`/app?council=${heroCouncil.id}`} class="pub-cta__button" data-agc-cta="start-exploring" data-agc-council={heroCouncil.id}>
           Enter the Cosmic Council
@@ -436,14 +436,14 @@ const deQuestions = [
     <!-- FAQ -->
     <section class="pub-section pub-home-faq">
       <h2 class="pub-section__title">Questions people ask</h2>
-      <dl class="pub-home-faq__list">
+      <div class="pub-home-faq__list">
         {faq.map(item => (
           <details class="pub-collapsible pub-home-faq__item">
             <summary class="pub-collapsible__header">
-              <dt class="pub-collapsible__title">{item.q}</dt>
+              <span class="pub-collapsible__title">{item.q}</span>
               <span class="pub-collapsible__arrow" aria-hidden="true">▼</span>
             </summary>
-            <dd class="pub-collapsible__body pub-home-faq__answer">
+            <div class="pub-collapsible__body pub-home-faq__answer">
               {item.more ? (
                 <>
                   <p class="pub-home-faq__p">{item.a}</p>
@@ -463,10 +463,10 @@ const deQuestions = [
               ) : (
                 item.a
               )}
-            </dd>
+            </div>
           </details>
         ))}
-      </dl>
+      </div>
     </section>
 
     <!-- Built for learning, open to everyone -->

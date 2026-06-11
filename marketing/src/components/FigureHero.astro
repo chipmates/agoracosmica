@@ -8,6 +8,7 @@ import FigurePortrait from './FigurePortrait.astro';
 import TrailerButton from '../islands/TrailerButton';
 import { getT } from '../i18n';
 import type { Lang } from '../i18n';
+import { getPublicTrailerUrl } from '@client/utils/public/publicMediaUrl';
 
 interface Figure {
   id: string;
@@ -27,6 +28,9 @@ const { figure, lang } = Astro.props;
 const t = getT(lang);
 
 const metaLine = [figure.tradition, figure.period].filter(Boolean).join('  ·  ');
+// No-JS fallback: a plain link to the raw trailer mp3, same URL the island's
+// audio hook builds, so the SSR'd play button is never a dead end.
+const trailerMp3 = getPublicTrailerUrl(figure.id, lang, 'mp3');
 const aboutParas = figure.about
   .split('\n')
   .map(p => p.trim())
@@ -45,6 +49,11 @@ const aboutParas = figure.about
       <p class="pub-fig-hero__learn">{`“${figure.learn}”`}</p>
     )}
     <TrailerButton client:visible figureId={figure.id} lang={lang} />
+    <noscript>
+      <a class="pub-textlink" href={trailerMp3}>
+        {lang === 'de' ? 'Intro anhören (MP3)' : 'Listen to the intro (MP3)'}
+      </a>
+    </noscript>
     {aboutParas.map(p => <p class="pub-fig-hero__about">{p}</p>)}
   </div>
 </section>

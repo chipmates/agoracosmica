@@ -139,7 +139,11 @@ const schemas = [
 
 // The hero's LCP portrait is the innermost first planet (Marcus Aurelius),
 // matching the ring plan in V2ObservatoryHero. Preload it at high priority.
+// The srcset + sizes pair MUST stay identical to the planet img's in
+// V2ObservatoryHero, so the preloaded resource is the one the img picks.
 const lcpPortrait = `${MEDIA_URL}/images/figures/aurelius/thumbnail/320.webp`;
+const lcpPortraitSrcset = `${MEDIA_URL}/images/figures/aurelius/thumbnail/160.webp 160w, ${MEDIA_URL}/images/figures/aurelius/thumbnail/320.webp 320w`;
+const lcpPortraitSizes = '(max-width: 900px) 52px, 76px';
 ---
 <Public
   title="A Living Library You Can Talk To"
@@ -149,6 +153,8 @@ const lcpPortrait = `${MEDIA_URL}/images/figures/aurelius/thumbnail/320.webp`;
   lang={lang}
   schemas={schemas}
   preloadImage={lcpPortrait}
+  preloadImageSrcset={lcpPortraitSrcset}
+  preloadImageSizes={lcpPortraitSizes}
   preloadImageType="image/webp"
 >
   <!-- cinematic orbital hero (static first paint; the island only enhances) -->

@@ -126,6 +126,10 @@ html:has(.public-page) #root {
   border: 1px solid var(--border-subtle, rgba(255,255,255,0.15));
   border-radius: 4px;
   padding: 0.25rem 0.5rem;
+  /* WCAG touch target: the 64px navbar row has room for a 44px chip */
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
   transition: color 0.2s, border-color 0.2s;
 }
 

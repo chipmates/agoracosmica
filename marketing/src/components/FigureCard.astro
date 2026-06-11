@@ -8,19 +8,23 @@ import type { PublicFigure } from '@client/data/public/figuresCatalog';
 interface Props {
   figure: PublicFigure;
   lang: Lang;
+  /** Heading level for the figure name. The /figures catalog pages keep the
+   *  default h2; the homepage grid sits under its own h2 and passes h3. */
+  headingLevel?: 'h2' | 'h3';
 }
 
-const { figure, lang } = Astro.props;
+const { figure, lang, headingLevel = 'h2' } = Astro.props;
+const Heading = headingLevel;
 const slug = figureIdToSlug[figure.id] || figure.id;
 const learnLine = figure.learn.trim();
 const fallback = figure.about.split('\n')[0].slice(0, 110);
 ---
 <a href={publicUrl(lang, `/figures/${slug}`)} class="pub-figure-card">
   <div class="pub-figure-card__image">
-    <StaticImage figureId={figure.id} type="thumbnail" alt={figure.name} loading="lazy" />
+    <StaticImage figureId={figure.id} type="thumbnail" alt="" loading="lazy" />
   </div>
   <div class="pub-figure-card__body">
-    <h2 class="pub-figure-card__name">{figure.name}</h2>
+    <Heading class="pub-figure-card__name">{figure.name}</Heading>
     <p class="pub-figure-card__tradition">{figure.tradition}</p>
     {learnLine ? (
       <p class="pub-figure-card__learn">{learnLine}</p>
