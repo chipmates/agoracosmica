@@ -12,8 +12,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - **Why we speak for the dead.** The strongest objection to the project, putting words in the mouths of real people who cannot consent, now has a public answer in three tiers: a homepage FAQ entry with a longer unfold, a full essay at `/echoes` (German at `/de/echoes`), and a repo mirror in [docs/WHY-WE-SPEAK-FOR-THE-DEAD.md](docs/WHY-WE-SPEAK-FOR-THE-DEAD.md) linked from the README. The Echo note on figure and theme pages and the in-app Echo explainer in Settings link to the essay.
 
+- **Keyboard, screen-reader, and no-JavaScript improvements across the landing pages.** A skip-to-content link on every page, a sane heading outline and valid FAQ markup on the homepage, localized language-switcher labels, a keyboard-operable mobile menu, and no-JS fallbacks: the app shell now points back to the open library in both languages and the audio preview buttons carry direct MP3 links.
+
 ### Changed
 
+- **Helper popups follow the dialog keyboard contract.** Focus moves in on open, Tab stays inside, Escape closes, and focus returns to the trigger. Before this, the Echo explainer could be opened but not read by keyboard.
+- **Public docs and in-app copy aligned with what the code does.** Rate limiting is described as eventually consistent rather than atomic, the BYOK wording everywhere is stored-on-device and sent only to OpenRouter, the settings privacy text names the anonymous en/de label in the aggregate counters, the jailbreak pattern count matches across docs, and the catalog tables say 55 questions rather than 55 themes.
+- **German landing copy reads like German.** A native-reader sweep replaced word-for-word transfers from the English source across the homepage, FAQ, About page, theme intros, and figure descriptions. No facts, names, or numbers changed.
+- Small avatars (related figures, theme voices, council casts) now request images at their real rendered size, saving roughly 100 KB and more per page on phones.
 - **The "What is an Echo?" explainer no longer auto-opens over the figure gallery.** It interrupted the first figure choice and repeated the AI notice every new visitor already confirms in the welcome dialog. It now opens on demand from a button under the gallery and keeps a permanent home in Settings, where it links the full essay.
 - **Privacy wording brought back in line with the code.** The consent prompt names the withdrawal path and links the privacy policy directly, the policies describe rate limiting exactly as implemented (the plain IP lives only in a short-lived one-hour key and never enters analytics), withdrawal instructions point at the Settings section by its real name, and the homepage structured data uses the current trust wording. Policy dates unified.
 - **Dismissing the consent prompt now also clears the stored click ID.** With no consent surface left in the session, there is nothing the ID could be kept for.
@@ -21,7 +27,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Fixed
 
-- A consent recorded under an older consent version now counts as undecided, so a future change of consent scope re-prompts instead of silently relying on the old record.
+- A consent recorded under an older consent version now counts as undecided, so a future change of consent scope re-prompts instead of silently relying on the old record. The same version rule now also guards the grant check itself.
+- A seed the user picked is restored again when returning to a figure (a string-versus-number id mismatch silently reset the choice).
+- Clear-all-history now removes prism transcripts and legacy-format history it used to leave behind, and a reset of help hints stays reset across reloads.
+- The language switcher on the English privacy policy lands on the German policy instead of a 404.
 
 ---
 
