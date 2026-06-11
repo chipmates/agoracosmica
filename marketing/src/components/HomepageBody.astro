@@ -70,7 +70,7 @@ const enQuestions = [
 // The repositioned German six mode cards and eight question tiles, verbatim
 // from the QA'd copy source. Each question tile links to its theme page.
 const deModes = [
-  { name: 'Story', text: 'Story bereitet die Lehre vor, ein erzähltes Kapitel aus dem Leben eines Menschen, das den Gedanken öffnet, zwölf Kapitel, gegen die Quellen geprüft.' },
+  { name: 'Story', text: 'Story bereitet die Lehre vor, ein erzähltes Kapitel aus dem Leben eines Menschen, das den Gedanken öffnet, zwölf Kapitel, anhand der Quellen geprüft.' },
   { name: 'Weisheit', text: 'In der Weisheit nimmst du eine ihrer Kernlehren und denkst sie durch, in deinen eigenen Worten und für dein eigenes Leben.' },
   { name: 'Prisma', text: 'Im Prisma hörst du vier verbundene Köpfe ein einziges Thema aus ihren eigenen Blickwinkeln umkreisen, wie ein Podcast, in dem du selbst mitsitzt.' },
   { name: 'Quest', text: 'Die Quest ist eine kurze sokratische Herausforderung, vier Fragen, die tiefer gehen als Oberflächenwissen.' },
@@ -105,8 +105,8 @@ const deQuestions = [
         Eine Bildungsplattform, auf der dreißig bemerkenswerte Menschen dir beibringen, was sie ein
         Leben lang durchdacht haben. Philosophen, Wissenschaftlerinnen, Mystiker, Künstlerinnen und
         Aktivisten, von Marcus Aurelius und Platon bis Ada Lovelace und Frida Kahlo, jede und jeder mit
-        einer eigenen, recherchierten Stimme und zwölf Kernlehren. Du lernst von ihnen über
-        sorgfältig gestaltete Inhalte. Hör eine erzählte Szene aus ihrem Leben. Vertiefe dich in
+        einer eigenen, recherchierten Stimme und zwölf Kernlehren. Du lernst von ihnen anhand
+        sorgfältig gestalteter Inhalte. Hör eine erzählte Szene aus ihrem Leben. Vertiefe dich in
         einen ihrer zentralen Gedanken. Setz dich mitten in einen vierstimmigen Dialog, oder lass
         einen Council eine Frage ausstreiten. Vier dieser Kapitel bilden einen Lernweg, und wenn du
         weitergehen willst, kannst du einen Gedanken mit jedem Menschen besprechen oder einfach alles fragen. Was sie lehren, schöpft aus ihrer
@@ -135,7 +135,7 @@ const deQuestions = [
     <!-- Das Menschen-Raster, nach oben gezogen -->
     <section class="pub-section">
       <h3 class="pub-section__title pub-home-subhead ll2-grid-head">Entdecke die 30 bemerkenswerten Menschen</h3>
-      <p class="pub-section__text ll2-caption">Öffne einen Namen und entdecke ihr Leben und ihre Ideen.</p>
+      <p class="pub-section__text ll2-caption">Öffne einen Namen und entdecke dieses Leben und seine Ideen.</p>
       <div class="pub-grid pub-grid--3">
         {figures.map(figure => <FigureCard figure={figure} lang={lang} />)}
       </div>
@@ -150,7 +150,7 @@ const deQuestions = [
       </p>
       <p class="pub-section__text ll2-lead">
         Verschiedene Fragen verlangen nach verschiedenen Wegen. Das meiste davon ist im Voraus
-        gestaltet, gemacht, um dir etwas beizubringen. Zwei sind ein lebendiges Gespräch, für die
+        gestaltet, gemacht, um dir etwas beizubringen. Zwei davon sind lebendige Gespräche, für die
         Momente, in denen du tiefer gehen willst.
       </p>
       <div class="ll2-mode-grid">
@@ -191,9 +191,9 @@ const deQuestions = [
         Menschen rund um eine einzige Frage in einen Raum und lässt sie streiten. Eine
         Moderation hält den Faden, drei Denkende widersprechen einander, und du hörst zu, wie Ideen
         aufeinanderprallen, wie es zu ihren Lebzeiten nie möglich war. Es gibt 110 sorgfältig
-        gebaute Debatten zum Abspielen, jede mit vollständigem erzähltem Audio. Oder bau deinen
-        eigenen. Wähle die Moderation, wähle die drei Stimmen, wähle die Frage und beruf ein
-        Gespräch ein, das es so noch nie gegeben hat.
+        gebaute Debatten zum Abspielen, jede mit vollständigem erzähltem Audio. Oder stell deinen
+        eigenen Council zusammen. Wähle die Moderation, wähle die drei Stimmen, wähle die Frage
+        und beruf ein Gespräch ein, das es so noch nie gegeben hat.
       </p>
       <CouncilHero council={heroCouncil} lang={lang} />
       <div class="pub-home-hero__actions">
@@ -221,9 +221,9 @@ const deQuestions = [
         </LabTrustCard>
         <LabTrustCard label="Offen">
           Live gesprochene Sprache läuft auf unseren eigenen GPUs in Deutschland, das übrige Audio
-          auf Hosting in der EU, und der gesamte Code liegt offen unter der AGPL-3.0. Du kannst es
-          auch komplett auf deinem eigenen Rechner laufen lassen. Der Local Mode richtet die App auf
-          jedes OpenAI-kompatible LLM aus, etwa LM Studio, Ollama oder vLLM, und betreibt den
+          auf Servern in der EU, und der gesamte Code liegt offen unter der AGPL-3.0. Du kannst es
+          auch komplett auf deinem eigenen Rechner laufen lassen. Der Local Mode verbindet die App
+          mit jedem OpenAI-kompatiblen LLM, etwa LM Studio, Ollama oder vLLM, und betreibt den
           Audio-Stack in Docker, sodass keine Gespräche, keine Stimme und kein Text deinen Computer
           verlassen. Du musst uns also nicht vertrauen. Du kannst nachsehen.
         </LabTrustCard>
@@ -281,7 +281,7 @@ const deQuestions = [
         auf dem du von jedem Menschen lernst, folgt einem vierstufigen Bogen.
         Eine Idee aufnehmen, sie erkunden, sie verknüpfen und dann zeigen,
         dass du sie verstanden hast. Keine Voraussetzungen, keine Bezahlschranken. Schulen und
-        Hochschulen sind eingeladen, es zu ihren Lernenden zu bringen, und Entwicklerinnen können
+        Hochschulen sind eingeladen, es ihren Lernenden zugänglich zu machen, und Entwicklerinnen können
         jede Zeile lesen oder die ganze Plattform mit einem einzigen Befehl selbst hosten. Für uns
         ist es ein Erfolg an dem Tag, an dem du über uns hinauswächst, von unseren Einführungen zu
         den Primärtexten, von KI-Gesprächen zu menschlichen Lehrern, von Neugier zu vertieftem

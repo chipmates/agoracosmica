@@ -137,7 +137,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
       seoTitle: "Albert Einstein - Relativity & Imagination | Agora Cosmica",
     },
     de: {
-      description: "Entdecke Einsteins Philosophie des Staunens, Gedankenexperimente und kosmisches Gefühl. 12 Kapitel Lebensgeschichte, Lehren zu Kreativität und wissenschaftlicher Imagination.",
+      description: "Entdecke Einsteins Philosophie des Staunens, der Gedankenexperimente und des kosmischen Gefühls. 12 Kapitel Lebensgeschichte, Lehren zu Kreativität.",
       teachingsHeading: "Einstein über Kreativität, Staunen und den Kosmos",
       seoTitle: "Albert Einstein - Relativität & Imagination | Agora Cosmica",
     },
@@ -281,7 +281,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
       seoTitle: "Friedrich Nietzsche - Zarathustra & Self-Overcoming",
     },
     de: {
-      description: "Entdecke Nietzsches Philosophie der Selbstüberwindung, ewigen Wiederkehr und Lebensbejahung. 12 Kapitel Lebensgeschichte, Lehren zu Wille zur Macht und Wertschöpfung.",
+      description: "Entdecke Nietzsches Philosophie der Selbstüberwindung, ewigen Wiederkehr und Lebensbejahung. 12 Kapitel Lebensgeschichte, Lehren zum Willen zur Macht und zum Schaffen eigener Werte.",
       teachingsHeading: "Nietzsche über Selbstüberwindung und Lebensbejahung",
       seoTitle: "Friedrich Nietzsche - Zarathustra & Selbstüberwindung",
     },
@@ -293,7 +293,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
       seoTitle: "Plato - The Cave, Forms & Justice | Agora Cosmica",
     },
     de: {
-      description: "Entdecke Platons Philosophie der Ideen, Gerechtigkeit und des geprüften Lebens. 12 Kapitel Lebensgeschichte, Lehren zum Höhlengleichnis, zur Sokratischen Methode und dem Guten.",
+      description: "Entdecke Platons Philosophie der Ideen, Gerechtigkeit und des geprüften Lebens. 12 Kapitel Lebensgeschichte, Lehren zum Höhlengleichnis, zur sokratischen Methode und zum Guten.",
       teachingsHeading: "Platon über Wahrheit, Gerechtigkeit und das geprüfte Leben",
       seoTitle: "Platon - Höhlengleichnis & Ideenlehre | Agora Cosmica",
     },
