@@ -4,24 +4,35 @@
 // the homepage). Mirrored in the repo as docs/WHY-WE-SPEAK-FOR-THE-DEAD.md.
 import Public from '../layouts/Public.astro';
 import EchoesContent from '../components/EchoesContent.astro';
-import { organizationSchema, breadcrumbSchema } from '../lib/schemas';
+import { organizationSchema, breadcrumbSchema, articleSchema } from '../lib/schemas';
 import { getT } from '../i18n';
-import { SITE_URL } from '../lib/urls';
+import { SITE_URL, MEDIA_URL } from '../lib/urls';
 
 const lang = 'en' as const;
 const t = getT(lang);
+const echoesUrl = `${SITE_URL}/echoes/`;
+const description = 'Every figure here is an AI Echo of a real person who cannot consent. We answer the strongest objection to our project, with the tradition and the risks named.';
 ---
 <Public
   title="Why We Speak for the Dead"
-  description="Every figure here is an AI Echo of a real person who cannot consent. We answer the strongest objection to our project, with the tradition and the risks named."
+  description={description}
   canonicalPath="/echoes"
   lang={lang}
   ogType="article"
   schemas={[
     organizationSchema(),
+    articleSchema({
+      title: 'Why We Speak for the Dead',
+      description,
+      url: echoesUrl,
+      lang,
+      image: `${MEDIA_URL}/images/ui/og-default/1200.webp`,
+      datePublished: '2026-06-10',
+      dateModified: '2026-06-10',
+    }),
     breadcrumbSchema([
       { name: t('breadcrumbs.home'), url: `${SITE_URL}/` },
-      { name: 'Why we speak for the dead', url: `${SITE_URL}/echoes` },
+      { name: 'Why we speak for the dead', url: echoesUrl },
     ]),
   ]}
 >

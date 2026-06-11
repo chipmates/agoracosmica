@@ -69,12 +69,14 @@ function gitLastModified(...relPaths) {
 // avoid a redirect hop on every crawl. Root stays bare (/).
 const slash = (p) => (p === '/' ? '/' : p.endsWith('/') ? p : `${p}/`);
 
-// German-only legal pages have no English equivalent. Sitemap emits a bare URL
-// (no /de/ prefix) and skips the en/de/x-default hreflang block.
-const LEGAL_DE_PATHS = new Set(['/impressum', '/datenschutz', '/cookie-policy', '/nutzungsbedingungen']);
+// Single-language pages with no twin. Sitemap emits a bare URL and skips the
+// en/de/x-default hreflang block. The four legal pages are German-only; the
+// privacy policy is the lone English page (its DE counterpart is /datenschutz,
+// reached via a 301, so they share no hreflang signal by design).
+const NO_HREFLANG_PATHS = new Set(['/impressum', '/datenschutz', '/cookie-policy', '/nutzungsbedingungen', '/privacy']);
 
 function url(rawPath, priority, lastmod, changefreq = 'monthly') {
-  const isLegalDe = LEGAL_DE_PATHS.has(rawPath);
+  const isLegalDe = NO_HREFLANG_PATHS.has(rawPath);
   const path = slash(rawPath);
   const fullUrl = `${SITE_URL}${path}`;
   const enUrl = fullUrl;
@@ -166,6 +168,7 @@ const LEGAL_MOD = {
   '/datenschutz': gitLastModified('marketing/src/pages/datenschutz.astro', 'client/src/pages/DatenschutzPage.tsx'),
   '/cookie-policy': gitLastModified('marketing/src/pages/cookie-policy.astro', 'client/src/pages/CookiePolicyPage.tsx'),
   '/nutzungsbedingungen': gitLastModified('marketing/src/pages/nutzungsbedingungen.astro', 'client/src/pages/NutzungsbedingungenPage.tsx'),
+  '/privacy': gitLastModified('marketing/src/pages/privacy.astro'),
 };
 
 const urls = [];
@@ -207,6 +210,9 @@ urls.push(url('/impressum', '0.3', LEGAL_MOD['/impressum']));
 urls.push(url('/datenschutz', '0.3', LEGAL_MOD['/datenschutz']));
 urls.push(url('/cookie-policy', '0.3', LEGAL_MOD['/cookie-policy']));
 urls.push(url('/nutzungsbedingungen', '0.3', LEGAL_MOD['/nutzungsbedingungen']));
+// English privacy policy: a substantive indexable page with no German twin.
+// Emitted bare (no hreflang block) like the German legal pages.
+urls.push(url('/privacy', '0.3', LEGAL_MOD['/privacy']));
 
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"

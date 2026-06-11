@@ -9,6 +9,18 @@ interface Props {
 
 const { lang } = Astro.props;
 const t = getT(lang);
+
+// Per-language podcast shows (mirrors ContactContent.astro). The footer renders
+// on every page, so DE pages must link the German show, not the English one.
+const spotifyUrl = lang === 'de'
+  ? 'https://open.spotify.com/show/5i63mEKJuCVniSIViXbEP8'
+  : 'https://open.spotify.com/show/3V02q5c8NAnFD1W2kQBYzd';
+const youtubeUrl = lang === 'de'
+  ? 'https://www.youtube.com/@agoracosmicade'
+  : 'https://www.youtube.com/@agoracosmica';
+const applePodcastUrl = lang === 'de'
+  ? 'https://podcasts.apple.com/us/podcast/agora-cosmica-deutsch/id1871505945'
+  : 'https://podcasts.apple.com/us/podcast/agora-cosmica/id1871505788';
 ---
 <footer class="pub-footer">
   <div class="pub-footer__inner">
@@ -31,9 +43,9 @@ const t = getT(lang);
         <a href="/nutzungsbedingungen/">{t('footer.terms')}</a>
       </div>
       <div class="pub-footer__col">
-        <a href="https://open.spotify.com/show/3V02q5c8NAnFD1W2kQBYzd" target="_blank" rel="noopener noreferrer">Spotify</a>
-        <a href="https://www.youtube.com/@agoracosmica" target="_blank" rel="noopener noreferrer">YouTube</a>
-        <a href="https://podcasts.apple.com/us/podcast/agora-cosmica/id1871505788" target="_blank" rel="noopener noreferrer">Apple Podcasts</a>
+        <a href={spotifyUrl} target="_blank" rel="noopener noreferrer">Spotify</a>
+        <a href={youtubeUrl} target="_blank" rel="noopener noreferrer">YouTube</a>
+        <a href={applePodcastUrl} target="_blank" rel="noopener noreferrer">Apple Podcasts</a>
         <a href="https://github.com/chipmates/agoracosmica" target="_blank" rel="noopener noreferrer">GitHub</a>
       </div>
     </div>

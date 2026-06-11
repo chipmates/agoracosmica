@@ -4,24 +4,35 @@
 // Startseite). Im Repo gespiegelt als docs/WHY-WE-SPEAK-FOR-THE-DEAD.md.
 import Public from '../../layouts/Public.astro';
 import EchoesContent from '../../components/EchoesContent.astro';
-import { organizationSchema, breadcrumbSchema } from '../../lib/schemas';
+import { organizationSchema, breadcrumbSchema, articleSchema } from '../../lib/schemas';
 import { getT } from '../../i18n';
-import { SITE_URL } from '../../lib/urls';
+import { SITE_URL, MEDIA_URL } from '../../lib/urls';
 
 const lang = 'de' as const;
 const t = getT(lang);
+const echoesUrl = `${SITE_URL}/de/echoes/`;
+const description = 'Jede Persönlichkeit ist ein KI-Echo eines Menschen, der nicht zustimmen kann. Wir beantworten den härtesten Einwand gegen unser Projekt offen und überprüfbar.';
 ---
 <Public
   title="Warum wir für die Toten sprechen"
-  description="Jede Persönlichkeit ist ein KI-Echo eines Menschen, der nicht zustimmen kann. Wir beantworten den härtesten Einwand gegen unser Projekt offen und überprüfbar."
+  description={description}
   canonicalPath="/echoes"
   lang={lang}
   ogType="article"
   schemas={[
     organizationSchema(),
+    articleSchema({
+      title: 'Warum wir für die Toten sprechen',
+      description,
+      url: echoesUrl,
+      lang,
+      image: `${MEDIA_URL}/images/ui/og-default/1200.webp`,
+      datePublished: '2026-06-10',
+      dateModified: '2026-06-10',
+    }),
     breadcrumbSchema([
       { name: t('breadcrumbs.home'), url: `${SITE_URL}/de/` },
-      { name: 'Warum wir für die Toten sprechen', url: `${SITE_URL}/de/echoes` },
+      { name: 'Warum wir für die Toten sprechen', url: echoesUrl },
     ]),
   ]}
 >
