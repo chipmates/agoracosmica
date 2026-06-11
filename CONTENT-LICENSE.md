@@ -27,7 +27,7 @@ language version as a separate licensed deliverable.
 |---|---:|---|---:|
 | Curated stories (12 per figure × 30 figures) | 360 | EN + DE | **720** |
 | Forewords (one per figure) | 30 | EN + DE | **60** |
-| Council dialogues (110 across 55 themes, L1 + L2 depth) | 110 | EN + DE | **220** |
+| Council dialogues (110 across 55 questions, L1 + L2 depth) | 110 | EN + DE | **220** |
 | Prism conversations (12 per figure × 30 figures) | 360 | EN + DE | **720** |
 | Wisdom teachings (12 per figure × 30 figures) | 360 | EN + DE | **720** |
 | Factchecks (one per figure) | 30 | EN + DE | **60** |

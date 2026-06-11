@@ -367,7 +367,7 @@
       "viewPrivacyPolicy": "Datenschutzerklärung anzeigen",
       "viewCookiePolicy": "Cookie-Richtlinie anzeigen",
       "cookieToggleInfo": "Um Cookie-Einstellungen direkt zu verwalten, besuche bitte unsere Datenschutzerklärung, wo du deine Einwilligungseinstellungen anpassen kannst.",
-      "dataInfo": "Wir verwenden keine Tracking-Cookies. Deine Spracheinstellung und Anzeigeeinstellungen werden lokal auf deinem Gerät gespeichert und niemals an einen Server gesendet."
+      "dataInfo": "Wir verwenden keine Tracking-Cookies. Deine Spracheinstellung und Anzeigeeinstellungen werden lokal auf deinem Gerät gespeichert. Anzeigeeinstellungen verlassen es nie, und die App-Sprache erscheint nur als anonymes en/de-Label in unseren aggregierten Zählern."
     },
     "help": {
       "title": "Hilfe & Tipps",
@@ -380,7 +380,7 @@
       "tipInfo": "Hilfetipps erscheinen, wenn du zum ersten Mal auf neue Funktionen stößt oder Anleitung benötigst. Du kannst sie jederzeit wieder mit \"Nicht mehr anzeigen\" ausblenden.",
       "mission": {
         "title": "Brücken zur Weisheit besonderer Menschen",
-        "text": "Agora Cosmica ist ein Projekt der ChipMates gemeinnützige GmbH, einer kleinen gemeinnützigen Organisation aus Freiburg im Breisgau. Wir arbeiten daran, Weisheit aus der Geschichte für alle zugänglich zu machen, befreit von akademischen Barrieren, Bezahlschranken und Werbung.\n\nDie Plattform bringt 30 besondere Persönlichkeiten aus Philosophie, Wissenschaft, Mystik, Kunst und Aktivismus zusammen — und öffnet eine Tür für jeden, mit Weisheitstraditionen die eigene Reise zu beginnen."
+        "text": "Agora Cosmica ist ein Projekt der ChipMates gemeinnützige GmbH, einer kleinen gemeinnützigen Organisation aus Freiburg im Breisgau. Wir arbeiten daran, Weisheit aus der Geschichte für alle zugänglich zu machen, befreit von akademischen Barrieren, Bezahlschranken und Werbung.\n\nDie Plattform bringt 30 besondere Persönlichkeiten aus Philosophie, Wissenschaft, Mystik, Kunst und Aktivismus zusammen und öffnet eine Tür für jeden, mit Weisheitstraditionen die eigene Reise zu beginnen."
       },
       "values": {
         "title": "Unsere Werte",
@@ -399,7 +399,7 @@
       },
       "vision": {
         "title": "Unsere Definition von Erfolg",
-        "text": "Wir feiern, wenn Menschen über uns hinauswachsen — von unseren Einführungen zu Primärtexten, von KI-Gesprächen zu menschlichen Lehrern, von Neugier zu ihrer eigenen tieferen Erkundung. Das ist die Mission."
+        "text": "Wir feiern, wenn Menschen über uns hinauswachsen: von unseren Einführungen zu Primärtexten, von KI-Gesprächen zu menschlichen Lehrern, von Neugier zu ihrer eigenen tieferen Erkundung. Das ist die Mission."
       },
       "community": {
         "title": "Unser Versprechen",
@@ -1603,7 +1603,7 @@
       },
       "dataStorage": {
         "title": "Auf deinem Gerät",
-        "description": "Geschichten, Einstellungen und dein API-Key verlassen niemals deinen Browser",
+        "description": "Geschichten, Einstellungen und dein API-Key liegen nur in deinem Browser. Der Key geht direkt an OpenRouter, nie an uns",
         "points": [
           "Verschlüsselt mit AES-256-GCM im IndexedDB",
           "Schlüssel ist an dieses Gerät gebunden und wird nie übertragen",
@@ -1620,12 +1620,12 @@
         ]
       },
       "tracking": {
-        "title": "Null Tracking",
+        "title": "Keine Tracking-Cookies, kein Profiling",
         "description": "Keine Analyse-Skripte, keine Nutzerprofile, keine Dritt-Tracker.",
         "points": [
           "Keine Tracker von Google, Meta oder anderen",
           "Ein technisches Cookie, das vor Bots schützt",
-          "Nur anonyme Fehlerzahlen, damit wir Bugs beheben können"
+          "Anonyme aggregierte Zähler, etwa welche Funktionen genutzt werden, damit der Dienst läuft und wir Bugs beheben können"
         ]
       },
       "aiModels": {

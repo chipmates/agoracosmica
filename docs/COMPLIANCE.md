@@ -20,7 +20,7 @@ Legitimate interest (Art. 6(1)(f) GDPR) for providing philosophical dialogue ser
 | Principle | Implementation |
 |-----------|---------------|
 | **No registration** | No email, no password, no account data. The one personal-data exception is the opt-in Google ad click ID (gclid), see [MEASUREMENT.md](MEASUREMENT.md) |
-| **No tracking** | No analytics cookies, no behavior tracking |
+| **No tracking cookies** | No analytics cookies, no behavior tracking |
 | **Local storage** | Conversations in IndexedDB on user's device |
 | **Minimal logging** | Safety events only (category + timestamp + IP hash), 90-day retention |
 | **No profiling** | No user profiles built, no recommendations based on behavior |
@@ -110,7 +110,7 @@ The Impressum page includes all legally required information:
 
 ## Terms of Service
 
-Available at `/nutzungsbedingungen` (German) and `/terms` (English).
+Available at `/nutzungsbedingungen` (German; `/terms` redirects there). An English version is planned.
 
 Key provisions (13 sections):
 - User owns their API key

@@ -31,7 +31,7 @@ Each chapter prepares the next. After Quest, the teaching is "gathered" and show
 - **360 stories** · 12 per figure
 - **360 wisdom teachings** · 12 per figure
 - **360 prism dialogues** · 12 per figure, four figures each
-- **110 councils** · 55 themes, two levels each
+- **110 councils** · 55 questions, two levels each
 
 All audio bilingual English + German with character-level timestamps.
 

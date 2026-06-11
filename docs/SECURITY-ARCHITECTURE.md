@@ -1,6 +1,6 @@
 # Security & Privacy Architecture
 
-This document explains how Agora Cosmica protects users, what data flows where, and what we explicitly do not defend against. Every claim here is verifiable against the AGPL-3.0 source code in this repository.
+This document explains how Agora Cosmica protects users, what data flows where, and what we explicitly do not defend against. The client and Worker claims are verifiable against the AGPL-3.0 source code in this repository; server-side operational claims (GPU servers, edge configuration) are described together with how we verify them.
 
 For vulnerability reporting and our disclosure policy, see [SECURITY.md](../SECURITY.md).
 
@@ -94,7 +94,7 @@ Users without an API key use the free tier through our LLM Worker:
 |-------|-----------|
 | **Cloudflare Turnstile** | Invisible bot challenge before JWT issuance |
 | **JWT** | HMAC-SHA256, **per-identity (UUID-bound, not IP-bound)**, 30-min TTL |
-| **Rate limiting** | **Per-identity** (UUID), atomic Cloudflare KV check-and-increment |
+| **Rate limiting** | **Per-identity** (UUID), Cloudflare KV check-and-increment (eventually consistent; worst case lets a couple of extra requests through under heavy concurrency, see the code comment in `rateLimit.ts`) |
 | **Global wallet cap** | 15,000 messages daily across all identities. Backstop against credential abuse. |
 | **Content screening** | Pre-LLM safety analysis. See [CONTENT-SAFETY.md](CONTENT-SAFETY.md). |
 | **Response validation** | Length cap (2,000 tokens), forbidden-pattern matching |
@@ -160,10 +160,10 @@ A daily cron audit (`zdr-audit.sh` on the GPU servers) verifies that no conversa
 
 | Threat | Mitigation |
 |--------|-----------|
-| **Jailbreak attempts** | 150+ pattern detection, server-side screening |
+| **Jailbreak attempts** | Multi-layer regex screening (~85 patterns, client + server), see [CONTENT-SAFETY.md](CONTENT-SAFETY.md) |
 | **Prompt injection** | Server-side prompt assembly, sanitized user input |
-| **API key theft** | AES-256-GCM client-side encryption, key never leaves device |
-| **Rate-limit abuse** | Atomic KV operations, per-identity counters, global wallet cap |
+| **API key theft** | AES-256-GCM client-side encryption, key stored only on the device and sent only to OpenRouter directly |
+| **Rate-limit abuse** | KV check-and-increment, per-identity counters, global wallet cap |
 | **Direct-to-origin abuse** | Two-token edge auth on Hetzner nginx |
 | **Stats-Worker exposure** | Cloudflare Access policy gates `/api/query*` |
 | **Content manipulation** | Figure whitelist (30), chapter whitelist, response length cap |
