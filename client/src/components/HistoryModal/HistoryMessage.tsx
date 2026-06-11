@@ -38,7 +38,7 @@ const HistoryMessage: FC<HistoryMessageProps> = ({
       <div className="message-header">
         {Icon && <Icon size={16} className="mode-icon" />}
         <strong>
-          {entry.role === 'user' ? seekerLabel + ': ' : `${selectedFigureName.replace(/^Echo of |^Echo von |^Echo de /i, '')}: `}
+          {entry.role === 'user' ? seekerLabel + ': ' : `${selectedFigureName}: `}
         </strong>
         {entry.timestamp && (
           <span className="message-timestamp">

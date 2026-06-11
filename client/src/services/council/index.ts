@@ -456,7 +456,7 @@ export class CosmicCouncilService {
    */
   _getEchoName(participantId: string): string {
     const baseName = this._getFullName(participantId);
-    const echoPrefix = 'Echo of';
+    const echoPrefix = this._getUserLanguage() === 'de' ? 'Echo von' : 'Echo of';
     return `${echoPrefix} ${baseName}`;
   }
 
