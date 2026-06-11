@@ -95,12 +95,17 @@ export const clearSeedHistory = async (selectedFigure: Figure, seedId: string): 
 export const clearAllHistory = async (): Promise<ClearAllResult> => {
   const allKeys = LocalStorageAdapter.keys();
   
-  // New format keys only
-  const modeKeys = allKeys.filter(k => 
+  // All history-bearing prefixes, matching what clearSeedHistory removes per
+  // seed (prism transcripts and the legacy history_ format were missed before,
+  // so "clear all" left conversation content behind).
+  const modeKeys = allKeys.filter(k =>
     k.startsWith('story_') ||
-    k.startsWith('starseed_') || 
-    k.startsWith('challenge_') || 
+    k.startsWith('starseed_') ||
+    k.startsWith('challenge_') ||
     k.startsWith('freetalk_') ||
+    k.startsWith('prism_') ||
+    k.startsWith('council_') ||
+    k.startsWith('history_') ||
     k.startsWith('summary_') ||
     k.startsWith('modeState_')
   );

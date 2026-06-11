@@ -168,9 +168,12 @@ export const useFigureManagerAdapter = (
 
       const seeds = await loadFigureSeeds(figure.id);
 
-      // CRITICAL FIX: Restore last selected seed for this figure, not always seeds[0]
+      // CRITICAL FIX: Restore last selected seed for this figure, not always seeds[0].
+      // Compare ids as strings: seed JSON ships numeric ids, but the persisted
+      // selection is stringified on save, so strict === never matched.
       const savedSeed = preferencesAdapter.getSelectedSeed<Seed>(figure.id);
-      const defaultSeed = (savedSeed && seeds.find(s => s.id === savedSeed.id)) ?? seeds[0] ?? null;
+      const defaultSeed =
+        (savedSeed && seeds.find(s => s.id?.toString() === savedSeed.id?.toString())) ?? seeds[0] ?? null;
 
       const result: SelectFigureResult = {
         seed: defaultSeed,

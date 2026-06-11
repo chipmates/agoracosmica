@@ -16,7 +16,9 @@ function detectLanguage(): 'en' | 'de' {
   try {
     const docLang = typeof document !== 'undefined' ? document.documentElement.lang : '';
     if (docLang && docLang.toLowerCase().startsWith('de')) return 'de';
-    const stored = typeof localStorage !== 'undefined' ? localStorage.getItem('language') : null;
+    const stored = typeof localStorage !== 'undefined'
+      ? localStorage.getItem('selectedLanguage') || localStorage.getItem('language')
+      : null;
     if (stored && stored.toLowerCase().startsWith('de')) return 'de';
     if (typeof navigator !== 'undefined' && navigator.language && navigator.language.toLowerCase().startsWith('de')) return 'de';
   } catch {

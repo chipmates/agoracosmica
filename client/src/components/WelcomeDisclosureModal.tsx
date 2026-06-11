@@ -8,6 +8,7 @@ import CosmicLogo from './CosmicLogo';
 import styles from './WelcomeDisclosureModal.module.css';
 import { preferencesIndexedDbAdapter } from '../storage/preferencesIndexedDbAdapter';
 import { LocalStorageAdapter } from '../storage/localAdapter';
+import { HISTORY_PREFIXES } from '../utils/userState';
 import { sendEntryBeacon } from '../utils/entryBeacon';
 import { sendSignupBeacon } from '../utils/signupBeacon';
 import { sendConversion } from '../utils/public/gclidCapture';
@@ -37,16 +38,21 @@ const WelcomeDisclosureModal: FC<WelcomeDisclosureModalProps> = ({ isOpen, onCom
 
   const handleComplete = useCallback((): void => {
     if (!consentGiven) return;
-    // Store consent in localStorage (technisch erforderlich, § 25 Abs. 2 Nr. 2 TDDDG)
-    localStorage.setItem('agb_consent', JSON.stringify({
-      version: CURRENT_AGB_VERSION,
-      timestamp: Date.now(),
-    }));
-    localStorage.setItem('age_confirmed', JSON.stringify({
-      confirmed: true,
-      minAge: 16,
-      timestamp: Date.now(),
-    }));
+    // Store consent in localStorage (technisch erforderlich, § 25 Abs. 2 Nr. 2 TDDDG).
+    // A full or blocked storage must not trap the user on the welcome screen.
+    try {
+      localStorage.setItem('agb_consent', JSON.stringify({
+        version: CURRENT_AGB_VERSION,
+        timestamp: Date.now(),
+      }));
+      localStorage.setItem('age_confirmed', JSON.stringify({
+        confirmed: true,
+        minAge: 16,
+        timestamp: Date.now(),
+      }));
+    } catch (err) {
+      console.error('Failed to persist consent record:', err);
+    }
     // No profile UI at entry — default to the Seeker. The user can rename or
     // change the avatar later in settings.
     preferencesIndexedDbAdapter.setUserProfile({
@@ -58,7 +64,12 @@ const WelcomeDisclosureModal: FC<WelcomeDisclosureModalProps> = ({ isOpen, onCom
     // Entry funnel beacons — this is the true "entered the app" moment (profile
     // created + consent given). isFirstLogin gates the organic-signup beacon;
     // the profile_created conversion self-gates on a captured gclid (unchanged).
-    const hasAnyHistory = LocalStorageAdapter.keys().some((k) => k.startsWith('history_'));
+    // Check the canonical history prefixes, not only the legacy history_ format,
+    // so returning users are not miscounted as first signups.
+    const historyPrefixes = [...HISTORY_PREFIXES, 'history_'];
+    const hasAnyHistory = LocalStorageAdapter.keys().some((k) =>
+      historyPrefixes.some((prefix) => k.startsWith(prefix))
+    );
     const hasSelectedFigure = LocalStorageAdapter.getString('selectedFigure');
     const isFirstLogin = !hasAnyHistory && !hasSelectedFigure;
     sendEntryBeacon();
@@ -231,7 +242,7 @@ const WelcomeDisclosureModal: FC<WelcomeDisclosureModalProps> = ({ isOpen, onCom
           {/* Legal consent — required before starting (scroll down to see) */}
           <div className={styles.consentSection}>
             <h3 className={styles.consentHeading}>{tNode('legal.consent.heading')}</h3>
-            <div className={styles.aiNotice} role="alert">
+            <div className={styles.aiNotice} role="note">
               <p>{tNode('legal.consent.aiNotice')}</p>
             </div>
 

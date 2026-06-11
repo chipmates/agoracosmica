@@ -153,7 +153,11 @@ export function adConsentGranted(): boolean {
     if (typeof localStorage === 'undefined') return false;
     const raw = localStorage.getItem(LS_AD_CONSENT_KEY);
     if (!raw) return false;
-    return (JSON.parse(raw) as { granted?: boolean }).granted === true;
+    // Same version rule as adConsentDecided: a grant recorded under an older
+    // consent version no longer covers the current scope, so it must not
+    // authorize sends. Strictly more conservative than before.
+    const record = JSON.parse(raw) as { granted?: boolean; version?: string };
+    return record.granted === true && record.version === AD_CONSENT_VERSION;
   } catch {
     return false;
   }

@@ -246,12 +246,6 @@
   transform: translateY(-8px) scale(1.02) translateZ(0);
 }
 
-.portraitFrame:focus {
-  outline: 2px solid var(--secondary-gold);
-  outline-offset: 4px;
-  border-radius: 16px;
-}
-
 /* Liquid Glass Frame */
 .glassFrame {
   position: relative;

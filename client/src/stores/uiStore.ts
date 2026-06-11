@@ -76,6 +76,12 @@ const bootstrapHelpPreferences = (): HelpDismissedMap => {
     if (typeof localStorage === 'undefined') {
       return {};
     }
+    // One-time migration: once the zustand persist entry exists it is the
+    // source of truth. Re-reading the legacy key on every load would merge old
+    // dismissals back in and silently undo "reset help hints" in Settings.
+    if (localStorage.getItem('ui-store')) {
+      return {};
+    }
     const stored = localStorage.getItem(PREFERENCES_KEY);
     if (!stored) {
       return {};

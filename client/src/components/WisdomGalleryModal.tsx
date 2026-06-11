@@ -552,7 +552,7 @@ const WisdomGalleryModal: FC<WisdomGalleryModalProps> = ({
       >
         {/* Bar Indicators — hidden when figure selected to reclaim space */}
         {!selectedFigure && (
-          <div className={styles.barIndicators} aria-hidden="true">
+          <div className={styles.barIndicators}>
             {figures.map((_, index) => (
               <button
                 key={index}

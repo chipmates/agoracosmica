@@ -1,7 +1,8 @@
-import { FC, ReactNode, useState, ChangeEvent } from 'react';
+import { FC, ReactNode, useState, useEffect, useRef, ChangeEvent } from 'react';
 import { createPortal } from 'react-dom';
 import useResponsive from '../../hooks/useResponsive';
 import { useTranslation } from '../../hooks/useTranslation';
+import { focusManagement } from '../../utils/accessibility/focusSystem';
 import './HelperPopup.css';
 
 interface HelperPopupProps {
@@ -44,6 +45,40 @@ const HelperPopup: FC<HelperPopupProps> = ({
   const { tString } = useTranslation();
   const dontShowLabel = tString('common.dontShowAgain', "Don't show this again");
 
+  const popupRef = useRef<HTMLDivElement>(null);
+  const restoreFocusRef = useRef<HTMLElement | null>(null);
+  const onDismissRef = useRef(onDismiss);
+  useEffect(() => {
+    onDismissRef.current = onDismiss;
+  });
+
+  // Dialog keyboard contract: focus moves into the popup on open, Tab is
+  // trapped inside, Escape closes, and focus returns to the trigger on close.
+  // Capture phase + stopPropagation, because hosts like WisdomGalleryModal run
+  // their own document-level trap that would otherwise yank focus back out of
+  // this portal (and react to arrow keys behind the open popup).
+  useEffect(() => {
+    if (!isOpen) return undefined;
+    restoreFocusRef.current =
+      document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    popupRef.current?.focus();
+
+    const handleKeyDown = (e: globalThis.KeyboardEvent): void => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onDismissRef.current();
+      } else if (e.key === 'Tab' && popupRef.current) {
+        focusManagement.trapFocus(popupRef.current, e);
+      }
+      e.stopPropagation();
+    };
+    document.addEventListener('keydown', handleKeyDown, true);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown, true);
+      restoreFocusRef.current?.focus();
+    };
+  }, [isOpen]);
+
   const handleDismiss = (): void => {
     if (dontShowAgain && onDontAskAgain) {
       onDontAskAgain();
@@ -61,7 +96,9 @@ const HelperPopup: FC<HelperPopupProps> = ({
   // This ensures the helper popup always appears above all other elements
   return createPortal(
     <div className={`helper-popup-container ${isMobile ? 'fullscreen-mobile' : ''}`}>
-      <div 
+      <div
+        ref={popupRef}
+        tabIndex={-1}
         className={`helper-popup ${isMobile ? 'fullscreen-mobile' : ''} ${className}`}
         role="dialog"
         aria-modal="true"

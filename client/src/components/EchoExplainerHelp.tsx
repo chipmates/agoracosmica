@@ -1,19 +1,16 @@
 /**
  * EchoExplainerHelp — HelperPopup explaining what Echoes are.
- * Shown once on first WisdomGallery visit. Combines the ECHO-CONCEPT
+ * Opens on demand (gallery button, Settings → Info). Combines the ECHO-CONCEPT
  * philosophy (modern knowledge, historical lens) with transparent AI disclosure.
  */
 import { FC, CSSProperties, ReactNode } from 'react';
 import HelperPopup from './HelperPopup/HelperPopup';
 import useTranslation from '../hooks/useTranslation';
-import { useUIStore } from '../stores/uiStore';
 import { Sparkle, Eye, ChatCircleDots, WarningCircle } from '@phosphor-icons/react';
 
 interface EchoExplainerHelpProps {
   onDismiss: () => void;
 }
-
-const HELP_ID = 'hideEchoExplainer';
 
 const sectionHeader: CSSProperties = {
   color: 'var(--gold-subtle)',
@@ -27,10 +24,11 @@ const sectionHeader: CSSProperties = {
 
 const sectionBox: CSSProperties = {
   marginBottom: '1rem',
-  background: 'linear-gradient(135deg, rgba(212, 165, 57, 0.08), rgba(212, 165, 57, 0.03))',
+  background:
+    'linear-gradient(135deg, color-mix(in srgb, var(--gold-subtle) 8%, transparent), color-mix(in srgb, var(--gold-subtle) 3%, transparent))',
   borderRadius: '8px',
   padding: '0.75rem',
-  border: '1px solid rgba(212, 165, 57, 0.15)',
+  border: '1px solid color-mix(in srgb, var(--gold-subtle) 15%, transparent)',
 };
 
 const listStyle: CSSProperties = {
@@ -58,11 +56,6 @@ const bulletIcon: CSSProperties = {
 
 const EchoExplainerHelp: FC<EchoExplainerHelpProps> = ({ onDismiss }) => {
   const { tString, tArray } = useTranslation();
-  const dismissHelp = useUIStore((state) => state.dismissHelp);
-
-  const handleDontAskAgain = (): void => {
-    dismissHelp(HELP_ID);
-  };
 
   const content: ReactNode = (
     <div style={{ fontSize: '0.95rem' }}>
@@ -114,7 +107,7 @@ const EchoExplainerHelp: FC<EchoExplainerHelpProps> = ({ onDismiss }) => {
 
       {/* Closing quote */}
       <blockquote style={{
-        background: 'linear-gradient(135deg, rgba(212, 165, 57, 0.05), rgba(212, 165, 57, 0.05))',
+        background: 'color-mix(in srgb, var(--gold-subtle) 5%, transparent)',
         borderLeft: '3px solid var(--gold-subtle)',
         padding: '0.75rem 1rem',
         margin: '0',
@@ -139,11 +132,9 @@ const EchoExplainerHelp: FC<EchoExplainerHelpProps> = ({ onDismiss }) => {
       title={tString('helpers.echoExplainer.title', 'What is an Echo?')}
       content={content}
       buttonText={tString('helpers.common.beginExploring', 'Begin Exploring')}
-      showDontAskAgain={true}
-      onDontAskAgain={handleDontAskAgain}
+      showDontAskAgain={false}
     />
   );
 };
 
-export { HELP_ID as ECHO_EXPLAINER_HELP_ID };
 export default EchoExplainerHelp;
