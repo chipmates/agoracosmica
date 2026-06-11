@@ -14,7 +14,7 @@ const echoesUrl = `${SITE_URL}/echoes/`;
 const description = 'Every figure here is an AI Echo of a real person who cannot consent. Why we chose that word, what the tradition shows, and where the risks lie.';
 ---
 <Public
-  title="Why Echoes?"
+  title="Why We Call Them Echoes"
   description={description}
   canonicalPath="/echoes"
   lang={lang}
@@ -22,7 +22,7 @@ const description = 'Every figure here is an AI Echo of a real person who cannot
   schemas={[
     organizationSchema(),
     articleSchema({
-      title: 'Why Echoes?',
+      title: 'Why We Call Them Echoes',
       description,
       url: echoesUrl,
       lang,
@@ -32,7 +32,7 @@ const description = 'Every figure here is an AI Echo of a real person who cannot
     }),
     breadcrumbSchema([
       { name: t('breadcrumbs.home'), url: `${SITE_URL}/` },
-      { name: 'Why Echoes?', url: echoesUrl },
+      { name: 'Why we call them Echoes', url: echoesUrl },
     ]),
   ]}
 >

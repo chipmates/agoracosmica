@@ -14,7 +14,7 @@ const echoesUrl = `${SITE_URL}/de/echoes/`;
 const description = 'Jede Persönlichkeit ist ein KI-Echo eines Menschen, der nicht zustimmen kann. Warum wir dieses Wort gewählt haben, was die Tradition zeigt und wo die Risiken liegen.';
 ---
 <Public
-  title="Warum eigentlich Echos?"
+  title="Warum wir sie Echos nennen"
   description={description}
   canonicalPath="/echoes"
   lang={lang}
@@ -22,7 +22,7 @@ const description = 'Jede Persönlichkeit ist ein KI-Echo eines Menschen, der ni
   schemas={[
     organizationSchema(),
     articleSchema({
-      title: 'Warum eigentlich Echos?',
+      title: 'Warum wir sie Echos nennen',
       description,
       url: echoesUrl,
       lang,
@@ -32,7 +32,7 @@ const description = 'Jede Persönlichkeit ist ein KI-Echo eines Menschen, der ni
     }),
     breadcrumbSchema([
       { name: t('breadcrumbs.home'), url: `${SITE_URL}/de/` },
-      { name: 'Warum eigentlich Echos?', url: echoesUrl },
+      { name: 'Warum wir sie Echos nennen', url: echoesUrl },
     ]),
   ]}
 >

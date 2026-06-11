@@ -1,4 +1,4 @@
-# Why Echoes?
+# Why We Call Them Echoes
 
 Every figure in Agora Cosmica is an AI Echo: an interpretation, grounded in primary works and historical context, of a person who can no longer speak for themselves. We chose that word with care. An echo is not the voice. It is what remains of one, shaped by the room it sounds in. This essay sits with the strongest question about that design. It is published at [agoracosmica.org/echoes](https://agoracosmica.org/echoes/) (German: [/de/echoes](https://agoracosmica.org/de/echoes/)) and mirrored here so the reasoning ships with the code.
 
