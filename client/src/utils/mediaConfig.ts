@@ -134,49 +134,6 @@ export async function fetchMedia(filePath: string): Promise<Response> {
 }
 
 /**
- * Get signed URL for media (backward compatibility)
- *
- * This maintains the existing getSignedUrl() API
- * but routes through the new system
- *
- * @param key - File path (e.g., 'stories/einstein/en/einstein_1_en.webm')
- * @returns URL string
- *
- * @deprecated Use getMediaUrl() directly for new code
- */
-export async function getSignedUrl(key: string): Promise<string> {
-  // BYOK Architecture: No signed URLs needed
-  // Worker validates simple token on every request (see getMediaHeaders)
-  return getMediaUrl(key);
-}
-
-/**
- * Check if media gateway is healthy
- * Useful for debugging and monitoring
- */
-export async function checkMediaHealth(): Promise<boolean> {
-  try {
-    const config = getMediaConfig();
-
-    // Try to fetch a known test file or just check connectivity
-    const healthUrl = config.useWorker
-      ? `${config.baseUrl}/health`
-      : `${config.baseUrl}/health`;
-
-    const response = await fetchWithTimeout(healthUrl, {
-      method: 'HEAD',
-      headers: getMediaHeaders(),
-      timeoutMs: 5_000,
-    });
-
-    return response.ok;
-  } catch (error) {
-    console.error('Media gateway health check failed:', error);
-    return false;
-  }
-}
-
-/**
  * Get media configuration info for debugging
  */
 export function getMediaInfo() {

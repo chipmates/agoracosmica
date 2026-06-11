@@ -136,8 +136,9 @@ export const OPENAI_VOICE_INFO = GERMAN_VOICE_INFO;
 // ============================================
 
 /**
- * Get technical Kokoro voice ID from user-friendly name
- * @deprecated Use getTechnicalVoice(name, 'english') instead
+ * Get technical Kokoro voice ID from user-friendly name.
+ * The English-side counterpart to getGermanTechnicalVoice; still the live
+ * resolver used by VoicePanel and voiceResolver.
  */
 export function getKokoroTechnicalVoice(voiceName: KokoroVoice | string): string {
   return ENGLISH_TECHNICAL_VOICES[voiceName as EnglishVoice] || ENGLISH_TECHNICAL_VOICES.stella;

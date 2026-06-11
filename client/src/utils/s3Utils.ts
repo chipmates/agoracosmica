@@ -24,27 +24,3 @@ export const getSignedUrl = async (key: string): Promise<string> => {
   }
 };
 
-/**
- * 🎉 Updated October 20, 2025 - BYOK Architecture Complete
- *
- * Get multiple media URLs in a single call
- * @param {string[]} keys - Array of storage object keys
- * @returns {Promise<Record<string, string>>} - Object mapping keys to their media URLs
- *
- * @deprecated Use getMediaUrl() from mediaConfig.ts directly for new code
- */
-export const getBatchSignedUrls = async (keys: string[]): Promise<Record<string, string>> => {
-  try {
-    // Simply map each key to its media URL
-    const urls: Record<string, string> = {};
-
-    for (const key of keys) {
-      urls[key] = getMediaUrl(key);
-    }
-
-    return urls;
-  } catch (error) {
-    console.error('Error getting batch media URLs:', error);
-    throw new Error('Failed to get resource URLs');
-  }
-};
