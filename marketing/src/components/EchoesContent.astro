@@ -1,0 +1,275 @@
+---
+// The full "Why We Speak for the Dead" essay (Tier 3 of the Echo disclosure).
+// Tier 1 lives as a homepage FAQ item, Tier 2 as its unfold; this page is the
+// stable, shareable URL for the strongest objection to the project. Mirrored
+// in the repo as docs/WHY-WE-SPEAK-FOR-THE-DEAD.md. Copy is hardcoded per
+// language here (the HomepageBody pattern), not in translation JSON.
+import Breadcrumbs from './Breadcrumbs.astro';
+import { publicUrl } from '../lib/urls';
+import type { Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const isDe = lang === 'de';
+
+const figuresHref = publicUrl(lang, '/figures');
+---
+<div class="pub-content pub-about pub-echoes">
+  <Breadcrumbs
+    lang={lang}
+    items={[{ label: isDe ? 'Warum wir für die Toten sprechen' : 'Why we speak for the dead' }]}
+  />
+
+{isDe ? (
+  <>
+    <h1 class="pub-hero__title">Warum wir für die Toten sprechen</h1>
+    <p class="pub-about-lead">
+      Jede Persönlichkeit in Agora Cosmica ist ein KI-Echo: eine Deutung eines Menschen, der nicht
+      mehr für sich selbst sprechen kann, verwurzelt in Primärwerken und historischem Kontext.
+    </p>
+
+    <section class="pub-section">
+      <div class="pub-section__text">
+        <p>
+          Der ernsteste Einwand gegen unser Projekt ist zugleich der natürlichste: Ist das nicht
+          respektlos? Ihr legt echten Menschen, die nicht zustimmen können, Worte in den Mund und
+          tut so, als kenntet ihr ein Innenleben, von dem nur öffentliche Zeugnisse geblieben sind.
+        </p>
+        <p>
+          Wir wollen diesen Einwand in seiner stärksten Form beantworten, weil wir seinen Sog
+          selbst spüren. Und das Erste, was zu sagen ist: Ein Teil davon stimmt einfach. Ein echter
+          Mensch ist widersprüchlich, voller Brüche, unabgeschlossen. Keine Darstellung fängt das
+          ein, unsere eingeschlossen. Das behaupten wir auch nicht. Was wir behaupten, ist enger
+          gefasst: Für die Toten zu sprechen, wenn man es ehrlich tut, ist kein Verstoß gegen die
+          humanistische Tradition. Es <em>ist</em> die humanistische Tradition.
+        </p>
+      </div>
+    </section>
+
+    <section class="pub-section">
+      <h2 class="pub-section__title">Die Philosophie begann genau so</h2>
+      <div class="pub-section__text">
+        <p>
+          Sokrates hat nichts geschrieben. Fast alles, was wir von ihm zu „wissen“ glauben, ist
+          Platon, der ihn sprechen lässt. Und Xenophons Sokrates unterscheidet sich vom Sokrates
+          Platons, die Zeitgenossen lasen diese Texte also offenkundig als Darstellungen, nicht
+          als Mitschriften. Die Gründungstexte der westlichen Philosophie sind erdachte
+          Gespräche mit einem Toten. Die Stoiker wandten die Praxis dann nach innen und machten
+          sie zur festen Übung: Seneca riet, sich „einen Cato“ zu wählen, ein verstorbenes
+          Vorbild, das man vor das innere Auge stellt, befragt, sich als Zeugen denkt. Und Epiktet
+          kam immer wieder auf die Frage zurück, was Sokrates tun würde. Mehrere der Menschen in
+          unserer Bibliothek haben das erdachte Gespräch mit den Toten nicht nur geduldet. Sie
+          haben es gelehrt.
+        </p>
+      </div>
+    </section>
+
+    <section class="pub-section">
+      <h2 class="pub-section__title">Zweitausend Jahre lang war es die übliche Lehrmethode</h2>
+      <div class="pub-section__text">
+        <p>
+          Schüler der antiken Rhetorikschulen lernten, indem sie Reden in der Rolle historischer
+          und legendärer Gestalten verfassten. Die Übung gehörte zum festen Lehrplan, und für das
+          Sprechen der Toten gab es sogar einen eigenen Fachbegriff: <em>Eidolopoiie</em>,
+          wörtlich: ein Abbild erschaffen. Dante baute die Göttliche Komödie um einen toten
+          Dichter, Vergil, der ihn durch die Hölle und über den Läuterungsberg führt. Fénelon
+          schrieb seine Totengespräche eigens, um den Thronfolger Frankreichs zu erziehen. Im
+          deutschsprachigen Raum waren David Fassmanns „Gespräche in dem Reiche derer Todten“,
+          über zwei Jahrzehnte hinweg fortgeschriebene, erfundene Gespräche unter Toten, eine der
+          meistgelesenen Zeitschriften des frühen 18. Jahrhunderts. In unserer eigenen Zeit holte
+          Steve Allens „Meeting of Minds“ Sokrates und Susan B. Anthony an einen Tisch im
+          amerikanischen Fernsehen. Das Medium wechselte immer wieder. Die Praxis blieb dieselbe.
+        </p>
+      </div>
+    </section>
+
+    <section class="pub-section">
+      <h2 class="pub-section__title">Selbst strenge Geschichtsschreibung spricht für die Toten</h2>
+      <div class="pub-section__text">
+        <p>
+          Und sie legt es offen. Thukydides, der Vater der kritischen Geschichtsschreibung,
+          erklärte ausdrücklich, die Reden in seinem Werk selbst verfasst zu haben, so nah wie
+          möglich am Sinn des tatsächlich Gesagten. Dieser Satz, vor fast fünfundzwanzig
+          Jahrhunderten geschrieben, ist der Funktion nach der erste Faktencheck: Rekonstruktion,
+          offengelegt. Petrarca legte mit Briefen an Cicero und Vergil einen Grundstein des
+          Renaissance-Humanismus: Er sprach sie direkt an, befragte sie, schalt sie sogar. Jede
+          ernsthafte Biografie seither beansprucht Zugang zu einem Innenleben, das nur in
+          Zeugnissen überdauert. Die Frage war nie, ob man die Toten deuten darf. Sondern wie
+          ehrlich.
+        </p>
+      </div>
+    </section>
+
+    <section class="pub-section">
+      <h2 class="pub-section__title">Wo die Analogie endet, und warum unser Design so aussieht, wie es aussieht</h2>
+      <div class="pub-section__text">
+        <p>
+          Wir würden uns die bequeme Version dieses Arguments zurechtlegen, wenn wir hier
+          aufhörten. Also: Die Analogie zu Büchern und Bühnen trägt an drei Stellen nicht. Der
+          Sokrates eines Buches spricht feste Worte, die ein Autor geprüft, signiert und
+          verantwortet hat. Ein Sprachmodell erzeugt live Äußerungen, die kein Mensch
+          gegengelesen hat. Ein Gespräch in der Ich-Form ist immersiver, als über jemanden zu
+          lesen, und ein einmal gelesener Hinweis kann nach zwanzig Minuten Gespräch längst
+          verblasst sein. Und die Autorschaft verschwimmt. Wer genau steht hinter dem, was ein
+          Echo sagt? Diese Risiken sind nicht hypothetisch. „Amadeus“, ein brillantes Stück und
+          ein brillanter Film, die nie den Anspruch erhoben, Geschichtsschreibung zu sein, hat
+          den Ruf des historischen Antonio Salieri über zwei Generationen hinweg verzerrt.
+          Darstellung ohne Offenlegungskonventionen kann den Toten wirklich schaden.
+        </p>
+        <p>
+          Genau deshalb ist unsere Offenlegung keine Dekoration. Unsere Instruktionsdateien sind
+          {' '}<a class="pub-textlink" href="https://media.agoracosmica.org/instructions/jung/free_conversation.json" target="_blank" rel="noopener noreferrer">veröffentlicht und für alle abrufbar</a>:
+          Sie sind unsere Signatur, so wie Platon seinen Sokrates signiert hat. Der
+          {' '}<a class="pub-textlink" href="https://media.agoracosmica.org/factchecks/de/jung.json" target="_blank" rel="noopener noreferrer">Faktencheck jeder Persönlichkeit</a>
+          {' '}trennt das Verbürgte vom Nachempfundenen, Schattenseiten eingeschlossen, denn das
+          waren widersprüchliche Menschen. Er ist unsere Fassung von Thukydides’ Methodennotiz.
+          Die Echo-Kennzeichnung verschwindet nie aus dem Gespräch: Die Persönlichkeiten treten
+          als Deutungen auf, nicht als Auferstandene. Und die ganze Plattform ist als Tür gebaut,
+          dazu gedacht, dass man ihr entwächst, hin zu Primärtexten und menschlichen Lehrern. Wir
+          sind gemeinnützig. Nichts hier ist darauf optimiert, dich im Gespräch mit einer
+          Simulation zu halten.
+        </p>
+        <p>
+          Jedes Medium, das die Toten dargestellt hat, entwickelte seine eigene
+          Offenlegungskonvention: die Methodennotiz des Thukydides, das Nachwort des historischen
+          Romans, die sichtbar kostümierte Schauspielerin auf der Bühne. Das Urteil der Tradition
+          war nie, dass es falsch ist, für die Toten zu sprechen. Falsch war, es zu tun, ohne es
+          zu sagen. Mit Agora Cosmica versuchen wir, die Offenlegungskonvention für das
+          Gesprächsmedium zu schreiben, öffentlich, mit quelloffenem Code, mit einer Begründung,
+          die jede und jeder <a class="pub-textlink" href="https://github.com/chipmates/agoracosmica" target="_blank" rel="noopener noreferrer">prüfen kann</a>.
+        </p>
+        <p>
+          Wir werden Fehler machen. Wenn das passiert, schreib uns:
+          {' '}<a class="pub-textlink" href="mailto:agoracosmica@chipmates.ai">agoracosmica@chipmates.ai</a>.
+          Und was immer du tust, bleib nicht bei unseren Echos.
+          {' '}<a class="pub-textlink" href={figuresHref}>Die Originale warten</a>.
+        </p>
+      </div>
+    </section>
+  </>
+) : (
+  <>
+    <h1 class="pub-hero__title">Why We Speak for the Dead</h1>
+    <p class="pub-about-lead">
+      Every figure in Agora Cosmica is an AI Echo: an interpretation, grounded in primary works
+      and historical context, of a person who can no longer speak for themselves.
+    </p>
+
+    <section class="pub-section">
+      <div class="pub-section__text">
+        <p>
+          The most serious objection to our project is also the most natural one: isn't this
+          disrespectful? You are putting words in the mouths of real people who cannot consent,
+          and pretending to know an inner world of which only public artifacts remain.
+        </p>
+        <p>
+          We want to answer that objection in its strongest form, because we feel its pull
+          ourselves. And the first thing to say is that part of it is simply true. A real human
+          being is messy, contradictory, unfinished. No portrayal captures that, ours included.
+          We do not claim to. What we claim is narrower: that speaking for the dead, done
+          honestly, is not a violation of the humanist tradition. It <em>is</em> the humanist
+          tradition.
+        </p>
+      </div>
+    </section>
+
+    <section class="pub-section">
+      <h2 class="pub-section__title">Philosophy began this way</h2>
+      <div class="pub-section__text">
+        <p>
+          Socrates wrote nothing. Nearly everything we “know” he said is Plato speaking in his
+          voice, and Xenophon's Socrates differs from Plato's, so even contemporaries plainly read
+          these texts as portrayals, not transcripts. Western philosophy's founding documents are
+          imagined conversations with a dead man. The Stoics then turned the practice inward and
+          made it a formal exercise: Seneca advised choosing “a Cato”, a dead exemplar held before
+          the mind, consulted, imagined watching you. And Epictetus returned again and again to
+          the question of what Socrates would do. Several of the figures in our library did not
+          merely tolerate imagined dialogue with the dead. They taught it.
+        </p>
+      </div>
+    </section>
+
+    <section class="pub-section">
+      <h2 class="pub-section__title">For two thousand years, it was the pedagogy</h2>
+      <div class="pub-section__text">
+        <p>
+          Students in ancient rhetorical schools learned by composing speeches in the voice of
+          historical and legendary figures. The exercise was part of the standard curriculum, and
+          teachers even had a dedicated name for voicing the dead: <em>eidolopoeia</em>,
+          image-making. Dante built the Divine Comedy around a dead poet, Virgil, serving as his
+          tutor through Hell and Purgatory. Fénelon composed his <em>Dialogues of the Dead</em>
+          expressly to educate the heir to the French throne. In the German-speaking world, David
+          Fassmann's <em>Gespräche in dem Reiche derer Todten</em>, decades of invented
+          conversations among the dead, was one of the most widely read periodicals of the early
+          eighteenth century. In our own era, Steve Allen's <em>Meeting of Minds</em> seated
+          Socrates and Susan B. Anthony at an American television table. The medium kept changing.
+          The act did not.
+        </p>
+      </div>
+    </section>
+
+    <section class="pub-section">
+      <h2 class="pub-section__title">Even rigorous history speaks for the dead</h2>
+      <div class="pub-section__text">
+        <p>
+          And it discloses it. Thucydides, the father of critical history, stated openly that he
+          composed the speeches in his work himself, keeping as close as he could to the general
+          sense of what was actually said. That sentence, written almost twenty-five centuries
+          ago, is functionally the first factcheck sheet: reconstruction, disclosed. Petrarch
+          helped found Renaissance humanism by writing letters addressed to Cicero and Virgil,
+          questioning them, even scolding them, in the second person. Every serious biographer
+          since has claimed some access to an inner world that survives only in artifacts. The
+          question was never whether to interpret the dead. It was how honestly.
+        </p>
+      </div>
+    </section>
+
+    <section class="pub-section">
+      <h2 class="pub-section__title">Where the analogy breaks, and why our design looks the way it does</h2>
+      <div class="pub-section__text">
+        <p>
+          We would be making the comfortable version of this argument if we stopped here. So: the
+          analogy to books and stages breaks in three places. A book's Socrates speaks fixed words
+          that an author vetted, signed, and stands behind. A language model generates live
+          utterances that no human reviewed. A first-person conversation is more immersive than
+          reading about someone, and a disclaimer read once can fade twenty minutes into a
+          dialogue. And authorship feels diffused. Who, exactly, stands behind what an Echo says?
+          These risks are not hypothetical. <em>Amadeus</em>, a brilliant play and film that never
+          claimed to be history, reshaped the real Antonio Salieri's reputation for two
+          generations. Portrayal without disclosure conventions can genuinely harm the dead.
+        </p>
+        <p>
+          This is precisely why our disclosure is not decoration. Our instruction files are
+          {' '}<a class="pub-textlink" href="https://media.agoracosmica.org/instructions/jung/free_conversation.json" target="_blank" rel="noopener noreferrer">published and fetchable by anyone</a>:
+          they are our signature, the way Plato signed his Socrates. Each
+          {' '}<a class="pub-textlink" href="https://media.agoracosmica.org/factchecks/en/jung.json" target="_blank" rel="noopener noreferrer">figure's factcheck</a>
+          {' '}separates the verified from the recreated, shadow sections included, because these
+          were messy humans. It is our version of Thucydides' method note. The Echo framing never
+          leaves the room: the figures are presented as interpretations, not resurrections. And
+          the entire platform is built as a doorway, designed to be outgrown in favor of primary
+          texts and human teachers. We are a nonprofit. Nothing here is optimized to keep you
+          talking to a simulation.
+        </p>
+        <p>
+          Every medium that portrayed the dead developed its own disclosure convention:
+          Thucydides' methodological note, the historical novelist's afterword, the visibly
+          costumed actor on a stage. The verdict of the tradition was never that speaking for the
+          dead is wrong. The sin was doing it without telling. With Agora Cosmica, we are trying
+          to write the disclosure convention for the conversational medium, in public, in an
+          open-source codebase, with our reasoning available for
+          {' '}<a class="pub-textlink" href="https://github.com/chipmates/agoracosmica" target="_blank" rel="noopener noreferrer">anyone to audit</a>.
+        </p>
+        <p>
+          We will get things wrong. When we do, write to us:
+          {' '}<a class="pub-textlink" href="mailto:agoracosmica@chipmates.ai">agoracosmica@chipmates.ai</a>.
+          And whatever you do, don't stay with our echoes.
+          {' '}<a class="pub-textlink" href={figuresHref}>The originals are waiting</a>.
+        </p>
+      </div>
+    </section>
+  </>
+)}
+</div>

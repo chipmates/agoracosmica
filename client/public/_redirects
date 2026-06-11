@@ -17,6 +17,7 @@
 /themes    /themes/    301
 /about     /about/     301
 /contact   /contact/   301
+/echoes    /echoes/    301
 /impressum           /impressum/           301
 /datenschutz         /datenschutz/         301
 /cookie-policy       /cookie-policy/       301
@@ -27,6 +28,7 @@
 /de/themes  /de/themes/ 301
 /de/about   /de/about/  301
 /de/contact /de/contact/ 301
+/de/echoes  /de/echoes/ 301
 
 # Guessable legal URLs that people (and crawlers) try but that live elsewhere.
 # Without these they fell through to the SPA shell as soft-404s.

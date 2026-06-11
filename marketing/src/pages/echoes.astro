@@ -1,0 +1,29 @@
+---
+// Tier 3 of the Echo disclosure: the stable, shareable URL for the
+// "isn't this disrespectful" objection (FAQ Tier 1 + unfold Tier 2 live on
+// the homepage). Mirrored in the repo as docs/WHY-WE-SPEAK-FOR-THE-DEAD.md.
+import Public from '../layouts/Public.astro';
+import EchoesContent from '../components/EchoesContent.astro';
+import { organizationSchema, breadcrumbSchema } from '../lib/schemas';
+import { getT } from '../i18n';
+import { SITE_URL } from '../lib/urls';
+
+const lang = 'en' as const;
+const t = getT(lang);
+---
+<Public
+  title="Why We Speak for the Dead"
+  description="Every figure here is an AI Echo of a real person who cannot consent. We answer the strongest objection to our project, with the tradition and the risks named."
+  canonicalPath="/echoes"
+  lang={lang}
+  ogType="article"
+  schemas={[
+    organizationSchema(),
+    breadcrumbSchema([
+      { name: t('breadcrumbs.home'), url: `${SITE_URL}/` },
+      { name: 'Why we speak for the dead', url: `${SITE_URL}/echoes` },
+    ]),
+  ]}
+>
+  <EchoesContent lang={lang} />
+</Public>

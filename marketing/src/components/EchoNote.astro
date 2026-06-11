@@ -1,6 +1,7 @@
 ---
 import { getT } from '../i18n';
 import type { Lang } from '../i18n';
+import { publicUrl } from '../lib/urls';
 
 interface Props {
   variant: 'figure' | 'theme';
@@ -16,7 +17,10 @@ const text =
     : t('echo.themeNote');
 ---
 <section class="pub-section">
-  <p class="pub-section__text pub-echo-note">{text}</p>
+  <p class="pub-section__text pub-echo-note">
+    {text}
+    {' '}<a class="pub-textlink" href={publicUrl(lang, '/echoes')}>{t('echo.whyLink')}</a>
+  </p>
 </section>
 
 <style is:global>

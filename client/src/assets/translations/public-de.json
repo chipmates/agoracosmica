@@ -42,7 +42,8 @@
   },
   "echo": {
     "figureNote": "{name} begegnet dir hier als Echo. Das ist eine KI-Stimme, geprägt von den eigenen Schriften und Gedanken dieses Menschen und in ein Gespräch gebracht, das du heute führen kannst. Sie schöpft aus ihrer Philosophie und bleibt doch eine Interpretation, nicht die reale Person und keine Aufnahme.",
-    "themeNote": "Die Stimmen hier nennen wir Echos. Jede ist eine KI-Stimme, geprägt von den eigenen Schriften und Gedanken eines historischen Menschen und in ein Gespräch gebracht, das du heute führen kannst. Sie schöpfen aus echter Philosophie und bleiben doch Interpretationen, nicht die realen Menschen und keine Aufnahmen."
+    "themeNote": "Die Stimmen hier nennen wir Echos. Jede ist eine KI-Stimme, geprägt von den eigenen Schriften und Gedanken eines historischen Menschen und in ein Gespräch gebracht, das du heute führen kannst. Sie schöpfen aus echter Philosophie und bleiben doch Interpretationen, nicht die realen Menschen und keine Aufnahmen.",
+    "whyLink": "Warum wir für die Toten sprechen →"
   },
   "figures": {
     "pageTitle": "30 bemerkenswerte Menschen, von denen du lernen kannst",

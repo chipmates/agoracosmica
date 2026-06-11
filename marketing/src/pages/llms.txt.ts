@@ -55,6 +55,7 @@ export const GET: APIRoute = () => {
   lines.push(`- [All figures](${SITE_URL}/figures/)`);
   lines.push(`- [All themes](${SITE_URL}/themes/)`);
   lines.push(`- [About](${SITE_URL}/about/)`);
+  lines.push(`- [Why we speak for the dead](${SITE_URL}/echoes/)`);
   lines.push('- [Source code (GitHub)](https://github.com/chipmates/agoracosmica)');
   lines.push('');
 

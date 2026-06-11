@@ -13,7 +13,8 @@ import { useTranslation } from '../../../hooks/useTranslation';
 import styles from '../../SettingsModal.module.css';
 
 const InfoPanel: FC = () => {
-  const { tNode, tArray, tString } = useTranslation();
+  const { tNode, tArray, tString, language } = useTranslation();
+  const echoesPath = language === 'de' ? '/de/echoes/' : '/echoes/';
   
   return (
     <div className={styles.tabPanel}>
@@ -171,8 +172,21 @@ const InfoPanel: FC = () => {
             {tNode('quickHelp.echoes.note')}
           </p>
         </div>
+
+        {/* The full disclosure essay (Tier 3) on the landing site */}
+        <div className={styles.githubSourceLinkRow}>
+          <a
+            href={echoesPath}
+            target="_blank"
+            rel="noopener"
+            className={styles.githubSourceLink}
+          >
+            <span>{tNode('quickHelp.echoes.essayLink')}</span>
+            <ArrowSquareOut size={12} weight="regular" className={styles.githubSourceLinkExternalIcon} aria-hidden="true" />
+          </a>
+        </div>
       </div>
-      
+
       {/* ChipMates Mission Statement */}
       <div className={styles.missionStatement} style={{
         background: `linear-gradient(

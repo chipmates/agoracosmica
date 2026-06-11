@@ -27,7 +27,15 @@ import type { CatalogCouncil } from '@client/data/councilCatalog';
 interface Props {
   lang: Lang;
   figures: PublicFigure[];
-  faq: { q: string; a: string }[];
+  faq: {
+    q: string;
+    a: string;
+    // Optional nested unfold (Tier 2 of the Echo disclosure): a second
+    // details element inside the answer, ending in a link to the full
+    // essay. The JSON-LD faqSchema only reads q + a, so the unfold stays
+    // out of the structured data by design.
+    more?: { toggle: string; paras: string[]; cta: { label: string; href: string } };
+  }[];
   heroCouncil: CatalogCouncil;
 }
 
@@ -237,7 +245,27 @@ const deQuestions = [
               <dt class="pub-collapsible__title">{item.q}</dt>
               <span class="pub-collapsible__arrow" aria-hidden="true">▼</span>
             </summary>
-            <dd class="pub-collapsible__body pub-home-faq__answer">{item.a}</dd>
+            <dd class="pub-collapsible__body pub-home-faq__answer">
+              {item.more ? (
+                <>
+                  <p class="pub-home-faq__p">{item.a}</p>
+                  <details class="pub-collapsible pub-home-faq__more">
+                    <summary class="pub-collapsible__header">
+                      <span class="pub-collapsible__title">{item.more.toggle}</span>
+                      <span class="pub-collapsible__arrow" aria-hidden="true">▼</span>
+                    </summary>
+                    <div class="pub-collapsible__body">
+                      {item.more.paras.map(p => <p class="pub-home-faq__p">{p}</p>)}
+                      <p class="pub-home-faq__p">
+                        <a class="pub-textlink" href={item.more.cta.href}>{item.more.cta.label}</a>
+                      </p>
+                    </div>
+                  </details>
+                </>
+              ) : (
+                item.a
+              )}
+            </dd>
           </details>
         ))}
       </dl>
@@ -415,7 +443,27 @@ const deQuestions = [
               <dt class="pub-collapsible__title">{item.q}</dt>
               <span class="pub-collapsible__arrow" aria-hidden="true">▼</span>
             </summary>
-            <dd class="pub-collapsible__body pub-home-faq__answer">{item.a}</dd>
+            <dd class="pub-collapsible__body pub-home-faq__answer">
+              {item.more ? (
+                <>
+                  <p class="pub-home-faq__p">{item.a}</p>
+                  <details class="pub-collapsible pub-home-faq__more">
+                    <summary class="pub-collapsible__header">
+                      <span class="pub-collapsible__title">{item.more.toggle}</span>
+                      <span class="pub-collapsible__arrow" aria-hidden="true">▼</span>
+                    </summary>
+                    <div class="pub-collapsible__body">
+                      {item.more.paras.map(p => <p class="pub-home-faq__p">{p}</p>)}
+                      <p class="pub-home-faq__p">
+                        <a class="pub-textlink" href={item.more.cta.href}>{item.more.cta.label}</a>
+                      </p>
+                    </div>
+                  </details>
+                </>
+              ) : (
+                item.a
+              )}
+            </dd>
           </details>
         ))}
       </dl>
@@ -487,6 +535,30 @@ const deQuestions = [
   }
   .pub-home-faq__answer {
     margin: 0;
+  }
+  .pub-home-faq__p {
+    margin: 0 0 0.75rem;
+  }
+  .pub-home-faq__p:last-child {
+    margin-bottom: 0;
+  }
+  /* nested Tier-2 unfold inside the Echo disclosure FAQ item */
+  .pub-home-faq__more {
+    margin-top: 0.25rem;
+  }
+  .pub-home-faq__more > .pub-collapsible__header {
+    min-height: 44px;
+    padding: 0.5rem 0;
+  }
+  .pub-home-faq__more .pub-collapsible__title {
+    font-size: var(--text-sm, 0.875rem);
+    color: var(--gold-primary, #E6BC5C);
+  }
+  /* Rotate the open-state arrow. Child combinator on purpose: a descendant
+     selector (as in CollapsibleSection.astro) would also rotate the closed
+     nested unfold's arrow whenever the outer FAQ item opens. */
+  .pub-home-faq details.pub-collapsible[open] > summary .pub-collapsible__arrow {
+    transform: rotate(180deg);
   }
 
   /* ══════════════════════════════════════════════════════════════════════

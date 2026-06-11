@@ -116,6 +116,11 @@ const CONTACT_MOD = gitLastModified(
   'marketing/src/pages/de/contact.astro',
   'marketing/src/components/ContactContent.astro',
 );
+const ECHOES_MOD = gitLastModified(
+  'marketing/src/pages/echoes.astro',
+  'marketing/src/pages/de/echoes.astro',
+  'marketing/src/components/EchoesContent.astro',
+);
 const FIGURES_CATALOG_MOD = gitLastModified(
   'marketing/src/pages/figures/index.astro',
   'marketing/src/pages/de/figures/index.astro',
@@ -174,6 +179,8 @@ urls.push(url('/about', '0.8', ABOUT_MOD));
 urls.push(deUrl('/about', '0.8', ABOUT_MOD));
 urls.push(url('/contact', '0.8', CONTACT_MOD));
 urls.push(deUrl('/contact', '0.8', CONTACT_MOD));
+urls.push(url('/echoes', '0.6', ECHOES_MOD));
+urls.push(deUrl('/echoes', '0.6', ECHOES_MOD));
 
 // Catalog pages
 urls.push(url('/figures', '0.9', FIGURES_CATALOG_MOD, 'weekly'));

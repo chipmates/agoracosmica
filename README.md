@@ -69,7 +69,7 @@ Each interaction in Agora Cosmica orbits one figure. The four educational chapte
 - **Fully bilingual**: English and German across all content, UI, and audio.
 
 **Honest by design**
-- **Echo framing**: every figure is presented as an AI Echo (an AI-rendered portrayal), never claimed to be a real recording or to speak for the actual person.
+- **Echo framing**: every figure is presented as an AI Echo (an AI-rendered portrayal), never claimed to be a real recording or to speak for the actual person. [Why we speak for the dead](docs/WHY-WE-SPEAK-FOR-THE-DEAD.md)
 - **Factcheck transparency**: each figure has a per-figure factcheck listing what's historically verified versus what's recreated for narrative.
 - **Open source under AGPL-3.0**: the privacy and architecture claims are verifiable by reading the code.
 - **Built on learning science**: the 4-chapter arc is informed by Kolb's experiential cycle, Bloom's taxonomy, and retrieval practice.

@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+
+- **Why we speak for the dead.** The strongest objection to the project, putting words in the mouths of real people who cannot consent, now has a public answer in three tiers: a homepage FAQ entry with a longer unfold, a full essay at `/echoes` (German at `/de/echoes`), and a repo mirror in [docs/WHY-WE-SPEAK-FOR-THE-DEAD.md](docs/WHY-WE-SPEAK-FOR-THE-DEAD.md) linked from the README. The Echo note on figure and theme pages and the in-app Echo explainer in Settings link to the essay.
+
 ### Changed
 
 - **Privacy wording brought back in line with the code.** The consent prompt names the withdrawal path and links the privacy policy directly, the policies describe rate limiting exactly as implemented (the plain IP lives only in a short-lived one-hour key and never enters analytics), withdrawal instructions point at the Settings section by its real name, and the homepage structured data uses the current trust wording. Policy dates unified.

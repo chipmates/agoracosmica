@@ -1,0 +1,29 @@
+---
+// Stufe 3 der Echo-Offenlegung: die stabile, teilbare URL für den Einwand
+// „Ist das nicht respektlos?“ (FAQ Stufe 1 + Ausklapp-Stufe 2 liegen auf der
+// Startseite). Im Repo gespiegelt als docs/WHY-WE-SPEAK-FOR-THE-DEAD.md.
+import Public from '../../layouts/Public.astro';
+import EchoesContent from '../../components/EchoesContent.astro';
+import { organizationSchema, breadcrumbSchema } from '../../lib/schemas';
+import { getT } from '../../i18n';
+import { SITE_URL } from '../../lib/urls';
+
+const lang = 'de' as const;
+const t = getT(lang);
+---
+<Public
+  title="Warum wir für die Toten sprechen"
+  description="Jede Persönlichkeit ist ein KI-Echo eines Menschen, der nicht zustimmen kann. Wir beantworten den härtesten Einwand gegen unser Projekt offen und überprüfbar."
+  canonicalPath="/echoes"
+  lang={lang}
+  ogType="article"
+  schemas={[
+    organizationSchema(),
+    breadcrumbSchema([
+      { name: t('breadcrumbs.home'), url: `${SITE_URL}/de/` },
+      { name: 'Warum wir für die Toten sprechen', url: `${SITE_URL}/de/echoes` },
+    ]),
+  ]}
+>
+  <EchoesContent lang={lang} />
+</Public>
