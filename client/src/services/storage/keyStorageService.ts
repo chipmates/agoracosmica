@@ -15,6 +15,7 @@ interface KeysDB extends DBSchema {
       value: string;           // Encrypted API key (AES-256-GCM) or base64 fallback
       encrypted: boolean;      // true = AES-256-GCM, false = base64 fallback (insecure context)
       salt: number[];          // Salt for PBKDF2 (empty for fallback)
+      iterations?: number;     // PBKDF2 iterations used at save time (absent = legacy record, device-class dependent)
       timestamp: number;       // When stored
       valid?: boolean;         // Last validation result
       lastUsed?: number;       // Last usage timestamp
@@ -102,6 +103,10 @@ class KeyStorageService {
       value: encrypted,
       encrypted: true,  // Always true (no plaintext option)
       salt: Array.from(salt),
+      // Stored per record: the device-class heuristic (mobile vs desktop) can
+      // flip between save and load, and a key derived with one count can never
+      // be decrypted with the other.
+      iterations: this.PBKDF2_ITERATIONS,
       timestamp: Date.now(),
       valid: true,
       ...(options?.lastValidated && { lastValidated: options.lastValidated })
@@ -136,12 +141,28 @@ class KeyStorageService {
     // Get device encryption key
     const deviceKey = await deviceKeyManager.getDeviceKey();
 
-    // Derive decryption key using stored salt
+    // Derive decryption key using stored salt. Records written before the
+    // iterations field used the device-class count of the day; if the
+    // classification has flipped since (UA change, touch-points change), the
+    // current count fails, so legacy records retry the other count and
+    // re-save with the count stored explicitly.
     const salt = new Uint8Array(record.salt);
-    const derivedKey = await this.deriveKey(deviceKey, salt);
-
-    // Decrypt API key
-    const decrypted = await this.decryptAES(record.value, derivedKey);
+    let decrypted: string;
+    if (record.iterations) {
+      const derivedKey = await this.deriveKey(deviceKey, salt, record.iterations);
+      decrypted = await this.decryptAES(record.value, derivedKey);
+    } else {
+      try {
+        const derivedKey = await this.deriveKey(deviceKey, salt);
+        decrypted = await this.decryptAES(record.value, derivedKey);
+      } catch {
+        const alternate = this.PBKDF2_ITERATIONS === 600000 ? 100000 : 600000;
+        const retryKey = await this.deriveKey(deviceKey, salt, alternate);
+        decrypted = await this.decryptAES(record.value, retryKey);
+      }
+      // Migrate: re-save so the record carries its iteration count from now on.
+      await this.saveKey(provider, decrypted);
+    }
 
     // Update last used timestamp
     await this.updateLastUsed(provider);
@@ -296,7 +317,7 @@ class KeyStorageService {
    * @param salt - Random salt (16 bytes)
    * @returns CryptoKey for AES-256-GCM
    */
-  private async deriveKey(deviceKey: string, salt: Uint8Array<ArrayBuffer>): Promise<CryptoKey> {
+  private async deriveKey(deviceKey: string, salt: Uint8Array<ArrayBuffer>, iterations?: number): Promise<CryptoKey> {
     const encoder = new TextEncoder();
     const keyMaterial = await crypto.subtle.importKey(
       'raw',
@@ -310,7 +331,7 @@ class KeyStorageService {
       {
         name: 'PBKDF2',
         salt: salt,
-        iterations: this.PBKDF2_ITERATIONS,  // 600,000 (OWASP 2023-2025)
+        iterations: iterations ?? this.PBKDF2_ITERATIONS,
         hash: 'SHA-256'
       },
       keyMaterial,
