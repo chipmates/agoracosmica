@@ -166,7 +166,11 @@ async function handleServerStats(env: Env): Promise<Response> {
       if (!res.ok) return { server: id, error: `HTTP ${res.status}` };
       return await res.json();
     } catch (err) {
-      return { server: id, error: err instanceof Error ? err.message : 'failed' };
+      // Log the detail server-side; return a generic label so upstream error
+      // text (timeouts, DNS, the origin URL) never reaches the client, even
+      // though this endpoint is already behind Cloudflare Access.
+      console.error(`[stats] server ${id} unreachable:`, err instanceof Error ? err.message : err);
+      return { server: id, error: 'unreachable' };
     }
   }
 

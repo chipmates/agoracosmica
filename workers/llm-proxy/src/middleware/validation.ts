@@ -39,6 +39,10 @@ export function validateChatRequest(body: unknown): ValidationResult {
     return { valid: false, error: 'messages must be an array' };
   }
 
+  if (req.messages.length === 0) {
+    return { valid: false, error: 'messages must be a non-empty array' };
+  }
+
   if (req.messages.length > LLM_CONFIG.MAX_CLIENT_MESSAGES) {
     return { valid: false, error: `Maximum ${LLM_CONFIG.MAX_CLIENT_MESSAGES} messages allowed` };
   }
