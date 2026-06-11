@@ -1080,7 +1080,11 @@ function funnelHtml(stages) {
 // Between stages we show the conversion to the next step (same honesty rule as
 // funnelHtml: raw fraction under a base of 20, color-free; a % above) plus the
 // percentage-point change vs the same step last period. Stages are
-// { label, value, prev, sub }; population-level only, no per-visitor key.
+// { label, value, prev, sub, pending }; population-level only, no per-visitor
+// key. 'pending' (optional) names the stage's event: while that event has zero
+// rows in both periods (its beacon may not be deployed yet), the stage shows a
+// graceful-degrade "awaiting first <event>" placeholder, and the arrows either
+// side stay flat so the gap never reads as a real 100% drop.
 function ghostFunnelHtml(stages) {
   if (!stages || stages.length === 0) return '';
   var base = 1;
@@ -1092,6 +1096,15 @@ function ghostFunnelHtml(stages) {
     var s = stages[i];
     var v = Number(s.value) || 0;
     var pv = (s.prev == null) ? null : (Number(s.prev) || 0);
+    var isPending = !!s.pending && v === 0 && (pv == null || pv === 0);
+    if (isPending) {
+      out += '<div class="fbar-row" role="listitem">' +
+        '<span class="fbar-labelwrap"><span class="fbar-label">' + s.label + '</span>' +
+        '<span class="fbar-sub2">awaiting first ' + s.pending + '</span></span>' +
+        '<div class="fbar-track"></div>' +
+        '<span class="fbar-num"><span class="fbar-val">--</span></span>' +
+        '</div>';
+    } else {
     var wv = (v / base * 100);
     var ghost = (pv == null) ? '' : '<div class="fbar-ghost" style="width:' + (pv / base * 100).toFixed(1) + '%"></div>';
     var sub2 = s.sub ? '<span class="fbar-sub2">' + s.sub + '</span>' : '';
@@ -1100,11 +1113,18 @@ function ghostFunnelHtml(stages) {
       '<div class="fbar-track">' + ghost + '<div class="fbar-fill" style="width:' + wv.toFixed(1) + '%"></div></div>' +
       '<span class="fbar-num"><span class="fbar-val">' + fmt(v) + '</span>' + (pv == null ? '' : deltaHtml(v, pv)) + '</span>' +
       '</div>';
+    }
     if (i < stages.length - 1) {
       var next = stages[i + 1];
       var nv = Number(next.value) || 0;
+      var npvPeek = (next.prev == null) ? null : (Number(next.prev) || 0);
+      var nextPending = !!next.pending && nv === 0 && (npvPeek == null || npvPeek === 0);
       var dropText;
-      if (v <= 0) {
+      if (isPending || nextPending) {
+        // Either side of this arrow is awaiting its first event. A "0%" here
+        // would claim a drop for a counter that does not exist yet.
+        dropText = '—';
+      } else if (v <= 0) {
         dropText = '—';
       } else if (v < 20) {
         // Small base: a percentage off fewer than 20 is Poisson noise, so show
@@ -1636,6 +1656,20 @@ async function loadOverview() {
     S.range > 1
       ? { sql: "SELECT toStartOfInterval(timestamp, INTERVAL '1' DAY) as t, COUNT() as c FROM agora_llm WHERE blob1 = 'chat' AND timestamp " + prevRange() + " GROUP BY t ORDER BY t", dataset: 'agora_llm' }
       : { sql: "SELECT 1 as c", dataset: 'agora_llm' },
+    // --- Wave-1 funnel additions (APPENDED at the end; reads are positional,
+    // so new queries must never be inserted mid-array). r[35..44]: one
+    // current + previous pair per step, queried by blob1 like entry/signup.
+    // Batch total after these: 45 of the 64 cap. ---
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'cta_click' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'cta_click' AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'cinematic_start' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'cinematic_start' AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'cinematic_end' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'cinematic_end' AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'welcome_shown' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'welcome_shown' AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'first_turn' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'first_turn' AND timestamp " + prevRange(), dataset: 'agora_llm' },
   ];
 
   var r = await batch(queries);
@@ -1725,6 +1759,12 @@ async function loadOverview() {
   var prevPaths = rows(r[32]);
   var dailyConv = S.range > 1 ? rows(r[33]) : [];
   var dailyConvPrev = S.range > 1 ? rows(r[34]) : [];
+  // Wave-1 funnel reads (appended queries r[35..44]).
+  var ctaClicks = val(r[35]), ctaClicksPrev = val(r[36]);
+  var cinStarts = val(r[37]), cinStartsPrev = val(r[38]);
+  var cinEnds = val(r[39]), cinEndsPrev = val(r[40]);
+  var welcomeShown = val(r[41]), welcomeShownPrev = val(r[42]);
+  var firstTurns = val(r[43]), firstTurnsPrev = val(r[44]);
   // Previous-period marketing-vs-app split (same classification as the current
   // period) so the funnel can draw a ghost bar behind each stage. MARKETING_*
   // and arrivalsPrev are already in scope above.
@@ -1809,11 +1849,20 @@ async function loadOverview() {
   // partly-disjoint population (returning + passive app opens), and chaining it
   // here is what produced the impossible "400%". Sessions now lives in the
   // Activity pool below, paired with Chats.
+  // Wave-1 stages carry a 'pending' event name: until that event has produced
+  // a single row in either period (deploy lag, or simply pre-launch of the
+  // beacon), the stage renders a quiet "awaiting first <event>" placeholder
+  // instead of a zero bar, so the funnel never reads as a fake 100% cliff.
   var funnelStages = [
     { label: 'Marketing', value: marketingArrivals, prev: marketingArrivalsPrev, sub: 'figures · themes · about' },
+    { label: 'CTA Click', value: ctaClicks, prev: ctaClicksPrev, sub: 'Start Exploring', pending: 'cta_click' },
     { label: 'App', value: appArrivals, prev: appArrivalsPrev, sub: '/app + SPA routes' },
+    { label: 'Saw Intro', value: cinStarts, prev: cinStartsPrev, sub: 'cinematic started', pending: 'cinematic_start' },
+    { label: 'Finished Intro', value: cinEnds, prev: cinEndsPrev, sub: 'watched or skipped', pending: 'cinematic_end' },
+    { label: 'Welcome', value: welcomeShown, prev: welcomeShownPrev, sub: 'consent screen shown', pending: 'welcome_shown' },
     { label: 'Entry', value: entries, prev: entriesPrev, sub: 'consent + enter' },
     { label: 'Signup', value: signups, prev: signupsPrev, sub: 'new accounts' },
+    { label: 'First Message', value: firstTurns, prev: firstTurnsPrev, sub: 'first chat turn, incl. BYOK', pending: 'first_turn' },
   ];
   // ACTIVITY POOL — App Sessions sits next to Chat Messages (not a funnel). The
   // relationship is shown as a sample-gated multiplier, never a percentage, so

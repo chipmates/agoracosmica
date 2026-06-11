@@ -30,6 +30,7 @@
   var LS_LANG = 'selectedLanguage';
   var LS_AD_CONSENT = 'agc_ad_consent';
   var CONV_URL = 'https://llm.agoracosmica.org/api/conversions';
+  var FUNNEL_URL = 'https://llm.agoracosmica.org/v1/funnel';
 
   function captureGclidFromUrl() {
     try {
@@ -107,6 +108,41 @@
     } catch (e) { /* storage blocked — app falls back */ }
   }
 
+  // Anonymous funnel counter: how many visitors click Start Exploring at all
+  // (cta_click / homepage page-views = the CTA rate). Unlike the conversion
+  // above it is keyless and unconditional: no gclid, no user dimension, same
+  // privacy posture as the /v1/page beacon. One-shot per tab. The dedup flag
+  // stays in tab-scoped sessionStorage and is never transmitted.
+  function sendCtaFunnelBeacon() {
+    try {
+      var firedKey = 'agc_funnel_fired_cta_click';
+      if (sessionStorage.getItem(firedKey)) return;
+      sessionStorage.setItem(firedKey, '1');
+    } catch (e) { /* storage blocked — still fire once, worker rate-limits */ }
+    try {
+      var docLang = (document.documentElement.lang || 'en').toLowerCase();
+      var body = JSON.stringify({
+        step: 'cta_click',
+        path: window.location.pathname,
+        language: docLang.indexOf('de') === 0 ? 'de' : 'en',
+      });
+      // Absolute worker URL on purpose (agoracosmica.org has no /v1/* route,
+      // see the conversion fetch above). sendBeacon survives the navigation
+      // to /app that follows the click; text/plain keeps it a simple CORS
+      // request so no preflight gets lost during the transition.
+      if (navigator.sendBeacon &&
+          navigator.sendBeacon(FUNNEL_URL, new Blob([body], { type: 'text/plain' }))) {
+        return;
+      }
+      fetch(FUNNEL_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: body,
+        keepalive: true,
+      }).catch(function () { /* never surface */ });
+    } catch (e) { /* no-op */ }
+  }
+
   function sendPageBeacon() {
     try {
       var docLang = (document.documentElement.lang || 'en').toLowerCase();
@@ -141,6 +177,7 @@
     if (figureId) metadata.figureId = figureId;
     if (councilId) metadata.councilId = councilId;
     fireConversion('start_exploring', Object.keys(metadata).length ? metadata : undefined);
+    sendCtaFunnelBeacon();
   });
 
   var burger = document.querySelector('[data-agc-burger]');

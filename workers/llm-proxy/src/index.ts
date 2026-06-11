@@ -12,6 +12,7 @@ import { handlePlayback } from './routes/playback';
 import { handlePage } from './routes/page';
 import { handleEntry } from './routes/entry';
 import { handleSignup } from './routes/signup';
+import { handleFunnel } from './routes/funnel';
 import type { Env } from './utils/types';
 
 function getCorsHeaders(request: Request, env: Env): Record<string, string> {
@@ -100,6 +101,8 @@ export default {
         response = await handleEntry(request, env);
       } else if (path === '/v1/signup' && request.method === 'POST') {
         response = await handleSignup(request, env);
+      } else if (path === '/v1/funnel' && request.method === 'POST') {
+        response = await handleFunnel(request, env);
       } else {
         response = new Response(
           JSON.stringify({ error: 'Not found' }),

@@ -11,6 +11,7 @@ import { LocalStorageAdapter } from '../storage/localAdapter';
 import { HISTORY_PREFIXES } from '../utils/userState';
 import { sendEntryBeacon } from '../utils/entryBeacon';
 import { sendSignupBeacon } from '../utils/signupBeacon';
+import { sendFunnelBeaconOnce } from '../utils/funnelBeacon';
 import { sendConversion } from '../utils/public/gclidCapture';
 
 interface WelcomeDisclosureModalProps {
@@ -128,6 +129,12 @@ const WelcomeDisclosureModal: FC<WelcomeDisclosureModalProps> = ({ isOpen, onCom
     if (isOpen && overlayRef.current) {
       overlayRef.current.focus();
     }
+  }, [isOpen]);
+
+  // Funnel: the consent screen opened (the top of the consent funnel;
+  // welcome_shown minus entry = consent-abandon rate). One-shot per tab.
+  useEffect(() => {
+    if (isOpen) sendFunnelBeaconOnce('welcome_shown');
   }, [isOpen]);
 
   // Battery optimization — pause animations when tab is backgrounded

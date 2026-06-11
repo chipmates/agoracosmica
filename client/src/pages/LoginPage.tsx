@@ -21,6 +21,7 @@ const ParadisoTransition = lazy(() => import('../components/animations/ParadisoT
 const FigureController = lazy(() => import('../components/animations/CosmicLoginTransition/FigureController'));
 import { useTranslation } from '../hooks/useTranslation';
 import { mediaBaseUrl as MEDIA_BASE } from '../config/runtime';
+import { sendFunnelBeaconOnce, cinematicDwellBucket, CinematicOutcome } from '../utils/funnelBeacon';
 
 // Music served from R2 (same track as the podcast + landing clips)
 const backgroundMusic = `${MEDIA_BASE}/images/music/music.webm`;
@@ -71,6 +72,9 @@ const LoginPage: FC<LoginPageProps> = ({ onComplete }) => {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const portalRef = useRef<HTMLDivElement>(null);
   const completingRef = useRef(false);
+  // Dwell clock for the cinematic_end funnel bucket. Only the coarse bucket
+  // index ever leaves the browser, never this raw timestamp.
+  const cinematicStartRef = useRef<number>(performance.now());
 
   const prefersReducedMotion = useRef(
     window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -78,9 +82,16 @@ const LoginPage: FC<LoginPageProps> = ({ onComplete }) => {
 
   // Hand off to the welcome step. Guarded so the skip click, Esc, and the
   // Paradiso auto-complete timer can't fire onComplete more than once.
-  const finishCinematic = useCallback(() => {
+  // The outcome says HOW the cinematic ended: 'watched' (auto-complete ran
+  // its course) or 'skipped' (Esc, background tap, skip overlay).
+  const finishCinematic = useCallback((outcome: CinematicOutcome) => {
     if (completingRef.current) return;
     completingRef.current = true;
+    // Funnel: cinematic finished. Outcome + coarse dwell bucket only.
+    sendFunnelBeaconOnce('cinematic_end', {
+      outcome,
+      bucket: cinematicDwellBucket(performance.now() - cinematicStartRef.current),
+    });
     window.loginFlashInProgress = true;
     setShowSkipOverlay(false);
     setTimeout(() => onComplete(), 100);
@@ -92,7 +103,9 @@ const LoginPage: FC<LoginPageProps> = ({ onComplete }) => {
     if (loginSuccessful) return;
     if (prefersReducedMotion.current) {
       setLoginSuccessful(true);
-      finishCinematic();
+      // Auto-handoff at the timeline's end (reduced motion skips the rose
+      // itself), so this counts as watched, not as a user skip.
+      finishCinematic('watched');
       return;
     }
     setShowSkipOverlay(true);
@@ -105,6 +118,14 @@ const LoginPage: FC<LoginPageProps> = ({ onComplete }) => {
   useEffect(() => {
     import('./HomePage').catch(() => {});
     import('../components/WelcomeDisclosureModal').catch(() => {});
+  }, []);
+
+  // Funnel: the cinematic started. New visitors only (returners are restored
+  // silently and never mount this page), so it is a clean new-visitor
+  // denominator. One-shot per tab; also (re)arms the dwell clock.
+  useEffect(() => {
+    cinematicStartRef.current = performance.now();
+    sendFunnelBeaconOnce('cinematic_start');
   }, []);
 
   // Mount: play the music, set the reveal timer, watch orientation.
@@ -200,7 +221,7 @@ const LoginPage: FC<LoginPageProps> = ({ onComplete }) => {
   // Esc skips the whole cinematic.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') finishCinematic();
+      if (e.key === 'Escape') finishCinematic('skipped');
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
@@ -210,7 +231,7 @@ const LoginPage: FC<LoginPageProps> = ({ onComplete }) => {
 
   // A tap/click anywhere skips straight to the welcome step.
   const handleBackgroundClick = () => {
-    finishCinematic();
+    finishCinematic('skipped');
   };
 
   if (isLandscape) {
@@ -251,7 +272,7 @@ const LoginPage: FC<LoginPageProps> = ({ onComplete }) => {
         <ParadisoTransition
           isActive={portalAnimActive}
           variant={1}
-          onAnimationComplete={finishCinematic}
+          onAnimationComplete={() => finishCinematic('watched')}
           autoCompleteMs={PARADISO_AUTO_MS}
         />
       </Suspense>
@@ -260,13 +281,13 @@ const LoginPage: FC<LoginPageProps> = ({ onComplete }) => {
       {loginSuccessful && showSkipOverlay && (
         <div
           className="skip-animation-overlay"
-          onClick={finishCinematic}
+          onClick={() => finishCinematic('skipped')}
           role="button"
           tabIndex={0}
           aria-label="Skip animation"
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') {
-              finishCinematic();
+              finishCinematic('skipped');
             }
           }}
         />

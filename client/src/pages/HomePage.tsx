@@ -31,6 +31,7 @@ import { processTextMessage } from '../services/audioService';
 import seedStateManager from '../services/SeedStateManager';
 import { modeStateManager } from '../utils/modeStateManager';
 import { screenContent } from '../utils/contentSafety';
+import { sendFunnelBeaconOnce } from '../utils/funnelBeacon';
 import { isNewUser, HISTORY_PREFIXES } from '../utils/userState';
 import {
   markStoryCompleted,
@@ -852,6 +853,16 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
             : `req-${Date.now()}`;
 
         setPendingRequestId(requestId);
+
+        // Funnel: first chat turn this tab (the North Star activation event).
+        // Fires for BYOK users too — their chat bypasses the proxy entirely,
+        // so this beacon is the only server-visible signal a conversation
+        // started. One-shot via tab-scoped sessionStorage, gated on the submit
+        // (the assistant has not replied yet), never on assistant count.
+        sendFunnelBeaconOnce('first_turn', {
+          figureId: figureIdentifier,
+          mode: normalizedMode ?? '',
+        });
       } catch (error) {
         console.error('[HomePage] Failed to queue conversation request', error);
         setPendingRequestId(null);

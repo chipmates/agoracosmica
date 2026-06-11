@@ -23,13 +23,18 @@ Per anonymous request, written to Cloudflare Analytics Engine:
 | Content type | `story`, `teaching`, `prism`, `council`, `foreword` (closed allowlist; only set on playback events) | Know which content type was started/completed |
 | Duration (ms) | Latency of the request | Find slow paths, fix them |
 | Signup | `signup` (fires once when a visitor creates a profile) | Count new profiles, so the funnel has an endpoint |
+| Funnel step | `cta_click`, `cinematic_start`, `cinematic_end`, `welcome_shown`, `first_turn` | See where new visitors drop off between landing and a first conversation |
+| Intro outcome | `watched` or `skipped` (only on `cinematic_end`) | Learn whether the intro animation gets watched to the end or skipped |
+| Dwell bucket | `0` (0 to 5s), `1` (5 to 15s), `2` (15 to 30s), `3` (over 30s), only on `cinematic_end` | See how long the intro holds attention. Only the bucket index is stored, the raw milliseconds never leave the browser |
 | Conversion event | `start_exploring`, `profile_created`, `mode_selected`, `council_engaged` (fire only for grant-ad visitors who opted in to ad measurement; `start_exploring` is the earliest signal, sent when they accept the on-page consent prompt) | Measure whether Google ad spend reaches real engagement |
 
 The conversion rows are written with the event name, an optional figure id, and a timestamp. The gclid is never part of this analytics write. It goes only to Google Ads, as described below.
 
+The funnel steps are keyless aggregate counts like everything else here. There is no join key between funnel steps: a question like "did the person who saw the intro also chat" is answered by comparing two totals, never by following an individual. Each step fires at most once per browser tab, deduped by a flag in tab-scoped sessionStorage that is never transmitted. `first_turn` may carry a figure id and a mode (the same content labels chat events already carry), and `cta_click` carries the sanitized page path. No funnel row ever contains a client id, a gclid, an IP, or a raw duration.
+
 ## What we don't count, ever
 
-- **No IP retention in analytics.** Cloudflare derives a 2-letter country code at the edge from the request IP, and the analytics rows store only that code, never the IP. Two operational paths touch the IP outside analytics, and neither feeds the counters: our abuse-protection log stores a salted, one-way SHA-256 hash of the IP (not the IP, and not reversible to it) for 90 days to investigate safety incidents, and the beacon and conversion rate limiters (page views, entries, playback, signup, conversions) hold the plain IP in a short-lived key for up to one hour to stop floods. The IP is never written to the analytics dataset and never joined to any event.
+- **No IP retention in analytics.** Cloudflare derives a 2-letter country code at the edge from the request IP, and the analytics rows store only that code, never the IP. Two operational paths touch the IP outside analytics, and neither feeds the counters: our abuse-protection log stores a salted, one-way SHA-256 hash of the IP (not the IP, and not reversible to it) for 90 days to investigate safety incidents, and the beacon and conversion rate limiters (page views, entries, playback, signup, funnel steps, conversions) hold the plain IP in a short-lived key for up to one hour to stop floods. The IP is never written to the analytics dataset and never joined to any event.
 - **No user IDs in analytics.** The free-tier `clientId` is a UUID stored in your browser's localStorage (the server hands one out on first session if none exists). It is used server-side for short-lived rate-limit accounting (24-hour KV TTL) and never written to analytics rows, never combined with figure/mode/country/source/any other dimension.
 - **No cookies, no fingerprints, no localStorage exfiltration.** Cloudflare sets strictly-necessary bot-detection cookies (`__cf_bm`, `cf_clearance`) at the edge. These are exempt under ePrivacy Article 5(3). We add nothing of our own.
 - **No message content, no prompts, no transcriptions.**
@@ -47,7 +52,7 @@ The same legal model is used by [Plausible](https://plausible.io/data-policy) an
 ## You can audit this
 
 All analytics writes are in:
-- [`workers/llm-proxy/src/utils/analytics.ts`](../workers/llm-proxy/src/utils/analytics.ts): chat, council, summary, session, rate-limit events
+- [`workers/llm-proxy/src/utils/analytics.ts`](../workers/llm-proxy/src/utils/analytics.ts): chat, council, summary, session, playback, page, entry, signup, funnel-step, rate-limit events
 - [`workers/audio-proxy/src/index.ts`](../workers/audio-proxy/src/index.ts): speech (TTS), transcriptions (STT) events
 
 Country values come from `request.cf.country` (a 2-letter ISO code), never from a stored IP.

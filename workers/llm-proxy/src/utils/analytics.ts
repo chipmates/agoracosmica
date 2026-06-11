@@ -209,6 +209,54 @@ export function trackSignup(
 }
 
 /**
+ * Track an anonymous funnel-step beacon (Wave 1: cta_click, cinematic_start,
+ * cinematic_end, welcome_shown, first_turn). Keyless aggregate counts only:
+ * no clientId, no gclid, no IP, no value that lets two rows be tied to the
+ * same person. There is no join key between funnel steps, so the funnel is
+ * read at the population level (compare totals), never per visitor.
+ *
+ * dataset: agora_llm
+ * blobs: [step, figureId|path|'', mode|'', language, outcome, '', country, '']
+ * doubles: [bucket]  — a coarse bucket INDEX (e.g. cinematic dwell 0-3),
+ *                      never raw milliseconds
+ * indexes: [step]
+ *
+ * blob6 stays reserved-empty (keeps country at blob7 across all event types);
+ * blob8 stays empty (it belongs to playback rows).
+ */
+export function trackFunnel(
+  env: Env,
+  data: {
+    step: string;
+    ref: string; // figureId or sanitized path, already validated by the route
+    mode: string;
+    language: string;
+    outcome: string;
+    bucket: number;
+    country: string;
+  }
+): void {
+  try {
+    env.ANALYTICS.writeDataPoint({
+      blobs: [
+        data.step,
+        data.ref,
+        data.mode,
+        data.language,
+        data.outcome,
+        '',
+        data.country,
+        '',
+      ],
+      doubles: [data.bucket],
+      indexes: [data.step],
+    });
+  } catch {
+    // Analytics must never break the request path
+  }
+}
+
+/**
  * Track a rate limit hit (429).
  * dataset: agora_llm
  * blobs: ['ratelimit', endpoint, reason, '', '429', '', country]
