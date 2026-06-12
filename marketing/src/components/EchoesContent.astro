@@ -8,7 +8,6 @@
 // question and the design answer; the evidence opens on demand.
 import Breadcrumbs from './Breadcrumbs.astro';
 import CollapsibleSection from './CollapsibleSection.astro';
-import { publicUrl } from '../lib/urls';
 import type { Lang } from '../i18n';
 
 interface Props {
@@ -17,8 +16,6 @@ interface Props {
 
 const { lang } = Astro.props;
 const isDe = lang === 'de';
-
-const figuresHref = publicUrl(lang, '/figures');
 ---
 <div class="pub-content pub-about pub-echoes">
   <Breadcrumbs
@@ -184,8 +181,7 @@ const figuresHref = publicUrl(lang, '/figures');
         <p>
           Wir werden Fehler machen. Wenn das passiert, schreib uns:
           {' '}<a class="pub-textlink" href="mailto:agoracosmica@chipmates.ai">agoracosmica@chipmates.ai</a>.
-          Und was immer du tust, bleib nicht bei unseren Echos.
-          {' '}<a class="pub-textlink" href={figuresHref}>Die Originale warten</a>.
+          Und was immer du tust, bleib nicht bei unseren Echos. Die Originale warten.
         </p>
       </div>
     </section>
@@ -339,8 +335,7 @@ const figuresHref = publicUrl(lang, '/figures');
         <p>
           We will get things wrong. When we do, write to us:
           {' '}<a class="pub-textlink" href="mailto:agoracosmica@chipmates.ai">agoracosmica@chipmates.ai</a>.
-          And whatever you do, don't stay with our echoes.
-          {' '}<a class="pub-textlink" href={figuresHref}>The originals are waiting</a>.
+          And whatever you do, don't stay with our echoes. The originals are waiting.
         </p>
       </div>
     </section>
