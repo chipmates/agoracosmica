@@ -125,8 +125,7 @@ export const generateResponse = async ({
     if (providerKind === 'custom-openai') {
       hasUsableProvider = !!serviceConfig.llm.baseURL?.trim();
     } else {
-      const keyMeta = await keyStorage.getKeyMetadata('openrouter');
-      hasUsableProvider = keyMeta !== null && keyMeta?.valid === true;
+      hasUsableProvider = await keyStorage.hasUsableKey('openrouter');
     }
 
     if (hasUsableProvider) {

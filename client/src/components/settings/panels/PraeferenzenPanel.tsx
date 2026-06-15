@@ -68,8 +68,7 @@ const PraeferenzenPanel: FC<PraeferenzenPanelProps> = ({
   useEffect(() => {
     const checkKey = async () => {
       try {
-        const meta = await keyStorage.getKeyMetadata('openrouter');
-        setHasByokKey(!!meta?.lastValidated);
+        setHasByokKey(await keyStorage.hasUsableKey('openrouter'));
       } catch {
         setHasByokKey(false);
       }

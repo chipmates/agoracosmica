@@ -202,6 +202,18 @@ class KeyStorageService {
   }
 
   /**
+   * Single definition of "this provider has a key worth using": a record
+   * exists and has not been marked invalid. Chat routing, councils, summaries,
+   * quota sync, the self-host gate, and the settings badge all call this so
+   * they can never disagree about whether BYOK is active. A record is only
+   * stored after a successful test, and markInvalid flips it off on rejection.
+   */
+  async hasUsableKey(provider: 'openrouter' | 'openai' | 'deepinfra' | 'custom-llm'): Promise<boolean> {
+    const meta = await this.getKeyMetadata(provider);
+    return meta !== null && meta.valid !== false;
+  }
+
+  /**
    * Delete key securely
    *
    * Note: This only deletes the encrypted key from IndexedDB.

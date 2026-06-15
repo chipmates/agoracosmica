@@ -61,14 +61,16 @@ const AiModelPanel: FC<AiModelPanelProps> = ({ SettingCard, CATEGORY_ICONS }) =>
         }
 
         if (orKey) {
-          setOpenRouterKey(prev => ({ ...prev, value: orKey, validationStatus: 'valid' }));
           const meta = await keyStorage.getKeyMetadata('openrouter');
-          if (meta?.lastValidated) {
-            setOpenRouterKey(prev => ({
-              ...prev,
-              lastTested: new Date(String(meta.lastValidated)),
-            }));
-          }
+          // A key only reaches storage after a passing test, so show it valid
+          // unless it was later marked invalid (then prompt a re-test).
+          const usable = meta !== null && meta.valid !== false;
+          setOpenRouterKey(prev => ({
+            ...prev,
+            value: orKey,
+            validationStatus: usable ? 'valid' : 'idle',
+            lastTested: meta?.lastValidated ? new Date(String(meta.lastValidated)) : null,
+          }));
         }
       } catch (error) {
         console.error('Failed to load OpenRouter key:', error);
@@ -124,6 +126,10 @@ const AiModelPanel: FC<AiModelPanelProps> = ({ SettingCard, CATEGORY_ICONS }) =>
 
   const handleSaveKey = async () => {
     if (!openRouterKey.value.trim()) return;
+    // Only persist a key that passed a test. Storing an untested key as valid
+    // is what made the three "has a usable key" checks disagree; now a saved
+    // record always means tested-good (markInvalid flips it off on rejection).
+    if (openRouterKey.validationStatus !== 'valid') return;
     try {
       await keyStorage.saveKey('openrouter', openRouterKey.value.trim(), {
         provider: 'openrouter',
@@ -343,7 +349,7 @@ const AiModelPanel: FC<AiModelPanelProps> = ({ SettingCard, CATEGORY_ICONS }) =>
           <RippleButton
             variant="primary"
             onClick={handleSaveKey}
-            disabled={!openRouterKey.value.trim() || !openRouterKey.isDirty}
+            disabled={!openRouterKey.value.trim() || !openRouterKey.isDirty || openRouterKey.validationStatus !== 'valid'}
             size="small"
           >
             {tNode('settings.apiKeys.buttonSave')}

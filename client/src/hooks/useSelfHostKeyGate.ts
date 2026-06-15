@@ -23,10 +23,9 @@ export function useSelfHostKeyGate(isLoggedIn: boolean): void {
 
     let cancelled = false;
     keyStorage
-      .getKeyMetadata('openrouter')
-      .then((meta) => {
+      .hasUsableKey('openrouter')
+      .then((hasValidKey) => {
         if (cancelled) return;
-        const hasValidKey = meta !== null && meta.valid !== false;
         if (!hasValidKey) {
           useDomainStore.getState().openByokModal(undefined, true);
         }

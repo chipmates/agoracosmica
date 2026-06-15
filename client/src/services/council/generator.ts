@@ -586,8 +586,7 @@ Begin the council now. Remember to use the EXACT format specified in your instru
     if (_councilKind === 'custom-openai') {
       hasBYOKKey = !!_councilConfig.llm.baseURL?.trim();
     } else {
-      const keyMeta = await keyStorage.getKeyMetadata('openrouter');
-      hasBYOKKey = keyMeta !== null && keyMeta.valid !== false;
+      hasBYOKKey = await keyStorage.hasUsableKey('openrouter');
     }
     councilLog(`🔑 Council routing: ${hasBYOKKey ? (_councilKind === 'custom-openai' ? 'Local Mode (custom-openai)' : 'BYOK (OpenRouter)') : 'Free-tier (Nebius proxy)'}`);
 

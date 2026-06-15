@@ -65,8 +65,7 @@ class SummaryService {
       if (_summaryKind === 'custom-openai') {
         hasValidKey = !!config.llm.baseURL?.trim();
       } else {
-        const keyMeta = await keyStorage.getKeyMetadata('openrouter');
-        hasValidKey = keyMeta !== null && keyMeta.valid !== false;
+        hasValidKey = await keyStorage.hasUsableKey('openrouter');
       }
 
       let responseText: string;

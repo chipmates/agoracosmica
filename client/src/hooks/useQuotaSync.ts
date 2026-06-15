@@ -20,8 +20,7 @@ export function useQuotaSync(): void {
     let cancelled = false;
 
     async function init() {
-      const keyMeta = await keyStorage.getKeyMetadata('openrouter');
-      const hasValidKey = keyMeta !== null && keyMeta.valid !== false;
+      const hasValidKey = await keyStorage.hasUsableKey('openrouter');
 
       if (cancelled) return;
 
