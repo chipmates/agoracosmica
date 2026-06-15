@@ -32,18 +32,6 @@ const FIGURE_IDS = [
   'schopenhauer', 'shakespeare', 'woolf', 'tubman', 'vinci',
 ];
 
-// Category translations (seed metadata categories)
-const CATEGORY_DE = {
-  'Sage': 'Weiser',
-  'Visionary': 'Vision\u00e4r',
-  'Seeker': 'Suchender',
-  'Creator': 'Sch\u00f6pfer',
-  'Liberator': 'Befreier',
-  'Explorer': 'Entdecker',
-  'Mystic': 'Mystiker',
-  'Architect': 'Architekt',
-};
-
 // Clean, short tradition labels for card display (the voice profile field is too long)
 const SHORT_TRADITIONS = {
   aurelius: { en: 'Stoicism', de: 'Stoizismus' },
@@ -377,7 +365,6 @@ function buildFiguresCatalog(tagsByFigure) {
         about: '',
         learn: '',
         tradition: SHORT_TRADITIONS[id]?.[lang] || '',
-        category: '',
         period: '',
         essence: '',
         keyConcepts: [],
@@ -389,7 +376,6 @@ function buildFiguresCatalog(tagsByFigure) {
         about: figTrans?.about || '',
         learn: figTrans?.learn || '',
         tradition: SHORT_TRADITIONS[id]?.[lang] || seedData?.metadata?.tradition?.split(',')[0]?.trim() || '',
-        category: lang === 'de' ? CATEGORY_DE[seedData?.metadata?.category] || '' : seedData?.metadata?.category || '',
         period: lang === 'de'
           ? (voiceExcerpt?.period || '').replace(/\bAD\b/g, 'n. Chr.').replace(/\bBC\b/g, 'v. Chr.').replace(/\bBCE\b/g, 'v. Chr.').replace(/\bCE\b/g, 'n. Chr.')
           : voiceExcerpt?.period || seedData?.metadata?.historicalPeriod || '',
@@ -411,7 +397,6 @@ export interface PublicFigure {
   about: string;
   learn: string;
   tradition: string;
-  category: string;
   period: string;
   essence: string;
   keyConcepts: { term: string; definition: string }[];

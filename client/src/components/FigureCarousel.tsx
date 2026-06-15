@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, FC, MouseEvent, KeyboardEvent } from 'react';
 import { useSwipeable } from 'react-swipeable';
-import { getHistoricalFigures } from '../api/figures';
+import { getHistoricalFigures, type TranslatedFigure } from '../api/figures';
 import { CategoryTab, ActionButton } from './Button';
 import { BookOpen, Check, Sparkle, Play, Pause } from "@phosphor-icons/react";
 import OptimizedImage from './OptimizedImage';
@@ -22,14 +22,6 @@ interface CategoryIDs {
   SAGES: string;
   REFORMERS: string;
   CREATORS: string;
-}
-
-interface BaseFigureNames {
-  [categoryId: string]: string[];
-}
-
-interface FigureIdToCategory {
-  [figureId: string]: string;
 }
 
 // Category ID constants (module-scoped to avoid re-creation on render)
@@ -54,59 +46,16 @@ const FigureCarousel: FC<FigureCarouselProps> = ({
   // Format the echo prefix based on current language
   const echoPrefix = tString('figures.echoOf', 'Echo of');
   
-  // Get the base figure names for categorization
-  const baseFigureNames: BaseFigureNames = {
-    [CATEGORY_IDS.SAGES]: [
-      `${echoPrefix} Siddhartha Gautama`, `${echoPrefix} Plato`, `${echoPrefix} Marcus Aurelius`, `${echoPrefix} Laozi`,
-      `${echoPrefix} Hildegard von Bingen`, `${echoPrefix} Rumi`, `${echoPrefix} Meister Eckhart`, `${echoPrefix} Dōgen Zenji`,
-      `${echoPrefix} Carl Gustav Jung`, `${echoPrefix} Joseph Campbell`
-    ],
-    [CATEGORY_IDS.REFORMERS]: [
-      `${echoPrefix} Mohandas Gandhi`, `${echoPrefix} Nelson Mandela`, `${echoPrefix} Martin Luther King Jr.`, `${echoPrefix} Harriet Tubman`,
-      `${echoPrefix} Simone de Beauvoir`, `${echoPrefix} Maya Angelou`, `${echoPrefix} Friedrich Nietzsche`, `${echoPrefix} Frida Kahlo`,
-      `${echoPrefix} Arthur Schopenhauer`, `${echoPrefix} Ada Lovelace`
-    ],
-    [CATEGORY_IDS.CREATORS]: [
-      `${echoPrefix} William Shakespeare`, `${echoPrefix} Leonardo da Vinci`, `${echoPrefix} Wolfgang Amadeus Mozart`, `${echoPrefix} Johann Wolfgang von Goethe`,
-      `${echoPrefix} Galileo Galilei`, `${echoPrefix} Albert Einstein`, `${echoPrefix} William Blake`, `${echoPrefix} Jane Austen`,
-      `${echoPrefix} Emily Dickinson`, `${echoPrefix} Virginia Woolf`
-    ]
-  };
-  
-  // Create a map of figure IDs to categories for easier lookup
-  const figureIdToCategory: FigureIdToCategory = {};
-  Object.entries(baseFigureNames).forEach(([category, names]) => {
-    names.forEach(name => {
-      // Extract figure ID from name by finding the last part that could be a last name
-      let figureId: string;
-      
-      // Handle multi-part and special case names first
-      if (name.includes('von Bingen')) figureId = 'bingen';
-      else if (name.includes('von Goethe')) figureId = 'goethe';
-      else if (name.includes('da Vinci')) figureId = 'vinci';
-      else if (name.includes('Luther King Jr.')) figureId = 'king';
-      else if (name.includes('Zenji') || name.includes('Dōgen')) figureId = 'zenji'; // Check both "Zenji" and "Dōgen"
-      else if (name.includes('Gautama')) figureId = 'gautama';
-      else {
-        // For standard names, extract the last part
-        const nameParts = name.split(' ');
-        const lastName = nameParts[nameParts.length - 1].toLowerCase();
-        figureId = lastName;
-      }
-      
-      figureIdToCategory[figureId] = category;
-    });
-  });
-  
-  // Find which category the selected figure belongs to
-  const findInitialCategory = (): string => {
-    if (!selectedFigure) return CATEGORY_IDS.SAGES;
-    return figureIdToCategory[selectedFigure.id] || CATEGORY_IDS.SAGES;
-  };
-  
   // Get the figures with translations for the current language
   // Initialize synchronously so findInitialIndex has data on first render
-  const [translatedFigures, setTranslatedFigures] = useState<Figure[]>(() => getHistoricalFigures(language));
+  const [translatedFigures, setTranslatedFigures] = useState<TranslatedFigure[]>(() => getHistoricalFigures(language));
+
+  // Find which category the selected figure belongs to. Category is now carried
+  // on each figure (single source in api/figures.ts), so resolve it by id.
+  const findInitialCategory = (): string => {
+    if (!selectedFigure) return CATEGORY_IDS.SAGES;
+    return translatedFigures.find(f => f.id === selectedFigure.id)?.category || CATEGORY_IDS.SAGES;
+  };
 
   // Update translated figures when language changes
   useEffect(() => {
@@ -117,9 +66,7 @@ const FigureCarousel: FC<FigureCarouselProps> = ({
   const findInitialIndex = (category: string): number => {
     if (!selectedFigure) return 0;
     
-    const categoryFigures = translatedFigures.filter(f => 
-      figureIdToCategory[f.id] === category
-    );
+    const categoryFigures = translatedFigures.filter(f => f.category === category);
     
     // First try exact ID match
     let index = categoryFigures.findIndex(f => f.id === selectedFigure.id);
@@ -201,7 +148,7 @@ const FigureCarousel: FC<FigureCarouselProps> = ({
   useEffect(() => {
     // When user changes category, check if selected figure is in the new category
     if (selectedFigure) {
-      const figures = translatedFigures.filter(f => figureIdToCategory[f.id] === currentCategory);
+      const figures = translatedFigures.filter(f => f.category === currentCategory);
       const index = figures.findIndex(f => f.id === selectedFigure.id);
       
       // If the figure is in this category, select it
@@ -228,7 +175,7 @@ const FigureCarousel: FC<FigureCarouselProps> = ({
   }, [currentIndex, hasNavigated]);
 
   // Group figures by category using our mapping
-  const figures = translatedFigures.filter(f => figureIdToCategory[f.id] === currentCategory);
+  const figures = translatedFigures.filter(f => f.category === currentCategory);
 
   // ULTRATHINK: Direct swipe navigation - no transitions
   const handleSwipeNavigation = useCallback((direction: 'left' | 'right') => {
