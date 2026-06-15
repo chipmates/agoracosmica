@@ -165,6 +165,7 @@ const PortraitFrame: FC<PortraitFrameProps> = ({
   const shouldShowEssence = showEssence || isSelected;
 
   return (
+    <>
     <div
       className={`${styles.portraitFrame} ${isActive ? styles.active : ''} ${isSelected ? styles.selected : ''} ${shouldShowEssence ? styles.showingEssence : ''} ${className}`}
       onMouseEnter={handleMouseEnter}
@@ -227,11 +228,16 @@ const PortraitFrame: FC<PortraitFrameProps> = ({
         </div>
       )}
 
-      {/* Golden line + trailer — mobile only (desktop renders it in the name row) */}
+    </div>
+
+      {/* Golden line + trailer — mobile only. Rendered as a sibling of the
+          selectable portrait tile (not a child) so the trailer button is never
+          nested inside the role="button" element. Desktop renders it in the
+          name row, where it was already a sibling. */}
       {showName && trailer && (
         <FigureHook figure={figure} language={language} trailer={trailer} />
       )}
-    </div>
+    </>
   );
 };
 
