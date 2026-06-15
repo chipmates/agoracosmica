@@ -47,12 +47,15 @@ const label = councilId
 // path; index.tsx reads ?figure=/?council= at boot). Use the public figure
 // slug for a human-meaningful, SEO-aligned URL; councils use their id (the
 // in-app consumer expects the id).
+// Carry the page language so a copied/shared link or new-tab open lands in the
+// same language. The same-tab click path sets it from document.documentElement
+// .lang in agc-public.js; index.tsx reads ?lang at boot for the other paths.
 const figureSlug = figureId ? figureIdToSlug[figureId] : undefined;
 const ctaHref = figureSlug
-  ? `/app?figure=${figureSlug}`
+  ? `/app?figure=${figureSlug}&lang=${lang}`
   : councilId
-    ? `/app?council=${councilId}`
-    : '/app';
+    ? `/app?council=${councilId}&lang=${lang}`
+    : `/app?lang=${lang}`;
 ---
 <div class={`pub-cta pub-cta--${variant} ${className}`}>
   <div class="pub-cta__inner">

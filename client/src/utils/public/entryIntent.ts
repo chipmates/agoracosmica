@@ -107,7 +107,10 @@ export function clearCouncilIntent(): void {
  * Unlike the sessionStorage-only click path, this survives no-JS-at-click,
  * new-tab opens, and copy-paste. The figure param accepts either the public
  * slug (marcus-aurelius) or the internal id (aurelius). Params are stripped
- * with replaceState so a reload doesn't re-fire the deep-link.
+ * with replaceState so a reload doesn't re-fire the deep-link. The optional
+ * lang param mirrors the click path (agc-public.js writes selectedLanguage from
+ * the page lang on click): a shared or new-tab DE link carries ?lang=de so the
+ * app opens in the link's language instead of falling back to browser locale.
  */
 export function captureEntryIntentFromUrl(): void {
   try {
@@ -115,7 +118,8 @@ export function captureEntryIntentFromUrl(): void {
     const params = new URLSearchParams(window.location.search);
     const figureParam = params.get('figure');
     const councilParam = params.get('council');
-    if (!figureParam && !councilParam) return;
+    const langParam = params.get('lang');
+    if (!figureParam && !councilParam && !langParam) return;
     if (figureParam) {
       const id = figureSlugToId[figureParam] || figureParam;
       if (id.length < 64) sessionStorage.setItem(SS_FIGURE_KEY, id);
@@ -123,8 +127,16 @@ export function captureEntryIntentFromUrl(): void {
     if (councilParam && councilParam.length < 64) {
       sessionStorage.setItem(SS_COUNCIL_KEY, councilParam);
     }
+    if (langParam === 'en' || langParam === 'de') {
+      try {
+        LocalStorageAdapter.setString('selectedLanguage', langParam);
+      } catch {
+        // storage blocked — the app falls back to browser-locale detection
+      }
+    }
     params.delete('figure');
     params.delete('council');
+    params.delete('lang');
     const qs = params.toString();
     window.history.replaceState(
       {},
