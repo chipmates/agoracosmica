@@ -21,7 +21,6 @@ import {
   faqSchema,
   itemListSchema,
   breadcrumbSchema,
-  podcastSeriesSchema,
 } from '../lib/schemas';
 import { getT } from '../i18n';
 import { canonicalUrl, publicUrl, SITE_URL, MEDIA_URL } from '../lib/urls';
@@ -134,7 +133,6 @@ const schemas = [
   itemListSchema(figureItems),
   itemListSchema(themeItems),
   breadcrumbSchema([{ name: t('breadcrumbs.home'), url: `${SITE_URL}/` }]),
-  podcastSeriesSchema(lang),
 ];
 
 // The hero's LCP portrait is the innermost first planet (Marcus Aurelius),
