@@ -36,6 +36,7 @@ import {
   sendFunnelBeaconOnce,
   markReplyDispatchStart,
   replyTimeBucketSinceDispatch,
+  hasFiredFunnelStep,
 } from '../utils/funnelBeacon';
 import { isNewUser, HISTORY_PREFIXES } from '../utils/userState';
 import {
@@ -1050,10 +1051,16 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
           // useConversationEffects, so whichever fires first wins and a later
           // success or error never double-fires. Bucket = coarse
           // time-to-failure since dispatch, never raw milliseconds.
-          sendFunnelBeaconOnce('first_reply', {
-            outcome: 'error',
-            bucket: replyTimeBucketSinceDispatch(),
-          });
+          //
+          // Gated on first_turn for the same reason as the success variant: a
+          // failed auto-greeting stream must not count as a first_reply before
+          // the visitor has sent a turn.
+          if (hasFiredFunnelStep('first_turn')) {
+            sendFunnelBeaconOnce('first_reply', {
+              outcome: 'error',
+              bucket: replyTimeBucketSinceDispatch(),
+            });
+          }
         }
       },
     });

@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { cleanupAudioResources } from '../services/audioService';
 import { LocalStorageAdapter } from '../storage/localAdapter';
-import { sendFunnelBeaconOnce, replyTimeBucketSinceDispatch } from '../utils/funnelBeacon';
+import { sendFunnelBeaconOnce, replyTimeBucketSinceDispatch, hasFiredFunnelStep } from '../utils/funnelBeacon';
 import type { Figure, Seed } from '../types/global';
 
 interface UseConversationEffectsParams {
@@ -156,10 +156,18 @@ export const useConversationEffects = (params: UseConversationEffectsParams) => 
       // no-ops and the HomePage dispatch-error variant can never double-
       // fire. Bucket = coarse time since dispatch start (indices 0-4),
       // never raw milliseconds.
-      sendFunnelBeaconOnce('first_reply', {
-        outcome: '200',
-        bucket: replyTimeBucketSinceDispatch(),
-      });
+      //
+      // Gated on first_turn: a figure's auto-greeting (initiateConversation on
+      // mode select) dispatches this same assistant-chunk event before the
+      // visitor has typed. Counting that as a reply makes first_reply outrun
+      // first_turn (more replies than messages — impossible), so only count a
+      // chunk that arrived after a real user turn.
+      if (hasFiredFunnelStep('first_turn')) {
+        sendFunnelBeaconOnce('first_reply', {
+          outcome: '200',
+          bucket: replyTimeBucketSinceDispatch(),
+        });
+      }
     };
 
     window.addEventListener('conversation:assistant-chunk', handleAssistantChunk);

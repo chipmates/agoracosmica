@@ -132,6 +132,17 @@ function markFired(step: FunnelStep): void {
   }
 }
 
+/**
+ * Has a given funnel step already fired this tab? Lets a later step gate itself
+ * on an earlier one. first_reply uses this to stay a true reply: the figure's
+ * auto-greeting dispatches the same assistant-chunk event before the visitor
+ * has typed, so first_reply must wait until first_turn has fired or it would
+ * outrun first_turn (more replies than messages, which is impossible).
+ */
+export function hasFiredFunnelStep(step: FunnelStep): boolean {
+  return alreadyFired(step);
+}
+
 interface FunnelFields {
   figureId?: string;
   mode?: string;
