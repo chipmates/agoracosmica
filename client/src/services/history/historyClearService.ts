@@ -110,16 +110,15 @@ export const clearAllHistory = async (): Promise<ClearAllResult> => {
     k.startsWith('modeState_')
   );
   const completionKeys = allKeys.filter(k => k.startsWith('completion_'));
-  
-  // Create backup of all completions
-  const allCompletions: Record<string, string | null> = {};
-  completionKeys.forEach(key => {
-    allCompletions[key] = LocalStorageAdapter.getString(key);
-  });
 
-  // Store the backup with a timestamp
-  const timestamp = new Date().toISOString().replace(/:/g, '-');
-  LocalStorageAdapter.setJSON(`backup_all_completions_${timestamp}`, allCompletions);
+  // Sweep any backup_all_completions_* blobs older builds wrote here on every
+  // clear-all. Nothing ever read them (no restore path), so they only piled up
+  // and quietly retained the data the user asked to clear. Remove on sight.
+  allKeys
+    .filter(k => k.startsWith('backup_all_completions_'))
+    .forEach(key => {
+      LocalStorageAdapter.remove(key);
+    });
 
   // Remove all mode-related keys
   modeKeys.forEach(key => {
