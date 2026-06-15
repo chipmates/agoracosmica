@@ -234,56 +234,6 @@ class KeyStorageService {
     }
   }
 
-  /**
-   * Export all keys (encrypted)
-   *
-   * Note: Exported keys remain encrypted with device key.
-   * They can only be decrypted on the same device.
-   *
-   * @returns JSON string with encrypted keys
-   */
-  async exportKeys(): Promise<string> {
-    const db = await this.getDB();
-    const allKeys = await db.getAll('keys');
-
-    const exported = {
-      version: 1,
-      timestamp: Date.now(),
-      encrypted: true,
-      keys: allKeys
-    };
-
-    return JSON.stringify(exported);
-  }
-
-  /**
-   * Import keys from export
-   *
-   * Warning: Imported keys must be from the same device (same device encryption key).
-   * Cross-device imports will fail during decryption.
-   *
-   * @param exportedData - JSON string from exportKeys()
-   * @throws Error if import fails or format is invalid
-   */
-  async importKeys(exportedData: string): Promise<void> {
-    const data = JSON.parse(exportedData);
-
-    if (data.version !== 1) {
-      throw new Error(`Unsupported export version: ${data.version}`);
-    }
-
-    if (!data.encrypted) {
-      throw new Error('Cannot import unencrypted keys');
-    }
-
-    const db = await this.getDB();
-
-    // Import all keys
-    for (const keyRecord of data.keys) {
-      await db.put('keys', keyRecord);
-    }
-  }
-
   // ============================================
   // Private Helper Methods
   // ============================================
