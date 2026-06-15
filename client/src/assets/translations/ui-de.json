@@ -1171,7 +1171,8 @@
       "sttUnavailable": "Spracheingabe ist gerade nicht verfügbar. Du kannst deine Nachricht stattdessen tippen.",
       "gpuCapacityGerman": "Deutsche Sprachausgabe ist kurz ausgelastet. Wechsle zu Englisch, um Antworten weiter zu hören.",
       "gpuCapacityAll": "Sprachausgabe ist kurz ausgelastet. Dein Gespräch läuft als Text weiter, bis sie sich erholt.",
-      "audioRateLimited": "Sprachausgabe macht eine kurze Pause. Dein Gespräch läuft als Text weiter."
+      "audioRateLimited": "Sprachausgabe macht eine kurze Pause. Dein Gespräch läuft als Text weiter.",
+      "byokFellBack": "Dein OpenRouter-Schlüssel wurde abgelehnt, daher kam diese Antwort vom kostenlosen Kontingent. Prüfe deinen Schlüssel in den Einstellungen."
     },
     "mic": {
       "generic": {
@@ -1215,6 +1216,7 @@
       "llmRateLimited": "Der KI-Dienst ist gerade ausgelastet. Bitte versuche es gleich nochmal.",
       "byokInvalidKey": "Dein OpenRouter-Schlüssel wurde abgelehnt. Bitte prüfe ihn in den Einstellungen.",
       "byokInsufficientCredits": "Deinem OpenRouter-Konto ist das Guthaben ausgegangen. Bitte lade es auf, um weiterzumachen.",
+      "byokModelNotFound": "Das gewählte KI-Modell ist nicht mehr verfügbar. Wähle in den Einstellungen ein anderes Modell, um weiterzumachen.",
       "timeout": "Die Anfrage hat zu lange gedauert. Bitte versuche es nochmal.",
       "network": "Verbindungsproblem. Bitte prüfe dein Netzwerk und versuche es nochmal.",
       "securityCheckBlocked": "Die Sicherheitsprüfung konnte nicht geladen werden. Vermutlich blockiert ein Werbeblocker oder strenger Privatsphäre-Schutz challenges.cloudflare.com. Erlaube es für diese Seite und versuche es nochmal.",

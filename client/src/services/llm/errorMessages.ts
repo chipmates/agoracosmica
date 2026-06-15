@@ -61,6 +61,9 @@ export function mapErrorToUserMessage(error: unknown, tString: TStringFn): strin
   if (error instanceof LLMApiError) {
     if (error.status === 401) return tString(`${KEY}.byokInvalidKey`);
     if (error.status === 402) return tString(`${KEY}.byokInsufficientCredits`);
+    // 404 = the requested model id is gone (e.g. OpenRouter retired the pinned
+    // default). Generic "try again" would loop forever; point at model choice.
+    if (error.status === 404) return tString(`${KEY}.byokModelNotFound`);
     if (error.status === 429) return tString(`${KEY}.llmRateLimited`);
     if (error.status === 503) return tString(`${KEY}.llmDown`);
     return tString(`${KEY}.generic`);

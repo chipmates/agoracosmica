@@ -11,7 +11,8 @@ type BannerState =
   | { type: 'offline' }
   | { type: 'reconnected' }
   | { type: 'circuit-breaker'; service: 'tts' | 'stt' }
-  | { type: 'rate-limit'; hint: RateLimitHint };
+  | { type: 'rate-limit'; hint: RateLimitHint }
+  | { type: 'byok-fallback' };
 
 const BANNER_STYLE: React.CSSProperties = {
   position: 'fixed',
@@ -77,6 +78,21 @@ const NetworkStatusBanner: FC = () => {
     return () => window.removeEventListener('audio-rate-limit', handleRateLimit);
   }, [handleRateLimit]);
 
+  // BYOK key rejected mid-session — the conversation transparently continued on
+  // the free tier. Let the power user know so they can fix their key.
+  const handleByokFallback = useCallback(() => {
+    setBanner({ type: 'byok-fallback' });
+    const timer = setTimeout(() => setBanner(prev =>
+      prev.type === 'byok-fallback' ? { type: 'hidden' } : prev
+    ), 10000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener('byok-fell-back', handleByokFallback);
+    return () => window.removeEventListener('byok-fell-back', handleByokFallback);
+  }, [handleByokFallback]);
+
   if (banner.type === 'hidden') return null;
 
   let message: string;
@@ -108,6 +124,10 @@ const NetworkStatusBanner: FC = () => {
         message = tString('errors.network.audioRateLimited', 'Audio rate limited. Please wait a moment.');
         bgColor = 'color-mix(in srgb, var(--warning-color, #f59e0b) 90%, transparent)';
       }
+      break;
+    case 'byok-fallback':
+      message = tString('errors.network.byokFellBack', 'Your OpenRouter key was rejected, so this reply used the free tier. Check your key in Settings.');
+      bgColor = 'color-mix(in srgb, var(--warning-color, #f59e0b) 90%, transparent)';
       break;
   }
 

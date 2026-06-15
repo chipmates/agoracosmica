@@ -1169,7 +1169,8 @@
       "sttUnavailable": "Voice input is not available right now. You can type your message instead.",
       "gpuCapacityGerman": "German audio is briefly at capacity. Switch to English to keep hearing responses.",
       "gpuCapacityAll": "Audio is briefly at capacity. Your conversation continues with text while it recovers.",
-      "audioRateLimited": "Audio is taking a short break. Your conversation continues with text."
+      "audioRateLimited": "Audio is taking a short break. Your conversation continues with text.",
+      "byokFellBack": "Your OpenRouter key was rejected, so this reply used the free tier. Check your key in Settings."
     },
     "mic": {
       "generic": {
@@ -1213,6 +1214,7 @@
       "llmRateLimited": "The AI service is busy. Please try again in a moment.",
       "byokInvalidKey": "Your OpenRouter key was rejected. Please check it in Settings.",
       "byokInsufficientCredits": "Your OpenRouter account is out of credits. Please top it up to continue.",
+      "byokModelNotFound": "The selected AI model is no longer available. Pick a different model in Settings to continue.",
       "timeout": "The request took too long. Please try again.",
       "network": "Connection issue. Please check your network and try again.",
       "securityCheckBlocked": "The security check could not load. An ad blocker or strict privacy setting is likely blocking challenges.cloudflare.com. Allow it for this site, then try again.",

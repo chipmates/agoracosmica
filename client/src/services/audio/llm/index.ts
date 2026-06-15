@@ -176,6 +176,13 @@ export const generateResponse = async ({
         if ((error?.status === 401 || error?.status === 403) && !isSelfHost) {
           console.warn('[LLM] BYOK key rejected (HTTP', error.status, ') — marking invalid, falling through to free-tier');
           await keyStorage.markInvalid('openrouter');
+          // The drop to free tier is otherwise silent. Flip the AI Model badge
+          // to Free (byok-key-changed) and raise a banner (byok-fell-back) so a
+          // power user knows their key was rejected and this reply used free tier.
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('byok-key-changed', { detail: { hasKey: false } }));
+            window.dispatchEvent(new CustomEvent('byok-fell-back'));
+          }
           // Fall through to free-tier path below instead of throwing
         } else {
           throw error;
