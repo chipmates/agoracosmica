@@ -32,6 +32,8 @@ interface Props {
   schemas?: Array<Record<string, unknown>>;
   includeRss?: boolean;
   noHreflang?: boolean;
+  /** Internal lab/preview pages: emit robots noindex. */
+  noindex?: boolean;
   /** Set false on pages that render their own dedicated CTA (figure + theme detail). */
   stickyCta?: boolean;
 }

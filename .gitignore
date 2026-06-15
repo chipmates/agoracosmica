@@ -86,3 +86,14 @@ client/public/assets/
 # ── Keep manifest stubs even when parent is ignored ────────
 !**/.gitkeep
 !client/src/assets/councils/councilCatalog.json
+
+# ── Landing-lab hero previews (local design experiments) ────
+# Promoted into the homepage by swapping one import; until a variant is
+# chosen these stay out of version control.
+marketing/src/pages/lab/
+marketing/src/components/landing-lab/HeroExchange.astro
+marketing/src/components/landing-lab/HeroListening.astro
+marketing/src/components/landing-lab/hero-exchange.css
+marketing/src/components/landing-lab/hero-listening.css
+marketing/src/islands/HeroVoice.tsx
+marketing/src/islands/VoiceDeck.tsx

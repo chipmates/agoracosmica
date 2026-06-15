@@ -3,15 +3,18 @@
 //
 // The golden orbital ring of the login page becomes a living solar system:
 // figure-portrait "planets" ride three concentric gold rings around a glowing
-// central core, while the H1 + CTA sit beside the system. Hover or focus a
-// planet to spotlight it and surface the figure's name.
+// central core, while the H1 + CTA sit beside the system. A spotlight plaque
+// below the stage names one figure at a time together with its catalog learn
+// line, so the cast is never anonymous: the server prefills it with the LCP
+// figure, and the V2ObservatoryMotion island cycles it after idle.
 //
 // LCP discipline: this whole block is static server HTML. The deep-blue
-// gradient, the core glow, the three rings, the H1, and every portrait paint
-// before any JS. Each planet's resting angle is baked into a CSS custom
-// property at build time, so the arrangement is correct on first paint. The
-// V2ObservatoryMotion island (client:idle) only flips on the orbit keyframes
-// and the pointer-parallax, and it stays off entirely under reduced motion.
+// gradient, the core glow, the three rings, the H1, every portrait, and the
+// prefilled plaque paint before any JS. Each planet's resting angle is baked
+// into a CSS custom property at build time, so the arrangement is correct on
+// first paint. The V2ObservatoryMotion island (client:idle) only flips on the
+// orbit keyframes, runs the spotlight cycle, and adds the pointer-parallax,
+// and it stays off entirely under reduced motion.
 
 import { getFiguresCatalog } from '@client/data/public/figuresCatalog';
 import { figureIdToSlug } from '@client/data/public/slugMap';
@@ -40,7 +43,9 @@ type HeroCopy = {
   lede: string;
   trust: string;
   free: string;
-  systemHint: string;
+  hearTemplate: string;
+  pauseVoice: string;
+  pauseMotion: string;
   scrollCue: string;
   scrollCueAria: string;
   systemAria: string;
@@ -49,16 +54,18 @@ type HeroCopy = {
 const COPY: Record<Lang, HeroCopy> = {
   en: {
     eyebrow: 'Voices from across history',
-    title: "Learn from 30 of history's remarkable people, Marcus Aurelius to Frida Kahlo",
+    title: 'Learn from 30 of history’s remarkable people, Marcus Aurelius to Frida Kahlo',
     subhead: 'A Living Library You Can Talk To',
     lede: "Pick anyone and start learning. Hear a narrated chapter of their life, work through one of their ideas, or sit in on a four-voice debate. You can also just ask them directly. Every voice here is an AI Echo, shaped from a real person's own writing. An interpretation, not a recording.",
     trust: 'Nonprofit · Open Source · No tracking cookies, no profiling',
     free: '30 free messages a day. No signup needed.',
-    systemHint: 'Reach toward anyone',
+    hearTemplate: 'Hear {name}',
+    pauseVoice: 'Pause',
+    pauseMotion: 'Pause the orbit motion',
     scrollCue: 'The library',
     scrollCueAria: 'Scroll to the library',
     systemAria:
-      'An orbital system of thirty remarkable people from history circling a glowing core. Marcus Aurelius, Albert Einstein, and Frida Kahlo ride the inner ring.',
+      'Fifteen of the thirty remarkable people, Marcus Aurelius, Albert Einstein, and Frida Kahlo among them, orbit a glowing golden core.',
   },
   de: {
     eyebrow: 'Stimmen aus der ganzen Geschichte',
@@ -67,17 +74,24 @@ const COPY: Record<Lang, HeroCopy> = {
     lede: 'Such dir jemanden aus und leg einfach los. Hör ein erzähltes Kapitel aus ihrem Leben, arbeite dich durch einen ihrer Gedanken, oder sitz bei einer vierstimmigen Debatte dabei. Du kannst sie auch einfach direkt fragen. Jede Stimme hier ist ein KI-Echo, geformt aus dem, was ein echter Mensch selbst geschrieben hat. Eine Deutung, keine Aufnahme.',
     trust: 'Gemeinnützig · Open Source · Keine Tracking-Cookies, kein Profiling',
     free: '30 kostenlose Nachrichten pro Tag. Ohne Anmeldung.',
-    systemHint: 'Streck die Hand nach jemandem aus',
+    hearTemplate: '{name} anhören',
+    pauseVoice: 'Pausieren',
+    pauseMotion: 'Die Orbit-Bewegung anhalten',
     scrollCue: 'Die Bibliothek',
     scrollCueAria: 'Zur Bibliothek scrollen',
     systemAria:
-      'Ein orbitales System aus dreißig bemerkenswerten Menschen der Geschichte, die einen leuchtenden Kern umkreisen. Marc Aurel, Albert Einstein und Frida Kahlo ziehen ihre Bahn auf dem inneren Ring.',
+      'Fünfzehn der dreißig bemerkenswerten Menschen, darunter Marc Aurel, Albert Einstein und Frida Kahlo, umkreisen einen leuchtenden goldenen Kern.',
   },
 };
 
 const copy = COPY[lang];
 // The hero CTA reuses the navbar's label so both surfaces stay in lockstep.
 const ctaLabel = t('nav.startExploring');
+// The locked trust line, split at its separators into no-wrap segments so a
+// line break can only happen between segments, never inside one (the DE
+// compound "Tracking-Cookies" used to break at its hyphen). Rendered text is
+// identical to the locked string.
+const trustParts = copy.trust.split(' · ');
 
 // Three rings, recognition-led: the most familiar faces ride the inner ring
 // closest to the core, the rest fan out. Counts: 3 inner, 5 middle, 7 outer.
@@ -89,25 +103,36 @@ const ringPlan: { ids: string[]; spin: number; reverse: boolean }[] = [
 ];
 
 // The LCP portrait is the innermost, first planet. It is eager + high priority
-// and preloaded in <head> from the page. Everything else lazy-loads.
+// and preloaded in <head> from the page. The inner and middle rings load
+// eagerly too (they are in the first viewport on desktop and the signature
+// visual should assemble with the text); only the outer ring lazy-loads.
 const lcpFigureId = ringPlan[0].ids[0];
+const lcpFigure = byId.get(lcpFigureId);
 
 type Planet = {
   id: string;
   name: string;
+  learn: string;
   src: string;
   srcset: string;
+  sizes: string;
   href: string;
   ring: number;
   angle: number;
   isLcp: boolean;
+  eager: boolean;
 };
 
-// Planets render at ~52 CSS px on mobile and ~76px on desktop, so the 160w
-// thumbnail covers up to 2x DPR and 320w covers 3x. The homepage preload for
-// the first (LCP) planet passes the identical srcset + sizes pair, so the
+// Depth grading: the inner ring renders largest and warmest, the outer ring
+// smallest and dimmest (atmospheric perspective). The sizes attribute per
+// ring matches the CSS clamp for that ring. The homepage preload for the
+// first (LCP) planet passes the identical srcset + sizes pair, so the
 // preloaded resource is exactly the one the img picks.
-const PLANET_SIZES = '(max-width: 900px) 52px, 76px';
+const PLANET_SIZES_BY_RING = [
+  '(max-width: 900px) 56px, 88px',
+  '(max-width: 900px) 46px, 72px',
+  '(max-width: 900px) 38px, 58px',
+];
 
 const planets: Planet[] = ringPlan.flatMap((ring, ringIndex) => {
   const step = 360 / ring.ids.length;
@@ -118,22 +143,25 @@ const planets: Planet[] = ringPlan.flatMap((ring, ringIndex) => {
     return {
       id,
       name: fig ? fig.name : id,
-      // Small face-crop thumbnail: the planets render at ~40-76px, so a 1200px
+      learn: fig ? fig.learn : '',
+      // Small face-crop thumbnail: the planets render at ~38-88px, so a 1200px
       // image is ~16x oversized. Loading 17 of those is fragile on mobile (slow
       // connections / Chrome time them out and they fail). 320 is sharp at
       // retina and tiny to fetch.
       src: `${MEDIA_URL}/images/figures/${id}/thumbnail/320.webp`,
       srcset: `${MEDIA_URL}/images/figures/${id}/thumbnail/160.webp 160w, ${MEDIA_URL}/images/figures/${id}/thumbnail/320.webp 320w`,
+      sizes: PLANET_SIZES_BY_RING[ringIndex],
       href: publicUrl(lang, `/figures/${figureIdToSlug[id]}`),
       ring: ringIndex,
       angle: offset + i * step,
       isLcp: ringIndex === 0 && i === 0,
+      eager: ringIndex <= 1,
     };
   });
 });
 ---
 <section class="v2-observatory" id="v2-observatory" aria-labelledby="v2-hero-title">
-  <!-- static cosmic backdrop: gradient + star field + gold specks -->
+  <!-- static cosmic backdrop: gradient + tiled star fields + gold specks -->
   <div class="v2-sky" aria-hidden="true">
     <div class="v2-stars v2-stars--far"></div>
     <div class="v2-stars v2-stars--near"></div>
@@ -141,17 +169,27 @@ const planets: Planet[] = ringPlan.flatMap((ring, ringIndex) => {
   </div>
 
   <div class="v2-hero-inner">
-    <!-- copy column -->
-    <div class="v2-copy">
+    <!-- copy column, split so the mobile grid can interleave the system -->
+    <div class="v2-copy v2-copy--head">
       <p class="v2-eyebrow">{copy.eyebrow}</p>
       <h1 class="v2-title" id="v2-hero-title">
         {copy.title}
       </h1>
       <p class="v2-subhead">{copy.subhead}</p>
+    </div>
+
+    <div class="v2-copy v2-copy--tail">
       <p class="v2-lede">
         {copy.lede}
       </p>
-      <p class="v2-trust">{copy.trust}</p>
+      <p class="v2-trust">
+        {trustParts.map((part, i) => (
+          <>
+            {i > 0 && ' · '}
+            <span class="v2-trust__part">{part}</span>
+          </>
+        ))}
+      </p>
       <div class="v2-actions">
         <a href="/app" class="pub-cta__button v2-cta" data-agc-cta="start-exploring">
           {ctaLabel}
@@ -160,55 +198,118 @@ const planets: Planet[] = ringPlan.flatMap((ring, ringIndex) => {
       </div>
     </div>
 
-    <!-- the living orbital system -->
-    <div class="v2-system" role="img" aria-label={copy.systemAria}>
-      <div class="v2-system-stage">
-        <!-- the three faint gold rings -->
-        <div class="v2-ring v2-ring--0" aria-hidden="true"></div>
-        <div class="v2-ring v2-ring--1" aria-hidden="true"></div>
-        <div class="v2-ring v2-ring--2" aria-hidden="true"></div>
+    <!-- the living orbital system. role="img" sits on the horizon (the purely
+         visual stage) so the plaque and the pause button below it stay real,
+         readable, reachable content instead of presentational children. -->
+    <div class="v2-system">
+      <!-- the horizon crops the stage to its upper arc on mobile; the handoff
+           wrapper carries the scroll-timeline fade so it never fights the
+           parallax transform that lives on .v2-system itself -->
+      <div class="v2-horizon" role="img" aria-label={copy.systemAria}>
+        <div class="v2-stagepos">
+          <div class="v2-handoff">
+            <div class="v2-system-stage">
+            <!-- the three faint gold rings -->
+            <div class="v2-ring v2-ring--0" aria-hidden="true"></div>
+            <div class="v2-ring v2-ring--1" aria-hidden="true"></div>
+            <div class="v2-ring v2-ring--2" aria-hidden="true"></div>
 
-        <!-- glowing central core -->
-        <div class="v2-core" aria-hidden="true">
-          <span class="v2-core__glow"></span>
-          <span class="v2-core__dot"></span>
-        </div>
+            <!-- glowing central core -->
+            <div class="v2-core" aria-hidden="true">
+              <span class="v2-core__glow"></span>
+              <span class="v2-core__dot"></span>
+            </div>
 
-        <!-- one rotating layer per ring, planets pinned around it -->
-        {ringPlan.map((ring, ringIndex) => (
-          <div
-            class={`v2-orbit v2-orbit--${ringIndex} ${ring.reverse ? 'v2-orbit--rev' : ''}`}
-            aria-hidden="true"
-          >
-            {planets
-              .filter(p => p.ring === ringIndex)
-              .map(p => (
-                <a
-                  class={`v2-planet ${p.isLcp ? 'v2-planet--lcp' : ''}`}
-                  href={p.href}
-                  data-figure={p.id}
-                  tabindex="-1"
-                >
-                  <span class="v2-planet__face">
-                    <img
-                      src={p.src}
-                      srcset={p.srcset}
-                      sizes={PLANET_SIZES}
-                      alt={p.name}
-                      width="96"
-                      height="96"
-                      loading={p.isLcp ? 'eager' : 'lazy'}
-                      fetchpriority={p.isLcp ? 'high' : 'auto'}
-                      decoding="async"
-                    />
-                  </span>
-                  <span class="v2-planet__name">{p.name}</span>
-                </a>
-              ))}
+            <!-- one rotating layer per ring, planets pinned around it -->
+            {ringPlan.map((ring, ringIndex) => (
+              <div
+                class={`v2-orbit v2-orbit--${ringIndex} ${ring.reverse ? 'v2-orbit--rev' : ''}`}
+                aria-hidden="true"
+              >
+                {planets
+                  .filter(p => p.ring === ringIndex)
+                  .map(p => (
+                    <a
+                      class={`v2-planet ${p.isLcp ? 'v2-planet--lcp' : ''}`}
+                      href={p.href}
+                      data-figure={p.id}
+                      data-name={p.name}
+                      data-learn={p.learn}
+                      tabindex="-1"
+                    >
+                      <span class="v2-planet__face">
+                        <img
+                          src={p.src}
+                          srcset={p.srcset}
+                          sizes={p.sizes}
+                          alt={p.name}
+                          width="96"
+                          height="96"
+                          loading={p.eager ? 'eager' : 'lazy'}
+                          fetchpriority={p.isLcp ? 'high' : 'auto'}
+                          decoding="async"
+                        />
+                      </span>
+                      <span class="v2-planet__name">{p.name}</span>
+                    </a>
+                  ))}
+              </div>
+            ))}
+            </div>
           </div>
-        ))}
+        </div>
       </div>
-      <p class="v2-system-hint" aria-hidden="true">{copy.systemHint}</p>
+
+      <!-- spotlight plaque: server-prefilled with the LCP figure, cycled by
+           the island. The voice chip plays the spotlighted figure's ~50s CDN
+           trailer (wired by the island after idle; until then it is the same
+           visible-but-inert button every TrailerButton page accepts). -->
+      <div class="v2-plaque" id="v2-plaque">
+        <div class="v2-plaque__text">
+          <p class="v2-plaque__name" id="v2-plaque-name">{lcpFigure ? lcpFigure.name : ''}</p>
+          <p class="v2-plaque__learn" id="v2-plaque-learn">{lcpFigure ? lcpFigure.learn : ''}</p>
+        </div>
+        <button
+          type="button"
+          class="pub-trailer v2-plaque__voice"
+          id="v2-plaque-voice"
+          data-hear-template={copy.hearTemplate}
+          data-pause-label={copy.pauseVoice}
+        >
+          <span class="pub-trailer__icon" aria-hidden="true">
+            <svg class="v2-voice__icon-play" viewBox="0 0 16 16" width="13" height="13" fill="currentColor">
+              <path d="M4 3l9 5-9 5z" />
+            </svg>
+            <svg class="v2-voice__icon-pause" viewBox="0 0 16 16" width="13" height="13" fill="currentColor">
+              <path d="M4 3h3v10H4zM9 3h3v10H9z" />
+            </svg>
+          </span>
+          <span class="pub-trailer__label" id="v2-plaque-voice-label">
+            {copy.hearTemplate.replace('{name}', lcpFigure ? lcpFigure.name : '')}
+          </span>
+          <span class="pub-trailer__dur">0:50</span>
+        </button>
+      </div>
+
+      <!-- motion pause: a quiet corner control, deliberately away from the
+           plaque so it cannot read as an audio button. Constant label +
+           aria-pressed carries the state. Appears once the island runs. -->
+      <button
+        type="button"
+        class="v2-plaque__pause"
+        id="v2-plaque-pause"
+        aria-pressed="false"
+        aria-label={copy.pauseMotion}
+        title={copy.pauseMotion}
+        hidden
+      >
+        <svg class="v2-plaque__icon-pause" viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true">
+          <path d="M4 3h3v10H4zM9 3h3v10H9z" />
+        </svg>
+        <svg class="v2-plaque__icon-play" viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true">
+          <path d="M5 3l8 5-8 5z" />
+        </svg>
+      </button>
     </div>
   </div>
 

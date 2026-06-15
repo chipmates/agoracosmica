@@ -1,7 +1,7 @@
 /* ============================================================================
    landing-lab v2 — "The Observatory"
-   Figure-portrait planets orbiting a glowing gold core. All selectors are
-   v2-prefixed to avoid collisions with the other four parallel variants.
+   Figure-portrait planets orbiting a glowing gold core, with a spotlight
+   plaque that names one figure at a time. All selectors are v2-prefixed.
 
    Motion contract:
      - First paint is fully static (server HTML). Orbits do NOT move until the
@@ -9,7 +9,8 @@
        reduced motion.
      - Every @keyframes loop is gated behind .is-live and
        @media (prefers-reduced-motion: no-preference), per the repo Animation
-       Efficiency rule, and parks via .is-hidden when the tab is backgrounded.
+       Efficiency rule, parks via .is-hidden when the tab is backgrounded, and
+       pauses via .is-paused when the user presses the plaque's pause toggle.
    Color: brand tokens only, transparency via color-mix.
    ========================================================================== */
 
@@ -69,13 +70,32 @@
   z-index: 0;
   pointer-events: none;
 }
+/* soft gold-dust bloom behind the orbital system grounds it in atmosphere */
+.v2-sky::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(46% 56% at 73% 46%,
+    color-mix(in srgb, var(--gold-subtle) 7%, transparent) 0%,
+    transparent 70%);
+}
+/* bottom vignette so the composition sits on deep space, not a flat slab */
+.v2-sky::after {
+  content: "";
+  position: absolute;
+  inset: 58% 0 0 0;
+  background: linear-gradient(180deg,
+    transparent 0%,
+    color-mix(in srgb, var(--bg-deep-space-darker, #080B20) 60%, transparent) 100%);
+}
 
 .v2-stars {
   position: absolute;
   inset: 0;
   background-repeat: repeat;
 }
-/* far field: small dim stars + a few gold specks */
+/* far field: small dim stars + a few gold specks. Tiled (not stretched), so
+   star density scales with the viewport instead of thinning out on desktop. */
 .v2-stars--far {
   background-image:
     radial-gradient(1px 1px at 12% 22%, var(--star-white-dim) 50%, transparent 51%),
@@ -87,7 +107,7 @@
     radial-gradient(1px 1px at 9% 81%, var(--star-white-dim) 50%, transparent 51%),
     radial-gradient(1px 1px at 91% 76%, var(--star-gold-medium) 50%, transparent 51%),
     radial-gradient(1px 1px at 38% 92%, var(--star-white-dim) 50%, transparent 51%);
-  background-size: 100% 100%;
+  background-size: 620px 620px;
   transform: translate3d(calc(var(--v2-px) * -6px), calc(var(--v2-py) * -6px), 0);
 }
 /* near field: slightly brighter, moves more for depth */
@@ -99,7 +119,7 @@
     radial-gradient(1.6px 1.6px at 34% 72%, var(--star-white-bright) 50%, transparent 51%),
     radial-gradient(1.6px 1.6px at 70% 85%, var(--star-gold-medium) 50%, transparent 51%),
     radial-gradient(1.6px 1.6px at 6% 60%, var(--star-white-medium) 50%, transparent 51%);
-  background-size: 100% 100%;
+  background-size: 860px 860px;
   transform: translate3d(calc(var(--v2-px) * -13px), calc(var(--v2-py) * -13px), 0);
 }
 
@@ -120,6 +140,9 @@
 }
 
 /* ── layout: copy beside the system ──────────────────────────────────── */
+/* The copy is split into a head (eyebrow, H1, tagline) and a tail (lede,
+   trust, actions) so the mobile grid can slide the orbital system between
+   them. On desktop both sit in the left column, system on the right. */
 .v2-hero-inner {
   position: relative;
   z-index: 1;
@@ -129,9 +152,16 @@
   padding: clamp(2rem, 5vw, 4.5rem) clamp(1.25rem, 4vw, 3rem);
   display: grid;
   grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
-  align-items: center;
-  gap: clamp(1.5rem, 4vw, 3.5rem);
+  grid-template-areas:
+    "head system"
+    "tail system";
+  align-content: center;
+  column-gap: clamp(1.5rem, 4vw, 3.5rem);
+  row-gap: 0;
 }
+
+.v2-copy--head { grid-area: head; align-self: end; }
+.v2-copy--tail { grid-area: tail; align-self: start; }
 
 /* Two-column desktop only: the copy column can run as tall as the orbital
    system, so its last line lands near the hero's bottom edge. The library
@@ -145,14 +175,16 @@
 /* ── copy column ─────────────────────────────────────────────────────── */
 .v2-copy { max-width: 38rem; }
 
+/* quiet eyebrow: tracking carries the voice, gold stays reserved for the
+   tagline and the CTA so the accent color keeps its authority */
 .v2-eyebrow {
   font-family: var(--font-ui, 'Space Grotesk', sans-serif);
   font-size: 0.78rem;
   font-weight: 600;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: color-mix(in srgb, var(--gold-primary) 80%, transparent);
-  margin: 0 0 1rem;
+  color: var(--text-tertiary, #9E9E9E);
+  margin: 0 0 0.75rem;
 }
 
 .v2-title {
@@ -161,7 +193,7 @@
   line-height: 1.08;
   font-weight: 400;
   color: var(--text-primary);
-  margin: 0 0 1.1rem;
+  margin: 0 0 0.85rem;
   text-wrap: balance;
 }
 
@@ -170,14 +202,14 @@
   font-style: italic;
   font-size: clamp(1.1rem, 2.6vw, 1.5rem);
   color: var(--gold-primary);
-  margin: 0 0 1.1rem;
+  margin: 0;
 }
 
 .v2-lede {
   font-size: clamp(0.98rem, 1.4vw, 1.1rem);
   line-height: 1.6;
   color: var(--text-secondary);
-  margin: 0 0 1.25rem;
+  margin: 1.9rem 0 0;
   max-width: 34rem;
 }
 
@@ -185,14 +217,17 @@
   font-size: 0.85rem;
   letter-spacing: 0.04em;
   color: var(--text-tertiary);
-  margin: 0 0 1.5rem;
+  margin: 1.9rem 0 0;
 }
+/* line breaks may only happen between the locked line's segments */
+.v2-trust__part { white-space: nowrap; }
 
 .v2-actions {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 0.75rem;
+  margin-top: 1rem;
 }
 .v2-cta {
   width: auto;
@@ -206,6 +241,7 @@
 
 /* ── the orbital system ──────────────────────────────────────────────── */
 .v2-system {
+  grid-area: system;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -215,29 +251,52 @@
   transform: translate3d(calc(var(--v2-px) * 10px), calc(var(--v2-py) * 10px), 0);
 }
 
+/* passthrough wrappers: the horizon centers the stage, the stagepos level
+   exists so a future windowed treatment has a mount point that does not
+   fight the handoff animation */
+.v2-horizon {
+  display: flex;
+  justify-content: center;
+}
+.v2-stagepos {
+  display: flex;
+  justify-content: center;
+}
+
 .v2-system-stage {
   position: relative;
-  --v2-stage: min(46vw, 560px);
+  --v2-stage: min(44vw, 520px);
   width: var(--v2-stage);
   aspect-ratio: 1 / 1;
   display: grid;
   place-items: center;
 }
 
-/* concentric ring outlines. radii are percentages of the stage box. */
+/* concentric ring outlines fading outward (atmospheric perspective) */
 .v2-ring {
   position: absolute;
   border-radius: 50%;
-  border: 1px solid color-mix(in srgb, var(--gold-subtle) 22%, transparent);
   box-shadow:
     inset 0 0 40px color-mix(in srgb, var(--gold-subtle) 6%, transparent),
     0 0 30px color-mix(in srgb, var(--gold-subtle) 5%, transparent);
 }
-.v2-ring--0 { width: 44%; height: 44%; }
-.v2-ring--1 { width: 70%; height: 70%; }
-.v2-ring--2 { width: 100%; height: 100%; }
+.v2-ring--0 {
+  width: 44%;
+  height: 44%;
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 28%, transparent);
+}
+.v2-ring--1 {
+  width: 70%;
+  height: 70%;
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+}
+.v2-ring--2 {
+  width: 100%;
+  height: 100%;
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 13%, transparent);
+}
 
-/* glowing central core (the portal heart) */
+/* glowing central core (the portal heart), layered luminosity */
 .v2-core {
   position: absolute;
   width: 22%;
@@ -248,12 +307,18 @@
 }
 .v2-core__glow {
   position: absolute;
-  inset: -60%;
+  inset: -110%;
   border-radius: 50%;
-  background: radial-gradient(circle,
-    color-mix(in srgb, var(--gold-hover) 38%, transparent) 0%,
-    color-mix(in srgb, var(--gold-subtle) 16%, transparent) 38%,
-    transparent 70%);
+  background:
+    radial-gradient(circle,
+      color-mix(in srgb, var(--gold-hover) 42%, transparent) 0%,
+      transparent 16%),
+    radial-gradient(circle,
+      color-mix(in srgb, var(--gold-subtle) 18%, transparent) 0%,
+      transparent 44%),
+    radial-gradient(circle,
+      color-mix(in srgb, var(--gold-subtle) 7%, transparent) 0%,
+      transparent 72%);
   filter: blur(2px);
 }
 .v2-core__dot {
@@ -263,6 +328,8 @@
   border-radius: 50%;
   background: var(--gold-gradient, linear-gradient(135deg, #B38B30, #D4A539, #E6BC5C));
   box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--gold-hover) 40%, transparent),
+    inset -3px -5px 10px color-mix(in srgb, var(--gold-deep) 55%, transparent),
     0 0 22px color-mix(in srgb, var(--gold-hover) 60%, transparent),
     0 0 50px color-mix(in srgb, var(--gold-subtle) 40%, transparent);
 }
@@ -310,8 +377,6 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  width: clamp(46px, 6.4vw, 76px);
-  height: clamp(46px, 6.4vw, 76px);
   margin: 0;
   padding: 0;
   border: 0;
@@ -329,6 +394,14 @@
   animation: v2-counter var(--v2-spin, 90s) linear infinite;
   animation-play-state: paused;
 }
+
+/* depth grading: inner ring largest and warmest, outer smallest and dimmest */
+.v2-orbit--0 .v2-planet { width: clamp(56px, 7.3vw, 88px); height: clamp(56px, 7.3vw, 88px); }
+.v2-orbit--1 .v2-planet { width: clamp(46px, 6vw, 72px); height: clamp(46px, 6vw, 72px); }
+.v2-orbit--2 .v2-planet { width: clamp(38px, 4.8vw, 58px); height: clamp(38px, 4.8vw, 58px); }
+.v2-orbit--0 .v2-planet__face img { filter: saturate(0.98) brightness(1); }
+.v2-orbit--1 .v2-planet__face img { filter: saturate(0.9) brightness(0.94); }
+.v2-orbit--2 .v2-planet__face img { filter: saturate(0.82) brightness(0.88); }
 
 /* Only the planet portraits are interactive. The rings, the core, and the
    orbit circles are decorative, but a later-in-DOM orbit circle overlaps the
@@ -369,8 +442,6 @@
   height: 100%;
   object-fit: cover;
   display: block;
-  /* fade the portrait into the navy at its base, login-style */
-  filter: saturate(0.92) brightness(0.96);
   transition: filter 0.25s ease;
 }
 
@@ -396,9 +467,10 @@
   z-index: 5;
 }
 
-/* spotlight on hover / keyboard focus */
+/* spotlight on hover, keyboard focus, or the island's cycling .is-spot */
 .v2-planet:hover .v2-planet__face,
-.v2-planet:focus-visible .v2-planet__face {
+.v2-planet:focus-visible .v2-planet__face,
+.v2-planet.is-spot .v2-planet__face {
   transform: scale(1.16);
   border-color: var(--gold-hover);
   box-shadow:
@@ -407,9 +479,13 @@
     0 0 0 4px color-mix(in srgb, var(--bg-deep-space-darker, #080B20) 55%, transparent);
 }
 .v2-planet:hover .v2-planet__face img,
-.v2-planet:focus-visible .v2-planet__face img {
+.v2-planet:focus-visible .v2-planet__face img,
+.v2-planet.is-spot .v2-planet__face img {
   filter: saturate(1.08) brightness(1.05);
 }
+/* the pill shows on hover and focus only: during the automatic cycle the
+   plaque already names the figure, and pill + plaque together read as
+   duplicated clutter */
 .v2-planet:hover .v2-planet__name,
 .v2-planet:focus-visible .v2-planet__name {
   opacity: 1;
@@ -428,14 +504,109 @@
   border-color: color-mix(in srgb, var(--gold-primary) 60%, transparent);
 }
 
-.v2-system-hint {
-  margin: 1.25rem 0 0;
-  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
-  font-size: 0.8rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: color-mix(in srgb, var(--gold-primary) 55%, transparent);
+/* ── spotlight plaque ────────────────────────────────────────────────── */
+/* Sits below the stage. The margin reserves the planets' overhang (planet
+   centers ride the outer ring at the stage edge, so faces protrude half a
+   planet past the stage box): the old caption-overlap bug is impossible by
+   construction. min-height reserves two learn-line rows so the cycle never
+   shifts layout, even in German. */
+.v2-plaque {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.7rem;
+  margin-top: calc(clamp(38px, 4.8vw, 58px) / 2 + 0.9rem);
+  min-height: 6.4rem;
 }
+.v2-plaque__text {
+  text-align: center;
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+.v2-plaque.is-fading .v2-plaque__text {
+  opacity: 0;
+  transform: translateY(4px);
+}
+.v2-plaque__name {
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold-primary);
+  margin: 0 0 0.25rem;
+}
+.v2-plaque__learn {
+  font-family: 'Libre Caslon Text', Georgia, serif;
+  font-style: italic;
+  font-size: 0.98rem;
+  line-height: 1.45;
+  color: var(--text-secondary);
+  margin: 0;
+  max-width: 26rem;
+}
+
+/* the voice chip: play / pause icon pair swapped via the island's
+   data-voice attribute (CSP-safe, no inline styles) */
+.v2-plaque__voice .v2-voice__icon-pause { display: none; }
+.v2-plaque__voice[data-voice="on"] .v2-voice__icon-play { display: none; }
+.v2-plaque__voice[data-voice="on"] .v2-voice__icon-pause { display: inline; }
+.v2-plaque__voice[data-voice="on"] .pub-trailer__dur { display: none; }
+
+/* while a voice plays, the library itself answers: the core brightens and
+   the speaking figure's face carries a stronger glow (static transitions,
+   no keyframes, so nothing burns when idle) */
+.v2-observatory.has-voice .v2-core__dot {
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--gold-hover) 55%, transparent),
+    inset -3px -5px 10px color-mix(in srgb, var(--gold-deep) 45%, transparent),
+    0 0 30px color-mix(in srgb, var(--gold-hover) 80%, transparent),
+    0 0 70px color-mix(in srgb, var(--gold-subtle) 55%, transparent);
+}
+.v2-planet.is-speaking .v2-planet__face {
+  transform: scale(1.16);
+  border-color: var(--gold-hover);
+  box-shadow:
+    0 8px 26px color-mix(in srgb, var(--utility-pure-black, #000) 55%, transparent),
+    0 0 34px color-mix(in srgb, var(--gold-hover) 70%, transparent),
+    0 0 0 4px color-mix(in srgb, var(--bg-deep-space-darker, #080B20) 55%, transparent);
+}
+
+/* motion pause toggle: a quiet ghost in the system's top right corner,
+   away from the plaque so it cannot read as a media control. Hidden until
+   the island arms it (it controls JS-driven motion, so it has no job in a
+   static or reduced-motion render). */
+.v2-plaque__pause {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 3;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--gold-primary) 22%, transparent);
+  background: transparent;
+  color: color-mix(in srgb, var(--gold-primary) 55%, transparent);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+/* the display above would defeat the hidden attribute (author rules beat the
+   UA's [hidden] { display: none }), so restate it for the unarmed state */
+.v2-plaque__pause[hidden] { display: none; }
+.v2-plaque__pause:hover {
+  background: color-mix(in srgb, var(--gold-primary) 10%, transparent);
+  color: var(--gold-primary);
+}
+.v2-plaque__pause:focus-visible {
+  outline: 2px solid var(--gold-hover);
+  outline-offset: 3px;
+}
+.v2-plaque__pause .v2-plaque__icon-play { display: none; }
+.v2-plaque__pause[aria-pressed="true"] .v2-plaque__icon-pause { display: none; }
+.v2-plaque__pause[aria-pressed="true"] .v2-plaque__icon-play { display: inline; }
 
 /* ── scroll cue ──────────────────────────────────────────────────────── */
 .v2-scrollcue {
@@ -514,6 +685,15 @@
   0%, 100% { transform: scale(1); opacity: 1; }
   50%      { transform: scale(1.08); opacity: 0.88; }
 }
+/* incommensurate twinkle periods so the sky never visibly loops */
+@keyframes v2-twinkle-far {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.7; }
+}
+@keyframes v2-twinkle-near {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.78; }
+}
 
 /* ── motion is OFF until live AND the user allows motion ──────────────── */
 @media (prefers-reduced-motion: no-preference) {
@@ -527,19 +707,36 @@
   .v2-observatory.is-live .v2-core__glow {
     animation: v2-core-breathe 6s ease-in-out infinite;
   }
-  /* park everything while the tab is hidden */
+  .v2-observatory.is-live .v2-stars--far {
+    animation: v2-twinkle-far 9.7s ease-in-out infinite;
+  }
+  .v2-observatory.is-live .v2-stars--near {
+    animation: v2-twinkle-near 7.3s ease-in-out infinite;
+  }
+  /* park everything while the tab is hidden, and respect the user's pause
+     toggle (the .is-live.is-paused pair outranks the .is-live runners) */
   .v2-observatory.is-live.is-hidden .v2-orbit,
   .v2-observatory.is-live.is-hidden .v2-planet,
   .v2-observatory.is-live.is-hidden .v2-shooting,
-  .v2-observatory.is-live.is-hidden .v2-core__glow {
+  .v2-observatory.is-live.is-hidden .v2-core__glow,
+  .v2-observatory.is-live.is-hidden .v2-stars--far,
+  .v2-observatory.is-live.is-hidden .v2-stars--near,
+  .v2-observatory.is-live.is-paused .v2-orbit,
+  .v2-observatory.is-live.is-paused .v2-planet,
+  .v2-observatory.is-live.is-paused .v2-shooting,
+  .v2-observatory.is-live.is-paused .v2-core__glow,
+  .v2-observatory.is-live.is-paused .v2-stars--far,
+  .v2-observatory.is-live.is-paused .v2-stars--near {
     animation-play-state: paused;
   }
 
   /* scroll-driven hand-off: the system fades + lifts as the hero scrolls
      away into the SEO library below. Zero JS, runs on the compositor.
-     Guarded by @supports so non-supporting browsers keep the static layout. */
+     Guarded by @supports so non-supporting browsers keep the static layout.
+     Lives on the .v2-handoff wrapper, NOT on .v2-system, so it never
+     overrides the pointer-parallax transform that .v2-system carries. */
   @supports (animation-timeline: view()) {
-    .v2-system {
+    .v2-handoff {
       animation: v2-handoff linear both;
       animation-timeline: view();
       animation-range: exit 0% exit 90%;
@@ -551,25 +748,64 @@
   }
 }
 
-/* ── responsive: stack copy above the system ─────────────────────────── */
+/* ── responsive: head copy, then the orbital horizon, then the tail ───── */
 @media (max-width: 900px) {
   .v2-hero-inner {
     grid-template-columns: 1fr;
+    grid-template-areas:
+      "head"
+      "system"
+      "tail";
     text-align: center;
-    gap: clamp(1.5rem, 6vw, 2.5rem);
+    row-gap: 1.1rem;
   }
   .v2-copy { max-width: none; }
+  .v2-copy--head,
+  .v2-copy--tail { align-self: auto; }
   .v2-actions { align-items: center; }
-  .v2-lede { margin-left: auto; margin-right: auto; }
-  /* drive both the stage size AND the planet radii from the same var so the
-     figures stay ON their rings on mobile instead of clustering at the core */
-  .v2-system-stage { --v2-stage: min(82vw, 440px); }
+  .v2-lede { margin: 0 auto; }
+  .v2-trust { margin-top: 1.4rem; }
+  .v2-actions { margin-top: 0.9rem; }
+
+  /* the COMPLETE circle, scaled to the screen: nothing is windowed, shifted,
+     or masked, so no face is ever cut. The stage (including the planets'
+     half-face overhang past its edge) stays narrower than every viewport,
+     which also keeps the grid track's min-content from overflowing. */
+  .v2-system-stage { --v2-stage: min(86vw, 440px); }
+
+  /* the plaque does the naming on touch screens; pills stay hidden */
+  .v2-planet__name { display: none; }
+  /* clear the planets' overhang below the stage box, same as desktop */
+  .v2-plaque {
+    margin-top: calc(clamp(34px, 9vw, 42px) / 2 + 0.5rem);
+    min-height: 3.6rem;
+  }
+
+  /* full-circle planet sizes: a touch smaller so fifteen faces breathe */
+  .v2-orbit--0 .v2-planet { width: clamp(46px, 12vw, 56px); height: clamp(46px, 12vw, 56px); }
+  .v2-orbit--1 .v2-planet { width: clamp(40px, 10.5vw, 48px); height: clamp(40px, 10.5vw, 48px); }
+  .v2-orbit--2 .v2-planet { width: clamp(34px, 9vw, 42px); height: clamp(34px, 9vw, 42px); }
+
+  /* center the gold dust behind the horizon instead of the right column */
+  .v2-sky::before {
+    background: radial-gradient(72% 38% at 50% 36%,
+      color-mix(in srgb, var(--gold-subtle) 7%, transparent) 0%,
+      transparent 70%);
+  }
+
+  /* single column puts the headline where desktop has empty sky, and the
+     shooting star would streak straight through the text */
+  .v2-shooting { display: none; }
+}
+
+@media (max-width: 640px) {
+  /* the eyebrow costs prime fold space on phones; the title carries it */
+  .v2-eyebrow { display: none; }
+  .v2-title { font-size: clamp(1.85rem, 5.6vw, 2.4rem); margin-top: 0.5rem; }
 }
 
 @media (max-width: 560px) {
   .v2-observatory { min-height: auto; padding: 1rem 0 3rem; }
-  /* on the smallest screens, thin the outer ring to 6 planets feels crowded,
-     but we keep all of them; just shrink faces and tighten the stage */
-  .v2-planet { width: clamp(38px, 11vw, 52px); height: clamp(38px, 11vw, 52px); }
+  .v2-system-stage { --v2-stage: min(88vw, 360px); }
   .v2-scrollcue { display: none; }
 }
