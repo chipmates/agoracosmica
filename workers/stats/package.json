@@ -13,5 +13,11 @@
     "@cloudflare/workers-types": "^4.20260317.1",
     "typescript": "^5.8.3",
     "wrangler": "^4.75.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "esbuild": "^0.28.1",
+      "ws": "^8.20.1"
+    }
   }
 }

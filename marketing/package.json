@@ -20,5 +20,10 @@
     "@types/react": "^18.3.28",
     "@types/react-dom": "^18.3.7",
     "typescript": "^5.9.3"
+  },
+  "pnpm": {
+    "overrides": {
+      "esbuild": "^0.28.1"
+    }
   }
 }
