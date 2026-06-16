@@ -117,8 +117,6 @@ export function agoraCosmicaSchema(): Record<string, unknown> {
     slogan: 'A Living Library You Can Talk To',
     sameAs: [
       'https://github.com/chipmates/agoracosmica',
-      'https://www.youtube.com/@agoracosmica',
-      'https://www.youtube.com/@agoracosmicade',
       'https://open.spotify.com/show/3V02q5c8NAnFD1W2kQBYzd',
       'https://open.spotify.com/show/5i63mEKJuCVniSIViXbEP8',
       'https://podcasts.apple.com/us/podcast/agora-cosmica/id1871505788',

@@ -13,9 +13,6 @@ const t = getT(lang);
 const spotifyUrl = lang === 'de'
   ? 'https://open.spotify.com/show/5i63mEKJuCVniSIViXbEP8'
   : 'https://open.spotify.com/show/3V02q5c8NAnFD1W2kQBYzd';
-const youtubeUrl = lang === 'de'
-  ? 'https://www.youtube.com/@agoracosmicade'
-  : 'https://www.youtube.com/@agoracosmica';
 const applePodcastUrl = lang === 'de'
   ? 'https://podcasts.apple.com/us/podcast/agora-cosmica-deutsch/id1871505945'
   : 'https://podcasts.apple.com/us/podcast/agora-cosmica/id1871505788';
@@ -50,9 +47,6 @@ const country = lang === 'de' ? 'Deutschland' : 'Germany';
     <div class="pub-contact-links">
       <a href={spotifyUrl} target="_blank" rel="noopener noreferrer" class="pub-textlink">
         Spotify - Agora Cosmica{podcastSuffix}
-      </a>
-      <a href={youtubeUrl} target="_blank" rel="noopener noreferrer" class="pub-textlink">
-        YouTube - Agora Cosmica{podcastSuffix}
       </a>
       <a href={applePodcastUrl} target="_blank" rel="noopener noreferrer" class="pub-textlink">
         Apple Podcasts - Agora Cosmica{podcastSuffix}
