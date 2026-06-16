@@ -21,7 +21,7 @@ const TITLE_OVER60_OK = new Set(['de/index.html', 'de/figures/index.html']);
 // the sitemap generator's deliberate omission. The 404 page is excluded too:
 // hreflang annotations belong on indexable 200-status pages only, and CF Pages
 // serves 404.html with HTTP 404.
-const NO_HREFLANG = new Set(['privacy', 'impressum', 'datenschutz', 'cookie-policy', 'nutzungsbedingungen', '404']);
+const NO_HREFLANG = new Set(['privacy', 'impressum', 'datenschutz', 'cookie-policy', 'nutzungsbedingungen', '404', 'figures/emily-dickinson/poems']);
 
 function walk(dir) {
   const out = [];

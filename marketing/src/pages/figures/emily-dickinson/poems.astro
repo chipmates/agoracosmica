@@ -1,0 +1,1081 @@
+---
+// Emily Dickinson's poems, grouped by theme. The text is transcribed verbatim
+// from her own manuscripts (public domain; she died in 1886), not from the
+// copyrighted Johnson 1955 / Franklin 1998 editions, so her dashes, capitals,
+// and spellings are kept as she wrote them. Manuscript images are served from
+// the media CDN, reproduced courtesy of the holding libraries:
+//   - Boston Public Library (Digital Commonwealth): no known copyright restrictions.
+//   - Amherst College, Archives & Special Collections: free for non-commercial
+//     and educational use, with attribution.
+//   - Houghton Library, Harvard University: publishing images of its public-domain
+//     material is permitted, with credit.
+// The poem text is quoted primary source; her dashes are intentional, not house style.
+
+import Public from '../../../layouts/Public.astro';
+import Breadcrumbs from '../../../components/Breadcrumbs.astro';
+// Manuscripts + portrait + audio are served from R2 (the media CDN), not
+// bundled, so the public repo stays free of binaries. Image stems below resolve
+// to /images/dickinson/{stem}.webp; audio sits under /trailers/dickinson/.
+const MS = 'https://media.agoracosmica.org/images/dickinson';
+const msUrl = (stem: string) => `${MS}/${stem}.webp`;
+
+const lang = 'en' as const;
+
+// --- Poems: dash-faithful, transcribed from the manuscripts (see header) ---
+const POEMS: Record<string, { firstLine: string; text: string }> = {
+  chariot: {
+    firstLine: 'Because I could not stop for Death',
+    text: `Because I could not stop for Death –
+He kindly stopped for me –
+The Carriage held but just Ourselves –
+And Immortality.
+
+We slowly drove – He knew no haste
+And I had put away
+My labor and my leisure too,
+For His Civility –
+
+We passed the School, where Children strove
+At Recess – in the Ring –
+We passed the Fields of Gazing Grain –
+We passed the Setting Sun –
+
+Or rather – He passed Us –
+The Dews drew quivering and Chill –
+For only Gossamer, my Gown –
+My Tippet – only Tulle –
+
+We paused before a House that seemed
+A Swelling of the Ground –
+The Roof was scarcely visible –
+The Cornice – in the Ground –
+
+Since then – 'tis Centuries – and yet
+Feels shorter than the Day
+I first surmised the Horses Heads
+Were toward Eternity –`,
+  },
+  dying: {
+    firstLine: 'I heard a Fly buzz – when I died',
+    text: `I heard a Fly buzz – when I died –
+The Stillness in the Room
+Was like the Stillness in the Air –
+Between the Heaves of Storm –
+
+The Eyes around – had wrung them dry –
+And Breaths were gathering firm
+For that last Onset – when the King
+Be witnessed – in the Room –
+
+I willed my Keepsakes – Signed away
+What portion of me be
+Assignable – and then it was
+There interposed a Fly –
+
+With Blue – uncertain stumbling Buzz –
+Between the light – and me –
+And then the Windows failed – and then
+I could not see to see –`,
+  },
+  alabaster: {
+    firstLine: 'Safe in their Alabaster Chambers',
+    text: `Safe in their Alabaster Chambers –
+Untouched by Morning – and untouched by Noon –
+Sleep the meek members of the Resurrection –
+Rafter of Satin – and Roof of Stone –
+
+Grand go the Years, in the Crescent – above them –
+Worlds scoop their Arcs – and Firmaments – row –
+Diadems – drop – and Doges – surrender –
+Soundless as Dots, On a Disc of Snow –`,
+  },
+  nobody: {
+    firstLine: "I'm Nobody! Who are you?",
+    text: `I'm Nobody! Who are you?
+Are you – Nobody – too?
+Then there's a pair of us!
+Dont tell! they'd advertise – you know!
+
+How dreary – to be – Somebody!
+How public – like a Frog –
+To tell one's name – the livelong June –
+To an admiring Bog!`,
+  },
+  loadedgun: {
+    firstLine: 'My Life had stood – a Loaded Gun',
+    text: `My Life had stood – a Loaded Gun –
+In Corners – till a Day
+The Owner passed – identified –
+And carried Me away –
+
+And now We roam in Sovereign Woods –
+And now We hunt the Doe –
+And every time I speak for Him
+The Mountains straight reply –
+
+And do I smile, such cordial light
+Opon the Valley glow –
+It is as a Vesuvian face
+Had let it's pleasure through –
+
+And when at Night – Our good Day done –
+I guard My Master's Head –
+'Tis better than the Eider-Duck's
+Deep Pillow – to have shared –
+
+To foe of His – I'm deadly foe –
+None stir the second time –
+On whom I lay a Yellow Eye –
+Or an emphatic Thumb –
+
+Though I than He – may longer live
+He longer must – than I –
+For I have but the power to kill,
+Without – the power to die –`,
+  },
+  exclusion: {
+    firstLine: 'The Soul selects her own Society',
+    text: `The Soul selects her own Society –
+Then – shuts the Door –
+To her divine Majority –
+Present no more –
+
+Unmoved – she notes the Chariots – pausing –
+At her low Gate –
+Unmoved – an Emperor be kneeling
+Upon her Mat –
+
+I've known her – from an ample nation –
+Choose One –
+Then – close the Valves of her attention –
+Like Stone –`,
+  },
+  letter: {
+    firstLine: 'This is my letter to the World',
+    text: `This is my letter to the World
+That never wrote to Me –
+The simple News that Nature told –
+With tender Majesty
+
+Her Message is committed
+To Hands I cannot see –
+For love of Her – Sweet – Countrymen –
+Judge tenderly – of Me`,
+  },
+  hope: {
+    firstLine: '"Hope" is the thing with feathers',
+    text: `"Hope" is the thing with feathers –
+That perches in the soul –
+And sings the tune without the words –
+And never stops – at all –
+
+And sweetest – in the Gale – is heard –
+And sore must be the storm –
+That could abash the little Bird
+That kept so many warm –
+
+I've heard it in the chillest land –
+And on the strangest Sea –
+Yet, never, in Extremity,
+It asked a crumb – of Me.`,
+  },
+  success: {
+    firstLine: 'Success is counted sweetest',
+    text: `Success – is counted sweetest
+By those who ne'er succeed –
+To comprehend a Nectar
+Requires sorest need –
+
+Not one of all the Purple Host
+Who took the Flag – today
+Can tell the Definition
+so clear, of Victory –
+
+As He – defeated – dying –
+On whose forbidden Ear
+The distant strains of triumph
+Burst – agonized – and Clear!`,
+  },
+  slant: {
+    firstLine: "There's a certain Slant of light",
+    text: `There's a certain Slant of light,
+Winter Afternoons –
+That oppresses, like the Heft
+Of Cathedral Tunes –
+
+Heavenly Hurt, it gives us –
+We can find no scar,
+But internal difference
+Where the Meanings, are –
+
+None may teach it – Any –
+'Tis the Seal Despair –
+An imperial affliction
+Sent us of the Air –
+
+When it comes, the Landscape listens –
+Shadows – hold their breath –
+When it goes, 'tis like the Distance
+On the look of Death –`,
+  },
+  funeral: {
+    firstLine: 'I felt a Funeral, in my Brain',
+    text: `I felt a Funeral, in my Brain,
+And Mourners to and fro
+Kept treading – treading – till it seemed
+That Sense was breaking through –
+
+And when they all were seated,
+A Service, like a Drum –
+Kept beating – beating – till I thought
+My Mind was going numb –
+
+And then I heard them lift a Box
+And creak across my Soul
+With those same Boots of Lead, again,
+Then Space – began to toll,
+
+As all the Heavens were a Bell,
+And Being, but an Ear,
+And I, and Silence, some strange Race
+Wrecked, solitary, here –
+
+And then a Plank in Reason, broke,
+And I dropped down, and down –
+And hit a World, at every plunge,
+And Finished knowing – then –`,
+  },
+  snake: {
+    firstLine: 'A narrow Fellow in the Grass',
+    text: `A narrow Fellow in the Grass
+Occasionally rides –
+You may have met him? did you not
+His notice instant is –
+
+The Grass divides as with a Comb –
+A spotted Shaft is seen,
+And then it closes at your feet
+And opens further on –
+
+He likes a Boggy Acre –
+A Floor too cool for Corn –
+But when a Boy and Barefoot
+I more than once at Noon
+
+Have passed I thought a Whip Lash
+Unbraiding in the Sun
+When stooping to secure it
+It wrinkled And was gone –
+
+Several of Nature's People
+I know and they know me
+I feel for them a transport
+Of cordiality –
+
+But never met this Fellow
+Attended or Alone
+Without a tighter Breathing
+And Zero at the Bone.`,
+  },
+  garden: {
+    firstLine: 'A Bird, came down the Walk',
+    text: `A Bird came down the Walk –
+He did not know I saw –
+He bit an Angleworm in halves
+And ate the fellow, raw,
+
+And then he drank a Dew
+From a convenient Grass –
+And then hopped sidewise to the Wall
+To let a Beetle pass –
+
+He glanced with rapid eyes
+That hurried all around –
+They looked like frightened Beads, I thought –
+He stirred his Velvet Head –
+
+Like One in danger, Cautious,
+I offered him a Crumb
+And he unrolled his feathers
+And rowed him softer home –
+
+Than Oars divide the Ocean,
+Too silver for a seam,
+Or Butterflies, off Banks of Noon
+Leap, plashless as they swim.`,
+  },
+  tellslant: {
+    firstLine: 'Tell all the truth but tell it slant',
+    text: `Tell all the truth but tell it slant –
+Success in Circuit lies
+Too bright for our infirm delight
+The truth's superb surprise
+As Lightning to the Children eased
+With explanation kind
+The truth must dazzle gradually
+Or every man be blind –`,
+  },
+  brain: {
+    firstLine: 'The Brain – is wider than the Sky',
+    text: `The Brain – is wider than the Sky –
+For – put them side by side –
+The One the Other will contain
+With ease – and You – beside –
+
+The Brain is deeper than the Sea –
+For – hold them – Blue to Blue –
+The One the Other will absorb –
+As Sponges – Buckets – do –
+
+The Brain is just the weight of God –
+For – Heft them – Pound for Pound –
+And they will differ – if they do –
+As Syllable from Sound –`,
+  },
+  frigate: {
+    firstLine: 'There is no Frigate like a Book',
+    text: `There is no Frigate like a Book
+To take us Lands away
+Nor any Coursers like a Page
+Of prancing Poetry –
+This Traverse may the poorest take
+Without oppress of Toll –
+How frugal is the Chariot
+That bears the Human soul –`,
+  },
+  wildnights: {
+    firstLine: 'Wild nights – Wild nights!',
+    text: `Wild nights – Wild nights!
+Were I with thee
+Wild nights should be
+Our luxury!
+
+Futile – the winds –
+To a Heart in port –
+Done with the Compass –
+Done with the Chart –!
+
+Rowing in Eden –
+Ah! the Sea!
+Might I but moor –
+Tonight –
+In thee!`,
+  },
+};
+
+// --- Facsimile sources (all embedded, rights verified 2026-06-16, see header).
+//     BPL = no known copyright restrictions; Amherst = free for non-commercial /
+//     educational use with attribution; Houghton/Harvard = publication permitted,
+//     no permission or fee. Only wildnights is cited (no scan on disk yet). ---
+const FACS_LEAVES: Record<string, string[]> = {
+  // BPL (no known copyright) / Amherst (non-commercial, with credit)
+  dying: ['fly-buzz'],
+  alabaster: ['safe-alabaster-1', 'safe-alabaster-2'],
+  success: ['success-1', 'success-2'],
+  garden: ['bird-walk-1', 'bird-walk-2', 'bird-walk-3'],
+  tellslant: ['tell-truth'],
+  brain: ['brain-sky'],
+  frigate: ['frigate-book'],
+  // Houghton/Harvard (publication permitted, credit Houghton)
+  chariot: ['chariot-1', 'chariot-2'],
+  nobody: ['nobody'],
+  loadedgun: ['loaded-gun-1', 'loaded-gun-2'],
+  exclusion: ['soul-society'],
+  letter: ['letter-world'],
+  hope: ['hope'],
+  slant: ['slant-light'],
+  funeral: ['funeral-brain-1', 'funeral-brain-2'],
+  snake: ['narrow-fellow-1', 'narrow-fellow-2', 'narrow-fellow-3', 'narrow-fellow-4'],
+  wildnights: ['wildnights'],
+};
+const FACS: Record<string, { repo: string; cite: string }> = {
+  chariot: { repo: 'Houghton Library, Harvard', cite: 'MS Am 1118.3, 165a' },
+  dying: { repo: 'Amherst College, Archives & Special Collections', cite: 'fascicle 84' },
+  alabaster: { repo: 'Boston Public Library', cite: 'Ms. Am. 1093, 2' },
+  nobody: { repo: 'Houghton Library, Harvard', cite: 'MS Am 1118.3, 35a' },
+  loadedgun: { repo: 'Houghton Library, Harvard', cite: 'MS Am 1118.3, 131a' },
+  exclusion: { repo: 'Houghton Library, Harvard', cite: 'MS Am 1118.3, 65c' },
+  letter: { repo: 'Houghton Library, Harvard', cite: 'MS Am 1118.3, 70b' },
+  hope: { repo: 'Houghton Library, Harvard', cite: 'MS Am 1118.3, 46b' },
+  success: { repo: 'Boston Public Library', cite: 'Ms. Am. 1093, 10' },
+  slant: { repo: 'Houghton Library, Harvard', cite: 'MS Am 1118.3, 74d' },
+  funeral: { repo: 'Houghton Library, Harvard', cite: 'MS Am 1118.3, 53c' },
+  snake: { repo: 'Houghton Library, Harvard', cite: 'MS Am 1118.5 (letter to Susan Dickinson)' },
+  garden: { repo: 'Amherst College, Archives & Special Collections', cite: 'Amherst Manuscript #96' },
+  tellslant: { repo: 'Amherst College, Archives & Special Collections', cite: 'Amherst Manuscript #372' },
+  brain: { repo: 'Amherst College, Archives & Special Collections', cite: 'fascicle 84' },
+  frigate: { repo: 'Amherst College, Archives & Special Collections', cite: 'Amherst Manuscript #462' },
+  wildnights: { repo: 'Houghton Library, Harvard', cite: 'MS Am 1118.3, 38b' },
+};
+
+// Optional per-poem note (reusable): surfaces a spot where the manuscript reading
+// is kept over a smoothed printed one. Empty for now.
+const POEM_NOTES: Record<string, string> = {};
+
+// Echo-voice recording of "This is my letter to the World", the closing teaser
+// by the CTA (you've read her words + seen her hand, now hear her). Set to the
+// media-CDN MP3 URL once generated (ElevenLabs /with-timestamps, real Echo
+// voice). Empty string = the player does not render, so the page never ships an
+// empty/broken audio control. Save the .timestamps.json alongside the .mp3.
+// Upload both to R2 (media.agoracosmica.org) and paste the URLs here. Both are
+// allowed by media-src in the header CSP (https://*.agoracosmica.org) and the
+// meta CSP does not restrict media, so NO header/hash change is needed.
+// e.g. 'https://media.agoracosmica.org/audio/emily-dickinson/letter-echo.mp3'
+// Currently served locally from public/audio (= 'self') so it previews now.
+// To move to R2 later, just swap these two to the media.agoracosmica.org URLs.
+const ECHO_AUDIO = 'https://media.agoracosmica.org/trailers/dickinson/letter-echo.mp3';
+const ECHO_AUDIO_WEBM = 'https://media.agoracosmica.org/trailers/dickinson/letter-echo.webm';
+const ECHO_AUDIO_POEM = 'This is my letter to the World';
+
+// --- Themes: the page's spine (title + a short framing + the poems in it) ---
+const THEMES = [
+  {
+    id: 'death',
+    title: 'On death, and what waits',
+    framing:
+      'Death was never an ending for Dickinson. It was a visitor, a carriage, a fly in the room. She wrote about it the way you write about something you have looked at closely and stopped fearing.',
+    poems: ['chariot', 'dying', 'alabaster'],
+  },
+  {
+    id: 'self',
+    title: 'The self, and its closed door',
+    framing:
+      'She chose her own company and shut the door on the rest. These are poems about identity and power, the inner life she guarded, and how vast it turned out to be.',
+    poems: ['nobody', 'loadedgun', 'exclusion', 'letter'],
+  },
+  {
+    id: 'hope',
+    title: 'Hope, and what survives',
+    framing:
+      'Hope, in her hands, is not loud. It is a small bird that sings in the worst weather and never asks for anything back.',
+    poems: ['hope', 'success'],
+  },
+  {
+    id: 'nature',
+    title: 'Nature, watched up close',
+    framing:
+      'Dickinson watched the small world closely, a snake in the grass, a bird on the path, and found the whole of it strange and alive.',
+    poems: ['snake', 'garden'],
+  },
+  {
+    id: 'mind',
+    title: 'The mind, truth, and books',
+    framing:
+      'How much truth can a person take at once, and where do we go to escape? She thought a book could carry you further than any ship, and that the truth is best told a little sideways.',
+    poems: ['tellslant', 'brain', 'frigate'],
+  },
+  {
+    id: 'despair',
+    title: 'The dark weather',
+    framing:
+      'She mapped despair like a kind of weather. A slant of winter light. A funeral held inside the skull. Few people have described the inside of a hard day better.',
+    poems: ['slant', 'funeral'],
+  },
+  {
+    id: 'longing',
+    title: 'Longing',
+    framing: 'And sometimes she simply wanted. These are her wildest lines.',
+    poems: ['wildnights'],
+  },
+];
+
+// --- JSON-LD: the citable interpretive layer (poem text itself is Gutenberg's
+//     turf; our value is the curation + framing). ---
+const PAGE_URL = 'https://agoracosmica.org/figures/emily-dickinson/poems/';
+const dickinson = {
+  '@type': 'Person',
+  name: 'Emily Dickinson',
+  birthDate: '1830-12-10',
+  deathDate: '1886-05-15',
+  birthPlace: 'Amherst, Massachusetts',
+  sameAs: 'https://en.wikipedia.org/wiki/Emily_Dickinson',
+};
+const schemas = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: "Emily Dickinson's poems, by what they're about",
+    url: PAGE_URL,
+    about: dickinson,
+    inLanguage: 'en',
+    isPartOf: { '@type': 'WebSite', name: 'Agora Cosmica', url: 'https://agoracosmica.org' },
+    mainEntity: {
+      '@type': 'ItemList',
+      itemListElement: THEMES.flatMap(t => t.poems).map((key, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        item: { '@type': 'CreativeWork', name: POEMS[key].firstLine, inLanguage: 'en', author: dickinson },
+      })),
+    },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: "What are Emily Dickinson's poems about?",
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: "Emily Dickinson's poems return again and again to a handful of subjects: death and immortality, the inner self and its privacy, hope, despair, the close watching of nature, the limits of the mind, and longing. She wrote nearly eighteen hundred poems and published almost none of them in her lifetime.",
+        },
+      },
+      {
+        '@type': 'Question',
+        name: "Why do Emily Dickinson's poems use so many dashes?",
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Dickinson wrote with dashes instead of ordinary commas and periods, and capitalized nouns inside her lines. The smoothed versions printed after her death removed much of this. The poems here are transcribed from her own manuscripts, so the dashes and capitals are hers.',
+        },
+      },
+    ],
+  },
+];
+---
+<Public
+  title="Emily Dickinson's poems, in her own hand"
+  description="Emily Dickinson's poems by theme: death, the self, hope, nature, mind. Transcribed from her own manuscripts, her dashes kept. Read a few, then talk with her."
+  canonicalPath="/figures/emily-dickinson/poems"
+  lang={lang}
+  ogType="article"
+  noindex={false}
+  noHreflang={true}
+  stickyCta={false}
+  schemas={schemas}
+>
+  <div class="pub-content ed">
+    <Breadcrumbs
+      lang={lang}
+      items={[
+        { label: 'Figures', path: '/figures' },
+        { label: 'Emily Dickinson', path: '/figures/emily-dickinson' },
+        { label: 'Poems' },
+      ]}
+    />
+
+    <header class="ed-hero">
+      <figure class="ed-hero__portrait">
+        <img
+          class="ed-hero__img"
+          src={msUrl('portrait-1847')}
+          alt="Emily Dickinson, daguerreotype, about 1847"
+          width="560"
+          height="688"
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+        />
+        <figcaption class="ed-hero__caption">Emily Dickinson, c. 1847</figcaption>
+      </figure>
+      <div class="ed-hero__text">
+        <p class="ed-hero__eyebrow">In her own words</p>
+        <h1 class="ed-hero__title">Emily Dickinson</h1>
+        <p class="ed-hero__dates">1830-1886 · Amherst, Massachusetts</p>
+        <p class="ed-hero__lead">
+          She wrote nearly eighteen hundred poems and published almost none of
+          them. She kept them in a drawer, stitched into little hand-sewn
+          booklets, and let almost no one read them. What survives is a mind
+          testing the largest questions in the smallest spaces. Here are a few
+          of her poems, grouped by what they reach for, in the words and dashes
+          she actually used.
+        </p>
+      </div>
+    </header>
+
+    {THEMES.map((theme, ti) => (
+      <section class="ed-theme" id={`theme-${theme.id}`}>
+        <h2 class="ed-theme__title">{theme.title}</h2>
+        <p class="ed-theme__framing">{theme.framing}</p>
+        <div class="ed-poems">
+          {theme.poems.map((key, i) => (
+            <details class="ed-poem" open={ti === 0 && i === 0}>
+              <summary class="ed-poem__first-line">{POEMS[key].firstLine}</summary>
+              <div class="ed-poem__body">
+                <div class="ed-poem__text">{POEMS[key].text}</div>
+                {POEM_NOTES[key] && <p class="ed-poem__note">{POEM_NOTES[key]}</p>}
+                {FACS_LEAVES[key] ? (
+                  FACS_LEAVES[key].length > 1 ? (
+                    <figure class="ed-hand">
+                      <div
+                        class="ed-carousel"
+                        data-ed-carousel
+                        role="group"
+                        aria-roledescription="carousel"
+                        aria-label={`Manuscript of "${POEMS[key].firstLine}", ${FACS_LEAVES[key].length} pages`}
+                      >
+                        <div class="ed-carousel__track">
+                          {FACS_LEAVES[key].map((leaf, n) => (
+                            <a
+                              class="ed-carousel__slide"
+                              href={msUrl(leaf)}
+                              target="_blank"
+                              rel="noopener"
+                              aria-label={`Page ${n + 1} of ${FACS_LEAVES[key].length}, manuscript of "${POEMS[key].firstLine}", opens full size in a new tab`}
+                            >
+                              <img
+                                class="ed-hand__img"
+                                src={msUrl(leaf)}
+                                alt={`Emily Dickinson's manuscript of "${POEMS[key].firstLine}", page ${n + 1} of ${FACS_LEAVES[key].length}`}
+                                loading="lazy"
+                                decoding="async"
+                              />
+                            </a>
+                          ))}
+                        </div>
+                        <div class="ed-carousel__dots" hidden>
+                          {FACS_LEAVES[key].map((_, n) => (
+                            <button type="button" class="ed-carousel__dot" data-ed-dot aria-current={n === 0 ? 'true' : 'false'} aria-label={`Go to page ${n + 1}`}></button>
+                          ))}
+                        </div>
+                      </div>
+                      <figcaption class="ed-hand__caption">
+                        In her own hand · {FACS[key].repo} · {FACS_LEAVES[key].length} pages
+                        <span class="ed-hand__zoom"> · swipe, or open full size</span>
+                      </figcaption>
+                    </figure>
+                  ) : (
+                    <figure class="ed-hand">
+                      <div class="ed-hand__leaves is-single">
+                        <a
+                          class="ed-hand__leaf"
+                          href={msUrl(FACS_LEAVES[key][0])}
+                          target="_blank"
+                          rel="noopener"
+                          aria-label={`Open the manuscript of "${POEMS[key].firstLine}" full size in a new tab`}
+                        >
+                          <img
+                            class="ed-hand__img"
+                            src={msUrl(FACS_LEAVES[key][0])}
+                            alt={`Emily Dickinson's handwritten manuscript of "${POEMS[key].firstLine}"`}
+                            loading="lazy"
+                            decoding="async"
+                          />
+                        </a>
+                      </div>
+                      <figcaption class="ed-hand__caption">
+                        In her own hand · {FACS[key].repo}
+                        <span class="ed-hand__zoom"> · open full size</span>
+                      </figcaption>
+                    </figure>
+                  )
+                ) : (
+                  <p class="ed-poem__provenance">
+                    In her own hand: {FACS[key].repo} ({FACS[key].cite})
+                  </p>
+                )}
+              </div>
+            </details>
+          ))}
+        </div>
+      </section>
+    ))}
+
+    <aside class="ed-invite">
+      <p class="ed-invite__eyebrow">A living library you can talk to</p>
+      <p class="ed-invite__line">
+        You have just read Emily Dickinson in her own words and seen her own
+        hand. On Agora Cosmica you can go one step further: hear narrated stories
+        from her life, sit with the ideas behind the poems, and talk them through
+        with her Echo, a voice shaped by her poems and letters.
+      </p>
+      <a
+        class="ed-invite__button pub-cta__button"
+        href={'/app?figure=emily-dickinson&lang=en'}
+        data-agc-cta="start-exploring"
+        data-agc-figure="dickinson"
+      >
+        Learn from her Echo
+      </a>
+      <p class="ed-invite__reassure">Nonprofit · Open Source · No tracking cookies, no profiling</p>
+      <p class="ed-invite__reassure">30 free messages a day. No signup needed.</p>
+      {ECHO_AUDIO && (
+        <div class="ed-listen" data-ed-audio>
+          <p class="ed-listen__eyebrow">In her Echo's voice</p>
+          <p class="ed-listen__poem">"{ECHO_AUDIO_POEM}"</p>
+          {/* Styled play button (reveals via JS); native controls below are the
+              no-JS fallback, hidden by the script once it takes over. */}
+          <button type="button" class="pub-trailer ed-listen__btn" data-ed-audio-btn aria-pressed="false" hidden>
+            <span class="pub-trailer__icon" data-ed-audio-icon aria-hidden="true">
+              <svg viewBox="0 0 16 16" width="13" height="13" fill="currentColor"><path d="M4 3l9 5-9 5z"></path></svg>
+            </span>
+            <span class="pub-trailer__label" data-ed-audio-label>Hear her letter</span>
+            <span class="pub-trailer__dur">0:17</span>
+          </button>
+          <audio class="ed-listen__player" data-ed-audio-el controls preload="none">
+            {ECHO_AUDIO_WEBM && <source src={ECHO_AUDIO_WEBM} type="audio/webm" />}
+            <source src={ECHO_AUDIO} type="audio/mpeg" />
+            <a href={ECHO_AUDIO}>Download the recording</a>
+          </audio>
+        </div>
+      )}
+      <p class="ed-invite__more">
+        <a class="pub-textlink" href="/figures/emily-dickinson">Read more about Emily Dickinson</a>
+      </p>
+    </aside>
+
+    <footer class="ed-sources">
+      <p>
+        The poems here are transcribed from Dickinson's own manuscripts, which
+        are in the public domain. Her dashes, capital letters, and spellings are
+        kept as she wrote them, so these read differently from the smoothed
+        versions printed after her death. The manuscript images are reproduced
+        courtesy of the libraries that hold them: the Boston Public Library (no
+        known copyright restrictions), Amherst College Archives and Special
+        Collections (free for non-commercial and educational use, with credit),
+        and the Houghton Library at Harvard University, whose policy permits
+        publishing images of its public-domain holdings. The modern dash-faithful
+        scholarly editions remain under copyright and are not used here.
+      </p>
+    </footer>
+  </div>
+</Public>
+
+<style>
+  /* Scoped reading-room treatment. Uses brand design tokens only; adds no
+     global CSS (architecture frozen at 89/100). */
+  .ed {
+    max-width: 46rem;
+    margin: 0 auto;
+    padding: 2.5rem 1.25rem 4rem;
+  }
+
+  /* Hero */
+  .ed-hero {
+    display: flex;
+    gap: 1.75rem;
+    align-items: center;
+    margin: 1.5rem 0 3.5rem;
+  }
+  .ed-hero__portrait {
+    flex: 0 0 auto;
+    width: 132px;
+    margin: 0;
+    text-align: center;
+  }
+  .ed-hero__img {
+    width: 132px;
+    aspect-ratio: 4 / 5;
+    height: auto;
+    border-radius: 3px;
+    object-fit: cover;
+    object-position: center 30%;
+    border: 1px solid color-mix(in srgb, var(--gold-subtle) 38%, transparent);
+    box-shadow: 0 8px 24px color-mix(in srgb, #000 38%, transparent);
+  }
+  .ed-hero__caption {
+    margin: 0.55rem 0 0;
+    font-size: 0.66rem;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  }
+  .ed-hero__eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.72rem;
+    color: var(--gold-primary);
+    margin: 0 0 0.4rem;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  }
+  .ed-hero__title {
+    font-size: clamp(2rem, 5vw, 2.9rem);
+    line-height: 1.05;
+    margin: 0 0 0.5rem;
+    color: var(--text-primary);
+  }
+  .ed-hero__dates {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    margin: 0 0 1rem;
+  }
+  .ed-hero__lead {
+    color: var(--text-secondary);
+    font-size: 1.05rem;
+    line-height: 1.7;
+    margin: 0;
+    max-width: 34rem;
+  }
+
+  /* Themed sections */
+  .ed-theme {
+    margin: 0 0 3.25rem;
+  }
+  .ed-theme__title {
+    font-size: clamp(1.4rem, 3.5vw, 1.85rem);
+    color: var(--gold-primary);
+    margin: 0 0 0.6rem;
+    line-height: 1.2;
+  }
+  .ed-theme__framing {
+    color: var(--text-secondary);
+    font-size: 1.05rem;
+    line-height: 1.7;
+    margin: 0 0 2rem;
+    max-width: 36rem;
+  }
+
+  /* Poems: the reading layer */
+  .ed-poems {
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+  }
+  .ed-poem {
+    border-left: 2px solid color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+    padding-left: 1.5rem;
+  }
+  .ed-poem__first-line {
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0.4rem 0;
+    gap: 0.65rem;
+    font-size: 0.84rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--gold-subtle);
+    font-weight: 500;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    transition: color 0.15s ease;
+  }
+  .ed-poem__first-line::-webkit-details-marker {
+    display: none;
+  }
+  .ed-poem__first-line::before {
+    content: '+';
+    color: var(--gold-primary);
+    font-size: 1.05rem;
+    line-height: 1;
+  }
+  .ed-poem[open] > .ed-poem__first-line::before {
+    content: '\2212';
+  }
+  .ed-poem__first-line:hover {
+    color: var(--gold-hover);
+  }
+  .ed-poem[open] > .ed-poem__first-line {
+    color: var(--gold-primary);
+  }
+  .ed-poem__text {
+    white-space: pre-line;
+    font-family: 'Iowan Old Style', Palatino, Georgia, 'Times New Roman', serif;
+    font-size: 1.16rem;
+    line-height: 1.75;
+    color: var(--text-primary);
+    margin-top: 1.05rem;
+  }
+  .ed-poem__note {
+    margin: 1rem 0 0;
+    padding-left: 0.9rem;
+    border-left: 2px solid color-mix(in srgb, var(--gold-subtle) 35%, transparent);
+    font-size: 0.82rem;
+    line-height: 1.55;
+    font-style: italic;
+    color: var(--text-secondary);
+    max-width: 32rem;
+  }
+
+  /* "In her own hand" facsimile (single image or a multi-leaf gallery) */
+  .ed-hand {
+    margin: 1.75rem 0 0;
+  }
+  .ed-hand__leaves.is-single {
+    max-width: 420px;
+  }
+  .ed-hand__leaf {
+    display: block;
+    border: 1px solid color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+    border-radius: 4px;
+    overflow: hidden;
+    background: color-mix(in srgb, #fff 92%, var(--gold-subtle) 8%);
+    transition: border-color 0.15s ease;
+  }
+  .ed-hand__leaf:hover,
+  .ed-hand__leaf:focus-visible {
+    border-color: var(--gold-primary);
+  }
+  .ed-hand__img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* Carousel for multi-leaf manuscripts: native swipe + snap, dots track position.
+     Works with no JS (swipe + snap are pure CSS); the bundled script only adds
+     active-dot tracking and click-to-page (progressive enhancement). */
+  .ed-carousel {
+    max-width: 420px;
+  }
+  .ed-carousel__track {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    border-radius: 4px;
+    border: 1px solid color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+    background: color-mix(in srgb, #fff 92%, var(--gold-subtle) 8%);
+  }
+  .ed-carousel__track::-webkit-scrollbar {
+    display: none;
+  }
+  .ed-carousel__slide {
+    flex: 0 0 100%;
+    scroll-snap-align: center;
+    display: block;
+  }
+  .ed-carousel__slide:focus-visible {
+    outline: 2px solid var(--gold-primary);
+    outline-offset: -2px;
+  }
+  .ed-carousel__dots {
+    display: flex;
+    justify-content: center;
+    gap: 0.1rem;
+    margin-top: 0.4rem;
+  }
+  .ed-carousel__dot {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+  }
+  .ed-carousel__dot::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--gold-subtle) 65%, transparent);
+    transition: background 0.15s ease, transform 0.15s ease;
+  }
+  .ed-carousel__dot[aria-current='true']::before {
+    background: var(--gold-primary);
+    transform: scale(1.35);
+  }
+  .ed-hand__caption {
+    margin: 0.6rem 0 0;
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    color: var(--text-secondary);
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  }
+  .ed-hand__zoom {
+    color: var(--gold-subtle);
+  }
+  .ed-poem__provenance {
+    margin: 1.4rem 0 0;
+    font-size: 0.78rem;
+    letter-spacing: 0.03em;
+    color: var(--text-secondary);
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  }
+
+  /* Audio teaser ("hear her") above the invite */
+  .ed-listen {
+    margin: 1.75rem auto 0.25rem;
+    max-width: 36rem;
+    text-align: center;
+  }
+  .ed-listen__eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.72rem;
+    color: var(--gold-primary);
+    margin: 0 0 0.4rem;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  }
+  .ed-listen__poem {
+    font-family: 'Iowan Old Style', Palatino, Georgia, 'Times New Roman', serif;
+    font-size: 1.05rem;
+    color: var(--text-primary);
+    margin: 0 0 0.9rem;
+  }
+  .ed-listen__player {
+    width: 100%;
+    max-width: 22rem;
+  }
+
+  /* Invite / funnel */
+  .ed-invite {
+    margin: 1.5rem auto 2.75rem;
+    max-width: 36rem;
+    text-align: center;
+    padding: 2.25rem 1.5rem;
+    border-top: 1px solid color-mix(in srgb, var(--gold-subtle) 22%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, var(--gold-subtle) 22%, transparent);
+  }
+  .ed-invite__eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.72rem;
+    color: var(--gold-primary);
+    margin: 0 0 0.9rem;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  }
+  .ed-invite__line {
+    font-size: 1.08rem;
+    line-height: 1.72;
+    color: var(--text-primary);
+    margin: 0 auto 1.6rem;
+    max-width: 32rem;
+  }
+  .ed-invite__button {
+    display: inline-block;
+  }
+  .ed-invite__reassure {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    line-height: 1.5;
+    margin: 0.85rem 0 0;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  }
+  .ed-invite__reassure + .ed-invite__reassure {
+    margin-top: 0.15rem;
+  }
+  .ed-invite__more {
+    margin: 1.4rem 0 0;
+    font-size: 0.9rem;
+  }
+
+  /* Sources note */
+  .ed-sources {
+    border-top: 1px solid color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+    padding-top: 1.5rem;
+  }
+  .ed-sources p {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  @media (max-width: 560px) {
+    .ed-hero {
+      flex-direction: column;
+      text-align: center;
+      gap: 1.25rem;
+    }
+    .ed-poem {
+      padding-left: 1rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ed-hand__leaf,
+    .ed-carousel__dot::before {
+      transition: none;
+    }
+  }
+</style>
+
+<!-- Carousel + audio enhancements, served as static files so they load under
+     script-src 'self' in both the meta and header CSP (no inline-hash). -->
+<script src="/ed-carousel.js" is:inline defer></script>
+<script src="/ed-audio.js" is:inline defer></script>

@@ -73,7 +73,7 @@ const slash = (p) => (p === '/' ? '/' : p.endsWith('/') ? p : `${p}/`);
 // en/de/x-default hreflang block. The four legal pages are German-only; the
 // privacy policy is the lone English page (its DE counterpart is /datenschutz,
 // reached via a 301, so they share no hreflang signal by design).
-const NO_HREFLANG_PATHS = new Set(['/impressum', '/datenschutz', '/cookie-policy', '/nutzungsbedingungen', '/privacy']);
+const NO_HREFLANG_PATHS = new Set(['/impressum', '/datenschutz', '/cookie-policy', '/nutzungsbedingungen', '/privacy', '/figures/emily-dickinson/poems']);
 
 function url(rawPath, priority, lastmod, changefreq = 'monthly') {
   const isLegalDe = NO_HREFLANG_PATHS.has(rawPath);
@@ -197,6 +197,9 @@ for (const slug of FIGURE_SLUGS) {
   urls.push(url(`/figures/${slug}`, '0.7', mod));
   urls.push(deUrl(`/figures/${slug}`, '0.7', mod));
 }
+
+// Emily Dickinson poems page (corpus/flagship; EN-only, no hreflang twin)
+urls.push(url('/figures/emily-dickinson/poems', '0.6', gitLastModified('marketing/src/pages/figures/emily-dickinson/poems.astro')));
 
 // Theme detail pages
 for (const theme of THEME_IDS) {

@@ -94,6 +94,12 @@ function cleanDisplayText(s: string): string {
     class="pub-cta--desktop"
   />
 
+  {figureId === 'dickinson' && (
+    <p class="pub-figure__corpus">
+      <a class="pub-textlink" href="/figures/emily-dickinson/poems">Read her poems, in her own hand</a>
+    </p>
+  )}
+
   {seeds.length > 0 && (
     <CollapsibleSection title={t('figures.ideasHeading')}>
       <ol class="pub-ideas">
@@ -198,6 +204,11 @@ function cleanDisplayText(s: string): string {
 </div>
 
 <style is:global>
+  .pub-figure__corpus {
+    text-align: center;
+    margin: 0.25rem 0 2rem;
+    font-size: 1.05rem;
+  }
   /* The inline figure CTA above is desktop-only (hidden on mobile, where the
      sticky bar carries the deep-link). The journey-path section above it has a
      3rem bottom margin and the inline variant adds 2rem 0 of its own padding,
