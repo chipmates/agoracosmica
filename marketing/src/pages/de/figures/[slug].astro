@@ -3,7 +3,8 @@ import Public from '../../../layouts/Public.astro';
 import FigureDetailContent from '../../../components/FigureDetailContent.astro';
 
 import { getT } from '../../../i18n';
-import { breadcrumbSchema, personSchema, audioObjectSchema } from '../../../lib/schemas';
+import { breadcrumbSchema, personSchema, audioObjectSchema, faqSchema } from '../../../lib/schemas';
+import { dickinsonPoemsFaqDe } from '../../../lib/dickinsonPoemsFaq';
 import { canonicalUrl, publicUrl, SITE_URL, MEDIA_URL } from '../../../lib/urls';
 import { figureSlugToId } from '@client/data/public/slugMap';
 import { getFigureById } from '@client/data/public/figuresCatalog';
@@ -57,6 +58,9 @@ const schemas = [
     slug: slug!,
     lang,
   }),
+  ...(figureId === 'dickinson'
+    ? [faqSchema(dickinsonPoemsFaqDe, `${figureUrl}/`)]
+    : []),
 ];
 ---
 <Public

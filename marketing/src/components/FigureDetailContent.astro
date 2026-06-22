@@ -20,6 +20,7 @@ import { getFigureById } from '@client/data/public/figuresCatalog';
 import { figureSlugToId, figureIdToSlug } from '@client/data/public/slugMap';
 import { figureThemes } from '@client/data/public/figureSeo';
 import { councilCatalog, getShortDisplayName } from '@client/data/councilCatalog';
+import { dickinsonPoemsFaqEn, dickinsonPoemsFaqDe } from '../lib/dickinsonPoemsFaq';
 
 interface Props {
   figureId: string;
@@ -55,6 +56,14 @@ for (const seed of seeds) {
 }
 const relatedFigureIds = [...connectionSet].slice(0, 4);
 const themesForFigure = figureThemes[figureId] ?? [];
+
+// Dickinson-only interpretive capsule: "what are her poems about" (the winnable
+// query) as a visible, snippet-eligible answer that funnels into her poems page.
+// Same array drives the FAQPage JSON-LD in the route, so DOM and schema match.
+const poemsFaq = figureId === 'dickinson' ? (lang === 'de' ? dickinsonPoemsFaqDe : dickinsonPoemsFaqEn) : null;
+const poemsLinkLabel = lang === 'de'
+  ? 'Lies ihre Gedichte nach Thema, in ihrer eigenen Handschrift →'
+  : 'Read her poems grouped by theme, in her own hand →';
 
 // Light cleanup for displayed prose: strip em/en dashes + stray semicolons.
 function cleanDisplayText(s: string): string {
@@ -94,10 +103,20 @@ function cleanDisplayText(s: string): string {
     class="pub-cta--desktop"
   />
 
-  {figureId === 'dickinson' && (
-    <p class="pub-figure__corpus">
-      <a class="pub-textlink" href="/figures/emily-dickinson/poems">Read her poems, in her own hand</a>
-    </p>
+  {poemsFaq && (
+    <section class="pub-section pub-figure__poems">
+      <h2 class="pub-section__title">{poemsFaq[0].q}</h2>
+      <p class="pub-section__text">{poemsFaq[0].a}</p>
+      <p class="pub-section__text pub-figure__poems-link">
+        <a class="pub-textlink" href="/figures/emily-dickinson/poems">{poemsLinkLabel}</a>
+      </p>
+      {poemsFaq.slice(1).map(item => (
+        <div class="pub-figure__qa">
+          <h3 class="pub-figure__qa-q">{item.q}</h3>
+          <p class="pub-section__text">{item.a}</p>
+        </div>
+      ))}
+    </section>
   )}
 
   {seeds.length > 0 && (
@@ -204,10 +223,21 @@ function cleanDisplayText(s: string): string {
 </div>
 
 <style is:global>
-  .pub-figure__corpus {
-    text-align: center;
-    margin: 0.25rem 0 2rem;
+  .pub-figure__poems {
+    margin: 0.5rem 0 2rem;
+  }
+  .pub-figure__poems-link {
+    margin-top: 0.5rem;
     font-size: 1.05rem;
+  }
+  .pub-figure__qa {
+    margin-top: 1.5rem;
+  }
+  .pub-figure__qa-q {
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: 1.1rem;
+    color: var(--gold-primary);
+    margin: 0 0 0.4rem;
   }
   /* The inline figure CTA above is desktop-only (hidden on mobile, where the
      sticky bar carries the deep-link). The journey-path section above it has a
