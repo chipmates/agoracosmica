@@ -3,7 +3,7 @@ import Public from '../../layouts/Public.astro';
 import ThemeDetailContent from '../../components/ThemeDetailContent.astro';
 
 import { getT } from '../../i18n';
-import { articleSchema, breadcrumbSchema } from '../../lib/schemas';
+import { articleSchema, breadcrumbSchema, faqSchema } from '../../lib/schemas';
 import { canonicalUrl, publicUrl, SITE_URL, MEDIA_URL } from '../../lib/urls';
 import { themeContentLastmod } from '../../lib/lastmod';
 import { THEMES, type ThemeId } from '@client/data/councilCatalog';
@@ -34,6 +34,10 @@ const { themeId } = Astro.props as { themeId: ThemeId };
 const t = getT(lang);
 const themeName = t(`themes.${themeId}.name`);
 const themeDescription = t(`themes.${themeId}.description`);
+const themeQuestion = t(`themes.${themeId}.question`);
+const themeAnswer = t(`themes.${themeId}.answer`);
+const hasQa =
+  themeQuestion !== `themes.${themeId}.question` && themeAnswer !== `themes.${themeId}.answer`;
 
 const ogFigureId = THEME_OG_FIGURE[themeId];
 const themeOgImage = ogFigureId
@@ -59,6 +63,7 @@ const schemas = [
     { name: t('breadcrumbs.themes'), url: `${SITE_URL}/themes` },
     { name: themeName, url: themeUrl },
   ]),
+  ...(hasQa ? [faqSchema([{ q: themeQuestion, a: themeAnswer }], themeUrl)] : []),
 ];
 ---
 <Public

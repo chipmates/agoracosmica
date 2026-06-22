@@ -6,7 +6,7 @@
 import Breadcrumbs from './Breadcrumbs.astro';
 import ThemeHero from './ThemeHero.astro';
 import EchoNote from './EchoNote.astro';
-import ThemeVoice from './ThemeVoice.astro';
+import FigureCard from './FigureCard.astro';
 import CouncilHero from './CouncilHero.astro';
 import CollapsibleSection from './CollapsibleSection.astro';
 import PublicCTA from './PublicCTA.astro';
@@ -23,6 +23,7 @@ import {
   getShortDisplayName,
 } from '@client/data/councilCatalog';
 import { themeVoices } from '@client/data/public/themeVoices';
+import { getFigureById } from '@client/data/public/figuresCatalog';
 
 interface Props {
   themeId: ThemeId;
@@ -57,10 +58,20 @@ const paragraphs = themeIntro
   ? themeIntro.split('\n\n').map(p => p.trim()).filter(Boolean)
   : [];
 const voices = themeVoices[themeId] ?? [];
-const faced = voices.length > 0 && paragraphs.length >= voices.length + 2;
-const lead = faced ? paragraphs[0] : '';
-const voiceParas = faced ? paragraphs.slice(1, 1 + voices.length) : [];
-const coda = faced ? paragraphs.slice(1 + voices.length).join(' ') : '';
+const voiceFigures = voices
+  .map(v => getFigureById(v.figureId, lang))
+  .filter((f): f is NonNullable<typeof f> => Boolean(f));
+
+const question = t(`themes.${themeId}.question`);
+const answer = t(`themes.${themeId}.answer`);
+const hasQa =
+  question !== `themes.${themeId}.question` && answer !== `themes.${themeId}.answer`;
+
+const voicesLabel = lang === 'de' ? 'Stimmen zu diesem Thema' : 'Voices in this theme';
+const voicesCaption =
+  lang === 'de'
+    ? 'Öffne einen Namen und entdecke dieses Leben und seine Ideen.'
+    : 'Open any name to explore their life and ideas.';
 
 const relatedThemeIds = (RELATED_THEMES[themeId] ?? []).slice(0, 3);
 
@@ -83,34 +94,34 @@ function councilTypeLabel(type: 'confrontational' | 'reflective'): string {
   <ThemeHero themeName={themeName} themeTagline={themeTagline} lang={lang} />
 
   <div class="pub-theme-body">
-    <EchoNote variant="theme" lang={lang} />
-
-    {faced ? (
-      <>
-        {lead && <p class="pub-voices__lead">{lead}</p>}
-        <section>
-          {voices.map((voice, i) => (
-            <ThemeVoice
-              figureId={voice.figureId}
-              stance={lang === 'de' ? voice.stanceDe : voice.stance}
-              paragraph={voiceParas[i] ?? ''}
-              lang={lang}
-            />
-          ))}
-        </section>
-        {coda && <p class="pub-theme-coda">{coda}</p>}
-      </>
-    ) : (
-      themeIntro && (
-        <section class="pub-section">
-          <div class="pub-section__text">
-            {paragraphs.map(para => <p>{para}</p>)}
-          </div>
-        </section>
-      )
+    {hasQa && (
+      <section class="pub-section">
+        <h2 class="pub-section__title">{question}</h2>
+        <p class="pub-voices__lead">{answer}</p>
+      </section>
     )}
 
-    {heroCouncil && <CouncilHero council={heroCouncil} lang={lang} />}
+    <EchoNote variant="theme" lang={lang} />
+
+    {themeIntro && (
+      <section class="pub-section">
+        <div class="pub-section__text">
+          {paragraphs.map(para => <p>{para}</p>)}
+        </div>
+      </section>
+    )}
+
+    {voiceFigures.length > 0 && (
+      <section class="pub-section">
+        <h2 class="pub-section__title">{voicesLabel}</h2>
+        <p class="pub-section__text">{voicesCaption}</p>
+        <div class="pub-grid pub-grid--3">
+          {voiceFigures.map(figure => <FigureCard figure={figure} lang={lang} headingLevel="h3" />)}
+        </div>
+      </section>
+    )}
+
+    {heroCouncil && <CouncilHero council={heroCouncil} lang={lang} headingLevel="h3" />}
 
     {otherCouncils.length > 0 && (
       <CollapsibleSection
