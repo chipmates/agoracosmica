@@ -8,6 +8,7 @@ By participating, you agree to our [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## Where to start
 
+- **Want a starter task?** Browse the [good first issues](https://github.com/chipmates/agoracosmica/labels/good%20first%20issue). Small, scoped, and mentored.
 - **Found a bug?** Open an [issue](https://github.com/chipmates/agoracosmica/issues) using the bug-report template.
 - **Have a question?** Ask in [Discussions](https://github.com/chipmates/agoracosmica/discussions).
 - **Want to translate?** See [Translations](#translations) below.
