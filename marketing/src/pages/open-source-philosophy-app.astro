@@ -1,0 +1,88 @@
+---
+// Product-category positioning page (EN). A query-shaped, indexed page for the
+// one winnable lane on a young domain: "open source / nonprofit / fact-checked
+// AI to talk with historical figures and philosophers." The DE twin lives at
+// /de/open-source-philosophy-app. The FAQ array is defined here and passed to
+// BOTH the visible render and faqSchema(), so the JSON-LD can never drift from
+// the DOM. All copy is fact-clean and inside the locked trust signals.
+import Public from '../layouts/Public.astro';
+import CategoryPageContent from '../components/CategoryPageContent.astro';
+import {
+  organizationSchema,
+  agoraCosmicaSchema,
+  softwareApplicationSchema,
+  faqSchema,
+  breadcrumbSchema,
+} from '../lib/schemas';
+import { getT } from '../i18n';
+import { canonicalUrl, publicUrl, SITE_URL } from '../lib/urls';
+import { getFiguresCatalog } from '@client/data/public/figuresCatalog';
+
+const lang = 'en' as const;
+const t = getT(lang);
+
+// A recognizable cross-tradition sample; full set on /figures.
+const CURATED = ['aurelius', 'plato', 'rumi', 'jung', 'dickinson', 'einstein', 'kahlo', 'lovelace'];
+const order = new Map(CURATED.map((id, i) => [id, i]));
+const figures = getFiguresCatalog(lang)
+  .filter(f => order.has(f.id))
+  .sort((a, b) => (order.get(a.id) ?? 0) - (order.get(b.id) ?? 0));
+
+const faq = [
+  {
+    q: 'Is there an open-source alternative to AI character apps?',
+    a: 'Yes. Agora Cosmica is open source under AGPL-3.0 and nonprofit. You can read every line, audit the privacy claims, or run the whole thing on your own machine. It is built for learning from real historical figures, not for roleplay with invented characters.',
+  },
+  {
+    q: 'Is this an alternative to Character.AI?',
+    a: 'If you want an open-source, nonprofit, fact-checked alternative to AI character apps like Character.AI, yes. Agora Cosmica is an education platform for learning from real historical figures, not a companion or roleplay app. It is open source, and it keeps no profile of you.',
+  },
+  {
+    q: 'Can I talk to historical figures with AI?',
+    a: "Yes. You can talk with the AI Echo of 30 figures from history, from Marcus Aurelius to Ada Lovelace and Frida Kahlo. Each Echo is grounded in that person's real writing and ideas. It is an interpretation, clearly labeled, never a recording or the real person.",
+  },
+  {
+    q: 'Is it a nonprofit?',
+    a: 'Yes. Agora Cosmica is built by ChipMates gemeinnützige GmbH, a small German nonprofit. There are no shareholders and no profit motive, just the work. The code is open source, and the content moves to a CC-BY license within 6 to 12 months.',
+  },
+  {
+    q: 'How is it different from a roleplay or companion app?',
+    a: 'A roleplay or companion app invents a character to play with. Agora Cosmica is an education platform built around real people from history. Each figure is grounded in their own work, and every figure ships with a public factcheck that separates what is verified from what is recreated.',
+  },
+  {
+    q: 'Does it track me?',
+    a: 'No tracking cookies, no third-party analytics, and no profiles of who you are. Your conversations stay in your browser and never reach our servers. If you bring your own key, it never touches our servers either. The code is open, so you can check this yourself.',
+  },
+  {
+    q: 'Is it free, and can I run it myself?',
+    a: 'You get 30 free messages a day with no signup. Want more, bring your own OpenRouter key. The whole platform is open source under AGPL-3.0, so you can self-host it with one command, and Local Mode runs the model and audio on your own machine.',
+  },
+  {
+    q: 'Where do the facts come from?',
+    a: 'Each voice is grounded in primary works and cross-checked sources. Because the Echoes are AI-rendered, what they say will vary, but the source material does not. Where the prose goes beyond the documented record, a public factcheck names what was recreated.',
+  },
+];
+
+const canonical = canonicalUrl(publicUrl(lang, '/open-source-philosophy-app'));
+const schemas = [
+  organizationSchema(),
+  agoraCosmicaSchema(),
+  softwareApplicationSchema(),
+  faqSchema(faq, canonical),
+  breadcrumbSchema([
+    { name: t('breadcrumbs.home'), url: `${SITE_URL}/` },
+    { name: 'Open source philosophy app', url: canonical },
+  ]),
+];
+---
+<Public
+  title="Open-Source Philosophy App"
+  fullTitle="Open-Source AI to Talk With Historical Figures"
+  description="A nonprofit, open source alternative to AI character apps, for philosophy and history. Fact-checked, no tracking cookies, AGPL-3.0, audio from the EU."
+  canonicalPath="/open-source-philosophy-app"
+  lang={lang}
+  ogType="website"
+  schemas={schemas}
+>
+  <CategoryPageContent lang={lang} faq={faq} figures={figures} />
+</Public>

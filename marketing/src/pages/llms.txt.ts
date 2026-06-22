@@ -26,7 +26,7 @@ export const GET: APIRoute = () => {
   lines.push('# Agora Cosmica');
   lines.push('');
   lines.push(
-    '> Learn from 30 remarkable people across philosophy, science, art, and activism through fact-checked biographies, narrated audio, and AI-voiced conversations. Open source (AGPL-3.0), nonprofit (ChipMates gGmbH), no tracking cookies, no profiling. English and German.',
+    '> Agora Cosmica is an open source, nonprofit education app where you talk with AI "Echoes" of 30 thinkers from history, across philosophy, science, art, and activism. Each is grounded in their own work, with fact-checked biographies and narrated audio. AGPL-3.0, built by ChipMates gGmbH. No tracking cookies, no profiling. English and German.',
   );
   lines.push('');
   lines.push(
@@ -56,6 +56,7 @@ export const GET: APIRoute = () => {
   lines.push(`- [All themes](${SITE_URL}/themes/)`);
   lines.push(`- [About](${SITE_URL}/about/)`);
   lines.push(`- [Why we call them Echoes](${SITE_URL}/echoes/)`);
+  lines.push(`- [Open source philosophy app](${SITE_URL}/open-source-philosophy-app/): an open source, nonprofit alternative to AI character apps, for philosophy and history.`);
   lines.push('- [Source code (GitHub)](https://github.com/chipmates/agoracosmica)');
   lines.push('');
 
@@ -64,6 +65,7 @@ export const GET: APIRoute = () => {
   lines.push(`- [Startseite](${SITE_URL}/de/)`);
   lines.push(`- [Alle Menschen](${SITE_URL}/de/figures/)`);
   lines.push(`- [Alle Themen](${SITE_URL}/de/themes/)`);
+  lines.push(`- [Open-Source-Philosophie-App](${SITE_URL}/de/open-source-philosophy-app/)`);
   lines.push('');
 
   return new Response(lines.join('\n'), {

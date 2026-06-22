@@ -1,0 +1,86 @@
+---
+// Produkt-Kategorie-Positionierungsseite (DE). Deutsches Pendant zu
+// /open-source-philosophy-app. Die FAQ wird hier definiert und sowohl an die
+// sichtbare Ausgabe als auch an faqSchema() übergeben, damit JSON-LD und DOM
+// nicht auseinanderlaufen. Alle Aussagen sind faktentreu und bleiben innerhalb
+// der gesperrten Vertrauenssignale.
+import Public from '../../layouts/Public.astro';
+import CategoryPageContent from '../../components/CategoryPageContent.astro';
+import {
+  organizationSchema,
+  agoraCosmicaSchema,
+  softwareApplicationSchema,
+  faqSchema,
+  breadcrumbSchema,
+} from '../../lib/schemas';
+import { getT } from '../../i18n';
+import { canonicalUrl, publicUrl, SITE_URL } from '../../lib/urls';
+import { getFiguresCatalog } from '@client/data/public/figuresCatalog';
+
+const lang = 'de' as const;
+const t = getT(lang);
+
+const CURATED = ['aurelius', 'plato', 'rumi', 'jung', 'dickinson', 'einstein', 'kahlo', 'lovelace'];
+const order = new Map(CURATED.map((id, i) => [id, i]));
+const figures = getFiguresCatalog(lang)
+  .filter(f => order.has(f.id))
+  .sort((a, b) => (order.get(a.id) ?? 0) - (order.get(b.id) ?? 0));
+
+const faq = [
+  {
+    q: 'Gibt es eine quelloffene Alternative zu KI-Charakter-Apps?',
+    a: 'Ja. Agora Cosmica ist quelloffen unter der AGPL-3.0 und gemeinnützig. Du kannst jede Zeile lesen, die Datenschutzversprechen prüfen oder das Ganze auf deinem eigenen Rechner betreiben. Es ist gebaut, um von echten historischen Persönlichkeiten zu lernen, nicht zum Rollenspiel mit erfundenen Figuren.',
+  },
+  {
+    q: 'Ist das eine Alternative zu Character.AI?',
+    a: 'Wenn du eine quelloffene, gemeinnützige, faktengeprüfte Alternative zu KI-Charakter-Apps wie Character.AI suchst, ja. Agora Cosmica ist eine Bildungsplattform, um von echten historischen Persönlichkeiten zu lernen, keine Begleiter- oder Rollenspiel-App. Es ist Open Source und legt kein Profil über dich an.',
+  },
+  {
+    q: 'Kann ich mit KI mit historischen Persönlichkeiten sprechen?',
+    a: 'Ja. Du sprichst mit dem KI-Echo von 30 Persönlichkeiten der Geschichte, von Marc Aurel bis Ada Lovelace und Frida Kahlo. Jedes Echo ist in den echten Schriften und Ideen dieses Menschen verankert. Es ist eine Deutung, klar gekennzeichnet, nie eine Aufnahme und nie die echte Person.',
+  },
+  {
+    q: 'Ist es gemeinnützig?',
+    a: 'Ja. Agora Cosmica wird von der ChipMates gemeinnützigen GmbH gebaut, einer kleinen gemeinnützigen Organisation aus Deutschland. Es gibt keine Anteilseigner und kein Gewinnstreben, nur die Arbeit. Der Code ist Open Source, und die Inhalte wechseln innerhalb von 6 bis 12 Monaten zu einer CC-BY-Lizenz.',
+  },
+  {
+    q: 'Wie unterscheidet es sich von einer Rollenspiel- oder Begleiter-App?',
+    a: 'Eine Rollenspiel- oder Begleiter-App erfindet eine Figur zum Spielen. Agora Cosmica ist eine Bildungsplattform rund um echte Menschen der Geschichte. Jeder Mensch ist in seinem eigenen Werk verankert, und zu jedem gehört ein öffentlicher Faktencheck, der trennt, was belegt und was nachgebildet ist.',
+  },
+  {
+    q: 'Werde ich getrackt?',
+    a: 'Keine Tracking-Cookies, keine Analyse durch Dritte und keine Profile darüber, wer du bist. Deine Gespräche bleiben in deinem Browser und erreichen nie unsere Server. Wenn du deinen eigenen Schlüssel mitbringst, berührt er unsere Server ebenfalls nie. Der Code ist offen, du kannst das also selbst nachprüfen.',
+  },
+  {
+    q: 'Ist es kostenlos, und kann ich es selbst betreiben?',
+    a: 'Du bekommst 30 kostenlose Nachrichten pro Tag, ohne Anmeldung. Du willst mehr? Bring deinen eigenen OpenRouter-Schlüssel mit. Die ganze Plattform ist quelloffen unter der AGPL-3.0, du kannst sie also mit einem einzigen Befehl selbst hosten, und der Local Mode betreibt Modell und Audio auf deinem eigenen Rechner.',
+  },
+  {
+    q: 'Woher kommen die Fakten?',
+    a: 'Jede Stimme ist in Primärwerken und mehrfach geprüften Quellen verankert. Weil die Echos KI-erzeugt sind, variiert das Gesagte, das Quellmaterial aber nicht. Wo der Text über das Dokumentierte hinausgeht, benennt ein öffentlicher Faktencheck, was nachgebildet wurde.',
+  },
+];
+
+const canonical = canonicalUrl(publicUrl(lang, '/open-source-philosophy-app'));
+const schemas = [
+  organizationSchema(),
+  agoraCosmicaSchema(),
+  softwareApplicationSchema(),
+  faqSchema(faq, canonical),
+  breadcrumbSchema([
+    { name: t('breadcrumbs.home'), url: `${SITE_URL}/de/` },
+    { name: 'Open-Source-Philosophie-App', url: canonical },
+  ]),
+];
+---
+<Public
+  title="Open-Source-Philosophie-App"
+  fullTitle="Quelloffene KI: Sprich mit Denkern der Geschichte"
+  description="Gemeinnützige, quelloffene Alternative zu KI-Charakter-Apps für Philosophie und Geschichte. Faktengeprüft, keine Tracking-Cookies, AGPL-3.0, Audio aus der EU."
+  canonicalPath="/open-source-philosophy-app"
+  lang={lang}
+  ogType="website"
+  schemas={schemas}
+>
+  <CategoryPageContent lang={lang} faq={faq} figures={figures} />
+</Public>

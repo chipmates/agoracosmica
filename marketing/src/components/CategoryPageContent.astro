@@ -1,0 +1,416 @@
+---
+// Body for the product-category positioning page (/open-source-philosophy-app,
+// EN + /de/ twin). A confident category definition: an open-source, nonprofit
+// app for talking with the AI Echoes of historical thinkers, built for learning,
+// not roleplay. The single <h1> is the category definition (NOT the locked
+// tagline). All copy is fact-clean and stays inside the locked trust signals
+// (no "Free" standalone, no "Private", never absolute "no tracking", content
+// "CC-BY pending"). The comparison names category rivals with neutral, durable,
+// publicly-verifiable facts only, and acknowledges their genuine strengths, so
+// it reads as a fair comparison and not an attack. Styling is a scoped block
+// using brand tokens only (CSS architecture frozen at 89/100), same pattern as
+// the Dickinson poems page; shared pub-* classes carry the structure.
+import FigureCard from './FigureCard.astro';
+import { publicUrl } from '../lib/urls';
+import type { Lang } from '../i18n';
+import type { PublicFigure } from '@client/data/public/figuresCatalog';
+
+interface Props {
+  lang: Lang;
+  faq: { q: string; a: string }[];
+  figures: PublicFigure[];
+}
+
+const { lang, faq, figures } = Astro.props;
+const isDe = lang === 'de';
+
+const en = {
+  eyebrow: 'For philosophy and history',
+  h1: "An open-source, nonprofit AI to talk with history's thinkers",
+  tagline: 'Fact-checked, no tracking cookies, and yours to self-host.',
+  lead:
+    "Agora Cosmica is an open-source, nonprofit app for talking with the AI Echoes of 30 historical thinkers, from Marcus Aurelius to Frida Kahlo. It is built for learning, not roleplay. Every figure is grounded in their real work with a public factcheck, there are no tracking cookies, and the code is yours to self-host.",
+  whatTitle: 'A library you talk with, not a roleplay app',
+  whatParas: [
+    'Most apps that let you chat with a character are built for entertainment, with invented personas and an open-ended roleplay. Agora Cosmica is an education platform. The 30 figures are real people from history, philosophers, scientists, mystics, artists, and activists, each with a researched voice and twelve core teachings.',
+    'Most of what you learn is crafted ahead of time: narrated life stories, core teachings, four-voice dialogues, and council debates. Talking with a figure is one of the ways to learn, for thinking an idea through, not the whole thing. Every figure is openly an AI Echo, never a recording and never the real person.',
+  ],
+  volume: ['360 narrated stories', '360 core teachings', '360 prism dialogues', '110 council debates'],
+  compareTitle: 'How it compares',
+  compareIntro:
+    'The character-chat apps are good at what they set out to do. Character.AI has a huge library of invented characters for play. Seneca Chat builds a daily Stoic practice. Hello History reaches a large audience on mobile. Agora Cosmica is the open, nonprofit, fact-checked option in the same space, and it is honest about the tradeoffs: a smaller, curated cast of 30, and a web-first app you can also run yourself.',
+  compareCols: ['Agora Cosmica', 'Character.AI', 'Seneca Chat', 'Hello History'],
+  compareRows: [
+    { dim: 'Focus', vals: ['Philosophy and history, to learn', 'Invented characters, roleplay', 'Stoic philosophy, daily practice', 'Chat with historical figures'] },
+    { dim: 'Open source', vals: ['Yes, AGPL-3.0', 'No', 'No', 'No'] },
+    { dim: 'Nonprofit', vals: ['Yes, a German gGmbH', 'No', 'No', 'No'] },
+    { dim: 'Pricing', vals: ['30 free messages a day, then your own key', 'Free tier and subscription', 'Subscription', 'Free tier and subscription'] },
+    { dim: 'Run it yourself', vals: ['Yes, one command', 'No', 'No', 'No'] },
+    { dim: 'Sources shown', vals: ['A public factcheck per figure', 'Not published', 'Not published', 'Not published'] },
+  ],
+  pillarsTitle: 'Honest, by design',
+  pillars: [
+    { label: 'Honest', text: 'We are upfront about what this is. Every figure is an AI Echo, an interpretation grounded in primary works and historical context. Never a recording, never claimed to speak for the real person. Each figure ships with factchecks that name what is verified and what is recreated for the story.' },
+    { label: 'Yours', text: 'Your conversations stay in your browser, and we never store them on our servers. Bring your own OpenRouter key if you like, and it never touches our servers. No tracking cookies, no third-party analytics, no profiles of who you are. What is yours stays yours.' },
+    { label: 'Open', text: 'Live speech runs on our own GPUs in Germany, the rest of the audio on EU hosting, and the whole codebase is open under AGPL-3.0. You can also run it entirely on your own machine. Local Mode points the app at any OpenAI-compatible LLM, like LM Studio, Ollama, or vLLM, and runs the audio stack in docker, so no conversation, voice, or text data ever leaves your computer. So you do not have to trust us. You can check.' },
+  ],
+  figuresTitle: 'Who you can learn from',
+  figuresLead: 'Thirty figures across 2,500 years. Here are a few. Open any name to explore their life and ideas.',
+  figuresMore: 'Browse all 30 figures',
+  faqTitle: 'Questions people ask',
+  ctaTitle: 'Start a conversation',
+  ctaText: 'Open the app and talk with the Echo of any figure. 30 free messages a day, no signup.',
+  ctaButton: 'Start exploring',
+  starText: 'If you find this interesting, a star is the simplest way to help us reach more people.',
+  starCta: 'Star on GitHub →',
+  aboutLink: 'About the project',
+  figuresLink: 'All figures',
+};
+
+const de = {
+  eyebrow: 'Für Philosophie und Geschichte',
+  h1: 'Eine quelloffene, gemeinnützige KI, mit der du mit den Denkern der Geschichte sprichst',
+  tagline: 'Faktengeprüft, keine Tracking-Cookies, und zum Selbsthosten.',
+  lead:
+    'Agora Cosmica ist eine quelloffene, gemeinnützige App, mit der du mit den KI-Echos von 30 Denkern der Geschichte sprichst, von Marc Aurel bis Frida Kahlo. Sie ist zum Lernen gebaut, nicht zum Rollenspiel. Jeder Mensch ist in seinem echten Werk verankert, mit einem öffentlichen Faktencheck, es gibt keine Tracking-Cookies, und den Code kannst du selbst hosten.',
+  whatTitle: 'Eine Bibliothek, mit der du sprichst, keine Rollenspiel-App',
+  whatParas: [
+    'Die meisten Apps, in denen du mit einer Figur chattest, sind zur Unterhaltung gebaut, mit erfundenen Rollen und offenem Rollenspiel. Agora Cosmica ist eine Bildungsplattform. Die 30 Menschen sind echte Persönlichkeiten der Geschichte, Philosophen, Wissenschaftlerinnen, Mystiker, Künstlerinnen und Aktivisten, jede und jeder mit einer recherchierten Stimme und zwölf Kernlehren.',
+    'Das meiste, was du lernst, ist im Voraus gestaltet: erzählte Lebensgeschichten, Kernlehren, vierstimmige Dialoge und Council-Debatten. Mit einem Menschen zu sprechen ist nur einer der Lernwege, um einen Gedanken durchzudenken, nicht das Ganze. Jeder Mensch ist offen ein KI-Echo, nie eine Aufnahme und nie die echte Person.',
+  ],
+  volume: ['360 erzählte Geschichten', '360 Kernlehren', '360 Prisma-Dialoge', '110 Council-Debatten'],
+  compareTitle: 'Im Vergleich',
+  compareIntro:
+    'Die Charakter-Chat-Apps sind gut in dem, was sie sich vorgenommen haben. Character.AI hat eine riesige Bibliothek erfundener Figuren zum Spielen. Seneca Chat baut eine tägliche stoische Praxis auf. Hello History erreicht ein großes Publikum auf dem Handy. Agora Cosmica ist die offene, gemeinnützige, faktengeprüfte Möglichkeit im selben Feld, und sie ist ehrlich bei den Kompromissen: eine kleinere, kuratierte Besetzung von 30, und eine Web-App, die du auch selbst betreiben kannst.',
+  compareCols: ['Agora Cosmica', 'Character.AI', 'Seneca Chat', 'Hello History'],
+  compareRows: [
+    { dim: 'Schwerpunkt', vals: ['Philosophie und Geschichte, zum Lernen', 'Erfundene Figuren, Rollenspiel', 'Stoische Philosophie, tägliche Praxis', 'Chat mit historischen Personen'] },
+    { dim: 'Open Source', vals: ['Ja, AGPL-3.0', 'Nein', 'Nein', 'Nein'] },
+    { dim: 'Gemeinnützig', vals: ['Ja, eine deutsche gGmbH', 'Nein', 'Nein', 'Nein'] },
+    { dim: 'Preis', vals: ['30 kostenlose Nachrichten pro Tag, dann eigener Schlüssel', 'Kostenlos und Abo', 'Abo', 'Kostenlos und Abo'] },
+    { dim: 'Selbst betreiben', vals: ['Ja, ein Befehl', 'Nein', 'Nein', 'Nein'] },
+    { dim: 'Quellen sichtbar', vals: ['Ein öffentlicher Faktencheck pro Mensch', 'Nicht veröffentlicht', 'Nicht veröffentlicht', 'Nicht veröffentlicht'] },
+  ],
+  pillarsTitle: 'Ehrlich, mit Absicht',
+  pillars: [
+    { label: 'Ehrlich', text: 'Wir sagen offen, was das hier ist. Jede Persönlichkeit ist ein KI-Echo, eine Deutung, verwurzelt in Primärwerken und historischem Kontext. Nie eine Aufnahme, nie der Anspruch, für den echten Menschen zu sprechen. Zu jedem Menschen gehören Faktenchecks, die benennen, was belegt und was für die Geschichte nachgebildet ist.' },
+    { label: 'Bei dir', text: 'Deine Gespräche bleiben in deinem Browser, und wir speichern sie nie auf unseren Servern. Bring deinen eigenen OpenRouter-Schlüssel mit, wenn du magst, er berührt unsere Server nie. Keine Tracking-Cookies, keine Analyse durch Dritte, keine Profile darüber, wer du bist. Was dir gehört, bleibt deins.' },
+    { label: 'Offen', text: 'Live gesprochene Sprache läuft auf unseren eigenen GPUs in Deutschland, das übrige Audio auf Servern in der EU, und der gesamte Code liegt offen unter der AGPL-3.0. Du kannst es auch komplett auf deinem eigenen Rechner laufen lassen. Der Local Mode verbindet die App mit jedem OpenAI-kompatiblen LLM, etwa LM Studio, Ollama oder vLLM, und betreibt den Audio-Stack in Docker, sodass keine Gespräche, keine Stimme und kein Text deinen Computer verlassen. Du musst uns also nicht vertrauen. Du kannst nachsehen.' },
+  ],
+  figuresTitle: 'Von wem du lernen kannst',
+  figuresLead: 'Dreißig Menschen aus 2.500 Jahren. Hier sind ein paar. Öffne einen Namen und entdecke dieses Leben und seine Ideen.',
+  figuresMore: 'Alle 30 Menschen ansehen',
+  faqTitle: 'Fragen, die Menschen uns stellen',
+  ctaTitle: 'Beginne ein Gespräch',
+  ctaText: 'Öffne die App und sprich mit dem Echo eines Menschen. 30 kostenlose Nachrichten pro Tag, ohne Anmeldung.',
+  ctaButton: 'Loslegen',
+  starText: 'Gefällt dir das Projekt? Ein Stern auf GitHub ist der einfachste Weg, uns zu helfen, mehr Menschen zu erreichen.',
+  starCta: 'Auf GitHub einen Stern geben →',
+  aboutLink: 'Über das Projekt',
+  figuresLink: 'Alle Menschen',
+};
+
+const c = isDe ? de : en;
+---
+<div class="pub-content osp">
+  <header class="pub-theme-hero">
+    <div class="pub-theme-hero__eyebrow">{c.eyebrow}</div>
+    <h1 class="pub-theme-hero__name">{c.h1}</h1>
+    <p class="pub-theme-hero__question">{c.tagline}</p>
+  </header>
+
+  <section class="pub-section">
+    <p class="pub-section__text osp-lead">{c.lead}</p>
+    <div class="pub-volume osp-volume">
+      {c.volume.map((item, i) => (
+        <>
+          {i > 0 && <span class="pub-volume__sep">·</span>}
+          <span class="pub-volume__item">{item}</span>
+        </>
+      ))}
+    </div>
+  </section>
+
+  <section class="pub-section">
+    <h2 class="pub-section__title">{c.whatTitle}</h2>
+    {c.whatParas.map(p => <p class="pub-section__text">{p}</p>)}
+  </section>
+
+  <section class="pub-section">
+    <h2 class="pub-section__title">{c.compareTitle}</h2>
+    <p class="pub-section__text">{c.compareIntro}</p>
+    <div class="osp-compare__scroll">
+      <table class="osp-compare">
+        <thead>
+          <tr>
+            <th scope="col" class="osp-compare__corner"></th>
+            {c.compareCols.map((col, i) => (
+              <th scope="col" class={i === 0 ? 'osp-compare__us' : undefined}>{col}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {c.compareRows.map(row => (
+            <tr>
+              <th scope="row">{row.dim}</th>
+              {row.vals.map((v, i) => (
+                <td class={i === 0 ? 'osp-compare__us' : undefined}>{v}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="pub-section">
+    <h2 class="pub-section__title">{c.pillarsTitle}</h2>
+    <div class="osp-pillars">
+      {c.pillars.map(p => (
+        <div class="osp-pillar">
+          <h3 class="osp-pillar__label">{p.label}</h3>
+          <p class="osp-pillar__text">{p.text}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="pub-section">
+    <h2 class="pub-section__title">{c.figuresTitle}</h2>
+    <p class="pub-section__text">{c.figuresLead}</p>
+    <div class="pub-grid pub-grid--3">
+      {figures.map(figure => <FigureCard figure={figure} lang={lang} headingLevel="h3" />)}
+    </div>
+    <p class="pub-section__text">
+      <a class="pub-textlink" href={publicUrl(lang, '/figures')}>{c.figuresMore}</a>
+    </p>
+  </section>
+
+  <section class="pub-section osp-faq">
+    <h2 class="pub-section__title">{c.faqTitle}</h2>
+    <div class="osp-faq__list">
+      {faq.map(item => (
+        <details class="osp-faq__item">
+          <summary class="osp-faq__q">
+            <span class="osp-faq__q-text">{item.q}</span>
+            <span class="osp-faq__arrow" aria-hidden="true">▼</span>
+          </summary>
+          <div class="osp-faq__a"><p>{item.a}</p></div>
+        </details>
+      ))}
+    </div>
+  </section>
+
+  <section class="pub-section osp-cta">
+    <h2 class="pub-section__title">{c.ctaTitle}</h2>
+    <p class="pub-section__text">{c.ctaText}</p>
+    <a href={`/app?lang=${lang}`} class="pub-cta__button" data-agc-cta="start-exploring">{c.ctaButton}</a>
+    <a
+      class="osp-star"
+      href="https://github.com/chipmates/agoracosmica"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <span class="osp-star__icon" aria-hidden="true">⭐</span>
+      <span class="osp-star__text">{c.starText}</span>
+      <span class="osp-star__cta">{c.starCta}</span>
+    </a>
+    <p class="pub-section__text osp-links">
+      <a class="pub-textlink" href={publicUrl(lang, '/about')}>{c.aboutLink}</a>
+      {' · '}
+      <a class="pub-textlink" href={publicUrl(lang, '/figures')}>{c.figuresLink}</a>
+    </p>
+  </section>
+</div>
+
+<style>
+  /* Scoped page treatment, brand design tokens only; adds no global CSS
+     (architecture frozen at 89/100), same approach as the poems page. */
+  .osp {
+    max-width: 50rem;
+    margin: 0 auto;
+    padding: 2.5rem 1.25rem 3.5rem;
+  }
+  .osp-lead {
+    font-size: 1.12rem;
+    line-height: 1.7;
+    color: var(--text-primary);
+  }
+  .osp-volume {
+    margin-top: 1.75rem;
+  }
+
+  /* Comparison table: a fair, scannable grid. Our column is highlighted. */
+  .osp-compare__scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-top: 1.5rem;
+  }
+  .osp-compare {
+    width: 100%;
+    min-width: 640px;
+    border-collapse: collapse;
+    font-size: var(--text-sm, 0.9rem);
+  }
+  .osp-compare th,
+  .osp-compare td {
+    text-align: left;
+    vertical-align: top;
+    padding: 0.7rem 0.85rem;
+    border-bottom: 1px solid color-mix(in srgb, var(--gold-subtle) 18%, transparent);
+    line-height: 1.45;
+    color: var(--text-secondary);
+  }
+  .osp-compare thead th {
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+    color: var(--text-primary);
+    border-bottom: 1px solid color-mix(in srgb, var(--gold-subtle) 35%, transparent);
+  }
+  .osp-compare tbody th[scope='row'] {
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+  }
+  .osp-compare__us {
+    background: color-mix(in srgb, var(--gold-subtle) 12%, transparent);
+    color: var(--text-primary);
+  }
+  .osp-compare thead th.osp-compare__us {
+    color: var(--gold-primary);
+  }
+
+  /* Three honest pillars (mirrors the homepage trust band, standalone styles) */
+  .osp-pillars {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-top: 1.25rem;
+  }
+  .osp-pillar {
+    padding: 1.25rem 1.3rem;
+    border-radius: var(--radius-lg, 0.75rem);
+    border: 1px solid color-mix(in srgb, var(--gold-subtle) 25%, transparent);
+    background: color-mix(in srgb, var(--bg-deep-space-darker) 45%, transparent);
+  }
+  .osp-pillar__label {
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold-primary);
+    margin: 0 0 0.65rem;
+  }
+  .osp-pillar__text {
+    font-size: var(--text-sm, 0.9rem);
+    line-height: var(--leading-relaxed, 1.6);
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  /* FAQ: self-contained collapsibles (no dependency on homepage-scoped styles) */
+  .osp-faq__list {
+    margin-top: 0.5rem;
+  }
+  .osp-faq__item {
+    border-bottom: 1px solid color-mix(in srgb, var(--gold-subtle) 18%, transparent);
+  }
+  .osp-faq__q {
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: 44px;
+    padding: 0.9rem 0;
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: 1.05rem;
+    color: var(--text-primary);
+  }
+  .osp-faq__q::-webkit-details-marker {
+    display: none;
+  }
+  .osp-faq__arrow {
+    flex: 0 0 auto;
+    font-size: 0.7rem;
+    color: var(--gold-primary);
+    transition: transform 0.2s ease;
+  }
+  .osp-faq__item[open] > .osp-faq__q .osp-faq__arrow {
+    transform: rotate(180deg);
+  }
+  .osp-faq__a {
+    padding: 0 0 1rem;
+  }
+  .osp-faq__a p {
+    margin: 0;
+    font-size: var(--text-base, 1rem);
+    line-height: var(--leading-relaxed, 1.7);
+    color: var(--text-secondary);
+  }
+
+  /* CTA + star */
+  .osp-cta {
+    text-align: center;
+    border-top: 1px solid color-mix(in srgb, var(--gold-subtle) 22%, transparent);
+    padding-top: 2.25rem;
+  }
+  .osp-star {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem 0.85rem;
+    max-width: 640px;
+    margin: 1.75rem auto 0;
+    padding: 1.1rem 1.4rem;
+    border-radius: var(--radius-lg, 0.75rem);
+    border: 1px solid color-mix(in srgb, var(--gold-subtle) 28%, transparent);
+    background: color-mix(in srgb, var(--bg-deep-space-darker) 50%, transparent);
+    text-decoration: none;
+    transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+  }
+  .osp-star:hover,
+  .osp-star:focus-visible {
+    border-color: var(--gold-hover);
+    background: color-mix(in srgb, var(--bg-deep-space-darker) 70%, transparent);
+    transform: translateY(-2px);
+  }
+  .osp-star__icon {
+    font-size: 1.15rem;
+    line-height: 1;
+  }
+  .osp-star__text {
+    font-size: var(--text-base, 1rem);
+    line-height: var(--leading-relaxed, 1.6);
+    color: var(--text-secondary);
+  }
+  .osp-star__cta {
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-weight: 600;
+    white-space: nowrap;
+    color: var(--gold-primary);
+  }
+  .osp-star:hover .osp-star__cta,
+  .osp-star:focus-visible .osp-star__cta {
+    color: var(--gold-hover);
+  }
+  .osp-links {
+    margin-top: 1.6rem;
+  }
+
+  @media (min-width: 641px) and (max-width: 1024px) {
+    .osp-pillars {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 640px) {
+    .osp-pillars {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

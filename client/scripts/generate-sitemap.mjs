@@ -201,6 +201,15 @@ for (const slug of FIGURE_SLUGS) {
 // Emily Dickinson poems page (corpus/flagship; EN-only, no hreflang twin)
 urls.push(url('/figures/emily-dickinson/poems', '0.6', gitLastModified('marketing/src/pages/figures/emily-dickinson/poems.astro')));
 
+// Open-source philosophy app (product-category positioning; EN + DE twin)
+const CATEGORY_MOD = gitLastModified(
+  'marketing/src/pages/open-source-philosophy-app.astro',
+  'marketing/src/pages/de/open-source-philosophy-app.astro',
+  'marketing/src/components/CategoryPageContent.astro',
+);
+urls.push(url('/open-source-philosophy-app', '0.7', CATEGORY_MOD));
+urls.push(deUrl('/open-source-philosophy-app', '0.7', CATEGORY_MOD));
+
 // Theme detail pages
 for (const theme of THEME_IDS) {
   const mod = themeLastmod();
