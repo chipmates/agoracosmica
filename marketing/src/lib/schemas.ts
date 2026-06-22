@@ -84,7 +84,7 @@ export function organizationSchema(): Record<string, unknown> {
     logo: ORG_LOGO,
     sameAs: ['https://github.com/chipmates/agoracosmica'],
     description:
-      'A small German non-profit building Agora Cosmica, an open source wisdom platform with 30 historical figures.',
+      'A small German nonprofit building Agora Cosmica, an open source education platform with 30 historical figures.',
     slogan: 'A Living Library You Can Talk To',
     knowsAbout: ['philosophy', 'history', 'historical figures', 'wisdom traditions'],
     address: {
@@ -113,7 +113,7 @@ export function agoraCosmicaSchema(): Record<string, unknown> {
     url: SITE_URL,
     logo: ORG_LOGO,
     description:
-      'A nonprofit, open source wisdom platform and podcast. Listen to life stories, learn from teachings, and talk with 30 figures from history, in English and German.',
+      'A nonprofit, open source education platform and podcast. Listen to life stories, learn from teachings, and talk with 30 figures from history, in English and German.',
     slogan: 'A Living Library You Can Talk To',
     sameAs: [
       'https://github.com/chipmates/agoracosmica',
@@ -279,12 +279,14 @@ export function softwareApplicationSchema(): Record<string, unknown> {
     name: 'Agora Cosmica',
     url: `${SITE_URL}/app`,
     applicationCategory: 'EducationApplication',
+    applicationSubCategory: 'Philosophy',
     operatingSystem: 'Web Browser',
     browserRequirements: 'Requires JavaScript',
     description:
-      'An open source wisdom platform with 30 historical figures, fully bilingual in English and German.',
+      'An open source, nonprofit education app to talk with AI Echoes of 30 historical thinkers, grounded in their work. Bilingual English and German.',
     inLanguage: ['en', 'de'],
     license: 'https://www.gnu.org/licenses/agpl-3.0.html',
+    isAccessibleForFree: true,
     publisher: { '@id': AGORA_ID },
     offers: {
       '@type': 'Offer',
@@ -299,6 +301,9 @@ export function softwareApplicationSchema(): Record<string, unknown> {
       'Conversation in English and German',
       'Pre-produced council debates',
       'No tracking cookies, no profiling',
+      'Self-hostable and open source under AGPL-3.0',
+      'Bring your own open model (any OpenAI-compatible LLM, local or hosted)',
+      'Grounded in primary works with a public factcheck for every figure',
     ],
   };
 }
