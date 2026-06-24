@@ -330,6 +330,14 @@ function buildFiguresCatalog(tagsByFigure) {
     for (const id of FIGURE_IDS) {
       const figTrans = readJson(join(FIGURES_DIR, lang, `${id}.json`));
       const voice = readJson(join(VOICE_DIR, `${id}.json`));
+      // Essence is authored per language (voice_profiles/<lang>/<id>.json). Read
+      // the lang-specific voice so German figure pages render their German
+      // essence too; no EN fallback for DE, so English essence never leaks onto
+      // a German page. (DE essence used to be hardcoded empty below, which
+      // silently dropped the German essence from every German figure page.)
+      const langVoice = lang === 'en'
+        ? voice
+        : readJson(join(CLIENT_DIR, 'src/assets/voice_profiles', lang, `${id}.json`));
       const seedData = readJson(join(SEEDS_DIR, 'en', `${id}-seeds.json`));
 
       const voiceExcerpt = voice ? {
@@ -345,7 +353,8 @@ function buildFiguresCatalog(tagsByFigure) {
 
       const name = figTrans?.name?.replace(/^Echo of /, '').replace(/^Echo von /, '') || voice?.name || id;
 
-      // For German, pull keyConcepts from DE seeds (voice profiles are English only)
+      // For German, pull keyConcepts from the DE seeds (the DE voice profile's
+      // essence is read above, but its keyConcepts metadata stays English)
       const langSeedData = readJson(join(SEEDS_DIR, lang, `${id}-seeds.json`));
       const langKeyConcepts = lang === 'de' && langSeedData?.seeds
         ? langSeedData.seeds.slice(0, 3).map(s => ({
@@ -379,7 +388,7 @@ function buildFiguresCatalog(tagsByFigure) {
         period: lang === 'de'
           ? (voiceExcerpt?.period || '').replace(/\bAD\b/g, 'n. Chr.').replace(/\bBC\b/g, 'v. Chr.').replace(/\bBCE\b/g, 'v. Chr.').replace(/\bCE\b/g, 'n. Chr.')
           : voiceExcerpt?.period || seedData?.metadata?.historicalPeriod || '',
-        essence: lang === 'de' ? '' : (voiceExcerpt?.essence || ''),
+        essence: lang === 'en' ? (voiceExcerpt?.essence || '') : (langVoice?.essence || ''),
         keyConcepts: langKeyConcepts,
         primaryWorks: lang === 'de' ? [] : (voiceExcerpt?.primaryWorks || []),
         topTags: tagsByFigure[lang]?.[id] || [],

@@ -41,7 +41,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
       seoTitle: "Jane Austen - Character, Society & Love | Agora Cosmica",
     },
     de: {
-      description: "Entdecke Jane Austens Philosophie über Charakter, soziale Beobachtung und moralische Klarheit. 12 Kapitel Lebensgeschichte, Lehren zu Urteilskraft und Integrität.",
+      description: "Jane Austens Romane über Charakter, scharfe Gesellschaftsbeobachtung und moralische Klarheit. Erzählte Lebensgeschichte, Lehren zu Urteilskraft und Liebe.",
       teachingsHeading: "Jane Austen über Charakter, Liebe und Gesellschaft",
       seoTitle: "Jane Austen - Charakter, Gesellschaft & Liebe",
     },
@@ -173,7 +173,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
       seoTitle: "Johann Wolfgang von Goethe - Faust & Classicism",
     },
     de: {
-      description: "Entdecke Goethes Philosophie der Natur, Kreativität und menschlichen Entwicklung. 12 Kapitel Lebensgeschichte, Lehren zu Bildung, Faust und der Einheit von Kunst und Wissenschaft.",
+      description: "Goethes Philosophie der Natur, Kreativität und Entwicklung. Erzählte Lebensgeschichte, Lehren zu Bildung, Faust und der Einheit von Kunst und Wissenschaft.",
       teachingsHeading: "Goethe über Natur, Kreativität und Bildung",
       seoTitle: "Johann Wolfgang von Goethe - Faust & Klassik",
     },
@@ -197,7 +197,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
       seoTitle: "Carl Gustav Jung - Shadow & Archetypes | Agora Cosmica",
     },
     de: {
-      description: "Entdecke C.G. Jungs Tiefenpsychologie. Schattenarbeit, Individuation, Archetypen und das kollektive Unbewusste. 12 Kapitel Lebensgeschichte und geführte Gespräche.",
+      description: "C.G. Jungs Tiefenpsychologie: Schattenarbeit, Individuation, Archetypen und kollektives Unbewusstes. Erzählte Lebensgeschichte mit geführten Gesprächen.",
       teachingsHeading: "Jung über Schatten, Individuation und das Unbewusste",
       seoTitle: "Carl Gustav Jung - Schatten & Archetypen | Agora Cosmica",
     },
@@ -209,7 +209,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
       seoTitle: "Frida Kahlo - Self-Portraits & Identity | Agora Cosmica",
     },
     de: {
-      description: "Entdecke Frida Kahlos Philosophie von Schmerz, Identität und kreativer Verwandlung. 12 Kapitel Lebensgeschichte, Lehren zu Selbstbeobachtung und kulturellen Wurzeln.",
+      description: "Frida Kahlos Malerei über Schmerz, Identität und kreative Verwandlung. Eine erzählte Lebensgeschichte, Lehren zu verkörperter Wahrheit und Wurzeln.",
       teachingsHeading: "Frida Kahlo über Kunst, Schmerz und Identität",
       seoTitle: "Frida Kahlo - Selbstporträts & Identität | Agora Cosmica",
     },
@@ -221,7 +221,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
       seoTitle: "Martin Luther King Jr. - Civil Rights & Nonviolence",
     },
     de: {
-      description: "Entdecke Martin Luther King Jr.s Philosophie des gewaltlosen Widerstands und der geliebten Gemeinschaft. 12 Kapitel Lebensgeschichte, Lehren zu Gerechtigkeit und Hoffnung.",
+      description: "Martin Luther King Jr. über gewaltlosen Widerstand und geliebte Gemeinschaft. Eine erzählte Lebensgeschichte, Lehren zu Gerechtigkeit, Hoffnung und Mut.",
       teachingsHeading: "Martin Luther King Jr. über Gerechtigkeit und Gemeinschaft",
       seoTitle: "Martin Luther King Jr. - Bürgerrechte & Gewaltlosigkeit",
     },
@@ -245,7 +245,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
       seoTitle: "Ada Lovelace - World's First Programmer | Agora Cosmica",
     },
     de: {
-      description: "Entdecke Ada Lovelaces Vision von Computing, Imagination und der Poesie der Wissenschaft. 12 Kapitel Lebensgeschichte, Lehren zu analytischem und kreativem Denken.",
+      description: "Ada Lovelace über Computing, Imagination und die Poesie der Wissenschaft. Eine erzählte Lebensgeschichte, Lehren zu analytischem und kreativem Denken.",
       teachingsHeading: "Ada Lovelace über Computing, Imagination und Wissenschaft",
       seoTitle: "Ada Lovelace - Erste Programmiererin | Agora Cosmica",
     },
@@ -257,7 +257,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
       seoTitle: "Nelson Mandela - Ubuntu & Reconciliation | Agora Cosmica",
     },
     de: {
-      description: "Entdecke Nelson Mandelas Philosophie der Versöhnung, Ubuntu und des langen Wegs zur Freiheit. 12 Kapitel Lebensgeschichte, Lehren zu Vergebung und moralischer Führung.",
+      description: "Nelson Mandela über Versöhnung, Ubuntu und den langen Weg zur Freiheit. Eine erzählte Lebensgeschichte, Lehren zu Vergebung und moralischer Führung.",
       teachingsHeading: "Nelson Mandela über Freiheit, Ubuntu und Versöhnung",
       seoTitle: "Nelson Mandela - Ubuntu & Versöhnung | Agora Cosmica",
     },
@@ -269,7 +269,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
       seoTitle: "Wolfgang Amadeus Mozart - Music & Composition",
     },
     de: {
-      description: "Entdecke Mozarts kreatives Genie und seine Philosophie der Musik als emotionale Wahrheit. 12 Kapitel Lebensgeschichte, Lehren zu Komposition und künstlerischer Freiheit.",
+      description: "Mozart über Musik als emotionale Wahrheit und spielerische Meisterschaft. Erzählte Lebensgeschichte, Lehren zu Komposition und künstlerischer Freiheit.",
       teachingsHeading: "Mozart über Musik, Kreativität und künstlerische Freiheit",
       seoTitle: "Wolfgang Amadeus Mozart - Musik & Komposition",
     },
@@ -281,7 +281,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
       seoTitle: "Friedrich Nietzsche - Zarathustra & Self-Overcoming",
     },
     de: {
-      description: "Entdecke Nietzsches Philosophie der Selbstüberwindung, ewigen Wiederkehr und Lebensbejahung. 12 Kapitel Lebensgeschichte, Lehren zum Willen zur Macht und zum Schaffen eigener Werte.",
+      description: "Nietzsche über Selbstüberwindung, ewige Wiederkehr und Lebensbejahung. Eine erzählte Lebensgeschichte, Lehren zum Willen zur Macht und zu eigenen Werten.",
       teachingsHeading: "Nietzsche über Selbstüberwindung und Lebensbejahung",
       seoTitle: "Friedrich Nietzsche - Zarathustra & Selbstüberwindung",
     },
@@ -293,7 +293,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
       seoTitle: "Plato - The Cave, Forms & Justice | Agora Cosmica",
     },
     de: {
-      description: "Entdecke Platons Philosophie der Ideen, Gerechtigkeit und des geprüften Lebens. 12 Kapitel Lebensgeschichte, Lehren zum Höhlengleichnis, zur sokratischen Methode und zum Guten.",
+      description: "Platons Philosophie der Ideen, Gerechtigkeit und des geprüften Lebens. Eine erzählte Lebensgeschichte, Lehren zum Höhlengleichnis und zur Sokratik.",
       teachingsHeading: "Platon über Wahrheit, Gerechtigkeit und das geprüfte Leben",
       seoTitle: "Platon - Höhlengleichnis & Ideenlehre | Agora Cosmica",
     },
@@ -305,7 +305,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
       seoTitle: "Rumi - Sufi Poetry & Divine Love | Agora Cosmica",
     },
     de: {
-      description: "Erlebe Rumis Sufi-Poesie und Philosophie der göttlichen Liebe. 12 Kapitel Lebensgeschichte, Lehren über das Herz, mystische Vereinigung, heiliges Hören und innere Verwandlung.",
+      description: "Rumis Sufi-Poesie und Philosophie der göttlichen Liebe. Eine erzählte Lebensgeschichte, Lehren über das Herz, mystische Vereinigung und innere Verwandlung.",
       teachingsHeading: "Rumi über Liebe, das Herz und das Göttliche",
       seoTitle: "Rumi - Sufi-Dichtung & Göttliche Liebe | Agora Cosmica",
     },
@@ -317,7 +317,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
       seoTitle: "Arthur Schopenhauer - Will & Pessimism | Agora Cosmica",
     },
     de: {
-      description: "Entdecke Schopenhauers Philosophie des Willens, des Leidens und der ästhetischen Kontemplation. 12 Kapitel Lebensgeschichte, Lehren zu Mitgefühl und dem Kreislauf des Begehrens.",
+      description: "Schopenhauer über den Willen, das Leiden und die ästhetische Kontemplation. Eine erzählte Lebensgeschichte, Lehren zu Mitgefühl, Musik und Begehren.",
       teachingsHeading: "Schopenhauer über Wille, Leiden und Kontemplation",
       seoTitle: "Arthur Schopenhauer - Wille & Pessimismus | Agora Cosmica",
     },
@@ -329,7 +329,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
       seoTitle: "William Shakespeare - Plays, Sonnets, Human Nature",
     },
     de: {
-      description: "Entdecke Shakespeares Philosophie der menschlichen Natur durch Drama. 12 Kapitel Lebensgeschichte, Lehren über Ambition, Liebe, Eifersucht, Gnade und das Theater des Selbst.",
+      description: "Shakespeares Sicht auf die menschliche Natur im Drama. Erzählte Lebensgeschichte, Lehren zu Ambition, Liebe, Eifersucht, Gnade und dem Theater des Selbst.",
       teachingsHeading: "Shakespeare über die menschliche Natur und das Drama des Lebens",
       seoTitle: "William Shakespeare - Dramen, Sonette, Menschennatur",
     },
@@ -341,7 +341,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
       seoTitle: "Harriet Tubman - Underground Railroad & Freedom",
     },
     de: {
-      description: "Entdecke Harriet Tubmans Philosophie der inneren Freiheit, des Glaubens unter Druck und der Befreiung anderer. 12 Kapitel Lebensgeschichte, Lehren zu Mut und moralischem Handeln.",
+      description: "Harriet Tubman über innere Freiheit, Glauben unter Druck und die Befreiung anderer. Eine erzählte Lebensgeschichte, Lehren zu Mut und moralischem Handeln.",
       teachingsHeading: "Harriet Tubman über Freiheit, Glaube und moralischen Mut",
       seoTitle: "Harriet Tubman - Underground Railroad & Freiheit",
     },
@@ -353,7 +353,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
       seoTitle: "Leonardo da Vinci - Renaissance Curiosity | Agora Cosmica",
     },
     de: {
-      description: "Entdecke Leonardo da Vincis Philosophie der Neugier, Beobachtung und Einheit von Kunst und Wissenschaft. 12 Kapitel Lebensgeschichte, Lehren zu Sehen, Denken und Meisterschaft.",
+      description: "Leonardo da Vinci über Neugier, Beobachtung und die Einheit von Kunst und Wissenschaft. Eine erzählte Lebensgeschichte, Lehren zu Sehen und Meisterschaft.",
       teachingsHeading: "Leonardo da Vinci über Neugier, Kunst und Wissenschaft",
       seoTitle: "Leonardo da Vinci - Renaissance & Neugier | Agora Cosmica",
     },
@@ -365,7 +365,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
       seoTitle: "Virginia Woolf - Modernism & Consciousness | Agora Cosmica",
     },
     de: {
-      description: "Entdecke Virginia Woolfs Philosophie des Bewusstseins, der Zeit und eines eigenen Zimmers. 12 Kapitel Lebensgeschichte, Lehren zu Wahrnehmung, Feminismus und dem Leuchten des Seins.",
+      description: "Virginia Woolf über Bewusstsein, Zeit und ein eigenes Zimmer. Eine erzählte Lebensgeschichte, Lehren zu Wahrnehmung, Feminismus und dem Leuchten des Seins.",
       teachingsHeading: "Virginia Woolf über Bewusstsein, Zeit und Selbst",
       seoTitle: "Virginia Woolf - Moderne & Bewusstsein | Agora Cosmica",
     },
