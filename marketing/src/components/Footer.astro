@@ -32,6 +32,7 @@ const applePodcastUrl = lang === 'de'
         <a href={publicUrl(lang, '/themes')}>{t('nav.themes')}</a>
         <a href={publicUrl(lang, '/about')}>{t('nav.about')}</a>
         <a href={publicUrl(lang, '/echoes')}>{t('nav.whyEchoes')}</a>
+        <a href={lang === 'de' ? '/de/methodik/' : '/methodology/'}>{lang === 'de' ? 'Methodik' : 'Methodology'}</a>
         <a href={publicUrl(lang, '/open-source-philosophy-app')}>{lang === 'de' ? 'Open-Source-App' : 'Open source app'}</a>
         <a href={publicUrl(lang, '/contact')}>{t('nav.contact')}</a>
       </div>

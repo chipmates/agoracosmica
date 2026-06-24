@@ -7,10 +7,12 @@ import Breadcrumbs from './Breadcrumbs.astro';
 import FigureHero from './FigureHero.astro';
 import EchoNote from './EchoNote.astro';
 import JourneyOverview from './JourneyOverview.astro';
+import FigureQA from './FigureQA.astro';
 import CollapsibleSection from './CollapsibleSection.astro';
 import CouncilPreview from './CouncilPreview.astro';
 import StaticImage from './StaticImage.astro';
 import PublicCTA from './PublicCTA.astro';
+import SourcesBlock from './SourcesBlock.astro';
 
 import { getT } from '../i18n';
 import type { Lang } from '../i18n';
@@ -45,17 +47,44 @@ const relatedCouncils = councilCatalog.filter(c =>
   c.participants.some(p => p.id === figureId),
 );
 
-// Related figures drawn from seed connections.
-const connectionSet = new Set<string>();
+// Related figures drawn from seed connections, ranked by how often this figure
+// references them across seeds (a stronger relevance signal than first-seen
+// order), then the top 8. Internal linking is the one lever a zero-authority
+// domain fully owns, so pass PageRank to as many real connections as fit.
+const connectionCounts = new Map<string, number>();
 for (const seed of seeds) {
   for (const conn of seed.connections ?? []) {
     if (conn.figure !== figureId && figureIdToSlug[conn.figure]) {
-      connectionSet.add(conn.figure);
+      connectionCounts.set(conn.figure, (connectionCounts.get(conn.figure) ?? 0) + 1);
     }
   }
 }
-const relatedFigureIds = [...connectionSet].slice(0, 4);
+const relatedFigureIds = [...connectionCounts.entries()]
+  .sort((a, b) => b[1] - a[1])
+  .map(([id]) => id)
+  .slice(0, 8);
 const themesForFigure = figureThemes[figureId] ?? [];
+
+// Figures whose Ideas list opens by default: the demand figures, where the
+// extra crawlable, above-the-fold body text matters most for AI extraction.
+const OPEN_IDEAS = new Set(['campbell', 'dickinson', 'jung', 'gautama', 'aurelius']);
+
+// Governing-hub up-link (the "up" half of the hub<->figure symbiosis): the 13
+// philosophy-cluster figures point to the philosophy hub, every other figure to
+// the wisdom hub. The DE hubs use localized slugs (philosophie-lernen, not a
+// /de/ prefix of the EN slug), so the href is built literally per language.
+const PHILO_FIGURES = new Set([
+  'laozi', 'aurelius', 'plato', 'nietzsche', 'schopenhauer', 'beauvoir',
+  'gautama', 'zenji', 'eckhart', 'bingen', 'rumi', 'jung', 'campbell',
+]);
+const isPhiloFigure = PHILO_FIGURES.has(figureId);
+const hubHref = lang === 'de'
+  ? (isPhiloFigure ? '/de/philosophie-lernen/' : '/de/von-historischen-persoenlichkeiten-lernen/')
+  : (isPhiloFigure ? '/ai-philosophy-tutor/' : '/learn-from-historical-figures/');
+const hubLinkLabel = isPhiloFigure
+  ? (lang === 'de' ? 'Philosophie lernen mit einem KI-Tutor' : 'Learn philosophy with an AI tutor')
+  : (lang === 'de' ? 'Von historischen Persönlichkeiten lernen' : 'Learn from historical figures');
+const hubLinkLead = lang === 'de' ? 'Weiter erkunden: ' : 'Keep exploring: ';
 
 // Dickinson-only interpretive capsule: "what are her poems about" (the winnable
 // query) as a visible, snippet-eligible answer that funnels into her poems page.
@@ -85,9 +114,21 @@ function cleanDisplayText(s: string): string {
 
   <FigureHero figure={figure} lang={lang} />
 
+  {figure.essence && (
+    <p class="pub-section__text pub-fig-essence">{cleanDisplayText(figure.essence)}</p>
+  )}
+
   <EchoNote variant="figure" name={figure.name} lang={lang} />
 
+  <p class="pub-section__text pub-figure__methodlink">
+    <a class="pub-textlink" href={lang === 'de' ? '/de/methodik/' : '/methodology/'}>
+      {lang === 'de' ? 'Wie wir diese Echos bauen und prüfen' : 'How we build and fact-check these Echoes'}
+    </a>
+  </p>
+
   <JourneyOverview figureName={figure.name} lang={lang} />
+
+  <FigureQA figureId={figureId} lang={lang} />
 
   <!-- Desktop-only inline CTA. The sticky bar below is mobile-only
        (display:none on desktop), so without this a desktop visitor on a figure
@@ -120,10 +161,29 @@ function cleanDisplayText(s: string): string {
   )}
 
   {seeds.length > 0 && (
-    <CollapsibleSection title={t('figures.ideasHeading')}>
+    <CollapsibleSection
+      title={t('figures.ideasHeading')}
+      count={seeds.length}
+      defaultOpen={OPEN_IDEAS.has(figureId)}
+    >
       <ol class="pub-ideas">
         {seeds.map(seed => (
-          <li class="pub-ideas__item">{seed.title}</li>
+          <li class="pub-ideas__item">
+            <span class="pub-ideas__title">{seed.title}</span>
+            {seed.summary && (
+              <span class="pub-ideas__summary">{cleanDisplayText(seed.summary)}</span>
+            )}
+            {seed.coreInsights && seed.coreInsights.length > 0 && (
+              <details class="pub-ideas__insights">
+                <summary>{lang === 'de' ? 'Kerngedanken' : 'Core ideas'}</summary>
+                <ul>
+                  {seed.coreInsights.map(ci => (
+                    <li>{cleanDisplayText(ci)}</li>
+                  ))}
+                </ul>
+              </details>
+            )}
+          </li>
         ))}
       </ol>
     </CollapsibleSection>
@@ -179,6 +239,10 @@ function cleanDisplayText(s: string): string {
     </CollapsibleSection>
   )}
 
+  <p class="pub-section__text pub-figure__hublink">
+    {hubLinkLead}<a class="pub-textlink" href={hubHref}>{hubLinkLabel}</a>
+  </p>
+
   {relatedFigureIds.length > 0 && (
     <CollapsibleSection
       title={t('figures.relatedFigures')}
@@ -214,6 +278,8 @@ function cleanDisplayText(s: string): string {
     </CollapsibleSection>
   )}
 
+  <SourcesBlock figureId={figureId} lang={lang} />
+
   <PublicCTA
     variant="sticky"
     figureId={figureId}
@@ -238,6 +304,47 @@ function cleanDisplayText(s: string): string {
     font-size: 1.1rem;
     color: var(--gold-primary);
     margin: 0 0 0.4rem;
+  }
+  /* A2: the figure's essence as a visible lead paragraph below the hero. The
+     only prominent, uncollapsed, on-topic body text on the page, which is what
+     a "tell me about X" visitor came for and what AI engines extract. Double-
+     scoped so it beats the base .pub-section__text spacing regardless of order. */
+  .pub-figure .pub-fig-essence {
+    margin: 0 0 1.75rem;
+    font-size: 1.1rem;
+    line-height: 1.75;
+  }
+  /* A1: each Idea is now title + a one-line summary gloss, with optional core
+     ideas in a nested native <details>. Turns 12 bare titles into real,
+     crawlable context, zero new prose (all from existing seed data). */
+  .pub-ideas__title {
+    font-weight: 600;
+  }
+  .pub-ideas__summary {
+    display: block;
+    margin-top: 0.2rem;
+    font-size: 0.95rem;
+    line-height: 1.55;
+    opacity: 0.85;
+  }
+  .pub-ideas__insights {
+    margin-top: 0.4rem;
+    font-size: 0.92rem;
+  }
+  .pub-ideas__insights > summary {
+    cursor: pointer;
+    color: var(--gold-primary);
+  }
+  .pub-ideas__insights ul {
+    margin: 0.4rem 0 0;
+    padding-left: 1.1rem;
+  }
+  .pub-figure__hublink {
+    margin: 0.75rem 0 1.5rem;
+  }
+  .pub-figure__methodlink {
+    margin: 0.6rem 0 0;
+    font-size: 0.95rem;
   }
   /* The inline figure CTA above is desktop-only (hidden on mobile, where the
      sticky bar carries the deep-link). The journey-path section above it has a

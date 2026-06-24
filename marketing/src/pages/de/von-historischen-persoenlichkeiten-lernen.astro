@@ -1,0 +1,74 @@
+---
+// Der breiteste LERN-Hub (DE). Deutsches Pendant zu
+// /learn-from-historical-figures und der eigentliche Eltern-Hub der 8
+// Themenseiten: zeitlose Weisheit von 30 Persönlichkeiten der Geschichte
+// lernen. Die Route ist schlank: Sprache festlegen, Schemas bauen,
+// <Public><WisdomHubContent /></Public> rendern. Die FAQ wird einmal in der
+// Inhaltskomponente definiert und sowohl sichtbar gerendert als auch an
+// faqSchema() übergeben, damit JSON-LD und DOM nicht auseinanderlaufen.
+//
+// Hinweis zu hreflang: EN- und DE-Slug unterscheiden sich
+// (learn-from-historical-figures vs von-historischen-persoenlichkeiten-lernen).
+// BaseHead leitet beide Sprach-URLs aus EINEM Pfad ab, daher würde der
+// automatische hreflang-Block die falsche Gegen-URL erzeugen. Deshalb
+// noHreflang und ein voll qualifizierter canonicalPath je Sprache.
+import Public from '../../layouts/Public.astro';
+import WisdomHubContent from '../../components/WisdomHubContent.astro';
+import { getWisdomFaq, HUB_THEME_IDS } from '../../lib/wisdomHubData';
+import {
+  organizationSchema,
+  agoraCosmicaSchema,
+  softwareApplicationSchema,
+  faqSchema,
+  breadcrumbSchema,
+  itemListSchema,
+} from '../../lib/schemas';
+import { getT } from '../../i18n';
+import { canonicalUrl, publicUrl, SITE_URL } from '../../lib/urls';
+import { getFiguresCatalog } from '@client/data/public/figuresCatalog';
+import { figureIdToSlug } from '@client/data/public/slugMap';
+
+const lang = 'de' as const;
+const t = getT(lang);
+
+const figures = getFiguresCatalog(lang);
+const faq = getWisdomFaq(lang);
+
+const canonical = canonicalUrl(publicUrl(lang, '/von-historischen-persoenlichkeiten-lernen'));
+
+const themeListItems = HUB_THEME_IDS.map(id => ({
+  name: t(`themes.${id}.name`),
+  url: canonicalUrl(publicUrl(lang, `/themes/${id}`)),
+  description: t(`themes.${id}.tagline`),
+}));
+const figureListItems = figures.map(f => ({
+  name: f.name,
+  url: canonicalUrl(publicUrl(lang, `/figures/${figureIdToSlug[f.id] || f.id}`)),
+  description: f.learn.trim(),
+}));
+
+const schemas = [
+  organizationSchema(),
+  agoraCosmicaSchema(),
+  softwareApplicationSchema(),
+  faqSchema(faq, canonical),
+  breadcrumbSchema([
+    { name: t('breadcrumbs.home'), url: `${SITE_URL}/de/` },
+    { name: 'Von historischen Persönlichkeiten lernen', url: canonical },
+  ]),
+  itemListSchema([...themeListItems, ...figureListItems]),
+];
+---
+<Public
+  title="Weisheits-App"
+  fullTitle="Weisheit von 30 Persönlichkeiten der Geschichte lernen"
+  description="Eine gemeinnützige Plattform, um Weisheit zu lernen. Alte und zeitlose Weisheit von 30 historischen Persönlichkeiten, aus Philosophie, Wissenschaft, Kunst und Glaube. Keine Tracking-Cookies."
+  canonicalPath="/de/von-historischen-persoenlichkeiten-lernen"
+  lang={lang}
+  ogType="website"
+  schemas={schemas}
+  altEn="/learn-from-historical-figures"
+  altDe="/de/von-historischen-persoenlichkeiten-lernen"
+>
+  <WisdomHubContent lang={lang} faq={faq} figures={figures} />
+</Public>

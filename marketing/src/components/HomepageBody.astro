@@ -43,6 +43,19 @@ const { lang, figures, faq, heroCouncil } = Astro.props;
 const t = getT(lang);
 const isDe = lang === 'de';
 
+// "Ways in" row: one unobtrusive row of three text links into the two category
+// hubs and the open-source story. The two hubs use localized DE slugs (built
+// literally per language), the OSS page shares its slug so publicUrl is fine.
+const philoHubHref = isDe ? '/de/philosophie-lernen/' : '/ai-philosophy-tutor/';
+const wisdomHubHref = isDe
+  ? '/de/von-historischen-persoenlichkeiten-lernen/'
+  : '/learn-from-historical-figures/';
+const ossHref = publicUrl(lang, '/open-source-philosophy-app');
+const waysInLead = isDe ? 'Womit möchtest du beginnen:' : 'Ways in:';
+const waysInPhilo = isDe ? 'Philosophie lernen' : 'Learn philosophy';
+const waysInWisdom = isDe ? 'Weisheit aus der Geschichte lernen' : 'Learn wisdom from history';
+const waysInOss = isDe ? 'Die Open-Source-Geschichte' : 'The open-source story';
+
 // ── EN body card data ───────────────────────────────────────────────────
 // The repositioned, education-first homepage copy (the six mode cards and the
 // eight question tiles). Verbatim from the QA'd copy source. The mode bodies
@@ -497,6 +510,20 @@ const deQuestions = [
     </section>
   </>
 )}
+
+  <!-- Ways in: one unobtrusive row of text links into the two category hubs
+       and the open-source story. Sits at the end of the body, after all the
+       value, as quiet wayfinding into the topic landing pages. -->
+  <section class="pub-section">
+    <p class="pub-section__text">
+      {waysInLead}{' '}
+      <a class="pub-textlink" href={philoHubHref}>{waysInPhilo}</a>
+      {' · '}
+      <a class="pub-textlink" href={wisdomHubHref}>{waysInWisdom}</a>
+      {' · '}
+      <a class="pub-textlink" href={ossHref}>{waysInOss}</a>
+    </p>
+  </section>
 
   <!-- GitHub star ask. Sits after all the value (the open-source / nonprofit
        closing beat above), so "if you find this interesting" has something to

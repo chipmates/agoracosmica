@@ -32,6 +32,12 @@ interface Props {
   /** German legal pages (Impressum, Datenschutz, etc.) have no EN equivalent —
    *  use a bare canonical (no /de/ prefix) and skip the hreflang block. */
   noHreflang?: boolean;
+  /** Cross-slug hreflang: when the EN and DE versions use DIFFERENT slugs (the
+   *  category hubs, eg /ai-philosophy-tutor vs /de/philosophie-lernen), pass
+   *  both lang-prefixed paths so the alternate links point at the real twins.
+   *  Both must be set together; otherwise alternates derive from canonicalPath. */
+  altEn?: string;
+  altDe?: string;
   /** Internal lab/preview pages: ask crawlers to stay out. */
   noindex?: boolean;
 }
@@ -53,13 +59,22 @@ const {
   includeRss = false,
   noHreflang = false,
   noindex = false,
+  altEn,
+  altDe,
 } = Astro.props;
 
 const computedFullTitle = fullTitle ?? `${title} | Agora Cosmica`;
-const canonical = noHreflang
-  ? canonicalUrl(canonicalPath)
-  : canonicalUrl(lang === 'de' ? `/de${canonicalPath}` : canonicalPath);
-const alts = alternateUrls(canonicalPath);
+// When the EN/DE versions use different slugs (the category hubs), altEn/altDe
+// carry the real per-language paths, so derive BOTH canonical and the alternates
+// from them and skip the same-slug /de-prefix logic entirely.
+const canonical = (altEn && altDe)
+  ? canonicalUrl(lang === 'de' ? altDe : altEn)
+  : noHreflang
+    ? canonicalUrl(canonicalPath)
+    : canonicalUrl(lang === 'de' ? `/de${canonicalPath}` : canonicalPath);
+const alts = (altEn && altDe)
+  ? { en: canonicalUrl(altEn), de: canonicalUrl(altDe) }
+  : alternateUrls(canonicalPath);
 const image = ogImage ?? `${MEDIA_URL}/images/ui/og-default/1200.webp`;
 const imageAlt = ogImageAlt ?? 'Agora Cosmica';
 const rss = includeRss ? podcastRssLink(lang) : null;
@@ -144,6 +159,11 @@ const metaDescription = clampDescription(description);
 <link rel="stylesheet" href="/fonts/fonts.css" />
 <link rel="prefetch" href="/app" as="document" />
 
-{schemas.map(s => (
-  <script type="application/ld+json" set:html={JSON.stringify(s)} />
-))}
+{schemas.length > 0 && (
+  <script type="application/ld+json" set:html={JSON.stringify({
+    '@context': 'https://schema.org',
+    '@graph': schemas.map(s =>
+      Object.fromEntries(Object.entries(s).filter(([k]) => k !== '@context'))
+    ),
+  })} />
+)}

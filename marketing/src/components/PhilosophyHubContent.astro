@@ -1,0 +1,496 @@
+---
+// Body for the philosophy-learning hub (/ai-philosophy-tutor, EN + the
+// /de/philosophie-lernen twin). A single answer-first page for someone who
+// wants to learn philosophy in conversation: narrated lives, core teachings,
+// and talking an idea through with a figure's AI Echo. The single <h1> is a
+// learning-promise (NOT the locked tagline). Head terms stay inside this
+// page's own cluster (philosophy app / philosophy learning platform / AI
+// philosophy tutor / learn philosophy online / chat with philosophers) so it
+// does not cannibalize the open-source positioning page.
+//
+// Honesty: we curate 13 philosophers and wisdom-tradition thinkers from the
+// 30, framed honestly (mystics, depth psychology, and comparative myth are
+// wisdom traditions, never miscalled analytic philosophers). No hard "15
+// philosophers" count. Every figure fact comes from figuresCatalog. Trust
+// signals stay locked: "30 free messages a day" (never bare "Free"), "no
+// tracking cookies, no profiling" (never "no tracking" / "Private"). Each
+// figure is openly an AI Echo, an educational interpretation, never a
+// recording or the real person.
+//
+// The FAQ array is defined in the route and passed in, so the visible render
+// and faqSchema() can never drift. Styling reuses the shared pub-* classes
+// plus the osp-* scoped block (FAQ, pillars, CTA, star), with a small scoped
+// philo-* block for the traditions list and the app-deep-linked figure grid.
+// CSS architecture stays frozen at 89/100: brand tokens only, no new global
+// primitives.
+import StaticImage from './StaticImage.astro';
+import { publicUrl } from '../lib/urls';
+import { figureIdToSlug } from '@client/data/public/slugMap';
+import type { Lang } from '../i18n';
+import type { PublicFigure } from '@client/data/public/figuresCatalog';
+
+interface Props {
+  lang: Lang;
+  faq: { q: string; a: string }[];
+  figures: PublicFigure[];
+}
+
+const { lang, faq, figures } = Astro.props;
+const isDe = lang === 'de';
+
+// The methodology page uses a localized DE slug (/de/methodik/, not a /de prefix
+// on the EN slug), so its href is a lang-aware literal, not publicUrl(...).
+const methodologyHref = isDe ? '/de/methodik/' : '/methodology/';
+const methodologyLabel = isDe ? 'Wie die Echos entstehen' : 'How the Echoes are built';
+
+const en = {
+  eyebrow: 'Learn philosophy online',
+  h1: "Learn philosophy with an AI tutor, in conversation with history's philosophers and the great wisdom traditions",
+  tagline: 'A nonprofit, open source philosophy app. 30 free messages a day, no signup.',
+  lead: [
+    "Yes, an AI can tutor you in philosophy, and this is a philosophy learning platform built for exactly that. Pick a thinker, listen to their narrated life, read their core teachings, then talk an idea through with their AI Echo until it actually clicks. You are not memorizing a syllabus. You are thinking with Marcus Aurelius about a bad morning, or asking Beauvoir what she meant by becoming a woman.",
+    "Every figure here is an AI Echo, an educational interpretation grounded in that person's real writing and ideas. It is clearly labeled as such, never a recording and never the real person. The point is to understand the philosophy, not to pretend the philosopher is back. That honesty is the whole design.",
+  ],
+  studyTitle: 'What you can study',
+  studyIntro:
+    'Thirteen thinkers across the traditions that shaped how people ask the big questions. Each one is a doorway into a way of thinking, not a single quote.',
+  traditions: [
+    { name: 'Stoicism', who: 'Marcus Aurelius', note: 'Separate what happened from the story your mind adds, and act on what is yours to control.' },
+    { name: 'Classical philosophy', who: 'Plato', note: 'The examined life, the Socratic question, and knowledge drawn out rather than poured in.' },
+    { name: 'Existentialism', who: 'Simone de Beauvoir and Friedrich Nietzsche', note: 'Freedom, how we are made by our situation, and building meaning once the old certainties are gone.' },
+    { name: 'Taoism', who: 'Laozi', note: 'Acting without forcing, and why what yields can outlast what forces.' },
+    { name: 'Zen and Buddhism', who: 'Dōgen Zenji and Siddhartha Gautama', note: 'Watching wanting rise and fade, the middle way, and practice that is the awakening, not a means to it.' },
+    { name: 'Christian mysticism', who: 'Meister Eckhart and Hildegard von Bingen', note: 'Detachment, the ground of the soul, and the living power Hildegard called viriditas.' },
+    { name: 'Sufi mysticism', who: 'Rumi', note: 'Love as a force that empties and remakes you, and longing as a guide.' },
+    { name: 'Depth psychology', who: 'Carl Gustav Jung', note: 'Meeting your own shadow, individuation, and the patterns the unconscious lives by.' },
+    { name: 'Comparative mythology', who: 'Joseph Campbell', note: 'The one shape beneath the world’s myths, and how to read your own turning points.' },
+    { name: 'The philosophy of will', who: 'Arthur Schopenhauer', note: 'Seeing through endless wanting, and the swing between the pain of desire and the boredom of having.' },
+  ],
+  figuresTitle: 'The thinkers you can learn from',
+  figuresLead:
+    'Open any one to start a conversation in the app. Each is an AI Echo, grounded in their own work, clearly labeled, never the real person.',
+  figuresMore: 'See all 30 figures',
+  howTitle: 'How the AI tutor works',
+  howIntro:
+    'Conversation is one of six ways to learn here, so most of what you study is crafted ahead of time and the chat is for thinking an idea through, not the whole course.',
+  modes: [
+    { label: 'Listen', text: 'A narrated, first-person life story for each figure, so the ideas land inside a real life and not as abstractions.' },
+    { label: 'Read', text: 'Twelve core teachings per figure, the working concepts of their philosophy explained in plain language with a vivid example.' },
+    { label: 'Talk', text: 'Ask the figure’s AI Echo your own question and follow it wherever it goes. This is the tutoring part, paced by you.' },
+    { label: 'Compare', text: 'Prism mode puts four voices on one question, so you hear a Stoic, a mystic, and a skeptic answer the same thing side by side.' },
+    { label: 'Debate', text: 'Pre-produced council debates where several figures argue a theme out, useful for seeing where traditions genuinely disagree.' },
+    { label: 'Switch', text: 'Everything works in English and German, so you can study a thinker in either language, or both.' },
+  ],
+  howClose:
+    'You get 30 free messages a day with no signup. Want more, bring your own OpenRouter key and it never touches our servers. The whole platform is open source under AGPL-3.0, and there are no tracking cookies and no profiling.',
+  faqTitle: 'Questions people ask',
+  ctaTitle: 'Start learning',
+  ctaText: 'Open the app and talk philosophy through with the Echo of any thinker. 30 free messages a day, no signup.',
+  ctaButton: 'Start exploring',
+  starText: 'If a free, open philosophy tutor is worth having, a star is the simplest way to help more people find it.',
+  starCta: 'Star on GitHub →',
+  crossTitle: 'Keep exploring',
+  crossText: 'There is more here than philosophy.',
+  // hrefs are the EN slugs, fed to publicUrl('en', ...). The wisdom hub keeps
+  // the same slug in EN; the OSS page and /figures are unlocalized too.
+  crossLinks: [
+    { href: '/learn-from-historical-figures', label: 'Learn from historical figures' },
+    { href: '/open-source-philosophy-app', label: 'Why it is open source and nonprofit' },
+    { href: '/figures', label: 'Browse all 30 figures' },
+  ],
+};
+
+const de = {
+  eyebrow: 'Philosophie online lernen',
+  h1: 'Philosophie lernen, im Gespräch mit den Denkern der Geschichte und den großen Weisheitstraditionen',
+  tagline: 'Eine gemeinnützige, quelloffene Philosophie-App. 30 kostenlose Nachrichten pro Tag, ohne Anmeldung.',
+  lead: [
+    'Ja, eine KI kann dir Philosophie beibringen, und genau dafür ist diese Lernplattform gebaut. Wähl einen Denker, hör seine erzählte Lebensgeschichte, lies seine Kernlehren und sprich dann einen Gedanken mit seinem KI-Echo durch, bis er wirklich sitzt. Du paukst keinen Lehrplan. Du denkst mit Marc Aurel über einen schlechten Morgen nach oder fragst Beauvoir, was sie damit meinte, dass man nicht als Frau geboren wird, sondern dazu gemacht wird.',
+    'Jede Persönlichkeit hier ist ein KI-Echo, eine pädagogische Deutung, verankert im echten Werk und Denken dieses Menschen. Das ist klar gekennzeichnet, nie eine Aufnahme und nie die echte Person. Es geht darum, die Philosophie zu verstehen, nicht darum, so zu tun, als wäre der Philosoph zurück. Diese Ehrlichkeit ist der ganze Ansatz.',
+  ],
+  studyTitle: 'Was du studieren kannst',
+  studyIntro:
+    'Dreizehn Denker aus den Traditionen, die geprägt haben, wie Menschen die großen Fragen stellen. Jeder ist eine Tür in eine Denkweise, kein einzelnes Zitat.',
+  traditions: [
+    { name: 'Stoizismus', who: 'Marc Aurel', note: 'Trenne, was geschehen ist, von der Geschichte, die dein Kopf hinzufügt, und handle bei dem, was in deiner Hand liegt.' },
+    { name: 'Klassische Philosophie', who: 'Platon', note: 'Das geprüfte Leben, die sokratische Frage, und Wissen, das herausgefragt statt eingefüllt wird.' },
+    { name: 'Existenzialismus', who: 'Simone de Beauvoir und Friedrich Nietzsche', note: 'Freiheit, wie uns unsere Lage formt, und Sinn bauen, wenn die alten Gewissheiten weg sind.' },
+    { name: 'Taoismus', who: 'Laozi', note: 'Handeln ohne zu erzwingen, und warum das Nachgebende länger besteht als das Erzwingende.' },
+    { name: 'Zen und Buddhismus', who: 'Dōgen Zenji und Siddhartha Gautama', note: 'Das Wollen aufsteigen und vergehen sehen, der mittlere Weg, und Übung, die das Erwachen ist, nicht ein Mittel dazu.' },
+    { name: 'Christliche Mystik', who: 'Meister Eckhart und Hildegard von Bingen', note: 'Gelassenheit, der Grund der Seele, und die lebendige Kraft, die Hildegard viriditas nannte.' },
+    { name: 'Sufi-Mystik', who: 'Rumi', note: 'Liebe als Kraft, die dich leert und neu macht, und Sehnsucht als Wegweiser.' },
+    { name: 'Tiefenpsychologie', who: 'Carl Gustav Jung', note: 'Dem eigenen Schatten begegnen, Individuation, und die Muster, nach denen das Unbewusste lebt.' },
+    { name: 'Vergleichende Mythologie', who: 'Joseph Campbell', note: 'Die eine Gestalt unter den Mythen der Welt, und wie man die eigenen Wendepunkte liest.' },
+    { name: 'Philosophie des Willens', who: 'Arthur Schopenhauer', note: 'Durch das endlose Wollen hindurchsehen, und das Pendeln zwischen dem Schmerz des Begehrens und der Langeweile des Habens.' },
+  ],
+  figuresTitle: 'Die Denker, von denen du lernen kannst',
+  figuresLead:
+    'Öffne einen davon, um in der App ein Gespräch zu beginnen. Jeder ist ein KI-Echo, verankert im eigenen Werk, klar gekennzeichnet, nie die echte Person.',
+  figuresMore: 'Alle 30 Menschen ansehen',
+  howTitle: 'Wie der KI-Tutor funktioniert',
+  howIntro:
+    'Das Gespräch ist einer von sechs Lernwegen, also ist das meiste im Voraus gestaltet, und der Chat dient dazu, einen Gedanken durchzudenken, nicht dem ganzen Kurs.',
+  modes: [
+    { label: 'Hören', text: 'Eine erzählte Lebensgeschichte in der Ich-Perspektive für jeden Menschen, damit die Ideen in einem echten Leben landen und nicht als Abstraktionen.' },
+    { label: 'Lesen', text: 'Zwölf Kernlehren pro Mensch, die tragenden Begriffe seiner Philosophie in klarer Sprache mit einem anschaulichen Beispiel erklärt.' },
+    { label: 'Sprechen', text: 'Stell dem KI-Echo deine eigene Frage und folge ihr, wohin sie führt. Das ist der Tutoring-Teil, von dir bestimmt.' },
+    { label: 'Vergleichen', text: 'Der Prisma-Modus stellt vier Stimmen auf eine Frage, sodass du einen Stoiker, einen Mystiker und einen Skeptiker dasselbe nebeneinander beantworten hörst.' },
+    { label: 'Debattieren', text: 'Vorproduzierte Council-Debatten, in denen mehrere Menschen ein Thema ausfechten, gut um zu sehen, wo Traditionen wirklich uneins sind.' },
+    { label: 'Wechseln', text: 'Alles funktioniert auf Deutsch und Englisch, du kannst einen Denker also in beiden Sprachen studieren.' },
+  ],
+  howClose:
+    'Du bekommst 30 kostenlose Nachrichten pro Tag, ohne Anmeldung. Wenn du mehr willst, bring deinen eigenen OpenRouter-Schlüssel mit, er berührt unsere Server nie. Die ganze Plattform ist quelloffen unter der AGPL-3.0, und es gibt keine Tracking-Cookies und kein Profiling.',
+  faqTitle: 'Fragen, die Menschen uns stellen',
+  ctaTitle: 'Fang an zu lernen',
+  ctaText: 'Öffne die App und denk Philosophie mit dem Echo eines Denkers durch. 30 kostenlose Nachrichten pro Tag, ohne Anmeldung.',
+  ctaButton: 'Loslegen',
+  starText: 'Wenn ein kostenloser, offener Philosophie-Tutor etwas wert ist, ist ein Stern der einfachste Weg, mehr Menschen zu helfen, ihn zu finden.',
+  starCta: 'Auf GitHub einen Stern geben →',
+  crossTitle: 'Weiter entdecken',
+  crossText: 'Hier gibt es mehr als Philosophie.',
+  // DE slugs. The wisdom hub has a localized slug
+  // (/de/von-historischen-persoenlichkeiten-lernen, NOT a /de prefix on the EN
+  // slug). The OSS page and /figures keep the same slug under the /de prefix,
+  // so publicUrl('de', ...) handles those correctly.
+  crossLinks: [
+    { href: '/von-historischen-persoenlichkeiten-lernen', label: 'Von historischen Persönlichkeiten lernen' },
+    { href: '/open-source-philosophy-app', label: 'Warum es quelloffen und gemeinnützig ist' },
+    { href: '/figures', label: 'Alle 30 Menschen ansehen' },
+  ],
+};
+
+const c = isDe ? de : en;
+
+// Figure cards deep-link into the app pre-set to that figure. The app honors
+// only ?figure= / ?council= / ?lang=, so we pass ?figure={slug}&lang={lang}.
+const cards = figures.map(f => ({
+  figure: f,
+  slug: figureIdToSlug[f.id] || f.id,
+}));
+---
+<div class="pub-content osp philo">
+  <header class="pub-theme-hero">
+    <div class="pub-theme-hero__eyebrow">{c.eyebrow}</div>
+    <h1 class="pub-theme-hero__name">{c.h1}</h1>
+    <p class="pub-theme-hero__question">{c.tagline}</p>
+  </header>
+
+  <section class="pub-section">
+    {c.lead.map(p => <p class="pub-section__text osp-lead">{p}</p>)}
+  </section>
+
+  <section class="pub-section">
+    <h2 class="pub-section__title">{c.studyTitle}</h2>
+    <p class="pub-section__text">{c.studyIntro}</p>
+    <ul class="philo-traditions">
+      {c.traditions.map(tr => (
+        <li class="philo-tradition">
+          <div class="philo-tradition__head">
+            <span class="philo-tradition__name">{tr.name}</span>
+            <span class="philo-tradition__who">{tr.who}</span>
+          </div>
+          <p class="philo-tradition__note">{tr.note}</p>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="pub-section">
+    <h2 class="pub-section__title">{c.figuresTitle}</h2>
+    <p class="pub-section__text">{c.figuresLead}</p>
+    <div class="pub-grid pub-grid--3">
+      {cards.map(({ figure, slug }) => (
+        <a href={`/app?figure=${slug}&lang=${lang}`} class="pub-figure-card" data-agc-cta="start-exploring">
+          <div class="pub-figure-card__image">
+            <StaticImage figureId={figure.id} type="thumbnail" alt="" loading="lazy" />
+          </div>
+          <div class="pub-figure-card__body">
+            <h3 class="pub-figure-card__name">{figure.name}</h3>
+            <p class="pub-figure-card__tradition">{figure.tradition}</p>
+            <p class="pub-figure-card__learn">{figure.learn.trim()}</p>
+          </div>
+        </a>
+      ))}
+    </div>
+    <p class="pub-section__text">
+      <a class="pub-textlink" href={publicUrl(lang, '/figures')}>{c.figuresMore}</a>
+    </p>
+  </section>
+
+  <section class="pub-section">
+    <h2 class="pub-section__title">{c.howTitle}</h2>
+    <p class="pub-section__text">{c.howIntro}</p>
+    <div class="osp-pillars philo-modes">
+      {c.modes.map(m => (
+        <div class="osp-pillar">
+          <h3 class="osp-pillar__label">{m.label}</h3>
+          <p class="osp-pillar__text">{m.text}</p>
+        </div>
+      ))}
+    </div>
+    <p class="pub-section__text">{c.howClose}</p>
+  </section>
+
+  <section class="pub-section osp-faq">
+    <h2 class="pub-section__title">{c.faqTitle}</h2>
+    <div class="osp-faq__list">
+      {faq.map(item => (
+        <details class="osp-faq__item">
+          <summary class="osp-faq__q">
+            <span class="osp-faq__q-text">{item.q}</span>
+            <span class="osp-faq__arrow" aria-hidden="true">▼</span>
+          </summary>
+          <div class="osp-faq__a"><p>{item.a}</p></div>
+        </details>
+      ))}
+    </div>
+  </section>
+
+  <section class="pub-section osp-cta">
+    <h2 class="pub-section__title">{c.ctaTitle}</h2>
+    <p class="pub-section__text">{c.ctaText}</p>
+    <a href={`/app?lang=${lang}`} class="pub-cta__button" data-agc-cta="start-exploring">{c.ctaButton}</a>
+    <a
+      class="osp-star"
+      href="https://github.com/chipmates/agoracosmica"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <span class="osp-star__icon" aria-hidden="true">⭐</span>
+      <span class="osp-star__text">{c.starText}</span>
+      <span class="osp-star__cta">{c.starCta}</span>
+    </a>
+    <div class="philo-cross">
+      <p class="philo-cross__title">{c.crossTitle} <span class="philo-cross__sub">{c.crossText}</span></p>
+      <p class="pub-section__text osp-links">
+        {c.crossLinks.map((link, i) => (
+          <>
+            {i > 0 && ' · '}
+            <a class="pub-textlink" href={publicUrl(lang, link.href)}>{link.label}</a>
+          </>
+        ))}
+        {' · '}
+        <a class="pub-textlink" href={methodologyHref}>{methodologyLabel}</a>
+      </p>
+    </div>
+  </section>
+</div>
+
+<style is:global>
+  /* The osp-* classes below are reused from CategoryPageContent.astro, whose
+     CSS is component-scoped and therefore does not reach this page. The rules
+     are copied here verbatim (brand design tokens only, CSS architecture frozen
+     at 89/100) and prefixed with .philo so they stay scoped to this hub and add
+     no truly global primitives. The osp-compare table and osp-volume are not
+     used on this page, so they are intentionally omitted. */
+  .philo.osp {
+    max-width: 50rem;
+    margin: 0 auto;
+    padding: 2.5rem 1.25rem 3.5rem;
+  }
+  .philo .osp-lead {
+    font-size: 1.12rem;
+    line-height: 1.7;
+    color: var(--text-primary);
+  }
+
+  /* Pillars. The column count is owned by .philo-modes (scoped block below),
+     which sets its own responsive 3/2/1 layout, so this base rule only carries
+     the card-grid container properties and leaves grid-template-columns to
+     .philo-modes to avoid a specificity clash. */
+  .philo .osp-pillars {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1.25rem;
+  }
+  .philo .osp-pillar {
+    padding: 1.25rem 1.3rem;
+    border-radius: var(--radius-lg, 0.75rem);
+    border: 1px solid color-mix(in srgb, var(--gold-subtle) 25%, transparent);
+    background: color-mix(in srgb, var(--bg-deep-space-darker) 45%, transparent);
+  }
+  .philo .osp-pillar__label {
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold-primary);
+    margin: 0 0 0.65rem;
+  }
+  .philo .osp-pillar__text {
+    font-size: var(--text-sm, 0.9rem);
+    line-height: var(--leading-relaxed, 1.6);
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  /* FAQ: self-contained collapsibles. */
+  .philo .osp-faq__list {
+    margin-top: 0.5rem;
+  }
+  .philo .osp-faq__item {
+    border-bottom: 1px solid color-mix(in srgb, var(--gold-subtle) 18%, transparent);
+  }
+  .philo .osp-faq__q {
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: 44px;
+    padding: 0.9rem 0;
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: 1.05rem;
+    color: var(--text-primary);
+  }
+  .philo .osp-faq__q::-webkit-details-marker {
+    display: none;
+  }
+  .philo .osp-faq__arrow {
+    flex: 0 0 auto;
+    font-size: 0.7rem;
+    color: var(--gold-primary);
+    transition: transform 0.2s ease;
+  }
+  .philo .osp-faq__item[open] > .osp-faq__q .osp-faq__arrow {
+    transform: rotate(180deg);
+  }
+  .philo .osp-faq__a {
+    padding: 0 0 1rem;
+  }
+  .philo .osp-faq__a p {
+    margin: 0;
+    font-size: var(--text-base, 1rem);
+    line-height: var(--leading-relaxed, 1.7);
+    color: var(--text-secondary);
+  }
+
+  /* CTA + star + cross-links. */
+  .philo .osp-cta {
+    text-align: center;
+    border-top: 1px solid color-mix(in srgb, var(--gold-subtle) 22%, transparent);
+    padding-top: 2.25rem;
+  }
+  .philo .osp-star {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem 0.85rem;
+    max-width: 640px;
+    margin: 1.75rem auto 0;
+    padding: 1.1rem 1.4rem;
+    border-radius: var(--radius-lg, 0.75rem);
+    border: 1px solid color-mix(in srgb, var(--gold-subtle) 28%, transparent);
+    background: color-mix(in srgb, var(--bg-deep-space-darker) 50%, transparent);
+    text-decoration: none;
+    transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+  }
+  .philo .osp-star:hover,
+  .philo .osp-star:focus-visible {
+    border-color: var(--gold-hover);
+    background: color-mix(in srgb, var(--bg-deep-space-darker) 70%, transparent);
+    transform: translateY(-2px);
+  }
+  .philo .osp-star__icon {
+    font-size: 1.15rem;
+    line-height: 1;
+  }
+  .philo .osp-star__text {
+    font-size: var(--text-base, 1rem);
+    line-height: var(--leading-relaxed, 1.6);
+    color: var(--text-secondary);
+  }
+  .philo .osp-star__cta {
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-weight: 600;
+    white-space: nowrap;
+    color: var(--gold-primary);
+  }
+  .philo .osp-star:hover .osp-star__cta,
+  .philo .osp-star:focus-visible .osp-star__cta {
+    color: var(--gold-hover);
+  }
+  .philo .osp-links {
+    margin-top: 1.6rem;
+  }
+</style>
+
+<style>
+  /* Scoped hub treatment, brand design tokens only; reuses the osp-* block
+     (lead, pillars, FAQ, CTA, star) and adds a small philo-* block for the
+     traditions list. No global CSS (architecture frozen at 89/100). */
+  .philo .osp-lead:not(:first-child) {
+    margin-top: 1.1rem;
+  }
+
+  /* "What you can study": a scannable tradition -> thinker list. */
+  .philo-traditions {
+    list-style: none;
+    margin: 1.5rem 0 0;
+    padding: 0;
+    display: grid;
+    gap: 0.9rem;
+  }
+  .philo-tradition {
+    padding: 1rem 1.2rem;
+    border-radius: var(--radius-lg, 0.75rem);
+    border: 1px solid color-mix(in srgb, var(--gold-subtle) 22%, transparent);
+    background: color-mix(in srgb, var(--bg-deep-space-darker) 40%, transparent);
+  }
+  .philo-tradition__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.35rem 0.75rem;
+    margin-bottom: 0.4rem;
+  }
+  .philo-tradition__name {
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-weight: 600;
+    color: var(--gold-primary);
+  }
+  .philo-tradition__who {
+    font-size: var(--text-sm, 0.9rem);
+    color: var(--text-secondary);
+  }
+  .philo-tradition__note {
+    margin: 0;
+    font-size: var(--text-base, 1rem);
+    line-height: var(--leading-relaxed, 1.6);
+    color: var(--text-secondary);
+  }
+
+  /* Six learning modes reuse the osp-pillars grid but allow more than three. */
+  .philo-modes {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  @media (min-width: 641px) and (max-width: 1024px) {
+    .philo-modes {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 640px) {
+    .philo-modes {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Cross-link block under the CTA. */
+  .philo-cross {
+    margin-top: 1.75rem;
+  }
+  .philo-cross__title {
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+  }
+  .philo-cross__sub {
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-weight: 400;
+    color: var(--text-secondary);
+  }
+</style>

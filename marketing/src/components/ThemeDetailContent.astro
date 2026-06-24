@@ -75,6 +75,16 @@ const voicesCaption =
 
 const relatedThemeIds = (RELATED_THEMES[themeId] ?? []).slice(0, 3);
 
+// Up-link to the wisdom hub (the "up" half of the hub<->theme symbiosis). The
+// DE hub uses a localized slug (von-historischen-persoenlichkeiten-lernen, not
+// a /de/ prefix of the EN slug), so the href is built literally per language.
+const wisdomHubHref =
+  lang === 'de' ? '/de/von-historischen-persoenlichkeiten-lernen/' : '/learn-from-historical-figures/';
+const wisdomHubLabel =
+  lang === 'de'
+    ? 'Von allen 30 Persönlichkeiten der Geschichte lernen'
+    : 'Learn from all 30 figures of history';
+
 function councilTypeLabel(type: 'confrontational' | 'reflective'): string {
   if (lang === 'de') {
     return type === 'confrontational' ? 'konfrontativ' : 'reflektiv';
@@ -121,6 +131,10 @@ function councilTypeLabel(type: 'confrontational' | 'reflective'): string {
         </section>
       </>
     )}
+
+    <p class="pub-section__text">
+      <a class="pub-textlink" href={wisdomHubHref}>{wisdomHubLabel}</a>
+    </p>
 
     {heroCouncil && <CouncilHero council={heroCouncil} lang={lang} headingLevel="h3" />}
 

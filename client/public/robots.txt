@@ -21,4 +21,10 @@ User-agent: Applebot-Extended
 User-agent: CCBot
 Allow: /
 
+# Answer-engine retrieval variants, explicitly welcome (AI citation is a channel)
+User-agent: Claude-SearchBot
+User-agent: Claude-User
+User-agent: Perplexity-User
+Allow: /
+
 Sitemap: https://agoracosmica.org/sitemap.xml

@@ -8,6 +8,7 @@
 // question and the design answer; the evidence opens on demand.
 import Breadcrumbs from './Breadcrumbs.astro';
 import CollapsibleSection from './CollapsibleSection.astro';
+import { publicUrl } from '../lib/urls';
 import type { Lang } from '../i18n';
 
 interface Props {
@@ -60,7 +61,7 @@ const isDe = lang === 'de';
         <p>
           Die Philosophie ist älter als Sokrates. Thales, Heraklit und Parmenides wirkten alle
           vor ihm, und was von ihrem Denken überdauert, sind Fragmente und Berichte, von
-          späteren Händen überliefert. Platon ist der erste Philosoph der westlichen Linie,
+          späteren Händen überliefert. <a class="pub-textlink" href={publicUrl(lang, '/figures/plato')}>Platon</a> ist der erste Philosoph der westlichen Linie,
           dessen Werke vollständig erhalten sind, und im Kern sind diese Werke erdachte
           Gespräche mit einem Toten. Sokrates hat nichts geschrieben. Der philosophische
           Sokrates, den wir erben, kommt überwiegend aus Platons Feder. Xenophons Sokrates
@@ -74,9 +75,9 @@ const isDe = lang === 'de';
           „einen Cato“ wählen, ein verstorbenes Vorbild, das man vor das innere Auge stellt und
           befragt. Und Epiktet kam immer wieder auf die Frage zurück, was Sokrates tun würde.
           Die Praxis reicht bis in unsere eigene Bibliothek. Platon, der das Gespräch mit seinem
-          toten Lehrer zur Form seines Lebenswerks machte, ist hier. Ebenso Marc Aurel, der
+          toten Lehrer zur Form seines Lebenswerks machte, ist hier. Ebenso <a class="pub-textlink" href={publicUrl(lang, '/figures/marcus-aurelius')}>Marc Aurel</a>, der
           dieselbe Regel in seine privaten Aufzeichnungen übernahm (Selbstbetrachtungen 11,26):
-          sich beständig einen der tugendhaften Toten in Erinnerung zu rufen. Und ebenso Jung,
+          sich beständig einen der tugendhaften Toten in Erinnerung zu rufen. Und ebenso <a class="pub-textlink" href={publicUrl(lang, '/figures/carl-gustav-jung')}>Jung</a>,
           der aus dem Dialog mit inneren Gestalten eine Methode machte, die er lehrte, und der
           selbst, im Roten Buch, Gespräche mit den Toten führte.
         </p>
@@ -222,7 +223,7 @@ const isDe = lang === 'de';
         <p>
           Philosophy is older than Socrates. Thales, Heraclitus, and Parmenides were all at
           work before him, and what survives of their thought is fragments and reports passed
-          down by later hands. Plato is the first philosopher in the Western line whose works
+          down by later hands. <a class="pub-textlink" href={publicUrl(lang, '/figures/plato')}>Plato</a> is the first philosopher in the Western line whose works
           survive complete, and at their heart are imagined conversations with a dead man.
           Socrates wrote nothing. The philosophical Socrates we inherit comes to us mostly
           through Plato's pen. Xenophon's Socrates differs from Plato's, and Aristophanes staged
@@ -234,9 +235,9 @@ const isDe = lang === 'de';
           Stoic version was to choose “a Cato”, a dead exemplar held before the mind and
           consulted. And Epictetus returned again and again to the question of what Socrates
           would do. The practice reaches into our own library. Plato, who made conversation with
-          his dead teacher the form of his life's work, is here. So is Marcus Aurelius, who
+          his dead teacher the form of his life's work, is here. So is <a class="pub-textlink" href={publicUrl(lang, '/figures/marcus-aurelius')}>Marcus Aurelius</a>, who
           copied the same precept into his private notebook (Meditations 11.26): keep one of the
-          virtuous dead continually in mind. So is Jung, who turned dialogue with inner figures
+          virtuous dead continually in mind. So is <a class="pub-textlink" href={publicUrl(lang, '/figures/carl-gustav-jung')}>Jung</a>, who turned dialogue with inner figures
           into a method he taught, and whose own practice of it, in the Red Book, included
           conversations with the dead.
         </p>

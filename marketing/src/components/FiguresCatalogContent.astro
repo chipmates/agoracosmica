@@ -56,6 +56,14 @@ const figures = [...getFiguresCatalog(lang)].sort((a, b) =>
   <div class="pub-grid pub-grid--3">
     {figures.map(figure => <FigureCard figure={figure} lang={lang} />)}
   </div>
+  <p class="pub-section__text">
+    <a
+      class="pub-textlink"
+      href={lang === 'de' ? '/de/von-historischen-persoenlichkeiten-lernen/' : '/learn-from-historical-figures/'}
+    >
+      {lang === 'de' ? 'Von diesen Persönlichkeiten lernen' : 'Learn from these figures'}
+    </a>
+  </p>
   <PublicCTA variant="inline" lang={lang} />
 </div>
 

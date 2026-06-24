@@ -1,0 +1,272 @@
+---
+// Body for the broadest LEARN hub (/learn-from-historical-figures, EN + the
+// /de/von-historischen-persoenlichkeiten-lernen twin). This is the true parent
+// of the 8 theme pages: an answer-first definition of what learning timeless
+// wisdom means here, the 8 themes as a card grid, all 30 figures each with
+// their real one-line teaching promise (copied verbatim from figuresCatalog,
+// which is pre-authored and fact-safe), an honest breadth note, an FAQ, and a
+// CTA. The single <h1> uses only this page's head-term cluster (wisdom app /
+// timeless wisdom / learn from historical figures), never another hub's terms.
+// Every figure is an AI Echo, an educational interpretation, never a recording
+// and never the real person. All copy stays inside the locked trust signals:
+// "30 free messages a day" (never bare "Free"), "no tracking cookies, no
+// profiling" (never "no tracking", never "Private"). Styling is a scoped block
+// under .whub using brand tokens only (CSS architecture frozen at 89/100);
+// shared pub-* classes and FigureCard carry the structure.
+import FigureCard from './FigureCard.astro';
+import { publicUrl } from '../lib/urls';
+import { getT } from '../i18n';
+import type { Lang } from '../i18n';
+import type { PublicFigure } from '@client/data/public/figuresCatalog';
+import { HUB_THEME_IDS } from '../lib/wisdomHubData';
+
+interface Props {
+  lang: Lang;
+  faq: { q: string; a: string }[];
+  figures: PublicFigure[];
+}
+
+const { lang, faq, figures } = Astro.props;
+const t = getT(lang);
+const isDe = lang === 'de';
+
+const themes = HUB_THEME_IDS.map(id => ({
+  id,
+  name: t(`themes.${id}.name`),
+  tagline: t(`themes.${id}.tagline`),
+  href: publicUrl(lang, `/themes/${id}`),
+}));
+
+// Cross-link slugs are localized per language. The philosophy hub lives at a
+// different DE slug than its EN slug, so publicUrl(lang, ...) cannot be fed a
+// single path. The OSS page, /figures, and /themes keep the same slug in both
+// languages (only the /de prefix changes), so publicUrl handles those.
+const philosophyHref = isDe
+  ? publicUrl('de', '/philosophie-lernen')
+  : publicUrl('en', '/ai-philosophy-tutor');
+
+// The methodology page uses a localized DE slug (/de/methodik/, not a /de prefix
+// on the EN slug), so its href is a lang-aware literal, not publicUrl(...).
+const methodologyHref = isDe ? '/de/methodik/' : '/methodology/';
+
+const en = {
+  eyebrow: 'A wisdom learning platform',
+  h1: 'Learn timeless wisdom from 30 figures of history',
+  tagline: 'Philosophy, science, art, activism, and faith, in one place to learn from.',
+  lead:
+    'Learning wisdom here means starting with what a person actually thought, then thinking it through for yourself. Agora Cosmica is a nonprofit wisdom learning platform built around 30 figures of history, from Laozi and Marcus Aurelius to Ada Lovelace and Frida Kahlo. Each one opens with a narrated life story and twelve core teachings (360 in all), grounded in their real work, across philosophy, science, art, activism, and faith. Every figure is an AI Echo, an educational interpretation of how that person thought, clearly labeled and never a recording or the real person.',
+  leadVolume: ['30 figures', '360 teachings', '2,500 years', 'East and West', 'English and German'],
+  themesTitle: 'Wisdom for life’s questions',
+  themesLead:
+    'The same questions return in every age. The 30 figures are grouped into eight themes, each with a question and the voices that answer it. Open a theme to explore it.',
+  figuresTitle: 'What each figure teaches you',
+  figuresLead:
+    'Thirty figures, each with one thing you can take from them. Open any name to explore their life, their ideas, and their teachings.',
+  figuresMore: 'Browse all 30 figures',
+  breadthTitle: 'Across 2,500 years, East and West',
+  breadthText:
+    'The cast reaches from Laozi in ancient China to thinkers of the twentieth century, and from Plato in Athens to Maya Angelou in America. Putting them in one library lets ideas speak across centuries and traditions. Each figure stays an AI Echo, grounded in primary works with a public factcheck that names what is verified and what was recreated for the story.',
+  faqTitle: 'Questions people ask',
+  crossTitle: 'Keep exploring',
+  crossText: 'There is more to dig into.',
+  crossPhilosophy: 'AI philosophy tutor',
+  crossFigures: 'All figures',
+  crossThemes: 'All themes',
+  crossOss: 'Open-source philosophy app',
+  crossMethod: 'How the Echoes are built',
+  ctaTitle: 'Start learning',
+  ctaText: 'Open the app and learn from any figure. 30 free messages a day, no signup.',
+  ctaButton: 'Start exploring',
+};
+
+const de = {
+  eyebrow: 'Eine Plattform, um Weisheit zu lernen',
+  h1: 'Zeitlose Weisheit von 30 Persönlichkeiten der Geschichte lernen',
+  tagline: 'Philosophie, Wissenschaft, Kunst, Aktivismus und Glaube, an einem Ort zum Lernen.',
+  lead:
+    'Weisheit zu lernen heißt hier: erst sehen, was ein Mensch wirklich gedacht hat, und dann selbst weiterdenken. Agora Cosmica ist eine gemeinnützige Weisheits-Lernplattform rund um 30 Persönlichkeiten der Geschichte, von Laozi und Marc Aurel bis Ada Lovelace und Frida Kahlo. Jeder Mensch beginnt mit einer erzählten Lebensgeschichte und zwölf Kernlehren (360 insgesamt), verankert in seinem echten Werk, aus Philosophie, Wissenschaft, Kunst, Aktivismus und Glaube. Jeder Mensch ist ein KI-Echo, eine Deutung davon, wie dieser Mensch gedacht hat, klar gekennzeichnet und nie eine Aufnahme oder die echte Person.',
+  leadVolume: ['30 Menschen', '360 Kernlehren', '2.500 Jahre', 'Ost und West', 'Deutsch und Englisch'],
+  themesTitle: 'Weisheit für die Fragen des Lebens',
+  themesLead:
+    'Dieselben Fragen kehren in jeder Zeit wieder. Die 30 Menschen sind in acht Themen geordnet, jedes mit einer Frage und den Stimmen, die sie beantworten. Öffne ein Thema und entdecke es.',
+  figuresTitle: 'Was dich jeder Mensch lehrt',
+  figuresLead:
+    'Dreißig Menschen, jeder mit einer Sache, die du mitnehmen kannst. Öffne einen Namen und entdecke dieses Leben, seine Ideen und seine Lehren.',
+  figuresMore: 'Alle 30 Menschen ansehen',
+  breadthTitle: 'Über 2.500 Jahre, aus Ost und West',
+  breadthText:
+    'Die Auswahl reicht von Laozi im alten China bis zu Denkern des zwanzigsten Jahrhunderts und von Platon in Athen bis zu Maya Angelou in Amerika. Sie in einer Bibliothek zu versammeln lässt Ideen über Jahrhunderte und Traditionen hinweg miteinander sprechen. Jeder Mensch bleibt ein KI-Echo, verankert in Primärwerken, mit einem öffentlichen Faktencheck, der benennt, was belegt und was für die Geschichte nachgebildet ist.',
+  faqTitle: 'Fragen, die Menschen uns stellen',
+  crossTitle: 'Weiter entdecken',
+  crossText: 'Es gibt mehr zu vertiefen.',
+  crossPhilosophy: 'KI-Philosophie-Tutor',
+  crossFigures: 'Alle Menschen',
+  crossThemes: 'Alle Themen',
+  crossOss: 'Open-Source-Philosophie-App',
+  crossMethod: 'Wie die Echos entstehen',
+  ctaTitle: 'Beginne zu lernen',
+  ctaText: 'Öffne die App und lerne von jedem Menschen. 30 kostenlose Nachrichten pro Tag, ohne Anmeldung.',
+  ctaButton: 'Loslegen',
+};
+
+const c = isDe ? de : en;
+---
+<div class="pub-content whub">
+  <header class="pub-theme-hero">
+    <div class="pub-theme-hero__eyebrow">{c.eyebrow}</div>
+    <h1 class="pub-theme-hero__name">{c.h1}</h1>
+    <p class="pub-theme-hero__question">{c.tagline}</p>
+  </header>
+
+  <section class="pub-section">
+    <p class="pub-section__text whub-lead">{c.lead}</p>
+    <div class="pub-volume whub-volume">
+      {c.leadVolume.map((item, i) => (
+        <>
+          {i > 0 && <span class="pub-volume__sep">·</span>}
+          <span class="pub-volume__item">{item}</span>
+        </>
+      ))}
+    </div>
+  </section>
+
+  <section class="pub-section">
+    <h2 class="pub-section__title">{c.themesTitle}</h2>
+    <p class="pub-section__text">{c.themesLead}</p>
+    <div class="pub-grid pub-grid--2 whub-themes">
+      {themes.map(theme => (
+        <a href={theme.href} class="pub-theme-tile">
+          <h3 class="pub-theme-tile__name">{theme.name}</h3>
+          <p class="pub-theme-tile__question">{theme.tagline}</p>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <section class="pub-section">
+    <h2 class="pub-section__title">{c.figuresTitle}</h2>
+    <p class="pub-section__text">{c.figuresLead}</p>
+    <div class="pub-grid pub-grid--3">
+      {figures.map(figure => <FigureCard figure={figure} lang={lang} headingLevel="h3" />)}
+    </div>
+    <p class="pub-section__text">
+      <a class="pub-textlink" href={publicUrl(lang, '/figures')}>{c.figuresMore}</a>
+    </p>
+  </section>
+
+  <section class="pub-section">
+    <h2 class="pub-section__title">{c.breadthTitle}</h2>
+    <p class="pub-section__text">{c.breadthText}</p>
+  </section>
+
+  <section class="pub-section whub-faq">
+    <h2 class="pub-section__title">{c.faqTitle}</h2>
+    <div class="whub-faq__list">
+      {faq.map(item => (
+        <details class="whub-faq__item">
+          <summary class="whub-faq__q">
+            <span class="whub-faq__q-text">{item.q}</span>
+            <span class="whub-faq__arrow" aria-hidden="true">▼</span>
+          </summary>
+          <div class="whub-faq__a"><p>{item.a}</p></div>
+        </details>
+      ))}
+    </div>
+  </section>
+
+  <section class="pub-section">
+    <h2 class="pub-section__title">{c.crossTitle}</h2>
+    <p class="pub-section__text whub-cross">
+      {c.crossText}{' '}
+      <a class="pub-textlink" href={philosophyHref}>{c.crossPhilosophy}</a>
+      {' · '}
+      <a class="pub-textlink" href={publicUrl(lang, '/figures')}>{c.crossFigures}</a>
+      {' · '}
+      <a class="pub-textlink" href={publicUrl(lang, '/themes')}>{c.crossThemes}</a>
+      {' · '}
+      <a class="pub-textlink" href={publicUrl(lang, '/open-source-philosophy-app')}>{c.crossOss}</a>
+      {' · '}
+      <a class="pub-textlink" href={methodologyHref}>{c.crossMethod}</a>
+    </p>
+  </section>
+
+  <section class="pub-section whub-cta">
+    <h2 class="pub-section__title">{c.ctaTitle}</h2>
+    <p class="pub-section__text">{c.ctaText}</p>
+    <a href={`/app?lang=${lang}`} class="pub-cta__button" data-agc-cta="start-exploring">{c.ctaButton}</a>
+  </section>
+</div>
+
+<style>
+  /* Scoped page treatment, brand design tokens only; adds no global CSS
+     (architecture frozen at 89/100), same approach as the open-source page. */
+  .whub {
+    max-width: 50rem;
+    margin: 0 auto;
+    padding: 2.5rem 1.25rem 3.5rem;
+  }
+  .whub-lead {
+    font-size: 1.12rem;
+    line-height: 1.7;
+    color: var(--text-primary);
+  }
+  .whub-volume {
+    margin-top: 1.75rem;
+  }
+  .whub-themes {
+    margin-top: 1.5rem;
+  }
+
+  /* FAQ: self-contained collapsibles (no dependency on homepage-scoped styles) */
+  .whub-faq__list {
+    margin-top: 0.5rem;
+  }
+  .whub-faq__item {
+    border-bottom: 1px solid color-mix(in srgb, var(--gold-subtle) 18%, transparent);
+  }
+  .whub-faq__q {
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: 44px;
+    padding: 0.9rem 0;
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: 1.05rem;
+    color: var(--text-primary);
+  }
+  .whub-faq__q::-webkit-details-marker {
+    display: none;
+  }
+  .whub-faq__arrow {
+    flex: 0 0 auto;
+    font-size: 0.7rem;
+    color: var(--gold-primary);
+    transition: transform 0.2s ease;
+  }
+  .whub-faq__item[open] > .whub-faq__q .whub-faq__arrow {
+    transform: rotate(180deg);
+  }
+  .whub-faq__a {
+    padding: 0 0 1rem;
+  }
+  .whub-faq__a p {
+    margin: 0;
+    font-size: var(--text-base, 1rem);
+    line-height: var(--leading-relaxed, 1.7);
+    color: var(--text-secondary);
+  }
+
+  .whub-cross {
+    line-height: var(--leading-relaxed, 1.7);
+  }
+
+  /* CTA */
+  .whub-cta {
+    text-align: center;
+    border-top: 1px solid color-mix(in srgb, var(--gold-subtle) 22%, transparent);
+    padding-top: 2.25rem;
+  }
+</style>

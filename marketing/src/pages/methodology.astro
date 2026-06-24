@@ -1,0 +1,79 @@
+---
+// Methodology / editorial-standards page (EN). The trust + E-E-A-T surface that
+// answers "how are the AI Echoes built, sourced, and fact-checked." It owns its
+// own intent, distinct from /echoes (which owns the ethics: WHY we voice the
+// dead) and from the hubs and the open-source positioning page, so the cluster
+// does not cannibalize itself. The DE twin lives at /de/methodik (a cross-slug
+// pair, like the hubs), so altEn/altDe carry the real per-language paths and
+// BaseHead derives canonical + hreflang from them. The FAQ array is defined
+// here and passed to BOTH the visible render and faqSchema(), so the JSON-LD
+// can never drift from the DOM. All copy is fact-clean and inside the locked
+// trust signals.
+import Public from '../layouts/Public.astro';
+import MethodologyContent from '../components/MethodologyContent.astro';
+import {
+  organizationSchema,
+  agoraCosmicaSchema,
+  articleSchema,
+  faqSchema,
+  breadcrumbSchema,
+} from '../lib/schemas';
+import { getT } from '../i18n';
+import { canonicalUrl, publicUrl, SITE_URL, MEDIA_URL } from '../lib/urls';
+
+const lang = 'en' as const;
+const t = getT(lang);
+
+const faq = [
+  {
+    q: 'Is the AI the real person?',
+    a: 'No. Every figure is an AI Echo, an educational interpretation grounded in that person’s primary works and documented life. It is clearly labeled as an Echo, never a recording and never the real person. No recordings of these figures speaking to you exist, and the synthesized audio is the figure’s Echo voice, not their own.',
+  },
+  {
+    q: 'How accurate are the Echoes?',
+    a: 'An Echo is grounded in the figure’s real work, so it stays close to the actual ideas. But it is generated live, with no human reviewing a sentence before it reaches you, so it can be wrong: a wrong date, a blurred source, more confidence than the record supports. Treat it as a learning companion, not an authority, and verify anything that matters against the sources.',
+  },
+  {
+    q: 'Where do the facts come from?',
+    a: 'Each figure is anchored in their own primary works, the books, letters, and texts they actually wrote, alongside standard biographies and scholarship. Every figure ships with a public factcheck that lists the sources and separates what is documented from what was recreated. The instruction profiles that ground each Echo are public, and the whole codebase is open source under AGPL-3.0.',
+  },
+  {
+    q: 'What if it gets something wrong?',
+    a: 'Open the figure’s factcheck, which names what is documented and what was recreated, and follow it to the primary text. If you find a genuine error, tell us at agoracosmica@chipmates.ai. We fix it, and because the code and the factchecks are public, the correction is public too.',
+  },
+];
+
+const url = canonicalUrl(publicUrl(lang, '/methodology'));
+const schemas = [
+  organizationSchema(),
+  agoraCosmicaSchema(),
+  articleSchema({
+    title: 'How we build, source, and fact-check the AI Echoes',
+    description:
+      'Our methodology and editorial standards: how each AI Echo is built from primary works, sourced, and fact-checked, and where the limits are.',
+    url,
+    lang,
+    image: `${MEDIA_URL}/images/ui/og-default/1200.webp`,
+    datePublished: '2026-06-24',
+    dateModified: '2026-06-24',
+  }),
+  faqSchema(faq, url),
+  breadcrumbSchema([
+    { name: t('breadcrumbs.home'), url: `${SITE_URL}/` },
+    { name: 'How we build the Echoes', url },
+  ]),
+];
+---
+<Public
+  title="How We Build the Echoes"
+  fullTitle="Methodology: How We Build, Source, and Fact-Check Echoes"
+  description="How Agora Cosmica builds its AI Echoes: a source-aware voice profile from primary works, a public factcheck per figure, and open-source code. Honest about the limits."
+  canonicalPath="/methodology"
+  lang={lang}
+  ogType="article"
+  altEn="/methodology"
+  altDe="/de/methodik"
+  schemas={schemas}
+>
+  <MethodologyContent lang={lang} faq={faq} />
+</Public>

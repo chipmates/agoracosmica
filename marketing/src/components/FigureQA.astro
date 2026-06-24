@@ -1,0 +1,42 @@
+---
+// Answer-first FAQ capsule for figure pages. Always visible (collapsed answers
+// are not snippet-eligible) and placed high, so a "what can I learn from X" or
+// "what did X teach" searcher gets the answer immediately. The SAME data drives
+// the FAQPage JSON-LD in figures/[slug].astro, so DOM and schema always match.
+//
+// Content is drafted from verified keyConcepts/primaryWorks/entity data and was
+// web-fact-checked + bilingually voiced, but it AWAITS MICHEL'S VOICE PASS +
+// final factcheck sign-off before deploy (kernel-and-Michel rule).
+import { getFigureQA } from '@client/data/public/figureQA';
+import type { Lang } from '../i18n';
+
+interface Props {
+  figureId: string;
+  lang: Lang;
+}
+
+const { figureId, lang } = Astro.props;
+const qa = getFigureQA(figureId, lang);
+const heading = lang === 'de' ? 'Häufige Fragen' : 'Common questions';
+---
+{qa && (
+  <section class="pub-section pub-figure__qa-capsule">
+    <h2 class="pub-section__title">{heading}</h2>
+    {qa.pairs.map(item => (
+      <div class="pub-figure__qa">
+        <h3 class="pub-figure__qa-q">{item.q}</h3>
+        <p class="pub-section__text">{item.a}</p>
+      </div>
+    ))}
+    <div class="pub-figure__qa">
+      <h3 class="pub-figure__qa-q">{qa.disclosure.q}</h3>
+      <p class="pub-section__text">{qa.disclosure.a}</p>
+    </div>
+  </section>
+)}
+
+<style is:global>
+  .pub-figure__qa-capsule {
+    margin: 0.5rem 0 2rem;
+  }
+</style>

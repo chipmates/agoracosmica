@@ -1,0 +1,431 @@
+---
+// Methodology / editorial-standards page (EN + DE twin). This is the trust and
+// E-E-A-T surface: HOW an AI Echo is built, sourced, and fact-checked. It is
+// deliberately distinct from /echoes, which owns the ethics question (WHY we
+// give the dead a voice, the tradition, the disclosure convention). This page
+// complements that essay and cross-links to it. Head terms stay in this page's
+// own cluster (how Agora Cosmica builds its AI Echoes, source-aware AI, AI
+// historical figures fact-checking, editorial standards) and avoid the hub
+// terms (wisdom/philosophy learning platform) and the open-source positioning
+// terms (Character.AI alternative), so the pages do not cannibalize each other.
+//
+// The FAQ array is passed in from the route so the same items render both in
+// the visible DOM and in faqSchema(), keeping JSON-LD and DOM in parity. All
+// copy is fact-clean and stays inside the locked trust signals (no standalone
+// "Free", no "Private", always "no tracking cookies, no profiling"). Styling
+// reuses the pub-* globals plus a scoped block that copies the osp-* treatment
+// (FAQ, pillars, CTA, star) into this component, since those are scoped to
+// CategoryPageContent and not global. CSS architecture frozen at 89/100.
+import Breadcrumbs from './Breadcrumbs.astro';
+import { publicUrl } from '../lib/urls';
+import type { Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+  faq: { q: string; a: string }[];
+}
+
+const { lang, faq } = Astro.props;
+const isDe = lang === 'de';
+
+// Hub hrefs are lang-aware: the two hubs use localized DE slugs, not a /de/
+// prefix of the EN slug.
+const philoHubHref = isDe ? '/de/philosophie-lernen/' : '/ai-philosophy-tutor/';
+const wisdomHubHref = isDe
+  ? '/de/von-historischen-persoenlichkeiten-lernen/'
+  : '/learn-from-historical-figures/';
+
+const en = {
+  crumb: 'How we build the Echoes',
+  eyebrow: 'Methodology and editorial standards',
+  h1: 'How we build, source, and fact-check the AI Echoes',
+  tagline: 'Source-aware by design. Honest about what is documented and what is recreated.',
+
+  briefTitle: 'In brief',
+  brief:
+    'Every figure in Agora Cosmica is an AI Echo. We distill a voice profile from the figure’s own primary works and their documented life, ground the conversation in that material, and ship a public factcheck for every figure that separates what is documented from what we recreated for the story. The Echo is an educational interpretation, openly labeled, never a recording and never the real person. The instruction profiles and the factchecks are public, and the whole codebase is open source, so you do not have to take our word for any of it.',
+
+  buildTitle: 'How we build an Echo',
+  buildParas: [
+    'We start with the person, not a persona. For each figure we read their primary works, the books, letters, and texts they actually wrote, alongside their documented life from standard biographies and scholarship. From that we distill a voice profile: how they reasoned, the ideas they returned to, the way they spoke. The voice profile is the recipe the model follows in a conversation. It is not a transcript of anything the person said.',
+    'What comes out is an AI Echo: an educational interpretation grounded in the source material. It is openly an Echo every time it speaks, never presented as a recording and never as the real person. No recordings of these figures talking to you exist. The synthesized audio is the figure’s Echo voice, a voice we give them, clearly separated from the original daguerreotypes, manuscripts, and writings that the work draws on.',
+    'A conversation is only one of the ways to learn here, meant for thinking an idea through. Most of what a figure offers is crafted ahead of time: a narrated life story, twelve core teachings, multi-voice dialogues. The live conversation sits alongside those, and it is built to send you onward to the primary texts, not to keep you talking.',
+  ],
+
+  sourcingTitle: 'Where the material comes from',
+  sourcingLead:
+    'The source of the words matters more than any single sentence. Because an Echo is AI-rendered, what it says will vary from one conversation to the next. The material underneath it does not. Four things make that material checkable.',
+  sourcing: [
+    { label: 'Primary works', text: 'Each figure is anchored in their own writing, the texts they actually produced. The voice and ideas come from there first, before any modern summary.' },
+    { label: 'A public factcheck', text: 'Every figure ships with a factcheck that lists what is historically documented and what was recreated for the narrative, shadow chapters included. It is published on the figure’s page, not hidden.' },
+    { label: 'Open instruction profiles', text: 'The instruction profiles that ground each Echo are served from a public CDN, not locked inside the app. They are our signature on the method, and anyone can fetch and read them.' },
+    { label: 'Open-source code', text: 'The whole platform is open source under AGPL-3.0. The way an Echo is assembled, sourced, and screened is in the repository for anyone to inspect.' },
+  ],
+
+  factcheckTitle: 'How the fact-checking works',
+  factcheckParas: [
+    'Every figure has a public factcheck, and it is specific. For each narrated chapter it names what is documented (dates, people, places, events drawn from the record) and what we recreated (a scene we staged, a line of dialogue, a sensory detail). Where the prose goes beyond the documented record, the factcheck says so plainly, and it labels the kind: an invented detail, a composite scene, a paraphrased source, a compressed timeline.',
+    'It does not flatter the figure. The factcheck includes a shadow section that records the harder parts of a life, the contradictions and the failures, because these were real and contradictory people. The aim is not a monument. It is an honest account you can check against the sources we list, which name the primary texts and the scholarship behind each figure.',
+    'This is the same obligation a careful historian takes on: reconstruct where you must, and disclose where you did. The factcheck is where we disclose it.',
+  ],
+
+  limitsTitle: 'What an Echo can and cannot do',
+  limitsParas: [
+    'An Echo can be wrong. It is generated live, and no human reviews a sentence before it reaches you. It can misremember a date, blur a source, or state something with more confidence than the record supports. That is the honest limit of this medium, and we would rather name it than paper over it.',
+    'So treat an Echo as a learning companion, not an authority. It is a doorway into a body of work, useful for thinking out loud and finding where to look next. When something matters, verify it: open the figure’s factcheck, read the primary text it points to, and follow the sources. The best outcome is that you outgrow the Echo and go to the originals.',
+    'If you find something we got wrong, tell us at agoracosmica@chipmates.ai. We will fix it, and the fix is public like everything else.',
+  ],
+
+  trustTitle: 'Why you can trust the method',
+  trustLead: 'You do not have to trust us. You can check. Four things hold the method accountable.',
+  trust: [
+    { label: 'Nonprofit', text: 'Agora Cosmica is built by ChipMates gemeinnützige GmbH, a small German nonprofit. There are no shareholders and no engagement targets. A longer conversation earns us nothing and even costs us, so nothing here is tuned to keep you hooked.' },
+    { label: 'Open source', text: 'The whole platform is open source under AGPL-3.0. The sourcing, the safety screening, and the privacy claims are all in the code, so the method is auditable rather than asserted.' },
+    { label: 'No profiling', text: 'No tracking cookies, no third-party analytics, no profiles of who you are. Your chat history lives only in your browser, encrypted, and is never stored on our servers. Bring your own model key and it stays in your browser.' },
+    { label: 'EU-hosted', text: 'Live speech runs on our own GPU servers in Germany, and the rest of the audio is served from EU hosting. You can also run the whole thing on your own machine.' },
+  ],
+
+  faqTitle: 'Questions people ask',
+
+  ctaTitle: 'See it for yourself',
+  ctaText: 'Open the app, talk with an Echo, then open that figure’s factcheck and read the sources behind it. 30 free messages a day, no signup.',
+  ctaButton: 'Start exploring',
+  starText: 'If an honest method matters to you, a star is the simplest way to help us reach more people.',
+  starCta: 'Star on GitHub →',
+
+  linksTitle: 'Read further',
+  echoesPre: 'This page covers how we build the Echoes. For why we give the dead a voice at all, the tradition behind it and where the risks lie, read ',
+  echoesLink: 'why we call them Echoes',
+  echoesMid: '. To see the method in a single life, browse the ',
+  figuresLink: 'figures',
+  echoesPost: ' and open any factcheck.',
+  hubsPre: 'To learn philosophy in conversation, start at the ',
+  hubsPhiloLink: 'AI philosophy tutor',
+  hubsMid: '. To learn timeless wisdom from history’s figures, start at the ',
+  hubsWisdomLink: 'wisdom guide',
+  hubsPost: '.',
+  ghPre: 'Or read the method in the code on ',
+  ghLink: 'GitHub',
+  ghPost: '.',
+};
+
+const de = {
+  crumb: 'Wie wir die Echos bauen',
+  eyebrow: 'Methodik und redaktionelle Standards',
+  h1: 'Wie wir die KI-Echos bauen, belegen und faktenprüfen',
+  tagline: 'Quellenbewusst gebaut. Ehrlich darüber, was belegt und was nachgebildet ist.',
+
+  briefTitle: 'Kurz gesagt',
+  brief:
+    'Jede Persönlichkeit in Agora Cosmica ist ein KI-Echo. Wir destillieren ein Stimmprofil aus den eigenen Primärwerken eines Menschen und seinem dokumentierten Leben, verankern das Gespräch in diesem Material und liefern zu jeder Persönlichkeit einen öffentlichen Faktencheck, der das Belegte vom Nachempfundenen trennt. Das Echo ist eine pädagogische Deutung, offen gekennzeichnet, nie eine Aufnahme und nie die echte Person. Die Anweisungsprofile und die Faktenchecks sind öffentlich, und der gesamte Code ist quelloffen, du musst uns also nichts davon glauben.',
+
+  buildTitle: 'Wie wir ein Echo bauen',
+  buildParas: [
+    'Wir beginnen beim Menschen, nicht bei einer Rolle. Für jede Persönlichkeit lesen wir die Primärwerke, also die Bücher, Briefe und Texte, die sie tatsächlich geschrieben hat, dazu das dokumentierte Leben aus anerkannten Biografien und der Forschung. Daraus destillieren wir ein Stimmprofil: wie dieser Mensch dachte, zu welchen Ideen er zurückkehrte, wie er sprach. Das Stimmprofil ist das Rezept, dem das Modell im Gespräch folgt. Es ist keine Mitschrift von irgendetwas, das die Person gesagt hat.',
+    'Heraus kommt ein KI-Echo: eine pädagogische Deutung, verankert im Quellmaterial. Es ist jedes Mal offen ein Echo, wenn es spricht, nie als Aufnahme ausgegeben und nie als die echte Person. Aufnahmen, in denen diese Menschen mit dir sprechen, existieren nicht. Das synthetisierte Audio ist die Echo-Stimme dieses Menschen, eine Stimme, die wir ihm geben, klar getrennt von den Originalen, den Daguerreotypien, Manuskripten und Schriften, auf die sich die Arbeit stützt.',
+    'Ein Gespräch ist nur einer der Lernwege hier, gedacht, um einen Gedanken durchzudenken. Das meiste, was eine Persönlichkeit bietet, ist im Voraus gestaltet: eine erzählte Lebensgeschichte, zwölf Kernlehren, mehrstimmige Dialoge. Das Live-Gespräch steht daneben, und es ist gebaut, dich weiter zu den Primärtexten zu schicken, nicht dich im Reden zu halten.',
+  ],
+
+  sourcingTitle: 'Woher das Material kommt',
+  sourcingLead:
+    'Die Quelle der Worte wiegt schwerer als jeder einzelne Satz. Weil ein Echo KI-erzeugt ist, variiert das Gesagte von Gespräch zu Gespräch. Das Material darunter nicht. Vier Dinge machen dieses Material nachprüfbar.',
+  sourcing: [
+    { label: 'Primärwerke', text: 'Jede Persönlichkeit ist in ihrem eigenen Werk verankert, in den Texten, die sie tatsächlich hervorgebracht hat. Stimme und Ideen kommen zuerst von dort, vor jeder modernen Zusammenfassung.' },
+    { label: 'Ein öffentlicher Faktencheck', text: 'Zu jeder Persönlichkeit gehört ein Faktencheck, der auflistet, was historisch belegt und was für die Erzählung nachgebildet ist, Schattenkapitel eingeschlossen. Er steht auf der Personenseite, nicht versteckt.' },
+    { label: 'Offene Anweisungsprofile', text: 'Die Anweisungsprofile, die jedes Echo verankern, kommen von einem öffentlichen CDN, nicht eingeschlossen in der App. Sie sind unsere Signatur unter der Methode, und alle können sie abrufen und lesen.' },
+    { label: 'Quelloffener Code', text: 'Die ganze Plattform ist quelloffen unter der AGPL-3.0. Wie ein Echo zusammengesetzt, belegt und geprüft wird, liegt im Repository für alle einsehbar.' },
+  ],
+
+  factcheckTitle: 'Wie die Faktenprüfung funktioniert',
+  factcheckParas: [
+    'Jede Persönlichkeit hat einen öffentlichen Faktencheck, und er ist genau. Für jedes erzählte Kapitel benennt er, was belegt ist (Daten, Menschen, Orte, Ereignisse aus dem Quellbestand) und was wir nachgebildet haben (eine inszenierte Szene, eine Zeile Dialog, ein sinnliches Detail). Wo der Text über das Dokumentierte hinausgeht, sagt der Faktencheck es klar und kennzeichnet die Art: ein erfundenes Detail, eine zusammengesetzte Szene, eine paraphrasierte Quelle, eine verdichtete Zeitlinie.',
+    'Er beschönigt den Menschen nicht. Der Faktencheck enthält einen Schattenteil, der die schwereren Seiten eines Lebens festhält, die Widersprüche und das Scheitern, denn das waren echte und widersprüchliche Menschen. Das Ziel ist kein Denkmal. Es ist eine ehrliche Darstellung, die du gegen die Quellen prüfen kannst, die wir nennen, und die die Primärtexte und die Forschung hinter jeder Persönlichkeit auflisten.',
+    'Das ist dieselbe Verpflichtung, die eine sorgfältige Geschichtsschreibung eingeht: rekonstruiere, wo du musst, und lege offen, wo du es getan hast. Im Faktencheck legen wir es offen.',
+  ],
+
+  limitsTitle: 'Was ein Echo kann und was nicht',
+  limitsParas: [
+    'Ein Echo kann sich irren. Es entsteht live, und kein Mensch liest einen Satz, bevor er dich erreicht. Es kann ein Datum verwechseln, eine Quelle verwischen oder etwas mit mehr Sicherheit sagen, als der Quellbestand hergibt. Das ist die ehrliche Grenze dieses Mediums, und wir nennen sie lieber, als sie zu kaschieren.',
+    'Behandle ein Echo also als Lernbegleiter, nicht als Autorität. Es ist eine Tür in ein Werk, gut zum lauten Nachdenken und um zu finden, wo man als Nächstes nachschaut. Wenn etwas wichtig ist, prüf es: öffne den Faktencheck der Persönlichkeit, lies den Primärtext, auf den er verweist, und folge den Quellen. Das beste Ergebnis ist, dass du dem Echo entwächst und zu den Originalen gehst.',
+    'Wenn du etwas findest, das wir falsch haben, schreib uns an agoracosmica@chipmates.ai. Wir korrigieren es, und die Korrektur ist öffentlich wie alles andere.',
+  ],
+
+  trustTitle: 'Warum du der Methode vertrauen kannst',
+  trustLead: 'Du musst uns nicht vertrauen. Du kannst nachsehen. Vier Dinge halten die Methode in der Verantwortung.',
+  trust: [
+    { label: 'Gemeinnützig', text: 'Agora Cosmica wird von der ChipMates gemeinnützigen GmbH gebaut, einer kleinen gemeinnützigen Organisation aus Deutschland. Es gibt keine Anteilseigner und keine Engagement-Ziele. Ein längeres Gespräch bringt uns nichts ein und kostet uns sogar etwas, nichts hier ist also darauf getrimmt, dich zu fesseln.' },
+    { label: 'Open Source', text: 'Die ganze Plattform ist quelloffen unter der AGPL-3.0. Die Quellen, die Sicherheitsprüfung und die Datenschutzversprechen stehen alle im Code, die Methode ist also nachprüfbar statt nur behauptet.' },
+    { label: 'Kein Profiling', text: 'Keine Tracking-Cookies, keine Analyse durch Dritte, keine Profile darüber, wer du bist. Deine Gesprächsverläufe liegen nur in deinem Browser, verschlüsselt, und werden nie auf unseren Servern gespeichert. Bringst du deinen eigenen Schlüssel mit, bleibt er in deinem Browser.' },
+    { label: 'In der EU gehostet', text: 'Live gesprochene Sprache läuft auf unseren eigenen GPU-Servern in Deutschland, das übrige Audio kommt von Servern in der EU. Du kannst das Ganze auch auf deinem eigenen Rechner betreiben.' },
+  ],
+
+  faqTitle: 'Fragen, die Menschen uns stellen',
+
+  ctaTitle: 'Sieh es dir selbst an',
+  ctaText: 'Öffne die App, sprich mit einem Echo, öffne dann den Faktencheck dieser Persönlichkeit und lies die Quellen dahinter. 30 kostenlose Nachrichten pro Tag, ohne Anmeldung.',
+  ctaButton: 'Loslegen',
+  starText: 'Wenn dir eine ehrliche Methode wichtig ist, ist ein Stern auf GitHub der einfachste Weg, uns zu helfen, mehr Menschen zu erreichen.',
+  starCta: 'Auf GitHub einen Stern geben →',
+
+  linksTitle: 'Weiterlesen',
+  echoesPre: 'Diese Seite behandelt, wie wir die Echos bauen. Warum wir den Toten überhaupt eine Stimme geben, die Tradition dahinter und wo die Risiken liegen, liest du unter ',
+  echoesLink: 'warum wir sie Echos nennen',
+  echoesMid: '. Um die Methode an einem einzelnen Leben zu sehen, durchstöbere die ',
+  figuresLink: 'Menschen',
+  echoesPost: ' und öffne einen beliebigen Faktencheck.',
+  hubsPre: 'Um Philosophie im Gespräch zu lernen, beginne beim ',
+  hubsPhiloLink: 'KI-Philosophie-Tutor',
+  hubsMid: '. Um zeitlose Weisheit von den Menschen der Geschichte zu lernen, beginne beim ',
+  hubsWisdomLink: 'Weisheits-Leitfaden',
+  hubsPost: '.',
+  ghPre: 'Oder lies die Methode im Code auf ',
+  ghLink: 'GitHub',
+  ghPost: '.',
+};
+
+const c = isDe ? de : en;
+---
+<div class="pub-content mth">
+  <Breadcrumbs lang={lang} items={[{ label: c.crumb }]} />
+
+  <header class="pub-theme-hero">
+    <div class="pub-theme-hero__eyebrow">{c.eyebrow}</div>
+    <h1 class="pub-theme-hero__name">{c.h1}</h1>
+    <p class="pub-theme-hero__question">{c.tagline}</p>
+  </header>
+
+  <section class="pub-section">
+    <h2 class="pub-section__title">{c.briefTitle}</h2>
+    <p class="pub-section__text mth-lead">{c.brief}</p>
+  </section>
+
+  <section class="pub-section">
+    <h2 class="pub-section__title">{c.buildTitle}</h2>
+    {c.buildParas.map(p => <p class="pub-section__text">{p}</p>)}
+  </section>
+
+  <section class="pub-section">
+    <h2 class="pub-section__title">{c.sourcingTitle}</h2>
+    <p class="pub-section__text">{c.sourcingLead}</p>
+    <div class="mth-pillars">
+      {c.sourcing.map(p => (
+        <div class="mth-pillar">
+          <h3 class="mth-pillar__label">{p.label}</h3>
+          <p class="mth-pillar__text">{p.text}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="pub-section">
+    <h2 class="pub-section__title">{c.factcheckTitle}</h2>
+    {c.factcheckParas.map(p => <p class="pub-section__text">{p}</p>)}
+  </section>
+
+  <section class="pub-section">
+    <h2 class="pub-section__title">{c.limitsTitle}</h2>
+    {c.limitsParas.map(p => <p class="pub-section__text">{p}</p>)}
+  </section>
+
+  <section class="pub-section">
+    <h2 class="pub-section__title">{c.trustTitle}</h2>
+    <p class="pub-section__text">{c.trustLead}</p>
+    <div class="mth-pillars">
+      {c.trust.map(p => (
+        <div class="mth-pillar">
+          <h3 class="mth-pillar__label">{p.label}</h3>
+          <p class="mth-pillar__text">{p.text}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="pub-section mth-faq">
+    <h2 class="pub-section__title">{c.faqTitle}</h2>
+    <div class="mth-faq__list">
+      {faq.map(item => (
+        <details class="mth-faq__item">
+          <summary class="mth-faq__q">
+            <span class="mth-faq__q-text">{item.q}</span>
+            <span class="mth-faq__arrow" aria-hidden="true">▼</span>
+          </summary>
+          <div class="mth-faq__a"><p>{item.a}</p></div>
+        </details>
+      ))}
+    </div>
+  </section>
+
+  <section class="pub-section mth-cta">
+    <h2 class="pub-section__title">{c.ctaTitle}</h2>
+    <p class="pub-section__text">{c.ctaText}</p>
+    <a href={`/app?lang=${lang}`} class="pub-cta__button" data-agc-cta="start-exploring">{c.ctaButton}</a>
+    <a
+      class="mth-star"
+      href="https://github.com/chipmates/agoracosmica"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <span class="mth-star__icon" aria-hidden="true">⭐</span>
+      <span class="mth-star__text">{c.starText}</span>
+      <span class="mth-star__cta">{c.starCta}</span>
+    </a>
+
+    <h2 class="pub-section__title mth-links-title">{c.linksTitle}</h2>
+    <p class="pub-section__text mth-links">
+      {c.echoesPre}<a class="pub-textlink" href={publicUrl(lang, '/echoes')}>{c.echoesLink}</a>{c.echoesMid}<a class="pub-textlink" href={publicUrl(lang, '/figures')}>{c.figuresLink}</a>{c.echoesPost}
+    </p>
+    <p class="pub-section__text mth-links">
+      {c.hubsPre}<a class="pub-textlink" href={philoHubHref}>{c.hubsPhiloLink}</a>{c.hubsMid}<a class="pub-textlink" href={wisdomHubHref}>{c.hubsWisdomLink}</a>{c.hubsPost}
+    </p>
+    <p class="pub-section__text mth-links">
+      {c.ghPre}<a class="pub-textlink" href="https://github.com/chipmates/agoracosmica" target="_blank" rel="noopener noreferrer">{c.ghLink}</a>{c.ghPost}
+    </p>
+  </section>
+</div>
+
+<style is:global>
+  /* Scoped page treatment using brand design tokens only (CSS architecture
+     frozen at 89/100). The mth-* rules below are this component's copy of the
+     osp-* treatment from CategoryPageContent, which is component-scoped and so
+     not reusable across components. Same structure, renamed to mth-*. */
+  .mth {
+    max-width: 50rem;
+    margin: 0 auto;
+    padding: 2.5rem 1.25rem 3.5rem;
+  }
+  .mth-lead {
+    font-size: 1.12rem;
+    line-height: 1.7;
+    color: var(--text-primary);
+  }
+
+  /* Pillar grid (sourcing + trust), 2 columns on wide screens, 1 on narrow */
+  .mth-pillars {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-top: 1.25rem;
+  }
+  .mth-pillar {
+    padding: 1.25rem 1.3rem;
+    border-radius: var(--radius-lg, 0.75rem);
+    border: 1px solid color-mix(in srgb, var(--gold-subtle) 25%, transparent);
+    background: color-mix(in srgb, var(--bg-deep-space-darker) 45%, transparent);
+  }
+  .mth-pillar__label {
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold-primary);
+    margin: 0 0 0.65rem;
+  }
+  .mth-pillar__text {
+    font-size: var(--text-sm, 0.9rem);
+    line-height: var(--leading-relaxed, 1.6);
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  /* FAQ: self-contained collapsibles (no dependency on homepage-scoped styles) */
+  .mth-faq__list {
+    margin-top: 0.5rem;
+  }
+  .mth-faq__item {
+    border-bottom: 1px solid color-mix(in srgb, var(--gold-subtle) 18%, transparent);
+  }
+  .mth-faq__q {
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: 44px;
+    padding: 0.9rem 0;
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: 1.05rem;
+    color: var(--text-primary);
+  }
+  .mth-faq__q::-webkit-details-marker {
+    display: none;
+  }
+  .mth-faq__arrow {
+    flex: 0 0 auto;
+    font-size: 0.7rem;
+    color: var(--gold-primary);
+    transition: transform 0.2s ease;
+  }
+  .mth-faq__item[open] > .mth-faq__q .mth-faq__arrow {
+    transform: rotate(180deg);
+  }
+  .mth-faq__a {
+    padding: 0 0 1rem;
+  }
+  .mth-faq__a p {
+    margin: 0;
+    font-size: var(--text-base, 1rem);
+    line-height: var(--leading-relaxed, 1.7);
+    color: var(--text-secondary);
+  }
+
+  /* CTA + star + further-reading links */
+  .mth-cta {
+    text-align: center;
+    border-top: 1px solid color-mix(in srgb, var(--gold-subtle) 22%, transparent);
+    padding-top: 2.25rem;
+  }
+  .mth-star {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem 0.85rem;
+    max-width: 640px;
+    margin: 1.75rem auto 0;
+    padding: 1.1rem 1.4rem;
+    border-radius: var(--radius-lg, 0.75rem);
+    border: 1px solid color-mix(in srgb, var(--gold-subtle) 28%, transparent);
+    background: color-mix(in srgb, var(--bg-deep-space-darker) 50%, transparent);
+    text-decoration: none;
+    transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+  }
+  .mth-star:hover,
+  .mth-star:focus-visible {
+    border-color: var(--gold-hover);
+    background: color-mix(in srgb, var(--bg-deep-space-darker) 70%, transparent);
+    transform: translateY(-2px);
+  }
+  .mth-star__icon {
+    font-size: 1.15rem;
+    line-height: 1;
+  }
+  .mth-star__text {
+    font-size: var(--text-base, 1rem);
+    line-height: var(--leading-relaxed, 1.6);
+    color: var(--text-secondary);
+  }
+  .mth-star__cta {
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-weight: 600;
+    white-space: nowrap;
+    color: var(--gold-primary);
+  }
+  .mth-star:hover .mth-star__cta,
+  .mth-star:focus-visible .mth-star__cta {
+    color: var(--gold-hover);
+  }
+  .mth-links-title {
+    margin-top: 2.5rem;
+  }
+  .mth-links {
+    margin-top: 1rem;
+  }
+
+  @media (max-width: 640px) {
+    .mth-pillars {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

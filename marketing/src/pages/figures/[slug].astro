@@ -9,6 +9,7 @@ import { canonicalUrl, publicUrl, SITE_URL, MEDIA_URL } from '../../lib/urls';
 import { figureSlugToId } from '@client/data/public/slugMap';
 import { getFigureById } from '@client/data/public/figuresCatalog';
 import { getFigureSeo } from '@client/data/public/figureSeo';
+import { getFigureQA } from '@client/data/public/figureQA';
 
 export async function getStaticPaths() {
   return Object.entries(figureSlugToId).map(([slug, figureId]) => ({
@@ -37,6 +38,14 @@ const figureUrl = `${SITE_URL}/figures/${slug}`;
 // eager <picture> below loads the portrait without it.)
 const figureImage = `${MEDIA_URL}/images/figures/${figureId}/main/1200.webp`;
 
+// Figure QA capsule -> FAQPage. Dickinson keeps her dedicated poems FAQ schema
+// (below) so two FAQPage nodes never share the same @id; every other figure
+// with a capsule emits it as FAQPage so the visible Q&A and the schema match.
+const figQA = getFigureQA(figureId, lang);
+const figQaItems = (figureId !== 'dickinson' && figQA)
+  ? [...figQA.pairs, figQA.disclosure]
+  : [];
+
 const schemas = [
   personSchema({
     name: figure.name,
@@ -61,6 +70,7 @@ const schemas = [
   ...(figureId === 'dickinson'
     ? [faqSchema(dickinsonPoemsFaqEn, `${figureUrl}/`)]
     : []),
+  ...(figQaItems.length ? [faqSchema(figQaItems, `${figureUrl}/`)] : []),
 ];
 ---
 <Public

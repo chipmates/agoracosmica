@@ -12,7 +12,7 @@ export interface FigureSeoData {
 export const figureSeo: Record<string, FigureSeoData> = {
   aurelius: {
     en: {
-      description: "Explore Stoic philosophy with Marcus Aurelius. 12-chapter narrated life story, teachings on emotional clarity, memento mori, the view from above, and virtue ethics.",
+      description: "Roman emperor and Stoic. His Meditations teach emotional clarity, memento mori, the view from above, and virtue. A narrated life story and guided talks.",
       teachingsHeading: "Stoic Teachings from Marcus Aurelius",
       seoTitle: "Marcus Aurelius - Stoicism & Meditations | Agora Cosmica",
     },
@@ -24,7 +24,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
   },
   angelou: {
     en: {
-      description: "Discover Maya Angelou's wisdom on resilience, identity, and finding your voice. 12-chapter narrated life story, teachings on courage, self-expression, and community.",
+      description: "Poet and memoirist Maya Angelou on resilience, identity, and finding your voice. A narrated life story with teachings on courage and self-expression.",
       teachingsHeading: "Maya Angelou on Courage, Voice, and Identity",
       seoTitle: "Maya Angelou - Voice, Resilience, Identity | Agora Cosmica",
     },
@@ -36,7 +36,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
   },
   austen: {
     en: {
-      description: "Explore Jane Austen's philosophy of character, social observation, and moral clarity. 12-chapter narrated life story and teachings on judgment, love, and integrity.",
+      description: "Novelist Jane Austen on character, sharp social observation, and moral clarity. A narrated life story with teachings on judgment, love, and integrity.",
       teachingsHeading: "Jane Austen on Character, Love, and Society",
       seoTitle: "Jane Austen - Character, Society & Love | Agora Cosmica",
     },
@@ -60,7 +60,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
   },
   bingen: {
     en: {
-      description: "Discover Hildegard von Bingen's mystical vision of nature, music, and divine wholeness. 12-chapter life story, teachings on healing, creativity, and spiritual sight.",
+      description: "Medieval mystic Hildegard von Bingen on nature, music, and divine wholeness. A narrated life story with teachings on healing and spiritual sight.",
       teachingsHeading: "Hildegard von Bingen on Vision, Nature, and the Divine",
       seoTitle: "Hildegard von Bingen - Visions & Music | Agora Cosmica",
     },
@@ -108,7 +108,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
   },
   zenji: {
     en: {
-      description: "Discover Dogen Zenji's Zen philosophy of sitting, presence, and everyday practice. 12-chapter life story, teachings on shikantaza, being-time, and beginner's mind.",
+      description: "Zen master Dogen on sitting, presence, and everyday practice. A narrated life story with teachings on shikantaza, being-time, and beginner's mind.",
       teachingsHeading: "Dōgen Zenji on Zen Practice and Being-Time",
       seoTitle: "Dōgen Zenji - Zen Buddhism & Shikantaza | Agora Cosmica",
     },
@@ -132,7 +132,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
   },
   einstein: {
     en: {
-      description: "Explore Einstein's philosophy of wonder, thought experiments, and cosmic feeling. 12-chapter life story, teachings on creativity, relativity, and scientific imagination.",
+      description: "Physicist Albert Einstein on wonder, thought experiments, and cosmic feeling. A narrated life story with teachings on creativity and relativity.",
       teachingsHeading: "Einstein on Creativity, Wonder, and the Cosmos",
       seoTitle: "Albert Einstein - Relativity & Imagination | Agora Cosmica",
     },
@@ -180,7 +180,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
   },
   gautama: {
     en: {
-      description: "Learn Buddhist philosophy from Siddhartha Gautama. Mindfulness, the Four Noble Truths, dependent origination. 12-chapter life story and guided wisdom conversations.",
+      description: "Siddhartha Gautama, the Buddha, on mindfulness, the Four Noble Truths, and dependent origination. A narrated life story and guided wisdom talks.",
       teachingsHeading: "Buddhist Teachings from Siddhartha Gautama",
       seoTitle: "Siddhartha Gautama - Buddhism & Four Noble Truths",
     },
@@ -192,7 +192,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
   },
   jung: {
     en: {
-      description: "Explore Carl Gustav Jung's depth psychology. Shadow work, individuation, archetypes, and the collective unconscious. 12-chapter life story and guided conversations.",
+      description: "Carl Gustav Jung on depth psychology: shadow work, individuation, archetypes, and the collective unconscious. A narrated life story and guided talks.",
       teachingsHeading: "Jung on the Shadow, Individuation, and the Unconscious",
       seoTitle: "Carl Gustav Jung - Shadow & Archetypes | Agora Cosmica",
     },
@@ -204,7 +204,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
   },
   kahlo: {
     en: {
-      description: "Discover Frida Kahlo's philosophy of pain, identity, and creative transformation. 12-chapter life story, teachings on self-observation, embodied truth, and cultural roots.",
+      description: "Painter Frida Kahlo on pain, identity, and creative transformation. A narrated life story with teachings on embodied truth and cultural roots.",
       teachingsHeading: "Frida Kahlo on Art, Pain, and Identity",
       seoTitle: "Frida Kahlo - Self-Portraits & Identity | Agora Cosmica",
     },
@@ -216,7 +216,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
   },
   king: {
     en: {
-      description: "Explore Martin Luther King Jr.'s philosophy of nonviolent resistance and beloved community. 12-chapter life story, teachings on justice, hope, and moral courage.",
+      description: "Martin Luther King Jr. on nonviolent resistance and beloved community. A narrated life story with teachings on justice, hope, and moral courage.",
       teachingsHeading: "Martin Luther King Jr. on Justice and Beloved Community",
       seoTitle: "Martin Luther King Jr. - Civil Rights & Nonviolence",
     },
@@ -228,7 +228,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
   },
   laozi: {
     en: {
-      description: "Discover Laozi's Taoist philosophy of wu wei, simplicity, and flowing with nature. 12-chapter life story, teachings from the Tao Te Ching on balance and non-action.",
+      description: "Laozi on Taoist philosophy: wu wei, simplicity, and flowing with nature. A narrated life story with teachings from the Tao Te Ching on balance.",
       teachingsHeading: "Laozi on the Tao, Wu Wei, and Natural Harmony",
       seoTitle: "Laozi - Taoism, Wu Wei & Tao Te Ching | Agora Cosmica",
     },
@@ -240,7 +240,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
   },
   lovelace: {
     en: {
-      description: "Explore Ada Lovelace's vision of computing, imagination, and the poetry of science. 12-chapter life story, teachings on analytical thinking and creative reasoning.",
+      description: "Ada Lovelace on computing, imagination, and the poetry of science. A narrated life story with teachings on analytical and creative reasoning.",
       teachingsHeading: "Ada Lovelace on Computing, Imagination, and Science",
       seoTitle: "Ada Lovelace - World's First Programmer | Agora Cosmica",
     },
@@ -252,7 +252,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
   },
   mandela: {
     en: {
-      description: "Explore Nelson Mandela's philosophy of reconciliation, ubuntu, and long-walk freedom. 12-chapter life story, teachings on forgiveness, patience, and moral leadership.",
+      description: "Nelson Mandela on reconciliation, ubuntu, and the long walk to freedom. A narrated life story with teachings on forgiveness and moral leadership.",
       teachingsHeading: "Nelson Mandela on Freedom, Ubuntu, and Reconciliation",
       seoTitle: "Nelson Mandela - Ubuntu & Reconciliation | Agora Cosmica",
     },
@@ -264,7 +264,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
   },
   mozart: {
     en: {
-      description: "Discover Mozart's creative genius and philosophy of music as emotional truth. 12-chapter life story, teachings on composition, artistic freedom, and playful mastery.",
+      description: "Composer Mozart on music as emotional truth and playful mastery. A narrated life story with teachings on composition and artistic freedom.",
       teachingsHeading: "Mozart on Music, Creativity, and Artistic Freedom",
       seoTitle: "Wolfgang Amadeus Mozart - Music & Composition",
     },
@@ -276,7 +276,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
   },
   nietzsche: {
     en: {
-      description: "Explore Nietzsche's philosophy of self-overcoming, eternal return, and life-affirmation. 12-chapter life story, teachings on will to power, values, and becoming who you are.",
+      description: "Friedrich Nietzsche on self-overcoming, eternal return, and life-affirmation. A narrated life story with teachings on values and the will to power.",
       teachingsHeading: "Nietzsche on Self-Overcoming and Life-Affirmation",
       seoTitle: "Friedrich Nietzsche - Zarathustra & Self-Overcoming",
     },
@@ -300,7 +300,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
   },
   rumi: {
     en: {
-      description: "Experience Rumi's Sufi poetry and philosophy of divine love. 12-chapter narrated life story, teachings on the heart, mystical union, sacred listening, and inner transformation.",
+      description: "Sufi poet Rumi on divine love, the heart, and mystical union. A narrated life story with teachings on sacred listening and inner transformation.",
       teachingsHeading: "Rumi on Love, the Heart, and the Divine",
       seoTitle: "Rumi - Sufi Poetry & Divine Love | Agora Cosmica",
     },
@@ -312,7 +312,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
   },
   schopenhauer: {
     en: {
-      description: "Explore Schopenhauer's philosophy of will, suffering, and aesthetic contemplation. 12-chapter life story, teachings on compassion, music, and escaping the cycle of desire.",
+      description: "Arthur Schopenhauer on will, suffering, and aesthetic contemplation. A narrated life story with teachings on compassion, music, and desire.",
       teachingsHeading: "Schopenhauer on Will, Suffering, and Contemplation",
       seoTitle: "Arthur Schopenhauer - Will & Pessimism | Agora Cosmica",
     },
@@ -336,7 +336,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
   },
   tubman: {
     en: {
-      description: "Discover Harriet Tubman's philosophy of inner freedom, faith under fire, and leading others to liberation. 12-chapter life story and teachings on courage and moral action.",
+      description: "Harriet Tubman on inner freedom, faith under fire, and leading others to liberation. A narrated life story with teachings on courage and moral action.",
       teachingsHeading: "Harriet Tubman on Freedom, Faith, and Moral Courage",
       seoTitle: "Harriet Tubman - Underground Railroad & Freedom",
     },
@@ -348,7 +348,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
   },
   vinci: {
     en: {
-      description: "Explore Leonardo da Vinci's philosophy of curiosity, observation, and the unity of art and science. 12-chapter life story, teachings on seeing, thinking, and creative mastery.",
+      description: "Leonardo da Vinci on curiosity, observation, and the unity of art and science. A narrated life story with teachings on seeing and creative mastery.",
       teachingsHeading: "Leonardo da Vinci on Curiosity, Art, and Science",
       seoTitle: "Leonardo da Vinci - Renaissance Curiosity | Agora Cosmica",
     },
@@ -360,7 +360,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
   },
   woolf: {
     en: {
-      description: "Explore Virginia Woolf's philosophy of consciousness, time, and a room of one's own. 12-chapter life story, teachings on perception, feminism, and the luminous halo of being.",
+      description: "Virginia Woolf on consciousness, time, and a room of one's own. A narrated life story with teachings on perception, feminism, and the halo of being.",
       teachingsHeading: "Virginia Woolf on Consciousness, Time, and Self",
       seoTitle: "Virginia Woolf - Modernism & Consciousness | Agora Cosmica",
     },

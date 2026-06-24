@@ -1,0 +1,81 @@
+---
+// Methodik- / redaktionelle-Standards-Seite (DE). Deutsches Pendant zu
+// /methodology. Die Vertrauens- und E-E-A-T-Oberfläche, die beantwortet, wie
+// die KI-Echos gebaut, belegt und faktengeprüft werden. Eigene Intention,
+// getrennt von /echoes (warum wir den Toten eine Stimme geben) und von den
+// Hubs und der Open-Source-Positionierungsseite, damit der Cluster sich nicht
+// selbst kannibalisiert. EN- und DE-Slug unterscheiden sich (/methodology vs
+// /de/methodik), wie bei den Hubs, darum tragen altEn/altDe die echten Pfade,
+// und BaseHead leitet Canonical + hreflang daraus ab. Die FAQ wird hier
+// definiert und sowohl an die sichtbare Ausgabe als auch an faqSchema()
+// übergeben, damit JSON-LD und DOM nicht auseinanderlaufen. Alle Aussagen sind
+// faktentreu und bleiben innerhalb der gesperrten Vertrauenssignale.
+import Public from '../../layouts/Public.astro';
+import MethodologyContent from '../../components/MethodologyContent.astro';
+import {
+  organizationSchema,
+  agoraCosmicaSchema,
+  articleSchema,
+  faqSchema,
+  breadcrumbSchema,
+} from '../../lib/schemas';
+import { getT } from '../../i18n';
+import { canonicalUrl, SITE_URL, MEDIA_URL } from '../../lib/urls';
+
+const lang = 'de' as const;
+const t = getT(lang);
+
+const faq = [
+  {
+    q: 'Ist die KI die echte Person?',
+    a: 'Nein. Jede Persönlichkeit ist ein KI-Echo, eine pädagogische Deutung, verankert in den Primärwerken und im dokumentierten Leben dieses Menschen. Es ist klar als Echo gekennzeichnet, nie eine Aufnahme und nie die echte Person. Aufnahmen, in denen diese Menschen mit dir sprechen, existieren nicht, und das synthetisierte Audio ist die Echo-Stimme dieses Menschen, nicht seine eigene.',
+  },
+  {
+    q: 'Wie genau sind die Echos?',
+    a: 'Ein Echo ist im echten Werk der Persönlichkeit verankert, bleibt also nah an den wirklichen Ideen. Aber es entsteht live, ohne dass ein Mensch einen Satz liest, bevor er dich erreicht, es kann sich also irren: ein falsches Datum, eine verwischte Quelle, mehr Sicherheit, als der Quellbestand hergibt. Behandle es als Lernbegleiter, nicht als Autorität, und prüf alles Wichtige gegen die Quellen.',
+  },
+  {
+    q: 'Woher kommen die Fakten?',
+    a: 'Jede Persönlichkeit ist in ihren eigenen Primärwerken verankert, in den Büchern, Briefen und Texten, die sie tatsächlich geschrieben hat, dazu anerkannte Biografien und Forschung. Zu jeder Persönlichkeit gehört ein öffentlicher Faktencheck, der die Quellen auflistet und das Belegte vom Nachgebildeten trennt. Die Anweisungsprofile, die jedes Echo verankern, sind öffentlich, und der gesamte Code ist quelloffen unter der AGPL-3.0.',
+  },
+  {
+    q: 'Was, wenn etwas falsch ist?',
+    a: 'Öffne den Faktencheck der Persönlichkeit, der benennt, was belegt und was nachgebildet ist, und folge ihm zum Primärtext. Wenn du einen echten Fehler findest, schreib uns an agoracosmica@chipmates.ai. Wir korrigieren ihn, und weil Code und Faktenchecks öffentlich sind, ist auch die Korrektur öffentlich.',
+  },
+];
+
+const canonicalPath = '/de/methodik';
+const url = canonicalUrl(canonicalPath);
+const schemas = [
+  organizationSchema(),
+  agoraCosmicaSchema(),
+  articleSchema({
+    title: 'Wie wir die KI-Echos bauen, belegen und faktenprüfen',
+    description:
+      'Unsere Methodik und redaktionellen Standards: wie jedes KI-Echo aus Primärwerken gebaut, belegt und faktengeprüft wird, und wo die Grenzen liegen.',
+    url,
+    lang,
+    image: `${MEDIA_URL}/images/ui/og-default/1200.webp`,
+    datePublished: '2026-06-24',
+    dateModified: '2026-06-24',
+  }),
+  faqSchema(faq, url),
+  breadcrumbSchema([
+    { name: t('breadcrumbs.home'), url: `${SITE_URL}/de/` },
+    { name: 'Wie wir die Echos bauen', url },
+  ]),
+];
+---
+<Public
+  title="Wie wir die Echos bauen"
+  fullTitle="Methodik: Wie wir KI-Echos bauen, belegen und prüfen"
+  description="Wie Agora Cosmica seine KI-Echos baut: ein quellenbewusstes Stimmprofil aus Primärwerken, ein öffentlicher Faktencheck pro Mensch und quelloffener Code. Ehrlich über die Grenzen."
+  canonicalPath={canonicalPath}
+  lang={lang}
+  ogType="article"
+  altEn="/methodology"
+  altDe="/de/methodik"
+  schemas={schemas}
+>
+  <MethodologyContent lang={lang} faq={faq} />
+</Public>

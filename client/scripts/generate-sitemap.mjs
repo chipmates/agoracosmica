@@ -210,6 +210,45 @@ const CATEGORY_MOD = gitLastModified(
 urls.push(url('/open-source-philosophy-app', '0.7', CATEGORY_MOD));
 urls.push(deUrl('/open-source-philosophy-app', '0.7', CATEGORY_MOD));
 
+// Category hubs (philosophy + wisdom). Unlike every pair above, these EN/DE
+// twins use DIFFERENT slugs, so the standard url()/deUrl() helpers (which
+// assume a /de prefix of the same slug) cannot express their hreflang block.
+// crossPair() emits both pages of a pair, each listing the SAME alternate set
+// pointing hreflang="en" -> EN slug, hreflang="de" -> DE slug, x-default -> EN.
+function crossPair(enPath, dePath, priority, lastmod, changefreq = 'monthly') {
+  const enUrl = `${SITE_URL}${slash(enPath)}`;
+  const deFullUrl = `${SITE_URL}${slash(dePath)}`;
+  const alternates =
+    `    <xhtml:link rel="alternate" hreflang="en" href="${enUrl}" />\n` +
+    `    <xhtml:link rel="alternate" hreflang="de" href="${deFullUrl}" />\n` +
+    `    <xhtml:link rel="alternate" hreflang="x-default" href="${enUrl}" />\n`;
+  const entry = (loc) =>
+    `  <url>\n    <loc>${loc}</loc>\n    <lastmod>${lastmod}</lastmod>\n    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>\n${alternates}  </url>`;
+  return [entry(enUrl), entry(deFullUrl)];
+}
+
+const PHILO_HUB_MOD = gitLastModified(
+  'marketing/src/pages/ai-philosophy-tutor.astro',
+  'marketing/src/pages/de/philosophie-lernen.astro',
+  'marketing/src/components/PhilosophyHubContent.astro',
+);
+const WISDOM_HUB_MOD = gitLastModified(
+  'marketing/src/pages/learn-from-historical-figures.astro',
+  'marketing/src/pages/de/von-historischen-persoenlichkeiten-lernen.astro',
+  'marketing/src/components/WisdomHubContent.astro',
+);
+urls.push(...crossPair('/ai-philosophy-tutor', '/de/philosophie-lernen', '0.8', PHILO_HUB_MOD, 'weekly'));
+urls.push(...crossPair('/learn-from-historical-figures', '/de/von-historischen-persoenlichkeiten-lernen', '0.8', WISDOM_HUB_MOD, 'weekly'));
+
+// Methodology / editorial-standards page (trust + E-E-A-T). Cross-slug EN/DE
+// twin (/methodology vs /de/methodik), so crossPair() like the hubs.
+const METHODOLOGY_MOD = gitLastModified(
+  'marketing/src/pages/methodology.astro',
+  'marketing/src/pages/de/methodik.astro',
+  'marketing/src/components/MethodologyContent.astro',
+);
+urls.push(...crossPair('/methodology', '/de/methodik', '0.6', METHODOLOGY_MOD));
+
 // Theme detail pages
 for (const theme of THEME_IDS) {
   const mod = themeLastmod();

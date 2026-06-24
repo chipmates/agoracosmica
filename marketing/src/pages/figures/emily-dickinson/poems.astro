@@ -484,11 +484,12 @@ const THEMES = [
 const PAGE_URL = 'https://agoracosmica.org/figures/emily-dickinson/poems/';
 const dickinson = {
   '@type': 'Person',
+  '@id': `${PAGE_URL}#person`,
   name: 'Emily Dickinson',
   birthDate: '1830-12-10',
   deathDate: '1886-05-15',
   birthPlace: 'Amherst, Massachusetts',
-  sameAs: 'https://en.wikipedia.org/wiki/Emily_Dickinson',
+  sameAs: ['https://en.wikipedia.org/wiki/Emily_Dickinson', 'https://www.wikidata.org/wiki/Q4441'],
 };
 const schemas = [
   {
@@ -901,6 +902,10 @@ const schemas = [
     display: block;
     width: 100%;
     height: auto;
+    /* Reserve space before lazy load to stop layout shift. Manuscript leaves are
+       portrait but vary; 3 / 4 is a conservative placeholder, height: auto lets
+       the real ratio take over once the image decodes. */
+    aspect-ratio: 3 / 4;
   }
 
   /* Carousel for multi-leaf manuscripts: native swipe + snap, dots track position.

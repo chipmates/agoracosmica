@@ -1,0 +1,70 @@
+---
+// "Sources and further reading" for a figure page. Renders verified outbound
+// entity records (Wikipedia + Wikidata) inside a native <details> matching the
+// CollapsibleSection markup. Renders nothing when the figure has no entity
+// record, so it never shows an empty box.
+import { figureEntities } from '../lib/figureEntities';
+import { figureIdToSlug } from '@client/data/public/slugMap';
+
+interface Props {
+  figureId: string;
+  lang: 'en' | 'de';
+}
+
+const { figureId, lang } = Astro.props;
+
+const slug = figureIdToSlug[figureId];
+const entity = slug ? figureEntities[slug] : undefined;
+
+const title =
+  lang === 'de' ? 'Quellen und weiterführende Links' : 'Sources and further reading';
+const caption =
+  lang === 'de'
+    ? 'Geprüfte Einträge zum Gegenprüfen.'
+    : 'Verified entity records for cross-checking.';
+
+const wikipediaUrl = entity
+  ? lang === 'de'
+    ? entity.wikipediaDe
+    : entity.wikipediaEn
+  : undefined;
+---
+{
+  entity && (
+    <details class="pub-section pub-collapsible pub-sources">
+      <summary class="pub-collapsible__header">
+        <h2 class="pub-section__title pub-collapsible__title">{title}</h2>
+        <span class="pub-collapsible__arrow" aria-hidden="true">▼</span>
+      </summary>
+      <div class="pub-collapsible__body">
+        <ul class="pub-sources__list">
+          {wikipediaUrl && (
+            <li>
+              <a class="pub-textlink" href={wikipediaUrl} rel="noopener" target="_blank">
+                Wikipedia
+              </a>
+            </li>
+          )}
+          {entity.wikidata && (
+            <li>
+              <a class="pub-textlink" href={entity.wikidata} rel="noopener" target="_blank">
+                Wikidata
+              </a>
+            </li>
+          )}
+        </ul>
+        <p class="pub-sources__caption">{caption}</p>
+      </div>
+    </details>
+  )
+}
+
+<style is:global>
+  /* Native <details> glue (mirrors CollapsibleSection) so this component works
+     standalone wherever it is dropped in. */
+  details.pub-sources > summary { list-style: none; cursor: pointer; }
+  details.pub-sources > summary::-webkit-details-marker { display: none; }
+  details.pub-sources[open] .pub-collapsible__arrow { transform: rotate(180deg); }
+  .pub-sources__list { margin: 0; padding-left: 1.25rem; }
+  .pub-sources__caption { margin: 0.5rem 0 0; font-size: 0.9rem; opacity: 0.75; }
+</style>

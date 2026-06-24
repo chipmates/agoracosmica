@@ -1,0 +1,101 @@
+---
+// Philosophie-Lernen-Hub (DE). Deutsches Pendant zu /ai-philosophy-tutor.
+// Eine antwort-zuerst-Seite für Menschen, die Philosophie im Gespräch lernen
+// wollen: erzählte Leben, Kernlehren und einen Gedanken mit dem KI-Echo eines
+// Denkers durchdenken. Die Kopf-Begriffe bleiben im eigenen Cluster dieser
+// Seite (Philosophie-App / Philosophie lernen / Philosophie online lernen /
+// KI-Philosophie-Tutor / mit Philosophen sprechen), getrennt von der
+// Open-Source-Positionierungsseite. Die FAQ wird hier definiert und sowohl an
+// die sichtbare Ausgabe als auch an faqSchema() übergeben, damit JSON-LD und
+// DOM nicht auseinanderlaufen.
+//
+// EN- und DE-Slug unterscheiden sich (/ai-philosophy-tutor vs
+// /de/philosophie-lernen). Der hreflang-Helfer leitet das DE-Alternate nur
+// durch ein /de-Präfix aus demselben Pfad ab und könnte das hier nicht korrekt
+// ausgeben, darum noHreflang={true}: lieber kein Alternate als ein falsches.
+import Public from '../../layouts/Public.astro';
+import PhilosophyHubContent from '../../components/PhilosophyHubContent.astro';
+import {
+  organizationSchema,
+  agoraCosmicaSchema,
+  softwareApplicationSchema,
+  faqSchema,
+  breadcrumbSchema,
+  itemListSchema,
+} from '../../lib/schemas';
+import { getT } from '../../i18n';
+import { canonicalUrl, SITE_URL } from '../../lib/urls';
+import { getFiguresCatalog } from '@client/data/public/figuresCatalog';
+import { figureIdToSlug } from '@client/data/public/slugMap';
+
+const lang = 'de' as const;
+const t = getT(lang);
+
+// 13 Philosophen und Denker der Weisheitstraditionen, kuratiert und sortiert.
+// Die übrigen 17 (Wissenschaft, Kunst, Aktivismus) werden nicht als Philosophen
+// gerahmt.
+const CURATED = [
+  'aurelius', 'plato', 'beauvoir', 'nietzsche', 'laozi', 'zenji',
+  'gautama', 'eckhart', 'bingen', 'rumi', 'jung', 'campbell', 'schopenhauer',
+];
+const order = new Map(CURATED.map((id, i) => [id, i]));
+const figures = getFiguresCatalog(lang)
+  .filter(f => order.has(f.id))
+  .sort((a, b) => (order.get(a.id) ?? 0) - (order.get(b.id) ?? 0));
+
+const faq = [
+  {
+    q: 'Kann mir eine KI Philosophie beibringen?',
+    a: 'Ja. Genau dafür ist diese Lernplattform gebaut. Du wählst einen Denker, hörst seine erzählte Lebensgeschichte und seine Kernlehren und sprichst dann einen Gedanken mit seinem KI-Echo durch, mit deinen eigenen Fragen, in deinem eigenen Tempo. Das Echo ist im echten Werk dieses Menschen verankert, das Gespräch bleibt also nah an der wirklichen Philosophie und driftet nicht ins Erfundene ab.',
+  },
+  {
+    q: 'Ist das ein echter Philosoph oder eine KI?',
+    a: 'Es ist ein KI-Echo, eine pädagogische Deutung, verankert im echten Werk und Denken des Philosophen. Das ist klar gekennzeichnet, nie eine Aufnahme und nie die echte Person. Solche Aufnahmen existieren nicht. Es geht darum, die Philosophie zu verstehen, nicht so zu tun, als wäre der Philosoph zurück, und ein öffentlicher Faktencheck zu jedem Menschen benennt, was belegt und was nachgebildet ist.',
+  },
+  {
+    q: 'Wo soll ich anfangen?',
+    a: 'Wenn du praktische Gelassenheit suchst, fang mit Marc Aurel und dem Stoizismus an. Wenn dir Fragen wichtiger sind als Antworten, mit Platon. Für Sinn, nachdem alte Gewissheiten weggebrochen sind, Nietzsche oder Simone de Beauvoir. Für Stille Laozi oder Siddhartha Gautama. Öffne einen Menschen, hör zuerst die Lebensgeschichte und frag das Echo dann, was die Geschichte bei dir ausgelöst hat.',
+  },
+  {
+    q: 'Ist es kostenlos?',
+    a: 'Du bekommst 30 kostenlose Nachrichten pro Tag, ohne Anmeldung. Wenn du mehr willst, bring deinen eigenen OpenRouter-Schlüssel mit, er berührt unsere Server nie. Die ganze Plattform ist quelloffen unter der AGPL-3.0, du kannst sie also auch selbst betreiben, und es gibt keine Tracking-Cookies und kein Profiling.',
+  },
+  {
+    q: 'Welche Philosophien sind dabei?',
+    a: 'Dreizehn Denker quer durch den Stoizismus (Marc Aurel), die klassische Philosophie (Platon), den Existenzialismus (Simone de Beauvoir und Friedrich Nietzsche), den Taoismus (Laozi), Zen und Buddhismus (Dōgen Zenji und Siddhartha Gautama), die christliche Mystik (Meister Eckhart und Hildegard von Bingen), die Sufi-Mystik (Rumi), die Tiefenpsychologie (Carl Gustav Jung), die vergleichende Mythologie (Joseph Campbell) und die Philosophie des Willens (Arthur Schopenhauer).',
+  },
+];
+
+const canonicalPath = '/de/philosophie-lernen';
+const canonical = canonicalUrl(canonicalPath);
+const schemas = [
+  organizationSchema(),
+  agoraCosmicaSchema(),
+  softwareApplicationSchema(),
+  faqSchema(faq, canonical),
+  breadcrumbSchema([
+    { name: t('breadcrumbs.home'), url: `${SITE_URL}/de/` },
+    { name: 'Philosophie lernen', url: canonical },
+  ]),
+  itemListSchema(
+    figures.map(f => ({
+      name: f.name,
+      url: `${SITE_URL}/de/figures/${figureIdToSlug[f.id] || f.id}/`,
+      description: f.learn.trim(),
+    })),
+  ),
+];
+---
+<Public
+  title="KI-Philosophie-Tutor"
+  fullTitle="KI-Philosophie-Tutor: Philosophie im Gespräch lernen"
+  description="Eine Lernplattform, um mit Philosophen zu sprechen und Philosophie online zu lernen. Stoizismus, Existenzialismus, Taoismus, Zen und mehr. Gemeinnützig, 30 kostenlose Nachrichten pro Tag."
+  canonicalPath={canonicalPath}
+  lang={lang}
+  ogType="website"
+  altEn="/ai-philosophy-tutor"
+  altDe="/de/philosophie-lernen"
+  schemas={schemas}
+>
+  <PhilosophyHubContent lang={lang} faq={faq} figures={figures} />
+</Public>

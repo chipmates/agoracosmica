@@ -65,6 +65,13 @@ const en = {
   starCta: 'Star on GitHub →',
   aboutLink: 'About the project',
   figuresLink: 'All figures',
+  // Cross-links to the two category hubs (the open-source page sits beside them
+  // in the topic cluster). Rendered as one short sentence with two links.
+  hubsPre: 'To learn philosophy in conversation, start at the ',
+  hubsPhiloLink: 'AI philosophy tutor',
+  hubsMid: '. To learn timeless wisdom from history’s figures, start at the ',
+  hubsWisdomLink: 'wisdom guide',
+  hubsPost: '.',
 };
 
 const de = {
@@ -108,9 +115,21 @@ const de = {
   starCta: 'Auf GitHub einen Stern geben →',
   aboutLink: 'Über das Projekt',
   figuresLink: 'Alle Menschen',
+  hubsPre: 'Um Philosophie im Gespräch zu lernen, beginne beim ',
+  hubsPhiloLink: 'KI-Philosophie-Tutor',
+  hubsMid: '. Um zeitlose Weisheit von den Menschen der Geschichte zu lernen, beginne beim ',
+  hubsWisdomLink: 'Weisheits-Leitfaden',
+  hubsPost: '.',
 };
 
 const c = isDe ? de : en;
+
+// Hub hrefs are lang-aware: the two hubs use localized DE slugs (built literally
+// per language), not a /de/ prefix of the EN slug.
+const philoHubHref = isDe ? '/de/philosophie-lernen/' : '/ai-philosophy-tutor/';
+const wisdomHubHref = isDe
+  ? '/de/von-historischen-persoenlichkeiten-lernen/'
+  : '/learn-from-historical-figures/';
 ---
 <div class="pub-content osp">
   <header class="pub-theme-hero">
@@ -215,6 +234,9 @@ const c = isDe ? de : en;
       <span class="osp-star__text">{c.starText}</span>
       <span class="osp-star__cta">{c.starCta}</span>
     </a>
+    <p class="pub-section__text osp-links">
+      {c.hubsPre}<a class="pub-textlink" href={philoHubHref}>{c.hubsPhiloLink}</a>{c.hubsMid}<a class="pub-textlink" href={wisdomHubHref}>{c.hubsWisdomLink}</a>{c.hubsPost}
+    </p>
     <p class="pub-section__text osp-links">
       <a class="pub-textlink" href={publicUrl(lang, '/about')}>{c.aboutLink}</a>
       {' · '}

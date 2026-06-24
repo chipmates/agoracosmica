@@ -1,0 +1,94 @@
+---
+// Philosophy-learning hub (EN). A query-shaped, indexed page for people who
+// want to learn philosophy in conversation: narrated lives, core teachings,
+// and talking an idea through with a thinker's AI Echo. The DE twin lives at
+// /de/philosophie-lernen. Head terms stay inside this page's own cluster
+// (philosophy app / philosophy learning platform / AI philosophy tutor /
+// learn philosophy online / chat with philosophers), distinct from the
+// open-source positioning page so the two do not cannibalize each other. The
+// FAQ array is defined here and passed to BOTH the visible render and
+// faqSchema(), so the JSON-LD can never drift from the DOM.
+import Public from '../layouts/Public.astro';
+import PhilosophyHubContent from '../components/PhilosophyHubContent.astro';
+import {
+  organizationSchema,
+  agoraCosmicaSchema,
+  softwareApplicationSchema,
+  faqSchema,
+  breadcrumbSchema,
+  itemListSchema,
+} from '../lib/schemas';
+import { getT } from '../i18n';
+import { canonicalUrl, publicUrl, SITE_URL } from '../lib/urls';
+import { getFiguresCatalog } from '@client/data/public/figuresCatalog';
+import { figureIdToSlug } from '@client/data/public/slugMap';
+
+const lang = 'en' as const;
+const t = getT(lang);
+
+// 13 philosophers and wisdom-tradition thinkers, curated and ordered. The other
+// 17 figures (scientists, artists, activists) are not framed as philosophers.
+const CURATED = [
+  'aurelius', 'plato', 'beauvoir', 'nietzsche', 'laozi', 'zenji',
+  'gautama', 'eckhart', 'bingen', 'rumi', 'jung', 'campbell', 'schopenhauer',
+];
+const order = new Map(CURATED.map((id, i) => [id, i]));
+const figures = getFiguresCatalog(lang)
+  .filter(f => order.has(f.id))
+  .sort((a, b) => (order.get(a.id) ?? 0) - (order.get(b.id) ?? 0));
+
+const faq = [
+  {
+    q: 'Can AI tutor me in philosophy?',
+    a: 'Yes. This is a philosophy learning platform built around that. You pick a thinker, listen to their narrated life and core teachings, then talk an idea through with their AI Echo, asking your own questions at your own pace. The Echo is grounded in that person’s real work, so the conversation stays close to the actual philosophy rather than drifting into invention.',
+  },
+  {
+    q: 'Is it a real philosopher or an AI?',
+    a: 'It is an AI Echo, an educational interpretation grounded in the philosopher’s real writing and ideas. It is clearly labeled as such, never a recording and never the real person. No such recordings exist. The aim is to help you understand the philosophy, not to pretend the philosopher is back, and a public factcheck for each figure names what is verified and what was recreated.',
+  },
+  {
+    q: 'Where should I start?',
+    a: 'If you want practical calm, start with Marcus Aurelius and Stoicism. If you like questions more than answers, start with Plato. For meaning after old certainties fall away, Nietzsche or Simone de Beauvoir. For stillness, Laozi or Siddhartha Gautama. Open any figure, listen to the life story first, then ask the Echo whatever the story raised for you.',
+  },
+  {
+    q: 'Is it free?',
+    a: 'You get 30 free messages a day with no signup. Want more, bring your own OpenRouter key and it never touches our servers. The whole platform is open source under AGPL-3.0, so you can also run it yourself, and there are no tracking cookies and no profiling.',
+  },
+  {
+    q: 'Which philosophies are covered?',
+    a: 'Thirteen thinkers across Stoicism (Marcus Aurelius), classical philosophy (Plato), existentialism (Simone de Beauvoir and Friedrich Nietzsche), Taoism (Laozi), Zen and Buddhism (Dōgen Zenji and Siddhartha Gautama), Christian mysticism (Meister Eckhart and Hildegard von Bingen), Sufi mysticism (Rumi), depth psychology (Carl Gustav Jung), comparative mythology (Joseph Campbell), and the philosophy of will (Arthur Schopenhauer).',
+  },
+];
+
+const canonical = canonicalUrl(publicUrl(lang, '/ai-philosophy-tutor'));
+const schemas = [
+  organizationSchema(),
+  agoraCosmicaSchema(),
+  softwareApplicationSchema(),
+  faqSchema(faq, canonical),
+  breadcrumbSchema([
+    { name: t('breadcrumbs.home'), url: `${SITE_URL}/` },
+    { name: 'AI philosophy tutor', url: canonical },
+  ]),
+  itemListSchema(
+    figures.map(f => ({
+      name: f.name,
+      url: `${SITE_URL}/figures/${figureIdToSlug[f.id] || f.id}/`,
+      description: f.learn.trim(),
+    })),
+  ),
+];
+---
+<Public
+  title="AI Philosophy Tutor"
+  fullTitle="AI Philosophy Tutor: Learn Philosophy in Conversation"
+  description="A philosophy learning platform to chat with philosophers and learn philosophy online. Stoicism, existentialism, Taoism, Zen, and more. Nonprofit, 30 free messages a day."
+  canonicalPath="/ai-philosophy-tutor"
+  lang={lang}
+  ogType="website"
+  altEn="/ai-philosophy-tutor"
+  altDe="/de/philosophie-lernen"
+  schemas={schemas}
+>
+  <PhilosophyHubContent lang={lang} faq={faq} figures={figures} />
+</Public>

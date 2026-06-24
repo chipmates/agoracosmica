@@ -33,6 +33,10 @@ interface Props {
   schemas?: Array<Record<string, unknown>>;
   includeRss?: boolean;
   noHreflang?: boolean;
+  /** Cross-slug hreflang alternates (lang-prefixed paths), for pages whose
+   *  EN/DE slugs differ (the category hubs). Forwarded to BaseHead. */
+  altEn?: string;
+  altDe?: string;
   /** Internal lab/preview pages: emit robots noindex. */
   noindex?: boolean;
   /** Set false on pages that render their own dedicated CTA (figure + theme detail). */
