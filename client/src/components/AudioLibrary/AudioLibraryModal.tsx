@@ -65,7 +65,7 @@ const getLastName = (fullName: string): string => {
     'Wolfgang Amadeus Mozart': 'Mozart',
     'Carl Gustav Jung': 'Jung',
     'Johann Wolfgang von Goethe': 'Goethe',
-    'Marc Aurel': 'Marc Aurel',
+    'Mark Aurel': 'Mark Aurel',
   };
 
   for (const [full, last] of Object.entries(specialCases)) {

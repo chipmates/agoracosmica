@@ -15,7 +15,7 @@ const hook = getLocalizedHook(council, lang);
 const participants = [council.moderator, ...council.participants]
   .map(p => {
     // Only swap in the catalog name where German uses a true exonym
-    // (Marc Aurel, Platon). Everywhere else keep the council JSON's
+    // (Mark Aurel, Platon). Everywhere else keep the council JSON's
     // deliberately abbreviated names (J.W. von Goethe, W.A. Mozart).
     if (lang !== 'de') return p.name;
     const deName = getFigureById(p.id, 'de')?.name;

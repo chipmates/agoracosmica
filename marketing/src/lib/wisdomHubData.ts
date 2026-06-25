@@ -40,7 +40,7 @@ export function getWisdomFaq(lang: Lang): WisdomFaqEntry[] {
       },
       {
         q: 'Ist alte Weisheit heute noch relevant?',
-        a: 'Ja. Die Fragen ändern sich kaum: Wie soll ich leben, wie gehe ich mit Verlust um, was macht das Leben lebenswert. Marc Aurel schrieb auf einem Feldzug Notizen an sich selbst über genau diese Dinge, Laozi über das Handeln ohne Zwang. Die Umstände sind neu, die Lage des Menschen ist alt. Deshalb sind diese Lebensweisheiten weiter brauchbar.',
+        a: 'Ja. Die Fragen ändern sich kaum: Wie soll ich leben, wie gehe ich mit Verlust um, was macht das Leben lebenswert. Mark Aurel schrieb auf einem Feldzug Notizen an sich selbst über genau diese Dinge, Laozi über das Handeln ohne Zwang. Die Umstände sind neu, die Lage des Menschen ist alt. Deshalb sind diese Lebensweisheiten weiter brauchbar.',
       },
       {
         q: 'Welche Persönlichkeiten und Themen sind dabei?',

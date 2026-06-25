@@ -98,7 +98,8 @@ const ChatBox: FC<ChatBoxProps> = ({
       'zenji': 'zenji', // Keep for backward compatibility but Dōgen is preferred
       // German variations
       'platon': 'plato',
-      'marc aurel': 'aurelius'
+      'marc aurel': 'aurelius',
+      'mark aurel': 'aurelius'
     };
     
     // Return mapped name or try to extract the last name

@@ -178,6 +178,8 @@ class IntroductionAudioService {
       'marcus': 'aurelius',
       'marc aurel': 'aurelius',
       'echo von marc aurel': 'aurelius',
+      'mark aurel': 'aurelius',
+      'echo von mark aurel': 'aurelius',
       'johann wolfgang von goethe': 'goethe',
       'wolfgang amadeus mozart': 'mozart',
       'william shakespeare': 'shakespeare',

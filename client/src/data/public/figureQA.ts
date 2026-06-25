@@ -198,21 +198,21 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
     de: {
       pairs: [
         {
-          q: "Was kann ich von Marc Aurel lernen?",
-          a: "Marc Aurel (Marcus Aurelius), der römische Kaiser, der von 121 bis 180 n. Chr. lebte, bringt dir bei, deine erste Reaktion zu hinterfragen. Sein Kerngedanke ist, das tatsächlich Geschehene von der Geschichte zu trennen, die dein Kopf hinzufügt. Er schrieb diese Notizen an sich selbst an der Grenze nieder, und sie blieben als die Selbstbetrachtungen erhalten.",
+          q: "Was kann ich von Mark Aurel lernen?",
+          a: "Mark Aurel (Marcus Aurelius), der römische Kaiser, der von 121 bis 180 n. Chr. lebte, bringt dir bei, deine erste Reaktion zu hinterfragen. Sein Kerngedanke ist, das tatsächlich Geschehene von der Geschichte zu trennen, die dein Kopf hinzufügt. Er schrieb diese Notizen an sich selbst an der Grenze nieder, und sie blieben als die Selbstbetrachtungen erhalten.",
         },
         {
-          q: "Was lehrte Marc Aurel wirklich?",
-          a: "Marc Aurel lehrte stoische Philosophie über drei zentrale Ideen. Die Prüfung der Eindrücke legt eine Pause zwischen ein Ereignis und deine Reaktion. Das Leben im Einklang mit der Natur wirkt auf drei Ebenen: deiner vernünftigen Natur, deinen sozialen Rollen und der kosmischen Ordnung. Die vorgezogenen Gleichgültigkeiten besagen, dass Gesundheit, Familie und Erfolg wichtig sind, aber nicht über deine Tugend entscheiden.",
+          q: "Was lehrte Mark Aurel wirklich?",
+          a: "Mark Aurel lehrte stoische Philosophie über drei zentrale Ideen. Die Prüfung der Eindrücke legt eine Pause zwischen ein Ereignis und deine Reaktion. Das Leben im Einklang mit der Natur wirkt auf drei Ebenen: deiner vernünftigen Natur, deinen sozialen Rollen und der kosmischen Ordnung. Die vorgezogenen Gleichgültigkeiten besagen, dass Gesundheit, Familie und Erfolg wichtig sind, aber nicht über deine Tugend entscheiden.",
         },
         {
-          q: "Was ist Marc Aurels Prüfung der Eindrücke?",
-          a: "Sie ist die stoische Disziplin der Zustimmung. Marc Aurel beschrieb, wie man eine Pause zwischen ein äußeres Ereignis und die eigene Reaktion legt, dann den Eindruck prüft, der entsteht, und sich fragt, ob das Urteil, das man daran geknüpft hat, wirklich wahr ist. Wenn jemand kritisiert wird, kommt der Stachel oft aus der Geschichte, die der Kopf um die Worte legt, nicht aus den Worten selbst.",
+          q: "Was ist Mark Aurels Prüfung der Eindrücke?",
+          a: "Sie ist die stoische Disziplin der Zustimmung. Mark Aurel beschrieb, wie man eine Pause zwischen ein äußeres Ereignis und die eigene Reaktion legt, dann den Eindruck prüft, der entsteht, und sich fragt, ob das Urteil, das man daran geknüpft hat, wirklich wahr ist. Wenn jemand kritisiert wird, kommt der Stachel oft aus der Geschichte, die der Kopf um die Worte legt, nicht aus den Worten selbst.",
         },
       ],
       disclosure: {
-        q: "Spricht hier wirklich Marc Aurel?",
-        a: "Nein. Das ist die Echo-Stimme, eine erklärende KI-Interpretation, die auf seinen überlieferten Schriften wie den Selbstbetrachtungen beruht. Es ist keine Aufnahme und nicht der echte Marc Aurel, der von 121 bis 180 n. Chr. lebte. Das Echo ist eine Stimme, die wir ihm geben, damit du seine stoischen Ideen im Gespräch erkunden kannst.",
+        q: "Spricht hier wirklich Mark Aurel?",
+        a: "Nein. Das ist die Echo-Stimme, eine erklärende KI-Interpretation, die auf seinen überlieferten Schriften wie den Selbstbetrachtungen beruht. Es ist keine Aufnahme und nicht der echte Mark Aurel, der von 121 bis 180 n. Chr. lebte. Das Echo ist eine Stimme, die wir ihm geben, damit du seine stoischen Ideen im Gespräch erkunden kannst.",
       },
     },
   },

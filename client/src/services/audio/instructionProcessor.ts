@@ -276,7 +276,7 @@ export const fetchInstructions = async (
     // Special case for Martin Luther King Jr.
     if (figure.includes('King Jr.') || figure.includes('King Jr')) {
       figureId = 'king';
-    } else if (figure.toLowerCase().includes('marc aurel')) {
+    } else if (figure.toLowerCase().includes('mark aurel') || figure.toLowerCase().includes('marc aurel')) {
       // German exonym: last-word split would yield "aurel" and 404 the instruction fetch
       figureId = 'aurelius';
     } else {

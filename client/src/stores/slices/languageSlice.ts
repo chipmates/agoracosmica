@@ -299,7 +299,7 @@ export const createLanguageSlice = (
     // Special case: "Martin Luther King Jr." → "king" (not "jr")
     if (normalizedFigureId.includes('king')) {
       normalizedFigureId = 'king';
-    } else if (normalizedFigureId.includes('marc aurel')) {
+    } else if (normalizedFigureId.includes('mark aurel') || normalizedFigureId.includes('marc aurel')) {
       // German exonym: last-word split would yield "aurel"
       normalizedFigureId = 'aurelius';
     } else {

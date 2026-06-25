@@ -31,7 +31,7 @@ function formatFigureName(figureName: string): string {
   if (full.includes('Simone de Beauvoir')) return 'Beauvoir';
   if (full.includes('Hildegard von Bingen')) return 'Hildegard';
   if (full.includes('Martin Luther King')) return 'King';
-  if (full.includes('Marc Aurel')) return 'Marc Aurel';
+  if (full.includes('Mark Aurel')) return 'Mark Aurel';
   const parts = full.split(' ');
   return parts[parts.length - 1] ?? full;
 }
