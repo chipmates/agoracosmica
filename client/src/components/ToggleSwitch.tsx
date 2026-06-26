@@ -66,7 +66,7 @@ const ToggleSwitch: FC<ToggleSwitchProps> = ({
       disabled={disabled}
       role="switch"
       aria-checked={checked}
-      aria-label={ariaLabel}
+      aria-label={ariaLabel || undefined}
       style={{
         background: 'transparent',
         border: 'none',
