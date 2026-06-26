@@ -38,7 +38,7 @@ The design system uses CSS custom properties for all colors, enforced project-wi
 | UI components | 3:1 |
 | Focus indicators | 3:1 |
 
-The color system uses a dark cosmic theme with gold accents. Contrast ratios for each token are documented inline in `client/src/index.css` (e.g., `--gold-primary` 7.21:1, `--text-primary` 10.8:1, `--text-dim` 4.5:1). A development helper at `pages/dev/ColorContrastTest.tsx` lets reviewers spot-check pairs.
+The color system uses a dark cosmic theme with gold accents. Contrast ratios for each token are documented inline in `client/src/index.css` (e.g., `--gold-primary` 7.21:1, `--text-primary` 10.8:1, `--text-dim` 4.5:1). A development helper at `client/src/components/ColorContrastTest.tsx` lets reviewers spot-check pairs.
 
 ---
 
