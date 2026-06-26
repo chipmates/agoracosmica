@@ -8,6 +8,7 @@ interface ToggleSwitchProps {
   id?: string;
   className?: string;
   size?: 'small' | 'medium' | 'large';
+  ariaLabel?: string;
 }
 
 /**
@@ -20,6 +21,7 @@ interface ToggleSwitchProps {
  * @param {string} props.id Optional ID for the toggle
  * @param {string} props.className Optional additional CSS classes
  * @param {string} props.size Size of toggle - small, medium (default), or large
+ * @param {string} props.ariaLabel Optional aria-label
  */
 const ToggleSwitch: FC<ToggleSwitchProps> = ({ 
   checked = false, 
@@ -27,7 +29,8 @@ const ToggleSwitch: FC<ToggleSwitchProps> = ({
   disabled = false, 
   id, 
   className = '',
-  size = 'medium'
+  size = 'medium',
+  ariaLabel = ''
 }) => {
   // Size mapping for the icons
   const sizeMap: Record<string, number> = {
@@ -63,6 +66,7 @@ const ToggleSwitch: FC<ToggleSwitchProps> = ({
       disabled={disabled}
       role="switch"
       aria-checked={checked}
+      aria-label={ariaLabel}
       style={{
         background: 'transparent',
         border: 'none',

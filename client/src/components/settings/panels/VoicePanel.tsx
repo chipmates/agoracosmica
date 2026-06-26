@@ -393,6 +393,7 @@ const VoicePanel: FC<VoicePanelProps> = ({
             checked={config.ttsEnabled !== false}
             onChange={(value) => onChange('ttsEnabled', value)}
             size="medium"
+            ariaLabel={tString('settings.voice.enabled')}
           />
         </div>
       </div>

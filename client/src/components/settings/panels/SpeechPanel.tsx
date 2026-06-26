@@ -75,6 +75,7 @@ const SpeechPanel: FC<SpeechPanelProps> = ({
             checked={config.sttEnabled !== false}
             onChange={(value) => onChange('sttEnabled', value)}
             size="medium"
+            ariaLabel={tString('settings.speech.enabled')}
           />
         </div>
       </div>
