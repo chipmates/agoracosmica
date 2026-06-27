@@ -361,11 +361,11 @@ const LocalModePanel: FC<LocalModePanelProps> = ({ SettingCard, CATEGORY_ICONS }
 
         {llmEnabled && (
           <>
-            <label style={labelStyle} htmlFor='local-llm-endpoint'>
+            <label style={labelStyle} htmlFor="local-llm-endpoint">
               {tNode('settings.aiModelKey.custom.endpointLabel')}
             </label>
             <input
-              id='local-llm-endpoint'
+              id="local-llm-endpoint"
               type="text"
               value={endpointURL}
               onChange={(e) => setEndpointURL(e.target.value)}
@@ -373,11 +373,11 @@ const LocalModePanel: FC<LocalModePanelProps> = ({ SettingCard, CATEGORY_ICONS }
               style={inputStyle}
             />
 
-            <label style={labelStyle} htmlFor='local-llm-model'>
+            <label style={labelStyle} htmlFor="local-llm-model">
               {tNode('settings.aiModelKey.custom.modelLabel')}
             </label>
             <input
-              id='local-llm-model'
+              id="local-llm-model"
               type="text"
               value={modelName}
               onChange={(e) => setModelName(e.target.value)}
@@ -424,11 +424,11 @@ const LocalModePanel: FC<LocalModePanelProps> = ({ SettingCard, CATEGORY_ICONS }
 
         {ttsEnabled && (
           <>
-            <label style={labelStyle} htmlFor='local-tts-kokoro'>
+            <label style={labelStyle} htmlFor="local-tts-kokoro">
               {tString('settings.localMode.urlOverrides.kokoroLabel', 'English endpoint (Kokoro)')}
             </label>
             <input
-              id='local-tts-kokoro'
+              id="local-tts-kokoro"
               type="text"
               value={kokoroURL}
               onChange={(e) => setKokoroURL(e.target.value)}
@@ -436,11 +436,11 @@ const LocalModePanel: FC<LocalModePanelProps> = ({ SettingCard, CATEGORY_ICONS }
               style={inputStyle}
             />
 
-            <label style={labelStyle} htmlFor='local-tts-qwen'>
+            <label style={labelStyle} htmlFor="local-tts-qwen">
               {tString('settings.localMode.urlOverrides.qwenLabel', 'German endpoint (Qwen3-TTS)')}
             </label>
             <input
-              id='local-tts-qwen'
+              id="local-tts-qwen"
               type="text"
               value={qwenURL}
               onChange={(e) => setQwenURL(e.target.value)}
@@ -478,11 +478,11 @@ const LocalModePanel: FC<LocalModePanelProps> = ({ SettingCard, CATEGORY_ICONS }
 
         {sttEnabled && (
           <>
-            <label style={labelStyle} htmlFor='local-stt-whisper'>
+            <label style={labelStyle} htmlFor="local-stt-whisper">
               {tString('settings.localMode.urlOverrides.whisperLabel', 'Whisper endpoint')}
             </label>
             <input
-              id='local-stt-whisper'
+              id="local-stt-whisper"
               type="text"
               value={sttURL}
               onChange={(e) => setSttURL(e.target.value)}
