@@ -15,6 +15,8 @@ import { getFigureById } from '@client/data/public/figuresCatalog';
 import { figureIdToSlug } from '@client/data/public/slugMap';
 import {
   councilCatalog,
+  councilsByTheme,
+  THEMES,
   getLocalizedTitle,
   getLocalizedQuestion,
 } from '@client/data/councilCatalog';
@@ -24,6 +26,20 @@ import type { LibMode } from './lab-library';
 
 const isDev = typeof import.meta !== 'undefined' && import.meta.env?.DEV;
 const MEDIA_BASE = isDev ? '' : 'https://media.agoracosmica.org';
+
+// Only one council per theme has a produced 50s preview trailer: the theme's
+// "featured" council, which the theme pages hero as the lowest-sortOrder council
+// (ThemeDetailContent uses the same councils[0] rule). Deriving the set from that
+// invariant keeps Council audio in lockstep with what is actually produced,
+// instead of a hand-maintained ID list that silently rots when content changes.
+// The other ~47 councils are catalog-only and 404 on their preview URL, so a
+// figure whose only councils lack audio gets a link-only Council panel instead
+// of a broken player.
+const COUNCIL_PREVIEW_IDS = new Set(
+  THEMES
+    .map(theme => [...(councilsByTheme[theme.id] ?? [])].sort((a, b) => a.sortOrder - b.sortOrder)[0]?.id)
+    .filter((id): id is string => Boolean(id)),
+);
 
 // Figure-agnostic per-mode display strings (the parts that do not change per
 // figure). German reviewed for gender-neutrality: no possessive that assumes a
@@ -160,14 +176,22 @@ export function getFigureLibraryModes(figureId: string, lang: 'en' | 'de'): LibM
     },
   ];
 
-  // Council: only if this figure actually appears in one. Use the first council
-  // where they moderate (they convene it, so it is genuinely "learn from them"),
-  // else the first they take part in.
+  // Council: only if this figure actually appears in one. Prefer a council they
+  // are in that HAS a preview trailer (so the panel plays a real taste),
+  // preferring one they moderate (they convene it, genuinely "learn from them").
+  // Fall back to any council they take part in, rendered link-only rather than
+  // with a play button that would 404.
   const inCouncils = councilCatalog.filter(
     c => c.moderator.id === figureId || c.participants.some(p => p.id === figureId),
   );
-  const council = inCouncils.find(c => c.moderator.id === figureId) ?? inCouncils[0];
+  const withPreview = inCouncils.filter(c => COUNCIL_PREVIEW_IDS.has(c.id));
+  const council =
+    withPreview.find(c => c.moderator.id === figureId) ??
+    withPreview[0] ??
+    inCouncils.find(c => c.moderator.id === figureId) ??
+    inCouncils[0];
   if (council) {
+    const hasPreview = COUNCIL_PREVIEW_IDS.has(council.id);
     const cast = [council.moderator, ...council.participants]
       .filter(p => p.id !== figureId)
       .slice(0, 3)
@@ -180,12 +204,18 @@ export function getFigureLibraryModes(figureId: string, lang: 'en' | 'de'): LibM
       kicker: t.council.kicker,
       title: getLocalizedTitle(council, lang),
       body: getLocalizedQuestion(council, lang),
-      audioWebm: getPublicCouncilPreviewUrl(council.id, lang, 'webm'),
-      audioMp3: getPublicCouncilPreviewUrl(council.id, lang, 'mp3'),
-      duration: t.council.duration,
-      playLabel: t.council.playLabel,
+      // Audio + its disclosure only when the chosen council is a produced one;
+      // otherwise the panel degrades to link-only (like Wisdom / Free Talk).
+      ...(hasPreview
+        ? {
+            audioWebm: getPublicCouncilPreviewUrl(council.id, lang, 'webm'),
+            audioMp3: getPublicCouncilPreviewUrl(council.id, lang, 'mp3'),
+            duration: t.council.duration,
+            playLabel: t.council.playLabel,
+            disclosure: t.council.disclosure,
+          }
+        : {}),
       scale: t.council.scale,
-      disclosure: t.council.disclosure,
       linkHref: publicUrl(lang, `/themes/${council.theme}`),
       linkLabel: t.council.linkLabel,
       cast,
