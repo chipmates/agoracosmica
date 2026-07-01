@@ -1,0 +1,92 @@
+---
+// Homepage "six ways" section: the interactive one-figure Library (Marcus
+// Aurelius / Mark Aurel), now the SINGLE telling of the six ways to learn. It
+// replaces the old static six-card grid: the island server-renders all six
+// panels (the five inactive ones carry `hidden`), so every mode's prose is in
+// crawlable HTML, and it inherits the grid's SEO heading + both reviewed ledes.
+// So the section is both the crawlable feature list AND the playable demo, with
+// no duplicate section above it. Island is client:visible (no LCP cost); the
+// band + labels are bilingual, German reviewed twice.
+import LabLibrary from '../islands/LabLibrary';
+import { getLibraryModes, FEATURED_ID } from './landing-lab/lab-library';
+import { getFiguresCatalog } from '@client/data/public/figuresCatalog';
+import { MEDIA_URL, publicUrl } from '../lib/urls';
+import './landing-lab/lab-samples.css';
+import './landing-lab/lab-library.css';
+
+interface Props { lang: 'en' | 'de'; }
+const { lang } = Astro.props;
+
+const modes = getLibraryModes(lang);
+const figures = getFiguresCatalog(lang);
+const featured = figures.find(f => f.id === FEATURED_ID);
+const figureName = featured ? featured.name : (lang === 'de' ? 'Mark Aurel' : 'Marcus Aurelius');
+const portrait = `${MEDIA_URL}/images/figures/${FEATURED_ID}/thumbnail/160.webp`;
+
+// Heading + both ledes are the exact copy inherited from the retired static
+// grid (German reviewed twice), so removing the grid loses no crawlable text.
+const BAND = {
+  en: {
+    eyebrow: 'Try the library',
+    title: 'Six ways to learn from a person',
+    newHere: 'New here?',
+    ledeOnboarding: 'Start with a Story, a narrated scene from their life. Everything else builds from there.',
+    ledeCrafted: 'Different questions ask for different paths. Most of it is crafted ahead of time, made to teach. Two are live conversation, for when you want to take it further.',
+  },
+  de: {
+    eyebrow: 'Probier die Bibliothek aus',
+    title: 'Sechs Wege, von einem Menschen zu lernen',
+    newHere: 'Neu hier?',
+    ledeOnboarding: 'Fang mit einer Geschichte an, einer erzählten Szene aus ihrem Leben. Alles andere baut darauf auf.',
+    ledeCrafted: 'Verschiedene Fragen verlangen nach verschiedenen Wegen. Das meiste davon ist im Voraus gestaltet, gemacht, um dir etwas beizubringen. Zwei davon sind lebendige Gespräche, für die Momente, in denen du tiefer gehen willst.',
+  },
+}[lang];
+
+const LABELS = {
+  en: {
+    tablistAria: 'Six ways to learn',
+    groupArc: 'The learning arc',
+    groupMore: 'Go further',
+    continueLabel: 'Hear the whole thing',
+    playDefault: 'Play',
+    footShowing: 'Showing {name}.',
+    footEvery: 'Every figure has all six →',
+    figuresHref: publicUrl('en', '/figures'),
+  },
+  de: {
+    tablistAria: 'Sechs Wege zu lernen',
+    groupArc: 'Der Lernweg',
+    groupMore: 'Weiter gehen',
+    continueLabel: 'Das Ganze anhören',
+    playDefault: 'Abspielen',
+    footShowing: 'Beispiel: {name}.',
+    footEvery: 'Jeder Mensch hat alle sechs →',
+    figuresHref: publicUrl('de', '/figures'),
+  },
+}[lang];
+---
+<section class="pub-section lib-showcase">
+  <p class="lib-showcase__eyebrow">{BAND.eyebrow}</p>
+  <h2 class="pub-section__title">{BAND.title}</h2>
+  <p class="pub-section__text ll2-lead"><strong>{BAND.newHere}</strong> {BAND.ledeOnboarding}</p>
+  <p class="pub-section__text ll2-lead">{BAND.ledeCrafted}</p>
+  <LabLibrary
+    client:visible
+    modes={modes}
+    portrait={portrait}
+    figureName={figureName}
+    figureId={FEATURED_ID}
+    labels={LABELS}
+  />
+</section>
+
+<style>
+  .lib-showcase__eyebrow {
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--star-blue-light, #b4c8ff) 70%, transparent);
+    margin: 0 0 0.5rem;
+  }
+  .lib-showcase :global(.lib) { margin-top: 1.75rem; }
+</style>

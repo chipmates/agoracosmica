@@ -1,0 +1,263 @@
+/* ============================================================================
+   landing-lab bake-off: shared styles for the sample player + modality cards
+   + the guided "tasting band". Brand tokens only, transparency via color-mix,
+   44px touch targets. Matches the hx- (First Exchange) aesthetic.
+   ========================================================================== */
+
+/* ── the lazy sample player ─────────────────────────────────────────────── */
+.lab-player {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin: 0.35rem 0 0.9rem;
+}
+.lab-player__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 44px;
+  padding: 0 1.1rem 0 0.9rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--gold-primary) 55%, transparent);
+  background: color-mix(in srgb, var(--gold-primary) 12%, transparent);
+  color: var(--gold-primary);
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+.lab-player__btn:hover {
+  background: color-mix(in srgb, var(--gold-primary) 20%, transparent);
+  border-color: var(--gold-hover);
+}
+.lab-player__btn:focus-visible {
+  outline: 2px solid var(--gold-hover);
+  outline-offset: 2px;
+}
+.lab-player.is-on .lab-player__btn {
+  background: color-mix(in srgb, var(--gold-primary) 22%, transparent);
+  border-color: var(--gold-hover);
+}
+.lab-player__icon {
+  display: inline-flex;
+  width: 22px;
+  height: 22px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--gold-primary) 22%, transparent);
+}
+.lab-player__track {
+  position: relative;
+  flex: 1 1 120px;
+  min-width: 90px;
+  height: 4px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--gold-subtle) 22%, transparent);
+  overflow: hidden;
+}
+.lab-player__fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0;
+  height: 100%;
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--gold-primary) 70%, transparent),
+    var(--gold-hover));
+  transition: width 0.2s linear;
+}
+.lab-player__time {
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.8rem;
+  color: var(--text-tertiary);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.lab-player__continue {
+  flex-basis: 100%;
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--gold-primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+.lab-player__continue:hover { color: var(--gold-hover); }
+
+/* ── a modality sample card ─────────────────────────────────────────────── */
+.lab-sample {
+  width: 100%;
+  padding: clamp(1.2rem, 2.2vw, 1.8rem);
+  border-radius: 16px;
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 28%, transparent);
+  background:
+    linear-gradient(165deg,
+      color-mix(in srgb, var(--bg-primary, #151C47) 45%, transparent) 0%,
+      color-mix(in srgb, var(--bg-deep-space-darker, #080B20) 72%, transparent) 100%);
+  box-shadow: 0 18px 50px color-mix(in srgb, var(--utility-pure-black, #000) 38%, transparent);
+}
+.lab-sample__head {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-bottom: 0.9rem;
+}
+.lab-sample__portrait {
+  flex: 0 0 auto;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1.5px solid color-mix(in srgb, var(--gold-primary) 55%, transparent);
+}
+.lab-sample__kicker {
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--gold-primary) 80%, transparent);
+  margin: 0 0 0.15rem;
+}
+.lab-sample__title {
+  font-family: 'Libre Caslon Text', Georgia, serif;
+  font-size: 1.2rem;
+  color: var(--text-primary);
+  margin: 0;
+}
+.lab-sample__opening {
+  font-family: 'Libre Caslon Text', Georgia, serif;
+  font-style: italic;
+  font-size: 1.08rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin: 0 0 0.4rem;
+}
+.lab-sample__disclosure {
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--text-tertiary);
+  margin: 0.2rem 0 0;
+}
+
+/* ── the guided tasting band (direction C) ──────────────────────────────── */
+.lab-band {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: clamp(2.5rem, 5vw, 4.5rem) clamp(1.25rem, 4vw, 2rem);
+}
+.lab-band__intro {
+  text-align: center;
+  max-width: 40rem;
+  margin: 0 auto clamp(1.75rem, 3vw, 2.75rem);
+}
+.lab-band__eyebrow {
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin: 0 0 0.6rem;
+}
+.lab-band__title {
+  font-family: 'Libre Caslon Text', Georgia, serif;
+  font-size: clamp(1.7rem, 3.4vw, 2.4rem);
+  line-height: 1.15;
+  color: var(--text-primary);
+  margin: 0 0 0.6rem;
+}
+.lab-band__lede {
+  font-size: 1.02rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin: 0;
+}
+.lab-band__grid {
+  display: grid;
+  gap: 1.1rem;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+/* a single "step" in the ladder, numbered */
+.lab-step__num {
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin: 0 0 0.5rem;
+}
+
+/* one loud CTA under a band */
+.lab-band__cta {
+  text-align: center;
+  margin-top: clamp(1.75rem, 3vw, 2.5rem);
+}
+.lab-band__cta .pub-cta__button { min-width: 240px; }
+.lab-band__cta p {
+  font-size: 0.9rem;
+  color: var(--text-tertiary);
+  margin: 0.6rem 0 0;
+}
+
+/* ── a full-width story feature (direction A + B body) ──────────────────── */
+.lab-feature {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(2.5rem, 5vw, 4.5rem) clamp(1.25rem, 4vw, 2rem);
+  background:
+    radial-gradient(120% 90% at 20% 20%,
+      color-mix(in srgb, var(--gold-subtle) 8%, transparent) 0%, transparent 55%),
+    var(--bg-deep-space-darker, #080B20);
+}
+.lab-feature__inner {
+  max-width: 880px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);
+  gap: clamp(1.5rem, 4vw, 3rem);
+  align-items: center;
+}
+.lab-feature__art {
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+  aspect-ratio: 4 / 5;
+}
+.lab-feature__art img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.lab-feature__eyebrow {
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--gold-primary) 80%, transparent);
+  margin: 0 0 0.6rem;
+}
+.lab-feature__title {
+  font-family: 'Libre Caslon Text', Georgia, serif;
+  font-size: clamp(1.6rem, 3.2vw, 2.3rem);
+  line-height: 1.18;
+  color: var(--text-primary);
+  margin: 0 0 0.8rem;
+}
+.lab-feature__opening {
+  font-family: 'Libre Caslon Text', Georgia, serif;
+  font-style: italic;
+  font-size: 1.15rem;
+  line-height: 1.65;
+  color: var(--text-secondary);
+  margin: 0 0 1rem;
+}
+
+@media (max-width: 720px) {
+  .lab-feature__inner { grid-template-columns: 1fr; }
+  .lab-feature__art { max-width: 240px; margin: 0 auto; }
+}

@@ -15,7 +15,7 @@
 
 import FigureCard from './FigureCard.astro';
 import CouncilHero from './CouncilHero.astro';
-import LabModeCard from './landing-lab/LabModeCard.astro';
+import LibraryShowcase from './LibraryShowcase.astro';
 import LabQuestionTile from './landing-lab/LabQuestionTile.astro';
 import LabTrustCard from './landing-lab/LabTrustCard.astro';
 import { getT } from '../i18n';
@@ -57,17 +57,9 @@ const waysInWisdom = isDe ? 'Weisheit aus der Geschichte lernen' : 'Learn wisdom
 const waysInOss = isDe ? 'Die Open-Source-Geschichte' : 'The open-source story';
 
 // ── EN body card data ───────────────────────────────────────────────────
-// The repositioned, education-first homepage copy (the six mode cards and the
-// eight question tiles). Verbatim from the QA'd copy source. The mode bodies
-// render as scannable cards; the question tiles each link to a theme page.
-const enModes = [
-  { name: 'Story', step: 'Chapter 1', text: "Story sets up the teaching, a narrated chapter from a figure's life that opens the idea, twelve chapters, checked against the record." },
-  { name: 'Wisdom', step: 'Chapter 2', text: 'Wisdom is where you take one of their core teachings and think it through, in your own words and your own life.' },
-  { name: 'Prism', step: 'Chapter 3', text: 'Prism lets you hear four connected minds circle a single theme from their own angles, like a podcast you can sit inside.' },
-  { name: 'Quest', step: 'Chapter 4', text: 'Quest is a short Socratic challenge, four questions that go deeper than surface knowledge.' },
-  { name: 'Free Talk', text: 'Free Talk is an open conversation. Ask anything and follow it wherever it goes.' },
-  { name: 'Cosmic Council', text: 'Cosmic Council puts four figures in one room, debating a single question while you listen.' },
-];
+// The eight question tiles (each links to its theme page). The six mode cards
+// moved into the interactive LibraryShowcase, which now server-renders all six
+// panels; the What-is section and the FAQ carry the modes in prose.
 const enQuestions = [
   { themeId: 'who-am-i', question: 'Who Am I?' },
   { themeId: 'love-connection', question: 'What binds us to each other?' },
@@ -80,16 +72,9 @@ const enQuestions = [
 ];
 
 // ── DE body card data (same verbatim discipline as EN) ──────────────────
-// The repositioned German six mode cards and eight question tiles, verbatim
-// from the QA'd copy source. Each question tile links to its theme page.
-const deModes = [
-  { name: 'Story', step: 'Kapitel 1', text: 'Story bereitet die Lehre vor, ein erzähltes Kapitel aus dem Leben eines Menschen, das den Gedanken öffnet, zwölf Kapitel, anhand der Quellen geprüft.' },
-  { name: 'Weisheit', step: 'Kapitel 2', text: 'In der Weisheit nimmst du eine ihrer Kernlehren und denkst sie durch, in deinen eigenen Worten und für dein eigenes Leben.' },
-  { name: 'Prisma', step: 'Kapitel 3', text: 'Im Prisma hörst du vier verbundene Köpfe ein einziges Thema aus ihren eigenen Blickwinkeln umkreisen, wie ein Podcast, in dem du selbst mitsitzt.' },
-  { name: 'Quest', step: 'Kapitel 4', text: 'Die Quest ist eine kurze sokratische Herausforderung, vier Fragen, die tiefer gehen als Oberflächenwissen.' },
-  { name: 'Free Talk', text: 'Free Talk ist ein offenes Gespräch. Frag alles, und folg ihm, wohin es führt.' },
-  { name: 'Cosmic Council', text: 'Der Cosmic Council bringt vier Menschen in einen Raum, die eine einzige Frage debattieren, während du zuhörst.' },
-];
+// The eight German question tiles (each links to its theme page). The six mode
+// cards moved into the interactive LibraryShowcase; the What-is section and the
+// FAQ carry the modes in prose.
 const deQuestions = [
   { themeId: 'who-am-i', question: 'Wer bin ich? Die Frage unter jeder Frage.' },
   { themeId: 'love-connection', question: 'Liebe und Verbundenheit: Was verbindet uns miteinander?' },
@@ -145,35 +130,20 @@ const deQuestions = [
       </div>
     </section>
 
-    <!-- Das Menschen-Raster, nach oben gezogen -->
+    <!-- Sechs Wege: die interaktive Ein-Menschen-Bibliothek (Mark Aurel, alle sechs
+         Wege). Direkt nach "Was ist Agora Cosmica?", damit man erst sieht, wie es
+         funktioniert, bevor die Menschen-Liste kommt. Alle sechs Panels serverseitig
+         gerendert = crawlbar; erbt die SEO-Überschrift + beide Ledes. -->
+    <LibraryShowcase lang={lang} />
+
+    <!-- Das Menschen-Raster: nach der Bibliothek, damit man weiss, was eine
+         Menschen-Seite bietet, bevor man Namen durchstöbert. -->
     <section class="pub-section">
       <h2 class="pub-section__title pub-home-subhead ll2-grid-head">Entdecke die 30 bemerkenswerten Menschen</h2>
       <p class="pub-section__text ll2-caption">Öffne einen Namen und entdecke dieses Leben und seine Ideen.</p>
       <div class="pub-grid pub-grid--3">
         {figures.map(figure => <FigureCard figure={figure} lang={lang} headingLevel="h3" />)}
       </div>
-    </section>
-
-    <!-- Sechs Wege, als 6-Karten-Raster -->
-    <section class="pub-section">
-      <h2 class="pub-section__title">Sechs Wege, von einem Menschen zu lernen</h2>
-      <p class="pub-section__text ll2-lead">
-        <strong>Neu hier?</strong> Fang mit einer Geschichte an, einer erzählten Szene aus
-        ihrem Leben. Alles andere baut darauf auf.
-      </p>
-      <p class="pub-section__text ll2-lead">
-        Verschiedene Fragen verlangen nach verschiedenen Wegen. Das meiste davon ist im Voraus
-        gestaltet, gemacht, um dir etwas beizubringen. Zwei davon sind lebendige Gespräche, für die
-        Momente, in denen du tiefer gehen willst.
-      </p>
-      <div class="ll2-mode-grid">
-        {deModes.map(mode => <LabModeCard name={mode.name} text={mode.text} step={mode.step} />)}
-      </div>
-      <p class="pub-section__text ll2-caption">
-        Die Bibliothek, die dich lehrt, reicht tief. 360 erzählte Geschichten, 360 Kernlehren,
-        360 Prisma-Dialoge und 110 Council-Debatten, alle im Voraus gestaltet. Geschichten,
-        Prismen und Councils kommen jeweils mit erzähltem Audio.
-      </p>
     </section>
 
     <!-- Dreißig Lehrende, die großen Fragen des Lebens: Fragen als Kachelraster -->
@@ -348,34 +318,20 @@ const deQuestions = [
       </div>
     </section>
 
-    <!-- The figure grid, moved up so faces appear early -->
+    <!-- Six ways: the interactive one-figure library (Marcus Aurelius, all six
+         ways). Placed right after "What is Agora Cosmica?" so the visitor sees
+         how it works before the figure list. All six panels server-rendered =
+         crawlable; inherits the SEO heading + both ledes. -->
+    <LibraryShowcase lang={lang} />
+
+    <!-- The figure grid: after the library, so the visitor knows what a figure
+         page offers before browsing names. -->
     <section class="pub-section">
       <h2 class="pub-section__title pub-home-subhead ll2-grid-head">Explore the 30 remarkable people</h2>
       <p class="pub-section__text ll2-caption">Open any name to explore their life and ideas.</p>
       <div class="pub-grid pub-grid--3">
         {figures.map(figure => <FigureCard figure={figure} lang={lang} headingLevel="h3" />)}
       </div>
-    </section>
-
-    <!-- Six ways to learn from a person, as a 6-card grid -->
-    <section class="pub-section">
-      <h2 class="pub-section__title">Six ways to learn from a person</h2>
-      <p class="pub-section__text ll2-lead">
-        <strong>New here?</strong> Start with a Story, a narrated scene from their life.
-        Everything else builds from there.
-      </p>
-      <p class="pub-section__text ll2-lead">
-        Different questions ask for different paths. Most of it is crafted ahead of time, made to
-        teach. Two are live conversation, for when you want to take it further.
-      </p>
-      <div class="ll2-mode-grid">
-        {enModes.map(mode => <LabModeCard name={mode.name} text={mode.text} step={mode.step} />)}
-      </div>
-      <p class="pub-section__text ll2-caption">
-        The library that teaches you runs deep. 360 narrated stories, 360 core teachings, 360 prism
-        dialogues, and 110 council debates, all crafted ahead of time. Stories, prisms, and
-        councils each come with narrated audio.
-      </p>
     </section>
 
     <!-- Thirty teachers, life's biggest questions: questions as a tile grid -->

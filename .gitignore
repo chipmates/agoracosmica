@@ -98,6 +98,9 @@ marketing/.lab-pages-archive/
 marketing/src/components/landing-lab/HeroListening.astro
 marketing/src/components/landing-lab/hero-listening.css
 marketing/src/islands/VoiceDeck.tsx
+# (The interactive library module was promoted to the homepage: LabLibrary.tsx,
+# LabSamplePlayer.tsx, lab-library.ts, lab-library.css, lab-samples.css are now
+# tracked. lab-samples.ts stays local — only the archived lab pages use it.)
 marketing/src/components/landing-lab/HeroAskListen.astro
 marketing/src/components/landing-lab/HeroStory.astro
 marketing/src/components/landing-lab/LabWhatIs.astro
@@ -105,9 +108,4 @@ marketing/src/components/landing-lab/LabLibraryBento.astro
 marketing/src/components/landing-lab/LabLibraryScroll.astro
 marketing/src/components/landing-lab/LabModeSample.astro
 marketing/src/components/landing-lab/LabStoryFeature.astro
-marketing/src/components/landing-lab/lab-library.css
-marketing/src/components/landing-lab/lab-library.ts
-marketing/src/components/landing-lab/lab-samples.css
 marketing/src/components/landing-lab/lab-samples.ts
-marketing/src/islands/LabLibrary.tsx
-marketing/src/islands/LabSamplePlayer.tsx

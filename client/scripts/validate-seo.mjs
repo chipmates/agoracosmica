@@ -113,6 +113,23 @@ for (const f of files) {
   //    attribution; anything else is flagged.
   const body = decode(html.replace(/<script[\s\S]*?<\/script>/g, ''));
   if (/—(?!\s+[A-ZÄÖÜ])/.test(body)) warn.push(`${rel}: non-attribution em-dash in body text`);
+
+  // 10. Homepage content-presence guard. The six ways moved from a static card
+  //     grid into the interactive LibraryShowcase, whose six panels are all
+  //     server-rendered. Assert every mode name + the volume band survive in
+  //     crawlable TEXT (tags stripped, so the hydration props="{…}" blob does
+  //     NOT count). If a future refactor pushes the panels JS-only, their prose
+  //     lives only in that attribute and this guard fails the deploy instead of
+  //     silently thinning the homepage.
+  const HOMEPAGE_TERMS = {
+    'index.html': ['Story', 'Wisdom', 'Prism', 'Quest', 'Council', 'Free Talk', '360', '110'],
+    'de/index.html': ['Story', 'Weisheit', 'Prisma', 'Quest', 'Council', 'Free Talk', '360', '110'],
+  };
+  if (HOMEPAGE_TERMS[rel]) {
+    const text = body.replace(/<[^>]+>/g, ' ');
+    for (const term of HOMEPAGE_TERMS[rel])
+      if (!text.includes(term)) hard.push(`${rel}: homepage missing crawlable text "${term}" (six-ways content regression?)`);
+  }
 }
 
 console.log(`validate-seo: checked ${files.length} built pages.`);

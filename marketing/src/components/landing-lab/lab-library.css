@@ -1,0 +1,383 @@
+/* ============================================================================
+   Compact "Library" module (showcase A): one framed object, selectable modes.
+   Brand tokens only, transparency via color-mix, 44px tap targets.
+   ========================================================================== */
+
+/* ── seamless canvas from the hero into the showcase ─────────────────────
+   The hero bottoms out at --bg-deep-space-darker (#080B20); the page body is
+   the lighter --bg-cosmic-void (#0D1338), which created a hard seam. This
+   full-bleed canvas starts at the hero's exact bottom colour, warms with a
+   faint gold wash (echoing the hero glow), then settles into cosmic-void, so
+   the hero flows into the content with no edge. Generous top padding also
+   unpresses the "What is Agora Cosmica?" heading. */
+.lab-canvas {
+  position: relative;
+  width: 100vw;
+  max-width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  /* mobile floor lowered so "What is Agora Cosmica?" sits higher, still a
+     clear gap from the hero (not pressed against it); desktop unchanged */
+  padding-top: clamp(2rem, 7vw, 6rem);
+  padding-bottom: clamp(1.5rem, 4vw, 3rem);
+  background:
+    radial-gradient(72% 46% at 50% 0%,
+      color-mix(in srgb, var(--gold-subtle) 8%, transparent) 0%,
+      transparent 62%),
+    linear-gradient(180deg,
+      var(--bg-deep-space-darker, #080B20) 0%,
+      var(--bg-deep-space, #0C1133) 34%,
+      var(--bg-cosmic-void, #0D1338) 100%);
+}
+/* keep the inner content at the normal reading width */
+.lab-canvas > * { position: relative; z-index: 1; }
+
+.lib {
+  max-width: 940px;
+  margin: 0 auto;
+  border-radius: 20px;
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+  background:
+    linear-gradient(165deg,
+      color-mix(in srgb, var(--bg-primary, #151C47) 50%, transparent) 0%,
+      color-mix(in srgb, var(--bg-deep-space-darker, #080B20) 78%, transparent) 100%);
+  box-shadow: 0 24px 70px color-mix(in srgb, var(--utility-pure-black, #000) 42%, transparent);
+  overflow: hidden;
+}
+
+/* ── selectable tab row: two groups (learning arc + go further) ──────────── */
+.lib__tabs {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap; /* German labels are wider; let the "go further" group drop
+                      to a second row instead of overflowing .lib (overflow:hidden
+                      would otherwise clip the Council / Free Talk tabs). */
+  gap: 0.75rem 1.1rem;
+  padding: 0.7rem 0.6rem 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+}
+.lib__tabgroup { display: flex; flex-direction: column; gap: 0.35rem; }
+/* a hairline between the arc and the "go further" pair */
+.lib__tabgroup--more { position: relative; padding-left: 1.1rem; }
+.lib__tabgroup--more::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 1.5rem; bottom: 0.5rem;
+  width: 1px;
+  background: color-mix(in srgb, var(--star-blue-light) 24%, transparent);
+}
+.lib__tabgroup-label {
+  padding-left: 0.9rem;
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+.lib__tabgroup--arc .lib__tabgroup-label { color: color-mix(in srgb, var(--gold-primary) 82%, transparent); }
+.lib__tabgroup--more .lib__tabgroup-label { color: color-mix(in srgb, var(--star-blue-light) 78%, transparent); }
+.lib__tabgroup-row { display: flex; gap: 0.25rem; }
+
+.lib__tab {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+  min-height: 56px;
+  padding: 0.55rem 0.72rem;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.18s ease, border-color 0.18s ease;
+}
+.lib__tab:focus-visible { outline: 2px solid var(--gold-hover); outline-offset: -2px; }
+.lib__tab-name {
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+.lib__tab-glyph { transition: color 0.18s ease; }
+
+/* arc group = warm gold accent */
+.lib__tabgroup--arc .lib__tab:hover { background: color-mix(in srgb, var(--gold-primary) 8%, transparent); }
+.lib__tabgroup--arc .lib__tab.is-active {
+  border-bottom-color: var(--gold-primary);
+  background: color-mix(in srgb, var(--gold-primary) 10%, transparent);
+}
+.lib__tabgroup--arc .lib__tab.is-active .lib__tab-name { color: var(--gold-primary); }
+
+/* go-further group = cool starlight accent */
+.lib__tabgroup--more .lib__tab:hover { background: color-mix(in srgb, var(--star-blue-light) 9%, transparent); }
+.lib__tabgroup--more .lib__tab.is-active {
+  border-bottom-color: var(--star-blue-light);
+  background: color-mix(in srgb, var(--star-blue-light) 11%, transparent);
+}
+.lib__tabgroup--more .lib__tab.is-active .lib__tab-name { color: var(--star-blue-light); }
+.lib__tabgroup--more .lib__tab:focus-visible { outline-color: var(--star-blue-light); }
+.lib__tab-glyph {
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.62rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+/* ── the swapping panel ─────────────────────────────────────────────────── */
+.lib__panel {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: clamp(1.25rem, 3vw, 2.25rem);
+  align-items: start;
+  padding: clamp(1.5rem, 3vw, 2.25rem);
+  min-height: 220px;
+}
+/* All six panels are server-rendered for crawlability; only the active one
+   shows. The class sets display:grid, which would beat the UA [hidden] rule,
+   so restore the hide explicitly. */
+.lib__panel[hidden] { display: none; }
+.lib__figure { display: flex; flex-direction: column; align-items: center; gap: 0.6rem; }
+.lib__portrait {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1.5px solid color-mix(in srgb, var(--gold-primary) 55%, transparent);
+}
+.lib__cast { display: flex; }
+.lib__cast img {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1.5px solid color-mix(in srgb, var(--gold-subtle) 45%, transparent);
+  background: var(--bg-deep-space-darker, #080B20);
+}
+.lib__cast img + img { margin-left: -8px; }
+
+.lib__step {
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--star-blue-light, #b4c8ff) 65%, transparent);
+  margin: 0 0 0.35rem;
+}
+.lib__kicker {
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--gold-primary) 80%, transparent);
+  margin: 0 0 0.3rem;
+}
+.lib__title {
+  font-family: 'Libre Caslon Text', Georgia, serif;
+  font-size: 1.4rem;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem;
+}
+.lib__text {
+  font-family: 'Libre Caslon Text', Georgia, serif;
+  font-size: 1.08rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin: 0 0 0.9rem;
+}
+.lib__meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.1rem;
+  margin-top: 0.2rem;
+}
+.lib__scale {
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.8rem;
+  letter-spacing: 0.03em;
+  color: var(--text-tertiary);
+}
+.lib__link {
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--gold-primary);
+  text-decoration: none;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+.lib__link:hover { color: var(--gold-hover); text-decoration: underline; text-underline-offset: 3px; }
+.lib__link:focus-visible { outline: 2px solid var(--gold-hover); outline-offset: 2px; border-radius: 3px; }
+.lib__disclosure {
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--text-tertiary);
+  margin: 0.7rem 0 0;
+}
+
+.lib__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  padding: 0.85rem clamp(1.5rem, 3vw, 2.25rem);
+  border-top: 1px solid color-mix(in srgb, var(--gold-subtle) 18%, transparent);
+  background: color-mix(in srgb, var(--bg-deep-space-darker, #080B20) 40%, transparent);
+}
+.lib__foot-figure {
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.82rem;
+  color: var(--text-tertiary);
+}
+
+@media (max-width: 640px) {
+  .lib__panel { grid-template-columns: 1fr; gap: 1rem; }
+  .lib__figure { flex-direction: row; justify-content: flex-start; }
+  /* stack the two groups; each group's tabs wrap into 2 columns so none hide */
+  .lib__tabs { flex-direction: column; align-items: stretch; gap: 0.85rem; }
+  .lib__tabgroup { gap: 0.3rem; }
+  .lib__tabgroup--more { padding-left: 0; padding-top: 0.75rem; border-top: 1px solid color-mix(in srgb, var(--star-blue-light) 18%, transparent); }
+  .lib__tabgroup--more::before { display: none; }
+  .lib__tabgroup-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.25rem; }
+  .lib__tab { min-height: 52px; padding: 0.5rem 0.4rem; }
+  .lib__tab-name { font-size: 0.84rem; }
+  .lib__tab-glyph { font-size: 0.58rem; }
+}
+
+/* ── scroll one-pager (showcase B): one repeating band for all six ways ──── */
+.lib-scroll { max-width: 820px; margin: 0 auto; }
+.lib-scroll__row {
+  display: grid;
+  grid-template-columns: 3.5rem auto minmax(0, 1fr);
+  gap: clamp(0.9rem, 2.5vw, 1.75rem);
+  align-items: start;
+  padding: clamp(1.5rem, 3vw, 2.25rem) 0;
+  border-top: 1px solid color-mix(in srgb, var(--gold-subtle) 16%, transparent);
+}
+.lib-scroll__row:first-child { border-top: 0; }
+.lib-scroll__rail { display: flex; flex-direction: column; gap: 0.35rem; }
+.lib-scroll__num {
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: color-mix(in srgb, var(--gold-primary) 70%, transparent);
+}
+.lib-scroll__tab {
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+.lib-scroll__media { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+.lib-scroll__media .lib__portrait { width: 64px; height: 64px; }
+.lib-scroll__media .lib__cast img { width: 30px; height: 30px; }
+
+@media (max-width: 640px) {
+  .lib-scroll__row { grid-template-columns: 1fr; gap: 0.6rem; }
+  .lib-scroll__rail { flex-direction: row; align-items: baseline; gap: 0.6rem; }
+  .lib-scroll__media { flex-direction: row; justify-content: flex-start; }
+}
+
+/* ── bento (showcase C): all six ways as tiles, nothing hidden ──────────── */
+.bento {
+  max-width: 1040px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.9rem;
+}
+.bento__tile {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: clamp(1.1rem, 2vw, 1.5rem);
+  border-radius: 16px;
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 26%, transparent);
+  background:
+    linear-gradient(165deg,
+      color-mix(in srgb, var(--bg-primary, #151C47) 46%, transparent) 0%,
+      color-mix(in srgb, var(--bg-deep-space-darker, #080B20) 74%, transparent) 100%);
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+.bento__tile:hover { border-color: color-mix(in srgb, var(--gold-primary) 45%, transparent); transform: translateY(-2px); }
+/* Story leads: a wider tile for emphasis */
+.bento__tile--story { grid-column: span 2; }
+
+.bento__top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.bento__mode {
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--gold-primary);
+}
+.bento__glyph {
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.66rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+.bento__kicker {
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--gold-primary) 75%, transparent);
+  margin: 0.2rem 0 0;
+}
+.bento__title {
+  font-family: 'Libre Caslon Text', Georgia, serif;
+  font-size: 1.2rem;
+  color: var(--text-primary);
+  margin: 0;
+}
+.bento__body {
+  font-family: 'Libre Caslon Text', Georgia, serif;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  margin: 0 0 0.2rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.bento__cast { margin: 0.1rem 0; }
+.bento__cast img { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; border: 1.5px solid color-mix(in srgb, var(--gold-subtle) 40%, transparent); }
+.bento__cast img + img { margin-left: -7px; }
+.bento__foot {
+  margin-top: auto;
+  padding-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+.bento__scale {
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.74rem;
+  color: var(--text-tertiary);
+}
+.bento .lab-player { margin: 0.2rem 0 0.35rem; }
+
+@media (max-width: 860px) {
+  .bento { grid-template-columns: repeat(2, 1fr); }
+  .bento__tile--story { grid-column: span 2; }
+}
+@media (max-width: 560px) {
+  .bento { grid-template-columns: 1fr; }
+  .bento__tile--story { grid-column: span 1; }
+}
