@@ -2672,7 +2672,7 @@ async function loadAdGrants() {
   html += '<div class="hint-banner">These count only visitors who arrive with a Google Ads gclid and grant ad consent. The consent gate caps this at the accept rate, so low numbers are structural, not a funnel failure. Paid campaigns (?p=1) run on clicks only and never appear here. Organic and Spotify traffic never appears in this section.</div>';
   html += '<div class="grid">';
   html += kpi('Start Exploring', startExpConv, { hero: true, spark: sparkStartExp, sparkColor: '#5B8BD4', delta: startExpPrev, sub: 'opted-in ad visitor accepted the consent prompt or clicked a Start Exploring CTA' });
-  html += kpi('Profile Conversions', profileConv, { spark: sparkProfile, sparkColor: '#68C397', delta: profilePrev, sub: 'Enter button after character + name picked' });
+  html += kpi('Profile Conversions', profileConv, { spark: sparkProfile, sparkColor: '#68C397', delta: profilePrev, sub: 'welcome disclosure accepted (consent given, Begin clicked)' });
   html += kpi('Mode Selected', modeSelConv, { spark: sparkModeSel, sparkColor: '#E6BC5C', sub: 'first mode pick (Story / Wisdom / Talk / Quest / Freetalk)' });
   html += kpi('Council Engaged', councilEngagedConv, { spark: sparkCouncilEng, sparkColor: '#9D83CD', sub: '60s of a council heard (curated or custom)' });
   html += kpi('Modes / Profile', modeFromProfile, { sub: modeFromProfile === '--' ? 'within ad visitors (need 5+ profiles)' : 'modes picked per ad-profile' });
