@@ -87,13 +87,24 @@ client/public/assets/
 !**/.gitkeep
 !client/src/assets/councils/councilCatalog.json
 
-# ── Landing-lab hero previews (local design experiments) ────
-# Promoted into the homepage by swapping one import; until a variant is
-# chosen these stay out of version control.
+# ── Landing-lab design experiments (local only) ────────────
+# The First Exchange hero and the figure orbit were chosen and promoted into
+# the real pages (now tracked). The rejected hero variants, the interactive
+# library experiments, and the lab preview pages stay out of version control.
 marketing/src/pages/lab/
-marketing/src/components/landing-lab/HeroExchange.astro
 marketing/src/components/landing-lab/HeroListening.astro
-marketing/src/components/landing-lab/hero-exchange.css
 marketing/src/components/landing-lab/hero-listening.css
-marketing/src/islands/HeroVoice.tsx
 marketing/src/islands/VoiceDeck.tsx
+marketing/src/components/landing-lab/HeroAskListen.astro
+marketing/src/components/landing-lab/HeroStory.astro
+marketing/src/components/landing-lab/LabWhatIs.astro
+marketing/src/components/landing-lab/LabLibraryBento.astro
+marketing/src/components/landing-lab/LabLibraryScroll.astro
+marketing/src/components/landing-lab/LabModeSample.astro
+marketing/src/components/landing-lab/LabStoryFeature.astro
+marketing/src/components/landing-lab/lab-library.css
+marketing/src/components/landing-lab/lab-library.ts
+marketing/src/components/landing-lab/lab-samples.css
+marketing/src/components/landing-lab/lab-samples.ts
+marketing/src/islands/LabLibrary.tsx
+marketing/src/islands/LabSamplePlayer.tsx

@@ -41,6 +41,9 @@ interface Props {
   noindex?: boolean;
   /** Set false on pages that render their own dedicated CTA (figure + theme detail). */
   stickyCta?: boolean;
+  /** Pages with a full hero (like the homepage): the mobile sticky CTA starts
+   *  hidden and slides in on first scroll, instead of showing from first paint. */
+  heroReveal?: boolean;
 }
 
 const props = Astro.props;
@@ -51,13 +54,16 @@ const t = getT(props.lang);
 // .pub-cta--sticky in public-layout.css + the reveal logic in agc-public.js).
 // Other pages have no hero and keep the bar visible from first paint.
 const isHome = currentPath === '/' || currentPath === '/de/' || currentPath === '/de';
+// Hero pages (homepage, and the figures orbit) hide the mobile sticky CTA until
+// the hero scrolls away, same reveal-on-scroll behavior driven by agc-public.js.
+const revealSticky = isHome || props.heroReveal === true;
 ---
 <!doctype html>
 <html lang={props.lang}>
   <head>
     <BaseHead {...props} />
   </head>
-  <body class={isHome ? 'pub-home-page' : undefined}>
+  <body class={revealSticky ? 'pub-home-page' : undefined}>
     <a href="#main-content" class="pub-skip-link">
       {props.lang === 'de' ? 'Zum Inhalt springen' : 'Skip to content'}
     </a>

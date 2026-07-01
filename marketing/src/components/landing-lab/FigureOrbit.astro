@@ -1,0 +1,191 @@
+---
+// Figures browse hero: the old landing-hero composition (copy left, orbit
+// right), but the left column carries the FIGURES page intro (breadcrumb, H1,
+// stats, description, lead) instead of the landing copy. The right column is
+// the "solar system" (15 curated planets, rings, glowing core, spotlight
+// plaque). The grid of all 30 renders below via FiguresCatalogContent gridOnly.
+//
+// The live landing component is left untouched. Drive the orbit with:
+//   <V2ObservatoryMotion client:idle targetId="figures-orbit" />
+
+import { getFiguresCatalog } from '@client/data/public/figuresCatalog';
+import { figureIdToSlug } from '@client/data/public/slugMap';
+import { MEDIA_URL, publicUrl } from '../../lib/urls';
+import { getT } from '../../i18n';
+import type { Lang } from '../../i18n';
+import Breadcrumbs from '../Breadcrumbs.astro';
+import ContentVolume from '../ContentVolume.astro';
+import './v2-observatory.css';
+import './figure-orbit.css';
+
+interface Props { lang: Lang; }
+const { lang } = Astro.props;
+const t = getT(lang);
+const figures = getFiguresCatalog(lang);
+const byId = new Map(figures.map(f => [f.id, f]));
+
+const COPY: Record<Lang, { hearTemplate: string; pauseVoice: string; pauseMotion: string; systemAria: string; lead: string }> = {
+  en: {
+    hearTemplate: 'Hear {name}',
+    pauseVoice: 'Pause',
+    pauseMotion: 'Pause the orbit motion',
+    systemAria: 'Fifteen of the thirty remarkable people, Marcus Aurelius, Albert Einstein, and Frida Kahlo among them, orbit a glowing golden core.',
+    lead: 'Open any name to explore their life and ideas.',
+  },
+  de: {
+    hearTemplate: '{name} anhören',
+    pauseVoice: 'Pausieren',
+    pauseMotion: 'Die Orbit-Bewegung anhalten',
+    systemAria: 'Fünfzehn der dreißig bemerkenswerten Menschen, darunter Mark Aurel, Albert Einstein und Frida Kahlo, umkreisen einen leuchtenden goldenen Kern.',
+    lead: 'Öffne einen Namen und entdecke das Leben und die Ideen dahinter.',
+  },
+};
+const copy = COPY[lang];
+
+// Three rings, recognition-led (3 inner, 5 middle, 7 outer) = 15 planets.
+const ringPlan = [
+  { ids: ['aurelius', 'einstein', 'kahlo'], reverse: false },
+  { ids: ['nietzsche', 'vinci', 'jung', 'gandhi', 'angelou'], reverse: true },
+  { ids: ['plato', 'rumi', 'gautama', 'mandela', 'lovelace', 'woolf', 'laozi'], reverse: false },
+];
+const PLANET_SIZES_BY_RING = [
+  '(max-width: 900px) 56px, 88px',
+  '(max-width: 900px) 46px, 72px',
+  '(max-width: 900px) 38px, 58px',
+];
+const planets = ringPlan.flatMap((ring, ringIndex) => {
+  const step = 360 / ring.ids.length;
+  const offset = ringIndex * 18;
+  return ring.ids.map((id, i) => {
+    const fig = byId.get(id);
+    return {
+      id,
+      name: fig ? fig.name : id,
+      learn: fig ? fig.learn : '',
+      src: `${MEDIA_URL}/images/figures/${id}/thumbnail/320.webp`,
+      srcset: `${MEDIA_URL}/images/figures/${id}/thumbnail/160.webp 160w, ${MEDIA_URL}/images/figures/${id}/thumbnail/320.webp 320w`,
+      sizes: PLANET_SIZES_BY_RING[ringIndex],
+      href: publicUrl(lang, `/figures/${figureIdToSlug[id]}`),
+      ring: ringIndex,
+      angle: offset + i * step,
+      isLcp: ringIndex === 0 && i === 0,
+      eager: ringIndex <= 1,
+    };
+  });
+});
+const lcpFigure = byId.get(ringPlan[0].ids[0]);
+---
+<section class="v2-observatory v2-observatory--figures" id="figures-orbit">
+  <div class="v2-sky" aria-hidden="true">
+    <div class="v2-stars v2-stars--far"></div>
+    <div class="v2-stars v2-stars--near"></div>
+    <div class="v2-shooting"></div>
+  </div>
+
+  <div class="v2-hero-inner figorbit">
+    <!-- head: on desktop the top of the left column, on mobile above the orbit -->
+    <div class="v2-copy v2-copy--head figorbit-copy">
+      <Breadcrumbs lang={lang} items={[{ label: t('breadcrumbs.figures') }]} />
+      <h1 class="pub-hero__title">{t('figures.pageTitle')}</h1>
+      <ContentVolume lang={lang} />
+    </div>
+
+    <!-- tail: on desktop the bottom of the left column, on mobile below the orbit -->
+    <div class="v2-copy v2-copy--tail figorbit-copy">
+      <p class="pub-section__text">{t('figures.pageDescription')}</p>
+      <p class="pub-section__text pub-catalog-lead">{copy.lead}</p>
+    </div>
+
+    <!-- the living orbital system -->
+    <div class="v2-system">
+      <div class="v2-horizon" role="img" aria-label={copy.systemAria}>
+        <div class="v2-stagepos">
+          <div class="v2-handoff">
+            <div class="v2-system-stage">
+              <div class="v2-ring v2-ring--0" aria-hidden="true"></div>
+              <div class="v2-ring v2-ring--1" aria-hidden="true"></div>
+              <div class="v2-ring v2-ring--2" aria-hidden="true"></div>
+
+              <div class="v2-core" aria-hidden="true">
+                <span class="v2-core__glow"></span>
+                <span class="v2-core__dot"></span>
+              </div>
+
+              {ringPlan.map((ring, ringIndex) => (
+                <div
+                  class={`v2-orbit v2-orbit--${ringIndex} ${ring.reverse ? 'v2-orbit--rev' : ''}`}
+                  aria-hidden="true"
+                >
+                  {planets
+                    .filter(p => p.ring === ringIndex)
+                    .map(p => (
+                      <a
+                        class={`v2-planet ${p.isLcp ? 'v2-planet--lcp' : ''}`}
+                        href={p.href}
+                        data-figure={p.id}
+                        data-name={p.name}
+                        data-learn={p.learn}
+                        tabindex="-1"
+                      >
+                        <span class="v2-planet__face">
+                          <img
+                            src={p.src}
+                            srcset={p.srcset}
+                            sizes={p.sizes}
+                            alt={p.name}
+                            width="96"
+                            height="96"
+                            loading={p.eager ? 'eager' : 'lazy'}
+                            fetchpriority={p.isLcp ? 'high' : 'auto'}
+                            decoding="async"
+                          />
+                        </span>
+                        <span class="v2-planet__name">{p.name}</span>
+                      </a>
+                    ))}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- spotlight plaque: server-prefilled with the LCP figure, cycled by the island -->
+      <div class="v2-plaque" id="v2-plaque">
+        <div class="v2-plaque__text">
+          <p class="v2-plaque__name" id="v2-plaque-name">{lcpFigure ? lcpFigure.name : ''}</p>
+          <p class="v2-plaque__learn" id="v2-plaque-learn">{lcpFigure ? lcpFigure.learn : ''}</p>
+        </div>
+        <button
+          type="button"
+          class="pub-trailer v2-plaque__voice"
+          id="v2-plaque-voice"
+          data-hear-template={copy.hearTemplate}
+          data-pause-label={copy.pauseVoice}
+        >
+          <span class="pub-trailer__icon" aria-hidden="true">
+            <svg class="v2-voice__icon-play" viewBox="0 0 16 16" width="13" height="13" fill="currentColor"><path d="M4 3l9 5-9 5z" /></svg>
+            <svg class="v2-voice__icon-pause" viewBox="0 0 16 16" width="13" height="13" fill="currentColor"><path d="M4 3h3v10H4zM9 3h3v10H9z" /></svg>
+          </span>
+          <span class="pub-trailer__label" id="v2-plaque-voice-label">
+            {copy.hearTemplate.replace('{name}', lcpFigure ? lcpFigure.name : '')}
+          </span>
+          <span class="pub-trailer__dur">0:50</span>
+        </button>
+      </div>
+
+      <button
+        type="button"
+        class="v2-plaque__pause"
+        id="v2-plaque-pause"
+        aria-pressed="false"
+        aria-label={copy.pauseMotion}
+        title={copy.pauseMotion}
+        hidden
+      >
+        <svg class="v2-plaque__icon-pause" viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M4 3h3v10H4zM9 3h3v10H9z" /></svg>
+        <svg class="v2-plaque__icon-play" viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M5 3l8 5-8 5z" /></svg>
+      </button>
+    </div>
+  </div>
+</section>

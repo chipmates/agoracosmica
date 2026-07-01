@@ -1,0 +1,227 @@
+---
+// "The First Exchange" hero (landing-lab alternative A).
+//
+// The hero shows one printed page from the library: a real question, Marcus
+// Aurelius answering as his Echo, a hear-his-voice button, and a rail of more
+// faces. The visitor sees the product before reading a word of marketing.
+// Print, not chat bubbles: the composition is a library page, so it never
+// pretends to be a live session. The answer text is adapted from the figure's
+// published keyConcepts entry (Examination of Impressions), and the card
+// carries the Echo disclosure as its caption.
+//
+// LCP discipline: the whole hero is static server HTML. The only island is
+// HeroVoice (client:idle), which plays the figure's ~50s CDN trailer and
+// flips the .is-live motion gate. Nothing visible depends on JS.
+
+import { getFiguresCatalog } from '@client/data/public/figuresCatalog';
+import { figureIdToSlug } from '@client/data/public/slugMap';
+import { MEDIA_URL, publicUrl } from '../../lib/urls';
+import { getT } from '../../i18n';
+import type { Lang } from '../../i18n';
+import HeroVoice from '../../islands/HeroVoice';
+import './hero-exchange.css';
+
+interface Props {
+  lang: Lang;
+  // Where the scroll cue hands off. The lab page uses #lab-after; the real
+  // homepage passes its crawlable library wrapper (#v2-library).
+  scrollTarget?: string;
+}
+
+const { lang, scrollTarget = '#lab-after' } = Astro.props;
+const t = getT(lang);
+const figures = getFiguresCatalog(lang);
+const byId = new Map(figures.map(f => [f.id, f]));
+
+const FEATURED_ID = 'aurelius';
+const featured = byId.get(FEATURED_ID);
+const featuredName = featured ? featured.name : 'Marcus Aurelius';
+const featuredMeta = featured ? `${featured.tradition} · ${featured.period}` : '';
+// The figure's "You will learn to..." promise, same line as the grid card,
+// so the hero exchange reads as a lesson: who, what you learn, then a taste.
+const featuredLearn = featured ? featured.learn : '';
+
+type ExchangeCopy = {
+  eyebrow: string;
+  title: string;
+  subhead: string;
+  lede: string;
+  trust: string;
+  free: string;
+  youAsk: string;
+  question: string;
+  answerLead: string;
+  answerThoughts: string;
+  answerRest: string;
+  hearVoice: string;
+  askYourself: string;
+  caption: string;
+  railCaption: string;
+  railMore: string;
+  scrollCue: string;
+  scrollCueAria: string;
+};
+
+// The Q&A is new display copy and needs an editorial pass before any deploy.
+// The answer adapts the published "Examination of Impressions" keyConcept
+// from figuresCatalog, EN and DE.
+const COPY: Record<Lang, ExchangeCopy> = {
+  en: {
+    eyebrow: 'Voices from across history',
+    title: "Learn from 30 of history's remarkable people, Marcus Aurelius to Frida Kahlo",
+    subhead: 'A Living Library You Can Talk To',
+    lede: 'Hear narrated chapters of their lives, work through their ideas, sit in on four-voice debates. Or just ask them directly.',
+    trust: 'Nonprofit · Open Source · No tracking cookies, no profiling',
+    free: '30 free messages a day. No signup needed.',
+    youAsk: 'You ask',
+    question: 'Someone criticized me today and I cannot stop replaying it. Why does it sting so much?',
+    answerLead: 'The burning is not from the words. It is from the story your mind wrapped around them the moment they landed. ',
+    answerThoughts: 'I am worthless. I am exposed.',
+    answerRest: ' Place a pause between the event and your answer to it. Examine the judgment you attached. Ask whether it is true.',
+    hearVoice: 'Hear his voice',
+    askYourself: 'Ask him yourself',
+    caption: 'An AI Echo, shaped from his own Meditations. An interpretation, not a recording.',
+    railCaption: 'One of 30 voices, Laozi to Frida Kahlo',
+    railMore: '+23 more',
+    scrollCue: 'The library',
+    scrollCueAria: 'Scroll to the library',
+  },
+  de: {
+    eyebrow: 'Stimmen aus der ganzen Geschichte',
+    title: 'Lerne von 30 bemerkenswerten Menschen, von Mark Aurel bis Frida Kahlo',
+    subhead: 'Eine lebendige Bibliothek, mit der du sprechen kannst',
+    lede: 'Hör erzählte Kapitel aus ihrem Leben, arbeite dich durch ihre Gedanken, sitz bei vierstimmigen Debatten dabei. Oder frag sie einfach direkt.',
+    trust: 'Gemeinnützig · Open Source · Keine Tracking-Cookies, kein Profiling',
+    free: '30 kostenlose Nachrichten pro Tag. Ohne Anmeldung.',
+    youAsk: 'Du fragst',
+    question: 'Jemand hat mich heute kritisiert. Ich werde es nicht los. Warum trifft mich das so?',
+    answerLead: 'Nicht die Worte brennen. Es brennt die Geschichte, die dein Kopf sofort um sie gelegt hat. ',
+    answerThoughts: 'Ich bin nichts wert. Ich bin entlarvt.',
+    answerRest: ' Zwischen dem, was geschieht, und deiner Antwort liegt ein Raum. Prüfe das Urteil, das du angeheftet hast. Frag, ob es wahr ist.',
+    hearVoice: 'Hör seine Stimme',
+    askYourself: 'Frag ihn selbst',
+    caption: 'Ein KI-Echo, geformt aus seinen eigenen Selbstbetrachtungen. Eine Deutung, keine Aufnahme.',
+    railCaption: 'Eine von 30 Stimmen, von Laozi bis Frida Kahlo',
+    railMore: '+23 weitere',
+    scrollCue: 'Die Bibliothek',
+    scrollCueAria: 'Zur Bibliothek scrollen',
+  },
+};
+
+const copy = COPY[lang];
+const ctaLabel = t('nav.startExploring');
+
+// Six rail faces beside the featured figure, recognition plus breadth.
+const RAIL_IDS = ['kahlo', 'einstein', 'rumi', 'woolf', 'laozi', 'lovelace'];
+const rail = RAIL_IDS.map(id => {
+  const fig = byId.get(id);
+  return {
+    id,
+    name: fig ? fig.name : id,
+    src: `${MEDIA_URL}/images/figures/${id}/thumbnail/160.webp`,
+    href: publicUrl(lang, `/figures/${figureIdToSlug[id]}`),
+  };
+});
+
+const portraitSrc = `${MEDIA_URL}/images/figures/${FEATURED_ID}/thumbnail/320.webp`;
+const portraitSrcset = `${MEDIA_URL}/images/figures/${FEATURED_ID}/thumbnail/160.webp 160w, ${MEDIA_URL}/images/figures/${FEATURED_ID}/thumbnail/320.webp 320w`;
+const portraitSizes = '(max-width: 900px) 64px, 88px';
+const figuresHref = publicUrl(lang, '/figures');
+const featuredHref = publicUrl(lang, `/figures/${figureIdToSlug[FEATURED_ID]}`);
+---
+<section class="hx-hero" id="hx-hero" aria-labelledby="hx-title">
+  <!-- static cosmic backdrop: tiled star fields, gold dust, vignette -->
+  <div class="hx-sky" aria-hidden="true">
+    <div class="hx-stars hx-stars--far"></div>
+    <div class="hx-stars hx-stars--near"></div>
+    <div class="hx-shooting"></div>
+  </div>
+
+  <div class="hx-inner">
+    <!-- copy column -->
+    <div class="hx-copy">
+      <p class="hx-eyebrow">{copy.eyebrow}</p>
+      <h1 class="hx-title" id="hx-title">{copy.title}</h1>
+      <p class="hx-subhead">{copy.subhead}</p>
+      <p class="hx-lede">{copy.lede}</p>
+      <p class="hx-trust">{copy.trust}</p>
+      <div class="hx-actions">
+        <a href="/app" class="pub-cta__button hx-cta" data-agc-cta="start-exploring">
+          {ctaLabel}
+        </a>
+        <p class="hx-free">{copy.free}</p>
+      </div>
+    </div>
+
+    <!-- the exchange card: one printed page from the library -->
+    <div class="hx-stage">
+      <article class="hx-card" id="hx-card">
+        <header class="hx-card__head">
+          <a class="hx-portrait" href={featuredHref} aria-label={featuredName}>
+            <img
+              src={portraitSrc}
+              srcset={portraitSrcset}
+              sizes={portraitSizes}
+              alt=""
+              width="96"
+              height="96"
+              loading="eager"
+              fetchpriority="high"
+              decoding="async"
+            />
+          </a>
+          <div class="hx-card__who">
+            <p class="hx-card__name">{featuredName}</p>
+            <p class="hx-card__meta">{featuredMeta}</p>
+            {featuredLearn && <p class="hx-card__learn">{featuredLearn}</p>}
+          </div>
+        </header>
+
+        <p class="hx-label">{copy.youAsk}</p>
+        <p class="hx-question">{copy.question}</p>
+
+        <hr class="hx-rule" />
+
+        <p class="hx-label">{featuredName}</p>
+        <div class="hx-answer">
+          <p class="hx-answer__text">
+            {copy.answerLead}<em>{copy.answerThoughts}</em>{copy.answerRest}
+          </p>
+        </div>
+
+        <footer class="hx-card__foot">
+          <HeroVoice
+            client:idle
+            figureId={FEATURED_ID}
+            lang={lang}
+            rootId="hx-hero"
+            cardId="hx-card"
+            label={copy.hearVoice}
+          />
+          <a class="hx-asklink" href="/app" data-agc-cta="start-exploring">{copy.askYourself}</a>
+        </footer>
+
+        <p class="hx-caption">{copy.caption}</p>
+      </article>
+
+      <!-- breadth rail: more faces, then the full catalog -->
+      <div class="hx-rail">
+        <p class="hx-rail__caption">{copy.railCaption}</p>
+        <div class="hx-rail__chips">
+          {rail.map(f => (
+            <a class="hx-chip" href={f.href} aria-label={f.name} title={f.name}>
+              <img src={f.src} alt="" width="40" height="40" loading="lazy" decoding="async" />
+            </a>
+          ))}
+          <a class="hx-chip hx-chip--more" href={figuresHref}>{copy.railMore}</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- scroll cue handing off to the content below -->
+  <a href={scrollTarget} class="hx-scrollcue" aria-label={copy.scrollCueAria}>
+    <span class="hx-scrollcue__text">{copy.scrollCue}</span>
+    <span class="hx-scrollcue__arrow" aria-hidden="true"></span>
+  </a>
+</section>

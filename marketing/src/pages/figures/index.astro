@@ -1,5 +1,7 @@
 ---
 import Public from '../../layouts/Public.astro';
+import FigureOrbit from '../../components/landing-lab/FigureOrbit.astro';
+import V2ObservatoryMotion from '../../islands/V2ObservatoryMotion';
 import FiguresCatalogContent from '../../components/FiguresCatalogContent.astro';
 import { getT } from '../../i18n';
 import { itemListSchema, breadcrumbSchema } from '../../lib/schemas';
@@ -26,6 +28,12 @@ const schemas = [
     { name: t('breadcrumbs.figures'), url: `${SITE_URL}/figures` },
   ]),
 ];
+
+// The orbit's first planet (Marcus Aurelius) is the LCP. Preload it to match
+// the img FigureOrbit marks fetchpriority=high (src/srcset/sizes must match).
+const lcpPortrait = `${MEDIA_URL}/images/figures/aurelius/thumbnail/320.webp`;
+const lcpPortraitSrcset = `${MEDIA_URL}/images/figures/aurelius/thumbnail/160.webp 160w, ${MEDIA_URL}/images/figures/aurelius/thumbnail/320.webp 320w`;
+const lcpPortraitSizes = '(max-width: 900px) 56px, 88px';
 ---
 <Public
   title={t('figures.pageTitle')}
@@ -33,6 +41,13 @@ const schemas = [
   canonicalPath="/figures"
   lang={lang}
   schemas={schemas}
+  heroReveal={true}
+  preloadImage={lcpPortrait}
+  preloadImageSrcset={lcpPortraitSrcset}
+  preloadImageSizes={lcpPortraitSizes}
+  preloadImageType="image/webp"
 >
-  <FiguresCatalogContent lang={lang} />
+  <FigureOrbit lang={lang} />
+  <V2ObservatoryMotion client:idle targetId="figures-orbit" />
+  <FiguresCatalogContent lang={lang} gridOnly={true} />
 </Public>

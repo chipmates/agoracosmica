@@ -1,0 +1,48 @@
+/* Figures browse hero = the old landing-hero composition, reusing
+   .v2-hero-inner + .v2-copy--head/--tail + .v2-system from v2-observatory.css.
+   So the layout tracks the real hero at every breakpoint:
+     desktop: head above tail on the left, orbit on the right
+     mobile:  head (breadcrumb, title, stats) -> orbit + plaque -> tail
+              (description, lead), then the browse grid below.
+   This file only swaps the landing copy for the figures pub- copy, sizes the
+   orbit, and softens the seam into the grid. Compound selectors beat the base. */
+
+/* keep all hero content above the seam fade */
+.v2-observatory.v2-observatory--figures .v2-hero-inner {
+  position: relative;
+  z-index: 2;
+}
+
+.v2-observatory.v2-observatory--figures .v2-system-stage {
+  --v2-stage: min(42vw, 460px);
+}
+
+/* the figures copy uses the site pub- classes; tighten the vertical rhythm so
+   head + tail read as one column on desktop */
+/* headline in the old hero's white/gray, so the gold stays an accent (stats,
+   plaque, CTA) rather than the whole heading */
+.figorbit-copy .pub-hero__title { color: var(--text-primary); margin: 0.35rem 0 0.7rem; }
+.figorbit-copy .pub-volume { margin: 0; }
+.figorbit-copy .pub-section__text { margin: 0.9rem 0 0; }
+.figorbit-copy .pub-section__text:first-child { margin-top: 0; }
+
+/* soften the hard edge where the orbit meets the browse grid below */
+.v2-observatory.v2-observatory--figures::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 130px;
+  background: linear-gradient(180deg, transparent, var(--bg-cosmic-void, #0D1338));
+  pointer-events: none;
+  z-index: 1;
+}
+
+@media (max-width: 900px) {
+  .figorbit-copy { text-align: center; }
+  .figorbit-copy .pub-volume { justify-content: center; }
+  .v2-observatory.v2-observatory--figures .v2-system-stage {
+    --v2-stage: min(82vw, 400px);
+  }
+}

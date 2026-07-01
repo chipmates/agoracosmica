@@ -1,0 +1,569 @@
+/* ============================================================================
+   landing-lab alternative A — "The First Exchange"
+   A printed page from the library: question, answer, voice, rail of faces.
+   All selectors hx-prefixed. Brand tokens only, transparency via color-mix.
+
+   Motion contract: first paint is fully static. Loops run only when the
+   HeroVoice island adds .is-live AND the user allows motion, and they park
+   via .is-hidden when the tab is backgrounded.
+   ========================================================================== */
+
+.hx-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: min(100svh, 920px);
+  display: flex;
+  align-items: center;
+  background:
+    radial-gradient(120% 90% at 72% 24%,
+      color-mix(in srgb, var(--gold-subtle) 10%, transparent) 0%,
+      transparent 52%),
+    radial-gradient(140% 120% at 50% 120%,
+      var(--bg-deep-space, #0C1133) 0%,
+      var(--bg-deep-space-darker, #080B20) 70%),
+    linear-gradient(180deg,
+      var(--bg-primary, #151C47) 0%,
+      var(--bg-deep-space-darker, #080B20) 100%);
+}
+
+/* full-bleed out of .pub-main, same trick as the production hero */
+@media (min-width: 641px) {
+  .hx-hero {
+    width: 100vw;
+    max-width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+    margin-top: -6rem;
+  }
+}
+@media (max-width: 640px) {
+  .hx-hero {
+    width: 100vw;
+    max-width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+    margin-top: -5rem;
+  }
+}
+
+/* ── backdrop: tiled stars so density scales with the viewport ─────────── */
+.hx-sky {
+  position: absolute;
+  inset: -8%;
+  z-index: 0;
+  pointer-events: none;
+}
+.hx-sky::after {
+  /* bottom vignette grounds the composition */
+  content: "";
+  position: absolute;
+  inset: 55% 0 0 0;
+  background: linear-gradient(180deg,
+    transparent 0%,
+    color-mix(in srgb, var(--bg-deep-space-darker, #080B20) 55%, transparent) 100%);
+}
+.hx-stars {
+  position: absolute;
+  inset: 0;
+  background-repeat: repeat;
+}
+.hx-stars--far {
+  background-image:
+    radial-gradient(1px 1px at 12% 22%, var(--star-white-dim) 50%, transparent 51%),
+    radial-gradient(1px 1px at 47% 8%, var(--star-white-medium) 50%, transparent 51%),
+    radial-gradient(1px 1px at 73% 31%, var(--star-white-dim) 50%, transparent 51%),
+    radial-gradient(1px 1px at 88% 14%, var(--star-gold-medium) 50%, transparent 51%),
+    radial-gradient(1px 1px at 28% 54%, var(--star-white-dim) 50%, transparent 51%),
+    radial-gradient(1px 1px at 63% 67%, var(--star-white-medium) 50%, transparent 51%),
+    radial-gradient(1px 1px at 9% 81%, var(--star-white-dim) 50%, transparent 51%),
+    radial-gradient(1px 1px at 91% 76%, var(--star-gold-medium) 50%, transparent 51%),
+    radial-gradient(1px 1px at 38% 92%, var(--star-white-dim) 50%, transparent 51%);
+  background-size: 620px 620px;
+}
+.hx-stars--near {
+  background-image:
+    radial-gradient(1.6px 1.6px at 20% 35%, var(--star-white-bright) 50%, transparent 51%),
+    radial-gradient(1.6px 1.6px at 55% 20%, var(--star-gold-bright) 50%, transparent 51%),
+    radial-gradient(1.6px 1.6px at 82% 48%, var(--star-white-medium) 50%, transparent 51%),
+    radial-gradient(1.6px 1.6px at 34% 72%, var(--star-white-bright) 50%, transparent 51%),
+    radial-gradient(1.6px 1.6px at 70% 85%, var(--star-gold-medium) 50%, transparent 51%),
+    radial-gradient(1.6px 1.6px at 6% 60%, var(--star-white-medium) 50%, transparent 51%);
+  background-size: 860px 860px;
+}
+
+/* single diagonal shooting star, reused gesture from the production hero */
+.hx-shooting {
+  position: absolute;
+  top: 14%;
+  left: 6%;
+  width: 140px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--gold-hover) 70%, transparent) 60%,
+    var(--star-white-bright) 100%);
+  opacity: 0;
+  transform: rotate(28deg) translateX(0);
+}
+
+/* ── layout ─────────────────────────────────────────────────────────────── */
+.hx-inner {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: clamp(2rem, 5vw, 4.5rem) clamp(1.25rem, 4vw, 3rem) clamp(4.5rem, 6vw, 6rem);
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  align-items: center;
+  gap: clamp(2rem, 4.5vw, 4rem);
+}
+
+/* ── copy column: one display element, one support line, one action ─────── */
+.hx-copy { max-width: 36rem; }
+
+.hx-eyebrow {
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-tertiary, #9E9E9E);
+  margin: 0 0 0.75rem;
+}
+
+.hx-title {
+  font-family: 'Libre Caslon Text', Georgia, serif;
+  font-size: clamp(2rem, 4.2vw, 3.2rem);
+  line-height: 1.08;
+  font-weight: 400;
+  color: var(--text-primary);
+  margin: 0 0 0.75rem;
+  text-wrap: balance;
+}
+
+.hx-subhead {
+  font-family: 'Libre Caslon Text', Georgia, serif;
+  font-style: italic;
+  font-size: clamp(1.1rem, 2.4vw, 1.45rem);
+  color: var(--gold-primary);
+  margin: 0 0 2rem;
+}
+
+.hx-lede {
+  font-size: clamp(0.98rem, 1.3vw, 1.08rem);
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin: 0 0 2rem;
+  max-width: 32rem;
+}
+
+.hx-trust {
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  color: var(--text-tertiary);
+  margin: 0 0 1rem;
+}
+.hx-trust .hx-nowrap { white-space: nowrap; }
+
+.hx-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+.hx-cta {
+  width: auto;
+  min-width: 220px;
+}
+.hx-free {
+  font-size: 0.9rem;
+  color: var(--text-tertiary);
+  margin: 0;
+}
+
+/* ── the exchange card ──────────────────────────────────────────────────── */
+.hx-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-self: center;
+  width: 100%;
+  max-width: 560px;
+}
+
+.hx-card {
+  position: relative;
+  width: 100%;
+  padding: clamp(1.4rem, 2.4vw, 2rem) clamp(1.4rem, 2.6vw, 2.25rem);
+  border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 32%, transparent);
+  background:
+    linear-gradient(165deg,
+      color-mix(in srgb, var(--bg-primary, #151C47) 55%, transparent) 0%,
+      color-mix(in srgb, var(--bg-deep-space-darker, #080B20) 78%, transparent) 100%);
+  box-shadow:
+    0 24px 70px color-mix(in srgb, var(--utility-pure-black, #000) 45%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--gold-subtle) 14%, transparent),
+    0 0 60px color-mix(in srgb, var(--gold-subtle) 7%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.hx-card__head {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.4rem;
+}
+
+.hx-portrait {
+  position: relative;
+  flex: 0 0 auto;
+  display: block;
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  border: 1.5px solid color-mix(in srgb, var(--gold-primary) 60%, transparent);
+  box-shadow:
+    0 4px 16px color-mix(in srgb, var(--utility-pure-black, #000) 45%, transparent),
+    0 0 24px color-mix(in srgb, var(--gold-subtle) 18%, transparent);
+  transition: border-color 0.25s ease;
+}
+.hx-portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 50%;
+}
+/* glow bloom rides a pseudo layer so the loops animate opacity only
+   (compositor), never box-shadow (main-thread paint) */
+.hx-portrait::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  box-shadow: 0 0 34px color-mix(in srgb, var(--gold-subtle) 32%, transparent);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.hx-portrait:hover,
+.hx-portrait:focus-visible {
+  border-color: var(--gold-hover);
+}
+.hx-portrait:focus-visible {
+  outline: 2px solid var(--gold-hover);
+  outline-offset: 3px;
+}
+
+.hx-card__name {
+  font-family: 'Libre Caslon Text', Georgia, serif;
+  font-size: 1.35rem;
+  color: var(--text-primary);
+  margin: 0 0 0.2rem;
+}
+.hx-card__meta {
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin: 0;
+}
+.hx-card__learn {
+  font-family: 'Libre Caslon Text', Georgia, serif;
+  font-style: italic;
+  font-size: 0.98rem;
+  line-height: 1.4;
+  color: var(--gold-primary);
+  margin: 0.35rem 0 0;
+}
+
+.hx-label {
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--gold-primary) 80%, transparent);
+  margin: 0 0 0.5rem;
+}
+
+.hx-question {
+  font-family: 'Libre Caslon Text', Georgia, serif;
+  font-style: italic;
+  font-size: 1.05rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+  margin: 0 0 1.25rem;
+}
+
+.hx-rule {
+  border: 0;
+  height: 1px;
+  background: color-mix(in srgb, var(--gold-subtle) 25%, transparent);
+  margin: 0 0 1.25rem;
+}
+
+.hx-answer {
+  position: relative;
+  margin: 0 0 1.4rem;
+}
+/* large decorative quote glyph breathing behind the answer */
+.hx-answer::before {
+  content: "\201C";
+  position: absolute;
+  top: -2.4rem;
+  left: -0.9rem;
+  font-family: 'Libre Caslon Text', Georgia, serif;
+  font-size: 7rem;
+  line-height: 1;
+  color: var(--gold-subtle);
+  opacity: 0.14;
+  pointer-events: none;
+}
+.hx-answer__text {
+  position: relative;
+  font-family: 'Libre Caslon Text', Georgia, serif;
+  font-size: 1.12rem;
+  line-height: 1.7;
+  color: var(--text-primary);
+  margin: 0;
+}
+.hx-answer__text em {
+  color: var(--text-secondary);
+}
+
+.hx-card__foot {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.1rem;
+}
+
+.hx-asklink {
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--gold-primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+.hx-asklink:hover { color: var(--gold-hover); }
+.hx-asklink:focus-visible {
+  outline: 2px solid var(--gold-hover);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.hx-caption {
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--text-tertiary);
+  margin: 0;
+}
+
+/* while the trailer plays, the portrait ring pulses (set via data-voice) */
+.hx-card[data-voice="playing"] .hx-portrait {
+  border-color: var(--gold-hover);
+}
+.hx-card[data-voice="playing"] .hx-portrait::after {
+  box-shadow: 0 0 38px color-mix(in srgb, var(--gold-hover) 55%, transparent);
+  opacity: 0.7;
+}
+
+/* ── breadth rail ───────────────────────────────────────────────────────── */
+.hx-rail {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+}
+.hx-rail__caption {
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin: 0;
+}
+.hx-rail__chips {
+  display: flex;
+  align-items: center;
+}
+.hx-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1.5px solid color-mix(in srgb, var(--gold-subtle) 45%, transparent);
+  background: var(--bg-deep-space-darker, #080B20);
+  box-shadow: 0 3px 10px color-mix(in srgb, var(--utility-pure-black, #000) 45%, transparent);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+  position: relative;
+}
+.hx-chip + .hx-chip { margin-left: -8px; }
+.hx-chip:hover,
+.hx-chip:focus-visible {
+  transform: translateY(-3px);
+  border-color: var(--gold-hover);
+  z-index: 2;
+}
+.hx-chip:focus-visible {
+  outline: 2px solid var(--gold-hover);
+  outline-offset: 2px;
+}
+.hx-chip img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+/* expand tap target to 44px around the 40px chip */
+.hx-chip::after {
+  content: "";
+  position: absolute;
+  inset: 50%;
+  width: 44px;
+  height: 44px;
+  transform: translate(-50%, -50%);
+}
+.hx-chip--more {
+  width: auto;
+  height: 40px;
+  border-radius: 999px;
+  padding: 0 0.9rem;
+  margin-left: 0.35rem;
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--gold-primary);
+  text-decoration: none;
+  background: color-mix(in srgb, var(--gold-primary) 9%, transparent);
+}
+.hx-chip--more:hover { background: color-mix(in srgb, var(--gold-primary) 16%, transparent); }
+
+/* ── scroll cue ─────────────────────────────────────────────────────────── */
+.hx-scrollcue {
+  position: absolute;
+  bottom: 1.4rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 44px;
+  justify-content: center;
+  padding: 0 0.75rem;
+  text-decoration: none;
+  color: var(--text-tertiary);
+}
+.hx-scrollcue__text {
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.hx-scrollcue__arrow {
+  width: 12px;
+  height: 12px;
+  border-right: 1.5px solid color-mix(in srgb, var(--gold-primary) 70%, transparent);
+  border-bottom: 1.5px solid color-mix(in srgb, var(--gold-primary) 70%, transparent);
+  transform: rotate(45deg);
+}
+.hx-scrollcue:hover { color: var(--gold-primary); }
+.hx-scrollcue:focus-visible { outline: 2px solid var(--gold-hover); outline-offset: 3px; border-radius: 4px; }
+
+/* ── keyframes (paused until .is-live) ──────────────────────────────────── */
+@keyframes hx-quote-breathe {
+  0%, 100% { opacity: 0.14; }
+  50%      { opacity: 0.22; }
+}
+/* opacity-only loops on the ::after bloom layer */
+@keyframes hx-portrait-glow {
+  0%, 100% { opacity: 0; }
+  50%      { opacity: 1; }
+}
+@keyframes hx-portrait-speak {
+  0%, 100% { opacity: 0.35; }
+  50%      { opacity: 1; }
+}
+@keyframes hx-shoot {
+  0%   { opacity: 0; transform: rotate(28deg) translateX(0); }
+  6%   { opacity: 1; }
+  18%  { opacity: 0; transform: rotate(28deg) translateX(62vw); }
+  100% { opacity: 0; transform: rotate(28deg) translateX(62vw); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hx-hero.is-live .hx-answer::before {
+    animation: hx-quote-breathe 7s ease-in-out infinite;
+  }
+  .hx-hero.is-live .hx-portrait::after {
+    animation: hx-portrait-glow 6s ease-in-out infinite;
+  }
+  .hx-hero.is-live .hx-card[data-voice="playing"] .hx-portrait::after {
+    animation: hx-portrait-speak 2.4s ease-in-out infinite;
+  }
+  .hx-hero.is-live .hx-shooting {
+    animation: hx-shoot 17s ease-in 4s infinite;
+  }
+  .hx-hero.is-live.is-hidden .hx-answer::before,
+  .hx-hero.is-live.is-hidden .hx-portrait::after,
+  .hx-hero.is-live.is-hidden .hx-shooting {
+    animation-play-state: paused;
+  }
+}
+
+/* ── responsive ─────────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .hx-inner {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    text-align: center;
+  }
+  /* mobile order: headline promise, then the proof card, then the action */
+  .hx-copy {
+    max-width: none;
+    display: contents;
+  }
+  .hx-eyebrow { order: 1; margin-bottom: 0.5rem; }
+  .hx-title   { order: 2; font-size: clamp(1.85rem, 5.4vw, 2.4rem); margin-bottom: 0.4rem; }
+  .hx-subhead { order: 3; margin-bottom: 0.4rem; }
+  .hx-lede    { order: 4; margin: 0 auto 0.5rem; }
+  .hx-stage   { order: 5; }
+  .hx-trust   { order: 6; margin: 0.75rem 0 0; }
+  .hx-actions { order: 7; align-items: center; }
+
+  .hx-inner { display: flex; flex-direction: column; }
+  .hx-stage { justify-self: auto; }
+
+  .hx-card { text-align: left; }
+  .hx-portrait { width: 64px; height: 64px; }
+  .hx-card__name { font-size: 1.2rem; }
+  .hx-question { font-size: 1rem; }
+  .hx-answer__text { font-size: 1.05rem; line-height: 1.65; }
+  .hx-card__foot { justify-content: flex-start; }
+}
+
+@media (max-width: 560px) {
+  .hx-hero { min-height: auto; padding: 1rem 0 3.5rem; }
+  .hx-card { padding: 1.1rem 1.1rem 1.2rem; }
+  .hx-answer::before { font-size: 5.5rem; top: -1.8rem; left: -0.4rem; }
+  .hx-scrollcue { display: none; }
+}

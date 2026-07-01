@@ -9,9 +9,12 @@ import { getFiguresCatalog } from '@client/data/public/figuresCatalog';
 
 interface Props {
   lang: Lang;
+  /** Skip the header block (breadcrumb, h1, stats, description, lead) when the
+   *  page renders those itself, e.g. the figures orbit hero. */
+  gridOnly?: boolean;
 }
 
-const { lang } = Astro.props;
+const { lang, gridOnly = false } = Astro.props;
 const t = getT(lang);
 
 // Sort by surname (last meaningful name part), with a handful of overrides
@@ -40,18 +43,22 @@ const figures = [...getFiguresCatalog(lang)].sort((a, b) =>
 );
 ---
 <div class="pub-content">
-  <Breadcrumbs lang={lang} items={[{ label: t('breadcrumbs.figures') }]} />
+  {!gridOnly && (
+    <Fragment>
+      <Breadcrumbs lang={lang} items={[{ label: t('breadcrumbs.figures') }]} />
 
-  <h1 class="pub-hero__title">{t('figures.pageTitle')}</h1>
-  <ContentVolume lang={lang} />
-  <p class="pub-section__text">
-    {t('figures.pageDescription')}
-  </p>
-  <p class="pub-section__text pub-catalog-lead">
-    {lang === 'de'
-      ? 'Öffne einen Namen und entdecke dieses Leben und seine Ideen.'
-      : 'Open any name to explore their life and ideas.'}
-  </p>
+      <h1 class="pub-hero__title">{t('figures.pageTitle')}</h1>
+      <ContentVolume lang={lang} />
+      <p class="pub-section__text">
+        {t('figures.pageDescription')}
+      </p>
+      <p class="pub-section__text pub-catalog-lead">
+        {lang === 'de'
+          ? 'Öffne einen Namen und entdecke das Leben und die Ideen dahinter.'
+          : 'Open any name to explore their life and ideas.'}
+      </p>
+    </Fragment>
+  )}
 
   <div class="pub-grid pub-grid--3">
     {figures.map(figure => <FigureCard figure={figure} lang={lang} />)}

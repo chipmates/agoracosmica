@@ -1,17 +1,16 @@
 ---
 // The static, crawlable English homepage served at /. The React SPA shell now
 // lives at /app (see merge-marketing.mjs + _redirects). This page is plain
-// prerendered HTML: the cinematic Observatory hero owns the single <h1>, and
-// the shared HomepageBody renders the crawlable library below it so a stranger
-// and a crawler both see the full library without running the React app.
+// prerendered HTML: the First Exchange hero owns the single <h1>, and the
+// shared HomepageBody renders the crawlable library below it so a stranger and
+// a crawler both see the full library without running the React app.
 // Exactly one <h1> (the hero); every other heading is h2/h3. The interactive
-// islands are the hero's V2ObservatoryMotion (client:idle, motion only) and
+// islands are the hero's HeroVoice (client:idle, plays the ~50s trailer) and
 // the body's CouncilHero audio button (client:visible), both already
 // CSP-hashed, so no new inline-script hash is introduced.
 
 import Public from '../layouts/Public.astro';
-import V2ObservatoryHero from '../components/landing-lab/V2ObservatoryHero.astro';
-import V2ObservatoryMotion from '../islands/V2ObservatoryMotion';
+import HeroExchange from '../components/landing-lab/HeroExchange.astro';
 import HomepageBody from '../components/HomepageBody.astro';
 import {
   agoraCosmicaSchema,
@@ -135,13 +134,13 @@ const schemas = [
   breadcrumbSchema([{ name: t('breadcrumbs.home'), url: `${SITE_URL}/` }]),
 ];
 
-// The hero's LCP portrait is the innermost first planet (Marcus Aurelius),
-// matching the ring plan in V2ObservatoryHero. Preload it at high priority.
-// The srcset + sizes pair MUST stay identical to the planet img's in
-// V2ObservatoryHero, so the preloaded resource is the one the img picks.
+// The hero's LCP portrait is the featured figure (Marcus Aurelius) in the
+// exchange card. Preload it at high priority. The srcset + sizes pair MUST
+// stay identical to the card portrait img's in HeroExchange, so the preloaded
+// resource is the one the img picks.
 const lcpPortrait = `${MEDIA_URL}/images/figures/aurelius/thumbnail/320.webp`;
 const lcpPortraitSrcset = `${MEDIA_URL}/images/figures/aurelius/thumbnail/160.webp 160w, ${MEDIA_URL}/images/figures/aurelius/thumbnail/320.webp 320w`;
-const lcpPortraitSizes = '(max-width: 900px) 56px, 88px';
+const lcpPortraitSizes = '(max-width: 900px) 64px, 88px';
 ---
 <Public
   title="A Living Library You Can Talk To"
@@ -156,9 +155,8 @@ const lcpPortraitSizes = '(max-width: 900px) 56px, 88px';
   preloadImageSizes={lcpPortraitSizes}
   preloadImageType="image/webp"
 >
-  <!-- cinematic orbital hero (static first paint; the island only enhances) -->
-  <V2ObservatoryHero lang={lang} />
-  <V2ObservatoryMotion client:idle targetId="v2-observatory" />
+  <!-- First Exchange hero (static first paint; HeroVoice only enhances) -->
+  <HeroExchange lang={lang} scrollTarget="#v2-library" />
 
   <!-- shared crawlable SEO body -->
   <div class="pub-content pub-home" id="v2-library">

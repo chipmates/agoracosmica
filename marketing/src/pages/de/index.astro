@@ -1,17 +1,16 @@
 ---
 // Die statische, crawlbare deutsche Startseite, ausgeliefert unter /de/. Die
 // React-SPA liegt jetzt unter /app. Diese Seite ist reines vorgerendertes
-// HTML: Der cinematische Observatory-Hero trägt das einzige <h1>, und der
-// gemeinsame HomepageBody rendert die crawlbare Bibliothek darunter, sodass
-// Besucher und Crawler die ganze Bibliothek ohne die React-App sehen. Genau
-// ein <h1> (der Hero); alle anderen Überschriften sind h2/h3. Die interaktiven
-// Inseln sind V2ObservatoryMotion des Heros (client:idle, nur Bewegung) und
-// der CouncilHero-Audio-Button im Body (client:visible), beide bereits
+// HTML: Der First-Exchange-Hero trägt das einzige <h1>, und der gemeinsame
+// HomepageBody rendert die crawlbare Bibliothek darunter, sodass Besucher und
+// Crawler die ganze Bibliothek ohne die React-App sehen. Genau ein <h1> (der
+// Hero); alle anderen Überschriften sind h2/h3. Die interaktiven Inseln sind
+// HeroVoice des Heros (client:idle, spielt den ~50s-Trailer) und der
+// CouncilHero-Audio-Button im Body (client:visible), beide bereits
 // CSP-gehasht, also kein neuer Inline-Script-Hash.
 
 import Public from '../../layouts/Public.astro';
-import V2ObservatoryHero from '../../components/landing-lab/V2ObservatoryHero.astro';
-import V2ObservatoryMotion from '../../islands/V2ObservatoryMotion';
+import HeroExchange from '../../components/landing-lab/HeroExchange.astro';
 import HomepageBody from '../../components/HomepageBody.astro';
 import {
   agoraCosmicaSchema,
@@ -135,13 +134,13 @@ const schemas = [
   breadcrumbSchema([{ name: t('breadcrumbs.home'), url: `${SITE_URL}/de/` }]),
 ];
 
-// Das LCP-Portrait des Heros ist der innerste erste Planet (Marcus Aurelius),
-// passend zum Ring-Plan in V2ObservatoryHero. Mit hoher Priorität vorladen.
-// Das srcset+sizes-Paar MUSS identisch zum Planet-img in V2ObservatoryHero
-// bleiben, damit der Preload genau die Ressource lädt, die das img wählt.
+// Das LCP-Portrait des Heros ist der vorgestellte Mensch (Mark Aurel) in der
+// Austausch-Karte. Mit hoher Priorität vorladen. Das srcset+sizes-Paar MUSS
+// identisch zum Karten-Portrait-img in HeroExchange bleiben, damit der Preload
+// genau die Ressource lädt, die das img wählt.
 const lcpPortrait = `${MEDIA_URL}/images/figures/aurelius/thumbnail/320.webp`;
 const lcpPortraitSrcset = `${MEDIA_URL}/images/figures/aurelius/thumbnail/160.webp 160w, ${MEDIA_URL}/images/figures/aurelius/thumbnail/320.webp 320w`;
-const lcpPortraitSizes = '(max-width: 900px) 56px, 88px';
+const lcpPortraitSizes = '(max-width: 900px) 64px, 88px';
 ---
 <Public
   title="Eine lebendige Bibliothek, mit der du sprechen kannst"
@@ -156,9 +155,8 @@ const lcpPortraitSizes = '(max-width: 900px) 56px, 88px';
   preloadImageSizes={lcpPortraitSizes}
   preloadImageType="image/webp"
 >
-  <!-- cinematischer orbitaler Hero (statischer Erstaufbau; die Insel ergänzt nur) -->
-  <V2ObservatoryHero lang={lang} />
-  <V2ObservatoryMotion client:idle targetId="v2-observatory" />
+  <!-- First-Exchange-Hero (statischer Erstaufbau; HeroVoice ergänzt nur) -->
+  <HeroExchange lang={lang} scrollTarget="#v2-library" />
 
   <!-- gemeinsamer crawlbarer SEO-Body -->
   <div class="pub-content pub-home" id="v2-library">

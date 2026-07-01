@@ -61,10 +61,10 @@ const waysInOss = isDe ? 'Die Open-Source-Geschichte' : 'The open-source story';
 // eight question tiles). Verbatim from the QA'd copy source. The mode bodies
 // render as scannable cards; the question tiles each link to a theme page.
 const enModes = [
-  { name: 'Story', text: "Story sets up the teaching, a narrated chapter from a figure's life that opens the idea, twelve chapters, checked against the record." },
-  { name: 'Wisdom', text: 'Wisdom is where you take one of their core teachings and think it through, in your own words and your own life.' },
-  { name: 'Prism', text: 'Prism lets you hear four connected minds circle a single theme from their own angles, like a podcast you can sit inside.' },
-  { name: 'Quest', text: 'Quest is a short Socratic challenge, four questions that go deeper than surface knowledge.' },
+  { name: 'Story', step: 'Chapter 1', text: "Story sets up the teaching, a narrated chapter from a figure's life that opens the idea, twelve chapters, checked against the record." },
+  { name: 'Wisdom', step: 'Chapter 2', text: 'Wisdom is where you take one of their core teachings and think it through, in your own words and your own life.' },
+  { name: 'Prism', step: 'Chapter 3', text: 'Prism lets you hear four connected minds circle a single theme from their own angles, like a podcast you can sit inside.' },
+  { name: 'Quest', step: 'Chapter 4', text: 'Quest is a short Socratic challenge, four questions that go deeper than surface knowledge.' },
   { name: 'Free Talk', text: 'Free Talk is an open conversation. Ask anything and follow it wherever it goes.' },
   { name: 'Cosmic Council', text: 'Cosmic Council puts four figures in one room, debating a single question while you listen.' },
 ];
@@ -83,10 +83,10 @@ const enQuestions = [
 // The repositioned German six mode cards and eight question tiles, verbatim
 // from the QA'd copy source. Each question tile links to its theme page.
 const deModes = [
-  { name: 'Story', text: 'Story bereitet die Lehre vor, ein erzähltes Kapitel aus dem Leben eines Menschen, das den Gedanken öffnet, zwölf Kapitel, anhand der Quellen geprüft.' },
-  { name: 'Weisheit', text: 'In der Weisheit nimmst du eine ihrer Kernlehren und denkst sie durch, in deinen eigenen Worten und für dein eigenes Leben.' },
-  { name: 'Prisma', text: 'Im Prisma hörst du vier verbundene Köpfe ein einziges Thema aus ihren eigenen Blickwinkeln umkreisen, wie ein Podcast, in dem du selbst mitsitzt.' },
-  { name: 'Quest', text: 'Die Quest ist eine kurze sokratische Herausforderung, vier Fragen, die tiefer gehen als Oberflächenwissen.' },
+  { name: 'Story', step: 'Kapitel 1', text: 'Story bereitet die Lehre vor, ein erzähltes Kapitel aus dem Leben eines Menschen, das den Gedanken öffnet, zwölf Kapitel, anhand der Quellen geprüft.' },
+  { name: 'Weisheit', step: 'Kapitel 2', text: 'In der Weisheit nimmst du eine ihrer Kernlehren und denkst sie durch, in deinen eigenen Worten und für dein eigenes Leben.' },
+  { name: 'Prisma', step: 'Kapitel 3', text: 'Im Prisma hörst du vier verbundene Köpfe ein einziges Thema aus ihren eigenen Blickwinkeln umkreisen, wie ein Podcast, in dem du selbst mitsitzt.' },
+  { name: 'Quest', step: 'Kapitel 4', text: 'Die Quest ist eine kurze sokratische Herausforderung, vier Fragen, die tiefer gehen als Oberflächenwissen.' },
   { name: 'Free Talk', text: 'Free Talk ist ein offenes Gespräch. Frag alles, und folg ihm, wohin es führt.' },
   { name: 'Cosmic Council', text: 'Der Cosmic Council bringt vier Menschen in einen Raum, die eine einzige Frage debattieren, während du zuhörst.' },
 ];
@@ -167,7 +167,7 @@ const deQuestions = [
         Momente, in denen du tiefer gehen willst.
       </p>
       <div class="ll2-mode-grid">
-        {deModes.map(mode => <LabModeCard name={mode.name} text={mode.text} />)}
+        {deModes.map(mode => <LabModeCard name={mode.name} text={mode.text} step={mode.step} />)}
       </div>
       <p class="pub-section__text ll2-caption">
         Die Bibliothek, die dich lehrt, reicht tief. 360 erzählte Geschichten, 360 Kernlehren,
@@ -369,7 +369,7 @@ const deQuestions = [
         teach. Two are live conversation, for when you want to take it further.
       </p>
       <div class="ll2-mode-grid">
-        {enModes.map(mode => <LabModeCard name={mode.name} text={mode.text} />)}
+        {enModes.map(mode => <LabModeCard name={mode.name} text={mode.text} step={mode.step} />)}
       </div>
       <p class="pub-section__text ll2-caption">
         The library that teaches you runs deep. 360 narrated stories, 360 core teachings, 360 prism
@@ -709,6 +709,13 @@ const deQuestions = [
     border-radius: var(--radius-lg, 0.75rem);
     border: 1px solid color-mix(in srgb, var(--gold-subtle) 22%, transparent);
     background: color-mix(in srgb, var(--bg-deep-space-darker, #080B20) 45%, transparent);
+  }
+  .ll2-mode-card__step {
+    font-size: 0.66rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--star-blue-light, #b4c8ff) 65%, transparent);
+    margin: 0 0 0.35rem;
   }
   .ll2-mode-card__name {
     font-family: var(--font-content, 'Libre Caslon Text', serif);

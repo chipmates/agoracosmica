@@ -66,6 +66,7 @@ export default defineConfig({
         '/images': { target: 'https://media.agoracosmica.org', changeOrigin: true, secure: true },
         '/trailers': { target: 'https://media.agoracosmica.org', changeOrigin: true, secure: true },
         '/stories': { target: 'https://media.agoracosmica.org', changeOrigin: true, secure: true },
+        '/prisms': { target: 'https://media.agoracosmica.org', changeOrigin: true, secure: true },
         '/seeds': { target: 'https://media.agoracosmica.org', changeOrigin: true, secure: true },
         '/instructions': { target: 'https://media.agoracosmica.org', changeOrigin: true, secure: true },
         '/voice-profiles': { target: 'https://media.agoracosmica.org', changeOrigin: true, secure: true },
