@@ -91,7 +91,10 @@ client/public/assets/
 # The First Exchange hero and the figure orbit were chosen and promoted into
 # the real pages (now tracked). The rejected hero variants, the interactive
 # library experiments, and the lab preview pages stay out of version control.
-marketing/src/pages/lab/
+# The lab preview pages moved to .lab-pages-archive/ so they no longer build
+# into production (they carry inline styles the CSP blocks); restore into
+# src/pages/lab/ locally to preview a variant.
+marketing/.lab-pages-archive/
 marketing/src/components/landing-lab/HeroListening.astro
 marketing/src/components/landing-lab/hero-listening.css
 marketing/src/islands/VoiceDeck.tsx

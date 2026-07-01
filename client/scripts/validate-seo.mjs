@@ -65,8 +65,11 @@ for (const f of files) {
   const inlineStyles = (html.match(/<[^>]+\sstyle="/g) || []).length;
   if (inlineStyles) hard.push(`${rel}: ${inlineStyles} inline style="" attribute(s) (CSP would block)`);
 
-  // 3. No forbidden "greatest minds" framing (locked positioning).
-  if (/great(est)? minds?|gr(ö|oe)(ß|ss)te[nr]? (denker|geister)/i.test(dhtml))
+  // 3. No forbidden "greatest minds" framing (locked positioning). Plural only:
+  // the collective positioning claim is always plural ("greatest minds"). The
+  // singular "great mind" occurs in genuine quotes (Woolf, "the great mind is
+  // androgynous") and must not trip the guard.
+  if (/great(est)? minds|gr(ö|oe)(ß|ss)te[nr]? (denker|geister)/i.test(dhtml))
     hard.push(`${rel}: forbidden "greatest minds / größten Denker" framing`);
 
   // 4. Meta description: present, <=160, unique.
