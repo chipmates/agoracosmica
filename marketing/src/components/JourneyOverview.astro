@@ -1,41 +1,55 @@
 ---
-// The four-step learning path on figure detail pages. Mirrors the React
-// version in client/src/components/public/JourneyOverview.tsx — static prose,
-// no interactivity, perfect Astro fit.
+// The "path you walk" section on figure detail pages. Keeps the crawlable
+// framing (heading "{name}, in twelve ideas", the four-step intro, the aside and
+// nudge) and swaps the old STATIC four-step illustration for the real
+// interactive Library element (the same island the homepage uses), resolved for
+// THIS figure. So the section that says "each idea opens up in four steps, a
+// short path you walk" now lets you actually walk one: play the first Story
+// chapter, hear the four-voice Prism, study a core teaching. It is the perfect
+// companion to the hero's voice trailer, voice identity up top, the learning
+// itself here. All six panels are server-rendered, so nothing crawlable is lost.
 
+import LabLibrary from '../islands/LabLibrary';
+import { getFigureLibraryModes } from './landing-lab/figure-library';
+import { MEDIA_URL, publicUrl } from '../lib/urls';
 import { getT } from '../i18n';
 import type { Lang } from '../i18n';
+import './landing-lab/lab-samples.css';
+import './landing-lab/lab-library.css';
 
 interface Props {
+  figureId: string;
   figureName: string;
   lang: Lang;
 }
 
-const { figureName, lang } = Astro.props;
+const { figureId, figureName, lang } = Astro.props;
 const t = getT(lang);
 
-const steps = [
-  {
-    n: 1, mode: 'story', name: t('journey.modeStory'),
-    label: t('journey.listen'), meta: t('journey.storyDuration'),
-    line: t('journey.storyLine'),
-  },
-  {
-    n: 2, mode: 'wisdom', name: t('journey.modeWisdom'),
-    label: t('journey.talk'), meta: '',
-    line: t('journey.wisdomLine'),
-  },
-  {
-    n: 3, mode: 'prism', name: t('journey.modePrism'),
-    label: t('journey.listen'), meta: '',
-    line: t('journey.prismLine'),
-  },
-  {
-    n: 4, mode: 'quest', name: t('journey.modeQuest'),
-    label: t('journey.talk'), meta: '',
-    line: t('journey.questLine'),
-  },
-];
+const modes = getFigureLibraryModes(figureId, lang);
+const portrait = `${MEDIA_URL}/images/figures/${figureId}/thumbnail/160.webp`;
+
+const LABELS = lang === 'de'
+  ? {
+      tablistAria: 'Sechs Wege zu lernen',
+      groupArc: 'Der Lernweg',
+      groupMore: 'Weiter gehen',
+      continueLabel: 'Das Ganze anhören',
+      playDefault: 'Abspielen',
+      footShowing: 'Wähl einen Weg und probier ihn aus.',
+      footEvery: 'Alle dreißig Menschen ansehen →',
+      figuresHref: publicUrl('de', '/figures'),
+    }
+  : {
+      tablistAria: 'Six ways to learn',
+      groupArc: 'The learning arc',
+      groupMore: 'Go further',
+      continueLabel: 'Hear the whole thing',
+      playDefault: 'Play',
+      footShowing: 'Pick a way and try it.',
+      footEvery: 'See all thirty figures →',
+      figuresHref: publicUrl('en', '/figures'),
+    };
 ---
 <section class="pub-section pub-path-section">
   <h2 class="pub-section__title">
@@ -43,23 +57,19 @@ const steps = [
   </h2>
   <p class="pub-path-intro">{t('journey.intro')}</p>
 
-  <ol class="pub-path">
-    {steps.map(step => (
-      <li class={`pub-path__step pub-path__step--${step.mode}`}>
-        <div class="pub-path__node">{step.n}</div>
-        <div class="pub-path__body">
-          <div class="pub-path__head">
-            <span class="pub-path__name">{step.name}</span>
-            <span class="pub-path__pill">
-              {step.meta ? `${step.label} · ${step.meta}` : step.label}
-            </span>
-          </div>
-          <p class="pub-path__line">{step.line}</p>
-        </div>
-      </li>
-    ))}
-  </ol>
+  <LabLibrary
+    client:visible
+    modes={modes}
+    portrait={portrait}
+    figureName={figureName}
+    figureId={figureId}
+    labels={LABELS}
+  />
 
   <p class="pub-path-aside">{t('journey.aside')}</p>
   <p class="pub-path-nudge">{t('journey.nudge')}</p>
 </section>
+
+<style>
+  .pub-path-section :global(.lib) { margin: 1.75rem auto; }
+</style>

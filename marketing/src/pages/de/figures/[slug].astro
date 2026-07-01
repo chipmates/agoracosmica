@@ -3,7 +3,8 @@ import Public from '../../../layouts/Public.astro';
 import FigureDetailContent from '../../../components/FigureDetailContent.astro';
 
 import { getT } from '../../../i18n';
-import { breadcrumbSchema, personSchema, audioObjectSchema, faqSchema } from '../../../lib/schemas';
+import { breadcrumbSchema, personSchema, audioObjectSchema, faqSchema, itemListSchema } from '../../../lib/schemas';
+import { getSeedsFor } from '../../../lib/seeds';
 import { dickinsonPoemsFaqDe } from '../../../lib/dickinsonPoemsFaq';
 import { canonicalUrl, publicUrl, SITE_URL, MEDIA_URL } from '../../../lib/urls';
 import { figureSlugToId } from '@client/data/public/slugMap';
@@ -43,6 +44,11 @@ const figQaItems = (figureId !== 'dickinson' && figQA)
   ? [...figQA.pairs, figQA.disclosure]
   : [];
 
+// Die zwölf Ideen als ItemList, deckungsgleich mit der sichtbaren Ideen-Liste
+// und ihren #idea-N-Ankern, damit jede Idee eine zitierbare, verlinkbare Einheit
+// ist.
+const ideaSeeds = getSeedsFor(figureId, lang);
+
 const schemas = [
   personSchema({
     name: figure.name,
@@ -68,6 +74,13 @@ const schemas = [
     ? [faqSchema(dickinsonPoemsFaqDe, `${figureUrl}/`)]
     : []),
   ...(figQaItems.length ? [faqSchema(figQaItems, `${figureUrl}/`)] : []),
+  ...(ideaSeeds.length
+    ? [itemListSchema(ideaSeeds.map((s, i) => ({
+        name: s.title,
+        url: `${figureUrl}/#idea-${i + 1}`,
+        description: s.summary,
+      })))]
+    : []),
 ];
 ---
 <Public

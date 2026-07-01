@@ -49,16 +49,16 @@
 .lib__tabs {
   display: flex;
   align-items: flex-end;
-  flex-wrap: wrap; /* German labels are wider; let the "go further" group drop
-                      to a second row instead of overflowing .lib (overflow:hidden
-                      would otherwise clip the Council / Free Talk tabs). */
-  gap: 0.75rem 1.1rem;
+  flex-wrap: wrap; /* mobile fallback only: the tabs are sized to fit one desktop
+                      row even in German (wider labels); wrap catches genuinely
+                      narrow widths instead of clipping the Council/Free Talk tabs. */
+  gap: 0.7rem 0.8rem;
   padding: 0.7rem 0.6rem 0;
   border-bottom: 1px solid color-mix(in srgb, var(--gold-subtle) 20%, transparent);
 }
 .lib__tabgroup { display: flex; flex-direction: column; gap: 0.35rem; }
 /* a hairline between the arc and the "go further" pair */
-.lib__tabgroup--more { position: relative; padding-left: 1.1rem; }
+.lib__tabgroup--more { position: relative; padding-left: 0.8rem; }
 .lib__tabgroup--more::before {
   content: '';
   position: absolute;
@@ -85,7 +85,7 @@
   align-items: center;
   gap: 0.1rem;
   min-height: 56px;
-  padding: 0.55rem 0.72rem;
+  padding: 0.5rem 0.5rem;
   border: 0;
   border-bottom: 2px solid transparent;
   background: transparent;
@@ -96,7 +96,7 @@
 .lib__tab:focus-visible { outline: 2px solid var(--gold-hover); outline-offset: -2px; }
 .lib__tab-name {
   font-family: var(--font-ui, 'Space Grotesk', sans-serif);
-  font-size: 0.9rem;
+  font-size: 0.86rem;
   font-weight: 600;
   color: var(--text-secondary);
 }
@@ -120,8 +120,8 @@
 .lib__tabgroup--more .lib__tab:focus-visible { outline-color: var(--star-blue-light); }
 .lib__tab-glyph {
   font-family: var(--font-ui, 'Space Grotesk', sans-serif);
-  font-size: 0.62rem;
-  letter-spacing: 0.03em;
+  font-size: 0.57rem;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
   color: var(--text-tertiary);
 }

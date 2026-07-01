@@ -126,7 +126,7 @@ function cleanDisplayText(s: string): string {
     </a>
   </p>
 
-  <JourneyOverview figureName={figure.name} lang={lang} />
+  <JourneyOverview figureId={figureId} figureName={figure.name} lang={lang} />
 
   <FigureQA figureId={figureId} lang={lang} />
 
@@ -167,8 +167,8 @@ function cleanDisplayText(s: string): string {
       defaultOpen={OPEN_IDEAS.has(figureId)}
     >
       <ol class="pub-ideas">
-        {seeds.map(seed => (
-          <li class="pub-ideas__item">
+        {seeds.map((seed, i) => (
+          <li class="pub-ideas__item" id={`idea-${i + 1}`}>
             <span class="pub-ideas__title">{seed.title}</span>
             {seed.summary && (
               <span class="pub-ideas__summary">{cleanDisplayText(seed.summary)}</span>
