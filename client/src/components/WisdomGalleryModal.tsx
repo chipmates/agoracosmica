@@ -194,7 +194,7 @@ const PortraitFrame: FC<PortraitFrameProps> = ({
             type="ui"
             purpose="main"
             priority={index < 3}
-            className={`${styles.portraitImage} ${imageLoaded ? styles.loaded : ''}`}
+            className={`${styles.portraitImage} ${imageLoaded ? styles.loaded : ''} ${figure.id === 'nietzsche' ? styles.flipped : ''}`}
             alt={figure.name}
             onLoad={() => setImageLoaded(true)}
           />
