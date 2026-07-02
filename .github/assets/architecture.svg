@@ -1,104 +1,176 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 590" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Agora Cosmica architecture diagram. Three tiers: your browser holds all user data and the encrypted BYOK key. Cloudflare Workers act as thin proxies with no user data and no per-request logs. Backends include Nebius in Finland for the free tier, OpenRouter for BYOK inference with ZDR providers available, Hetzner GPUs in Germany for self-hosted live audio, and Cloudflare R2 in EU storage for pre-recorded media.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 628" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Agora Cosmica architecture diagram. Three tiers: your browser holds all user data and the encrypted BYOK key. Cloudflare Workers act as thin proxies with no user data and no per-request logs. Backends include Nebius in Finland for the free tier, OpenRouter for BYOK inference with ZDR providers available, Hetzner GPUs in Germany for self-hosted live audio, and Cloudflare R2 in EU storage for pre-recorded media. A fourth self-host row shows the same app running from docker compose with a local LLM via Ollama, vLLM, or LM Studio, so conversations stay on your machine.">
   <defs>
     <radialGradient id="bg" cx="50%" cy="35%" r="80%">
       <stop offset="0%" stop-color="#1c2452"/>
       <stop offset="100%" stop-color="#151c48"/>
     </radialGradient>
+    <linearGradient id="panel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1f2857"/>
+      <stop offset="100%" stop-color="#131a44"/>
+    </linearGradient>
+    <filter id="lift" x="-15%" y="-25%" width="130%" height="160%">
+      <feDropShadow dx="0" dy="5" stdDeviation="9" flood-color="#080d2c" flood-opacity="0.55"/>
+    </filter>
     <style>
       .label { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; fill: #e6bc5c; }
+      .mono { font-family: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace; }
       .tier-label { font-size: 15px; letter-spacing: 3.5px; fill: #e6bc5c; opacity: 0.6; font-weight: 600; }
       .box-title { font-size: 23px; font-weight: 600; fill: #f8e696; }
       .box-sub { font-size: 17px; fill: #e6bc5c; opacity: 0.88; }
       .note { font-size: 15px; fill: #e6bc5c; opacity: 0.6; letter-spacing: 0.5px; font-style: italic; }
-      .footer { font-size: 14px; fill: #e6bc5c; opacity: 0.55; letter-spacing: 1.5px; font-weight: 500; }
       .badge-text { font-size: 12px; fill: #e6bc5c; opacity: 0.95; letter-spacing: 1px; font-weight: 600; }
+      .panel-box { fill: url(#panel); stroke: #e6bc5c; stroke-width: 1.3; stroke-opacity: 0.8; }
+      .flow { stroke: #e6bc5c; stroke-width: 1; opacity: 0.55; stroke-dasharray: 4 5; }
+      .flow-dot { fill: #e6bc5c; opacity: 0.7; }
+      .star { fill: #e6bc5c; }
+      .rule { stroke: #e6bc5c; stroke-width: 1; opacity: 0.3; }
     </style>
   </defs>
 
   <!-- Background -->
-  <rect width="1200" height="590" fill="url(#bg)" rx="14"/>
+  <rect width="1200" height="628" fill="url(#bg)" rx="14"/>
+
+  <!-- Starfield -->
+  <g>
+    <circle class="star" cx="92" cy="26" r="0.9" opacity="0.20"/>
+    <circle class="star" cx="233" cy="34" r="0.7" opacity="0.16"/>
+    <circle class="star" cx="391" cy="22" r="1.1" opacity="0.22"/>
+    <circle class="star" cx="517" cy="36" r="0.8" opacity="0.15"/>
+    <circle class="star" cx="668" cy="24" r="0.9" opacity="0.20"/>
+    <circle class="star" cx="779" cy="34" r="0.7" opacity="0.14"/>
+    <circle class="star" cx="1013" cy="22" r="1.0" opacity="0.20"/>
+    <circle class="star" cx="1113" cy="38" r="0.8" opacity="0.16"/>
+    <circle class="star" cx="154" cy="182" r="0.8" opacity="0.18"/>
+    <circle class="star" cx="420" cy="176" r="0.9" opacity="0.16"/>
+    <circle class="star" cx="568" cy="188" r="0.7" opacity="0.14"/>
+    <circle class="star" cx="836" cy="178" r="0.9" opacity="0.18"/>
+    <circle class="star" cx="1102" cy="186" r="0.8" opacity="0.15"/>
+    <circle class="star" cx="70" cy="322" r="0.9" opacity="0.18"/>
+    <circle class="star" cx="256" cy="318" r="0.8" opacity="0.15"/>
+    <circle class="star" cx="886" cy="320" r="0.8" opacity="0.16"/>
+    <circle class="star" cx="1128" cy="324" r="0.9" opacity="0.18"/>
+    <circle class="star" cx="100" cy="382" r="0.7" opacity="0.14"/>
+    <circle class="star" cx="920" cy="386" r="0.8" opacity="0.15"/>
+    <circle class="star" cx="28" cy="240" r="0.8" opacity="0.14"/>
+    <circle class="star" cx="24" cy="470" r="0.7" opacity="0.13"/>
+    <circle class="star" cx="1174" cy="300" r="0.8" opacity="0.15"/>
+    <circle class="star" cx="1176" cy="480" r="0.8" opacity="0.15"/>
+    <circle class="star" cx="300" cy="616" r="0.9" opacity="0.16"/>
+    <circle class="star" cx="760" cy="614" r="0.8" opacity="0.14"/>
+    <circle class="star" cx="60" cy="612" r="0.7" opacity="0.13"/>
+    <path class="star" opacity="0.22" d="M 935 24 L 936 27 L 939 28 L 936 29 L 935 32 L 934 29 L 931 28 L 934 27 Z"/>
+    <path class="star" opacity="0.20" d="M 208 178 L 209 181 L 212 182 L 209 183 L 208 186 L 207 183 L 204 182 L 207 181 Z"/>
+    <path class="star" opacity="0.18" d="M 1090 610 L 1091 613 L 1094 614 L 1091 615 L 1090 618 L 1089 615 L 1086 614 L 1089 613 Z"/>
+  </g>
+
+  <!-- Brand mark -->
+  <g>
+    <circle cx="836" cy="41" r="6.5" fill="none" stroke="#e6bc5c" stroke-width="1.2" opacity="0.55"/>
+    <circle cx="836" cy="41" r="2.6" fill="#e6bc5c" opacity="0.6"/>
+    <text x="1152" y="46" class="label tier-label" text-anchor="end">AGORA COSMICA · AGPL-3.0</text>
+  </g>
 
   <!-- ===== TIER 1: YOUR DEVICE ===== -->
-  <text x="48" y="50" class="tier-label">YOUR DEVICE</text>
+  <text x="48" y="46" class="tier-label">YOUR DEVICE</text>
 
   <g>
-    <rect x="48" y="64" width="1104" height="96" rx="12" fill="#151c48" stroke="#e6bc5c" stroke-width="1.5" opacity="0.95"/>
-    <text x="76" y="100" class="label box-title">Browser</text>
-    <text x="76" y="132" class="label box-sub">React 18 · TypeScript · Vite · Zustand · IndexedDB encrypted with AES-256-GCM</text>
+    <rect x="48" y="58" width="1104" height="86" rx="12" class="panel-box" stroke-width="1.5" stroke-opacity="0.9" filter="url(#lift)"/>
+    <text x="76" y="92" class="label box-title">Browser</text>
+    <text x="76" y="124" class="label box-sub">React 18 · TypeScript · Vite · Zustand · IndexedDB encrypted with AES-256-GCM</text>
 
     <!-- Lock badge right side -->
-    <g transform="translate(1024, 86)">
-      <rect x="0" y="0" width="100" height="52" rx="8" fill="#1c2452" stroke="#e6bc5c" stroke-width="0.9" opacity="0.9"/>
-      <path d="M 44 16 a 6 6 0 0 1 12 0 v 6" stroke="#e6bc5c" stroke-width="1.7" fill="none" stroke-linecap="round"/>
+    <g transform="translate(1024, 75)">
+      <rect x="0" y="0" width="100" height="52" rx="8" fill="#252e60" stroke="#e6bc5c" stroke-width="0.9" opacity="0.9"/>
+      <path d="M 44 22 v -6 a 6 6 0 0 1 12 0 v 6" stroke="#e6bc5c" stroke-width="1.7" fill="none" stroke-linecap="round"/>
       <rect x="40" y="22" width="20" height="14" rx="2" fill="none" stroke="#e6bc5c" stroke-width="1.7"/>
       <circle cx="50" cy="29" r="1.6" fill="#e6bc5c"/>
       <text x="50" y="48" class="label badge-text" text-anchor="middle">YOUR DATA</text>
     </g>
   </g>
 
-  <!-- Connector tier 1 → tier 2 -->
-  <line x1="600" y1="160" x2="600" y2="195" stroke="#e6bc5c" stroke-width="1" opacity="0.5" stroke-dasharray="4 5"/>
-  <circle cx="600" cy="195" r="3" fill="#e6bc5c" opacity="0.7"/>
+  <!-- Browser → each edge proxy -->
+  <line x1="302.5" y1="144" x2="302.5" y2="170" class="flow"/>
+  <circle cx="302.5" cy="174" r="3" class="flow-dot"/>
+  <line x1="709" y1="144" x2="709" y2="170" class="flow"/>
+  <circle cx="709" cy="174" r="3" class="flow-dot"/>
+  <line x1="1006.5" y1="144" x2="1006.5" y2="170" class="flow"/>
+  <circle cx="1006.5" cy="174" r="3" class="flow-dot"/>
 
   <!-- ===== TIER 2: EDGE ===== -->
-  <text x="48" y="222" class="tier-label">EDGE · CLOUDFLARE WORKERS</text>
+  <!-- Each proxy spans exactly the backends it talks to -->
+  <text x="48" y="200" class="tier-label">EDGE · CLOUDFLARE WORKERS</text>
 
   <g>
-    <!-- LLM Proxy -->
-    <rect x="48" y="236" width="350" height="106" rx="12" fill="#151c48" stroke="#e6bc5c" stroke-width="1.3" opacity="0.95"/>
-    <text x="76" y="273" class="label box-title">LLM Proxy</text>
-    <text x="76" y="304" class="label box-sub">Rate limit · safety screening</text>
-    <text x="76" y="328" class="label box-sub">Per-identity quotas</text>
+    <!-- LLM Proxy → OpenRouter + Nebius -->
+    <rect x="48" y="212" width="509" height="96" rx="12" class="panel-box" filter="url(#lift)"/>
+    <text x="76" y="246" class="label box-title">LLM Proxy</text>
+    <text x="76" y="275" class="label box-sub">Rate limit · safety screening</text>
+    <text x="76" y="299" class="label box-sub">Per-identity quotas</text>
 
-    <!-- Audio Proxy -->
-    <rect x="425" y="236" width="350" height="106" rx="12" fill="#151c48" stroke="#e6bc5c" stroke-width="1.3" opacity="0.95"/>
-    <text x="453" y="273" class="label box-title">Audio Proxy</text>
-    <text x="453" y="304" class="label box-sub">Authenticated at the edge</text>
-    <text x="453" y="328" class="label box-sub">Server failover</text>
+    <!-- Audio Proxy → Hetzner GPUs -->
+    <rect x="576" y="212" width="266" height="96" rx="12" class="panel-box" filter="url(#lift)"/>
+    <text x="604" y="246" class="label box-title">Audio Proxy</text>
+    <text x="604" y="275" class="label box-sub">GPU-aware rate limits</text>
+    <text x="604" y="299" class="label box-sub">Server failover</text>
 
-    <!-- Media Gateway -->
-    <rect x="802" y="236" width="350" height="106" rx="12" fill="#151c48" stroke="#e6bc5c" stroke-width="1.3" opacity="0.95"/>
-    <text x="830" y="273" class="label box-title">Media Gateway</text>
-    <text x="830" y="304" class="label box-sub">Streams pre-recorded audio</text>
-    <text x="830" y="328" class="label box-sub">From EU storage</text>
+    <!-- Media Gateway → Cloudflare R2 -->
+    <rect x="861" y="212" width="291" height="96" rx="12" class="panel-box" filter="url(#lift)"/>
+    <text x="889" y="246" class="label box-title">Media Gateway</text>
+    <text x="889" y="275" class="label box-sub">Streams pre-recorded audio</text>
+    <text x="889" y="299" class="label box-sub">From EU storage</text>
   </g>
 
   <!-- Note under workers tier -->
-  <text x="600" y="370" class="label note" text-anchor="middle">Thin proxies. No per-request logs. No user data at rest.</text>
+  <line x1="300" y1="330" x2="374" y2="330" class="rule"/>
+  <text x="600" y="334" class="label note" text-anchor="middle">Thin proxies. No per-request logs. No user data at rest.</text>
+  <line x1="826" y1="330" x2="900" y2="330" class="rule"/>
 
-  <!-- Connector tier 2 → tier 3 -->
-  <line x1="223" y1="382" x2="223" y2="418" stroke="#e6bc5c" stroke-width="0.8" opacity="0.4" stroke-dasharray="4 5"/>
-  <line x1="600" y1="382" x2="600" y2="418" stroke="#e6bc5c" stroke-width="0.8" opacity="0.4" stroke-dasharray="4 5"/>
-  <line x1="977" y1="382" x2="977" y2="418" stroke="#e6bc5c" stroke-width="0.8" opacity="0.4" stroke-dasharray="4 5"/>
+  <!-- Edge → backends, one line per backend column -->
+  <line x1="170.5" y1="348" x2="170.5" y2="390" class="flow"/>
+  <circle cx="170.5" cy="394" r="3" class="flow-dot"/>
+  <line x1="434.5" y1="348" x2="434.5" y2="390" class="flow"/>
+  <circle cx="434.5" cy="394" r="3" class="flow-dot"/>
+  <line x1="709" y1="348" x2="709" y2="390" class="flow"/>
+  <circle cx="709" cy="394" r="3" class="flow-dot"/>
+  <line x1="1006.5" y1="348" x2="1006.5" y2="390" class="flow"/>
+  <circle cx="1006.5" cy="394" r="3" class="flow-dot"/>
 
   <!-- ===== TIER 3: BACKENDS ===== -->
-  <text x="48" y="446" class="tier-label">BACKENDS</text>
+  <text x="48" y="420" class="tier-label">BACKENDS</text>
 
   <g>
     <!-- OpenRouter (BYOK) -->
-    <rect x="48" y="460" width="262" height="100" rx="12" fill="#151c48" stroke="#e6bc5c" stroke-width="1.3" opacity="0.95"/>
-    <text x="76" y="498" class="label box-title">OpenRouter</text>
-    <text x="76" y="529" class="label box-sub">BYOK · your provider</text>
-    <text x="76" y="553" class="label box-sub">ZDR available</text>
+    <rect x="48" y="432" width="245" height="96" rx="12" class="panel-box" filter="url(#lift)"/>
+    <text x="76" y="466" class="label box-title">OpenRouter</text>
+    <text x="76" y="495" class="label box-sub">BYOK · your provider</text>
+    <text x="76" y="519" class="label box-sub">ZDR available</text>
 
     <!-- Nebius (free tier) -->
-    <rect x="329" y="460" width="262" height="100" rx="12" fill="#151c48" stroke="#e6bc5c" stroke-width="1.3" opacity="0.95"/>
-    <text x="357" y="498" class="label box-title">Nebius</text>
-    <text x="357" y="529" class="label box-sub">Free tier · 30 msg/day</text>
-    <text x="357" y="553" class="label box-sub">EU (Finland)</text>
+    <rect x="312" y="432" width="245" height="96" rx="12" class="panel-box" filter="url(#lift)"/>
+    <text x="340" y="466" class="label box-title">Nebius</text>
+    <text x="340" y="495" class="label box-sub">Free tier · 30 msg/day</text>
+    <text x="340" y="519" class="label box-sub">EU (Finland)</text>
 
     <!-- Hetzner GEX130 GPUs -->
-    <rect x="610" y="460" width="262" height="100" rx="12" fill="#151c48" stroke="#e6bc5c" stroke-width="1.3" opacity="0.95"/>
-    <text x="638" y="498" class="label box-title">Hetzner GPUs</text>
-    <text x="638" y="529" class="label box-sub">Self-hosted live audio</text>
-    <text x="638" y="553" class="label box-sub">EU (Germany)</text>
+    <rect x="576" y="432" width="266" height="96" rx="12" class="panel-box" filter="url(#lift)"/>
+    <text x="604" y="466" class="label box-title">Hetzner GPUs</text>
+    <text x="604" y="495" class="label box-sub">Self-hosted live audio</text>
+    <text x="604" y="519" class="label box-sub">EU (Germany)</text>
 
     <!-- Cloudflare R2 -->
-    <rect x="891" y="460" width="261" height="100" rx="12" fill="#151c48" stroke="#e6bc5c" stroke-width="1.3" opacity="0.95"/>
-    <text x="919" y="498" class="label box-title">Cloudflare R2</text>
-    <text x="919" y="529" class="label box-sub">Pre-recorded audio</text>
-    <text x="919" y="553" class="label box-sub">EU storage</text>
+    <rect x="861" y="432" width="291" height="96" rx="12" class="panel-box" filter="url(#lift)"/>
+    <text x="889" y="466" class="label box-title">Cloudflare R2</text>
+    <text x="889" y="495" class="label box-sub">Pre-recorded audio</text>
+    <text x="889" y="519" class="label box-sub">EU storage</text>
+  </g>
+
+  <!-- ===== ALT PATH: SELF-HOST ===== -->
+  <g>
+    <rect x="48" y="552" width="1104" height="52" rx="12" fill="#151c48" fill-opacity="0.35" stroke="#e6bc5c" stroke-width="1.2" stroke-opacity="0.75" stroke-dasharray="7 7"/>
+    <text x="76" y="584" class="label tier-label" opacity="0.85">OR SELF-HOST</text>
+    <text x="262" y="584" class="label mono" font-size="16" fill="#f8e696" opacity="0.95">docker compose up -d</text>
+    <text x="478" y="584" class="label box-sub">· your LLM via Ollama, vLLM, or LM Studio · conversations stay on your machine</text>
   </g>
 
 </svg>
