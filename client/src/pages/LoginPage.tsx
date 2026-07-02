@@ -23,8 +23,10 @@ import { useTranslation } from '../hooks/useTranslation';
 import { mediaBaseUrl as MEDIA_BASE } from '../config/runtime';
 import { sendFunnelBeaconOnce, cinematicDwellBucket, CinematicOutcome } from '../utils/funnelBeacon';
 
-// Music served from R2 (same track as the podcast + landing clips)
+// Music served from R2 (same track as the podcast + landing clips). The mp3
+// exists because Safari and iOS cannot decode Opus-in-WebM in an audio element.
 const backgroundMusic = `${MEDIA_BASE}/images/music/music.webm`;
+const backgroundMusicMp3 = `${MEDIA_BASE}/images/music/music.mp3`;
 // The hooded "Seeker" — the frameless protagonist at the ring's core
 const userThumbnail = `${MEDIA_BASE}/images/figures/user/thumbnail/320.webp`;
 
@@ -66,7 +68,7 @@ const LoginPage: FC<LoginPageProps> = ({ onComplete }) => {
   const [figureIndices, setFigureIndices] = useState<number[]>([]);
   const [portalAnimActive, setPortalAnimActive] = useState(false);
 
-  const { tNode } = useTranslation();
+  const { tNode, tString } = useTranslation();
 
   const audioRef = useRef<HTMLAudioElement>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -92,6 +94,28 @@ const LoginPage: FC<LoginPageProps> = ({ onComplete }) => {
       outcome,
       bucket: cinematicDwellBucket(performance.now() - cinematicStartRef.current),
     });
+    // Fade the music out over the handoff so it is silent by the time the
+    // welcome disclosure takes over (unmount alone would cut it mid-note).
+    // Step-counted because iOS ignores volume writes: the pause on the last
+    // step is the guaranteed stop everywhere.
+    const audio = audioRef.current;
+    if (audio && !audio.paused) {
+      const startVolume = audio.volume;
+      let step = 0;
+      const fade = setInterval(() => {
+        const a = audioRef.current;
+        step += 1;
+        if (!a || step >= 10) {
+          if (a) {
+            a.pause();
+            a.volume = startVolume;
+          }
+          clearInterval(fade);
+          return;
+        }
+        a.volume = Math.max(0, startVolume * (1 - step / 10));
+      }, 50);
+    }
     window.loginFlashInProgress = true;
     setShowSkipOverlay(false);
     setTimeout(() => onComplete(), 100);
@@ -293,6 +317,12 @@ const LoginPage: FC<LoginPageProps> = ({ onComplete }) => {
         />
       )}
 
+      {/* Static AI disclosure, always visible while the cinematic shows the
+          figure portraits (before the welcome gate notice appears) */}
+      <p className="login-ai-note">
+        {tString('aiDisclosure.figuresShown', 'The figures shown are AI interpretations.')}
+      </p>
+
       {/* Quiet skip hint, visual only (the SR live region below says the same) */}
       <div
         aria-hidden="true"
@@ -315,6 +345,7 @@ const LoginPage: FC<LoginPageProps> = ({ onComplete }) => {
 
       <audio ref={audioRef} loop preload="none">
         <source src={backgroundMusic} type="audio/webm" />
+        <source src={backgroundMusicMp3} type="audio/mpeg" />
         {tNode('audio.browserNotSupported')}
       </audio>
 
