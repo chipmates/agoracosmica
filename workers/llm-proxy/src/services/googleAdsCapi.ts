@@ -291,7 +291,7 @@ async function uploadToAccount(
   // partial_failure_error populated — those are the EXPECTED silent
   // failures for the dual-upload approach.
   if (!res.ok) {
-    const text = await res.text().catch(() => '');
+    const text = redactGclid(await res.text().catch(() => ''), input.gclid);
     console.error(
       `[capi] ${accountKey} upload http ${res.status}:`,
       text.slice(0, 400),
@@ -313,19 +313,35 @@ async function uploadToAccount(
   if (json?.partial_failure_error?.message) {
     // Don't elevate to error — the gclid-not-in-account row is the normal
     // case for one of the two dual-uploads on every conversion.
+    const pfMessage = redactGclid(json.partial_failure_error.message, input.gclid);
     console.log(
       `[capi] ${accountKey} partial-failure (expected for non-matching account):`,
-      json.partial_failure_error.message.slice(0, 200),
+      pfMessage.slice(0, 200),
     );
     return {
       status: 'partial_failure',
-      pfMessage: json.partial_failure_error.message,
+      pfMessage,
       actionId,
     };
   }
 
   console.log(`[capi] ${accountKey} upload ok (http ${res.status})`);
   return { status: 'ok_200', pfMessage: null, actionId };
+}
+
+/**
+ * Google error messages can echo the uploaded row back, including the
+ * order_id ('{gclid}:{event}') and the raw gclid. Strip both before any
+ * text from Google is logged, so click IDs never land in worker logs.
+ */
+function redactGclid(text: string, gclid: string): string {
+  if (!text) return text;
+  let out = gclid ? text.split(gclid).join('[gclid]') : text;
+  // Defensive: also catch gclid-shaped tokens echoed from other rows.
+  // Real gclids are long base64url-ish blobs; nothing else in these
+  // messages matches this shape.
+  out = out.replace(/\b[A-Za-z0-9_-]{40,}\b/g, '[gclid]');
+  return out;
 }
 
 /**
