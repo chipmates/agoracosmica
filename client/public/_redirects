@@ -32,8 +32,7 @@
 
 # Guessable legal URLs that people (and crawlers) try but that live elsewhere.
 # Without these they fell through to the SPA shell as soft-404s.
-/terms                   /nutzungsbedingungen/ 301
-/terms/                  /nutzungsbedingungen/ 301
+# (/terms is a real English page since 2026-07, so it no longer redirects.)
 /de/impressum            /impressum/           301
 /de/impressum/           /impressum/           301
 /de/datenschutz          /datenschutz/         301
