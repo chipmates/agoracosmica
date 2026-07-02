@@ -54,9 +54,10 @@
 
 .live-council-player__bottom-chip {
   position: absolute;
+  top: -0.95em;
   right: 0.85rem;
-  bottom: calc(env(safe-area-inset-bottom, 0px) + 0.55rem);
   pointer-events: none;
+  background: color-mix(in srgb, var(--bg-cosmic-void) 88%, transparent);
 }
 
 @keyframes live-council-speaker-fade {

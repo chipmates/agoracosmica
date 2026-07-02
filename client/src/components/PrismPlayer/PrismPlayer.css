@@ -234,8 +234,9 @@
   right: 0;
   z-index: 15;
   border-radius: 16px 16px 0 0;
-  padding: 0.5rem 1rem;
-  padding-bottom: calc(0.5rem + env(safe-area-inset-bottom, 0px));
+  /* Kept slim so the caption block above never hides behind the glass. */
+  padding: 0.35rem 1rem;
+  padding-bottom: calc(0.35rem + env(safe-area-inset-bottom, 0px));
   opacity: 0;
   transition: opacity 0.3s ease;
   pointer-events: none;
@@ -475,21 +476,21 @@
   white-space: nowrap;
 }
 
-/* Council variant: rides the bottom bar's top edge, centered */
+/* Council variant: rides the bottom bar's top edge, left-aligned like the
+   prism caption so both players read identically. */
 .prism-player__speaker-tag--bar {
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0.9rem;
 }
 
-.prism-player__controls-chip {
-  display: block;
-  width: fit-content;
-  margin: 0.3rem auto 0;
+/* AI disclosure on the caption line: same height as the speaker tag, pinned
+   to the subtitle box's right edge. Scrimmed like the tag so it holds over
+   any portrait pixel. */
+.prism-player__caption-chip {
+  position: absolute;
+  top: -0.95em;
+  right: 0.9rem;
   pointer-events: none;
-  /* One step brighter than the base chip: it sits on the glass card and
-     must never read as a faint label. */
-  color: var(--text-secondary);
-  border-color: color-mix(in srgb, var(--text-secondary) 35%, transparent);
+  background: color-mix(in srgb, var(--bg-cosmic-void) 88%, transparent);
 }
 
 .prism-player__close {
@@ -632,6 +633,24 @@
 @media (max-width: 767px) {
   .prism-player .prism-player__sentence {
     bottom: 15%;
+    /* Wide enough that the speaker tag and the AI chip share the top edge
+       without touching. */
+    max-width: 94%;
+    min-width: min(94vw, 340px);
+  }
+
+  .prism-player__caption-chip {
+    /* Reserve the tag's corner; the chip ellipsizes instead of colliding. */
+    max-width: calc(100% - 9.5rem);
+  }
+
+  /* Pills sit flush on the box's top edge, attached like folder tabs:
+     anchoring by bottom makes the contact exact regardless of the pill's
+     computed height, with 1px of overlap so no hairline gap can show. */
+  .prism-player__speaker-tag,
+  .prism-player__caption-chip {
+    top: auto;
+    bottom: calc(100% - 1px);
   }
 }
 

@@ -644,6 +644,10 @@ export function PrismPlayer({ figure, seed, councilId, councilLevel = 1, languag
                 {getEchoShortName(subtitleState.figureId, tString)}
               </span>
             )}
+            {/* AI disclosure on the same caption line, right side */}
+            <span className="ai-voice-chip ai-voice-chip--inline prism-player__caption-chip">
+              {tString('aiDisclosure.voiceChip', 'AI voice, not a recording')}
+            </span>
             {subtitleState.currentChunk}
           </p>
         )}
@@ -766,11 +770,6 @@ export function PrismPlayer({ figure, seed, councilId, councilLevel = 1, languag
             </button>
 
           </div>
-
-          {/* Persistent audio disclosure, docked in the player chrome */}
-          <span className="ai-voice-chip ai-voice-chip--inline prism-player__controls-chip">
-            {tString('aiDisclosure.voiceChip', 'AI voice, not a recording')}
-          </span>
         </div>
 
         {onClose && (
