@@ -154,6 +154,12 @@ const StoryAudioPlayer: FC<StoryAudioPlayerProps> = ({
         />
         <div className="player-time">
           <span className="player-time__current">{currentTime}</span>
+          {/* AI disclosure chip, in the player chrome without its own row.
+              Sits between the timestamps, so it stays co-visible with the
+              controls at the point of listening (Art 50 label placement). */}
+          <span className="ai-voice-chip ai-voice-chip--inline">
+            {tString('aiDisclosure.voiceChip', 'AI voice, not a recording')}
+          </span>
           <span className="player-time__total">{duration}</span>
         </div>
       </div>
@@ -220,12 +226,6 @@ const StoryAudioPlayer: FC<StoryAudioPlayerProps> = ({
         </div>
       </div>
 
-      {/* AI disclosure chip, always visible in the player chrome */}
-      <div className="player-ai-disclosure">
-        <span className="ai-voice-chip">
-          {tString('aiDisclosure.voiceChip', 'AI voice, not a recording')}
-        </span>
-      </div>
     </div>
   );
 };

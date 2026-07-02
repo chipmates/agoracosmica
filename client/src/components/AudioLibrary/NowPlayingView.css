@@ -920,7 +920,18 @@
   }
 }
 /* AI voice chip under the figure name */
+.now-playing-view__name-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.now-playing-view__name-row .now-playing-view__figure-name {
+  margin: 0;
+}
+
 .now-playing-view__ai-chip {
-  align-self: center;
-  margin: 2px 0 4px;
+  margin: 0;
 }

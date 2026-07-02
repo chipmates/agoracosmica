@@ -121,6 +121,8 @@
 .player-time {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
   font-family: 'Space Grotesk', sans-serif;
   font-size: 0.75rem;
   color: var(--player-accent);
@@ -417,7 +419,4 @@
 }
 
 /* AI disclosure chip row under the playback controls (always visible) */
-.player-ai-disclosure {
-  margin-top: 4px;
-  text-align: center;
-}
+

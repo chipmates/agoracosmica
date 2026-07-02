@@ -643,10 +643,13 @@ const NowPlayingView: FC<NowPlayingViewProps> = ({ story, figure, audioService, 
         <div className={`now-playing-view__controls-overlay ${glassClasses} ${showControls ? 'now-playing-view__controls-overlay--visible' : ''}`}>
           {/* Title information moved to top of controls */}
           <div className="now-playing-view__title-container">
-            <p className="now-playing-view__figure-name">{currentFigure && currentFigure.name ? getFigureDisplayName(currentFigure.name) : ''}</p>
-            <span className="ai-voice-chip now-playing-view__ai-chip">
-              {tString('aiDisclosure.voiceChip', 'AI voice, not a recording')}
-            </span>
+            {/* Name and AI chip share one line, the chip owns no row of its own */}
+            <div className="now-playing-view__name-row">
+              <p className="now-playing-view__figure-name">{currentFigure && currentFigure.name ? getFigureDisplayName(currentFigure.name) : ''}</p>
+              <span className="ai-voice-chip ai-voice-chip--inline now-playing-view__ai-chip">
+                {tString('aiDisclosure.voiceChip', 'AI voice, not a recording')}
+              </span>
+            </div>
             <h3 className="now-playing-view__title">
               <span className="now-playing-view__seed-number">{currentStory?.seedId}.</span>
               <span className="now-playing-view__seed-title">{currentStory?.title || tNode('audioLibrary.nowPlaying.defaultTitle')}</span>
