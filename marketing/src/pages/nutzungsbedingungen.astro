@@ -3,7 +3,9 @@ import Public from '../layouts/Public.astro';
 import LegalDoc from '../components/legal/LegalDoc.astro';
 
 const title = 'Nutzungsbedingungen';
-const lastUpdated = 'Stand: 27. April 2026';
+// Version maps the stored consent record (WelcomeDisclosureModal
+// CURRENT_AGB_VERSION) to this published text.
+const lastUpdated = 'Version 1.0.0 · Stand: 27. April 2026';
 const description = 'Nutzungsbedingungen der Plattform Agora Cosmica der ChipMates gemeinnützige GmbH. Geltungsbereich, KI-Hinweise, Altersanforderung, Nutzungsregeln, Haftung und Streitbeilegung.';
 ---
 <Public
@@ -12,9 +14,14 @@ const description = 'Nutzungsbedingungen der Plattform Agora Cosmica der ChipMat
   fullTitle="Nutzungsbedingungen | Agora Cosmica"
   description={description}
   canonicalPath="/nutzungsbedingungen"
-  noHreflang
+  altEn="/terms"
+  altDe="/nutzungsbedingungen"
 >
   <LegalDoc title={title} lastUpdated={lastUpdated}>
+    <section>
+      <p><a href="/terms/">Zur englischen Übersetzung</a></p>
+    </section>
+
     <section>
       <h2>§ 1 Geltungsbereich und Vertragsgegenstand</h2>
       <p>(1) Diese Nutzungsbedingungen gelten für die Nutzung der Plattform Agora Cosmica (nachfolgend "Plattform"), betrieben von ChipMates gemeinnützige GmbH, Schusterstr. 50, 79098 Freiburg im Breisgau (nachfolgend "Anbieter").</p>

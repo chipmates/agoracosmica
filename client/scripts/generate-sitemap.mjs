@@ -70,10 +70,11 @@ function gitLastModified(...relPaths) {
 const slash = (p) => (p === '/' ? '/' : p.endsWith('/') ? p : `${p}/`);
 
 // Single-language pages with no twin. Sitemap emits a bare URL and skips the
-// en/de/x-default hreflang block. The four legal pages are German-only; the
+// en/de/x-default hreflang block. Three legal pages are German-only; the
 // privacy policy is the lone English page (its DE counterpart is /datenschutz,
-// reached via a 301, so they share no hreflang signal by design).
-const NO_HREFLANG_PATHS = new Set(['/impressum', '/datenschutz', '/cookie-policy', '/nutzungsbedingungen', '/privacy', '/figures/emily-dickinson/poems']);
+// reached via a 301, so they share no hreflang signal by design). The terms
+// pages (/nutzungsbedingungen + /terms) are a cross-slug hreflang pair below.
+const NO_HREFLANG_PATHS = new Set(['/impressum', '/datenschutz', '/cookie-policy', '/privacy', '/figures/emily-dickinson/poems']);
 
 function url(rawPath, priority, lastmod, changefreq = 'monthly') {
   const isLegalDe = NO_HREFLANG_PATHS.has(rawPath);
@@ -167,7 +168,7 @@ const LEGAL_MOD = {
   '/impressum': gitLastModified('marketing/src/pages/impressum.astro', 'client/src/pages/ImpressumPage.tsx'),
   '/datenschutz': gitLastModified('marketing/src/pages/datenschutz.astro', 'client/src/pages/DatenschutzPage.tsx'),
   '/cookie-policy': gitLastModified('marketing/src/pages/cookie-policy.astro', 'client/src/pages/CookiePolicyPage.tsx'),
-  '/nutzungsbedingungen': gitLastModified('marketing/src/pages/nutzungsbedingungen.astro', 'client/src/pages/NutzungsbedingungenPage.tsx'),
+  '/nutzungsbedingungen': gitLastModified('marketing/src/pages/nutzungsbedingungen.astro', 'marketing/src/pages/terms.astro', 'client/src/pages/NutzungsbedingungenPage.tsx'),
   '/privacy': gitLastModified('marketing/src/pages/privacy.astro'),
 };
 
@@ -260,7 +261,9 @@ for (const theme of THEME_IDS) {
 urls.push(url('/impressum', '0.3', LEGAL_MOD['/impressum']));
 urls.push(url('/datenschutz', '0.3', LEGAL_MOD['/datenschutz']));
 urls.push(url('/cookie-policy', '0.3', LEGAL_MOD['/cookie-policy']));
-urls.push(url('/nutzungsbedingungen', '0.3', LEGAL_MOD['/nutzungsbedingungen']));
+// Terms of Service: the German original and its English convenience
+// translation form a cross-slug hreflang pair (no /de/ prefix on the DE slug).
+urls.push(...crossPair('/terms', '/nutzungsbedingungen', '0.3', LEGAL_MOD['/nutzungsbedingungen']));
 // English privacy policy: a substantive indexable page with no German twin.
 // Emitted bare (no hreflang block) like the German legal pages.
 urls.push(url('/privacy', '0.3', LEGAL_MOD['/privacy']));

@@ -26,7 +26,7 @@ const isEn = lang === 'en';
       <span class="legal-doc__footer-sep">•</span>
       <a href="/cookie-policy/">{isEn ? 'Cookie Policy' : 'Cookie-Richtlinie'}</a>
       <span class="legal-doc__footer-sep">•</span>
-      <a href="/nutzungsbedingungen/">{isEn ? 'Terms' : 'Nutzungsbedingungen'}</a>
+      <a href={isEn ? '/terms/' : '/nutzungsbedingungen/'}>{isEn ? 'Terms' : 'Nutzungsbedingungen'}</a>
     </nav>
   </div>
 </article>
