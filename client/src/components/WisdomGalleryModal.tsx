@@ -23,14 +23,19 @@ import { useFigureTrailer, type FigureTrailerControls } from '../hooks/useFigure
 import styles from './WisdomGalleryModal.module.css';
 
 /**
- * Gallery figure data - Aurelius, Tubman, Da Vinci
+ * Gallery figure data - Aurelius, Kahlo, Nietzsche
+ *
+ * Trio picked from live demand (7d figure_selected: nietzsche 14, aurelius 11,
+ * kahlo 4 + 13 content first-plays; tubman 0, vinci 2) plus continuity: the
+ * homepage hero features Marcus and the ad copy names Marcus and Frida, so the
+ * first three faces honor what the visitor was promised.
  */
-const GALLERY_FIGURES = ['aurelius', 'tubman', 'vinci'];
+const GALLERY_FIGURES = ['aurelius', 'kahlo', 'nietzsche'];
 
 const FIGURE_ESSENCES: Record<string, string> = {
   aurelius: 'The philosopher-emperor who turned the battlefield into a meditation on virtue and impermanence.',
-  tubman: 'Every great dream begins with a dreamer. You have the strength to reach for the stars.',
-  vinci: 'The universal mind who saw art in science and science in art, endlessly curious about everything.'
+  kahlo: 'The painter who turned a broken body into unflinching self-portraits, and pain into color.',
+  nietzsche: 'The philosopher with a hammer who asked what you would do if this exact life repeated forever.'
 };
 
 interface Figure {
@@ -189,7 +194,7 @@ const PortraitFrame: FC<PortraitFrameProps> = ({
             type="ui"
             purpose="main"
             priority={index < 3}
-            className={`${styles.portraitImage} ${imageLoaded ? styles.loaded : ''} ${figure.id === 'vinci' ? styles.flipped : ''}`}
+            className={`${styles.portraitImage} ${imageLoaded ? styles.loaded : ''}`}
             alt={figure.name}
             onLoad={() => setImageLoaded(true)}
           />
