@@ -20,6 +20,11 @@ const t = getT(lang);
   <p class="pub-section__text">
     {t('themes.pageDescription')}
   </p>
+  <p class="pub-section__text pub-themes-ai">
+    {lang === 'de'
+      ? 'Jede Stimme in diesen Councils ist ein KI-Echo. Deutungen, keine Aufnahmen.'
+      : 'Every voice in these councils is an AI Echo. Interpretations, not recordings.'}
+  </p>
   <p class="pub-section__text pub-catalog-lead">
     {lang === 'de'
       ? 'Öffne ein Thema und entdecke seine Frage und seine Stimmen.'
@@ -48,4 +53,10 @@ const t = getT(lang);
 
 <style>
   .pub-catalog-lead { margin-bottom: 2rem; }
+
+  /* AI disclosure line near the lede: muted, static, always visible */
+  .pub-themes-ai {
+    font-size: var(--text-sm);
+    color: var(--text-tertiary);
+  }
 </style>

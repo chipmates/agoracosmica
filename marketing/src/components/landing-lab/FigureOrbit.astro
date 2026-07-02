@@ -15,6 +15,7 @@ import { getT } from '../../i18n';
 import type { Lang } from '../../i18n';
 import Breadcrumbs from '../Breadcrumbs.astro';
 import ContentVolume from '../ContentVolume.astro';
+import EchoNote from '../EchoNote.astro';
 import './v2-observatory.css';
 import './figure-orbit.css';
 
@@ -94,6 +95,7 @@ const lcpFigure = byId.get(ringPlan[0].ids[0]);
     <div class="v2-copy v2-copy--tail figorbit-copy">
       <p class="pub-section__text">{t('figures.pageDescription')}</p>
       <p class="pub-section__text pub-catalog-lead">{copy.lead}</p>
+      <EchoNote variant="theme" lang={lang} />
     </div>
 
     <!-- the living orbital system -->
@@ -132,7 +134,7 @@ const lcpFigure = byId.get(ringPlan[0].ids[0]);
                             src={p.src}
                             srcset={p.srcset}
                             sizes={p.sizes}
-                            alt={p.name}
+                            alt={t('aiDisclosure.imageAlt').replace('{name}', p.name)}
                             width="96"
                             height="96"
                             loading={p.eager ? 'eager' : 'lazy'}
@@ -171,6 +173,9 @@ const lcpFigure = byId.get(ringPlan[0].ids[0]);
             {copy.hearTemplate.replace('{name}', lcpFigure ? lcpFigure.name : '')}
           </span>
           <span class="pub-trailer__dur">0:50</span>
+          <span class="v2-plaque__ai" title={t('aiDisclosure.voiceChip')}>
+            {t('aiDisclosure.voiceShort')}
+          </span>
         </button>
       </div>
 

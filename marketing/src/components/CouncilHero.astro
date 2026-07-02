@@ -98,6 +98,13 @@ const cast = [council.moderator, ...council.participants];
       </a>
     </noscript>
   </div>
+
+  <!-- Same wording as the Library panels' council disclosure, kept verbatim -->
+  <p class="pub-council-hero__ai">
+    {lang === 'de'
+      ? 'Vier KI-Echos, eines davon moderiert. Deutungen, keine Aufnahmen.'
+      : 'Four AI Echoes, one of them moderating. Interpretations, not recordings.'}
+  </p>
 </section>
 
 <style is:global>
@@ -114,4 +121,13 @@ const cast = [council.moderator, ...council.participants];
   .pub-council-hero[data-theme='freedom-justice'] .pub-council-hero__question-bar { background: var(--council-freedom-justice); }
   .pub-council-hero[data-theme='faith-death-mystery'] .pub-council-hero__question-bar { background: var(--council-faith-death-mystery); }
   .pub-council-hero[data-theme='loss-grief'] .pub-council-hero__question-bar { background: var(--council-loss-grief); }
+
+  /* AI disclosure line under the preview actions: muted, static, never hidden */
+  .pub-council-hero__ai {
+    margin: var(--space-sm) 0 0;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: var(--text-xs);
+    line-height: var(--leading-normal, 1.5);
+    color: var(--text-tertiary);
+  }
 </style>

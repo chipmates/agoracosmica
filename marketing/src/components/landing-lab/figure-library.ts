@@ -51,7 +51,7 @@ type ModeCopy = {
 };
 const TX: Record<'en' | 'de', Record<string, ModeCopy>> = {
   en: {
-    story: { tab: 'Story', glyph: 'Learn by story', kicker: 'A teaching, told as a story', playLabel: 'Play Chapter 1', duration: '~13 min', scale: 'the first of twelve chapters', disclosure: 'Each chapter turns one idea into a scene you move through, read in the Echo voice. An interpretation, not a recording.', linkLabel: 'Hear the whole story' },
+    story: { tab: 'Story', glyph: 'Learn by story', kicker: 'A teaching, told as a story', playLabel: 'Play Chapter 1', duration: '~13 min', scale: 'the first of twelve chapters', disclosure: 'Each chapter turns one idea into a scene you move through, read in the AI Echo voice. An interpretation, not a recording.', linkLabel: 'Hear the whole story' },
     wisdom: { tab: 'Wisdom', glyph: 'Study an idea', kicker: 'One of twelve core teachings', scale: 'one of 360 core teachings', linkLabel: 'Study this together' },
     prism: { tab: 'Prism', glyph: 'Hear a dialogue', kicker: 'A four-voice dialogue between Echoes', duration: 'The opening exchange', playLabel: 'Play the opening', scale: 'one of 360 prism dialogues', disclosure: 'Four AI Echoes in dialogue. Interpretations, not recordings.', linkLabel: 'Hear the full dialogue' },
     quest: { tab: 'Quest', glyph: 'Test yourself', kicker: 'A short Socratic challenge', linkLabel: 'Take the quest' },
@@ -59,7 +59,7 @@ const TX: Record<'en' | 'de', Record<string, ModeCopy>> = {
     freetalk: { tab: 'Free Talk', glyph: 'Ask anything', kicker: 'Open conversation, whenever you want', scale: '30 free messages a day', linkLabel: 'Start talking' },
   },
   de: {
-    story: { tab: 'Story', glyph: 'Mit Geschichten lernen', kicker: 'Eine Lehre, als Geschichte erzählt', playLabel: 'Kapitel 1 abspielen', duration: '~13 Min.', scale: 'das erste von zwölf Kapiteln', disclosure: 'Jedes Kapitel macht aus einer Idee eine Szene, durch die du dich bewegst, gelesen in der Echo-Stimme. Eine Deutung, keine Aufnahme.', linkLabel: 'Die ganze Geschichte hören' },
+    story: { tab: 'Story', glyph: 'Mit Geschichten lernen', kicker: 'Eine Lehre, als Geschichte erzählt', playLabel: 'Kapitel 1 abspielen', duration: '~13 Min.', scale: 'das erste von zwölf Kapiteln', disclosure: 'Jedes Kapitel macht aus einer Idee eine Szene, durch die du dich bewegst, gelesen in der KI-Echo-Stimme. Eine Deutung, keine Aufnahme.', linkLabel: 'Die ganze Geschichte hören' },
     wisdom: { tab: 'Weisheit', glyph: 'Eine Idee vertiefen', kicker: 'Eine von zwölf Kernlehren', scale: 'eine von 360 Kernlehren', linkLabel: 'Das gemeinsam vertiefen' },
     prism: { tab: 'Prisma', glyph: 'Einen Dialog hören', kicker: 'Ein vierstimmiger Dialog zwischen Echos', duration: 'Der erste Wortwechsel', playLabel: 'Den Anfang abspielen', scale: 'einer von 360 Prisma-Dialogen', disclosure: 'Vier KI-Echos im Dialog. Deutungen, keine Aufnahmen.', linkLabel: 'Den ganzen Dialog hören' },
     quest: { tab: 'Quest', glyph: 'Dich selbst prüfen', kicker: 'Eine kurze sokratische Herausforderung', linkLabel: 'Die Quest starten' },

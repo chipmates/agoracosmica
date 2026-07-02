@@ -27,12 +27,19 @@ export function personSchema(figure: {
         entity.wikidata,
       ].filter(Boolean)
     : [];
+  // Keeps the entity honest: the page presents an AI Echo and an AI portrait
+  // of the real Wikidata person, and the schema says so explicitly.
+  const disambiguatingDescription =
+    figure.lang === 'de'
+      ? `Bildungsbezogenes KI-Echo der historischen Persönlichkeit ${figure.name}. Das Porträt ist ein KI-erzeugtes Bild, keine Fotografie.`
+      : `Educational AI Echo of the historical ${figure.name}. The portrait is an AI-generated image, not a photograph.`;
   return {
     '@context': 'https://schema.org',
     '@type': 'Person',
     '@id': `${url}#person`,
     name: figure.name,
     description: figure.about,
+    disambiguatingDescription,
     url,
     knowsAbout: figure.tradition,
     ...(figure.image && { image: figure.image }),
@@ -65,6 +72,10 @@ export function audioObjectSchema(figure: {
       figure.lang === 'de'
         ? `${figure.name}: Audio-Einführung`
         : `${figure.name}: audio introduction`,
+    description:
+      figure.lang === 'de'
+        ? 'Eine synthetische KI-Stimme, keine Aufnahme der echten Person.'
+        : 'A synthetic AI voice, not a recording of the real person.',
     contentUrl,
     encodingFormat: 'audio/mpeg',
     inLanguage: figure.lang,
@@ -240,7 +251,7 @@ const PODCASTS: Record<Lang, {
   en: {
     name: 'Agora Cosmica',
     description:
-      'Lives that still speak. First-person audiobooks inspired by remarkable people from history.',
+      'Lives that still speak. First-person audiobooks inspired by remarkable people from history. Narrated with synthetic AI voices.',
     feedUrl: `${MEDIA_URL}/podcasts/agora-cosmica/feed.xml`,
     coverUrl: `${MEDIA_URL}/podcasts/agora-cosmica/cover.jpg?v=7`,
     id: `${MEDIA_URL}/podcasts/agora-cosmica/#series`,
@@ -248,7 +259,7 @@ const PODCASTS: Record<Lang, {
   de: {
     name: 'Agora Cosmica Deutsch',
     description:
-      'Leben, die noch sprechen. Hörbücher in der Ich-Perspektive, inspiriert von besonderen Menschen der Geschichte.',
+      'Leben, die noch sprechen. Hörbücher in der Ich-Perspektive, inspiriert von besonderen Menschen der Geschichte. Erzählt mit synthetischen KI-Stimmen.',
     feedUrl: `${MEDIA_URL}/podcasts/agora-cosmica-de/feed.xml`,
     coverUrl: `${MEDIA_URL}/podcasts/agora-cosmica-de/cover.jpg?v=7`,
     id: `${MEDIA_URL}/podcasts/agora-cosmica-de/#series`,

@@ -261,7 +261,7 @@ function cleanDisplayText(s: string): string {
               <StaticImage
                 figureId={relId}
                 type="thumbnail"
-                alt={relFigure.name}
+                alt={t('aiDisclosure.imageAlt').replace('{name}', relFigure.name)}
                 loading="lazy"
                 width={64}
                 height={64}
