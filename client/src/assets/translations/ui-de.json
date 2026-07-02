@@ -114,7 +114,8 @@
       "card1": "Jede Frage beginnt im Dunkeln.",
       "card2": "Vor dir haben viele gefragt.",
       "card3": "Sie erheben sich, um dir zu begegnen."
-    }
+    },
+    "heroAskQuestion": "Jemand hat mich heute kritisiert. Ich werde es nicht los. Warum trifft mich das so?"
   },
   "login": {
     "title": "Willkommen zurück",

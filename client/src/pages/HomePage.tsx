@@ -51,7 +51,7 @@ import PostQuestVerdictCard from '../components/QuestVerdictCard/PostQuestVerdic
 import { getPendingQuestVerdict, clearPendingQuestVerdict } from '../utils/questVerdict';
 import { restartQuest } from '../utils/questRestart';
 import { LocalStorageAdapter } from '../storage/localAdapter';
-import { readFigureIntent, clearFigureIntent, readCouncilIntent, clearCouncilIntent } from '../utils/public/entryIntent';
+import { readFigureIntent, clearFigureIntent, readCouncilIntent, clearCouncilIntent, readAskIntent, clearAskIntent, stashAskPrefill } from '../utils/public/entryIntent';
 import { readHistoryMessages } from '../services/history/historyEncryption';
 import { registerSessionControllerHandlers } from '../controllers/sessionControllerRegistry';
 import { registerConversationControllerHandlers } from '../controllers/conversationControllerRegistry';
@@ -1361,6 +1361,26 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
     lastSeedSelectTimeRef.current = Date.now();
 
     useDomainStore.getState().markVisited();
+
+    // Homepage ask-link: the visitor already chose the talk door on the
+    // marketing page, so skip the mode choice entirely and open Free Talk.
+    // The consumed tag is staged for the composer, which prefills the
+    // promised question so the first turn is one tap away. Runs for first
+    // timers and returning visitors alike (both select paths land here).
+    const askIntent = readAskIntent();
+    if (askIntent) {
+      clearAskIntent();
+      stashAskPrefill(askIntent);
+      resetConversation();
+      handleModeSelect('free_conversation', true);
+      // handleModeSelect clears the suppression flag on entry, but Effect#14
+      // would then see a fresh figure+seed with no stored mode and open the
+      // selector over the conversation. Re-assert the flag: the mode choice
+      // IS made. The next handleModeSelect from any path clears it again,
+      // same lifecycle as the keep-until-choice selector path below.
+      figureSelectHandlingModeRef.current = true;
+      return;
+    }
 
     // Reset mode to default before showing ModeSelector
     // This prevents the previous figure's mode (e.g., prism) from leaking into the new figure's UI

@@ -132,7 +132,9 @@ const featuredHref = publicUrl(lang, `/figures/${figureIdToSlug[FEATURED_ID]}`);
 // carries the featured figure as intent (same slug-href + data-attr pair as
 // PublicCTA), so its clicker lands on Marcus after the gate, not the gallery.
 const appHref = `/app?lang=${lang}`;
-const askHref = `/app?figure=${figureIdToSlug[FEATURED_ID]}&lang=${lang}`;
+// ask=hero: the app opens Free Talk with this card's question staged in the
+// composer, so the promised exchange continues instead of restarting.
+const askHref = `/app?figure=${figureIdToSlug[FEATURED_ID]}&lang=${lang}&ask=hero`;
 ---
 <section class="hx-hero" id="hx-hero" aria-labelledby="hx-title">
   <!-- static cosmic backdrop: tiled star fields, gold dust, vignette -->

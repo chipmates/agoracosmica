@@ -12,6 +12,13 @@ import { figureSlugToId } from '../../data/public/slugMap';
 
 const SS_FIGURE_KEY = 'agc_intended_figure';
 const SS_COUNCIL_KEY = 'agc_intended_council';
+const SS_ASK_KEY = 'agc_intended_ask';
+const SS_ASK_PREFILL_KEY = 'agc_ask_prefill';
+
+// Allowlisted ask tags. A tag names a curated starter question that lives in
+// the app's translations (entry.heroAskQuestion), so no free text ever rides
+// the URL and the prefill is always language-correct at render time.
+const ASK_TAGS = new Set(['hero']);
 
 /**
  * Called from the "Start Exploring" CTA, just before navigating into the app.
@@ -98,6 +105,57 @@ export function clearCouncilIntent(): void {
 }
 
 /**
+ * Ask intent — the marketing hero's "Ask him yourself" link. The visitor
+ * already chose the talk door on the public page, so figure selection skips
+ * the mode choice and opens Free Talk with the promised question staged in
+ * the composer. Routing consumes the intent (read + clear), then stashes the
+ * tag as a prefill for the composer to pick up once Free Talk renders.
+ */
+export function readAskIntent(): string | null {
+  try {
+    return typeof sessionStorage === 'undefined'
+      ? null
+      : sessionStorage.getItem(SS_ASK_KEY);
+  } catch {
+    return null;
+  }
+}
+
+/** Clears the ask intent. Call once routing has consumed it. */
+export function clearAskIntent(): void {
+  try {
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.removeItem(SS_ASK_KEY);
+    }
+  } catch {
+    // no-op
+  }
+}
+
+/** Stash the consumed ask tag for the composer prefill. */
+export function stashAskPrefill(tag: string): void {
+  try {
+    if (typeof sessionStorage !== 'undefined' && ASK_TAGS.has(tag)) {
+      sessionStorage.setItem(SS_ASK_PREFILL_KEY, tag);
+    }
+  } catch {
+    // no-op — the visitor just types the question themselves
+  }
+}
+
+/** One-shot read of the staged prefill tag (clears on read). */
+export function consumeAskPrefill(): string | null {
+  try {
+    if (typeof sessionStorage === 'undefined') return null;
+    const tag = sessionStorage.getItem(SS_ASK_PREFILL_KEY);
+    if (tag !== null) sessionStorage.removeItem(SS_ASK_PREFILL_KEY);
+    return tag;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Robust, shareable deep-link reader. Run once at app boot (index.tsx), before
  * React renders. Reads ?figure={slug|id} / ?council={id} from the landing URL
  * and writes the same sessionStorage keys the click delegate uses, so the
@@ -119,13 +177,17 @@ export function captureEntryIntentFromUrl(): void {
     const figureParam = params.get('figure');
     const councilParam = params.get('council');
     const langParam = params.get('lang');
-    if (!figureParam && !councilParam && !langParam) return;
+    const askParam = params.get('ask');
+    if (!figureParam && !councilParam && !langParam && !askParam) return;
     if (figureParam) {
       const id = figureSlugToId[figureParam] || figureParam;
       if (id.length < 64) sessionStorage.setItem(SS_FIGURE_KEY, id);
     }
     if (councilParam && councilParam.length < 64) {
       sessionStorage.setItem(SS_COUNCIL_KEY, councilParam);
+    }
+    if (askParam && ASK_TAGS.has(askParam)) {
+      sessionStorage.setItem(SS_ASK_KEY, askParam);
     }
     if (langParam === 'en' || langParam === 'de') {
       try {
@@ -137,6 +199,7 @@ export function captureEntryIntentFromUrl(): void {
     params.delete('figure');
     params.delete('council');
     params.delete('lang');
+    params.delete('ask');
     const qs = params.toString();
     window.history.replaceState(
       {},

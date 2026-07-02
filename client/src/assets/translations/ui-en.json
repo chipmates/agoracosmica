@@ -116,7 +116,8 @@
       "card1": "Every question begins in the dark.",
       "card2": "You are not the first to ask.",
       "card3": "Those who came before rise to meet you."
-    }
+    },
+    "heroAskQuestion": "Someone criticized me today and I cannot stop replaying it. Why does it sting so much?"
   },
   "login": {
     "title": "Welcome Back",

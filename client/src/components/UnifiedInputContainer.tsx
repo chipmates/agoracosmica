@@ -7,6 +7,7 @@ import ProcessingLoader from './ProcessingLoader';
 import { ttsScheduler } from '../controllers/conversationStreamDriver';
 import { getOrRollConversationSessionId, sendSessionEndBeacon } from '../services/audio/tts/ttsSessions';
 import { preferTextInput, saveInputPreference, registerInputToggleShortcut } from '../utils/inputMethodDetection';
+import { consumeAskPrefill } from '../utils/public/entryIntent';
 import { loadServiceConfig } from '../services/audio/config/serviceConfig';
 import { useTranslation } from '../hooks/useTranslation';
 import { useAutoplayGate } from '../hooks/useAutoplayGate';
@@ -76,6 +77,22 @@ const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure,
   const pendingRequestId = useDomainStore((state) => state.conversation.pendingRequestId);
   const processingStage = useDomainStore((state) => state.conversation.processingStage);
   const setProcessingStage = useDomainStore((state) => state.setProcessingStage);
+
+  // One-shot composer prefill staged by the homepage ask-link. Once Free Talk
+  // renders, the promised question sits in the text input (text mode forced so
+  // it is visible) and the visitor just sends it. The stash clears on read.
+  const selectedModeForPrefill = useDomainStore((state) => state.mode.selected);
+  useEffect(() => {
+    if (selectedModeForPrefill !== 'free_conversation') return;
+    const tag = consumeAskPrefill();
+    if (tag !== 'hero') return;
+    const question = tString('entry.heroAskQuestion', '');
+    if (question) {
+      setMessage(question);
+      setUseTextInput(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedModeForPrefill]);
 
   // Free-tier quota state for turn counter
   const quota = useDomainStore((state) => state.quota);
