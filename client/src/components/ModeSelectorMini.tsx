@@ -325,7 +325,7 @@ const ModeSelectorMini: FC<ModeSelectorMiniProps> = ({
               </button>
             </div>
             <button className="doors-allways" onClick={() => setShowAllWays(true)}>
-              {tString('modes.doors.allWays', 'See all six ways')} →
+              {tString('modes.doors.allWays', 'See all the ways')} →
             </button>
           </div>
         ) : (
