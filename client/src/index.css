@@ -11,6 +11,7 @@
 @import './styles/dark-mode-typography.css';
 @import './styles/safari-fixes.css';
 @import './styles/viewport-browser-only.css';
+@import './styles/ai-disclosure.css';
 @import './styles/sidebar-liquid-glass-final-fix.css'; /* Must be last */
 
 /* Base Reset & Typography */

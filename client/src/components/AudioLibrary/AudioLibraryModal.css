@@ -471,3 +471,10 @@ body.audio-library-open {
     border-width: 2px;
   }
 }
+
+/* AI disclosure footer row (always visible, below the scrollable content) */
+.audio-library__ai-disclosure {
+  flex-shrink: 0;
+  text-align: center;
+  padding: 4px 1rem calc(6px + env(safe-area-inset-bottom, 0px));
+}

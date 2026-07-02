@@ -240,6 +240,11 @@ const MiniPlayer: FC<MiniPlayerProps> = ({ story, figure, onExpand, audioService
         <div className="mini-player__info">
           <div className="mini-player__figure-name">
             {typeof currentFigure?.name === 'string' ? currentFigure.name : 'Unknown Figure'}
+            {/* Visible short form only: aria-label is unreliable on generic
+                spans, and the expanded player shows the full voice chip. */}
+            <span className="ai-voice-chip ai-voice-chip--compact mini-player__ai-chip">
+              {tString('aiDisclosure.voiceShort', 'AI voice')}
+            </span>
           </div>
           <div className="mini-player__title">
             <span className="mini-player__seed-number">{currentStory.seedId}.</span>

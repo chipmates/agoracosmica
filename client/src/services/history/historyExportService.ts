@@ -2,6 +2,7 @@
 
 import { LocalStorageAdapter } from '../../storage/localAdapter';
 import { runWithWal } from '../../storage';
+import { useDomainStore } from '../../stores/domainStore';
 import {
   buildWalOperationsFromModeData,
   createClearHistoryWalOperation,
@@ -58,8 +59,21 @@ const restoreIndexedDbHistories = async (modeData?: Record<string, string | null
 // field stays in the schema (null) for v2.0 forward-compat with older backups
 // that may set it to a figure name; nothing in the import path reads it.
 export const exportHistory = async () => {
+  // The exported file travels without app context, so the payload itself
+  // carries the AI disclosure (in the current app language). Read the
+  // translated string from the store; fall back to the built-in variants.
+  const languageState = useDomainStore.getState().language;
+  const exportLanguage = languageState.current || 'en';
+  const translatedNotice = (languageState.uiTranslations as any)?.aiDisclosure?.exportNotice;
+  const exportNotice = typeof translatedNotice === 'string' && translatedNotice
+    ? translatedNotice
+    : (exportLanguage === 'de'
+      ? 'Dieser Export enthält KI-generierte Gespräche und Dialoge mit KI-Echos, keine Aussagen der echten Menschen.'
+      : 'This export contains AI-generated conversations and dialogues with AI Echoes, not statements by the real people.');
+
   const backupData = {
     version: '2.0', // New format version
+    notice: exportNotice,
     figure: null,
     exportDate: new Date().toISOString(),
     modeData: {}, // New structure for mode-based storage

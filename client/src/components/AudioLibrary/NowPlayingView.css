@@ -919,3 +919,8 @@
     margin: 0 auto;
   }
 }
+/* AI voice chip under the figure name */
+.now-playing-view__ai-chip {
+  align-self: center;
+  margin: 2px 0 4px;
+}

@@ -1,7 +1,7 @@
 {
   "name": "Agora Cosmica",
   "short_name": "Agora",
-  "description": "A Living Library You Can Talk To. Philosophical dialogue with 30 historical figures across 6 conversation modes, fully bilingual in English and German.",
+  "description": "A Living Library You Can Talk To. Philosophical dialogue with AI Echoes of 30 historical figures across 6 conversation modes, fully bilingual in English and German.",
   "start_url": "/app",
   "scope": "/app",
   "display": "standalone",

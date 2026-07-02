@@ -1,0 +1,27 @@
+/**
+ * AI Disclosure Labels
+ *
+ * Shared classes for the always-visible AI transparency labels
+ * (voice chips, standing lines). Static by design: never animated,
+ * never dismissible, never hover-only.
+ */
+
+/* Small pill placed next to player and figure labels */
+.ai-voice-chip {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  font-size: var(--text-xs);
+  line-height: 1.4;
+  font-weight: 400;
+  color: var(--text-tertiary);
+  border: 1px solid color-mix(in srgb, var(--text-tertiary) var(--a-30), transparent);
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Compact variant for tight chrome (mini player) */
+.ai-voice-chip--compact {
+  padding: 0.0625rem 0.375rem;
+}

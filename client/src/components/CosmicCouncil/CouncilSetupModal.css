@@ -2203,3 +2203,13 @@
     display: none;
   }
 }
+
+/* Static AI disclosure line under the header subtitle (always visible) */
+.council-setup-ai-note {
+  margin: 4px 0 0;
+  font-size: var(--text-xs);
+  line-height: 1.4;
+  color: var(--text-dim);
+  text-align: center;
+  user-select: none;
+}

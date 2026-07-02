@@ -42,9 +42,23 @@
     "listenFeaturedDebate": "Erkunde diese Debatte"
   },
   "echo": {
-    "figureNote": "{name} begegnet dir hier als Echo. Das ist eine KI-Stimme, geprägt von den eigenen Schriften und Gedanken dieses Menschen und in ein Gespräch gebracht, das du heute führen kannst. Sie schöpft aus ihrer Philosophie und bleibt doch eine Interpretation, nicht die reale Person und keine Aufnahme.",
-    "themeNote": "Die Stimmen hier nennen wir Echos. Jede ist eine KI-Stimme, geprägt von den eigenen Schriften und Gedanken eines historischen Menschen und in ein Gespräch gebracht, das du heute führen kannst. Sie schöpfen aus echter Philosophie und bleiben doch Interpretationen, nicht die realen Menschen und keine Aufnahmen.",
+    "figureNote": "{name} begegnet dir hier als Echo. Das ist eine KI-Stimme, geprägt von den eigenen Schriften und Gedanken dieses Menschen und in ein Gespräch gebracht, das du heute führen kannst. Sie schöpft aus ihrer Philosophie und bleibt doch eine Interpretation, nicht die reale Person und keine Aufnahme. Das Porträt ist ein KI-erzeugtes Bild, keine Fotografie.",
+    "themeNote": "Die Stimmen hier nennen wir Echos. Jede ist eine KI-Stimme, geprägt von den eigenen Schriften und Gedanken eines historischen Menschen und in ein Gespräch gebracht, das du heute führen kannst. Sie schöpfen aus echter Philosophie und bleiben doch Interpretationen, nicht die realen Menschen und keine Aufnahmen. Die Porträts sind KI-erzeugte Bilder, keine Fotografien.",
     "whyLink": "Warum wir sie Echos nennen →"
+  },
+  "aiDisclosure": {
+    "echo": "KI-Echo",
+    "imageBadge": "KI-Bild",
+    "imageBadgeLong": "KI-generiertes Bild",
+    "imageAlt": "KI-generiertes Porträt von {name}",
+    "voiceChip": "KI-Stimme, keine Aufnahme",
+    "voiceShort": "KI-Stimme",
+    "chatLine": "KI-Echo, kann sich irren. Prüfe Wichtiges nach.",
+    "notice": "Diese Persönlichkeiten sind KI-Interpretationen, nicht die echten Menschen. Was sie in Gesprächen, Geschichten und Audios sagen, ist KI-generiert und kann ungenau sein. Ihre Porträts sind KI-erzeugte Bilder, keine Fotografien. Prüfe Wichtiges nach.",
+    "learnMore": "Wie Echos funktionieren",
+    "transcriptHeader": "KI-generierter Dialog (KI-Echos)",
+    "exportNotice": "Dieser Export enthält KI-generierte Gespräche und Dialoge mit KI-Echos, keine Aussagen der echten Menschen.",
+    "figuresShown": "Die gezeigten Persönlichkeiten sind KI-Interpretationen."
   },
   "figures": {
     "pageTitle": "30 bemerkenswerte Menschen, von denen du lernen kannst",

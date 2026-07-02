@@ -67,8 +67,9 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
-  /* Updated dynamically by .prism-player__top-bar; default 0 so non-council
-     mode (no top bar) keeps the figure full-bleed. */
+  /* Updated dynamically by .prism-player__top-bar, which now renders in both
+     modes (it carries the AI voice disclosure). The 0px default only covers
+     the no-top-bar edge case. */
   --top-bar-h: 0px;
 }
 
@@ -680,4 +681,27 @@
   align-items: center;
   justify-content: center;
   min-height: 300px;
+}
+
+/* --- Top bar title + AI voice chip (shared leading grid cell) --- */
+/* Wrapper keeps the close button anchored right while title and chip
+   sit together, centered across the bar like the title used to be. */
+.prism-player__top-bar-lead {
+  justify-self: center;
+  margin-left: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  max-width: calc(100% - 1rem);
+}
+
+.prism-player__top-bar-lead .prism-player__top-bar-title {
+  margin-left: 0;
+  max-width: none;
+  min-width: 0;
+}
+
+.prism-player__top-bar-lead .ai-voice-chip {
+  flex-shrink: 0;
 }

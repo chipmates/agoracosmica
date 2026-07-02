@@ -11,6 +11,7 @@
 import { useEffect, useRef } from 'react';
 import { loadFigureImageV2, getBestImageFromMetadata } from '../../utils/imageLoaderV2';
 import { getFullFigureName } from '../../services/audio/introduction/navigationHelper';
+import { useTranslation } from '../../hooks/useTranslation';
 
 interface UseMediaSessionParams {
   title: string;
@@ -35,6 +36,8 @@ export function useMediaSession({
   onSkipBack,
   onSkipForward,
 }: UseMediaSessionParams): void {
+  const { language } = useTranslation();
+
   // Callback refs so action handlers always call the latest function
   const togglePlayRef = useRef(onTogglePlay);
   const skipBackRef = useRef(onSkipBack);
@@ -80,9 +83,16 @@ export function useMediaSession({
 
     const updateMetadata = (artistName: string, artworkUrl?: string) => {
       if (cancelled) return;
+      // Lock-screen metadata travels without app context, so the artist
+      // line itself carries the AI disclosure. Catalog names already carry
+      // an "Echo of/von" prefix, so unwrap it before adding the AI variant.
+      const figureName = (artistName || figureId).replace(/^Echo (of|von) /i, '');
+      const artist = language === 'de'
+        ? `KI-Echo von ${figureName}`
+        : `AI Echo of ${figureName}`;
       navigator.mediaSession.metadata = new MediaMetadata({
         title: title || 'Agora Cosmica',
-        artist: artistName || figureId,
+        artist,
         album: 'Agora Cosmica',
         ...(artworkUrl ? { artwork: [{ src: artworkUrl, sizes: '512x512', type: 'image/webp' }] } : {}),
       });
@@ -112,7 +122,7 @@ export function useMediaSession({
     });
 
     return () => { cancelled = true; };
-  }, [figureId, title]);
+  }, [figureId, title, language]);
 
   // Effect 3: Sync playback state + position
   useEffect(() => {

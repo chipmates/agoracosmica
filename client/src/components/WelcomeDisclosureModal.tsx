@@ -258,7 +258,7 @@ const WelcomeDisclosureModal: FC<WelcomeDisclosureModalProps> = ({ isOpen, onCom
         <div className={styles.modalFooter}>
           <p className={styles.clickwrapStatement} id="agc-clickwrap-notice">
             {tNode('legal.consent.clickwrapPre')}{' '}
-            <a href="/nutzungsbedingungen" target="_blank" rel="noopener" className={styles.consentLink}>
+            <a href={language === 'de' ? '/nutzungsbedingungen' : '/terms'} target="_blank" rel="noopener" className={styles.consentLink}>
               {tNode('legal.consent.termsLink')}
             </a>{' '}
             {tNode('legal.consent.clickwrapMid')}

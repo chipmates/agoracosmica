@@ -4,6 +4,20 @@
     "brandTagline": "Eine lebendige Bibliothek, mit der du sprechen kannst",
     "attribution": "Ein Projekt der ChipMates gemeinnützige GmbH"
   },
+  "aiDisclosure": {
+    "echo": "KI-Echo",
+    "imageBadge": "KI-Bild",
+    "imageBadgeLong": "KI-generiertes Bild",
+    "imageAlt": "KI-generiertes Porträt von {name}",
+    "voiceChip": "KI-Stimme, keine Aufnahme",
+    "voiceShort": "KI-Stimme",
+    "chatLine": "KI-Echo, kann sich irren. Prüfe Wichtiges nach.",
+    "notice": "Diese Persönlichkeiten sind KI-Interpretationen, nicht die echten Menschen. Was sie in Gesprächen, Geschichten und Audios sagen, ist KI-generiert und kann ungenau sein. Ihre Porträts sind KI-erzeugte Bilder, keine Fotografien. Prüfe Wichtiges nach.",
+    "learnMore": "Wie Echos funktionieren",
+    "transcriptHeader": "KI-generierter Dialog (KI-Echos)",
+    "exportNotice": "Dieser Export enthält KI-generierte Gespräche und Dialoge mit KI-Echos, keine Aussagen der echten Menschen.",
+    "figuresShown": "Die gezeigten Persönlichkeiten sind KI-Interpretationen."
+  },
   "questVerdict": {
     "notEarned": {
       "title": "Noch nicht, aber der Weg bleibt offen",
@@ -64,8 +78,7 @@
     "listening": "Höre Geschichte..."
   },
   "about": {
-    "title": "{figureName}",
-    "disclaimer": "Hinweis: Dies ist ein fiktiver KI-Charakter, inspiriert von der historischen Persönlichkeit."
+    "title": "{figureName}"
   },
   "orientation": {
     "title": "Bitte drehe dein Gerät",
@@ -1293,17 +1306,13 @@
       "github": "Quellcode"
     },
     "consent": {
-      "heading": "Bevor du loslegst",
-      "aiNotice": "Diese Persönlichkeiten sind KI-Interpretationen, nicht die echten Menschen. Was sie in Gesprächen, Geschichten und Audios sagen, ist KI-generiert und kann ungenau sein. Prüfe Wichtiges nach.",
+      "aiNotice": "Diese Persönlichkeiten sind KI-Interpretationen, nicht die echten Menschen. Was sie in Gesprächen, Geschichten und Audios sagen, ist KI-generiert und kann ungenau sein. Ihre Porträts sind KI-erzeugte Bilder, keine Fotografien. Prüfe Wichtiges nach.",
       "clickwrapPre": "Mit dem Tippen auf den Button unten stimmst du den",
       "clickwrapMid": "zu und bist mindestens 16 Jahre alt.",
-      "ageCheckbox": "Ich bestätige, dass ich mindestens 16 Jahre alt bin oder die Zustimmung eines Erziehungsberechtigten habe.",
-      "termsCheckbox": "Ich habe die",
       "termsLink": "Nutzungsbedingungen",
       "privacyNote": "Datenschutzerklärung",
       "jsbNote": "Jugendschutzbeauftragter",
-      "startButton": "Jetzt entdecken",
-      "termsCheckboxSuffix": " gelesen und stimme diesen zu."
+      "startButton": "Jetzt entdecken"
     },
     "cookiePolicy": {
       "title": "Cookie-Richtlinie",
@@ -1509,7 +1518,7 @@
   },
   "quickHelp": {
     "title": "Kompass",
-    "aiDisclosure": "KI-Echos sind KI-generierte Darstellungen, inspiriert von historischen Lehren. Vorgeschriebene Geschichten entstehen in Mensch-KI-Zusammenarbeit. Unterhaltungen und Stimmen in Echtzeit werden vollständig von KI erzeugt.",
+    "aiDisclosure": "KI-Echos sind KI-generierte Darstellungen, inspiriert von historischen Lehren. Vorgeschriebene Geschichten entstehen in Mensch-KI-Zusammenarbeit. Unterhaltungen und Stimmen in Echtzeit werden vollständig von KI erzeugt. Die Porträts sind KI-erzeugte Bilder, keine Fotografien.",
     "learnMore": "Mehr erfahren",
     "showLess": "Weniger anzeigen",
     "footer": "Brauchst du mehr Details? Vollständige Anleitung kommt nach der Beta!",

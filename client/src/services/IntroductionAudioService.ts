@@ -402,12 +402,21 @@ class IntroductionAudioService {
 
           if (artworkUrl) {
             try {
-              // Get full figure name with "Echo of..." prefix for elegant lock screen display
               const fullFigureName = await getFullFigureName(figureId);
+              // Lock-screen metadata travels without app context, so the
+              // artist line itself carries the AI disclosure. The service has
+              // no i18n access, so pick the variant by the story language.
+              // Catalog names already carry an "Echo of/von" prefix, so
+              // unwrap it before adding the AI variant.
+              const figureName = (fullFigureName || story.figureName || figureId)
+                .replace(/^Echo (of|von) /i, '');
+              const artist = story.language === 'de'
+                ? `KI-Echo von ${figureName}`
+                : `AI Echo of ${figureName}`;
 
               navigator.mediaSession.metadata = new MediaMetadata({
                 title: story.title || 'Instruction Story',
-                artist: fullFigureName || story.figureName || figureId,
+                artist,
                 album: 'Agora Cosmica',
                 artwork: [
                   { src: artworkUrl, sizes: '512x512', type: 'image/webp' },

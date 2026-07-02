@@ -199,10 +199,14 @@ export function PrismPlayer({ figure, seed, councilId, councilLevel = 1, languag
         if (cancelled) return;
         setPrismData(data);
 
-        // Save transcript for history display + LLM context
-        const transcript = data.manifest.segments
-          .map(seg => `${seg.speaker}: ${seg.text}`)
-          .join('\n\n');
+        // Save transcript for history display + LLM context.
+        // Header line marks the dialogue as AI-generated once the text
+        // leaves the player (history, exports, LLM context).
+        const transcript = tString('aiDisclosure.transcriptHeader', 'AI-generated dialogue (AI Echoes)')
+          + '\n\n'
+          + data.manifest.segments
+            .map(seg => `${seg.speaker}: ${seg.text}`)
+            .join('\n\n');
 
         if (isCouncilMode) {
           saveCouncilContent(councilId!, transcript);
@@ -755,10 +759,11 @@ export function PrismPlayer({ figure, seed, councilId, councilLevel = 1, languag
           </div>
         </div>
 
-        {/* Top bar — current speaker (council mode). Always-visible flow strip
-            so the figure image sits below it (not cropped by an overlay). */}
-        {isCouncilMode && (
-          <div className="prism-player__top-bar">
+        {/* Top bar — current speaker (both modes). Always-visible flow strip
+            so the figure image sits below it (not cropped by an overlay).
+            Carries the AI voice chip as the persistent audio disclosure. */}
+        <div className="prism-player__top-bar">
+          <span className="prism-player__top-bar-lead">
             <span
               className="prism-player__top-bar-title"
               key={`speaker-bar-${subtitleState.figureId || 'idle'}`}
@@ -768,14 +773,17 @@ export function PrismPlayer({ figure, seed, councilId, councilLevel = 1, languag
             >
               {getEchoShortName(subtitleState.figureId, tString) || mediaSessionTitle}
             </span>
-            {onClose && (
-              <CloseButton
-                onClick={() => onClose()}
-                ariaLabel={tString('common.close', 'Close')}
-              />
-            )}
-          </div>
-        )}
+            <span className="ai-voice-chip">
+              {tString('aiDisclosure.voiceChip', 'AI voice, not a recording')}
+            </span>
+          </span>
+          {onClose && (
+            <CloseButton
+              onClick={() => onClose()}
+              ariaLabel={tString('common.close', 'Close')}
+            />
+          )}
+        </div>
       </div>
 
     </div>

@@ -484,6 +484,13 @@ const AudioLibraryModal: FC<AudioLibraryModalProps> = ({
               )}
             </div>
 
+            {/* AI disclosure footer, always visible in the modal chrome */}
+            <div className="audio-library__ai-disclosure">
+              <span className="ai-voice-chip">
+                {tString('aiDisclosure.voiceChip', 'AI voice, not a recording')}
+              </span>
+            </div>
+
             {showAudioHelp && (
               <HelperPopup
                 isOpen={true}

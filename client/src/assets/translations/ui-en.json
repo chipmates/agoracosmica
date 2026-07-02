@@ -4,6 +4,20 @@
     "brandTagline": "A Living Library You Can Talk To",
     "attribution": "A project of ChipMates gemeinnützige GmbH"
   },
+  "aiDisclosure": {
+    "echo": "AI Echo",
+    "imageBadge": "AI image",
+    "imageBadgeLong": "AI-generated image",
+    "imageAlt": "AI-generated portrait of {name}",
+    "voiceChip": "AI voice, not a recording",
+    "voiceShort": "AI voice",
+    "chatLine": "AI Echo, can be wrong. Verify anything important.",
+    "notice": "These figures are AI interpretations, not the real people. What they say in chat, stories, and audio is AI-generated and can be inaccurate. Their portraits are AI-generated images, not photographs. Verify anything important.",
+    "learnMore": "How Echoes work",
+    "transcriptHeader": "AI-generated dialogue (AI Echoes)",
+    "exportNotice": "This export contains AI-generated conversations and dialogues with AI Echoes, not statements by the real people.",
+    "figuresShown": "The figures shown are AI interpretations."
+  },
   "questVerdict": {
     "notEarned": {
       "title": "Not yet, but the path remains open",
@@ -66,8 +80,7 @@
     "listening": "Listening to story..."
   },
   "about": {
-    "title": "{figureName}",
-    "disclaimer": "Note: This is a fictive AI character inspired by the historical figure."
+    "title": "{figureName}"
   },
   "orientation": {
     "title": "Please Rotate Your Device",
@@ -1291,17 +1304,13 @@
       "github": "Source code"
     },
     "consent": {
-      "heading": "Before you begin",
-      "aiNotice": "These figures are AI interpretations, not the real people. What they say in chat, stories, and audio is AI-generated and can be inaccurate. Verify anything important.",
+      "aiNotice": "These figures are AI interpretations, not the real people. What they say in chat, stories, and audio is AI-generated and can be inaccurate. Their portraits are AI-generated images, not photographs. Verify anything important.",
       "clickwrapPre": "By tapping the button below, you agree to the",
       "clickwrapMid": "and you are 16 or older.",
-      "ageCheckbox": "I confirm that I am at least 16 years old or have the consent of a parent or guardian.",
-      "termsCheckbox": "I have read and accept the",
       "termsLink": "Terms of Service",
       "privacyNote": "Privacy Policy",
       "jsbNote": "Youth Protection Officer",
-      "startButton": "Start exploring",
-      "termsCheckboxSuffix": "."
+      "startButton": "Start exploring"
     },
     "cookiePolicy": {
       "title": "Cookie Policy",
@@ -1507,7 +1516,7 @@
   },
   "quickHelp": {
     "title": "Guide",
-    "aiDisclosure": "AI Echoes are AI-generated portrayals inspired by historical teachings. Pre-written stories involve human-AI collaboration. Live conversations and voices are generated entirely by AI.",
+    "aiDisclosure": "AI Echoes are AI-generated portrayals inspired by historical teachings. Pre-written stories involve human-AI collaboration. Live conversations and voices are generated entirely by AI. The portraits are AI-generated images, not photographs.",
     "learnMore": "Learn more",
     "showLess": "Show less",
     "footer": "Need more details? Full instructions coming after beta!",

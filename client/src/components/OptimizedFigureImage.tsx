@@ -10,6 +10,7 @@
 import React, { FC, useState, useEffect, useCallback, CSSProperties } from 'react';
 import { normalizeFigureKey } from '../utils/imagePathUtils';
 import { loadFigureImageV2, getBestImageFromMetadata, type ImageResult } from '../utils/imageLoaderV2';
+import { useTranslation } from '../hooks/useTranslation';
 import './OptimizedUIImage.css'; // Reuse the base styles
 
 type ImageType = 'thumbnail' | 'main';
@@ -226,6 +227,21 @@ const OptimizedFigureImage: FC<OptimizedFigureImageProps> = ({
   const calculatedSize = useResponsiveImageSize(type, size);
   const { imageData, loading: pathsLoading } = useImagePaths(figure, type, calculatedSize, format);
   const { loaded, handleLoad, handleError } = useImageLoading({ onLoad, onError });
+  const { tString } = useTranslation();
+
+  // Portraits are AI-generated images, so a bare figure name would mislabel
+  // them. The convention is applied here at the choke point: every alt that
+  // does not already name AI is wrapped as "AI-generated portrait of {name}"
+  // (catalog "Echo of/von" prefixes unwrapped first). Consumers cannot bypass
+  // it by passing a bare name; alts that already disclose pass through.
+  const imageAltPattern = tString('aiDisclosure.imageAlt', 'AI-generated portrait of {name}');
+  const fallbackAlt = typeof figure === 'string' && figure
+    ? imageAltPattern.replace('{name}', figure.charAt(0).toUpperCase() + figure.slice(1))
+    : 'Figure image';
+  const rawAlt = alt || fallbackAlt;
+  const disclosedAlt = rawAlt && !/AI-generated|KI-generiert/i.test(rawAlt)
+    ? imageAltPattern.replace('{name}', rawAlt.replace(/^Echo (of|von) /i, ''))
+    : rawAlt;
   
   // Show loading state while paths are being resolved
   if (pathsLoading) {
@@ -260,7 +276,7 @@ const OptimizedFigureImage: FC<OptimizedFigureImageProps> = ({
           ...style
         }}
         role="img"
-        aria-label={alt || `Image of figure unavailable`}
+        aria-label={disclosedAlt || `Image of figure unavailable`}
         {...props}
       >
         <span>{typeof figure === 'string' ? figure : 'Figure'}</span>
@@ -307,7 +323,7 @@ const OptimizedFigureImage: FC<OptimizedFigureImageProps> = ({
         {/* PNG fallback */}
         <img
           src={imageData.primary}
-          alt={alt || (typeof figure === 'string' ? figure : 'Figure image')}
+          alt={disclosedAlt}
           loading={priority ? "eager" : "lazy"}
           fetchPriority={priority ? "high" : "auto"}
           width={imageData.width ?? undefined}

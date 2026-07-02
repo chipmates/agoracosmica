@@ -42,9 +42,23 @@
     "listenFeaturedDebate": "Explore this debate"
   },
   "echo": {
-    "figureNote": "{name} here is what we call an echo. It's an AI voice shaped by their own writing and ideas, brought into a conversation you can have today. It draws on their philosophy, and it stays an interpretation, not the real person and not a recording.",
-    "themeNote": "The voices here are what we call echoes. Each one is an AI voice shaped by a historical figure's own writing and ideas, brought into a conversation you can have today. They draw on real philosophy, and they stay interpretations, not the real people and not recordings.",
+    "figureNote": "{name} here is what we call an echo. It's an AI voice shaped by their own writing and ideas, brought into a conversation you can have today. It draws on their philosophy, and it stays an interpretation, not the real person and not a recording. The portrait is an AI-generated image, not a photograph.",
+    "themeNote": "The voices here are what we call echoes. Each one is an AI voice shaped by a historical figure's own writing and ideas, brought into a conversation you can have today. They draw on real philosophy, and they stay interpretations, not the real people and not recordings. The portraits are AI-generated images, not photographs.",
     "whyLink": "Why we call them Echoes →"
+  },
+  "aiDisclosure": {
+    "echo": "AI Echo",
+    "imageBadge": "AI image",
+    "imageBadgeLong": "AI-generated image",
+    "imageAlt": "AI-generated portrait of {name}",
+    "voiceChip": "AI voice, not a recording",
+    "voiceShort": "AI voice",
+    "chatLine": "AI Echo, can be wrong. Verify anything important.",
+    "notice": "These figures are AI interpretations, not the real people. What they say in chat, stories, and audio is AI-generated and can be inaccurate. Their portraits are AI-generated images, not photographs. Verify anything important.",
+    "learnMore": "How Echoes work",
+    "transcriptHeader": "AI-generated dialogue (AI Echoes)",
+    "exportNotice": "This export contains AI-generated conversations and dialogues with AI Echoes, not statements by the real people.",
+    "figuresShown": "The figures shown are AI interpretations."
   },
   "figures": {
     "pageTitle": "30 Remarkable People You Can Learn From",

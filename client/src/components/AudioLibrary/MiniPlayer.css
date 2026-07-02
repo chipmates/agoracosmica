@@ -555,3 +555,8 @@
 .mini-player {
   animation: slideUp 0.3s ease-out forwards;
 }
+/* Tiny AI voice chip next to the figure name */
+.mini-player__ai-chip {
+  margin-left: 6px;
+  vertical-align: middle;
+}

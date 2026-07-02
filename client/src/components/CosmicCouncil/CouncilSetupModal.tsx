@@ -373,6 +373,11 @@ const CouncilSetupModal: FC<CouncilSetupModalProps> = ({
               <p className="council-setup-subtitle">
                 {tString('cosmicCouncil.subtitle', 'Assemble wisdom from across time')}
               </p>
+              {/* Static AI disclosure, always visible (the HelperPopup version
+                  can be dismissed permanently) */}
+              <p className="council-setup-ai-note">
+                {tString('helpers.councilSetup.welcome.sections.transparency.brief', 'AI Echoes in dialogue · Not a substitute for professional counseling')}
+              </p>
             </div>
             <CloseButton
               onClick={viewMode === 'custom' ? handleBackToCatalog : onClose}

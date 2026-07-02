@@ -735,6 +735,11 @@ const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure,
             </div>
           )}
         </div>
+
+        {/* AI disclosure standing line, always visible under the composer */}
+        <p className="ai-chat-disclosure">
+          {tString('aiDisclosure.chatLine', 'AI Echo, can be wrong. Verify anything important.')}
+        </p>
       </div>
     </>
   );

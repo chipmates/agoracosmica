@@ -785,3 +785,12 @@
   color: var(--text-primary);
   border-color: color-mix(in srgb, var(--gold-subtle, #d4a539) 40%, transparent);
 }
+/* AI disclosure standing line under the composer (always visible) */
+.ai-chat-disclosure {
+  margin: 6px 0 0;
+  text-align: center;
+  font-size: var(--text-xs);
+  line-height: 1.4;
+  color: var(--text-dim);
+  user-select: none;
+}

@@ -197,3 +197,26 @@
     animation: none;
   }
 }
+
+/* ── Top bar title + AI voice chip (shared leading grid cell) ── */
+/* Wrapper keeps the close button anchored right while title and chip
+   sit together, centered across the bar like the title used to be. */
+.live-council-player__top-bar-lead {
+  justify-self: center;
+  margin-left: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  max-width: calc(100% - 1rem);
+}
+
+.live-council-player__top-bar-lead .live-council-player__top-bar-title {
+  margin-left: 0;
+  max-width: none;
+  min-width: 0;
+}
+
+.live-council-player__top-bar-lead .ai-voice-chip {
+  flex-shrink: 0;
+}

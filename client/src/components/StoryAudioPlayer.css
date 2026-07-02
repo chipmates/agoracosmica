@@ -415,3 +415,9 @@
     box-shadow: 0 0 40px color-mix(in srgb, var(--gold-subtle) var(--a-60), transparent);
   }
 }
+
+/* AI disclosure chip row under the playback controls (always visible) */
+.player-ai-disclosure {
+  margin-top: 4px;
+  text-align: center;
+}

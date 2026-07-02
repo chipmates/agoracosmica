@@ -651,7 +651,7 @@
 
   .cosmicScene {
     height: auto;
-    min-height: 200px;
+    min-height: 150px;
     margin: 0.5rem 0 1rem;
     padding: 1rem;
   }
@@ -734,7 +734,7 @@
   }
 
   .aiNotice {
-    font-size: 1.1875rem; /* 19px — leads consent block as safety-critical */
+    font-size: 1rem; /* 16px — compact on mobile, still leads the consent block */
     line-height: 1.55;
   }
 
@@ -751,7 +751,7 @@
 /* Ultra-small screens (iPhone SE) */
 @media (max-width: 375px) {
   .cosmicScene {
-    min-height: 180px;
+    min-height: 140px;
     padding: 0.75rem;
   }
 
@@ -806,7 +806,7 @@
   }
 
   .aiNotice {
-    font-size: 1.0625rem; /* 17px — SE has less width, scale safety notice down from 19px */
+    font-size: 0.9375rem; /* 15px — SE has less width, scale safety notice down from 16px */
   }
 }
 

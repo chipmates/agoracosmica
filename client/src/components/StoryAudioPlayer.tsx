@@ -219,6 +219,13 @@ const StoryAudioPlayer: FC<StoryAudioPlayerProps> = ({
           </button>
         </div>
       </div>
+
+      {/* AI disclosure chip, always visible in the player chrome */}
+      <div className="player-ai-disclosure">
+        <span className="ai-voice-chip">
+          {tString('aiDisclosure.voiceChip', 'AI voice, not a recording')}
+        </span>
+      </div>
     </div>
   );
 };

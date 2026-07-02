@@ -644,6 +644,9 @@ const NowPlayingView: FC<NowPlayingViewProps> = ({ story, figure, audioService, 
           {/* Title information moved to top of controls */}
           <div className="now-playing-view__title-container">
             <p className="now-playing-view__figure-name">{currentFigure && currentFigure.name ? getFigureDisplayName(currentFigure.name) : ''}</p>
+            <span className="ai-voice-chip now-playing-view__ai-chip">
+              {tString('aiDisclosure.voiceChip', 'AI voice, not a recording')}
+            </span>
             <h3 className="now-playing-view__title">
               <span className="now-playing-view__seed-number">{currentStory?.seedId}.</span>
               <span className="now-playing-view__seed-title">{currentStory?.title || tNode('audioLibrary.nowPlaying.defaultTitle')}</span>

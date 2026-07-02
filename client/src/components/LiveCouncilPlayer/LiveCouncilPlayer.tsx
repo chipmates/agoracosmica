@@ -109,14 +109,19 @@ export function LiveCouncilPlayer({ onClose }: LiveCouncilPlayerProps) {
             Pushes the figure down via --top-bar-h so the portrait isn't
             cropped behind it. */}
         <div className="live-council-player__top-bar">
-          <span
-            className="live-council-player__top-bar-title"
-            key={`speaker-bar-${audioPlayback?.speakerId || speaker || 'idle'}`}
-            role="status"
-            aria-live="polite"
-            aria-atomic="true"
-          >
-            {speakerName || tString('cosmicCouncil.livePlayer', 'Council in session')}
+          <span className="live-council-player__top-bar-lead">
+            <span
+              className="live-council-player__top-bar-title"
+              key={`speaker-bar-${audioPlayback?.speakerId || speaker || 'idle'}`}
+              role="status"
+              aria-live="polite"
+              aria-atomic="true"
+            >
+              {speakerName || tString('cosmicCouncil.livePlayer', 'Council in session')}
+            </span>
+            <span className="ai-voice-chip">
+              {tString('aiDisclosure.voiceChip', 'AI voice, not a recording')}
+            </span>
           </span>
           <CloseButton
             onClick={handleClose}
