@@ -80,7 +80,7 @@ const COPY: Record<Lang, ExchangeCopy> = {
     answerRest: ' Place a pause between the event and your answer to it. Examine the judgment you attached. Ask whether it is true.',
     hearVoice: 'Hear his voice',
     askYourself: 'Ask him yourself',
-    caption: 'An AI Echo, shaped from his own Meditations. An interpretation, not a recording. The portrait and faces are AI-generated images.',
+    caption: 'An AI Echo, shaped from his own Meditations. An interpretation, not a recording. Portraits painted by AI, not photographs.',
     railCaption: 'One of 30 voices, Laozi to Frida Kahlo',
     railMore: '+23 more',
     scrollCue: 'The library',
@@ -100,7 +100,7 @@ const COPY: Record<Lang, ExchangeCopy> = {
     answerRest: ' Zwischen dem, was geschieht, und deiner Antwort liegt ein Raum. Prüfe das Urteil, das du angeheftet hast. Frag, ob es wahr ist.',
     hearVoice: 'Hör seine Stimme',
     askYourself: 'Frag ihn selbst',
-    caption: 'Ein KI-Echo, geformt aus seinen eigenen Selbstbetrachtungen. Eine Deutung, keine Aufnahme. Porträt und Gesichter sind KI-generierte Bilder.',
+    caption: 'Ein KI-Echo, geformt aus seinen eigenen Selbstbetrachtungen. Eine Deutung, keine Aufnahme. Von KI gemalte Porträts, keine Fotografien.',
     railCaption: 'Eine von 30 Stimmen, von Laozi bis Frida Kahlo',
     railMore: '+23 weitere',
     scrollCue: 'Die Bibliothek',
@@ -169,9 +169,6 @@ const featuredHref = publicUrl(lang, `/figures/${figureIdToSlug[FEATURED_ID]}`);
               fetchpriority="high"
               decoding="async"
             />
-            <span class="hx-ai-badge" title={t('aiDisclosure.imageBadgeLong')}>
-              {t('aiDisclosure.imageBadge')}
-            </span>
           </a>
           <div class="hx-card__who">
             <p class="hx-card__name">{featuredName}</p>

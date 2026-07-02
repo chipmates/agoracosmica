@@ -553,21 +553,6 @@
 .v2-plaque__voice[data-voice="on"] .v2-voice__icon-pause { display: inline; }
 .v2-plaque__voice[data-voice="on"] .pub-trailer__dur { display: none; }
 
-/* AI-voice disclosure pill on the plaque trailer button: static text, never
-   dismissed, and unlike the duration it stays visible while the voice plays */
-.v2-plaque__ai {
-  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
-  font-size: var(--text-xs);
-  font-weight: var(--weight-regular);
-  line-height: var(--leading-tight);
-  color: var(--text-tertiary);
-  padding: 0 var(--space-sm);
-  border: 1px solid var(--utility-border);
-  border-radius: var(--radius-full);
-  background: color-mix(in srgb, var(--bg-deep-space-darker) 40%, transparent);
-  white-space: nowrap;
-}
-
 /* while a voice plays, the library itself answers: the core brightens and
    the speaking figure's face carries a stronger glow (static transitions,
    no keyframes, so nothing burns when idle) */

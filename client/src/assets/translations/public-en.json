@@ -48,8 +48,6 @@
   },
   "aiDisclosure": {
     "echo": "AI Echo",
-    "imageBadge": "AI image",
-    "imageBadgeLong": "AI-generated image",
     "imageAlt": "AI-generated portrait of {name}",
     "voiceChip": "AI voice, not a recording",
     "voiceShort": "AI voice",
@@ -66,7 +64,7 @@
     "searchPlaceholder": "Search by name or tradition...",
     "teachings": "Teachings",
     "echoOf": "Echo of",
-    "echoGloss": "An AI Echo, a voice shaped from their own writing. An interpretation, not a recording.",
+    "echoGloss": "An AI Echo, a voice shaped from their own writing. An interpretation, not a recording. The portrait is painted by AI.",
     "playIntro": "Play intro",
     "pauseIntro": "Pause",
     "ideasHeading": "The twelve ideas",

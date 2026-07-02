@@ -173,9 +173,9 @@ const lcpFigure = byId.get(ringPlan[0].ids[0]);
             {copy.hearTemplate.replace('{name}', lcpFigure ? lcpFigure.name : '')}
           </span>
           <span class="pub-trailer__dur">0:50</span>
-          <span class="v2-plaque__ai" title={t('aiDisclosure.voiceChip')}>
-            {t('aiDisclosure.voiceShort')}
-          </span>
+          <!-- The visible AI naming for this view is the EchoNote in the tail
+               column (one line per view); the control keeps it assistively. -->
+          <span class="sr-only">{t('aiDisclosure.voiceChip')}</span>
         </button>
       </div>
 

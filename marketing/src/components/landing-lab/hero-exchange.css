@@ -260,27 +260,6 @@
   outline: 2px solid var(--gold-hover);
   outline-offset: 3px;
 }
-/* AI-image disclosure badge on the portrait: static, always visible, sits at
-   the circle's lower edge on a dark scrim so it reads over any pixel */
-.hx-ai-badge {
-  position: absolute;
-  bottom: calc(-1 * var(--space-xs));
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 0 var(--space-sm);
-  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
-  font-size: var(--text-xs);
-  font-weight: var(--weight-medium);
-  line-height: var(--leading-tight);
-  color: var(--text-secondary);
-  background: color-mix(in srgb, var(--bg-deep-space-darker) 70%, transparent);
-  border: 1px solid var(--utility-border);
-  border-radius: var(--radius-sm);
-  pointer-events: none;
-  white-space: nowrap;
-  z-index: 1;
-}
-
 .hx-card__name {
   font-family: 'Libre Caslon Text', Georgia, serif;
   font-size: 1.35rem;

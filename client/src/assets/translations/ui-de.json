@@ -6,8 +6,6 @@
   },
   "aiDisclosure": {
     "echo": "KI-Echo",
-    "imageBadge": "KI-Bild",
-    "imageBadgeLong": "KI-generiertes Bild",
     "imageAlt": "KI-generiertes Porträt von {name}",
     "voiceChip": "KI-Stimme, keine Aufnahme",
     "voiceShort": "KI-Stimme",

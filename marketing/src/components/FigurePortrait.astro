@@ -23,7 +23,8 @@ interface Props {
 const { figureId, name, lang } = Astro.props;
 const t = getT(lang);
 // Every figure portrait is an AI-generated image of a real person: the alt
-// names that, and a small always-visible badge marks the image itself.
+// names that, and the hero gloss beside the portrait carries the visible
+// disclosure line for the view (one calm line per view, no badge).
 const alt = t('aiDisclosure.imageAlt').replace('{name}', name);
 ---
 <picture>
@@ -50,29 +51,3 @@ const alt = t('aiDisclosure.imageAlt').replace('{name}', name);
     decoding="async"
   />
 </picture>
-<!-- Anchors to the caller's portrait frame (.pub-fig-hero__portrait is
-     position: relative), so the badge sits on the image at every breakpoint. -->
-<span class="pub-ai-badge" title={t('aiDisclosure.imageBadgeLong')}>
-  {t('aiDisclosure.imageBadge')}
-</span>
-
-<style>
-  /* AI-image disclosure badge: static, always visible, dark scrim for
-     contrast over any portrait pixel, never intercepts the pointer */
-  .pub-ai-badge {
-    position: absolute;
-    bottom: var(--space-xs);
-    right: var(--space-xs);
-    padding: var(--space-xs) var(--space-sm);
-    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
-    font-size: var(--text-xs);
-    font-weight: var(--weight-medium);
-    line-height: var(--leading-tight);
-    color: var(--text-secondary);
-    background: color-mix(in srgb, var(--bg-deep-space-darker) 70%, transparent);
-    border: 1px solid var(--utility-border);
-    border-radius: var(--radius-sm);
-    pointer-events: none;
-    white-space: nowrap;
-  }
-</style>

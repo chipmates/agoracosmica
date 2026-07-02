@@ -417,19 +417,3 @@ body, html {
     height: 16px;
   }
 }
-/* Static AI disclosure line during the cinematic (always visible, no animation) */
-.login-ai-note {
-  position: fixed;
-  bottom: calc(52px + env(safe-area-inset-bottom, 0px));
-  left: 50%;
-  transform: translateX(-50%);
-  margin: 0;
-  font-size: var(--text-xs);
-  line-height: 1.4;
-  color: var(--text-dim);
-  text-align: center;
-  pointer-events: none;
-  user-select: none;
-  max-width: calc(100vw - 2rem); /* the DE line wraps on the smallest phones */
-  z-index: var(--z-dropdown); /* 100 - above the cinematic layers */
-}

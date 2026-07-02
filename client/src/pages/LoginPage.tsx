@@ -68,7 +68,7 @@ const LoginPage: FC<LoginPageProps> = ({ onComplete }) => {
   const [figureIndices, setFigureIndices] = useState<number[]>([]);
   const [portalAnimActive, setPortalAnimActive] = useState(false);
 
-  const { tNode, tString } = useTranslation();
+  const { tNode } = useTranslation();
 
   const audioRef = useRef<HTMLAudioElement>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -317,11 +317,9 @@ const LoginPage: FC<LoginPageProps> = ({ onComplete }) => {
         />
       )}
 
-      {/* Static AI disclosure, always visible while the cinematic shows the
-          figure portraits (before the welcome gate notice appears) */}
-      <p className="login-ai-note">
-        {tString('aiDisclosure.figuresShown', 'The figures shown are AI interpretations.')}
-      </p>
+      {/* No AI note over the cinematic: the welcome gate notice lands seconds
+          later in the same first-run flow and carries the full disclosure
+          (accepted-risk call 2026-07-02, lawyer question stays open). */}
 
       {/* Quiet skip hint, visual only (the SR live region below says the same) */}
       <div

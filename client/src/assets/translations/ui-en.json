@@ -6,8 +6,6 @@
   },
   "aiDisclosure": {
     "echo": "AI Echo",
-    "imageBadge": "AI image",
-    "imageBadgeLong": "AI-generated image",
     "imageAlt": "AI-generated portrait of {name}",
     "voiceChip": "AI voice, not a recording",
     "voiceShort": "AI voice",

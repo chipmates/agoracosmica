@@ -48,8 +48,6 @@
   },
   "aiDisclosure": {
     "echo": "KI-Echo",
-    "imageBadge": "KI-Bild",
-    "imageBadgeLong": "KI-generiertes Bild",
     "imageAlt": "KI-generiertes Porträt von {name}",
     "voiceChip": "KI-Stimme, keine Aufnahme",
     "voiceShort": "KI-Stimme",
@@ -66,7 +64,7 @@
     "searchPlaceholder": "Nach Name oder Tradition suchen...",
     "teachings": "Lehren",
     "echoOf": "Echo von",
-    "echoGloss": "Ein KI-Echo, eine Stimme, gepr\u00e4gt von den eigenen Schriften. Eine Deutung, keine Aufnahme.",
+    "echoGloss": "Ein KI-Echo, eine Stimme, gepr\u00e4gt von den eigenen Schriften. Eine Deutung, keine Aufnahme. Das Portr\u00e4t ist von KI gemalt.",
     "playIntro": "Intro abspielen",
     "pauseIntro": "Pause",
     "ideasHeading": "Die zwölf Ideen",
