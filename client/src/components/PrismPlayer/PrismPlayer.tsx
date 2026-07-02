@@ -773,7 +773,7 @@ export function PrismPlayer({ figure, seed, councilId, councilLevel = 1, languag
             >
               {getEchoShortName(subtitleState.figureId, tString) || mediaSessionTitle}
             </span>
-            <span className="ai-voice-chip">
+            <span className="ai-voice-chip ai-voice-chip--inline">
               {tString('aiDisclosure.voiceChip', 'AI voice, not a recording')}
             </span>
           </span>

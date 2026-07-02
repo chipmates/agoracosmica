@@ -119,7 +119,7 @@ export function LiveCouncilPlayer({ onClose }: LiveCouncilPlayerProps) {
             >
               {speakerName || tString('cosmicCouncil.livePlayer', 'Council in session')}
             </span>
-            <span className="ai-voice-chip">
+            <span className="ai-voice-chip ai-voice-chip--inline">
               {tString('aiDisclosure.voiceChip', 'AI voice, not a recording')}
             </span>
           </span>
