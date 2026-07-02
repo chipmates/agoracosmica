@@ -1022,6 +1022,46 @@
   text-align: center;
 }
 
+/* === Option C: single-action clickwrap footer (stays co-visible with the button) === */
+.modalFooter {
+  flex-shrink: 0;
+  padding: 1rem 2rem calc(1.25rem + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  border-top: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-20), transparent);
+  background: linear-gradient(to top,
+    color-mix(in srgb, var(--bg-cosmic-void) var(--a-95), transparent),
+    color-mix(in srgb, var(--bg-card) var(--a-60), transparent));
+}
+
+/* Conspicuous, not grey micro-print: real size + primary text color for AA contrast */
+.clickwrapStatement {
+  margin: 0;
+  max-width: 34rem;
+  text-align: center;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+.footerLinks {
+  margin: 0;
+  font-size: 0.8rem;
+  text-align: center;
+  color: var(--text-tertiary);
+}
+
+@media (max-width: 768px) {
+  .modalFooter {
+    padding: 0.875rem 1.5rem calc(1rem + env(safe-area-inset-bottom, 0px));
+  }
+  .clickwrapStatement {
+    font-size: 0.9375rem; /* 15px, keep it legible on the action line */
+  }
+}
+
 /* Print styles */
 @media print {
   .welcomeOverlay {

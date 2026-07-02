@@ -26,19 +26,18 @@ const WelcomeDisclosureModal: FC<WelcomeDisclosureModalProps> = ({ isOpen, onCom
   const { tString, tNode, language } = useTranslation();
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
   const [hasAnimated, setHasAnimated] = useState<boolean>(false);
-  const [ageConfirmed, setAgeConfirmed] = useState<boolean>(false);
-  const [termsAccepted, setTermsAccepted] = useState<boolean>(false);
-  const consentGiven = ageConfirmed && termsAccepted;
-  // Ad-measurement consent is asked once, as a non-blocking prompt on the
-  // marketing landing page (AdConsentPrompt), not here. The welcome step stays
-  // focused on the required age + terms acknowledgment.
+  // Single-action clickwrap (Option C): tapping the button IS the affirmative
+  // act (a 16+ self-declaration plus AGB inclusion under Sec 305 Abs 2 BGB). No
+  // checkbox is legally required for this non-consent acknowledgment, and the
+  // conspicuous statement sits directly above the button. Ad-measurement consent
+  // stays a separate non-blocking prompt on the landing page, not here.
 
   const overlayRef = useRef<HTMLDivElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
   const completedRef = useRef(false);
 
   const handleComplete = useCallback((): void => {
-    if (!consentGiven) return;
+    if (isAnimating) return;
     // Store consent in localStorage (technisch erforderlich, § 25 Abs. 2 Nr. 2 TDDDG).
     // A full or blocked storage must not trap the user on the welcome screen.
     try {
@@ -80,7 +79,7 @@ const WelcomeDisclosureModal: FC<WelcomeDisclosureModalProps> = ({ isOpen, onCom
     sendConversion('profile_created');
 
     setIsAnimating(true);
-  }, [consentGiven, language, tString]);
+  }, [isAnimating, language, tString]);
 
   const handleSkip = useCallback((): void => {
     onSkip();
@@ -246,60 +245,41 @@ const WelcomeDisclosureModal: FC<WelcomeDisclosureModalProps> = ({ isOpen, onCom
 
           </div>
 
-          {/* Legal consent — required before starting (scroll down to see) */}
-          <div className={styles.consentSection}>
-            <h3 className={styles.consentHeading}>{tNode('legal.consent.heading')}</h3>
-            <div className={styles.aiNotice} role="note">
-              <p>{tNode('legal.consent.aiNotice')}</p>
-            </div>
-
-            <label className={styles.checkboxLabel}>
-              <input
-                type="checkbox"
-                checked={ageConfirmed}
-                onChange={(e) => setAgeConfirmed(e.target.checked)}
-                className={styles.checkbox}
-              />
-              <span>{tNode('legal.consent.ageCheckbox')}</span>
-            </label>
-
-            <label className={styles.checkboxLabel}>
-              <input
-                type="checkbox"
-                checked={termsAccepted}
-                onChange={(e) => setTermsAccepted(e.target.checked)}
-                className={styles.checkbox}
-              />
-              <span>
-                {tNode('legal.consent.termsCheckbox')}{' '}
-                <a href="/nutzungsbedingungen" target="_blank" rel="noopener" className={styles.consentLink}>
-                  {tNode('legal.consent.termsLink')}
-                </a>
-                {tNode('legal.consent.termsCheckboxSuffix')}
-              </span>
-            </label>
-
-            <p className={styles.consentLinks}>
-              <a href={language === 'de' ? '/datenschutz' : '/privacy'} target="_blank" rel="noopener" className={styles.consentLink}>
-                {tNode('legal.consent.privacyNote')}
-              </a>
-              {' | '}
-              <a href="/impressum#jugendschutz" target="_blank" rel="noopener" className={styles.consentLink}>
-                {tNode('legal.consent.jsbNote')}
-              </a>
-            </p>
+          {/* AI transparency notice (short, names chat/stories/audio) */}
+          <div className={styles.aiNotice} role="note">
+            <p>{tNode('legal.consent.aiNotice')}</p>
           </div>
+        </div>
 
-          {/* Begin button — disabled until both checkboxes checked */}
-          <div className={styles.modalActions}>
-            <button
-              onClick={handleComplete}
-              className={`${styles.beginButton} ${isAnimating ? styles.animating : ''}`}
-              disabled={!consentGiven || isAnimating}
-            >
-              {tNode('legal.consent.startButton')}
-            </button>
-          </div>
+        {/* Single-action clickwrap footer (Option C). The statement renders
+            directly ABOVE the always-enabled button and stays co-visible with
+            it in this sticky footer, so the tap is an informed affirmative act
+            (16+ self-declaration + AGB inclusion, Sec 305 Abs 2 BGB). */}
+        <div className={styles.modalFooter}>
+          <p className={styles.clickwrapStatement} id="agc-clickwrap-notice">
+            {tNode('legal.consent.clickwrapPre')}{' '}
+            <a href="/nutzungsbedingungen" target="_blank" rel="noopener" className={styles.consentLink}>
+              {tNode('legal.consent.termsLink')}
+            </a>{' '}
+            {tNode('legal.consent.clickwrapMid')}
+          </p>
+          <button
+            onClick={handleComplete}
+            className={`${styles.beginButton} ${isAnimating ? styles.animating : ''}`}
+            disabled={isAnimating}
+            aria-describedby="agc-clickwrap-notice"
+          >
+            {tNode('legal.consent.startButton')}
+          </button>
+          <p className={styles.footerLinks}>
+            <a href={language === 'de' ? '/datenschutz' : '/privacy'} target="_blank" rel="noopener" className={styles.consentLink}>
+              {tNode('legal.consent.privacyNote')}
+            </a>
+            {' · '}
+            <a href="/impressum#jugendschutz" target="_blank" rel="noopener" className={styles.consentLink}>
+              {tNode('legal.consent.jsbNote')}
+            </a>
+          </p>
         </div>
       </div>
 

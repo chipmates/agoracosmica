@@ -1294,7 +1294,9 @@
     },
     "consent": {
       "heading": "Bevor du loslegst",
-      "aiNotice": "Die Persönlichkeiten hier sind KI-Interpretationen, nicht die echten historischen Menschen. Alles, was sie sagen, ob im Gespräch oder vorab erstellt, wird von künstlicher Intelligenz (KI) erzeugt und kann ungenau, unvollständig oder irreführend sein. Überprüfe wichtige Informationen immer anhand vertrauenswürdiger Primärquellen.",
+      "aiNotice": "Diese Persönlichkeiten sind KI-Interpretationen, nicht die echten Menschen. Was sie in Gesprächen, Geschichten und Audios sagen, ist KI-generiert und kann ungenau sein. Prüfe Wichtiges nach.",
+      "clickwrapPre": "Mit dem Tippen auf den Button unten stimmst du den",
+      "clickwrapMid": "zu und bist mindestens 16 Jahre alt.",
       "ageCheckbox": "Ich bestätige, dass ich mindestens 16 Jahre alt bin oder die Zustimmung eines Erziehungsberechtigten habe.",
       "termsCheckbox": "Ich habe die",
       "termsLink": "Nutzungsbedingungen",
