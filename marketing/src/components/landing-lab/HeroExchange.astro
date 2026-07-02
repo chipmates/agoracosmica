@@ -128,6 +128,11 @@ const portraitSrcset = `${MEDIA_URL}/images/figures/${FEATURED_ID}/thumbnail/160
 const portraitSizes = '(max-width: 900px) 64px, 88px';
 const figuresHref = publicUrl(lang, '/figures');
 const featuredHref = publicUrl(lang, `/figures/${figureIdToSlug[FEATURED_ID]}`);
+// App entries. The generic CTA keeps the H1's library promise; the ask link
+// carries the featured figure as intent (same slug-href + data-attr pair as
+// PublicCTA), so its clicker lands on Marcus after the gate, not the gallery.
+const appHref = `/app?lang=${lang}`;
+const askHref = `/app?figure=${figureIdToSlug[FEATURED_ID]}&lang=${lang}`;
 ---
 <section class="hx-hero" id="hx-hero" aria-labelledby="hx-title">
   <!-- static cosmic backdrop: tiled star fields, gold dust, vignette -->
@@ -146,7 +151,7 @@ const featuredHref = publicUrl(lang, `/figures/${figureIdToSlug[FEATURED_ID]}`);
       <p class="hx-lede">{copy.lede}</p>
       <p class="hx-trust">{copy.trust}</p>
       <div class="hx-actions">
-        <a href="/app" class="pub-cta__button hx-cta" data-agc-cta="start-exploring">
+        <a href={appHref} class="pub-cta__button hx-cta" data-agc-cta="start-exploring">
           {ctaLabel}
         </a>
         <p class="hx-free">{copy.free}</p>
@@ -198,7 +203,7 @@ const featuredHref = publicUrl(lang, `/figures/${figureIdToSlug[FEATURED_ID]}`);
             cardId="hx-card"
             label={copy.hearVoice}
           />
-          <a class="hx-asklink" href="/app" data-agc-cta="start-exploring">{copy.askYourself}</a>
+          <a class="hx-asklink" href={askHref} data-agc-cta="start-exploring" data-agc-figure={FEATURED_ID}>{copy.askYourself}</a>
         </footer>
 
         <p class="hx-caption">{copy.caption}</p>
