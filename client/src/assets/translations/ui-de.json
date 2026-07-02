@@ -1075,12 +1075,13 @@
     "doors": {
       "title": "Wie möchtest du mit {name} beginnen?",
       "storyTitle": "Fang mit der Geschichte an",
-      "storyBody": "Eine erzählte Szene aus einem Leben. Lehn dich zurück und hör zu.",
-      "storyMeta": "Rund 15 Minuten",
+      "storyBody": "Es beginnt mit einer erzählten Szene aus einem Leben. Du sprichst sie durch, hörst sie im Streitgespräch und machst sie dir zu eigen.",
+      "storyMeta": "Vier Kapitel. Das erste dauert rund 15 Minuten.",
       "talkTitle": "Frag einfach etwas",
-      "talkBody": "Offenes Gespräch mit dem Echo, über alles.",
+      "talkBody": "Kein Weg, keine Kapitel. Bring eine Frage mit, und das Echo antwortet.",
       "talkMeta": "Sofort. 30 kostenlose Nachrichten pro Tag.",
-      "allWays": "Alle sechs Wege ansehen"
+      "allWays": "Alle sechs Wege ansehen",
+      "arcEyebrow": "Der Lernweg · Kapitel 1 von 4"
     }
   },
   "processing": {

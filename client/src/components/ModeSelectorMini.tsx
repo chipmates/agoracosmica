@@ -80,25 +80,29 @@ const ModeSelectorMini: FC<ModeSelectorMiniProps> = ({
 
   const [visitedModes] = useState<string[]>(loadVisitedModes());
 
-  // First contact with this figure and seed: no mode visited, nothing
-  // completed, no free-talk history. Cold visitors then get two honest doors
-  // (the story with its time cost, or an open chat right now) instead of the
-  // full eclipse, which reads as a map once you know the place. "All six
-  // ways" reveals the eclipse, and any engagement ends first contact for good.
-  const hasFreeTalkHistory = !!(selectedFigure &&
-    LocalStorageAdapter.getString(STORAGE_KEYS.getFreeTalkHistory(selectedFigure.id)));
-  const anyModeTouched = visitedModes.length > 0 ||
-    ECLIPSE_MODES.some(m => {
-      if (!selectedFigure || !selectedSeed) return false;
-      switch (m.id) {
-        case 'introduction': return isStoryCompleted(selectedFigure.id, selectedSeed.id);
-        case 'prism': return isPrismCompleted(selectedFigure.id, selectedSeed.id);
-        case 'seed_conversation': return !!LocalStorageAdapter.getString(STORAGE_KEYS.getStarSeedHistory(selectedFigure.id, selectedSeed.id));
-        case 'challenge': return !!LocalStorageAdapter.getString(STORAGE_KEYS.getChallengeHistory(selectedFigure.id, selectedSeed.id));
-        default: return false;
-      }
-    });
-  const isFirstContact = !anyModeTouched && !hasFreeTalkHistory;
+  // First contact is per FIGURE, not per seed: the doors are a one-time
+  // welcome ceremony. A returning visitor who picks a fresh seed from the
+  // wisdom map or the seeds modal has already met the figure and goes
+  // straight to the eclipse. Engagement leaves per-seed keys behind
+  // (visited modes, story/prism completions, starseed and challenge
+  // history, free talk), so one prefix scan over local keys answers
+  // "has this visitor ever engaged with this figure" across all seeds
+  // and all entry paths.
+  const isFirstContact = (() => {
+    if (!selectedFigure) return false;
+    const fId = selectedFigure.id;
+    if (LocalStorageAdapter.getString(STORAGE_KEYS.getFreeTalkHistory(fId))) return false;
+    const engagedPrefixes = [
+      `visitedModes_${fId}_`,
+      `starseed_${fId}_`,
+      `challenge_${fId}_`,
+      `story_${fId}_`,
+      `prism_${fId}_`,
+    ];
+    return !LocalStorageAdapter.keys().some(k =>
+      engagedPrefixes.some(prefix => k.startsWith(prefix))
+    );
+  })();
   const [showAllWays, setShowAllWays] = useState<boolean>(false);
 
   const [animatingOut, setAnimatingOut] = useState<boolean>(false);
@@ -293,18 +297,30 @@ const ModeSelectorMini: FC<ModeSelectorMiniProps> = ({
             <div className="doors-row">
               <button className="doors-door doors-door--story" onClick={() => handleModeSelect('introduction')}>
                 <Books size={30} weight="duotone" className="doors-door-icon" />
-                <span className="doors-door-eyebrow">
-                  {tString('modes.selector.chapterLabel', 'Chapter')} 1 · {tString('modes.selector.story.title', 'Story')}
-                </span>
+                <span className="doors-door-eyebrow">{tString('modes.doors.arcEyebrow', 'The learning arc · Chapter 1 of 4')}</span>
                 <span className="doors-door-name">{tString('modes.doors.storyTitle', 'Begin the story')}</span>
-                <span className="doors-door-body">{tString('modes.doors.storyBody', 'A narrated scene from a life. Lean back and listen.')}</span>
-                <span className="doors-door-meta">{tString('modes.doors.storyMeta', 'Around 15 minutes')}</span>
+                <span className="doors-door-body">{tString('modes.doors.storyBody', 'It starts with a narrated scene from a life. You talk it through, hear it debated, then make it yours.')}</span>
+                {/* The arc, legible at a glance: four chapter glyphs, the
+                    first one lit. Decorative, the eyebrow and body carry the
+                    same information as text. */}
+                <span className="doors-arc" aria-hidden="true">
+                  {ECLIPSE_MODES.map((m, i) => {
+                    const StepIcon = m.icon;
+                    return (
+                      <span key={m.id} className={`doors-arc-step${i === 0 ? ' doors-arc-step--now' : ''}`}>
+                        <StepIcon size={14} weight="duotone" />
+                        <span className="doors-arc-step-label">{tString(m.titleKey)}</span>
+                      </span>
+                    );
+                  })}
+                </span>
+                <span className="doors-door-meta">{tString('modes.doors.storyMeta', 'Four chapters. The first takes around 15 minutes.')}</span>
               </button>
               <button className="doors-door doors-door--talk" onClick={() => handleModeSelect('free_conversation')}>
                 <Bird size={30} weight="duotone" className="doors-door-icon" />
                 <span className="doors-door-eyebrow">{tString('modes.selector.freetalk.title', 'Free Talk')}</span>
                 <span className="doors-door-name">{tString('modes.doors.talkTitle', 'Just ask something')}</span>
-                <span className="doors-door-body">{tString('modes.doors.talkBody', 'Open conversation with the Echo, about anything.')}</span>
+                <span className="doors-door-body">{tString('modes.doors.talkBody', 'No path, no chapters. Bring a question and the Echo answers.')}</span>
                 <span className="doors-door-meta">{tString('modes.doors.talkMeta', 'Right now. 30 free messages a day.')}</span>
               </button>
             </div>

@@ -1073,12 +1073,13 @@
     "doors": {
       "title": "How do you want to start with {name}?",
       "storyTitle": "Begin the story",
-      "storyBody": "A narrated scene from a life. Lean back and listen.",
-      "storyMeta": "Around 15 minutes",
+      "storyBody": "It starts with a narrated scene from a life. You talk it through, hear it debated, then make it yours.",
+      "storyMeta": "Four chapters. The first takes around 15 minutes.",
       "talkTitle": "Just ask something",
-      "talkBody": "Open conversation with the Echo, about anything.",
+      "talkBody": "No path, no chapters. Bring a question and the Echo answers.",
       "talkMeta": "Right now. 30 free messages a day.",
-      "allWays": "See all six ways"
+      "allWays": "See all six ways",
+      "arcEyebrow": "The learning arc · Chapter 1 of 4"
     }
   },
   "processing": {

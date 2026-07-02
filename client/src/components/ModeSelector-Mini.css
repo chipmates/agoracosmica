@@ -1183,3 +1183,48 @@
     transform: none;
   }
 }
+
+/* The arc made legible inside the story door: four chapter glyphs joined by
+   hairlines, chapter 1 lit. Decorative only, the eyebrow and body carry the
+   same information as text. */
+.doors-arc {
+  display: flex;
+  justify-content: center;
+  margin-top: 0.4rem;
+}
+
+.doors-arc-step {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.22rem;
+  padding: 0 0.7rem;
+  color: color-mix(in srgb, var(--text-tertiary) 80%, transparent);
+}
+
+.doors-arc-step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 7px;
+  right: -7px;
+  width: 14px;
+  height: 1px;
+  background: color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+}
+
+.doors-arc-step--now {
+  color: var(--gold-primary);
+}
+
+.doors-arc-step--now svg {
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--gold-subtle) 60%, transparent));
+}
+
+.doors-arc-step-label {
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
