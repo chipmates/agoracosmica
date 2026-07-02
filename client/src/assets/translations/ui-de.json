@@ -1071,6 +1071,16 @@
         "title": "Quest",
         "description": "5-Fragen-Challenge • Teste dein Verständnis"
       }
+    },
+    "doors": {
+      "title": "Wie möchtest du mit {name} beginnen?",
+      "storyTitle": "Fang mit der Geschichte an",
+      "storyBody": "Eine erzählte Szene aus einem Leben. Lehn dich zurück und hör zu.",
+      "storyMeta": "Rund 15 Minuten",
+      "talkTitle": "Frag einfach etwas",
+      "talkBody": "Offenes Gespräch mit dem Echo, über alles.",
+      "talkMeta": "Sofort. 30 kostenlose Nachrichten pro Tag.",
+      "allWays": "Alle sechs Wege ansehen"
     }
   },
   "processing": {

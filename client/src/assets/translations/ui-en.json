@@ -1069,6 +1069,16 @@
         "title": "Quest",
         "description": "5-question challenge • Test your understanding"
       }
+    },
+    "doors": {
+      "title": "How do you want to start with {name}?",
+      "storyTitle": "Begin the story",
+      "storyBody": "A narrated scene from a life. Lean back and listen.",
+      "storyMeta": "Around 15 minutes",
+      "talkTitle": "Just ask something",
+      "talkBody": "Open conversation with the Echo, about anything.",
+      "talkMeta": "Right now. 30 free messages a day.",
+      "allWays": "See all six ways"
     }
   },
   "processing": {

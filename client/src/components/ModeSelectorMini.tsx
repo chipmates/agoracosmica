@@ -80,6 +80,27 @@ const ModeSelectorMini: FC<ModeSelectorMiniProps> = ({
 
   const [visitedModes] = useState<string[]>(loadVisitedModes());
 
+  // First contact with this figure and seed: no mode visited, nothing
+  // completed, no free-talk history. Cold visitors then get two honest doors
+  // (the story with its time cost, or an open chat right now) instead of the
+  // full eclipse, which reads as a map once you know the place. "All six
+  // ways" reveals the eclipse, and any engagement ends first contact for good.
+  const hasFreeTalkHistory = !!(selectedFigure &&
+    LocalStorageAdapter.getString(STORAGE_KEYS.getFreeTalkHistory(selectedFigure.id)));
+  const anyModeTouched = visitedModes.length > 0 ||
+    ECLIPSE_MODES.some(m => {
+      if (!selectedFigure || !selectedSeed) return false;
+      switch (m.id) {
+        case 'introduction': return isStoryCompleted(selectedFigure.id, selectedSeed.id);
+        case 'prism': return isPrismCompleted(selectedFigure.id, selectedSeed.id);
+        case 'seed_conversation': return !!LocalStorageAdapter.getString(STORAGE_KEYS.getStarSeedHistory(selectedFigure.id, selectedSeed.id));
+        case 'challenge': return !!LocalStorageAdapter.getString(STORAGE_KEYS.getChallengeHistory(selectedFigure.id, selectedSeed.id));
+        default: return false;
+      }
+    });
+  const isFirstContact = !anyModeTouched && !hasFreeTalkHistory;
+  const [showAllWays, setShowAllWays] = useState<boolean>(false);
+
   const [animatingOut, setAnimatingOut] = useState<boolean>(false);
   const modalRef = useRef<HTMLDivElement>(null);
 
@@ -128,6 +149,7 @@ const ModeSelectorMini: FC<ModeSelectorMiniProps> = ({
   useEffect(() => {
     if (isOpen) {
       setAnimatingOut(false);
+      setShowAllWays(false);
       isClosingRef.current = false;
     }
   }, [isOpen, selectedMode]);
@@ -240,6 +262,58 @@ const ModeSelectorMini: FC<ModeSelectorMiniProps> = ({
       />
 
       <div className="mode-selector-content-wrapper">
+        {isFirstContact && !showAllWays ? (
+          /* The threshold: first contact with this figure. Two honest doors
+             with their real costs (a 15 minute listen, or a chat right now),
+             the full eclipse one tap away. Any engagement ends first contact,
+             so returners always get the map directly. */
+          <div className="doors">
+            {selectedFigure && (
+              <div className="doors-portrait" aria-hidden="true">
+                <OptimizedFigureImage
+                  figure={selectedFigure}
+                  type="thumbnail"
+                  className="doors-portrait-img"
+                  alt=""
+                  width={112}
+                  height={112}
+                />
+                <div className="doors-portrait-glow" />
+              </div>
+            )}
+            <h2 id="mode-selector-title" className="doors-title">
+              {tString('modes.doors.title', 'How do you want to start with {name}?')
+                .replace('{name}', selectedFigure?.name || 'this Echo')}
+            </h2>
+            {selectedSeed?.title && (
+              <p className="doors-seed">
+                {String(selectedSeed.id).includes('-') ? String(selectedSeed.id).split('-')[1] : selectedSeed.id}. {selectedSeed.title}
+              </p>
+            )}
+            <div className="doors-row">
+              <button className="doors-door doors-door--story" onClick={() => handleModeSelect('introduction')}>
+                <Books size={30} weight="duotone" className="doors-door-icon" />
+                <span className="doors-door-eyebrow">
+                  {tString('modes.selector.chapterLabel', 'Chapter')} 1 · {tString('modes.selector.story.title', 'Story')}
+                </span>
+                <span className="doors-door-name">{tString('modes.doors.storyTitle', 'Begin the story')}</span>
+                <span className="doors-door-body">{tString('modes.doors.storyBody', 'A narrated scene from a life. Lean back and listen.')}</span>
+                <span className="doors-door-meta">{tString('modes.doors.storyMeta', 'Around 15 minutes')}</span>
+              </button>
+              <button className="doors-door doors-door--talk" onClick={() => handleModeSelect('free_conversation')}>
+                <Bird size={30} weight="duotone" className="doors-door-icon" />
+                <span className="doors-door-eyebrow">{tString('modes.selector.freetalk.title', 'Free Talk')}</span>
+                <span className="doors-door-name">{tString('modes.doors.talkTitle', 'Just ask something')}</span>
+                <span className="doors-door-body">{tString('modes.doors.talkBody', 'Open conversation with the Echo, about anything.')}</span>
+                <span className="doors-door-meta">{tString('modes.doors.talkMeta', 'Right now. 30 free messages a day.')}</span>
+              </button>
+            </div>
+            <button className="doors-allways" onClick={() => setShowAllWays(true)}>
+              {tString('modes.doors.allWays', 'See all six ways')} →
+            </button>
+          </div>
+        ) : (
+        <>
         {/* Freetalk card — top billing, separate from chapter system */}
           <div className="mode-selector-header">
             <button
@@ -371,6 +445,8 @@ const ModeSelectorMini: FC<ModeSelectorMiniProps> = ({
               </button>
             ))}
           </div>
+        </>
+        )}
       </div>
     </div>,
     document.body

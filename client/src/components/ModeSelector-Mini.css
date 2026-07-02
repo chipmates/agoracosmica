@@ -921,3 +921,265 @@
     transform: none;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════════════
+   The threshold: first-contact doors. Shown instead of the eclipse the
+   first time a visitor meets a figure. Two honest doors with their real
+   costs, the full eclipse one tap behind. The story door glows like a lit
+   reading room, the talk door like open night sky.
+   ══════════════════════════════════════════════════════════════════════ */
+
+.doors {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  width: min(760px, calc(100vw - 2.5rem));
+  min-height: min(620px, calc(100vh - 5rem));
+  margin: 0 auto;
+  padding: 0.75rem 0 0.5rem;
+  text-align: center;
+}
+
+.doors-portrait {
+  position: relative;
+  width: 112px;
+  height: 112px;
+  margin-bottom: 0.35rem;
+}
+
+.doors-portrait img,
+.doors-portrait-img {
+  width: 112px;
+  height: 112px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid color-mix(in srgb, var(--gold-subtle) 55%, transparent);
+  box-shadow: 0 0 32px color-mix(in srgb, var(--gold-subtle) 28%, transparent);
+}
+
+.doors-portrait-glow {
+  position: absolute;
+  inset: -14px;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    color-mix(in srgb, var(--gold-subtle) 22%, transparent) 0%,
+    transparent 65%);
+  pointer-events: none;
+  animation: doors-breathe 4.5s ease-in-out infinite;
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .doors-portrait-glow {
+    animation-play-state: running;
+  }
+}
+
+@keyframes doors-breathe {
+  0%, 100% { opacity: 0.55; transform: scale(1); }
+  50%      { opacity: 1; transform: scale(1.06); }
+}
+
+.doors-title {
+  margin: 0;
+  font-family: var(--font-content, 'Libre Caslon Text', serif);
+  font-size: clamp(1.3rem, 3.6vw, 1.75rem);
+  font-weight: 400;
+  line-height: 1.3;
+  color: var(--text-primary);
+}
+
+.doors-seed {
+  margin: 0;
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: var(--text-sm, 0.875rem);
+  color: var(--text-tertiary);
+}
+
+.doors-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.1rem;
+  width: 100%;
+  margin-top: 1.4rem;
+}
+
+.doors-door {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 252px;
+  padding: 1.9rem 1.4rem 1.4rem;
+  border-radius: var(--radius-lg, 0.75rem);
+  cursor: pointer;
+  text-align: center;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .doors-door {
+    animation: doors-rise 0.45s ease-out both;
+  }
+  .doors-door--talk {
+    animation-delay: 0.08s;
+  }
+  .doors-allways {
+    animation: doors-rise 0.45s ease-out both;
+    animation-delay: 0.16s;
+  }
+}
+
+@keyframes doors-rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.doors-door--story {
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 50%, transparent);
+  background:
+    radial-gradient(120% 90% at 50% 0%,
+      color-mix(in srgb, var(--gold-subtle) 24%, transparent) 0%,
+      transparent 62%),
+    radial-gradient(90% 40% at 50% 108%,
+      color-mix(in srgb, var(--gold-subtle) 14%, transparent) 0%,
+      transparent 70%),
+    color-mix(in srgb, var(--bg-deep-space-darker) 72%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--gold-subtle) 35%, transparent);
+}
+
+.doors-door--talk {
+  border: 1px solid color-mix(in srgb, var(--star-blue-light) 45%, transparent);
+  background:
+    radial-gradient(120% 90% at 50% 0%,
+      color-mix(in srgb, var(--star-blue-light) 20%, transparent) 0%,
+      transparent 62%),
+    radial-gradient(1.5px 1.5px at 22% 34%, color-mix(in srgb, var(--star-blue-light) 80%, transparent) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 78% 26%, color-mix(in srgb, var(--star-blue-light) 65%, transparent) 50%, transparent 51%),
+    radial-gradient(1px 1px at 64% 58%, color-mix(in srgb, var(--star-blue-light) 60%, transparent) 50%, transparent 51%),
+    radial-gradient(1px 1px at 34% 72%, color-mix(in srgb, var(--star-blue-light) 55%, transparent) 50%, transparent 51%),
+    color-mix(in srgb, var(--bg-deep-space-darker) 72%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--star-blue-light) 30%, transparent);
+}
+
+.doors-door:hover,
+.doors-door:focus-visible {
+  transform: translateY(-4px);
+}
+
+.doors-door--story:hover,
+.doors-door--story:focus-visible {
+  border-color: var(--gold-hover);
+  box-shadow: 0 10px 34px color-mix(in srgb, var(--gold-subtle) 26%, transparent);
+}
+
+.doors-door--talk:hover,
+.doors-door--talk:focus-visible {
+  border-color: color-mix(in srgb, var(--star-blue-light) 80%, var(--text-primary));
+  box-shadow: 0 10px 34px color-mix(in srgb, var(--star-blue-light) 22%, transparent);
+}
+
+.doors-door-icon {
+  width: 38px;
+  height: 38px;
+  margin-bottom: 0.2rem;
+}
+
+.doors-door--story .doors-door-icon {
+  color: var(--gold-primary);
+}
+
+.doors-door--talk .doors-door-icon {
+  color: var(--star-blue-light);
+}
+
+.doors-door-eyebrow {
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.doors-door-name {
+  font-family: var(--font-content, 'Libre Caslon Text', serif);
+  font-size: 1.35rem;
+  line-height: 1.25;
+}
+
+.doors-door--story .doors-door-name {
+  color: var(--gold-primary);
+}
+
+.doors-door--talk .doors-door-name {
+  color: var(--star-blue-light);
+}
+
+.doors-door-body {
+  max-width: 30ch;
+  font-size: var(--text-sm, 0.9rem);
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+.doors-door-meta {
+  margin-top: auto;
+  padding-top: 0.5rem;
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.8rem;
+  color: var(--text-tertiary);
+}
+
+.doors-allways {
+  min-height: 44px;
+  margin-top: 0.75rem;
+  padding: 0 0.75rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: var(--text-sm, 0.875rem);
+  color: var(--gold-primary);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  transition: color 0.2s ease;
+}
+
+.doors-allways:hover,
+.doors-allways:focus-visible {
+  color: var(--gold-hover);
+}
+
+@media (max-width: 640px) {
+  .doors-portrait,
+  .doors-portrait img,
+  .doors-portrait-img {
+    width: 88px;
+    height: 88px;
+  }
+  .doors-row {
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+  }
+  .doors-door {
+    min-height: 0;
+    padding: 1.15rem 1rem 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .doors-door,
+  .doors-allways,
+  .doors-portrait-glow {
+    animation: none !important;
+  }
+  .doors-door:hover,
+  .doors-door:focus-visible {
+    transform: none;
+  }
+}
