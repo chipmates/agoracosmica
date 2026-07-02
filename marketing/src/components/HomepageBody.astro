@@ -630,6 +630,31 @@ const deQuestions = [
     margin-top: 0.5rem;
   }
 
+  /* Mobile: the 30-card figure grid stacked vertically was a ~17-screen wall
+     that buried the questions, council, FAQ, and trust sections beyond screen
+     22 of 28. Turn it into one horizontally swipeable row: every card (and
+     link) stays in the DOM, the section shrinks to about one screen, and the
+     next card peeks in from the right so the swipe explains itself. Desktop
+     keeps the 3-column grid. */
+  @media (max-width: 640px) {
+    .pub-home .pub-grid--3 {
+      grid-auto-flow: column;
+      grid-template-columns: none;
+      grid-auto-columns: 78%;
+      overflow-x: auto;
+      scroll-snap-type: x proximity;
+      padding: 0.25rem 0.25rem 1rem;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .pub-home .pub-grid--3::-webkit-scrollbar {
+      display: none;
+    }
+    .pub-home .pub-grid--3 > * {
+      scroll-snap-align: center;
+    }
+  }
+
   /* volume stat band a touch more separated from the prose above it */
   .ll2-volume {
     margin-top: 2rem;
