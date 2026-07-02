@@ -93,6 +93,12 @@ export function getLibraryModes(lang: 'en' | 'de'): LibMode[] {
       src: `${MEDIA_URL}/images/figures/${p.id}/thumbnail/160.webp`,
     }));
 
+  // Every panel teaches through the featured figure, so every app entry
+  // carries him as intent (slug href, same pair as PublicCTA plus the
+  // island's data attributes). A new-tab open or the post-gate router then
+  // lands the visitor with Marcus instead of the generic gallery.
+  const appHref = `/app?figure=${figureIdToSlug[FEATURED_ID]}&lang=${lang}`;
+
   return [
     // ── The learning arc: story → wisdom → prism → quest ──────────────────
     {
@@ -124,7 +130,7 @@ export function getLibraryModes(lang: 'en' | 'de'): LibMode[] {
       title: wisdomConcept ? wisdomConcept.term : t.wisdom.title!,
       body: t.wisdom.body!,
       scale: t.wisdom.scale,
-      linkHref: '/app',
+      linkHref: appHref,
       linkLabel: t.wisdom.linkLabel,
     },
     {
@@ -152,7 +158,7 @@ export function getLibraryModes(lang: 'en' | 'de'): LibMode[] {
       playLabel: t.prism.playLabel,
       scale: t.prism.scale,
       disclosure: t.prism.disclosure,
-      linkHref: '/app',
+      linkHref: appHref,
       linkLabel: t.prism.linkLabel,
     },
     {
@@ -164,7 +170,7 @@ export function getLibraryModes(lang: 'en' | 'de'): LibMode[] {
       kicker: t.quest.kicker,
       title: t.quest.title!,
       body: t.quest.body!,
-      linkHref: '/app',
+      linkHref: appHref,
       linkLabel: t.quest.linkLabel,
     },
     // ── Go further: council + free talk ───────────────────────────────────
@@ -195,7 +201,7 @@ export function getLibraryModes(lang: 'en' | 'de'): LibMode[] {
       title: t.freetalk.title!,
       body: t.freetalk.body!,
       scale: t.freetalk.scale,
-      linkHref: '/app',
+      linkHref: appHref,
       linkLabel: t.freetalk.linkLabel,
     },
   ];
