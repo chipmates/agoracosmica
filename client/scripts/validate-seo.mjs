@@ -114,6 +114,10 @@ for (const f of files) {
   const body = decode(html.replace(/<script[\s\S]*?<\/script>/g, ''));
   if (/—(?!\s+[A-ZÄÖÜ])/.test(body)) warn.push(`${rel}: non-attribution em-dash in body text`);
 
+  // Visible body TEXT (tags stripped), shared by the content-presence guards
+  // below. Hydration props="{…}" blobs and JSON-LD do not count as text.
+  const text = body.replace(/<[^>]+>/g, ' ');
+
   // 10. Homepage content-presence guard. The six ways moved from a static card
   //     grid into the interactive LibraryShowcase, whose six panels are all
   //     server-rendered. Assert every mode name + the volume band survive in
@@ -126,10 +130,76 @@ for (const f of files) {
     'de/index.html': ['Story', 'Weisheit', 'Prisma', 'Quest', 'Council', 'Free Talk', '360', '110'],
   };
   if (HOMEPAGE_TERMS[rel]) {
-    const text = body.replace(/<[^>]+>/g, ' ');
     for (const term of HOMEPAGE_TERMS[rel])
       if (!text.includes(term)) hard.push(`${rel}: homepage missing crawlable text "${term}" (six-ways content regression?)`);
   }
+
+  // 11. AI-disclosure invariants (the 2026-07 Art-50 transparency revision).
+  //     Codified so a copy rewrite can't silently strip the disclosure surface.
+  const isDe = rel.startsWith('de/');
+  const isFigureDetail = /^(de\/)?figures\/[^/]+\/index\.html$/.test(rel);
+  const isThemeDetail = /^(de\/)?themes\/[^/]+\/index\.html$/.test(rel);
+
+  // 11a. Every figure detail page, theme detail page, and hub page names the
+  //      AI nature in crawlable body text ("AI Echo" / "AI-generated" and the
+  //      DE equivalents, incl. the "KI-erzeugt" variant used in the notice
+  //      copy). Theme pages carry it via EchoNote, hubs via their L2 lines.
+  const HUB_PAGES = new Set([
+    'ai-philosophy-tutor/index.html', 'de/philosophie-lernen/index.html',
+    'learn-from-historical-figures/index.html', 'de/von-historischen-persoenlichkeiten-lernen/index.html',
+    'open-source-philosophy-app/index.html', 'de/open-source-philosophy-app/index.html',
+  ]);
+  if (isFigureDetail || isThemeDetail || HUB_PAGES.has(rel)) {
+    const aiWord = isDe ? /KI-Echo|KI-generiert|KI-erzeugt|KI-Stimme/ : /AI Echo|AI-generated|AI voice/;
+    if (!aiWord.test(text)) hard.push(`${rel}: page has no AI disclosure in visible body text`);
+  }
+
+  // 11b. Share-card alt text labels the portrait as AI-generated on figure +
+  //      theme detail pages, so the disclosure travels with the artifact
+  //      off-platform.
+  if (isFigureDetail || isThemeDetail) {
+    const prefix = isDe ? 'KI-generiertes Porträt:' : 'AI-generated portrait:';
+    const am = html.match(/<meta property="og:image:alt" content="([^"]*)"/);
+    if (!am) hard.push(`${rel}: missing og:image:alt`);
+    else if (!decode(am[1]).startsWith(prefix))
+      hard.push(`${rel}: og:image:alt must start with "${prefix}" (got "${decode(am[1])}")`);
+  }
+
+  // 11c. Figure JSON-LD keeps the disambiguatingDescription that separates the
+  //      AI Echo from the real Wikidata person.
+  if (isFigureDetail && !html.includes('"disambiguatingDescription"'))
+    hard.push(`${rel}: figure JSON-LD missing "disambiguatingDescription"`);
+
+  // 11d. The entry pages (home + both catalogs, EN + DE) each carry at least
+  //      one disclosure line in visible text. Matched against the disclosure
+  //      vocabulary, not one exact phrase: home + themes say "AI Echo", the
+  //      figures catalog's EchoNote says "AI voice" / "AI-generated images".
+  const DISCLOSURE_PAGES = new Set([
+    'index.html', 'de/index.html',
+    'figures/index.html', 'de/figures/index.html',
+    'themes/index.html', 'de/themes/index.html',
+  ]);
+  if (DISCLOSURE_PAGES.has(rel)) {
+    const disclosure = isDe
+      ? /KI-Echo|KI-Stimme|KI-generiert|KI-erzeugt/
+      : /AI Echo|AI voice|AI-generated/;
+    if (!disclosure.test(text)) hard.push(`${rel}: missing AI disclosure line in visible text`);
+  }
+}
+
+// 12. Terms-of-service pair: both language versions published, both carrying
+//     the version string that the in-app consent record points at, and the EN
+//     convenience translation naming the German text as the binding one.
+const TERMS_PAGES = [
+  { rel: 'terms/index.html', mustContain: ['Version 1.0.0', 'legally binding'] },
+  { rel: 'nutzungsbedingungen/index.html', mustContain: ['Version 1.0.0'] },
+];
+for (const { rel, mustContain } of TERMS_PAGES) {
+  const p = join(DIST, rel);
+  if (!existsSync(p)) { hard.push(`${rel}: page missing from build`); continue; }
+  const page = decode(readFileSync(p, 'utf8'));
+  for (const s of mustContain)
+    if (!page.includes(s)) hard.push(`${rel}: missing required text "${s}"`);
 }
 
 console.log(`validate-seo: checked ${files.length} built pages.`);
