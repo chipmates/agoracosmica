@@ -338,6 +338,7 @@ const MainContent: FC<MainContentProps> = ({
                         storyData={storyData as any}
                         onComplete={() => handleSeedComplete(selectedSeed?.id)}
                         onError={(err: Error) => setError(err.message)}
+                        onTalkChapter2={() => handleQuickAction('seeds')}
                         selectedSeed={selectedSeed ?? undefined}
                       />
                     </Suspense>

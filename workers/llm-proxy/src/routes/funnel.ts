@@ -40,6 +40,9 @@ const VALID_STEPS = new Set([
   'figure_selected',
   'mode_selected',
   'first_reply',
+  // Wave 3: listen-to-talk handoff, per-occurrence volume counters
+  'handoff_shown',
+  'handoff_taken',
 ]);
 
 // Outcome slot (blob5): same role as status/type elsewhere. Steps without a

@@ -6,11 +6,13 @@ import { useTranslation } from '../hooks/useTranslation';
 import { Headphones, Info, CaretDown, CaretUp, Play, TrendUp, Trophy, Sparkle, BookOpen, BookBookmark, CheckCircle, Scroll } from '@phosphor-icons/react';
 import StoryAudioPlayer from './StoryAudioPlayer';
 import AudioLibraryModal from './AudioLibrary/AudioLibraryModal';
+import Button from './Button/Button';
 import HelperPopup from './HelperPopup/HelperPopup';
 import { StoryFactCheckPanel } from './FactCheck';
 import { ForewordModal } from './Foreword';
 import { figureHasForeword } from '../hooks/useForeword';
 import useStoryHighlighting from '../hooks/useStoryHighlighting';
+import { sendFunnelBeacon } from '../utils/funnelBeacon';
 import { Seed } from '../types/global';
 // Manifest no longer needed - using direct path construction
 // SimpleBar removed - using native CSS scrollbar system from index.css
@@ -35,6 +37,10 @@ interface StoryPlayerProps {
   storyData: StoryData;
   onComplete?: () => void;
   onError?: (error: Error) => void;
+  /** Chapter-2 handoff: when set, a card appears at story completion offering
+   *  to talk the same seed through (seed_conversation). Omit on hidden
+   *  audio-only instances so the card and its beacons stay silent. */
+  onTalkChapter2?: () => void;
   selectedSeed?: Seed;
   style?: React.CSSProperties;
 }
@@ -107,6 +113,7 @@ const StoryPlayer: FC<StoryPlayerProps> = ({
   storyData,
   onComplete,
   onError,
+  onTalkChapter2,
   selectedSeed,
   style
 }) => {
@@ -155,6 +162,29 @@ const StoryPlayer: FC<StoryPlayerProps> = ({
     setAudioIsPlaying(playing);
   }, []);
 
+  // Chapter-2 handoff: the story's end is the most engaged moment a visitor
+  // has, and it used to end into silence. When the story completes (audio
+  // finished or read to the bottom), offer one tap into the same seed's talk
+  // chapter. Population-level beacons only, and only on instances that were
+  // given the handoff callback (the hidden audio-only twin stays silent).
+  const [handoffReady, setHandoffReady] = useState<boolean>(false);
+  const [handoffDismissed, setHandoffDismissed] = useState<boolean>(false);
+  const handoffBeaconRef = useRef(false);
+
+  const handleCompletion = useCallback(() => {
+    if (onTalkChapter2 && !handoffBeaconRef.current) {
+      handoffBeaconRef.current = true;
+      setHandoffReady(true);
+      sendFunnelBeacon('handoff_shown', { figureId: figure, mode: 'story' });
+    }
+    onComplete?.();
+  }, [onComplete, onTalkChapter2, figure]);
+
+  const handleHandoffTake = useCallback(() => {
+    sendFunnelBeacon('handoff_taken', { figureId: figure, mode: 'story' });
+    onTalkChapter2?.();
+  }, [onTalkChapter2, figure]);
+
   // Track whether story has been fully read (scrolled to bottom)
   const storyReadRef = useRef(false);
   const handleStoryScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
@@ -163,9 +193,9 @@ const StoryPlayer: FC<StoryPlayerProps> = ({
     // Consider "read" when user is within 50px of the bottom
     if (el.scrollHeight - el.scrollTop - el.clientHeight < 50) {
       storyReadRef.current = true;
-      onComplete?.();
+      handleCompletion();
     }
-  }, [onComplete]);
+  }, [handleCompletion]);
 
   // Check if figure has foreword
   const hasForeword = figureHasForeword(figure);
@@ -656,7 +686,7 @@ const StoryPlayer: FC<StoryPlayerProps> = ({
               key={`audio-${playerKey}-${language}`}
               audioUrl={audioUrl ?? ''}
               isPrerecorded={true}
-              onPlaybackComplete={onComplete}
+              onPlaybackComplete={handleCompletion}
               onError={onError}
               triggerPlayHighlight={triggerPlayHighlight}
               onTimeUpdate={handleTimeUpdate}
@@ -693,6 +723,29 @@ const StoryPlayer: FC<StoryPlayerProps> = ({
             <button className="story-resume-banner__dismiss" onClick={handleResumeDismiss} aria-label="Dismiss">
               ×
             </button>
+          </div>
+        )}
+
+        {/* Chapter-2 handoff — appears once the story completes (audio ended
+            or read to the bottom) and stays visible above the transcript.
+            One tap continues the same seed as a conversation. */}
+        {handoffReady && !handoffDismissed && onTalkChapter2 && (
+          <div className="story-handoff" role="group" aria-label={tString('storyPlayer.handoffCta', 'Begin the conversation')}>
+            <p className="story-handoff__eyebrow">
+              {tString('modes.selector.chapterLabel', 'Chapter')} 2 · {tString('modes.selector.wisdom.title', 'Wisdom')}
+            </p>
+            <p className="story-handoff__title">
+              {tString('storyPlayer.handoffTitle', 'Talk it through with {name}').replace('{name}', figureName || 'this Echo')}
+            </p>
+            <p className="story-handoff__body">{tNode('storyPlayer.handoffBody')}</p>
+            <div className="story-handoff__actions">
+              <Button variant="gold" size="medium" onClick={handleHandoffTake}>
+                {tNode('storyPlayer.handoffCta')}
+              </Button>
+              <button className="story-handoff__later" onClick={() => setHandoffDismissed(true)}>
+                {tNode('storyPlayer.handoffDismiss')}
+              </button>
+            </div>
           </div>
         )}
 

@@ -1252,7 +1252,11 @@
     "learnMoreLink": "Mehr erfahren",
     "continueListening": "Weiterhören, wo du aufgehört hast?",
     "resume": "Fortsetzen",
-    "jumpToParagraph": "Zu Absatz {number} springen"
+    "jumpToParagraph": "Zu Absatz {number} springen",
+    "handoffTitle": "Sprich es mit {name} durch",
+    "handoffBody": "Du hast die Geschichte gehört. Nimm mit ins Gespräch, was dich nicht loslässt.",
+    "handoffCta": "Gespräch beginnen",
+    "handoffDismiss": "Später"
   },
   "prismPlayer": {
     "loading": "Prisma wird geladen...",

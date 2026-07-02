@@ -28,7 +28,12 @@ export type FunnelStep =
   | 'first_turn'
   | 'figure_selected'
   | 'mode_selected'
-  | 'first_reply';
+  | 'first_reply'
+  // Wave 3: listen-to-talk handoff (per-occurrence volume counters, like
+  // figure_selected). shown = the card appeared at content completion,
+  // taken = the visitor tapped through into the talk chapter.
+  | 'handoff_shown'
+  | 'handoff_taken';
 
 export type CinematicOutcome = 'watched' | 'skipped';
 

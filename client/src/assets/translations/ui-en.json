@@ -1250,7 +1250,11 @@
     "learnMoreLink": "Learn more",
     "continueListening": "Continue where you left off?",
     "resume": "Resume",
-    "jumpToParagraph": "Jump to paragraph {number}"
+    "jumpToParagraph": "Jump to paragraph {number}",
+    "handoffTitle": "Talk it through with {name}",
+    "handoffBody": "You heard the story. Take what stayed with you into a conversation.",
+    "handoffCta": "Begin the conversation",
+    "handoffDismiss": "Not now"
   },
   "prismPlayer": {
     "loading": "Loading prism...",

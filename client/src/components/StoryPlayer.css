@@ -457,6 +457,86 @@
   opacity: 0.8;
 }
 
+/* Chapter-2 handoff card, shown when the story completes. The one card in the
+   story view that asks for a tap, so it gets the warmest treatment: gold rim,
+   soft glow, serif title. Sits between the player and the transcript. */
+.story-handoff {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin: 0.75rem 0;
+  padding: 1rem 1.15rem;
+  border-radius: var(--radius-lg, 0.75rem);
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 45%, transparent);
+  background:
+    radial-gradient(120% 140% at 85% 0%,
+      color-mix(in srgb, var(--gold-subtle) 12%, transparent) 0%,
+      transparent 55%),
+    color-mix(in srgb, var(--bg-deep-space-darker) 78%, transparent);
+  box-shadow: 0 0 24px color-mix(in srgb, var(--gold-subtle) 18%, transparent);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .story-handoff {
+    animation: story-handoff-in 0.5s ease-out;
+  }
+}
+
+@keyframes story-handoff-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.story-handoff__eyebrow {
+  margin: 0;
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--star-blue-light) 75%, transparent);
+}
+
+.story-handoff__title {
+  margin: 0;
+  font-family: var(--font-content, 'Libre Caslon Text', serif);
+  font-size: var(--text-lg, 1.125rem);
+  color: var(--gold-primary);
+}
+
+.story-handoff__body {
+  margin: 0 0 0.35rem;
+  font-size: var(--text-sm, 0.9rem);
+  line-height: var(--leading-relaxed, 1.6);
+  color: var(--text-secondary);
+}
+
+.story-handoff__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.story-handoff__later {
+  min-height: 44px;
+  padding: 0 0.5rem;
+  border: none;
+  background: none;
+  color: var(--text-tertiary);
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: var(--text-sm, 0.875rem);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.2s ease;
+}
+
+.story-handoff__later:hover,
+.story-handoff__later:focus-visible {
+  color: var(--text-secondary);
+}
+
 /* Editorial Drop Cap - First paragraph only */
 .story-text p:first-of-type::first-letter {
   font-family: var(--font-content, 'Libre Caslon Text', Georgia, serif);
