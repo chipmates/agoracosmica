@@ -19,7 +19,7 @@
   overflow: hidden;
   background: var(--bg-cosmic-void);
   /* Bracket dimensions exposed as vars so figure-bg can clamp to them. */
-  --top-bar-h: calc(env(safe-area-inset-top, 0px) + 56px);
+  --top-bar-h: env(safe-area-inset-top, 0px);
   --bottom-bar-h: calc(env(safe-area-inset-bottom, 0px) + 140px);
 }
 
@@ -49,43 +49,8 @@
   }
 }
 
-/* ── Top bar ── speaker name + close. Solid navy, always visible. */
-.live-council-player__top-bar {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: var(--top-bar-h);
-  z-index: 25;
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: center;
-  gap: 0.75rem;
-  padding: env(safe-area-inset-top, 0px) 0.75rem 0 1rem;
-  background: var(--bg-cosmic-void);
-  border-bottom: 1px solid color-mix(in srgb, var(--gold-subtle) 18%, transparent);
-}
-
-.live-council-player__top-bar-title {
-  justify-self: center;
-  /* Visually center the title across the bar by offsetting for the
-     close button on the right (~44px touch target). */
-  margin-left: 44px;
-  font-family: var(--font-display, 'Cormorant Garamond', Georgia, serif);
-  font-size: clamp(0.95rem, 1.5vw, 1.1rem);
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  color: var(--gold-subtle);
-  text-transform: capitalize;
-  text-shadow: 0 1px 4px color-mix(in srgb, black var(--a-50), transparent);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: calc(100% - 1rem);
-  /* Soft fade when the speaker key changes (re-mount) — mirrors the
-     figure crossfade so identity transitions feel cohesive. */
-  animation: live-council-speaker-fade 0.3s ease-out;
-}
+/* The current-speaker pill + corner close come from PrismPlayer.css
+   (.prism-player__speaker-pill / .prism-player__close), shared classes. */
 
 @keyframes live-council-speaker-fade {
   from { opacity: 0; transform: translateY(-2px); }
@@ -198,25 +163,3 @@
   }
 }
 
-/* ── Top bar title + AI voice chip (shared leading grid cell) ── */
-/* Wrapper keeps the close button anchored right while title and chip
-   sit together, centered across the bar like the title used to be. */
-.live-council-player__top-bar-lead {
-  justify-self: center;
-  margin-left: 44px;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  min-width: 0;
-  max-width: calc(100% - 1rem);
-}
-
-.live-council-player__top-bar-lead .live-council-player__top-bar-title {
-  margin-left: 0;
-  max-width: none;
-  min-width: 0;
-}
-
-.live-council-player__top-bar-lead .ai-voice-chip {
-  flex-shrink: 0;
-}

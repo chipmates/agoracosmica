@@ -105,29 +105,28 @@ export function LiveCouncilPlayer({ onClose }: LiveCouncilPlayerProps) {
   return createPortal(
     <div className="live-council-player" role="dialog" aria-modal="true" aria-label={tString('cosmicCouncil.livePlayer', 'Council in session')}>
       <div className="live-council-player__stage prism-player">
-        {/* Top bar — speaker name + close (always-visible flow strip).
-            Pushes the figure down via --top-bar-h so the portrait isn't
-            cropped behind it. */}
-        <div className="live-council-player__top-bar">
-          <span className="live-council-player__top-bar-lead">
-            <span
-              className="live-council-player__top-bar-title"
-              key={`speaker-bar-${audioPlayback?.speakerId || speaker || 'idle'}`}
-              role="status"
-              aria-live="polite"
-              aria-atomic="true"
-            >
-              {speakerName || tString('cosmicCouncil.livePlayer', 'Council in session')}
-            </span>
-            <span className="ai-voice-chip ai-voice-chip--inline">
-              {tString('aiDisclosure.voiceChip', 'AI voice, not a recording')}
-            </span>
+        {/* Current speaker pill — floats over the stage (same pattern as the
+            prism player) and carries the persistent AI voice disclosure. The
+            close button sits in its classic top-right corner, no bar. */}
+        <div
+          className="prism-player__speaker-pill"
+          key={`speaker-pill-${audioPlayback?.speakerId || speaker || 'idle'}`}
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+        >
+          <span className="prism-player__speaker-pill-name">
+            {speakerName || tString('cosmicCouncil.livePlayer', 'Council in session')}
           </span>
-          <CloseButton
-            onClick={handleClose}
-            ariaLabel={tString('common.close', 'Close')}
-          />
+          <span className="ai-voice-chip ai-voice-chip--inline">
+            {tString('aiDisclosure.voiceChip', 'AI voice, not a recording')}
+          </span>
         </div>
+        <CloseButton
+          onClick={handleClose}
+          ariaLabel={tString('common.close', 'Close')}
+          className="prism-player__close"
+        />
 
         {/* Dual-layer crossfade figure images */}
         {figureLayer.front && (

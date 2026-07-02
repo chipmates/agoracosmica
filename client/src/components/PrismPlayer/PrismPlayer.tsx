@@ -759,31 +759,30 @@ export function PrismPlayer({ figure, seed, councilId, councilLevel = 1, languag
           </div>
         </div>
 
-        {/* Top bar — current speaker (both modes). Always-visible flow strip
-            so the figure image sits below it (not cropped by an overlay).
-            Carries the AI voice chip as the persistent audio disclosure. */}
-        <div className="prism-player__top-bar">
-          <span className="prism-player__top-bar-lead">
-            <span
-              className="prism-player__top-bar-title"
-              key={`speaker-bar-${subtitleState.figureId || 'idle'}`}
-              role="status"
-              aria-live="polite"
-              aria-atomic="true"
-            >
-              {getEchoShortName(subtitleState.figureId, tString) || mediaSessionTitle}
-            </span>
-            <span className="ai-voice-chip ai-voice-chip--inline">
-              {tString('aiDisclosure.voiceChip', 'AI voice, not a recording')}
-            </span>
+        {/* Current speaker pill — floats over the stage like the subtitles
+            and carries the persistent AI voice disclosure. The close button
+            sits in its classic top-right corner, no bar. */}
+        <div
+          className="prism-player__speaker-pill"
+          key={`speaker-pill-${subtitleState.figureId || 'idle'}`}
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+        >
+          <span className="prism-player__speaker-pill-name">
+            {getEchoShortName(subtitleState.figureId, tString) || mediaSessionTitle}
           </span>
-          {onClose && (
-            <CloseButton
-              onClick={() => onClose()}
-              ariaLabel={tString('common.close', 'Close')}
-            />
-          )}
+          <span className="ai-voice-chip ai-voice-chip--inline">
+            {tString('aiDisclosure.voiceChip', 'AI voice, not a recording')}
+          </span>
         </div>
+        {onClose && (
+          <CloseButton
+            onClick={() => onClose()}
+            ariaLabel={tString('common.close', 'Close')}
+            className="prism-player__close"
+          />
+        )}
       </div>
 
     </div>

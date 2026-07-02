@@ -67,9 +67,8 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
-  /* Updated dynamically by .prism-player__top-bar, which now renders in both
-     modes (it carries the AI voice disclosure). The 0px default only covers
-     the no-top-bar edge case. */
+  /* The speaker pill overlays the stage, so nothing pushes the figure down
+     here. The live council player raises this var for its own bracket. */
   --top-bar-h: 0px;
 }
 
@@ -453,68 +452,51 @@
 
 /* --- Top bar (council mode): speaker + close, always-visible flow strip --- */
 
-/* Bar height (without safe-area) — exposed as a stage var so the figure
-   knows how far down to start. Bar uses solid background so the figure
-   isn't visible behind it (no overlay). */
-.prism-player__stage:has(> .prism-player__top-bar) {
-  --top-bar-h: calc(env(safe-area-inset-top, 0px) + 56px);
-}
-
-.prism-player__top-bar {
+/* --- Current speaker pill + corner close --- */
+/* The speaker attribution floats over the stage the way the subtitles do,
+   so no bar pushes the portrait down. Carries the persistent AI voice chip.
+   Shared by the prism player and the live council player. */
+.prism-player__speaker-pill {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: var(--top-bar-h);
+  top: calc(env(safe-area-inset-top, 0px) + 0.9rem);
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 25;
-  display: grid;
-  grid-template-columns: 1fr auto;
+  display: inline-flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: env(safe-area-inset-top, 0px) 0.75rem 0 1rem;
-  background: var(--bg-cosmic-void);
-  border-bottom: 1px solid color-mix(in srgb, var(--gold-subtle) 18%, transparent);
+  gap: 0.55rem;
+  max-width: calc(100% - 7.5rem);
+  padding: 0.3rem 0.85rem;
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--bg-cosmic-void) 62%, transparent);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 22%, transparent);
+  pointer-events: none;
 }
 
-.prism-player__top-bar-title {
-  /* Centered title — grid keeps the close button anchored right while
-     the title takes the leftover column. Center within the column. */
-  justify-self: center;
-  /* Account for the close button width so the title is visually centered
-     across the whole bar (close button is ~44px). */
-  margin-left: 44px;
+.prism-player__speaker-pill-name {
   font-family: var(--font-display, 'Cormorant Garamond', Georgia, serif);
-  font-size: clamp(0.95rem, 1.5vw, 1.1rem);
+  font-size: clamp(0.95rem, 1.5vw, 1.05rem);
   font-weight: 600;
   letter-spacing: 0.04em;
   color: var(--gold-subtle);
-  text-shadow: 0 1px 4px color-mix(in srgb, black var(--a-50), transparent);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: calc(100% - 1rem);
 }
 
-/* --- Speaker name label above subtitles --- */
+.prism-player__speaker-pill .ai-voice-chip {
+  flex-shrink: 0;
+}
 
-.prism-player__speaker-label {
+.prism-player__close {
   position: absolute;
-  top: 1rem;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 10;
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--gold-subtle);
-  text-shadow: 0 1px 3px color-mix(in srgb, black var(--a-60), transparent);
-  background: color-mix(in srgb, var(--bg-primary) 55%, transparent);
-  padding: 0.2rem 0.6rem;
-  border-radius: 4px;
-  pointer-events: none;
-  opacity: 0;
-  animation: prism-sentence-in 0.15s ease-out forwards;
+  top: calc(env(safe-area-inset-top, 0px) + 0.55rem);
+  right: 0.6rem;
+  z-index: 26;
+  background: color-mix(in srgb, var(--bg-cosmic-void) 55%, transparent);
+  border-radius: 50%;
 }
 
 /* --- Transcript drawer --- */
@@ -683,25 +665,3 @@
   min-height: 300px;
 }
 
-/* --- Top bar title + AI voice chip (shared leading grid cell) --- */
-/* Wrapper keeps the close button anchored right while title and chip
-   sit together, centered across the bar like the title used to be. */
-.prism-player__top-bar-lead {
-  justify-self: center;
-  margin-left: 44px;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  min-width: 0;
-  max-width: calc(100% - 1rem);
-}
-
-.prism-player__top-bar-lead .prism-player__top-bar-title {
-  margin-left: 0;
-  max-width: none;
-  min-width: 0;
-}
-
-.prism-player__top-bar-lead .ai-voice-chip {
-  flex-shrink: 0;
-}
