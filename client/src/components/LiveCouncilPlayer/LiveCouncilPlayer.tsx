@@ -105,23 +105,6 @@ export function LiveCouncilPlayer({ onClose }: LiveCouncilPlayerProps) {
   return createPortal(
     <div className="live-council-player" role="dialog" aria-modal="true" aria-label={tString('cosmicCouncil.livePlayer', 'Council in session')}>
       <div className="live-council-player__stage prism-player">
-        {/* Current speaker pill — floats over the stage (same pattern as the
-            prism player) and carries the persistent AI voice disclosure. The
-            close button sits in its classic top-right corner, no bar. */}
-        <div
-          className="prism-player__speaker-pill"
-          key={`speaker-pill-${audioPlayback?.speakerId || speaker || 'idle'}`}
-          role="status"
-          aria-live="polite"
-          aria-atomic="true"
-        >
-          <span className="prism-player__speaker-pill-name">
-            {speakerName || tString('cosmicCouncil.livePlayer', 'Council in session')}
-          </span>
-          <span className="ai-voice-chip ai-voice-chip--inline">
-            {tString('aiDisclosure.voiceChip', 'AI voice, not a recording')}
-          </span>
-        </div>
         <CloseButton
           onClick={handleClose}
           ariaLabel={tString('common.close', 'Close')}
@@ -166,8 +149,19 @@ export function LiveCouncilPlayer({ onClose }: LiveCouncilPlayerProps) {
         {/* Bottom strip — dedicated subtitle area. Always rendered so the
             figure layout is stable; subtitle text inside is conditional.
             a11y: subtitle is intentionally NOT aria-live (typewriter would
-            spam SRs). Speaker changes are announced via the top bar. */}
+            spam SRs). Speaker changes are announced via the caption tag. */}
         <div className="live-council-player__bottom-bar">
+          {speakerName && (
+            <span
+              className="prism-player__speaker-tag prism-player__speaker-tag--bar"
+              key={`speaker-tag-${audioPlayback?.speakerId || speaker || 'idle'}`}
+              role="status"
+              aria-live="polite"
+              aria-atomic="true"
+            >
+              {speakerName}
+            </span>
+          )}
           {visibleText && (
             <div className="live-council-player__subtitle-zone">
               <p
@@ -178,6 +172,10 @@ export function LiveCouncilPlayer({ onClose }: LiveCouncilPlayerProps) {
               </p>
             </div>
           )}
+          {/* Persistent audio disclosure, docked in the bar corner */}
+          <span className="ai-voice-chip ai-voice-chip--inline live-council-player__bottom-chip">
+            {tString('aiDisclosure.voiceChip', 'AI voice, not a recording')}
+          </span>
         </div>
 
         {/* Completion popup */}

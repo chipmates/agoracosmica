@@ -452,42 +452,44 @@
 
 /* --- Top bar (council mode): speaker + close, always-visible flow strip --- */
 
-/* --- Current speaker pill + corner close --- */
-/* The speaker attribution floats over the stage the way the subtitles do,
-   so no bar pushes the portrait down. Carries the persistent AI voice chip.
-   Shared by the prism player and the live council player. */
-.prism-player__speaker-pill {
+/* --- Broadcast caption tag + control-bar chip + corner close --- */
+/* The current speaker rides the subtitle's top edge like a TV caption tag,
+   so nothing floats over the portrait. The AI voice chip docks into the
+   player chrome. Shared by the prism player and the live council player. */
+.prism-player__speaker-tag {
   position: absolute;
-  top: calc(env(safe-area-inset-top, 0px) + 0.9rem);
+  top: -0.95em;
+  left: 0.9rem;
+  z-index: 11;
+  padding: 0.12rem 0.6rem;
+  border-radius: var(--radius-full);
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.64rem;
+  font-weight: 600;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--gold-subtle);
+  background: color-mix(in srgb, var(--bg-cosmic-void) 88%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* Council variant: rides the bottom bar's top edge, centered */
+.prism-player__speaker-tag--bar {
   left: 50%;
   transform: translateX(-50%);
-  z-index: 25;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.55rem;
-  max-width: calc(100% - 7.5rem);
-  padding: 0.3rem 0.85rem;
-  border-radius: var(--radius-full);
-  background: color-mix(in srgb, var(--bg-cosmic-void) 62%, transparent);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  border: 1px solid color-mix(in srgb, var(--gold-subtle) 22%, transparent);
+}
+
+.prism-player__controls-chip {
+  display: block;
+  width: fit-content;
+  margin: 0.3rem auto 0;
   pointer-events: none;
-}
-
-.prism-player__speaker-pill-name {
-  font-family: var(--font-display, 'Cormorant Garamond', Georgia, serif);
-  font-size: clamp(0.95rem, 1.5vw, 1.05rem);
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  color: var(--gold-subtle);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.prism-player__speaker-pill .ai-voice-chip {
-  flex-shrink: 0;
+  /* One step brighter than the base chip: it sits on the glass card and
+     must never read as a faint label. */
+  color: var(--text-secondary);
+  border-color: color-mix(in srgb, var(--text-secondary) 35%, transparent);
 }
 
 .prism-player__close {

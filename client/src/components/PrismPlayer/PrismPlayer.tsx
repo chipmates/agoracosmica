@@ -629,12 +629,21 @@ export function PrismPlayer({ figure, seed, councilId, councilLevel = 1, languag
           </div>
         )}
 
-        {/* Speaker label is now rendered in the top bar (council mode) — no
-            on-portrait overlay needed. Prism mode keeps no label here. */}
-
-        {/* Sentence chunk - one sentence at a time, instant replace with subtle crossfade */}
+        {/* Sentence chunk with the current speaker riding its top edge,
+            broadcast-caption style. The name lives where the eyes already
+            are, so nothing overlays the portrait. */}
         {subtitleState.currentChunk && (
           <p className="prism-player__sentence" key={chunkKey}>
+            {getEchoShortName(subtitleState.figureId, tString) && (
+              <span
+                className="prism-player__speaker-tag"
+                role="status"
+                aria-live="polite"
+                aria-atomic="true"
+              >
+                {getEchoShortName(subtitleState.figureId, tString)}
+              </span>
+            )}
             {subtitleState.currentChunk}
           </p>
         )}
@@ -757,25 +766,13 @@ export function PrismPlayer({ figure, seed, councilId, councilLevel = 1, languag
             </button>
 
           </div>
-        </div>
 
-        {/* Current speaker pill — floats over the stage like the subtitles
-            and carries the persistent AI voice disclosure. The close button
-            sits in its classic top-right corner, no bar. */}
-        <div
-          className="prism-player__speaker-pill"
-          key={`speaker-pill-${subtitleState.figureId || 'idle'}`}
-          role="status"
-          aria-live="polite"
-          aria-atomic="true"
-        >
-          <span className="prism-player__speaker-pill-name">
-            {getEchoShortName(subtitleState.figureId, tString) || mediaSessionTitle}
-          </span>
-          <span className="ai-voice-chip ai-voice-chip--inline">
+          {/* Persistent audio disclosure, docked in the player chrome */}
+          <span className="ai-voice-chip ai-voice-chip--inline prism-player__controls-chip">
             {tString('aiDisclosure.voiceChip', 'AI voice, not a recording')}
           </span>
         </div>
+
         {onClose && (
           <CloseButton
             onClick={() => onClose()}

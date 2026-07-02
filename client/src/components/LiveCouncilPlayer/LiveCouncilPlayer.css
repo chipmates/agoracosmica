@@ -49,8 +49,15 @@
   }
 }
 
-/* The current-speaker pill + corner close come from PrismPlayer.css
-   (.prism-player__speaker-pill / .prism-player__close), shared classes. */
+/* The caption speaker tag + corner close come from PrismPlayer.css
+   (.prism-player__speaker-tag / .prism-player__close), shared classes. */
+
+.live-council-player__bottom-chip {
+  position: absolute;
+  right: 0.85rem;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 0.55rem);
+  pointer-events: none;
+}
 
 @keyframes live-council-speaker-fade {
   from { opacity: 0; transform: translateY(-2px); }
