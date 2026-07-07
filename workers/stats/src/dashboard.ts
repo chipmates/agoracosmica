@@ -849,7 +849,7 @@ const COLORS = {
   lang: { de: '#E6BC5C', en: '#5B8BD4' },
   servers: { fsn1: '#68C397', nbg1: '#9D83CD' },
   models: { 'qwen3-tts': '#9D83CD', kokoro: '#68C397', 'f5-tts': '#5B8BD4', whisper: '#E6BC5C' },
-  rl: { gpu_capacity_german: '#E97451', daily_limit: '#F5A623', burst_limit: '#9D83CD', daily: '#F5A623', global: '#E97451', council: '#5B8BD4', summary: '#E6BC5C' },
+  rl: { daily_limit: '#F5A623', burst_limit: '#9D83CD', daily: '#F5A623', global: '#E97451', council: '#5B8BD4', summary: '#E6BC5C' },
 };
 const MODE_LABELS = { introduction: 'Story', seed_conversation: 'Wisdom', prism: 'Prism', challenge: 'Quest', free_conversation: 'Freetalk', seed_challenge: 'Quest' };
 const RANGE_OPTS = [
@@ -2295,7 +2295,7 @@ function renderServers() {
     html += gaugeCard('CPU', cpuPct, (cpu.cores || '?') + ' cores');
     html += gaugeCard('RAM', ramPct, (ram.used_gb || 0).toFixed(0) + ' / ' + (ram.total_gb || 128).toFixed(0) + ' GB');
     html += gaugeCard('Disk', diskPct, '');
-    html += '<div class="gauge-card"><div class="gauge-label">Network</div><div class="gauge-val c-ok" style="font-size:0.875rem">' + (net.bandwidth_in_mbps || 0).toFixed(0) + ' / ' + (net.bandwidth_out_mbps || 0).toFixed(0) + '</div><div class="gauge-detail">in / out Mbit/s</div></div>';
+    html += '<div class="gauge-card"><div class="gauge-label">Network</div><div class="gauge-val" style="font-size:0.875rem">' + (net.bandwidth_in_mbps || 0).toFixed(0) + ' / ' + (net.bandwidth_out_mbps || 0).toFixed(0) + '</div><div class="gauge-detail">in / out Mbit/s</div></div>';
     html += '</div>';
 
     // Services
@@ -2614,6 +2614,12 @@ async function loadAudio() {
     { sql: "SELECT blob1 as lang, COUNT() as c FROM agora_audio WHERE blob5 = 'speech' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY lang ORDER BY c DESC", dataset: 'agora_audio' },
     // Audio rate limits
     { sql: "SELECT blob4 as reason, COUNT() as c FROM agora_audio WHERE blob5 = 'ratelimit' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY reason ORDER BY c DESC", dataset: 'agora_audio' },
+    // --- STT parity + error split (APPENDED; reads positional). r[11..13].
+    // TTS errors, STT errors (so "Audio Errors" can name the split), and an STT
+    // volume trend so STT is not the only pipeline with no time series. ---
+    { sql: "SELECT COUNT() as c FROM agora_audio WHERE blob5 = 'speech' AND blob4 != '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_audio' },
+    { sql: "SELECT COUNT() as c FROM agora_audio WHERE blob5 = 'transcriptions' AND blob4 != '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_audio' },
+    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_audio WHERE blob5 = 'transcriptions' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_audio' },
   ];
 
   var r = await batch(queries);
@@ -2630,6 +2636,8 @@ async function loadAudio() {
   var audioLangs = rows(r[9]);
   var rlAudio = rows(r[10]);
   var totalRlAudio = rlAudio.reduce(function(s, x) { return s + x.c; }, 0);
+  var ttsErr = val(r[11]), sttErr = val(r[12]);
+  var sttTrendRows = rows(r[13]);
 
   var html = '';
 
@@ -2639,18 +2647,29 @@ async function loadAudio() {
   html += kpi('TTS Requests', tts, { hero: true, spark: sparkTts, sparkColor: '#68C397', delta: ttsPrev });
   html += kpi('STT Requests', stt, { delta: sttPrev });
   html += kpi('Avg TTS Latency', fmtMs(avgLatency), { sub: avgLatency == null ? 'no successful TTS calls in period' : '' });
-  html += kpi('Audio Errors', audioErrors, { sub: audioErrors > 0 ? 'non-200 responses' : 'all clear', valColor: audioErrors > 0 ? '#E97451' : '#68C397' });
+  html += kpi('Audio Errors', audioErrors, { sub: audioErrors > 0 ? ttsErr + ' TTS + ' + sttErr + ' STT' : 'all clear', valColor: audioErrors > 0 ? '#E97451' : '#68C397' });
 
-  // TTS volume over time
+  // TTS + STT volume over time, both zero-filled so an empty bucket reads as
+  // zero rather than vanishing.
   if (sparkTtsRows.length > 1) {
-    var ttsGraphItems = sparkTtsRows.map(function(row) {
+    var ttsGraphItems = zeroFill(sparkTtsRows).map(function(row) {
       var d = new Date(row.t);
       var label = S.range <= 1
         ? d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         : d.toLocaleDateString([], { month: 'short', day: 'numeric' });
-      return { label: label, c: row.c };
+      return { label: label, c: Number(row.c) };
     });
     html += chartCard('TTS Volume Over Time', svgAreaGraph(ttsGraphItems, { color: '#68C397', height: 130, ariaLabel: 'TTS requests over time' }), 'card-full');
+  }
+  if (sttTrendRows.length > 1) {
+    var sttGraphItems = zeroFill(sttTrendRows).map(function(row) {
+      var d = new Date(row.t);
+      var label = S.range <= 1
+        ? d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        : d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+      return { label: label, c: Number(row.c) };
+    });
+    html += chartCard('STT Volume Over Time', svgAreaGraph(sttGraphItems, { color: '#9D83CD', height: 130, ariaLabel: 'STT requests over time' }), 'card-full');
   }
   html += '</div>';
 
@@ -2678,7 +2697,7 @@ async function loadAudio() {
   html += '<div class="section-divider">Audio Rate Limits</div>';
   html += '<div class="grid">';
   if (totalRlAudio > 0) {
-    var audioRlLabels = { gpu_capacity_german: 'GPU RED (DE)', daily_limit: 'Daily cap', burst_limit: 'Burst' };
+    var audioRlLabels = { daily_limit: 'Daily cap', burst_limit: 'Burst' };
     var audioDonut = donutSvg(rlAudio.map(function(r) { return { key: r.reason, c: r.c }; }), COLORS.rl, function(r) { return audioRlLabels[r] || r; }, 60);
     html += chartCard('Audio Rate Limits (' + totalRlAudio + ')', audioDonut, '');
   } else {
