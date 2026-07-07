@@ -720,9 +720,9 @@ html { scrollbar-color: var(--bg-highlight) transparent; scrollbar-width: thin; 
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
       <span class="nav-label">Overview</span>
     </button>
-    <button class="nav-item" data-tab="servers">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><circle cx="6" cy="6" r="1" fill="currentColor"/><circle cx="6" cy="18" r="1" fill="currentColor"/></svg>
-      <span class="nav-label">Servers</span>
+    <button class="nav-item" data-tab="adgrants">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 11 12 6 7 11"/><line x1="12" y1="6" x2="12" y2="18"/><path d="M5 21h14"/></svg>
+      <span class="nav-label">Growth</span>
     </button>
     <button class="nav-item" data-tab="product">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
@@ -732,9 +732,9 @@ html { scrollbar-color: var(--bg-highlight) transparent; scrollbar-width: thin; 
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h3l3-9 4 18 3-9h5"/></svg>
       <span class="nav-label">Audio</span>
     </button>
-    <button class="nav-item" data-tab="adgrants">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 11 12 6 7 11"/><line x1="12" y1="6" x2="12" y2="18"/><path d="M5 21h14"/></svg>
-      <span class="nav-label">Growth</span>
+    <button class="nav-item" data-tab="servers">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><circle cx="6" cy="6" r="1" fill="currentColor"/><circle cx="6" cy="18" r="1" fill="currentColor"/></svg>
+      <span class="nav-label">Servers</span>
     </button>
   </div>
   <div class="sidebar-section">
@@ -819,9 +819,9 @@ html { scrollbar-color: var(--bg-highlight) transparent; scrollbar-width: thin; 
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
     Overview
   </button>
-  <button class="mob-tab" data-tab="servers">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><circle cx="6" cy="6" r="1" fill="currentColor"/><circle cx="6" cy="18" r="1" fill="currentColor"/></svg>
-    Servers
+  <button class="mob-tab" data-tab="adgrants">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="17 11 12 6 7 11"/><line x1="12" y1="6" x2="12" y2="18"/><path d="M5 21h14"/></svg>
+    Growth
   </button>
   <button class="mob-tab" data-tab="product">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
@@ -831,9 +831,9 @@ html { scrollbar-color: var(--bg-highlight) transparent; scrollbar-width: thin; 
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 12h3l3-9 4 18 3-9h5"/></svg>
     Audio
   </button>
-  <button class="mob-tab" data-tab="adgrants">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="17 11 12 6 7 11"/><line x1="12" y1="6" x2="12" y2="18"/><path d="M5 21h14"/></svg>
-    Growth
+  <button class="mob-tab" data-tab="servers">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><circle cx="6" cy="6" r="1" fill="currentColor"/><circle cx="6" cy="18" r="1" fill="currentColor"/></svg>
+    Servers
   </button>
 </div>
 </nav>
@@ -1790,6 +1790,12 @@ async function loadOverview() {
     { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'first_reply' AND blob5 = '200' AND timestamp " + prevRange(), dataset: 'agora_llm' },
     { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'first_reply' AND blob5 = 'error' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
     { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'first_reply' AND blob5 = 'error' AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    // --- Device split (blob6, live 2026-07-07). r[49..50], APPENDED at the end
+    // so existing positional reads never shift. Arrivals + conversations by
+    // device class, for the visit-share vs conversation-share card beside the
+    // funnel (does mobile underconvert). Batch total after these: 51 of 64. ---
+    { sql: "SELECT blob6 as device, COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND blob6 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY device ORDER BY c DESC", dataset: 'agora_llm' },
+    { sql: "SELECT blob6 as device, COUNT() as c FROM agora_llm WHERE blob1 IN ('chat','council','summary') AND blob5 = '200' AND blob6 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY device ORDER BY c DESC", dataset: 'agora_llm' },
   ];
 
   var r = await batch(queries);
@@ -2039,6 +2045,15 @@ async function loadOverview() {
     funnelNote,
     'card-full'
   );
+
+  // FUNNEL RATES + DEVICE — moved here from Growth so Overview answers "is
+  // traffic converting" (counts in the funnel above, rates-with-targets here)
+  // and "does mobile underconvert" in one morning read. Every input is already
+  // in this batch (signups/entries/arrivals + prevs); device is r[49..50].
+  html += '<div class="section-divider" style="grid-column:1/-1">Conversion rates &amp; device</div>';
+  html += rateCard('Signup rate', signups, arrivals, signupsPrev, arrivalsPrev, { target: 5, sub: 'new accounts as a share of all visits' });
+  html += rateCard('Entry rate', entries, arrivals, entriesPrev, arrivalsPrev, { target: 10, sub: 'reached welcome and consented, share of all visits' });
+  html += deviceShareHtml(rows(r[49]), rows(r[50]), { floor: 20 });
 
   // Health check: errors + the server mini-card. Chat volume now lives in the
   // Pulse row above; TTS/voice infra moved to the Audio tab where it belongs.
@@ -2762,19 +2777,9 @@ async function loadAdGrants() {
 
   var html = '';
 
-  // ── FUNNEL RATES (source-free, existing events) ──
-  // The new hero of this tab: are the top-of-funnel rates trending up? Rates are
-  // taken over all visits (a conservative floor, since visits include ads + bots
-  // that we never split by source). What matters is the direction, shown as the
-  // percentage-point change vs the previous period. Activation depth stays a
-  // sample-gated multiplier (chats per session), never a cross-population %.
-  html += '<div class="section-divider">Funnel rates</div>';
-  html += '<div class="hint-banner">Rates over all visits, so they read low on purpose (visits include ads and bots, which we never split by source). Watch the direction week over week, not the absolute number.</div>';
-  html += '<div class="grid">';
-  html += rateCard('Signup rate', gSignups, visits, gSignupsPrev, visitsPrev, { hero: true, target: 5, sub: 'new accounts as a share of all visits' });
-  html += rateCard('Entry rate', gEntries, visits, gEntriesPrev, visitsPrev, { target: 10, sub: 'reached welcome and consented, as a share of all visits' });
-  html += kpi('Chats per session', multiplierOrDash(gChats, gSessions, 20), { sub: 'activation depth (a multiplier, not a %). App Sessions include returning and passive opens' });
-  html += '</div>';
+  // Funnel rates moved to Overview (rendered beside the funnel counts, where the
+  // rates-with-targets belong). Growth now opens on what is unique to it: the
+  // gclid-gated Google Ads conversions and the traffic anatomy.
 
   // ── GOOGLE ADS CONVERSIONS (gclid-gated) ──
   html += '<div class="section-divider">Google Ads Conversions</div>';
@@ -2806,20 +2811,15 @@ async function loadAdGrants() {
   html += chartCard('Top Countries (all visits)', barsHtml(countryAllItems, '#9B7BC7'), 'card-wide');
   var countryChatItems = aggregateByLabel(topCountriesChat.map(function(r) { return { label: r.country || 'Unknown', c: r.c }; }));
   html += chartCard('Top Countries (conversations)', barsHtml(countryChatItems, '#5B8BD4'), 'card-wide');
-  // Device: the share-vs-share comparison directly answers "does mobile
-  // underconvert" (a funnel cut), which two absolute bars could not without
-  // cross-chart math. A raw arrivals bar stays for symmetry with Top Countries.
-  html += deviceShareHtml(deviceArrivals, deviceChats, { floor: 20 });
+  // Device share-vs-share moved to Overview (beside the funnel, where the
+  // activation question lives). Growth keeps the raw arrivals bar for symmetry
+  // with Top Countries.
   var deviceArrivalItems = aggregateByLabel(deviceArrivals.map(function(r) { return { label: cap(r.device || 'unknown'), c: r.c }; }));
   html += chartCard('Device (all visits)', barsHtml(deviceArrivalItems, 'var(--s-wisdom)'), 'card-wide');
   html += '</div>';
 
-  // ── CONTENT REACH ──
-  html += '<div class="section-divider">Content Reach</div>';
-  html += '<div class="grid">';
-  var playbackTypeItems = aggregateByLabel(playbackByType.map(function(r) { return { label: r.type || 'unknown', c: r.c }; }));
-  html += chartCard('Content Completions by Type', barsHtml(playbackTypeItems, '#68C397'), 'card-wide');
-  html += '</div>';
+  // Content Reach removed: "Completions by Type" was SQL-identical to the
+  // Engagement tab's "By Type" panel. Content consumption lives on Engagement.
 
   grid.innerHTML = html;
 }
