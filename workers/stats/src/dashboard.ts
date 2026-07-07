@@ -1349,6 +1349,34 @@ function tableHtml(headers, rows) {
   return html + '</table></div>';
 }
 
+// Interior zero-fill for time-bucketed GROUP BY rows. Analytics Engine omits
+// empty buckets, so a real zero day/hour (a zero-chat day on the North Star
+// trend) silently vanishes and the line bridges it. This inserts the missing
+// buckets as c:0, inferring bucket size from the smallest gap between present
+// buckets. Interior gaps only (leading/trailing need a server clock we do not
+// have here), which is exactly the vanishing-middle-day case.
+function zeroFill(rows) {
+  if (!rows || rows.length < 2) return rows || [];
+  var pts = rows.map(function(r) { return { t: new Date(r.t).getTime(), raw: r }; })
+    .filter(function(p) { return !isNaN(p.t); })
+    .sort(function(a, b) { return a.t - b.t; });
+  if (pts.length < 2) return rows;
+  var step = Infinity;
+  for (var i = 1; i < pts.length; i++) { var d = pts[i].t - pts[i - 1].t; if (d > 0 && d < step) step = d; }
+  if (!isFinite(step) || step <= 0) return rows.slice();
+  var out = [];
+  for (var j = 0; j < pts.length; j++) {
+    if (j > 0) {
+      var missing = Math.round((pts[j].t - pts[j - 1].t) / step) - 1;
+      if (missing > 0 && missing < 1000) {
+        for (var k = 1; k <= missing; k++) out.push({ t: new Date(pts[j - 1].t + k * step).toISOString(), c: 0 });
+      }
+    }
+    out.push(pts[j].raw);
+  }
+  return out;
+}
+
 // SVG vertical bar chart (proper graph with axes)
 function svgBarGraph(data, opts) {
   if (!data || data.length === 0) return '<div class="empty-state">No data for this period</div>';
@@ -1419,6 +1447,10 @@ function svgAreaGraph(data, opts) {
     var gmax = Math.max.apply(null, opts.ghost.map(function(d) { return typeof d === 'number' ? d : Number(d.c); }));
     if (gmax > maxVal) maxVal = gmax;
   }
+  if (opts.line2 && opts.line2.values && opts.line2.values.length) {
+    var l2max = Math.max.apply(null, opts.line2.values.map(Number));
+    if (l2max > maxVal) maxVal = l2max;
+  }
   if (maxVal === 0) maxVal = 1;
 
   // Y-axis
@@ -1465,6 +1497,19 @@ function svgAreaGraph(data, opts) {
       gPath += (gi === 0 ? 'M' : ' L') + gx.toFixed(1) + ',' + gy.toFixed(1);
     }
     svg += '<path d="' + gPath + '" fill="none" stroke="' + color + '" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.35"/>';
+  }
+
+  // Optional second solid series (e.g. Completed drawn over Started), same yMax.
+  if (opts.line2 && opts.line2.values && opts.line2.values.length >= 2) {
+    var l2 = opts.line2.values.map(Number);
+    var l2n = l2.length;
+    var l2Path = '';
+    for (var li = 0; li < l2n; li++) {
+      var lx = padL + (li / (l2n - 1)) * plotW;
+      var ly = padT + plotH - (l2[li] / yMax) * plotH;
+      l2Path += (li === 0 ? 'M' : ' L') + lx.toFixed(1) + ',' + ly.toFixed(1);
+    }
+    svg += '<path d="' + l2Path + '" fill="none" stroke="' + (opts.line2.color || '#68C397') + '" stroke-width="1.75" opacity="0.9"/>';
   }
 
   // Build smooth path (monotone cubic)
@@ -2098,10 +2143,17 @@ async function loadOverview() {
   // improvement reads as the solid line sitting above its ghost. Conversations
   // (chat) is the North Star: the one metric a bot or click flood cannot inflate.
   if (dailyConv.length > 1) {
-    var convItems = dailyConv.map(function(row) {
-      return { label: new Date(row.t).toLocaleDateString([], { month: 'short', day: 'numeric' }), c: row.c };
+    var convRows = zeroFill(dailyConv);
+    var convItems = convRows.map(function(row) {
+      return { label: new Date(row.t).toLocaleDateString([], { month: 'short', day: 'numeric' }), c: Number(row.c) };
     });
-    var convGhost = dailyConvPrev.map(function(row) { return Number(row.c); });
+    var convGhost = zeroFill(dailyConvPrev).map(function(row) { return Number(row.c); });
+    // Align ghost length to the current series so it sits at the same calendar
+    // offset (svgAreaGraph stretches by index, so unequal lengths misalign).
+    if (convGhost.length > 1 && convGhost.length !== convItems.length) {
+      if (convGhost.length < convItems.length) { while (convGhost.length < convItems.length) convGhost.unshift(0); }
+      else { convGhost = convGhost.slice(convGhost.length - convItems.length); }
+    }
     html += chartCard('Daily Conversations', svgAreaGraph(convItems, { color: '#5B8BD4', ghost: convGhost.length > 1 ? convGhost : null, ariaLabel: 'Daily conversations trend; the dashed line is the previous period' }), 'card-full');
   } else if (sparkTts.length > 1) {
     // Show TTS activity as area graph when there is no multi-day trend yet
@@ -2404,12 +2456,12 @@ async function loadProduct() {
 
   // Chat activity graph (always visible)
   if (chatTimeline.length > 1) {
-    var timeItems = chatTimeline.map(function(row) {
+    var timeItems = zeroFill(chatTimeline).map(function(row) {
       var d = new Date(row.t);
       var label = S.range <= 1
         ? d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         : d.toLocaleDateString([], { month: 'short', day: 'numeric' });
-      return { label: label, c: row.c };
+      return { label: label, c: Number(row.c) };
     });
     html += chartCard('Chat Activity', svgBarGraph(timeItems, { color: '#5B8BD4', ariaLabel: 'Chat messages over time' }), 'card-full');
   } else {
@@ -2431,40 +2483,33 @@ async function loadProduct() {
       valColor: completionRate === null ? 'var(--dim)' : (completionRate >= 50 ? '#68C397' : completionRate >= 25 ? '#F5A623' : '#E97451') }
   );
 
-  // Started vs Completed over time (the funnel signal)
+  // Started vs Completed over time. Rebuilt on the SVG chart system: the old
+  // inline flex bars used percent heights in a content-sized column, so every
+  // bar collapsed toward 1px. Started is the filled area, Completed the green
+  // line, both zero-filled so an empty day reads as zero rather than vanishing.
   if (sparkPlaybackRows.length > 1 || sparkStartedRows.length > 1) {
-    var startedMap = {};
-    sparkStartedRows.forEach(function(row) { startedMap[row.t] = row.c; });
-    var allBuckets = new Set();
-    sparkPlaybackRows.forEach(function(row) { allBuckets.add(row.t); });
-    sparkStartedRows.forEach(function(row) { allBuckets.add(row.t); });
-    var bucketArr = Array.from(allBuckets).sort();
-    var completedMap = {};
-    sparkPlaybackRows.forEach(function(row) { completedMap[row.t] = row.c; });
-    var graphItems = bucketArr.map(function(t) {
-      var d = new Date(t);
+    var sMap = {}, cMap = {};
+    sparkStartedRows.forEach(function(row) { sMap[row.t] = Number(row.c); });
+    sparkPlaybackRows.forEach(function(row) { cMap[row.t] = Number(row.c); });
+    var unionT = {};
+    sparkStartedRows.forEach(function(row) { unionT[row.t] = true; });
+    sparkPlaybackRows.forEach(function(row) { unionT[row.t] = true; });
+    var scRows = zeroFill(Object.keys(unionT).map(function(t) { return { t: t, c: 0 }; }));
+    var scItems = scRows.map(function(row) {
+      var d = new Date(row.t);
       var label = S.range <= 1
         ? d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         : d.toLocaleDateString([], { month: 'short', day: 'numeric' });
-      return { label: label, started: startedMap[t] || 0, completed: completedMap[t] || 0 };
+      return { label: label, c: sMap[row.t] || 0 };
     });
-    // Render as a stacked-style summary inline (vanilla bar pair per bucket)
-    var maxBucket = Math.max(1, ...graphItems.map(function(g) { return Math.max(g.started, g.completed); }));
-    var graphHtml = '<div style="display:flex;align-items:flex-end;gap:4px;height:120px;padding:8px 0">';
-    graphItems.slice(-24).forEach(function(g) {
-      var h1 = Math.round((g.started / maxBucket) * 100);
-      var h2 = Math.round((g.completed / maxBucket) * 100);
-      graphHtml += '<div style="flex:1;display:flex;flex-direction:column;gap:1px;justify-content:flex-end;min-width:0" title="' + g.label + ': ' + g.started + ' started / ' + g.completed + ' completed">';
-      graphHtml += '<div style="background:#5B8BD4;height:' + h1 + '%;border-radius:2px 2px 0 0;min-height:1px;opacity:0.85"></div>';
-      graphHtml += '<div style="background:#68C397;height:' + h2 + '%;border-radius:2px 2px 0 0;min-height:1px"></div>';
-      graphHtml += '</div>';
-    });
-    graphHtml += '</div>';
-    graphHtml += '<div style="display:flex;gap:16px;font-size:0.75rem;margin-top:6px;color:var(--dim)">';
-    graphHtml += '<span><span style="display:inline-block;width:10px;height:10px;background:#5B8BD4;border-radius:2px;margin-right:4px;vertical-align:middle"></span>Started</span>';
-    graphHtml += '<span><span style="display:inline-block;width:10px;height:10px;background:#68C397;border-radius:2px;margin-right:4px;vertical-align:middle"></span>Completed</span>';
-    graphHtml += '</div>';
-    html += chartCard('Started vs Completed Over Time', graphHtml, 'card-full');
+    var completedVals = scRows.map(function(row) { return cMap[row.t] || 0; });
+    html += chartCard('Started vs Completed Over Time',
+      svgAreaGraph(scItems, { color: '#5B8BD4', height: 150, line2: { values: completedVals, color: '#68C397' }, ariaLabel: 'Content started (filled area) and completed (green line) over time' }) +
+      '<div style="display:flex;gap:16px;font-size:0.75rem;margin-top:6px;color:var(--dim)">' +
+      '<span><span style="display:inline-block;width:10px;height:10px;background:#5B8BD4;border-radius:2px;margin-right:4px;vertical-align:middle"></span>Started</span>' +
+      '<span><span style="display:inline-block;width:10px;height:10px;background:#68C397;border-radius:2px;margin-right:4px;vertical-align:middle"></span>Completed</span>' +
+      '</div>',
+      'card-full');
   }
 
   // By type — story / teaching / prism / council / foreword
