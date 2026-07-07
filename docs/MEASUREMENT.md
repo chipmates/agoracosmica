@@ -19,6 +19,7 @@ Per anonymous request, written to Cloudflare Analytics Engine:
 | Language | `en` or `de` | See bilingual reach |
 | HTTP status | `200`, `429`, `502`, ... | Detect outages and rate-limit pressure |
 | Country | 2-letter ISO code from Cloudflare edge (`DE`, `US`, `XX` for unknown) | Demonstrate geographic reach to grant funders |
+| Device type | `mobile`, `desktop`, or `tablet`, a coarse class derived server-side from the User-Agent (never the User-Agent string itself, far too coarse to identify a device) | See whether the mobile experience works as well as desktop, so we fix it if not |
 | Playback event | `started` (audio first play) or `completed` (content marked finished, gamification star awarded) | Distinguish click-and-bail from real consumption (completion-rate funnel) |
 | Content type | `story`, `teaching`, `prism`, `council`, `foreword` (closed allowlist; only set on playback events) | Know which content type was started/completed |
 | Duration (ms) | Latency of the request | Find slow paths, fix them |

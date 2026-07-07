@@ -16,14 +16,38 @@ export function readCountry(request: Request): string {
 }
 
 /**
+ * Derive a coarse device class (mobile | desktop | tablet) from the request
+ * User-Agent, mirroring readCountry: taken server-side from a header already on
+ * every request. Only the three-value class is ever returned or written, never
+ * the User-Agent string, so it is far too coarse to identify a device (it is
+ * not a fingerprint). Prefers the low-entropy Sec-CH-UA-Mobile client hint when
+ * the browser sends it, otherwise a coarse User-Agent test. Returns 'unknown'
+ * when no User-Agent is present (a header-less beacon).
+ */
+export function readDevice(request: Request): string {
+  const ua = request.headers.get('User-Agent') || '';
+  // Tablets before phones: iPad, an explicit "Tablet", or Android without the
+  // "Mobile" token are tablets; Android *with* "Mobile" is a phone.
+  if (/\biPad\b/i.test(ua) || /\bTablet\b/i.test(ua) || (/\bAndroid\b/i.test(ua) && !/\bMobile\b/i.test(ua))) {
+    return 'tablet';
+  }
+  if (request.headers.get('Sec-CH-UA-Mobile') === '?1' ||
+      /Mobi|iPhone|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(ua)) {
+    return 'mobile';
+  }
+  return ua ? 'desktop' : 'unknown';
+}
+
+/**
  * Track an LLM proxy event (chat/council/summary).
  * dataset: agora_llm
- * blobs: [endpoint, figureId, mode, language, status, '', country]
+ * blobs: [endpoint, figureId, mode, language, status, device, country]
  * doubles: [durationMs]
  * indexes: [endpoint]
  *
- * blob6 is reserved as an empty slot to preserve schema position for blob7
- * (country). Legacy rows have channel labels here; new rows write empty.
+ * blob6 carries the coarse device class (mobile/desktop/tablet) from
+ * readDevice, which keeps country pinned at blob7 across every event type.
+ * Legacy rows hold a channel label or an empty string in this slot (pre-device).
  */
 export function trackLlmEvent(
   env: Env,
@@ -35,6 +59,7 @@ export function trackLlmEvent(
     status: number;
     durationMs: number;
     country: string;
+    device: string;
   }
 ): void {
   try {
@@ -45,7 +70,7 @@ export function trackLlmEvent(
         data.mode,
         data.language.startsWith('de') ? 'de' : 'en',
         String(data.status),
-        '',
+        data.device,
         data.country,
       ],
       doubles: [data.durationMs],
@@ -59,17 +84,18 @@ export function trackLlmEvent(
 /**
  * Track a session creation (DAU proxy).
  * dataset: agora_llm
- * blobs: ['session', '', '', '', status, '', country]
+ * blobs: ['session', '', '', '', status, device, country]
  * indexes: ['session']
  */
 export function trackSession(
   env: Env,
   status: number,
   country: string,
+  device: string,
 ): void {
   try {
     env.ANALYTICS.writeDataPoint({
-      blobs: ['session', '', '', '', String(status), '', country],
+      blobs: ['session', '', '', '', String(status), device, country],
       doubles: [0],
       indexes: ['session'],
     });
@@ -86,7 +112,7 @@ export function trackSession(
  * rate and funnel over time.
  *
  * dataset: agora_llm
- * blobs: ['playback', figureId, mode, language, type, '', country, event]
+ * blobs: ['playback', figureId, mode, language, type, device, country, event]
  * indexes: ['playback']
  *
  * Backward compat: rows written before 2026-05-08 evening have empty blob8.
@@ -101,6 +127,7 @@ export function trackPlayback(
     mode: string;
     language: string;
     country: string;
+    device: string;
     event: string;
   }
 ): void {
@@ -112,7 +139,7 @@ export function trackPlayback(
         data.mode,
         data.language,
         data.type,
-        '',
+        data.device,
         data.country,
         data.event,
       ],
@@ -128,7 +155,7 @@ export function trackPlayback(
  * Track a page-load beacon. Fires once on App mount in the client, before any
  * user interaction. Lets the dashboard show arrivals over time.
  * dataset: agora_llm
- * blobs: ['page', path, '', language, '200', '', country]
+ * blobs: ['page', path, '', language, '200', device, country]
  * indexes: ['page']
  */
 export function trackPageView(
@@ -137,11 +164,12 @@ export function trackPageView(
     path: string;
     language: string;
     country: string;
+    device: string;
   }
 ): void {
   try {
     env.ANALYTICS.writeDataPoint({
-      blobs: ['page', data.path, '', data.language, '200', '', data.country],
+      blobs: ['page', data.path, '', data.language, '200', data.device, data.country],
       doubles: [0],
       indexes: ['page'],
     });
@@ -156,7 +184,7 @@ export function trackPageView(
  * step; since the 2026-05-29 refactor). Sits between the page-load beacon
  * (every arrival) and the session row (Turnstile-gated).
  * dataset: agora_llm
- * blobs: ['entry', path, '', language, '200', '', country]
+ * blobs: ['entry', path, '', language, '200', device, country]
  * indexes: ['entry']
  */
 export function trackEntry(
@@ -165,11 +193,12 @@ export function trackEntry(
     path: string;
     language: string;
     country: string;
+    device: string;
   }
 ): void {
   try {
     env.ANALYTICS.writeDataPoint({
-      blobs: ['entry', data.path, '', data.language, '200', '', data.country],
+      blobs: ['entry', data.path, '', data.language, '200', data.device, data.country],
       doubles: [0],
       indexes: ['entry'],
     });
@@ -186,7 +215,7 @@ export function trackEntry(
  * dashboard show total signups including organic.
  *
  * dataset: agora_llm
- * blobs: ['signup', path, '', language, '200', '', country]
+ * blobs: ['signup', path, '', language, '200', device, country]
  * indexes: ['signup']
  */
 export function trackSignup(
@@ -195,11 +224,12 @@ export function trackSignup(
     path: string;
     language: string;
     country: string;
+    device: string;
   }
 ): void {
   try {
     env.ANALYTICS.writeDataPoint({
-      blobs: ['signup', data.path, '', data.language, '200', '', data.country],
+      blobs: ['signup', data.path, '', data.language, '200', data.device, data.country],
       doubles: [0],
       indexes: ['signup'],
     });
@@ -219,13 +249,13 @@ export function trackSignup(
  * mode_selected count every occurrence (volume counters, same row shape).
  *
  * dataset: agora_llm
- * blobs: [step, figureId|path|'', mode|'', language, outcome, '', country, '']
+ * blobs: [step, figureId|path|'', mode|'', language, outcome, device, country, '']
  * doubles: [bucket]  — a coarse bucket INDEX (cinematic dwell 0-3,
  *                      first_reply reply-time 0-4), never raw milliseconds
  * indexes: [step]
  *
- * blob6 stays reserved-empty (keeps country at blob7 across all event types);
- * blob8 stays empty (it belongs to playback rows).
+ * blob6 carries the coarse device class (keeps country at blob7 across all
+ * event types); blob8 stays empty (it belongs to playback rows).
  */
 export function trackFunnel(
   env: Env,
@@ -237,6 +267,7 @@ export function trackFunnel(
     outcome: string;
     bucket: number;
     country: string;
+    device: string;
   }
 ): void {
   try {
@@ -247,7 +278,7 @@ export function trackFunnel(
         data.mode,
         data.language,
         data.outcome,
-        '',
+        data.device,
         data.country,
         '',
       ],
@@ -262,7 +293,7 @@ export function trackFunnel(
 /**
  * Track a rate limit hit (429).
  * dataset: agora_llm
- * blobs: ['ratelimit', endpoint, reason, '', '429', '', country]
+ * blobs: ['ratelimit', endpoint, reason, '', '429', device, country]
  * indexes: ['ratelimit']
  */
 export function trackRateLimit(
@@ -270,10 +301,11 @@ export function trackRateLimit(
   endpoint: string,
   reason: 'daily' | 'global' | 'council' | 'summary' | 'conversions',
   country: string,
+  device: string,
 ): void {
   try {
     env.ANALYTICS.writeDataPoint({
-      blobs: ['ratelimit', endpoint, reason, '', '429', '', country],
+      blobs: ['ratelimit', endpoint, reason, '', '429', device, country],
       doubles: [0],
       indexes: ['ratelimit'],
     });

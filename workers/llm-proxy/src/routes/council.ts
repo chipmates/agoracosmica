@@ -8,7 +8,7 @@ import { SAFETY_PREAMBLE } from '../utils/safety';
 import { screenCouncilContent } from '../utils/contentScreen';
 import { createSafetyFilteredStream } from '../services/streamFilter';
 import { logComplianceEvent, getSeverity } from '../utils/complianceLog';
-import { trackLlmEvent, trackRateLimit, readCountry } from '../utils/analytics';
+import { trackLlmEvent, trackRateLimit, readCountry, readDevice } from '../utils/analytics';
 import type { Env, ChatMessage, CouncilRequest } from '../utils/types';
 
 const VALID_LANGUAGES = ['de', 'en', 'es', 'fr', 'it', 'pt', 'nl', 'pl', 'ja', 'ko', 'zh'];
@@ -142,7 +142,7 @@ export async function handleCouncil(request: Request, env: Env, ctx: ExecutionCo
   // 3. Check council-specific rate limit (1/day per identity; see rateLimit.ts for race caveats)
   const rateLimit = await checkAndIncrementCouncilRateLimit(request, env, authResult.payload);
   if (!rateLimit.allowed) {
-    trackRateLimit(env, 'council', 'council', readCountry(request));
+    trackRateLimit(env, 'council', 'council', readCountry(request), readDevice(request));
     return new Response(
       JSON.stringify({
         error: 'You have used your free council for today. Your next council will be available tomorrow.',
@@ -222,6 +222,7 @@ export async function handleCouncil(request: Request, env: Env, ctx: ExecutionCo
       status: 200,
       durationMs: Date.now() - startMs,
       country: readCountry(request),
+      device: readDevice(request),
     });
   }));
 

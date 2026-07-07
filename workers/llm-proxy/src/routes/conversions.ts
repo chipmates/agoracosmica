@@ -5,7 +5,7 @@
 
 import type { Env } from '../utils/types';
 import { forwardConversionToGoogleAds } from '../services/googleAdsCapi';
-import { trackRateLimit, readCountry } from '../utils/analytics';
+import { trackRateLimit, readCountry, readDevice } from '../utils/analytics';
 
 type ConversionEvent = 'profile_created' | 'start_exploring' | 'mode_selected' | 'council_engaged';
 
@@ -80,7 +80,7 @@ export async function handleConversions(
   if (currentCount >= RATE_LIMIT_MAX) {
     // Track the hit so the dashboard sees when this fires. Fire-and-forget
     // (we don't await), so it never delays the 429 response.
-    trackRateLimit(env, 'conversions', 'conversions', readCountry(request));
+    trackRateLimit(env, 'conversions', 'conversions', readCountry(request), readDevice(request));
     return Response.json({ error: 'Rate limited' }, { status: 429 });
   }
   await env.RATE_LIMITS.put(rateLimitKey, String(currentCount + 1), { expirationTtl: RATE_LIMIT_WINDOW });

@@ -12,7 +12,7 @@
 // coarse bucket index, never raw milliseconds. Disclosed in
 // docs/MEASUREMENT.md alongside the other event counters.
 
-import { trackFunnel, readCountry } from '../utils/analytics';
+import { trackFunnel, readCountry, readDevice } from '../utils/analytics';
 import type { Env } from '../utils/types';
 
 interface FunnelPayload {
@@ -129,6 +129,7 @@ export async function handleFunnel(request: Request, env: Env): Promise<Response
     outcome,
     bucket,
     country: readCountry(request),
+    device: readDevice(request),
   });
 
   return new Response(null, { status: 204 });

@@ -6,7 +6,7 @@ import { proxyToNebius } from '../services/nebius';
 import { screenCouncilContent } from '../utils/contentScreen';
 import { createSafetyFilteredStream } from '../services/streamFilter';
 import { logComplianceEvent, getSeverity } from '../utils/complianceLog';
-import { trackLlmEvent, trackRateLimit, readCountry } from '../utils/analytics';
+import { trackLlmEvent, trackRateLimit, readCountry, readDevice } from '../utils/analytics';
 import { VALID_FIGURES } from '../config';
 import type { Env } from '../utils/types';
 
@@ -120,7 +120,7 @@ export async function handleSummary(request: Request, env: Env, ctx: ExecutionCo
   // 3. Check summary-specific rate limit (2/day per identity; see rateLimit.ts for race caveats)
   const rateLimit = await checkAndIncrementSummaryRateLimit(request, env, authResult.payload);
   if (!rateLimit.allowed) {
-    trackRateLimit(env, 'summary', 'summary', readCountry(request));
+    trackRateLimit(env, 'summary', 'summary', readCountry(request), readDevice(request));
     return new Response(
       JSON.stringify({
         error: `Daily summary limit reached (${rateLimit.limit} per day). Try again tomorrow.`,
@@ -173,6 +173,7 @@ export async function handleSummary(request: Request, env: Env, ctx: ExecutionCo
       status: nebiusResponse.status,
       durationMs: Date.now() - startMs,
       country: readCountry(request),
+      device: readDevice(request),
     });
   }));
 
