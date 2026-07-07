@@ -1349,6 +1349,28 @@ function tableHtml(headers, rows) {
   return html + '</table></div>';
 }
 
+// Unified Figures table: Picks (figure_selected) -> Chats (chat rows) ->
+// Completions (playback completed), joined by figure key. Replaces the four
+// scattered figure leaderboards so pick-to-chat-to-completion reads on one row.
+function figuresTableHtml(picks, chats, completions) {
+  var m = {};
+  function add(rowsArr, key) {
+    (rowsArr || []).forEach(function(r) {
+      var f = r.figure; if (!f) return;
+      if (!m[f]) m[f] = { figure: f, picks: 0, chats: 0, comps: 0 };
+      m[f][key] = Number(r.c);
+    });
+  }
+  add(picks, 'picks'); add(chats, 'chats'); add(completions, 'comps');
+  var arr = Object.keys(m).map(function(k) { return m[k]; });
+  if (arr.length === 0) return '<div class="empty-state">No figure activity for this period</div>';
+  arr.sort(function(a, b) { return (b.picks + b.chats) - (a.picks + a.chats); });
+  var rowsHtml = arr.slice(0, 12).map(function(x) {
+    return [esc(cap(x.figure)), fmt(x.picks), fmt(x.chats), fmt(x.comps)];
+  });
+  return tableHtml(['Figure', 'Picks', 'Chats', 'Completions'], rowsHtml);
+}
+
 // Interior zero-fill for time-bucketed GROUP BY rows. Analytics Engine omits
 // empty buckets, so a real zero day/hour (a zero-chat day on the North Star
 // trend) silently vanishes and the line bridges it. This inserts the missing
@@ -2093,11 +2115,9 @@ async function loadOverview() {
   }));
   html += chartCard('Chat by Mode', barsHtml(chatModeItems, '#D8A4C0'), 'card-half');
 
-  // Top figures by content first-play (same data, grouped by figure)
-  var topFiguresContentItems = aggregateByLabel(topFiguresByContent.map(function(r) {
-    return { label: cap(r.figure), c: r.c };
-  }).filter(function(r) { return r.label; }));
-  html += chartCard('Top Figures by Plays', barsHtml(topFiguresContentItems, '#5B8BD4'), 'card-half');
+  // "Top Figures by Plays" removed: the canonical figure home is the Engagement
+  // Figures table (Picks/Chats/Completions). Overview keeps Content Started by
+  // Type + Chat by Mode for overview-level demand.
 
   // Top marketing pages by arrivals — which figure / theme pages are pulling
   // the most paid + organic traffic. Strips the path to a short readable
@@ -2428,10 +2448,11 @@ async function loadProduct() {
   html += kpi('Summaries', summaries, { delta: summariesPrev });
   html += kpi('Chats / Session', chatsPerSession, { sub: chatsPerSession === '--' ? 'need 20+ sessions to be meaningful' : 'reads low: sessions incl. passive and returning opens' });
 
-  // Figure popularity
-  if (figures.length > 0) {
-    html += chartCard('Most Popular Figures', barsHtml(figures.map(function(r) { return { label: cap(r.figure), c: r.c }; }), '#E6BC5C'), 'card-wide');
-  }
+  // One Figures table (Picks -> Chats -> Completions), joined by figure. This
+  // replaces the four scattered figure leaderboards (chats, organic picks,
+  // completions, figure x mode) that never joined, and is the pick-to-chat
+  // activation view the funnel work made central.
+  html += chartCard('Figures: pick to chat to completion', figuresTableHtml(organicFigures, figures, playbackByFigure), 'card-wide');
 
   // Mode + Lang donuts
   if (modes.length > 0) {
@@ -2452,20 +2473,9 @@ async function loadProduct() {
   } else {
     html += chartCard('Mode Picks (organic)', '<div class="empty-state" style="padding:30px 0">-- awaiting first mode_selected</div>', 'card-half');
   }
-  if (organicFigures.length > 0) {
-    html += chartCard('Figure Picks (organic)', barsHtml(organicFigures.map(function(x) { return { label: cap(x.figure), c: x.c }; }), '#E6BC5C'), 'card-half');
-  } else {
-    html += chartCard('Figure Picks (organic)', '<div class="empty-state" style="padding:30px 0">-- awaiting first figure_selected</div>', 'card-half');
-  }
-
-  // Figure x Mode table
-  if (figMode.length > 0) {
-    var fmRows = figMode.map(function(r) {
-      var mc = COLORS.modes[r.mode] || 'var(--dim)';
-      return ['<span>' + esc(cap(r.figure)) + '</span>', '<span style="color:' + mc + '">' + esc(modeLabel(r.mode)) + '</span>', r.c];
-    });
-    html += chartCard('Figure x Mode', tableHtml(['Figure', 'Mode', 'Chats'], fmRows), 'card-wide');
-  }
+  // Figure Picks and Figure x Mode folded into the unified Figures table above
+  // (Picks column + the pick-to-chat relationship), so figure signals read on
+  // one row instead of across three disjoint cards.
 
   // Chat activity graph (always visible)
   if (chatTimeline.length > 1) {
@@ -2541,15 +2551,8 @@ async function loadProduct() {
     html += chartCard('By Type', '<div class="empty-state" style="padding:30px 0">No completions yet ' + RANGE_LABEL[S.range] + '</div>', 'card-half');
   }
 
-  // By figure — which figures users actually finish
-  var pbFigItems = aggregateByLabel(playbackByFigure.map(function(r) {
-    return { label: cap(r.figure), c: r.c };
-  }).filter(function(r) { return r.label; }));
-  if (pbFigItems.length > 0) {
-    html += chartCard('Top Figures by Completion', barsHtml(pbFigItems, '#5B8BD4'), 'card-half');
-  } else {
-    html += chartCard('Top Figures by Completion', '<div class="empty-state" style="padding:30px 0">No completions yet ' + RANGE_LABEL[S.range] + '</div>', 'card-half');
-  }
+  // Top Figures by Completion folded into the unified Figures table above
+  // (Completions column), so completion sits next to picks and chats.
 
   // By language
   if (playbackByLang.length > 0) {
