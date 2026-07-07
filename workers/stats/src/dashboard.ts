@@ -912,6 +912,9 @@ function esc(s) {
 function modeLabel(m) { return MODE_LABELS[m] || cap(m); }
 
 function tier(p) { return p >= 90 ? 'err' : p >= 75 ? 'warn' : 'ok'; }
+// Worst (most severe) tier across a set of resource percentages. A composite
+// health verdict must be the worst of gpu/vram/cpu/ram/disk, never gpu alone.
+function worstTier(ps) { var o = { ok: 0, warn: 1, err: 2 }; var w = 'ok'; for (var i = 0; i < ps.length; i++) { var tt = tier(Number(ps[i]) || 0); if (o[tt] > o[w]) w = tt; } return w; }
 
 function now() { return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }); }
 
@@ -920,6 +923,7 @@ function iv() { return String(S.range); }
 // Sparkline: monotone cubic interpolation
 function sparkSvg(pts, w, h, color) {
   if (!pts || pts.length < 2) return '';
+  const gid = 'sg' + (S.__sg = (S.__sg || 0) + 1);
   const n = pts.length;
   const max = Math.max(...pts, 1);
   const min = Math.min(...pts, 0);
@@ -944,8 +948,8 @@ function sparkSvg(pts, w, h, color) {
   const areaD = d + ' L' + w + ',' + h + ' L0,' + h + ' Z';
 
   return '<svg width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '" style="display:block">' +
-    '<defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="' + color + '" stop-opacity="0.25"/><stop offset="100%" stop-color="' + color + '" stop-opacity="0"/></linearGradient></defs>' +
-    '<path d="' + areaD + '" fill="url(#sg)"/>' +
+    '<defs><linearGradient id="' + gid + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="' + color + '" stop-opacity="0.25"/><stop offset="100%" stop-color="' + color + '" stop-opacity="0"/></linearGradient></defs>' +
+    '<path d="' + areaD + '" fill="url(#' + gid + ')"/>' +
     '<path d="' + d + '" fill="none" stroke="' + color + '" stroke-width="1.5" stroke-linecap="round"/>' +
     '</svg>';
 }
@@ -988,7 +992,9 @@ function decisionLine(chats, signups, visits, sessions) {
   } else if (chats === 0) {
     msg = 'People open the app but no one has talked to a figure yet. Check the first-chat path on mobile.';
   } else if (visits > 200 && signups <= 2) {
-    msg = 'Lots of visits, few signups. That is the cold ad traffic (mostly Spotify), which converts near zero by nature. Judge it as awareness, not acquisition, and do not buy more cold clicks.';
+    msg = 'Lots of visits, few signups. That is the cold ad traffic, which converts near zero by nature. Judge it as awareness, not acquisition, and do not buy more cold clicks.';
+  } else if (signups === 0 && chats > 0) {
+    msg = 'Conversations are happening but no new signups this period. Returning or existing users, not new acquisition. The gap is getting new people in, not the product.';
   } else if (signups > 0 && chats > 0) {
     msg = 'Healthy window: real signups and real conversations. No fire to fight.';
   } else {
@@ -1289,6 +1295,44 @@ function barsHtml(items, color) {
   return html + '</div>';
 }
 
+// Device: visit-share vs conversation-share per class. Two absolute bar charts
+// could not answer "does mobile underconvert" without cross-chart math; this
+// puts both shares on one row so a gap is visible at a glance. Small-base
+// guarded, and the conversation side is message-weighted (one chatty desktop
+// user skews it), so both caveats are captioned.
+function deviceShareHtml(arrivals, chats, opts) {
+  opts = opts || {};
+  var floor = opts.floor || 20;
+  var aTot = (arrivals || []).reduce(function(s, r) { return s + Number(r.c); }, 0);
+  var cTot = (chats || []).reduce(function(s, r) { return s + Number(r.c); }, 0);
+  if (aTot < floor) {
+    return '<div class="card card-wide"><div class="kpi-label">Device: visit share vs conversation share</div><div class="empty-state">Needs 20+ device-tagged visits. Tagging shipped 2026-07-07, so short ranges and any range before then read low.</div></div>';
+  }
+  var aMap = {}, cMap = {};
+  (arrivals || []).forEach(function(r) { if (r.device) aMap[r.device] = Number(r.c); });
+  (chats || []).forEach(function(r) { if (r.device) cMap[r.device] = Number(r.c); });
+  var classes = ['desktop', 'mobile', 'tablet'].filter(function(d) { return aMap[d] || cMap[d]; });
+  var chatShown = cTot >= floor;
+  var rowsHtml = classes.map(function(d) {
+    var aPct = Math.round((aMap[d] || 0) / aTot * 100);
+    var cPct = chatShown ? Math.round((cMap[d] || 0) / cTot * 100) : null;
+    var color = d === 'mobile' ? 'var(--s-quest)' : d === 'tablet' ? 'var(--s-story)' : 'var(--s-prism)';
+    // Underconversion flag: a device that pulls real visit share but a much
+    // smaller conversation share is the mobile-UX signal we shipped this for.
+    var flag = (cPct != null && aPct >= 15 && cPct <= aPct - 10)
+      ? ' <span style="color:var(--warn);font-weight:600">underconverts</span>' : '';
+    var visBar = '<div style="height:6px;border-radius:3px;background:var(--bg-highlight);overflow:hidden;margin:2px 0"><div style="height:100%;width:' + aPct + '%;background:' + color + ';opacity:0.55"></div></div>';
+    var chatBar = cPct == null ? '' : '<div style="height:6px;border-radius:3px;background:var(--bg-highlight);overflow:hidden"><div style="height:100%;width:' + cPct + '%;background:' + color + '"></div></div>';
+    return '<div style="margin:10px 0">' +
+      '<div style="display:flex;justify-content:space-between;font-size:0.8125rem;color:var(--tx)"><span>' + cap(d) + flag + '</span>' +
+      '<span style="color:var(--tx2)">' + aPct + '% visits &rarr; ' + (cPct == null ? '--' : cPct + '% conv') + '</span></div>' +
+      visBar + chatBar + '</div>';
+  }).join('');
+  var caption = '<div class="kpi-sub" style="margin-top:6px">Device tagging since 2026-07-07 (older rows untagged). ' +
+    (chatShown ? 'Conversation share is message-weighted, so one chatty user skews it.' : 'Conversation share hidden until 20+ tagged conversations.') + '</div>';
+  return '<div class="card card-wide"><div class="kpi-label">Device: visit share vs conversation share</div>' + rowsHtml + caption + '</div>';
+}
+
 // Table HTML
 function tableHtml(headers, rows) {
   if (!rows || rows.length === 0) return '<div class="empty-state">No data for this period</div>';
@@ -1486,10 +1530,12 @@ async function batch(queries) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ queries: queries }),
     });
-    if (!res.ok) return queries.map(function() { return { data: [] }; });
+    if (!res.ok) { S.fetchError = true; return queries.map(function() { return { data: [] }; }); }
     const json = await res.json();
+    S.fetchError = false;
     return json.results || queries.map(function() { return { data: [] }; });
   } catch (e) {
+    S.fetchError = true;
     return queries.map(function() { return { data: [] }; });
   }
 }
@@ -1518,9 +1564,19 @@ function updateStatus() {
       if (!s || s.error) {
         msgs.push(id.toUpperCase() + ' unreachable');
         level = 'err';
-      } else if (s.gpu && s.gpu.utilization_percent >= 90) {
-        msgs.push(id.toUpperCase() + ' GPU high (' + Math.round(s.gpu.utilization_percent) + '%)');
-        if (level !== 'err') level = 'warn';
+      } else {
+        // Composite health: the worst of gpu/cpu/ram/disk, not gpu alone (a
+        // maxed disk or RAM used to ship silently green).
+        var worstP = 0, worstName = '';
+        [['GPU', s.gpu && s.gpu.utilization_percent],
+         ['CPU', s.cpu && s.cpu.usage_percent],
+         ['RAM', (s.ram && s.ram.total_gb > 0) ? (s.ram.used_gb / s.ram.total_gb * 100) : 0],
+         ['Disk', s.disk && s.disk.usage_percent]].forEach(function(rr) {
+          var p = Number(rr[1]) || 0;
+          if (p > worstP) { worstP = p; worstName = rr[0]; }
+        });
+        if (worstP >= 90) { msgs.push(id.toUpperCase() + ' ' + worstName + ' high (' + Math.round(worstP) + '%)'); level = 'err'; }
+        else if (worstP >= 75) { msgs.push(id.toUpperCase() + ' ' + worstName + ' elevated (' + Math.round(worstP) + '%)'); if (level !== 'err') level = 'warn'; }
       }
     });
   }
@@ -1823,6 +1879,7 @@ async function loadOverview() {
 
   // Alerts
   var alerts = '';
+  if (S.fetchError) alerts += '<div class="alert-card a-err">Stats API unreachable. The numbers below are stale or absent, not real zeros. Retry in a moment.</div>';
   if (totalRl > 0) alerts += '<div class="alert-card a-warn">' + totalRl + ' users hit rate limits ' + RANGE_LABEL[S.range] + '</div>';
   if (S.serverData) {
     ['fsn1', 'nbg1'].forEach(function(id) {
@@ -1835,7 +1892,7 @@ async function loadOverview() {
   // Reassurance banner: a quiet 24h window is expected at this scale, so frame
   // it as normal and point at the 7-day view rather than letting it read as a
   // failure. Only fires on the 24h window with near-zero conversations.
-  if (S.range === 1 && chats < 3) {
+  if (!S.fetchError && S.range === 1 && chats < 3) {
     alertsEl.innerHTML += '<div class="hint-banner">Quiet 24h is normal at this stage. <a onclick="setRange(7)">The 7-day view</a> is the real read, not any single day.</div>';
   }
 
@@ -1857,7 +1914,7 @@ async function loadOverview() {
   html += '<div class="section-divider" style="grid-column:1/-1">Pulse &middot; ' + RANGE_LABEL[S.range] + '</div>';
   html += kpi('Conversations', chats, { hero: true, spark: sparkChats, sparkColor: '#5B8BD4', delta: chatsPrev, sub: 'real chat messages. the one that means it worked' });
   html += kpi('New Signups', signups, { hero: true, delta: signupsPrev, sub: 'genuinely new accounts' });
-  html += kpi('Raw Visits', arrivals, { sub: 'mixed: ads + bots, no source split yet' });
+  html += kpi('Raw Visits', arrivals, { sub: 'mixed: ads + bots, no source split by design' });
   html += decisionLine(chats, signups, arrivals, sessions);
 
   // Hero KPIs removed 2026-05-25: the previous Arrivals/Sessions/Conversations
@@ -2110,7 +2167,7 @@ function renderServers() {
     var ramPct = ram.total_gb > 0 ? (ram.used_gb / ram.total_gb * 100) : 0;
     var cpuPct = cpu.usage_percent || 0;
     var diskPct = disk.usage_percent || 0;
-    var t = tier(gpuPct);
+    var t = worstTier([gpuPct, vramPct, cpuPct, ramPct, diskPct]);
 
     html += '<div class="server-panel">';
     html += '<div class="server-panel-title"><span class="status-dot" style="background:var(--' + t + ')"></span>' + label + '</div>';
@@ -2499,7 +2556,7 @@ async function loadAudio() {
   var stt = val(r[2]), sttPrev = val(r[3]);
   var sparkTts = rows(r[4]).map(function(x) { return x.c; });
   var sparkTtsRows = rows(r[4]);
-  var avgLatency = r[5] && r[5].data && r[5].data[0] ? Number(r[5].data[0].avg_ms) : 0;
+  var avgLatency = r[5] && r[5].data && r[5].data[0] && r[5].data[0].avg_ms != null ? Number(r[5].data[0].avg_ms) : null;
   var audioErrors = val(r[6]);
   var ttsModels = rows(r[7]);
   var serverDist = rows(r[8]);
@@ -2514,7 +2571,7 @@ async function loadAudio() {
   html += '<div class="grid">';
   html += kpi('TTS Requests', tts, { hero: true, spark: sparkTts, sparkColor: '#68C397', delta: ttsPrev });
   html += kpi('STT Requests', stt, { delta: sttPrev });
-  html += kpi('Avg TTS Latency', fmtMs(avgLatency), {});
+  html += kpi('Avg TTS Latency', fmtMs(avgLatency), { sub: avgLatency == null ? 'no successful TTS calls in period' : '' });
   html += kpi('Audio Errors', audioErrors, { sub: audioErrors > 0 ? 'non-200 responses' : 'all clear', valColor: audioErrors > 0 ? '#E97451' : '#68C397' });
 
   // TTS volume over time
@@ -2622,6 +2679,11 @@ async function loadAdGrants() {
     { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'start_exploring' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
     { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'start_exploring' AND timestamp " + prevRange(), dataset: 'agora_llm' },
     { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE index1 = 'start_exploring' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
+    // --- Device split (blob6, live from 2026-07-07). r[22..23], appended at the
+    // end so existing positional reads do not shift. blob6 != '' drops the
+    // pre-device untagged rows, mirroring the blob7 != '' country panels. ---
+    { sql: "SELECT blob6 as device, COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND blob6 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY device ORDER BY c DESC", dataset: 'agora_llm' },
+    { sql: "SELECT blob6 as device, COUNT() as c FROM agora_llm WHERE blob1 IN ('chat','council','summary') AND blob5 = '200' AND blob6 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY device ORDER BY c DESC", dataset: 'agora_llm' },
   ];
 
   var r = await batch(queries);
@@ -2644,6 +2706,9 @@ async function loadAdGrants() {
   // start_exploring (r[19..21]) — the re-added funnel entry.
   var startExpConv = val(r[19]), startExpPrev = val(r[20]);
   var sparkStartExp = rows(r[21]).map(function(x) { return x.c; });
+  // Device split (r[22..23]) — arrivals and conversations by device class.
+  var deviceArrivals = rows(r[22]);
+  var deviceChats = rows(r[23]);
 
   // Modes picked per ad-profile, within the gclid population only, gated for n.
   var modeFromProfile = multiplierOrDash(modeSelConv, profileConv, 5);
@@ -2685,7 +2750,7 @@ async function loadAdGrants() {
   // Instrumentation health — demoted from the old all-green status board (which
   // read as failure next to a row of zeros) to one quiet line. The plumbing
   // being wired says nothing about whether anyone converted.
-  html += '<div class="insight" style="padding:8px 2px 0">Instrumentation healthy: gclid capture, profile / mode / council events, the CF worker, and Google Ads CAPI forwarding are all wired.</div>';
+  html += '<div class="insight" style="padding:8px 2px 0">Instrumentation wired (not live-checked): gclid capture, profile / mode / council / start_exploring events, the CF worker, and Google Ads CAPI forwarding. Wiring being in place says nothing about whether anyone converted.</div>';
 
   // ── TRAFFIC (mixed sources) ──
   html += '<div class="section-divider">Traffic (mixed sources)</div>';
@@ -2696,6 +2761,12 @@ async function loadAdGrants() {
   html += chartCard('Top Countries (all visits)', barsHtml(countryAllItems, '#9B7BC7'), 'card-wide');
   var countryChatItems = aggregateByLabel(topCountriesChat.map(function(r) { return { label: r.country || 'Unknown', c: r.c }; }));
   html += chartCard('Top Countries (conversations)', barsHtml(countryChatItems, '#5B8BD4'), 'card-wide');
+  // Device: the share-vs-share comparison directly answers "does mobile
+  // underconvert" (a funnel cut), which two absolute bars could not without
+  // cross-chart math. A raw arrivals bar stays for symmetry with Top Countries.
+  html += deviceShareHtml(deviceArrivals, deviceChats, { floor: 20 });
+  var deviceArrivalItems = aggregateByLabel(deviceArrivals.map(function(r) { return { label: cap(r.device || 'unknown'), c: r.c }; }));
+  html += chartCard('Device (all visits)', barsHtml(deviceArrivalItems, 'var(--s-wisdom)'), 'card-wide');
   html += '</div>';
 
   // ── CONTENT REACH ──
