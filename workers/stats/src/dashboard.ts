@@ -2060,7 +2060,7 @@ async function loadOverview() {
   html += kpi('Errors', totalErrors, { sub: totalErrors > 0 ? llmErrors + ' LLM + ' + audioErrors + ' audio' : 'all clear', valColor: totalErrors > 0 ? '#E97451' : '#68C397' });
 
   // Mini server health
-  html += '<div class="card card-interactive" onclick="switchTab(\\\'servers\\\')" tabindex="0" role="button" id="mini-servers"><div class="kpi-label">Server Health</div><div id="mini-servers-inner" style="margin-top:8px">Loading...</div></div>';
+  html += '<div class="card card-interactive" onclick="switchTab(\\\'servers\\\')" onkeydown="if(event.key===\\\'Enter\\\'||event.key===\\\' \\\'){event.preventDefault();switchTab(\\\'servers\\\')}" tabindex="0" role="button" id="mini-servers"><div class="kpi-label">Server Health</div><div id="mini-servers-inner" style="margin-top:8px">Loading...</div></div>';
 
   // Chat activity graph (always visible)
   html += '<div class="section-divider" style="grid-column:1/-1">Activity &amp; content</div>';
@@ -2170,11 +2170,9 @@ async function loadOverview() {
       else { convGhost = convGhost.slice(convGhost.length - convItems.length); }
     }
     html += chartCard('Daily Conversations', svgAreaGraph(convItems, { color: '#5B8BD4', ghost: convGhost.length > 1 ? convGhost : null, ariaLabel: 'Daily conversations trend; the dashed line is the previous period' }), 'card-full');
-  } else if (sparkTts.length > 1) {
-    // Show TTS activity as area graph when there is no multi-day trend yet
-    var ttsItems = sparkTts.map(function(v, i) { return { label: String(i), c: v }; });
-    html += chartCard('TTS Activity', svgAreaGraph(ttsItems, { color: '#68C397', height: 120, ariaLabel: 'TTS requests over time' }), 'card-full');
   }
+  // TTS fallback chart removed from Overview: a TTS-infra curve standing in for
+  // the North Star trend belonged on the Audio tab, not here.
 
   grid.innerHTML = html;
   var ts = now();
@@ -2424,8 +2422,8 @@ async function loadProduct() {
   // === ENGAGEMENT SECTION ===
   html += '<div class="section-divider">Engagement</div>';
   html += '<div class="grid">';
-  html += kpi('App Sessions', sessions, { hero: true, spark: sparkSessions, delta: sessionsPrev, sub: 'app opened, incl. returning. not a conversation' });
-  html += kpi('Chat Messages', chats, { spark: sparkChats, sparkColor: '#5B8BD4', delta: chatsPrev });
+  html += kpi('Chat Messages', chats, { hero: true, spark: sparkChats, sparkColor: '#5B8BD4', delta: chatsPrev, sub: 'real LLM messages. the North Star' });
+  html += kpi('App Sessions', sessions, { spark: sparkSessions, delta: sessionsPrev, sub: 'app opened, incl. returning. not a conversation' });
   html += kpi('Councils', councils, { delta: councilsPrev });
   html += kpi('Summaries', summaries, { delta: summariesPrev });
   html += kpi('Chats / Session', chatsPerSession, { sub: chatsPerSession === '--' ? 'need 20+ sessions to be meaningful' : 'reads low: sessions incl. passive and returning opens' });
@@ -2440,7 +2438,7 @@ async function loadProduct() {
     html += chartCard('Mode Distribution', donutSvg(modes.map(function(r) { return { key: r.mode, c: r.c }; }), COLORS.modes, modeLabel), '');
   }
   if (langs.length > 0) {
-    html += chartCard('Language Split', donutSvg(langs.map(function(r) { return { key: r.lang, c: r.c }; }), COLORS.lang, function(l) { return l === 'de' ? 'Deutsch' : 'English'; }), '');
+    html += chartCard('Language Split', donutSvg(langs.map(function(r) { return { key: r.lang, c: r.c }; }), COLORS.lang, function(l) { return l === 'de' ? 'Deutsch' : l === 'en' ? 'English' : cap(l || 'unknown'); }), '');
   }
 
   // Organic pick volume (Wave-2 funnel events, per-occurrence counters).
@@ -2492,10 +2490,16 @@ async function loadProduct() {
   html += '<div class="grid">';
   html += kpi('Content Started', playbackStarted, { hero: true, sub: 'audio first-play (story/prism/council/foreword)' });
   html += kpi('Content Completed', totalPlayback, { hero: true, spark: sparkPlayback, sparkColor: '#68C397', delta: playbackPrev, sub: 'stories, teachings, prisms, councils' });
+  // Floor 20 starts before a rate: below that a % is Poisson noise (1 of 1 =
+  // 100%). Show the raw fraction instead. A rate over 100% means legacy
+  // completions predate the started beacon, flagged rather than clamped.
+  var compBelowFloor = playbackStarted < 20;
   html += kpi('Completion Rate',
-    completionRate === null ? '--' : (completionRate + '%'),
-    { sub: completionRate === null ? 'awaiting first start' : (totalPlayback + ' / ' + playbackStarted),
-      valColor: completionRate === null ? 'var(--dim)' : (completionRate >= 50 ? '#68C397' : completionRate >= 25 ? '#F5A623' : '#E97451') }
+    completionRate === null ? '--' : (compBelowFloor ? (totalPlayback + '/' + playbackStarted) : (completionRate + '%')),
+    { sub: completionRate === null ? 'awaiting first start'
+        : (compBelowFloor ? 'raw count, needs 20+ starts for a rate'
+        : (completionRate > 100 ? totalPlayback + ' / ' + playbackStarted + ', legacy completions predate the started beacon' : totalPlayback + ' / ' + playbackStarted)),
+      valColor: (completionRate === null || compBelowFloor) ? 'var(--dim)' : (completionRate >= 50 ? '#68C397' : completionRate >= 25 ? '#F5A623' : '#E97451') }
   );
 
   // Started vs Completed over time. Rebuilt on the SVG chart system: the old
@@ -2663,7 +2667,7 @@ async function loadAudio() {
     html += chartCard('Server Distribution', donutSvg(serverDist.map(function(r) { return { key: r.server, c: r.c }; }), COLORS.servers, function(s) { return s.toUpperCase(); }), '');
   }
   if (audioLangs.length > 0) {
-    html += chartCard('Audio Language', donutSvg(audioLangs.map(function(r) { return { key: r.lang, c: r.c }; }), COLORS.lang, function(l) { return l === 'de' ? 'Deutsch' : 'English'; }), '');
+    html += chartCard('Audio Language', donutSvg(audioLangs.map(function(r) { return { key: r.lang, c: r.c }; }), COLORS.lang, function(l) { return l === 'de' ? 'Deutsch' : l === 'en' ? 'English' : cap(l || 'unknown'); }), '');
   }
   html += '</div>';
 
@@ -2937,10 +2941,17 @@ function init() {
   loadServerHealth();
   loadTab(S.tab);
 
-  // Analytics auto-refresh (60s)
+  // Analytics auto-refresh (60s), paused while the tab is hidden so we do not
+  // burn the query batch every minute on an unwatched dashboard.
   setInterval(function() {
+    if (document.visibilityState === 'hidden') return;
     loadTab(S.tab);
   }, 60000);
+  // Refresh immediately on return to visible, so a founder coming back never
+  // reads stale numbers that look current.
+  document.addEventListener('visibilitychange', function() {
+    if (document.visibilityState === 'visible') loadTab(S.tab);
+  });
 }
 
 init();
