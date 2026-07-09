@@ -16,6 +16,7 @@ import type { CouncilMessage } from './index';
 import { councilLog, councilWarn, councilError } from './logger';
 import { getOrRollCouncilFigureSessionId, touchCouncilFigureSession, clearCouncilSessions } from '../audio/tts/ttsSessions';
 import { getAudioContext } from '../audio/audioQueueManager';
+import { registerContentPlayer, type AudioFocusHandle } from '../audio/audioFocus';
 import { splitForGatewayCap } from '../audio/utils/splitForGatewayCap';
 import { sendConversion, COUNCIL_ENGAGED_THRESHOLD_S } from '../../utils/public/gclidCapture';
 
@@ -151,9 +152,16 @@ export class CustomCouncilService {
   // one-shot flag so the conversion fires at most once per council.
   private councilHeardSeconds = 0;
   private councilEngagedFired = false;
+  // Global audio-focus membership. A live council plays through Web Audio
+  // buffer sources (no 'play' event to hook), so we claim focus by hand before
+  // each segment and expose cleanup() as the "pause" other players trigger when
+  // they take over (issue #18).
+  private readonly focusHandle: AudioFocusHandle;
 
   constructor(mainService: MainService) {
     this.mainService = mainService;
+
+    this.focusHandle = registerContentPlayer(() => this.cleanup());
 
     // Progressive streaming state
     this.progressiveState = null;
@@ -739,6 +747,10 @@ export class CustomCouncilService {
         duration: audioBuffer.duration
       });
 
+      // Claim audio focus so any other content audio is paused before this
+      // segment starts producing sound.
+      this.focusHandle.claim();
+
       // Set BEFORE start() so a same-tick cleanup still has the ref to stop.
       this.activeSource = source;
       source.start();
@@ -1210,6 +1222,9 @@ export class CustomCouncilService {
    */
   cleanup(): void {
     councilLog('🧹 Cleaning up CustomCouncilService resources');
+
+    // Leave audio focus (idempotent — safe when we never held it).
+    this.focusHandle.release();
 
     // Reset the Council Engaged accumulator so the next council starts fresh.
     this.councilHeardSeconds = 0;

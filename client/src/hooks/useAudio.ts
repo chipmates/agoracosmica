@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { sendPlaybackBeacon, detectCurrentLanguage } from '../utils/playbackBeacon';
 import type { PlaybackContentType } from '../utils/playbackBeacon';
+import { bindAudioElement } from '../services/audio/audioFocus';
 
 // ============================================
 // Type Definitions
@@ -83,6 +84,17 @@ const useAudio = (audioUrl: string | null | undefined, options: UseAudioOptions 
   onPlaybackCompleteRef.current = onPlaybackComplete;
   onErrorRef.current = onError;
   playbackBeaconRef.current = playbackBeacon;
+
+  // Register this player with the global audio-focus coordinator so starting it
+  // pauses any other content audio, and vice versa (issue #18). Runs once on
+  // mount, before the URL effect below ever calls play(), so the first 'play'
+  // is caught. The element is reused for the hook's lifetime, so we bind once.
+  useEffect(() => {
+    if (!audioRef.current) {
+      audioRef.current = new Audio();
+    }
+    return bindAudioElement(audioRef.current);
+  }, []);
 
   // Initialize or update audio element when URL changes
   useEffect(() => {

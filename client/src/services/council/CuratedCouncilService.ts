@@ -14,6 +14,7 @@ import { getSignedUrl } from '../../utils/s3Utils';
 import { useDomainStore } from '../../stores/domainStore';
 import { canPlayWebm } from '../../utils/audioFormat';
 import { councilLog, councilWarn, councilError } from './logger';
+import { registerContentPlayer, type AudioFocusHandle } from '../audio/audioFocus';
 
 interface CouncilSegment {
   id: string;
@@ -64,15 +65,28 @@ export class CuratedCouncilService {
   private mainService: MainService;
   private curatedPlayback: CuratedPlaybackState | null;
   private readonly CURATED_PLAYBACK_RATE: number;
+  // Global audio-focus membership: a curated debate is content-exclusive, so it
+  // pauses other content audio when it plays and stops cleanly when something
+  // else starts (issue #18). Web Audio has no 'play' event to hook, and curated
+  // segments are a chain of short <audio> elements, so we drive focus by hand
+  // rather than binding each element.
+  private readonly focusHandle: AudioFocusHandle;
 
   constructor(mainService: MainService) {
     this.mainService = mainService;
-    
+
     // Curated playback state
     this.curatedPlayback = null;
-    
+
     // Playback rate for curated content (10% faster for dynamic feel)
     this.CURATED_PLAYBACK_RATE = 1.1;
+
+    // Use cleanup() (not just stopCuratedPlayback) as the "pause" the
+    // coordinator triggers. cleanup() nulls curatedPlayback, which fails the
+    // guard on the pending inter-segment advance timer — otherwise a queued
+    // segment would fire ~700ms after an interruption and steal focus back from
+    // whatever the user just started.
+    this.focusHandle = registerContentPlayer(() => this.cleanup());
   }
 
   /**
@@ -321,6 +335,10 @@ export class CuratedCouncilService {
       }, 1000);
     }, { once: true });
     
+    // Claim audio focus so any other content audio (story, prism, library,
+    // preview) is paused before this segment starts.
+    this.focusHandle.claim();
+
     // Start playback
     audio.play().catch(error => {
       councilError('❌ Failed to start audio playback:', error);
@@ -341,9 +359,10 @@ export class CuratedCouncilService {
       this.curatedPlayback.currentAudio.currentTime = 0;
       this.curatedPlayback.currentAudio = null;
       this.curatedPlayback.isPlaying = false;
-      
+
       councilLog('🔇 Curated audio stopped and silenced');
     }
+    this.focusHandle.release();
   }
 
   /**

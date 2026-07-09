@@ -3,6 +3,7 @@
 // StoryTextProcessor not needed for Audio Library (only for dynamic TTS)
 // import { storyTextProcessor } from './StoryTextProcessor';
 // import { convertTextToSpeech } from './audio/tts';
+import { bindAudioElement } from './audio/audioFocus';
 
 interface AudioObject {
   url: string;
@@ -40,11 +41,13 @@ class AudioStoryService {
   private currentAudio: HTMLAudioElement | null;
   private isPlaying: boolean;
   private listenerAbort: AbortController | null; // Cleanup signal for audio event listeners
+  private focusUnbind: (() => void) | null; // Detach from the audio-focus coordinator
 
   constructor() {
     this.currentAudio = null;
     this.isPlaying = false;
     this.listenerAbort = null;
+    this.focusUnbind = null;
   }
 
   // Handle pre-recorded audio playback
@@ -78,6 +81,12 @@ class AudioStoryService {
       // Create new Audio instance
       const audio = new Audio(audioUrl);
       this.currentAudio = audio;
+
+      // Join the global audio-focus coordinator so this story pauses any other
+      // content audio when it starts, and is paused when something else starts
+      // (issue #18). Bind before play() below so the first 'play' is caught.
+      this.focusUnbind?.();
+      this.focusUnbind = bindAudioElement(audio);
 
       // Abort previous listeners before creating new ones
       if (this.listenerAbort) {
@@ -233,6 +242,10 @@ class AudioStoryService {
       this.listenerAbort.abort();
       this.listenerAbort = null;
     }
+
+    // Leave the audio-focus coordinator (the element is about to be discarded).
+    this.focusUnbind?.();
+    this.focusUnbind = null;
 
     if (this.currentAudio) {
       try {

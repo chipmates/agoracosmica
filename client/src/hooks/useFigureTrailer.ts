@@ -1,6 +1,7 @@
 // src/hooks/useFigureTrailer.ts
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { getPublicTrailerUrl } from '../utils/public/publicMediaUrl';
+import { bindAudioElement } from '../services/audio/audioFocus';
 
 /**
  * Plays a figure's ~50-second page trailer (rendered audio, served from R2).
@@ -45,6 +46,7 @@ export interface FigureTrailerControls {
 
 export function useFigureTrailer(): FigureTrailerControls {
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const unbindFocusRef = useRef<(() => void) | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [status, setStatus] = useState<TrailerStatus>('idle');
 
@@ -61,6 +63,8 @@ export function useFigureTrailer(): FigureTrailerControls {
   // Never leave a trailer playing behind a closed / unmounted modal.
   useEffect(() => {
     return () => {
+      unbindFocusRef.current?.();
+      unbindFocusRef.current = null;
       const audio = audioRef.current;
       if (audio) {
         audio.pause();
@@ -87,6 +91,9 @@ export function useFigureTrailer(): FigureTrailerControls {
       if (!audioRef.current) {
         el.preload = 'none';
         audioRef.current = el;
+        // Join the audio-focus coordinator so a trailer pauses other content
+        // audio (and is paused by it). Bound once, before the play() below.
+        unbindFocusRef.current = bindAudioElement(el);
       }
 
       el.pause();

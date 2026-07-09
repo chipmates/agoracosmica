@@ -1,4 +1,4 @@
-import React, { FC, ReactNode, CSSProperties, ChangeEvent, useState } from 'react';
+import React, { FC, ReactNode, CSSProperties, ChangeEvent, useRef, useState } from 'react';
 import { useShallow } from 'zustand/shallow';
 import {
   Play,
@@ -26,6 +26,7 @@ import { useTranslation } from '../../../hooks/useTranslation';
 import { isMobileOrTablet } from '../../../utils/deviceDetection';
 import { selfHostedTTS } from '../../../services/audio/tts/selfHostedTTS';
 import { newPreviewSessionId } from '../../../services/audio/tts/ttsSessions';
+import { bindAudioElement } from '../../../services/audio/audioFocus';
 import {
   getGermanTechnicalVoice,
   getKokoroTechnicalVoice,
@@ -146,8 +147,21 @@ const VoicePanel: FC<VoicePanelProps> = ({
   const { tString, tNode } = useTranslation();
   const [previewingVoice, setPreviewingVoice] = useState<string | null>(null);
   const [previewAudio, setPreviewAudio] = useState<HTMLAudioElement | null>(null);
+  const previewUnbindRef = useRef<(() => void) | null>(null);
 
-  // Cleanup preview audio on unmount
+  // Leave the audio-focus coordinator when the panel unmounts. Kept in its own
+  // mount-only effect on purpose: the [previewAudio] effect below re-runs on
+  // every preview, and unbinding there would tear down the binding we just
+  // created for the new preview (it holds the live ref, already reassigned).
+  React.useEffect(() => {
+    return () => {
+      previewUnbindRef.current?.();
+      previewUnbindRef.current = null;
+    };
+  }, []);
+
+  // Release the preview element (pause + revoke its blob) when it is replaced
+  // or the panel unmounts.
   React.useEffect(() => {
     return () => {
       if (previewAudio) {
@@ -182,6 +196,10 @@ const VoicePanel: FC<VoicePanelProps> = ({
   // and applies the user's current speed via playbackRate. Falls back to
   // a live self-hosted TTS call if the cached file isn't reachable.
   const handlePreview = async (voice: CosmicVoice, voiceLanguage: 'german' | 'english') => {
+    // Unregister the previous preview first, unconditionally — previewAudio can
+    // still be stale here during the async fetch/TTS window before it is set.
+    previewUnbindRef.current?.();
+    previewUnbindRef.current = null;
     if (previewAudio) {
       previewAudio.pause();
       previewAudio.src = '';
@@ -197,6 +215,9 @@ const VoicePanel: FC<VoicePanelProps> = ({
       (audioEl as HTMLAudioElement & { preservesPitch?: boolean }).preservesPitch = true;
       audioEl.playbackRate = userSpeed;
       setPreviewAudio(audioEl);
+      // Join the audio-focus coordinator (before play()) so a voice preview
+      // pauses other content audio, and is paused when something else starts.
+      previewUnbindRef.current = bindAudioElement(audioEl);
       audioEl.addEventListener('ended', () => setPreviewingVoice(null));
       return audioEl.play();
     };

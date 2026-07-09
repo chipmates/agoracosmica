@@ -1,6 +1,7 @@
 // src/hooks/useCouncilPreview.ts
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { getPublicCouncilPreviewUrl } from '../utils/public/publicMediaUrl';
+import { bindAudioElement } from '../services/audio/audioFocus';
 
 /**
  * Plays a council's ~50-second theme-page preview clip (rendered audio, served
@@ -44,6 +45,7 @@ export interface CouncilPreviewControls {
 
 export function useCouncilPreview(): CouncilPreviewControls {
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const unbindFocusRef = useRef<(() => void) | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [status, setStatus] = useState<CouncilPreviewStatus>('idle');
 
@@ -59,6 +61,8 @@ export function useCouncilPreview(): CouncilPreviewControls {
 
   useEffect(() => {
     return () => {
+      unbindFocusRef.current?.();
+      unbindFocusRef.current = null;
       const audio = audioRef.current;
       if (audio) {
         audio.pause();
@@ -84,6 +88,9 @@ export function useCouncilPreview(): CouncilPreviewControls {
       if (!audioRef.current) {
         el.preload = 'none';
         audioRef.current = el;
+        // Join the audio-focus coordinator so a preview pauses other content
+        // audio (and is paused by it). Bound once, before the play() below.
+        unbindFocusRef.current = bindAudioElement(el);
       }
 
       el.pause();

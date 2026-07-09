@@ -2,6 +2,7 @@
 // Production-Grade: Queue caps + promise barrier integration
 
 import { loadServiceConfig } from './config/serviceConfig';
+import { registerContentPlayer, type AudioFocusHandle } from './audioFocus';
 
 // ============================================
 // Type Definitions
@@ -78,6 +79,11 @@ let isEnqueuing = false; // Guard flag to prevent race conditions
 let currentSessionId: string | null = null;
 let activeTranslation = false;
 let audioEl: HTMLAudioElement | null = null;
+// Audio-focus membership for the live conversation (issue #18). The whole
+// conversation is ONE logical stream played as many chunks on `audioEl`, so we
+// register a single stable handle and hold focus across the inter-chunk gaps:
+// claim when a real chunk plays, release only when the conversation stops.
+let queueFocusHandle: AudioFocusHandle | null = null;
 let currentAudioUrl: string | null = null; // Track current audio for cleanup
 
 // Queue size limits (memory safety)
@@ -467,6 +473,22 @@ const playNextInQueue = async (): Promise<void> => {
         audioEl.style.display = 'none';
       }
 
+      // Register the conversation with the audio-focus coordinator (once). The
+      // "pause" other players trigger is a full stop, so a story/prism started
+      // mid-conversation wins durably instead of being overridden by the next
+      // buffered chunk.
+      //
+      // Known limitation: if the conversation is interrupted WHILE its turn is
+      // still generating TTS, a straggler chunk produced after this drain can
+      // still arrive and re-take focus, leaving the user's new audio paused.
+      // Fully closing that needs the pause to also cancel upstream generation
+      // (ttsScheduler.cancelAll), which lives in conversationStreamDriver and
+      // would form an import cycle here, so it is left for a follow-up. This is
+      // a rare wrong-winner, not the audible overlap of issue #18.
+      if (!queueFocusHandle) {
+        queueFocusHandle = registerContentPlayer(() => cleanupAudioResources());
+      }
+
       // Event handlers with proper cleanup
       audioEl.onended = () => {
         if (import.meta.env.DEV) {
@@ -582,6 +604,12 @@ const playNextInQueue = async (): Promise<void> => {
       });
     }
 
+    // Claim audio focus at the exact point a real TTS chunk plays (not via an
+    // element 'play' listener — this element is the shared iOS autoplay primer,
+    // whose muted priming play() would otherwise steal focus). Idempotent once
+    // the conversation already holds focus.
+    queueFocusHandle?.claim();
+
     const playPromise = audioEl.play();
     if (playPromise !== undefined) {
       playPromise
@@ -646,6 +674,9 @@ export const cleanupAudioResources = (): void => {
     clearTimeout(interChunkTimer);
     interChunkTimer = null;
   }
+
+  // The conversation is stopping — leave the audio-focus coordinator.
+  queueFocusHandle?.release();
 
   // Revoke all queued blob URLs before clearing
   audioQueue.forEach(file => safeRevokeUrl(file.url));
