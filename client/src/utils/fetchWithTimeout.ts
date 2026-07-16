@@ -22,6 +22,7 @@ export async function fetchWithTimeout(
   // If caller provided a signal, abort our controller when theirs fires
   const onExternalAbort = () => controller.abort();
   externalSignal?.addEventListener('abort', onExternalAbort, { once: true });
+  if (externalSignal?.aborted) onExternalAbort();
 
   try {
     const response = await fetch(url, {
