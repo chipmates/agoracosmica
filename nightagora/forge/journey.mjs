@@ -116,10 +116,10 @@ try {
   await page.waitForTimeout(1400)
   await shot('pane-auto')
   await wheel(300, 1)
-  const crossed = await waitPhase('crossing', 8000)
+  // one breath now carries you in (the long crossing rests in the organ
+  // library)
+  const crossed = await waitPhase('camp', 10000)
   if (crossed) {
-    await shot('crossing')
-    await waitPhase('camp', 30000)
     await page.waitForTimeout(2500)
     await shot('camp')
 

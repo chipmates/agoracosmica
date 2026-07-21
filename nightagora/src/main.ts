@@ -120,13 +120,16 @@ const CAMP_SPOTS = [
   {
     id: 'hearth',
     label: 'The Hearth',
-    pos: new Vector3(-0.75, -0.28, -5.2),
+    // beside the flame, never inside it
+    pos: new Vector3(-1.45, -0.3, -5.0),
+    posNarrow: new Vector3(-0.95, -0.34, -4.5),
     open: () => openHearth(),
   },
   {
     id: 'trace',
     label: 'The Trace',
     pos: new Vector3(0.42, 0.06, -4.55),
+    posNarrow: new Vector3(0.48, 0.1, -4.3),
     open: () => {
       traceOpen = !traceOpen
     },
@@ -135,12 +138,14 @@ const CAMP_SPOTS = [
     id: 'chapters',
     label: 'His Nights',
     pos: new Vector3(1.82, 0.62, -5.9),
+    posNarrow: new Vector3(1.0, 0.72, -5.7),
     open: () => chapters.open(),
   },
   {
     id: 'prism',
     label: 'The Prism',
     pos: new Vector3(-2.2, 0.1, -6.6),
+    posNarrow: new Vector3(-0.85, 0.62, -5.9),
     open: () =>
       openDrawn(
         'Chapter III',
@@ -152,6 +157,7 @@ const CAMP_SPOTS = [
     id: 'quest',
     label: 'The Quest',
     pos: new Vector3(1.05, -0.32, -3.7),
+    posNarrow: new Vector3(0.8, -0.3, -3.6),
     open: () =>
       openDrawn(
         'Chapter IV',
@@ -163,6 +169,7 @@ const CAMP_SPOTS = [
     id: 'hissky',
     label: 'His Sky',
     pos: new Vector3(0.3, 1.55, -7.2),
+    posNarrow: new Vector3(0.1, 1.3, -6.6),
     open: () =>
       openDrawn(
         'The Wisdom Map',
@@ -176,6 +183,7 @@ const HUB_SPOTS = [
     id: 'sky',
     label: 'The Sky',
     pos: new Vector3(0, 2.3, -6.2),
+    posNarrow: new Vector3(0, 1.75, -5.6),
     open: () => {
       lookTarget = 1 // the gaze lifts itself; the wheel receives you
     },
@@ -185,12 +193,14 @@ const HUB_SPOTS = [
     label: "Tonight's Council",
     // on the engraved circle BEFORE the fire, never behind the flame
     pos: new Vector3(0, -0.68, -3.7),
+    posNarrow: new Vector3(0, -0.66, -3.3),
     open: () => conveneCouncil(),
   },
   {
     id: 'commons',
     label: 'The Commons',
     pos: new Vector3(-4.6, 0.6, -8.6),
+    posNarrow: new Vector3(-1.3, 0.7, -8.4),
     open: () =>
       openDrawn(
         'The Agora',
@@ -236,6 +246,7 @@ let agoraEnteredAt = -1
 let campReveal = 0
 let campYield = 0
 let campEnteredAt = -1
+let campEnteredWall = -1
 let campHearthOpen = false
 let traceOpen = false
 let voiceTimerA = 0
@@ -801,16 +812,23 @@ function syncTrace(): void {
   traceEl.hidden = false
 }
 
-const crossingTo = new Vector3()
 function beginCrossing(): void {
-  if (!atlas.starWorld(OPEN_WORLD, crossingTo)) return
+  // one diamond-ring breath, the same perfect transition the return
+  // uses (Michel 2026-07-20: the long crossing was too long; it rests
+  // in the organ library for a future tournament)
   if (firstNight) {
     firstNight = false
     autoRide = false
     store('na-first', '1')
   }
-  setPhase('crossing')
-  crossing.begin(crossingTo.clone())
+  closePane()
+  ringEl.classList.add('lit')
+  window.setTimeout(() => {
+    setPhase('camp')
+    ringEl.classList.remove('lit')
+    ringEl.classList.add('passing')
+    window.setTimeout(() => ringEl.classList.remove('passing'), 1200)
+  }, 460)
 }
 
 addEventListener('click', (e) => {
@@ -976,6 +994,7 @@ function setPhase(next: Phase): void {
   if (next === 'camp') {
     setStatus('Carnuntum on the Danube')
     campEnteredAt = elapsed
+    campEnteredWall = performance.now()
     campHearthOpen = false
     traceOpen = false
     // the sentence begun in space completes on the ground
@@ -1154,11 +1173,14 @@ function frame(now: number): void {
     lookUp += (lookTarget - lookUp) * Math.min(1, dt * 4)
     if (reducedMotion) lookUp = lookTarget
     camera.rotation.x = -0.12 + lookUp * 0.78
+    camera.rotation.y += (0 - camera.rotation.y) * Math.min(1, dt * 2.2)
     if (lookUp > 0.93) setPhase('sky')
     if (agoraEnteredAt >= 0 && elapsed - agoraEnteredAt > 1.1) keeperEl.hidden = false
   } else if (phase === 'camp') {
-    // the hearth opens once the arrival sentence has had its say
-    if (!campHearthOpen && campEnteredAt >= 0 && elapsed - campEnteredAt > 6.6) {
+    // the hearth opens once the arrival sentence has had its say —
+    // on the WALL clock: scene time clamps on slow frames and would
+    // stretch the wait (the keeper's own pacing lesson)
+    if (!campHearthOpen && campEnteredWall > 0 && performance.now() - campEnteredWall > 6600) {
       // the auto-open routes through the Sitting: the first hearth of
       // the night asks its one question before the keeper speaks
       openHearth()

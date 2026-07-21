@@ -10,6 +10,8 @@ export interface HotspotDef {
   label: string
   /** world anchor */
   pos: Vector3
+  /** narrow-stage anchor: phones restage the set, they never clip it */
+  posNarrow?: Vector3
   open(): void
 }
 
@@ -60,7 +62,8 @@ export function createHotspots(container: HTMLElement): HotspotsHandles {
         s.el.style.visibility = 'hidden'
         continue
       }
-      projected.copy(s.def.pos).project(camera)
+      const anchor = camera.aspect < 0.9 && s.def.posNarrow ? s.def.posNarrow : s.def.pos
+      projected.copy(anchor).project(camera)
       if (projected.z > 1 || Math.abs(projected.x) > 0.94 || Math.abs(projected.y) > 0.94) {
         s.el.classList.remove('lit')
         s.el.style.visibility = 'hidden'

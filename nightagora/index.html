@@ -1175,7 +1175,8 @@
     /* on the postcard frame the letterpress band is shorter: tighten the
        exchange and let the coda carry the look-up hint */
     @media (max-width: 480px) {
-      #keeper { bottom: calc(40px + env(safe-area-inset-bottom)); }
+      /* clear of the rail and the status line on narrow stages */
+      #keeper { bottom: calc(96px + env(safe-area-inset-bottom)); }
       .keeper-name { font-size: 9px; letter-spacing: 0.22em; text-indent: 0.22em; }
       .keeper-ask { margin-top: 10px; }
       .keeper-breath { min-height: 4.2em; font-size: 17px; }
