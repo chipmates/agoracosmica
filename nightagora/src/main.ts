@@ -992,7 +992,11 @@ function setPhase(next: Phase): void {
     hearthWanted = false
   }
   if (next === 'camp') {
-    setStatus('Carnuntum on the Danube')
+    setStatus(
+      camera.aspect < 0.9
+        ? 'Carnuntum · touch and move to look around'
+        : 'Carnuntum on the Danube'
+    )
     campEnteredAt = elapsed
     campEnteredWall = performance.now()
     campHearthOpen = false
@@ -1094,12 +1098,21 @@ addEventListener('touchmove', (e) => {
   if (y === undefined || x === undefined || touchY === null || touchX === null) return
   const dy = touchY - y
   const dx = touchX - x
-  // in the sky a horizontal swipe is the natural carousel gesture; the
-  // dominant axis wins so diagonals never double-count
-  push(phase === 'sky' && Math.abs(dx) > Math.abs(dy) ? dx * 3 : dy * 3)
+  if (dragAllowed()) {
+    // at the hub and in a cosmos, the finger moves the gaze itself
+    applyDrag(-dx, -dy)
+  } else {
+    // in the sky a horizontal swipe is the natural carousel gesture; the
+    // dominant axis wins so diagonals never double-count
+    push(phase === 'sky' && Math.abs(dx) > Math.abs(dy) ? dx * 3 : dy * 3)
+  }
   touchY = y
   touchX = x
 }, { passive: true })
+addEventListener('pointermove', (e) => {
+  if (!dragging || e.pointerType !== 'mouse') return
+  applyDrag(-e.movementX, -e.movementY)
+})
 
 addEventListener('resize', () => {
   camera.aspect = innerWidth / innerHeight
@@ -1286,10 +1299,21 @@ function frame(now: number): void {
   // so the letterpress rides the same breath as the world)
   freeLook += (freeLookTarget() - freeLook) * Math.min(1, dt * 2.4)
   freeLookY += (freeLookYTarget() - freeLookY) * Math.min(1, dt * 2.4)
+  // drag inertia glides and the gaze drifts home when the hand rests
+  if (!dragging) {
+    dragYaw = Math.max(-0.42, Math.min(0.42, dragYaw + dragVX * dt))
+    dragPitch = Math.max(-0.2, Math.min(0.2, dragPitch + dragVY * dt))
+    dragVX *= Math.exp(-3 * dt)
+    dragVY *= Math.exp(-3 * dt)
+    if (!dragAllowed()) {
+      dragYaw *= Math.exp(-2.5 * dt)
+      dragPitch *= Math.exp(-2.5 * dt)
+    }
+  }
   const baseRx = camera.rotation.x
   const baseRy = camera.rotation.y
-  camera.rotation.y -= freeLook * 0.026
-  camera.rotation.x -= freeLookY * 0.018
+  camera.rotation.y -= freeLook * 0.026 - dragYaw
+  camera.rotation.x -= freeLookY * 0.018 - dragPitch
   renderer.render(scene, camera)
   camera.rotation.x = baseRx
   camera.rotation.y = baseRy
@@ -1303,6 +1327,35 @@ let freeLookY = 0
 addEventListener('pointermove', (e) => {
   pointerNX = (e.clientX / innerWidth - 0.5) * 2
   pointerNY = (e.clientY / innerHeight - 0.5) * 2
+})
+
+// ---- drag-to-look (state of the art on touch: the frame can never
+// hold a world, the hand moves the gaze). Selection stages only; the
+// sky keeps its wheel, the descent its rail. Damped, rubber-limited. ----
+let dragYaw = 0
+let dragPitch = 0
+let dragVX = 0
+let dragVY = 0
+let dragging = false
+function dragAllowed(): boolean {
+  return (phase === 'agora' || phase === 'camp' || phase === 'council') && !paneOpen
+}
+function applyDrag(dx: number, dy: number): void {
+  if (!dragAllowed()) return
+  dragYaw = Math.max(-0.42, Math.min(0.42, dragYaw - dx * 0.0021))
+  dragPitch = Math.max(-0.2, Math.min(0.2, dragPitch - dy * 0.0013))
+  dragVX = -dx * 0.0021 * 60
+  dragVY = -dy * 0.0013 * 60
+}
+addEventListener('pointerdown', (e) => {
+  if (e.pointerType === 'mouse' && e.button !== 0) return
+  dragging = true
+})
+addEventListener('pointerup', () => {
+  dragging = false
+})
+addEventListener('pointercancel', () => {
+  dragging = false
 })
 function freeLookAllowed(): boolean {
   if (reducedMotion || frozen) return false
