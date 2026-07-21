@@ -19,6 +19,9 @@ import { localModeTTS, LocalModeTtsUnavailable } from './localModeTTS';
 export interface AudioFile {
   name: string;
   url: string;
+  // The decoded payload behind `url`. Blob URLs are revoked after playback,
+  // so callers that want to replay must keep the Blob and mint fresh URLs.
+  blob?: Blob;
   speed?: number;
   estimatedDuration?: number; // seconds, for buffer-aware scheduling
   backend?: string; // X-TTS-Backend: which engine the gateway routed to (qwen / f5 / kokoro)

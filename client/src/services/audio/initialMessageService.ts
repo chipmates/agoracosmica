@@ -85,8 +85,14 @@ const splitInitialMessageForGateway = (text: string, language: SupportedLanguage
  * Service for loading pre-created initial messages
  */
 class InitialMessageService {
-  /** In-memory cache for dynamically generated greeting audio (blob URLs). */
-  private dynamicAudioCache = new Map<string, { urls: string[] }>();
+  /**
+   * In-memory cache for dynamically generated greeting audio. Stores Blobs,
+   * NOT blob URLs: the audio queue revokes every blob URL after playback
+   * (audioQueueManager safeRevokeUrl), so a cached URL is dead by the time
+   * of the next hit. Fresh object URLs are minted per hit instead.
+   */
+  private dynamicAudioCache = new Map<string, { blobs: Blob[] }>();
+  private static readonly DYNAMIC_AUDIO_CACHE_MAX = 12;
   /**
    * Get initial message for a conversation
    *
@@ -292,13 +298,15 @@ class InitialMessageService {
     if (cached) {
       if (import.meta.env.DEV) {
         console.log('[InitialMessageService] Cache hit for dynamic greeting audio', {
-          cacheKey, chunks: cached.urls.length
+          cacheKey, chunks: cached.blobs.length
         });
       }
+      // Fresh object URLs per hit: the previous ones were revoked after play.
+      const cachedUrls = cached.blobs.map(blob => URL.createObjectURL(blob));
       return {
         text: baseMessage.text,
-        audioUrl: cached.urls[0],
-        audioUrls: cached.urls,
+        audioUrl: cachedUrls[0],
+        audioUrls: cachedUrls,
         metadata: baseMessage.metadata,
         hasAudio: true
       };
@@ -340,8 +348,17 @@ class InitialMessageService {
 
     const urls = audioFiles.map(af => af.url);
 
-    // Step 5: Cache and return
-    this.dynamicAudioCache.set(cacheKey, { urls });
+    // Step 5: Cache the Blobs (never the URLs, they die after playback) and
+    // return. Only cache when every chunk carried its Blob; otherwise skip
+    // caching rather than poison the cache with unreplayable entries.
+    const blobs = audioFiles.map(af => af.blob).filter((b): b is Blob => !!b);
+    if (blobs.length === audioFiles.length) {
+      if (this.dynamicAudioCache.size >= InitialMessageService.DYNAMIC_AUDIO_CACHE_MAX) {
+        const oldestKey = this.dynamicAudioCache.keys().next().value;
+        if (oldestKey !== undefined) this.dynamicAudioCache.delete(oldestKey);
+      }
+      this.dynamicAudioCache.set(cacheKey, { blobs });
+    }
 
     if (import.meta.env.DEV) {
       console.log('[InitialMessageService] Dynamic greeting audio generated', {

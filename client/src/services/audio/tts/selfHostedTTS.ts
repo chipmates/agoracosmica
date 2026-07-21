@@ -168,6 +168,7 @@ export async function selfHostedTTS(
     return {
       name: `${fileBaseName}${ext}`,
       url,
+      blob: audioBlob,
       speed,
       estimatedDuration,
       backend: xBackend,

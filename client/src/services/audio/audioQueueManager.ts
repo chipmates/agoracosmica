@@ -47,6 +47,13 @@ export interface AudioFile {
    * POST-RELEASE-ROADMAP.md). Undefined for pre-rendered R2 audio.
    */
   backend?: string;
+  /**
+   * The decoded audio payload behind `url`, when the producer had it in hand
+   * (selfHostedTTS). Lets callers cache audio across playbacks: `url` is a
+   * blob URL that gets revoked after playing, so anything that wants to
+   * replay must keep the Blob and mint a fresh object URL per use.
+   */
+  blob?: Blob;
 }
 
 export interface QueueState {
