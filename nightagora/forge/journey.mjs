@@ -139,21 +139,28 @@ try {
     await page.waitForTimeout(1500)
     await shot('camp-after-scroll-down')
 
-    // 7 · the way onward: wait for the hearth keeper, take the exit,
-    // the return breath should convene the council
+    // 7 · the way home: the hearth keeper walks you back to the fire,
+    // where the council waits on its mark, chosen not forced
     const exit = page.locator('.keeper-exit')
     try {
       await exit.waitFor({ state: 'visible', timeout: 30000 })
       await exit.click()
-      if (await waitPhase('council', 10000)) {
-        await page.waitForTimeout(4000)
-        await shot('council')
-        await page.waitForTimeout(4000)
-        await shot('council-seated')
+      if (await waitPhase('agora', 10000)) {
+        await page.waitForTimeout(3200)
+        await shot('hub-return')
+        const councilSpot = page.locator('.hotspot', { hasText: "Tonight's Council" })
+        await councilSpot.waitFor({ state: 'visible', timeout: 8000 })
+        await councilSpot.click()
+        if (await waitPhase('council', 8000)) {
+          await page.waitForTimeout(4000)
+          await shot('council')
+          await page.waitForTimeout(4000)
+          await shot('council-seated')
+        }
       }
     } catch {
-      console.log('[journey] keeper exit never appeared at the camp')
-      await shot('STUCK-no-keeper-exit')
+      console.log('[journey] the way home to the council never opened')
+      await shot('STUCK-way-home')
     }
   }
 

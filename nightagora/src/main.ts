@@ -7,6 +7,8 @@ import { createCamp } from './scenes/camp'
 import { createCouncil } from './scenes/council'
 import { createAtlas } from './scenes/atlas'
 import { createMandala } from './scenes/mandala'
+import { createHotspots } from './core/hotspots'
+import { createChapters } from './core/chapters'
 import { CAMP_SCRIPT, FIRE_SCRIPT } from './content/keeper-script'
 import { ambience } from './core/ambience'
 import { COUNCIL_DONE } from './content/council'
@@ -71,6 +73,51 @@ const camp = createCamp(scene)
 const council = createCouncil(scene, () => councilEnded())
 const atlas = createAtlas(scene)
 const mandala = createMandala(scene)
+
+// ---- the cosmos points: the world itself is the menu (contract §s
+// hearth/trace/chapters; the wisdom-map sky is the next forge) ----
+const hotspotsHost = document.getElementById('hotspots')
+if (!hotspotsHost) throw new Error('missing hotspots shell')
+const hotspots = createHotspots(hotspotsHost)
+const chapters = createChapters('aurelius', 12)
+
+function openHearth(): void {
+  if (phase !== 'camp' || campHearthOpen) return
+  campHearthOpen = true
+  keeperScene.setScript(CAMP_SCRIPT)
+  keeperEl.hidden = false
+}
+
+const CAMP_SPOTS = [
+  {
+    id: 'hearth',
+    label: 'The Hearth',
+    pos: new Vector3(-0.75, -0.28, -5.2),
+    open: () => openHearth(),
+  },
+  {
+    id: 'trace',
+    label: 'The Trace',
+    pos: new Vector3(0.42, 0.06, -4.55),
+    open: () => {
+      traceOpen = !traceOpen
+    },
+  },
+  {
+    id: 'chapters',
+    label: 'His Nights',
+    pos: new Vector3(1.82, 0.62, -5.9),
+    open: () => chapters.open(),
+  },
+]
+const HUB_SPOTS = [
+  {
+    id: 'council',
+    label: "Tonight's Council",
+    pos: new Vector3(0, -0.15, -5.6),
+    open: () => conveneCouncil(),
+  },
+]
 
 function councilEnded(): void {
   setStatus(COUNCIL_DONE)
@@ -361,18 +408,26 @@ function syncChips(): void {
   }
 }
 
-/** The short-dawn rhyme: one diamond-ring breath, and the agora is
-    changed: the council is convening. */
+/** The short-dawn rhyme: one diamond-ring breath carries you home to
+    the fire. The council is not forced on the returner: it waits on the
+    circle, chosen by its own mark. */
 function returnFromCamp(): void {
   if (phase !== 'camp') return
   ringEl.classList.add('lit')
   window.setTimeout(() => {
-    setPhase('council')
-    council.begin()
+    setPhase('agora')
+    campReveal = 0 // the cut hides inside the ring's white breath
     ringEl.classList.remove('lit')
     ringEl.classList.add('passing')
     window.setTimeout(() => ringEl.classList.remove('passing'), 1200)
   }, 460)
+}
+
+/** The circle convenes only when asked. */
+function conveneCouncil(): void {
+  if (phase !== 'agora') return
+  setPhase('council')
+  council.begin()
 }
 
 // ---- the descent staging: through the ring, then the plumb-line dive
@@ -824,6 +879,7 @@ function setPhase(next: Phase): void {
     setStatus('')
     verseShow('This is the Agora.')
   }
+  hotspots.set(next === 'camp' ? CAMP_SPOTS : next === 'agora' ? HUB_SPOTS : [])
   if (next === 'camp') {
     setStatus('Carnuntum on the Danube')
     campEnteredAt = elapsed
@@ -840,6 +896,7 @@ function setPhase(next: Phase): void {
     }, 900)
   } else {
     traceOpen = false
+    chapters.close()
   }
 }
 
@@ -1018,9 +1075,12 @@ function frame(now: number): void {
     keeperEl.hidden = true
   }
 
-  // the camp world breathes in and out with its phase
+  // the camp world breathes in with its phase and strikes FAST on the
+  // way out: its ink is opaque, and a slow fade leaves ghost silhouettes
+  // standing in the agora
   const campTarget = phase === 'camp' ? 1 : 0
-  campReveal += (campTarget - campReveal) * Math.min(1, dt * (reducedMotion ? 20 : 1.1))
+  campReveal +=
+    (campTarget - campReveal) * Math.min(1, dt * (reducedMotion ? 20 : campTarget ? 1.1 : 3.4))
   if (phase === 'camp') {
     camera.rotation.x += (-0.12 - camera.rotation.x) * Math.min(1, dt * 2)
     camera.rotation.y += (0 - camera.rotation.y) * Math.min(1, dt * 2)
@@ -1091,7 +1151,49 @@ function frame(now: number): void {
   ambience.update(dt)
   agora.update({ reveal: agoraReveal, elapsed, speak: keeperScene.speak(), blaze: council.blaze() })
 
+  // the world's points breathe with their stage; the hub offers the
+  // council after the arrival breath, the camp its learning paths
+  const spotsVisible =
+    (phase === 'camp' && campReveal > 0.6 && !chapters.isOpen()) ||
+    (phase === 'agora' &&
+      agoraReveal > 0.6 &&
+      agoraEnteredAt >= 0 &&
+      elapsed - agoraEnteredAt > 2.4)
+  hotspots.sync(camera, spotsVisible)
+  chapters.update()
+
+  // free-look: the world answers the hand, a few damped degrees only
+  // (render-only offset: every projection reads last frame's matrices,
+  // so the letterpress rides the same breath as the world)
+  freeLook += (freeLookTarget() - freeLook) * Math.min(1, dt * 2.4)
+  freeLookY += (freeLookYTarget() - freeLookY) * Math.min(1, dt * 2.4)
+  const baseRx = camera.rotation.x
+  const baseRy = camera.rotation.y
+  camera.rotation.y -= freeLook * 0.026
+  camera.rotation.x -= freeLookY * 0.018
   renderer.render(scene, camera)
+  camera.rotation.x = baseRx
+  camera.rotation.y = baseRy
+}
+
+// ---- free-look state: pointer position, eased, phase-gated ----
+let pointerNX = 0
+let pointerNY = 0
+let freeLook = 0
+let freeLookY = 0
+addEventListener('pointermove', (e) => {
+  pointerNX = (e.clientX / innerWidth - 0.5) * 2
+  pointerNY = (e.clientY / innerHeight - 0.5) * 2
+})
+function freeLookAllowed(): boolean {
+  if (reducedMotion || frozen) return false
+  return phase === 'agora' || phase === 'sky' || phase === 'camp' || phase === 'council'
+}
+function freeLookTarget(): number {
+  return freeLookAllowed() ? pointerNX : 0
+}
+function freeLookYTarget(): number {
+  return freeLookAllowed() ? pointerNY : 0
 }
 
 async function main(): Promise<void> {

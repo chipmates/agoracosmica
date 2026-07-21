@@ -489,6 +489,118 @@
     body[data-phase='held'] #overture-skip { display: block; }
     #overture-skip:hover, #overture-skip:focus-visible { opacity: 1; color: var(--na-starlight); outline: none; }
 
+    /* ---- hotspots: the ring-and-bead marks, the night's one selection
+       device (44px targets, letterpress labels) ---- */
+    #hotspots { position: fixed; inset: 0; z-index: 3; pointer-events: none; }
+    .hotspot {
+      position: absolute; transform: translate(-50%, -50%);
+      background: none; border: none; cursor: pointer;
+      min-width: 44px; min-height: 44px;
+      display: flex; flex-direction: column; align-items: center; gap: 7px;
+      pointer-events: auto;
+      opacity: 0; transition: opacity 0.9s ease;
+    }
+    .hotspot.lit { opacity: 1; }
+    .hotspot-mark {
+      width: 17px; height: 17px; border-radius: 50%;
+      border: 1px solid color-mix(in srgb, var(--na-gold) 75%, transparent);
+      position: relative;
+      box-shadow: 0 0 12px color-mix(in srgb, var(--na-gold) 25%, transparent);
+      transition: box-shadow 0.3s ease, border-color 0.3s ease;
+    }
+    .hotspot-mark::after {
+      content: ''; position: absolute; top: 50%; left: 50%;
+      width: 3px; height: 3px; border-radius: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--na-gold);
+    }
+    .hotspot-label {
+      font-family: var(--sans);
+      font-size: 9px; letter-spacing: 0.3em; text-indent: 0.3em;
+      text-transform: uppercase; color: var(--na-starlight);
+      white-space: nowrap;
+      text-shadow: 0 1px 10px rgba(4, 6, 13, 0.9);
+    }
+    .hotspot:hover .hotspot-mark, .hotspot:focus-visible .hotspot-mark {
+      border-color: var(--na-gold);
+      box-shadow: 0 0 20px color-mix(in srgb, var(--na-gold) 55%, transparent);
+    }
+    .hotspot:hover .hotspot-label, .hotspot:focus-visible .hotspot-label { color: var(--na-gold); }
+    .hotspot:focus-visible { outline: none; }
+    body.forge .hotspot { transition: none !important; }
+
+    /* ---- the chapters: his nights, told in his Echo's voice ---- */
+    #chapters {
+      position: fixed; left: 50%; transform: translateX(-50%);
+      bottom: calc(76px + env(safe-area-inset-bottom));
+      width: min(560px, calc(100% - 48px));
+      z-index: 6;
+      padding: 20px 24px;
+      background: color-mix(in srgb, var(--na-abyss) 88%, transparent);
+      border: 1px solid color-mix(in srgb, var(--na-gold) 35%, transparent);
+      backdrop-filter: blur(6px);
+    }
+    #chapters[hidden] { display: none; }
+    .chapters-kicker {
+      font-family: var(--sans);
+      font-size: 9px; letter-spacing: 0.32em; text-indent: 0.32em;
+      text-transform: uppercase; color: var(--na-gold);
+    }
+    .chapters-ink {
+      margin-top: 6px;
+      font-family: var(--sans);
+      font-size: 8px; letter-spacing: 0.24em;
+      text-transform: uppercase; color: var(--na-mist);
+    }
+    .chapters-list {
+      margin-top: 12px;
+      display: flex; flex-wrap: wrap; gap: 4px 6px;
+    }
+    .chapter-btn {
+      background: none; cursor: pointer;
+      border: 1px solid color-mix(in srgb, var(--na-gold) 25%, transparent);
+      min-width: 44px; min-height: 40px; padding: 8px 12px;
+      font-family: var(--sans);
+      font-size: 9px; letter-spacing: 0.22em;
+      text-transform: uppercase; color: var(--na-starlight);
+      transition: border-color 0.3s ease, color 0.3s ease;
+    }
+    .chapter-btn:hover, .chapter-btn:focus-visible { border-color: var(--na-gold); color: var(--na-gold); outline: none; }
+    .chapter-btn.playing { border-color: var(--na-gold); color: var(--na-gold); }
+    .chapters-bar {
+      position: relative; margin-top: 14px;
+      display: flex; align-items: center; gap: 14px;
+      padding-top: 10px;
+      border-top: 1px solid color-mix(in srgb, var(--na-gold) 30%, transparent);
+    }
+    .chapters-progress {
+      position: absolute; top: -1px; left: 0;
+      height: 1px; width: 0%;
+      background: var(--na-gold);
+    }
+    .chapters-toggle {
+      background: none; border: none; cursor: pointer;
+      min-height: 40px; padding: 6px 8px;
+      font-family: var(--sans);
+      font-size: 10px; letter-spacing: 0.3em; text-indent: 0.3em;
+      text-transform: uppercase; color: var(--na-gold);
+    }
+    .chapters-now {
+      flex: 1; text-align: right;
+      font-family: var(--sans);
+      font-size: 9px; letter-spacing: 0.24em;
+      text-transform: uppercase; color: var(--na-mist);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .chapters-close {
+      background: none; border: none; cursor: pointer;
+      min-height: 40px; padding: 6px 0 6px 10px;
+      font-family: var(--sans);
+      font-size: 9px; letter-spacing: 0.3em;
+      text-transform: uppercase; color: var(--na-mist);
+    }
+    .chapters-close:hover, .chapters-close:focus-visible { color: var(--na-gold); outline: none; }
+
     /* the beckoning star: the first night points to Marcus, three breaths */
     .star-chip.beckon { animation: beckon 2.6s ease-in-out 3; }
     @keyframes beckon {
@@ -1072,6 +1184,18 @@
         <p class="pane-sib-label"></p>
         <div class="pane-siblings"></div>
       </div>
+    </div>
+  </div>
+  <div id="hotspots" aria-label="Points in this world"></div>
+  <div id="chapters" hidden>
+    <p class="chapters-kicker">His Nights · The Story of Marcus Aurelius</p>
+    <p class="chapters-ink">Told in his Echo's voice · An interpretation, not a recording</p>
+    <div class="chapters-list"></div>
+    <div class="chapters-bar">
+      <div class="chapters-progress"></div>
+      <button class="chapters-toggle" type="button">Listen</button>
+      <span class="chapters-now"></span>
+      <button class="chapters-close" type="button">Close</button>
     </div>
   </div>
   <div id="rail" hidden>
