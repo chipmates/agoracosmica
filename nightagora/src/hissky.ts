@@ -238,19 +238,27 @@ interface SeedStar {
 }
 
 const seeds: SeedStar[] = []
-// two laurel branches, TIED at the bottom and OPEN at the crown's top —
-// the wreath of the emperor who refused the laurels' vanity
-const SEAT: Array<[number, number]> = []
-for (let side = 0; side < 2; side++) {
-  for (let i = 0; i < 6; i++) {
-    const u = i / 5
-    // left branch climbs 265° -> 105°, right branch 275° -> 75°: a near
-    // circle with a 30° opening at the top and a close tie at the base
-    const phi = ((side === 0 ? 265 - u * 160 : 275 + u * 160) * Math.PI) / 180
-    const r = 7.4
-    SEAT.push([Math.cos(phi) * r, Math.sin(phi) * r - 1.2])
-  }
-}
+// THE STOIC TAURUS — the canon sign, verbatim from the classic app's
+// ZodiacConstellation pattern (0..100 screen space, y down): horns,
+// face, neck, shoulder, legs, belly, back, tail tuft.
+const TAURUS: Array<[number, number]> = [
+  [30, 30], // Horn left tip
+  [40, 25], // Horn arc to forehead
+  [50, 30], // Head top
+  [60, 25], // Horn arc to right tip
+  [70, 30], // Right horn tip
+  [65, 40], // Face
+  [55, 45], // Neck
+  [45, 50], // Shoulder
+  [40, 60], // Front leg
+  [35, 70], // Belly / hind leg
+  [55, 65], // Back / tail base
+  [65, 55], // Tail tuft
+]
+const SEAT: Array<[number, number]> = TAURUS.map(([px, py]) => [
+  ((px - 50) / 100) * 16.5,
+  ((50 - py) / 100) * 15.5 + 0.6,
+])
 
 function makeSeed(i: number, title: string): SeedStar {
   const group = new Group()
@@ -378,20 +386,54 @@ async function boot(): Promise<void> {
     return
   }
 
-  // seed titles: the real twelve from R2, graceful fallback offline
-  let titles = Array.from({ length: 12 }, (_, i) => `Seed ${i + 1}`)
+  // the real twelve from R2 (title + summary + quote feed the panel)
+  interface SeedData {
+    title?: string
+    summary?: string
+    quote?: string
+  }
+  let seedData: SeedData[] = Array.from({ length: 12 }, (_, i) => ({ title: `Seed ${i + 1}` }))
   try {
     const res = await fetch('https://media.agoracosmica.org/seeds/en/aurelius-seeds.json')
-    const data = (await res.json()) as { seeds?: Array<{ title?: string }> }
-    if (data.seeds)
-      titles = data.seeds.slice(0, 12).map((s, i) => s.title ?? `Seed ${i + 1}`)
+    const data = (await res.json()) as { seeds?: SeedData[] }
+    if (data.seeds) seedData = data.seeds.slice(0, 12)
   } catch {
-    /* the wreath still grows */
+    /* the sign still grows */
   }
-  for (let i = 0; i < 12; i++) seeds.push(makeSeed(i, titles[i] ?? `Seed ${i + 1}`))
-  for (let i = 0; i < 5; i++) bind(i, i + 1)
-  for (let i = 6; i < 11; i++) bind(i, i + 1)
-  bind(0, 6) // the tie at the base, where the two branches are bound
+  for (let i = 0; i < 12; i++) seeds.push(makeSeed(i, seedData[i]?.title ?? `Seed ${i + 1}`))
+
+  // ---- selectable seeds: every star opens its own letterpress ----
+  const seedButtons = document.getElementById('seed-buttons')
+  const seedPanel = document.getElementById('seed-panel')
+  const btns: HTMLButtonElement[] = []
+  function openSeed(i: number): void {
+    if (!seedPanel) return
+    const d = seedData[i]
+    const k = seedPanel.querySelector('.panel-kicker')
+    const t = seedPanel.querySelector('.panel-title')
+    const sm = seedPanel.querySelector('.panel-summary')
+    const q = seedPanel.querySelector('.panel-quote')
+    if (k) k.textContent = `Seed ${i + 1} · The Stoic Taurus`
+    if (t) t.textContent = d?.title ?? `Seed ${i + 1}`
+    if (sm) sm.textContent = d?.summary ?? ''
+    if (q) q.textContent = d?.quote ? `“${d.quote}”` : ''
+    seedPanel.hidden = false
+  }
+  seedPanel?.querySelector('.panel-close')?.addEventListener('click', () => {
+    if (seedPanel) seedPanel.hidden = true
+  })
+  if (seedButtons) {
+    for (let i = 0; i < 12; i++) {
+      const b = document.createElement('button')
+      b.type = 'button'
+      b.className = 'seed-btn'
+      b.setAttribute('aria-label', seedData[i]?.title ?? `Seed ${i + 1}`)
+      b.addEventListener('click', () => openSeed(i))
+      seedButtons.appendChild(b)
+      btns.push(b)
+    }
+  }
+  for (let i = 0; i < 11; i++) bind(i, i + 1) // the bull, drawn in one line
 
   const stages = Array.from(document.querySelectorAll('#stages button'))
   for (const b of stages) {
@@ -491,6 +533,17 @@ async function boot(): Promise<void> {
       } else {
         seedLabel.classList.remove('lit')
       }
+    }
+
+    for (let i = 0; i < btns.length; i++) {
+      const b = btns[i]
+      const sd = seeds[i]
+      if (!b || !sd) continue
+      proj.copy(sd.group.position)
+      wreath.localToWorld(proj)
+      proj.project(camera)
+      b.style.left = `${(proj.x * 0.5 + 0.5) * innerWidth}px`
+      b.style.top = `${(-proj.y * 0.5 + 0.5) * innerHeight}px`
     }
 
     camera.rotation.x = 0.24

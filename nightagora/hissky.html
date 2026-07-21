@@ -96,6 +96,64 @@
       font-family: var(--serif); font-style: italic;
       font-size: 14px; color: var(--na-mist); opacity: 0.85;
     }
+    #seed-buttons { position: fixed; inset: 0; z-index: 3; pointer-events: none; }
+    .seed-btn {
+      position: absolute; transform: translate(-50%, -50%);
+      width: 44px; height: 44px;
+      background: none; border: none; cursor: pointer;
+      pointer-events: auto;
+    }
+    .seed-btn:focus-visible { outline: 1px solid var(--na-gold); outline-offset: 4px; border-radius: 50%; }
+    #seed-panel {
+      position: fixed; left: 50%; top: 50%;
+      transform: translate(-50%, -50%);
+      width: min(480px, calc(100% - 44px));
+      z-index: 6; text-align: center;
+      padding: 30px 34px 22px;
+      background: color-mix(in srgb, var(--na-abyss) 88%, transparent);
+      border: 1px solid color-mix(in srgb, var(--na-gold) 35%, transparent);
+      backdrop-filter: blur(6px);
+    }
+    #seed-panel[hidden] { display: none; }
+    .panel-kicker {
+      font-family: var(--sans);
+      font-size: 9px; letter-spacing: 0.32em; text-indent: 0.32em;
+      text-transform: uppercase; color: var(--na-gold);
+    }
+    .panel-title {
+      margin-top: 12px;
+      font-family: var(--serif);
+      font-size: clamp(20px, 2.4vw, 26px);
+      color: var(--na-starlight);
+    }
+    .panel-summary {
+      margin-top: 14px;
+      font-family: var(--serif);
+      font-size: 15px; line-height: 1.6;
+      color: var(--na-mist);
+      text-align: left;
+    }
+    .panel-quote {
+      margin-top: 14px;
+      font-family: var(--serif); font-style: italic;
+      font-size: 15px; line-height: 1.55;
+      color: var(--na-starlight);
+    }
+    .panel-note {
+      margin-top: 16px;
+      font-family: var(--sans);
+      font-size: 8px; letter-spacing: 0.28em;
+      text-transform: uppercase; color: var(--na-gold); opacity: 0.8;
+    }
+    .panel-close {
+      margin-top: 10px;
+      background: none; border: none; cursor: pointer;
+      min-height: 44px; padding: 8px 16px;
+      font-family: var(--sans);
+      font-size: 9px; letter-spacing: 0.3em; text-indent: 0.3em;
+      text-transform: uppercase; color: var(--na-mist);
+    }
+    .panel-close:hover, .panel-close:focus-visible { color: var(--na-gold); outline: none; }
     @media (max-aspect-ratio: 9/10) {
       #plate { top: 6%; }
       #night-line {
@@ -114,16 +172,25 @@
   <div id="plate">
     <p class="plate-kicker">His Sky · The Wisdom Map</p>
     <h1 class="plate-name">Marcus Aurelius</h1>
-    <p class="plate-sub">Twelve seeds · the wreath grows as you learn</p>
+    <p class="plate-sub">The Stoic Taurus · twelve seeds · the sign grows as you learn</p>
   </div>
   <p id="night-line"></p>
-  <p id="note">A living concept: every seed is a star, and the four ways of knowing it — story, dialogue, prism, quest — bloom it stage by stage.</p>
+  <p id="note">A Taurus bull silhouette: his birth sign, and his grounded strength, patience, and resolve. Every seed is a star; the four ways of knowing it bloom it stage by stage. Open any star.</p>
   <p id="seed-label"></p>
   <div id="legend" aria-label="Bloom stages"></div>
+  <div id="seed-buttons" aria-label="The twelve seeds"></div>
+  <div id="seed-panel" hidden>
+    <p class="panel-kicker"></p>
+    <p class="panel-title"></p>
+    <p class="panel-summary"></p>
+    <p class="panel-quote"></p>
+    <p class="panel-note">The full seed · its story, dialogue, prism, and quest · opens in Agora Cosmica</p>
+    <button class="panel-close" type="button">Close</button>
+  </div>
   <div id="stages" role="group" aria-label="Demonstrate the growth">
     <button type="button" data-stage="0">First night</button>
     <button type="button" data-stage="1">Growing</button>
-    <button type="button" data-stage="2">The wreath complete</button>
+    <button type="button" data-stage="2">The sign complete</button>
     <button type="button" data-stage="auto" class="here">Let it live</button>
   </div>
   <script type="module" src="/src/hissky.ts"></script>
