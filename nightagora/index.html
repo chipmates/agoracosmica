@@ -757,6 +757,21 @@
       opacity: 0; transition: opacity 1.2s ease;
     }
     #chapter-marks.lit { opacity: 1; }
+    #sky-return {
+      position: fixed; left: 50%; transform: translateX(-50%);
+      bottom: calc(58px + env(safe-area-inset-bottom));
+      background: none; border: none; cursor: pointer;
+      min-height: 44px; padding: 8px 16px;
+      font-family: var(--sans);
+      font-size: 9px; letter-spacing: 0.3em; text-indent: 0.3em;
+      text-transform: uppercase; color: var(--na-gold);
+      opacity: 0; transition: opacity 1.2s ease, color 0.3s ease;
+      pointer-events: none;
+    }
+    #sky-return.lit { opacity: 0.85; pointer-events: auto; }
+    #sky-return:hover, #sky-return:focus-visible { opacity: 1; color: var(--na-starlight); outline: none; }
+    #sky-return[hidden] { display: none; }
+    body.forge #sky-return { transition: none !important; }
     #chapter-marks span { margin: 0 7px; opacity: 0.45; transition: opacity 0.6s ease, color 0.6s ease; }
     #chapter-marks span.here { opacity: 1; color: var(--na-gold); }
     #star-chips { position: fixed; inset: 0; z-index: 3; pointer-events: none; }
@@ -1241,6 +1256,7 @@
   </div>
   <p id="sky-invite">Open any name to explore their life and ideas.</p>
   <p id="chapter-marks" aria-hidden="true"></p>
+  <button id="sky-return" type="button" hidden>The Fire · return</button>
   <div id="star-chips" hidden></div>
   <div id="figure-pane" hidden>
     <button class="pane-close" type="button">Back to the sky</button>

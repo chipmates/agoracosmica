@@ -12,15 +12,31 @@ import {
   MeshBasicMaterial,
   MeshBasicNodeMaterial,
   Points,
-  PointsMaterial,
+  PointsNodeMaterial,
   RingGeometry,
   Scene,
   SphereGeometry,
   Sprite,
   SpriteMaterial,
 } from 'three/webgpu'
-import { float, length, mix, positionLocal, pow, sin, smoothstep, uniform, vec3 } from 'three/tsl'
-import { mulberry32, shellPoint, FOUNDING_SEED } from '../core/seed'
+import {
+  attribute,
+  clamp,
+  float,
+  length,
+  mix,
+  pointUV,
+  positionLocal,
+  positionView,
+  pow,
+  sin,
+  smoothstep,
+  time,
+  uniform,
+  vec2,
+  vec3,
+} from 'three/tsl'
+import { mulberry32, FOUNDING_SEED } from '../core/seed'
 
 const GOLD = new Color('#e0b96a')
 const GOLD_DEEP = new Color('#a97c2f')
@@ -80,7 +96,14 @@ export function createEclipse(scene: Scene) {
     colors.push(c.r, c.g, c.b)
   }
   domeGeo.setAttribute('color', new Float32BufferAttribute(colors, 3))
-  scene.add(new Mesh(domeGeo, new MeshBasicMaterial({ vertexColors: true, side: BackSide })))
+  // the dome is a wash of night, not a wall: no depth write, so the
+  // deep starfield beyond it still shines through
+  const dome = new Mesh(
+    domeGeo,
+    new MeshBasicMaterial({ vertexColors: true, side: BackSide, depthWrite: false })
+  )
+  dome.renderOrder = -2
+  scene.add(dome)
 
   // ---- the eclipse ----
   const eclipse = new Group()
@@ -185,44 +208,73 @@ export function createEclipse(scene: Scene) {
   flash.scale.setScalar(2.1)
   eclipse.add(flash)
 
-  // ---- the firmament: star populations as soft round glows (concept
-  // 01 law: a star is a falloff, never a hard point) ----
-  const starGlow = glowTexture([
-    [0, 'rgba(255, 255, 255, 1)'],
-    [0.25, 'rgba(255, 255, 255, 0.55)'],
-    [0.55, 'rgba(255, 255, 255, 0.12)'],
-    [1, 'rgba(0, 0, 0, 0)'],
-  ])
-  function starField(count: number, size: number, color: Color, rMin: number, rMax: number) {
-    const geo = new BufferGeometry()
-    const pos: number[] = []
-    for (let i = 0; i < count; i++) pos.push(...shellPoint(rand, rMin, rMax))
-    geo.setAttribute('position', new Float32BufferAttribute(pos, 3))
-    const mat = new PointsMaterial({
-      color,
-      size,
-      map: starGlow,
-      sizeAttenuation: true,
-      transparent: true,
-      opacity: 0,
-      depthWrite: false,
-      blending: AdditiveBlending,
-    })
-    const points = new Points(geo, mat)
-    scene.add(points)
-    return { points, mat }
+  // ---- THE FIRMAMENT, ported from concept 01's star shader: ONE field,
+  // every star its own size and twinkle, soft shader falloff, real depth
+  // (60..180), upper-sky bias that still fills the band behind the
+  // pillars. The dome writes no depth so the far stars shine through. ----
+  const STAR_COUNT = 3200
+  const starGeo = new BufferGeometry()
+  {
+    const pos = new Float32Array(STAR_COUNT * 3)
+    const col = new Float32Array(STAR_COUNT * 3)
+    const size = new Float32Array(STAR_COUNT)
+    const tw = new Float32Array(STAR_COUNT * 2)
+    const TINTS = [STAR_COOL, STAR_ICE, STAR_PALE, STAR_WARM]
+    for (let i = 0; i < STAR_COUNT; i++) {
+      const r = 60 + rand() * 120
+      const th = rand() * Math.PI * 2
+      // a third of the heaven gathers low, where the seated eye lives
+      // between the columns; the rest favours the upper sky
+      const y = i % 3 === 0 ? 0.03 + rand() * 0.33 : -0.35 + rand() * 1.35
+      const ph = Math.acos(Math.max(-1, Math.min(1, y)))
+      pos[i * 3] = Math.sin(ph) * Math.cos(th) * r
+      pos[i * 3 + 1] = Math.cos(ph) * r
+      pos[i * 3 + 2] = Math.sin(ph) * Math.sin(th) * r
+      const tint = TINTS[rand() < 0.085 ? 3 : Math.floor(rand() * 3)] ?? STAR_COOL
+      const dim = 0.55 + rand() * 0.45
+      col[i * 3] = tint.r * dim
+      col[i * 3 + 1] = tint.g * dim
+      col[i * 3 + 2] = tint.b * dim
+      size[i] = 0.7 + rand() * 1.4
+      tw[i * 2] = 0.4 + rand() * 1.2
+      tw[i * 2 + 1] = rand() * Math.PI * 2
+    }
+    starGeo.setAttribute('position', new Float32BufferAttribute(pos, 3))
+    starGeo.setAttribute('aColor', new Float32BufferAttribute(col, 3))
+    starGeo.setAttribute('aSize', new Float32BufferAttribute(size, 1))
+    starGeo.setAttribute('aTw', new Float32BufferAttribute(tw, 2))
   }
-  // a rich, varied heaven: four populations at different sizes and hues,
-  // dense dust to bright gems, cool sparkle among the warm
-  // concept-01 density and depth: a far veil, deep shells, a NEAR layer
-  // whose parallax makes the night feel inhabited, rare gold gems
-  const farDust = starField(2200, 0.16, STAR_PALE, 82, 88)
-  const dustStars = starField(3600, 0.2, STAR_PALE, 50, 80)
-  const dimStars = starField(2600, 0.3, STAR_COOL, 46, 78)
-  const midStars = starField(900, 0.46, STAR_ICE, 44, 72)
-  const brightStars = starField(380, 0.62, STAR_ICE, 43, 68)
-  const gemStars = starField(130, 0.9, STAR_WARM, 42, 62)
-  const nearStars = starField(240, 0.5, STAR_COOL, 30, 40)
+  const uBirth = uniform(0)
+  const uPx = uniform(Math.min(devicePixelRatio, 2))
+  const starMat = new PointsNodeMaterial({
+    transparent: true,
+    depthWrite: false,
+    blending: AdditiveBlending,
+  })
+  starMat.sizeAttenuation = false
+  // the TSL runtime swizzles attribute nodes fine; the generated typings
+  // do not follow — the same boundary escape the mandala's fbm uses
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const aSizeN = attribute('aSize', 'float') as any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const twN = attribute('aTw', 'vec2') as any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const pUV = pointUV as any
+  starMat.sizeNode = clamp(
+    aSizeN.mul(float(900)).div(positionView.z.negate().max(1)),
+    0.6,
+    26
+  ).mul(uPx)
+  const twinkle = sin(time.mul(twN.x).add(twN.y)).mul(0.28).add(0.72)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  starMat.colorNode = attribute('aColor', 'vec3') as any
+  starMat.opacityNode = smoothstep(0.5, 0.08, length(pUV.sub(vec2(0.5, 0.5))))
+    .mul(twinkle)
+    .mul(0.95)
+    .mul(uBirth)
+  const stars = new Points(starGeo, starMat)
+  stars.frustumCulled = false
+  scene.add(stars)
 
   const wandererBase: Array<[number, number, number]> = []
   const wandererMat = new SpriteMaterial({
@@ -286,21 +338,9 @@ export function createEclipse(scene: Scene) {
       flashMat.opacity = 0
     }
 
-    farDust.mat.opacity = 0.42 * s.skyBirth
-    dustStars.mat.opacity = 0.6 * s.skyBirth
-    dimStars.mat.opacity = 0.78 * s.skyBirth
-    midStars.mat.opacity = (0.72 + 0.1 * Math.sin(s.elapsed * 0.7)) * s.skyBirth
-    brightStars.mat.opacity = s.skyBirth
-    gemStars.mat.opacity = (0.82 + 0.16 * Math.sin(s.elapsed * 0.9 + 2)) * s.skyBirth
-    nearStars.mat.opacity = 0.55 * s.skyBirth
+    uBirth.value = s.skyBirth
     wandererMat.opacity = s.skyBirth * s.lanterns
-    farDust.points.rotation.y = s.elapsed * 0.002
-    dustStars.points.rotation.y = s.elapsed * 0.0025
-    dimStars.points.rotation.y = s.elapsed * 0.003
-    midStars.points.rotation.y = s.elapsed * 0.0035
-    brightStars.points.rotation.y = s.elapsed * 0.004
-    gemStars.points.rotation.y = s.elapsed * 0.0045
-    nearStars.points.rotation.y = s.elapsed * 0.0055
+    stars.rotation.y = s.elapsed * 0.003
     wanderers.rotation.y = s.elapsed * 0.011
     wanderers.rotation.x = Math.sin(s.elapsed * 0.05) * 0.01
 

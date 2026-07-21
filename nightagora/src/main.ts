@@ -183,7 +183,8 @@ const HUB_SPOTS = [
   {
     id: 'council',
     label: "Tonight's Council",
-    pos: new Vector3(0, -0.15, -5.6),
+    // on the engraved circle BEFORE the fire, never behind the flame
+    pos: new Vector3(0, -0.68, -3.7),
     open: () => conveneCouncil(),
   },
   {
@@ -415,10 +416,17 @@ addEventListener('keydown', (e) => {
 })
 
 /** dress or strike the sky's letterpress in one move */
+const skyReturnEl = document.getElementById('sky-return')
+skyReturnEl?.addEventListener('click', () => returnToFire())
 function skyDress(on: boolean): void {
   plateEl.classList.toggle('lit', on)
   inviteEl.classList.toggle('lit', on)
   marksEl.classList.toggle('lit', on)
+  if (skyReturnEl) {
+    skyReturnEl.hidden = false
+    // the way home appears once the wheel is yours, not on the rail
+    skyReturnEl.classList.toggle('lit', on && !autoRide)
+  }
   chipsEl.hidden = !on
   if (on) {
     // the first night is a rail: the sky itself says so
@@ -1030,13 +1038,7 @@ function push(delta: number): void {
     if (Math.sign(delta) !== Math.sign(skyAcc)) skyAcc = 0
     skyAcc += delta
     if (Math.abs(skyAcc) > 150) {
-      // browsing turns the wheel; a firm downward pull past the wheel
-      // returns the gaze to the fire (every stage has a way back)
-      if (skyAcc < 0 && !autoRide) {
-        skyAcc = 0
-        returnToFire()
-        return
-      }
+      // the wheel turns both ways; the way home is its own visible mark
       stepChapter(skyAcc > 0 ? 1 : -1)
       skyAcc = 0
     }

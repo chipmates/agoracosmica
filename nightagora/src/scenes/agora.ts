@@ -672,10 +672,12 @@ export function createAgora(scene: Scene) {
     refl.scale.set(REFL_W * wide, REFL_H * breath * rise, 1)
     refl.position.y = 2 * FLOOR_Y - FLAME_BASE - (REFL_H * breath * rise) / 2
 
-    dustFar.mat.opacity = 0.75 * r
-    dustNear.mat.opacity = 0.3 * r
-    dustGold.mat.opacity = 0.42 * r
-    dustEdge.mat.opacity = 0.3 * r
+    // the polish keeps only a whisper of the firmament (Michel: the
+    // stars belong in the sky behind the pillars, not on the marble)
+    dustFar.mat.opacity = 0.32 * r
+    dustNear.mat.opacity = 0.13 * r
+    dustGold.mat.opacity = 0.2 * r
+    dustEdge.mat.opacity = 0.13 * r
 
     for (const c of coals) {
       c.mat.opacity = r * (0.66 + 0.22 * Math.sin(t * 2.3 + c.phase))
