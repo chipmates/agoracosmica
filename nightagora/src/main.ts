@@ -170,12 +170,9 @@ const CAMP_SPOTS = [
     label: 'His Sky',
     pos: new Vector3(0.3, 1.55, -7.2),
     posNarrow: new Vector3(0.1, 1.3, -6.6),
-    open: () =>
-      openDrawn(
-        'The Wisdom Map',
-        'His Sky',
-        'His themes as his own constellation, growing brighter as you learn.'
-      ),
+    // the living concept page shows the wreath evolving (task #10);
+    // the in-cosmos dusk version follows with the day machinery
+    open: () => window.open('/hissky.html', '_blank', 'noopener'),
   },
 ]
 const HUB_SPOTS = [

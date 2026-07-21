@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#060b1c" />
+  <meta name="robots" content="noindex" />
+  <title>His Sky · The Wisdom Map of Marcus Aurelius (concept)</title>
+  <style>
+    :root {
+      --na-abyss: #060b1c;
+      --na-gold: #e0b96a;
+      --na-starlight: #f3efe2;
+      --na-mist: #8d93ad;
+      --serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+      --sans: 'Avenir Next', Avenir, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; overscroll-behavior: none; }
+    body { background: var(--na-abyss); color: var(--na-starlight); overflow: hidden; }
+    #stage { position: fixed; inset: 0; }
+    #plate {
+      position: fixed; left: max(28px, env(safe-area-inset-left)); top: 8%;
+      z-index: 3; pointer-events: none;
+    }
+    .plate-kicker {
+      font-family: var(--sans);
+      font-size: 10px; letter-spacing: 0.34em;
+      text-transform: uppercase; color: var(--na-gold);
+    }
+    .plate-name {
+      margin-top: 12px;
+      font-family: var(--sans); font-weight: 300;
+      font-size: clamp(20px, 3vw, 36px); letter-spacing: 0.22em;
+      text-transform: uppercase; color: var(--na-starlight);
+    }
+    .plate-sub {
+      margin-top: 10px;
+      font-family: var(--sans);
+      font-size: 9px; letter-spacing: 0.3em;
+      text-transform: uppercase; color: var(--na-mist);
+    }
+    #night-line {
+      position: fixed; left: 0; right: 0; top: 8%;
+      text-align: right; padding-right: max(28px, env(safe-area-inset-right));
+      z-index: 3; pointer-events: none;
+      font-family: var(--sans);
+      font-size: 9px; letter-spacing: 0.3em;
+      text-transform: uppercase; color: var(--na-mist);
+    }
+    #seed-label {
+      position: fixed; z-index: 3; pointer-events: none;
+      transform: translateX(-50%);
+      font-family: var(--sans);
+      font-size: 10px; letter-spacing: 0.28em; text-indent: 0.28em;
+      text-transform: uppercase; color: var(--na-starlight);
+      white-space: nowrap;
+      text-shadow: 0 1px 10px rgba(4, 6, 13, 0.95);
+      opacity: 0; transition: opacity 0.5s ease;
+    }
+    #seed-label.lit { opacity: 1; }
+    #legend {
+      position: fixed; left: 0; right: 0;
+      bottom: calc(74px + env(safe-area-inset-bottom));
+      z-index: 3; display: flex; gap: 26px; justify-content: center;
+      pointer-events: none; flex-wrap: wrap; padding: 0 18px;
+    }
+    .legend-item { display: flex; align-items: center; gap: 9px; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .legend-name {
+      font-family: var(--sans);
+      font-size: 8px; letter-spacing: 0.28em; text-indent: 0.28em;
+      text-transform: uppercase; color: var(--na-mist);
+    }
+    #stages {
+      position: fixed; left: 0; right: 0;
+      bottom: calc(24px + env(safe-area-inset-bottom));
+      z-index: 3; display: flex; gap: 10px; justify-content: center;
+    }
+    #stages button {
+      background: none; cursor: pointer;
+      border: 1px solid color-mix(in srgb, var(--na-gold) 30%, transparent);
+      min-height: 40px; padding: 9px 16px;
+      font-family: var(--sans);
+      font-size: 9px; letter-spacing: 0.28em; text-indent: 0.28em;
+      text-transform: uppercase; color: var(--na-mist);
+      transition: color 0.3s ease, border-color 0.3s ease;
+    }
+    #stages button.here, #stages button:hover, #stages button:focus-visible {
+      color: var(--na-gold); border-color: var(--na-gold); outline: none;
+    }
+    #note {
+      position: fixed; left: 0; right: 0; top: calc(8% + 96px);
+      text-align: left; padding-left: max(28px, env(safe-area-inset-left));
+      z-index: 3; pointer-events: none;
+      font-family: var(--serif); font-style: italic;
+      font-size: 14px; color: var(--na-mist); opacity: 0.85;
+    }
+    @media (max-aspect-ratio: 9/10) {
+      #plate { top: 6%; }
+      #night-line {
+        top: auto; bottom: calc(150px + env(safe-area-inset-bottom));
+        text-align: center; padding: 0 18px;
+      }
+      #note { display: none; }
+      #legend { bottom: calc(128px + env(safe-area-inset-bottom)); gap: 12px 16px; }
+      #stages { gap: 6px; padding: 0 10px; flex-wrap: wrap; }
+      #stages button { min-height: 44px; padding: 8px 10px; font-size: 8px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="stage"></div>
+  <div id="plate">
+    <p class="plate-kicker">His Sky · The Wisdom Map</p>
+    <h1 class="plate-name">Marcus Aurelius</h1>
+    <p class="plate-sub">Twelve seeds · the wreath grows as you learn</p>
+  </div>
+  <p id="night-line"></p>
+  <p id="note">A living concept: every seed is a star, and the four ways of knowing it — story, dialogue, prism, quest — bloom it stage by stage.</p>
+  <p id="seed-label"></p>
+  <div id="legend" aria-label="Bloom stages"></div>
+  <div id="stages" role="group" aria-label="Demonstrate the growth">
+    <button type="button" data-stage="0">First night</button>
+    <button type="button" data-stage="1">Growing</button>
+    <button type="button" data-stage="2">The wreath complete</button>
+    <button type="button" data-stage="auto" class="here">Let it live</button>
+  </div>
+  <script type="module" src="/src/hissky.ts"></script>
+</body>
+</html>
