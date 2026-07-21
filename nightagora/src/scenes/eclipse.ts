@@ -26,11 +26,14 @@ const GOLD = new Color('#e0b96a')
 const GOLD_DEEP = new Color('#a97c2f')
 const EMBER = new Color('#f6dfae')
 const WHITE_HOT = new Color('#fffaf0')
-const ABYSS = new Color('#030509')
-const LAPIS = new Color('#0a1128')
-const HORIZON = new Color('#111a3e')
+// the welcoming night (2026-07-20): the zenith lifted from void-black
+// toward a deep lapis, so the dark reads as a place, not an absence
+const ABYSS = new Color('#060b1c')
+const LAPIS = new Color('#0c1430')
+const HORIZON = new Color('#182350')
 const STAR_WARM = new Color('#f3efe2')
 const STAR_COOL = new Color('#c9d4f2')
+const STAR_ICE = new Color('#dfe9ff')
 
 function glowTexture(stops: Array<[number, string]>): CanvasTexture {
   const size = 512
@@ -149,8 +152,9 @@ export function createEclipse(scene: Scene) {
   breath.renderOrder = 1
   eclipse.add(breath)
 
-  // the moon
-  const disc = new Mesh(new CircleGeometry(1.012, 128), new MeshBasicMaterial({ color: ABYSS }))
+  // the moon: darker than any sky the night now wears, or the silhouette dies
+  const MOON = new Color('#02030a')
+  const disc = new Mesh(new CircleGeometry(1.012, 128), new MeshBasicMaterial({ color: MOON }))
   disc.position.z = 0.15
   disc.renderOrder = 4
   eclipse.add(disc)
@@ -193,8 +197,13 @@ export function createEclipse(scene: Scene) {
     scene.add(points)
     return { points, mat }
   }
+  // a rich, varied heaven: four populations at different sizes and hues,
+  // dense dust to bright gems, cool sparkle among the warm
+  const dustStars = starField(3200, 0.18, STAR_COOL, 46, 74)
   const dimStars = starField(2400, 0.26, STAR_COOL, 44, 72)
+  const midStars = starField(760, 0.38, STAR_ICE, 43, 68)
   const brightStars = starField(320, 0.5, STAR_WARM, 42, 66)
+  const gemStars = starField(110, 0.72, STAR_ICE, 41, 60)
 
   const wandererBase: Array<[number, number, number]> = []
   const wandererMat = new SpriteMaterial({
@@ -258,11 +267,17 @@ export function createEclipse(scene: Scene) {
       flashMat.opacity = 0
     }
 
+    dustStars.mat.opacity = 0.5 * s.skyBirth
     dimStars.mat.opacity = 0.7 * s.skyBirth
+    midStars.mat.opacity = (0.68 + 0.1 * Math.sin(s.elapsed * 0.7)) * s.skyBirth
     brightStars.mat.opacity = s.skyBirth
+    gemStars.mat.opacity = (0.8 + 0.16 * Math.sin(s.elapsed * 0.9 + 2)) * s.skyBirth
     wandererMat.opacity = s.skyBirth * s.lanterns
+    dustStars.points.rotation.y = s.elapsed * 0.0025
     dimStars.points.rotation.y = s.elapsed * 0.003
+    midStars.points.rotation.y = s.elapsed * 0.0035
     brightStars.points.rotation.y = s.elapsed * 0.004
+    gemStars.points.rotation.y = s.elapsed * 0.0045
     wanderers.rotation.y = s.elapsed * 0.011
     wanderers.rotation.x = Math.sin(s.elapsed * 0.05) * 0.01
 
