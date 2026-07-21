@@ -68,9 +68,65 @@
 
     .copy { transition: opacity 1.6s ease; }
     body[data-phase='door'] .copy { opacity: 0; }
+    body[data-phase='stone'] .copy { opacity: 0; }
     body[data-phase='agora'] .copy { opacity: 0; }
     body[data-phase='sky'] .copy { opacity: 0; }
     body[data-phase='sky'] .status { opacity: 0.9; }
+
+    /* ---- the black breath: pure darkness holding the inscription ---- */
+    #blackout {
+      position: fixed; inset: 0; z-index: 1;
+      background: #020307;
+      opacity: 0; pointer-events: none;
+      transition: opacity 1.4s ease;
+    }
+    body[data-phase='stone'] #blackout { opacity: 1; }
+    body.forge #blackout { transition: none !important; }
+
+    /* ---- the stone: the threshold inscription in the black breath ---- */
+    #stone {
+      position: fixed; left: 50%; top: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 2; max-width: 640px; width: calc(100% - 48px);
+      text-align: center; pointer-events: none;
+      opacity: 0; transition: opacity 2.4s ease;
+    }
+    #stone.lit { opacity: 1; }
+    #stone::before, #stone::after {
+      content: ''; display: block; width: 44px; height: 1px;
+      margin: 0 auto;
+      background: color-mix(in srgb, var(--na-gold) 55%, transparent);
+    }
+    #stone::before { margin-bottom: 28px; }
+    #stone::after { margin-top: 28px; }
+    .stone-text {
+      font-family: var(--sans);
+      font-size: 12px; letter-spacing: 0.34em; text-indent: 0.34em;
+      text-transform: uppercase; line-height: 2.3;
+      color: var(--na-mist);
+    }
+    .stone-strong {
+      margin-top: 16px;
+      font-family: var(--sans);
+      font-size: 12px; letter-spacing: 0.34em; text-indent: 0.34em;
+      text-transform: uppercase; line-height: 2.3;
+      color: var(--na-starlight);
+    }
+
+    /* ---- the verse: one poem line per threshold, then it yields ---- */
+    #verse {
+      position: fixed; left: 0; right: 0; top: 19%;
+      z-index: 2; text-align: center; pointer-events: none;
+      padding: 0 24px;
+      font-family: var(--serif); font-style: italic;
+      font-size: clamp(18px, 2.6vw, 26px);
+      color: var(--na-starlight);
+      text-shadow: 0 1px 18px rgba(4, 6, 13, 0.8);
+      opacity: 0; transition: opacity 2.4s ease;
+    }
+    #verse.lit { opacity: 0.92; }
+
+    body.forge #stone, body.forge #verse { transition: none !important; }
 
     #keeper {
       position: fixed; left: 0; right: 0;
@@ -192,7 +248,10 @@
     @media (prefers-reduced-motion: reduce) {
       body[data-phase='held'] .status { animation: none; }
       .copy, .status { transition: none; }
-      #keeper, #keeper * { transition: none; }
+      #keeper, #keeper *, #stone, #verse { transition: none; }
+    }
+    @media (max-width: 480px) {
+      .stone-text, .stone-strong { font-size: 11px; letter-spacing: 0.26em; text-indent: 0.26em; }
     }
 
     #atlas-card {
@@ -226,6 +285,7 @@
 <body data-phase="transit">
   <div id="stage" aria-hidden="true"></div>
   <div id="vignette" aria-hidden="true" style="position: fixed; inset: 0; z-index: 1; pointer-events: none; background: radial-gradient(ellipse 120% 90% at 50% 40%, transparent 52%, rgba(2, 3, 8, 0.62) 100%);"></div>
+  <div id="blackout" aria-hidden="true"></div>
   <div id="veil">
     <p class="brand">Agora Cosmica</p>
     <div class="copy">
@@ -234,6 +294,11 @@
     </div>
     <p class="status" id="status" role="status">First light</p>
   </div>
+  <div id="stone">
+    <p class="stone-text">Here speak the Echoes: interpretations built from what the dead left behind.</p>
+    <p class="stone-strong">Not recordings. Not the dead themselves.</p>
+  </div>
+  <p id="verse"></p>
   <div id="keeper" hidden>
     <p class="keeper-name">Marcus Aurelius · Keeper of Tonight's Fire</p>
     <p class="keeper-line">"I am not Marcus. I am an echo of what he left behind. Sit anyway."</p>

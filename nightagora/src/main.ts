@@ -4,14 +4,18 @@ import { createAgora } from './scenes/agora'
 import { createKeeper } from './scenes/keeper'
 import { WANDERERS } from './content/wanderers'
 
-type Phase = 'transit' | 'held' | 'door' | 'agora' | 'sky'
+type Phase = 'transit' | 'held' | 'door' | 'stone' | 'agora' | 'sky'
 
 const stage = document.getElementById('stage')
 const status = document.getElementById('status')
 const card = document.getElementById('atlas-card')
 const keeper = document.getElementById('keeper')
-if (!stage || !status || !card || !keeper) throw new Error('missing shell')
+const stone = document.getElementById('stone')
+const verse = document.getElementById('verse')
+if (!stage || !status || !card || !keeper || !stone || !verse) throw new Error('missing shell')
 const keeperEl: HTMLElement = keeper
+const stoneEl: HTMLElement = stone
+const verseEl: HTMLElement = verse
 const cardName = card.querySelector('.card-name')
 const cardYears = card.querySelector('.card-years')
 const cardEpithet = card.querySelector('.card-epithet')
@@ -46,6 +50,19 @@ let agoraReveal = 0
 let lookUp = 0
 let lookTarget = 0
 let agoraEnteredAt = -1
+let stoneEnteredAt = -1
+
+// each poem line appears once, at its appointed threshold
+const spokenVerses = new Set<string>()
+let verseTimer = 0
+function verseShow(line: string): void {
+  if (spokenVerses.has(line)) return
+  spokenVerses.add(line)
+  verseEl.textContent = line
+  verseEl.classList.add('lit')
+  window.clearTimeout(verseTimer)
+  verseTimer = window.setTimeout(() => verseEl.classList.remove('lit'), 5600)
+}
 
 // forge hook: lets the screenshot rig drive deterministic states
 declare global {
@@ -125,10 +142,12 @@ addEventListener('click', (e) => {
 
 window.__forge = {
   jump(p, opts = {}) {
+    document.body.classList.add('forge') // DOM beats compose instantly
     setPhase(p)
     transit = opts.transit ?? (p === 'transit' ? 0.5 : 1)
-    door = doorTarget = opts.door ?? (p === 'door' ? 0.5 : p === 'agora' || p === 'sky' ? 1 : 0)
-    skyBirth = opts.skyBirth ?? (p === 'transit' ? 0 : p === 'held' ? 0.75 : 1)
+    door = doorTarget =
+      opts.door ?? (p === 'door' ? 0.5 : p === 'stone' || p === 'agora' || p === 'sky' ? 1 : 0)
+    skyBirth = opts.skyBirth ?? (p === 'transit' ? 0 : p === 'held' || p === 'stone' ? 0.75 : 1)
     flashAt = elapsed - (opts.sinceFlash ?? 999)
     agoraReveal = p === 'agora' || p === 'sky' ? 1 : 0
     lookUp = lookTarget = p === 'sky' ? 1 : 0
@@ -141,6 +160,7 @@ window.__forge = {
     if (opts.keeper) {
       keeperEl.hidden = false
       keeperScene.forgeStage(opts.keeper)
+      verseEl.classList.remove('lit') // the verse is long gone by the exchange
     }
   },
   freeze(t) {
@@ -173,6 +193,13 @@ const TRANSIT_SECONDS = 2.8
 function setPhase(next: Phase): void {
   phase = next
   document.body.dataset['phase'] = next
+  if (next === 'stone') {
+    stoneEnteredAt = elapsed
+    setStatus('')
+    stoneEl.classList.add('lit')
+  } else {
+    stoneEl.classList.remove('lit')
+  }
   if (next === 'held') setStatus('Scroll to enter')
   if (next === 'door') setStatus('')
   if (next === 'agora') {
@@ -180,8 +207,12 @@ function setPhase(next: Phase): void {
     lookTarget = 0
     lookUp = 0
     setStatus('The night agora · scroll to look up')
+    verseShow('Questions shine within you')
   }
-  if (next === 'sky') setStatus('The sky is the map · the gold lights are the thirty')
+  if (next === 'sky') {
+    setStatus('The sky is the map · the gold lights are the thirty')
+    verseShow('Voices awaken across Time')
+  }
 }
 
 function setStatus(text: string): void {
@@ -195,6 +226,7 @@ function push(delta: number): void {
   if (phase === 'door') {
     doorTarget = Math.min(1, Math.max(0, doorTarget + delta * 0.0012))
   }
+  if (phase === 'stone' && delta > 0 && elapsed - stoneEnteredAt > 1.2) setPhase('agora')
   if (phase === 'agora') {
     lookTarget = Math.min(1, Math.max(0, lookTarget + delta * 0.0009))
   }
@@ -251,8 +283,11 @@ function frame(now: number): void {
   if (phase === 'door') {
     door += (doorTarget - door) * Math.min(1, dt * 4)
     if (reducedMotion) door = doorTarget
-    if (door > 0.985) setPhase('agora')
+    if (door > 0.985) setPhase('stone')
   }
+
+  // the stone: one held black breath, long enough to be read
+  if (phase === 'stone' && elapsed - stoneEnteredAt > 4.8) setPhase('agora')
 
   const revealTarget = phase === 'agora' || phase === 'sky' ? 1 : 0
   agoraReveal += (revealTarget - agoraReveal) * Math.min(1, dt * (reducedMotion ? 20 : 1.2))
@@ -268,7 +303,8 @@ function frame(now: number): void {
   }
 
   // stars are born at totality; near the fire they yield to its light
-  const birthTarget = phase === 'transit' ? 0 : phase === 'held' ? 0.75 : phase === 'agora' ? 0.55 : 1
+  const birthTarget =
+    phase === 'transit' ? 0 : phase === 'held' || phase === 'stone' ? 0.75 : phase === 'agora' ? 0.55 : 1
   skyBirth += (birthTarget - skyBirth) * Math.min(1, dt * (reducedMotion ? 20 : 0.9))
 
   const state: EclipseState = {
