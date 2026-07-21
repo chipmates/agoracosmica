@@ -55,6 +55,7 @@ import {
 } from 'three/tsl'
 import { mulberry32, FOUNDING_SEED } from '../core/seed'
 import { createSign } from '../core/sign'
+import { createFirmament } from '../core/firmament'
 import { STOIC_TAURUS } from '../content/signs'
 
 const GOLD = new Color('#e0b96a')
@@ -89,7 +90,6 @@ export function createCamp(scene: Scene) {
   const uT = uniform(0)
   const uR = uniform(0)
   const uDusk = uniform(0)
-  const starMats: PointsMaterial[] = []
   /** dawn color that remembers its pre-dawn original as dusk falls */
   const hour = (
     dr: number, dg: number, db: number,
@@ -127,27 +127,18 @@ export function createCamp(scene: Scene) {
   sky.position.set(0, 30, -48)
   root.add(sky)
 
-  // sparse high stars over the dusk
-  {
-    const pos: number[] = []
-    for (let i = 0; i < 70; i++) {
-      pos.push((rand() - 0.5) * 120, 9 + rand() * 26, -46.5)
-    }
-    const geo = new BufferGeometry()
-    geo.setAttribute('position', new BufferAttribute(new Float32Array(pos), 3))
-    const mat = new PointsMaterial({
-      color: new Color('#c9d4f2'),
-      size: 0.12,
-      sizeAttenuation: true,
-      transparent: true,
-      opacity: 0,
-      blending: AdditiveBlending,
-      depthWrite: false,
-    })
-    const pts = new Points(geo, mat)
-    root.add(pts)
-    starMats.push(mat)
-  }
+  // the standard firmament over the camp, shells drawn INSIDE the dawn
+  // sky plane (z=-48, depth-writing): every star must live in front of
+  // it or the dawn occludes the field. Faint at his morning, whole at
+  // the duskrise.
+  const firmament = createFirmament({
+    count: 2200,
+    far: [16, 46],
+    near: [7, 17],
+    bias: 'zenith',
+    rand,
+  })
+  root.add(firmament.points)
 
   // ------------------------------------------------------------------
   // 2 · THE RIVER — dark water carrying the dusk on its far edge
@@ -436,8 +427,8 @@ export function createCamp(scene: Scene) {
     flame.position.y = GROUND_Y + 0.1 + (FLAME_H * breathe) / 2
 
     poolMat.opacity = r * (0.3 + 0.12 * fl)
-    // the high stars keep dawn's reserve until night falls
-    for (const m of starMats) m.opacity = (0.08 + 0.47 * dusk) * r
+    // the firmament keeps dawn's reserve until night falls over him
+    firmament.update(t, (0.06 + 0.94 * dusk) * r)
     markMat.opacity = r * (0.55 + 0.25 * Math.sin(t * 1.9)) * (1 - (s.yield ?? 0))
 
     const pos = sparkGeo.getAttribute('position')

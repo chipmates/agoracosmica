@@ -11,15 +11,12 @@
 import {
   AdditiveBlending,
   BackSide,
-  BufferGeometry,
   Color,
   Float32BufferAttribute,
   Group,
   Mesh,
   MeshBasicMaterial,
   PerspectiveCamera,
-  Points,
-  PointsNodeMaterial,
   Scene,
   SphereGeometry,
   Sprite,
@@ -28,30 +25,14 @@ import {
   WebGPURenderer,
   CanvasTexture,
 } from 'three/webgpu'
-import {
-  attribute,
-  clamp,
-  float,
-  length,
-  pointUV,
-  positionView,
-  sin,
-  smoothstep,
-  time,
-  uniform,
-  vec2,
-} from 'three/tsl'
 import { mulberry32, FOUNDING_SEED } from './core/seed'
 import { createSign } from './core/sign'
+import { createFirmament } from './core/firmament'
 import { STOIC_TAURUS } from './content/signs'
 
 const ABYSS = new Color('#060b1c')
 const LAPIS = new Color('#0c1430')
 const HORIZON = new Color('#182350')
-const STAR_COOL = new Color('#b4c8ff')
-const STAR_ICE = new Color('#d2ebff')
-const STAR_PALE = new Color('#b4d2ff')
-const STAR_WARM = new Color('#e6bc5c')
 
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
@@ -93,60 +74,17 @@ const rand = mulberry32(FOUNDING_SEED + 144)
   scene.add(dome)
 }
 
-// ---- the concept firmament (same law as the night) ----
-{
-  const COUNT = 2600
-  const geo = new BufferGeometry()
-  const pos = new Float32Array(COUNT * 3)
-  const col = new Float32Array(COUNT * 3)
-  const size = new Float32Array(COUNT)
-  const tw = new Float32Array(COUNT * 2)
-  const TINTS = [STAR_COOL, STAR_ICE, STAR_PALE, STAR_WARM]
-  for (let i = 0; i < COUNT; i++) {
-    const r = i % 6 === 0 ? 24 + rand() * 40 : 60 + rand() * 120
-    const th = rand() * Math.PI * 2
-    const y = -0.2 + rand() * 1.2
-    const ph = Math.acos(Math.max(-1, Math.min(1, y)))
-    pos[i * 3] = Math.sin(ph) * Math.cos(th) * r
-    pos[i * 3 + 1] = Math.cos(ph) * r
-    pos[i * 3 + 2] = Math.sin(ph) * Math.sin(th) * r
-    const tint = TINTS[rand() < 0.085 ? 3 : Math.floor(rand() * 3)] ?? STAR_COOL
-    const dim = 0.5 + rand() * 0.4
-    col[i * 3] = tint.r * dim
-    col[i * 3 + 1] = tint.g * dim
-    col[i * 3 + 2] = tint.b * dim
-    size[i] = 0.7 + rand() * 1.3
-    tw[i * 2] = 0.4 + rand() * 1.2
-    tw[i * 2 + 1] = rand() * Math.PI * 2
-  }
-  geo.setAttribute('position', new Float32BufferAttribute(pos, 3))
-  geo.setAttribute('aColor', new Float32BufferAttribute(col, 3))
-  geo.setAttribute('aSize', new Float32BufferAttribute(size, 1))
-  geo.setAttribute('aTw', new Float32BufferAttribute(tw, 2))
-  const mat = new PointsNodeMaterial({
-    transparent: true,
-    depthWrite: false,
-    blending: AdditiveBlending,
-  })
-  mat.sizeAttenuation = false
-  const uPx = uniform(Math.min(devicePixelRatio, 2))
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const aSizeN = attribute('aSize', 'float') as any
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const twN = attribute('aTw', 'vec2') as any
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const pUV = pointUV as any
-  mat.sizeNode = clamp(aSizeN.mul(float(900)).div(positionView.z.negate().max(1)), 0.6, 26).mul(uPx)
-  const twinkle = sin(time.mul(twN.x).add(twN.y)).mul(0.28).add(0.72)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  mat.colorNode = attribute('aColor', 'vec3') as any
-  mat.opacityNode = smoothstep(0.5, 0.08, length(pUV.sub(vec2(0.5, 0.5))))
-    .mul(twinkle)
-    .mul(0.55)
-  const pts = new Points(geo, mat)
-  pts.frustumCulled = false
-  scene.add(pts)
-}
+// ---- the standard firmament (core/firmament.ts, same law as the
+// night); its inline ancestor held the field at 0.55 so the wreath
+// owns the frame — the organ receives that as its master ----
+const firmament = createFirmament({
+  count: 2600,
+  far: [60, 180],
+  near: [24, 64],
+  bias: 'zenith',
+  rand,
+})
+scene.add(firmament.points)
 
 // ---- THE SIGN in its sky ----
 const wreath = new Group()
@@ -323,6 +261,7 @@ async function boot(): Promise<void> {
 
     const lv = levelsAt(t)
     sign.update(dt, elapsed, lv)
+    firmament.update(elapsed, 0.55)
     let bloomed = 0
     for (const v of lv) if (v >= 3.9) bloomed++
 

@@ -1,7 +1,6 @@
 import {
   AdditiveBlending,
   BackSide,
-  BufferGeometry,
   CanvasTexture,
   CircleGeometry,
   Color,
@@ -11,8 +10,6 @@ import {
   Mesh,
   MeshBasicMaterial,
   MeshBasicNodeMaterial,
-  Points,
-  PointsNodeMaterial,
   RingGeometry,
   Scene,
   SphereGeometry,
@@ -20,23 +17,18 @@ import {
   SpriteMaterial,
 } from 'three/webgpu'
 import {
-  attribute,
-  clamp,
   float,
   length,
   mix,
-  pointUV,
   positionLocal,
-  positionView,
   pow,
   sin,
   smoothstep,
-  time,
   uniform,
-  vec2,
   vec3,
 } from 'three/tsl'
 import { mulberry32, FOUNDING_SEED } from '../core/seed'
+import { createFirmament } from '../core/firmament'
 
 const GOLD = new Color('#e0b96a')
 const GOLD_DEEP = new Color('#a97c2f')
@@ -47,11 +39,6 @@ const WHITE_HOT = new Color('#fffaf0')
 const ABYSS = new Color('#060b1c')
 const LAPIS = new Color('#0c1430')
 const HORIZON = new Color('#182350')
-// star tints ported from concept 01 (three cool blues + rare gold)
-const STAR_WARM = new Color('#e6bc5c')
-const STAR_COOL = new Color('#b4c8ff')
-const STAR_ICE = new Color('#d2ebff')
-const STAR_PALE = new Color('#b4d2ff')
 
 function glowTexture(stops: Array<[number, string]>): CanvasTexture {
   const size = 512
@@ -208,75 +195,18 @@ export function createEclipse(scene: Scene) {
   flash.scale.setScalar(2.1)
   eclipse.add(flash)
 
-  // ---- THE FIRMAMENT, ported from concept 01's star shader: ONE field,
-  // every star its own size and twinkle, soft shader falloff, real depth
-  // (60..180), upper-sky bias that still fills the band behind the
-  // pillars. The dome writes no depth so the far stars shine through. ----
-  const STAR_COUNT = 3200
-  const starGeo = new BufferGeometry()
-  {
-    const pos = new Float32Array(STAR_COUNT * 3)
-    const col = new Float32Array(STAR_COUNT * 3)
-    const size = new Float32Array(STAR_COUNT)
-    const tw = new Float32Array(STAR_COUNT * 2)
-    const TINTS = [STAR_COOL, STAR_ICE, STAR_PALE, STAR_WARM]
-    for (let i = 0; i < STAR_COUNT; i++) {
-      // one star in six is NEAR: it renders as a big soft bokeh disc —
-      // the concept's depth signature the far shells can never give
-      const r = i % 6 === 0 ? 24 + rand() * 40 : 60 + rand() * 120
-      const th = rand() * Math.PI * 2
-      // a third of the heaven gathers low, where the seated eye lives
-      // between the columns; the rest favours the upper sky
-      const y = i % 3 === 0 ? 0.03 + rand() * 0.33 : -0.35 + rand() * 1.35
-      const ph = Math.acos(Math.max(-1, Math.min(1, y)))
-      pos[i * 3] = Math.sin(ph) * Math.cos(th) * r
-      pos[i * 3 + 1] = Math.cos(ph) * r
-      pos[i * 3 + 2] = Math.sin(ph) * Math.sin(th) * r
-      const tint = TINTS[rand() < 0.085 ? 3 : Math.floor(rand() * 3)] ?? STAR_COOL
-      const dim = 0.55 + rand() * 0.45
-      col[i * 3] = tint.r * dim
-      col[i * 3 + 1] = tint.g * dim
-      col[i * 3 + 2] = tint.b * dim
-      size[i] = 0.7 + rand() * 1.4
-      tw[i * 2] = 0.4 + rand() * 1.2
-      tw[i * 2 + 1] = rand() * Math.PI * 2
-    }
-    starGeo.setAttribute('position', new Float32BufferAttribute(pos, 3))
-    starGeo.setAttribute('aColor', new Float32BufferAttribute(col, 3))
-    starGeo.setAttribute('aSize', new Float32BufferAttribute(size, 1))
-    starGeo.setAttribute('aTw', new Float32BufferAttribute(tw, 2))
-  }
-  const uBirth = uniform(0)
-  const uPx = uniform(Math.min(devicePixelRatio, 2))
-  const starMat = new PointsNodeMaterial({
-    transparent: true,
-    depthWrite: false,
-    blending: AdditiveBlending,
+  // ---- THE FIRMAMENT — the standard stars (core/firmament.ts): real
+  // depth 60..180 with the near bokeh shell, seated bias filling the
+  // band behind the pillars. The dome writes no depth so the far
+  // stars shine through. ----
+  const firmament = createFirmament({
+    count: 3200,
+    far: [60, 180],
+    near: [24, 64],
+    bias: 'seated',
+    rand,
   })
-  starMat.sizeAttenuation = false
-  // the TSL runtime swizzles attribute nodes fine; the generated typings
-  // do not follow — the same boundary escape the mandala's fbm uses
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const aSizeN = attribute('aSize', 'float') as any
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const twN = attribute('aTw', 'vec2') as any
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const pUV = pointUV as any
-  starMat.sizeNode = clamp(
-    aSizeN.mul(float(900)).div(positionView.z.negate().max(1)),
-    0.6,
-    26
-  ).mul(uPx)
-  const twinkle = sin(time.mul(twN.x).add(twN.y)).mul(0.28).add(0.72)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  starMat.colorNode = attribute('aColor', 'vec3') as any
-  starMat.opacityNode = smoothstep(0.5, 0.08, length(pUV.sub(vec2(0.5, 0.5))))
-    .mul(twinkle)
-    .mul(0.95)
-    .mul(uBirth)
-  const stars = new Points(starGeo, starMat)
-  stars.frustumCulled = false
-  scene.add(stars)
+  scene.add(firmament.points)
 
   const wandererBase: Array<[number, number, number]> = []
   const wandererMat = new SpriteMaterial({
@@ -340,9 +270,8 @@ export function createEclipse(scene: Scene) {
       flashMat.opacity = 0
     }
 
-    uBirth.value = s.skyBirth
+    firmament.update(s.elapsed, s.skyBirth)
     wandererMat.opacity = s.skyBirth * s.lanterns
-    stars.rotation.y = s.elapsed * 0.003
     wanderers.rotation.y = s.elapsed * 0.011
     wanderers.rotation.x = Math.sin(s.elapsed * 0.05) * 0.01
 

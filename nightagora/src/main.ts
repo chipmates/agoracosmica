@@ -959,13 +959,13 @@ window.__forge = {
     skyBirth =
       opts.skyBirth ??
       (p === 'transit' ? 0
-      : p === 'held' ? 0.75
-      : p === 'descent' ? 0.75 - 0.2 * desc
+      : p === 'held' ? 0.9
+      : p === 'descent' ? 0.9 - 0.25 * desc
       : p === 'crossing' ? 0.12
-      : p === 'camp' ? 0.08
-      : p === 'council' ? 0.78
-      : p === 'sky' ? 0.4
-      : p === 'agora' ? 0.78
+      : p === 'camp' ? 0
+      : p === 'council' ? 1
+      : p === 'sky' ? 0
+      : p === 'agora' ? 1
       : 1)
     flashAt = elapsed - (opts.sinceFlash ?? 999)
     agoraReveal =
@@ -1360,18 +1360,19 @@ function frame(now: number): void {
   })
   syncTrace()
 
-  // stars are born at totality; near the fire they yield to its light,
-  // and during the crossing the sky withdraws to ember
-  // in the constellation sky the background stars step well back, so
-  // the six houses own the night without competition
+  // stars are born at totality and burn FULL at the fire (the hub is
+  // the one place the whole firmament belongs to the visitor). In the
+  // constellation sky they leave entirely: the six houses own that
+  // night. During the crossing the sky withdraws to ember, and at the
+  // camp the cosmos raises its own firmament inside its dawn plane.
   const birthTarget =
     phase === 'transit' ? 0
-    : phase === 'held' ? 0.75
-    : phase === 'descent' ? 0.75 - 0.2 * desc
-    : phase === 'agora' || phase === 'council' ? 0.78
+    : phase === 'held' ? 0.9
+    : phase === 'descent' ? 0.9 - 0.25 * desc
+    : phase === 'agora' || phase === 'council' ? 1
     : phase === 'crossing' ? 0.12
-    : phase === 'camp' ? 0.08
-    : phase === 'sky' ? 0.4
+    : phase === 'camp' ? 0
+    : phase === 'sky' ? 0
     : 1
   skyBirth += (birthTarget - skyBirth) * Math.min(1, dt * (reducedMotion ? 20 : 0.9))
 
