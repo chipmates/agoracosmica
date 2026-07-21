@@ -16,8 +16,14 @@ const STATES = [
   { name: 'stone', jump: ['stone', {}] },
   { name: 'agora', jump: ['agora', {}] },
   { name: 'keeper', jump: ['agora', { keeper: 2 }] },
-  { name: 'sky', jump: ['sky', {}] },
-  { name: 'card', jump: ['sky', {}], focus: -1 },
+  { name: 'sky-i', jump: ['sky', { chapter: 0 }] },
+  { name: 'sky-ii', jump: ['sky', { chapter: 1 }] },
+  { name: 'sky-iii', jump: ['sky', { chapter: 2 }] },
+  { name: 'sky-iv', jump: ['sky', { chapter: 3 }] },
+  { name: 'sky-v', jump: ['sky', { chapter: 4 }] },
+  { name: 'sky-vi', jump: ['sky', { chapter: 5 }] },
+  { name: 'pane-marcus', jump: ['sky', { chapter: 0, figure: 'aurelius' }] },
+  { name: 'pane-kahlo', jump: ['sky', { chapter: 3, figure: 'kahlo' }] },
   { name: 'crossing', jump: ['crossing', { crossing: 'hatch' }] },
   { name: 'portrait', jump: ['crossing', { crossing: 'portrait' }] },
   { name: 'breath', jump: ['crossing', { crossing: 'breath' }] },
@@ -38,7 +44,7 @@ const VIEWPORTS = [
     height: 950,
     deviceScaleFactor: 1,
     query: '?webgpu',
-    only: ['transit', 'agora', 'sky'],
+    only: ['transit', 'agora', 'sky-i'],
   },
 ]
 
@@ -84,11 +90,10 @@ try {
     await page.waitForTimeout(1200) // let pipelines compile
     for (const s of STATES) {
       if (vp.only && !vp.only.includes(s.name)) continue
-      await page.evaluate(([phase, opts, focus]) => {
+      await page.evaluate(([phase, opts]) => {
         window.__forge.freeze(12.4)
         window.__forge.jump(phase, opts)
-        if (focus !== undefined) window.__forge.focusWanderer(focus)
-      }, [...s.jump, s.focus])
+      }, s.jump)
       await page.waitForTimeout(450)
       await page.screenshot({ path: `${OUT}${s.name}-${vp.tag}.png` })
     }

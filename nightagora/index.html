@@ -123,6 +123,10 @@
       opacity: 0; transition: opacity 2.4s ease;
     }
     #verse.lit { opacity: 0.92; }
+    /* on narrow stages the sky verse steps below the constellation plate */
+    @media (max-aspect-ratio: 9/10) {
+      body[data-phase='sky'] #verse { top: 30%; }
+    }
 
     body.forge #stone, body.forge #verse { transition: none !important; }
 
@@ -253,6 +257,182 @@
     #ringflash.lit { opacity: 1; }
     #ringflash.passing { opacity: 0; transition: opacity 1.1s ease; }
     body.forge #trace-card, body.forge #ringflash { transition: none !important; }
+
+    /* ---- the atlas: the wheel of the night. Plate top-left, invite at
+       the horizon, one chip per star, the figure pane when a name opens ---- */
+    #constellation-plate {
+      position: fixed; left: max(28px, env(safe-area-inset-left)); top: 9%;
+      z-index: 3; pointer-events: none;
+      opacity: 0; transition: opacity 1.2s ease;
+    }
+    #constellation-plate.lit { opacity: 1; }
+    .plate-kicker {
+      font-family: var(--sans);
+      font-size: 10px; letter-spacing: 0.34em;
+      text-transform: uppercase; color: var(--na-gold);
+    }
+    .plate-name {
+      margin-top: 12px;
+      font-family: var(--sans); font-weight: 300;
+      font-size: clamp(22px, 3.2vw, 40px); letter-spacing: 0.22em;
+      text-transform: uppercase; color: var(--na-starlight);
+    }
+    .plate-voices {
+      margin-top: 10px;
+      font-family: var(--sans);
+      font-size: 9px; letter-spacing: 0.3em;
+      text-transform: uppercase; color: var(--na-mist);
+    }
+    #sky-invite {
+      position: fixed; left: 0; right: 0;
+      bottom: calc(64px + env(safe-area-inset-bottom));
+      z-index: 3; text-align: center; pointer-events: none;
+      font-family: var(--sans);
+      font-size: 9px; letter-spacing: 0.28em; text-indent: 0.28em;
+      text-transform: uppercase; color: var(--na-mist);
+      opacity: 0; transition: opacity 1.2s ease;
+    }
+    #sky-invite.lit { opacity: 1; }
+    #chapter-marks {
+      position: fixed; left: 0; right: 0;
+      bottom: calc(34px + env(safe-area-inset-bottom));
+      z-index: 3; text-align: center; pointer-events: none;
+      font-family: var(--sans); font-size: 9px; letter-spacing: 0.3em;
+      color: var(--na-mist);
+      opacity: 0; transition: opacity 1.2s ease;
+    }
+    #chapter-marks.lit { opacity: 1; }
+    #chapter-marks span { margin: 0 7px; opacity: 0.45; transition: opacity 0.6s ease, color 0.6s ease; }
+    #chapter-marks span.here { opacity: 1; color: var(--na-gold); }
+    #star-chips { position: fixed; inset: 0; z-index: 3; pointer-events: none; }
+    #star-chips[hidden] { display: none; }
+    .star-chip {
+      position: absolute; transform: translateX(-50%);
+      background: none; border: none; cursor: pointer;
+      min-height: 44px; min-width: 44px; padding: 6px 10px;
+      font-family: var(--sans);
+      font-size: 10px; letter-spacing: 0.26em; text-indent: 0.26em;
+      text-transform: uppercase; color: var(--na-starlight);
+      white-space: nowrap; pointer-events: auto;
+      opacity: 0; transition: opacity 0.8s ease, color 0.3s ease;
+      text-shadow: 0 1px 10px rgba(4, 6, 13, 0.9);
+    }
+    .star-chip.lit { opacity: 1; }
+    .star-chip:hover, .star-chip:focus-visible { color: var(--na-gold); outline: none; }
+    body.forge .star-chip, body.forge #constellation-plate, body.forge #sky-invite,
+    body.forge #chapter-marks { transition: none !important; }
+
+    /* the figure pane: a name opened into a presence */
+    #figure-pane {
+      position: fixed; inset: 0; z-index: 5;
+      display: flex; align-items: center; justify-content: center;
+      background: radial-gradient(ellipse 90% 80% at 50% 45%, rgba(2, 3, 8, 0.68) 0%, rgba(2, 3, 8, 0.88) 100%);
+      opacity: 1; transition: opacity 0.7s ease;
+    }
+    #figure-pane[hidden] { display: none; }
+    .pane-inner {
+      display: flex; align-items: center; gap: clamp(28px, 4vw, 56px);
+      max-width: min(980px, calc(100% - 48px));
+      padding: 24px;
+    }
+    /* the same double gold hairline the crossing's portrait wears */
+    .pane-portrait {
+      width: clamp(220px, 30vw, 360px); flex: none; margin: 0;
+      border: 1px solid color-mix(in srgb, var(--na-gold) 45%, transparent);
+      padding: 7px;
+      background: rgba(2, 3, 7, 0.4);
+      box-shadow: 0 0 60px rgba(224, 185, 106, 0.08);
+    }
+    .pane-portrait img {
+      display: block; width: 100%; height: auto;
+      border: 1px solid color-mix(in srgb, var(--na-gold) 22%, transparent);
+    }
+    .pane-text { min-width: 0; }
+    .pane-kicker {
+      font-family: var(--sans);
+      font-size: 9px; letter-spacing: 0.32em;
+      text-transform: uppercase; color: var(--na-gold);
+    }
+    .pane-name {
+      margin-top: 14px;
+      font-family: var(--serif);
+      font-size: clamp(26px, 3.4vw, 40px);
+      color: var(--na-starlight);
+    }
+    .pane-tradition {
+      margin-top: 8px;
+      font-family: var(--sans);
+      font-size: 10px; letter-spacing: 0.3em;
+      text-transform: uppercase; color: var(--na-gold);
+    }
+    .pane-years {
+      margin-top: 6px;
+      font-family: var(--sans);
+      font-size: 9px; letter-spacing: 0.26em; color: var(--na-mist);
+    }
+    .pane-promise {
+      margin-top: 20px;
+      font-family: var(--serif); font-style: italic;
+      font-size: clamp(17px, 1.9vw, 22px); line-height: 1.5;
+      color: var(--na-starlight);
+      max-width: 30ch;
+    }
+    .pane-ink {
+      margin-top: 18px;
+      font-family: var(--sans);
+      font-size: 8px; letter-spacing: 0.26em;
+      text-transform: uppercase; color: var(--na-mist);
+    }
+    .pane-enter {
+      display: inline-block; margin-top: 26px;
+      background: none; cursor: pointer;
+      border: 1px solid color-mix(in srgb, var(--na-gold) 45%, transparent);
+      min-height: 44px; padding: 12px 26px;
+      font-family: var(--sans);
+      font-size: 10px; letter-spacing: 0.3em; text-indent: 0.3em;
+      text-transform: uppercase; color: var(--na-gold);
+      transition: border-color 0.3s ease, color 0.3s ease;
+    }
+    .pane-enter:hover, .pane-enter:focus-visible { border-color: var(--na-gold); color: var(--na-starlight); outline: none; }
+    .pane-enter[hidden] { display: none; }
+    .pane-drawn {
+      margin-top: 26px;
+      font-family: var(--sans);
+      font-size: 9px; letter-spacing: 0.28em;
+      text-transform: uppercase; color: var(--na-mist);
+    }
+    .pane-drawn[hidden] { display: none; }
+    .pane-siblings {
+      margin-top: 30px; display: flex; flex-wrap: wrap; gap: 4px 18px;
+    }
+    .pane-sibling {
+      background: none; border: none; cursor: pointer;
+      min-height: 44px; padding: 4px 0;
+      font-family: var(--sans);
+      font-size: 9px; letter-spacing: 0.28em;
+      text-transform: uppercase; color: var(--na-mist);
+      transition: color 0.3s ease;
+    }
+    .pane-sibling:hover, .pane-sibling:focus-visible { color: var(--na-gold); outline: none; }
+    .pane-close {
+      position: absolute; top: max(22px, env(safe-area-inset-top)); right: max(22px, env(safe-area-inset-right));
+      background: none; border: none; cursor: pointer;
+      min-height: 44px; min-width: 44px;
+      font-family: var(--sans);
+      font-size: 9px; letter-spacing: 0.3em; text-indent: 0.3em;
+      text-transform: uppercase; color: var(--na-mist);
+      transition: color 0.3s ease;
+    }
+    .pane-close:hover, .pane-close:focus-visible { color: var(--na-gold); outline: none; }
+    @media (max-aspect-ratio: 9/10) {
+      #constellation-plate { top: 11%; }
+      .pane-inner {
+        flex-direction: column; align-items: flex-start;
+        gap: 20px; max-height: 100%; overflow-y: auto;
+        padding: 84px 24px 40px;
+      }
+      .pane-portrait { width: min(52vw, 240px); }
+    }
 
     /* ---- the council: topic in letterpress, names in the register,
        a thin cartouche for the produced audio ---- */
@@ -489,39 +669,6 @@
       .stone-text, .stone-strong { font-size: 11px; letter-spacing: 0.26em; text-indent: 0.26em; }
     }
 
-    #atlas-card {
-      position: fixed; z-index: 3;
-      max-width: 280px;
-      padding: 2px 0 2px 16px;
-      border-left: 1px solid color-mix(in srgb, var(--na-gold) 55%, transparent);
-      pointer-events: none;
-      transition: opacity 0.3s ease;
-      text-align: left;
-    }
-    #atlas-card[hidden] { display: block; opacity: 0; visibility: hidden; }
-    .card-name {
-      font-family: var(--sans);
-      font-size: 12px; letter-spacing: 0.26em;
-      text-transform: uppercase; color: var(--na-gold);
-    }
-    .card-years {
-      margin-top: 4px;
-      font-family: var(--sans);
-      font-size: 10px; letter-spacing: 0.3em; color: var(--na-mist);
-    }
-    .card-epithet {
-      margin-top: 8px;
-      font-family: var(--serif);
-      font-style: italic;
-      font-size: 16px; line-height: 1.45; color: var(--na-starlight);
-    }
-    .card-note {
-      margin-top: 10px;
-      font-family: var(--sans);
-      font-size: 9px; letter-spacing: 0.3em;
-      text-transform: uppercase; color: var(--na-gold);
-    }
-    .card-note:empty { display: none; }
   </style>
 </head>
 <body data-phase="transit">
@@ -546,12 +693,6 @@
     <p class="keeper-line">"I am not Marcus. I am an echo of what he left behind. Sit anyway."</p>
     <p class="keeper-note">An AI Echo · An interpretation, not a recording</p>
   </div>
-  <div id="atlas-card" aria-live="polite" hidden>
-    <p class="card-name"></p>
-    <p class="card-years"></p>
-    <p class="card-epithet"></p>
-    <p class="card-note"></p>
-  </div>
   <p id="voice" aria-live="polite"></p>
   <figure id="portrait">
     <div class="portrait-frame">
@@ -573,6 +714,31 @@
     <p class="trace-source">Meditations 5.20</p>
   </div>
   <div id="ringflash" aria-hidden="true"></div>
+  <div id="constellation-plate">
+    <p class="plate-kicker"></p>
+    <h2 class="plate-name"></h2>
+    <p class="plate-voices"></p>
+  </div>
+  <p id="sky-invite">Open any name to explore their life and ideas.</p>
+  <p id="chapter-marks" aria-hidden="true"></p>
+  <div id="star-chips" hidden></div>
+  <div id="figure-pane" hidden>
+    <button class="pane-close" type="button">Back to the sky</button>
+    <div class="pane-inner">
+      <figure class="pane-portrait"><img alt="" /></figure>
+      <div class="pane-text">
+        <p class="pane-kicker"></p>
+        <h2 class="pane-name"></h2>
+        <p class="pane-tradition"></p>
+        <p class="pane-years"></p>
+        <p class="pane-promise"></p>
+        <p class="pane-ink">An AI Echo · an interpretation, not a recording</p>
+        <button class="pane-enter" type="button" hidden>Enter his night</button>
+        <p class="pane-drawn" hidden>This world is still being drawn</p>
+        <div class="pane-siblings"></div>
+      </div>
+    </div>
+  </div>
   <div id="council-topic">
     <p class="council-kicker">Lives That Still Speak</p>
     <p class="council-title">The Calling That Won't Shut Up.</p>

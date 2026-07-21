@@ -5,24 +5,32 @@ import { createKeeper } from './scenes/keeper'
 import { createCrossing } from './scenes/crossing'
 import { createCamp } from './scenes/camp'
 import { createCouncil } from './scenes/council'
+import { createAtlas } from './scenes/atlas'
 import { CAMP_SCRIPT } from './content/keeper-script'
 import { COUNCIL_DONE } from './content/council'
 import { WANDERERS } from './content/wanderers'
-
-const MARCUS = WANDERERS.findIndex((w) => w.slug === 'aurelius')
+import { CONSTELLATIONS, OPEN_WORLD } from './content/constellations'
+import { mediaUrl } from './content/media'
 
 type Phase = 'transit' | 'held' | 'door' | 'stone' | 'agora' | 'sky' | 'crossing' | 'camp' | 'council'
 
 const stage = document.getElementById('stage')
 const status = document.getElementById('status')
-const card = document.getElementById('atlas-card')
 const keeper = document.getElementById('keeper')
 const stone = document.getElementById('stone')
 const verse = document.getElementById('verse')
 const voiceDom = document.getElementById('voice')
 const traceCard = document.getElementById('trace-card')
 const ringflash = document.getElementById('ringflash')
-if (!stage || !status || !card || !keeper || !stone || !verse || !voiceDom || !traceCard || !ringflash)
+const plate = document.getElementById('constellation-plate')
+const invite = document.getElementById('sky-invite')
+const marks = document.getElementById('chapter-marks')
+const chips = document.getElementById('star-chips')
+const pane = document.getElementById('figure-pane')
+if (
+  !stage || !status || !keeper || !stone || !verse || !voiceDom || !traceCard ||
+  !ringflash || !plate || !invite || !marks || !chips || !pane
+)
   throw new Error('missing shell')
 const keeperEl: HTMLElement = keeper
 const stoneEl: HTMLElement = stone
@@ -30,10 +38,11 @@ const verseEl: HTMLElement = verse
 const voiceEl2: HTMLElement = voiceDom
 const traceEl: HTMLElement = traceCard
 const ringEl: HTMLElement = ringflash
-const cardName = card.querySelector('.card-name')
-const cardYears = card.querySelector('.card-years')
-const cardEpithet = card.querySelector('.card-epithet')
-const cardNote = card.querySelector('.card-note')
+const plateEl: HTMLElement = plate
+const inviteEl: HTMLElement = invite
+const marksEl: HTMLElement = marks
+const chipsEl: HTMLElement = chips
+const paneEl: HTMLElement = pane
 
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
@@ -47,6 +56,7 @@ const keeperScene = createKeeper(keeperEl, reducedMotion, () => returnFromCamp()
 const crossing = createCrossing(scene, () => setPhase('camp'))
 const camp = createCamp(scene)
 const council = createCouncil(scene, () => councilEnded())
+const atlas = createAtlas(scene)
 
 function councilEnded(): void {
   setStatus(COUNCIL_DONE)
@@ -80,6 +90,219 @@ let campHearthOpen = false
 let traceOpen = false
 let voiceTimerA = 0
 let voiceTimerB = 0
+let chapter = 0
+let chapterChangedAt = -99
+let paneOpen = false
+let skyAcc = 0
+let atlasReveal = 0
+
+// ---- the wheel of the night: plate, marks, chips, pane ----
+const roster = new Map(WANDERERS.map((w) => [w.slug, w]))
+const plateKicker = plateEl.querySelector('.plate-kicker') as HTMLElement | null
+const plateName = plateEl.querySelector('.plate-name') as HTMLElement | null
+const plateVoices = plateEl.querySelector('.plate-voices') as HTMLElement | null
+
+for (const c of CONSTELLATIONS) {
+  const m = document.createElement('span')
+  m.textContent = c.numeral
+  marksEl.appendChild(m)
+}
+
+function setPlate(): void {
+  const c = CONSTELLATIONS[chapter]
+  if (!c) return
+  if (plateKicker) plateKicker.textContent = `Constellation ${c.numeral}`
+  if (plateName) plateName.textContent = c.name
+  if (plateVoices) plateVoices.textContent = `${c.voices} · ${c.after}`
+  const spans = Array.from(marksEl.children)
+  for (let i = 0; i < spans.length; i++) spans[i]?.classList.toggle('here', i === chapter)
+}
+
+interface Chip {
+  el: HTMLButtonElement
+  slug: string
+  chapter: number
+}
+const chipList: Chip[] = []
+for (const s of atlas.stars) {
+  const w = roster.get(s.slug)
+  if (!w) continue
+  const b = document.createElement('button')
+  b.type = 'button'
+  b.className = 'star-chip'
+  b.textContent = w.name
+  b.style.visibility = 'hidden'
+  b.addEventListener('click', () => openPane(s.slug))
+  chipsEl.appendChild(b)
+  chipList.push({ el: b, slug: s.slug, chapter: s.chapter })
+}
+
+function stepChapter(dir: number): void {
+  chapter = (chapter + dir + CONSTELLATIONS.length) % CONSTELLATIONS.length
+  chapterChangedAt = elapsed
+  atlas.setChapter(chapter)
+  if (reducedMotion) atlas.snap(chapter)
+  setPlate()
+}
+
+const paneKicker = paneEl.querySelector('.pane-kicker') as HTMLElement | null
+const paneName = paneEl.querySelector('.pane-name') as HTMLElement | null
+const paneTradition = paneEl.querySelector('.pane-tradition') as HTMLElement | null
+const paneYears = paneEl.querySelector('.pane-years') as HTMLElement | null
+const panePromise = paneEl.querySelector('.pane-promise') as HTMLElement | null
+const paneEnter = paneEl.querySelector('.pane-enter') as HTMLButtonElement | null
+const paneDrawn = paneEl.querySelector('.pane-drawn') as HTMLElement | null
+const paneSiblings = paneEl.querySelector('.pane-siblings') as HTMLElement | null
+const panePortrait = paneEl.querySelector('.pane-portrait img') as HTMLImageElement | null
+const paneClose = paneEl.querySelector('.pane-close') as HTMLButtonElement | null
+
+function openPane(slug: string): void {
+  const ci = CONSTELLATIONS.findIndex((c) => c.stars.some((s) => s.slug === slug))
+  const c = CONSTELLATIONS[ci]
+  const star = c?.stars.find((s) => s.slug === slug)
+  const w = roster.get(slug)
+  if (!c || !star || !w) return
+  if (ci !== chapter) {
+    chapter = ci
+    chapterChangedAt = elapsed
+    atlas.setChapter(ci)
+    setPlate()
+  }
+  if (paneKicker) paneKicker.textContent = `Constellation ${c.numeral} · ${c.name}`
+  if (paneName) paneName.textContent = w.name
+  if (paneTradition) paneTradition.textContent = star.tradition
+  if (paneYears) paneYears.textContent = w.years
+  if (panePromise) panePromise.textContent = star.promise
+  if (paneEnter) paneEnter.hidden = slug !== OPEN_WORLD
+  if (paneDrawn) paneDrawn.hidden = slug === OPEN_WORLD
+  if (panePortrait) {
+    panePortrait.src = mediaUrl(`/images/figures/${slug}/main/900.webp`)
+    panePortrait.alt = `AI-generated portrait of ${w.name}`
+  }
+  if (paneSiblings) {
+    paneSiblings.textContent = ''
+    for (const sib of c.stars) {
+      if (sib.slug === slug) continue
+      const sw = roster.get(sib.slug)
+      if (!sw) continue
+      const b = document.createElement('button')
+      b.type = 'button'
+      b.className = 'pane-sibling'
+      b.textContent = sw.name
+      b.addEventListener('click', () => openPane(sib.slug))
+      paneSiblings.appendChild(b)
+    }
+  }
+  paneOpen = true
+  paneEl.hidden = false
+  // the sky chrome steps back while a figure holds the frame
+  plateEl.classList.remove('lit')
+  inviteEl.classList.remove('lit')
+  marksEl.classList.remove('lit')
+}
+
+function closePane(): void {
+  paneOpen = false
+  paneEl.hidden = true
+  if (phase === 'sky') {
+    plateEl.classList.add('lit')
+    inviteEl.classList.add('lit')
+    marksEl.classList.add('lit')
+  }
+}
+
+paneClose?.addEventListener('click', () => closePane())
+paneEl.addEventListener('click', (e) => {
+  if (e.target === paneEl) closePane()
+})
+paneEnter?.addEventListener('click', () => {
+  closePane()
+  beginCrossing()
+})
+addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && paneOpen) closePane()
+})
+
+/** dress or strike the sky's letterpress in one move */
+function skyDress(on: boolean): void {
+  plateEl.classList.toggle('lit', on)
+  inviteEl.classList.toggle('lit', on)
+  marksEl.classList.toggle('lit', on)
+  chipsEl.hidden = !on
+  if (!on) closePane()
+}
+
+const chipProject = new Vector3()
+interface ChipPlace {
+  chip: Chip
+  x: number
+  y: number
+  half: number
+  above: boolean
+}
+function syncChips(): void {
+  const settled = phase === 'sky' && !paneOpen && elapsed - chapterChangedAt > 0.9
+  const places: ChipPlace[] = []
+  for (const chip of chipList) {
+    const on = settled && chip.chapter === chapter && atlasReveal > 0.6
+    if (!on) {
+      chip.el.classList.remove('lit')
+      chip.el.style.visibility = 'hidden'
+      continue
+    }
+    // narrow stages call the names the way the register does
+    const w = roster.get(chip.slug)
+    const label = camera.aspect < 0.9 ? (w?.short ?? w?.name ?? '') : (w?.name ?? '')
+    if (chip.el.textContent !== label) chip.el.textContent = label
+    const star = atlas.stars.find((s) => s.slug === chip.slug)
+    if (!star) continue
+    star.sprite.updateWorldMatrix(true, false)
+    chipProject.setFromMatrixPosition(star.sprite.matrixWorld).project(camera)
+    if (chipProject.z > 1 || Math.abs(chipProject.x) > 0.96) {
+      chip.el.classList.remove('lit')
+      chip.el.style.visibility = 'hidden'
+      continue
+    }
+    // ridge stars carry their names above, valley stars below; edges
+    // clamp inside the frame
+    chip.el.style.visibility = 'visible'
+    const above = star.sprite.position.y >= 0
+    const half = chip.el.offsetWidth / 2 || 40
+    const x = Math.min(
+      Math.max((chipProject.x * 0.5 + 0.5) * innerWidth, half + 8),
+      innerWidth - half - 8
+    )
+    const y = (-chipProject.y * 0.5 + 0.5) * innerHeight + (above ? -48 : 24)
+    places.push({ chip, x, y, half, above })
+  }
+  // a tiny label solver: any two names that would touch step apart along
+  // their own side of the sky until every name has clear air
+  for (let i = 0; i < places.length; i++) {
+    const a = places[i]
+    if (!a) continue
+    for (let guard = 0; guard < 4; guard++) {
+      let bumped = false
+      for (let j = 0; j < i; j++) {
+        const b = places[j]
+        if (!b) continue
+        const overlapX = Math.abs(a.x - b.x) < a.half + b.half + 10
+        const overlapY = Math.abs(a.y - b.y) < 26
+        if (overlapX && overlapY) {
+          // one gentle step per round, or crowded rows leapfrog their stars
+          a.y += a.above ? -26 : 26
+          bumped = true
+          break
+        }
+      }
+      if (!bumped) break
+    }
+  }
+  for (const p of places) {
+    p.chip.el.style.left = `${p.x}px`
+    p.chip.el.style.top = `${p.y}px`
+    p.chip.el.classList.add('lit')
+  }
+}
 
 /** The short-dawn rhyme: one diamond-ring breath, and the agora is
     changed: the council is convening. */
@@ -121,81 +344,14 @@ declare global {
           keeper?: number
           crossing?: 'hatch' | 'portrait' | 'breath'
           camp?: 'trace' | 'hearth'
+          chapter?: number
+          figure?: string
         }
       ) => void
       freeze: (t: number) => void
-      focusWanderer: (i: number) => void
     }
   }
 }
-// ---- the atlas: wanderer focus + card ----
-let pointerX = -1
-let pointerY = -1
-let hoverIdx: number | null = null
-let lockedIdx: number | null = null
-const projected = new Vector3()
-
-function wandererScreenPos(i: number): { x: number; y: number } | null {
-  const base = eclipse.wandererBase[i]
-  if (!base) return null
-  projected.set(base[0], base[1], base[2]).applyMatrix4(eclipse.wanderers.matrixWorld).project(camera)
-  if (projected.z > 1) return null
-  const x = (projected.x * 0.5 + 0.5) * innerWidth
-  const y = (-projected.y * 0.5 + 0.5) * innerHeight
-  if (x < -40 || x > innerWidth + 40 || y < -40 || y > innerHeight + 40) return null
-  return { x, y }
-}
-
-function nearestWanderer(px: number, py: number, radius: number): number | null {
-  let best: number | null = null
-  let bestDist = radius
-  for (let i = 0; i < WANDERERS.length; i++) {
-    const p = wandererScreenPos(i)
-    if (!p) continue
-    const d = Math.hypot(p.x - px, p.y - py)
-    if (d < bestDist) {
-      bestDist = d
-      best = i
-    }
-  }
-  return best
-}
-
-function syncCard(): void {
-  if (!card) return
-  const idx = lockedIdx ?? hoverIdx
-  const visible = phase === 'sky' && idx !== null && eclipse.wandererOpacity() > 0.4
-  if (!visible || idx === null) {
-    card.hidden = true
-    return
-  }
-  const w = WANDERERS[idx]
-  const p = wandererScreenPos(idx)
-  if (!w || !p) {
-    card.hidden = true
-    return
-  }
-  if (cardName) cardName.textContent = w.name
-  if (cardYears) cardYears.textContent = w.years
-  if (cardEpithet) cardEpithet.textContent = w.epithet
-  if (cardNote) {
-    cardNote.textContent =
-      idx === MARCUS
-        ? lockedIdx === MARCUS
-          ? 'His night is open · tap his light again'
-          : 'Tap his light to cross'
-        : 'This world is still being drawn'
-  }
-  const el = card as HTMLElement
-  el.style.left = `${Math.min(Math.max(p.x + 22, 16), innerWidth - 300)}px`
-  el.style.top = `${Math.min(Math.max(p.y - 24, 16), innerHeight - 140)}px`
-  card.hidden = false
-}
-
-addEventListener('pointermove', (e) => {
-  pointerX = e.clientX
-  pointerY = e.clientY
-})
 // ---- the trace: the carved words at the tent post ----
 const traceProjected = new Vector3()
 function traceScreenPos(): { x: number; y: number } | null {
@@ -218,12 +374,11 @@ function syncTrace(): void {
   traceEl.hidden = false
 }
 
+const crossingTo = new Vector3()
 function beginCrossing(): void {
-  const base = eclipse.wandererBase[MARCUS]
-  if (!base) return
-  const to = new Vector3(base[0], base[1], base[2]).applyMatrix4(eclipse.wanderers.matrixWorld)
+  if (!atlas.starWorld(OPEN_WORLD, crossingTo)) return
   setPhase('crossing')
-  crossing.begin(to)
+  crossing.begin(crossingTo.clone())
 }
 
 addEventListener('click', (e) => {
@@ -236,13 +391,6 @@ addEventListener('click', (e) => {
     if (p && Math.hypot(p.x - e.clientX, p.y - e.clientY) < 60) traceOpen = !traceOpen
     return
   }
-  if (phase !== 'sky') return
-  const hit = nearestWanderer(e.clientX, e.clientY, 64)
-  if (hit === MARCUS && lockedIdx === MARCUS) {
-    beginCrossing()
-    return
-  }
-  lockedIdx = hit !== null && hit === lockedIdx ? null : hit
 })
 
 window.__forge = {
@@ -278,7 +426,22 @@ window.__forge = {
       agoraEnteredAt = Math.max(0, elapsed - 2)
       camera.rotation.x = -0.12
     }
-    if (p === 'sky') camera.rotation.x = 0.62
+    if (p === 'sky') {
+      chapter = opts.chapter ?? 0
+      atlas.snap(chapter)
+      atlasReveal = 1
+      atlas.visible(true)
+      chapterChangedAt = -99
+      setPlate()
+      skyDress(true)
+      camera.rotation.set(atlas.currentElevation(), 0, 0)
+      if (opts.figure) openPane(opts.figure)
+      else closePane()
+    } else {
+      atlasReveal = 0
+      atlas.visible(false)
+      skyDress(false)
+    }
     if (p !== 'agora' && p !== 'sky' && p !== 'camp' && p !== 'council') camera.rotation.set(0, 0, 0)
     if (p === 'council') {
       agoraReveal = 1
@@ -313,25 +476,6 @@ window.__forge = {
     elapsed = t
     frozen = true
   },
-  focusWanderer(i) {
-    if (i >= 0) {
-      lockedIdx = i
-      return
-    }
-    // i < 0: pick the visible wanderer nearest the frame center
-    let best: number | null = null
-    let bestDist = Number.POSITIVE_INFINITY
-    for (let k = 0; k < WANDERERS.length; k++) {
-      const p = wandererScreenPos(k)
-      if (!p) continue
-      const d = Math.hypot(p.x - innerWidth / 2, p.y - innerHeight / 2)
-      if (d < bestDist) {
-        bestDist = d
-        best = k
-      }
-    }
-    lockedIdx = best
-  },
 }
 
 const TRANSIT_SECONDS = 2.8
@@ -341,6 +485,7 @@ function setPhase(next: Phase): void {
   document.body.dataset['phase'] = next
   if (next === 'stone') {
     stoneEnteredAt = elapsed
+    doorTarget = 1 // the crossed door completes on its own
     setStatus('')
     stoneEl.classList.add('lit')
   } else {
@@ -356,13 +501,17 @@ function setPhase(next: Phase): void {
     verseShow('Questions shine within you')
   }
   if (next === 'sky') {
-    setStatus('The sky is the map · the gold lights are the thirty')
+    setStatus('')
     verseShow('Voices awaken across Time')
+    chapterChangedAt = elapsed
+    setPlate()
+    skyDress(true)
+    if (reducedMotion) atlas.snap(chapter)
+  } else {
+    skyDress(false)
   }
   if (next === 'crossing') {
     setStatus('')
-    lockedIdx = null
-    hoverIdx = null
     verseEl.classList.remove('lit') // a fast chooser carries no verse across
   }
   if (next === 'council') {
@@ -403,6 +552,15 @@ function push(delta: number): void {
   if (phase === 'agora') {
     lookTarget = Math.min(1, Math.max(0, lookTarget + delta * 0.0009))
   }
+  // the wheel of the night: scroll or swipe steps the carousel, wrapping
+  if (phase === 'sky' && !paneOpen) {
+    if (Math.sign(delta) !== Math.sign(skyAcc)) skyAcc = 0
+    skyAcc += delta
+    if (Math.abs(skyAcc) > 150) {
+      stepChapter(skyAcc > 0 ? 1 : -1)
+      skyAcc = 0
+    }
+  }
   if (phase === 'council' && delta > 0 && council.active()) {
     council.stop()
     councilEnded()
@@ -415,17 +573,30 @@ addEventListener('keydown', (e) => {
   if (e.target instanceof HTMLInputElement || e.target instanceof HTMLButtonElement) return
   if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') push(160)
   if (e.key === 'ArrowUp' || e.key === 'PageUp') push(-160)
+  // in the sky the carousel also answers left and right
+  if (phase === 'sky' && !paneOpen) {
+    if (e.key === 'ArrowRight') stepChapter(1)
+    if (e.key === 'ArrowLeft') stepChapter(-1)
+  }
   if (e.key === 'Enter' && phase === 'transit') transit = 1
 })
 let touchY: number | null = null
+let touchX: number | null = null
 addEventListener('touchstart', (e) => {
   touchY = e.touches[0]?.clientY ?? null
+  touchX = e.touches[0]?.clientX ?? null
 }, { passive: true })
 addEventListener('touchmove', (e) => {
   const y = e.touches[0]?.clientY
-  if (y === undefined || touchY === null) return
-  push((touchY - y) * 3)
+  const x = e.touches[0]?.clientX
+  if (y === undefined || x === undefined || touchY === null || touchX === null) return
+  const dy = touchY - y
+  const dx = touchX - x
+  // in the sky a horizontal swipe is the natural carousel gesture; the
+  // dominant axis wins so diagonals never double-count
+  push(phase === 'sky' && Math.abs(dx) > Math.abs(dy) ? dx * 3 : dy * 3)
   touchY = y
+  touchX = x
 }, { passive: true })
 
 addEventListener('resize', () => {
@@ -457,11 +628,11 @@ function frame(now: number): void {
     }
   }
 
-  if (phase === 'door') {
-    door += (doorTarget - door) * Math.min(1, dt * 4)
-    if (reducedMotion) door = doorTarget
-    if (door > 0.985) setPhase('stone')
-  }
+  // the door keeps easing in every phase: once crossed it must finish its
+  // swing to 1, or its dark plane hangs across the live sky forever
+  door += (doorTarget - door) * Math.min(1, dt * 4)
+  if (reducedMotion) door = doorTarget
+  if (phase === 'door' && door > 0.985) setPhase('stone')
 
   // the stone: one held black breath, long enough to be read
   if (phase === 'stone' && elapsed - stoneEnteredAt > 4.8) setPhase('agora')
@@ -512,8 +683,10 @@ function frame(now: number): void {
     transit,
     door,
     skyBirth,
+    // in the sky the anonymous sparks recede: the thirty resolve into
+    // their six houses (the atlas takes the light over)
     lanterns:
-      phase === 'sky' ? 1
+      phase === 'sky' ? Math.max(0.08, 0.55 * (1 - atlasReveal))
       : phase === 'agora' || phase === 'council' ? 0.55
       : phase === 'crossing' || phase === 'camp' ? 0
       : 0.3,
@@ -522,13 +695,19 @@ function frame(now: number): void {
   }
   eclipse.update(state)
 
-  // in the born sky, the visitor gazes upward and the dome drifts
+  // the wheel of the night: the dome carries the six houses around the
+  // visitor; the camera only breathes toward the focused elevation
   if (phase === 'sky') {
     keeperEl.hidden = true
-    camera.rotation.y += dt * 0.008
-    camera.rotation.x = 0.62 + Math.sin(elapsed * 0.05) * 0.02
-    if (lockedIdx === null && pointerX >= 0) hoverIdx = nearestWanderer(pointerX, pointerY, 64)
+    camera.rotation.y += (0 - camera.rotation.y) * Math.min(1, dt * 2)
+    camera.rotation.x +=
+      (atlas.currentElevation() - camera.rotation.x) * Math.min(1, dt * 2.2)
   }
+  atlasReveal +=
+    ((phase === 'sky' ? 1 : 0) - atlasReveal) * Math.min(1, dt * (reducedMotion ? 20 : 1.4))
+  atlas.visible(atlasReveal > 0.005)
+  atlas.update(dt, elapsed, camera.aspect, atlasReveal)
+  syncChips()
 
   // the crossing: the gaze levels out and the hatching carries you
   if (phase === 'crossing') {
@@ -543,7 +722,6 @@ function frame(now: number): void {
     camera.rotation.y += (0 - camera.rotation.y) * Math.min(1, dt * 2.4)
     council.update(dt, elapsed, camera)
   }
-  syncCard()
   keeperScene.update(dt)
   agora.update({ reveal: agoraReveal, elapsed, speak: keeperScene.speak(), blaze: council.blaze() })
 
