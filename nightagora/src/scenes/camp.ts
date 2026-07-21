@@ -132,9 +132,9 @@ export function createCamp(scene: Scene) {
   // it or the dawn occludes the field. Faint at his morning, whole at
   // the duskrise.
   const firmament = createFirmament({
-    count: 2200,
+    count: 1450,
     far: [16, 46],
-    near: [7, 17],
+    near: [10, 24],
     bias: 'zenith',
     rand,
   })
@@ -427,8 +427,11 @@ export function createCamp(scene: Scene) {
     flame.position.y = GROUND_Y + 0.1 + (FLAME_H * breathe) / 2
 
     poolMat.opacity = r * (0.3 + 0.12 * fl)
-    // the firmament keeps dawn's reserve until night falls over him
-    firmament.update(t, (0.06 + 0.94 * dusk) * r)
+    // the firmament keeps dawn's reserve until night falls over him,
+    // and even at full dusk it stays a murmur: HIS SIGN is the hero
+    // of that sky — the ember seeds must be the brightest thing in it
+    // (concept bar; the constellation fine tuning is a later forge)
+    firmament.update(t, (0.04 + 0.24 * dusk) * r)
     markMat.opacity = r * (0.55 + 0.25 * Math.sin(t * 1.9)) * (1 - (s.yield ?? 0))
 
     const pos = sparkGeo.getAttribute('position')

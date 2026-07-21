@@ -200,9 +200,9 @@ export function createEclipse(scene: Scene) {
   // band behind the pillars. The dome writes no depth so the far
   // stars shine through. ----
   const firmament = createFirmament({
-    count: 3200,
+    count: 2000,
     far: [60, 180],
-    near: [24, 64],
+    near: [30, 80],
     bias: 'seated',
     rand,
   })

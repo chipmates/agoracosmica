@@ -270,13 +270,16 @@ export function createSign(opts: SignOptions): Sign {
       shown[i] = s.shown
       const L = s.shown
       const breathe = 1 + 0.05 * Math.sin(elapsed * (0.8 + s.phase * 0.1) + s.phase) * Math.min(1, L)
-      // the language of the five stages, continuous:
-      s.core.scale.setScalar((0.3 + 0.11 * L) * breathe)
+      // the language of the five stages, continuous. Even the ember
+      // stage must be RECOGNIZABLE as a seed against the firmament
+      // (Michel, first-night law): warmer, a breath stronger, and
+      // ringed by a barely-lit mark from night one.
+      s.core.scale.setScalar((0.36 + 0.1 * L) * breathe)
       s.coreMat.color.copy(scratch.copy(EMBER).lerp(STARLIGHT, Math.min(1, L / 2.2)))
-      s.coreMat.opacity = (0.32 + 0.17 * L) * master
+      s.coreMat.opacity = (0.42 + 0.14 * L) * master
       s.haloMat.opacity = Math.max(0, (L - 1.6) / 2.4) * 0.5 * master
       s.halo.scale.setScalar((1.3 + 0.28 * L) * breathe)
-      s.ringMat.opacity = Math.max(0, Math.min(1, L - 0.7)) * 0.6 * master
+      s.ringMat.opacity = Math.max(0.12, Math.min(1, L - 0.7)) * 0.6 * master
       s.ring.scale.setScalar(0.95 + 0.1 * L)
       s.rayMat.opacity = Math.max(0, (L - 2.7) / 1.3) * 0.62 * master
       s.ray.scale.setScalar(1.45 + 0.3 * (L - 2.5))
@@ -288,7 +291,9 @@ export function createSign(opts: SignOptions): Sign {
       const la = seeds[b.a]?.shown ?? 0
       const lb = seeds[b.b]?.shown ?? 0
       const on = Math.max(0, Math.min(la, lb) - 1.2) / 2.8
-      b.mat.opacity = on * 0.3 * master
+      // a whisper of the whole figure is always drawn: the sign must
+      // read as a SIGN on the first night, its light still unearned
+      b.mat.opacity = Math.max(0.06, on * 0.3) * master
       const pa = seeds[b.a]?.group.position
       const pb = seeds[b.b]?.group.position
       if (pa && pb) {

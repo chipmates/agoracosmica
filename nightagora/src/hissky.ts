@@ -78,7 +78,7 @@ const rand = mulberry32(FOUNDING_SEED + 144)
 // night); its inline ancestor held the field at 0.55 so the wreath
 // owns the frame — the organ receives that as its master ----
 const firmament = createFirmament({
-  count: 2600,
+  count: 1550,
   far: [60, 180],
   near: [24, 64],
   bias: 'zenith',
