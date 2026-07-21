@@ -80,7 +80,9 @@ export function createCamp(scene: Scene) {
   root.visible = false
   scene.add(root)
 
-  const GROUND_Y = -0.9
+  // a breath below the agora's marble (-0.9): the two grounds must
+  // never share a plane, or the crossfade window z-fights in blocks
+  const GROUND_Y = -0.92
   // composed for the postcard too: everything must hold at 390px wide
   const FIRE = { x: -0.75, z: -5.2 }
 

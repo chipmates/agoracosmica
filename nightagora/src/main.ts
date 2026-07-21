@@ -868,6 +868,13 @@ declare global {
         }
       ) => void
       freeze: (t: number) => void
+      state: () => {
+        phase: Phase
+        agoraReveal: number
+        campReveal: number
+        campDusk: number
+        desc: number
+      }
     }
   }
 }
@@ -1041,6 +1048,11 @@ window.__forge = {
     elapsed = t
     frozen = true
   },
+  // the rig's stethoscope: read the live blend state without guessing
+  // from pixels (numbers first, then the shot)
+  state() {
+    return { phase, agoraReveal, campReveal, campDusk, desc }
+  },
 }
 
 const TRANSIT_SECONDS = 2.8
@@ -1097,6 +1109,11 @@ function setPhase(next: Phase): void {
   if (next === 'camp') {
     endDusk()
     campDusk = 0
+    // the agora CUTS here, inside the entry breath (ring flash or gold
+    // breath, both full-frame): a fade cannot hide it — its ink fades
+    // toward black, and black against the Danube dawn is a solid
+    // occluding silhouette until the visibility gate finally trips
+    agoraReveal = 0
     setStatus(
       camera.aspect < 0.9
         ? 'Carnuntum · touch and move to look around'
