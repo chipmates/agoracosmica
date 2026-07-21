@@ -44,6 +44,8 @@ export interface CrossingHandles {
   skip(): void
   /** Rig hook: compose a deterministic mid-crossing frame. */
   forgeStage(stage: 'hatch' | 'portrait' | 'breath'): void
+  /** Leave no trace: clear the canvas organs and the DOM classes. */
+  stop(): void
   active(): boolean
 }
 
@@ -285,6 +287,14 @@ export function createCrossing(scene: Scene, onDone: () => void): CrossingHandle
     else if (t < T_BREATH) t = T_BREATH
   }
 
+  function stop(): void {
+    running = false
+    root.visible = false
+    voiceEl.classList.remove('lit', 'clean')
+    portraitEl.classList.remove('lit')
+    breathEl.classList.remove('lit', 'passing')
+  }
+
   function forgeStage(stage: 'hatch' | 'portrait' | 'breath'): void {
     begin(new Vector3(2.4, 5.2, -12))
     const until = stage === 'hatch' ? 3.5 : stage === 'portrait' ? 6.2 : 8.8
@@ -293,5 +303,5 @@ export function createCrossing(scene: Scene, onDone: () => void): CrossingHandle
     for (let i = 0; i < steps; i++) update(1 / 60, 12.4 + i / 60)
   }
 
-  return { begin, update, skip, forgeStage, active: () => running }
+  return { begin, update, skip, forgeStage, stop, active: () => running }
 }

@@ -24,6 +24,7 @@ const STATES = [
   { name: 'camp', jump: ['camp', {}] },
   { name: 'trace', jump: ['camp', { camp: 'trace' }] },
   { name: 'hearth', jump: ['camp', { camp: 'hearth' }] },
+  { name: 'council', jump: ['council', {}] },
 ]
 const VIEWPORTS = [
   { tag: 'desktop', width: 1512, height: 950, deviceScaleFactor: 1 },

@@ -254,6 +254,100 @@
     #ringflash.passing { opacity: 0; transition: opacity 1.1s ease; }
     body.forge #trace-card, body.forge #ringflash { transition: none !important; }
 
+    /* ---- the council: topic in letterpress, names in the register,
+       a thin cartouche for the produced audio ---- */
+    #council-topic {
+      position: fixed; left: 0; right: 0; top: 13%;
+      z-index: 3; text-align: center; pointer-events: none;
+      padding: 0 24px;
+      opacity: 0; transition: opacity 2s ease;
+    }
+    #council-topic.lit { opacity: 1; }
+    .council-kicker {
+      font-family: var(--sans);
+      font-size: 10px; letter-spacing: 0.34em; text-indent: 0.34em;
+      text-transform: uppercase; color: var(--na-gold);
+      text-shadow: 0 1px 10px rgba(4, 6, 13, 0.95), 0 0 3px rgba(4, 6, 13, 0.85);
+    }
+    .council-title {
+      margin-top: 12px;
+      font-family: var(--serif);
+      font-size: clamp(20px, 2.8vw, 28px);
+      color: var(--na-starlight);
+      text-shadow: 0 1px 16px rgba(4, 6, 13, 0.85);
+    }
+    /* narrow stage (phones): the playbill register names the circle;
+       the positioned chips step aside */
+    .council-register {
+      display: none;
+      margin-top: 18px;
+      font-family: var(--sans);
+      font-size: 9px; letter-spacing: 0.3em; text-indent: 0.3em;
+      text-transform: uppercase; color: var(--na-mist);
+      text-shadow: 0 1px 10px rgba(4, 6, 13, 0.95), 0 0 3px rgba(4, 6, 13, 0.85);
+    }
+    .council-register .moderator { color: var(--na-starlight); }
+    @media (max-aspect-ratio: 9/10) {
+      .council-register { display: block; }
+      #council-names { display: none; }
+    }
+    #council-names { position: fixed; inset: 0; z-index: 3; pointer-events: none; }
+    #council-names[hidden] { display: none; }
+    .council-name {
+      position: absolute; transform: translateX(-50%);
+      font-family: var(--sans);
+      font-size: 9px; letter-spacing: 0.3em; text-indent: 0.3em;
+      text-transform: uppercase; color: var(--na-mist);
+      white-space: nowrap;
+    }
+    .council-name.moderator { color: var(--na-starlight); }
+    .council-name[hidden] { display: none; }
+    #cartouche {
+      position: fixed; left: 50%; bottom: calc(30px + env(safe-area-inset-bottom));
+      transform: translateX(-50%);
+      width: min(560px, calc(100% - 48px));
+      z-index: 3; cursor: pointer;
+      transition: opacity 0.8s ease;
+    }
+    #cartouche[hidden] { display: block; opacity: 0; visibility: hidden; }
+    /* the disclosure rests on dark marble, right where the voices are
+       invited — never over the blaze */
+    .cartouche-honesty {
+      margin-bottom: 14px; text-align: center;
+      font-family: var(--sans);
+      font-size: 9px; letter-spacing: 0.28em; text-indent: 0.28em;
+      text-transform: uppercase; color: var(--na-mist);
+    }
+    @media (min-aspect-ratio: 9/10) {
+      /* one quiet line on wide stages; the centered overflow is symmetric */
+      .cartouche-honesty { white-space: nowrap; }
+    }
+    .cartouche-bar {
+      position: relative;
+      display: flex; align-items: center; gap: 16px;
+      padding: 12px 6px 4px;
+      border-top: 1px solid color-mix(in srgb, var(--na-gold) 30%, transparent);
+    }
+    .cartouche-toggle {
+      font-family: var(--sans);
+      font-size: 10px; letter-spacing: 0.3em; text-indent: 0.3em;
+      text-transform: uppercase; color: var(--na-gold);
+      min-width: 52px; text-align: left;
+    }
+    .cartouche-title {
+      flex: 1; text-align: center;
+      font-family: var(--sans);
+      font-size: 9px; letter-spacing: 0.26em; text-indent: 0.26em;
+      text-transform: uppercase; color: var(--na-mist);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .cartouche-progress {
+      position: absolute; top: -1px; left: 0;
+      height: 1px; width: 0%;
+      background: var(--na-gold);
+    }
+    body.forge #council-topic, body.forge #cartouche { transition: none !important; }
+
     /* the way onward, after the coda */
     .keeper-exit {
       display: block;
@@ -479,6 +573,25 @@
     <p class="trace-source">Meditations 5.20</p>
   </div>
   <div id="ringflash" aria-hidden="true"></div>
+  <div id="council-topic">
+    <p class="council-kicker">Lives That Still Speak</p>
+    <p class="council-title">The Calling That Won't Shut Up.</p>
+    <p class="council-register">Campbell · <span class="moderator">Goethe</span> · Lovelace · Gandhi</p>
+  </div>
+  <div id="council-names" hidden>
+    <span class="council-name">Campbell</span>
+    <span class="council-name moderator">Goethe</span>
+    <span class="council-name">Lovelace</span>
+    <span class="council-name">Gandhi</span>
+  </div>
+  <div id="cartouche" hidden>
+    <p class="cartouche-honesty">Four AI Echoes, one of them moderating · Interpretations, not recordings</p>
+    <div class="cartouche-bar">
+      <span class="cartouche-toggle">Listen</span>
+      <span class="cartouche-title">A short preview · English</span>
+      <div class="cartouche-progress"></div>
+    </div>
+  </div>
   <script type="module" src="/src/main.ts"></script>
 </body>
 </html>

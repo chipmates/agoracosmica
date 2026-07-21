@@ -59,6 +59,8 @@ export interface AgoraState {
   elapsed: number
   /** 0..1 while the Keeper speaks: the fire listens and leans in */
   speak?: number
+  /** 0..1 while the council convenes: hearth scales toward blaze */
+  blaze?: number
 }
 
 /**
@@ -591,20 +593,23 @@ export function createAgora(scene: Scene) {
     // one fire, many flickers: the source stays steady, the light it throws
     // trembles a little more. All motion is sine-woven and deterministic.
     const sp = s.speak ?? 0
+    const bz = s.blaze ?? 0
     const fl =
       0.76 + 0.12 * Math.sin(t * 7.1) + 0.07 * Math.sin(t * 11.7 + 1.3) + 0.05 * Math.sin(t * 19.3 + 4.1)
-    uFlame.value = r * (0.82 + 0.18 * fl) * (1 + 0.1 * sp)
+    uFlame.value = r * (0.82 + 0.18 * fl) * (1 + 0.1 * sp) * (1 + 0.28 * bz)
     uLean.value = 0.03 * Math.sin(t * 0.42) + 0.015 * Math.sin(t * 1.1 + 2)
 
-    // the flame breathes in scale as well as in noise, a little deeper
-    // while its keeper speaks
+    // the flame breathes in scale as well as in noise: deeper while its
+    // keeper speaks, and it rises hearth-to-blaze when the council sits
     const breath = 1 + (0.035 + 0.02 * sp) * Math.sin(t * 2.1) + 0.02 * Math.sin(t * 3.7 + 1.1)
-    flame.scale.set(FLAME_W, FLAME_H * breath, 1)
-    flame.position.y = FLAME_BASE + (FLAME_H * breath) / 2
-    tongue.scale.set(TONGUE_W, TONGUE_H * breath, 1)
-    tongue.position.y = FLAME_BASE + (TONGUE_H * breath) / 2
-    refl.scale.set(REFL_W, REFL_H * breath, 1)
-    refl.position.y = 2 * FLOOR_Y - FLAME_BASE - (REFL_H * breath) / 2
+    const rise = 1 + 0.42 * bz
+    const wide = 1 + 0.16 * bz
+    flame.scale.set(FLAME_W * wide, FLAME_H * breath * rise, 1)
+    flame.position.y = FLAME_BASE + (FLAME_H * breath * rise) / 2
+    tongue.scale.set(TONGUE_W * wide, TONGUE_H * breath * rise, 1)
+    tongue.position.y = FLAME_BASE + (TONGUE_H * breath * rise) / 2
+    refl.scale.set(REFL_W * wide, REFL_H * breath * rise, 1)
+    refl.position.y = 2 * FLOOR_Y - FLAME_BASE - (REFL_H * breath * rise) / 2
 
     dustFar.mat.opacity = 0.75 * r
     dustNear.mat.opacity = 0.3 * r
@@ -642,7 +647,7 @@ export function createAgora(scene: Scene) {
       }
       pos.needsUpdate = true
       col.needsUpdate = true
-      ascMat.opacity = 0.9 * r
+      ascMat.opacity = 0.9 * r * (1 + 0.35 * bz)
     }
 
     // sparks: quick bright leaps just above the flame

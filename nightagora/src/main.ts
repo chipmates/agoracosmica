@@ -4,12 +4,14 @@ import { createAgora } from './scenes/agora'
 import { createKeeper } from './scenes/keeper'
 import { createCrossing } from './scenes/crossing'
 import { createCamp } from './scenes/camp'
-import { AGORA_SCRIPT, CAMP_SCRIPT } from './content/keeper-script'
+import { createCouncil } from './scenes/council'
+import { CAMP_SCRIPT } from './content/keeper-script'
+import { COUNCIL_DONE } from './content/council'
 import { WANDERERS } from './content/wanderers'
 
 const MARCUS = WANDERERS.findIndex((w) => w.slug === 'aurelius')
 
-type Phase = 'transit' | 'held' | 'door' | 'stone' | 'agora' | 'sky' | 'crossing' | 'camp'
+type Phase = 'transit' | 'held' | 'door' | 'stone' | 'agora' | 'sky' | 'crossing' | 'camp' | 'council'
 
 const stage = document.getElementById('stage')
 const status = document.getElementById('status')
@@ -44,6 +46,11 @@ const agora = createAgora(scene)
 const keeperScene = createKeeper(keeperEl, reducedMotion, () => returnFromCamp())
 const crossing = createCrossing(scene, () => setPhase('camp'))
 const camp = createCamp(scene)
+const council = createCouncil(scene, () => councilEnded())
+
+function councilEnded(): void {
+  setStatus(COUNCIL_DONE)
+}
 
 // WebGL is the proven backend tonight; ?webgpu opts into the newer path
 // until it is verified on real hardware (see FORGE-STATE DEEPEN list).
@@ -74,13 +81,14 @@ let traceOpen = false
 let voiceTimerA = 0
 let voiceTimerB = 0
 
-/** The short-dawn rhyme: one diamond-ring breath carries you back. */
+/** The short-dawn rhyme: one diamond-ring breath, and the agora is
+    changed: the council is convening. */
 function returnFromCamp(): void {
   if (phase !== 'camp') return
   ringEl.classList.add('lit')
   window.setTimeout(() => {
-    keeperScene.setScript(AGORA_SCRIPT)
-    setPhase('agora')
+    setPhase('council')
+    council.begin()
     ringEl.classList.remove('lit')
     ringEl.classList.add('passing')
     window.setTimeout(() => ringEl.classList.remove('passing'), 1200)
@@ -241,6 +249,17 @@ window.__forge = {
   jump(p, opts = {}) {
     document.body.classList.add('forge') // DOM beats compose instantly
     setPhase(p)
+    // each jump is a single composed moment: no scene leaks across
+    if (p !== 'crossing') crossing.stop()
+    if (p !== 'council') council.stop()
+    if (p !== 'camp') {
+      campReveal = 0
+      campYield = 0
+      window.clearTimeout(voiceTimerA)
+      window.clearTimeout(voiceTimerB)
+      voiceEl2.classList.remove('lit', 'clean')
+    }
+    ringEl.classList.remove('lit', 'passing')
     transit = opts.transit ?? (p === 'transit' ? 0.5 : 1)
     door = doorTarget =
       opts.door ?? (p === 'door' ? 0.5 : p === 'transit' || p === 'held' ? 0 : 1)
@@ -250,6 +269,7 @@ window.__forge = {
       : p === 'held' || p === 'stone' ? 0.75
       : p === 'crossing' ? 0.12
       : p === 'camp' ? 0.08
+      : p === 'council' ? 0.55
       : 1)
     flashAt = elapsed - (opts.sinceFlash ?? 999)
     agoraReveal = p === 'agora' || p === 'sky' ? 1 : 0
@@ -259,7 +279,13 @@ window.__forge = {
       camera.rotation.x = -0.12
     }
     if (p === 'sky') camera.rotation.x = 0.62
-    if (p !== 'agora' && p !== 'sky' && p !== 'camp') camera.rotation.set(0, 0, 0)
+    if (p !== 'agora' && p !== 'sky' && p !== 'camp' && p !== 'council') camera.rotation.set(0, 0, 0)
+    if (p === 'council') {
+      agoraReveal = 1
+      camera.rotation.set(-0.12, 0, 0)
+      verseEl.classList.remove('lit')
+      council.forgeStage(camera)
+    }
     if (p === 'camp') {
       campReveal = 1
       camera.rotation.set(-0.12, 0, 0)
@@ -339,6 +365,10 @@ function setPhase(next: Phase): void {
     hoverIdx = null
     verseEl.classList.remove('lit') // a fast chooser carries no verse across
   }
+  if (next === 'council') {
+    setStatus('')
+    verseShow('This is the Agora.')
+  }
   if (next === 'camp') {
     setStatus('Carnuntum on the Danube')
     campEnteredAt = elapsed
@@ -372,6 +402,10 @@ function push(delta: number): void {
   if (phase === 'stone' && delta > 0 && elapsed - stoneEnteredAt > 1.2) setPhase('agora')
   if (phase === 'agora') {
     lookTarget = Math.min(1, Math.max(0, lookTarget + delta * 0.0009))
+  }
+  if (phase === 'council' && delta > 0 && council.active()) {
+    council.stop()
+    councilEnded()
   }
 }
 
@@ -432,7 +466,7 @@ function frame(now: number): void {
   // the stone: one held black breath, long enough to be read
   if (phase === 'stone' && elapsed - stoneEnteredAt > 4.8) setPhase('agora')
 
-  const revealTarget = phase === 'agora' || phase === 'sky' ? 1 : 0
+  const revealTarget = phase === 'agora' || phase === 'sky' || phase === 'council' ? 1 : 0
   agoraReveal += (revealTarget - agoraReveal) * Math.min(1, dt * (reducedMotion ? 20 : 1.2))
 
   if (phase === 'agora') {
@@ -468,7 +502,7 @@ function frame(now: number): void {
   const birthTarget =
     phase === 'transit' ? 0
     : phase === 'held' || phase === 'stone' ? 0.75
-    : phase === 'agora' ? 0.55
+    : phase === 'agora' || phase === 'council' ? 0.55
     : phase === 'crossing' ? 0.12
     : phase === 'camp' ? 0.08
     : 1
@@ -480,7 +514,7 @@ function frame(now: number): void {
     skyBirth,
     lanterns:
       phase === 'sky' ? 1
-      : phase === 'agora' ? 0.55
+      : phase === 'agora' || phase === 'council' ? 0.55
       : phase === 'crossing' || phase === 'camp' ? 0
       : 0.3,
     sinceFlash: flashAt < 0 ? -1 : elapsed - flashAt,
@@ -502,9 +536,16 @@ function frame(now: number): void {
     camera.rotation.y += (0 - camera.rotation.y) * Math.min(1, dt * 2.2)
     crossing.update(dt, elapsed)
   }
+
+  // the council: back at the seated eye, the circle convening
+  if (phase === 'council') {
+    camera.rotation.x += (-0.12 - camera.rotation.x) * Math.min(1, dt * 2.4)
+    camera.rotation.y += (0 - camera.rotation.y) * Math.min(1, dt * 2.4)
+    council.update(dt, elapsed, camera)
+  }
   syncCard()
   keeperScene.update(dt)
-  agora.update({ reveal: agoraReveal, elapsed, speak: keeperScene.speak() })
+  agora.update({ reveal: agoraReveal, elapsed, speak: keeperScene.speak(), blaze: council.blaze() })
 
   renderer.render(scene, camera)
 }
