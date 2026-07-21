@@ -18,8 +18,8 @@ dependencies:
     specifier: ^3.7.2
     version: 3.7.2
   astro:
-    specifier: ^6.4.6
-    version: 6.4.7
+    specifier: ^6.4.8
+    version: 6.4.8
   react:
     specifier: ^18.3.1
     version: 18.3.1
@@ -1303,8 +1303,8 @@ packages:
     resolution: {integrity: sha512-I1jXZMjAgCMmxT4qxXfPXa6SthSoE8h6gkSI9BGGNv8mP8G/v0blc+qFnZu6K42vTOiuME596QaLO0TP3Lk0xg==}
     dev: false
 
-  /astro@6.4.7:
-    resolution: {integrity: sha512-5vsXx0H52u23Jpshs9tM81D03Tb3Oh2Vt2Zo0bpqjXN+njkAWjFyGjTfmWJLAcrCQd9Q+iWB1eqfhR1sZJEaUA==}
+  /astro@6.4.8:
+    resolution: {integrity: sha512-KK5lX90uU9EeVaTjINyj3sy9/NFXVa59aowaqbWBDDKLXZh4rr7GwIaCFYVetE22MJtsCNFerQXn0vlCLmpP/Q==}
     engines: {node: '>=22.12.0', npm: '>=9.6.5', pnpm: '>=7.1.0'}
     hasBin: true
     dependencies:
@@ -1352,7 +1352,7 @@ packages:
       svgo: 4.0.1
       tinyclip: 0.1.12
       tinyexec: 1.1.2
-      tinyglobby: 0.2.16
+      tinyglobby: 0.2.17
       ultrahtml: 1.6.0
       unifont: 0.7.4
       unist-util-visit: 5.1.0
@@ -1998,8 +1998,8 @@ packages:
   /magicast@0.5.3:
     resolution: {integrity: sha512-pVKE4UdSQ7DvHzivsCIFx2BJn1mHG6KsyrFcaxFx6tONdneEuThrDx0Cj3AMg58KyN4pzYT+LHOotxDQDjNvkw==}
     dependencies:
-      '@babel/parser': 7.29.3
-      '@babel/types': 7.29.0
+      '@babel/parser': 7.29.7
+      '@babel/types': 7.29.7
       source-map-js: 1.2.1
     dev: false
 
@@ -2905,14 +2905,6 @@ packages:
   /tinyexec@1.1.2:
     resolution: {integrity: sha512-dAqSqE/RabpBKI8+h26GfLq6Vb3JVXs30XYQjdMjaj/c2tS8IYYMbIzP599KtRj7c57/wYApb3QjgRgXmrCukA==}
     engines: {node: '>=18'}
-    dev: false
-
-  /tinyglobby@0.2.16:
-    resolution: {integrity: sha512-pn99VhoACYR8nFHhxqix+uvsbXineAasWm5ojXoN8xEwK5Kd3/TrhNn1wByuD52UxWRLy8pu+kRMniEi6Eq9Zg==}
-    engines: {node: '>=12.0.0'}
-    dependencies:
-      fdir: 6.5.0(picomatch@4.0.4)
-      picomatch: 4.0.4
     dev: false
 
   /tinyglobby@0.2.17:
