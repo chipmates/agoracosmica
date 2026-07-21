@@ -20,17 +20,20 @@ import {
   TorusGeometry,
 } from 'three/webgpu'
 import {
+  abs,
   clamp,
   dot,
   float,
   fract,
   length,
   mix,
+  mx_fractal_noise_float,
   mx_noise_float,
   normalWorld,
   normalize,
   oneMinus,
   positionWorld,
+  pow,
   sin,
   smoothstep,
   texture,
@@ -259,60 +262,74 @@ export function createAgora(scene: Scene) {
   const dustEdge = dustField(85, false, false, 8.9, 11.6)
 
   // ------------------------------------------------------------------
-  // 3 · THE FIRE — noise-shaped tongues over a stone altar
+  // 3 · THE FIRE — one TSL field carved from fractal noise (the
+  //     tournament's most alive flame: torn tips, rising turbulence,
+  //     a slow whole-body lean), burning over the bronze brazier.
+  //     The same node graph, flipped and dimmed, is its twin in the
+  //     marble (section 4).
   // ------------------------------------------------------------------
-  const flameMat = new MeshBasicNodeMaterial({
-    transparent: true,
-    blending: AdditiveBlending,
-    depthWrite: false,
-  })
-  {
-    const fu = uv().x.mul(2).sub(1) // -1 .. 1 across
-    const fv = uv().y // 0 base .. 1 tip
-    const swayA = sin(fv.mul(5.1).sub(uT.mul(2.2))).mul(fv).mul(0.11)
-    const swayB = sin(fv.mul(10.7).sub(uT.mul(3.4)).add(1.9)).mul(fv).mul(0.05)
-    const fx = fu.add(swayA).add(swayB)
+  const uFlame = uniform(0)
+  const uLean = uniform(0)
 
-    // a fire is many tongues, not one wick: three envelopes, each with its
-    // own lean, height and breath, joined by max()
-    function tongue(center: number, width: number, tall: number, lean: number, phase: number) {
-      const cx = fx.sub(center).sub(sin(uT.mul(1.3).add(phase)).mul(0.05).add(lean).mul(fv))
-      const h = fv.div(tall)
-      const halfW = oneMinus(clamp(h, 0, 1)).pow(0.72).mul(width).add(0.03)
-      const e = oneMinus(smoothstep(halfW.mul(0.28), halfW, cx.abs()))
-      // each tongue thins out past its own height
-      return e.mul(oneMinus(smoothstep(0.75, 1.0, h)))
-    }
-    const envA = tongue(-0.34, 0.26, 0.62, -0.1, 0.0)
-    const envB = tongue(0.02, 0.34, 1.0, 0.03, 2.3)
-    const envC = tongue(0.36, 0.22, 0.5, 0.12, 4.1)
-    const env = envA.max(envB).max(envC)
-
-    const np = vec3(fx.mul(2.6), fv.mul(3.2).sub(uT.mul(1.85)), uT.mul(0.21))
-    const noise = mx_noise_float(np).add(mx_noise_float(np.mul(2.13).add(vec3(7.3, 3.7, 1.9))).mul(0.6))
-
-    const field = env
-      .mul(noise.mul(0.54).add(0.86))
-      .sub(fv.mul(0.55))
-      .add(oneMinus(fv).mul(0.12))
-      .sub(0.1)
-
-    const alpha = smoothstep(0.07, 0.38, field).mul(smoothstep(0.0, 0.06, fv))
-    const heatCore = smoothstep(0.3, 0.95, field).mul(oneMinus(fv).pow(1.15))
-    const bodyMix = clamp(field.mul(1.5), 0, 1)
-    const col = mix(
-      mix(vec3(GOLD_DEEP.r, GOLD_DEEP.g, GOLD_DEEP.b), vec3(GOLD.r, GOLD.g, GOLD.b), bodyMix),
-      vec3(WHITE_HOT.r, WHITE_HOT.g, WHITE_HOT.b),
-      heatCore
+  function flameMaterial(flip: boolean, gain: number, seed: number): MeshBasicNodeMaterial {
+    const mat = new MeshBasicNodeMaterial({
+      transparent: true,
+      blending: AdditiveBlending,
+      depthWrite: false,
+    })
+    const p = uv()
+    const y = clamp(flip ? oneMinus(p.y) : p.y, 0.0, 1.0)
+    const x = p.x.sub(0.5)
+    // the tongue sways: two octaves of drifting noise, growing with height,
+    // plus one slow whole-body lean. It turns and breathes; it never bounces.
+    const swayA = mx_noise_float(vec3(y.mul(1.9).sub(uT.mul(1.15)), uT.mul(0.27), 5.2 + seed))
+    const swayB = mx_noise_float(vec3(y.mul(4.6).sub(uT.mul(2.1)), uT.mul(0.4), 9.7 + seed))
+    const xx = x
+      .add(swayA.mul(y.mul(0.17)))
+      .add(swayB.mul(y.mul(0.06)))
+      .add(uLean.mul(y))
+    // envelope: wide at the coals, a needle at the tip
+    const radius = mix(float(0.38), float(0.05), pow(y, float(0.74)))
+    const d = abs(xx).div(radius)
+    // rising turbulence carves the body into separate tongues
+    const turb = mx_fractal_noise_float(
+      vec3(xx.mul(5.6).add(2.0), y.mul(2.6).sub(uT.mul(1.9)), uT.mul(0.12).add(7.3 + seed)),
+      3,
+      2.0,
+      0.55,
+      1.0
     )
-    const flicker = sin(uT.mul(8.3)).mul(0.06).add(sin(uT.mul(13.1)).mul(0.04)).add(0.92)
-    flameMat.colorNode = col
-    flameMat.opacityNode = alpha.mul(flicker).mul(uR).add(dither)
+    const field = float(1.02).sub(d.mul(d)).add(turb.mul(0.52)).sub(y.mul(0.72))
+    const rooted = smoothstep(0.0, 0.06, y)
+    const crown = oneMinus(smoothstep(0.8, 0.97, y))
+    let alpha = smoothstep(0.16, 0.46, field).mul(rooted).mul(crown).mul(uFlame).mul(float(gain))
+    if (flip) alpha = alpha.mul(oneMinus(smoothstep(0.05, 0.46, y)))
+    const heat = smoothstep(0.55, 1.3, field.add(oneMinus(y).mul(0.5)).sub(abs(xx).mul(1.5)))
+    const body = mix(vec3(0.58, 0.12, 0.015), vec3(1.0, 0.63, 0.19), smoothstep(0.0, 0.85, field))
+    mat.colorNode = mix(body, vec3(1.02, 0.94, 0.8), heat)
+    mat.opacityNode = alpha
+    return mat
   }
-  const flame = new Mesh(new PlaneGeometry(1.1, 1.42), flameMat)
-  flame.position.set(FIRE.x, 0.03, FIRE.z)
+
+  const RIM_Y = FLOOR_Y + 0.385 // the brazier's lip
+  const flameGeo = new PlaneGeometry(1, 1)
+  const FLAME_W = 1.2
+  const FLAME_H = 1.35
+  const TONGUE_W = FLAME_W * 0.62
+  const TONGUE_H = FLAME_H * 0.66
+  const FLAME_BASE = RIM_Y - 0.12
+  const flame = new Mesh(flameGeo, flameMaterial(false, 1, 0))
+  flame.scale.set(FLAME_W, FLAME_H, 1)
+  flame.position.set(FIRE.x, FLAME_BASE + FLAME_H / 2, FIRE.z)
   flame.renderOrder = 7
   root.add(flame)
+
+  // a second, smaller tongue: fire is never one voice
+  const tongue = new Mesh(flameGeo, flameMaterial(false, 0.85, 4.3))
+  tongue.scale.set(TONGUE_W, TONGUE_H, 1)
+  tongue.position.set(FIRE.x + 0.1, FLAME_BASE + TONGUE_H / 2, FIRE.z + 0.16)
+  tongue.renderOrder = 7
+  root.add(tongue)
 
   // the stone altar that holds the fire
   const altarPedMat = new MeshBasicNodeMaterial()
@@ -397,36 +414,17 @@ export function createAgora(scene: Scene) {
   root.add(air)
 
   // ------------------------------------------------------------------
-  // 4 · THE ANSWER IN THE STONE — the flame's mirror image, lying on
-  //     the floor exactly where reflection geometry puts it (the image
-  //     of the flame spans the stone between altar and visitor, with a
-  //     gap of dark marble after the altar's own dark reflection)
+  // 4 · THE ANSWER IN THE STONE — the flame's true twin: the same node
+  //     graph flipped, dimmed and fading with height, hung below the
+  //     floor plane exactly where reflection geometry puts it
   // ------------------------------------------------------------------
-  const reflMat = new MeshBasicNodeMaterial({
-    transparent: true,
-    blending: AdditiveBlending,
-    depthWrite: false,
-  })
-  {
-    const m = uv().y // 1 = far end (flame base image), 0 = near end (tip)
-    const vf = oneMinus(m) // flame-space height of the mirrored image
-    const ru = uv().x.mul(2).sub(1)
-    const swayA = sin(vf.mul(5.1).sub(uT.mul(2.2))).mul(vf).mul(0.14)
-    const rx = ru.add(swayA)
-    const halfW = m.pow(0.68).mul(0.44).add(0.06)
-    const env = oneMinus(smoothstep(halfW.mul(0.25), halfW, rx.abs()))
-    const np = vec3(rx.mul(2.4), vf.mul(3.0).sub(uT.mul(1.85)), uT.mul(0.21))
-    const noise = mx_noise_float(np)
-    const field = env.mul(noise.mul(0.3).add(0.8)).sub(vf.mul(0.6)).sub(0.06)
-    const alpha = smoothstep(0.0, 0.6, field).mul(smoothstep(0.02, 0.3, m)).mul(0.38)
-    const col = mix(vec3(GOLD_DEEP.r, GOLD_DEEP.g, GOLD_DEEP.b), vec3(GOLD.r, GOLD.g, GOLD.b), clamp(field.mul(1.3), 0, 1))
-    const flicker = sin(uT.mul(8.3)).mul(0.05).add(0.95)
-    reflMat.colorNode = col
-    reflMat.opacityNode = alpha.mul(flicker).mul(uR).add(dither)
-  }
-  const refl = new Mesh(new PlaneGeometry(0.95, 1.5), reflMat)
-  refl.rotation.x = -Math.PI / 2
-  refl.position.set(FIRE.x, FLOOR_Y + 0.012, -3.75)
+  const REFL_W = FLAME_W * 1.1
+  const REFL_H = FLAME_H * 1.18
+  const reflMat = flameMaterial(true, 0.2, 0)
+  reflMat.depthTest = false
+  const refl = new Mesh(flameGeo, reflMat)
+  refl.scale.set(REFL_W, REFL_H, 1)
+  refl.position.set(FIRE.x, 2 * FLOOR_Y - FLAME_BASE - REFL_H / 2, FIRE.z)
   refl.renderOrder = 4
   root.add(refl)
 
@@ -587,6 +585,22 @@ export function createAgora(scene: Scene) {
     const t = s.elapsed
     uT.value = t
     uR.value = r
+
+    // one fire, many flickers: the source stays steady, the light it throws
+    // trembles a little more. All motion is sine-woven and deterministic.
+    const fl =
+      0.76 + 0.12 * Math.sin(t * 7.1) + 0.07 * Math.sin(t * 11.7 + 1.3) + 0.05 * Math.sin(t * 19.3 + 4.1)
+    uFlame.value = r * (0.82 + 0.18 * fl)
+    uLean.value = 0.03 * Math.sin(t * 0.42) + 0.015 * Math.sin(t * 1.1 + 2)
+
+    // the flame breathes in scale as well as in noise
+    const breath = 1 + 0.035 * Math.sin(t * 2.1) + 0.02 * Math.sin(t * 3.7 + 1.1)
+    flame.scale.set(FLAME_W, FLAME_H * breath, 1)
+    flame.position.y = FLAME_BASE + (FLAME_H * breath) / 2
+    tongue.scale.set(TONGUE_W, TONGUE_H * breath, 1)
+    tongue.position.y = FLAME_BASE + (TONGUE_H * breath) / 2
+    refl.scale.set(REFL_W, REFL_H * breath, 1)
+    refl.position.y = 2 * FLOOR_Y - FLAME_BASE - (REFL_H * breath) / 2
 
     dustFar.mat.opacity = 0.75 * r
     dustNear.mat.opacity = 0.3 * r
