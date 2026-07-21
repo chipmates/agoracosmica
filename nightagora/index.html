@@ -140,6 +140,8 @@
     }
     #voice.lit { opacity: 0.85; }
     #voice.clean { color: var(--na-starlight); letter-spacing: 0.01em; }
+    /* at the camp the fire owns the left middle: the voice steps lower */
+    body[data-phase='camp'] #voice { top: 72%; }
 
     /* ---- the portrait: the atlas entry is the arrival ---- */
     #portrait {
@@ -210,6 +212,62 @@
 
     body.forge #voice, body.forge #portrait, body.forge #portrait *,
     body.forge #goldbreath { transition: none !important; }
+
+    /* ---- the trace: carved words, marked by a little star ---- */
+    #trace-card {
+      position: fixed; z-index: 3;
+      max-width: 300px;
+      padding: 2px 0 2px 16px;
+      border-left: 1px solid color-mix(in srgb, var(--na-gold) 55%, transparent);
+      pointer-events: none;
+      text-align: left;
+      transition: opacity 0.4s ease;
+    }
+    #trace-card[hidden] { display: block; opacity: 0; visibility: hidden; }
+    .trace-kicker {
+      font-family: var(--sans);
+      font-size: 9px; letter-spacing: 0.3em;
+      text-transform: uppercase; color: var(--na-gold);
+    }
+    .trace-quote {
+      margin-top: 10px;
+      font-family: var(--serif); font-style: italic;
+      font-size: 17px; line-height: 1.5;
+      color: var(--na-starlight);
+    }
+    .trace-source {
+      margin-top: 10px;
+      font-family: var(--sans);
+      font-size: 9px; letter-spacing: 0.28em;
+      text-transform: uppercase; color: var(--na-mist);
+    }
+
+    /* ---- the return: one diamond-ring breath, the short dawn ---- */
+    #ringflash {
+      position: fixed; inset: 0; z-index: 5; pointer-events: none;
+      opacity: 0;
+      background: radial-gradient(circle at 50% 46%,
+        #ffffff 0%, #e8edff 14%, rgba(46, 60, 120, 0.55) 48%, rgba(2, 3, 8, 0.97) 100%);
+      transition: opacity 0.35s ease;
+    }
+    #ringflash.lit { opacity: 1; }
+    #ringflash.passing { opacity: 0; transition: opacity 1.1s ease; }
+    body.forge #trace-card, body.forge #ringflash { transition: none !important; }
+
+    /* the way onward, after the coda */
+    .keeper-exit {
+      display: block;
+      margin: 10px auto 0;
+      background: none; border: none; cursor: pointer;
+      min-height: 44px; padding: 0 16px;
+      font-family: var(--sans);
+      font-size: 10px; letter-spacing: 0.32em; text-indent: 0.32em;
+      text-transform: uppercase; color: var(--na-gold);
+      opacity: 0.85;
+      pointer-events: auto;
+      transition: opacity 0.5s ease;
+    }
+    .keeper-exit:hover, .keeper-exit:focus-visible { opacity: 1; }
 
     #keeper {
       position: fixed; left: 0; right: 0;
@@ -325,7 +383,7 @@
       .keeper-offers { margin-top: 10px; }
       .keeper-form { margin-top: 4px; }
       #keeper .keeper-note { margin-top: 10px; }
-      body[data-phase='agora'] .status { opacity: 0; }
+      body[data-phase='agora'] .status, body[data-phase='camp'] .status { opacity: 0; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -415,6 +473,12 @@
     </figcaption>
   </figure>
   <div id="goldbreath" aria-hidden="true"><div class="dark-line"></div></div>
+  <div id="trace-card" hidden>
+    <p class="trace-kicker">A trace · kept in the wood</p>
+    <p class="trace-quote">"What stands in the way becomes the way."</p>
+    <p class="trace-source">Meditations 5.20</p>
+  </div>
+  <div id="ringflash" aria-hidden="true"></div>
   <script type="module" src="/src/main.ts"></script>
 </body>
 </html>

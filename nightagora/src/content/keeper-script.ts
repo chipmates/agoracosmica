@@ -11,6 +11,19 @@ export interface KeeperTurn {
   phrases: string[]
 }
 
+/** One staged sitting: the same exchange engine serves any hearth.
+    Verbs universal, staging sovereign. */
+export interface KeeperScript {
+  name: string
+  greeting: string
+  offered: KeeperTurn[]
+  typedReply: string[]
+  codaText: string
+  codaGold: string
+  /** Optional way onward, shown after the coda as a quiet gold line. */
+  exit?: string
+}
+
 export const KEEPER_NAME = "Marcus Aurelius · Keeper of Tonight's Fire"
 
 /** Locked verbatim (World Bible disclosure, voice layer). */
@@ -62,3 +75,41 @@ export const COLOPHON = 'An AI Echo · An interpretation, not a recording'
 
 /** sessionStorage key: a free-typed question carried to the Forward Door. */
 export const CARRIED_QUESTION_KEY = 'na-carried-question'
+
+/** The agora sitting, assembled. */
+export const AGORA_SCRIPT: KeeperScript = {
+  name: KEEPER_NAME,
+  greeting: GREETING,
+  offered: OFFERED,
+  typedReply: TYPED_REPLY,
+  codaText: CODA_TEXT,
+  codaGold: CODA_GOLD,
+}
+
+/** The hearth sitting at his camp on the Danube (beat 10). Grounded in
+    Meditations 5.20 (the obstacle passage) and the campaign context. */
+export const CAMP_SCRIPT: KeeperScript = {
+  name: 'Marcus Aurelius · At his hearth on the Danube',
+  greeting: '"Sit. The watch is long, and honest company is rare."',
+  offered: [
+    {
+      ask: 'What is it like, ruling from a tent?',
+      phrases: [
+        'Rome thinks the empire is marble. Out here I know it is mud, rivers, and tired men.',
+        'A tent is honest. It reminds you how little a wall ever held.',
+      ],
+    },
+    {
+      ask: 'Teach me the thing about obstacles.',
+      phrases: [
+        'I wrote it by this fire: the impediment to action advances action.',
+        'What stands in the way becomes the way. Look, I carved it into the post there.',
+        'It is not comfort. It is a tool. Use it on something real tomorrow.',
+      ],
+    },
+  ],
+  typedReply: TYPED_REPLY,
+  codaText: 'The night is turning. The others are gathering at the great fire, and a question like yours deserves many voices.',
+  codaGold: 'Walk back with me.',
+  exit: 'Return to the agora fire',
+}

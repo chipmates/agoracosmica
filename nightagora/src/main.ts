@@ -3,6 +3,8 @@ import { createEclipse, type EclipseState } from './scenes/eclipse'
 import { createAgora } from './scenes/agora'
 import { createKeeper } from './scenes/keeper'
 import { createCrossing } from './scenes/crossing'
+import { createCamp } from './scenes/camp'
+import { AGORA_SCRIPT, CAMP_SCRIPT } from './content/keeper-script'
 import { WANDERERS } from './content/wanderers'
 
 const MARCUS = WANDERERS.findIndex((w) => w.slug === 'aurelius')
@@ -15,10 +17,17 @@ const card = document.getElementById('atlas-card')
 const keeper = document.getElementById('keeper')
 const stone = document.getElementById('stone')
 const verse = document.getElementById('verse')
-if (!stage || !status || !card || !keeper || !stone || !verse) throw new Error('missing shell')
+const voiceDom = document.getElementById('voice')
+const traceCard = document.getElementById('trace-card')
+const ringflash = document.getElementById('ringflash')
+if (!stage || !status || !card || !keeper || !stone || !verse || !voiceDom || !traceCard || !ringflash)
+  throw new Error('missing shell')
 const keeperEl: HTMLElement = keeper
 const stoneEl: HTMLElement = stone
 const verseEl: HTMLElement = verse
+const voiceEl2: HTMLElement = voiceDom
+const traceEl: HTMLElement = traceCard
+const ringEl: HTMLElement = ringflash
 const cardName = card.querySelector('.card-name')
 const cardYears = card.querySelector('.card-years')
 const cardEpithet = card.querySelector('.card-epithet')
@@ -32,8 +41,9 @@ camera.position.set(0, 0, 0)
 
 const eclipse = createEclipse(scene)
 const agora = createAgora(scene)
-const keeperScene = createKeeper(keeperEl, reducedMotion)
+const keeperScene = createKeeper(keeperEl, reducedMotion, () => returnFromCamp())
 const crossing = createCrossing(scene, () => setPhase('camp'))
+const camp = createCamp(scene)
 
 // WebGL is the proven backend tonight; ?webgpu opts into the newer path
 // until it is verified on real hardware (see FORGE-STATE DEEPEN list).
@@ -56,6 +66,26 @@ let lookUp = 0
 let lookTarget = 0
 let agoraEnteredAt = -1
 let stoneEnteredAt = -1
+let campReveal = 0
+let campYield = 0
+let campEnteredAt = -1
+let campHearthOpen = false
+let traceOpen = false
+let voiceTimerA = 0
+let voiceTimerB = 0
+
+/** The short-dawn rhyme: one diamond-ring breath carries you back. */
+function returnFromCamp(): void {
+  if (phase !== 'camp') return
+  ringEl.classList.add('lit')
+  window.setTimeout(() => {
+    keeperScene.setScript(AGORA_SCRIPT)
+    setPhase('agora')
+    ringEl.classList.remove('lit')
+    ringEl.classList.add('passing')
+    window.setTimeout(() => ringEl.classList.remove('passing'), 1200)
+  }, 460)
+}
 
 // each poem line appears once, at its appointed threshold
 const spokenVerses = new Set<string>()
@@ -82,6 +112,7 @@ declare global {
           sinceFlash?: number
           keeper?: number
           crossing?: 'hatch' | 'portrait' | 'breath'
+          camp?: 'trace' | 'hearth'
         }
       ) => void
       freeze: (t: number) => void
@@ -157,6 +188,28 @@ addEventListener('pointermove', (e) => {
   pointerX = e.clientX
   pointerY = e.clientY
 })
+// ---- the trace: the carved words at the tent post ----
+const traceProjected = new Vector3()
+function traceScreenPos(): { x: number; y: number } | null {
+  traceProjected.copy(camp.tracePos).project(camera)
+  if (traceProjected.z > 1) return null
+  return {
+    x: (traceProjected.x * 0.5 + 0.5) * innerWidth,
+    y: (-traceProjected.y * 0.5 + 0.5) * innerHeight,
+  }
+}
+
+function syncTrace(): void {
+  const p = phase === 'camp' && traceOpen && campReveal > 0.4 ? traceScreenPos() : null
+  if (!p) {
+    traceEl.hidden = true
+    return
+  }
+  traceEl.style.left = `${Math.min(Math.max(p.x - 150, 16), innerWidth - 320)}px`
+  traceEl.style.top = `${Math.max(p.y - 190, 16)}px`
+  traceEl.hidden = false
+}
+
 function beginCrossing(): void {
   const base = eclipse.wandererBase[MARCUS]
   if (!base) return
@@ -168,6 +221,11 @@ function beginCrossing(): void {
 addEventListener('click', (e) => {
   if (phase === 'crossing') {
     crossing.skip()
+    return
+  }
+  if (phase === 'camp') {
+    const p = traceScreenPos()
+    if (p && Math.hypot(p.x - e.clientX, p.y - e.clientY) < 60) traceOpen = !traceOpen
     return
   }
   if (phase !== 'sky') return
@@ -201,7 +259,23 @@ window.__forge = {
       camera.rotation.x = -0.12
     }
     if (p === 'sky') camera.rotation.x = 0.62
-    if (p !== 'agora' && p !== 'sky') camera.rotation.set(0, 0, 0)
+    if (p !== 'agora' && p !== 'sky' && p !== 'camp') camera.rotation.set(0, 0, 0)
+    if (p === 'camp') {
+      campReveal = 1
+      camera.rotation.set(-0.12, 0, 0)
+      campYield = opts.camp === 'hearth' ? 1 : 0
+      // rig frames are single moments: the arrival voice never overlaps
+      window.clearTimeout(voiceTimerA)
+      window.clearTimeout(voiceTimerB)
+      if (opts.camp) voiceEl2.classList.remove('lit')
+      if (opts.camp === 'trace') traceOpen = true
+      if (opts.camp === 'hearth') {
+        campHearthOpen = true
+        keeperScene.setScript(CAMP_SCRIPT)
+        keeperEl.hidden = false
+        keeperScene.forgeStage(3)
+      }
+    }
     if (opts.keeper) {
       keeperEl.hidden = false
       keeperScene.forgeStage(opts.keeper)
@@ -266,7 +340,21 @@ function setPhase(next: Phase): void {
     verseEl.classList.remove('lit') // a fast chooser carries no verse across
   }
   if (next === 'camp') {
-    setStatus('Carnuntum on the Danube · his world is still being drawn')
+    setStatus('Carnuntum on the Danube')
+    campEnteredAt = elapsed
+    campHearthOpen = false
+    traceOpen = false
+    // the sentence begun in space completes on the ground
+    window.clearTimeout(voiceTimerA)
+    window.clearTimeout(voiceTimerB)
+    voiceTimerA = window.setTimeout(() => {
+      if (phase !== 'camp') return
+      voiceEl2.textContent = 'The Danube is quiet tonight. We can talk.'
+      voiceEl2.classList.add('lit', 'clean')
+      voiceTimerB = window.setTimeout(() => voiceEl2.classList.remove('lit'), 5600)
+    }, 900)
+  } else {
+    traceOpen = false
   }
 }
 
@@ -353,9 +441,27 @@ function frame(now: number): void {
     camera.rotation.x = -0.12 + lookUp * 0.78
     if (lookUp > 0.93) setPhase('sky')
     if (agoraEnteredAt >= 0 && elapsed - agoraEnteredAt > 1.1) keeperEl.hidden = false
+  } else if (phase === 'camp') {
+    // the hearth opens once the arrival sentence has had its say
+    if (!campHearthOpen && campEnteredAt >= 0 && elapsed - campEnteredAt > 6.6) {
+      campHearthOpen = true
+      keeperScene.setScript(CAMP_SCRIPT)
+      keeperEl.hidden = false
+    }
   } else if (phase !== 'sky') {
     keeperEl.hidden = true
   }
+
+  // the camp world breathes in and out with its phase
+  const campTarget = phase === 'camp' ? 1 : 0
+  campReveal += (campTarget - campReveal) * Math.min(1, dt * (reducedMotion ? 20 : 1.1))
+  if (phase === 'camp') {
+    camera.rotation.x += (-0.12 - camera.rotation.x) * Math.min(1, dt * 2)
+    camera.rotation.y += (0 - camera.rotation.y) * Math.min(1, dt * 2)
+  }
+  campYield += ((phase === 'camp' && !keeperEl.hidden ? 1 : 0) - campYield) * Math.min(1, dt * 2.5)
+  camp.update({ reveal: campReveal, elapsed, yield: campYield })
+  syncTrace()
 
   // stars are born at totality; near the fire they yield to its light,
   // and during the crossing the sky withdraws to ember

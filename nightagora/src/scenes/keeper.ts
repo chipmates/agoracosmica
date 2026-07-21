@@ -1,28 +1,28 @@
-/* Beat 5 · THE KEEPER SPEAKS — the staged exchange at the fire.
-   DOM theater, no canvas: Marcus's words set in letterpress serif and
-   are revealed phrase by phrase, paced like breath. The visitor writes
-   in italic ink. The offered lines are the real interface. A free-typed
-   question receives one honest staged answer and is carried to the
-   Forward Door. The module exposes speak() so the fire can listen. */
+/* The staged sitting — one exchange engine for every hearth (beat 5 at
+   the agora fire, beat 10 at the Danube camp). DOM theater, no canvas:
+   the host's words set in letterpress serif and are revealed phrase by
+   phrase, paced like breath; the live exchange shows only the current
+   breath. The visitor writes in italic ink. The offered lines are the
+   real interface. A free-typed question receives one honest staged
+   answer and is carried to the Forward Door. speak() lets the fire
+   listen. Verbs universal, staging sovereign. */
 
 import {
+  AGORA_SCRIPT,
   CARRIED_QUESTION_KEY,
-  CODA_GOLD,
-  CODA_TEXT,
   COLOPHON,
-  GREETING,
-  KEEPER_NAME,
-  OFFERED,
-  TYPED_REPLY,
+  type KeeperScript,
 } from '../content/keeper-script'
 
 type Mode = 'idle' | 'greeting' | 'open' | 'answering'
 
 export interface KeeperHandles {
-  /** Drive the theater. Call every frame with real dt (never frozen). */
+  /** Drive the theater. Call every frame; pacing runs on wall clock. */
   update(dt: number): void
   /** 0..1 speaking intensity, smoothed. The fire brightens with it. */
   speak(): number
+  /** Swap the sitting (e.g. agora fire → camp hearth) and reset. */
+  setScript(script: KeeperScript): void
   /** Rig hook: compose a deterministic mid-conversation frame. */
   forgeStage(stage: number): void
 }
@@ -34,30 +34,20 @@ function el(tag: string, cls: string, text?: string): HTMLElement {
   return node
 }
 
-export function createKeeper(host: HTMLElement, reducedMotion: boolean): KeeperHandles {
+export function createKeeper(
+  host: HTMLElement,
+  reducedMotion: boolean,
+  onExit?: () => void
+): KeeperHandles {
+  let script: KeeperScript = AGORA_SCRIPT
+
   // ---- build the chrome once ----
   host.textContent = ''
-  const name = el('p', 'keeper-name', KEEPER_NAME)
+  const name = el('p', 'keeper-name')
   const dialogue = el('div', 'keeper-dialogue')
   dialogue.setAttribute('aria-live', 'polite')
-  const greeting = el('p', 'keeper-line keeper-phrase', GREETING)
-  dialogue.appendChild(greeting)
-
+  const greeting = el('p', 'keeper-line keeper-phrase')
   const offersBox = el('div', 'keeper-offers')
-  const offerButtons: HTMLButtonElement[] = []
-  for (const turn of OFFERED) {
-    const b = document.createElement('button')
-    b.type = 'button'
-    b.className = 'keeper-offer'
-    b.textContent = turn.ask
-    b.addEventListener('click', () => {
-      if (mode !== 'open') return
-      b.remove()
-      startTurn(turn.ask, turn.phrases)
-    })
-    offersBox.appendChild(b)
-    offerButtons.push(b)
-  }
 
   const form = document.createElement('form')
   form.className = 'keeper-form'
@@ -67,7 +57,7 @@ export function createKeeper(host: HTMLElement, reducedMotion: boolean): KeeperH
   input.type = 'text'
   input.maxLength = 240
   input.autocomplete = 'off'
-  input.setAttribute('aria-label', 'Ask Marcus Aurelius')
+  input.setAttribute('aria-label', 'Ask the Echo')
   form.append(askLabel, input)
   input.addEventListener('keydown', (e) => {
     if (e.key !== 'Enter') return
@@ -86,27 +76,69 @@ export function createKeeper(host: HTMLElement, reducedMotion: boolean): KeeperH
     }
     input.value = ''
     input.blur()
-    startTurn(text, TYPED_REPLY)
+    startTurn(text, script.typedReply)
+  })
+
+  const exitBtn = document.createElement('button')
+  exitBtn.type = 'button'
+  exitBtn.className = 'keeper-exit'
+  exitBtn.hidden = true
+  exitBtn.addEventListener('click', () => {
+    if (onExit) onExit()
   })
 
   const colophon = el('p', 'keeper-note', COLOPHON)
-  host.append(name, dialogue, offersBox, form, colophon)
+  host.append(name, dialogue, offersBox, form, exitBtn, colophon)
 
   // ---- the theater's state ----
   let mode: Mode = 'idle'
   let sp = 0
   let turns = 0
   let codaShown = false
-  let wait = 0 // seconds until the next step of the current mode
+  let wait = 0
   let queue: string[] = []
   let breath: HTMLElement | null = null
+
+  function buildOffers(): void {
+    offersBox.textContent = ''
+    for (const turn of script.offered) {
+      const b = document.createElement('button')
+      b.type = 'button'
+      b.className = 'keeper-offer'
+      b.textContent = turn.ask
+      b.addEventListener('click', () => {
+        if (mode !== 'open') return
+        b.remove()
+        startTurn(turn.ask, turn.phrases)
+      })
+      offersBox.appendChild(b)
+    }
+  }
+
+  function setScript(next: KeeperScript): void {
+    script = next
+    name.textContent = script.name
+    greeting.textContent = script.greeting
+    greeting.classList.remove('lit')
+    dialogue.textContent = ''
+    dialogue.appendChild(greeting)
+    buildOffers()
+    exitBtn.textContent = script.exit ?? ''
+    exitBtn.hidden = true
+    host.classList.remove('open', 'answering')
+    mode = 'idle'
+    turns = 0
+    codaShown = false
+    wait = 0
+    queue = []
+    breath = null
+  }
 
   function phraseSeconds(text: string): number {
     return Math.min(4.5, 1.15 + text.length * 0.028)
   }
 
-  /** The live exchange shows only the current breath: the new phrase
-      crossfades in while the previous one leaves the window entirely. */
+  /** The live exchange shows only the current breath. */
   function showPhrase(node: HTMLElement, instant: boolean): void {
     if (!breath) return
     for (const old of Array.from(breath.children)) {
@@ -136,7 +168,6 @@ export function createKeeper(host: HTMLElement, reducedMotion: boolean): KeeperH
   }
 
   function flush(): void {
-    // the visitor skipped ahead: rest on the final phrase
     const lastText = queue[queue.length - 1]
     queue = []
     if (lastText !== undefined) showPhrase(phraseNode(lastText), true)
@@ -144,8 +175,8 @@ export function createKeeper(host: HTMLElement, reducedMotion: boolean): KeeperH
   }
 
   function codaNode(): HTMLElement {
-    const p = el('p', 'keeper-phrase', CODA_TEXT + ' ')
-    p.appendChild(el('span', 'keeper-gold', CODA_GOLD))
+    const p = el('p', 'keeper-phrase', script.codaText + ' ')
+    p.appendChild(el('span', 'keeper-gold', script.codaGold))
     return p
   }
 
@@ -154,6 +185,7 @@ export function createKeeper(host: HTMLElement, reducedMotion: boolean): KeeperH
     if (turns >= 2 && !codaShown) {
       codaShown = true
       showPhrase(codaNode(), false)
+      if (script.exit) exitBtn.hidden = false
     }
     host.classList.remove('answering')
     mode = 'open'
@@ -182,8 +214,6 @@ export function createKeeper(host: HTMLElement, reducedMotion: boolean): KeeperH
     if (host.hidden) return
 
     if (mode === 'idle') {
-      // first sight of the block: the greeting is already in the DOM,
-      // let it breathe, then open the floor
       requestAnimationFrame(() => greeting.classList.add('lit'))
       mode = 'greeting'
       wait = reducedMotion ? 0 : 2.4
@@ -222,9 +252,9 @@ export function createKeeper(host: HTMLElement, reducedMotion: boolean): KeeperH
     mode = 'open'
     sp = 0
     if (stage >= 2) {
-      const first = OFFERED[0]
+      const first = script.offered[0]
       if (!first) return
-      offerButtons[0]?.remove()
+      offersBox.querySelector('.keeper-offer')?.remove()
       dialogue.textContent = ''
       dialogue.appendChild(el('p', 'keeper-ask', first.ask))
       breath = el('div', 'keeper-breath')
@@ -234,7 +264,15 @@ export function createKeeper(host: HTMLElement, reducedMotion: boolean): KeeperH
       turns = 1
       sp = 0.85
     }
+    if (stage >= 3) {
+      // the coda + the way onward, composed
+      turns = 2
+      codaShown = true
+      showPhrase(codaNode(), true)
+      if (script.exit) exitBtn.hidden = false
+    }
   }
 
-  return { update, speak, forgeStage }
+  setScript(AGORA_SCRIPT)
+  return { update, speak, setScript, forgeStage }
 }

@@ -21,6 +21,9 @@ const STATES = [
   { name: 'crossing', jump: ['crossing', { crossing: 'hatch' }] },
   { name: 'portrait', jump: ['crossing', { crossing: 'portrait' }] },
   { name: 'breath', jump: ['crossing', { crossing: 'breath' }] },
+  { name: 'camp', jump: ['camp', {}] },
+  { name: 'trace', jump: ['camp', { camp: 'trace' }] },
+  { name: 'hearth', jump: ['camp', { camp: 'hearth' }] },
 ]
 const VIEWPORTS = [
   { tag: 'desktop', width: 1512, height: 950, deviceScaleFactor: 1 },
