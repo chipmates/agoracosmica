@@ -87,10 +87,10 @@ export function createCamp(scene: Scene) {
     // ember dusk, not sunset: the night owns the sky, the smolder owns
     // only the lowest band above the water
     const h = positionWorld.y
-    const nightTop = vec3(0.0016, 0.0028, 0.0075)
-    const nightMid = vec3(0.0034, 0.005, 0.013)
-    const emberLow = vec3(0.045, 0.017, 0.005)
-    const emberCore = vec3(0.14, 0.05, 0.011)
+    const nightTop = vec3(0.014, 0.026, 0.062)
+    const nightMid = vec3(0.052, 0.078, 0.14)
+    const emberLow = vec3(0.3, 0.155, 0.07)
+    const emberCore = vec3(0.85, 0.5, 0.2)
     const band = smoothstep(5.0, 0.4, h)
     const core = smoothstep(1.6, -2.0, h)
     // slow drifting smoke strata carved from the glow, never banding
@@ -133,9 +133,9 @@ export function createCamp(scene: Scene) {
   {
     // dark water; the dusk survives only as a thin trembling line at
     // the far shore
-    const base = vec3(0.003, 0.005, 0.011)
+    const base = vec3(0.045, 0.07, 0.105)
     const far = smoothstep(-22.0, -25.8, positionWorld.z)
-    const emberMirror = vec3(0.05, 0.019, 0.005)
+    const emberMirror = vec3(0.42, 0.23, 0.095)
     const flow = mx_noise_float(
       vec3(positionWorld.x.mul(0.6).add(uT.mul(0.12)), positionWorld.z.mul(2.2), uT.mul(0.05))
     )
@@ -168,7 +168,7 @@ export function createCamp(scene: Scene) {
       .mul(0.3)
       .add(0.85)
     const flick = sin(uT.mul(6.7)).mul(0.07).add(0.93)
-    const base = vec3(0.006, 0.005, 0.0042).mul(mottle)
+    const base = vec3(0.052, 0.043, 0.028).mul(mottle)
     groundMat.colorNode = base
       .add(warm.mul(fireFall).mul(flick).mul(0.05))
       .add(dither.mul(0.03))
@@ -190,7 +190,9 @@ export function createCamp(scene: Scene) {
     const fall = float(3.4).div(dist.mul(dist).add(1.6))
     const flick = sin(uT.mul(6.7).add(positionWorld.x.mul(1.7))).mul(0.09).add(0.91)
     const glow = ndl.mul(fall).mul(flick).mul(rim)
-    mat.colorNode = vec3(0.004, 0.0045, 0.008)
+    const dawnLight = clamp(dot(normalWorld, normalize(vec3(0.35, 0.8, 0.45))), 0, 1).mul(0.11)
+    mat.colorNode = vec3(0.06, 0.052, 0.045)
+      .add(vec3(0.55, 0.48, 0.4).mul(dawnLight))
       .add(vec3(GOLD.r, GOLD.g, GOLD.b).mul(glow))
       .add(dither.mul(0.02))
       .mul(uR)
@@ -388,7 +390,7 @@ export function createCamp(scene: Scene) {
     flame.position.y = GROUND_Y + 0.1 + (FLAME_H * breathe) / 2
 
     poolMat.opacity = r * (0.3 + 0.12 * fl)
-    for (const m of starMats) m.opacity = 0.55 * r
+    for (const m of starMats) m.opacity = 0.08 * r
     markMat.opacity = r * (0.55 + 0.25 * Math.sin(t * 1.9)) * (1 - (s.yield ?? 0))
 
     const pos = sparkGeo.getAttribute('position')

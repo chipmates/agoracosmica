@@ -1087,6 +1087,18 @@
 
     /* ---- keeper · beat 5: the staged exchange ---- */
     #keeper { max-width: 680px; margin: 0 auto; }
+    /* the day register: at his hearth in the dawn, the letterpress sits
+       on its own quiet panel and never over the flame */
+    body[data-phase='camp'] #keeper {
+      left: 50%; right: auto; transform: translateX(-50%);
+      width: min(620px, calc(100% - 40px));
+      bottom: calc(96px + env(safe-area-inset-bottom));
+      padding: 22px 28px;
+      background: color-mix(in srgb, var(--na-abyss) 72%, transparent);
+      border: 1px solid color-mix(in srgb, var(--na-gold) 30%, transparent);
+      backdrop-filter: blur(7px);
+    }
+    body[data-phase='camp'] #keeper[hidden] { display: none; }
     .keeper-dialogue { margin-top: 2px; pointer-events: auto; }
     .keeper-ask {
       margin-top: 12px;

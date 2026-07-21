@@ -1175,7 +1175,10 @@ function frame(now: number): void {
     (campTarget - campReveal) * Math.min(1, dt * (reducedMotion ? 20 : campTarget ? 1.1 : 3.4))
   if (phase === 'camp') {
     camera.rotation.x += (-0.12 - camera.rotation.x) * Math.min(1, dt * 2)
-    camera.rotation.y += (0 - camera.rotation.y) * Math.min(1, dt * 2)
+    // narrow stages yaw gently toward the hearth so the fire holds the
+    // frame instead of clipping at its edge
+    const campYaw = camera.aspect < 0.9 ? 0.14 : 0
+    camera.rotation.y += (campYaw - camera.rotation.y) * Math.min(1, dt * 2)
   }
   campYield += ((phase === 'camp' && !keeperEl.hidden ? 1 : 0) - campYield) * Math.min(1, dt * 2.5)
   camp.update({ reveal: campReveal, elapsed, yield: campYield })
