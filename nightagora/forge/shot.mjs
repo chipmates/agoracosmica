@@ -13,7 +13,7 @@ const STATES = [
   { name: 'flash', jump: ['held', { sinceFlash: 0.18 }] },
   { name: 'held', jump: ['held', {}] },
   { name: 'descent-gate', jump: ['descent', { desc: 0.04 }] },
-  { name: 'stone-gate', jump: ['descent', { desc: 0.13 }] },
+  { name: 'descent-breath', jump: ['descent', { desc: 0.13 }] },
   { name: 'descent-title', jump: ['descent', { desc: 0.29 }] },
   { name: 'descent-question', jump: ['descent', { desc: 0.55 }] },
   { name: 'descent-late', jump: ['descent', { desc: 0.88 }] },

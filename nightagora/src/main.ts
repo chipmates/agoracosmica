@@ -565,7 +565,6 @@ const smooth = (a: number, b: number, k: number): number => {
 // questions drifting past on the way down. The Echo disclosure lives
 // where the figures speak (pane ink, keeper colophon, council cartouche).
 const DESCENT_STATIONS: Array<[number, number]> = [
-  [0.06, 0.2], // the disclosure stone, carved in the black (read in passing)
   [0.24, 0.34], // The Descent · eight questions (over the emerging ring)
   [0.38, 0.435], // Who am I?
   [0.448, 0.503], // What binds us to each other?
@@ -647,10 +646,9 @@ function syncDescentBeats(k: number): void {
       beat.style.opacity = '0'
       continue
     }
-    // the stone and the title card hold nearly still; every question
-    // travels past
-    const travel = i <= 1 ? 9 : 34 + (i % 3) * 9
-    const scale = i <= 1 ? 1 : 1 + p * 0.045
+    // the title card holds nearly still; every question travels past
+    const travel = i === 0 ? 9 : 34 + (i % 3) * 9
+    const scale = i === 0 ? 1 : 1 + p * 0.045
     beat.style.opacity = String(Math.max(0, 1 - Math.pow(Math.abs(p), 1.6)))
     beat.style.transform = `translate3d(0, ${(-p * travel).toFixed(2)}vh, 0) scale(${scale.toFixed(3)})`
   }
@@ -666,8 +664,9 @@ document.getElementById('descent-skip')?.addEventListener('click', () => skipDes
 // ---- THE SITTING: the night's one contract, taken at the first
 // hearth (terms + age 16 in one declarative action; legal basis:
 // transparency memo 01; storage per § 25 Abs. 2 Nr. 2 TDDDG). The
-// black-breath stone above is information only; passive listening
-// stays ungated. ----
+// stone retired 2026-07-21 (Michel): the Sitting, every figure pane's
+// ink, and the keeper's own line carry the disclosure; passive
+// listening stays ungated. ----
 const sittingNode = document.getElementById('sitting')
 const sittingEl: HTMLElement = sittingNode ?? document.createElement('div')
 let hearthWanted = false
@@ -958,9 +957,8 @@ window.__forge = {
     door = p === 'transit' || p === 'held' ? 0 : Math.min(1, desc / 0.18)
     skyBirth =
       opts.skyBirth ??
-      (p === 'transit' ? 0
-      : p === 'held' ? 0.9
-      : p === 'descent' ? 0.9 - 0.25 * desc
+      (p === 'transit' || p === 'held' ? 0
+      : p === 'descent' ? smooth(0.2, 0.98, desc) * 0.8
       : p === 'crossing' ? 0.12
       : p === 'camp' ? 0
       : p === 'council' ? 1
@@ -1055,7 +1053,7 @@ window.__forge = {
   },
 }
 
-const TRANSIT_SECONDS = 2.8
+const TRANSIT_SECONDS = 2.0
 
 function setPhase(next: Phase): void {
   phase = next
@@ -1148,8 +1146,8 @@ function push(delta: number): void {
   if (phase === 'held' && delta > 0) setPhase('descent')
   if (phase === 'descent') {
     // the gate blooms in about two flicks; the dive breathes one
-    // question per flick. The whole travel scrubs both ways; the stone
-    // is read in passing (the contract waits at the first hearth).
+    // question per flick. The whole travel scrubs both ways; the
+    // contract waits at the first hearth.
     const rate = desc < GATE_END ? 0.0005 : 0.00042
     descTarget = Math.min(1, Math.max(0, descTarget + delta * rate))
     if (descTarget <= 0 && desc < 0.02 && delta < 0) setPhase('held')
@@ -1302,7 +1300,11 @@ function frame(now: number): void {
     phase === 'agora' || phase === 'sky' || phase === 'council' ? 1
     : phase === 'descent' ? smooth(0.95, 0.998, desc)
     : 0
-  agoraReveal += (revealTarget - agoraReveal) * Math.min(1, dt * (reducedMotion ? 20 : 1.2))
+  // the fire materializes briskly on arrival (the wait read as lag);
+  // every other blend keeps the night's slow breath
+  agoraReveal +=
+    (revealTarget - agoraReveal) *
+    Math.min(1, dt * (reducedMotion ? 20 : phase === 'agora' || phase === 'council' ? 2.2 : 1.2))
 
   if (phase === 'agora') {
     lookUp += (lookTarget - lookUp) * Math.min(1, dt * 4)
@@ -1310,7 +1312,7 @@ function frame(now: number): void {
     camera.rotation.x = -0.12 + lookUp * 0.78
     camera.rotation.y += (0 - camera.rotation.y) * Math.min(1, dt * 2.2)
     if (lookUp > 0.93) setPhase('sky')
-    if (agoraEnteredAt >= 0 && elapsed - agoraEnteredAt > 1.1) keeperEl.hidden = false
+    if (agoraEnteredAt >= 0 && elapsed - agoraEnteredAt > 0.5) keeperEl.hidden = false
   } else if (phase === 'camp') {
     // the hearth opens once the arrival sentence has had its say —
     // on the WALL clock: scene time clamps on slow frames and would
@@ -1365,10 +1367,12 @@ function frame(now: number): void {
   // constellation sky they leave entirely: the six houses own that
   // night. During the crossing the sky withdraws to ember, and at the
   // camp the cosmos raises its own firmament inside its dawn plane.
+  // the heavens are earned by the passage: NONE at the eclipse (the
+  // corona owns that frame), blooming bit by bit through the descent
+  // once the stone has passed, whole when the campfire appears
   const birthTarget =
-    phase === 'transit' ? 0
-    : phase === 'held' ? 0.9
-    : phase === 'descent' ? 0.9 - 0.25 * desc
+    phase === 'transit' || phase === 'held' ? 0
+    : phase === 'descent' ? smooth(0.2, 0.98, desc) * 0.8
     : phase === 'agora' || phase === 'council' ? 1
     : phase === 'crossing' ? 0.12
     : phase === 'camp' ? 0
@@ -1432,7 +1436,7 @@ function frame(now: number): void {
     (phase === 'agora' &&
       agoraReveal > 0.6 &&
       agoraEnteredAt >= 0 &&
-      elapsed - agoraEnteredAt > 2.4)
+      elapsed - agoraEnteredAt > 1.4)
   hotspots.sync(camera, spotsVisible)
   chapters.update()
 

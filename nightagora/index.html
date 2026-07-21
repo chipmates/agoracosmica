@@ -83,36 +83,6 @@
     }
     body.forge #blackout { transition: none !important; }
 
-    /* ---- the stone: the threshold inscription in the black breath ---- */
-    #stone {
-      position: fixed; left: 50%; top: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 2; max-width: 640px; width: calc(100% - 48px);
-      text-align: center; pointer-events: none;
-      opacity: 0; transition: opacity 2.4s ease;
-    }
-    #stone.lit { opacity: 1; }
-    #stone::before, #stone::after {
-      content: ''; display: block; width: 44px; height: 1px;
-      margin: 0 auto;
-      background: color-mix(in srgb, var(--na-gold) 55%, transparent);
-    }
-    #stone::before { margin-bottom: 28px; }
-    #stone::after { margin-top: 28px; }
-    .stone-text {
-      font-family: var(--sans);
-      font-size: 12px; letter-spacing: 0.34em; text-indent: 0.34em;
-      text-transform: uppercase; line-height: 2.3;
-      color: var(--na-mist);
-    }
-    .stone-strong {
-      margin-top: 16px;
-      font-family: var(--sans);
-      font-size: 12px; letter-spacing: 0.34em; text-indent: 0.34em;
-      text-transform: uppercase; line-height: 2.3;
-      color: var(--na-starlight);
-    }
-
     /* ---- the verse: one poem line per threshold, then it yields ---- */
     #verse {
       position: fixed; left: 0; right: 0; top: 19%;
@@ -130,7 +100,7 @@
       body[data-phase='sky'] #verse { top: 30%; }
     }
 
-    body.forge #stone, body.forge #verse { transition: none !important; }
+    body.forge #verse { transition: none !important; }
 
     /* ---- the crossing: the homing voice ---- */
     #voice {
@@ -339,22 +309,6 @@
       color: var(--na-starlight);
       text-shadow: 0 1px 18px rgba(4, 6, 13, 0.85);
     }
-    .descent-stone {
-      max-width: 640px; margin: 0 auto;
-      font-family: var(--sans);
-      font-size: 12px; letter-spacing: 0.34em; text-indent: 0.34em;
-      text-transform: uppercase; line-height: 2.3;
-      color: var(--na-mist);
-      text-shadow: 0 1px 12px rgba(4, 6, 13, 0.9);
-    }
-    .descent-stone.strong {
-      margin-top: 16px;
-      color: var(--na-starlight);
-    }
-    .descent-beat .rule {
-      display: block; width: 44px; height: 1px; margin: 0 auto 26px;
-      background: color-mix(in srgb, var(--na-gold) 55%, transparent);
-    }
     .descent-kicker {
       margin-bottom: 14px;
       font-family: var(--sans);
@@ -368,10 +322,7 @@
       width: 1px; height: 40px;
       background: color-mix(in srgb, var(--na-gold) 65%, transparent);
     }
-    /* ---- the stone gate: disclosure, the one declarative act, and the
-       sound choice, all in one gesture ---- */
-    .gate-block { margin-top: 30px; }
-    .gate-beat.accepted .gate-block { display: none; }
+    /* ---- the declarative line + links, shared by the Sitting ---- */
     .gate-declare {
       font-family: var(--sans);
       font-size: 10px; letter-spacing: 0.24em; text-indent: 0.24em;
@@ -815,7 +766,9 @@
     #chapter-marks.lit { opacity: 1; }
     #sky-return {
       position: fixed; left: 50%; transform: translateX(-50%);
-      bottom: calc(58px + env(safe-area-inset-bottom));
+      /* clearly ABOVE the invite line: sharing its spot made the way
+         home unreadable and unclickable in practice (Michel, live) */
+      bottom: calc(92px + env(safe-area-inset-bottom));
       background: none; border: none; cursor: pointer;
       min-height: 44px; padding: 8px 16px;
       font-family: var(--sans);
@@ -1287,16 +1240,10 @@
     <p class="status" id="status" role="status">First light</p>
     <button id="overture-skip" type="button">Skip the overture · begin at the fire</button>
   </div>
-  <div id="stone">
-    <p class="stone-text">Here speak the Echoes: interpretations built from what the dead left behind.</p>
-    <p class="stone-strong">Not recordings. Not the dead themselves.</p>
-  </div>
+  <!-- the stone retired 2026-07-21 (Michel): its words live on at the
+       Sitting, in every figure pane's ink, and in the keeper's own
+       mouth — three tellings were one too many -->
   <div id="descent" hidden>
-    <div class="descent-beat gate-beat">
-      <span class="rule" aria-hidden="true"></span>
-      <p class="descent-stone">Here speak the Echoes: interpretations built from what the dead left behind.</p>
-      <p class="descent-stone strong">Not recordings. Not the dead themselves.</p>
-    </div>
     <div class="descent-beat">
       <p class="descent-kicker">The Descent</p>
       <p class="descent-ask">Eight questions, older than every voice below.</p>

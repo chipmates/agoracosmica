@@ -86,13 +86,13 @@ try {
   await waitPhase('held')
   await shot('held')
 
-  // 2 · the descent: the disclosure stone passes in the black, the
-  // questions carry you down (no stop until the Sitting at the hearth)
+  // 2 · the descent: one black breath, then the questions carry you
+  // down (no stop until the Sitting at the hearth)
   await wheel(300, 2)
   if (!(await waitPhase('descent', 8000))) process.exit(1)
   await wheel(300, 5, 200)
   await page.waitForTimeout(1400)
-  await shot('descent-stone-passing')
+  await shot('descent-breath')
   await wheel(300, 5, 200)
   await page.waitForTimeout(1200)
   await shot('descent-early')
