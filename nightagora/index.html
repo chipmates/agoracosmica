@@ -78,7 +78,6 @@
       opacity: 0; pointer-events: none;
       transition: opacity 1.4s ease;
     }
-    body[data-phase='stone'] #blackout { opacity: 1; }
     body.forge #blackout { transition: none !important; }
 
     /* ---- the stone: the threshold inscription in the black breath ---- */
@@ -257,6 +256,64 @@
     #ringflash.lit { opacity: 1; }
     #ringflash.passing { opacity: 0; transition: opacity 1.1s ease; }
     body.forge #trace-card, body.forge #ringflash { transition: none !important; }
+
+    /* ---- the descent: the travel down to the agora, question by
+       question. Every scroll gives a line and the world coming closer ---- */
+    #descent { position: fixed; inset: 0; z-index: 3; pointer-events: none; }
+    #descent[hidden] { display: none; }
+    .descent-beat {
+      position: fixed; left: 0; right: 0; top: 42%;
+      text-align: center; padding: 0 24px;
+      opacity: 0; will-change: transform, opacity;
+    }
+    .descent-ask {
+      font-family: var(--serif); font-style: italic;
+      font-size: clamp(21px, 3vw, 31px); line-height: 1.5;
+      color: var(--na-starlight);
+      text-shadow: 0 1px 18px rgba(4, 6, 13, 0.85);
+    }
+    .descent-stone {
+      max-width: 640px; margin: 0 auto;
+      font-family: var(--sans);
+      font-size: 12px; letter-spacing: 0.34em; text-indent: 0.34em;
+      text-transform: uppercase; line-height: 2.3;
+      color: var(--na-mist);
+      text-shadow: 0 1px 12px rgba(4, 6, 13, 0.9);
+    }
+    .descent-stone.strong {
+      margin-top: 16px;
+      color: var(--na-starlight);
+    }
+    .descent-beat .rule {
+      display: block; width: 44px; height: 1px; margin: 0 auto 26px;
+      background: color-mix(in srgb, var(--na-gold) 55%, transparent);
+    }
+    .descent-kicker {
+      margin-bottom: 14px;
+      font-family: var(--sans);
+      font-size: 10px; letter-spacing: 0.34em; text-indent: 0.34em;
+      text-transform: uppercase; color: var(--na-gold);
+      text-shadow: 0 1px 10px rgba(4, 6, 13, 0.9);
+    }
+    #descent .plumb {
+      position: fixed; left: 50%;
+      bottom: calc(78px + env(safe-area-inset-bottom));
+      width: 1px; height: 40px;
+      background: color-mix(in srgb, var(--na-gold) 65%, transparent);
+    }
+    #descent-skip {
+      position: fixed; left: 50%; transform: translateX(-50%);
+      bottom: calc(30px + env(safe-area-inset-bottom));
+      background: none; border: none; cursor: pointer;
+      min-height: 44px; padding: 10px 18px;
+      font-family: var(--sans);
+      font-size: 10px; letter-spacing: 0.3em; text-indent: 0.3em;
+      text-transform: uppercase; color: var(--na-gold);
+      pointer-events: auto;
+      opacity: 0.85; transition: opacity 0.3s ease, color 0.3s ease;
+    }
+    #descent-skip:hover, #descent-skip:focus-visible { opacity: 1; color: var(--na-starlight); outline: none; }
+    body.forge #descent * { transition: none !important; }
 
     /* ---- the atlas: the wheel of the night. Plate top-left, invite at
        the horizon, one chip per star, the figure pane when a name opens ---- */
@@ -686,6 +743,22 @@
   <div id="stone">
     <p class="stone-text">Here speak the Echoes: interpretations built from what the dead left behind.</p>
     <p class="stone-strong">Not recordings. Not the dead themselves.</p>
+  </div>
+  <div id="descent" hidden>
+    <div class="descent-beat">
+      <p class="descent-kicker">The Descent</p>
+      <p class="descent-ask">Eight questions, older than every voice below.</p>
+    </div>
+    <div class="descent-beat"><p class="descent-ask">How do I begin a day I dread?</p></div>
+    <div class="descent-beat"><p class="descent-ask">Does any of this matter in the end?</p></div>
+    <div class="descent-beat"><p class="descent-ask">Why do I want what I cannot keep?</p></div>
+    <div class="descent-beat"><p class="descent-ask">How do I live with what I regret?</p></div>
+    <div class="descent-beat"><p class="descent-ask">What do I owe the people I love?</p></div>
+    <div class="descent-beat"><p class="descent-ask">Why does beauty hurt?</p></div>
+    <div class="descent-beat"><p class="descent-ask">How should I meet my death?</p></div>
+    <div class="descent-beat"><p class="descent-ask">Who am I when no one watches?</p></div>
+    <div class="plumb" aria-hidden="true"></div>
+    <button id="descent-skip" type="button">Skip to the fire</button>
   </div>
   <p id="verse"></p>
   <div id="keeper" hidden>

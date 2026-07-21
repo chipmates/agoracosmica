@@ -62,15 +62,18 @@ export interface EclipseState {
 export function createEclipse(scene: Scene) {
   const rand = mulberry32(FOUNDING_SEED)
 
-  // ---- night dome: abyss above, a memory of blue at the horizon ----
+  // ---- night dome: the horizon glow belongs at eye level. The bottom
+  // cap stays deep night, so looking straight down during the descent
+  // reads as clean darkness around the mandala, never a muddy band ----
   const domeGeo = new SphereGeometry(90, 32, 24)
   const dpos = domeGeo.getAttribute('position')
   const colors: number[] = []
   const c = new Color()
   for (let i = 0; i < dpos.count; i++) {
     const y = (dpos.getY(i) / 90 + 1) / 2
-    if (y < 0.16) c.copy(HORIZON).lerp(LAPIS, y / 0.16)
-    else c.copy(LAPIS).lerp(ABYSS, Math.min(1, (y - 0.16) / 0.5))
+    if (y < 0.42) c.copy(ABYSS).lerp(HORIZON, Math.pow(y / 0.42, 2.2))
+    else if (y < 0.56) c.copy(HORIZON).lerp(LAPIS, (y - 0.42) / 0.14)
+    else c.copy(LAPIS).lerp(ABYSS, Math.min(1, (y - 0.56) / 0.34))
     colors.push(c.r, c.g, c.b)
   }
   domeGeo.setAttribute('color', new Float32BufferAttribute(colors, 3))

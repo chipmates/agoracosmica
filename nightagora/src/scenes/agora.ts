@@ -144,23 +144,32 @@ export function createAgora(scene: Scene) {
       ctx.fillRect(x - r, y - r, r * 2, r * 2)
     }
 
-    // the agora is BUILT around its fire: paving joints, concentric and
-    // radial, centered where the fire stands (fire sits at uv 0.5, 0.3)
+    // the pavement centers on the agora itself (seen from above in the
+    // descent it reads as a mandala); the fire keeps its own engraved
+    // council rings as the off-center jewel
     const fx = size * 0.5
-    const fy = size * 0.3
+    const fy = size * 0.5
     ctx.strokeStyle = 'rgba(2, 4, 9, 0.35)'
     ctx.lineWidth = 1.6
-    for (let ring = 1; ring <= 7; ring++) {
-      const r = (ring * 1.55 * size) / 28
+    for (let ring = 1; ring <= 8; ring++) {
+      const r = (ring * 1.6 * size) / 28
       ctx.beginPath()
       ctx.arc(fx, fy, r, 0, Math.PI * 2)
       ctx.stroke()
     }
-    for (let sp = 0; sp < 14; sp++) {
-      const a = (sp / 14) * Math.PI * 2 + 0.11
+    for (let sp = 0; sp < 16; sp++) {
+      const a = (sp / 16) * Math.PI * 2 + 0.11
       ctx.beginPath()
-      ctx.moveTo(fx + Math.cos(a) * ((1.1 * size) / 28), fy + Math.sin(a) * ((1.1 * size) / 28))
-      ctx.lineTo(fx + Math.cos(a) * ((12 * size) / 28), fy + Math.sin(a) * ((12 * size) / 28))
+      ctx.moveTo(fx + Math.cos(a) * ((1.6 * size) / 28), fy + Math.sin(a) * ((1.6 * size) / 28))
+      ctx.lineTo(fx + Math.cos(a) * ((13.4 * size) / 28), fy + Math.sin(a) * ((13.4 * size) / 28))
+      ctx.stroke()
+    }
+    // two pale pavement rings echo the colonnade from above
+    ctx.strokeStyle = 'rgba(182, 194, 224, 0.10)'
+    ctx.lineWidth = 3
+    for (const rr of [5.4, 8.9]) {
+      ctx.beginPath()
+      ctx.arc(fx, fy, (rr * size) / 28, 0, Math.PI * 2)
       ctx.stroke()
     }
 

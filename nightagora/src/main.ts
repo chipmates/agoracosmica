@@ -6,18 +6,21 @@ import { createCrossing } from './scenes/crossing'
 import { createCamp } from './scenes/camp'
 import { createCouncil } from './scenes/council'
 import { createAtlas } from './scenes/atlas'
+import { createMandala } from './scenes/mandala'
 import { CAMP_SCRIPT } from './content/keeper-script'
 import { COUNCIL_DONE } from './content/council'
 import { WANDERERS } from './content/wanderers'
 import { CONSTELLATIONS, OPEN_WORLD } from './content/constellations'
+import { channel } from './core/motion'
 import { mediaUrl } from './content/media'
 
-type Phase = 'transit' | 'held' | 'door' | 'stone' | 'agora' | 'sky' | 'crossing' | 'camp' | 'council'
+type Phase = 'transit' | 'held' | 'descent' | 'agora' | 'sky' | 'crossing' | 'camp' | 'council'
 
 const stage = document.getElementById('stage')
 const status = document.getElementById('status')
 const keeper = document.getElementById('keeper')
-const stone = document.getElementById('stone')
+const descent = document.getElementById('descent')
+const descentSkip = document.getElementById('descent-skip')
 const verse = document.getElementById('verse')
 const voiceDom = document.getElementById('voice')
 const traceCard = document.getElementById('trace-card')
@@ -28,12 +31,14 @@ const marks = document.getElementById('chapter-marks')
 const chips = document.getElementById('star-chips')
 const pane = document.getElementById('figure-pane')
 if (
-  !stage || !status || !keeper || !stone || !verse || !voiceDom || !traceCard ||
-  !ringflash || !plate || !invite || !marks || !chips || !pane
+  !stage || !status || !keeper || !descent || !descentSkip || !verse || !voiceDom ||
+  !traceCard || !ringflash || !plate || !invite || !marks || !chips || !pane
 )
   throw new Error('missing shell')
 const keeperEl: HTMLElement = keeper
-const stoneEl: HTMLElement = stone
+const descentEl: HTMLElement = descent
+const descentSkipEl: HTMLElement = descentSkip
+const descentBeats = Array.from(descentEl.querySelectorAll('.descent-beat')) as HTMLElement[]
 const verseEl: HTMLElement = verse
 const voiceEl2: HTMLElement = voiceDom
 const traceEl: HTMLElement = traceCard
@@ -57,6 +62,7 @@ const crossing = createCrossing(scene, () => setPhase('camp'))
 const camp = createCamp(scene)
 const council = createCouncil(scene, () => councilEnded())
 const atlas = createAtlas(scene)
+const mandala = createMandala(scene)
 
 function councilEnded(): void {
   setStatus(COUNCIL_DONE)
@@ -73,7 +79,8 @@ stage.appendChild(renderer.domElement)
 let phase: Phase = 'transit'
 let transit = 0
 let door = 0
-let doorTarget = 0
+let desc = 0
+let descTarget = 0
 let skyBirth = 0
 let flashAt = -1
 let elapsed = 0
@@ -82,7 +89,6 @@ let agoraReveal = 0
 let lookUp = 0
 let lookTarget = 0
 let agoraEnteredAt = -1
-let stoneEnteredAt = -1
 let campReveal = 0
 let campYield = 0
 let campEnteredAt = -1
@@ -318,6 +324,108 @@ function returnFromCamp(): void {
   }, 460)
 }
 
+// ---- the descent staging: through the ring, then the plumb-line dive
+// into the agora mandala, one question per breath, then the flare ----
+const GATE_END = 0.16 // corona bloom, one black breath, then above the ring
+const smooth = (a: number, b: number, k: number): number => {
+  const t = Math.min(1, Math.max(0, (k - a) / (b - a)))
+  return t * t * (3 - 2 * t)
+}
+// the overture stays clean: a title card in the black breath, then eight
+// questions drifting past on the way down. The Echo disclosure lives
+// where the figures speak (pane ink, keeper colophon, council cartouche).
+const DESCENT_STATIONS: Array<[number, number]> = [
+  [0.08, 0.22], // The Descent · eight questions
+  [0.26, 0.33], // day I dread
+  [0.345, 0.415], // matter in the end
+  [0.43, 0.5], // want what I cannot keep
+  [0.515, 0.585], // live with what I regret
+  [0.6, 0.67], // owe the people I love
+  [0.685, 0.755], // beauty hurt
+  [0.77, 0.84], // meet my death
+  [0.855, 0.925], // no one watches
+]
+
+/** The dolly, concept-01 law: every camera value is a pure channel of
+    progress, position + lookAt on a slow helix. The flip into the
+    top-down view hides inside the black breath; the spiral carries the
+    dive; the flare banks to the seated eye at the fire. */
+const dCamY = channel([
+  { p: 0, v: 0 },
+  { p: 0.06, v: 0 },
+  { p: 0.2, v: 66, e: 'sineInOut' },
+  { p: 0.995, v: 0, e: 'sineInOut' },
+])
+const dCamR = channel([
+  { p: 0, v: 0.001 },
+  { p: 0.06, v: 0.001 },
+  { p: 0.2, v: 7, e: 'sineInOut' },
+  { p: 0.7, v: 4.5 },
+  { p: 0.995, v: 0.001, e: 'cubicInOut' },
+])
+const dCamTh = channel([
+  { p: 0, v: 0 },
+  { p: 0.2, v: 0 },
+  { p: 0.995, v: 2.6, e: 'sineInOut' },
+])
+// gaze: the disc's heart through the dive, banking to the fire for landing
+const dLookX = channel([
+  { p: 0, v: 0 },
+  { p: 0.88, v: 0 },
+  { p: 0.995, v: 0, e: 'sineInOut' },
+])
+const dLookY = channel([
+  { p: 0, v: 1.35 },
+  { p: 0.06, v: 1.35 },
+  { p: 0.2, v: -0.9, e: 'sineInOut' },
+  { p: 0.88, v: -0.9 },
+  { p: 0.995, v: -0.68, e: 'sineInOut' },
+])
+const dLookZ = channel([
+  { p: 0, v: -10 },
+  { p: 0.06, v: -10 },
+  { p: 0.2, v: 0, e: 'sineInOut' },
+  { p: 0.88, v: 0 },
+  { p: 0.995, v: -5.6, e: 'sineInOut' },
+])
+const descentLook = new Vector3()
+function descentCamera(k: number): void {
+  const th = dCamTh(k)
+  const r = dCamR(k)
+  camera.position.set(Math.sin(th) * r, dCamY(k), Math.cos(th) * r)
+  descentLook.set(dLookX(k), dLookY(k), dLookZ(k))
+  camera.lookAt(descentLook)
+}
+
+/** The questions drift past with parallax: each line rises through the
+    frame as the visitor falls, near lines faster than far ones. */
+function syncDescentBeats(k: number): void {
+  for (let i = 0; i < descentBeats.length; i++) {
+    const beat = descentBeats[i]
+    const range = DESCENT_STATIONS[i]
+    if (!beat || !range) continue
+    const mid = (range[0] + range[1]) / 2
+    const half = (range[1] - range[0]) / 2
+    const p = (k - mid) / (half * 1.55)
+    if (Math.abs(p) > 1.1) {
+      beat.style.opacity = '0'
+      continue
+    }
+    // the title card holds nearly still; every question travels past
+    const travel = i === 0 ? 9 : 34 + (i % 3) * 9
+    const scale = i === 0 ? 1 : 1 + p * 0.045
+    beat.style.opacity = String(Math.max(0, 1 - Math.pow(Math.abs(p), 1.6)))
+    beat.style.transform = `translate3d(0, ${(-p * travel).toFixed(2)}vh, 0) scale(${scale.toFixed(3)})`
+  }
+}
+
+function skipDescent(): void {
+  if (phase !== 'descent') return
+  descTarget = 1
+  desc = Math.max(desc, 0.93)
+}
+document.getElementById('descent-skip')?.addEventListener('click', () => skipDescent())
+
 // each poem line appears once, at its appointed threshold
 const spokenVerses = new Set<string>()
 let verseTimer = 0
@@ -337,7 +445,7 @@ declare global {
       jump: (
         p: Phase,
         opts?: {
-          door?: number
+          desc?: number
           transit?: number
           skyBirth?: number
           sinceFlash?: number
@@ -409,20 +517,29 @@ window.__forge = {
     }
     ringEl.classList.remove('lit', 'passing')
     transit = opts.transit ?? (p === 'transit' ? 0.5 : 1)
-    door = doorTarget =
-      opts.door ?? (p === 'door' ? 0.5 : p === 'transit' || p === 'held' ? 0 : 1)
+    desc = descTarget = p === 'descent' ? (opts.desc ?? 0.5) : p === 'transit' || p === 'held' ? 0 : 1
+    door = p === 'transit' || p === 'held' ? 0 : Math.min(1, desc / 0.18)
     skyBirth =
       opts.skyBirth ??
       (p === 'transit' ? 0
-      : p === 'held' || p === 'stone' ? 0.75
+      : p === 'held' ? 0.75
+      : p === 'descent' ? 0.75 - 0.2 * desc
       : p === 'crossing' ? 0.12
       : p === 'camp' ? 0.08
       : p === 'council' ? 0.55
       : p === 'sky' ? 0.4
       : 1)
     flashAt = elapsed - (opts.sinceFlash ?? 999)
-    agoraReveal = p === 'agora' || p === 'sky' ? 1 : 0
+    agoraReveal =
+      p === 'agora' || p === 'sky' ? 1
+      : p === 'descent' ? smooth(0.88, 0.995, desc)
+      : 0
     lookUp = lookTarget = p === 'sky' ? 1 : 0
+    camera.position.y = 0
+    if (p === 'descent') {
+      descentCamera(desc)
+      syncDescentBeats(desc)
+    }
     if (p === 'agora') {
       agoraEnteredAt = Math.max(0, elapsed - 2)
       camera.rotation.x = -0.12
@@ -443,7 +560,8 @@ window.__forge = {
       atlas.visible(false)
       skyDress(false)
     }
-    if (p !== 'agora' && p !== 'sky' && p !== 'camp' && p !== 'council') camera.rotation.set(0, 0, 0)
+    if (p !== 'agora' && p !== 'sky' && p !== 'camp' && p !== 'council' && p !== 'descent')
+      camera.rotation.set(0, 0, 0)
     if (p === 'council') {
       agoraReveal = 1
       camera.rotation.set(-0.12, 0, 0)
@@ -484,16 +602,14 @@ const TRANSIT_SECONDS = 2.8
 function setPhase(next: Phase): void {
   phase = next
   document.body.dataset['phase'] = next
-  if (next === 'stone') {
-    stoneEnteredAt = elapsed
-    doorTarget = 1 // the crossed door completes on its own
-    setStatus('')
-    stoneEl.classList.add('lit')
-  } else {
-    stoneEl.classList.remove('lit')
-  }
   if (next === 'held') setStatus('Scroll to enter')
-  if (next === 'door') setStatus('')
+  if (next === 'descent') {
+    setStatus('Scroll to descend')
+    descentEl.hidden = false
+  } else {
+    descentEl.hidden = true
+    for (const b of descentBeats) b.style.opacity = '0'
+  }
   if (next === 'agora') {
     agoraEnteredAt = elapsed
     lookTarget = 0
@@ -503,7 +619,6 @@ function setPhase(next: Phase): void {
   }
   if (next === 'sky') {
     setStatus('')
-    verseShow('Voices awaken across Time')
     chapterChangedAt = elapsed
     setPlate()
     skyDress(true)
@@ -545,11 +660,14 @@ function setStatus(text: string): void {
 // ---- input: scroll is the only verb ----
 function push(delta: number): void {
   if (phase === 'transit') return
-  if (phase === 'held' && delta > 0) setPhase('door')
-  if (phase === 'door') {
-    doorTarget = Math.min(1, Math.max(0, doorTarget + delta * 0.0012))
+  if (phase === 'held' && delta > 0) setPhase('descent')
+  if (phase === 'descent') {
+    // the gate blooms in about two flicks; the dive breathes one
+    // question per flick. The whole travel scrubs both ways.
+    const rate = desc < GATE_END ? 0.0005 : 0.00042
+    descTarget = Math.min(1, Math.max(0, descTarget + delta * rate))
+    if (descTarget <= 0 && desc < 0.02 && delta < 0) setPhase('held')
   }
-  if (phase === 'stone' && delta > 0 && elapsed - stoneEnteredAt > 1.2) setPhase('agora')
   if (phase === 'agora') {
     lookTarget = Math.min(1, Math.max(0, lookTarget + delta * 0.0009))
   }
@@ -583,6 +701,7 @@ addEventListener('keydown', (e) => {
     if (e.key === 'ArrowLeft') stepChapter(-1)
   }
   if (e.key === 'Enter' && phase === 'transit') transit = 1
+  if (e.key === 'Enter' && phase === 'descent') skipDescent()
 })
 let touchY: number | null = null
 let touchX: number | null = null
@@ -632,16 +751,34 @@ function frame(now: number): void {
     }
   }
 
-  // the door keeps easing in every phase: once crossed it must finish its
-  // swing to 1, or its dark plane hangs across the live sky forever
+  // the descent: every scroll is a step of the travel down. The eclipse
+  // gate opens itself in the first fifth, the agora materializes below,
+  // and one question at a time holds the frame.
+  desc += (descTarget - desc) * Math.min(1, dt * 2.4)
+  if (reducedMotion) desc = descTarget
+  const doorTarget = phase === 'transit' || phase === 'held' ? 0 : Math.min(1, desc / GATE_END)
   door += (doorTarget - door) * Math.min(1, dt * 4)
   if (reducedMotion) door = doorTarget
-  if (phase === 'door' && door > 0.985) setPhase('stone')
+  if (phase === 'descent') {
+    descentCamera(desc)
+    syncDescentBeats(desc)
+    if (desc > 0.24) verseShow('Voices awaken across Time')
+    if (desc > 0.993) {
+      camera.position.y = 0
+      setPhase('agora')
+    }
+  }
 
-  // the stone: one held black breath, long enough to be read
-  if (phase === 'stone' && elapsed - stoneEnteredAt > 4.8) setPhase('agora')
+  // the map carries the whole dive; the territory only wakes for the flare
+  const mandalaReveal =
+    phase === 'descent' ? smooth(0.16, 0.3, desc) * (1 - smooth(0.9, 0.985, desc)) : 0
+  mandala.visible(mandalaReveal > 0.004)
+  mandala.update(dt, elapsed, mandalaReveal)
 
-  const revealTarget = phase === 'agora' || phase === 'sky' || phase === 'council' ? 1 : 0
+  const revealTarget =
+    phase === 'agora' || phase === 'sky' || phase === 'council' ? 1
+    : phase === 'descent' ? smooth(0.88, 0.995, desc)
+    : 0
   agoraReveal += (revealTarget - agoraReveal) * Math.min(1, dt * (reducedMotion ? 20 : 1.2))
 
   if (phase === 'agora') {
@@ -678,7 +815,8 @@ function frame(now: number): void {
   // the six houses own the night without competition
   const birthTarget =
     phase === 'transit' ? 0
-    : phase === 'held' || phase === 'stone' ? 0.75
+    : phase === 'held' ? 0.75
+    : phase === 'descent' ? 0.75 - 0.2 * desc
     : phase === 'agora' || phase === 'council' ? 0.55
     : phase === 'crossing' ? 0.12
     : phase === 'camp' ? 0.08
