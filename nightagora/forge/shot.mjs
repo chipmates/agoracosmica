@@ -14,6 +14,7 @@ const STATES = [
   { name: 'held', jump: ['held', {}] },
   { name: 'door', jump: ['door', { door: 0.55 }] },
   { name: 'agora', jump: ['agora', {}] },
+  { name: 'keeper', jump: ['agora', { keeper: 2 }] },
   { name: 'sky', jump: ['sky', {}] },
   { name: 'card', jump: ['sky', {}], focus: -1 },
 ]

@@ -1,6 +1,7 @@
 import { PerspectiveCamera, Scene, Vector3, WebGPURenderer } from 'three/webgpu'
 import { createEclipse, type EclipseState } from './scenes/eclipse'
 import { createAgora } from './scenes/agora'
+import { createKeeper } from './scenes/keeper'
 import { WANDERERS } from './content/wanderers'
 
 type Phase = 'transit' | 'held' | 'door' | 'agora' | 'sky'
@@ -23,6 +24,7 @@ camera.position.set(0, 0, 0)
 
 const eclipse = createEclipse(scene)
 const agora = createAgora(scene)
+const keeperScene = createKeeper(keeperEl, reducedMotion)
 
 // WebGL is the proven backend tonight; ?webgpu opts into the newer path
 // until it is verified on real hardware (see FORGE-STATE DEEPEN list).
@@ -49,7 +51,7 @@ let agoraEnteredAt = -1
 declare global {
   interface Window {
     __forge?: {
-      jump: (p: Phase, opts?: { door?: number; transit?: number; skyBirth?: number; sinceFlash?: number }) => void
+      jump: (p: Phase, opts?: { door?: number; transit?: number; skyBirth?: number; sinceFlash?: number; keeper?: number }) => void
       freeze: (t: number) => void
       focusWanderer: (i: number) => void
     }
@@ -131,11 +133,15 @@ window.__forge = {
     agoraReveal = p === 'agora' || p === 'sky' ? 1 : 0
     lookUp = lookTarget = p === 'sky' ? 1 : 0
     if (p === 'agora') {
-      agoraEnteredAt = elapsed - 2
+      agoraEnteredAt = Math.max(0, elapsed - 2)
       camera.rotation.x = -0.12
     }
     if (p === 'sky') camera.rotation.x = 0.62
     if (p !== 'agora' && p !== 'sky') camera.rotation.set(0, 0, 0)
+    if (opts.keeper) {
+      keeperEl.hidden = false
+      keeperScene.forgeStage(opts.keeper)
+    }
   },
   freeze(t) {
     elapsed = t
@@ -196,6 +202,8 @@ function push(delta: number): void {
 
 addEventListener('wheel', (e) => push(e.deltaY), { passive: true })
 addEventListener('keydown', (e) => {
+  // the visitor is writing or choosing, not steering
+  if (e.target instanceof HTMLInputElement || e.target instanceof HTMLButtonElement) return
   if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') push(160)
   if (e.key === 'ArrowUp' || e.key === 'PageUp') push(-160)
   if (e.key === 'Enter' && phase === 'transit') transit = 1
@@ -281,7 +289,8 @@ function frame(now: number): void {
     if (lockedIdx === null && pointerX >= 0) hoverIdx = nearestWanderer(pointerX, pointerY, 64)
   }
   syncCard()
-  agora.update({ reveal: agoraReveal, elapsed })
+  keeperScene.update(dt)
+  agora.update({ reveal: agoraReveal, elapsed, speak: keeperScene.speak() })
 
   renderer.render(scene, camera)
 }

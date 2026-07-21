@@ -57,6 +57,8 @@ export interface AgoraState {
   /** 0..1 fade-in of the ground world after the dark door */
   reveal: number
   elapsed: number
+  /** 0..1 while the Keeper speaks: the fire listens and leans in */
+  speak?: number
 }
 
 /**
@@ -588,13 +590,15 @@ export function createAgora(scene: Scene) {
 
     // one fire, many flickers: the source stays steady, the light it throws
     // trembles a little more. All motion is sine-woven and deterministic.
+    const sp = s.speak ?? 0
     const fl =
       0.76 + 0.12 * Math.sin(t * 7.1) + 0.07 * Math.sin(t * 11.7 + 1.3) + 0.05 * Math.sin(t * 19.3 + 4.1)
-    uFlame.value = r * (0.82 + 0.18 * fl)
+    uFlame.value = r * (0.82 + 0.18 * fl) * (1 + 0.1 * sp)
     uLean.value = 0.03 * Math.sin(t * 0.42) + 0.015 * Math.sin(t * 1.1 + 2)
 
-    // the flame breathes in scale as well as in noise
-    const breath = 1 + 0.035 * Math.sin(t * 2.1) + 0.02 * Math.sin(t * 3.7 + 1.1)
+    // the flame breathes in scale as well as in noise, a little deeper
+    // while its keeper speaks
+    const breath = 1 + (0.035 + 0.02 * sp) * Math.sin(t * 2.1) + 0.02 * Math.sin(t * 3.7 + 1.1)
     flame.scale.set(FLAME_W, FLAME_H * breath, 1)
     flame.position.y = FLAME_BASE + (FLAME_H * breath) / 2
     tongue.scale.set(TONGUE_W, TONGUE_H * breath, 1)
