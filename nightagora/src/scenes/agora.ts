@@ -11,6 +11,7 @@ import {
   Mesh,
   MeshBasicNodeMaterial,
   PlaneGeometry,
+  RingGeometry,
   Points,
   PointsMaterial,
   Scene,
@@ -143,6 +144,26 @@ export function createAgora(scene: Scene) {
       ctx.fillRect(x - r, y - r, r * 2, r * 2)
     }
 
+    // the agora is BUILT around its fire: paving joints, concentric and
+    // radial, centered where the fire stands (fire sits at uv 0.5, 0.3)
+    const fx = size * 0.5
+    const fy = size * 0.3
+    ctx.strokeStyle = 'rgba(2, 4, 9, 0.35)'
+    ctx.lineWidth = 1.6
+    for (let ring = 1; ring <= 7; ring++) {
+      const r = (ring * 1.55 * size) / 28
+      ctx.beginPath()
+      ctx.arc(fx, fy, r, 0, Math.PI * 2)
+      ctx.stroke()
+    }
+    for (let sp = 0; sp < 14; sp++) {
+      const a = (sp / 14) * Math.PI * 2 + 0.11
+      ctx.beginPath()
+      ctx.moveTo(fx + Math.cos(a) * ((1.1 * size) / 28), fy + Math.sin(a) * ((1.1 * size) / 28))
+      ctx.lineTo(fx + Math.cos(a) * ((12 * size) / 28), fy + Math.sin(a) * ((12 * size) / 28))
+      ctx.stroke()
+    }
+
     // veins: long wandering hairlines, a few warmer ones
     for (let i = 0; i < 17; i++) {
       const warm = rnd() > 0.78
@@ -150,7 +171,7 @@ export function createAgora(scene: Scene) {
       let y = rnd() * size
       let ang = rnd() * Math.PI * 2
       const steps = 70 + Math.floor(rnd() * 130)
-      const alpha = 0.05 + rnd() * 0.06
+      const alpha = 0.07 + rnd() * 0.08
       ctx.strokeStyle = warm
         ? `rgba(214, 192, 148, ${alpha})`
         : `rgba(182, 194, 224, ${alpha})`
@@ -453,6 +474,30 @@ export function createAgora(scene: Scene) {
   root.add(wash)
 
   // ------------------------------------------------------------------
+  // 4b · THE ENGRAVED CIRCLES — two rings cut into the stone around the
+  //      fire (where the council sits), catching the firelight faintly
+  // ------------------------------------------------------------------
+  function inlayRing(radius: number, width: number, strength: number): void {
+    const mat = new MeshBasicNodeMaterial({
+      transparent: true,
+      depthWrite: false,
+      blending: AdditiveBlending,
+    })
+    const dxz = length(positionWorld.xz.sub(vec2(FIRE.x, FIRE.z)))
+    const fireFall = float(5.2).div(dxz.mul(dxz).add(1.4))
+    const flick = sin(uT.mul(5.9).add(dxz.mul(2.1))).mul(0.1).add(0.9)
+    mat.colorNode = vec3(GOLD.r, GOLD.g, GOLD.b)
+    mat.opacityNode = fireFall.mul(flick).mul(strength).mul(uR).add(dither.mul(0.3))
+    const ring = new Mesh(new RingGeometry(radius - width, radius, 128), mat)
+    ring.rotation.x = -Math.PI / 2
+    ring.position.set(FIRE.x, FLOOR_Y + 0.006, FIRE.z)
+    ring.renderOrder = 3
+    root.add(ring)
+  }
+  inlayRing(1.9, 0.028, 0.05)
+  inlayRing(3.05, 0.018, 0.022)
+
+  // ------------------------------------------------------------------
   // 5 · THE COLONNADE — a far arc of carved shafts, rim-lit by the fire
   // ------------------------------------------------------------------
   const colMat = new MeshBasicNodeMaterial()
@@ -464,9 +509,14 @@ export function createAgora(scene: Scene) {
     const fall = float(5.6).div(dist.mul(dist).add(2.0))
     const vert = oneMinus(smoothstep(-0.8, 2.4, positionWorld.y)).pow(1.3).mul(0.9).add(0.1)
     const flick = sin(uT.mul(6.7).add(positionWorld.x.mul(1.3))).mul(0.08).add(0.92)
-    const glow = ndl.mul(fall).mul(vert).mul(flick).mul(0.36)
+    const glow = ndl.mul(fall).mul(vert).mul(flick).mul(0.52)
+    // the lapis night rests on the upper shafts: a cool lift toward the
+    // capitals so the stone reads round against the sky, not flat
+    const skyLift = smoothstep(0.6, 4.4, positionWorld.y).mul(0.14)
+    const lapis = vec3(0.1, 0.16, 0.34)
     colMat.colorNode = vec3(COLUMN_INK.r, COLUMN_INK.g, COLUMN_INK.b)
       .mul(0.7)
+      .add(lapis.mul(skyLift))
       .add(vec3(GOLD.r, GOLD.g, GOLD.b).mul(glow))
       .add(dither.mul(0.02))
       .mul(uR)
@@ -487,13 +537,19 @@ export function createAgora(scene: Scene) {
       .add(dither.mul(0.02))
       .mul(uR)
   }
-  const shaftGeo = new CylinderGeometry(0.21, 0.27, 5.4, 14)
+  const shaftGeo = new CylinderGeometry(0.21, 0.27, 5.4, 18)
   const plinthGeo = new BoxGeometry(0.72, 0.22, 0.72)
+  // the capital: a flared echinus under a square abacus, then the
+  // architrave chords crown the arc and the posts become architecture
+  const echinusGeo = new CylinderGeometry(0.3, 0.22, 0.12, 18)
+  const abacusGeo = new BoxGeometry(0.56, 0.1, 0.56)
+  const COL_R = 10.6
   const COL_ANGLES = [-62, -44, -30, -19, -9, 9, 19, 30, 44, 62]
+  const SHAFT_TOP = FLOOR_Y + 0.22 + 5.4 // plinth crown to shaft crown
   for (const deg of COL_ANGLES) {
     const a = (deg * Math.PI) / 180
-    const x = Math.sin(a) * 10.6
-    const z = -Math.cos(a) * 10.6
+    const x = Math.sin(a) * COL_R
+    const z = -Math.cos(a) * COL_R
     const shaft = new Mesh(shaftGeo, colMat)
     shaft.position.set(x, FLOOR_Y + 2.92, z)
     root.add(shaft)
@@ -501,6 +557,30 @@ export function createAgora(scene: Scene) {
     plinth.position.set(x, FLOOR_Y + 0.11, z)
     plinth.rotation.y = -a
     root.add(plinth)
+    const echinus = new Mesh(echinusGeo, colMat)
+    echinus.position.set(x, SHAFT_TOP + 0.06, z)
+    root.add(echinus)
+    const abacus = new Mesh(abacusGeo, plinthMat)
+    abacus.position.set(x, SHAFT_TOP + 0.17, z)
+    abacus.rotation.y = -a
+    root.add(abacus)
+  }
+  // architrave: one quiet beam per neighboring pair, spanning the chord.
+  // The two nine-degree gaps flanking the fire stay open: the arc breathes
+  // where the visitor's gaze passes through it.
+  for (let i = 0; i < COL_ANGLES.length - 1; i++) {
+    const d0 = COL_ANGLES[i]
+    const d1 = COL_ANGLES[i + 1]
+    if (d0 === undefined || d1 === undefined) continue
+    if (d0 === -9 && d1 === 9) continue // the open lintel behind the fire
+    const a0 = (d0 * Math.PI) / 180
+    const a1 = (d1 * Math.PI) / 180
+    const mid = (a0 + a1) / 2
+    const chord = 2 * COL_R * Math.sin(Math.abs(a1 - a0) / 2)
+    const beam = new Mesh(new BoxGeometry(chord + 0.3, 0.3, 0.44), plinthMat)
+    beam.position.set(Math.sin(mid) * COL_R, SHAFT_TOP + 0.37, -Math.cos(mid) * COL_R)
+    beam.rotation.y = -mid
+    root.add(beam)
   }
 
   // ------------------------------------------------------------------
