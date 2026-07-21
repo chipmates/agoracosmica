@@ -71,6 +71,9 @@ export function createCrossing(scene: Scene, onDone: () => void): CrossingHandle
   const DIR_X = Math.cos(ANGLE)
   const DIR_Y = Math.sin(ANGLE)
   const strokes: Stroke[] = []
+  // each stroke keeps its own slight bearing: a hand engraved this, not
+  // a machine (the shared direction still reads as one wind)
+  const strokeDir: Array<[number, number]> = []
   for (let i = 0; i < N; i++) {
     strokes.push({
       x: (rand() - 0.5) * 16,
@@ -78,9 +81,11 @@ export function createCrossing(scene: Scene, onDone: () => void): CrossingHandle
       z: -2.6 - rand() * 4.2,
       v: 2.2 + rand() * 5.2,
       len: 0.14 + rand() * 0.5,
-      bright: 0.25 + rand() * 0.75,
+      bright: 0.12 + rand() * 0.88,
       gold: rand() > 0.94,
     })
+    const jitter = ANGLE + (rand() - 0.5) * 0.07
+    strokeDir.push([Math.cos(jitter), Math.sin(jitter)])
   }
   const hatchGeo = new BufferGeometry()
   const hatchPos = new Float32Array(N * 6)
@@ -114,8 +119,9 @@ export function createCrossing(scene: Scene, onDone: () => void): CrossingHandle
   route.frustumCulled = false
   root.add(route)
 
-  // ---- the destination: his light, growing with proximity ----
-  function glowTexture(): CanvasTexture {
+  // ---- the destination: his light, a hard bright star in a warm halo,
+  // never a fog ----
+  function glowTexture(stops: Array<[number, string]>): CanvasTexture {
     const size = 128
     const canvas = document.createElement('canvas')
     canvas.width = size
@@ -123,15 +129,18 @@ export function createCrossing(scene: Scene, onDone: () => void): CrossingHandle
     const ctx = canvas.getContext('2d')
     if (!ctx) throw new Error('2d context unavailable')
     const g = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2)
-    g.addColorStop(0, 'rgba(255, 244, 214, 1)')
-    g.addColorStop(0.3, 'rgba(224, 185, 106, 0.5)')
-    g.addColorStop(1, 'rgba(0, 0, 0, 0)')
+    for (const [at, color] of stops) g.addColorStop(at, color)
     ctx.fillStyle = g
     ctx.fillRect(0, 0, size, size)
     return new CanvasTexture(canvas)
   }
   const destMat = new SpriteMaterial({
-    map: glowTexture(),
+    map: glowTexture([
+      [0, 'rgba(255, 250, 235, 0.9)'],
+      [0.14, 'rgba(246, 223, 174, 0.42)'],
+      [0.4, 'rgba(224, 185, 106, 0.1)'],
+      [1, 'rgba(0, 0, 0, 0)'],
+    ]),
     transparent: true,
     opacity: 0,
     blending: AdditiveBlending,
@@ -139,6 +148,20 @@ export function createCrossing(scene: Scene, onDone: () => void): CrossingHandle
   })
   const dest = new Sprite(destMat)
   root.add(dest)
+  const coreMat = new SpriteMaterial({
+    map: glowTexture([
+      [0, 'rgba(255, 253, 244, 1)'],
+      [0.22, 'rgba(255, 250, 232, 0.95)'],
+      [0.34, 'rgba(246, 223, 174, 0.25)'],
+      [1, 'rgba(0, 0, 0, 0)'],
+    ]),
+    transparent: true,
+    opacity: 0,
+    blending: AdditiveBlending,
+    depthWrite: false,
+  })
+  const destCore = new Sprite(coreMat)
+  root.add(destCore)
 
   // ---- the DOM organs: voice line, portrait, gold breath ----
   const voiceNode = document.getElementById('voice')
@@ -223,12 +246,13 @@ export function createCrossing(scene: Scene, onDone: () => void): CrossingHandle
         s.y = (rand() - 0.5) * 9
       }
       const len = s.len * (0.12 + spd * 1.6)
+      const dir = strokeDir[i] ?? [DIR_X, DIR_Y]
       const o = i * 6
       hatchPos[o] = s.x
       hatchPos[o + 1] = s.y
       hatchPos[o + 2] = s.z
-      hatchPos[o + 3] = s.x + DIR_X * len
-      hatchPos[o + 4] = s.y + DIR_Y * len
+      hatchPos[o + 3] = s.x + dir[0] * len
+      hatchPos[o + 4] = s.y + dir[1] * len
       hatchPos[o + 5] = s.z
       const flick = 0.75 + 0.25 * Math.sin(elapsed * 5 + i * 1.7)
       const b = s.bright * flick * (0.35 + spd * 0.65)
@@ -254,7 +278,14 @@ export function createCrossing(scene: Scene, onDone: () => void): CrossingHandle
     )
     const grow = 0.3 + Math.min(1, t / 5) * 1.7
     dest.scale.set(grow, grow, 1)
-    destMat.opacity = Math.min(0.9, t / 2.5) * (1 - Math.min(1, Math.max(0, (t - T_PORTRAIT) / 0.8)))
+    destCore.position.copy(dest.position)
+    destCore.scale.set(grow * 0.34, grow * 0.34, 1)
+    // approaching, his light is a bright star; at the portrait it blooms
+    // into a wide quiet halo BEHIND the frame instead of dying out
+    const portraitK = Math.min(1, Math.max(0, (t - T_PORTRAIT) / 0.8))
+    destMat.opacity = Math.min(0.85, t / 2.5) * (1 - portraitK * 0.72)
+    dest.scale.multiplyScalar(1 + portraitK * 2.6)
+    coreMat.opacity = Math.min(1, t / 2.2) * (1 - portraitK)
 
     // the voice homes in: fragments, then the sentence begun in space
     if (t >= T_VOICE_FRAGMENTS && t < T_VOICE_CLEAN) setVoice(VOICE_FRAGMENTS, false)

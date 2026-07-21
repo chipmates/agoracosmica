@@ -218,6 +218,8 @@ function openPane(slug: string): void {
     panePortrait.src = mediaUrl(`/images/figures/${slug}/main/900.webp`)
     panePortrait.alt = `AI-generated portrait of ${w.name}`
   }
+  const sibLabel = paneEl.querySelector('.pane-sib-label')
+  if (sibLabel) sibLabel.textContent = `Also among the ${c.name}`
   if (paneSiblings) {
     paneSiblings.textContent = ''
     for (const sib of c.stars) {
@@ -234,6 +236,8 @@ function openPane(slug: string): void {
   }
   paneOpen = true
   paneEl.hidden = false
+  document.body.classList.add('pane-open')
+  requestAnimationFrame(() => requestAnimationFrame(() => paneEl.classList.add('lit')))
   // the sky chrome steps back while a figure holds the frame
   plateEl.classList.remove('lit')
   inviteEl.classList.remove('lit')
@@ -245,6 +249,8 @@ function closePane(): void {
   // rail lets go; the cleanup calls from phase changes are not
   if (paneOpen && phase === 'sky') autoRide = false
   paneOpen = false
+  paneEl.classList.remove('lit')
+  document.body.classList.remove('pane-open')
   paneEl.hidden = true
   if (phase === 'sky') {
     plateEl.classList.add('lit')
@@ -600,13 +606,13 @@ doorEl.querySelector('.door-stay')?.addEventListener('click', () => {
 // each poem line appears once, at its appointed threshold
 const spokenVerses = new Set<string>()
 let verseTimer = 0
-function verseShow(line: string): void {
+function verseShow(line: string, holdMs = 5600): void {
   if (spokenVerses.has(line)) return
   spokenVerses.add(line)
   verseEl.textContent = line
   verseEl.classList.add('lit')
   window.clearTimeout(verseTimer)
-  verseTimer = window.setTimeout(() => verseEl.classList.remove('lit'), 5600)
+  verseTimer = window.setTimeout(() => verseEl.classList.remove('lit'), holdMs)
 }
 
 // forge hook: lets the screenshot rig drive deterministic states
@@ -811,7 +817,8 @@ function setPhase(next: Phase): void {
   if (next === 'crossing') {
     setStatus('')
     verseEl.classList.remove('lit') // a fast chooser carries no verse across
-    verseShow('You enter a life through its light')
+    // one short breath only: the voice line needs the frame to itself
+    verseShow('You enter a life through its light', 2900)
   }
   if (next === 'council') {
     setStatus('')

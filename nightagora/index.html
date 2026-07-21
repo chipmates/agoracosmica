@@ -158,6 +158,14 @@
       transition: opacity 1.8s ease, transform 1.8s ease;
     }
     #portrait.lit { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    /* the arrival halo: his gold light blooms behind the frame */
+    #portrait::before {
+      content: ''; position: absolute; inset: -38%;
+      background: radial-gradient(circle, color-mix(in srgb, var(--na-gold) 13%, transparent) 0%, transparent 60%);
+      opacity: 0; transition: opacity 2s ease 0.4s;
+      pointer-events: none;
+    }
+    #portrait.lit::before { opacity: 1; }
     .portrait-frame {
       border: 1px solid color-mix(in srgb, var(--na-gold) 45%, transparent);
       padding: 7px;
@@ -459,6 +467,11 @@
       transition: color 0.3s ease;
     }
     .door-stay:hover, .door-stay:focus-visible { color: var(--na-gold); outline: none; }
+    @media (max-aspect-ratio: 9/10) {
+      /* the mark yields on narrow: the fire itself is the doorway */
+      .door-mark { display: none; }
+      #forward-door { padding-bottom: calc(13vh + env(safe-area-inset-bottom)); }
+    }
     body.forge #forward-door, body.forge #rail button { transition: none !important; }
 
     /* the impatient door: visible only while totality holds */
@@ -495,6 +508,11 @@
       opacity: 0.85; transition: opacity 0.3s ease, color 0.3s ease;
     }
     #descent-skip:hover, #descent-skip:focus-visible { opacity: 1; color: var(--na-starlight); outline: none; }
+    @media (max-aspect-ratio: 9/10) {
+      /* clear of the rail line on narrow stages */
+      #descent-skip { bottom: calc(64px + env(safe-area-inset-bottom)); }
+      #descent .plumb { bottom: calc(112px + env(safe-area-inset-bottom)); }
+    }
     body.forge #descent *, body.forge .copy { transition: none !important; }
     /* the static mirror serves readers and crawlers, never the canvas */
     .static-soul {
@@ -571,9 +589,37 @@
       position: fixed; inset: 0; z-index: 5;
       display: flex; align-items: center; justify-content: center;
       background: radial-gradient(ellipse 90% 80% at 50% 45%, rgba(2, 3, 8, 0.68) 0%, rgba(2, 3, 8, 0.88) 100%);
-      opacity: 1; transition: opacity 0.7s ease;
+      opacity: 0; visibility: hidden; pointer-events: none;
+      transition: opacity 0.8s ease, visibility 0s linear 0.8s;
+    }
+    #figure-pane.lit {
+      opacity: 1; visibility: visible; pointer-events: auto;
+      transition: opacity 0.8s ease;
     }
     #figure-pane[hidden] { display: none; }
+    /* the figure rises: portrait first, then the letterpress, line by line */
+    #figure-pane .pane-portrait {
+      opacity: 0; transform: translateY(18px);
+      transition: opacity 0.9s ease 0.15s, transform 0.9s ease 0.15s;
+    }
+    #figure-pane.lit .pane-portrait { opacity: 1; transform: none; }
+    #figure-pane .pane-text > * {
+      opacity: 0; transform: translateY(10px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    #figure-pane.lit .pane-text > * { opacity: 1; transform: none; }
+    #figure-pane .pane-kicker { transition-delay: 0.3s; }
+    #figure-pane .pane-name { transition-delay: 0.38s; }
+    #figure-pane .pane-tradition { transition-delay: 0.46s; }
+    #figure-pane .pane-years { transition-delay: 0.52s; }
+    #figure-pane .pane-promise { transition-delay: 0.6s; }
+    #figure-pane .pane-ink { transition-delay: 0.7s; }
+    #figure-pane .pane-enter, #figure-pane .pane-drawn { transition-delay: 0.78s; }
+    #figure-pane .pane-siblings { transition-delay: 0.88s; }
+    body.forge #figure-pane, body.forge #figure-pane .pane-portrait,
+    body.forge #figure-pane .pane-text > * { transition: none !important; }
+    /* the brand yields the top line while a figure holds the frame */
+    body.pane-open #veil .brand { opacity: 0; transition: opacity 0.5s ease; }
     .pane-inner {
       display: flex; align-items: center; gap: clamp(28px, 4vw, 56px);
       max-width: min(980px, calc(100% - 48px));
@@ -626,6 +672,16 @@
       font-family: var(--sans);
       font-size: 8px; letter-spacing: 0.26em;
       text-transform: uppercase; color: var(--na-mist);
+      max-width: 40ch; text-wrap: balance;
+      margin-left: auto; margin-right: auto;
+    }
+    .pane-text .pane-ink { margin-left: 0; margin-right: 0; }
+    .pane-sib-label {
+      margin-top: 26px;
+      font-family: var(--sans);
+      font-size: 8px; letter-spacing: 0.3em; text-indent: 0.3em;
+      text-transform: uppercase; color: var(--na-gold);
+      opacity: 0.75;
     }
     .pane-enter {
       display: inline-block; margin-top: 26px;
@@ -647,7 +703,7 @@
     }
     .pane-drawn[hidden] { display: none; }
     .pane-siblings {
-      margin-top: 30px; display: flex; flex-wrap: wrap; gap: 4px 18px;
+      margin-top: 6px; display: flex; flex-wrap: wrap; gap: 0 18px;
     }
     .pane-sibling {
       background: none; border: none; cursor: pointer;
@@ -771,6 +827,10 @@
       background: var(--na-gold);
     }
     body.forge #council-topic, body.forge #cartouche { transition: none !important; }
+    @media (max-aspect-ratio: 9/10) {
+      /* the cartouche rests above the instrument rail on narrow stages */
+      #cartouche { bottom: calc(76px + env(safe-area-inset-bottom)); }
+    }
 
     /* the way onward, after the coda */
     .keeper-exit {
@@ -1009,6 +1069,7 @@
         <p class="pane-ink">An AI Echo · an interpretation, not a recording</p>
         <button class="pane-enter" type="button" hidden>Enter his night</button>
         <p class="pane-drawn" hidden>This world is still being drawn</p>
+        <p class="pane-sib-label"></p>
         <div class="pane-siblings"></div>
       </div>
     </div>
