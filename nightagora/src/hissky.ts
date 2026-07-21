@@ -213,10 +213,38 @@ const ringMap = (() => {
   return new CanvasTexture(canvas)
 })()
 
-// ---- THE WREATH: twelve seats in an open laurel crown ----
+// ---- THE SIGN in its sky ----
 const wreath = new Group()
 wreath.position.set(0, 8.5, -34)
 scene.add(wreath)
+
+// the mist the classic sky breathes: three vast quiet clouds behind
+{
+  const mistMap = radial([
+    [0, 'rgba(90, 116, 178, 0.16)'],
+    [0.5, 'rgba(60, 82, 140, 0.07)'],
+    [1, 'rgba(0, 0, 0, 0)'],
+  ])
+  const seats: Array<[number, number, number, number]> = [
+    [-7, 2.5, -9, 30],
+    [8, -3, -11, 26],
+    [-1, -7.5, -8, 22],
+  ]
+  for (const [mx, my, mz, ms] of seats) {
+    const m = new Sprite(
+      new SpriteMaterial({
+        map: mistMap,
+        transparent: true,
+        opacity: 1,
+        blending: AdditiveBlending,
+        depthWrite: false,
+      })
+    )
+    m.position.set(mx, my, mz)
+    m.scale.setScalar(ms)
+    wreath.add(m)
+  }
+}
 
 interface SeedStar {
   group: Group
@@ -255,15 +283,28 @@ const TAURUS: Array<[number, number]> = [
   [55, 65], // Back / tail base
   [65, 55], // Tail tuft
 ]
-const SEAT: Array<[number, number]> = TAURUS.map(([px, py]) => [
-  ((px - 50) / 100) * 16.5,
-  ((50 - py) / 100) * 15.5 + 0.6,
-])
+// fit ANY sign into a generous frame: normalize the pattern's own
+// bounds, keep its aspect, give every star breathing room and a
+// whisper of depth. This is the rule all thirty signs will share.
+function fitPattern(pattern: Array<[number, number]>, w: number, h: number): Array<[number, number, number]> {
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity
+  for (const [x, y] of pattern) {
+    minX = Math.min(minX, x); maxX = Math.max(maxX, x)
+    minY = Math.min(minY, y); maxY = Math.max(maxY, y)
+  }
+  const sx = w / Math.max(1e-6, maxX - minX)
+  const sy = h / Math.max(1e-6, maxY - minY)
+  const k = Math.min(sx, sy)
+  const cx = (minX + maxX) / 2
+  const cy = (minY + maxY) / 2
+  return pattern.map(([x, y]) => [(x - cx) * k, (cy - y) * k, (rand() - 0.5) * 3.4])
+}
+const SEAT: Array<[number, number, number]> = fitPattern(TAURUS, 26, 19)
 
 function makeSeed(i: number, title: string): SeedStar {
   const group = new Group()
-  const seat = SEAT[i] ?? [0, 0]
-  const base = new Vector3(seat[0], seat[1], 0)
+  const seat = SEAT[i] ?? [0, 0, 0]
+  const base = new Vector3(seat[0], seat[1], seat[2] ?? 0)
   group.position.copy(base)
   wreath.add(group)
   const coreMat = new SpriteMaterial({
@@ -483,16 +524,16 @@ async function boot(): Promise<void> {
       if (s.level >= 3.9) bloomed++
       const breathe = 1 + 0.05 * Math.sin(elapsed * (0.8 + s.phase * 0.1) + s.phase) * Math.min(1, L)
       // the language of the five stages, continuous:
-      const coreScale = (0.42 + 0.16 * L) * breathe
+      const coreScale = (0.3 + 0.11 * L) * breathe
       s.core.scale.setScalar(coreScale)
       s.coreMat.color.copy(EMBER).lerp(STARLIGHT, Math.min(1, L / 2.2))
       s.coreMat.opacity = 0.32 + 0.17 * L
-      s.haloMat.opacity = Math.max(0, (L - 1.6) / 2.4) * 0.8
-      s.halo.scale.setScalar((2.1 + 0.5 * L) * breathe)
-      s.ringMat.opacity = Math.max(0, Math.min(1, L - 0.7)) * 0.75
-      s.ring.scale.setScalar(1.3 + 0.14 * L)
-      s.rayMat.opacity = Math.max(0, (L - 2.7) / 1.3) * 0.85
-      s.ray.scale.setScalar(2.0 + 0.5 * (L - 2.5))
+      s.haloMat.opacity = Math.max(0, (L - 1.6) / 2.4) * 0.5
+      s.halo.scale.setScalar((1.3 + 0.28 * L) * breathe)
+      s.ringMat.opacity = Math.max(0, Math.min(1, L - 0.7)) * 0.6
+      s.ring.scale.setScalar(0.95 + 0.1 * L)
+      s.rayMat.opacity = Math.max(0, (L - 2.7) / 1.3) * 0.62
+      s.ray.scale.setScalar(1.45 + 0.3 * (L - 2.5))
       s.ray.material.rotation = elapsed * 0.05 + s.phase
       // a waking star drifts a breath upward as it comes alive
       s.group.position.y = s.base.y + Math.min(1, L / 4) * 0.22
@@ -501,7 +542,7 @@ async function boot(): Promise<void> {
       const la = seeds[b.a]?.shown ?? 0
       const lb = seeds[b.b]?.shown ?? 0
       const on = Math.max(0, Math.min(la, lb) - 1.2) / 2.8
-      b.mat.opacity = on * 0.5
+      b.mat.opacity = on * 0.3
       const pa = seeds[b.a]?.group.position
       const pb = seeds[b.b]?.group.position
       if (pa && pb) {
@@ -514,7 +555,7 @@ async function boot(): Promise<void> {
 
     // the wreath breathes as one, and narrow stages hold all of it
     wreath.rotation.z = Math.sin(elapsed * 0.05) * 0.012
-    wreath.scale.setScalar(camera.aspect < 0.9 ? 0.56 : 1)
+    wreath.scale.setScalar(camera.aspect < 0.9 ? 0.5 : 1)
 
     // letterpress: night count + the most recently waking seed's name
     if (nightLine)
