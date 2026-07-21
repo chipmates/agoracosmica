@@ -418,6 +418,7 @@ window.__forge = {
       : p === 'crossing' ? 0.12
       : p === 'camp' ? 0.08
       : p === 'council' ? 0.55
+      : p === 'sky' ? 0.4
       : 1)
     flashAt = elapsed - (opts.sinceFlash ?? 999)
     agoraReveal = p === 'agora' || p === 'sky' ? 1 : 0
@@ -552,8 +553,11 @@ function push(delta: number): void {
   if (phase === 'agora') {
     lookTarget = Math.min(1, Math.max(0, lookTarget + delta * 0.0009))
   }
-  // the wheel of the night: scroll or swipe steps the carousel, wrapping
+  // the wheel of the night: scroll or swipe steps the carousel, wrapping.
+  // A short cooldown makes one gesture one step and keeps the look-up
+  // momentum from bleeding into the wheel.
   if (phase === 'sky' && !paneOpen) {
+    if (elapsed - chapterChangedAt < 0.8) return
     if (Math.sign(delta) !== Math.sign(skyAcc)) skyAcc = 0
     skyAcc += delta
     if (Math.abs(skyAcc) > 150) {
@@ -670,12 +674,15 @@ function frame(now: number): void {
 
   // stars are born at totality; near the fire they yield to its light,
   // and during the crossing the sky withdraws to ember
+  // in the constellation sky the background stars step well back, so
+  // the six houses own the night without competition
   const birthTarget =
     phase === 'transit' ? 0
     : phase === 'held' || phase === 'stone' ? 0.75
     : phase === 'agora' || phase === 'council' ? 0.55
     : phase === 'crossing' ? 0.12
     : phase === 'camp' ? 0.08
+    : phase === 'sky' ? 0.4
     : 1
   skyBirth += (birthTarget - skyBirth) * Math.min(1, dt * (reducedMotion ? 20 : 0.9))
 

@@ -92,50 +92,24 @@ try {
   await page.waitForTimeout(2500)
   await shot('sky')
 
-  // 4 · scrolling back down must not strand the visitor
-  await wheel(-300, 10)
-  await page.waitForTimeout(2000)
-  await shot('sky-after-scroll-up')
+  // 4 · the wheel of the night: step forward two houses and back
+  // (one gesture per step; the wheel has a 0.8s cooldown)
+  await wheel(300, 2, 1100)
+  await page.waitForTimeout(2500)
+  await shot('sky-wheeled-forward')
+  await wheel(-300, 2, 1100)
+  await page.waitForTimeout(2500)
+  await shot('sky-wheeled-back')
 
-  // 5 · choose Marcus -> crossing -> camp (tap his focused light, twice:
-  // once to lock the card, once to cross)
-  // probe the roster until the card names Marcus — indices are not stable
-  let found = false
-  for (let i = 0; i < 30; i++) {
-    await page.evaluate((k) => window.__forge.focusWanderer(k), i)
-    await page.waitForTimeout(120)
-    const card = await page.evaluate(() => {
-      const el = document.getElementById('atlas-card')
-      return {
-        hidden: !el || el.hidden,
-        name: document.querySelector('#atlas-card .card-name')?.textContent ?? '',
-        left: el ? el.style.left : '',
-        top: el ? el.style.top : '',
-      }
-    })
-    if (/marcus/i.test(card.name)) {
-      console.log(`[journey] Marcus is index ${i}, card at (${card.left}, ${card.top}) hidden=${card.hidden}`)
-      found = true
-      break
-    }
-  }
-  if (!found) console.log('[journey] Marcus never appeared on the atlas card')
-  await page.waitForTimeout(500)
-  await shot('marcus-card')
-  const light = await page.evaluate(() => {
-    const el = document.getElementById('atlas-card')
-    if (!el || el.hidden) return null
-    // syncCard anchors the card at (light.x + 22, light.y - 24)
-    return { x: parseFloat(el.style.left) - 22, y: parseFloat(el.style.top) + 24 }
-  })
-  if (light) {
-    console.log(`[journey] tapping the light at (${light.x}, ${light.y})`)
-    await page.mouse.click(light.x, light.y)
-    await page.waitForTimeout(300)
-    await page.mouse.click(light.x, light.y)
-  } else {
-    console.log('[journey] no visible card to derive the light position from')
-  }
+  // 5 · open Marcus's name -> his pane -> enter his night
+  const marcusChip = page.locator('.star-chip', { hasText: 'Marcus Aurelius' })
+  await marcusChip.waitFor({ state: 'visible', timeout: 8000 })
+  await marcusChip.click()
+  await page.waitForTimeout(900)
+  await shot('pane-marcus')
+  const enter = page.locator('.pane-enter')
+  await enter.waitFor({ state: 'visible', timeout: 4000 })
+  await enter.click()
   const crossed = await waitPhase('crossing', 8000)
   if (crossed) {
     await shot('crossing')
