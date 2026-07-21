@@ -238,6 +238,22 @@ const WisdomMapModal: FC<WisdomMapModalProps> = ({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Pause every map animation when the tab is backgrounded, same
+  // data-visibility pattern as Sidebar and WisdomGalleryModal. The
+  // gathered-star and bloom glows animate filter/box-shadow and would
+  // otherwise keep burning frames in a hidden tab.
+  useEffect(() => {
+    const applyVisibility = () => {
+      mapContainerRef.current?.setAttribute(
+        'data-visibility',
+        document.hidden ? 'hidden' : 'visible'
+      );
+    };
+    applyVisibility();
+    document.addEventListener('visibilitychange', applyVisibility);
+    return () => document.removeEventListener('visibilitychange', applyVisibility);
+  }, []);
+
   // Measure container dimensions when modal opens
   useEffect(() => {
     if (isOpen) {

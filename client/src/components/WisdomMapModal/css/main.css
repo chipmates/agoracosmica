@@ -877,3 +877,11 @@ body.detail-view-open {
     font-size: 1.125rem; /* 18px */
   }
 }
+/* Backgrounded tab: stop all map animation work (gathered-star glows,
+   bloom scintillation, next-seed breathing are filter/box-shadow
+   animations). data-visibility is set by WisdomMapModal/index.tsx. */
+.map-container[data-visibility="hidden"] *,
+.map-container[data-visibility="hidden"] *::before,
+.map-container[data-visibility="hidden"] *::after {
+  animation-play-state: paused !important;
+}
