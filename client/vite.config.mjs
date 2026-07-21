@@ -41,6 +41,24 @@ export default defineConfig(({ command, mode }) => {
     react(),
     // Images are pre-processed and served from R2 (see scripts/process-images-for-r2.mjs)
     // vite-imagetools removed — no build-time image processing needed
+    {
+      // In production / is the static marketing homepage and the SPA lives at
+      // /app (router basename). The dev server has no marketing build, so /
+      // would render the empty shell (blank navy page). Redirect to /app.
+      name: 'dev-root-redirect',
+      apply: 'serve',
+      configureServer(server) {
+        server.middlewares.use((req, res, next) => {
+          if (req.url === '/' || req.url === '/index.html') {
+            res.statusCode = 302;
+            res.setHeader('Location', '/app');
+            res.end();
+            return;
+          }
+          next();
+        });
+      }
+    },
   ],
   server: {
     port: 5173,
