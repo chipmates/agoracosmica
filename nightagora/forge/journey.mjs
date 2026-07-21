@@ -89,9 +89,9 @@ try {
   await wheel(300, 6, 150)
   await page.waitForTimeout(1200)
   await shot('stone-gate-still-held')
-  const quiet = page.locator('#gate-quiet')
-  await quiet.waitFor({ state: 'visible', timeout: 5000 })
-  await quiet.click()
+  const enter = page.locator('#gate-enter')
+  await enter.waitFor({ state: 'visible', timeout: 5000 })
+  await enter.click()
   await page.waitForTimeout(400)
   await wheel(300, 5, 200)
   await page.waitForTimeout(1200)
@@ -117,33 +117,13 @@ try {
   await page.waitForTimeout(2500)
   await shot('sky')
 
-  // 4 · the wheel of the night: step forward two houses and back
-  // (one gesture per step; the wheel has a 0.8s cooldown)
-  await wheel(300, 2, 1100)
-  await page.waitForTimeout(2500)
-  await shot('sky-wheeled-forward')
-  // step back until the plate reads Philosophers again (the cooldown may
-  // swallow an event; a visitor would simply flick once more)
-  for (let i = 0; i < 8; i++) {
-    const name = await page.evaluate(
-      () => document.querySelector('#constellation-plate .plate-name')?.textContent ?? ''
-    )
-    if (/philosophers/i.test(name)) break
-    await wheel(-300, 1)
-    await page.waitForTimeout(1100)
-  }
-  await page.waitForTimeout(1600)
-  await shot('sky-wheeled-back')
-
-  // 5 · open Marcus's name -> his pane -> enter his night
-  const marcusChip = page.locator('.star-chip', { hasText: 'Marcus Aurelius' })
-  await marcusChip.waitFor({ state: 'visible', timeout: 8000 })
-  await marcusChip.click()
-  await page.waitForTimeout(900)
-  await shot('pane-marcus')
-  const enter = page.locator('.pane-enter')
-  await enter.waitFor({ state: 'visible', timeout: 4000 })
-  await enter.click()
+  // 4 · the first night rides the rail: scroll opens Marcus, scroll
+  // again enters his cosmos (zero taps, Michel's law)
+  await page.waitForTimeout(1200)
+  await wheel(300, 1)
+  await page.waitForTimeout(1400)
+  await shot('pane-auto')
+  await wheel(300, 1)
   const crossed = await waitPhase('crossing', 8000)
   if (crossed) {
     await shot('crossing')

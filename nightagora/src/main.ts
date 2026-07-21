@@ -130,6 +130,9 @@ function store(key: string, value: string): void {
 let gateAccepted = stored('na-gate') === '1'
 let skipAfterGate = false
 let firstNight = stored('na-first') !== '1'
+// the first ride is a rail: scroll alone opens Marcus and enters his
+// cosmos. Any deliberate browsing gesture hands the wheel back.
+let autoRide = firstNight
 
 // ---- the wheel of the night: plate, marks, chips, pane ----
 const roster = new Map(WANDERERS.map((w) => [w.slug, w]))
@@ -173,6 +176,7 @@ for (const s of atlas.stars) {
 }
 
 function stepChapter(dir: number): void {
+  autoRide = false // turning the wheel by hand is browsing
   chapter = (chapter + dir + CONSTELLATIONS.length) % CONSTELLATIONS.length
   chapterChangedAt = elapsed
   atlas.setChapter(chapter)
@@ -237,6 +241,9 @@ function openPane(slug: string): void {
 }
 
 function closePane(): void {
+  // a REAL close (pane open, in the sky) is a browsing gesture and the
+  // rail lets go; the cleanup calls from phase changes are not
+  if (paneOpen && phase === 'sky') autoRide = false
   paneOpen = false
   paneEl.hidden = true
   if (phase === 'sky') {
@@ -265,9 +272,9 @@ function skyDress(on: boolean): void {
   marksEl.classList.toggle('lit', on)
   chipsEl.hidden = !on
   if (on) {
-    // the first night is guided: the sky itself names the beginning
-    inviteEl.textContent = firstNight
-      ? 'Begin with Marcus Aurelius · open his name'
+    // the first night is a rail: the sky itself says so
+    inviteEl.textContent = autoRide
+      ? 'Scroll on · the first night begins with Marcus Aurelius'
       : 'Open any name to explore their life and ideas.'
   }
   if (!on) closePane()
@@ -483,13 +490,14 @@ document.getElementById('descent-skip')?.addEventListener('click', () => skipDes
 const gateBeat = descentBeats[0]
 if (gateAccepted) gateBeat?.classList.add('accepted')
 
-function acceptGate(withSound: boolean): void {
+function acceptGate(): void {
   if (gateAccepted) return
   gateAccepted = true
   store('na-gate', '1')
   gateBeat?.classList.add('accepted')
-  if (withSound) ambience.enable()
-  else ambience.disable()
+  // the music is part of the night by default; the Sound mark quiets it.
+  // A visitor who quieted it on an earlier night stays quieted.
+  if (ambience.remembered() !== 'off') ambience.enable()
   railEl.hidden = false
   syncSoundLabel()
   if (skipAfterGate) {
@@ -498,8 +506,7 @@ function acceptGate(withSound: boolean): void {
     desc = Math.max(desc, 0.93)
   }
 }
-document.getElementById('gate-sound')?.addEventListener('click', () => acceptGate(true))
-document.getElementById('gate-quiet')?.addEventListener('click', () => acceptGate(false))
+document.getElementById('gate-enter')?.addEventListener('click', () => acceptGate())
 
 // the impatient door on the totality screen: through the stone, then
 // straight down to the fire where Marcus keeps the watch
@@ -652,6 +659,7 @@ function beginCrossing(): void {
   if (!atlas.starWorld(OPEN_WORLD, crossingTo)) return
   if (firstNight) {
     firstNight = false
+    autoRide = false
     store('na-first', '1')
   }
   setPhase('crossing')
@@ -803,6 +811,7 @@ function setPhase(next: Phase): void {
   if (next === 'crossing') {
     setStatus('')
     verseEl.classList.remove('lit') // a fast chooser carries no verse across
+    verseShow('You enter a life through its light')
   }
   if (next === 'council') {
     setStatus('')
@@ -852,9 +861,22 @@ function push(delta: number): void {
   }
   // the wheel of the night: scroll or swipe steps the carousel, wrapping.
   // A short cooldown makes one gesture one step and keeps the look-up
-  // momentum from bleeding into the wheel.
-  if (phase === 'sky' && !paneOpen) {
+  // momentum from bleeding into the wheel. On the first night the same
+  // scroll rides the rail instead: open Marcus, then enter his cosmos.
+  if (phase === 'sky') {
     if (elapsed - chapterChangedAt < 0.8) return
+    if (autoRide && delta > 0) {
+      if (Math.sign(delta) !== Math.sign(skyAcc)) skyAcc = 0
+      skyAcc += delta
+      if (Math.abs(skyAcc) > 150) {
+        skyAcc = 0
+        chapterChangedAt = elapsed // one breath between rail steps
+        if (!paneOpen) openPane(OPEN_WORLD)
+        else beginCrossing()
+      }
+      return
+    }
+    if (paneOpen) return
     if (Math.sign(delta) !== Math.sign(skyAcc)) skyAcc = 0
     skyAcc += delta
     if (Math.abs(skyAcc) > 150) {
@@ -881,7 +903,7 @@ addEventListener('keydown', (e) => {
   }
   if (e.key === 'Enter' && phase === 'transit') transit = 1
   if (e.key === 'Enter' && phase === 'descent') {
-    if (!gateAccepted && desc > GATE_HOLD - 0.05) acceptGate(false)
+    if (!gateAccepted && desc > GATE_HOLD - 0.05) acceptGate()
     else skipDescent()
   }
 })
