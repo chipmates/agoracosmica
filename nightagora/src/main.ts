@@ -267,6 +267,7 @@ function frame(now: number): void {
     transit,
     door,
     skyBirth,
+    lanterns: phase === 'sky' ? 1 : phase === 'agora' ? 0.55 : 0.3,
     sinceFlash: flashAt < 0 ? -1 : elapsed - flashAt,
     elapsed,
   }

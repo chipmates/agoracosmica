@@ -50,6 +50,8 @@ export interface EclipseState {
   transit: number
   door: number
   skyBirth: number
+  /** 0..1 how present the thirty lanterns are (whispers at the eclipse, full in the sky) */
+  lanterns: number
   sinceFlash: number
   elapsed: number
 }
@@ -196,9 +198,12 @@ export function createEclipse(scene: Scene) {
 
   const wandererBase: Array<[number, number, number]> = []
   const wandererMat = new SpriteMaterial({
+    // a distant lantern: hard bright core, quick falloff, faint breath
     map: glowTexture([
-      [0, 'rgba(255, 246, 220, 1)'],
-      [0.25, 'rgba(224, 185, 106, 0.55)'],
+      [0, 'rgba(255, 250, 232, 1)'],
+      [0.09, 'rgba(246, 223, 174, 0.8)'],
+      [0.22, 'rgba(224, 185, 106, 0.22)'],
+      [0.55, 'rgba(224, 185, 106, 0.05)'],
       [1, 'rgba(0, 0, 0, 0)'],
     ]),
     color: GOLD,
@@ -229,7 +234,7 @@ export function createEclipse(scene: Scene) {
     wandererBase.push(p)
     const s = new Sprite(wandererMat)
     s.position.set(p[0], p[1], p[2])
-    s.scale.setScalar(2.6)
+    s.scale.setScalar(1.4)
     wanderers.add(s)
   }
   scene.add(wanderers)
@@ -255,7 +260,7 @@ export function createEclipse(scene: Scene) {
 
     dimStars.mat.opacity = 0.7 * s.skyBirth
     brightStars.mat.opacity = s.skyBirth
-    wandererMat.opacity = s.skyBirth
+    wandererMat.opacity = s.skyBirth * s.lanterns
     dimStars.points.rotation.y = s.elapsed * 0.003
     brightStars.points.rotation.y = s.elapsed * 0.004
     wanderers.rotation.y = s.elapsed * 0.011
