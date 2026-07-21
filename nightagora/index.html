@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#04060d" />
+  <title>Agora Cosmica · Night Agora</title>
+  <meta name="description" content="A living library you can talk to. Thirty remarkable people from history, kept as Echoes under one night sky." />
+  <style>
+    :root {
+      --na-abyss: #04060d;
+      --na-lapis: #0a1128;
+      --na-horizon: #182350;
+      --na-gold: #e0b96a;
+      --na-gold-deep: #b8863b;
+      --na-starlight: #f3efe2;
+      --na-mist: #8d93ad;
+      --serif: Georgia, 'Times New Roman', serif;
+      --sans: system-ui, -apple-system, 'Segoe UI', sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; overscroll-behavior: none; }
+    body {
+      background: var(--na-abyss);
+      color: var(--na-starlight);
+      font-family: var(--serif);
+      overflow: hidden;
+    }
+    #stage { position: fixed; inset: 0; }
+    #stage canvas { display: block; width: 100%; height: 100%; }
+
+    #veil {
+      position: fixed; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: flex-end;
+      text-align: center;
+      padding: 0 24px calc(64px + env(safe-area-inset-bottom));
+      pointer-events: none;
+      z-index: 2;
+    }
+    .brand {
+      position: fixed; top: calc(28px + env(safe-area-inset-top)); left: 0; right: 0;
+      font-family: var(--sans);
+      font-size: 11px; letter-spacing: 0.42em; text-indent: 0.42em;
+      text-transform: uppercase; color: var(--na-mist);
+    }
+    h1 {
+      font-weight: 400; font-size: clamp(26px, 4.2vw, 44px);
+      letter-spacing: 0.02em; color: var(--na-starlight);
+      text-wrap: balance;
+    }
+    .tagline {
+      margin-top: 14px;
+      font-family: var(--sans);
+      font-size: 11px; letter-spacing: 0.34em; text-indent: 0.34em;
+      text-transform: uppercase; color: var(--na-gold);
+    }
+    .status {
+      margin-top: 42px;
+      font-family: var(--sans);
+      font-size: 10px; letter-spacing: 0.3em; text-indent: 0.3em;
+      text-transform: uppercase; color: var(--na-mist);
+      min-height: 14px;
+      transition: opacity 1.2s ease;
+    }
+    body[data-phase='held'] .status { animation: breathe 3.4s ease-in-out infinite; animation-play-state: running; }
+    @keyframes breathe { 0%, 100% { opacity: 0.85; } 50% { opacity: 0.3; } }
+
+    .copy { transition: opacity 1.6s ease; }
+    body[data-phase='door'] .copy { opacity: 0; }
+    body[data-phase='sky'] .copy { opacity: 0; }
+    body[data-phase='sky'] .status { opacity: 0.9; }
+
+    @media (prefers-reduced-motion: reduce) {
+      body[data-phase='held'] .status { animation: none; }
+      .copy, .status { transition: none; }
+    }
+  </style>
+</head>
+<body data-phase="transit">
+  <div id="stage" aria-hidden="true"></div>
+  <div id="veil">
+    <p class="brand">Agora Cosmica</p>
+    <div class="copy">
+      <h1>A Living Library You Can Talk To</h1>
+      <p class="tagline">Thirty Remarkable People · One Night Sky</p>
+    </div>
+    <p class="status" id="status" role="status">First light</p>
+  </div>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
