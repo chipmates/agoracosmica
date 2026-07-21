@@ -1311,7 +1311,12 @@ function frame(now: number): void {
     if (reducedMotion) lookUp = lookTarget
     camera.rotation.x = -0.12 + lookUp * 0.78
     camera.rotation.y += (0 - camera.rotation.y) * Math.min(1, dt * 2.2)
-    if (lookUp > 0.93) setPhase('sky')
+    // the sky opens only while the gaze is RISING toward it: on the
+    // way home lookUp starts at 1 and one 60fps easing step still
+    // sits above the threshold — without the target guard the return
+    // bounced straight back into the sky (frame-rate dependent; the
+    // slow headless eye never saw it)
+    if (lookTarget > 0.9 && lookUp > 0.93) setPhase('sky')
     if (agoraEnteredAt >= 0 && elapsed - agoraEnteredAt > 0.5) keeperEl.hidden = false
   } else if (phase === 'camp') {
     // the hearth opens once the arrival sentence has had its say —
