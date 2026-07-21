@@ -304,6 +304,185 @@
       width: 1px; height: 40px;
       background: color-mix(in srgb, var(--na-gold) 65%, transparent);
     }
+    /* ---- the stone gate: disclosure, the one declarative act, and the
+       sound choice, all in one gesture ---- */
+    .gate-block { margin-top: 30px; }
+    .gate-beat.accepted .gate-block { display: none; }
+    .gate-declare {
+      font-family: var(--sans);
+      font-size: 10px; letter-spacing: 0.24em; text-indent: 0.24em;
+      text-transform: uppercase; color: var(--na-mist);
+    }
+    .gate-declare a { color: var(--na-gold); text-decoration: none; border-bottom: 1px solid color-mix(in srgb, var(--na-gold) 45%, transparent); pointer-events: auto; }
+    .gate-actions {
+      margin-top: 20px;
+      display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
+    }
+    .gate-actions button {
+      background: none; cursor: pointer;
+      border: 1px solid color-mix(in srgb, var(--na-gold) 45%, transparent);
+      min-height: 44px; padding: 12px 24px;
+      font-family: var(--sans);
+      font-size: 10px; letter-spacing: 0.3em; text-indent: 0.3em;
+      text-transform: uppercase; color: var(--na-gold);
+      pointer-events: auto;
+      transition: border-color 0.3s ease, color 0.3s ease;
+    }
+    .gate-actions button:hover, .gate-actions button:focus-visible { border-color: var(--na-gold); color: var(--na-starlight); outline: none; }
+    .gate-links {
+      margin-top: 18px;
+      font-family: var(--sans);
+      font-size: 9px; letter-spacing: 0.28em;
+      text-transform: uppercase;
+    }
+    .gate-links a { color: var(--na-mist); text-decoration: none; pointer-events: auto; }
+    .gate-links a:hover { color: var(--na-gold); }
+
+    /* ---- the instrument rail: the plain-faced layer, two quiet marks ---- */
+    #rail { position: fixed; inset: 0; z-index: 4; pointer-events: none; }
+    #rail[hidden] { display: none; }
+    #rail button {
+      position: fixed; bottom: calc(22px + env(safe-area-inset-bottom));
+      background: none; border: none; cursor: pointer;
+      min-height: 44px; padding: 10px 14px;
+      font-family: var(--sans);
+      font-size: 9px; letter-spacing: 0.3em; text-indent: 0.3em;
+      text-transform: uppercase; color: var(--na-mist);
+      pointer-events: auto;
+      transition: color 0.3s ease;
+    }
+    #rail button:hover, #rail button:focus-visible { color: var(--na-gold); outline: none; }
+    #rail-sound { left: max(14px, env(safe-area-inset-left)); }
+    #rail-instruments { right: max(14px, env(safe-area-inset-right)); }
+    #instruments {
+      position: fixed; right: max(18px, env(safe-area-inset-right));
+      bottom: calc(70px + env(safe-area-inset-bottom));
+      z-index: 6; min-width: 230px;
+      padding: 22px 26px;
+      background: color-mix(in srgb, var(--na-abyss) 88%, transparent);
+      border: 1px solid color-mix(in srgb, var(--na-gold) 35%, transparent);
+      backdrop-filter: blur(6px);
+    }
+    #instruments[hidden] { display: none; }
+    .inst-kicker {
+      font-family: var(--sans);
+      font-size: 9px; letter-spacing: 0.32em; text-indent: 0.32em;
+      text-transform: uppercase; color: var(--na-gold);
+      margin-bottom: 14px;
+    }
+    .inst-links { display: flex; flex-direction: column; }
+    .inst-links a {
+      font-family: var(--sans);
+      font-size: 10px; letter-spacing: 0.26em; text-indent: 0.26em;
+      text-transform: uppercase; color: var(--na-starlight);
+      text-decoration: none; padding: 11px 0;
+      transition: color 0.3s ease;
+    }
+    .inst-links a:hover, .inst-links a:focus-visible { color: var(--na-gold); outline: none; }
+    .inst-close {
+      margin-top: 12px;
+      background: none; border: none; cursor: pointer;
+      min-height: 44px; padding: 8px 0;
+      font-family: var(--sans);
+      font-size: 9px; letter-spacing: 0.3em; text-indent: 0.3em;
+      text-transform: uppercase; color: var(--na-mist);
+    }
+    .inst-close:hover, .inst-close:focus-visible { color: var(--na-gold); outline: none; }
+
+    /* ---- the Forward Door: the eclipse mark as a doorway, a hairline
+       of dawn, and the way into the Agora ---- */
+    #forward-door {
+      position: fixed; inset: 0; z-index: 5;
+      display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+      text-align: center; padding: 24px 24px calc(9vh + env(safe-area-inset-bottom));
+      opacity: 0; transition: opacity 2.2s ease;
+      pointer-events: none;
+    }
+    #forward-door.lit { opacity: 1; pointer-events: auto; }
+    #forward-door[hidden] { display: none; }
+    .door-dawn {
+      position: absolute; left: 0; right: 0; bottom: 0; height: 38%;
+      background: linear-gradient(to top, color-mix(in srgb, var(--na-horizon) 65%, transparent) 0%, transparent 100%);
+      pointer-events: none;
+    }
+    .door-mark {
+      position: relative; width: 84px; height: 84px;
+      border: 1px solid color-mix(in srgb, var(--na-gold) 70%, transparent);
+      border-radius: 50%;
+      box-shadow: 0 0 46px color-mix(in srgb, var(--na-gold) 18%, transparent);
+    }
+    .door-bead {
+      position: absolute; top: 4px; right: 14px;
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--na-starlight);
+      box-shadow: 0 0 14px var(--na-starlight);
+    }
+    .door-kicker {
+      margin-top: 34px;
+      font-family: var(--sans);
+      font-size: 10px; letter-spacing: 0.34em; text-indent: 0.34em;
+      text-transform: uppercase; color: var(--na-gold);
+    }
+    .door-title {
+      margin-top: 12px;
+      font-family: var(--serif);
+      font-size: clamp(24px, 3.2vw, 34px);
+      color: var(--na-starlight);
+    }
+    .door-trust {
+      margin-top: 14px;
+      font-family: var(--sans);
+      font-size: 9px; letter-spacing: 0.28em; text-indent: 0.28em;
+      text-transform: uppercase; color: var(--na-mist);
+    }
+    .door-actions {
+      margin-top: 30px;
+      display: flex; gap: 18px; align-items: center; flex-wrap: wrap; justify-content: center;
+    }
+    .door-enter {
+      display: inline-block;
+      border: 1px solid color-mix(in srgb, var(--na-gold) 45%, transparent);
+      min-height: 44px; padding: 13px 28px;
+      font-family: var(--sans);
+      font-size: 10px; letter-spacing: 0.3em; text-indent: 0.3em;
+      text-transform: uppercase; color: var(--na-gold);
+      text-decoration: none;
+      transition: border-color 0.3s ease, color 0.3s ease;
+    }
+    .door-enter:hover, .door-enter:focus-visible { border-color: var(--na-gold); color: var(--na-starlight); outline: none; }
+    .door-stay {
+      background: none; border: none; cursor: pointer;
+      min-height: 44px; padding: 10px 14px;
+      font-family: var(--sans);
+      font-size: 9px; letter-spacing: 0.3em; text-indent: 0.3em;
+      text-transform: uppercase; color: var(--na-mist);
+      transition: color 0.3s ease;
+    }
+    .door-stay:hover, .door-stay:focus-visible { color: var(--na-gold); outline: none; }
+    body.forge #forward-door, body.forge #rail button { transition: none !important; }
+
+    /* the impatient door: visible only while totality holds */
+    #overture-skip {
+      display: none;
+      margin: 14px auto 0;
+      background: none; border: none; cursor: pointer;
+      min-height: 44px; padding: 8px 16px;
+      font-family: var(--sans);
+      font-size: 9px; letter-spacing: 0.3em; text-indent: 0.3em;
+      text-transform: uppercase; color: var(--na-gold);
+      opacity: 0.85; transition: opacity 0.3s ease, color 0.3s ease;
+      pointer-events: auto;
+    }
+    body[data-phase='held'] #overture-skip { display: block; }
+    #overture-skip:hover, #overture-skip:focus-visible { opacity: 1; color: var(--na-starlight); outline: none; }
+
+    /* the beckoning star: the first night points to Marcus, three breaths */
+    .star-chip.beckon { animation: beckon 2.6s ease-in-out 3; }
+    @keyframes beckon {
+      0%, 100% { text-shadow: 0 1px 10px rgba(4, 6, 13, 0.9); color: var(--na-starlight); }
+      50% { text-shadow: 0 0 18px color-mix(in srgb, var(--na-gold) 80%, transparent); color: var(--na-gold); }
+    }
+
     #descent-skip {
       position: fixed; left: 50%; transform: translateX(-50%);
       bottom: calc(30px + env(safe-area-inset-bottom));
@@ -695,6 +874,7 @@
       opacity: 0; transition: opacity 1.4s ease;
       pointer-events: none;
     }
+    .keeper-form[hidden] { display: none !important; }
     #keeper.open .keeper-offers, #keeper.open .keeper-form { opacity: 1; pointer-events: auto; }
     #keeper.answering .keeper-offers, #keeper.answering .keeper-form { opacity: 0; pointer-events: none; }
     .keeper-ask-label {
@@ -747,12 +927,26 @@
       <p class="tagline">Thirty Remarkable People · One Night Sky</p>
     </div>
     <p class="status" id="status" role="status">First light</p>
+    <button id="overture-skip" type="button">Skip the overture · begin at the fire</button>
   </div>
   <div id="stone">
     <p class="stone-text">Here speak the Echoes: interpretations built from what the dead left behind.</p>
     <p class="stone-strong">Not recordings. Not the dead themselves.</p>
   </div>
   <div id="descent" hidden>
+    <div class="descent-beat gate-beat">
+      <span class="rule" aria-hidden="true"></span>
+      <p class="descent-stone">Here speak the Echoes: interpretations built from what the dead left behind.</p>
+      <p class="descent-stone strong">Not recordings. Not the dead themselves.</p>
+      <div class="gate-block">
+        <p class="gate-declare">I am 16 or older and I agree to the <a href="https://agoracosmica.org/terms" target="_blank" rel="noopener">Terms</a>.</p>
+        <div class="gate-actions">
+          <button id="gate-sound" type="button">Enter with sound</button>
+          <button id="gate-quiet" type="button">Enter quietly</button>
+        </div>
+        <p class="gate-links"><a href="https://agoracosmica.org/privacy" target="_blank" rel="noopener">Privacy</a></p>
+      </div>
+    </div>
     <div class="descent-beat">
       <p class="descent-kicker">The Descent</p>
       <p class="descent-ask">Eight questions, older than every voice below.</p>
@@ -818,6 +1012,32 @@
         <p class="pane-drawn" hidden>This world is still being drawn</p>
         <div class="pane-siblings"></div>
       </div>
+    </div>
+  </div>
+  <div id="rail" hidden>
+    <button id="rail-sound" type="button" aria-pressed="false">Sound · Off</button>
+    <button id="rail-instruments" type="button" aria-haspopup="true" aria-expanded="false">Instruments</button>
+  </div>
+  <div id="instruments" hidden>
+    <p class="inst-kicker">The Instruments</p>
+    <nav class="inst-links">
+      <a href="https://agoracosmica.org/app?lang=en">Open Agora Cosmica</a>
+      <a href="https://agoracosmica.org/app?lang=en">The Councils</a>
+      <a href="https://open.spotify.com/show/3V02q5c8NAnFD1W2kQBYzd" target="_blank" rel="noopener">The Podcast</a>
+      <a href="https://agoracosmica.org/terms" target="_blank" rel="noopener">Terms</a>
+      <a href="https://agoracosmica.org/privacy" target="_blank" rel="noopener">Privacy</a>
+    </nav>
+    <button class="inst-close" type="button">Close</button>
+  </div>
+  <div id="forward-door" hidden>
+    <div class="door-dawn" aria-hidden="true"></div>
+    <div class="door-mark" aria-hidden="true"><span class="door-bead"></span></div>
+    <p class="door-kicker">The night holds thirty worlds</p>
+    <p class="door-title">Walk into the Agora</p>
+    <p class="door-trust">Nonprofit · Open Source · No tracking cookies, no profiling</p>
+    <div class="door-actions">
+      <a class="door-enter" href="https://agoracosmica.org/app?lang=en">Start Exploring</a>
+      <button class="door-stay" type="button">Stay by the fire</button>
     </div>
   </div>
   <div id="council-topic">

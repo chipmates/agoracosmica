@@ -7,7 +7,8 @@ import { createCamp } from './scenes/camp'
 import { createCouncil } from './scenes/council'
 import { createAtlas } from './scenes/atlas'
 import { createMandala } from './scenes/mandala'
-import { CAMP_SCRIPT } from './content/keeper-script'
+import { CAMP_SCRIPT, FIRE_SCRIPT } from './content/keeper-script'
+import { ambience } from './core/ambience'
 import { COUNCIL_DONE } from './content/council'
 import { WANDERERS } from './content/wanderers'
 import { CONSTELLATIONS, OPEN_WORLD } from './content/constellations'
@@ -57,7 +58,14 @@ camera.position.set(0, 0, 0)
 
 const eclipse = createEclipse(scene)
 const agora = createAgora(scene)
-const keeperScene = createKeeper(keeperEl, reducedMotion, () => returnFromCamp())
+const keeperScene = createKeeper(keeperEl, reducedMotion, () => keeperExit())
+
+/** The keeper's way onward depends on where he stands: at the hub he
+    lifts your gaze to the sky, at his hearth he walks you back. */
+function keeperExit(): void {
+  if (phase === 'camp') returnFromCamp()
+  else if (phase === 'agora') lookTarget = 1
+}
 const crossing = createCrossing(scene, () => setPhase('camp'))
 const camp = createCamp(scene)
 const council = createCouncil(scene, () => councilEnded())
@@ -66,6 +74,7 @@ const mandala = createMandala(scene)
 
 function councilEnded(): void {
   setStatus(COUNCIL_DONE)
+  showDoor(false)
 }
 
 // WebGL is the proven backend tonight; ?webgpu opts into the newer path
@@ -101,6 +110,26 @@ let chapterChangedAt = -99
 let paneOpen = false
 let skyAcc = 0
 let atlasReveal = 0
+
+// ---- the stone gate + the remembered night ----
+const GATE_HOLD = 0.13
+function stored(key: string): string | null {
+  try {
+    return localStorage.getItem(key)
+  } catch {
+    return null
+  }
+}
+function store(key: string, value: string): void {
+  try {
+    localStorage.setItem(key, value)
+  } catch {
+    /* private mode: the night still works, it just forgets */
+  }
+}
+let gateAccepted = stored('na-gate') === '1'
+let skipAfterGate = false
+let firstNight = stored('na-first') !== '1'
 
 // ---- the wheel of the night: plate, marks, chips, pane ----
 const roster = new Map(WANDERERS.map((w) => [w.slug, w]))
@@ -235,6 +264,12 @@ function skyDress(on: boolean): void {
   inviteEl.classList.toggle('lit', on)
   marksEl.classList.toggle('lit', on)
   chipsEl.hidden = !on
+  if (on) {
+    // the first night is guided: the sky itself names the beginning
+    inviteEl.textContent = firstNight
+      ? 'Begin with Marcus Aurelius · open his name'
+      : 'Open any name to explore their life and ideas.'
+  }
   if (!on) closePane()
 }
 
@@ -272,6 +307,9 @@ function syncChips(): void {
     // ridge stars carry their names above, valley stars below; edges
     // clamp inside the frame
     chip.el.style.visibility = 'visible'
+    // the first night: Marcus's name beckons, three quiet breaths
+    if (firstNight && chip.slug === OPEN_WORLD && !chip.el.classList.contains('beckon'))
+      chip.el.classList.add('beckon')
     const above = star.sprite.position.y >= 0
     const half = chip.el.offsetWidth / 2 || 40
     const x = Math.min(
@@ -335,15 +373,16 @@ const smooth = (a: number, b: number, k: number): number => {
 // questions drifting past on the way down. The Echo disclosure lives
 // where the figures speak (pane ink, keeper colophon, council cartouche).
 const DESCENT_STATIONS: Array<[number, number]> = [
-  [0.1, 0.24], // The Descent · eight questions (a title card in the black)
-  [0.3, 0.365], // Who am I?
-  [0.38, 0.445], // What binds us to each other?
-  [0.46, 0.525], // What makes a life worth living?
-  [0.54, 0.605], // Where do ideas come from?
-  [0.62, 0.685], // How should we live?
-  [0.7, 0.765], // What does it mean to be free?
-  [0.78, 0.845], // What lies beyond what we know?
-  [0.86, 0.925], // How do we carry what we have lost?
+  [0.06, 0.2], // the stone gate, carved in the black (holds at GATE_HOLD)
+  [0.24, 0.34], // The Descent · eight questions (over the emerging ring)
+  [0.38, 0.435], // Who am I?
+  [0.448, 0.503], // What binds us to each other?
+  [0.516, 0.571], // What makes a life worth living?
+  [0.584, 0.639], // Where do ideas come from?
+  [0.652, 0.707], // How should we live?
+  [0.72, 0.775], // What does it mean to be free?
+  [0.788, 0.843], // What lies beyond what we know?
+  [0.856, 0.911], // How do we carry what we have lost?
 ]
 
 /** The dolly, concept-01 law: every camera value is a pure channel of
@@ -416,9 +455,10 @@ function syncDescentBeats(k: number): void {
       beat.style.opacity = '0'
       continue
     }
-    // the title card holds nearly still; every question travels past
-    const travel = i === 0 ? 9 : 34 + (i % 3) * 9
-    const scale = i === 0 ? 1 : 1 + p * 0.045
+    // the stone and the title card hold nearly still; every question
+    // travels past
+    const travel = i <= 1 ? 9 : 34 + (i % 3) * 9
+    const scale = i <= 1 ? 1 : 1 + p * 0.045
     beat.style.opacity = String(Math.max(0, 1 - Math.pow(Math.abs(p), 1.6)))
     beat.style.transform = `translate3d(0, ${(-p * travel).toFixed(2)}vh, 0) scale(${scale.toFixed(3)})`
   }
@@ -426,10 +466,129 @@ function syncDescentBeats(k: number): void {
 
 function skipDescent(): void {
   if (phase !== 'descent') return
+  if (!gateAccepted) {
+    // the stone cannot be skipped: the skip carries you to it instead
+    descTarget = GATE_HOLD
+    skipAfterGate = true
+    return
+  }
   descTarget = 1
   desc = Math.max(desc, 0.93)
 }
 document.getElementById('descent-skip')?.addEventListener('click', () => skipDescent())
+
+// ---- the stone gate: one gesture carries the disclosure, the terms,
+// and the sound choice (legal basis: transparency memo 01, one-action
+// gate with declarative wording; storage per § 25 Abs. 2 Nr. 2 TDDDG) ----
+const gateBeat = descentBeats[0]
+if (gateAccepted) gateBeat?.classList.add('accepted')
+
+function acceptGate(withSound: boolean): void {
+  if (gateAccepted) return
+  gateAccepted = true
+  store('na-gate', '1')
+  gateBeat?.classList.add('accepted')
+  if (withSound) ambience.enable()
+  else ambience.disable()
+  railEl.hidden = false
+  syncSoundLabel()
+  if (skipAfterGate) {
+    skipAfterGate = false
+    descTarget = 1
+    desc = Math.max(desc, 0.93)
+  }
+}
+document.getElementById('gate-sound')?.addEventListener('click', () => acceptGate(true))
+document.getElementById('gate-quiet')?.addEventListener('click', () => acceptGate(false))
+
+// the impatient door on the totality screen: through the stone, then
+// straight down to the fire where Marcus keeps the watch
+document.getElementById('overture-skip')?.addEventListener('click', () => {
+  if (phase !== 'held' && phase !== 'transit') return
+  transit = 1
+  if (phase === 'held') setPhase('descent')
+  skipAfterGate = true
+  if (gateAccepted) {
+    descTarget = 1
+    desc = Math.max(desc, 0.93)
+    skipAfterGate = false
+  } else {
+    descTarget = GATE_HOLD
+  }
+})
+
+// ---- the instrument rail: the plain-faced layer over the poetry ----
+const railNode = document.getElementById('rail')
+const railSound = document.getElementById('rail-sound')
+const railInstruments = document.getElementById('rail-instruments')
+const instrumentsNode = document.getElementById('instruments')
+if (!railNode || !railSound || !railInstruments || !instrumentsNode) throw new Error('missing rail')
+const railEl: HTMLElement = railNode
+const instrumentsEl: HTMLElement = instrumentsNode
+
+function syncSoundLabel(): void {
+  railSound?.setAttribute('aria-pressed', ambience.on() ? 'true' : 'false')
+  if (railSound) railSound.textContent = ambience.on() ? 'Sound · On' : 'Sound · Off'
+}
+railSound?.addEventListener('click', () => {
+  if (ambience.on()) ambience.disable()
+  else ambience.enable()
+  syncSoundLabel()
+})
+railInstruments?.addEventListener('click', () => {
+  const open = instrumentsEl.hidden
+  instrumentsEl.hidden = !open
+  railInstruments.setAttribute('aria-expanded', open ? 'true' : 'false')
+})
+instrumentsEl.querySelector('.inst-close')?.addEventListener('click', () => {
+  instrumentsEl.hidden = true
+  railInstruments?.setAttribute('aria-expanded', 'false')
+})
+if (gateAccepted) railEl.hidden = false
+syncSoundLabel()
+
+// a returning night with sound remembered: the first gesture wakes it
+if (gateAccepted && ambience.remembered() === 'on') {
+  const wake = (): void => {
+    ambience.enable()
+    syncSoundLabel()
+    removeEventListener('pointerdown', wake)
+    removeEventListener('keydown', wake)
+  }
+  addEventListener('pointerdown', wake, { once: true })
+  addEventListener('keydown', wake, { once: true })
+}
+
+// the council voices hold the floor; the ambient bed steps back
+addEventListener('na-voice', (e) => {
+  ambience.duck(Boolean((e as CustomEvent).detail))
+})
+
+// ---- the Forward Door: after the council, the one door that faces
+// the morning ----
+const doorNode = document.getElementById('forward-door')
+const doorEl: HTMLElement = doorNode ?? document.createElement('div')
+
+function showDoor(instant: boolean): void {
+  // the council's letterpress yields the frame to the way onward
+  document.getElementById('council-topic')?.classList.remove('lit')
+  const names = document.getElementById('council-names')
+  if (names) names.hidden = true
+  const cartouche = document.getElementById('cartouche')
+  if (cartouche) cartouche.hidden = true
+  doorEl.hidden = false
+  if (instant) doorEl.classList.add('lit')
+  else requestAnimationFrame(() => requestAnimationFrame(() => doorEl.classList.add('lit')))
+}
+function hideDoor(): void {
+  doorEl.classList.remove('lit')
+  doorEl.hidden = true
+}
+doorEl.querySelector('.door-stay')?.addEventListener('click', () => {
+  hideDoor()
+  council.stop()
+  setPhase('agora')
+})
 
 // each poem line appears once, at its appointed threshold
 const spokenVerses = new Set<string>()
@@ -459,6 +618,7 @@ declare global {
           camp?: 'trace' | 'hearth'
           chapter?: number
           figure?: string
+          coda?: number
         }
       ) => void
       freeze: (t: number) => void
@@ -490,6 +650,10 @@ function syncTrace(): void {
 const crossingTo = new Vector3()
 function beginCrossing(): void {
   if (!atlas.starWorld(OPEN_WORLD, crossingTo)) return
+  if (firstNight) {
+    firstNight = false
+    store('na-first', '1')
+  }
   setPhase('crossing')
   crossing.begin(crossingTo.clone())
 }
@@ -572,7 +736,9 @@ window.__forge = {
       camera.rotation.set(-0.12, 0, 0)
       verseEl.classList.remove('lit')
       council.forgeStage(camera)
+      if (opts.coda) showDoor(true)
     }
+    railEl.hidden = p === 'transit' || p === 'held'
     if (p === 'camp') {
       campReveal = 1
       camera.rotation.set(-0.12, 0, 0)
@@ -619,9 +785,12 @@ function setPhase(next: Phase): void {
     agoraEnteredAt = elapsed
     lookTarget = 0
     lookUp = 0
+    keeperScene.setScript(FIRE_SCRIPT)
+    keeperEl.hidden = true
     setStatus('The night agora · scroll to look up')
     verseShow('Questions shine within you')
   }
+  if (next !== 'council') hideDoor()
   if (next === 'sky') {
     setStatus('')
     chapterChangedAt = elapsed
@@ -668,9 +837,11 @@ function push(delta: number): void {
   if (phase === 'held' && delta > 0) setPhase('descent')
   if (phase === 'descent') {
     // the gate blooms in about two flicks; the dive breathes one
-    // question per flick. The whole travel scrubs both ways.
+    // question per flick. The whole travel scrubs both ways, but the
+    // stone holds until its one gesture is given.
     const rate = desc < GATE_END ? 0.0005 : 0.00042
     descTarget = Math.min(1, Math.max(0, descTarget + delta * rate))
+    if (!gateAccepted) descTarget = Math.min(descTarget, GATE_HOLD)
     if (descTarget <= 0 && desc < 0.02 && delta < 0) setPhase('held')
   }
   if (phase === 'agora') {
@@ -709,7 +880,10 @@ addEventListener('keydown', (e) => {
     if (e.key === 'ArrowLeft') stepChapter(-1)
   }
   if (e.key === 'Enter' && phase === 'transit') transit = 1
-  if (e.key === 'Enter' && phase === 'descent') skipDescent()
+  if (e.key === 'Enter' && phase === 'descent') {
+    if (!gateAccepted && desc > GATE_HOLD - 0.05) acceptGate(false)
+    else skipDescent()
+  }
 })
 let touchY: number | null = null
 let touchX: number | null = null
@@ -770,7 +944,7 @@ function frame(now: number): void {
   if (phase === 'descent') {
     descentCamera(desc)
     syncDescentBeats(desc)
-    if (desc > 0.31) verseShow('Voices awaken across Time')
+    if (desc > 0.36) verseShow('Voices awaken across Time')
     if (desc > 0.993) {
       camera.position.y = 0
       setPhase('agora')
@@ -885,6 +1059,7 @@ function frame(now: number): void {
     council.update(dt, elapsed, camera)
   }
   keeperScene.update(dt)
+  ambience.update(dt)
   agora.update({ reveal: agoraReveal, elapsed, speak: keeperScene.speak(), blaze: council.blaze() })
 
   renderer.render(scene, camera)

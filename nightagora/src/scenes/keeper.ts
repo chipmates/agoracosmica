@@ -8,7 +8,7 @@
    listen. Verbs universal, staging sovereign. */
 
 import {
-  AGORA_SCRIPT,
+  FIRE_SCRIPT,
   CARRIED_QUESTION_KEY,
   COLOPHON,
   type KeeperScript,
@@ -39,7 +39,7 @@ export function createKeeper(
   reducedMotion: boolean,
   onExit?: () => void
 ): KeeperHandles {
-  let script: KeeperScript = AGORA_SCRIPT
+  let script: KeeperScript = FIRE_SCRIPT
 
   // ---- build the chrome once ----
   host.textContent = ''
@@ -117,6 +117,9 @@ export function createKeeper(
 
   function setScript(next: KeeperScript): void {
     script = next
+    // a keeper with nothing offered also takes no written questions:
+    // the hub points the way, the hearth holds the conversation
+    form.hidden = next.offered.length === 0
     name.textContent = script.name
     greeting.textContent = script.greeting
     greeting.classList.remove('lit')
@@ -228,6 +231,7 @@ export function createKeeper(
     if (mode === 'greeting') {
       host.classList.add('open')
       mode = 'open'
+      if (script.exitImmediate && script.exit) exitBtn.hidden = false
       return
     }
 
@@ -251,6 +255,7 @@ export function createKeeper(
     greeting.classList.add('lit')
     mode = 'open'
     sp = 0
+    if (script.exitImmediate && script.exit) exitBtn.hidden = false
     if (stage >= 2) {
       const first = script.offered[0]
       if (!first) return
@@ -273,6 +278,6 @@ export function createKeeper(
     }
   }
 
-  setScript(AGORA_SCRIPT)
+  setScript(FIRE_SCRIPT)
   return { update, speak, setScript, forgeStage }
 }

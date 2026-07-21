@@ -111,7 +111,12 @@ export function createCouncil(scene: Scene, onEnded: () => void): CouncilHandles
   const audio = new Audio(AUDIO_COUNCIL)
   audio.preload = 'auto'
   let endedFired = false
+  /** the ambient bed listens and ducks while the voices hold the floor */
+  function announceVoice(playing: boolean): void {
+    window.dispatchEvent(new CustomEvent('na-voice', { detail: playing }))
+  }
   audio.addEventListener('ended', () => {
+    announceVoice(false)
     if (endedFired) return
     endedFired = true
     onEnded()
@@ -123,6 +128,7 @@ export function createCouncil(scene: Scene, onEnded: () => void): CouncilHandles
     if (!running) return
     if (audio.paused) void audio.play().catch(() => undefined)
     else audio.pause()
+    announceVoice(!audio.paused)
     setToggleLabel()
   })
 
@@ -170,6 +176,7 @@ export function createCouncil(scene: Scene, onEnded: () => void): CouncilHandles
     running = false
     root.visible = false
     audio.pause()
+    announceVoice(false)
     audio.currentTime = 0
     window.clearTimeout(topicTimer)
     topicEl.classList.remove('lit')

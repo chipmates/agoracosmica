@@ -22,6 +22,9 @@ export interface KeeperScript {
   codaGold: string
   /** Optional way onward, shown after the coda as a quiet gold line. */
   exit?: string
+  /** Greeting-only staging: the exit shows as soon as the greeting has
+      landed (the hub keeper points the way, the hearth keeper talks). */
+  exitImmediate?: boolean
 }
 
 export const KEEPER_NAME = "Marcus Aurelius · Keeper of Tonight's Fire"
@@ -77,6 +80,19 @@ export const COLOPHON = 'An AI Echo · An interpretation, not a recording'
 export const CARRIED_QUESTION_KEY = 'na-carried-question'
 
 /** The agora sitting, assembled. */
+/** The hub keeper (guided first night, Michel 2026-07-20): one greeting,
+    one invitation. The full exchange lives at his hearth in his world. */
+export const FIRE_SCRIPT: KeeperScript = {
+  name: KEEPER_NAME,
+  greeting: GREETING,
+  offered: [],
+  typedReply: TYPED_REPLY,
+  codaText: '',
+  codaGold: '',
+  exit: 'Look up · the thirty are chosen in the sky',
+  exitImmediate: true,
+}
+
 export const AGORA_SCRIPT: KeeperScript = {
   name: KEEPER_NAME,
   greeting: GREETING,

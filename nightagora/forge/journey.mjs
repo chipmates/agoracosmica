@@ -78,9 +78,21 @@ try {
   await waitPhase('held')
   await shot('held')
 
-  // 2 · the descent: through the ring, the questions, down to the fire
+  // 2 · the descent: through the ring, the stone gate, the questions,
+  // down to the fire
   await wheel(300, 2)
   if (!(await waitPhase('descent', 8000))) process.exit(1)
+  await wheel(300, 6, 200)
+  await page.waitForTimeout(1600)
+  await shot('stone-gate-held')
+  // the stone must HOLD against further scrolling until accepted
+  await wheel(300, 6, 150)
+  await page.waitForTimeout(1200)
+  await shot('stone-gate-still-held')
+  const quiet = page.locator('#gate-quiet')
+  await quiet.waitFor({ state: 'visible', timeout: 5000 })
+  await quiet.click()
+  await page.waitForTimeout(400)
   await wheel(300, 5, 200)
   await page.waitForTimeout(1200)
   await shot('descent-early')
