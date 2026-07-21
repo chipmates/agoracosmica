@@ -399,7 +399,9 @@ const OptimizedImage: FC<OptimizedImageProps> = ({
           alt={alt}
           loading={loading || (priority ? "eager" : "lazy")}
           decoding={decoding || "async"}
-          fetchPriority={fetchPriority || (priority ? "high" : "auto")}
+          // React 18 only forwards the all-lowercase DOM attribute; camelCase
+          // fetchPriority reaches the element unrecognized and logs a warning
+          {...{ fetchpriority: fetchPriority || (priority ? "high" : "auto") }}
           width={imageData.width}
           height={imageData.height}
           className={imageClasses}
