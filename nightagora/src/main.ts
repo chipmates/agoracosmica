@@ -1,13 +1,16 @@
 import { PerspectiveCamera, Scene, Vector3, WebGPURenderer } from 'three/webgpu'
 import { createEclipse, type EclipseState } from './scenes/eclipse'
+import { createAgora } from './scenes/agora'
 import { WANDERERS } from './content/wanderers'
 
-type Phase = 'transit' | 'held' | 'door' | 'sky'
+type Phase = 'transit' | 'held' | 'door' | 'agora' | 'sky'
 
 const stage = document.getElementById('stage')
 const status = document.getElementById('status')
 const card = document.getElementById('atlas-card')
-if (!stage || !status || !card) throw new Error('missing shell')
+const keeper = document.getElementById('keeper')
+if (!stage || !status || !card || !keeper) throw new Error('missing shell')
+const keeperEl: HTMLElement = keeper
 const cardName = card.querySelector('.card-name')
 const cardYears = card.querySelector('.card-years')
 const cardEpithet = card.querySelector('.card-epithet')
@@ -19,6 +22,7 @@ const camera = new PerspectiveCamera(46, innerWidth / innerHeight, 0.1, 200)
 camera.position.set(0, 0, 0)
 
 const eclipse = createEclipse(scene)
+const agora = createAgora(scene)
 
 // WebGL is the proven backend tonight; ?webgpu opts into the newer path
 // until it is verified on real hardware (see FORGE-STATE DEEPEN list).
@@ -36,6 +40,10 @@ let skyBirth = 0
 let flashAt = -1
 let elapsed = 0
 let frozen = false
+let agoraReveal = 0
+let lookUp = 0
+let lookTarget = 0
+let agoraEnteredAt = -1
 
 // forge hook: lets the screenshot rig drive deterministic states
 declare global {
@@ -117,9 +125,17 @@ window.__forge = {
   jump(p, opts = {}) {
     setPhase(p)
     transit = opts.transit ?? (p === 'transit' ? 0.5 : 1)
-    door = doorTarget = opts.door ?? (p === 'door' ? 0.5 : p === 'sky' ? 1 : 0)
+    door = doorTarget = opts.door ?? (p === 'door' ? 0.5 : p === 'agora' || p === 'sky' ? 1 : 0)
     skyBirth = opts.skyBirth ?? (p === 'transit' ? 0 : p === 'held' ? 0.75 : 1)
     flashAt = elapsed - (opts.sinceFlash ?? 999)
+    agoraReveal = p === 'agora' || p === 'sky' ? 1 : 0
+    lookUp = lookTarget = p === 'sky' ? 1 : 0
+    if (p === 'agora') {
+      agoraEnteredAt = elapsed - 2
+      camera.rotation.x = -0.12
+    }
+    if (p === 'sky') camera.rotation.x = 0.62
+    if (p !== 'agora' && p !== 'sky') camera.rotation.set(0, 0, 0)
   },
   freeze(t) {
     elapsed = t
@@ -153,7 +169,13 @@ function setPhase(next: Phase): void {
   document.body.dataset['phase'] = next
   if (next === 'held') setStatus('Scroll to enter')
   if (next === 'door') setStatus('')
-  if (next === 'sky') setStatus('Night Agora · the rest of the universe is still being drawn')
+  if (next === 'agora') {
+    agoraEnteredAt = elapsed
+    lookTarget = 0
+    lookUp = 0
+    setStatus('The night agora · scroll to look up')
+  }
+  if (next === 'sky') setStatus('The sky is the map · the gold lights are the thirty')
 }
 
 function setStatus(text: string): void {
@@ -166,6 +188,9 @@ function push(delta: number): void {
   if (phase === 'held' && delta > 0) setPhase('door')
   if (phase === 'door') {
     doorTarget = Math.min(1, Math.max(0, doorTarget + delta * 0.0012))
+  }
+  if (phase === 'agora') {
+    lookTarget = Math.min(1, Math.max(0, lookTarget + delta * 0.0009))
   }
 }
 
@@ -218,11 +243,24 @@ function frame(now: number): void {
   if (phase === 'door') {
     door += (doorTarget - door) * Math.min(1, dt * 4)
     if (reducedMotion) door = doorTarget
-    if (door > 0.985) setPhase('sky')
+    if (door > 0.985) setPhase('agora')
   }
 
-  // stars are born at totality and complete through the door
-  const birthTarget = phase === 'transit' ? 0 : phase === 'held' ? 0.75 : 1
+  const revealTarget = phase === 'agora' || phase === 'sky' ? 1 : 0
+  agoraReveal += (revealTarget - agoraReveal) * Math.min(1, dt * (reducedMotion ? 20 : 1.2))
+
+  if (phase === 'agora') {
+    lookUp += (lookTarget - lookUp) * Math.min(1, dt * 4)
+    if (reducedMotion) lookUp = lookTarget
+    camera.rotation.x = -0.12 + lookUp * 0.78
+    if (lookUp > 0.93) setPhase('sky')
+    if (agoraEnteredAt >= 0 && elapsed - agoraEnteredAt > 1.1) keeperEl.hidden = false
+  } else if (phase !== 'sky') {
+    keeperEl.hidden = true
+  }
+
+  // stars are born at totality; near the fire they yield to its light
+  const birthTarget = phase === 'transit' ? 0 : phase === 'held' ? 0.75 : phase === 'agora' ? 0.55 : 1
   skyBirth += (birthTarget - skyBirth) * Math.min(1, dt * (reducedMotion ? 20 : 0.9))
 
   const state: EclipseState = {
@@ -234,13 +272,15 @@ function frame(now: number): void {
   }
   eclipse.update(state)
 
-  // in the born sky, the camera drifts like a slow exhale
+  // in the born sky, the visitor gazes upward and the dome drifts
   if (phase === 'sky') {
+    keeperEl.hidden = true
     camera.rotation.y += dt * 0.008
-    camera.rotation.x = Math.sin(elapsed * 0.05) * 0.02
+    camera.rotation.x = 0.62 + Math.sin(elapsed * 0.05) * 0.02
     if (lockedIdx === null && pointerX >= 0) hoverIdx = nearestWanderer(pointerX, pointerY, 64)
   }
   syncCard()
+  agora.update({ reveal: agoraReveal, elapsed })
 
   renderer.render(scene, camera)
 }

@@ -68,8 +68,39 @@
 
     .copy { transition: opacity 1.6s ease; }
     body[data-phase='door'] .copy { opacity: 0; }
+    body[data-phase='agora'] .copy { opacity: 0; }
     body[data-phase='sky'] .copy { opacity: 0; }
     body[data-phase='sky'] .status { opacity: 0.9; }
+
+    #keeper {
+      position: fixed; left: 0; right: 0;
+      bottom: calc(120px + env(safe-area-inset-bottom));
+      z-index: 2;
+      text-align: center;
+      padding: 0 24px;
+      pointer-events: none;
+      transition: opacity 1.4s ease;
+    }
+    #keeper[hidden] { display: block; opacity: 0; visibility: hidden; }
+    .keeper-name {
+      font-family: var(--sans);
+      font-size: 11px; letter-spacing: 0.3em; text-indent: 0.3em;
+      text-transform: uppercase; color: var(--na-gold);
+    }
+    .keeper-line {
+      margin-top: 12px;
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: clamp(17px, 2.4vw, 22px);
+      color: var(--na-starlight);
+      text-wrap: balance;
+    }
+    .keeper-note {
+      margin-top: 12px;
+      font-family: var(--sans);
+      font-size: 9px; letter-spacing: 0.28em; text-indent: 0.28em;
+      text-transform: uppercase; color: var(--na-mist);
+    }
 
     @media (prefers-reduced-motion: reduce) {
       body[data-phase='held'] .status { animation: none; }
@@ -114,6 +145,11 @@
       <p class="tagline">Thirty Remarkable People · One Night Sky</p>
     </div>
     <p class="status" id="status" role="status">First light</p>
+  </div>
+  <div id="keeper" aria-live="polite" hidden>
+    <p class="keeper-name">Marcus Aurelius · Keeper of Tonight's Fire</p>
+    <p class="keeper-line">"I am not Marcus. I am an echo of what he left behind. Sit anyway."</p>
+    <p class="keeper-note">An AI Echo · An interpretation, not a recording · Conversation arrives in a coming rung</p>
   </div>
   <div id="atlas-card" aria-live="polite" hidden>
     <p class="card-name"></p>

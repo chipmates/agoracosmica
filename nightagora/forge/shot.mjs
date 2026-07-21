@@ -13,6 +13,7 @@ const STATES = [
   { name: 'flash', jump: ['held', { sinceFlash: 0.18 }] },
   { name: 'held', jump: ['held', {}] },
   { name: 'door', jump: ['door', { door: 0.55 }] },
+  { name: 'agora', jump: ['agora', {}] },
   { name: 'sky', jump: ['sky', {}] },
   { name: 'card', jump: ['sky', {}], focus: -1 },
 ]

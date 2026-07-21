@@ -214,10 +214,17 @@ export function createEclipse(scene: Scene) {
     const th = Math.acos(0.42 + 0.58 * rand())
     const ph = rand() * Math.PI * 2
     const rr = 40 + 12 * rand()
-    const p: [number, number, number] = [
+    const raw: [number, number, number] = [
       rr * Math.sin(th) * Math.cos(ph),
       rr * Math.sin(th) * Math.sin(ph) * 0.85,
       -rr * Math.cos(th),
+    ]
+    // tilt the gathering upward: in the sky phase the visitor gazes up
+    const tilt = 0.6
+    const p: [number, number, number] = [
+      raw[0],
+      raw[1] * Math.cos(tilt) - raw[2] * Math.sin(tilt),
+      raw[1] * Math.sin(tilt) + raw[2] * Math.cos(tilt),
     ]
     wandererBase.push(p)
     const s = new Sprite(wandererMat)
