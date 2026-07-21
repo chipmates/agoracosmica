@@ -563,7 +563,8 @@
   "chat": {
     "emptyState": "Wähle ein Thema, um das Gespräch zu beginnen.",
     "reviewMode": "Zusammenfassung",
-    "seeker": "Suchender"
+    "seeker": "Suchender",
+    "stopVoice": "Stimme stoppen"
   },
   "history": {
     "title": "Dialoge mit {figure}",

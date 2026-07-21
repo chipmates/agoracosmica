@@ -559,7 +559,8 @@
   "chat": {
     "emptyState": "Choose a topic to begin your conversation.",
     "reviewMode": "Summary",
-    "seeker": "Seeker"
+    "seeker": "Seeker",
+    "stopVoice": "Stop voice"
   },
   "history": {
     "title": "{figure}'s Dialogues",

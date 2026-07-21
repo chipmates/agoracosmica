@@ -6,8 +6,10 @@ import { sanitizeContent } from '../utils/sanitizeContent';
 import { getDisplayShortName } from '../utils/figureDisplayName';
 import { useTranslation } from '../hooks/useTranslation';
 import VoiceInteractionHelper from './VoiceInteractionHelper';
-import { Flag } from '@phosphor-icons/react';
+import { Flag, SpeakerSlash } from '@phosphor-icons/react';
 import { preferencesIndexedDbAdapter } from '../storage/preferencesIndexedDbAdapter';
+import { ttsScheduler } from '../controllers/conversationStreamDriver';
+import { cleanupAudioResources } from '../services/audioService';
 
 interface UserProfile {
   name: string | null;
@@ -38,6 +40,7 @@ const ChatBox: FC<ChatBoxProps> = ({
   selectedFigureName,
   isLoading = false,
   isReviewMode = false,
+  isAudioPlaying = false,
 }) => {
   const { tString, tNode } = useTranslation();
   const chatBoxRef = useRef<HTMLDivElement>(null);
@@ -335,6 +338,23 @@ const ChatBox: FC<ChatBoxProps> = ({
           ))}
       </div>
       
+      {/* Stop voice: visible while the Echo speaks. Cancels upstream TTS
+          generation BEFORE stopping playback, so a straggler chunk finishing
+          after the stop cannot re-take audio focus. */}
+      {isAudioPlaying && !isReviewMode && (
+        <button
+          type="button"
+          className="stop-voice-pill"
+          onClick={() => {
+            ttsScheduler.cancelAll();
+            cleanupAudioResources();
+          }}
+        >
+          <SpeakerSlash size={18} weight="bold" aria-hidden="true" />
+          <span>{tString('chat.stopVoice', 'Stop voice')}</span>
+        </button>
+      )}
+
       {/* Voice Interaction Helper - shows after first message */}
       <VoiceInteractionHelper
         isVisible={showVoiceHelper}

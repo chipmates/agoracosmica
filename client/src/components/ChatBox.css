@@ -803,3 +803,51 @@
 .message.council {
   position: relative;
 }
+/* ══════════════════════════════════════════════════════════════════════
+   Stop-voice pill: floats above the input while the Echo speaks.
+   Deliberately no backdrop-filter (the chat surface already carries
+   blur layers); a near-opaque card background reads the same.
+   ══════════════════════════════════════════════════════════════════════ */
+.stop-voice-pill {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: var(--z-base);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 18px;
+  border-radius: 22px;
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 40%, transparent);
+  background: color-mix(in srgb, var(--bg-primary) 92%, var(--gold-subtle));
+  color: var(--gold-subtle);
+  font-size: 0.9rem;
+  font-family: inherit;
+  cursor: pointer;
+  animation: stop-voice-rise 0.25s ease-out;
+}
+
+.stop-voice-pill:hover,
+.stop-voice-pill:focus-visible {
+  border-color: color-mix(in srgb, var(--gold-subtle) 70%, transparent);
+  color: var(--gold-hover);
+}
+
+@keyframes stop-voice-rise {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stop-voice-pill {
+    animation: none;
+  }
+}
