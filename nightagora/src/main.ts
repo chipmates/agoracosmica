@@ -10,12 +10,15 @@ if (!stage || !status) throw new Error('missing shell')
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
 const scene = new Scene()
-const camera = new PerspectiveCamera(50, innerWidth / innerHeight, 0.1, 200)
+const camera = new PerspectiveCamera(46, innerWidth / innerHeight, 0.1, 200)
 camera.position.set(0, 0, 0)
 
 const eclipse = createEclipse(scene)
 
-const renderer = new WebGPURenderer({ antialias: true })
+// WebGL is the proven backend tonight; ?webgpu opts into the newer path
+// until it is verified on real hardware (see FORGE-STATE DEEPEN list).
+const wantWebGPU = location.search.includes('webgpu') && 'gpu' in navigator
+const renderer = new WebGPURenderer({ antialias: true, forceWebGL: !wantWebGPU })
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2))
 renderer.setSize(innerWidth, innerHeight)
 stage.appendChild(renderer.domElement)
@@ -27,6 +30,30 @@ let doorTarget = 0
 let skyBirth = 0
 let flashAt = -1
 let elapsed = 0
+let frozen = false
+
+// forge hook: lets the screenshot rig drive deterministic states
+declare global {
+  interface Window {
+    __forge?: {
+      jump: (p: Phase, opts?: { door?: number; transit?: number; skyBirth?: number; sinceFlash?: number }) => void
+      freeze: (t: number) => void
+    }
+  }
+}
+window.__forge = {
+  jump(p, opts = {}) {
+    setPhase(p)
+    transit = opts.transit ?? (p === 'transit' ? 0.5 : 1)
+    door = doorTarget = opts.door ?? (p === 'door' ? 0.5 : p === 'sky' ? 1 : 0)
+    skyBirth = opts.skyBirth ?? (p === 'transit' ? 0 : p === 'held' ? 0.75 : 1)
+    flashAt = elapsed - (opts.sinceFlash ?? 999)
+  },
+  freeze(t) {
+    elapsed = t
+    frozen = true
+  },
+}
 
 const TRANSIT_SECONDS = 2.8
 
@@ -87,7 +114,7 @@ function frame(now: number): void {
   if (hidden) return
   const dt = Math.min((now - last) / 1000, 0.05)
   last = now
-  elapsed += dt
+  if (!frozen) elapsed += dt
 
   if (phase === 'transit') {
     transit = reducedMotion ? 1 : Math.min(1, transit + dt / TRANSIT_SECONDS)
@@ -104,7 +131,7 @@ function frame(now: number): void {
   }
 
   // stars are born at totality and complete through the door
-  const birthTarget = phase === 'transit' ? 0 : phase === 'held' ? 0.55 : 1
+  const birthTarget = phase === 'transit' ? 0 : phase === 'held' ? 0.75 : 1
   skyBirth += (birthTarget - skyBirth) * Math.min(1, dt * (reducedMotion ? 20 : 0.9))
 
   const state: EclipseState = {
@@ -126,11 +153,24 @@ function frame(now: number): void {
 }
 
 async function main(): Promise<void> {
-  await renderer.init()
+  try {
+    await renderer.init()
+  } catch (err) {
+    console.error('renderer init failed', err)
+    setStatus('This night needs a newer browser')
+    return
+  }
   setStatus('First light')
+  console.log(`[na] init ok, gpu=${'gpu' in navigator}, hidden=${document.hidden}`)
+  let logged = false
+  const origRender = frame
   requestAnimationFrame((t) => {
     last = t
-    frame(t)
+    origRender(t)
+    if (!logged) {
+      logged = true
+      console.log('[na] first frame requested')
+    }
   })
 }
 

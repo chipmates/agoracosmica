@@ -19,41 +19,37 @@ import {
   Sprite,
   SpriteMaterial,
 } from 'three/webgpu'
-import { length, mix, positionLocal, pow, sin, smoothstep, uniform, vec3 } from 'three/tsl'
+import { float, length, mix, positionLocal, pow, sin, smoothstep, uniform, vec3 } from 'three/tsl'
 import { mulberry32, shellPoint, FOUNDING_SEED } from '../core/seed'
 
 const GOLD = new Color('#e0b96a')
-const GOLD_DEEP = new Color('#b8863b')
-const STARLIGHT = new Color('#f3efe2')
-const ABYSS = new Color('#04060d')
+const GOLD_DEEP = new Color('#a97c2f')
+const EMBER = new Color('#f6dfae')
+const WHITE_HOT = new Color('#fffaf0')
+const ABYSS = new Color('#030509')
 const LAPIS = new Color('#0a1128')
-const HORIZON = new Color('#182350')
+const HORIZON = new Color('#111a3e')
+const STAR_WARM = new Color('#f3efe2')
+const STAR_COOL = new Color('#c9d4f2')
 
-/** Soft radial glow texture, drawn in code. No asset ships for light. */
-function glowTexture(inner: string, outer: string): CanvasTexture {
-  const size = 256
+function glowTexture(stops: Array<[number, string]>): CanvasTexture {
+  const size = 512
   const canvas = document.createElement('canvas')
   canvas.width = size
   canvas.height = size
   const ctx = canvas.getContext('2d')
   if (!ctx) throw new Error('2d context unavailable')
   const g = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2)
-  g.addColorStop(0, inner)
-  g.addColorStop(0.28, outer)
-  g.addColorStop(1, 'rgba(0,0,0,0)')
+  for (const [at, color] of stops) g.addColorStop(at, color)
   ctx.fillStyle = g
   ctx.fillRect(0, 0, size, size)
   return new CanvasTexture(canvas)
 }
 
 export interface EclipseState {
-  /** 0..1 the moon's remaining travel to totality (loader-as-transit) */
   transit: number
-  /** 0..1 scroll progress into the dark door */
   door: number
-  /** 0..1 star reveal after totality */
   skyBirth: number
-  /** seconds since diamond-ring flash, negative before it fires */
   sinceFlash: number
   elapsed: number
 }
@@ -61,102 +57,150 @@ export interface EclipseState {
 export function createEclipse(scene: Scene) {
   const rand = mulberry32(FOUNDING_SEED)
 
-  // ---- night gradient dome (vertex colors, zero shaders) ----
+  // ---- night dome: abyss above, a memory of blue at the horizon ----
   const domeGeo = new SphereGeometry(90, 32, 24)
-  const pos = domeGeo.getAttribute('position')
+  const dpos = domeGeo.getAttribute('position')
   const colors: number[] = []
   const c = new Color()
-  for (let i = 0; i < pos.count; i++) {
-    const y = (pos.getY(i) / 90 + 1) / 2
-    if (y < 0.35) c.copy(HORIZON).lerp(LAPIS, y / 0.35)
-    else c.copy(LAPIS).lerp(ABYSS, (y - 0.35) / 0.65)
+  for (let i = 0; i < dpos.count; i++) {
+    const y = (dpos.getY(i) / 90 + 1) / 2
+    if (y < 0.16) c.copy(HORIZON).lerp(LAPIS, y / 0.16)
+    else c.copy(LAPIS).lerp(ABYSS, Math.min(1, (y - 0.16) / 0.5))
     colors.push(c.r, c.g, c.b)
   }
   domeGeo.setAttribute('color', new Float32BufferAttribute(colors, 3))
-  const dome = new Mesh(domeGeo, new MeshBasicMaterial({ vertexColors: true, side: BackSide }))
-  scene.add(dome)
+  scene.add(new Mesh(domeGeo, new MeshBasicMaterial({ vertexColors: true, side: BackSide })))
 
-  // ---- the eclipse group ----
+  // ---- the eclipse ----
   const eclipse = new Group()
-  eclipse.position.set(0, 1.1, -10)
+  eclipse.position.set(0, 1.35, -10)
   scene.add(eclipse)
 
-  // outer glow (the corona's breath)
-  const glowMat = new SpriteMaterial({
-    map: glowTexture('rgba(255, 244, 214, 0.9)', 'rgba(224, 185, 106, 0.32)'),
-    blending: AdditiveBlending,
-    depthWrite: false,
-    transparent: true,
-  })
-  const glow = new Sprite(glowMat)
-  glow.scale.setScalar(9)
-  eclipse.add(glow)
-
-  // shimmer ring (TSL: live light, never a static image)
   const uTime = uniform(0)
   const uIntensity = uniform(0)
-  const ringMat = new MeshBasicNodeMaterial({
+
+  // angular direction without atan: normalized local direction
+  const r = length(positionLocal.xy)
+  const safeR = r.max(0.0001)
+  const dx = positionLocal.x.div(safeR)
+  const dy = positionLocal.y.div(safeR)
+
+  // (a) chromosphere: a thin, uneven, white-hot rim
+  const rimMat = new MeshBasicNodeMaterial({
     transparent: true,
     blending: AdditiveBlending,
     depthWrite: false,
     side: DoubleSide,
   })
-  const r = length(positionLocal.xy)
-  const falloff = pow(smoothstep(1.9, 1.04, r), 1.7)
-  const flickA = sin(positionLocal.x.mul(7.3).add(uTime.mul(1.6)))
-  const flickB = sin(positionLocal.y.mul(6.1).sub(uTime.mul(1.2)))
-  const flicker = flickA.mul(flickB).mul(0.22).add(0.78)
-  ringMat.colorNode = mix(
-    vec3(GOLD_DEEP.r, GOLD_DEEP.g, GOLD_DEEP.b),
-    vec3(STARLIGHT.r, STARLIGHT.g, STARLIGHT.b),
-    pow(falloff, 3)
+  const rimFall = pow(smoothstep(1.42, 1.01, r), 2.4)
+  const rimUneven = sin(dx.mul(9.0).add(dy.mul(4.0)).add(uTime.mul(0.21)))
+    .mul(sin(dx.mul(3.0).sub(dy.mul(8.0)).sub(uTime.mul(0.17))))
+    .mul(0.18)
+    .add(0.82)
+  rimMat.colorNode = mix(
+    vec3(GOLD.r, GOLD.g, GOLD.b),
+    vec3(WHITE_HOT.r, WHITE_HOT.g, WHITE_HOT.b),
+    pow(rimFall, 2)
   )
-  ringMat.opacityNode = falloff.mul(flicker).mul(uIntensity)
-  const ring = new Mesh(new RingGeometry(1.02, 1.9, 128), ringMat)
-  eclipse.add(ring)
+  rimMat.opacityNode = rimFall.mul(rimUneven).mul(uIntensity)
+  const rim = new Mesh(new RingGeometry(1.0, 1.5, 256), rimMat)
+  rim.renderOrder = 2
+  eclipse.add(rim)
 
-  // the moon: a black disc sliding to totality
-  const disc = new Mesh(new CircleGeometry(1.06, 96), new MeshBasicMaterial({ color: ABYSS }))
+  // (b) corona streamers: long irregular petals of pale fire
+  const coronaMat = new MeshBasicNodeMaterial({
+    transparent: true,
+    blending: AdditiveBlending,
+    depthWrite: false,
+    side: DoubleSide,
+  })
+  const petalsA = sin(dx.mul(7.3).add(dy.mul(3.1)).add(uTime.mul(0.05)))
+  const petalsB = sin(dx.mul(2.7).sub(dy.mul(8.3)).sub(uTime.mul(0.04)))
+  const petalsC = sin(dx.mul(5.1).add(dy.mul(5.9)).add(uTime.mul(0.03)))
+  const streamer = petalsA.mul(petalsB).mul(petalsC).mul(0.5).add(0.5)
+  const streamerMask = pow(streamer, 2.2).mul(0.85).add(0.15)
+  const reach = pow(smoothstep(3.9, 1.02, r), 2.1)
+  const nearRim = pow(smoothstep(2.2, 1.0, r), 3.0)
+  coronaMat.colorNode = mix(
+    vec3(GOLD_DEEP.r, GOLD_DEEP.g, GOLD_DEEP.b),
+    vec3(EMBER.r, EMBER.g, EMBER.b),
+    nearRim
+  )
+  coronaMat.opacityNode = reach.mul(streamerMask).mul(uIntensity).mul(float(0.62))
+  const corona = new Mesh(new RingGeometry(1.0, 3.9, 256), coronaMat)
+  corona.renderOrder = 1
+  eclipse.add(corona)
+
+  // (c) one quiet outer breath, tight and warm, no lamp
+  const breathMat = new SpriteMaterial({
+    map: glowTexture([
+      [0, 'rgba(246, 223, 174, 0.5)'],
+      [0.35, 'rgba(224, 185, 106, 0.16)'],
+      [1, 'rgba(0, 0, 0, 0)'],
+    ]),
+    blending: AdditiveBlending,
+    depthWrite: false,
+    transparent: true,
+  })
+  const breath = new Sprite(breathMat)
+  breath.scale.setScalar(4.6)
+  breath.renderOrder = 1
+  eclipse.add(breath)
+
+  // the moon
+  const disc = new Mesh(new CircleGeometry(1.012, 128), new MeshBasicMaterial({ color: ABYSS }))
   disc.position.z = 0.15
+  disc.renderOrder = 4
   eclipse.add(disc)
 
-  // diamond ring flash, waiting at the rim
+  // the diamond ring, waiting at the rim
   const flashMat = new SpriteMaterial({
-    map: glowTexture('rgba(255, 252, 240, 1)', 'rgba(224, 185, 106, 0.5)'),
+    map: glowTexture([
+      [0, 'rgba(255, 255, 250, 1)'],
+      [0.12, 'rgba(255, 250, 235, 0.9)'],
+      [0.3, 'rgba(246, 223, 174, 0.35)'],
+      [1, 'rgba(0, 0, 0, 0)'],
+    ]),
     blending: AdditiveBlending,
     depthWrite: false,
     transparent: true,
     opacity: 0,
   })
   const flash = new Sprite(flashMat)
-  const rimAngle = Math.PI * 0.22
-  flash.position.set(Math.cos(rimAngle) * 1.05, Math.sin(rimAngle) * 1.05, 0.2)
-  flash.scale.setScalar(1.6)
+  flash.renderOrder = 5
+  const rimAngle = Math.PI * 0.24
+  flash.position.set(Math.cos(rimAngle) * 1.03, Math.sin(rimAngle) * 1.03, 0.2)
+  flash.scale.setScalar(2.1)
   eclipse.add(flash)
 
-  // ---- the firmament: fixed stars, and thirty that wander ----
-  const starGeo = new BufferGeometry()
-  const starPos: number[] = []
-  for (let i = 0; i < 1500; i++) starPos.push(...shellPoint(rand, 42, 70))
-  starGeo.setAttribute('position', new Float32BufferAttribute(starPos, 3))
-  const starMat = new PointsMaterial({
-    color: STARLIGHT,
-    size: 0.22,
-    sizeAttenuation: true,
-    transparent: true,
-    opacity: 0,
-    depthWrite: false,
-  })
-  const stars = new Points(starGeo, starMat)
-  scene.add(stars)
+  // ---- the firmament: two star populations, and thirty that wander ----
+  function starField(count: number, size: number, color: Color, rMin: number, rMax: number) {
+    const geo = new BufferGeometry()
+    const pos: number[] = []
+    for (let i = 0; i < count; i++) pos.push(...shellPoint(rand, rMin, rMax))
+    geo.setAttribute('position', new Float32BufferAttribute(pos, 3))
+    const mat = new PointsMaterial({
+      color,
+      size,
+      sizeAttenuation: true,
+      transparent: true,
+      opacity: 0,
+      depthWrite: false,
+    })
+    const points = new Points(geo, mat)
+    scene.add(points)
+    return { points, mat }
+  }
+  const dimStars = starField(2400, 0.26, STAR_COOL, 44, 72)
+  const brightStars = starField(320, 0.5, STAR_WARM, 42, 66)
 
   const wandererGeo = new BufferGeometry()
-  const wandererPos: number[] = []
-  for (let i = 0; i < 30; i++) wandererPos.push(...shellPoint(rand, 40, 52))
-  wandererGeo.setAttribute('position', new Float32BufferAttribute(wandererPos, 3))
+  const wpos: number[] = []
+  for (let i = 0; i < 30; i++) wpos.push(...shellPoint(rand, 40, 52))
+  wandererGeo.setAttribute('position', new Float32BufferAttribute(wpos, 3))
   const wandererMat = new PointsMaterial({
     color: GOLD,
-    size: 0.55,
+    size: 0.9,
     sizeAttenuation: true,
     transparent: true,
     opacity: 0,
@@ -168,34 +212,41 @@ export function createEclipse(scene: Scene) {
   function update(s: EclipseState): void {
     uTime.value = s.elapsed
 
-    // transit: the moon slides from offset to concentric; corona earns its light
     const cover = 1 - s.transit
     disc.position.x = -0.62 * cover
-    uIntensity.value = 0.15 + 0.85 * Math.pow(s.transit, 2)
-    glowMat.opacity = 0.5 + 0.5 * s.transit
+    uIntensity.value = 0.12 + 0.88 * Math.pow(s.transit, 2)
+    breathMat.opacity = 0.25 + 0.55 * s.transit
 
-    // diamond ring: one bead of last sunlight, decaying
-    if (s.sinceFlash >= 0) {
-      flashMat.opacity = Math.max(0, 1 - s.sinceFlash / 0.9) * (0.4 + 0.6 * Math.exp(-s.sinceFlash * 4))
+    // the diamond ring: the bead ignites while the corona is still faint,
+    // then the corona blooms as the bead dies
+    if (s.sinceFlash >= 0 && s.sinceFlash < 1.4) {
+      const k = s.sinceFlash / 1.4
+      flashMat.opacity = (1 - k) * (0.55 + 0.45 * Math.exp(-s.sinceFlash * 3))
+      flash.scale.setScalar(1.3 + 0.9 * (1 - k))
+      uIntensity.value *= 0.3 + 0.7 * k
+    } else {
+      flashMat.opacity = 0
     }
 
-    // totality births the sky
-    starMat.opacity = 0.9 * s.skyBirth
+    dimStars.mat.opacity = 0.7 * s.skyBirth
+    brightStars.mat.opacity = s.skyBirth
     wandererMat.opacity = s.skyBirth
-    stars.rotation.y = s.elapsed * 0.004
+    dimStars.points.rotation.y = s.elapsed * 0.003
+    brightStars.points.rotation.y = s.elapsed * 0.004
     wanderers.rotation.y = s.elapsed * 0.011
     wanderers.rotation.x = Math.sin(s.elapsed * 0.05) * 0.01
 
-    // the dark door: the disc grows until darkness is the frame
     const door = s.door
     const scale = 1 + Math.pow(door, 1.6) * 26
     eclipse.scale.setScalar(scale)
-    glowMat.opacity *= 1 - Math.pow(door, 2.2)
+    // once through the door, the eclipse is behind you
+    eclipse.visible = door < 0.995
+    breathMat.opacity *= 1 - Math.pow(door, 2.2)
     uIntensity.value *= 1 - Math.pow(door, 1.4) * 0.92
 
-    // corona breathes, slowly, like a held note
-    const breath = 1 + Math.sin(s.elapsed * 0.6) * 0.012
-    ring.scale.setScalar(breath)
+    const pulse = 1 + Math.sin(s.elapsed * 0.6) * 0.008
+    rim.scale.setScalar(pulse)
+    corona.scale.setScalar(2 - pulse)
   }
 
   return { update }
