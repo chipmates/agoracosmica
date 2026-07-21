@@ -170,9 +170,8 @@ const CAMP_SPOTS = [
     label: 'His Sky',
     pos: new Vector3(0.3, 1.55, -7.2),
     posNarrow: new Vector3(0.1, 1.3, -6.6),
-    // the living concept page shows the wreath evolving (task #10);
-    // the in-cosmos dusk version follows with the day machinery
-    open: () => window.open('/hissky.html', '_blank', 'noopener'),
+    // the Dusk Law: to see what you have learned, night must fall
+    open: () => beginDusk(),
   },
 ]
 const HUB_SPOTS = [
@@ -253,6 +252,10 @@ let chapterChangedAt = -99
 let paneOpen = false
 let skyAcc = 0
 let atlasReveal = 0
+let campDusk = 0
+let campDuskTarget = 0
+let duskUp = false
+let campSignLevels: number[] = new Array(12).fill(0)
 
 // ---- the Sitting + the remembered night (concept-revision §2b) ----
 function stored(key: string): string | null {
@@ -421,6 +424,7 @@ paneEnter?.addEventListener('click', () => {
 })
 addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && paneOpen) closePane()
+  if (e.key === 'Escape' && duskUp) endDusk()
 })
 
 /** dress or strike the sky's letterpress in one move */
@@ -680,6 +684,86 @@ function acceptSitting(): void {
 }
 document.getElementById('sitting-accept')?.addEventListener('click', () => acceptSitting())
 
+// ---- THE DUSKRISE: His Sky inside the camp (the Dusk Law) ----
+/** The classic app's own bloom arithmetic (seedLevelComputation.ts):
+    level = count of the four completed modes, read from the classic
+    storage keys. Same-origin at merge the keys are simply present;
+    anywhere else every seed stays an ember and the sky is honest. */
+function readSeedLevels(figureId: string, count: number): number[] {
+  const levels: number[] = []
+  for (let i = 1; i <= count; i++) {
+    let level = 0
+    if (stored(`story_${figureId}_${i}_completed`) === 'true') level++
+    let wisdom = stored(`starseed_${figureId}_${i}_completed`) === 'true'
+    if (!wisdom) {
+      // legacy histories that crossed 30 messages before the marker existed
+      const raw = stored(`starseed_${figureId}_${i}`)
+      if (raw) {
+        try {
+          const arr: unknown = JSON.parse(raw)
+          wisdom = Array.isArray(arr) && arr.length >= 30
+        } catch {
+          /* invalid history = not done */
+        }
+      }
+    }
+    if (wisdom) level++
+    if (stored(`prism_${figureId}_${i}_completed`) === 'true') level++
+    if (stored(`completion_${figureId}_${i}`) === 'true') level++
+    levels.push(level)
+  }
+  return levels
+}
+
+const duskNode = document.getElementById('dusk-pane')
+const duskEl: HTMLElement = duskNode ?? document.createElement('div')
+const duskLineEl = duskEl.querySelector('.dusk-line')
+
+function duskLineText(): string {
+  const lit = campSignLevels.filter((l) => l > 0).length
+  const bloomed = campSignLevels.filter((l) => l >= 4).length
+  if (lit === 0) return 'Twelve seeds wait as embers. What you learn with him wakens them.'
+  if (bloomed === 12) return 'All twelve seeds in bloom. His whole sky remembers you.'
+  if (bloomed > 0) return `${lit} of 12 seeds waking · ${bloomed} in bloom`
+  return `${lit} of 12 seeds waking`
+}
+
+function beginDusk(): void {
+  if (phase !== 'camp' || duskUp) return
+  duskUp = true
+  campDuskTarget = 1
+  campSignLevels = readSeedLevels('aurelius', 12)
+  camp.setSign(campSignLevels, reducedMotion)
+  // the sky needs the whole frame: the ground letterpress steps back
+  keeperEl.hidden = true
+  sittingEl.hidden = true
+  hearthWanted = false
+  traceOpen = false
+  drawnEl.hidden = true
+  if (duskLineEl) duskLineEl.textContent = duskLineText()
+  verseShow('To see what you have learned, night must fall.')
+  setStatus('')
+  duskEl.hidden = false
+  requestAnimationFrame(() => requestAnimationFrame(() => duskEl.classList.add('lit')))
+}
+
+function endDusk(): void {
+  if (!duskUp && duskEl.hidden) return
+  duskUp = false
+  campDuskTarget = 0
+  duskEl.classList.remove('lit')
+  duskEl.hidden = true
+  if (phase === 'camp') {
+    if (campHearthOpen) keeperEl.hidden = false
+    setStatus(
+      camera.aspect < 0.9
+        ? 'Carnuntum · touch and move to look around'
+        : 'Carnuntum on the Danube'
+    )
+  }
+}
+document.getElementById('dusk-return')?.addEventListener('click', () => endDusk())
+
 // the impatient door on the totality screen: straight down to the fire
 document.getElementById('overture-skip')?.addEventListener('click', () => {
   if (phase !== 'held' && phase !== 'transit') return
@@ -777,7 +861,7 @@ declare global {
           sinceFlash?: number
           keeper?: number
           crossing?: 'hatch' | 'portrait' | 'breath'
-          camp?: 'trace' | 'hearth'
+          camp?: 'trace' | 'hearth' | 'dusk'
           chapter?: number
           figure?: string
           coda?: number
@@ -834,6 +918,7 @@ addEventListener('click', (e) => {
     return
   }
   if (phase === 'camp') {
+    if (duskUp) return
     const p = traceScreenPos()
     if (p && Math.hypot(p.x - e.clientX, p.y - e.clientY) < 60) traceOpen = !traceOpen
     return
@@ -853,6 +938,12 @@ window.__forge = {
       window.clearTimeout(voiceTimerA)
       window.clearTimeout(voiceTimerB)
       voiceEl2.classList.remove('lit', 'clean')
+    }
+    if (opts.camp !== 'dusk') {
+      duskUp = false
+      campDusk = campDuskTarget = 0
+      duskEl.classList.remove('lit')
+      duskEl.hidden = true
     }
     ringEl.classList.remove('lit', 'passing')
     transit = opts.transit ?? (p === 'transit' ? 0.5 : 1)
@@ -925,6 +1016,19 @@ window.__forge = {
         keeperEl.hidden = false
         keeperScene.forgeStage(3)
       }
+      if (opts.camp === 'dusk') {
+        // a believable mid-journey sky: every bloom stage on display
+        duskUp = true
+        campDusk = campDuskTarget = 1
+        campSignLevels = [4, 4, 3, 2, 1, 0, 0, 2, 4, 1, 0, 3]
+        camp.setSign(campSignLevels, true)
+        keeperEl.hidden = true
+        camera.rotation.set(0.5, 0, 0)
+        if (duskLineEl) duskLineEl.textContent = duskLineText()
+        duskEl.hidden = false
+        duskEl.classList.add('lit')
+        setStatus('')
+      }
     }
     if (opts.keeper) {
       keeperEl.hidden = false
@@ -987,8 +1091,12 @@ function setPhase(next: Phase): void {
   if (next !== 'camp') {
     sittingEl.hidden = true
     hearthWanted = false
+    endDusk()
+    campDusk = 0
   }
   if (next === 'camp') {
+    endDusk()
+    campDusk = 0
     setStatus(
       camera.aspect < 0.9
         ? 'Carnuntum · touch and move to look around'
@@ -1189,8 +1297,14 @@ function frame(now: number): void {
   } else if (phase === 'camp') {
     // the hearth opens once the arrival sentence has had its say —
     // on the WALL clock: scene time clamps on slow frames and would
-    // stretch the wait (the keeper's own pacing lesson)
-    if (!campHearthOpen && campEnteredWall > 0 && performance.now() - campEnteredWall > 6600) {
+    // stretch the wait (the keeper's own pacing lesson). Never while
+    // the gaze is up in his sky.
+    if (
+      !duskUp &&
+      !campHearthOpen &&
+      campEnteredWall > 0 &&
+      performance.now() - campEnteredWall > 6600
+    ) {
       // the auto-open routes through the Sitting: the first hearth of
       // the night asks its one question before the keeper speaks
       openHearth()
@@ -1206,14 +1320,27 @@ function frame(now: number): void {
   campReveal +=
     (campTarget - campReveal) * Math.min(1, dt * (reducedMotion ? 20 : campTarget ? 1.1 : 3.4))
   if (phase === 'camp') {
-    camera.rotation.x += (-0.12 - camera.rotation.x) * Math.min(1, dt * 2)
+    // duskrise lifts the gaze to his sign; morning lands it again
+    const campPitch = duskUp ? 0.5 : -0.12
+    camera.rotation.x += (campPitch - camera.rotation.x) * Math.min(1, dt * (duskUp ? 1.1 : 2))
     // narrow stages yaw gently toward the hearth so the fire holds the
-    // frame instead of clipping at its edge
-    const campYaw = camera.aspect < 0.9 ? 0.14 : 0
+    // frame instead of clipping at its edge; the sign sits centered
+    const campYaw = !duskUp && camera.aspect < 0.9 ? 0.14 : 0
     camera.rotation.y += (campYaw - camera.rotation.y) * Math.min(1, dt * 2)
   }
+  // night falls slowly enough to be felt; morning answers a bit quicker
+  campDusk +=
+    (campDuskTarget - campDusk) *
+    Math.min(1, dt * (reducedMotion ? 20 : campDuskTarget ? 0.9 : 1.4))
   campYield += ((phase === 'camp' && !keeperEl.hidden ? 1 : 0) - campYield) * Math.min(1, dt * 2.5)
-  camp.update({ reveal: campReveal, elapsed, yield: campYield })
+  camp.update({
+    reveal: campReveal,
+    elapsed,
+    dt,
+    aspect: camera.aspect,
+    yield: campYield,
+    dusk: campDusk,
+  })
   syncTrace()
 
   // stars are born at totality; near the fire they yield to its light,
@@ -1283,7 +1410,7 @@ function frame(now: number): void {
   // the world's points breathe with their stage; the hub offers the
   // council after the arrival breath, the camp its learning paths
   const spotsVisible =
-    (phase === 'camp' && campReveal > 0.6 && !chapters.isOpen()) ||
+    (phase === 'camp' && campReveal > 0.6 && !chapters.isOpen() && !duskUp) ||
     (phase === 'agora' &&
       agoraReveal > 0.6 &&
       agoraEnteredAt >= 0 &&

@@ -140,6 +140,22 @@ try {
     await page.waitForTimeout(1500)
     await shot('camp-after-scroll-down')
 
+    // 6b · the DUSK LAW: His Sky rises over the camp, and his morning
+    // answers the return
+    const hisSky = page.locator('.hotspot', { hasText: 'His Sky' })
+    try {
+      await hisSky.waitFor({ state: 'visible', timeout: 8000 })
+      await hisSky.click()
+      await page.waitForTimeout(4500)
+      await shot('duskrise')
+      await page.locator('#dusk-return').click()
+      await page.waitForTimeout(3000)
+      await shot('camp-morning-again')
+    } catch {
+      console.log('[journey] His Sky never rose over the camp')
+      await shot('STUCK-dusk')
+    }
+
     // 7 · the way home: the hearth keeper walks you back to the fire,
     // where the council waits on its mark, chosen not forced
     const exit = page.locator('.keeper-exit')

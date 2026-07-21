@@ -256,6 +256,62 @@
       text-transform: uppercase; color: var(--na-mist);
     }
 
+    /* ---- the duskrise: His Sky's letterpress, low while the gaze is
+       up. The Dusk Law: to see what you have learned, night must fall ---- */
+    #dusk-pane {
+      position: fixed; left: 50%;
+      bottom: calc(74px + env(safe-area-inset-bottom));
+      transform: translateX(-50%);
+      z-index: 3; width: min(560px, calc(100% - 40px));
+      text-align: center; pointer-events: none;
+      opacity: 0; transition: opacity 1.8s ease;
+    }
+    #dusk-pane.lit { opacity: 1; }
+    #dusk-pane[hidden] { display: none; }
+    .dusk-kicker {
+      font-family: var(--sans);
+      font-size: 10px; letter-spacing: 0.3em; text-indent: 0.3em;
+      text-transform: uppercase; color: var(--na-gold);
+      text-shadow: 0 1px 12px rgba(4, 6, 13, 0.9);
+    }
+    .dusk-line {
+      margin-top: 10px;
+      font-family: var(--serif); font-style: italic;
+      font-size: clamp(14px, 1.9vw, 17px);
+      color: var(--na-starlight);
+      text-shadow: 0 1px 16px rgba(4, 6, 13, 0.85);
+    }
+    .dusk-actions {
+      margin-top: 10px;
+      display: flex; align-items: center; justify-content: center;
+      gap: 2px 22px; flex-wrap: wrap;
+    }
+    #dusk-return {
+      background: none; border: none; cursor: pointer;
+      pointer-events: auto;
+      font-family: var(--sans);
+      font-size: 10px; letter-spacing: 0.3em; text-indent: 0.3em;
+      text-transform: uppercase; color: var(--na-mist);
+      min-height: 44px; padding: 0 10px;
+      text-shadow: 0 1px 12px rgba(4, 6, 13, 0.9);
+      transition: color 0.5s ease;
+    }
+    #dusk-return:hover, #dusk-return:focus-visible { color: var(--na-starlight); outline: none; }
+    #dusk-concept {
+      pointer-events: auto;
+      font-family: var(--sans);
+      font-size: 10px; letter-spacing: 0.3em; text-indent: 0.3em;
+      text-transform: uppercase;
+      color: color-mix(in srgb, var(--na-gold) 72%, transparent);
+      text-decoration: none;
+      min-height: 44px; display: inline-flex; align-items: center;
+      padding: 0 10px;
+      text-shadow: 0 1px 12px rgba(4, 6, 13, 0.9);
+      transition: color 0.5s ease;
+    }
+    #dusk-concept:hover, #dusk-concept:focus-visible { color: var(--na-gold); outline: none; }
+    body.forge #dusk-pane { transition: none !important; }
+
     /* ---- the return: one diamond-ring breath, the short dawn ---- */
     #ringflash {
       position: fixed; inset: 0; z-index: 5; pointer-events: none;
@@ -1273,6 +1329,14 @@
     <p class="trace-kicker">A trace · kept in the wood</p>
     <p class="trace-quote">"What stands in the way becomes the way."</p>
     <p class="trace-source">Meditations 5.20</p>
+  </div>
+  <div id="dusk-pane" hidden>
+    <p class="dusk-kicker">His Sky · The Wisdom Map of Marcus Aurelius</p>
+    <p class="dusk-line"></p>
+    <div class="dusk-actions">
+      <button id="dusk-return" type="button">Return to his morning</button>
+      <a id="dusk-concept" href="/hissky.html" target="_blank" rel="noopener">Open the living concept</a>
+    </div>
   </div>
   <div id="ringflash" aria-hidden="true"></div>
   <div id="constellation-plate">

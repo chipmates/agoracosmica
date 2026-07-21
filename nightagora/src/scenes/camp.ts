@@ -1,10 +1,14 @@
 /* Beat 9 · PLANETFALL — Marcus's world: a fortified camp on a small
-   dark planet, ember dusk on the Danube. The ground's curved rim gives
-   the tiny-planet read; the river carries the last of the light; the
+   dark planet, ember dawn on the Danube. The ground's curved rim gives
+   the tiny-planet read; the river carries the first of the light; the
    tents are ink silhouettes that remember the fire on their flanks.
    No Bodies: Marcus is present as the hearth and the voice. One trace
    (Meditations 5.20) is carved at the tent post, marked by a small
-   gold star. */
+   gold star.
+   THE DUSK LAW (COSMOS-CONTRACT §6): to see what you have learned,
+   night must fall. uDusk pulls every dawn constant back to its
+   pre-dawn original and raises HIS SIGN (the shared organ) over the
+   tents; morning answers the way down. */
 
 import {
   AdditiveBlending,
@@ -50,16 +54,24 @@ import {
   positionWorld,
 } from 'three/tsl'
 import { mulberry32, FOUNDING_SEED } from '../core/seed'
+import { createSign } from '../core/sign'
+import { STOIC_TAURUS } from '../content/signs'
 
 const GOLD = new Color('#e0b96a')
 
 export interface CampState {
   reveal: number
   elapsed: number
+  /** real frame delta (the sign's waking ease needs it) */
+  dt?: number
+  /** camera aspect: narrow stages restage the sign, they never clip it */
+  aspect?: number
   /** 0..1: how much the world yields the letterpress band (a sitting
       is open); the trace post and its star step back while text holds
       the frame. */
   yield?: number
+  /** 0..1: how far night has fallen back over the dawn (the Dusk Law) */
+  dusk?: number
 }
 
 export function createCamp(scene: Scene) {
@@ -74,23 +86,30 @@ export function createCamp(scene: Scene) {
 
   const uT = uniform(0)
   const uR = uniform(0)
+  const uDusk = uniform(0)
   const starMats: PointsMaterial[] = []
+  /** dawn color that remembers its pre-dawn original as dusk falls */
+  const hour = (
+    dr: number, dg: number, db: number,
+    nr: number, ng: number, nb: number
+  ) => mix(vec3(dr, dg, db), vec3(nr, ng, nb), uDusk)
 
   const hash = fract(sin(dot(uv().mul(vec2(511.7, 337.3)), vec2(12.9898, 78.233))).mul(43758.5453))
   const dither = hash.sub(0.5).mul(0.016)
 
   // ------------------------------------------------------------------
-  // 1 · THE DUSK — the last ember light low in the sky, night above
+  // 1 · THE DAWN — the first ember light low in the sky, night above;
+  //     at dusk every band sinks back to its pre-dawn original
   // ------------------------------------------------------------------
   const skyMat = new MeshBasicNodeMaterial()
   {
-    // ember dusk, not sunset: the night owns the sky, the smolder owns
+    // ember dawn, not sunrise: the night owns the sky, the smolder owns
     // only the lowest band above the water
     const h = positionWorld.y
-    const nightTop = vec3(0.014, 0.026, 0.062)
-    const nightMid = vec3(0.052, 0.078, 0.14)
-    const emberLow = vec3(0.3, 0.155, 0.07)
-    const emberCore = vec3(0.85, 0.5, 0.2)
+    const nightTop = hour(0.014, 0.026, 0.062, 0.0016, 0.0028, 0.0075)
+    const nightMid = hour(0.052, 0.078, 0.14, 0.0034, 0.005, 0.013)
+    const emberLow = hour(0.3, 0.155, 0.07, 0.045, 0.017, 0.005)
+    const emberCore = hour(0.85, 0.5, 0.2, 0.14, 0.05, 0.011)
     const band = smoothstep(5.0, 0.4, h)
     const core = smoothstep(1.6, -2.0, h)
     // slow drifting smoke strata carved from the glow, never banding
@@ -100,8 +119,10 @@ export function createCamp(scene: Scene) {
     const col = mix(mix(nightTop, nightMid, band), mix(nightMid, mix(emberLow, emberCore, core), band), band)
     skyMat.colorNode = col.mul(strata).add(dither.mul(0.02)).mul(uR)
   }
-  const sky = new Mesh(new PlaneGeometry(170, 70), skyMat)
-  sky.position.set(0, 12, -48)
+  // tall enough that the duskrise gaze (pitch 0.5 + drag headroom)
+  // never sees past its top edge into the eclipse behind
+  const sky = new Mesh(new PlaneGeometry(170, 140), skyMat)
+  sky.position.set(0, 30, -48)
   root.add(sky)
 
   // sparse high stars over the dusk
@@ -131,11 +152,11 @@ export function createCamp(scene: Scene) {
   // ------------------------------------------------------------------
   const riverMat = new MeshBasicNodeMaterial()
   {
-    // dark water; the dusk survives only as a thin trembling line at
+    // dark water; the dawn survives only as a thin trembling line at
     // the far shore
-    const base = vec3(0.045, 0.07, 0.105)
+    const base = hour(0.045, 0.07, 0.105, 0.003, 0.005, 0.011)
     const far = smoothstep(-22.0, -25.8, positionWorld.z)
-    const emberMirror = vec3(0.42, 0.23, 0.095)
+    const emberMirror = hour(0.42, 0.23, 0.095, 0.05, 0.019, 0.005)
     const flow = mx_noise_float(
       vec3(positionWorld.x.mul(0.6).add(uT.mul(0.12)), positionWorld.z.mul(2.2), uT.mul(0.05))
     )
@@ -168,7 +189,7 @@ export function createCamp(scene: Scene) {
       .mul(0.3)
       .add(0.85)
     const flick = sin(uT.mul(6.7)).mul(0.07).add(0.93)
-    const base = vec3(0.052, 0.043, 0.028).mul(mottle)
+    const base = hour(0.052, 0.043, 0.028, 0.006, 0.005, 0.0042).mul(mottle)
     groundMat.colorNode = base
       .add(warm.mul(fireFall).mul(flick).mul(0.05))
       .add(dither.mul(0.03))
@@ -190,8 +211,10 @@ export function createCamp(scene: Scene) {
     const fall = float(3.4).div(dist.mul(dist).add(1.6))
     const flick = sin(uT.mul(6.7).add(positionWorld.x.mul(1.7))).mul(0.09).add(0.91)
     const glow = ndl.mul(fall).mul(flick).mul(rim)
-    const dawnLight = clamp(dot(normalWorld, normalize(vec3(0.35, 0.8, 0.45))), 0, 1).mul(0.11)
-    mat.colorNode = vec3(0.06, 0.052, 0.045)
+    const dawnLight = clamp(dot(normalWorld, normalize(vec3(0.35, 0.8, 0.45))), 0, 1)
+      .mul(0.11)
+      .mul(oneMinus(uDusk))
+    mat.colorNode = hour(0.06, 0.052, 0.045, 0.004, 0.0045, 0.008)
       .add(vec3(0.55, 0.48, 0.4).mul(dawnLight))
       .add(vec3(GOLD.r, GOLD.g, GOLD.b).mul(glow))
       .add(dither.mul(0.02))
@@ -372,13 +395,34 @@ export function createCamp(scene: Scene) {
   sparks.renderOrder = 7
   root.add(sparks)
 
+  // ------------------------------------------------------------------
+  // 6 · HIS SIGN — the Stoic Taurus over the tents, raised by the dusk
+  //     (the same organ His Sky's concept page grows; Light Law: the
+  //     camp hands it the frame and the master, never the other way)
+  // ------------------------------------------------------------------
+  const sign = createSign({ pattern: STOIC_TAURUS, width: 18, height: 13, rand })
+  // high enough that the belly stars clear the letterpress band
+  sign.group.position.set(0, 12.5, -30)
+  root.add(sign.group)
+  let signLevels: number[] = new Array(STOIC_TAURUS.length).fill(0)
+  function setSign(levels: number[], snap = false): void {
+    signLevels = levels
+    if (snap) sign.snap(levels)
+  }
+
   function update(s: CampState): void {
     root.visible = s.reveal > 0.01
     if (!root.visible) return
     const r = s.reveal
     const t = s.elapsed
+    const dusk = s.dusk ?? 0
     uT.value = t
     uR.value = r
+    uDusk.value = dusk
+    const narrow = (s.aspect ?? 2) < 0.9
+    sign.group.scale.setScalar(narrow ? 0.55 : 1)
+    sign.group.position.y = narrow ? 15 : 12.5
+    sign.update(s.dt ?? 0, t, signLevels, dusk * r)
 
     const fl = 0.78 + 0.12 * Math.sin(t * 6.9) + 0.06 * Math.sin(t * 11.3 + 1.1)
     uFlame.value = r * (0.8 + 0.2 * fl)
@@ -390,7 +434,8 @@ export function createCamp(scene: Scene) {
     flame.position.y = GROUND_Y + 0.1 + (FLAME_H * breathe) / 2
 
     poolMat.opacity = r * (0.3 + 0.12 * fl)
-    for (const m of starMats) m.opacity = 0.08 * r
+    // the high stars keep dawn's reserve until night falls
+    for (const m of starMats) m.opacity = (0.08 + 0.47 * dusk) * r
     markMat.opacity = r * (0.55 + 0.25 * Math.sin(t * 1.9)) * (1 - (s.yield ?? 0))
 
     const pos = sparkGeo.getAttribute('position')
@@ -409,5 +454,5 @@ export function createCamp(scene: Scene) {
     sparkMat.opacity = r * (0.5 - 0.3 * Math.abs(Math.sin(t * 2.6)))
   }
 
-  return { update, tracePos }
+  return { update, tracePos, setSign }
 }

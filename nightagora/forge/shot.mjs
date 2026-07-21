@@ -35,6 +35,7 @@ const STATES = [
   { name: 'camp', jump: ['camp', {}] },
   { name: 'trace', jump: ['camp', { camp: 'trace' }] },
   { name: 'hearth', jump: ['camp', { camp: 'hearth' }] },
+  { name: 'dusk', jump: ['camp', { camp: 'dusk' }] },
   { name: 'council', jump: ['council', {}] },
 ]
 const VIEWPORTS = [
