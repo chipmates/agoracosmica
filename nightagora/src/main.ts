@@ -2,9 +2,12 @@ import { PerspectiveCamera, Scene, Vector3, WebGPURenderer } from 'three/webgpu'
 import { createEclipse, type EclipseState } from './scenes/eclipse'
 import { createAgora } from './scenes/agora'
 import { createKeeper } from './scenes/keeper'
+import { createCrossing } from './scenes/crossing'
 import { WANDERERS } from './content/wanderers'
 
-type Phase = 'transit' | 'held' | 'door' | 'stone' | 'agora' | 'sky'
+const MARCUS = WANDERERS.findIndex((w) => w.slug === 'aurelius')
+
+type Phase = 'transit' | 'held' | 'door' | 'stone' | 'agora' | 'sky' | 'crossing' | 'camp'
 
 const stage = document.getElementById('stage')
 const status = document.getElementById('status')
@@ -19,6 +22,7 @@ const verseEl: HTMLElement = verse
 const cardName = card.querySelector('.card-name')
 const cardYears = card.querySelector('.card-years')
 const cardEpithet = card.querySelector('.card-epithet')
+const cardNote = card.querySelector('.card-note')
 
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
@@ -29,6 +33,7 @@ camera.position.set(0, 0, 0)
 const eclipse = createEclipse(scene)
 const agora = createAgora(scene)
 const keeperScene = createKeeper(keeperEl, reducedMotion)
+const crossing = createCrossing(scene, () => setPhase('camp'))
 
 // WebGL is the proven backend tonight; ?webgpu opts into the newer path
 // until it is verified on real hardware (see FORGE-STATE DEEPEN list).
@@ -68,7 +73,17 @@ function verseShow(line: string): void {
 declare global {
   interface Window {
     __forge?: {
-      jump: (p: Phase, opts?: { door?: number; transit?: number; skyBirth?: number; sinceFlash?: number; keeper?: number }) => void
+      jump: (
+        p: Phase,
+        opts?: {
+          door?: number
+          transit?: number
+          skyBirth?: number
+          sinceFlash?: number
+          keeper?: number
+          crossing?: 'hatch' | 'portrait' | 'breath'
+        }
+      ) => void
       freeze: (t: number) => void
       focusWanderer: (i: number) => void
     }
@@ -124,6 +139,14 @@ function syncCard(): void {
   if (cardName) cardName.textContent = w.name
   if (cardYears) cardYears.textContent = w.years
   if (cardEpithet) cardEpithet.textContent = w.epithet
+  if (cardNote) {
+    cardNote.textContent =
+      idx === MARCUS
+        ? lockedIdx === MARCUS
+          ? 'His night is open · tap his light again'
+          : 'Tap his light to cross'
+        : 'This world is still being drawn'
+  }
   const el = card as HTMLElement
   el.style.left = `${Math.min(Math.max(p.x + 22, 16), innerWidth - 300)}px`
   el.style.top = `${Math.min(Math.max(p.y - 24, 16), innerHeight - 140)}px`
@@ -134,9 +157,25 @@ addEventListener('pointermove', (e) => {
   pointerX = e.clientX
   pointerY = e.clientY
 })
+function beginCrossing(): void {
+  const base = eclipse.wandererBase[MARCUS]
+  if (!base) return
+  const to = new Vector3(base[0], base[1], base[2]).applyMatrix4(eclipse.wanderers.matrixWorld)
+  setPhase('crossing')
+  crossing.begin(to)
+}
+
 addEventListener('click', (e) => {
+  if (phase === 'crossing') {
+    crossing.skip()
+    return
+  }
   if (phase !== 'sky') return
   const hit = nearestWanderer(e.clientX, e.clientY, 64)
+  if (hit === MARCUS && lockedIdx === MARCUS) {
+    beginCrossing()
+    return
+  }
   lockedIdx = hit !== null && hit === lockedIdx ? null : hit
 })
 
@@ -146,8 +185,14 @@ window.__forge = {
     setPhase(p)
     transit = opts.transit ?? (p === 'transit' ? 0.5 : 1)
     door = doorTarget =
-      opts.door ?? (p === 'door' ? 0.5 : p === 'stone' || p === 'agora' || p === 'sky' ? 1 : 0)
-    skyBirth = opts.skyBirth ?? (p === 'transit' ? 0 : p === 'held' || p === 'stone' ? 0.75 : 1)
+      opts.door ?? (p === 'door' ? 0.5 : p === 'transit' || p === 'held' ? 0 : 1)
+    skyBirth =
+      opts.skyBirth ??
+      (p === 'transit' ? 0
+      : p === 'held' || p === 'stone' ? 0.75
+      : p === 'crossing' ? 0.12
+      : p === 'camp' ? 0.08
+      : 1)
     flashAt = elapsed - (opts.sinceFlash ?? 999)
     agoraReveal = p === 'agora' || p === 'sky' ? 1 : 0
     lookUp = lookTarget = p === 'sky' ? 1 : 0
@@ -162,6 +207,7 @@ window.__forge = {
       keeperScene.forgeStage(opts.keeper)
       verseEl.classList.remove('lit') // the verse is long gone by the exchange
     }
+    if (p === 'crossing' && opts.crossing) crossing.forgeStage(opts.crossing)
   },
   freeze(t) {
     elapsed = t
@@ -212,6 +258,15 @@ function setPhase(next: Phase): void {
   if (next === 'sky') {
     setStatus('The sky is the map · the gold lights are the thirty')
     verseShow('Voices awaken across Time')
+  }
+  if (next === 'crossing') {
+    setStatus('')
+    lockedIdx = null
+    hoverIdx = null
+    verseEl.classList.remove('lit') // a fast chooser carries no verse across
+  }
+  if (next === 'camp') {
+    setStatus('Carnuntum on the Danube · his world is still being drawn')
   }
 }
 
@@ -302,16 +357,26 @@ function frame(now: number): void {
     keeperEl.hidden = true
   }
 
-  // stars are born at totality; near the fire they yield to its light
+  // stars are born at totality; near the fire they yield to its light,
+  // and during the crossing the sky withdraws to ember
   const birthTarget =
-    phase === 'transit' ? 0 : phase === 'held' || phase === 'stone' ? 0.75 : phase === 'agora' ? 0.55 : 1
+    phase === 'transit' ? 0
+    : phase === 'held' || phase === 'stone' ? 0.75
+    : phase === 'agora' ? 0.55
+    : phase === 'crossing' ? 0.12
+    : phase === 'camp' ? 0.08
+    : 1
   skyBirth += (birthTarget - skyBirth) * Math.min(1, dt * (reducedMotion ? 20 : 0.9))
 
   const state: EclipseState = {
     transit,
     door,
     skyBirth,
-    lanterns: phase === 'sky' ? 1 : phase === 'agora' ? 0.55 : 0.3,
+    lanterns:
+      phase === 'sky' ? 1
+      : phase === 'agora' ? 0.55
+      : phase === 'crossing' || phase === 'camp' ? 0
+      : 0.3,
     sinceFlash: flashAt < 0 ? -1 : elapsed - flashAt,
     elapsed,
   }
@@ -323,6 +388,13 @@ function frame(now: number): void {
     camera.rotation.y += dt * 0.008
     camera.rotation.x = 0.62 + Math.sin(elapsed * 0.05) * 0.02
     if (lockedIdx === null && pointerX >= 0) hoverIdx = nearestWanderer(pointerX, pointerY, 64)
+  }
+
+  // the crossing: the gaze levels out and the hatching carries you
+  if (phase === 'crossing') {
+    camera.rotation.x += (0 - camera.rotation.x) * Math.min(1, dt * 2.2)
+    camera.rotation.y += (0 - camera.rotation.y) * Math.min(1, dt * 2.2)
+    crossing.update(dt, elapsed)
   }
   syncCard()
   keeperScene.update(dt)

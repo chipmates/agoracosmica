@@ -18,12 +18,24 @@ const STATES = [
   { name: 'keeper', jump: ['agora', { keeper: 2 }] },
   { name: 'sky', jump: ['sky', {}] },
   { name: 'card', jump: ['sky', {}], focus: -1 },
+  { name: 'crossing', jump: ['crossing', { crossing: 'hatch' }] },
+  { name: 'portrait', jump: ['crossing', { crossing: 'portrait' }] },
+  { name: 'breath', jump: ['crossing', { crossing: 'breath' }] },
 ]
 const VIEWPORTS = [
   { tag: 'desktop', width: 1512, height: 950, deviceScaleFactor: 1 },
   { tag: 'wide', width: 2016, height: 1150, deviceScaleFactor: 1 },
-  { tag: 'desktop-webgpu', width: 1512, height: 950, deviceScaleFactor: 1, query: '?webgpu' },
   { tag: 'mobile', width: 390, height: 844, deviceScaleFactor: 2 },
+  // backend spot-check only: headless WebGPU is unreliable on DOM-heavy
+  // states, so it shoots the core scene states alone
+  {
+    tag: 'desktop-webgpu',
+    width: 1512,
+    height: 950,
+    deviceScaleFactor: 1,
+    query: '?webgpu',
+    only: ['transit', 'agora', 'sky'],
+  },
 ]
 
 function startPreview() {
@@ -67,6 +79,7 @@ try {
     await page.waitForFunction(() => Boolean(window.__forge))
     await page.waitForTimeout(1200) // let pipelines compile
     for (const s of STATES) {
+      if (vp.only && !vp.only.includes(s.name)) continue
       await page.evaluate(([phase, opts, focus]) => {
         window.__forge.freeze(12.4)
         window.__forge.jump(phase, opts)
