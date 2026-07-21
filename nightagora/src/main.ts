@@ -1,11 +1,16 @@
-import { PerspectiveCamera, Scene, WebGPURenderer } from 'three/webgpu'
+import { PerspectiveCamera, Scene, Vector3, WebGPURenderer } from 'three/webgpu'
 import { createEclipse, type EclipseState } from './scenes/eclipse'
+import { WANDERERS } from './content/wanderers'
 
 type Phase = 'transit' | 'held' | 'door' | 'sky'
 
 const stage = document.getElementById('stage')
 const status = document.getElementById('status')
-if (!stage || !status) throw new Error('missing shell')
+const card = document.getElementById('atlas-card')
+if (!stage || !status || !card) throw new Error('missing shell')
+const cardName = card.querySelector('.card-name')
+const cardYears = card.querySelector('.card-years')
+const cardEpithet = card.querySelector('.card-epithet')
 
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
@@ -38,9 +43,76 @@ declare global {
     __forge?: {
       jump: (p: Phase, opts?: { door?: number; transit?: number; skyBirth?: number; sinceFlash?: number }) => void
       freeze: (t: number) => void
+      focusWanderer: (i: number) => void
     }
   }
 }
+// ---- the atlas: wanderer focus + card ----
+let pointerX = -1
+let pointerY = -1
+let hoverIdx: number | null = null
+let lockedIdx: number | null = null
+const projected = new Vector3()
+
+function wandererScreenPos(i: number): { x: number; y: number } | null {
+  const base = eclipse.wandererBase[i]
+  if (!base) return null
+  projected.set(base[0], base[1], base[2]).applyMatrix4(eclipse.wanderers.matrixWorld).project(camera)
+  if (projected.z > 1) return null
+  const x = (projected.x * 0.5 + 0.5) * innerWidth
+  const y = (-projected.y * 0.5 + 0.5) * innerHeight
+  if (x < -40 || x > innerWidth + 40 || y < -40 || y > innerHeight + 40) return null
+  return { x, y }
+}
+
+function nearestWanderer(px: number, py: number, radius: number): number | null {
+  let best: number | null = null
+  let bestDist = radius
+  for (let i = 0; i < WANDERERS.length; i++) {
+    const p = wandererScreenPos(i)
+    if (!p) continue
+    const d = Math.hypot(p.x - px, p.y - py)
+    if (d < bestDist) {
+      bestDist = d
+      best = i
+    }
+  }
+  return best
+}
+
+function syncCard(): void {
+  if (!card) return
+  const idx = lockedIdx ?? hoverIdx
+  const visible = phase === 'sky' && idx !== null && eclipse.wandererOpacity() > 0.4
+  if (!visible || idx === null) {
+    card.hidden = true
+    return
+  }
+  const w = WANDERERS[idx]
+  const p = wandererScreenPos(idx)
+  if (!w || !p) {
+    card.hidden = true
+    return
+  }
+  if (cardName) cardName.textContent = w.name
+  if (cardYears) cardYears.textContent = w.years
+  if (cardEpithet) cardEpithet.textContent = w.epithet
+  const el = card as HTMLElement
+  el.style.left = `${Math.min(Math.max(p.x + 22, 16), innerWidth - 300)}px`
+  el.style.top = `${Math.min(Math.max(p.y - 24, 16), innerHeight - 140)}px`
+  card.hidden = false
+}
+
+addEventListener('pointermove', (e) => {
+  pointerX = e.clientX
+  pointerY = e.clientY
+})
+addEventListener('click', (e) => {
+  if (phase !== 'sky') return
+  const hit = nearestWanderer(e.clientX, e.clientY, 64)
+  lockedIdx = hit !== null && hit === lockedIdx ? null : hit
+})
+
 window.__forge = {
   jump(p, opts = {}) {
     setPhase(p)
@@ -52,6 +124,25 @@ window.__forge = {
   freeze(t) {
     elapsed = t
     frozen = true
+  },
+  focusWanderer(i) {
+    if (i >= 0) {
+      lockedIdx = i
+      return
+    }
+    // i < 0: pick the visible wanderer nearest the frame center
+    let best: number | null = null
+    let bestDist = Number.POSITIVE_INFINITY
+    for (let k = 0; k < WANDERERS.length; k++) {
+      const p = wandererScreenPos(k)
+      if (!p) continue
+      const d = Math.hypot(p.x - innerWidth / 2, p.y - innerHeight / 2)
+      if (d < bestDist) {
+        bestDist = d
+        best = k
+      }
+    }
+    lockedIdx = best
   },
 }
 
@@ -147,7 +238,9 @@ function frame(now: number): void {
   if (phase === 'sky') {
     camera.rotation.y += dt * 0.008
     camera.rotation.x = Math.sin(elapsed * 0.05) * 0.02
+    if (lockedIdx === null && pointerX >= 0) hoverIdx = nearestWanderer(pointerX, pointerY, 64)
   }
+  syncCard()
 
   renderer.render(scene, camera)
 }

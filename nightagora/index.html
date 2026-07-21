@@ -75,6 +75,33 @@
       body[data-phase='held'] .status { animation: none; }
       .copy, .status { transition: none; }
     }
+
+    #atlas-card {
+      position: fixed; z-index: 3;
+      max-width: 280px;
+      padding: 2px 0 2px 16px;
+      border-left: 1px solid color-mix(in srgb, var(--na-gold) 55%, transparent);
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      text-align: left;
+    }
+    #atlas-card[hidden] { display: block; opacity: 0; visibility: hidden; }
+    .card-name {
+      font-family: var(--sans);
+      font-size: 12px; letter-spacing: 0.26em;
+      text-transform: uppercase; color: var(--na-gold);
+    }
+    .card-years {
+      margin-top: 4px;
+      font-family: var(--sans);
+      font-size: 10px; letter-spacing: 0.3em; color: var(--na-mist);
+    }
+    .card-epithet {
+      margin-top: 8px;
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 16px; line-height: 1.45; color: var(--na-starlight);
+    }
   </style>
 </head>
 <body data-phase="transit">
@@ -87,6 +114,11 @@
       <p class="tagline">Thirty Remarkable People · One Night Sky</p>
     </div>
     <p class="status" id="status" role="status">First light</p>
+  </div>
+  <div id="atlas-card" aria-live="polite" hidden>
+    <p class="card-name"></p>
+    <p class="card-years"></p>
+    <p class="card-epithet"></p>
   </div>
   <script type="module" src="/src/main.ts"></script>
 </body>

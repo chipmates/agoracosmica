@@ -194,19 +194,37 @@ export function createEclipse(scene: Scene) {
   const dimStars = starField(2400, 0.26, STAR_COOL, 44, 72)
   const brightStars = starField(320, 0.5, STAR_WARM, 42, 66)
 
-  const wandererGeo = new BufferGeometry()
-  const wpos: number[] = []
-  for (let i = 0; i < 30; i++) wpos.push(...shellPoint(rand, 40, 52))
-  wandererGeo.setAttribute('position', new Float32BufferAttribute(wpos, 3))
-  const wandererMat = new PointsMaterial({
+  const wandererBase: Array<[number, number, number]> = []
+  const wandererMat = new SpriteMaterial({
+    map: glowTexture([
+      [0, 'rgba(255, 246, 220, 1)'],
+      [0.25, 'rgba(224, 185, 106, 0.55)'],
+      [1, 'rgba(0, 0, 0, 0)'],
+    ]),
     color: GOLD,
-    size: 0.9,
-    sizeAttenuation: true,
+    blending: AdditiveBlending,
+    depthWrite: false,
     transparent: true,
     opacity: 0,
-    depthWrite: false,
   })
-  const wanderers = new Points(wandererGeo, wandererMat)
+  const wanderers = new Group()
+  for (let i = 0; i < 30; i++) {
+    // the wanderers gather in a wide cone around the visitor's gaze:
+    // a sky of thirty must greet, not hide. Drift reveals the rest.
+    const th = Math.acos(0.42 + 0.58 * rand())
+    const ph = rand() * Math.PI * 2
+    const rr = 40 + 12 * rand()
+    const p: [number, number, number] = [
+      rr * Math.sin(th) * Math.cos(ph),
+      rr * Math.sin(th) * Math.sin(ph) * 0.85,
+      -rr * Math.cos(th),
+    ]
+    wandererBase.push(p)
+    const s = new Sprite(wandererMat)
+    s.position.set(p[0], p[1], p[2])
+    s.scale.setScalar(2.6)
+    wanderers.add(s)
+  }
   scene.add(wanderers)
 
   function update(s: EclipseState): void {
@@ -249,5 +267,5 @@ export function createEclipse(scene: Scene) {
     corona.scale.setScalar(2 - pulse)
   }
 
-  return { update }
+  return { update, wanderers, wandererBase, wandererOpacity: () => wandererMat.opacity }
 }

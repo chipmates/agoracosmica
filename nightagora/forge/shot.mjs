@@ -14,6 +14,7 @@ const STATES = [
   { name: 'held', jump: ['held', {}] },
   { name: 'door', jump: ['door', { door: 0.55 }] },
   { name: 'sky', jump: ['sky', {}] },
+  { name: 'card', jump: ['sky', {}], focus: -1 },
 ]
 const VIEWPORTS = [
   { tag: 'desktop', width: 1512, height: 950, deviceScaleFactor: 1 },
@@ -62,10 +63,11 @@ try {
     await page.waitForFunction(() => Boolean(window.__forge))
     await page.waitForTimeout(1200) // let pipelines compile
     for (const s of STATES) {
-      await page.evaluate(([phase, opts]) => {
+      await page.evaluate(([phase, opts, focus]) => {
         window.__forge.freeze(12.4)
         window.__forge.jump(phase, opts)
-      }, s.jump)
+        if (focus !== undefined) window.__forge.focusWanderer(focus)
+      }, [...s.jump, s.focus])
       await page.waitForTimeout(450)
       await page.screenshot({ path: `${OUT}${s.name}-${vp.tag}.png` })
     }
