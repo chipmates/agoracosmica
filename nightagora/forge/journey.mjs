@@ -78,15 +78,28 @@ try {
   await waitPhase('held')
   await shot('held')
 
-  // 2 · scroll opens the door, the stone holds, the agora reveals
-  await wheel(300, 8)
-  await waitPhase('stone', 20000)
-  await shot('stone')
-  await waitPhase('agora', 20000)
+  // 2 · the descent: through the ring, the questions, down to the fire
+  await wheel(300, 2)
+  if (!(await waitPhase('descent', 8000))) process.exit(1)
+  await wheel(300, 5, 200)
+  await page.waitForTimeout(1200)
+  await shot('descent-early')
+  // scrub back a little mid-dive: the travel must reverse cleanly
+  await wheel(-300, 3, 200)
+  await page.waitForTimeout(1200)
+  await shot('descent-scrubbed-back')
+  // forward until the landing takes
+  for (let i = 0; i < 40; i++) {
+    const s = await state()
+    if (s.phase === 'agora') break
+    await wheel(300, 1, 140)
+  }
+  await waitPhase('agora', 15000)
   await page.waitForTimeout(2500)
   await shot('agora')
 
-  // 3 · scroll up from the agora fire into the sky of thirty
+  // 3 · after the arrival breath, scroll up into the sky of thirty
+  await page.waitForTimeout(1800)
   await wheel(300, 10)
   if (!(await waitPhase('sky'))) process.exit(1)
   await page.waitForTimeout(2500)
@@ -97,8 +110,17 @@ try {
   await wheel(300, 2, 1100)
   await page.waitForTimeout(2500)
   await shot('sky-wheeled-forward')
-  await wheel(-300, 2, 1100)
-  await page.waitForTimeout(2500)
+  // step back until the plate reads Philosophers again (the cooldown may
+  // swallow an event; a visitor would simply flick once more)
+  for (let i = 0; i < 8; i++) {
+    const name = await page.evaluate(
+      () => document.querySelector('#constellation-plate .plate-name')?.textContent ?? ''
+    )
+    if (/philosophers/i.test(name)) break
+    await wheel(-300, 1)
+    await page.waitForTimeout(1100)
+  }
+  await page.waitForTimeout(1600)
   await shot('sky-wheeled-back')
 
   // 5 · open Marcus's name -> his pane -> enter his night

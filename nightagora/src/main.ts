@@ -669,6 +669,9 @@ function push(delta: number): void {
     if (descTarget <= 0 && desc < 0.02 && delta < 0) setPhase('held')
   }
   if (phase === 'agora') {
+    // the arrival breath: landing at the fire absorbs the scroll for a
+    // moment, so a fast descent cannot blow straight through the hub
+    if (agoraEnteredAt >= 0 && elapsed - agoraEnteredAt < 1.6) return
     lookTarget = Math.min(1, Math.max(0, lookTarget + delta * 0.0009))
   }
   // the wheel of the night: scroll or swipe steps the carousel, wrapping.
