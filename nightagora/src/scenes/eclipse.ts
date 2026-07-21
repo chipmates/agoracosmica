@@ -185,7 +185,14 @@ export function createEclipse(scene: Scene) {
   flash.scale.setScalar(2.1)
   eclipse.add(flash)
 
-  // ---- the firmament: two star populations, and thirty that wander ----
+  // ---- the firmament: star populations as soft round glows (concept
+  // 01 law: a star is a falloff, never a hard point) ----
+  const starGlow = glowTexture([
+    [0, 'rgba(255, 255, 255, 1)'],
+    [0.25, 'rgba(255, 255, 255, 0.55)'],
+    [0.55, 'rgba(255, 255, 255, 0.12)'],
+    [1, 'rgba(0, 0, 0, 0)'],
+  ])
   function starField(count: number, size: number, color: Color, rMin: number, rMax: number) {
     const geo = new BufferGeometry()
     const pos: number[] = []
@@ -194,10 +201,12 @@ export function createEclipse(scene: Scene) {
     const mat = new PointsMaterial({
       color,
       size,
+      map: starGlow,
       sizeAttenuation: true,
       transparent: true,
       opacity: 0,
       depthWrite: false,
+      blending: AdditiveBlending,
     })
     const points = new Points(geo, mat)
     scene.add(points)
@@ -205,11 +214,11 @@ export function createEclipse(scene: Scene) {
   }
   // a rich, varied heaven: four populations at different sizes and hues,
   // dense dust to bright gems, cool sparkle among the warm
-  const dustStars = starField(3200, 0.18, STAR_PALE, 46, 74)
-  const dimStars = starField(2400, 0.26, STAR_COOL, 44, 72)
-  const midStars = starField(760, 0.38, STAR_ICE, 43, 68)
-  const brightStars = starField(320, 0.5, STAR_ICE, 42, 66)
-  const gemStars = starField(110, 0.72, STAR_WARM, 41, 60)
+  const dustStars = starField(3200, 0.26, STAR_PALE, 46, 74)
+  const dimStars = starField(2400, 0.38, STAR_COOL, 44, 72)
+  const midStars = starField(760, 0.55, STAR_ICE, 43, 68)
+  const brightStars = starField(320, 0.72, STAR_ICE, 42, 66)
+  const gemStars = starField(110, 1.0, STAR_WARM, 41, 60)
 
   const wandererBase: Array<[number, number, number]> = []
   const wandererMat = new SpriteMaterial({

@@ -120,7 +120,9 @@ export function createAgora(scene: Scene) {
     return new CanvasTexture(canvas)
   }
 
-  /** Dark polished marble: ink base, pale veins, tonal clouds, fine grain. */
+  /** Paving joints only, as a multiplier map: the marble itself now
+      comes from the same fbm shader as the descent's mandala, so the map
+      and the territory are one stone. */
   function marbleTexture(rnd: () => number): CanvasTexture {
     const size = 1024
     const canvas = document.createElement('canvas')
@@ -128,28 +130,13 @@ export function createAgora(scene: Scene) {
     canvas.height = size
     const ctx = canvas.getContext('2d')
     if (!ctx) throw new Error('2d context unavailable')
-    ctx.fillStyle = '#0a0f1e'
+    ctx.fillStyle = '#ffffff'
     ctx.fillRect(0, 0, size, size)
 
-    // tonal clouds: the stone is never one value
-    for (let i = 0; i < 46; i++) {
-      const x = rnd() * size
-      const y = rnd() * size
-      const r = 60 + rnd() * 220
-      const g = ctx.createRadialGradient(x, y, 0, x, y, r)
-      const lift = rnd() > 0.5
-      g.addColorStop(0, lift ? 'rgba(26, 34, 60, 0.10)' : 'rgba(3, 5, 10, 0.12)')
-      g.addColorStop(1, 'rgba(0, 0, 0, 0)')
-      ctx.fillStyle = g
-      ctx.fillRect(x - r, y - r, r * 2, r * 2)
-    }
-
-    // the pavement centers on the agora itself (seen from above in the
-    // descent it reads as a mandala); the fire keeps its own engraved
-    // council rings as the off-center jewel
+    // the pavement centers on the agora itself
     const fx = size * 0.5
     const fy = size * 0.5
-    ctx.strokeStyle = 'rgba(2, 4, 9, 0.35)'
+    ctx.strokeStyle = 'rgba(80, 92, 118, 0.42)'
     ctx.lineWidth = 1.6
     for (let ring = 1; ring <= 8; ring++) {
       const r = (ring * 1.6 * size) / 28
@@ -164,52 +151,8 @@ export function createAgora(scene: Scene) {
       ctx.lineTo(fx + Math.cos(a) * ((13.4 * size) / 28), fy + Math.sin(a) * ((13.4 * size) / 28))
       ctx.stroke()
     }
-    // two pale pavement rings echo the colonnade from above
-    ctx.strokeStyle = 'rgba(182, 194, 224, 0.10)'
-    ctx.lineWidth = 3
-    for (const rr of [5.4, 8.9]) {
-      ctx.beginPath()
-      ctx.arc(fx, fy, (rr * size) / 28, 0, Math.PI * 2)
-      ctx.stroke()
-    }
 
-    // veins: long wandering hairlines, a few warmer ones
-    for (let i = 0; i < 17; i++) {
-      const warm = rnd() > 0.78
-      let x = rnd() * size
-      let y = rnd() * size
-      let ang = rnd() * Math.PI * 2
-      const steps = 70 + Math.floor(rnd() * 130)
-      const alpha = 0.07 + rnd() * 0.08
-      ctx.strokeStyle = warm
-        ? `rgba(214, 192, 148, ${alpha})`
-        : `rgba(182, 194, 224, ${alpha})`
-      ctx.lineWidth = 0.8 + rnd() * 1.5
-      ctx.beginPath()
-      ctx.moveTo(x, y)
-      for (let s = 0; s < steps; s++) {
-        ang += (rnd() - 0.5) * 0.7
-        const step = 4 + rnd() * 9
-        x += Math.cos(ang) * step
-        y += Math.sin(ang) * step
-        ctx.lineTo(x, y)
-        // occasional faint branch
-        if (rnd() > 0.965) {
-          const bx = x
-          const by = y
-          let ba = ang + (rnd() - 0.5) * 1.6
-          ctx.moveTo(bx, by)
-          for (let b = 0; b < 14; b++) {
-            ba += (rnd() - 0.5) * 0.8
-            ctx.lineTo(bx + Math.cos(ba) * b * 5, by + Math.sin(ba) * b * 5)
-          }
-          ctx.moveTo(x, y)
-        }
-      }
-      ctx.stroke()
-    }
-
-    paintNoise(ctx, size, rnd, 1.7)
+    paintNoise(ctx, size, rnd, 2.4)
     const tex = new CanvasTexture(canvas)
     tex.colorSpace = SRGBColorSpace
     return tex
@@ -223,7 +166,36 @@ export function createAgora(scene: Scene) {
   // ------------------------------------------------------------------
   const floorMat = new MeshBasicNodeMaterial()
   {
-    const albedo = texture(marble).rgb
+    // the same stone as the descent's mandala: concept-01 fbm marble in
+    // the same normalized frame (disc radius 14, centered on the agora)
+    const vP = positionWorld.xz.div(14)
+    const rN = length(vP)
+    const q = vP.mul(7.0)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const fbm = (p: any) =>
+      mx_noise_float(vec2(p.x, p.y))
+        .mul(0.5)
+        .add(mx_noise_float(vec2(p.x, p.y).mul(2.03)).mul(0.25))
+        .add(mx_noise_float(vec2(p.x, p.y).mul(4.12)).mul(0.125))
+        .add(mx_noise_float(vec2(p.x, p.y).mul(8.36)).mul(0.0625))
+        .add(0.5)
+    const warp = clamp(fbm(q.mul(1.7).add(3.7)), 0, 1)
+    const marbleM = clamp(fbm(q.add(warp.mul(1.3))), 0, 1)
+    const vein = pow(clamp(oneMinus(abs(marbleM.mul(2.0).sub(1.0))), 0, 1), 9.0)
+    const marbleBase = mix(
+      vec3(0.059, 0.078, 0.212),
+      vec3(0.029, 0.041, 0.119),
+      smoothstep(0.05, 1.0, rN)
+    )
+    let stone = marbleBase.mul(fbm(q.mul(0.5)).mul(0.16).add(0.9))
+    stone = stone.add(vec3(0.165, 0.2, 0.455).mul(vein).mul(0.17))
+    stone = stone.add(vec3(0.902, 0.737, 0.361).mul(vein).mul(0.045).mul(fbm(q.mul(2.6))))
+    stone = stone.mul(oneMinus(smoothstep(0.66, 1.0, rN).mul(0.55)))
+    // at the seated eye the pattern whispers: same stone as the mandala,
+    // at half the contrast, under the fire's own light
+    stone = mix(marbleBase, stone, 0.45)
+    // sRGB constants into the linear pipeline, joints carved on top
+    const albedo = pow(stone, vec3(2.2, 2.2, 2.2)).mul(texture(marble).rgb)
     const dxz = length(positionWorld.xz.sub(vec2(FIRE.x, FIRE.z)))
     // firelight lying on the stone, dancing a little
     const fireFall = float(6.4).div(dxz.mul(dxz).add(1.3))
