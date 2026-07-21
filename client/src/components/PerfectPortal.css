@@ -67,6 +67,7 @@
 
 /* Zodiac ring */
 .zodiac-ring {
+  --current-rotation: 0deg;
   position: absolute;
   width: 90%;
   height: 90%;
@@ -116,16 +117,20 @@
     color-mix(in srgb, var(--bg-primary) var(--a-70), transparent) 70%
   );
   transform-style: preserve-3d;
+  filter: blur(1px);
   animation: distortion-morph 8s infinite alternate ease-in-out;
   animation-play-state: paused;
 }
 
+/* Transform-only morph: the old sub-2px animated blur was invisible at this
+   scale but forced a full repaint every frame. A static soft blur gives the
+   same look for free. */
 @keyframes distortion-morph {
-  0% { transform: scale(0.95) rotate(0deg); filter: blur(1px); }
-  25% { transform: scale(0.98) rotate(1deg); filter: blur(0.5px); }
-  50% { transform: scale(0.96) rotate(-1deg); filter: blur(1.5px); }
-  75% { transform: scale(0.97) rotate(0.5deg); filter: blur(1px); }
-  100% { transform: scale(0.99) rotate(-0.5deg); filter: blur(0px); }
+  0% { transform: scale(0.95) rotate(0deg); }
+  25% { transform: scale(0.98) rotate(1deg); }
+  50% { transform: scale(0.96) rotate(-1deg); }
+  75% { transform: scale(0.97) rotate(0.5deg); }
+  100% { transform: scale(0.99) rotate(-0.5deg); }
 }
 
 /* Vortex center */

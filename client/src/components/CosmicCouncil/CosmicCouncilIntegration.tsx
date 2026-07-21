@@ -1,6 +1,9 @@
 // src/components/CosmicCouncil/CosmicCouncilIntegration.tsx
-import { FC } from 'react';
-import CouncilSetupModal from './CouncilSetupModal';
+import { FC, lazy, Suspense } from 'react';
+
+// Lazy like the sibling modals in ModalsContainer: keeps CouncilSetupModal
+// (and its large stylesheet) out of the eager HomePage chunk.
+const CouncilSetupModal = lazy(() => import('./CouncilSetupModal'));
 
 interface CouncilConfig {
   participants?: any[];
@@ -36,11 +39,13 @@ const CosmicCouncilIntegration: FC<CosmicCouncilIntegrationProps> = ({
   return (
     <>
       {/* Council Setup Modal with Smart Dynamic Header */}
-      <CouncilSetupModal
-        isOpen={categoryModalOpen}
-        onClose={onCategoryModalClose}
-        onStartCouncil={handleCouncilStart}
-      />
+      <Suspense fallback={null}>
+        <CouncilSetupModal
+          isOpen={categoryModalOpen}
+          onClose={onCategoryModalClose}
+          onStartCouncil={handleCouncilStart}
+        />
+      </Suspense>
     </>
   );
 };

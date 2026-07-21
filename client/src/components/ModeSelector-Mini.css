@@ -508,13 +508,31 @@
   box-shadow: 0 0 16px color-mix(in srgb, currentColor 30%, transparent);
 }
 
-/* Active — current mode, pulse animation */
+/* Active — current mode, pulse animation.
+   The glow breathes via an opacity-only ::after layer (compositor work,
+   no per-frame box-shadow repaint like the old eclipseNodePulse). */
 .eclipse-node--active .eclipse-node-icon {
   opacity: 1;
+  position: relative;
   border-width: 3px;
   background: color-mix(in srgb, var(--bg-card) 25%, transparent);
-  animation: eclipseNodePulse 3s ease-in-out infinite;
-  animation-play-state: running;
+  box-shadow: 0 0 12px color-mix(in srgb, currentColor 25%, transparent);
+}
+
+.eclipse-node--active .eclipse-node-icon::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  box-shadow: 0 0 24px color-mix(in srgb, currentColor 45%, transparent);
+  opacity: 0;
+  pointer-events: none;
+  animation: eclipseNodeGlow 3s ease-in-out infinite;
+}
+
+@keyframes eclipseNodeGlow {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
@@ -585,15 +603,6 @@
 @keyframes fadeOut {
   from { opacity: 1; }
   to { opacity: 0; }
-}
-
-@keyframes eclipseNodePulse {
-  0%, 100% {
-    box-shadow: 0 0 12px color-mix(in srgb, currentColor 25%, transparent);
-  }
-  50% {
-    box-shadow: 0 0 24px color-mix(in srgb, currentColor 45%, transparent);
-  }
 }
 
 @keyframes eclipseSunPulse {
@@ -908,6 +917,7 @@
   .mode-selector-overlay,
   .eclipse-node,
   .eclipse-node-icon,
+  .eclipse-node-icon::after,
   .eclipse-sun {
     animation: none !important;
     transition: opacity 0.1s linear !important;

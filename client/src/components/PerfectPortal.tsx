@@ -141,7 +141,6 @@ const PerfectPortal = forwardRef<HTMLDivElement, PerfectPortalProps>(({
   const flashRef = useRef<HTMLDivElement>(null);
   const soundRef = useRef<HTMLAudioElement>(null);
   
-  const [ringRotation, setRingRotation] = useState(0);
   const [zodiacSymbols, setZodiacSymbols] = useState<ZodiacSymbol[]>([]);
   
   // Generate zodiac symbols around the ring
@@ -251,22 +250,10 @@ const PerfectPortal = forwardRef<HTMLDivElement, PerfectPortalProps>(({
     };
   }, []);
   
-  // Track zodiac ring rotation
-  useEffect(() => {
-    const rotationInterval = setInterval(() => {
-      setRingRotation(prev => (prev + 0.05) % 360);
-    }, 1000 / 60); // 60 fps
-    
-    return () => clearInterval(rotationInterval);
-  }, []);
-  
-  // Update CSS variable for ring rotation when revealed
-  useEffect(() => {
-    if (!zodiacRingRef.current) return;
-    
-    zodiacRingRef.current.style.setProperty('--current-rotation', `${ringRotation}deg`);
-  }, [ringRotation, isRevealed]);
-  
+  // Ring rotation runs purely in CSS (rotate-zodiac keyframes); the reveal
+  // and unreveal keyframes read --current-rotation, which defaults to 0deg
+  // in the stylesheet.
+
   // Play sound effect when portal is revealed
   useEffect(() => {
     if (isRevealed && soundRef.current && soundRef.current.src) {
@@ -302,10 +289,9 @@ const PerfectPortal = forwardRef<HTMLDivElement, PerfectPortalProps>(({
         <div className="portal-rim"></div>
         
         {/* Zodiac ring with symbols */}
-        <div 
-          className="zodiac-ring" 
+        <div
+          className="zodiac-ring"
           ref={zodiacRingRef}
-          style={{ transform: `rotate(${ringRotation}deg)` }}
         >
           {zodiacSymbols.map(symbol => (
             <div 
