@@ -1,5 +1,6 @@
 import {
   AdditiveBlending,
+  BoxGeometry,
   BufferGeometry,
   CanvasTexture,
   CircleGeometry,
@@ -8,32 +9,46 @@ import {
   Float32BufferAttribute,
   Group,
   Mesh,
-  MeshBasicMaterial,
+  MeshBasicNodeMaterial,
+  PlaneGeometry,
   Points,
   PointsMaterial,
   Scene,
   Sprite,
   SpriteMaterial,
+  SRGBColorSpace,
+  TorusGeometry,
 } from 'three/webgpu'
+import {
+  clamp,
+  dot,
+  float,
+  fract,
+  length,
+  mix,
+  mx_noise_float,
+  normalWorld,
+  normalize,
+  oneMinus,
+  positionWorld,
+  sin,
+  smoothstep,
+  texture,
+  uniform,
+  uv,
+  vec2,
+  vec3,
+} from 'three/tsl'
 import { mulberry32, FOUNDING_SEED } from '../core/seed'
 
-const FLOOR = new Color('#070b18')
-const COLUMN = new Color('#0d1330')
-const EMBER_GOLD = new Color('#f0c87e')
-
-function radialTexture(stops: Array<[number, string]>): CanvasTexture {
-  const size = 256
-  const canvas = document.createElement('canvas')
-  canvas.width = size
-  canvas.height = size
-  const ctx = canvas.getContext('2d')
-  if (!ctx) throw new Error('2d context unavailable')
-  const g = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2)
-  for (const [at, color] of stops) g.addColorStop(at, color)
-  ctx.fillStyle = g
-  ctx.fillRect(0, 0, size, size)
-  return new CanvasTexture(canvas)
-}
+// ---- the palette: night stone, earned gold ----
+const GOLD = new Color('#e0b96a')
+const GOLD_DEEP = new Color('#a9611f')
+const WHITE_HOT = new Color('#fff6e0')
+const EMBER_GOLD = new Color('#f0b45a')
+const STAR_WHITE = new Color('#eef1ff')
+const STAR_COOL = new Color('#c9d4f2')
+const COLUMN_INK = new Color('#0a0e22')
 
 export interface AgoraState {
   /** 0..1 fade-in of the ground world after the dark door */
@@ -42,183 +57,590 @@ export interface AgoraState {
 }
 
 /**
- * The ground hub, lean first pass: marble disc, colonnade silhouettes,
- * the fire with rising embers. The camera stays at origin; the world
- * sits low (floor at y=-1.7) so the sky scenes keep their framing.
+ * The ground hub, material-first: a polished dark-marble disc that answers
+ * the fire (lit veins, a grazing sheen, the firmament doubled faintly in the
+ * stone), a noise-driven flame over a stone fire-altar, its mirror image
+ * lying on the floor where reflection geometry actually puts it, a far
+ * colonnade rim-lit by the fire, and embers that whiten into stars as they
+ * climb. Camera stays at origin; everything below is staged for the seated
+ * eye (pitch -0.12, fov 46).
  */
 export function createAgora(scene: Scene) {
-  const rand = mulberry32(FOUNDING_SEED + 7)
   const root = new Group()
   root.visible = false
   scene.add(root)
 
-  // the eye sits low, as if seated at the fire: floor just under the chest
   const FLOOR_Y = -0.9
-  const FIRE = { x: 0, z: -4.8 }
+  const FIRE = { x: 0, y: -0.45, z: -5.6 } // light anchor sits low in the bowl
 
-  // marble disc
-  const floorMat = new MeshBasicMaterial({ color: FLOOR, transparent: true, opacity: 0 })
-  const floor = new Mesh(new CircleGeometry(14, 72), floorMat)
+  const uT = uniform(0)
+  const uR = uniform(0)
+
+  // shared 2d hash for dithering shader gradients (kills banding)
+  const hash = fract(sin(dot(uv().mul(vec2(511.7, 337.3)), vec2(12.9898, 78.233))).mul(43758.5453))
+  const dither = hash.sub(0.5).mul(0.016)
+
+  // ------------------------------------------------------------------
+  // textures (seeded canvas, always dithered: gradients never band)
+  // ------------------------------------------------------------------
+  function paintNoise(ctx: CanvasRenderingContext2D, size: number, rnd: () => number, amp: number): void {
+    const img = ctx.getImageData(0, 0, size, size)
+    const d = img.data
+    for (let i = 0; i < d.length; i += 4) {
+      const n = (rnd() - 0.5) * 2 * amp
+      d[i] = Math.max(0, Math.min(255, (d[i] ?? 0) + n))
+      d[i + 1] = Math.max(0, Math.min(255, (d[i + 1] ?? 0) + n))
+      d[i + 2] = Math.max(0, Math.min(255, (d[i + 2] ?? 0) + n))
+      const a = (rnd() - 0.5) * amp
+      d[i + 3] = Math.max(0, Math.min(255, (d[i + 3] ?? 0) + a))
+    }
+    ctx.putImageData(img, 0, 0)
+  }
+
+  function glowTexture(stops: Array<[number, string]>, rnd: () => number): CanvasTexture {
+    const size = 256
+    const canvas = document.createElement('canvas')
+    canvas.width = size
+    canvas.height = size
+    const ctx = canvas.getContext('2d')
+    if (!ctx) throw new Error('2d context unavailable')
+    const g = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2)
+    for (const [at, color] of stops) g.addColorStop(at, color)
+    ctx.fillStyle = g
+    ctx.fillRect(0, 0, size, size)
+    paintNoise(ctx, size, rnd, 5)
+    return new CanvasTexture(canvas)
+  }
+
+  /** Dark polished marble: ink base, pale veins, tonal clouds, fine grain. */
+  function marbleTexture(rnd: () => number): CanvasTexture {
+    const size = 1024
+    const canvas = document.createElement('canvas')
+    canvas.width = size
+    canvas.height = size
+    const ctx = canvas.getContext('2d')
+    if (!ctx) throw new Error('2d context unavailable')
+    ctx.fillStyle = '#0a0f1e'
+    ctx.fillRect(0, 0, size, size)
+
+    // tonal clouds: the stone is never one value
+    for (let i = 0; i < 46; i++) {
+      const x = rnd() * size
+      const y = rnd() * size
+      const r = 60 + rnd() * 220
+      const g = ctx.createRadialGradient(x, y, 0, x, y, r)
+      const lift = rnd() > 0.5
+      g.addColorStop(0, lift ? 'rgba(26, 34, 60, 0.10)' : 'rgba(3, 5, 10, 0.12)')
+      g.addColorStop(1, 'rgba(0, 0, 0, 0)')
+      ctx.fillStyle = g
+      ctx.fillRect(x - r, y - r, r * 2, r * 2)
+    }
+
+    // veins: long wandering hairlines, a few warmer ones
+    for (let i = 0; i < 17; i++) {
+      const warm = rnd() > 0.78
+      let x = rnd() * size
+      let y = rnd() * size
+      let ang = rnd() * Math.PI * 2
+      const steps = 70 + Math.floor(rnd() * 130)
+      const alpha = 0.05 + rnd() * 0.06
+      ctx.strokeStyle = warm
+        ? `rgba(214, 192, 148, ${alpha})`
+        : `rgba(182, 194, 224, ${alpha})`
+      ctx.lineWidth = 0.8 + rnd() * 1.5
+      ctx.beginPath()
+      ctx.moveTo(x, y)
+      for (let s = 0; s < steps; s++) {
+        ang += (rnd() - 0.5) * 0.7
+        const step = 4 + rnd() * 9
+        x += Math.cos(ang) * step
+        y += Math.sin(ang) * step
+        ctx.lineTo(x, y)
+        // occasional faint branch
+        if (rnd() > 0.965) {
+          const bx = x
+          const by = y
+          let ba = ang + (rnd() - 0.5) * 1.6
+          ctx.moveTo(bx, by)
+          for (let b = 0; b < 14; b++) {
+            ba += (rnd() - 0.5) * 0.8
+            ctx.lineTo(bx + Math.cos(ba) * b * 5, by + Math.sin(ba) * b * 5)
+          }
+          ctx.moveTo(x, y)
+        }
+      }
+      ctx.stroke()
+    }
+
+    paintNoise(ctx, size, rnd, 1.7)
+    const tex = new CanvasTexture(canvas)
+    tex.colorSpace = SRGBColorSpace
+    return tex
+  }
+
+  const texRand = mulberry32(FOUNDING_SEED + 21)
+  const marble = marbleTexture(texRand)
+
+  // ------------------------------------------------------------------
+  // 1 · THE MARBLE — a real material, lit by the fire, polished
+  // ------------------------------------------------------------------
+  const floorMat = new MeshBasicNodeMaterial()
+  {
+    const albedo = texture(marble).rgb
+    const dxz = length(positionWorld.xz.sub(vec2(FIRE.x, FIRE.z)))
+    // firelight lying on the stone, dancing a little
+    const fireFall = float(6.4).div(dxz.mul(dxz).add(1.3))
+    const shimmer = mx_noise_float(vec3(positionWorld.x.mul(0.5), positionWorld.z.mul(0.5), uT.mul(0.33)))
+      .mul(0.08)
+      .add(0.96)
+    const warm = vec3(0.93, 0.68, 0.34)
+    const ambient = vec3(0.55, 0.7, 1.15)
+    const light = ambient.add(warm.mul(fireFall).mul(shimmer))
+    // the fire's own gleam on the polish: a direct warm sheen, not paint
+    const gleam = warm.mul(fireFall).mul(shimmer).mul(0.017)
+    // polish: the far stone catches the night at grazing angles
+    const grazing = oneMinus(clamp(normalize(positionWorld).y.abs(), 0, 1))
+    const sheen = vec3(0.0035, 0.005, 0.009).mul(grazing.pow(7))
+    floorMat.colorNode = albedo.mul(light).add(gleam).add(sheen).add(dither.mul(0.05)).mul(uR)
+  }
+  const floor = new Mesh(new CircleGeometry(14, 96), floorMat)
   floor.rotation.x = -Math.PI / 2
   floor.position.y = FLOOR_Y
   root.add(floor)
 
-  // pool of firelight on the marble
-  const poolMat = new MeshBasicMaterial({
-    map: radialTexture([
-      [0, 'rgba(224, 185, 106, 0.34)'],
-      [0.5, 'rgba(169, 124, 47, 0.12)'],
-      [1, 'rgba(0, 0, 0, 0)'],
-    ]),
+  // ------------------------------------------------------------------
+  // 2 · THE FIRMAMENT IN THE STONE — star-dust on the polish
+  //     (camera never translates, so dots on the surface read exactly
+  //      as the cheated mirrored starfield the doctrine names)
+  // ------------------------------------------------------------------
+  const dustRand = mulberry32(FOUNDING_SEED + 34)
+  function dustField(
+    count: number,
+    near: boolean,
+    gold: boolean,
+    rMin = 0,
+    rMax = 9.3
+  ): { points: Points; mat: PointsMaterial } {
+    const pos: number[] = []
+    let guard = 0
+    while (pos.length / 3 < count && guard < count * 60) {
+      guard++
+      const r = rMin + (rMax - rMin) * Math.pow(dustRand(), 0.42)
+      const a = dustRand() * Math.PI * 2
+      const x = Math.sin(a) * r
+      const z = -Math.cos(a) * r
+      if (z > 0.4) continue // behind the visitor
+      const dFire = Math.hypot(x - FIRE.x, z - FIRE.z)
+      if (dFire < 1.5) continue // the altar owns its ground
+      const dCam = Math.hypot(x, z)
+      if (near !== dCam < 3.6) continue
+      pos.push(x, FLOOR_Y + 0.015, z)
+    }
+    const geo = new BufferGeometry()
+    geo.setAttribute('position', new Float32BufferAttribute(pos, 3))
+    const mat = new PointsMaterial({
+      color: gold ? GOLD : STAR_COOL,
+      size: gold ? 0.03 : near ? 0.012 : 0.021,
+      sizeAttenuation: true,
+      transparent: true,
+      opacity: 0,
+      blending: AdditiveBlending,
+      depthWrite: false,
+    })
+    const points = new Points(geo, mat)
+    points.renderOrder = 2
+    root.add(points)
+    return { points, mat }
+  }
+  const dustFar = dustField(360, false, false)
+  const dustNear = dustField(120, true, false)
+  const dustGold = dustField(9, false, true)
+  // the polish does not end in a line: a sparse feather past the main field
+  const dustEdge = dustField(85, false, false, 8.9, 11.6)
+
+  // ------------------------------------------------------------------
+  // 3 · THE FIRE — noise-shaped tongues over a stone altar
+  // ------------------------------------------------------------------
+  const flameMat = new MeshBasicNodeMaterial({
     transparent: true,
     blending: AdditiveBlending,
     depthWrite: false,
-    opacity: 0,
   })
-  const pool = new Mesh(new CircleGeometry(5.4, 48), poolMat)
-  pool.rotation.x = -Math.PI / 2
-  pool.position.set(FIRE.x, FLOOR_Y + 0.02, FIRE.z)
-  root.add(pool)
+  {
+    const fu = uv().x.mul(2).sub(1) // -1 .. 1 across
+    const fv = uv().y // 0 base .. 1 tip
+    const swayA = sin(fv.mul(5.1).sub(uT.mul(2.2))).mul(fv).mul(0.11)
+    const swayB = sin(fv.mul(10.7).sub(uT.mul(3.4)).add(1.9)).mul(fv).mul(0.05)
+    const fx = fu.add(swayA).add(swayB)
 
-  // colonnade silhouettes, an open arc (nothing behind the visitor's back)
-  const colMat = new MeshBasicMaterial({ color: COLUMN, transparent: true, opacity: 0 })
-  const colGeo = new CylinderGeometry(0.24, 0.3, 4.6, 10)
-  for (let i = 0; i < 9; i++) {
-    if (i === 4) continue // the arc frames the fire, never skewers it
-    const a = (-Math.PI * 0.78) + (i / 8) * Math.PI * 1.56
-    const col = new Mesh(colGeo, colMat)
-    col.position.set(Math.sin(a) * 11.5, FLOOR_Y + 2.3, -Math.cos(a) * 11.5)
-    root.add(col)
+    // a fire is many tongues, not one wick: three envelopes, each with its
+    // own lean, height and breath, joined by max()
+    function tongue(center: number, width: number, tall: number, lean: number, phase: number) {
+      const cx = fx.sub(center).sub(sin(uT.mul(1.3).add(phase)).mul(0.05).add(lean).mul(fv))
+      const h = fv.div(tall)
+      const halfW = oneMinus(clamp(h, 0, 1)).pow(0.72).mul(width).add(0.03)
+      const e = oneMinus(smoothstep(halfW.mul(0.28), halfW, cx.abs()))
+      // each tongue thins out past its own height
+      return e.mul(oneMinus(smoothstep(0.75, 1.0, h)))
+    }
+    const envA = tongue(-0.34, 0.26, 0.62, -0.1, 0.0)
+    const envB = tongue(0.02, 0.34, 1.0, 0.03, 2.3)
+    const envC = tongue(0.36, 0.22, 0.5, 0.12, 4.1)
+    const env = envA.max(envB).max(envC)
+
+    const np = vec3(fx.mul(2.6), fv.mul(3.2).sub(uT.mul(1.85)), uT.mul(0.21))
+    const noise = mx_noise_float(np).add(mx_noise_float(np.mul(2.13).add(vec3(7.3, 3.7, 1.9))).mul(0.6))
+
+    const field = env
+      .mul(noise.mul(0.54).add(0.86))
+      .sub(fv.mul(0.55))
+      .add(oneMinus(fv).mul(0.12))
+      .sub(0.1)
+
+    const alpha = smoothstep(0.07, 0.38, field).mul(smoothstep(0.0, 0.06, fv))
+    const heatCore = smoothstep(0.3, 0.95, field).mul(oneMinus(fv).pow(1.15))
+    const bodyMix = clamp(field.mul(1.5), 0, 1)
+    const col = mix(
+      mix(vec3(GOLD_DEEP.r, GOLD_DEEP.g, GOLD_DEEP.b), vec3(GOLD.r, GOLD.g, GOLD.b), bodyMix),
+      vec3(WHITE_HOT.r, WHITE_HOT.g, WHITE_HOT.b),
+      heatCore
+    )
+    const flicker = sin(uT.mul(8.3)).mul(0.06).add(sin(uT.mul(13.1)).mul(0.04)).add(0.92)
+    flameMat.colorNode = col
+    flameMat.opacityNode = alpha.mul(flicker).mul(uR).add(dither)
   }
+  const flame = new Mesh(new PlaneGeometry(1.1, 1.42), flameMat)
+  flame.position.set(FIRE.x, 0.03, FIRE.z)
+  flame.renderOrder = 7
+  root.add(flame)
 
-  // the fire: three breathing layers of light
-  function flame(stops: Array<[number, string]>, sx: number, sy: number, y: number) {
+  // the stone altar that holds the fire
+  const altarPedMat = new MeshBasicNodeMaterial()
+  altarPedMat.colorNode = vec3(0.004, 0.0032, 0.0026)
+    .mul(oneMinus(smoothstep(-0.9, -0.5, positionWorld.y)).mul(0.5).add(0.5))
+    .mul(uR)
+  const pedestal = new Mesh(new CylinderGeometry(0.26, 0.38, 0.22, 20), altarPedMat)
+  pedestal.position.set(FIRE.x, FLOOR_Y + 0.11, FIRE.z)
+  root.add(pedestal)
+
+  const bowlMat = new MeshBasicNodeMaterial()
+  bowlMat.colorNode = mix(vec3(0.002, 0.0016, 0.0012), vec3(0.02, 0.011, 0.005), smoothstep(-0.78, -0.5, positionWorld.y)).mul(uR)
+  const bowl = new Mesh(new CylinderGeometry(0.54, 0.24, 0.28, 24), bowlMat)
+  bowl.position.set(FIRE.x, FLOOR_Y + 0.24, FIRE.z) // rim at -0.52
+  root.add(bowl)
+
+  // molten rim: the bowl's lip catches the flame
+  const rimMat = new MeshBasicNodeMaterial({
+    transparent: true,
+    blending: AdditiveBlending,
+    depthWrite: false,
+  })
+  rimMat.colorNode = vec3(GOLD.r, GOLD.g, GOLD.b)
+  rimMat.opacityNode = sin(uT.mul(7.9)).mul(0.12).add(0.56).mul(uR)
+  const rim = new Mesh(new TorusGeometry(0.53, 0.014, 8, 64), rimMat)
+  rim.rotation.x = Math.PI / 2
+  rim.position.set(FIRE.x, FLOOR_Y + 0.385, FIRE.z)
+  rim.renderOrder = 5
+  root.add(rim)
+
+  // coals breathing inside the bowl
+  const coalRand = mulberry32(FOUNDING_SEED + 8)
+  const coalTex = glowTexture(
+    [
+      [0, 'rgba(255, 214, 140, 0.9)'],
+      [0.25, 'rgba(240, 160, 64, 0.5)'],
+      [0.6, 'rgba(150, 74, 20, 0.14)'],
+      [1, 'rgba(0, 0, 0, 0)'],
+    ],
+    coalRand
+  )
+  const coals: Array<{ s: Sprite; mat: SpriteMaterial; phase: number }> = []
+  for (const [ox, oy, sc, ph] of [
+    [-0.14, 0.02, 0.42, 0.0],
+    [0.12, -0.01, 0.36, 2.1],
+    [0.0, 0.05, 0.3, 4.2],
+  ] as Array<[number, number, number, number]>) {
     const mat = new SpriteMaterial({
-      map: radialTexture(stops),
+      map: coalTex,
       blending: AdditiveBlending,
       depthWrite: false,
       transparent: true,
       opacity: 0,
     })
     const s = new Sprite(mat)
-    s.position.set(FIRE.x, y, FIRE.z)
-    s.scale.set(sx, sy, 1)
+    s.position.set(FIRE.x + ox, FLOOR_Y + 0.42 + oy, FIRE.z + 0.05)
+    s.scale.set(sc, sc * 0.8, 1)
+    s.renderOrder = 6
     root.add(s)
-    return { s, mat, sx, sy }
+    coals.push({ s, mat, phase: ph })
   }
-  // a fire is a tongue, not a lamp: tall tight core, modest body, small halo,
-  // and darkness allowed to hold the edges
-  const core = flame(
-    [
-      [0, 'rgba(255, 250, 235, 0.95)'],
-      [0.16, 'rgba(246, 223, 174, 0.6)'],
-      [0.4, 'rgba(224, 185, 106, 0.14)'],
-      [1, 'rgba(0, 0, 0, 0)'],
-    ],
-    1.0,
-    2.3,
-    FLOOR_Y + 1.0
-  )
-  const body = flame(
-    [
-      [0, 'rgba(240, 200, 126, 0.5)'],
-      [0.35, 'rgba(224, 185, 106, 0.16)'],
-      [1, 'rgba(0, 0, 0, 0)'],
-    ],
-    1.7,
-    2.3,
-    FLOOR_Y + 0.9
-  )
-  const halo = flame(
-    [
-      [0, 'rgba(224, 185, 106, 0.2)'],
-      [0.5, 'rgba(169, 124, 47, 0.06)'],
-      [1, 'rgba(0, 0, 0, 0)'],
-    ],
-    4.6,
-    3.4,
-    FLOOR_Y + 1.3
-  )
-  // the polished marble answers the fire: a low sheen across the stone,
-  // and the flame's streak mirrored toward the visitor
-  const sheen = flame(
-    [
-      [0, 'rgba(240, 200, 126, 0.26)'],
-      [0.5, 'rgba(169, 124, 47, 0.08)'],
-      [1, 'rgba(0, 0, 0, 0)'],
-    ],
-    7.2,
-    1.15,
-    FLOOR_Y + 0.14
-  )
-  const streak = flame(
-    [
-      [0, 'rgba(240, 200, 126, 0.16)'],
-      [0.4, 'rgba(224, 185, 106, 0.05)'],
-      [1, 'rgba(0, 0, 0, 0)'],
-    ],
-    0.8,
-    2.1,
-    FLOOR_Y - 0.15
-  )
-  streak.s.position.z = FIRE.z + 1.6
 
-  // embers: sparks that rise toward the firmament
-  const EMBERS = 64
-  const emberGeo = new BufferGeometry()
-  const emberPos = new Float32Array(EMBERS * 3)
-  const emberSeed: Array<{ speed: number; sway: number; phase: number }> = []
-  for (let i = 0; i < EMBERS; i++) {
-    emberPos[i * 3] = FIRE.x + (rand() - 0.5) * 0.7
-    emberPos[i * 3 + 1] = FLOOR_Y + 0.4 + rand() * 5.5
-    emberPos[i * 3 + 2] = FIRE.z + (rand() - 0.5) * 0.7
-    emberSeed.push({ speed: 0.55 + rand() * 0.8, sway: 0.15 + rand() * 0.3, phase: rand() * Math.PI * 2 })
+  // one quiet breath of warm air above the flame (tight; darkness holds the edges)
+  const airMat = new SpriteMaterial({
+    map: glowTexture(
+      [
+        [0, 'rgba(224, 169, 84, 0.20)'],
+        [0.5, 'rgba(180, 120, 50, 0.06)'],
+        [1, 'rgba(0, 0, 0, 0)'],
+      ],
+      coalRand
+    ),
+    blending: AdditiveBlending,
+    depthWrite: false,
+    transparent: true,
+    opacity: 0,
+  })
+  const air = new Sprite(airMat)
+  air.position.set(FIRE.x, 0.3, FIRE.z)
+  air.scale.set(1.8, 1.5, 1)
+  air.renderOrder = 8
+  root.add(air)
+
+  // ------------------------------------------------------------------
+  // 4 · THE ANSWER IN THE STONE — the flame's mirror image, lying on
+  //     the floor exactly where reflection geometry puts it (the image
+  //     of the flame spans the stone between altar and visitor, with a
+  //     gap of dark marble after the altar's own dark reflection)
+  // ------------------------------------------------------------------
+  const reflMat = new MeshBasicNodeMaterial({
+    transparent: true,
+    blending: AdditiveBlending,
+    depthWrite: false,
+  })
+  {
+    const m = uv().y // 1 = far end (flame base image), 0 = near end (tip)
+    const vf = oneMinus(m) // flame-space height of the mirrored image
+    const ru = uv().x.mul(2).sub(1)
+    const swayA = sin(vf.mul(5.1).sub(uT.mul(2.2))).mul(vf).mul(0.14)
+    const rx = ru.add(swayA)
+    const halfW = m.pow(0.68).mul(0.44).add(0.06)
+    const env = oneMinus(smoothstep(halfW.mul(0.25), halfW, rx.abs()))
+    const np = vec3(rx.mul(2.4), vf.mul(3.0).sub(uT.mul(1.85)), uT.mul(0.21))
+    const noise = mx_noise_float(np)
+    const field = env.mul(noise.mul(0.3).add(0.8)).sub(vf.mul(0.6)).sub(0.06)
+    const alpha = smoothstep(0.0, 0.6, field).mul(smoothstep(0.02, 0.3, m)).mul(0.38)
+    const col = mix(vec3(GOLD_DEEP.r, GOLD_DEEP.g, GOLD_DEEP.b), vec3(GOLD.r, GOLD.g, GOLD.b), clamp(field.mul(1.3), 0, 1))
+    const flicker = sin(uT.mul(8.3)).mul(0.05).add(0.95)
+    reflMat.colorNode = col
+    reflMat.opacityNode = alpha.mul(flicker).mul(uR).add(dither)
   }
-  emberGeo.setAttribute('position', new Float32BufferAttribute(emberPos, 3))
-  const emberMat = new PointsMaterial({
-    color: EMBER_GOLD,
-    size: 0.12,
+  const refl = new Mesh(new PlaneGeometry(0.95, 1.5), reflMat)
+  refl.rotation.x = -Math.PI / 2
+  refl.position.set(FIRE.x, FLOOR_Y + 0.012, -3.75)
+  refl.renderOrder = 4
+  root.add(refl)
+
+  // a soft glossy wash around the streak: polish, not paint
+  const washMat = new MeshBasicNodeMaterial({
+    transparent: true,
+    blending: AdditiveBlending,
+    depthWrite: false,
+  })
+  {
+    const cu = uv().sub(vec2(0.5, 0.5))
+    const d = length(vec2(cu.x.mul(1.6), cu.y))
+    const a = oneMinus(smoothstep(0.06, 0.5, d)).mul(0.075)
+    const shim = mx_noise_float(vec3(uv().x.mul(5), uv().y.mul(5), uT.mul(0.4))).mul(0.2).add(0.9)
+    washMat.colorNode = vec3(GOLD.r, GOLD.g, GOLD.b)
+    washMat.opacityNode = a.mul(shim).mul(uR).add(dither)
+  }
+  const wash = new Mesh(new PlaneGeometry(3.4, 3.6), washMat)
+  wash.rotation.x = -Math.PI / 2
+  wash.position.set(FIRE.x, FLOOR_Y + 0.008, -4.3)
+  wash.renderOrder = 3
+  root.add(wash)
+
+  // ------------------------------------------------------------------
+  // 5 · THE COLONNADE — a far arc of carved shafts, rim-lit by the fire
+  // ------------------------------------------------------------------
+  const colMat = new MeshBasicNodeMaterial()
+  {
+    const toFire = normalize(vec3(FIRE.x, FIRE.y, FIRE.z).sub(positionWorld))
+    // a narrow rim: only the fire-facing edge catches, the shaft stays ink
+    const ndl = clamp(dot(normalWorld, toFire), 0, 1).pow(3.2)
+    const dist = length(positionWorld.sub(vec3(FIRE.x, FIRE.y, FIRE.z)))
+    const fall = float(5.6).div(dist.mul(dist).add(2.0))
+    const vert = oneMinus(smoothstep(-0.8, 2.4, positionWorld.y)).pow(1.3).mul(0.9).add(0.1)
+    const flick = sin(uT.mul(6.7).add(positionWorld.x.mul(1.3))).mul(0.08).add(0.92)
+    const glow = ndl.mul(fall).mul(vert).mul(flick).mul(0.36)
+    colMat.colorNode = vec3(COLUMN_INK.r, COLUMN_INK.g, COLUMN_INK.b)
+      .mul(0.7)
+      .add(vec3(GOLD.r, GOLD.g, GOLD.b).mul(glow))
+      .add(dither.mul(0.02))
+      .mul(uR)
+  }
+  // plinths sit square to the fire's light and would blaze if they shared
+  // the shaft's wrap: give them a quieter stone of their own
+  const plinthMat = new MeshBasicNodeMaterial()
+  {
+    const toFire = normalize(vec3(FIRE.x, FIRE.y, FIRE.z).sub(positionWorld))
+    const ndl = clamp(dot(normalWorld, toFire), 0, 1).pow(2.0)
+    const dist = length(positionWorld.sub(vec3(FIRE.x, FIRE.y, FIRE.z)))
+    const fall = float(5.6).div(dist.mul(dist).add(2.0))
+    const flick = sin(uT.mul(6.7).add(positionWorld.x.mul(1.3))).mul(0.08).add(0.92)
+    const glow = ndl.mul(fall).mul(flick).mul(0.045)
+    plinthMat.colorNode = vec3(COLUMN_INK.r, COLUMN_INK.g, COLUMN_INK.b)
+      .mul(0.85)
+      .add(vec3(GOLD.r, GOLD.g, GOLD.b).mul(glow))
+      .add(dither.mul(0.02))
+      .mul(uR)
+  }
+  const shaftGeo = new CylinderGeometry(0.21, 0.27, 5.4, 14)
+  const plinthGeo = new BoxGeometry(0.72, 0.22, 0.72)
+  const COL_ANGLES = [-62, -44, -30, -19, -9, 9, 19, 30, 44, 62]
+  for (const deg of COL_ANGLES) {
+    const a = (deg * Math.PI) / 180
+    const x = Math.sin(a) * 10.6
+    const z = -Math.cos(a) * 10.6
+    const shaft = new Mesh(shaftGeo, colMat)
+    shaft.position.set(x, FLOOR_Y + 2.92, z)
+    root.add(shaft)
+    const plinth = new Mesh(plinthGeo, plinthMat)
+    plinth.position.set(x, FLOOR_Y + 0.11, z)
+    plinth.rotation.y = -a
+    root.add(plinth)
+  }
+
+  // ------------------------------------------------------------------
+  // 6 · EMBERS BECOME STARS — a deterministic plume, gold cooling to
+  //     star-white as it climbs (pure function of elapsed: the rig's
+  //     frozen clock and the live loop see the same sky)
+  // ------------------------------------------------------------------
+  const emberRand = mulberry32(FOUNDING_SEED + 55)
+
+  interface Ascender {
+    speed: number
+    phase: number
+    a0: number
+    rad0: number
+  }
+  const ASC_N = 56
+  const ASC_H = 6.6
+  const ascenders: Ascender[] = []
+  for (let i = 0; i < ASC_N; i++) {
+    ascenders.push({
+      speed: 0.5 + emberRand() * 0.55,
+      phase: emberRand() * ASC_H,
+      a0: emberRand() * Math.PI * 2,
+      rad0: 0.06 + emberRand() * 0.16,
+    })
+  }
+  const ascGeo = new BufferGeometry()
+  ascGeo.setAttribute('position', new Float32BufferAttribute(new Float32Array(ASC_N * 3), 3))
+  ascGeo.setAttribute('color', new Float32BufferAttribute(new Float32Array(ASC_N * 3), 3))
+  const ascMat = new PointsMaterial({
+    size: 0.055,
+    sizeAttenuation: true,
+    vertexColors: true,
+    color: new Color(1.55, 1.45, 1.3),
+    transparent: true,
+    opacity: 0,
+    blending: AdditiveBlending,
+    depthWrite: false,
+  })
+  const ascPoints = new Points(ascGeo, ascMat)
+  ascPoints.renderOrder = 9
+  root.add(ascPoints)
+
+  interface Spark {
+    speed: number
+    phase: number
+    ox: number
+    wob: number
+  }
+  const SPK_N = 26
+  const SPK_H = 1.8
+  const sparks: Spark[] = []
+  for (let i = 0; i < SPK_N; i++) {
+    sparks.push({
+      speed: 1.5 + emberRand() * 1.1,
+      phase: emberRand() * SPK_H,
+      ox: (emberRand() - 0.5) * 0.34,
+      wob: 4 + emberRand() * 4,
+    })
+  }
+  const spkGeo = new BufferGeometry()
+  spkGeo.setAttribute('position', new Float32BufferAttribute(new Float32Array(SPK_N * 3), 3))
+  const spkMat = new PointsMaterial({
+    color: new Color(1.5, 1.36, 1.06),
+    size: 0.034,
     sizeAttenuation: true,
     transparent: true,
     opacity: 0,
+    blending: AdditiveBlending,
     depthWrite: false,
   })
-  const embers = new Points(emberGeo, emberMat)
-  root.add(embers)
+  const spkPoints = new Points(spkGeo, spkMat)
+  spkPoints.renderOrder = 9
+  root.add(spkPoints)
 
+  // ------------------------------------------------------------------
+  // update
+  // ------------------------------------------------------------------
+  const emberCold = EMBER_GOLD
+  const emberWhite = STAR_WHITE
   function update(s: AgoraState): void {
     root.visible = s.reveal > 0.01
     if (!root.visible) return
 
     const r = s.reveal
-    floorMat.opacity = r
-    poolMat.opacity = r
-    colMat.opacity = r
-
     const t = s.elapsed
-    const breathe = (f: number, p: number) => 1 + Math.sin(t * f + p) * 0.06 + Math.sin(t * f * 2.7 + p * 2) * 0.03
-    core.mat.opacity = 0.95 * r * (0.85 + Math.sin(t * 9.1) * 0.08 + Math.sin(t * 13.7) * 0.05)
-    body.mat.opacity = 0.62 * r
-    halo.mat.opacity = 0.5 * r
-    core.s.scale.set(core.sx * breathe(7.3, 0), core.sy * breathe(9.7, 0.7), 1)
-    body.s.scale.set(body.sx * breathe(4.1, 1.3), body.sy * breathe(5.3, 2.1), 1)
-    halo.s.scale.set(halo.sx * breathe(2.3, 2.6), halo.sy * breathe(2.9, 0.4), 1)
-    sheen.mat.opacity = 0.75 * r * (0.9 + Math.sin(t * 5.9) * 0.1)
-    streak.mat.opacity = 0.7 * r * (0.85 + Math.sin(t * 7.7 + 1) * 0.15)
+    uT.value = t
+    uR.value = r
 
-    emberMat.opacity = 0.8 * r
-    const pos = emberGeo.getAttribute('position')
-    for (let i = 0; i < EMBERS; i++) {
-      const seed = emberSeed[i]
-      if (!seed) continue
-      let y = pos.getY(i) + seed.speed * 0.016
-      if (y > FLOOR_Y + 6.2) y = FLOOR_Y + 0.4
-      pos.setY(i, y)
-      const k = (y - FLOOR_Y) / 6.2
-      pos.setX(i, FIRE.x + Math.sin(t * seed.sway * 4 + seed.phase) * (0.2 + k * 0.9))
-      pos.setZ(i, FIRE.z + Math.cos(t * seed.sway * 3.1 + seed.phase) * (0.2 + k * 0.7))
+    dustFar.mat.opacity = 0.75 * r
+    dustNear.mat.opacity = 0.3 * r
+    dustGold.mat.opacity = 0.42 * r
+    dustEdge.mat.opacity = 0.3 * r
+
+    for (const c of coals) {
+      c.mat.opacity = r * (0.66 + 0.22 * Math.sin(t * 2.3 + c.phase))
     }
-    pos.needsUpdate = true
+    airMat.opacity = r * (0.24 + 0.06 * Math.sin(t * 1.7))
+
+    // ascenders: helix upward, cool from ember-gold to star-white
+    {
+      const pos = ascGeo.getAttribute('position')
+      const col = ascGeo.getAttribute('color')
+      for (let i = 0; i < ASC_N; i++) {
+        const e = ascenders[i]
+        if (!e) continue
+        const k = (((t * e.speed + e.phase) % ASC_H) + ASC_H) % ASC_H / ASC_H
+        const y = FLOOR_Y + 0.42 + k * ASC_H
+        const ang = e.a0 + t * 0.22 + k * 2.6
+        const rad = Math.min(0.6, e.rad0 + Math.pow(k, 1.4) * 0.62)
+        pos.setXYZ(i, FIRE.x + Math.cos(ang) * rad, y, FIRE.z + Math.sin(ang) * rad * 0.55)
+        const ignite = Math.min(1, k / 0.05)
+        const cool = 1 - 0.36 * Math.min(1, k * 1.8)
+        const white = k < 0.55 ? 0 : (k - 0.55) / 0.45
+        const fade = 1 - Math.max(0, (k - 0.9) / 0.1) * 0.8
+        const b = ignite * (cool + white * 0.28) * fade
+        col.setXYZ(
+          i,
+          (emberCold.r + (emberWhite.r - emberCold.r) * white) * b,
+          (emberCold.g + (emberWhite.g - emberCold.g) * white) * b,
+          (emberCold.b + (emberWhite.b - emberCold.b) * white) * b
+        )
+      }
+      pos.needsUpdate = true
+      col.needsUpdate = true
+      ascMat.opacity = 0.9 * r
+    }
+
+    // sparks: quick bright leaps just above the flame
+    {
+      const pos = spkGeo.getAttribute('position')
+      for (let i = 0; i < SPK_N; i++) {
+        const e = sparks[i]
+        if (!e) continue
+        const k = (((t * e.speed + e.phase) % SPK_H) + SPK_H) % SPK_H / SPK_H
+        const y = FLOOR_Y + 0.5 + k * SPK_H
+        const x = FIRE.x + e.ox * (0.4 + k) + Math.sin(t * e.wob + e.phase * 9) * 0.05 * k
+        pos.setXYZ(i, x, y, FIRE.z + Math.cos(t * e.wob * 0.7 + e.phase * 7) * 0.06 * k)
+      }
+      pos.needsUpdate = true
+      spkMat.opacity = (0.75 - 0.35 * (0.5 + 0.5 * Math.sin(t * 5.3))) * r
+    }
   }
 
   return { update }

@@ -4,7 +4,7 @@ import { chromium } from 'playwright'
 import { spawn } from 'node:child_process'
 import { mkdirSync } from 'node:fs'
 
-const PORT = 5199
+const PORT = Number(process.env['FORGE_PORT'] ?? 5199)
 const BASE = `http://localhost:${PORT}`
 const OUT = new URL('./shots/', import.meta.url).pathname
 
@@ -19,6 +19,7 @@ const STATES = [
 ]
 const VIEWPORTS = [
   { tag: 'desktop', width: 1512, height: 950, deviceScaleFactor: 1 },
+  { tag: 'wide', width: 2016, height: 1150, deviceScaleFactor: 1 },
   { tag: 'desktop-webgpu', width: 1512, height: 950, deviceScaleFactor: 1, query: '?webgpu' },
   { tag: 'mobile', width: 390, height: 844, deviceScaleFactor: 2 },
 ]
