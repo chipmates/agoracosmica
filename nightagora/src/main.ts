@@ -1296,6 +1296,14 @@ function frame(now: number): void {
   // so the letterpress rides the same breath as the world)
   freeLook += (freeLookTarget() - freeLook) * Math.min(1, dt * 2.4)
   freeLookY += (freeLookYTarget() - freeLookY) * Math.min(1, dt * 2.4)
+  // the overture never stands still (concept law): a slow breathing
+  // drift through the eclipse and the whole descent, deterministic in
+  // the rig's frozen clock
+  const idleWanted =
+    !reducedMotion && (phase === 'transit' || phase === 'held' || phase === 'descent') ? 1 : 0
+  idleAmt += (idleWanted - idleAmt) * Math.min(1, dt * 1.2)
+  const idleYaw = (Math.sin(elapsed * 0.11) * 0.013 + Math.sin(elapsed * 0.053 + 2.1) * 0.006) * idleAmt
+  const idlePitch = (Math.sin(elapsed * 0.083 + 1.3) * 0.009 + Math.sin(elapsed * 0.041) * 0.004) * idleAmt
   // drag inertia glides and the gaze drifts home when the hand rests
   if (!dragging) {
     dragYaw = Math.max(-0.42, Math.min(0.42, dragYaw + dragVX * dt))
@@ -1309,8 +1317,8 @@ function frame(now: number): void {
   }
   const baseRx = camera.rotation.x
   const baseRy = camera.rotation.y
-  camera.rotation.y -= freeLook * 0.026 - dragYaw
-  camera.rotation.x -= freeLookY * 0.018 - dragPitch
+  camera.rotation.y -= freeLook * 0.026 - dragYaw - idleYaw
+  camera.rotation.x -= freeLookY * 0.018 - dragPitch - idlePitch
   renderer.render(scene, camera)
   camera.rotation.x = baseRx
   camera.rotation.y = baseRy
@@ -1331,6 +1339,7 @@ addEventListener('pointermove', (e) => {
 // sky keeps its wheel, the descent its rail. Damped, rubber-limited. ----
 let dragYaw = 0
 let dragPitch = 0
+let idleAmt = 0
 let dragVX = 0
 let dragVY = 0
 let dragging = false
