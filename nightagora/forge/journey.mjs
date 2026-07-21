@@ -8,7 +8,12 @@ import { mkdirSync } from 'node:fs'
 
 const PORT = Number(process.env['FORGE_PORT'] ?? 5199)
 const BASE = `http://localhost:${PORT}`
-const OUT = new URL('./shots/journey/', import.meta.url).pathname
+// JOURNEY_VP=mobile walks the same night at the phone postcard
+const MOBILE = process.env['JOURNEY_VP'] === 'mobile'
+const VP = MOBILE
+  ? { width: 390, height: 844, deviceScaleFactor: 2 }
+  : { width: 1512, height: 950, deviceScaleFactor: 1 }
+const OUT = new URL(`./shots/${MOBILE ? 'journey-mobile' : 'journey'}/`, import.meta.url).pathname
 
 function startPreview() {
   return spawn('pnpm', ['preview', '--port', String(PORT), '--strictPort'], {
@@ -35,7 +40,10 @@ const server = startPreview()
 try {
   await waitForServer(BASE)
   const browser = await chromium.launch()
-  const page = await browser.newPage({ viewport: { width: 1512, height: 950 } })
+  const page = await browser.newPage({
+    viewport: { width: VP.width, height: VP.height },
+    deviceScaleFactor: VP.deviceScaleFactor,
+  })
   page.on('pageerror', (err) => console.error(`[pageerror] ${err.message}`))
   page.on('console', (msg) => {
     if (msg.type() === 'error') console.log(`[console.error] ${msg.text()}`)
@@ -115,9 +123,15 @@ try {
   await wheel(300, 1)
   await page.waitForTimeout(1400)
   await shot('pane-auto')
-  await wheel(300, 1)
   // one breath now carries you in (the long crossing rests in the organ
-  // library)
+  // library). A visitor whose scroll lands inside the rail's cooldown
+  // simply scrolls again; so does the walker (slow headless frames make
+  // scene-time lag wall-time, especially at the mobile pixel ratio).
+  for (let i = 0; i < 12; i++) {
+    const p = await page.evaluate(() => document.body.dataset.phase)
+    if (p === 'camp') break
+    await wheel(300, 1, 500)
+  }
   const crossed = await waitPhase('camp', 10000)
   if (crossed) {
     await page.waitForTimeout(2500)

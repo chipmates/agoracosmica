@@ -156,14 +156,28 @@
     .panel-close:hover, .panel-close:focus-visible { color: var(--na-gold); outline: none; }
     @media (max-aspect-ratio: 9/10) {
       #plate { top: 6%; }
+      #note { display: none; }
+      /* the bottom chrome stacks in one clear column: stages (up to two
+         rows), the legend above them, the night count above the legend.
+         Restage, never overlap (the narrow-stage law). */
       #night-line {
-        top: auto; bottom: calc(150px + env(safe-area-inset-bottom));
+        top: auto; bottom: calc(158px + env(safe-area-inset-bottom));
         text-align: center; padding: 0 18px;
       }
-      #note { display: none; }
-      #legend { bottom: calc(128px + env(safe-area-inset-bottom)); gap: 12px 16px; }
-      #stages { gap: 6px; padding: 0 10px; flex-wrap: wrap; }
-      #stages button { min-height: 44px; padding: 8px 10px; font-size: 8px; }
+      #legend {
+        bottom: calc(130px + env(safe-area-inset-bottom));
+        gap: 8px 12px; padding: 0 12px;
+      }
+      .legend-item { gap: 6px; }
+      .legend-name { letter-spacing: 0.16em; text-indent: 0.16em; }
+      #stages {
+        bottom: calc(18px + env(safe-area-inset-bottom));
+        gap: 6px; padding: 0 10px; flex-wrap: wrap;
+      }
+      #stages button {
+        min-height: 44px; padding: 8px 10px;
+        font-size: 8px; letter-spacing: 0.2em; text-indent: 0.2em;
+      }
     }
   </style>
 </head>

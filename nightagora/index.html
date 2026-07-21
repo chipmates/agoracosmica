@@ -830,6 +830,14 @@
     body.forge #sky-return { transition: none !important; }
     #chapter-marks span { margin: 0 7px; opacity: 0.45; transition: opacity 0.6s ease, color 0.6s ease; }
     #chapter-marks span.here { opacity: 1; color: var(--na-gold); }
+    @media (max-aspect-ratio: 9/10) {
+      /* narrow stages stack the sky's letterpress clear of the rail
+         row: rail, then the wheel marks, the invite, the way home */
+      #chapter-marks { bottom: calc(76px + env(safe-area-inset-bottom)); }
+      #chapter-marks span { margin: 0 5px; }
+      #sky-invite { bottom: calc(98px + env(safe-area-inset-bottom)); padding: 0 24px; }
+      #sky-return { bottom: calc(132px + env(safe-area-inset-bottom)); }
+    }
     #star-chips { position: fixed; inset: 0; z-index: 3; pointer-events: none; }
     #star-chips[hidden] { display: none; }
     .star-chip {
