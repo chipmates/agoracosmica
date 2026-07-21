@@ -317,6 +317,11 @@
     }
     #descent-skip:hover, #descent-skip:focus-visible { opacity: 1; color: var(--na-starlight); outline: none; }
     body.forge #descent *, body.forge .copy { transition: none !important; }
+    /* the static mirror serves readers and crawlers, never the canvas */
+    .static-soul {
+      position: absolute; width: 1px; height: 1px;
+      overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+    }
 
     /* ---- the atlas: the wheel of the night. Plate top-left, invite at
        the horizon, one chip per star, the figure pane when a name opens ---- */
@@ -834,6 +839,61 @@
       <div class="cartouche-progress"></div>
     </div>
   </div>
+  <!-- The night, in plain words: an honest static mirror of what the
+       experience shows, for readers without WebGL, screen readers, and
+       search engines. Nothing here is not in the experience. -->
+  <section class="static-soul" aria-label="About the Night Agora">
+    <h2>The six constellations of the thirty</h2>
+    <p>Open any name to explore their life and ideas. Every voice here is an AI Echo: an interpretation built from what each person left behind. Not recordings. Not the dead themselves.</p>
+    <h3>Constellation I · Philosophers · five voices, after Cassiopeia</h3>
+    <ul>
+      <li>Plato · Classical Philosophy · You will learn to examine your own life.</li>
+      <li>Simone de Beauvoir · Existentialist Feminism · You will learn to see how you were made.</li>
+      <li>Marcus Aurelius · Stoicism · You will learn to question your first reaction.</li>
+      <li>Arthur Schopenhauer · Philosophy of Will · You will learn to see through the wanting.</li>
+      <li>Friedrich Nietzsche · Existential Philosophy · You will learn to build your own meaning.</li>
+    </ul>
+    <h3>Constellation II · Spiritual Teachers · six voices, after Corona Borealis</h3>
+    <ul>
+      <li>Laozi · Taoism · You will learn to act without forcing.</li>
+      <li>Meister Eckhart · Christian Mysticism · You will learn to stop clutching what you love.</li>
+      <li>Siddhartha Gautama · Buddhism · You will learn to watch wanting rise and fade.</li>
+      <li>Rumi · Sufi Mysticism · You will learn to let your longing guide you.</li>
+      <li>Hildegard von Bingen · Christian Mysticism · You will learn to notice the life in things.</li>
+      <li>Dōgen Zenji · Zen Buddhism · You will learn to stop chasing the next moment.</li>
+    </ul>
+    <h3>Constellation III · Activists and Leaders · four voices, after the Southern Cross</h3>
+    <ul>
+      <li>Martin Luther King Jr. · Civil Rights &amp; Theology · You will learn to resist without hate.</li>
+      <li>Mohandas Gandhi · Nonviolent Resistance · You will learn to stay willing to be wrong.</li>
+      <li>Harriet Tubman · Liberation &amp; Faith · You will learn to act before fear stops you.</li>
+      <li>Nelson Mandela · Ubuntu &amp; Liberation · You will learn to free yourself from bitterness.</li>
+    </ul>
+    <h3>Constellation IV · Artists · four voices, after Lyra</h3>
+    <ul>
+      <li>Frida Kahlo · Art &amp; Identity · You will learn to look at yourself without flinching.</li>
+      <li>Leonardo da Vinci · Renaissance Polymath · You will learn to train your own eye.</li>
+      <li>William Blake · Visionary Poetry · You will learn to see the chains you forged.</li>
+      <li>Wolfgang Amadeus Mozart · Classical Music · You will learn to find freedom inside the rules.</li>
+    </ul>
+    <h3>Constellation V · Writers · six voices, after Cygnus</h3>
+    <ul>
+      <li>William Shakespeare · Renaissance Drama · You will learn to see a person from inside.</li>
+      <li>Johann Wolfgang von Goethe · German Classicism · You will learn to look until you understand.</li>
+      <li>Jane Austen · Literary Realism · You will learn to read what people don't say.</li>
+      <li>Virginia Woolf · Modernist Literature · You will learn to wake inside an ordinary moment.</li>
+      <li>Emily Dickinson · American Poetry · You will learn to tell the truth slant.</li>
+      <li>Maya Angelou · Poetry &amp; Civil Rights · You will learn to find your own voice.</li>
+    </ul>
+    <h3>Constellation VI · Scientists and Thinkers · five voices, after Auriga</h3>
+    <ul>
+      <li>Albert Einstein · Theoretical Physics · You will learn to keep asking why.</li>
+      <li>Ada Lovelace · Mathematics &amp; Computing · You will learn to see what a thing could become.</li>
+      <li>Galileo Galilei · Natural Philosophy · You will learn to test what you are told.</li>
+      <li>Carl Gustav Jung · Depth Psychology · You will learn to meet your own shadow.</li>
+      <li>Joseph Campbell · Comparative Mythology · You will learn to read your own turning points.</li>
+    </ul>
+  </section>
   <script type="module" src="/src/main.ts"></script>
 </body>
 </html>

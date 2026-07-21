@@ -377,7 +377,10 @@ const dLookX = channel([
   { p: 0.995, v: 0, e: 'sineInOut' },
 ])
 const dLookY = channel([
-  { p: 0, v: 1.35 },
+  // starts exactly on the held gaze (level), lifting into the eclipse's
+  // heart as the zoom begins: the first scroll must not snap the view
+  { p: 0, v: 0 },
+  { p: 0.06, v: 1.35, e: 'sineInOut' },
   { p: 0.15, v: 1.35 },
   { p: 0.28, v: -0.9, e: 'sineInOut' },
   { p: 0.88, v: -0.9 },
