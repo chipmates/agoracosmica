@@ -221,7 +221,9 @@ export function createEclipse(scene: Scene) {
     const tw = new Float32Array(STAR_COUNT * 2)
     const TINTS = [STAR_COOL, STAR_ICE, STAR_PALE, STAR_WARM]
     for (let i = 0; i < STAR_COUNT; i++) {
-      const r = 60 + rand() * 120
+      // one star in six is NEAR: it renders as a big soft bokeh disc —
+      // the concept's depth signature the far shells can never give
+      const r = i % 6 === 0 ? 24 + rand() * 40 : 60 + rand() * 120
       const th = rand() * Math.PI * 2
       // a third of the heaven gathers low, where the seated eye lives
       // between the columns; the rest favours the upper sky

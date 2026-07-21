@@ -1227,9 +1227,11 @@ function frame(now: number): void {
     skyBirth,
     // in the sky the anonymous sparks recede: the thirty resolve into
     // their six houses (the atlas takes the light over)
+    // the anonymous wanderer sparks belong to the birth moment alone:
+    // at the hub they read as cheap floating blobs against the true field
     lanterns:
       phase === 'sky' ? Math.max(0.08, 0.55 * (1 - atlasReveal))
-      : phase === 'agora' || phase === 'council' ? 0.55
+      : phase === 'agora' || phase === 'council' ? 0.05
       : phase === 'crossing' || phase === 'camp' ? 0
       : 0.3,
     sinceFlash: flashAt < 0 ? -1 : elapsed - flashAt,
