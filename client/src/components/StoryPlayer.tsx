@@ -185,6 +185,18 @@ const StoryPlayer: FC<StoryPlayerProps> = ({
     onTalkChapter2?.();
   }, [onTalkChapter2, figure]);
 
+  // Story completion fires the handoff card AND a bloom invite at the same
+  // moment. Tell the homepage while the card is on screen so it holds its
+  // floating cards; the cleanup covers dismissal and leaving the story view.
+  const handoffVisible = handoffReady && !handoffDismissed && !!onTalkChapter2;
+  useEffect(() => {
+    if (!handoffVisible) return;
+    window.dispatchEvent(new CustomEvent('storyHandoffVisible', { detail: { visible: true } }));
+    return () => {
+      window.dispatchEvent(new CustomEvent('storyHandoffVisible', { detail: { visible: false } }));
+    };
+  }, [handoffVisible]);
+
   // Track whether story has been fully read (scrolled to bottom)
   const storyReadRef = useRef(false);
   const handleStoryScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {

@@ -233,6 +233,16 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
     return () => window.removeEventListener('bloomModeCompleted', handleBloomEvent);
   }, []);
 
+  // Chapter-2 handoff visible in the story view: hold the floating cards below.
+  // Story completion fires both the handoff and a bloom invite; one CTA at a time.
+  const [storyHandoffActive, setStoryHandoffActive] = useState(false);
+  useEffect(() => {
+    const handleHandoffVisibility = (e: Event) =>
+      setStoryHandoffActive(Boolean((e as CustomEvent).detail?.visible));
+    window.addEventListener('storyHandoffVisible', handleHandoffVisibility);
+    return () => window.removeEventListener('storyHandoffVisible', handleHandoffVisibility);
+  }, []);
+
   // Quest not-earned verdict card state.
   // Symmetric with bloomInvite: surfaces on homepage when figure called award_seed
   // with passed:false (ALMOST or NOT_YET). Persists in localStorage until acknowledged
@@ -1723,8 +1733,12 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
 
       {/* Floating buttons removed - now integrated into sidebar */}
 
-      {/* Prismatic Bloom: post-dialogue invite card */}
-      {bloomInvite && !isSeedsOpen && !showOnboarding && (
+      {/* Prismatic Bloom: post-dialogue invite card.
+          Held while the voice still speaks (the card lands on the stop-voice
+          pill's spot and would cover it) and while the story handoff card is
+          up (one CTA at a time). The pending-invite store keeps it alive, so
+          it appears the moment the gate opens. */}
+      {bloomInvite && !isAudioPlaying && !storyHandoffActive && !isSeedsOpen && !showOnboarding && (
         <PostDialogueBloomInvite
           count={bloomInvite.count}
           onTap={() => {
@@ -1740,8 +1754,9 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
       )}
 
       {/* Quest verdict (not earned): Try Again / Deepen Wisdom / Later.
-          Suppressed if a bloom invite is active so cards never stack. */}
-      {questVerdict && !bloomInvite && !isSeedsOpen && !showOnboarding && (
+          Suppressed if a bloom invite is active so cards never stack, and
+          held while the voice speaks (same slot as the stop-voice pill). */}
+      {questVerdict && !bloomInvite && !isAudioPlaying && !isSeedsOpen && !showOnboarding && (
         <PostQuestVerdictCard
           onTryAgain={async () => {
             await restartQuest(questVerdict.figureId, questVerdict.seedId);
