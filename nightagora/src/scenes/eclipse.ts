@@ -31,9 +31,11 @@ const WHITE_HOT = new Color('#fffaf0')
 const ABYSS = new Color('#060b1c')
 const LAPIS = new Color('#0c1430')
 const HORIZON = new Color('#182350')
-const STAR_WARM = new Color('#f3efe2')
-const STAR_COOL = new Color('#c9d4f2')
-const STAR_ICE = new Color('#dfe9ff')
+// star tints ported from concept 01 (three cool blues + rare gold)
+const STAR_WARM = new Color('#e6bc5c')
+const STAR_COOL = new Color('#b4c8ff')
+const STAR_ICE = new Color('#d2ebff')
+const STAR_PALE = new Color('#b4d2ff')
 
 function glowTexture(stops: Array<[number, string]>): CanvasTexture {
   const size = 512
@@ -71,9 +73,10 @@ export function createEclipse(scene: Scene) {
   const c = new Color()
   for (let i = 0; i < dpos.count; i++) {
     const y = (dpos.getY(i) / 90 + 1) / 2
-    if (y < 0.42) c.copy(ABYSS).lerp(HORIZON, Math.pow(y / 0.42, 2.2))
-    else if (y < 0.56) c.copy(HORIZON).lerp(LAPIS, (y - 0.42) / 0.14)
-    else c.copy(LAPIS).lerp(ABYSS, Math.min(1, (y - 0.56) / 0.34))
+    if (y < 0.46) c.copy(ABYSS)
+    else if (y < 0.52) c.copy(ABYSS).lerp(HORIZON, (y - 0.46) / 0.06)
+    else if (y < 0.58) c.copy(HORIZON).lerp(LAPIS, (y - 0.52) / 0.06)
+    else c.copy(LAPIS).lerp(ABYSS, Math.min(1, (y - 0.58) / 0.34))
     colors.push(c.r, c.g, c.b)
   }
   domeGeo.setAttribute('color', new Float32BufferAttribute(colors, 3))
@@ -202,11 +205,11 @@ export function createEclipse(scene: Scene) {
   }
   // a rich, varied heaven: four populations at different sizes and hues,
   // dense dust to bright gems, cool sparkle among the warm
-  const dustStars = starField(3200, 0.18, STAR_COOL, 46, 74)
+  const dustStars = starField(3200, 0.18, STAR_PALE, 46, 74)
   const dimStars = starField(2400, 0.26, STAR_COOL, 44, 72)
   const midStars = starField(760, 0.38, STAR_ICE, 43, 68)
-  const brightStars = starField(320, 0.5, STAR_WARM, 42, 66)
-  const gemStars = starField(110, 0.72, STAR_ICE, 41, 60)
+  const brightStars = starField(320, 0.5, STAR_ICE, 42, 66)
+  const gemStars = starField(110, 0.72, STAR_WARM, 41, 60)
 
   const wandererBase: Array<[number, number, number]> = []
   const wandererMat = new SpriteMaterial({
@@ -287,10 +290,12 @@ export function createEclipse(scene: Scene) {
     const door = s.door
     const scale = 1 + Math.pow(door, 1.6) * 26
     eclipse.scale.setScalar(scale)
-    // once through the door, the eclipse is behind you
+    // once through the door, the eclipse is behind you. The breath and
+    // corona die early in the swallow, or their scaled-up glow paints a
+    // muddy wash across the whole frame mid-passage.
     eclipse.visible = door < 0.995
-    breathMat.opacity *= 1 - Math.pow(door, 2.2)
-    uIntensity.value *= 1 - Math.pow(door, 1.4) * 0.92
+    breathMat.opacity *= Math.max(0, 1 - Math.pow(door * 1.9, 2))
+    uIntensity.value *= Math.max(0, 1 - Math.pow(door * 1.45, 1.6))
 
     const pulse = 1 + Math.sin(s.elapsed * 0.6) * 0.008
     rim.scale.setScalar(pulse)

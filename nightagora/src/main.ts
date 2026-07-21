@@ -335,37 +335,39 @@ const smooth = (a: number, b: number, k: number): number => {
 // questions drifting past on the way down. The Echo disclosure lives
 // where the figures speak (pane ink, keeper colophon, council cartouche).
 const DESCENT_STATIONS: Array<[number, number]> = [
-  [0.08, 0.22], // The Descent · eight questions
-  [0.26, 0.33], // day I dread
-  [0.345, 0.415], // matter in the end
-  [0.43, 0.5], // want what I cannot keep
-  [0.515, 0.585], // live with what I regret
-  [0.6, 0.67], // owe the people I love
-  [0.685, 0.755], // beauty hurt
-  [0.77, 0.84], // meet my death
-  [0.855, 0.925], // no one watches
+  [0.1, 0.24], // The Descent · eight questions (a title card in the black)
+  [0.3, 0.365], // Who am I?
+  [0.38, 0.445], // What binds us to each other?
+  [0.46, 0.525], // What makes a life worth living?
+  [0.54, 0.605], // Where do ideas come from?
+  [0.62, 0.685], // How should we live?
+  [0.7, 0.765], // What does it mean to be free?
+  [0.78, 0.845], // What lies beyond what we know?
+  [0.86, 0.925], // How do we carry what we have lost?
 ]
 
 /** The dolly, concept-01 law: every camera value is a pure channel of
     progress, position + lookAt on a slow helix. The flip into the
     top-down view hides inside the black breath; the spiral carries the
     dive; the flare banks to the seated eye at the fire. */
+// the flip waits until the moon has fully swallowed the frame (door
+// completes at GATE_END): the turn happens inside true black
 const dCamY = channel([
   { p: 0, v: 0 },
-  { p: 0.06, v: 0 },
-  { p: 0.2, v: 66, e: 'sineInOut' },
+  { p: 0.15, v: 0 },
+  { p: 0.28, v: 66, e: 'sineInOut' },
   { p: 0.995, v: 0, e: 'sineInOut' },
 ])
 const dCamR = channel([
   { p: 0, v: 0.001 },
-  { p: 0.06, v: 0.001 },
-  { p: 0.2, v: 7, e: 'sineInOut' },
+  { p: 0.15, v: 0.001 },
+  { p: 0.28, v: 7, e: 'sineInOut' },
   { p: 0.7, v: 4.5 },
   { p: 0.995, v: 0.001, e: 'cubicInOut' },
 ])
 const dCamTh = channel([
   { p: 0, v: 0 },
-  { p: 0.2, v: 0 },
+  { p: 0.28, v: 0 },
   { p: 0.995, v: 2.6, e: 'sineInOut' },
 ])
 // gaze: the disc's heart through the dive, banking to the fire for landing
@@ -376,15 +378,15 @@ const dLookX = channel([
 ])
 const dLookY = channel([
   { p: 0, v: 1.35 },
-  { p: 0.06, v: 1.35 },
-  { p: 0.2, v: -0.9, e: 'sineInOut' },
+  { p: 0.15, v: 1.35 },
+  { p: 0.28, v: -0.9, e: 'sineInOut' },
   { p: 0.88, v: -0.9 },
   { p: 0.995, v: -0.68, e: 'sineInOut' },
 ])
 const dLookZ = channel([
   { p: 0, v: -10 },
-  { p: 0.06, v: -10 },
-  { p: 0.2, v: 0, e: 'sineInOut' },
+  { p: 0.15, v: -10 },
+  { p: 0.28, v: 0, e: 'sineInOut' },
   { p: 0.88, v: 0 },
   { p: 0.995, v: -5.6, e: 'sineInOut' },
 ])
@@ -532,7 +534,7 @@ window.__forge = {
     flashAt = elapsed - (opts.sinceFlash ?? 999)
     agoraReveal =
       p === 'agora' || p === 'sky' ? 1
-      : p === 'descent' ? smooth(0.88, 0.995, desc)
+      : p === 'descent' ? smooth(0.95, 0.998, desc)
       : 0
     lookUp = lookTarget = p === 'sky' ? 1 : 0
     camera.position.y = 0
@@ -765,22 +767,31 @@ function frame(now: number): void {
   if (phase === 'descent') {
     descentCamera(desc)
     syncDescentBeats(desc)
-    if (desc > 0.24) verseShow('Voices awaken across Time')
+    if (desc > 0.31) verseShow('Voices awaken across Time')
     if (desc > 0.993) {
       camera.position.y = 0
       setPhase('agora')
     }
   }
 
-  // the map carries the whole dive; the territory only wakes for the flare
+  // the map carries the whole dive; the territory only wakes at the very
+  // cut, once the camera has leveled (from above, the flame billboard
+  // would fill the frame with streaks)
   const mandalaReveal =
-    phase === 'descent' ? smooth(0.16, 0.3, desc) * (1 - smooth(0.9, 0.985, desc)) : 0
+    phase === 'descent' ? smooth(0.26, 0.36, desc) * (1 - smooth(0.93, 0.99, desc)) : 0
   mandala.visible(mandalaReveal > 0.004)
-  mandala.update(dt, elapsed, mandalaReveal)
+  // the heart warms at overview altitude and yields before the close
+  // pass, or its glow would paint the whole near frame beige
+  mandala.update(
+    dt,
+    elapsed,
+    mandalaReveal,
+    smooth(0.55, 0.78, desc) * (1 - smooth(0.84, 0.93, desc))
+  )
 
   const revealTarget =
     phase === 'agora' || phase === 'sky' || phase === 'council' ? 1
-    : phase === 'descent' ? smooth(0.88, 0.995, desc)
+    : phase === 'descent' ? smooth(0.95, 0.998, desc)
     : 0
   agoraReveal += (revealTarget - agoraReveal) * Math.min(1, dt * (reducedMotion ? 20 : 1.2))
 

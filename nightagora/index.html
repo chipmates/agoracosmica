@@ -5,7 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#060b1c" />
   <title>Agora Cosmica · Night Agora</title>
-  <meta name="description" content="A living library you can talk to. Thirty remarkable people from history, kept as Echoes under one night sky." />
+  <meta name="description" content="A living library you can talk to. Thirty remarkable people from history, kept as Echoes under one night sky. Nonprofit, open source, no tracking cookies." />
+  <meta property="og:title" content="Agora Cosmica · Night Agora" />
+  <meta property="og:description" content="A living library you can talk to. Thirty remarkable people from history, kept as Echoes under one night sky." />
+  <meta property="og:type" content="website" />
   <style>
     :root {
       --na-abyss: #060b1c;
@@ -313,7 +316,7 @@
       opacity: 0.85; transition: opacity 0.3s ease, color 0.3s ease;
     }
     #descent-skip:hover, #descent-skip:focus-visible { opacity: 1; color: var(--na-starlight); outline: none; }
-    body.forge #descent * { transition: none !important; }
+    body.forge #descent *, body.forge .copy { transition: none !important; }
 
     /* ---- the atlas: the wheel of the night. Plate top-left, invite at
        the horizon, one chip per star, the figure pane when a name opens ---- */
@@ -749,14 +752,14 @@
       <p class="descent-kicker">The Descent</p>
       <p class="descent-ask">Eight questions, older than every voice below.</p>
     </div>
-    <div class="descent-beat"><p class="descent-ask">How do I begin a day I dread?</p></div>
-    <div class="descent-beat"><p class="descent-ask">Does any of this matter in the end?</p></div>
-    <div class="descent-beat"><p class="descent-ask">Why do I want what I cannot keep?</p></div>
-    <div class="descent-beat"><p class="descent-ask">How do I live with what I regret?</p></div>
-    <div class="descent-beat"><p class="descent-ask">What do I owe the people I love?</p></div>
-    <div class="descent-beat"><p class="descent-ask">Why does beauty hurt?</p></div>
-    <div class="descent-beat"><p class="descent-ask">How should I meet my death?</p></div>
-    <div class="descent-beat"><p class="descent-ask">Who am I when no one watches?</p></div>
+    <div class="descent-beat"><p class="descent-ask">Who am I?</p></div>
+    <div class="descent-beat"><p class="descent-ask">What binds us to each other?</p></div>
+    <div class="descent-beat"><p class="descent-ask">What makes a life worth living?</p></div>
+    <div class="descent-beat"><p class="descent-ask">Where do ideas come from?</p></div>
+    <div class="descent-beat"><p class="descent-ask">How should we live?</p></div>
+    <div class="descent-beat"><p class="descent-ask">What does it mean to be free?</p></div>
+    <div class="descent-beat"><p class="descent-ask">What lies beyond what we know?</p></div>
+    <div class="descent-beat"><p class="descent-ask">How do we carry what we have lost?</p></div>
     <div class="plumb" aria-hidden="true"></div>
     <button id="descent-skip" type="button">Skip to the fire</button>
   </div>
