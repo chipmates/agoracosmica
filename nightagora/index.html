@@ -346,6 +346,78 @@
     .gate-links a { color: var(--na-mist); text-decoration: none; pointer-events: auto; }
     .gate-links a:hover { color: var(--na-gold); }
 
+    /* ---- the Sitting: the one contract of the night, taken at the
+       first hearth (concept-revision §2b) ---- */
+    #sitting {
+      position: fixed; left: 50%; bottom: calc(96px + env(safe-area-inset-bottom));
+      transform: translateX(-50%);
+      width: min(560px, calc(100% - 48px));
+      z-index: 6; text-align: center;
+      padding: 26px 28px;
+      background: color-mix(in srgb, var(--na-abyss) 82%, transparent);
+      border: 1px solid color-mix(in srgb, var(--na-gold) 35%, transparent);
+      backdrop-filter: blur(6px);
+    }
+    #sitting[hidden] { display: none; }
+    #sitting .rule { display: block; width: 44px; height: 1px; margin: 0 auto 20px; background: color-mix(in srgb, var(--na-gold) 55%, transparent); }
+    .sitting-stone {
+      font-family: var(--sans);
+      font-size: 10px; letter-spacing: 0.3em; text-indent: 0.3em;
+      text-transform: uppercase; line-height: 2.1;
+      color: var(--na-mist);
+    }
+    .sitting-stone.strong { margin-top: 8px; color: var(--na-starlight); }
+    #sitting .gate-declare { margin-top: 18px; }
+    #sitting .gate-actions { margin-top: 16px; }
+    #sitting .gate-links { margin-top: 14px; }
+
+    /* ---- the being-drawn pane: the honest placeholder, one per future
+       organ (concept phase law) ---- */
+    #drawn-pane {
+      position: fixed; left: 50%; top: 50%;
+      transform: translate(-50%, -50%);
+      width: min(460px, calc(100% - 48px));
+      z-index: 6; text-align: center;
+      padding: 30px 32px 22px;
+      background: color-mix(in srgb, var(--na-abyss) 86%, transparent);
+      border: 1px solid color-mix(in srgb, var(--na-gold) 35%, transparent);
+      backdrop-filter: blur(6px);
+    }
+    #drawn-pane[hidden] { display: none; }
+    .drawn-kicker {
+      font-family: var(--sans);
+      font-size: 9px; letter-spacing: 0.32em; text-indent: 0.32em;
+      text-transform: uppercase; color: var(--na-gold);
+    }
+    .drawn-title {
+      margin-top: 12px;
+      font-family: var(--serif);
+      font-size: clamp(20px, 2.4vw, 26px);
+      color: var(--na-starlight);
+    }
+    .drawn-promise {
+      margin-top: 12px;
+      font-family: var(--serif); font-style: italic;
+      font-size: 15px; line-height: 1.55;
+      color: var(--na-mist);
+    }
+    .drawn-status {
+      margin-top: 18px;
+      font-family: var(--sans);
+      font-size: 8px; letter-spacing: 0.3em; text-indent: 0.3em;
+      text-transform: uppercase; color: var(--na-gold);
+      opacity: 0.8;
+    }
+    .drawn-close {
+      margin-top: 10px;
+      background: none; border: none; cursor: pointer;
+      min-height: 44px; padding: 8px 16px;
+      font-family: var(--sans);
+      font-size: 9px; letter-spacing: 0.3em; text-indent: 0.3em;
+      text-transform: uppercase; color: var(--na-mist);
+    }
+    .drawn-close:hover, .drawn-close:focus-visible { color: var(--na-gold); outline: none; }
+
     /* ---- the instrument rail: the plain-faced layer, two quiet marks ---- */
     #rail { position: fixed; inset: 0; z-index: 4; pointer-events: none; }
     #rail[hidden] { display: none; }
@@ -379,6 +451,15 @@
       margin-bottom: 14px;
     }
     .inst-links { display: flex; flex-direction: column; }
+    .inst-links button {
+      background: none; border: none; cursor: pointer; text-align: left;
+      font-family: var(--sans);
+      font-size: 10px; letter-spacing: 0.26em; text-indent: 0.26em;
+      text-transform: uppercase; color: var(--na-starlight);
+      padding: 11px 0;
+      transition: color 0.3s ease;
+    }
+    .inst-links button:hover, .inst-links button:focus-visible { color: var(--na-gold); outline: none; }
     .inst-links a {
       font-family: var(--sans);
       font-size: 10px; letter-spacing: 0.26em; text-indent: 0.26em;
@@ -502,10 +583,10 @@
     }
     .hotspot.lit { opacity: 1; }
     .hotspot-mark {
-      width: 17px; height: 17px; border-radius: 50%;
-      border: 1px solid color-mix(in srgb, var(--na-gold) 75%, transparent);
+      width: 20px; height: 20px; border-radius: 50%;
+      border: 1px solid color-mix(in srgb, var(--na-gold) 88%, transparent);
       position: relative;
-      box-shadow: 0 0 12px color-mix(in srgb, var(--na-gold) 25%, transparent);
+      box-shadow: 0 0 16px color-mix(in srgb, var(--na-gold) 38%, transparent);
       transition: box-shadow 0.3s ease, border-color 0.3s ease;
     }
     .hotspot-mark::after {
@@ -516,10 +597,10 @@
     }
     .hotspot-label {
       font-family: var(--sans);
-      font-size: 9px; letter-spacing: 0.3em; text-indent: 0.3em;
+      font-size: 10px; letter-spacing: 0.3em; text-indent: 0.3em;
       text-transform: uppercase; color: var(--na-starlight);
       white-space: nowrap;
-      text-shadow: 0 1px 10px rgba(4, 6, 13, 0.9);
+      text-shadow: 0 1px 10px rgba(4, 6, 13, 0.95);
     }
     .hotspot:hover .hotspot-mark, .hotspot:focus-visible .hotspot-mark {
       border-color: var(--na-gold);
@@ -1110,13 +1191,6 @@
       <span class="rule" aria-hidden="true"></span>
       <p class="descent-stone">Here speak the Echoes: interpretations built from what the dead left behind.</p>
       <p class="descent-stone strong">Not recordings. Not the dead themselves.</p>
-      <div class="gate-block">
-        <p class="gate-declare">I am 16 or older and I agree to the <a href="https://agoracosmica.org/terms" target="_blank" rel="noopener">Terms</a>.</p>
-        <div class="gate-actions">
-          <button id="gate-enter" type="button">Enter the night</button>
-        </div>
-        <p class="gate-links"><a href="https://agoracosmica.org/privacy" target="_blank" rel="noopener">Privacy</a></p>
-      </div>
     </div>
     <div class="descent-beat">
       <p class="descent-kicker">The Descent</p>
@@ -1198,6 +1272,23 @@
       <button class="chapters-close" type="button">Close</button>
     </div>
   </div>
+  <div id="sitting" hidden>
+    <span class="rule" aria-hidden="true"></span>
+    <p class="sitting-stone">Here speaks his Echo: an interpretation built from what he left behind.</p>
+    <p class="sitting-stone strong">Not a recording. Not the man himself.</p>
+    <p class="gate-declare">I am 16 or older and I agree to the <a href="https://agoracosmica.org/terms" target="_blank" rel="noopener">Terms</a>.</p>
+    <div class="gate-actions">
+      <button id="sitting-accept" type="button">Sit with him</button>
+    </div>
+    <p class="gate-links"><a href="https://agoracosmica.org/privacy" target="_blank" rel="noopener">Privacy</a></p>
+  </div>
+  <div id="drawn-pane" hidden>
+    <p class="drawn-kicker"></p>
+    <p class="drawn-title"></p>
+    <p class="drawn-promise"></p>
+    <p class="drawn-status">Still being drawn</p>
+    <button class="drawn-close" type="button">Close</button>
+  </div>
   <div id="rail" hidden>
     <button id="rail-sound" type="button" aria-pressed="false">Sound · Off</button>
     <button id="rail-instruments" type="button" aria-haspopup="true" aria-expanded="false">Instruments</button>
@@ -1205,6 +1296,7 @@
   <div id="instruments" hidden>
     <p class="inst-kicker">The Instruments</p>
     <nav class="inst-links">
+      <button id="inst-library" type="button">The Library</button>
       <a href="https://agoracosmica.org/app?lang=en">Classic Agora Cosmica</a>
       <a href="https://agoracosmica.org/terms" target="_blank" rel="noopener">Terms</a>
       <a href="https://agoracosmica.org/privacy" target="_blank" rel="noopener">Privacy</a>

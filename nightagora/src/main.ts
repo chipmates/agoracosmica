@@ -81,12 +81,40 @@ if (!hotspotsHost) throw new Error('missing hotspots shell')
 const hotspots = createHotspots(hotspotsHost)
 const chapters = createChapters('aurelius', 12)
 
-function openHearth(): void {
+function openHearthNow(): void {
   if (phase !== 'camp' || campHearthOpen) return
   campHearthOpen = true
   keeperScene.setScript(CAMP_SCRIPT)
   keeperEl.hidden = false
 }
+
+/** Sitting down is the contract: the first hearth of the night shows
+    the Sitting once; after that, every hearth simply opens. */
+function openHearth(): void {
+  if (phase !== 'camp' || campHearthOpen) return
+  if (!gateAccepted) {
+    hearthWanted = true
+    sittingEl.hidden = false
+    return
+  }
+  openHearthNow()
+}
+
+// ---- the being-drawn pane: the honest placeholder (concept law) ----
+const drawnNode = document.getElementById('drawn-pane')
+const drawnEl: HTMLElement = drawnNode ?? document.createElement('div')
+function openDrawn(kicker: string, title: string, promise: string): void {
+  const k = drawnEl.querySelector('.drawn-kicker')
+  const t = drawnEl.querySelector('.drawn-title')
+  const p = drawnEl.querySelector('.drawn-promise')
+  if (k) k.textContent = kicker
+  if (t) t.textContent = title
+  if (p) p.textContent = promise
+  drawnEl.hidden = false
+}
+drawnEl.querySelector('.drawn-close')?.addEventListener('click', () => {
+  drawnEl.hidden = true
+})
 
 const CAMP_SPOTS = [
   {
@@ -109,6 +137,39 @@ const CAMP_SPOTS = [
     pos: new Vector3(1.82, 0.62, -5.9),
     open: () => chapters.open(),
   },
+  {
+    id: 'prism',
+    label: 'The Prism',
+    pos: new Vector3(-2.2, 0.1, -6.6),
+    open: () =>
+      openDrawn(
+        'Chapter III',
+        'The Prism',
+        'His thought, split into its colors. The prism will be light in this world, not a card.'
+      ),
+  },
+  {
+    id: 'quest',
+    label: 'The Quest',
+    pos: new Vector3(1.05, -0.32, -3.7),
+    open: () =>
+      openDrawn(
+        'Chapter IV',
+        'The Quest',
+        'A journey across his ground, one honest step at a time.'
+      ),
+  },
+  {
+    id: 'hissky',
+    label: 'His Sky',
+    pos: new Vector3(0.3, 1.55, -7.2),
+    open: () =>
+      openDrawn(
+        'The Wisdom Map',
+        'His Sky',
+        'His themes as his own constellation, growing brighter as you learn.'
+      ),
+  },
 ]
 const HUB_SPOTS = [
   {
@@ -117,7 +178,25 @@ const HUB_SPOTS = [
     pos: new Vector3(0, -0.15, -5.6),
     open: () => conveneCouncil(),
   },
+  {
+    id: 'commons',
+    label: 'The Commons',
+    pos: new Vector3(-4.6, 0.6, -8.6),
+    open: () =>
+      openDrawn(
+        'The Agora',
+        'The Commons',
+        'Where visitors will leave marks for one another under the colonnade.'
+      ),
+  },
 ]
+document.getElementById('inst-library')?.addEventListener('click', () =>
+  openDrawn(
+    'The Archive',
+    'The Library',
+    'Every night and every council of the thirty, gathered in one place.'
+  )
+)
 
 function councilEnded(): void {
   setStatus(COUNCIL_DONE)
@@ -158,8 +237,7 @@ let paneOpen = false
 let skyAcc = 0
 let atlasReveal = 0
 
-// ---- the stone gate + the remembered night ----
-const GATE_HOLD = 0.13
+// ---- the Sitting + the remembered night (concept-revision §2b) ----
 function stored(key: string): string | null {
   try {
     return localStorage.getItem(key)
@@ -175,8 +253,18 @@ function store(key: string, value: string): void {
   }
 }
 let gateAccepted = stored('na-gate') === '1'
-let skipAfterGate = false
 let firstNight = stored('na-first') !== '1'
+let musicWoken = false
+
+/** The first scroll is the browser's unlock gesture: the ambient bed
+    starts with the descent as the night's standard voice. */
+function wakeMusic(): void {
+  if (musicWoken) return
+  musicWoken = true
+  if (ambience.remembered() !== 'off') ambience.enable()
+  railEl.hidden = false
+  syncSoundLabel()
+}
 // the first ride is a rail: scroll alone opens Marcus and enters his
 // cosmos. Any deliberate browsing gesture hands the wheel back.
 let autoRide = firstNight
@@ -430,6 +518,14 @@ function conveneCouncil(): void {
   council.begin()
 }
 
+/** From the sky back down to the hearth, the gaze easing all the way. */
+function returnToFire(): void {
+  if (phase !== 'sky') return
+  setPhase('agora')
+  lookUp = 1 // land the gaze from above, no snap
+  lookTarget = 0
+}
+
 // ---- the descent staging: through the ring, then the plumb-line dive
 // into the agora mandala, one question per breath, then the flare ----
 const GATE_END = 0.16 // corona bloom, one black breath, then above the ring
@@ -441,7 +537,7 @@ const smooth = (a: number, b: number, k: number): number => {
 // questions drifting past on the way down. The Echo disclosure lives
 // where the figures speak (pane ink, keeper colophon, council cartouche).
 const DESCENT_STATIONS: Array<[number, number]> = [
-  [0.06, 0.2], // the stone gate, carved in the black (holds at GATE_HOLD)
+  [0.06, 0.2], // the disclosure stone, carved in the black (read in passing)
   [0.24, 0.34], // The Descent · eight questions (over the emerging ring)
   [0.38, 0.435], // Who am I?
   [0.448, 0.503], // What binds us to each other?
@@ -534,55 +630,40 @@ function syncDescentBeats(k: number): void {
 
 function skipDescent(): void {
   if (phase !== 'descent') return
-  if (!gateAccepted) {
-    // the stone cannot be skipped: the skip carries you to it instead
-    descTarget = GATE_HOLD
-    skipAfterGate = true
-    return
-  }
   descTarget = 1
   desc = Math.max(desc, 0.93)
 }
 document.getElementById('descent-skip')?.addEventListener('click', () => skipDescent())
 
-// ---- the stone gate: one gesture carries the disclosure, the terms,
-// and the sound choice (legal basis: transparency memo 01, one-action
-// gate with declarative wording; storage per § 25 Abs. 2 Nr. 2 TDDDG) ----
-const gateBeat = descentBeats[0]
-if (gateAccepted) gateBeat?.classList.add('accepted')
+// ---- THE SITTING: the night's one contract, taken at the first
+// hearth (terms + age 16 in one declarative action; legal basis:
+// transparency memo 01; storage per § 25 Abs. 2 Nr. 2 TDDDG). The
+// black-breath stone above is information only; passive listening
+// stays ungated. ----
+const sittingNode = document.getElementById('sitting')
+const sittingEl: HTMLElement = sittingNode ?? document.createElement('div')
+let hearthWanted = false
 
-function acceptGate(): void {
+function acceptSitting(): void {
   if (gateAccepted) return
   gateAccepted = true
   store('na-gate', '1')
-  gateBeat?.classList.add('accepted')
-  // the music is part of the night by default; the Sound mark quiets it.
-  // A visitor who quieted it on an earlier night stays quieted.
-  if (ambience.remembered() !== 'off') ambience.enable()
-  railEl.hidden = false
-  syncSoundLabel()
-  if (skipAfterGate) {
-    skipAfterGate = false
-    descTarget = 1
-    desc = Math.max(desc, 0.93)
+  sittingEl.hidden = true
+  if (hearthWanted) {
+    hearthWanted = false
+    openHearthNow()
   }
 }
-document.getElementById('gate-enter')?.addEventListener('click', () => acceptGate())
+document.getElementById('sitting-accept')?.addEventListener('click', () => acceptSitting())
 
-// the impatient door on the totality screen: through the stone, then
-// straight down to the fire where Marcus keeps the watch
+// the impatient door on the totality screen: straight down to the fire
 document.getElementById('overture-skip')?.addEventListener('click', () => {
   if (phase !== 'held' && phase !== 'transit') return
+  wakeMusic()
   transit = 1
   if (phase === 'held') setPhase('descent')
-  skipAfterGate = true
-  if (gateAccepted) {
-    descTarget = 1
-    desc = Math.max(desc, 0.93)
-    skipAfterGate = false
-  } else {
-    descTarget = GATE_HOLD
-  }
+  descTarget = 1
+  desc = Math.max(desc, 0.93)
 })
 
 // ---- the instrument rail: the plain-faced layer over the poetry ----
@@ -612,20 +693,9 @@ instrumentsEl.querySelector('.inst-close')?.addEventListener('click', () => {
   instrumentsEl.hidden = true
   railInstruments?.setAttribute('aria-expanded', 'false')
 })
-if (gateAccepted) railEl.hidden = false
 syncSoundLabel()
-
-// a returning night with sound remembered: the first gesture wakes it
-if (gateAccepted && ambience.remembered() === 'on') {
-  const wake = (): void => {
-    ambience.enable()
-    syncSoundLabel()
-    removeEventListener('pointerdown', wake)
-    removeEventListener('keydown', wake)
-  }
-  addEventListener('pointerdown', wake, { once: true })
-  addEventListener('keydown', wake, { once: true })
-}
+// (music standard: wakeMusic() fires with the first gesture that opens
+// the descent, for first and returning nights alike)
 
 // the council voices hold the floor; the ambient bed steps back
 addEventListener('na-voice', (e) => {
@@ -844,6 +914,7 @@ function setPhase(next: Phase): void {
   document.body.dataset['phase'] = next
   if (next === 'held') setStatus('Scroll to enter')
   if (next === 'descent') {
+    wakeMusic() // reaching the descent IS the first gesture
     setStatus('Scroll to descend')
     descentEl.hidden = false
   } else {
@@ -880,6 +951,11 @@ function setPhase(next: Phase): void {
     verseShow('This is the Agora.')
   }
   hotspots.set(next === 'camp' ? CAMP_SPOTS : next === 'agora' ? HUB_SPOTS : [])
+  drawnEl.hidden = true
+  if (next !== 'camp') {
+    sittingEl.hidden = true
+    hearthWanted = false
+  }
   if (next === 'camp') {
     setStatus('Carnuntum on the Danube')
     campEnteredAt = elapsed
@@ -910,11 +986,10 @@ function push(delta: number): void {
   if (phase === 'held' && delta > 0) setPhase('descent')
   if (phase === 'descent') {
     // the gate blooms in about two flicks; the dive breathes one
-    // question per flick. The whole travel scrubs both ways, but the
-    // stone holds until its one gesture is given.
+    // question per flick. The whole travel scrubs both ways; the stone
+    // is read in passing (the contract waits at the first hearth).
     const rate = desc < GATE_END ? 0.0005 : 0.00042
     descTarget = Math.min(1, Math.max(0, descTarget + delta * rate))
-    if (!gateAccepted) descTarget = Math.min(descTarget, GATE_HOLD)
     if (descTarget <= 0 && desc < 0.02 && delta < 0) setPhase('held')
   }
   if (phase === 'agora') {
@@ -944,6 +1019,13 @@ function push(delta: number): void {
     if (Math.sign(delta) !== Math.sign(skyAcc)) skyAcc = 0
     skyAcc += delta
     if (Math.abs(skyAcc) > 150) {
+      // browsing turns the wheel; a firm downward pull past the wheel
+      // returns the gaze to the fire (every stage has a way back)
+      if (skyAcc < 0 && !autoRide) {
+        skyAcc = 0
+        returnToFire()
+        return
+      }
       stepChapter(skyAcc > 0 ? 1 : -1)
       skyAcc = 0
     }
@@ -966,10 +1048,7 @@ addEventListener('keydown', (e) => {
     if (e.key === 'ArrowLeft') stepChapter(-1)
   }
   if (e.key === 'Enter' && phase === 'transit') transit = 1
-  if (e.key === 'Enter' && phase === 'descent') {
-    if (!gateAccepted && desc > GATE_HOLD - 0.05) acceptGate()
-    else skipDescent()
-  }
+  if (e.key === 'Enter' && phase === 'descent') skipDescent()
 })
 let touchY: number | null = null
 let touchX: number | null = null
@@ -1067,9 +1146,9 @@ function frame(now: number): void {
   } else if (phase === 'camp') {
     // the hearth opens once the arrival sentence has had its say
     if (!campHearthOpen && campEnteredAt >= 0 && elapsed - campEnteredAt > 6.6) {
-      campHearthOpen = true
-      keeperScene.setScript(CAMP_SCRIPT)
-      keeperEl.hidden = false
+      // the auto-open routes through the Sitting: the first hearth of
+      // the night asks its one question before the keeper speaks
+      openHearth()
     }
   } else if (phase !== 'sky') {
     keeperEl.hidden = true

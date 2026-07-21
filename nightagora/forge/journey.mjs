@@ -78,21 +78,13 @@ try {
   await waitPhase('held')
   await shot('held')
 
-  // 2 · the descent: through the ring, the stone gate, the questions,
-  // down to the fire
+  // 2 · the descent: the disclosure stone passes in the black, the
+  // questions carry you down (no stop until the Sitting at the hearth)
   await wheel(300, 2)
   if (!(await waitPhase('descent', 8000))) process.exit(1)
-  await wheel(300, 6, 200)
-  await page.waitForTimeout(1600)
-  await shot('stone-gate-held')
-  // the stone must HOLD against further scrolling until accepted
-  await wheel(300, 6, 150)
-  await page.waitForTimeout(1200)
-  await shot('stone-gate-still-held')
-  const enter = page.locator('#gate-enter')
-  await enter.waitFor({ state: 'visible', timeout: 5000 })
-  await enter.click()
-  await page.waitForTimeout(400)
+  await wheel(300, 5, 200)
+  await page.waitForTimeout(1400)
+  await shot('descent-stone-passing')
   await wheel(300, 5, 200)
   await page.waitForTimeout(1200)
   await shot('descent-early')
@@ -131,7 +123,16 @@ try {
     await page.waitForTimeout(2500)
     await shot('camp')
 
-    // 6 · scrolling at the camp must not strand the visitor either
+    // 6 · the SITTING: the hearth opens with the night's one contract;
+    // one declarative tap and the keeper speaks
+    const sitting = page.locator('#sitting')
+    await sitting.waitFor({ state: 'visible', timeout: 12000 })
+    await shot('sitting')
+    await page.locator('#sitting-accept').click()
+    await page.waitForTimeout(1500)
+    await shot('hearth-after-sitting')
+
+    // scrolling at the camp must not strand the visitor either
     await wheel(-300, 6)
     await page.waitForTimeout(1500)
     await shot('camp-after-scroll-up')

@@ -214,11 +214,15 @@ export function createEclipse(scene: Scene) {
   }
   // a rich, varied heaven: four populations at different sizes and hues,
   // dense dust to bright gems, cool sparkle among the warm
-  const dustStars = starField(3200, 0.26, STAR_PALE, 46, 74)
-  const dimStars = starField(2400, 0.38, STAR_COOL, 44, 72)
-  const midStars = starField(760, 0.55, STAR_ICE, 43, 68)
-  const brightStars = starField(320, 0.72, STAR_ICE, 42, 66)
-  const gemStars = starField(110, 1.0, STAR_WARM, 41, 60)
+  // concept-01 density and depth: a far veil, deep shells, a NEAR layer
+  // whose parallax makes the night feel inhabited, rare gold gems
+  const farDust = starField(2200, 0.16, STAR_PALE, 82, 88)
+  const dustStars = starField(3600, 0.2, STAR_PALE, 50, 80)
+  const dimStars = starField(2600, 0.3, STAR_COOL, 46, 78)
+  const midStars = starField(900, 0.46, STAR_ICE, 44, 72)
+  const brightStars = starField(380, 0.62, STAR_ICE, 43, 68)
+  const gemStars = starField(130, 0.9, STAR_WARM, 42, 62)
+  const nearStars = starField(240, 0.5, STAR_COOL, 30, 40)
 
   const wandererBase: Array<[number, number, number]> = []
   const wandererMat = new SpriteMaterial({
@@ -282,17 +286,21 @@ export function createEclipse(scene: Scene) {
       flashMat.opacity = 0
     }
 
-    dustStars.mat.opacity = 0.5 * s.skyBirth
-    dimStars.mat.opacity = 0.7 * s.skyBirth
-    midStars.mat.opacity = (0.68 + 0.1 * Math.sin(s.elapsed * 0.7)) * s.skyBirth
+    farDust.mat.opacity = 0.42 * s.skyBirth
+    dustStars.mat.opacity = 0.6 * s.skyBirth
+    dimStars.mat.opacity = 0.78 * s.skyBirth
+    midStars.mat.opacity = (0.72 + 0.1 * Math.sin(s.elapsed * 0.7)) * s.skyBirth
     brightStars.mat.opacity = s.skyBirth
-    gemStars.mat.opacity = (0.8 + 0.16 * Math.sin(s.elapsed * 0.9 + 2)) * s.skyBirth
+    gemStars.mat.opacity = (0.82 + 0.16 * Math.sin(s.elapsed * 0.9 + 2)) * s.skyBirth
+    nearStars.mat.opacity = 0.55 * s.skyBirth
     wandererMat.opacity = s.skyBirth * s.lanterns
+    farDust.points.rotation.y = s.elapsed * 0.002
     dustStars.points.rotation.y = s.elapsed * 0.0025
     dimStars.points.rotation.y = s.elapsed * 0.003
     midStars.points.rotation.y = s.elapsed * 0.0035
     brightStars.points.rotation.y = s.elapsed * 0.004
     gemStars.points.rotation.y = s.elapsed * 0.0045
+    nearStars.points.rotation.y = s.elapsed * 0.0055
     wanderers.rotation.y = s.elapsed * 0.011
     wanderers.rotation.x = Math.sin(s.elapsed * 0.05) * 0.01
 
