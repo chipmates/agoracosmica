@@ -173,6 +173,14 @@ const CAMP_SPOTS = [
 ]
 const HUB_SPOTS = [
   {
+    id: 'sky',
+    label: 'The Sky',
+    pos: new Vector3(0, 2.3, -6.2),
+    open: () => {
+      lookTarget = 1 // the gaze lifts itself; the wheel receives you
+    },
+  },
+  {
     id: 'council',
     label: "Tonight's Council",
     pos: new Vector3(0, -0.15, -5.6),
@@ -834,8 +842,9 @@ window.__forge = {
       : p === 'descent' ? 0.75 - 0.2 * desc
       : p === 'crossing' ? 0.12
       : p === 'camp' ? 0.08
-      : p === 'council' ? 0.55
+      : p === 'council' ? 0.78
       : p === 'sky' ? 0.4
+      : p === 'agora' ? 0.78
       : 1)
     flashAt = elapsed - (opts.sinceFlash ?? 999)
     agoraReveal =
@@ -927,7 +936,7 @@ function setPhase(next: Phase): void {
     lookUp = 0
     keeperScene.setScript(FIRE_SCRIPT)
     keeperEl.hidden = true
-    setStatus('The night agora · scroll to look up')
+    setStatus(autoRide ? 'The night agora · scroll to look up' : 'The night agora')
     verseShow('Questions shine within you')
   }
   if (next !== 'council') hideDoor()
@@ -993,8 +1002,10 @@ function push(delta: number): void {
     if (descTarget <= 0 && desc < 0.02 && delta < 0) setPhase('held')
   }
   if (phase === 'agora') {
-    // the arrival breath: landing at the fire absorbs the scroll for a
-    // moment, so a fast descent cannot blow straight through the hub
+    // ONE grammar per stage (Michel): on the guided first night the
+    // scroll still carries you skyward; in free hub life the marks are
+    // the only way — scroll rests, selection speaks
+    if (!autoRide) return
     if (agoraEnteredAt >= 0 && elapsed - agoraEnteredAt < 1.6) return
     lookTarget = Math.min(1, Math.max(0, lookTarget + delta * 0.0009))
   }
@@ -1176,7 +1187,7 @@ function frame(now: number): void {
     phase === 'transit' ? 0
     : phase === 'held' ? 0.75
     : phase === 'descent' ? 0.75 - 0.2 * desc
-    : phase === 'agora' || phase === 'council' ? 0.55
+    : phase === 'agora' || phase === 'council' ? 0.78
     : phase === 'crossing' ? 0.12
     : phase === 'camp' ? 0.08
     : phase === 'sky' ? 0.4
