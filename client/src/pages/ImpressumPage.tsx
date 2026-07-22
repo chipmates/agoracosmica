@@ -156,7 +156,7 @@ const ImpressumPage: FC = () => {
           <h2>Musik-Credits</h2>
           <p>
             Hintergrundmusik: "Adrift Among Infinite Stars" von Scott Buckley – veröffentlicht unter CC-BY 4.0.<br />
-            Für Podcast-Nutzung angepasst.<br />
+            Bearbeitet (gekürzt und angepasst).<br />
             <a href="https://www.scottbuckley.com.au" target="_blank" rel="noopener noreferrer">www.scottbuckley.com.au</a>
           </p>
         </section>

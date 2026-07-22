@@ -7,7 +7,6 @@ import {
   organizationSchema,
   webSiteSchema,
   softwareApplicationSchema,
-  podcastSeriesSchema,
   breadcrumbSchema,
 } from '../lib/schemas';
 import { SITE_URL } from '../lib/urls';
@@ -21,13 +20,11 @@ const t = getT(lang);
   canonicalPath="/about"
   lang={lang}
   ogType="website"
-  includeRss={true}
   schemas={[
     agoraCosmicaSchema(),
     organizationSchema(),
     webSiteSchema(),
     softwareApplicationSchema(),
-    podcastSeriesSchema(lang),
     breadcrumbSchema([
       { name: t('breadcrumbs.home'), url: `${SITE_URL}/` },
       { name: t('breadcrumbs.about'), url: `${SITE_URL}/about` },

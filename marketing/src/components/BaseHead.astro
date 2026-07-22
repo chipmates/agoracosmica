@@ -6,7 +6,6 @@
 
 import { canonicalUrl, alternateUrls, MEDIA_URL } from '../lib/urls';
 import type { Lang } from '../i18n';
-import { podcastRssLink } from '../lib/schemas';
 
 interface Props {
   title: string;
@@ -27,8 +26,6 @@ interface Props {
   preloadImageType?: string;
   /** Inline JSON-LD blocks. Each entry becomes one <script type="application/ld+json">. */
   schemas?: Array<Record<string, unknown>>;
-  /** Emit the podcast feed as <link rel="alternate" type="application/rss+xml">. */
-  includeRss?: boolean;
   /** German legal pages (Impressum, Datenschutz, etc.) have no EN equivalent —
    *  use a bare canonical (no /de/ prefix) and skip the hreflang block. */
   noHreflang?: boolean;
@@ -56,7 +53,6 @@ const {
   preloadImageSizes,
   preloadImageType,
   schemas = [],
-  includeRss = false,
   noHreflang = false,
   noindex = false,
   altEn,
@@ -77,7 +73,6 @@ const alts = (altEn && altDe)
   : alternateUrls(canonicalPath);
 const image = ogImage ?? `${MEDIA_URL}/images/ui/og-default/1200.webp`;
 const imageAlt = ogImageAlt ?? 'Agora Cosmica';
-const rss = includeRss ? podcastRssLink(lang) : null;
 const ogLocale = lang === 'de' ? 'de_DE' : 'en_US';
 
 // Keep meta/og/twitter descriptions inside the ~160-char SERP + social-card
@@ -128,10 +123,6 @@ const metaDescription = clampDescription(description);
 <meta name="twitter:description" content={metaDescription} />
 <meta name="twitter:image" content={image} />
 <meta name="twitter:image:alt" content={imageAlt} />
-
-{rss && (
-  <link rel="alternate" type="application/rss+xml" title={rss.title} href={rss.href} />
-)}
 
 {preloadImage && !preloadImageSrcset && (
   <link

@@ -10,13 +10,6 @@ interface Props {
 const { lang } = Astro.props;
 const t = getT(lang);
 
-const spotifyUrl = lang === 'de'
-  ? 'https://open.spotify.com/show/5i63mEKJuCVniSIViXbEP8'
-  : 'https://open.spotify.com/show/3V02q5c8NAnFD1W2kQBYzd';
-const applePodcastUrl = lang === 'de'
-  ? 'https://podcasts.apple.com/us/podcast/agora-cosmica-deutsch/id1871505945'
-  : 'https://podcasts.apple.com/us/podcast/agora-cosmica/id1871505788';
-const podcastSuffix = lang === 'de' ? ' Deutsch' : '';
 const country = lang === 'de' ? 'Deutschland' : 'Germany';
 ---
 <div class="pub-content pub-contact">
@@ -45,12 +38,6 @@ const country = lang === 'de' ? 'Deutschland' : 'Germany';
   <section class="pub-section">
     <h2 class="pub-section__title">{t('contact.social')}</h2>
     <div class="pub-contact-links">
-      <a href={spotifyUrl} target="_blank" rel="noopener noreferrer" class="pub-textlink">
-        Spotify - Agora Cosmica{podcastSuffix}
-      </a>
-      <a href={applePodcastUrl} target="_blank" rel="noopener noreferrer" class="pub-textlink">
-        Apple Podcasts - Agora Cosmica{podcastSuffix}
-      </a>
       <a href="https://github.com/chipmates/agoracosmica" target="_blank" rel="noopener noreferrer" class="pub-textlink">
         GitHub - chipmates/agoracosmica
       </a>

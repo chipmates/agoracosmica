@@ -124,14 +124,10 @@ export function agoraCosmicaSchema(): Record<string, unknown> {
     url: SITE_URL,
     logo: ORG_LOGO,
     description:
-      'A nonprofit, open source education platform and podcast. Listen to life stories, learn from teachings, and talk with 30 figures from history, in English and German.',
+      'A nonprofit, open source education platform. Listen to life stories, learn from teachings, and talk with 30 figures from history, in English and German.',
     slogan: 'A Living Library You Can Talk To',
     sameAs: [
       'https://github.com/chipmates/agoracosmica',
-      'https://open.spotify.com/show/3V02q5c8NAnFD1W2kQBYzd',
-      'https://open.spotify.com/show/5i63mEKJuCVniSIViXbEP8',
-      'https://podcasts.apple.com/us/podcast/agora-cosmica/id1871505788',
-      'https://podcasts.apple.com/us/podcast/agora-cosmica-deutsch/id1871505945',
     ],
     parentOrganization: { '@id': ORG_ID },
   };
@@ -239,48 +235,8 @@ export function itemListSchema(
   };
 }
 
-// Podcast + software schemas, Astro-only — the React app never emitted these.
-
-const PODCASTS: Record<Lang, {
-  name: string;
-  description: string;
-  feedUrl: string;
-  coverUrl: string;
-  id: string;
-}> = {
-  en: {
-    name: 'Agora Cosmica',
-    description:
-      'Lives that still speak. First-person audiobooks inspired by remarkable people from history. Narrated with synthetic AI voices.',
-    feedUrl: `${MEDIA_URL}/podcasts/agora-cosmica/feed.xml`,
-    coverUrl: `${MEDIA_URL}/podcasts/agora-cosmica/cover.jpg?v=7`,
-    id: `${MEDIA_URL}/podcasts/agora-cosmica/#series`,
-  },
-  de: {
-    name: 'Agora Cosmica Deutsch',
-    description:
-      'Leben, die noch sprechen. Hörbücher in der Ich-Perspektive, inspiriert von besonderen Menschen der Geschichte. Erzählt mit synthetischen KI-Stimmen.',
-    feedUrl: `${MEDIA_URL}/podcasts/agora-cosmica-de/feed.xml`,
-    coverUrl: `${MEDIA_URL}/podcasts/agora-cosmica-de/cover.jpg?v=7`,
-    id: `${MEDIA_URL}/podcasts/agora-cosmica-de/#series`,
-  },
-};
-
-export function podcastSeriesSchema(lang: Lang): Record<string, unknown> {
-  const p = PODCASTS[lang];
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'PodcastSeries',
-    '@id': p.id,
-    name: p.name,
-    description: p.description,
-    url: SITE_URL,
-    webFeed: p.feedUrl,
-    image: p.coverUrl,
-    inLanguage: lang,
-    publisher: { '@id': AGORA_ID },
-  };
-}
+// Software schema, Astro-only — the React app never emitted these.
+// (The PodcastSeries schema was removed 2026-07-22 when the podcast was retired.)
 
 export function softwareApplicationSchema(): Record<string, unknown> {
   return {
@@ -317,9 +273,4 @@ export function softwareApplicationSchema(): Record<string, unknown> {
       'Grounded in primary works with a public factcheck for every figure',
     ],
   };
-}
-
-export function podcastRssLink(lang: Lang): { title: string; href: string } {
-  const p = PODCASTS[lang];
-  return { title: p.name, href: p.feedUrl };
 }
