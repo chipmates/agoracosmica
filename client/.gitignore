@@ -6,6 +6,8 @@ build/
 node_modules/
 tests/*
 !tests/setup.ts
+!tests/e2e/
+tests/e2e/failures/
 
 # Environment files
 .env
