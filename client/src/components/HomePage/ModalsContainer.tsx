@@ -3,7 +3,9 @@ const HistoryModal = lazy(() => import('../HistoryModal'));
 import ModeSelectorMini from '../ModeSelectorMini';
 import SeedsModal from '../SeedsModal';
 const WelcomeDisclosureModal = lazy(() => import('../WelcomeDisclosureModal'));
-const WisdomGalleryModal = lazy(() => import('../WisdomGalleryModal'));
+// V2 = the night gallery (design blessed 2026-07-23). V1 stays as the instant
+// fallback: swap the import path back to '../WisdomGalleryModal' to revert.
+const WisdomGalleryModal = lazy(() => import('../WisdomGalleryModalV2'));
 
 import RenderCounter from '../../dev/RenderCounter';
 import type { Figure, Seed } from '../../types/global';

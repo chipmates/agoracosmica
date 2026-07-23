@@ -50,6 +50,12 @@ const ICON_FORMATS = ['avif', 'webp', 'png'] as const;
 
 // Typed manifest access (JSON arrays are number[], cast to tuples)
 const manifestData = manifest as unknown as {
+  /** Figure-set revision. When present, figure paths use `main-<rev>/` and
+   *  `thumbnail-<rev>/` keyspaces on R2. Images ship with a 1-year immutable
+   *  cache, so an art-direction change must move to NEW URLs: the whole set
+   *  flips atomically with the bundle that carries the new manifest, returning
+   *  visitors included, no purge, while the old tree keeps serving old bundles. */
+  figuresRev?: string;
   figures: Record<string, { main?: [number, number]; thumbnail?: [number, number] }>;
   ui: Record<string, [number, number]>;
   backgrounds: Record<string, [number, number]>;
@@ -101,9 +107,15 @@ export const loadFigureImageV2 = async (
     return null;
   }
 
-  const basePath = `images/figures/${figureName}/${type}`;
+  const rev = manifestData.figuresRev;
+  const basePath = `images/figures/${figureName}/${type}${rev ? `-${rev}` : ''}`;
   const widths = type === 'thumbnail' ? THUMBNAIL_WIDTHS : FIGURE_MAIN_WIDTHS;
-  const formats = type === 'thumbnail' ? THUMBNAIL_FORMATS : FIGURE_MAIN_FORMATS;
+  // Revision trees are webp-only (measured 2026-07-23: avif encoded +58%
+  // larger on the night set; png was never fetched — the <img> fallback src
+  // is the webp primary). The legacy tree keeps all three formats.
+  const formats = rev
+    ? (['webp'] as const)
+    : type === 'thumbnail' ? THUMBNAIL_FORMATS : FIGURE_MAIN_FORMATS;
 
   return buildMetadata(basePath, widths, formats, dims);
 };

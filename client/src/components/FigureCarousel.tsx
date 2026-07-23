@@ -4,6 +4,7 @@ import { getHistoricalFigures, type TranslatedFigure } from '../api/figures';
 import { CategoryTab, ActionButton } from './Button';
 import { BookOpen, Check, Sparkle, Play, Pause } from "@phosphor-icons/react";
 import OptimizedImage from './OptimizedImage';
+import { loadFigureImageV2, getBestImageFromMetadata } from '../utils/imageLoaderV2';
 import { useTranslation } from '../hooks/useTranslation';
 import WisdomMapModal from './WisdomMapModal';
 import type { Figure, Seed } from '../types/global';
@@ -228,14 +229,19 @@ const FigureCarousel: FC<FigureCarouselProps> = ({
         const figure = figures[index];
         if (figure && !preloadedImages.has(figure.id)) {
           const figureName = figure.id === 'dogen' ? 'zenji' : figure.id;
-          
-          // Preload the actual images that OptimizedImage will use
-          const img1 = new Image();
-          img1.src = `/assets/figures/full/${figureName}-main-1200.png`;
-          
-          const img2 = new Image();
-          img2.src = `/assets/figures/full/${figureName}-main-1200.webp`;
-          
+
+          // Preload through the loader so the URL (R2 layout + figure revision)
+          // always matches what OptimizedImage will actually request. The old
+          // hardcoded /assets/figures/full/ paths had drifted from the R2
+          // layout and preloaded 404 HTML instead of images.
+          loadFigureImageV2(figureName, 'main').then((meta) => {
+            const best = getBestImageFromMetadata(meta, 1200, 'webp');
+            if (best?.primary) {
+              const img = new Image();
+              img.src = best.primary;
+            }
+          });
+
           // Track that we've preloaded this figure
           setPreloadedImages(prev => new Set([...prev, figure.id]));
         }

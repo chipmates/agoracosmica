@@ -155,11 +155,17 @@ button {
   /* =================
      BACKGROUNDS (5)
      ================= */
-  --bg-cosmic-void: #0D1338;    /* Standard cosmic background */
-  --bg-primary: #151C47;        /* Main app background - perfect balance */
-  --bg-astral: #1A1B4B;         /* Secondary containers */
-  --bg-card: #1C245C;           /* Cards, modals, elevated surfaces */
-  --bg-highlight: #2A3374;      /* Hover states, subtle accents */
+  /* NIGHT TOKEN SYSTEM v2 (2026-07-23): the deep-space family promoted to THE
+     system. No new blue: astro pages, login and the cinematic already lived on
+     this palette (#080B20 hardcoded 36x in astro). One hue angle (~229°),
+     desaturating as it darkens. Old navy values retired: 0D1338/151C47/1A1B4B/
+     1C245C/2A3374. */
+  --bg-void: #080B20;           /* deepest layer: behind portraits, cinematic */
+  --bg-cosmic-void: #080B20;    /* legacy alias of the void */
+  --bg-primary: #0C1133;        /* Main app canvas (= the login deep-space) */
+  --bg-astral: #10152E;         /* Secondary containers */
+  --bg-card: #141A3E;           /* Cards, modals, elevated surfaces */
+  --bg-highlight: #1D2450;      /* Hover states, subtle accents */
   
   /* =================
      DEEP SPACE SYSTEM (Login & Cosmic Scenes)
@@ -201,31 +207,37 @@ button {
      The original coral is more elegant and sophisticated,
      fitting better with philosophical discourse than bright orange.
      ================= */
+  /* v2 dusk recipe (2026-07-23): same hues, one saturation/lightness envelope,
+     stained glass in one window. Quest recast coral -> EMBER (manuscript
+     vermilion; the indigo+gold+vermilion triad). All >=4.5:1 on canvas+card. */
   --mode-story: var(--gold-primary);     /* Story mode uses gold */
-  --mode-quest: #E97451;                  /* Elegant coral - refined, not loud */
-  --mode-quest-hover: #F2917A;            /* Soft coral hover */
-  --mode-quest-active: #C86344;           /* Deep coral - pressed state */
-  
-  --mode-wisdom: #9D83CD;                 /* Purple base - softer blend */
-  --mode-wisdom-hover: #B099DD;           /* Purple hover - gentle lift */
-  --mode-wisdom-active: #8A71BA;          /* Purple active - deeper tone */
-  
-  --mode-freetalk: #68C397;               /* Mint base - balanced sage-mint */
-  --mode-freetalk-hover: #7FD4AA;         /* Mint hover - soft lift */
-  --mode-freetalk-active: #51B285;        /* Mint active - grounded green */
+  --mode-quest: #D65A38;                  /* Ember - commitment warmth */
+  --mode-quest-hover: #E4785A;            /* Ember hover */
+  --mode-quest-active: #B84A2E;           /* Ember pressed */
+  --ember: var(--mode-quest);             /* semantic alias: commit moments */
 
-  --mode-prism: #5B8BD4;                  /* Blue base - crystalline sapphire */
-  --mode-prism-hover: #7BA3E0;            /* Blue hover - soft lift */
-  --mode-prism-active: #4A78C0;           /* Blue active - deeper tone */
+  --mode-wisdom: #907CC4;                 /* Purple dusk */
+  --mode-wisdom-hover: #A18FD0;           /* Purple hover */
+  --mode-wisdom-active: #7E6BB0;          /* Purple active */
+
+  --mode-freetalk: #4FA97E;               /* Sage dusk */
+  --mode-freetalk-hover: #63BC91;         /* Sage hover */
+  --mode-freetalk-active: #41946C;        /* Sage active */
+
+  --mode-prism: #5E88CE;                  /* Sapphire dusk */
+  --mode-prism-hover: #7699D8;            /* Sapphire hover */
+  --mode-prism-active: #4E77BC;           /* Sapphire active */
   
   /* =================
      TEXT COLORS (4)
      NO PURE WHITE!
      ================= */
-  --text-primary: #D2D2D2;      /* Main text (10.8:1 contrast) */
-  --text-secondary: #CACACA;    /* Secondary text (9.2:1) */
-  --text-tertiary: #9E9E9E;     /* Tertiary text (5.8:1) */
-  --text-dim: #8A8A8A;           /* Dim text for low-emphasis content (4.5:1) */
+  /* v2: PARCHMENT replaces neutral gray — the warmth the astro pages already
+     speak. Ratios measured on the v2 canvas #0C1133. */
+  --text-primary: #E8E2D4;      /* Main text (14.2:1 contrast) */
+  --text-secondary: #CEC8B9;    /* Secondary text (11.0:1) */
+  --text-tertiary: #A29C8D;     /* Tertiary text (6.7:1) */
+  --text-dim: #8C8677;           /* Dim text for low-emphasis content (5.1:1) */
   --text-disabled: #6B7BA3;     /* Disabled text (3.2:1) */
   
   /* =================
@@ -233,8 +245,8 @@ button {
      ================= */
   --color-success: var(--mode-freetalk);  /* Reuses mint */
   --color-warning: var(--mode-quest);     /* Reuses orange */
-  --color-error: #EF4444;                 /* Distinct red */
-  --color-error-hover: #F87171;           /* Red hover */
+  --color-error: #DA5F5F;                 /* Distinct red, night-tuned (v2) */
+  --color-error-hover: #E67B7B;           /* Red hover */
   --color-info: var(--mode-wisdom);       /* Reuses purple */
   
   /* Star colors - carefully designed, DO NOT change values */

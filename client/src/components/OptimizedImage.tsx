@@ -327,7 +327,11 @@ const OptimizedImage: FC<OptimizedImageProps> = ({
       <div 
         className={`optimized-image optimized-image--loading ${className}`}
         style={{
-          backgroundColor: 'rgba(28, 36, 92, 0.3)',
+          // The void: with the night figure set the placeholder matches the
+          // image's own darkness, so loading reads as the light arriving
+          // rather than a gray box swap. Falls back to the same hex until
+          // the v2 tokens land in index.css.
+          backgroundColor: 'var(--bg-void, #080B20)',
           borderRadius: '4px',
           ...style
         }}
@@ -342,8 +346,8 @@ const OptimizedImage: FC<OptimizedImageProps> = ({
       <div 
         className={`optimized-image optimized-image--missing ${className}`}
         style={{
-          backgroundColor: 'var(--primary-deep, #1C245C)',
-          color: 'var(--text-color, #fff)',
+          backgroundColor: 'var(--bg-card, #141A3E)',
+          color: 'var(--text-primary, #E8E2D4)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -389,7 +393,13 @@ const OptimizedImage: FC<OptimizedImageProps> = ({
           <source
             srcSet={imageData.webp.srcSet}
             type="image/webp"
-            sizes={sizes ?? `(max-width: 640px) 100vw, ${imageData.webp.width}px`}
+            // Thumbnails render as small rail/grid tiles (~60-100 CSS px);
+            // the old 100vw default made mobile fetch the 640px variant for
+            // a 70px slot. 128px bounds it (browser still scales by DPR), and
+            // surfaces with bigger tiles pass an explicit `sizes`.
+            sizes={sizes ?? (purpose === 'thumbnail'
+              ? '128px'
+              : `(max-width: 640px) 100vw, ${imageData.webp.width}px`)}
           />
         )}
         
