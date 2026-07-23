@@ -30,6 +30,18 @@ module.exports = [
     rules: {
       // Add your rules here
       'react/prop-types': 'off',
+      // User-facing attribute strings must go through the translation layer;
+      // a raw literal here is invisible to the EN/DE parity net and leaks
+      // English into the German UI (the "Sages"/"List view" class of bug).
+      'no-restricted-syntax': [
+        'warn',
+        {
+          selector:
+            "JSXAttribute[name.name=/^(aria-label|title|placeholder)$/] > Literal",
+          message:
+            'Use tString(...) for aria-label/title/placeholder so the string exists in both languages.',
+        },
+      ],
       'no-restricted-imports': [
         'warn',
         {
