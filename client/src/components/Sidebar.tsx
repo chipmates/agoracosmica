@@ -608,7 +608,6 @@ const Sidebar: FC<SidebarProps> = ({
           <nav className="navigation-grid" role="navigation">
             <div className="nav-button-container">
               <WisdomSidebarButton
-                selectedFigure={selectedFigure}
                 isHovered={pathsHover}
                 onMouseMove={(e: MouseEvent<HTMLButtonElement>) => applyMagneticEffect(e, pathsButtonRef, setPathsHover)}
                 onMouseLeave={() => resetMagneticEffect(pathsButtonRef, setPathsHover)}

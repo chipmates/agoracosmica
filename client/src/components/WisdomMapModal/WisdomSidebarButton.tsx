@@ -1,12 +1,9 @@
-import { FC, useState, MouseEvent as ReactMouseEvent, RefObject } from 'react';
-import { createPortal } from 'react-dom';
-import WisdomMapModal from './index';
+import { FC, MouseEvent as ReactMouseEvent, RefObject } from 'react';
 import OptimizedImage from '../OptimizedImage';
 import useTranslation from '../../hooks/useTranslation';
-import { Figure } from '../../types/global';
+import { useUIStore } from '../../stores/uiStore';
 
 interface WisdomSidebarButtonProps {
-  selectedFigure?: Figure | null;
   isHovered?: boolean;
   onMouseMove?: (e: ReactMouseEvent<HTMLButtonElement>) => void;
   onMouseLeave?: (e: ReactMouseEvent<HTMLButtonElement>) => void;
@@ -15,12 +12,13 @@ interface WisdomSidebarButtonProps {
 }
 
 /**
- * Sidebar button for Wisdom Hub (WisdomMapModal)
- * Self-contained component managing its own modal state.
- * Follows the AudioLibrarySidebarButton pattern.
+ * Sidebar button for the Wisdom hub. Opens the ONE store-driven wisdom map
+ * mount (SeedsModal in ModalsContainer) instead of carrying its own modal
+ * instance and routing seed selection through the window bridge, which is
+ * how this button worked before 2026-07-23. Seed selection now flows through
+ * HomePage's handleSeedSelect prop binding like every other modal.
  */
 export const WisdomSidebarButton: FC<WisdomSidebarButtonProps> = ({
-  selectedFigure,
   isHovered,
   onMouseMove,
   onMouseLeave,
@@ -28,55 +26,32 @@ export const WisdomSidebarButton: FC<WisdomSidebarButtonProps> = ({
   onButtonClick
 }) => {
   const { tString } = useTranslation();
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const setSeedsModalOpen = useUIStore((s) => s.setSeedsModalOpen);
 
   const handleClick = (): void => {
-    setIsModalOpen(true);
+    setSeedsModalOpen(true);
     if (onButtonClick) onButtonClick();
   };
 
-  const handleSeedSelect = (seed: any, mode?: string): void => {
-    // Use the same global pattern as FigureCarousel
-    if (window.handleSeedSelect) {
-      window.handleSeedSelect(seed, mode);
-    }
-    setIsModalOpen(false);
-  };
-
   return (
-    <>
-      <button
-        ref={buttonRef}
-        className="nav-button"
-        onClick={handleClick}
-        onMouseMove={onMouseMove}
-        onMouseLeave={onMouseLeave}
-        aria-label={tString('navigation.wisdom', 'Wisdom')}
-      >
-        <div className="button-frame">
-          <OptimizedImage
-            src="paths"
-            type="ui"
-            purpose="icon"
-            priority={true}
-            className={`button-icon ${isHovered ? 'hover' : ''}`}
-            alt="Wisdom"
-          />
-        </div>
-      </button>
-
-      {isModalOpen && createPortal(
-        <WisdomMapModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          selectedFigure={selectedFigure || null}
-          defaultView="map"
-          showSelectButton={true}
-          onSeedSelect={handleSeedSelect}
-          isForSeedConversation
-        />,
-        document.body
-      )}
-    </>
+    <button
+      ref={buttonRef}
+      className="nav-button"
+      onClick={handleClick}
+      onMouseMove={onMouseMove}
+      onMouseLeave={onMouseLeave}
+      aria-label={tString('navigation.wisdom', 'Wisdom')}
+    >
+      <div className="button-frame">
+        <OptimizedImage
+          src="paths"
+          type="ui"
+          purpose="icon"
+          priority={true}
+          className={`button-icon ${isHovered ? 'hover' : ''}`}
+          alt="Wisdom"
+        />
+      </div>
+    </button>
   );
 };
