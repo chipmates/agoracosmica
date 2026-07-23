@@ -6,6 +6,11 @@ import { sanitizeContent } from '../utils/sanitizeContent';
 import { getDisplayShortName } from '../utils/figureDisplayName';
 import { useTranslation } from '../hooks/useTranslation';
 import VoiceInteractionHelper from './VoiceInteractionHelper';
+
+// Helper doctrine (2026-07-23): first-time popups must not cover content. The
+// voice helper duplicated the composer bar's own wording and re-fired over the
+// Echo's replies, so it is removed from the flow but kept in the tree.
+const VOICE_HELPER_REMOVED = true;
 import { Flag, SpeakerSlash } from '@phosphor-icons/react';
 import { preferencesIndexedDbAdapter } from '../storage/preferencesIndexedDbAdapter';
 import { ttsScheduler } from '../controllers/conversationStreamDriver';
@@ -355,13 +360,18 @@ const ChatBox: FC<ChatBoxProps> = ({
         </button>
       )}
 
-      {/* Voice Interaction Helper - shows after first message */}
-      <VoiceInteractionHelper
-        isVisible={showVoiceHelper}
-        onDismiss={() => setShowVoiceHelper(false)}
-        isMobile={isMobile}
-        messageCount={messages.filter(m => m.role === 'assistant' && !m.hidden).length}
-      />
+      {/* Voice Interaction Helper — REMOVED from the flow 2026-07-23 (helper
+          doctrine: the composer bar already carries the same guidance, and the
+          popup re-fired over every first reply). Component kept for a possible
+          return. Revert = set VOICE_HELPER_REMOVED to false. */}
+      {!VOICE_HELPER_REMOVED && (
+        <VoiceInteractionHelper
+          isVisible={showVoiceHelper}
+          onDismiss={() => setShowVoiceHelper(false)}
+          isMobile={isMobile}
+          messageCount={messages.filter(m => m.role === 'assistant' && !m.hidden).length}
+        />
+      )}
     </div>
   );
 };
