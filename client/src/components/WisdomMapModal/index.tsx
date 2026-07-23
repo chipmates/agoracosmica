@@ -972,7 +972,7 @@ const WisdomMapModal: FC<WisdomMapModalProps> = ({
                 <button
                   className="toolbar-btn"
                   onClick={handleOpenListView}
-                  aria-label="List view"
+                  aria-label={tString('seeds.viewModes.switchToList', 'Switch to list view')}
                 >
                   <ListBullets size={22} weight={showDetailView ? 'fill' : 'regular'} />
                 </button>
@@ -995,7 +995,7 @@ const WisdomMapModal: FC<WisdomMapModalProps> = ({
                 <button
                   className={`toolbar-btn toolbar-info-btn ${showConstellationInfo ? 'active' : ''}`}
                   onClick={() => setShowConstellationInfo(!showConstellationInfo)}
-                  aria-label={showConstellationInfo ? 'Hide info' : 'Show info'}
+                  aria-label={showConstellationInfo ? tString('constellations.hideInfo', 'Hide info') : tString('constellations.showInfo', 'Show info')}
                 >
                   <Info size={22} />
                 </button>

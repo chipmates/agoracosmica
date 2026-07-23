@@ -19,6 +19,10 @@
   font-family: 'Space Grotesk', sans-serif;
   font-size: 0.9375rem;
   font-weight: 500;
+  /* The header group may squeeze this button; the label must never
+     wrap letter-by-letter (Li-st-e). */
+  white-space: nowrap;
+  flex-shrink: 0;
 
   cursor: pointer;
   transition: all 0.2s ease;

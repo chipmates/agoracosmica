@@ -42,7 +42,7 @@ export const AudioLibrarySidebarButton: FC<AudioLibrarySidebarButtonProps> = ({
         onClick={handleClick}
         onMouseMove={onMouseMove}
         onMouseLeave={onMouseLeave}
-        aria-label={tString('audioLibrary.title', 'Audio Library')}
+        aria-label={tString('navigation.audioLibrary', 'Audio Library')}
       >
         <div className="button-frame">
           <OptimizedImage 

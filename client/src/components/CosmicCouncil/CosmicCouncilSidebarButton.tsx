@@ -86,7 +86,7 @@ export const CosmicCouncilSidebarButton: FC<CosmicCouncilSidebarButtonProps> = (
         onClick={handleClick}
         onMouseMove={onMouseMove}
         onMouseLeave={onMouseLeave}
-        aria-label={tString('cosmicCouncil.title', 'Cosmic Council')}
+        aria-label={tString('navigation.council', 'Council')}
       >
         <div className="button-frame">
           <OptimizedImage 

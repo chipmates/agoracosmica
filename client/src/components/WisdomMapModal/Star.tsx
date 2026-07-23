@@ -172,7 +172,7 @@ const Star: FC<StarProps> = ({
           <strong>
             {seedId}. {seedTitle}
           </strong>
-          {symbolicMeaning && !symbolicMeaning.includes('.') && (
+          {symbolicMeaning && !symbolicMeaning.includes('.') && symbolicMeaning !== seedTitle && (
             <div className="tooltip-symbolism">
               <span>{tString('constellations.symbolizes', 'Symbolizes')}: {symbolicMeaning}</span>
             </div>

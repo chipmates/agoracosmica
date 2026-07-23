@@ -536,7 +536,7 @@ const Sidebar: FC<SidebarProps> = ({
                 handleFigureButtonMouseLeave();
               }}
               onMouseEnter={handleFigureButtonMouseEnter}
-              aria-label={tString('figures.selectFigure', 'Select figure')}
+              aria-label={tString('navigation.tabs.echoes', 'Echoes')}
             >
               <div className="button-frame">
                 {isCouncilMode && councilConfig ? (
@@ -600,7 +600,7 @@ const Sidebar: FC<SidebarProps> = ({
 
             {/* Preview indicator - moved outside button like other labels */}
             <span className={`nav-button-label ${showFigurePreview ? 'active' : ''}`}>
-              Echos
+              {tNode('navigation.tabs.echoes')}
             </span>
           </div>
           </div>
@@ -640,7 +640,7 @@ const Sidebar: FC<SidebarProps> = ({
                 buttonRef={councilButtonRef}
                 onButtonClick={() => onClose()}
               />
-              <span className="nav-button-label">Council</span>
+              <span className="nav-button-label">{tNode('navigation.council')}</span>
             </div>
 
             <div className="nav-button-container">

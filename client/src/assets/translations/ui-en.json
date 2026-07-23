@@ -600,6 +600,7 @@
     "journey": "Journey",
     "settings": "Settings",
     "audioLibrary": "Audio Library",
+    "council": "Council",
     "profile": "Profile",
     "help": "Help",
     "closeMenu": "Close menu",
@@ -1020,7 +1021,9 @@
     "close": "Close language selector"
   },
   "constellations": {
-    "symbolizes": "Symbolizes"
+    "symbolizes": "Symbolizes",
+    "showInfo": "Show info",
+    "hideInfo": "Hide info"
   },
   "device": {
     "landscapeWarning": "Screen size not supported. Please rotate your device."

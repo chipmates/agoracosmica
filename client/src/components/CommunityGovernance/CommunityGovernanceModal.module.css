@@ -467,11 +467,17 @@
 
 .dataCardActions {
   display: flex;
+  /* Long German labels (Wiederherstellen) must never break mid-word:
+     whole buttons wrap onto their own row instead. */
+  flex-wrap: wrap;
   gap: 10px;
 }
 
 .dataCardButton {
-  flex: 1;
+  flex: 1 1 auto;
+  min-width: max-content;
+  overflow-wrap: normal;
+  word-break: keep-all;
   display: inline-flex;
   align-items: center;
   justify-content: center;

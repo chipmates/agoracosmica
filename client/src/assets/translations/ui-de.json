@@ -604,6 +604,7 @@
     "journey": "Reise",
     "settings": "Optionen",
     "audioLibrary": "Audiothek",
+    "council": "Council",
     "profile": "Profil",
     "help": "Hilfe",
     "closeMenu": "Menü schließen",
@@ -1022,7 +1023,9 @@
     "close": "Sprachauswahl schließen"
   },
   "constellations": {
-    "symbolizes": "Symbolisiert"
+    "symbolizes": "Symbolisiert",
+    "showInfo": "Info anzeigen",
+    "hideInfo": "Info ausblenden"
   },
   "device": {
     "landscapeWarning": "Bildschirmgröße nicht unterstützt. Bitte drehe dein Gerät."
