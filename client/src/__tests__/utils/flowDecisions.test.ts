@@ -5,7 +5,7 @@ import {
   resolveRestoreAction,
   type NodeStateSnapshot,
 } from '../../utils/flowDecisions';
-import { getStorageKeyForMode } from '../../utils/storageKeysV2';
+import { getStorageKeyForMode, parseHistoryKey } from '../../utils/storageKeysV2';
 import {
   captureEntryIntentFromUrl,
   readFigureIntent,
@@ -152,6 +152,30 @@ describe('getStorageKeyForMode', () => {
 
   it('prism has no conversation storage', () => {
     expect(getStorageKeyForMode('prism', 'aurelius', '42')).toBeNull();
+  });
+});
+
+describe('parseHistoryKey (inverse of the key generators)', () => {
+  it.each([
+    ['seed_conversation', '42'],
+    ['challenge', '42'],
+    ['free_conversation', null],
+  ] as const)('%s keys round-trip', (mode, seedId) => {
+    const key = getStorageKeyForMode(mode, 'aurelius', seedId ?? undefined)!;
+    expect(parseHistoryKey(key, 'aurelius')).toEqual({ mode, seedId });
+  });
+
+  it('recognizes prism content keys', () => {
+    expect(parseHistoryKey('prism_content_aurelius_42', 'aurelius')).toEqual({
+      mode: 'prism',
+      seedId: '42',
+    });
+  });
+
+  it('rejects other figures and unrelated keys', () => {
+    expect(parseHistoryKey('starseed_kahlo_42', 'aurelius')).toBeNull();
+    expect(parseHistoryKey('selectedLanguage', 'aurelius')).toBeNull();
+    expect(parseHistoryKey('story_content_aurelius_42', 'aurelius')).toBeNull();
   });
 });
 

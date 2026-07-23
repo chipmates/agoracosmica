@@ -5,7 +5,7 @@ import useSeedTranslation from '../../hooks/useSeedTranslation';
 import { useHapticFeedback } from '../../hooks/useHapticFeedback';
 import { useUIStore } from '../../stores/uiStore';
 import SummaryService from '../../services/SummaryService';
-import { STORAGE_KEYS } from '../../utils/storageKeysV2';
+import { STORAGE_KEYS, parseHistoryKey } from '../../utils/storageKeysV2';
 import { createRequestGate } from '../../utils/async/requestGate';
 import { abortable, AbortableTask } from '../../utils/async/abortable';
 import { LocalStorageAdapter } from '../../storage/localAdapter';
@@ -70,23 +70,16 @@ export function useHistoryModalData({
   const lastSyncSignatureRef = useRef<string | null>(null);
   const conversationSnapshotRef = useRef({ historyKey: null as string | null, messages: [] as any[] });
 
-  // Helper: Extract mode from history key
-  const normalizeModeFromKey = useCallback((key: string, figureId: string): string | null => {
-    if (key.startsWith(`prism_content_${figureId}_`)) return 'prism';
-    if (key.startsWith(`starseed_${figureId}_`)) return 'seed_conversation';
-    if (key.startsWith(`challenge_${figureId}_`)) return 'challenge';
-    if (key.startsWith(`freetalk_${figureId}`)) return 'free_conversation';
-    return null;
-  }, []);
+  // Helpers: both derive from the one key-format owner (storageKeysV2).
+  const normalizeModeFromKey = useCallback(
+    (key: string, figureId: string): string | null => parseHistoryKey(key, figureId)?.mode ?? null,
+    []
+  );
 
-  // Helper: Extract seed ID from history key
   const extractSeedIdFromKey = useCallback((key: string, figureId: string): string | null => {
-    if (key.startsWith(`freetalk_${figureId}`)) return 'freetalk';
-    const prefixes = [`prism_content_${figureId}_`, `starseed_${figureId}_`, `challenge_${figureId}_`];
-    for (const prefix of prefixes) {
-      if (key.startsWith(prefix)) return key.slice(prefix.length);
-    }
-    return null;
+    const parsed = parseHistoryKey(key, figureId);
+    if (!parsed) return null;
+    return parsed.mode === 'free_conversation' ? 'freetalk' : parsed.seedId;
   }, []);
 
   // Sync Zustand conversation state to local histories

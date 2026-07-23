@@ -89,6 +89,30 @@ export const getStorageKeyForMode = (
   }
 };
 
+export interface ParsedHistoryKey {
+  mode: string;
+  seedId: string | null;
+}
+
+/**
+ * Inverse of getStorageKeyForMode for one figure: recognize which conversation
+ * mode and seed a stored history key belongs to. Returns null for keys that
+ * are not conversation histories of this figure. Free talk is figure-global,
+ * so its seedId is null.
+ */
+export const parseHistoryKey = (key: string, figureId: string): ParsedHistoryKey | null => {
+  if (key.startsWith(`freetalk_${figureId}`)) return { mode: 'free_conversation', seedId: null };
+  const prefixes: Array<[string, string]> = [
+    [`prism_content_${figureId}_`, 'prism'],
+    [`starseed_${figureId}_`, 'seed_conversation'],
+    [`challenge_${figureId}_`, 'challenge'],
+  ];
+  for (const [prefix, mode] of prefixes) {
+    if (key.startsWith(prefix)) return { mode, seedId: key.slice(prefix.length) };
+  }
+  return null;
+};
+
 /**
  * Story content structure stored in localStorage
  */
