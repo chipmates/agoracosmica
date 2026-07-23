@@ -1,4 +1,6 @@
 {
+  "seedDetail": { "wisdomLabel": "Wisdom" },
+  "report": { "label": "Report content" },
   "app": {
     "name": "Agora Cosmica",
     "brandTagline": "A Living Library You Can Talk To",
@@ -9,7 +11,7 @@
     "imageAlt": "AI-generated portrait of {name}",
     "voiceChip": "AI voice, not a recording",
     "voiceShort": "AI voice",
-    "chatLine": "AI Echo, can be wrong. Verify anything important.",
+    "chatLine": "AI Echo can be wrong. Verify anything important.",
     "notice": "These figures are AI interpretations, not the real people. What they say in chat, stories, and audio is AI-generated and can be inaccurate. Their portraits are AI-generated images, not photographs. Verify anything important.",
     "learnMore": "How Echoes work",
     "transcriptHeader": "AI-generated dialogue (AI Echoes)",
@@ -1735,6 +1737,7 @@
   },
   "factCheck": {
     "facts": "Facts",
+    "titlePattern": "{name}'s Facts",
     "storyDetails": "Story Details",
     "documented": "Documented",
     "recreated": "Recreated",

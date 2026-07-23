@@ -250,7 +250,7 @@ export const SeedDetailView: FC<SeedDetailViewProps> = ({
 
                 {/* Header */}
                 <header className="detail-seed-header">
-                  <div className="detail-seed-number">Wisdom #{seedNumber}</div>
+                  <div className="detail-seed-number">{tString('seedDetail.wisdomLabel', 'Wisdom')} #{seedNumber}</div>
                   <h2 className="detail-seed-title">{seed.title}</h2>
 
                   {/* Tags */}

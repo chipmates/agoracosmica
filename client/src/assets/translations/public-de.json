@@ -51,7 +51,7 @@
     "imageAlt": "KI-generiertes Porträt von {name}",
     "voiceChip": "KI-Stimme, keine Aufnahme",
     "voiceShort": "KI-Stimme",
-    "chatLine": "KI-Echo, kann sich irren. Prüfe Wichtiges nach.",
+    "chatLine": "KI-Echo kann sich irren. Prüfe Wichtiges nach.",
     "notice": "Diese Persönlichkeiten sind KI-Interpretationen, nicht die echten Menschen. Was sie in Gesprächen, Geschichten und Audios sagen, ist KI-generiert und kann ungenau sein. Ihre Porträts sind KI-erzeugte Bilder, keine Fotografien. Prüfe Wichtiges nach.",
     "learnMore": "Wie Echos funktionieren",
     "transcriptHeader": "KI-generierter Dialog (KI-Echos)",
