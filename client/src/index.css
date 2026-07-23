@@ -215,6 +215,8 @@ button {
   --mode-quest-hover: #E4785A;            /* Ember hover */
   --mode-quest-active: #B84A2E;           /* Ember pressed */
   --ember: var(--mode-quest);             /* semantic alias: commit moments */
+  --ember-ink: #151C47;                   /* navy ink ON ember surfaces (record-bar turn counter). The one
+                                             place the retired navy lives on: it IS the blue against ember. */
 
   --mode-wisdom: #907CC4;                 /* Purple dusk */
   --mode-wisdom-hover: #A18FD0;           /* Purple hover */

@@ -159,7 +159,7 @@
   align-self: center;
   padding-left: 12px;
   font-size: 0.85rem;
-  color: var(--bg-primary, #151C47);
+  color: var(--ember-ink, #151C47);
   font-weight: 600;
   display: inline-flex;
   align-items: center;
@@ -168,8 +168,10 @@
   white-space: nowrap;
 }
 .turn-counter.voice-mode[data-urgency="normal"],
-.turn-counter.voice-mode[data-urgency="warning"] { color: var(--bg-primary, #151C47); }
-.turn-counter.voice-mode[data-urgency="critical"] { color: var(--color-error, #EF4444); }
+.turn-counter.voice-mode[data-urgency="warning"] { color: var(--ember-ink, #151C47); }
+/* Error-red on the ember bar is nearly invisible (red on red-orange), so
+   critical borrows exhausted's white but stays lighter in weight. */
+.turn-counter.voice-mode[data-urgency="critical"] { color: var(--utility-pure-white, #FFFFFF); font-weight: 500; }
 /* Exhausted on the coral record-button: red on red is unreadable. White on coral
    has WCAG-AA contrast and reads as a clear "this is the limit" badge. */
 .turn-counter.voice-mode[data-urgency="exhausted"] {
