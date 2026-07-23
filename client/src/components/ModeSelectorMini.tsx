@@ -271,11 +271,10 @@ const ModeSelectorMini: FC<ModeSelectorMiniProps> = ({
               {tString('modes.doors.title', 'How do you want to start with {name}?')
                 .replace('{name}', selectedFigure?.name || 'this Echo')}
             </h2>
-            {selectedSeed?.title && (
-              <p className="doors-seed">
-                {String(selectedSeed.id).includes('-') ? String(selectedSeed.id).split('-')[1] : selectedSeed.id}. {selectedSeed.title}
-              </p>
-            )}
+            {/* No seed subtitle here: the doors are first contact, and the
+                auto-defaulted wisdom name ("1. Der unbearbeitete Block") reads
+                as context-free noise before any chapter exists. The eclipse
+                keeps its seed line — returners have the context. */}
             <div className="doors-row">
               <button className="doors-door doors-door--story" onClick={() => handleModeSelect('introduction')}>
                 <Books size={30} weight="duotone" className="doors-door-icon" />
