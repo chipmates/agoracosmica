@@ -45,6 +45,7 @@ import {
   backfillWisdomMarkers,
   STORAGE_KEYS
 } from '../utils/storageKeysV2';
+import { resolveRestoreAction } from '../utils/flowDecisions';
 import { checkAndSetBloomInvite, getPendingInvite, clearPendingInvite } from '../utils/pendingBlooms';
 import PostDialogueBloomInvite from '../components/WisdomMapModal/PostDialogueBloomInvite';
 import PostQuestVerdictCard from '../components/QuestVerdictCard/PostQuestVerdictCard';
@@ -1178,30 +1179,28 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
           });
         }
 
-        if (storedMode && storedMode !== currentMode) {
-          // Route through handleModeSelect for consistent initialization
-          handleModeSelectRef.current(storedMode, true);
-        } else if (!storedMode) {
-          // NEW figure+seed: let user choose via mode selector
-          setModeSelectorVisible(true);
-        } else {
-          // Mode already correct — covers page refresh where Zustand already has the right mode
-          if (storedMode === 'prism') {
-            // Prism uses its own player — just mark started so bookmarks + UI work
+        const action = resolveRestoreAction(storedMode, currentMode, selectedFigure.id, selectedSeed.id);
+        switch (action.kind) {
+          case 'selectStoredMode':
+            // Route through handleModeSelect for consistent initialization
+            handleModeSelectRef.current(action.mode, true);
+            break;
+          case 'openModeSelector':
+            // NEW figure+seed: let user choose via mode selector
+            setModeSelectorVisible(true);
+            break;
+          case 'markConversationStarted':
+            // Prism refresh: prism uses its own player — just mark started so bookmarks + UI work
             useDomainStore.getState().setConversationStarted(true);
-          } else {
+            break;
+          case 'presetKeyAndSelect':
             // Pre-set historyKey so handleLanguageAutoSelect detects "same key"
             // and skips resetConversationState (avoids race with controller's updateThreadForSelection)
-            const expectedKey = getStorageKeyForMode(
-              storedMode,
-              selectedFigure.id,
-              storedMode === 'free_conversation' ? undefined : String(selectedSeed.id)
-            );
-            if (expectedKey) {
-              useDomainStore.getState().setConversationHistoryKey(expectedKey);
+            if (action.historyKey) {
+              useDomainStore.getState().setConversationHistoryKey(action.historyKey);
             }
-            handleModeSelectRef.current(storedMode, true);
-          }
+            handleModeSelectRef.current(action.mode, true);
+            break;
         }
       }
     };

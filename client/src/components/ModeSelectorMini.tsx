@@ -4,6 +4,7 @@ import { Bird, Books, Sparkle, Mountains, DiamondsFour } from '@phosphor-icons/r
 import { CloseButton } from './Button';
 import OptimizedFigureImage from './OptimizedFigureImage';
 import { isStoryCompleted, isPrismCompleted, STORAGE_KEYS } from '../utils/storageKeysV2';
+import { isFirstContactForFigure, resolveNodeState } from '../utils/flowDecisions';
 import { LocalStorageAdapter } from '../storage/localAdapter';
 import { sendConversion } from '../utils/public/gclidCapture';
 import { sendFunnelBeacon } from '../utils/funnelBeacon';
@@ -88,21 +89,13 @@ const ModeSelectorMini: FC<ModeSelectorMiniProps> = ({
   // history, free talk), so one prefix scan over local keys answers
   // "has this visitor ever engaged with this figure" across all seeds
   // and all entry paths.
-  const isFirstContact = (() => {
-    if (!selectedFigure) return false;
-    const fId = selectedFigure.id;
-    if (LocalStorageAdapter.getString(STORAGE_KEYS.getFreeTalkHistory(fId))) return false;
-    const engagedPrefixes = [
-      `visitedModes_${fId}_`,
-      `starseed_${fId}_`,
-      `challenge_${fId}_`,
-      `story_${fId}_`,
-      `prism_${fId}_`,
-    ];
-    return !LocalStorageAdapter.keys().some(k =>
-      engagedPrefixes.some(prefix => k.startsWith(prefix))
-    );
-  })();
+  const isFirstContact = selectedFigure
+    ? isFirstContactForFigure(
+        selectedFigure.id,
+        LocalStorageAdapter.keys(),
+        !!LocalStorageAdapter.getString(STORAGE_KEYS.getFreeTalkHistory(selectedFigure.id))
+      )
+    : false;
   const [showAllWays, setShowAllWays] = useState<boolean>(false);
 
   const [animatingOut, setAnimatingOut] = useState<boolean>(false);
@@ -114,33 +107,22 @@ const ModeSelectorMini: FC<ModeSelectorMiniProps> = ({
   const nodeIconSize = windowWidth < 480 ? 28 : windowWidth < 768 ? 32 : 40;
   const isMobile = windowWidth < 768;
 
-  // Completion state helper — uses existing storageKeysV2 helpers
+  // Completion state helper. Guarded reads (LocalStorageAdapter swallows
+  // storage-blocked throws): this runs during render, so a raw localStorage
+  // throw would crash the mode selector to the error boundary. Missing = not done.
   const getNodeState = (modeId: string): 'dormant' | 'visited' | 'completed' | 'active' => {
-    if (selectedMode === modeId) return 'active';
-    if (!selectedFigure || !selectedSeed) return 'dormant';
-    const fId = selectedFigure.id;
-    const sId = selectedSeed.id;
-
-    switch (modeId) {
-      case 'introduction':
-        if (isStoryCompleted(fId, sId)) return 'completed';
-        break;
-      case 'prism':
-        if (isPrismCompleted(fId, sId)) return 'completed';
-        break;
-      case 'seed_conversation':
-        // Guarded reads (LocalStorageAdapter swallows storage-blocked throws):
-        // getNodeState runs during render, so a raw localStorage throw would
-        // crash the mode selector to the error boundary. Missing = not done.
-        if (LocalStorageAdapter.getString(STORAGE_KEYS.getStarSeedHistory(fId, sId))) return 'completed';
-        break;
-      case 'challenge':
-        if (LocalStorageAdapter.getString(STORAGE_KEYS.getChallengeHistory(fId, sId))) return 'completed';
-        break;
-    }
-
-    if (visitedModes.includes(modeId)) return 'visited';
-    return 'dormant';
+    const hasSelection = !!(selectedFigure && selectedSeed);
+    const fId = selectedFigure?.id ?? '';
+    const sId = selectedSeed?.id ?? '';
+    return resolveNodeState(modeId, {
+      selectedMode,
+      hasSelection,
+      storyCompleted: hasSelection && isStoryCompleted(fId, sId),
+      prismCompleted: hasSelection && isPrismCompleted(fId, sId),
+      wisdomEngaged: hasSelection && !!LocalStorageAdapter.getString(STORAGE_KEYS.getStarSeedHistory(fId, sId)),
+      challengeEngaged: hasSelection && !!LocalStorageAdapter.getString(STORAGE_KEYS.getChallengeHistory(fId, sId)),
+      visitedModes,
+    });
   };
 
   // Determine sun click target: current mode, or Story as default
