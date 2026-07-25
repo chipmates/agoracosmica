@@ -50,16 +50,16 @@
     },
     "participants": [
       {
+        "id": "nietzsche",
+        "name": "Friedrich Nietzsche"
+      },
+      {
         "id": "jung",
         "name": "Carl Gustav Jung"
       },
       {
         "id": "woolf",
         "name": "Virginia Woolf"
-      },
-      {
-        "id": "nietzsche",
-        "name": "Friedrich Nietzsche"
       }
     ],
     "hook": "Are you being real or just performing better?",
@@ -78,21 +78,21 @@
     "question": "If you go looking for the self behind all your roles, opinions, and habits, what do you actually find?",
     "questionDe": "Wenn du hinter all deinen Rollen, Meinungen und Gewohnheiten nach dem Selbst suchst, was findest du dann tatsächlich?",
     "moderator": {
-      "id": "gautama",
-      "name": "Siddhartha Gautama"
+      "id": "jung",
+      "name": "Carl Gustav Jung"
     },
     "participants": [
       {
-        "id": "jung",
-        "name": "Carl Gustav Jung"
+        "id": "plato",
+        "name": "Plato"
       },
       {
         "id": "nietzsche",
         "name": "Friedrich Nietzsche"
       },
       {
-        "id": "woolf",
-        "name": "Virginia Woolf"
+        "id": "gautama",
+        "name": "Siddhartha Gautama"
       }
     ],
     "hook": "Who do you find when you look for yourself?",
@@ -124,8 +124,8 @@
         "name": "William Blake"
       },
       {
-        "id": "kahlo",
-        "name": "Frida Kahlo"
+        "id": "lovelace",
+        "name": "Ada Lovelace"
       }
     ],
     "hook": "What if the prison is one you designed?",
@@ -149,8 +149,8 @@
     },
     "participants": [
       {
-        "id": "aurelius",
-        "name": "Marcus Aurelius"
+        "id": "zenji",
+        "name": "Dōgen Zenji"
       },
       {
         "id": "gautama",
@@ -182,16 +182,16 @@
     },
     "participants": [
       {
-        "id": "austen",
-        "name": "Jane Austen"
-      },
-      {
         "id": "goethe",
         "name": "J.W. von Goethe"
       },
       {
         "id": "laozi",
         "name": "Laozi"
+      },
+      {
+        "id": "austen",
+        "name": "Jane Austen"
       }
     ],
     "hook": "Who are you without everything you own?",
@@ -215,8 +215,8 @@
     },
     "participants": [
       {
-        "id": "aurelius",
-        "name": "Marcus Aurelius"
+        "id": "shakespeare",
+        "name": "William Shakespeare"
       },
       {
         "id": "gandhi",
@@ -252,8 +252,8 @@
         "name": "Emily Dickinson"
       },
       {
-        "id": "nietzsche",
-        "name": "Friedrich Nietzsche"
+        "id": "schopenhauer",
+        "name": "Arthur Schopenhauer"
       },
       {
         "id": "woolf",
@@ -289,8 +289,8 @@
         "name": "Jane Austen"
       },
       {
-        "id": "mandela",
-        "name": "Nelson Mandela"
+        "id": "kahlo",
+        "name": "Frida Kahlo"
       }
     ],
     "hook": "Is there a place where you never have to explain yourself?",
@@ -318,12 +318,12 @@
         "name": "Arthur Schopenhauer"
       },
       {
-        "id": "beauvoir",
-        "name": "Simone de Beauvoir"
-      },
-      {
         "id": "rumi",
         "name": "Rumi"
+      },
+      {
+        "id": "beauvoir",
+        "name": "Simone de Beauvoir"
       }
     ],
     "hook": "Do you love them or just need to own them?",
@@ -380,16 +380,16 @@
     },
     "participants": [
       {
-        "id": "aurelius",
-        "name": "Marcus Aurelius"
-      },
-      {
-        "id": "beauvoir",
-        "name": "Simone de Beauvoir"
+        "id": "austen",
+        "name": "Jane Austen"
       },
       {
         "id": "jung",
         "name": "Carl Gustav Jung"
+      },
+      {
+        "id": "beauvoir",
+        "name": "Simone de Beauvoir"
       }
     ],
     "hook": "What if the person you loved never existed?",
@@ -487,8 +487,8 @@
         "name": "Ada Lovelace"
       },
       {
-        "id": "gandhi",
-        "name": "Mohandas Gandhi"
+        "id": "mozart",
+        "name": "W.A. Mozart"
       }
     ],
     "hook": "Am I wasting my life?",
@@ -512,16 +512,16 @@
     },
     "participants": [
       {
+        "id": "schopenhauer",
+        "name": "Arthur Schopenhauer"
+      },
+      {
         "id": "gautama",
         "name": "Siddhartha Gautama"
       },
       {
         "id": "nietzsche",
         "name": "Friedrich Nietzsche"
-      },
-      {
-        "id": "schopenhauer",
-        "name": "Arthur Schopenhauer"
       }
     ],
     "hook": "Why do you keep returning to what destroys you?",
@@ -545,16 +545,16 @@
     },
     "participants": [
       {
-        "id": "nietzsche",
-        "name": "Friedrich Nietzsche"
+        "id": "plato",
+        "name": "Plato"
       },
       {
         "id": "beauvoir",
         "name": "Simone de Beauvoir"
       },
       {
-        "id": "rumi",
-        "name": "Rumi"
+        "id": "einstein",
+        "name": "Albert Einstein"
       }
     ],
     "hook": "What is the question your whole life answers?",
@@ -644,16 +644,16 @@
     },
     "participants": [
       {
-        "id": "mandela",
-        "name": "Nelson Mandela"
-      },
-      {
         "id": "tubman",
         "name": "Harriet Tubman"
       },
       {
-        "id": "gautama",
-        "name": "Siddhartha Gautama"
+        "id": "goethe",
+        "name": "J.W. von Goethe"
+      },
+      {
+        "id": "mandela",
+        "name": "Nelson Mandela"
       }
     ],
     "hook": "How do you start over when everything is gone?",
@@ -743,16 +743,16 @@
     },
     "participants": [
       {
+        "id": "blake",
+        "name": "William Blake"
+      },
+      {
         "id": "einstein",
         "name": "Albert Einstein"
       },
       {
         "id": "zenji",
         "name": "Dōgen Zenji"
-      },
-      {
-        "id": "blake",
-        "name": "William Blake"
       }
     ],
     "hook": "Is there something about you a machine can never have?",
@@ -776,8 +776,8 @@
     },
     "participants": [
       {
-        "id": "gautama",
-        "name": "Siddhartha Gautama"
+        "id": "galilei",
+        "name": "Galileo Galilei"
       },
       {
         "id": "goethe",
@@ -813,12 +813,12 @@
         "name": "William Blake"
       },
       {
-        "id": "angelou",
-        "name": "Maya Angelou"
+        "id": "einstein",
+        "name": "Albert Einstein"
       },
       {
-        "id": "laozi",
-        "name": "Laozi"
+        "id": "vinci",
+        "name": "Leonardo da Vinci"
       }
     ],
     "hook": "What did you lose when you decided to grow up?",
@@ -879,12 +879,12 @@
         "name": "W.A. Mozart"
       },
       {
-        "id": "dickinson",
-        "name": "Emily Dickinson"
+        "id": "lovelace",
+        "name": "Ada Lovelace"
       },
       {
-        "id": "angelou",
-        "name": "Maya Angelou"
+        "id": "galilei",
+        "name": "Galileo Galilei"
       }
     ],
     "hook": "Do limits make better art, better work, better lives?",
@@ -936,21 +936,21 @@
     "question": "Your anger is not asking to be calmed. It is asking to be heard. What is it trying to tell you, and what does it want you to do?",
     "questionDe": "Deine Wut will nicht beruhigt werden. Sie will gehört werden. Was versucht sie dir zu sagen, und was will sie, dass du tust?",
     "moderator": {
-      "id": "king",
-      "name": "Martin Luther King Jr."
+      "id": "angelou",
+      "name": "Maya Angelou"
     },
     "participants": [
       {
-        "id": "angelou",
-        "name": "Maya Angelou"
-      },
-      {
-        "id": "aurelius",
-        "name": "Marcus Aurelius"
+        "id": "blake",
+        "name": "William Blake"
       },
       {
         "id": "nietzsche",
         "name": "Friedrich Nietzsche"
+      },
+      {
+        "id": "king",
+        "name": "Martin Luther King Jr."
       }
     ],
     "hook": "What is your anger asking you to do?",
@@ -974,8 +974,8 @@
     },
     "participants": [
       {
-        "id": "nietzsche",
-        "name": "Friedrich Nietzsche"
+        "id": "goethe",
+        "name": "J.W. von Goethe"
       },
       {
         "id": "laozi",
@@ -1040,16 +1040,16 @@
     },
     "participants": [
       {
-        "id": "aurelius",
-        "name": "Marcus Aurelius"
+        "id": "kahlo",
+        "name": "Frida Kahlo"
+      },
+      {
+        "id": "galilei",
+        "name": "Galileo Galilei"
       },
       {
         "id": "gandhi",
         "name": "Mohandas Gandhi"
-      },
-      {
-        "id": "kahlo",
-        "name": "Frida Kahlo"
       }
     ],
     "hook": "Is fear protecting you or trapping you?",
@@ -1068,14 +1068,10 @@
     "question": "You are holding on to something that is already gone. Your fingers know this. Your heart does not. How do you open your hand?",
     "questionDe": "Du hältst an etwas fest, das schon gegangen ist. Deine Finger wissen es. Dein Herz nicht. Wie öffnest du die Hand?",
     "moderator": {
-      "id": "gautama",
-      "name": "Siddhartha Gautama"
+      "id": "laozi",
+      "name": "Laozi"
     },
     "participants": [
-      {
-        "id": "laozi",
-        "name": "Laozi"
-      },
       {
         "id": "rumi",
         "name": "Rumi"
@@ -1083,6 +1079,10 @@
       {
         "id": "aurelius",
         "name": "Marcus Aurelius"
+      },
+      {
+        "id": "gautama",
+        "name": "Siddhartha Gautama"
       }
     ],
     "hook": "How do you open your hand around something gone?",
@@ -1106,16 +1106,16 @@
     },
     "participants": [
       {
+        "id": "vinci",
+        "name": "Leonardo da Vinci"
+      },
+      {
+        "id": "bingen",
+        "name": "Hildegard von Bingen"
+      },
+      {
         "id": "zenji",
         "name": "Dōgen Zenji"
-      },
-      {
-        "id": "nietzsche",
-        "name": "Friedrich Nietzsche"
-      },
-      {
-        "id": "angelou",
-        "name": "Maya Angelou"
       }
     ],
     "hook": "What does your body know that your mind won't hear?",
@@ -1143,12 +1143,12 @@
         "name": "Simone de Beauvoir"
       },
       {
-        "id": "gautama",
-        "name": "Siddhartha Gautama"
-      },
-      {
         "id": "goethe",
         "name": "J.W. von Goethe"
+      },
+      {
+        "id": "lovelace",
+        "name": "Ada Lovelace"
       }
     ],
     "hook": "How do you shape a life without crushing it?",
@@ -1213,8 +1213,8 @@
         "name": "Mohandas Gandhi"
       },
       {
-        "id": "gautama",
-        "name": "Siddhartha Gautama"
+        "id": "king",
+        "name": "Martin Luther King Jr."
       }
     ],
     "hook": "What part of you stays untouched no matter what?",
@@ -1233,14 +1233,10 @@
     "question": "When does obedience become complicity, and who bears the cost when someone finally refuses?",
     "questionDe": "Ab wann wird Gehorsam zu Mittäterschaft, und wer zahlt den Preis, wenn jemand endlich nein sagt?",
     "moderator": {
-      "id": "king",
-      "name": "Martin Luther King Jr."
+      "id": "galilei",
+      "name": "Galileo Galilei"
     },
     "participants": [
-      {
-        "id": "galilei",
-        "name": "Galileo Galilei"
-      },
       {
         "id": "tubman",
         "name": "Harriet Tubman"
@@ -1248,6 +1244,10 @@
       {
         "id": "aurelius",
         "name": "Marcus Aurelius"
+      },
+      {
+        "id": "king",
+        "name": "Martin Luther King Jr."
       }
     ],
     "hook": "When does following orders make you responsible?",
@@ -1308,12 +1308,12 @@
         "name": "Martin Luther King Jr."
       },
       {
-        "id": "gandhi",
-        "name": "Mohandas Gandhi"
-      },
-      {
         "id": "tubman",
         "name": "Harriet Tubman"
+      },
+      {
+        "id": "gandhi",
+        "name": "Mohandas Gandhi"
       }
     ],
     "hook": "When does staying quiet make you guilty?",
@@ -1332,21 +1332,21 @@
     "question": "You did not choose to be born into a world of strangers. And yet their suffering follows you home. What, if anything, do you owe them?",
     "questionDe": "Du hast dir nicht ausgesucht, in eine Welt voller Fremder geboren zu werden. Und doch folgt dir ihr Leid nach Hause. Was, wenn überhaupt etwas, schuldest du ihnen?",
     "moderator": {
-      "id": "king",
-      "name": "Martin Luther King Jr."
+      "id": "mandela",
+      "name": "Nelson Mandela"
     },
     "participants": [
-      {
-        "id": "mandela",
-        "name": "Nelson Mandela"
-      },
       {
         "id": "gandhi",
         "name": "Mohandas Gandhi"
       },
       {
-        "id": "gautama",
-        "name": "Siddhartha Gautama"
+        "id": "plato",
+        "name": "Plato"
+      },
+      {
+        "id": "king",
+        "name": "Martin Luther King Jr."
       }
     ],
     "hook": "What do you owe people you will never meet?",
@@ -1370,16 +1370,16 @@
     },
     "participants": [
       {
+        "id": "nietzsche",
+        "name": "Friedrich Nietzsche"
+      },
+      {
         "id": "eckhart",
         "name": "Meister Eckhart"
       },
       {
         "id": "gautama",
         "name": "Siddhartha Gautama"
-      },
-      {
-        "id": "nietzsche",
-        "name": "Friedrich Nietzsche"
       }
     ],
     "hook": "Why do bad things happen to good people?",
@@ -1431,14 +1431,10 @@
     "question": "Every tradition tells you to be present. And yet your mind has already left this sentence. Why is the simplest instruction the hardest to follow?",
     "questionDe": "Jede Tradition sagt dir, gegenwärtig zu sein. Und doch hat dein Geist diesen Satz schon verlassen. Warum ist die einfachste Anweisung die schwerste?",
     "moderator": {
-      "id": "gautama",
-      "name": "Siddhartha Gautama"
+      "id": "aurelius",
+      "name": "Marcus Aurelius"
     },
     "participants": [
-      {
-        "id": "aurelius",
-        "name": "Marcus Aurelius"
-      },
       {
         "id": "laozi",
         "name": "Laozi"
@@ -1446,6 +1442,10 @@
       {
         "id": "zenji",
         "name": "Dōgen Zenji"
+      },
+      {
+        "id": "gautama",
+        "name": "Siddhartha Gautama"
       }
     ],
     "hook": "Why can you never stay in this moment?",
@@ -1473,8 +1473,8 @@
         "name": "Emily Dickinson"
       },
       {
-        "id": "gautama",
-        "name": "Siddhartha Gautama"
+        "id": "mozart",
+        "name": "W.A. Mozart"
       },
       {
         "id": "kahlo",
@@ -1568,16 +1568,16 @@
     },
     "participants": [
       {
-        "id": "eckhart",
-        "name": "Meister Eckhart"
-      },
-      {
         "id": "blake",
         "name": "William Blake"
       },
       {
         "id": "bingen",
         "name": "Hildegard von Bingen"
+      },
+      {
+        "id": "eckhart",
+        "name": "Meister Eckhart"
       }
     ],
     "hook": "Have you ever felt something beyond all this?",
@@ -1605,12 +1605,12 @@
         "name": "Friedrich Nietzsche"
       },
       {
-        "id": "angelou",
-        "name": "Maya Angelou"
+        "id": "mozart",
+        "name": "W.A. Mozart"
       },
       {
-        "id": "aurelius",
-        "name": "Marcus Aurelius"
+        "id": "angelou",
+        "name": "Maya Angelou"
       }
     ],
     "hook": "Why do you laugh at the things that terrify you?",
@@ -1634,12 +1634,12 @@
     },
     "participants": [
       {
-        "id": "nietzsche",
-        "name": "Friedrich Nietzsche"
-      },
-      {
         "id": "schopenhauer",
         "name": "Arthur Schopenhauer"
+      },
+      {
+        "id": "nietzsche",
+        "name": "Friedrich Nietzsche"
       },
       {
         "id": "rumi",
@@ -1667,16 +1667,16 @@
     },
     "participants": [
       {
-        "id": "rumi",
-        "name": "Rumi"
+        "id": "shakespeare",
+        "name": "William Shakespeare"
       },
       {
         "id": "dickinson",
         "name": "Emily Dickinson"
       },
       {
-        "id": "angelou",
-        "name": "Maya Angelou"
+        "id": "rumi",
+        "name": "Rumi"
       }
     ],
     "hook": "How do you survive the next hour when they are gone?",
@@ -1700,16 +1700,16 @@
     },
     "participants": [
       {
-        "id": "nietzsche",
-        "name": "Friedrich Nietzsche"
-      },
-      {
-        "id": "aurelius",
-        "name": "Marcus Aurelius"
-      },
-      {
         "id": "bingen",
         "name": "Hildegard von Bingen"
+      },
+      {
+        "id": "goethe",
+        "name": "J.W. von Goethe"
+      },
+      {
+        "id": "zenji",
+        "name": "Dōgen Zenji"
       }
     ],
     "hook": "What do you do when your body stops being yours?",
@@ -1766,16 +1766,16 @@
     },
     "participants": [
       {
-        "id": "aurelius",
-        "name": "Marcus Aurelius"
+        "id": "beauvoir",
+        "name": "Simone de Beauvoir"
       },
       {
-        "id": "eckhart",
-        "name": "Meister Eckhart"
+        "id": "dickinson",
+        "name": "Emily Dickinson"
       },
       {
-        "id": "kahlo",
-        "name": "Frida Kahlo"
+        "id": "bingen",
+        "name": "Hildegard von Bingen"
       }
     ],
     "hook": "How do you become safety for someone who always kept you safe?",
@@ -1803,12 +1803,12 @@
         "name": "Galileo Galilei"
       },
       {
-        "id": "woolf",
-        "name": "Virginia Woolf"
+        "id": "shakespeare",
+        "name": "William Shakespeare"
       },
       {
-        "id": "nietzsche",
-        "name": "Friedrich Nietzsche"
+        "id": "woolf",
+        "name": "Virginia Woolf"
       }
     ],
     "hook": "Who are you after everything you built collapses?",
