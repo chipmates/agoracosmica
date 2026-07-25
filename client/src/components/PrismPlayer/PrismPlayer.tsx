@@ -20,9 +20,10 @@ import prismService, {
 } from '../../services/prism/PrismService';
 import councilPlayerService from '../../services/council/CouncilPlayerService';
 import { loadSeedsDirectly } from '../../services/directSeedLoader';
-import { councilCatalog, getLocalizedTitle, getEchoShortName } from '../../data/councilCatalog';
+import { councilCatalog, getLocalizedTitle, getLocalizedQuestion, getEchoShortName, getShortDisplayName } from '../../data/councilCatalog';
 import { savePrismContent, markPrismCompleted, saveCouncilContent, markCouncilCompleted } from '../../utils/storageKeysV2';
 import { sendConversion, COUNCIL_ENGAGED_THRESHOLD_S } from '../../utils/public/gclidCapture';
+import { sendFunnelBeacon } from '../../utils/funnelBeacon';
 import { useSubtitleSync } from './useSubtitleSync';
 import { useLiquidGlass } from '../../hooks/useLiquidGlass';
 import OptimizedFigureImage from '../OptimizedFigureImage';
@@ -38,6 +39,11 @@ interface PrismPlayerProps {
   councilLevel?: 1 | 2;
   language?: string;
   onClose?: () => void;
+  /** Council end state: open a Free Talk with one of the council's figures,
+      the heard question staged in the composer. */
+  onCouncilHandoff?: (figureId: string, question: string) => Promise<void> | void;
+  /** Council end state: replay the same council at level 2. */
+  onCouncilGoDeeper?: (councilId: string) => void;
 }
 
 const PROGRESS_SAVE_INTERVAL = 5000; // Save every 5s
@@ -49,7 +55,7 @@ interface SavedProgress {
   totalSegments?: number;
 }
 
-export function PrismPlayer({ figure, seed, councilId, councilLevel = 1, language: languageProp, onClose }: PrismPlayerProps) {
+export function PrismPlayer({ figure, seed, councilId, councilLevel = 1, language: languageProp, onClose, onCouncilHandoff, onCouncilGoDeeper }: PrismPlayerProps) {
   const isCouncilMode = !!councilId;
   const { tString } = useTranslation();
   const { glassClasses } = useLiquidGlass('audio');
@@ -67,6 +73,8 @@ export function PrismPlayer({ figure, seed, councilId, councilLevel = 1, languag
   const [resumeTime, setResumeTime] = useState<number | null>(null);
   const [showResumeBanner, setShowResumeBanner] = useState(false);
   const [showPreviewCard, setShowPreviewCard] = useState(!isCouncilMode);
+  // Council end state: the handoff card shown when playback completes.
+  const [showEndCard, setShowEndCard] = useState(false);
 
   // --- Seed data for preview card (title, quote, connections) ---
   const [seedData, setSeedData] = useState<{
@@ -411,6 +419,33 @@ export function PrismPlayer({ figure, seed, councilId, councilLevel = 1, languag
     }
   }, [currentTimeSeconds, subtitleState.currentSegmentIndex, prismData, audioTimelineSegments, isPlaying]);
 
+  // --- Level switch (Tiefer eintauchen): fresh playback state ---
+  useEffect(() => {
+    autoplayAttemptedRef.current = false;
+    completionTriggeredRef.current = false;
+    setShowEndCard(false);
+  }, [councilLevel, councilId]);
+
+  // --- Council autoplay (2026-07 council revision) ---
+  // Catalog tap = play: once the council audio is ready, start playback.
+  // With saved progress, auto-resume from the saved position instead of
+  // showing the banner (the catalog's Weiterhören tap already expressed the
+  // intent). Browsers may reject the play() promise (autoplay policy after
+  // async loads); the play button remains as the fallback, so a rejection
+  // degrades to exactly the old manual behavior.
+  const autoplayAttemptedRef = useRef(false);
+  useEffect(() => {
+    if (!isCouncilMode || autoplayAttemptedRef.current) return;
+    if (!prismData || audioLoading || isPlaying) return;
+    if (resumeTime !== null && durationSeconds <= 0) return; // wait for seekable audio
+    autoplayAttemptedRef.current = true;
+    if (resumeTime !== null && durationSeconds > 0) {
+      seek((resumeTime / durationSeconds) * 100);
+      setShowResumeBanner(false);
+    }
+    togglePlay();
+  }, [isCouncilMode, prismData, audioLoading, isPlaying, resumeTime, durationSeconds, seek, togglePlay]);
+
   // --- Council Engaged conversion ---
   // Fires once the visitor has heard about 60s of a council. Accumulates
   // forward playback only. Skip-forward jumps and seeks are large deltas
@@ -468,6 +503,10 @@ export function PrismPlayer({ figure, seed, councilId, councilLevel = 1, languag
 
       if (isCouncilMode) {
         markCouncilCompleted(councilId!);
+        setShowEndCard(true);
+        // Handoff card appeared at council completion (same pair as the
+        // story handoff, labeled council via mode).
+        sendFunnelBeacon('handoff_shown', { mode: 'council' });
       } else {
         markPrismCompleted(String(figure), seed!);
       }
@@ -632,7 +671,7 @@ export function PrismPlayer({ figure, seed, councilId, councilLevel = 1, languag
         {/* Sentence chunk with the current speaker riding its top edge,
             broadcast-caption style. The name lives where the eyes already
             are, so nothing overlays the portrait. */}
-        {subtitleState.currentChunk && (
+        {subtitleState.currentChunk && !showEndCard && (
           <p className="prism-player__sentence" key={chunkKey}>
             {getEchoShortName(subtitleState.figureId, tString) && (
               <span
@@ -667,8 +706,81 @@ export function PrismPlayer({ figure, seed, councilId, councilLevel = 1, languag
           </div>
         )}
 
+        {/* Council end state: the handoff card. The warmest moment goes into
+            a conversation, not back to the catalog. */}
+        {showEndCard && isCouncilMode && (() => {
+          const councilEntry = councilCatalog.find(c => c.id === councilId);
+          if (!councilEntry) return null;
+          const endQuestion = getLocalizedQuestion(councilEntry, language);
+          return (
+            <div
+              className="prism-player__end-card"
+              role="dialog"
+              aria-label={tString('cosmicCouncil.endCard.kicker', 'The council has ended')}
+            >
+              <span className="prism-player__end-kicker">
+                {tString('cosmicCouncil.endCard.kicker', 'The council has ended')}
+              </span>
+              <p className="prism-player__end-question">{endQuestion}</p>
+              {onCouncilHandoff && (
+                <>
+                  <button
+                    type="button"
+                    className="prism-player__end-talk"
+                    onClick={() => {
+                      sendFunnelBeacon('handoff_taken', { mode: 'council', figureId: councilEntry.moderator.id });
+                      void onCouncilHandoff(councilEntry.moderator.id, endQuestion);
+                    }}
+                  >
+                    {tString('cosmicCouncil.endCard.talkTo', 'Talk to {name} about this')
+                      .replace('{name}', getShortDisplayName(councilEntry.moderator.id))}
+                  </button>
+                  <p className="prism-player__end-others">
+                    {tString('cosmicCouncil.endCard.orWith', 'or with')}{' '}
+                    {councilEntry.participants.map((p, i) => (
+                      <span key={p.id}>
+                        {i > 0 && ' · '}
+                        <button
+                          type="button"
+                          className="prism-player__end-other"
+                          onClick={() => {
+                            sendFunnelBeacon('handoff_taken', { mode: 'council', figureId: p.id });
+                            void onCouncilHandoff(p.id, endQuestion);
+                          }}
+                        >
+                          {getShortDisplayName(p.id)}
+                        </button>
+                      </span>
+                    ))}
+                  </p>
+                </>
+              )}
+              <div className="prism-player__end-secondary">
+                {councilLevel === 1 && onCouncilGoDeeper && (
+                  <button
+                    type="button"
+                    className="prism-player__end-deeper"
+                    onClick={() => onCouncilGoDeeper(councilId!)}
+                  >
+                    {tString('cosmicCouncil.programme.goDeeper', 'Go deeper')} · ~15 min
+                  </button>
+                )}
+                {onClose && (
+                  <button
+                    type="button"
+                    className="prism-player__end-back"
+                    onClick={onClose}
+                  >
+                    {tString('cosmicCouncil.endCard.backToProgramme', 'Back to the programme')}
+                  </button>
+                )}
+              </div>
+            </div>
+          );
+        })()}
+
         {/* Controls overlay - floats over image */}
-        <div className={`prism-player__controls-bar ${glassClasses} ${showControls ? 'prism-player__controls-bar--visible' : ''}`}>
+        <div className={`prism-player__controls-bar ${glassClasses} ${showControls && !showEndCard ? 'prism-player__controls-bar--visible' : ''}`}>
           {/* Progress bar with segment markers */}
           <div className="prism-player__progress-area">
             <span className="prism-player__time">{formatTime(currentTimeSeconds)}</span>
