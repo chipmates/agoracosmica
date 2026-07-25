@@ -45,13 +45,25 @@ export default defineConfig(({ command, mode }) => {
       // In production / is the static marketing homepage and the SPA lives at
       // /app (router basename). The dev server has no marketing build, so /
       // would render the empty shell (blank navy page). Redirect to /app.
+      // Same for the static legal pages the app links to (welcome modal,
+      // settings): they only exist in the marketing build, so in dev send
+      // them to the live site. URL fragments (#jugendschutz) survive the
+      // redirect client-side.
       name: 'dev-root-redirect',
       apply: 'serve',
       configureServer(server) {
+        const legalPaths = ['/terms', '/privacy', '/nutzungsbedingungen', '/datenschutz', '/impressum'];
         server.middlewares.use((req, res, next) => {
           if (req.url === '/' || req.url === '/index.html') {
             res.statusCode = 302;
             res.setHeader('Location', '/app');
+            res.end();
+            return;
+          }
+          const pathname = req.url.split('?')[0];
+          if (legalPaths.includes(pathname)) {
+            res.statusCode = 302;
+            res.setHeader('Location', `https://agoracosmica.org${req.url}`);
             res.end();
             return;
           }
