@@ -300,45 +300,9 @@ const ChatBox: FC<ChatBoxProps> = ({
                   </button>
                 )}
               </div>
-              {message.role === 'user' && (
-                <div className="avatar-container user-avatar">
-                  {userProfile?.avatar?.startsWith('figure:') ? (
-                    // Character avatar (Dante/Beatrice) — render via optimized figure pipeline
-                    <OptimizedImage
-                      name={userProfile.avatar.replace('figure:', '')}
-                      purpose="thumbnail"
-                      alt={userProfile.name || tString('chat.seeker', 'Seeker')}
-                      className="avatar-image"
-                      loading="lazy"
-                    />
-                  ) : userProfile?.avatar ? (
-                    // Custom avatar uploaded by user (data URL from IndexedDB)
-                    <img
-                      src={userProfile.avatar}
-                      alt={userProfile.name || tString('chat.seeker', 'Seeker')}
-                      className="avatar-image"
-                      width={64}
-                      height={64}
-                      loading="lazy"
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover'
-                      }}
-                    />
-                  ) : (
-                    // Default cosmic user avatar
-                    <OptimizedImage
-                      src="user"
-                      type="ui"
-                      purpose="thumbnail"
-                      alt={userProfile?.name || tString('chat.seeker', 'Seeker')}
-                      className="avatar-image"
-                      loading="lazy"
-                    />
-                  )}
-                </div>
-              )}
+              {/* User messages carry no avatar (removed 2026-07-24): the
+                  header names the speaker, and the freed column goes to the
+                  bubble, which matters most on mobile. */}
             </div>
           ))}
       </div>

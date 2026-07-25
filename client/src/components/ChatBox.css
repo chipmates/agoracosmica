@@ -301,13 +301,6 @@
   box-shadow: 0 0 20px color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent);
 }
 
-.user-avatar {
-  margin-left: 4px; /* Ultra-compact for maximum bubble space */
-  border: 3px solid var(--gold-deep); /* Gold border for user avatar */
-  box-shadow: 0 0 20px color-mix(in srgb, var(--gold-deep) var(--a-30), transparent);
-  background-color: var(--bg-primary); /* Deep blue background - matches sidebar/header */
-}
-
 /* Avatar Image */
 .avatar-image {
   width: 100%;
@@ -328,7 +321,7 @@
   padding-right: 0;
   justify-content: flex-end;
   margin-bottom: clamp(12px, 1rem, 20px); /* PHASE 1: Responsive spacing */
-  margin-right: -1rem; /* Ultra-aggressive: move avatar closer to edge for maximum bubble space */
+  /* No trailing avatar anymore: the bubble ends flush at the content edge */
 }
 
 /* PHASE 1: Responsive margin adjustments */
@@ -415,20 +408,8 @@
   transform: translateY(-50%);
 }
 
-.user-avatar::before {
-  content: '';
-  position: absolute;
-  width: 10px;
-  height: 3px;
-  background: linear-gradient(to left, var(--gold-deep), transparent); /* Gold connecting line */
-  top: 50%;
-  left: -10px;
-  transform: translateY(-50%);
-}
-
 /* Connection Animation on Hover */
-.message-wrapper:hover .figure-avatar::after,
-.message-wrapper:hover .user-avatar::before {
+.message-wrapper:hover .figure-avatar::after {
   width: 14px;
   opacity: 0.8;
   transition: all 0.3s var(--transition-bezier);
@@ -459,10 +440,6 @@
 
 .message-wrapper.assistant:hover .avatar-container {
   box-shadow: 0 0 20px color-mix(in srgb, var(--gold-subtle) var(--a-60), transparent);
-}
-
-.message-wrapper.user:hover .avatar-container {
-  box-shadow: 0 0 20px color-mix(in srgb, var(--gold-deep) var(--a-60), transparent); /* Gold glow on hover */
 }
 
 /* Spinner Container */
@@ -553,10 +530,6 @@
     margin-right: 2px; /* Ultra-compact on mobile for maximum bubble space */
   }
 
-  .user-avatar {
-    margin-left: 2px; /* Ultra-compact on mobile for maximum bubble space */
-  }
-
   .message-wrapper.assistant {
     padding: 0; /* No padding - edge-to-edge gray */
     margin-left: 0;
@@ -624,10 +597,6 @@
     margin-right: 2px; /* Ultra-compact on small screens for maximum bubble space */
   }
 
-  .user-avatar {
-    margin-left: 2px; /* Ultra-compact on small screens for maximum bubble space */
-  }
-
   /* PHASE 1: Improve contrast and performance on small screens */
   .message.assistant {
     background: var(--bg-primary); /* Solid deep blue - matches sidebar/header */
@@ -682,9 +651,7 @@
   .message:hover,
   .message-wrapper:hover .avatar-container,
   .message-wrapper.assistant:hover .avatar-container,
-  .message-wrapper.user:hover .avatar-container,
-  .message-wrapper:hover .figure-avatar::after,
-  .message-wrapper:hover .user-avatar::before {
+  .message-wrapper:hover .figure-avatar::after {
     animation: none;
     transition: none;
     transform: none;
@@ -702,8 +669,7 @@
     border: 2px solid CanvasText;
   }
   
-  .figure-avatar::after,
-  .user-avatar::before {
+  .figure-avatar::after {
     background: CanvasText;
   }
 }
@@ -819,10 +785,10 @@
   gap: 8px;
   min-height: 44px;
   padding: 10px 18px;
-  border-radius: 22px;
-  border: 1px solid color-mix(in srgb, var(--gold-subtle) 40%, transparent);
+  border-radius: 4px; /* plate doctrine: action on content = squared mark */
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 42%, transparent);
   background: color-mix(in srgb, var(--bg-primary) 92%, var(--gold-subtle));
-  color: var(--gold-subtle);
+  color: var(--gold-primary);
   font-size: 0.9rem;
   font-family: inherit;
   cursor: pointer;
