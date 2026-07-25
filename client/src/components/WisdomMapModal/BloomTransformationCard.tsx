@@ -24,6 +24,10 @@ interface BloomTransformationCardProps {
    *  block: "+1 voting power · You're now a Voice". Set by WisdomMapModal
    *  via hasAnyWitnessedMastery() when the user reaches their very first L4. */
   isFirstMastery?: boolean;
+  /** Celestial Atlas mode: the plate itself performs the gilding choreography
+   *  (flourish, rays, gathered gold dust), so this card slims to its
+   *  informational core — a calm annotation, no duplicate star morph. */
+  atlas?: boolean;
 }
 
 // First-mastery reward copy. Hardcoded EN/DE matches the existing pattern
@@ -81,6 +85,7 @@ const BloomTransformationCard: FC<BloomTransformationCardProps> = ({
   speedMultiplier = 1,
   masteryVariant = 'light-burst',
   isFirstMastery = false,
+  atlas = false,
 }) => {
   const lang = (
     (typeof window !== 'undefined' && window.localStorage?.getItem('selectedLanguage')) || 'en'
@@ -120,6 +125,20 @@ const BloomTransformationCard: FC<BloomTransformationCardProps> = ({
 
   useEffect(() => {
     setPhase('entering');
+
+    // Atlas mode: no star morph on the card — the plate gilds the real star
+    // when the note is dismissed. The note settles straight into its text.
+    if (atlas) {
+      addTimer(() => {
+        setStarLevel(toLevel);
+        setPhase('reflecting');
+        playSound();
+      }, 350);
+      return () => {
+        timersRef.current.forEach(id => clearTimeout(id));
+        timersRef.current = [];
+      };
+    }
 
     // Show the "before" state (egg stays visible longer)
     addTimer(() => {
@@ -190,7 +209,7 @@ const BloomTransformationCard: FC<BloomTransformationCardProps> = ({
 
   return (
     <div
-      className={`bloom-card-overlay ${isVisible ? 'visible' : ''} ${reducedMotion ? 'reduced-motion' : ''} ${isMastery ? 'mastery' : ''}`}
+      className={`bloom-card-overlay ${isVisible ? 'visible' : ''} ${reducedMotion ? 'reduced-motion' : ''} ${isMastery ? 'mastery' : ''} ${atlas ? 'atlas-note' : ''}`}
       onClick={handleDismiss}
       role="dialog"
       aria-modal="true"
@@ -204,7 +223,8 @@ const BloomTransformationCard: FC<BloomTransformationCardProps> = ({
         {/* Decorative accent line */}
         <div className="bloom-card-accent" />
 
-        {/* Star stage */}
+        {/* Star stage — atlas mode leaves the transformation to the plate */}
+        {!atlas && (
         <div className={`bloom-card-stage ${isMastery && (pulseActive || lightBurstActive) ? 'mastery-dimmed' : ''} ${lightBurstActive ? 'light-burst-active' : ''}`}>
           <div
             className={getStarClasses()}
@@ -236,11 +256,12 @@ const BloomTransformationCard: FC<BloomTransformationCardProps> = ({
 
           {/* Variant 3: Light burst (no ring, handled via CSS on .light-burst-active) */}
         </div>
+        )}
 
         {/* Header */}
         {header && (
           <div className={`bloom-card-header ${showText ? 'visible' : ''}`}>
-            {header.en}
+            {header[lang] ?? header.en}
           </div>
         )}
 
@@ -260,7 +281,7 @@ const BloomTransformationCard: FC<BloomTransformationCardProps> = ({
         {/* Reflection line */}
         {reflection && (
           <p className={`bloom-card-reflection ${showText ? 'visible' : ''}`}>
-            {reflection.en}
+            {reflection[lang] ?? reflection.en}
           </p>
         )}
 
@@ -302,6 +323,13 @@ const BloomTransformationCard: FC<BloomTransformationCardProps> = ({
               </div>
             </div>
           </div>
+        )}
+
+        {/* Atlas note: quiet continue hint, the tap gilds the star on the plate */}
+        {atlas && (
+          <p className={`bloom-card-continue ${showText ? 'visible' : ''}`}>
+            {lang === 'de' ? 'Tippe, um fortzufahren' : 'Tap to continue'}
+          </p>
         )}
       </div>
     </div>

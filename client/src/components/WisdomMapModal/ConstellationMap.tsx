@@ -45,6 +45,10 @@ interface ConstellationMapProps {
   seedPositions?: SeedPosition[];
   seedLevels?: Record<string, number>;
   selectedSeedId?: string | number | null;
+  /** Celestial Atlas mode: engraved stars, no legacy SVG lines (AtlasPlate draws the ink). */
+  atlas?: boolean;
+  /** Seed currently receiving its gilding moment (bloom just witnessed). */
+  novaSeedId?: string | null;
   onSeedClick: (seed: Seed) => void;
 }
 
@@ -56,6 +60,8 @@ const ConstellationMap: FC<ConstellationMapProps> = ({
   seedPositions,
   seedLevels,
   selectedSeedId,
+  atlas = false,
+  novaSeedId = null,
   onSeedClick
 }) => {
   // Add state to track mobile status for responsive adjustments
@@ -118,8 +124,9 @@ const ConstellationMap: FC<ConstellationMapProps> = ({
 
   return (
     <>
-      {/* Progressive Constellation Revelation - Milestone-based Network */}
-      {lineSegments && lineSegments.length > 0 && (
+      {/* Progressive Constellation Revelation - Milestone-based Network.
+          In atlas mode the AtlasPlate engraves all linework itself. */}
+      {!atlas && lineSegments && lineSegments.length > 0 && (
         <svg className={`constellation-container revelation-${revelationStage}`}>
           {/* Show lines based on revelation stage */}
           {revelationStage === 'awakening' && (
@@ -251,6 +258,8 @@ const ConstellationMap: FC<ConstellationMapProps> = ({
             isNextSeed={(nextSeed && seed.id === nextSeed.id) ?? undefined}
             isSelected={selectedSeedId != null && String(seed.id) === String(selectedSeedId)}
             level={seedLevels?.[String(seed.id)] ?? 0}
+            atlas={atlas}
+            isNova={novaSeedId != null && String(seed.id) === String(novaSeedId)}
             onClick={onSeedClick as any}
           />
         );

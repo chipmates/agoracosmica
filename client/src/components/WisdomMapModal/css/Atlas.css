@@ -1,0 +1,1020 @@
+/* Atlas.css — the Celestial Atlas presentation of the Wisdom Map.
+   "B's ink on A's sky": proto B's engraved-plate language (hairlines,
+   cartouche, gilding ladder, margin-docked notes) rendered inside proto A's
+   living parallax night. Measured values ported from the prototypes:
+   hairlines 0.75 to 1.45px, ease-out-expo cubic-bezier(0.16, 1, 0.3, 1),
+   cartouche tilt -2.5deg, Caslon marginalia 15.5px.
+
+   Everything here is scoped to .atlas-mode (the modal content) or
+   body.wisdom-atlas-open (portal surfaces). Flat tiers ('still',
+   'mobile-low', engine failure) never receive these classes and keep
+   today's flat map untouched. */
+
+.atlas-mode {
+  --as-ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --as-ease-soft: cubic-bezier(0.65, 0, 0.35, 1);
+  --as-ink: color-mix(in srgb, var(--star-blue-light) 60%, transparent);
+  --as-ink-faint: color-mix(in srgb, var(--star-blue-light) 24%, transparent);
+  --as-ink-ghost: color-mix(in srgb, var(--star-blue-light) 12%, transparent);
+  background: var(--bg-deep-space-darker);
+  /* Anchor the inheritance chain: the plate is excluded from the app-wide
+     justify rule (index.css), so annotations read left unless centered. */
+  text-align: left;
+}
+
+/* ------------------------------------------------------------------
+   Sky layers inside the map container
+   ------------------------------------------------------------------ */
+
+.atlas-mode .atlas-field,
+.atlas-mode .atlas-fx,
+.atlas-mode .atlas-hush {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.atlas-mode .atlas-field {
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 700ms ease;
+}
+.atlas-mode .atlas-field.ready {
+  opacity: 1;
+}
+
+.atlas-mode .atlas-world {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  will-change: transform, opacity;
+  transform-origin: 50% 50%;
+}
+
+.atlas-mode .atlas-fx {
+  z-index: 3;
+}
+
+/* A's celebration hush: the sky dims from the edges in, never the center. */
+.atlas-mode .atlas-hush {
+  z-index: 4;
+  opacity: 0;
+  background: radial-gradient(
+    ellipse 120% 95% at 50% 46%,
+    transparent 38%,
+    color-mix(in srgb, var(--bg-deep-space-darker) 82%, transparent) 100%
+  );
+}
+
+/* Quiet vignette, always present: the page is lit from its middle. */
+.atlas-mode .map-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 120% 90% at 50% 42%,
+    transparent 48%,
+    color-mix(in srgb, var(--bg-deep-space-darker) 55%, transparent) 100%
+  );
+}
+
+/* Crossfade partner: the photo fades out under the fading-in sky. */
+.map-container.sky-atlas .responsive-background {
+  opacity: 0;
+  transition: opacity 700ms ease;
+}
+
+/* The map container stays mounted through figure switches, so the loading
+   text becomes a centered annotation on the living sky. */
+.atlas-mode .map-container .loading-state {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 6;
+  font-family: var(--font-content);
+  font-style: italic;
+  color: var(--text-tertiary);
+}
+
+/* A whisper of the plate frame on large pages only (verdict: no literal
+   border on mobile). */
+@media (min-width: 1024px) {
+  .atlas-mode .map-container::after {
+    content: '';
+    position: absolute;
+    inset: 14px;
+    z-index: 2;
+    pointer-events: none;
+    border: 1px solid color-mix(in srgb, var(--gold-deep) 22%, transparent);
+  }
+}
+
+/* ------------------------------------------------------------------
+   The engraved plate (SVG linework)
+   ------------------------------------------------------------------ */
+
+.atlas-plate {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.atlas-graticule {
+  fill: none;
+  stroke: var(--as-ink-ghost);
+  stroke-width: 0.75;
+  vector-effect: non-scaling-stroke;
+}
+
+.atlas-via {
+  fill: none;
+  stroke: color-mix(in srgb, var(--gold-deep) 40%, transparent);
+  stroke-width: 1.1;
+  stroke-dasharray: 1 9;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.atlas-via-label {
+  font-family: var(--font-content);
+  font-style: italic;
+  font-size: 14px;
+  fill: color-mix(in srgb, var(--gold-deep) 66%, transparent);
+  letter-spacing: 0.06em;
+}
+
+/* Construction lines: the figure the engraver has not finished yet. */
+.atlas-construction {
+  fill: none;
+  stroke: color-mix(in srgb, var(--star-blue-light) 26%, transparent);
+  stroke-width: 1;
+  stroke-dasharray: 2 7;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+  transition: stroke 2s var(--as-ease-soft);
+}
+
+/* Lit links between gathered stars: hairline gold ink. */
+.atlas-link-lit {
+  fill: none;
+  stroke: color-mix(in srgb, var(--gold-subtle) 46%, transparent);
+  stroke-width: 1.05;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+  transition: stroke 1.2s var(--as-ease-soft);
+}
+
+.atlas-plate.is-complete .atlas-link-lit {
+  stroke: color-mix(in srgb, var(--gold-primary) 78%, transparent);
+  stroke-width: 1.25;
+  filter: drop-shadow(0 0 3px color-mix(in srgb, var(--gold-primary) 50%, transparent));
+}
+
+.atlas-plate.is-complete .atlas-construction {
+  stroke: color-mix(in srgb, var(--gold-primary) 30%, transparent);
+}
+
+/* ------------------------------------------------------------------
+   Cartouche: the plate reads its own progress
+   ------------------------------------------------------------------ */
+
+.atlas-cartouche {
+  position: absolute;
+  right: 2.5%;
+  bottom: 7%;
+  z-index: 2;
+  width: min(272px, 34vw);
+  padding: 16px 20px 13px;
+  background: color-mix(in srgb, var(--bg-deep-space) 86%, transparent);
+  border: 1px solid var(--as-ink-faint);
+  text-align: center;
+  transform: rotate(-2.5deg);
+  pointer-events: none;
+}
+
+.atlas-cartouche::before {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  border: 1px solid var(--as-ink-ghost);
+  pointer-events: none;
+}
+
+.atlas-cartouche-star {
+  display: block;
+  font-size: 11px;
+  line-height: 1;
+  color: color-mix(in srgb, var(--gold-deep) 85%, transparent);
+  margin-bottom: 7px;
+}
+
+.atlas-cartouche-name {
+  font-family: var(--font-content);
+  font-weight: 400;
+  font-size: clamp(0.95rem, 1.5vw, 1.3rem);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  margin: 0 0 5px;
+  line-height: 1.25;
+  transition: color 1.4s var(--as-ease-soft);
+}
+
+.atlas-cartouche-epithet {
+  font-family: var(--font-content);
+  font-style: italic;
+  font-size: 0.85rem;
+  color: var(--text-tertiary);
+  margin: 0 0 9px;
+}
+
+.atlas-cartouche-flourish {
+  display: block;
+  width: 72%;
+  height: 12px;
+  margin: 0 auto 8px;
+  opacity: 0;
+}
+.atlas-cartouche-flourish path {
+  fill: none;
+  stroke: color-mix(in srgb, var(--gold-primary) 70%, transparent);
+  stroke-width: 1.1;
+  stroke-linecap: round;
+}
+
+.atlas-cartouche-progress {
+  font-family: var(--font-ui);
+  font-size: 0.64rem;
+  font-weight: 500;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin: 0;
+  white-space: nowrap;
+}
+
+.atlas-cartouche-complete {
+  font-family: var(--font-content);
+  font-style: italic;
+  font-size: 0.85rem;
+  color: var(--gold-primary);
+  margin: 8px 0 0;
+  animation: atlasFadeIn 1.2s var(--as-ease-soft) both;
+}
+
+.atlas-cartouche.is-complete {
+  border-color: color-mix(in srgb, var(--gold-deep) 60%, transparent);
+}
+.atlas-cartouche.is-complete .atlas-cartouche-name {
+  color: var(--gold-primary);
+}
+.atlas-cartouche.is-complete .atlas-cartouche-progress {
+  color: color-mix(in srgb, var(--gold-subtle) 80%, var(--text-tertiary));
+}
+.atlas-cartouche.is-complete .atlas-cartouche-flourish {
+  opacity: 1;
+}
+.atlas-cartouche.is-complete .atlas-cartouche-flourish path {
+  stroke-dasharray: 230;
+  stroke-dashoffset: 230;
+  animation: atlasDrawFlourish 1.1s var(--as-ease-out-expo) 0.2s forwards;
+}
+
+@keyframes atlasDrawFlourish {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes atlasFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ------------------------------------------------------------------
+   Marginalia: italic annotation in the plate margin
+   ------------------------------------------------------------------ */
+
+.atlas-marginalia {
+  position: absolute;
+  left: 2.5%;
+  bottom: 7%;
+  z-index: 2;
+  max-width: min(250px, 26vw);
+  font-family: var(--font-content);
+  font-style: italic;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: color-mix(in srgb, var(--star-blue-light) 42%, transparent);
+  margin: 0;
+  pointer-events: none;
+}
+
+@media (max-width: 900px) {
+  .atlas-marginalia {
+    display: none;
+  }
+  .atlas-cartouche {
+    right: 50%;
+    transform: translateX(50%) rotate(-2deg);
+    bottom: 6%;
+    width: min(272px, 74vw);
+    padding: 10px 16px 9px;
+  }
+  .atlas-cartouche-star { display: none; }
+  .atlas-cartouche-epithet { margin-bottom: 5px; }
+}
+
+/* ------------------------------------------------------------------
+   Engraved stars (DOM layer, interactive)
+   ------------------------------------------------------------------ */
+
+.map-container .star.atlas-star {
+  width: 12px !important;
+  height: 12px !important;
+  margin-left: -6px !important;
+  margin-top: -6px !important;
+  background: none !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  filter: none !important;
+  animation: none !important;
+  opacity: 1 !important;
+}
+
+.map-container .star.atlas-star::before {
+  display: none !important;
+}
+
+/* interaction feedback: the ink brightens, the page does not jump */
+.map-container .star.atlas-star:hover {
+  transform: none;
+}
+.map-container .star.atlas-star:hover .atlas-star-svg,
+.map-container .star.atlas-star:focus-visible .atlas-star-svg {
+  filter: brightness(1.25);
+}
+.map-container .star.atlas-star:focus-visible {
+  outline: 1px solid var(--gold-subtle);
+  outline-offset: 12px;
+  border-radius: 50%;
+}
+.map-container .star.atlas-star.star-selected {
+  outline: none;
+  animation: none !important;
+}
+
+.atlas-star-svg {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  overflow: visible;
+  pointer-events: none;
+  transition: filter 0.3s ease;
+}
+
+.atlas-star-svg .as-dotted {
+  fill: none;
+  stroke: color-mix(in srgb, var(--star-blue-light) 50%, transparent);
+  stroke-width: 1;
+  stroke-dasharray: 2.2 4.4;
+}
+.atlas-star-svg .as-tick {
+  stroke: color-mix(in srgb, var(--star-blue-light) 36%, transparent);
+  stroke-width: 1;
+}
+.atlas-star-svg .as-ink-core {
+  fill: color-mix(in srgb, var(--star-blue-light) 75%, transparent);
+}
+.atlas-star-svg .as-ring,
+.atlas-star-svg .as-halo {
+  fill: none;
+  stroke-width: 1;
+}
+.atlas-star-svg .as-ray {
+  stroke-linecap: round;
+}
+.atlas-star-svg .as-core {
+  transition: r 0.4s var(--as-ease-out-expo, ease);
+}
+
+/* level 4 breathes, the only idle star animation (7s, proto B) */
+.atlas-star-svg .as-breathe {
+  animation: atlasBreathe 7s var(--as-ease-soft, ease-in-out) infinite;
+}
+@keyframes atlasBreathe {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.8; }
+}
+
+/* the "next" marker: a slowly rotating dashed gold circle (26s, proto B) */
+.atlas-star-svg .as-next-ring {
+  fill: none;
+  stroke: color-mix(in srgb, var(--gold-primary) 75%, transparent);
+  stroke-width: 1;
+  stroke-dasharray: 4 7;
+  animation: atlasNextSpin 26s linear infinite;
+  transform-origin: center;
+  transform-box: fill-box;
+}
+@keyframes atlasNextSpin {
+  to { transform: rotate(360deg); }
+}
+.atlas-star-svg .as-next-leader {
+  stroke: color-mix(in srgb, var(--gold-primary) 50%, transparent);
+  stroke-width: 1;
+}
+.atlas-star-svg .as-next-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  fill: var(--gold-primary);
+}
+
+/* selection: engraved dashed ring, quiet pulse */
+.atlas-star-svg .as-selected-ring {
+  fill: none;
+  stroke: var(--gold-hover);
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+  animation: atlasSelectedPulse 3s var(--as-ease-soft, ease-in-out) infinite;
+}
+@keyframes atlasSelectedPulse {
+  0%, 100% { opacity: 0.9; }
+  50% { opacity: 0.45; }
+}
+
+/* gilding moment: rays draw themselves stroke by stroke, the core swells */
+.atlas-star-svg .as-ray-nova {
+  stroke-dasharray: var(--ray-len);
+  stroke-dashoffset: var(--ray-len);
+  animation: atlasRayDraw 520ms var(--as-ease-out-expo, ease-out) forwards;
+}
+@keyframes atlasRayDraw {
+  to { stroke-dashoffset: 0; }
+}
+.atlas-star-svg .as-core-nova {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: atlasCorePop 700ms var(--as-ease-out-expo, ease-out);
+}
+@keyframes atlasCorePop {
+  0% { transform: scale(0.35); opacity: 0.4; }
+  62% { transform: scale(1.22); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* ------------------------------------------------------------------
+   Chrome: the modal furniture speaks print and gold
+   ------------------------------------------------------------------ */
+
+/* header: the night ladder (never pure black) with one gold hairline rule.
+   Binding notes 2026-07-23/24: no degree ticks ("cm lines"), the graticule
+   field lines alone carry the cartographic feel. */
+.atlas-mode > [role='group'] {
+  position: relative;
+  background: var(--bg-primary);
+  border-bottom: 1px solid color-mix(in srgb, var(--gold-deep) 38%, transparent);
+  box-shadow: none;
+}
+
+.atlas-mode > [role='group'] h1,
+.atlas-mode > [role='group'] h2,
+.atlas-mode > [role='group'] h3 {
+  font-family: var(--font-content);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: var(--gold-primary);
+  text-shadow: none;
+}
+
+/* action buttons: hairline pills, tracked small caps */
+.atlas-mode .header-action-btn,
+.atlas-mode .header-button-group .list-view-button {
+  background: none;
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 34%, transparent);
+  border-radius: 999px;
+  color: var(--text-secondary);
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+.atlas-mode .header-action-btn:hover,
+.atlas-mode .header-button-group .list-view-button:hover {
+  background: color-mix(in srgb, var(--bg-highlight) 35%, transparent);
+  border-color: var(--gold-subtle);
+  color: var(--gold-primary);
+}
+.atlas-mode .header-action-btn.active,
+.atlas-mode .header-button-group .list-view-button.active {
+  border-color: var(--gold-subtle);
+  color: var(--gold-primary);
+  background: color-mix(in srgb, var(--bg-highlight) 45%, transparent);
+}
+
+/* the neutral info toggle stays silver ink */
+.atlas-mode .header-action-btn.info-btn {
+  border-color: var(--as-ink-faint);
+  background: none;
+  color: var(--text-tertiary);
+  border-radius: 999px;
+}
+.atlas-mode .header-action-btn.info-btn:hover {
+  border-color: color-mix(in srgb, var(--star-blue-light) 45%, transparent);
+  color: var(--text-secondary);
+  background: color-mix(in srgb, var(--bg-highlight) 35%, transparent);
+}
+.atlas-mode .header-action-btn.info-btn.active {
+  border-color: color-mix(in srgb, var(--star-blue-light) 60%, transparent);
+  color: var(--text-primary);
+}
+
+/* mobile toolbar: hairline rule, same ink */
+.atlas-mode .mobile-bottom-toolbar {
+  background: color-mix(in srgb, var(--bg-deep-space-darker) 88%, transparent);
+  border-top: 1px solid color-mix(in srgb, var(--gold-deep) 30%, transparent);
+}
+
+/* ------------------------------------------------------------------
+   The seed note, docked in the plate margin (proto B's annotation)
+   ------------------------------------------------------------------ */
+
+.atlas-mode .seed-details-panel.atlas-seed-dock {
+  left: auto;
+  right: auto;
+  bottom: auto;
+  top: var(--dock-top, 50%);
+  transform: translateY(-40%);
+  width: min(330px, calc(100vw - 56px));
+  max-width: none;
+  padding: 20px 24px 18px;
+  border-radius: 3px;
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--bg-card) 94%, var(--gold-deep)) 0%,
+    var(--bg-deep-space) 90%
+  );
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 42%, transparent);
+  box-shadow:
+    0 24px 60px color-mix(in srgb, var(--bg-deep-space-darker) 80%, transparent);
+  animation: atlasNoteIn 0.45s var(--as-ease-out-expo) both;
+}
+.atlas-mode .seed-details-panel.atlas-seed-dock.dock-left {
+  left: 24px;
+}
+.atlas-mode .seed-details-panel.atlas-seed-dock.dock-right {
+  right: 24px;
+}
+
+@keyframes atlasNoteIn {
+  from { opacity: 0; transform: translateY(calc(-40% + 10px)); }
+  to { opacity: 1; transform: translateY(-40%); }
+}
+
+/* corner tick ornament instead of the glowing accent line */
+.atlas-mode .seed-details-panel.atlas-seed-dock::after {
+  display: none;
+}
+.atlas-mode .seed-details-panel.atlas-seed-dock::before {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  pointer-events: none;
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 18%, transparent);
+}
+
+.atlas-seed-kicker {
+  font-family: var(--font-ui);
+  font-size: 0.66rem;
+  font-weight: 500;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--gold-deep) 85%, var(--text-tertiary));
+  margin: 0 0 8px;
+}
+
+.atlas-mode .atlas-seed-dock .seed-details-header {
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: 8px;
+}
+
+.atlas-mode .atlas-seed-dock h3 {
+  font-family: var(--font-content);
+  font-weight: 400;
+  font-size: 1.25rem;
+  line-height: 1.25;
+  color: var(--text-primary);
+  text-shadow: none;
+  letter-spacing: 0;
+  margin: 0;
+}
+
+.atlas-mode .atlas-seed-dock .seed-preview-summary {
+  font-family: var(--font-content);
+  font-style: italic;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+  text-shadow: none;
+}
+
+.atlas-mode .atlas-seed-dock .seed-details-content {
+  margin-bottom: 12px;
+}
+
+/* mastery pips: four diamonds, one per completed mode */
+.atlas-seed-pips {
+  display: flex;
+  gap: 7px;
+  margin: 0 0 14px;
+}
+.atlas-pip {
+  width: 9px;
+  height: 9px;
+  transform: rotate(45deg);
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 55%, transparent);
+  transition: background 0.5s, border-color 0.5s, box-shadow 0.5s;
+}
+.atlas-pip.on {
+  background: var(--gold-primary);
+  border-color: var(--gold-primary);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--gold-primary) 50%, transparent);
+}
+
+/* Chapter-coloured pips (2026-07-24): story gold, wisdom purple,
+   prism sapphire, quest ember — the border carries the chapter tint
+   even while the diamond still waits. */
+.atlas-pip.pip-story { border-color: color-mix(in srgb, var(--mode-story) 55%, transparent); }
+.atlas-pip.pip-wisdom { border-color: color-mix(in srgb, var(--mode-wisdom) 60%, transparent); }
+.atlas-pip.pip-prism { border-color: color-mix(in srgb, var(--mode-prism) 60%, transparent); }
+.atlas-pip.pip-quest { border-color: color-mix(in srgb, var(--mode-quest) 60%, transparent); }
+.atlas-pip.pip-story.on {
+  background: var(--mode-story);
+  border-color: var(--mode-story);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--mode-story) 50%, transparent);
+}
+.atlas-pip.pip-wisdom.on {
+  background: var(--mode-wisdom);
+  border-color: var(--mode-wisdom);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--mode-wisdom) 55%, transparent);
+}
+.atlas-pip.pip-prism.on {
+  background: var(--mode-prism);
+  border-color: var(--mode-prism);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--mode-prism) 55%, transparent);
+}
+.atlas-pip.pip-quest.on {
+  background: var(--mode-quest);
+  border-color: var(--mode-quest);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--mode-quest) 55%, transparent);
+}
+
+/* the note's actions: engraved buttons, tracked small caps */
+.atlas-mode .atlas-seed-dock .seed-details-footer {
+  justify-content: flex-start;
+  gap: 8px;
+}
+.atlas-mode .atlas-seed-dock .seed-details-footer button {
+  background: color-mix(in srgb, var(--gold-subtle) 14%, transparent) !important;
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 55%, transparent) !important;
+  border-radius: 2px !important;
+  color: var(--gold-primary) !important;
+  font-family: var(--font-ui) !important;
+  font-size: 0.72rem !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  box-shadow: none !important;
+}
+.atlas-mode .atlas-seed-dock .seed-details-footer button:hover {
+  background: color-mix(in srgb, var(--gold-subtle) 24%, transparent) !important;
+  border-color: var(--gold-primary) !important;
+  color: var(--gold-hover) !important;
+}
+/* Chapter-coloured smart action (2026-07-24): the next step wears its
+   chapter's colour — wisdom purple, prism sapphire, quest ember, story gold. */
+.atlas-mode .atlas-seed-dock .seed-details-footer button:first-child {
+  background: color-mix(in srgb, var(--note-mode, var(--gold-subtle)) 14%, transparent) !important;
+  border-color: color-mix(in srgb, var(--note-mode, var(--gold-subtle)) 55%, transparent) !important;
+  color: color-mix(in srgb, var(--note-mode, var(--gold-primary)) 55%, var(--text-primary)) !important;
+}
+.atlas-mode .atlas-seed-dock .seed-details-footer button:first-child:hover {
+  background: color-mix(in srgb, var(--note-mode, var(--gold-subtle)) 24%, transparent) !important;
+  border-color: color-mix(in srgb, var(--note-mode, var(--gold-primary)) 80%, transparent) !important;
+  color: color-mix(in srgb, var(--note-mode, var(--gold-primary)) 40%, white) !important;
+}
+
+.atlas-mode .atlas-seed-dock .seed-details-footer button:last-child {
+  background: none !important;
+  border-color: color-mix(in srgb, var(--gold-deep) 30%, transparent) !important;
+  color: var(--text-tertiary) !important;
+}
+.atlas-mode .atlas-seed-dock .seed-details-footer button:last-child:hover {
+  color: var(--text-secondary) !important;
+  border-color: color-mix(in srgb, var(--gold-deep) 55%, transparent) !important;
+}
+
+.atlas-mode .atlas-seed-dock .more-paths-link-container {
+  border-top: 1px solid color-mix(in srgb, var(--gold-deep) 18%, transparent);
+}
+.atlas-mode .atlas-seed-dock .more-paths-link {
+  font-family: var(--font-content);
+  font-style: italic;
+  font-size: 0.85rem;
+}
+
+/* mobile: the note becomes a bottom sheet above the toolbar (proto B) */
+@media (max-width: 640px) {
+  .atlas-mode .seed-details-panel.atlas-seed-dock,
+  .atlas-mode .seed-details-panel.atlas-seed-dock.dock-left,
+  .atlas-mode .seed-details-panel.atlas-seed-dock.dock-right {
+    left: 50%;
+    right: auto;
+    top: auto;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    transform: translateX(-50%);
+    width: min(380px, calc(100vw - 24px));
+    animation: atlasSheetIn 0.45s var(--as-ease-out-expo) both;
+  }
+  @keyframes atlasSheetIn {
+    from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+  }
+}
+
+/* ------------------------------------------------------------------
+   Constellation info (the "i" toggle): a margin annotation panel
+   ------------------------------------------------------------------ */
+
+.atlas-mode .constellation-info {
+  background: color-mix(in srgb, var(--bg-deep-space) 92%, transparent);
+  border: 1px solid var(--as-ink-faint);
+  border-radius: 3px;
+  box-shadow: none;
+}
+.atlas-mode .constellation-info h3 {
+  font-family: var(--font-content);
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gold-primary);
+  text-shadow: none;
+}
+.atlas-mode .constellation-info p {
+  font-family: var(--font-content);
+  font-style: italic;
+  color: var(--text-secondary);
+}
+
+/* ------------------------------------------------------------------
+   Bloom note: the celebration card slimmed to its informational core
+   ------------------------------------------------------------------ */
+
+.bloom-card-overlay.atlas-note {
+  background: color-mix(in srgb, var(--bg-deep-space-darker) 25%, transparent);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  align-items: flex-end;
+  padding-bottom: max(9vh, 64px);
+}
+
+.bloom-card-overlay.atlas-note .bloom-card {
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--bg-card) 94%, var(--gold-deep)) 0%,
+    var(--bg-deep-space) 90%
+  );
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 42%, transparent);
+  border-radius: 3px;
+  box-shadow: 0 24px 60px color-mix(in srgb, var(--bg-deep-space-darker) 80%, transparent);
+  width: min(420px, calc(100vw - 40px));
+  padding: 26px 30px 20px;
+}
+
+.bloom-card-overlay.atlas-note .bloom-card::before {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  pointer-events: none;
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 18%, transparent);
+}
+
+.bloom-card-overlay.atlas-note .bloom-card-accent {
+  display: none;
+}
+
+.bloom-card-overlay.atlas-note .bloom-card-header {
+  font-family: var(--font-ui);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--gold-deep) 85%, var(--text-tertiary));
+  background: none;
+  -webkit-text-fill-color: currentColor;
+  text-shadow: none;
+  margin-bottom: 8px;
+}
+
+.bloom-card-overlay.atlas-note .bloom-card-seed-title {
+  font-family: var(--font-content);
+  font-weight: 400;
+  font-size: 1.35rem;
+  color: var(--text-primary);
+  text-shadow: none;
+}
+
+.bloom-card-overlay.atlas-note .bloom-card-figure {
+  font-family: var(--font-content);
+  font-style: italic;
+  color: var(--text-tertiary);
+}
+
+.bloom-card-overlay.atlas-note .bloom-card-reflection {
+  font-family: var(--font-content);
+  font-style: italic;
+  font-size: 0.98rem;
+  color: var(--text-secondary);
+}
+
+.bloom-card-continue {
+  font-family: var(--font-ui);
+  font-size: 0.66rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin: 16px 0 0;
+  opacity: 0;
+  transition: opacity 0.6s ease 0.4s;
+}
+.bloom-card-continue.visible {
+  opacity: 0.8;
+}
+
+/* ------------------------------------------------------------------
+   Completion card (informational core over the finished plate)
+   ------------------------------------------------------------------ */
+
+.atlas-mode .celebration-card {
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--bg-card) 94%, var(--gold-deep)) 0%,
+    var(--bg-deep-space) 90%
+  );
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 42%, transparent);
+  border-radius: 3px;
+  box-shadow: 0 24px 60px color-mix(in srgb, var(--bg-deep-space-darker) 80%, transparent);
+}
+.atlas-mode .celebration-card::after {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  pointer-events: none;
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 18%, transparent);
+}
+.atlas-mode .celebration-accent {
+  display: none;
+}
+.atlas-mode .celebration-card h2 {
+  font-family: var(--font-content);
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold-primary);
+  text-shadow: none;
+  background: none;
+  -webkit-text-fill-color: currentColor;
+}
+.atlas-mode .celebration-constellation-name {
+  font-family: var(--font-content);
+  font-style: italic;
+  color: var(--text-primary);
+}
+.atlas-mode .celebration-description {
+  font-family: var(--font-content);
+  font-style: italic;
+  color: var(--text-secondary);
+}
+.atlas-mode .celebration-button {
+  background: color-mix(in srgb, var(--gold-subtle) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 55%, transparent);
+  border-radius: 2px;
+  color: var(--gold-primary);
+  font-family: var(--font-ui);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  box-shadow: none;
+}
+.atlas-mode .celebration-button:hover {
+  background: color-mix(in srgb, var(--gold-subtle) 24%, transparent);
+  border-color: var(--gold-primary);
+  color: var(--gold-hover);
+}
+
+/* ------------------------------------------------------------------
+   Help overlay (HelperPopup portal) in the atlas language
+   ------------------------------------------------------------------ */
+
+body.wisdom-atlas-open .helper-popup {
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--bg-card) 94%, var(--gold-deep)) 0%,
+    var(--bg-deep-space) 92%
+  );
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 42%, transparent);
+  border-radius: 3px;
+  box-shadow: 0 24px 60px color-mix(in srgb, var(--bg-deep-space-darker) 80%, transparent);
+}
+
+body.wisdom-atlas-open .helper-popup .helper-title {
+  font-family: var(--font-content);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  color: var(--gold-primary);
+  text-shadow: none;
+}
+
+body.wisdom-atlas-open .helper-popup .helper-dismiss-btn {
+  background: color-mix(in srgb, var(--gold-subtle) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 55%, transparent);
+  border-radius: 2px;
+  color: var(--gold-primary);
+  font-family: var(--font-ui);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  box-shadow: none;
+}
+body.wisdom-atlas-open .helper-popup .helper-dismiss-btn:hover {
+  background: color-mix(in srgb, var(--gold-subtle) 24%, transparent);
+  border-color: var(--gold-primary);
+  color: var(--gold-hover);
+}
+
+/* focus = the engraver's dashed ring (button doctrine 2026-07-24) */
+.atlas-mode .atlas-seed-dock .seed-details-footer button:focus-visible {
+  outline: 1.5px dashed var(--gold-primary);
+  outline-offset: 4px;
+}
+
+/* ------------------------------------------------------------------
+   Star tooltip in the plate language (hover, desktop only)
+   ------------------------------------------------------------------ */
+
+body.wisdom-atlas-open .star-tooltip-portal {
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--bg-card) 94%, var(--gold-deep)) 0%,
+    var(--bg-primary) 90%
+  );
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 42%, transparent);
+  border-radius: 3px;
+  box-shadow: 0 12px 30px color-mix(in srgb, var(--bg-void) 70%, transparent);
+  font-family: var(--font-content);
+  color: var(--text-secondary);
+}
+body.wisdom-atlas-open .star-tooltip-portal strong {
+  font-family: var(--font-content);
+  font-weight: 400;
+  color: var(--text-primary);
+}
+body.wisdom-atlas-open .star-tooltip-portal .tooltip-status,
+body.wisdom-atlas-open .star-tooltip-portal .tooltip-symbolism {
+  font-style: italic;
+  color: var(--text-tertiary);
+}
+
+/* ------------------------------------------------------------------
+   Drag affordance
+   ------------------------------------------------------------------ */
+
+.atlas-mode .map-container {
+  cursor: grab;
+  touch-action: none;
+}
+.atlas-mode .map-container:active {
+  cursor: grabbing;
+}
+.atlas-mode .map-container .star,
+.atlas-mode .map-container button {
+  cursor: pointer;
+  touch-action: auto;
+}

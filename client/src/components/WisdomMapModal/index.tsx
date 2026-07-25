@@ -28,9 +28,15 @@ import {
   calculateConstellationPositions,
   calculateConstellationPaths
 } from '../ZodiacConstellation';
+import { getConstellationTranslationKey } from '../../utils/constellationTranslationHelper';
+import AtlasSkyLayer, { AtlasSkyLayerHandle } from './AtlasSkyLayer';
+import AtlasPlate from './AtlasPlate';
+import { pickAtlasTier } from '../../cosmos/tiers';
+import type { SkyScene, SkyStar, SkySegment } from '../../cosmos/wisdom-sky/types';
 
 // Import CSS
 import './css/main.css';
+import './css/Atlas.css';
 
 // Import modular components
 import ListButton from './ListButton';
@@ -227,7 +233,41 @@ const WisdomMapModal: FC<WisdomMapModalProps> = ({
   // Container ref for measuring dimensions
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const [containerDimensions, setContainerDimensions] = useState<ContainerDimensions | null>(null);
-  
+
+  // The Celestial Atlas ("your sky") — presentational layer only.
+  // 'still' and 'mobile-low' tiers keep the flat map (photo background)
+  // exactly as before; any engine failure also drops back to it.
+  const skyRef = useRef<AtlasSkyLayerHandle | null>(null);
+  const worldRef = useRef<HTMLDivElement | null>(null);
+  const [skyFailed, setSkyFailed] = useState<boolean>(false);
+  const [skyReady, setSkyReady] = useState<boolean>(false);
+  const skyTier = useMemo(() => (isOpen ? pickAtlasTier() : 'still'), [isOpen]);
+  const skyEnabled = !skyFailed && (skyTier === 'desktop' || skyTier === 'mobile');
+
+  // Bloom staging: stars keep their pre-bloom engraving until the bloom note
+  // is witnessed, then gild on the plate (flourish + rays + gathered dust).
+  const [pendingLevelOverrides, setPendingLevelOverrides] = useState<Record<string, number>>({});
+  const [novaSeedId, setNovaSeedId] = useState<string | null>(null);
+  const novaTimerRef = useRef<number | null>(null);
+
+  // Reset the crossfade state for the next open (the layer itself unmounts
+  // and disposes its renderer when the modal closes)
+  useEffect(() => {
+    if (!isOpen) setSkyReady(false);
+  }, [isOpen]);
+
+  // Crossfade: when the sky's first frame lands, the photo fades out under
+  // the fading-in canvas (CSS), then unmounts once the transition settles
+  const [skySettled, setSkySettled] = useState<boolean>(false);
+  useEffect(() => {
+    if (!skyReady) {
+      setSkySettled(false);
+      return;
+    }
+    const id = window.setTimeout(() => setSkySettled(true), 900);
+    return () => window.clearTimeout(id);
+  }, [skyReady]);
+
   // Reference to track previous gathered count for completion celebration
   const prevMasteredCountRef = useRef<number>(0);
 
@@ -548,6 +588,102 @@ const WisdomMapModal: FC<WisdomMapModalProps> = ({
     return computeSeedLevels(seedSlices);
   }, [seedSlices]);
 
+  // Displayed levels: unwitnessed blooms hold their star at the pre-bloom
+  // engraving so the gilding happens ON the plate when the note is dismissed.
+  const displaySeedLevels = useMemo<Record<string, number>>(() => {
+    if (!skyEnabled || !Object.keys(pendingLevelOverrides).length) return seedLevels;
+    return { ...seedLevels, ...pendingLevelOverrides };
+  }, [seedLevels, pendingLevelOverrides, skyEnabled]);
+
+  // Lit segments connect consecutive gathered pattern stars: gathered seeds
+  // occupy pattern points 0..mainStarCount-1, so the first mainStarCount-1
+  // segments run between gathered stars. Shared by the atlas plate and the
+  // sky engine so ink and light always agree.
+  const litCount = useMemo<number>(() => {
+    const mainStarCount = seedPositions.filter((p) => p.isMainStar).length;
+    return Math.max(0, mainStarCount - 1);
+  }, [seedPositions]);
+
+  // Declarative snapshot for the atlas sky engine: star states, line segments
+  // and their lit status, all derived from the same data that drives the DOM
+  // layer, so the two always agree.
+  const skyScene = useMemo<SkyScene | null>(() => {
+    if (!skyEnabled || !containerDimensions || !seeds.length || !seedPositions.length) {
+      return null;
+    }
+
+    // Suggested "start here" seed — mirrors ConstellationMap.findNextSeed
+    let nextSeedId: string | null = null;
+    const noProgressSeeds = seeds.filter(
+      (seed) => (seedLevels[String(seed.id)] ?? 0) === 0
+    );
+    if (noProgressSeeds.length > 0) {
+      const lowest = noProgressSeeds.reduce((low, cur) => {
+        const lowId = parseInt(String(low.id).split('-').pop() || '') || Number(low.id);
+        const curId = parseInt(String(cur.id).split('-').pop() || '') || Number(cur.id);
+        return curId < lowId ? cur : low;
+      });
+      nextSeedId = String(lowest.id);
+    }
+
+    // Same Blake center-point skip as the DOM layer in ConstellationMap
+    const isBlakeConstellation =
+      constellation?.name === 'The Divine Vision' ||
+      getConstellationTranslationKey(constellation?.name ?? '') ===
+        'constellations.names.theDivineVision';
+
+    const stars: SkyStar[] = [];
+    seeds.forEach((seed, i) => {
+      const pos = seedPositions[i];
+      if (!pos || pos.coordX === undefined || pos.coordY === undefined) return;
+      if (
+        isBlakeConstellation &&
+        pos.coordX >= 49 && pos.coordX <= 51 &&
+        pos.coordY >= 49 && pos.coordY <= 51
+      ) {
+        return;
+      }
+      stars.push({
+        id: String(seed.id),
+        xPct: pos.coordX,
+        yPct: pos.coordY,
+        gathered: !!seed.gathered,
+        level: displaySeedLevels[String(seed.id)] ?? 0,
+        isNext: String(seed.id) === nextSeedId,
+      });
+    });
+
+    const segments: SkySegment[] = lineSegments.map((seg, i) => ({
+      x1: seg.x1,
+      y1: seg.y1,
+      x2: seg.x2,
+      y2: seg.y2,
+      lit: i < litCount,
+    }));
+
+    return {
+      figureKey: String(selectedFigure?.id ?? selectedFigure?.name ?? 'figure'),
+      width: containerDimensions.width,
+      height: containerDimensions.height,
+      stars,
+      segments,
+      stage: revelationStage,
+    };
+  }, [
+    skyEnabled,
+    containerDimensions,
+    seeds,
+    seedPositions,
+    seedLevels,
+    displaySeedLevels,
+    litCount,
+    lineSegments,
+    constellation,
+    revelationStage,
+    selectedFigure?.id,
+    selectedFigure?.name,
+  ]);
+
   // Sync ref on open — needs seedSlices because they load async after modal opens.
   // Use a flag to sync only ONCE per open cycle (otherwise celebration never fires).
   const hasSyncedRef = useRef(false);
@@ -590,6 +726,9 @@ const WisdomMapModal: FC<WisdomMapModalProps> = ({
           : undefined;
       setCompletionTierData({ total: power.total, newlyUnlockedTier: transitioned });
       setShowCompletionCelebration(true);
+      // The whole constellation ignites brightest-first in the sky,
+      // synchronized with the DOM celebration
+      skyRef.current?.ignite();
     }
 
     prevMasteredCountRef.current = completedModes;
@@ -599,6 +738,12 @@ const WisdomMapModal: FC<WisdomMapModalProps> = ({
   useEffect(() => {
     if (!isOpen) {
       bloomsDetectedRef.current = false;
+      setPendingLevelOverrides({});
+      setNovaSeedId(null);
+      if (novaTimerRef.current) {
+        window.clearTimeout(novaTimerRef.current);
+        novaTimerRef.current = null;
+      }
       return;
     }
     if (bloomsDetectedRef.current || !seedSlices.length || !selectedFigure?.id) return;
@@ -611,6 +756,11 @@ const WisdomMapModal: FC<WisdomMapModalProps> = ({
     const blooms = computePendingBlooms(figureId, currentLevels, seeds, figureName);
 
     if (blooms.length > 0) {
+      // Atlas: hold each blooming star at its pre-bloom engraving until its
+      // note is witnessed, so the gilding is seen happening on the plate.
+      const overrides: Record<string, number> = {};
+      for (const b of blooms) overrides[String(b.seedId)] = b.fromLevel;
+      setPendingLevelOverrides(overrides);
       setBloomQueue(blooms);
       setBloomIndex(0);
       setShowBloomCard(true);
@@ -631,6 +781,20 @@ const WisdomMapModal: FC<WisdomMapModalProps> = ({
     if (bloom) {
       markBloomWitnessed(bloom.figureId, bloom.seedId, bloom.toLevel);
       if (bloom.tier === 1) markFirstBloomShown(bloom.figureId, bloom.seedId);
+      // The plate gilds the star as the note closes: the engraved star steps
+      // up a level (rays draw themselves) while the sky inks the surveyor's
+      // flourish and gathers gold dust inward, under a brief hush.
+      const seedKey = String(bloom.seedId);
+      skyRef.current?.nova(seedKey);
+      setPendingLevelOverrides(prev => {
+        if (!(seedKey in prev)) return prev;
+        const next = { ...prev };
+        delete next[seedKey];
+        return next;
+      });
+      setNovaSeedId(seedKey);
+      if (novaTimerRef.current) window.clearTimeout(novaTimerRef.current);
+      novaTimerRef.current = window.setTimeout(() => setNovaSeedId(null), 2600);
     }
 
     const nextIndex = bloomIndex + 1;
@@ -699,6 +863,24 @@ const WisdomMapModal: FC<WisdomMapModalProps> = ({
 
   // seedsExplorerHelp handler removed — list view is self-explanatory
 
+  // Atlas celebrations: when a figure completes, the engraver finishes the
+  // plate first (links re-ink gold, one gilding light pass), then the
+  // informational card fades in. Flat tiers keep today's immediate overlay.
+  const [completionCardReady, setCompletionCardReady] = useState<boolean>(false);
+  useEffect(() => {
+    const pending = showFigureCompletion || showCompletionCelebration;
+    if (!pending) {
+      setCompletionCardReady(false);
+      return;
+    }
+    if (!skyEnabled) {
+      setCompletionCardReady(true);
+      return;
+    }
+    const id = window.setTimeout(() => setCompletionCardReady(true), 3400);
+    return () => window.clearTimeout(id);
+  }, [showFigureCompletion, showCompletionCelebration, skyEnabled]);
+
   // Add/remove body class to prevent scrolling when modal is open
   useEffect(() => {
     if (isOpen) {
@@ -712,6 +894,19 @@ const WisdomMapModal: FC<WisdomMapModalProps> = ({
       document.body.classList.remove('wisdom-map-open');
     };
   }, [isOpen]);
+
+  // Atlas chrome scope: portal surfaces (help overlay) restyle through this
+  // body class while the atlas is the active presentation.
+  useEffect(() => {
+    if (isOpen && skyEnabled) {
+      document.body.classList.add('wisdom-atlas-open');
+    } else {
+      document.body.classList.remove('wisdom-atlas-open');
+    }
+    return () => {
+      document.body.classList.remove('wisdom-atlas-open');
+    };
+  }, [isOpen, skyEnabled]);
 
   // Add/remove body class to prevent scrolling when detail view is open
   useEffect(() => {
@@ -738,11 +933,50 @@ const WisdomMapModal: FC<WisdomMapModalProps> = ({
   const progressPercentage = totalSeeds > 0 ? Math.round((gatheredCount/totalSeeds)*100) : 0;
   const isCompleted = gatheredCount === totalSeeds && totalSeeds > 0;
 
+  // While the engraver is finishing the plate (ignite choreography, before
+  // the informational card), hold the plate's completed styling back so the
+  // sequential gold re-inking is seen happening rather than pre-painted.
+  const completionPending =
+    skyEnabled && (showFigureCompletion || showCompletionCelebration) && !completionCardReady;
+
+  // Atlas plate data: figure name without the Echo prefix (for the cartouche
+  // epithet) and the translated constellation name (for the seed note kicker).
+  const echoPrefixForClean = tString('figures.echoOf', 'Echo of');
+  const cleanFigureName = selectedFigure
+    ? selectedFigure.name.replace(
+        new RegExp(
+          `^(Echo (of|von|de|del|di|des)|${echoPrefixForClean.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})\\s+`,
+          'i'
+        ),
+        ''
+      )
+    : '';
+  const constellationNameKey = constellation?.name
+    ? getConstellationTranslationKey(constellation.name)
+    : null;
+  const translatedConstellationName = constellationNameKey
+    ? tString(constellationNameKey, constellation?.name || '')
+    : constellation?.name || '';
+
+  // Seed note docking: the annotation sits in the plate margin OPPOSITE the
+  // star, near its height, never covering the figure (proto B).
+  const selectedSeedPos = selectedSeed
+    ? seedPositions[seeds.findIndex((s) => s.id === selectedSeed.id)] ?? null
+    : null;
+  const atlasDockSide: 'left' | 'right' =
+    selectedSeedPos && (selectedSeedPos.coordX ?? 50) >= 50 ? 'left' : 'right';
+  // Lower bound 26: the note is translated -40% of its own height, so a
+  // higher anchor would push its kicker out of the plate (seen 2026-07-24
+  // with top-row stars, the note lost its first line under the header).
+  const atlasDockTopPct = selectedSeedPos
+    ? Math.min(64, Math.max(26, selectedSeedPos.coordY ?? 50))
+    : 50;
+
   return (
-    <ModalContainer 
+    <ModalContainer
       isOpen={isOpen}
       onClose={onClose}
-      contentClassName="wisdom-map-content"
+      contentClassName={`wisdom-map-content${skyEnabled ? ' atlas-mode' : ''}`}
       animationType="fade-scale"
       overlayClassName="wisdom-map-overlay"
       alignTop={false}
@@ -801,13 +1035,17 @@ const WisdomMapModal: FC<WisdomMapModalProps> = ({
             }
             rightContent={
               <div className="header-button-group">
-                <button
-                  className={`header-action-btn info-btn ${showConstellationInfo ? 'active' : ''}`}
-                  onClick={() => setShowConstellationInfo(!showConstellationInfo)}
-                  aria-label={showConstellationInfo ? 'Hide constellation info' : 'Show constellation info'}
-                >
-                  <Info size={22} />
-                </button>
+                {/* Atlas plates explain themselves (marginalia carries the
+                    sign lore), so the desktop info toggle retires there. */}
+                {!skyEnabled && (
+                  <button
+                    className={`header-action-btn info-btn ${showConstellationInfo ? 'active' : ''}`}
+                    onClick={() => setShowConstellationInfo(!showConstellationInfo)}
+                    aria-label={showConstellationInfo ? 'Hide constellation info' : 'Show constellation info'}
+                  >
+                    <Info size={22} />
+                  </button>
+                )}
                 <CloseButton
                   onClick={onClose}
                   ariaLabel={tString('common.close', 'Close wisdom map')}
@@ -822,7 +1060,10 @@ const WisdomMapModal: FC<WisdomMapModalProps> = ({
         );
       })()}
 
-      {loading ? (
+      {loading && !skyEnabled ? (
+        /* Flat tiers keep the plain loading state exactly as before. In atlas
+           mode the map container stays mounted through figure switches so the
+           sky can glide instead of tearing down. */
         <div className="loading-state">{tNode('common.loading')}</div>
       ) : error ? (
         <div className="error-state">
@@ -835,7 +1076,7 @@ const WisdomMapModal: FC<WisdomMapModalProps> = ({
         <>
           {/* Always show map view - no more toggle */}
           <div
-            className="map-container visible"
+            className={`map-container visible${skyEnabled && skyReady ? ' sky-atlas' : ''}`}
             ref={mapContainerRef}
             role="region"
             aria-label="Map view"
@@ -847,8 +1088,69 @@ const WisdomMapModal: FC<WisdomMapModalProps> = ({
               minHeight: '300px'
             } as CSSProperties}
           >
-            <ResponsiveBackground />
+            {skyEnabled ? (
+              <>
+                {/* Photo stays underneath until the sky's first frame, fades
+                    out under the fading-in canvas, then unmounts */}
+                {!skySettled && <ResponsiveBackground />}
+                <AtlasSkyLayer
+                  ref={skyRef}
+                  tier={skyTier === 'desktop' ? 'desktop' : 'mobile'}
+                  scene={skyScene}
+                  worldRef={worldRef}
+                  onReady={() => setSkyReady(true)}
+                  onFallback={() => {
+                    setSkyFailed(true);
+                    setSkyReady(false);
+                  }}
+                />
+              </>
+            ) : (
+              <ResponsiveBackground />
+            )}
 
+            {/* One world layer: the engraved plate and the interactive DOM
+                stars travel together under the engine's camera (glides,
+                drag-to-peek with spring-back). Mounted whenever the atlas is
+                active so the engine can bind it before the seeds arrive. */}
+            {skyEnabled && (
+              <div className="atlas-world" ref={worldRef}>
+                {!loading && constellation && containerDimensions && (
+                  <AtlasPlate
+                    width={containerDimensions.width}
+                    height={containerDimensions.height}
+                    segments={lineSegments}
+                    litCount={litCount}
+                    constellationName={constellation.name || ''}
+                    constellationDescription={constellation.description || ''}
+                    figureCleanName={cleanFigureName}
+                    gatheredCount={gatheredCount}
+                    totalSeeds={totalSeeds}
+                    isComplete={isCompleted && !completionPending}
+                  />
+                )}
+                {!loading && (
+                  <ConstellationMap
+                    revelationStage={revelationStage}
+                    lineSegments={lineSegments}
+                    constellation={constellation || undefined}
+                    boundingBox={boundingBox || undefined}
+                    seeds={seeds as any}
+                    seedPositions={seedPositions as any}
+                    seedLevels={displaySeedLevels}
+                    selectedSeedId={selectedSeed?.id ?? appSelectedSeedId ?? null}
+                    atlas
+                    novaSeedId={novaSeedId}
+                    onSeedClick={handleMapSeedClick}
+                  />
+                )}
+              </div>
+            )}
+
+            {loading ? (
+              <div className="loading-state">{tNode('common.loading')}</div>
+            ) : (
+              <>
             {showConstellationInfo && constellation && (
               <ConstellationInfo
                 name={constellation.name || ''}
@@ -856,20 +1158,27 @@ const WisdomMapModal: FC<WisdomMapModalProps> = ({
               />
             )}
 
-            <ConstellationMap
-              revelationStage={revelationStage}
-              lineSegments={lineSegments}
-              constellation={constellation || undefined}
-              boundingBox={boundingBox || undefined}
-              seeds={seeds as any}
-              seedPositions={seedPositions as any}
-              seedLevels={seedLevels}
-              selectedSeedId={selectedSeed?.id ?? appSelectedSeedId ?? null}
-              onSeedClick={handleMapSeedClick}
-            />
+            {!skyEnabled && (
+              <ConstellationMap
+                revelationStage={revelationStage}
+                lineSegments={lineSegments}
+                constellation={constellation || undefined}
+                boundingBox={boundingBox || undefined}
+                seeds={seeds as any}
+                seedPositions={seedPositions as any}
+                seedLevels={seedLevels}
+                selectedSeedId={selectedSeed?.id ?? appSelectedSeedId ?? null}
+                onSeedClick={handleMapSeedClick}
+              />
+            )}
 
-            {/* Celebration overlays: mutually exclusive. Priority: bloom card > figure completion > legacy completion */}
-            {showCompletionCelebration && !showFigureCompletion && !showBloomCard && (
+            {/* Celebration overlays: mutually exclusive. Priority: bloom card > figure completion > legacy completion.
+                Atlas mode: the plate performs the choreography (the engraver
+                finishes the plate on ignite()), so the DOM celebration keeps
+                only its informational core, delayed until the ink is dry.
+                FigureCompletionOverlay's star-by-star illumination duplicates
+                that choreography and is used on flat tiers only. */}
+            {showCompletionCelebration && !showFigureCompletion && !showBloomCard && completionCardReady && (
               <CompletionCelebration
                 constellationName={constellation?.name || ''}
                 totalSeeds={totalSeeds}
@@ -883,7 +1192,21 @@ const WisdomMapModal: FC<WisdomMapModalProps> = ({
               />
             )}
 
-            {showFigureCompletion && !showBloomCard && constellation?.pattern && (
+            {showFigureCompletion && !showBloomCard && skyEnabled && completionCardReady && (
+              <CompletionCelebration
+                constellationName={constellation?.name || ''}
+                totalSeeds={totalSeeds}
+                onClose={() => setShowFigureCompletion(false)}
+                votingPowerTotal={completionTierData?.total}
+                newlyUnlockedTier={completionTierData?.newlyUnlockedTier}
+                onOpenCommunity={isSelfHost ? undefined : () => {
+                  setShowFigureCompletion(false);
+                  setShowCommunity(true);
+                }}
+              />
+            )}
+
+            {showFigureCompletion && !showBloomCard && !skyEnabled && constellation?.pattern && (
               <FigureCompletionOverlay
                 constellationPattern={constellation.pattern}
                 figureName={selectedFigure?.name || ''}
@@ -907,6 +1230,7 @@ const WisdomMapModal: FC<WisdomMapModalProps> = ({
                 toLevel={bloomQueue[bloomIndex].toLevel}
                 seedTitle={bloomQueue[bloomIndex].seedTitle}
                 figureName={bloomQueue[bloomIndex].figureName}
+                atlas={skyEnabled}
                 onClose={handleBloomDismiss}
                 soundUrl={uiSounds.getUrl(bloomQueue[bloomIndex].toLevel === 4 ? 'bloom-choir' : 'bloom-shimmer')}
                 soundEnabled={uiSounds.isEnabled()}
@@ -920,7 +1244,9 @@ const WisdomMapModal: FC<WisdomMapModalProps> = ({
               />
             )}
 
-            {showInitialPatternHelp && (
+            {/* The map helper dies with the redesign (Wave-1 helper doctrine):
+                the plate explains itself. Flat fallback tiers keep it. */}
+            {showInitialPatternHelp && !skyEnabled && (
               <InitialPatternHelp
                 onDismiss={() => setShowInitialPatternHelp(false)}
                 revelationStage={revelationStage}
@@ -935,6 +1261,10 @@ const WisdomMapModal: FC<WisdomMapModalProps> = ({
                 onViewDetails={handleViewDetails}
                 onSelect={handleSeedSelect}
                 showSelectButton={showSelectButton}
+                atlas={skyEnabled}
+                atlasDockSide={atlasDockSide}
+                atlasDockTopPct={atlasDockTopPct}
+                constellationName={translatedConstellationName}
                 figureId={selectedFigure?.id || ''}
                 onModeSelect={(seed, mode) => {
                   // Route through handleSeedSelect for proper figure selection (FigureCarousel context)
@@ -948,10 +1278,12 @@ const WisdomMapModal: FC<WisdomMapModalProps> = ({
                 }}
               />
             )}
+              </>
+            )}
           </div>
 
           {/* Full-screen detail view overlay - opens when "View Full Details" or [List] clicked */}
-          {showDetailView && (
+          {!loading && showDetailView && (
             <div className="detail-view-overlay">
               {/* Close returns to map */}
               <SeedDetailView
@@ -966,7 +1298,7 @@ const WisdomMapModal: FC<WisdomMapModalProps> = ({
           )}
           
           {/* Mobile bottom toolbar */}
-          {isMobileHub && (
+          {!loading && isMobileHub && (
             <div className="mobile-bottom-toolbar">
               <div className="toolbar-buttons">
                 <button
@@ -1003,6 +1335,10 @@ const WisdomMapModal: FC<WisdomMapModalProps> = ({
             </div>
           )}
 
+          {/* The old segmented progress strip belongs to the flat map only.
+              On the atlas, progress lives in the cartouche ("N of M stars
+              gathered"), read quietly, the way a plate is read. */}
+          {!loading && !skyEnabled && (
           <ProgressBar
             gatheredCount={gatheredCount}
             totalSeeds={totalSeeds}
@@ -1016,6 +1352,7 @@ const WisdomMapModal: FC<WisdomMapModalProps> = ({
               constellationComplete: tString('seeds.constellationComplete', 'Constellation Complete!')
             }}
           />
+          )}
         </>
       )}
 
