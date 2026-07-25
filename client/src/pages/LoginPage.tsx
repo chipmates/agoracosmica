@@ -1,16 +1,16 @@
 // src/pages/LoginPage.tsx
 //
 // Entry "Vorspann": a short, auto-playing, skippable cosmic cinematic. No card,
-// no button. The wordmark breathes (brand beat), the ring ignites with the
-// frameless Seeker at its core, two verse cards cross-fade, the figures fade
-// one by one, and the core blooms into the Paradiso rose. A tap/click/Esc at
-// any point skips straight to onComplete (the welcome step, where profile
-// creation + consent now live). Returning users never see this page.
+// no button. The verse lines rise alone on the night (the portal ring and the
+// hooded Seeker were removed 2026-07-24 — the words are the scene), the
+// figures fade one by one, and the night blooms into the Paradiso rose. A
+// tap/click/Esc at any point skips straight to onComplete (the welcome step,
+// where profile creation + consent now live). Returning users never see this
+// page.
 
 import { useState, useEffect, useRef, useCallback, FC, Suspense, lazy } from 'react';
 import './LoginPage.css';
 import CosmicBackground from '../components/CosmicBackground';
-import LoginContainer from '../components/LoginContainer';
 import CinematicCards from '../components/CinematicCards';
 import MessagePopup from '../components/MessagePopup';
 import LandscapeWarning from '../components/LandscapeWarning';
@@ -27,18 +27,19 @@ import { sendFunnelBeaconOnce, cinematicDwellBucket, CinematicOutcome } from '..
 // exists because Safari and iOS cannot decode Opus-in-WebM in an audio element.
 const backgroundMusic = `${MEDIA_BASE}/images/music/music.webm`;
 const backgroundMusicMp3 = `${MEDIA_BASE}/images/music/music.mp3`;
-// The hooded "Seeker" — the frameless protagonist at the ring's core
-const userThumbnail = `${MEDIA_BASE}/images/figures/user/thumbnail/320.webp`;
 
 // Cinematic timeline — distinct beats, each given room to breathe (skippable).
 // All tunable: bump these to make the atmosphere linger.
-const PORTAL_MS = 1200;        // the portal ring circles alone (card 1)
-const SEEKER_MS = 3400;        // let the portal breathe a while before the Seeker (card 2)
-const FIGURES_MS = 2600;       // then the figures begin to fade, one by one (card 3)
+const PORTAL_MS = 1200;        // the night breathes alone before the first question (card 1)
+const QUESTION2_MS = 2400;     // "Who am I?" holds, then the outward question rises (card 2)
+const SEEKER_MS = 2800;        // reading room for card 2 before the reply (card 3)
+const FIGURES_MS = 2600;       // then the figures begin to fade, one by one (card 4)
 const FADE_MS = 4400;          // let them all fade before the rose appears
 const FIGURE_START_MS = 200;   // first figure's fade delay
 const FIGURE_STAGGER_MS = 460; // gap between figures (atmospheric, one by one)
-const PARADISO_AUTO_MS = 4500; // rose bloom (a touch longer) before handing off
+const PARADISO_AUTO_MS = 7500; // rose bloom + real reading room for the Dante
+                               // line (2026-07-24: 4500 cut readers off mid-verse;
+                               // whoever wants out taps, whoever stays gets to read)
 
 declare global {
   interface Window {
@@ -54,6 +55,7 @@ type PopupType = 'error' | 'info' | 'success' | '';
 
 const LoginPage: FC<LoginPageProps> = ({ onComplete }) => {
   const [isFormVisible, setIsFormVisible] = useState<boolean>(false);
+  const [secondQuestion, setSecondQuestion] = useState<boolean>(false);
   const [seekerVisible, setSeekerVisible] = useState<boolean>(false);
   const [figuresFading, setFiguresFading] = useState<boolean>(false);
   const [isLandscape, setIsLandscape] = useState<boolean>(false);
@@ -72,7 +74,6 @@ const LoginPage: FC<LoginPageProps> = ({ onComplete }) => {
 
   const audioRef = useRef<HTMLAudioElement>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const portalRef = useRef<HTMLDivElement>(null);
   const completingRef = useRef(false);
   // Dwell clock for the cinematic_end funnel bucket. Only the coarse bucket
   // index ever leaves the browser, never this raw timestamp.
@@ -202,14 +203,21 @@ const LoginPage: FC<LoginPageProps> = ({ onComplete }) => {
     };
   }, []);
 
-  // Beat 2: the Seeker materializes once the portal has circled alone.
+  // Beat 2: the outward question rises after the inner one has held.
   useEffect(() => {
-    if (!isFormVisible || seekerVisible || loginSuccessful) return;
+    if (!isFormVisible || secondQuestion || loginSuccessful) return;
+    const t = setTimeout(() => setSecondQuestion(true), prefersReducedMotion.current ? 0 : QUESTION2_MS);
+    return () => clearTimeout(t);
+  }, [isFormVisible, secondQuestion, loginSuccessful]);
+
+  // Beat 3: the reply ("you are not the first to ask") after the pair.
+  useEffect(() => {
+    if (!secondQuestion || seekerVisible || loginSuccessful) return;
     const t = setTimeout(() => setSeekerVisible(true), prefersReducedMotion.current ? 0 : SEEKER_MS);
     return () => clearTimeout(t);
-  }, [isFormVisible, seekerVisible, loginSuccessful]);
+  }, [secondQuestion, seekerVisible, loginSuccessful]);
 
-  // Beat 3: the figures begin to fade, one by one.
+  // Beat 4: the figures begin to fade, one by one.
   useEffect(() => {
     if (!seekerVisible || figuresFading || loginSuccessful) return;
     const t = setTimeout(() => setFiguresFading(true), prefersReducedMotion.current ? 0 : FIGURES_MS);
@@ -226,7 +234,7 @@ const LoginPage: FC<LoginPageProps> = ({ onComplete }) => {
     return () => clearTimeout(t);
   }, [figuresFading, loginSuccessful, beginRose]);
 
-  // Beat 4: the rose blooms (the portal + Seeker have handed off).
+  // Final beat: the rose blooms.
   useEffect(() => {
     if (!loginSuccessful) return;
     const t = setTimeout(() => setPortalAnimActive(true), prefersReducedMotion.current ? 0 : 200);
@@ -267,22 +275,10 @@ const LoginPage: FC<LoginPageProps> = ({ onComplete }) => {
       {/* Cosmic background — hide meteors once the rose takes over */}
       <CosmicBackground hideMeteors={loginSuccessful} />
 
-      {/* Portal + frameless Seeker portrait at its core (no card box) */}
-      <LoginContainer
-        ref={portalRef}
-        isFormVisible={!loginSuccessful && isFormVisible}
-        loginSuccessful={loginSuccessful}
-        handlePortalClick={() => {}}
-      >
-        <div className={`cinematic-seeker ${seekerVisible ? 'is-visible' : ''}`} aria-hidden="true">
-          <img src={userThumbnail} alt="" />
-        </div>
-      </LoginContainer>
-
-      {/* Parallel verse story above the ring (the Dante line lives in the rose) */}
+      {/* The verse story IS the scene (the Dante line lives in the rose) */}
       <CinematicCards
         active={!loginSuccessful && isFormVisible}
-        step={figuresFading ? 2 : seekerVisible ? 1 : 0}
+        step={figuresFading ? 3 : seekerVisible ? 2 : secondQuestion ? 1 : 0}
       />
 
       {/* Figure fade-out + Celestial Rose */}
