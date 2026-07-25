@@ -70,10 +70,13 @@ button {
   font-family: var(--font-ui, 'Space Grotesk', sans-serif);
 }
 
-/* Justified text styles for main content and history modal */
-.main-content p, 
-.main-content div:not(.no-justify), 
-.main-content span:not(.no-justify),
+/* Justified text styles for main content and history modal.
+   The atlas surfaces (wisdom plate + reading room) and the figure catalog
+   (portrait plates + cartouche column) are excluded: engraved annotations
+   read left or centered, never with stretched word gaps. */
+.main-content p:not(.seed-detail-view *):not(.atlas-mode *):not(.figure-carousel *),
+.main-content div:not(.no-justify):not(.seed-detail-view):not(.seed-detail-view *):not(.atlas-mode):not(.atlas-mode *):not(.figure-carousel):not(.figure-carousel *),
+.main-content span:not(.no-justify):not(.seed-detail-view *):not(.atlas-mode *):not(.figure-carousel *),
 .history-modal-content p,
 .history-modal-content div:not(.no-justify),
 .history-modal-content span:not(.no-justify) {
