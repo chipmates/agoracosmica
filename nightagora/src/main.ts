@@ -681,7 +681,7 @@ document.getElementById('descent-skip')?.addEventListener('click', () => skipDes
 // ---- THE SITTING: the night's one contract, taken at the first
 // hearth (terms + age 16 in one declarative action; legal basis:
 // transparency memo 01; storage per § 25 Abs. 2 Nr. 2 TDDDG). The
-// stone retired 2026-07-21 (Michel): the Sitting, every figure pane's
+// stone retired 2026-07-21 (the founder): the Sitting, every figure pane's
 // ink, and the keeper's own line carry the disclosure; passive
 // listening stays ungated. ----
 const sittingNode = document.getElementById('sitting')
@@ -753,10 +753,12 @@ function beginDusk(): void {
   campWalkTarget = 1
   campSignLevels = readSeedLevels('aurelius', 12)
   camp.setSign(campSignLevels, reducedMotion)
-  // the sky needs the whole frame: the ground letterpress steps back
+  // the sky needs the whole frame: the ground letterpress steps back. The
+  // Sitting is only PUT DOWN, never withdrawn: if it was open, his morning
+  // hands it back (round 8: walking past the tent used to strand a visitor
+  // at the overlook with the hearth never opened and no way home).
   keeperEl.hidden = true
   sittingEl.hidden = true
-  hearthWanted = false
   traceOpen = -1
   drawnEl.hidden = true
   if (duskLineEl) duskLineEl.textContent = duskLineText()
@@ -780,8 +782,8 @@ function endDusk(): void {
     if (campHearthOpen) keeperEl.hidden = false
     setStatus(
       camera.aspect < 0.9
-        ? 'Carnuntum · touch and move to look around'
-        : 'Carnuntum on the Danube'
+        ? 'Carnuntum · swipe to walk his ground'
+        : 'Carnuntum on the Danube · scroll to walk'
     )
   }
 }
@@ -911,6 +913,8 @@ declare global {
         campWalk: number
         campGaze: number
         desc: number
+        draws: number
+        tris: number
       }
     }
   }
@@ -1002,7 +1006,7 @@ function syncLabels(): void {
 
 function beginCrossing(): void {
   // one diamond-ring breath, the same perfect transition the return
-  // uses (Michel 2026-07-20: the long crossing was too long; it rests
+  // uses (the founder, 2026-07-20: the long crossing was too long; it rests
   // in the organ library for a future tournament)
   if (firstNight) {
     firstNight = false
@@ -1130,7 +1134,7 @@ window.__forge = {
       const at: Record<string, number> = {
         shore: 0,
         ford: 0.28,
-        gate: 0.42,
+        gate: 0.35,
         via: 0.57,
         trace: 0.57,
         praetorium: 0.7,
@@ -1201,6 +1205,10 @@ window.__forge = {
       campWalk,
       campGaze,
       desc,
+      // what the last frame actually cost: the rig quotes this instead of
+      // guessing from a software-rasterizer fps number
+      draws: renderer.info.render.drawCalls,
+      tris: renderer.info.render.triangles,
       cam: {
         p: camera.position.toArray(),
         r: camera.rotation.toArray().slice(0, 3),
@@ -1261,9 +1269,13 @@ function setPhase(next: Phase): void {
     hearthWanted = false
     endDusk()
     campDusk = 0
-    // every other stage is the SEATED eye at the origin: his ground is
-    // the one place the visitor walks, and it hands the eye back
+    // every other stage is the SEATED eye at the origin: his ground is the
+    // one place the visitor walks, and it hands the eye back. The ROLL has
+    // to come back too: the walk ends looking the opposite way down the
+    // via, and an Euler read off that quaternion carries z = pi. Easing
+    // only x and y then leaves the hub hanging upside down (round 9).
     camera.position.set(0, 0, 0)
+    camera.rotation.set(next === 'agora' || next === 'council' ? -0.12 : 0, 0, 0)
     if (camera.fov !== 46) {
       camera.fov = 46
       camera.updateProjectionMatrix()
@@ -1287,7 +1299,7 @@ function setPhase(next: Phase): void {
     agoraReveal = 0
     setStatus(
       camera.aspect < 0.9
-        ? 'Carnuntum · swipe to walk, drag up to look'
+        ? 'Carnuntum · swipe to walk his ground'
         : 'Carnuntum on the Danube · scroll to walk'
     )
     campEnteredAt = elapsed
@@ -1326,7 +1338,7 @@ function push(delta: number): void {
     if (descTarget <= 0 && desc < 0.02 && delta < 0) setPhase('held')
   }
   if (phase === 'agora') {
-    // ONE grammar per stage (Michel): on the guided first night the
+    // ONE grammar per stage (the founder): on the guided first night the
     // scroll still carries you skyward; in free hub life the marks are
     // the only way — scroll rests, selection speaks
     if (!autoRide) return
@@ -1523,8 +1535,10 @@ function frame(now: number): void {
     // the first hearth of the night asks its one question first.
     if (!duskUp && !campHearthOpen && campWalk > 0.66) openHearth()
     // and the sign rises where the walk ends: at the overlook, night
-    // falls over his morning (the Dusk Law, kept)
-    if (!duskUp && campWalk > 0.955) beginDusk()
+    // falls over his morning (the Dusk Law, kept). It WAITS for the
+    // Sitting: a visitor who has been asked the night's one question does
+    // not get yanked into the duskrise before they can answer it.
+    if (!duskUp && campWalk > 0.955 && sittingEl.hidden) beginDusk()
   } else if (phase !== 'sky') {
     keeperEl.hidden = true
   }
@@ -1713,7 +1727,7 @@ function dragAllowed(): boolean {
   return (phase === 'agora' || phase === 'camp' || phase === 'council') && !paneOpen
 }
 /** his ground gives the eye real headroom: looking UP is a gesture there,
-    and the sky answers it (Michel's law) */
+    and the sky answers it (the founder's law) */
 function pitchUpLimit(): number {
   return phase === 'camp' ? 0.54 : 0.2
 }

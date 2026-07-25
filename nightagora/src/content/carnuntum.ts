@@ -74,7 +74,9 @@ export interface Station {
 export const STATIONS: Station[] = [
   { t: 0.0, name: 'The far shore' },
   { t: 0.28, name: 'The ford', trace: 0 },
-  { t: 0.42, name: 'The gate' },
+  // where the porta praetoria READS: at 0.42 the eye is already through it
+  // and the arch is behind your shoulders (round 7)
+  { t: 0.35, name: 'The gate' },
   { t: 0.57, name: 'Via principalis', trace: 1 },
   { t: 0.7, name: 'The praetorium' },
   { t: 0.79, name: 'His desk', trace: 2 },

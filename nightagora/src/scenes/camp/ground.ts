@@ -4,7 +4,7 @@
    the bearing of the dying day), gold only ever emits or reflects, and
    the earth always keeps enough skylight to be a surface.
 
-   Michel's law (2026-07-25): the CAMP is a dawn you can read. The night
+   the founder's law (2026-07-25): the CAMP is a dawn you can read. The night
    lives overhead, in uNight, and the ground follows it only part of the
    way (uDeep). Look up, and the sky deepens over a camp that is still
    there when you look back down. */
@@ -259,6 +259,10 @@ function groundMaterial(): MeshBasicNodeMaterial {
   )
   col = col.add(hex3('#C4611E', 0.062).mul(alb).mul(pour).mul(oneMinusN(uDeep.mul(0.85))).mul(oneMinusN(sh.mul(0.62))))
   col = col.add(firelight(world, n, 0.85, 0.92).mul(alb))
+  // the far rim: a planet has no edge, it has a distance the light stops
+  // reaching. The ground sinks into the dome's own value out there.
+  const away = smoothstep(60.0, 150.0, length(world.xz))
+  col = mix(col, mix(hex3('#101838', 0.5), hex3('#080C22', 0.42), uDeep), away)
   mat.colorNode = shoulder(col).add(dither(0.0026)).mul(uReveal)
   return mat
 }
@@ -293,6 +297,13 @@ function riverMaterial(): MeshBasicNodeMaterial {
     col = col.add(colU.mul(radU).mul(lat).mul(lon).mul(up).mul(0.055).mul(flow))
   }
 
+  // THE CURRENT: the one thing on this planet that moves on its own. Long
+  // streaks drawn along the drift, catching whatever light is on the water,
+  // so the Danube reads as a river and not as a dark floor
+  const lane = sn(vec3(world.x.mul(0.9), world.z.mul(0.24).add(uT.mul(0.09)), 2.4))
+  const streak = smoothstep(0.55, 0.95, abs(lane)).mul(smoothstep(26.0, 6.0, world.z))
+  col = col.add(mix(hex3('#2A3A66', 0.5), hex3('#7A4A22', 0.42), far).mul(streak).mul(0.5))
+
   // and at full night the field itself glitters on the surface
   const sp = fract(sin(dot(vec2(floor(world.x.mul(7.0)), floor(world.z.mul(3.0))), vec2(12.9898, 78.233))).mul(43758.5453))
   const glint = step(0.982, sp).mul(sin(uT.mul(2.6).add(sp.mul(40))).mul(0.5).add(0.5)).mul(uNight)
@@ -316,7 +327,7 @@ function mistMaterial(): MeshBasicNodeMaterial {
   // you cannot see the mist you are standing in: a bank fades out as the
   // eye reaches it, or the far shore washes the whole foreground
   const near = smoothstep(6.0, 20.0, length(world.sub(cameraPosition)))
-  const a = body.mul(near).mul(mix(float(0.34), float(0.42), uDeep)).mul(uReveal)
+  const a = body.mul(near).mul(mix(float(0.5), float(0.58), uDeep)).mul(uReveal)
   // mist is lapis lit from below by the water, never white
   let col: N = mix(vec3(0.082, 0.096, 0.163), vec3(0.02, 0.026, 0.055), uDeep)
   col = col.add(vec3(0.06, 0.033, 0.015).mul(oneMinusN(uDeep)).mul(pow(oneMinusN(t.y), 3.0)))

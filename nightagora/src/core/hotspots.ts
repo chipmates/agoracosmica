@@ -1,4 +1,4 @@
-/* The selection grammar of the whole night (Michel, 2026-07-20, after
+/* The selection grammar of the whole night (the founder, 2026-07-20, after
    the Breton example): world-anchored points of interest. One device
    everywhere — the gold ring-and-bead mark with a letterpress label,
    44px targets, keyboard-tabbable, projected like every other chip. */

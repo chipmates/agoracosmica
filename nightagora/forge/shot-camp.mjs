@@ -22,7 +22,7 @@ const STATES = [
   { name: '08-desk', camp: 'desk' },
   { name: '09-vista', camp: 'vista' },
   { name: '10-dusk', camp: 'dusk' },
-  // Michel's law: the same ground with the gaze raised
+  // the founder's law: the same ground with the gaze raised
   { name: '11-gaze-via', camp: 'via', gaze: 1 },
   { name: '12-gaze-gate', camp: 'gate', gaze: 0.55 },
 ]
@@ -50,6 +50,25 @@ async function waitForServer(url, tries = 60) {
     await new Promise((r) => setTimeout(r, 250))
   }
   throw new Error('preview server never came up')
+}
+
+/** the headless GL context can die mid-run on the heavier stages: a lost
+    context looks exactly like a bad frame, so the rig proves the state
+    took and reloads once if it did not */
+async function jump(page, phase, opts, settle) {
+  for (let attempt = 0; attempt < 2; attempt++) {
+    await page.evaluate(([p, o]) => {
+      window.__forge.freeze(12.4)
+      window.__forge.jump(p, o ?? {})
+    }, [phase, opts])
+    await page.waitForTimeout(settle)
+    const ok = await page.evaluate((p) => document.body.dataset.phase === p, phase)
+    if (ok) return true
+    await page.reload()
+    await page.waitForFunction(() => Boolean(window.__forge))
+    await page.waitForTimeout(1500)
+  }
+  return false
 }
 
 mkdirSync(OUT, { recursive: true })
@@ -81,11 +100,8 @@ try {
     await page.waitForFunction(() => Boolean(window.__forge))
     await page.waitForTimeout(1500)
     for (const s of STATES) {
-      await page.evaluate(([camp, gaze]) => {
-        window.__forge.freeze(12.4)
-        window.__forge.jump('camp', { camp, gaze })
-      }, [s.camp, s.gaze ?? 0])
-      await page.waitForTimeout(420)
+      const took = await jump(page, 'camp', { camp: s.camp, gaze: s.gaze ?? 0 }, 420)
+      if (!took) problems.push(`[${vp.tag}] ${s.name}: the stage never took (context lost twice)`)
       await page.screenshot({ path: `${OUT}${vp.tag}-${s.name}.png` })
     }
 
@@ -125,6 +141,36 @@ try {
     }
     await page.close()
   }
+
+  // ---- the quiet walk: reduced motion must still be a composed night,
+  // not a broken one (the walk cuts between stations instead of travelling)
+  {
+    const page = await browser.newPage({
+      viewport: { width: 1512, height: 950 },
+      reducedMotion: 'reduce',
+    })
+    page.on('pageerror', (e) => problems.push(`[reduced] pageerror: ${e.message}`))
+    page.on('console', (m) => {
+      if (m.type() === 'error') problems.push(`[reduced] console: ${m.text()}`)
+    })
+    await page.addInitScript(() => {
+      try {
+        localStorage.setItem('na-gate', '1')
+        localStorage.setItem('na-first', '1')
+      } catch {
+        /* private mode */
+      }
+    })
+    await page.goto(BASE)
+    await page.waitForFunction(() => Boolean(window.__forge))
+    await page.waitForTimeout(1500)
+    for (const s of ['gate', 'praetorium', 'dusk']) {
+      await jump(page, 'camp', { camp: s }, 500)
+      await page.screenshot({ path: `${OUT}reduced-${s}.png` })
+    }
+    await page.close()
+  }
+
   await browser.close()
   console.log(`shots written to forge/shots/camp/${ROUND}/`)
   if (problems.length) {

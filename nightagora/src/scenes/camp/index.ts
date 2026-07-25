@@ -11,7 +11,7 @@
    app's own beats are the stations: the hearth is the praetorium, the
    traces are cut where they belong, and His Sky is the vista.
 
-   THE HOUR (Michel, 2026-07-25): the camp is a DAWN you can read. Night
+   THE HOUR (the founder's note, 2026-07-25): the camp is a DAWN you can read. Night
    lives overhead and answers the GAZE — look up and it deepens, look back
    down and his morning is still there. The duskrise takes it all the way,
    because that is the one moment where night falling IS the point. */
@@ -40,7 +40,8 @@ import { createWorld } from './ground'
 import { createFort } from './fort'
 import { createPraetorium } from './praetorium'
 import { createFires } from './fire'
-import { createBreath, createGrass, createSmoke, createSparks } from './drift'
+import { createBreath, createGrass, createMotes, createSmoke, createSparks } from './drift'
+import { mergeStatic } from './merge'
 
 export { groundDrop, place } from './hour'
 
@@ -62,7 +63,7 @@ export interface CampState {
   yield: number
   /** 0..1 the duskrise: night falls over his morning and the sign rises */
   dusk: number
-  /** 0..1 how far the visitor has raised their own gaze (Michel's law) */
+  /** 0..1 how far the visitor has raised their own gaze (the founder's law) */
   gaze: number
   reduced: boolean
 }
@@ -127,6 +128,10 @@ const SPOTS: Record<SpotId, [number, number, number]> = {
   trace: [3.32, 1.02, -5.22],
 }
 
+/** the weld is a performance pass, and a performance pass has to be
+    provable: ?noweld renders the same camp unmerged for an A/B */
+const WELD = typeof location === 'undefined' || !location.search.includes('noweld')
+
 export function createCamp(scene: Scene): Camp {
   const rand = mulberry32(FOUNDING_SEED + 91)
   const reduced =
@@ -137,6 +142,7 @@ export function createCamp(scene: Scene): Camp {
     sparks: mobile ? 12 : 26,
     smoke: mobile ? 8 : 16,
     grass: mobile ? 130 : 300,
+    motes: mobile ? 90 : 240,
   }
 
   const root = new Group()
@@ -176,6 +182,10 @@ export function createCamp(scene: Scene): Camp {
   })
   root.add(smoke.mesh)
   root.add(createGrass({ count: tier.grass, rand }).mesh)
+  // the air itself: invisible until a fire finds it, and the reason his
+  // fires read as light thrown THROUGH something
+  const motes = createMotes({ count: tier.motes, rand })
+  root.add(motes.mesh)
   root.add(
     createBreath({
       anchors: fort.sentryAnchors.map((p, i) => ({ p, dir: i % 2 ? 1 : -1 })),
@@ -186,11 +196,17 @@ export function createCamp(scene: Scene): Camp {
   // ---- the standard stars, and HIS SIGN over the camp
   const firmament = createFirmament({
     count: tier.stars,
-    far: [58, 150],
-    // the near shell is the sky's bokeh: pushed out, so his stars read as
-    // STARS over the camp instead of as smudges on the lens (round 1)
-    near: [42, 74],
+    // BOTH shells stand outside his world. The fort is thirty metres and the
+    // overlook stands thirty-four out from its heart, so a star inside that
+    // radius hangs IN the camp: at the duskrise the near shell's soft discs
+    // were sitting on the tents like smudges on a lens. Out here the ground
+    // occludes anything below the horizon and the sky is a sky (round 8).
+    far: [120, 300],
+    near: [86, 150],
     bias: 'zenith',
+    // and none of them below his horizon: this planet curves away faster
+    // than the sky does, so a star seeded low hangs over the far tents
+    floor: 0.05,
     rand,
     heroes: 11,
     meteors: true,
@@ -234,6 +250,20 @@ export function createCamp(scene: Scene): Camp {
     }
     camPos.y -= groundDrop(camPos.x, camPos.z)
     camTgt.y -= groundDrop(camTgt.x, camTgt.z)
+  }
+
+  // ---- the weld. The camp asks its own world to breathe, watches which
+  // solids answer, and merges everything that did not move, per material:
+  // a fort is four hundred stakes and it should not be four hundred draws.
+  // Sprites, instanced fields and anything that moved keep their own draw.
+  {
+    const weld = WELD ? mergeStatic(root, (t) => {
+      fort.update(t, 0)
+      fires.update(t, camPos, 1)
+    }) : { before: 0, after: 0, moving: 0 }
+    console.log(
+      `[na] camp welded: ${weld.before} meshes -> ${weld.after} draws (${weld.moving} moving)`
+    )
   }
 
   function stationAt(t: number): number {
@@ -293,7 +323,11 @@ export function createCamp(scene: Scene): Camp {
       // the vista is a wide shot and the desk is a close one: the lens
       // opens as the overlook opens, and shuts inside the tent, because
       // sixty degrees at a hand's reach puts the codex in your lap
-      const base = narrow ? 50 : 46
+      // the gateway is a WIDE opening in a TALL frame: on a phone the lens
+      // closes through it so the arch fills the plate instead of floating
+      // in a screenful of dark timber (round 8)
+      const atGate = smoothstep(0.18, 0.3, walk) * (1 - smoothstep(0.44, 0.6, walk))
+      const base = (narrow ? 50 : 46) - (narrow ? 9 * atGate : 0)
       const wide = narrow ? 66 : 58
       const shut = narrow ? 42 : 40
       const inside = smoothstep(0.72, 0.79, walk) * (1 - smoothstep(0.83, 0.9, walk))
@@ -302,7 +336,9 @@ export function createCamp(scene: Scene): Camp {
         camera.fov = fov
         camera.updateProjectionMatrix()
       }
-      sparks.setLens(fov, typeof window === 'undefined' ? 900 : window.innerHeight)
+      const stageH = typeof window === 'undefined' ? 900 : window.innerHeight
+      sparks.setLens(fov, stageH)
+      motes.setLens(fov, stageH)
       sign.group.scale.setScalar(narrow ? 0.62 : 1)
       sign.group.position.copy(narrow ? SIGN_NARROW : SIGN_WIDE)
 
@@ -311,8 +347,14 @@ export function createCamp(scene: Scene): Camp {
         // a phone frame is tall, and a level rail hands it half a screen of
         // bare earth. The eye lifts a little and the target lifts more, so
         // the fort — not the ground in front of it — owns the frame.
+        //
+        // Except at the GATE. A 4.5 m arch six metres away cannot fit a tall
+        // frame, and lifting the eye there just fills it with lintel: the
+        // phone stands further back through the gateway instead, and lifts
+        // its gaze only once the arch is behind it (round 8).
         camPos.y += 0.16
-        camTgt.y += 0.92 + 1.6 * smoothstep(0.86, 1, walk)
+        camPos.z += 4.2 * atGate
+        camTgt.y += (0.92 - 0.62 * atGate) + 1.6 * smoothstep(0.86, 1, walk)
       }
       camera.position.copy(camPos)
       camera.lookAt(camTgt)

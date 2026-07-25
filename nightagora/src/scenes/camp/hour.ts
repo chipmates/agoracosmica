@@ -5,7 +5,7 @@
    in this camp reads its light out of the single block below, and the
    composition in index.ts owns every relationship.
 
-   THE HOUR ITSELF (Michel, 2026-07-25): his camp is a DAWN. The floor is
+   THE HOUR ITSELF (the founder's note, 2026-07-25): his camp is a DAWN. The floor is
    lifted so every detail reads — a camp lost in black is a camp nobody
    walks. Night is not a place on the walk, it is a place in the GAZE:
    look up and the sky deepens over you, look back down and his morning
@@ -112,7 +112,7 @@ export function place(x: number, y: number, z: number): Vector3 {
 // ------------------------------------------------------------ the uniforms
 export const uT = uniform(0)
 /** THE SKY'S HOUR: 0 = his lifted dawn, 1 = full night overhead. The gaze
-    drives it — look up and the night deepens over you (Michel's law). */
+    drives it — look up and the night deepens over you (the founder's law). */
 export const uNight = uniform(0)
 /** THE GROUND'S HOUR: the camp follows the sky only part of the way, so a
     raised gaze never costs you his morning. It reaches 1 only at the
@@ -121,7 +121,7 @@ export const uDeep = uniform(0)
 export const uReveal = uniform(0)
 export const uFlick = uniform(1)
 export const uGust = uniform(0)
-/** the value floor: how much skylight the world gets for free. Michel's
+/** the value floor: how much skylight the world gets for free. the founder's
     one note on camp-a was that it went too dark, so this is a real dial
     and not a constant buried in eight shaders. */
 export const uFloor = uniform(1)
@@ -154,7 +154,9 @@ export const FIRES: FireDef[] = [
   { id: 'brazier', p: [1.75, 1.05, 13.4], hex: '#ffa347', r: 5.2, ph: 1.7, amp: 0.22 },
   { id: 'torchL', p: [-2.35, 2.15, 4.5], hex: '#ff9a3c', r: 2.7, ph: 2.9, amp: 0.3 },
   { id: 'torchR', p: [2.35, 2.15, 4.5], hex: '#ff9a3c', r: 2.7, ph: 0.8, amp: 0.3 },
-  { id: 'campfire', p: [5.9, 0.42, -8.6], hex: '#ff9c42', r: 4.4, ph: 4.1, amp: 0.24 },
+  // ON its own body: the crossed-log fire stands at (-3.4, -11.2), and a
+  // light thrown from the far side of the via is a fire with no fire in it
+  { id: 'campfire', p: [-3.4, 0.42, -11.2], hex: '#ff9c42', r: 4.4, ph: 4.1, amp: 0.24 },
   { id: 'watchL', p: [-4.4, 5.5, 4.9], hex: '#ff8f3a', r: 2.1, ph: 5.2, amp: 0.26 },
   { id: 'watchR', p: [4.4, 5.5, 4.9], hex: '#ff8f3a', r: 2.1, ph: 3.3, amp: 0.26 },
   { id: 'lamp', p: [0.72, 0.92, -22.5], hex: '#ffcf86', r: 1.5, ph: 2.2, amp: 0.14 },

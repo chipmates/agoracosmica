@@ -3,7 +3,7 @@
    the identity, so shapes stay rigid while the whole sky breathes.
    Coordinates are patch-local: x right, y up, unit scaled by the scene.
 
-   Tradition + promise lines are Michel's locked copy (2026-07-20). */
+   Tradition + promise lines are the founder's locked copy (2026-07-20). */
 
 export interface ConstellationStar {
   slug: string

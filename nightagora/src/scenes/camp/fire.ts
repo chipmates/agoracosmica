@@ -334,6 +334,41 @@ export function createFires(rand: () => number): Fires {
   // from a side the doorway cannot serve
   pool(place(T.x, T.h - 0.15, T.z), 2.1, 1.5, 0.95)
 
+  // ------------------------------------------------- the fires of others
+  /* A legion is four hundred men, and the eight lights this camp can afford
+     to model are not all the fire in it. These are the ones burning between
+     the tent rows and along the rampart: far enough to be a glow and never
+     a body, and the reason the fort reads as occupied instead of staged. */
+  const farTex = glowTexture(rand, [
+    [0, 'rgba(226,150,74,0.30)'],
+    [0.4, 'rgba(150,86,34,0.09)'],
+    [1, 'rgba(0,0,0,0)'],
+  ])
+  const others: Array<{ mat: SpriteMaterial; k: number; ph: number }> = []
+  for (const [x, y, z, k] of [
+    [8.6, 0.35, -3.4, 0.9],
+    [-8.2, 0.35, -6.2, 0.8],
+    [10.4, 0.35, -14.8, 0.7],
+    [-9.8, 0.35, -16.4, 0.62],
+    [6.4, 0.3, -25.8, 0.5],
+    [-11.9, 4.9, -28.2, 0.42],
+    [12.6, 1.2, -9.4, 0.36],
+  ] as Array<[number, number, number, number]>) {
+    const mat = new SpriteMaterial({
+      map: farTex,
+      blending: AdditiveBlending,
+      depthWrite: false,
+      transparent: true,
+      opacity: 0,
+    })
+    const s = new Sprite(mat)
+    s.position.copy(place(x, y, z))
+    s.scale.set(2.4 * k + 0.9, 1.5 * k + 0.5, 1)
+    s.renderOrder = 23
+    add(s)
+    others.push({ mat, k, ph: rand() * 6.28 })
+  }
+
   // ------------------------------------------------------------ the marks
   const markTex = glowTexture(rand, [
     [0, 'rgba(255,240,200,1)'],
@@ -371,6 +406,10 @@ export function createFires(rand: () => number): Fires {
     update(t, camPos, reveal) {
       for (const fl of flames) fl.f.update(t, fl.pos, camPos, fl.mirrorY)
       for (const p of pools) p.mat.opacity = reveal * (0.26 + 0.16 * uFlick.value) * p.k
+      // the other fires keep their own time: a camp does not breathe in unison
+      for (const o of others)
+        o.mat.opacity =
+          reveal * o.k * (0.30 + 0.13 * Math.sin(t * 3.1 + o.ph) + 0.07 * Math.sin(t * 7.7 + o.ph * 2))
       // the marks pulse like the sky's stars, and step back while a trace
       // holds the frame
       marks.forEach((m, i) => {

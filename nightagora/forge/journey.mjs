@@ -121,7 +121,7 @@ try {
   await shot('sky')
 
   // 4 · the first night rides the rail: scroll opens Marcus, scroll
-  // again enters his cosmos (zero taps, Michel's law)
+  // again enters his cosmos (zero taps, the founder's law)
   await page.waitForTimeout(1200)
   await wheel(300, 1)
   await page.waitForTimeout(1400)
@@ -222,7 +222,19 @@ try {
         }
       }
     } catch {
-      console.log('[journey] the way home to the council never opened')
+      // a stuck way home is worth a diagnosis, not just a screenshot
+      const k = await page.evaluate(() => {
+        const host = document.getElementById('keeper')
+        const exit = host?.querySelector('.keeper-exit')
+        return {
+          keeperHidden: host?.hidden,
+          mode: host?.dataset.mode,
+          exitInDom: Boolean(exit),
+          exitHidden: exit?.hidden,
+          exitText: exit?.textContent?.trim(),
+        }
+      })
+      console.log('[journey] the way home to the council never opened', JSON.stringify(k))
       await shot('STUCK-way-home')
     }
   }

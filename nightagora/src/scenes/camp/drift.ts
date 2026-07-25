@@ -30,8 +30,10 @@ import {
   cameraViewMatrix,
   clamp,
   cos,
+  dot,
   float,
   fract,
+  length,
   max,
   min,
   mix,
@@ -48,7 +50,18 @@ import {
   vec3,
   vec4,
 } from './tsl'
-import { dither, fbm3, planetize, uDeep, uGust, uReveal, uT } from './hour'
+import {
+  dither,
+  fbm3,
+  fireRadU,
+  FIRES,
+  firePosU,
+  planetize,
+  uDeep,
+  uGust,
+  uReveal,
+  uT,
+} from './hour'
 
 function quadGeo(n: number): InstancedBufferGeometry {
   const g = new InstancedBufferGeometry()
@@ -297,6 +310,83 @@ export function createGrass(opts: { count: number; rand(): number }): Drift {
   return { mesh }
 }
 
+// -------------------------------------------------------------- the motes
+/* THE AIR ITSELF. A night camp is not a vacuum: chaff off the thatch, ash,
+   river damp, the dust four hundred men raise walking. It is invisible
+   until a fire finds it, which is exactly the point — the motes are how
+   you SEE that the fires throw light through air, and they are what makes
+   the ground between the tents feel occupied rather than empty. */
+export function createMotes(opts: { count: number; rand(): number }): Sparks {
+  const { count, rand } = opts
+  const iPos = new Float32Array(count * 3)
+  const iSeed = new Float32Array(count * 4)
+  for (let i = 0; i < count; i++) {
+    // gathered along the walk, where the eye actually travels
+    const z = 16 - Math.pow(rand(), 0.75) * 42
+    iPos[i * 3] = (rand() - 0.5) * 22
+    iPos[i * 3 + 1] = 0.15 + Math.pow(rand(), 1.6) * 3.4
+    iPos[i * 3 + 2] = z
+    iSeed[i * 4] = 0.04 + rand() * 0.07
+    iSeed[i * 4 + 1] = rand() * 6.28
+    iSeed[i * 4 + 2] = 0.5 + rand() * 1.4
+    iSeed[i * 4 + 3] = rand()
+  }
+  const geo = quadGeo(count)
+  geo.setAttribute('iPos', new InstancedBufferAttribute(iPos, 3))
+  geo.setAttribute('iSeed', new InstancedBufferAttribute(iSeed, 4))
+
+  const uPx = uniform(0.001)
+  const mat = new MeshBasicNodeMaterial()
+  mat.transparent = true
+  mat.depthWrite = false
+  mat.blending = AdditiveBlending
+
+  const pos = attribute('iPos', 'vec3')
+  const seed = attribute('iSeed', 'vec4')
+  // a mote does not fall and it does not fly: it wanders, and the gust
+  // carries it a little way downwind
+  const t = uT.mul(seed.x).add(seed.y)
+  const w = vec3(
+    pos.x.add(sin(t).mul(0.9)).add(uGust.mul(1.6)),
+    pos.y.add(sin(t.mul(0.61).add(1.7)).mul(0.32)),
+    pos.z.add(cos(t.mul(0.83)).mul(0.7))
+  )
+  // it is invisible until a fire finds it: one cheap warm term over the
+  // same eight lights every surface reads
+  let warm: N = float(0)
+  for (let i = 0; i < FIRES.length; i++) {
+    const posU = firePosU[i]
+    const radU = fireRadU[i]
+    if (!posU || !radU) continue
+    const d = posU.sub(w)
+    warm = warm.add(radU.div(dot(d, d).mul(1.6).add(2.2)))
+  }
+  const lit = min(warm, 1.6)
+  const twinkle = sin(uT.mul(seed.z.mul(1.7)).add(seed.w.mul(24))).mul(0.3).add(0.7)
+  const alpha = lit.mul(0.16).mul(twinkle).mul(uReveal)
+  const size = float(2.4).add(seed.w.mul(2.2))
+  const mv = cameraViewMatrix.mul(vec4(w, 1))
+  const px = size.mul(uPx).mul(max(mv.z.negate(), 1))
+  mat.vertexNode = cameraProjectionMatrix.mul(
+    vec4(mv.x.add(positionLocal.x.mul(px)), mv.y.add(positionLocal.y.mul(px)), mv.z, mv.w)
+  )
+  const vUv: N = varying(positionLocal.xy)
+  const vA: N = varying(alpha)
+  const d2 = vUv.length()
+  mat.colorNode = vec3(0.62, 0.44, 0.22)
+  mat.opacityNode = min(smoothstep(1.0, 0.0, d2).mul(vA), 1)
+
+  const mesh = new Mesh(geo, mat)
+  mesh.frustumCulled = false
+  mesh.renderOrder = 21
+  return {
+    mesh,
+    setLens(fovDeg, height) {
+      uPx.value = Math.tan((fovDeg * Math.PI) / 360) / Math.max(200, height)
+    },
+  }
+}
+
 // ------------------------------------------------------------ the breath
 export function createBreath(opts: {
   anchors: Array<{ p: Vector3; dir: number }>
@@ -331,9 +421,14 @@ export function createBreath(opts: {
 
   const vUv: N = varying(positionLocal.xy)
   const vP: N = varying(p)
+  // A BREATH IS A NEAR THING. Warm air disperses in a metre or two, and
+  // from the overlook these puffs were reading as pale discs floating over
+  // the tents. It exists where you could hear the man breathing.
+  const vNear: N = varying(smoothstep(22.0, 7.0, length(cameraPosition.sub(w))))
   const d = vUv.length()
   const a = smoothstep(1.0, 0.15, d)
     .mul(uReveal)
+    .mul(vNear)
     .mul(smoothstep(0.0, 0.06, vP))
     .mul(oneMinus(smoothstep(0.16, 0.55, vP)))
     .mul(0.5)

@@ -80,7 +80,7 @@ export const COLOPHON = 'An AI Echo · An interpretation, not a recording'
 export const CARRIED_QUESTION_KEY = 'na-carried-question'
 
 /** The agora sitting, assembled. */
-/** The hub keeper (guided first night, Michel 2026-07-20): one greeting,
+/** The hub keeper (guided first night, the founder, 2026-07-20): one greeting,
     one invitation. The full exchange lives at his hearth in his world. */
 export const FIRE_SCRIPT: KeeperScript = {
   name: KEEPER_NAME,
@@ -128,4 +128,8 @@ export const CAMP_SCRIPT: KeeperScript = {
   codaText: 'The night is turning. The others are gathering at the great fire, and a question like yours deserves many voices.',
   codaGold: 'Walk back with me.',
   exit: 'Return to the agora fire',
+  // his ground is WALKED now, and a visitor who reaches his tent and wants
+  // to go back must be able to: the way home is not a reward for two
+  // exchanges. The coda still comes when the sitting has run its course.
+  exitImmediate: true,
 }

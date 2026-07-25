@@ -272,7 +272,7 @@ export function createSign(opts: SignOptions): Sign {
       const breathe = 1 + 0.05 * Math.sin(elapsed * (0.8 + s.phase * 0.1) + s.phase) * Math.min(1, L)
       // the language of the five stages, continuous. Even the ember
       // stage must be RECOGNIZABLE as a seed against the firmament
-      // (Michel, first-night law): warmer, a breath stronger, and
+      // (the founder, first-night law): warmer, a breath stronger, and
       // ringed by a barely-lit mark from night one.
       s.core.scale.setScalar((0.36 + 0.1 * L) * breathe)
       s.coreMat.color.copy(scratch.copy(EMBER).lerp(STARLIGHT, Math.min(1, L / 2.2)))
