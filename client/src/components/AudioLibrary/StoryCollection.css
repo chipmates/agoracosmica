@@ -114,10 +114,12 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-sm);
-  color: var(--text-secondary);
-  font-size: var(--text-base); /* 2025 MINIMALISM: Same size as story titles (Notion/Linear pattern) */
+  color: var(--text-tertiary);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
   font-family: var(--font-ui);
-  opacity: 0.9;
 }
 
 
@@ -209,6 +211,7 @@
   padding: var(--space-sm) 0; /* Vertical only - parent provides horizontal */
   margin: 0;
   border-radius: 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--star-blue-light) 8%, transparent);
   transition: all var(--transition-fast);
   cursor: pointer;
   position: relative;
@@ -232,9 +235,6 @@
 
 .story-item--played {
   /* Played state styling moved to individual element rules for better control */
-  .story-item__duration {
-    opacity: 0.7;
-  }
 }
 
 .story-item--disabled {
@@ -273,6 +273,9 @@
 
 .story-item__index {
   font-variant-numeric: tabular-nums;
+  font-family: var(--font-content, 'Libre Caslon Text', serif);
+  font-size: 1rem;
+  color: var(--text-tertiary);
 }
 
 .story-item__play-btn {
@@ -315,7 +318,7 @@
 }
 
 .story-item__check {
-  color: var(--semantic-success);
+  color: var(--gold-primary); /* collected, not spent — gilded like the atlas */
 }
 
 .story-item__in-progress {
@@ -374,10 +377,10 @@
   font-weight: var(--weight-semibold);
 }
 
-/* Played state: Maintain gray but with reduced opacity for visual hierarchy */
+/* Played state: full-strength text — listened reads as collected, never
+   as disabled. The gilded check in the number cell carries the state. */
 .story-item--played .story-item__title {
   color: var(--text-secondary);
-  opacity: 0.7;
 }
 
 .story-item__subtitle {
@@ -424,9 +427,10 @@
   transition: width 0.3s ease;
 }
 
-.story-progress-fill--completed {
-  background: var(--gold-subtle);
-  box-shadow: 0 0 6px color-mix(in srgb, var(--gold-subtle) 40%, transparent);
+/* Completed rows show the gilded check instead — a 100% bar under every
+   finished story just stripes the list with redundant gold. */
+.story-progress-track--completed {
+  display: none;
 }
 
 /* ===================================

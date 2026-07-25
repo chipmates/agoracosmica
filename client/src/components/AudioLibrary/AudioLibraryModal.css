@@ -330,10 +330,22 @@ body.audio-library-open {
 }
 
 .audio-library__figure-item--selected .audio-library__figure-name {
-  color: var(--gold-light, var(--gold-vibrant));
-  font-weight: 600;
+  color: var(--gold-primary);
+  font-weight: 500;
   letter-spacing: 0.2px;
-  text-shadow: 0 0 5px color-mix(in srgb, var(--gold-soft, var(--gold-subtle)) 50%, transparent);
+}
+
+/* ============================================================
+   PLATE LAYER (2026-07-24 lift): the title is engraved Caslon
+   caps (cartouche-name treatment), no glow, no cosmic stars.
+   ============================================================ */
+.audio-library > [role="group"] h1,
+.audio-library > [role="group"] h2 {
+  font-family: var(--font-content, 'Libre Caslon Text', serif);
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  color: var(--gold-primary); /* headers stay golden app-wide */
+  text-shadow: none;
 }
 
 /* ========================================

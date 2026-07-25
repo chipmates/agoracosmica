@@ -414,7 +414,7 @@ const AudioLibraryModal: FC<AudioLibraryModalProps> = ({
                 title={tString('audioLibrary.title', 'STORIES')}
                 onClose={handleClose}
                 closeAriaLabel="Close audio library"
-                cosmicStars={true}
+                cosmicStars={false}
               />
             )}
 
