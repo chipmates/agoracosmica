@@ -89,7 +89,7 @@ export const FactCheckModal: FC<FactCheckModalProps> = ({
         </div>
         <div className="factcheck-modal__error">
           <Info size={32} />
-          <p>No factcheck data available for this figure.</p>
+          <p>{tString('factCheck.noData', 'No factcheck data available for this figure.')}</p>
         </div>
       </div>
     );
@@ -164,8 +164,7 @@ export const FactCheckModal: FC<FactCheckModalProps> = ({
                 ((figureName || figure.name).includes('Mark Aurel')
                   ? 'Mark Aurel'
                   : (figureName || figure.name).split(' ').pop()) ?? ''
-              )
-              .toUpperCase()}
+              )}
           </h1>
           <p className="factcheck-modal__subtitle">
             {figure.name} ({figure.dates})

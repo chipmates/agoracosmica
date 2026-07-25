@@ -11,15 +11,14 @@
   overflow: hidden;
 }
 
-/* Header */
+/* Header: the night ladder with one gold hairline (atlas chrome) */
 .factcheck-modal__header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   padding: 1rem 1.5rem;
-  border-bottom: 1px solid color-mix(in srgb, var(--gold-subtle) 20%, transparent);
-  background: color-mix(in srgb, var(--bg-secondary) 80%, transparent);
-  backdrop-filter: blur(var(--glass-blur-heavy));
+  border-bottom: 1px solid color-mix(in srgb, var(--gold-deep) 38%, transparent);
+  background: var(--bg-primary);
   flex-shrink: 0;
 }
 
@@ -33,16 +32,20 @@
 }
 
 .factcheck-modal__title {
+  font-family: var(--font-content);
   font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--gold-subtle);
+  font-weight: 400;
+  color: var(--gold-primary);
   margin: 0;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.02em;
+  text-transform: none;
 }
 
 .factcheck-modal__subtitle {
+  font-family: var(--font-content);
+  font-style: italic;
   font-size: 0.9rem;
-  color: var(--text-secondary);
+  color: var(--text-tertiary);
   margin: 0;
 }
 
@@ -88,39 +91,55 @@
   color: var(--text-secondary);
 }
 
-/* Sections */
+/* Sections as plate cards: square-cut hairline frames, kicker titles,
+   Caslon reading prose (atlas card language, 2026-07-24) */
 .factcheck-section {
-  background: color-mix(in srgb, var(--bg-secondary) 50%, transparent);
-  border-radius: 12px;
+  background: color-mix(in srgb, var(--bg-card) 45%, transparent);
+  border-radius: 3px;
   padding: 1rem 1.25rem;
-  border: 1px solid color-mix(in srgb, var(--gold-subtle) 15%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 26%, transparent);
 }
 
-.factcheck-section--highlight {
-  background: color-mix(in srgb, var(--gold-subtle) 8%, var(--bg-secondary));
-  border-color: color-mix(in srgb, var(--gold-subtle) 25%, transparent);
-}
-
+.factcheck-section--highlight,
 .factcheck-section--note {
-  background: color-mix(in srgb, var(--gold-subtle) 8%, var(--bg-secondary));
-  border-color: color-mix(in srgb, var(--gold-subtle) 25%, transparent);
+  position: relative;
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--bg-card) 94%, var(--gold-deep)) 0%,
+    var(--bg-primary) 90%
+  );
+  border-color: color-mix(in srgb, var(--gold-deep) 42%, transparent);
+}
+
+.factcheck-section--highlight::before,
+.factcheck-section--note::before {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  pointer-events: none;
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 16%, transparent);
 }
 
 .factcheck-section__title {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--gold-subtle);
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--gold-deep) 85%, var(--text-tertiary));
   margin: 0 0 0.75rem 0;
 }
 
 .factcheck-section__text {
-  font-size: 0.95rem;
-  line-height: 1.6;
+  font-family: var(--font-content);
+  font-size: 1rem;
+  line-height: 1.65;
   color: var(--text-primary);
   margin: 0;
+  text-align: left;
 }
 
 /* Collapsible toggle */
@@ -132,9 +151,12 @@
   padding: 0;
   background: none;
   border: none;
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--gold-subtle);
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold-primary);
   cursor: pointer;
   text-align: left;
   min-height: 44px; /* WCAG touch target */
@@ -145,15 +167,15 @@
 }
 
 .factcheck-section__toggle:focus-visible {
-  outline: 2px solid var(--gold-subtle);
-  outline-offset: 2px;
-  border-radius: 4px;
+  outline: 1.5px dashed var(--gold-primary);
+  outline-offset: 4px;
 }
 
 .factcheck-section__count {
   font-weight: 400;
-  color: var(--text-secondary);
-  font-size: 0.9rem;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+  font-size: 0.78rem;
 }
 
 .factcheck-section__toggle svg:last-child {
@@ -301,9 +323,9 @@
 
 .factcheck-story-card {
   background: color-mix(in srgb, var(--bg-primary) 60%, transparent);
-  border-radius: 10px;
+  border-radius: 3px;
   padding: 1rem;
-  border: 1px solid color-mix(in srgb, var(--gold-subtle) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 24%, transparent);
 }
 
 /* Story card toggle */
@@ -326,9 +348,8 @@
 }
 
 .factcheck-story-card__toggle:focus-visible {
-  outline: 2px solid var(--gold-subtle);
-  outline-offset: 2px;
-  border-radius: 4px;
+  outline: 1.5px dashed var(--gold-primary);
+  outline-offset: 4px;
 }
 
 .factcheck-story-card__toggle > svg {
@@ -348,17 +369,19 @@
 
 .factcheck-story-card__number {
   display: block;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--gold-subtle);
+  font-family: var(--font-ui);
+  font-size: 0.66rem;
+  font-weight: 500;
+  color: color-mix(in srgb, var(--gold-deep) 85%, var(--text-tertiary));
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.2em;
   margin-bottom: 0.25rem;
 }
 
 .factcheck-story-card__title {
-  font-size: 1rem;
-  font-weight: 600;
+  font-family: var(--font-content);
+  font-size: 1.05rem;
+  font-weight: 400;
   color: var(--text-primary);
   margin: 0;
 }

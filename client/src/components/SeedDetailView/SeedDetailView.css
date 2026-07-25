@@ -22,10 +22,13 @@
   overflow-x: hidden;
   scroll-behavior: smooth;
 
-  /* Styling */
+  /* Styling. text-align anchors the inheritance chain: the reading room
+     is excluded from the app-wide justify rule (index.css), so everything
+     inside resolves to left unless a block centers itself. */
   background: var(--bg-primary);
   color: var(--text-primary);
   font-family: var(--font-ui);
+  text-align: left;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
@@ -50,6 +53,8 @@
    COSMIC HEADER (Desktop Only)
    ======================================== */
 
+/* The reading room opens like a plate: night ladder, one gold hairline,
+   Caslon gold title (atlas chrome, 2026-07-24) */
 .seed-detail-view .cosmic-header {
   position: relative;
   text-align: center;
@@ -59,31 +64,16 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border-bottom: 2px solid color-mix(in srgb, var(--gold-subtle) 30%, transparent);
-  background: linear-gradient(
-    180deg,
-    rgba(21, 28, 71, 0.8) 0%,
-    rgba(21, 28, 71, 0.4) 100%
-  );
-  backdrop-filter: blur(var(--glass-blur-heavy));
+  border-bottom: 1px solid color-mix(in srgb, var(--gold-deep) 38%, transparent);
+  background: var(--bg-primary);
 }
 
 .seed-detail-view .figure-name-cosmic {
-  font-family: var(--font-ui);
+  font-family: var(--font-content);
   font-size: var(--text-2xl);
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  background: linear-gradient(
-    135deg,
-    var(--gold-primary) 0%,
-    var(--gold-subtle) 50%,
-    var(--gold-primary) 100%
-  );
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 20px rgba(230, 188, 92, 0.3));
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: var(--gold-primary);
   margin: 0;
 }
 
@@ -95,16 +85,14 @@
   position: sticky;
   top: 0;
   z-index: 100;
-  background: var(--bg-astral);
-  border-bottom: 1px solid color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+  background: var(--bg-primary);
+  border-bottom: 1px solid color-mix(in srgb, var(--gold-deep) 38%, transparent);
   padding: 1rem 1.5rem;
-  backdrop-filter: blur(var(--glass-blur-heavy));
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
   flex-wrap: wrap;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 /* Navigation button container for organized layout */
@@ -123,41 +111,46 @@
   margin-right: 0.5rem;
 }
 
+/* Navigation pills per the button doctrine: hairline, selection = gilded
+   ink, the plate never levitates. Focus = the engraver's dashed ring. */
 .seed-detail-view .seed-nav-button {
   min-width: 44px;
   height: 44px;
   padding: 0;
-  background: color-mix(in srgb, var(--gold-subtle) 10%, transparent);
-  border: 1px solid color-mix(in srgb, var(--gold-subtle) 25%, transparent);
-  border-radius: 8px;
-  color: var(--text-secondary);
+  background: none;
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 32%, transparent);
+  border-radius: 999px;
+  color: var(--text-tertiary);
   font-family: var(--font-ui);
   font-size: var(--text-base);
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background 0.22s ease, border-color 0.22s ease, color 0.22s ease,
+    transform 0.09s ease;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .seed-detail-view .seed-nav-button:hover {
-  background: color-mix(in srgb, var(--gold-subtle) 20%, transparent);
-  border-color: color-mix(in srgb, var(--gold-subtle) 40%, transparent);
+  border-color: color-mix(in srgb, var(--gold-primary) 60%, transparent);
   color: var(--gold-primary);
-  transform: translateY(-1px);
+}
+
+.seed-detail-view .seed-nav-button:active {
+  transform: translateY(1px);
 }
 
 .seed-detail-view .seed-nav-button.active {
-  background: var(--gold-subtle);
-  border-color: var(--gold-primary);
-  color: var(--bg-primary);
-  font-weight: 700;
+  background: color-mix(in srgb, var(--gold-subtle) 15%, transparent);
+  border-color: color-mix(in srgb, var(--gold-primary) 80%, transparent);
+  color: var(--gold-primary);
+  font-weight: 600;
 }
 
 .seed-detail-view .seed-nav-button:focus-visible {
-  outline: 2px solid var(--gold-primary);
-  outline-offset: 2px;
+  outline: 1.5px dashed var(--gold-primary);
+  outline-offset: 4px;
 }
 
 /* ========================================
@@ -277,24 +270,36 @@
    QUOTE CONTAINER - Enhanced Visual Framing
    ======================================== */
 
+/* The quote reads like a framed plate inscription: hairline frame with
+   an inner keyline, square-cut corners (atlas card language) */
 .seed-detail-view .quote-container {
+  position: relative;
   text-align: center;
   margin: 0 auto 3rem;
   max-width: 800px;
-  padding: 3rem 2.5rem; /* Slightly less horizontal padding */
+  padding: 3rem 2.5rem;
   background: linear-gradient(
     135deg,
     color-mix(in srgb, var(--gold-subtle) 3%, transparent),
     color-mix(in srgb, var(--gold-subtle) 6%, transparent)
   );
-  border-radius: 12px;
-  border: 1px solid color-mix(in srgb, var(--gold-subtle) 12%, transparent);
+  border-radius: 3px;
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 30%, transparent);
+}
+
+.seed-detail-view .quote-container::before {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  pointer-events: none;
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 16%, transparent);
 }
 
 .seed-detail-view .quote-mark {
+  font-family: var(--font-content);
   font-size: 4rem;
-  color: var(--gold-primary);
-  opacity: 0.4;
+  color: color-mix(in srgb, var(--gold-deep) 85%, transparent);
+  opacity: 0.55;
   line-height: 0.5;
 }
 
@@ -340,27 +345,30 @@
   gap: 0;
 }
 
+/* Eyebrow + title in the note's language: tracked small-caps kicker,
+   Caslon regular title (atlas card language) */
 .seed-detail-view .detail-seed-number {
   display: block;
-  font-size: clamp(0.8rem, 0.75rem + 0.35vw, 0.9rem); /* Slightly larger for impact */
-  color: var(--gold-primary);
-  font-weight: 700;
-  letter-spacing: 0.15em;
+  font-family: var(--font-ui);
+  font-size: 0.7rem;
+  color: color-mix(in srgb, var(--gold-deep) 85%, var(--text-tertiary));
+  font-weight: 500;
+  letter-spacing: 0.26em;
+  text-indent: 0.26em;
   text-transform: uppercase;
-  margin-bottom: 0.75rem; /* Increased from 0.5rem */
+  margin-bottom: 0.75rem;
   text-align: center;
-  opacity: 0.95; /* Subtle luminance */
-  text-shadow: 0 0 12px rgba(230, 188, 92, 0.25); /* Subtle cosmic glow */
 }
 
 .seed-detail-view .detail-seed-title {
   display: block;
+  font-family: var(--font-content);
   font-size: var(--text-3xl);
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-weight: 400;
+  letter-spacing: 0;
   line-height: 1.25;
   color: var(--text-primary);
-  margin-bottom: 1.75rem; /* Increased from 1.5rem - more breathing room */
+  margin-bottom: 1.75rem;
   margin-top: 0;
   text-align: center;
 }
@@ -378,26 +386,24 @@
   margin-bottom: 2.5rem; /* Increased from 2rem - clearer transition to content */
 }
 
+/* Tags as hairline marginalia chips: quiet ink, no plastic depth,
+   nothing levitates */
 .seed-detail-view .detail-tag {
   display: inline-block;
-  padding: 0.35rem 0.75rem;
-  background: color-mix(in srgb, var(--gold-subtle) 12%, transparent);
-  border: 1px solid color-mix(in srgb, var(--gold-subtle) 30%, transparent);
-  border-radius: 16px;
-  font-size: var(--text-xs);
-  color: var(--gold-primary);
+  padding: 0.35rem 0.85rem;
+  background: none;
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 32%, transparent);
+  border-radius: 999px;
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
   font-weight: 500;
-  letter-spacing: 0.02em;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); /* Subtle depth */
+  letter-spacing: 0.08em;
+  transition: border-color 0.22s ease, color 0.22s ease;
 }
 
 .seed-detail-view .detail-tag:hover {
-  background: color-mix(in srgb, var(--gold-subtle) 18%, transparent);
-  border-color: color-mix(in srgb, var(--gold-subtle) 45%, transparent);
-  color: var(--gold-hover);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Enhanced depth on hover */
-  transform: translateY(-1px); /* Subtle lift */
+  border-color: color-mix(in srgb, var(--gold-primary) 60%, transparent);
+  color: var(--gold-primary);
 }
 
 /* ========================================
@@ -485,23 +491,26 @@
    SECTION HEADINGS
    ======================================== */
 
+/* Section headings as plate kickers (atlas card language, matches the
+   Fakten sections): tracked small caps in quiet gold-deep ink. */
 .seed-detail-view .section-heading {
-  font-size: var(--text-xl);
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 1.75rem; /* Increased from 1.5rem */
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--gold-deep) 85%, var(--text-tertiary));
+  margin-bottom: 1.5rem;
   margin-top: 0;
   display: flex;
   align-items: center;
-  gap: 0.75rem; /* Tighter icon-to-text gap */
-  letter-spacing: 0.01em; /* Subtle openness */
+  gap: 0.6rem;
 }
 
 .seed-detail-view .section-icon {
-  font-size: 1.3em;
-  color: var(--gold-primary);
-  opacity: 0.95; /* Subtle luminance */
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1)); /* Micro-depth */
+  width: 17px;
+  height: 17px;
+  color: color-mix(in srgb, var(--gold-deep) 90%, var(--text-tertiary));
 }
 
 /* ========================================
@@ -550,19 +559,27 @@
    FEATURED CONNECTION - Elevated
    ======================================== */
 
+/* Featured connection as a warm plate card: hairline frame with inner
+   keyline, no shadow theatre, nothing levitates. */
 .seed-detail-view .featured-connection {
-  background: color-mix(in srgb, var(--gold-subtle) 12%, transparent);
-  border-radius: 12px;
+  position: relative;
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--bg-card) 94%, var(--gold-deep)) 0%,
+    var(--bg-primary) 90%
+  );
+  border-radius: 3px;
   padding: 2rem;
   margin: 3rem 0;
-  border: 2px solid color-mix(in srgb, var(--gold-subtle) 30%, transparent);
-  box-shadow: 0 8px 24px color-mix(in srgb, var(--gold-subtle) 20%, transparent);
-  transition: all 0.3s ease;
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 42%, transparent);
 }
 
-.seed-detail-view .featured-connection:hover {
-  box-shadow: 0 12px 32px color-mix(in srgb, var(--gold-subtle) 30%, transparent);
-  transform: translateY(-2px);
+.seed-detail-view .featured-connection::before {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  pointer-events: none;
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 16%, transparent);
 }
 
 .seed-detail-view .connection-header {
@@ -639,13 +656,14 @@
 }
 
 .seed-detail-view .source-category-title {
-  font-size: var(--text-sm);
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--gold-primary);
+  letter-spacing: 0.2em;
+  color: color-mix(in srgb, var(--gold-deep) 85%, var(--text-tertiary));
   margin-bottom: 1rem;
   margin-top: 0;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .seed-detail-view .source-list {
@@ -839,47 +857,54 @@
   margin: 3rem 0;
 }
 
+/* Collapsible toggles as engraved plate rows: hairline frame, kicker
+   label, no scaling on hover (the plate never levitates). */
 .seed-detail-view .section-toggle {
   width: 100%;
-  background: color-mix(in srgb, var(--bg-highlight) 30%, transparent);
-  border: 1px solid color-mix(in srgb, var(--gold-subtle) 20%, transparent);
-  border-radius: 12px;
-  padding: 1.5rem 2rem;
-  color: var(--text-primary);
+  background: color-mix(in srgb, var(--bg-card) 45%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 26%, transparent);
+  border-radius: 3px;
+  padding: 1.25rem 1.75rem;
+  color: var(--gold-primary);
   font-family: var(--font-ui);
-  font-size: var(--text-base);
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  transition: all 0.25s ease;
+  transition: background 0.22s ease, border-color 0.22s ease, color 0.22s ease;
   text-align: left;
   min-height: 44px;
 }
 
 .seed-detail-view .section-toggle:hover {
-  background: color-mix(in srgb, var(--bg-highlight) 50%, transparent);
-  border-color: color-mix(in srgb, var(--gold-subtle) 40%, transparent);
-  transform: scale(1.01);
+  background: color-mix(in srgb, var(--bg-card) 65%, transparent);
+  border-color: color-mix(in srgb, var(--gold-primary) 50%, transparent);
+  color: var(--gold-hover);
 }
 
 .seed-detail-view .section-toggle:focus-visible {
-  outline: 2px solid var(--gold-primary);
-  outline-offset: 2px;
+  outline: 1.5px dashed var(--gold-primary);
+  outline-offset: 4px;
 }
 
 .seed-detail-view .toggle-label {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .seed-detail-view .toggle-count {
-  color: var(--text-secondary);
-  font-size: var(--text-sm);
+  color: var(--text-tertiary);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
   margin-left: 0.5rem;
-  font-weight: 500;
+  font-weight: 400;
+  text-transform: none;
 }
 
 .seed-detail-view .toggle-icon {
@@ -913,19 +938,20 @@
 
 .seed-detail-view .related-connections-inner {
   background: color-mix(in srgb, var(--gold-subtle) 5%, transparent);
-  border-radius: 12px;
+  border-radius: 3px;
   padding: 2rem;
-  border: 1px solid color-mix(in srgb, var(--gold-subtle) 15%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 24%, transparent);
 }
 
 .seed-detail-view .related-heading {
-  font-size: var(--text-sm);
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-secondary);
+  letter-spacing: 0.2em;
+  color: color-mix(in srgb, var(--gold-deep) 85%, var(--text-tertiary));
   margin-bottom: 1.5rem;
   margin-top: 0;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .seed-detail-view .related-connection {

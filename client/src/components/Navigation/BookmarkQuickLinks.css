@@ -21,11 +21,13 @@
   cursor: pointer;
   pointer-events: auto;
   
-  /* Simple solid bookmark on blue background */
-  background: var(--bg-secondary);
-  border: 1px solid color-mix(in srgb, var(--utility-pure-white) 10%, transparent);
+  /* Plate doctrine (2026-07-24): bookmarks stay bookmarks (the shape is
+     the library's own metaphor) but trade solid slabs for gilded ink —
+     mode tint + mode-colored label instead of color blocks. */
+  background: color-mix(in srgb, var(--gold-subtle) 14%, var(--bg-primary));
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 40%, transparent);
   border-bottom: none;
-  border-radius: 10px 10px 0 0;
+  border-radius: 4px 4px 0 0;
   box-shadow: 0 -2px 4px color-mix(in srgb, var(--utility-pure-black) 20%, transparent);
   
   /* No transitions needed */
@@ -75,53 +77,54 @@
 
 /* Dynamic color variants for modes */
 .bookmark-tab.bookmark-purple {
-  background: color-mix(in srgb, var(--mode-wisdom-active) 85%, transparent);
+  background: color-mix(in srgb, var(--mode-wisdom-active) 22%, var(--bg-primary));
   border-right: 3px solid var(--mode-wisdom);
 }
 
 .bookmark-tab.bookmark-purple .bookmark-icon,
 .bookmark-tab.bookmark-purple .bookmark-label {
-  color: var(--bg-primary);
+  color: var(--mode-wisdom-hover);
 }
 
 .bookmark-tab.bookmark-orange {
-  background: color-mix(in srgb, var(--mode-quest) 85%, transparent);
+  background: color-mix(in srgb, var(--mode-quest) 22%, var(--bg-primary));
   border-right: 3px solid var(--mode-quest-active);
 }
 
 .bookmark-tab.bookmark-orange .bookmark-icon,
 .bookmark-tab.bookmark-orange .bookmark-label {
-  color: var(--bg-primary);
+  color: var(--mode-quest-hover);
 }
 
 .bookmark-tab.bookmark-green {
-  background: color-mix(in srgb, var(--mode-freetalk-active) 85%, transparent);
+  background: color-mix(in srgb, var(--mode-freetalk-active) 22%, var(--bg-primary));
   border-right: 3px solid var(--mode-freetalk);
 }
 
 .bookmark-tab.bookmark-green .bookmark-icon,
 .bookmark-tab.bookmark-green .bookmark-label {
-  color: var(--bg-primary);
+  color: var(--mode-freetalk-hover);
 }
 
 .bookmark-tab.bookmark-blue {
-  background: color-mix(in srgb, var(--mode-prism-active) 85%, transparent);
+  background: color-mix(in srgb, var(--mode-prism-active) 22%, var(--bg-primary));
   border-right: 3px solid var(--mode-prism);
 }
 
 .bookmark-tab.bookmark-blue .bookmark-icon,
 .bookmark-tab.bookmark-blue .bookmark-label {
-  color: var(--bg-primary);
+  color: var(--mode-prism-hover);
 }
 
 /* History bookmark - always gold */
 .bookmark-tab.bookmark-gold {
-  background: color-mix(in srgb, var(--gold-subtle) 85%, transparent);
+  background: color-mix(in srgb, var(--gold-subtle) 16%, var(--bg-primary));
+  border-color: color-mix(in srgb, var(--gold-primary) 55%, transparent);
 }
 
 .bookmark-tab.bookmark-gold .bookmark-icon,
 .bookmark-tab.bookmark-gold .bookmark-label {
-  color: var(--bg-primary);
+  color: var(--gold-primary);
 }
 
 /* Position variants - left = history, right = next mode */

@@ -1,36 +1,52 @@
 /* SettingsModal.module.css - Modern 2025 Settings Design */
 
 /* Core Design Tokens */
+/* The dialog as a plate: solid night ladder, gold hairline frame with an
+   inner keyline, square-cut corners (atlas card language, 2026-07-24) */
 .modal {
   composes: windowed-modal from global;
+  position: relative;
   max-width: 860px;
   max-height: 90vh; /* Increased from default */
   height: 85vh; /* Use more screen space */
   padding: 0;
-  background: linear-gradient(
-    145deg,
-    rgba(21, 28, 71, 0.98) 0%,
-    rgba(28, 36, 88, 0.95) 50%,
-    rgba(42, 51, 116, 0.92) 100%
-  );
-  border: 1px solid color-mix(in srgb, var(--gold-subtle) 30%, transparent);
-  backdrop-filter: blur(var(--glass-blur-max)) saturate(150%);
-  -webkit-backdrop-filter: blur(var(--glass-blur-max)) saturate(150%);
+  background: linear-gradient(180deg, var(--bg-astral) 0%, var(--bg-primary) 100%);
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 42%, transparent);
+  border-radius: 4px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
 }
 
+.modal::after {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  pointer-events: none;
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 14%, transparent);
+  z-index: 3;
+}
+
+/* Header title in the plate voice: Caslon, mixed case, no glow */
+.modal [role='group'] h1,
+.modal [role='group'] h2,
+.modal [role='group'] h3 {
+  font-family: var(--font-content);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: var(--gold-primary);
+  text-shadow: none;
+}
+
 /* Tab Navigation */
+/* Tabs per the button doctrine: ink text, the gold thread underlines the
+   open page. No fills, no glow ridge. */
 .tabNav {
   display: flex;
   gap: 0;
-  background: linear-gradient(
-    180deg,
-    rgba(0, 0, 0, 0.3) 0%,
-    rgba(0, 0, 0, 0.1) 100%
-  );
-  border-bottom: 1px solid color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+  background: transparent;
+  border-bottom: 1px solid color-mix(in srgb, var(--gold-deep) 38%, transparent);
   padding: 0;
   margin: 0;
 }
@@ -41,15 +57,17 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  padding: 20px 24px;
+  padding: 18px 24px;
   background: transparent;
   border: none;
-  border-bottom: 3px solid transparent;
-  color: var(--text-secondary);
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 15px;
-  font-weight: 600;
-  letter-spacing: 0.5px;
+  border-bottom: 1px solid transparent;
+  margin-bottom: -1px;
+  color: var(--text-tertiary);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
   cursor: pointer;
   transition: none; /* Performance optimization */
   position: relative;
@@ -57,34 +75,17 @@
   min-height: 44px; /* Ensure 44px touch target */
 }
 
-/* Hover on idle tab: color change only. Gold fill is reserved for the active
+/* Hover on idle tab: color change only. Gold is reserved for the active
    tab — previewing it on hover would read as "already selected". */
 .tabButton:hover:not(.active) {
-  color: var(--text-primary);
+  color: var(--text-secondary);
 }
 
 .tabButton.active {
-  background: color-mix(in srgb, var(--gold-subtle) 15%, transparent);
+  background: transparent;
   border-bottom-color: var(--gold-subtle);
   color: var(--gold-primary);
-}
-
-.tabButton.active::after {
-  content: '';
-  position: absolute;
-  bottom: -1px;
-  left: 20%;
-  right: 20%;
-  height: 3px;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    var(--gold-subtle) 20%,
-    var(--gold-primary) 50%,
-    var(--gold-subtle) 80%,
-    transparent 100%
-  );
-  border-radius: 2px;
+  text-shadow: 0 0 14px color-mix(in srgb, var(--gold-subtle) 35%, transparent);
 }
 
 .tabIcon {
@@ -136,36 +137,34 @@
 }
 
 .sectionIcon {
-  width: 36px;
-  height: 36px;
+  width: 22px;
+  height: 22px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: color-mix(in srgb, var(--gold-subtle) 15%, transparent);
-  border-radius: 50%;
-  color: var(--gold-subtle);
+  background: none;
+  color: color-mix(in srgb, var(--gold-deep) 90%, var(--text-tertiary));
 }
 
+/* Section titles as plate kickers (atlas card language) */
 .sectionTitle {
   flex: 1;
   margin: 0;
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 24px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  color: var(--gold-subtle);
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  color: color-mix(in srgb, var(--gold-deep) 85%, var(--text-tertiary));
   text-transform: uppercase;
 }
 
 /* Info Cards */
 .infoCard {
-  background: color-mix(in srgb, var(--bg-card) 40%, transparent);
-  border: 1px solid color-mix(in srgb, var(--gold-subtle) 15%, transparent);
-  border-radius: 16px;
+  background: color-mix(in srgb, var(--bg-card) 45%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 26%, transparent);
+  border-radius: 3px;
   padding: 24px;
   margin-bottom: 24px;
-  backdrop-filter: blur(var(--glass-blur-heavy));
-  -webkit-backdrop-filter: blur(var(--glass-blur-heavy));
 }
 
 /* Remove redundant styling when inside CollapsibleSection */
@@ -200,15 +199,15 @@
 .infoCardTitle {
   margin: 0;
   font-size: 18px;
-  font-weight: 600;
+  font-weight: 400;
   color: var(--text-primary);
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: var(--font-content);
 }
 
 .infoCardContent {
   color: var(--text-secondary);
-  line-height: 1.6;
-  font-family: 'Space Grotesk', sans-serif;
+  line-height: 1.65;
+  font-family: var(--font-content);
 }
 
 /* Checkmark List */
@@ -228,7 +227,7 @@
   padding: 12px 16px;
   background: color-mix(in srgb, var(--color-success) 10%, transparent);
   border: 1px solid color-mix(in srgb, var(--color-success) 20%, transparent);
-  border-radius: 10px;
+  border-radius: 3px;
   color: var(--text-primary);
   font-family: 'Space Grotesk', sans-serif;
   font-size: 14px;
@@ -256,7 +255,7 @@
   padding: 20px;
   background: color-mix(in srgb, var(--bg-card) 30%, transparent);
   border: 1px solid color-mix(in srgb, var(--gold-subtle) 15%, transparent);
-  border-radius: 12px;
+  border-radius: 3px;
   cursor: pointer;
   transition: none; /* Performance */
   text-decoration: none;
@@ -264,9 +263,8 @@
 }
 
 .legalCard:hover {
-  background: color-mix(in srgb, var(--bg-card) 40%, transparent);
-  border-color: color-mix(in srgb, var(--gold-subtle) 30%, transparent);
-  transform: translateY(-2px);
+  background: color-mix(in srgb, var(--bg-card) 55%, transparent);
+  border-color: color-mix(in srgb, var(--gold-primary) 50%, transparent);
 }
 
 .legalCardIcon {
@@ -277,9 +275,9 @@
 }
 
 .legalCardTitle {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: var(--font-content);
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 400;
   color: var(--text-primary);
   text-align: center;
   margin-bottom: 8px;
@@ -371,7 +369,7 @@
   padding: 8px 14px;
   background: color-mix(in srgb, var(--coral-base) 12%, transparent);
   border: 1px solid color-mix(in srgb, var(--coral-base) 30%, transparent);
-  border-radius: 8px;
+  border-radius: 4px;
   color: var(--coral-base);
   font-family: 'Space Grotesk', sans-serif;
   font-size: 13px;
@@ -388,7 +386,7 @@
 }
 
 .clearAllButton:focus-visible {
-  outline: 2px solid var(--coral-base);
+  outline: 1.5px dashed var(--coral-base);
   outline-offset: 2px;
 }
 
@@ -447,7 +445,7 @@
 }
 
 .trustBadgeLink:focus-visible {
-  outline: 2px solid var(--gold-subtle);
+  outline: 1.5px dashed var(--gold-subtle);
   outline-offset: 2px;
 }
 
@@ -502,7 +500,7 @@
   padding: 14px 16px;
   background: color-mix(in srgb, var(--bg-card) 30%, transparent);
   border: 1px solid color-mix(in srgb, var(--gold-subtle) 12%, transparent);
-  border-radius: 12px;
+  border-radius: 3px;
 }
 
 .subProcessorAvatar {
@@ -510,7 +508,7 @@
   align-self: center;
   width: 44px;
   height: 44px;
-  border-radius: 12px;
+  border-radius: 3px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -579,7 +577,7 @@
     color-mix(in srgb, var(--mode-quest) 8%, transparent) 100%
   );
   border: 1px solid var(--mode-quest);
-  border-radius: 12px;
+  border-radius: 3px;
   margin-bottom: 24px;
   min-height: 48px;
 }
@@ -613,7 +611,7 @@
     color-mix(in srgb, var(--mode-quest) 15%, transparent) 100%
   );
   border: 1px solid var(--mode-quest);
-  border-radius: 10px;
+  border-radius: 3px;
   color: var(--mode-quest-hover);
   font-size: 14px;
   font-weight: 600;
@@ -655,7 +653,7 @@
     color-mix(in srgb, var(--gold-subtle) 5%, transparent) 100%
   );
   border: 1px solid color-mix(in srgb, var(--gold-subtle) 25%, transparent);
-  border-radius: 16px;
+  border-radius: 3px;
   padding: 28px;
   margin: 32px 0;
   text-align: center;
@@ -700,7 +698,7 @@
   gap: 8px;
   min-height: 44px;
   padding: 10px 16px;
-  border-radius: 10px;
+  border-radius: 3px;
   font-family: 'Space Grotesk', sans-serif;
   font-size: 13px;
   font-weight: 500;
@@ -719,7 +717,7 @@
 }
 
 .githubSourceLink:focus-visible {
-  outline: 2px solid var(--gold-subtle);
+  outline: 1.5px dashed var(--gold-subtle);
   outline-offset: 2px;
 }
 
@@ -960,7 +958,7 @@
     rgba(28, 36, 88, 0.95) 100%
   );
   border: 1px solid color-mix(in srgb, var(--gold-subtle) 40%, transparent);
-  border-radius: 16px;
+  border-radius: 3px;
   padding: 32px;
   max-width: 400px;
   text-align: center;

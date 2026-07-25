@@ -29,7 +29,7 @@ export const SeedDetailView: FC<SeedDetailViewProps> = ({
   onClose,
   figureName = ''
 }) => {
-  const { tString } = useTranslation();
+  const { t, tString } = useTranslation();
   const { isMobile } = useResponsive();
   const [activeSeedNumber, setActiveSeedNumber] = useState(initialSeedNumber);
   const [expandedSections, setExpandedSections] = useState<{ [key: string]: boolean }>({});
@@ -187,7 +187,9 @@ export const SeedDetailView: FC<SeedDetailViewProps> = ({
       {/* Desktop Only: Cosmic Header with Figure Name */}
       <header className="cosmic-header">
         <h1 className="figure-name-cosmic">
-          {displayName ? `${displayName}'s Wisdom` : 'Wisdom'}
+          {displayName
+            ? String(t('seeds.titleWithFigure', { figure: displayName }))
+            : tString('seedDetail.wisdomLabel', 'Wisdom')}
         </h1>
       </header>
 
@@ -250,14 +252,14 @@ export const SeedDetailView: FC<SeedDetailViewProps> = ({
 
                 {/* Header */}
                 <header className="detail-seed-header">
-                  <div className="detail-seed-number">{tString('seedDetail.wisdomLabel', 'Wisdom')} #{seedNumber}</div>
+                  <div className="detail-seed-number">{tString('seedDetail.wisdomLabel', 'Wisdom')} {seedNumber}</div>
                   <h2 className="detail-seed-title">{seed.title}</h2>
 
-                  {/* Tags */}
+                  {/* Tags (authored kebab-case, displayed as words) */}
                   {seed.tags && seed.tags.length > 0 && (
                     <div className="detail-seed-tags">
                       {seed.tags.map((tag, i) => (
-                        <span key={i} className="detail-tag">{tag}</span>
+                        <span key={i} className="detail-tag">{tag.replace(/-/g, ' ')}</span>
                       ))}
                     </div>
                   )}
@@ -377,7 +379,7 @@ export const SeedDetailView: FC<SeedDetailViewProps> = ({
                             <span className="toggle-label">
                               <Link size={20} weight="duotone" className="section-icon" />
                               <span>{tString('seeds.sections.relatedConnections', 'Related Connections')}</span>
-                              <span className="toggle-count">(+{related.length} more)</span>
+                              <span className="toggle-count">({String(t('seeds.sections.moreCount', { count: related.length }))})</span>
                             </span>
                             <span className="toggle-icon">▶</span>
                           </button>
@@ -421,7 +423,7 @@ export const SeedDetailView: FC<SeedDetailViewProps> = ({
                             <span className="toggle-label">
                               <Books size={20} weight="duotone" className="section-icon" />
                               <span>{tString('seeds.sections.sourcesVerification', 'Sources & Verification')}</span>
-                              <span className="toggle-count">({totalSources} sources)</span>
+                              <span className="toggle-count">({String(t('seeds.sections.sourceCount', { count: totalSources }))})</span>
                             </span>
                             <span className="toggle-icon">▶</span>
                           </button>
@@ -492,7 +494,7 @@ export const SeedDetailView: FC<SeedDetailViewProps> = ({
                         >
                           <span className="toggle-label">
                             <Brain size={20} weight="duotone" className="section-icon" />
-                            <span>{tString('seeds.sections.practice', 'Optional Practice')} (Outside App)</span>
+                            <span>{tString('seeds.sections.practice', 'Optional Practice')} ({tString('seeds.sections.practiceOutside', 'outside the app')})</span>
                           </span>
                           <span className="toggle-icon">▶</span>
                         </button>
