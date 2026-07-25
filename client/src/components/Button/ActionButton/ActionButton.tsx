@@ -5,7 +5,7 @@ import styles from './ActionButton.module.css';
 interface ActionButtonProps {
   children: ReactNode;
   className?: string;
-  variant?: 'gold' | 'coral';
+  variant?: 'gold' | 'coral' | 'ink';
   icon?: ReactNode;
   iconPosition?: 'left' | 'right';
   size?: 'small' | 'medium' | 'large';

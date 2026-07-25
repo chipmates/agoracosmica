@@ -9,7 +9,7 @@ interface RippleButtonProps {
   className?: string;
   style?: CSSProperties;
   rippleColor?: string;
-  variant?: 'primary' | 'secondary' | 'ghost' | 'gold' | 'coral' | 'light';
+  variant?: 'primary' | 'secondary' | 'ghost' | 'gold' | 'coral' | 'ink' | 'light';
   size?: 'small' | 'medium' | 'large';
   fullWidth?: boolean;
   elevated?: boolean;

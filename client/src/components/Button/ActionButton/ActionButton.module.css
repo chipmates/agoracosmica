@@ -9,16 +9,15 @@
 @import '../button-tokens.css';
 
 .actionButton {
-  /* Enhanced base styles for CTAs */
+  /* Plate doctrine (2026-07-24): tracked instrument caps, optically centered
+     (text-indent eats the trailing letter-space), no glass blur — buttons are
+     marks on the plate, not floating panes. */
   position: relative;
-  font-weight: 500; /* Lighter weight for more elegance */
-  text-transform: none; /* Remove uppercase for modern feel */
-  letter-spacing: 0.02em; /* Subtle letter spacing */
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  text-indent: 0.1em;
   transition: all 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  
-  /* Modern glass effect */
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
 }
 
 /* Content wrapper for advanced effects */
@@ -71,46 +70,59 @@
   transition: filter 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-/* Variant: Gold (Primary CTA) - Clean with glow effect */
+/* Variant: Gold — GOLD LEAF, the one money action per surface.
+   Lit from above (bevel: top catch-light, deep lower edge). Light responds
+   on hover, the object never moves. Press = the plate accepts the mark. */
 .variant-gold {
-  background: var(--gold-subtle); /* Story Mode CTA - Use brighter gold */
-  color: var(--primary-deep); /* Consistent dark blue text */
-  border: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-40), transparent);
-  box-shadow: 
-    0 2px 6px color-mix(in srgb, var(--gold-subtle) var(--a-15), transparent),
-    inset 0 1px 0 color-mix(in srgb, var(--gold-primary) var(--a-20), transparent);
+  background: linear-gradient(180deg, var(--gold-primary) 0%, var(--gold-subtle) 100%);
+  color: var(--primary-deep);
+  border: 1px solid color-mix(in srgb, var(--gold-deep) var(--a-70), transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, white var(--a-30), transparent),
+    inset 0 -1px 0 color-mix(in srgb, var(--gold-deep) var(--a-50), transparent),
+    0 2px 8px color-mix(in srgb, black var(--a-30), transparent);
 }
 
 .variant-gold.glow:hover {
-  background: var(--gold-primary); /* Story Mode hover - brighter gold */
-  transform: translateY(-1px);
-  box-shadow: 
-    0 6px 20px color-mix(in srgb, var(--gold-primary) var(--a-20), transparent),
-    inset 0 1px 0 color-mix(in srgb, var(--gold-primary) var(--a-25), transparent);
-  
-  /* Simple, elegant glow - one color only */
-  filter: drop-shadow(0 0 clamp(12px, 1.5vw, 20px) color-mix(in srgb, var(--gold-primary) var(--a-50), transparent));
+  filter: brightness(1.07);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, white var(--a-40), transparent),
+    inset 0 -1px 0 color-mix(in srgb, var(--gold-deep) var(--a-50), transparent),
+    0 0 18px color-mix(in srgb, var(--gold-subtle) var(--a-25), transparent),
+    0 2px 8px color-mix(in srgb, black var(--a-30), transparent);
 }
 
-/* Variant: Coral (Secondary CTA) - Clean with glow effect */
+/* Variant: Coral — the EMBER SEAL, commit moments only */
 .variant-coral {
-  background: var(--mode-quest-active); /* Quest Mode CTA */
-  color: var(--primary-deep); /* Consistent dark blue text */
-  border: 1px solid color-mix(in srgb, var(--mode-quest-active) var(--a-30), transparent);
-  box-shadow: 
-    0 2px 6px color-mix(in srgb, var(--mode-quest-active) var(--a-10), transparent),
-    inset 0 1px 0 color-mix(in srgb, var(--mode-quest) var(--a-15), transparent);
+  background: linear-gradient(180deg, var(--mode-quest-hover) 0%, var(--mode-quest) 100%);
+  color: var(--ember-ink);
+  border: 1px solid color-mix(in srgb, var(--mode-quest-active) var(--a-80), transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, white var(--a-20), transparent),
+    inset 0 -1px 0 color-mix(in srgb, var(--mode-quest-active) var(--a-60), transparent),
+    0 2px 8px color-mix(in srgb, black var(--a-30), transparent);
 }
 
 .variant-coral.glow:hover {
-  background: var(--mode-quest); /* Quest Mode hover */
-  transform: translateY(-1px);
-  box-shadow: 
-    0 6px 20px color-mix(in srgb, var(--mode-quest-active) var(--a-15), transparent),
-    inset 0 1px 0 color-mix(in srgb, var(--mode-quest-hover) var(--a-25), transparent);
-  
-  /* Simple, elegant glow - one color only */
-  filter: drop-shadow(0 0 clamp(12px, 1.5vw, 20px) color-mix(in srgb, var(--mode-quest) var(--a-50), transparent));
+  filter: brightness(1.06);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, white var(--a-30), transparent),
+    inset 0 -1px 0 color-mix(in srgb, var(--mode-quest-active) var(--a-60), transparent),
+    0 0 18px color-mix(in srgb, var(--mode-quest) var(--a-25), transparent),
+    0 2px 8px color-mix(in srgb, black var(--a-30), transparent);
+}
+
+/* Variant: Ink — engraved secondary action on content */
+.variant-ink {
+  background: color-mix(in srgb, var(--gold-subtle) 7%, transparent);
+  color: var(--gold-primary);
+  border: 1px solid color-mix(in srgb, var(--gold-deep) var(--a-40), transparent);
+}
+
+.variant-ink.glow:hover {
+  background: color-mix(in srgb, var(--gold-subtle) 14%, transparent);
+  border-color: color-mix(in srgb, var(--gold-primary) var(--a-70), transparent);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--gold-subtle) var(--a-15), transparent);
 }
 
 /* Variant: Deep (Tertiary CTA) */
@@ -137,28 +149,20 @@
 
 /* Pulse effect removed - too much visual noise */
 
-/* Active/pressed state - More subtle */
+/* Press = the plate accepts the mark */
 .actionButton:active:not(:disabled) {
-  transform: scale(0.98) translateY(0);
+  transform: translateY(1px);
   transition-duration: 0.1s;
 }
 
-/* Focus state - Enhanced for accessibility */
+/* Focus = the engraver's dashed ring (the map's ALS-NÄCHSTES language) */
 .actionButton:focus-visible {
-  outline: 3px solid currentColor;
+  outline: 1.5px dashed var(--gold-primary);
   outline-offset: 4px;
-}
-
-.variant-gold:focus-visible {
-  outline-color: var(--gold-subtle);
 }
 
 .variant-coral:focus-visible {
   outline-color: var(--mode-quest-hover);
-}
-
-.variant-deep:focus-visible {
-  outline-color: var(--bg-highlight);
 }
 
 /* Disabled state */

@@ -24,10 +24,12 @@
   font-weight: var(--font-medium, 500);
   line-height: 1.5;
   
-  /* Sizing - Default medium */
+  /* Sizing - Default medium. Plate doctrine (2026-07-24): interactive
+     elements carry a 4px corner — squared like the plate cards (3px), with
+     one notch of ink-spread so solid fills don't read as spikes. */
   padding: 12px 24px;
   font-size: 16px;
-  border-radius: var(--radius-md, 8px);
+  border-radius: 4px;
   
   /* Transitions matching original timing */
   transition: 
@@ -49,7 +51,7 @@
 .sizeSmall {
   font-size: clamp(0.8125rem, 0.8125rem + 0.25vw, 0.9375rem); /* 13px to 15px */
   padding: 8px 16px;
-  border-radius: var(--radius-sm, 6px);
+  border-radius: 4px;
   /* ✅ Accessibility: Ensure 44px minimum touch target */
   min-height: 44px;
   min-width: 44px;
@@ -58,7 +60,7 @@
 .sizeMedium {
   font-size: clamp(0.875rem, 0.875rem + 0.25vw, 1.0625rem); /* 14px to 17px */
   padding: 12px 24px;
-  border-radius: var(--radius-md, 8px);
+  border-radius: 4px;
   /* ✅ Accessibility: Ensure 44px minimum touch target */
   min-height: 44px;
   min-width: 44px;
@@ -67,7 +69,7 @@
 .sizeLarge {
   font-size: clamp(0.9375rem, 0.9375rem + 0.375vw, 1.1875rem); /* 15px to 19px */
   padding: 16px 32px;
-  border-radius: var(--radius-lg, 12px);
+  border-radius: 4px;
   /* ✅ Accessibility: Ensure 44px minimum touch target */
   min-height: 44px;
   min-width: 44px;
@@ -82,7 +84,7 @@
 
 .variantPrimary:hover:not(.disabled) {
   box-shadow: var(--shadow-interactive-hover, 0 4px 12px color-mix(in srgb, var(--utility-pure-black) var(--a-15), transparent));
-  transform: translateY(-2px);
+  filter: brightness(1.06);
 }
 
 .variantPrimary:active:not(.disabled) {
@@ -90,68 +92,113 @@
   transform: translateY(1px);
 }
 
+/* Plate doctrine materials (2026-07-24): gold LEAF = the one money action,
+   ember SEAL = commit moments, engraved INK = actions on content. Light
+   responds on hover, objects never levitate; press = the plate accepts
+   the mark. */
+
 .variantSecondary {
-  background: color-mix(in srgb, var(--gold-subtle) var(--a-20), transparent);
-  color: var(--gold-subtle);
-  border: 1px solid var(--gold-subtle);
+  background: color-mix(in srgb, var(--gold-subtle) 7%, transparent);
+  color: var(--gold-primary);
+  border: 1px solid color-mix(in srgb, var(--gold-deep) var(--a-40), transparent);
 }
 
 .variantSecondary:hover:not(.disabled) {
-  background: color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent);
-  transform: translateY(-2px);
+  background: color-mix(in srgb, var(--gold-subtle) 14%, transparent);
+  border-color: color-mix(in srgb, var(--gold-primary) var(--a-70), transparent);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--gold-subtle) var(--a-15), transparent);
 }
 
 .variantSecondary:active:not(.disabled) {
-  background: color-mix(in srgb, var(--gold-subtle) var(--a-40), transparent);
+  background: color-mix(in srgb, var(--gold-subtle) var(--a-20), transparent);
+  transform: translateY(1px);
+}
+
+.variantInk {
+  background: color-mix(in srgb, var(--gold-subtle) 7%, transparent);
+  color: var(--gold-primary);
+  border: 1px solid color-mix(in srgb, var(--gold-deep) var(--a-40), transparent);
+}
+
+.variantInk:hover:not(.disabled) {
+  background: color-mix(in srgb, var(--gold-subtle) 14%, transparent);
+  border-color: color-mix(in srgb, var(--gold-primary) var(--a-70), transparent);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--gold-subtle) var(--a-15), transparent);
+}
+
+.variantInk:active:not(.disabled) {
+  background: color-mix(in srgb, var(--gold-subtle) var(--a-20), transparent);
   transform: translateY(1px);
 }
 
 .variantGold {
-  background: var(--gold-gradient, linear-gradient(135deg, var(--gold-subtle) 0%, var(--gold-primary) 50%, var(--gold-hover) 100%));
+  background: linear-gradient(180deg, var(--gold-primary) 0%, var(--gold-subtle) 100%);
   color: var(--bg-primary);
-  box-shadow: var(--shadow-gold, 0 4px 12px color-mix(in srgb, var(--gold-subtle) var(--a-25), transparent));
+  border: 1px solid color-mix(in srgb, var(--gold-deep) var(--a-70), transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, white var(--a-30), transparent),
+    inset 0 -1px 0 color-mix(in srgb, var(--gold-deep) var(--a-50), transparent),
+    0 2px 8px color-mix(in srgb, black var(--a-30), transparent);
 }
 
 .variantGold:hover:not(.disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent);
+  filter: brightness(1.07);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, white var(--a-40), transparent),
+    inset 0 -1px 0 color-mix(in srgb, var(--gold-deep) var(--a-50), transparent),
+    0 0 18px color-mix(in srgb, var(--gold-subtle) var(--a-25), transparent),
+    0 2px 8px color-mix(in srgb, black var(--a-30), transparent);
 }
 
 .variantGold:active:not(.disabled) {
   transform: translateY(1px);
-  box-shadow: 0 2px 4px color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, white var(--a-20), transparent),
+    inset 0 -1px 0 color-mix(in srgb, var(--gold-deep) var(--a-50), transparent),
+    0 1px 4px color-mix(in srgb, black var(--a-30), transparent);
 }
 
 .variantCoral {
-  background: var(--coral-gradient, linear-gradient(135deg, var(--mode-quest-active) 0%, var(--mode-quest) 50%, var(--mode-quest-hover) 100%));
-  color: var(--bg-primary); /* Dark blue for better contrast */
-  box-shadow: var(--shadow-coral, 0 4px 12px color-mix(in srgb, var(--mode-quest) var(--a-25), transparent));
+  background: linear-gradient(180deg, var(--mode-quest-hover) 0%, var(--mode-quest) 100%);
+  color: var(--ember-ink);
+  border: 1px solid color-mix(in srgb, var(--mode-quest-active) var(--a-80), transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, white var(--a-20), transparent),
+    inset 0 -1px 0 color-mix(in srgb, var(--mode-quest-active) var(--a-60), transparent),
+    0 2px 8px color-mix(in srgb, black var(--a-30), transparent);
 }
 
 .variantCoral:hover:not(.disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px color-mix(in srgb, var(--mode-quest) var(--a-30), transparent);
+  filter: brightness(1.06);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, white var(--a-30), transparent),
+    inset 0 -1px 0 color-mix(in srgb, var(--mode-quest-active) var(--a-60), transparent),
+    0 0 18px color-mix(in srgb, var(--mode-quest) var(--a-25), transparent),
+    0 2px 8px color-mix(in srgb, black var(--a-30), transparent);
 }
 
 .variantCoral:active:not(.disabled) {
   transform: translateY(1px);
-  box-shadow: 0 2px 4px color-mix(in srgb, var(--mode-quest) var(--a-30), transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, white var(--a-15), transparent),
+    inset 0 -1px 0 color-mix(in srgb, var(--mode-quest-active) var(--a-60), transparent),
+    0 1px 4px color-mix(in srgb, black var(--a-30), transparent);
 }
 
 .variantGhost {
   background: transparent;
-  color: var(--text-primary);
-  border: 1px solid color-mix(in srgb, var(--text-primary) var(--a-15), transparent);
+  color: var(--text-secondary);
+  border: 1px solid color-mix(in srgb, var(--gold-deep) var(--a-34), transparent);
 }
 
 .variantGhost:hover:not(.disabled) {
-  background: color-mix(in srgb, var(--text-primary) var(--a-05), transparent);
-  border-color: color-mix(in srgb, var(--text-primary) var(--a-25), transparent);
-  transform: translateY(-2px);
+  background: color-mix(in srgb, var(--bg-highlight) var(--a-35), transparent);
+  border-color: color-mix(in srgb, var(--gold-primary) var(--a-60), transparent);
+  color: var(--gold-primary);
 }
 
 .variantGhost:active:not(.disabled) {
-  background: color-mix(in srgb, var(--text-primary) var(--a-10), transparent);
+  background: color-mix(in srgb, var(--bg-highlight) var(--a-45), transparent);
   transform: translateY(1px);
 }
 
@@ -185,23 +232,11 @@
   pointer-events: none;
 }
 
-/* Focus State with animation */
+/* Focus = the engraver's dashed ring (the map's ALS-NÄCHSTES language).
+   Static on purpose: motion in this system means something is live. */
 .button:focus-visible {
-  outline: 2px solid var(--gold-subtle);
-  outline-offset: 2px;
-  animation: focusRingPulse 2s var(--animation-standard, cubic-bezier(0.4, 0, 0.2, 1)) infinite;
-}
-
-@keyframes focusRingPulse {
-  0% {
-    outline-color: color-mix(in srgb, var(--gold-subtle) var(--a-60), transparent);
-  }
-  50% {
-    outline-color: var(--gold-subtle);
-  }
-  100% {
-    outline-color: color-mix(in srgb, var(--gold-subtle) var(--a-60), transparent);
-  }
+  outline: 1.5px dashed var(--gold-primary);
+  outline-offset: 4px;
 }
 
 /* Icon Support */
