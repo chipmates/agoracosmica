@@ -14,7 +14,7 @@
   --gold-light: var(--gold-primary);      /* Uses design system gold primary */
   --gold-hover-bg: color-mix(in srgb, var(--gold-subtle) var(--a-10), transparent); /* Gold transparent overlay */
   --deep-blue: color-mix(in srgb, var(--bg-primary) var(--a-80), transparent);
-  --border-radius: 22px;
+  --border-radius: 4px; /* plate doctrine 2026-07-24: input surfaces sit squared on the plate (was 22px) */
   --transition-bezier: cubic-bezier(0.4, 0, 0.2, 1);
   
   /* 2025 State-of-the-art responsive variables */
@@ -262,28 +262,36 @@
   overflow: hidden;
 }
 
-/* Record button */
+/* Record button — the EMBER SEAL (plate doctrine 2026-07-24): the commit
+   bar wears the seal material. Kept on the darker ember pair so the white
+   quota badges keep their AA contrast. Light responds on hover, the bar
+   never levitates; press = the plate accepts the mark. */
 .record-button {
   width: 100%;
-  background-color: var(--mode-quest-active); /* Deeper coral - same as seeker message */
-  border: none;
-  color: white;
+  background: linear-gradient(180deg, var(--mode-quest) 0%, var(--mode-quest-active) 100%);
+  border: 1px solid color-mix(in srgb, var(--mode-quest-active) var(--a-80), transparent);
+  color: var(--ember-ink);
   font-family: 'Space Grotesk', sans-serif;
   cursor: pointer;
   padding: 0;
-  border-radius: var(--border-radius);
+  border-radius: 4px;
   transition: all 0.2s var(--transition-bezier);
   overflow: hidden;
   position: relative;
   height: var(--input-height-desktop);
-  /* Add box-shadow for depth */
-  box-shadow: 0 2px 5px color-mix(in srgb, var(--utility-pure-black) var(--a-20), transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, white var(--a-20), transparent),
+    inset 0 -1px 0 color-mix(in srgb, var(--mode-quest-active) var(--a-60), transparent),
+    0 2px 5px color-mix(in srgb, var(--utility-pure-black) var(--a-20), transparent);
 }
 
 .record-button:hover {
-  background-color: var(--mode-quest); /* Brighter coral on hover */
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px color-mix(in srgb, var(--utility-pure-black) var(--a-30), transparent);
+  filter: brightness(1.06);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, white var(--a-30), transparent),
+    inset 0 -1px 0 color-mix(in srgb, var(--mode-quest-active) var(--a-60), transparent),
+    0 0 16px color-mix(in srgb, var(--mode-quest) var(--a-22), transparent),
+    0 2px 5px color-mix(in srgb, var(--utility-pure-black) var(--a-20), transparent);
 }
 
 /* Quota exhausted: dimmer, no lift on hover. Click routes to rate-limit modal. */
@@ -299,12 +307,13 @@
 }
 
 .record-button:active {
-  background-color: var(--coral-active); /* Deeper coral when pressed */
-  transform: scale(0.98);
+  transform: translateY(1px);
+  filter: brightness(0.97);
 }
 
 .record-button.recording {
-  background-color: var(--coral-active); /* Deeper coral when recording */
+  /* the seal darkens while it takes the mark; the pulse is the live signal */
+  background: linear-gradient(180deg, var(--mode-quest-active) 0%, color-mix(in srgb, var(--mode-quest-active) 82%, black) 100%);
   animation: pulse-frame 2s infinite;
 }
 

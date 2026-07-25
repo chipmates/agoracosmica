@@ -92,6 +92,8 @@ interface MainContentProps {
 
   // Council player props
   councilPlayerId: string | null;
+  onCouncilHandoff: (figureId: string, question: string) => Promise<void> | void;
+  onCouncilGoDeeper: (councilId: string) => void;
   councilPlayerLevel: 1 | 2;
   onCouncilPlayerClose: () => void;
 
@@ -145,6 +147,8 @@ const MainContent: FC<MainContentProps> = ({
 
   // Council player props
   councilPlayerId,
+  onCouncilHandoff,
+  onCouncilGoDeeper,
   councilPlayerLevel,
   onCouncilPlayerClose,
 
@@ -169,6 +173,8 @@ const MainContent: FC<MainContentProps> = ({
                 councilId={councilPlayerId}
                 councilLevel={councilPlayerLevel}
                 onClose={onCouncilPlayerClose}
+                onCouncilHandoff={onCouncilHandoff}
+                onCouncilGoDeeper={onCouncilGoDeeper}
               />
             </Suspense>
           </ErrorBoundary>

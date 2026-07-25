@@ -31,6 +31,8 @@ interface SessionSlice {
   councilPlayerId: string | null;
   councilPlayerLevel: 1 | 2;
   handleCouncilPlayerClose: () => void;
+  handleCouncilHandoff: (figureId: string, question: string) => Promise<void> | void;
+  handleCouncilGoDeeper: (councilId: string) => void;
   handlePrismClose: () => void;
   handleModeSelectorOpen: () => void;
   handleFigureCarouselOpen: () => void;
@@ -113,6 +115,8 @@ const MainContentContainer: React.FC<MainContentContainerProps> = ({
         councilPlayerId={session.councilPlayerId}
         councilPlayerLevel={session.councilPlayerLevel}
         onCouncilPlayerClose={session.handleCouncilPlayerClose}
+        onCouncilHandoff={session.handleCouncilHandoff}
+        onCouncilGoDeeper={session.handleCouncilGoDeeper}
         onPrismClose={session.handlePrismClose}
         onChooseMode={session.handleModeSelectorOpen}
         onChooseFigure={session.handleFigureCarouselOpen}

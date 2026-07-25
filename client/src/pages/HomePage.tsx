@@ -52,7 +52,7 @@ import PostQuestVerdictCard from '../components/QuestVerdictCard/PostQuestVerdic
 import { getPendingQuestVerdict, clearPendingQuestVerdict } from '../utils/questVerdict';
 import { restartQuest } from '../utils/questRestart';
 import { LocalStorageAdapter } from '../storage/localAdapter';
-import { readFigureIntent, clearFigureIntent, readCouncilIntent, clearCouncilIntent, readAskIntent, clearAskIntent, stashAskPrefill } from '../utils/public/entryIntent';
+import { readFigureIntent, clearFigureIntent, readCouncilIntent, clearCouncilIntent, readAskIntent, clearAskIntent, stashAskPrefill, stageCouncilHandoff } from '../utils/public/entryIntent';
 import { readHistoryMessages } from '../services/history/historyEncryption';
 import { registerSessionControllerHandlers } from '../controllers/sessionControllerRegistry';
 import { registerConversationControllerHandlers } from '../controllers/conversationControllerRegistry';
@@ -1534,6 +1534,40 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
     handleWisdomGalleryExploreAll
   } = helperFunctions;
 
+  // Council end-state handoff: close the player and open a Free Talk with one
+  // of the council's figures, the heard question staged in the composer (the
+  // ask-link rails). The one moment a listener is warm goes into the North
+  // Star instead of back to the catalog.
+  const handleCouncilHandoff = useCallback(
+    async (figureId: string, question: string) => {
+      setCouncilPlayerId(null);
+      setCouncilPlayerLevel(1);
+      const figure = getFigureById(figureId);
+      if (!figure) {
+        // Unknown figure — fall back to the catalog like a normal close.
+        useUIStore.getState().setCouncilSetupOpen(true);
+        return;
+      }
+      stageCouncilHandoff(question);
+      if (selectedFigure && figure.id === selectedFigure.id) {
+        // Same figure already selected: handleSelectFigure would early-return
+        // before the ask-intent branch, so run its tail directly.
+        clearAskIntent();
+        resetConversation();
+        handleModeSelect('free_conversation', true);
+        return;
+      }
+      await handleSelectFigure(figure);
+    },
+    [selectedFigure, handleSelectFigure, handleModeSelect, resetConversation]
+  );
+
+  // "Tiefer eintauchen" from the council end state: same council, level 2.
+  const handleCouncilGoDeeper = useCallback((councilId: string) => {
+    setCouncilPlayerId(councilId);
+    setCouncilPlayerLevel(2);
+  }, []);
+
   const mainContentSession = useMemo(
     () => ({
       showFigureCarousel,
@@ -1550,6 +1584,8 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
       councilPlayerId,
       councilPlayerLevel,
       handleCouncilPlayerClose,
+      handleCouncilHandoff,
+      handleCouncilGoDeeper,
       handlePrismClose,
       handleModeSelectorOpen,
       handleFigureCarouselOpen
@@ -1569,6 +1605,8 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
       councilPlayerId,
       councilPlayerLevel,
       handleCouncilPlayerClose,
+      handleCouncilHandoff,
+      handleCouncilGoDeeper,
       handlePrismClose,
       handleModeSelectorOpen,
       handleFigureCarouselOpen

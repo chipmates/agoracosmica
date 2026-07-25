@@ -7,7 +7,7 @@ import ProcessingLoader from './ProcessingLoader';
 import { ttsScheduler } from '../controllers/conversationStreamDriver';
 import { getOrRollConversationSessionId, sendSessionEndBeacon } from '../services/audio/tts/ttsSessions';
 import { preferTextInput, saveInputPreference, registerInputToggleShortcut } from '../utils/inputMethodDetection';
-import { consumeAskPrefill } from '../utils/public/entryIntent';
+import { consumeAskPrefill, consumeCouncilPrefill } from '../utils/public/entryIntent';
 import { loadServiceConfig } from '../services/audio/config/serviceConfig';
 import { useTranslation } from '../hooks/useTranslation';
 import { useAutoplayGate } from '../hooks/useAutoplayGate';
@@ -84,6 +84,13 @@ const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure,
   const selectedModeForPrefill = useDomainStore((state) => state.mode.selected);
   useEffect(() => {
     if (selectedModeForPrefill !== 'free_conversation') return;
+    // Council end-state handoff: the heard question, staged as free text.
+    const councilQuestion = consumeCouncilPrefill();
+    if (councilQuestion) {
+      setMessage(councilQuestion);
+      setUseTextInput(true);
+      return;
+    }
     const tag = consumeAskPrefill();
     if (tag !== 'hero') return;
     const question = tString('entry.heroAskQuestion', '');

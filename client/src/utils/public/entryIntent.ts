@@ -14,6 +14,7 @@ const SS_FIGURE_KEY = 'agc_intended_figure';
 const SS_COUNCIL_KEY = 'agc_intended_council';
 const SS_ASK_KEY = 'agc_intended_ask';
 const SS_ASK_PREFILL_KEY = 'agc_ask_prefill';
+const SS_COUNCIL_PREFILL_KEY = 'agc_council_prefill';
 
 // Allowlisted ask tags. A tag names a curated starter question that lives in
 // the app's translations (entry.heroAskQuestion), so no free text ever rides
@@ -150,6 +151,37 @@ export function consumeAskPrefill(): string | null {
     const tag = sessionStorage.getItem(SS_ASK_PREFILL_KEY);
     if (tag !== null) sessionStorage.removeItem(SS_ASK_PREFILL_KEY);
     return tag;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Council end-state handoff — "talk to a figure about this". Stages the ask
+ * intent (so figure selection skips the mode choice and opens Free Talk, the
+ * same rails as the homepage ask-link) plus the council's question as a
+ * free-text composer prefill. Unlike ask tags this text never rides a URL:
+ * it is written by the player from bundled catalog data, so free text is
+ * safe here. Length-capped to the composer's own limit.
+ */
+export function stageCouncilHandoff(question: string): void {
+  try {
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.setItem(SS_ASK_KEY, 'council');
+      sessionStorage.setItem(SS_COUNCIL_PREFILL_KEY, question.slice(0, 500));
+    }
+  } catch {
+    // no-op — the visitor just types the question themselves
+  }
+}
+
+/** One-shot read of the staged council question prefill (clears on read). */
+export function consumeCouncilPrefill(): string | null {
+  try {
+    if (typeof sessionStorage === 'undefined') return null;
+    const text = sessionStorage.getItem(SS_COUNCIL_PREFILL_KEY);
+    if (text !== null) sessionStorage.removeItem(SS_COUNCIL_PREFILL_KEY);
+    return text;
   } catch {
     return null;
   }
