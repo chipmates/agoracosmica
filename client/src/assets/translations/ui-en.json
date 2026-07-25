@@ -1,6 +1,18 @@
 {
-  "seedDetail": { "wisdomLabel": "Wisdom" },
-  "report": { "label": "Report content" },
+  "wisdomAtlas": {
+    "after": "after {figure}",
+    "starsGathered": "{gathered} of {total} wisdoms gathered",
+    "plateComplete": "The plate is complete",
+    "next": "Next",
+    "seedKicker": "{constellation} · Wisdom {num}",
+    "mastery": "Mastery {level} of 4"
+  },
+  "seedDetail": {
+    "wisdomLabel": "Wisdom"
+  },
+  "report": {
+    "label": "Report content"
+  },
   "app": {
     "name": "Agora Cosmica",
     "brandTagline": "A Living Library You Can Talk To",
@@ -115,9 +127,10 @@
     "reassure": "Your name stays on this device. No account, no email.",
     "formAria": "Choose how you appear",
     "cinematic": {
-      "card1": "Every question begins in the dark.",
-      "card2": "You are not the first to ask.",
-      "card3": "Those who came before rise to meet you."
+      "card1": "Who am I?",
+      "card2": "How should we live?",
+      "card3": "You are not the first to ask.",
+      "card4": "Those who came before rise to meet you."
     },
     "heroAskQuestion": "Someone criticized me today and I cannot stop replaying it. Why does it sting so much?"
   },
@@ -651,6 +664,7 @@
     "trailerPlay": "Play intro",
     "trailerPause": "Pause",
     "echoOf": "Echo of",
+    "positionOf": "of",
     "echoOfName": "Echo of {name}",
     "categories": {
       "sages": "Sages",
@@ -742,6 +756,9 @@
       "furtherReading": "Further Reading",
       "importance": "Importance",
       "practice": "Practice",
+      "moreCount": "+{count} more",
+      "sourceCount": "{count} sources",
+      "practiceOutside": "outside the app",
       "quotesAndSources": "Quotes & Sources",
       "originalSource": "Original Source",
       "wisdomConnections": "Wisdom Connections",
@@ -930,7 +947,8 @@
       "moderator": "Moderator",
       "tapToExpand": "Tap to expand",
       "buildYourOwn": "Build Your Own Council",
-      "buildYourOwnSubtitle": "Choose figures, set the question"
+      "buildYourOwnSubtitle": "Choose figures, set the question",
+      "startHere": "Start here"
     },
     "level2": {
       "title": "Go Deeper",
@@ -1010,6 +1028,30 @@
         "subtitle": "Radical Forgiveness, Trauma Transcendence, Strength from Wounds",
         "question": "How do I forgive someone who betrayed me deeply?"
       }
+    },
+    "programme": {
+      "firstKicker": "Your first council",
+      "nextKicker": "Your next council",
+      "resumeKicker": "Continue listening",
+      "listen": "Listen",
+      "resume": "Continue listening",
+      "goDeeper": "Go deeper",
+      "lifeQuestions": "Eight life questions",
+      "browseAll": "Browse all {count} councils",
+      "heardCount": "{n} of {total} councils heard",
+      "allDoneTitle": "Every council heard",
+      "allDoneText": "You have heard the whole programme. Browse the archive to listen again or go deeper."
+    },
+    "endCard": {
+      "kicker": "The council has ended",
+      "talkTo": "Talk to {name} about this",
+      "orWith": "or with",
+      "backToProgramme": "Back to the programme"
+    },
+    "recommended": "Recommended",
+    "themeRow": {
+      "seeAll": "See all {count}",
+      "showLess": "Show less"
     }
   },
   "languageWheel": {
@@ -1330,7 +1372,8 @@
       "termsLink": "Terms of Service",
       "privacyNote": "Privacy Policy",
       "jsbNote": "Youth Protection Officer",
-      "startButton": "Start exploring"
+      "startButton": "Start exploring",
+      "aiNoticeKicker": "AI notice"
     },
     "cookiePolicy": {
       "title": "Cookie Policy",
@@ -1767,6 +1810,7 @@
     "figureOverview": "Sources & Bio",
     "aboutFigure": "About {name}",
     "allStories": "All Stories",
+    "noData": "No factcheck data available for this figure.",
     "notes": "Notes",
     "forewordSection": "Foreword",
     "shadow": "Shadow",

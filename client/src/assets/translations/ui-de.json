@@ -1,6 +1,18 @@
 {
-  "seedDetail": { "wisdomLabel": "Weisheit" },
-  "report": { "label": "Inhalt melden" },
+  "wisdomAtlas": {
+    "after": "nach {figure}",
+    "starsGathered": "{gathered} von {total} Weisheiten gesammelt",
+    "plateComplete": "Die Tafel ist vollendet",
+    "next": "Als Nächstes",
+    "seedKicker": "{constellation} · Weisheit {num}",
+    "mastery": "Meisterschaft {level} von 4"
+  },
+  "seedDetail": {
+    "wisdomLabel": "Weisheit"
+  },
+  "report": {
+    "label": "Inhalt melden"
+  },
   "app": {
     "name": "Agora Cosmica",
     "brandTagline": "Eine lebendige Bibliothek, mit der du sprechen kannst",
@@ -113,9 +125,10 @@
     "reassure": "Dein Name bleibt auf diesem Gerät. Kein Konto, keine E-Mail.",
     "formAria": "Wähle, wie du erscheinst",
     "cinematic": {
-      "card1": "Jede Frage beginnt im Dunkeln.",
-      "card2": "Vor dir haben viele gefragt.",
-      "card3": "Sie erheben sich, um dir zu begegnen."
+      "card1": "Wer bin ich?",
+      "card2": "Wie sollen wir leben?",
+      "card3": "Vor dir haben viele gefragt.",
+      "card4": "Sie erheben sich, um dir zu begegnen."
     },
     "heroAskQuestion": "Jemand hat mich heute kritisiert. Ich werde es nicht los. Warum trifft mich das so?"
   },
@@ -653,6 +666,7 @@
     "trailerPlay": "Intro abspielen",
     "trailerPause": "Pause",
     "echoOf": "Echo von",
+    "positionOf": "von",
     "echoOfName": "Echo von {name}",
     "categories": {
       "sages": "Weise",
@@ -744,6 +758,9 @@
       "furtherReading": "Weiterführende Literatur",
       "importance": "Bedeutung",
       "practice": "Übung",
+      "moreCount": "+{count} weitere",
+      "sourceCount": "{count} Quellen",
+      "practiceOutside": "außerhalb der App",
       "quotesAndSources": "Zitate & Quellen",
       "originalSource": "Originalquelle",
       "wisdomConnections": "Weisheitsverbindungen",
@@ -969,7 +986,8 @@
       "moderator": "Moderator",
       "tapToExpand": "Tippen zum Aufklappen",
       "buildYourOwn": "Eigenen Rat erstellen",
-      "buildYourOwnSubtitle": "Figuren wählen, Frage stellen"
+      "buildYourOwnSubtitle": "Figuren wählen, Frage stellen",
+      "startHere": "Zum Einstieg"
     },
     "level2": {
       "title": "Tiefer eintauchen",
@@ -1012,6 +1030,30 @@
       },
       "stopCouncil": "Rat beenden",
       "councilInProgress": "Rat läuft"
+    },
+    "programme": {
+      "firstKicker": "Dein erster Rat",
+      "nextKicker": "Dein nächster Rat",
+      "resumeKicker": "Weiterhören",
+      "listen": "Anhören",
+      "resume": "Weiterhören",
+      "goDeeper": "Tiefer eintauchen",
+      "lifeQuestions": "Acht Lebensfragen",
+      "browseAll": "Alle {count} Räte durchstöbern",
+      "heardCount": "{n} von {total} Räten gehört",
+      "allDoneTitle": "Alle Räte gehört",
+      "allDoneText": "Du hast das ganze Programm gehört. Im Archiv findest du jeden Rat zum Wiederhören und Vertiefen."
+    },
+    "endCard": {
+      "kicker": "Der Rat ist beendet",
+      "talkTo": "Sprich mit {name} darüber",
+      "orWith": "oder mit",
+      "backToProgramme": "Zurück zum Programm"
+    },
+    "recommended": "Empfohlen",
+    "themeRow": {
+      "seeAll": "Alle {count} Räte",
+      "showLess": "Weniger anzeigen"
     }
   },
   "languageWheel": {
@@ -1332,7 +1374,8 @@
       "termsLink": "Nutzungsbedingungen",
       "privacyNote": "Datenschutzerklärung",
       "jsbNote": "Jugendschutzbeauftragter",
-      "startButton": "Jetzt entdecken"
+      "startButton": "Jetzt entdecken",
+      "aiNoticeKicker": "KI-Hinweis"
     },
     "cookiePolicy": {
       "title": "Cookie-Richtlinie",
@@ -1765,10 +1808,11 @@
     "bio": "Biografie",
     "specialNote": "Besonderer Hinweis",
     "backToStories": "Zurück zu Stories",
-    "storyNumber": "Story {number}",
+    "storyNumber": "Geschichte {number}",
     "figureOverview": "Quellen & Bio",
     "aboutFigure": "Über {name}",
-    "allStories": "Alle Stories",
+    "allStories": "Alle Geschichten",
+    "noData": "Für diese Figur liegen noch keine Fakten vor.",
     "notes": "Anmerkungen",
     "forewordSection": "Vorwort",
     "shadow": "Schatten",
