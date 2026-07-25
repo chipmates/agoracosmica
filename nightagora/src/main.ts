@@ -3,13 +3,14 @@ import { createEclipse, type EclipseState } from './scenes/eclipse'
 import { createAgora } from './scenes/agora'
 import { createKeeper } from './scenes/keeper'
 import { createCrossing } from './scenes/crossing'
-import { createCamp } from './scenes/camp'
+import { createCamp, groundDrop } from './scenes/camp'
 import { createCouncil } from './scenes/council'
 import { createAtlas } from './scenes/atlas'
 import { createMandala } from './scenes/mandala'
 import { createHotspots } from './core/hotspots'
 import { createChapters } from './core/chapters'
 import { CAMP_SCRIPT, FIRE_SCRIPT } from './content/keeper-script'
+import { LABELS, STATIONS, TRACES, TRACE_WINDOWS } from './content/carnuntum'
 import { ambience } from './core/ambience'
 import { COUNCIL_DONE } from './content/council'
 import { WANDERERS } from './content/wanderers'
@@ -116,36 +117,31 @@ drawnEl.querySelector('.drawn-close')?.addEventListener('click', () => {
   drawnEl.hidden = true
 })
 
+/* The camp's points hang in the camp itself, and each one belongs to its
+   own stretch of the walk: a mark for a site you have not reached is a
+   mark you cannot read. */
 const CAMP_SPOTS = [
   {
     id: 'hearth',
     label: 'The Hearth',
-    // beside the flame, never inside it
-    pos: new Vector3(-1.45, -0.3, -5.0),
-    posNarrow: new Vector3(-0.95, -0.34, -4.5),
+    // beside the doorway wedge, never inside the tent's own light
+    pos: camp.spot('hearth'),
+    when: () => campWalk > 0.6,
     open: () => openHearth(),
-  },
-  {
-    id: 'trace',
-    label: 'The Trace',
-    pos: new Vector3(0.42, 0.06, -4.55),
-    posNarrow: new Vector3(0.48, 0.1, -4.3),
-    open: () => {
-      traceOpen = !traceOpen
-    },
   },
   {
     id: 'chapters',
     label: 'His Nights',
-    pos: new Vector3(1.82, 0.62, -5.9),
-    posNarrow: new Vector3(1.0, 0.72, -5.7),
+    // at the crossed-log fire, where a legion's nights are told
+    pos: camp.spot('chapters'),
+    when: () => campWalk > 0.44 && campWalk < 0.76,
     open: () => chapters.open(),
   },
   {
     id: 'prism',
     label: 'The Prism',
-    pos: new Vector3(-2.2, 0.1, -6.6),
-    posNarrow: new Vector3(-0.85, 0.62, -5.9),
+    pos: camp.spot('prism'),
+    when: () => campWalk > 0.46 && campWalk < 0.74,
     open: () =>
       openDrawn(
         'Chapter III',
@@ -156,8 +152,8 @@ const CAMP_SPOTS = [
   {
     id: 'quest',
     label: 'The Quest',
-    pos: new Vector3(1.05, -0.32, -3.7),
-    posNarrow: new Vector3(0.8, -0.3, -3.6),
+    pos: camp.spot('quest'),
+    when: () => campWalk > 0.3 && campWalk < 0.56,
     open: () =>
       openDrawn(
         'Chapter IV',
@@ -168,11 +164,22 @@ const CAMP_SPOTS = [
   {
     id: 'hissky',
     label: 'His Sky',
-    pos: new Vector3(0.3, 1.55, -7.2),
-    posNarrow: new Vector3(0.1, 1.3, -6.6),
+    pos: camp.spot('hissky'),
+    when: () => campWalk > 0.8,
     // the Dusk Law: to see what you have learned, night must fall
     open: () => beginDusk(),
   },
+  // the three carved words, each a gold star at the site it was cut into
+  ...TRACES.map((tr, i) => ({
+    id: `trace-${tr.id}`,
+    label: 'A trace',
+    pos: camp.tracePos[i] ?? new Vector3(),
+    when: () => {
+      const win = TRACE_WINDOWS[i]
+      return Boolean(win && campWalk > win[0] && campWalk < win[1] && traceOpen !== i)
+    },
+    open: () => openTrace(i),
+  })),
 ]
 const HUB_SPOTS = [
   {
@@ -244,7 +251,16 @@ let campYield = 0
 let campEnteredAt = -1
 let campEnteredWall = -1
 let campHearthOpen = false
-let traceOpen = false
+/** 0..1 along his ground: far shore → ford → gate → via → tent → desk →
+    vista. The night's one verb drives it, the same as every other stage. */
+let campWalk = 0
+let campWalkTarget = 0
+/** how far the visitor has raised their own gaze: the sky answers it */
+let campGaze = 0
+/** the rig holds the gaze still so a frame can be judged (-1 = the hand) */
+let gazeHold = -1
+/** which carved word holds the frame, or -1 */
+let traceOpen = -1
 let voiceTimerA = 0
 let voiceTimerB = 0
 let chapter = 0
@@ -425,6 +441,7 @@ paneEnter?.addEventListener('click', () => {
 addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && paneOpen) closePane()
   if (e.key === 'Escape' && duskUp) endDusk()
+  if (e.key === 'Escape' && traceOpen >= 0) traceOpen = -1
 })
 
 /** dress or strike the sky's letterpress in one move */
@@ -731,13 +748,16 @@ function beginDusk(): void {
   if (phase !== 'camp' || duskUp) return
   duskUp = true
   campDuskTarget = 1
+  // his sign belongs to the overlook: the mark walks you there, the walk
+  // arrives on its own, and either way the frame is the same composed one
+  campWalkTarget = 1
   campSignLevels = readSeedLevels('aurelius', 12)
   camp.setSign(campSignLevels, reducedMotion)
   // the sky needs the whole frame: the ground letterpress steps back
   keeperEl.hidden = true
   sittingEl.hidden = true
   hearthWanted = false
-  traceOpen = false
+  traceOpen = -1
   drawnEl.hidden = true
   if (duskLineEl) duskLineEl.textContent = duskLineText()
   verseShow('To see what you have learned, night must fall.')
@@ -753,6 +773,10 @@ function endDusk(): void {
   duskEl.classList.remove('lit')
   duskEl.hidden = true
   if (phase === 'camp') {
+    // his morning answers a step back down from the overlook: standing on
+    // the spot that raises the sign would simply raise it again
+    campWalk = Math.min(campWalk, 0.93)
+    campWalkTarget = Math.min(campWalkTarget, 0.9)
     if (campHearthOpen) keeperEl.hidden = false
     setStatus(
       camera.aspect < 0.9
@@ -860,7 +884,19 @@ declare global {
           sinceFlash?: number
           keeper?: number
           crossing?: 'hatch' | 'portrait' | 'breath'
-          camp?: 'trace' | 'hearth' | 'dusk'
+          camp?:
+            | 'shore'
+            | 'ford'
+            | 'gate'
+            | 'via'
+            | 'trace'
+            | 'praetorium'
+            | 'hearth'
+            | 'desk'
+            | 'vista'
+            | 'dusk'
+          /** how far the visitor has raised their gaze (the sky's hour) */
+          gaze?: number
           chapter?: number
           figure?: string
           coda?: number
@@ -872,15 +908,33 @@ declare global {
         agoraReveal: number
         campReveal: number
         campDusk: number
+        campWalk: number
+        campGaze: number
         desc: number
       }
     }
   }
 }
-// ---- the trace: the carved words at the tent post ----
+// ---- the traces: his own words, cut into the ground where they belong ----
 const traceProjected = new Vector3()
-function traceScreenPos(): { x: number; y: number } | null {
-  traceProjected.copy(camp.tracePos).project(camera)
+const traceKicker = traceEl.querySelector('.trace-kicker')
+const traceQuote = traceEl.querySelector('.trace-quote')
+const traceSource = traceEl.querySelector('.trace-source')
+
+function openTrace(i: number): void {
+  const tr = TRACES[i]
+  if (!tr) return
+  traceOpen = traceOpen === i ? -1 : i
+  if (traceOpen < 0) return
+  if (traceKicker) traceKicker.textContent = `A trace · ${tr.where}`
+  if (traceQuote) traceQuote.textContent = `"${tr.text}"`
+  if (traceSource) traceSource.textContent = `${tr.cite} · trans. George Long`
+}
+
+function traceScreenPos(i: number): { x: number; y: number } | null {
+  const anchor = camp.tracePos[i]
+  if (!anchor) return null
+  traceProjected.copy(anchor).project(camera)
   if (traceProjected.z > 1) return null
   return {
     x: (traceProjected.x * 0.5 + 0.5) * innerWidth,
@@ -889,14 +943,61 @@ function traceScreenPos(): { x: number; y: number } | null {
 }
 
 function syncTrace(): void {
-  const p = phase === 'camp' && traceOpen && campReveal > 0.4 ? traceScreenPos() : null
+  const p =
+    phase === 'camp' && traceOpen >= 0 && campReveal > 0.4 ? traceScreenPos(traceOpen) : null
   if (!p) {
     traceEl.hidden = true
     return
   }
-  traceEl.style.left = `${Math.min(Math.max(p.x - 150, 16), innerWidth - 320)}px`
-  traceEl.style.top = `${Math.max(p.y - 190, 16)}px`
+  // the card takes the side of the mark with room for it, and it never
+  // runs off the stage (round 5: at the tent post it fell off the edge)
+  const w = traceEl.offsetWidth || 300
+  const h = traceEl.offsetHeight || 220
+  const left = p.x > innerWidth / 2 ? p.x - w - 34 : p.x + 34
+  traceEl.style.left = `${Math.min(Math.max(left, 16), Math.max(16, innerWidth - w - 16))}px`
+  traceEl.style.top = `${Math.min(Math.max(p.y - h / 2, 16), Math.max(16, innerHeight - h - 72))}px`
   traceEl.hidden = false
+}
+
+// ---- the atlas layer: letterspaced small caps with degree ticks, inked
+// in only while their site is the thing being looked at ----
+const labelHost = document.getElementById('camp-labels')
+const labelEls = LABELS.map((l) => {
+  const el = document.createElement('div')
+  el.className = 'atlas-label'
+  const tick = document.createElement('span')
+  tick.className = 'atlas-tick'
+  const site = document.createElement('span')
+  site.className = 'atlas-site'
+  site.textContent = l.site
+  const deg = document.createElement('span')
+  deg.className = 'atlas-deg'
+  deg.textContent = l.tick
+  el.append(tick, site, deg)
+  labelHost?.appendChild(el)
+  return { el, label: l, at: new Vector3(l.at[0], l.at[1] - groundDrop(l.at[0], l.at[2]), l.at[2]) }
+})
+
+const labelProjected = new Vector3()
+function syncLabels(): void {
+  const on = phase === 'camp' && campReveal > 0.5 && !duskUp
+  for (const L of labelEls) {
+    labelProjected.copy(L.at).project(camera)
+    const x = (labelProjected.x * 0.5 + 0.5) * innerWidth
+    const y = (-labelProjected.y * 0.5 + 0.5) * innerHeight
+    const pad = innerWidth < 720 ? 18 : 40
+    const inWindow = campWalk >= L.label.from - 0.03 && campWalk <= L.label.to + 0.03
+    const vis =
+      on &&
+      inWindow &&
+      labelProjected.z < 1 &&
+      x > pad &&
+      x < innerWidth - pad &&
+      y > 40 &&
+      y < innerHeight - 90
+    L.el.style.opacity = vis ? '1' : '0'
+    if (vis) L.el.style.transform = `translate(${Math.round(x)}px, ${Math.round(y)}px)`
+  }
 }
 
 function beginCrossing(): void {
@@ -925,8 +1026,19 @@ addEventListener('click', (e) => {
   }
   if (phase === 'camp') {
     if (duskUp) return
-    const p = traceScreenPos()
-    if (p && Math.hypot(p.x - e.clientX, p.y - e.clientY) < 60) traceOpen = !traceOpen
+    // the marks are real buttons; this is the generous target around them
+    for (let i = 0; i < camp.tracePos.length; i++) {
+      const win = TRACE_WINDOWS[i]
+      if (!win || campWalk < win[0] || campWalk > win[1]) continue
+      const p = traceScreenPos(i)
+      if (p && Math.hypot(p.x - e.clientX, p.y - e.clientY) < 60) {
+        openTrace(i)
+        return
+      }
+    }
+    // clicking the open card's own air closes it
+    if (traceOpen >= 0 && !(e.target instanceof HTMLElement && traceEl.contains(e.target)))
+      traceOpen = -1
     return
   }
 })
@@ -1008,13 +1120,32 @@ window.__forge = {
     railEl.hidden = p === 'transit' || p === 'held'
     if (p === 'camp') {
       campReveal = 1
-      camera.rotation.set(-0.12, 0, 0)
       campYield = opts.camp === 'hearth' ? 1 : 0
+      traceOpen = -1
+      campGaze = opts.gaze ?? 0
+      gazeHold = opts.gaze === undefined ? -1 : opts.gaze
+      dragPitch = 0
+      dragYaw = 0
+      // every station of the walk is its own composed moment
+      const at: Record<string, number> = {
+        shore: 0,
+        ford: 0.28,
+        gate: 0.42,
+        via: 0.57,
+        trace: 0.57,
+        praetorium: 0.7,
+        hearth: 0.7,
+        desk: 0.79,
+        vista: 1,
+        dusk: 1,
+      }
+      campWalk = campWalkTarget = opts.camp ? (at[opts.camp] ?? 0) : 0
+      camp.stageCamera(camera, campWalk, camera.aspect < 0.9)
       // rig frames are single moments: the arrival voice never overlaps
       window.clearTimeout(voiceTimerA)
       window.clearTimeout(voiceTimerB)
       if (opts.camp) voiceEl2.classList.remove('lit')
-      if (opts.camp === 'trace') traceOpen = true
+      if (opts.camp === 'trace') openTrace(1)
       if (opts.camp === 'hearth') {
         campHearthOpen = true
         keeperScene.setScript(CAMP_SCRIPT)
@@ -1028,12 +1159,25 @@ window.__forge = {
         campSignLevels = [4, 4, 3, 2, 1, 0, 0, 2, 4, 1, 0, 3]
         camp.setSign(campSignLevels, true)
         keeperEl.hidden = true
-        camera.rotation.set(0.5, 0, 0)
         if (duskLineEl) duskLineEl.textContent = duskLineText()
         duskEl.hidden = false
         duskEl.classList.add('lit')
         setStatus('')
+      } else {
+        const here = STATIONS[camp.stationAt(campWalk)]
+        if (here) setStatus(here.name)
       }
+      camp.update({
+        reveal: 1,
+        elapsed,
+        dt: 0.016,
+        aspect: camera.aspect,
+        walk: campWalk,
+        gaze: campGaze,
+        yield: campYield,
+        dusk: campDusk,
+        reduced: reducedMotion,
+      })
     }
     if (opts.keeper) {
       keeperEl.hidden = false
@@ -1049,7 +1193,21 @@ window.__forge = {
   // the rig's stethoscope: read the live blend state without guessing
   // from pixels (numbers first, then the shot)
   state() {
-    return { phase, agoraReveal, campReveal, campDusk, desc }
+    return {
+      phase,
+      agoraReveal,
+      campReveal,
+      campDusk,
+      campWalk,
+      campGaze,
+      desc,
+      cam: {
+        p: camera.position.toArray(),
+        r: camera.rotation.toArray().slice(0, 3),
+        fov: camera.fov,
+        proj: camera.projectionMatrix.elements.slice(0, 4),
+      },
+    }
   },
 }
 
@@ -1103,10 +1261,25 @@ function setPhase(next: Phase): void {
     hearthWanted = false
     endDusk()
     campDusk = 0
+    // every other stage is the SEATED eye at the origin: his ground is
+    // the one place the visitor walks, and it hands the eye back
+    camera.position.set(0, 0, 0)
+    if (camera.fov !== 46) {
+      camera.fov = 46
+      camera.updateProjectionMatrix()
+    }
   }
   if (next === 'camp') {
     endDusk()
     campDusk = 0
+    // the arrival is always the far shore: the walk begins where the
+    // crossing set you down
+    campWalk = 0
+    campWalkTarget = 0
+    campGaze = 0
+    gazeHold = -1
+    dragPitch = 0
+    dragYaw = 0
     // the agora CUTS here, inside the entry breath (ring flash or gold
     // breath, both full-frame): a fade cannot hide it — its ink fades
     // toward black, and black against the Danube dawn is a solid
@@ -1114,13 +1287,13 @@ function setPhase(next: Phase): void {
     agoraReveal = 0
     setStatus(
       camera.aspect < 0.9
-        ? 'Carnuntum · touch and move to look around'
-        : 'Carnuntum on the Danube'
+        ? 'Carnuntum · swipe to walk, drag up to look'
+        : 'Carnuntum on the Danube · scroll to walk'
     )
     campEnteredAt = elapsed
     campEnteredWall = performance.now()
     campHearthOpen = false
-    traceOpen = false
+    traceOpen = -1
     // the sentence begun in space completes on the ground
     window.clearTimeout(voiceTimerA)
     window.clearTimeout(voiceTimerB)
@@ -1131,7 +1304,7 @@ function setPhase(next: Phase): void {
       voiceTimerB = window.setTimeout(() => voiceEl2.classList.remove('lit'), 5600)
     }, 900)
   } else {
-    traceOpen = false
+    traceOpen = -1
     chapters.close()
   }
 }
@@ -1159,6 +1332,19 @@ function push(delta: number): void {
     if (!autoRide) return
     if (agoraEnteredAt >= 0 && elapsed - agoraEnteredAt < 1.6) return
     lookTarget = Math.min(1, Math.max(0, lookTarget + delta * 0.0009))
+  }
+  // his ground is walked, and the same one verb walks it: about twenty
+  // flicks from the far shore to the overlook, and it scrubs both ways
+  if (phase === 'camp') {
+    if (duskUp) {
+      // at the vista the scroll answers the way home, never a further step
+      if (delta < 0) {
+        endDusk()
+        campWalkTarget = 0.86
+      }
+      return
+    }
+    campWalkTarget = Math.min(1, Math.max(0, campWalkTarget + delta * 0.00055))
   }
   // the wheel of the night: scroll or swipe steps the carousel, wrapping.
   // A short cooldown makes one gesture one step and keeps the look-up
@@ -1218,7 +1404,12 @@ addEventListener('touchmove', (e) => {
   if (y === undefined || x === undefined || touchY === null || touchX === null) return
   const dy = touchY - y
   const dx = touchX - x
-  if (dragAllowed()) {
+  if (phase === 'camp') {
+    // his ground is the one stage with two verbs: the dominant axis wins,
+    // so a swipe up the frame WALKS and a swipe across it LOOKS
+    if (Math.abs(dy) >= Math.abs(dx)) push(dy * 3)
+    else applyDrag(-dx, 0)
+  } else if (dragAllowed()) {
     // at the hub and in a cosmos, the finger moves the gaze itself
     applyDrag(-dx, -dy)
   } else {
@@ -1229,9 +1420,17 @@ addEventListener('touchmove', (e) => {
   touchY = y
   touchX = x
 }, { passive: true })
+let lastMouseX = 0
+let lastMouseY = 0
 addEventListener('pointermove', (e) => {
-  if (!dragging || e.pointerType !== 'mouse') return
-  applyDrag(-e.movementX, -e.movementY)
+  if (e.pointerType !== 'mouse') return
+  // movementX/Y is not filled in by every driver (headless chromium among
+  // them): the hand's own delta is the honest source
+  const dx = e.clientX - lastMouseX
+  const dy = e.clientY - lastMouseY
+  lastMouseX = e.clientX
+  lastMouseY = e.clientY
+  if (dragging) applyDrag(-dx, -dy)
 })
 
 addEventListener('resize', () => {
@@ -1319,20 +1518,13 @@ function frame(now: number): void {
     if (lookTarget > 0.9 && lookUp > 0.93) setPhase('sky')
     if (agoraEnteredAt >= 0 && elapsed - agoraEnteredAt > 0.5) keeperEl.hidden = false
   } else if (phase === 'camp') {
-    // the hearth opens once the arrival sentence has had its say —
-    // on the WALL clock: scene time clamps on slow frames and would
-    // stretch the wait (the keeper's own pacing lesson). Never while
-    // the gaze is up in his sky.
-    if (
-      !duskUp &&
-      !campHearthOpen &&
-      campEnteredWall > 0 &&
-      performance.now() - campEnteredWall > 6600
-    ) {
-      // the auto-open routes through the Sitting: the first hearth of
-      // the night asks its one question before the keeper speaks
-      openHearth()
-    }
+    // the hearth is a PLACE now: it opens when the walk reaches his tent,
+    // not on a timer. The auto-open routes through the Sitting, because
+    // the first hearth of the night asks its one question first.
+    if (!duskUp && !campHearthOpen && campWalk > 0.66) openHearth()
+    // and the sign rises where the walk ends: at the overlook, night
+    // falls over his morning (the Dusk Law, kept)
+    if (!duskUp && campWalk > 0.955) beginDusk()
   } else if (phase !== 'sky') {
     keeperEl.hidden = true
   }
@@ -1344,13 +1536,25 @@ function frame(now: number): void {
   campReveal +=
     (campTarget - campReveal) * Math.min(1, dt * (reducedMotion ? 20 : campTarget ? 1.1 : 3.4))
   if (phase === 'camp') {
-    // duskrise lifts the gaze to his sign; morning lands it again
-    const campPitch = duskUp ? 0.5 : -0.12
-    camera.rotation.x += (campPitch - camera.rotation.x) * Math.min(1, dt * (duskUp ? 1.1 : 2))
-    // narrow stages yaw gently toward the hearth so the fire holds the
-    // frame instead of clipping at its edge; the sign sits centered
-    const campYaw = !duskUp && camera.aspect < 0.9 ? 0.14 : 0
-    camera.rotation.y += (campYaw - camera.rotation.y) * Math.min(1, dt * 2)
+    // the duskrise holds the walk at the overlook; otherwise the eye
+    // travels toward wherever the visitor has pushed it
+    if (duskUp) campWalkTarget = Math.max(campWalkTarget, 0.985)
+    if (reducedMotion) {
+      // no travel: the walk cuts between stations
+      campWalk = STATIONS[camp.stationAt(campWalkTarget)]?.t ?? campWalkTarget
+    } else {
+      campWalk += (campWalkTarget - campWalk) * Math.min(1, dt * 2.6)
+    }
+    // MICHEL'S LAW: the night belongs to the gaze. Raising the eye — by
+    // drag, by touch, or just by carrying the pointer high in the frame —
+    // deepens the sky; lowering it gives his morning back.
+    if (gazeHold >= 0) {
+      campGaze = gazeHold
+    } else {
+      const raised = Math.max(0, dragPitch) + Math.max(0, -pointerNY) * 0.09
+      campGaze += (Math.min(1, raised / 0.46) - campGaze) * Math.min(1, dt * 2.4)
+    }
+    camp.stageCamera(camera, campWalk, camera.aspect < 0.9)
   }
   // night falls slowly enough to be felt; morning answers a bit quicker
   campDusk +=
@@ -1362,10 +1566,18 @@ function frame(now: number): void {
     elapsed,
     dt,
     aspect: camera.aspect,
-    yield: campYield,
+    walk: campWalk,
+    gaze: phase === 'camp' ? campGaze : 0,
+    yield: Math.max(campYield, traceOpen >= 0 ? 1 : 0),
     dusk: campDusk,
+    reduced: reducedMotion,
   })
   syncTrace()
+  syncLabels()
+  if (phase === 'camp' && !duskUp && campReveal > 0.5) {
+    const here = STATIONS[camp.stationAt(campWalk)]
+    if (here && status && status.textContent !== here.name) setStatus(here.name)
+  }
 
   // stars are born at totality and burn FULL at the fire (the hub is
   // the one place the whole firmament belongs to the visitor). In the
@@ -1461,7 +1673,7 @@ function frame(now: number): void {
   // drag inertia glides and the gaze drifts home when the hand rests
   if (!dragging) {
     dragYaw = Math.max(-0.42, Math.min(0.42, dragYaw + dragVX * dt))
-    dragPitch = Math.max(-0.2, Math.min(0.2, dragPitch + dragVY * dt))
+    dragPitch = Math.max(-0.2, Math.min(pitchUpLimit(), dragPitch + dragVY * dt))
     dragVX *= Math.exp(-3 * dt)
     dragVY *= Math.exp(-3 * dt)
     if (!dragAllowed()) {
@@ -1500,12 +1712,17 @@ let dragging = false
 function dragAllowed(): boolean {
   return (phase === 'agora' || phase === 'camp' || phase === 'council') && !paneOpen
 }
+/** his ground gives the eye real headroom: looking UP is a gesture there,
+    and the sky answers it (Michel's law) */
+function pitchUpLimit(): number {
+  return phase === 'camp' ? 0.54 : 0.2
+}
 function applyDrag(dx: number, dy: number): void {
   if (!dragAllowed()) return
   dragYaw = Math.max(-0.42, Math.min(0.42, dragYaw - dx * 0.0021))
-  dragPitch = Math.max(-0.2, Math.min(0.2, dragPitch - dy * 0.0013))
+  dragPitch = Math.max(-0.2, Math.min(pitchUpLimit(), dragPitch - dy * 0.0016))
   dragVX = -dx * 0.0021 * 60
-  dragVY = -dy * 0.0013 * 60
+  dragVY = -dy * 0.0016 * 60
 }
 addEventListener('pointerdown', (e) => {
   if (e.pointerType === 'mouse' && e.button !== 0) return

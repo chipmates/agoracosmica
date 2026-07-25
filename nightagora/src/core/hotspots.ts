@@ -12,6 +12,9 @@ export interface HotspotDef {
   pos: Vector3
   /** narrow-stage anchor: phones restage the set, they never clip it */
   posNarrow?: Vector3
+  /** a point can belong to one stretch of a walk: a mark for a site you
+      have not reached yet is a mark you cannot read */
+  when?(): boolean
   open(): void
 }
 
@@ -57,7 +60,7 @@ export function createHotspots(container: HTMLElement): HotspotsHandles {
 
   function sync(camera: PerspectiveCamera, visible: boolean): void {
     for (const s of spots) {
-      if (!visible) {
+      if (!visible || (s.def.when && !s.def.when())) {
         s.el.classList.remove('lit')
         s.el.style.visibility = 'hidden'
         continue

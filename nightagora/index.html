@@ -197,6 +197,40 @@
     body.forge #voice, body.forge #portrait, body.forge #portrait *,
     body.forge #goldbreath { transition: none !important; }
 
+    /* ---- the atlas layer: his ground, annotated the way a survey plate
+       annotates a coast. Letterspaced small caps, one hairline tick, and
+       a bearing — they ink in only while their site holds the frame. ---- */
+    #camp-labels { position: fixed; inset: 0; z-index: 2; pointer-events: none; }
+    .atlas-label {
+      position: absolute; top: 0; left: 0;
+      display: flex; align-items: baseline; gap: 8px;
+      transform: translate(-50%, -50%);
+      opacity: 0;
+      transition: opacity 0.7s ease;
+      white-space: nowrap;
+    }
+    .atlas-tick {
+      width: 26px; height: 1px;
+      background: linear-gradient(90deg,
+        transparent, color-mix(in srgb, var(--na-gold) 62%, transparent));
+    }
+    .atlas-site {
+      font-family: var(--sans);
+      font-size: 10px; letter-spacing: 0.34em; text-transform: uppercase;
+      color: color-mix(in srgb, var(--na-starlight) 88%, transparent);
+    }
+    .atlas-deg {
+      font-family: var(--sans);
+      font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase;
+      color: color-mix(in srgb, var(--na-gold) 72%, transparent);
+    }
+    @media (max-width: 720px) {
+      .atlas-site { font-size: 9px; letter-spacing: 0.26em; }
+      .atlas-deg { display: none; }
+      .atlas-tick { width: 16px; }
+    }
+    body.forge .atlas-label { transition: none !important; }
+
     /* ---- the trace: carved words, marked by a little star ---- */
     #trace-card {
       position: fixed; z-index: 3;
@@ -1280,6 +1314,7 @@
     </figcaption>
   </figure>
   <div id="goldbreath" aria-hidden="true"><div class="dark-line"></div></div>
+  <div id="camp-labels" aria-hidden="true"></div>
   <div id="trace-card" hidden>
     <p class="trace-kicker">A trace · kept in the wood</p>
     <p class="trace-quote">"What stands in the way becomes the way."</p>

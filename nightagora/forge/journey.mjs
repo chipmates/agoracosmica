@@ -56,6 +56,9 @@ try {
     page.evaluate(() => ({
       phase: document.body.dataset.phase,
       status: document.getElementById('status')?.textContent ?? '',
+      // his ground is walked: the walk's own number decides when a
+      // station has been reached (a DOM-only read overshoots to the vista)
+      campWalk: window.__forge?.state().campWalk ?? 0,
     }))
   const shot = async (name) => {
     const s = await state()
@@ -137,8 +140,29 @@ try {
     await page.waitForTimeout(2500)
     await shot('camp')
 
-    // 6 · the SITTING: the hearth opens with the night's one contract;
-    // one declarative tap and the keeper speaks
+    // 5b · HIS GROUND IS WALKED: the same one verb carries the visitor
+    // from the far shore to his tent, and every station is a real frame
+    for (const [name, until] of [
+      ['camp-ford', 0.28],
+      ['camp-gate', 0.42],
+      ['camp-via', 0.57],
+    ]) {
+      for (let i = 0; i < 30; i++) {
+        const s = await state()
+        if ((s.campWalk ?? 0) >= until) break
+        await wheel(240, 1, 90)
+      }
+      await page.waitForTimeout(900)
+      await shot(name)
+    }
+
+    // 6 · the SITTING: the hearth is a PLACE — it opens when the walk
+    // reaches his tent, and asks the night's one contract there
+    for (let i = 0; i < 40; i++) {
+      const s = await state()
+      if ((s.campWalk ?? 0) >= 0.7) break
+      await wheel(240, 1, 90)
+    }
     const sitting = page.locator('#sitting')
     await sitting.waitFor({ state: 'visible', timeout: 12000 })
     await shot('sitting')
@@ -154,19 +178,27 @@ try {
     await page.waitForTimeout(1500)
     await shot('camp-after-scroll-down')
 
-    // 6b · the DUSK LAW: His Sky rises over the camp, and his morning
-    // answers the return
-    const hisSky = page.locator('.hotspot', { hasText: 'His Sky' })
+    // 6b · THE DUSK LAW: the walk's end IS the overlook, and night falls
+    // over his morning there. His morning has to answer the return.
     try {
-      await hisSky.waitFor({ state: 'visible', timeout: 8000 })
-      await hisSky.click()
-      await page.waitForTimeout(4500)
+      for (let i = 0; i < 30; i++) {
+        const s = await state()
+        if ((s.campWalk ?? 0) >= 0.96) break
+        await wheel(240, 1, 90)
+      }
+      await page.locator('#dusk-pane').waitFor({ state: 'visible', timeout: 12000 })
+      await page.waitForTimeout(3500)
       await shot('duskrise')
       await page.locator('#dusk-return').click()
       await page.waitForTimeout(3000)
       await shot('camp-morning-again')
+      const back = await state()
+      if ((back.campWalk ?? 1) > 0.95) {
+        console.log('[journey] the duskrise will not let go: walk still at the vista')
+        await shot('STUCK-dusk-loop')
+      }
     } catch {
-      console.log('[journey] His Sky never rose over the camp')
+      console.log('[journey] the sign never rose over the camp')
       await shot('STUCK-dusk')
     }
 
