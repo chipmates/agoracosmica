@@ -202,10 +202,15 @@ export function beat(t: number, reduced: boolean): void {
   // is at the doorway; before that they would light the whole via. The
   // boost is small on purpose: inside the tent the eye is a metre from
   // every surface, and inverse-square does the rest (round 1).
+  // INSIDE, THE LAMP IS THE LIGHT. The praetorium's own glow is what the
+  // camp sees from the via; at his desk it would flood the canvas from a
+  // metre away and flatten the whole tent into one warm wall. So it stands
+  // down as the visitor steps in, and the little clay lamp takes over.
   const prae = fireRadU[0]
   const lamp = fireRadU[7]
-  if (prae) prae.value = 9.0 + 1.6 * uInterior.value
-  if (lamp) lamp.value = 1.5 + 1.1 * uInterior.value
+  const inside = uInterior.value
+  if (prae) prae.value = 9.0 * (1 - 0.62 * inside)
+  if (lamp) lamp.value = 1.5 + 2.8 * inside
 }
 
 // ------------------------------------------------------------ the TSL laws
@@ -342,8 +347,16 @@ export function inkMaterial(o: InkOptions = {}): MeshBasicNodeMaterial {
     const weave = sn(vec3(world.x.mul(9), world.y.mul(9), 1.7)).mul(0.26).add(0.84)
     const lowFall = pow(oneMinus(clamp(t.y, 0, 1)), 2.9)
     const innerC = c3(lin(o.innerC ?? '#F09040'), o.innerK ?? 0.04)
+    // and transmission is what you see from the OTHER side of the cloth:
+    // standing inside his tent, the canvas is lit by his lamp, not by its
+    // own glow, so the wash stands down as the visitor steps in
     col = col.add(
-      innerC.mul(seam).mul(weave).mul(float(0.05).add(lowFall.mul(0.95))).mul(float(0.74).add(uFlick.mul(0.26)))
+      innerC
+        .mul(seam)
+        .mul(weave)
+        .mul(float(0.05).add(lowFall.mul(0.95)))
+        .mul(float(0.74).add(uFlick.mul(0.26)))
+        .mul(oneMinus(uInterior.mul(0.8)))
     )
   }
 
