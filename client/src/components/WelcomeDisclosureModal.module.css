@@ -1,4 +1,11 @@
-/* WelcomeDisclosureModal.module.css - Welcome modal with cosmic scene and AI disclosure */
+/* WelcomeDisclosureModal.module.css — the frontispiece.
+   The entry modal speaks the atlas plate language (the app-wide style set
+   2026-07-23): hairline double frame on a deep plate gradient, Caslon
+   tracked-caps title, engraved portrait medallion over an epigraph, the
+   trust line as a typographic imprint, and one solid-gold squared button
+   for the single conversion action. Measured values from Atlas.css:
+   ease-out-expo cubic-bezier(0.16, 1, 0.3, 1), 3px plate radius, inner
+   keyline at inset 5px. */
 
 .welcomeOverlay {
   position: fixed;
@@ -6,7 +13,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: color-mix(in srgb, var(--bg-cosmic-void) var(--a-95), transparent);
+  background: color-mix(in srgb, var(--bg-void) var(--a-95), transparent);
   backdrop-filter: blur(var(--glass-blur-heavy));
   z-index: var(--z-overlay); /* 9999 */
   display: flex;
@@ -21,46 +28,41 @@
   to { opacity: 1; }
 }
 
+/* The plate */
 .welcomeModal {
   position: relative;
-  background: linear-gradient(135deg,
-    var(--bg-cosmic-void) 0%,
-    var(--bg-card) 50%,
-    var(--bg-highlight) 100%);
-  border-radius: 1.5rem;
-  border: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-60), transparent);
-  box-shadow:
-    0 0 20px color-mix(in srgb, var(--gold-subtle) var(--a-10), transparent),
-    0 10px 40px color-mix(in srgb, black var(--a-30), transparent);
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--bg-card) 94%, var(--gold-deep)) 0%,
+    var(--bg-deep-space) 90%
+  );
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 42%, transparent);
+  border-radius: 3px;
+  box-shadow: 0 24px 60px color-mix(in srgb, var(--bg-void) 80%, transparent);
   max-width: 700px;
   width: 100%;
   max-height: 90vh;
   overflow: hidden;
-  animation: slideIn 0.4s ease-out;
+  animation: plateIn 0.45s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   flex-direction: column;
 }
 
-/* Subtle top highlight for depth */
+/* Inner keyline — the double frame every plate card carries */
 .welcomeModal::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 40%;
-  background: linear-gradient(to bottom,
-    color-mix(in srgb, white var(--a-08), transparent) 0%,
-    transparent 100%);
-  border-radius: 1.5rem 1.5rem 0 0;
+  inset: 5px;
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 18%, transparent);
+  border-radius: 2px;
   pointer-events: none;
   z-index: var(--z-base);
 }
 
-@keyframes slideIn {
+@keyframes plateIn {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
@@ -68,47 +70,33 @@
   }
 }
 
+/* ========================================
+   TITLE BLOCK (frontispiece)
+   ======================================== */
+
 .modalHeader {
-  padding: 1.75rem 2rem 0.5rem;
+  padding: 1.5rem 2rem 1rem;
+  margin: 0 1.25rem;
   text-align: center;
   position: relative;
   z-index: var(--z-base);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.125rem;
+  gap: 0.3rem;
   flex-shrink: 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--gold-deep) 30%, transparent);
 }
 
-/* Title row — title with logo floating top-right */
-.titleRow {
-  position: relative;
-  display: inline-block;
-}
-
-/* Logo container — positioned above-right of title, like login page */
+/* Publisher's device: the logo sits centered above the title */
 .logoContainer {
-  position: absolute;
-  top: -20px;
-  right: -28px;
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 32px;
-  height: 32px;
-  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--gold-subtle) var(--a-50), transparent));
-  animation: logoGlow 4s ease-in-out 3 alternate;
-}
-
-@keyframes logoGlow {
-  0% {
-    filter: drop-shadow(0 0 10px color-mix(in srgb, var(--gold-subtle) var(--a-40), transparent));
-    transform: scale(1);
-  }
-  100% {
-    filter: drop-shadow(0 0 20px color-mix(in srgb, var(--gold-subtle) var(--a-60), transparent));
-    transform: scale(1.05);
-  }
+  width: 28px;
+  height: 28px;
+  margin-bottom: 0.25rem;
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--gold-subtle) var(--a-40), transparent));
 }
 
 .welcomeLogo {
@@ -116,50 +104,45 @@
   height: 100%;
 }
 
-/* DESIGN SYSTEM: 3 sizes only
-   Hero:  1.875rem  — title
-   Body:  1rem — all readable text
-   Meta:  0.8125rem — trust signals, attribution
-*/
-
 .modalTitle {
-  color: var(--gold-subtle);
-  font-size: 1.875rem;
-  font-weight: 600;
+  color: var(--gold-primary);
+  font-family: var(--font-content);
+  font-size: 1.75rem;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  line-height: 1.2;
   margin: 0;
-  font-family: 'Space Grotesk', var(--font-ui);
-  letter-spacing: 1px;
-  text-shadow:
-    0 0 15px color-mix(in srgb, var(--gold-subtle) var(--a-50), transparent),
-    0 2px 4px color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent);
-  background: linear-gradient(to right,
-    var(--gold-subtle),
-    color-mix(in srgb, var(--gold-subtle) 80%, white),
-    var(--gold-subtle));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-size: 200% 100%;
-  animation: shineText 4s linear 1;
 }
 
-@keyframes shineText {
-  0% { background-position: -100% 0; }
-  100% { background-position: 200% 0; }
-}
-
-/* Subtitle — platform tagline, tight to title, gold like login page */
 .modalSubtitle {
-  color: color-mix(in srgb, var(--gold-subtle) var(--a-80), transparent);
-  font-size: 1.125rem;
+  color: var(--text-secondary);
+  font-size: 1.0625rem;
   font-style: italic;
   margin: 0;
   line-height: 1.4;
-  font-family: var(--font-secondary, 'Crimson Text', Georgia, serif);
-  letter-spacing: 0.3px;
+  font-family: var(--font-content);
 }
 
+/* The imprint line: tracked small caps, dots do the structuring */
+.trustSignals {
+  margin-top: 0.4rem;
+  color: color-mix(in srgb, var(--gold-primary) 78%, var(--text-tertiary));
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-wrap: balance;
+  line-height: 1.7;
+}
+
+/* ========================================
+   CONTENT
+   ======================================== */
+
 .modalContent {
-  padding: 1rem 2rem 2rem;
+  padding: 1.5rem 2rem 1.25rem;
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
@@ -171,28 +154,26 @@
   outline-offset: -2px;
 }
 
-.modalActions {
-  padding: 1.5rem 0 0.5rem;
-  display: flex;
-  justify-content: center;
-}
-
 .welcomeContent {
   text-align: center;
 }
 
-/* Explainer — flowing prose with warm glow */
-.explainer {
+/* Medallion + epigraph, one centered column on every viewport */
+.cosmicScene {
   position: relative;
-  text-align: center;
-  margin: 0 auto 1.25rem;
-  max-width: 440px;
-  padding: 0.75rem 0.5rem;
-  opacity: 0;
-  animation: fadeInExplainer 0.8s ease-out 0.3s forwards;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.1rem;
+  margin: 0 0 1.4rem;
 }
 
-@keyframes fadeInExplainer {
+.campbellReveal {
+  opacity: 0;
+  animation: revealIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.7s forwards;
+}
+
+@keyframes revealIn {
   from {
     opacity: 0;
     transform: translateY(8px);
@@ -203,320 +184,177 @@
   }
 }
 
-/* Warm radial glow behind the text block */
-.explainerGlow {
-  position: absolute;
-  top: 45%;
-  left: 50%;
-  width: 130%;
-  height: 160%;
-  transform: translate(-50%, -50%);
-  background: radial-gradient(
-    ellipse at center,
-    color-mix(in srgb, var(--gold-subtle) var(--a-12), transparent) 0%,
-    color-mix(in srgb, var(--gold-subtle) var(--a-05), transparent) 40%,
-    transparent 70%
-  );
-  pointer-events: none;
-  z-index: 0;
-}
-
-.explainerBody {
+/* Engraved portrait medallion: hairline ring + dotted outer ring */
+.medallion {
   position: relative;
-  z-index: 1;
-  color: color-mix(in srgb, white var(--a-75), transparent);
-  font-size: 1rem;
-  line-height: 1.7;
-  margin: 0 0 0.625rem;
-}
-
-.highlight {
-  color: var(--gold-subtle);
-  font-weight: 600;
-}
-
-.explainerMission {
-  position: relative;
-  z-index: 1;
-  color: var(--mode-wisdom);
-  font-size: 1rem;
-  font-style: italic;
-  margin: 0 0 0.5rem;
-  line-height: 1.4;
-  font-family: var(--font-secondary, 'Crimson Text', Georgia, serif);
-}
-
-/* Campbell reveal - Pure CSS animation with delay (after value prop items) */
-.campbellReveal {
-  opacity: 0;
-  animation: fadeInCampbell 0.8s ease-out forwards;
-  animation-delay: 1.5s;
-}
-
-@keyframes fadeInCampbell {
-  from {
-    opacity: 0;
-    transform: translateY(15px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Campbell Scene */
-.cosmicScene {
-  position: relative;
-  height: 180px;
-  margin: 0 0 1rem;
-  overflow: hidden;
-  border-radius: 16px;
-  box-shadow: none;
-  background: linear-gradient(135deg,
-    color-mix(in srgb, var(--bg-cosmic-void) var(--a-95), transparent) 0%,
-    color-mix(in srgb, var(--bg-card) var(--a-85), transparent) 50%,
-    color-mix(in srgb, var(--bg-highlight) var(--a-80), transparent) 100%);
-}
-
-.nebulaBackground {
-  position: absolute;
-  inset: 0;
-  will-change: transform, opacity;
-  contain: strict;
-  background:
-    radial-gradient(circle at 40% 50%,
-      color-mix(in srgb, var(--gold-subtle) var(--a-20), transparent),
-      transparent 60%),
-    radial-gradient(circle at 60% 50%,
-      color-mix(in srgb, var(--mode-wisdom) var(--a-15), transparent),
-      transparent 60%);
-  filter: blur(15px);
-  opacity: 0.8;
-  transform-origin: center;
-  animation: guideNebulaBreathing 10s ease-in-out infinite alternate;
-}
-
-@keyframes guideNebulaBreathing {
-  0% {
-    transform: scale(1);
-    opacity: 0.9;
-  }
-  100% {
-    transform: scale(1.1);
-    opacity: 0.7;
-  }
-}
-
-.figureContainer {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 20px;
-  z-index: var(--z-base);
-}
-
-.silhouetteWrapper {
-  flex: 0 0 auto;
-  width: 145px;
-  height: 145px;
-  position: relative;
-  margin-right: 15px;
-}
-
-.silhouette {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 125px;
-  height: 125px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
   overflow: hidden;
-  box-shadow: 0 0 10px color-mix(in srgb, black var(--a-20), transparent);
-  border: 2px solid var(--gold-subtle);
-  z-index: var(--z-base);
-  animation: wisdomBreathing 6s ease-in-out infinite;
-  animation-delay: 3s;
-  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 60%, transparent);
+  box-shadow: 0 6px 24px color-mix(in srgb, var(--bg-void) 60%, transparent);
 }
 
-.silhouette:hover {
-  border-color: color-mix(in srgb, var(--gold-subtle) 80%, white);
-  box-shadow:
-    0 0 25px color-mix(in srgb, var(--mode-wisdom) var(--a-50), transparent),
-    inset 0 0 20px color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent);
-}
-
-.silhouette:hover .guideImage {
-  filter: brightness(1.15) saturate(1.1);
-}
-
-@keyframes wisdomBreathing {
-  0%, 100% {
-    transform: translate(-50%, -50%) scale(1);
-    filter: brightness(0.9);
-    box-shadow: 0 0 10px color-mix(in srgb, black var(--a-20), transparent);
-  }
-  50% {
-    transform: translate(-50%, -50%) scale(1.03);
-    filter: brightness(1.05);
-    box-shadow: 0 0 15px color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent);
-  }
+.cosmicScene::before {
+  content: '';
+  position: absolute;
+  top: -7px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 134px;
+  height: 134px;
+  border-radius: 50%;
+  border: 1px dotted color-mix(in srgb, var(--gold-deep) 45%, transparent);
+  pointer-events: none;
 }
 
 .guideImage {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transform: scale(1.1);
-  transition: filter 0.3s ease;
+  transform: scale(1.08);
 }
 
-/* Campbell Quote Section */
+/* The epigraph: pure typography on the plate, no box */
 .campbellQuote {
-  flex: 1;
-  color: var(--text-primary);
-  padding: 12px 15px;
   margin: 0;
-  background: linear-gradient(135deg,
-    color-mix(in srgb, var(--bg-cosmic-void) var(--a-70), transparent) 0%,
-    color-mix(in srgb, black var(--a-60), transparent) 100%);
-  border-radius: 12px;
-  border-left: 3px solid var(--gold-subtle);
-  backdrop-filter: blur(var(--glass-blur-light));
-  max-width: 65%;
-  box-shadow: 0 2px 8px color-mix(in srgb, black var(--a-15), transparent);
-}
-
-.quoteContent {
-  display: flex;
-  align-items: flex-start;
-  margin-bottom: 5px;
-}
-
-.quoteMark {
-  color: var(--gold-subtle);
-  font-size: 24px;
-  line-height: 1;
-  margin-right: 3px;
-  font-family: Georgia, serif;
-}
-
-.quoteMark.closing {
-  margin-left: 3px;
-  margin-right: 0;
+  padding: 0;
+  max-width: 30rem;
 }
 
 .quoteText {
-  font-size: 1rem;
+  font-family: var(--font-content);
   font-style: italic;
-  line-height: 1.5;
+  font-size: 1.125rem;
+  line-height: 1.6;
   color: var(--text-primary);
-  font-family: var(--font-secondary, 'Crimson Text', Georgia, serif);
+  margin: 0;
+}
+
+.quoteMark {
+  color: color-mix(in srgb, var(--text-tertiary) 85%, transparent);
+  font-size: 1.15em;
 }
 
 .quoteAttribution {
-  font-size: 0.8125rem;
-  text-align: right;
-  color: var(--gold-subtle);
-  margin-top: 8px;
-  font-weight: 500;
+  margin-top: 0.5rem;
+  font-family: var(--font-content);
+  font-style: italic;
+  font-size: 0.9rem;
+  color: var(--text-tertiary);
 }
 
 .quoteAttribution cite {
-  font-style: normal;
+  font-style: inherit;
 }
 
-/* Trust Signals — meta size, gold tint */
-.trustSignals {
-  position: relative;
-  z-index: 1;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  color: color-mix(in srgb, var(--gold-subtle) var(--a-70), transparent);
-  font-size: 0.875rem; /* 14px — one step above meta/caption floor */
+/* AI transparency: a printed notice with its own kicker. Stays high-contrast
+   on purpose — this is the legal-conspicuous element, not decoration. */
+.aiNotice {
+  background: color-mix(in srgb, var(--bg-card) 55%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 42%, transparent);
+  border-radius: 3px;
+  padding: 0.875rem 1.125rem;
+  text-align: left;
+}
+
+.aiNoticeKicker {
+  margin: 0 0 0.4rem;
+  font-family: var(--font-ui);
+  font-size: 0.68rem;
   font-weight: 500;
-  letter-spacing: 0.04em;
-}
-
-.trustIcon {
-  color: color-mix(in srgb, var(--gold-subtle) var(--a-70), transparent);
-}
-
-/* Begin Button */
-.beginButton {
-  padding: 1rem 3rem;
-  min-height: 44px;
-  background: linear-gradient(135deg,
-    var(--gold-subtle) 0%,
-    var(--gold-primary) 50%,
-    var(--gold-hover) 100%);
-  border: none;
-  color: var(--bg-primary);
-  border-radius: 2rem;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-  font-family: var(--font-primary, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+  letter-spacing: 0.24em;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 4px 16px color-mix(in srgb, black var(--a-20), transparent);
+  color: color-mix(in srgb, var(--gold-primary) 78%, var(--text-tertiary));
 }
 
-/* Premium shimmer effect */
-.beginButton::after {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle,
-    color-mix(in srgb, white 40%, transparent) 0%,
-    transparent 70%);
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-.beginButton:hover {
-  transform: translateY(-3px) scale(1.05);
-  box-shadow:
-    0 0 20px color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent),
-    0 6px 20px color-mix(in srgb, black var(--a-25), transparent);
-}
-
-.beginButton:hover::after {
-  opacity: 1;
-  animation: ripple 1s ease-out;
-}
-
-@keyframes ripple {
-  from {
-    transform: scale(0.3);
-    opacity: 0.3;
-  }
-  to {
-    transform: scale(1);
-    opacity: 0;
-  }
-}
-
-.beginButton:active {
-  transform: translateY(0);
+.aiNotice p:not(.aiNoticeKicker) {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--text-primary);
 }
 
 /* ========================================
-   GOLDEN DISSOLVE EXIT
+   FOOTER (imprint + the act)
    ======================================== */
 
-/* Phase 1: Button fades */
+.modalFooter {
+  flex-shrink: 0;
+  padding: 1rem 2rem calc(1.25rem + env(safe-area-inset-bottom, 0px));
+  margin: 0 1.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  border-top: 1px solid color-mix(in srgb, var(--gold-deep) 30%, transparent);
+}
+
+/* Conspicuous, not grey micro-print: real size + primary text color for AA contrast */
+.clickwrapStatement {
+  margin: 0;
+  max-width: 34rem;
+  text-align: center;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+.consentLink {
+  color: var(--gold-primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.consentLink:hover {
+  color: var(--gold-hover);
+}
+
+/* Gold leaf pressed into the plate: solid, squared, calm */
+.beginButton {
+  padding: 0.9rem 2.75rem;
+  min-height: 44px;
+  background: linear-gradient(180deg, var(--gold-primary) 0%, var(--gold-subtle) 100%);
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 60%, transparent);
+  color: var(--bg-primary);
+  border-radius: 3px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-ui);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  box-shadow: 0 6px 18px color-mix(in srgb, black var(--a-25), transparent);
+  transition: background 0.25s ease, box-shadow 0.25s ease;
+}
+
+.beginButton:hover {
+  background: linear-gradient(180deg, var(--gold-hover) 0%, var(--gold-primary) 100%);
+  box-shadow:
+    0 0 16px color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent),
+    0 6px 18px color-mix(in srgb, black var(--a-25), transparent);
+}
+
+.beginButton:active {
+  transform: translateY(1px);
+}
+
+.beginButton:focus-visible {
+  outline: 2px solid var(--gold-subtle);
+  outline-offset: 3px;
+}
+
+.footerLinks {
+  margin: 0;
+  font-size: 0.8rem;
+  text-align: center;
+  color: var(--text-tertiary);
+}
+
+/* ========================================
+   GOLDEN DISSOLVE EXIT (unchanged beat)
+   ======================================== */
+
 .beginButton.animating {
   animation: buttonFade 0.3s ease-out forwards;
   pointer-events: none;
@@ -529,7 +367,6 @@
   }
 }
 
-/* Phase 2: Modal content fades, then card dissolves (compositor-only: opacity + transform) */
 .transitioning {
   animation: cardDissolve 0.7s cubic-bezier(0.4, 0, 0.2, 1) 0.15s forwards;
   will-change: opacity, transform;
@@ -546,12 +383,10 @@
   }
 }
 
-/* Overlay during animation */
 .animatingOverlay {
   pointer-events: none;
 }
 
-/* Dissolve overlay — warm golden bloom behind the fading card (compositor-only) */
 .dissolveOverlay {
   position: fixed;
   top: 50%;
@@ -598,16 +433,10 @@
   transition: none !important;
 }
 
-.welcomeOverlay[data-visibility="hidden"] .nebulaBackground,
-.welcomeOverlay[data-visibility="hidden"] .silhouette {
-  animation: none !important;
-}
-
 /* ========================================
    RESPONSIVE DESIGN
    ======================================== */
 
-/* Mobile */
 @media (max-width: 768px) {
   .dissolveOverlay {
     width: 200px;
@@ -618,6 +447,8 @@
     padding: 0;
   }
 
+  /* Full-screen plate: the outer border goes, the inner keyline stays and
+     frames the page the way the nocturne portraits frame themselves */
   .welcomeModal {
     max-width: 100%;
     width: 100vw;
@@ -630,213 +461,146 @@
     box-shadow: none;
   }
 
+  .welcomeModal::before {
+    inset: 6px;
+  }
+
   .modalHeader {
-    padding: calc(1.75rem + env(safe-area-inset-top, 0px)) 1.5rem 0.75rem;
+    padding: calc(1.5rem + env(safe-area-inset-top, 0px)) 1.25rem 0.875rem;
+    margin: 0 1rem;
   }
 
   .logoContainer {
-    width: 28px;
-    height: 28px;
-    top: -16px;
-    right: -22px;
+    width: 24px;
+    height: 24px;
   }
 
   .modalTitle {
-    font-size: 1.375rem;
+    font-size: 1.35rem;
+    letter-spacing: 0.12em;
   }
 
   .modalSubtitle {
     font-size: 1rem; /* 16px */
   }
 
+  .trustSignals {
+    font-size: 0.7rem;
+    letter-spacing: 0.12em; /* DE runs long: keep the imprint to two calm lines */
+  }
+
+  /* DE runs 25-35% longer than EN, so the notice can sit below the fold on
+     phones — the fade turns the cut into a visible "more below" */
+  .modalContent {
+    padding: 1.25rem 1.5rem 1.75rem;
+    mask-image: linear-gradient(to bottom, black calc(100% - 24px), transparent);
+    -webkit-mask-image: linear-gradient(to bottom, black calc(100% - 24px), transparent);
+  }
+
   .cosmicScene {
-    height: auto;
-    min-height: 150px;
-    margin: 0.5rem 0 1rem;
-    padding: 1rem;
+    gap: 0.8rem;
+    margin: 0 0 1rem;
   }
 
-  .figureContainer {
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-    padding: 0;
+  .medallion {
+    width: 104px;
+    height: 104px;
   }
 
-  .silhouetteWrapper {
-    width: 110px;
-    height: 110px;
-    margin-right: 0;
-    margin-bottom: 0.5rem;
-  }
-
-  .silhouette {
-    width: 90px;
-    height: 90px;
-    border-width: 1.5px;
-  }
-
-  .campbellQuote {
-    max-width: 100%;
-    padding: 10px;
-    margin: 0;
-  }
-
-  .quoteContent {
-    justify-content: center;
+  .cosmicScene::before {
+    width: 118px;
+    height: 118px;
   }
 
   .quoteText {
-    font-size: 1.0625rem; /* 17px — leads the explainer body (15px) */
-    line-height: 1.4;
-  }
-
-  .quoteMark {
-    font-size: 1.25rem;
+    font-size: 1.0625rem; /* 17px */
+    line-height: 1.5;
   }
 
   .quoteAttribution {
     font-size: 0.875rem; /* 14px */
   }
 
-  .explainer {
-    padding: 0.75rem 0;
-    margin: 0 auto 0.75rem;
+  .aiNotice p:not(.aiNoticeKicker) {
+    font-size: 0.9375rem; /* 15px, still leads the consent block */
   }
 
-  .explainerTagline {
-    font-size: 1.0625rem; /* 17px */
+  .modalFooter {
+    padding: 0.875rem 1.25rem calc(1rem + env(safe-area-inset-bottom, 0px));
+    margin: 0 1rem;
   }
 
-  .explainerBody {
-    font-size: 1.0625rem; /* 17px — comfortable read on mid-large phones */
-    line-height: 1.6;
-  }
-
-  .explainerMission {
-    font-size: 1rem; /* 16px */
+  .clickwrapStatement {
+    font-size: 0.9375rem; /* 15px, keep it legible on the action line */
   }
 
   .beginButton {
-    padding: 0.625rem 1.25rem;
+    padding: 0.75rem 2rem;
     font-size: 0.875rem;
-    letter-spacing: 0.02em;
-    border-radius: 1.5rem;
+    letter-spacing: 0.1em;
     min-height: 44px;
-  }
-
-  .modalActions {
-    padding: 1rem 2rem calc(2rem + env(safe-area-inset-bottom, 0px));
-  }
-
-  .consentHeading {
-    font-size: 1.25rem; /* 20px */
-  }
-
-  .aiNotice {
-    font-size: 1rem; /* 16px — compact on mobile, still leads the consent block */
-    line-height: 1.55;
-  }
-
-  .checkboxLabel {
-    font-size: 0.9375rem; /* 15px */
-    line-height: 1.55;
-  }
-
-  .consentLinks {
-    font-size: 0.875rem; /* 14px */
   }
 }
 
 /* Ultra-small screens (iPhone SE) */
 @media (max-width: 375px) {
-  .cosmicScene {
-    min-height: 140px;
-    padding: 0.75rem;
-  }
-
-  .silhouetteWrapper {
-    width: 110px;
-    height: 110px;
-  }
-
-  .silhouette {
-    width: 90px;
-    height: 90px;
-  }
-
-  .campbellQuote {
-    padding: 8px;
-  }
-
-  .quoteText {
-    font-size: 0.9375rem; /* 15px — iOS readability floor */
-    line-height: 1.4;
-  }
-
-  .quoteMark {
-    font-size: 1.125rem;
-  }
-
-  .quoteAttribution {
-    font-size: 0.8125rem; /* 13px */
-  }
-
-  .explainer {
-    padding: 0.5rem 0.25rem;
-  }
-
-  .explainerBody {
-    font-size: 0.9375rem;
-  }
-
   .modalTitle {
-    font-size: 1.25rem;
+    font-size: 1.2rem;
   }
 
   .modalSubtitle {
-    font-size: 0.875rem;
+    font-size: 0.9375rem;
   }
 
-  .beginButton {
-    padding: 0.5rem 1rem;
-    font-size: 0.8125rem;
-    letter-spacing: 0.01em;
-    border-radius: 1.25rem;
+  .medallion {
+    width: 92px;
+    height: 92px;
   }
 
-  .aiNotice {
-    font-size: 0.9375rem; /* 15px — SE has less width, scale safety notice down from 16px */
-  }
-}
-
-/* Landscape orientation */
-@media (max-height: 500px) and (orientation: landscape) {
-  .cosmicScene {
-    height: 140px;
-    padding: 0.5rem;
-  }
-
-  .figureContainer {
-    flex-direction: row;
-  }
-
-  .silhouetteWrapper {
-    width: 90px;
-    height: 90px;
-  }
-
-  .silhouette {
-    width: 70px;
-    height: 70px;
-  }
-
-  .campbellQuote {
-    padding: 8px;
+  .cosmicScene::before {
+    width: 106px;
+    height: 106px;
   }
 
   .quoteText {
-    font-size: 0.75rem;
+    font-size: 0.9375rem; /* 15px, iOS readability floor */
+  }
+
+  .beginButton {
+    padding: 0.625rem 1.5rem;
+    font-size: 0.8125rem;
+    letter-spacing: 0.08em;
+  }
+}
+
+/* Short viewports: the notice can sit below the fold — fade the scroll edge
+   so the cut reads as "more below", not as the end of the page */
+@media (max-height: 700px) {
+  .modalContent {
+    mask-image: linear-gradient(to bottom, black calc(100% - 24px), transparent);
+    -webkit-mask-image: linear-gradient(to bottom, black calc(100% - 24px), transparent);
+    padding-bottom: 1.75rem;
+  }
+
+  .cosmicScene {
+    gap: 0.6rem;
+    margin: 0 0 0.8rem;
+  }
+
+  .quoteText {
+    font-size: 1rem;
+    line-height: 1.45;
+  }
+
+  .medallion {
+    width: 84px;
+    height: 84px;
+  }
+
+  .cosmicScene::before {
+    top: -6px;
+    width: 96px;
+    height: 96px;
   }
 }
 
@@ -844,10 +608,9 @@
    ACCESSIBILITY
    ======================================== */
 
-/* High contrast mode */
 @media (prefers-contrast: high) {
   .welcomeModal {
-    background: var(--bg-cosmic-void);
+    background: var(--bg-void);
     border: 2px solid var(--gold-subtle);
   }
 
@@ -856,37 +619,24 @@
   }
 
   .modalTitle {
-    background: none;
-    -webkit-background-clip: unset;
-    -webkit-text-fill-color: unset;
     color: var(--gold-subtle);
-    font-weight: 700;
-    text-shadow: none;
+    font-weight: 600;
   }
 
-  .nebulaBackground {
-    display: none;
+  .trustSignals,
+  .aiNoticeKicker {
+    color: var(--gold-primary);
   }
 
-  .silhouette {
-    animation: none;
+  .medallion {
+    border: 2px solid var(--gold-subtle);
   }
 
-  .logoContainer {
-    animation: none;
-    filter: none;
-  }
-
-  .explainerBody {
-    color: var(--text-primary);
-  }
-
-  .explainerGlow {
+  .cosmicScene::before {
     display: none;
   }
 }
 
-/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .welcomeOverlay {
     animation: none;
@@ -896,37 +646,11 @@
     animation: none;
   }
 
-  .explainer {
-    animation: none;
-    opacity: 1;
-  }
-
   .campbellReveal {
     animation: none;
     opacity: 1;
   }
 
-  .logoContainer {
-    animation: none;
-  }
-
-  .transitioning .logoContainer {
-    animation: none;
-  }
-
-  .modalTitle {
-    animation: none;
-  }
-
-  .nebulaBackground {
-    animation: none;
-  }
-
-  .silhouette {
-    animation: none;
-  }
-
-  /* Simplified exit: fade only, no glow effects */
   .transitioning {
     animation: reducedFadeOut 0.4s ease-out forwards;
   }
@@ -945,124 +669,6 @@
   }
 }
 
-/* Focus indicators */
-.beginButton:focus-visible {
-  outline: 2px solid var(--gold-subtle);
-  outline-offset: 2px;
-}
-
-/* === Legal consent section === */
-
-.consentSection {
-  padding: 1.5rem 0 0;
-  margin-top: 1.5rem;
-  border-top: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-20), transparent);
-}
-
-.consentHeading {
-  font-family: var(--font-display);
-  font-size: 1.1rem;
-  color: var(--gold-subtle);
-  text-align: center;
-  margin: 0 0 1rem;
-  font-weight: 500;
-}
-
-.aiNotice {
-  background: color-mix(in srgb, var(--warning-subtle, #b8860b) 12%, transparent);
-  border: 1px solid color-mix(in srgb, var(--warning-subtle, #b8860b) 25%, transparent);
-  border-radius: 8px;
-  padding: 0.75rem 1rem;
-  margin-bottom: 1rem;
-  font-size: 0.85rem;
-  line-height: 1.5;
-  color: var(--text-primary);
-}
-
-.aiNotice p {
-  margin: 0;
-}
-
-.checkboxLabel {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
-  margin-bottom: 0.75rem;
-  font-size: 0.85rem;
-  line-height: 1.5;
-  color: var(--text-secondary);
-  cursor: pointer;
-  min-height: 44px;
-  padding: 4px 0;
-}
-
-.checkbox {
-  flex-shrink: 0;
-  width: 20px;
-  height: 20px;
-  margin-top: 2px;
-  accent-color: var(--gold-subtle, #d4a539);
-  cursor: pointer;
-}
-
-.consentLink {
-  color: var(--gold-subtle, #d4a539);
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
-.consentLink:hover {
-  opacity: 0.8;
-}
-
-.consentLinks {
-  font-size: 0.8rem;
-  color: var(--text-tertiary);
-  margin: 0.5rem 0 0;
-  text-align: center;
-}
-
-/* === Option C: single-action clickwrap footer (stays co-visible with the button) === */
-.modalFooter {
-  flex-shrink: 0;
-  padding: 1rem 2rem calc(1.25rem + env(safe-area-inset-bottom, 0px));
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.6rem;
-  border-top: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-20), transparent);
-  background: linear-gradient(to top,
-    color-mix(in srgb, var(--bg-cosmic-void) var(--a-95), transparent),
-    color-mix(in srgb, var(--bg-card) var(--a-60), transparent));
-}
-
-/* Conspicuous, not grey micro-print: real size + primary text color for AA contrast */
-.clickwrapStatement {
-  margin: 0;
-  max-width: 34rem;
-  text-align: center;
-  font-size: 0.9rem;
-  line-height: 1.5;
-  color: var(--text-primary);
-}
-
-.footerLinks {
-  margin: 0;
-  font-size: 0.8rem;
-  text-align: center;
-  color: var(--text-tertiary);
-}
-
-@media (max-width: 768px) {
-  .modalFooter {
-    padding: 0.875rem 1.5rem calc(1rem + env(safe-area-inset-bottom, 0px));
-  }
-  .clickwrapStatement {
-    font-size: 0.9375rem; /* 15px, keep it legible on the action line */
-  }
-}
-
-/* Print styles */
 @media print {
   .welcomeOverlay {
     display: none;

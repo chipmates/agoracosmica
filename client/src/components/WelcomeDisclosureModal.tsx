@@ -2,7 +2,6 @@ import React, { useState, useCallback, useEffect, useRef, FC } from 'react';
 import { useTranslation } from '../hooks/useTranslation';
 import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
 import { focusManagement } from '../utils/accessibility/focusSystem';
-import { ShieldCheck } from '@phosphor-icons/react';
 import OptimizedImage from './OptimizedImage';
 import CosmicLogo from './CosmicLogo';
 import styles from './WelcomeDisclosureModal.module.css';
@@ -182,17 +181,15 @@ const WelcomeDisclosureModal: FC<WelcomeDisclosureModalProps> = ({ isOpen, onCom
         className={`${styles.welcomeModal} ${isAnimating ? styles.transitioning : ''}`}
         onAnimationEnd={handleBurstEnd}
       >
-        {/* Branded header — matches login/website */}
+        {/* Frontispiece title block: publisher's device above the title,
+            italic serif tagline, trust signals as the typographic imprint */}
         <div className={styles.modalHeader}>
-          <div className={styles.titleRow}>
-            <h2 className={styles.modalTitle}>{tNode('welcome.title')}</h2>
-            <div className={styles.logoContainer}>
-              <CosmicLogo className={styles.welcomeLogo} />
-            </div>
+          <div className={styles.logoContainer}>
+            <CosmicLogo className={styles.welcomeLogo} />
           </div>
+          <h2 className={styles.modalTitle}>{tNode('welcome.title')}</h2>
           <p className={styles.modalSubtitle}>{tNode('welcome.explainer.tagline')}</p>
           <div className={styles.trustSignals}>
-            <ShieldCheck size={12} weight="duotone" className={styles.trustIcon} />
             <span>{tNode('welcome.trustSignals')}</span>
           </div>
         </div>
@@ -200,53 +197,44 @@ const WelcomeDisclosureModal: FC<WelcomeDisclosureModalProps> = ({ isOpen, onCom
         {/* Content */}
         <div className={styles.modalContent} tabIndex={-1}>
           <div className={styles.welcomeContent}>
-            {/* Campbell Scene — fades in after value prop */}
+            {/* Campbell as engraved medallion over an epigraph — fades in
+                after the title block */}
             <div
               className={`${styles.cosmicScene} ${!hasAnimated ? styles.campbellReveal : ''}`}
               onAnimationEnd={handleRevealEnd}
             >
-              <div className={styles.nebulaBackground} />
-
-              <div className={styles.figureContainer}>
-                <div className={styles.silhouetteWrapper}>
-                  <div className={styles.silhouette}>
-                    {/* Portrait renders at ~125px (<=90px on small phones); the
-                        sizes cap makes mobile fetch 320-480w (~11-37KB) instead
-                        of the generic-100vw 640w (~53-68KB) on the entry screen. */}
-                    <OptimizedImage
-                      src="campbell"
-                      type="ui"
-                      purpose="thumbnail"
-                      priority={true}
-                      loading="eager"
-                      withBlurUp={true}
-                      alt="Joseph Campbell"
-                      className={styles.guideImage}
-                      sizes="(max-width: 640px) 150px, 145px"
-                    />
-                  </div>
-                </div>
-
-                {/* Campbell Quote */}
-                <blockquote className={styles.campbellQuote}>
-                  <div className={styles.quoteContent}>
-                    <span className={styles.quoteMark} aria-hidden="true">&ldquo;</span>
-                    <span className={styles.quoteText}>
-                      {tNode('welcome.quote')}
-                    </span>
-                    <span className={`${styles.quoteMark} ${styles.closing}`} aria-hidden="true">&rdquo;</span>
-                  </div>
-                  <footer className={styles.quoteAttribution}>
-                    <cite>{tNode('welcome.quoteAttribution')}</cite>
-                  </footer>
-                </blockquote>
+              <div className={styles.medallion}>
+                {/* Portrait renders at ~120px; the sizes cap keeps mobile on
+                    the 320-480w variants instead of the generic-100vw 640w. */}
+                <OptimizedImage
+                  src="campbell"
+                  type="ui"
+                  purpose="thumbnail"
+                  priority={true}
+                  loading="eager"
+                  withBlurUp={true}
+                  alt="Joseph Campbell"
+                  className={styles.guideImage}
+                  sizes="(max-width: 640px) 120px, 130px"
+                />
               </div>
-            </div>
 
+              <blockquote className={styles.campbellQuote}>
+                <p className={styles.quoteText}>
+                  <span className={styles.quoteMark} aria-hidden="true">&ldquo;</span>
+                  {tNode('welcome.quote')}
+                  <span className={styles.quoteMark} aria-hidden="true">&rdquo;</span>
+                </p>
+                <footer className={styles.quoteAttribution}>
+                  <cite>{tNode('welcome.quoteAttribution')}</cite>
+                </footer>
+              </blockquote>
+            </div>
           </div>
 
           {/* AI transparency notice (short, names chat/stories/audio) */}
           <div className={styles.aiNotice} role="note">
+            <p className={styles.aiNoticeKicker}>{tNode('legal.consent.aiNoticeKicker')}</p>
             <p>{tNode('legal.consent.aiNotice')}</p>
           </div>
         </div>
