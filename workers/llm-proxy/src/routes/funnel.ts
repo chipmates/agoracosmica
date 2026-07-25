@@ -43,6 +43,10 @@ const VALID_STEPS = new Set([
   // Wave 3: listen-to-talk handoff, per-occurrence volume counters
   'handoff_shown',
   'handoff_taken',
+  // Council revision: catalog opens, per-occurrence volume counter. Closes
+  // the "never opens vs opens and flees" gap between sidebar tap and the
+  // playback started beacon.
+  'council_open',
 ]);
 
 // Outcome slot (blob5): same role as status/type elsewhere. Steps without a

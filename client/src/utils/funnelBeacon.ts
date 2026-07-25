@@ -33,7 +33,10 @@ export type FunnelStep =
   // figure_selected). shown = the card appeared at content completion,
   // taken = the visitor tapped through into the talk chapter.
   | 'handoff_shown'
-  | 'handoff_taken';
+  | 'handoff_taken'
+  // Council revision: catalog opens (per-occurrence volume counter). With
+  // playback 'started' this separates "never opens" from "opens and flees".
+  | 'council_open';
 
 export type CinematicOutcome = 'watched' | 'skipped';
 
