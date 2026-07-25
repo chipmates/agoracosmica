@@ -31,7 +31,6 @@ const CouncilDetailSheet: FC<CouncilDetailSheetProps> = ({ council, onClose, onP
   const title = getLocalizedTitle(council, language);
   const question = getLocalizedQuestion(council, language);
   const tagline = getLocalizedTagline(council, language);
-  const typeEmoji = council.type === 'confrontational' ? '🔥' : '🌊';
   const typeClass = council.type === 'confrontational'
     ? 'council-detail-sheet--confrontational'
     : 'council-detail-sheet--reflective';
@@ -66,10 +65,8 @@ const CouncilDetailSheet: FC<CouncilDetailSheetProps> = ({ council, onClose, onP
 
         <div className="council-detail-sheet__header">
           <div className="council-detail-sheet__title-row">
-            <span className="council-detail-sheet__type-badge" aria-label={council.type}>
-              {typeEmoji}
-            </span>
             <h3 className="council-detail-sheet__title">{title}</h3>
+            <span className="council-detail-sheet__type-word">{typeLabel}</span>
           </div>
           <CloseButton
             onClick={onClose}
@@ -157,11 +154,12 @@ const CouncilDetailSheet: FC<CouncilDetailSheetProps> = ({ council, onClose, onP
           )}
         </div>
 
-        {/* Safety + type indicator (footer) */}
-        <div className="council-safety-indicator">
-          {safetyLabel && <span>{safetyLabel}</span>}
-          <span>{typeLabel}</span>
-        </div>
+        {/* Safety indicator (footer) — the type already sits in the header chip */}
+        {safetyLabel && (
+          <div className="council-safety-indicator">
+            <span>{safetyLabel}</span>
+          </div>
+        )}
       </div>
     </div>,
     document.body

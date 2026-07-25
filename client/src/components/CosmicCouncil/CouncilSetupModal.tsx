@@ -1,10 +1,8 @@
 // src/components/CosmicCouncil/CouncilSetupModal.tsx
 import React, { useState, useEffect, useRef, FC, ReactNode, MouseEvent } from 'react';
 import { useBodyScrollLock } from '../../hooks/useBodyScrollLock';
-import { Play, Crown, Sparkle, MoonStars, Lightning as Zap, Users, Wrench, Star, Globe, PuzzlePiece } from '@phosphor-icons/react';
+import { Play, Crown, Sparkle, Globe, PuzzlePiece } from '@phosphor-icons/react';
 import { createPortal } from 'react-dom';
-import HelperPopup from '../HelperPopup/HelperPopup';
-import { useUIStore } from '../../stores/uiStore';
 import { useDomainStore } from '../../stores/domainStore';
 import { getHistoricalFigures } from '../../api/figures';
 import useTranslation from '../../hooks/useTranslation';
@@ -17,11 +15,12 @@ import CouncilThemeRow from './CouncilThemeRow';
 import CouncilCard from './CouncilCard';
 import CouncilDetailSheet from './CouncilDetailSheet';
 import { screenContent, type CrisisResources } from '../../utils/contentSafety';
+import { sendFunnelBeacon } from '../../utils/funnelBeacon';
 import {
   THEMES,
-  councilsByTheme,
   heroConfrontational,
   heroReflective,
+  getThemeCouncilsRanked,
   typeToInternal,
   getShortDisplayName,
   CatalogCouncil
@@ -74,12 +73,8 @@ const CouncilSetupModal: FC<CouncilSetupModalProps> = ({
   onClose,
   onStartCouncil
 }) => {
-  const { t, tString, tNode, language } = useTranslation();
+  const { tString, tNode, language } = useTranslation();
   const historicalFigures = React.useMemo(() => getHistoricalFigures(language), [language]);
-
-  // Help preferences from Zustand
-  const shouldShowHelp = useUIStore((state) => state.shouldShowHelp);
-  const dismissHelp = useUIStore((state) => state.dismissHelp);
 
   // Council quota gate: when free-tier and council/day used up, intercept the
   // start action and route to the rate-limit modal instead of starting the council.
@@ -102,7 +97,6 @@ const CouncilSetupModal: FC<CouncilSetupModalProps> = ({
   const [userQuestion, setUserQuestion] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [customType, setCustomType] = useState<'debate' | 'advisory'>('debate');
-  const [showCouncilHelp, setShowCouncilHelp] = useState<boolean>(false);
 
   // View state
   const [viewMode, setViewMode] = useState<'catalog' | 'custom'>('catalog');
@@ -117,10 +111,9 @@ const CouncilSetupModal: FC<CouncilSetupModalProps> = ({
   // Reset state when modal is closed
   useEffect(() => {
     if (isOpen) {
-      const shouldShow = shouldShowHelp('councilSetupHelp');
-      if (shouldShow) {
-        setShowCouncilHelp(true);
-      }
+      // Anonymous volume counter: catalog opens. With the playback 'started'
+      // beacon this separates "never opens" from "opens and flees".
+      sendFunnelBeacon('council_open');
       // a11y: move focus into the dialog on open so screen-reader users hear
       // the title and Tab cycles within the modal. rAF defers one frame so
       // the portal node is mounted before .focus() runs.
@@ -131,7 +124,7 @@ const CouncilSetupModal: FC<CouncilSetupModalProps> = ({
       setViewMode('catalog');
       setSelectedCouncil(null);
     }
-  }, [isOpen, shouldShowHelp]);
+  }, [isOpen]);
 
   // a11y: lightweight focus trap — keep Tab/Shift+Tab inside the dialog while open.
   useEffect(() => {
@@ -168,7 +161,7 @@ const CouncilSetupModal: FC<CouncilSetupModalProps> = ({
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
-        if (viewMode === 'custom') {
+        if (viewMode !== 'catalog') {
           setViewMode('catalog');
         } else {
           onClose();
@@ -183,7 +176,7 @@ const CouncilSetupModal: FC<CouncilSetupModalProps> = ({
     return () => {
       document.removeEventListener('keydown', handleEscape);
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, viewMode]);
 
   // Figure selection handlers (custom builder)
   const handleFigureSelect = (figure: Figure): void => {
@@ -273,11 +266,6 @@ const CouncilSetupModal: FC<CouncilSetupModalProps> = ({
     setViewMode('catalog');
   };
 
-  // Helper popup handler
-  const handleDontShowCouncilHelp = (): void => {
-    dismissHelp('councilSetupHelp');
-  };
-
   // Custom builder start handler
   const handleStartCustomCouncil = async (): Promise<void> => {
     // Quota check FIRST — when the user is exhausted we want them to see the
@@ -365,9 +353,6 @@ const CouncilSetupModal: FC<CouncilSetupModalProps> = ({
           <div className="council-setup-header">
             <div className="council-setup-title-section">
               <h2 className="council-setup-title" id="council-setup-title">
-                <span className="council-setup-title-icon">
-                  <MoonStars size={24} strokeWidth={2} />
-                </span>
                 {tString('cosmicCouncil.title', 'Cosmic Council')}
               </h2>
               <p className="council-setup-subtitle">
@@ -380,8 +365,8 @@ const CouncilSetupModal: FC<CouncilSetupModalProps> = ({
               </p>
             </div>
             <CloseButton
-              onClick={viewMode === 'custom' ? handleBackToCatalog : onClose}
-              aria-label={viewMode === 'custom'
+              onClick={viewMode !== 'catalog' ? handleBackToCatalog : onClose}
+              aria-label={viewMode !== 'catalog'
                 ? tString('cosmicCouncil.cardFeed.backToCatalog', 'Back')
                 : tString('common.close', 'Close')
               }
@@ -390,9 +375,14 @@ const CouncilSetupModal: FC<CouncilSetupModalProps> = ({
           </div>
 
           {viewMode === 'catalog' ? (
-            /* ====== CATALOG VIEW: Hero Section + Theme Rows ====== */
+            /* ====== CATALOG VIEW: Hero Section + Theme Rows (audit-ranked) ====== */
             <>
               {/* Hero Section — 2 curated heroes (same CouncilCard component) + custom builder */}
+              <div className="council-hero-header">
+                <span className="council-hero-header__kicker">
+                  {tString('cosmicCouncil.cardFeed.startHere', 'Start here')}
+                </span>
+              </div>
               <div className="council-hero-section">
                 <CouncilCard council={heroConfrontational} onSelect={handleSelectCouncil} isHero />
                 <CouncilCard council={heroReflective} onSelect={handleSelectCouncil} isHero />
@@ -423,12 +413,15 @@ const CouncilSetupModal: FC<CouncilSetupModalProps> = ({
                 </div>
               </div>
 
-              {/* Theme Rows */}
+              {/* Theme Rows — audit order (blessed pick first, weakest last);
+                  the heroes stay out of their home rails (no duplicates) */}
               {THEMES.map(theme => (
                 <CouncilThemeRow
                   key={theme.id}
                   theme={theme}
-                  councils={councilsByTheme[theme.id]}
+                  councils={getThemeCouncilsRanked(theme.id).filter(
+                    c => c.id !== heroConfrontational.id && c.id !== heroReflective.id
+                  )}
                   onSelect={handleSelectCouncil}
                 />
               ))}
@@ -474,7 +467,6 @@ const CouncilSetupModal: FC<CouncilSetupModalProps> = ({
                       role="radio"
                       aria-checked={customType === 'debate'}
                     >
-                      <span role="img" aria-hidden="true">🔥</span>
                       {tNode('cosmicCouncil.setup.debate')}
                     </button>
                     <button
@@ -483,7 +475,6 @@ const CouncilSetupModal: FC<CouncilSetupModalProps> = ({
                       role="radio"
                       aria-checked={customType === 'advisory'}
                     >
-                      <span role="img" aria-hidden="true">🌊</span>
                       {tNode('cosmicCouncil.setup.advisory')}
                     </button>
                   </div>
@@ -635,76 +626,6 @@ const CouncilSetupModal: FC<CouncilSetupModalProps> = ({
         </div>
       )}
 
-      {/* Council Setup Helper Popup */}
-      {showCouncilHelp && (
-        <HelperPopup
-          isOpen={true}
-          onDismiss={() => setShowCouncilHelp(false)}
-          title={tString('helpers.councilSetup.welcome.title', 'Cosmic Council')}
-          content={
-            <div className="council-setup-help-content">
-              {/* What to expect */}
-              <div className="council-setup-help-overview">
-                <h4 className="council-setup-help-heading">
-                  <Users size={18} className="council-setup-help-heading-icon" />
-                  {tNode('helpers.councilSetup.welcome.sections.overview.title')}
-                </h4>
-                <p className="council-setup-help-text">
-                  {tNode('helpers.councilSetup.welcome.sections.overview.text')}
-                </p>
-              </div>
-
-              {/* Two styles */}
-              <div className="council-setup-help-section">
-                <h4 className="council-setup-help-heading">
-                  <Zap size={18} className="council-setup-help-heading-icon" />
-                  {tNode('helpers.councilSetup.welcome.sections.modes.title')}
-                </h4>
-                <ul className="council-setup-help-list">
-                  {Array.isArray(t('helpers.councilSetup.welcome.sections.modes.points')) ?
-                    (t('helpers.councilSetup.welcome.sections.modes.points') as string[]).map((point, i) => (
-                      <li key={i} className="council-setup-help-list-item">
-                        <span>{point}</span>
-                      </li>
-                    )) : null}
-                </ul>
-              </div>
-
-              {/* Curated councils */}
-              <div className="council-setup-help-section">
-                <h4 className="council-setup-help-heading">
-                  <Star size={18} className="council-setup-help-heading-icon" />
-                  {tNode('helpers.councilSetup.welcome.sections.curated.title')}
-                </h4>
-                <p className="council-setup-help-text">
-                  {tNode('helpers.councilSetup.welcome.sections.curated.text')}
-                </p>
-              </div>
-
-              {/* Build your own */}
-              <div className="council-setup-help-section">
-                <h4 className="council-setup-help-heading">
-                  <Wrench size={18} className="council-setup-help-heading-icon" />
-                  {tNode('helpers.councilSetup.welcome.sections.building.title')}
-                </h4>
-                <p className="council-setup-help-text">
-                  {tNode('helpers.councilSetup.welcome.sections.building.text')}
-                </p>
-              </div>
-
-              {/* Legal footer */}
-              <div className="council-setup-help-modes">
-                <p className="council-setup-help-text" style={{ opacity: 0.6, fontSize: '0.8rem', textAlign: 'center', margin: 0 }}>
-                  {tNode('helpers.councilSetup.welcome.sections.transparency.brief')}
-                </p>
-              </div>
-            </div>
-          }
-          buttonText={tString('helpers.common.beginExploring', 'Begin Exploring')}
-          showDontAskAgain={true}
-          onDontAskAgain={handleDontShowCouncilHelp}
-        />
-      )}
     </>,
     document.body
   );

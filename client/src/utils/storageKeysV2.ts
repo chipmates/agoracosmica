@@ -366,6 +366,27 @@ export const markCouncilCompleted = (councilId: string): void => {
 };
 
 /**
+ * Whether a council has saved listening progress (any language, L1, incl.
+ * the pre-level legacy key). Used by the catalog's featured slot to offer
+ * resume instead of the next station.
+ */
+export const hasCouncilProgress = (councilId: string): boolean => {
+  try {
+    for (const lang of ['de', 'en']) {
+      if (
+        localStorage.getItem(`councilProgress_${councilId}_L1_${lang}`) ||
+        localStorage.getItem(`councilProgress_${councilId}_${lang}`)
+      ) {
+        return true;
+      }
+    }
+  } catch {
+    // Storage unavailable — treat as no progress
+  }
+  return false;
+};
+
+/**
  * Helper to get stored council content
  */
 export const getStoredCouncilContent = (councilId: string): CouncilContent | null => {

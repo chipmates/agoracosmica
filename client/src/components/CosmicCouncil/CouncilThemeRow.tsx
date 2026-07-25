@@ -10,8 +10,25 @@ interface CouncilThemeRowProps {
   onSelect: (council: CatalogCouncil) => void;
 }
 
+const DESKTOP_QUERY = '(min-width: 768px)';
+
 const CouncilThemeRow: FC<CouncilThemeRowProps> = ({ theme, councils, onSelect }) => {
   const { tString } = useTranslation();
+
+  // Desktop starts collapsed: only the audit's blessed pick (councils[0]),
+  // centered, with a see-all toggle revealing the full rail. Mobile always
+  // shows the swipe rail (one card visible at a time anyway).
+  const [expanded, setExpanded] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia(DESKTOP_QUERY).matches
+  );
+  useEffect(() => {
+    const mq = window.matchMedia(DESKTOP_QUERY);
+    const onChange = () => setIsDesktop(mq.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
+  const collapsed = isDesktop && !expanded;
   const scrollRef = useRef<HTMLDivElement>(null);
   const [, setCanScrollLeft] = useState(false);
   const [, setCanScrollRight] = useState(false);
@@ -117,15 +134,43 @@ const CouncilThemeRow: FC<CouncilThemeRowProps> = ({ theme, councils, onSelect }
         <h3 className="council-theme-row__label">
           {tString(theme.labelKey, theme.id)}
         </h3>
-        <div className="council-theme-row__bars" aria-hidden="true">
-          {councils.map((_, i) => (
-            <span
-              key={i}
-              className={`council-theme-row__bar ${i === activeIndex ? 'council-theme-row__bar--active' : ''}`}
+        {!collapsed && (
+          <div className="council-theme-row__bars" aria-hidden="true">
+            {councils.map((_, i) => (
+              <span
+                key={i}
+                className={`council-theme-row__bar ${i === activeIndex ? 'council-theme-row__bar--active' : ''}`}
+              />
+            ))}
+          </div>
+        )}
+        {isDesktop && (
+          <button
+            type="button"
+            className="council-theme-row__toggle"
+            onClick={() => setExpanded(e => !e)}
+            aria-expanded={!collapsed}
+          >
+            {collapsed
+              ? tString('cosmicCouncil.themeRow.seeAll', 'See all {count}').replace('{count}', String(councils.length))
+              : tString('cosmicCouncil.themeRow.showLess', 'Show less')}
+            <CaretRight
+              size={13}
+              weight="bold"
+              className={`council-theme-row__toggle-caret${collapsed ? '' : ' council-theme-row__toggle-caret--open'}`}
+              aria-hidden="true"
             />
-          ))}
-        </div>
+          </button>
+        )}
       </div>
+      {collapsed ? (
+        /* Desktop collapsed: the blessed pick alone, centered */
+        <div className="council-theme-row__solo">
+          <div className="council-theme-row__solo-card">
+            <CouncilCard council={councils[0]} onSelect={onSelect} />
+          </div>
+        </div>
+      ) : (
       <div className="council-theme-row__scroll-container">
         <button
           className="council-theme-row__arrow council-theme-row__arrow--left"
@@ -151,6 +196,7 @@ const CouncilThemeRow: FC<CouncilThemeRowProps> = ({ theme, councils, onSelect }
           <CaretRight size={18} weight="bold" />
         </button>
       </div>
+      )}
     </div>
   );
 };

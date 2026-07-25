@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 import { Check } from '@phosphor-icons/react';
 import useTranslation from '../../hooks/useTranslation';
 import { useCouncilProgress } from '../../hooks/useCouncilProgress';
-import { CatalogCouncil, getLocalizedTitle, getLocalizedHook, getShortDisplayName, getThemeAccentVar } from '../../data/councilCatalog';
+import { CatalogCouncil, BLESSED_BY_THEME, getLocalizedTitle, getLocalizedHook, getShortDisplayName, getThemeAccentVar } from '../../data/councilCatalog';
 import { getCouncilArtwork } from './CouncilArtwork';
 import CouncilSigil from './CouncilSigil';
 
@@ -13,14 +13,18 @@ interface CouncilCardProps {
 }
 
 const CouncilCard: FC<CouncilCardProps> = ({ council, onSelect, isHero = false }) => {
-  const { language } = useTranslation();
+  const { language, tString } = useTranslation();
   const progress = useCouncilProgress(council.id, language);
-  const typeEmoji = council.type === 'confrontational' ? '🔥' : '🌊';
+  const typeLabel = council.type === 'confrontational'
+    ? tString('cosmicCouncil.type.confrontational', 'Confrontational')
+    : tString('cosmicCouncil.type.reflective', 'Reflective');
   const typeClass = council.type === 'confrontational' ? 'council-card--confrontational' : 'council-card--reflective';
   const title = getLocalizedTitle(council, language);
   const hasProgress = progress.status !== 'not-started';
   const isCompleted = progress.status === 'completed';
   const accentVar = getThemeAccentVar(council.theme);
+  // The audit's per-theme pick: leads its rail and wears a quiet gilded mark.
+  const isBlessed = BLESSED_BY_THEME[council.theme] === council.id;
 
   const allNames = [council.moderator, ...council.participants]
     .map(f => getShortDisplayName(f.id))
@@ -39,7 +43,7 @@ const CouncilCard: FC<CouncilCardProps> = ({ council, onSelect, isHero = false }
 
   return (
     <div
-      className={`council-card ${typeClass}${isHero ? ' council-card--hero' : ''}${hasProgress ? ' council-card--has-progress' : ''}`}
+      className={`council-card ${typeClass}${isHero ? ' council-card--hero' : ''}${isBlessed ? ' council-card--blessed' : ''}${hasProgress ? ' council-card--has-progress' : ''}`}
       data-theme={council.theme}
       role="button"
       tabIndex={0}
@@ -64,12 +68,20 @@ const CouncilCard: FC<CouncilCardProps> = ({ council, onSelect, isHero = false }
         <div className="council-card__header">
           <h3 className="council-card__title">{title}</h3>
           <span className="council-card__type-badge-group">
+            {isBlessed && (
+              <span
+                className="council-card__badge-blessed"
+                aria-label={tString('cosmicCouncil.recommended', 'Recommended')}
+              >
+                ✦
+              </span>
+            )}
             {isCompleted && (
               <span className="council-card__badge-check" aria-label="completed">
                 <Check size={11} weight="bold" />
               </span>
             )}
-            <span aria-label={council.type}>{typeEmoji}</span>
+            <span className="council-card__type-word">{typeLabel}</span>
           </span>
         </div>
 
