@@ -409,7 +409,7 @@ const FigureCarousel: FC<FigureCarouselProps> = ({
   );
 
   // ULTRATHINK: Simplified image handling - no complex transitions
-  
+
   // Enhanced image loading with modern optimization
   const renderMainImage = () => {
     if (!currentFigure) return null;
@@ -434,6 +434,7 @@ const FigureCarousel: FC<FigureCarouselProps> = ({
       <div className="main-image-section">
         <div className="figure-image-container">
           <OptimizedImage
+            key={currentFigure.id}
             src={currentFigure.id}
             type="ui"
             purpose="main"
@@ -494,8 +495,10 @@ const FigureCarousel: FC<FigureCarouselProps> = ({
 
     return (
       <div className="actions-section">
+        {/* Plate doctrine: Select is THE money action on this surface, so it
+            wears the gold leaf; About/Wisdom step back to engraved ink. */}
         <ActionButton
-          variant="gold"
+          variant="ink"
           onClick={() => setShowFullInfo(!showFullInfo)}
           size="medium"
           fullWidth={windowWidth < 400}
@@ -506,7 +509,7 @@ const FigureCarousel: FC<FigureCarouselProps> = ({
           {tNode('figures.about')}
         </ActionButton>
         <ActionButton
-          variant="coral"
+          variant="gold"
           onClick={handleSelect}
           size="medium"
           fullWidth={windowWidth < 400}
@@ -516,7 +519,8 @@ const FigureCarousel: FC<FigureCarouselProps> = ({
           {tNode('figures.select')}
         </ActionButton>
         <ActionButton
-          variant="gold"
+          variant="ink"
+          className="action-wisdom"
           onClick={() => setShowWisdom(true)}
           size="medium"
           fullWidth={windowWidth < 400}

@@ -45,6 +45,10 @@
 }
 
 .figure-carousel {
+  /* Plate ink recipe (matches Atlas.css), available at every breakpoint */
+  --fc-ink: color-mix(in srgb, var(--star-blue-light) 60%, transparent);
+  --fc-ink-faint: color-mix(in srgb, var(--star-blue-light) 24%, transparent);
+  --fc-ink-ghost: color-mix(in srgb, var(--star-blue-light) 12%, transparent);
   position:fixed; top:0; left:0; width:100%;
   height: var(--figure-container-fallback); /* Fallback for older browsers */
   height: var(--figure-container-height); /* Dynamic viewport height (100dvh) */
@@ -149,7 +153,8 @@
   width: 70px; /* Increased from 65px - we have more space now */
   height: 70px;
   margin: 0; /* Use gap instead for consistent spacing */
-  border-radius: 15px;
+  border-radius: 8px; /* gently rounded keyline mat (plate language) */
+  border: 1px solid var(--fc-ink-faint);
   overflow: hidden;
   cursor: pointer;
   position: relative;
@@ -209,10 +214,11 @@
   z-index: var(--z-base); /* 2 */ /* Above the glow effect */
   transition: transform 0.4s cubic-bezier(0.23, 1, 0.320, 1);
 }
-/* REMOVED: All hover and active effects */
+/* Active mat: gold double ring (the ember ring belongs to quest mode) */
 .miniature.active {
-  /* Simple visual indicator without effects */
-  border: 2px solid var(--accent-color);
+  border: 1px solid color-mix(in srgb, var(--gold-primary) 85%, transparent);
+  outline: 1px solid color-mix(in srgb, var(--gold-deep) 45%, transparent);
+  outline-offset: 2px;
   z-index:1;
 }
 
@@ -286,8 +292,13 @@
   bottom: 0;
   left: 0;
   right: 0;
-  /* COLLAPSED STATE: Solid uniform background - clean and simple */
-  background: rgba(21, 28, 71, 0.45); /* 45% opacity - good text support, portrait still visible */
+  /* COLLAPSED STATE: transparent vignette — the portrait shows through */
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--bg-deep-space-darker) 82%, transparent) 0%,
+    color-mix(in srgb, var(--bg-deep-space-darker) 46%, transparent) 58%,
+    transparent 100%
+  );
   padding: 15px;
   text-align: center;
   /* Smooth transition for background change */
@@ -297,20 +308,23 @@
   z-index: var(--z-base); /* 10 */
 }
 
-/* EXPANDED STATE: Full background when about text is visible */
+/* EXPANDED STATE: deeper feathered veil, no blur (frost edges cut faces) */
 .info-overlay:has(.figure-about-text) {
-  background: rgba(21, 28, 71, 0.85); /* 85% opacity for readability */
-  /* Optional: Liquid glass effect for depth separation */
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--bg-deep-space-darker) 97%, transparent) 0%,
+    color-mix(in srgb, var(--bg-deep-space-darker) 92%, transparent) 58%,
+    color-mix(in srgb, var(--bg-deep-space-darker) 60%, transparent) 86%,
+    transparent 100%
+  );
 }
 .info-overlay h2 {
   margin: 0;
   font-size: clamp(1.0625rem, 1.0625rem + 1.2vw, 2rem); /* 17px mobile to 32px desktop - restored to readable size */
   text-align: center;
-  font-family: var(--font-primary); /* Space Grotesk for figure names */
-  color: var(--text-primary); /* Lightest gray #D2D2D2 - soft on eyes, excellent contrast */
-  font-weight: 600;
+  font-family: var(--font-content); /* engraved Caslon, matches the plate world */
+  color: var(--text-primary);
+  font-weight: 400;
   /* Enhanced multi-layer text-shadow for readability on any background */
   text-shadow:
     0 2px 8px color-mix(in srgb, var(--utility-pure-black) 60%, transparent),
@@ -334,7 +348,8 @@
   margin-top: 10px;
   font-family: var(--font-content, 'Libre Caslon Text', Georgia, serif); /* Classical serif for wisdom content */
   font-size: clamp(0.9375rem, 0.9375rem + 0.75vw, 1.375rem); /* 15px mobile to 22px desktop */
-  text-align: center;
+  text-align: left;
+  hyphens: auto;
   line-height: 1.75; /* More generous for serif readability */
   font-weight: 400;
   font-feature-settings: 'liga' 1, 'kern' 1, 'onum' 1; /* Ligatures, kerning, old-style numerals */
@@ -358,6 +373,17 @@
   text-shadow: 0 0 8px color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent);
   margin-top: 0.5rem;
   text-align: center; /* Component-specific centering without forcing */
+}
+
+/* Mobile/tablet: cap the reading block so the expanded overlay never climbs
+   over the face — long German about-texts scroll inside instead. */
+@media (max-width: 1024px) {
+  .figure-about-text {
+    max-height: 26vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-right: 4px;
+  }
 }
 
 /* Small mobile optimization (iPhone SE, etc.) - balanced approach */
@@ -479,7 +505,9 @@
   }
   /* Simple active state for tablet */
   .miniature.active {
-    border: 2px solid var(--accent-color);
+    border: 1px solid color-mix(in srgb, var(--gold-primary) 85%, transparent);
+    outline: 1px solid color-mix(in srgb, var(--gold-deep) 45%, transparent);
+    outline-offset: 2px;
   }
   .tablet-main-content { 
     flex-grow: 1; 
@@ -1299,4 +1327,101 @@
     margin: 7px auto 0;
     padding: 0 15px;
   }
+}
+
+/* ============================================================
+   PLATE LAYER — Hall of Portraits (desktop), 2026-07-24.
+   The Atlas plate language on the figure catalog: night ladder
+   shell, floating portrait plate, cartouche identity column.
+   Overrides the legacy desktop rules above (sweep pending once
+   the walk blesses the layer). Ink recipe matches Atlas.css.
+   ============================================================ */
+@media (min-width: 1025px) {
+  .figure-carousel {
+    --fc-ink: color-mix(in srgb, var(--star-blue-light) 60%, transparent);
+    --fc-ink-faint: color-mix(in srgb, var(--star-blue-light) 24%, transparent);
+    --fc-ink-ghost: color-mix(in srgb, var(--star-blue-light) 12%, transparent);
+    background: var(--bg-deep-space); /* one canvas, no black side columns */
+    text-align: left; /* anchor: this surface opts out of the global justify */
+  }
+
+  /* One canvas across the whole stage, ghost keylines mark the columns */
+  .figure-carousel .desktop-layout {
+    background: var(--bg-deep-space);
+  }
+  .figure-carousel .carousel-content-area {
+    background: var(--bg-deep-space);
+    border-left: 1px solid var(--fc-ink-ghost);
+    border-right: 1px solid var(--fc-ink-ghost);
+  }
+  .figure-carousel .left-sidebar,
+  .figure-carousel .right-sidebar {
+    background: transparent;
+  }
+
+  /* Full-height portrait, as before */
+  .figure-carousel .main-image-section {
+    background: transparent;
+    padding: 0;
+  }
+
+  /* Left register: keyline mats, gently rounded (square felt too hard) */
+  .figure-carousel .miniature {
+    border-radius: 8px;
+    border: 1px solid var(--fc-ink-faint);
+    background: var(--bg-deep-space);
+    transition: border-color 0.25s ease;
+  }
+  .figure-carousel .miniature::after {
+    display: none; /* quantum glow retired on the plate */
+  }
+  .figure-carousel .miniature:hover {
+    transform: none;
+    border-color: var(--fc-ink);
+  }
+  .figure-carousel .miniature.active {
+    border: 1px solid color-mix(in srgb, var(--gold-primary) 85%, transparent);
+    outline: 1px solid color-mix(in srgb, var(--gold-deep) 45%, transparent);
+    outline-offset: 3px;
+  }
+  .figure-carousel .miniature:focus-visible {
+    outline: 2px dashed var(--gold-primary);
+    outline-offset: 3px;
+  }
+
+  /* Desktop overlay spacing (gradient + typography now live at base) */
+  .figure-carousel .info-overlay {
+    padding: 26px 30px 16px;
+  }
+}
+
+/* ============================================================
+   Plate elements at every breakpoint (mobile pass 2026-07-24):
+   quiet motion, engraved ink actions, Weisheit chapter colour.
+   ============================================================ */
+
+/* Quiet motion: the plate settles in on figure swap (was a hard cut).
+   The global prefers-reduced-motion block kills this for those users. */
+@keyframes fc-plate-in {
+  from { opacity: 0.25; }
+  to { opacity: 1; }
+}
+.figure-carousel .main-image-section .figure-image {
+  animation: fc-plate-in 240ms ease;
+}
+
+/* Engraved ink actions: outline on the canvas, no black slab fill */
+.figure-carousel .actions-section [class*="variant-ink"] {
+  background: transparent;
+}
+
+/* Weisheit wears its chapter colour (wisdom purple, per the mode doctrine) */
+.figure-carousel .actions-section .action-wisdom {
+  color: color-mix(in srgb, var(--mode-wisdom) 62%, white);
+  border-color: color-mix(in srgb, var(--mode-wisdom) 70%, transparent);
+  background: color-mix(in srgb, var(--mode-wisdom) 12%, transparent);
+}
+.figure-carousel .actions-section .action-wisdom:hover {
+  border-color: color-mix(in srgb, var(--mode-wisdom) 90%, transparent);
+  background: color-mix(in srgb, var(--mode-wisdom) 20%, transparent);
 }
