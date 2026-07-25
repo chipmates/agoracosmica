@@ -27,10 +27,15 @@
   background: color-mix(in srgb, var(--gold-subtle) 14%, var(--bg-primary));
   border: 1px solid color-mix(in srgb, var(--gold-deep) 40%, transparent);
   border-bottom: none;
-  border-radius: 4px 4px 0 0;
+  border-radius: 3px 3px 0 0;
   box-shadow: 0 -2px 4px color-mix(in srgb, var(--utility-pure-black) 20%, transparent);
-  
-  /* No transitions needed */
+  transition: border-color 0.2s ease, filter 0.2s ease;
+}
+
+/* interaction: the ink brightens, the tab does not move */
+.bookmark-tab:hover,
+.bookmark-tab.hovered {
+  filter: brightness(1.12);
 }
 
 /* Virtual 44px touch target for bookmark tabs */
@@ -62,10 +67,12 @@
 }
 
 .bookmark-label {
-  font-size: 11px;
-  font-weight: 600;
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
   color: var(--bg-primary);
+  white-space: nowrap; /* DE labels (Weisheit, Verlauf) must never wrap */
 }
 
 /* No hover effects - keep it simple */
@@ -78,7 +85,7 @@
 /* Dynamic color variants for modes */
 .bookmark-tab.bookmark-purple {
   background: color-mix(in srgb, var(--mode-wisdom-active) 22%, var(--bg-primary));
-  border-right: 3px solid var(--mode-wisdom);
+  border-right: 2px solid var(--mode-wisdom);
 }
 
 .bookmark-tab.bookmark-purple .bookmark-icon,
@@ -88,7 +95,7 @@
 
 .bookmark-tab.bookmark-orange {
   background: color-mix(in srgb, var(--mode-quest) 22%, var(--bg-primary));
-  border-right: 3px solid var(--mode-quest-active);
+  border-right: 2px solid var(--mode-quest-active);
 }
 
 .bookmark-tab.bookmark-orange .bookmark-icon,
@@ -98,7 +105,7 @@
 
 .bookmark-tab.bookmark-green {
   background: color-mix(in srgb, var(--mode-freetalk-active) 22%, var(--bg-primary));
-  border-right: 3px solid var(--mode-freetalk);
+  border-right: 2px solid var(--mode-freetalk);
 }
 
 .bookmark-tab.bookmark-green .bookmark-icon,
@@ -108,7 +115,7 @@
 
 .bookmark-tab.bookmark-blue {
   background: color-mix(in srgb, var(--mode-prism-active) 22%, var(--bg-primary));
-  border-right: 3px solid var(--mode-prism);
+  border-right: 2px solid var(--mode-prism);
 }
 
 .bookmark-tab.bookmark-blue .bookmark-icon,
@@ -130,17 +137,17 @@
 /* Position variants - left = history, right = next mode */
 .bookmark-tab.bookmark-left {
   left: 80px; /* Move more inside */
-  border-left: 3px solid var(--gold-subtle);
+  border-left: 2px solid var(--gold-subtle);
 }
 
 .bookmark-tab.bookmark-right {
   right: 80px; /* Move more inside */
 }
 
-/* Focus state for accessibility */
+/* Focus = the engraver's dashed ring (button doctrine 2026-07-24) */
 .bookmark-tab:focus-visible {
-  outline: 2px solid var(--gold-subtle);
-  outline-offset: 2px;
+  outline: 1.5px dashed var(--gold-primary);
+  outline-offset: 3px;
 }
 
 /* Adjust for mobile - optimized for freed hamburger space */
@@ -152,49 +159,51 @@
   }
   
   .bookmark-tab {
-    width: 75px; /* Slightly wider for better touch */
+    width: 88px; /* DE labels (Weisheit) need the room at mobile size */
     height: 30px;
   }
-  
+
   .bookmark-tab.bookmark-left {
     top: 0;
     left: 15px; /* Positioned in freed hamburger space */
   }
-  
+
   .bookmark-tab.bookmark-right {
     top: 0;
     right: 15px; /* Balanced positioning */
   }
-  
+
   .bookmark-icon {
     width: 15px;
     height: 15px;
   }
-  
+
   .bookmark-label {
     font-size: 10px;
+    letter-spacing: 0.05em;
   }
 }
 
 /* Very small mobile adjustments */
 @media (max-width: 400px) {
   .bookmark-tab {
-    width: 65px; /* Smaller for tiny screens */
+    width: 80px; /* Keeps DE labels on one line even on tiny screens */
     height: 28px;
   }
-  
+
   .bookmark-tab.bookmark-left {
     left: 10px; /* Closer to edge on tiny screens */
   }
-  
+
   .bookmark-tab.bookmark-right {
     right: 10px; /* Closer to edge on tiny screens */
   }
-  
+
   .bookmark-label {
     font-size: 9px; /* Smaller text */
+    letter-spacing: 0.04em;
   }
-  
+
   .bookmark-icon {
     width: 14px;
     height: 14px;

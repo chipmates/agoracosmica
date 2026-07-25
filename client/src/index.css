@@ -73,10 +73,13 @@ button {
 /* Justified text styles for main content and history modal.
    The atlas surfaces (wisdom plate + reading room) and the figure catalog
    (portrait plates + cartouche column) are excluded: engraved annotations
-   read left or centered, never with stretched word gaps. */
-.main-content p:not(.seed-detail-view *):not(.atlas-mode *):not(.figure-carousel *),
-.main-content div:not(.no-justify):not(.seed-detail-view):not(.seed-detail-view *):not(.atlas-mode):not(.atlas-mode *):not(.figure-carousel):not(.figure-carousel *),
-.main-content span:not(.no-justify):not(.seed-detail-view *):not(.atlas-mode *):not(.figure-carousel *),
+   read left or centered, never with stretched word gaps. Story prose is
+   excluded here and owns its own justification (StoryPlayer.css): desktop
+   keeps the reading-room justify, narrow screens read left — German at
+   390px tears into two-word rivers under a blanket justify. */
+.main-content p:not(.seed-detail-view *):not(.atlas-mode *):not(.figure-carousel *):not(.story-text):not(.story-text *):not(.message-content):not(.message-content *),
+.main-content div:not(.no-justify):not(.seed-detail-view):not(.seed-detail-view *):not(.atlas-mode):not(.atlas-mode *):not(.figure-carousel):not(.figure-carousel *):not(.story-text):not(.story-text *):not(.message-content):not(.message-content *),
+.main-content span:not(.no-justify):not(.seed-detail-view *):not(.atlas-mode *):not(.figure-carousel *):not(.story-text):not(.story-text *):not(.message-content):not(.message-content *),
 .history-modal-content p,
 .history-modal-content div:not(.no-justify),
 .history-modal-content span:not(.no-justify) {

@@ -115,6 +115,8 @@
   margin: 0; /* No margins */
 }
 
+/* Plate lift (2026-07): one gold hairline rule under the header, the same
+   ink the Atlas header speaks. No gradient, no glow. */
 .chat-header::after {
   content: '';
   position: absolute;
@@ -122,27 +124,22 @@
   left: 50%;
   transform: translateX(-50%);
   width: 500px;
-  height: 2px;
-  background: linear-gradient(90deg, 
-    transparent,
-    var(--gold-subtle),
-    var(--mode-quest),
-    transparent
-  );
+  height: 1px;
+  background: color-mix(in srgb, var(--gold-deep) 38%, transparent);
 }
- 
+
 .figure-name {
-  color: var(--gold-subtle); /* Golden color, unchanged */
-  font-family: 'Space Grotesk', sans-serif; /* Updated to match unified system */
+  color: var(--gold-primary); /* headers stay golden app-wide */
+  font-family: var(--font-content, 'Libre Caslon Text', Georgia, serif);
   font-size: var(--chat-header-font-size);
   margin: 0;
   width: 100%;
   text-align: center;
-  font-weight: 500;
+  font-weight: 400;
   letter-spacing: 0.02em;
-  text-shadow: 0 0 20px color-mix(in srgb, var(--gold-subtle) 20%, transparent);
-  line-height: 1.1;
-  
+  text-shadow: none;
+  line-height: 1.15;
+
   /* Text overflow handling */
   white-space: nowrap;
   overflow: hidden;
@@ -172,82 +169,97 @@
   line-height: 1.4;
 }
 
-/* White seed name text */
+/* Seed name: an engraved annotation under the title (Caslon italic, no glow) */
 .seed-name-text {
-  color: var(--cosmic-text-primary);
-  text-shadow: 0 0 10px color-mix(in srgb, white 30%, transparent); /* Subtle white glow */
+  color: var(--text-secondary);
+  text-shadow: none;
+  font-family: var(--font-content, 'Libre Caslon Text', Georgia, serif);
+  font-style: italic;
   font-weight: 400;
   letter-spacing: 0.01em;
-  line-height: 1.2;
+  line-height: 1.25;
 }
 
-/* Mode Indicator */
+/* Mode Indicator: a tracked small-caps kicker in the chapter's own color.
+   The color arrives per-mode via --mode-line-color (set in MainContent). */
 .mode-indicator {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Space Grotesk', sans-serif; /* Updated to match unified system */
-  font-size: var(--mode-indicator-font-size);
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: calc(var(--mode-indicator-font-size) * 0.82);
   margin: 6px 0 8px 0;
-  font-weight: 400;
-  letter-spacing: 0.01em; /* Match seed-name letter spacing */
-  opacity: 0.9;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 1;
   background-color: transparent;
   padding: 0; /* Removed padding since no background */
   max-width: 90%;
   width: fit-content;
   margin-left: auto;
   margin-right: auto;
-  
+
   /* Prevent wrapping */
   flex-shrink: 0;
   min-width: 0;
   white-space: nowrap;
 }
 
-/* Desktop-only chatbox container styles - mobile handles its own margins */
+.mode-indicator .mode-indicator-label {
+  color: var(--mode-line-color, var(--gold-primary));
+}
+
+/* Desktop-only chatbox container styles - mobile handles its own margins.
+   Material lives in ChatBox.css (the plate card); this block keeps layout only.
+   The old background-color: var(--text-tertiary) khaki slab is gone. */
 @media (min-width: 769px) {
   .chatbox-container {
     flex: 1;
     display: flex;
     flex-direction: column;
-    background-color: var(--text-tertiary);
     overflow: hidden;
     margin: 5px 1rem 16px; /* Top, sides, bottom margins combined - DESKTOP ONLY */
     width: calc(100% - 2rem); /* Calculated width - DESKTOP ONLY */
   }
 }
 
-/* Error Message Styles */
+/* Error Message Styles - a plate note that carries the ember warning ink */
 .error-message {
   position: fixed;
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  background: color-mix(in srgb, var(--mode-quest) 90%, transparent);
-  color: var(--cosmic-text-primary);
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--bg-card) 88%, var(--mode-quest)) 0%,
+    var(--bg-deep-space) 90%
+  );
+  border: 1px solid color-mix(in srgb, var(--mode-quest) 55%, transparent);
+  color: var(--text-primary);
   padding: 15px 20px;
-  border-radius: 8px;
+  border-radius: 3px;
   z-index: var(--z-modal); /* 2000 */
   display: flex;
   align-items: center;
   gap: 15px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 16px 40px color-mix(in srgb, var(--bg-deep-space-darker) 70%, transparent);
 }
 
 .error-message button {
-  background: transparent;
-  border: 1px solid white;
-  color: var(--cosmic-text-primary);
-  padding: 5px 10px;
-  border-radius: 4px;
+  background: color-mix(in srgb, var(--mode-quest) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--mode-quest) 55%, transparent);
+  color: var(--text-primary);
+  padding: 5px 12px;
+  border-radius: 2px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: border-color 0.2s ease, background 0.2s ease;
 }
 
 .error-message button:hover {
-  background: white;
-  color: var(--accent-color);
+  background: color-mix(in srgb, var(--mode-quest) 24%, transparent);
+  border-color: var(--mode-quest);
+  color: var(--text-primary);
 }
  
 /* Desktop styles - CONSOLIDATED */
@@ -313,18 +325,12 @@
     margin-bottom: 6px; /* Reduced from 8px */
   }
   
-  /* Refined gradient separator - matches content width */
+  /* Hairline rule matches content width (plate: one gold ink line) */
   .chat-header::after {
     width: calc(100% - 2 * var(--content-inline-padding)); /* Match content width */
     max-width: var(--content-max-width); /* Constrain like other components */
-    height: 2px; /* More visible */
-    background: linear-gradient(
-      90deg,
-      transparent,
-      color-mix(in srgb, var(--gold-subtle) 40%, transparent),
-      color-mix(in srgb, var(--mode-quest) 30%, transparent),
-      transparent
-    );
+    height: 1px;
+    background: color-mix(in srgb, var(--gold-deep) 38%, transparent);
     left: 50%;
     transform: translateX(-50%);
   }

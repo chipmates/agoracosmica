@@ -1,12 +1,14 @@
 /* src/components/StoryAudioPlayer.css — Compact redesign */
 
 :root {
+  /* Plate lift (2026-07): gilded ink controls — gold family only, no ember
+     hover, no glow halos. */
   --player-bg: color-mix(in srgb, var(--bg-card) var(--a-40), transparent);
-  --player-border: color-mix(in srgb, var(--gold-subtle) var(--a-15), transparent);
-  --player-accent: color-mix(in srgb, var(--gold-subtle) var(--a-90), transparent);
-  --player-accent-glow: color-mix(in srgb, var(--gold-subtle) var(--a-40), transparent);
-  --player-hover: color-mix(in srgb, var(--mode-quest) var(--a-90), transparent);
-  --player-hover-glow: color-mix(in srgb, var(--mode-quest) var(--a-40), transparent);
+  --player-border: color-mix(in srgb, var(--gold-deep) 42%, transparent);
+  --player-accent: var(--gold-primary);
+  --player-accent-glow: color-mix(in srgb, var(--gold-subtle) var(--a-25), transparent);
+  --player-hover: var(--gold-hover);
+  --player-hover-glow: color-mix(in srgb, var(--gold-subtle) var(--a-25), transparent);
   --player-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -52,7 +54,7 @@
 }
 
 .player-slider:focus-visible {
-  outline: 2px solid var(--player-accent);
+  outline: 1.5px dashed var(--gold-primary);
   outline-offset: 4px;
 }
 
@@ -124,10 +126,11 @@
   align-items: center;
   gap: 0.5rem;
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 0.75rem;
-  color: var(--player-accent);
-  letter-spacing: 0.5px;
-  text-shadow: 0 0 6px var(--player-accent-glow);
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: color-mix(in srgb, var(--gold-primary) 80%, var(--text-tertiary));
+  letter-spacing: 0.08em;
+  text-shadow: none;
   padding: 0 2px;
 }
 
@@ -169,7 +172,12 @@
 
 .player-skip:hover {
   color: var(--player-hover);
-  transform: scale(1.1);
+}
+
+.player-skip:focus-visible {
+  outline: 1.5px dashed var(--gold-primary);
+  outline-offset: 3px;
+  border-radius: 2px;
 }
 
 .player-skip:active {
@@ -195,8 +203,8 @@
   justify-content: center;
   width: 40px;
   height: 40px;
-  background: color-mix(in srgb, var(--gold-subtle) var(--a-10), transparent);
-  border: 1px solid var(--player-border);
+  background: color-mix(in srgb, var(--gold-subtle) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 55%, transparent);
   border-radius: 50%;
   color: var(--player-accent);
   cursor: pointer;
@@ -218,20 +226,21 @@
 .player-play svg {
   width: 22px;
   height: 22px;
-  filter: drop-shadow(0 0 6px var(--player-accent-glow));
 }
 
 .player-play:hover {
-  background: color-mix(in srgb, var(--mode-quest) var(--a-15), transparent);
-  border-color: var(--player-hover);
-  transform: translateY(-1px);
-  box-shadow:
-    0 3px 10px var(--player-hover-glow),
-    0 0 0 1px color-mix(in srgb, var(--mode-quest) var(--a-10), transparent);
+  background: color-mix(in srgb, var(--gold-subtle) 24%, transparent);
+  border-color: var(--gold-primary);
+  color: var(--gold-hover);
+}
+
+.player-play:focus-visible {
+  outline: 1.5px dashed var(--gold-primary);
+  outline-offset: 4px;
 }
 
 .player-play:active {
-  transform: scale(0.95);
+  transform: scale(0.96);
 }
 
 /* ── Speed control ── */
@@ -284,6 +293,12 @@
 
 .player-speed__arrow:hover {
   color: var(--player-hover);
+}
+
+.player-speed__arrow:focus-visible {
+  outline: 1.5px dashed var(--gold-primary);
+  outline-offset: 2px;
+  border-radius: 2px;
 }
 
 .player-speed__arrow:active {

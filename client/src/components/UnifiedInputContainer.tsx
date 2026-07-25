@@ -748,7 +748,7 @@ const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure,
                               }
                             }}
                           >
-                            <Keyboard size={isMobile ? 26 : 24} color="#151C47" />
+                            <Keyboard size={isMobile ? 26 : 24} color="var(--ember-ink)" />
                           </div>
                         )}
                       </div>

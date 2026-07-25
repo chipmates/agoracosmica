@@ -14,7 +14,7 @@
   --gold-light: var(--gold-primary);      /* Uses design system gold primary */
   --gold-hover-bg: color-mix(in srgb, var(--gold-subtle) var(--a-10), transparent); /* Gold transparent overlay */
   --deep-blue: color-mix(in srgb, var(--bg-primary) var(--a-80), transparent);
-  --border-radius: 4px; /* plate doctrine 2026-07-24: input surfaces sit squared on the plate (was 22px) */
+  --border-radius: 8px; /* balance law 2026-07-25: the composer is conversational, soft on the plate (was 22px pre-lift, 4px in the squared pass) */
   --transition-bezier: cubic-bezier(0.4, 0, 0.2, 1);
   
   /* 2025 State-of-the-art responsive variables */
@@ -83,11 +83,11 @@
   transition: all 0.2s var(--transition-bezier);
 }
 
-/* Text input: one solid dark pill — no visible border, just background contrast.
-   Focus adds a soft gold glow without a crisp rectangle stroke. */
+/* Text input: an ink well sunk into the page — deep opaque ground with a
+   gold-deep hairline (plate doctrine). Focus brightens the hairline. */
 .text-input-area {
-  background-color: var(--deep-blue);
-  border: 1px solid transparent;
+  background-color: var(--bg-deep-space);
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 34%, transparent);
 }
 
 /* Voice input is transparent - the coral record button provides color */
@@ -104,8 +104,8 @@
 }
 
 .text-input-area.focused {
-  border-color: color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--gold-subtle) var(--a-15), transparent);
+  border-color: color-mix(in srgb, var(--gold-subtle) var(--a-60), transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--gold-subtle) var(--a-12), transparent);
 }
 
 /* The textarea itself */
@@ -148,22 +148,31 @@
   gap: 2px;
 }
 .turn-counter[data-urgency="normal"] { color: var(--text-dim); }
-.turn-counter[data-urgency="warning"] { color: var(--color-warning, #E97451); }
-.turn-counter[data-urgency="critical"] { color: var(--color-error, #EF4444); font-weight: 500; }
-.turn-counter[data-urgency="exhausted"] { color: var(--color-error, #EF4444); font-weight: 600; }
+.turn-counter[data-urgency="warning"] { color: var(--color-warning); }
+.turn-counter[data-urgency="critical"] { color: var(--color-error); font-weight: 500; }
+.turn-counter[data-urgency="exhausted"] { color: var(--color-error); font-weight: 600; }
+/* On the navy chip the urgency inks read against navy, not ember: parchment
+   holds normal/warning, error keeps its night-tuned red */
+.turn-counter.voice-mode[data-urgency="normal"] { color: var(--text-primary); }
+.turn-counter.voice-mode[data-urgency="warning"] { color: var(--text-primary); }
 .record-button { position: relative; }
 .turn-counter.voice-mode {
   grid-column: 1;
   grid-row: 1;
   justify-self: start;
   align-self: center;
-  padding-left: 12px;
+  margin-left: 10px;
+  padding: 3px 8px;
+  /* Its own navy chip: small text cannot reach AA on the ember gradient in
+     any ink, so the counter gets a ground it can be read on */
+  background: color-mix(in srgb, var(--ember-ink) 92%, transparent);
+  border-radius: 3px;
   font-size: 0.85rem;
-  color: var(--ember-ink, #151C47);
+  color: var(--text-primary);
   font-weight: 600;
   display: inline-flex;
   align-items: center;
-  gap: 2px;
+  gap: 3px;
   z-index: 1;
   white-space: nowrap;
 }
@@ -220,7 +229,11 @@
 
 .action-button:hover {
   background-color: var(--gold-hover-bg); /* Uses design system gold with opacity */
-  transform: translateY(-1px);
+}
+
+.action-button:focus-visible {
+  outline: 1.5px dashed var(--gold-primary);
+  outline-offset: 2px;
 }
 
 .action-button:active {
@@ -311,6 +324,14 @@
   filter: brightness(0.97);
 }
 
+/* focus = the engraver's dashed ring (button doctrine 2026-07-24).
+   Drawn INSET in the seal's navy ink: the surrounding .voice-input-area
+   clips overflow, so an outside ring would never render. */
+.record-button:focus-visible {
+  outline: 2px dashed var(--ember-ink);
+  outline-offset: -6px;
+}
+
 .record-button.recording {
   /* the seal darkens while it takes the mark; the pulse is the live signal */
   background: linear-gradient(180deg, var(--mode-quest-active) 0%, color-mix(in srgb, var(--mode-quest-active) 82%, black) 100%);
@@ -320,7 +341,10 @@
 /* Content layout within record button */
 .record-button-content {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  /* minmax(0, 1fr) lets the label column actually shrink; without it the
+     German instruction pushes the counter chip off the bar */
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  column-gap: 6px;
   align-items: center;
   width: 100%;
   height: 100%;
@@ -338,7 +362,12 @@
   grid-column: 2;
   justify-self: center;
   text-align: center;
-  font-weight: 500;
+  min-width: 0;
+  /* WCAG large text (>=18.66px bold): navy-on-ember cannot clear 4.5:1 at
+     small sizes in any ink, but clears the 3:1 large-text threshold */
+  font-size: 1.1875rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
   white-space: nowrap;
 }
 
@@ -662,7 +691,9 @@
   }
   
   .record-text {
-    font-size: 0.85rem;
+    /* Stay at the WCAG large-text floor (18.66px @700) even on narrow
+       containers; the minmax column absorbs the German string */
+    font-size: 1.1667rem;
   }
 }
 
@@ -757,11 +788,11 @@
   }
 }
 
-/* PII Warning */
+/* PII Warning - a plate note carrying the gold warning ink */
 .pii-warning {
-  background: color-mix(in srgb, var(--warning-subtle, #b8860b) 15%, var(--bg-primary));
-  border: 1px solid color-mix(in srgb, var(--warning-subtle, #b8860b) 30%, transparent);
-  border-radius: 8px;
+  background: color-mix(in srgb, var(--gold-deep) 15%, var(--bg-primary));
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 42%, transparent);
+  border-radius: 3px;
   padding: 0.75rem 1rem;
   margin: 0 1rem 0.5rem;
   font-size: 0.82rem;
@@ -781,7 +812,7 @@
 .pii-send-anyway,
 .pii-edit {
   padding: 6px 12px;
-  border-radius: 6px;
+  border-radius: 2px;
   font-size: 0.8rem;
   cursor: pointer;
   border: 1px solid color-mix(in srgb, var(--text-secondary) 30%, transparent);
@@ -792,14 +823,17 @@
 }
 
 .pii-edit {
-  background: color-mix(in srgb, var(--gold-subtle, #d4a539) 15%, transparent);
-  color: var(--text-primary);
-  border-color: color-mix(in srgb, var(--gold-subtle, #d4a539) 40%, transparent);
+  background: color-mix(in srgb, var(--gold-subtle) 14%, transparent);
+  color: var(--gold-primary);
+  border-color: color-mix(in srgb, var(--gold-subtle) 55%, transparent);
 }
-/* AI disclosure standing line under the composer (always visible) */
+/* AI disclosure standing line under the composer (always visible).
+   Reads as an engraved margin annotation: Caslon italic, dim ink. */
 .ai-chat-disclosure {
   margin: 6px 0 0;
   text-align: center;
+  font-family: var(--font-content, 'Libre Caslon Text', Georgia, serif);
+  font-style: italic;
   font-size: var(--text-xs);
   line-height: 1.4;
   color: var(--text-dim);

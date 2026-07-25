@@ -225,29 +225,26 @@ const MainContent: FC<MainContentProps> = ({
                   </div>
                 )}
                 {conversationStartedFinal && selectedMode && (
-                  <div className="mode-indicator" key={`mode-${selectedMode}`}>
+                  <div
+                    className="mode-indicator"
+                    key={`mode-${selectedMode}`}
+                    style={{
+                      '--mode-line-color': `var(--${MODES.find(mode => mode.id === selectedMode)?.color ?? 'gold'}-base)`
+                    } as React.CSSProperties}
+                  >
                     {MODES.find(mode => mode.id === selectedMode) && (() => {
                       const currentMode = MODES.find(mode => mode.id === selectedMode)!;
                       return (
                         <>
                           {React.createElement(currentMode.icon, {
-                            size: 28,
+                            size: 20,
                             weight: "duotone",
                             style: {
-                              marginRight: '10px',
+                              marginRight: '8px',
                               color: `var(--${currentMode.color}-base)`
                             }
                           })}
-                          <span style={{
-                            background: `linear-gradient(120deg, var(--${currentMode.color}-base), var(--${currentMode.color}-light))`,
-                            WebkitBackgroundClip: 'text',
-                            backgroundClip: 'text',
-                            color: 'transparent',
-                            textShadow: `0 0 20px rgba(var(--${currentMode.color}-rgb), 0.5)`,
-                            padding: '0px 5px',
-                            position: 'relative',
-                            zIndex: 2
-                          }}>
+                          <span className="mode-indicator-label">
                             {currentMode.label}
                           </span>
                         </>
@@ -316,12 +313,14 @@ const MainContent: FC<MainContentProps> = ({
                       style={{
                         minHeight: '44px',
                         padding: '10px 24px',
-                        background: 'transparent',
-                        border: '1px solid color-mix(in srgb, var(--gold-base) 45%, transparent)',
-                        borderRadius: '22px',
-                        color: 'var(--gold-base)',
-                        fontSize: '16px',
+                        background: 'color-mix(in srgb, var(--gold-subtle) 14%, transparent)',
+                        border: '1px solid color-mix(in srgb, var(--gold-subtle) 55%, transparent)',
+                        borderRadius: '2px',
+                        color: 'var(--gold-primary)',
+                        fontSize: '0.85rem',
                         fontWeight: 500,
+                        letterSpacing: '0.1em',
+                        textTransform: 'uppercase',
                         cursor: 'pointer'
                       }}
                     >
