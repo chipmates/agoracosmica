@@ -1407,19 +1407,38 @@ addEventListener('keydown', (e) => {
 let touchY: number | null = null
 let touchX: number | null = null
 addEventListener('touchstart', (e) => {
-  touchY = e.touches[0]?.clientY ?? null
-  touchX = e.touches[0]?.clientX ?? null
+  // a second finger arriving restarts the measurement from its midpoint,
+  // or the first frame of a two-finger gesture jumps the gaze
+  const two = e.touches.length > 1
+  const a = e.touches[0]
+  const b = e.touches[1]
+  touchY = two && a && b ? (a.clientY + b.clientY) / 2 : (a?.clientY ?? null)
+  touchX = two && a && b ? (a.clientX + b.clientX) / 2 : (a?.clientX ?? null)
+}, { passive: true })
+addEventListener('touchend', (e) => {
+  // and a finger leaving does the same, so the walk never lurches
+  const a = e.touches[0]
+  touchY = a?.clientY ?? null
+  touchX = a?.clientX ?? null
 }, { passive: true })
 addEventListener('touchmove', (e) => {
-  const y = e.touches[0]?.clientY
-  const x = e.touches[0]?.clientX
+  // two fingers move together: their midpoint is the gesture
+  const twoFinger = e.touches.length > 1
+  const t0 = e.touches[0]
+  const t1 = e.touches[1]
+  const y = twoFinger && t0 && t1 ? (t0.clientY + t1.clientY) / 2 : t0?.clientY
+  const x = twoFinger && t0 && t1 ? (t0.clientX + t1.clientX) / 2 : t0?.clientX
   if (y === undefined || x === undefined || touchY === null || touchX === null) return
   const dy = touchY - y
   const dx = touchX - x
   if (phase === 'camp') {
-    // his ground is the one stage with two verbs: the dominant axis wins,
-    // so a swipe up the frame WALKS and a swipe across it LOOKS
-    if (Math.abs(dy) >= Math.abs(dx)) push(dy * 3)
+    // his ground is the one stage with two verbs, so the finger has to
+    // carry both. ONE finger walks: the dominant axis wins, a swipe up the
+    // frame travels and a swipe across it turns the eye. TWO fingers are
+    // the gaze itself, which is how a phone gets the night's own law —
+    // pull the sky down with two fingers and it deepens over you.
+    if (twoFinger) applyDrag(-dx, -dy)
+    else if (Math.abs(dy) >= Math.abs(dx)) push(dy * 3)
     else applyDrag(-dx, 0)
   } else if (dragAllowed()) {
     // at the hub and in a cosmos, the finger moves the gaze itself
