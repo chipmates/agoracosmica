@@ -327,7 +327,6 @@ const ModeSelectorMini: FC<ModeSelectorMiniProps> = ({
                   {tString('modes.selector.freetalkCtaSub')}
                 </span>
               </div>
-              <Bird size={20} weight="duotone" className="eclipse-freetalk-card-icon eclipse-freetalk-card-icon--mirrored" />
             </button>
 
             {/* Divider — gradient line + chapter heading below */}
@@ -383,7 +382,7 @@ const ModeSelectorMini: FC<ModeSelectorMiniProps> = ({
               {/* Seed name under sun — numbered to match wisdom map */}
               {selectedSeed?.title && (
                 <span className="eclipse-sun-seed">
-                  {String(selectedSeed.id).includes('-') ? String(selectedSeed.id).split('-')[1] : selectedSeed.id}. {selectedSeed.title}
+                  {String(selectedSeed.id).includes('-') ? String(selectedSeed.id).split('-')[1] : selectedSeed.id} · {selectedSeed.title}
                 </span>
               )}
 
@@ -407,6 +406,7 @@ const ModeSelectorMini: FC<ModeSelectorMiniProps> = ({
                   >
                     <div className="eclipse-node-icon">
                       <IconComponent size={nodeIconSize} weight="duotone" />
+                      <span className="eclipse-node-num" aria-hidden="true">{mode.chapter}</span>
                     </div>
                     <span className="eclipse-node-title">{tString(mode.titleKey)}</span>
                     <span className="eclipse-node-label">{tString(mode.labelKey)}</span>
