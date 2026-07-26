@@ -221,7 +221,8 @@ try {
           await shot('council-seated')
         }
       }
-    } catch {
+    } catch (err) {
+      console.log('[journey] way-home wait failed:', String(err).split('\n')[0])
       // a stuck way home is worth a diagnosis, not just a screenshot
       const k = await page.evaluate(() => {
         const host = document.getElementById('keeper')

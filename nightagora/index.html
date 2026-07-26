@@ -20,6 +20,34 @@
       --na-mist: #8d93ad;
       --serif: Georgia, 'Times New Roman', serif;
       --sans: system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+      /* ---- THE PRESS — the shell's one letterpress voice. Every surface of
+         the night reads its ink, its rules and its plates out of this block,
+         the way every lit thing in the camp reads the hour out of one set of
+         uniforms. Nothing below invents a hue: the seven colours above are
+         the whole palette. ---- */
+
+      /* type on the night: a hard close shadow so the letter has an edge,
+         and a wide soft one so it sits IN the dark instead of on it */
+      --ink-night: 0 1px 2px rgba(4, 6, 13, 0.92), 0 2px 26px rgba(4, 6, 13, 0.72);
+      /* type on his morning: the camp is a dawn, so its ink is warm-dark or
+         the letterpress looks pasted on (the same reading keeper-press made) */
+      --ink-day: 0 1px 3px rgba(14, 9, 4, 0.92), 0 2px 24px rgba(14, 9, 4, 0.74);
+      /* one hairline weight, two strengths: a rule you read, a rule you feel */
+      --rule: color-mix(in srgb, var(--na-gold) 46%, transparent);
+      --rule-faint: color-mix(in srgb, var(--na-gold) 20%, transparent);
+      /* the plates: abyss with a little of the sky still in the top edge */
+      --plate-top: color-mix(in srgb, var(--na-lapis) 88%, transparent);
+      --plate-foot: color-mix(in srgb, var(--na-abyss) 93%, transparent);
+      --plate-edge: color-mix(in srgb, var(--na-gold) 32%, transparent);
+      --plate-lift: 0 22px 64px rgba(2, 3, 8, 0.5);
+      /* the standard letterpress set, and the leading a wrapped caps line
+         needs. German runs a third longer than English: every one of these
+         lines wraps eventually, so leading is authored, never defaulted. */
+      --press-lead: 1.85;
+      /* mist that has been sitting near a fire: the register between a label
+         and a kicker, so gold is not asked to carry whole blocks of text */
+      --mist-warm: color-mix(in srgb, var(--na-mist) 76%, var(--na-gold));
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { height: 100%; overscroll-behavior: none; }
@@ -28,6 +56,42 @@
       color: var(--na-starlight);
       font-family: var(--serif);
       overflow: hidden;
+      text-rendering: optimizeLegibility;
+      font-feature-settings: 'kern' 1, 'liga' 1;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ---- HIS MORNING TAKES WARM INK — the camp is a dawn, and cool ink on
+       a warm-lit ground makes the letterpress look pasted on. Every line
+       the shell puts over that ground switches its shadow with the hour
+       (the same reading the keeper's own press made). ---- */
+    body[data-phase='camp'] .brand,
+    body[data-phase='camp'] .status,
+    body[data-phase='camp'] #voice,
+    body[data-phase='camp'] #rail button {
+      text-shadow: var(--ink-day);
+    }
+
+    /* ---- THE CAPS REGISTER — every letterspaced line in the night, given
+       its leading once. A tracked capital never ties to its neighbour, so
+       ligatures go, and a wrapped line gets air instead of the browser's
+       default 1.2. Components below still set their own where the line has
+       a reason of its own. ---- */
+    .brand, .tagline, .status, .plate-kicker, .plate-voices, .trace-kicker,
+    .trace-source, .dusk-kicker, .drawn-kicker, .drawn-status, .inst-kicker,
+    .chapters-kicker, .chapters-ink, .chapters-now, .cartouche-honesty,
+    .cartouche-title, .council-kicker, .council-register, .council-name,
+    .door-kicker, .door-trust, .pane-kicker, .pane-tradition, .pane-years,
+    .pane-ink, .pane-sib-label, .pane-drawn, .gate-links, .sitting-stone,
+    .hotspot-label, .atlas-site, .atlas-deg, .star-chip, .portrait-name,
+    .portrait-years, .portrait-note, .descent-kicker, .chapter-btn,
+    #sky-invite, #chapter-marks, #rail button, #dusk-return, #dusk-concept,
+    #descent-skip, #sky-return, #overture-skip, .door-enter, .door-stay,
+    .gate-actions button, .pane-enter, .pane-sibling, .pane-close,
+    .inst-links button, .inst-links a, .inst-close, .drawn-close,
+    .chapters-toggle, .chapters-close, .cartouche-toggle {
+      line-height: var(--press-lead);
+      font-variant-ligatures: none;
     }
     #stage { position: fixed; inset: 0; }
     #stage canvas { display: block; width: 100%; height: 100%; }
@@ -41,28 +105,45 @@
       pointer-events: none;
       z-index: 2;
     }
+    /* the masthead: the one line that is on every frame of the night, so it
+       is set like a masthead and not like a caption. Two hairlines hold it
+       the way a rule holds a running head on a printed page. */
     .brand {
       position: fixed; top: calc(28px + env(safe-area-inset-top)); left: 0; right: 0;
+      display: flex; align-items: center; justify-content: center; gap: 16px;
       font-family: var(--sans);
       font-size: 11px; letter-spacing: 0.42em; text-indent: 0.42em;
       text-transform: uppercase; color: var(--na-mist);
+      text-shadow: var(--ink-night);
+    }
+    .brand::before, .brand::after {
+      content: ''; width: 26px; height: 1px; flex: none;
+      background: color-mix(in srgb, var(--na-mist) 34%, transparent);
     }
     h1 {
       font-weight: 400; font-size: clamp(26px, 4.2vw, 44px);
-      letter-spacing: 0.02em; color: var(--na-starlight);
+      line-height: 1.14;
+      letter-spacing: 0.015em; color: var(--na-starlight);
       text-wrap: balance;
+      text-shadow: var(--ink-night);
     }
     .tagline {
-      margin-top: 14px;
+      margin-top: 16px;
       font-family: var(--sans);
       font-size: 11px; letter-spacing: 0.34em; text-indent: 0.34em;
       text-transform: uppercase; color: var(--na-gold);
+      text-wrap: balance;
+      text-shadow: var(--ink-night);
     }
+    /* the night's own caption line: it names where you are, so it stays the
+       quietest voice on the frame and never argues with a keeper's colophon */
     .status {
       margin-top: 42px;
       font-family: var(--sans);
-      font-size: 10px; letter-spacing: 0.3em; text-indent: 0.3em;
-      text-transform: uppercase; color: var(--na-mist);
+      font-size: 9.5px; letter-spacing: 0.32em; text-indent: 0.32em;
+      text-transform: uppercase;
+      color: color-mix(in srgb, var(--na-mist) 82%, transparent);
+      text-shadow: var(--ink-night);
       min-height: 14px;
       transition: opacity 1.2s ease;
     }
@@ -90,14 +171,20 @@
       padding: 0 24px;
       font-family: var(--serif); font-style: italic;
       font-size: clamp(18px, 2.6vw, 26px);
+      line-height: 1.42; text-wrap: balance;
       color: var(--na-starlight);
-      text-shadow: 0 1px 18px rgba(4, 6, 13, 0.8);
+      text-shadow: var(--ink-night);
       opacity: 0; transition: opacity 2.4s ease;
     }
     #verse.lit { opacity: 0.92; }
+    /* at the crossing the portrait's own name plate hangs at 19%: the verse
+       steps up out of it, or the arrival frame prints two lines on top of
+       each other (round 1, both viewports) */
+    body[data-phase='crossing'] #verse { top: 10.5%; }
     /* on narrow stages the sky verse steps below the constellation plate */
     @media (max-aspect-ratio: 9/10) {
       body[data-phase='sky'] #verse { top: 30%; }
+      body[data-phase='crossing'] #verse { top: 8%; }
     }
 
     body.forge #verse { transition: none !important; }
@@ -109,9 +196,9 @@
       padding: 0 24px;
       font-family: var(--serif); font-style: italic;
       font-size: clamp(16px, 2.2vw, 21px);
-      letter-spacing: 0.06em;
+      letter-spacing: 0.06em; line-height: 1.5; text-wrap: balance;
       color: var(--na-mist);
-      text-shadow: 0 1px 16px rgba(4, 6, 13, 0.85);
+      text-shadow: var(--ink-night);
       opacity: 0; transition: opacity 1.1s ease, letter-spacing 1.1s ease, color 1.1s ease;
     }
     #voice.lit { opacity: 0.85; }
@@ -156,28 +243,40 @@
     #portrait.lit .portrait-years { opacity: 1; transition-delay: 0.6s; }
     #portrait.lit .portrait-epithet { opacity: 1; transition-delay: 0.85s; }
     #portrait.lit .portrait-note { opacity: 1; transition-delay: 1.1s; }
+    /* the caption hangs off the frame the way a plate is captioned in a
+       catalogue: his name over the picture, his ground under it, and a
+       hairline saying the two belong to the same entry */
     .portrait-name {
-      top: -50px; left: 0;
+      top: -54px; left: 0;
       font-family: var(--sans); font-size: 11px;
       letter-spacing: 0.3em; text-transform: uppercase;
       color: var(--na-gold);
+      text-shadow: var(--ink-night);
     }
     .portrait-years {
-      top: -28px; left: 0;
-      font-family: var(--sans); font-size: 10px;
-      letter-spacing: 0.3em; color: var(--na-mist);
+      top: -30px; left: 0;
+      font-family: var(--sans); font-size: 9.5px;
+      letter-spacing: 0.28em;
+      color: color-mix(in srgb, var(--na-mist) 88%, transparent);
+      text-shadow: var(--ink-night);
     }
     .portrait-epithet {
-      bottom: -32px; left: 0;
+      bottom: -34px; left: 0;
       font-family: var(--serif); font-style: italic;
-      font-size: 15px; color: var(--na-starlight);
+      font-size: 15px; letter-spacing: 0.01em;
+      color: var(--na-starlight);
+      text-shadow: var(--ink-night);
     }
     .portrait-note {
-      bottom: -56px; left: 0;
+      bottom: -58px; left: 0;
       font-family: var(--sans); font-size: 9px;
-      letter-spacing: 0.28em; text-transform: uppercase;
-      color: var(--na-mist);
+      letter-spacing: 0.26em; text-transform: uppercase;
+      color: color-mix(in srgb, var(--na-mist) 84%, transparent);
+      text-shadow: var(--ink-night);
     }
+    /* no rule under the picture: the frame already wears two gold hairlines
+       of its own, and a third one under it lands on the frame's own edge
+       (round 2). The caption earns its place with air and with ink. */
 
     /* ---- the gold breath: you enter a life through its light ---- */
     #goldbreath {
@@ -201,28 +300,41 @@
        annotates a coast. Letterspaced small caps, one hairline tick, and
        a bearing — they ink in only while their site holds the frame. ---- */
     #camp-labels { position: fixed; inset: 0; z-index: 2; pointer-events: none; }
+    /* the label hangs off its site the way a survey plate hangs a name off a
+       coast: the leader runs out of the ground, the name sits on the leader,
+       and the bearing is set beneath it in the smaller register. The walk
+       writes the position straight onto the element, so the composition has
+       to grow out of that one anchor point. */
     .atlas-label {
       position: absolute; top: 0; left: 0;
-      display: flex; align-items: baseline; gap: 8px;
+      display: grid;
+      grid-template-columns: auto auto;
+      align-items: center;
+      column-gap: 9px; row-gap: 2px;
       transform: translate(-50%, -50%);
       opacity: 0;
       transition: opacity 0.7s ease;
       white-space: nowrap;
     }
     .atlas-tick {
-      width: 26px; height: 1px;
+      grid-column: 1; grid-row: 1;
+      width: 30px; height: 1px;
       background: linear-gradient(90deg,
-        transparent, color-mix(in srgb, var(--na-gold) 62%, transparent));
+        transparent, color-mix(in srgb, var(--na-gold) 68%, transparent));
     }
     .atlas-site {
+      grid-column: 2; grid-row: 1;
       font-family: var(--sans);
       font-size: 10px; letter-spacing: 0.34em; text-transform: uppercase;
-      color: color-mix(in srgb, var(--na-starlight) 88%, transparent);
+      color: color-mix(in srgb, var(--na-starlight) 90%, transparent);
+      text-shadow: var(--ink-day);
     }
     .atlas-deg {
+      grid-column: 2; grid-row: 2;
       font-family: var(--sans);
-      font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase;
-      color: color-mix(in srgb, var(--na-gold) 72%, transparent);
+      font-size: 8.5px; letter-spacing: 0.24em; text-transform: uppercase;
+      color: color-mix(in srgb, var(--na-gold) 66%, transparent);
+      text-shadow: var(--ink-day);
     }
     @media (max-width: 720px) {
       .atlas-site { font-size: 9px; letter-spacing: 0.26em; }
@@ -235,29 +347,57 @@
     #trace-card {
       position: fixed; z-index: 3;
       max-width: 300px;
-      padding: 2px 0 2px 16px;
-      border-left: 1px solid color-mix(in srgb, var(--na-gold) 55%, transparent);
+      padding: 2px 0 2px 18px;
       pointer-events: none;
       text-align: left;
       transition: opacity 0.4s ease;
     }
     #trace-card[hidden] { display: block; opacity: 0; visibility: hidden; }
+    /* the card holds over a lit tent as often as over the dark, so it earns
+       its legibility from its own air, not from a box: an ellipse of the
+       night feathered out long before it has an edge (the keeper's device,
+       because a card here would wall the words off from the wood) */
+    #trace-card::before {
+      content: ''; position: absolute; z-index: -1;
+      left: -30px; right: -40px; top: -30px; bottom: -30px;
+      background: radial-gradient(ellipse 58% 60% at 44% 44%,
+        color-mix(in srgb, var(--na-abyss) 88%, transparent) 0%,
+        color-mix(in srgb, var(--na-abyss) 62%, transparent) 48%,
+        transparent 80%);
+    }
+    /* the knife stroke: bright where the cut began, spent at its foot */
+    #trace-card::after {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 1px;
+      background: linear-gradient(to bottom,
+        color-mix(in srgb, var(--na-gold) 72%, transparent) 0%,
+        color-mix(in srgb, var(--na-gold) 34%, transparent) 62%,
+        transparent 100%);
+    }
+    /* where and how it was cut: a caption, not a headline. Three lines of
+       tracked gold read as a block of paint, and gold in this night only
+       ever emits or reflects. */
     .trace-kicker {
       font-family: var(--sans);
-      font-size: 9px; letter-spacing: 0.3em;
-      text-transform: uppercase; color: var(--na-gold);
+      font-size: 8.5px; letter-spacing: 0.26em; line-height: 1.75;
+      text-transform: uppercase;
+      color: color-mix(in srgb, var(--mist-warm) 74%, var(--na-starlight));
+      text-shadow: var(--ink-day);
     }
+    /* the opening quote hangs into the margin, the way a set page does it */
     .trace-quote {
-      margin-top: 10px;
+      margin-top: 12px; text-indent: -0.42em;
       font-family: var(--serif); font-style: italic;
       font-size: 17px; line-height: 1.5;
       color: var(--na-starlight);
+      text-shadow: var(--ink-day);
     }
     .trace-source {
-      margin-top: 10px;
+      margin-top: 12px;
       font-family: var(--sans);
-      font-size: 9px; letter-spacing: 0.28em;
-      text-transform: uppercase; color: var(--na-mist);
+      font-size: 8.5px; letter-spacing: 0.26em; line-height: 1.8;
+      text-transform: uppercase;
+      color: color-mix(in srgb, var(--na-mist) 88%, transparent);
+      text-shadow: var(--ink-day);
     }
 
     /* ---- the duskrise: His Sky's letterpress, low while the gaze is
@@ -272,48 +412,76 @@
     }
     #dusk-pane.lit { opacity: 1; }
     #dusk-pane[hidden] { display: none; }
+    /* the duskrise stands over the brightest ground in the night, the lit
+       tent rows: the block takes its own air with it */
+    #dusk-pane::before {
+      content: ''; position: absolute; z-index: -1;
+      left: -8%; right: -8%; top: -34px; bottom: -30px;
+      background: radial-gradient(ellipse 46% 50% at 50% 50%,
+        color-mix(in srgb, var(--na-abyss) 74%, transparent) 0%,
+        color-mix(in srgb, var(--na-abyss) 46%, transparent) 48%,
+        transparent 78%);
+    }
     .dusk-kicker {
       font-family: var(--sans);
       font-size: 10px; letter-spacing: 0.3em; text-indent: 0.3em;
       text-transform: uppercase; color: var(--na-gold);
-      text-shadow: 0 1px 12px rgba(4, 6, 13, 0.9);
+      text-wrap: balance;
+      text-shadow: var(--ink-day);
     }
     .dusk-line {
-      margin-top: 10px;
+      margin-top: 12px;
       font-family: var(--serif); font-style: italic;
-      font-size: clamp(14px, 1.9vw, 17px);
+      font-size: clamp(14px, 1.9vw, 17px); line-height: 1.5;
       color: var(--na-starlight);
-      text-shadow: 0 1px 16px rgba(4, 6, 13, 0.85);
+      text-shadow: var(--ink-day);
     }
     .dusk-actions {
-      margin-top: 10px;
+      margin-top: 8px;
       display: flex; align-items: center; justify-content: center;
-      gap: 2px 22px; flex-wrap: wrap;
+      gap: 2px 26px; flex-wrap: wrap;
     }
     #dusk-return {
       background: none; border: none; cursor: pointer;
       pointer-events: auto;
       font-family: var(--sans);
-      font-size: 10px; letter-spacing: 0.3em; text-indent: 0.3em;
-      text-transform: uppercase; color: var(--na-mist);
+      font-size: 9.5px; letter-spacing: 0.3em; text-indent: 0.3em;
+      text-transform: uppercase;
+      color: color-mix(in srgb, var(--na-mist) 92%, transparent);
       min-height: 44px; padding: 0 10px;
-      text-shadow: 0 1px 12px rgba(4, 6, 13, 0.9);
+      text-shadow: var(--ink-day);
       transition: color 0.5s ease;
     }
     #dusk-return:hover, #dusk-return:focus-visible { color: var(--na-starlight); outline: none; }
+    /* the way onward wears a door's hairline; the way back is a quiet step */
     #dusk-concept {
+      position: relative;
       pointer-events: auto;
       font-family: var(--sans);
-      font-size: 10px; letter-spacing: 0.3em; text-indent: 0.3em;
+      font-size: 9.5px; letter-spacing: 0.3em; text-indent: 0.3em;
       text-transform: uppercase;
-      color: color-mix(in srgb, var(--na-gold) 72%, transparent);
+      color: color-mix(in srgb, var(--na-gold) 78%, transparent);
       text-decoration: none;
       min-height: 44px; display: inline-flex; align-items: center;
       padding: 0 10px;
-      text-shadow: 0 1px 12px rgba(4, 6, 13, 0.9);
+      text-shadow: var(--ink-day);
       transition: color 0.5s ease;
     }
+    #dusk-concept::after {
+      content: ''; position: absolute; left: 10px; right: 10px; bottom: 12px;
+      height: 1px; background: var(--rule-faint);
+      transition: background-color 0.5s ease;
+    }
     #dusk-concept:hover, #dusk-concept:focus-visible { color: var(--na-gold); outline: none; }
+    #dusk-concept:hover::after, #dusk-concept:focus-visible::after { background: var(--rule); }
+    @media (min-width: 481px) {
+      /* one hairline between the two ways out, only while they share a row */
+      #dusk-concept::before {
+        content: ''; position: absolute; left: -13px; top: 50%;
+        width: 1px; height: 13px; margin-top: -6px;
+        background: var(--rule-faint);
+      }
+    }
     body.forge #dusk-pane { transition: none !important; }
 
     /* ---- the return: one diamond-ring breath, the short dawn ---- */
@@ -339,78 +507,164 @@
     }
     .descent-ask {
       font-family: var(--serif); font-style: italic;
-      font-size: clamp(21px, 3vw, 31px); line-height: 1.5;
+      font-size: clamp(21px, 3vw, 31px); line-height: 1.42;
+      letter-spacing: 0.005em; text-wrap: balance;
       color: var(--na-starlight);
-      text-shadow: 0 1px 18px rgba(4, 6, 13, 0.85);
+      text-shadow: var(--ink-night);
     }
+    /* the one kicker of the descent stands in the open sky, so it is flanked
+       the way a title is ruled: the hairlines say a threshold, not a label */
     .descent-kicker {
-      margin-bottom: 14px;
+      margin-bottom: 16px;
+      display: flex; align-items: center; justify-content: center; gap: 15px;
       font-family: var(--sans);
       font-size: 10px; letter-spacing: 0.34em; text-indent: 0.34em;
       text-transform: uppercase; color: var(--na-gold);
-      text-shadow: 0 1px 10px rgba(4, 6, 13, 0.9);
+      text-shadow: var(--ink-night);
     }
+    .descent-kicker::before, .descent-kicker::after {
+      content: ''; width: 22px; height: 1px; flex: none; background: var(--rule);
+    }
+    /* the plumb: a weighted line, heavy where it hangs from */
     #descent .plumb {
       position: fixed; left: 50%;
-      bottom: calc(78px + env(safe-area-inset-bottom));
-      width: 1px; height: 40px;
-      background: color-mix(in srgb, var(--na-gold) 65%, transparent);
+      bottom: calc(82px + env(safe-area-inset-bottom));
+      width: 1px; height: 46px;
+      background: linear-gradient(to bottom,
+        color-mix(in srgb, var(--na-gold) 12%, transparent) 0%,
+        color-mix(in srgb, var(--na-gold) 68%, transparent) 100%);
     }
     /* ---- the declarative line + links, shared by the Sitting ---- */
+    /* the one line that carries a legal consequence, so it is set to be
+       read: sentence case, a real measure, and the link marked as a link */
     .gate-declare {
+      max-width: 44ch; margin-left: auto; margin-right: auto;
       font-family: var(--sans);
-      font-size: 10px; letter-spacing: 0.24em; text-indent: 0.24em;
-      text-transform: uppercase; color: var(--na-mist);
+      font-size: 11.5px; letter-spacing: 0.012em; line-height: 1.62;
+      color: color-mix(in srgb, var(--na-mist) 92%, transparent);
     }
-    .gate-declare a { color: var(--na-gold); text-decoration: none; border-bottom: 1px solid color-mix(in srgb, var(--na-gold) 45%, transparent); pointer-events: auto; }
+    /* the named document never breaks across two lines: half a link on each
+       line reads as two links (round 2, phone) */
+    .gate-declare a {
+      white-space: nowrap;
+      color: var(--na-gold); text-decoration: none;
+      border-bottom: 1px solid color-mix(in srgb, var(--na-gold) 45%, transparent);
+      pointer-events: auto;
+      transition: border-color 0.3s ease;
+    }
+    .gate-declare a:hover, .gate-declare a:focus-visible {
+      border-bottom-color: var(--na-gold); outline: none;
+    }
     .gate-actions {
-      margin-top: 20px;
+      margin-top: 22px;
       display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
     }
+    /* ---- the doors of the night: one plate, one sheen, three places
+       (the Sitting's own, the figure pane's, the Forward Door's) ---- */
+    .gate-actions button, .pane-enter, .door-enter {
+      position: relative;
+      background:
+        linear-gradient(to bottom,
+          color-mix(in srgb, var(--na-gold) 6%, transparent) 0%,
+          transparent 72%);
+      box-shadow: inset 0 0 24px color-mix(in srgb, var(--na-gold) 6%, transparent);
+      transition: border-color 0.3s ease, color 0.3s ease, box-shadow 0.4s ease;
+    }
+    .gate-actions button:hover, .gate-actions button:focus-visible,
+    .pane-enter:hover, .pane-enter:focus-visible,
+    .door-enter:hover, .door-enter:focus-visible {
+      box-shadow:
+        inset 0 0 30px color-mix(in srgb, var(--na-gold) 11%, transparent),
+        0 0 26px color-mix(in srgb, var(--na-gold) 9%, transparent);
+    }
     .gate-actions button {
-      background: none; cursor: pointer;
+      cursor: pointer;
       border: 1px solid color-mix(in srgb, var(--na-gold) 45%, transparent);
-      min-height: 44px; padding: 12px 24px;
+      min-height: 44px; padding: 12px 26px;
       font-family: var(--sans);
       font-size: 10px; letter-spacing: 0.3em; text-indent: 0.3em;
       text-transform: uppercase; color: var(--na-gold);
       pointer-events: auto;
-      transition: border-color 0.3s ease, color 0.3s ease;
     }
     .gate-actions button:hover, .gate-actions button:focus-visible { border-color: var(--na-gold); color: var(--na-starlight); outline: none; }
     .gate-links {
-      margin-top: 18px;
+      margin-top: 20px;
       font-family: var(--sans);
-      font-size: 9px; letter-spacing: 0.28em;
+      font-size: 9px; letter-spacing: 0.26em;
       text-transform: uppercase;
+      color: color-mix(in srgb, var(--na-mist) 70%, transparent);
     }
-    .gate-links a { color: var(--na-mist); text-decoration: none; pointer-events: auto; }
-    .gate-links a:hover { color: var(--na-gold); }
+    .gate-links a {
+      color: color-mix(in srgb, var(--na-mist) 92%, transparent);
+      text-decoration: none; pointer-events: auto;
+      transition: color 0.3s ease;
+    }
+    .gate-links a:hover, .gate-links a:focus-visible { color: var(--na-gold); outline: none; }
 
     /* ---- the Sitting: the one contract of the night, taken at the
        first hearth (concept-revision §2b) ---- */
+    /* ---- THE PLATES — the three surfaces of the night that are objects and
+       not voices (the contract, the honest placeholder, the instruments).
+       One plate: abyss with the sky still in its top edge, a gold hairline,
+       an inner hairline a breath inside it, corner ticks the way a survey
+       plate is trimmed, and a shadow that seats it on the world. Cut, not
+       carded.
+
+       His nights are NOT in this family. That element ships its own press
+       (id chapters-press) and is deliberately a leaf and not a plate: no
+       box, no border, no shadow. The shell stages it and stays out of it. */
+    #sitting, #drawn-pane, #instruments {
+      background:
+        linear-gradient(to bottom, var(--plate-top) 0%, var(--plate-foot) 62%);
+      border: 1px solid var(--plate-edge);
+      box-shadow:
+        var(--plate-lift),
+        inset 0 1px 0 color-mix(in srgb, var(--na-gold) 10%, transparent);
+      backdrop-filter: blur(6px);
+    }
+    #sitting::before, #drawn-pane::before, #instruments::before {
+      content: ''; position: absolute; inset: 5px;
+      pointer-events: none;
+      background:
+        linear-gradient(var(--rule-faint), var(--rule-faint)) left top / 10px 1px no-repeat,
+        linear-gradient(var(--rule-faint), var(--rule-faint)) left top / 1px 10px no-repeat,
+        linear-gradient(var(--rule-faint), var(--rule-faint)) right bottom / 10px 1px no-repeat,
+        linear-gradient(var(--rule-faint), var(--rule-faint)) right bottom / 1px 10px no-repeat;
+    }
+
     #sitting {
       position: fixed; left: 50%; bottom: calc(96px + env(safe-area-inset-bottom));
       transform: translateX(-50%);
       width: min(560px, calc(100% - 48px));
       z-index: 6; text-align: center;
-      padding: 26px 28px;
-      background: color-mix(in srgb, var(--na-abyss) 82%, transparent);
-      border: 1px solid color-mix(in srgb, var(--na-gold) 35%, transparent);
-      backdrop-filter: blur(6px);
+      padding: 30px 32px 28px;
     }
     #sitting[hidden] { display: none; }
-    #sitting .rule { display: block; width: 44px; height: 1px; margin: 0 auto 20px; background: color-mix(in srgb, var(--na-gold) 55%, transparent); }
+    #sitting .rule { display: block; width: 44px; height: 1px; margin: 0 auto 22px; background: color-mix(in srgb, var(--na-gold) 55%, transparent); }
+    /* THE CONTRACT MUST BE READ. It was set in tracked capitals, which on a
+       phone is seven lines of shouting, and shouting is the one register a
+       reader skips. It is the same words, set to be read: sentence case, a
+       measure that fits the eye, and the one line that has to land kept as
+       a stamp above it. */
     .sitting-stone {
+      max-width: 46ch; margin: 0 auto;
+      text-align: left;
       font-family: var(--sans);
-      font-size: 10px; letter-spacing: 0.3em; text-indent: 0.3em;
-      text-transform: uppercase; line-height: 2.1;
-      color: var(--na-mist);
+      font-size: 13px; letter-spacing: 0.012em; text-indent: 0;
+      text-transform: none; line-height: 1.68;
+      color: color-mix(in srgb, var(--na-mist) 90%, var(--na-starlight));
     }
-    .sitting-stone.strong { margin-top: 8px; color: var(--na-starlight); }
-    #sitting .gate-declare { margin-top: 18px; }
-    #sitting .gate-actions { margin-top: 16px; }
-    #sitting .gate-links { margin-top: 14px; }
+    /* the one line that has to land is a stamp, so it is centred under the
+       paragraph it stamps, in capitals, alone */
+    .sitting-stone.strong {
+      margin-top: 16px; text-align: center;
+      font-size: 10px; letter-spacing: 0.3em; text-indent: 0.3em;
+      text-transform: uppercase; line-height: 1.6;
+      color: var(--na-starlight);
+    }
+    #sitting .gate-declare { margin-top: 20px; }
+    #sitting .gate-actions { margin-top: 20px; }
+    #sitting .gate-links { margin-top: 16px; }
 
     /* ---- the being-drawn pane: the honest placeholder, one per future
        organ (concept phase law) ---- */
@@ -419,10 +673,7 @@
       transform: translate(-50%, -50%);
       width: min(460px, calc(100% - 48px));
       z-index: 6; text-align: center;
-      padding: 30px 32px 22px;
-      background: color-mix(in srgb, var(--na-abyss) 86%, transparent);
-      border: 1px solid color-mix(in srgb, var(--na-gold) 35%, transparent);
-      backdrop-filter: blur(6px);
+      padding: 32px 34px 22px;
     }
     #drawn-pane[hidden] { display: none; }
     .drawn-kicker {
@@ -431,91 +682,124 @@
       text-transform: uppercase; color: var(--na-gold);
     }
     .drawn-title {
-      margin-top: 12px;
+      margin-top: 14px;
       font-family: var(--serif);
-      font-size: clamp(20px, 2.4vw, 26px);
+      font-size: clamp(20px, 2.4vw, 26px); line-height: 1.2;
+      letter-spacing: 0.01em;
       color: var(--na-starlight);
     }
+    /* the promise sits under a hairline: an entry in a catalogue of things
+       not drawn yet, which is exactly what it is */
     .drawn-promise {
-      margin-top: 12px;
+      position: relative;
+      margin-top: 20px; padding-top: 18px;
+      max-width: 34ch; margin-left: auto; margin-right: auto;
       font-family: var(--serif); font-style: italic;
-      font-size: 15px; line-height: 1.55;
-      color: var(--na-mist);
+      font-size: 15px; line-height: 1.58;
+      color: color-mix(in srgb, var(--na-mist) 94%, var(--na-starlight));
+    }
+    .drawn-promise::before {
+      content: ''; position: absolute; top: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 34px; height: 1px; background: var(--rule-faint);
     }
     .drawn-status {
-      margin-top: 18px;
+      margin-top: 20px;
       font-family: var(--sans);
       font-size: 8px; letter-spacing: 0.3em; text-indent: 0.3em;
-      text-transform: uppercase; color: var(--na-gold);
-      opacity: 0.8;
+      text-transform: uppercase;
+      color: color-mix(in srgb, var(--na-gold) 72%, transparent);
     }
     .drawn-close {
-      margin-top: 10px;
+      margin-top: 8px;
       background: none; border: none; cursor: pointer;
       min-height: 44px; padding: 8px 16px;
       font-family: var(--sans);
       font-size: 9px; letter-spacing: 0.3em; text-indent: 0.3em;
-      text-transform: uppercase; color: var(--na-mist);
+      text-transform: uppercase;
+      color: color-mix(in srgb, var(--na-mist) 88%, transparent);
+      transition: color 0.3s ease;
     }
     .drawn-close:hover, .drawn-close:focus-visible { color: var(--na-gold); outline: none; }
 
     /* ---- the instrument rail: the plain-faced layer, two quiet marks ---- */
     #rail { position: fixed; inset: 0; z-index: 4; pointer-events: none; }
     #rail[hidden] { display: none; }
+    /* each mark carries a hairline out to its own edge of the frame, so the
+       two of them read as instruments fixed to the rail and not as two words
+       floating in the corners */
     #rail button {
       position: fixed; bottom: calc(22px + env(safe-area-inset-bottom));
+      display: inline-flex; align-items: center; gap: 11px;
       background: none; border: none; cursor: pointer;
       min-height: 44px; padding: 10px 14px;
       font-family: var(--sans);
       font-size: 9px; letter-spacing: 0.3em; text-indent: 0.3em;
-      text-transform: uppercase; color: var(--na-mist);
+      text-transform: uppercase;
+      color: color-mix(in srgb, var(--na-mist) 88%, transparent);
+      text-shadow: var(--ink-night);
       pointer-events: auto;
       transition: color 0.3s ease;
     }
+    #rail-sound::before, #rail-instruments::after {
+      content: ''; flex: none; width: 18px; height: 1px;
+      background: color-mix(in srgb, var(--na-mist) 40%, transparent);
+      transition: background-color 0.3s ease;
+    }
     #rail button:hover, #rail button:focus-visible { color: var(--na-gold); outline: none; }
+    #rail button:hover::before, #rail button:focus-visible::before,
+    #rail button:hover::after, #rail button:focus-visible::after { background: var(--rule); }
+    /* sound carries its state in the hairline as well as in the word */
+    #rail-sound[aria-pressed='true'] { color: var(--na-starlight); }
+    #rail-sound[aria-pressed='true']::before { background: var(--rule); }
     #rail-sound { left: max(14px, env(safe-area-inset-left)); }
     #rail-instruments { right: max(14px, env(safe-area-inset-right)); }
     #instruments {
       position: fixed; right: max(18px, env(safe-area-inset-right));
       bottom: calc(70px + env(safe-area-inset-bottom));
-      z-index: 6; min-width: 230px;
-      padding: 22px 26px;
-      background: color-mix(in srgb, var(--na-abyss) 88%, transparent);
-      border: 1px solid color-mix(in srgb, var(--na-gold) 35%, transparent);
-      backdrop-filter: blur(6px);
+      z-index: 6; min-width: 236px;
+      padding: 24px 26px 20px;
     }
     #instruments[hidden] { display: none; }
     .inst-kicker {
+      position: relative;
       font-family: var(--sans);
       font-size: 9px; letter-spacing: 0.32em; text-indent: 0.32em;
       text-transform: uppercase; color: var(--na-gold);
-      margin-bottom: 14px;
+      margin-bottom: 8px; padding-bottom: 12px;
     }
+    .inst-kicker::after {
+      content: ''; position: absolute; left: 0; bottom: 0;
+      width: 30px; height: 1px; background: var(--rule);
+    }
+    /* the list is a register: one hairline between entries, nothing boxed */
     .inst-links { display: flex; flex-direction: column; }
-    .inst-links button {
+    .inst-links button, .inst-links a {
+      position: relative;
       background: none; border: none; cursor: pointer; text-align: left;
       font-family: var(--sans);
       font-size: 10px; letter-spacing: 0.26em; text-indent: 0.26em;
-      text-transform: uppercase; color: var(--na-starlight);
-      padding: 11px 0;
+      text-transform: uppercase;
+      color: color-mix(in srgb, var(--na-starlight) 92%, transparent);
+      text-decoration: none;
+      padding: 12px 0;
       transition: color 0.3s ease;
     }
-    .inst-links button:hover, .inst-links button:focus-visible { color: var(--na-gold); outline: none; }
-    .inst-links a {
-      font-family: var(--sans);
-      font-size: 10px; letter-spacing: 0.26em; text-indent: 0.26em;
-      text-transform: uppercase; color: var(--na-starlight);
-      text-decoration: none; padding: 11px 0;
-      transition: color 0.3s ease;
+    .inst-links > * + *::before {
+      content: ''; position: absolute; left: 0; right: 0; top: 0; height: 1px;
+      background: color-mix(in srgb, var(--na-mist) 16%, transparent);
     }
+    .inst-links button:hover, .inst-links button:focus-visible,
     .inst-links a:hover, .inst-links a:focus-visible { color: var(--na-gold); outline: none; }
     .inst-close {
-      margin-top: 12px;
+      margin-top: 14px;
       background: none; border: none; cursor: pointer;
       min-height: 44px; padding: 8px 0;
       font-family: var(--sans);
       font-size: 9px; letter-spacing: 0.3em; text-indent: 0.3em;
-      text-transform: uppercase; color: var(--na-mist);
+      text-transform: uppercase;
+      color: color-mix(in srgb, var(--na-mist) 84%, transparent);
+      transition: color 0.3s ease;
     }
     .inst-close:hover, .inst-close:focus-visible { color: var(--na-gold); outline: none; }
 
@@ -530,9 +814,15 @@
     }
     #forward-door.lit { opacity: 1; pointer-events: auto; }
     #forward-door[hidden] { display: none; }
+    /* the hairline of dawn under the door: it has to hold the letterpress
+       that stands in it, so it comes up higher and carries a little of the
+       night's own ink at its foot */
     .door-dawn {
-      position: absolute; left: 0; right: 0; bottom: 0; height: 38%;
-      background: linear-gradient(to top, color-mix(in srgb, var(--na-horizon) 65%, transparent) 0%, transparent 100%);
+      position: absolute; left: 0; right: 0; bottom: 0; height: 46%;
+      background: linear-gradient(to top,
+        color-mix(in srgb, var(--na-abyss) 72%, transparent) 0%,
+        color-mix(in srgb, var(--na-horizon) 58%, transparent) 46%,
+        transparent 100%);
       pointer-events: none;
     }
     .door-mark {
@@ -547,48 +837,72 @@
       background: var(--na-starlight);
       box-shadow: 0 0 14px var(--na-starlight);
     }
+    /* the kicker is the lintel of the door, so it is ruled on both sides */
     .door-kicker {
       margin-top: 34px;
+      display: flex; align-items: center; justify-content: center; gap: 16px;
       font-family: var(--sans);
       font-size: 10px; letter-spacing: 0.34em; text-indent: 0.34em;
       text-transform: uppercase; color: var(--na-gold);
+      text-shadow: var(--ink-night);
+    }
+    .door-kicker::before, .door-kicker::after {
+      content: ''; width: 24px; height: 1px; flex: none; background: var(--rule);
     }
     .door-title {
-      margin-top: 12px;
-      font-family: var(--serif);
-      font-size: clamp(24px, 3.2vw, 34px);
-      color: var(--na-starlight);
-    }
-    .door-trust {
       margin-top: 14px;
+      font-family: var(--serif);
+      font-size: clamp(24px, 3.2vw, 34px); line-height: 1.16;
+      letter-spacing: 0.012em; text-wrap: balance;
+      color: var(--na-starlight);
+      text-shadow: var(--ink-night);
+    }
+    /* the trust line stands on lit marble and wraps on a phone: it gets
+       leading, a balanced break, and enough ink to survive the fire */
+    /* no ch measure on a tracked capital line: the ch box knows nothing
+       about letter-spacing, so 40ch broke the trust line into three stubs
+       on a wide stage (round 1). The balance is what shapes it. */
+    .door-trust {
+      margin-top: 16px;
       font-family: var(--sans);
-      font-size: 9px; letter-spacing: 0.28em; text-indent: 0.28em;
-      text-transform: uppercase; color: var(--na-mist);
+      font-size: 9px; letter-spacing: 0.26em; text-indent: 0.26em;
+      text-transform: uppercase; text-wrap: balance;
+      color: color-mix(in srgb, var(--na-mist) 92%, var(--na-starlight));
+      text-shadow: var(--ink-night);
     }
     .door-actions {
-      margin-top: 30px;
-      display: flex; gap: 18px; align-items: center; flex-wrap: wrap; justify-content: center;
+      margin-top: 32px;
+      display: flex; gap: 20px; align-items: center; flex-wrap: wrap; justify-content: center;
     }
     .door-enter {
       display: inline-block;
       border: 1px solid color-mix(in srgb, var(--na-gold) 45%, transparent);
-      min-height: 44px; padding: 13px 28px;
+      min-height: 44px; padding: 14px 30px;
       font-family: var(--sans);
       font-size: 10px; letter-spacing: 0.3em; text-indent: 0.3em;
       text-transform: uppercase; color: var(--na-gold);
       text-decoration: none;
-      transition: border-color 0.3s ease, color 0.3s ease;
     }
     .door-enter:hover, .door-enter:focus-visible { border-color: var(--na-gold); color: var(--na-starlight); outline: none; }
     .door-stay {
+      position: relative;
       background: none; border: none; cursor: pointer;
       min-height: 44px; padding: 10px 14px;
       font-family: var(--sans);
       font-size: 9px; letter-spacing: 0.3em; text-indent: 0.3em;
-      text-transform: uppercase; color: var(--na-mist);
+      text-transform: uppercase;
+      color: color-mix(in srgb, var(--na-mist) 90%, transparent);
+      text-shadow: var(--ink-night);
       transition: color 0.3s ease;
     }
+    .door-stay::after {
+      content: ''; position: absolute; left: 50%; bottom: 11px;
+      transform: translateX(-50%);
+      width: 0; height: 1px; background: var(--rule);
+      transition: width 0.4s ease;
+    }
     .door-stay:hover, .door-stay:focus-visible { color: var(--na-gold); outline: none; }
+    .door-stay:hover::after, .door-stay:focus-visible::after { width: calc(100% - 28px); }
     @media (max-aspect-ratio: 9/10) {
       /* the mark yields on narrow: the fire itself is the doorway */
       .door-mark { display: none; }
@@ -599,12 +913,13 @@
     /* the impatient door: visible only while totality holds */
     #overture-skip {
       display: none;
-      margin: 14px auto 0;
+      margin: 12px auto 0;
       background: none; border: none; cursor: pointer;
       min-height: 44px; padding: 8px 16px;
       font-family: var(--sans);
       font-size: 9px; letter-spacing: 0.3em; text-indent: 0.3em;
       text-transform: uppercase; color: var(--na-gold);
+      text-shadow: var(--ink-night);
       opacity: 0.85; transition: opacity 0.3s ease, color 0.3s ease;
       pointer-events: auto;
     }
@@ -639,9 +954,11 @@
     .hotspot-label {
       font-family: var(--sans);
       font-size: 10px; letter-spacing: 0.3em; text-indent: 0.3em;
-      text-transform: uppercase; color: var(--na-starlight);
+      text-transform: uppercase;
+      color: color-mix(in srgb, var(--na-starlight) 94%, transparent);
       white-space: nowrap;
-      text-shadow: 0 1px 10px rgba(4, 6, 13, 0.95);
+      text-shadow: var(--ink-night);
+      transition: color 0.3s ease;
     }
     .hotspot:hover .hotspot-mark, .hotspot:focus-visible .hotspot-mark {
       border-color: var(--na-gold);
@@ -652,15 +969,16 @@
     body.forge .hotspot { transition: none !important; }
 
     /* ---- the chapters: his nights, told in his Echo's voice ---- */
+    /* the shell's staging for his nights only. The element's own press
+       (chapters-press) ships after this one and owns the composition: it is
+       a leaf, so nothing here gives it a box, an edge or a shadow. */
     #chapters {
       position: fixed; left: 50%; transform: translateX(-50%);
       bottom: calc(76px + env(safe-area-inset-bottom));
       width: min(560px, calc(100% - 48px));
       z-index: 6;
-      padding: 20px 24px;
-      background: color-mix(in srgb, var(--na-abyss) 88%, transparent);
-      border: 1px solid color-mix(in srgb, var(--na-gold) 35%, transparent);
-      backdrop-filter: blur(6px);
+      padding: 22px 26px 18px;
+      background: none; border: none;
     }
     #chapters[hidden] { display: none; }
     .chapters-kicker {
@@ -669,36 +987,46 @@
       text-transform: uppercase; color: var(--na-gold);
     }
     .chapters-ink {
-      margin-top: 6px;
+      margin-top: 7px;
       font-family: var(--sans);
-      font-size: 8px; letter-spacing: 0.24em;
-      text-transform: uppercase; color: var(--na-mist);
+      font-size: 8px; letter-spacing: 0.24em; line-height: 1.8;
+      text-transform: uppercase;
+      color: color-mix(in srgb, var(--na-mist) 84%, transparent);
     }
     .chapters-list {
-      margin-top: 12px;
-      display: flex; flex-wrap: wrap; gap: 4px 6px;
+      margin-top: 16px;
+      display: flex; flex-wrap: wrap; gap: 6px;
     }
+    /* the numerals are a programme, so they are set square and even: a
+       numeral is a mark, not a word, and tracking pushes it off its own tile */
     .chapter-btn {
       background: none; cursor: pointer;
-      border: 1px solid color-mix(in srgb, var(--na-gold) 25%, transparent);
-      min-width: 44px; min-height: 40px; padding: 8px 12px;
+      border: 1px solid color-mix(in srgb, var(--na-gold) 22%, transparent);
+      min-width: 44px; min-height: 40px; padding: 8px 10px;
       font-family: var(--sans);
-      font-size: 9px; letter-spacing: 0.22em;
-      text-transform: uppercase; color: var(--na-starlight);
-      transition: border-color 0.3s ease, color 0.3s ease;
+      font-size: 9.5px; letter-spacing: 0.12em; text-indent: 0.12em;
+      text-transform: uppercase;
+      color: color-mix(in srgb, var(--na-starlight) 88%, transparent);
+      transition: border-color 0.3s ease, color 0.3s ease, box-shadow 0.4s ease;
     }
     .chapter-btn:hover, .chapter-btn:focus-visible { border-color: var(--na-gold); color: var(--na-gold); outline: none; }
-    .chapter-btn.playing { border-color: var(--na-gold); color: var(--na-gold); }
+    /* the night being told is the one lit tile on the plate */
+    .chapter-btn.playing {
+      border-color: color-mix(in srgb, var(--na-gold) 78%, transparent);
+      color: var(--na-gold);
+      box-shadow: inset 0 0 16px color-mix(in srgb, var(--na-gold) 12%, transparent);
+    }
     .chapters-bar {
-      position: relative; margin-top: 14px;
+      position: relative; margin-top: 16px;
       display: flex; align-items: center; gap: 14px;
-      padding-top: 10px;
-      border-top: 1px solid color-mix(in srgb, var(--na-gold) 30%, transparent);
+      padding-top: 12px;
+      border-top: 1px solid color-mix(in srgb, var(--na-gold) 26%, transparent);
     }
     .chapters-progress {
       position: absolute; top: -1px; left: 0;
       height: 1px; width: 0%;
       background: var(--na-gold);
+      box-shadow: 0 0 8px color-mix(in srgb, var(--na-gold) 55%, transparent);
     }
     .chapters-toggle {
       background: none; border: none; cursor: pointer;
@@ -706,12 +1034,15 @@
       font-family: var(--sans);
       font-size: 10px; letter-spacing: 0.3em; text-indent: 0.3em;
       text-transform: uppercase; color: var(--na-gold);
+      transition: color 0.3s ease;
     }
+    .chapters-toggle:hover, .chapters-toggle:focus-visible { color: var(--na-starlight); outline: none; }
     .chapters-now {
       flex: 1; text-align: right;
       font-family: var(--sans);
       font-size: 9px; letter-spacing: 0.24em;
-      text-transform: uppercase; color: var(--na-mist);
+      text-transform: uppercase;
+      color: color-mix(in srgb, var(--na-mist) 90%, transparent);
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
     .chapters-close {
@@ -719,7 +1050,9 @@
       min-height: 40px; padding: 6px 0 6px 10px;
       font-family: var(--sans);
       font-size: 9px; letter-spacing: 0.3em;
-      text-transform: uppercase; color: var(--na-mist);
+      text-transform: uppercase;
+      color: color-mix(in srgb, var(--na-mist) 80%, transparent);
+      transition: color 0.3s ease;
     }
     .chapters-close:hover, .chapters-close:focus-visible { color: var(--na-gold); outline: none; }
 
@@ -730,22 +1063,29 @@
       50% { text-shadow: 0 0 18px color-mix(in srgb, var(--na-gold) 80%, transparent); color: var(--na-gold); }
     }
 
+    /* the impatient way down. It shared a hand's width with the status line,
+       which put two lines of the same size a breath apart (round 1): it
+       steps to the foot of the frame and lets the status keep its own air */
     #descent-skip {
       position: fixed; left: 50%; transform: translateX(-50%);
-      bottom: calc(30px + env(safe-area-inset-bottom));
+      bottom: calc(14px + env(safe-area-inset-bottom));
       background: none; border: none; cursor: pointer;
       min-height: 44px; padding: 10px 18px;
       font-family: var(--sans);
-      font-size: 10px; letter-spacing: 0.3em; text-indent: 0.3em;
+      font-size: 9.5px; letter-spacing: 0.3em; text-indent: 0.3em;
       text-transform: uppercase; color: var(--na-gold);
+      text-shadow: var(--ink-night);
       pointer-events: auto;
       opacity: 0.85; transition: opacity 0.3s ease, color 0.3s ease;
     }
     #descent-skip:hover, #descent-skip:focus-visible { opacity: 1; color: var(--na-starlight); outline: none; }
     @media (max-aspect-ratio: 9/10) {
-      /* clear of the rail line on narrow stages */
-      #descent-skip { bottom: calc(64px + env(safe-area-inset-bottom)); }
-      #descent .plumb { bottom: calc(112px + env(safe-area-inset-bottom)); }
+      /* on a phone the way down cannot sit at the foot: a centred label
+         there runs straight into both rail marks. It steps up instead, and
+         it steps clear of the status line, which sat a breath under it
+         (round 2, the two lines were touching) */
+      #descent-skip { bottom: calc(96px + env(safe-area-inset-bottom)); }
+      #descent .plumb { bottom: calc(146px + env(safe-area-inset-bottom)); }
     }
     body.forge #descent *, body.forge .copy { transition: none !important; }
     /* the static mirror serves readers and crawlers, never the canvas */
@@ -762,22 +1102,35 @@
       opacity: 0; transition: opacity 1.2s ease;
     }
     #constellation-plate.lit { opacity: 1; }
+    /* the wheel's masthead: a kicker, a hairline, the constellation's name
+       cut in wide capitals, and what it holds */
     .plate-kicker {
+      position: relative;
       font-family: var(--sans);
       font-size: 10px; letter-spacing: 0.34em;
       text-transform: uppercase; color: var(--na-gold);
+      padding-bottom: 13px;
+      text-shadow: var(--ink-night);
+    }
+    .plate-kicker::after {
+      content: ''; position: absolute; left: 0; bottom: 0;
+      width: 38px; height: 1px; background: var(--rule);
     }
     .plate-name {
       margin-top: 12px;
       font-family: var(--sans); font-weight: 300;
       font-size: clamp(22px, 3.2vw, 40px); letter-spacing: 0.22em;
+      line-height: 1.1;
       text-transform: uppercase; color: var(--na-starlight);
+      text-shadow: var(--ink-night);
     }
     .plate-voices {
-      margin-top: 10px;
+      margin-top: 12px;
       font-family: var(--sans);
       font-size: 9px; letter-spacing: 0.3em;
-      text-transform: uppercase; color: var(--na-mist);
+      text-transform: uppercase;
+      color: color-mix(in srgb, var(--na-mist) 90%, transparent);
+      text-shadow: var(--ink-night);
     }
     #sky-invite {
       position: fixed; left: 0; right: 0;
@@ -785,7 +1138,9 @@
       z-index: 3; text-align: center; pointer-events: none;
       font-family: var(--sans);
       font-size: 9px; letter-spacing: 0.28em; text-indent: 0.28em;
-      text-transform: uppercase; color: var(--na-mist);
+      text-transform: uppercase;
+      color: color-mix(in srgb, var(--na-mist) 88%, transparent);
+      text-shadow: var(--ink-night);
       opacity: 0; transition: opacity 1.2s ease;
     }
     #sky-invite.lit { opacity: 1; }
@@ -795,6 +1150,7 @@
       z-index: 3; text-align: center; pointer-events: none;
       font-family: var(--sans); font-size: 9px; letter-spacing: 0.3em;
       color: var(--na-mist);
+      text-shadow: var(--ink-night);
       opacity: 0; transition: opacity 1.2s ease;
     }
     #chapter-marks.lit { opacity: 1; }
@@ -808,6 +1164,7 @@
       font-family: var(--sans);
       font-size: 9px; letter-spacing: 0.3em; text-indent: 0.3em;
       text-transform: uppercase; color: var(--na-gold);
+      text-shadow: var(--ink-night);
       opacity: 0; transition: opacity 1.2s ease, color 0.3s ease;
       pointer-events: none;
     }
@@ -816,38 +1173,58 @@
     #sky-return[hidden] { display: none; }
     body.forge #sky-return { transition: none !important; }
     #chapter-marks span { margin: 0 7px; opacity: 0.45; transition: opacity 0.6s ease, color 0.6s ease; }
-    #chapter-marks span.here { opacity: 1; color: var(--na-gold); }
+    #chapter-marks span.here {
+      opacity: 1; color: var(--na-gold);
+      text-shadow: 0 0 12px color-mix(in srgb, var(--na-gold) 45%, transparent);
+    }
     @media (max-aspect-ratio: 9/10) {
       /* narrow stages stack the sky's letterpress clear of the rail
          row: rail, then the wheel marks, the invite, the way home */
       #chapter-marks { bottom: calc(76px + env(safe-area-inset-bottom)); }
       #chapter-marks span { margin: 0 5px; }
-      #sky-invite { bottom: calc(98px + env(safe-area-inset-bottom)); padding: 0 24px; }
-      #sky-return { bottom: calc(132px + env(safe-area-inset-bottom)); }
+      #sky-invite {
+        bottom: calc(98px + env(safe-area-inset-bottom)); padding: 0 24px;
+        letter-spacing: 0.22em; text-indent: 0.22em;
+      }
+      #sky-return { bottom: calc(140px + env(safe-area-inset-bottom)); }
     }
     #star-chips { position: fixed; inset: 0; z-index: 3; pointer-events: none; }
     #star-chips[hidden] { display: none; }
+    /* a name in the sky is a name you can open: the hairline under it on
+       hover is the same promise the keeper's offered lines make */
     .star-chip {
       position: absolute; transform: translateX(-50%);
       background: none; border: none; cursor: pointer;
       min-height: 44px; min-width: 44px; padding: 6px 10px;
       font-family: var(--sans);
       font-size: 10px; letter-spacing: 0.26em; text-indent: 0.26em;
-      text-transform: uppercase; color: var(--na-starlight);
+      text-transform: uppercase;
+      color: color-mix(in srgb, var(--na-starlight) 94%, transparent);
       white-space: nowrap; pointer-events: auto;
       opacity: 0; transition: opacity 0.8s ease, color 0.3s ease;
-      text-shadow: 0 1px 10px rgba(4, 6, 13, 0.9);
+      text-shadow: var(--ink-night);
+    }
+    .star-chip::after {
+      content: ''; position: absolute; left: 50%; bottom: 7px;
+      transform: translateX(-50%);
+      width: 0; height: 1px; background: var(--rule);
+      transition: width 0.4s ease;
     }
     .star-chip.lit { opacity: 1; }
     .star-chip:hover, .star-chip:focus-visible { color: var(--na-gold); outline: none; }
+    .star-chip:hover::after, .star-chip:focus-visible::after { width: calc(100% - 24px); }
     body.forge .star-chip, body.forge #constellation-plate, body.forge #sky-invite,
     body.forge #chapter-marks { transition: none !important; }
 
     /* the figure pane: a name opened into a presence */
+    /* a figure holds the whole frame while it is open. The scrim was thin
+       enough that the sky's own letterpress read straight through the pane
+       on a phone and collided with the names (round 1), so it deepens, and
+       the layer under it steps back with it. */
     #figure-pane {
       position: fixed; inset: 0; z-index: 5;
       display: flex; align-items: center; justify-content: center;
-      background: radial-gradient(ellipse 90% 80% at 50% 45%, rgba(2, 3, 8, 0.68) 0%, rgba(2, 3, 8, 0.88) 100%);
+      background: radial-gradient(ellipse 92% 82% at 50% 45%, rgba(2, 3, 8, 0.9) 0%, rgba(2, 3, 8, 0.98) 100%);
       opacity: 0; visibility: hidden; pointer-events: none;
       transition: opacity 0.8s ease, visibility 0s linear 0.8s;
     }
@@ -879,6 +1256,13 @@
     body.forge #figure-pane .pane-text > * { transition: none !important; }
     /* the brand yields the top line while a figure holds the frame */
     body.pane-open #veil .brand { opacity: 0; transition: opacity 0.5s ease; }
+    /* and so does the rest of the sky's letterpress: the wheel's invite, its
+       marks and the way home all sat UNDER the pane and read through it on
+       a phone. The rail goes with them, since the pane already owns every
+       pointer on the stage. */
+    body.pane-open #sky-invite, body.pane-open #chapter-marks,
+    body.pane-open #sky-return { opacity: 0; }
+    body.pane-open #rail { visibility: hidden; }
     .pane-inner {
       display: flex; align-items: center; gap: clamp(28px, 4vw, 56px);
       max-width: min(980px, calc(100% - 48px));
@@ -896,7 +1280,22 @@
       display: block; width: 100%; height: auto;
       border: 1px solid color-mix(in srgb, var(--na-gold) 22%, transparent);
     }
+    /* on a wide stage the entry is a catalogue page: the plate, a hairline,
+       then everything the plate is. The rule is what makes the two halves
+       one entry instead of two objects sharing a gap. */
     .pane-text { min-width: 0; }
+    @media (min-aspect-ratio: 9/10) {
+      .pane-text { position: relative; padding-left: clamp(24px, 3vw, 44px); }
+      .pane-text::before {
+        content: ''; position: absolute; left: 0; top: 4px; bottom: 4px;
+        width: 1px;
+        background: linear-gradient(to bottom,
+          transparent 0%,
+          color-mix(in srgb, var(--na-gold) 22%, transparent) 16%,
+          color-mix(in srgb, var(--na-gold) 22%, transparent) 84%,
+          transparent 100%);
+      }
+    }
     .pane-kicker {
       font-family: var(--sans);
       font-size: 9px; letter-spacing: 0.32em;
@@ -905,52 +1304,63 @@
     .pane-name {
       margin-top: 14px;
       font-family: var(--serif);
-      font-size: clamp(26px, 3.4vw, 40px);
+      font-size: clamp(26px, 3.4vw, 40px); line-height: 1.12;
+      letter-spacing: 0.008em;
       color: var(--na-starlight);
     }
     .pane-tradition {
-      margin-top: 8px;
+      margin-top: 10px;
       font-family: var(--sans);
       font-size: 10px; letter-spacing: 0.3em;
       text-transform: uppercase; color: var(--na-gold);
     }
     .pane-years {
-      margin-top: 6px;
+      margin-top: 5px;
       font-family: var(--sans);
-      font-size: 9px; letter-spacing: 0.26em; color: var(--na-mist);
+      font-size: 9px; letter-spacing: 0.26em;
+      color: color-mix(in srgb, var(--na-mist) 92%, transparent);
     }
+    /* the one sentence a visitor came for */
     .pane-promise {
-      margin-top: 20px;
+      margin-top: 24px;
       font-family: var(--serif); font-style: italic;
-      font-size: clamp(17px, 1.9vw, 22px); line-height: 1.5;
+      font-size: clamp(17px, 1.9vw, 22px); line-height: 1.48;
       color: var(--na-starlight);
       max-width: 30ch;
     }
+    /* the colophon, set as a colophon: under its own hairline, with the
+       measure taken off it. Capped at 40ch it broke into three stubs, which
+       is what a colophon must never look like (round 1). */
     .pane-ink {
-      margin-top: 18px;
+      position: relative;
+      margin-top: 22px; padding-top: 16px;
       font-family: var(--sans);
-      font-size: 8px; letter-spacing: 0.26em;
-      text-transform: uppercase; color: var(--na-mist);
+      font-size: 8px; letter-spacing: 0.24em; line-height: 1.9;
+      text-transform: uppercase;
+      color: color-mix(in srgb, var(--na-mist) 86%, transparent);
       max-width: 40ch; text-wrap: balance;
       margin-left: auto; margin-right: auto;
     }
-    .pane-text .pane-ink { margin-left: 0; margin-right: 0; }
+    .pane-ink::before {
+      content: ''; position: absolute; top: 0; left: 0;
+      width: 34px; height: 1px; background: var(--rule-faint);
+    }
+    .pane-text .pane-ink { margin-left: 0; margin-right: 0; max-width: none; }
     .pane-sib-label {
-      margin-top: 26px;
+      margin-top: 30px;
       font-family: var(--sans);
       font-size: 8px; letter-spacing: 0.3em; text-indent: 0.3em;
-      text-transform: uppercase; color: var(--na-gold);
-      opacity: 0.75;
+      text-transform: uppercase;
+      color: color-mix(in srgb, var(--na-gold) 74%, transparent);
     }
     .pane-enter {
-      display: inline-block; margin-top: 26px;
+      display: inline-block; margin-top: 28px;
       background: none; cursor: pointer;
       border: 1px solid color-mix(in srgb, var(--na-gold) 45%, transparent);
-      min-height: 44px; padding: 12px 26px;
+      min-height: 44px; padding: 13px 28px;
       font-family: var(--sans);
       font-size: 10px; letter-spacing: 0.3em; text-indent: 0.3em;
       text-transform: uppercase; color: var(--na-gold);
-      transition: border-color 0.3s ease, color 0.3s ease;
     }
     .pane-enter:hover, .pane-enter:focus-visible { border-color: var(--na-gold); color: var(--na-starlight); outline: none; }
     .pane-enter[hidden] { display: none; }
@@ -958,31 +1368,53 @@
       margin-top: 26px;
       font-family: var(--sans);
       font-size: 9px; letter-spacing: 0.28em;
-      text-transform: uppercase; color: var(--na-mist);
+      text-transform: uppercase;
+      color: color-mix(in srgb, var(--na-mist) 86%, transparent);
     }
     .pane-drawn[hidden] { display: none; }
+    /* the others of his constellation, set as a register and not as a stack
+       of links: two columns, one name to a line, each one taking its rule
+       when a hand is on it */
     .pane-siblings {
-      margin-top: 6px; display: flex; flex-wrap: wrap; gap: 0 18px;
+      margin-top: 4px;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 0 22px;
     }
     .pane-sibling {
+      position: relative; text-align: left; white-space: nowrap;
       background: none; border: none; cursor: pointer;
       min-height: 44px; padding: 4px 0;
       font-family: var(--sans);
-      font-size: 9px; letter-spacing: 0.28em;
-      text-transform: uppercase; color: var(--na-mist);
+      font-size: 9px; letter-spacing: 0.26em;
+      text-transform: uppercase;
+      color: color-mix(in srgb, var(--na-mist) 92%, transparent);
       transition: color 0.3s ease;
     }
+    .pane-sibling::after {
+      content: ''; position: absolute; left: 0; right: 0.26em; bottom: 12px;
+      height: 1px; background: transparent;
+      transition: background-color 0.35s ease;
+    }
     .pane-sibling:hover, .pane-sibling:focus-visible { color: var(--na-gold); outline: none; }
+    .pane-sibling:hover::after, .pane-sibling:focus-visible::after { background: var(--rule); }
     .pane-close {
       position: absolute; top: max(22px, env(safe-area-inset-top)); right: max(22px, env(safe-area-inset-right));
+      display: inline-flex; align-items: center; justify-content: flex-end; gap: 11px;
       background: none; border: none; cursor: pointer;
       min-height: 44px; min-width: 44px;
       font-family: var(--sans);
       font-size: 9px; letter-spacing: 0.3em; text-indent: 0.3em;
-      text-transform: uppercase; color: var(--na-mist);
+      text-transform: uppercase;
+      color: color-mix(in srgb, var(--na-mist) 88%, transparent);
       transition: color 0.3s ease;
     }
+    .pane-close::after {
+      content: ''; flex: none; width: 18px; height: 1px;
+      background: color-mix(in srgb, var(--na-mist) 40%, transparent);
+      transition: background-color 0.3s ease;
+    }
     .pane-close:hover, .pane-close:focus-visible { color: var(--na-gold); outline: none; }
+    .pane-close:hover::after, .pane-close:focus-visible::after { background: var(--rule); }
     @media (max-aspect-ratio: 9/10) {
       #constellation-plate { top: 11%; }
       .pane-inner {
@@ -991,6 +1423,10 @@
         padding: 84px 24px 40px;
       }
       .pane-portrait { width: min(52vw, 240px); }
+      /* the phone gives the register the whole column and tightens the set
+         so the longest name still holds its own line */
+      .pane-siblings { gap: 0 12px; width: 100%; }
+      .pane-sibling { font-size: 8.5px; letter-spacing: 0.17em; }
     }
 
     /* ---- the council: topic in letterpress, names in the register,
@@ -1002,18 +1438,24 @@
       opacity: 0; transition: opacity 2s ease;
     }
     #council-topic.lit { opacity: 1; }
+    /* the playbill's own lintel, ruled like the door's */
     .council-kicker {
+      display: flex; align-items: center; justify-content: center; gap: 15px;
       font-family: var(--sans);
       font-size: 10px; letter-spacing: 0.34em; text-indent: 0.34em;
       text-transform: uppercase; color: var(--na-gold);
-      text-shadow: 0 1px 10px rgba(4, 6, 13, 0.95), 0 0 3px rgba(4, 6, 13, 0.85);
+      text-shadow: var(--ink-night), 0 0 3px rgba(4, 6, 13, 0.85);
+    }
+    .council-kicker::before, .council-kicker::after {
+      content: ''; width: 22px; height: 1px; flex: none; background: var(--rule);
     }
     .council-title {
-      margin-top: 12px;
+      margin-top: 14px;
       font-family: var(--serif);
-      font-size: clamp(20px, 2.8vw, 28px);
+      font-size: clamp(20px, 2.8vw, 28px); line-height: 1.24;
+      letter-spacing: 0.01em; text-wrap: balance;
       color: var(--na-starlight);
-      text-shadow: 0 1px 16px rgba(4, 6, 13, 0.85);
+      text-shadow: var(--ink-night);
     }
     /* narrow stage (phones): the playbill register names the circle;
        the positioned chips step aside */
@@ -1051,39 +1493,57 @@
     #cartouche[hidden] { display: block; opacity: 0; visibility: hidden; }
     /* the disclosure rests on dark marble, right where the voices are
        invited — never over the blaze */
+    /* no balanced wrap here: the line's own separator is a word, and an
+       evened break drops it to the head of line two, where a middot leads
+       a line like a stray mark (round 2, phone) */
     .cartouche-honesty {
       margin-bottom: 14px; text-align: center;
       font-family: var(--sans);
       font-size: 9px; letter-spacing: 0.28em; text-indent: 0.28em;
-      text-transform: uppercase; color: var(--na-mist);
+      text-transform: uppercase;
+      color: color-mix(in srgb, var(--na-mist) 92%, transparent);
+      text-shadow: var(--ink-night);
     }
     @media (min-aspect-ratio: 9/10) {
       /* one quiet line on wide stages; the centered overflow is symmetric */
       .cartouche-honesty { white-space: nowrap; }
     }
+    /* a cartouche is a rule with ends, not a border: the two end ticks turn
+       the line the produced audio hangs from into a frame around it */
     .cartouche-bar {
       position: relative;
       display: flex; align-items: center; gap: 16px;
-      padding: 12px 6px 4px;
+      padding: 13px 6px 4px;
       border-top: 1px solid color-mix(in srgb, var(--na-gold) 30%, transparent);
     }
+    .cartouche-bar::before, .cartouche-bar::after {
+      content: ''; position: absolute; top: -1px;
+      width: 1px; height: 6px;
+      background: color-mix(in srgb, var(--na-gold) 42%, transparent);
+    }
+    .cartouche-bar::before { left: 0; }
+    .cartouche-bar::after { right: 0; }
     .cartouche-toggle {
       font-family: var(--sans);
       font-size: 10px; letter-spacing: 0.3em; text-indent: 0.3em;
       text-transform: uppercase; color: var(--na-gold);
       min-width: 52px; text-align: left;
+      text-shadow: var(--ink-night);
     }
     .cartouche-title {
       flex: 1; text-align: center;
       font-family: var(--sans);
       font-size: 9px; letter-spacing: 0.26em; text-indent: 0.26em;
-      text-transform: uppercase; color: var(--na-mist);
+      text-transform: uppercase;
+      color: color-mix(in srgb, var(--na-mist) 92%, transparent);
+      text-shadow: var(--ink-night);
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
     .cartouche-progress {
       position: absolute; top: -1px; left: 0;
       height: 1px; width: 0%;
       background: var(--na-gold);
+      box-shadow: 0 0 8px color-mix(in srgb, var(--na-gold) 55%, transparent);
     }
     body.forge #council-topic, body.forge #cartouche { transition: none !important; }
     @media (max-aspect-ratio: 9/10) {
@@ -1250,13 +1710,83 @@
       body[data-phase='agora'] .status, body[data-phase='camp'] .status { opacity: 0; }
     }
 
+    /* ---- KEYBOARD EYES — a hand on a key gets the same second hairline a
+       plate gets when it is trimmed. Colour alone is not a focus state, and
+       a browser's own ring does not belong in this night. This block sits
+       after every rule that clears an outline, so it is the one that lands.
+       Elements that ship their own press (the keeper, his nights, the marks)
+       own their focus and are not named here. ---- */
+    .gate-actions button:focus-visible, .pane-enter:focus-visible,
+    .door-enter:focus-visible, .door-stay:focus-visible,
+    .pane-close:focus-visible, .pane-sibling:focus-visible,
+    .star-chip:focus-visible, #rail button:focus-visible,
+    .inst-links button:focus-visible, .inst-links a:focus-visible,
+    .inst-close:focus-visible, .drawn-close:focus-visible,
+    #dusk-return:focus-visible, #dusk-concept:focus-visible,
+    #sky-return:focus-visible, #descent-skip:focus-visible,
+    #overture-skip:focus-visible,
+    .gate-declare a:focus-visible, .gate-links a:focus-visible {
+      outline: 1px solid color-mix(in srgb, var(--na-gold) 52%, transparent);
+      outline-offset: 4px;
+    }
+
+    /* ---- THE POSTCARD FRAME — where the shell's long lines have to
+       compose. German runs a quarter longer than English, so every line
+       that wraps here is checked in the longer language first: the fix is
+       always less tracking and more leading, never a smaller measure. ---- */
+    @media (max-width: 480px) {
+      .brand { gap: 12px; font-size: 10px; letter-spacing: 0.34em; text-indent: 0.34em; }
+      .brand::before, .brand::after { width: 18px; }
+      /* "Thirty Remarkable People · One Night Sky" broke as ONE / NIGHT SKY
+         at 0.34em: the set comes in so the line breaks where it means to */
+      .tagline { font-size: 10px; letter-spacing: 0.22em; text-indent: 0.22em; }
+      .status { font-size: 9px; letter-spacing: 0.26em; text-indent: 0.26em; }
+      #overture-skip { font-size: 8.5px; letter-spacing: 0.24em; text-indent: 0.24em; }
+
+      .trace-kicker { font-size: 8px; letter-spacing: 0.22em; }
+      .trace-quote { font-size: 15.5px; }
+      .trace-source { font-size: 8px; letter-spacing: 0.22em; }
+
+      .dusk-kicker { font-size: 9px; letter-spacing: 0.24em; text-indent: 0.24em; }
+      .dusk-actions { margin-top: 4px; gap: 0; }
+
+      .door-kicker { gap: 12px; font-size: 9px; letter-spacing: 0.26em; text-indent: 0.26em; }
+      .door-kicker::before, .door-kicker::after { width: 16px; }
+      .door-trust { font-size: 8.5px; letter-spacing: 0.22em; text-indent: 0.22em; }
+      .door-actions { margin-top: 26px; gap: 8px; }
+
+      .council-kicker { gap: 11px; font-size: 9px; letter-spacing: 0.26em; text-indent: 0.26em; }
+      .council-kicker::before, .council-kicker::after { width: 15px; }
+      .council-register { font-size: 8.5px; letter-spacing: 0.24em; text-indent: 0.24em; }
+
+      .descent-kicker { gap: 11px; font-size: 9px; letter-spacing: 0.26em; text-indent: 0.26em; }
+      .descent-kicker::before, .descent-kicker::after { width: 15px; }
+
+      /* the contract is the one surface on this frame a visitor must read
+         to the end, so it keeps its measure and gives up its margins */
+      #sitting { padding: 24px 20px 22px; }
+      .sitting-stone { font-size: 12.5px; line-height: 1.66; }
+      .sitting-stone.strong { font-size: 9.5px; letter-spacing: 0.26em; text-indent: 0.26em; }
+      .gate-declare { font-size: 11px; }
+      .gate-links { font-size: 8.5px; letter-spacing: 0.22em; }
+
+      .pane-ink { font-size: 8px; letter-spacing: 0.2em; }
+      .pane-tradition { letter-spacing: 0.26em; }
+      .drawn-promise { font-size: 14.5px; }
+      .inst-links button, .inst-links a { font-size: 9.5px; letter-spacing: 0.22em; text-indent: 0.22em; }
+      .chapters-ink { letter-spacing: 0.2em; }
+      .cartouche-honesty { font-size: 8.5px; letter-spacing: 0.22em; text-indent: 0.22em; }
+      .stone-text, .stone-strong { font-size: 11px; letter-spacing: 0.26em; text-indent: 0.26em; }
+    }
+
     @media (prefers-reduced-motion: reduce) {
       body[data-phase='held'] .status { animation: none; }
       .copy, .status { transition: none; }
       #keeper, #keeper *, #stone, #verse { transition: none; }
-    }
-    @media (max-width: 480px) {
-      .stone-text, .stone-strong { font-size: 11px; letter-spacing: 0.26em; text-indent: 0.26em; }
+      /* the same composition, it simply arrives already composed */
+      .star-chip::after, .door-stay::after, .pane-sibling::after,
+      #dusk-concept::after, #rail button::before, #rail button::after,
+      .chapter-btn, .gate-actions button, .pane-enter, .door-enter { transition: none; }
     }
 
   </style>

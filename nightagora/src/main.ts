@@ -1527,7 +1527,11 @@ function frame(now: number): void {
   )
 
   const revealTarget =
-    phase === 'agora' || phase === 'sky' || phase === 'council' ? 1
+    phase === 'agora' || phase === 'council' ? 1
+    // looking up, the court is scenery: it still frames the sky from below,
+    // but its own embers stop crossing the wheel's letterpress (and the
+    // heaviest fragment shader in the night stops paying full price)
+    : phase === 'sky' ? 0.72
     : phase === 'descent' ? smooth(0.95, 0.998, desc)
     : 0
   // the fire materializes briskly on arrival (the wait read as lag);
