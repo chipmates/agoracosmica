@@ -213,32 +213,96 @@ export function createEclipse(scene: Scene) {
   const equator = pow(abs(sin(axA)), 1.9)
   const poles = pow(abs(cos(axA)), 7.0)
 
-  /* THE FILAMENTS — a stack of angular harmonics, RIDGED so the bright
-     part is the thin zero crossing and not the fat crest, sheared outward
-     so each lane bends on its own instead of leaving as a spoke. The time
-     terms are slower than a minute: the corona writhes, it never pulses. */
-  const shear = sin(ang.mul(2.0).add(0.6)).mul(0.15).mul(r.sub(1.0))
-  const aw = ang.add(shear)
-  const harm = sin(aw.mul(3.0).add(uTime.mul(0.019)).add(0.7)).mul(0.46)
-    .add(sin(aw.mul(7.0).sub(uTime.mul(0.015)).sub(1.9)).mul(0.28))
-    .add(sin(aw.mul(13.0).add(uTime.mul(0.011)).add(2.6)).mul(0.17))
-    .add(sin(aw.mul(23.0).sub(uTime.mul(0.008)).sub(0.4)).mul(0.09))
-  // two registers, because a corona has both: broad soft streamers, and a
-  // few crisp threads laid over them (round 4 — one register alone read as
-  // a starburst, every ray the same width)
-  const lane = pow(oneMinus(abs(harm)), 3.6)
-  const thread = sin(aw.mul(17.0).add(2.2))
-    .mul(0.5)
-    .add(sin(aw.mul(29.0).sub(0.8)).mul(0.32))
-    .add(sin(aw.mul(43.0).add(1.4)).mul(0.18))
-  const crisp = pow(oneMinus(abs(thread)), 9.0)
-  // a hair inside each lane, so a streamer has grain and not a smooth core.
-  // Kept gentle: at the door's 26x a strong comb reads as brushed metal.
-  const grain = sin(aw.mul(31.0).add(1.7)).mul(0.5).add(0.5)
-  const filament = lane
-    .mul(float(0.74).add(grain.mul(0.26)))
-    .add(crisp.mul(0.55))
-    .add(0.085)
+  /* THE STREAMERS — and here the picture stops being a texture and starts
+     being a corona.
+
+     A stack of angular harmonics gives evenly spaced rays of equal width
+     leaving a point, which is a starburst filter, not plasma (round 11:
+     it read as a bicycle wheel and it was right to). What the sun actually
+     has is a HANDFUL of discrete streamers standing over the closed-field
+     belt: each one a bulbous helmet at the limb narrowing into a long
+     stalk, each at its own angle, its own width, its own reach, leaning on
+     its own as it goes out. Over the poles there are no streamers at all,
+     only plumes: short, fine, and straight, because they follow open field
+     lines that do not close.
+
+     So: seven streamers drawn from the world's own seeded hand, clustered
+     on the tilted equator, two of them the great helmets. Plus plumes, at
+     the poles alone. Plus the diffuse inner corona they all rise out of. */
+  interface Streamer {
+    at: number
+    wid: number
+    reach: number
+    lean: number
+    amp: number
+  }
+  const STREAMERS: Streamer[] = []
+  {
+    // they crowd the belt: an offset drawn toward the equator, never onto
+    // the pole, and never two of them in the same place
+    const takenAngles: number[] = []
+    for (let i = 0; i < 11; i++) {
+      const helmet = i < 2
+      let at = 0
+      for (let t = 0; t < 40; t++) {
+        // sin of the draw pulls the population toward the equator
+        const side = i % 2 === 0 ? 1 : -1
+        const off = (0.5 - Math.pow(rand(), 1.7)) * 1.35
+        at = AXIS + (side > 0 ? 0 : Math.PI) + off
+        if (takenAngles.every((q) => Math.abs(Math.atan2(Math.sin(at - q), Math.cos(at - q))) > 0.34))
+          break
+      }
+      takenAngles.push(at)
+      STREAMERS.push({
+        at,
+        // a helmet is broad at the base; the lesser ones are narrower
+        wid: helmet ? 0.31 + rand() * 0.07 : 0.10 + rand() * 0.13,
+        reach: helmet ? 2.7 + rand() * 0.5 : 1.4 + rand() * 1.0,
+        // each leans on its own, and neighbours do not lean together
+        lean: (rand() - 0.5) * 0.42,
+        amp: helmet ? 1.35 : 0.36 + rand() * 0.54,
+      })
+    }
+  }
+
+  /** the signed angular distance to a bearing, wrapped, so nothing seams */
+  const bearing = (a: N, to: N): N => atan(sin(a.sub(to)), cos(a.sub(to)))
+
+  let streamers: N = float(0)
+  for (const st of STREAMERS) {
+    // the stalk leans further the further out it goes
+    const centre = float(st.at).add(float(st.lean).mul(r.sub(1.0)))
+    const d = bearing(ang, centre)
+    // THE HELMET AND THE STALK: wide and round where it stands on the limb,
+    // narrowing as it climbs. This one line is most of what makes a
+    // streamer read as a structure instead of a ray.
+    const wid = float(st.wid).mul(oneMinus(smoothstep(1.0, float(st.reach), r).mul(0.74)))
+    // a broad shoulder on a bright core: a streamer is not a gaussian pin
+    const t = d.div(wid)
+    const cross = exp(pow(t, 2.0).mul(-0.62)).mul(0.72).add(exp(pow(t, 2.0).mul(-0.14)).mul(0.28))
+    // it does not end, it thins out
+    const ext = oneMinus(smoothstep(float(st.reach).mul(0.42), float(st.reach), r))
+    // grain INSIDE the streamer, so it has fibre without becoming a comb
+    // FIBRE: a streamer is a bundle of threads, and the threads live INSIDE
+    // it, in its own cross-section, which is why this can never comb the
+    // whole frame the way a global harmonic did
+    const fibre = float(0.62)
+      .add(sin(t.mul(7.1).add(st.at * 7.3).add(uTime.mul(0.02))).mul(0.24))
+      .add(sin(t.mul(15.3).sub(st.at * 3.1)).mul(0.14))
+    streamers = streamers.add(cross.mul(ext).mul(fibre).mul(st.amp))
+  }
+
+  /* THE PLUMES — the poles have no streamers, they have open field. Fine,
+     straight, short, and only inside the polar cones. */
+  const plume = pow(oneMinus(abs(sin(ang.mul(34.0).add(0.9)))), 5.0)
+    .mul(poles)
+    .mul(oneMinus(smoothstep(1.0, 1.8, r)))
+
+  /* THE DIFFUSE INNER CORONA every filament rises OUT of. Without it the
+     streamers start at the limb like spokes on a hub; with it they emerge
+     from light. It is a FLOOR though, not the body: let it carry the
+     picture and the structure drowns in its own glow (round 12). */
+  const diffuse = oneMinus(smoothstep(1.0, 2.2, r)).mul(0.16).add(0.042)
 
   // ---------------------------------------------------- (a) THE CORONA
   const coronaMat = new MeshBasicNodeMaterial({
@@ -262,6 +326,12 @@ export function createEclipse(scene: Scene) {
 
     // K corona falls off like a cube, the dusty F corona barely at all
     const body = pow(inv, 2.9).add(pow(inv, 1.25).mul(0.10))
+    // BUT NOT ALONG A STREAMER. The belt is denser plasma on closed field,
+    // which is the whole reason a helmet is still visible at four solar
+    // radii while the ambient corona beside it has gone. So the structure
+    // gets its own, much shallower falloff, and that is what lets these
+    // reach out of the frame instead of dying at the collar.
+    const stalk = pow(inv, 1.62).mul(0.62)
     const taper = oneMinus(smoothstep(reach.mul(0.34), reach, r))
     // the ring's own outer rim must never be an edge in the picture
     const outer = smoothstep(5.2, 3.9, r)
@@ -269,22 +339,28 @@ export function createEclipse(scene: Scene) {
     // shortens its polar rays still reads as a wheel (round 4)
     const density = float(0.30).add(equator.mul(0.70))
 
-    let a: N = body.mul(filament).mul(density).mul(taper).mul(outer)
-    // THE BRUSHES: fine near-radial hairs everywhere close to the limb,
-    // gathering into the classic stiff tufts over the poles
-    const brush = pow(oneMinus(abs(sin(aw.mul(29.0)))), 3.0)
+    // the diffuse corona keeps the old envelope; the STREAMERS carry their
+    // own extent (each knows its reach), so the envelope must not cut them
+    // a second time — that is what kept the helmets from leaving the collar
+    let a: N = body
+      .mul(diffuse.add(plume.mul(0.55)))
+      .mul(density)
+      .mul(taper)
+      .add(stalk.mul(streamers).mul(0.34))
+      .mul(outer)
+    // and the low collar of light the whole thing stands on, which is the
+    // inner corona seen edge-on rather than another set of hairs (the old
+    // brush comb was the wheel a second time, at the same frequencies)
     a = a.add(
-      float(0.30)
-        .add(poles.mul(0.70))
-        .mul(brush)
-        .mul(pow(inv, 3.6))
-        .mul(smoothstep(2.0, 1.0, r))
-        .mul(0.55)
+      pow(inv, 3.4)
+        .mul(smoothstep(2.2, 1.0, r))
+        .mul(float(0.36).add(equator.mul(0.34)))
+        .mul(0.5)
         .mul(uTotal)
     )
     // THE COLLAR: the bright tight ring every streamer rises out of. Thin
     // on purpose, or the frame gains a second white disc (round 2).
-    a = a.add(pow(smoothstep(1.34, 1.0, r), 2.2).mul(0.55))
+    a = a.add(pow(smoothstep(1.30, 1.0, r), 2.1).mul(0.66))
     // and the innermost hair of it steps back, because that hair belongs
     // to the chromosphere. At full strength the white collar simply ate
     // every trace of hydrogen colour off the limb (round 5).
