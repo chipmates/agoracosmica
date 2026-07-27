@@ -20,9 +20,8 @@
   --chat-margin-tablet: 16px;
   --chat-margin-desktop: max(16px, 2vw);
   
-  /* 2025 Best Practice Font Sizes for Chat Messages */
-  /* Mobile: 16px minimum (WCAG), Tablet: 17px, Desktop: 18px */
-  --ui-font-size-chat: clamp(1rem, 0.95rem + 0.3vw, 1.125rem); /* 16px → 18px */
+  /* Chat reading sizes: 17px floor on phones, 18px on desktop */
+  --ui-font-size-chat: clamp(1.0625rem, 0.95rem + 0.3vw, 1.125rem);
 }
 
 /* Review Mode Indicator */
