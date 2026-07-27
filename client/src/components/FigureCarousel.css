@@ -46,10 +46,6 @@
   padding-right: env(safe-area-inset-right, 0px);
   box-sizing: border-box;
 }
-.figure-carousel.extra-large-screen {
-  background: var(--primary-deep);
-}
-
 .categories-section {
   display:flex; 
   justify-content:center; 
@@ -529,12 +525,9 @@
   .left-sidebar,
   .right-sidebar {
     width: var(--desktop-sidebar-width);
-    display: flex;
-    flex-direction: column;
   }
-  
+
   .left-sidebar {
-    background-color: var(--primary-deep);
     /* Grid-based layout for self-healing behavior */
     display: grid;
     grid-template-rows: auto 1fr; /* Categories auto-size, miniatures fill remaining */
@@ -585,12 +578,8 @@
     width: min(100%, var(--desktop-miniature-size));
     height: auto;
     margin: 0; /* Remove margin, use gap instead */
-    border-radius: clamp(15px, 1.5vw, 20px);
     justify-self: center;
     align-self: center;
-    /* REMOVED: All transitions and shadows */
-    transition: none;
-    box-shadow: none;
     /* Ensure the image inside also maintains aspect ratio */
     overflow: hidden;
     position: relative;
@@ -617,12 +606,10 @@
   .main-image-section {
     flex: 1 1 auto; /* Take ALL remaining vertical space */
     position: relative;
-    background-color: var(--primary-deep);
     display: flex; /* Flex for image positioning */
     align-items: center; /* Center vertically */
     justify-content: center; /* Perfect centering of figure image */
     /* ZERO GAPS */
-    padding: 0;
     margin: 0;
     border: 0;
     /* HEIGHT FIRST - width expands as needed */
@@ -691,7 +678,6 @@
     flex-direction: column;
     justify-content: center;
     padding: clamp(15px, 2vw, 30px); /* Reduced padding for more button space */
-    background-color: var(--primary-deep);
   }
   
   .actions-section {
@@ -768,9 +754,6 @@
 
 /* ULTRATHINK: EXTRA LARGE DESKTOP - HEIGHT-FIRST OPTIMIZATION */
 @media(min-width:1601px) {
-  .figure-carousel.extra-large-screen { 
-    background-color:var(--primary-deep); 
-  }
   .extra-large-screen .desktop-layout {
     border-radius:15px; 
     overflow:hidden; 
