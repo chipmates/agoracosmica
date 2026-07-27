@@ -630,16 +630,14 @@ const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure,
                 disabled={isProcessing || isQuotaExhausted}
               />
 
-              {quotaVisible && (
+              {quotaVisible && !isQuotaExhausted && (
                 <span
                   className="turn-counter"
                   data-urgency={quotaUrgency}
                   aria-live="polite"
-                  aria-label={isQuotaExhausted ? tString('quota.limitReached', 'Daily limit reached') : `${quotaRemaining} ${tString('quota.remaining', 'left')}`}
+                  aria-label={`${quotaRemaining} ${tString('quota.remaining', 'left')}`}
                 >
-                  {isQuotaExhausted
-                    ? tString('quota.limitReached', 'Daily limit reached')
-                    : <>{quotaRemaining} <Sparkle size={14} weight="fill" aria-hidden="true" /></>}
+                  {quotaRemaining} <Sparkle size={14} weight="fill" aria-hidden="true" />
                 </span>
               )}
 
@@ -708,19 +706,21 @@ const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure,
                     </>
                   ) : (
                     <>
-                      {quotaVisible && (
+                      {quotaVisible && !isQuotaExhausted && (
                         <span
                           className="turn-counter voice-mode"
                           data-urgency={quotaUrgency}
                           aria-live="polite"
-                          aria-label={isQuotaExhausted ? tString('quota.limitReached', 'Daily limit reached') : `${quotaRemaining} ${tString('quota.remaining', 'left')}`}
+                          aria-label={`${quotaRemaining} ${tString('quota.remaining', 'left')}`}
                         >
-                          {isQuotaExhausted
-                            ? tString('quota.limitReached', 'Daily limit reached')
-                            : <>{quotaRemaining} <Sparkle size={14} weight="fill" aria-hidden="true" /></>}
+                          {quotaRemaining} <Sparkle size={14} weight="fill" aria-hidden="true" />
                         </span>
                       )}
-                      <span className="record-text">{isMobile ? tNode('input.tapToRecord') : tNode('input.clickToRecord')}</span>
+                      <span className="record-text">
+                        {isQuotaExhausted
+                          ? tString('quota.limitReached', 'Daily limit reached')
+                          : (isMobile ? tNode('input.tapToRecord') : tNode('input.clickToRecord'))}
+                      </span>
                       <div className="control-area">
                         <div className="waveform inactive">
                           {[...Array(6)].map((_, i) => (
@@ -748,7 +748,7 @@ const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure,
                               }
                             }}
                           >
-                            <Keyboard size={isMobile ? 26 : 24} color="var(--ember-ink)" />
+                            <Keyboard size={isMobile ? 26 : 24} color="var(--text-primary)" />
                           </div>
                         )}
                       </div>

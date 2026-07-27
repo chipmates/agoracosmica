@@ -134,7 +134,9 @@
   color: color-mix(in srgb, var(--text-primary) var(--a-50), transparent);
 }
 
-/* Free-tier turn counter (between textarea and buttons / below record button) */
+/* Free-tier turn counter (between textarea and buttons / on the record bar).
+   Hidden at exhausted in both modes: the bar label / placeholder carry the
+   limit text alone. */
 .turn-counter {
   font-size: 0.9rem;
   font-family: var(--ui-font-family);
@@ -147,28 +149,26 @@
   align-items: center;
   gap: 2px;
 }
-.turn-counter[data-urgency="normal"] { color: var(--text-dim); }
-.turn-counter[data-urgency="warning"] { color: var(--color-warning); }
-.turn-counter[data-urgency="critical"] { color: var(--color-error); font-weight: 500; }
-.turn-counter[data-urgency="exhausted"] { color: var(--color-error); font-weight: 600; }
-/* On the navy chip the urgency inks read against navy, not ember: parchment
-   holds normal/warning, error keeps its night-tuned red */
-.turn-counter.voice-mode[data-urgency="normal"] { color: var(--text-primary); }
-.turn-counter.voice-mode[data-urgency="warning"] { color: var(--text-primary); }
+/* The counter stays golden through every state; urgency escalates within
+   the gold register (brighter + bolder), never into a foreign ink. */
+.turn-counter { font-variant-numeric: tabular-nums; }
+.turn-counter[data-urgency="normal"] { color: var(--gold-primary); }
+.turn-counter[data-urgency="warning"] { color: var(--gold-primary); }
+.turn-counter[data-urgency="critical"] { color: var(--gold-hover); font-weight: 700; }
 .record-button { position: relative; }
+/* Naked gold counter on the oxblood bar: the ground is deep enough that
+   gold-primary is legal at small size, so the counter needs no chip. */
 .turn-counter.voice-mode {
   grid-column: 1;
   grid-row: 1;
   justify-self: start;
   align-self: center;
-  margin-left: 10px;
-  padding: 3px 8px;
-  /* Its own navy chip: small text cannot reach AA on the ember gradient in
-     any ink, so the counter gets a ground it can be read on */
-  background: color-mix(in srgb, var(--ember-ink) 92%, transparent);
-  border-radius: 3px;
+  margin-left: 16px;
+  margin-right: 8px;
+  padding: 0;
   font-size: 0.85rem;
-  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+  color: var(--gold-primary);
   font-weight: 600;
   display: inline-flex;
   align-items: center;
@@ -177,16 +177,19 @@
   white-space: nowrap;
 }
 .turn-counter.voice-mode[data-urgency="normal"],
-.turn-counter.voice-mode[data-urgency="warning"] { color: var(--ember-ink, #151C47); }
-/* Error-red on the ember bar is nearly invisible (red on red-orange), so
-   critical borrows exhausted's white but stays lighter in weight. */
-.turn-counter.voice-mode[data-urgency="critical"] { color: var(--utility-pure-white, #FFFFFF); font-weight: 500; }
-/* Exhausted on the coral record-button: red on red is unreadable. White on coral
-   has WCAG-AA contrast and reads as a clear "this is the limit" badge. */
-.turn-counter.voice-mode[data-urgency="exhausted"] {
-  color: var(--utility-pure-white, #FFFFFF);
-  font-weight: 700;
-  letter-spacing: 0.02em;
+.turn-counter.voice-mode[data-urgency="warning"] { color: var(--gold-primary); }
+.turn-counter.voice-mode[data-urgency="critical"] { color: var(--gold-hover); font-weight: 700; }
+
+/* Exhausted: the seal cools until parchment is legal at any size; the bar
+   itself carries the limit text and stays tappable (opens the limit modal) */
+.record-button[data-quota-exhausted] {
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--mode-quest-active) 55%, var(--bg-void)) 0%,
+    color-mix(in srgb, var(--mode-quest-active) 42%, var(--bg-void)) 100%);
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 45%, transparent);
+}
+.record-button[data-quota-exhausted] .record-text {
+  color: var(--text-primary);
 }
 
 /* Input action buttons container */
@@ -275,15 +278,17 @@
   overflow: hidden;
 }
 
-/* Record button — the EMBER SEAL (plate doctrine 2026-07-24): the commit
-   bar wears the seal material. Kept on the darker ember pair so the white
-   quota badges keep their AA contrast. Light responds on hover, the bar
-   never levitates; press = the plate accepts the mark. */
+/* Record button — the INSTRUMENT (oxblood seal): deep ember ground on
+   which every ink is legal at every size, so nothing on the bar needs a
+   chip or a ground. White label, naked gold counter, parchment furniture.
+   Press = the plate accepts the mark. */
 .record-button {
   width: 100%;
-  background: linear-gradient(180deg, var(--mode-quest) 0%, var(--mode-quest-active) 100%);
-  border: 1px solid color-mix(in srgb, var(--mode-quest-active) var(--a-80), transparent);
-  color: var(--ember-ink);
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--mode-quest-active) 68%, var(--bg-void)) 0%,
+    color-mix(in srgb, var(--mode-quest-active) 56%, var(--bg-void)) 100%);
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 45%, transparent);
+  color: var(--utility-pure-white);
   font-family: 'Space Grotesk', sans-serif;
   cursor: pointer;
   padding: 0;
@@ -293,30 +298,24 @@
   position: relative;
   height: var(--input-height-desktop);
   box-shadow:
-    inset 0 1px 0 color-mix(in srgb, white var(--a-20), transparent),
-    inset 0 -1px 0 color-mix(in srgb, var(--mode-quest-active) var(--a-60), transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--gold-primary) var(--a-15), transparent),
+    inset 0 -1px 0 color-mix(in srgb, var(--bg-void) var(--a-40), transparent),
     0 2px 5px color-mix(in srgb, var(--utility-pure-black) var(--a-20), transparent);
 }
 
 .record-button:hover {
-  filter: brightness(1.06);
+  filter: brightness(1.08);
   box-shadow:
-    inset 0 1px 0 color-mix(in srgb, white var(--a-30), transparent),
-    inset 0 -1px 0 color-mix(in srgb, var(--mode-quest-active) var(--a-60), transparent),
-    0 0 16px color-mix(in srgb, var(--mode-quest) var(--a-22), transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--gold-primary) var(--a-22), transparent),
+    inset 0 -1px 0 color-mix(in srgb, var(--bg-void) var(--a-40), transparent),
+    0 0 16px color-mix(in srgb, var(--mode-quest-active) var(--a-22), transparent),
     0 2px 5px color-mix(in srgb, var(--utility-pure-black) var(--a-20), transparent);
 }
 
-/* Quota exhausted: dimmer, no lift on hover. Click routes to rate-limit modal. */
-.record-button[data-quota-exhausted="true"] {
-  opacity: 0.7;
-  cursor: pointer;
-}
-.record-button[data-quota-exhausted="true"]:hover {
-  opacity: 0.9;
-  background-color: var(--mode-quest-active);
+/* Quota exhausted hover: slight warmth, no lift. Click routes to the modal. */
+.record-button[data-quota-exhausted]:hover {
+  filter: brightness(1.12);
   transform: none;
-  box-shadow: 0 2px 5px color-mix(in srgb, var(--utility-pure-black) var(--a-20), transparent);
 }
 
 .record-button:active {
@@ -328,21 +327,22 @@
    Drawn INSET in the seal's navy ink: the surrounding .voice-input-area
    clips overflow, so an outside ring would never render. */
 .record-button:focus-visible {
-  outline: 2px dashed var(--ember-ink);
+  outline: 2px dashed var(--text-primary);
   outline-offset: -6px;
 }
 
+/* Recording: depth inverts (dark top, lighter bottom) - the plate has
+   accepted the mark. The waveform carries the live motion; no field pulse. */
 .record-button.recording {
-  /* the seal darkens while it takes the mark; the pulse is the live signal */
-  background: linear-gradient(180deg, var(--mode-quest-active) 0%, color-mix(in srgb, var(--mode-quest-active) 82%, black) 100%);
-  animation: pulse-frame 2s infinite;
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--mode-quest-active) 56%, var(--bg-void)) 0%,
+    color-mix(in srgb, var(--mode-quest-active) 68%, var(--bg-void)) 100%);
 }
 
 /* Content layout within record button */
 .record-button-content {
   display: grid;
-  /* minmax(0, 1fr) lets the label column actually shrink; without it the
-     German instruction pushes the counter chip off the bar */
+  /* minmax(0, 1fr) lets the label column actually shrink on narrow bars */
   grid-template-columns: auto minmax(0, 1fr) auto;
   column-gap: 6px;
   align-items: center;
@@ -363,8 +363,8 @@
   justify-self: center;
   text-align: center;
   min-width: 0;
-  /* WCAG large text (>=18.66px bold): navy-on-ember cannot clear 4.5:1 at
-     small sizes in any ink, but clears the 3:1 large-text threshold */
+  /* White on the ember gradient: WCAG large text (>=18.66px bold) clears
+     the 3:1 threshold across the full gradient */
   font-size: 1.1875rem;
   font-weight: 700;
   letter-spacing: 0.01em;
@@ -390,7 +390,7 @@
 }
 
 .waveform.inactive {
-  opacity: 0.5;
+  opacity: 0.65;
   left: 0; /* Override -20px from .waveform — center dots between text and keyboard */
 }
 
@@ -462,12 +462,6 @@
   }
 }
 
-@keyframes pulse-frame {
-  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--gold-subtle) var(--a-70), transparent); }
-  70% { box-shadow: 0 0 0 5px color-mix(in srgb, var(--gold-subtle) var(--a-70), transparent); }
-  100% { box-shadow: 0 0 0 0 var(--gold-subtle); }
-}
-
 @keyframes touch-feedback {
   0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--text-primary) var(--a-50), transparent); }
   50% { box-shadow: 0 0 0 15px color-mix(in srgb, var(--text-primary) var(--a-00), transparent); }
@@ -533,7 +527,7 @@
     justify-self: end;
   }
 
-  /* When no counter is rendered, let the buttons occupy the full bottom row. */
+  /* When no counter is rendered, the buttons occupy the full bottom row. */
   .text-input-area .input-actions:only-of-type {
     grid-column: 1 / -1;
   }
@@ -543,7 +537,7 @@
   }
 
   .record-button {
-    background-color: var(--mode-quest-active); /* Deeper coral - consistent across devices */
+    background-color: color-mix(in srgb, var(--mode-quest-active) 62%, var(--bg-void)); /* gradient fallback */
     box-shadow: 0 3px 10px color-mix(in srgb, var(--utility-pure-black) var(--a-20), transparent);
   }
   
@@ -590,7 +584,7 @@
   }
   
   .record-button {
-    background-color: var(--mode-quest-active); /* Deeper coral - consistent across devices */
+    background-color: color-mix(in srgb, var(--mode-quest-active) 62%, var(--bg-void)); /* gradient fallback */
     box-shadow: 0 2px 8px color-mix(in srgb, var(--utility-pure-black) var(--a-15), transparent);
   }
   
@@ -662,7 +656,7 @@
 /* For devices that don't support hover - prevent sticky :hover on mobile */
 @media (hover: none) {
   .record-button:hover {
-    background-color: var(--mode-quest-active); /* Keep coral, don't go transparent */
+    background-color: color-mix(in srgb, var(--mode-quest-active) 62%, var(--bg-void)); /* keep the seal, don't go transparent */
     transform: none;
     box-shadow: 0 2px 5px color-mix(in srgb, var(--utility-pure-black) var(--a-20), transparent);
   }
@@ -724,7 +718,7 @@
   }
   
   .record-button-content {
-    grid-template-columns: auto 1fr auto; /* Balanced layout with counter column */
+    grid-template-columns: auto 1fr auto; /* icon | label | controls */
   }
 }
 

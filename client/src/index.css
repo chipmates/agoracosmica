@@ -266,6 +266,7 @@ button {
      UTILITY COLORS
      ================= */
   --utility-pure-black: #000000;  /* OLED optimization only */
+  --utility-pure-white: #FFFFFF;  /* max-contrast ink on ember surfaces */
   --utility-shadow: rgba(0, 0, 0, 0.25);
   --utility-border: rgba(158, 158, 158, 0.1);
 
