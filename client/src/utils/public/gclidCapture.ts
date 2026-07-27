@@ -165,7 +165,8 @@ export function adConsentGranted(): boolean {
 
 /**
  * Record ad-measurement consent and keep the gclid available for the later
- * conversion events (mode_selected, council_engaged) that fire outside the modal.
+ * engagement conversions (listened, dialogue_started, conversation_deepened,
+ * council_engaged) that fire outside the modal.
  */
 export function grantAdConsent(): void {
   try {
@@ -200,7 +201,17 @@ export function revokeAdConsent(): void {
   try {
     if (typeof sessionStorage !== 'undefined') {
       sessionStorage.removeItem(SS_GCLID_KEY);
-      for (const event of ['start_exploring', 'profile_created', 'mode_selected', 'council_engaged']) {
+      // Every event in ConversionEvent, including the ones fired from the
+      // marketing islands. A flag left behind would not leak anything, but it
+      // would block a re-granted visitor's event from ever firing again.
+      for (const event of [
+        'start_exploring',
+        'profile_created',
+        'council_engaged',
+        'listened',
+        'dialogue_started',
+        'conversation_deepened',
+      ]) {
         sessionStorage.removeItem(`agc_conv_fired_${event}`);
       }
     }
@@ -209,12 +220,23 @@ export function revokeAdConsent(): void {
   }
 }
 
-export type ConversionEvent = 'start_exploring' | 'profile_created' | 'mode_selected' | 'council_engaged';
+export type ConversionEvent =
+  | 'start_exploring'
+  | 'profile_created'
+  | 'council_engaged'
+  | 'listened'
+  | 'dialogue_started'
+  | 'conversation_deepened';
 
 // Council Engaged fires once a visitor has heard this many seconds of council
 // audio (curated or custom), measured as audio actually played. One number,
 // shared by both council players.
 export const COUNCIL_ENGAGED_THRESHOLD_S = 60;
+
+// Listened fires once a visitor has heard this many seconds of audio on the
+// marketing pages, measured as audio actually played and summed across every
+// play surface and page of the tab. One number, shared by all of them.
+export const LISTENED_THRESHOLD_S = 30;
 
 /**
  * Send a conversion event to the CF Worker endpoint. Only fires if a gclid was

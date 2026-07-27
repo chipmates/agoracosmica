@@ -38,6 +38,7 @@ import {
   replyTimeBucketSinceDispatch,
   hasFiredFunnelStep,
 } from '../utils/funnelBeacon';
+import { sendConversion } from '../utils/public/gclidCapture';
 import { isNewUser, HISTORY_PREFIXES } from '../utils/userState';
 import {
   markStoryCompleted,
@@ -891,6 +892,14 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
           figureId: figureIdentifier,
           mode: normalizedMode ?? '',
         });
+
+        // The ad-side twin of first_turn: a conversation really began. Gated
+        // on a captured gclid plus ad-measurement consent, and deduped per tab
+        // inside sendConversion, so this needs no one-shot of its own.
+        void sendConversion(
+          'dialogue_started',
+          figureIdentifier ? { figureId: figureIdentifier } : undefined,
+        );
       } catch (error) {
         console.error('[HomePage] Failed to queue conversation request', error);
         setPendingRequestId(null);

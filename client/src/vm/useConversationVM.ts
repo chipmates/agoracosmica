@@ -1,6 +1,8 @@
 import { useMemo, useCallback } from 'react';
 import { useConversationActions, useConversationState } from '../stores';
 import { getStorageKeyForMode } from '../utils/storageKeysV2';
+import { reachedDeepenedTurns } from '../utils/flowDecisions';
+import { sendConversion } from '../utils/public/gclidCapture';
 import { useAppState } from '../hooks/useAppState';
 import { Figure, Seed, ConversationMode } from '../types/global';
 import type { ConversationMessage } from '../stores/slices/domainTypes';
@@ -176,6 +178,14 @@ export function useConversationVM(params: ConversationVMParams): UseConversation
 
       if (message.role === 'assistant' && processSeedAcquisitionFromMessage) {
         processSeedAcquisitionFromMessage(updatedContent);
+      }
+
+      // Conversation Deepened conversion. Every message append in the app
+      // funnels through here, so this is the one place that sees a user
+      // message land in the conversation it belongs to. Deduped per tab
+      // inside sendConversion.
+      if (message.role === 'user' && reachedDeepenedTurns(nextMessages)) {
+        void sendConversion('conversation_deepened');
       }
 
       setConversationMessages(nextMessages);

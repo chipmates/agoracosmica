@@ -113,3 +113,24 @@ export function resolveRestoreAction(
     ),
   };
 }
+
+/** Conversation Deepened counts user messages, never greetings or replies. */
+export const CONVERSATION_DEEPENED_TURNS = 3;
+
+/**
+ * Has this conversation reached its third user message? Counted over the
+ * active conversation's own message list, so switching figure, seed or mode
+ * (which replaces that list) starts the count over instead of carrying a
+ * session-wide tally.
+ */
+export function reachedDeepenedTurns(
+  messages: readonly { role?: string }[]
+): boolean {
+  let turns = 0;
+  for (const message of messages) {
+    if (message.role !== 'user') continue;
+    turns += 1;
+    if (turns >= CONVERSATION_DEEPENED_TURNS) return true;
+  }
+  return false;
+}

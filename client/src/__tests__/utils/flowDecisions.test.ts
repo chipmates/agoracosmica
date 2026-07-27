@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import {
   isFirstContactForFigure,
+  reachedDeepenedTurns,
   resolveNodeState,
   resolveRestoreAction,
   type NodeStateSnapshot,
@@ -231,5 +232,31 @@ describe('entryIntent URL capture round-trip', () => {
     captureEntryIntentFromUrl();
     expect(window.location.search).toBe('?utm_keep=x');
     expect(window.location.hash).toBe('#section');
+  });
+});
+
+describe('reachedDeepenedTurns', () => {
+  const user = { role: 'user' as const };
+  const assistant = { role: 'assistant' as const };
+  const council = { role: 'council' as const };
+
+  it('is false below three user messages', () => {
+    expect(reachedDeepenedTurns([])).toBe(false);
+    expect(reachedDeepenedTurns([user, assistant, user, assistant])).toBe(false);
+  });
+
+  it('is true at the third user message', () => {
+    expect(reachedDeepenedTurns([user, assistant, user, assistant, user])).toBe(true);
+  });
+
+  it('ignores assistant, council and greeting messages', () => {
+    const greeting = [assistant, assistant, council, assistant];
+    expect(reachedDeepenedTurns(greeting)).toBe(false);
+    expect(reachedDeepenedTurns([...greeting, user, user])).toBe(false);
+    expect(reachedDeepenedTurns([...greeting, user, user, user])).toBe(true);
+  });
+
+  it('stays true past the third user message', () => {
+    expect(reachedDeepenedTurns([user, user, user, user, user])).toBe(true);
   });
 });
