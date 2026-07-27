@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { CSSProperties, FC } from 'react';
 import {
   Info,
   Sparkle,
@@ -11,6 +11,55 @@ import {
 } from '@phosphor-icons/react';
 import { useTranslation } from '../../../hooks/useTranslation';
 import styles from '../../SettingsModal.module.css';
+
+/* Plate language for the mission block. Inline because the shell stylesheet
+   is shared with the other settings panels. */
+const headingInk = 'color-mix(in srgb, var(--gold-primary) 85%, var(--text-tertiary))';
+const quietGold = 'color-mix(in srgb, var(--gold-deep) 90%, var(--text-tertiary))';
+
+const plateCard: CSSProperties = {
+  marginTop: '20px',
+  padding: '18px 20px',
+  background: 'color-mix(in srgb, var(--bg-card) 72%, var(--bg-void))',
+  border: '1px solid color-mix(in srgb, var(--gold-deep) 40%, transparent)',
+  borderRadius: '3px',
+  textAlign: 'left'
+};
+
+const plateTitle: CSSProperties = {
+  margin: '0 0 14px 0',
+  fontFamily: 'var(--font-content)',
+  fontSize: '1.02rem',
+  fontWeight: 400,
+  letterSpacing: 0,
+  lineHeight: 1.35,
+  color: headingInk
+};
+
+const plateBody: CSSProperties = {
+  margin: 0,
+  fontFamily: 'var(--font-content)',
+  fontSize: '0.92rem',
+  lineHeight: 1.7,
+  color: 'var(--text-primary)'
+};
+
+const plateList: CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '8px',
+  fontFamily: 'var(--font-content)',
+  fontSize: '0.92rem',
+  lineHeight: 1.6,
+  color: 'var(--text-primary)'
+};
+
+/* Hanging indent keeps wrapped German lines off the bullet column */
+const plateListItem: CSSProperties = {
+  margin: 0,
+  paddingLeft: '1.1em',
+  textIndent: '-1.1em'
+};
 
 const InfoPanel: FC = () => {
   const { tNode, tArray, tString, language } = useTranslation();
@@ -31,14 +80,14 @@ const InfoPanel: FC = () => {
       {/* KI-Echos Information */}
       <div id="ki-echos-section" style={{ marginBottom: '32px' }}>
         <h3 style={{
-          fontFamily: 'Space Grotesk, sans-serif',
-          fontSize: '20px',
-          fontWeight: '600',
-          color: 'var(--gold-subtle)',
-          marginBottom: '24px',
-          textAlign: 'center',
-          textTransform: 'uppercase',
-          letterSpacing: '1px'
+          fontFamily: 'var(--font-content)',
+          fontSize: 'clamp(1.15rem, 1.05rem + 0.5vw, 1.35rem)',
+          fontWeight: 400,
+          color: headingInk,
+          margin: '0 0 24px 0',
+          textAlign: 'left',
+          letterSpacing: 0,
+          lineHeight: 1.3
         }}>
           {tNode('quickHelp.echoes.title')}
         </h3>
@@ -188,167 +237,106 @@ const InfoPanel: FC = () => {
       </div>
 
       {/* ChipMates Mission Statement */}
-      <div className={styles.missionStatement} style={{
-        background: `linear-gradient(
-          135deg,
-          color-mix(in srgb, var(--mode-wisdom) 8%, transparent) 0%,
-          color-mix(in srgb, var(--mode-wisdom) 5%, transparent) 100%
-        )`,
-        borderColor: 'var(--mode-wisdom)'
-      }}>
-        <Heart className={styles.missionIcon} style={{ color: 'var(--mode-wisdom)' }} />
-        <h3 className={styles.missionTitle}>
-          {tNode('settings.help.mission.title')}
-        </h3>
-        <p className={styles.missionText} style={{ whiteSpace: 'pre-line' }}>
+      <div className={styles.missionStatement} style={{ textAlign: 'left' }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: '12px',
+          marginBottom: '18px'
+        }}>
+          <Heart size={18} style={{ flexShrink: 0, marginTop: '4px', color: quietGold }} />
+          <h3 className={styles.missionTitle} style={{
+            margin: 0,
+            fontFamily: 'var(--font-content)',
+            fontSize: 'clamp(1.15rem, 1.05rem + 0.5vw, 1.35rem)',
+            fontWeight: 400,
+            letterSpacing: 0,
+            lineHeight: 1.3,
+            textTransform: 'none',
+            color: headingInk
+          }}>
+            {tNode('settings.help.mission.title')}
+          </h3>
+        </div>
+        <p className={styles.missionText} style={{
+          whiteSpace: 'pre-line',
+          margin: 0,
+          maxWidth: '64ch',
+          fontFamily: 'var(--font-content)',
+          fontSize: 'clamp(0.95rem, 0.92rem + 0.2vw, 1.02rem)',
+          lineHeight: 1.75,
+          textAlign: 'left',
+          color: 'var(--text-primary)'
+        }}>
           {tNode('settings.help.mission.text')}
         </p>
 
         {/* Our Values */}
-        <div style={{
-          marginTop: '24px',
-          padding: '16px',
-          background: 'color-mix(in srgb, var(--mode-wisdom) 10%, transparent)',
-          borderRadius: '10px',
-          border: '1px solid color-mix(in srgb, var(--mode-wisdom) 20%, transparent)'
-        }}>
-          <h4 style={{
-            margin: '0 0 12px 0',
-            fontSize: '16px',
-            fontWeight: '600',
-            color: 'var(--mode-wisdom)',
-            fontFamily: 'Space Grotesk, sans-serif'
-          }}>
+        <div style={{ ...plateCard, marginTop: '24px' }}>
+          <h4 style={plateTitle}>
             {tNode('settings.help.values.title')}
           </h4>
-          <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '6px',
-            fontSize: '13px',
-            color: 'var(--text-primary)',
-            fontFamily: 'Space Grotesk, sans-serif'
-          }}>
-            <p style={{ margin: 0 }}>• {tNode('settings.help.values.gratitude')}</p>
-            <p style={{ margin: 0 }}>• {tNode('settings.help.values.curiosity')}</p>
-            <p style={{ margin: 0 }}>• {tNode('settings.help.values.openness')}</p>
-            <p style={{ margin: 0 }}>• {tNode('settings.help.values.transformation')}</p>
+          <div style={plateList}>
+            <p style={plateListItem}>• {tNode('settings.help.values.gratitude')}</p>
+            <p style={plateListItem}>• {tNode('settings.help.values.curiosity')}</p>
+            <p style={plateListItem}>• {tNode('settings.help.values.openness')}</p>
+            <p style={plateListItem}>• {tNode('settings.help.values.transformation')}</p>
           </div>
         </div>
 
         {/* Breaking Down Barriers */}
-        <div style={{
-          marginTop: '24px',
-          padding: '16px',
-          background: 'color-mix(in srgb, var(--mode-wisdom) 10%, transparent)',
-          borderRadius: '10px',
-          border: '1px solid color-mix(in srgb, var(--mode-wisdom) 20%, transparent)'
-        }}>
-          <h4 style={{
-            margin: '0 0 12px 0',
-            fontSize: '16px',
-            fontWeight: '600',
-            color: 'var(--mode-wisdom)',
-            fontFamily: 'Space Grotesk, sans-serif'
-          }}>
+        <div style={plateCard}>
+          <h4 style={plateTitle}>
             {tNode('settings.help.barriers.title')}
           </h4>
-          <p style={{
-            margin: '0 0 12px 0',
-            fontSize: '14px',
-            color: 'var(--text-secondary)',
-            lineHeight: '1.6',
-            fontFamily: 'Space Grotesk, sans-serif'
-          }}>
+          <p style={{ ...plateBody, marginBottom: '12px' }}>
             {tNode('settings.help.barriers.intro')}
           </p>
-          <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '6px',
-            fontSize: '13px',
-            color: 'var(--text-primary)',
-            fontFamily: 'Space Grotesk, sans-serif'
-          }}>
-            <p style={{ margin: 0 }}>• {tNode('settings.help.barriers.geographic')}</p>
-            <p style={{ margin: 0 }}>• {tNode('settings.help.barriers.economic')}</p>
-            <p style={{ margin: 0 }}>• {tNode('settings.help.barriers.academic')}</p>
-            <p style={{ margin: 0 }}>• {tNode('settings.help.barriers.age')}</p>
+          <div style={plateList}>
+            <p style={plateListItem}>• {tNode('settings.help.barriers.geographic')}</p>
+            <p style={plateListItem}>• {tNode('settings.help.barriers.economic')}</p>
+            <p style={plateListItem}>• {tNode('settings.help.barriers.academic')}</p>
+            <p style={plateListItem}>• {tNode('settings.help.barriers.age')}</p>
           </div>
         </div>
 
         {/* Vision */}
-        <div style={{
-          marginTop: '16px',
-          padding: '16px',
-          background: 'color-mix(in srgb, var(--mode-wisdom) 10%, transparent)',
-          borderRadius: '10px',
-          border: '1px solid color-mix(in srgb, var(--mode-wisdom) 20%, transparent)'
-        }}>
-          <h4 style={{
-            margin: '0 0 12px 0',
-            fontSize: '16px',
-            fontWeight: '600',
-            color: 'var(--mode-wisdom)',
-            fontFamily: 'Space Grotesk, sans-serif'
-          }}>
+        <div style={plateCard}>
+          <h4 style={plateTitle}>
             {tNode('settings.help.vision.title')}
           </h4>
-          <p style={{
-            margin: 0,
-            fontSize: '14px',
-            color: 'var(--text-secondary)',
-            lineHeight: '1.6',
-            fontFamily: 'Space Grotesk, sans-serif'
-          }}>
+          <p style={plateBody}>
             {tNode('settings.help.vision.text')}
           </p>
         </div>
 
         {/* Community */}
-        <div style={{
-          marginTop: '16px',
-          padding: '16px',
-          background: 'color-mix(in srgb, var(--mode-wisdom) 10%, transparent)',
-          borderRadius: '10px',
-          border: '1px solid color-mix(in srgb, var(--mode-wisdom) 20%, transparent)'
-        }}>
-          <h4 style={{
-            margin: '0 0 12px 0',
-            fontSize: '16px',
-            fontWeight: '600',
-            color: 'var(--mode-wisdom)',
-            fontFamily: 'Space Grotesk, sans-serif'
-          }}>
+        <div style={plateCard}>
+          <h4 style={plateTitle}>
             {tNode('settings.help.community.title')}
           </h4>
-          <p style={{
-            margin: 0,
-            fontSize: '14px',
-            color: 'var(--text-secondary)',
-            lineHeight: '1.6',
-            fontFamily: 'Space Grotesk, sans-serif'
-          }}>
+          <p style={plateBody}>
             {tNode('settings.help.community.text')}
           </p>
         </div>
 
         <div style={{
-          marginTop: '16px',
+          marginTop: '22px',
           display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          alignItems: 'flex-start',
           gap: '8px',
-          color: 'var(--text-secondary)',
-          fontSize: '13px'
+          color: 'var(--text-tertiary)',
+          fontFamily: 'var(--font-content)',
+          fontSize: '0.85rem',
+          lineHeight: 1.5
         }}>
-          <Sparkle size={16} style={{ color: 'var(--mode-wisdom)' }} />
-          <span style={{ color: 'var(--mode-wisdom)' }}>
+          <Sparkle size={14} style={{ flexShrink: 0, marginTop: '3px', color: quietGold }} />
+          <span>
             {tNode('settings.help.broughtBy')}
           </span>
         </div>
 
-        <div className={styles.githubSourceLinkRow}>
+        <div className={styles.githubSourceLinkRow} style={{ justifyContent: 'flex-start', marginTop: '18px' }}>
           <a
             href="https://github.com/chipmates/agoracosmica"
             target="_blank"
