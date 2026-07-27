@@ -5,6 +5,7 @@ import { useCouncilProgress } from '../../hooks/useCouncilProgress';
 import { CatalogCouncil, BLESSED_BY_THEME, getLocalizedTitle, getLocalizedHook, getShortDisplayName, getThemeAccentVar } from '../../data/councilCatalog';
 import { getCouncilArtwork } from './CouncilArtwork';
 import CouncilSigil from './CouncilSigil';
+import CouncilPlate from './CouncilPlate';
 
 interface CouncilCardProps {
   council: CatalogCouncil;
@@ -51,18 +52,24 @@ const CouncilCard: FC<CouncilCardProps> = ({ council, onSelect, isHero = false }
       onClick={handleClick}
       onKeyDown={handleKeyDown}
     >
-      {/* Artwork layer: v4 hand-crafted SVG or generative sigil fallback */}
-      <div className="council-card__art" aria-hidden="true">
-        {ArtworkComponent ? (
-          <ArtworkComponent color={`var(${accentVar})`} />
-        ) : (
-          <CouncilSigil
-            theme={council.theme}
-            seed={council.sortOrder}
-            color={`var(${accentVar})`}
-          />
-        )}
-      </div>
+      {/* Plate window: the ink plate where one exists, otherwise the existing
+          artwork set into the same frame. The cartouche below covers it, so
+          text never lands on raw art either way. */}
+      <CouncilPlate
+        councilId={council.id}
+        accentVar={accentVar}
+        fallback={
+          ArtworkComponent ? (
+            <ArtworkComponent color={`var(${accentVar})`} />
+          ) : (
+            <CouncilSigil
+              theme={council.theme}
+              seed={council.sortOrder}
+              color={`var(${accentVar})`}
+            />
+          )
+        }
+      />
 
       <div className="council-card__content">
         <div className="council-card__header">

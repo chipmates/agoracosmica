@@ -638,16 +638,23 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 0.75rem;
   margin-top: auto;
   padding-top: 0.75rem;
   border-top: 1px solid color-mix(in srgb, var(--cosmic-silver) 10%, transparent);
 }
 
+/* One line always: a wrapped cast grows the cartouche, and every plate crop
+   is tuned against the cartouche heights as they stand */
 .council-card__figures-text {
   font-size: 0.8rem;
   color: color-mix(in srgb, var(--cosmic-silver) 60%, transparent);
   letter-spacing: 0.3px;
   line-height: 1.4;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .council-card__duration {
@@ -2361,9 +2368,11 @@
   filter: brightness(1.7) saturate(1.25);
 }
 
-/* Round 2: the solo stage takes more room */
+/* Round 3: the stage narrows. The wide masters are tuned for the rail card's
+   ~2.4:1 art window; at 680px the solo band letterboxes past 3:1 and the
+   subject is sliced away. 560px keeps the window inside the tuned range. */
 .council-theme-row__solo-card {
-  width: min(680px, 100%);
+  width: min(560px, 100%);
 }
 
 /* ============================================================
@@ -2644,4 +2653,160 @@
   background: color-mix(in srgb, var(--bg-highlight) 40%, transparent);
   border-color: color-mix(in srgb, var(--text-disabled) 30%, transparent);
   color: var(--text-disabled);
+}
+
+/* ============================================================
+   COUNCIL PLATE FRAME (2026-07 council revision)
+   One card anatomy for heroes and rail cards alike: the art owns
+   the card, the text sits on an opaque cartouche band at the
+   foot. Type never lands on raw line work, which is the whole
+   discipline of this geometry.
+   ============================================================ */
+
+/* Per-theme ink, so the plate rules need one selector instead of eight */
+.council-card[data-theme="loss-grief"] { --card-accent: var(--council-loss-grief); }
+.council-card[data-theme="love-connection"] { --card-accent: var(--council-love-connection); }
+.council-card[data-theme="who-am-i"] { --card-accent: var(--council-who-am-i); }
+.council-card[data-theme="meaning-purpose"] { --card-accent: var(--council-meaning-purpose); }
+.council-card[data-theme="freedom-justice"] { --card-accent: var(--council-freedom-justice); }
+.council-card[data-theme="faith-death-mystery"] { --card-accent: var(--council-faith-death-mystery); }
+.council-card[data-theme="moral-life"] { --card-accent: var(--council-moral-life); }
+.council-card[data-theme="mind-creativity"] { --card-accent: var(--council-mind-creativity); }
+
+/* The bled art layer and its dissolve mask are retired by this frame */
+.council-card__art { display: none !important; }
+
+/* The plate fills the card, the cartouche is laid over it */
+.council-card__plate {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  border-radius: 7px;
+}
+
+/* Plate tone: the paper the marks sit on, quieter than the card wash */
+.council-card__plate-tone {
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--card-accent) 8%, var(--bg-card));
+}
+
+/* The ink: a flat field of the theme accent, shaped by the plate's alpha.
+   One asset per crop serves every theme. */
+.council-card__plate-ink {
+  position: absolute;
+  inset: 0;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: cover;
+  mask-size: cover;
+  opacity: 0.92;
+}
+
+/* The card ratio picks the crop: the wide master from tablet up, the squarer
+   one on phones where the card is nearly as tall as it is wide */
+.council-card__plate-ink--square {
+  display: none;
+}
+
+/* Councils still on the legacy artwork sit in the same window. Those SVGs fit
+   their box instead of covering it, so the layer is held to the band the
+   cartouche leaves free, or the art would centre itself behind the band. */
+.council-card__plate-legacy {
+  position: absolute;
+  inset: 0 0 46% 0;
+  opacity: 0.85;
+}
+
+.council-card__plate-legacy > svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: scale(1.12);
+}
+
+/* Neutral silver hairline framing the plate: never gold, so the plate edge
+   cannot collide with the chrome in the three gold themes */
+.council-card__plate-keyline {
+  position: absolute;
+  inset: 4px;
+  border: 1px solid color-mix(in srgb, var(--cosmic-silver) 26%, transparent);
+  border-radius: 4px;
+}
+
+/* The cartouche: an opaque band carrying title, question, cast and duration.
+   Opacity is load-bearing here, a translucent band puts text back on the art. */
+.council-card__content {
+  flex: 0 0 auto;
+  margin-top: auto;
+  background: color-mix(in srgb, var(--card-accent) 14%, var(--bg-card));
+  border: 1px solid color-mix(in srgb, var(--cosmic-silver) 20%, transparent);
+  border-radius: 4px;
+  padding: 0.6rem 0.85rem 0.55rem;
+  margin-left: -0.5rem;
+  margin-right: -0.5rem;
+  margin-bottom: -0.5rem;
+}
+
+.council-card__hook {
+  flex: 0 0 auto;
+  margin-top: 0.15rem;
+}
+
+/* Art needs room above the cartouche at every card width. A two-line German
+   title plus a two-line question already claims most of a 400px card, so the
+   floor is set by what is left over, not by the text. */
+.council-card,
+.council-card--hero,
+.council-hero-section > .council-card--hero {
+  min-height: 288px;
+}
+
+/* The collapsed rail's solo stage is the widest card on the wall, so it takes
+   the most height before the art band reads as a letterbox slit */
+.council-theme-row__solo-card .council-card {
+  min-height: 330px;
+}
+
+/* ---- Mobile: the card narrows, the cartouche keeps its full measure ---- */
+@media (max-width: 767px) {
+  .council-card__plate-ink--wide {
+    display: none;
+  }
+
+  .council-card__plate-ink--square {
+    display: block;
+  }
+
+  .council-card,
+  .council-card--hero,
+  .council-hero-section > .council-card--hero,
+  .council-theme-row__solo-card .council-card {
+    min-height: 292px;
+  }
+
+  /* the type chip stops competing with the title for the same row, otherwise
+     a long German title is squeezed into a four-word column */
+  .council-card__header {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    row-gap: 0.3rem;
+  }
+
+  .council-card__type-badge-group {
+    order: 1;
+  }
+
+  .council-card__title {
+    order: 2;
+    flex: 1 1 100%;
+  }
+
+  /* the cartouche claims a bigger share of a narrow card, so the legacy
+     artwork stops higher to stay whole */
+  .council-card__plate-legacy {
+    inset: 0 0 54% 0;
+  }
 }
