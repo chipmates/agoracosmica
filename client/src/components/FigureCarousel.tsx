@@ -354,19 +354,6 @@ const FigureCarousel: FC<FigureCarouselProps> = ({
     }
   };
 
-  const handleMiniatureMouseMove = (e: MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
-    e.currentTarget.style.setProperty('--mouse-x', `${x}%`);
-    e.currentTarget.style.setProperty('--mouse-y', `${y}%`);
-  };
-
-  const handleMiniatureMouseLeave = (e: MouseEvent<HTMLDivElement>) => {
-    e.currentTarget.style.setProperty('--mouse-x', '50%');
-    e.currentTarget.style.setProperty('--mouse-y', '50%');
-  };
-  
   const renderMiniatures = () => (
     <div className="miniatures-section">
       {figures.map((figure, index) => {
@@ -387,9 +374,6 @@ const FigureCarousel: FC<FigureCarouselProps> = ({
             aria-label={`Select ${figure.name}`}
             aria-pressed={isActive}
             onKeyDown={(e) => handleMiniatureKeyDown(e, index)}
-            // Minimal Quantum Glow - mouse tracking for gradient origin
-            onMouseMove={handleMiniatureMouseMove}
-            onMouseLeave={handleMiniatureMouseLeave}
           >
             <OptimizedImage
               src={figure.id}
