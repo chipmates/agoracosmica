@@ -118,6 +118,7 @@ button {
      TYPOGRAPHY SYSTEM (Hybrid: Modern UI + Classical Content)
      ================= */
   --font-ui: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --ui-font-family: var(--font-ui); /* legacy alias, consumed by four stylesheets */
   --font-content: 'Libre Caslon Text', Georgia, 'Times New Roman', serif; /* Long-form reading */
   --font-mono: 'SF Mono', Monaco, 'Cascadia Code', monospace;
   
