@@ -116,6 +116,11 @@
   margin-top: 1rem;
 }
 
+/* Without a checkbox the dismiss button still sits right */
+.helper-actions > :only-child {
+  margin-left: auto;
+}
+
 /* Checkbox */
 .helper-checkbox {
   display: flex;

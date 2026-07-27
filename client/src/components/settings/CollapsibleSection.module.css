@@ -2,22 +2,15 @@
 
 .section {
   margin-bottom: 12px;
-  background: color-mix(in srgb, var(--bg-card) 30%, transparent);
-  border: 1px solid color-mix(in srgb, var(--gold-subtle) 12%, transparent);
-  border-radius: 14px;
+  background: color-mix(in srgb, var(--bg-card) 92%, var(--bg-void));
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 34%, transparent);
+  border-radius: 8px;
   overflow: hidden;
-  backdrop-filter: blur(var(--glass-blur-heavy));
-  -webkit-backdrop-filter: blur(var(--glass-blur-heavy));
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .section:hover {
-  border-color: color-mix(in srgb, var(--gold-subtle) 20%, transparent);
-  background: color-mix(in srgb, var(--bg-card) 35%, transparent);
-  transform: translateY(-1px);
-  box-shadow: 
-    0 4px 20px rgba(0, 0, 0, 0.1),
-    0 0 40px color-mix(in srgb, var(--gold-subtle) 8%, transparent);
+  border-color: color-mix(in srgb, var(--gold-deep) 50%, transparent);
 }
 
 .header {
@@ -82,7 +75,7 @@
   align-items: center;
   justify-content: center;
   background: color-mix(in srgb, var(--gold-subtle) 12%, transparent);
-  border-radius: 12px;
+  border-radius: 8px;
   color: var(--gold-subtle);
   flex-shrink: 0;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -90,10 +83,6 @@
 
 .header.expanded .iconWrapper {
   background: color-mix(in srgb, var(--gold-subtle) 20%, transparent);
-  transform: scale(1.05);
-  box-shadow: 
-    0 0 20px color-mix(in srgb, var(--gold-subtle) 30%, transparent),
-    inset 0 0 10px color-mix(in srgb, var(--gold-subtle) 10%, transparent);
 }
 
 .titleWrapper {
@@ -151,23 +140,13 @@
   padding: 4px 10px;
   background: color-mix(in srgb, var(--gold-subtle) 15%, transparent);
   border: 1px solid color-mix(in srgb, var(--gold-subtle) 25%, transparent);
-  border-radius: 20px;
+  border-radius: 4px;
   font-size: 12px;
   font-weight: 600;
   color: var(--gold-primary);
   font-family: 'Space Grotesk', sans-serif;
   letter-spacing: 0.3px;
   white-space: nowrap;
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.7;
-  }
 }
 
 .chevron {
@@ -178,7 +157,7 @@
   justify-content: center;
   color: var(--gold-subtle);
   background: color-mix(in srgb, var(--gold-subtle) 8%, transparent);
-  border-radius: 50%;
+  border-radius: 4px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 

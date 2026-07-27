@@ -214,7 +214,7 @@
 .option-button {
   background: rgba(var(--modal-gold-rgb), 0.08);
   border: 1px solid rgba(var(--modal-gold-rgb), 0.2);
-  border-radius: 10px;
+  border-radius: 4px;
   color: var(--cosmic-text-primary);  padding: 12px 16px;
   font-size: 15px;
   cursor: pointer;
@@ -229,32 +229,15 @@
   text-align: center;
 }
 
-.option-button::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-  transition: .5s;
-}
-
-.option-button:hover::before {
-  left: 100%;
-}
-
 .option-button:hover {
   background: rgba(var(--modal-gold-rgb), 0.12);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15), 0 0 8px rgba(var(--modal-gold-rgb), 0.2);
+  border-color: rgba(var(--modal-gold-rgb), 0.4);
 }
 
 .option-button.active {
   background: var(--modal-gold);
   color: var(--modal-bg-primary);
   font-weight: 600;
-  box-shadow: 0 0 15px rgba(var(--modal-gold-rgb), 0.3);
   border-color: var(--modal-gold);
 }
 

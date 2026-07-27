@@ -102,9 +102,9 @@
 .windowed-modal /* Legacy alias */ {
   width: 90%;
   max-width: 500px;
-  border: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent);
-  box-shadow: 0 0 40px color-mix(in srgb, var(--gold-subtle) var(--a-20), transparent), 0 0 80px color-mix(in srgb, black var(--a-40), transparent);
-  border-radius: 20px;
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 45%, transparent);
+  box-shadow: 0 24px 60px color-mix(in srgb, black var(--a-40), transparent);
+  border-radius: 0;
 }
 
 /* Content Modal - NEW DEFAULT for rich content */
@@ -422,7 +422,7 @@
     width: 95%;
     max-width: none;
     margin: 20px 10px;
-    border-radius: 12px;
+    border-radius: 0;
   }
   
   .content-modal,
@@ -443,7 +443,7 @@
   .windowed-modal /* Legacy alias */ {
     width: 98%;
     margin: 10px 4px;
-    border-radius: 8px;
+    border-radius: 0;
   }
 
   .content-modal,

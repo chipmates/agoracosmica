@@ -150,7 +150,7 @@ const BYOKSetupModal: FC = () => {
               textAlign: 'left',
               padding: '14px',
               background: 'color-mix(in srgb, var(--gold-base) 6%, transparent)',
-              borderRadius: '10px',
+              borderRadius: '4px',
             }}>
               {[
                 isSelfHost
@@ -169,7 +169,7 @@ const BYOKSetupModal: FC = () => {
                   fontSize: 'var(--ui-font-size-body)',
                   color: 'var(--text-primary)',
                 }}>
-                  <CheckCircle size={18} weight="fill" style={{ color: 'var(--success-green)', flexShrink: 0 }} />
+                  <CheckCircle size={18} weight="fill" style={{ color: 'var(--gold-primary)', flexShrink: 0 }} />
                   <span>{benefit}</span>
                 </div>
               ))}
@@ -189,7 +189,7 @@ const BYOKSetupModal: FC = () => {
                     color: 'var(--text-dim)',
                     background: 'transparent',
                     border: '1px solid color-mix(in srgb, var(--text-dim) 30%, transparent)',
-                    borderRadius: '10px',
+                    borderRadius: '4px',
                     cursor: 'pointer',
                     minHeight: '44px',
                   }}
@@ -299,7 +299,7 @@ const BYOKSetupModal: FC = () => {
                   fontSize: '13px',
                   fontFamily: 'monospace',
                   background: 'color-mix(in srgb, var(--bg-secondary) 50%, transparent)',
-                  border: `1px solid ${status === 'invalid' ? 'var(--coral-base)' : status === 'valid' ? 'var(--success-green)' : 'color-mix(in srgb, var(--gold-base) 20%, transparent)'}`,
+                  border: `1px solid ${status === 'invalid' ? 'var(--coral-base)' : status === 'valid' ? 'var(--gold-primary)' : 'color-mix(in srgb, var(--gold-base) 20%, transparent)'}`,
                   borderRadius: '8px',
                   color: 'var(--text-primary)',
                   outline: 'none',
@@ -372,13 +372,26 @@ const BYOKSetupModal: FC = () => {
                   width: 18,
                   height: 18,
                   marginTop: 1,
-                  accentColor: 'var(--gold-base)',
+                  appearance: 'none',
+                  WebkitAppearance: 'none',
+                  border: '1px solid color-mix(in srgb, var(--gold-deep) 70%, transparent)',
+                  borderRadius: 3,
+                  background: zdrEnabled
+                    ? 'color-mix(in srgb, var(--gold-deep) 30%, transparent)'
+                    : 'transparent',
+                  backgroundImage: zdrEnabled
+                    ? `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 8.5l3 3 6-7' fill='none' stroke='%23E6BC5C' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`
+                    : 'none',
+                  backgroundSize: '14px 14px',
+                  backgroundPosition: 'center',
+                  backgroundRepeat: 'no-repeat',
+                  cursor: 'pointer',
                   flexShrink: 0,
                 }}
               />
               <div>
                 <div style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: 2, display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <ShieldCheck size={16} weight="fill" style={{ color: 'var(--success-green)' }} />
+                  <ShieldCheck size={16} weight="fill" style={{ color: 'var(--gold-primary)' }} />
                   {tString('byok.wizard.zdrLabel', 'Zero Data Retention')}
                 </div>
                 <div style={{ lineHeight: 1.4 }}>
@@ -423,18 +436,18 @@ const BYOKSetupModal: FC = () => {
               width: 64,
               height: 64,
               borderRadius: '50%',
-              background: 'color-mix(in srgb, var(--success-green) 15%, transparent)',
+              background: 'color-mix(in srgb, var(--gold-deep) 18%, transparent)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               margin: '0 auto 16px',
             }}>
-              <CheckCircle size={36} weight="fill" style={{ color: 'var(--success-green)' }} />
+              <CheckCircle size={36} weight="fill" style={{ color: 'var(--gold-primary)' }} />
             </div>
 
             <h2 style={{
               fontSize: 'clamp(1.1rem, 1rem + 0.5vw, 1.4rem)',
-              color: 'var(--success-green)',
+              color: 'var(--gold-primary)',
               marginBottom: '12px',
               fontFamily: 'var(--heading-font-family)',
             }}>
@@ -462,7 +475,7 @@ const BYOKSetupModal: FC = () => {
                 justifyContent: 'center',
                 gap: '6px',
               }}>
-                <ShieldCheck size={16} weight="fill" style={{ color: 'var(--success-green)' }} />
+                <ShieldCheck size={16} weight="fill" style={{ color: 'var(--gold-primary)' }} />
                 {tString('byok.wizard.successZdr', 'Zero Data Retention is enabled.')}
               </p>
             )}

@@ -50,7 +50,7 @@ const LanguagePanel: FC<LanguagePanelProps> = ({
         <OptionButtons
           options={[
             { label: 'English', value: 'en' },
-            { label: 'German', value: 'de' }
+            { label: 'Deutsch', value: 'de' }
           ]}
           selected={selectedLanguage}
           onChange={onChange}

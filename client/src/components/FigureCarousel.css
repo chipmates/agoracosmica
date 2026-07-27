@@ -955,9 +955,7 @@
   font-weight: 500;
   line-height: 1.4;
   text-align: center;
-  text-shadow:
-    0 1px 4px color-mix(in srgb, var(--utility-pure-black) 70%, transparent),
-    0 0 12px color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent);
+  text-shadow: 0 1px 4px color-mix(in srgb, var(--utility-pure-black) 70%, transparent);
 }
 
 /* Trailer play control — paired with the golden line, always visible. */
@@ -970,14 +968,15 @@
   margin: 9px auto 2px;
   min-height: 44px; /* WCAG touch target */
   padding: 0 18px;
-  border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-40), transparent);
-  background: color-mix(in srgb, var(--gold-subtle) var(--a-15), transparent);
+  border-radius: 4px;
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 55%, transparent);
+  background: color-mix(in srgb, var(--bg-void) 72%, transparent);
   color: var(--secondary-color);
   font-family: var(--ui-font-family);
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
   font-weight: 600;
-  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  letter-spacing: 0.11em;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition: background 0.25s ease, border-color 0.25s ease;

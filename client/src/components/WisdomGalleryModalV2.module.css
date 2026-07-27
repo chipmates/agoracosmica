@@ -65,7 +65,7 @@
 @media (min-width: 768px) {
   .flipped .portraitImage { transform: scaleX(-1); }
 }
-.fig:not(.dim) .portrait:hover { transform: translateY(-6px); filter: brightness(1.06); }
+.fig:not(.dim) .portrait:hover { filter: brightness(1.06); }
 .chosen .portrait {
   transform: scale(1.03);
   filter: drop-shadow(0 0 34px color-mix(in srgb, var(--gold-subtle, #D4A539) 26%, transparent));
