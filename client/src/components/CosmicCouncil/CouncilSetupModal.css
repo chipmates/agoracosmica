@@ -46,17 +46,17 @@
   --advisory-accent: var(--mode-prism); /* Prism blue — 🌊 water = blue */
   --custom-accent: var(--mode-wisdom);
 
-  /* Council Theme Accent Colors — proven brand palette (revision 1, 2026-05-02)
-     All colors sourced from existing brand tokens. Adjacent themes in catalog order
-     (who-am-i → loss-grief) read distinct at a glance. */
-  --council-who-am-i: var(--gold-primary);                 /* Gold (#E6BC5C) — brand signature, identity as inner mirror */
-  --council-love-connection: var(--mode-quest);            /* Coral (#E97451) — love runs warm */
-  --council-meaning-purpose: var(--mode-freetalk-hover);   /* Mint (#7FD4AA) — forward, fresh */
-  --council-mind-creativity: var(--star-blue-light);       /* Silver-blue (#B4C8FF) — intellectual ether */
-  --council-moral-life: var(--gold-deep);                  /* Deep gold (#B38B30) — earned, grounded ethics */
-  --council-freedom-justice: var(--gold-subtle);           /* Subtle gold (#D4A539) — dignity, NOT alarm red */
-  --council-faith-death-mystery: var(--mode-wisdom);       /* Wisdom purple (#9D83CD) — mystical, cosmic */
-  --council-loss-grief: var(--mode-prism);                 /* Prism blue (#5B8BD4) — mourning blue, depth, dusk */
+  /* Council rail inks — the Scriptorium set: eight pigments ~45 degrees
+     apart, one deliberate gold on the opening rail. Values are the --ink-*
+     tokens in index.css. */
+  --council-who-am-i: var(--gold-primary);
+  --council-love-connection: var(--ink-rose);
+  --council-meaning-purpose: var(--ink-sap-green);
+  --council-mind-creativity: var(--ink-smalt);
+  --council-moral-life: var(--ink-verdigris);
+  --council-freedom-justice: var(--ink-madder);
+  --council-faith-death-mystery: var(--ink-folium);
+  --council-loss-grief: var(--ink-azurite);
 }
 
 /* Main Modal Overlay - Fullscreen (plate pass 2026-07: solid night, no

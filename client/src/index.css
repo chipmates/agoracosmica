@@ -237,7 +237,22 @@ button {
   --mode-prism: #5E88CE;                  /* Sapphire dusk */
   --mode-prism-hover: #7699D8;            /* Sapphire hover */
   --mode-prism-active: #4E77BC;           /* Sapphire active */
-  
+
+  /* =================
+     COUNCIL RAIL INKS
+     ================= */
+  /* The Scriptorium set: seven pigments joining the brand gold as the eighth,
+     ~45 degrees apart on the wheel. Tuned against the council card grounds,
+     every ink clears 4.5:1 on its title plate. Consumed via the --council-*
+     aliases in CouncilSetupModal.css. */
+  --ink-rose: #F397BB;          /* love-connection */
+  --ink-sap-green: #97CC86;     /* meaning-purpose */
+  --ink-smalt: #6FCEFD;         /* mind-creativity */
+  --ink-verdigris: #45BCB6;     /* moral-life */
+  --ink-madder: #F38B6B;        /* freedom-justice */
+  --ink-folium: #CCABFD;        /* faith-death-mystery */
+  --ink-azurite: #78A7EB;       /* loss-grief */
+
   /* =================
      TEXT COLORS (4)
      NO PURE WHITE!
