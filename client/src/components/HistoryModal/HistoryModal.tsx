@@ -64,7 +64,7 @@ const HistoryModal: FC<HistoryModalProps> = (props) => {
         title={String(t('history.title', { figure: getLastName(selectedFigure.name) }))}
         onClose={handleClose}
         closeAriaLabel="Close history modal"
-        cosmicStars={true}
+        cosmicStars={false}
       />
 
       <ModeFilterBar

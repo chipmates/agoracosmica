@@ -28,49 +28,33 @@ const HistoryHelperContent: FC<HistoryHelperContentProps> = ({
       title={tString('helpers.historyModal.welcome.title', 'History Overview')}
       content={
         <div style={{ fontSize: '0.95rem' }}>
-          {/* Quick Guide */}
+          {/* Quick Guide — night plate, one gold hairline */}
           <div style={{
-            background: 'linear-gradient(135deg, color-mix(in srgb, var(--gold-subtle) 8%, transparent), color-mix(in srgb, var(--gold-subtle) 3%, transparent))',
-            borderRadius: '8px',
+            background: 'color-mix(in srgb, var(--bg-void) 45%, transparent)',
+            borderRadius: '3px',
             padding: '0.75rem',
             marginBottom: '1rem',
-            border: '1px solid color-mix(in srgb, var(--gold-subtle) 15%, transparent)'
+            border: '1px solid color-mix(in srgb, var(--gold-deep) 40%, transparent)'
           } as CSSProperties}>
-            <h4 style={{
-              color: 'var(--gold-subtle)',
-              marginBottom: '0.5rem',
-              fontSize: '1rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              fontWeight: 600
-            } as CSSProperties}>
-              <BookOpen size={18} style={{ color: 'var(--gold-subtle)' }} />
+            {/* h4 inherits the shared kicker doctrine from HelperPopup.css */}
+            <h4>
+              <BookOpen size={16} style={{ color: 'var(--gold-deep)' }} />
               {tNode('helpers.historyModal.welcome.sections.overview.title')}
             </h4>
-            <p style={{ margin: 0, opacity: 0.9, paddingLeft: '26px', lineHeight: 1.5 } as CSSProperties}>
+            <p style={{ margin: 0, paddingLeft: '24px', lineHeight: 1.5 } as CSSProperties}>
               {tNode('helpers.historyModal.welcome.sections.overview.text')}
             </p>
           </div>
 
           {/* Key Actions */}
           <div style={{ marginBottom: '1rem' }}>
-            <h4 style={{
-              color: 'var(--gold-subtle)',
-              marginBottom: '0.5rem',
-              fontSize: '1rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              fontWeight: 600
-            } as CSSProperties}>
-              <Archive size={18} style={{ color: 'var(--gold-subtle)' }} />
+            <h4>
+              <Archive size={16} style={{ color: 'var(--gold-deep)' }} />
               {tNode('helpers.historyModal.welcome.sections.actions.title')}
             </h4>
             <ul style={{
               margin: 0,
-              paddingLeft: '26px',
-              opacity: 0.9,
+              paddingLeft: '24px',
               fontSize: '0.9rem',
               listStyle: 'none'
             } as CSSProperties}>
@@ -84,7 +68,7 @@ const HistoryHelperContent: FC<HistoryHelperContentProps> = ({
                     alignItems: 'center',
                     gap: '0.5rem'
                   } as CSSProperties}>
-                    {Icon && <Icon size={14} style={{ color: 'var(--gold-subtle)', flexShrink: 0 }} />}
+                    {Icon && <Icon size={14} style={{ color: 'var(--gold-deep)', flexShrink: 0 }} />}
                     <span>{point}</span>
                   </li>
                 );
@@ -97,13 +81,13 @@ const HistoryHelperContent: FC<HistoryHelperContentProps> = ({
             display: 'flex',
             alignItems: 'center',
             gap: '0.5rem',
-            padding: '0.5rem 0.75rem',
-            background: 'color-mix(in srgb, var(--gold-subtle) 5%, transparent)',
-            borderRadius: '6px',
-            fontSize: '0.85rem',
-            opacity: 0.9
+            padding: '0.6rem 0.75rem',
+            background: 'none',
+            border: '1px solid color-mix(in srgb, var(--gold-deep) 28%, transparent)',
+            borderRadius: '3px',
+            fontSize: '0.85rem'
           } as CSSProperties}>
-            <Lightbulb size={14} style={{ color: 'var(--gold-subtle)', flexShrink: 0 }} />
+            <Lightbulb size={14} style={{ color: 'var(--gold-deep)', flexShrink: 0 }} />
             <span>{tNode('helpers.historyModal.welcome.sections.tip.text')}</span>
           </div>
         </div>

@@ -66,7 +66,7 @@ const SeedHistoryItem: FC<SeedHistoryItemProps> = ({
           onSelectSeed(seedId);
         }}
       >
-        {isExpanded ? <CaretDown size={20} weight="duotone" color="var(--gold-subtle)" /> : <CaretRight size={20} weight="duotone" color="var(--gold-subtle)" />}
+        {isExpanded ? <CaretDown size={20} weight="duotone" color="var(--gold-deep)" /> : <CaretRight size={20} weight="duotone" color="var(--gold-deep)" />}
         <span className="seed-title">{seedTitle}</span>
         <RippleButton
           onClick={(e) => {

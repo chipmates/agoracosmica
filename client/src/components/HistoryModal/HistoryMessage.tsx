@@ -30,10 +30,6 @@ const HistoryMessage: FC<HistoryMessageProps> = ({
     <div
       key={index}
       className={`message ${entry.role} mode-${mode}`}
-      style={entry.role === 'user' ? {
-        backgroundColor: 'var(--mode-quest)',
-        color: 'white'
-      } : {}}
     >
       <div className="message-header">
         {Icon && <Icon size={16} className="mode-icon" />}
