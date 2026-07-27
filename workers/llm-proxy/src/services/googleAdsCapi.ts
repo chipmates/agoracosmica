@@ -16,7 +16,17 @@
 
 import type { Env } from '../utils/types';
 
-type ConversionEvent = 'profile_created' | 'start_exploring' | 'mode_selected' | 'council_engaged';
+// mode_selected no longer arrives from the client (dropped from the accepted
+// list in routes/conversions.ts). It stays in this union so its action ids
+// keep a home until the actions are deleted in the Ads UI.
+type ConversionEvent =
+  | 'profile_created'
+  | 'start_exploring'
+  | 'mode_selected'
+  | 'council_engaged'
+  | 'listened'
+  | 'dialogue_started'
+  | 'conversation_deepened';
 type AccountKey = 'grants' | 'paid';
 
 interface AccountConfig {
@@ -70,6 +80,9 @@ const ACCOUNTS: Record<AccountKey, AccountConfig> = {
       start_exploring: '7620352758',
       mode_selected: '7620352752',
       council_engaged: '7620352755',
+      listened: '7699419339',
+      dialogue_started: '7699419342',
+      conversation_deepened: '7699419345',
     },
   },
   paid: {
@@ -82,6 +95,9 @@ const ACCOUNTS: Record<AccountKey, AccountConfig> = {
       profile_created: 'TODO_PENDING',
       start_exploring: 'TODO_PENDING',
       mode_selected: 'TODO_PENDING',
+      listened: 'TODO_PENDING',
+      dialogue_started: 'TODO_PENDING',
+      conversation_deepened: 'TODO_PENDING',
       // council_engaged is Grants-only — see SCOPED_EVENTS below.
       council_engaged: 'NOT_APPLICABLE',
     },
@@ -109,7 +125,9 @@ const SCOPED_EVENTS: Partial<Record<ConversionEvent, AccountKey[]>> = {
 //
 // When a secret is unset, the worker forwards conversion_value: 0. Google Ads
 // accepts a zero value but won't use it for value-based bidding, so an unset
-// secret degrades gracefully into Max Conversions instead of breaking.
+// secret degrades gracefully into Max Conversions instead of breaking. Every
+// event in the union needs its own VALUE_<EVENT> secret, including the three
+// engagement events, or it uploads at zero.
 function conversionValue(env: Env, event: ConversionEvent): number {
   const key = `VALUE_${event.toUpperCase()}` as keyof Env;
   const raw = env[key];

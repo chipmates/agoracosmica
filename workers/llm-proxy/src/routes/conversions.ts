@@ -7,7 +7,15 @@ import type { Env } from '../utils/types';
 import { forwardConversionToGoogleAds } from '../services/googleAdsCapi';
 import { trackRateLimit, readCountry, readDevice } from '../utils/analytics';
 
-type ConversionEvent = 'profile_created' | 'start_exploring' | 'mode_selected' | 'council_engaged';
+type ConversionEvent =
+  | 'profile_created'
+  | 'start_exploring'
+  | 'council_engaged'
+  // Engagement ladder: 30s of audio actually played, a first chat turn sent,
+  // a third user message in the same conversation.
+  | 'listened'
+  | 'dialogue_started'
+  | 'conversation_deepened';
 
 interface ConversionPayload {
   gclid: string;
@@ -16,18 +24,23 @@ interface ConversionPayload {
   figureId?: string;
 }
 
+// mode_selected is retired as a conversion: picking a mode said nothing about
+// engagement. Its funnel beacon (routes/funnel.ts) stays, and the CAPI action
+// map keeps the id until the action is deleted in the Ads UI.
 const VALID_EVENTS = new Set<ConversionEvent>([
   'profile_created',
   'start_exploring',
-  'mode_selected',
   'council_engaged',
+  'listened',
+  'dialogue_started',
+  'conversation_deepened',
 ]);
 
 // Rate limit: 500 conversion events per IP per hour. Generous on purpose:
-// a single legit user fires at most 3 events per session (client-deduped),
-// so 500/hr supports a NATted network (school, office, conference WiFi,
-// carrier-grade NAT) without false positives. Abuse protection still
-// bounded since each excess request gets 429.
+// a single legit user fires at most 6 events per session (one per event,
+// client-deduped), so 500/hr supports a NATted network (school, office,
+// conference WiFi, carrier-grade NAT) without false positives. Abuse
+// protection still bounded since each excess request gets 429.
 const RATE_LIMIT_WINDOW = 3600;
 const RATE_LIMIT_MAX = 500;
 
@@ -130,6 +143,20 @@ export async function handleConversions(
   return Response.json({ ok: true });
 }
 
+// Counters exposed on the stats readout. Every accepted event plus
+// mode_selected, whose rows stay readable while its 90-day history lasts.
+const STATS_EVENTS = [
+  'profile_created',
+  'start_exploring',
+  'council_engaged',
+  'listened',
+  'dialogue_started',
+  'conversation_deepened',
+  'mode_selected',
+] as const;
+
+type StatsEvent = (typeof STATS_EVENTS)[number];
+
 // GET endpoint for stats dashboard to read conversion counts
 export async function handleConversionStats(
   request: Request,
@@ -137,10 +164,7 @@ export async function handleConversionStats(
 ): Promise<Response> {
   const url = new URL(request.url);
   const days = parseInt(url.searchParams.get('days') || '30', 10);
-  const results: Record<
-    string,
-    { profile_created: number; start_exploring: number; mode_selected: number }
-  > = {};
+  const results: Record<string, Record<StatsEvent, number>> = {};
 
   const now = new Date();
   for (let i = 0; i < Math.min(days, 90); i++) {
@@ -148,16 +172,20 @@ export async function handleConversionStats(
     date.setDate(date.getDate() - i);
     const dateKey = date.toISOString().split('T')[0];
 
-    const profileCount = parseInt(await env.RATE_LIMITS.get(`conv_count:${dateKey}:profile_created`) || '0', 10);
-    const startCount = parseInt(await env.RATE_LIMITS.get(`conv_count:${dateKey}:start_exploring`) || '0', 10);
-    const modeCount = parseInt(await env.RATE_LIMITS.get(`conv_count:${dateKey}:mode_selected`) || '0', 10);
+    // One KV round trip per day rather than one per counter: the readout
+    // spans up to 90 days across every event.
+    const counts = await Promise.all(
+      STATS_EVENTS.map(async (event) =>
+        parseInt((await env.RATE_LIMITS.get(`conv_count:${dateKey}:${event}`)) || '0', 10),
+      ),
+    );
 
-    if (profileCount > 0 || startCount > 0 || modeCount > 0) {
-      results[dateKey] = {
-        profile_created: profileCount,
-        start_exploring: startCount,
-        mode_selected: modeCount,
-      };
+    if (counts.some((n) => n > 0)) {
+      const day = {} as Record<StatsEvent, number>;
+      STATS_EVENTS.forEach((event, idx) => {
+        day[event] = counts[idx];
+      });
+      results[dateKey] = day;
     }
   }
 

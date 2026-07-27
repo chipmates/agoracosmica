@@ -1,6 +1,7 @@
 // Anonymous funnel-step beacon
-// Fires from the marketing pages (cta_click via agc-public.js) and from the
-// client app (cinematic_start / cinematic_end / welcome_shown / first_turn /
+// Fires from the marketing pages (cta_click via agc-public.js, the
+// ad_consent_* counters via the AdConsentPrompt island) and from the client
+// app (cinematic_start / cinematic_end / welcome_shown / first_turn /
 // figure_selected / mode_selected / first_reply via utils/funnelBeacon.ts).
 // Lights up the dark zone between the page-load beacon and the entry/signup
 // beacons: does the intro play, is it watched or skipped, does the consent
@@ -25,6 +26,15 @@ interface FunnelPayload {
   bucket?: number;
 }
 
+// Ad-measurement consent prompt: how many ad arrivals see the question and
+// what they answer. One-shot per tab on the client, counter-only here.
+const CONSENT_STEPS = [
+  'ad_consent_shown',
+  'ad_consent_accepted',
+  'ad_consent_declined',
+  'ad_consent_dismissed',
+] as const;
+
 // Strict server-side step allowlist (Waves 1-2). Anything not on this list is
 // silently dropped — no row is written and the client learns nothing (same
 // fire-and-forget posture as the other beacons).
@@ -47,7 +57,19 @@ const VALID_STEPS = new Set([
   // the "never opens vs opens and flees" gap between sidebar tap and the
   // playback started beacon.
   'council_open',
+  ...CONSENT_STEPS,
 ]);
+
+// Counter-only steps: the row is the step name, the sanitized page path the
+// question appeared on, the interface language, and the country and device
+// class the edge derives. Nothing else. The mode slot is blanked, the outcome
+// is forced to '200' and the bucket to 0 server-side, and the path slot only
+// ever takes a path — a figure id sent on one of these steps is dropped
+// rather than stored, so no content dimension can ride along with a consent
+// answer. The route reads no gclid field on any step, so none can be stored
+// either. Derived from CONSENT_STEPS rather than re-listed, so the two lists
+// cannot drift apart. docs/MEASUREMENT.md states this shape.
+const COUNTER_ONLY_STEPS = new Set<string>(CONSENT_STEPS);
 
 // Outcome slot (blob5): same role as status/type elsewhere. Steps without a
 // meaningful outcome default to '200', matching the entry/signup convention.
@@ -101,11 +123,12 @@ export async function handleFunnel(request: Request, env: Env): Promise<Response
 
   // blob2: figureId wins over path; anything that fails validation becomes ''
   // so the row is still recorded with a clean content slot.
-  let ref = '';
+  const path = (typeof payload.path === 'string' && PATH_RE.test(payload.path))
+    ? payload.path
+    : '';
+  let ref = path;
   if (typeof payload.figureId === 'string' && FIGURE_RE.test(payload.figureId)) {
     ref = payload.figureId;
-  } else if (typeof payload.path === 'string' && PATH_RE.test(payload.path)) {
-    ref = payload.path;
   }
 
   const mode = (typeof payload.mode === 'string' && MODE_RE.test(payload.mode))
@@ -125,13 +148,19 @@ export async function handleFunnel(request: Request, env: Env): Promise<Response
     ? payload.bucket
     : 0;
 
+  const counterOnly = COUNTER_ONLY_STEPS.has(step);
+
   trackFunnel(env, {
     step,
-    ref,
-    mode,
+    // Path only on the counter-only steps, so a figure id can never ride
+    // along with a consent answer.
+    ref: counterOnly ? path : ref,
+    mode: counterOnly ? '' : mode,
     language: lang,
-    outcome,
-    bucket,
+    // '200', never '', so a counter row stays recognizable as a funnel row
+    // (the dashboard tells conversion rows apart by an empty outcome slot).
+    outcome: counterOnly ? '200' : outcome,
+    bucket: counterOnly ? 0 : bucket,
     country: readCountry(request),
     device: readDevice(request),
   });

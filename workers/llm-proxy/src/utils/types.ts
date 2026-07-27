@@ -30,6 +30,9 @@ export interface Env {
   VALUE_START_EXPLORING?: string;
   VALUE_MODE_SELECTED?: string;
   VALUE_COUNCIL_ENGAGED?: string;
+  VALUE_LISTENED?: string;
+  VALUE_DIALOGUE_STARTED?: string;
+  VALUE_CONVERSATION_DEEPENED?: string;
 }
 
 export interface ChatRequest {
