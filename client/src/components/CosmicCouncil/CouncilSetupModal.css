@@ -2810,3 +2810,136 @@
     inset: 0 0 54% 0;
   }
 }
+
+/* ============================================================
+   SHEET PLATE BAND + FULL-PLATE LIGHTBOX (council art arc)
+   ============================================================ */
+
+/* The band bleeds to the sheet's edges and shows the wide master generously.
+   It is one button: the whole art is the tap surface, the marginalia note
+   is its visible label. */
+.council-detail-sheet__plate-band {
+  position: relative;
+  display: block;
+  width: calc(100% + 3rem);
+  margin: -1.25rem -1.5rem 1.1rem;
+  height: clamp(150px, 22vh, 200px);
+  padding: 0;
+  border: none;
+  border-radius: 7px 7px 0 0;
+  overflow: hidden;
+  cursor: pointer;
+  background: none;
+}
+
+.council-detail-sheet__plate-band-tone {
+  position: absolute;
+  inset: 0;
+}
+
+.council-detail-sheet__plate-band-ink {
+  position: absolute;
+  inset: 0;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: cover;
+  mask-size: cover;
+  opacity: 0.92;
+}
+
+.council-detail-sheet__plate-band-note {
+  position: absolute;
+  right: 0.9rem;
+  bottom: 0.6rem;
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--text-secondary) 85%, transparent);
+  background: color-mix(in srgb, var(--bg-primary) 74%, transparent);
+  border: 1px solid color-mix(in srgb, var(--star-blue-light) 14%, transparent);
+  border-radius: 4px;
+  padding: 0.3rem 0.55rem;
+}
+
+.council-detail-sheet__plate-band:focus-visible {
+  outline: 2px dashed var(--gold-primary);
+  outline-offset: -4px;
+}
+
+/* The lightbox: the entire uncropped plate alone on the night. Sits above
+   the sheet backdrop (3050). Tap anywhere closes; the credit link opts out. */
+.council-art-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 3060;
+  background: var(--bg-deep-space);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: zoom-out;
+}
+
+.council-art-lightbox__close {
+  position: absolute;
+  top: max(1rem, env(safe-area-inset-top, 0px));
+  right: max(1rem, env(safe-area-inset-right, 0px));
+}
+
+.council-art-lightbox__stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+  max-width: 92vw;
+}
+
+.council-art-lightbox__plate {
+  position: relative;
+}
+
+.council-art-lightbox__tone {
+  position: absolute;
+  inset: 0;
+  border-radius: 4px;
+}
+
+.council-art-lightbox__ink {
+  position: absolute;
+  inset: 0;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  opacity: 0.94;
+}
+
+.council-art-lightbox__keyline {
+  position: absolute;
+  inset: 0;
+  border: 1px solid color-mix(in srgb, var(--star-blue-light) 14%, transparent);
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+.council-art-lightbox__credit {
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.76rem;
+  letter-spacing: 0.02em;
+  color: var(--text-tertiary);
+  text-decoration: none;
+  text-align: center;
+  max-width: 88vw;
+  cursor: pointer;
+}
+
+.council-art-lightbox__credit:hover {
+  color: var(--text-secondary);
+  text-decoration: underline;
+}
+
+@media (max-width: 767px) {
+  .council-detail-sheet__plate-band {
+    height: clamp(130px, 20vh, 170px);
+  }
+}

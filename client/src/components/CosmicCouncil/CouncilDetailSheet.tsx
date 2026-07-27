@@ -1,10 +1,13 @@
-import { FC } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Play, Crown, ArrowsClockwise, Lock } from '@phosphor-icons/react';
 import { CloseButton } from '../Button';
 import useTranslation from '../../hooks/useTranslation';
 import { useFocusTrap } from '../../hooks/useFocusTrap';
 import { useCouncilProgress } from '../../hooks/useCouncilProgress';
+import { getCouncilPlate } from './plates';
+import { inkStyle } from './CouncilPlate';
+import CouncilArtLightbox from './CouncilArtLightbox';
 import {
   CatalogCouncil,
   getShortDisplayName,
@@ -23,10 +26,17 @@ interface CouncilDetailSheetProps {
 
 const CouncilDetailSheet: FC<CouncilDetailSheetProps> = ({ council, onClose, onPlay }) => {
   const { tString, language } = useTranslation();
-  const trapRef = useFocusTrap({ onClose, enabled: !!council });
+  const [artOpen, setArtOpen] = useState(false);
+  const trapRef = useFocusTrap({ onClose, enabled: !!council && !artOpen });
   const progress = useCouncilProgress(council?.id ?? '', language);
 
+  useEffect(() => {
+    setArtOpen(false);
+  }, [council?.id]);
+
   if (!council) return null;
+
+  const plate = getCouncilPlate(council.id);
 
   const title = getLocalizedTitle(council, language);
   const question = getLocalizedQuestion(council, language);
@@ -61,7 +71,34 @@ const CouncilDetailSheet: FC<CouncilDetailSheetProps> = ({ council, onClose, onP
         tabIndex={-1}
         style={{ borderTopColor: `var(${accentVar})` }}
       >
-        {/* Clean readable layout — no artwork noise */}
+        {/* The plate band: art shown generously, one tap opens the full
+            uncropped engraving in the lightbox */}
+        {plate && (
+          <button
+            type="button"
+            className="council-detail-sheet__plate-band"
+            onClick={() => setArtOpen(true)}
+            aria-label={tString('cosmicCouncil.artwork.view', 'View the full artwork')}
+          >
+            <span
+              className="council-detail-sheet__plate-band-tone"
+              aria-hidden="true"
+              style={{ background: `color-mix(in srgb, var(${accentVar}) 8%, var(--bg-card))` }}
+            />
+            <span
+              className="council-detail-sheet__plate-band-ink"
+              aria-hidden="true"
+              style={inkStyle(accentVar, plate.wide, plate.focal)}
+            />
+            <span className="council-detail-sheet__plate-band-note">
+              {tString('cosmicCouncil.artwork.note', 'The Artwork')}
+            </span>
+          </button>
+        )}
+
+        {artOpen && (
+          <CouncilArtLightbox council={council} onClose={() => setArtOpen(false)} />
+        )}
 
         <div className="council-detail-sheet__header">
           <div className="council-detail-sheet__title-row">

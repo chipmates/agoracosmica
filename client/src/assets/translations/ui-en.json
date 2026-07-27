@@ -1052,6 +1052,11 @@
     "themeRow": {
       "seeAll": "See all {count}",
       "showLess": "Show less"
+    },
+    "artwork": {
+      "label": "Artwork",
+      "view": "View the full artwork",
+      "note": "The Artwork"
     }
   },
   "languageWheel": {

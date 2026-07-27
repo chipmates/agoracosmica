@@ -1054,6 +1054,11 @@
     "themeRow": {
       "seeAll": "Alle {count} Räte",
       "showLess": "Weniger anzeigen"
+    },
+    "artwork": {
+      "label": "Kunstwerk",
+      "view": "Das ganze Kunstwerk ansehen",
+      "note": "Das Kunstwerk"
     }
   },
   "languageWheel": {
