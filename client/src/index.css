@@ -119,6 +119,7 @@ button {
      ================= */
   --font-ui: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --ui-font-family: var(--font-ui); /* legacy alias, consumed by four stylesheets */
+  --heading-font-family: var(--font-content); /* legacy alias, consumed by the compact modals */
   --font-content: 'Libre Caslon Text', Georgia, 'Times New Roman', serif; /* Long-form reading */
   --font-mono: 'SF Mono', Monaco, 'Cascadia Code', monospace;
   
