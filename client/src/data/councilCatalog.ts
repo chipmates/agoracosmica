@@ -100,6 +100,14 @@ export const getThemeAccentVar = (themeId: ThemeId): string => {
 
 export const councilCatalog: CatalogCouncil[] = catalogData as CatalogCouncil[];
 
+export const councilsByTheme: Record<ThemeId, CatalogCouncil[]> = THEMES.reduce(
+  (acc, theme) => {
+    acc[theme.id] = councilCatalog.filter(c => c.theme === theme.id);
+    return acc;
+  },
+  {} as Record<ThemeId, CatalogCouncil[]>
+);
+
 // Hero councils — one confrontational, one reflective
 const defaultConfrontational: CatalogCouncil = councilCatalog.find(c => c.type === 'confrontational') ?? councilCatalog[0];
 const defaultReflective: CatalogCouncil = councilCatalog.find(c => c.type === 'reflective') ?? councilCatalog[0];
