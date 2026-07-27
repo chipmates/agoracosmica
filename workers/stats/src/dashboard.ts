@@ -253,6 +253,10 @@ body {
     0 2px 12px color-mix(in srgb, #000 12%, transparent);
   position: relative;
   transition: opacity 0.15s ease;
+  /* Grid items default to min-width:auto, so one wide nowrap table inside a
+     card stretches the whole column and pushes the tab sideways on a phone.
+     The table already scrolls inside .tbl-wrap, so let the card shrink. */
+  min-width: 0;
 }
 .card-hero { padding: 1.25rem; }
 .card-wide { grid-column: span 2; }
@@ -804,6 +808,7 @@ html { scrollbar-color: var(--bg-highlight) transparent; scrollbar-width: thin; 
 <section class="tab-section" id="tab-adgrants" aria-labelledby="title-adgrants">
   <div class="tab-header">
     <h2 class="tab-title" id="title-adgrants">Growth</h2>
+    <span class="tab-updated" id="updated-adgrants"></span>
   </div>
   <div id="alerts-adgrants" class="alerts"></div>
   <div id="grid-adgrants"></div>
@@ -1222,7 +1227,10 @@ function rateCard(label, num, den, prevNum, prevDen, opts) {
     if (Math.abs(pp) < 0.05) {
       ppHtml = '<span class="kpi-delta flat">~0pp</span>';
     } else {
-      var cls = pp > 0 ? 'up' : 'down';
+      // The arrow always follows the sign, the colour follows whether the move
+      // is good. opts.invert flips the colour for rates where up is the bad
+      // direction (a rising dismiss share must never render green).
+      var cls = (opts.invert ? pp < 0 : pp > 0) ? 'up' : 'down';
       var arr = pp > 0 ? '&#9650;' : '&#9660;';
       ppHtml = '<span class="kpi-delta ' + cls + '">' + arr + ' ' + (pp > 0 ? '+' : '') + pp.toFixed(1) + 'pp</span>';
     }
@@ -1263,8 +1271,87 @@ function engagementPoolHtml(label, stages, note) {
     noteHtml;
 }
 
+// Depth ladder: rungs on one shared axis so their relative size reads at a
+// glance, each with a previous-period ghost bar, a sparkline and a delta.
+// Deliberately NOT ghostFunnelHtml: these rungs are depths, not gates. Listened
+// happens on the marketing pages while the dialogue events happen in the app,
+// so a between-rung conversion percentage would claim a sequence that does not
+// exist. The one true subset relation belongs in the caption, as a sentence.
+// Rungs are { label, value, prev, sub, spark, sparkColor, pending }; 'pending'
+// works exactly as in ghostFunnelHtml (zero rows in both periods means the
+// beacon has produced nothing yet, so the rung says so instead of drawing an
+// empty bar that reads as failure).
+function ladderHtml(rungs) {
+  if (!rungs || rungs.length === 0) return '';
+  var base = 1;
+  for (var k = 0; k < rungs.length; k++) {
+    base = Math.max(base, Number(rungs[k].value) || 0, Number(rungs[k].prev) || 0);
+  }
+  var out = '<div class="fbar-list" role="list" aria-label="Ad engagement ladder">';
+  for (var i = 0; i < rungs.length; i++) {
+    var s = rungs[i];
+    var v = Number(s.value) || 0;
+    var pv = (s.prev == null) ? null : (Number(s.prev) || 0);
+    var labelWrap = '<span class="fbar-labelwrap"><span class="fbar-label">' + s.label + '</span>' +
+      (s.sub ? '<span class="fbar-sub2">' + s.sub + '</span>' : '') + '</span>';
+    // The spark slot is reserved even when there is nothing to draw, so a rung
+    // without a trend does not stretch its bar past the rung above. Reuses
+    // .kpi-spark, which already hides itself under 640px.
+    var sparkHtml = '<span class="kpi-spark" style="width:64px">' +
+      ((s.spark && s.spark.length > 1) ? sparkSvg(s.spark, 64, 24, s.sparkColor || '#D4A539') : '') +
+      '</span>';
+    if (s.pending && v === 0 && (pv == null || pv === 0)) {
+      // The beacon has produced nothing in either period. The note sits inside
+      // the empty track rather than in the value column, so a long event name
+      // cannot push this row's bar out of line with the rungs above it.
+      out += '<div class="fbar-row" role="listitem" style="margin:3px 0">' + labelWrap +
+        '<div class="fbar-track"><span style="position:absolute;left:10px;top:0;line-height:30px;font-size:0.6875rem;color:var(--dim)">awaiting first ' + s.pending + '</span></div>' +
+        '<span class="kpi-spark" style="width:64px"></span>' +
+        '<span class="fbar-num"><span class="fbar-val">--</span></span>' +
+        '</div>';
+      continue;
+    }
+    var ghost = (pv == null) ? '' : '<div class="fbar-ghost" style="width:' + (pv / base * 100).toFixed(1) + '%"></div>';
+    out += '<div class="fbar-row" role="listitem" style="margin:3px 0">' + labelWrap +
+      '<div class="fbar-track">' + ghost + '<div class="fbar-fill" style="width:' + (v / base * 100).toFixed(1) + '%"></div></div>' +
+      sparkHtml +
+      '<span class="fbar-num"><span class="fbar-val">' + fmt(v) + '</span>' + (pv == null ? '' : deltaHtml(v, pv)) + '</span>' +
+      '</div>';
+  }
+  return out + '</div>';
+}
+
 function chartCard(title, body, cls) {
   return '<div class="card ' + (cls || '') + '"><div class="kpi-label" style="margin-bottom:6px">' + title + '</div>' + body + '</div>';
+}
+
+// Strip a page path to a short readable label ("aurelius (de)" not
+// "/de/figures/marcus-aurelius/"). No regex: TS template literals eat regex
+// escape sequences, so this uses plain string methods only. Distinguishes
+// EN/DE with a "(de)" suffix, marks theme pages with a leading tilde and
+// labels the index pages explicitly. Shared by Top Marketing Pages and the
+// consent-by-page table so a path reads the same wherever it appears (and so
+// no card is forced wide by a full path on a 390px screen).
+function pathLabel(raw) {
+  raw = String(raw || '');
+  var isDe = raw.indexOf('/de/') === 0;
+  var p = isDe ? raw.slice(4) : (raw.charAt(0) === '/' ? raw.slice(1) : raw);
+  var prefix = '';
+  var bucket = '';
+  if (p.indexOf('figures/') === 0) { p = p.slice(8); bucket = 'figures'; }
+  else if (p === 'figures') { p = ''; bucket = 'figures'; }
+  else if (p.indexOf('themes/') === 0) { p = p.slice(7); prefix = '~'; bucket = 'themes'; }
+  else if (p === 'themes') { p = ''; prefix = '~'; bucket = 'themes'; }
+  if (p.length > 0 && p.charAt(p.length - 1) === '/') p = p.slice(0, -1);
+  var label;
+  if (p === '') {
+    if (bucket === 'themes') label = 'all themes';
+    else if (bucket === 'figures') label = 'all figures';
+    else label = raw || '/';
+  } else {
+    label = prefix + p;
+  }
+  return isDe ? label + ' (de)' : label;
 }
 
 // Merge same-label rows (e.g. empty-string rows that fall back to a default
@@ -2124,29 +2211,7 @@ async function loadOverview() {
   // label ("aurelius" not "/figures/marcus-aurelius/"). Empty if no marketing
   // arrivals yet (typical for first 1-2 days after the page-beacon fix went live).
   var topMarketingItems = topMarketingPages.map(function(row) {
-    // Strip path to a short readable label without regex — TS template literals
-    // eat regex escape sequences, so we use plain string methods. Distinguishes
-    // EN/DE with a "(de)" suffix and labels the index pages explicitly.
-    var raw = String(row.path || '');
-    var isDe = raw.indexOf('/de/') === 0;
-    var p = isDe ? raw.slice(4) : (raw.charAt(0) === '/' ? raw.slice(1) : raw);
-    var prefix = '';
-    var bucket = '';
-    if (p.indexOf('figures/') === 0) { p = p.slice(8); bucket = 'figures'; }
-    else if (p === 'figures') { p = ''; bucket = 'figures'; }
-    else if (p.indexOf('themes/') === 0) { p = p.slice(7); prefix = '~'; bucket = 'themes'; }
-    else if (p === 'themes') { p = ''; prefix = '~'; bucket = 'themes'; }
-    if (p.length > 0 && p.charAt(p.length - 1) === '/') p = p.slice(0, -1);
-    var label;
-    if (p === '') {
-      if (bucket === 'themes') label = 'all themes';
-      else if (bucket === 'figures') label = 'all figures';
-      else label = raw || '/';
-    } else {
-      label = prefix + p;
-    }
-    if (isDe) label += ' (de)';
-    return { label: label, c: row.c };
+    return { label: pathLabel(row.path), c: row.c };
   });
   html += chartCard('Top Marketing Pages', topMarketingItems.length > 0 ? barsHtml(topMarketingItems, '#9B7BC7') : '<div class="empty-state" style="padding:20px 0">No marketing arrivals yet ' + RANGE_LABEL[S.range] + '</div>', 'card-wide');
 
@@ -2716,138 +2781,264 @@ async function loadAudio() {
 
 // --- Navigation ---
 
-// ─── Ad Grants Conversions ───
+// ─── Growth: the ad engagement ladder, the consent prompt, traffic ───
 
 async function loadAdGrants() {
   var grid = document.getElementById('grid-adgrants');
   var alertsEl = document.getElementById('alerts-adgrants');
 
-  // Conversion events are GCLID-GATED: they fire only for visitors who arrive
-  // with a Google Ads gclid AND grant ad consent. With the Ad Grant paused, ~0
-  // is expected and correct. start_exploring is the earliest signal: it fires
-  // when an opted-in grant visitor accepts the on-page consent prompt or clicks
-  // a Start Exploring CTA, so it leads the conversions row below.
+  // Two row shapes live on this tab and must never be mixed.
+  //
+  // CONVERSION rows (routes/conversions.ts) are gclid-gated: they exist only
+  // for a visitor who arrived on a Google Ads click AND granted ad consent.
+  // They write index1/blob1 = event and blob2 = figureId, nothing else, so
+  // blob5 = '' is what separates them from a funnel row carrying the same
+  // name. Every conversion query below keeps that guard even where no name
+  // collision exists today, so a later funnel step cannot silently inflate a
+  // paid number.
+  //
+  // CONSENT rows (routes/funnel.ts, the ad_consent_* steps) are anonymous
+  // counters about the prompt itself: blob1 = step, blob2 = sanitized page
+  // path, blob4 = language, blob5 forced to '200'. No click id, no figure,
+  // no user dimension, by construction in the worker.
+  //
+  // mode_selected is retired as a conversion (the worker rejects it and the
+  // Ads action is deleted), so nothing here queries it any more. Its organic
+  // funnel namesake is untouched and still lives on the Engagement tab.
   var queries = [
-    // Profile Creation — current, previous (delta), sparkline
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'profile_created' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'profile_created' AND timestamp " + prevRange(), dataset: 'agora_llm' },
-    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE index1 = 'profile_created' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
-    // Mode Selected — current, sparkline, by figure. blob5 = '' keeps these
-    // gclid-only: the Wave-2 ORGANIC funnel beacon reuses the 'mode_selected'
-    // name in index1/blob1 and always writes an outcome into blob5, while the
-    // conversion rows (routes/conversions.ts) never set blob5. Without the
-    // guard, organic picks would silently inflate the paid-conversion counts.
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'mode_selected' AND blob5 = '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE index1 = 'mode_selected' AND blob5 = '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
-    { sql: "SELECT blob2 as figure, COUNT() as c FROM agora_llm WHERE index1 = 'mode_selected' AND blob5 = '' AND blob2 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY figure ORDER BY c DESC LIMIT 10", dataset: 'agora_llm' },
-    // Council Engaged — current, sparkline
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'council_engaged' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE index1 = 'council_engaged' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
-    // Geographic reach: where conversations physically come from
-    { sql: "SELECT blob7 as country, COUNT() as c FROM agora_llm WHERE blob1 IN ('chat','council','summary') AND blob5 = '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY country ORDER BY c DESC LIMIT 10", dataset: 'agora_llm' },
-    // Content reach: completions by type
-    { sql: "SELECT blob5 as type, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND (blob8 = '' OR blob8 = 'completed') AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY type ORDER BY c DESC", dataset: 'agora_llm' },
-    // Traffic volume (mixed sources, no attribution yet): page beacons + prev
+    // --- Engagement ladder, r[0..11]. Four depths in ladder order, each as
+    // current + previous (delta) + sparkline. ---
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'start_exploring' AND blob5 = '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'start_exploring' AND blob5 = '' AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE index1 = 'start_exploring' AND blob5 = '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'listened' AND blob5 = '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'listened' AND blob5 = '' AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE index1 = 'listened' AND blob5 = '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'dialogue_started' AND blob5 = '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'dialogue_started' AND blob5 = '' AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE index1 = 'dialogue_started' AND blob5 = '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'conversation_deepened' AND blob5 = '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'conversation_deepened' AND blob5 = '' AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE index1 = 'conversation_deepened' AND blob5 = '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
+    // --- Off-ladder conversions, r[12..17]. Same three-query shape. ---
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'profile_created' AND blob5 = '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'profile_created' AND blob5 = '' AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE index1 = 'profile_created' AND blob5 = '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'council_engaged' AND blob5 = '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'council_engaged' AND blob5 = '' AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE index1 = 'council_engaged' AND blob5 = '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
+    // --- Figures, r[18]. Blended across every conversion that can carry a
+    // figureId. conversation_deepened never does, so it is absent by design. ---
+    { sql: "SELECT blob2 as figure, COUNT() as c FROM agora_llm WHERE index1 IN ('listened','dialogue_started','council_engaged','start_exploring') AND blob5 = '' AND blob2 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY figure ORDER BY c DESC LIMIT 10", dataset: 'agora_llm' },
+    // --- Ad consent prompt, r[19..26]. Anonymous counters, current + previous
+    // for every step so both rates can show a percentage-point change. ---
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'ad_consent_shown' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'ad_consent_shown' AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'ad_consent_accepted' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'ad_consent_accepted' AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'ad_consent_declined' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'ad_consent_declined' AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'ad_consent_dismissed' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'ad_consent_dismissed' AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    // --- Consent breakdowns, r[27..30]. Seen and accepted by page path
+    // (blob2) and by interface language (blob4): where does the question work. ---
+    { sql: "SELECT blob2 as path, COUNT() as c FROM agora_llm WHERE blob1 = 'ad_consent_shown' AND blob2 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY path ORDER BY c DESC LIMIT 12", dataset: 'agora_llm' },
+    { sql: "SELECT blob2 as path, COUNT() as c FROM agora_llm WHERE blob1 = 'ad_consent_accepted' AND blob2 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY path ORDER BY c DESC LIMIT 12", dataset: 'agora_llm' },
+    { sql: "SELECT blob4 as language, COUNT() as c FROM agora_llm WHERE blob1 = 'ad_consent_shown' AND blob4 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY language ORDER BY c DESC", dataset: 'agora_llm' },
+    { sql: "SELECT blob4 as language, COUNT() as c FROM agora_llm WHERE blob1 = 'ad_consent_accepted' AND blob4 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY language ORDER BY c DESC", dataset: 'agora_llm' },
+    // --- Traffic, r[31..35]. Volume and geography only, no source split. ---
     { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
     { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND timestamp " + prevRange(), dataset: 'agora_llm' },
-    // Top countries by raw page arrivals (geo of all traffic, not just chatters)
     { sql: "SELECT blob7 as country, COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND blob7 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY country ORDER BY c DESC LIMIT 10", dataset: 'agora_llm' },
-    // --- D1: funnel-rate scoreboard (source-free, existing events). r[13..18],
-    // appended at the end so existing positional reads do not shift. ---
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'signup' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'signup' AND timestamp " + prevRange(), dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'entry' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'entry' AND timestamp " + prevRange(), dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'chat' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'session' AND blob5 = '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    // --- start_exploring (re-added as the funnel entry). r[19..21], appended at
-    // the end so existing positional reads do not shift. ---
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'start_exploring' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'start_exploring' AND timestamp " + prevRange(), dataset: 'agora_llm' },
-    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE index1 = 'start_exploring' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
-    // --- Device split (blob6, live from 2026-07-07). r[22..23], appended at the
-    // end so existing positional reads do not shift. blob6 != '' drops the
-    // pre-device untagged rows, mirroring the blob7 != '' country panels. ---
+    { sql: "SELECT blob7 as country, COUNT() as c FROM agora_llm WHERE blob1 IN ('chat','council','summary') AND blob5 = '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY country ORDER BY c DESC LIMIT 10", dataset: 'agora_llm' },
+    // blob6 != '' drops the pre-device untagged rows, mirroring the country panels.
     { sql: "SELECT blob6 as device, COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND blob6 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY device ORDER BY c DESC", dataset: 'agora_llm' },
-    { sql: "SELECT blob6 as device, COUNT() as c FROM agora_llm WHERE blob1 IN ('chat','council','summary') AND blob5 = '200' AND blob6 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY device ORDER BY c DESC", dataset: 'agora_llm' },
   ];
 
   var r = await batch(queries);
+  S.lastAnalytics = Date.now();
 
-  var profileConv = val(r[0]), profilePrev = val(r[1]);
-  var sparkProfile = rows(r[2]).map(function(x) { return x.c; });
-  var modeSelConv = val(r[3]);
-  var sparkModeSel = rows(r[4]).map(function(x) { return x.c; });
-  var modeByFigure = rows(r[5]);
-  var councilEngagedConv = val(r[6]);
-  var sparkCouncilEng = rows(r[7]).map(function(x) { return x.c; });
-  var topCountriesChat = rows(r[8]);
-  var playbackByType = rows(r[9]);
-  var visits = val(r[10]), visitsPrev = val(r[11]);
-  var topCountriesAll = rows(r[12]);
-  // D1 rate scoreboard inputs (r[13..18]).
-  var gSignups = val(r[13]), gSignupsPrev = val(r[14]);
-  var gEntries = val(r[15]), gEntriesPrev = val(r[16]);
-  var gChats = val(r[17]), gSessions = val(r[18]);
-  // start_exploring (r[19..21]) — the re-added funnel entry.
-  var startExpConv = val(r[19]), startExpPrev = val(r[20]);
-  var sparkStartExp = rows(r[21]).map(function(x) { return x.c; });
-  // Device split (r[22..23]) — arrivals and conversations by device class.
-  var deviceArrivals = rows(r[22]);
-  var deviceChats = rows(r[23]);
+  // Ladder (r[0..11]).
+  var startExp = val(r[0]), startExpPrev = val(r[1]);
+  var sparkStartExp = rows(r[2]).map(function(x) { return x.c; });
+  var listened = val(r[3]), listenedPrev = val(r[4]);
+  var sparkListened = rows(r[5]).map(function(x) { return x.c; });
+  var dialogues = val(r[6]), dialoguesPrev = val(r[7]);
+  var sparkDialogues = rows(r[8]).map(function(x) { return x.c; });
+  var deepened = val(r[9]), deepenedPrev = val(r[10]);
+  var sparkDeepened = rows(r[11]).map(function(x) { return x.c; });
+  // Off-ladder conversions (r[12..17]).
+  var profileConv = val(r[12]), profilePrev = val(r[13]);
+  var sparkProfile = rows(r[14]).map(function(x) { return x.c; });
+  var councilConv = val(r[15]), councilPrev = val(r[16]);
+  var sparkCouncil = rows(r[17]).map(function(x) { return x.c; });
+  // Figures (r[18]).
+  var figuresByEngagement = rows(r[18]);
+  // Consent counters (r[19..26]).
+  var cShown = val(r[19]), cShownPrev = val(r[20]);
+  var cAccept = val(r[21]), cAcceptPrev = val(r[22]);
+  var cDecline = val(r[23]), cDeclinePrev = val(r[24]);
+  var cDismiss = val(r[25]), cDismissPrev = val(r[26]);
+  // Consent breakdowns (r[27..30]).
+  var shownByPath = rows(r[27]), acceptByPath = rows(r[28]);
+  var shownByLang = rows(r[29]), acceptByLang = rows(r[30]);
+  // Traffic (r[31..35]).
+  var visits = val(r[31]), visitsPrev = val(r[32]);
+  var topCountriesAll = rows(r[33]);
+  var topCountriesChat = rows(r[34]);
+  var deviceArrivals = rows(r[35]);
 
-  // Modes picked per ad-profile, within the gclid population only, gated for n.
-  var modeFromProfile = multiplierOrDash(modeSelConv, profileConv, 5);
+  // A decision is a yes or a no. Closing the card is not an answer, so it stays
+  // out of the decisions denominator and gets its own share instead.
+  var cDecisions = cAccept + cDecline;
+  var cDecisionsPrev = cAcceptPrev + cDeclinePrev;
+  // Seen but never answered. Clamped: the beacons are independent, so an accept
+  // that beats its own shown beacon (a click inside the first second, a lost
+  // sendBeacon) can push this below zero without anything being wrong.
+  var cNoAnswer = Math.max(0, cShown - cAccept - cDecline - cDismiss);
 
-  alertsEl.innerHTML = '';
+  alertsEl.innerHTML = S.fetchError
+    ? '<div class="alert-card a-err">Stats API unreachable. The numbers below are stale or absent, not real zeros. Retry in a moment.</div>'
+    : '';
 
   var html = '';
 
-  // Funnel rates moved to Overview (rendered beside the funnel counts, where the
-  // rates-with-targets belong). Growth now opens on what is unique to it: the
-  // gclid-gated Google Ads conversions and the traffic anatomy.
-
-  // ── GOOGLE ADS CONVERSIONS (gclid-gated) ──
-  html += '<div class="section-divider">Google Ads Conversions</div>';
+  // ── ENGAGEMENT LADDER (gclid-gated conversions) ──
+  html += '<div class="section-divider">Engagement ladder &middot; Google Ads conversions</div>';
   // Persistent scope banner so a row of zeros never reads as a product failure.
-  html += '<div class="hint-banner">These count only visitors who arrive with a Google Ads gclid and grant ad consent. The consent gate caps this at the accept rate, so low numbers are structural, not a funnel failure. Paid campaigns (?p=1) run on clicks only and never appear here. Organic and Spotify traffic never appears in this section.</div>';
-  html += '<div class="grid">';
-  html += kpi('Start Exploring', startExpConv, { hero: true, spark: sparkStartExp, sparkColor: '#5B8BD4', delta: startExpPrev, sub: 'opted-in ad visitor accepted the consent prompt or clicked a Start Exploring CTA' });
-  html += kpi('Profile Conversions', profileConv, { spark: sparkProfile, sparkColor: '#68C397', delta: profilePrev, sub: 'welcome disclosure accepted (consent given, Begin clicked)' });
-  html += kpi('Mode Selected', modeSelConv, { spark: sparkModeSel, sparkColor: '#E6BC5C', sub: 'first mode pick (Story / Wisdom / Talk / Quest / Freetalk)' });
-  html += kpi('Council Engaged', councilEngagedConv, { spark: sparkCouncilEng, sparkColor: '#9D83CD', sub: '60s of a council heard (curated or custom)' });
-  html += kpi('Modes / Profile', modeFromProfile, { sub: modeFromProfile === '--' ? 'within ad visitors (need 5+ profiles)' : 'modes picked per ad-profile' });
+  html += '<div class="hint-banner">Only visitors who arrive with a Google Ads gclid and grant ad consent are counted here, so the consent gate caps every number on this tab and low is structural, not a funnel failure. The four rungs are depths, not gates: Listened happens on the marketing pages while both dialogue events happen in the app, so someone can start a dialogue without ever listening. All six conversions are secondary actions in August, building the history September value bidding will run on. Mode Selected is retired as a conversion and gone from this tab, while its organic counter on Engagement keeps running. Paid campaigns (?p=1) run on clicks only, and organic traffic never appears here at all.</div>';
 
-  if (modeByFigure.length > 0) {
-    html += chartCard('Top Figures by Engagement', barsHtml(modeByFigure.map(function(r) { return { label: cap(r.figure), c: r.c }; }), '#E6BC5C'), 'card-wide');
+  // The ladder itself: one shared axis, ghost bars for the previous period.
+  var ladderRungs = [
+    { label: 'Start Exploring', value: startExp, prev: startExpPrev, sub: 'consent given', spark: sparkStartExp, sparkColor: '#5B8BD4', pending: 'start_exploring' },
+    { label: 'Listened', value: listened, prev: listenedPrev, sub: '30s of audio', spark: sparkListened, sparkColor: '#E6BC5C', pending: 'listened' },
+    { label: 'Dialogue', value: dialogues, prev: dialoguesPrev, sub: 'first message', spark: sparkDialogues, sparkColor: '#68C397', pending: 'dialogue_started' },
+    { label: 'Deepened', value: deepened, prev: deepenedPrev, sub: 'third message', spark: sparkDeepened, sparkColor: '#9D83CD', pending: 'conversation_deepened' },
+  ];
+  // Deepened is the one true subset on this ladder (a third message implies a
+  // first), so it is the only place a rate is honest. Same small-base rule as
+  // everywhere else: raw counts under 20, a percentage above it.
+  var deepenLine;
+  if (dialogues === 0) {
+    // A deepen without its own dialogue start is possible (consent arriving
+    // mid-conversation lets the third message send while the first could not),
+    // so say that rather than print a fraction over zero.
+    deepenLine = deepened > 0
+      ? 'Third-message depth: ' + fmt(deepened) + ' deepened with no dialogue start recorded, which is what consent arriving mid-conversation looks like.'
+      : 'Third-message depth: no dialogues started ' + RANGE_LABEL[S.range] + '.';
+  } else if (dialogues < 20) {
+    deepenLine = 'Third-message depth: ' + fmt(deepened) + ' of ' + fmt(dialogues) + ' dialogues reached a third message (small base, raw counts).';
+  } else {
+    deepenLine = 'Third-message depth: ' + Math.round(deepened / dialogues * 100) + '% (' + fmt(deepened) + ' of ' + fmt(dialogues) + ' dialogues).';
   }
+  var ladderLegend = '<div class="fbar-legend">' +
+    '<span class="swatch" style="background:var(--gold-subtle)"></span> this ' + RANGE_LABEL[S.range] +
+    '<span class="swatch" style="background:color-mix(in srgb, var(--gold-deep) 22%, transparent);margin-left:10px"></span> previous period (ghost)' +
+    '</div>';
+  var ladderNote = '<div style="margin-top:8px;font-size:11px;color:var(--dim);line-height:1.4">' +
+    'Start Exploring fires when an ad visitor accepts the consent prompt or clicks a Start Exploring CTA. ' +
+    'Listened is 30 seconds of audio played on the marketing pages. Dialogue is the first message sent in the app. ' +
+    'Deepened is the third message in the same conversation. ' +
+    'Read the bars as depth reached, never as drop-off. ' + deepenLine + ' ' +
+    'All four are secondary actions in August, so they steer no bidding yet. They go primary on September 1 with value bidding, weighted so a deepened conversation counts for far more than a listen.' +
+    '</div>';
+  html += chartCard('How deep ad visitors get', ladderHtml(ladderRungs) + ladderLegend + ladderNote, 'card-full');
+
+  // ── OFF-LADDER CONVERSIONS ──
+  html += '<div class="section-divider">Other ad conversions</div>';
+  html += '<div class="grid">';
+  html += kpi('Profile Created', profileConv, { spark: sparkProfile, sparkColor: '#68C397', delta: profilePrev, sub: 'welcome disclosure accepted (consent given, Begin clicked)' });
+  html += kpi('Council Engaged', councilConv, { spark: sparkCouncil, sparkColor: '#9D83CD', delta: councilPrev, sub: '60s of a council heard (curated or custom)' });
+  // The volume Google Ads actually receives. Six events of very different
+  // depth, every one weighted the same in this sum, which is precisely the
+  // flattening that September value bidding exists to undo.
+  var allConv = startExp + listened + dialogues + deepened + profileConv + councilConv;
+  var allConvPrev = startExpPrev + listenedPrev + dialoguesPrev + deepenedPrev + profilePrev + councilPrev;
+  html += kpi('All Ad Conversions', allConv, { delta: allConvPrev, sub: 'the six events summed, weighted the same here and secondary all August' });
+  html += chartCard('Top Figures by Ad Engagement',
+    barsHtml(figuresByEngagement.map(function(x) { return { label: cap(x.figure), c: x.c }; }), '#E6BC5C') +
+    '<div class="kpi-sub" style="margin-top:6px;display:block">Listened, dialogue, council and start events that carried a figure. Deepened never carries one.</div>',
+    'card-wide');
   html += '</div>';
 
-  // Instrumentation health — demoted from the old all-green status board (which
-  // read as failure next to a row of zeros) to one quiet line. The plumbing
-  // being wired says nothing about whether anyone converted.
-  html += '<div class="insight" style="padding:8px 2px 0">Instrumentation wired (not live-checked): gclid capture, profile / mode / council / start_exploring events, the CF worker, and Google Ads CAPI forwarding. Wiring being in place says nothing about whether anyone converted.</div>';
+  // Instrumentation health — one quiet line. The plumbing being wired says
+  // nothing about whether anyone converted.
+  html += '<div class="insight" style="padding:8px 2px 0">Instrumentation wired (not live-checked): gclid capture, the four consent counters, the start / listened / dialogue / deepened / profile / council conversions, the CF worker, and Google Ads CAPI forwarding. Wiring being in place says nothing about whether anyone converted.</div>';
+
+  // ── AD CONSENT PROMPT ──
+  // The gate in front of every number above. Two rates, always together: the
+  // accept-of-seen rate moves mechanically whenever the prompt starts appearing
+  // more often, the accept-of-decisions rate does not.
+  html += '<div class="section-divider">Ad consent prompt</div>';
+  html += '<div class="hint-banner">Seen counts only cards that sat at least half in view for a full second, so the denominator means plausibly seen, not merely rendered. Both accept rates are shown on purpose. Accepts over seen moves whenever the prompt starts appearing more often, accepts over decisions does not, so a change in one and not the other tells you which happened. Closing the card is not a decision, so it gets its own share.</div>';
+  html += '<div class="grid">';
+  html += kpi('Prompt Seen', cShown, { hero: true, delta: cShownPrev, sub: 'half the card in view for a full second' });
+  html += '<div class="card card-wide">' + engagementPoolHtml(
+    'What they answered (one visitor, one answer)',
+    [
+      { label: 'Accepted', value: cAccept, sub: 'measurement on' },
+      { label: 'Declined', value: cDecline, sub: 'measurement off' },
+      { label: 'Dismissed', value: cDismiss, sub: 'closed the card' },
+      { label: 'No answer', value: cNoAnswer, sub: 'left it open' },
+    ],
+    'No answer is what is left of Seen once the three answers are counted, so it reads 0 when the beacons land out of order.'
+  ) + '</div>';
+  html += rateCard('Accepts / seen', cAccept, cShown, cAcceptPrev, cShownPrev, { sub: fmt(cAccept) + ' of ' + fmt(cShown) + ' seen' });
+  html += rateCard('Accepts / decisions', cAccept, cDecisions, cAcceptPrev, cDecisionsPrev, { sub: fmt(cAccept) + ' of ' + fmt(cDecisions) + ' yes-or-no answers' });
+  html += rateCard('Dismiss share', cDismiss, cShown, cDismissPrev, cShownPrev, { invert: true, sub: 'closed the card without answering' });
+  html += consentTable('Language', shownByLang, acceptByLang, 'language', function(v) {
+    return v === 'de' ? 'Deutsch' : v === 'en' ? 'English' : cap(v || 'unknown');
+  }, '');
+  html += consentTable('Page', shownByPath, acceptByPath, 'path', pathLabel, 'card-wide');
+  html += '</div>';
 
   // ── TRAFFIC (mixed sources) ──
   html += '<div class="section-divider">Traffic (mixed sources)</div>';
   html += '<div class="grid">';
   html += kpi('Raw Visits', visits, { hero: true, delta: visitsPrev, sub: 'page loads, mixed: ads + organic + bots' });
   html += '<div class="card card-wide"><div class="kpi-label">No source split, by design</div><div style="margin-top:8px;font-size:0.8125rem;color:var(--tx2);line-height:1.5">We deliberately do not record where a visit came from (no utm tags, no referrer profiling), so this stays inside the no-tracking, no-profiling promise. Channel performance is judged on each platform\\'s own console (Google Ads, Search Console, Spotify, Reddit), not here. This view shows volume and geography only.</div></div>';
+  // The three geography and device panels sit one row across rather than each
+  // taking two of three columns and leaving a hole beside it.
   var countryAllItems = aggregateByLabel(topCountriesAll.map(function(r) { return { label: r.country || 'Unknown', c: r.c }; }));
-  html += chartCard('Top Countries (all visits)', barsHtml(countryAllItems, '#9B7BC7'), 'card-wide');
+  html += chartCard('Top Countries (all visits)', barsHtml(countryAllItems, '#9B7BC7'), '');
   var countryChatItems = aggregateByLabel(topCountriesChat.map(function(r) { return { label: r.country || 'Unknown', c: r.c }; }));
-  html += chartCard('Top Countries (conversations)', barsHtml(countryChatItems, '#5B8BD4'), 'card-wide');
+  html += chartCard('Top Countries (conversations)', barsHtml(countryChatItems, '#5B8BD4'), '');
   // Device share-vs-share moved to Overview (beside the funnel, where the
   // activation question lives). Growth keeps the raw arrivals bar for symmetry
   // with Top Countries.
   var deviceArrivalItems = aggregateByLabel(deviceArrivals.map(function(r) { return { label: cap(r.device || 'unknown'), c: r.c }; }));
-  html += chartCard('Device (all visits)', barsHtml(deviceArrivalItems, 'var(--s-wisdom)'), 'card-wide');
+  html += chartCard('Device (all visits)', barsHtml(deviceArrivalItems, 'var(--s-wisdom)'), '');
   html += '</div>';
 
   // Content Reach removed: "Completions by Type" was SQL-identical to the
   // Engagement tab's "By Type" panel. Content consumption lives on Engagement.
 
   grid.innerHTML = html;
+  document.getElementById('updated-adgrants').textContent = 'Updated ' + now();
+}
+
+// Consent prompt seen-vs-accepted, joined on one dimension (page path or
+// language). Two independent counters, so the join happens here rather than in
+// SQL. The per-row rate follows the same small-base rule as everywhere else:
+// under 20 cards seen there is no rate worth printing, and the raw Seen and
+// Accepted columns already carry the honest version.
+function consentTable(dimLabel, shownRows, acceptRows, key, labelFn, cls) {
+  var floor = 20;
+  var accMap = {};
+  (acceptRows || []).forEach(function(x) { if (x[key]) accMap[x[key]] = Number(x.c) || 0; });
+  var body = (shownRows || []).filter(function(x) { return x[key]; }).map(function(x) {
+    var seen = Number(x.c) || 0;
+    var acc = accMap[x[key]] || 0;
+    return [
+      esc(labelFn(x[key])),
+      fmt(seen),
+      fmt(acc),
+      seen >= floor ? Math.round(acc / seen * 100) + '%' : '--',
+    ];
+  });
+  var caption = '<div class="kpi-sub" style="margin-top:6px;display:block">Accepts over seen, hidden under ' + floor + ' seen.</div>';
+  return chartCard('Consent by ' + dimLabel.toLowerCase(),
+    tableHtml([dimLabel, 'Seen', 'Accepted', 'Accepts / seen'], body) + caption, cls);
 }
 
 function switchTab(tab) {
