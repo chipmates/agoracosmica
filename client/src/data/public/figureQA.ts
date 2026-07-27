@@ -1,7 +1,7 @@
 // Answer-first FAQ capsules per figure. Drafted from verified keyConcepts /
 // primaryWorks / entity data, web-fact-checked, bilingual. Drives BOTH the
 // on-page capsule and the FAQPage JSON-LD so DOM and schema always match.
-// AWAITING MICHEL VOICE PASS before deploy (kernel-and-Michel rule).
+// AWAITING EDITORIAL VOICE PASS before deploy.
 export interface QAPair { q: string; a: string; }
 export interface FigureQAEntry { pairs: QAPair[]; disclosure: QAPair; }
 
