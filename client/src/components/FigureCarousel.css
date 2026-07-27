@@ -1,48 +1,25 @@
 :root {
-  --primary-color: var(--bg-card); --secondary-color: var(--gold-subtle); --accent-color: var(--mode-quest);
-  --text-color: var(--cosmic-text-primary); --max-desktop-width:2250px;
-  
+  --primary-color: var(--bg-card); --secondary-color: var(--gold-subtle);
+  --text-color: var(--cosmic-text-primary);
+
   /* Safe area variables handled globally in viewport-fixes.css */
 
   /* Desktop dynamic sizing */
   --desktop-sidebar-width: clamp(280px, 18vw, 380px); /* Increased min width for button text */
   --desktop-miniature-size: clamp(80px, min(6.5vw, 12vh), 112px); /* Reduced by 20% for more spacing */
-  --desktop-miniature-gap: clamp(4px, 0.5vw, 8px); /* Deprecated - using row/column gap now */
-  --desktop-action-gap: clamp(12px, 1.5vw, 20px);
 
   /* Action button sizing - Golden ratio based */
   --desktop-button-height: clamp(44px, 5vh, 56px);
   --desktop-button-gap: clamp(12px, 1.5vh, 20px);
   --desktop-button-padding-x: clamp(24px, 2.5vw, 36px); /* Increased for text space */
-  --desktop-button-font-size: clamp(0.9375rem, 0.9375rem + 0.2vw, 1.0625rem); /* 15px to 17px for better fit */
   --desktop-icon-size: clamp(18px, 1.5vw, 22px); /* Slightly smaller max icon */
-  
+
   /* 2025 STATE-OF-THE-ART: Dynamic viewport height for complete screen usage */
   --figure-container-height: 100dvh;
   --figure-container-fallback: 100vh;
-  
-  /* Advanced image optimization variables */
-  --image-aspect-preference: auto; /* Dynamic based on container */
-  --image-scale-factor: 1;
-  --image-priority-loading: high;
 }
 
 /* FIXED: Renamed class from .main-content to .carousel-content-area to avoid CSS namespace collision with HomePage */
-
-/* FADE/ZOOM KEYFRAMES */
-/* Removed fade animations */
-@keyframes fadeInOverlay {
-  0% { opacity:1; }
-  100%{ opacity:1; }
-}
-@keyframes fadeInContent {
-  0% {
-    opacity:1; transform:scale(1);
-  }
-  100% {
-    opacity:1; transform:scale(1);
-  }
-}
 
 .figure-carousel {
   /* Plate ink recipe (matches Atlas.css), available at every breakpoint */
@@ -68,23 +45,9 @@
   padding-left: env(safe-area-inset-left, 0px);
   padding-right: env(safe-area-inset-right, 0px);
   box-sizing: border-box;
-
-  animation: none;
 }
-.figure-carousel.extra-large-screen { 
+.figure-carousel.extra-large-screen {
   background: var(--primary-deep);
-}
-
-/* Blurred background for liquid glass overlay effect */
-.figure-carousel.blurred-background {
-  filter: blur(3px);
-  transform: scale(1.02);
-  transition: all 0.6s cubic-bezier(0.23, 1, 0.320, 1);
-}
-
-/* Prevent interaction when blurred */
-.figure-carousel.blurred-background * {
-  pointer-events: none;
 }
 
 .categories-section {
@@ -98,13 +61,6 @@
   max-width: 340px; /* Increased from 320px for 6% more width on mobile */
   margin: 0 auto; /* Center the container */
 }
-
-/* CategoryTab specific styles */
-.figure-category-tab {
-  /* Buttons use flex: 1 from CategoryTab.module.css */
-  /* This ensures equal width distribution */
-}
-/* Old category-button styles - no longer used */
 
 /* MINIATURES - Mobile: Single horizontal scroll row (2025 pattern) */
 .miniatures-section {
@@ -147,7 +103,7 @@
   height: 100%;
   background: linear-gradient(to right, transparent 0%, var(--primary-deep) 85%);
   pointer-events: none; /* Don't block clicks */
-  z-index: var(--z-base); /* 2 - Above miniatures */
+  z-index: var(--z-base); /* token value is 0 */
 }
 .miniature {
   width: 70px; /* Increased from 65px - we have more space now */
@@ -169,22 +125,6 @@
   transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
   transform-style: preserve-3d;
   will-change: transform;
-}
-
-/* Minimal Quantum Glow effect - State-of-the-art 2025 */
-.miniature::after {
-  content: '';
-  position: absolute;
-  inset: -5px;
-  background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), 
-    color-mix(in srgb, var(--gold-subtle) var(--a-70), transparent) 0%, 
-    color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent) 40%,
-    transparent 70%);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  border-radius: 20px;
-  pointer-events: none;
-  z-index: var(--z-base); /* 1 */
 }
 
 /* Touch-friendly: scale-only feedback on mobile tap — no gold glow. */
@@ -211,7 +151,7 @@
   position: absolute;
   top: 0;
   left: 0;
-  z-index: var(--z-base); /* 2 */ /* Above the glow effect */
+  z-index: var(--z-base); /* token value is 0 */
   transition: transform 0.4s cubic-bezier(0.23, 1, 0.320, 1);
 }
 /* Active mat: gold double ring (the ember ring belongs to quest mode) */
@@ -282,10 +222,6 @@
   /* PERFORMANCE OPTIMIZATION */
   content-visibility: auto;
   contain: layout style;
-  /* LOADING OPTIMIZATION */
-  loading: eager;
-  fetchpriority: "high";
-  decoding: "sync";
 }
 .info-overlay {
   position: absolute;
@@ -305,7 +241,7 @@
   transition: background 0.3s cubic-bezier(0.23, 1, 0.320, 1);
   /* ENSURE IT DOESN'T INTERFERE WITH IMAGE HEIGHT */
   pointer-events: auto;
-  z-index: var(--z-base); /* 10 */
+  z-index: var(--z-base); /* token value is 0 */
 }
 
 /* EXPANDED STATE: deeper feathered veil, no blur (frost edges cut faces) */
@@ -362,19 +298,6 @@
   text-shadow: 0 1px 2px color-mix(in srgb, var(--utility-pure-black) var(--a-40), transparent);
 }
 
-/* Golden tags styling - enhanced specificity for centering */
-.figure-carousel .golden-tags {
-  color: var(--secondary-color); /* Golden color */
-  font-family: var(--ui-font-family); /* Space Grotesk for tags */
-  font-size: 0.8125rem; /* 13px - balanced base size */
-  font-weight: 500;
-  letter-spacing: 0.04em; /* Slightly reduced for better fit */
-  text-transform: uppercase;
-  text-shadow: 0 0 8px color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent);
-  margin-top: 0.5rem;
-  text-align: center; /* Component-specific centering without forcing */
-}
-
 /* Mobile/tablet: cap the reading block so the expanded overlay never climbs
    over the face — long German about-texts scroll inside instead. */
 @media (max-width: 1024px) {
@@ -393,11 +316,6 @@
     line-height: 1.72; /* Balanced between 1.7 and 1.75 */
     padding: 0 8px; /* Breathing room */
   }
-
-  .figure-carousel .golden-tags {
-    font-size: 0.75rem; /* 12px - fits better without being cramped */
-    letter-spacing: 0.03em;
-  }
 }
 
 /* ACTIONS */
@@ -410,27 +328,6 @@
 }
 
 /* REMOVED: All glow effects and hover states */
-
-/* Ensure button content stays on one line */
-.actions-section .ripple-button .ripple-button-content {
-  white-space: nowrap;
-  display: flex;
-  align-items: center;
-  gap: clamp(6px, 0.8vw, 10px);
-}
-
-/* ACTIONS - Base styles for mobile/tablet */
-@media (max-width: 1023px) {
-  .actions-section {
-    display: flex;
-    justify-content: space-around;
-    padding: 12px;
-    padding-bottom: 12px;
-    gap: 10px; /* Reduced gap to provide more space for buttons */
-    background-color: var(--primary-deep);
-    margin-bottom: 0;
-  }
-}
 
 /* Tablet and Desktop category adjustments */
 @media (min-width: 768px) {
@@ -496,69 +393,27 @@
     transform-style: preserve-3d;
   }
   
-  /* Fallback for browsers without CSS custom properties */
-  @supports not (width: var(--miniature-size)) {
-    .miniature {
-      width: 85px;
-      height: 85px;
-    }
-  }
   /* Simple active state for tablet */
   .miniature.active {
     border: 1px solid color-mix(in srgb, var(--gold-primary) 85%, transparent);
     outline: 1px solid color-mix(in srgb, var(--gold-deep) 45%, transparent);
     outline-offset: 2px;
   }
-  .tablet-main-content { 
-    flex-grow: 1; 
-    display: flex; 
+  /* Tablet-specific: NO PADDING/MARGINS, full height */
+  .tablet-main-content {
+    flex-grow: 1;
+    display: flex;
     flex-direction: column;
     background-color: var(--primary-deep);
     width: calc(100% - 140px); /* Full width minus sidebar width */
-    padding: 0; /* Remove padding */
-    margin: 0; /* Remove margins */
-  }
-  /* ULTRATHINK: TABLET 100% HEIGHT OPTIMIZATION */
-  .main-image-section { 
-    flex: 1 1 auto; /* Take ALL remaining space */
-    position: relative;
-    /* ZERO GAPS */
-    padding: 0;
-    margin: 0;
-    border: 0;
-    /* ABSOLUTE FILL */
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-  }
-  
-  /* Tablet-specific: NO PADDING/MARGINS */
-  .tablet-main-content {
-    width: calc(100% - 140px);
     /* ZERO GAPS */
     padding: 0;
     margin: 0;
     border: 0;
     /* FULL HEIGHT */
     height: 100%;
-    display: flex;
-    flex-direction: column;
   }
-  
-  /* TABLET: Absolute positioning for perfect fill */
-  .main-image-section .figure-image-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    padding: 0;
-    margin: 0;
-    border: 0;
-    width: 100%;
-    height: 100%;
-  }
-  
+
   /* TABLET: Override mobile cover with contain - show complete images */
   .figure-carousel .main-image-section .figure-image-container .optimized-image__img,
   .figure-carousel .main-image-section .figure-image-container .figure-image,
@@ -599,10 +454,6 @@
     .miniature {
       --miniature-size: min(68px, calc(var(--available-height) / 13.5));
     }
-    
-    .miniatures-section {
-      padding: 4px 2px;
-    }
   }
 }
 
@@ -638,12 +489,6 @@
     display: flex;
     flex-direction: column;
   }
-  
-  /* Ensure image fills available space */
-  .main-image-section {
-    width: 100%;
-    height: 100%;
-  }
 }
 
 /* Desktop category adjustments */
@@ -674,8 +519,7 @@
     display: flex;
     height: 100%;
     width: 100%;
-    /* ULTRATHINK: Remove max-width to allow image-driven expansion */
-    /* max-width: var(--max-desktop-width); - REMOVED for height-first scaling */
+    /* ULTRATHINK: no max-width, so the image drives horizontal expansion */
     min-width: 100%; /* Use full available width, not viewport width */
     /* Container for height-first image scaling */
     position: relative;
@@ -826,52 +670,21 @@
     /* PERFORMANCE */
     content-visibility: auto;
     contain: layout style;
-    /* LOADING */
-    loading: eager;
-    fetchpriority: "high";
-    decoding: "sync";
-    /* IMAGE QUALITY */
-    image-rendering: high-quality;
     /* Safari-specific image fixes */
     -webkit-backface-visibility: hidden;
     -webkit-transform: translateZ(0);
     /* Ensure crisp display */
     image-rendering: -webkit-optimize-contrast;
   }
-  
-  /* Loading state for images */
-  .figure-image.loading,
-  .optimized-image.loading {
-    opacity: 0;
-  }
-  
+
   /* REMOVED: All hover zoom effects */
-  
-  /* ULTRATHINK: Info overlay for height-first layout */
-  .info-overlay {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    width: 100%; /* Full width of image */
-    transform: none;
-    z-index: var(--z-base); /* 10 */
-    /* Inherits gradient background from base rule - subtle vignette when collapsed */
-    /* Transitions to solid background when expanded via :has() selector */
-    padding: 20px 30px; /* Better padding for desktop */
-  }
-  
+
   /* Constrain text width for readability on large screens */
   .info-overlay h2 {
     max-width: 800px; /* Reasonable reading width */
     margin: 0 auto; /* Center the text block */
   }
-  
-  .info-overlay p {
-    max-width: 700px; /* Slightly narrower for better readability */
-    margin: 10px auto 0; /* Center the text block */
-  }
-  
+
   /* Right sidebar with dynamic spacing */
   .right-sidebar {
     display: flex;
@@ -889,61 +702,17 @@
     align-items: stretch;
   }
 
-  /* Responsive button styling */
-  .actions-section .ripple-button {
-    height: var(--desktop-button-height);
-    min-height: 44px; /* Accessibility minimum */
-    padding: 0 var(--desktop-button-padding-x);
-    /* Font size handled by Button component's responsive sizing */
-    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  }
-  
-  /* Icon sizing within buttons */
-  .actions-section .ripple-button svg {
-    width: var(--desktop-icon-size);
-    height: var(--desktop-icon-size);
-  }
-  
   /* REMOVED: All hover and active scaling effects */
-  
   /* Font sizes now handled by responsive clamp() values in base styles */
-  .info-overlay {
-    /* Desktop-specific positioning adjustments only */
-  }
 }
 
-/* 2025 STATE-OF-THE-ART: Container-based optimizations */
-@container figure-carousel (max-height: 750px) {
-  /* Use container queries instead of viewport for better precision */
-  .categories-section {
-    padding: 6px 8px;
-  }
-  
-  .miniatures-section {
-    --base-gap: 4px;
-    padding: 4px;
-  }
-  
-  /* Intelligent size reduction for constrained containers */
-  :root {
-    --desktop-miniature-size: clamp(64px, min(5.6vw, 10vh), 88px);
-    --desktop-button-height: clamp(36px, 4vh, 44px);
-    --desktop-button-gap: clamp(8px, 1vh, 14px);
-    /* Button font sizes handled by component responsive sizing */
-    --desktop-icon-size: clamp(16px, 1.3vw, 20px);
-    --image-scale-factor: 0.98; /* Slightly smaller for tight spaces */
-  }
-}
-
-/* Legacy media query fallback */
+/* Height-constrained desktop: tighten the sidebar rails */
 @media (min-width: 1025px) and (max-height: 750px) {
-  /* Fallback for browsers without container query support */
   .categories-section {
     padding: 6px 8px;
   }
-  
+
   .miniatures-section {
-    --base-gap: 4px;
     padding: 4px;
   }
 }
@@ -994,18 +763,7 @@
   .figure-image,
   .optimized-image {
     image-rendering: high-quality;
-    /* SAFETY: Prevent extreme horizontal expansion */
-    max-width: calc(100vw - var(--desktop-sidebar-width) * 2);
   }
-  
-  /* ULTRA-WIDE OPTIMIZATION: Very wide images get horizontal scroll */
-  .carousel-content-area {
-    /* Enable smooth horizontal scrolling for very wide images */
-    scroll-behavior: smooth;
-    scrollbar-width: thin;
-  }
-  
-  /* Global purple scrollbar will be inherited automatically */
 }
 
 /* ULTRATHINK: EXTRA LARGE DESKTOP - HEIGHT-FIRST OPTIMIZATION */
@@ -1019,13 +777,6 @@
     box-shadow: 0 0 50px color-mix(in srgb, var(--utility-pure-black) var(--a-40), transparent), 0 0 0 1px color-mix(in srgb, var(--gold-subtle) var(--a-15), transparent);
     /* ENSURE HEIGHT-FIRST SCALING EVEN ON MASSIVE SCREENS */
     max-width: none; /* Allow unlimited width for full-height images */
-  }
-  
-  /* Ultra-wide image handling for massive displays */
-  .figure-image,
-  .optimized-image {
-    /* On ultra-large screens, remove width constraints entirely */
-    max-width: none;
   }
 }
 
@@ -1103,32 +854,11 @@
       height: 100%;
       justify-content: center;
     }
-    
-    .right-sidebar .actions-section .ripple-button {
-      width: 100%; /* Full width in sidebar */
-      flex: 0 0 auto; /* Don't flex, maintain natural height */
-      min-height: var(--desktop-button-height);
-      padding: 0 clamp(16px, 1.5vw, 24px); /* Responsive padding */
-      font-size: clamp(0.9375rem, 0.9375rem + 0.2vw, 1.0625rem); /* Slightly smaller font if needed */
-    }
-    
-    /* Ensure button text stays on one line */
-    .right-sidebar .ripple-button-content {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      gap: 8px; /* Smaller gap between icon and text */
-    }
   }
 }
 
 /* SMALL < 400px */
 @media(min-width:1px) and (max-width:400px){
-  /* Small mobile adjustments - safe areas handled by base rule */
-  .figure-carousel {
-    /* Small mobile styling handled by base rule */
-  }
-
   .miniature {
     width: 65px; /* Slightly smaller on very small screens */
     height: 65px;
@@ -1159,32 +889,12 @@
     padding: 8px 0 4px 0; /* Ultra-tight bottom padding - closer to miniatures */
     max-width: 100%; /* Allow full width on very small screens */
   }
-  /* Ensure buttons have minimum width to fit content properly */
-  .actions-section .ripple-button {
-    min-width: 90px; /* Minimum width for buttons to prevent text wrapping */
-  }
-  
-  /* Ensure button content (text) doesn't wrap */
-  .actions-section .ripple-button-content {
-    white-space: nowrap;
-  }
-  
+
   /* Optimize info-overlay spacing for mobile to fit longer German descriptions */
   .info-overlay {
     padding: 8px 10px 4px 10px; /* Significantly reduced all padding */
   }
-  
-  .info-overlay h2 {
-    margin-bottom: 0; /* Remove any default margin */
-  }
-  
-  .info-overlay p {
-    margin-top: 4px; /* Minimal gap between title and description */
-    margin-bottom: 0; /* Remove bottom margin */
-    line-height: 1.5; /* Maintain readability */
-    /* Ensure efficient use of space without sacrificing readability */
-  }
-  
+
   /* ULTRATHINK: Reduce gap between image and buttons to give more space for content */
   .actions-section {
     margin-top: -6px; /* Moderate pull to avoid overlapping buttons */
@@ -1201,22 +911,9 @@
 
 /* MEDIUM MOBILE 401-768px */
 @media(min-width:401px) and (max-width:768px){
-  /* Mobile-specific adjustments - safe areas handled by base rule */
-  .figure-carousel {
-    /* Mobile styling handled by base rule */
-  }
-
   /* Ultra-tight spacing for maximum portrait space - 2025 mobile-first pattern */
   .categories-section {
     padding: 10px 0 6px 0; /* Ultra-tight bottom padding - closer to miniatures */
-  }
-
-  .miniatures-section {
-    padding: 8px 12px; /* Horizontal padding for edge spacing */
-    gap: 6px; /* Consistent spacing */
-    height: 86px; /* 70px miniature + 16px padding */
-    min-height: 86px;
-    align-items: center; /* Vertically center miniatures */
   }
 
   .actions-section {
@@ -1227,11 +924,6 @@
   /* Optimize info-overlay spacing for tablets and larger phones */
   .info-overlay {
     padding: 14px 14px 10px 14px; /* Slightly less aggressive than small mobile */
-  }
-
-  .info-overlay p {
-    margin-top: 8px; /* Between desktop (10px) and small mobile (6px) */
-    line-height: 1.55; /* Slightly more comfortable than small mobile */
   }
 }
 
@@ -1338,9 +1030,7 @@
    ============================================================ */
 @media (min-width: 1025px) {
   .figure-carousel {
-    --fc-ink: color-mix(in srgb, var(--star-blue-light) 60%, transparent);
-    --fc-ink-faint: color-mix(in srgb, var(--star-blue-light) 24%, transparent);
-    --fc-ink-ghost: color-mix(in srgb, var(--star-blue-light) 12%, transparent);
+    /* ink recipe lives at the base rule, available at every breakpoint */
     background: var(--bg-deep-space); /* one canvas, no black side columns */
     text-align: left; /* anchor: this surface opts out of the global justify */
   }
@@ -1371,9 +1061,6 @@
     border: 1px solid var(--fc-ink-faint);
     background: var(--bg-deep-space);
     transition: border-color 0.25s ease;
-  }
-  .figure-carousel .miniature::after {
-    display: none; /* quantum glow retired on the plate */
   }
   .figure-carousel .miniature:hover {
     transform: none;
@@ -1417,7 +1104,7 @@
 
 /* Weisheit wears its chapter colour (wisdom purple, per the mode doctrine) */
 .figure-carousel .actions-section .action-wisdom {
-  color: color-mix(in srgb, var(--mode-wisdom) 62%, white);
+  color: color-mix(in srgb, var(--mode-wisdom) 62%, var(--utility-pure-white));
   border-color: color-mix(in srgb, var(--mode-wisdom) 70%, transparent);
   background: color-mix(in srgb, var(--mode-wisdom) 12%, transparent);
 }
