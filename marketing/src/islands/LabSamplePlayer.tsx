@@ -11,6 +11,7 @@
 //  - webm (Opus) primary, mp3 fallback for iOS Safari.
 
 import { useEffect, useRef, useState } from 'react';
+import { trackHeardSeconds } from '../utils/listenedConversion';
 
 interface Props {
   audioWebm: string;
@@ -63,6 +64,7 @@ export default function LabSamplePlayer({
   variant = 'default',
 }: Props) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const untrackRef = useRef<(() => void) | null>(null);
   const fillRef = useRef<HTMLDivElement | null>(null);
   const [status, setStatus] = useState<'idle' | 'playing' | 'paused' | 'ended'>('idle');
   const [current, setCurrent] = useState(0);
@@ -71,6 +73,8 @@ export default function LabSamplePlayer({
   useEffect(() => {
     return () => {
       // Tear down on unmount so a backgrounded page stops audio.
+      untrackRef.current?.();
+      untrackRef.current = null;
       const el = audioRef.current;
       if (el) {
         el.pause();
@@ -99,6 +103,9 @@ export default function LabSamplePlayer({
       setTotal(tasteSeconds ? Math.min(tasteSeconds, el.duration) : el.duration);
     });
     el.addEventListener('ended', () => setStatus('ended'));
+    // Counts toward the shared Listened threshold. No figure id: these are
+    // chapter samples, not a figure's voice.
+    untrackRef.current = trackHeardSeconds(el);
     audioRef.current = el;
     return el;
   }

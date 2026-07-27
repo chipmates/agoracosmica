@@ -4,6 +4,7 @@
 
 import { getPublicT } from '@client/utils/public/publicI18n';
 import { useCouncilPreview } from '@client/hooks/useCouncilPreview';
+import { useHeardSeconds } from '../utils/listenedConversion';
 
 interface Props {
   councilId: string;
@@ -15,6 +16,10 @@ export default function CouncilPreviewButton({ councilId, lang }: Props) {
   const t = getPublicT(lang);
   const status = preview.activeId === councilId ? preview.status : 'idle';
   const engaged = status === 'loading' || status === 'playing';
+
+  // Counts toward the shared Listened threshold. No figure id: a council is a
+  // group of voices, its id is not a figure.
+  useHeardSeconds(status === 'playing');
   const label = engaged
     ? t('themes.pausePreview', 'Pause')
     : t('themes.playPreview', 'Play preview');

@@ -6,6 +6,7 @@
 
 import { getPublicT } from '@client/utils/public/publicI18n';
 import { useFigureTrailer } from '@client/hooks/useFigureTrailer';
+import { useHeardSeconds } from '../utils/listenedConversion';
 
 interface Props {
   figureId: string;
@@ -17,6 +18,10 @@ export default function TrailerButton({ figureId, lang }: Props) {
   const t = getPublicT(lang);
   const status = trailer.activeId === figureId ? trailer.status : 'idle';
   const engaged = status === 'loading' || status === 'playing';
+
+  // Counts toward the shared Listened threshold. The hook exposes no audio
+  // element, so the seconds come from wall clock while it reports playing.
+  useHeardSeconds(status === 'playing', figureId);
 
   return (
     <button

@@ -25,6 +25,7 @@
 
 import { useEffect } from 'react';
 import { getPublicTrailerUrl } from '@client/utils/public/publicMediaUrl';
+import { trackHeardSeconds } from '../utils/listenedConversion';
 
 interface Props {
   /** id of the .v2-observatory root this controller drives */
@@ -81,6 +82,7 @@ export default function V2ObservatoryMotion({ targetId }: Props) {
     let lastPointerType = '';
     let voiceOn = false;
     let voiceAudio: HTMLAudioElement | null = null;
+    let untrackVoice: (() => void) | null = null;
     // the figure currently named on the plaque (the voice chip plays them)
     let plaqueFigure = {
       id: planets[0]?.dataset.figure ?? '',
@@ -271,6 +273,9 @@ export default function V2ObservatoryMotion({ targetId }: Props) {
         voiceAudio.preload = 'none';
         voiceAudio.addEventListener('ended', stopVoice);
         voiceAudio.addEventListener('error', stopVoice);
+        // Counts toward the shared Listened threshold. The figure id is read
+        // at fire time, because the chip follows whoever is on the plaque.
+        untrackVoice = trackHeardSeconds(voiceAudio, () => plaqueFigure.id || undefined);
       }
       const lang = document.documentElement.lang === 'de' ? 'de' : 'en';
       voiceAudio.src = getPublicTrailerUrl(plaqueFigure.id, lang, trailerExt());
@@ -359,6 +364,8 @@ export default function V2ObservatoryMotion({ targetId }: Props) {
     return () => {
       reduceQuery.removeEventListener('change', onReduceChange);
       voiceButton?.removeEventListener('click', onVoiceClick);
+      untrackVoice?.();
+      untrackVoice = null;
       if (voiceAudio) {
         voiceAudio.pause();
         voiceAudio.removeAttribute('src');
