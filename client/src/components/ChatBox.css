@@ -232,12 +232,14 @@
   contain: layout style paint;
 }
 
-/* User Message - the seeker writes on the ember seal (record-bar material) */
+/* User Message - a night plate joining the book: faintly ember-washed
+   ground, framed by an ember keyline answering the Echo's gold one. The
+   record bar alone stays warm. */
 .message.user {
   align-self: flex-end;
-  background: color-mix(in srgb, var(--mode-quest-active) var(--a-90), transparent); /* Deeper coral - nearly solid for consistency with record button */
-  border: 1px solid color-mix(in srgb, var(--mode-quest-active) var(--a-60), transparent);
-  color: var(--text-primary); /* Cosmic white instead of pure white */
+  background: color-mix(in srgb, var(--mode-quest-active) 14%, var(--bg-card));
+  border: 1px solid color-mix(in srgb, var(--mode-quest-active) 60%, transparent);
+  color: var(--text-primary);
   margin-left: 20%;
   box-shadow: 0 8px 20px color-mix(in srgb, var(--bg-deep-space-darker) var(--a-40), transparent);
 }
@@ -346,17 +348,10 @@
   color: color-mix(in srgb, var(--gold-primary) 85%, var(--text-tertiary));
 }
 
-/* User message header - navy ink on the ember seal */
+/* User message header: the seeker answers in the Echo's grammar - the
+   same gold kicker ink, no chip, legal on the night plate */
 .message.user .message-header {
-  /* Quiet navy chip under the kicker: navy ink straight on the ember seal
-     measured 2.6:1; the chip gives the label a ground without unsealing
-     the ember (balance law: the seal's feel stays, the label becomes
-     readable) */
-  color: var(--text-primary);
-  background: color-mix(in srgb, var(--ember-ink) 88%, transparent);
-  padding: 2px 8px;
-  border-radius: 3px;
-  width: fit-content;
+  color: color-mix(in srgb, var(--gold-primary) 85%, var(--text-tertiary));
 }
 
 /* Message Content - 2025 Best Practice Typography */
