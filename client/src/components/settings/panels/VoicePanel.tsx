@@ -138,6 +138,98 @@ const PREVIEW_TEXT_DE = "Die Ideen großer Köpfe sind Brücken zwischen Zeiten 
 // the user's slider. Falls back to live self-hosted TTS on 404 or fetch error.
 const PREVIEW_BASE_URL = 'https://media.agoracosmica.org/voice-previews';
 
+// ============================================
+// Plate language: night ground, one gold-deep hairline, gilded selection.
+// ============================================
+
+// --text-secondary is self-referential inside `.setting-card` (voiding the token,
+// so text falls back to inherited gold) and --text-tertiary is remapped to the
+// dimmer --text-dim there. Both inks are derived from --text-primary, which is
+// stable in this scope, and clear AA on every ground used below.
+const INK_BODY = 'color-mix(in srgb, var(--text-primary) 88%, var(--bg-void))';
+const INK_QUIET = 'color-mix(in srgb, var(--text-primary) 68%, var(--bg-void))';
+const PLATE_GROUND = 'color-mix(in srgb, var(--bg-card) 82%, var(--bg-void))';
+const PLATE_GROUND_CHOSEN = 'color-mix(in srgb, var(--bg-card) 88%, var(--gold-deep))';
+const PLATE_HAIRLINE = '1px solid color-mix(in srgb, var(--gold-deep) 40%, transparent)';
+const CALLOUT_GROUND = 'color-mix(in srgb, var(--bg-card) 70%, var(--bg-void))';
+const CALLOUT_RULE = '3px solid color-mix(in srgb, var(--gold-deep) 75%, transparent)';
+
+const kickerStyle: CSSProperties = {
+  fontFamily: 'var(--font-ui)',
+  fontSize: '12px',
+  fontWeight: 500,
+  letterSpacing: '0.2em',
+  textTransform: 'uppercase',
+  color: 'color-mix(in srgb, var(--gold-deep) 70%, var(--gold-primary))',
+};
+
+const calloutStyle: CSSProperties = {
+  marginBottom: '16px',
+  padding: '10px 14px',
+  background: CALLOUT_GROUND,
+  borderLeft: CALLOUT_RULE,
+  borderRadius: '4px',
+  fontSize: '13px',
+  color: INK_BODY,
+  display: 'flex',
+  alignItems: 'flex-start',
+  gap: '10px',
+};
+
+// Engraved ink buttons need :hover / :focus-visible / :disabled, which inline
+// styles cannot express. Scoped to this panel's own class prefix.
+const VOICE_PLATE_CSS = `
+.voice-plate-btn {
+  padding: 10px 4px;
+  min-height: 44px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 45%, transparent);
+  border-radius: 4px;
+  color: var(--gold-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  overflow: hidden;
+  white-space: nowrap;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+.voice-plate-btn--select {
+  background: color-mix(in srgb, var(--gold-subtle) 10%, transparent);
+  border-color: color-mix(in srgb, var(--gold-deep) 60%, transparent);
+}
+.voice-plate-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--gold-subtle) 16%, transparent);
+  border-color: color-mix(in srgb, var(--gold-deep) 85%, transparent);
+}
+.voice-plate-btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.voice-plate-btn:focus-visible {
+  outline: 1.5px dashed var(--gold-primary);
+  outline-offset: 3px;
+}
+.voice-plate-btn--playing {
+  background: color-mix(in srgb, var(--gold-subtle) 16%, transparent);
+  border-color: color-mix(in srgb, var(--gold-primary) 70%, transparent);
+  cursor: not-allowed;
+}
+.voice-plate-btn--chosen {
+  background: transparent;
+  border-color: color-mix(in srgb, var(--gold-deep) 32%, transparent);
+  cursor: not-allowed;
+}
+@media (prefers-reduced-motion: reduce) {
+  .voice-plate-btn { transition: none; }
+  .voice-plate-btn:active:not(:disabled) { transform: none; }
+}
+`;
+
 const VoicePanel: FC<VoicePanelProps> = ({
   SettingCard,
   CATEGORY_ICONS,
@@ -318,12 +410,7 @@ const VoicePanel: FC<VoicePanelProps> = ({
     onSelect: (voice: CosmicVoice) => void
   ) => (
     <div style={{ marginTop: '20px' }}>
-      <h4 style={{
-        fontSize: '14px',
-        marginBottom: '16px',
-        color: 'var(--gold-base)',
-        fontWeight: 'bold'
-      }}>
+      <h4 style={{ ...kickerStyle, margin: '0 0 16px' }}>
         {tNode('settings.voice.voiceSelection.title')}
       </h4>
 
@@ -393,11 +480,14 @@ const VoicePanel: FC<VoicePanelProps> = ({
       icon={CATEGORY_ICONS.voice}
       description={tString('settings.voice.description', 'Configure voice settings')}
     >
+      <style>{VOICE_PLATE_CSS}</style>
+
       <div className="voice-settings-toggle-group" style={{
         marginBottom: '16px',
-        padding: '12px',
-        background: 'rgba(20, 28, 58, 0.3)',
-        borderRadius: '8px',
+        padding: '14px',
+        background: PLATE_GROUND,
+        border: PLATE_HAIRLINE,
+        borderRadius: '6px',
         display: 'flex',
         flexDirection: 'column',
         gap: '8px'
@@ -407,7 +497,11 @@ const VoicePanel: FC<VoicePanelProps> = ({
           justifyContent: 'space-between',
           alignItems: 'center'
         }}>
-          <CosmicText variant="body-small" className="setting-label" style={{fontWeight: 'bold'}}>
+          <CosmicText
+            variant="body-small"
+            className="setting-label"
+            style={{ margin: 0, fontSize: '14px', fontWeight: 500, color: 'var(--text-primary)' }}
+          >
             {tNode('settings.voice.enabled')}
           </CosmicText>
           <ToggleSwitch
@@ -422,37 +516,25 @@ const VoicePanel: FC<VoicePanelProps> = ({
       {config.ttsEnabled !== false && (
         <>
           {/* Self-hosted info banner */}
-          <div style={{
-            marginBottom: '16px',
-            padding: '8px 12px',
-            background: 'rgba(46, 213, 115, 0.1)',
-            borderLeft: '3px solid var(--green-base, #2ED573)',
-            borderRadius: '4px',
-            fontSize: '13px',
-            display: 'flex',
-            alignItems: 'flex-start',
-            gap: '8px'
-          }}>
-            <ShieldCheck size={16} weight="fill" style={{ flexShrink: 0 }} />
-            <span className="note-text" style={{ opacity: 0.9, lineHeight: 1.4 }}>
+          <div style={calloutStyle}>
+            <ShieldCheck
+              size={16}
+              weight="fill"
+              style={{ flexShrink: 0, marginTop: '2px', color: 'var(--gold-deep)' }}
+            />
+            <span className="note-text" style={{ lineHeight: 1.5 }}>
               {tString('settings.voice.privacyNote', 'All voices are processed on our own servers in Germany. No data leaves the EU.')}
             </span>
           </div>
 
           {/* Scope note: voices apply to live modes, curated content has its own narrators */}
-          <div style={{
-            marginBottom: '16px',
-            padding: '8px 12px',
-            background: 'color-mix(in srgb, var(--gold-subtle) 8%, transparent)',
-            borderLeft: '3px solid var(--gold-subtle)',
-            borderRadius: '4px',
-            fontSize: '13px',
-            display: 'flex',
-            alignItems: 'flex-start',
-            gap: '8px'
-          }}>
-            <Info size={16} weight="fill" style={{ flexShrink: 0, color: 'var(--gold-subtle)' }} />
-            <span className="note-text" style={{ opacity: 0.9, lineHeight: 1.4 }}>
+          <div style={calloutStyle}>
+            <Info
+              size={16}
+              weight="fill"
+              style={{ flexShrink: 0, marginTop: '2px', color: 'var(--gold-deep)' }}
+            />
+            <span className="note-text" style={{ lineHeight: 1.5 }}>
               {tString('settings.voice.voiceSelection.scopeNote', 'These voices power live conversations with the figures. Stories, prisms and councils come with their own handpicked narrators.')}
             </span>
           </div>
@@ -485,17 +567,15 @@ const VoicePanel: FC<VoicePanelProps> = ({
               alignItems: 'center',
               marginBottom: '8px'
             }}>
-              <CosmicText variant="body-small" style={{
-                fontWeight: 'bold',
-                margin: 0,
-                fontSize: '14px'
-              }}>
+              <CosmicText variant="body-small" style={{ ...kickerStyle, margin: 0 }}>
                 {tNode('settings.voice.speed')}
               </CosmicText>
               <span style={{
+                fontFamily: 'var(--font-ui)',
                 fontSize: '14px',
-                fontWeight: 'bold',
-                color: 'var(--gold-base)'
+                fontWeight: 600,
+                letterSpacing: '0.04em',
+                color: 'var(--gold-primary)'
               }}>
                 {config.ttsSettings.speed.toFixed(2)}x
               </span>
@@ -515,9 +595,9 @@ const VoicePanel: FC<VoicePanelProps> = ({
                   width: '100%',
                   height: '6px',
                   borderRadius: '3px',
-                  outline: 'none',
                   cursor: 'pointer',
-                  minHeight: '44px'
+                  minHeight: '44px',
+                  accentColor: 'var(--gold-primary)'
                 }}
                 aria-valuemin={0.8}
                 aria-valuemax={1.3}
@@ -529,8 +609,8 @@ const VoicePanel: FC<VoicePanelProps> = ({
             <div style={{
               display: 'flex',
               justifyContent: 'space-between',
-              fontSize: '12px',
-              opacity: 0.7
+              fontSize: '13px',
+              color: INK_QUIET
             }}>
               <span>{tNode('settings.voice.speedSlower')}</span>
               <span>{tNode('settings.voice.speedFaster')}</span>
@@ -566,27 +646,31 @@ const CosmicVoiceCard: FC<CosmicVoiceCardProps> = ({
   const { tNode } = useTranslation();
 
   return (
-    <div style={{
+    <div className="voice-plate-card" style={{
       padding: '12px',
-      background: selected ? 'rgba(46, 213, 115, 0.15)' : 'rgba(255, 255, 255, 0.05)',
-      border: `2px solid ${selected ? 'var(--gold-base)' : 'rgba(255, 255, 255, 0.1)'}`,
-      borderRadius: '8px',
-      transition: 'all 0.2s',
+      background: selected ? PLATE_GROUND_CHOSEN : PLATE_GROUND,
+      border: selected ? '1px solid var(--gold-primary)' : PLATE_HAIRLINE,
+      borderRadius: '4px',
+      transition: 'background 0.2s ease, border-color 0.2s ease',
       display: 'flex',
       flexDirection: 'column',
       gap: '10px'
     }}>
       <div style={{
-        fontSize: '15px',
-        fontWeight: 'bold',
+        fontFamily: 'var(--font-content)',
+        fontSize: '16px',
+        fontWeight: 400,
+        letterSpacing: '0.01em',
         textAlign: 'center',
-        color: selected ? 'var(--gold-base)' : 'var(--text-primary)',
+        color: selected ? 'var(--gold-primary)' : 'var(--text-primary)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: '6px'
+        gap: '8px'
       }}>
-        <span>{voice.icon}</span>
+        <span style={{ display: 'flex', color: selected ? 'var(--gold-primary)' : 'var(--gold-deep)' }}>
+          {voice.icon}
+        </span>
         <span>{voice.name}</span>
       </div>
 
@@ -599,24 +683,7 @@ const CosmicVoiceCard: FC<CosmicVoiceCardProps> = ({
           <button
             onClick={onPreview}
             disabled={previewing}
-            style={{
-              padding: '10px 4px',
-              fontSize: '12px',
-              background: previewing ? 'rgba(255, 165, 0, 0.2)' : 'rgba(255, 255, 255, 0.1)',
-              color: previewing ? 'orange' : 'var(--text-primary)',
-              border: previewing ? '1px solid orange' : '1px solid rgba(255, 255, 255, 0.2)',
-              borderRadius: '6px',
-              cursor: previewing ? 'not-allowed' : 'pointer',
-              outline: 'none',
-              minHeight: '44px',
-              fontWeight: 'bold',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '4px',
-              overflow: 'hidden',
-              whiteSpace: 'nowrap'
-            }}
+            className={`voice-plate-btn${previewing ? ' voice-plate-btn--playing' : ''}`}
           >
             <Play size={16} weight="fill" />
             {previewing ? tNode('settings.voice.voiceSelection.playing') : tNode('settings.voice.voiceSelection.preview')}
@@ -625,23 +692,7 @@ const CosmicVoiceCard: FC<CosmicVoiceCardProps> = ({
         <button
           onClick={onSelect}
           disabled={selected}
-          style={{
-            padding: '10px 4px',
-            fontSize: '12px',
-            fontWeight: 'bold',
-            background: selected ? 'var(--gold-base)' : 'rgba(255, 255, 255, 0.1)',
-            color: selected ? 'var(--bg-primary)' : 'var(--text-primary)',
-            border: 'none',
-            borderRadius: '6px',
-            cursor: selected ? 'not-allowed' : 'pointer',
-            minHeight: '44px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '4px',
-            overflow: 'hidden',
-            whiteSpace: 'nowrap'
-          }}
+          className={`voice-plate-btn ${selected ? 'voice-plate-btn--chosen' : 'voice-plate-btn--select'}`}
         >
           {selected ? <><Check size={16} weight="bold" /> {tNode('settings.voice.voiceSelection.selected')}</> : tNode('settings.voice.voiceSelection.select')}
         </button>

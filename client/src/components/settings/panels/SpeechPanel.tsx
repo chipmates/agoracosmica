@@ -25,6 +25,26 @@ const CosmicText: FC<CosmicTextProps> = ({
   </p>
 );
 
+// Plate language: night ground, one gold-deep hairline, callouts on a navy
+// plate with a gold-deep left rule.
+// --text-secondary is self-referential inside `.setting-card`, which voids the
+// token and leaves text inheriting gold. Body ink is derived from --text-primary,
+// which is stable in this scope.
+const INK_BODY = 'color-mix(in srgb, var(--text-primary) 88%, var(--bg-void))';
+const PLATE_GROUND = 'color-mix(in srgb, var(--bg-card) 82%, var(--bg-void))';
+const PLATE_HAIRLINE = '1px solid color-mix(in srgb, var(--gold-deep) 40%, transparent)';
+const CALLOUT_GROUND = 'color-mix(in srgb, var(--bg-card) 70%, var(--bg-void))';
+const CALLOUT_RULE = '3px solid color-mix(in srgb, var(--gold-deep) 75%, transparent)';
+
+const kickerStyle: CSSProperties = {
+  fontFamily: 'var(--font-ui)',
+  fontSize: '12px',
+  fontWeight: 500,
+  letterSpacing: '0.2em',
+  textTransform: 'uppercase',
+  color: 'color-mix(in srgb, var(--gold-deep) 70%, var(--gold-primary))',
+};
+
 interface SpeechConfig {
   sttEnabled?: boolean;
   stt?: string;
@@ -56,9 +76,10 @@ const SpeechPanel: FC<SpeechPanelProps> = ({
       {/* Voice Input Only Toggle */}
       <div style={{
         marginBottom: '16px',
-        padding: '12px',
-        background: 'rgba(20, 28, 58, 0.3)',
-        borderRadius: '8px',
+        padding: '14px',
+        background: PLATE_GROUND,
+        border: PLATE_HAIRLINE,
+        borderRadius: '6px',
         display: 'flex',
         flexDirection: 'column',
         gap: '8px'
@@ -68,7 +89,11 @@ const SpeechPanel: FC<SpeechPanelProps> = ({
           justifyContent: 'space-between',
           alignItems: 'center'
         }}>
-          <CosmicText variant="body-small" className="setting-label" style={{fontWeight: 'bold'}}>
+          <CosmicText
+            variant="body-small"
+            className="setting-label"
+            style={{ margin: 0, fontSize: '14px', fontWeight: 500, color: 'var(--text-primary)' }}
+          >
             {tNode('settings.speech.enabled')}
           </CosmicText>
           <ToggleSwitch
@@ -83,17 +108,18 @@ const SpeechPanel: FC<SpeechPanelProps> = ({
       {/* Self-hosted STT info */}
       <div style={{
         marginTop: '12px',
-        padding: '12px',
-        background: 'rgba(46, 213, 115, 0.08)',
-        borderLeft: '3px solid var(--success-green)',
+        padding: '12px 14px',
+        background: CALLOUT_GROUND,
+        borderLeft: CALLOUT_RULE,
         borderRadius: '4px',
-        fontSize: '13px'
+        fontSize: '13px',
+        color: INK_BODY
       }}>
-        <div style={{ marginBottom: '4px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <Rocket size={16} weight="fill" />
+        <div style={{ ...kickerStyle, marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Rocket size={16} weight="fill" style={{ flexShrink: 0, color: 'var(--gold-deep)' }} />
           {tString('settings.speech.privacyTitle', 'Whisper · EU Server · No profiling')}
         </div>
-        <div style={{ opacity: 0.9, lineHeight: 1.4 }}>
+        <div style={{ lineHeight: 1.5 }}>
           {tString('settings.speech.privacyNote', 'Speech recognition runs on our own servers in Germany. No data leaves the EU.')}
         </div>
       </div>
@@ -103,23 +129,25 @@ const SpeechPanel: FC<SpeechPanelProps> = ({
         <div style={{
           marginTop: '16px',
           padding: '16px',
-          background: 'rgba(212, 165, 57, 0.08)',
-          border: '1px solid rgba(212, 165, 57, 0.2)',
-          borderRadius: '8px'
+          background: PLATE_GROUND,
+          border: PLATE_HAIRLINE,
+          borderRadius: '6px'
         }}>
           <div style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '8px',
+            gap: '10px',
             marginBottom: '12px',
-            fontWeight: 'bold',
-            fontSize: '14px'
+            fontFamily: 'var(--font-content)',
+            fontWeight: 400,
+            fontSize: '17px',
+            color: 'var(--gold-primary)'
           }}>
-            <DeviceMobile size={20} weight="duotone" color="var(--gold-base)" />
+            <DeviceMobile size={20} weight="duotone" color="var(--gold-deep)" />
             <span>{tNode('settings.speech.ios.title')}</span>
           </div>
 
-          <CosmicText variant="body-small" style={{ marginBottom: '12px', opacity: 0.9, lineHeight: 1.5 }}>
+          <CosmicText variant="body-small" style={{ marginBottom: '12px', color: INK_BODY, lineHeight: 1.5 }}>
             {tNode('settings.speech.ios.intro')}
           </CosmicText>
 
@@ -127,7 +155,8 @@ const SpeechPanel: FC<SpeechPanelProps> = ({
             margin: '0 0 12px 0',
             paddingLeft: '20px',
             fontSize: '13px',
-            lineHeight: 1.6
+            lineHeight: 1.6,
+            color: INK_BODY
           }}>
             <li style={{ marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '4px' }}>
               <span>
@@ -148,16 +177,18 @@ const SpeechPanel: FC<SpeechPanelProps> = ({
           </ol>
 
           <div style={{
-            padding: '10px 12px',
-            background: 'rgba(212, 165, 57, 0.12)',
-            borderRadius: '6px',
-            fontSize: '12px',
+            padding: '10px 14px',
+            background: CALLOUT_GROUND,
+            borderLeft: CALLOUT_RULE,
+            borderRadius: '4px',
+            fontSize: '13px',
+            color: INK_BODY,
             display: 'flex',
             alignItems: 'flex-start',
-            gap: '8px'
+            gap: '10px'
           }}>
-            <Microphone size={16} weight="fill" color="var(--gold-base)" />
-            <span style={{ opacity: 0.95, lineHeight: 1.4 }}>
+            <Microphone size={16} weight="fill" color="var(--gold-deep)" style={{ flexShrink: 0, marginTop: '2px' }} />
+            <span style={{ lineHeight: 1.5 }}>
               {tNode('settings.speech.ios.benefit')}
             </span>
           </div>

@@ -16,6 +16,34 @@ interface AiModelPanelProps {
   CATEGORY_ICONS: Record<string, any>;
 }
 
+// Plate language: night ground, one gold-deep hairline, gilded active state,
+// callouts on a navy plate with a gold-deep left rule.
+// --text-secondary is self-referential inside `.setting-card` (voiding the token,
+// so text falls back to inherited gold) and --text-tertiary is remapped to the
+// dimmer --text-dim there. Both inks are derived from --text-primary, which is
+// stable in this scope, and clear AA on every ground used below.
+const INK_BODY = 'color-mix(in srgb, var(--text-primary) 88%, var(--bg-void))';
+const INK_QUIET = 'color-mix(in srgb, var(--text-primary) 68%, var(--bg-void))';
+const PLATE_GROUND = 'color-mix(in srgb, var(--bg-card) 82%, var(--bg-void))';
+const PLATE_GROUND_ACTIVE = 'color-mix(in srgb, var(--bg-card) 88%, var(--gold-deep))';
+const PLATE_HAIRLINE = '1px solid color-mix(in srgb, var(--gold-deep) 40%, transparent)';
+const CALLOUT_GROUND = 'color-mix(in srgb, var(--bg-card) 70%, var(--bg-void))';
+const CALLOUT_RULE = '3px solid color-mix(in srgb, var(--gold-deep) 75%, transparent)';
+const FIELD_GROUND = 'color-mix(in srgb, var(--bg-void) 80%, var(--bg-card))';
+const FIELD_KEYLINE = 'color-mix(in srgb, var(--gold-deep) 45%, transparent)';
+// Raw --coral-base lands at 4.2:1 on these grounds; warmed toward parchment it
+// clears AA for the small failure text it carries.
+const ALARM_INK = 'color-mix(in srgb, var(--coral-base) 65%, var(--text-primary))';
+
+const kickerStyle: React.CSSProperties = {
+  fontFamily: 'var(--font-ui)',
+  fontSize: '12px',
+  fontWeight: 500,
+  letterSpacing: '0.2em',
+  textTransform: 'uppercase',
+  color: 'color-mix(in srgb, var(--gold-deep) 70%, var(--gold-primary))',
+};
+
 type ValidationStatus = 'idle' | 'testing' | 'valid' | 'invalid' | 'not_configured';
 
 interface KeyState {
@@ -187,29 +215,29 @@ const AiModelPanel: FC<AiModelPanelProps> = ({ SettingCard, CATEGORY_ICONS }) =>
     const map: Record<ValidationStatus, { icon: ReactNode; color: string; text: string }> = {
       not_configured: {
         icon: <WarningCircle size={16} weight="fill" />,
-        color: 'var(--text-tertiary)',
+        color: INK_QUIET,
         text: tString('settings.apiKeys.statusNotConfigured', 'Not configured'),
       },
       idle: {
         icon: <WarningCircle size={16} weight="fill" />,
-        color: 'var(--gold-base)',
+        color: 'var(--gold-subtle)',
         text: tString('settings.apiKeys.statusNotTested', 'Not tested'),
       },
       testing: {
         icon: <WarningCircle size={16} weight="fill" />,
-        color: 'var(--gold-base)',
+        color: 'var(--gold-subtle)',
         text: tString('settings.apiKeys.statusTesting', 'Testing...'),
       },
       valid: {
         icon: <CheckCircle size={16} weight="fill" />,
-        color: 'var(--success-green)',
+        color: 'var(--gold-primary)',
         text: openRouterKey.lastTested
           ? `${tString('settings.apiKeys.statusValid', 'Valid')} (${openRouterKey.lastTested.toLocaleTimeString()})`
           : tString('settings.apiKeys.statusValid', 'Valid'),
       },
       invalid: {
         icon: <XCircle size={16} weight="fill" />,
-        color: 'var(--coral-base)',
+        color: ALARM_INK,
         text: tString('settings.apiKeys.statusInvalid', 'Invalid'),
       },
     };
@@ -218,11 +246,11 @@ const AiModelPanel: FC<AiModelPanelProps> = ({ SettingCard, CATEGORY_ICONS }) =>
       <div style={{
         display: 'flex',
         alignItems: 'center',
-        gap: '6px',
+        gap: '8px',
         marginTop: '10px',
-        padding: '8px 10px',
-        background: 'rgba(20, 28, 58, 0.25)',
-        borderRadius: '6px',
+        padding: '8px 12px',
+        background: CALLOUT_GROUND,
+        borderRadius: '4px',
         borderLeft: `3px solid ${cfg.color}`,
         fontSize: '13px',
         color: cfg.color,
@@ -246,17 +274,16 @@ const AiModelPanel: FC<AiModelPanelProps> = ({ SettingCard, CATEGORY_ICONS }) =>
       {/* 1. Key section — primary action, surfaced first */}
       <div style={{
         padding: '16px',
-        background: 'rgba(20, 28, 58, 0.2)',
-        borderRadius: '12px',
-        border: '1px solid rgba(212, 165, 57, 0.15)',
+        background: PLATE_GROUND,
+        borderRadius: '6px',
+        border: PLATE_HAIRLINE,
         marginBottom: '14px',
       }}>
         <p style={{
           fontSize: '13px',
-          color: 'var(--text-secondary)',
+          color: INK_BODY,
           margin: '0 0 12px',
           lineHeight: 1.5,
-          opacity: 0.9,
         }}>
           {tNode('settings.aiModelKey.keySectionIntro')}
         </p>
@@ -272,15 +299,15 @@ const AiModelPanel: FC<AiModelPanelProps> = ({ SettingCard, CATEGORY_ICONS }) =>
               padding: '11px 42px 11px 12px',
               fontSize: '16px',
               fontFamily: 'monospace',
-              background: 'rgba(20, 28, 58, 0.5)',
-              border: '1px solid rgba(212, 165, 57, 0.2)',
-              borderRadius: '8px',
+              background: FIELD_GROUND,
+              border: `1px solid ${FIELD_KEYLINE}`,
+              borderRadius: '4px',
               color: 'var(--text-primary)',
               outline: 'none',
               boxSizing: 'border-box',
             }}
-            onFocus={(e) => { e.target.style.borderColor = 'var(--gold-base)'; }}
-            onBlur={(e) => { e.target.style.borderColor = 'rgba(212, 165, 57, 0.2)'; }}
+            onFocus={(e) => { e.target.style.borderColor = 'var(--gold-primary)'; }}
+            onBlur={(e) => { e.target.style.borderColor = FIELD_KEYLINE; }}
           />
           <button
             type="button"
@@ -293,7 +320,7 @@ const AiModelPanel: FC<AiModelPanelProps> = ({ SettingCard, CATEGORY_ICONS }) =>
               background: 'none',
               border: 'none',
               cursor: 'pointer',
-              color: 'var(--text-secondary)',
+              color: 'var(--gold-deep)',
               display: 'flex',
               alignItems: 'center',
               padding: '4px',
@@ -313,18 +340,18 @@ const AiModelPanel: FC<AiModelPanelProps> = ({ SettingCard, CATEGORY_ICONS }) =>
         {openRouterKey.errorMessage && (
           <div style={{
             marginTop: '10px',
-            padding: '8px 10px',
-            background: 'rgba(233, 116, 81, 0.1)',
-            borderLeft: '3px solid var(--coral-base)',
+            padding: '8px 12px',
+            background: CALLOUT_GROUND,
+            borderLeft: `3px solid ${ALARM_INK}`,
             borderRadius: '4px',
-            fontSize: '12px',
+            fontSize: '13px',
             display: 'flex',
             alignItems: 'flex-start',
-            gap: '6px',
-            color: 'var(--coral-base)',
-            lineHeight: 1.4,
+            gap: '8px',
+            color: ALARM_INK,
+            lineHeight: 1.5,
           }}>
-            <Warning size={14} weight="fill" style={{ flexShrink: 0 }} />
+            <Warning size={14} weight="fill" style={{ flexShrink: 0, marginTop: '3px' }} />
             <span>{openRouterKey.errorMessage}</span>
           </div>
         )}
@@ -365,7 +392,7 @@ const AiModelPanel: FC<AiModelPanelProps> = ({ SettingCard, CATEGORY_ICONS }) =>
         <div style={{
           marginTop: '12px',
           paddingTop: '12px',
-          borderTop: '1px solid rgba(212, 165, 57, 0.1)',
+          borderTop: '1px solid color-mix(in srgb, var(--gold-deep) 28%, transparent)',
         }}>
           <a
             href="https://openrouter.ai/keys"
@@ -375,7 +402,7 @@ const AiModelPanel: FC<AiModelPanelProps> = ({ SettingCard, CATEGORY_ICONS }) =>
               display: 'inline-flex',
               alignItems: 'center',
               gap: '4px',
-              color: 'var(--gold-base)',
+              color: 'var(--gold-primary)',
               textDecoration: 'none',
               fontSize: '13px',
               fontWeight: 500,
@@ -390,9 +417,9 @@ const AiModelPanel: FC<AiModelPanelProps> = ({ SettingCard, CATEGORY_ICONS }) =>
       {/* 2. ZDR toggle — directly tied to key behavior */}
       <div style={{
         padding: '14px',
-        background: 'color-mix(in srgb, var(--accent-blue) 8%, transparent)',
-        borderRadius: '10px',
-        border: '1px solid color-mix(in srgb, var(--accent-blue) 15%, transparent)',
+        background: PLATE_GROUND,
+        borderRadius: '6px',
+        border: PLATE_HAIRLINE,
         marginBottom: '14px',
       }}>
         <label style={{
@@ -409,7 +436,7 @@ const AiModelPanel: FC<AiModelPanelProps> = ({ SettingCard, CATEGORY_ICONS }) =>
               width: 18,
               height: 18,
               marginTop: 2,
-              accentColor: 'var(--gold-base)',
+              accentColor: 'var(--gold-primary)',
               flexShrink: 0,
             }}
           />
@@ -417,21 +444,21 @@ const AiModelPanel: FC<AiModelPanelProps> = ({ SettingCard, CATEGORY_ICONS }) =>
             <div style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '6px',
-              fontWeight: 600,
-              fontSize: '14px',
-              color: 'var(--text-primary)',
-              marginBottom: '4px',
+              gap: '8px',
+              fontFamily: 'var(--font-content)',
+              fontWeight: 400,
+              fontSize: '16px',
+              color: 'var(--gold-primary)',
+              marginBottom: '6px',
             }}>
-              <ShieldCheck size={16} weight="fill" style={{ color: 'var(--success-green)' }} />
+              <ShieldCheck size={16} weight="fill" style={{ flexShrink: 0, color: 'var(--gold-deep)' }} />
               {tString('settings.apiKeys.zdrLabel', 'Zero Data Retention')}
             </div>
             <p style={{
-              fontSize: '12px',
-              opacity: 0.85,
+              fontSize: '13px',
               margin: 0,
-              lineHeight: 1.45,
-              color: 'var(--text-secondary)',
+              lineHeight: 1.5,
+              color: INK_BODY,
             }}>
               {tNode('settings.apiKeys.zdrDescription')}
             </p>
@@ -442,30 +469,24 @@ const AiModelPanel: FC<AiModelPanelProps> = ({ SettingCard, CATEGORY_ICONS }) =>
       {/* 3. About OpenRouter — context for the chosen vendor */}
       <div style={{
         padding: '12px 14px',
-        background: 'color-mix(in srgb, var(--accent-blue) 7%, transparent)',
-        borderRadius: '8px',
-        borderLeft: '3px solid color-mix(in srgb, var(--accent-blue) 50%, transparent)',
+        background: CALLOUT_GROUND,
+        borderRadius: '4px',
+        borderLeft: CALLOUT_RULE,
         marginBottom: '14px',
       }}>
         <div style={{
+          ...kickerStyle,
           display: 'flex',
           alignItems: 'center',
           gap: '8px',
-          marginBottom: '8px',
-          fontFamily: 'Space Grotesk, sans-serif',
-          fontSize: '12px',
-          fontWeight: 600,
-          color: 'var(--text-primary)',
-          letterSpacing: '0.5px',
-          textTransform: 'uppercase',
-          opacity: 0.85,
+          marginBottom: '10px',
         }}>
-          <Info size={14} weight="fill" style={{ color: 'var(--accent-blue)' }} />
+          <Info size={14} weight="fill" style={{ flexShrink: 0, color: 'var(--gold-deep)' }} />
           {tNode('settings.aiModelKey.aboutOpenRouter.title')}
         </div>
         <p style={{
           fontSize: '13px',
-          color: 'var(--text-secondary)',
+          color: INK_BODY,
           margin: '0 0 8px',
           lineHeight: 1.5,
         }}>
@@ -473,7 +494,7 @@ const AiModelPanel: FC<AiModelPanelProps> = ({ SettingCard, CATEGORY_ICONS }) =>
         </p>
         <p style={{
           fontSize: '13px',
-          color: 'var(--text-secondary)',
+          color: INK_BODY,
           margin: '0 0 10px',
           lineHeight: 1.5,
         }}>
@@ -487,9 +508,9 @@ const AiModelPanel: FC<AiModelPanelProps> = ({ SettingCard, CATEGORY_ICONS }) =>
             display: 'inline-flex',
             alignItems: 'center',
             gap: '4px',
-            color: 'var(--accent-blue)',
+            color: 'var(--gold-primary)',
             textDecoration: 'none',
-            fontSize: '12px',
+            fontSize: '13px',
             fontWeight: 500,
           }}
         >
@@ -501,49 +522,36 @@ const AiModelPanel: FC<AiModelPanelProps> = ({ SettingCard, CATEGORY_ICONS }) =>
       {/* 4. Currently using model card — confirms what's running right now */}
       <div style={{
         padding: '16px 18px',
-        background: isByokActive
-          ? 'color-mix(in srgb, var(--gold-subtle) 10%, transparent)'
-          : 'color-mix(in srgb, var(--accent-blue) 10%, transparent)',
-        border: `1px solid ${isByokActive
-          ? 'color-mix(in srgb, var(--gold-subtle) 28%, transparent)'
-          : 'color-mix(in srgb, var(--accent-blue) 25%, transparent)'}`,
-        borderRadius: '12px',
+        background: isByokActive ? PLATE_GROUND_ACTIVE : PLATE_GROUND,
+        border: isByokActive ? '1px solid var(--gold-primary)' : PLATE_HAIRLINE,
+        borderRadius: '6px',
         marginBottom: '14px',
       }}>
-        <div style={{
-          fontSize: '12px',
-          fontWeight: 600,
-          letterSpacing: '0.5px',
-          color: 'var(--text-secondary)',
-          textTransform: 'uppercase',
-          marginBottom: '6px',
-          opacity: 0.85,
-        }}>
+        <div style={{ ...kickerStyle, marginBottom: '10px' }}>
           {tNode('settings.aiModelKey.currentlyUsing')}
         </div>
         <div style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '8px',
+          gap: '10px',
           marginBottom: '6px',
         }}>
-          <Sparkle size={18} weight="fill" style={{ color: 'var(--gold-base)' }} />
+          <Sparkle size={18} weight="fill" style={{ flexShrink: 0, color: 'var(--gold-deep)' }} />
           <span style={{
-            fontFamily: 'Space Grotesk, sans-serif',
-            fontSize: '17px',
-            fontWeight: 700,
-            color: 'var(--gold-base)',
-            letterSpacing: '0.3px',
+            fontFamily: 'var(--font-content)',
+            fontSize: '19px',
+            fontWeight: 400,
+            color: 'var(--gold-primary)',
+            letterSpacing: '0.01em',
           }}>
             Qwen3 235B
           </span>
         </div>
         <div style={{
           fontSize: '13px',
-          color: 'var(--text-secondary)',
+          color: INK_BODY,
           lineHeight: 1.5,
           marginBottom: '10px',
-          opacity: 0.9,
         }}>
           {tNode('settings.aiModelKey.modelTagline')}
         </div>
@@ -552,15 +560,16 @@ const AiModelPanel: FC<AiModelPanelProps> = ({ SettingCard, CATEGORY_ICONS }) =>
           alignItems: 'center',
           gap: '8px',
           fontSize: '13px',
-          color: isByokActive ? 'var(--gold-primary)' : 'var(--accent-blue-hover, var(--accent-blue))',
+          color: isByokActive ? 'var(--gold-primary)' : INK_BODY,
           fontWeight: 500,
         }}>
           <span style={{
             width: '8px',
             height: '8px',
             borderRadius: '50%',
-            background: isByokActive ? 'var(--gold-primary)' : 'var(--accent-blue)',
+            background: isByokActive ? 'var(--gold-primary)' : 'var(--gold-deep)',
             display: 'inline-block',
+            flexShrink: 0,
           }} />
           {isByokActive
             ? tNode('settings.aiModelKey.statusByok')
@@ -574,17 +583,17 @@ const AiModelPanel: FC<AiModelPanelProps> = ({ SettingCard, CATEGORY_ICONS }) =>
         alignItems: 'flex-start',
         gap: '10px',
         padding: '12px 14px',
-        background: 'color-mix(in srgb, var(--gold-subtle) 6%, transparent)',
-        borderRadius: '8px',
-        borderLeft: '3px solid var(--gold-subtle)',
-        fontSize: '12px',
-        color: 'var(--text-secondary)',
+        background: CALLOUT_GROUND,
+        borderRadius: '4px',
+        borderLeft: CALLOUT_RULE,
+        fontSize: '13px',
+        color: INK_BODY,
         lineHeight: 1.5,
       }}>
-        <LockKey size={16} weight="regular" style={{ flexShrink: 0, color: 'var(--gold-subtle)', marginTop: 1 }} />
+        <LockKey size={16} weight="regular" style={{ flexShrink: 0, color: 'var(--gold-deep)', marginTop: '2px' }} />
         <span>
           {tNode('settings.aiModelKey.encryptionNote')}{' '}
-          <span style={{ color: 'var(--gold-base)', opacity: 0.85 }}>
+          <span style={{ color: 'var(--gold-primary)' }}>
             ({tNode('settings.aiModelKey.learnMoreLink')})
           </span>
         </span>

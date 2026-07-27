@@ -70,7 +70,8 @@
 .category-button,
 .seed-header {
   --text-primary: var(--cosmic-text-on-golden);
-  --text-secondary: var(--text-secondary);
+  /* --text-secondary keeps its global value (a self-reference here is
+     guaranteed-invalid and made consumers inherit) */
   --text-tertiary: var(--text-dim);
 }
 

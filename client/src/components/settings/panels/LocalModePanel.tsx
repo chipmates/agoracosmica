@@ -53,37 +53,53 @@ function detectHardwareTier(): HardwareTier {
   return 'unknown';
 }
 
+// Plate language: night ground, one gold-deep hairline, gilded active state,
+// callouts on a navy plate with a gold-deep left rule.
+// --text-secondary is self-referential inside `.setting-card` (voiding the token,
+// so text falls back to inherited gold) and --text-tertiary is remapped to the
+// dimmer --text-dim there. Both inks are derived from --text-primary, which is
+// stable in this scope, and clear AA on every ground used below.
+const INK_BODY = 'color-mix(in srgb, var(--text-primary) 88%, var(--bg-void))';
+const INK_QUIET = 'color-mix(in srgb, var(--text-primary) 68%, var(--bg-void))';
+const PLATE_GROUND = 'color-mix(in srgb, var(--bg-card) 82%, var(--bg-void))';
+const PLATE_GROUND_ACTIVE = 'color-mix(in srgb, var(--bg-card) 88%, var(--gold-deep))';
+const PLATE_HAIRLINE = '1px solid color-mix(in srgb, var(--gold-deep) 40%, transparent)';
+const CALLOUT_GROUND = 'color-mix(in srgb, var(--bg-card) 70%, var(--bg-void))';
+const CALLOUT_RULE = 'color-mix(in srgb, var(--gold-deep) 75%, transparent)';
+const FIELD_GROUND = 'color-mix(in srgb, var(--bg-void) 80%, var(--bg-card))';
+// Raw --coral-base lands at 4.2:1 on the warmed active ground; warmed toward
+// parchment it clears AA for the small probe text it carries.
+const ALARM_INK = 'color-mix(in srgb, var(--coral-base) 65%, var(--text-primary))';
+
 // Visual style helpers shared across the three service sections.
 const sectionContainerStyle = (active: boolean): React.CSSProperties => ({
   padding: '14px',
-  background: active
-    ? 'color-mix(in srgb, var(--success-green) 6%, transparent)'
-    : 'rgba(20, 28, 58, 0.2)',
-  border: `1px solid ${active
-    ? 'color-mix(in srgb, var(--success-green) 22%, transparent)'
-    : 'rgba(212, 165, 57, 0.15)'}`,
-  borderRadius: '12px',
+  background: active ? PLATE_GROUND_ACTIVE : PLATE_GROUND,
+  border: active ? '1px solid var(--gold-primary)' : PLATE_HAIRLINE,
+  borderRadius: '6px',
   marginBottom: '12px',
 });
 
 const inputStyle: React.CSSProperties = {
   width: '100%', padding: '10px 12px', fontSize: '14px', fontFamily: 'monospace',
-  background: 'rgba(20, 28, 58, 0.5)',
-  border: '1px solid rgba(212, 165, 57, 0.2)', borderRadius: '6px',
+  background: FIELD_GROUND,
+  border: '1px solid color-mix(in srgb, var(--gold-deep) 45%, transparent)',
+  borderRadius: '4px',
   color: 'var(--text-primary)', outline: 'none', boxSizing: 'border-box',
   marginBottom: '10px',
 };
 
 const labelStyle: React.CSSProperties = {
-  display: 'block', fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px',
+  display: 'block', fontSize: '13px', color: INK_QUIET, marginBottom: '5px',
 };
 
-const sectionLabelStyle: React.CSSProperties = {
-  fontWeight: 600, fontSize: '14px', color: 'var(--text-primary)', marginBottom: '4px',
-};
+const sectionLabelStyle = (active: boolean): React.CSSProperties => ({
+  fontFamily: 'var(--font-content)', fontWeight: 400, fontSize: '16px',
+  color: active ? 'var(--gold-primary)' : 'var(--text-primary)', marginBottom: '5px',
+});
 
 const sectionHelpStyle: React.CSSProperties = {
-  fontSize: '12px', opacity: 0.85, margin: 0, lineHeight: 1.45, color: 'var(--text-secondary)',
+  fontSize: '13px', margin: 0, lineHeight: 1.5, color: INK_BODY,
 };
 
 const LocalModePanel: FC<LocalModePanelProps> = ({ SettingCard, CATEGORY_ICONS }) => {
@@ -250,40 +266,40 @@ const LocalModePanel: FC<LocalModePanelProps> = ({ SettingCard, CATEGORY_ICONS }
         icon: <Cpu size={18} weight="fill" />,
         text: tString('settings.localMode.hardwareBanner.full',
           'NVIDIA GPU detected. The full pipeline (LLM, EN + DE TTS, STT) can run locally with `docker compose --profile nvidia up`.'),
-        color: 'var(--success-green)',
+        color: 'var(--gold-primary)',
       },
       'full-apple': {
         icon: <Cpu size={18} weight="fill" />,
         text: tString('settings.localMode.hardwareBanner.apple',
           'Apple Silicon Mac detected. EN TTS + STT run via docker; for DE local TTS run `scripts/setup-local-tts-apple.sh` once.'),
-        color: 'var(--success-green)',
+        color: 'var(--gold-primary)',
       },
       'reduced': {
         icon: <WarningCircle size={18} weight="fill" />,
         text: tString('settings.localMode.hardwareBanner.reduced',
           'Limited hardware detected. EN + STT run locally; DE will fall back to our cloud.'),
-        color: 'var(--gold-base)',
+        color: 'var(--gold-subtle)',
       },
       'unknown': {
         icon: <WarningCircle size={18} weight="fill" />,
         text: tString('settings.localMode.hardwareBanner.unknown',
           'Hardware not detected. Local Mode may still work, try it.'),
-        color: 'var(--text-tertiary)',
+        color: INK_QUIET,
       },
     };
     const cfg = map[tier];
     return (
       <div style={{
         display: 'flex', alignItems: 'flex-start', gap: '10px',
-        padding: '10px 12px', marginBottom: '12px',
-        background: 'color-mix(in srgb, var(--accent-blue) 7%, transparent)',
-        borderRadius: '8px',
-        borderLeft: `3px solid ${cfg.color}`,
+        padding: '10px 14px', marginBottom: '12px',
+        background: CALLOUT_GROUND,
+        borderRadius: '4px',
+        borderLeft: `3px solid ${CALLOUT_RULE}`,
         fontSize: '13px',
-        color: 'var(--text-secondary)',
-        lineHeight: 1.45,
+        color: INK_BODY,
+        lineHeight: 1.5,
       }}>
-        <span style={{ color: cfg.color, display: 'flex', flexShrink: 0, marginTop: 1 }}>{cfg.icon}</span>
+        <span style={{ color: cfg.color, display: 'flex', flexShrink: 0, marginTop: '2px' }}>{cfg.icon}</span>
         <span>{cfg.text}</span>
       </div>
     );
@@ -291,10 +307,10 @@ const LocalModePanel: FC<LocalModePanelProps> = ({ SettingCard, CATEGORY_ICONS }
 
   const renderProbePill = (probe: ServiceProbeResult, label?: string): React.ReactNode => {
     const map: Record<ServiceStatus, { color: string; text: string }> = {
-      unknown: { color: 'var(--text-tertiary)', text: tString('settings.localMode.status.notConfigured', 'Not checked') },
-      probing: { color: 'var(--gold-base)', text: tString('settings.localMode.status.probing', 'Checking…') },
-      ok: { color: 'var(--success-green)', text: tString('settings.localMode.status.configured', 'Reachable') },
-      unreachable: { color: 'var(--coral-base)', text: tString('settings.localMode.status.unreachable', 'Unreachable') },
+      unknown: { color: INK_QUIET, text: tString('settings.localMode.status.notConfigured', 'Not checked') },
+      probing: { color: 'var(--gold-subtle)', text: tString('settings.localMode.status.probing', 'Checking…') },
+      ok: { color: 'var(--gold-primary)', text: tString('settings.localMode.status.configured', 'Reachable') },
+      unreachable: { color: ALARM_INK, text: tString('settings.localMode.status.unreachable', 'Unreachable') },
     };
     const cfg = map[probe.status];
     const StatusIcon =
@@ -303,13 +319,13 @@ const LocalModePanel: FC<LocalModePanelProps> = ({ SettingCard, CATEGORY_ICONS }
     return (
       <div style={{
         display: 'inline-flex', alignItems: 'center', gap: '4px',
-        fontSize: '12px', color: cfg.color, fontWeight: 500,
+        fontSize: '13px', color: cfg.color, fontWeight: 500,
       }}>
-        {label && <span style={{ color: 'var(--text-tertiary)', fontWeight: 400 }}>{label}:</span>}
+        {label && <span style={{ color: INK_QUIET, fontWeight: 400 }}>{label}:</span>}
         <StatusIcon size={14} weight="fill" />
         <span>{cfg.text}</span>
         {probe.detail && probe.status !== 'probing' && (
-          <span style={{ color: 'var(--text-tertiary)', fontWeight: 400, marginLeft: '4px' }}>
+          <span style={{ color: INK_QUIET, fontWeight: 400, marginLeft: '4px' }}>
             · {probe.detail}
           </span>
         )}
@@ -329,11 +345,14 @@ const LocalModePanel: FC<LocalModePanelProps> = ({ SettingCard, CATEGORY_ICONS }
         type="checkbox"
         checked={checked}
         onChange={(e) => onChange(e.target.checked)}
-        style={{ width: 20, height: 20, marginTop: 2, accentColor: 'var(--gold-base)', flexShrink: 0 }}
+        style={{ width: 20, height: 20, marginTop: 2, accentColor: 'var(--gold-primary)', flexShrink: 0 }}
       />
-      <span style={{ display: 'flex', color: 'var(--text-secondary)', marginTop: 2, flexShrink: 0 }}>{icon}</span>
+      <span style={{
+        display: 'flex', marginTop: 2, flexShrink: 0,
+        color: checked ? 'var(--gold-primary)' : 'var(--gold-deep)',
+      }}>{icon}</span>
       <div style={{ flex: 1 }}>
-        <div style={sectionLabelStyle}>{label}</div>
+        <div style={sectionLabelStyle(checked)}>{label}</div>
         <p style={sectionHelpStyle}>{helpText}</p>
       </div>
     </label>
@@ -386,7 +405,7 @@ const LocalModePanel: FC<LocalModePanelProps> = ({ SettingCard, CATEGORY_ICONS }
             />
 
             <details style={{ marginBottom: '10px' }}>
-              <summary style={{ cursor: 'pointer', fontSize: '12px', color: 'var(--text-secondary)' }}>
+              <summary style={{ cursor: 'pointer', fontSize: '13px', color: INK_QUIET }}>
                 {tNode('settings.aiModelKey.custom.keyDisclosure')}
               </summary>
               <input
@@ -506,11 +525,11 @@ const LocalModePanel: FC<LocalModePanelProps> = ({ SettingCard, CATEGORY_ICONS }
       {/* Honest framing */}
       <div style={{
         padding: '12px 14px',
-        background: 'color-mix(in srgb, var(--gold-subtle) 8%, transparent)',
-        borderRadius: '8px',
-        borderLeft: '3px solid var(--gold-subtle)',
-        fontSize: '12px',
-        color: 'var(--text-secondary)',
+        background: CALLOUT_GROUND,
+        borderRadius: '4px',
+        borderLeft: `3px solid ${CALLOUT_RULE}`,
+        fontSize: '13px',
+        color: INK_BODY,
         lineHeight: 1.5,
         marginTop: '6px',
         marginBottom: '8px',
@@ -524,7 +543,7 @@ const LocalModePanel: FC<LocalModePanelProps> = ({ SettingCard, CATEGORY_ICONS }
         rel="noopener noreferrer"
         style={{
           display: 'inline-flex', alignItems: 'center', gap: '4px',
-          color: 'var(--gold-base)', textDecoration: 'none',
+          color: 'var(--gold-primary)', textDecoration: 'none',
           fontSize: '13px', fontWeight: 500,
         }}
       >
