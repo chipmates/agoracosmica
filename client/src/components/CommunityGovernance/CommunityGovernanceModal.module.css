@@ -64,7 +64,6 @@
   height: 2px;
   background: color-mix(in srgb, var(--gold-subtle) 70%, white);
   border-radius: 50%;
-  box-shadow: 0 0 6px color-mix(in srgb, var(--gold-subtle) 60%, transparent);
 }
 
 .headerStars span:nth-child(1) { top: 22%; left: 8%; animation: starTwinkle 3.2s ease-in-out infinite; }
@@ -76,6 +75,10 @@
 @keyframes starTwinkle {
   0%, 100% { opacity: 0.3; transform: scale(0.85); }
   50% { opacity: 1; transform: scale(1.15); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .headerStars span { animation: none; }
 }
 
 .headerTitleWrap {
@@ -122,17 +125,6 @@
   overscroll-behavior: contain;
   padding: 24px 22px 18px;
   padding-bottom: max(18px, env(safe-area-inset-bottom));
-  scrollbar-width: thin;
-  scrollbar-color: color-mix(in srgb, var(--gold-subtle) 24%, transparent) transparent;
-}
-
-.body::-webkit-scrollbar {
-  width: 6px;
-}
-
-.body::-webkit-scrollbar-thumb {
-  background: color-mix(in srgb, var(--gold-subtle) 24%, transparent);
-  border-radius: 3px;
 }
 
 /* ==================== Hero ==================== */
@@ -161,13 +153,7 @@
     color-mix(in srgb, var(--gold-subtle) 4%, transparent) 40%,
     transparent 70%
   );
-  opacity: 0.5;
-  animation: heroAuroraPulse 6s ease-in-out infinite;
-}
-
-@keyframes heroAuroraPulse {
-  0%, 100% { opacity: 0.35; transform: scale(1); }
-  50% { opacity: 0.6; transform: scale(1.06); }
+  opacity: 0.35;
 }
 
 .heroTier-strong .heroAurora {
@@ -226,7 +212,6 @@
 .heroCommunityTier-council .heroTierBadge {
   background: color-mix(in srgb, var(--gold-subtle) 16%, transparent);
   border-color: color-mix(in srgb, var(--gold-subtle) 40%, transparent);
-  box-shadow: 0 0 24px color-mix(in srgb, var(--gold-subtle) 18%, transparent);
 }
 
 .heroStars {

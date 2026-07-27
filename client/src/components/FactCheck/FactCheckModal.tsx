@@ -361,10 +361,10 @@ export const FactCheckModal: FC<FactCheckModalProps> = ({
             <ul className="factcheck-list">
               {realPeople.map((person: RealPerson, idx: number) => (
                 <li key={idx} className="factcheck-list__item">
-                  <strong>{person.name}</strong> — {person.role}
+                  <strong>{person.name}</strong> · {person.role}
                   {person.note && <span className="factcheck-list__note"> ({person.note})</span>}
                   <span className="factcheck-list__stories">
-                    Stories: {person.stories.join(', ')}
+                    {tString('factCheck.storiesLabel', 'Stories')}: {person.stories.join(', ')}
                   </span>
                 </li>
               ))}
@@ -389,8 +389,8 @@ export const FactCheckModal: FC<FactCheckModalProps> = ({
               <ul className="factcheck-list">
                 {compositeCharacters.map((char: CompositeCharacter, idx: number) => (
                   <li key={idx} className="factcheck-list__item">
-                    <strong>{char.name}</strong> (Story {char.story})
-                    <span className="factcheck-list__represents"> — {char.represents}</span>
+                    <strong>{char.name}</strong> ({tString('factCheck.storyLabel', 'Story')} {char.story})
+                    <span className="factcheck-list__represents"> · {char.represents}</span>
                   </li>
                 ))}
               </ul>
@@ -516,7 +516,7 @@ export const FactCheckModal: FC<FactCheckModalProps> = ({
                 <ul className="factcheck-quotes__list">
                   {quotes.documented.map((q, idx) => (
                     <li key={idx} className="factcheck-quotes__item">
-                      <blockquote>"{q.quote}"</blockquote>
+                      <blockquote>{tString('factCheck.quoteOpen', '"')}{q.quote}{tString('factCheck.quoteClose', '"')}</blockquote>
                       <cite>— {q.source}</cite>
                     </li>
                   ))}

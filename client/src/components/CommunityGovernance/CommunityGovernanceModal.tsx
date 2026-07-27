@@ -52,7 +52,7 @@ const ThresholdPanel: FC<ThresholdPanelProps> = ({ threshold, phase }) => {
   const explainer = tString(
     'community.threshold.explainer',
     'When other members back a suggestion, it becomes visible. The threshold rises as the community grows. We announce every change.'
-  );
+  ).replace('{n}', String(threshold));
   const phaseKey = phase ? PHASE_KEY_BY_WORKER_STRING[phase] : null;
   const phaseLabel = phaseKey ? tString(phaseKey, phase ?? '') : phase;
 

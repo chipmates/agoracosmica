@@ -1782,6 +1782,10 @@
     }
   },
   "factCheck": {
+    "storiesLabel": "Stories",
+    "storyLabel": "Story",
+    "quoteOpen": "“",
+    "quoteClose": "”",
     "facts": "Facts",
     "titlePattern": "{name}'s Facts",
     "storyDetails": "Story Details",

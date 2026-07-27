@@ -1784,6 +1784,10 @@
     }
   },
   "factCheck": {
+    "storiesLabel": "Geschichten",
+    "storyLabel": "Geschichte",
+    "quoteOpen": "„",
+    "quoteClose": "“",
     "facts": "Fakten",
     "titlePattern": "Fakten zu {name}",
     "storyDetails": "Story-Details",
@@ -1832,7 +1836,7 @@
     "basisLabel": "Was dokumentiert ist",
     "appearancesLabel": "Erscheint in",
     "documentedUsedLabel": "Dokumentierte Ereignisse",
-    "turn": "Turn",
+    "turn": "Runde",
     "kind": {
       "composite-scene": "Komposit-Szene",
       "dramatized-quote": "Dramatisiertes Zitat",
