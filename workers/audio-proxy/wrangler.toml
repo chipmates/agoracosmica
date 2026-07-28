@@ -19,6 +19,12 @@ binding = "RATE_LIMITS"
 id = "276f721cc5ca4ff9aa3a8c01cda4494a"
 preview_id = "e8ab36271a3046759a07bdc0a7a2dba2"
 
+# R2 bucket holding the prerecorded story audio + transcripts
+# (keys: stories/{figure}/{lang}/{figure}_{seed}_{lang}.{mp3,txt})
+[[r2_buckets]]
+binding = "STORY_BUCKET"
+bucket_name = "agora-cosmica"
+
 # Environment Variables
 [vars]
 ALLOWED_ORIGINS = "https://agoracosmica.org,https://www.agoracosmica.org"

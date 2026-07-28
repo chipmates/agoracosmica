@@ -2,6 +2,8 @@ export interface Env {
   HEALTH_CACHE: KVNamespace;
   RATE_LIMITS: KVNamespace;
   ANALYTICS: AnalyticsEngineDataset;
+  /** Media bucket holding the prerecorded story audio and transcripts. */
+  STORY_BUCKET: R2Bucket;
   AUDIO_API_KEY: string;
   ALLOWED_ORIGINS: string;
   SERVER_FSN1_URL: string;

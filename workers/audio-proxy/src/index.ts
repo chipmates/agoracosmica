@@ -3,7 +3,10 @@ import { handlePreflight, corsHeaders } from './cors';
 import { selectServers, refreshHealth, getAggregatedHealth } from './health';
 import { proxyWithFailover, proxyWithFailoverFromBuffer } from './proxy';
 import { checkAudioRateLimit, buildRateLimitResponse } from './rateLimit';
+import { handleStoryArchive } from './storyArchive';
 import type { Env } from './types';
+
+const STORY_ARCHIVE_PREFIX = '/v1/audio/story-archive/';
 
 function readCountry(request: Request): string {
   const country = (request as Request & { cf?: { country?: string } }).cf?.country;
@@ -42,6 +45,21 @@ export default {
         headers.set(k, v);
       }
       return new Response(res.body, { status: res.status, headers });
+    }
+
+    // Story archive — streams one figure + language as a ZIP straight from R2.
+    // HEAD serves the same headers for the client's availability + size probe.
+    if (
+      path.startsWith(STORY_ARCHIVE_PREFIX) &&
+      (request.method === 'GET' || request.method === 'HEAD')
+    ) {
+      return handleStoryArchive(
+        request,
+        env,
+        ctx,
+        path.slice(STORY_ARCHIVE_PREFIX.length),
+        readCountry(request),
+      );
     }
 
     // TTS proxy (GPU-aware rate limiting)

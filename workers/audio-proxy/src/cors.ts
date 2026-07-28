@@ -1,6 +1,6 @@
 import type { Env } from './types';
 
-const EXPOSE_HEADERS = 'X-Model, X-Inference-Ms, X-Total-Ms, X-Audio-Server, X-RateLimit-Daily, X-RateLimit-GpuLoad, X-TTS-Backend, X-TTS-Session-Expires-In';
+const EXPOSE_HEADERS = 'X-Model, X-Inference-Ms, X-Total-Ms, X-Audio-Server, X-RateLimit-Daily, X-RateLimit-GpuLoad, X-TTS-Backend, X-TTS-Session-Expires-In, X-Archive-Bytes, Content-Disposition, Content-Length';
 
 function getAllowedOrigins(env: Env): string[] {
   return env.ALLOWED_ORIGINS.split(',').map((o) => o.trim());
@@ -35,7 +35,7 @@ export function handlePreflight(request: Request, env: Env): Response {
     status: 204,
     headers: {
       'Access-Control-Allow-Origin': origin,
-      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Methods': 'GET, HEAD, POST, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, X-Session-Id, X-Marketing-Source',
       'Access-Control-Expose-Headers': EXPOSE_HEADERS,
       'Access-Control-Max-Age': '86400',
