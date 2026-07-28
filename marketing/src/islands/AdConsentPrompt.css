@@ -1,119 +1,277 @@
-/* Ad-measurement consent prompt (AdConsentPrompt island). A non-blocking card
-   fixed to the bottom of the viewport, so the figure/theme content stays fully
+/* Ad-measurement consent prompt (AdConsentPrompt island). A non-blocking plate
+   pinned to the bottom of the viewport, so the figure/theme content stays fully
    readable behind it (no wall). Tokens come from the page (Public.astro loads
    index.css); hex fallbacks keep it sane if a token is ever missing. */
 
 .agc-consent {
+  /* Plate mix and the two ink registers, so the values below stay readable */
+  --agc-plate-a: color-mix(in srgb, var(--bg-primary, #0C1133) 91%, var(--gold-deep, #B38B30));
+  --agc-plate-b: color-mix(in srgb, var(--bg-cosmic-void, #080B20) 88%, #000);
+  --agc-keyline: color-mix(in srgb, var(--gold-deep, #B38B30) 44%, transparent);
+  --agc-keyline-in: color-mix(in srgb, var(--gold-deep, #B38B30) 19%, transparent);
+  --agc-ink-value: color-mix(in srgb, var(--text-primary, #E8E2D4) 70%, var(--text-secondary, #CEC8B9));
+  --agc-ink-fine: color-mix(in srgb, var(--text-dim, #8C8677) 67%, var(--text-secondary, #CEC8B9));
+
   position: fixed;
   left: 50%;
   bottom: 1rem;
   transform: translateX(-50%);
-  width: min(420px, calc(100% - 1.5rem));
+  width: min(476px, calc(100% - 1.5rem));
   z-index: 1000;
   box-sizing: border-box;
-  padding: 1.1rem 1.2rem 1rem;
-  border-radius: 1rem;
-  background: color-mix(in srgb, var(--bg-cosmic-void, #0D1338) 92%, transparent);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
-  border: 1px solid color-mix(in srgb, var(--gold-primary, #E6BC5C) 24%, transparent);
+  padding: 0.9rem 1.1rem 0.8rem;
+  border-radius: 3px;
+  border: 1px solid var(--agc-keyline);
+  background: linear-gradient(
+    158deg,
+    color-mix(in srgb, var(--agc-plate-a) 95%, transparent) 0%,
+    color-mix(in srgb, var(--agc-plate-b) 96%, transparent) 88%
+  );
+  -webkit-backdrop-filter: blur(16px) saturate(112%);
+  backdrop-filter: blur(16px) saturate(112%);
   box-shadow:
-    0 18px 50px color-mix(in srgb, #000 55%, transparent),
-    inset 0 1px 0 color-mix(in srgb, var(--gold-primary, #E6BC5C) 20%, transparent);
-  color: var(--text-primary, #D2D2D2);
+    0 24px 60px color-mix(in srgb, #000 68%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--gold-primary, #E6BC5C) 14%, transparent);
+  color: var(--text-primary, #E8E2D4);
   font-family: var(--font-ui, system-ui, -apple-system, 'Segoe UI', sans-serif);
-  animation: agc-consent-in 0.28s ease;
+  animation: agc-consent-rise-c 0.34s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@keyframes agc-consent-in {
-  from { opacity: 0; transform: translate(-50%, 14px); }
+/* Hairline outside, keyline inside: the double frame every plate carries */
+.agc-consent::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border: 1px solid var(--agc-keyline-in);
+  border-radius: 1px;
+  pointer-events: none;
+}
+
+@keyframes agc-consent-rise-c {
+  from { opacity: 0; transform: translate(-50%, 12px); }
   to { opacity: 1; transform: translate(-50%, 0); }
 }
-
-@media (prefers-reduced-motion: reduce) {
-  .agc-consent { animation: none; }
+/* Same rise for the two placements that carry no centering transform */
+@keyframes agc-consent-rise-s {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
+/* Desktop: the polite note corner, clear of the content column and of the
+   path to the page's own entry CTA. Under the deferred ask the CTA-intent
+   trigger would otherwise raise the card onto the button being reached for. */
+@media (min-width: 960px) {
+  .agc-consent {
+    left: auto;
+    right: 1.5rem;
+    bottom: 1.5rem;
+    transform: none;
+    animation-name: agc-consent-rise-s;
+  }
+}
+
+/* ---- the dismiss control -------------------------------------------- */
 .agc-consent__x {
   position: absolute;
-  top: 0.35rem;
-  right: 0.45rem;
+  top: 2px;
+  right: 2px;
   width: 44px;
   height: 44px;
   display: grid;
   place-items: center;
+  padding: 0;
   background: none;
   border: none;
-  border-radius: 0.5rem;
-  color: var(--text-dim, #8A8A8A);
-  font-size: 1.3rem;
-  line-height: 1;
+  border-radius: 2px;
+  color: var(--text-dim, #8C8677);
   cursor: pointer;
 }
-.agc-consent__x:hover { color: var(--text-primary, #D2D2D2); }
+.agc-consent__x svg {
+  width: 13px;
+  height: 13px;
+  display: block;
+}
+.agc-consent__x:hover { color: var(--text-primary, #E8E2D4); }
 
-.agc-consent__trust {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-size: 0.7rem;
-  color: var(--text-dim, #8A8A8A);
-  margin-bottom: 0.55rem;
-  padding-right: 2rem;
+/* ---- the ask --------------------------------------------------------- */
+.agc-consent__kicker {
+  margin: 0 2.6rem 0.42rem 0;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--gold-primary, #E6BC5C) 76%, var(--text-dim, #8C8677));
 }
-.agc-consent__dot {
-  width: 11px;
-  height: 11px;
-  border-radius: 3px;
-  background: var(--gold-subtle, #D4A539);
-  flex: none;
+.agc-consent__q {
+  margin: 0 2.4rem 0.5rem 0;
+  font-family: var(--font-serif, Georgia, 'Times New Roman', serif);
+  font-weight: 500;
+  font-size: 1.32rem;
+  line-height: 1.22;
+  letter-spacing: 0.005em;
+  color: var(--text-primary, #E8E2D4);
+  text-wrap: balance;
 }
-
-.agc-consent__h {
-  margin: 0 0 0.4rem;
-  font-size: 1rem;
-  line-height: 1.3;
-  color: var(--gold-subtle, #D4A539);
+.agc-consent__why {
+  margin: 0 0 0.52rem;
+  font-size: 0.885rem;
+  line-height: 1.48;
+  color: var(--agc-ink-value);
+  text-wrap: pretty;
 }
-.agc-consent__b {
-  margin: 0 0 0.9rem;
-  font-size: 0.85rem;
+.agc-consent__fine {
+  margin: 0 0 0.72rem;
+  font-size: 0.735rem;
   line-height: 1.5;
-  color: var(--text-secondary, #CACACA);
+  letter-spacing: 0.004em;
+  color: var(--agc-ink-fine);
+  text-wrap: pretty;
 }
 
+/* ---- the two answers, identical in every property but the word ------- */
 .agc-consent__actions {
   display: flex;
-  flex-direction: column;
+  align-items: stretch;
   gap: 0.5rem;
 }
 .agc-consent__btn {
-  width: 100%;
+  flex: 1 1 0;
+  min-width: 0;
   min-height: 44px;
+  box-sizing: border-box;
+  padding: 0.55rem 0.6rem;
   cursor: pointer;
   font: inherit;
-  font-size: 0.88rem;
+  font-size: 0.845rem;
   font-weight: 600;
-  padding: 0.6rem 0.9rem;
-  border-radius: 0.6rem;
+  line-height: 1.2;
+  border-radius: 2px;
   color: var(--gold-primary, #E6BC5C);
-  background: color-mix(in srgb, var(--gold-primary, #E6BC5C) 12%, transparent);
-  border: 1px solid color-mix(in srgb, var(--gold-primary, #E6BC5C) 38%, transparent);
-  transition: background 0.15s ease;
+  background: color-mix(in srgb, var(--gold-primary, #E6BC5C) 15%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gold-primary, #E6BC5C) 52%, transparent);
+  transition: background 0.16s ease, border-color 0.16s ease;
 }
 .agc-consent__btn:hover {
-  background: color-mix(in srgb, var(--gold-primary, #E6BC5C) 20%, transparent);
+  background: color-mix(in srgb, var(--gold-primary, #E6BC5C) 24%, transparent);
+  border-color: color-mix(in srgb, var(--gold-primary, #E6BC5C) 72%, transparent);
 }
+.agc-consent__btn:active { transform: translateY(1px); }
 
+/* ---- the imprint: who is asking, and where to check them ------------- */
+/* Phones run it as one inline flow so it costs the fewest lines. From 481 up
+   it becomes a wrapping flex row, so the break falls between the trust line
+   and the links, never mid-claim. */
+.agc-consent__imprint {
+  margin: 0.7rem 0 0;
+  padding-top: 0.58rem;
+  border-top: 1px solid color-mix(in srgb, var(--gold-deep, #B38B30) 26%, transparent);
+  font-size: 0.665rem;
+  line-height: 1.55;
+  letter-spacing: 0.01em;
+  color: var(--agc-ink-fine);
+}
+.agc-consent__sep { color: color-mix(in srgb, var(--agc-ink-fine) 55%, transparent); }
+@media (min-width: 481px) {
+  .agc-consent__imprint {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: 0.85em;
+    row-gap: 0.05em;
+  }
+  /* block, not flex: keeps the links inline inside it, so their enlarged hit
+     padding does not grow the imprint row */
+  .agc-consent__links { display: block; white-space: nowrap; }
+}
 .agc-consent__link {
-  display: inline-block;
-  margin-top: 0.65rem;
-  font-size: 0.75rem;
-  color: var(--gold-subtle, #D4A539);
+  color: var(--gold-primary, #E6BC5C);
   text-decoration: underline;
   text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+  white-space: nowrap;
+  /* vertical padding on an inline box grows the hit area without growing the
+     line box, so the imprint stays one row tall and clear of the buttons */
+  padding-block: 9px;
+}
+.agc-consent__link:hover { color: var(--gold-hover, #F6D55C); }
+
+.agc-consent :focus-visible {
+  outline: 2px solid var(--gold-hover, #F6D55C);
+  outline-offset: 2px;
+  border-radius: 2px;
 }
 
-/* Accept and decline are always stacked full-width and identical (size, weight,
-   colour), so the decline is never demoted. The card is narrow (<=420px) on
-   every screen, so stacking reads cleaner than a cramped side-by-side row. */
+/* ---- phones: a flush bottom plate, so the page above stays readable --- */
+@media (max-width: 480px) {
+  .agc-consent {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    transform: none;
+    border-radius: 4px 4px 0 0;
+    border-bottom: none;
+    padding: 0.8rem 0.95rem calc(0.7rem + env(safe-area-inset-bottom, 0px));
+    animation-name: agc-consent-rise-s;
+  }
+  .agc-consent::before { inset: 4px 4px 0; border-bottom: none; }
+  /* the imprint runs as one inline flow here, so the trust line needs its own
+     gap or it reads into the first link */
+  .agc-consent__trust { margin-right: 0.7em; }
+  .agc-consent__q { font-size: 1.16rem; margin-right: 2.2rem; }
+  .agc-consent__why { font-size: 0.845rem; }
+  .agc-consent__fine { font-size: 0.725rem; }
+  .agc-consent__btn { font-size: 0.815rem; }
+}
+
+/* ---- the make-or-break: 320 wide, German, short viewport -------------- */
+@media (max-width: 360px) {
+  .agc-consent {
+    padding: 0.55rem 0.72rem calc(0.5rem + env(safe-area-inset-bottom, 0px));
+  }
+  .agc-consent__kicker { display: none; }
+  .agc-consent__q { font-size: 1.02rem; line-height: 1.18; margin: 0 2.2rem 0.28rem 0; }
+  .agc-consent__why { font-size: 0.78rem; line-height: 1.32; margin-bottom: 0.26rem; }
+  .agc-consent__fine { font-size: 0.695rem; line-height: 1.32; margin-bottom: 0.42rem; }
+  .agc-consent__btn { font-size: 0.775rem; min-height: 44px; padding: 0.4rem 0.3rem; }
+  .agc-consent__imprint {
+    font-size: 0.625rem;
+    line-height: 1.4;
+    margin-top: 0.42rem;
+    padding-top: 0.34rem;
+  }
+  .agc-consent__link { padding-block: 6px; }
+  .agc-consent__x { top: 0; right: 0; }
+}
+
+@media (max-height: 620px) {
+  .agc-consent__why { line-height: 1.36; }
+  .agc-consent__fine { line-height: 1.36; }
+}
+
+/* ---- accessibility posture ------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .agc-consent { animation: none; }
+  .agc-consent__btn { transition: none; }
+  .agc-consent__btn:active { transform: none; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .agc-consent {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: linear-gradient(158deg, var(--agc-plate-a) 0%, var(--agc-plate-b) 88%);
+  }
+}
+@media (prefers-contrast: more) {
+  .agc-consent {
+    background: color-mix(in srgb, var(--bg-cosmic-void, #080B20) 66%, #000);
+    border-color: var(--gold-subtle, #D4A539);
+  }
+  .agc-consent::before { display: none; }
+  .agc-consent__fine,
+  .agc-consent__imprint { color: var(--text-secondary, #CEC8B9); }
+  .agc-consent__btn { border-color: var(--gold-primary, #E6BC5C); }
+}
+
+/* Accept and decline sit side by side at identical width, weight and colour,
+   so neither answer is demoted. */

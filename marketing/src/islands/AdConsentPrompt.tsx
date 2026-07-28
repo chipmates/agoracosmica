@@ -14,9 +14,10 @@
 //              left this session, so keeping the gclid would be purposeless
 //              storage under § 25 TDDDG).
 //
-// Copy finalized 2026-06-10 after legal review (withdrawal notice, privacy
-// link, precise click-ID wording). Lift into publicI18n if it ever needs
-// more languages.
+// Copy is legally reviewed: the withdrawal notice, the privacy link, the
+// click-ID scope sentence and the honest X label are all load bearing and
+// none of them may be dropped for space. Lift into publicI18n if it ever
+// needs more languages.
 
 import { useEffect, useRef, useState } from 'react';
 import {
@@ -50,25 +51,31 @@ interface Props {
 const COPY = {
   en: {
     trust: 'Nonprofit · Open Source · No tracking cookies, no profiling',
-    heading: 'About this one Google thing',
-    body: 'You came from a Google ad we get free as a nonprofit. With your okay, Google counts it, and that lets us keep these ads in the future. Just the ad’s click ID, no name, no browsing data. You can change your mind anytime in Settings under "Legal". Saying no opens the full library too.',
-    accept: 'Yes, count the ad',
-    decline: 'No, just open the library',
+    kicker: 'One question about this ad',
+    heading: 'So the next person finds it too.',
+    lead: 'Nonprofits get their Google ads for free. Counted clicks help those ads reach more people searching for the same thing.',
+    // Non-breaking spaces around the chevron: the settings path must never
+    // break across lines.
+    fine: 'Nothing about you goes to Google except the ad’s click ID. No name, no browsing history. You can undo it anytime under Settings › Legal. Either way, the whole library stays open. The X deletes the click ID. A no is remembered.',
+    accept: 'Yes, count it',
+    decline: 'No, don’t count it',
     link: 'See the code',
     privacy: 'Privacy policy',
     privacyHref: '/privacy/',
-    dismiss: 'Close',
+    dismiss: 'Close. Deletes the click ID.',
   },
   de: {
     trust: 'Gemeinnützig · Open Source · Keine Tracking-Cookies, kein Profiling',
-    heading: 'Zu dieser einen Google-Sache',
-    body: 'Wir bekommen als Nonprofit kostenlose Google Anzeigen. Dein Okay lässt Google sie zählen und erlaubt uns damit diese Anzeigen auch in Zukunft. Nur die Klick-ID der Anzeige, kein Name, keine Browserdaten. Du kannst das jederzeit in den Einstellungen unter „Rechtliches" ändern. Ein Nein öffnet die Bibliothek genauso.',
-    accept: 'Ja, Anzeige zählen',
-    decline: 'Nein, einfach öffnen',
+    kicker: 'Eine Frage zu dieser Anzeige',
+    heading: 'Damit der nächste Mensch es auch findet.',
+    lead: 'Gemeinnützige bekommen ihre Anzeigen bei Google gratis. Gezählte Klicks helfen, mehr Menschen zu erreichen, die dasselbe suchen.',
+    fine: 'Von dir geht nur die Klick-ID der Anzeige zu Google. Kein Name, keine Browserdaten. Jederzeit widerrufbar unter Einstellungen › Rechtliches. So oder so bleibt die Bibliothek offen. Das X löscht die Klick-ID. Ein Nein merken wir uns.',
+    accept: 'Ja, zählen',
+    decline: 'Nein, nicht zählen',
     link: 'Code ansehen',
     privacy: 'Datenschutzerklärung',
     privacyHref: '/datenschutz/',
-    dismiss: 'Schließen',
+    dismiss: 'Schließen. Löscht die Klick-ID.',
   },
 } as const;
 
@@ -87,9 +94,10 @@ const SS_FIRED = 'agc_conv_fired_start_exploring';
 
 // Anonymous consent counters: how many ad arrivals get asked, and what they
 // answer. Same keyless posture as the cta_click beacon in agc-public.js: the
-// step, the page path, and the interface language, and it has to stay that
-// way. A gclid or an id here would pair a user dimension with a consent
-// decision, which is exactly what this measurement must not do.
+// step, the page path, the interface language, and on the three answer steps
+// a coarse time-to-answer bucket, and it has to stay that way. A gclid or an
+// id here would pair a user dimension with a consent decision, which is
+// exactly what this measurement must not do.
 type ConsentCounter =
   | 'ad_consent_shown'
   | 'ad_consent_accepted'
@@ -102,7 +110,32 @@ type ConsentCounter =
 const SEEN_MS = 1000;
 const SEEN_RATIO = 0.5;
 
-function countConsentStep(step: ConsentCounter, lang: Props['lang']): void {
+// Time-to-answer buckets, in seconds, measured from the moment the card came
+// into view (render where there is no IntersectionObserver). Four coarse
+// buckets: 0 = under 1s, 1 = 1 to 3s, 2 = 3 to 10s, 3 = over 10s. A reflex tap
+// and a read-then-decide look the same in the totals otherwise. Raw
+// milliseconds never leave the browser, and the bucket rides the same keyless
+// row as the step itself, so it adds no user dimension.
+const ANSWER_BUCKETS_S: readonly number[] = [1, 3, 10];
+
+function answerBucket(elapsedMs: number): number {
+  const seconds = elapsedMs / 1000;
+  const crossed = ANSWER_BUCKETS_S.findIndex((edge) => seconds < edge);
+  return crossed === -1 ? ANSWER_BUCKETS_S.length : crossed;
+}
+
+function nowMs(): number {
+  try {
+    if (typeof performance !== 'undefined' && typeof performance.now === 'function') {
+      return performance.now();
+    }
+  } catch {
+    // fall through to the wall clock
+  }
+  return Date.now();
+}
+
+function countConsentStep(step: ConsentCounter, lang: Props['lang'], bucket?: number): void {
   try {
     const firedKey = `agc_funnel_fired_${step}`;
     if (sessionStorage.getItem(firedKey)) return;
@@ -113,12 +146,13 @@ function countConsentStep(step: ConsentCounter, lang: Props['lang']): void {
   try {
     // Path only, no query and no hash, exactly like the cta_click beacon.
     // The worker holds it to the same closed shape it holds that one to
-    // (a short slug path or nothing).
-    const body = JSON.stringify({
-      step,
-      path: window.location.pathname,
-      language: lang,
-    });
+    // (a short slug path or nothing), plus the coarse bucket on the three
+    // answer steps.
+    const body = JSON.stringify(
+      bucket === undefined
+        ? { step, path: window.location.pathname, language: lang }
+        : { step, path: window.location.pathname, language: lang, bucket }
+    );
     // sendBeacon survives the navigation an accept can trigger. text/plain
     // keeps it a simple CORS request, so no preflight gets lost in transit.
     if (
@@ -223,6 +257,10 @@ function armDeferredShow(fire: () => void): () => void {
 export default function AdConsentPrompt({ lang }: Props) {
   const [show, setShow] = useState(false);
   const cardRef = useRef<HTMLElement | null>(null);
+  // Start of the time-to-answer window. Never transmitted, never stored: the
+  // three answer beacons carry the coarse bucket derived from it and nothing
+  // else.
+  const seenAtRef = useRef<number | null>(null);
   const t = COPY[lang] ?? COPY.en;
 
   useEffect(() => {
@@ -256,15 +294,24 @@ export default function AdConsentPrompt({ lang }: Props) {
   // so those browsers keep counting on render.
   useEffect(() => {
     if (!show) return;
+    // The commit is the fallback start of the answer window. The observer
+    // below moves it to the moment the card actually reached the viewport
+    // wherever the browser can tell us.
+    seenAtRef.current = nowMs();
     const node = cardRef.current;
     if (!node || typeof IntersectionObserver === 'undefined') {
       countConsentStep('ad_consent_shown', lang);
       return;
     }
     let timer = 0;
+    let stamped = false;
     const observer = new IntersectionObserver(
       (entries) => {
         const seen = entries.some((entry) => entry.intersectionRatio >= SEEN_RATIO);
+        if (seen && !stamped) {
+          stamped = true;
+          seenAtRef.current = nowMs();
+        }
         if (seen && !timer) {
           timer = window.setTimeout(() => {
             countConsentStep('ad_consent_shown', lang);
@@ -287,9 +334,15 @@ export default function AdConsentPrompt({ lang }: Props) {
 
   if (!show) return null;
 
+  // Coarse time-to-answer for the step about to be counted.
+  const answered = (): number | undefined => {
+    const seenAt = seenAtRef.current;
+    return seenAt === null ? undefined : answerBucket(nowMs() - seenAt);
+  };
+
   const onAccept = (): void => {
     grantAdConsent();
-    countConsentStep('ad_consent_accepted', lang);
+    countConsentStep('ad_consent_accepted', lang, answered());
     fireStartExploring();
     // Consent is recorded first, so a crossing held while they were deciding
     // goes out now, dated when it actually happened.
@@ -298,7 +351,7 @@ export default function AdConsentPrompt({ lang }: Props) {
   };
   const onDecline = (): void => {
     revokeAdConsent();
-    countConsentStep('ad_consent_declined', lang);
+    countConsentStep('ad_consent_declined', lang, answered());
     if (ASK_ON_INTERACTION) dropPreDecisionListening();
     setShow(false);
   };
@@ -308,7 +361,7 @@ export default function AdConsentPrompt({ lang }: Props) {
     } catch {
       /* no-op */
     }
-    countConsentStep('ad_consent_dismissed', lang);
+    countConsentStep('ad_consent_dismissed', lang, answered());
     // No consent surface remains this session, so a stored click ID would be
     // purposeless storage. Drop it, and with it anything held for an answer
     // that is no longer coming.
@@ -320,7 +373,10 @@ export default function AdConsentPrompt({ lang }: Props) {
   return (
     <aside
       className="agc-consent"
-      aria-label={t.heading}
+      // Kicker plus question: the region announces the size of the ask and the
+      // ask itself. The kicker is hidden below 360px but stays part of the
+      // name, since a directly referenced node counts either way.
+      aria-labelledby="agc-consent-kicker agc-consent-q"
       // Deferred ask only: the card can arrive mid-visit, so its arrival is
       // announced without moving focus. Undefined renders no attribute, so the
       // markup that ships today is untouched. Never a dialog: it must not trap
@@ -328,20 +384,14 @@ export default function AdConsentPrompt({ lang }: Props) {
       aria-live={ASK_ON_INTERACTION ? 'polite' : undefined}
       ref={cardRef}
     >
-      <button
-        type="button"
-        className="agc-consent__x"
-        aria-label={t.dismiss}
-        onClick={onDismiss}
-      >
-        ×
-      </button>
-      <div className="agc-consent__trust">
-        <span className="agc-consent__dot" aria-hidden="true" />
-        {t.trust}
-      </div>
-      <h2 className="agc-consent__h">{t.heading}</h2>
-      <p className="agc-consent__b">{t.body}</p>
+      <p className="agc-consent__kicker" id="agc-consent-kicker">
+        {t.kicker}
+      </p>
+      <h2 className="agc-consent__q" id="agc-consent-q">
+        {t.heading}
+      </h2>
+      <p className="agc-consent__why">{t.lead}</p>
+      <p className="agc-consent__fine">{t.fine}</p>
       <div className="agc-consent__actions">
         <button type="button" className="agc-consent__btn" onClick={onAccept}>
           {t.accept}
@@ -350,17 +400,44 @@ export default function AdConsentPrompt({ lang }: Props) {
           {t.decline}
         </button>
       </div>
-      <a
-        className="agc-consent__link"
-        href={CODE_URL}
-        target="_blank"
-        rel="noopener noreferrer"
+      <p className="agc-consent__imprint">
+        <span className="agc-consent__trust">{t.trust}</span>{' '}
+        <span className="agc-consent__links">
+          <a
+            className="agc-consent__link"
+            href={CODE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {t.link}
+          </a>
+          <span className="agc-consent__sep" aria-hidden="true">
+            {' · '}
+          </span>
+          <a className="agc-consent__link" href={t.privacyHref}>
+            {t.privacy}
+          </a>
+        </span>
+      </p>
+      {/* Last in the DOM on purpose: the two answers come before the way out,
+          for the tab order and for the screen reader. */}
+      <button
+        type="button"
+        className="agc-consent__x"
+        aria-label={t.dismiss}
+        title={t.dismiss}
+        onClick={onDismiss}
       >
-        {t.link} ›
-      </a>
-      <a className="agc-consent__link" href={t.privacyHref}>
-        {t.privacy} ›
-      </a>
+        <svg viewBox="0 0 12 12" aria-hidden="true" focusable="false">
+          <path
+            d="M1 1l10 10M11 1L1 11"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.4"
+            strokeLinecap="round"
+          />
+        </svg>
+      </button>
     </aside>
   );
 }

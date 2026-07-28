@@ -28,12 +28,15 @@ interface FunnelPayload {
 
 // Ad-measurement consent prompt: how many ad arrivals see the question and
 // what they answer. One-shot per tab on the client, counter-only here.
-const CONSENT_STEPS = [
-  'ad_consent_shown',
+// The three answers carry a coarse time-to-answer bucket (0 = under 1s,
+// 1 = 1 to 3s, 2 = 3 to 10s, 3 = over 10s, measured from the moment the card
+// came into view). The shown step has nothing to time and keeps bucket 0.
+const CONSENT_ANSWER_STEPS = [
   'ad_consent_accepted',
   'ad_consent_declined',
   'ad_consent_dismissed',
 ] as const;
+const CONSENT_STEPS = ['ad_consent_shown', ...CONSENT_ANSWER_STEPS] as const;
 
 // Strict server-side step allowlist (Waves 1-2). Anything not on this list is
 // silently dropped — no row is written and the client learns nothing (same
@@ -61,15 +64,23 @@ const VALID_STEPS = new Set([
 ]);
 
 // Counter-only steps: the row is the step name, the sanitized page path the
-// question appeared on, the interface language, and the country and device
-// class the edge derives. Nothing else. The mode slot is blanked, the outcome
-// is forced to '200' and the bucket to 0 server-side, and the path slot only
-// ever takes a path — a figure id sent on one of these steps is dropped
-// rather than stored, so no content dimension can ride along with a consent
-// answer. The route reads no gclid field on any step, so none can be stored
-// either. Derived from CONSENT_STEPS rather than re-listed, so the two lists
-// cannot drift apart. docs/MEASUREMENT.md states this shape.
+// question appeared on, the interface language, the country and device class
+// the edge derives, and on the three answers the coarse time-to-answer
+// bucket. Nothing else. The mode slot is blanked, the outcome is forced to
+// '200' server-side, and the path slot only ever takes a path — a figure id
+// sent on one of these steps is dropped rather than stored, so no content
+// dimension can ride along with a consent answer. The route reads no gclid
+// field on any step, so none can be stored either. Derived from CONSENT_STEPS
+// rather than re-listed, so the lists cannot drift apart.
+// docs/MEASUREMENT.md states this shape.
 const COUNTER_ONLY_STEPS = new Set<string>(CONSENT_STEPS);
+
+// Counter-only steps that may still carry a bucket. Everything else on the
+// counter-only list is pinned to 0. The consent set has exactly four buckets,
+// so a higher index is not ours and collapses to 0 rather than writing a value
+// docs/MEASUREMENT.md does not describe.
+const TIMED_COUNTER_STEPS = new Set<string>(CONSENT_ANSWER_STEPS);
+const CONSENT_MAX_BUCKET = 3;
 
 // Outcome slot (blob5): same role as status/type elsewhere. Steps without a
 // meaningful outcome default to '200', matching the entry/signup convention.
@@ -82,9 +93,9 @@ const FIGURE_RE = /^[A-Za-z0-9_-]{1,64}$/;
 const MODE_RE = /^[a-z_]{1,40}$/;
 const VALID_LANGS = new Set(['en', 'de']);
 
-// Coarse bucket index ceiling (cinematic dwell uses 0-3, the first_reply
-// reply-time set uses 0-4; the ceiling keeps one slot of headroom). Anything
-// else collapses to 0.
+// Coarse bucket index ceiling (cinematic dwell and the consent time-to-answer
+// set use 0-3, the first_reply reply-time set uses 0-4; the ceiling keeps one
+// slot of headroom). Anything else collapses to 0.
 const MAX_BUCKET = 5;
 
 // Rate limit: 200 funnel beacons per IP per hour. A single session emits
@@ -149,6 +160,9 @@ export async function handleFunnel(request: Request, env: Env): Promise<Response
     : 0;
 
   const counterOnly = COUNTER_ONLY_STEPS.has(step);
+  const timedCounter = TIMED_COUNTER_STEPS.has(step);
+  let outBucket = !counterOnly || timedCounter ? bucket : 0;
+  if (timedCounter && outBucket > CONSENT_MAX_BUCKET) outBucket = 0;
 
   trackFunnel(env, {
     step,
@@ -160,7 +174,7 @@ export async function handleFunnel(request: Request, env: Env): Promise<Response
     // '200', never '', so a counter row stays recognizable as a funnel row
     // (the dashboard tells conversion rows apart by an empty outcome slot).
     outcome: counterOnly ? '200' : outcome,
-    bucket: counterOnly ? 0 : bucket,
+    bucket: outBucket,
     country: readCountry(request),
     device: readDevice(request),
   });
