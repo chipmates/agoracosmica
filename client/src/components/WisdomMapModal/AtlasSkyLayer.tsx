@@ -17,6 +17,7 @@ import {
   useState,
 } from 'react';
 import { TIER_BUDGETS } from '../../cosmos/tiers';
+import type { CosmosTier } from '../../cosmos/tiers';
 import type { SkyScene, AtlasSky } from '../../cosmos/wisdom-sky/types';
 
 export interface AtlasSkyLayerHandle {
@@ -27,7 +28,7 @@ export interface AtlasSkyLayerHandle {
 }
 
 interface AtlasSkyLayerProps {
-  tier: 'desktop' | 'mobile';
+  tier: Exclude<CosmosTier, 'still'>;
   scene: SkyScene | null;
   /** The world layer the engine moves during glides and drag-to-peek. */
   worldRef: React.RefObject<HTMLDivElement>;

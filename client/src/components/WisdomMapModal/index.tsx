@@ -242,7 +242,11 @@ const WisdomMapModal: FC<WisdomMapModalProps> = ({
   const [skyFailed, setSkyFailed] = useState<boolean>(false);
   const [skyReady, setSkyReady] = useState<boolean>(false);
   const skyTier = useMemo(() => (isOpen ? pickAtlasTier() : 'still'), [isOpen]);
-  const skyEnabled = !skyFailed && (skyTier === 'desktop' || skyTier === 'mobile');
+  /* The atlas is Canvas 2D at a ~30fps idle cadence, cheap enough for every
+     tier. iOS Safari caps hardwareConcurrency at 4 and hides deviceMemory,
+     so 'mobile-low' includes all iPhones; it rides the leaner budget instead
+     of falling back. Only reduced motion and runtime failure stay flat. */
+  const skyEnabled = !skyFailed && skyTier !== 'still';
 
   // Bloom staging: stars keep their pre-bloom engraving until the bloom note
   // is witnessed, then gild on the plate (flourish + rays + gathered dust).
@@ -1095,7 +1099,7 @@ const WisdomMapModal: FC<WisdomMapModalProps> = ({
                 {!skySettled && <ResponsiveBackground />}
                 <AtlasSkyLayer
                   ref={skyRef}
-                  tier={skyTier === 'desktop' ? 'desktop' : 'mobile'}
+                  tier={skyTier}
                   scene={skyScene}
                   worldRef={worldRef}
                   onReady={() => setSkyReady(true)}
