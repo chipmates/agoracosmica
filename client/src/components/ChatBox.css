@@ -355,14 +355,6 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Mobile-specific optimizations for accessibility */
-@media (max-width: 480px) {
-  .message-content {
-    /* Ensure minimum 16px on small mobile devices (WCAG AA) */
-    font-size: max(1rem, var(--ui-font-size-chat));
-  }
-}
-
 @media (min-width: 768px) {
   .message-content {
     text-align: justify; /* the scored desktop look: long lines carry justify well */
@@ -456,8 +448,8 @@
     max-width: 80%; /* WhatsApp/Signal standard: balanced, scannable conversations */
     width: auto; /* Let content determine width naturally */
     min-width: auto; /* Remove forced minimum */
-    font-size: 15.5px; /* 🎯 Slightly reduced for mobile density (0.5px smaller) */
-    line-height: 1.45; /* PHASE 1: Slightly tighter on mobile */
+    font-size: var(--ui-font-size-chat); /* phones read at arm's length: never below the responsive floor */
+    line-height: 1.5;
   }
 }
 
@@ -483,8 +475,8 @@
   }
   
   .message-content {
-    font-size: 15.5px; /* 🎯 Slightly reduced for mobile density (0.5px smaller) */
-    line-height: 1.45; /* PHASE 1: Mobile optimized */
+    font-size: var(--ui-font-size-chat);
+    line-height: 1.5;
   }
   
   .message-paragraph {
@@ -528,8 +520,8 @@
     max-width: 80%; /* WhatsApp/Signal standard: balanced, scannable conversations */
     width: auto; /* Let content determine width naturally */
     min-width: auto; /* Remove forced minimum */
-    font-size: 15px; /* 🎯 Even more compact for small screens */
-    line-height: 1.4; /* PHASE 1: Tighter for density */
+    font-size: var(--ui-font-size-chat);
+    line-height: 1.5;
   }
   
   /* 🎯 CRITICAL: Use same specificity as width overrides for consistency */
@@ -539,9 +531,8 @@
   }
   
   .message-content {
-    font-size: 15px; /* 🎯 Even more compact for small screens */
-    line-height: 1.4; /* PHASE 1: Optimal for small screens */
-    letter-spacing: 0.005em;
+    font-size: var(--ui-font-size-chat);
+    line-height: 1.5;
   }
   
   .message-paragraph {
