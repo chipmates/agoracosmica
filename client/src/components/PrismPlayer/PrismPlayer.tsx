@@ -9,7 +9,7 @@
  */
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { useMediaSession } from './useMediaSession';
+import { useMediaSession } from '../../hooks/useMediaSession';
 import useAudio from '../../hooks/useAudio';
 import { useTranslation } from '../../hooks/useTranslation';
 import { useDomainStore } from '../../stores/domainStore';
@@ -171,6 +171,9 @@ export function PrismPlayer({ figure, seed, councilId, councilLevel = 1, languag
     onTogglePlay: togglePlay,
     onSkipBack: skipBack,
     onSkipForward: skipForward,
+    onSeekTo: (seconds: number) => {
+      if (durationSeconds > 0) seek((seconds / durationSeconds) * 100);
+    },
   });
 
   // --- Compute progress key for save/load/clear ---

@@ -1,6 +1,5 @@
 // src/services/IntroductionAudioService.ts
 import { audioStoryService } from './AudioStoryService';
-import { loadFigureImageV2, getBestImageFromMetadata } from '../utils/imageLoaderV2';
 
 // Import extracted modules
 import { normalizeManifestFigureName } from './audio/introduction/figureNameNormalizer';
@@ -12,7 +11,7 @@ import {
 } from './audio/introduction/playbackControls';
 import { HistoryManager } from './audio/introduction/historyManager';
 import { ProgressTracker } from './audio/introduction/progressTracker';
-import { getNextStory, getPreviousStory, getFullFigureName } from './audio/introduction/navigationHelper';
+import { getNextStory, getPreviousStory } from './audio/introduction/navigationHelper';
 
 // Re-export for backward compatibility
 export { AUDIO_SUPPORTED_LANGUAGES };
@@ -354,7 +353,7 @@ class IntroductionAudioService {
           onStart: (data) => {
             this.isLoading = false;
             this.emit('loadingChange', false);
-            this.handlePlaybackStart(data, story, figureId);
+            this.handlePlaybackStart(data);
           },
           onProgress: (data) => this.handlePlaybackProgress(data),
           onEnd: () => this.handlePlaybackEnd(story, figureId),
@@ -384,54 +383,17 @@ class IntroductionAudioService {
   }
   
   // Handler for playback start
-  private handlePlaybackStart(data: PlaybackData, story: Story, figureId: string): void {
+  //
+  // Media Session metadata is NOT set here. The document has one session and
+  // several players can be mounted at once, so ownership is arbitrated in the
+  // useMediaSession hook and the Audio Library modal drives it.
+  private handlePlaybackStart(data: PlaybackData): void {
     this.isPlaying = true;
     this.duration = data.duration;
-    
+
     // Start progress tracking
     this.startProgressTracking();
-    
-    // Set MediaSession metadata for lock screen controls with vite-processed artwork
-    if ('mediaSession' in navigator && typeof MediaMetadata !== 'undefined') {
-      // Load thumbnail asynchronously for lock screen artwork
-      loadFigureImageV2(figureId, 'thumbnail').then(async metadata => {
-        if (metadata && metadata.length > 0) {
-          // Get best image (prioritize WebP, fallback to PNG)
-          const bestImage = getBestImageFromMetadata(metadata, 512, 'webp');
-          const artworkUrl = bestImage?.primary || bestImage?.webp?.src || bestImage?.png?.src;
 
-          if (artworkUrl) {
-            try {
-              const fullFigureName = await getFullFigureName(figureId);
-              // Lock-screen metadata travels without app context, so the
-              // artist line itself carries the AI disclosure. The service has
-              // no i18n access, so pick the variant by the story language.
-              // Catalog names already carry an "Echo of/von" prefix, so
-              // unwrap it before adding the AI variant.
-              const figureName = (fullFigureName || story.figureName || figureId)
-                .replace(/^Echo (of|von) /i, '');
-              const artist = story.language === 'de'
-                ? `KI-Echo von ${figureName}`
-                : `AI Echo of ${figureName}`;
-
-              navigator.mediaSession.metadata = new MediaMetadata({
-                title: story.title || 'Instruction Story',
-                artist,
-                album: 'Agora Cosmica',
-                artwork: [
-                  { src: artworkUrl, sizes: '512x512', type: 'image/webp' },
-                ]
-              });
-            } catch (error) {
-              console.warn('MediaMetadata not supported:', error);
-            }
-          }
-        }
-      }).catch(error => {
-        console.warn('Failed to load thumbnail for media session:', error);
-      });
-    }
-    
     // Notify listeners
     this.emit('playbackUpdate', {
       isPlaying: true,
@@ -848,7 +810,7 @@ class IntroductionAudioService {
           onStart: (data) => {
             this.isLoading = false;
             this.emit('loadingChange', false);
-            this.handlePlaybackStart(data, story, figureId);
+            this.handlePlaybackStart(data);
           },
           onProgress: (data) => this.handlePlaybackProgress(data),
           onEnd: () => this.handlePlaybackEnd(story, figureId),

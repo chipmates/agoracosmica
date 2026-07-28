@@ -3,6 +3,7 @@ import { FC, useState, useRef, useEffect, useCallback, ChangeEvent } from 'react
 import { Play, Pause, ClockCounterClockwise, ClockClockwise } from '@phosphor-icons/react';
 import './StoryAudioPlayer.css';
 import useAudio from '../hooks/useAudio';
+import { useMediaSession } from '../hooks/useMediaSession';
 import type { PlaybackContentType } from '../utils/playbackBeacon';
 import { useTranslation } from '../hooks/useTranslation';
 
@@ -20,6 +21,10 @@ interface StoryAudioPlayerProps {
    *  'started' event on first play. Caller must provide content type +
    *  optional figureId. */
   playbackBeacon?: { type: PlaybackContentType; figureId?: string; mode?: string };
+  /** Figure whose Echo is speaking. Drives lock screen artwork and artist. */
+  figureId?: string;
+  /** Episode title for the lock screen. */
+  mediaTitle?: string;
 }
 
 const StoryAudioPlayer: FC<StoryAudioPlayerProps> = ({
@@ -31,7 +36,9 @@ const StoryAudioPlayer: FC<StoryAudioPlayerProps> = ({
   onPlayStateChange,
   seekToTime,
   togglePlayRequest,
-  playbackBeacon
+  playbackBeacon,
+  figureId,
+  mediaTitle
 }) => {
   const { tString } = useTranslation();
   const {
@@ -118,6 +125,23 @@ const StoryAudioPlayer: FC<StoryAudioPlayerProps> = ({
     const newPercent = (newTime / durationSeconds) * 100;
     seek(Math.min(Math.max(newPercent, 0), 100));
   }, [currentTimeSeconds, durationSeconds, seek]);
+
+  // Lock screen / OS transport controls for the story episode
+  useMediaSession({
+    title: mediaTitle ?? '',
+    figureId: figureId ?? '',
+    isPlaying,
+    currentTimeSeconds,
+    durationSeconds,
+    playbackRate,
+    onTogglePlay: togglePlay,
+    onSkipBack: () => handleSkip(-15),
+    onSkipForward: () => handleSkip(15),
+    onSeekTo: (seconds: number) => {
+      if (durationSeconds > 0) seek((seconds / durationSeconds) * 100);
+    },
+    enabled: Boolean(figureId && audioUrl),
+  });
 
   // Increment/decrement speed by 0.05
   const adjustSpeed = (increment: number): void => {

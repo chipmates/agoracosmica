@@ -6,6 +6,7 @@ import { useForeword } from '../../hooks/useForeword';
 import { useTranslation } from '../../hooks/useTranslation';
 import { useFocusTrap } from '../../hooks/useFocusTrap';
 import useAudio from '../../hooks/useAudio';
+import { useMediaSession } from '../../hooks/useMediaSession';
 import { Play, Pause, SpeakerSimpleHigh, Info, Scroll } from '@phosphor-icons/react';
 import './ForewordModal.css';
 
@@ -36,13 +37,39 @@ export const ForewordModal: FC<ForewordModalProps> = ({
     isPlaying,
     progress,
     currentTime,
+    currentTimeSeconds,
     duration,
+    durationSeconds,
+    playbackRate,
     togglePlay,
     seek,
   } = useAudio(foreword?.audioUrl ?? null, {
     autoplay: false,
     initialVolume: 1.0,
     playbackBeacon: { type: 'foreword', figureId, mode: 'foreword' },
+  });
+
+  const seekBySeconds = (offset: number): void => {
+    if (durationSeconds <= 0) return;
+    const target = currentTimeSeconds + offset;
+    seek(Math.min(Math.max((target / durationSeconds) * 100, 0), 100));
+  };
+
+  // Lock screen / OS transport controls for the foreword
+  useMediaSession({
+    title: tString('audioLibrary.foreword', 'Foreword'),
+    figureId,
+    isPlaying,
+    currentTimeSeconds,
+    durationSeconds,
+    playbackRate,
+    onTogglePlay: togglePlay,
+    onSkipBack: () => seekBySeconds(-15),
+    onSkipForward: () => seekBySeconds(15),
+    onSeekTo: (seconds: number) => {
+      if (durationSeconds > 0) seek((seconds / durationSeconds) * 100);
+    },
+    enabled: Boolean(foreword?.audioUrl),
   });
 
   const handleSeek = (e: ChangeEvent<HTMLInputElement>): void => {
