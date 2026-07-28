@@ -12,6 +12,17 @@ import { StoryFactCheckPanel } from './FactCheck';
 import { ForewordModal } from './Foreword';
 import { figureHasForeword } from '../hooks/useForeword';
 import useStoryHighlighting from '../hooks/useStoryHighlighting';
+import { useSeedTranslation } from '../hooks/useSeedTranslation';
+import { useFileSize } from '../hooks/useFileSize';
+import { DownloadControl } from './DownloadControl';
+import {
+  buildEpisodeFilename,
+  formatFileSize,
+  getEpisodeAudioUrl,
+  getEpisodeTranscriptUrl
+} from '../services/mediaDownload';
+import { normalizeFigureName } from '../utils/nameUtils';
+import { STORY_DOWNLOADS_ENABLED } from '../config/features';
 import { sendFunnelBeacon } from '../utils/funnelBeacon';
 import { Seed } from '../types/global';
 // Manifest no longer needed - using direct path construction
@@ -620,6 +631,37 @@ const StoryPlayer: FC<StoryPlayerProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [shouldShowAudioPlayer, isHighlightingAvailable, activeParagraphIndex, audioTimeSeconds, paragraphs.length, seekToParagraph, showStoryHelp, showFactCheck, showForeword, isAudioLibraryOpen]);
 
+  // --- Offline copy of this episode ---
+  // Always mp3: the webm the player streams is smaller but useless outside a
+  // browser, and a downloaded file has to work in any music app.
+  const { getTranslatedSeedTitle } = useSeedTranslation();
+  const downloadFigureId = normalizeFigureName(figure);
+
+  const seedNumber = React.useMemo(() => {
+    const raw = selectedSeed?.id;
+    if (raw == null) return null;
+    const match = String(raw).match(/(\d+)\s*$/);
+    return match ? Number(match[1]) : null;
+  }, [selectedSeed]);
+
+  const episodeTitle = React.useMemo(() => {
+    if (seedNumber == null) return '';
+    return getTranslatedSeedTitle(downloadFigureId, seedNumber) || selectedSeed?.title || '';
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [downloadFigureId, seedNumber, selectedSeed]);
+
+  const echoName = React.useMemo(() => {
+    const baseName = (figureName || downloadFigureId).replace(/^Echo (of|von|de) /i, '').trim();
+    return tString('figures.echoOfName', `Echo of ${baseName}`).replace('{name}', baseName);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [figureName, downloadFigureId, language]);
+
+  const canDownload = STORY_DOWNLOADS_ENABLED && Boolean(shouldShowAudioPlayer) && seedNumber != null;
+  const audioDownloadUrl = canDownload ? getEpisodeAudioUrl(downloadFigureId, seedNumber!, language) : null;
+  const transcriptDownloadUrl = canDownload ? getEpisodeTranscriptUrl(downloadFigureId, seedNumber!, language) : null;
+  const audioBytes = useFileSize(audioDownloadUrl);
+  const audioSizeLabel = audioBytes ? formatFileSize(audioBytes, language) : null;
+
   // Display nothing if we don't have valid story data to show
   if (!storyData) {
     return null;
@@ -683,6 +725,41 @@ const StoryPlayer: FC<StoryPlayerProps> = ({
                     <span className="story-foreword-link__text">{tNode('audioLibrary.foreword')}</span>
                   </button>
                 )}
+                {audioDownloadUrl && (
+                  <DownloadControl
+                    className="story-download-link"
+                    url={audioDownloadUrl}
+                    filename={buildEpisodeFilename({
+                      echoName,
+                      seedId: seedNumber ?? 0,
+                      title: episodeTitle,
+                      language,
+                      ext: 'mp3'
+                    })}
+                    label={
+                      audioSizeLabel
+                        ? tString('download.audioWithSize', 'Download ({size})').replace('{size}', audioSizeLabel)
+                        : tString('download.audio', 'Download')
+                    }
+                    ariaLabel={tString('download.audioAria', 'Download the audio for {title}').replace('{title}', episodeTitle)}
+                  />
+                )}
+                {transcriptDownloadUrl && (
+                  <DownloadControl
+                    className="story-download-link story-download-link--quiet"
+                    url={transcriptDownloadUrl}
+                    filename={buildEpisodeFilename({
+                      echoName,
+                      seedId: seedNumber ?? 0,
+                      title: episodeTitle,
+                      language,
+                      ext: 'txt'
+                    })}
+                    label={tString('download.transcript', 'Text')}
+                    ariaLabel={tString('download.transcriptAria', 'Download the text for {title}').replace('{title}', episodeTitle)}
+                    iconSize={12}
+                  />
+                )}
                 <button
                   className="story-help-link"
                   onClick={handleStoryHelpClick}
@@ -706,6 +783,8 @@ const StoryPlayer: FC<StoryPlayerProps> = ({
               seekToTime={seekTarget}
               togglePlayRequest={togglePlayRequest}
               playbackBeacon={{ type: 'story', figureId: figure, mode: 'story' }}
+              figureId={downloadFigureId}
+              mediaTitle={episodeTitle}
             />
 
             {/* Paragraph progress indicator */}

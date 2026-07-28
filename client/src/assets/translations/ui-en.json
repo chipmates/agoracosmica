@@ -840,6 +840,19 @@
       "figure": "Figure"
     }
   },
+  "download": {
+    "audio": "MP3",
+    "audioWithSize": "MP3 ({size})",
+    "audioAria": "Download the audio for {title}",
+    "transcript": "Text",
+    "transcriptAria": "Download the text for {title}",
+    "cancel": "Cancel download",
+    "failed": "Download failed, try again",
+    "retry": "Try again",
+    "all": "Download all {count} stories",
+    "allWithSize": "Download all {count} stories ({size})",
+    "allAria": "Download every story by {name} as one file"
+  },
   "foreword": {
     "notAvailable": "Foreword not available for this figure."
   },

@@ -1,13 +1,24 @@
 // src/components/AudioLibrary/StoryCollection.tsx
 // Spotify-inspired modern design - 2025 best practices
 import { FC, useState, useEffect, useMemo } from 'react';
-import { Play, Check, Clock, SpeakerSimpleHigh, BookOpen } from '@phosphor-icons/react';
+import { Play, Check, Clock, SpeakerSimpleHigh, BookOpen, DownloadSimple } from '@phosphor-icons/react';
 import { AUDIO_SUPPORTED_LANGUAGES } from '../../constants/languages';
 import { getSeedById } from '../../services/seedCacheInitializer';
 import { useTranslation } from '../../hooks/useTranslation';
 import { useSeedTranslation } from '../../hooks/useSeedTranslation';
+import { useFileSize } from '../../hooks/useFileSize';
 import { useDomainStore } from '../../stores/domainStore';
 import { getMediaUrl } from '../../utils/mediaConfig';
+import { STORY_DOWNLOADS_ENABLED } from '../../config/features';
+import { DownloadControl } from '../DownloadControl';
+import {
+  buildEpisodeFilename,
+  formatFileSize,
+  getEpisodeAudioUrl,
+  getStoryArchiveUrl,
+  probeStoryArchive
+} from '../../services/mediaDownload';
+import type { ArchiveProbe } from '../../services/mediaDownload';
 
 import { Story } from '../../types/global';
 import { FactCheckModal } from '../FactCheck';
@@ -74,6 +85,35 @@ const markStoryAsPlayed = (storyId: string): void => {
   localStorage.setItem('audioLibrary_playedStories', JSON.stringify(played));
 };
 
+interface EpisodeDownloadProps {
+  figureId: string;
+  seedId: string;
+  title: string;
+  echoName: string;
+  language: string;
+}
+
+/**
+ * Per-episode download for a list row. Always the mp3: the webm the player
+ * streams is smaller but useless outside a browser.
+ */
+const EpisodeDownload: FC<EpisodeDownloadProps> = ({ figureId, seedId, title, echoName, language }) => {
+  const { tString } = useTranslation();
+  const url = getEpisodeAudioUrl(figureId, seedId, language);
+  const bytes = useFileSize(url);
+
+  return (
+    <DownloadControl
+      variant="stacked"
+      iconSize={16}
+      url={url}
+      filename={buildEpisodeFilename({ echoName, seedId, title, language, ext: 'mp3' })}
+      label={bytes ? formatFileSize(bytes, language) : ''}
+      ariaLabel={tString('download.audioAria', 'Download the audio for {title}').replace('{title}', title)}
+    />
+  );
+};
+
 const StoryCollection: FC<StoryCollectionProps> = ({ figure, currentStory, onPlayStory }) => {
   const { tString, tNode } = useTranslation();
   const language = useDomainStore((state) => state.language.current);
@@ -105,6 +145,22 @@ const StoryCollection: FC<StoryCollectionProps> = ({ figure, currentStory, onPla
 
   // Per-track progress from localStorage (real-time updates via storyProgressUpdated event)
   const progressMap = useStoryProgress(figureId, stories, language);
+
+  // Whole-figure archive. The route lives on the audio worker and may not be
+  // deployed, so it is probed first and the affordance stays hidden on failure.
+  const [archive, setArchive] = useState<ArchiveProbe | null>(null);
+  useEffect(() => {
+    if (!STORY_DOWNLOADS_ENABLED || !figureId) {
+      setArchive(null);
+      return;
+    }
+    let cancelled = false;
+    setArchive(null);
+    probeStoryArchive(figureId, language).then(result => {
+      if (!cancelled) setArchive(result);
+    });
+    return () => { cancelled = true; };
+  }, [figureId, language]);
   
   // Get figure display name (with proper Echo translation)
   const getFigureDisplayName = (fullName?: string): string => {
@@ -236,8 +292,18 @@ const StoryCollection: FC<StoryCollectionProps> = ({ figure, currentStory, onPla
 
   const isCurrentlyPlaying = (storyId: string): boolean => currentStory?.id === storyId;
 
+  const echoName = getFigureDisplayName(figure?.name);
+  const showDownloads = STORY_DOWNLOADS_ENABLED;
+  const showArchive = showDownloads && !!archive?.available && !!figureId;
+  const archiveLabel = archive?.bytes
+    ? tString('download.allWithSize', 'Download all {count} stories ({size})')
+        .replace('{count}', String(stories.length))
+        .replace('{size}', formatFileSize(archive.bytes, language))
+    : tString('download.all', 'Download all {count} stories')
+        .replace('{count}', String(stories.length));
+
   return (
-    <div className="story-collection">
+    <div className={`story-collection${showDownloads ? ' story-collection--downloads' : ''}`}>
       {/* Header Section - Figure name shown once */}
       <div className="story-collection__header">
         <div className="story-collection__figure-info">
@@ -267,6 +333,21 @@ const StoryCollection: FC<StoryCollectionProps> = ({ figure, currentStory, onPla
                 {tNode('factCheck.facts')}
               </button>
             </div>
+
+            {showArchive && (
+              <div className="story-collection__actions">
+                <a
+                  className="story-collection__download-all"
+                  href={getStoryArchiveUrl(figureId, language)}
+                  download
+                  rel="noopener"
+                  aria-label={tString('download.allAria', 'Download every story by {name} as one file').replace('{name}', echoName)}
+                >
+                  <DownloadSimple size={16} weight="duotone" />
+                  <span>{archiveLabel}</span>
+                </a>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -339,6 +420,25 @@ const StoryCollection: FC<StoryCollectionProps> = ({ figure, currentStory, onPla
               <div className="story-item__duration">
                 {formatDuration(story.duration)}
               </div>
+
+              {/* Download — its own cell so a tap never starts playback */}
+              {showDownloads && (
+                <div
+                  className="story-item__download"
+                  onClick={(e) => e.stopPropagation()}
+                  onKeyDown={(e) => e.stopPropagation()}
+                >
+                  {canPlay && (
+                    <EpisodeDownload
+                      figureId={story.figureId}
+                      seedId={story.seedId}
+                      title={story.title}
+                      echoName={echoName}
+                      language={language}
+                    />
+                  )}
+                </div>
+              )}
 
               {/* Progress bar */}
               {hasProgress && (

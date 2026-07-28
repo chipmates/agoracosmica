@@ -20,6 +20,7 @@ import { getHistoricalFigures } from '../../api/figures';
 import { introductionAudioService } from '../../services/IntroductionAudioService';
 import { useHapticFeedback } from '../../hooks/useHapticFeedback';
 import { useTranslation } from '../../hooks/useTranslation';
+import { useMediaSession } from '../../hooks/useMediaSession';
 import { useUIStore } from '../../stores/uiStore';
 import HelperPopup from '../HelperPopup/HelperPopup';
 import { CaretLeft, CaretRight, Sparkle, BookOpen, Info, CaretDown, CaretUp, Play, TrendUp, Trophy } from '@phosphor-icons/react';
@@ -96,6 +97,9 @@ const AudioLibraryModal: FC<AudioLibraryModalProps> = ({
   const dismissHelp = useUIStore((state) => state.dismissHelp);
   const [showAudioHelp, setShowAudioHelp] = useState<boolean>(false);
   const [showFullDisclaimer, setShowFullDisclaimer] = useState<boolean>(false);
+  // Mirror of the service's transport state, for the Media Session position bar
+  const [transport, setTransport] = useState({ isPlaying: false, currentTime: 0, duration: 0 });
+  const [playbackRate, setPlaybackRate] = useState<number>(1);
 
   const figures: Figure[] = historicalFigures.map(fig => ({
     ...fig,
@@ -129,7 +133,6 @@ const AudioLibraryModal: FC<AudioLibraryModalProps> = ({
         setCurrentlyPlaying(initialFigure ?? null);
         setActiveView('nowPlaying');
       }
-      setupMediaSession();
       document.body.classList.add('audio-library-open');
     } else {
       document.body.classList.remove('audio-library-open');
@@ -155,12 +158,49 @@ const AudioLibraryModal: FC<AudioLibraryModalProps> = ({
       } else if (!state.isPlaying) {
         setCurrentlyPlaying(null);
       }
+      setTransport({
+        isPlaying: !!state.isPlaying,
+        currentTime: state.currentTime ?? 0,
+        duration: state.duration ?? 0,
+      });
     };
+    const handleRateChange = (rate: number) => setPlaybackRate(rate);
     introductionAudioService.on('playbackUpdate', handlePlaybackUpdate);
+    introductionAudioService.on('rateChange', handleRateChange);
     return () => {
       introductionAudioService.off('playbackUpdate', handlePlaybackUpdate);
+      introductionAudioService.off('rateChange', handleRateChange);
     };
   }, [selectedFigure]);
+
+  // ±15s from the lock screen, expressed in the service's percentage seek
+  const seekBySeconds = (offset: number): void => {
+    const state = introductionAudioService.getPlaybackState();
+    if (!state.duration || state.duration <= 0) return;
+    const target = (state.currentTime ?? 0) + offset;
+    introductionAudioService.seek(Math.min(Math.max((target / state.duration) * 100, 0), 100));
+  };
+
+  // Lock screen / OS transport controls for library playback
+  useMediaSession({
+    title: currentStory?.title ?? '',
+    figureId: currentStory?.figureId ?? selectedFigure?.id ?? '',
+    isPlaying: transport.isPlaying,
+    currentTimeSeconds: transport.currentTime,
+    durationSeconds: transport.duration,
+    playbackRate,
+    onTogglePlay: () => introductionAudioService.togglePlayback(),
+    onSkipBack: () => seekBySeconds(-15),
+    onSkipForward: () => seekBySeconds(15),
+    onSeekTo: (seconds: number) => {
+      const state = introductionAudioService.getPlaybackState();
+      if (!state.duration || state.duration <= 0) return;
+      introductionAudioService.seek(Math.min(Math.max((seconds / state.duration) * 100, 0), 100));
+    },
+    onPreviousTrack: () => introductionAudioService.playPrevious(),
+    onNextTrack: () => introductionAudioService.playNext(),
+    enabled: isOpen && !!currentStory,
+  });
 
   // Calculate how many figures fit in the carousel (like MiniFigureCarousel)
   useEffect(() => {
@@ -276,32 +316,6 @@ const AudioLibraryModal: FC<AudioLibraryModalProps> = ({
         }
       }
     } catch { /* ignore */ }
-  };
-
-  const setupMediaSession = (): void => {
-    if ('mediaSession' in navigator) {
-      navigator.mediaSession.setActionHandler('play', () => introductionAudioService.resume());
-      navigator.mediaSession.setActionHandler('pause', () => introductionAudioService.pause());
-      navigator.mediaSession.setActionHandler('nexttrack', () => introductionAudioService.playNext());
-      navigator.mediaSession.setActionHandler('previoustrack', () => introductionAudioService.playPrevious());
-
-      // ±15s skip from lock screen
-      const handleSeekBy = (offset: number): void => {
-        const state = introductionAudioService.getPlaybackState();
-        if (state.duration && state.duration > 0) {
-          const newTime = (state.currentTime ?? 0) + offset;
-          const newProgress = (newTime / state.duration) * 100;
-          introductionAudioService.seek(Math.min(Math.max(newProgress, 0), 100));
-        }
-      };
-
-      try {
-        navigator.mediaSession.setActionHandler('seekbackward', () => handleSeekBy(-15));
-        navigator.mediaSession.setActionHandler('seekforward', () => handleSeekBy(15));
-      } catch {
-        // seekbackward/seekforward not supported in all browsers
-      }
-    }
   };
 
   const handleViewChange = (view: 'collection' | 'nowPlaying'): void => {

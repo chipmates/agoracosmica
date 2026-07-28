@@ -213,6 +213,21 @@
   border-radius: 2px;
 }
 
+/* Download links - same weight as the other intro affordances */
+.story-download-link {
+  font-size: 0.85rem;
+}
+
+/* The transcript sits behind the audio: same row, less pull */
+.story-download-link--quiet {
+  color: color-mix(in srgb, var(--gold-subtle) 70%, transparent);
+  font-size: 0.78rem;
+}
+
+.story-download-link--quiet:hover {
+  color: var(--gold-hover);
+}
+
 /* Story content area - enhanced typography */
 .story-content {
   color: var(--story-text);

@@ -842,6 +842,19 @@
       "figure": "Persönlichkeit"
     }
   },
+  "download": {
+    "audio": "MP3",
+    "audioWithSize": "MP3 ({size})",
+    "audioAria": "Audio zu {title} herunterladen",
+    "transcript": "Text",
+    "transcriptAria": "Text zu {title} herunterladen",
+    "cancel": "Download abbrechen",
+    "failed": "Download fehlgeschlagen, bitte nochmal",
+    "retry": "Nochmal",
+    "all": "Alle {count} Geschichten laden",
+    "allWithSize": "Alle {count} Geschichten laden ({size})",
+    "allAria": "Alle Geschichten von {name} in einer Datei laden"
+  },
   "foreword": {
     "notAvailable": "Vorwort für diese Persönlichkeit nicht verfügbar."
   },

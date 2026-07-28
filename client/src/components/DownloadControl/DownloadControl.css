@@ -1,0 +1,123 @@
+/* src/components/DownloadControl/DownloadControl.css */
+
+.download-control {
+  --download-progress: 0%;
+
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--gold-subtle);
+  cursor: pointer;
+  transition: color var(--transition-fast, 150ms ease);
+  min-height: 44px;
+  flex-shrink: 0;
+}
+
+.download-control:hover {
+  color: var(--gold-hover);
+}
+
+.download-control:focus-visible {
+  outline: 1.5px dashed var(--gold-primary);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.download-control__icon {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+/* ── Link variant: sits in a row of text affordances ───────────────── */
+
+.download-control--link {
+  font-size: 0.85rem;
+  font-family: var(--font-content, 'Libre Caslon Text', Georgia, serif);
+  font-style: italic;
+}
+
+.download-control--link .download-control__label {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Determinate progress as a filled underline while the file streams in */
+.download-control--link.download-control--busy .download-control__label {
+  text-decoration: none;
+  background-image: linear-gradient(
+    to right,
+    var(--gold-primary) var(--download-progress),
+    color-mix(in srgb, var(--gold-subtle) 25%, transparent) var(--download-progress)
+  );
+  background-repeat: no-repeat;
+  background-size: 100% 2px;
+  background-position: 0 100%;
+  padding-bottom: 2px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Stacked variant: icon over a size line, for list rows ─────────── */
+
+.download-control--stacked {
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.15rem;
+  width: 100%;
+  color: var(--text-tertiary);
+}
+
+.download-control--stacked:hover {
+  color: var(--gold-primary);
+}
+
+.download-control--stacked .download-control__label {
+  font-size: 0.6rem;
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.download-control--stacked.download-control--busy {
+  color: var(--gold-primary);
+}
+
+/* Progress ring around the cancel glyph */
+.download-control--stacked.download-control--busy .download-control__icon {
+  border-radius: 50%;
+  padding: 3px;
+  background:
+    conic-gradient(
+      var(--gold-primary) var(--download-progress),
+      color-mix(in srgb, var(--gold-subtle) 20%, transparent) var(--download-progress)
+    );
+}
+
+/* ── Error state ───────────────────────────────────────────────────── */
+
+.download-control--error,
+.download-control--error:hover {
+  color: var(--color-error);
+}
+
+/* ── Touch target: the glyphs are small, the tap zone is not ───────── */
+
+.download-control::after {
+  content: '';
+  position: absolute;
+  inset: 50% 0 auto 50%;
+  width: max(100%, 44px);
+  height: 44px;
+  transform: translate(-50%, -50%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .download-control {
+    transition: none;
+  }
+}
