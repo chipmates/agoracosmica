@@ -1,0 +1,210 @@
+---
+// The merged landing hero: plate portrait, four-beat spine, prefilled
+// question, thirty-link shelf. Ships complete in markup (the ignition
+// choreography in the client script only replays what is already here).
+// The shelf anchors are real figure-page links; script intercepts clicks
+// to re-key the hero in place.
+import { getFiguresCatalog } from '@client/data/public/figuresCatalog';
+import { figureIdToSlug } from '@client/data/public/slugMap';
+import manifest from '@client/data/image-manifest.json';
+import { figureImage, figureSrcset } from '../lib/figureImages';
+import type { Lang } from '../i18n';
+import '../styles/night-hero.css';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const de = lang === 'de';
+const figuresRev = (manifest as { figuresRev?: string }).figuresRev ?? '';
+
+// DE display names where the product uses the exonym. Everything else keeps
+// the catalog name in both languages.
+const DE_NAMES: Record<string, string> = { aurelius: 'Mark Aurel', plato: 'Platon' };
+
+// Desktop shows ONE exact row (19 fill the shell) of the priority figures;
+// the full thirty stay in the markup and on the phone's swipe rail, and
+// "Meet all thirty" carries the rest. Edit this list to recast the row.
+const PRIORITY = [
+  'aurelius', 'kahlo', 'nietzsche', 'einstein', 'jung', 'gautama',
+  'dickinson', 'campbell', 'goethe', 'eckhart', 'laozi', 'plato', 'rumi',
+  'shakespeare', 'angelou', 'king', 'mandela', 'tubman', 'vinci',
+];
+
+const figures = getFiguresCatalog().map((f) => ({
+  id: f.id,
+  slug: figureIdToSlug[f.id],
+  name: de ? (DE_NAMES[f.id] ?? f.name) : f.name,
+  priority: PRIORITY.includes(f.id),
+}));
+
+const figuresBase = de ? '/de/figures/' : '/figures/';
+
+// The default figure the page ships with. Strings match the client script's
+// table for aurelius, so the first re-key swaps nothing.
+const S = de
+  ? {
+      eyebrow: 'Stimmen aus der ganzen Geschichte',
+      h1a: 'Eine lebendige Bibliothek,',
+      h1b: 'mit der du sprechen kannst',
+      sub: 'Lerne von 30 bemerkenswerten Menschen, von Mark Aurel bis Frida Kahlo.',
+      name: 'Mark Aurel',
+      trad: 'Stoizismus',
+      play: 'Das Echo hören',
+      qkick: 'Wohin sein Weg führt',
+      promise: 'Du lernst, deine erste Reaktion zu hinterfragen.',
+      council: 'Vier von ihnen streiten es aus',
+      askLbl: 'Deine erste Frage',
+      q: 'Wie halte ich kleine Ärgernisse davon ab, mir den ganzen Tag zu nehmen?',
+      free: '30 kostenlose Nachrichten pro Tag. Ohne Anmeldung.',
+      disc: 'Ein Echo, keine Aufnahme. Gemalt, nicht fotografiert.',
+      trust: 'Gemeinnützig · Open Source · Keine Tracking-Cookies, kein Profiling',
+      shelf: 'Dreißig Leben. Wähle ein Gesicht.',
+      entryA: 'Alle dreißig ansehen',
+      entryAshort: 'Alle 30',
+    }
+  : {
+      eyebrow: 'Voices from across history',
+      h1a: 'A Living Library',
+      h1b: 'You Can Talk To',
+      sub: "Learn from 30 of history's remarkable people, Marcus Aurelius to Frida Kahlo.",
+      name: 'Marcus Aurelius',
+      trad: 'Stoicism',
+      play: 'Hear the Echo',
+      qkick: 'Where his path leads',
+      promise: 'You will learn to question your first reaction.',
+      council: 'Four of them argue it out',
+      askLbl: 'Your first question',
+      q: 'How do I stop small annoyances from taking my whole day?',
+      free: '30 free messages a day. No signup needed.',
+      disc: 'An Echo, not a recording. Painted, not photographed.',
+      trust: 'Nonprofit · Open Source · No tracking cookies, no profiling',
+      shelf: 'Thirty lives. Pick a face.',
+      entryA: 'Meet all thirty',
+      entryAshort: 'All 30',
+    };
+
+const councilDefault = ['aurelius', 'gautama', 'nietzsche', 'schopenhauer'];
+---
+<script is:inline>
+  /* Pre-paint marker: hands the painting to the motion layer. No script and
+     reduced motion both keep the finished hero, nothing is ever hidden. */
+  (function () {
+    if (/motion=still/.test(location.search)) return;
+    if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    document.documentElement.classList.add('settling');
+  })();
+</script>
+
+<div class="mh" data-figrev={figuresRev}>
+  <section class="hero" aria-labelledby="h1">
+    <canvas class="dustlayer" id="dust" aria-hidden="true"></canvas>
+    <div class="wrap">
+      <div class="headcol">
+        <p class="caps eyebrow" id="eyebrow">{S.eyebrow}</p>
+        <h1 id="h1">{S.h1a} <i>{S.h1b}</i></h1>
+        <p class="sub" id="sub">{S.sub}</p>
+      </div>
+
+      <div class="artcol">
+        <figure class="pplate">
+          <div class="mat">
+            <img
+              class="shot"
+              id="shot"
+              alt=""
+              crossorigin="anonymous"
+              fetchpriority="high"
+              decoding="async"
+              src={figureImage('aurelius', 'main', 900)}
+              srcset={figureSrcset('aurelius', 'main', [600, 900, 1200])}
+              sizes="(max-width: 899px) 100vw, 46vw"
+            />
+          </div>
+          <figcaption class="pcap">
+            <span class="pcap__nm"><span class="pcap__echo">{de ? 'Echo von' : 'Echo of'}</span> <span id="nm">{S.name}</span></span>
+            <span class="pcap__tr caps" id="tr">{S.trad}</span>
+          </figcaption>
+        </figure>
+      </div>
+
+      <div class="beatscol">
+        <ol class="beats">
+          <li>
+            <button class="play" id="play" type="button" aria-pressed="false">
+              <span class="play__disc">
+                <svg id="icoPlay" viewBox="0 0 12 14" aria-hidden="true"><path d="M0 0l12 7-12 7z"/></svg>
+                <svg id="icoPause" viewBox="0 0 12 14" hidden aria-hidden="true"><path d="M0 0h4v14H0zM8 0h4v14H8z"/></svg>
+              </span>
+              <span id="playLbl">{S.play}</span>
+              <span class="play__t" id="playT"></span>
+            </button>
+          </li>
+          <li class="labelled">
+            <p class="caps blabel" id="qkick">{S.qkick}</p>
+            <p class="promise" id="promise"><em>{S.promise}</em></p>
+          </li>
+          <li>
+            <a class="council" id="council" href="/app">
+              <span class="faces" id="faces">
+                {councilDefault.map((cid) => (
+                  <img src={figureImage(cid, 'thumbnail', 160)} alt="" loading="lazy" decoding="async" />
+                ))}
+              </span>
+              <span id="councilTxt">{S.council}</span>
+            </a>
+          </li>
+          <li class="labelled">
+            <p class="caps blabel gold" id="askLbl">{S.askLbl}</p>
+            <a
+              class="ask"
+              id="ask"
+              href={`/app?figure=${figureIdToSlug['aurelius']}&lang=${lang}&ask=hero`}
+              data-agc-cta="start-exploring"
+              data-agc-figure="aurelius"
+            >
+              <q id="q">{S.q}</q>
+              <span class="ask__go"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1l7 7-7 7-1.4-1.4L11.2 9H1V7h10.2L6.6 2.4z"/></svg></span>
+            </a>
+          </li>
+        </ol>
+
+        <div class="fine">
+          <div class="fine__col">
+            <p class="free" id="free">{S.free}</p>
+            <p class="disc" id="discl">{S.disc}</p>
+            <p class="trust" id="trust">{S.trust}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="shelf shelfcol">
+        <p class="caps shelfcap">
+          <span class="shelfcap__t" id="shelfLbl">{S.shelf}</span>
+          <a class="entryA" id="entryA" href={figuresBase}>
+            <span id="entryAlong">{S.entryA}</span><span id="entryAshort" hidden>{S.entryAshort}</span> &rarr;
+          </a>
+        </p>
+        <div class="rail" id="rail">
+          {figures.map((f) => (
+            <a
+              href={`${figuresBase}${f.slug}/`}
+              class={f.priority ? undefined : 'rail__more'}
+              data-id={f.id}
+              aria-label={f.name}
+              title={f.name}
+              aria-current={f.id === 'aurelius' ? 'true' : undefined}
+            >
+              <img src={figureImage(f.id, 'thumbnail', 160)} alt="" loading="lazy" decoding="async" />
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <audio id="au" crossorigin="anonymous" preload="none"></audio>
+  </section>
+</div>
+
+<script src="../scripts/agora-hero.js"></script>

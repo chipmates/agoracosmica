@@ -1,0 +1,362 @@
+/* Merged hero skin. Everything is scoped to .mh so it can be dropped into the
+   V2 reskin page without touching a single existing rule. Colour comes from
+   skin/tokens.css. */
+
+/* ============================================================
+   Merged hero. Visual language: the V2 reskin (plate, mat, rule,
+   engraved caps). Colour comes from skin/tokens.css only.
+   ============================================================ */
+.mh [hidden]{display:none !important}
+.mh{
+  --shell: 1120px;
+  --gutter: clamp(1.1rem, 4vw, 2.5rem);
+  --keyline: color-mix(in srgb, var(--gold-subtle) var(--a-20), transparent);
+  --keyline-soft: color-mix(in srgb, var(--gold-subtle) var(--a-12), transparent);
+  --keyline-strong: color-mix(in srgb, var(--gold-primary) var(--a-45), transparent);
+  --keyline-inner: color-mix(in srgb, var(--gold-primary) var(--a-08), transparent);
+  --plate-radius: 4px;
+  --plate-radius-soft: 10px;
+  --plate-shadow: 0 18px 44px color-mix(in srgb, #000 var(--a-45), transparent);
+  --plate-shadow-sm: 0 8px 22px color-mix(in srgb, #000 var(--a-35), transparent);
+  /* one rule keeps every head whole: the plate is always WIDER than the widest
+     portrait (0.834), so cover only ever trims the bottom, and the crop is
+     anchored to the top. Verified against all thirty at 1/1 and 4/3. */
+  --plate-aspect: 1/1;
+}
+
+/* engraved caps: the reskin's eyebrow / label voice */
+.caps{font-family:var(--font-ui);text-transform:uppercase;letter-spacing:.16em;
+  font-size:.688rem;font-weight:var(--weight-medium);line-height:1.4}
+/* an eyebrow trails a fading rule to the right */
+.eyebrow{display:flex;align-items:center;gap:.85rem;color:var(--gold-primary)}
+.eyebrow::after{content:"";flex:1;height:1px;
+  background:linear-gradient(to right,
+    color-mix(in srgb,var(--gold-subtle) var(--a-45),transparent),transparent)}
+
+/* ---------- hero ---------- */
+.hero{position:relative;padding:1.6rem 0 0;background:
+  radial-gradient(120% 80% at 78% 6%, color-mix(in srgb,var(--bg-primary) 82%,transparent) 0%,
+    var(--bg-void) 62%)}
+/* the motion layer spans the whole hero, because the dust travels: it builds the
+   face inside the mat, then runs down the spine into the question */
+.dustlayer{position:absolute;inset:0;z-index:2;pointer-events:none;
+  width:100%;height:100%}
+.wrap{position:relative;z-index:1;max-width:var(--shell);margin:0 auto;padding:0 var(--gutter);
+  display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,1fr);
+  grid-template-areas:"head art" "beats art" "shelf shelf";
+  column-gap:3rem;align-items:start}
+.headcol{grid-area:head}
+.beatscol{grid-area:beats}
+.artcol{grid-area:art;justify-self:end;width:100%;max-width:406px}
+.shelfcol{grid-area:shelf}
+
+.mh h1{font-family:var(--font-content);font-weight:400;
+  font-size:clamp(2rem,3.2vw,2.85rem);line-height:1.1;letter-spacing:-.01em;
+  margin:.85rem 0 0;color:var(--text-primary)}
+.mh h1 i{display:block;font-style:italic;color:var(--gold-primary)}
+html[lang=de] .mh h1{font-size:clamp(1.75rem,2.7vw,2.4rem)}
+.sub{margin:.6rem 0 0;max-width:38ch;font-size:1rem;line-height:1.6;
+  color:var(--text-secondary)}
+
+/* ---------- the four beats ---------- */
+.beats{list-style:none;position:relative;margin:1.5rem 0 0;padding-left:1.7rem}
+.beats::before{content:"";position:absolute;left:5px;top:10px;bottom:16px;width:1px;
+  background:linear-gradient(to bottom,
+    color-mix(in srgb,var(--gold-subtle) var(--a-45),transparent),
+    color-mix(in srgb,var(--gold-subtle) var(--a-12),transparent) 76%,transparent)}
+.beats>li{position:relative;margin-bottom:.88rem}
+.beats>li:last-child{margin-bottom:0}
+.beats>li::before{content:"";position:absolute;left:-1.7rem;top:15px;width:11px;height:11px;
+  border-radius:50%;border:1px solid var(--keyline-strong);background:var(--gold-primary);
+  box-shadow:0 0 12px color-mix(in srgb,var(--gold-primary) var(--a-40),transparent)}
+/* a beat with a label above it drops its node onto the object the label names */
+.beats>li.labelled::before{top:34px}
+.blabel{margin-bottom:.35rem;color:var(--text-tertiary)}
+.blabel.gold{color:var(--gold-primary)}
+
+/* LISTEN: a plate pill. Silent by default, pressing it is a reward. */
+.play{display:inline-flex;align-items:center;gap:.75rem;min-height:46px;
+  padding:0 1.1rem 0 .3rem;cursor:pointer;font:inherit;font-size:.9rem;
+  color:var(--text-primary);background:var(--bg-card);
+  border:1px solid var(--keyline);border-radius:999px;
+  box-shadow:var(--plate-shadow-sm),inset 0 1px 0 var(--keyline-inner);
+  transition:border-color .25s ease,background .25s ease}
+.play:hover{border-color:var(--keyline-strong)}
+.play__disc{width:34px;height:34px;flex:0 0 34px;border-radius:50%;display:grid;
+  place-items:center;background:var(--gold-primary)}
+.play__disc svg{width:13px;height:13px;fill:var(--bg-void)}
+#icoPlay{margin-left:2px}
+.play__t{color:var(--text-tertiary);font-size:.78rem;font-variant-numeric:tabular-nums}
+.play[aria-pressed=true]{border-color:var(--keyline-strong);
+  background:color-mix(in srgb,var(--gold-primary) var(--a-10),var(--bg-card))}
+
+/* QUEST */
+.promise{font-family:var(--font-content);font-size:1.16rem;line-height:1.45;
+  color:var(--text-primary)}
+.promise em{font-style:italic}
+
+/* DISCUSSION: a chip, the figure sits inside their own council */
+.council{display:inline-flex;align-items:center;gap:.8rem;min-height:46px;
+  padding:.2rem 1rem .2rem .25rem;border:1px solid var(--keyline-soft);
+  border-radius:999px;text-decoration:none;font-size:.875rem;
+  color:var(--text-secondary);transition:border-color .25s ease}
+.council:hover{border-color:var(--keyline-strong)}
+.faces{display:flex;flex:0 0 auto}
+.faces img{width:34px;height:34px;border-radius:50%;object-fit:cover;
+  border:2px solid var(--bg-void);background:var(--bg-astral);margin-left:-11px}
+.faces img:first-child{margin-left:0}
+
+/* SPEAK: the climax. The warmest plate on the page. */
+.ask{display:flex;align-items:center;gap:1rem;text-decoration:none;
+  padding:1rem 1rem 1rem 1.15rem;border-radius:var(--plate-radius-soft);
+  background:linear-gradient(150deg,
+    color-mix(in srgb,var(--gold-primary) var(--a-12),var(--bg-card)) 0%,
+    var(--bg-card) 64%);
+  border:1px solid var(--keyline-strong);
+  box-shadow:0 14px 40px -18px color-mix(in srgb,var(--gold-primary) var(--a-50),transparent),
+    inset 0 1px 0 var(--keyline-inner);
+  transition:border-color .25s ease,transform .25s ease}
+.ask:hover{border-color:var(--gold-primary);transform:translateY(-2px)}
+.ask q{font-family:var(--font-content);font-size:1.18rem;line-height:1.36;quotes:none;
+  color:var(--text-primary)}
+.ask__go{flex:0 0 44px;width:44px;height:44px;border-radius:50%;display:grid;
+  place-items:center;background:var(--gold-primary)}
+.ask__go svg{width:17px;height:17px;fill:var(--bg-void)}
+
+/* ---------- fine print, on a rule ---------- */
+.fine{margin-top:1.05rem;padding-top:.8rem;border-top:1px solid var(--keyline-soft);
+  display:flex;flex-wrap:wrap;align-items:baseline;gap:.35rem 1.2rem}
+.fine__col{min-width:0}
+.free{font-size:.875rem;color:var(--text-secondary)}
+.disc{font-size:.8rem;color:var(--text-tertiary);margin-top:.2rem}
+.trust{font-size:.75rem;color:var(--text-tertiary);margin-top:.2rem;line-height:1.5}
+.entryB{margin-left:auto;font-size:.8rem;color:var(--gold-primary);text-decoration:none;
+  min-height:44px;display:inline-flex;align-items:center;white-space:nowrap}
+.entryB:hover{color:var(--gold-hover)}
+
+/* ---------- the portrait plate ---------- */
+.pplate{position:relative;background:var(--bg-primary);border:1px solid var(--keyline);
+  border-radius:var(--plate-radius);box-shadow:var(--plate-shadow),
+    inset 0 0 0 1px var(--keyline-inner);padding:10px}
+.mat{position:relative;overflow:hidden;border:1px solid var(--keyline-soft);
+  background:var(--bg-void);aspect-ratio:var(--plate-aspect)}
+.shot{width:100%;height:100%;display:block;object-fit:cover;
+  /* top-anchored: the crop only ever trims the bottom, so the head is never cut */
+  object-position:50% 0%}
+.pcap{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;
+  padding:.7rem .25rem .15rem}
+.pcap__nm{font-family:var(--font-content);font-size:1.32rem;line-height:1.15;
+  color:var(--text-primary)}
+/* the Echo identity lives in the name itself: "Echo of Marcus Aurelius" */
+.pcap__echo{color:var(--text-secondary)}
+.pcap__tr{color:var(--gold-primary);white-space:nowrap}
+
+/* THE IGNITION, beat one: the painting is handed to the dust.
+   Only a document that ran the pre-paint marker hides it, so no script and
+   reduced motion both keep a finished painting. The script drives the opacity
+   back up as the grains land, which is why there is no transition here. */
+.settling .shot{opacity:0}
+/* the dissolve before a figure switch */
+.shot.gone{opacity:0;transition:opacity .30s ease}
+
+/* THE IGNITION, beat two: the same dust runs down the spine and the question
+   arrives with it. Every word is in the markup: script only wraps and re-keys. */
+.mh w{display:inline-block;opacity:1}
+.settling .ask q w{opacity:.13;filter:blur(1.6px);
+  transition:opacity .34s ease,filter .34s ease}
+.settling .ask q w.in{opacity:1;filter:none}
+/* the plate is cool until its question is written */
+.settling .ask.cool{border-color:var(--keyline-soft);
+  background:var(--bg-card);box-shadow:none}
+.settling .ask{transition:border-color .5s ease,background .5s ease,box-shadow .5s ease,
+  transform .25s ease}
+.settling .ask.cool .ask__go{background:color-mix(in srgb,var(--gold-primary) var(--a-30),var(--bg-astral))}
+.ask__go{transition:background .5s ease}
+/* a node the stream has not reached yet is unlit */
+.settling .beats>li.dim::before{background:var(--bg-astral);
+  border-color:var(--keyline-soft);box-shadow:none}
+.beats>li::before{transition:background .45s ease,box-shadow .45s ease,border-color .45s ease}
+
+/* ---------- the shelf: thirty round faces, real links ---------- */
+.shelf{margin:1.15rem 0 0;padding:0 0 2.6rem}
+.shelfcap{display:flex;align-items:center;gap:.85rem;color:var(--gold-primary);
+  margin-bottom:.7rem}
+.shelfcap__t{white-space:nowrap}
+.shelfcap::after{content:"";flex:1;height:1px;
+  background:linear-gradient(to right,
+    color-mix(in srgb,var(--gold-subtle) var(--a-45),transparent),transparent)}
+.entryA{flex:0 0 auto;color:var(--gold-primary);text-decoration:none;
+  min-height:44px;display:inline-flex;align-items:center;white-space:nowrap;
+  letter-spacing:.16em}
+.entryA:hover{color:var(--gold-hover)}
+.rail{display:flex;gap:.55rem;overflow-x:auto;padding:.25rem 0 .35rem;
+  scrollbar-width:none;-webkit-overflow-scrolling:touch;
+  mask-image:linear-gradient(to right,#000 92%,transparent 100%);
+  -webkit-mask-image:linear-gradient(to right,#000 92%,transparent 100%)}
+.rail::-webkit-scrollbar{display:none}
+/* round, always. The 160px thumbnail is already a square head-safe crop, so a
+   circular mask never chops a forehead. Never mask a `main/` image round. */
+.rail a{flex:0 0 auto;width:46px;height:46px;border-radius:50%;overflow:hidden;
+  display:block;border:1px solid var(--keyline);background:var(--bg-astral);
+  transition:border-color .22s ease,transform .22s ease}
+.rail img{width:100%;height:100%;object-fit:cover;object-position:50% 50%;display:block;
+  filter:saturate(.62) brightness(.82);transition:filter .22s ease}
+.rail a:hover{border-color:var(--keyline-strong);transform:translateY(-2px)}
+.rail a:hover img,.rail a[aria-current=true] img{filter:none}
+.rail a[aria-current=true]{border-color:var(--gold-primary);
+  box-shadow:0 0 0 1px var(--gold-primary)}
+/* desktop: one exact row. The nineteen priority faces fill the shell; the
+   rest stay in the markup (and on the phone's swipe rail), reachable through
+   "Meet all thirty". No cut-off faces, no orphan second row. */
+@media (min-width:900px){
+  .rail{overflow-x:visible;mask-image:none;-webkit-mask-image:none;
+    justify-content:space-between}
+  .rail a.rail__more{display:none}
+}
+
+/* ---------- below the fold: the four beats again, compact ---------- */
+.below{border-top:1px solid var(--keyline-soft);background:var(--bg-primary)}
+.below__in{max-width:var(--shell);margin:0 auto;padding:1.7rem var(--gutter) 2.4rem}
+.strip{display:flex;gap:.4rem;margin-bottom:1rem}
+.strip a{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:.4rem;min-width:78px;min-height:56px;padding:0 .5rem;border-radius:var(--plate-radius);
+  text-decoration:none;color:var(--text-tertiary);transition:color .22s ease}
+.strip a:hover{color:var(--text-secondary)}
+.strip svg{width:21px;height:21px;color:var(--gold-subtle)}
+.mh .below p{max-width:58ch;font-size:.85rem;line-height:1.65;color:var(--text-tertiary)}
+
+/* ---------- phone ---------- */
+@media (max-width:899px){
+  /* both custom properties belong on .mh: set on :root they lose to the .mh
+     block above and the phone silently keeps the desktop plate */
+  .mh{--gutter:1.25rem;--plate-aspect:4/3}
+  .hero{padding-top:.35rem}
+  /* the painted face comes right after the proposition, the beats follow it */
+  .wrap{grid-template-columns:minmax(0,1fr);
+    grid-template-areas:"head" "art" "beats" "shelf";column-gap:0}
+  /* one breadth line is enough on a phone, and the subline is the one with the 30 */
+  .eyebrow{display:none}
+  /* a mounted print with a margin: it keeps the face big and the fold honest */
+  .artcol{max-width:290px;margin:.65rem auto 0}
+  .mh h1{font-size:1.55rem;margin-top:.5rem}
+  html[lang=de] .mh h1{font-size:1.44rem}
+  .sub{margin-top:.5rem;font-size:.86rem;line-height:1.45;max-width:none}
+  .pplate{padding:5px}
+  .pcap{padding:.42rem .15rem .02rem}
+  .pcap__nm{font-size:1.06rem}
+  .pcap__tr{font-size:.625rem}
+  .beats{margin-top:.7rem;padding-left:1.55rem}
+  .beats>li{margin-bottom:.56rem}
+  .beats>li::before{left:-1.55rem;top:14px}
+  .beats>li.labelled::before{top:30px}
+  .blabel{font-size:.625rem;margin-bottom:.2rem}
+  .promise{font-size:1.02rem;line-height:1.36}
+  .play{min-height:46px;font-size:.85rem}
+  .council{font-size:.8rem;gap:.65rem;padding:.2rem .8rem .2rem .2rem}
+  .faces img{width:31px;height:31px;margin-left:-10px}
+  .ask{padding:.72rem .72rem .72rem .85rem;gap:.6rem}
+  .ask q{font-size:1.02rem;line-height:1.32}
+  .ask__go{flex-basis:40px;width:40px;height:40px}
+  .fine{margin-top:.85rem;padding-top:.7rem;display:block}
+  .free{font-size:.82rem}
+  .disc{font-size:.75rem}
+  /* the German trust line has to hold one line at 390 or it eats the fold */
+  .trust{font-size:.655rem;letter-spacing:.002em}
+  .entryB{margin-left:0;min-height:44px;font-size:.75rem}
+  .shelf{margin-top:.95rem;padding-bottom:1.8rem}
+  .shelfcap{margin-bottom:.5rem;font-size:.625rem}
+  .shelfcap::after{display:none}
+  .entryA{margin-left:auto;font-size:.625rem;min-height:44px}
+  #entryAlong{display:none}
+  #entryAshort{display:inline !important}
+  .rail{gap:.45rem}
+  .rail a{width:44px;height:44px}
+  .below__in{padding:1.5rem var(--gutter) 2rem}
+  .strip{gap:0}
+  .strip a{min-width:0;flex:1;padding:0 .15rem}
+  .strip span{font-size:.6rem;letter-spacing:.1em}
+}
+
+/* ---------- tablet: one column, but everything gets its room back ---------- */
+@media (min-width:620px) and (max-width:899px){
+  .headcol,.beatscol,.shelfcol{width:100%;max-width:600px;margin-inline:auto}
+  .artcol{max-width:420px}
+  .eyebrow{display:flex}
+  .mh h1{font-size:2.1rem}
+  html[lang=de] .mh h1{font-size:1.9rem}
+  .sub{font-size:.95rem}
+  .promise{font-size:1.12rem}
+  .ask q{font-size:1.1rem}
+  .pcap__nm{font-size:1.25rem}
+}
+
+/* ---------- wide screens: the plate closes the composition ----------
+   The page's whole system is a 1120px shell, so widening the hero alone would
+   break it against the navbar and every section below. What changes instead is
+   the balance inside that shell: the plate takes its full track and stretches
+   down the two rows it already spans, so its foot lands on the left column's
+   foot instead of stopping a third of the way up. The label is pinned to the
+   plate's bottom edge, the way a mounted print carries its caption.
+
+   The head-not-cut rule survives the stretch by construction. The mat's height
+   is capped against its OWN width in container units, so its aspect can never
+   leave the verified 0.86 to 1.34 band no matter how tall the column grows.
+   German, which runs longer and pushes the column down, hits that cap first:
+   the mat stops, the mount takes the rest, and no head is ever trimmed. */
+@media (min-width:1440px){
+  .wrap{grid-template-columns:minmax(0,1.06fr) minmax(0,1fr);column-gap:3.25rem}
+  .artcol{max-width:none;align-self:stretch;container-type:inline-size}
+  .pplate{display:flex;flex-direction:column;height:100%;padding:12px}
+  .mat{flex:1 1 auto;aspect-ratio:auto;
+    /* 1cqw is 1% of the art column; the mat is that minus the mount and the
+       hairlines. Floor 0.90 and ceiling 1.34, both inside the verified band. */
+    max-height:calc(111.11cqw - 31px);
+    min-height:calc(74.63cqw - 21px)}
+  .pcap{margin-top:auto;padding:.85rem .3rem .1rem}
+  .pcap__nm{font-size:1.42rem}
+  .mh h1{font-size:3rem}
+  html[lang=de] .mh h1{font-size:2.5rem}
+  .promise{font-size:1.22rem}
+  .ask q{font-size:1.22rem}
+}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.001ms !important;transition-duration:.001ms !important}
+}
+
+/* ============================================================
+   Curated figures block (page.html). The complete thirty live once, at
+   /figures/. Here six priority names carry the rich anchor text, and one
+   strong link hands off to the catalog.
+   ============================================================ */
+.mhc-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem;margin-top:1.6rem}
+.mhc-card{display:flex;gap:1rem;align-items:flex-start;text-decoration:none;
+  padding:1.1rem;background:var(--bg-primary);border:1px solid var(--keyline);
+  border-radius:var(--plate-radius);box-shadow:var(--plate-shadow-sm),
+    inset 0 0 0 1px var(--keyline-inner);transition:border-color .22s ease,transform .22s ease}
+.mhc-card:hover{border-color:var(--keyline-strong);transform:translateY(-2px)}
+/* every small portrait on the site is a circle, cropped from the square
+   thumbnail asset, so no forehead is ever clipped */
+.mhc-face{width:64px;height:64px;flex:0 0 64px;border-radius:50%;object-fit:cover;
+  object-position:50% 50%;border:1px solid var(--keyline);background:var(--bg-astral)}
+.mhc-body{display:block;min-width:0}
+.mhc-name{display:block;font-family:var(--font-content);font-size:1.16rem;line-height:1.2;
+  color:var(--text-primary)}
+.mhc-trad{display:block;margin-top:.25rem;font-family:var(--font-ui);text-transform:uppercase;
+  letter-spacing:.16em;font-size:.625rem;color:var(--gold-primary)}
+.mhc-ess{display:block;margin-top:.55rem;font-size:.85rem;line-height:1.6;
+  color:var(--text-secondary)}
+.mhc-all{margin-top:1.5rem}
+.mhc-all a{display:inline-flex;align-items:center;min-height:44px;
+  font-family:var(--font-ui);text-transform:uppercase;letter-spacing:.16em;font-size:.688rem;
+  color:var(--gold-primary);text-decoration:none;border-bottom:1px solid var(--keyline-strong);
+  padding-bottom:.2rem}
+.mhc-all a:hover{color:var(--gold-hover)}
+@media (max-width:1023px){ .mhc-grid{grid-template-columns:repeat(2,minmax(0,1fr))} }
+@media (max-width:659px){
+  .mhc-grid{grid-template-columns:minmax(0,1fr);gap:.7rem;margin-top:1.2rem}
+  .mhc-card{padding:.9rem;gap:.85rem}
+  .mhc-face{width:56px;height:56px;flex-basis:56px}
+  .mhc-name{font-size:1.06rem}
+  .mhc-ess{font-size:.82rem;margin-top:.45rem}
+}
