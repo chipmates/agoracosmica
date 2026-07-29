@@ -9,6 +9,7 @@
 //   <V2ObservatoryMotion client:idle targetId="figures-orbit" />
 
 import { getFiguresCatalog } from '@client/data/public/figuresCatalog';
+import { figureImage, figureSrcset } from '../../lib/figureImages';
 import { figureIdToSlug } from '@client/data/public/slugMap';
 import { MEDIA_URL, publicUrl } from '../../lib/urls';
 import { getT } from '../../i18n';
@@ -63,8 +64,8 @@ const planets = ringPlan.flatMap((ring, ringIndex) => {
       id,
       name: fig ? fig.name : id,
       learn: fig ? fig.learn : '',
-      src: `${MEDIA_URL}/images/figures/${id}/thumbnail/320.webp`,
-      srcset: `${MEDIA_URL}/images/figures/${id}/thumbnail/160.webp 160w, ${MEDIA_URL}/images/figures/${id}/thumbnail/320.webp 320w`,
+      src: figureImage(id, 'thumbnail', 320),
+      srcset: figureSrcset(id, 'thumbnail', [160, 320]),
       sizes: PLANET_SIZES_BY_RING[ringIndex],
       href: publicUrl(lang, `/figures/${figureIdToSlug[id]}`),
       ring: ringIndex,

@@ -11,6 +11,7 @@
 // comes from the data (seed titles, core teachings), not hand-authored lines.
 
 import { getPublicAudioUrl, getPublicCouncilPreviewUrl } from '@client/utils/public/publicMediaUrl';
+import { figureImage, figureSrcset } from '../../lib/figureImages';
 import { getFigureById } from '@client/data/public/figuresCatalog';
 import { figureIdToSlug } from '@client/data/public/slugMap';
 import {
@@ -195,7 +196,7 @@ export function getFigureLibraryModes(figureId: string, lang: 'en' | 'de'): LibM
     const cast = [council.moderator, ...council.participants]
       .filter(p => p.id !== figureId)
       .slice(0, 3)
-      .map(p => ({ name: p.name, src: `${MEDIA_URL}/images/figures/${p.id}/thumbnail/160.webp` }));
+      .map(p => ({ name: p.name, src: figureImage(p.id, 'thumbnail', 160) }));
     modes.push({
       id: 'council',
       group: 'more',

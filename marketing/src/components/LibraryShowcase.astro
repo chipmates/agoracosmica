@@ -8,6 +8,7 @@
 // no duplicate section above it. Island is client:visible (no LCP cost); the
 // band + labels are bilingual, German reviewed twice.
 import LabLibrary from '../islands/LabLibrary';
+import { figureImage } from '../lib/figureImages';
 import { getLibraryModes, FEATURED_ID } from './landing-lab/lab-library';
 import { getFiguresCatalog } from '@client/data/public/figuresCatalog';
 import { MEDIA_URL, publicUrl } from '../lib/urls';
@@ -21,7 +22,7 @@ const modes = getLibraryModes(lang);
 const figures = getFiguresCatalog(lang);
 const featured = figures.find(f => f.id === FEATURED_ID);
 const figureName = featured ? featured.name : (lang === 'de' ? 'Mark Aurel' : 'Marcus Aurelius');
-const portrait = `${MEDIA_URL}/images/figures/${FEATURED_ID}/thumbnail/160.webp`;
+const portrait = figureImage(FEATURED_ID, 'thumbnail', 160);
 
 // Heading + both ledes are the exact copy inherited from the retired static
 // grid (German reviewed twice), so removing the grid loses no crawlable text.

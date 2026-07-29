@@ -17,6 +17,7 @@
 // and it stays off entirely under reduced motion.
 
 import { getFiguresCatalog } from '@client/data/public/figuresCatalog';
+import { figureImage, figureSrcset } from '../../lib/figureImages';
 import { figureIdToSlug } from '@client/data/public/slugMap';
 import { MEDIA_URL, publicUrl } from '../../lib/urls';
 import { getT } from '../../i18n';
@@ -148,8 +149,8 @@ const planets: Planet[] = ringPlan.flatMap((ring, ringIndex) => {
       // image is ~16x oversized. Loading 17 of those is fragile on mobile (slow
       // connections / Chrome time them out and they fail). 320 is sharp at
       // retina and tiny to fetch.
-      src: `${MEDIA_URL}/images/figures/${id}/thumbnail/320.webp`,
-      srcset: `${MEDIA_URL}/images/figures/${id}/thumbnail/160.webp 160w, ${MEDIA_URL}/images/figures/${id}/thumbnail/320.webp 320w`,
+      src: figureImage(id, 'thumbnail', 320),
+      srcset: figureSrcset(id, 'thumbnail', [160, 320]),
       sizes: PLANET_SIZES_BY_RING[ringIndex],
       href: publicUrl(lang, `/figures/${figureIdToSlug[id]}`),
       ring: ringIndex,

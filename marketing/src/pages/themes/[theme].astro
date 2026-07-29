@@ -1,5 +1,6 @@
 ---
 import Public from '../../layouts/Public.astro';
+import { figureImage, figureSrcset } from '../../lib/figureImages';
 import ThemeDetailContent from '../../components/ThemeDetailContent.astro';
 
 import { getT } from '../../i18n';
@@ -42,7 +43,7 @@ const hasQa =
 
 const ogFigureId = THEME_OG_FIGURE[themeId];
 const themeOgImage = ogFigureId
-  ? `${MEDIA_URL}/images/figures/${ogFigureId}/main/1200.webp`
+  ? figureImage(ogFigureId, 'main', 1200)
   : undefined;
 // The share-card image is an AI portrait of a real person: the alt names that
 // (Art 50 disclosure travels inside the artifact, off-platform).

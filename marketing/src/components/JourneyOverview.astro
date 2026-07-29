@@ -10,6 +10,7 @@
 // itself here. All six panels are server-rendered, so nothing crawlable is lost.
 
 import LabLibrary from '../islands/LabLibrary';
+import { figureImage } from '../lib/figureImages';
 import { getFigureLibraryModes } from './landing-lab/figure-library';
 import { MEDIA_URL, publicUrl } from '../lib/urls';
 import { getT } from '../i18n';
@@ -27,7 +28,7 @@ const { figureId, figureName, lang } = Astro.props;
 const t = getT(lang);
 
 const modes = getFigureLibraryModes(figureId, lang);
-const portrait = `${MEDIA_URL}/images/figures/${figureId}/thumbnail/160.webp`;
+const portrait = figureImage(figureId, 'thumbnail', 160);
 
 const LABELS = lang === 'de'
   ? {

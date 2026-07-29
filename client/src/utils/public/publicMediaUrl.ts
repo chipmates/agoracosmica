@@ -3,8 +3,14 @@
 
 // In dev, use relative paths (Vite proxy handles /stories, /images)
 // In production, use the R2 CDN URL
+import manifest from '../../data/image-manifest.json';
+
 const isDev = typeof import.meta !== 'undefined' && import.meta.env?.DEV;
 const MEDIA_BASE = isDev ? '' : 'https://media.agoracosmica.org';
+
+// Figure-set revision from the app manifest (main-<rev>/ keyspaces on R2).
+// Revision trees are webp-only, so non-webp requests stay on the legacy tree.
+const FIGURES_REV = (manifest as { figuresRev?: string }).figuresRev;
 
 export type ImageType = 'main' | 'thumbnail';
 export type ImageFormat = 'avif' | 'webp' | 'png';
@@ -20,7 +26,8 @@ export function getPublicImageUrl(
   size: number,
   format: ImageFormat = 'webp'
 ): string {
-  return `${MEDIA_BASE}/images/figures/${figureId}/${type}/${size}.${format}`;
+  const keyspace = FIGURES_REV && format === 'webp' ? `${type}-${FIGURES_REV}` : type;
+  return `${MEDIA_BASE}/images/figures/${figureId}/${keyspace}/${size}.${format}`;
 }
 
 export function getPublicImageSrcSet(

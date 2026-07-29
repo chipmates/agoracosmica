@@ -1,5 +1,6 @@
 ---
 import Public from '../../../layouts/Public.astro';
+import { figureImage, figureSrcset } from '../../../lib/figureImages';
 import FigureOrbit from '../../../components/landing-lab/FigureOrbit.astro';
 import V2ObservatoryMotion from '../../../islands/V2ObservatoryMotion';
 import FiguresCatalogContent from '../../../components/FiguresCatalogContent.astro';
@@ -18,7 +19,7 @@ const figureItems = figures.map(f => ({
   name: f.name,
   url: canonicalUrl(publicUrl(lang, `/figures/${figureIdToSlug[f.id]}`)),
   description: f.about.split('\n')[0].slice(0, 160),
-  image: `${MEDIA_URL}/images/figures/${f.id}/main/1200.webp`,
+  image: figureImage(f.id, 'main', 1200),
 }));
 
 const schemas = [
@@ -31,8 +32,8 @@ const schemas = [
 
 // The orbit's first planet (Mark Aurel) is the LCP. Preload it to match the
 // img FigureOrbit marks fetchpriority=high (src/srcset/sizes must match).
-const lcpPortrait = `${MEDIA_URL}/images/figures/aurelius/thumbnail/320.webp`;
-const lcpPortraitSrcset = `${MEDIA_URL}/images/figures/aurelius/thumbnail/160.webp 160w, ${MEDIA_URL}/images/figures/aurelius/thumbnail/320.webp 320w`;
+const lcpPortrait = figureImage('aurelius', 'thumbnail', 320);
+const lcpPortraitSrcset = figureSrcset('aurelius', 'thumbnail', [160, 320]);
 const lcpPortraitSizes = '(max-width: 900px) 56px, 88px';
 ---
 <Public

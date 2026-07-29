@@ -1,5 +1,6 @@
 ---
 import Public from '../../../layouts/Public.astro';
+import { figureImage } from '../../../lib/figureImages';
 import FigureDetailContent from '../../../components/FigureDetailContent.astro';
 
 import { getT } from '../../../i18n';
@@ -37,7 +38,7 @@ const figureUrl = `${SITE_URL}/de/figures/${slug}`;
 // (figure-portrait LCP preload removed 2026-06-04: it hinted WebP while the
 // <picture> serves AVIF, so the browser double-downloaded an unused file. The
 // eager <picture> below loads the portrait without it.)
-const figureImage = `${MEDIA_URL}/images/figures/${figureId}/main/1200.webp`;
+const figurePortrait = figureImage(figureId, 'main', 1200);
 
 const figQA = getFigureQA(figureId, lang);
 const figQaItems = (figureId !== 'dickinson' && figQA)
@@ -57,7 +58,7 @@ const schemas = [
     tradition: figure.tradition,
     slug: slug!,
     lang,
-    image: figureImage,
+    image: figurePortrait,
   }),
   breadcrumbSchema([
     { name: t('breadcrumbs.home'), url: `${SITE_URL}/de/` },
@@ -91,7 +92,7 @@ const schemas = [
   lang={lang}
   stickyCta={false}
   ogType="profile"
-  ogImage={figureImage}
+  ogImage={figurePortrait}
   ogImageAlt={`KI-generiertes Porträt: ${figure.name}`}
   schemas={schemas}
 >

@@ -8,6 +8,7 @@
 // Verified assets 2026-07-01. Display copy: human voice, Echo-voice labeling.
 
 import { getPublicAudioUrl, getPublicTrailerUrl, getPublicCouncilPreviewUrl } from '@client/utils/public/publicMediaUrl';
+import { figureImage, figureSrcset } from '../../lib/figureImages';
 import { getFiguresCatalog } from '@client/data/public/figuresCatalog';
 import { figureIdToSlug } from '@client/data/public/slugMap';
 import {
@@ -90,7 +91,7 @@ export function getLibraryModes(lang: 'en' | 'de'): LibMode[] {
     .slice(0, 3)
     .map(p => ({
       name: p.name,
-      src: `${MEDIA_URL}/images/figures/${p.id}/thumbnail/160.webp`,
+      src: figureImage(p.id, 'thumbnail', 160),
     }));
 
   // Every panel teaches through the featured figure, so every app entry
@@ -145,9 +146,9 @@ export function getLibraryModes(lang: 'en' | 'de'): LibMode[] {
       // The four voices in this dialogue (Marcus opens, Plato answers, then
       // Campbell and Tubman). Shown so the panel reads as a dialogue at a glance.
       cast: [
-        { name: 'Plato', src: `${MEDIA_URL}/images/figures/plato/thumbnail/160.webp` },
-        { name: 'Joseph Campbell', src: `${MEDIA_URL}/images/figures/campbell/thumbnail/160.webp` },
-        { name: 'Harriet Tubman', src: `${MEDIA_URL}/images/figures/tubman/thumbnail/160.webp` },
+        { name: 'Plato', src: figureImage('plato', 'thumbnail', 160) },
+        { name: 'Joseph Campbell', src: figureImage('campbell', 'thumbnail', 160) },
+        { name: 'Harriet Tubman', src: figureImage('tubman', 'thumbnail', 160) },
       ],
       audioWebm: `${MEDIA_BASE}/prisms/${FEATURED_ID}/seed-1/audio/combined-raw-${lang}.webm`,
       audioMp3: `${MEDIA_BASE}/prisms/${FEATURED_ID}/seed-1/audio/combined-raw-${lang}.mp3`,
