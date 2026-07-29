@@ -6,6 +6,7 @@
 // to re-key the hero in place.
 import { getFiguresCatalog } from '@client/data/public/figuresCatalog';
 import { figureIdToSlug } from '@client/data/public/slugMap';
+import { councilCatalog, BLESSED_BY_THEME, heroConfrontational } from '@client/data/councilCatalog';
 import manifest from '@client/data/image-manifest.json';
 import { figureImage, figureSrcset } from '../lib/figureImages';
 import type { Lang } from '../i18n';
@@ -85,7 +86,19 @@ const S = de
       entryAshort: 'All 30',
     };
 
-const councilDefault = ['aurelius', 'gautama', 'nietzsche', 'schopenhauer'];
+// The council chip is honest: each figure maps to a REAL council that
+// features them (blessed councils win, catalog order breaks ties), the chip
+// shows that council's actual cast, and the link lands on that council.
+const blessedIds = new Set(Object.values(BLESSED_BY_THEME));
+function councilFor(figureId: string): { id: string; cast: string[] } {
+  const features = (c: (typeof councilCatalog)[number]) =>
+    c.moderator.id === figureId || c.participants.some((p) => p.id === figureId);
+  const candidates = councilCatalog.filter(features);
+  const pick = candidates.find((c) => blessedIds.has(c.id)) ?? candidates[0] ?? heroConfrontational;
+  return { id: pick.id, cast: [pick.moderator.id, ...pick.participants.map((p) => p.id)].slice(0, 4) };
+}
+const councilMap = Object.fromEntries(figures.map((f) => [f.id, councilFor(f.id)]));
+const councilDefault = councilMap['aurelius'];
 ---
 <script is:inline>
   /* Pre-paint marker: hands the painting to the motion layer. No script and
@@ -97,7 +110,7 @@ const councilDefault = ['aurelius', 'gautama', 'nietzsche', 'schopenhauer'];
   })();
 </script>
 
-<div class="mh" data-figrev={figuresRev}>
+<div class="mh" data-figrev={figuresRev} data-councils={JSON.stringify(councilMap)}>
   <section class="hero" aria-labelledby="h1">
     <canvas class="dustlayer" id="dust" aria-hidden="true"></canvas>
     <div class="wrap">
@@ -146,9 +159,14 @@ const councilDefault = ['aurelius', 'gautama', 'nietzsche', 'schopenhauer'];
             <p class="promise" id="promise"><em>{S.promise}</em></p>
           </li>
           <li>
-            <a class="council" id="council" href="/app">
+            <a
+              class="council"
+              id="council"
+              href={`/app?council=${councilDefault.id}&lang=${lang}`}
+              data-agc-cta="start-exploring"
+            >
               <span class="faces" id="faces">
-                {councilDefault.map((cid) => (
+                {councilDefault.cast.map((cid) => (
                   <img src={figureImage(cid, 'thumbnail', 160)} alt="" loading="lazy" decoding="async" />
                 ))}
               </span>

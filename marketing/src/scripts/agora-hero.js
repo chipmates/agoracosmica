@@ -32,6 +32,8 @@ if (!mhRoot) return;
 /* the figure-set revision, stamped by the component from the app manifest */
 var REV = mhRoot.dataset.figrev ? '-' + mhRoot.dataset.figrev : '';
 var thumb = function (id) { return CDN + '/images/figures/' + id + '/thumbnail' + REV + '/160.webp'; };
+var COUNCIL_MAP = {};
+try { COUNCIL_MAP = JSON.parse(mhRoot.dataset.councils || '{}'); } catch (e) {}
 var main  = function (id, w) { return CDN + '/images/figures/' + id + '/main' + REV + '/' + w + '.webp'; };
 var trail = function (id) {
   return CDN + '/trailers/figures/' + id + '/' + LANG + '/' + id + '_trailer_' + LANG + '.mp3';
@@ -292,11 +294,15 @@ function paint(id) {
   words($('q'), f.q);
   shot.alt = '';
   var fc = $('faces'); fc.innerHTML = '';
-  [id].concat(COUNCIL[id] || []).forEach(function (cid) {
+  var cm = COUNCIL_MAP[id];
+  var cast = cm ? cm.cast : [id].concat(COUNCIL[id] || []);
+  cast.forEach(function (cid) {
     var im = document.createElement('img');
     im.src = thumb(cid); im.alt = ''; im.loading = 'lazy';
     fc.appendChild(im);
   });
+  var councilEl = $('council');
+  if (councilEl && cm) councilEl.href = '/app?council=' + cm.id + '&lang=' + LANG;
   [].forEach.call(rail.children, function (a) {
     if (a.dataset.id === id) a.setAttribute('aria-current', 'true');
     else a.removeAttribute('aria-current');
