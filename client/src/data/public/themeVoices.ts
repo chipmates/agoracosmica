@@ -3,11 +3,13 @@
 // one faced segment per voice, pairing this list with the essay's middle
 // paragraphs. Hand-curated from the essays.
 //
-// Stances: where an essay closes with a recap line (meaning-purpose, who-am-i,
-// mind-creativity, love-connection, faith-death-mystery) the stance is the
-// essay's own word. For loss-grief, freedom-justice and moral-life the essay
-// has no recap line, so those stances are drawn from the essay body and want
-// a closer look. stanceDe values are drafts pending review, like all German.
+// Stances are the essay's own short word for each answer, so a change here
+// needs the matching essay paragraph and recap line to change with it.
+//
+// German is not a translation of this list. Three themes are written for
+// German readers and walk a different cast, so they carry their own entries in
+// themeVoicesDe; the other five reuse this list and read stanceDe. Voice
+// counts per theme match across languages, because the page titles count them.
 // Remove this file when stripping marketing pages from a fork.
 
 export interface ThemeVoice {
@@ -15,7 +17,7 @@ export interface ThemeVoice {
   figureId: string;
   /** The essay's own short word for this voice's answer. */
   stance: string;
-  /** German draft. */
+  /** The German essay's own short word. */
   stanceDe: string;
 }
 
@@ -28,7 +30,7 @@ export const themeVoices: Record<string, ThemeVoice[]> = {
   ],
   'loss-grief': [
     { figureId: 'mandela', stance: 'Reconciliation', stanceDe: 'Versöhnung' },
-    { figureId: 'king', stance: 'Moral imagination', stanceDe: 'Moralische Vorstellungskraft' },
+    { figureId: 'king', stance: 'Moral imagination', stanceDe: 'Trauer als Antrieb' },
     { figureId: 'jung', stance: 'Integration', stanceDe: 'Integration' },
     { figureId: 'eckhart', stance: 'Detachment', stanceDe: 'Gelassenheit' },
   ],
@@ -67,13 +69,42 @@ export const themeVoices: Record<string, ThemeVoice[]> = {
   ],
   'moral-life': [
     { figureId: 'aurelius', stance: 'The four virtues', stanceDe: 'Die vier Tugenden' },
-    { figureId: 'gandhi', stance: 'Means as ends', stanceDe: 'Mittel als Zweck' },
-    { figureId: 'king', stance: 'Bending the arc', stanceDe: 'Den Bogen biegen' },
+    { figureId: 'gandhi', stance: 'Means as ends', stanceDe: 'Die Mittel zählen' },
+    { figureId: 'king', stance: 'Bending the arc', stanceDe: 'Niemand ist neutral' },
     { figureId: 'plato', stance: 'Inner harmony', stanceDe: 'Innere Harmonie' },
     { figureId: 'gautama', stance: 'The Eightfold Path', stanceDe: 'Der Achtfache Pfad' },
   ],
 };
 
-export function getThemeVoices(themeId: string): ThemeVoice[] {
+// The German cast for the three themes written for German readers. Each voice
+// is a figure the theme's own debates already cast, and each answer is drawn
+// from that figure's German seed material, so the walk changes without any
+// claim changing. The voices these replace stay reachable through the debate
+// rail on the same page. `stance` is carried for type parity and is not
+// rendered on a German page.
+export const themeVoicesDe: Record<string, ThemeVoice[]> = {
+  'meaning-purpose': [
+    { figureId: 'nietzsche', stance: 'Make your own', stanceDe: 'Sinn selbst machen' },
+    { figureId: 'schopenhauer', stance: 'Want less', stanceDe: 'Weniger wollen' },
+    { figureId: 'goethe', stance: 'Keep striving', stanceDe: 'Weiter streben' },
+    { figureId: 'aurelius', stance: 'Do right today', stanceDe: 'Heute richtig handeln' },
+  ],
+  'faith-death-mystery': [
+    { figureId: 'aurelius', stance: 'Death as teacher', stanceDe: 'Der Tod als Lehrer' },
+    { figureId: 'gautama', stance: 'What dies', stanceDe: 'Was da stirbt' },
+    { figureId: 'nietzsche', stance: 'No afterlife', stanceDe: 'Ohne Jenseits leben' },
+    { figureId: 'bingen', stance: 'The living light', stanceDe: 'Das lebendige Licht' },
+    { figureId: 'eckhart', stance: 'No boundary', stanceDe: 'Keine Grenze' },
+  ],
+  'love-connection': [
+    { figureId: 'rumi', stance: 'Yearning', stanceDe: 'Sehnsucht' },
+    { figureId: 'austen', stance: 'Clear sight', stanceDe: 'Klarer Blick' },
+    { figureId: 'schopenhauer', stance: 'The wall falls', stanceDe: 'Die Wand fällt' },
+    { figureId: 'eckhart', stance: 'Nothing between', stanceDe: 'Kein Dazwischen' },
+  ],
+};
+
+export function getThemeVoices(themeId: string, lang: 'en' | 'de' = 'en'): ThemeVoice[] {
+  if (lang === 'de') return themeVoicesDe[themeId] ?? themeVoices[themeId] ?? [];
   return themeVoices[themeId] ?? [];
 }

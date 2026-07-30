@@ -21,7 +21,7 @@ import {
   getLocalizedQuestion,
   COUNCIL_SEQUENCE,
 } from '@client/data/councilCatalog';
-import { themeVoices } from '@client/data/public/themeVoices';
+import { getThemeVoices } from '@client/data/public/themeVoices';
 import { figureIdToSlug } from '@client/data/public/slugMap';
 import { localizedShortName } from './figureNames';
 
@@ -89,7 +89,7 @@ const opener = councilCatalog.find(c => c.id === COUNCIL_SEQUENCE[0]) ?? council
         <ThemeCard
           themeId={theme.id}
           councilCount={councilsByTheme[theme.id]?.length || 0}
-          voiceCount={(themeVoices[theme.id] ?? []).length}
+          voiceCount={getThemeVoices(theme.id, lang).length}
           lang={lang}
         />
       ))}

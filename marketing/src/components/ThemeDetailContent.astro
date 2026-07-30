@@ -30,7 +30,7 @@ import {
   getLocalizedHook,
   getShortDisplayName,
 } from '@client/data/councilCatalog';
-import { themeVoices } from '@client/data/public/themeVoices';
+import { getThemeVoices } from '@client/data/public/themeVoices';
 import { themeSeedCrossRef } from '@client/data/public/themeSeedCrossRef';
 import { getFigureById } from '@client/data/public/figuresCatalog';
 import { figureIdToSlug } from '@client/data/public/slugMap';
@@ -134,7 +134,9 @@ const paragraphs =
     ? introRaw.split('\n\n').map(p => p.trim()).filter(Boolean)
     : [];
 
-const voices = themeVoices[themeId] ?? [];
+// Three themes walk a different cast in German, so the voice list is resolved
+// per language and the essay is paired against the list its own language uses.
+const voices = getThemeVoices(themeId, lang);
 // The essays were written as opener, one paragraph per voice, closer. When
 // that shape holds, each paragraph gets its voice's name and portrait beside
 // it; otherwise the essay falls back to plain prose.
