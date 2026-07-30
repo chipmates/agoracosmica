@@ -105,6 +105,7 @@ export default function LabLibrary({ modes, portrait, figureName, figureId, labe
             tasteSeconds={m.tasteSeconds}
             continueHref={m.linkHref}
             continueLabel={labels.continueLabel}
+            door={m.door}
           />
         )}
 
@@ -114,7 +115,11 @@ export default function LabLibrary({ modes, portrait, figureName, figureId, labe
             className="lib__link"
             href={m.linkHref}
             {...(m.linkHref.startsWith('/app')
-              ? { 'data-agc-cta': 'start-exploring', 'data-agc-figure': figureId }
+              ? {
+                  'data-agc-cta': 'start-exploring',
+                  'data-agc-figure': figureId,
+                  ...(m.door ? { 'data-agc-door': m.door } : {}),
+                }
               : {})}
           >{m.linkLabel} →</a>
         </div>

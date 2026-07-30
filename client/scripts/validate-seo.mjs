@@ -14,9 +14,10 @@ const SCRIPTS_DIR = import.meta.dirname;
 const DIST = join(SCRIPTS_DIR, '..', '..', 'marketing', 'dist');
 
 // Pages knowingly allowed a >60-char title pending a copy decision (2026-06-04):
-// the DE home (the LOCKED platform tagline) + the DE figures catalog. Remove
-// from here once shortened.
-const TITLE_OVER60_OK = new Set(['de/index.html', 'de/figures/index.html']);
+// the DE figures catalog. Remove from here once shortened. The DE home left the
+// list once its <title> stopped repeating the locked tagline (that line now
+// lives on og:title, which has no length budget).
+const TITLE_OVER60_OK = new Set(['de/figures/index.html']);
 // Legal pages are standalone (no EN/DE twin), so no hreflang block, matching
 // the sitemap generator's deliberate omission. The 404 page is excluded too:
 // hreflang annotations belong on indexable 200-status pages only, and CF Pages

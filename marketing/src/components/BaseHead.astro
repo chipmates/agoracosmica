@@ -11,6 +11,10 @@ interface Props {
   title: string;
   /** Optional override; otherwise `${title} | Agora Cosmica`. */
   fullTitle?: string;
+  /** Optional override for og:title + twitter:title only. The <title> tag can
+   *  then carry the category words a SERP needs while the share card keeps the
+   *  brand line. Defaults to the page title. */
+  ogTitle?: string;
   description: string;
   /** Path without lang prefix or trailing slash — eg `/figures/marcus-aurelius`. */
   canonicalPath: string;
@@ -42,6 +46,7 @@ interface Props {
 const {
   title,
   fullTitle,
+  ogTitle,
   description,
   canonicalPath,
   lang,
@@ -60,6 +65,7 @@ const {
 } = Astro.props;
 
 const computedFullTitle = fullTitle ?? `${title} | Agora Cosmica`;
+const computedOgTitle = ogTitle ?? computedFullTitle;
 // When the EN/DE versions use different slugs (the category hubs), altEn/altDe
 // carry the real per-language paths, so derive BOTH canonical and the alternates
 // from them and skip the same-slug /de-prefix logic entirely.
@@ -110,7 +116,7 @@ const metaDescription = clampDescription(description);
   </>
 )}
 
-<meta property="og:title" content={computedFullTitle} />
+<meta property="og:title" content={computedOgTitle} />
 <meta property="og:description" content={metaDescription} />
 <meta property="og:url" content={canonical} />
 <meta property="og:type" content={ogType} />
@@ -119,7 +125,7 @@ const metaDescription = clampDescription(description);
 <meta property="og:site_name" content="Agora Cosmica" />
 <meta property="og:locale" content={ogLocale} />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content={computedFullTitle} />
+<meta name="twitter:title" content={computedOgTitle} />
 <meta name="twitter:description" content={metaDescription} />
 <meta name="twitter:image" content={image} />
 <meta name="twitter:image:alt" content={imageAlt} />

@@ -25,6 +25,8 @@ interface Props {
   /** where "hear the whole thing" points once the taste ends */
   continueHref?: string;
   continueLabel?: string;
+  /** funnel door label for the continuation link, when it enters the app */
+  door?: string;
   /** visual size hint */
   variant?: 'default' | 'compact';
 }
@@ -61,6 +63,7 @@ export default function LabSamplePlayer({
   tasteSeconds,
   continueHref,
   continueLabel,
+  door,
   variant = 'default',
 }: Props) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -171,7 +174,9 @@ export default function LabSamplePlayer({
         <a
           className="lab-player__continue"
           href={continueHref}
-          {...(continueHref?.startsWith('/app') ? { 'data-agc-cta': 'start-exploring' } : {})}
+          {...(continueHref?.startsWith('/app')
+            ? { 'data-agc-cta': 'start-exploring', ...(door ? { 'data-agc-door': door } : {}) }
+            : {})}
         >
           {continueLabel ?? 'Hear the whole thing'}
         </a>

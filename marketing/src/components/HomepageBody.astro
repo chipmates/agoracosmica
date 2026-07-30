@@ -1,9 +1,9 @@
 ---
 // Below-the-hero homepage content for the production homepages (/ and /de/).
-// The cinematic Observatory hero owns the single <h1>; this is the crawlable,
-// SEO-bearing body it hands off to: What is, Six ways + volume band, figures
-// grid + theme question-wall, Cosmic Council, the honest/private band, FAQ,
-// and the education + footer-links section.
+// The cinematic hero owns the single <h1>; this is the crawlable, SEO-bearing
+// body it hands off to: What is, Six ways + volume band, figures grid + theme
+// question-wall, Cosmic Council, the honest band, FAQ, and the education +
+// footer-links section.
 //
 // It renders NO <h1> (the page that imports it owns the single hero <h1>) and
 // NO hero block. Every heading here is h2/h3, matching the original pages.
@@ -43,23 +43,33 @@ const { lang, figures, faq, heroCouncil } = Astro.props;
 const t = getT(lang);
 const isDe = lang === 'de';
 
-// "Ways in" row: one unobtrusive row of three text links into the two category
-// hubs and the open-source story. The two hubs use localized DE slugs (built
-// literally per language), the OSS page shares its slug so publicUrl is fine.
+// Wayfinding links that used to sit in their own orphan "Ways in" row. They now
+// ride in the closing link row, where the reader already is when they are done.
 const philoHubHref = isDe ? '/de/philosophie-lernen/' : '/ai-philosophy-tutor/';
 const wisdomHubHref = isDe
   ? '/de/von-historischen-persoenlichkeiten-lernen/'
   : '/learn-from-historical-figures/';
 const ossHref = publicUrl(lang, '/open-source-philosophy-app');
-const waysInLead = isDe ? 'Womit möchtest du beginnen:' : 'Ways in:';
 const waysInPhilo = isDe ? 'Philosophie lernen' : 'Learn philosophy';
 const waysInWisdom = isDe ? 'Weisheit aus der Geschichte lernen' : 'Learn wisdom from history';
 const waysInOss = isDe ? 'Die Open-Source-Geschichte' : 'The open-source story';
 
+const repoHref = 'https://github.com/chipmates/agoracosmica';
+const privacyHref = isDe ? '/datenschutz/' : '/privacy/';
+const echoesHref = publicUrl(lang, '/echoes');
+
+// The featured debate's real runtime, read off its produced audio manifest
+// (level 1: 12:56 in English, 14:23 in German). Stated next to the 50-second
+// preview so the preview never reads as the whole thing.
+const councilRuntime = isDe
+  ? 'Hör 50 Sekunden · die ganze Debatte läuft 14 Minuten'
+  : 'Hear 50 seconds · the whole debate runs 13 minutes';
+const councilPlayLabel = isDe ? 'Diese Debatte anhören' : 'Play this debate';
+
 // ── EN body card data ───────────────────────────────────────────────────
-// The eight question tiles (each links to its theme page). The six mode cards
-// moved into the interactive LibraryShowcase, which now server-renders all six
-// panels; the What-is section and the FAQ carry the modes in prose.
+// The eight question tiles (each links to its theme page). The theme name
+// rides along as the tile's small-caps label, so the link carries the theme
+// wording without stuffing it into the question sentence.
 const enQuestions = [
   { themeId: 'who-am-i', question: 'Who Am I?' },
   { themeId: 'love-connection', question: 'What binds us to each other?' },
@@ -72,19 +82,20 @@ const enQuestions = [
 ];
 
 // ── DE body card data (same verbatim discipline as EN) ──────────────────
-// The eight German question tiles (each links to its theme page). The six mode
-// cards moved into the interactive LibraryShowcase; the What-is section and the
-// FAQ carry the modes in prose.
+// The German tiles used to carry the theme name inside the question, which
+// wrapped to two lines on every tile. The theme name is now the label.
 const deQuestions = [
   { themeId: 'who-am-i', question: 'Wer bin ich? Die Frage unter jeder Frage.' },
-  { themeId: 'love-connection', question: 'Liebe und Verbundenheit: Was verbindet uns miteinander?' },
-  { themeId: 'meaning-purpose', question: 'Sinn und Bestimmung: Was macht das Leben lebenswert?' },
-  { themeId: 'mind-creativity', question: 'Geist und Kreativität: Woher kommen Ideen?' },
-  { themeId: 'moral-life', question: 'Das moralische Leben: Wie sollen wir leben?' },
-  { themeId: 'freedom-justice', question: 'Freiheit und Gerechtigkeit: Was bedeutet es, frei zu sein?' },
-  { themeId: 'faith-death-mystery', question: 'Glaube, Tod und Mysterium: Was liegt jenseits dessen, was wir wissen?' },
-  { themeId: 'loss-grief', question: 'Verlust und Trauer: Wie tragen wir, was wir verloren haben?' },
+  { themeId: 'love-connection', question: 'Was verbindet uns miteinander?' },
+  { themeId: 'meaning-purpose', question: 'Was macht das Leben lebenswert?' },
+  { themeId: 'mind-creativity', question: 'Woher kommen Ideen?' },
+  { themeId: 'moral-life', question: 'Wie sollen wir leben?' },
+  { themeId: 'freedom-justice', question: 'Was bedeutet es, frei zu sein?' },
+  { themeId: 'faith-death-mystery', question: 'Was liegt jenseits dessen, was wir wissen?' },
+  { themeId: 'loss-grief', question: 'Wie tragen wir, was wir verloren haben?' },
 ];
+
+const questions = isDe ? deQuestions : enQuestions;
 ---
 <div class="ll2-cosmic">
   <!-- continuous deep-space field flowing down from the hero, static + CSS only.
@@ -96,26 +107,22 @@ const deQuestions = [
   <div class="ll2-cosmic__inner">
 {isDe ? (
   <>
-    <!-- Was ist Agora Cosmica? -->
+    <!-- Was ist Agora Cosmica? Antwort zuerst: derselbe Text, den FAQ #1 und
+         llms.txt tragen, damit alle drei Flächen dieselbe Definition sagen. -->
     <section class="pub-section">
       <h2 class="pub-section__title">Was ist Agora Cosmica?</h2>
       <p class="pub-section__text">
-        Eine Bildungsplattform, auf der dreißig bemerkenswerte Menschen dir beibringen, was sie ein
-        Leben lang durchdacht haben. Philosophen, Wissenschaftlerinnen, Mystiker, Künstlerinnen und
-        Aktivisten, von Mark Aurel und Platon bis Ada Lovelace und Frida Kahlo, jede und jeder mit
-        einer eigenen, recherchierten Stimme und zwölf Kernlehren. Du lernst von ihnen anhand
-        sorgfältig gestalteter Inhalte. Hör eine erzählte Szene aus ihrem Leben. Vertiefe dich in
-        einen ihrer zentralen Gedanken. Setz dich mitten in einen vierstimmigen Dialog, oder lass
-        einen Council eine Frage ausstreiten. Vier dieser Kapitel bilden einen Lernweg, und wenn du
-        weitergehen willst, kannst du einen Gedanken mit jedem Menschen besprechen oder einfach alles fragen. Was sie lehren, schöpft aus ihrer
-        echten Philosophie und den Ideen, an denen sie ein Leben lang gebaut haben. Das Ganze ist
-        von einer kleinen gemeinnützigen Organisation aus Deutschland gebaut, und es ist Open
-        Source.
+        Agora Cosmica ist eine Bildungsplattform, auf der 30 Menschen aus der Geschichte dir
+        beibringen, was sie ein Leben lang durchdacht haben. Du hörst erzählte Szenen aus ihrem
+        Leben, vertiefst ihre Kerngedanken, sitzt in vierstimmigen Debatten und besprichst jede
+        Idee mit ihnen in deinen eigenen Worten. Von Mark Aurel bis Frida Kahlo, auf Deutsch und
+        Englisch. Gebaut von einer kleinen gemeinnützigen Organisation in Deutschland, Open Source
+        und zum Nachprüfen gemacht.
       </p>
       <p class="pub-section__text">
-        <a class="pub-textlink" href={publicUrl(lang, '/figures')}>Menschen ansehen</a>
-        {' · '}
-        <a class="pub-textlink" href={publicUrl(lang, '/about')}>Über das Projekt</a>
+        Das meiste, was du hier lernst, ist im Voraus entstanden und geschrieben, um dir etwas
+        beizubringen. Zu jedem Menschen gehören zwölf Kapitel, und die vier, die du der Reihe nach
+        gehst, sind ein Lernweg. Das lebendige Gespräch ist einer der Wege hinein, nicht das Ganze.
       </p>
 
       <!-- Volumen-Band direkt nach der Einleitung -->
@@ -128,20 +135,26 @@ const deQuestions = [
         <span class="pub-volume__sep">·</span>
         <span class="pub-volume__item">110 Council-Debatten</span>
       </div>
+
+      <p class="pub-section__text">
+        <a class="pub-textlink" href={publicUrl(lang, '/figures')}>Menschen ansehen</a>
+        {' · '}
+        <a class="pub-textlink" href={publicUrl(lang, '/about')}>Über das Projekt</a>
+      </p>
     </section>
 
-    <!-- Sechs Wege: die interaktive Ein-Menschen-Bibliothek (Mark Aurel, alle sechs
-         Wege). Direkt nach "Was ist Agora Cosmica?", damit man erst sieht, wie es
-         funktioniert, bevor die Menschen-Liste kommt. Alle sechs Panels serverseitig
-         gerendert = crawlbar; erbt die SEO-Überschrift + beide Ledes. -->
+    <!-- Sechs Wege: die interaktive Ein-Menschen-Bibliothek (Carl Gustav Jung,
+         alle sechs Wege). Direkt nach "Was ist Agora Cosmica?", damit man erst
+         sieht, wie es funktioniert, bevor die Menschen-Liste kommt. Alle sechs
+         Panels serverseitig gerendert = crawlbar. -->
     <LibraryShowcase lang={lang} />
 
     <!-- Das Menschen-Raster: nach der Bibliothek, damit man weiss, was eine
          Menschen-Seite bietet, bevor man Namen durchstöbert. -->
     <section class="pub-section">
-      <h2 class="pub-section__title pub-home-subhead ll2-grid-head">Entdecke die 30 bemerkenswerten Menschen</h2>
+      <h2 class="pub-section__title pub-home-subhead ll2-grid-head">Die 30 Menschen aus der Geschichte, mit denen du sprechen kannst</h2>
       <p class="pub-section__text ll2-caption">Öffne einen Namen und entdecke dieses Leben und seine Ideen.</p>
-      <div class="pub-grid pub-grid--3">
+      <div class="pub-grid pub-grid--3 ll2-grid-compact">
         {figures.map(figure => <FigureCard figure={figure} lang={lang} headingLevel="h3" />)}
       </div>
     </section>
@@ -156,62 +169,61 @@ const deQuestions = [
 
       <h3 class="pub-section__title pub-home-subhead">Acht Fragen</h3>
       <div class="ll2-question-grid">
-        {deQuestions.map(item => (
-          <LabQuestionTile themeId={item.themeId} question={item.question} lang={lang} />
+        {questions.map(item => (
+          <LabQuestionTile
+            themeId={item.themeId}
+            question={item.question}
+            themeName={t(`themes.${item.themeId}.name`)}
+            lang={lang}
+          />
         ))}
       </div>
     </section>
 
-    <!-- Der Cosmic Council -->
+    <!-- Der Cosmic Council: erst die Definition, dann die echte Debatte -->
     <section class="pub-section">
       <h2 class="pub-section__title">Der Cosmic Council</h2>
       <p class="pub-section__text">
-        Manche Fragen sind zu groß für eine einzige Stimme. Der Cosmic Council bringt vier
-        Menschen rund um eine einzige Frage in einen Raum und lässt sie streiten. Eine
-        Moderation hält den Faden, drei Denkende widersprechen einander, und du hörst zu, wie Ideen
-        aufeinanderprallen, wie es zu ihren Lebzeiten nie möglich war. Es gibt 110 sorgfältig
-        gebaute Debatten zum Abspielen, jede mit vollständigem erzähltem Audio. Oder stell deinen
-        eigenen Council zusammen. Wähle die Moderation, wähle die drei Stimmen, wähle die Frage
-        und beruf ein Gespräch ein, das es so noch nie gegeben hat.
+        Ein Council sind vier Echos, die eine Frage ausstreiten, während du zuhörst. Eines
+        moderiert, die anderen drei widersprechen einander, und niemand spielt hier Einigkeit vor.
+        Es gibt 110 fertig produzierte Debatten, 55 Fragen, jede in zwei Tiefen gebaut, alle mit
+        vollständigem erzähltem Audio. Oder du stellst deine eigene aus vier beliebigen Stimmen
+        zusammen.
       </p>
       <CouncilHero council={heroCouncil} lang={lang} headingLevel="h3" />
+      <p class="ll2-runtime">{councilRuntime}</p>
       <div class="pub-home-hero__actions">
-        <a href={`/app?council=${heroCouncil.id}&lang=${lang}`} class="pub-cta__button" data-agc-cta="start-exploring" data-agc-council={heroCouncil.id}>
-          Den Cosmic Council betreten
+        <a
+          href={`/app?council=${heroCouncil.id}&lang=${lang}`}
+          class="pub-cta__button"
+          data-agc-cta="start-exploring"
+          data-agc-council={heroCouncil.id}
+          data-agc-door="council_play"
+        >
+          {councilPlayLabel}
         </a>
       </div>
     </section>
 
-    <!-- Ehrlich, mit Absicht: dreispaltiges Vertrauens-Band -->
+    <!-- Ehrlich, mit Absicht: drei Aussagen, jede mit einem Beleg -->
     <section class="pub-section">
       <h2 class="pub-section__title">Ehrlich, mit Absicht</h2>
       <div class="ll2-trust-grid">
-        <LabTrustCard label="Ehrlich">
-          Wir sagen offen, was das hier ist. Jede Persönlichkeit ist ein KI-Echo, eine Deutung,
-          verwurzelt in Primärwerken und historischem Kontext. Nie eine Aufnahme, nie der Anspruch,
-          für den echten Menschen zu sprechen. Zu jedem Menschen gehören Faktenchecks, die
-          benennen, was belegt und was für die Geschichte nachgebildet ist.
+        <LabTrustCard label="Ehrlich" proofHref={echoesHref} proofLabel="Warum wir sie Echos nennen">
+          Jede Persönlichkeit ist ein KI-Echo, eine Deutung, verwurzelt in ihren eigenen Schriften.
+          Nie eine Aufnahme, nie der echte Mensch. Zu jeder gehört ein Faktencheck, der benennt, was
+          belegt und was nachgebildet ist.
         </LabTrustCard>
-        <LabTrustCard label="Bei dir">
-          Deine Gespräche bleiben in deinem Browser, und wir speichern sie nie auf unseren Servern. Bring deinen
-          eigenen OpenRouter-Schlüssel mit, wenn du magst, er berührt unsere Server nie. Keine
-          Tracking-Cookies, keine Analyse durch Dritte, keine Profile darüber, wer du bist. Was dir
-          gehört, bleibt deins.
+        <LabTrustCard label="Bei dir" proofHref={privacyHref} proofLabel="Zur Datenschutzseite">
+          Deine Gespräche bleiben in deinem Browser und erreichen unsere Server nie. Keine
+          Tracking-Cookies, keine Analyse durch Dritte, kein Profil darüber, wer du bist.
         </LabTrustCard>
-        <LabTrustCard label="Offen">
-          Live gesprochene Sprache läuft auf unseren eigenen GPUs in Deutschland, das übrige Audio
-          auf Servern in der EU, und der gesamte Code liegt offen unter der AGPL-3.0. Du kannst es
-          auch komplett auf deinem eigenen Rechner laufen lassen. Der Local Mode verbindet die App
-          mit jedem OpenAI-kompatiblen LLM, etwa LM Studio, Ollama oder vLLM, und betreibt den
-          Audio-Stack in Docker, sodass keine Gespräche, keine Stimme und kein Text deinen Computer
-          verlassen. Du musst uns also nicht vertrauen. Du kannst nachsehen.
+        <LabTrustCard label="Offen" proofHref={repoHref} proofLabel="Zum Code auf GitHub" proofExternal>
+          Jede Zeile Code liegt offen unter der AGPL-3.0, jede und jeder kann die Versprechen von
+          oben also nachprüfen. Du kannst die ganze Plattform auch auf deinem eigenen Rechner
+          betreiben.
         </LabTrustCard>
       </div>
-      <p class="pub-section__text">
-        <a class="pub-textlink" href={publicUrl(lang, '/figures')}>Lerne die Menschen kennen</a>
-        {' · '}
-        <a class="pub-textlink" href={publicUrl(lang, '/about')}>Wie es funktioniert</a>
-      </p>
     </section>
 
     <!-- FAQ -->
@@ -250,7 +262,8 @@ const deQuestions = [
       </div>
     </section>
 
-    <!-- Zum Lernen gebaut, offen für alle -->
+    <!-- Zum Lernen gebaut, offen für alle. Nimmt die Wegweiser-Links und die
+         GitHub-Bitte auf, die vorher als eigene Blöcke am Seitenende standen. -->
     <section class="pub-section">
       <h2 class="pub-section__title">Zum Lernen gebaut, offen für alle</h2>
       <p class="pub-section__text">
@@ -268,7 +281,7 @@ const deQuestions = [
         an agoracosmica@chipmates.ai. Wir bauen das nicht für dich. Wir bauen es mit dir.
       </p>
       <p class="pub-quote">„Verkaufe deine Klugheit und kaufe Verwunderung.“ — Rumi</p>
-      <p class="pub-section__text">
+      <p class="pub-section__text ll2-linkrow">
         <a class="pub-textlink" href={publicUrl(lang, '/about')}>Über uns</a>
         {' · '}
         <a class="pub-textlink" href={publicUrl(lang, '/contact')}>Kontakt</a>
@@ -276,30 +289,48 @@ const deQuestions = [
         <a class="pub-textlink" href={publicUrl(lang, '/figures')}>Menschen</a>
         {' · '}
         <a class="pub-textlink" href={publicUrl(lang, '/themes')}>Themen</a>
+        {' · '}
+        <a class="pub-textlink" href={philoHubHref}>{waysInPhilo}</a>
+        {' · '}
+        <a class="pub-textlink" href={wisdomHubHref}>{waysInWisdom}</a>
+        {' · '}
+        <a class="pub-textlink" href={ossHref}>{waysInOss}</a>
       </p>
+
+      <!-- GitHub-Bitte als letzte Zeile dieses Abschnitts. Reiner Repo-Link,
+           kein Stern-Widget von Dritten, damit das Tracking-Versprechen hält. -->
+      <a
+        class="ll2-star__card"
+        href={repoHref}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <span class="ll2-star__icon" aria-hidden="true">⭐</span>
+        <span class="ll2-star__text">
+          Gefällt dir das Projekt? Ein Stern auf GitHub ist der einfachste Weg, uns zu helfen, mehr
+          Menschen zu erreichen.
+        </span>
+        <span class="ll2-star__cta">Auf GitHub einen Stern geben →</span>
+      </a>
     </section>
   </>
 ) : (
   <>
-    <!-- What is Agora Cosmica? -->
+    <!-- What is Agora Cosmica? Answer first: the same definition FAQ #1 and
+         llms.txt carry, so all three surfaces say one thing. -->
     <section class="pub-section">
       <h2 class="pub-section__title">What is Agora Cosmica?</h2>
       <p class="pub-section__text">
-        An education platform where thirty remarkable people teach you what they spent a lifetime
-        working out. Philosophers, scientists, mystics, artists, and activists, from Marcus
-        Aurelius and Plato to Ada Lovelace and Frida Kahlo, each with their own researched voice
-        and twelve core teachings. You learn from them through crafted content. Hear a narrated
-        scene from their life. Study one of their core ideas. Sit inside a four-voice dialogue, or
-        let a council argue a question out. Four of those chapters form a learning arc, and when you
-        want to go further you can talk an idea through with any
-        figure or just ask anything. What they teach draws on their real philosophy and the ideas
-        they built over a lifetime. The whole thing is made by a small German nonprofit, and it is
-        open source.
+        Agora Cosmica is an education platform where 30 people from history teach you what they
+        spent a lifetime working out. You hear narrated scenes from their lives, study their core
+        ideas, sit in on four-voice debates, and talk any idea through with them in your own words.
+        Marcus Aurelius to Frida Kahlo, in English and German. Made by a small German nonprofit,
+        open source, and built to be checked.
       </p>
       <p class="pub-section__text">
-        <a class="pub-textlink" href={publicUrl(lang, '/figures')}>Browse the figures</a>
-        {' · '}
-        <a class="pub-textlink" href={publicUrl(lang, '/about')}>About the project</a>
+        Most of what you learn here was made ahead of time and written to teach. Every person
+        carries twelve chapters, and the four you walk in order are a learning arc. Live
+        conversation is one of the ways in, not the whole thing.
       </p>
 
       <!-- volume stat band, right after the What-is intro as a visual band -->
@@ -312,20 +343,26 @@ const deQuestions = [
         <span class="pub-volume__sep">·</span>
         <span class="pub-volume__item">110 council debates</span>
       </div>
+
+      <p class="pub-section__text">
+        <a class="pub-textlink" href={publicUrl(lang, '/figures')}>Browse the figures</a>
+        {' · '}
+        <a class="pub-textlink" href={publicUrl(lang, '/about')}>About the project</a>
+      </p>
     </section>
 
-    <!-- Six ways: the interactive one-figure library (Marcus Aurelius, all six
+    <!-- Six ways: the interactive one-figure library (Carl Gustav Jung, all six
          ways). Placed right after "What is Agora Cosmica?" so the visitor sees
          how it works before the figure list. All six panels server-rendered =
-         crawlable; inherits the SEO heading + both ledes. -->
+         crawlable. -->
     <LibraryShowcase lang={lang} />
 
     <!-- The figure grid: after the library, so the visitor knows what a figure
          page offers before browsing names. -->
     <section class="pub-section">
-      <h2 class="pub-section__title pub-home-subhead ll2-grid-head">Explore the 30 remarkable people</h2>
+      <h2 class="pub-section__title pub-home-subhead ll2-grid-head">The 30 people from history you can talk to</h2>
       <p class="pub-section__text ll2-caption">Open any name to explore their life and ideas.</p>
-      <div class="pub-grid pub-grid--3">
+      <div class="pub-grid pub-grid--3 ll2-grid-compact">
         {figures.map(figure => <FigureCard figure={figure} lang={lang} headingLevel="h3" />)}
       </div>
     </section>
@@ -340,59 +377,59 @@ const deQuestions = [
 
       <h3 class="pub-section__title pub-home-subhead">Eight questions</h3>
       <div class="ll2-question-grid">
-        {enQuestions.map(item => (
-          <LabQuestionTile themeId={item.themeId} question={item.question} lang={lang} />
+        {questions.map(item => (
+          <LabQuestionTile
+            themeId={item.themeId}
+            question={item.question}
+            themeName={t(`themes.${item.themeId}.name`)}
+            lang={lang}
+          />
         ))}
       </div>
     </section>
 
-    <!-- The Cosmic Council -->
+    <!-- The Cosmic Council: definition first, then the real debate -->
     <section class="pub-section">
       <h2 class="pub-section__title">The Cosmic Council</h2>
       <p class="pub-section__text">
-        Some questions are too big for one voice. The Cosmic Council puts four figures in a room
-        around a single question and lets them disagree. A moderator holds the thread, three
-        thinkers push back on each other, and you listen to ideas collide the way they never could
-        in their own lifetimes. There are 110 crafted debates ready to play, each with full
-        narrated audio. Or build your own. Choose the moderator, choose the three voices, choose
-        the question, and convene a conversation that has never happened before.
+        A council is four Echoes arguing one question while you listen. One of them moderates, the
+        other three disagree with each other, and nobody is performing agreement. There are 110
+        produced debates, 55 questions each made at two depths, every one with full narrated audio.
+        Or you build your own from any four voices.
       </p>
       <CouncilHero council={heroCouncil} lang={lang} headingLevel="h3" />
+      <p class="ll2-runtime">{councilRuntime}</p>
       <div class="pub-home-hero__actions">
-        <a href={`/app?council=${heroCouncil.id}&lang=${lang}`} class="pub-cta__button" data-agc-cta="start-exploring" data-agc-council={heroCouncil.id}>
-          Enter the Cosmic Council
+        <a
+          href={`/app?council=${heroCouncil.id}&lang=${lang}`}
+          class="pub-cta__button"
+          data-agc-cta="start-exploring"
+          data-agc-council={heroCouncil.id}
+          data-agc-door="council_play"
+        >
+          {councilPlayLabel}
         </a>
       </div>
     </section>
 
-    <!-- Honest, by design: three-column trust band -->
+    <!-- Honest, by design: three claims, each with a way to check it -->
     <section class="pub-section">
       <h2 class="pub-section__title">Honest, by design</h2>
       <div class="ll2-trust-grid">
-        <LabTrustCard label="Honest">
-          We are upfront about what this is. Every figure is an AI Echo, an interpretation grounded
-          in primary works and historical context. Never a recording, never claimed to speak for the
-          real person. Each figure ships with factchecks that name what is verified and what is
-          recreated for the story.
+        <LabTrustCard label="Honest" proofHref={echoesHref} proofLabel="Why we call them Echoes">
+          Every figure is an AI Echo, an interpretation grounded in their own writing. Never a
+          recording, never the real person speaking. Each one ships with a factcheck naming what is
+          verified and what is recreated.
         </LabTrustCard>
-        <LabTrustCard label="Yours">
-          Your conversations stay in your browser, and we never store them on our servers. Bring your own
-          OpenRouter key if you like, and it never touches our servers. No tracking cookies, no
-          third-party analytics, no profiles of who you are. What is yours stays yours.
+        <LabTrustCard label="Yours" proofHref={privacyHref} proofLabel="Read the privacy page">
+          Your conversations stay in your browser and never reach our servers. No tracking cookies,
+          no third-party analytics, no profile of who you are.
         </LabTrustCard>
-        <LabTrustCard label="Open">
-          Live speech runs on our own GPUs in Germany, the rest of the audio on EU hosting, and
-          the whole codebase is open under AGPL-3.0. You can also run it entirely on your own
-          machine. Local Mode points the app at any OpenAI-compatible LLM, like LM Studio, Ollama,
-          or vLLM, and runs the audio stack in docker, so no conversation, voice, or text data ever
-          leaves your computer. So you don't have to trust us. You can check.
+        <LabTrustCard label="Open" proofHref={repoHref} proofLabel="See the code on GitHub" proofExternal>
+          Every line of code is public under AGPL-3.0, so anyone can audit the promises above. You
+          can also run the whole platform on your own machine.
         </LabTrustCard>
       </div>
-      <p class="pub-section__text">
-        <a class="pub-textlink" href={publicUrl(lang, '/figures')}>Meet the figures</a>
-        {' · '}
-        <a class="pub-textlink" href={publicUrl(lang, '/about')}>How it works</a>
-      </p>
     </section>
 
     <!-- FAQ -->
@@ -431,7 +468,8 @@ const deQuestions = [
       </div>
     </section>
 
-    <!-- Built for learning, open to everyone -->
+    <!-- Built for learning, open to everyone. Absorbs the wayfinding links and
+         the GitHub ask that used to sit as separate blocks at the page end. -->
     <section class="pub-section">
       <h2 class="pub-section__title">Built for learning, open to everyone</h2>
       <p class="pub-section__text">
@@ -447,7 +485,7 @@ const deQuestions = [
         agoracosmica@chipmates.ai. We are not building this for you. We are building it with you.
       </p>
       <p class="pub-quote">“Sell your cleverness and buy bewilderment.” — Rumi</p>
-      <p class="pub-section__text">
+      <p class="pub-section__text ll2-linkrow">
         <a class="pub-textlink" href={publicUrl(lang, '/about')}>About</a>
         {' · '}
         <a class="pub-textlink" href={publicUrl(lang, '/contact')}>Contact</a>
@@ -455,47 +493,31 @@ const deQuestions = [
         <a class="pub-textlink" href={publicUrl(lang, '/figures')}>Figures</a>
         {' · '}
         <a class="pub-textlink" href={publicUrl(lang, '/themes')}>Themes</a>
+        {' · '}
+        <a class="pub-textlink" href={philoHubHref}>{waysInPhilo}</a>
+        {' · '}
+        <a class="pub-textlink" href={wisdomHubHref}>{waysInWisdom}</a>
+        {' · '}
+        <a class="pub-textlink" href={ossHref}>{waysInOss}</a>
       </p>
+
+      <!-- GitHub star ask, now the last line of this section. Plain repo link,
+           no third-party star widget, so the no-tracking claim stays true. -->
+      <a
+        class="ll2-star__card"
+        href={repoHref}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <span class="ll2-star__icon" aria-hidden="true">⭐</span>
+        <span class="ll2-star__text">
+          If you find this interesting, a star is the simplest way to help us reach more people.
+        </span>
+        <span class="ll2-star__cta">Star on GitHub →</span>
+      </a>
     </section>
   </>
 )}
-
-  <!-- Ways in: one unobtrusive row of text links into the two category hubs
-       and the open-source story. Sits at the end of the body, after all the
-       value, as quiet wayfinding into the topic landing pages. -->
-  <section class="pub-section">
-    <p class="pub-section__text">
-      {waysInLead}{' '}
-      <a class="pub-textlink" href={philoHubHref}>{waysInPhilo}</a>
-      {' · '}
-      <a class="pub-textlink" href={wisdomHubHref}>{waysInWisdom}</a>
-      {' · '}
-      <a class="pub-textlink" href={ossHref}>{waysInOss}</a>
-    </p>
-  </section>
-
-  <!-- GitHub star ask. Sits after all the value (the open-source / nonprofit
-       closing beat above), so "if you find this interesting" has something to
-       refer to. Plain repo link, no third-party star widget, so the no-tracking
-       claim stays true. Homepage only (this body renders on / and /de/ only);
-       figure and theme pages get just the subtle footer line, so the app CTA
-       stays their primary action. -->
-  <section class="pub-section ll2-star">
-    <a
-      class="ll2-star__card"
-      href="https://github.com/chipmates/agoracosmica"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      <span class="ll2-star__icon" aria-hidden="true">⭐</span>
-      <span class="ll2-star__text">
-        {isDe
-          ? 'Gefällt dir das Projekt? Ein Stern auf GitHub ist der einfachste Weg, uns zu helfen, mehr Menschen zu erreichen.'
-          : 'If you find this interesting, a star is the simplest way to help us reach more people.'}
-      </span>
-      <span class="ll2-star__cta">{isDe ? 'Auf GitHub einen Stern geben →' : 'Star on GitHub →'}</span>
-    </a>
-  </section>
   </div>
 </div>
 
@@ -655,6 +677,49 @@ const deQuestions = [
     }
   }
 
+  /* Desktop: the 30 figure cards used to run 4.5 screens, over a third of the
+     page, pushing the council, FAQ and closing sections out of reach. Same
+     three columns, same thirty anchors in source order, but each card lays out
+     as a row (mat on the left, name and promise beside it), which brings the
+     block back to about two screens. */
+  @media (min-width: 861px) {
+    .ll2-grid-compact { gap: 0.65rem; }
+    .ll2-grid-compact .pub-figure-card {
+      flex-direction: row;
+      align-items: stretch;
+    }
+    .ll2-grid-compact .pub-figure-card__image {
+      flex: none;
+      width: 74px;
+      margin: 7px 0 7px 7px;
+    }
+    .ll2-grid-compact .pub-figure-card__body {
+      justify-content: center;
+      gap: 0.15rem;
+      padding: 0.5rem 0.7rem;
+      min-width: 0;
+    }
+    .ll2-grid-compact .pub-figure-card__name { font-size: 1rem; }
+    /* the text column is half a card wide now, and German tradition labels run
+       to single words of 29 letters, so let them hyphenate instead of bleeding
+       past the keyline */
+    .ll2-grid-compact .pub-figure-card__tradition {
+      letter-spacing: 0.1em;
+      overflow-wrap: break-word;
+      hyphens: auto;
+    }
+    .ll2-grid-compact .pub-figure-card__learn {
+      margin-top: 0.1rem;
+      padding-top: 0.35rem;
+      font-size: 0.82rem;
+      line-height: 1.35;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 3;
+      overflow: hidden;
+    }
+  }
+
   /* volume stat band a touch more separated from the prose above it */
   .ll2-volume {
     margin-top: 2rem;
@@ -671,37 +736,20 @@ const deQuestions = [
     text-align: center;
   }
 
-  /* ── six mode cards ──────────────────────────────────────────────────── */
-  .ll2-mode-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
+  /* runtime line under the featured debate: the preview is 50 seconds, the
+     debate is not, and the reader should know that before pressing play */
+  .ll2-runtime {
+    margin: 0.15rem 0 0.2rem;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: 0.78rem;
+    letter-spacing: 0.06em;
+    color: var(--text-tertiary, #9E9E9E);
+    text-align: center;
   }
-  .ll2-mode-card {
-    min-height: 44px;
-    padding: 1.1rem 1.15rem;
-    border-radius: var(--radius-lg, 0.75rem);
-    border: 1px solid color-mix(in srgb, var(--gold-subtle) 22%, transparent);
-    background: color-mix(in srgb, var(--bg-deep-space-darker, #080B20) 45%, transparent);
-  }
-  .ll2-mode-card__step {
-    font-size: 0.66rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: color-mix(in srgb, var(--star-blue-light, #b4c8ff) 65%, transparent);
-    margin: 0 0 0.35rem;
-  }
-  .ll2-mode-card__name {
-    font-family: var(--font-content, 'Libre Caslon Text', serif);
-    font-size: var(--text-lg, 1.125rem);
-    color: var(--gold-primary, #E6BC5C);
-    margin: 0 0 0.4rem;
-  }
-  .ll2-mode-card__text {
-    font-size: var(--text-sm, 0.9rem);
-    line-height: var(--leading-relaxed, 1.6);
-    color: var(--text-secondary, #CACACA);
-    margin: 0;
+
+  /* the closing wayfinding row runs to seven links, so let it breathe */
+  .ll2-linkrow {
+    line-height: 2;
   }
 
   /* ── eight question tiles ────────────────────────────────────────────── */
@@ -727,11 +775,26 @@ const deQuestions = [
     background: color-mix(in srgb, var(--bg-deep-space-darker, #080B20) 65%, transparent);
     transform: translateY(-2px);
   }
+  .ll2-question-tile__body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    min-width: 0;
+  }
   .ll2-question-tile__text {
     font-family: var(--font-content, 'Libre Caslon Text', serif);
     font-size: var(--text-base, 1rem);
     line-height: 1.4;
     color: var(--text-primary, #D2D2D2);
+  }
+  .ll2-question-tile__label {
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    font-size: 0.65rem;
+    font-weight: var(--weight-medium, 500);
+    line-height: 1.3;
+    color: var(--gold-deep, #B08A2E);
   }
   .ll2-question-tile:hover .ll2-question-tile__text,
   .ll2-question-tile:focus-visible .ll2-question-tile__text {
@@ -746,6 +809,8 @@ const deQuestions = [
     margin-bottom: 1.25rem;
   }
   .ll2-trust-card {
+    display: flex;
+    flex-direction: column;
     padding: 1.25rem 1.3rem;
     border-radius: var(--radius-lg, 0.75rem);
     border: 1px solid color-mix(in srgb, var(--gold-subtle) 25%, transparent);
@@ -766,11 +831,24 @@ const deQuestions = [
     color: var(--text-secondary, #CACACA);
     margin: 0;
   }
+  .ll2-trust-card__proof {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    margin-top: auto;
+    padding-top: 0.4rem;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: 0.82rem;
+    font-weight: var(--weight-medium, 500);
+    color: var(--gold-primary, #E6BC5C);
+    text-decoration: none;
+  }
+  .ll2-trust-card__proof:hover,
+  .ll2-trust-card__proof:focus-visible {
+    color: var(--gold-hover, #F6D55C);
+  }
 
   /* ── github star ask ─────────────────────────────────────────────────── */
-  .ll2-star {
-    text-align: center;
-  }
   .ll2-star__card {
     display: inline-flex;
     flex-wrap: wrap;
@@ -778,7 +856,7 @@ const deQuestions = [
     justify-content: center;
     gap: 0.5rem 0.85rem;
     max-width: 640px;
-    margin: 0 auto;
+    margin: 0.6rem auto 0;
     padding: 1.1rem 1.4rem;
     border-radius: var(--radius-lg, 0.75rem);
     border: 1px solid color-mix(in srgb, var(--gold-subtle) 28%, transparent);
@@ -814,14 +892,12 @@ const deQuestions = [
 
   /* ── responsive ──────────────────────────────────────────────────────── */
   @media (min-width: 641px) and (max-width: 1024px) {
-    .ll2-mode-grid,
     .ll2-trust-grid {
       grid-template-columns: repeat(2, 1fr);
     }
   }
   @media (max-width: 640px) {
     .ll2-cosmic { margin-top: -4rem; padding-top: 4rem; }
-    .ll2-mode-grid,
     .ll2-question-grid,
     .ll2-trust-grid {
       grid-template-columns: 1fr;

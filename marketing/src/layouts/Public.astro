@@ -20,6 +20,8 @@ import '@client/styles/public/public-cards.css';
 interface Props {
   title: string;
   fullTitle?: string;
+  /** og:title + twitter:title only; <title> keeps `fullTitle`. */
+  ogTitle?: string;
   description: string;
   canonicalPath: string;
   lang: Lang;

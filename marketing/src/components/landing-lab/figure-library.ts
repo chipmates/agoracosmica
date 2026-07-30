@@ -48,11 +48,13 @@ const COUNCIL_PREVIEW_IDS = new Set(
 type ModeCopy = {
   tab: string; glyph: string; kicker: string;
   duration?: string; playLabel?: string; scale?: string;
+  /** Chapter scale line when the panel is NOT showing chapter one. */
+  scaleAny?: string;
   disclosure?: string; linkLabel: string;
 };
 const TX: Record<'en' | 'de', Record<string, ModeCopy>> = {
   en: {
-    story: { tab: 'Story', glyph: 'Learn by story', kicker: 'A teaching, told as a story', playLabel: 'Play Chapter 1', duration: '~13 min', scale: 'the first of twelve chapters', disclosure: 'Each chapter turns one idea into a scene you move through, read in the AI Echo voice. An interpretation, not a recording.', linkLabel: 'Hear the whole story' },
+    story: { tab: 'Story', glyph: 'Learn by story', kicker: 'A teaching, told as a story', playLabel: 'Play Chapter 1', duration: '~13 min', scale: 'the first of twelve chapters', scaleAny: 'one of twelve chapters', disclosure: 'Each chapter turns one idea into a scene you move through, read in the AI Echo voice. An interpretation, not a recording.', linkLabel: 'Hear the whole story' },
     wisdom: { tab: 'Wisdom', glyph: 'Study an idea', kicker: 'One of twelve core teachings', scale: 'one of 360 core teachings', linkLabel: 'Study this together' },
     prism: { tab: 'Prism', glyph: 'Hear a dialogue', kicker: 'A four-voice dialogue between Echoes', duration: 'The opening exchange', playLabel: 'Play the opening', scale: 'one of 360 prism dialogues', disclosure: 'Four AI Echoes in dialogue. Interpretations, not recordings.', linkLabel: 'Hear the full dialogue' },
     quest: { tab: 'Quest', glyph: 'Test yourself', kicker: 'A short Socratic challenge', linkLabel: 'Take the quest' },
@@ -60,7 +62,7 @@ const TX: Record<'en' | 'de', Record<string, ModeCopy>> = {
     freetalk: { tab: 'Free Talk', glyph: 'Ask anything', kicker: 'Open conversation, whenever you want', scale: '30 free messages a day', linkLabel: 'Start talking' },
   },
   de: {
-    story: { tab: 'Story', glyph: 'Mit Geschichten lernen', kicker: 'Eine Lehre, als Geschichte erzählt', playLabel: 'Kapitel 1 abspielen', duration: '~13 Min.', scale: 'das erste von zwölf Kapiteln', disclosure: 'Jedes Kapitel macht aus einer Idee eine Szene, durch die du dich bewegst, gelesen in der KI-Echo-Stimme. Eine Deutung, keine Aufnahme.', linkLabel: 'Die ganze Geschichte hören' },
+    story: { tab: 'Story', glyph: 'Mit Geschichten lernen', kicker: 'Eine Lehre, als Geschichte erzählt', playLabel: 'Kapitel 1 abspielen', duration: '~13 Min.', scale: 'das erste von zwölf Kapiteln', scaleAny: 'eines von zwölf Kapiteln', disclosure: 'Jedes Kapitel macht aus einer Idee eine Szene, durch die du dich bewegst, gelesen in der KI-Echo-Stimme. Eine Deutung, keine Aufnahme.', linkLabel: 'Die ganze Geschichte hören' },
     wisdom: { tab: 'Weisheit', glyph: 'Eine Idee vertiefen', kicker: 'Eine von zwölf Kernlehren', scale: 'eine von 360 Kernlehren', linkLabel: 'Das gemeinsam vertiefen' },
     prism: { tab: 'Prisma', glyph: 'Einen Dialog hören', kicker: 'Ein vierstimmiger Dialog zwischen Echos', duration: 'Der erste Wortwechsel', playLabel: 'Den Anfang abspielen', scale: 'einer von 360 Prisma-Dialogen', disclosure: 'Vier KI-Echos im Dialog. Deutungen, keine Aufnahmen.', linkLabel: 'Den ganzen Dialog hören' },
     quest: { tab: 'Quest', glyph: 'Dich selbst prüfen', kicker: 'Eine kurze sokratische Herausforderung', linkLabel: 'Die Quest starten' },
@@ -90,21 +92,46 @@ function gloss(s: string | undefined, cap = 150): string {
   return first.length > cap ? first.slice(0, cap - 1).trimEnd() + '…' : first;
 }
 
+export interface FigureLibraryOptions {
+  /** Which chapter the Story and Prism panels use, as a 0-based index into the
+   *  figure's twelve seeds. Defaults to 0, the first chapter, which is what the
+   *  thirty figure pages show. The homepage showcase pins a later one. */
+  seedIndex?: number;
+  /** Per-mode display-string overrides, keyed by mode id. Only the listed
+   *  fields are replaced, so an override never has to restate a whole panel.
+   *  Used by the homepage, whose one-figure showcase can be gendered and can
+   *  talk about the rest of the page. Figure pages pass nothing. */
+  overrides?: Record<string, Partial<LibMode>>;
+}
+
 /**
  * The six ways to learn from one figure, resolved for their detail page.
  * Mirrors getLibraryModes() but parameterized by figureId, from real data.
  * Council is included only if this figure is in one (graceful).
  */
-export function getFigureLibraryModes(figureId: string, lang: 'en' | 'de'): LibMode[] {
+export function getFigureLibraryModes(
+  figureId: string,
+  lang: 'en' | 'de',
+  options: FigureLibraryOptions = {},
+): LibMode[] {
   const figure = getFigureById(figureId, lang);
   const seeds = getSeedsFor(figureId, lang);
   const t = TX[lang];
   const slug = figureIdToSlug[figureId];
   const appHref = `/app?figure=${slug}`;
 
-  const seed0 = seeds[0];
+  // The chosen chapter. Seed ids run 1..12 and match both the story segment
+  // number and the prism folder, so everything below derives from the seed
+  // itself rather than a second hardcoded index.
+  const seedIndex = options.seedIndex ?? 0;
+  const seed0 = seeds[seedIndex] ?? seeds[0];
+  const chapter = seed0?.id ?? 1;
   const storyTitle = clean(seed0?.title);
   const storyBody = gloss(seed0?.coreInsights?.[0] ?? seed0?.summary);
+  const storyPlayLabel = chapter === 1
+    ? t.story.playLabel
+    : (lang === 'de' ? `Kapitel ${chapter} abspielen` : `Play Chapter ${chapter}`);
+  const storyScale = chapter === 1 ? t.story.scale : t.story.scaleAny;
 
   const concept = figure?.keyConcepts?.[0];
   const conceptTerm = clean(concept?.term);
@@ -113,18 +140,19 @@ export function getFigureLibraryModes(figureId: string, lang: 'en' | 'de'): LibM
     {
       id: 'story',
       group: 'arc',
-      step: lang === 'de' ? 'Kapitel 1' : 'Chapter 1',
+      step: lang === 'de' ? 'Schritt 1' : 'Step 1',
+      door: 'lib_story',
       tab: t.story.tab,
       glyph: t.story.glyph,
       kicker: t.story.kicker,
       title: storyTitle,
       body: storyBody,
-      audioWebm: getPublicAudioUrl(figureId, lang, 1),
-      audioMp3: getPublicAudioUrl(figureId, lang, 1).replace('.webm', '.mp3'),
+      audioWebm: getPublicAudioUrl(figureId, lang, chapter),
+      audioMp3: getPublicAudioUrl(figureId, lang, chapter).replace('.webm', '.mp3'),
       duration: t.story.duration,
       tasteSeconds: 75,
-      playLabel: t.story.playLabel,
-      scale: t.story.scale,
+      playLabel: storyPlayLabel,
+      scale: storyScale,
       disclosure: t.story.disclosure,
       linkHref: appHref,
       linkLabel: t.story.linkLabel,
@@ -132,7 +160,8 @@ export function getFigureLibraryModes(figureId: string, lang: 'en' | 'de'): LibM
     {
       id: 'wisdom',
       group: 'arc',
-      step: lang === 'de' ? 'Kapitel 2' : 'Chapter 2',
+      step: lang === 'de' ? 'Schritt 2' : 'Step 2',
+      door: 'lib_wisdom',
       tab: t.wisdom.tab,
       glyph: t.wisdom.glyph,
       kicker: t.wisdom.kicker,
@@ -145,14 +174,15 @@ export function getFigureLibraryModes(figureId: string, lang: 'en' | 'de'): LibM
     {
       id: 'prism',
       group: 'arc',
-      step: lang === 'de' ? 'Kapitel 3' : 'Chapter 3',
+      step: lang === 'de' ? 'Schritt 3' : 'Step 3',
+      door: 'lib_prism',
       tab: t.prism.tab,
       glyph: t.prism.glyph,
       kicker: t.prism.kicker,
       title: storyTitle,
       body: gloss(seed0?.summary),
-      audioWebm: `${MEDIA_BASE}/prisms/${figureId}/seed-1/audio/combined-raw-${lang}.webm`,
-      audioMp3: `${MEDIA_BASE}/prisms/${figureId}/seed-1/audio/combined-raw-${lang}.mp3`,
+      audioWebm: `${MEDIA_BASE}/prisms/${figureId}/seed-${chapter}/audio/combined-raw-${lang}.webm`,
+      audioMp3: `${MEDIA_BASE}/prisms/${figureId}/seed-${chapter}/audio/combined-raw-${lang}.mp3`,
       duration: t.prism.duration,
       tasteSeconds: 96,
       playLabel: t.prism.playLabel,
@@ -164,7 +194,8 @@ export function getFigureLibraryModes(figureId: string, lang: 'en' | 'de'): LibM
     {
       id: 'quest',
       group: 'arc',
-      step: lang === 'de' ? 'Kapitel 4' : 'Chapter 4',
+      step: lang === 'de' ? 'Schritt 4' : 'Step 4',
+      door: 'lib_quest',
       tab: t.quest.tab,
       glyph: t.quest.glyph,
       kicker: t.quest.kicker,
@@ -226,6 +257,7 @@ export function getFigureLibraryModes(figureId: string, lang: 'en' | 'de'): LibM
   modes.push({
     id: 'freetalk',
     group: 'more',
+    door: 'lib_freetalk',
     tab: t.freetalk.tab,
     glyph: t.freetalk.glyph,
     kicker: t.freetalk.kicker,
@@ -238,5 +270,7 @@ export function getFigureLibraryModes(figureId: string, lang: 'en' | 'de'): LibM
     linkLabel: t.freetalk.linkLabel,
   });
 
-  return modes;
+  const { overrides } = options;
+  if (!overrides) return modes;
+  return modes.map(m => (overrides[m.id] ? { ...m, ...overrides[m.id] } : m));
 }

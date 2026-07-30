@@ -1,14 +1,26 @@
 ---
 // Homepage body partial: one pillar of the "Honest, by design" trust
-// band. The pillar label is a small heading, the body holds the verbatim
-// sentences grouped out of HomepageBody's existing honest paragraph. No copy
-// is reworded, the page passes the exact sentences in via the default slot.
+// band. The pillar label is a small heading, the body holds one claim, and
+// the optional proof link is the point of the card: every claim on this band
+// can be checked somewhere else on the site or in the repo.
 interface Props {
   label: string;
+  /** Where the claim can be checked. Omit for a claim with no proof page. */
+  proofHref?: string;
+  proofLabel?: string;
+  /** External proof (the repo) opens in a new tab. */
+  proofExternal?: boolean;
 }
-const { label } = Astro.props;
+const { label, proofHref, proofLabel, proofExternal = false } = Astro.props;
 ---
 <div class="ll2-trust-card">
   <h3 class="ll2-trust-card__label">{label}</h3>
   <p class="ll2-trust-card__text"><slot /></p>
+  {proofHref && proofLabel && (
+    <a
+      class="ll2-trust-card__proof"
+      href={proofHref}
+      {...(proofExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+    >{proofLabel} →</a>
+  )}
 </div>

@@ -1,17 +1,25 @@
 ---
 // Homepage body partial: one of the eight life-question tiles.
-// Each tile carries the verbatim question phrase from HomepageBody and links
-// to that question's theme page, so the eight questions read as a scannable
-// grid instead of a run-on sentence while keeping every theme link crawlable.
+// The question is the headline, the theme name sits under it as an engraved
+// label. That gives the link a keyword-shaped anchor without stuffing the
+// theme name into the question sentence itself. The label is dropped when it
+// would only restate the question (the "Who Am I?" theme).
 import { publicUrl } from '../../lib/urls';
 import type { Lang } from '../../i18n';
 interface Props {
   themeId: string;
   question: string;
+  /** Localized theme name, shown as the small-caps label under the question. */
+  themeName?: string;
   lang: Lang;
 }
-const { themeId, question, lang } = Astro.props;
+const { themeId, question, themeName, lang } = Astro.props;
+const norm = (s: string) => s.toLowerCase().replace(/[^\p{L}\p{N}]/gu, '');
+const showLabel = Boolean(themeName) && !norm(question).startsWith(norm(themeName!));
 ---
 <a href={publicUrl(lang, `/themes/${themeId}`)} class="ll2-question-tile">
-  <span class="ll2-question-tile__text">{question}</span>
+  <span class="ll2-question-tile__body">
+    <span class="ll2-question-tile__text">{question}</span>
+    {showLabel && <span class="ll2-question-tile__label">{themeName}</span>}
+  </span>
 </a>

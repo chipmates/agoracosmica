@@ -1,16 +1,20 @@
 ---
-// Homepage "six ways" section: the interactive one-figure Library (Marcus
-// Aurelius / Mark Aurel), now the SINGLE telling of the six ways to learn. It
-// replaces the old static six-card grid: the island server-renders all six
-// panels (the five inactive ones carry `hidden`), so every mode's prose is in
-// crawlable HTML, and it inherits the grid's SEO heading + both reviewed ledes.
-// So the section is both the crawlable feature list AND the playable demo, with
-// no duplicate section above it. Island is client:visible (no LCP cost); the
-// band + labels are bilingual, German reviewed twice.
+// Homepage "six ways" section: the interactive one-figure Library, now keyed to
+// Carl Gustav Jung and his fourth chapter, "The Shadow". The hero above already
+// features a different person, so the page shows two of the thirty instead of
+// repeating one, and the section reads as breadth rather than duplication.
+// The island server-renders all six panels (the five inactive ones carry
+// `hidden`), so every mode's prose is in crawlable HTML, and it inherits the
+// retired card grid's SEO heading + both reviewed ledes. So the section is both
+// the crawlable feature list AND the playable demo. Island is client:visible
+// (no LCP cost); the band + labels are bilingual, German reviewed twice.
 import LabLibrary from '../islands/LabLibrary';
 import { figureImage } from '../lib/figureImages';
-import { getLibraryModes, FEATURED_ID } from './landing-lab/lab-library';
+import { getFigureLibraryModes } from './landing-lab/figure-library';
 import { getFiguresCatalog } from '@client/data/public/figuresCatalog';
+import { figureIdToSlug } from '@client/data/public/slugMap';
+import { getSeedsFor } from '../lib/seeds';
+import { getStoryChapter } from '../lib/stories';
 import { MEDIA_URL, publicUrl } from '../lib/urls';
 import './landing-lab/lab-samples.css';
 import './landing-lab/lab-library.css';
@@ -18,18 +22,96 @@ import './landing-lab/lab-library.css';
 interface Props { lang: 'en' | 'de'; }
 const { lang } = Astro.props;
 
-const modes = getLibraryModes(lang);
+// The featured person and chapter. Chapter four is where the Freud break
+// happens, so the twelve-second taste opens on a scene instead of a preamble.
+const FEATURED_ID = 'jung';
+const CHAPTER_INDEX = 3; // 0-based: the fourth of twelve seeds
+
 const figures = getFiguresCatalog(lang);
 const featured = figures.find(f => f.id === FEATURED_ID);
-const figureName = featured ? featured.name : (lang === 'de' ? 'Mark Aurel' : 'Marcus Aurelius');
+const figureName = featured ? featured.name : 'Carl Gustav Jung';
 const portrait = figureImage(FEATURED_ID, 'thumbnail', 160);
+const figureHref = publicUrl(lang, `/figures/${figureIdToSlug[FEATURED_ID]}`);
+
+// Wisdom shows a DIFFERENT teaching than the Story and Prism panels, so the
+// six panels demonstrate the twelve chapters instead of circling one. Persona
+// is Jung's own counterpart to the shadow. Both strings come from the seed
+// file, never hand-written here.
+const seeds = getSeedsFor(FEATURED_ID, lang);
+const personaSeed = seeds[1];
+// Same displayed-text scrub the library applies to seed prose: no em/en dash,
+// no semicolon on screen, no double spaces from the authoring pipeline.
+const clean = (s: string | undefined): string =>
+  (s ?? '')
+    .replace(/\s*[—–]\s*/g, ', ')
+    .replace(/\s*;\s*/g, ', ')
+    .replace(/,\s*,/g, ',')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+// The Story panel quotes the chapter's own hook and states its real runtime,
+// both straight out of the story catalog.
+const chapter = getStoryChapter(FEATURED_ID, lang, CHAPTER_INDEX + 1);
+const chapterHook = clean(chapter?.hook);
+const chapterRuntime = chapter
+  ? (lang === 'de' ? `${chapter.minutes} Min.` : `${chapter.minutes} min`)
+  : undefined;
+
+// Per-mode overrides. Everything else resolves from the figure's real data.
+const OVERRIDES = {
+  en: {
+    // The Story link points at his full page (the four app doors below are
+    // enough), and the chapter runtime comes from the story catalog.
+    story: {
+      ...(chapterHook ? { body: chapterHook } : {}),
+      ...(chapterRuntime ? { duration: chapterRuntime } : {}),
+      scale: 'one of his twelve chapters',
+      linkHref: figureHref,
+      linkLabel: 'Open his full page',
+    },
+    wisdom: {
+      title: clean(personaSeed?.title) || 'The Social Mask',
+      body: clean(personaSeed?.coreInsights?.[0]),
+      kicker: 'One of his twelve core teachings',
+    },
+    freetalk: {
+      title: 'Ask him anything',
+      body: 'Bring your own question, in your own words. He answers in his Echo voice, for as long as you want to keep going.',
+    },
+  },
+  de: {
+    story: {
+      ...(chapterHook ? { body: chapterHook } : {}),
+      ...(chapterRuntime ? { duration: chapterRuntime } : {}),
+      scale: 'eines seiner zwölf Kapitel',
+      linkHref: figureHref,
+      linkLabel: 'Seine ganze Seite öffnen',
+    },
+    wisdom: {
+      title: clean(personaSeed?.title) || 'Die soziale Maske',
+      body: clean(personaSeed?.coreInsights?.[0]),
+      kicker: 'Eine seiner zwölf Kernlehren',
+    },
+    freetalk: {
+      title: 'Frag ihn alles',
+      body: 'Bring deine eigene Frage mit, in deinen eigenen Worten. Er antwortet in seiner Echo-Stimme, so lange du magst.',
+    },
+  },
+}[lang];
+
+const modes = getFigureLibraryModes(FEATURED_ID, lang, {
+  seedIndex: CHAPTER_INDEX,
+  overrides: OVERRIDES,
+});
 
 // Heading + both ledes are the exact copy inherited from the retired static
 // grid (German reviewed twice), so removing the grid loses no crawlable text.
+// The opening lede is new: it names the person and says what the instrument is.
 const BAND = {
   en: {
     eyebrow: 'Try the library',
     title: 'Six ways to learn from a person',
+    ledeOpen: 'Up top you met one person and one door. This is everything one person actually holds. Six ways to learn from Carl Gustav Jung, three of them playable right here.',
     newHere: 'New here?',
     ledeOnboarding: 'Start with a Story, a narrated scene from their life. Everything else builds from there.',
     ledeCrafted: 'Different questions ask for different paths. Most of it is crafted ahead of time, made to teach. Two are live conversation, for when you want to take it further.',
@@ -37,6 +119,7 @@ const BAND = {
   de: {
     eyebrow: 'Probier die Bibliothek aus',
     title: 'Sechs Wege, von einem Menschen zu lernen',
+    ledeOpen: 'Oben hast du einen Menschen und eine Tür kennengelernt. Hier siehst du, was ein einziger Mensch wirklich alles mitbringt. Sechs Wege, von Carl Gustav Jung zu lernen, drei davon kannst du direkt hier abspielen.',
     newHere: 'Neu hier?',
     ledeOnboarding: 'Fang mit einer Geschichte an, einer erzählten Szene aus ihrem Leben. Alles andere baut darauf auf.',
     ledeCrafted: 'Verschiedene Fragen verlangen nach verschiedenen Wegen. Das meiste davon ist im Voraus gestaltet, gemacht, um dir etwas beizubringen. Zwei davon sind lebendige Gespräche, für die Momente, in denen du tiefer gehen willst.',
@@ -69,6 +152,7 @@ const LABELS = {
 <section class="pub-section lib-showcase">
   <p class="lib-showcase__eyebrow">{BAND.eyebrow}</p>
   <h2 class="pub-section__title">{BAND.title}</h2>
+  <p class="pub-section__text ll2-lead">{BAND.ledeOpen}</p>
   <p class="pub-section__text ll2-lead"><strong>{BAND.newHere}</strong> {BAND.ledeOnboarding}</p>
   <p class="pub-section__text ll2-lead">{BAND.ledeCrafted}</p>
   <LabLibrary

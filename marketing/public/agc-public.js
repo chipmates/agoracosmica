@@ -113,7 +113,11 @@
   // above it is keyless and unconditional: no gclid, no user dimension, same
   // privacy posture as the /v1/page beacon. One-shot per tab. The dedup flag
   // stays in tab-scoped sessionStorage and is never transmitted.
-  function sendCtaFunnelBeacon() {
+  // Door names are a fixed vocabulary of page positions, not anything about the
+  // visitor. Anything unexpected is dropped rather than forwarded.
+  var DOOR_RE = /^[a-z_]{1,40}$/;
+
+  function sendCtaFunnelBeacon(door) {
     try {
       var firedKey = 'agc_funnel_fired_cta_click';
       if (sessionStorage.getItem(firedKey)) return;
@@ -121,11 +125,15 @@
     } catch (e) { /* storage blocked — still fire once, worker rate-limits */ }
     try {
       var docLang = (document.documentElement.lang || 'en').toLowerCase();
-      var body = JSON.stringify({
+      var payload = {
         step: 'cta_click',
         path: window.location.pathname,
         language: docLang.indexOf('de') === 0 ? 'de' : 'en',
-      });
+      };
+      // Which door on the page was used, in the row's existing mode slot. A
+      // position label like "council_play", never a user dimension.
+      if (door && DOOR_RE.test(door)) payload.mode = door;
+      var body = JSON.stringify(payload);
       // Absolute worker URL on purpose (agoracosmica.org has no /v1/* route,
       // see the conversion fetch above). sendBeacon survives the navigation
       // to /app that follows the click; text/plain keeps it a simple CORS
@@ -177,7 +185,7 @@
     if (figureId) metadata.figureId = figureId;
     if (councilId) metadata.councilId = councilId;
     fireConversion('start_exploring', Object.keys(metadata).length ? metadata : undefined);
-    sendCtaFunnelBeacon();
+    sendCtaFunnelBeacon(target.getAttribute('data-agc-door') || '');
   });
 
   var burger = document.querySelector('[data-agc-burger]');
@@ -211,14 +219,44 @@
   // class show the bar from first paint, so this whole block is a no-op there.
   var stickyCta = document.querySelector('.pub-cta--sticky');
   if (stickyCta && document.body.classList.contains('pub-home-page')) {
+    var scrolledPast = false;
+    // Body doors that are themselves a gold primary. While one of them is on
+    // screen the sticky bar would double the same action in one viewport, so
+    // the bar stands down and the section's own button owns the moment.
+    var primaries = document.querySelectorAll('[data-agc-door].pub-cta__button');
+    var onScreen = [];
+    var anyPrimaryVisible = function () {
+      for (var i = 0; i < onScreen.length; i++) if (onScreen[i]) return true;
+      return false;
+    };
+    var syncSticky = function () {
+      if (scrolledPast && !anyPrimaryVisible()) stickyCta.classList.add('is-revealed');
+      else stickyCta.classList.remove('is-revealed');
+    };
     var revealSticky = function () {
       if ((window.scrollY || window.pageYOffset || 0) > 24) {
-        stickyCta.classList.add('is-revealed');
+        scrolledPast = true;
         window.removeEventListener('scroll', revealSticky);
+        syncSticky();
       }
     };
     window.addEventListener('scroll', revealSticky, { passive: true });
     // In case the page restored a scrolled position before this ran.
     revealSticky();
+
+    if (primaries.length && typeof IntersectionObserver === 'function') {
+      var io = new IntersectionObserver(function (entries) {
+        for (var i = 0; i < entries.length; i++) {
+          for (var k = 0; k < primaries.length; k++) {
+            if (primaries[k] === entries[i].target) onScreen[k] = entries[i].isIntersecting;
+          }
+        }
+        syncSticky();
+      }, { rootMargin: '0px 0px -72px 0px' });
+      for (var p = 0; p < primaries.length; p++) {
+        onScreen[p] = false;
+        io.observe(primaries[p]);
+      }
+    }
   }
 })();
