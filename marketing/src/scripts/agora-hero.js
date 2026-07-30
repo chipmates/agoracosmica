@@ -187,6 +187,14 @@ var COUNCIL = {
 var FEM = { angelou:1, austen:1, beauvoir:1, bingen:1, dickinson:1, kahlo:1,
             lovelace:1, woolf:1, tubman:1 };
 
+/* Horizontal focal point for the phone's full-bleed crop, in percent. Cover
+   trims the sides there, so a face that does not sit mid-canvas needs its own
+   x. Audited across all thirty at 390 wide; anything absent is centred. */
+var FOCAL = { laozi:27, campbell:36, galilei:36, zenji:40, goethe:40, jung:40,
+              eckhart:42, kahlo:42, angelou:43, einstein:44, gandhi:46,
+              shakespeare:53, blake:55, vinci:55, austen:57, king:58,
+              bingen:64, rumi:68, mozart:85 };
+
 var F = RAW.map(function (a) {
   return { id:a[0], slug:a[1], name: DE ? a[3] : a[2], trad: DE ? a[5] : a[4],
            promise: DE ? a[7] : a[6], q: DE ? a[9] : a[8], fem: !!FEM[a[0]] };
@@ -294,6 +302,7 @@ function paint(id) {
   $('promise').innerHTML = '<em>' + f.promise + '</em>';
   words($('q'), f.q);
   shot.alt = '';
+  shot.style.setProperty('--focal', (FOCAL[id] || 50) + '%');
   var fc = $('faces'); fc.innerHTML = '';
   var cm = COUNCIL_MAP[id];
   var cast = cm ? cm.cast : [id].concat(COUNCIL[id] || []);
@@ -379,14 +388,23 @@ function sizeCanvas() {
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
 }
 
-/* Sample the painting the way the browser draws it: cover, anchored to the top.
+/* Sample the painting the way the browser draws it: cover, at whatever
+   object-position is live (the plate anchors to the top, the phone's full-bleed
+   stage carries a per-figure focal point).
    The grid is what beat one condenses into and what beat two lifts off. */
+function objectPos() {
+  var v = (getComputedStyle(shot).objectPosition || '50% 0%').split(/\s+/);
+  var x = parseFloat(v[0]) / 100, y = parseFloat(v[1]) / 100;
+  return { x: isFinite(x) ? x : 0.5, y: isFinite(y) ? y : 0 };
+}
+
 function sampleFace() {
   var m = boxOf(heroEl.querySelector('.mat'));
   if (!m.w || !m.h || !shot.complete || !shot.naturalWidth) return null;
   var iw = shot.naturalWidth, ih = shot.naturalHeight;
   var s = Math.max(m.w / iw, m.h / ih);
-  var dx = m.x + (m.w - iw * s) * 0.5, dy = m.y;   /* object-position: 50% 0% */
+  var op = objectPos();
+  var dx = m.x + (m.w - iw * s) * op.x, dy = m.y + (m.h - ih * s) * op.y;
   var budget = W < 900 ? 3600 : 7200;
   var aspect = m.h / m.w;
   var cols = Math.max(20, Math.round(Math.sqrt(budget / aspect)));
@@ -617,6 +635,73 @@ function ignite() {
   raf = requestAnimationFrame(loop);
 }
 
+/* ============================================================
+   THE DESCENT (phone only)
+   The portrait is presented full bleed and held still behind the hero, so the
+   room has to go dark around it as the reading column descends. --p carries
+   that curve: decisively across the first screen, so no line is ever read over
+   a lit face, then the rest of the way down to the question.
+   ============================================================ */
+var PHONE = window.matchMedia ? matchMedia('(max-width: 899px)') : null;
+function isPhone() { return !!PHONE && PHONE.matches; }
+
+var pTick = false;
+function descent() {
+  pTick = false;
+  var vh = window.innerHeight || 1;
+  var r = heroEl.getBoundingClientRect();
+  var y = window.scrollY || window.pageYOffset || 0;
+  var span = Math.max(1, y + r.bottom - vh);   /* the hero's last scroll position */
+  /* two stages, the first decisive so no line is read over a lit face. A short
+     hero gets a proportionally short first stage instead of a step. */
+  var first = Math.min(vh * 0.90, span * 0.75);
+  var d = 0.80 * sstep(0, first, y) + 0.20 * sstep(first, Math.max(first + 1, span), y);
+  mhRoot.style.setProperty('--p', d.toFixed(4));
+  /* the room closes behind you: a held layer spans the viewport, so it has to
+     be gone by the time the page below owns the screen */
+  var out = 1 - Math.min(1, Math.max(0, r.bottom / vh));
+  mhRoot.style.setProperty('--out', out.toFixed(3));
+  mhRoot.classList.toggle('mh--past', r.bottom <= 0);
+}
+function onDescentScroll() {
+  if (!pTick) { pTick = true; requestAnimationFrame(descent); }
+}
+var descentOn = false;
+function watchDescent() {
+  var want = isPhone() && !STILL;
+  if (want === descentOn) return;
+  descentOn = want;
+  if (want) {
+    addEventListener('scroll', onDescentScroll, { passive: true });
+    descent();
+  } else {
+    removeEventListener('scroll', onDescentScroll);
+    mhRoot.style.setProperty('--p', '0');
+    mhRoot.style.setProperty('--out', '0');
+    mhRoot.classList.remove('mh--past');
+  }
+}
+if (STILL) mhRoot.classList.add('mh--still');
+watchDescent();
+if (PHONE && PHONE.addEventListener) PHONE.addEventListener('change', watchDescent);
+
+/* The ignition arrives with the question. On a phone the descent runs first and
+   the card starts below the fold, so the choreography waits until it is on
+   screen. Once only: a later face switch replays it straight away. */
+var asked = false;
+function igniteWhenAsked() {
+  if (asked || STILL || !isPhone() || !('IntersectionObserver' in window)) {
+    asked = true; ignite(); return;
+  }
+  var io = new IntersectionObserver(function (entries) {
+    if (!entries[0].isIntersecting) return;
+    io.disconnect();
+    asked = true;
+    ignite();
+  }, { threshold: 0.55 });
+  io.observe(askEl);
+}
+
 /* ---------- the audio: pure upside ---------- */
 var playing = false;
 function fmt(s) {
@@ -667,14 +752,14 @@ au.addEventListener('timeupdate', function () {
    the hero re-keys and the whole choreography replays with the new question. */
 var DEFAULT = 'aurelius';
 
-function swapTo(id) {
+function swapTo(id, gate) {
   var im = new Image();
   im.crossOrigin = 'anonymous';
   im.onload = function () {
     shot.removeAttribute('srcset');
     shot.src = im.src;
     paint(id);
-    requestAnimationFrame(ignite);
+    requestAnimationFrame(gate ? igniteWhenAsked : ignite);
   };
   im.onerror = function () { paint(id); arrive(); };
   im.src = main(id, innerWidth <= 899 ? 900 : 1200);
@@ -693,12 +778,14 @@ function select(id, user) {
     setTimeout(function () { swapTo(id); }, 300);
     return;
   }
-  if (id !== DEFAULT) { swapTo(id); return; }
+  if (id !== DEFAULT) { swapTo(id, true); return; }
   paint(id);
-  ignite();
-  /* a slow byte must never leave the mat empty: reveal the painting regardless */
+  igniteWhenAsked();
+  /* a slow byte must never leave the mat empty: reveal the painting regardless.
+     On a phone the painting is already up and the question is waiting on the
+     descent, so nothing is owed. */
   setTimeout(function () {
-    if (!running && FREEZE === null && !STILL &&
+    if (!running && FREEZE === null && !STILL && !isPhone() &&
         document.documentElement.classList.contains('settling')) arrive();
   }, 2800);
 }
@@ -710,7 +797,10 @@ addEventListener('resize', function () {
     if (running) { cancelAnimationFrame(raf); raf = 0; running = false; }
     sizeCanvas();
     ctx.clearRect(0, 0, W, H);
-    arrive();
+    /* a phone fires resize when the URL bar collapses, which must not hand the
+       question its gold before the descent has reached it */
+    if (asked || !isPhone()) arrive();
+    if (descentOn) descent();
   }, 160);
 });
 

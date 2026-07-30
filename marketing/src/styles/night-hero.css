@@ -143,6 +143,8 @@ html[lang=de] .mh h1{font-size:clamp(1.75rem,2.7vw,2.4rem)}
 .shot{width:100%;height:100%;display:block;object-fit:cover;
   /* top-anchored: the crop only ever trims the bottom, so the head is never cut */
   object-position:50% 0%}
+/* the three light layers belong to the phone's full-bleed stage only */
+.mat__scrim,.mat__lamp,.mat__veil{display:none}
 .pcap{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;
   padding:.7rem .25rem .15rem}
 .pcap__nm{font-family:var(--font-content);font-size:1.32rem;line-height:1.15;
@@ -288,6 +290,83 @@ html[lang=de] .mh h1{font-size:clamp(1.75rem,2.7vw,2.4rem)}
   .promise{font-size:1.12rem}
   .ask q{font-size:1.1rem}
   .pcap__nm{font-size:1.25rem}
+}
+
+/* ---------- phone: the painting becomes the room ----------
+   The portrait leaves its plate and is presented full bleed behind the hero,
+   held still while the content descends over it. --p is the descent, 0 on the
+   first screen and 1 where the hero ends; agora-hero.js writes it, and the 0
+   below is what a no-script visit keeps. */
+@media (max-width:899px){
+  .mh{--p:0;--out:0}
+  /* no stacking context on the column, so the stage can sit in the document's
+     own negative layer and never paint over anything below the hero */
+  .wrap{z-index:auto}
+  .hero{background:none}
+
+  .artcol{max-width:none;width:100%;margin:.45rem 0 0}
+  .pplate{position:static;padding:0;border:0;background:none;box-shadow:none}
+
+  .mat{position:fixed;top:0;left:0;right:0;bottom:0;z-index:-1;
+    width:auto;height:auto;aspect-ratio:auto;border:0;background:var(--bg-void);
+    opacity:calc(1 - var(--out))}
+  /* the painting settles back into the room as the descent runs */
+  .shot{object-position:var(--focal,50%) 3%;
+    transform:scale(calc(1.05 - .05 * var(--p)));transform-origin:50% 20%;
+    will-change:transform}
+  /* below the hero there is no room left to light */
+  .mh--past .mat{visibility:hidden}
+
+  .mat__scrim,.mat__lamp,.mat__veil{display:block;position:absolute;inset:0;
+    pointer-events:none}
+  /* hands the lower half of the screen to type */
+  .mat__scrim{background:
+    linear-gradient(to bottom,
+      color-mix(in srgb,var(--bg-void) var(--a-60),transparent) 0%,
+      color-mix(in srgb,var(--bg-void) var(--a-25),transparent) 13%,
+      transparent 26%,
+      transparent 33%,
+      color-mix(in srgb,var(--bg-void) var(--a-50),transparent) 55%,
+      color-mix(in srgb,var(--bg-void) var(--a-90),transparent) 74%,
+      var(--bg-void) 95%),
+    radial-gradient(126% 60% at 50% 4%,
+      transparent 0%,
+      color-mix(in srgb,var(--bg-void) var(--a-25),transparent) 70%,
+      color-mix(in srgb,var(--bg-void) var(--a-60),transparent) 100%)}
+  /* a lamp over the face, spent by the time the question arrives */
+  .mat__lamp{background:radial-gradient(62% 32% at 50% 24%,
+    color-mix(in srgb,var(--gold-primary) var(--a-12),transparent) 0%,
+    transparent 72%);
+    opacity:calc(1 - var(--p))}
+  /* the dimmer: this is the whole move */
+  .mat__veil{background:var(--bg-void);opacity:calc(.94 * var(--p));
+    will-change:opacity}
+
+  /* the first screen belongs to the painting, the proposition sits at its foot.
+     The subtraction is the sticky navbar plus the hero's own top padding. */
+  .headcol{min-height:calc(100svh - 5.2rem);display:flex;flex-direction:column;
+    justify-content:flex-end;padding-bottom:.35rem}
+  /* everything now reads over paint, so every line carries its own ground */
+  .eyebrow,.mh h1,.sub,.pcap__nm,.pcap__tr,.blabel,.promise,.play,.council,
+  .free,.disc,.trust,.shelfcap,.entryA,.entryB{
+    text-shadow:0 2px 18px var(--bg-void)}
+  .pcap{padding-top:.55rem;
+    border-top:1px solid color-mix(in srgb,var(--gold-subtle) var(--a-25),transparent)}
+
+  /* the ignition waits for the question here, so the painting is never handed
+     to the dust at load: it is the first thing on screen and stays lit */
+  .settling .shot{opacity:1}
+}
+
+/* the still: the painting stops being fixed and is simply the first screen,
+   the room is already lit, nothing waits on a scroll */
+@media (max-width:899px){
+  .mh--still .mat{position:absolute;bottom:auto;height:100svh}
+  .mh--still .shot{transform:none}
+}
+@media (max-width:899px) and (prefers-reduced-motion:reduce){
+  .mat{position:absolute;bottom:auto;height:100svh}
+  .shot{transform:none}
 }
 
 /* ---------- wide screens: the plate closes the composition ----------
