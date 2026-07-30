@@ -58,6 +58,33 @@ body {
   overflow-x: hidden;
 }
 
+/* Override the SPA's overflow:hidden (index.css) so the document scrolls the
+   window, not the body. Without this, window.scrollY stays 0 and the mobile
+   sticky CTA reveal in agc-public.js never fires. `clip` (not `hidden`) keeps
+   the page from becoming a scroll container, so position:sticky still works;
+   overflow-y stays visible for normal scrolling. */
+html:has(.public-page) {
+  overflow-x: clip;
+  overflow-y: visible;
+  height: auto;
+}
+
+html:has(.public-page) body {
+  overflow-x: clip;
+  overflow-y: visible;
+  height: auto;
+}
+
+/* iOS Safari pins body with position:fixed to block elastic scroll
+   (viewport-browser-only.css). That also stops public pages scrolling
+   the window, so undo it for them. */
+@supports (-webkit-touch-callout: none) {
+  html:has(.public-page) body {
+    position: static;
+    width: auto;
+  }
+}
+
 img { max-width: 100%; display: block; }
 h1, h2, h3, p, figure { margin: 0; }
 a { color: inherit; }
