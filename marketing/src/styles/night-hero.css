@@ -95,16 +95,15 @@ html[lang=de] .mh h1{font-size:clamp(1.75rem,2.7vw,2.4rem)}
   color:var(--text-primary)}
 .promise em{font-style:italic}
 
-/* DISCUSSION: a chip, the figure sits inside their own council */
-.council{display:inline-flex;align-items:center;gap:.8rem;min-height:46px;
-  padding:.2rem 1rem .2rem .25rem;border:1px solid var(--keyline-soft);
-  border-radius:999px;text-decoration:none;font-size:.875rem;
-  color:var(--text-secondary);transition:border-color .25s ease}
-.council:hover{border-color:var(--keyline-strong)}
-.faces{display:flex;flex:0 0 auto}
-.faces img{width:34px;height:34px;border-radius:50%;object-fit:cover;
-  border:2px solid var(--bg-void);background:var(--bg-astral);margin-left:-11px}
-.faces img:first-child{margin-left:0}
+/* CHAPTER: the long-form door. A quiet line, so the question below it stays
+   the climax of the ladder. Block with a fit-content width, not a flex row:
+   the arrow has to stay inline with the last word when German wraps the line,
+   and the padding is what makes the 44px target. */
+.chapter{display:block;width:fit-content;padding:.75rem 0;
+  font-size:.9rem;line-height:1.4;text-decoration:none;
+  color:var(--text-secondary);transition:color .25s ease}
+.chapter__go{margin-left:.45em;color:var(--gold-primary)}
+.chapter:hover{color:var(--text-primary)}
 
 /* SPEAK: the climax. The warmest plate on the page. */
 .ask{display:flex;align-items:center;gap:1rem;text-decoration:none;
@@ -254,8 +253,7 @@ html[lang=de] .mh h1{font-size:clamp(1.75rem,2.7vw,2.4rem)}
   .blabel{font-size:.625rem;margin-bottom:.2rem}
   .promise{font-size:1.02rem;line-height:1.36}
   .play{min-height:46px;font-size:.85rem}
-  .council{font-size:.8rem;gap:.65rem;padding:.2rem .8rem .2rem .2rem}
-  .faces img{width:31px;height:31px;margin-left:-10px}
+  .chapter{font-size:.82rem;padding:.82rem 0}
   .ask{padding:.72rem .72rem .72rem .85rem;gap:.6rem}
   .ask q{font-size:1.02rem;line-height:1.32}
   .ask__go{flex-basis:40px;width:40px;height:40px}
@@ -354,7 +352,7 @@ html[lang=de] .mh h1{font-size:clamp(1.75rem,2.7vw,2.4rem)}
      subtraction is the sticky navbar plus the hero's own top padding. */
   .headcol{padding-top:calc(58.5svh - 5.7rem);padding-bottom:.35rem}
   /* everything now reads over paint, so every line carries its own ground */
-  .eyebrow,.mh h1,.sub,.pcap__nm,.pcap__tr,.blabel,.promise,.play,.council,
+  .eyebrow,.mh h1,.sub,.pcap__nm,.pcap__tr,.blabel,.promise,.play,.chapter,
   .free,.disc,.trust,.shelfcap,.entryA,.entryB{
     text-shadow:0 2px 18px var(--bg-void)}
   .pcap{padding-top:.55rem;

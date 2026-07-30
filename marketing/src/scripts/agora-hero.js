@@ -31,9 +31,6 @@ var mhRoot = document.querySelector('.mh');
 if (!mhRoot) return;
 /* the figure-set revision, stamped by the component from the app manifest */
 var REV = mhRoot.dataset.figrev ? '-' + mhRoot.dataset.figrev : '';
-var thumb = function (id) { return CDN + '/images/figures/' + id + '/thumbnail' + REV + '/160.webp'; };
-var COUNCIL_MAP = {};
-try { COUNCIL_MAP = JSON.parse(mhRoot.dataset.councils || '{}'); } catch (e) {}
 var main  = function (id, w) { return CDN + '/images/figures/' + id + '/main' + REV + '/' + w + '.webp'; };
 var trail = function (id) {
   return CDN + '/trailers/figures/' + id + '/' + LANG + '/' + id + '_trailer_' + LANG + '.mp3';
@@ -165,25 +162,6 @@ var RAW = [
  'Ich interessiere mich für alles und bringe nichts zu Ende. Ist das ein Fehler?']
 ];
 
-/* the three who sit with them in a council */
-var COUNCIL = {
-  aurelius:['gautama','nietzsche','schopenhauer'], laozi:['zenji','gautama','rumi'],
-  angelou:['king','tubman','dickinson'], austen:['woolf','shakespeare','beauvoir'],
-  beauvoir:['nietzsche','woolf','jung'], bingen:['eckhart','goethe','rumi'],
-  campbell:['jung','gautama','blake'], zenji:['laozi','gautama','eckhart'],
-  dickinson:['woolf','rumi','blake'], einstein:['galilei','vinci','lovelace'],
-  eckhart:['zenji','bingen','rumi'], galilei:['einstein','vinci','plato'],
-  gandhi:['king','mandela','tubman'], goethe:['vinci','bingen','schopenhauer'],
-  gautama:['zenji','laozi','schopenhauer'], jung:['campbell','nietzsche','blake'],
-  kahlo:['angelou','woolf','blake'], king:['gandhi','mandela','angelou'],
-  lovelace:['einstein','vinci','galilei'], mandela:['gandhi','king','tubman'],
-  mozart:['goethe','blake','vinci'], blake:['jung','dickinson','rumi'],
-  nietzsche:['schopenhauer','beauvoir','aurelius'], plato:['aurelius','galilei','nietzsche'],
-  rumi:['eckhart','bingen','dickinson'], schopenhauer:['gautama','nietzsche','goethe'],
-  shakespeare:['austen','woolf','blake'], woolf:['austen','dickinson','beauvoir'],
-  tubman:['king','mandela','angelou'], vinci:['galilei','goethe','einstein']
-};
-
 var FEM = { angelou:1, austen:1, beauvoir:1, bingen:1, dickinson:1, kahlo:1,
             lovelace:1, woolf:1, tubman:1 };
 
@@ -208,7 +186,8 @@ var T = DE ? {
   sub:'Lerne von 30 bemerkenswerten Menschen, von Mark Aurel bis Frida Kahlo.',
   play:'Das Echo hören', playing:'Läuft',
   qkickM:'Wohin sein Weg führt', qkickF:'Wohin ihr Weg führt',
-  council:'Vier von ihnen streiten es aus',
+  chapKickM:'Sein erstes Kapitel', chapKickF:'Ihr erstes Kapitel',
+  chap:'Eine Lehre, als Geschichte erzählt. Kapitel eins anhören',
   askLbl:'Deine erste Frage',
   free:'30 kostenlose Nachrichten pro Tag. Ohne Anmeldung.',
   disc:'Ein Echo, keine Aufnahme. Gemalt, nicht fotografiert.',
@@ -226,7 +205,8 @@ var T = DE ? {
   sub:"Learn from 30 of history's remarkable people, Marcus Aurelius to Frida Kahlo.",
   play:'Hear the Echo', playing:'Playing',
   qkickM:'Where his path leads', qkickF:'Where her path leads',
-  council:'Four of them argue it out',
+  chapKickM:'His first chapter', chapKickF:'Her first chapter',
+  chap:'A teaching, told as a story. Play chapter one',
   askLbl:'Your first question',
   free:'30 free messages a day. No signup needed.',
   disc:'An Echo, not a recording. Painted, not photographed.',
@@ -254,7 +234,7 @@ if (DE) {
   html('h1', T.h1);
   txt('sub', T.sub);
   txt('playLbl', T.play);
-  txt('councilTxt', T.council);
+  txt('chapTxt', T.chap);
   txt('askLbl', T.askLbl);
   txt('free', T.free);
   txt('discl', T.disc);
@@ -299,20 +279,13 @@ function paint(id) {
   /* the tag names THIS figure's question, so the app prefills what was clicked */
   askEl.href = '/app?figure=' + f.slug + '&lang=' + LANG + '&ask=f:' + f.id + ':1';
   askEl.setAttribute('data-agc-figure', id);
+  $('chapKick').textContent = f.fem ? T.chapKickF : T.chapKickM;
+  chapEl.href = '/app?figure=' + f.slug + '&lang=' + LANG + '&mode=story&chapter=1';
+  chapEl.setAttribute('data-agc-figure', id);
   $('promise').innerHTML = '<em>' + f.promise + '</em>';
   words($('q'), f.q);
   shot.alt = '';
   shot.style.setProperty('--focal', (FOCAL[id] || 50) + '%');
-  var fc = $('faces'); fc.innerHTML = '';
-  var cm = COUNCIL_MAP[id];
-  var cast = cm ? cm.cast : [id].concat(COUNCIL[id] || []);
-  cast.forEach(function (cid) {
-    var im = document.createElement('img');
-    im.src = thumb(cid); im.alt = ''; im.loading = 'lazy';
-    fc.appendChild(im);
-  });
-  var councilEl = $('council');
-  if (councilEl && cm) councilEl.href = '/app?council=' + cm.id + '&lang=' + LANG;
   [].forEach.call(rail.children, function (a) {
     if (a.dataset.id === id) a.setAttribute('aria-current', 'true');
     else a.removeAttribute('aria-current');
@@ -343,7 +316,7 @@ var heroEl = document.querySelector('.hero');
 var cv = $('dust'), ctx = cv.getContext('2d');
 var W = 0, H = 0, DPR = 1;
 var face = [], stream = [], raf = 0, t0 = 0, running = false;
-var qWords = [], askEl = $('ask'), askLi = askEl.closest('li');
+var qWords = [], askEl = $('ask'), chapEl = $('chapDoor'), askLi = askEl.closest('li');
 var seed = 20260728;
 function rnd() { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; }
 
