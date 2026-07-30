@@ -6,8 +6,8 @@ import { EmptyAudioError } from '../services/audio/stt/sttUtils';
 import ProcessingLoader from './ProcessingLoader';
 import { ttsScheduler } from '../controllers/conversationStreamDriver';
 import { getOrRollConversationSessionId, sendSessionEndBeacon } from '../services/audio/tts/ttsSessions';
-import { preferTextInput, saveInputPreference, registerInputToggleShortcut } from '../utils/inputMethodDetection';
-import { consumeAskPrefill, consumeCouncilPrefill } from '../utils/public/entryIntent';
+import { preferTextInput, saveInputPreference, registerInputToggleShortcut, hasExplicitInputPreference } from '../utils/inputMethodDetection';
+import { consumeAskPrefill, consumeCouncilPrefill, resolveAskPrefill, hasEntryTextFirst, PREFILL_STAGED_EVENT } from '../utils/public/entryIntent';
 import { loadServiceConfig } from '../services/audio/config/serviceConfig';
 import { useTranslation } from '../hooks/useTranslation';
 import { useAutoplayGate } from '../hooks/useAutoplayGate';
@@ -33,7 +33,7 @@ interface UnifiedInputContainerProps {
 }
 
 const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure, onSubmitMessage }) => {
-  const { tString, tNode } = useTranslation();
+  const { tString, tNode, language } = useTranslation();
   const { getContext, unlock } = useAutoplayGate();
 
   // Detect if we're on a mobile device for UI optimizations
@@ -62,6 +62,11 @@ const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure,
     if (config.sttEnabled === false) {
       return true;
     }
+    // Anyone who came in through a public page carries a question, not a
+    // recording. Their own saved preference still wins.
+    if (!hasExplicitInputPreference() && hasEntryTextFirst()) {
+      return true;
+    }
     return preferTextInput();
   });
   
@@ -78,12 +83,18 @@ const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure,
   const processingStage = useDomainStore((state) => state.conversation.processingStage);
   const setProcessingStage = useDomainStore((state) => state.setProcessingStage);
 
-  // One-shot composer prefill staged by the homepage ask-link. Once Free Talk
-  // renders, the promised question sits in the text input (text mode forced so
-  // it is visible) and the visitor just sends it. The stash clears on read.
+  // One-shot composer prefill staged by a public-page ask link. Once Free Talk
+  // renders, the question the visitor actually clicked sits in the text input
+  // (text mode forced so it is visible) and they just send it. The stash
+  // clears on read. Tags name a question, they never carry one, so the string
+  // is resolved here in the app's own language.
   const selectedModeForPrefill = useDomainStore((state) => state.mode.selected);
-  useEffect(() => {
-    if (selectedModeForPrefill !== 'free_conversation') return;
+  const selectedFigureIdForPrefill = useDomainStore((state) => state.figures.selectedId);
+
+  const applyStagedPrefill = useCallback(() => {
+    // Read the live state, not the render's: the staging event can arrive
+    // between renders.
+    if (useDomainStore.getState().mode.selected !== 'free_conversation') return;
     // Council end-state handoff: the heard question, staged as free text.
     const councilQuestion = consumeCouncilPrefill();
     if (councilQuestion) {
@@ -91,15 +102,31 @@ const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure,
       setUseTextInput(true);
       return;
     }
-    const tag = consumeAskPrefill();
-    if (tag !== 'hero') return;
-    const question = tString('entry.heroAskQuestion', '');
+    const figureId = useDomainStore.getState().figures.selectedId;
+    const prefill = resolveAskPrefill(consumeAskPrefill(), figureId, language);
+    if (!prefill) return;
+    const question = prefill.kind === 'text'
+      ? prefill.text
+      : tString(prefill.key, tString('entry.heroAskQuestion', ''));
     if (question) {
       setMessage(question);
       setUseTextInput(true);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedModeForPrefill]);
+  }, [language, tString]);
+
+  // Three ways in, because the staging can land before or after this mounts:
+  // on mount, when the mode or figure settles, and on the staging event itself
+  // (a returning visitor can already be in Free Talk with the same figure, and
+  // then neither of the other two ever fires). The stash clears on read, so
+  // whichever arrives first wins and the rest are no-ops.
+  useEffect(() => {
+    applyStagedPrefill();
+  }, [selectedModeForPrefill, selectedFigureIdForPrefill, applyStagedPrefill]);
+
+  useEffect(() => {
+    window.addEventListener(PREFILL_STAGED_EVENT, applyStagedPrefill);
+    return () => window.removeEventListener(PREFILL_STAGED_EVENT, applyStagedPrefill);
+  }, [applyStagedPrefill]);
 
   // Free-tier quota state for turn counter
   const quota = useDomainStore((state) => state.quota);

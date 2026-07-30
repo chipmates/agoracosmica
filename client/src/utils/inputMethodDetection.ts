@@ -22,6 +22,19 @@ export const preferTextInput = (): boolean => {
 };
 
 /**
+ * Whether the visitor ever chose an input method themselves. Callers that want
+ * to open the composer on text for a reason of their own must not override a
+ * real preference, only the absence of one.
+ */
+export const hasExplicitInputPreference = (): boolean => {
+  try {
+    return localStorage.getItem('preferTextInput') !== null;
+  } catch {
+    return false;
+  }
+};
+
+/**
  * Save user's preference for input method
  * @param useText - Whether the user prefers text input over speech
  */

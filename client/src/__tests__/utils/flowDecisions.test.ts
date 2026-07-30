@@ -14,7 +14,15 @@ import {
   readCouncilIntent,
   clearCouncilIntent,
   readAskIntent,
+  readStoryIntent,
+  clearStoryIntent,
+  hasEntryTextFirst,
+  isValidAskTag,
+  resolveAskPrefill,
+  stashAskPrefill,
+  consumeAskPrefill,
 } from '../../utils/public/entryIntent';
+import { heroEntries, getHeroEntry } from '../../data/public/heroEntry';
 
 describe('isFirstContactForFigure', () => {
   it('is first contact when no keys and no free talk exist', () => {
@@ -232,6 +240,104 @@ describe('entryIntent URL capture round-trip', () => {
     captureEntryIntentFromUrl();
     expect(window.location.search).toBe('?utm_keep=x');
     expect(window.location.hash).toBe('#section');
+  });
+
+  it('captures a per-figure ask tag and marks the arrival text-first', () => {
+    window.history.replaceState({}, '', '/app?figure=hildegard-von-bingen&ask=f:bingen:1&lang=de');
+    captureEntryIntentFromUrl();
+    expect(readFigureIntent()).toBe('bingen');
+    expect(readAskIntent()).toBe('f:bingen:1');
+    expect(hasEntryTextFirst()).toBe(true);
+    expect(window.location.search).toBe('');
+  });
+
+  it('captures a story chapter deep-link and clears it once consumed', () => {
+    window.history.replaceState({}, '', '/app?figure=jung&mode=story&chapter=4');
+    captureEntryIntentFromUrl();
+    expect(readStoryIntent()).toEqual({ chapter: 4 });
+    clearStoryIntent();
+    expect(readStoryIntent()).toBeNull();
+  });
+
+  it.each(['/app?mode=prism&chapter=1', '/app?mode=story&chapter=0', '/app?mode=story&chapter=13'])(
+    'rejects %s',
+    (url) => {
+      window.history.replaceState({}, '', url);
+      captureEntryIntentFromUrl();
+      expect(readStoryIntent()).toBeNull();
+    }
+  );
+});
+
+describe('ask tags', () => {
+  beforeEach(() => {
+    sessionStorage.clear();
+  });
+
+  it('accepts the legacy tag, the life tag and every figure slot', () => {
+    expect(isValidAskTag('hero')).toBe(true);
+    expect(isValidAskTag('life')).toBe(true);
+    for (const entry of heroEntries) {
+      for (const slot of [1, 2, 3]) {
+        expect(isValidAskTag(`f:${entry.figureId}:${slot}`)).toBe(true);
+      }
+    }
+  });
+
+  it.each([
+    'f:aurelius:0',
+    'f:aurelius:4',
+    'f:aurelius',
+    'f:nobody:1',
+    'f:constructor:1',
+    'f:Aurelius:1',
+    'javascript:alert(1)',
+    'How do I stop small annoyances from taking my whole day?',
+  ])('rejects %s', (tag) => {
+    expect(isValidAskTag(tag)).toBe(false);
+    stashAskPrefill(tag);
+    expect(consumeAskPrefill()).toBeNull();
+  });
+
+  it('resolves a figure tag to that figure question in both languages', () => {
+    const bingen = getHeroEntry('bingen')!;
+    expect(resolveAskPrefill('f:bingen:1', null, 'en')).toEqual({
+      kind: 'text',
+      text: bingen.questionEn,
+    });
+    expect(resolveAskPrefill('f:bingen:1', 'aurelius', 'de')).toEqual({
+      kind: 'text',
+      text: bingen.questionDe,
+    });
+  });
+
+  it('reserved slots 2 and 3 resolve to the hero question for now', () => {
+    const question = getHeroEntry('jung')!.questionEn;
+    expect(resolveAskPrefill('f:jung:2', null, 'en')).toEqual({ kind: 'text', text: question });
+    expect(resolveAskPrefill('f:jung:3', null, 'en')).toEqual({ kind: 'text', text: question });
+  });
+
+  it('the legacy tag keys off the selected figure, and falls back when there is none', () => {
+    expect(resolveAskPrefill('hero', 'kahlo', 'de')).toEqual({
+      kind: 'text',
+      text: getHeroEntry('kahlo')!.questionDe,
+    });
+    expect(resolveAskPrefill('hero', null, 'en')).toEqual({
+      kind: 'translationKey',
+      key: 'entry.heroAskQuestion',
+    });
+  });
+
+  it('the life tag resolves through translations, not the figure table', () => {
+    expect(resolveAskPrefill('life', 'jung', 'en')).toEqual({
+      kind: 'translationKey',
+      key: 'entry.askQuestion.life',
+    });
+  });
+
+  it('resolves nothing for an unknown tag or no tag at all', () => {
+    expect(resolveAskPrefill(null, 'jung', 'en')).toBeNull();
+    expect(resolveAskPrefill('council', 'jung', 'en')).toBeNull();
   });
 });
 

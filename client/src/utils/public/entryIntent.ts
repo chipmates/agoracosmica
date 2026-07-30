@@ -9,17 +9,73 @@
 
 import { LocalStorageAdapter } from '../../storage/localAdapter';
 import { figureSlugToId } from '../../data/public/slugMap';
+import { getHeroEntryQuestion, hasHeroEntry } from '../../data/public/heroEntry';
 
 const SS_FIGURE_KEY = 'agc_intended_figure';
 const SS_COUNCIL_KEY = 'agc_intended_council';
 const SS_ASK_KEY = 'agc_intended_ask';
 const SS_ASK_PREFILL_KEY = 'agc_ask_prefill';
 const SS_COUNCIL_PREFILL_KEY = 'agc_council_prefill';
+const SS_MODE_KEY = 'agc_intended_mode';
+const SS_CHAPTER_KEY = 'agc_intended_chapter';
+const SS_TEXT_FIRST_KEY = 'agc_entry_text_first';
 
-// Allowlisted ask tags. A tag names a curated starter question that lives in
-// the app's translations (entry.heroAskQuestion), so no free text ever rides
-// the URL and the prefill is always language-correct at render time.
-const ASK_TAGS = new Set(['hero']);
+// Ask tags. A tag NAMES a curated question, it never carries one: no free text
+// ever rides a URL, so the prefill is always language-correct at render time
+// and nothing a stranger can type reaches the composer.
+//
+//   hero              legacy, the pre-2026-07 single question. Resolves to the
+//                     selected figure's own question when there is one, so old
+//                     links and cached marketing pages upgrade themselves.
+//   f:{figure}:{slot} the figure's landing question. Slot 1 is the hero
+//                     question; 2 and 3 are reserved for the figure pages'
+//                     three-question CTA and resolve to slot 1 until those
+//                     questions exist.
+//   life              the one question that belongs to no figure.
+const LEGACY_ASK_TAG = 'hero';
+const LIFE_ASK_TAG = 'life';
+const LIFE_QUESTION_KEY = 'entry.askQuestion.life';
+const HERO_QUESTION_KEY = 'entry.heroAskQuestion';
+const FIGURE_ASK_TAG = /^f:([a-z]+):([1-3])$/;
+
+/** True for any tag the app knows how to resolve into a question. */
+export function isValidAskTag(tag: string): boolean {
+  if (tag === LEGACY_ASK_TAG || tag === LIFE_ASK_TAG) return true;
+  const match = FIGURE_ASK_TAG.exec(tag);
+  return !!match && hasHeroEntry(match[1]);
+}
+
+// Either the question itself (resolved from the bundled table) or the key the
+// caller's translator has to look up. Keeps this module free of the i18n hook.
+export type AskPrefill =
+  | { kind: 'text'; text: string }
+  | { kind: 'translationKey'; key: string };
+
+/**
+ * Turns a consumed ask tag into the question to stage in the composer.
+ * `figureId` is the figure the visitor is about to talk to, which is what the
+ * legacy 'hero' tag keys off.
+ */
+export function resolveAskPrefill(
+  tag: string | null,
+  figureId: string | null,
+  lang: string
+): AskPrefill | null {
+  if (!tag) return null;
+  if (tag === LIFE_ASK_TAG) return { kind: 'translationKey', key: LIFE_QUESTION_KEY };
+
+  const match = FIGURE_ASK_TAG.exec(tag);
+  if (match) {
+    const text = getHeroEntryQuestion(match[1], lang);
+    return text ? { kind: 'text', text } : null;
+  }
+
+  if (tag === LEGACY_ASK_TAG) {
+    const text = getHeroEntryQuestion(figureId, lang);
+    return text ? { kind: 'text', text } : { kind: 'translationKey', key: HERO_QUESTION_KEY };
+  }
+  return null;
+}
 
 /**
  * Called from the "Start Exploring" CTA, just before navigating into the app.
@@ -38,6 +94,7 @@ export function captureEntryIntent(figureId: string | undefined, lang: 'en' | 'd
   } catch {
     // sessionStorage unavailable (private mode) — no deep-link, normal flow
   }
+  markEntryTextFirst();
 }
 
 /** Returns the figure id the visitor picked on a public page, or null. */
@@ -81,6 +138,7 @@ export function captureCouncilIntent(councilId: string | undefined, lang: 'en' |
   } catch {
     // sessionStorage unavailable (private mode) — no deep-link, normal flow
   }
+  markEntryTextFirst();
 }
 
 /** Returns the council id the visitor picked on a public page, or null. */
@@ -133,15 +191,34 @@ export function clearAskIntent(): void {
   }
 }
 
+/**
+ * Announced whenever a question is staged for the composer. The composer picks
+ * a staged question up when it mounts and when the mode or figure changes, but
+ * a returning visitor can already be sitting in Free Talk with the same figure
+ * when the staging happens, and then neither ever changes.
+ */
+export const PREFILL_STAGED_EVENT = 'agc:prefill-staged';
+
+function announcePrefill(): void {
+  try {
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event(PREFILL_STAGED_EVENT));
+    }
+  } catch {
+    // no-op — the mount / mode / figure paths still pick it up
+  }
+}
+
 /** Stash the consumed ask tag for the composer prefill. */
 export function stashAskPrefill(tag: string): void {
   try {
-    if (typeof sessionStorage !== 'undefined' && ASK_TAGS.has(tag)) {
+    if (typeof sessionStorage !== 'undefined' && isValidAskTag(tag)) {
       sessionStorage.setItem(SS_ASK_PREFILL_KEY, tag);
     }
   } catch {
     // no-op — the visitor just types the question themselves
   }
+  announcePrefill();
 }
 
 /** One-shot read of the staged prefill tag (clears on read). */
@@ -173,6 +250,8 @@ export function stageCouncilHandoff(question: string): void {
   } catch {
     // no-op — the visitor just types the question themselves
   }
+  markEntryTextFirst();
+  announcePrefill();
 }
 
 /** One-shot read of the staged council question prefill (clears on read). */
@@ -184,6 +263,66 @@ export function consumeCouncilPrefill(): string | null {
     return text;
   } catch {
     return null;
+  }
+}
+
+/**
+ * Story deep-link — the hero's "Chapter 1 of 12" beat. Only the mode name and
+ * the chapter number ride the URL; the chapter maps to the figure's seed of the
+ * same number, which is what story mode plays. Staged like the other intents
+ * and consumed by the single figure-select chokepoint.
+ */
+export interface StoryIntent {
+  chapter: number;
+}
+
+export function readStoryIntent(): StoryIntent | null {
+  try {
+    if (typeof sessionStorage === 'undefined') return null;
+    if (sessionStorage.getItem(SS_MODE_KEY) !== 'story') return null;
+    const chapter = Number(sessionStorage.getItem(SS_CHAPTER_KEY));
+    if (!Number.isInteger(chapter) || chapter < 1 || chapter > 12) return null;
+    return { chapter };
+  } catch {
+    return null;
+  }
+}
+
+/** Clears the story intent. Call once routing has consumed it. */
+export function clearStoryIntent(): void {
+  try {
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.removeItem(SS_MODE_KEY);
+      sessionStorage.removeItem(SS_CHAPTER_KEY);
+    }
+  } catch {
+    // no-op
+  }
+}
+
+/**
+ * Text-first marker. Anyone arriving with an entry intent came from a public
+ * page holding a question, so the composer opens on the keyboard rather than
+ * the microphone. Tab-scoped and non-consuming: it has to survive the welcome
+ * step, the mode choice and any later remount of the composer. A visitor who
+ * sets an input preference of their own wins over it.
+ */
+export function markEntryTextFirst(): void {
+  try {
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.setItem(SS_TEXT_FIRST_KEY, '1');
+    }
+  } catch {
+    // no-op — the composer just opens on its normal default
+  }
+}
+
+export function hasEntryTextFirst(): boolean {
+  try {
+    return typeof sessionStorage !== 'undefined'
+      && sessionStorage.getItem(SS_TEXT_FIRST_KEY) === '1';
+  } catch {
+    return false;
   }
 }
 
@@ -201,6 +340,12 @@ export function consumeCouncilPrefill(): string | null {
  * lang param mirrors the click path (agc-public.js writes selectedLanguage from
  * the page lang on click): a shared or new-tab DE link carries ?lang=de so the
  * app opens in the link's language instead of falling back to browser locale.
+ *
+ * Also reads ?ask={tag} (a named question, never the question itself),
+ * ?q={councilId} (a heard council's question, resolved from the bundled
+ * catalog) and ?mode=story&chapter={1-12}. Every one of them is an identifier
+ * the app resolves at render time, so nothing a stranger writes into a link
+ * can reach the composer or the model.
  */
 export function captureEntryIntentFromUrl(): void {
   try {
@@ -210,7 +355,12 @@ export function captureEntryIntentFromUrl(): void {
     const councilParam = params.get('council');
     const langParam = params.get('lang');
     const askParam = params.get('ask');
-    if (!figureParam && !councilParam && !langParam && !askParam) return;
+    const questionParam = params.get('q');
+    const modeParam = params.get('mode');
+    const chapterParam = params.get('chapter');
+    if (!figureParam && !councilParam && !langParam && !askParam && !questionParam && !modeParam) {
+      return;
+    }
     if (figureParam) {
       const id = figureSlugToId[figureParam] || figureParam;
       if (id.length < 64) sessionStorage.setItem(SS_FIGURE_KEY, id);
@@ -218,7 +368,7 @@ export function captureEntryIntentFromUrl(): void {
     if (councilParam && councilParam.length < 64) {
       sessionStorage.setItem(SS_COUNCIL_KEY, councilParam);
     }
-    if (askParam && ASK_TAGS.has(askParam)) {
+    if (askParam && isValidAskTag(askParam)) {
       sessionStorage.setItem(SS_ASK_KEY, askParam);
     }
     if (langParam === 'en' || langParam === 'de') {
@@ -228,10 +378,42 @@ export function captureEntryIntentFromUrl(): void {
         // storage blocked — the app falls back to browser-locale detection
       }
     }
+    // Story deep-link. Only 'story' is allowlisted; every other mode name is
+    // ignored rather than staged.
+    if (modeParam === 'story') {
+      const chapter = Number(chapterParam);
+      if (Number.isInteger(chapter) && chapter >= 1 && chapter <= 12) {
+        sessionStorage.setItem(SS_MODE_KEY, 'story');
+        sessionStorage.setItem(SS_CHAPTER_KEY, String(chapter));
+      }
+    }
+    if (figureParam || councilParam || askParam || questionParam || modeParam) {
+      markEntryTextFirst();
+    }
+    // A council id resolves to that council's own question, in the link's
+    // language. The catalog is a large bundled asset, so it is fetched only
+    // when a q= link is actually used; the staged prefill is read after the
+    // welcome step, long after this resolves.
+    if (questionParam && /^[a-z0-9-]{1,64}$/.test(questionParam)) {
+      const lang = langParam === 'de' || langParam === 'en'
+        ? langParam
+        : LocalStorageAdapter.getString('selectedLanguage') || 'en';
+      void import('../../data/councilCatalog')
+        .then(({ councilCatalog, getLocalizedQuestion }) => {
+          const council = councilCatalog.find((c) => c.id === questionParam);
+          if (council) stageCouncilHandoff(getLocalizedQuestion(council, lang));
+        })
+        .catch(() => {
+          // catalog chunk unavailable — the visitor just types their question
+        });
+    }
     params.delete('figure');
     params.delete('council');
     params.delete('lang');
     params.delete('ask');
+    params.delete('q');
+    params.delete('mode');
+    params.delete('chapter');
     const qs = params.toString();
     window.history.replaceState(
       {},

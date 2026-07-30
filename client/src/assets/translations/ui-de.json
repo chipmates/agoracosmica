@@ -130,7 +130,10 @@
       "card3": "Vor dir haben viele gefragt.",
       "card4": "Sie erheben sich, um dir zu begegnen."
     },
-    "heroAskQuestion": "Jemand hat mich heute kritisiert. Ich werde es nicht los. Warum trifft mich das so?"
+    "heroAskQuestion": "Jemand hat mich heute kritisiert. Ich werde es nicht los. Warum trifft mich das so?",
+    "askQuestion": {
+      "life": "Was soll ich mit meinem Leben anfangen?"
+    }
   },
   "login": {
     "title": "Willkommen zurück",

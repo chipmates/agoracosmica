@@ -53,7 +53,9 @@ import PostQuestVerdictCard from '../components/QuestVerdictCard/PostQuestVerdic
 import { getPendingQuestVerdict, clearPendingQuestVerdict } from '../utils/questVerdict';
 import { restartQuest } from '../utils/questRestart';
 import { LocalStorageAdapter } from '../storage/localAdapter';
-import { readFigureIntent, clearFigureIntent, readCouncilIntent, clearCouncilIntent, readAskIntent, clearAskIntent, stashAskPrefill, stageCouncilHandoff } from '../utils/public/entryIntent';
+import { readFigureIntent, clearFigureIntent, readCouncilIntent, clearCouncilIntent, readAskIntent, clearAskIntent, stashAskPrefill, stageCouncilHandoff, readStoryIntent, clearStoryIntent } from '../utils/public/entryIntent';
+import { getHeroEntrySeedId } from '../data/public/heroEntry';
+import { preferencesAdapter } from '../storage/preferencesAdapter';
 import { readHistoryMessages } from '../services/history/historyEncryption';
 import { registerSessionControllerHandlers } from '../controllers/sessionControllerRegistry';
 import { registerConversationControllerHandlers } from '../controllers/conversationControllerRegistry';
@@ -1129,11 +1131,16 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
     // Load default seed asynchronously using the hook
     const loadDefaultSeed = async () => {
       try {
-        
+
         // Use the hook's loadFigureSeeds function
         const seeds = await loadFigureSeeds(selectedFigure.id);
-        const defaultSeed = seeds[0] || null;
-        
+        // Same rule as selectFigure: the seed on record for this figure wins
+        // over seeds[0]. Without it this effect overwrites a deliberate choice
+        // (deep-linked chapter, the ask path's anchor) with chapter one.
+        const savedSeed = preferencesAdapter.getSelectedSeed<any>(selectedFigure.id);
+        const defaultSeed =
+          (savedSeed && seeds.find(s => s.id?.toString() === savedSeed.id?.toString())) ?? seeds[0] ?? null;
+
         if (defaultSeed) {
           setSelectedSeed(defaultSeed); // Zustand handles persistence in seedsSlice
         }
@@ -1340,6 +1347,29 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
     }
   }, [selectedFigure, selectedSeed, handleModeSelectorOpen, handleModeSelect, handleSeedsOpen, resetConversation]);
   
+  // Pick a specific seed for a figure that was just selected. The store AND
+  // the persisted preference both have to be written: the session controller
+  // and the default-seed loader read the preference back a moment later, so a
+  // store-only selection is overwritten by the figure's default seed.
+  const selectSeedForFigure = useCallback((figureId: string, seedId: number): boolean => {
+    const seeds = useDomainStore.getState().seeds.byFigure[figureId] ?? [];
+    const seed = seeds.find((candidate) => String(candidate.id) === String(seedId));
+    if (!seed) return false;
+    const normalized = { ...seed, id: String(seed.id) };
+    useDomainStore.getState().selectSeed(normalized.id);
+    preferencesAdapter.setSelectedSeed(figureId, normalized);
+    return true;
+  }, []);
+
+  // The seed a landing question is anchored to. Selected quietly on the ask
+  // path so the first reply stands on the teaching that answers the question
+  // instead of whichever seed the figure defaults to. No-op for a figure with
+  // no entry question, or before its seeds have loaded.
+  const selectHeroAnchorSeed = useCallback((figureId: string): void => {
+    const anchorId = getHeroEntrySeedId(figureId);
+    if (anchorId !== null) selectSeedForFigure(figureId, anchorId);
+  }, [selectSeedForFigure]);
+
   const handleSelectFigure = useCallback(async (figure: any) => {
     if (import.meta.env.DEV) {
       console.log('[handleSelectFigure] called', {
@@ -1389,6 +1419,10 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
     if (askIntent) {
       clearAskIntent();
       stashAskPrefill(askIntent);
+      // Silent anchor: the landing question has one teaching that answers it,
+      // so that seed becomes the conversation's context instead of whichever
+      // seed the figure defaults to. Never shown, only selected.
+      selectHeroAnchorSeed(figure.id);
       resetConversation();
       handleModeSelect('free_conversation', true);
       // handleModeSelect clears the suppression flag on entry, but Effect#14
@@ -1398,6 +1432,22 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
       // same lifecycle as the keep-until-choice selector path below.
       figureSelectHandlingModeRef.current = true;
       return;
+    }
+
+    // Story deep-link from the hero's chapter beat: open story mode straight
+    // at the chapter that was clicked. Chapter N is this figure's seed N.
+    const storyIntent = readStoryIntent();
+    if (storyIntent) {
+      clearStoryIntent();
+      if (selectSeedForFigure(figure.id, storyIntent.chapter)) {
+        setStoryData(null);
+        resetConversation();
+        handleModeSelect('introduction', true);
+        // Same reason as the ask branch: the mode choice IS made, so Effect#14
+        // must not reopen the selector over the story.
+        figureSelectHandlingModeRef.current = true;
+        return;
+      }
     }
 
     // Reset mode to default before showing ModeSelector
@@ -1435,7 +1485,7 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
         // This prevents Effect#14 from overriding the ModeSelector
       }
     }
-  }, [selectedFigure, selectFigure, setFigureCarousel,
+  }, [selectedFigure, selectFigure, setFigureCarousel, selectHeroAnchorSeed, selectSeedForFigure,
       setSelectedSeed, setStoryData, setModeSelectorVisible, resetConversation, handleModeSelect]);
 
   const handleSeedSelect = useCallback((seed: any, forceMode?: string) => {

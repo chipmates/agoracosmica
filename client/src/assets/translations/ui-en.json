@@ -132,7 +132,10 @@
       "card3": "You are not the first to ask.",
       "card4": "Those who came before rise to meet you."
     },
-    "heroAskQuestion": "Someone criticized me today and I cannot stop replaying it. Why does it sting so much?"
+    "heroAskQuestion": "Someone criticized me today and I cannot stop replaying it. Why does it sting so much?",
+    "askQuestion": {
+      "life": "What am I supposed to do with my life?"
+    }
   },
   "login": {
     "title": "Welcome Back",
