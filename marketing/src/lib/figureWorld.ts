@@ -5,7 +5,7 @@
 import { getSeedsFor } from './seeds';
 import type { Seed } from './seeds';
 import { councilCatalog, BLESSED_BY_THEME, COUNCIL_SEQUENCE } from '@client/data/councilCatalog';
-import type { CatalogCouncil, ThemeId } from '@client/data/councilCatalog';
+import type { CatalogCouncil } from '@client/data/councilCatalog';
 import { figureThemes } from '@client/data/public/figureSeo';
 import { figureIdToSlug } from '@client/data/public/slugMap';
 
@@ -97,24 +97,6 @@ export function councilsFor(figureId: string): CatalogCouncil[] {
     c => c.moderator.id === figureId || c.participants.some(p => p.id === figureId),
   );
 }
-
-/**
- * Only one council per theme has a produced 50s preview: the theme's featured
- * council, the lowest-sortOrder one. Deriving the set from that invariant keeps
- * the players in lockstep with what actually exists on R2 (verified live:
- * the eight below return 200, everything else 404s), instead of a hand-kept id
- * list that rots silently.
- */
-const PREVIEW_IDS = new Set(
-  Object.keys(BLESSED_BY_THEME).map(theme => {
-    const inTheme = councilCatalog
-      .filter(c => c.theme === (theme as ThemeId))
-      .sort((a, b) => a.sortOrder - b.sortOrder);
-    return inTheme[0]?.id;
-  }).filter((id): id is string => Boolean(id)),
-);
-
-export const hasCouncilPreview = (councilId: string): boolean => PREVIEW_IDS.has(councilId);
 
 const SEQUENCE_POS = new Map(COUNCIL_SEQUENCE.map((id, i) => [id, i]));
 const sequencePos = (id: string): number => SEQUENCE_POS.get(id) ?? COUNCIL_SEQUENCE.length;

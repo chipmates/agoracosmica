@@ -17,6 +17,7 @@ import {
   getLocalizedTitle,
   getLocalizedQuestion,
 } from '@client/data/councilCatalog';
+import { hasCouncilPreview } from '@client/data/public/councilPreviews';
 import { MEDIA_URL, publicUrl } from '../../lib/urls';
 
 const isDev = typeof import.meta !== 'undefined' && import.meta.env?.DEV;
@@ -186,12 +187,17 @@ export function getLibraryModes(lang: 'en' | 'de'): LibMode[] {
       kicker: t.council.kicker,
       title: getLocalizedTitle(council, lang),
       body: getLocalizedQuestion(council, lang),
-      audioWebm: getPublicCouncilPreviewUrl(council.id, lang, 'webm'),
-      audioMp3: getPublicCouncilPreviewUrl(council.id, lang, 'mp3'),
-      duration: '0:50',
-      playLabel: t.council.playLabel,
+      // Audio only while the clip's voices still match the cast beside it.
+      ...(hasCouncilPreview(council.id)
+        ? {
+            audioWebm: getPublicCouncilPreviewUrl(council.id, lang, 'webm'),
+            audioMp3: getPublicCouncilPreviewUrl(council.id, lang, 'mp3'),
+            duration: '0:50',
+            playLabel: t.council.playLabel,
+            disclosure: t.council.disclosure,
+          }
+        : {}),
       scale: t.council.scale,
-      disclosure: t.council.disclosure,
       linkHref: publicUrl(lang, `/themes/${council.theme}`),
       linkLabel: t.council.linkLabel,
       cast: councilCast,

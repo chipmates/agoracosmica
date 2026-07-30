@@ -16,31 +16,16 @@ import { getFigureById } from '@client/data/public/figuresCatalog';
 import { figureIdToSlug } from '@client/data/public/slugMap';
 import {
   councilCatalog,
-  councilsByTheme,
-  THEMES,
   getLocalizedTitle,
   getLocalizedQuestion,
 } from '@client/data/councilCatalog';
+import { hasCouncilPreview } from '@client/data/public/councilPreviews';
 import { getSeedsFor } from '../../lib/seeds';
 import { MEDIA_URL, publicUrl } from '../../lib/urls';
 import type { LibMode } from './lab-library';
 
 const isDev = typeof import.meta !== 'undefined' && import.meta.env?.DEV;
 const MEDIA_BASE = isDev ? '' : 'https://media.agoracosmica.org';
-
-// Only one council per theme has a produced 50s preview trailer: the theme's
-// "featured" council, which the theme pages hero as the lowest-sortOrder council
-// (ThemeDetailContent uses the same councils[0] rule). Deriving the set from that
-// invariant keeps Council audio in lockstep with what is actually produced,
-// instead of a hand-maintained ID list that silently rots when content changes.
-// The other ~47 councils are catalog-only and 404 on their preview URL, so a
-// figure whose only councils lack audio gets a link-only Council panel instead
-// of a broken player.
-const COUNCIL_PREVIEW_IDS = new Set(
-  THEMES
-    .map(theme => [...(councilsByTheme[theme.id] ?? [])].sort((a, b) => a.sortOrder - b.sortOrder)[0]?.id)
-    .filter((id): id is string => Boolean(id)),
-);
 
 // Figure-agnostic per-mode display strings (the parts that do not change per
 // figure). German reviewed for gender-neutrality: no possessive that assumes a
@@ -216,14 +201,14 @@ export function getFigureLibraryModes(
   const inCouncils = councilCatalog.filter(
     c => c.moderator.id === figureId || c.participants.some(p => p.id === figureId),
   );
-  const withPreview = inCouncils.filter(c => COUNCIL_PREVIEW_IDS.has(c.id));
+  const withPreview = inCouncils.filter(c => hasCouncilPreview(c.id));
   const council =
     withPreview.find(c => c.moderator.id === figureId) ??
     withPreview[0] ??
     inCouncils.find(c => c.moderator.id === figureId) ??
     inCouncils[0];
   if (council) {
-    const hasPreview = COUNCIL_PREVIEW_IDS.has(council.id);
+    const hasPreview = hasCouncilPreview(council.id);
     const cast = [council.moderator, ...council.participants]
       .filter(p => p.id !== figureId)
       .slice(0, 3)

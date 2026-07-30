@@ -30,6 +30,7 @@ import {
   getLocalizedHook,
   getShortDisplayName,
 } from '@client/data/councilCatalog';
+import { hasCouncilPreview } from '@client/data/public/councilPreviews';
 import { getThemeVoices } from '@client/data/public/themeVoices';
 import { themeSeedCrossRef } from '@client/data/public/themeSeedCrossRef';
 import { getFigureById } from '@client/data/public/figuresCatalog';
@@ -53,20 +54,6 @@ const RELATED_THEMES: Record<string, string[]> = {
   'faith-death-mystery': ['meaning-purpose', 'loss-grief', 'moral-life'],
   'moral-life': ['freedom-justice', 'meaning-purpose', 'love-connection'],
 };
-
-// Councils that have a ~50s preview clip on R2. Verified with HEAD requests
-// against media.agoracosmica.org on 2026-07-29: these eight are the whole set,
-// so a blessed pick outside it would render a play button over a 404.
-const HAS_PREVIEW = new Set([
-  'alone-in-the-room-full-of-people',
-  'four-freedoms',
-  'laughing-at-the-abyss',
-  'the-calling-that-wont-shut-up',
-  'the-mind-that-wont-be-quiet',
-  'the-problem-of-evil',
-  'the-story-you-keep-telling',
-  'what-does-your-anger-want',
-]);
 
 // The self-directed questions that round who-am-i's own seven up to twelve.
 // Every one is a real council question from another theme, so each stays a
@@ -155,12 +142,12 @@ const ranked = getThemeCouncilsRanked(themeId);
 const blessedId = BLESSED_BY_THEME[themeId];
 const blessed = ranked.find(c => c.id === blessedId);
 // D6: the featured slot is the blessed pick, not the sortOrder accident. It
-// only steps aside when that council has no preview clip yet, in which case
-// the first ranked council that does takes the slot.
+// only steps aside when that council has no playable preview clip, in which
+// case the first ranked council that does takes the slot.
 const featured: CatalogCouncil | undefined =
-  blessed && HAS_PREVIEW.has(blessed.id)
+  blessed && hasCouncilPreview(blessed.id)
     ? blessed
-    : ranked.find(c => HAS_PREVIEW.has(c.id)) ?? blessed ?? ranked[0];
+    : ranked.find(c => hasCouncilPreview(c.id)) ?? blessed ?? ranked[0];
 const rail = ranked.filter(c => c.id !== featured?.id);
 
 const stationOf = (id: string): number | null => {

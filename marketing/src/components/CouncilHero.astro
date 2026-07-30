@@ -15,6 +15,7 @@ import {
   getShortDisplayName,
 } from '@client/data/councilCatalog';
 import { getPublicCouncilPreviewUrl } from '@client/utils/public/publicMediaUrl';
+import { hasCouncilPreview } from '@client/data/public/councilPreviews';
 
 interface Props {
   council: CatalogCouncil;
@@ -52,6 +53,10 @@ const t = getT(lang);
 const meta = [typeLabel, runtimeLabel, stationLabel].filter(Boolean) as string[];
 
 const title = getLocalizedTitle(council, lang);
+// The player only appears where a clip exists whose voices are still in the
+// cast shown above it. Otherwise the card is text and doors, never a button
+// over a 404 or over an argument between people the portraits do not name.
+const withPreview = hasCouncilPreview(council.id);
 // No-JS fallback: a plain link to the raw preview mp3, same URL the island's
 // audio hook builds, so the SSR'd play button is never a dead end.
 const previewMp3 = getPublicCouncilPreviewUrl(council.id, lang, 'mp3');
@@ -124,14 +129,16 @@ const cast = [council.moderator, ...council.participants];
     ))}
   </div>
 
-  <div class="pub-council-hero__actions">
-    <CouncilPreviewButton client:visible councilId={council.id} lang={lang} />
-    <noscript>
-      <a class="pub-textlink" href={previewMp3}>
-        {lang === 'de' ? 'Intro anhören (MP3)' : 'Listen to the intro (MP3)'}
-      </a>
-    </noscript>
-  </div>
+  {withPreview && (
+    <div class="pub-council-hero__actions">
+      <CouncilPreviewButton client:visible councilId={council.id} lang={lang} />
+      <noscript>
+        <a class="pub-textlink" href={previewMp3}>
+          {lang === 'de' ? 'Intro anhören (MP3)' : 'Listen to the intro (MP3)'}
+        </a>
+      </noscript>
+    </div>
+  )}
 
   {(openHref || askHref) && (
     <p class="pub-council-hero__doors">

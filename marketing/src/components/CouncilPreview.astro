@@ -1,16 +1,16 @@
 ---
 // One council card on a figure page. The featured variant carries the real
-// question, the cast, the type label and, where a 50 second preview was
-// actually produced, a player. Only the featured council of each theme has one
-// (8 of 110), so every other card is link-only rather than a play button that
-// would 404.
+// question, the cast, the type label and, where a preview clip exists whose
+// voices match the shipped cast, a player. Every other card is link-only rather
+// than a play button that would 404 or contradict the names beside it.
 
 import type { Lang } from '../i18n';
 import type { CatalogCouncil } from '@client/data/councilCatalog';
 import { getLocalizedTitle, getLocalizedQuestion } from '@client/data/councilCatalog';
 import { getFigureById } from '@client/data/public/figuresCatalog';
 import CouncilPreviewButton from '../islands/CouncilPreviewButton';
-import { hasCouncilPreview, cleanDisplayText } from '../lib/figureWorld';
+import { hasCouncilPreview } from '@client/data/public/councilPreviews';
+import { cleanDisplayText } from '../lib/figureWorld';
 import { publicUrl } from '../lib/urls';
 
 interface Props {
