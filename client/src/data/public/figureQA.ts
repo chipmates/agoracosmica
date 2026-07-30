@@ -8,6 +8,8 @@
 // paragraph, subject first, full name and dates in the opening clause, 40 to
 // 80 words, no list and no link. pairs[1..] each become a section heading with
 // its own self-contained passage.
+import { fragments } from './figureContent/registry';
+
 export interface QAPair { q: string; a: string; }
 export interface FigureQAEntry { pairs: QAPair[]; disclosure: QAPair; }
 
@@ -1275,5 +1277,7 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
 };
 
 export function getFigureQA(figureId: string, lang: 'en' | 'de'): FigureQAEntry | null {
+  const fragment = fragments[figureId]?.qa?.[lang];
+  if (fragment) return fragment;
   return figureQA[figureId]?.[lang] ?? null;
 }

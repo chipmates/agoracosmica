@@ -18,6 +18,8 @@
 //   - every claim traceable to seeds / factchecks / catalog. Never invent a
 //     fact, never strengthen one.
 
+import { fragments } from './figureContent/registry';
+
 export interface FigureConceptBlock {
   /** The visible <h2>. A question someone actually typed, never a shelf label. */
   h2: string;
@@ -115,9 +117,11 @@ export function getFigurePageContent(
   lang: string
 ): FigurePageLang | null {
   if (!figureId) return null;
-  const entry = Object.prototype.hasOwnProperty.call(figurePageContent, figureId)
-    ? figurePageContent[figureId]
-    : undefined;
+  const fragment = fragments[figureId]?.page;
+  const entry = fragment
+    ?? (Object.prototype.hasOwnProperty.call(figurePageContent, figureId)
+      ? figurePageContent[figureId]
+      : undefined);
   if (!entry) return null;
   return lang === 'de' ? entry.de : entry.en;
 }
