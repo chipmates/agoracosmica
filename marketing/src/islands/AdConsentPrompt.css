@@ -70,32 +70,9 @@
   }
 }
 
-/* ---- the dismiss control -------------------------------------------- */
-.agc-consent__x {
-  position: absolute;
-  top: 2px;
-  right: 2px;
-  width: 44px;
-  height: 44px;
-  display: grid;
-  place-items: center;
-  padding: 0;
-  background: none;
-  border: none;
-  border-radius: 2px;
-  color: var(--text-dim, #8C8677);
-  cursor: pointer;
-}
-.agc-consent__x svg {
-  width: 13px;
-  height: 13px;
-  display: block;
-}
-.agc-consent__x:hover { color: var(--text-primary, #E8E2D4); }
-
 /* ---- the ask --------------------------------------------------------- */
 .agc-consent__kicker {
-  margin: 0 2.6rem 0.42rem 0;
+  margin: 0 0 0.42rem;
   font-size: 0.68rem;
   font-weight: 500;
   letter-spacing: 0.16em;
@@ -103,7 +80,7 @@
   color: color-mix(in srgb, var(--gold-primary, #E6BC5C) 76%, var(--text-dim, #8C8677));
 }
 .agc-consent__q {
-  margin: 0 2.4rem 0.5rem 0;
+  margin: 0 0 0.5rem;
   font-family: var(--font-serif, Georgia, 'Times New Roman', serif);
   font-weight: 500;
   font-size: 1.32rem;
@@ -218,7 +195,7 @@
   /* the imprint runs as one inline flow here, so the trust line needs its own
      gap or it reads into the first link */
   .agc-consent__trust { margin-right: 0.7em; }
-  .agc-consent__q { font-size: 1.16rem; margin-right: 2.2rem; }
+  .agc-consent__q { font-size: 1.16rem; }
   .agc-consent__why { font-size: 0.845rem; }
   .agc-consent__fine { font-size: 0.725rem; }
   .agc-consent__btn { font-size: 0.815rem; }
@@ -230,7 +207,7 @@
     padding: 0.55rem 0.72rem calc(0.5rem + env(safe-area-inset-bottom, 0px));
   }
   .agc-consent__kicker { display: none; }
-  .agc-consent__q { font-size: 1.02rem; line-height: 1.18; margin: 0 2.2rem 0.28rem 0; }
+  .agc-consent__q { font-size: 1.02rem; line-height: 1.18; margin: 0 0 0.28rem; }
   .agc-consent__why { font-size: 0.78rem; line-height: 1.32; margin-bottom: 0.26rem; }
   .agc-consent__fine { font-size: 0.695rem; line-height: 1.32; margin-bottom: 0.42rem; }
   .agc-consent__btn { font-size: 0.775rem; min-height: 44px; padding: 0.4rem 0.3rem; }
@@ -241,7 +218,6 @@
     padding-top: 0.34rem;
   }
   .agc-consent__link { padding-block: 6px; }
-  .agc-consent__x { top: 0; right: 0; }
 }
 
 @media (max-height: 620px) {

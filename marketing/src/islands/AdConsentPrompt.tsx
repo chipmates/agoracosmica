@@ -9,20 +9,19 @@
 //              real opt-in instead of the bare gclid).
 //   Decline -> revokeAdConsent() (records the choice, clears the gclid, sends
 //              nothing). Remembered, so the visitor is not asked again.
-//   Dismiss -> hide for this session AND clear the stored click ID (no record,
-//              no later ask: with the prompt gone there is no consent surface
-//              left this session, so keeping the gclid would be purposeless
-//              storage under § 25 TDDDG).
 //
-// Copy is legally reviewed: the withdrawal notice, the privacy link, the
-// click-ID scope sentence and the honest X label are all load bearing and
-// none of them may be dropped for space. Lift into publicI18n if it ever
-// needs more languages.
+// There is no dismiss control: the two answers are the only exits, and an
+// unanswered card simply stays for the visit. While the ask is pending the
+// stored click ID keeps its purpose under § 25 TDDDG (an open consent
+// surface is waiting on it); it leaves storage with the answer either way.
+//
+// Copy is legally reviewed: the withdrawal notice, the privacy link and the
+// click-ID scope sentence are all load bearing and none of them may be
+// dropped for space. Lift into publicI18n if it ever needs more languages.
 
 import { useEffect, useRef, useState } from 'react';
 import {
   captureGclid,
-  clearGclid,
   getGclid,
   isPaidVisitor,
   adConsentDecided,
@@ -56,26 +55,24 @@ const COPY = {
     lead: 'Nonprofits get their Google ads for free. Counted clicks help those ads reach more people searching for the same thing.',
     // Non-breaking spaces around the chevron: the settings path must never
     // break across lines.
-    fine: 'Nothing about you goes to Google except the ad’s click ID. No name, no browsing history. You can undo it anytime under Settings › Legal. Either way, the whole library stays open. The X deletes the click ID. A no is remembered.',
+    fine: 'Nothing about you goes to Google except the ad’s click ID. No name, no browsing history. You can undo it anytime under Settings › Legal. Either way, the whole library stays open. A no is remembered.',
     accept: 'Yes, count it',
     decline: 'No, don’t count it',
     link: 'See the code',
     privacy: 'Privacy policy',
     privacyHref: '/privacy/',
-    dismiss: 'Close. Deletes the click ID.',
   },
   de: {
     trust: 'Gemeinnützig · Open Source · Keine Tracking-Cookies, kein Profiling',
     kicker: 'Eine Frage zu dieser Anzeige',
     heading: 'Damit der nächste Mensch es auch findet.',
     lead: 'Gemeinnützige bekommen ihre Anzeigen bei Google gratis. Gezählte Klicks helfen, mehr Menschen zu erreichen, die dasselbe suchen.',
-    fine: 'Von dir geht nur die Klick-ID der Anzeige zu Google. Kein Name, keine Browserdaten. Jederzeit widerrufbar unter Einstellungen › Rechtliches. So oder so bleibt die Bibliothek offen. Das X löscht die Klick-ID. Ein Nein merken wir uns.',
+    fine: 'Von dir geht nur die Klick-ID der Anzeige zu Google. Kein Name, keine Browserdaten. Jederzeit widerrufbar unter Einstellungen › Rechtliches. So oder so bleibt die Bibliothek offen. Ein Nein merken wir uns.',
     accept: 'Ja, zählen',
     decline: 'Nein, nicht zählen',
     link: 'Code ansehen',
     privacy: 'Datenschutzerklärung',
     privacyHref: '/datenschutz/',
-    dismiss: 'Schließen. Löscht die Klick-ID.',
   },
 } as const;
 
@@ -89,20 +86,18 @@ const CONVERSIONS_URL = 'https://llm.agoracosmica.org/api/conversions';
 const FUNNEL_URL = 'https://llm.agoracosmica.org/v1/funnel';
 const CODE_URL =
   'https://github.com/chipmates/agoracosmica/blob/main/client/src/utils/public/gclidCapture.ts';
-const SS_DISMISSED = 'agc_ad_prompt_dismissed';
 const SS_FIRED = 'agc_conv_fired_start_exploring';
 
 // Anonymous consent counters: how many ad arrivals get asked, and what they
 // answer. Same keyless posture as the cta_click beacon in agc-public.js: the
-// step, the page path, the interface language, and on the three answer steps
+// step, the page path, the interface language, and on the two answer steps
 // a coarse time-to-answer bucket, and it has to stay that way. A gclid or an
 // id here would pair a user dimension with a consent decision, which is
 // exactly what this measurement must not do.
 type ConsentCounter =
   | 'ad_consent_shown'
   | 'ad_consent_accepted'
-  | 'ad_consent_declined'
-  | 'ad_consent_dismissed';
+  | 'ad_consent_declined';
 
 // How long the card has to be at least half in view before it counts as
 // shown. Without it "shown" would mean "rendered", and an accept rate against
@@ -264,19 +259,6 @@ export default function AdConsentPrompt({ lang }: Props) {
   const t = COPY[lang] ?? COPY.en;
 
   useEffect(() => {
-    let dismissed = false;
-    try {
-      dismissed = sessionStorage.getItem(SS_DISMISSED) === '1';
-    } catch {
-      // sessionStorage blocked — show once
-    }
-    if (dismissed) {
-      // Prompt was dismissed earlier this session: no consent surface remains,
-      // so make sure no click ID lingers in storage (also catches a reload of
-      // a landing URL that still carries ?gclid).
-      clearGclid();
-      return;
-    }
     captureGclid(); // reads ?gclid / ?p=1 from the landing URL into storage
     if (!getGclid() || isPaidVisitor() || adConsentDecided()) return;
     if (!ASK_ON_INTERACTION) {
@@ -355,21 +337,6 @@ export default function AdConsentPrompt({ lang }: Props) {
     if (ASK_ON_INTERACTION) dropPreDecisionListening();
     setShow(false);
   };
-  const onDismiss = (): void => {
-    try {
-      sessionStorage.setItem(SS_DISMISSED, '1');
-    } catch {
-      /* no-op */
-    }
-    countConsentStep('ad_consent_dismissed', lang, answered());
-    // No consent surface remains this session, so a stored click ID would be
-    // purposeless storage. Drop it, and with it anything held for an answer
-    // that is no longer coming.
-    clearGclid();
-    if (ASK_ON_INTERACTION) dropPreDecisionListening();
-    setShow(false);
-  };
-
   return (
     <aside
       className="agc-consent"
@@ -419,25 +386,6 @@ export default function AdConsentPrompt({ lang }: Props) {
           </a>
         </span>
       </p>
-      {/* Last in the DOM on purpose: the two answers come before the way out,
-          for the tab order and for the screen reader. */}
-      <button
-        type="button"
-        className="agc-consent__x"
-        aria-label={t.dismiss}
-        title={t.dismiss}
-        onClick={onDismiss}
-      >
-        <svg viewBox="0 0 12 12" aria-hidden="true" focusable="false">
-          <path
-            d="M1 1l10 10M11 1L1 11"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.4"
-            strokeLinecap="round"
-          />
-        </svg>
-      </button>
     </aside>
   );
 }
