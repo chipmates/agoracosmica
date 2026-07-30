@@ -1,0 +1,217 @@
+---
+// The era descent under the /figures orbit hero: a sticky era bar with six
+// anchors (five bands plus the alphabet), then the five bands themselves,
+// newest birth year first. Every anchor, link and word is server rendered, so
+// the whole thing works with JS off. The one script sets the active chip, the
+// depth readout and the gauge.
+//
+// Deliberately NOT taken from the prototype this harvests: the entry gate,
+// smooth-scroll library, scroll pinning framework, ambient audio, custom
+// cursor. This page's job is to pass rank to thirty children, so it stays on
+// native scroll and ships no third-party runtime.
+
+import { getFiguresCatalog } from '@client/data/public/figuresCatalog';
+import { figureIdToSlug } from '@client/data/public/slugMap';
+import { getHeroEntryQuestion } from '@client/data/public/heroEntry';
+import { figureImage, figureSrcset } from '../lib/figureImages';
+import { publicUrl } from '../lib/urls';
+import { STRATA, LIFE_YEARS, getStrataUi } from './figureStrata';
+import type { Lang } from '../i18n';
+import './figures-index.css';
+
+interface Props { lang: Lang; }
+const { lang } = Astro.props;
+const ui = getStrataUi(lang);
+const byId = new Map(getFiguresCatalog(lang).map(f => [f.id, f]));
+
+const intro = lang === 'de'
+  ? 'Ganz oben stehen die Stimmen, die uns am nächsten sind. Je weiter du kommst, desto älter wird die Frage. Am Grund liegen die vier ältesten.'
+  : 'The voices closest to us are at the top. The further you go, the older the question gets. The four oldest are waiting at the floor.';
+
+const floorLine = lang === 'de'
+  ? 'Der Grund. Dreißig Stimmen, fünf Epochen, rund 2.500 Jahre.'
+  : 'The floor. Thirty voices, five eras, roughly 2,500 years.';
+
+const bands = STRATA.map(s => {
+  const copy = s[lang];
+  const doorFigure = byId.get(s.door);
+  return {
+    id: s.id,
+    num: s.num,
+    ...copy,
+    question: getHeroEntryQuestion(s.door, lang) ?? '',
+    doorName: doorFigure ? doorFigure.name : s.door,
+    doorHref: `/app?figure=${figureIdToSlug[s.door]}&lang=${lang}&ask=f:${s.door}:1`,
+    people: s.figures.map(id => {
+      const f = byId.get(id);
+      return {
+        id,
+        name: f ? f.name : id,
+        tradition: f ? f.tradition : '',
+        learn: f ? f.learn : '',
+        years: LIFE_YEARS[id] ? LIFE_YEARS[id][lang] : '',
+        href: publicUrl(lang, `/figures/${figureIdToSlug[id]}`),
+        src: figureImage(id, 'thumbnail', 160),
+        srcset: figureSrcset(id, 'thumbnail', [160, 320]),
+      };
+    }),
+  };
+});
+
+const askLabel = lang === 'de' ? 'Frage an' : 'Ask';
+---
+<nav class="fx-bar" id="fx-bar" aria-label={ui.navAria}>
+  <div class="fx-bar__inner">
+    <span class="fx-bar__label">{ui.navLabel}</span>
+    <ul class="fx-bar__list">
+      {bands.map(b => (
+        <li>
+          <a class="fx-bar__link" href={`#${b.id}`} data-span={b.span}>
+            <span class="fx-bar__num" aria-hidden="true">{b.num}</span>{b.short}
+          </a>
+        </li>
+      ))}
+      <li>
+        <a class="fx-bar__link fx-bar__link--az" href="#a-z" data-span={ui.azLabel}>{ui.azLabel}</a>
+      </li>
+    </ul>
+    <p class="fx-bar__depth">
+      <span>{ui.depthLabel}</span>
+      <b id="fx-depth">{ui.surface}</b>
+    </p>
+  </div>
+  <div class="fx-bar__gauge" aria-hidden="true"><span></span></div>
+</nav>
+
+<div class="fx-descent" id="fx-descent">
+  <div class="fx-wrap">
+    <div class="fx-intro">
+      <p class="fx-eyebrow">{ui.descentHeading}</p>
+      <p class="fx-intro__text">{intro}</p>
+    </div>
+
+    {bands.map(b => (
+      <section class="fx-stratum" id={b.id} aria-labelledby={`${b.id}-name`}>
+        <div class="fx-plate">
+          <span class="fx-num" aria-hidden="true">{b.num}</span>
+          <h2 class="fx-name" id={`${b.id}-name`}>{b.name}</h2>
+          <p class="fx-span">{b.span}</p>
+          <p class="fx-caption">{b.caption}</p>
+          <p class="fx-era">{b.era}</p>
+          {b.question && (
+            <div class="fx-door">
+              <p class="fx-door__lead">{ui.doorLead}</p>
+              <p class="fx-door__q">{b.question}</p>
+              <a
+                class="fx-door__cta"
+                href={b.doorHref}
+                data-agc-cta="start-exploring"
+                data-agc-door={`figures_era_${b.id}`}
+              >{ui.doorCta}</a>
+              <span class="fx-door__who">{askLabel} {b.doorName}</span>
+            </div>
+          )}
+        </div>
+
+        <div class="fx-voices">
+          <p class="fx-voices__label">{ui.voicesLabel}</p>
+          <ul class="fx-list">
+            {b.people.map(p => (
+              <li>
+                <a class="fx-voice" href={p.href}>
+                  <span class="fx-voice__face">
+                    <img
+                      src={p.src}
+                      srcset={p.srcset}
+                      sizes="56px"
+                      alt=""
+                      width="160"
+                      height="160"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </span>
+                  <span>
+                    <span class="fx-voice__name">{p.name}</span>
+                    <span class="fx-voice__meta">{p.years} · {p.tradition}</span>
+                    <span class="fx-voice__learn">{p.learn}</span>
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    ))}
+  </div>
+  <p class="fx-floor">{floorLine}</p>
+</div>
+
+<script>
+  // Era bar enhancement: active band, depth readout, descent gauge. Everything
+  // it touches is already correct without it.
+  const bar = document.getElementById('fx-bar');
+  const descent = document.getElementById('fx-descent');
+  const depth = document.getElementById('fx-depth');
+  const gaugeFill = document.querySelector<HTMLElement>('.fx-bar__gauge span');
+  const links = Array.from(document.querySelectorAll<HTMLAnchorElement>('.fx-bar__link'));
+
+  if (bar && descent && links.length) {
+    const surface = depth ? depth.textContent : '';
+    const sections = links
+      .map(link => ({ link, el: document.getElementById(link.hash.slice(1)) }))
+      .filter((s): s is { link: HTMLAnchorElement; el: HTMLElement } => !!s.el);
+    const closers = document.getElementById('fx-closers');
+    let ticking = false;
+
+    const apply = () => {
+      ticking = false;
+      const line = bar.getBoundingClientRect().bottom + 32;
+
+      let active: (typeof sections)[number] | null = null;
+      for (const s of sections) {
+        if (s.el.getBoundingClientRect().top <= line) active = s;
+      }
+      const changed = active ? !active.link.hasAttribute('aria-current') : false;
+      for (const s of sections) {
+        if (s === active) s.link.setAttribute('aria-current', 'true');
+        else s.link.removeAttribute('aria-current');
+      }
+      if (depth) depth.textContent = active ? (active.link.dataset.span || '') : surface;
+
+      // narrow screens scroll the chip row, so keep the live band in view
+      const list = bar.querySelector<HTMLElement>('.fx-bar__list');
+      if (changed && active && list && list.scrollWidth > list.clientWidth + 4) {
+        list.scrollTo({
+          left: active.link.offsetLeft - list.clientWidth / 2 + active.link.offsetWidth / 2,
+          behavior: 'smooth',
+        });
+      }
+
+      if (gaugeFill) {
+        const box = descent.getBoundingClientRect();
+        const run = box.height - window.innerHeight * 0.5;
+        const done = run > 0 ? (line - box.top) / run : 0;
+        gaugeFill.parentElement?.style.setProperty(
+          '--fx-progress',
+          String(Math.min(1, Math.max(0, done))),
+        );
+      }
+
+      // the bar has no job once the closing blocks start
+      if (closers) {
+        bar.classList.toggle('is-off', closers.getBoundingClientRect().top <= line);
+      }
+    };
+
+    const onScroll = () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(apply);
+      }
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    apply();
+  }
+</script>

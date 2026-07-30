@@ -3,9 +3,11 @@ import Breadcrumbs from './Breadcrumbs.astro';
 import FigureCard from './FigureCard.astro';
 import ContentVolume from './ContentVolume.astro';
 import PublicCTA from './PublicCTA.astro';
+import { getStrataUi } from './figureStrata';
 import { getT } from '../i18n';
 import type { Lang } from '../i18n';
 import { getFiguresCatalog } from '@client/data/public/figuresCatalog';
+import './figures-index.css';
 
 interface Props {
   lang: Lang;
@@ -16,6 +18,7 @@ interface Props {
 
 const { lang, gridOnly = false } = Astro.props;
 const t = getT(lang);
+const ui = getStrataUi(lang);
 
 // Sort by surname (last meaningful name part), with a handful of overrides
 // for figures whose name doesn't map cleanly to a Western surname pattern.
@@ -42,7 +45,7 @@ const figures = [...getFiguresCatalog(lang)].sort((a, b) =>
   getSurname(a).localeCompare(getSurname(b), lang),
 );
 ---
-<div class="pub-content">
+<div class={gridOnly ? 'fx-block fx-az' : 'pub-content'} id="a-z">
   {!gridOnly && (
     <Fragment>
       <Breadcrumbs lang={lang} items={[{ label: t('breadcrumbs.figures') }]} />
@@ -52,26 +55,20 @@ const figures = [...getFiguresCatalog(lang)].sort((a, b) =>
       <p class="pub-section__text">
         {t('figures.pageDescription')}
       </p>
-      <p class="pub-section__text pub-catalog-lead">
-        {lang === 'de'
-          ? 'Öffne einen Namen und entdecke das Leben und die Ideen dahinter.'
-          : 'Open any name to explore their life and ideas.'}
-      </p>
     </Fragment>
   )}
 
+  <!-- The alphabet is the page's crawlable spine: thirty links, one tap from
+       the era bar, present whichever way a visitor is browsing. -->
+  <h2 class="pub-section__title">{ui.azHeading}</h2>
+  <p class="pub-section__text pub-catalog-lead">{ui.azLead}</p>
+
   <div class="pub-grid pub-grid--3">
-    {figures.map(figure => <FigureCard figure={figure} lang={lang} />)}
+    {figures.map(figure => (
+      <FigureCard figure={figure} lang={lang} headingLevel={gridOnly ? 'h3' : 'h2'} />
+    ))}
   </div>
-  <p class="pub-section__text">
-    <a
-      class="pub-textlink"
-      href={lang === 'de' ? '/de/von-historischen-persoenlichkeiten-lernen/' : '/learn-from-historical-figures/'}
-    >
-      {lang === 'de' ? 'Von diesen Persönlichkeiten lernen' : 'Learn from these figures'}
-    </a>
-  </p>
-  <PublicCTA variant="inline" lang={lang} />
+  {!gridOnly && <PublicCTA variant="inline" lang={lang} />}
 </div>
 
 <style>

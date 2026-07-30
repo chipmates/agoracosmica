@@ -1,0 +1,71 @@
+---
+// Closing blocks of the /figures index: the theme question rail and the FAQ,
+// both absorbed from the broad LEARN hub this page replaces, plus the lattice
+// links out. The FAQ array is the same one the route feeds to faqSchema(), so
+// the visible answers and the JSON-LD cannot drift.
+
+import { publicUrl } from '../lib/urls';
+import { HUB_THEME_IDS } from '../lib/wisdomHubData';
+import { getFiguresFaq, getStrataUi } from './figureStrata';
+import { getT } from '../i18n';
+import type { Lang } from '../i18n';
+import './figures-index.css';
+
+interface Props { lang: Lang; }
+const { lang } = Astro.props;
+const t = getT(lang);
+const ui = getStrataUi(lang);
+const faq = getFiguresFaq(lang);
+
+const themes = HUB_THEME_IDS.map(id => ({
+  id,
+  name: t(`themes.${id}.name`),
+  question: t(`themes.${id}.tagline`),
+  href: publicUrl(lang, `/themes/${id}`),
+}));
+
+const readOn = [
+  { label: ui.moreThemes, href: publicUrl(lang, '/themes') },
+  { label: ui.moreEchoes, href: publicUrl(lang, '/echoes') },
+  { label: ui.moreMethod, href: lang === 'de' ? '/de/methodik/' : '/methodology/' },
+  {
+    label: lang === 'de' ? 'Philosophie lernen, ohne Vorwissen' : 'Learn philosophy from scratch',
+    href: lang === 'de' ? '/de/philosophie-lernen/' : '/ai-philosophy-tutor/',
+  },
+];
+---
+<div id="fx-closers">
+  <section class="fx-block" aria-labelledby="fx-themes-title">
+    <h2 class="pub-section__title" id="fx-themes-title">{ui.themesHeading}</h2>
+    <p class="pub-section__text">{ui.themesLead}</p>
+    <ul class="fx-themes">
+      {themes.map(theme => (
+        <li>
+          <a class="fx-theme" href={theme.href}>
+            <span class="fx-theme__q">{theme.question}</span>
+            <span class="fx-theme__name">{theme.name}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="fx-block" aria-labelledby="fx-faq-title">
+    <h2 class="pub-section__title" id="fx-faq-title">{ui.faqHeading}</h2>
+    <div class="fx-faq">
+      {faq.map(entry => (
+        <div class="fx-faq__item">
+          <h3 class="fx-faq__q">{entry.q}</h3>
+          <p class="fx-faq__a">{entry.a}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="fx-block" aria-labelledby="fx-readon-title">
+    <h2 class="pub-section__title" id="fx-readon-title">{ui.moreHeading}</h2>
+    <ul class="fx-readon">
+      {readOn.map(link => <li><a href={link.href}>{link.label}</a></li>)}
+    </ul>
+  </section>
+</div>

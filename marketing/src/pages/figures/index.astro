@@ -3,10 +3,15 @@ import Public from '../../layouts/Public.astro';
 import { figureImage, figureSrcset } from '../../lib/figureImages';
 import FigureOrbit from '../../components/landing-lab/FigureOrbit.astro';
 import V2ObservatoryMotion from '../../islands/V2ObservatoryMotion';
+import FigureDescent from '../../components/FigureDescent.astro';
+import FigureTraditions from '../../components/FigureTraditions.astro';
+import FigureIndexClosers from '../../components/FigureIndexClosers.astro';
 import FiguresCatalogContent from '../../components/FiguresCatalogContent.astro';
+import PublicCTA from '../../components/PublicCTA.astro';
+import { getFiguresFaq, strataSchemas } from '../../components/figureStrata';
 import { getT } from '../../i18n';
-import { itemListSchema, breadcrumbSchema } from '../../lib/schemas';
-import { canonicalUrl, publicUrl, SITE_URL, MEDIA_URL } from '../../lib/urls';
+import { itemListSchema, breadcrumbSchema, faqSchema } from '../../lib/schemas';
+import { canonicalUrl, publicUrl, SITE_URL } from '../../lib/urls';
 import { getFiguresCatalog } from '@client/data/public/figuresCatalog';
 import { figureIdToSlug } from '@client/data/public/slugMap';
 
@@ -14,20 +19,32 @@ const lang = 'en' as const;
 const t = getT(lang);
 
 const figures = getFiguresCatalog(lang);
+const byId = new Map(figures.map(f => [f.id, f]));
+const figureUrl = (id: string) => canonicalUrl(publicUrl(lang, `/figures/${figureIdToSlug[id]}`));
 
 const figureItems = figures.map(f => ({
   name: f.name,
-  url: canonicalUrl(publicUrl(lang, `/figures/${figureIdToSlug[f.id]}`)),
+  url: figureUrl(f.id),
   description: f.about.split('\n')[0].slice(0, 160),
   image: figureImage(f.id, 'main', 1200),
 }));
 
+const canonical = canonicalUrl(publicUrl(lang, '/figures'));
 const schemas = [
   itemListSchema(figureItems),
   breadcrumbSchema([
     { name: t('breadcrumbs.home'), url: `${SITE_URL}/` },
     { name: t('breadcrumbs.figures'), url: `${SITE_URL}/figures` },
   ]),
+  ...strataSchemas(
+    lang,
+    canonical,
+    t('figures.pageTitle'),
+    t('figures.pageDescription'),
+    figureUrl,
+    id => byId.get(id)?.name ?? id,
+  ),
+  faqSchema(getFiguresFaq(lang), canonical),
 ];
 
 // The orbit's first planet (Marcus Aurelius) is the LCP. Preload it to match
@@ -50,5 +67,9 @@ const lcpPortraitSizes = '(max-width: 900px) 56px, 88px';
 >
   <FigureOrbit lang={lang} />
   <V2ObservatoryMotion client:idle targetId="figures-orbit" />
+  <FigureDescent lang={lang} />
+  <FigureTraditions lang={lang} />
   <FiguresCatalogContent lang={lang} gridOnly={true} />
+  <FigureIndexClosers lang={lang} />
+  <PublicCTA variant="inline" lang={lang} />
 </Public>

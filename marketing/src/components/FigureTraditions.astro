@@ -1,0 +1,44 @@
+---
+// The second cross cut under the era descent: nine tradition clusters, each a
+// heading, one sentence and its member links. Names repeat across clusters on
+// purpose, this is an index and not a partition. It also gives the category
+// searches a home ("german mystics", "visionary poet" had no page anywhere).
+
+import { getFiguresCatalog } from '@client/data/public/figuresCatalog';
+import { figureIdToSlug } from '@client/data/public/slugMap';
+import { publicUrl } from '../lib/urls';
+import { TRADITION_CLUSTERS, getStrataUi } from './figureStrata';
+import type { Lang } from '../i18n';
+import './figures-index.css';
+
+interface Props { lang: Lang; }
+const { lang } = Astro.props;
+const ui = getStrataUi(lang);
+const byId = new Map(getFiguresCatalog(lang).map(f => [f.id, f]));
+
+const clusters = TRADITION_CLUSTERS.map(c => ({
+  id: c.id,
+  ...c[lang],
+  members: c.figures.map(id => ({
+    name: byId.get(id)?.name ?? id,
+    href: publicUrl(lang, `/figures/${figureIdToSlug[id]}`),
+  })),
+}));
+---
+<section class="fx-block" aria-labelledby="fx-traditions-title">
+  <h2 class="pub-section__title" id="fx-traditions-title">{ui.traditionsHeading}</h2>
+  <p class="pub-section__text">{ui.traditionsLead}</p>
+  <ul class="fx-traditions">
+    {clusters.map(c => (
+      <li id={`tradition-${c.id}`}>
+        <h3 class="fx-trad__name">{c.name}</h3>
+        <p class="fx-trad__line">{c.line}</p>
+        <ul class="fx-trad__links">
+          {c.members.map(m => (
+            <li><a class="fx-chip" href={m.href}>{m.name}</a></li>
+          ))}
+        </ul>
+      </li>
+    ))}
+  </ul>
+</section>

@@ -17,6 +17,7 @@ import type { Lang } from '../../i18n';
 import Breadcrumbs from '../Breadcrumbs.astro';
 import ContentVolume from '../ContentVolume.astro';
 import EchoNote from '../EchoNote.astro';
+import { getIndexAnswer } from '../figureStrata';
 import './v2-observatory.css';
 import './figure-orbit.css';
 
@@ -26,20 +27,18 @@ const t = getT(lang);
 const figures = getFiguresCatalog(lang);
 const byId = new Map(figures.map(f => [f.id, f]));
 
-const COPY: Record<Lang, { hearTemplate: string; pauseVoice: string; pauseMotion: string; systemAria: string; lead: string }> = {
+const COPY: Record<Lang, { hearTemplate: string; pauseVoice: string; pauseMotion: string; systemAria: string }> = {
   en: {
     hearTemplate: 'Hear {name}',
     pauseVoice: 'Pause',
     pauseMotion: 'Pause the orbit motion',
-    systemAria: 'Fifteen of the thirty remarkable people, Marcus Aurelius, Albert Einstein, and Frida Kahlo among them, orbit a glowing golden core.',
-    lead: 'Open any name to explore their life and ideas.',
+    systemAria: 'Fifteen of the thirty remarkable people, Marcus Aurelius, Albert Einstein, and Frida Kahlo among them, orbit a glowing golden core. Every portrait is a link to that person.',
   },
   de: {
     hearTemplate: '{name} anhören',
     pauseVoice: 'Pausieren',
     pauseMotion: 'Die Orbit-Bewegung anhalten',
-    systemAria: 'Fünfzehn der dreißig bemerkenswerten Menschen, darunter Mark Aurel, Albert Einstein und Frida Kahlo, umkreisen einen leuchtenden goldenen Kern.',
-    lead: 'Öffne einen Namen und entdecke das Leben und die Ideen dahinter.',
+    systemAria: 'Fünfzehn der dreißig bemerkenswerten Menschen, darunter Mark Aurel, Albert Einstein und Frida Kahlo, umkreisen einen leuchtenden goldenen Kern. Jedes Porträt ist ein Link zu diesem Menschen.',
   },
 };
 const copy = COPY[lang];
@@ -92,16 +91,19 @@ const lcpFigure = byId.get(ringPlan[0].ids[0]);
       <ContentVolume lang={lang} />
     </div>
 
-    <!-- tail: on desktop the bottom of the left column, on mobile below the orbit -->
+    <!-- tail: on desktop the bottom of the left column, on mobile below the
+         orbit. Carries the answer block, the first prose after the H1. -->
     <div class="v2-copy v2-copy--tail figorbit-copy">
-      <p class="pub-section__text">{t('figures.pageDescription')}</p>
-      <p class="pub-section__text pub-catalog-lead">{copy.lead}</p>
+      <p class="pub-section__text">{getIndexAnswer(lang)}</p>
       <EchoNote variant="theme" lang={lang} />
     </div>
 
     <!-- the living orbital system -->
     <div class="v2-system">
-      <div class="v2-horizon" role="img" aria-label={copy.systemAria}>
+      <!-- role=group, not role=img: an img role would collapse the whole orbit
+           into one graphic and hide the fifteen portrait links from assistive
+           tech. The rings and the core stay decorative. -->
+      <div class="v2-horizon" role="group" aria-label={copy.systemAria}>
         <div class="v2-stagepos">
           <div class="v2-handoff">
             <div class="v2-system-stage">
@@ -115,20 +117,17 @@ const lcpFigure = byId.get(ringPlan[0].ids[0]);
               </div>
 
               {ringPlan.map((ring, ringIndex) => (
-                <div
-                  class={`v2-orbit v2-orbit--${ringIndex} ${ring.reverse ? 'v2-orbit--rev' : ''}`}
-                  aria-hidden="true"
-                >
+                <div class={`v2-orbit v2-orbit--${ringIndex} ${ring.reverse ? 'v2-orbit--rev' : ''}`}>
                   {planets
                     .filter(p => p.ring === ringIndex)
                     .map(p => (
                       <a
                         class={`v2-planet ${p.isLcp ? 'v2-planet--lcp' : ''}`}
                         href={p.href}
+                        aria-label={p.name}
                         data-figure={p.id}
                         data-name={p.name}
                         data-learn={p.learn}
-                        tabindex="-1"
                       >
                         <span class="v2-planet__face">
                           <img

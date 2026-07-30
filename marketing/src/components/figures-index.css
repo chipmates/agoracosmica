@@ -1,0 +1,569 @@
+/* The /figures browse index: era descent, jump nav, tradition cross cut.
+   Native scroll only. No library, no pinning framework, no smooth-scroll
+   package. The one enhancement script sets the active chip, the depth gauge
+   and the era readout; with JS off every anchor, every link and every word is
+   already in the HTML.
+
+   Layer notes: this page runs on the public stylesheets (Public.astro), so
+   everything here consumes the app token layer directly. No literal colors. */
+
+:root {
+  /* sticky stack: 64px site navbar + the era bar */
+  --fx-navbar: 64px;
+  --fx-bar: 52px;
+  scroll-padding-top: calc(var(--fx-navbar) + var(--fx-bar) + 1.25rem);
+}
+/* No smooth scroll: an era jump on this page can cross ten thousand pixels,
+   and a browse hub has to land you on a person at once. */
+
+/* ── the era bar ──────────────────────────────────────────────────────── */
+
+.fx-bar {
+  position: sticky;
+  top: var(--fx-navbar);
+  z-index: 90;
+  /* full bleed out of .pub-main, same technique as the orbit hero above */
+  width: 100vw;
+  max-width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  background: color-mix(in srgb, var(--bg-void) 92%, transparent);
+  border-block: 1px solid color-mix(in srgb, var(--gold-deep) 22%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.fx-bar__inner {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-height: var(--fx-bar);
+}
+.fx-bar__label {
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+.fx-bar__list {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  flex: 1 1 auto;
+}
+.fx-bar__list::-webkit-scrollbar { display: none; }
+.fx-bar__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 44px;
+  padding: 0 0.7rem;
+  border-radius: var(--radius-sm, 6px);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.fx-bar__num {
+  font-family: var(--font-content);
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+  color: var(--gold-deep);
+}
+.fx-bar__link:hover {
+  color: var(--gold-hover);
+  background: color-mix(in srgb, var(--gold-subtle) 8%, transparent);
+}
+.fx-bar__link:hover .fx-bar__num { color: var(--gold-hover); }
+.fx-bar__link[aria-current] {
+  color: var(--gold-primary);
+  background: color-mix(in srgb, var(--gold-subtle) 12%, transparent);
+  box-shadow: inset 0 -2px 0 0 var(--gold-subtle);
+}
+.fx-bar__link[aria-current] .fx-bar__num { color: var(--gold-primary); }
+.fx-bar__link--az {
+  margin-left: 0.35rem;
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 40%, transparent);
+}
+
+/* the depth readout: the year span of the band you are standing in */
+.fx-bar__depth {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  white-space: nowrap;
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  color: var(--text-dim);
+}
+.fx-bar__depth b {
+  font-family: var(--font-content);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-regular);
+  color: var(--gold-subtle);
+  font-variant-numeric: tabular-nums;
+}
+/* the gauge fills as the descent passes under it */
+.fx-bar__gauge {
+  height: 2px;
+  background: color-mix(in srgb, var(--gold-deep) 18%, transparent);
+}
+.fx-bar__gauge span {
+  display: block;
+  height: 100%;
+  width: calc(var(--fx-progress, 0) * 100%);
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--gold-deep) 60%, transparent),
+    var(--gold-subtle));
+}
+@media (prefers-reduced-motion: no-preference) {
+  .fx-bar__gauge span { transition: width 120ms linear; }
+}
+.fx-bar.is-off { visibility: hidden; }
+
+@media (max-width: 860px) {
+  .fx-bar__inner { padding: 0 0.9rem; gap: 0.6rem; }
+  .fx-bar__label, .fx-bar__depth { display: none; }
+}
+
+/* ── the descent ──────────────────────────────────────────────────────── */
+
+.fx-descent {
+  position: relative;
+  width: 100vw;
+  max-width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  background:
+    radial-gradient(90% 34% at 50% 97%,
+      color-mix(in srgb, var(--gold-subtle) 16%, transparent), transparent 72%),
+    linear-gradient(180deg,
+      var(--bg-primary) 0%,
+      var(--bg-void) 52%,
+      var(--bg-void) 88%,
+      transparent 100%);
+  padding: 2.75rem 0 3.25rem;
+}
+.fx-wrap {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+.fx-intro {
+  max-width: 46rem;
+  margin: 0 0 2.5rem;
+}
+.fx-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold-deep);
+  margin: 0 0 0.6rem;
+}
+.fx-eyebrow::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--gold-deep) 45%, transparent), transparent);
+}
+.fx-intro__text {
+  font-family: var(--font-content);
+  font-size: var(--text-md);
+  line-height: var(--leading-relaxed);
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* one band */
+.fx-stratum {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  gap: 2.5rem;
+  padding: 2.5rem 0 3rem 4.5rem;
+  border-top: 1px solid color-mix(in srgb, var(--gold-deep) 18%, transparent);
+}
+.fx-stratum:first-of-type { border-top: 0; }
+
+/* the shaft: one line down the whole descent, a node at every band */
+.fx-stratum::before {
+  content: '';
+  position: absolute;
+  left: 1.55rem;
+  top: 0;
+  bottom: -1px;
+  width: 1px;
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--gold-deep) 30%, transparent),
+    color-mix(in srgb, var(--gold-deep) 12%, transparent));
+}
+.fx-stratum:last-of-type::before { bottom: 40%; }
+.fx-stratum::after {
+  content: '';
+  position: absolute;
+  left: calc(1.55rem - 3px);
+  top: 2.9rem;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--gold-subtle);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--gold-subtle) 14%, transparent);
+}
+
+.fx-plate { min-width: 0; }
+.fx-num {
+  display: block;
+  font-family: var(--font-content);
+  font-size: clamp(2.4rem, 1.4rem + 3.4vw, 3.6rem);
+  line-height: 1;
+  color: color-mix(in srgb, var(--gold-deep) 62%, transparent);
+  margin: 0 0 0.35rem;
+}
+.fx-name {
+  font-family: var(--font-content);
+  font-size: clamp(1.6rem, 1.2rem + 1.6vw, 2.1rem);
+  line-height: 1.15;
+  color: var(--gold-subtle);
+  margin: 0 0 0.4rem;
+}
+.fx-span {
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin: 0 0 1rem;
+}
+.fx-caption {
+  font-family: var(--font-content);
+  font-style: italic;
+  font-size: var(--text-md);
+  line-height: var(--leading-normal);
+  color: var(--text-primary);
+  margin: 0 0 0.9rem;
+}
+.fx-era {
+  font-size: var(--text-base);
+  line-height: var(--leading-relaxed);
+  color: var(--text-secondary);
+  margin: 0 0 1.4rem;
+}
+
+/* the band's app door */
+.fx-door {
+  border-left: 2px solid var(--gold-subtle);
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--bg-card) 85%, transparent), transparent);
+  padding: 0.9rem 1rem 1rem;
+}
+.fx-door__lead {
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+  margin: 0 0 0.4rem;
+}
+.fx-door__q {
+  font-family: var(--font-content);
+  font-style: italic;
+  font-size: var(--text-md);
+  line-height: var(--leading-normal);
+  color: var(--text-primary);
+  margin: 0 0 0.7rem;
+}
+.fx-door__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 44px;
+  padding: 0 1rem;
+  border: 1px solid var(--gold-deep);
+  border-radius: var(--radius-sm, 6px);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--gold-primary);
+  text-decoration: none;
+}
+.fx-door__cta:hover {
+  color: var(--bg-void);
+  background: var(--gold-primary);
+  border-color: var(--gold-primary);
+}
+.fx-door__who {
+  display: block;
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  color: var(--text-dim);
+  margin: 0.5rem 0 0;
+}
+
+/* the band's people */
+.fx-voices { min-width: 0; }
+.fx-voices__label {
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin: 0.4rem 0 0.9rem;
+}
+.fx-list { list-style: none; margin: 0; padding: 0; }
+.fx-voice {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  gap: 0.9rem;
+  align-items: center;
+  padding: 0.6rem 0.7rem;
+  border-radius: var(--radius-md, 10px);
+  border: 1px solid transparent;
+  text-decoration: none;
+}
+.fx-voice:hover {
+  border-color: color-mix(in srgb, var(--gold-deep) 38%, transparent);
+  background: color-mix(in srgb, var(--bg-card) 55%, transparent);
+}
+.fx-voice__face {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 45%, transparent);
+  background: var(--bg-astral);
+}
+.fx-voice__face img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.fx-voice:hover .fx-voice__face {
+  border-color: var(--gold-subtle);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--gold-subtle) 14%, transparent);
+}
+.fx-voice__name {
+  display: block;
+  font-family: var(--font-content);
+  font-size: var(--text-md);
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.25;
+}
+.fx-voice:hover .fx-voice__name { color: var(--gold-hover); }
+.fx-voice__meta {
+  display: block;
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  color: var(--text-dim);
+  margin: 0.15rem 0 0.2rem;
+}
+.fx-voice__learn {
+  display: block;
+  font-family: var(--font-content);
+  font-size: var(--text-sm);
+  color: var(--gold-subtle);
+  margin: 0;
+  line-height: 1.35;
+}
+
+@media (min-width: 861px) {
+  /* the era plate holds while its people pass under it */
+  .fx-plate {
+    position: sticky;
+    top: calc(var(--fx-navbar) + var(--fx-bar) + 1.5rem);
+  }
+}
+@media (max-width: 860px) {
+  .fx-descent { padding: 2rem 0 3rem; }
+  .fx-wrap { padding: 0 1.1rem; }
+  .fx-stratum {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.4rem;
+    padding: 1.9rem 0 2.2rem 2.6rem;
+  }
+  .fx-stratum::before { left: 0.6rem; }
+  .fx-stratum::after { left: calc(0.6rem - 3px); top: 2.2rem; }
+  .fx-voice { grid-template-columns: 48px minmax(0, 1fr); gap: 0.75rem; }
+  .fx-voice__face { width: 48px; height: 48px; }
+}
+
+/* ── the floor line, between the descent and the alphabet ─────────────── */
+.fx-floor {
+  position: relative;
+  max-width: 1120px;
+  margin: 1.75rem auto 0;
+  padding: 0 1.5rem;
+  text-align: center;
+  font-family: var(--font-content);
+  font-style: italic;
+  font-size: var(--text-md);
+  color: var(--text-tertiary);
+}
+
+/* ── blocks below the descent ─────────────────────────────────────────── */
+
+.fx-block {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 0;
+}
+.fx-block .pub-section__title { margin-bottom: 0.6rem; }
+.fx-block > .pub-section__text { max-width: 58ch; }
+@media (max-width: 860px) {
+  .fx-block { padding: 2.25rem 1.1rem 0; }
+}
+
+/* ── tradition cross cut ──────────────────────────────────────────────── */
+
+.fx-traditions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+  gap: 1.6rem 2rem;
+  margin: 1.6rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+.fx-trad__name {
+  font-family: var(--font-content);
+  font-size: var(--text-lg);
+  color: var(--gold-subtle);
+  margin: 0 0 0.35rem;
+}
+.fx-trad__line {
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+  color: var(--text-secondary);
+  margin: 0 0 0.5rem;
+}
+.fx-trad__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.fx-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 30%, transparent);
+  border-radius: var(--radius-sm, 6px);
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  text-decoration: none;
+}
+.fx-chip:hover {
+  border-color: var(--gold-subtle);
+  color: var(--gold-hover);
+}
+
+/* ── the alphabet ─────────────────────────────────────────────────────── */
+
+/* the wide container fits a fourth column at the same card size */
+.fx-az .pub-grid--3 { grid-template-columns: repeat(4, 1fr); }
+@media (max-width: 1024px) {
+  .fx-az .pub-grid--3 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 640px) {
+  .fx-az .pub-grid--3 { grid-template-columns: 1fr; }
+}
+
+/* ── theme rail + FAQ + read on ───────────────────────────────────────── */
+
+.fx-themes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 0.7rem;
+  margin: 1.2rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+.fx-theme {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.2rem;
+  min-height: 4.5rem;
+  padding: 0.8rem 1rem;
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 22%, transparent);
+  border-radius: var(--radius-md, 10px);
+  background: color-mix(in srgb, var(--bg-card) 45%, transparent);
+  text-decoration: none;
+}
+.fx-theme:hover {
+  border-color: var(--gold-subtle);
+  background: color-mix(in srgb, var(--bg-card) 80%, transparent);
+}
+.fx-theme__q {
+  font-family: var(--font-content);
+  font-size: var(--text-base);
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.3;
+}
+.fx-theme:hover .fx-theme__q { color: var(--gold-hover); }
+.fx-theme__name {
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+  margin: 0;
+}
+
+.fx-faq { margin: 1.2rem 0 0; }
+.fx-faq__item {
+  padding: 1rem 0;
+  border-top: 1px solid color-mix(in srgb, var(--gold-deep) 16%, transparent);
+}
+.fx-faq__q {
+  max-width: 74ch;
+  font-family: var(--font-content);
+  font-size: var(--text-md);
+  color: var(--gold-subtle);
+  margin: 0 0 0.4rem;
+}
+.fx-faq__a {
+  max-width: 74ch;
+  font-size: var(--text-base);
+  line-height: var(--leading-relaxed);
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.fx-readon {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  margin: 0.8rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+.fx-readon a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  color: var(--gold-primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.fx-readon a:hover { color: var(--gold-hover); }
