@@ -67,6 +67,15 @@ interface ProcessedFreeConversationData {
   mode: 'free_conversation';
   figureMeta: FigureMetadata;
   seedsOverview: SeedOverview[];
+  /** Full teaching of the prefilled question's anchor seed, when the
+   *  conversation was opened from a question that names one. */
+  anchorSeed?: {
+    id: string | number;
+    title: string;
+    summary: string;
+    coreInsights?: string[];
+    quote?: string;
+  };
   conversationalGuidance: ConversationalGuidance;
   seeds?: Seed[];
 }
@@ -178,7 +187,8 @@ export const processSeedConversationData = (
 export const processFreeConversationData = (
   allSeeds: Seed[] = [],
   figureMeta: FigureMetadata | null = null,
-  _language: Language | string = 'en'
+  _language: Language | string = 'en',
+  anchorSeedId?: string | number | null
 ): ProcessedFreeConversationData => {
   try {
     // Handle minimal or missing allSeeds
@@ -296,7 +306,31 @@ export const processFreeConversationData = (
     }
 
     // Generate seeds overview
-    const seedsOverview = generateSeedsOverview(normalizedSeeds);
+    let seedsOverview = generateSeedsOverview(normalizedSeeds);
+
+    // A conversation opened from a prefilled question carries that question's
+    // anchor seed. Lead the overview with it and hand the model the anchor's
+    // full teaching, so the first reply answers from the teaching instead of
+    // the figure's general register. For default arrivals the selected seed
+    // is seed 1, which is already first, so ordering is unchanged.
+    let anchorSeed: ProcessedFreeConversationData['anchorSeed'];
+    if (anchorSeedId !== undefined && anchorSeedId !== null) {
+      const anchorKey = String(anchorSeedId);
+      const idx = seedsOverview.findIndex((o: SeedOverview) => String(o.id) === anchorKey);
+      if (idx > 0) {
+        seedsOverview = [seedsOverview[idx], ...seedsOverview.slice(0, idx), ...seedsOverview.slice(idx + 1)];
+      }
+      const raw = normalizedSeeds.find((s) => String((s as any).id) === anchorKey) as any;
+      if (raw) {
+        anchorSeed = {
+          id: raw.id,
+          title: raw.title || raw.name || '',
+          summary: raw.summary || raw.description || '',
+          ...(Array.isArray(raw.coreInsights) && raw.coreInsights.length ? { coreInsights: raw.coreInsights } : {}),
+          ...(raw.quote ? { quote: raw.quote } : {})
+        };
+      }
+    }
 
     // Generate conversational guidance
     const conversationalGuidance = generateConversationalGuidance(normalizedSeeds);
@@ -306,6 +340,7 @@ export const processFreeConversationData = (
       mode: "free_conversation",
       figureMeta: figureMetadata || { figure: 'Unknown' },
       seedsOverview,
+      ...(anchorSeed ? { anchorSeed } : {}),
       conversationalGuidance
     };
 

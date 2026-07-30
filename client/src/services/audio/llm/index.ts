@@ -226,7 +226,12 @@ export const generateResponse = async ({
     } else if (currentMode === 'seed_conversation' && seedData) {
       processedSeedData = seedDataProcessor.processSeedConversationData(seedData, allSeeds, figureMeta, selectedLanguage);
     } else if (currentMode === 'free_conversation') {
-      processedSeedData = seedDataProcessor.processFreeConversationData(allSeeds, figureMeta, selectedLanguage);
+      // The selected seed doubles as the anchor: an ask-intent arrival has
+      // its question's seed on record, a default arrival sits on seed 1.
+      processedSeedData = seedDataProcessor.processFreeConversationData(
+        allSeeds, figureMeta, selectedLanguage,
+        useDomainStore.getState().seeds.selectedId ?? undefined
+      );
     }
 
     const result = await generateFreeTierResponse({
