@@ -60,6 +60,20 @@
   text-shadow: 0 0 2px color-mix(in srgb, black var(--a-30), transparent);
 }
 
+/* Dismiss surface behind the panel. A button so the atlas sky engine
+   treats it as chrome instead of a drag handle. */
+.constellation-info-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 59;
+  padding: 0;
+  border: none;
+  background: color-mix(in srgb, var(--bg-deep-space) var(--a-25), transparent);
+  cursor: default;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
 @media(max-width:1023px) {
   .constellation-info {
     top: 90px;
@@ -67,5 +81,20 @@
     left: 15px;
     max-width: calc(100% - 30px);
     z-index: 60;
+  }
+}
+
+/* Phones: the panel carries the plate's cartouche text, so it sits low,
+   next to the toolbar button that opened it, and never owns the field. */
+@media(max-width:767px) {
+  .constellation-info {
+    top: auto;
+    bottom: 12px;
+    right: 12px;
+    left: 12px;
+    max-width: none;
+    max-height: min(62%, 440px);
+    overflow-y: auto;
+    padding: 20px 22px 22px;
   }
 }

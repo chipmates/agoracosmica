@@ -260,6 +260,7 @@ const ConstellationMap: FC<ConstellationMapProps> = ({
             level={seedLevels?.[String(seed.id)] ?? 0}
             atlas={atlas}
             isNova={novaSeedId != null && String(seed.id) === String(novaSeedId)}
+            nextLabelSide={(seedPositions[i]?.coordX ?? 50) > 62 ? 'left' : 'right'}
             onClick={onSeedClick as any}
           />
         );

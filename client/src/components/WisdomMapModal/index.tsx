@@ -90,6 +90,9 @@ interface BoundingBox {
   offsetY: number;
 }
 
+/** Quarter-turn threshold: the turned fit has to buy this much more scale. */
+const ROTATE_GAIN = 1.2;
+
 interface WisdomMapModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -520,14 +523,24 @@ const WisdomMapModal: FC<WisdomMapModalProps> = ({
     };
   }, [selectedFigure]);
 
+  // The seed the app already had selected when the map opened. On phones the
+  // note is a bottom sheet, so opening it unasked would bury the whole field:
+  // that one selection only lights its star's ring, and a tap opens the note.
+  const openingSeedIdRef = useRef<string | null>(null);
+  useEffect(() => {
+    // isOpen only: the id is captured at the open transition, not tracked
+    openingSeedIdRef.current = isOpen && appSelectedSeedId ? String(appSelectedSeedId) : null;
+  }, [isOpen]);
+
   // Sync local selectedSeed with the app's actual selected seed from Zustand
   useEffect(() => {
     if (!seeds.length || !appSelectedSeedId) return;
+    if (isMobileHub && String(appSelectedSeedId) === openingSeedIdRef.current) return;
     const match = seeds.find(s => String(s.id) === String(appSelectedSeedId));
     if (match && match.id !== selectedSeed?.id) {
       setSelectedSeed(match);
     }
-  }, [seeds, appSelectedSeedId]);
+  }, [seeds, appSelectedSeedId, isMobileHub]);
 
   // Create zodiac constellation layout
   const constellation = useMemo<Constellation | null>(() => {
@@ -537,16 +550,50 @@ const WisdomMapModal: FC<WisdomMapModalProps> = ({
     return getConstellationForFigure(selectedFigure.name);
   }, [selectedFigure]);
   
+  // Display-space constellation. A phone held upright crushes a wide figure
+  // into a thin band and leaves the height empty, so below the tablet
+  // breakpoint (where the plate annotations are gone) the pattern takes a
+  // quarter turn and flows down the long axis instead, first point at the
+  // top. Rotation is display only: the authored patterns never change.
+  const displayConstellation = useMemo<Constellation | null>(() => {
+    const pattern = constellation?.pattern;
+    if (!constellation || !pattern?.length || !containerDimensions) return constellation;
+
+    const xs = pattern.map(([x]) => x);
+    const ys = pattern.map(([, y]) => y);
+    const patternW = Math.max(...xs) - Math.min(...xs);
+    const patternH = Math.max(...ys) - Math.min(...ys);
+    if (patternW <= 0 || patternH <= 0) return constellation;
+
+    const { width, height } = containerDimensions;
+    if (!isMobileHub || width >= height) return constellation;
+
+    const fit = (w: number, h: number) => Math.min(width / w, height / h);
+    if (fit(patternH, patternW) < fit(patternW, patternH) * ROTATE_GAIN) return constellation;
+
+    return {
+      ...constellation,
+      pattern: pattern.map(([x, y]) => [100 - y, x]),
+    };
+  }, [constellation, containerDimensions, isMobileHub]);
+
   // Calculate star positions and boundingBox
   const { seedPositions, boundingBox } = useMemo<{ seedPositions: SeedPosition[]; boundingBox: BoundingBox | null }>(() => {
-    if (!seeds.length || !constellation || !containerDimensions) {
+    if (!seeds.length || !displayConstellation || !containerDimensions) {
       return { seedPositions: [], boundingBox: null };
     }
 
-    const result = calculateConstellationPositions(seeds as any, constellation as any, containerDimensions);
+    const result = calculateConstellationPositions(
+      seeds as any,
+      displayConstellation as any,
+      containerDimensions,
+      // The cartouche no longer owns the lower band on phones, so the
+      // figure can breathe into it.
+      isMobileHub ? { marginFactor: 0.86 } : undefined
+    );
     return result as { seedPositions: SeedPosition[]; boundingBox: BoundingBox | null };
-  }, [seeds, constellation, containerDimensions]);
-  
+  }, [seeds, displayConstellation, containerDimensions, isMobileHub]);
+
   // Calculate progressive revelation stage based on gathered seeds
   const revelationStage = useMemo(() => {
     const gatheredCount = seeds.filter(seed => seed.gathered).length;
@@ -562,23 +609,23 @@ const WisdomMapModal: FC<WisdomMapModalProps> = ({
 
   // Calculate line segments for drawing with progressive revelation
   const lineSegments = useMemo(() => {
-    if (!boundingBox || !containerDimensions || !constellation) return [];
+    if (!boundingBox || !containerDimensions || !displayConstellation) return [];
 
     const baseSegments = calculateConstellationPaths(
       seedPositions as any,
       boundingBox as any,
-      constellation.pattern || [],
+      displayConstellation.pattern || [],
       containerDimensions,
-      constellation as any // Pass the full constellation object
+      displayConstellation as any // Pass the full constellation object
     );
-    
+
     // Add revelation stage information to each segment
     return baseSegments.map(segment => ({
       ...segment,
       revelationStage,
       shouldShow: revelationStage !== 'void' // Show lines for all stages except void
     }));
-  }, [boundingBox, containerDimensions, constellation, seedPositions, revelationStage]);
+  }, [boundingBox, containerDimensions, displayConstellation, seedPositions, revelationStage]);
 
   // Compute per-seed slice status for segmented progress bar
   // Logic extracted to seedLevelComputation.ts for reuse by pendingBlooms
@@ -1131,6 +1178,7 @@ const WisdomMapModal: FC<WisdomMapModalProps> = ({
                     gatheredCount={gatheredCount}
                     totalSeeds={totalSeeds}
                     isComplete={isCompleted && !completionPending}
+                    showAnnotations={!isMobileHub}
                   />
                 )}
                 {!loading && (
@@ -1156,10 +1204,29 @@ const WisdomMapModal: FC<WisdomMapModalProps> = ({
             ) : (
               <>
             {showConstellationInfo && constellation && (
-              <ConstellationInfo
-                name={constellation.name || ''}
-                description={constellation.description || ''}
-              />
+              <>
+                {isMobileHub && (
+                  /* A button, so the sky engine reads it as chrome and does
+                     not start a camera drag under the panel. */
+                  <button
+                    type="button"
+                    className="constellation-info-scrim"
+                    tabIndex={-1}
+                    aria-hidden="true"
+                    onClick={() => setShowConstellationInfo(false)}
+                  />
+                )}
+                <ConstellationInfo
+                  name={constellation.name || ''}
+                  description={constellation.description || ''}
+                  figureCleanName={isMobileHub ? cleanFigureName : undefined}
+                  gatheredCount={isMobileHub ? gatheredCount : undefined}
+                  totalSeeds={isMobileHub ? totalSeeds : undefined}
+                  isComplete={isMobileHub && isCompleted && !completionPending}
+                  rotated={displayConstellation !== constellation}
+                  onClose={isMobileHub ? () => setShowConstellationInfo(false) : undefined}
+                />
+              </>
             )}
 
             {!skyEnabled && (

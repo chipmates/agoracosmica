@@ -753,12 +753,14 @@ export function getConstellationForFigure(figureName: string): ConstellationPatt
  * @param seeds - The array of seed objects.
  * @param constellation - Constellation data including `pattern` (Array of [x, y]) and name/description.
  * @param containerDimensions - The { width, height } of the map container in real pixels.
+ * @param options - `marginFactor` sets how much of the container the figure fills (0.8 default).
  * @returns An object with seedPositions array and boundingBox info for line drawing.
  */
 export function calculateConstellationPositions(
   seeds: ConstellationSeed[],
   constellation: ConstellationPattern,
-  containerDimensions: ContainerDimensions | null = null
+  containerDimensions: ContainerDimensions | null = null,
+  options: { marginFactor?: number } = {}
 ): ConstellationPositionsResult {
   if (!seeds?.length || !constellation?.pattern?.length || !containerDimensions) {
     // Fallback: place all seeds at center
@@ -813,7 +815,7 @@ export function calculateConstellationPositions(
   }
 
   // 2) Compute scale to fit bounding box into container
-  const marginFactor = 0.8; // 80% fill for breathing space
+  const marginFactor = options.marginFactor ?? 0.8; // 80% fill for breathing space
   const containerAspect = containerW / containerH;
   const patternAspect = patternWidth / patternHeight;
   let scale: number;
@@ -822,6 +824,13 @@ export function calculateConstellationPositions(
   } else {
     scale = (marginFactor * containerH) / patternHeight;
   }
+
+  // A star ornament reaches ~32px out from its centre, so the outermost
+  // points need that much room or the engraving gets cut by the edge. The
+  // cap stays under a 0.8 fill, which makes this a no-op at the default.
+  const edge = Math.min(34, containerW * 0.08, containerH * 0.08);
+  if (patternWidth > 0) scale = Math.min(scale, (containerW - 2 * edge) / patternWidth);
+  if (patternHeight > 0) scale = Math.min(scale, (containerH - 2 * edge) / patternHeight);
 
   // Actual scaled dimensions
   const scaledW = patternWidth * scale;
@@ -835,12 +844,40 @@ export function calculateConstellationPositions(
   const toContainerPercent = (px: number, py: number) => {
     const dx = (px - xMin) * scale + offsetX;
     const dy = (py - yMin) * scale + offsetY;
+    placedPx.push({ x: dx, y: dy });
     return {
       left: `${(dx / containerW) * 100}%`,
       top: `${(dy / containerH) * 100}%`,
       coordX: (dx / containerW) * 100,
       coordY: (dy / containerH) * 100
     };
+  };
+
+  // Ring extras must clear the stars already on the plate: a tall display
+  // pattern runs through the ring circle, and two stars a few px apart end
+  // up sharing one touch target. Deterministic sweep: try the requested
+  // angle, swing outward in alternating steps while growing the radius,
+  // keep inside the edge margin, and settle for the clearest spot found.
+  const RING_CLEARANCE = 48;
+  const placedPx: Array<{ x: number; y: number }> = [];
+  const ringSpot = (baseAngle: number, baseRadius: number) => {
+    let best = { x: containerW / 2, y: containerH / 2, clear: -Infinity };
+    for (let attempt = 0; attempt < 24; attempt++) {
+      const swing = Math.ceil(attempt / 2) * (Math.PI / 12) * (attempt % 2 ? 1 : -1);
+      const radius = baseRadius * (1 + 0.15 * Math.floor(attempt / 8));
+      const x = Math.min(containerW - edge, Math.max(edge, containerW / 2 + radius * Math.cos(baseAngle + swing)));
+      const y = Math.min(containerH - edge, Math.max(edge, containerH / 2 + radius * Math.sin(baseAngle + swing)));
+      const clear = placedPx.length
+        ? Math.min(...placedPx.map((p) => Math.hypot(p.x - x, p.y - y)))
+        : Infinity;
+      if (clear >= RING_CLEARANCE) {
+        placedPx.push({ x, y });
+        return { x, y };
+      }
+      if (clear > best.clear) best = { x, y, clear };
+    }
+    placedPx.push({ x: best.x, y: best.y });
+    return { x: best.x, y: best.y };
   };
 
   // Separate gathered vs. ungathered seeds
@@ -901,10 +938,7 @@ export function calculateConstellationPositions(
       const angle = (extraRingIndex / Math.max(gatheredCount - specialPointCount, 1)) * 2 * Math.PI;
       extraRingIndex++;
       const ringRadiusPx = Math.min(containerW, containerH) * 0.3;
-      const centerX = containerW / 2;
-      const centerY = containerH / 2;
-      const ringX = centerX + ringRadiusPx * Math.cos(angle);
-      const ringY = centerY + ringRadiusPx * Math.sin(angle);
+      const { x: ringX, y: ringY } = ringSpot(angle, ringRadiusPx);
 
       seedPositions.push({
         left: `${(ringX / containerW) * 100}%`,
@@ -944,10 +978,7 @@ export function calculateConstellationPositions(
         (ringIndex / (Math.max(gatheredCount - usablePoints, 1))) * 2 * Math.PI;
       ringIndex++;
       const ringRadiusPx = Math.min(containerW, containerH) * 0.25;
-      const centerX = containerW / 2;
-      const centerY = containerH / 2;
-      const ringX = centerX + ringRadiusPx * Math.cos(angle);
-      const ringY = centerY + ringRadiusPx * Math.sin(angle);
+      const { x: ringX, y: ringY } = ringSpot(angle, ringRadiusPx);
 
       seedPositions.push({
         left: `${(ringX / containerW) * 100}%`,
@@ -997,10 +1028,7 @@ export function calculateConstellationPositions(
     const angle = (ringIndex / (Math.max(ungatheredCount - minCount, 1))) * 2 * Math.PI;
     ringIndex++;
     const ringRadiusPx = Math.min(containerW, containerH) * 0.3;
-    const centerX = containerW / 2;
-    const centerY = containerH / 2;
-    const ringX = centerX + ringRadiusPx * Math.cos(angle);
-    const ringY = centerY + ringRadiusPx * Math.sin(angle);
+    const { x: ringX, y: ringY } = ringSpot(angle, ringRadiusPx);
 
     seedPositions.push({
       left: `${(ringX / containerW) * 100}%`,

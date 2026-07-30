@@ -29,6 +29,9 @@ interface StarProps {
   atlas?: boolean;
   /** One-shot gilding animation right after a bloom is witnessed. */
   isNova?: boolean;
+  /** Which side the "next" leader label extends to, so it stays on screen
+   *  when the star sits near the right edge. */
+  nextLabelSide?: 'left' | 'right';
   onClick: (seed: Seed) => void;
 }
 
@@ -79,12 +82,14 @@ const AtlasStarVisual: FC<{
   isSelected: boolean;
   isNova: boolean;
   nextLabel: string;
+  nextLabelSide: 'left' | 'right';
 }> = ({
   level,
   isNext,
   isSelected,
   isNova,
   nextLabel,
+  nextLabelSide,
 }) => {
   const gradId = `asCore${level}`;
   let novaRay = 0;
@@ -117,10 +122,21 @@ const AtlasStarVisual: FC<{
       {isNext && level === 0 && (
         <g className="as-next">
           <circle r={24} className="as-next-ring" />
-          <line x1={18} y1={-18} x2={34} y2={-34} className="as-next-leader" />
-          <text x={38} y={-38} className="as-next-label">
-            {nextLabel}
-          </text>
+          {nextLabelSide === 'left' ? (
+            <>
+              <line x1={-18} y1={-18} x2={-34} y2={-34} className="as-next-leader" />
+              <text x={-38} y={-38} className="as-next-label" textAnchor="end">
+                {nextLabel}
+              </text>
+            </>
+          ) : (
+            <>
+              <line x1={18} y1={-18} x2={34} y2={-34} className="as-next-leader" />
+              <text x={38} y={-38} className="as-next-label">
+                {nextLabel}
+              </text>
+            </>
+          )}
         </g>
       )}
 
@@ -224,6 +240,7 @@ const Star: FC<StarProps> = ({
   level = 0,
   atlas = false,
   isNova = false,
+  nextLabelSide = 'right',
   onClick
 }) => {
   const { tString } = useTranslation();
@@ -340,6 +357,7 @@ const Star: FC<StarProps> = ({
             isSelected={isSelected}
             isNova={isNova}
             nextLabel={tString('wisdomAtlas.next', 'next')}
+            nextLabelSide={nextLabelSide}
           />
         ) : (
           <>

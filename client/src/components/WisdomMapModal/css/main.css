@@ -286,6 +286,21 @@ body.detail-view-open {
   white-space: nowrap;
 }
 
+/* Long figure names ("Weisheit von Schopenhauer") must clear the close
+   button. The title column is absolutely positioned over the header, so a
+   second line centers in place instead of growing the header. */
+@media (max-width: 767px) {
+  .wisdom-map-content .wisdom-modal-title {
+    display: inline-block;
+    max-width: calc(100vw - 128px);
+    white-space: normal;
+    text-wrap: balance;
+    font-size: min(1.4rem, 5.5vw);
+    letter-spacing: 1px;
+    line-height: 1.15;
+  }
+}
+
 /* True-center the title by making the center column span the full header */
 .wisdom-map-content [role="group"] > div:has(.wisdom-modal-title) {
   position: absolute;

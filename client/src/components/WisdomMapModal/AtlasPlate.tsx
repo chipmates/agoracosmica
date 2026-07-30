@@ -35,6 +35,9 @@ interface AtlasPlateProps {
   totalSeeds: number;
   /** All seeds gathered: the plate is complete (gold ink, inscription). */
   isComplete: boolean;
+  /** Phones drop the cartouche and marginalia: they would sit on the stars.
+   *  Their text moves to the info panel behind the toolbar. */
+  showAnnotations?: boolean;
 }
 
 const AtlasPlate: FC<AtlasPlateProps> = ({
@@ -48,6 +51,7 @@ const AtlasPlate: FC<AtlasPlateProps> = ({
   gatheredCount,
   totalSeeds,
   isComplete,
+  showAnnotations = true,
 }) => {
   const { t, tString } = useTranslation();
 
@@ -83,12 +87,13 @@ const AtlasPlate: FC<AtlasPlateProps> = ({
     }
     // The via sapientiae runs beneath the constellation. On portrait plates
     // the centered cartouche owns the lower band, so the via rides higher
-    // there to keep its label readable (2026-07-24 revision).
+    // there to keep its label readable. On phones the figure takes the whole
+    // height instead, so the via drops to the foot and loses its label.
     const portrait = height > width * 1.2;
-    const vy = height * (portrait ? 0.78 : 0.86);
+    const vy = height * (portrait ? (showAnnotations ? 0.78 : 0.94) : 0.86);
     const via = `M ${(-width * 0.05).toFixed(1)} ${(vy + height * 0.03).toFixed(1)} Q ${(width / 2).toFixed(1)} ${(vy - height * 0.055).toFixed(1)} ${(width * 1.05).toFixed(1)} ${(vy + height * 0.03).toFixed(1)}`;
     return { grat, via, viaLabelX: width * 0.4, viaLabelY: vy - height * 0.028 };
-  }, [width, height]);
+  }, [width, height, showAnnotations]);
 
   if (!paths) return null;
 
@@ -108,9 +113,11 @@ const AtlasPlate: FC<AtlasPlateProps> = ({
 
         {/* via sapientiae */}
         <path d={paths.via} className="atlas-via" />
-        <text x={paths.viaLabelX} y={paths.viaLabelY} className="atlas-via-label">
-          via sapientiae
-        </text>
+        {showAnnotations && (
+          <text x={paths.viaLabelX} y={paths.viaLabelY} className="atlas-via-label">
+            via sapientiae
+          </text>
+        )}
 
         {/* construction-line silhouette: the whole figure, faintly present,
             the way an engraver leaves a figure unfinished */}
@@ -138,26 +145,30 @@ const AtlasPlate: FC<AtlasPlateProps> = ({
         ))}
       </svg>
 
-      {/* the tilted cartouche: real names, real counts */}
-      <div className={`atlas-cartouche ${isComplete ? 'is-complete' : ''}`} aria-hidden="false">
-        <span className="atlas-cartouche-star" aria-hidden="true">✦</span>
-        <h3 className="atlas-cartouche-name">{translatedName}</h3>
-        <p className="atlas-cartouche-epithet">{epithet}</p>
-        <svg
-          className="atlas-cartouche-flourish"
-          viewBox="0 0 216 14"
-          aria-hidden="true"
-          focusable="false"
-        >
-          <path d="M 0 8 Q 54 14 108 8 Q 162 2 216 8" />
-        </svg>
-        <p className="atlas-cartouche-progress">{progressLine}</p>
-        {isComplete && <p className="atlas-cartouche-complete">{completeLine}</p>}
-      </div>
+      {showAnnotations && (
+        <>
+          {/* the tilted cartouche: real names, real counts */}
+          <div className={`atlas-cartouche ${isComplete ? 'is-complete' : ''}`} aria-hidden="false">
+            <span className="atlas-cartouche-star" aria-hidden="true">✦</span>
+            <h3 className="atlas-cartouche-name">{translatedName}</h3>
+            <p className="atlas-cartouche-epithet">{epithet}</p>
+            <svg
+              className="atlas-cartouche-flourish"
+              viewBox="0 0 216 14"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <path d="M 0 8 Q 54 14 108 8 Q 162 2 216 8" />
+            </svg>
+            <p className="atlas-cartouche-progress">{progressLine}</p>
+            {isComplete && <p className="atlas-cartouche-complete">{completeLine}</p>}
+          </div>
 
-      {/* marginalia: the constellation's own description, an annotation in
-          the margin of the plate */}
-      <p className="atlas-marginalia">{translatedDescription}</p>
+          {/* marginalia: the constellation's own description, an annotation in
+              the margin of the plate */}
+          <p className="atlas-marginalia">{translatedDescription}</p>
+        </>
+      )}
     </>
   );
 };

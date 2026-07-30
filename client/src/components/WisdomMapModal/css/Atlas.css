@@ -767,6 +767,12 @@
   border: 1px solid var(--as-ink-faint);
   border-radius: 3px;
   box-shadow: none;
+  /* the engraver's second rule, as an outline so it survives scrolling */
+  outline: 1px solid var(--as-ink-ghost);
+  outline-offset: -6px;
+}
+.atlas-mode .constellation-info::after {
+  display: none;
 }
 .atlas-mode .constellation-info h3 {
   font-family: var(--font-content);
@@ -775,11 +781,61 @@
   text-transform: uppercase;
   color: var(--gold-primary);
   text-shadow: none;
+  margin-bottom: 4px;
+  padding-right: 34px;
 }
 .atlas-mode .constellation-info p {
   font-family: var(--font-content);
   font-style: italic;
   color: var(--text-secondary);
+}
+
+/* The cartouche moved in here on phones: epithet, progress, inscription. */
+.atlas-mode .constellation-info .constellation-info-epithet {
+  color: var(--text-tertiary);
+  font-size: 0.92rem;
+  margin-bottom: 10px;
+}
+.atlas-mode .constellation-info .constellation-info-progress {
+  font-family: var(--font-ui);
+  font-style: normal;
+  font-size: 0.64rem;
+  font-weight: 500;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--as-ink-ghost);
+}
+.atlas-mode .constellation-info .constellation-info-complete {
+  color: var(--gold-primary);
+  margin-top: 12px;
+}
+
+.constellation-info-close {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: 3px;
+  background: none;
+  color: var(--text-tertiary);
+  cursor: pointer;
+}
+.constellation-info-close:hover,
+.constellation-info-close:focus-visible {
+  color: var(--gold-primary);
+}
+.atlas-mode .constellation-info-close:focus-visible {
+  outline: 1.5px dashed var(--gold-primary);
+  outline-offset: -6px;
 }
 
 /* ------------------------------------------------------------------
