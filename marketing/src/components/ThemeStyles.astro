@@ -1,0 +1,69 @@
+---
+// Shared type scale for the theme pages. Rendered by both the detail body and
+// the index, because Astro only bundles a component's styles into the pages
+// that actually render it, and these classes are used by both.
+---
+<style is:global>
+  .tq-section { margin: 0 0 2.75rem; }
+
+  .tq-answer {
+    margin: 0 0 2.5rem;
+    padding: 1.25rem 1.4rem;
+    border-left: 2px solid color-mix(in srgb, var(--gold-subtle) var(--a-50), transparent);
+    background: color-mix(in srgb, var(--bg-card) var(--a-45), transparent);
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: var(--text-md);
+    line-height: var(--leading-loose);
+    color: var(--text-primary);
+  }
+
+  .tq-h2 {
+    margin: 0 0 0.35rem;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-weight: var(--weight-semibold);
+    font-size: var(--text-xl);
+    line-height: var(--leading-tight);
+    color: var(--gold-subtle);
+  }
+  .tq-h2::after {
+    content: "";
+    display: block;
+    width: 2.5rem;
+    height: 1px;
+    margin-top: 0.6rem;
+    background: color-mix(in srgb, var(--gold-subtle) var(--a-45), transparent);
+  }
+  .tq-h3 {
+    margin: 2rem 0 0.75rem;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-weight: var(--weight-medium);
+    font-size: var(--text-md);
+    color: var(--text-secondary);
+  }
+  .tq-note {
+    margin: 0.85rem 0 1.1rem;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: var(--text-sm);
+    line-height: var(--leading-relaxed);
+    color: var(--text-tertiary);
+  }
+  .tq-lead,
+  .tq-coda,
+  .tq-prose p,
+  .tq-prose-p {
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: var(--text-md);
+    line-height: var(--leading-loose);
+    color: var(--text-secondary);
+  }
+  .tq-lead { margin: 1.1rem 0 0; }
+  .tq-prose-p { margin: 1.1rem 0 0; }
+  .tq-prose p { margin: 0 0 1.1rem; }
+  .tq-coda {
+    margin: 1.75rem 0 0;
+    padding-top: 1.25rem;
+    border-top: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-15), transparent);
+    color: var(--text-tertiary);
+    font-style: italic;
+  }
+</style>

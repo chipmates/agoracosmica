@@ -9,6 +9,7 @@ import { canonicalUrl, publicUrl, SITE_URL, MEDIA_URL } from '../../lib/urls';
 import { themeContentLastmod } from '../../lib/lastmod';
 import { THEMES, type ThemeId } from '@client/data/councilCatalog';
 import { getFigureById } from '@client/data/public/figuresCatalog';
+import publicEn from '@client/assets/translations/public-en.json';
 
 const THEME_OG_FIGURE: Record<string, string> = {
   'meaning-purpose': 'aurelius',
@@ -35,11 +36,16 @@ const { themeId } = Astro.props as { themeId: ThemeId };
 
 const t = getT(lang);
 const themeName = t(`themes.${themeId}.name`);
-const themeDescription = t(`themes.${themeId}.description`);
 const themeQuestion = t(`themes.${themeId}.question`);
 const themeAnswer = t(`themes.${themeId}.answer`);
-const hasQa =
-  themeQuestion !== `themes.${themeId}.question` && themeAnswer !== `themes.${themeId}.answer`;
+// The SERP title is the question, not the shelf label, and it carries no brand
+// suffix so the whole 60-char budget goes to the question. The description is
+// written for the result, never a clamped slice of the essay.
+const metaTitle = t(`themes.${themeId}.metaTitle`, themeQuestion);
+const metaDescription = t(`themes.${themeId}.metaDescription`, themeAnswer);
+
+const substance =
+  ((publicEn as Record<string, any>).themes?.[themeId]?.substance ?? []) as { q: string; a: string }[];
 
 const ogFigureId = THEME_OG_FIGURE[themeId];
 const themeOgImage = ogFigureId
@@ -54,11 +60,11 @@ const themeUrl = canonicalUrl(publicUrl(lang, `/themes/${themeId}`));
 
 const schemas = [
   articleSchema({
-    title: themeName,
+    title: themeQuestion,
     // Full text on purpose: JSON-LD has no SERP length budget, and a raw
     // .slice() cuts mid-word (the meta description below is word-boundary
     // clamped centrally in BaseHead).
-    description: themeDescription,
+    description: themeAnswer,
     url: themeUrl,
     lang,
     image: themeOgImage,
@@ -70,12 +76,20 @@ const schemas = [
     { name: t('breadcrumbs.themes'), url: `${SITE_URL}/themes` },
     { name: themeName, url: themeUrl },
   ]),
-  ...(hasQa ? [faqSchema([{ q: themeQuestion, a: themeAnswer }], themeUrl)] : []),
+  faqSchema(
+    [
+      { q: themeQuestion, a: themeAnswer },
+      ...substance.map(block => ({ q: block.q, a: block.a })),
+    ],
+    themeUrl,
+  ),
 ];
 ---
 <Public
-  title={themeName}
-  description={themeDescription}
+  title={metaTitle}
+  fullTitle={metaTitle}
+  ogTitle={`${metaTitle} | Agora Cosmica`}
+  description={metaDescription}
   canonicalPath={`/themes/${themeId}`}
   lang={lang}
   stickyCta={false}

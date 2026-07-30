@@ -1,4 +1,8 @@
 ---
+// Index card for one life question. The card leads with the QUESTION; the
+// theme name drops to a small-caps label. Per-theme colour is a hairline
+// only, set through data-theme so no inline style attribute is emitted.
+
 import { getT } from '../i18n';
 import type { Lang } from '../i18n';
 import { publicUrl } from '../lib/urls';
@@ -6,14 +10,102 @@ import { publicUrl } from '../lib/urls';
 interface Props {
   themeId: string;
   councilCount: number;
+  voiceCount: number;
   lang: Lang;
 }
 
-const { themeId, councilCount, lang } = Astro.props;
+const { themeId, councilCount, voiceCount, lang } = Astro.props;
 const t = getT(lang);
+const question = t(`themes.${themeId}.question`);
+const tagline = t(`themes.${themeId}.tagline`);
+// Three themes use the question as their tagline; printing it twice reads
+// like a rendering bug, so the second line only appears when it differs.
+const showTagline = tagline.trim() !== question.trim();
+const meta = [
+  t('themes.voicesCount', '{count} voices').replace('{count}', String(voiceCount)),
+  `${councilCount} ${t('themes.councils')}`,
+].join(' \u00b7 ');
 ---
-<a href={publicUrl(lang, `/themes/${themeId}`)} class="pub-theme-tile">
-  <h2 class="pub-theme-tile__name">{t(`themes.${themeId}.name`)}</h2>
-  <p class="pub-theme-tile__question">{t(`themes.${themeId}.tagline`)}</p>
-  <p class="pub-theme-tile__count">{councilCount} {t('themes.councils')}</p>
+<a href={publicUrl(lang, `/themes/${themeId}`)} class="tq-card" data-theme={themeId}>
+  <span class="tq-card__label">{t(`themes.${themeId}.name`)}</span>
+  <h2 class="tq-card__q">{question}</h2>
+  {showTagline && <p class="tq-card__tag">{tagline}</p>}
+  <p class="tq-card__meta">{meta}</p>
 </a>
+
+<style is:global>
+  .tq-card {
+    --tq-ink: var(--gold-primary);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    min-height: 44px;
+    padding: 1.15rem 1.25rem 1.1rem;
+    border: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-12), transparent);
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--bg-card) var(--a-50), transparent);
+    text-decoration: none;
+    transition: border-color var(--transition-fast), background var(--transition-fast);
+  }
+  .tq-card::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 2px;
+    background: var(--tq-ink);
+    opacity: 0.55;
+    border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+  }
+  .tq-card:hover,
+  .tq-card:focus-visible {
+    border-color: color-mix(in srgb, var(--gold-primary) var(--a-40), transparent);
+    background: color-mix(in srgb, var(--bg-highlight) var(--a-50), transparent);
+  }
+  .tq-card:hover::before { opacity: 1; }
+
+  .tq-card[data-theme='who-am-i'] { --tq-ink: var(--council-who-am-i, var(--gold-primary)); }
+  .tq-card[data-theme='love-connection'] { --tq-ink: var(--council-love-connection, var(--ink-rose)); }
+  .tq-card[data-theme='meaning-purpose'] { --tq-ink: var(--council-meaning-purpose, var(--ink-sap-green)); }
+  .tq-card[data-theme='mind-creativity'] { --tq-ink: var(--council-mind-creativity, var(--ink-smalt)); }
+  .tq-card[data-theme='moral-life'] { --tq-ink: var(--council-moral-life, var(--ink-verdigris)); }
+  .tq-card[data-theme='freedom-justice'] { --tq-ink: var(--council-freedom-justice, var(--ink-madder)); }
+  .tq-card[data-theme='faith-death-mystery'] { --tq-ink: var(--council-faith-death-mystery, var(--ink-folium)); }
+  .tq-card[data-theme='loss-grief'] { --tq-ink: var(--council-loss-grief, var(--ink-azurite)); }
+
+  .tq-card__label {
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: 0.6875rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+  }
+  .tq-card__q {
+    margin: 0;
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-weight: var(--weight-bold);
+    font-size: var(--text-lg);
+    line-height: var(--leading-tight);
+    color: var(--gold-subtle);
+  }
+  .tq-card:hover .tq-card__q { color: var(--gold-hover); }
+  .tq-card__tag {
+    margin: 0;
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: var(--text-base);
+    line-height: var(--leading-relaxed);
+    color: var(--text-secondary);
+  }
+  .tq-card__meta {
+    /* Bottom-aligned, so the three questions that carry no second line do not
+       leave a hole where the other cards have one. */
+    margin: auto 0 0;
+    padding-top: 0.25rem;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: var(--text-xs);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+  }
+  .tq-card__sep { color: var(--text-dim); }
+</style>

@@ -1,0 +1,97 @@
+---
+// Theme-page closing CTA, inverted: the primary door is a prefilled question
+// (one tap, the Echo replies first), the debate is second, browsing figures
+// third. Exactly one gold primary lives here, and the theme pages suppress
+// the layout's sticky bar, so the page never doubles the same action.
+
+import type { Lang } from '../i18n';
+import { getT } from '../i18n';
+import { publicUrl } from '../lib/urls';
+import { figureIdToSlug } from '@client/data/public/slugMap';
+import { localizedShortName } from './figureNames';
+
+interface Props {
+  lang: Lang;
+  councilId: string;
+  question: string;
+  figureId: string;
+}
+
+const { lang, councilId, question, figureId } = Astro.props;
+const t = getT(lang);
+const slug = figureIdToSlug[figureId] || figureId;
+const name = localizedShortName(figureId, lang);
+const askHref = `/app?figure=${slug}&q=${councilId}&lang=${lang}`;
+const debateHref = `/app?council=${councilId}&lang=${lang}`;
+---
+<section class="tq-cta">
+  <p class="tq-cta__lead">{t('themes.ctaLead')}</p>
+  <p class="tq-cta__q">{question}</p>
+  <a
+    class="pub-cta__button tq-cta__button"
+    href={askHref}
+    data-agc-cta="start-exploring"
+    data-agc-figure={figureId}
+    data-agc-door="theme_cta"
+  >
+    {t('themes.ctaPrimary', 'Ask {name} this').replace('{name}', name)}
+  </a>
+  <p class="tq-cta__alt">
+    <a
+      class="pub-textlink"
+      href={debateHref}
+      data-agc-cta="start-exploring"
+      data-agc-council={councilId}
+      data-agc-door="theme_cta_debate"
+    >{t('themes.ctaSecondary')}</a>
+    <span class="tq-cta__sep" aria-hidden="true">·</span>
+    <a class="pub-textlink" href={publicUrl(lang, '/figures')}>{t('themes.allFigures')}</a>
+  </p>
+  <p class="tq-cta__trust">{t('cta.trust')}</p>
+  <p class="tq-cta__trust">{t('cta.freeNote')}</p>
+</section>
+
+<style is:global>
+  .tq-cta {
+    margin: 3rem auto 0;
+    padding: 2rem 1.5rem;
+    max-width: 44rem;
+    text-align: center;
+    border: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-18), transparent);
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--bg-card) var(--a-70), transparent);
+  }
+  .tq-cta__lead {
+    margin: 0 auto;
+    max-width: 42ch;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: var(--text-sm);
+    line-height: var(--leading-relaxed);
+    color: var(--text-tertiary);
+  }
+  .tq-cta__q {
+    margin: 1rem auto 1.4rem;
+    max-width: 34ch;
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: var(--text-lg);
+    line-height: var(--leading-normal);
+    color: var(--text-primary);
+  }
+  .tq-cta__button { display: inline-flex; min-height: 48px; }
+  .tq-cta__alt {
+    margin: 1.1rem 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: var(--text-sm);
+  }
+  .tq-cta__sep { color: var(--text-dim); }
+  .tq-cta__trust {
+    margin: 0.75rem 0 0;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: var(--text-xs);
+    color: var(--text-tertiary);
+  }
+</style>

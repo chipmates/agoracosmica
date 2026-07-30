@@ -1,20 +1,68 @@
 ---
-import { getT } from '../i18n';
+// Theme detail hero. The H1 is the QUESTION, not the shelf label: the theme
+// name survives as the eyebrow, in the breadcrumbs and in the URL.
+
 import type { Lang } from '../i18n';
 
 interface Props {
   themeName: string;
-  themeTagline: string;
+  question: string;
+  tagline: string;
+  facts: string;
   lang: Lang;
 }
 
-const { themeName, themeTagline, lang } = Astro.props;
-const t = getT(lang);
+const { themeName, question, tagline, facts } = Astro.props;
 ---
-<header class="pub-theme-hero">
-  <div class="pub-theme-hero__eyebrow">
-    {t('themes.detailEyebrow', 'A life question')}
-  </div>
-  <h1 class="pub-theme-hero__name">{themeName}</h1>
-  <p class="pub-theme-hero__question">{themeTagline}</p>
+<header class="tq-hero">
+  <p class="tq-hero__eyebrow">{themeName}</p>
+  <h1 class="tq-hero__q">{question}</h1>
+  <p class="tq-hero__tag">{tagline}</p>
+  <p class="tq-hero__facts">{facts}</p>
 </header>
+
+<style is:global>
+  .tq-hero {
+    max-width: 46rem;
+    margin: 0 auto 1.5rem;
+    text-align: center;
+  }
+  .tq-hero__eyebrow {
+    margin: 0 0 0.7rem;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: 0.6875rem;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: var(--gold-deep);
+  }
+  .tq-hero__q {
+    margin: 0 auto;
+    max-width: 24ch;
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-weight: var(--weight-bold);
+    font-size: clamp(1.9rem, 1.4rem + 2.4vw, 2.85rem);
+    line-height: 1.15;
+    color: var(--gold-subtle);
+    text-wrap: balance;
+  }
+  .tq-hero__tag {
+    margin: 0.9rem auto 0;
+    max-width: 34ch;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: var(--text-md);
+    line-height: var(--leading-relaxed);
+    color: var(--text-secondary);
+  }
+  .tq-hero__facts {
+    margin: 0.9rem 0 0;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: var(--text-xs);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+  }
+  @media (max-width: 640px) {
+    .tq-hero { text-align: left; }
+    .tq-hero__q, .tq-hero__tag { margin-left: 0; margin-right: 0; max-width: none; }
+  }
+</style>

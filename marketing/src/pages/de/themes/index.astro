@@ -2,7 +2,7 @@
 import Public from '../../../layouts/Public.astro';
 import ThemesCatalogContent from '../../../components/ThemesCatalogContent.astro';
 import { getT } from '../../../i18n';
-import { itemListSchema, breadcrumbSchema } from '../../../lib/schemas';
+import { itemListSchema, breadcrumbSchema, faqSchema } from '../../../lib/schemas';
 import { canonicalUrl, publicUrl, SITE_URL } from '../../../lib/urls';
 import { THEMES } from '@client/data/councilCatalog';
 
@@ -10,10 +10,13 @@ const lang = 'de' as const;
 const t = getT(lang);
 
 const themeItems = THEMES.map(theme => ({
-  name: t(`themes.${theme.id}.name`),
+  // Der Eintrag ist die Frage, passend zu Karte und H1 der Detailseite.
+  name: t(`themes.${theme.id}.question`),
   url: canonicalUrl(publicUrl(lang, `/themes/${theme.id}`)),
   description: t(`themes.${theme.id}.tagline`),
 }));
+
+const indexUrl = canonicalUrl(publicUrl(lang, '/themes'));
 
 const schemas = [
   itemListSchema(themeItems),
@@ -21,13 +24,23 @@ const schemas = [
     { name: t('breadcrumbs.home'), url: `${SITE_URL}/de/` },
     { name: t('breadcrumbs.themes'), url: `${SITE_URL}/de/themes` },
   ]),
+  faqSchema(
+    THEMES.map(theme => ({
+      q: t(`themes.${theme.id}.question`),
+      a: t(`themes.${theme.id}.answer`),
+    })),
+    indexUrl,
+  ),
 ];
 ---
 <Public
-  title={t('themes.pageTitle')}
-  description={t('themes.pageDescription')}
+  title={t('themes.indexTitle')}
+  fullTitle={t('themes.indexTitle')}
+  ogTitle={`${t('themes.indexTitle')} | Agora Cosmica`}
+  description={t('themes.indexDescription')}
   canonicalPath="/themes"
   lang={lang}
+  stickyCta={false}
   schemas={schemas}
 >
   <ThemesCatalogContent lang={lang} />

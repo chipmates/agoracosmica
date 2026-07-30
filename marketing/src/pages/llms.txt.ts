@@ -82,8 +82,8 @@ export const GET: APIRoute = () => {
   lines.push('## Themes');
   for (const th of THEMES) {
     const name = t(`themes.${th.id}.name`);
-    const tagline = t(`themes.${th.id}.tagline`);
-    lines.push(`- [${name}](${SITE_URL}/themes/${th.id}/): ${tagline}`);
+    const question = t(`themes.${th.id}.question`);
+    lines.push(`- [${question}](${SITE_URL}/themes/${th.id}/): ${name}`);
   }
   lines.push('');
 

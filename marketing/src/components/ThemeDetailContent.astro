@@ -1,29 +1,42 @@
 ---
-// Full body for a theme detail page. The voice essay renders faced when the
-// curated voices line up with the essay's middle paragraphs, else as plain
-// prose. CouncilHero embeds the only React island (council preview audio).
+// Full body for a theme detail page, in ten blocks: hero question, the
+// answer-first paragraph, the answers paired one-to-one with the curated
+// voices, the ask-it-yourself doors, the featured debate plus the open rail,
+// attributed quotes, the substance layer, the lattice, and the CTA.
+// CouncilHero embeds the only React island (council preview audio).
 
 import Breadcrumbs from './Breadcrumbs.astro';
 import ThemeHero from './ThemeHero.astro';
 import EchoNote from './EchoNote.astro';
-import FigureCard from './FigureCard.astro';
+import StaticImage from './StaticImage.astro';
 import CouncilHero from './CouncilHero.astro';
-import CollapsibleSection from './CollapsibleSection.astro';
-import PublicCTA from './PublicCTA.astro';
+import QuestionDoors from './QuestionDoors.astro';
+import type { DoorItem } from './QuestionDoors.astro';
+import ThemeCTA from './ThemeCTA.astro';
+import ThemeStyles from './ThemeStyles.astro';
 
 import { getT } from '../i18n';
 import type { Lang } from '../i18n';
 import { publicUrl } from '../lib/urls';
 import {
   type ThemeId,
-  THEMES,
-  councilsByTheme,
+  type CatalogCouncil,
+  BLESSED_BY_THEME,
+  councilCatalog,
+  getThemeCouncilsRanked,
+  COUNCIL_SEQUENCE,
   getLocalizedTitle,
+  getLocalizedQuestion,
   getLocalizedHook,
   getShortDisplayName,
 } from '@client/data/councilCatalog';
 import { themeVoices } from '@client/data/public/themeVoices';
+import { themeSeedCrossRef } from '@client/data/public/themeSeedCrossRef';
 import { getFigureById } from '@client/data/public/figuresCatalog';
+import { figureIdToSlug } from '@client/data/public/slugMap';
+import { localizedShortName } from './figureNames';
+import publicEn from '@client/assets/translations/public-en.json';
+import publicDe from '@client/assets/translations/public-de.json';
 
 interface Props {
   themeId: ThemeId;
@@ -41,57 +54,163 @@ const RELATED_THEMES: Record<string, string[]> = {
   'moral-life': ['freedom-justice', 'meaning-purpose', 'love-connection'],
 };
 
+// Councils that have a ~50s preview clip on R2. Verified with HEAD requests
+// against media.agoracosmica.org on 2026-07-29: these eight are the whole set,
+// so a blessed pick outside it would render a play button over a 404.
+const HAS_PREVIEW = new Set([
+  'alone-in-the-room-full-of-people',
+  'four-freedoms',
+  'laughing-at-the-abyss',
+  'the-calling-that-wont-shut-up',
+  'the-mind-that-wont-be-quiet',
+  'the-problem-of-evil',
+  'the-story-you-keep-telling',
+  'what-does-your-anger-want',
+]);
+
+// The self-directed questions that round who-am-i's own seven up to twelve.
+// Every one is a real council question from another theme, so each stays a
+// working door rather than page furniture.
+const EXTRA_SELF_QUESTIONS = [
+  'the-life-you-think-you-want',
+  'the-calling-that-wont-shut-up',
+  'the-question-behind-every-question',
+  'what-does-your-anger-want',
+  'the-discipline-of-seeing',
+];
+
+// Real runtimes, summed from the shipped level-1 segment manifests. Both
+// languages, because the German reads roughly ten percent longer.
+type Manifest = { segments: { duration?: number }[] };
+const manifestModules = {
+  en: import.meta.glob<{ default: Manifest }>(
+    '../../../client/src/assets/councils/*/level-1/en/manifest-en.json',
+    { eager: true },
+  ),
+  de: import.meta.glob<{ default: Manifest }>(
+    '../../../client/src/assets/councils/*/level-1/de/manifest-de.json',
+    { eager: true },
+  ),
+};
+
+function runtimeMinutes(councilId: string, l: Lang): number | null {
+  const entry = Object.entries(manifestModules[l]).find(([path]) =>
+    path.includes(`/councils/${councilId}/level-1/`),
+  );
+  if (!entry) return null;
+  const total = entry[1].default.segments.reduce((sum, s) => sum + (s.duration ?? 0), 0);
+  return total > 0 ? Math.round(total / 60) : null;
+}
+
+// The attribution always comes from the figure catalog, never from the
+// extracted figureName: the German seed file for one figure carries the string
+// "undefined", and the English one names him differently from every other
+// surface on the site.
+// Quotes are shown verbatim or not at all. The extractor clips at 200 chars,
+// so anything at the cap is a fragment; paraphrase placeholders and quotes
+// carrying a modern translator credit are skipped too, and the two estates
+// whose prose is still in copyright never appear.
+const RIGHTS_EXCLUDED = new Set(['angelou', 'king']);
+function usableQuote(quote: string, figureId: string): boolean {
+  if (RIGHTS_EXCLUDED.has(figureId)) return false;
+  if (quote.length >= 200 || quote.length < 20) return false;
+  if (quote.startsWith('[')) return false;
+  if (quote.trimEnd().endsWith('...') || quote.trimEnd().endsWith('…')) return false;
+  if (/trans\.|©/.test(quote)) return false;
+  return true;
+}
+
 const { themeId, lang } = Astro.props;
 const t = getT(lang);
 
 const themeName = t(`themes.${themeId}.name`);
 const themeTagline = t(`themes.${themeId}.tagline`);
-const themeIntroRaw = t(`themes.${themeId}.intro`);
-const themeIntro =
-  themeIntroRaw && themeIntroRaw !== `themes.${themeId}.intro` ? themeIntroRaw : '';
-
-const councils = [...(councilsByTheme[themeId] ?? [])].sort((a, b) => a.sortOrder - b.sortOrder);
-const heroCouncil = councils[0];
-const otherCouncils = councils.slice(1);
-
-const paragraphs = themeIntro
-  ? themeIntro.split('\n\n').map(p => p.trim()).filter(Boolean)
-  : [];
-const voices = themeVoices[themeId] ?? [];
-const voiceFigures = voices
-  .map(v => getFigureById(v.figureId, lang))
-  .filter((f): f is NonNullable<typeof f> => Boolean(f));
-
 const question = t(`themes.${themeId}.question`);
 const answer = t(`themes.${themeId}.answer`);
-const hasQa =
-  question !== `themes.${themeId}.question` && answer !== `themes.${themeId}.answer`;
 
-const voicesLabel = lang === 'de' ? 'Stimmen zu diesem Thema' : 'Voices in this theme';
-const voicesCaption =
-  lang === 'de'
-    ? 'Öffne einen Namen und entdecke dieses Leben und seine Ideen.'
-    : 'Open any name to explore their life and ideas.';
+const introRaw = t(`themes.${themeId}.intro`);
+const paragraphs =
+  introRaw && introRaw !== `themes.${themeId}.intro`
+    ? introRaw.split('\n\n').map(p => p.trim()).filter(Boolean)
+    : [];
+
+const voices = themeVoices[themeId] ?? [];
+// The essays were written as opener, one paragraph per voice, closer. When
+// that shape holds, each paragraph gets its voice's name and portrait beside
+// it; otherwise the essay falls back to plain prose.
+const paired = paragraphs.length === voices.length + 2;
+const leadPara = paired ? paragraphs[0] : '';
+const codaPara = paired ? paragraphs[paragraphs.length - 1] : '';
+const voiceBlocks = paired
+  ? voices.map((voice, i) => ({
+      voice,
+      paragraph: paragraphs[i + 1],
+      figure: getFigureById(voice.figureId, lang),
+    }))
+  : [];
+
+const ranked = getThemeCouncilsRanked(themeId);
+const blessedId = BLESSED_BY_THEME[themeId];
+const blessed = ranked.find(c => c.id === blessedId);
+// D6: the featured slot is the blessed pick, not the sortOrder accident. It
+// only steps aside when that council has no preview clip yet, in which case
+// the first ranked council that does takes the slot.
+const featured: CatalogCouncil | undefined =
+  blessed && HAS_PREVIEW.has(blessed.id)
+    ? blessed
+    : ranked.find(c => HAS_PREVIEW.has(c.id)) ?? blessed ?? ranked[0];
+const rail = ranked.filter(c => c.id !== featured?.id);
+
+const stationOf = (id: string): number | null => {
+  const i = COUNCIL_SEQUENCE.indexOf(id);
+  return i === -1 ? null : i + 1;
+};
+const typeLabel = (type: CatalogCouncil['type']): string =>
+  type === 'confrontational' ? t('themes.typeArgument') : t('themes.typeReflection');
+
+const featuredMinutes = featured ? runtimeMinutes(featured.id, lang) : null;
+const featuredStation = featured ? stationOf(featured.id) : null;
+
+function doorHref(councilId: string, figureId: string): string {
+  const slug = figureIdToSlug[figureId] || figureId;
+  return `/app?figure=${slug}&q=${councilId}&lang=${lang}`;
+}
+
+const isSelfTheme = themeId === 'who-am-i';
+const askCouncils: CatalogCouncil[] = isSelfTheme
+  ? [
+      ...ranked,
+      ...EXTRA_SELF_QUESTIONS.map(id => councilCatalog.find(c => c.id === id)).filter(
+        (c): c is CatalogCouncil => Boolean(c),
+      ),
+    ]
+  : ranked;
+const askItems: DoorItem[] = askCouncils.map(c => ({
+  councilId: c.id,
+  question: getLocalizedQuestion(c, lang),
+  figureId: c.moderator.id,
+}));
+
+// Dickinson and Woolf punctuate with dashes, and those are theirs, not ours.
+// The house rule still keeps dashes off displayed pages, so a dashed quote is
+// only used when dropping it would leave the block too thin to run.
+const quotePool = (themeSeedCrossRef[themeId]?.[lang] ?? []).filter(m =>
+  usableQuote(m.quote, m.figureId),
+);
+const dashless = quotePool.filter(m => !/[—–]/.test(m.quote));
+const quotes = (dashless.length >= 2 ? dashless : quotePool).slice(0, 4);
+
+const bundle = (lang === 'de' ? publicDe : publicEn) as Record<string, any>;
+const substance: { q: string; a: string }[] = bundle.themes?.[themeId]?.substance ?? [];
 
 const relatedThemeIds = (RELATED_THEMES[themeId] ?? []).slice(0, 3);
 
-// Up-link to the wisdom hub (the "up" half of the hub<->theme symbiosis). The
-// DE hub uses a localized slug (von-historischen-persoenlichkeiten-lernen, not
-// a /de/ prefix of the EN slug), so the href is built literally per language.
-const wisdomHubHref =
-  lang === 'de' ? '/de/von-historischen-persoenlichkeiten-lernen/' : '/learn-from-historical-figures/';
-const wisdomHubLabel =
-  lang === 'de'
-    ? 'Von allen 30 Persönlichkeiten der Geschichte lernen'
-    : 'Learn from all 30 figures of history';
-
-function councilTypeLabel(type: 'confrontational' | 'reflective'): string {
-  if (lang === 'de') {
-    return type === 'confrontational' ? 'konfrontativ' : 'reflektiv';
-  }
-  return type;
-}
+const heroFacts = [
+  t('themes.voicesCount', '{count} voices').replace('{count}', String(voices.length)),
+  `${ranked.length} ${t('themes.councils')}`,
+].join(' · ');
 ---
+<ThemeStyles />
 <div class="pub-content pub-theme">
   <Breadcrumbs
     lang={lang}
@@ -101,102 +220,446 @@ function councilTypeLabel(type: 'confrontational' | 'reflective'): string {
     ]}
   />
 
-  <ThemeHero themeName={themeName} themeTagline={themeTagline} lang={lang} />
+  <ThemeHero
+    themeName={themeName}
+    question={question}
+    tagline={themeTagline}
+    facts={heroFacts}
+    lang={lang}
+  />
 
-  <div class="pub-theme-body">
-    {hasQa && (
-      <section class="pub-section">
-        <h2 class="pub-section__title">{question}</h2>
-        <p class="pub-voices__lead">{answer}</p>
-      </section>
-    )}
+  <div class="tq-body">
+    <!-- Block 3: the answer, before anything else, in crawlable HTML. -->
+    <p class="tq-answer">{answer}</p>
 
-    {themeIntro && (
-      <section class="pub-section">
-        <div class="pub-section__text">
-          {paragraphs.map(para => <p>{para}</p>)}
-        </div>
-      </section>
-    )}
-
-    {voiceFigures.length > 0 && (
-      <>
-        <EchoNote variant="theme" lang={lang} />
-        <section class="pub-section">
-          <h2 class="pub-section__title">{voicesLabel}</h2>
-          <p class="pub-section__text">{voicesCaption}</p>
-          <div class="pub-grid pub-grid--3">
-            {voiceFigures.map(figure => <FigureCard figure={figure} lang={lang} headingLevel="h3" />)}
-          </div>
-        </section>
-      </>
-    )}
-
-    <p class="pub-section__text">
-      <a class="pub-textlink" href={wisdomHubHref}>{wisdomHubLabel}</a>
-    </p>
-
-    {heroCouncil && <CouncilHero council={heroCouncil} lang={lang} headingLevel="h3" />}
-
-    {otherCouncils.length > 0 && (
-      <CollapsibleSection
-        title={t('themes.moreDebates', 'More debates in this theme')}
-        count={otherCouncils.length}
-      >
-        <div class="pub-council-list">
-          {otherCouncils.map(council => (
-            <a
-              href="/app"
-              data-agc-cta="start-exploring"
-              data-agc-council={council.id}
-              class="pub-council-row pub-council-row--link"
-              aria-label={`${t('cta.listenDebate', 'Listen to this debate')}: ${getLocalizedTitle(council, lang)}`}
-            >
-              <div class="pub-council-row__head">
-                <span class="pub-council-row__title">
-                  {getLocalizedTitle(council, lang)}
-                </span>
-                <span class="pub-council-row__tag">
-                  {councilTypeLabel(council.type)}
-                </span>
+    <!-- Block 4: the answers, one named voice per paragraph. -->
+    {voiceBlocks.length > 0 ? (
+      <section class="tq-section">
+        <h2 class="tq-h2">{t('themes.answersLabel')}</h2>
+        {leadPara && <p class="tq-lead">{leadPara}</p>}
+        <div class="tq-answers">
+          {voiceBlocks.map(({ voice, paragraph, figure }) => (
+            <article class="tq-voice">
+              <a
+                class="tq-voice__portrait"
+                href={publicUrl(lang, `/figures/${figureIdToSlug[voice.figureId] || voice.figureId}`)}
+                tabindex="-1"
+                aria-hidden="true"
+              >
+                <StaticImage
+                  figureId={voice.figureId}
+                  type="thumbnail"
+                  alt=""
+                  loading="lazy"
+                  width={72}
+                  height={72}
+                  sizes="72px"
+                />
+              </a>
+              <div class="tq-voice__body">
+                <h3 class="tq-voice__head">
+                  <a
+                    class="tq-voice__name"
+                    href={publicUrl(lang, `/figures/${figureIdToSlug[voice.figureId] || voice.figureId}`)}
+                  >{figure?.name ?? getShortDisplayName(voice.figureId)}</a>
+                  <span class="tq-voice__sep" aria-hidden="true">·</span>
+                  <span class="tq-voice__stance">{lang === 'de' ? voice.stanceDe : voice.stance}</span>
+                </h3>
+                <p class="tq-voice__text">{paragraph}</p>
               </div>
-              <p class="pub-council-row__hook">
-                {getLocalizedHook(council, lang)}
-              </p>
-              <p class="pub-council-row__figures">
-                {[council.moderator, ...council.participants]
-                  .map(p => getShortDisplayName(p.id))
-                  .join(' · ')}
-              </p>
-              <span class="pub-council-row__cta">
-                {t('cta.listenDebate', 'Listen to this debate')}
-              </span>
-            </a>
+            </article>
           ))}
         </div>
-      </CollapsibleSection>
+        {codaPara && <p class="tq-coda">{codaPara}</p>}
+      </section>
+    ) : (
+      paragraphs.length > 0 && (
+        <section class="tq-section">
+          <h2 class="tq-h2">{t('themes.answersLabel')}</h2>
+          <div class="tq-prose">{paragraphs.map(p => <p>{p}</p>)}</div>
+        </section>
+      )
+    )}
+
+    <!-- The Echo disclosure sits here on purpose: it comes before the page
+         invites anyone to talk to one, not after. -->
+    <EchoNote variant="theme" lang={lang} />
+
+    <!-- Block 5: ask it yourself. -->
+    {askItems.length > 0 && (
+      <section class="tq-section">
+        <h2 class="tq-h2">{isSelfTheme ? t('themes.askLabelSelf') : t('themes.askLabel')}</h2>
+        <p class="tq-note">{t('themes.askCaption')}</p>
+        <QuestionDoors items={askItems} lang={lang} door="theme_ask" />
+      </section>
+    )}
+
+    <!-- Block 6: hear it argued. -->
+    {featured && (
+      <section class="tq-section">
+        <h2 class="tq-h2">{t('themes.hearLabel')}</h2>
+        <p class="tq-note">{t('themes.hearCaption')}</p>
+        <CouncilHero
+          council={featured}
+          lang={lang}
+          headingLevel="h3"
+          typeLabel={typeLabel(featured.type)}
+          runtimeLabel={featuredMinutes
+            ? t('themes.runtime').replace('{minutes}', String(featuredMinutes))
+            : undefined}
+          stationLabel={featuredStation
+            ? t('themes.station').replace('{n}', String(featuredStation))
+            : undefined}
+          openHref={`/app?council=${featured.id}&lang=${lang}`}
+          openLabel={t('themes.openDebate')}
+          askHref={doorHref(featured.id, featured.moderator.id)}
+          askLabel={t('themes.askThis')}
+          askFigureId={featured.moderator.id}
+        />
+
+        {rail.length > 0 && (
+          <>
+            <h3 class="tq-h3">
+              {t('themes.allDebates').replace('{count}', String(ranked.length))}
+            </h3>
+            <ol class="tq-rail">
+              {rail.map(council => (
+                <li class="tq-rail__item">
+                  <p class="tq-rail__title">{getLocalizedTitle(council, lang)}</p>
+                  <p class="tq-rail__hook">{getLocalizedHook(council, lang)}</p>
+                  <p class="tq-rail__meta">
+                    <span>{[council.moderator, ...council.participants]
+                      .map(p => getShortDisplayName(p.id))
+                      .join(' · ')}</span>
+                  </p>
+                  <p class="tq-rail__doors">
+                    <a
+                      class="pub-textlink"
+                      href={`/app?council=${council.id}&lang=${lang}`}
+                      data-agc-cta="start-exploring"
+                      data-agc-council={council.id}
+                      data-agc-door="theme_debate"
+                    >{t('themes.openDebate')}</a>
+                    <span class="tq-rail__sep" aria-hidden="true">·</span>
+                    <a
+                      class="pub-textlink"
+                      href={doorHref(council.id, council.moderator.id)}
+                      data-agc-cta="start-exploring"
+                      data-agc-figure={council.moderator.id}
+                      data-agc-door="theme_ask_rail"
+                    >{t('themes.askThis')}</a>
+                  </p>
+                </li>
+              ))}
+            </ol>
+          </>
+        )}
+      </section>
+    )}
+
+    <!-- Block 7: in their own words. -->
+    {quotes.length >= 2 && (
+      <section class="tq-section">
+        <h2 class="tq-h2">{t('themes.quotesLabel')}</h2>
+        <p class="tq-note">{t('themes.quotesCaption')}</p>
+        <div class="tq-quotes">
+          {quotes.map(q => (
+            <figure class="tq-quote">
+              <blockquote class="tq-quote__text">{q.quote}</blockquote>
+              <figcaption class="tq-quote__cite">
+                <a
+                  class="tq-quote__name"
+                  href={publicUrl(lang, `/figures/${figureIdToSlug[q.figureId] || q.figureId}`)}
+                >{getFigureById(q.figureId, lang)?.name ?? q.figureName}</a>
+                <span class="tq-quote__sep" aria-hidden="true">·</span>
+                <span class="tq-quote__src">
+                  {t('themes.fromTeaching', 'from {title}').replace('{title}', q.seedTitle)}
+                </span>
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <!-- Block 8: the substance layer. -->
+    {substance.map(block => (
+      <section class="tq-section">
+        <h2 class="tq-h2">{block.q}</h2>
+        <p class="tq-prose-p">{block.a}</p>
+      </section>
+    ))}
+
+    <!-- Block 9: the lattice. -->
+    {voices.length > 0 && (
+      <section class="tq-section">
+        <h2 class="tq-h2">{t('themes.voicesLabel')}</h2>
+        <p class="tq-note">{t('themes.voicesCaption')}</p>
+        <ul class="tq-grid">
+          {voices.map(voice => {
+            const figure = getFigureById(voice.figureId, lang);
+            const slug = figureIdToSlug[voice.figureId] || voice.figureId;
+            // The voice's own debate in this theme when there is one, else
+            // the featured debate, so every card carries a working door.
+            const own = ranked.find(c => c.moderator.id === voice.figureId)
+              ?? ranked.find(c => c.participants.some(p => p.id === voice.figureId))
+              ?? featured;
+            return (
+              <li class="tq-grid__item">
+                <a class="tq-grid__link" href={publicUrl(lang, `/figures/${slug}`)}>
+                  <StaticImage
+                    figureId={voice.figureId}
+                    type="thumbnail"
+                    alt=""
+                    loading="lazy"
+                    width={56}
+                    height={56}
+                    sizes="56px"
+                  />
+                  <span class="tq-grid__name">{figure?.name ?? getShortDisplayName(voice.figureId)}</span>
+                  <span class="tq-grid__stance">{lang === 'de' ? voice.stanceDe : voice.stance}</span>
+                </a>
+                {own && (
+                  <a
+                    class="tq-grid__ask"
+                    href={doorHref(own.id, voice.figureId)}
+                    data-agc-cta="start-exploring"
+                    data-agc-figure={voice.figureId}
+                    data-agc-door="theme_voice_ask"
+                  >{t('themes.askVoice').replace('{name}', localizedShortName(voice.figureId, lang))}</a>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      </section>
     )}
 
     {relatedThemeIds.length > 0 && (
-      <CollapsibleSection title={t('themes.relatedThemes')}>
-        <div class="pub-theme-rel">
+      <section class="tq-section">
+        <h2 class="tq-h2">{t('themes.relatedLabel')}</h2>
+        <ul class="tq-related">
           {relatedThemeIds.map(relId => (
-            <a
-              href={publicUrl(lang, `/themes/${relId}`)}
-              class="pub-theme-rel__link"
-            >
-              {t(`themes.${relId}.name`)}
-            </a>
+            <li>
+              <a class="tq-related__link" href={publicUrl(lang, `/themes/${relId}`)}>
+                {t(`themes.${relId}.question`)}
+              </a>
+            </li>
           ))}
-        </div>
-      </CollapsibleSection>
+        </ul>
+        <p class="tq-note">
+          <a class="pub-textlink" href={publicUrl(lang, '/figures')}>{t('themes.allFigures')}</a>
+        </p>
+      </section>
+    )}
+
+    <!-- Block 10: the CTA, primary door first. -->
+    {featured && (
+      <ThemeCTA
+        lang={lang}
+        councilId={featured.id}
+        question={getLocalizedQuestion(featured, lang)}
+        figureId={featured.moderator.id}
+      />
     )}
   </div>
-
-  <PublicCTA
-    variant="sticky"
-    councilCta={true}
-    councilId={heroCouncil?.id}
-    lang={lang}
-  />
 </div>
+
+<style is:global>
+  .pub-theme { padding-bottom: 2.5rem; }
+  .tq-body { max-width: 42rem; margin: 0 auto; }
+
+
+  /* ── The answers ── */
+  .tq-answers { margin-top: 1.4rem; }
+  .tq-voice { display: flex; gap: 1.1rem; padding: 1.5rem 0; }
+  .tq-voice + .tq-voice {
+    border-top: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-12), transparent);
+  }
+  .tq-voice__portrait { flex: 0 0 auto; display: block; }
+  .tq-voice__portrait img {
+    display: block;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: var(--bg-card);
+    border: 1px solid color-mix(in srgb, var(--gold-primary) var(--a-30), transparent);
+  }
+  .tq-voice__body { min-width: 0; }
+  .tq-voice__head {
+    margin: 0 0 0.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.45rem;
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: var(--text-lg);
+    font-weight: var(--weight-bold);
+    line-height: var(--leading-tight);
+  }
+  .tq-voice__name { color: var(--text-primary); text-decoration: none; }
+  .tq-voice__name:hover { color: var(--gold-primary); }
+  .tq-voice__sep { color: var(--text-dim); }
+  .tq-voice__stance {
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-weight: var(--weight-medium);
+    font-size: var(--text-xs);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold-deep);
+  }
+  .tq-voice__text {
+    margin: 0;
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: var(--text-md);
+    line-height: var(--leading-loose);
+    color: var(--text-secondary);
+  }
+  @media (max-width: 560px) {
+    .tq-voice { flex-direction: column; gap: 0.75rem; }
+    .tq-voice__portrait img { width: 56px; height: 56px; }
+  }
+
+  /* ── The debate rail ── */
+  .tq-rail { list-style: none; margin: 0; padding: 0; }
+  .tq-rail__item {
+    padding: 1.1rem 0;
+    border-top: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-12), transparent);
+  }
+  .tq-rail__title {
+    margin: 0;
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: var(--text-md);
+    font-weight: var(--weight-bold);
+    color: var(--text-primary);
+  }
+  .tq-rail__hook {
+    margin: 0.3rem 0 0;
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: var(--text-base);
+    line-height: var(--leading-relaxed);
+    color: var(--text-secondary);
+  }
+  .tq-rail__meta {
+    margin: 0.45rem 0 0;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
+    color: var(--text-tertiary);
+  }
+  .tq-rail__doors {
+    margin: 0.6rem 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: var(--text-sm);
+  }
+  .tq-rail__doors a { min-height: 44px; display: inline-flex; align-items: center; }
+  .tq-rail__sep { color: var(--text-dim); }
+
+  /* ── Quotes ── */
+  .tq-quotes { display: flex; flex-direction: column; gap: 1.4rem; }
+  .tq-quote { margin: 0; }
+  .tq-quote__text {
+    margin: 0;
+    padding-left: 1rem;
+    border-left: 2px solid color-mix(in srgb, var(--gold-subtle) var(--a-40), transparent);
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: var(--text-md);
+    line-height: var(--leading-relaxed);
+    color: var(--text-primary);
+    font-style: italic;
+  }
+  .tq-quote__cite {
+    margin: 0.5rem 0 0 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: var(--text-xs);
+    color: var(--text-tertiary);
+  }
+  .tq-quote__name { color: var(--gold-deep); text-decoration: none; }
+  .tq-quote__sep { color: var(--text-dim); }
+  .tq-quote__name:hover { color: var(--gold-primary); }
+
+  /* ── Lattice ── */
+  .tq-grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 0.75rem;
+  }
+  .tq-grid__item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 0.9rem;
+    border: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-12), transparent);
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--bg-card) var(--a-45), transparent);
+  }
+  .tq-grid__link {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    text-decoration: none;
+  }
+  .tq-grid__link img {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: var(--bg-card);
+    border: 1px solid color-mix(in srgb, var(--gold-primary) var(--a-25), transparent);
+  }
+  .tq-grid__name {
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: var(--text-base);
+    color: var(--text-primary);
+  }
+  .tq-grid__link:hover .tq-grid__name { color: var(--gold-primary); }
+  .tq-grid__stance {
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: var(--text-xs);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold-deep);
+  }
+  .tq-grid__ask {
+    margin-top: auto;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: var(--text-sm);
+    color: var(--gold-primary);
+    text-decoration: none;
+    border-bottom: 1px solid color-mix(in srgb, var(--gold-primary) var(--a-30), transparent);
+    align-self: flex-start;
+  }
+  .tq-grid__ask:hover { color: var(--gold-hover); }
+
+  .tq-related { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+  .tq-related__link {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0.5rem 0.85rem;
+    border: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-12), transparent);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: var(--text-base);
+    color: var(--text-primary);
+    text-decoration: none;
+  }
+  .tq-related__link:hover {
+    color: var(--gold-primary);
+    border-color: color-mix(in srgb, var(--gold-primary) var(--a-40), transparent);
+  }
+</style>

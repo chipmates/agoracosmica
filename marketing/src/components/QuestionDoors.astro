@@ -1,0 +1,120 @@
+---
+// A list of council questions, each a working door into the app. The `q=`
+// param names a council id; the app resolves it through the bundled catalog
+// and stages that council's own localized question in the composer. No free
+// text ever rides the URL. `figure` is the council's moderator, so the person
+// who answers is the person the card promises.
+
+import StaticImage from './StaticImage.astro';
+import type { Lang } from '../i18n';
+import { getT } from '../i18n';
+import { figureIdToSlug } from '@client/data/public/slugMap';
+import { localizedShortName } from './figureNames';
+
+export interface DoorItem {
+  councilId: string;
+  question: string;
+  figureId: string;
+}
+
+interface Props {
+  items: DoorItem[];
+  lang: Lang;
+  /** Fixed funnel-position vocabulary, matched by agc-public.js. */
+  door: string;
+}
+
+const { items, lang, door } = Astro.props;
+const t = getT(lang);
+const askDoor = t('themes.askDoor', 'Ask {name}');
+
+function href(item: DoorItem): string {
+  const slug = figureIdToSlug[item.figureId] || item.figureId;
+  return `/app?figure=${slug}&q=${item.councilId}&lang=${lang}`;
+}
+---
+<ul class="tq-doors">
+  {items.map(item => (
+    <li class="tq-doors__item">
+      <a
+        class="tq-door"
+        href={href(item)}
+        data-agc-cta="start-exploring"
+        data-agc-figure={item.figureId}
+        data-agc-door={door}
+      >
+        <span class="tq-door__thumb">
+          <StaticImage
+            figureId={item.figureId}
+            type="thumbnail"
+            alt=""
+            loading="lazy"
+            width={48}
+            height={48}
+            sizes="48px"
+          />
+        </span>
+        <span class="tq-door__body">
+          <span class="tq-door__q">{item.question}</span>
+          <span class="tq-door__who">
+            {askDoor.replace('{name}', localizedShortName(item.figureId, lang))}
+          </span>
+        </span>
+      </a>
+    </li>
+  ))}
+</ul>
+
+<style is:global>
+  .tq-doors {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .tq-door {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    min-height: 56px;
+    padding: 0.6rem 0.85rem;
+    border: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-12), transparent);
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--bg-card) var(--a-60), transparent);
+    text-decoration: none;
+    transition: border-color var(--transition-fast), background var(--transition-fast);
+  }
+  .tq-door:hover,
+  .tq-door:focus-visible {
+    border-color: color-mix(in srgb, var(--gold-primary) var(--a-45), transparent);
+    background: color-mix(in srgb, var(--bg-highlight) var(--a-60), transparent);
+  }
+  .tq-door__thumb { flex: 0 0 auto; display: block; }
+  .tq-door__thumb img {
+    display: block;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: var(--bg-card);
+    border: 1px solid color-mix(in srgb, var(--gold-primary) var(--a-25), transparent);
+  }
+  .tq-door__body { display: flex; flex-direction: column; gap: 0.2rem; min-width: 0; }
+  .tq-door__q {
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: var(--text-base);
+    line-height: var(--leading-normal);
+    color: var(--text-primary);
+  }
+  .tq-door__who {
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: var(--text-xs);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold-deep);
+  }
+  .tq-door:hover .tq-door__who,
+  .tq-door:focus-visible .tq-door__who { color: var(--gold-primary); }
+</style>

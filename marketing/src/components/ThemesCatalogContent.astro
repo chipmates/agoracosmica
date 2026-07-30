@@ -1,10 +1,29 @@
 ---
+// The themes index: eight life questions as type, then every one of the 55
+// council questions as a working door, grouped under the question it belongs
+// to. No per-theme art anywhere, only hairline ink accents.
+
 import Breadcrumbs from './Breadcrumbs.astro';
 import ThemeCard from './ThemeCard.astro';
-import PublicCTA from './PublicCTA.astro';
+import ThemeCTA from './ThemeCTA.astro';
+import QuestionDoors from './QuestionDoors.astro';
+import type { DoorItem } from './QuestionDoors.astro';
+import QuestionOfTheDay from '../islands/QuestionOfTheDay';
+import ThemeStyles from './ThemeStyles.astro';
 import { getT } from '../i18n';
 import type { Lang } from '../i18n';
-import { THEMES, councilsByTheme } from '@client/data/councilCatalog';
+import { publicUrl } from '../lib/urls';
+import {
+  THEMES,
+  councilCatalog,
+  councilsByTheme,
+  getThemeCouncilsRanked,
+  getLocalizedQuestion,
+  COUNCIL_SEQUENCE,
+} from '@client/data/councilCatalog';
+import { themeVoices } from '@client/data/public/themeVoices';
+import { figureIdToSlug } from '@client/data/public/slugMap';
+import { localizedShortName } from './figureNames';
 
 interface Props {
   lang: Lang;
@@ -12,51 +31,199 @@ interface Props {
 
 const { lang } = Astro.props;
 const t = getT(lang);
+
+// The answer-first paragraph names all eight questions by reading them
+// straight out of the theme strings, so both languages stay in step.
+const eightQuestions = THEMES.map(theme => t(`themes.${theme.id}.question`));
+const indexAnswer = [
+  t('themes.indexAnswerLead'),
+  ...eightQuestions,
+  t('themes.indexAnswerClose'),
+].join(' ');
+
+const groups = THEMES.map(theme => ({
+  theme,
+  question: t(`themes.${theme.id}.question`),
+  items: getThemeCouncilsRanked(theme.id).map<DoorItem>(c => ({
+    councilId: c.id,
+    question: getLocalizedQuestion(c, lang),
+    figureId: c.moderator.id,
+  })),
+}));
+const totalQuestions = groups.reduce((n, g) => n + g.items.length, 0);
+
+// Build-day pick, so the panel is a real question before JS runs. The island
+// re-picks against the visitor's own day once it hydrates.
+const flat = groups.flatMap(g => g.items);
+const buildDay = Math.floor(Date.now() / 86_400_000);
+const seed = flat[buildDay % flat.length];
+const seedSlug = figureIdToSlug[seed.figureId] || seed.figureId;
+const qotdInitial = {
+  question: seed.question,
+  who: t('themes.askDoor', 'Ask {name}').replace('{name}', localizedShortName(seed.figureId, lang)),
+  href: `/app?figure=${seedSlug}&q=${seed.councilId}&lang=${lang}`,
+  figureId: seed.figureId,
+};
+
+// The programme's own opening station carries the page CTA.
+const opener = councilCatalog.find(c => c.id === COUNCIL_SEQUENCE[0]) ?? councilCatalog[0];
 ---
-<div class="pub-content">
+<ThemeStyles />
+<div class="pub-content tq-index">
   <Breadcrumbs lang={lang} items={[{ label: t('breadcrumbs.themes') }]} />
 
-  <h1 class="pub-hero__title">{t('themes.pageTitle')}</h1>
-  <p class="pub-section__text">
-    {t('themes.pageDescription')}
-  </p>
-  <p class="pub-section__text pub-themes-ai">
-    {lang === 'de'
-      ? 'Jede Stimme in diesen Councils ist ein KI-Echo. Deutungen, keine Aufnahmen.'
-      : 'Every voice in these councils is an AI Echo. Interpretations, not recordings.'}
-  </p>
-  <p class="pub-section__text pub-catalog-lead">
-    {lang === 'de'
-      ? 'Öffne ein Thema und entdecke seine Frage und seine Stimmen.'
-      : 'Open any theme to explore its question and voices.'}
-  </p>
+  <header class="tq-index__head">
+    <h1 class="tq-index__title">{t('themes.indexTitle')}</h1>
+    <p class="tq-answer">{indexAnswer}</p>
+    <p class="tq-index__ai">
+      {lang === 'de'
+        ? 'Jede Stimme in diesen Councils ist ein KI-Echo. Deutungen, keine Aufnahmen.'
+        : 'Every voice in these councils is an AI Echo. Interpretations, not recordings.'}
+    </p>
+  </header>
 
-  <div class="pub-grid pub-grid--2">
-    {THEMES.map(theme => (
-      <ThemeCard
-        themeId={theme.id}
-        councilCount={councilsByTheme[theme.id]?.length || 0}
-        lang={lang}
-      />
-    ))}
-  </div>
-  <p class="pub-section__text">
-    <a
-      class="pub-textlink"
-      href={lang === 'de' ? '/de/von-historischen-persoenlichkeiten-lernen/' : '/learn-from-historical-figures/'}
-    >
-      {lang === 'de' ? 'Weisheit nach Frage erkunden' : 'Explore wisdom by question'}
-    </a>
-  </p>
-  <PublicCTA variant="inline" lang={lang} />
+  <section class="tq-section tq-cards-section">
+    <p class="tq-note">{t('themes.indexOpenLine')}</p>
+    <div class="tq-cards">
+      {THEMES.map(theme => (
+        <ThemeCard
+          themeId={theme.id}
+          councilCount={councilsByTheme[theme.id]?.length || 0}
+          voiceCount={(themeVoices[theme.id] ?? []).length}
+          lang={lang}
+        />
+      ))}
+    </div>
+  </section>
+
+  <section class="tq-section">
+    <h2 class="tq-h2">
+      {t('themes.questionsLabel').replace('55', String(totalQuestions))}
+    </h2>
+    <p class="tq-note">{t('themes.questionsCaption')}</p>
+
+    <QuestionOfTheDay
+      client:idle
+      initial={qotdInitial}
+      label={t('themes.qotdLabel')}
+      caption={t('themes.qotdCaption')}
+      poolSelector=".tq-pool .tq-door"
+    />
+
+    <div class="tq-pool">
+      {groups.map(group => (
+        <div class="tq-pool__group">
+          <h3 class="tq-pool__head">
+            <a class="tq-pool__link" href={publicUrl(lang, `/themes/${group.theme.id}`)}>
+              {group.question}
+            </a>
+          </h3>
+          <QuestionDoors items={group.items} lang={lang} door="themes_question" />
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="tq-section">
+    <p class="tq-note">
+      <a class="pub-textlink" href={publicUrl(lang, '/figures')}>{t('themes.allFigures')}</a>
+    </p>
+  </section>
+
+  <ThemeCTA
+    lang={lang}
+    councilId={opener.id}
+    question={getLocalizedQuestion(opener, lang)}
+    figureId={opener.moderator.id}
+  />
 </div>
 
-<style>
-  .pub-catalog-lead { margin-bottom: 2rem; }
-
-  /* AI disclosure line near the lede: muted, static, always visible */
-  .pub-themes-ai {
+<style is:global>
+  .tq-index { padding-bottom: 2.5rem; }
+  .tq-index__head { max-width: 42rem; margin: 0 auto 2.5rem; }
+  .tq-index__title {
+    margin: 0 0 1.25rem;
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-weight: var(--weight-bold);
+    font-size: clamp(1.9rem, 1.4rem + 2.2vw, 2.6rem);
+    line-height: 1.15;
+    color: var(--gold-subtle);
+    text-wrap: balance;
+  }
+  .tq-index__ai {
+    margin: 1rem 0 0;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
     font-size: var(--text-sm);
+    color: var(--text-tertiary);
+  }
+  .tq-index .tq-section { max-width: 42rem; margin: 0 auto 2.75rem; }
+  /* The catalog block breathes wider than the reading column. */
+  .tq-index .tq-section.tq-cards-section { max-width: 54rem; }
+
+  .tq-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .tq-pool { display: flex; flex-direction: column; gap: 1.75rem; }
+  .tq-pool__group { display: flex; flex-direction: column; gap: 0.6rem; }
+  .tq-pool__head { margin: 0; }
+  .tq-pool__link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-weight: var(--weight-bold);
+    font-size: var(--text-md);
+    color: var(--gold-subtle);
+    text-decoration: none;
+    border-bottom: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent);
+  }
+  .tq-pool__link:hover { color: var(--gold-hover); }
+
+  /* Question of the day */
+  .tq-qotd {
+    margin: 0 0 2rem;
+    padding: 1.25rem 1.4rem;
+    border: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-20), transparent);
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--bg-card) var(--a-60), transparent);
+  }
+  .tq-qotd__label {
+    margin: 0 0 0.55rem;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: 0.6875rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--gold-deep);
+  }
+  .tq-qotd__q {
+    margin: 0;
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: var(--text-lg);
+    line-height: var(--leading-normal);
+    color: var(--text-primary);
+  }
+  .tq-qotd__door {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    margin-top: 0.6rem;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: var(--text-sm);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold-primary);
+    text-decoration: none;
+    border-bottom: 1px solid color-mix(in srgb, var(--gold-primary) var(--a-35), transparent);
+    align-self: flex-start;
+  }
+  .tq-qotd__door:hover { color: var(--gold-hover); }
+  .tq-qotd__caption {
+    margin: 0.75rem 0 0;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: var(--text-xs);
     color: var(--text-tertiary);
   }
 </style>

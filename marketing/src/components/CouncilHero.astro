@@ -22,11 +22,34 @@ interface Props {
   /** Heading level for the council title. Theme pages keep the default h2;
    *  the homepage council section has its own h2 above and passes h3. */
   headingLevel?: 'h2' | 'h3';
+  /** Context strip, all optional so the homepage rendering is unchanged. */
+  typeLabel?: string;
+  runtimeLabel?: string;
+  stationLabel?: string;
+  /** Doors under the preview: open the debate, or ask the question yourself. */
+  openHref?: string;
+  openLabel?: string;
+  askHref?: string;
+  askLabel?: string;
+  askFigureId?: string;
 }
 
-const { council, lang, headingLevel = 'h2' } = Astro.props;
+const {
+  council,
+  lang,
+  headingLevel = 'h2',
+  typeLabel,
+  runtimeLabel,
+  stationLabel,
+  openHref,
+  openLabel,
+  askHref,
+  askLabel,
+  askFigureId,
+} = Astro.props;
 const TitleHeading = headingLevel;
 const t = getT(lang);
+const meta = [typeLabel, runtimeLabel, stationLabel].filter(Boolean) as string[];
 
 const title = getLocalizedTitle(council, lang);
 // No-JS fallback: a plain link to the raw preview mp3, same URL the island's
@@ -56,6 +79,17 @@ const cast = [council.moderator, ...council.participants];
   </p>
 
   {tagline && <p class="pub-council-hero__tagline">{tagline}</p>}
+
+  {meta.length > 0 && (
+    <p class="pub-council-hero__meta">
+      {meta.map((entry, i) => (
+        <>
+          {i > 0 && <span class="pub-council-hero__meta-sep" aria-hidden="true">·</span>}
+          <span>{entry}</span>
+        </>
+      ))}
+    </p>
+  )}
 
   <div class="pub-council-hero__cast" role="list">
     {cast.map((figure, idx) => (
@@ -99,6 +133,30 @@ const cast = [council.moderator, ...council.participants];
     </noscript>
   </div>
 
+  {(openHref || askHref) && (
+    <p class="pub-council-hero__doors">
+      {openHref && (
+        <a
+          class="pub-textlink"
+          href={openHref}
+          data-agc-cta="start-exploring"
+          data-agc-council={council.id}
+          data-agc-door="theme_debate"
+        >{openLabel}</a>
+      )}
+      {openHref && askHref && <span class="pub-council-hero__meta-sep" aria-hidden="true">·</span>}
+      {askHref && (
+        <a
+          class="pub-textlink"
+          href={askHref}
+          data-agc-cta="start-exploring"
+          data-agc-figure={askFigureId}
+          data-agc-door="theme_ask_featured"
+        >{askLabel}</a>
+      )}
+    </p>
+  )}
+
   <!-- Same wording as the Library panels' council disclosure, kept verbatim -->
   <p class="pub-council-hero__ai">
     {lang === 'de'
@@ -112,15 +170,44 @@ const cast = [council.moderator, ...council.participants];
      instead of an inline style attribute, so the strict production CSP (whose
      Astro meta hashes nullify style 'unsafe-inline') cannot block it. Bundled
      to an external stylesheet, served from 'self'. Applies wherever CouncilHero
-     renders (homepage + theme pages). */
-  .pub-council-hero[data-theme='who-am-i'] .pub-council-hero__question-bar { background: var(--council-who-am-i); }
-  .pub-council-hero[data-theme='love-connection'] .pub-council-hero__question-bar { background: var(--council-love-connection); }
-  .pub-council-hero[data-theme='meaning-purpose'] .pub-council-hero__question-bar { background: var(--council-meaning-purpose); }
-  .pub-council-hero[data-theme='mind-creativity'] .pub-council-hero__question-bar { background: var(--council-mind-creativity); }
-  .pub-council-hero[data-theme='moral-life'] .pub-council-hero__question-bar { background: var(--council-moral-life); }
-  .pub-council-hero[data-theme='freedom-justice'] .pub-council-hero__question-bar { background: var(--council-freedom-justice); }
-  .pub-council-hero[data-theme='faith-death-mystery'] .pub-council-hero__question-bar { background: var(--council-faith-death-mystery); }
-  .pub-council-hero[data-theme='loss-grief'] .pub-council-hero__question-bar { background: var(--council-loss-grief); }
+     renders (homepage + theme pages). The --council-* layer only exists in the
+     night reskin, so each rule falls back to the ink token it maps to; without
+     the fallback the bar renders invisible on the pages still on public-*.css. */
+  .pub-council-hero[data-theme='who-am-i'] .pub-council-hero__question-bar { background: var(--council-who-am-i, var(--gold-primary)); }
+  .pub-council-hero[data-theme='love-connection'] .pub-council-hero__question-bar { background: var(--council-love-connection, var(--ink-rose)); }
+  .pub-council-hero[data-theme='meaning-purpose'] .pub-council-hero__question-bar { background: var(--council-meaning-purpose, var(--ink-sap-green)); }
+  .pub-council-hero[data-theme='mind-creativity'] .pub-council-hero__question-bar { background: var(--council-mind-creativity, var(--ink-smalt)); }
+  .pub-council-hero[data-theme='moral-life'] .pub-council-hero__question-bar { background: var(--council-moral-life, var(--ink-verdigris)); }
+  .pub-council-hero[data-theme='freedom-justice'] .pub-council-hero__question-bar { background: var(--council-freedom-justice, var(--ink-madder)); }
+  .pub-council-hero[data-theme='faith-death-mystery'] .pub-council-hero__question-bar { background: var(--council-faith-death-mystery, var(--ink-folium)); }
+  .pub-council-hero[data-theme='loss-grief'] .pub-council-hero__question-bar { background: var(--council-loss-grief, var(--ink-azurite)); }
+
+  /* Context strip + doors, rendered only when the caller passes them. */
+  .pub-council-hero__meta {
+    margin: var(--space-sm) 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: var(--text-xs);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+  }
+  .pub-council-hero__meta-sep { color: var(--text-dim); }
+  @media (max-width: 560px) {
+    .pub-council-hero__meta { flex-direction: column; gap: 0.2rem; }
+    .pub-council-hero__meta .pub-council-hero__meta-sep { display: none; }
+  }
+  .pub-council-hero__doors {
+    margin: var(--space-md) 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: var(--text-sm);
+  }
 
   /* AI disclosure line under the preview actions: muted, static, never hidden */
   .pub-council-hero__ai {
