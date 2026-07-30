@@ -35,7 +35,8 @@ export type ConstellationName =
   | "E Pur Si Muove"
   | "Candle of Enlightenment"
   | "The Caged Bird Freedom"
-  | "Ensō Circle";
+  | "Ensō Circle"
+  | "The Divine Spark";
 
 /**
  * Translation key type
@@ -79,7 +80,8 @@ const CONSTELLATION_NAME_TO_KEY: ConstellationNameMap = {
   "E Pur Si Muove": "constellations.names.ePurSiMuove",
   "Candle of Enlightenment": "constellations.names.candleOfEnlightenment",
   "The Caged Bird Freedom": "constellations.names.theCagedBirdFreedom",
-  "Ensō Circle": "constellations.names.ensoCircle"
+  "Ensō Circle": "constellations.names.ensoCircle",
+  "The Divine Spark": "constellations.names.theDivineSpark"
 };
 
 /**

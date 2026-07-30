@@ -29,7 +29,8 @@
       "ePurSiMuove": "E Pur Si Muove",
       "candleOfEnlightenment": "Candle of Enlightenment",
       "theCagedBirdFreedom": "The Caged Bird Freedom",
-      "ensoCircle": "Ensō Circle"
+      "ensoCircle": "Ensō Circle",
+      "theDivineSpark": "The Divine Spark"
     },
     "descriptions": {
       "theDivineVision": "A symbolic eye with radiating rays, representing Blake's visionary perception that saw the infinite in the mundane and the divine imagination that reveals eternity.",
@@ -60,7 +61,13 @@
       "ePurSiMuove": "A circular orbit layout of Jupiter and four moons, wrapped by a sweeping arc signifying Galileo's insistence that the Earth moves, 'E pur si muove'.",
       "candleOfEnlightenment": "A tall candle silhouette with a glowing flame, symbolizing Goethe's era and intellectual light.",
       "theCagedBirdFreedom": "A symbol of resilience, hope, and the triumphant rise of the spirit, inspired by Maya Angelou's timeless call for freedom and the power of voice to overcome adversity.",
-      "ensoCircle": "An incomplete circle (ensō) with a deliberate gap, symbolizing Zen practice."
+      "ensoCircle": "An incomplete circle (ensō) with a deliberate gap, symbolizing Zen practice.",
+      "theDivineSpark": "A vertical 'ladder of being' leading from the soul's emptiness up into the Godhead, representing progressive detachment."
+    },
+    "descriptionsPortrait": {
+      "theEternalDao": "A gentle wave flowing from top to bottom, expressing a calm, unforced path reflective of the Dao's natural course.",
+      "theFreedHorizon": "The horizon stood on end, its rising sun at the middle, marking the dawn of freedom and the end of oppression.",
+      "theTwoFridas": "Two hearts, one above the other, reflecting Frida's exploration of duality in love, heritage, and self. This shape outlines two connected hearts, symbolizing the internal dialogue between her two identities."
     },
     "symbolizes": "Symbolizes"
   }

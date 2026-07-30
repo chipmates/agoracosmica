@@ -29,7 +29,8 @@
       "ePurSiMuove": "E Pur Si Muove",
       "candleOfEnlightenment": "Kerze der Erleuchtung",
       "theCagedBirdFreedom": "Die Freiheit des Käfigvogels",
-      "ensoCircle": "Ensō-Kreis"
+      "ensoCircle": "Ensō-Kreis",
+      "theDivineSpark": "Der Göttliche Funke"
     },
     "descriptions": {
       "theDivineVision": "Ein symbolisches Auge mit ausstrahlenden Strahlen, das Blakes visionäre Wahrnehmung darstellt, die das Unendliche im Alltäglichen sah, und die göttliche Vorstellungskraft, die die Ewigkeit offenbart.",
@@ -60,7 +61,13 @@
       "ePurSiMuove": "Ein kreisförmiges Umlaufbahnlayout des Jupiters und vier Monde, umgeben von einem schwungvollen Bogen, der Galileos Beharren darauf signalisiert, dass sich die Erde bewegt, 'E pur si muove'.",
       "candleOfEnlightenment": "Eine hohe Kerzensilhouette mit einer glühenden Flamme, die Goethes Ära und intellektuelles Licht symbolisiert.",
       "theCagedBirdFreedom": "Ein Symbol für Resilienz, Hoffnung und den triumphalen Aufstieg des Geistes, inspiriert von Maya Angelous zeitlosem Ruf nach Freiheit und der Kraft der Stimme, Widrigkeiten zu überwinden.",
-      "ensoCircle": "Ein unvollständiger Kreis (Ensō) mit einer absichtlichen Lücke, der die Zen-Praxis symbolisiert."
+      "ensoCircle": "Ein unvollständiger Kreis (Ensō) mit einer absichtlichen Lücke, der die Zen-Praxis symbolisiert.",
+      "theDivineSpark": "Eine senkrechte Leiter des Seins, die aus der Leere der Seele hinauf in die Gottheit führt und die wachsende Abgeschiedenheit darstellt."
+    },
+    "descriptionsPortrait": {
+      "theEternalDao": "Eine sanfte Welle, die von oben nach unten fließt und einen ruhigen, ungezwungenen Pfad ausdrückt, der den natürlichen Verlauf des Dao widerspiegelt.",
+      "theFreedHorizon": "Die Horizontlinie hochkant gestellt, mit der aufgehenden Sonne in ihrer Mitte, die den Anbruch der Freiheit und das Ende der Unterdrückung markiert.",
+      "theTwoFridas": "Zwei Herzen übereinander, die Fridas Erforschung der Dualität in Liebe, Erbe und Selbst widerspiegeln. Diese Form umreißt zwei verbundene Herzen, die den inneren Dialog zwischen ihren beiden Identitäten symbolisieren."
     },
     "symbolizes": "Symbolisiert"
   }
