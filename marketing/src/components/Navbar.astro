@@ -24,7 +24,7 @@ const navLinks = [
   { to: publicUrl(lang, '/figures'), label: t('nav.figures') },
   { to: publicUrl(lang, '/themes'), label: t('nav.themes') },
   { to: publicUrl(lang, '/about'), label: t('nav.about') },
-  { to: publicUrl(lang, '/contact'), label: t('nav.contact') },
+  { to: publicUrl(lang, lang === 'de' ? '/about#kontakt' : '/about#contact'), label: t('nav.contact') },
 ];
 
 const isActive = (path: string) => currentPath === path || currentPath === path.replace(/\/$/, '');

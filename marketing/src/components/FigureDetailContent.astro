@@ -102,8 +102,8 @@ const PHILO_FIGURES = new Set([
 ]);
 const isPhiloFigure = PHILO_FIGURES.has(figureId);
 const hubHref = de
-  ? (isPhiloFigure ? '/de/philosophie-lernen/' : '/de/von-historischen-persoenlichkeiten-lernen/')
-  : (isPhiloFigure ? '/ai-philosophy-tutor/' : '/learn-from-historical-figures/');
+  ? (isPhiloFigure ? '/de/philosophie-lernen/' : '/de/figures/')
+  : (isPhiloFigure ? '/ai-philosophy-tutor/' : '/figures/');
 const hubLinkLabel = isPhiloFigure
   ? (de ? 'Philosophie lernen mit einem KI-Tutor' : 'Learn philosophy with an AI tutor')
   : (de ? 'Von historischen Persönlichkeiten lernen' : 'Learn from historical figures');
