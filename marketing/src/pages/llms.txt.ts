@@ -4,6 +4,7 @@ import { figureIdToSlug } from '@client/data/public/slugMap';
 import { THEMES } from '@client/data/councilCatalog';
 import { getT } from '../i18n';
 import { SITE_URL } from '../lib/urls';
+import { citationBlock, figureYears } from '../lib/llmsData';
 
 // Generated /llms.txt: a small machine-readable map for AI agents (Perplexity
 // and Claude confirmed use it; Google does not). Built from the same catalog
@@ -67,11 +68,17 @@ export const GET: APIRoute = () => {
   );
   lines.push('');
 
+  lines.push(...citationBlock('en', `${SITE_URL}/`));
+
   lines.push('## Figures');
   for (const f of figures) {
     const slug = figureIdToSlug[f.id];
     if (!slug) continue;
-    lines.push(`- [${f.name}](${SITE_URL}/figures/${slug}/): ${firstSentence(f.about)}`);
+    // Verified years sit next to the name: they are the token that binds this
+    // text to the right person. Omitted where the record is not solid.
+    const years = figureYears(slug, 'en');
+    const dated = years ? ` (${years})` : '';
+    lines.push(`- [${f.name}](${SITE_URL}/figures/${slug}/)${dated}: ${firstSentence(f.about)}`);
     const ctx = context(f.tradition, f.period);
     if (ctx) lines.push(`  - ${ctx}`);
     const teach = teachings(f.keyConcepts);
@@ -95,8 +102,8 @@ export const GET: APIRoute = () => {
   lines.push(`- [Why we call them Echoes](${SITE_URL}/echoes/)`);
   lines.push(`- [Methodology: how we build the Echoes](${SITE_URL}/methodology/): how each AI Echo is built from primary works, sourced, and fact-checked, with a public factcheck per figure and open-source code.`);
   lines.push(`- [Open source philosophy app](${SITE_URL}/open-source-philosophy-app/): an open source, nonprofit alternative to AI character apps, for philosophy and history.`);
-  lines.push(`- [AI philosophy tutor](${SITE_URL}/ai-philosophy-tutor/): learn philosophy in conversation with the AI Echoes of history's philosophers, nonprofit and open source, 30 free messages a day.`);
-  lines.push(`- [Learn from historical figures](${SITE_URL}/learn-from-historical-figures/): a guide to learning timeless wisdom from 30 figures of history, no tracking cookies, 30 free messages a day.`);
+  lines.push(`- [Where should I start with philosophy?](${SITE_URL}/ai-philosophy-tutor/): one recommendation and six other ways in, each carrying a first question into the app.`);
+  lines.push(`- [Full text index (llms-full.txt)](${SITE_URL}/llms-full.txt): every figure's full description and all question-and-answer pairs, plus the eight themes.`);
   lines.push('- [Source code (GitHub)](https://github.com/chipmates/agoracosmica)');
   lines.push('');
 

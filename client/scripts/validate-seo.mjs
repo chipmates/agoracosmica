@@ -145,9 +145,10 @@ for (const f of files) {
   //      AI nature in crawlable body text ("AI Echo" / "AI-generated" and the
   //      DE equivalents, incl. the "KI-erzeugt" variant used in the notice
   //      copy). Theme pages carry it via EchoNote, hubs via their L2 lines.
+  // The wisdom hub (EN + DE) was consolidated into /figures/ in 2026-07 and
+  // 301s there, so it is no longer a built page.
   const HUB_PAGES = new Set([
     'ai-philosophy-tutor/index.html', 'de/philosophie-lernen/index.html',
-    'learn-from-historical-figures/index.html', 'de/von-historischen-persoenlichkeiten-lernen/index.html',
     'open-source-philosophy-app/index.html', 'de/open-source-philosophy-app/index.html',
   ]);
   if (isFigureDetail || isThemeDetail || HUB_PAGES.has(rel)) {

@@ -1,15 +1,15 @@
 ---
-// Philosophy-learning hub (EN). A query-shaped, indexed page for people who
-// want to learn philosophy in conversation: narrated lives, core teachings,
-// and talking an idea through with a thinker's AI Echo. The DE twin lives at
-// /de/philosophie-lernen. Head terms stay inside this page's own cluster
-// (philosophy app / philosophy learning platform / AI philosophy tutor /
-// learn philosophy online / chat with philosophers), distinct from the
-// open-source positioning page so the two do not cannibalize each other. The
-// FAQ array is defined here and passed to BOTH the visible render and
-// faqSchema(), so the JSON-LD can never drift from the DOM.
+// The starting-point hub (EN), repositioned onto the one question no figure
+// page can answer: where should I start with philosophy. It is also the
+// structural up-link for the 13 philosopher figure pages, so the route stays
+// exactly where it was. The DE twin lives at /de/philosophie-lernen and keeps
+// its own component. Head terms stay inside this page's own cluster (where to
+// start / learn philosophy / AI philosophy tutor / chat with philosophers),
+// distinct from the open-source positioning page so the two do not cannibalize
+// each other. The FAQ array is defined here and passed to BOTH the visible
+// render and faqSchema(), so the JSON-LD can never drift from the DOM.
 import Public from '../layouts/Public.astro';
-import PhilosophyHubContent from '../components/PhilosophyHubContent.astro';
+import TutorHubContent from '../components/TutorHubContent.astro';
 import {
   organizationSchema,
   agoraCosmicaSchema,
@@ -68,7 +68,7 @@ const schemas = [
   faqSchema(faq, canonical),
   breadcrumbSchema([
     { name: t('breadcrumbs.home'), url: `${SITE_URL}/` },
-    { name: 'AI philosophy tutor', url: canonical },
+    { name: 'Where to start with philosophy', url: canonical },
   ]),
   itemListSchema(
     figures.map(f => ({
@@ -80,9 +80,9 @@ const schemas = [
 ];
 ---
 <Public
-  title="AI Philosophy Tutor"
-  fullTitle="AI Philosophy Tutor: Learn Philosophy in Conversation"
-  description="A philosophy learning platform to chat with philosophers and learn philosophy online. Stoicism, existentialism, Taoism, Zen, and more. Nonprofit, 30 free messages a day."
+  title="Where to Start With Philosophy"
+  fullTitle="Where Should I Start With Philosophy?"
+  description="One real recommendation instead of a reading list, then six other ways in. Talk an idea through with 13 thinkers. Nonprofit, 30 free messages a day."
   canonicalPath="/ai-philosophy-tutor"
   lang={lang}
   ogType="website"
@@ -90,5 +90,5 @@ const schemas = [
   altDe="/de/philosophie-lernen"
   schemas={schemas}
 >
-  <PhilosophyHubContent lang={lang} faq={faq} figures={figures} />
+  <TutorHubContent lang={lang} faq={faq} figures={figures} />
 </Public>

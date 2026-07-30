@@ -25,7 +25,7 @@ const t = getT(lang);
         <a href={publicUrl(lang, '/echoes')}>{t('nav.whyEchoes')}</a>
         <a href={lang === 'de' ? '/de/methodik/' : '/methodology/'}>{lang === 'de' ? 'Methodik' : 'Methodology'}</a>
         <a href={publicUrl(lang, '/open-source-philosophy-app')}>{lang === 'de' ? 'Open-Source-App' : 'Open source app'}</a>
-        <a href={publicUrl(lang, '/contact')}>{t('nav.contact')}</a>
+        <a href={lang === 'de' ? '/de/about/#kontakt' : '/about/#contact'}>{t('nav.contact')}</a>
       </div>
       <div class="pub-footer__col">
         <a href="/impressum/">{t('footer.impressum')}</a>

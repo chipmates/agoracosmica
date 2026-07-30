@@ -1,4 +1,19 @@
 ---
+// The trust page (/about + /de/about). Seven blocks, in the order a stranger
+// asks the questions: who built this, what kind of organization is it, why does
+// it exist, what can I do here, who is in it, can I check any of this, how do I
+// reach you. The old twelve-heading version answered the trust question in
+// paragraph nine.
+//
+// Two blocks carry a named job:
+//   - the lead answers "who is behind this" in about sixty words, above the
+//     fold and server-rendered, because that is the snippet a search engine and
+//     an AI assistant both quote.
+//   - the trust block's heading IS the query people type, and its first
+//     paragraph answers it before the checkable details follow.
+// /contact was merged in as block seven; the anchor is #contact in English and
+// #kontakt in German, and both ids resolve in both languages so an old or a
+// cross-language link still lands. /impressum keeps the legal duty.
 import Breadcrumbs from './Breadcrumbs.astro';
 import ContentVolume from './ContentVolume.astro';
 import PublicCTA from './PublicCTA.astro';
@@ -14,6 +29,7 @@ interface Props {
 
 const { lang } = Astro.props;
 const t = getT(lang);
+const isDe = lang === 'de';
 
 const TRADITION_GROUPS = [
   { key: 'western', ids: ['aurelius', 'plato', 'nietzsche', 'schopenhauer', 'beauvoir', 'eckhart'] },
@@ -60,30 +76,25 @@ const barriers = (['barrierGeographic', 'barrierAcademic', 'barrierAge', 'barrie
 const figures = getFiguresCatalog(lang);
 const figureMap = new Map(figures.map(f => [f.id, f]));
 
-const missionParas = t('about.missionStatement').split('\n\n');
+const methodologyHref = isDe ? '/de/methodik/' : '/methodology/';
+const contactAnchor = isDe ? 'kontakt' : 'contact';
+const contactAnchorAlt = isDe ? 'contact' : 'kontakt';
+const country = isDe ? 'Deutschland' : 'Germany';
 ---
 <div class="pub-content pub-about">
   <Breadcrumbs lang={lang} items={[{ label: t('breadcrumbs.about') }]} />
 
-  <h1 class="pub-hero__title">{t('about.pageTitle')}</h1>
+  <h1 class="pub-hero__title">{t('about.h1')}</h1>
   <p class="pub-about-lead">{t('about.mission')}</p>
+  <p class="pub-about-answer">{t('about.lead')}</p>
 
   <section class="pub-section">
-    <h2 class="pub-section__title">{t('about.missionTitle')}</h2>
+    <h2 class="pub-section__title">{t('about.orgTitle')}</h2>
     <div class="pub-section__text">
-      {missionParas.map(p => <p>{p}</p>)}
+      <p>{t('about.orgP1')}</p>
+      <p>{t('about.orgP2')}</p>
     </div>
-  </section>
-
-  <section class="pub-section">
-    <h2 class="pub-section__title">{t('about.organizationTitle')}</h2>
-    <div class="pub-section__text">
-      <p>{t('about.organizationStatement')}</p>
-    </div>
-  </section>
-
-  <section class="pub-section">
-    <h2 class="pub-section__title">{t('about.valuesTitle')}</h2>
+    <h3 class="pub-about-sub">{t('about.valuesTitle')}</h3>
     <dl class="pub-about-dl">
       {values.map(v => (
         <div class="pub-about-dl__row">
@@ -95,17 +106,13 @@ const missionParas = t('about.missionStatement').split('\n\n');
   </section>
 
   <section class="pub-section">
-    <h2 class="pub-section__title">{t('about.promiseTitle')}</h2>
+    <h2 class="pub-section__title">{t('about.whyTitle')}</h2>
     <div class="pub-section__text">
-      <p>{t('about.promiseStatement')}</p>
+      <p>{t('about.whyP1')}</p>
+      <p>{t('about.whyP2')}</p>
     </div>
-  </section>
-
-  <section class="pub-section">
-    <h2 class="pub-section__title">{t('about.barriersTitle')}</h2>
-    <div class="pub-section__text">
-      <p>{t('about.barriersIntro')}</p>
-    </div>
+    <h3 class="pub-about-sub">{t('about.barriersTitle')}</h3>
+    <p class="pub-section__text">{t('about.barriersIntro')}</p>
     <dl class="pub-about-dl">
       {barriers.map(b => (
         <div class="pub-about-dl__row">
@@ -117,28 +124,14 @@ const missionParas = t('about.missionStatement').split('\n\n');
   </section>
 
   <section class="pub-section">
-    <h2 class="pub-section__title">{t('about.successTitle')}</h2>
+    <h2 class="pub-section__title">{t('about.doTitle')}</h2>
     <div class="pub-section__text">
-      <p>{t('about.successStatement')}</p>
+      <p>{t('about.doP1')}</p>
+      <p>{t('about.doP2')}</p>
+      <p>{t('about.doP3')}</p>
     </div>
-  </section>
-
-  <ContentVolume lang={lang} />
-
-  <section class="pub-section">
-    <h2 class="pub-section__title">{t('about.whatYoullFind.title')}</h2>
-    <div class="pub-section__text">
-      <p>{t('about.whatYoullFind.p1')}</p>
-      <p>{t('about.whatYoullFind.p2')}</p>
-      <p>{t('about.whatYoullFind.p3')}</p>
-    </div>
-  </section>
-
-  <section class="pub-section">
-    <h2 class="pub-section__title">{t('about.howItWorks.title')}</h2>
-    <div class="pub-section__text">
-      <p>{t('about.howItWorks.subtitle')}</p>
-    </div>
+    <ContentVolume lang={lang} />
+    <p class="pub-section__text pub-about-modes-lead">{t('about.howItWorks.subtitle')}</p>
     <div class="pub-concepts">
       {MODE_CARDS.map(mode => (
         <div class="pub-concept">
@@ -186,10 +179,12 @@ const missionParas = t('about.missionStatement').split('\n\n');
     ))}
   </section>
 
-  <section class="pub-section">
-    <h2 class="pub-section__title">{t('about.builtDifferent.title')}</h2>
+  <section class="pub-section pub-about-target" id="trust">
+    <h2 class="pub-section__title">{t('about.trustTitle')}</h2>
+    <p class="pub-about-answer">{t('about.trustAnswer')}</p>
+    <h3 class="pub-about-sub">{t('about.checkTitle')}</h3>
     <div class="pub-about-points">
-      {(['nonprofit', 'factChecked', 'noTracking', 'freeTurns'] as const).map(key => (
+      {(['nonprofit', 'factChecked', 'noTracking', 'openSource', 'freeTurns'] as const).map(key => (
         <p>{t(`about.builtDifferent.${key}`)}</p>
       ))}
       <p>
@@ -204,13 +199,50 @@ const missionParas = t('about.missionStatement').split('\n\n');
         </a>
       </p>
     </div>
+    <p class="pub-section__text pub-about-trustlinks">
+      {t('about.trustLinksLead')}{' '}
+      <a class="pub-textlink" href={methodologyHref}>{t('about.methodologyLink')}</a>
+      {' · '}
+      <a class="pub-textlink" href={publicUrl(lang, '/echoes')}>{t('about.echoesLink')}</a>
+    </p>
+    <h3 class="pub-about-sub">{t('about.voiceCredits.title')}</h3>
+    <p class="pub-section__text">{t('about.voiceCredits.body')}</p>
   </section>
 
-  <section class="pub-section">
-    <h2 class="pub-section__title">{t('about.voiceCredits.title')}</h2>
-    <div class="pub-section__text">
-      <p>{t('about.voiceCredits.body')}</p>
-    </div>
+  <section class="pub-section pub-about-target" id={contactAnchor}>
+    <span id={contactAnchorAlt} class="pub-about-alt-anchor"></span>
+    <h2 class="pub-section__title">{t('about.contactTitle')}</h2>
+    <p class="pub-section__text">{t('about.contactP1')}</p>
+    <dl class="pub-about-dl">
+      <div class="pub-about-dl__row">
+        <dt>{t('about.contactEmailLabel')}</dt>
+        <dd>
+          <a href="mailto:agoracosmica@chipmates.ai" class="pub-textlink">agoracosmica@chipmates.ai</a>
+        </dd>
+      </div>
+      <div class="pub-about-dl__row">
+        <dt>{t('about.contactAddressLabel')}</dt>
+        <dd>
+          <address class="pub-contact-address">
+            ChipMates gemeinnützige GmbH<br />
+            Schusterstr. 50<br />
+            79098 Freiburg im Breisgau<br />
+            {country}
+          </address>
+        </dd>
+      </div>
+      <div class="pub-about-dl__row">
+        <dt>{t('about.contactSocialLabel')}</dt>
+        <dd>
+          <a href="https://github.com/chipmates/agoracosmica" target="_blank" rel="noopener noreferrer" class="pub-textlink">
+            GitHub - chipmates/agoracosmica
+          </a>
+        </dd>
+      </div>
+    </dl>
+    <p class="pub-section__text pub-about-legalnote">
+      {t('about.contactLegalPre')}<a class="pub-textlink" href="/impressum/">{t('about.contactLegalLink')}</a>{t('about.contactLegalPost')}
+    </p>
   </section>
 
   <div class="pub-about-quote">
@@ -221,3 +253,50 @@ const missionParas = t('about.missionStatement').split('\n\n');
 
   <PublicCTA variant="inline" lang={lang} />
 </div>
+
+<style>
+  /* The answer-first paragraphs (page lead + the trust answer). Set a step
+     above body copy so the eye starts there, brand tokens only. */
+  .pub-about-answer {
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: 1.12rem;
+    line-height: 1.72;
+    color: var(--text-primary);
+    margin: 0 0 2.25rem;
+    max-width: 40rem;
+  }
+  .pub-section .pub-about-answer {
+    margin-bottom: 1.75rem;
+  }
+
+  /* Sub-headings inside a block, so a long section still reads as movements
+     without adding another h2 to the page outline. */
+  .pub-about-sub {
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold-subtle);
+    margin: 2rem 0 0.85rem;
+  }
+
+  .pub-about-modes-lead {
+    margin-top: 1.75rem;
+  }
+
+  .pub-about-trustlinks,
+  .pub-about-legalnote {
+    margin-top: 1.4rem;
+  }
+
+  /* Anchored blocks clear the sticky navbar when jumped to. */
+  .pub-about-target {
+    scroll-margin-top: 5.5rem;
+  }
+  .pub-about-alt-anchor {
+    display: block;
+    height: 0;
+    scroll-margin-top: 5.5rem;
+  }
+</style>

@@ -61,6 +61,10 @@ const faq = [
     q: 'Where do the facts come from?',
     a: 'Each voice is grounded in primary works and cross-checked sources. Because the Echoes are AI-rendered, what they say will vary, but the source material does not. Where the prose goes beyond the documented record, a public factcheck names what was recreated.',
   },
+  {
+    q: 'Can I self-host it?',
+    a: 'Yes. The whole platform is open source under AGPL-3.0, and one command brings it up on your own machine. Local Mode then points the app at any OpenAI-compatible model, like LM Studio, Ollama, or vLLM, and runs the audio stack in Docker. Nothing you say, type, or hear leaves your computer.',
+  },
 ];
 
 const canonical = canonicalUrl(publicUrl(lang, '/open-source-philosophy-app'));
@@ -77,8 +81,8 @@ const schemas = [
 ---
 <Public
   title="Open-Source Philosophy App"
-  fullTitle="Open-Source AI to Talk With Historical Figures"
-  description="A nonprofit, open source alternative to AI character apps, for philosophy and history. Fact-checked, no tracking cookies, AGPL-3.0, audio from the EU."
+  fullTitle="Open-Source Alternative to AI Character Apps"
+  description="Nonprofit and open source under AGPL-3.0, for philosophy and history instead of roleplay. 30 real figures, a public factcheck each, no tracking cookies."
   canonicalPath="/open-source-philosophy-app"
   lang={lang}
   ogType="website"

@@ -114,11 +114,6 @@ const ABOUT_MOD = gitLastModified(
   'marketing/src/pages/de/about.astro',
   'marketing/src/components/AboutContent.astro',
 );
-const CONTACT_MOD = gitLastModified(
-  'marketing/src/pages/contact.astro',
-  'marketing/src/pages/de/contact.astro',
-  'marketing/src/components/ContactContent.astro',
-);
 const ECHOES_MOD = gitLastModified(
   'marketing/src/pages/echoes.astro',
   'marketing/src/pages/de/echoes.astro',
@@ -181,8 +176,6 @@ urls.push(deUrl('/', '1.0', HOME_MOD, 'weekly'));
 // Static pages (EN + DE pairs)
 urls.push(url('/about', '0.8', ABOUT_MOD));
 urls.push(deUrl('/about', '0.8', ABOUT_MOD));
-urls.push(url('/contact', '0.8', CONTACT_MOD));
-urls.push(deUrl('/contact', '0.8', CONTACT_MOD));
 urls.push(url('/echoes', '0.6', ECHOES_MOD));
 urls.push(deUrl('/echoes', '0.6', ECHOES_MOD));
 
@@ -231,15 +224,10 @@ function crossPair(enPath, dePath, priority, lastmod, changefreq = 'monthly') {
 const PHILO_HUB_MOD = gitLastModified(
   'marketing/src/pages/ai-philosophy-tutor.astro',
   'marketing/src/pages/de/philosophie-lernen.astro',
+  'marketing/src/components/TutorHubContent.astro',
   'marketing/src/components/PhilosophyHubContent.astro',
 );
-const WISDOM_HUB_MOD = gitLastModified(
-  'marketing/src/pages/learn-from-historical-figures.astro',
-  'marketing/src/pages/de/von-historischen-persoenlichkeiten-lernen.astro',
-  'marketing/src/components/WisdomHubContent.astro',
-);
 urls.push(...crossPair('/ai-philosophy-tutor', '/de/philosophie-lernen', '0.8', PHILO_HUB_MOD, 'weekly'));
-urls.push(...crossPair('/learn-from-historical-figures', '/de/von-historischen-persoenlichkeiten-lernen', '0.8', WISDOM_HUB_MOD, 'weekly'));
 
 // Methodology / editorial-standards page (trust + E-E-A-T). Cross-slug EN/DE
 // twin (/methodology vs /de/methodik), so crossPair() like the hubs.

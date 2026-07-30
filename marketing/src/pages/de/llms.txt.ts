@@ -4,6 +4,7 @@ import { figureIdToSlug } from '@client/data/public/slugMap';
 import { THEMES } from '@client/data/councilCatalog';
 import { getT } from '../../i18n';
 import { SITE_URL } from '../../lib/urls';
+import { citationBlock, figureYears } from '../../lib/llmsData';
 
 // Deutsche /de/llms.txt: das gleiche maschinenlesbare Verzeichnis für
 // KI-Agenten wie die englische Fassung, nur aus dem deutschen Katalog. Wird
@@ -67,11 +68,17 @@ export const GET: APIRoute = () => {
   );
   lines.push('');
 
+  lines.push(...citationBlock('de', `${SITE_URL}/de/`));
+
   lines.push('## Menschen');
   for (const f of figures) {
     const slug = figureIdToSlug[f.id];
     if (!slug) continue;
-    lines.push(`- [${f.name}](${SITE_URL}/de/figures/${slug}/): ${firstSentence(f.about)}`);
+    // Die belegten Jahreszahlen stehen direkt am Namen: sie binden den Text an
+    // die richtige Person. Weggelassen, wo die Quellenlage nicht eindeutig ist.
+    const years = figureYears(slug, 'de');
+    const dated = years ? ` (${years})` : '';
+    lines.push(`- [${f.name}](${SITE_URL}/de/figures/${slug}/)${dated}: ${firstSentence(f.about)}`);
     const ctx = context(f.tradition, f.period);
     if (ctx) lines.push(`  - ${ctx}`);
     const teach = teachings(f.keyConcepts);
@@ -96,7 +103,7 @@ export const GET: APIRoute = () => {
   lines.push(`- [Methodik: wie wir die Echos bauen](${SITE_URL}/de/methodik/): wie jedes KI-Echo aus Primärwerken gebaut, belegt und faktengeprüft wird, mit einem öffentlichen Faktencheck pro Mensch und quelloffenem Code.`);
   lines.push(`- [Open-Source-Philosophie-App](${SITE_URL}/de/open-source-philosophy-app/): eine quelloffene, gemeinnützige Alternative zu KI-Charakter-Apps, für Philosophie und Geschichte.`);
   lines.push(`- [Philosophie lernen mit einem KI-Tutor](${SITE_URL}/de/philosophie-lernen/): Philosophie im Gespräch mit den KI-Echos der Philosophen der Geschichte lernen, gemeinnützig und quelloffen, 30 kostenlose Nachrichten pro Tag.`);
-  lines.push(`- [Von historischen Persönlichkeiten lernen](${SITE_URL}/de/von-historischen-persoenlichkeiten-lernen/): ein Leitfaden, um zeitlose Weisheit von 30 Menschen der Geschichte zu lernen, keine Tracking-Cookies, 30 kostenlose Nachrichten pro Tag.`);
+  lines.push(`- [Volltext-Verzeichnis (llms-full.txt)](${SITE_URL}/de/llms-full.txt): die vollständigen Beschreibungen aller Menschen und alle Frage-Antwort-Paare, dazu die acht Themen.`);
   lines.push('- [Quellcode (GitHub)](https://github.com/chipmates/agoracosmica)');
   lines.push('');
 

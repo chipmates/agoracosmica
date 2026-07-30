@@ -46,9 +46,7 @@ const isDe = lang === 'de';
 // Wayfinding links that used to sit in their own orphan "Ways in" row. They now
 // ride in the closing link row, where the reader already is when they are done.
 const philoHubHref = isDe ? '/de/philosophie-lernen/' : '/ai-philosophy-tutor/';
-const wisdomHubHref = isDe
-  ? '/de/von-historischen-persoenlichkeiten-lernen/'
-  : '/learn-from-historical-figures/';
+const wisdomHubHref = isDe ? '/de/figures/' : '/figures/';
 const ossHref = publicUrl(lang, '/open-source-philosophy-app');
 const waysInPhilo = isDe ? 'Philosophie lernen' : 'Learn philosophy';
 const waysInWisdom = isDe ? 'Weisheit aus der Geschichte lernen' : 'Learn wisdom from history';
@@ -284,7 +282,7 @@ const questions = isDe ? deQuestions : enQuestions;
       <p class="pub-section__text ll2-linkrow">
         <a class="pub-textlink" href={publicUrl(lang, '/about')}>Über uns</a>
         {' · '}
-        <a class="pub-textlink" href={publicUrl(lang, '/contact')}>Kontakt</a>
+        <a class="pub-textlink" href="/de/about/#kontakt">Kontakt</a>
         {' · '}
         <a class="pub-textlink" href={publicUrl(lang, '/figures')}>Menschen</a>
         {' · '}
@@ -488,7 +486,7 @@ const questions = isDe ? deQuestions : enQuestions;
       <p class="pub-section__text ll2-linkrow">
         <a class="pub-textlink" href={publicUrl(lang, '/about')}>About</a>
         {' · '}
-        <a class="pub-textlink" href={publicUrl(lang, '/contact')}>Contact</a>
+        <a class="pub-textlink" href="/about/#contact">Contact</a>
         {' · '}
         <a class="pub-textlink" href={publicUrl(lang, '/figures')}>Figures</a>
         {' · '}

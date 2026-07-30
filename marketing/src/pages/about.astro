@@ -1,4 +1,8 @@
 ---
+// The trust page (EN). Title and H1 both answer the query people actually
+// type; the brand used to appear twice in the <title> and once in the body,
+// answering nothing. The FAQ schema carries only the two question-shaped
+// headings that are visible verbatim on the page, so DOM and JSON-LD match.
 import Public from '../layouts/Public.astro';
 import AboutContent from '../components/AboutContent.astro';
 import { getT } from '../i18n';
@@ -7,15 +11,23 @@ import {
   organizationSchema,
   webSiteSchema,
   softwareApplicationSchema,
+  faqSchema,
   breadcrumbSchema,
 } from '../lib/schemas';
-import { SITE_URL } from '../lib/urls';
+import { canonicalUrl, SITE_URL } from '../lib/urls';
 
 const lang = 'en' as const;
 const t = getT(lang);
+
+const canonical = canonicalUrl('/about');
+const faq = [
+  { q: t('about.h1'), a: t('about.lead') },
+  { q: t('about.trustTitle'), a: t('about.trustAnswer') },
+];
 ---
 <Public
   title={t('about.pageTitle')}
+  fullTitle={t('about.pageTitle')}
   description={t('about.pageDescription')}
   canonicalPath="/about"
   lang={lang}
@@ -25,6 +37,7 @@ const t = getT(lang);
     organizationSchema(),
     webSiteSchema(),
     softwareApplicationSchema(),
+    faqSchema(faq, canonical),
     breadcrumbSchema([
       { name: t('breadcrumbs.home'), url: `${SITE_URL}/` },
       { name: t('breadcrumbs.about'), url: `${SITE_URL}/about` },

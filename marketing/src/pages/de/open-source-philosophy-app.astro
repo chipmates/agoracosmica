@@ -59,6 +59,10 @@ const faq = [
     q: 'Woher kommen die Fakten?',
     a: 'Jede Stimme ist in Primärwerken und mehrfach geprüften Quellen verankert. Weil die Echos KI-erzeugt sind, variiert das Gesagte, das Quellmaterial aber nicht. Wo der Text über das Dokumentierte hinausgeht, benennt ein öffentlicher Faktencheck, was nachgebildet wurde.',
   },
+  {
+    q: 'Kann ich es selbst hosten?',
+    a: 'Ja. Die ganze Plattform ist quelloffen unter der AGPL-3.0, und ein einziger Befehl bringt sie auf deinem eigenen Rechner zum Laufen. Der Local Mode verbindet die App dann mit jedem OpenAI-kompatiblen Modell, etwa LM Studio, Ollama oder vLLM, und betreibt den Audio-Stack in Docker. Nichts, was du sagst, tippst oder hörst, verlässt deinen Computer.',
+  },
 ];
 
 const canonical = canonicalUrl(publicUrl(lang, '/open-source-philosophy-app'));
@@ -75,8 +79,8 @@ const schemas = [
 ---
 <Public
   title="Open-Source-Philosophie-App"
-  fullTitle="Quelloffene KI: Sprich mit Denkern der Geschichte"
-  description="Gemeinnützige, quelloffene Alternative zu KI-Charakter-Apps für Philosophie und Geschichte. Faktengeprüft, keine Tracking-Cookies, AGPL-3.0, Audio aus der EU."
+  fullTitle="Quelloffene Alternative zu KI-Charakter-Apps"
+  description="Gemeinnützig und quelloffen unter AGPL-3.0, für Philosophie und Geschichte statt Rollenspiel. 30 echte Menschen, je ein Faktencheck, keine Tracking-Cookies."
   canonicalPath="/open-source-philosophy-app"
   lang={lang}
   ogType="website"

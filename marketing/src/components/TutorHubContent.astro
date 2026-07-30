@@ -1,0 +1,533 @@
+---
+// Body for /ai-philosophy-tutor, repositioned around the one job no figure page
+// can do: answering "where should I start with philosophy?"
+//
+// The page used to open with a category claim and a ten-row menu, which is the
+// answer a beginner already has. It now opens with ONE recommendation, then a
+// row of six alternatives keyed to a felt need, and every row is a working door
+// that carries that thinker's own first question into the composer.
+//
+// The rows are generated from data, never hand-copied: the want line is the
+// catalog's `learn` sentence with its lead-in removed, and the question is the
+// figure's entry question from heroEntry, linked as ?ask=f:{id}:1 so what you
+// click is what the app stages. The DE twin at /de/philosophie-lernen keeps its
+// own component and is untouched.
+import StaticImage from './StaticImage.astro';
+import { publicUrl } from '../lib/urls';
+import { figureIdToSlug } from '@client/data/public/slugMap';
+import { getHeroEntryQuestion } from '@client/data/public/heroEntry';
+import type { Lang } from '../i18n';
+import type { PublicFigure } from '@client/data/public/figuresCatalog';
+
+interface Props {
+  lang: Lang;
+  faq: { q: string; a: string }[];
+  figures: PublicFigure[];
+}
+
+const { lang, faq, figures } = Astro.props;
+const byId = new Map(figures.map(f => [f.id, f]));
+
+// Six starting points, one felt need each, across six different traditions.
+const START_IDS = ['aurelius', 'plato', 'nietzsche', 'laozi', 'gautama', 'jung'];
+// The closing doors use three thinkers the rows above do not, so the page ends
+// on a name the reader has not been offered yet.
+const FIRST_QUESTION_IDS = ['beauvoir', 'rumi', 'bingen'];
+
+// "You will learn to X." -> "to X". The catalog sentence is the source of
+// truth; only its lead-in is dropped, so a catalog edit flows straight through.
+function want(learn: string): string {
+  return learn.trim().replace(/^You will learn\s+/i, '').replace(/\.$/, '');
+}
+
+interface Row {
+  id: string;
+  name: string;
+  tradition: string;
+  want: string;
+  question: string;
+  href: string;
+}
+
+function buildRows(ids: string[]): Row[] {
+  const rows: Row[] = [];
+  for (const id of ids) {
+    const f = byId.get(id);
+    const question = getHeroEntryQuestion(id, lang);
+    if (!f || !question) continue;
+    const slug = figureIdToSlug[id] || id;
+    rows.push({
+      id,
+      name: f.name,
+      tradition: f.tradition,
+      want: want(f.learn),
+      question,
+      href: `/app?figure=${slug}&lang=${lang}&ask=f:${id}:1`,
+    });
+  }
+  return rows;
+}
+
+const startRows = buildRows(START_IDS);
+const firstQuestions = buildRows(FIRST_QUESTION_IDS);
+
+const c = {
+  eyebrow: 'A starting point, not a reading list',
+  h1: 'Where should I start with philosophy?',
+  tagline: 'One thinker, one first question, and a conversation you steer.',
+  lead: 'Start with Marcus Aurelius. He wrote a private notebook while running an empire, never meaning anyone to read it, so the advice is practical and unheroic. Listen to his life story first, twelve short chapters, then ask him the thing that is actually bothering you. If Stoicism leaves you cold, the six doors below point at five other places to begin.',
+  leadTwo: 'Every thinker here speaks as an AI Echo, an educational interpretation grounded in their real writing. It is clearly labeled, never a recording and never the real person. Understanding the philosophy is the point, not pretending the philosopher is back.',
+  startTitle: 'Start here if you want',
+  startIntro: 'Six ways in, one per tradition. Each row opens the app with that question already in the box, so your first message is a tap.',
+  askLabel: 'Ask this question',
+  thinkersTitle: 'The thirteen thinkers',
+  thinkersLead: 'Thirteen of the thirty are philosophers or teachers in a wisdom tradition. The mystics, the depth psychologist, and the mythologist are named for what they are, never miscalled analytic philosophers.',
+  thinkersMore: 'See all 30 figures',
+  howTitle: 'How learning in conversation works',
+  howIntro: 'Conversation is one of six ways to learn here. Most of the material is written and narrated ahead of time, and the chat is where you take an idea apart in your own words.',
+  modes: [
+    { label: 'Listen', text: 'A narrated life story in twelve chapters, told in the first person, so an idea lands inside a real life instead of arriving as an abstraction.' },
+    { label: 'Read', text: 'Twelve core teachings per thinker, the working concepts of their philosophy in plain language, each with a concrete example.' },
+    { label: 'Talk', text: 'Ask your own question and follow it wherever it goes. This is the tutoring part, and you set the pace.' },
+    { label: 'Compare', text: 'Prism mode puts four voices on one question, so a Stoic, a mystic, and a skeptic answer the same thing side by side.' },
+  ],
+  howClose: 'There are also 110 produced council debates where several thinkers argue a theme out, useful for hearing where traditions genuinely disagree. Everything works in English and German. You get 30 free messages a day with no signup. Want more, bring your own OpenRouter key and it never touches our servers. The whole platform is open source under AGPL-3.0, with no tracking cookies and no profiling.',
+  firstTitle: 'Your first question',
+  firstIntro: 'Still undecided? Take one of these. The question is already written, you only send it.',
+  faqTitle: 'Questions people ask',
+  ctaTitle: 'Start with one question',
+  ctaText: 'Open the app and think one idea through with any of the thirteen. 30 free messages a day, no signup.',
+  ctaButton: 'Start exploring',
+  starText: 'If a free, open philosophy tutor is worth having, a star is the simplest way to help more people find it.',
+  starCta: 'Star on GitHub →',
+  crossTitle: 'Keep exploring',
+  crossLinks: [
+    { href: '/figures', label: 'All 30 figures' },
+    { href: '/themes', label: 'The 8 big questions' },
+    { href: '/open-source-philosophy-app', label: 'Why it is open source and nonprofit' },
+  ],
+  methodologyLabel: 'How the Echoes are built',
+};
+---
+<div class="pub-content tut">
+  <header class="pub-theme-hero">
+    <div class="pub-theme-hero__eyebrow">{c.eyebrow}</div>
+    <h1 class="pub-theme-hero__question tut-hero__h1">{c.h1}</h1>
+    <p class="tut-hero__sub">{c.tagline}</p>
+  </header>
+
+  <section class="pub-section">
+    <p class="tut-lead">{c.lead}</p>
+    <p class="pub-section__text">{c.leadTwo}</p>
+  </section>
+
+  <section class="pub-section">
+    <h2 class="pub-section__title">{c.startTitle}</h2>
+    <p class="pub-section__text">{c.startIntro}</p>
+    <ul class="tut-rows">
+      {startRows.map(row => (
+        <li>
+          <a
+            class="tut-row"
+            href={row.href}
+            data-agc-cta="start-exploring"
+            data-agc-figure={row.id}
+            data-agc-door="tutor_start_row"
+          >
+            <span class="tut-row__thumb">
+              <StaticImage
+                figureId={row.id}
+                type="thumbnail"
+                alt=""
+                loading="lazy"
+                width={48}
+                height={48}
+                sizes="48px"
+              />
+            </span>
+            <span class="tut-row__body">
+              <span class="tut-row__want">{row.want}</span>
+              <span class="tut-row__who">{row.name} · {row.tradition}</span>
+              <span class="tut-row__q">{row.question}</span>
+              <span class="tut-row__cue">{c.askLabel}</span>
+            </span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="pub-section">
+    <h2 class="pub-section__title">{c.thinkersTitle}</h2>
+    <p class="pub-section__text">{c.thinkersLead}</p>
+    <div class="pub-grid pub-grid--3">
+      {figures.map(figure => (
+        <a
+          href={`/app?figure=${figureIdToSlug[figure.id] || figure.id}&lang=${lang}`}
+          class="pub-figure-card"
+          data-agc-cta="start-exploring"
+          data-agc-figure={figure.id}
+        >
+          <div class="pub-figure-card__image">
+            <StaticImage figureId={figure.id} type="thumbnail" alt="" loading="lazy" />
+          </div>
+          <div class="pub-figure-card__body">
+            <h3 class="pub-figure-card__name">{figure.name}</h3>
+            <p class="pub-figure-card__tradition">{figure.tradition}</p>
+            <p class="pub-figure-card__learn">{figure.learn.trim()}</p>
+          </div>
+        </a>
+      ))}
+    </div>
+    <p class="pub-section__text">
+      <a class="pub-textlink" href={publicUrl(lang, '/figures')}>{c.thinkersMore}</a>
+    </p>
+  </section>
+
+  <section class="pub-section">
+    <h2 class="pub-section__title">{c.howTitle}</h2>
+    <p class="pub-section__text">{c.howIntro}</p>
+    <div class="tut-modes">
+      {c.modes.map(m => (
+        <div class="tut-mode">
+          <h3 class="tut-mode__label">{m.label}</h3>
+          <p class="tut-mode__text">{m.text}</p>
+        </div>
+      ))}
+    </div>
+    <p class="pub-section__text">{c.howClose}</p>
+  </section>
+
+  <section class="pub-section">
+    <h2 class="pub-section__title">{c.firstTitle}</h2>
+    <p class="pub-section__text">{c.firstIntro}</p>
+    <ul class="tut-rows tut-rows--compact">
+      {firstQuestions.map(row => (
+        <li>
+          <a
+            class="tut-row"
+            href={row.href}
+            data-agc-cta="start-exploring"
+            data-agc-figure={row.id}
+            data-agc-door="tutor_first_q"
+          >
+            <span class="tut-row__thumb">
+              <StaticImage
+                figureId={row.id}
+                type="thumbnail"
+                alt=""
+                loading="lazy"
+                width={48}
+                height={48}
+                sizes="48px"
+              />
+            </span>
+            <span class="tut-row__body">
+              <span class="tut-row__q">{row.question}</span>
+              <span class="tut-row__cue">{c.askLabel} · {row.name}</span>
+            </span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="pub-section tut-faq">
+    <h2 class="pub-section__title">{c.faqTitle}</h2>
+    <div class="tut-faq__list">
+      {faq.map(item => (
+        <details class="tut-faq__item">
+          <summary class="tut-faq__q">
+            <span>{item.q}</span>
+            <span class="tut-faq__arrow" aria-hidden="true">▼</span>
+          </summary>
+          <div class="tut-faq__a"><p>{item.a}</p></div>
+        </details>
+      ))}
+    </div>
+  </section>
+
+  <section class="pub-section tut-cta">
+    <h2 class="pub-section__title">{c.ctaTitle}</h2>
+    <p class="pub-section__text">{c.ctaText}</p>
+    <a href={`/app?lang=${lang}`} class="pub-cta__button" data-agc-cta="start-exploring">{c.ctaButton}</a>
+    <a
+      class="tut-star"
+      href="https://github.com/chipmates/agoracosmica"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <span class="tut-star__icon" aria-hidden="true">⭐</span>
+      <span class="tut-star__text">{c.starText}</span>
+      <span class="tut-star__cta">{c.starCta}</span>
+    </a>
+    <p class="tut-cross">
+      <span class="tut-cross__title">{c.crossTitle}</span>
+      {c.crossLinks.map(link => (
+        <>
+          {' '}
+          <a class="pub-textlink" href={publicUrl(lang, link.href)}>{link.label}</a>
+          {' · '}
+        </>
+      ))}
+      <a class="pub-textlink" href="/methodology/">{c.methodologyLabel}</a>
+    </p>
+  </section>
+</div>
+
+<style is:global>
+  /* The portrait lives inside StaticImage, which a scoped style cannot reach,
+     so the one rule that has to cross that boundary is global and namespaced
+     under .tut-row. */
+  .tut-row__thumb img {
+    display: block;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: var(--bg-card);
+    border: 1px solid color-mix(in srgb, var(--gold-primary) 25%, transparent);
+  }
+</style>
+
+<style>
+  /* Scoped page treatment. Brand design tokens only, no new global primitives. */
+  .tut {
+    max-width: 50rem;
+    margin: 0 auto;
+    padding: 2.5rem 1.25rem 3.5rem;
+  }
+  /* The H1 is the query, so it takes the gold display line; the promise line
+     steps down to a subhead. The theme hero's 16ch measure is cut for a short
+     theme name, so a full question gets a wider one. */
+  .tut-hero__h1 {
+    max-width: 20ch;
+  }
+  .tut-hero__sub {
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: var(--text-md, 1.0625rem);
+    line-height: 1.5;
+    color: var(--text-secondary);
+    max-width: 34rem;
+    margin: 1.1rem auto 0;
+  }
+  .tut-lead {
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: 1.12rem;
+    line-height: 1.72;
+    color: var(--text-primary);
+    margin: 0 0 1.1rem;
+  }
+
+  /* Start rows: the felt need first, the thinker second, the question third.
+     The whole row is the door. */
+  .tut-rows {
+    list-style: none;
+    margin: 1.4rem 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+  }
+  .tut-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.95rem;
+    min-height: 56px;
+    padding: 0.9rem 1.05rem;
+    border: 1px solid color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+    border-radius: var(--plate-radius, 4px);
+    background: color-mix(in srgb, var(--bg-card) 60%, transparent);
+    text-decoration: none;
+    transition: border-color 0.2s ease, background 0.2s ease;
+  }
+  .tut-row:hover,
+  .tut-row:focus-visible {
+    border-color: color-mix(in srgb, var(--gold-primary) 45%, transparent);
+    background: color-mix(in srgb, var(--bg-highlight) 60%, transparent);
+  }
+  .tut-row__thumb {
+    flex: 0 0 auto;
+    display: block;
+    padding-top: 0.15rem;
+  }
+  .tut-row__body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.28rem;
+    min-width: 0;
+  }
+  .tut-row__want {
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: 1.02rem;
+    font-weight: 600;
+    line-height: 1.35;
+    color: var(--gold-primary);
+  }
+  .tut-row__who {
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+  }
+  .tut-row__q {
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: 1.02rem;
+    line-height: 1.5;
+    color: var(--text-primary);
+  }
+  .tut-row__cue {
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold-deep);
+  }
+  .tut-row:hover .tut-row__cue,
+  .tut-row:focus-visible .tut-row__cue {
+    color: var(--gold-primary);
+  }
+  .tut-rows--compact .tut-row {
+    align-items: center;
+  }
+
+  /* How it works: four short cards. */
+  .tut-modes {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin: 1.4rem 0;
+  }
+  .tut-mode {
+    padding: 1.2rem 1.3rem;
+    border-radius: var(--radius-lg, 0.75rem);
+    border: 1px solid color-mix(in srgb, var(--gold-subtle) 25%, transparent);
+    background: color-mix(in srgb, var(--bg-deep-space-darker) 45%, transparent);
+  }
+  .tut-mode__label {
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold-primary);
+    margin: 0 0 0.6rem;
+  }
+  .tut-mode__text {
+    margin: 0;
+    font-size: var(--text-sm, 0.9rem);
+    line-height: var(--leading-relaxed, 1.6);
+    color: var(--text-secondary);
+  }
+
+  /* FAQ */
+  .tut-faq__list {
+    margin-top: 0.5rem;
+  }
+  .tut-faq__item {
+    border-bottom: 1px solid color-mix(in srgb, var(--gold-subtle) 18%, transparent);
+  }
+  .tut-faq__q {
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: 44px;
+    padding: 0.9rem 0;
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: 1.05rem;
+    color: var(--text-primary);
+  }
+  .tut-faq__q::-webkit-details-marker {
+    display: none;
+  }
+  .tut-faq__arrow {
+    flex: 0 0 auto;
+    font-size: 0.7rem;
+    color: var(--gold-primary);
+    transition: transform 0.2s ease;
+  }
+  .tut-faq__item[open] > .tut-faq__q .tut-faq__arrow {
+    transform: rotate(180deg);
+  }
+  .tut-faq__a {
+    padding: 0 0 1rem;
+  }
+  .tut-faq__a p {
+    margin: 0;
+    font-size: var(--text-base, 1rem);
+    line-height: var(--leading-relaxed, 1.7);
+    color: var(--text-secondary);
+  }
+
+  /* CTA + star + cross-links */
+  .tut-cta {
+    text-align: center;
+    border-top: 1px solid color-mix(in srgb, var(--gold-subtle) 22%, transparent);
+    padding-top: 2.25rem;
+  }
+  .tut-star {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem 0.85rem;
+    max-width: 640px;
+    margin: 1.75rem auto 0;
+    padding: 1.1rem 1.4rem;
+    border-radius: var(--radius-lg, 0.75rem);
+    border: 1px solid color-mix(in srgb, var(--gold-subtle) 28%, transparent);
+    background: color-mix(in srgb, var(--bg-deep-space-darker) 50%, transparent);
+    text-decoration: none;
+    transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+  }
+  .tut-star:hover,
+  .tut-star:focus-visible {
+    border-color: var(--gold-hover);
+    background: color-mix(in srgb, var(--bg-deep-space-darker) 70%, transparent);
+    transform: translateY(-2px);
+  }
+  .tut-star__icon {
+    font-size: 1.15rem;
+    line-height: 1;
+  }
+  .tut-star__text {
+    font-size: var(--text-base, 1rem);
+    line-height: var(--leading-relaxed, 1.6);
+    color: var(--text-secondary);
+  }
+  .tut-star__cta {
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-weight: 600;
+    white-space: nowrap;
+    color: var(--gold-primary);
+  }
+  .tut-star:hover .tut-star__cta,
+  .tut-star:focus-visible .tut-star__cta {
+    color: var(--gold-hover);
+  }
+  .tut-cross {
+    margin-top: 1.7rem;
+    font-size: var(--text-sm, 0.9rem);
+    line-height: 1.9;
+    color: var(--text-secondary);
+  }
+  .tut-cross__title {
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  @media (max-width: 640px) {
+    .tut-modes {
+      grid-template-columns: 1fr;
+    }
+    .tut-row {
+      padding: 0.85rem 0.9rem;
+      gap: 0.75rem;
+    }
+  }
+</style>

@@ -16,7 +16,6 @@
 /figures   /figures/   301
 /themes    /themes/    301
 /about     /about/     301
-/contact   /contact/   301
 /echoes    /echoes/    301
 /impressum           /impressum/           301
 /datenschutz         /datenschutz/         301
@@ -27,8 +26,21 @@
 /de/figures /de/figures/ 301
 /de/themes  /de/themes/ 301
 /de/about   /de/about/  301
-/de/contact /de/contact/ 301
 /de/echoes  /de/echoes/ 301
+
+# Consolidated pages. /contact merged into /about (the contact block carries
+# the #contact / #kontakt anchor, /impressum keeps the legal duty), and the
+# wisdom hub was absorbed by the figures index. Both slug forms are listed
+# because these pages no longer exist as static files, so nothing normalizes
+# the trailing slash before these rules run.
+/contact    /about/#contact    301
+/contact/   /about/#contact    301
+/de/contact /de/about/#kontakt 301
+/de/contact/ /de/about/#kontakt 301
+/learn-from-historical-figures  /figures/ 301
+/learn-from-historical-figures/ /figures/ 301
+/de/von-historischen-persoenlichkeiten-lernen  /de/figures/ 301
+/de/von-historischen-persoenlichkeiten-lernen/ /de/figures/ 301
 
 # Guessable legal URLs that people (and crawlers) try but that live elsewhere.
 # Without these they fell through to the SPA shell as soft-404s.
