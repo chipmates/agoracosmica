@@ -1,15 +1,38 @@
 ---
-// Full body for a figure detail page. Static Astro everywhere except the
-// trailer button (React island, inside FigureHero). All data resolves at
-// build time from the existing client/ data files via the @client alias.
+// The figure detail page, top to bottom.
+//
+// The order is the point. A searcher lands here with a question, so the answer
+// comes first, the door comes second, and the substance that used to sit inside
+// collapsed boxes is open and headed with the questions people actually type.
+// Everything down to the councils is server-rendered and uncollapsed. <details>
+// survives only for the council tail.
+//
+//   hero            who this is, the voice, the promise, the first question
+//   answer          40 to 80 words, the first paragraph after the H1
+//   questions       one tap into the app, at peak intent
+//   concepts        headings that are real queries, each answer self-contained
+//   twelve chapters the life, with the documented/recreated ledger per scene
+//   six ways        the interactive library, the only "try it" on the page
+//   councils        where the figure argues, with the produced previews
+//   lattice         the 36 typed edges, the densest internal linking we own
+//   themes, hub     the rest of the lattice
+//   shadow          built, wired, renders nothing (owner-gated)
+//   works, sources  the paper trail, then the Echo disclosure as the last word
+//   questions       the same door again, for the long reader
+//
+// All data resolves at build time from client/ via the @client alias.
 
 import Breadcrumbs from './Breadcrumbs.astro';
 import FigureHero from './FigureHero.astro';
-import EchoNote from './EchoNote.astro';
-import JourneyOverview from './JourneyOverview.astro';
+import FigureQuestions from './FigureQuestions.astro';
+import FigureConcepts from './FigureConcepts.astro';
+import FigureChapters from './FigureChapters.astro';
+import FigureSixWays from './FigureSixWays.astro';
+import FigureCouncils from './FigureCouncils.astro';
+import FigureLattice from './FigureLattice.astro';
+import FigureShadow from './FigureShadow.astro';
 import FigureQA from './FigureQA.astro';
-import CollapsibleSection from './CollapsibleSection.astro';
-import CouncilPreview from './CouncilPreview.astro';
+import EchoNote from './EchoNote.astro';
 import StaticImage from './StaticImage.astro';
 import PublicCTA from './PublicCTA.astro';
 import SourcesBlock from './SourcesBlock.astro';
@@ -18,10 +41,12 @@ import { getT } from '../i18n';
 import type { Lang } from '../i18n';
 import { publicUrl } from '../lib/urls';
 import { getSeedsFor } from '../lib/seeds';
+import { cleanDisplayText, rankedCouncilsFor } from '../lib/figureWorld';
 import { getFigureById } from '@client/data/public/figuresCatalog';
-import { figureSlugToId, figureIdToSlug } from '@client/data/public/slugMap';
+import { figureIdToSlug } from '@client/data/public/slugMap';
+import { getShortDisplayName } from '@client/data/councilCatalog';
 import { figureThemes } from '@client/data/public/figureSeo';
-import { councilCatalog, getShortDisplayName } from '@client/data/councilCatalog';
+import { getFigureQA } from '@client/data/public/figureQA';
 import { dickinsonPoemsFaqEn, dickinsonPoemsFaqDe } from '../lib/dickinsonPoemsFaq';
 
 interface Props {
@@ -32,6 +57,7 @@ interface Props {
 
 const { figureId, slug, lang } = Astro.props;
 const t = getT(lang);
+const de = lang === 'de';
 const figure = getFigureById(figureId, lang);
 
 if (!figure) {
@@ -40,17 +66,18 @@ if (!figure) {
 
 const seeds = getSeedsFor(figureId, lang);
 const shortName = getShortDisplayName(figureId);
+const qa = getFigureQA(figureId, lang);
+const leadAnswer = qa?.pairs[0]?.a ?? '';
+const aboutParas = figure.about.split('\n').map(p => p.trim()).filter(Boolean);
 
-// Councils where this figure participates (moderator or panelist).
-const relatedCouncils = councilCatalog.filter(c =>
-  c.moderator.id === figureId ||
-  c.participants.some(p => p.id === figureId),
-);
+// The debate this figure leads, for the questions block. Same ranking the
+// council section uses, so the question card and the first council card are
+// always the same debate.
+const leadCouncil = rankedCouncilsFor(figureId)[0];
 
 // Related figures drawn from seed connections, ranked by how often this figure
-// references them across seeds (a stronger relevance signal than first-seen
-// order), then the top 8. Internal linking is the one lever a zero-authority
-// domain fully owns, so pass PageRank to as many real connections as fit.
+// references them across seeds, then the top 8. The typed rails above carry the
+// why; this row is the visual coda that puts faces to the names.
 const connectionCounts = new Map<string, number>();
 for (const seed of seeds) {
   for (const conn of seed.connections ?? []) {
@@ -65,10 +92,6 @@ const relatedFigureIds = [...connectionCounts.entries()]
   .slice(0, 8);
 const themesForFigure = figureThemes[figureId] ?? [];
 
-// Figures whose Ideas list opens by default: the demand figures, where the
-// extra crawlable, above-the-fold body text matters most for AI extraction.
-const OPEN_IDEAS = new Set(['campbell', 'dickinson', 'jung', 'gautama', 'aurelius']);
-
 // Governing-hub up-link (the "up" half of the hub<->figure symbiosis): the 13
 // philosophy-cluster figures point to the philosophy hub, every other figure to
 // the wisdom hub. The DE hubs use localized slugs (philosophie-lernen, not a
@@ -78,29 +101,49 @@ const PHILO_FIGURES = new Set([
   'gautama', 'zenji', 'eckhart', 'bingen', 'rumi', 'jung', 'campbell',
 ]);
 const isPhiloFigure = PHILO_FIGURES.has(figureId);
-const hubHref = lang === 'de'
+const hubHref = de
   ? (isPhiloFigure ? '/de/philosophie-lernen/' : '/de/von-historischen-persoenlichkeiten-lernen/')
   : (isPhiloFigure ? '/ai-philosophy-tutor/' : '/learn-from-historical-figures/');
 const hubLinkLabel = isPhiloFigure
-  ? (lang === 'de' ? 'Philosophie lernen mit einem KI-Tutor' : 'Learn philosophy with an AI tutor')
-  : (lang === 'de' ? 'Von historischen Persönlichkeiten lernen' : 'Learn from historical figures');
-const hubLinkLead = lang === 'de' ? 'Weiter erkunden: ' : 'Keep exploring: ';
+  ? (de ? 'Philosophie lernen mit einem KI-Tutor' : 'Learn philosophy with an AI tutor')
+  : (de ? 'Von historischen Persönlichkeiten lernen' : 'Learn from historical figures');
 
 // Dickinson-only interpretive capsule: "what are her poems about" (the winnable
 // query) as a visible, snippet-eligible answer that funnels into her poems page.
 // Same array drives the FAQPage JSON-LD in the route, so DOM and schema match.
-const poemsFaq = figureId === 'dickinson' ? (lang === 'de' ? dickinsonPoemsFaqDe : dickinsonPoemsFaqEn) : null;
-const poemsLinkLabel = lang === 'de'
-  ? 'Lies ihre Gedichte nach Thema, in ihrer eigenen Handschrift →'
-  : 'Read her poems grouped by theme, in her own hand →';
+const poemsFaq = figureId === 'dickinson' ? (de ? dickinsonPoemsFaqDe : dickinsonPoemsFaqEn) : null;
 
-// Light cleanup for displayed prose: strip em/en dashes + stray semicolons.
-function cleanDisplayText(s: string): string {
-  return s
-    .replace(/\s*[—–]\s*/g, ', ')
-    .replace(/\s*;\s*/g, ', ')
-    .replace(/,\s*,/g, ',')
-    .trim();
+const S = de
+  ? {
+      hubLead: 'Weiter erkunden: ',
+      related: 'Menschen, die hier immer wieder auftauchen',
+      themes: 'Große Fragen, an denen er arbeitet',
+      voice: 'Wie dieses Echo klingt',
+      method: 'Wie wir diese Echos bauen und prüfen',
+      poemsLink: 'Lies ihre Gedichte nach Thema, in ihrer eigenen Handschrift →',
+    }
+  : {
+      hubLead: 'Keep exploring: ',
+      related: 'People who keep coming up here',
+      themes: 'The big questions this work touches',
+      voice: 'How this Echo sounds',
+      method: 'How we build and fact-check these Echoes',
+      poemsLink: 'Read her poems grouped by theme, in her own hand →',
+    };
+
+// German needs a pronoun where English does not, and thirty figures are of
+// mixed gender, so the themes heading drops the possessive in German too.
+const themesHeading = de ? 'Große Fragen, die dieses Werk berührt' : S.themes;
+
+// The voice-profile essence is one long block written for a model to read, so
+// it breaks into paragraphs at sentence boundaries before it goes on a page.
+// A display split only: not a word changes.
+const essenceParas: string[] = [];
+if (figure.essence) {
+  const sentences = cleanDisplayText(figure.essence).match(/[^.!?]+[.!?]+(\s|$)/g) ?? [];
+  for (let i = 0; i < sentences.length; i += 2) {
+    essenceParas.push(sentences.slice(i, i + 2).join('').trim());
+  }
 }
 ---
 <div class="pub-content pub-figure">
@@ -112,44 +155,30 @@ function cleanDisplayText(s: string): string {
     ]}
   />
 
-  <FigureHero figure={figure} lang={lang} />
+  <FigureHero figure={figure} slug={slug} lang={lang} />
 
-  {figure.essence && (
-    <p class="pub-section__text pub-fig-essence">{cleanDisplayText(figure.essence)}</p>
+  {leadAnswer && (
+    <p class="pub-section__text pub-fig-answer">{leadAnswer}</p>
   )}
 
-  <EchoNote variant="figure" name={figure.name} lang={lang} />
-
-  <p class="pub-section__text pub-figure__methodlink">
-    <a class="pub-textlink" href={lang === 'de' ? '/de/methodik/' : '/methodology/'}>
-      {lang === 'de' ? 'Wie wir diese Echos bauen und prüfen' : 'How we build and fact-check these Echoes'}
-    </a>
-  </p>
-
-  <JourneyOverview figureId={figureId} figureName={figure.name} lang={lang} />
-
-  <FigureQA figureId={figureId} lang={lang} />
-
-  <!-- Desktop-only inline CTA. The sticky bar below is mobile-only
-       (display:none on desktop), so without this a desktop visitor on a figure
-       page had no figure-specific deep-link and fell back to the generic navbar
-       CTA into the gallery. Carries the same /app?figure={slug} deep-link, and
-       is hidden on mobile (the sticky bar covers it there) so each viewport
-       shows exactly one figure CTA. -->
-  <PublicCTA
-    variant="inline"
+  <FigureQuestions
     figureId={figureId}
-    figureName={shortName}
+    slug={slug}
+    figureName={figure.name}
+    council={leadCouncil}
     lang={lang}
-    class="pub-cta--desktop"
+    door="fig_q_lead"
+    skipEntryQuestion
   />
+
+  <FigureConcepts figureId={figureId} slug={slug} lang={lang} />
 
   {poemsFaq && (
     <section class="pub-section pub-figure__poems">
       <h2 class="pub-section__title">{poemsFaq[0].q}</h2>
       <p class="pub-section__text">{poemsFaq[0].a}</p>
       <p class="pub-section__text pub-figure__poems-link">
-        <a class="pub-textlink" href="/figures/emily-dickinson/poems">{poemsLinkLabel}</a>
+        <a class="pub-textlink" href="/figures/emily-dickinson/poems">{S.poemsLink}</a>
       </p>
       {poemsFaq.slice(1).map(item => (
         <div class="pub-figure__qa">
@@ -160,125 +189,98 @@ function cleanDisplayText(s: string): string {
     </section>
   )}
 
-  {seeds.length > 0 && (
-    <CollapsibleSection
-      title={t('figures.ideasHeading')}
-      count={seeds.length}
-      defaultOpen={OPEN_IDEAS.has(figureId)}
-    >
-      <ol class="pub-ideas">
-        {seeds.map((seed, i) => (
-          <li class="pub-ideas__item" id={`idea-${i + 1}`}>
-            <span class="pub-ideas__title">{seed.title}</span>
-            {seed.summary && (
-              <span class="pub-ideas__summary">{cleanDisplayText(seed.summary)}</span>
-            )}
-            {seed.coreInsights && seed.coreInsights.length > 0 && (
-              <details class="pub-ideas__insights">
-                <summary>{lang === 'de' ? 'Kerngedanken' : 'Core ideas'}</summary>
-                <ul>
-                  {seed.coreInsights.map(ci => (
-                    <li>{cleanDisplayText(ci)}</li>
-                  ))}
-                </ul>
-              </details>
-            )}
-          </li>
-        ))}
-      </ol>
-    </CollapsibleSection>
-  )}
+  <FigureChapters
+    figureId={figureId}
+    slug={slug}
+    figureName={figure.name}
+    intro={aboutParas}
+    lang={lang}
+  />
 
-  {figure.keyConcepts.length > 0 && (
-    <CollapsibleSection title={t('figures.keyIdeas')}>
-      <div class="pub-concepts">
-        {figure.keyConcepts.map(concept => (
-          <div class="pub-concept">
-            <div class="pub-concept__term">{concept.term}</div>
-            <div class="pub-concept__def">
-              {cleanDisplayText(concept.definition)}
-            </div>
-          </div>
-        ))}
-      </div>
-      {figure.primaryWorks.length > 0 && (
-        <p class="pub-concept__works">
-          <strong>{t('figures.primaryWorks')}:</strong>{' '}
-          {figure.primaryWorks.map(cleanDisplayText).join(', ')}
-        </p>
-      )}
-    </CollapsibleSection>
-  )}
+  <FigureSixWays figureId={figureId} figureName={figure.name} lang={lang} />
 
-  {relatedCouncils.length > 0 && (
-    <CollapsibleSection
-      title={t('figures.councilAppearances')}
-      count={relatedCouncils.length}
-    >
-      <div class="pub-council-list">
-        {relatedCouncils.map(council => (
-          <CouncilPreview council={council} lang={lang} />
-        ))}
+  <FigureCouncils figureId={figureId} slug={slug} figureName={figure.name} lang={lang} />
+
+  <FigureLattice figureId={figureId} figureName={figure.name} lang={lang}>
+    {relatedFigureIds.length > 0 && (
+      <div class="fig-related" slot="coda">
+        <h3 class="fig-related__title">{S.related}</h3>
+        <div class="pub-grid pub-grid--2">
+          {relatedFigureIds.map(relId => {
+            const relFigure = getFigureById(relId, lang);
+            const relSlug = figureIdToSlug[relId];
+            if (!relFigure || !relSlug) return null;
+            return (
+              <a
+                href={publicUrl(lang, `/figures/${relSlug}`)}
+                class="pub-figure-card pub-figure-card--row"
+              >
+                <StaticImage
+                  figureId={relId}
+                  type="thumbnail"
+                  alt=""
+                  loading="lazy"
+                  width={64}
+                  height={64}
+                  sizes="64px"
+                />
+                <div>
+                  <div class="pub-figure-card__name">{relFigure.name}</div>
+                  <div class="pub-figure-card__tradition">{relFigure.tradition}</div>
+                </div>
+              </a>
+            );
+          })}
+        </div>
       </div>
-    </CollapsibleSection>
-  )}
+    )}
+  </FigureLattice>
 
   {themesForFigure.length > 0 && (
-    <CollapsibleSection title={t('figures.themes')}>
+    <section class="pub-section fig-themes">
+      <h2 class="pub-section__title">{themesHeading}</h2>
       <div class="pub-grid pub-grid--3">
         {themesForFigure.map(themeId => (
-          <a
-            href={publicUrl(lang, `/themes/${themeId}`)}
-            class="pub-theme-card"
-          >
+          <a href={publicUrl(lang, `/themes/${themeId}`)} class="pub-theme-card">
             <h3 class="pub-theme-card__name">{t(`themes.${themeId}.name`)}</h3>
             <p class="pub-theme-card__tagline">{t(`themes.${themeId}.tagline`)}</p>
           </a>
         ))}
       </div>
-    </CollapsibleSection>
+      <p class="pub-section__text pub-figure__hublink">
+        {S.hubLead}<a class="pub-textlink" href={hubHref}>{hubLinkLabel}</a>
+      </p>
+    </section>
   )}
 
-  <p class="pub-section__text pub-figure__hublink">
-    {hubLinkLead}<a class="pub-textlink" href={hubHref}>{hubLinkLabel}</a>
-  </p>
-
-  {relatedFigureIds.length > 0 && (
-    <CollapsibleSection
-      title={t('figures.relatedFigures')}
-      count={relatedFigureIds.length}
-    >
-      <div class="pub-grid pub-grid--2">
-        {relatedFigureIds.map(relId => {
-          const relFigure = getFigureById(relId, lang);
-          const relSlug = figureIdToSlug[relId];
-          if (!relFigure || !relSlug) return null;
-          return (
-            <a
-              href={publicUrl(lang, `/figures/${relSlug}`)}
-              class="pub-figure-card pub-figure-card--row"
-            >
-              <StaticImage
-                figureId={relId}
-                type="thumbnail"
-                alt={t('aiDisclosure.imageAlt').replace('{name}', relFigure.name)}
-                loading="lazy"
-                width={64}
-                height={64}
-                sizes="64px"
-              />
-              <div>
-                <div class="pub-figure-card__name">{relFigure.name}</div>
-                <div class="pub-figure-card__tradition">{relFigure.tradition}</div>
-              </div>
-            </a>
-          );
-        })}
-      </div>
-    </CollapsibleSection>
-  )}
+  <FigureShadow figureId={figureId} lang={lang} />
 
   <SourcesBlock figureId={figureId} lang={lang} />
+
+  {essenceParas.length > 0 && (
+    <section class="pub-section fig-voice">
+      <h2 class="pub-section__title">{S.voice}</h2>
+      {essenceParas.map(p => <p class="pub-section__text">{p}</p>)}
+    </section>
+  )}
+
+  <FigureQA figureId={figureId} lang={lang} />
+
+  <EchoNote variant="figure" name={figure.name} lang={lang} />
+
+  <p class="pub-section__text pub-figure__methodlink">
+    <a class="pub-textlink" href={de ? '/de/methodik/' : '/methodology/'}>{S.method}</a>
+  </p>
+
+  <FigureQuestions
+    figureId={figureId}
+    slug={slug}
+    figureName={figure.name}
+    council={leadCouncil}
+    lang={lang}
+    door="fig_q_foot"
+    variant="foot"
+  />
 
   <PublicCTA
     variant="sticky"
@@ -289,80 +291,40 @@ function cleanDisplayText(s: string): string {
 </div>
 
 <style is:global>
-  .pub-figure__poems {
-    margin: 0.5rem 0 2rem;
+  /* The answer. First body element, 40 to 80 words, the paragraph a snippet
+     and an answer engine lift. Sized up so the eye lands on it. */
+  .pub-figure .pub-fig-answer {
+    margin: 0 0 0.4rem;
+    font-size: 1.12rem;
+    line-height: 1.78;
+    color: var(--text-primary);
+    max-width: 64ch;
   }
-  .pub-figure__poems-link {
-    margin-top: 0.5rem;
-    font-size: 1.05rem;
-  }
-  .pub-figure__qa {
-    margin-top: 1.5rem;
-  }
+  .pub-figure__poems { margin: 0; }
+  .pub-figure__poems-link { margin-top: 0.5rem; font-size: 1.05rem; }
+  .pub-figure__qa { margin-top: 1.5rem; }
   .pub-figure__qa-q {
     font-family: var(--font-content, 'Libre Caslon Text', serif);
     font-size: 1.1rem;
     color: var(--gold-primary);
     margin: 0 0 0.4rem;
   }
-  /* A2: the figure's essence as a visible lead paragraph below the hero. The
-     only prominent, uncollapsed, on-topic body text on the page, which is what
-     a "tell me about X" visitor came for and what AI engines extract. Double-
-     scoped so it beats the base .pub-section__text spacing regardless of order. */
-  .pub-figure .pub-fig-essence {
-    margin: 0 0 1.75rem;
-    font-size: 1.1rem;
-    line-height: 1.75;
+  /* The portrait rows are the lattice's coda, so they live inside its section
+     and keep the tighter in-section rhythm. */
+  .fig-related { margin-top: 0.6rem; }
+  .fig-related__title {
+    margin: 0 0 0.8rem;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: 0.72rem;
+    font-weight: var(--weight-medium, 500);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold-deep);
   }
-  /* A1: each Idea is now title + a one-line summary gloss, with optional core
-     ideas in a nested native <details>. Turns 12 bare titles into real,
-     crawlable context, zero new prose (all from existing seed data). */
-  .pub-ideas__title {
-    font-weight: 600;
-  }
-  .pub-ideas__summary {
-    display: block;
-    margin-top: 0.2rem;
-    font-size: 0.95rem;
-    line-height: 1.55;
-    opacity: 0.85;
-  }
-  .pub-ideas__insights {
-    margin-top: 0.4rem;
-    font-size: 0.92rem;
-  }
-  .pub-ideas__insights > summary {
-    cursor: pointer;
-    color: var(--gold-primary);
-  }
-  .pub-ideas__insights ul {
-    margin: 0.4rem 0 0;
-    padding-left: 1.1rem;
-  }
-  .pub-figure__hublink {
-    margin: 0.75rem 0 1.5rem;
-  }
-  .pub-figure__methodlink {
-    margin: 0.6rem 0 0;
-    font-size: 0.95rem;
-  }
-  /* The inline figure CTA above is desktop-only (hidden on mobile, where the
-     sticky bar carries the deep-link). The journey-path section above it has a
-     3rem bottom margin and the inline variant adds 2rem 0 of its own padding,
-     which stacked into a big empty band. Pull the CTA up tight under the
-     "new here, start with the first story" nudge and trim its padding. The
-     double class beats .pub-cta--inline regardless of bundle order. */
-  .pub-cta--inline.pub-cta--desktop {
-    margin-top: -2rem;
-    padding: 0 0 1.5rem;
-  }
-  @media (max-width: 640px) {
-    .pub-cta--desktop {
-      display: none;
-    }
-  }
-  /* Related-figures rows: horizontal card variant (was an inline style,
-     moved to a class so the strict CSP style-src needs no 'unsafe-inline'). */
+  .pub-figure__hublink { margin: 0.5rem 0 0; }
+  .pub-figure__methodlink { margin: 0; font-size: 0.95rem; }
+  /* Related-figures rows: horizontal card variant (a class, not an inline
+     style, so the strict CSP style-src needs no 'unsafe-inline'). */
   .pub-figure-card.pub-figure-card--row {
     flex-direction: row;
     gap: 0.75rem;

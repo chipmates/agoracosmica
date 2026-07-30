@@ -1,0 +1,80 @@
+---
+// Where this figure argues. The top three debates are open, the rest sit in a
+// native <details> tail so a figure in eleven councils does not bury the page.
+// Order: the debate the figure leads on one of their own themes first, then the
+// other featured debates, then the curated listening order.
+
+import type { Lang } from '../i18n';
+import CouncilPreview from './CouncilPreview.astro';
+import { rankedCouncilsFor } from '../lib/figureWorld';
+
+interface Props {
+  figureId: string;
+  slug: string;
+  figureName: string;
+  lang: Lang;
+}
+
+const { figureId, slug, figureName, lang } = Astro.props;
+const de = lang === 'de';
+
+const councils = rankedCouncilsFor(figureId);
+const top = councils.slice(0, 3);
+const tail = councils.slice(3);
+
+const S = de
+  ? {
+      heading: `Wo ${figureName} mitdiskutiert`,
+      lead: 'Vier Stimmen, eine Frage, aufgenommen und angehört. Du hörst zu, und danach kannst du dieselbe Frage selbst stellen.',
+      more: `Alle ${councils.length} Debatten mit ${figureName}`,
+    }
+  : {
+      heading: `Where ${figureName} argues`,
+      lead: 'Four voices on one question, recorded and ready to hear. You listen in, and then you can put the same question yourself.',
+      more: `All ${councils.length} debates with ${figureName}`,
+    };
+---
+{councils.length > 0 && (
+  <section class="pub-section fig-councils">
+    <h2 class="pub-section__title">{S.heading}</h2>
+    <p class="pub-section__text">{S.lead}</p>
+    <div class="fig-councils__top">
+      {top.map(c => (
+        <CouncilPreview council={c} lang={lang} figureId={figureId} slug={slug} featured />
+      ))}
+    </div>
+    {tail.length > 0 && (
+      <details class="fig-councils__tail">
+        <summary>{S.more}</summary>
+        <div class="fig-councils__rows">
+          {tail.map(c => (
+            <CouncilPreview council={c} lang={lang} figureId={figureId} slug={slug} />
+          ))}
+        </div>
+      </details>
+    )}
+  </section>
+)}
+
+<style is:global>
+  .fig-councils__top {
+    display: grid;
+    gap: 1rem;
+  }
+  .fig-councils__tail > summary {
+    cursor: pointer;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: 0.8rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold-deep);
+  }
+  .fig-councils__tail[open] > summary { color: var(--gold-primary); }
+  .fig-councils__rows { padding-top: 0.4rem; }
+  @media (min-width: 900px) {
+    .fig-councils__top { grid-template-columns: repeat(3, 1fr); }
+  }
+</style>

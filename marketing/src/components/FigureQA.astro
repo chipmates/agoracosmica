@@ -1,12 +1,15 @@
 ---
-// Answer-first FAQ capsule for figure pages. Always visible (collapsed answers
-// are not snippet-eligible) and placed high, so a "what can I learn from X" or
-// "what did X teach" searcher gets the answer immediately. The SAME data drives
-// the FAQPage JSON-LD in figures/[slug].astro, so DOM and schema always match.
+// The honesty capsule at the foot of a figure page: "is this really X
+// speaking?", answered plainly.
+//
+// The other Q&A pairs are not here any more. Pair 0 is now the lead paragraph
+// under the H1 (an answer a searcher can read without scrolling), and pairs 1
+// and up became the concept sections. The same array still drives the FAQPage
+// JSON-LD in the route, so the schema and the visible page stay in step.
 //
 // Content is drafted from verified keyConcepts/primaryWorks/entity data and was
-// web-fact-checked + bilingually voiced, but it AWAITS MICHEL'S VOICE PASS +
-// final factcheck sign-off before deploy (kernel-and-Michel rule).
+// web-fact-checked, and it AWAITS THE EDITORIAL VOICE PASS for the 29 figures
+// that have not had it (Jung has).
 import { getFigureQA } from '@client/data/public/figureQA';
 import type { Lang } from '../i18n';
 
@@ -17,26 +20,10 @@ interface Props {
 
 const { figureId, lang } = Astro.props;
 const qa = getFigureQA(figureId, lang);
-const heading = lang === 'de' ? 'Häufige Fragen' : 'Common questions';
 ---
 {qa && (
   <section class="pub-section pub-figure__qa-capsule">
-    <h2 class="pub-section__title">{heading}</h2>
-    {qa.pairs.map(item => (
-      <div class="pub-figure__qa">
-        <h3 class="pub-figure__qa-q">{item.q}</h3>
-        <p class="pub-section__text">{item.a}</p>
-      </div>
-    ))}
-    <div class="pub-figure__qa">
-      <h3 class="pub-figure__qa-q">{qa.disclosure.q}</h3>
-      <p class="pub-section__text">{qa.disclosure.a}</p>
-    </div>
+    <h2 class="pub-section__title">{qa.disclosure.q}</h2>
+    <p class="pub-section__text">{qa.disclosure.a}</p>
   </section>
 )}
-
-<style is:global>
-  .pub-figure__qa-capsule {
-    margin: 0.5rem 0 2rem;
-  }
-</style>

@@ -1,0 +1,74 @@
+---
+// "Six ways to learn from {name}" — the interactive Library, resolved for this
+// figure. The one place on the page where a visitor can actually try the thing:
+// play the first story chapter, hear the four-voice Prism, read a core
+// teaching. All six panels are server-rendered, so nothing crawlable depends on
+// the island hydrating.
+//
+// Same element the homepage uses. It sits below the answer and the questions
+// now, because a feature menu is not what a searcher came for.
+
+import LabLibrary from '../islands/LabLibrary';
+import { figureImage } from '../lib/figureImages';
+import { getFigureLibraryModes } from './landing-lab/figure-library';
+import { publicUrl } from '../lib/urls';
+import type { Lang } from '../i18n';
+import './landing-lab/lab-samples.css';
+import './landing-lab/lab-library.css';
+
+interface Props {
+  figureId: string;
+  figureName: string;
+  lang: Lang;
+}
+
+const { figureId, figureName, lang } = Astro.props;
+const de = lang === 'de';
+
+const S = de
+  ? {
+      heading: `Sechs Wege, von ${figureName} zu lernen`,
+      intro: 'Vier davon bilden einen Weg: eine Szene hören, die Idee durchdenken, vier Stimmen dazu hören, dich selbst prüfen. Die anderen zwei stehen daneben, für offene Fragen und für die große Debatte.',
+      tablistAria: 'Sechs Wege zu lernen',
+      groupArc: 'Der Lernweg',
+      groupMore: 'Weiter gehen',
+      continueLabel: 'Das Ganze anhören',
+      playDefault: 'Abspielen',
+      footShowing: 'Wähl einen Weg und probier ihn aus.',
+      footEvery: 'Alle dreißig Menschen ansehen →',
+      figuresHref: publicUrl('de', '/figures'),
+    }
+  : {
+      heading: `Six ways to learn from ${figureName}`,
+      intro: 'Four of them make a path: hear a scene, think the idea through, hear four voices turn it over, test yourself. The other two sit beside it, for open questions and for the big debate.',
+      tablistAria: 'Six ways to learn',
+      groupArc: 'The learning arc',
+      groupMore: 'Go further',
+      continueLabel: 'Hear the whole thing',
+      playDefault: 'Play',
+      footShowing: 'Pick a way and try it.',
+      footEvery: 'See all thirty figures →',
+      figuresHref: publicUrl('en', '/figures'),
+    };
+
+const modes = getFigureLibraryModes(figureId, lang);
+const portrait = figureImage(figureId, 'thumbnail', 160);
+const { heading, intro, ...labels } = S;
+---
+<section class="pub-section pub-path-section">
+  <h2 class="pub-section__title">{heading}</h2>
+  <p class="pub-section__text">{intro}</p>
+
+  <LabLibrary
+    client:visible
+    modes={modes}
+    portrait={portrait}
+    figureName={figureName}
+    figureId={figureId}
+    labels={labels}
+  />
+</section>
+
+<style>
+  .pub-path-section :global(.lib) { margin: 1.2rem auto 0; }
+</style>

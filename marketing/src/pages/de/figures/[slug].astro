@@ -12,6 +12,7 @@ import { figureSlugToId } from '@client/data/public/slugMap';
 import { getFigureById } from '@client/data/public/figuresCatalog';
 import { getFigureSeo } from '@client/data/public/figureSeo';
 import { getFigureQA } from '@client/data/public/figureQA';
+import { getFigurePageContent } from '@client/data/public/figurePageContent';
 
 export async function getStaticPaths() {
   return Object.entries(figureSlugToId).map(([slug, figureId]) => ({
@@ -50,6 +51,14 @@ const figQaItems = (figureId !== 'dickinson' && figQA)
 // ist.
 const ideaSeeds = getSeedsFor(figureId, lang);
 
+// Die Werke, die die Seite zeigt: die redigierte Liste, wenn es sie gibt (sie
+// trägt die deutschen Titel), sonst die Katalogliste. Als Book-Knoten
+// ausgegeben, damit die Werke strukturierte Daten sind und nicht nur Fließtext.
+const pageContent = getFigurePageContent(figureId, lang);
+const schemaWorks = pageContent?.works?.length
+  ? pageContent.works.map(w => w.title)
+  : figure.primaryWorks;
+
 const schemas = [
   personSchema({
     name: figure.name,
@@ -59,6 +68,8 @@ const schemas = [
     slug: slug!,
     lang,
     image: figurePortrait,
+    concepts: figure.keyConcepts.map(c => c.term),
+    works: schemaWorks,
   }),
   breadcrumbSchema([
     { name: t('breadcrumbs.home'), url: `${SITE_URL}/de/` },

@@ -1,0 +1,209 @@
+---
+// The life, in twelve chapters. Uncollapsed, server-rendered, and every line
+// of it is a join of data that already exists:
+//
+//   title      seeds/{lang}/{id}.json
+//   year, age, setting, the documented/recreated ledger   factchecks
+//   runtime    stories/{lang}/{id}.json
+//
+// The ledger line is the honesty signature: per scene, what the record shows
+// and what we staged. Factcheck strings render VERBATIM or not at all.
+// No per-chapter art exists (the image manifest carries a portrait and a
+// thumbnail only), so the block is typographic by design.
+
+import type { Lang } from '../i18n';
+import { getSeedsFor } from '../lib/seeds';
+import { getStoryChapter } from '../lib/stories';
+import { getChapterFactcheck } from '../lib/factchecks';
+import { cleanDisplayText, cleanFactText } from '../lib/figureWorld';
+
+interface Props {
+  figureId: string;
+  slug: string;
+  figureName: string;
+  /** The catalog's short life summary. It used to sit in the hero, above the
+   *  answer, where it pushed the voice and the question below the fold. Here it
+   *  is the bridge into the twelve scenes it summarises. */
+  intro?: string[];
+  lang: Lang;
+}
+
+const { figureId, slug, figureName, intro = [], lang } = Astro.props;
+const de = lang === 'de';
+
+const S = de
+  ? {
+      heading: `Das Leben von ${figureName}, in zwölf Kapiteln`,
+      lead: 'Jedes Kapitel nimmt eine Idee und macht eine Szene daraus. Unter jeder Szene steht, was belegt ist und was wir für die Erzählung gebaut haben.',
+      age: 'mit',
+      min: 'Min.',
+      documented: 'Belegt',
+      recreated: 'Für die Szene gebaut',
+      listen: 'Kapitel',
+      listenTail: 'hören',
+    }
+  : {
+      heading: `The life of ${figureName}, in twelve chapters`,
+      lead: 'Each chapter takes one idea and turns it into a scene. Under every scene we say what the record shows and what we built for the telling.',
+      age: 'age',
+      min: 'min',
+      documented: 'Documented',
+      recreated: 'Built for the scene',
+      listen: 'Hear chapter',
+      listenTail: '',
+    };
+
+const seeds = getSeedsFor(figureId, lang);
+
+// The locked-positioning guard: "greatest minds" is a framing the site never
+// uses about itself, and validate-seo enforces that on every built page. One
+// story hook contains it as narration (a scene at the Solvay Conference), which
+// is a true description of that room but still trips the guard, so that chapter
+// falls back to its seed summary instead of the hook. Never edit the source
+// prose to get past a guard.
+const LOCKED_FRAMING = /great(est)? minds|gr(ö|oe)(ß|ss)te[nr]? (denker|geister)/i;
+
+const chapters = seeds.map((seed, i) => {
+  const n = i + 1;
+  const fc = getChapterFactcheck(figureId, lang, n);
+  const story = getStoryChapter(figureId, lang, n);
+  const meta = [
+    fc?.year,
+    fc?.age ? `${S.age} ${fc.age}` : '',
+    fc?.setting,
+    story?.minutes ? `${story.minutes} ${S.min}` : '',
+  ].filter(Boolean).map(cleanFactText) as string[];
+  const hook = cleanDisplayText(story?.hook);
+  return {
+    n,
+    title: cleanDisplayText(seed.title),
+    summary: cleanDisplayText(seed.summary),
+    hook: LOCKED_FRAMING.test(hook) ? '' : hook,
+    meta,
+    documented: cleanFactText(fc?.documented?.[0]),
+    recreated: cleanFactText(fc?.recreated?.[0]),
+  };
+});
+---
+{chapters.length > 0 && (
+  <section class="pub-section fig-chapters">
+    <h2 class="pub-section__title">{S.heading}</h2>
+    {intro.map(p => <p class="pub-section__text fig-chapters__intro">{p}</p>)}
+    <p class="pub-section__text">{S.lead}</p>
+    <ol class="fig-chapters__list">
+      {chapters.map(c => (
+        <li class="fig-chapter" id={`idea-${c.n}`}>
+          <h3 class="fig-chapter__title">
+            <span class="fig-chapter__n" aria-hidden="true">{c.n}</span>
+            {c.title}
+          </h3>
+          {c.meta.length > 0 && (
+            <p class="fig-chapter__meta">{c.meta.join('  ·  ')}</p>
+          )}
+          <p class="fig-chapter__text">{c.hook || c.summary}</p>
+          {(c.documented || c.recreated) && (
+            <p class="fig-chapter__ledger">
+              {c.documented && (
+                <span class="fig-chapter__ledger-item">
+                  <span class="fig-chapter__ledger-key">{S.documented}:</span> {c.documented}
+                </span>
+              )}
+              {c.recreated && (
+                <span class="fig-chapter__ledger-item">
+                  <span class="fig-chapter__ledger-key">{S.recreated}:</span> {c.recreated}
+                </span>
+              )}
+            </p>
+          )}
+          <p class="fig-chapter__door">
+            <a
+              class="pub-textlink"
+              href={`/app?figure=${slug}&lang=${lang}&mode=story&chapter=${c.n}`}
+              data-agc-cta="start-exploring"
+              data-agc-figure={figureId}
+              data-agc-door="fig_chapter"
+            >
+              {`${S.listen} ${c.n}${S.listenTail ? ' ' + S.listenTail : ''} →`}
+            </a>
+          </p>
+        </li>
+      ))}
+    </ol>
+  </section>
+)}
+
+<style is:global>
+  .fig-chapters__list {
+    list-style: none;
+    margin: 0.4rem 0 0;
+    padding: 0;
+  }
+  .fig-chapter {
+    padding-left: 1.15rem;
+    margin-bottom: 1.7rem;
+    border-left: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-20, 20%), transparent);
+  }
+  .fig-chapter:last-child { margin-bottom: 0; }
+  .fig-chapter__title {
+    display: flex;
+    align-items: baseline;
+    gap: 0.7rem;
+    margin: 0 0 0.3rem;
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-weight: var(--weight-regular, 400);
+    font-size: 1.2rem;
+    line-height: 1.3;
+    color: var(--gold-subtle);
+  }
+  .fig-chapter__n {
+    flex: 0 0 auto;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    color: var(--gold-deep);
+  }
+  .fig-chapter__meta {
+    margin: 0 0 0.55rem;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: 0.74rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+  }
+  .fig-chapter__text {
+    margin: 0 0 0.55rem;
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    max-width: 66ch;
+  }
+  .fig-chapter__ledger {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin: 0 0 0.5rem;
+    padding: 0.6rem 0.8rem;
+    border: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-12, 12%), transparent);
+    border-radius: var(--plate-radius, 4px);
+    background: color-mix(in srgb, var(--bg-card) var(--a-45, 45%), transparent);
+    font-size: 0.86rem;
+    line-height: 1.55;
+    color: var(--text-tertiary);
+    max-width: 66ch;
+  }
+  .fig-chapter__ledger-key {
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold-deep);
+  }
+  .fig-chapter__door { margin: 0; font-size: 0.92rem; }
+  /* Two columns that FLOW. A grid would lock the rows to the tallest chapter
+     and leave holes, and the twelve chapters differ a lot in length. */
+  @media (min-width: 900px) {
+    .fig-chapters__list { columns: 2; column-gap: 2.6rem; }
+    .fig-chapter { break-inside: avoid; }
+  }
+</style>

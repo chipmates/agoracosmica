@@ -16,6 +16,12 @@ export function personSchema(figure: {
   slug: string;
   lang: string;
   image?: string;
+  /** The figure's own key-concept terms. Widens knowsAbout from the single
+   *  tradition label to the named ideas the page actually explains. Optional,
+   *  so existing callers keep the tradition-only behaviour. */
+  concepts?: string[];
+  /** Primary works, emitted as Book nodes under workExample. */
+  works?: string[];
 }): Record<string, unknown> {
   // Trailing slash: the canonical URL form. The no-slash form 301s, and
   // @ids pointing at redirecting URLs weaken entity reconciliation.
@@ -33,6 +39,19 @@ export function personSchema(figure: {
     figure.lang === 'de'
       ? `Bildungsbezogenes KI-Echo der historischen Persönlichkeit ${figure.name}. Das Porträt ist ein KI-erzeugtes Bild, keine Fotografie.`
       : `Educational AI Echo of the historical ${figure.name}. The portrait is an AI-generated image, not a photograph.`;
+  // knowsAbout stays a plain string when no concepts are passed, so nothing
+  // changes for the callers that do not supply them.
+  const knowsAbout = figure.concepts?.length
+    ? [figure.tradition, ...figure.concepts].filter(Boolean)
+    : figure.tradition;
+  // The primary works as Book nodes, each pointing back at this Person as its
+  // author. Titles carry their publication year in parentheses, which is data,
+  // not a claim, so it stays in the name verbatim.
+  const workExample = (figure.works ?? []).filter(Boolean).map(title => ({
+    '@type': 'Book',
+    name: title,
+    author: { '@id': `${url}#person` },
+  }));
   return {
     '@context': 'https://schema.org',
     '@type': 'Person',
@@ -41,7 +60,8 @@ export function personSchema(figure: {
     description: figure.about,
     disambiguatingDescription,
     url,
-    knowsAbout: figure.tradition,
+    knowsAbout,
+    ...(workExample.length && { workExample }),
     ...(figure.image && { image: figure.image }),
     ...(entity?.birthDate && { birthDate: entity.birthDate }),
     ...(entity?.deathDate && { deathDate: entity.deathDate }),

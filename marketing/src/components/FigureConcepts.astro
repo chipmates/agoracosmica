@@ -1,0 +1,107 @@
+---
+// The concept sections: each heading is a question someone actually typed,
+// each answer stands on its own.
+//
+// Two sources, in this order:
+//   1. the authored blocks in figurePageContent.ts (the harvested queries, and
+//      the German-only "einfach erklärt" summary that has no English twin)
+//   2. the figure's own Q&A pairs from index 1 on, which exist for all 30 in
+//      both languages and also drive the page's FAQPage schema
+// A figure with no authored blocks renders only the second group, so the
+// template gives every figure the same shape with nothing missing.
+
+import type { Lang } from '../i18n';
+import { getFigurePageContent } from '@client/data/public/figurePageContent';
+import { getFigureQA } from '@client/data/public/figureQA';
+import { getSeedsFor } from '../lib/seeds';
+import { cleanDisplayText } from '../lib/figureWorld';
+
+interface Props {
+  figureId: string;
+  slug: string;
+  lang: Lang;
+}
+
+const { figureId, slug, lang } = Astro.props;
+const de = lang === 'de';
+const authored = getFigurePageContent(figureId, lang);
+const qa = getFigureQA(figureId, lang);
+const seeds = getSeedsFor(figureId, lang);
+
+const S = de
+  ? { chapterLink: 'Das ganze Kapitel hören', chapterAria: 'Kapitel' }
+  : { chapterLink: 'Hear the whole chapter', chapterAria: 'Chapter' };
+
+interface Block {
+  h2: string;
+  body: string;
+  bullets: string[];
+  chapter?: number;
+}
+
+const blocks: Block[] = [];
+
+for (const c of authored?.concepts ?? []) {
+  const seed = c.seedId ? seeds.find(s => s.id === c.seedId) : undefined;
+  blocks.push({
+    h2: c.h2,
+    body: c.body,
+    bullets: (seed?.coreInsights ?? []).map(cleanDisplayText),
+    chapter: seed ? c.seedId : undefined,
+  });
+}
+
+for (const pair of qa?.pairs.slice(1) ?? []) {
+  blocks.push({ h2: pair.q, body: pair.a, bullets: [] });
+}
+---
+{blocks.length > 0 && (
+  <div class="fig-concepts">
+    {blocks.map(b => (
+      <section class="pub-section fig-concept">
+        <h2 class="pub-section__title">{b.h2}</h2>
+        <p class="pub-section__text">{b.body}</p>
+        {b.bullets.length > 0 && (
+          <ul class="fig-concept__points">
+            {b.bullets.map(p => <li>{p}</li>)}
+          </ul>
+        )}
+        {b.chapter && (
+          <p class="fig-concept__link">
+            <a
+              class="pub-textlink"
+              href={`/app?figure=${slug}&lang=${lang}&mode=story&chapter=${b.chapter}`}
+              data-agc-cta="start-exploring"
+              data-agc-figure={figureId}
+              data-agc-door="fig_concept_chapter"
+            >
+              {`${S.chapterLink} (${S.chapterAria} ${b.chapter})`}
+            </a>
+          </p>
+        )}
+      </section>
+    ))}
+  </div>
+)}
+
+<style is:global>
+  .fig-concepts {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(2rem, 3.4vw, 2.8rem);
+  }
+  .fig-concept__points {
+    margin: 0;
+    padding: 0 0 0 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    max-width: 66ch;
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: 0.98rem;
+    line-height: 1.65;
+    color: var(--text-secondary);
+  }
+  .fig-concept__points li::marker { color: var(--gold-deep); }
+  .fig-concept__link { margin: 0.35rem 0 0; font-size: 0.95rem; }
+</style>

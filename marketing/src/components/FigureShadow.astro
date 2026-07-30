@@ -1,0 +1,78 @@
+---
+// "What we do not smooth over" — the verified record about the figure that a
+// admiring page would leave out. Source: factchecks/{lang}/{id}.json, the
+// shadow object, already written and already sourced.
+//
+// BUILT AND WIRED, RENDERS NOTHING. The flag below is hard off.
+//
+// Why: the block is per-figure owner-gated. Some entries are much heavier than
+// others and the block must never read as gossip, so each of the thirty needs a
+// sign-off before it goes public. The review list ships alongside this build.
+// Until a figure clears the gate it shows nothing, and the text is NEVER
+// softened to make it shippable.
+//
+// To turn on: replace SHOW with a per-figure allowlist of cleared ids, keep the
+// verbatim rendering below untouched, and screenshot both languages first.
+
+import type { Lang } from '../i18n';
+import { getShadowRecord } from '../lib/factchecks';
+
+interface Props {
+  figureId: string;
+  lang: Lang;
+}
+
+const { figureId, lang } = Astro.props;
+const de = lang === 'de';
+
+/** Owner gate. No figure is cleared. */
+const SHOW: ReadonlySet<string> = new Set<string>();
+
+const record = getShadowRecord(figureId, lang);
+const items = [
+  ...(record?.personal ?? []),
+  ...(record?.historical ?? []),
+  ...(record?.context ?? []),
+].filter(Boolean);
+
+const visible = SHOW.has(figureId) && items.length > 0;
+
+const S = de
+  ? {
+      heading: 'Was wir nicht glätten',
+      lead: 'Dieselbe Person, die diese Ideen hatte, hat auch das getan. Wir lassen es stehen, weil du es wissen solltest, bevor du zuhörst.',
+    }
+  : {
+      heading: 'What we do not smooth over',
+      lead: 'The same person who had these ideas also did this. We leave it in, because you should know it before you listen.',
+    };
+---
+{visible && (
+  <section class="pub-section fig-shadow">
+    <h2 class="pub-section__title">{S.heading}</h2>
+    <p class="pub-section__text">{S.lead}</p>
+    <ul class="fig-shadow__list">
+      {items.map(item => <li>{item}</li>)}
+    </ul>
+  </section>
+)}
+
+<style is:global>
+  .fig-shadow__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    max-width: 68ch;
+  }
+  .fig-shadow__list li {
+    padding-left: 0.9rem;
+    border-left: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-20, 20%), transparent);
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: 0.98rem;
+    line-height: 1.7;
+    color: var(--text-secondary);
+  }
+</style>

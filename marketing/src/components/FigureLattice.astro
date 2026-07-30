@@ -1,0 +1,135 @@
+---
+// The typed lattice. Every one of the 360 teachings carries exactly one
+// foundation, one expansion and one tension link, so each figure has 36
+// outbound edges that say WHY they connect. Wikipedia's links do not.
+//
+// Rendered as three named rails, each edge "{this teaching} -> {figure},
+// {their teaching}", pointing at the other page's chapter anchor. This is the
+// densest internal-link structure the site has, and internal linking is the one
+// ranking lever a young domain fully owns.
+
+import type { Lang } from '../i18n';
+import { getLattice } from '../lib/figureWorld';
+import type { EdgeType } from '../lib/figureWorld';
+import { getFigureById } from '@client/data/public/figuresCatalog';
+import { publicUrl } from '../lib/urls';
+
+interface Props {
+  figureId: string;
+  figureName: string;
+  lang: Lang;
+}
+
+const { figureId, figureName, lang } = Astro.props;
+const de = lang === 'de';
+
+const S = de
+  ? {
+      heading: `Woran ${figureName} anknüpft, und wer widerspricht`,
+      lead: 'Jede der zwölf Lehren steht auf einer anderen, führt zu einer dritten und stößt sich an einer vierten. Hier stehen alle drei Richtungen.',
+      rails: {
+        foundation: 'Baut auf',
+        expansion: 'Öffnet sich zu',
+        tension: 'Widerspricht',
+      },
+    }
+  : {
+      heading: `What ${figureName} builds on, and who argues back`,
+      lead: 'Each of the twelve teachings stands on another one, opens into a third and rubs against a fourth. All three directions are here.',
+      rails: {
+        foundation: 'Builds on',
+        expansion: 'Opens into',
+        tension: 'Argues with',
+      },
+    };
+
+const lattice = getLattice(
+  figureId,
+  lang,
+  id => getFigureById(id, lang)?.name,
+  path => publicUrl(lang, path),
+);
+const rails: EdgeType[] = ['foundation', 'expansion', 'tension'];
+const total = rails.reduce((n, r) => n + lattice[r].length, 0);
+---
+{total > 0 && (
+  <section class="pub-section fig-lattice">
+    <h2 class="pub-section__title">{S.heading}</h2>
+    <p class="pub-section__text">{S.lead}</p>
+    <div class="fig-lattice__rails">
+      {rails.map(rail => lattice[rail].length > 0 && (
+        <div class="fig-lattice__rail">
+          <h3 class="fig-lattice__rail-name">{S.rails[rail]}</h3>
+          <ul class="fig-lattice__edges">
+            {lattice[rail].map(e => (
+              <li class="fig-lattice__edge">
+                <span class="fig-lattice__from">{e.fromTitle}</span>
+                <a class="fig-lattice__to" href={e.href}>
+                  {`${e.toFigureName}, ${e.toSeedTitle}`}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+    <slot name="coda" />
+  </section>
+)}
+
+<style is:global>
+  .fig-lattice__rails {
+    display: grid;
+    gap: 1.8rem;
+  }
+  .fig-lattice__rail-name {
+    margin: 0 0 0.6rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-20, 20%), transparent);
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: 0.72rem;
+    font-weight: var(--weight-medium, 500);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold-deep);
+  }
+  .fig-lattice__edges {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+  }
+  .fig-lattice__edge {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+  .fig-lattice__from {
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+  .fig-lattice__to {
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: 0.98rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    padding-bottom: 1px;
+    min-height: 1.5rem;
+  }
+  .fig-lattice__to:hover,
+  .fig-lattice__to:focus-visible {
+    color: var(--gold-primary);
+    border-bottom-color: var(--keyline-strong);
+  }
+  @media (min-width: 900px) {
+    .fig-lattice__rails { grid-template-columns: repeat(3, 1fr); gap: 2.2rem; }
+  }
+</style>

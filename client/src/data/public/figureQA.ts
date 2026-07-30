@@ -1,7 +1,13 @@
 // Answer-first FAQ capsules per figure. Drafted from verified keyConcepts /
 // primaryWorks / entity data, web-fact-checked, bilingual. Drives BOTH the
 // on-page capsule and the FAQPage JSON-LD so DOM and schema always match.
-// AWAITING EDITORIAL VOICE PASS before deploy.
+// AWAITING EDITORIAL VOICE PASS before deploy. Jung has had it (the reference
+// implementation); the other 29 have not.
+//
+// pairs[0].a is the page's lead paragraph, so it is written to that job: one
+// paragraph, subject first, full name and dates in the opening clause, 40 to
+// 80 words, no list and no link. pairs[1..] each become a section heading with
+// its own self-contained passage.
 export interface QAPair { q: string; a: string; }
 export interface FigureQAEntry { pairs: QAPair[]; disclosure: QAPair; }
 
@@ -95,40 +101,40 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       pairs: [
         {
           q: "What can I learn from Carl Gustav Jung?",
-          a: "Carl Gustav Jung (1875-1961) was a psychiatrist who taught that the unconscious is a living country, not just an attic of forgotten things. The parts of yourself you disown do not vanish. They run you from below, and you meet them in whatever you cannot stand in other people. With Jung, you learn to meet your own shadow.",
+          a: "Carl Gustav Jung (1875-1961) was a Swiss psychiatrist. He taught that the unconscious is not a dusty attic of things you forgot. It is a place with its own life in it. The parts of yourself you refuse to own do not disappear. They steer you from below, and you meet them in whatever you cannot stand about other people. With Jung, you learn to meet your own shadow.",
         },
         {
-          q: "What did Carl Gustav Jung actually teach?",
-          a: "Carl Gustav Jung founded analytical psychology, a branch of depth psychology, exploring shadow work, individuation, archetypes, and the collective unconscious. He worked from clinical evidence, beginning with his word association studies (1904-1910), then Symbols of Transformation (1912, revised 1952) and Psychological Types (1921). His writing is clinically precise yet confessional.",
+          q: "What did Carl Gustav Jung teach?",
+          a: "Carl Gustav Jung founded analytical psychology, his own branch of depth psychology. Four ideas hold it together. The shadow is everything about yourself you push away. Individuation is the slow work of becoming the whole person you already are. Archetypes are old patterns that shape how we picture the world. The collective unconscious is the layer of mind we all share. Jung did not start from theory. He started from measurement: his word association studies (1904-1910) timed how long a patient hesitated before answering. The books came after. Symbols of Transformation (1912, revised 1952) and Psychological Types (1921) are where he set the ideas down.",
         },
         {
           q: "What is individuation in Jung's psychology?",
-          a: "For Carl Gustav Jung, individuation is the lifelong process of becoming who you truly are, opening doors in yourself you have never opened. It means confronting the shadow you have rejected, withdrawing the projections you have cast onto others, and discovering that you are far larger than the rooms you once called 'me.' It is central to his analytical psychology.",
+          a: "Individuation is Jung's word for becoming whole. Picture a house you have lived in for years. You know the rooms you use. There are doors you never open and a basement you avoid. Individuation means opening them. It means facing the shadow you rejected and taking back what you dumped on other people. Then you find out the house is far bigger than the few rooms you called 'me'. Jung saw this as the work of a lifetime, never something you finish.",
         },
       ],
       disclosure: {
         q: "Is this really Carl Gustav Jung speaking?",
-        a: "No. This is the Echo of Carl Gustav Jung, an educational AI interpretation grounded in his documented writings, the voice we give him here. It is not a recording and not the real man, who lived from 1875 to 1961. Think of it as a guided way to explore his ideas, never his actual words.",
+        a: "No. This is an Echo of Carl Gustav Jung. It is an AI voice, built from what he actually wrote, and it stays an interpretation, not a recording. The real man lived from 1875 to 1961 and no recording of him speaks here. Use it as a way into his ideas, never as his own words.",
       },
     },
     de: {
       pairs: [
         {
           q: "Was kann ich von Carl Gustav Jung lernen?",
-          a: "Carl Gustav Jung (1875-1961) war ein Psychiater, der lehrte, dass das Unbewusste ein lebendiges Land ist und nicht nur eine Abstellkammer für Vergessenes. Die Anteile von dir, die du nicht wahrhaben willst, verschwinden nicht. Sie steuern dich aus dem Verborgenen, und du begegnest ihnen in allem, was du an anderen Menschen nicht ertragen kannst. Bei Jung lernst du, deinem eigenen Schatten zu begegnen.",
+          a: "Carl Gustav Jung (1875-1961) war ein Schweizer Psychiater. Er lehrte: Das Unbewusste ist keine Abstellkammer für Vergessenes. Es ist ein Ort, in dem etwas lebt. Die Anteile von dir, zu denen du nicht stehen willst, verschwinden nicht. Sie steuern dich aus dem Verborgenen. Du begegnest ihnen in allem, was du an anderen Menschen nicht ertragen kannst. Bei Jung lernst du, deinem eigenen Schatten zu begegnen.",
         },
         {
-          q: "Was hat Carl Gustav Jung wirklich gelehrt?",
-          a: "Carl Gustav Jung begründete die analytische Psychologie, einen Zweig der Tiefenpsychologie, und erforschte Schattenarbeit, Individuation, Archetypen und das kollektive Unbewusste. Er arbeitete aus klinischen Belegen heraus, angefangen bei seinen Assoziationsstudien (1904-1910), dann Symbole der Wandlung (1912, überarbeitet 1952) und Psychologische Typen (1921). Sein Schreiben ist klinisch präzise und zugleich bekennend.",
+          q: "Was hat Carl Gustav Jung gelehrt?",
+          a: "Carl Gustav Jung begründete die analytische Psychologie, seinen eigenen Zweig der Tiefenpsychologie. Vier Begriffe tragen sie. Der Schatten ist alles an dir, was du von dir wegschiebst. Individuation ist die lange Arbeit, ganz der Mensch zu werden, der du schon bist. Archetypen sind alte Muster, die formen, wie wir uns die Welt vorstellen. Das kollektive Unbewusste ist die Schicht, die wir alle teilen. Jung fing nicht bei der Theorie an, sondern beim Messen. In seinen Assoziationsstudien (1904-1910) stoppte er die Zeit, die ein Patient vor einer Antwort zögerte. Die Bücher kamen danach: Symbole der Wandlung (1912, überarbeitet 1952) und Psychologische Typen (1921).",
         },
         {
           q: "Was ist Individuation in Jungs Psychologie?",
-          a: "Für Carl Gustav Jung ist Individuation der lebenslange Prozess, zu werden, wer du wirklich bist, und Türen in dir zu öffnen, die du nie geöffnet hast. Es bedeutet, dem Schatten zu begegnen, den du abgelehnt hast, die Projektionen zurückzunehmen, die du auf andere geworfen hast, und zu entdecken, dass du weit größer bist als die Räume, die du einst 'ich' genannt hast. Sie steht im Zentrum seiner analytischen Psychologie.",
+          a: "Individuation ist Jungs Wort dafür, ganz zu werden. Stell dir ein Haus vor, in dem du seit Jahren wohnst. Die Zimmer, die du nutzt, kennst du. Es gibt Türen, die du nie öffnest, und einen Keller, den du meidest. Individuation heißt, sie zu öffnen. Es heißt, dem Schatten zu begegnen, den du abgelehnt hast, und zurückzunehmen, was du bei anderen abgeladen hast. Dann merkst du, dass das Haus viel größer ist als die paar Zimmer, die du 'ich' genannt hast. Für Jung war das die Arbeit eines ganzen Lebens, nie etwas, das fertig wird.",
         },
       ],
       disclosure: {
         q: "Spricht hier wirklich Carl Gustav Jung?",
-        a: "Nein. Dies ist das Echo von Carl Gustav Jung, eine bildende KI-Deutung, verankert in seinen überlieferten Schriften, die Stimme, die wir ihm hier geben. Es ist keine Aufnahme und nicht der echte Mensch, der von 1875 bis 1961 lebte. Sieh es als einen geführten Weg, seine Ideen zu erkunden, nie als seine tatsächlichen Worte.",
+        a: "Nein. Das hier ist ein Echo von Carl Gustav Jung. Es ist eine KI-Stimme, gebaut aus dem, was er wirklich geschrieben hat, und sie bleibt eine Deutung, keine Aufnahme. Der echte Mensch lebte von 1875 bis 1961, und hier spricht keine Tonaufnahme von ihm. Nimm es als Weg in seine Ideen, nie als seine eigenen Worte.",
       },
     },
   },

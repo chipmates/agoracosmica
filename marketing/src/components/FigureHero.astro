@@ -1,14 +1,19 @@
 ---
-// The hero block at the top of every figure detail page. The piece that
-// must paint immediately for ad clickers — portrait, eyebrow, name, meta,
-// learn line, trailer button (React island), about paragraphs. Pre-static
-// markup, the only client-side bit is the trailer button.
+// The figure page hero: the per-figure spine.
+//
+// Five beats, top to bottom. Portrait (the LCP image), who this is, the Echo
+// trailer that ends by handing you the story, the promise line, the visitor's
+// first question as a working door, and one line naming how big this figure's
+// world is. The about paragraphs that used to sit here moved down the page:
+// they pushed the trailer and the question below the fold on a phone.
 
 import FigurePortrait from './FigurePortrait.astro';
-import TrailerButton from '../islands/TrailerButton';
+import FigureTrailer from '../islands/FigureTrailer';
 import { getT } from '../i18n';
 import type { Lang } from '../i18n';
 import { getPublicTrailerUrl } from '@client/utils/public/publicMediaUrl';
+import { getHeroEntryQuestion } from '@client/data/public/heroEntry';
+import { getFigureWorld, numberWord, capitalize } from '../lib/figureWorld';
 
 interface Figure {
   id: string;
@@ -21,20 +26,48 @@ interface Figure {
 
 interface Props {
   figure: Figure;
+  slug: string;
   lang: Lang;
 }
 
-const { figure, lang } = Astro.props;
+const { figure, slug, lang } = Astro.props;
 const t = getT(lang);
+const de = lang === 'de';
+
+const S = de
+  ? {
+      askLabel: 'Deine erste Frage',
+      worldChapters: 'Kapitel',
+      worldCouncils: 'Debatten',
+      worldEdges: 'Ideen, die mit den Ideen anderer sprechen',
+      noscript: 'Intro anhören (MP3)',
+    }
+  : {
+      askLabel: 'Your first question',
+      worldChapters: 'chapters',
+      worldCouncils: 'debates',
+      worldEdges: "ideas that talk to other people's ideas",
+      noscript: 'Listen to the intro (MP3)',
+    };
 
 const metaLine = [figure.tradition, figure.period].filter(Boolean).join('  ·  ');
-// No-JS fallback: a plain link to the raw trailer mp3, same URL the island's
-// audio hook builds, so the SSR'd play button is never a dead end.
+// No-JS fallback: a plain link to the raw trailer mp3, the same URL the island
+// builds, so the SSR'd play button is never a dead end.
 const trailerMp3 = getPublicTrailerUrl(figure.id, lang, 'mp3');
-const aboutParas = figure.about
-  .split('\n')
-  .map(p => p.trim())
-  .filter(Boolean);
+const chapterHref = `/app?figure=${slug}&lang=${lang}&mode=story&chapter=1`;
+
+// The one question this figure's page carries into the app. The tag names the
+// question, the app renders it in its own language: no free text on the URL.
+const question = getHeroEntryQuestion(figure.id, lang);
+const askHref = `/app?figure=${slug}&lang=${lang}&ask=f:${figure.id}:1`;
+
+// The size of this figure's world, counted from the data every build.
+const world = getFigureWorld(figure.id, lang);
+const worldLine = [
+  `${capitalize(numberWord(world.chapters, lang))} ${S.worldChapters}.`,
+  world.councils > 0 ? `${capitalize(numberWord(world.councils, lang))} ${S.worldCouncils}.` : '',
+  world.connections > 0 ? `${capitalize(numberWord(world.connections, lang))} ${S.worldEdges}.` : '',
+].filter(Boolean).join(' ');
 ---
 <section class="pub-fig-hero">
   <div class="pub-fig-hero__portrait">
@@ -45,15 +78,83 @@ const aboutParas = figure.about
     <h1 class="pub-fig-hero__name">{figure.name}</h1>
     <p class="pub-fig-hero__meta">{t('figures.echoGloss')}</p>
     {metaLine && <p class="pub-fig-hero__meta">{metaLine}</p>}
+
+    <FigureTrailer client:visible figureId={figure.id} lang={lang} chapterHref={chapterHref} />
+    <noscript>
+      <a class="pub-textlink" href={trailerMp3}>{S.noscript}</a>
+    </noscript>
+
     {figure.learn && (
       <p class="pub-fig-hero__learn">{`“${figure.learn}”`}</p>
     )}
-    <TrailerButton client:visible figureId={figure.id} lang={lang} />
-    <noscript>
-      <a class="pub-textlink" href={trailerMp3}>
-        {lang === 'de' ? 'Intro anhören (MP3)' : 'Listen to the intro (MP3)'}
+
+    {question && (
+      <a
+        class="fig-ask"
+        href={askHref}
+        data-agc-cta="start-exploring"
+        data-agc-figure={figure.id}
+        data-agc-door="fig_hero_ask"
+      >
+        <span class="fig-ask__label">{S.askLabel}</span>
+        <span class="fig-ask__q">{question}</span>
       </a>
-    </noscript>
-    {aboutParas.map(p => <p class="pub-fig-hero__about">{p}</p>)}
+    )}
+
+    <p class="pub-fig-hero__world">{worldLine}</p>
   </div>
 </section>
+
+<style is:global>
+  /* The hero question: the page's one gold primary above the fold. */
+  .fig-ask {
+    display: block;
+    margin: 1.4rem 0 0;
+    padding: 0.85rem 1.1rem;
+    min-height: 44px;
+    border: 1px solid color-mix(in srgb, var(--gold-primary) var(--a-45, 45%), transparent);
+    border-radius: var(--plate-radius, 4px);
+    background: color-mix(in srgb, var(--gold-primary) var(--a-08, 8%), transparent);
+    text-decoration: none;
+    transition: border-color var(--transition-base), background var(--transition-base);
+  }
+  .fig-ask:hover,
+  .fig-ask:focus-visible {
+    border-color: var(--gold-primary);
+    background: color-mix(in srgb, var(--gold-primary) var(--a-12, 12%), transparent);
+  }
+  .fig-ask__label {
+    display: block;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: 0.68rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold-deep);
+    margin-bottom: 0.35rem;
+  }
+  .fig-ask__q {
+    display: block;
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: 1.05rem;
+    line-height: 1.45;
+    color: var(--text-primary);
+  }
+  .pub-fig-hero__world {
+    margin: 1.1rem 0 0;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: 0.82rem;
+    line-height: 1.6;
+    letter-spacing: 0.04em;
+    color: var(--text-tertiary);
+  }
+  /* The trailer's ending state is a link, not a button, so it needs the
+     button's own box back. */
+  a.pub-trailer--after {
+    text-decoration: none;
+    color: var(--gold-primary);
+    border-color: color-mix(in srgb, var(--gold-primary) var(--a-45, 45%), transparent);
+  }
+  @media (min-width: 820px) {
+    .fig-ask { max-width: 34rem; }
+  }
+</style>

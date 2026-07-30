@@ -1,70 +1,165 @@
 ---
-// "Sources and further reading" for a figure page. Renders verified outbound
-// entity records (Wikipedia + Wikidata) inside a native <details> matching the
-// CollapsibleSection markup. Renders nothing when the figure has no entity
-// record, so it never shows an empty box.
+// Works, sources and the paper trail. Three parts, in order:
+//
+//   1. the primary works, VISIBLE, each with one line saying what it is
+//      (a live query "die besten bücher von carl jung" ranks first and gets
+//      no clicks, because the list used to sit inside a collapsed box)
+//   2. the factcheck bibliography, verbatim, which is what an answer engine
+//      looks at when deciding whether we are worth citing
+//   3. the verified entity records, Wikipedia and Wikidata
+//
+// Titles come from the catalog or, where a language has none, from the
+// authored works list. Bibliography strings render verbatim or not at all.
+
+import type { Lang } from '../i18n';
 import { figureEntities } from '../lib/figureEntities';
 import { figureIdToSlug } from '@client/data/public/slugMap';
+import { getFigureById } from '@client/data/public/figuresCatalog';
+import { getFigurePageContent } from '@client/data/public/figurePageContent';
+import { getBibliography } from '../lib/factchecks';
+import { cleanDisplayText, cleanFactText } from '../lib/figureWorld';
 
 interface Props {
   figureId: string;
-  lang: 'en' | 'de';
+  lang: Lang;
 }
 
 const { figureId, lang } = Astro.props;
+const de = lang === 'de';
 
 const slug = figureIdToSlug[figureId];
 const entity = slug ? figureEntities[slug] : undefined;
+const figure = getFigureById(figureId, lang);
+const authored = getFigurePageContent(figureId, lang);
 
-const title =
-  lang === 'de' ? 'Quellen und weiterführende Links' : 'Sources and further reading';
-const caption =
-  lang === 'de'
-    ? 'Geprüfte Einträge zum Gegenprüfen.'
-    : 'Verified entity records for cross-checking.';
+const S = de
+  ? {
+      heading: 'Werke und Quellen',
+      works: 'Die wichtigsten Werke',
+      biblio: 'Worauf wir uns stützen',
+      biblioNote: 'Die Quellen, gegen die jede Szene und jede Lehre geprüft wurde.',
+      records: 'Zum Gegenprüfen',
+    }
+  : {
+      heading: 'Works and sources',
+      works: 'The main works',
+      biblio: 'What we worked from',
+      biblioNote: 'The sources every scene and every teaching was checked against.',
+      records: 'Cross-check us',
+    };
 
-const wikipediaUrl = entity
-  ? lang === 'de'
-    ? entity.wikipediaDe
-    : entity.wikipediaEn
-  : undefined;
+// Authored entries win because they carry the one-line gloss. Where a language
+// has none, the catalog list still renders, title only.
+const works = authored?.works?.length
+  ? authored.works.map(w => ({ title: w.title, note: w.note }))
+  : (figure?.primaryWorks ?? []).map(t => ({ title: cleanDisplayText(t), note: '' }));
+
+// Citations run through the fact-safe laundering: a year range keeps its
+// meaning as a hyphen, nothing else in the string moves.
+const bibliography = getBibliography(figureId, lang).map(cleanFactText);
+
+const wikipediaUrl = entity ? (de ? entity.wikipediaDe : entity.wikipediaEn) : undefined;
+const hasAnything = works.length > 0 || bibliography.length > 0 || Boolean(entity);
 ---
-{
-  entity && (
-    <details class="pub-section pub-collapsible pub-sources">
-      <summary class="pub-collapsible__header">
-        <h2 class="pub-section__title pub-collapsible__title">{title}</h2>
-        <span class="pub-collapsible__arrow" aria-hidden="true">▼</span>
-      </summary>
-      <div class="pub-collapsible__body">
-        <ul class="pub-sources__list">
+{hasAnything && (
+  <section class="pub-section fig-sources">
+    <h2 class="pub-section__title">{S.heading}</h2>
+
+    {works.length > 0 && (
+      <div class="fig-sources__works">
+        <h3 class="fig-sources__sub">{S.works}</h3>
+        <ul class="fig-works">
+          {works.map(w => (
+            <li class="fig-works__item">
+              <span class="fig-works__title">{w.title}</span>
+              {w.note && <span class="fig-works__note">{w.note}</span>}
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
+
+    {bibliography.length > 0 && (
+      <div class="fig-sources__biblio">
+        <h3 class="fig-sources__sub">{S.biblio}</h3>
+        <p class="pub-section__text fig-sources__note">{S.biblioNote}</p>
+        <ul class="fig-biblio">
+          {bibliography.map(s => <li>{s}</li>)}
+        </ul>
+      </div>
+    )}
+
+    {entity && (
+      <div class="fig-sources__records">
+        <h3 class="fig-sources__sub">{S.records}</h3>
+        <ul class="fig-biblio">
           {wikipediaUrl && (
             <li>
-              <a class="pub-textlink" href={wikipediaUrl} rel="noopener" target="_blank">
-                Wikipedia
-              </a>
+              <a class="pub-textlink" href={wikipediaUrl} rel="noopener" target="_blank">Wikipedia</a>
             </li>
           )}
           {entity.wikidata && (
             <li>
-              <a class="pub-textlink" href={entity.wikidata} rel="noopener" target="_blank">
-                Wikidata
-              </a>
+              <a class="pub-textlink" href={entity.wikidata} rel="noopener" target="_blank">Wikidata</a>
             </li>
           )}
         </ul>
-        <p class="pub-sources__caption">{caption}</p>
       </div>
-    </details>
-  )
-}
+    )}
+  </section>
+)}
 
 <style is:global>
-  /* Native <details> glue (mirrors CollapsibleSection) so this component works
-     standalone wherever it is dropped in. */
-  details.pub-sources > summary { list-style: none; cursor: pointer; }
-  details.pub-sources > summary::-webkit-details-marker { display: none; }
-  details.pub-sources[open] .pub-collapsible__arrow { transform: rotate(180deg); }
-  .pub-sources__list { margin: 0; padding-left: 1.25rem; }
-  .pub-sources__caption { margin: 0.5rem 0 0; font-size: 0.9rem; opacity: 0.75; }
+  .fig-sources__biblio,
+  .fig-sources__records { margin-top: 0.7rem; }
+  .fig-sources__sub {
+    margin: 0 0 0.7rem;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: 0.72rem;
+    font-weight: var(--weight-medium, 500);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold-deep);
+  }
+  .fig-sources__note { margin: 0 0 0.6rem; font-size: 0.92rem; }
+  .fig-works {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+  .fig-works__item {
+    padding-left: 0.9rem;
+    border-left: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-20, 20%), transparent);
+    max-width: 66ch;
+  }
+  .fig-works__title {
+    display: block;
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: 1.05rem;
+    line-height: 1.4;
+    color: var(--gold-subtle);
+  }
+  .fig-works__note {
+    display: block;
+    margin-top: 0.2rem;
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: 0.95rem;
+    line-height: 1.65;
+    color: var(--text-secondary);
+  }
+  .fig-biblio {
+    margin: 0;
+    padding-left: 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    font-size: 0.9rem;
+    line-height: 1.55;
+    color: var(--text-tertiary);
+    max-width: 66ch;
+  }
+  .fig-biblio li::marker { color: var(--gold-deep); }
 </style>

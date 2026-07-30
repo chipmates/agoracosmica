@@ -1,37 +1,192 @@
 ---
+// One council card on a figure page. The featured variant carries the real
+// question, the cast, the type label and, where a 50 second preview was
+// actually produced, a player. Only the featured council of each theme has one
+// (8 of 110), so every other card is link-only rather than a play button that
+// would 404.
+
 import type { Lang } from '../i18n';
 import type { CatalogCouncil } from '@client/data/councilCatalog';
-import { getLocalizedTitle, getLocalizedHook } from '@client/data/councilCatalog';
+import { getLocalizedTitle, getLocalizedQuestion } from '@client/data/councilCatalog';
 import { getFigureById } from '@client/data/public/figuresCatalog';
+import CouncilPreviewButton from '../islands/CouncilPreviewButton';
+import { hasCouncilPreview, cleanDisplayText } from '../lib/figureWorld';
+import { publicUrl } from '../lib/urls';
 
 interface Props {
   council: CatalogCouncil;
   lang: Lang;
+  /** The figure whose page this is: their own name is dropped from the cast. */
+  figureId?: string;
+  slug?: string;
+  /** Full card with question, player and doors. The tail uses the compact row. */
+  featured?: boolean;
 }
 
-const { council, lang } = Astro.props;
+const { council, lang, figureId, slug, featured = false } = Astro.props;
+const de = lang === 'de';
+
+const S = de
+  ? {
+      withLabel: 'Mit',
+      leads: 'Moderation',
+      ask: 'Diese Frage selbst stellen',
+      read: 'Zur Debatte',
+      echo: 'Vier KI-Echos, eines davon moderiert. Deutungen, keine Aufnahmen.',
+      blessed: 'Empfohlen',
+    }
+  : {
+      withLabel: 'With',
+      leads: 'Led by',
+      ask: 'Ask this question yourself',
+      read: 'See the debate',
+      echo: 'Four AI Echoes, one of them moderating. Interpretations, not recordings.',
+      blessed: 'Our pick',
+    };
+
 const title = getLocalizedTitle(council, lang);
-const hook = getLocalizedHook(council, lang);
-const participants = [council.moderator, ...council.participants]
-  .map(p => {
-    // Only swap in the catalog name where German uses a true exonym
-    // (Mark Aurel, Platon). Everywhere else keep the council JSON's
-    // deliberately abbreviated names (J.W. von Goethe, W.A. Mozart).
-    if (lang !== 'de') return p.name;
-    const deName = getFigureById(p.id, 'de')?.name;
-    const enName = getFigureById(p.id, 'en')?.name;
-    return deName && deName !== enName ? deName : p.name;
-  })
-  .join(', ');
-const typeLabel = lang === 'de'
+const question = cleanDisplayText(getLocalizedQuestion(council, lang));
+const typeLabel = de
   ? (council.type === 'confrontational' ? 'konfrontativ' : 'reflektiv')
   : council.type;
+
+// Only swap in the catalog name where German uses a true exonym (Mark Aurel,
+// Platon). Everywhere else keep the council JSON's deliberately abbreviated
+// names (J.W. von Goethe, W.A. Mozart).
+const displayName = (id: string, fallback: string): string => {
+  if (!de) return fallback;
+  const deName = getFigureById(id, 'de')?.name;
+  const enName = getFigureById(id, 'en')?.name;
+  return deName && deName !== enName ? deName : fallback;
+};
+
+const moderator = displayName(council.moderator.id, council.moderator.name);
+const cast = council.participants
+  .filter(p => p.id !== figureId)
+  .map(p => displayName(p.id, p.name))
+  .join(', ');
+
+const themeHref = publicUrl(lang, `/themes/${council.theme}`);
+const askHref = slug
+  ? `/app?figure=${slug}&lang=${lang}&q=${council.id}`
+  : `/app?council=${council.id}&lang=${lang}`;
+const withPreview = featured && hasCouncilPreview(council.id);
 ---
-<div class="pub-council">
-  <h3 class="pub-council__title">{title}</h3>
-  <p class="pub-council__hook">{hook}</p>
-  <div class="pub-council__meta">
-    <span class="pub-council__type">{typeLabel}</span>
+{featured ? (
+  <div class="fig-council">
+    <h3 class="fig-council__title">{title}</h3>
+    <p class="fig-council__question">{question}</p>
+    <p class="fig-council__meta">
+      <span class="fig-council__type">{typeLabel}</span>
+      <span class="fig-council__cast">{`${S.leads}: ${moderator}. ${S.withLabel} ${cast}.`}</span>
+    </p>
+    {withPreview && (
+      <div class="fig-council__player">
+        <CouncilPreviewButton client:visible councilId={council.id} lang={lang} />
+        <span class="fig-council__echo">{S.echo}</span>
+      </div>
+    )}
+    <p class="fig-council__doors">
+      <a
+        class="pub-textlink"
+        href={askHref}
+        data-agc-cta="start-exploring"
+        data-agc-figure={figureId}
+        data-agc-door="fig_council_ask"
+      >{S.ask}</a>
+      <a class="pub-textlink" href={themeHref}>{S.read}</a>
+    </p>
   </div>
-  <p class="pub-council__participants">{participants}</p>
-</div>
+) : (
+  <a class="fig-council-row" href={themeHref}>
+    <span class="fig-council-row__title">{title}</span>
+    <span class="fig-council-row__q">{question}</span>
+  </a>
+)}
+
+<style is:global>
+  .fig-council {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 1rem 1.1rem;
+    border: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-20, 20%), transparent);
+    border-radius: var(--plate-radius, 4px);
+    background: color-mix(in srgb, var(--bg-card) var(--a-45, 45%), transparent);
+  }
+  .fig-council__title {
+    margin: 0 0 0.4rem;
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-weight: var(--weight-regular, 400);
+    font-size: 1.15rem;
+    line-height: 1.3;
+    color: var(--gold-subtle);
+  }
+  .fig-council__question {
+    margin: 0 0 0.6rem;
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: 1rem;
+    line-height: 1.65;
+    color: var(--text-primary);
+    max-width: 62ch;
+  }
+  .fig-council__meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    margin: 0 0 0.7rem;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    color: var(--text-tertiary);
+  }
+  /* Only the type label is engraved. The cast is a sentence, and three lines of
+     shouted capitals is not a sentence. */
+  .fig-council__type {
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold-deep);
+  }
+  .fig-council__player {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem 0.9rem;
+    margin-bottom: 0.7rem;
+  }
+  .fig-council__echo {
+    font-size: 0.78rem;
+    line-height: 1.5;
+    color: var(--text-dim);
+    max-width: 46ch;
+  }
+  .fig-council__doors {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.4rem;
+    margin: auto 0 0;
+    padding-top: 0.6rem;
+    font-size: 0.92rem;
+  }
+  .fig-council-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-12, 12%), transparent);
+    text-decoration: none;
+  }
+  .fig-council-row:last-child { border-bottom: 0; }
+  .fig-council-row__title {
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: 1rem;
+    color: var(--gold-subtle);
+  }
+  .fig-council-row:hover .fig-council-row__title { color: var(--gold-primary); }
+  .fig-council-row__q {
+    font-size: 0.88rem;
+    line-height: 1.55;
+    color: var(--text-tertiary);
+  }
+</style>
