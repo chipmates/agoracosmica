@@ -318,19 +318,20 @@ html:has(.public-page) #root {
 
 .pub-cta--sticky {
   /* Hidden on desktop (the navbar CTA is visible there); shown only on mobile,
-     where the navbar CTA is tucked inside the hamburger. */
+     where the navbar CTA is tucked inside the hamburger. Bar and button match
+     the night layout's sticky rail so the mobile door reads the same on every
+     public page. */
   display: none;
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 0.625rem 1.5rem;
-  padding-bottom: max(0.625rem, env(safe-area-inset-bottom));
-  background: color-mix(in srgb, var(--bg-deep-space, #0C1133) 92%, transparent);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-top: 1px solid color-mix(in srgb, var(--gold-primary) 16%, transparent);
-  box-shadow: 0 -10px 40px color-mix(in srgb, var(--utility-pure-black) 40%, transparent);
+  padding: 0.6rem 1.5rem;
+  padding-bottom: max(0.6rem, env(safe-area-inset-bottom));
+  background: color-mix(in srgb, var(--bg-void, #080B20) 95%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-top: 1px solid color-mix(in srgb, var(--gold-subtle) 20%, transparent);
   z-index: 50;
   transition: transform 0.28s ease, opacity 0.28s ease;
 }
@@ -360,39 +361,52 @@ html:has(.public-page) #root {
   color: var(--text-dim, #8A8A8A);
 }
 
+/* The gold plate door, same values as night-reskin's .pub-cta__button, so the
+   primary /app button is identical on every public page regardless of layout. */
 .pub-cta__button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 44px;
+  min-height: 50px;
   width: 100%;
   max-width: 360px;
-  padding: 0.625rem 1.5rem;
+  padding: 0.8rem 1.5rem;
   font-family: var(--font-ui, 'Space Grotesk', sans-serif);
-  font-size: 0.96875rem;
-  font-weight: 600;
+  font-size: 0.95rem;
+  font-weight: var(--weight-semibold, 600);
+  letter-spacing: 0.045em;
   line-height: 1.2;
   white-space: nowrap;
-  color: var(--bg-deep-space, #0C1133);
-  background: linear-gradient(135deg, var(--gold-hover, #F6D55C), var(--gold-subtle, #D4A539));
+  color: var(--bg-void, #080B20);
+  background: linear-gradient(
+    170deg,
+    var(--gold-primary) 0%,
+    var(--gold-subtle) 55%,
+    var(--gold-deep) 100%
+  );
   text-decoration: none;
-  border-radius: var(--radius-full, 9999px);
+  text-align: center;
+  border-radius: 3px;
   box-shadow:
-    0 8px 24px color-mix(in srgb, var(--utility-pure-black) 40%, transparent),
-    0 0 40px color-mix(in srgb, var(--gold-primary) 20%, transparent);
-  transition: transform 0.12s;
+    inset 0 0 0 1px color-mix(in srgb, var(--utility-pure-white) 25%, transparent),
+    0 10px 26px color-mix(in srgb, var(--gold-deep) 25%, transparent);
+  transition: transform var(--transition-base, 200ms ease), box-shadow var(--transition-base, 200ms ease), filter var(--transition-base, 200ms ease);
 }
 
 .pub-cta__button:hover {
+  filter: brightness(1.07);
   transform: translateY(-1px);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--utility-pure-white) 35%, transparent),
+    0 14px 32px color-mix(in srgb, var(--gold-deep) 35%, transparent);
 }
 
 .pub-cta__button:active {
-  transform: scale(0.98);
+  transform: translateY(0);
 }
 
 /* Narrow phones (iPhone SE class, <=360px): let long CTA labels wrap to two
-   lines instead of overflowing the pill. The button stays >=44px via
+   lines instead of overflowing the plate. The button stays >=44px via
    min-height and tightens its side padding to give the text more room. */
 @media (max-width: 360px) {
   .pub-cta__button {
