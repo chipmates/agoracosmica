@@ -87,14 +87,54 @@ const isActive = (path: string) => currentPath === path || currentPath === path.
 </header>
 
 <style is:global>
-  /* Bug fix: .pub-navbar had no background in public-layout.css, so the
-     sticky bar showed through to page content on scroll. Same cosmic blue
-     + blur as .pub-cta--sticky for visual consistency. */
+  /* One bar across the whole site: the night-reskin glass, declared here so
+     every page gets it and not just the landing. public-layout.css leaves
+     .pub-navbar without a background, so the sticky bar would otherwise show
+     page content through it on scroll. */
   .pub-navbar {
-    background: color-mix(in srgb, var(--bg-deep-space, #0C1133) 92%, transparent);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-bottom: 1px solid color-mix(in srgb, var(--gold-primary) 16%, transparent);
+    background: color-mix(in srgb, var(--bg-void) var(--a-90), transparent);
+    backdrop-filter: blur(10px) saturate(120%);
+    -webkit-backdrop-filter: blur(10px) saturate(120%);
+    border-bottom: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-12), transparent);
+  }
+  /* the hairline that trails the bar, brightest at the centre */
+  .pub-navbar::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -3px;
+    height: 1px;
+    background: linear-gradient(
+      to right,
+      transparent,
+      color-mix(in srgb, var(--gold-subtle) var(--a-20), transparent),
+      transparent
+    );
+  }
+  /* The landing's serif wordmark, site-wide. Class-stacked to 0,3,0 so it
+     beats the layout stylesheet's bold sans regardless of bundle order. */
+  .pub-navbar .pub-navbar__logo .pub-navbar__logo-name {
+    font-family: var(--font-content);
+    font-size: 1.16rem;
+    font-weight: 400;
+    color: var(--gold-primary);
+    letter-spacing: 0.012em;
+  }
+  .pub-navbar .pub-navbar__logo .pub-navbar__logo-tagline {
+    font-size: 0.66rem;
+    font-weight: 400;
+    color: var(--text-tertiary);
+    letter-spacing: 0.05em;
+  }
+  /* One height everywhere: a 44px lockup inside 0.65rem of air above and
+     below. Class-stacked (0,2,0) so it beats public-layout.css's flat 64px
+     (0,1,0) regardless of bundle order. A floor rather than a cap, so the
+     narrow band where the German nav labels wrap grows the bar instead of
+     spilling its lockup out of it. */
+  .pub-navbar .pub-navbar__inner {
+    height: auto;
+    min-height: calc(44px + 1.3rem);
   }
 
   /* Brand lockup: the CosmicLogo eclipse mark from the login page sits beside
@@ -106,6 +146,7 @@ const isActive = (path: string) => currentPath === path || currentPath === path.
     flex-direction: row;
     align-items: center;
     gap: 0.6rem;
+    min-height: 44px;
   }
   .pub-navbar__logo-mark {
     width: 30px;
@@ -116,6 +157,12 @@ const isActive = (path: string) => currentPath === path || currentPath === path.
     display: flex;
     flex-direction: column;
     line-height: 1.2;
+  }
+  /* Narrow screens keep the wordmark alone. The German tagline wraps to two
+     lines at this width, which would push the bar taller than it is on every
+     other page. */
+  @media (max-width: 620px) {
+    .pub-navbar__logo-tagline { display: none; }
   }
 
   /* Background fix for the open mobile menu. public-layout.css sets
@@ -132,7 +179,6 @@ const isActive = (path: string) => currentPath === path || currentPath === path.
      the declaration is parsed as invalid. Lighter blur(10) on mobile
      so older phones don't fight a heavy filter. */
   @media (max-width: 640px) {
-    .pub-navbar,
     .pub-cta--sticky {
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
