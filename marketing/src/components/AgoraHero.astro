@@ -26,12 +26,21 @@ const DE_NAMES: Record<string, string> = { aurelius: 'Mark Aurel', plato: 'Plato
 
 // Desktop shows ONE exact row (19 fill the shell) of the priority figures;
 // the full thirty stay in the markup and on the phone's swipe rail, and
-// "Meet all thirty" carries the rest. Edit this list to recast the row.
-const PRIORITY = [
-  'aurelius', 'kahlo', 'nietzsche', 'einstein', 'jung', 'gautama',
-  'dickinson', 'campbell', 'goethe', 'eckhart', 'laozi', 'plato', 'rumi',
-  'shakespeare', 'angelou', 'king', 'mandela', 'tubman', 'vinci',
+// "Meet all thirty" carries the rest. Rows are per language: the German
+// shelf leads with the German-language thinkers German search demand
+// actually names. Edit these lists to recast a row.
+const PRIORITY_EN = [
+  'aurelius', 'jung', 'kahlo', 'nietzsche', 'gautama', 'dickinson', 'rumi',
+  'laozi', 'einstein', 'lovelace', 'shakespeare', 'vinci', 'angelou',
+  'tubman', 'king', 'campbell', 'schopenhauer', 'woolf', 'plato',
 ];
+const PRIORITY_DE = [
+  'aurelius', 'jung', 'nietzsche', 'goethe', 'eckhart', 'bingen',
+  'schopenhauer', 'kahlo', 'einstein', 'gautama', 'laozi', 'rumi',
+  'dickinson', 'mozart', 'beauvoir', 'shakespeare', 'vinci', 'campbell',
+  'king',
+];
+const PRIORITY = de ? PRIORITY_DE : PRIORITY_EN;
 
 const figures = getFiguresCatalog().map((f) => ({
   id: f.id,
