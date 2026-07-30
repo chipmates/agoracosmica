@@ -11,13 +11,14 @@
 // (client/src/utils/public/entryIntent.ts, resolveAskPrefill), so the card would
 // promise one question and deliver another. Click-promise coherence beats
 // completeness.
-// TODO: render Q2 the day resolveAskPrefill returns a real slot-2 question.
+// Slot 2 resolves app-side to the figure's idea question (figurePageContent).
 
 import type { Lang } from '../i18n';
 import StaticImage from './StaticImage.astro';
 import { getLocalizedTitle, getLocalizedQuestion } from '@client/data/councilCatalog';
 import type { CatalogCouncil } from '@client/data/councilCatalog';
 import { getHeroEntryQuestion } from '@client/data/public/heroEntry';
+import { getFigurePageContent } from '@client/data/public/figurePageContent';
 import { cleanDisplayText } from '../lib/figureWorld';
 
 interface Props {
@@ -47,7 +48,7 @@ const S = de
   ? {
       headLead: `Frag ${figureName} selbst`,
       headFoot: 'Bereit für die erste Frage?',
-      caption: 'Ein Tipp, kein Tippen. Die Frage steht schon im Feld, du schickst sie nur ab.',
+      caption: 'Einmal antippen, schreiben musst du nichts. Die Frage steht schon im Feld.',
       whoAsk: 'Diese Frage stellen',
       whoDebate: 'Aus der Debatte',
       free: '30 kostenlose Nachrichten pro Tag. Ohne Anmeldung.',
@@ -62,6 +63,7 @@ const S = de
     };
 
 const heroQuestion = getHeroEntryQuestion(figureId, lang);
+const ideaQuestion = getFigurePageContent(figureId, lang)?.ideaQuestion;
 
 interface Door {
   question: string;
@@ -77,6 +79,13 @@ if (heroQuestion && !skipEntryQuestion) {
   doors.push({
     question: heroQuestion,
     href: `/app?figure=${slug}&lang=${lang}&ask=f:${figureId}:1`,
+    who: S.whoAsk,
+  });
+}
+if (ideaQuestion) {
+  doors.push({
+    question: ideaQuestion,
+    href: `/app?figure=${slug}&lang=${lang}&ask=f:${figureId}:2`,
     who: S.whoAsk,
   });
 }

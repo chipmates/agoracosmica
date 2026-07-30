@@ -10,6 +10,7 @@
 import { LocalStorageAdapter } from '../../storage/localAdapter';
 import { figureSlugToId } from '../../data/public/slugMap';
 import { getHeroEntryQuestion, hasHeroEntry } from '../../data/public/heroEntry';
+import { getFigurePageContent } from '../../data/public/figurePageContent';
 
 const SS_FIGURE_KEY = 'agc_intended_figure';
 const SS_COUNCIL_KEY = 'agc_intended_council';
@@ -28,9 +29,9 @@ const SS_TEXT_FIRST_KEY = 'agc_entry_text_first';
 //                     selected figure's own question when there is one, so old
 //                     links and cached marketing pages upgrade themselves.
 //   f:{figure}:{slot} the figure's landing question. Slot 1 is the hero
-//                     question; 2 and 3 are reserved for the figure pages'
-//                     three-question CTA and resolve to slot 1 until those
-//                     questions exist.
+//                     question, slot 2 the figure page's idea question, and
+//                     slot 3 falls back to slot 1 (the council door prefills
+//                     through its own rail instead).
 //   life              the one question that belongs to no figure.
 const LEGACY_ASK_TAG = 'hero';
 const LIFE_ASK_TAG = 'life';
@@ -66,6 +67,12 @@ export function resolveAskPrefill(
 
   const match = FIGURE_ASK_TAG.exec(tag);
   if (match) {
+    // Slot 2 is the figure page's idea question; slots 1 and 3 resolve to the
+    // hero question (3 is the council door, which prefills via its own rail).
+    if (match[2] === '2') {
+      const idea = getFigurePageContent(match[1], lang)?.ideaQuestion;
+      if (idea) return { kind: 'text', text: idea };
+    }
     const text = getHeroEntryQuestion(match[1], lang);
     return text ? { kind: 'text', text } : null;
   }

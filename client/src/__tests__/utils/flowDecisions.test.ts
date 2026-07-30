@@ -311,10 +311,13 @@ describe('ask tags', () => {
     });
   });
 
-  it('reserved slots 2 and 3 resolve to the hero question for now', () => {
-    const question = getHeroEntry('jung')!.questionEn;
-    expect(resolveAskPrefill('f:jung:2', null, 'en')).toEqual({ kind: 'text', text: question });
-    expect(resolveAskPrefill('f:jung:3', null, 'en')).toEqual({ kind: 'text', text: question });
+  it('slot 2 resolves to the idea question, slot 3 falls back to the hero question', () => {
+    const hero = getHeroEntry('jung')!.questionEn;
+    const idea = resolveAskPrefill('f:jung:2', null, 'en');
+    expect(idea?.kind).toBe('text');
+    expect(idea && 'text' in idea && idea.text).not.toBe(hero);
+    expect(resolveAskPrefill('f:jung:2', null, 'de')?.kind).toBe('text');
+    expect(resolveAskPrefill('f:jung:3', null, 'en')).toEqual({ kind: 'text', text: hero });
   });
 
   it('the legacy tag keys off the selected figure, and falls back when there is none', () => {
