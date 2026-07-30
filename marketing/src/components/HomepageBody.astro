@@ -901,4 +901,10 @@ const questions = isDe ? deQuestions : enQuestions;
       grid-template-columns: 1fr;
     }
   }
+  /* The phone hero ends on its shelf of faces and carries no background of its
+     own, so there is no seam to hide and the pull-up would paint over the last
+     row. The field starts where the hero ends instead. */
+  @media (max-width: 899px) {
+    .ll2-cosmic { margin-top: 0; padding-top: clamp(2.4rem, 7vw, 3.2rem); }
+  }
 </style>

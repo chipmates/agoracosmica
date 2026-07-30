@@ -190,10 +190,10 @@ var FEM = { angelou:1, austen:1, beauvoir:1, bingen:1, dickinson:1, kahlo:1,
 /* Horizontal focal point for the phone's full-bleed crop, in percent. Cover
    trims the sides there, so a face that does not sit mid-canvas needs its own
    x. Audited across all thirty at 390 wide; anything absent is centred. */
-var FOCAL = { laozi:27, campbell:36, galilei:36, zenji:40, goethe:40, jung:40,
+var FOCAL = { laozi:27, campbell:36, zenji:40, goethe:40, jung:40,
               eckhart:42, kahlo:42, angelou:43, einstein:44, gandhi:46,
-              shakespeare:53, blake:55, vinci:55, austen:57, king:58,
-              bingen:64, rumi:68, mozart:85 };
+              shakespeare:53, blake:55, vinci:55, austen:57, galilei:58,
+              king:58, bingen:64, nietzsche:64, rumi:68, mozart:85 };
 
 var F = RAW.map(function (a) {
   return { id:a[0], slug:a[1], name: DE ? a[3] : a[2], trad: DE ? a[5] : a[4],
@@ -354,7 +354,18 @@ var FLY     = 1150,               /* how long one grain travels */
     FADE_A  = 1560, FADE_B  = 2300,   /* the dust lets it go */
     Q_AT    = 2200,               /* beat two opens, after the face has landed */
     Q_SPREAD = 560, Q_FLY = [520, 840],
+    FACE_OUT = FADE_B + 60,       /* the dust has handed the whole face back */
     END     = Q_AT + Q_SPREAD + Q_FLY[1] + 120;   /* 3720 */
+
+/* The two beats can run apart. Beat one belongs to the arrival and always plays
+   at once. Beat two belongs to the question, so while that card is off screen
+   the words stay unlit and the stream waits there; when the reader reaches it,
+   the stream is rebuilt against the layout as it stands and runs. */
+var qAt = Q_AT,                   /* when beat two opens on this run */
+    stopAt = END,                 /* where the running timeline ends */
+    qParked = false,              /* beat two is waiting for its card */
+    qDue = false,                 /* it came into view mid-beat-one */
+    qWatching = false;
 
 var GOLD = [236, 198, 116], GOLDCSS = 'rgb(236,198,116)';
 function ease(x) { return 1 - Math.pow(1 - x, 3); }
@@ -552,7 +563,7 @@ function drawFace(tt) {
 }
 
 function drawStream(tt) {
-  var t = tt - Q_AT;
+  var t = tt - qAt;
   if (t <= 0) return;
   for (var i = 0; i < stream.length; i++) {
     var m = stream[i];
@@ -574,7 +585,7 @@ function drawStream(tt) {
 /* what the two beats do to the page itself */
 function reveal(tt) {
   shot.style.opacity = sstep(CROSS_A, CROSS_B, tt);
-  var frac = Math.min(1, Math.max(0, (tt - Q_AT - 60) / (Q_SPREAD + Q_FLY[0])));
+  var frac = Math.min(1, Math.max(0, (tt - qAt - 60) / (Q_SPREAD + Q_FLY[0])));
   var upto = Math.round(frac * (qWords.length + 1.2));
   for (var i = 0; i < qWords.length; i++) qWords[i].classList.toggle('in', i < upto);
   askEl.classList.toggle('cool', frac < 0.5);
@@ -594,7 +605,13 @@ function renderAt(tt) {
 function loop(ts) {
   if (!t0) t0 = ts;
   var tt = ts - t0;
-  if (tt >= END) { ctx.clearRect(0, 0, W, H); running = false; raf = 0; arrive(); return; }
+  if (tt >= stopAt) {
+    ctx.clearRect(0, 0, W, H); running = false; raf = 0;
+    if (!qParked) { arrive(); return; }
+    faceArrived();
+    if (qDue) { qDue = false; runQuestion(); }
+    return;
+  }
   renderAt(tt);
   raf = requestAnimationFrame(loop);
 }
@@ -604,10 +621,54 @@ function arrive() {
   for (var i = 0; i < qWords.length; i++) qWords[i].classList.add('in');
   askEl.classList.remove('cool');
   if (askLi) askLi.classList.remove('dim');
+  qParked = false;
   shot.classList.remove('gone');
   shot.style.transition = '';
   shot.style.opacity = '';
   document.documentElement.classList.remove('settling');
+}
+
+/* beat one is resolved: the painting is present, the question still waits.
+   The root keeps its marker, which is what holds the words unlit. */
+function faceArrived() {
+  shot.classList.remove('gone');
+  shot.style.transition = '';
+  shot.style.opacity = '1';
+}
+
+function inView(el, frac) {
+  var r = el.getBoundingClientRect(), vh = window.innerHeight || 1;
+  var vis = Math.min(r.bottom, vh) - Math.max(r.top, 0);
+  return vis >= Math.min(r.height, vh) * frac;
+}
+
+/* beat two, once, when the card the stream writes is actually on screen */
+function watchQuestion() {
+  if (qWatching) return;
+  qWatching = true;
+  var io = new IntersectionObserver(function (e) {
+    if (!e[0].isIntersecting) return;
+    io.disconnect();
+    qWatching = false;
+    if (running) { qDue = true; return; }
+    runQuestion();
+  }, { threshold: 0.55 });
+  io.observe(askEl);
+}
+
+function runQuestion() {
+  if (!qParked) return;
+  if (STILL) { arrive(); return; }
+  sizeCanvas();
+  var g = sampleFace();
+  if (!g) { arrive(); return; }
+  buildStream(g);
+  qParked = false;
+  qAt = FACE_OUT;                        /* it opens the moment it starts */
+  stopAt = qAt + Q_SPREAD + Q_FLY[1] + 120;
+  cancelAnimationFrame(raf);
+  running = true;
+  raf = requestAnimationFrame(function (ts) { t0 = ts - qAt; loop(ts); });
 }
 
 function ignite() {
@@ -621,7 +682,14 @@ function ignite() {
   var g = sampleFace();
   if (!g) { arrive(); return; }
   buildFace(g);
-  buildStream(g);
+  qParked = FREEZE === null && 'IntersectionObserver' in window &&
+            !inView(askEl, 0.55);
+  qDue = false;
+  /* parked, beat two's clock sits at the end of beat one, so not a word of the
+     question is written and no grain is released until the reader arrives */
+  qAt = qParked ? FACE_OUT : Q_AT;
+  stopAt = qParked ? FACE_OUT : END;
+  if (!qParked) buildStream(g);
   shot.classList.remove('gone');
   shot.style.transition = 'none';
   shot.style.opacity = '0';
@@ -632,6 +700,7 @@ function ignite() {
   }
   cancelAnimationFrame(raf);
   t0 = 0; running = true;
+  if (qParked) watchQuestion();
   raf = requestAnimationFrame(loop);
 }
 
@@ -685,23 +754,6 @@ if (STILL) mhRoot.classList.add('mh--still');
 watchDescent();
 if (PHONE && PHONE.addEventListener) PHONE.addEventListener('change', watchDescent);
 
-/* The ignition arrives with the question. On a phone the descent runs first and
-   the card starts below the fold, so the choreography waits until it is on
-   screen. Once only: a later face switch replays it straight away. */
-var asked = false;
-function igniteWhenAsked() {
-  if (asked || STILL || !isPhone() || !('IntersectionObserver' in window)) {
-    asked = true; ignite(); return;
-  }
-  var io = new IntersectionObserver(function (entries) {
-    if (!entries[0].isIntersecting) return;
-    io.disconnect();
-    asked = true;
-    ignite();
-  }, { threshold: 0.55 });
-  io.observe(askEl);
-}
-
 /* ---------- the audio: pure upside ---------- */
 var playing = false;
 function fmt(s) {
@@ -752,14 +804,32 @@ au.addEventListener('timeupdate', function () {
    the hero re-keys and the whole choreography replays with the new question. */
 var DEFAULT = 'aurelius';
 
-function swapTo(id, gate) {
+/* the hero opens the page, so the top of the document is the top of the stage */
+function toStage() {
+  try { scrollTo({ top: 0, behavior: STILL ? 'auto' : 'smooth' }); }
+  catch (e) { scrollTo(0, 0); }
+}
+
+/* The stage is fixed to the viewport on a phone, so the dust can only be placed
+   once a scroll has come to rest: mid-scroll the grid lands where the stage no
+   longer is. The cap keeps an interrupted scroll from stalling the ignition. */
+function whenSteady(fn) {
+  if (!isPhone() || (window.scrollY || 0) <= 1) { fn(); return; }
+  var tries = 0;
+  (function step() {
+    if ((window.scrollY || 0) <= 1 || ++tries > 90) { fn(); return; }
+    requestAnimationFrame(step);
+  })();
+}
+
+function swapTo(id) {
   var im = new Image();
   im.crossOrigin = 'anonymous';
   im.onload = function () {
     shot.removeAttribute('srcset');
     shot.src = im.src;
     paint(id);
-    requestAnimationFrame(gate ? igniteWhenAsked : ignite);
+    requestAnimationFrame(function () { whenSteady(ignite); });
   };
   im.onerror = function () { paint(id); arrive(); };
   im.src = main(id, innerWidth <= 899 ? 900 : 1200);
@@ -775,17 +845,19 @@ function select(id, user) {
     shot.style.transition = '';
     shot.style.opacity = '';
     shot.classList.add('gone');
+    /* the rail sits two screens under the painting, so the room comes back
+       first: the new face is ignited where the visitor can watch it */
+    if (isPhone()) toStage();
     setTimeout(function () { swapTo(id); }, 300);
     return;
   }
-  if (id !== DEFAULT) { swapTo(id, true); return; }
+  if (id !== DEFAULT) { swapTo(id); return; }
   paint(id);
-  igniteWhenAsked();
+  ignite();
   /* a slow byte must never leave the mat empty: reveal the painting regardless.
-     On a phone the painting is already up and the question is waiting on the
-     descent, so nothing is owed. */
+     A parked beat two is not a stall, so it is left alone. */
   setTimeout(function () {
-    if (!running && FREEZE === null && !STILL && !isPhone() &&
+    if (!running && !qParked && FREEZE === null && !STILL &&
         document.documentElement.classList.contains('settling')) arrive();
   }, 2800);
 }
@@ -798,8 +870,8 @@ addEventListener('resize', function () {
     sizeCanvas();
     ctx.clearRect(0, 0, W, H);
     /* a phone fires resize when the URL bar collapses, which must not hand the
-       question its gold before the descent has reached it */
-    if (asked || !isPhone()) arrive();
+       question its gold before the reader has reached it */
+    if (qParked) { faceArrived(); watchQuestion(); } else arrive();
     if (descentOn) descent();
   }, 160);
 });

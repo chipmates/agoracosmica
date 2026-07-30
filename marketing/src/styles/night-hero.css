@@ -300,8 +300,11 @@ html[lang=de] .mh h1{font-size:clamp(1.75rem,2.7vw,2.4rem)}
 @media (max-width:899px){
   .mh{--p:0;--out:0}
   /* no stacking context on the column, so the stage can sit in the document's
-     own negative layer and never paint over anything below the hero */
+     own negative layer and never paint over anything below the hero. The
+     reading columns take that layer instead, so a section below can never
+     paint over the shelf. */
   .wrap{z-index:auto}
+  .headcol,.beatscol,.shelfcol,.pcap{position:relative;z-index:1}
   .hero{background:none}
 
   .artcol{max-width:none;width:100%;margin:.45rem 0 0}
@@ -310,9 +313,11 @@ html[lang=de] .mh h1{font-size:clamp(1.75rem,2.7vw,2.4rem)}
   .mat{position:fixed;top:0;left:0;right:0;bottom:0;z-index:-1;
     width:auto;height:auto;aspect-ratio:auto;border:0;background:var(--bg-void);
     opacity:calc(1 - var(--out))}
-  /* the painting settles back into the room as the descent runs */
-  .shot{object-position:var(--focal,50%) 3%;
-    transform:scale(calc(1.05 - .05 * var(--p)));transform-origin:50% 20%;
+  /* At rest the painting's top edge sits exactly on the stage top, so no crown
+     is ever trimmed: it rests unscaled and anchored there, and the room pushes
+     in only as the descent darkens it. */
+  .shot{object-position:var(--focal,50%) 0%;
+    transform:scale(calc(1 + .05 * var(--p)));transform-origin:50% 0;
     will-change:transform}
   /* below the hero there is no room left to light */
   .mh--past .mat{visibility:hidden}
@@ -342,20 +347,24 @@ html[lang=de] .mh h1{font-size:clamp(1.75rem,2.7vw,2.4rem)}
   .mat__veil{background:var(--bg-void);opacity:calc(.94 * var(--p));
     will-change:opacity}
 
-  /* the first screen belongs to the painting, the proposition sits at its foot.
-     The subtraction is the sticky navbar plus the hero's own top padding. */
-  .headcol{min-height:calc(100svh - 5.2rem);display:flex;flex-direction:column;
-    justify-content:flex-end;padding-bottom:.35rem}
+  /* The painting owns the top of the first screen and the proposition starts
+     under the face, near 57% of the screen and clear of the eyes on all thirty.
+     Nothing reserves the rest of the screen: the column runs straight on into
+     the name and the beats, so there is never a dead screen between them. The
+     subtraction is the sticky navbar plus the hero's own top padding. */
+  .headcol{padding-top:calc(58.5svh - 5.7rem);padding-bottom:.35rem}
   /* everything now reads over paint, so every line carries its own ground */
   .eyebrow,.mh h1,.sub,.pcap__nm,.pcap__tr,.blabel,.promise,.play,.council,
   .free,.disc,.trust,.shelfcap,.entryA,.entryB{
     text-shadow:0 2px 18px var(--bg-void)}
   .pcap{padding-top:.55rem;
     border-top:1px solid color-mix(in srgb,var(--gold-subtle) var(--a-25),transparent)}
+}
 
-  /* the ignition waits for the question here, so the painting is never handed
-     to the dust at load: it is the first thing on screen and stays lit */
-  .settling .shot{opacity:1}
+/* tablet: the stage stays full bleed, but the name under it belongs to the
+   capped reading column, so it starts on the same line as the proposition */
+@media (min-width:620px) and (max-width:899px){
+  .artcol{max-width:600px;margin-inline:auto}
 }
 
 /* the still: the painting stops being fixed and is simply the first screen,
