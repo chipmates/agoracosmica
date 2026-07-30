@@ -1009,19 +1009,105 @@ const WisdomMapModal: FC<WisdomMapModalProps> = ({
     ? tString(constellationNameKey, constellation?.name || '')
     : constellation?.name || '';
 
-  // Seed note docking: the annotation sits in the plate margin OPPOSITE the
-  // star, near its height, never covering the figure (proto B).
+  // Seed note docking: the annotation prefers the plate margin OPPOSITE the
+  // star, near its height (proto B). A wide figure fills both margins, so
+  // the dock walks a small candidate grid (side x anchor height) and takes
+  // the first rect that buries no star, then none of the plate annotations.
+  // Lower bound 26: the note is translated -40% of its own height, so a
+  // higher anchor would push its kicker out of the plate.
   const selectedSeedPos = selectedSeed
     ? seedPositions[seeds.findIndex((s) => s.id === selectedSeed.id)] ?? null
     : null;
-  const atlasDockSide: 'left' | 'right' =
-    selectedSeedPos && (selectedSeedPos.coordX ?? 50) >= 50 ? 'left' : 'right';
-  // Lower bound 26: the note is translated -40% of its own height, so a
-  // higher anchor would push its kicker out of the plate (seen 2026-07-24
-  // with top-row stars, the note lost its first line under the header).
-  const atlasDockTopPct = selectedSeedPos
-    ? Math.min(64, Math.max(26, selectedSeedPos.coordY ?? 50))
-    : 50;
+  const dockChoice = (() => {
+    const starX = selectedSeedPos?.coordX ?? 50;
+    const starY = selectedSeedPos?.coordY ?? 50;
+    const preferred: 'left' | 'right' = starX >= 50 ? 'left' : 'right';
+    const fallback = {
+      side: preferred,
+      top: Math.min(64, Math.max(26, starY)),
+      compact: false,
+    };
+    if (!selectedSeedPos || !containerDimensions) return fallback;
+    const { width: W, height: H } = containerDimensions;
+    // Phones show the note as a bottom sheet, the dock props are unused.
+    if (W < 768) return fallback;
+
+    const noteW = Math.min(330, W - 56);
+    const pad = 6;
+    const starR = 22;
+    const starYPx = (starY / 100) * H;
+
+    const starsPx = seedPositions
+      .filter((p) => p.coordX !== undefined && p.coordY !== undefined)
+      .map((p) => ({
+        x: ((p.coordX as number) / 100) * W,
+        y: ((p.coordY as number) / 100) * H,
+      }));
+
+    // Cartouche and marginalia footprints (bottom corners), padded instead
+    // of modelling the cartouche tilt.
+    const cartW = Math.min(272, 0.34 * W);
+    const annotations = [
+      { x1: W * 0.975 - cartW - 10, y1: H * 0.93 - 165, x2: W * 0.975 + 10, y2: H * 0.93 + 10 },
+      { x1: W * 0.025 - 10, y1: H * 0.93 - 150, x2: W * 0.025 + Math.min(250, 0.26 * W) + 10, y2: H * 0.93 + 10 },
+    ];
+
+    const other: 'left' | 'right' = preferred === 'left' ? 'right' : 'left';
+    const evaluate = (noteH: number) => {
+      // The star-height anchor comes first: with free margins it wins on
+      // distance and the note sits exactly where it always has.
+      const anchorY1 = Math.min(H - noteH - 12, Math.max(12, starYPx - 0.4 * noteH));
+      const y1s = [anchorY1, 12, H * 0.13, H * 0.26, H * 0.39, H * 0.52, H - noteH - 12];
+      let best: { side: 'left' | 'right'; y1: number; buried: number; score: number } | null = null;
+      for (const side of [preferred, other]) {
+        for (const y1 of y1s) {
+          if (y1 < 12 || y1 + noteH > H - 12) continue;
+          const x1 = side === 'left' ? 24 : W - 24 - noteW;
+          const x2 = x1 + noteW;
+          const y2 = y1 + noteH;
+          const buried = starsPx.filter(
+            (s) =>
+              s.x + starR > x1 - pad &&
+              s.x - starR < x2 + pad &&
+              s.y + starR > y1 - pad &&
+              s.y - starR < y2 + pad
+          ).length;
+          const onAnnotation = annotations.some(
+            (a) => a.x1 < x2 && a.x2 > x1 && a.y1 < y2 && a.y2 > y1
+          ) ? 1 : 0;
+          const score =
+            buried * 1000 +
+            onAnnotation * 100 +
+            (side === preferred ? 0 : 10) +
+            Math.abs(y1 + noteH / 2 - starYPx) / H;
+          if (!best || score < best.score) best = { side, y1, buried, score };
+        }
+      }
+      return best;
+    };
+
+    // The CSS anchors the note at top: X% then lifts it 40% of its own
+    // height, so the found slot converts back to that anchor scale.
+    const toChoice = (slot: { side: 'left' | 'right'; y1: number }, noteH: number, compact: boolean) => ({
+      side: slot.side,
+      top: ((slot.y1 + 0.4 * noteH) / H) * 100,
+      compact,
+    });
+
+    // Natural size first; if every slot buries a star, a capped note with
+    // internal scroll may still find a clear one (wide figures fill both
+    // margins at mid height). If even that fails, least burial wins.
+    const naturalH = Math.min(420, H * 0.62);
+    const compactH = Math.min(340, H * 0.5);
+    const natural = evaluate(naturalH);
+    if (natural && natural.buried === 0) return toChoice(natural, naturalH, false);
+    const compact = evaluate(compactH);
+    if (compact && compact.buried === 0) return toChoice(compact, compactH, true);
+    return natural ? toChoice(natural, naturalH, false) : fallback;
+  })();
+  const atlasDockSide = dockChoice.side;
+  const atlasDockTopPct = dockChoice.top;
+  const atlasDockCompact = dockChoice.compact;
 
   return (
     <ModalContainer
@@ -1335,6 +1421,7 @@ const WisdomMapModal: FC<WisdomMapModalProps> = ({
                 atlas={skyEnabled}
                 atlasDockSide={atlasDockSide}
                 atlasDockTopPct={atlasDockTopPct}
+                atlasDockCompact={atlasDockCompact}
                 constellationName={translatedConstellationName}
                 figureId={selectedFigure?.id || ''}
                 onModeSelect={(seed, mode) => {

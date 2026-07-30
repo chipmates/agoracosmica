@@ -353,6 +353,13 @@
   display: none !important;
 }
 
+/* A mastered star's rays reach ~27px from centre, past the standard 44px
+   hit area, so its whole visible ornament stays tappable. */
+.map-container .star.atlas-star.as-lv4::after {
+  width: 56px;
+  height: 56px;
+}
+
 /* interaction feedback: the ink brightens, the page does not jump */
 .map-container .star.atlas-star:hover {
   transform: none;
@@ -579,6 +586,28 @@
 }
 .atlas-mode .seed-details-panel.atlas-seed-dock.dock-right {
   right: 24px;
+}
+
+/* Compact dock: a wide figure can fill both margins at mid height, so the
+   note takes the one star-free slot at a capped height. The summary clamps
+   to a preview, the full text stays one click away on the details button,
+   and nothing gets sliced by the cap. The corner frame becomes an outline
+   because an inset pseudo would scroll with the backstop overflow. */
+.atlas-mode .seed-details-panel.atlas-seed-dock.dock-compact {
+  max-height: min(340px, 50%);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  outline: 1px solid color-mix(in srgb, var(--gold-deep) 18%, transparent);
+  outline-offset: -6px;
+}
+.atlas-mode .seed-details-panel.atlas-seed-dock.dock-compact::before {
+  display: none;
+}
+.atlas-mode .atlas-seed-dock.dock-compact .seed-preview-summary {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  overflow: hidden;
 }
 
 @keyframes atlasNoteIn {

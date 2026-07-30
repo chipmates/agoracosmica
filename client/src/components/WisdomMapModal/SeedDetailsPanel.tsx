@@ -37,6 +37,9 @@ interface SeedDetailsPanelProps {
   atlasDockSide?: 'left' | 'right';
   /** Vertical anchor near the star, percent of the map height. */
   atlasDockTopPct?: number;
+  /** Capped height with internal scroll, when only a shorter note finds a
+   *  slot that buries no star. */
+  atlasDockCompact?: boolean;
   /** Translated constellation name for the kicker line. */
   constellationName?: string;
 }
@@ -53,6 +56,7 @@ const SeedDetailsPanel: FC<SeedDetailsPanelProps> = ({
   atlas = false,
   atlasDockSide = 'right',
   atlasDockTopPct = 50,
+  atlasDockCompact = false,
   constellationName = ''
 }) => {
   const { t, tNode, tString } = useTranslation();
@@ -133,7 +137,7 @@ const SeedDetailsPanel: FC<SeedDetailsPanelProps> = ({
     : 0;
 
   const panelClass = atlas
-    ? `seed-details-panel atlas-seed-dock dock-${atlasDockSide}`
+    ? `seed-details-panel atlas-seed-dock dock-${atlasDockSide}${atlasDockCompact ? ' dock-compact' : ''}`
     : 'seed-details-panel';
   const panelStyle = atlas
     ? ({ '--dock-top': `${atlasDockTopPct}%` } as CSSProperties)

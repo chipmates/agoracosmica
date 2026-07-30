@@ -69,6 +69,8 @@
       "theFreedHorizon": "Die Horizontlinie hochkant gestellt, mit der aufgehenden Sonne in ihrer Mitte, die den Anbruch der Freiheit und das Ende der Unterdrückung markiert.",
       "theTwoFridas": "Zwei Herzen übereinander, die Fridas Erforschung der Dualität in Liebe, Erbe und Selbst widerspiegeln. Diese Form umreißt zwei verbundene Herzen, die den inneren Dialog zwischen ihren beiden Identitäten symbolisieren."
     },
-    "symbolizes": "Symbolisiert"
+    "symbolizes": "Symbolisiert",
+    "showInfo": "Info anzeigen",
+    "hideInfo": "Info ausblenden"
   }
 }
