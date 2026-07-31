@@ -66,4 +66,30 @@
     color: var(--text-tertiary);
     font-style: italic;
   }
+
+  /* The question, its answer and the first band share one screen, so the gaps
+     above the band come in. Only the gaps: nothing here touches the reading,
+     and the page still opens on the question. */
+  .pub-theme,
+  .tq-index { margin-top: -2rem; }
+  .pub-theme .pub-breadcrumbs,
+  .tq-index .pub-breadcrumbs { margin-bottom: 1rem; }
+  .tq-hero { margin-bottom: 1rem; }
+  .tq-answer { margin-bottom: 1.5rem; }
+
+  /* A phone has a third of the room and German runs a third longer, so the
+     same gaps come in further. */
+  @media (max-width: 640px) {
+    .pub-theme .pub-breadcrumbs,
+    .tq-index .pub-breadcrumbs { margin-bottom: 0.75rem; }
+    .tq-hero__eyebrow { margin-bottom: 0.5rem; }
+    .tq-hero__tag { margin-top: 0.6rem; }
+    .tq-hero__facts { margin-top: 0.55rem; }
+    .tq-answer {
+      margin-bottom: 1.25rem;
+      padding-top: 1rem;
+      padding-bottom: 1rem;
+    }
+    .tq-index__head { margin-bottom: 1.5rem; }
+  }
 </style>

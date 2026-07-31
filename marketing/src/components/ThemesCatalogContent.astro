@@ -8,6 +8,7 @@ import Breadcrumbs from './Breadcrumbs.astro';
 import ThemeCard from './ThemeCard.astro';
 import ThemeCTA from './ThemeCTA.astro';
 import ThemePlate from './ThemePlate.astro';
+import PlateLightbox from './PlateLightbox.astro';
 import QuestionDoors from './QuestionDoors.astro';
 import type { DoorItem } from './QuestionDoors.astro';
 import QuestionOfTheDay from '../islands/QuestionOfTheDay';
@@ -69,6 +70,11 @@ const qotdInitial = {
 
 // The programme's own opening station carries the page CTA.
 const opener = councilCatalog.find(c => c.id === COUNCIL_SEQUENCE[0]) ?? councilCatalog[0];
+
+// The page opens on a procession, which is what a catalog of 55 questions and
+// 30 voices is. It is not the opener's plate on purpose: the closing band is,
+// and the two would say the same thing twice.
+const OPENING_PLATE = 'the-emperor-and-the-fugitive';
 ---
 <ThemeStyles />
 <div class="pub-content tq-index">
@@ -83,6 +89,8 @@ const opener = councilCatalog.find(c => c.id === COUNCIL_SEQUENCE[0]) ?? council
         : 'Every voice in these councils is an AI Echo. Interpretations, not recordings.'}
     </p>
   </header>
+
+  <ThemePlate councilId={OPENING_PLATE} ink="house" lang={lang} />
 
   <section class="tq-section tq-cards-section">
     <p class="tq-note">{t('themes.indexOpenLine')}</p>
@@ -132,7 +140,7 @@ const opener = councilCatalog.find(c => c.id === COUNCIL_SEQUENCE[0]) ?? council
     </p>
   </section>
 
-  <ThemePlate councilId={opener.id} ink="house" />
+  <ThemePlate councilId={opener.id} ink="house" lang={lang} />
 
   <ThemeCTA
     lang={lang}
@@ -141,6 +149,8 @@ const opener = councilCatalog.find(c => c.id === COUNCIL_SEQUENCE[0]) ?? council
     figureId={opener.moderator.id}
   />
 </div>
+
+<PlateLightbox lang={lang} />
 
 <style is:global>
   .tq-index { padding-bottom: 2.5rem; }

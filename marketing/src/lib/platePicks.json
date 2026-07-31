@@ -5,7 +5,7 @@
       "debate": "the-problem-of-evil"
     },
     "freedom-justice": {
-      "lead": "the-virtue-of-surrender",
+      "lead": "the-debt-you-didnt-sign",
       "debate": "four-freedoms"
     },
     "loss-grief": {
@@ -17,7 +17,7 @@
       "debate": "alone-in-the-room-full-of-people"
     },
     "meaning-purpose": {
-      "lead": "why-do-i-keep-going-back",
+      "lead": "the-calling-that-wont-shut-up",
       "debate": "the-life-you-think-you-want"
     },
     "mind-creativity": {
@@ -29,313 +29,519 @@
       "debate": "what-does-your-anger-want"
     },
     "who-am-i": {
-      "lead": "the-stain-that-stays",
+      "lead": "the-mask-that-speaks",
       "debate": "the-story-you-keep-telling"
     }
   },
   "plates": {
     "the-god-after-god": {
-      "focal": "48% 30%",
+      "crop": {
+        "cx": 0.5,
+        "cy": 0.4,
+        "w": 0.94
+      },
       "variants": {
         "640": {
           "src": "/plates/the-god-after-god-640.avif",
           "width": 640,
-          "height": 360,
-          "bytes": 53972,
+          "height": 267,
+          "bytes": 39863,
           "quality": 50
         },
         "1024": {
           "src": "/plates/the-god-after-god-1024.avif",
-          "width": 900,
-          "height": 506,
-          "bytes": 107801,
+          "width": 1024,
+          "height": 427,
+          "bytes": 99621,
           "quality": 50
         }
+      },
+      "full": {
+        "src": "/plates/the-god-after-god-full.avif",
+        "width": 1100,
+        "height": 914,
+        "bytes": 125241,
+        "quality": 38
       }
     },
     "the-problem-of-evil": {
-      "focal": "50% 45%",
+      "crop": {
+        "cx": 0.5,
+        "cy": 0.345,
+        "w": 0.84
+      },
       "variants": {
         "640": {
           "src": "/plates/the-problem-of-evil-640.avif",
           "width": 640,
-          "height": 360,
-          "bytes": 57754,
+          "height": 267,
+          "bytes": 44916,
           "quality": 50
         },
         "1024": {
           "src": "/plates/the-problem-of-evil-1024.avif",
-          "width": 1024,
-          "height": 576,
-          "bytes": 108261,
-          "quality": 38
+          "width": 895,
+          "height": 373,
+          "bytes": 77073,
+          "quality": 50
         }
+      },
+      "full": {
+        "src": "/plates/the-problem-of-evil-full.avif",
+        "width": 814,
+        "height": 1100,
+        "bytes": 152295,
+        "quality": 50
       }
     },
-    "the-virtue-of-surrender": {
-      "focal": "62% 20%",
+    "the-debt-you-didnt-sign": {
+      "crop": {
+        "cx": 0.5,
+        "cy": 0.42,
+        "w": 0.88
+      },
       "variants": {
         "640": {
-          "src": "/plates/the-virtue-of-surrender-640.avif",
+          "src": "/plates/the-debt-you-didnt-sign-640.avif",
           "width": 640,
-          "height": 360,
-          "bytes": 31160,
+          "height": 267,
+          "bytes": 48727,
           "quality": 50
         },
         "1024": {
-          "src": "/plates/the-virtue-of-surrender-1024.avif",
-          "width": 1024,
-          "height": 576,
-          "bytes": 67443,
+          "src": "/plates/the-debt-you-didnt-sign-1024.avif",
+          "width": 874,
+          "height": 364,
+          "bytes": 86171,
           "quality": 50
         }
+      },
+      "full": {
+        "src": "/plates/the-debt-you-didnt-sign-full.avif",
+        "width": 759,
+        "height": 1100,
+        "bytes": 129451,
+        "quality": 38
       }
     },
     "four-freedoms": {
-      "focal": "50% 20%",
+      "crop": {
+        "cx": 0.46,
+        "cy": 0.56,
+        "w": 0.9
+      },
       "variants": {
         "640": {
           "src": "/plates/four-freedoms-640.avif",
           "width": 640,
-          "height": 360,
-          "bytes": 55651,
+          "height": 267,
+          "bytes": 35731,
           "quality": 50
         },
         "1024": {
           "src": "/plates/four-freedoms-1024.avif",
           "width": 1024,
-          "height": 576,
-          "bytes": 105377,
-          "quality": 32
+          "height": 427,
+          "bytes": 107613,
+          "quality": 50
         }
+      },
+      "full": {
+        "src": "/plates/four-freedoms-full.avif",
+        "width": 1100,
+        "height": 788,
+        "bytes": 122127,
+        "quality": 38
       }
     },
     "the-meaning-of-pain": {
-      "focal": "56% 42%",
+      "crop": {
+        "cx": 0.5,
+        "cy": 0.35,
+        "w": 0.92
+      },
       "variants": {
         "640": {
           "src": "/plates/the-meaning-of-pain-640.avif",
           "width": 640,
-          "height": 360,
-          "bytes": 42078,
+          "height": 267,
+          "bytes": 44481,
           "quality": 50
         },
         "1024": {
           "src": "/plates/the-meaning-of-pain-1024.avif",
           "width": 1024,
-          "height": 576,
-          "bytes": 78431,
+          "height": 427,
+          "bytes": 83529,
           "quality": 50
         }
+      },
+      "full": {
+        "src": "/plates/the-meaning-of-pain-full.avif",
+        "width": 872,
+        "height": 1100,
+        "bytes": 133467,
+        "quality": 38
       }
     },
     "laughing-at-the-abyss": {
-      "focal": "46% 40%",
+      "crop": {
+        "cx": 0.5,
+        "cy": 0.5,
+        "w": 0.94
+      },
       "variants": {
         "640": {
           "src": "/plates/laughing-at-the-abyss-640.avif",
           "width": 640,
-          "height": 360,
-          "bytes": 35785,
+          "height": 267,
+          "bytes": 38965,
           "quality": 50
         },
         "1024": {
           "src": "/plates/laughing-at-the-abyss-1024.avif",
-          "width": 1021,
-          "height": 574,
-          "bytes": 83469,
+          "width": 1024,
+          "height": 427,
+          "bytes": 89375,
           "quality": 50
         }
+      },
+      "full": {
+        "src": "/plates/laughing-at-the-abyss-full.avif",
+        "width": 1100,
+        "height": 861,
+        "bytes": 125740,
+        "quality": 50
       }
     },
     "where-do-you-belong": {
-      "focal": "50% 42%",
+      "crop": {
+        "cx": 0.5,
+        "cy": 0.76,
+        "w": 0.9
+      },
       "variants": {
         "640": {
           "src": "/plates/where-do-you-belong-640.avif",
           "width": 640,
-          "height": 360,
-          "bytes": 59646,
-          "quality": 44
+          "height": 267,
+          "bytes": 52009,
+          "quality": 50
         },
         "1024": {
           "src": "/plates/where-do-you-belong-1024.avif",
-          "width": 1024,
-          "height": 576,
-          "bytes": 118845,
-          "quality": 38
+          "width": 885,
+          "height": 369,
+          "bytes": 93716,
+          "quality": 50
         }
+      },
+      "full": {
+        "src": "/plates/where-do-you-belong-full.avif",
+        "width": 751,
+        "height": 1100,
+        "bytes": 139992,
+        "quality": 44
       }
     },
     "alone-in-the-room-full-of-people": {
-      "focal": "50% 42%",
+      "crop": {
+        "cx": 0.46,
+        "cy": 0.46,
+        "w": 0.72
+      },
       "variants": {
         "640": {
           "src": "/plates/alone-in-the-room-full-of-people-640.avif",
           "width": 640,
-          "height": 360,
-          "bytes": 49395,
+          "height": 267,
+          "bytes": 38590,
           "quality": 50
         },
         "1024": {
           "src": "/plates/alone-in-the-room-full-of-people-1024.avif",
-          "width": 873,
-          "height": 491,
-          "bytes": 76983,
+          "width": 1024,
+          "height": 427,
+          "bytes": 88080,
           "quality": 50
         }
+      },
+      "full": {
+        "src": "/plates/alone-in-the-room-full-of-people-full.avif",
+        "width": 1100,
+        "height": 866,
+        "bytes": 126796,
+        "quality": 38
       }
     },
-    "why-do-i-keep-going-back": {
-      "focal": "50% 0%",
+    "the-calling-that-wont-shut-up": {
+      "crop": {
+        "cx": 0.5,
+        "cy": 0.35,
+        "w": 0.8
+      },
       "variants": {
         "640": {
-          "src": "/plates/why-do-i-keep-going-back-640.avif",
+          "src": "/plates/the-calling-that-wont-shut-up-640.avif",
           "width": 640,
-          "height": 360,
-          "bytes": 57145,
+          "height": 266,
+          "bytes": 56182,
           "quality": 50
         },
         "1024": {
-          "src": "/plates/why-do-i-keep-going-back-1024.avif",
-          "width": 896,
-          "height": 504,
-          "bytes": 78298,
+          "src": "/plates/the-calling-that-wont-shut-up-1024.avif",
+          "width": 848,
+          "height": 353,
+          "bytes": 93144,
           "quality": 50
         }
+      },
+      "full": {
+        "src": "/plates/the-calling-that-wont-shut-up-full.avif",
+        "width": 810,
+        "height": 1100,
+        "bytes": 134303,
+        "quality": 26
       }
     },
     "the-life-you-think-you-want": {
-      "focal": "50% 0%",
+      "crop": {
+        "cx": 0.42,
+        "cy": 0.63,
+        "w": 0.78
+      },
       "variants": {
         "640": {
           "src": "/plates/the-life-you-think-you-want-640.avif",
           "width": 640,
-          "height": 360,
-          "bytes": 54672,
-          "quality": 38
+          "height": 266,
+          "bytes": 58508,
+          "quality": 44
         },
         "1024": {
           "src": "/plates/the-life-you-think-you-want-1024.avif",
-          "width": 896,
-          "height": 504,
-          "bytes": 94793,
+          "width": 829,
+          "height": 345,
+          "bytes": 104379,
           "quality": 50
         }
+      },
+      "full": {
+        "src": "/plates/the-life-you-think-you-want-full.avif",
+        "width": 812,
+        "height": 1100,
+        "bytes": 145157,
+        "quality": 26
       }
     },
     "the-serious-work-of-play": {
-      "focal": "50% 30%",
+      "crop": {
+        "cx": 0.5,
+        "cy": 0.33,
+        "w": 0.92
+      },
       "variants": {
         "640": {
           "src": "/plates/the-serious-work-of-play-640.avif",
           "width": 640,
-          "height": 360,
-          "bytes": 59292,
+          "height": 267,
+          "bytes": 51380,
           "quality": 50
         },
         "1024": {
           "src": "/plates/the-serious-work-of-play-1024.avif",
-          "width": 1024,
-          "height": 576,
-          "bytes": 112430,
+          "width": 974,
+          "height": 406,
+          "bytes": 110299,
           "quality": 44
         }
+      },
+      "full": {
+        "src": "/plates/the-serious-work-of-play-full.avif",
+        "width": 809,
+        "height": 1100,
+        "bytes": 129006,
+        "quality": 26
       }
     },
     "the-mind-that-wont-be-quiet": {
-      "focal": "50% 30%",
+      "crop": {
+        "cx": 0.52,
+        "cy": 0.38,
+        "w": 0.86
+      },
       "variants": {
         "640": {
           "src": "/plates/the-mind-that-wont-be-quiet-640.avif",
           "width": 640,
-          "height": 360,
-          "bytes": 57309,
-          "quality": 38
+          "height": 266,
+          "bytes": 46186,
+          "quality": 50
         },
         "1024": {
           "src": "/plates/the-mind-that-wont-be-quiet-1024.avif",
-          "width": 1024,
-          "height": 576,
-          "bytes": 110709,
-          "quality": 20
+          "width": 980,
+          "height": 408,
+          "bytes": 109852,
+          "quality": 44
         }
+      },
+      "full": {
+        "src": "/plates/the-mind-that-wont-be-quiet-full.avif",
+        "width": 871,
+        "height": 1100,
+        "bytes": 120620,
+        "quality": 32
       }
     },
     "the-fear-you-feed": {
-      "focal": "50% 30%",
+      "crop": {
+        "cx": 0.5,
+        "cy": 0.35,
+        "w": 0.9
+      },
       "variants": {
         "640": {
           "src": "/plates/the-fear-you-feed-640.avif",
           "width": 640,
-          "height": 360,
-          "bytes": 59021,
-          "quality": 38
+          "height": 267,
+          "bytes": 47287,
+          "quality": 50
         },
         "1024": {
           "src": "/plates/the-fear-you-feed-1024.avif",
-          "width": 1024,
-          "height": 576,
-          "bytes": 120632,
-          "quality": 32
+          "width": 1006,
+          "height": 419,
+          "bytes": 118294,
+          "quality": 50
         }
+      },
+      "full": {
+        "src": "/plates/the-fear-you-feed-full.avif",
+        "width": 854,
+        "height": 1100,
+        "bytes": 118291,
+        "quality": 32
       }
     },
     "what-does-your-anger-want": {
-      "focal": "50% 30%",
+      "crop": {
+        "cx": 0.5,
+        "cy": 0.5,
+        "w": 0.95
+      },
       "variants": {
         "640": {
           "src": "/plates/what-does-your-anger-want-640.avif",
           "width": 640,
-          "height": 360,
-          "bytes": 33670,
+          "height": 267,
+          "bytes": 14481,
           "quality": 50
         },
         "1024": {
           "src": "/plates/what-does-your-anger-want-1024.avif",
           "width": 1024,
-          "height": 576,
-          "bytes": 78396,
+          "height": 427,
+          "bytes": 26947,
           "quality": 50
         }
+      },
+      "full": {
+        "src": "/plates/what-does-your-anger-want-full.avif",
+        "width": 1100,
+        "height": 577,
+        "bytes": 34748,
+        "quality": 50
       }
     },
-    "the-stain-that-stays": {
-      "focal": "50% 95%",
+    "the-mask-that-speaks": {
+      "crop": {
+        "cx": 0.5,
+        "cy": 0.34,
+        "w": 1
+      },
       "variants": {
         "640": {
-          "src": "/plates/the-stain-that-stays-640.avif",
+          "src": "/plates/the-mask-that-speaks-640.avif",
           "width": 640,
-          "height": 360,
-          "bytes": 55247,
+          "height": 267,
+          "bytes": 43602,
           "quality": 50
         },
         "1024": {
-          "src": "/plates/the-stain-that-stays-1024.avif",
-          "width": 720,
-          "height": 405,
-          "bytes": 65794,
+          "src": "/plates/the-mask-that-speaks-1024.avif",
+          "width": 970,
+          "height": 404,
+          "bytes": 84540,
           "quality": 50
         }
+      },
+      "full": {
+        "src": "/plates/the-mask-that-speaks-full.avif",
+        "width": 741,
+        "height": 1100,
+        "bytes": 136471,
+        "quality": 44
       }
     },
     "the-story-you-keep-telling": {
-      "focal": "52% 40%",
+      "crop": {
+        "cx": 0.6,
+        "cy": 0.36,
+        "w": 0.38
+      },
       "variants": {
         "640": {
           "src": "/plates/the-story-you-keep-telling-640.avif",
-          "width": 640,
-          "height": 359,
-          "bytes": 58521,
-          "quality": 44
+          "width": 399,
+          "height": 166,
+          "bytes": 19283,
+          "quality": 50
         },
         "1024": {
           "src": "/plates/the-story-you-keep-telling-1024.avif",
-          "width": 1024,
-          "height": 574,
-          "bytes": 119146,
-          "quality": 38
+          "width": 399,
+          "height": 166,
+          "bytes": 19283,
+          "quality": 50
         }
+      },
+      "full": {
+        "src": "/plates/the-story-you-keep-telling-full.avif",
+        "width": 801,
+        "height": 1100,
+        "bytes": 81582,
+        "quality": 50
+      }
+    },
+    "the-emperor-and-the-fugitive": {
+      "crop": {
+        "cx": 0.5,
+        "cy": 0.57,
+        "w": 0.98
+      },
+      "variants": {
+        "640": {
+          "src": "/plates/the-emperor-and-the-fugitive-640.avif",
+          "width": 640,
+          "height": 267,
+          "bytes": 49282,
+          "quality": 50
+        },
+        "1024": {
+          "src": "/plates/the-emperor-and-the-fugitive-1024.avif",
+          "width": 1024,
+          "height": 427,
+          "bytes": 117472,
+          "quality": 50
+        }
+      },
+      "full": {
+        "src": "/plates/the-emperor-and-the-fugitive-full.avif",
+        "width": 1100,
+        "height": 872,
+        "bytes": 143663,
+        "quality": 44
       }
     }
   }

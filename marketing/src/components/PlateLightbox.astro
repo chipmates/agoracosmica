@@ -1,0 +1,148 @@
+---
+// The viewer behind every ink band on a page: the whole plate at its own
+// proportion, alone on the night, with the museum's record under it.
+//
+// Mirrors the council sheet in the app (CouncilArtLightbox): same layers, same
+// tap-anywhere-to-close, same credit link. Here it is a native <dialog>, so
+// the modal behaviour, the ESC key and the focus return are the platform's
+// rather than ours. One per page, shared by all its bands.
+//
+// The markup ships empty. /plate-lightbox.js fills it from the band that was
+// pressed, which is also when the full plate is first fetched.
+
+import type { Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const label = lang === 'de' ? 'Kunstwerk' : 'Artwork';
+const closeLabel = lang === 'de' ? 'Schließen' : 'Close';
+---
+<dialog class="tq-lightbox" data-plate-dialog aria-label={label}>
+  <button type="button" class="tq-lightbox__close" data-plate-close aria-label={closeLabel}>
+    <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" focusable="false">
+      <path
+        d="M3 3l10 10M13 3L3 13"
+        stroke="currentColor"
+        stroke-width="1.6"
+        fill="none"
+        stroke-linecap="round"
+      ></path>
+    </svg>
+  </button>
+  <div class="tq-lightbox__stage">
+    <div class="tq-lightbox__plate" data-plate-stage>
+      <div class="tq-lightbox__tone"></div>
+      <div class="tq-lightbox__ink" data-plate-ink-layer></div>
+      <div class="tq-lightbox__keyline"></div>
+    </div>
+    <a
+      class="tq-lightbox__credit"
+      data-plate-credit-link
+      target="_blank"
+      rel="noopener noreferrer"
+      hidden
+    ></a>
+  </div>
+</dialog>
+
+<script src="/plate-lightbox.js" is:inline defer></script>
+
+<style is:global>
+  .tq-lightbox {
+    --tq-plate-ink: var(--gold-primary);
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: var(--bg-deep-space);
+    color: var(--text-primary);
+    overflow: hidden;
+  }
+  .tq-lightbox[open] {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: zoom-out;
+  }
+  .tq-lightbox::backdrop { background: var(--bg-deep-space); }
+
+  .tq-lightbox__close {
+    position: absolute;
+    top: max(0.75rem, env(safe-area-inset-top, 0px));
+    right: max(0.75rem, env(safe-area-inset-right, 0px));
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 1px solid color-mix(in srgb, var(--star-blue-light) var(--a-15), transparent);
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--bg-card) var(--a-70), transparent);
+    color: var(--text-secondary);
+    cursor: pointer;
+  }
+  .tq-lightbox__close:hover { color: var(--gold-primary); }
+  .tq-lightbox__close:focus-visible {
+    outline: 2px solid var(--gold-primary);
+    outline-offset: 2px;
+  }
+
+  .tq-lightbox__stage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.85rem;
+    max-width: 92vw;
+  }
+  /* Width and proportion are set from the plate that was opened, so the box
+     is the engraving's own shape and never a letterbox around it. */
+  .tq-lightbox__plate { position: relative; }
+  .tq-lightbox__tone {
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--tq-plate-ink) var(--a-08), var(--bg-card));
+  }
+  .tq-lightbox__ink {
+    position: absolute;
+    inset: 0;
+    background: var(--tq-plate-ink);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: 50% 50%;
+    mask-position: 50% 50%;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    opacity: 0.94;
+  }
+  @supports not ((mask-image: url('')) or (-webkit-mask-image: url(''))) {
+    .tq-lightbox__ink { display: none; }
+  }
+  .tq-lightbox__keyline {
+    position: absolute;
+    inset: 0;
+    border: 1px solid color-mix(in srgb, var(--star-blue-light) var(--a-15), transparent);
+    border-radius: var(--radius-sm);
+    pointer-events: none;
+  }
+
+  .tq-lightbox__credit {
+    max-width: 88vw;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: var(--text-xs);
+    line-height: var(--leading-relaxed);
+    text-align: center;
+    color: var(--text-tertiary);
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .tq-lightbox__credit:hover,
+  .tq-lightbox__credit:focus-visible { color: var(--text-secondary); }
+</style>

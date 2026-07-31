@@ -13,6 +13,7 @@ import CouncilHero from './CouncilHero.astro';
 import QuestionDoors from './QuestionDoors.astro';
 import type { DoorItem } from './QuestionDoors.astro';
 import ThemePlate from './ThemePlate.astro';
+import PlateLightbox from './PlateLightbox.astro';
 import ThemeCTA from './ThemeCTA.astro';
 import ThemeStyles from './ThemeStyles.astro';
 
@@ -222,6 +223,12 @@ const heroFacts = [
     <!-- Block 3: the answer, before anything else, in crawlable HTML. -->
     <p class="tq-answer">{answer}</p>
 
+    <!-- The lead band, right under the question and its answer. It is a mask
+         over flat colour, so it costs the first paint nothing and reserves its
+         own height, and the page still opens with the two lines that answer
+         the visitor's question. -->
+    <ThemePlate themeId={themeId} slot="lead" lang={lang} />
+
     <!-- Block 4: the answers, one named voice per paragraph. -->
     {voiceBlocks.length > 0 ? (
       <section class="tq-section">
@@ -275,9 +282,6 @@ const heroFacts = [
          invites anyone to talk to one, not after. -->
     <EchoNote variant="theme" lang={lang} />
 
-    <!-- A council plate as a breath after the essay, before the doors. -->
-    <ThemePlate themeId={themeId} slot="lead" />
-
     <!-- Block 5: ask it yourself. -->
     {askItems.length > 0 && (
       <section class="tq-section">
@@ -293,7 +297,7 @@ const heroFacts = [
         <h2 class="tq-h2">{t('themes.hearLabel')}</h2>
         <p class="tq-note">{t('themes.hearCaption')}</p>
         <!-- The featured debate's own plate, over the card that opens it. -->
-        <ThemePlate themeId={themeId} slot="debate" />
+        <ThemePlate themeId={themeId} slot="debate" lang={lang} />
         <CouncilHero
           council={featured}
           lang={lang}
@@ -459,6 +463,8 @@ const heroFacts = [
     )}
   </div>
 </div>
+
+<PlateLightbox lang={lang} />
 
 <style is:global>
   .pub-theme { padding-bottom: 2.5rem; }

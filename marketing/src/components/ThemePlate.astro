@@ -6,15 +6,24 @@
 // as the council cards in the app: no colour is ever baked into the asset.
 // Files, crops and the pick come from scripts/extract-plates.mjs.
 //
+// The band is also a door: pressing it opens the whole plate at its own
+// proportion, the way the council sheet does in the app. The viewer itself is
+// one <PlateLightbox /> per page, shared by every band on it.
+//
 // The credit line under each band is the institution's own record, verbatim.
 
 import platePicks from '../lib/platePicks.json';
 import { PLATE_CREDITS } from '@client/components/CosmicCouncil/plates/credits';
+import type { Lang } from '../i18n';
 import '../styles/plates.css';
+
+interface PlateEntry {
+  full: { src: string; width: number; height: number };
+}
 
 interface Manifest {
   picks: Record<string, Record<string, string>>;
-  plates: Record<string, unknown>;
+  plates: Record<string, PlateEntry>;
 }
 
 interface Props {
@@ -26,9 +35,10 @@ interface Props {
   councilId?: string;
   /** House gold instead of a theme ink, for the same case. */
   ink?: 'theme' | 'house';
+  lang: Lang;
 }
 
-const { themeId, slot, councilId, ink = 'theme' } = Astro.props;
+const { themeId, slot, councilId, ink = 'theme', lang } = Astro.props;
 const manifest = platePicks as Manifest;
 const plateId =
   councilId ?? (themeId && slot ? manifest.picks[themeId]?.[slot] : undefined);
@@ -47,6 +57,15 @@ const creditLine = credit
       .filter(Boolean)
       .join(' · ')
   : '';
+// What the button announces: the work, by name, in the visitor's language.
+const named = credit
+  ? credit.artist
+    ? lang === 'de'
+      ? `${credit.title} von ${credit.artist}`
+      : `${credit.title} by ${credit.artist}`
+    : credit.title
+  : '';
+const openLabel = lang === 'de' ? `Kunstwerk öffnen, ${named}` : `Open the artwork, ${named}`;
 ---
 {plate && (
   <figure
@@ -54,11 +73,26 @@ const creditLine = credit
     data-theme={ink === 'house' ? undefined : themeId}
     data-plate={plateId}
   >
-    <div class="tq-plate__frame" aria-hidden="true">
-      <div class="tq-plate__tone"></div>
-      <div class="tq-plate__ink"></div>
-      <div class="tq-plate__keyline"></div>
-    </div>
+    {/* Ships disabled so a visitor without the viewer never meets a dead
+        control. /plate-lightbox.js enables every band it can drive. */}
+    <button
+      type="button"
+      class="tq-plate__open"
+      disabled
+      data-plate-open
+      data-plate-ink={ink === 'house' ? 'house' : themeId}
+      data-plate-full={plate.full.src}
+      data-plate-aspect={(plate.full.width / plate.full.height).toFixed(4)}
+      data-plate-credit={creditLine}
+      data-plate-href={credit?.objectUrl}
+      aria-label={openLabel}
+    >
+      <span class="tq-plate__frame" aria-hidden="true">
+        <span class="tq-plate__tone"></span>
+        <span class="tq-plate__ink"></span>
+        <span class="tq-plate__keyline"></span>
+      </span>
+    </button>
     {credit && (
       <figcaption class="tq-plate__credit">
         <a
@@ -79,18 +113,39 @@ const creditLine = credit
     --tq-plate-ink: var(--gold-primary);
     margin: 0 0 2.75rem;
   }
-  /* On the index the band closes the page, so it lines up with the CTA under
-     it and the two read as one block. */
+  /* On the index the closing band lines up with the CTA under it, so the two
+     read as one block. */
   .tq-index > .tq-plate {
     max-width: 44rem;
     margin: 3rem auto 0;
   }
+  /* The opening band is the other way round: it follows the intro and hands
+     the page to the cards, so its air sits underneath. */
+  .tq-index__head + .tq-plate { margin: 0 auto 2.75rem; }
   .tq-plate + .tq-cta { margin-top: 1.1rem; }
+  /* The button is only a hit area, so it carries no chrome of its own. */
+  .tq-plate__open {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: inherit;
+  }
+  .tq-plate__open:not(:disabled) { cursor: zoom-in; }
+  .tq-plate__open:focus-visible {
+    outline: 2px solid var(--gold-primary);
+    outline-offset: 3px;
+    border-radius: var(--radius-sm);
+  }
   /* The frame stays near the master's own proportion. Crop it much harder and
      the marks blow up into texture, which is when the engraving stops reading
      as an engraving. */
   .tq-plate__frame {
     position: relative;
+    display: block;
     width: 100%;
     aspect-ratio: 12 / 5;
     max-height: 300px;
@@ -104,13 +159,16 @@ const creditLine = credit
     background: color-mix(in srgb, var(--tq-plate-ink) var(--a-08), var(--bg-card));
   }
   /* The ink: a flat field of the theme colour, shaped by the plate's alpha.
-     mask-image and mask-position come from the generated plates.css. */
+     mask-image comes from the generated plates.css, which already carries the
+     curated crop, so the band needs no position of its own. */
   .tq-plate__ink {
     position: absolute;
     inset: 0;
     background: var(--tq-plate-ink);
     -webkit-mask-repeat: no-repeat;
     mask-repeat: no-repeat;
+    -webkit-mask-position: 50% 50%;
+    mask-position: 50% 50%;
     -webkit-mask-size: cover;
     mask-size: cover;
     opacity: 0.85;
@@ -130,14 +188,23 @@ const creditLine = credit
     border-radius: var(--radius-sm);
   }
 
-  .tq-plate[data-theme='who-am-i'] { --tq-plate-ink: var(--council-who-am-i, var(--gold-primary)); }
-  .tq-plate[data-theme='love-connection'] { --tq-plate-ink: var(--council-love-connection, var(--ink-rose)); }
-  .tq-plate[data-theme='meaning-purpose'] { --tq-plate-ink: var(--council-meaning-purpose, var(--ink-sap-green)); }
-  .tq-plate[data-theme='mind-creativity'] { --tq-plate-ink: var(--council-mind-creativity, var(--ink-smalt)); }
-  .tq-plate[data-theme='moral-life'] { --tq-plate-ink: var(--council-moral-life, var(--ink-verdigris)); }
-  .tq-plate[data-theme='freedom-justice'] { --tq-plate-ink: var(--council-freedom-justice, var(--ink-madder)); }
-  .tq-plate[data-theme='faith-death-mystery'] { --tq-plate-ink: var(--council-faith-death-mystery, var(--ink-folium)); }
-  .tq-plate[data-theme='loss-grief'] { --tq-plate-ink: var(--council-loss-grief, var(--ink-azurite)); }
+  /* One ink map, worn by the band and by the opened plate alike. */
+  .tq-plate[data-theme='who-am-i'],
+  .tq-lightbox[data-ink='who-am-i'] { --tq-plate-ink: var(--council-who-am-i, var(--gold-primary)); }
+  .tq-plate[data-theme='love-connection'],
+  .tq-lightbox[data-ink='love-connection'] { --tq-plate-ink: var(--council-love-connection, var(--ink-rose)); }
+  .tq-plate[data-theme='meaning-purpose'],
+  .tq-lightbox[data-ink='meaning-purpose'] { --tq-plate-ink: var(--council-meaning-purpose, var(--ink-sap-green)); }
+  .tq-plate[data-theme='mind-creativity'],
+  .tq-lightbox[data-ink='mind-creativity'] { --tq-plate-ink: var(--council-mind-creativity, var(--ink-smalt)); }
+  .tq-plate[data-theme='moral-life'],
+  .tq-lightbox[data-ink='moral-life'] { --tq-plate-ink: var(--council-moral-life, var(--ink-verdigris)); }
+  .tq-plate[data-theme='freedom-justice'],
+  .tq-lightbox[data-ink='freedom-justice'] { --tq-plate-ink: var(--council-freedom-justice, var(--ink-madder)); }
+  .tq-plate[data-theme='faith-death-mystery'],
+  .tq-lightbox[data-ink='faith-death-mystery'] { --tq-plate-ink: var(--council-faith-death-mystery, var(--ink-folium)); }
+  .tq-plate[data-theme='loss-grief'],
+  .tq-lightbox[data-ink='loss-grief'] { --tq-plate-ink: var(--council-loss-grief, var(--ink-azurite)); }
 
   .tq-plate__credit {
     margin: 0.5rem 0 0;
