@@ -714,6 +714,17 @@ const schemas = [
       </p>
     </aside>
 
+    <script>
+      // Feed the Echo teaser into the shared listened accumulator like every
+      // other marketing play surface. The playback UI stays in /ed-audio.js
+      // (its no-JS fallback intact); this only counts seconds actually heard.
+      import { trackHeardSeconds } from '../../../utils/listenedConversion';
+      const audio = document.querySelector('[data-ed-audio-el]');
+      if (audio instanceof HTMLAudioElement) {
+        trackHeardSeconds(audio, () => 'dickinson');
+      }
+    </script>
+
     <footer class="ed-sources">
       <p>
         The poems here are transcribed from Dickinson's own manuscripts, which
