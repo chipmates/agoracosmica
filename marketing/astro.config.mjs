@@ -49,7 +49,13 @@ export default defineConfig({
   // sitemap-index/sitemap-0 pair that would emit / and /de/ with the wrong
   // priority and no x-default hreflang once the homepages exist.
   integrations: [
-    react(),
+    react({
+      // Static prerender only, so streaming buys nothing. It also bakes NUL
+      // bytes into the HTML: react-dom 18's stream renderer flushes its full
+      // 2048-byte view, zero padding included, whenever a multibyte character
+      // straddles the view boundary (renderToString has no byte views).
+      experimentalDisableStreaming: true,
+    }),
   ],
   // Dev-only proxy. publicMediaUrl returns relative paths in dev (assuming
   // the host bundler proxies /images, /trailers, etc. to media.agoracosmica.org).
