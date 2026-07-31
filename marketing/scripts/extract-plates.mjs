@@ -75,11 +75,14 @@ const LEAD_OVERRIDES = {
   // Dürer's Saint Michael is nearly all wing at band height. The Horsemen
   // from the same series give three riders and three faces instead.
   'meaning-purpose': 'the-calling-that-wont-shut-up',
+  // A Corinthian capital is ornament, not a scene. Hirschvogel's church in
+  // open country is the theme's own image: a cathedral without walls.
+  'faith-death-mystery': 'the-cathedral-without-walls',
 };
 
 // Plates a page names directly, outside the per-theme picks.
 const EXTRA_PLATES = [
-  'the-emperor-and-the-fugitive', // the themes hub's opening band, a procession
+  'the-question-behind-every-question', // the themes hub's opening band: Jerome, the seeker
 ];
 
 // The band crop, curated per plate against the full master and verified by
@@ -88,7 +91,7 @@ const EXTRA_PLATES = [
 // and re-running this script reproduces the same frames.
 const DEFAULT_CROP = { cx: 0.5, cy: 0.5, w: 1 };
 const BAND_CROP = {
-  'the-mask-that-speaks': { cx: 0.5, cy: 0.34, w: 1 },              // brow, eyes, curls
+  'the-mask-that-speaks': { cx: 0.5, cy: 0.45, w: 1 },              // eyes through mouth, the whole gaze
   'the-story-you-keep-telling': { cx: 0.6, cy: 0.36, w: 0.38 },     // the masked faces
   'where-do-you-belong': { cx: 0.5, cy: 0.76, w: 0.9 },             // figures on the steps
   'alone-in-the-room-full-of-people': { cx: 0.46, cy: 0.46, w: 0.72 }, // the platform, the crowd
@@ -100,11 +103,11 @@ const BAND_CROP = {
   'what-does-your-anger-want': { cx: 0.5, cy: 0.5, w: 0.95 },       // the three faces
   'the-debt-you-didnt-sign': { cx: 0.5, cy: 0.42, w: 0.88 },        // the hand at the door
   'four-freedoms': { cx: 0.46, cy: 0.56, w: 0.9 },                  // the chained men
-  'the-god-after-god': { cx: 0.5, cy: 0.4, w: 0.94 },               // volutes and acanthus
-  'the-problem-of-evil': { cx: 0.5, cy: 0.345, w: 0.84 },           // Job, his wife, the demon
+  'the-cathedral-without-walls': { cx: 0.58, cy: 0.52, w: 0.9 },    // church, bridge, village
+  'the-problem-of-evil': { cx: 0.48, cy: 0.5, w: 0.78 },            // Job and his wife, below the verso text
   'the-meaning-of-pain': { cx: 0.5, cy: 0.35, w: 0.92 },            // the two heads and the skull
   'laughing-at-the-abyss': { cx: 0.5, cy: 0.5, w: 0.94 },           // both dancers, the stage
-  'the-emperor-and-the-fugitive': { cx: 0.5, cy: 0.57, w: 0.98 },   // the whole procession
+  'the-question-behind-every-question': { cx: 0.5, cy: 0.63, w: 0.96 }, // tree, lions, Jerome
 };
 
 // ── the app's data, read as text so this stays a plain node script ──────────

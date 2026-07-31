@@ -1,7 +1,7 @@
 {
   "picks": {
     "faith-death-mystery": {
-      "lead": "the-god-after-god",
+      "lead": "the-cathedral-without-walls",
       "debate": "the-problem-of-evil"
     },
     "freedom-justice": {
@@ -34,55 +34,55 @@
     }
   },
   "plates": {
-    "the-god-after-god": {
+    "the-cathedral-without-walls": {
       "crop": {
-        "cx": 0.5,
-        "cy": 0.4,
-        "w": 0.94
+        "cx": 0.58,
+        "cy": 0.52,
+        "w": 0.9
       },
       "variants": {
         "640": {
-          "src": "/plates/the-god-after-god-640.avif",
+          "src": "/plates/the-cathedral-without-walls-640.avif",
           "width": 640,
           "height": 267,
-          "bytes": 39863,
+          "bytes": 48948,
           "quality": 50
         },
         "1024": {
-          "src": "/plates/the-god-after-god-1024.avif",
+          "src": "/plates/the-cathedral-without-walls-1024.avif",
           "width": 1024,
           "height": 427,
-          "bytes": 99621,
+          "bytes": 113571,
           "quality": 50
         }
       },
       "full": {
-        "src": "/plates/the-god-after-god-full.avif",
+        "src": "/plates/the-cathedral-without-walls-full.avif",
         "width": 1100,
-        "height": 914,
-        "bytes": 125241,
-        "quality": 38
+        "height": 901,
+        "bytes": 132891,
+        "quality": 32
       }
     },
     "the-problem-of-evil": {
       "crop": {
-        "cx": 0.5,
-        "cy": 0.345,
-        "w": 0.84
+        "cx": 0.48,
+        "cy": 0.5,
+        "w": 0.78
       },
       "variants": {
         "640": {
           "src": "/plates/the-problem-of-evil-640.avif",
           "width": 640,
-          "height": 267,
-          "bytes": 44916,
+          "height": 266,
+          "bytes": 49147,
           "quality": 50
         },
         "1024": {
           "src": "/plates/the-problem-of-evil-1024.avif",
-          "width": 895,
-          "height": 373,
-          "bytes": 77073,
+          "width": 831,
+          "height": 346,
+          "bytes": 75422,
           "quality": 50
         }
       },
@@ -457,7 +457,7 @@
     "the-mask-that-speaks": {
       "crop": {
         "cx": 0.5,
-        "cy": 0.34,
+        "cy": 0.45,
         "w": 1
       },
       "variants": {
@@ -465,14 +465,14 @@
           "src": "/plates/the-mask-that-speaks-640.avif",
           "width": 640,
           "height": 267,
-          "bytes": 43602,
+          "bytes": 45028,
           "quality": 50
         },
         "1024": {
           "src": "/plates/the-mask-that-speaks-1024.avif",
           "width": 970,
           "height": 404,
-          "bytes": 84540,
+          "bytes": 91815,
           "quality": 50
         }
       },
@@ -514,34 +514,34 @@
         "quality": 50
       }
     },
-    "the-emperor-and-the-fugitive": {
+    "the-question-behind-every-question": {
       "crop": {
         "cx": 0.5,
-        "cy": 0.57,
-        "w": 0.98
+        "cy": 0.63,
+        "w": 0.96
       },
       "variants": {
         "640": {
-          "src": "/plates/the-emperor-and-the-fugitive-640.avif",
+          "src": "/plates/the-question-behind-every-question-640.avif",
           "width": 640,
           "height": 267,
-          "bytes": 49282,
-          "quality": 50
+          "bytes": 56246,
+          "quality": 44
         },
         "1024": {
-          "src": "/plates/the-emperor-and-the-fugitive-1024.avif",
+          "src": "/plates/the-question-behind-every-question-1024.avif",
           "width": 1024,
           "height": 427,
-          "bytes": 117472,
-          "quality": 50
+          "bytes": 115591,
+          "quality": 32
         }
       },
       "full": {
-        "src": "/plates/the-emperor-and-the-fugitive-full.avif",
+        "src": "/plates/the-question-behind-every-question-full.avif",
         "width": 1100,
-        "height": 872,
-        "bytes": 143663,
-        "quality": 44
+        "height": 804,
+        "bytes": 152941,
+        "quality": 20
       }
     }
   }

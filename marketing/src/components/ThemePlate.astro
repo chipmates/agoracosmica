@@ -143,12 +143,18 @@ const openLabel = lang === 'de' ? `Kunstwerk öffnen, ${named}` : `Open the artw
   /* The frame stays near the master's own proportion. Crop it much harder and
      the marks blow up into texture, which is when the engraving stops reading
      as an engraving. */
+  /* Width-capped, never height-capped: a height cap lets a wide column
+     stretch the frame past 12/5 and cover then re-crops the curated window.
+     720px at 12/5 is the same 300px ceiling, with the aspect always true. */
+  .tq-plate {
+    max-width: 720px;
+    margin-inline: auto;
+  }
   .tq-plate__frame {
     position: relative;
     display: block;
     width: 100%;
     aspect-ratio: 12 / 5;
-    max-height: 300px;
     overflow: hidden;
     border-radius: var(--radius-sm);
   }

@@ -7,9 +7,9 @@
    no stylesheet can make a visitor download one before they ask. */
 
 @media (max-width: 700px) {
-  .tq-plate[data-plate='the-god-after-god'] .tq-plate__ink {
-    -webkit-mask-image: url('/plates/the-god-after-god-640.avif');
-    mask-image: url('/plates/the-god-after-god-640.avif');
+  .tq-plate[data-plate='the-cathedral-without-walls'] .tq-plate__ink {
+    -webkit-mask-image: url('/plates/the-cathedral-without-walls-640.avif');
+    mask-image: url('/plates/the-cathedral-without-walls-640.avif');
   }
   .tq-plate[data-plate='the-problem-of-evil'] .tq-plate__ink {
     -webkit-mask-image: url('/plates/the-problem-of-evil-640.avif');
@@ -71,16 +71,16 @@
     -webkit-mask-image: url('/plates/the-story-you-keep-telling-640.avif');
     mask-image: url('/plates/the-story-you-keep-telling-640.avif');
   }
-  .tq-plate[data-plate='the-emperor-and-the-fugitive'] .tq-plate__ink {
-    -webkit-mask-image: url('/plates/the-emperor-and-the-fugitive-640.avif');
-    mask-image: url('/plates/the-emperor-and-the-fugitive-640.avif');
+  .tq-plate[data-plate='the-question-behind-every-question'] .tq-plate__ink {
+    -webkit-mask-image: url('/plates/the-question-behind-every-question-640.avif');
+    mask-image: url('/plates/the-question-behind-every-question-640.avif');
   }
 }
 
 @media (min-width: 701px) {
-  .tq-plate[data-plate='the-god-after-god'] .tq-plate__ink {
-    -webkit-mask-image: url('/plates/the-god-after-god-1024.avif');
-    mask-image: url('/plates/the-god-after-god-1024.avif');
+  .tq-plate[data-plate='the-cathedral-without-walls'] .tq-plate__ink {
+    -webkit-mask-image: url('/plates/the-cathedral-without-walls-1024.avif');
+    mask-image: url('/plates/the-cathedral-without-walls-1024.avif');
   }
   .tq-plate[data-plate='the-problem-of-evil'] .tq-plate__ink {
     -webkit-mask-image: url('/plates/the-problem-of-evil-1024.avif');
@@ -142,8 +142,8 @@
     -webkit-mask-image: url('/plates/the-story-you-keep-telling-1024.avif');
     mask-image: url('/plates/the-story-you-keep-telling-1024.avif');
   }
-  .tq-plate[data-plate='the-emperor-and-the-fugitive'] .tq-plate__ink {
-    -webkit-mask-image: url('/plates/the-emperor-and-the-fugitive-1024.avif');
-    mask-image: url('/plates/the-emperor-and-the-fugitive-1024.avif');
+  .tq-plate[data-plate='the-question-behind-every-question'] .tq-plate__ink {
+    -webkit-mask-image: url('/plates/the-question-behind-every-question-1024.avif');
+    mask-image: url('/plates/the-question-behind-every-question-1024.avif');
   }
 }
