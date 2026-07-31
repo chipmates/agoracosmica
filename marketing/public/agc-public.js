@@ -29,6 +29,10 @@
   var SS_COUNCIL = 'agc_intended_council';
   var LS_LANG = 'selectedLanguage';
   var LS_AD_CONSENT = 'agc_ad_consent';
+  // Keep in sync with AD_CONSENT_VERSION in client/src/utils/public/
+  // gclidCapture.ts: a grant recorded under an older consent version no longer
+  // covers the current scope, so it must not authorize sends.
+  var AD_CONSENT_VERSION = '1.0.0';
   var CONV_URL = 'https://llm.agoracosmica.org/api/conversions';
   var FUNNEL_URL = 'https://llm.agoracosmica.org/v1/funnel';
 
@@ -56,7 +60,9 @@
   function adConsentGranted() {
     try {
       var raw = localStorage.getItem(LS_AD_CONSENT);
-      return !!raw && JSON.parse(raw).granted === true;
+      if (!raw) return false;
+      var record = JSON.parse(raw);
+      return record.granted === true && record.version === AD_CONSENT_VERSION;
     } catch (e) { return false; }
   }
 
@@ -181,9 +187,11 @@
     // CTA (navbar, hero, sticky, figure, theme) for an opted-in grant visitor.
     // This catches returning consenters whose remembered choice means the
     // landing prompt never re-shows. Deduped with the prompt's own Accept fire.
+    // figureId only: the worker's conversion route reads no council field, so
+    // sending one is dead payload. The council intent still reaches the app
+    // through persistIntent above.
     var metadata = {};
     if (figureId) metadata.figureId = figureId;
-    if (councilId) metadata.councilId = councilId;
     fireConversion('start_exploring', Object.keys(metadata).length ? metadata : undefined);
     sendCtaFunnelBeacon(target.getAttribute('data-agc-door') || '');
   });
