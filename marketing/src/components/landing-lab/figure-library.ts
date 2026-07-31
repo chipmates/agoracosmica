@@ -74,7 +74,11 @@ function gloss(s: string | undefined, cap = 150): string {
   const c = clean(s);
   if (!c) return '';
   const first = c.split(/(?<=[.!?])\s/)[0].trim();
-  return first.length > cap ? first.slice(0, cap - 1).trimEnd() + '…' : first;
+  if (first.length <= cap) return first;
+  // Cut at a word boundary, never mid-word (same rule as BaseHead).
+  const slice = first.slice(0, cap - 1);
+  const lastSpace = slice.lastIndexOf(' ');
+  return (lastSpace > 0 ? slice.slice(0, lastSpace) : slice).trimEnd() + '…';
 }
 
 export interface FigureLibraryOptions {
