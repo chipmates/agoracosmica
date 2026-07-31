@@ -12,6 +12,7 @@ import StaticImage from './StaticImage.astro';
 import CouncilHero from './CouncilHero.astro';
 import QuestionDoors from './QuestionDoors.astro';
 import type { DoorItem } from './QuestionDoors.astro';
+import ThemePlate from './ThemePlate.astro';
 import ThemeCTA from './ThemeCTA.astro';
 import ThemeStyles from './ThemeStyles.astro';
 
@@ -274,6 +275,9 @@ const heroFacts = [
          invites anyone to talk to one, not after. -->
     <EchoNote variant="theme" lang={lang} />
 
+    <!-- A council plate as a breath after the essay, before the doors. -->
+    <ThemePlate themeId={themeId} slot="lead" />
+
     <!-- Block 5: ask it yourself. -->
     {askItems.length > 0 && (
       <section class="tq-section">
@@ -288,6 +292,8 @@ const heroFacts = [
       <section class="tq-section">
         <h2 class="tq-h2">{t('themes.hearLabel')}</h2>
         <p class="tq-note">{t('themes.hearCaption')}</p>
+        <!-- The featured debate's own plate, over the card that opens it. -->
+        <ThemePlate themeId={themeId} slot="debate" />
         <CouncilHero
           council={featured}
           lang={lang}

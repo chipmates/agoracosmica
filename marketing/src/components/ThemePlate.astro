@@ -1,0 +1,159 @@
+---
+// A council ink plate as a band on a theme page.
+//
+// The plate is a grayscale master whose marks live in the alpha channel, so
+// the band paints the theme ink and the plate only shapes it. Same technique
+// as the council cards in the app: no colour is ever baked into the asset.
+// Files, crops and the pick come from scripts/extract-plates.mjs.
+//
+// The credit line under each band is the institution's own record, verbatim.
+
+import platePicks from '../lib/platePicks.json';
+import { PLATE_CREDITS } from '@client/components/CosmicCouncil/plates/credits';
+import '../styles/plates.css';
+
+interface Manifest {
+  picks: Record<string, Record<string, string>>;
+  plates: Record<string, unknown>;
+}
+
+interface Props {
+  /** The theme whose ink the band is painted in, and whose pick it takes. */
+  themeId?: string;
+  /** Which of the theme's two plates: the essay band, or the debate band. */
+  slot?: 'lead' | 'debate';
+  /** Names the plate directly, for pages that are not one theme's page. */
+  councilId?: string;
+  /** House gold instead of a theme ink, for the same case. */
+  ink?: 'theme' | 'house';
+}
+
+const { themeId, slot, councilId, ink = 'theme' } = Astro.props;
+const manifest = platePicks as Manifest;
+const plateId =
+  councilId ?? (themeId && slot ? manifest.picks[themeId]?.[slot] : undefined);
+// A plate the extraction script did not produce simply leaves no band behind.
+const plate = plateId ? manifest.plates[plateId] : undefined;
+const credit = plateId ? PLATE_CREDITS[plateId] : undefined;
+// Two plates carry no date in the museum record, so the artist line is built
+// from the parts that exist instead of printing an empty one.
+const creditLine = credit
+  ? [
+      credit.institution,
+      credit.title,
+      [credit.artist, credit.date].filter(Boolean).join(', '),
+      'CC0',
+    ]
+      .filter(Boolean)
+      .join(' · ')
+  : '';
+---
+{plate && (
+  <figure
+    class="tq-plate"
+    data-theme={ink === 'house' ? undefined : themeId}
+    data-plate={plateId}
+  >
+    <div class="tq-plate__frame" aria-hidden="true">
+      <div class="tq-plate__tone"></div>
+      <div class="tq-plate__ink"></div>
+      <div class="tq-plate__keyline"></div>
+    </div>
+    {credit && (
+      <figcaption class="tq-plate__credit">
+        <a
+          class="tq-plate__source"
+          href={credit.objectUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+        >{creditLine}</a>
+      </figcaption>
+    )}
+  </figure>
+)}
+
+<style is:global>
+  /* The band. Height is fixed in CSS and the mask covers it, so the art
+     reserves its own space and never shifts the text around it. */
+  .tq-plate {
+    --tq-plate-ink: var(--gold-primary);
+    margin: 0 0 2.75rem;
+  }
+  /* On the index the band closes the page, so it lines up with the CTA under
+     it and the two read as one block. */
+  .tq-index > .tq-plate {
+    max-width: 44rem;
+    margin: 3rem auto 0;
+  }
+  .tq-plate + .tq-cta { margin-top: 1.1rem; }
+  /* The frame stays near the master's own proportion. Crop it much harder and
+     the marks blow up into texture, which is when the engraving stops reading
+     as an engraving. */
+  .tq-plate__frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 12 / 5;
+    max-height: 300px;
+    overflow: hidden;
+    border-radius: var(--radius-sm);
+  }
+  /* The paper the marks sit on, a breath warmer than the page. */
+  .tq-plate__tone {
+    position: absolute;
+    inset: 0;
+    background: color-mix(in srgb, var(--tq-plate-ink) var(--a-08), var(--bg-card));
+  }
+  /* The ink: a flat field of the theme colour, shaped by the plate's alpha.
+     mask-image and mask-position come from the generated plates.css. */
+  .tq-plate__ink {
+    position: absolute;
+    inset: 0;
+    background: var(--tq-plate-ink);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: cover;
+    mask-size: cover;
+    opacity: 0.85;
+  }
+  /* Without mask support the ink layer would be a solid slab of colour, so
+     it steps aside and the band stays an empty mat. */
+  @supports not ((mask-image: url('')) or (-webkit-mask-image: url(''))) {
+    .tq-plate__ink { display: none; }
+  }
+
+  /* Neutral hairline, never gold: three themes ink in gold and the frame
+     would disappear into the plate. */
+  .tq-plate__keyline {
+    position: absolute;
+    inset: 0;
+    border: 1px solid color-mix(in srgb, var(--star-blue-light) var(--a-15), transparent);
+    border-radius: var(--radius-sm);
+  }
+
+  .tq-plate[data-theme='who-am-i'] { --tq-plate-ink: var(--council-who-am-i, var(--gold-primary)); }
+  .tq-plate[data-theme='love-connection'] { --tq-plate-ink: var(--council-love-connection, var(--ink-rose)); }
+  .tq-plate[data-theme='meaning-purpose'] { --tq-plate-ink: var(--council-meaning-purpose, var(--ink-sap-green)); }
+  .tq-plate[data-theme='mind-creativity'] { --tq-plate-ink: var(--council-mind-creativity, var(--ink-smalt)); }
+  .tq-plate[data-theme='moral-life'] { --tq-plate-ink: var(--council-moral-life, var(--ink-verdigris)); }
+  .tq-plate[data-theme='freedom-justice'] { --tq-plate-ink: var(--council-freedom-justice, var(--ink-madder)); }
+  .tq-plate[data-theme='faith-death-mystery'] { --tq-plate-ink: var(--council-faith-death-mystery, var(--ink-folium)); }
+  .tq-plate[data-theme='loss-grief'] { --tq-plate-ink: var(--council-loss-grief, var(--ink-azurite)); }
+
+  .tq-plate__credit {
+    margin: 0.5rem 0 0;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: var(--text-xs);
+    line-height: var(--leading-relaxed);
+    color: var(--text-tertiary);
+  }
+  .tq-plate__source {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+  }
+  .tq-plate__source:hover,
+  .tq-plate__source:focus-visible {
+    color: var(--text-secondary);
+    border-bottom-color: color-mix(in srgb, var(--text-secondary) var(--a-40), transparent);
+  }
+</style>

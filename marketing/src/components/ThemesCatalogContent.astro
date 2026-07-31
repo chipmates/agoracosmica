@@ -1,11 +1,13 @@
 ---
 // The themes index: eight life questions as type, then every one of the 55
 // council questions as a working door, grouped under the question it belongs
-// to. No per-theme art anywhere, only hairline ink accents.
+// to. The cards stay type and hairline ink; the page's one plate is the
+// opening council's own, and it sits directly over the CTA that opens it.
 
 import Breadcrumbs from './Breadcrumbs.astro';
 import ThemeCard from './ThemeCard.astro';
 import ThemeCTA from './ThemeCTA.astro';
+import ThemePlate from './ThemePlate.astro';
 import QuestionDoors from './QuestionDoors.astro';
 import type { DoorItem } from './QuestionDoors.astro';
 import QuestionOfTheDay from '../islands/QuestionOfTheDay';
@@ -129,6 +131,8 @@ const opener = councilCatalog.find(c => c.id === COUNCIL_SEQUENCE[0]) ?? council
       <a class="pub-textlink" href={publicUrl(lang, '/figures')}>{t('themes.allFigures')}</a>
     </p>
   </section>
+
+  <ThemePlate councilId={opener.id} ink="house" />
 
   <ThemeCTA
     lang={lang}

@@ -1,0 +1,342 @@
+{
+  "picks": {
+    "faith-death-mystery": {
+      "lead": "the-god-after-god",
+      "debate": "the-problem-of-evil"
+    },
+    "freedom-justice": {
+      "lead": "the-virtue-of-surrender",
+      "debate": "four-freedoms"
+    },
+    "loss-grief": {
+      "lead": "the-meaning-of-pain",
+      "debate": "laughing-at-the-abyss"
+    },
+    "love-connection": {
+      "lead": "where-do-you-belong",
+      "debate": "alone-in-the-room-full-of-people"
+    },
+    "meaning-purpose": {
+      "lead": "why-do-i-keep-going-back",
+      "debate": "the-life-you-think-you-want"
+    },
+    "mind-creativity": {
+      "lead": "the-serious-work-of-play",
+      "debate": "the-mind-that-wont-be-quiet"
+    },
+    "moral-life": {
+      "lead": "the-fear-you-feed",
+      "debate": "what-does-your-anger-want"
+    },
+    "who-am-i": {
+      "lead": "the-stain-that-stays",
+      "debate": "the-story-you-keep-telling"
+    }
+  },
+  "plates": {
+    "the-god-after-god": {
+      "focal": "48% 30%",
+      "variants": {
+        "640": {
+          "src": "/plates/the-god-after-god-640.avif",
+          "width": 640,
+          "height": 360,
+          "bytes": 53972,
+          "quality": 50
+        },
+        "1024": {
+          "src": "/plates/the-god-after-god-1024.avif",
+          "width": 900,
+          "height": 506,
+          "bytes": 107801,
+          "quality": 50
+        }
+      }
+    },
+    "the-problem-of-evil": {
+      "focal": "50% 45%",
+      "variants": {
+        "640": {
+          "src": "/plates/the-problem-of-evil-640.avif",
+          "width": 640,
+          "height": 360,
+          "bytes": 57754,
+          "quality": 50
+        },
+        "1024": {
+          "src": "/plates/the-problem-of-evil-1024.avif",
+          "width": 1024,
+          "height": 576,
+          "bytes": 108261,
+          "quality": 38
+        }
+      }
+    },
+    "the-virtue-of-surrender": {
+      "focal": "62% 20%",
+      "variants": {
+        "640": {
+          "src": "/plates/the-virtue-of-surrender-640.avif",
+          "width": 640,
+          "height": 360,
+          "bytes": 31160,
+          "quality": 50
+        },
+        "1024": {
+          "src": "/plates/the-virtue-of-surrender-1024.avif",
+          "width": 1024,
+          "height": 576,
+          "bytes": 67443,
+          "quality": 50
+        }
+      }
+    },
+    "four-freedoms": {
+      "focal": "50% 20%",
+      "variants": {
+        "640": {
+          "src": "/plates/four-freedoms-640.avif",
+          "width": 640,
+          "height": 360,
+          "bytes": 55651,
+          "quality": 50
+        },
+        "1024": {
+          "src": "/plates/four-freedoms-1024.avif",
+          "width": 1024,
+          "height": 576,
+          "bytes": 105377,
+          "quality": 32
+        }
+      }
+    },
+    "the-meaning-of-pain": {
+      "focal": "56% 42%",
+      "variants": {
+        "640": {
+          "src": "/plates/the-meaning-of-pain-640.avif",
+          "width": 640,
+          "height": 360,
+          "bytes": 42078,
+          "quality": 50
+        },
+        "1024": {
+          "src": "/plates/the-meaning-of-pain-1024.avif",
+          "width": 1024,
+          "height": 576,
+          "bytes": 78431,
+          "quality": 50
+        }
+      }
+    },
+    "laughing-at-the-abyss": {
+      "focal": "46% 40%",
+      "variants": {
+        "640": {
+          "src": "/plates/laughing-at-the-abyss-640.avif",
+          "width": 640,
+          "height": 360,
+          "bytes": 35785,
+          "quality": 50
+        },
+        "1024": {
+          "src": "/plates/laughing-at-the-abyss-1024.avif",
+          "width": 1021,
+          "height": 574,
+          "bytes": 83469,
+          "quality": 50
+        }
+      }
+    },
+    "where-do-you-belong": {
+      "focal": "50% 42%",
+      "variants": {
+        "640": {
+          "src": "/plates/where-do-you-belong-640.avif",
+          "width": 640,
+          "height": 360,
+          "bytes": 59646,
+          "quality": 44
+        },
+        "1024": {
+          "src": "/plates/where-do-you-belong-1024.avif",
+          "width": 1024,
+          "height": 576,
+          "bytes": 118845,
+          "quality": 38
+        }
+      }
+    },
+    "alone-in-the-room-full-of-people": {
+      "focal": "50% 42%",
+      "variants": {
+        "640": {
+          "src": "/plates/alone-in-the-room-full-of-people-640.avif",
+          "width": 640,
+          "height": 360,
+          "bytes": 49395,
+          "quality": 50
+        },
+        "1024": {
+          "src": "/plates/alone-in-the-room-full-of-people-1024.avif",
+          "width": 873,
+          "height": 491,
+          "bytes": 76983,
+          "quality": 50
+        }
+      }
+    },
+    "why-do-i-keep-going-back": {
+      "focal": "50% 0%",
+      "variants": {
+        "640": {
+          "src": "/plates/why-do-i-keep-going-back-640.avif",
+          "width": 640,
+          "height": 360,
+          "bytes": 57145,
+          "quality": 50
+        },
+        "1024": {
+          "src": "/plates/why-do-i-keep-going-back-1024.avif",
+          "width": 896,
+          "height": 504,
+          "bytes": 78298,
+          "quality": 50
+        }
+      }
+    },
+    "the-life-you-think-you-want": {
+      "focal": "50% 0%",
+      "variants": {
+        "640": {
+          "src": "/plates/the-life-you-think-you-want-640.avif",
+          "width": 640,
+          "height": 360,
+          "bytes": 54672,
+          "quality": 38
+        },
+        "1024": {
+          "src": "/plates/the-life-you-think-you-want-1024.avif",
+          "width": 896,
+          "height": 504,
+          "bytes": 94793,
+          "quality": 50
+        }
+      }
+    },
+    "the-serious-work-of-play": {
+      "focal": "50% 30%",
+      "variants": {
+        "640": {
+          "src": "/plates/the-serious-work-of-play-640.avif",
+          "width": 640,
+          "height": 360,
+          "bytes": 59292,
+          "quality": 50
+        },
+        "1024": {
+          "src": "/plates/the-serious-work-of-play-1024.avif",
+          "width": 1024,
+          "height": 576,
+          "bytes": 112430,
+          "quality": 44
+        }
+      }
+    },
+    "the-mind-that-wont-be-quiet": {
+      "focal": "50% 30%",
+      "variants": {
+        "640": {
+          "src": "/plates/the-mind-that-wont-be-quiet-640.avif",
+          "width": 640,
+          "height": 360,
+          "bytes": 57309,
+          "quality": 38
+        },
+        "1024": {
+          "src": "/plates/the-mind-that-wont-be-quiet-1024.avif",
+          "width": 1024,
+          "height": 576,
+          "bytes": 110709,
+          "quality": 20
+        }
+      }
+    },
+    "the-fear-you-feed": {
+      "focal": "50% 30%",
+      "variants": {
+        "640": {
+          "src": "/plates/the-fear-you-feed-640.avif",
+          "width": 640,
+          "height": 360,
+          "bytes": 59021,
+          "quality": 38
+        },
+        "1024": {
+          "src": "/plates/the-fear-you-feed-1024.avif",
+          "width": 1024,
+          "height": 576,
+          "bytes": 120632,
+          "quality": 32
+        }
+      }
+    },
+    "what-does-your-anger-want": {
+      "focal": "50% 30%",
+      "variants": {
+        "640": {
+          "src": "/plates/what-does-your-anger-want-640.avif",
+          "width": 640,
+          "height": 360,
+          "bytes": 33670,
+          "quality": 50
+        },
+        "1024": {
+          "src": "/plates/what-does-your-anger-want-1024.avif",
+          "width": 1024,
+          "height": 576,
+          "bytes": 78396,
+          "quality": 50
+        }
+      }
+    },
+    "the-stain-that-stays": {
+      "focal": "50% 95%",
+      "variants": {
+        "640": {
+          "src": "/plates/the-stain-that-stays-640.avif",
+          "width": 640,
+          "height": 360,
+          "bytes": 55247,
+          "quality": 50
+        },
+        "1024": {
+          "src": "/plates/the-stain-that-stays-1024.avif",
+          "width": 720,
+          "height": 405,
+          "bytes": 65794,
+          "quality": 50
+        }
+      }
+    },
+    "the-story-you-keep-telling": {
+      "focal": "52% 40%",
+      "variants": {
+        "640": {
+          "src": "/plates/the-story-you-keep-telling-640.avif",
+          "width": 640,
+          "height": 359,
+          "bytes": 58521,
+          "quality": 44
+        },
+        "1024": {
+          "src": "/plates/the-story-you-keep-telling-1024.avif",
+          "width": 1024,
+          "height": 574,
+          "bytes": 119146,
+          "quality": 38
+        }
+      }
+    }
+  }
+}
