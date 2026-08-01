@@ -34,6 +34,17 @@ export default defineConfig({
       styleDirective: {
         resources: ["'self'", "'unsafe-inline'"],
       },
+      // Astro only auto-hashes its own emitted scripts, not authored is:inline
+      // ones. The homepage pre-paint marker (AgoraHero) must run before first
+      // paint, so it stays inline and its hash is added here by hand. The
+      // response-header CSP in client/public/_headers lists the same hash;
+      // both policies AND-enforce, so a miss on either side blocks the script
+      // (that exact miss shipped once: header yes, meta no, script dead in
+      // every browser). If the script text changes, recompute the hash in BOTH
+      // places: echo -n '<script text>' | openssl dgst -sha256 -binary | base64
+      scriptDirective: {
+        hashes: ['sha256-i/ofomzmMjJLegES6OLDsJfA4wJAI3UQ8UCNyC3zlcY='],
+      },
     },
   },
   i18n: {
