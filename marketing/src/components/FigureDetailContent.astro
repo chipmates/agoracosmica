@@ -10,9 +10,11 @@
 //   hero            who this is, the voice, the promise, the first question
 //   answer          40 to 80 words, the first paragraph after the H1
 //   questions       one tap into the app, at peak intent
+//   six ways        the interactive library, the only "try it" on the page:
+//                   the playable overture before the long read, so the taste
+//                   comes before the two scroll-walls instead of after them
 //   concepts        headings that are real queries, each answer self-contained
 //   twelve chapters the life, with the documented/recreated ledger per scene
-//   six ways        the interactive library, the only "try it" on the page
 //   councils        where the figure argues, with the produced previews
 //   lattice         the 36 typed edges, the densest internal linking we own
 //   themes, hub     the rest of the lattice
@@ -171,6 +173,8 @@ if (figure.essence) {
     skipEntryQuestion
   />
 
+  <FigureSixWays figureId={figureId} figureName={figure.name} lang={lang} />
+
   <FigureConcepts figureId={figureId} slug={slug} lang={lang} />
 
   {poemsFaq && (
@@ -196,8 +200,6 @@ if (figure.essence) {
     intro={aboutParas}
     lang={lang}
   />
-
-  <FigureSixWays figureId={figureId} figureName={figure.name} lang={lang} />
 
   <FigureCouncils figureId={figureId} slug={slug} figureName={figure.name} lang={lang} />
 
