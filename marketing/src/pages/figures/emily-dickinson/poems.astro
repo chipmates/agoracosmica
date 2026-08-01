@@ -718,7 +718,7 @@ const schemas = [
       // Feed the Echo teaser into the shared listened accumulator like every
       // other marketing play surface. The playback UI stays in /ed-audio.js
       // (its no-JS fallback intact); this only counts seconds actually heard.
-      import { trackHeardSeconds } from '../../../utils/listenedConversion';
+      import { trackHeardSeconds } from '../../../utils/heardSeconds';
       const audio = document.querySelector('[data-ed-audio-el]');
       if (audio instanceof HTMLAudioElement) {
         trackHeardSeconds(audio, () => 'dickinson');

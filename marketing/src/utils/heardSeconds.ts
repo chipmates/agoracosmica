@@ -1,3 +1,8 @@
+// NAMING CONSTRAINT: this file name becomes a public chunk URL that nearly
+// every island imports. It must never contain ad-tech-looking words
+// (conversion, track, ad, gclid): content blockers match those in URLs and a
+// blocked chunk takes every importing island down with it, unhydrated.
+//
 // Listened conversion for the marketing pages: 30 seconds of audio actually
 // played, summed across every play surface (figure trailers, the homepage
 // voice hero, the observatory voice chip, the council preview, the sample
@@ -10,7 +15,7 @@
 // sits on the accumulator, not just on the send, so a visitor this could
 // never be sent for gets no seconds counted and nothing written.
 //
-// The deferred ask (ASK_ON_INTERACTION in AdConsentPrompt) adds one state to
+// The deferred ask (ASK_ON_INTERACTION in ArrivalChoice) adds one state to
 // that: while the prompt is armed and still unanswered, seconds accrue but
 // nothing may be sent, so a crossing is held with the moment it happened. An
 // accept flushes it, a decline or a dismiss drops it. Only the prompt arms
@@ -19,7 +24,7 @@
 // The worker URL is absolute on purpose: agoracosmica.org has no /api/* route,
 // so a relative path falls through the SPA fallback (/* -> index.html 200),
 // the fetch resolves, .catch() never fires, and the conversion silently never
-// arrives. (Same posture as AdConsentPrompt's fireStartExploring.)
+// arrives. (Same posture as ArrivalChoice's fireStartExploring.)
 
 import { useEffect } from 'react';
 import {

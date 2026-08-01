@@ -8,7 +8,7 @@ import BaseHead from '../components/BaseHead.astro';
 import Navbar from '../components/Navbar.astro';
 import Footer from '../components/Footer.astro';
 import PublicScript from '../components/PublicScript.astro';
-import AdConsentPrompt from '../islands/AdConsentPrompt';
+import ArrivalChoice from '../islands/ArrivalChoice';
 import { getT } from '../i18n';
 import type { Lang } from '../i18n';
 
@@ -76,7 +76,7 @@ const revealSticky = isHome || props.heroReveal === true;
       </div>
     )}
     <PublicScript />
-    <AdConsentPrompt client:idle lang={props.lang} />
+    <ArrivalChoice client:idle lang={props.lang} />
   </body>
 </html>
 

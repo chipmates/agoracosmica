@@ -1,4 +1,4 @@
-/* Ad-measurement consent prompt (AdConsentPrompt island). A non-blocking plate
+/* Ad-measurement consent prompt (ArrivalChoice island). A non-blocking plate
    pinned to the bottom of the viewport, so the figure/theme content stays fully
    readable behind it (no wall). Tokens come from the page (Public.astro loads
    index.css); hex fallbacks keep it sane if a token is ever missing. */

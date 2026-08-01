@@ -11,7 +11,7 @@
 //  - webm (Opus) primary, mp3 fallback for iOS Safari.
 
 import { useEffect, useRef, useState } from 'react';
-import { trackHeardSeconds } from '../utils/listenedConversion';
+import { trackHeardSeconds } from '../utils/heardSeconds';
 
 interface Props {
   audioWebm: string;

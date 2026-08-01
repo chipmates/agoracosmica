@@ -25,7 +25,7 @@
 
 import { useEffect } from 'react';
 import { getPublicTrailerUrl } from '@client/utils/public/publicMediaUrl';
-import { trackHeardSeconds } from '../utils/listenedConversion';
+import { trackHeardSeconds } from '../utils/heardSeconds';
 
 interface Props {
   /** id of the .v2-observatory root this controller drives */

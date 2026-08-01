@@ -35,11 +35,11 @@
   "scripts": {
     "dev": "vite",
     "start": "vite",
-    "build": "node scripts/setup-assets.mjs && node scripts/extract-public-data.mjs && vite build && (cd ../marketing && pnpm install --prefer-frozen-lockfile && pnpm build) && node scripts/merge-marketing.mjs && node scripts/generate-sitemap.mjs",
+    "build": "node scripts/setup-assets.mjs && node scripts/extract-public-data.mjs && vite build && (cd ../marketing && pnpm install --prefer-frozen-lockfile && pnpm build) && node scripts/merge-marketing.mjs && node scripts/generate-sitemap.mjs && node scripts/check-asset-names.mjs",
     "build:self-host": "node scripts/setup-assets.mjs && node scripts/extract-public-data.mjs && vite build",
     "build:extract": "node scripts/extract-public-data.mjs",
     "build:client": "vite build",
-    "build:marketing": "cd ../marketing && pnpm build && cd ../client && node scripts/merge-marketing.mjs",
+    "build:marketing": "cd ../marketing && pnpm build && cd ../client && node scripts/merge-marketing.mjs && node scripts/check-asset-names.mjs",
     "preview": "vite preview",
     "lint": "eslint .",
     "preinstall": "node check-pkgmgr.js",

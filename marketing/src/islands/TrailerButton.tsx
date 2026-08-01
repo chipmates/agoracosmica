@@ -6,7 +6,7 @@
 
 import { getPublicT } from '@client/utils/public/publicI18n';
 import { useFigureTrailer } from '@client/hooks/useFigureTrailer';
-import { useHeardSeconds } from '../utils/listenedConversion';
+import { useHeardSeconds } from '../utils/heardSeconds';
 
 interface Props {
   figureId: string;

@@ -8,7 +8,7 @@
      ?lang=en|de   ?figure=<id>   ?t=<ms> freeze the choreography
      ?motion=still  ?entry=a|b  ?playing=1
    ============================================================ */
-import { addHeardSeconds } from '../utils/listenedConversion';
+import { addHeardSeconds } from '../utils/heardSeconds';
 
 (function () {
 'use strict';

@@ -1,4 +1,7 @@
 // React island: ad-measurement consent prompt for Google ad-grant arrivals.
+// NAMING CONSTRAINT: the file name becomes a public chunk URL and must stay
+// free of ad-tech-looking words (ad, consent+ad, conversion, track): content
+// blockers match those in URLs and would keep the card from ever loading.
 // Shown only when a gclid is present, the visitor is NOT on the paid ?p=1 split,
 // and no explicit choice was made yet this session. Non-blocking: the figure or
 // theme content stays fully readable behind it (no wall, no scroll lock, no
@@ -32,8 +35,8 @@ import {
   armPreDecisionListening,
   dropPreDecisionListening,
   flushPreDecisionListening,
-} from '../utils/listenedConversion';
-import './AdConsentPrompt.css';
+} from '../utils/heardSeconds';
+import './ArrivalChoice.css';
 
 // Deferred ask. False is the shipping behavior: the card comes up on mount,
 // exactly as reviewed. True holds it back until the visitor does something
@@ -249,7 +252,7 @@ function armDeferredShow(fire: () => void): () => void {
   return detach;
 }
 
-export default function AdConsentPrompt({ lang }: Props) {
+export default function ArrivalChoice({ lang }: Props) {
   const [show, setShow] = useState(false);
   const cardRef = useRef<HTMLElement | null>(null);
   // Start of the time-to-answer window. Never transmitted, never stored: the
@@ -267,7 +270,7 @@ export default function AdConsentPrompt({ lang }: Props) {
     }
     // Deferred ask: eligible, so arm instead of showing. Nothing renders until
     // a trigger lands, and audio meanwhile counts toward Listened without ever
-    // being sent (see listenedConversion's pre-decision buffer).
+    // being sent (see heardSeconds' pre-decision buffer).
     return armDeferredShow(() => setShow(true));
   }, []);
 
