@@ -9,6 +9,7 @@ import { useLiquidGlass } from '../hooks/useLiquidGlass';
 import {
   TURNSTILE_INTERACTIVE_START_EVENT,
   TURNSTILE_INTERACTIVE_END_EVENT,
+  isTurnstileInteractive,
 } from '../services/proxy/turnstile';
 
 export type ProcessingStage = 'preparing' | 'hearing' | 'contemplating' | 'shaping';
@@ -82,7 +83,9 @@ const ProcessingLoader: FC<ProcessingLoaderProps> = ({
   const [derivedCapacity, setDerivedCapacity] = useState<CapacityState>('normal');
   const [showOptOut, setShowOptOut] = useState(false);
   const [quoteIndex, setQuoteIndex] = useState(0);
-  const [turnstileInteractive, setTurnstileInteractive] = useState(false);
+  // Seeded from the module state: on a challenge re-render the escalation can
+  // beat this component's mount, so the events alone would miss it.
+  const [turnstileInteractive, setTurnstileInteractive] = useState(isTurnstileInteractive);
 
   // 1. Delayed appearance — kills flicker on fast responses (<250ms).
   useEffect(() => {
@@ -110,6 +113,8 @@ const ProcessingLoader: FC<ProcessingLoaderProps> = ({
     const onEnd = () => setTurnstileInteractive(false);
     window.addEventListener(TURNSTILE_INTERACTIVE_START_EVENT, onStart);
     window.addEventListener(TURNSTILE_INTERACTIVE_END_EVENT, onEnd);
+    // Catch a change that slipped between the seeded initial state and here.
+    setTurnstileInteractive(isTurnstileInteractive());
     return () => {
       window.removeEventListener(TURNSTILE_INTERACTIVE_START_EVENT, onStart);
       window.removeEventListener(TURNSTILE_INTERACTIVE_END_EVENT, onEnd);

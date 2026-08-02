@@ -29,8 +29,19 @@ export const TURNSTILE_INTERACTIVE_END_EVENT = 'agc:turnstile-interactive-end';
 let scriptLoaded = false;
 let scriptLoading = false;
 let widgetId: string | null = null;
+let interactiveActive = false;
+
+/**
+ * Whether a checkbox is waiting on the visitor right now. The escalation can
+ * fire before a late-mounting listener subscribes to the events, so consumers
+ * must seed their state from this and use the events only for changes.
+ */
+export function isTurnstileInteractive(): boolean {
+  return interactiveActive;
+}
 
 function emit(eventName: string): void {
+  interactiveActive = eventName === TURNSTILE_INTERACTIVE_START_EVENT;
   try {
     window.dispatchEvent(new CustomEvent(eventName));
   } catch { /* ignore */ }
@@ -63,6 +74,8 @@ function placeInCenter(el: HTMLElement): void {
  * where the cross-origin iframe may have been suspended by the browser.
  */
 function resetTurnstileState(): void {
+  // The widget this challenge belonged to is being torn down.
+  if (interactiveActive) emit(TURNSTILE_INTERACTIVE_END_EVENT);
   if (widgetId !== null) {
     try { (window as any).turnstile?.remove(widgetId); } catch { /* ignore */ }
     widgetId = null;
