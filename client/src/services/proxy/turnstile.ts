@@ -2,6 +2,7 @@
 // Renders a managed challenge, returns a token for session creation
 
 import { isSelfHost } from '../../config/deployment';
+import { sendFunnelBeacon } from '../../utils/funnelBeacon';
 
 const TURNSTILE_SCRIPT_URL = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
 // 30s, not 15s: mobile Safari resuming from bfcache or a long backgrounded tab
@@ -10,6 +11,9 @@ const TURNSTILE_SCRIPT_URL = 'https://challenges.cloudflare.com/turnstile/v0/api
 // "request took too long" — better to wait a bit longer than to surface that
 // to a user who is already actively trying to send a message.
 const TURNSTILE_TIMEOUT_MS = 30_000;
+// Once the challenge turns interactive the clock is on a human, not on an
+// iframe: the box has to be noticed, read and ticked. Total budget from render.
+const TURNSTILE_INTERACTIVE_TIMEOUT_MS = 120_000;
 // After this much hidden time, the cross-origin Turnstile iframe is likely
 // frozen/stale on iOS Safari; reset module state on return so the next call
 // reloads the script and container fresh. 5 min mirrors the JWT refresh
@@ -17,9 +21,40 @@ const TURNSTILE_TIMEOUT_MS = 30_000;
 // anyway, and a fresh re-issue is what we're protecting.
 const STALE_HIDDEN_THRESHOLD_MS = 5 * 60 * 1000;
 
+/** Turnstile escalated to a checkbox the visitor has to tick. */
+export const TURNSTILE_INTERACTIVE_START_EVENT = 'agc:turnstile-interactive-start';
+/** That challenge settled, however it settled. */
+export const TURNSTILE_INTERACTIVE_END_EVENT = 'agc:turnstile-interactive-end';
+
 let scriptLoaded = false;
 let scriptLoading = false;
 let widgetId: string | null = null;
+
+function emit(eventName: string): void {
+  try {
+    window.dispatchEvent(new CustomEvent(eventName));
+  } catch { /* ignore */ }
+}
+
+/** Unobtrusive default: the managed challenge usually needs no attention. */
+function placeInCorner(el: HTMLElement): void {
+  el.style.position = 'fixed';
+  el.style.bottom = '0';
+  el.style.left = '';
+  el.style.right = '0';
+  el.style.transform = '';
+  el.style.zIndex = '100000';
+}
+
+/** Interactive: a box nobody finds is a dead request, so it moves into view. */
+function placeInCenter(el: HTMLElement): void {
+  el.style.position = 'fixed';
+  el.style.bottom = '16px';
+  el.style.left = '50%';
+  el.style.right = '';
+  el.style.transform = 'translateX(-50%)';
+  el.style.zIndex = '100000';
+}
 
 /**
  * Drop all cached Turnstile state so the next getTurnstileToken() rebuilds
@@ -117,7 +152,9 @@ function loadTurnstileScript(): Promise<void> {
 /**
  * Get a Turnstile token for session creation.
  * Uses 'normal' size + 'always' appearance for maximum cross-browser compatibility.
- * The widget renders at the bottom-right but is tiny and unobtrusive.
+ * The widget renders at the bottom-right but is tiny and unobtrusive. If the
+ * challenge escalates to a checkbox it moves to the bottom-center and the UI
+ * is told, so the visitor knows what to tap.
  * Includes a timeout so the app never hangs if the challenge fails silently.
  */
 export async function getTurnstileToken(): Promise<string> {
@@ -156,10 +193,6 @@ export async function getTurnstileToken(): Promise<string> {
     if (!container) {
       container = document.createElement('div');
       container.id = 'turnstile-container';
-      container.style.position = 'fixed';
-      container.style.bottom = '0';
-      container.style.right = '0';
-      container.style.zIndex = '100000';
       document.body.appendChild(container);
     }
     // Reset visibility — a prior successful challenge sets display:none on
@@ -167,15 +200,33 @@ export async function getTurnstileToken(): Promise<string> {
     // session refreshes (Turnstile's iframe can't communicate from a hidden
     // parent and times out at TURNSTILE_TIMEOUT_MS).
     container.style.display = '';
+    // Re-applied every call: a previous interactive challenge left it centered.
+    placeInCorner(container);
 
-    // Timeout: if Turnstile fails silently (Safari edge cases), don't hang forever
-    const timeout = setTimeout(() => {
+    const startedAtMs = Date.now();
+    let interactive = false;
+
+    // Back to the corner and tell the UI, so a later invisible re-issue stays
+    // quiet and no instruction is left on screen.
+    const endInteractive = (): void => {
+      if (!interactive) return;
+      interactive = false;
+      if (container) placeInCorner(container);
+      emit(TURNSTILE_INTERACTIVE_END_EVENT);
+    };
+
+    const onTimeout = (): void => {
       if (widgetId !== null) {
         try { turnstile.remove(widgetId); } catch { /* ignore */ }
         widgetId = null;
       }
+      endInteractive();
+      sendFunnelBeacon('turnstile_failed', { outcome: 'timeout' });
       reject(new Error('Turnstile challenge timed out. Please try again.'));
-    }, TURNSTILE_TIMEOUT_MS);
+    };
+
+    // Timeout: if Turnstile fails silently (Safari edge cases), don't hang forever
+    let timeout = setTimeout(onTimeout, TURNSTILE_TIMEOUT_MS);
 
     widgetId = turnstile.render(container, {
       sitekey: siteKey,
@@ -183,18 +234,37 @@ export async function getTurnstileToken(): Promise<string> {
       appearance: 'always',
       retry: 'auto',
       'retry-interval': 3000,
+      'before-interactive-callback': () => {
+        if (interactive) return;
+        interactive = true;
+        clearTimeout(timeout);
+        timeout = setTimeout(
+          onTimeout,
+          Math.max(0, TURNSTILE_INTERACTIVE_TIMEOUT_MS - (Date.now() - startedAtMs)),
+        );
+        if (container) placeInCenter(container);
+        emit(TURNSTILE_INTERACTIVE_START_EVENT);
+        sendFunnelBeacon('turnstile_interactive');
+      },
       callback: (token: string) => {
         clearTimeout(timeout);
+        const wasInteractive = interactive;
+        endInteractive();
+        if (wasInteractive) sendFunnelBeacon('turnstile_solved');
         // Hide widget after successful challenge
         if (container) container.style.display = 'none';
         resolve(token);
       },
       'error-callback': () => {
         clearTimeout(timeout);
+        endInteractive();
+        sendFunnelBeacon('turnstile_failed', { outcome: 'error' });
         reject(new Error('Turnstile challenge failed'));
       },
       'expired-callback': () => {
         clearTimeout(timeout);
+        endInteractive();
+        sendFunnelBeacon('turnstile_failed', { outcome: 'expired' });
         reject(new Error('Turnstile token expired'));
       },
     });

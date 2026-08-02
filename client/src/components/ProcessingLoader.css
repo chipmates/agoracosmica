@@ -480,6 +480,21 @@
   outline-color: var(--coral-base);
 }
 
+/* Bot-check instruction, in the quote's place: an ask, not another waiting
+ * line. Last so it keeps gold even once the coral capacity cues are on. */
+.cosmic-processing-overlay .cosmic-processing-note.cosmic-processing-security {
+  margin-top: 0;
+  /* German wraps to two lines and eats the quote's slack, so pad it back. */
+  margin-bottom: 0.5rem;
+  min-height: 2.5em;
+  font-size: 0.95rem;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--gold-primary);
+  opacity: 1;
+}
+
 /* Subtle coral tint on the progress bar fill too — one more cue that state shifted. */
 .cosmic-processing-overlay.capacity-takingLonger .cosmic-progress-fill {
   background: color-mix(in srgb, var(--coral-base) 80%, var(--gold-subtle));

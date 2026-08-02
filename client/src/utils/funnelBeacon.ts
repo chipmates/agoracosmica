@@ -3,9 +3,10 @@
 // (LoginPage), welcome_shown (WelcomeDisclosureModal), first_turn (HomePage),
 // first_reply (useConversationEffects chunk handler, error variant from the
 // HomePage dispatch error path). Volume steps fire on every occurrence, no
-// dedup: figure_selected (HomePage.handleSelectFigure) and mode_selected
-// (ModeSelectorMini). The marketing pages' cta_click fires from agc-public.js
-// with the same payload shape.
+// dedup: figure_selected (HomePage.handleSelectFigure), mode_selected
+// (ModeSelectorMini) and the turnstile_* trio (services/proxy/turnstile.ts).
+// The marketing pages' cta_click fires from agc-public.js with the same
+// payload shape.
 //
 // Privacy: keyless aggregate counter only. No clientId, no gclid, no IP, no
 // raw milliseconds — timing leaves the browser only as a coarse bucket index.
@@ -36,13 +37,23 @@ export type FunnelStep =
   | 'handoff_taken'
   // Council revision: catalog opens (per-occurrence volume counter). With
   // playback 'started' this separates "never opens" from "opens and flees".
-  | 'council_open';
+  | 'council_open'
+  // Free-tier bot check (per-occurrence volume counters, like figure_selected):
+  // how often the challenge asks for a tap, how often that tap lands, and how
+  // often the check kills the message instead.
+  | 'turnstile_interactive'
+  | 'turnstile_solved'
+  | 'turnstile_failed';
 
 export type CinematicOutcome = 'watched' | 'skipped';
 
+/** Why a bot check ended without a token, on turnstile_failed. */
+export type TurnstileOutcome = 'error' | 'timeout' | 'expired';
+
 // blob5 outcome slot: cinematic_end sends watched/skipped, first_reply sends
-// 200/error. Steps that send nothing default to '200' server-side.
-export type FunnelOutcome = CinematicOutcome | '200' | 'error';
+// 200/error, turnstile_failed sends error/timeout/expired. Steps that send
+// nothing default to '200' server-side.
+export type FunnelOutcome = CinematicOutcome | '200' | TurnstileOutcome;
 
 /**
  * Cinematic dwell bucket boundaries, in seconds. Four buckets:

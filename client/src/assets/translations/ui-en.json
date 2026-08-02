@@ -1204,7 +1204,8 @@
       }
     },
     "optOut": "Read text instead",
-    "takingLonger": "Takes longer today. Wait a moment for the voice, or read now and skip the wait."
+    "takingLonger": "Takes longer today. Wait a moment for the voice, or read now and skip the wait.",
+    "securityCheck": "Quick security check. Tap the box at the bottom of the screen and your message continues."
   },
   "councilProcessing": {
     "title": "Convening Cosmic Council",
