@@ -60,6 +60,11 @@ const VALID_STEPS = new Set([
   // the "never opens vs opens and flees" gap between sidebar tap and the
   // playback started beacon.
   'council_open',
+  // Free-tier bot check, per-occurrence volume counters. turnstile_failed
+  // carries why it ended without a token.
+  'turnstile_interactive',
+  'turnstile_solved',
+  'turnstile_failed',
   ...CONSENT_STEPS,
 ]);
 
@@ -84,7 +89,9 @@ const CONSENT_MAX_BUCKET = 3;
 
 // Outcome slot (blob5): same role as status/type elsewhere. Steps without a
 // meaningful outcome default to '200', matching the entry/signup convention.
-const VALID_OUTCOMES = new Set(['200', 'watched', 'skipped', 'error']);
+const VALID_OUTCOMES = new Set([
+  '200', 'watched', 'skipped', 'error', 'timeout', 'expired',
+]);
 
 // blob2 holds a figureId OR a sanitized path, never free text. Paths are
 // validated like routes/page.ts; figure ids against a tight slug shape.
