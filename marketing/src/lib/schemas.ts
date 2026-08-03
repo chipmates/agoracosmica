@@ -203,6 +203,16 @@ export function articleSchema(article: {
   };
 }
 
+// Breadcrumb items name the canonical URL, so they carry the trailing slash.
+// The bare form 301s, and crawlers have indexed the redirecting URL as a page
+// of its own. Kept local so this file stays free of @client imports.
+function trailingSlash(url: string): string {
+  const cut = url.search(/[?#]/);
+  const base = cut === -1 ? url : url.slice(0, cut);
+  const suffix = cut === -1 ? '' : url.slice(cut);
+  return base.endsWith('/') ? `${base}${suffix}` : `${base}/${suffix}`;
+}
+
 export function breadcrumbSchema(
   items: { name: string; url: string }[],
 ): Record<string, unknown> {
@@ -213,7 +223,7 @@ export function breadcrumbSchema(
       '@type': 'ListItem',
       position: i + 1,
       name: item.name,
-      item: item.url,
+      item: trailingSlash(item.url),
     })),
   };
 }

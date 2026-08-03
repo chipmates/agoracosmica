@@ -9,9 +9,16 @@ type Language = 'en' | 'de';
 // public URL the site emits (links, canonical, hreflang) must already carry the
 // trailing slash. Otherwise crawlers hit a 308 on every internal link and the
 // canonical drifts from the prerendered HTML.
+// The slash belongs on the path, before any ?query or #fragment. Appending it
+// blindly yields URLs like /about#contact/, which crawlers index as separate
+// pages and which no server redirect can repair, since fragments never reach
+// the server.
 function withSlash(path: string): string {
-  if (path === '/') return '/';
-  return path.endsWith('/') ? path : `${path}/`;
+  const cut = path.search(/[?#]/);
+  const base = cut === -1 ? path : path.slice(0, cut);
+  const suffix = cut === -1 ? '' : path.slice(cut);
+  if (base === '' || base === '/') return `/${suffix}`;
+  return base.endsWith('/') ? `${base}${suffix}` : `${base}/${suffix}`;
 }
 
 export function publicUrl(lang: Language, path: string): string {

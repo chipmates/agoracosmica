@@ -107,11 +107,11 @@ const RechtDatenschutzPanel: FC<RechtDatenschutzPanelProps> = ({ onNavigateToAII
         <div className={styles.legalGrid}>
           <div
             className={styles.legalCard}
-            onClick={() => { window.location.href = '/about'; }}
+            onClick={() => { window.location.href = '/about/'; }}
             role="button"
             tabIndex={0}
             aria-label={tString('legal.links.about', 'About Us')}
-            onKeyDown={(e: KeyboardEvent<HTMLDivElement>) => (e.key === 'Enter' || e.key === ' ') && (window.location.href = '/about')}
+            onKeyDown={(e: KeyboardEvent<HTMLDivElement>) => (e.key === 'Enter' || e.key === ' ') && (window.location.href = '/about/')}
           >
             <Info className={styles.legalCardIcon} />
             <div className={styles.legalCardTitle}>

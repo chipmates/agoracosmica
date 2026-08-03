@@ -35,7 +35,7 @@ const aboutParas = figure.about.split('\n').map(p => p.trim()).filter(Boolean);
 // No pre-slice: a raw .slice(0,160) cuts mid-word and then BaseHead's
 // word-boundary clamp sees a "fitting" string and passes it through.
 const metaDescription = seo?.description || aboutParas[0] || '';
-const figureUrl = `${SITE_URL}/de/figures/${slug}`;
+const figureUrl = `${SITE_URL}/de/figures/${slug}/`;
 // (figure-portrait LCP preload removed 2026-06-04: it hinted WebP while the
 // <picture> serves AVIF, so the browser double-downloaded an unused file. The
 // eager <picture> below loads the portrait without it.)
@@ -83,13 +83,13 @@ const schemas = [
     lang,
   }),
   ...(figureId === 'dickinson'
-    ? [faqSchema(dickinsonPoemsFaqDe, `${figureUrl}/`)]
+    ? [faqSchema(dickinsonPoemsFaqDe, figureUrl)]
     : []),
-  ...(figQaItems.length ? [faqSchema(figQaItems, `${figureUrl}/`)] : []),
+  ...(figQaItems.length ? [faqSchema(figQaItems, figureUrl)] : []),
   ...(ideaSeeds.length
     ? [itemListSchema(ideaSeeds.map((s, i) => ({
         name: s.title,
-        url: `${figureUrl}/#idea-${i + 1}`,
+        url: `${figureUrl}#idea-${i + 1}`,
         description: s.summary,
       })))]
     : []),
