@@ -8,6 +8,7 @@
 // Same posture as the entry and page-load beacons.
 
 import { isSelfHost } from '../config/deployment';
+import { probeField } from './probeSession';
 
 const API_BASE = import.meta.env.VITE_FREE_TIER_API_URL || '';
 
@@ -32,6 +33,7 @@ function detectLanguage(): 'en' | 'de' {
  *   - path (no query string, validated server-side against a regex)
  *   - language (en/de)
  *   - country (CF-edge two-letter code, server-side)
+ *   - the in-house probe constant, only from a browser marked as one
  *
  * No user dimension, no email, no name. Aggregate counter only.
  *
@@ -46,6 +48,7 @@ export function sendSignupBeacon(): void {
     const body = JSON.stringify({
       path,
       language: detectLanguage(),
+      probe: probeField(),
     });
 
     fetch(`${API_BASE}/v1/signup`, {

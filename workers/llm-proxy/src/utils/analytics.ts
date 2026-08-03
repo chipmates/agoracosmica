@@ -39,15 +39,33 @@ export function readDevice(request: Request): string {
 }
 
 /**
+ * blob9 across every event type: a marked browser stamps its own rows so
+ * in-house probing can be subtracted at query time. It is a constant, the
+ * same string for every marked row, never an identifier and never varying
+ * per visitor, so it adds no user dimension. Self-declared by the client on
+ * purpose: the only thing a false claim buys is self-exclusion.
+ */
+export const PROBE_LABEL = 'probe';
+
+/** Read the probe marker off a beacon payload field. Anything else is ''. */
+export function readProbe(value: unknown): string {
+  return (value === 1 || value === true || value === '1') ? PROBE_LABEL : '';
+}
+
+/**
  * Track an LLM proxy event (chat/council/summary).
  * dataset: agora_llm
- * blobs: [endpoint, figureId, mode, language, status, device, country]
+ * blobs: [endpoint, figureId, mode, language, status, device, country, kind, probe]
  * doubles: [durationMs]
  * indexes: [endpoint]
  *
  * blob6 carries the coarse device class (mobile/desktop/tablet) from
  * readDevice, which keeps country pinned at blob7 across every event type.
  * Legacy rows hold a channel label or an empty string in this slot (pre-device).
+ *
+ * blob8 rides alongside on chat rows only: greeting / turn / prefilled, so the
+ * auto-greeting can be told apart from a human turn. The row count itself is
+ * untouched, so the Conversations total stays comparable across the change.
  */
 export function trackLlmEvent(
   env: Env,
@@ -60,6 +78,8 @@ export function trackLlmEvent(
     durationMs: number;
     country: string;
     device: string;
+    kind: string;
+    probe: string;
   }
 ): void {
   try {
@@ -72,6 +92,8 @@ export function trackLlmEvent(
         String(data.status),
         data.device,
         data.country,
+        data.kind,
+        data.probe,
       ],
       doubles: [data.durationMs],
       indexes: [data.endpoint],
@@ -112,7 +134,7 @@ export function trackSession(
  * rate and funnel over time.
  *
  * dataset: agora_llm
- * blobs: ['playback', figureId, mode, language, type, device, country, event]
+ * blobs: ['playback', figureId, mode, language, type, device, country, event, probe]
  * indexes: ['playback']
  *
  * Backward compat: rows written before 2026-05-08 evening have empty blob8.
@@ -129,6 +151,7 @@ export function trackPlayback(
     country: string;
     device: string;
     event: string;
+    probe: string;
   }
 ): void {
   try {
@@ -142,6 +165,7 @@ export function trackPlayback(
         data.device,
         data.country,
         data.event,
+        data.probe,
       ],
       doubles: [0],
       indexes: ['playback'],
@@ -155,7 +179,7 @@ export function trackPlayback(
  * Track a page-load beacon. Fires once on App mount in the client, before any
  * user interaction. Lets the dashboard show arrivals over time.
  * dataset: agora_llm
- * blobs: ['page', path, '', language, '200', device, country]
+ * blobs: ['page', path, '', language, '200', device, country, '', probe]
  * indexes: ['page']
  */
 export function trackPageView(
@@ -165,11 +189,12 @@ export function trackPageView(
     language: string;
     country: string;
     device: string;
+    probe: string;
   }
 ): void {
   try {
     env.ANALYTICS.writeDataPoint({
-      blobs: ['page', data.path, '', data.language, '200', data.device, data.country],
+      blobs: ['page', data.path, '', data.language, '200', data.device, data.country, '', data.probe],
       doubles: [0],
       indexes: ['page'],
     });
@@ -184,7 +209,7 @@ export function trackPageView(
  * step; since the 2026-05-29 refactor). Sits between the page-load beacon
  * (every arrival) and the session row (Turnstile-gated).
  * dataset: agora_llm
- * blobs: ['entry', path, '', language, '200', device, country]
+ * blobs: ['entry', path, '', language, '200', device, country, '', probe]
  * indexes: ['entry']
  */
 export function trackEntry(
@@ -194,11 +219,12 @@ export function trackEntry(
     language: string;
     country: string;
     device: string;
+    probe: string;
   }
 ): void {
   try {
     env.ANALYTICS.writeDataPoint({
-      blobs: ['entry', data.path, '', data.language, '200', data.device, data.country],
+      blobs: ['entry', data.path, '', data.language, '200', data.device, data.country, '', data.probe],
       doubles: [0],
       indexes: ['entry'],
     });
@@ -215,7 +241,7 @@ export function trackEntry(
  * dashboard show total signups including organic.
  *
  * dataset: agora_llm
- * blobs: ['signup', path, '', language, '200', device, country]
+ * blobs: ['signup', path, '', language, '200', device, country, '', probe]
  * indexes: ['signup']
  */
 export function trackSignup(
@@ -225,11 +251,12 @@ export function trackSignup(
     language: string;
     country: string;
     device: string;
+    probe: string;
   }
 ): void {
   try {
     env.ANALYTICS.writeDataPoint({
-      blobs: ['signup', data.path, '', data.language, '200', data.device, data.country],
+      blobs: ['signup', data.path, '', data.language, '200', data.device, data.country, '', data.probe],
       doubles: [0],
       indexes: ['signup'],
     });
@@ -249,9 +276,10 @@ export function trackSignup(
  * mode_selected count every occurrence (volume counters, same row shape).
  *
  * dataset: agora_llm
- * blobs: [step, figureId|path|'', mode|'', language, outcome, device, country, '']
+ * blobs: [step, figureId|path|'', mode|'', language, outcome, device, country, '', probe]
  * doubles: [bucket]  — a coarse bucket INDEX (cinematic dwell 0-3,
- *                      first_reply reply-time 0-4), never raw milliseconds
+ *                      first_reply reply-time 0-4, chat_depth 0-3), never raw
+ *                      milliseconds and never a per-chat message count
  * indexes: [step]
  *
  * blob6 carries the coarse device class (keeps country at blob7 across all
@@ -268,6 +296,7 @@ export function trackFunnel(
     bucket: number;
     country: string;
     device: string;
+    probe: string;
   }
 ): void {
   try {
@@ -281,6 +310,7 @@ export function trackFunnel(
         data.device,
         data.country,
         '',
+        data.probe,
       ],
       doubles: [data.bucket],
       indexes: [data.step],

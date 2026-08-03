@@ -33,6 +33,15 @@
   // gclidCapture.ts: a grant recorded under an older consent version no longer
   // covers the current scope, so it must not authorize sends.
   var AD_CONSENT_VERSION = '1.0.0';
+  // In-house probe marker, shared with the app (utils/probeSession.ts). A
+  // constant, never an identifier: a marked browser stamps its own rows so
+  // internal testing can be subtracted from small-n weeks at query time.
+  var LS_PROBE = 'agc_probe';
+  function probeField() {
+    try { return localStorage.getItem(LS_PROBE) === '1' ? 1 : undefined; }
+    catch (e) { return undefined; }
+  }
+
   var CONV_URL = 'https://llm.agoracosmica.org/api/conversions';
   var FUNNEL_URL = 'https://llm.agoracosmica.org/v1/funnel';
 
@@ -135,6 +144,7 @@
         step: 'cta_click',
         path: window.location.pathname,
         language: docLang.indexOf('de') === 0 ? 'de' : 'en',
+        probe: probeField(),
       };
       // Which door on the page was used, in the row's existing mode slot. A
       // position label like "council_play", never a user dimension.
@@ -165,7 +175,11 @@
       fetch('https://llm.agoracosmica.org/v1/page', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ path: window.location.pathname, language: language }),
+        body: JSON.stringify({
+          path: window.location.pathname,
+          language: language,
+          probe: probeField(),
+        }),
         keepalive: true,
       }).catch(function () { /* never surface */ });
     } catch (e) { /* no-op */ }

@@ -37,6 +37,8 @@ import {
   markReplyDispatchStart,
   replyTimeBucketSinceDispatch,
   hasFiredFunnelStep,
+  firstReplyFailReason,
+  noteChatTurn,
 } from '../utils/funnelBeacon';
 import { sendConversion } from '../utils/public/gclidCapture';
 import { isNewUser, HISTORY_PREFIXES } from '../utils/userState';
@@ -895,6 +897,15 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
           mode: normalizedMode ?? '',
         });
 
+        // Depth of the chat this turn belongs to. Counted in memory and
+        // emitted once, as a bucket, when the chat is left behind — so a
+        // conversation that goes ten turns deep is distinguishable from ten
+        // one-line openers, without any per-chat row ever being written.
+        noteChatTurn(
+          useDomainStore.getState().conversation.historyKey,
+          normalizedMode ?? undefined,
+        );
+
         // The ad-side twin of first_turn: a conversation really began. Gated
         // on a captured gclid plus ad-measurement consent, and deduped per tab
         // inside sendConversion, so this needs no one-shot of its own.
@@ -1078,8 +1089,30 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
           // failed auto-greeting stream must not count as a first_reply before
           // the visitor has sent a turn.
           if (hasFiredFunnelStep('first_turn')) {
+            // Read before the beacon below marks first_reply as fired: a
+            // failure on a later turn is not a first-reply failure.
+            const firstReplyAlreadyLanded = hasFiredFunnelStep('first_reply');
             sendFunnelBeaconOnce('first_reply', {
               outcome: 'error',
+              bucket: replyTimeBucketSinceDispatch(),
+            });
+            // Why it failed. A separate step on purpose: first_reply keeps its
+            // exact prior shape, so the weekly answer rate stays comparable
+            // across this change while the reason becomes readable.
+            if (!firstReplyAlreadyLanded) {
+              sendFunnelBeaconOnce('first_reply_failed', {
+                outcome: firstReplyFailReason(error),
+                bucket: replyTimeBucketSinceDispatch(),
+              });
+            }
+          }
+        } else if (outcome === 'aborted') {
+          // Typed, then the stream was cancelled before any reply arrived. It
+          // costs the visitor the same as an error, so it belongs in the same
+          // counter under its own reason.
+          if (hasFiredFunnelStep('first_turn') && !hasFiredFunnelStep('first_reply')) {
+            sendFunnelBeaconOnce('first_reply_failed', {
+              outcome: 'abort',
               bucket: replyTimeBucketSinceDispatch(),
             });
           }

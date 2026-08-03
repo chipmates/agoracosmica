@@ -6,7 +6,7 @@ import { proxyToNebius } from '../services/nebius';
 import { screenCouncilContent } from '../utils/contentScreen';
 import { createSafetyFilteredStream } from '../services/streamFilter';
 import { logComplianceEvent, getSeverity } from '../utils/complianceLog';
-import { trackLlmEvent, trackRateLimit, readCountry, readDevice } from '../utils/analytics';
+import { trackLlmEvent, trackRateLimit, readCountry, readDevice, readProbe } from '../utils/analytics';
 import { VALID_FIGURES } from '../config';
 import type { Env } from '../utils/types';
 
@@ -174,6 +174,9 @@ export async function handleSummary(request: Request, env: Env, ctx: ExecutionCo
       durationMs: Date.now() - startMs,
       country: readCountry(request),
       device: readDevice(request),
+      // The greeting/turn label belongs to chat rows only.
+      kind: '',
+      probe: readProbe((body as Record<string, unknown>).probe),
     });
   }));
 

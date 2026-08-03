@@ -552,6 +552,9 @@ export const createLegacyConversationStream = () => {
       tools: questTools,
       onToolCall: questToolHandler,
       signal,
+      // isInitial is the auto greeting that opens a chat: same LLM request as
+      // any other, but nobody typed it.
+      turnKind: isInitial ? 'greeting' : 'turn',
     });
 
     // Stream complete — flush any remaining TTS jobs immediately

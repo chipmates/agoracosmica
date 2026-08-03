@@ -13,7 +13,7 @@
 // coarse bucket index, never raw milliseconds. Disclosed in
 // docs/MEASUREMENT.md alongside the other event counters.
 
-import { trackFunnel, readCountry, readDevice } from '../utils/analytics';
+import { trackFunnel, readCountry, readDevice, readProbe } from '../utils/analytics';
 import type { Env } from '../utils/types';
 
 interface FunnelPayload {
@@ -24,6 +24,7 @@ interface FunnelPayload {
   language?: string;
   outcome?: string;
   bucket?: number;
+  probe?: unknown;
 }
 
 // Ad-measurement consent prompt: how many ad arrivals see the question and
@@ -53,6 +54,14 @@ const VALID_STEPS = new Set([
   'figure_selected',
   'mode_selected',
   'first_reply',
+  // Why a first reply never arrived, in the outcome slot: turnstile / quota /
+  // upstream / abort. One-shot per tab like first_reply, and it never replaces
+  // first_reply — that counter keeps its exact prior shape.
+  'first_reply_failed',
+  // Per-chat depth, emitted once when a chat is left behind. The row carries
+  // only a bucket index (0 = 1 turn, 1 = 2-3, 2 = 4-9, 3 = 10+), never the
+  // turn count and never a chat key.
+  'chat_depth',
   // Wave 3: listen-to-talk handoff, per-occurrence volume counters
   'handoff_shown',
   'handoff_taken',
@@ -61,10 +70,17 @@ const VALID_STEPS = new Set([
   // playback started beacon.
   'council_open',
   // Free-tier bot check, per-occurrence volume counters. turnstile_failed
-  // carries why it ended without a token.
+  // carries why it ended without a token. turnstile_started is the denominator
+  // (one per widget render), turnstile_abandoned counts a check still pending
+  // when the page goes away, and turnstile_token_aged sits deliberately
+  // OUTSIDE the failure family: it is a token expiring after a successful
+  // check, which is housekeeping, not a lost message.
+  'turnstile_started',
   'turnstile_interactive',
   'turnstile_solved',
   'turnstile_failed',
+  'turnstile_abandoned',
+  'turnstile_token_aged',
   ...CONSENT_STEPS,
 ]);
 
@@ -89,8 +105,13 @@ const CONSENT_MAX_BUCKET = 3;
 
 // Outcome slot (blob5): same role as status/type elsewhere. Steps without a
 // meaningful outcome default to '200', matching the entry/signup convention.
+// 'interactive' and 'pending' say whether an abandoned bot check was waiting on
+// a tap or still invisible, which separates challenge failure from widget-load
+// failure. The last four are the first_reply_failed reason buckets.
 const VALID_OUTCOMES = new Set([
   '200', 'watched', 'skipped', 'error', 'timeout', 'expired',
+  'interactive', 'pending',
+  'turnstile', 'quota', 'upstream', 'abort',
 ]);
 
 // blob2 holds a figureId OR a sanitized path, never free text. Paths are
@@ -184,6 +205,7 @@ export async function handleFunnel(request: Request, env: Env): Promise<Response
     bucket: outBucket,
     country: readCountry(request),
     device: readDevice(request),
+    probe: readProbe(payload.probe),
   });
 
   return new Response(null, { status: 204 });

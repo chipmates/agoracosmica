@@ -8,9 +8,17 @@ import { proxyToNebius } from '../services/nebius';
 import { screenCouncilContent } from '../utils/contentScreen';
 import { createSafetyFilteredStream } from '../services/streamFilter';
 import { logComplianceEvent, getSeverity } from '../utils/complianceLog';
-import { trackLlmEvent, trackRateLimit, readCountry, readDevice } from '../utils/analytics';
+import { trackLlmEvent, trackRateLimit, readCountry, readDevice, readProbe } from '../utils/analytics';
 import { LLM_CONFIG } from '../config';
 import type { Env } from '../utils/types';
+
+// Which kind of chat request this is, in blob8 of the chat row. The auto
+// greeting that opens a chat is an LLM request like any other, so without a
+// label the Conversations total cannot be split into machine and human. Read
+// off the raw body rather than through validation: it is a label with no
+// effect on the prompt, and an unknown value collapses to ''.
+// 'prefilled' is reserved for the carried-question entry flow.
+const VALID_CHAT_KINDS = new Set(['greeting', 'turn', 'prefilled']);
 
 export async function handleChat(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
   const startMs = Date.now();
@@ -39,6 +47,12 @@ export async function handleChat(request: Request, env: Env, ctx: ExecutionConte
   }
 
   const { figureId, mode, language, messages, seedData, tools } = validation.data;
+
+  const rawBody = body as Record<string, unknown>;
+  const kind = (typeof rawBody.kind === 'string' && VALID_CHAT_KINDS.has(rawBody.kind))
+    ? rawBody.kind
+    : '';
+  const probe = readProbe(rawBody.probe);
 
   // 2b. Content safety screen on user messages
   const contentCheck = screenCouncilContent('', messages);
@@ -135,6 +149,8 @@ export async function handleChat(request: Request, env: Env, ctx: ExecutionConte
       durationMs: Date.now() - startMs,
       country: readCountry(request),
       device: readDevice(request),
+      kind,
+      probe,
     });
   }));
 

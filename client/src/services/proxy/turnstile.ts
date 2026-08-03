@@ -29,7 +29,22 @@ export const TURNSTILE_INTERACTIVE_END_EVENT = 'agc:turnstile-interactive-end';
 let scriptLoaded = false;
 let scriptLoading = false;
 let widgetId: string | null = null;
-let interactiveActive = false;
+
+/**
+ * What the bot check is doing right now. 'invisible' = running with nothing on
+ * screen, 'interactive' = a checkbox is waiting on the visitor.
+ *
+ * Every cross-module signal this file emits is paired with a readable snapshot,
+ * because an event can fire before a late-mounting listener subscribes: a
+ * consumer seeds itself from the snapshot and uses the events only for changes.
+ */
+export type TurnstileChallengeState = 'idle' | 'invisible' | 'interactive';
+let challengeState: TurnstileChallengeState = 'idle';
+
+/** Readable snapshot of the state the interactive events describe. */
+export function getTurnstileChallengeState(): TurnstileChallengeState {
+  return challengeState;
+}
 
 /**
  * Whether a checkbox is waiting on the visitor right now. The escalation can
@@ -37,11 +52,11 @@ let interactiveActive = false;
  * must seed their state from this and use the events only for changes.
  */
 export function isTurnstileInteractive(): boolean {
-  return interactiveActive;
+  return challengeState === 'interactive';
 }
 
 function emit(eventName: string): void {
-  interactiveActive = eventName === TURNSTILE_INTERACTIVE_START_EVENT;
+  challengeState = eventName === TURNSTILE_INTERACTIVE_START_EVENT ? 'interactive' : 'idle';
   try {
     window.dispatchEvent(new CustomEvent(eventName));
   } catch { /* ignore */ }
@@ -75,7 +90,8 @@ function placeInCenter(el: HTMLElement): void {
  */
 function resetTurnstileState(): void {
   // The widget this challenge belonged to is being torn down.
-  if (interactiveActive) emit(TURNSTILE_INTERACTIVE_END_EVENT);
+  if (challengeState === 'interactive') emit(TURNSTILE_INTERACTIVE_END_EVENT);
+  challengeState = 'idle';
   if (widgetId !== null) {
     try { (window as any).turnstile?.remove(widgetId); } catch { /* ignore */ }
     widgetId = null;
@@ -100,6 +116,19 @@ function resetTurnstileState(): void {
 //   2. visibilitychange returning visible after STALE_HIDDEN_THRESHOLD_MS hidden
 if (typeof window !== 'undefined') {
   let hiddenSinceMs = 0;
+
+  // A check still running when the page goes away is a message that never got
+  // sent. pagehide fires on iOS Safari where unload does not, and the beacon
+  // transport outlives the page. The outcome says whether the visitor was
+  // being asked for a tap or the check was still invisible, which separates
+  // "people give up on the checkbox" from "the widget never loaded".
+  window.addEventListener('pagehide', () => {
+    if (challengeState === 'idle') return;
+    sendFunnelBeacon('turnstile_abandoned', {
+      outcome: challengeState === 'interactive' ? 'interactive' : 'pending',
+    });
+    challengeState = 'idle';
+  });
 
   window.addEventListener('pageshow', (event) => {
     if ((event as PageTransitionEvent).persisted) {
@@ -218,6 +247,10 @@ export async function getTurnstileToken(): Promise<string> {
 
     const startedAtMs = Date.now();
     let interactive = false;
+    // Whether this widget ever handed out a token. Scoped to the closure, which
+    // is the widget's lifetime: the previous widget is removed above, so a late
+    // callback from it can never read this one.
+    let tokenIssued = false;
 
     // Back to the corner and tell the UI, so a later invisible re-issue stays
     // quiet and no instruction is left on screen.
@@ -228,18 +261,31 @@ export async function getTurnstileToken(): Promise<string> {
       emit(TURNSTILE_INTERACTIVE_END_EVENT);
     };
 
+    // The check is over, however it ended: nothing is pending any more.
+    const settle = (): void => {
+      endInteractive();
+      challengeState = 'idle';
+    };
+
     const onTimeout = (): void => {
       if (widgetId !== null) {
         try { turnstile.remove(widgetId); } catch { /* ignore */ }
         widgetId = null;
       }
-      endInteractive();
+      settle();
       sendFunnelBeacon('turnstile_failed', { outcome: 'timeout' });
       reject(new Error('Turnstile challenge timed out. Please try again.'));
     };
 
     // Timeout: if Turnstile fails silently (Safari edge cases), don't hang forever
     let timeout = setTimeout(onTimeout, TURNSTILE_TIMEOUT_MS);
+
+    // One counter per widget render. Without it there is no denominator: an
+    // escalation count on its own cannot say whether escalation is rare or
+    // routine, and the escalation rate is what decides whether the check is
+    // tuned wrong or just occasionally noticed.
+    challengeState = 'invisible';
+    sendFunnelBeacon('turnstile_started');
 
     widgetId = turnstile.render(container, {
       sitekey: siteKey,
@@ -262,7 +308,8 @@ export async function getTurnstileToken(): Promise<string> {
       callback: (token: string) => {
         clearTimeout(timeout);
         const wasInteractive = interactive;
-        endInteractive();
+        tokenIssued = true;
+        settle();
         if (wasInteractive) sendFunnelBeacon('turnstile_solved');
         // Hide widget after successful challenge
         if (container) container.style.display = 'none';
@@ -270,13 +317,22 @@ export async function getTurnstileToken(): Promise<string> {
       },
       'error-callback': () => {
         clearTimeout(timeout);
-        endInteractive();
+        settle();
         sendFunnelBeacon('turnstile_failed', { outcome: 'error' });
         reject(new Error('Turnstile challenge failed'));
       },
       'expired-callback': () => {
+        // Turnstile tokens age out a few minutes after a successful check, and
+        // the widget stays mounted, so this fires on the happy path far more
+        // often than on a real failure. Counted apart, never as a failure: the
+        // promise is long settled and no message was lost.
+        if (tokenIssued) {
+          challengeState = 'idle';
+          sendFunnelBeacon('turnstile_token_aged');
+          return;
+        }
         clearTimeout(timeout);
-        endInteractive();
+        settle();
         sendFunnelBeacon('turnstile_failed', { outcome: 'expired' });
         reject(new Error('Turnstile token expired'));
       },

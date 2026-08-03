@@ -9,6 +9,7 @@
 // Disclosed in docs/MEASUREMENT.md alongside the other event counters.
 
 import { isSelfHost } from '../config/deployment';
+import { probeField } from './probeSession';
 
 const API_BASE = import.meta.env.VITE_FREE_TIER_API_URL || '';
 
@@ -33,6 +34,7 @@ function detectLanguage(): 'en' | 'de' {
  *   - path (no query string, validated server-side against a regex)
  *   - language (en/de)
  *   - country (CF-edge two-letter code, server-side)
+ *   - the in-house probe constant, only from a browser marked as one
  *
  * No user dimension, no message content, no fingerprint. Same posture as
  * the page-load and playback beacons.
@@ -44,6 +46,7 @@ export function sendEntryBeacon(): void {
     const body = JSON.stringify({
       path,
       language: detectLanguage(),
+      probe: probeField(),
     });
 
     fetch(`${API_BASE}/v1/entry`, {

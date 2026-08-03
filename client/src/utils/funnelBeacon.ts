@@ -2,9 +2,11 @@
 // One-shot steps fire once per tab: cinematic_start / cinematic_end
 // (LoginPage), welcome_shown (WelcomeDisclosureModal), first_turn (HomePage),
 // first_reply (useConversationEffects chunk handler, error variant from the
-// HomePage dispatch error path). Volume steps fire on every occurrence, no
-// dedup: figure_selected (HomePage.handleSelectFigure), mode_selected
-// (ModeSelectorMini) and the turnstile_* trio (services/proxy/turnstile.ts).
+// HomePage dispatch error path), first_reply_failed (HomePage, alongside the
+// error variant and on an abandoned stream). Volume steps fire on every
+// occurrence, no dedup: figure_selected (HomePage.handleSelectFigure),
+// mode_selected (ModeSelectorMini), chat_depth (flushed here on chat switch
+// and unload) and the turnstile_* family (services/proxy/turnstile.ts).
 // The marketing pages' cta_click fires from agc-public.js with the same
 // payload shape.
 //
@@ -18,6 +20,7 @@
 // Disclosed in docs/MEASUREMENT.md alongside the other event counters.
 
 import { isSelfHost } from '../config/deployment';
+import { probeField } from './probeSession';
 
 const API_BASE = import.meta.env.VITE_FREE_TIER_API_URL || '';
 
@@ -30,6 +33,12 @@ export type FunnelStep =
   | 'figure_selected'
   | 'mode_selected'
   | 'first_reply'
+  // Why a first reply never arrived. One-shot per tab, fired next to (never
+  // instead of) first_reply, so the existing counter keeps its exact shape.
+  | 'first_reply_failed'
+  // How deep a chat went, emitted once when the chat is left behind. Carries a
+  // bucket index only, never the turn count and never a chat key.
+  | 'chat_depth'
   // Wave 3: listen-to-talk handoff (per-occurrence volume counters, like
   // figure_selected). shown = the card appeared at content completion,
   // taken = the visitor tapped through into the talk chapter.
@@ -39,21 +48,41 @@ export type FunnelStep =
   // playback 'started' this separates "never opens" from "opens and flees".
   | 'council_open'
   // Free-tier bot check (per-occurrence volume counters, like figure_selected):
-  // how often the challenge asks for a tap, how often that tap lands, and how
-  // often the check kills the message instead.
+  // how often the check runs at all, how often it asks for a tap, how often
+  // that tap lands, and how often the check kills the message instead.
+  // turnstile_started is the denominator the escalation rate needs.
+  | 'turnstile_started'
   | 'turnstile_interactive'
   | 'turnstile_solved'
-  | 'turnstile_failed';
+  | 'turnstile_failed'
+  // The page went away with a check still running.
+  | 'turnstile_abandoned'
+  // A token aged out AFTER the check had already succeeded. Deliberately its
+  // own step: it is housekeeping, not a lost message, and folding it into
+  // turnstile_failed drowned the real failures at roughly 14 to 1.
+  | 'turnstile_token_aged';
 
 export type CinematicOutcome = 'watched' | 'skipped';
 
 /** Why a bot check ended without a token, on turnstile_failed. */
 export type TurnstileOutcome = 'error' | 'timeout' | 'expired';
 
+/** What an abandoned bot check was waiting on: a tap, or nothing visible yet. */
+export type TurnstileAbandonOutcome = 'interactive' | 'pending';
+
+/** Why a first reply never arrived, on first_reply_failed. */
+export type FirstReplyFailReason = 'turnstile' | 'quota' | 'upstream' | 'abort';
+
 // blob5 outcome slot: cinematic_end sends watched/skipped, first_reply sends
-// 200/error, turnstile_failed sends error/timeout/expired. Steps that send
-// nothing default to '200' server-side.
-export type FunnelOutcome = CinematicOutcome | '200' | TurnstileOutcome;
+// 200/error, turnstile_failed sends error/timeout/expired, turnstile_abandoned
+// sends interactive/pending, first_reply_failed sends the reason bucket. Steps
+// that send nothing default to '200' server-side.
+export type FunnelOutcome =
+  | CinematicOutcome
+  | '200'
+  | TurnstileOutcome
+  | TurnstileAbandonOutcome
+  | FirstReplyFailReason;
 
 /**
  * Cinematic dwell bucket boundaries, in seconds. Four buckets:
@@ -118,6 +147,87 @@ export function replyTimeBucketSinceDispatch(): number | undefined {
   }
 }
 
+/**
+ * Sort a conversation failure into one of four reason buckets for
+ * first_reply_failed. Pure and total: anything unrecognized is 'upstream', so
+ * the four buckets always sum to the failure count.
+ *
+ * Order matters. A blocked bot check surfaces as a plain timeout Error with no
+ * status, so it has to be tested before the status branches, and an abort has
+ * to be tested before everything (an aborted request can carry any shape).
+ */
+export function firstReplyFailReason(error: unknown): FirstReplyFailReason {
+  const name = (error as { name?: unknown } | null | undefined)?.name;
+  if (name === 'AbortError') return 'abort';
+
+  const message = error instanceof Error ? error.message.toLowerCase() : '';
+  if (message.includes('turnstile')) return 'turnstile';
+
+  const status = (error as { status?: unknown } | null | undefined)?.status;
+  if (status === 429) return 'quota';
+
+  return 'upstream';
+}
+
+/**
+ * Per-chat depth bucket boundaries, in user-typed turns. Four buckets:
+ * index 0 = 1 turn, 1 = 2-3, 2 = 4-9, 3 = 10+.
+ * Adjust the boundaries here (one line); the bucket count follows.
+ */
+export const CHAT_DEPTH_BUCKETS: readonly number[] = [2, 4, 10];
+
+/** Map a user-turn count to its coarse depth bucket index (0-based). */
+export function chatDepthBucket(turns: number): number {
+  for (let i = 0; i < CHAT_DEPTH_BUCKETS.length; i++) {
+    if (turns < CHAT_DEPTH_BUCKETS[i]) return i;
+  }
+  return CHAT_DEPTH_BUCKETS.length;
+}
+
+// Live depth of the chat currently open, in memory only. Never written to any
+// storage, never transmitted: the count leaves the browser once, as a bucket
+// index, when the chat is left behind. The chat key is used only to notice
+// that a different chat is now open and stays inside this module.
+let openChatKey: string | null = null;
+let openChatTurns = 0;
+let openChatMode = '';
+
+/**
+ * Count one user-typed turn in the chat identified by `chatKey`. Switching to
+ * a different chat flushes the previous one first, so each chat contributes
+ * exactly one depth row.
+ */
+export function noteChatTurn(chatKey: string | null, mode?: string): void {
+  const key = chatKey || 'unkeyed';
+  if (key !== openChatKey) {
+    flushChatDepth();
+    openChatKey = key;
+    openChatTurns = 0;
+  }
+  openChatTurns += 1;
+  if (mode) openChatMode = mode;
+}
+
+/** Emit the open chat's depth bucket, if it had any user turn at all. */
+export function flushChatDepth(): void {
+  if (openChatTurns > 0) {
+    sendFunnelBeacon('chat_depth', {
+      bucket: chatDepthBucket(openChatTurns),
+      mode: openChatMode || undefined,
+    });
+  }
+  openChatKey = null;
+  openChatTurns = 0;
+  openChatMode = '';
+}
+
+// A closing tab is the most common way a chat ends, so the flush has to
+// survive unload. pagehide fires on iOS Safari where unload does not, and
+// sendBeacon is the transport that outlives the page.
+if (typeof window !== 'undefined') {
+  window.addEventListener('pagehide', () => flushChatDepth());
+}
+
 function detectLanguage(): 'en' | 'de' {
   try {
     const docLang = typeof document !== 'undefined' ? document.documentElement.lang : '';
@@ -171,8 +281,9 @@ interface FunnelFields {
 
 // Shared transport for both senders. Payload: step, optional figureId/mode
 // (content labels, validated server-side), optional outcome, optional coarse
-// bucket index, and language (en/de). Country is derived server-side at the
-// CF edge. No user dimension of any kind.
+// bucket index, language (en/de), and the in-house probe constant when this
+// browser is marked. Country is derived server-side at the CF edge. No user
+// dimension of any kind.
 function postFunnel(step: FunnelStep, fields: FunnelFields): void {
   const body = JSON.stringify({
     step,
@@ -181,6 +292,7 @@ function postFunnel(step: FunnelStep, fields: FunnelFields): void {
     outcome: fields.outcome,
     bucket: fields.bucket,
     language: detectLanguage(),
+    probe: probeField(),
   });
   const url = `${API_BASE}/v1/funnel`;
 

@@ -8,7 +8,8 @@ import {
   validateResponse,
   performanceMonitor,
 } from '../audio/llm/llmUtils';
-import type { Message, LLMResponse } from '../audio/llm/index';
+import type { Message, LLMResponse, ChatTurnKind } from '../audio/llm/index';
+import { probeField } from '../../utils/probeSession';
 import { useDomainStore } from '../../stores/domainStore';
 
 const FREE_TIER_API_URL = import.meta.env.VITE_FREE_TIER_API_URL || '';
@@ -145,6 +146,7 @@ interface FreeTierOptions {
   tools?: Array<{ type: string; function: { name: string; description: string; parameters: any } }>;
   onToolCall?: (toolCall: { name: string; arguments: string; id?: string }) => void;
   signal?: AbortSignal;
+  turnKind?: ChatTurnKind;
 }
 
 /**
@@ -253,6 +255,7 @@ export async function generateFreeTierResponse({
   tools,
   onToolCall,
   signal,
+  turnKind,
 }: FreeTierOptions): Promise<LLMResponse> {
   const perfMetrics = performanceMonitor.startRequest();
 
@@ -275,6 +278,13 @@ export async function generateFreeTierResponse({
           : m.content,
       })),
     };
+
+    // Analytics labels, ignored by the prompt builder. kind splits the
+    // Conversations total into the auto greeting and real turns; probe marks an
+    // in-house session so it can be subtracted at query time.
+    requestBody.kind = turnKind ?? 'turn';
+    const probe = probeField();
+    if (probe) requestBody.probe = probe;
 
     if (seedId) requestBody.seedId = seedId;
     if (seedData) requestBody.seedData = seedData;

@@ -7,6 +7,7 @@
 // See docs/MEASUREMENT.md for the full disclosure.
 
 import { isSelfHost } from '../config/deployment';
+import { probeField } from './probeSession';
 
 const API_BASE = import.meta.env.VITE_FREE_TIER_API_URL || '';
 
@@ -43,6 +44,7 @@ export function sendPlaybackBeacon(payload: PlaybackPayload): void {
       figureId: payload.figureId,
       mode: payload.mode,
       language: payload.language,
+      probe: probeField(),
     });
 
     fetch(`${API_BASE}/v1/playback`, {

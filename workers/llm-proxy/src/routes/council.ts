@@ -8,7 +8,7 @@ import { SAFETY_PREAMBLE } from '../utils/safety';
 import { screenCouncilContent } from '../utils/contentScreen';
 import { createSafetyFilteredStream } from '../services/streamFilter';
 import { logComplianceEvent, getSeverity } from '../utils/complianceLog';
-import { trackLlmEvent, trackRateLimit, readCountry, readDevice } from '../utils/analytics';
+import { trackLlmEvent, trackRateLimit, readCountry, readDevice, readProbe } from '../utils/analytics';
 import type { Env, ChatMessage, CouncilRequest } from '../utils/types';
 
 const VALID_LANGUAGES = ['de', 'en', 'es', 'fr', 'it', 'pt', 'nl', 'pl', 'ja', 'ko', 'zh'];
@@ -223,6 +223,9 @@ export async function handleCouncil(request: Request, env: Env, ctx: ExecutionCo
       durationMs: Date.now() - startMs,
       country: readCountry(request),
       device: readDevice(request),
+      // The greeting/turn label belongs to chat rows only.
+      kind: '',
+      probe: readProbe((body as Record<string, unknown>).probe),
     });
   }));
 

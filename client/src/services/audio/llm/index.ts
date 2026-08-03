@@ -25,6 +25,14 @@ export interface Message {
   content: string;
 }
 
+/**
+ * What a chat LLM request is: the auto greeting that opens a chat, a turn the
+ * visitor typed, or the carried question of the prefilled entry flow (reserved,
+ * not emitted yet). Rides along on the request as a label; it never changes the
+ * prompt or the routing.
+ */
+export type ChatTurnKind = 'greeting' | 'turn' | 'prefilled';
+
 export interface PresetResponse {
   response: string;
   [key: string]: any;
@@ -54,6 +62,7 @@ export interface GenerateResponseOptions {
   tools?: Array<{ type: string; function: { name: string; description: string; parameters: any } }>;
   onToolCall?: (toolCall: { name: string; arguments: string; id?: string }) => void;
   signal?: AbortSignal;
+  turnKind?: ChatTurnKind;
 }
 
 // ============================================
@@ -71,7 +80,8 @@ export const generateResponse = async ({
   language = null,
   tools,
   onToolCall,
-  signal
+  signal,
+  turnKind
 }: GenerateResponseOptions): Promise<LLMResponse> => {
   const perfMetrics = performanceMonitor.startRequest();
 
@@ -249,6 +259,7 @@ export const generateResponse = async ({
       tools,
       onToolCall,
       signal,
+      turnKind,
     });
 
     const perfResult = performanceMonitor.endRequest(perfMetrics, true);

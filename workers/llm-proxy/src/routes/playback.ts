@@ -7,7 +7,7 @@
 // Privacy: aggregate counter only. No user dimension. No IP retention.
 // Same legal posture as the rest of analytics — see docs/MEASUREMENT.md.
 
-import { trackPlayback, readCountry, readDevice } from '../utils/analytics';
+import { trackPlayback, readCountry, readDevice, readProbe } from '../utils/analytics';
 import type { Env } from '../utils/types';
 
 interface PlaybackPayload {
@@ -16,6 +16,7 @@ interface PlaybackPayload {
   figureId?: string;
   mode?: string;
   language?: string;
+  probe?: unknown;
 }
 
 const VALID_TYPES = new Set(['story', 'teaching', 'prism', 'council', 'foreword']);
@@ -83,6 +84,7 @@ export async function handlePlayback(request: Request, env: Env): Promise<Respon
     country: readCountry(request),
     device: readDevice(request),
     event,
+    probe: readProbe(payload.probe),
   });
 
   return new Response(null, { status: 204 });

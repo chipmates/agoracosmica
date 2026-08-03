@@ -7,12 +7,13 @@
 // Privacy: aggregate counter only. No user dimension. No IP retention.
 // Same legal posture as the rest of analytics.
 
-import { trackSignup, readCountry, readDevice } from '../utils/analytics';
+import { trackSignup, readCountry, readDevice, readProbe } from '../utils/analytics';
 import type { Env } from '../utils/types';
 
 interface SignupPayload {
   path?: string;
   language?: string;
+  probe?: unknown;
 }
 
 const PATH_RE = /^\/[A-Za-z0-9/_-]{0,60}$/;
@@ -56,6 +57,7 @@ export async function handleSignup(request: Request, env: Env): Promise<Response
     language: lang,
     country: readCountry(request),
     device: readDevice(request),
+    probe: readProbe(payload.probe),
   });
 
   return new Response(null, { status: 204 });
