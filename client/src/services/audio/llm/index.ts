@@ -7,6 +7,7 @@ import { keyStorage } from '../../storage/keyStorageService';
 import { useDomainStore } from '../../../stores/domainStore';
 import { LLM_SERVICES } from '../config/serviceConfig';
 import seedDataProcessor from '../../seedDataProcessor';
+import { applyCarriedEntry, type CarriedEntry } from '../instructionProcessor';
 import {
   validateAndPreprocessMessages,
   performanceMonitor,
@@ -63,6 +64,14 @@ export interface GenerateResponseOptions {
   onToolCall?: (toolCall: { name: string; arguments: string; id?: string }) => void;
   signal?: AbortSignal;
   turnKind?: ChatTurnKind;
+  /**
+   * Set when the send carries a question the visitor chose before the
+   * conversation opened. Changes how the figure opens, so unlike turnKind it
+   * is a behavior trigger, not a label.
+   */
+  entry?: CarriedEntry;
+  /** The teaching that grounds the carried question. null suppresses it. */
+  anchorSeedId?: string | number | null;
 }
 
 // ============================================
@@ -81,7 +90,9 @@ export const generateResponse = async ({
   tools,
   onToolCall,
   signal,
-  turnKind
+  turnKind,
+  entry,
+  anchorSeedId
 }: GenerateResponseOptions): Promise<LLMResponse> => {
   const perfMetrics = performanceMonitor.startRequest();
 
@@ -141,9 +152,17 @@ export const generateResponse = async ({
     if (hasUsableProvider) {
       // BYOK / Local Mode path
       try {
+        // These requests never reach the worker, so the carried-question
+        // directive is applied here instead of in the proxy's prompt loader.
+        const byokInstructions = applyCarriedEntry(instructions, {
+          entry,
+          anchorSeedId,
+          mode: useDomainStore.getState().mode.selected ?? undefined,
+          userMessageCount: processedMessages.filter(m => m.role === 'user').length,
+        });
         const result = await generateBYOKResponse({
           messages: processedMessages,
-          instructions,
+          instructions: byokInstructions,
           seedData,
           model: model || (providerKind === 'openrouter'
             ? LLM_SERVICES.OPENROUTER.models.QWEN3_235B

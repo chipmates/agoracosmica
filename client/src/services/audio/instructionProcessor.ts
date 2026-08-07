@@ -83,6 +83,69 @@ export const INSTRUCTION_MODES = {
 export type InstructionMode = typeof INSTRUCTION_MODES[keyof typeof INSTRUCTION_MODES];
 
 // ============================================
+// Carried-question entry (BYOK parity)
+// ============================================
+
+/** A conversation opened from a question the visitor chose before it began. */
+export type CarriedEntry = 'carried';
+
+export interface InstructionOptions {
+  /**
+   * The seed that grounds the carried question. Left out, the selected seed is
+   * used (same rule as the free-tier path). Explicit null suppresses the
+   * anchor, which is what a council handoff needs.
+   */
+  anchorSeedId?: string | number | null;
+  /** Set when the send carries a question chosen before the conversation opened. */
+  entry?: CarriedEntry;
+  /** User messages in the payload. 1 means this is the carried question itself. */
+  userMessageCount?: number;
+  /** The conversation mode, when the caller knows it. */
+  mode?: string;
+}
+
+// BYOK requests never reach the worker, so the answer-first directive lives
+// here as well as in workers/llm-proxy/src/services/promptLoader.ts. The two
+// texts must stay identical.
+const ANSWERED_REPLY_OPENING =
+  'The visitor arrived carrying the question in their message — they chose it before you two ever spoke. Answer it directly as your first words: no greeting, no topic offers, no preamble.';
+const ANSWERED_REPLY_ANCHOR =
+  'Ground your answer in {{SEED_DATA}}.anchorSeed — that teaching exists because it answers this question; draw on its insights naturally, without naming it as a lesson.';
+const ANSWERED_REPLY_UNGROUNDED =
+  'Answer from your life and your thought, concretely.';
+const ANSWERED_REPLY_CLOSE =
+  'Keep your register: peer on the bench, not a podium. End with one real question back to them.';
+const CARRIED_CONTINUATION =
+  'This conversation began with a question the visitor carried in. While the exchange is young, stay with what they raise and end your replies with a question back when it serves the dialogue.';
+
+const buildCarriedDirective = (userMessageCount: number, hasAnchor: boolean): string => {
+  if (userMessageCount > 1) return CARRIED_CONTINUATION;
+  return [
+    ANSWERED_REPLY_OPENING,
+    hasAnchor ? ANSWERED_REPLY_ANCHOR : ANSWERED_REPLY_UNGROUNDED,
+    ANSWERED_REPLY_CLOSE,
+  ].join(' ');
+};
+
+/**
+ * Appends the answer-first directive when the visitor carried their question
+ * in. No-op on every other request, and idempotent, so a caller may pass
+ * instructions that were already built with the same options.
+ */
+export const applyCarriedEntry = (
+  instructions: string,
+  options: InstructionOptions = {}
+): string => {
+  if (options.entry !== 'carried') return instructions;
+  if (options.mode !== INSTRUCTION_MODES.FREE_CONVERSATION) return instructions;
+  if (instructions.includes(ANSWERED_REPLY_OPENING) || instructions.includes(CARRIED_CONTINUATION)) {
+    return instructions;
+  }
+  const hasAnchor = options.anchorSeedId !== null && /"anchorSeed"\s*:/.test(instructions);
+  return `${instructions}\n\n${buildCarriedDirective(options.userMessageCount ?? 1, hasAnchor)}`;
+};
+
+// ============================================
 // Helper Functions
 // ============================================
 
@@ -107,7 +170,11 @@ const getModeInstructionPath = (mode: string): string => {
   }
 };
 
-const processSeedData = (instructions: string, seedData: any): string => {
+const processSeedData = (
+  instructions: string,
+  seedData: any,
+  options: InstructionOptions = {}
+): string => {
   if (!seedData) return instructions;
   
   try {
@@ -162,9 +229,17 @@ const processSeedData = (instructions: string, seedData: any): string => {
       case INSTRUCTION_MODES.SEED_CONVERSATION:
         processedSeedData = seedDataProcessor.processSeedConversationData(seedData, allSeeds, figureMeta);
         break;
-      case INSTRUCTION_MODES.FREE_CONVERSATION:
-        processedSeedData = seedDataProcessor.processFreeConversationData(allSeeds, figureMeta);
+      case INSTRUCTION_MODES.FREE_CONVERSATION: {
+        // The selected seed doubles as the anchor, same rule the free-tier
+        // path follows. An explicit null in the options suppresses it.
+        const anchorSeedId = options.anchorSeedId !== undefined
+          ? options.anchorSeedId
+          : useDomainStore.getState().seeds.selectedId;
+        processedSeedData = seedDataProcessor.processFreeConversationData(
+          allSeeds, figureMeta, undefined, anchorSeedId
+        );
         break;
+      }
       default:
         // For story mode or unknown modes, use raw data
         processedSeedData = seedData;
@@ -269,7 +344,8 @@ const processSeedData = (instructions: string, seedData: any): string => {
 export const fetchInstructions = async (
   figure: string,
   mode: string,
-  seedData: any = null
+  seedData: any = null,
+  options: InstructionOptions = {}
 ): Promise<string> => {
   try {
     let figureId = "";
@@ -295,12 +371,12 @@ export const fetchInstructions = async (
       throw new Error(`Instructions not found: ${figureId}/${instructionMode}`);
     }
 
+    const carried = { ...options, mode: validMode };
     if (seedData) {
-      const processedInstructions = processSeedData(instructions.system, seedData);
-      return processedInstructions;
+      return applyCarriedEntry(processSeedData(instructions.system, seedData, options), carried);
     }
 
-    return instructions.system;
+    return applyCarriedEntry(instructions.system, carried);
   } catch (error) {
     throw new Error(`Failed to fetch instructions for ${figure}`);
   }

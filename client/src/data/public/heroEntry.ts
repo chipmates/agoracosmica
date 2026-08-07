@@ -8,6 +8,8 @@
 // at entry, only selected as the conversation's seed context so the reply is
 // grounded in the right material.
 
+import { getIdeaSeedId } from './figurePageContent';
+
 export interface HeroEntry {
   figureId: string;
   questionEn: string;
@@ -222,3 +224,30 @@ export const getHeroEntryQuestion = (
 /** The anchor seed for a figure's entry question, or null for unknown ids. */
 export const getHeroEntrySeedId = (figureId: string | null | undefined): number | null =>
   getHeroEntry(figureId)?.seedId ?? null;
+
+// Same shape as entryIntent's ask-tag pattern. Duplicated rather than imported
+// because entryIntent reads this table, and the cycle would be worse.
+const FIGURE_ASK_TAG = /^f:([a-z]+):([1-3])$/;
+
+/**
+ * The anchor seed behind a staged question, by the ask tag that named it.
+ * Follows the same figure the question text follows, so text and grounding
+ * never come from different tables. Returns null whenever the tag names no
+ * teaching we can trust (council handoffs, the figure-less life question,
+ * unmapped idea slots): no anchor beats a wrong one.
+ */
+export const resolveAnchorSeedId = (figureId: string, tag: string): string | null => {
+  const match = FIGURE_ASK_TAG.exec(tag);
+  if (match) {
+    // Slot 2 is the figure page's idea question, slots 1 and 3 the hero one.
+    const seedId = match[2] === '2'
+      ? getIdeaSeedId(match[1])
+      : getHeroEntrySeedId(match[1]);
+    return seedId === null ? null : String(seedId);
+  }
+  if (tag === 'hero') {
+    const seedId = getHeroEntrySeedId(figureId);
+    return seedId === null ? null : String(seedId);
+  }
+  return null;
+};

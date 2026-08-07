@@ -20,6 +20,12 @@ import type { Env } from '../utils/types';
 // 'prefilled' is reserved for the carried-question entry flow.
 const VALID_CHAT_KINDS = new Set(['greeting', 'turn', 'prefilled']);
 
+// How the conversation was entered. Unlike `kind` this is a behavior trigger,
+// not a label: 'carried' switches the free-talk prompt to answer-first. It is
+// the only accepted value, anything else counts as absent, and it never reaches
+// analytics.
+const CARRIED_ENTRY = 'carried';
+
 export async function handleChat(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
   const startMs = Date.now();
 
@@ -53,6 +59,7 @@ export async function handleChat(request: Request, env: Env, ctx: ExecutionConte
     ? rawBody.kind
     : '';
   const probe = readProbe(rawBody.probe);
+  const carriedEntry = rawBody.entry === CARRIED_ENTRY;
 
   // 2b. Content safety screen on user messages
   const contentCheck = screenCouncilContent('', messages);
@@ -108,7 +115,10 @@ export async function handleChat(request: Request, env: Env, ctx: ExecutionConte
   // seedData: client sends processed seed data (targetSeed, seedsOverview, etc.)
   // Instructions remain server-owned — only the content data comes from client
   const seedDataJson = seedData ? JSON.stringify(seedData) : undefined;
-  const systemPrompt = buildSystemPrompt(figureId, mode, language, seedDataJson);
+  const carried = carriedEntry
+    ? { userMessageCount: messages.filter(m => m.role === 'user').length }
+    : undefined;
+  const systemPrompt = buildSystemPrompt(figureId, mode, language, seedDataJson, carried);
   if (!systemPrompt) {
     return new Response(
       JSON.stringify({ error: `No instructions found for ${figureId}/${mode}` }),

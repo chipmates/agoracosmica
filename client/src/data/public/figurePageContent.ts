@@ -112,6 +112,52 @@ export const figurePageContent: Record<string, { en: FigurePageLang; de: FigureP
   },
 };
 
+// The seed whose teaching answers each figure's idea question (ask slot 2).
+// The question itself is authored per figure, so the anchor has to be named
+// here rather than derived. A figure missing from this table gets no anchor
+// for that slot, which is deliberate: a wrong teaching grounds the first reply
+// worse than none.
+export const ideaSeedIds: Record<string, number> = {
+  angelou: 3,
+  aurelius: 10,
+  austen: 8,
+  beauvoir: 9,
+  bingen: 4,
+  blake: 2,
+  campbell: 6,
+  dickinson: 10,
+  eckhart: 5,
+  einstein: 11,
+  galilei: 11,
+  gandhi: 1,
+  gautama: 1,
+  goethe: 1,
+  jung: 4,
+  kahlo: 3,
+  king: 2,
+  laozi: 5,
+  lovelace: 5,
+  mandela: 7,
+  mozart: 4,
+  nietzsche: 11,
+  plato: 6,
+  rumi: 7,
+  schopenhauer: 7,
+  shakespeare: 4,
+  tubman: 11,
+  vinci: 2,
+  woolf: 2,
+  zenji: 2,
+};
+
+/** The idea question's anchor seed, or null when the figure has no clean match. */
+export function getIdeaSeedId(figureId: string | null | undefined): number | null {
+  if (!figureId) return null;
+  return Object.prototype.hasOwnProperty.call(ideaSeedIds, figureId)
+    ? ideaSeedIds[figureId]
+    : null;
+}
+
 export function getFigurePageContent(
   figureId: string | null | undefined,
   lang: string
