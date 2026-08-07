@@ -1123,7 +1123,7 @@
       "title": "Wähle dein Kapitel",
       "description": "Wie möchtest du {figureName} heute begegnen?",
       "descriptionWithSeed": "Wie möchtest du '{seedTitle}' mit {figureName} erkunden?",
-      "freetalkCta": "Sprich frei",
+      "freetalkCta": "Sprich frei,",
       "freetalkCtaSub": "worüber du willst.",
       "chapterDivider": "oder wähle dein Lern-Kapitel",
       "listen": "Zuhören",

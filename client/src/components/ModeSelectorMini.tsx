@@ -251,7 +251,7 @@ const ModeSelectorMini: FC<ModeSelectorMiniProps> = ({
       {/* Close button */}
       <CloseButton
         onClick={handleClose}
-        aria-label={`Close ${tString('modes.selector.title', 'Mode Selector').toLowerCase()}`}
+        aria-label={tString('common.close', 'Close')}
         size="large"
         style={{
           position: 'absolute',
@@ -394,7 +394,7 @@ const ModeSelectorMini: FC<ModeSelectorMiniProps> = ({
             </div>
 
             {/* Eclipse container */}
-            <div className="eclipse-container" role="radiogroup" aria-label={`Available ${tString('modes.selector.title', 'Mode Selector').toLowerCase()}`}>
+            <div className="eclipse-container" role="radiogroup" aria-label={tString('modes.selector.title', 'Mode Selector')}>
               {/* Orbital ring */}
               <div className="eclipse-ring" aria-hidden="true" />
               <div className="eclipse-ring-glow" aria-hidden="true" />
