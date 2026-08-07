@@ -76,7 +76,7 @@ const chapterTitle = cleanDisplayText(getSeedsFor(figure.id, lang)[0]?.title);
 const chapterMinutes = getStoryChapter(figure.id, lang, 1)?.minutes;
 let chapterBeat = `${S.chapterWord} 1`;
 if (chapterTitle) chapterBeat += `: ${chapterTitle}`;
-if (chapterMinutes) chapterBeat += `  ·  ${chapterMinutes} ${S.min}`;
+if (chapterMinutes) chapterBeat += ` · ${chapterMinutes} ${S.min}`;
 
 // The size of this figure's world, counted from the data every build.
 const world = getFigureWorld(figure.id, lang);
@@ -104,7 +104,7 @@ const worldLine = [
     </noscript>
 
     {figure.learn && (
-      <p class="pub-fig-hero__learn">{`“${figure.learn}”`}</p>
+      <p class="pub-fig-hero__learn">{de ? `„${figure.learn}“` : `“${figure.learn}”`}</p>
     )}
 
     <p class="fig-hero-chapter">

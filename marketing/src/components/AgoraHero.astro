@@ -64,7 +64,7 @@ function chapterOneBeat(id: string): string {
   const minutes = getStoryChapter(id, lang, 1)?.minutes;
   let line = `${chapterWord} 1`;
   if (title) line += `: ${title}`;
-  if (minutes) line += `  ·  ${minutes} ${minWord}`;
+  if (minutes) line += ` · ${minutes} ${minWord}`;
   return line;
 }
 // Handed to the client script so a shelf pick re-keys the beat from the same
