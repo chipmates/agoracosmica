@@ -11,6 +11,7 @@
 import LabLibrary from '../islands/LabLibrary';
 import { figureImage } from '../lib/figureImages';
 import { getFigureLibraryModes } from './landing-lab/figure-library';
+import { figureIdToSlug } from '@client/data/public/slugMap';
 import { publicUrl } from '../lib/urls';
 import type { Lang } from '../i18n';
 import './landing-lab/lab-samples.css';
@@ -32,7 +33,7 @@ const S = de
       tablistAria: 'Sechs Wege zu lernen',
       groupArc: 'Der Lernweg',
       groupMore: 'Weiter gehen',
-      continueLabel: 'Das Ganze anhören',
+      continueLabel: 'Sieh, wie es weitergeht',
       playDefault: 'Abspielen',
       footShowing: 'Wähl einen Weg und probier ihn aus.',
       footEvery: 'Alle dreißig Menschen ansehen →',
@@ -44,14 +45,36 @@ const S = de
       tablistAria: 'Six ways to learn',
       groupArc: 'The learning arc',
       groupMore: 'Go further',
-      continueLabel: 'Hear the whole thing',
+      // One label serves three destinations (chapter player, the choosing
+      // place, the theme page), so it promises no single mode.
+      continueLabel: 'See where it continues',
       playDefault: 'Play',
       footShowing: 'Pick a way and try it.',
       footEvery: 'See all thirty figures →',
       figuresHref: publicUrl('en', '/figures'),
     };
 
-const modes = getFigureLibraryModes(figureId, lang);
+// Click-promise repair. Four panels named a mode the link did not encode:
+// they all pointed at the bare figure link, which opens the choosing place.
+// Only the story mode has a URL shape the app reads (mode + chapter), so the
+// story panel deep-links chapter one and the rest say what they deliver:
+// the place where the way gets chosen. The council panel already links to its
+// theme page and keeps its own label.
+const slug = figureIdToSlug[figureId];
+const chooseHref = `/app?figure=${slug}&lang=${lang}`;
+const chooseLabel = de ? `Mit ${figureName} beginnen und den Weg wählen` : `Begin with ${figureName}, choose your way`;
+const modes = getFigureLibraryModes(figureId, lang, {
+  overrides: {
+    story: {
+      linkHref: `/app?figure=${slug}&lang=${lang}&mode=story&chapter=1`,
+      linkLabel: de ? 'Bei Kapitel 1 anfangen' : 'Start at chapter 1',
+    },
+    wisdom: { linkHref: chooseHref, linkLabel: chooseLabel },
+    prism: { linkHref: chooseHref, linkLabel: chooseLabel },
+    quest: { linkHref: chooseHref, linkLabel: chooseLabel },
+    freetalk: { linkHref: chooseHref, linkLabel: chooseLabel },
+  },
+});
 const portrait = figureImage(figureId, 'thumbnail', 160);
 const { heading, intro, ...labels } = S;
 ---

@@ -1,15 +1,21 @@
 ---
-// The life, in twelve chapters. Uncollapsed, server-rendered, and every line
-// of it is a join of data that already exists:
+// The life, in twelve chapters: one sequential rail, first to last. Server
+// rendered, and every line of it is a join of data that already exists:
 //
 //   title      seeds/{lang}/{id}.json
 //   year, age, setting, the documented/recreated ledger   factchecks
 //   runtime    stories/{lang}/{id}.json
 //
-// The ledger line is the honesty signature: per scene, what the record shows
-// and what we staged. Factcheck strings render VERBATIM or not at all.
+// The rail runs top to bottom in ONE column on every width. Two flowing
+// columns read 1-6 down the left and 7-12 down the right, which sends a
+// reader who finished chapter six back UP the page for chapter seven.
+//
+// The ledger is the honesty signature: per scene, what the record shows and
+// what we staged. It sits in a per-chapter <details> so the rail stays
+// walkable, and its text stays in the page either way. Factcheck strings
+// render VERBATIM or not at all.
 // No per-chapter art exists (the image manifest carries a portrait and a
-// thumbnail only), so the block is typographic by design.
+// thumbnail only), so the rail is typographic by design.
 
 import type { Lang } from '../i18n';
 import { getSeedsFor } from '../lib/seeds';
@@ -21,22 +27,19 @@ interface Props {
   figureId: string;
   slug: string;
   figureName: string;
-  /** The catalog's short life summary. It used to sit in the hero, above the
-   *  answer, where it pushed the voice and the question below the fold. Here it
-   *  is the bridge into the twelve scenes it summarises. */
-  intro?: string[];
   lang: Lang;
 }
 
-const { figureId, slug, figureName, intro = [], lang } = Astro.props;
+const { figureId, slug, figureName, lang } = Astro.props;
 const de = lang === 'de';
 
 const S = de
   ? {
       heading: `Das Leben von ${figureName}, in zwölf Kapiteln`,
-      lead: 'Jedes Kapitel nimmt eine Idee und macht eine Szene daraus. Unter jeder Szene steht, was belegt ist und was wir für die Erzählung gebaut haben.',
+      lead: 'Jedes Kapitel nimmt eine Idee und macht eine Szene daraus. Der Weg läuft von oben nach unten, Kapitel eins bis zwölf, und unter jeder Szene steht, was belegt ist und was wir für die Erzählung gebaut haben.',
       age: 'mit',
       min: 'Min.',
+      ledger: 'Was belegt ist, was wir gebaut haben',
       documented: 'Belegt',
       recreated: 'Für die Szene gebaut',
       listen: 'Kapitel',
@@ -44,9 +47,10 @@ const S = de
     }
   : {
       heading: `The life of ${figureName}, in twelve chapters`,
-      lead: 'Each chapter takes one idea and turns it into a scene. Under every scene we say what the record shows and what we built for the telling.',
+      lead: 'Each chapter takes one idea and turns it into a scene. The path runs top to bottom, chapter one to twelve, and under every scene we say what the record shows and what we built for the telling.',
       age: 'age',
       min: 'min',
+      ledger: 'What the record shows, what we built',
       documented: 'Documented',
       recreated: 'Built for the scene',
       listen: 'Hear chapter',
@@ -88,44 +92,46 @@ const chapters = seeds.map((seed, i) => {
 {chapters.length > 0 && (
   <section class="pub-section fig-chapters">
     <h2 class="pub-section__title">{S.heading}</h2>
-    {intro.map(p => <p class="pub-section__text fig-chapters__intro">{p}</p>)}
     <p class="pub-section__text">{S.lead}</p>
     <ol class="fig-chapters__list">
       {chapters.map(c => (
         <li class="fig-chapter" id={`idea-${c.n}`}>
-          <h3 class="fig-chapter__title">
-            <span class="fig-chapter__n" aria-hidden="true">{c.n}</span>
-            {c.title}
-          </h3>
-          {c.meta.length > 0 && (
-            <p class="fig-chapter__meta">{c.meta.join('  ·  ')}</p>
-          )}
-          <p class="fig-chapter__text">{c.hook || c.summary}</p>
-          {(c.documented || c.recreated) && (
-            <p class="fig-chapter__ledger">
-              {c.documented && (
-                <span class="fig-chapter__ledger-item">
-                  <span class="fig-chapter__ledger-key">{S.documented}:</span> {c.documented}
-                </span>
-              )}
-              {c.recreated && (
-                <span class="fig-chapter__ledger-item">
-                  <span class="fig-chapter__ledger-key">{S.recreated}:</span> {c.recreated}
-                </span>
-              )}
+          <span class="fig-chapter__n" aria-hidden="true">{c.n}</span>
+          <div class="fig-chapter__body">
+            <h3 class="fig-chapter__title">{c.title}</h3>
+            {c.meta.length > 0 && (
+              <p class="fig-chapter__meta">{c.meta.join('  ·  ')}</p>
+            )}
+            <p class="fig-chapter__text">{c.hook || c.summary}</p>
+            {(c.documented || c.recreated) && (
+              <details class="fig-chapter__ledger">
+                <summary class="fig-chapter__ledger-toggle">{S.ledger}</summary>
+                <p class="fig-chapter__ledger-body">
+                  {c.documented && (
+                    <span class="fig-chapter__ledger-item">
+                      <span class="fig-chapter__ledger-key">{S.documented}:</span> {c.documented}
+                    </span>
+                  )}
+                  {c.recreated && (
+                    <span class="fig-chapter__ledger-item">
+                      <span class="fig-chapter__ledger-key">{S.recreated}:</span> {c.recreated}
+                    </span>
+                  )}
+                </p>
+              </details>
+            )}
+            <p class="fig-chapter__door">
+              <a
+                class="pub-textlink"
+                href={`/app?figure=${slug}&lang=${lang}&mode=story&chapter=${c.n}`}
+                data-agc-cta="start-exploring"
+                data-agc-figure={figureId}
+                data-agc-door="fig_chapter"
+              >
+                {`${S.listen} ${c.n}${S.listenTail ? ' ' + S.listenTail : ''} →`}
+              </a>
             </p>
-          )}
-          <p class="fig-chapter__door">
-            <a
-              class="pub-textlink"
-              href={`/app?figure=${slug}&lang=${lang}&mode=story&chapter=${c.n}`}
-              data-agc-cta="start-exploring"
-              data-agc-figure={figureId}
-              data-agc-door="fig_chapter"
-            >
-              {`${S.listen} ${c.n}${S.listenTail ? ' ' + S.listenTail : ''} →`}
-            </a>
-          </p>
+          </div>
         </li>
       ))}
     </ol>
@@ -135,19 +141,30 @@ const chapters = seeds.map((seed, i) => {
 <style is:global>
   .fig-chapters__list {
     list-style: none;
-    margin: 0.4rem 0 0;
+    margin: 0.9rem 0 0;
     padding: 0;
   }
+  /* The rail: numbered stops in a gutter, one line running through them. */
   .fig-chapter {
-    padding-left: 1.15rem;
-    margin-bottom: 1.7rem;
-    border-left: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-20, 20%), transparent);
+    position: relative;
+    display: grid;
+    grid-template-columns: 1.9rem 1fr;
+    column-gap: 0.9rem;
+    padding-bottom: 1.9rem;
   }
-  .fig-chapter:last-child { margin-bottom: 0; }
+  .fig-chapter::before {
+    content: "";
+    position: absolute;
+    left: 0.95rem;
+    top: 2.1rem;
+    bottom: 0;
+    width: 1px;
+    background: color-mix(in srgb, var(--gold-subtle) var(--a-20, 20%), transparent);
+  }
+  .fig-chapter:last-child { padding-bottom: 0; }
+  .fig-chapter:last-child::before { display: none; }
+  .fig-chapter__body { min-width: 0; }
   .fig-chapter__title {
-    display: flex;
-    align-items: baseline;
-    gap: 0.7rem;
     margin: 0 0 0.3rem;
     font-family: var(--font-content, 'Libre Caslon Text', serif);
     font-weight: var(--weight-regular, 400);
@@ -156,11 +173,18 @@ const chapters = seeds.map((seed, i) => {
     color: var(--gold-subtle);
   }
   .fig-chapter__n {
-    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.9rem;
+    height: 1.9rem;
+    border: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-45, 45%), transparent);
+    border-radius: 50%;
+    background: var(--bg-void);
     font-family: var(--font-ui, 'Space Grotesk', sans-serif);
-    font-size: 0.72rem;
-    letter-spacing: 0.14em;
-    color: var(--gold-deep);
+    font-size: 0.76rem;
+    letter-spacing: 0.04em;
+    color: var(--gold-subtle);
   }
   .fig-chapter__meta {
     margin: 0 0 0.55rem;
@@ -178,11 +202,39 @@ const chapters = seeds.map((seed, i) => {
     color: var(--text-secondary);
     max-width: 66ch;
   }
+  /* The honesty ledger, one line by default, the wording one tap away. */
   .fig-chapter__ledger {
+    margin: 0 0 0.5rem;
+    max-width: 66ch;
+  }
+  .fig-chapter__ledger-toggle {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    cursor: pointer;
+    list-style: none;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold-deep);
+    transition: color var(--transition-fast);
+  }
+  .fig-chapter__ledger-toggle::-webkit-details-marker { display: none; }
+  .fig-chapter__ledger-toggle::after {
+    content: "+";
+    margin-left: 0.5rem;
+    font-size: 0.9rem;
+    line-height: 1;
+  }
+  .fig-chapter__ledger[open] .fig-chapter__ledger-toggle::after { content: "−"; }
+  .fig-chapter__ledger-toggle:hover,
+  .fig-chapter__ledger[open] .fig-chapter__ledger-toggle { color: var(--gold-primary); }
+  .fig-chapter__ledger-body {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
-    margin: 0 0 0.5rem;
+    margin: 0 0 0.2rem;
     padding: 0.6rem 0.8rem;
     border: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-12, 12%), transparent);
     border-radius: var(--plate-radius, 4px);
@@ -190,7 +242,6 @@ const chapters = seeds.map((seed, i) => {
     font-size: 0.86rem;
     line-height: 1.55;
     color: var(--text-tertiary);
-    max-width: 66ch;
   }
   .fig-chapter__ledger-key {
     font-family: var(--font-ui, 'Space Grotesk', sans-serif);
@@ -200,10 +251,9 @@ const chapters = seeds.map((seed, i) => {
     color: var(--gold-deep);
   }
   .fig-chapter__door { margin: 0; font-size: 0.92rem; }
-  /* Two columns that FLOW. A grid would lock the rows to the tallest chapter
-     and leave holes, and the twelve chapters differ a lot in length. */
   @media (min-width: 900px) {
-    .fig-chapters__list { columns: 2; column-gap: 2.6rem; }
-    .fig-chapter { break-inside: avoid; }
+    .fig-chapter { grid-template-columns: 2.2rem 1fr; column-gap: 1.2rem; }
+    .fig-chapter::before { left: 1.1rem; }
+    .fig-chapter__n { width: 2.2rem; height: 2.2rem; font-size: 0.78rem; }
   }
 </style>

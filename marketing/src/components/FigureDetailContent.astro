@@ -1,32 +1,43 @@
 ---
 // The figure detail page, top to bottom.
 //
-// The order is the point. A searcher lands here with a question, so the answer
-// comes first, the door comes second, and the substance that used to sit inside
-// collapsed boxes is open and headed with the questions people actually type.
-// Everything down to the councils is server-rendered and uncollapsed. <details>
-// survives only for the council tail.
+// The order is the point, and it is one rhythm: who this is, why you can
+// trust it, what it holds, THE PATH, where the figure argues, then begin.
+// A searcher lands here with a question, so the answer comes first and the
+// substance is open, headed with the questions people actually type.
 //
-//   hero            who this is, the voice, the promise, the first question
+//   WHO
+//   hero            portrait and its disclosure caption, the promise, one
+//                   gold Begin
 //   answer          40 to 80 words, the first paragraph after the H1
-//   questions       one tap into the app, at peak intent
+//   life            the short life summary the twelve scenes expand
+//   PROOF
+//   is this real    the honesty capsule, answered plainly, with the link to
+//                   how these Echoes get built and checked
+//   WHAT IT HOLDS
 //   six ways        the interactive library, the only "try it" on the page:
-//                   the playable overture before the long read, so the taste
-//                   comes before the two scroll-walls instead of after them
+//                   the playable overture before the long read
 //   concepts        headings that are real queries, each answer self-contained
-//   twelve chapters the life, with the documented/recreated ledger per scene
-//   councils        where the figure argues, with the produced previews
+//   THE PATH
+//   twelve chapters the life as one rail, first to last, ledger per scene
+//   WHERE THE FIGURE ARGUES
+//   councils        the debates, with the produced previews
 //   lattice         the 36 typed edges, the densest internal linking we own
 //   themes, hub     the rest of the lattice
 //   shadow          built, wired, renders nothing (owner-gated)
-//   works, sources  the paper trail, then the Echo disclosure as the last word
-//   questions       the same door again, for the long reader
+//   works, sources  the paper trail, then the Echo note
+//   BEGIN
+//   closing door    the same gold Begin as the hero, for the long reader,
+//                   plus the phone's fixed rail
+//
+// The ask blocks that used to sit above and below this are gone: the page is
+// the path surface now, and the question moment lives one tap in, where the
+// visitor chooses it.
 //
 // All data resolves at build time from client/ via the @client alias.
 
 import Breadcrumbs from './Breadcrumbs.astro';
 import FigureHero from './FigureHero.astro';
-import FigureQuestions from './FigureQuestions.astro';
 import FigureConcepts from './FigureConcepts.astro';
 import FigureChapters from './FigureChapters.astro';
 import FigureSixWays from './FigureSixWays.astro';
@@ -36,17 +47,15 @@ import FigureShadow from './FigureShadow.astro';
 import FigureQA from './FigureQA.astro';
 import EchoNote from './EchoNote.astro';
 import StaticImage from './StaticImage.astro';
-import PublicCTA from './PublicCTA.astro';
 import SourcesBlock from './SourcesBlock.astro';
 
 import { getT } from '../i18n';
 import type { Lang } from '../i18n';
 import { publicUrl } from '../lib/urls';
 import { getSeedsFor } from '../lib/seeds';
-import { cleanDisplayText, rankedCouncilsFor } from '../lib/figureWorld';
+import { cleanDisplayText } from '../lib/figureWorld';
 import { getFigureById } from '@client/data/public/figuresCatalog';
 import { figureIdToSlug } from '@client/data/public/slugMap';
-import { getShortDisplayName } from '@client/data/councilCatalog';
 import { figureThemes } from '@client/data/public/figureSeo';
 import { getFigureQA } from '@client/data/public/figureQA';
 import { dickinsonPoemsFaqEn, dickinsonPoemsFaqDe } from '../lib/dickinsonPoemsFaq';
@@ -67,15 +76,16 @@ if (!figure) {
 }
 
 const seeds = getSeedsFor(figureId, lang);
-const shortName = getShortDisplayName(figureId);
 const qa = getFigureQA(figureId, lang);
 const leadAnswer = qa?.pairs[0]?.a ?? '';
 const aboutParas = figure.about.split('\n').map(p => p.trim()).filter(Boolean);
 
-// The debate this figure leads, for the questions block. Same ranking the
-// council section uses, so the question card and the first council card are
-// always the same debate.
-const leadCouncil = rankedCouncilsFor(figureId)[0];
+// The closing door: the same promise and the same destination as the hero's,
+// so the long reader ends on the offer they started with. Wide screens get the
+// plate at the page end, phones get the fixed rail (the rail is display:none
+// above 860px), and the label is identical either way.
+const beginHref = `/app?figure=${slug}&lang=${lang}`;
+const beginLabel = de ? `Mit ${figure.name} beginnen` : `Begin with ${figure.name}`;
 
 // Related figures drawn from seed connections, ranked by how often this figure
 // references them across seeds, then the top 8. The typed rails above carry the
@@ -123,6 +133,7 @@ const S = de
       voice: 'Wie dieses Echo klingt',
       method: 'Wie wir diese Echos bauen und prüfen',
       poemsLink: 'Lies ihre Gedichte nach Thema, in ihrer eigenen Handschrift →',
+      beginLead: 'Du wählst, wo es losgeht. Die Geschichte oder deine eigene Frage.',
     }
   : {
       hubLead: 'Keep exploring: ',
@@ -131,6 +142,7 @@ const S = de
       voice: 'How this Echo sounds',
       method: 'How we build and fact-check these Echoes',
       poemsLink: 'Read her poems grouped by theme, in her own hand →',
+      beginLead: 'You choose where it starts. The story, or your own question.',
     };
 
 // German needs a pronoun where English does not, and thirty figures are of
@@ -163,15 +175,17 @@ if (figure.essence) {
     <p class="pub-section__text pub-fig-answer">{leadAnswer}</p>
   )}
 
-  <FigureQuestions
-    figureId={figureId}
-    slug={slug}
-    figureName={figure.name}
-    council={leadCouncil}
-    lang={lang}
-    door="fig_q_lead"
-    skipEntryQuestion
-  />
+  {aboutParas.length > 0 && (
+    <section class="pub-section pub-fig-life">
+      {aboutParas.map(p => <p class="pub-section__text">{p}</p>)}
+    </section>
+  )}
+
+  <FigureQA figureId={figureId} lang={lang} />
+
+  <p class="pub-section__text pub-figure__methodlink">
+    <a class="pub-textlink" href={de ? '/de/methodik/' : '/methodology/'}>{S.method}</a>
+  </p>
 
   <FigureSixWays figureId={figureId} figureName={figure.name} lang={lang} />
 
@@ -197,7 +211,6 @@ if (figure.essence) {
     figureId={figureId}
     slug={slug}
     figureName={figure.name}
-    intro={aboutParas}
     lang={lang}
   />
 
@@ -266,30 +279,34 @@ if (figure.essence) {
     </section>
   )}
 
-  <FigureQA figureId={figureId} lang={lang} />
-
   <EchoNote variant="figure" name={figure.name} lang={lang} />
 
-  <p class="pub-section__text pub-figure__methodlink">
-    <a class="pub-textlink" href={de ? '/de/methodik/' : '/methodology/'}>{S.method}</a>
-  </p>
+  <section class="pub-section fig-close">
+    <p class="fig-close__lead">{S.beginLead}</p>
+    <a
+      class="fig-close__button fig-begin__button pub-cta__button"
+      href={beginHref}
+      data-agc-cta="start-exploring"
+      data-agc-figure={figureId}
+      data-agc-door="fig_begin_close"
+    >{beginLabel}</a>
+    <p class="fig-close__free">{t('cta.freeNote')}</p>
+    <p class="fig-close__trust">{t('cta.trust')}</p>
+  </section>
 
-  <FigureQuestions
-    figureId={figureId}
-    slug={slug}
-    figureName={figure.name}
-    council={leadCouncil}
-    lang={lang}
-    door="fig_q_foot"
-    variant="foot"
-  />
-
-  <PublicCTA
-    variant="sticky"
-    figureId={figureId}
-    figureName={shortName}
-    lang={lang}
-  />
+  <div class="pub-cta pub-cta--sticky fig-rail">
+    <div class="pub-cta__inner">
+      <p class="pub-cta__trust">{t('cta.trust')}</p>
+      <p class="pub-cta__trust">{t('cta.freeNote')}</p>
+      <a
+        href={beginHref}
+        class="pub-cta__button"
+        data-agc-cta="start-exploring"
+        data-agc-figure={figureId}
+        data-agc-door="fig_begin_sticky"
+      >{beginLabel}</a>
+    </div>
+  </div>
 </div>
 
 <style is:global>
@@ -301,6 +318,51 @@ if (figure.essence) {
     line-height: 1.78;
     color: var(--text-primary);
     max-width: 64ch;
+  }
+  /* The life summary: the short prose the twelve scenes expand, sitting with
+     the answer it belongs to instead of on top of the chapter rail. */
+  .pub-figure .pub-fig-life { margin: 0; }
+  .pub-figure .pub-fig-life .pub-section__text { max-width: 64ch; }
+  /* The closing door. Same label, same destination as the hero plate. */
+  .pub-figure .fig-close {
+    margin: 0;
+    padding: 1.6rem 0 0;
+    border-top: 1px solid var(--keyline, color-mix(in srgb, var(--gold-subtle) 12%, transparent));
+  }
+  .fig-close__lead {
+    margin: 0 0 1.1rem;
+    max-width: 46ch;
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+  }
+  .fig-close__button {
+    width: fit-content;
+    max-width: 100%;
+    padding: 0.85rem 1.7rem;
+    border-radius: var(--plate-radius, 4px);
+    white-space: normal;
+    line-height: 1.3;
+    text-wrap: balance;
+  }
+  .fig-close__free,
+  .fig-close__trust {
+    margin: 0.7rem 0 0;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: var(--text-tertiary);
+  }
+  .fig-close__trust {
+    margin-top: 0.3rem;
+    letter-spacing: 0.04em;
+    color: var(--gold-deep);
+  }
+  /* One closing door per viewport. The phone already carries the fixed rail
+     with the same label, so the plate is the wide-screen half of that pair. */
+  @media (max-width: 860px) {
+    .pub-figure .fig-close { display: none; }
   }
   .pub-figure__poems { margin: 0; }
   .pub-figure__poems-link { margin-top: 0.5rem; font-size: 1.05rem; }
@@ -324,7 +386,9 @@ if (figure.essence) {
     color: var(--gold-deep);
   }
   .pub-figure__hublink { margin: 0.5rem 0 0; }
-  .pub-figure__methodlink { margin: 0; font-size: 0.95rem; }
+  /* The method link belongs to the honesty capsule above it, not to the
+     section below, so it climbs back up into that block's own spacing. */
+  .pub-figure__methodlink { margin: -2rem 0 3rem; font-size: 0.95rem; }
   /* Related-figures rows: horizontal card variant (a class, not an inline
      style, so the strict CSP style-src needs no 'unsafe-inline'). */
   .pub-figure-card.pub-figure-card--row {

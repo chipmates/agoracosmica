@@ -1,19 +1,24 @@
 ---
 // The figure page hero: the per-figure spine.
 //
-// Five beats, top to bottom. Portrait (the LCP image), who this is, the Echo
-// trailer that ends by handing you the story, the promise line, the visitor's
-// first question as a working door, and one line naming how big this figure's
-// world is. The about paragraphs that used to sit here moved down the page:
-// they pushed the trailer and the question below the fold on a phone.
+// Portrait (the LCP image) with the Echo disclosure as its caption, who this
+// is, the trailer that ends by handing you the story, the promise line, the
+// first chapter as a quiet door, one gold Begin, and one line naming how big
+// this figure's world is. The about paragraphs that used to sit here moved
+// down the page: they pushed the trailer below the fold on a phone.
+//
+// The disclosure sits under the portrait because that is what it describes:
+// the image and the voice. Its wording is fixed by the transparency program,
+// so it is rendered from its translation key and never restated here.
 
 import FigurePortrait from './FigurePortrait.astro';
 import FigureTrailer from '../islands/FigureTrailer';
 import { getT } from '../i18n';
 import type { Lang } from '../i18n';
 import { getPublicTrailerUrl } from '@client/utils/public/publicMediaUrl';
-import { getHeroEntryQuestion } from '@client/data/public/heroEntry';
-import { getFigureWorld, numberWord, capitalize } from '../lib/figureWorld';
+import { getSeedsFor } from '../lib/seeds';
+import { getStoryChapter } from '../lib/stories';
+import { getFigureWorld, numberWord, capitalize, cleanDisplayText } from '../lib/figureWorld';
 
 interface Figure {
   id: string;
@@ -36,14 +41,18 @@ const de = lang === 'de';
 
 const S = de
   ? {
-      askLabel: 'Deine erste Frage',
+      begin: `Mit ${figure.name} beginnen`,
+      chapterWord: 'Kapitel',
+      min: 'Min.',
       worldChapters: 'Kapitel',
       worldCouncils: 'Debatten',
       worldEdges: 'Ideen, die mit den Ideen anderer sprechen',
       noscript: 'Intro anhören (MP3)',
     }
   : {
-      askLabel: 'Your first question',
+      begin: `Begin with ${figure.name}`,
+      chapterWord: 'Chapter',
+      min: 'min',
       worldChapters: 'chapters',
       worldCouncils: 'debates',
       worldEdges: "ideas that talk to other people's ideas",
@@ -56,10 +65,18 @@ const metaLine = [figure.tradition, figure.period].filter(Boolean).join('  ·  '
 const trailerMp3 = getPublicTrailerUrl(figure.id, lang, 'mp3');
 const chapterHref = `/app?figure=${slug}&lang=${lang}&mode=story&chapter=1`;
 
-// The one question this figure's page carries into the app. The tag names the
-// question, the app renders it in its own language: no free text on the URL.
-const question = getHeroEntryQuestion(figure.id, lang);
-const askHref = `/app?figure=${slug}&lang=${lang}&ask=f:${figure.id}:1`;
+// The one gold door. It carries the figure, nothing else: the choosing place
+// on the other side is where the visitor picks the path or their own question.
+const beginHref = `/app?figure=${slug}&lang=${lang}`;
+
+// Chapter one, from the produced catalogs: the title the twelve-chapter rail
+// below uses for chapter 1 and the runtime the story file reports. Nothing is
+// written by hand, and a figure missing either half drops that half.
+const chapterTitle = cleanDisplayText(getSeedsFor(figure.id, lang)[0]?.title);
+const chapterMinutes = getStoryChapter(figure.id, lang, 1)?.minutes;
+let chapterBeat = `${S.chapterWord} 1`;
+if (chapterTitle) chapterBeat += `: ${chapterTitle}`;
+if (chapterMinutes) chapterBeat += `  ·  ${chapterMinutes} ${S.min}`;
 
 // The size of this figure's world, counted from the data every build.
 const world = getFigureWorld(figure.id, lang);
@@ -70,13 +87,15 @@ const worldLine = [
 ].filter(Boolean).join(' ');
 ---
 <section class="pub-fig-hero">
-  <div class="pub-fig-hero__portrait">
-    <FigurePortrait figureId={figure.id} name={figure.name} lang={lang} />
-  </div>
+  <figure class="pub-fig-hero__figure">
+    <div class="pub-fig-hero__portrait">
+      <FigurePortrait figureId={figure.id} name={figure.name} lang={lang} />
+    </div>
+    <figcaption class="pub-fig-hero__caption">{t('figures.echoGloss')}</figcaption>
+  </figure>
   <div class="pub-fig-hero__text">
     <p class="pub-fig-hero__eyebrow">{t('figures.echoOf')}</p>
     <h1 class="pub-fig-hero__name">{figure.name}</h1>
-    <p class="pub-fig-hero__meta">{t('figures.echoGloss')}</p>
     {metaLine && <p class="pub-fig-hero__meta">{metaLine}</p>}
 
     <FigureTrailer client:visible figureId={figure.id} lang={lang} chapterHref={chapterHref} />
@@ -88,56 +107,79 @@ const worldLine = [
       <p class="pub-fig-hero__learn">{`“${figure.learn}”`}</p>
     )}
 
-    {question && (
+    <p class="fig-hero-chapter">
       <a
-        class="fig-ask"
-        href={askHref}
+        class="fig-hero-chapter__link"
+        href={chapterHref}
         data-agc-cta="start-exploring"
         data-agc-figure={figure.id}
-        data-agc-door="fig_hero_ask"
-      >
-        <span class="fig-ask__label">{S.askLabel}</span>
-        <span class="fig-ask__q">{question}</span>
-      </a>
-    )}
+        data-agc-door="fig_hero_chapter"
+      >{chapterBeat}<span class="fig-hero-chapter__go" aria-hidden="true"> →</span></a>
+    </p>
+
+    <p class="fig-begin">
+      <a
+        class="fig-begin__button pub-cta__button"
+        href={beginHref}
+        data-agc-cta="start-exploring"
+        data-agc-figure={figure.id}
+        data-agc-door="fig_begin"
+      >{S.begin}</a>
+    </p>
 
     <p class="pub-fig-hero__world">{worldLine}</p>
   </div>
 </section>
 
 <style is:global>
-  /* The hero question: the page's one gold primary above the fold. */
-  .fig-ask {
-    display: block;
-    margin: 1.4rem 0 0;
-    padding: 0.85rem 1.1rem;
-    min-height: 44px;
-    border: 1px solid color-mix(in srgb, var(--gold-primary) var(--a-45, 45%), transparent);
-    border-radius: var(--plate-radius, 4px);
-    background: color-mix(in srgb, var(--gold-primary) var(--a-08, 8%), transparent);
-    text-decoration: none;
-    transition: border-color var(--transition-base), background var(--transition-base);
+  /* The portrait and its caption travel together, so the disclosure reads as
+     what it is: the note under the picture. */
+  .pub-fig-hero__figure {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0;
+    flex-shrink: 0;
   }
-  .fig-ask:hover,
-  .fig-ask:focus-visible {
-    border-color: var(--gold-primary);
-    background: color-mix(in srgb, var(--gold-primary) var(--a-12, 12%), transparent);
-  }
-  .fig-ask__label {
-    display: block;
+  .pub-fig-hero__caption {
+    margin: 0.85rem 0 0;
+    max-width: 30ch;
     font-family: var(--font-ui, 'Space Grotesk', sans-serif);
-    font-size: 0.68rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--gold-deep);
-    margin-bottom: 0.35rem;
+    font-size: 0.7rem;
+    line-height: 1.6;
+    letter-spacing: 0.02em;
+    color: var(--text-dim);
   }
-  .fig-ask__q {
-    display: block;
-    font-family: var(--font-content, 'Libre Caslon Text', serif);
-    font-size: 1.05rem;
-    line-height: 1.45;
-    color: var(--text-primary);
+  /* Chapter one as a quiet door under the promise: it names the chapter and
+     the runtime, and the click plays that chapter. */
+  .fig-hero-chapter { margin: 1.2rem 0 0; }
+  .fig-hero-chapter__link {
+    display: inline-block;
+    min-height: 44px;
+    padding: 0.6rem 0;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: 0.82rem;
+    line-height: 1.5;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: color var(--transition-base);
+  }
+  .fig-hero-chapter__link:hover,
+  .fig-hero-chapter__link:focus-visible { color: var(--gold-primary); }
+  .fig-hero-chapter__go { color: var(--gold-deep); }
+  /* The one gold door, the site's primary /app button fitted to the hero
+     column. German names run long, so the label wraps instead of ragging. */
+  .fig-begin { margin: 0.9rem 0 0; }
+  .fig-begin__button {
+    width: fit-content;
+    max-width: 100%;
+    padding: 0.85rem 1.7rem;
+    border-radius: var(--plate-radius, 4px);
+    white-space: normal;
+    line-height: 1.3;
+    text-wrap: balance;
   }
   .pub-fig-hero__world {
     margin: 1.1rem 0 0;
@@ -155,6 +197,8 @@ const worldLine = [
     border-color: color-mix(in srgb, var(--gold-primary) var(--a-45, 45%), transparent);
   }
   @media (min-width: 820px) {
-    .fig-ask { max-width: 34rem; }
+    /* the caption belongs to the portrait column, so it keeps its width */
+    .pub-fig-hero__figure { align-items: flex-start; }
+    .pub-fig-hero__caption { max-width: 340px; }
   }
 </style>

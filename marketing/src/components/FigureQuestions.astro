@@ -1,17 +1,16 @@
 ---
 // The questions block: one tap into the app, carrying the question with it.
 //
-// Two doors ship today and both are live end to end:
-//   Q1  the figure's own entry question   ?ask=f:{figureId}:1
-//   Q3  the real question of the debate the figure leads   ?q={councilId}
+// NOT RENDERED ANYWHERE TODAY. Figure pages carried it twice (above and below
+// the body) until the front-door revision made them a path surface: the ask
+// moment moved one tap in, to the choosing place, where the visitor picks it
+// instead of the page picking for them. Kept because the three doors below are
+// wired end to end and a future surface may want them.
 //
-// Q2, the idea question, is written per figure in figurePageContent.ts and is
-// deliberately NOT rendered yet. Its door would be ?ask=f:{figureId}:2, and the
-// app's ask table resolves slot 2 back to slot 1 today
-// (client/src/utils/public/entryIntent.ts, resolveAskPrefill), so the card would
-// promise one question and deliver another. Click-promise coherence beats
-// completeness.
-// Slot 2 resolves app-side to the figure's idea question (figurePageContent).
+// The three doors, all live app-side:
+//   Q1  the figure's own entry question   ?ask=f:{figureId}:1
+//   Q2  the figure's idea question, from figurePageContent   ?ask=f:{figureId}:2
+//   Q3  the real question of the debate the figure leads   ?q={councilId}
 
 import type { Lang } from '../i18n';
 import StaticImage from './StaticImage.astro';
