@@ -1,0 +1,33 @@
+/* RoomContainer.css
+   The wrapper carries state, never appearance. display: contents keeps it out
+   of layout entirely, so every child sits exactly where it sat before the
+   wrapper existed. What ships here is the one dial a room needs, the accent ink
+   of its state; rules for a room hang off [data-room-state] when it earns a
+   look of its own. */
+
+.room-container {
+  display: contents;
+}
+
+.room-container[data-room-state='story'],
+.room-container[data-room-state='chapterend'],
+.room-container[data-room-state='woven'] {
+  --room-accent: var(--gold-base);
+}
+
+.room-container[data-room-state='wisdom'] {
+  --room-accent: var(--purple-base);
+}
+
+.room-container[data-room-state='prism'] {
+  --room-accent: var(--prism-base);
+}
+
+.room-container[data-room-state='quest'] {
+  --room-accent: var(--coral-base);
+}
+
+.room-container[data-room-state='asking'],
+.room-container[data-room-state='voice'] {
+  --room-accent: var(--mint-base);
+}

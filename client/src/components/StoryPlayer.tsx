@@ -8,6 +8,7 @@ import StoryAudioPlayer from './StoryAudioPlayer';
 import Button from './Button/Button';
 import HelperPopup from './HelperPopup/HelperPopup';
 import { StoryFactCheckPanel } from './FactCheck';
+import RoomContainer from './RoomContainer';
 import { ForewordModal } from './Foreword';
 import { figureHasForeword } from '../hooks/useForeword';
 import useStoryHighlighting from '../hooks/useStoryHighlighting';
@@ -117,7 +118,7 @@ function storyPlayerReducer(state: StoryPlayerState, action: StoryPlayerAction):
   }
 }
 
-const StoryPlayer: FC<StoryPlayerProps> = ({
+const StoryPlayerSurface: FC<StoryPlayerProps> = ({
   figure,
   figureName,
   storyData,
@@ -1081,6 +1082,26 @@ const StoryPlayer: FC<StoryPlayerProps> = ({
         />
       )}
     </div>
+  );
+};
+
+// The story is the second talking surface, so it names the room it renders in.
+// The end card is its own room: the player already announces that card for the
+// cards that must yield to it, so the room reads the same signal instead of
+// threading state back out. The wrapper is layout-neutral (display: contents).
+const StoryPlayer: FC<StoryPlayerProps> = (props) => {
+  const [atChapterEnd, setAtChapterEnd] = useState<boolean>(false);
+
+  useEffect(() => {
+    const sync = (e: Event) => setAtChapterEnd(Boolean((e as CustomEvent).detail?.visible));
+    window.addEventListener('storyHandoffVisible', sync);
+    return () => window.removeEventListener('storyHandoffVisible', sync);
+  }, []);
+
+  return (
+    <RoomContainer state={atChapterEnd ? 'chapterend' : undefined}>
+      <StoryPlayerSurface {...props} />
+    </RoomContainer>
   );
 };
 

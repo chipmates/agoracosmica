@@ -1833,14 +1833,24 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
     );
   }, [selectedFigure?.id, selectedSeed?.id]);
 
+  // The archive door in the fresh state did not exist before the bar's widened
+  // gate, so the intent behind it was unmeasurable. Counted only there, so the
+  // number keeps answering that one question.
+  const handleHistoryQuickLink = useCallback(() => {
+    if (NAV_BATCH && !conversationStartedFinal && !derivedConversationStarted) {
+      sendFunnelBeacon('nav_open', { figureId: selectedFigure?.id, mode: 'history_fresh' });
+    }
+    handleHistoryModalOpen();
+  }, [conversationStartedFinal, derivedConversationStarted, selectedFigure?.id, handleHistoryModalOpen]);
+
   const mainContentQuickActions = useMemo(
     () => ({
       showQuickLinkBar: !showFigureCarousel && !isCouncilMode &&
         (conversationStartedFinal || derivedConversationStarted || selectedFigureHasStoredHistory),
       handleQuickAction,
-      handleHistoryModalOpen
+      handleHistoryModalOpen: handleHistoryQuickLink
     }),
-    [showFigureCarousel, isCouncilMode, conversationStartedFinal, derivedConversationStarted, selectedFigureHasStoredHistory, handleQuickAction, handleHistoryModalOpen]
+    [showFigureCarousel, isCouncilMode, conversationStartedFinal, derivedConversationStarted, selectedFigureHasStoredHistory, handleQuickAction, handleHistoryQuickLink]
   );
 
   useEffect(() => scheduleRenderLog('initial-mount'), [scheduleRenderLog]);

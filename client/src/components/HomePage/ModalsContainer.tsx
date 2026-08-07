@@ -43,6 +43,18 @@ interface ModalsContainerProps {
 
 }
 
+// The welcome disclosure is a required consent gate but it loads lazily, so
+// between "show it" and the chunk arriving there is a window with nothing over
+// the app. A figure click inside that window persists a selection, which alone
+// classifies the visitor as returning and closes the gate for good. This shield
+// covers exactly that window: it exists only while the gate is open and the
+// chunk is still in flight, and it carries no appearance of its own.
+const WELCOME_GATE_SHIELD: React.CSSProperties = {
+  position: 'fixed',
+  inset: 0,
+  zIndex: 9999,
+};
+
 /**
  * Container for all modal components
  * Extracted from HomePage to reduce complexity
@@ -119,7 +131,7 @@ const ModalsContainer: FC<ModalsContainerProps> = ({
         selectedMode={selectedMode ?? undefined}
       />
       
-      <Suspense fallback={null}>
+      <Suspense fallback={showOnboarding ? <div style={WELCOME_GATE_SHIELD} /> : null}>
         <WelcomeDisclosureModal
           isOpen={showOnboarding}
           onComplete={handleOnboardingComplete}

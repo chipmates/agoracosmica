@@ -19,6 +19,7 @@ import { useDomainStore } from '../stores';
 import { readCarriedThread, hasCarriedQuestionPending, CARRIED_THREAD_EVENT } from '../utils/public/entryIntent';
 import { ANSWER_FIRST_REPLY, ANSWER_PROVENANCE } from '../config/features';
 import { ProvenanceChip, ChapterDoor } from './ProvenanceChip';
+import RoomContainer from './RoomContainer';
 
 interface UserProfile {
   name: string | null;
@@ -44,7 +45,7 @@ interface ChatBoxProps {
   isAudioPlaying?: boolean;
 }
 
-const ChatBox: FC<ChatBoxProps> = ({
+const ChatBoxSurface: FC<ChatBoxProps> = ({
   messages,
   selectedFigureName,
   isLoading = false,
@@ -400,5 +401,14 @@ const ChatBox: FC<ChatBoxProps> = ({
     </div>
   );
 };
+
+// The chat log is one of the two talking surfaces, so it names the room it
+// renders in. The wrapper is layout-neutral (display: contents), so nothing
+// inside moves.
+const ChatBox: FC<ChatBoxProps> = (props) => (
+  <RoomContainer>
+    <ChatBoxSurface {...props} />
+  </RoomContainer>
+);
 
 export default ChatBox;

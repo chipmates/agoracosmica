@@ -9,6 +9,7 @@ import { useTranslation } from '../hooks/useTranslation';
 import WisdomMapModal from './WisdomMapModal';
 import type { Figure, Seed } from '../types/global';
 import { useFigureTrailer } from '../hooks/useFigureTrailer';
+import { sendFunnelBeacon } from '../utils/funnelBeacon';
 import { NAV_BATCH } from '../config/features';
 import './FigureCarousel.css';
 
@@ -541,10 +542,14 @@ const FigureCarousel: FC<FigureCarouselProps> = ({
         {...handlers}
       >
         {/* The carousel fills the screen and hides the rail, so it has to carry
-            its own exit. ESC alone leaves phones with no way out. */}
+            its own exit. ESC alone leaves phones with no way out. The beacon
+            counts the visible door only: how often the way out is wanted. */}
         {NAV_BATCH && (
           <CloseButton
-            onClick={onClose}
+            onClick={() => {
+              sendFunnelBeacon('nav_open', { figureId: currentFigure?.id, mode: 'carousel_exit' });
+              onClose();
+            }}
             className="figure-carousel-close"
             ariaLabel={tString('common.close', 'Close')}
           />

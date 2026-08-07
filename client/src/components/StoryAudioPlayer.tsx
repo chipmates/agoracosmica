@@ -57,7 +57,13 @@ const StoryAudioPlayer: FC<StoryAudioPlayerProps> = ({
     autoplay: false,
     initialVolume: 1.0,
     onPlaybackComplete,
-    onError: onError ? (error) => onError(error instanceof Error ? error : new Error(String(error))) : undefined,
+    // A media element hands its handler a DOM Event, which stringifies to
+    // "[object Event]" and would reach the visitor's error box verbatim.
+    onError: onError
+      ? (error) => onError(error instanceof Error
+          ? error
+          : new Error(typeof error === 'string' ? error : 'Audio could not be loaded'))
+      : undefined,
     playbackBeacon
   });
 

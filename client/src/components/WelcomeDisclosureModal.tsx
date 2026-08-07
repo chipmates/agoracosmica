@@ -7,7 +7,7 @@ import CosmicLogo from './CosmicLogo';
 import styles from './WelcomeDisclosureModal.module.css';
 import { preferencesIndexedDbAdapter } from '../storage/preferencesIndexedDbAdapter';
 import { LocalStorageAdapter } from '../storage/localAdapter';
-import { HISTORY_PREFIXES } from '../utils/userState';
+import { HISTORY_PREFIXES, CURRENT_AGB_VERSION } from '../utils/userState';
 import { sendEntryBeacon } from '../utils/entryBeacon';
 import { sendSignupBeacon } from '../utils/signupBeacon';
 import { sendFunnelBeaconOnce } from '../utils/funnelBeacon';
@@ -19,8 +19,6 @@ interface WelcomeDisclosureModalProps {
   onComplete: () => void;
   onSkip: () => void;
 }
-
-const CURRENT_AGB_VERSION = '1.0.0';
 
 const WelcomeDisclosureModal: FC<WelcomeDisclosureModalProps> = ({ isOpen, onComplete, onSkip }) => {
   const { tString, tNode, language } = useTranslation();

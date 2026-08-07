@@ -1,8 +1,7 @@
 // Per-figure entry question — the one table behind "what you clicked is what
-// you get". The landing hero shows a different first question per figure, so
-// the app has to prefill exactly that one, in the visitor's language. The same
-// strings are rendered by marketing/src/scripts/agora-hero.js (RAW columns
-// 8/9); the two must stay in step.
+// you get". A question door names one of these, and the app prefills exactly
+// that question in the visitor's language. This is the canonical table; the
+// public pages resolve their question doors against the same ids.
 //
 // seedId is the anchor teaching that answers the question. It is never shown
 // at entry, only selected as the conversation's seed context so the reply is

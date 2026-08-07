@@ -17,10 +17,50 @@ export const HISTORY_PREFIXES: readonly string[] = [
 ] as const;
 
 /**
- * Checks if the user is new based on the absence of chat history and preferences
- * @returns True if the user appears to be new
+ * Version of the disclosure the consent record was written against. Single
+ * site: the welcome modal stamps it, the gate below compares against it, so a
+ * future wording change re-prompts every device by bumping this one line.
+ */
+export const CURRENT_AGB_VERSION = '1.0.0';
+
+const CONSENT_STORAGE_KEY = 'agb_consent';
+
+/**
+ * The stored consent record, or null when it is missing, blocked or unreadable.
+ */
+const readConsentRecord = (): { version?: unknown } | null => {
+  try {
+    const raw = localStorage.getItem(CONSENT_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed: unknown = JSON.parse(raw);
+    return typeof parsed === 'object' && parsed !== null ? (parsed as { version?: unknown }) : null;
+  } catch {
+    return null;
+  }
+};
+
+/**
+ * Has this device accepted the CURRENT disclosure? A missing record and a
+ * record stamped with an older version both answer no, so the disclosure is
+ * shown again rather than assumed from a past acceptance.
+ */
+export const hasCurrentConsent = (): boolean =>
+  readConsentRecord()?.version === CURRENT_AGB_VERSION;
+
+/**
+ * Checks whether the welcome disclosure still has to be shown: no consent
+ * record for the current version, or none of the post-consent signals (chat
+ * history, a selected figure, a completed or skipped onboarding) present.
+ *
+ * The consent record is checked first because the three signals below are only
+ * proxies for having passed the gate. Without it a lost record, or a record
+ * predating a wording change, would silently keep the disclosure closed.
+ *
+ * @returns True if the user has not passed the current disclosure
  */
 export const isNewUser = (): boolean => {
+  if (!hasCurrentConsent()) return true;
+
   // Check if any history exists (updated for new storage system)
   const hasAnyHistory: boolean = LocalStorageAdapter.keys().some((key) =>
     HISTORY_PREFIXES.some((prefix) => key.startsWith(prefix))
