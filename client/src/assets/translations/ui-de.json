@@ -1144,12 +1144,16 @@
     },
     "doors": {
       "title": "Wie möchtest du mit {name} beginnen?",
+      "standardMarker": "Die meisten beginnen hier",
       "storyTitle": "Fang mit der Geschichte an",
-      "storyBody": "Es beginnt mit einer erzählten Szene aus einem Leben. Du sprichst sie durch, hörst sie im Streitgespräch und machst sie dir zu eigen.",
+      "storyBody": "Es beginnt mit einer erzählten Szene aus einem Leben. Die Geschichte legt den Grund für alles Weitere. Du sprichst sie durch, hörst sie im Streitgespräch und machst sie dir zu eigen.",
       "storyMeta": "Vier Kapitel. Das erste dauert rund 15 Minuten.",
+      "storyMetaTimed": "Vier Kapitel. Das erste dauert rund {minutes} Minuten.",
       "talkTitle": "Frag einfach etwas",
-      "talkBody": "Kein Weg, keine Kapitel. Bring eine Frage mit, und das Echo antwortet.",
+      "talkTitleStaged": "Stell deine Frage",
+      "talkBody": "Deine Frage gibt die Richtung vor. Gut, wenn die Zeit knapp ist oder dich etwas beschäftigt.",
       "talkMeta": "Sofort. 30 kostenlose Nachrichten pro Tag.",
+      "stagedLabel": "Deine Frage wartet:",
       "allWays": "Alle Wege ansehen",
       "arcEyebrow": "Der Lernweg · Kapitel 1 von 4"
     }

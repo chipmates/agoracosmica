@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, FC, CSSProperties } from 'react';
+import { useState, useEffect, useMemo, useRef, FC, CSSProperties } from 'react';
 import ReactDOM from 'react-dom';
 import { Bird, Books, Sparkle, Mountains, DiamondsFour } from '@phosphor-icons/react';
 import { CloseButton } from './Button';
@@ -7,9 +7,20 @@ import { isStoryCompleted, isPrismCompleted, STORAGE_KEYS } from '../utils/stora
 import { isFirstContactForFigure, resolveNodeState } from '../utils/flowDecisions';
 import { LocalStorageAdapter } from '../storage/localAdapter';
 import { sendFunnelBeacon } from '../utils/funnelBeacon';
+import { peekStagedQuestion } from '../utils/public/entryIntent';
 import useTranslation from '../hooks/useTranslation';
 import type { Figure, Seed } from '../types/global';
 import './ModeSelector-Mini.css';
+
+// Real chapter-1 length per figure, from the generated story catalogs. Sixty
+// files, so the glob stays lazy and only the open figure's language file is
+// fetched; the static meta line stands in until it arrives.
+interface StoryCatalog {
+  chapters: Array<{ segment: number; minutes: number }>;
+}
+const storyCatalogs = import.meta.glob<{ default: StoryCatalog }>(
+  '../data/public/stories/*/*.json'
+);
 
 // Eclipse mode definitions — clockwise: Story (12), Wisdom (3), Prism (6), Quest (9)
 // Orbital coordinates: x/y normalized (-1 to 1), like council SolarSystemInterface
@@ -37,7 +48,7 @@ const ModeSelectorMini: FC<ModeSelectorMiniProps> = ({
   selectedFigure,
   selectedSeed
 }) => {
-  const { tString } = useTranslation();
+  const { tString, language } = useTranslation();
 
   // Track window width for responsive icon sizes
   const [windowWidth, setWindowWidth] = useState<number>(window.innerWidth);
@@ -96,6 +107,32 @@ const ModeSelectorMini: FC<ModeSelectorMiniProps> = ({
       )
     : false;
   const [showAllWays, setShowAllWays] = useState<boolean>(false);
+
+  // The question a public-page door carried in. Shown, never consumed: the
+  // composer still picks it up once Free Talk opens.
+  const stagedQuestion = useMemo(
+    () => (isOpen ? peekStagedQuestion(selectedFigure?.id ?? null, language, tString) : null),
+    [isOpen, selectedFigure?.id, language, tString]
+  );
+
+  // Chapter 1's real running time, for the honest meta line on the story door.
+  const [chapterMinutes, setChapterMinutes] = useState<number | null>(null);
+  useEffect(() => {
+    setChapterMinutes(null);
+    if (!isOpen || !isFirstContact || !selectedFigure) return;
+    const loader = storyCatalogs[`../data/public/stories/${language}/${selectedFigure.id}.json`];
+    if (!loader) return;
+    let alive = true;
+    loader()
+      .then((mod) => {
+        const minutes = mod.default?.chapters?.find((c) => c.segment === 1)?.minutes;
+        if (alive && typeof minutes === 'number' && minutes > 0) setChapterMinutes(minutes);
+      })
+      .catch(() => {
+        // catalog chunk unavailable — the static meta line stands
+      });
+    return () => { alive = false; };
+  }, [isOpen, isFirstContact, selectedFigure, language]);
 
   const [animatingOut, setAnimatingOut] = useState<boolean>(false);
   const modalRef = useRef<HTMLDivElement>(null);
@@ -267,8 +304,9 @@ const ModeSelectorMini: FC<ModeSelectorMiniProps> = ({
               <button className="doors-door doors-door--story" onClick={() => handleModeSelect('introduction')}>
                 <Books size={30} weight="duotone" className="doors-door-icon" />
                 <span className="doors-door-eyebrow">{tString('modes.doors.arcEyebrow', 'The learning arc · Chapter 1 of 4')}</span>
+                <span className="doors-door-standard">{tString('modes.doors.standardMarker', 'Most people start here')}</span>
                 <span className="doors-door-name">{tString('modes.doors.storyTitle', 'Begin the story')}</span>
-                <span className="doors-door-body">{tString('modes.doors.storyBody', 'It starts with a narrated scene from a life. You talk it through, hear it debated, then make it yours.')}</span>
+                <span className="doors-door-body">{tString('modes.doors.storyBody', 'It starts with a narrated scene from a life. The story lays the ground for everything after. You talk it through, hear it debated, then make it yours.')}</span>
                 {/* The arc, legible at a glance: four chapter glyphs, the
                     first one lit. Decorative, the eyebrow and body carry the
                     same information as text. */}
@@ -283,13 +321,28 @@ const ModeSelectorMini: FC<ModeSelectorMiniProps> = ({
                     );
                   })}
                 </span>
-                <span className="doors-door-meta">{tString('modes.doors.storyMeta', 'Four chapters. The first takes around 15 minutes.')}</span>
+                <span className="doors-door-meta">
+                  {chapterMinutes
+                    ? tString('modes.doors.storyMetaTimed', 'Four chapters. The first takes around {minutes} minutes.')
+                        .replace('{minutes}', String(chapterMinutes))
+                    : tString('modes.doors.storyMeta', 'Four chapters. The first takes around 15 minutes.')}
+                </span>
               </button>
               <button className="doors-door doors-door--talk" onClick={() => handleModeSelect('free_conversation')}>
                 <Bird size={30} weight="duotone" className="doors-door-icon" />
                 <span className="doors-door-eyebrow">{tString('modes.selector.freetalk.title', 'Free Talk')}</span>
-                <span className="doors-door-name">{tString('modes.doors.talkTitle', 'Just ask something')}</span>
-                <span className="doors-door-body">{tString('modes.doors.talkBody', 'No path, no chapters. Bring a question and the Echo answers.')}</span>
+                <span className="doors-door-name">
+                  {stagedQuestion
+                    ? tString('modes.doors.talkTitleStaged', 'Ask your question')
+                    : tString('modes.doors.talkTitle', 'Just ask something')}
+                </span>
+                {stagedQuestion && (
+                  <span className="doors-staged">
+                    <span className="doors-staged-label">{tString('modes.doors.stagedLabel', 'Your question is waiting:')}</span>
+                    <span className="doors-staged-text">{stagedQuestion.text}</span>
+                  </span>
+                )}
+                <span className="doors-door-body">{tString('modes.doors.talkBody', 'Your question sets the direction. Good when time is short, or when something is already on your mind.')}</span>
                 <span className="doors-door-meta">{tString('modes.doors.talkMeta', 'Right now. 30 free messages a day.')}</span>
               </button>
             </div>
@@ -302,18 +355,28 @@ const ModeSelectorMini: FC<ModeSelectorMiniProps> = ({
         {/* Freetalk card — top billing, separate from chapter system */}
           <div className="mode-selector-header">
             <button
-              className="eclipse-freetalk-card"
+              className={`eclipse-freetalk-card${stagedQuestion ? ' eclipse-freetalk-card--staged' : ''}`}
               onClick={() => handleModeSelect('free_conversation')}
               aria-label={tString('modes.selector.freetalk.title', 'Freetalk')}
             >
               <Bird size={20} weight="duotone" className="eclipse-freetalk-card-icon" />
               <div className="eclipse-freetalk-card-text">
-                <span className="eclipse-freetalk-card-title">
-                  {tString('modes.selector.freetalkCta')}
+                <span className="eclipse-freetalk-card-line">
+                  <span className="eclipse-freetalk-card-title">
+                    {tString('modes.selector.freetalkCta')}
+                  </span>
+                  <span className="eclipse-freetalk-card-sub">
+                    {tString('modes.selector.freetalkCtaSub')}
+                  </span>
                 </span>
-                <span className="eclipse-freetalk-card-sub">
-                  {tString('modes.selector.freetalkCtaSub')}
-                </span>
+                {stagedQuestion && (
+                  <span className="eclipse-freetalk-card-staged">
+                    <span className="eclipse-freetalk-card-staged-label">
+                      {tString('modes.doors.stagedLabel', 'Your question is waiting:')}
+                    </span>
+                    <span className="eclipse-freetalk-card-staged-text">{stagedQuestion.text}</span>
+                  </span>
+                )}
               </div>
             </button>
 

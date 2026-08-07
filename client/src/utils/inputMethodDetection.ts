@@ -15,10 +15,17 @@ export type InputToggleCallback = () => void;
 export type CleanupFunction = () => void;
 
 /**
- * Check if user prefers text input based on stored preferences
+ * Whether the composer should open on the keyboard. With no stored preference
+ * the answer is yes: arriving on an open microphone asks for a decision nobody
+ * came to make. Only an explicit saved choice can select voice.
  */
 export const preferTextInput = (): boolean => {
-  return localStorage.getItem('preferTextInput') === 'true';
+  try {
+    const stored = localStorage.getItem('preferTextInput');
+    return stored === null ? true : stored === 'true';
+  } catch {
+    return true;
+  }
 };
 
 /**

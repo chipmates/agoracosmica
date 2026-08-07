@@ -154,9 +154,10 @@
 
 .eclipse-freetalk-card-text {
   display: flex;
-  flex-direction: row;
-  align-items: baseline;
-  gap: 0.45rem;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+  min-width: 0;
 }
 
 .eclipse-freetalk-card-title {
@@ -1292,4 +1293,116 @@
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+/* The quiet marker that names the story door as the standard way in. Sits
+   under the kicker, deliberately lighter than both the kicker and the name. */
+.doors-door-standard {
+  margin-top: -0.2rem;
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.72rem;
+  line-height: 1.3;
+  color: color-mix(in srgb, var(--gold-subtle) 50%, var(--text-tertiary));
+}
+
+/* The visitor's own words, held on the talk door until they walk through it.
+   Left-aligned and set in the reading serif so it reads as a quotation inside
+   a centered card, never as more UI copy. */
+.doors-staged {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  width: 100%;
+  max-width: 30ch;
+  margin-top: 0.25rem;
+  padding: 0.15rem 0 0.15rem 0.7rem;
+  border-left: 2px solid color-mix(in srgb, var(--star-blue-light) 60%, transparent);
+  text-align: left;
+}
+
+.doors-staged-label {
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.66rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.doors-staged-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-family: var(--font-content, 'Libre Caslon Text', serif);
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: var(--text-primary);
+}
+
+@media (max-width: 640px) {
+  .doors-staged {
+    max-width: none;
+    padding-left: 0.6rem;
+  }
+  .doors-staged-text {
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    font-size: 0.85rem;
+  }
+}
+
+/* The same carried question on the returner's freetalk card: one line, cut
+   with an ellipsis, so the card keeps its compact shape above the eclipse.
+   The wider cap is desktop only, where the close button is far away; the
+   phone caps stay untouched and the line just runs shorter there. */
+.eclipse-freetalk-card-line {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  gap: 0.45rem;
+}
+
+@media (min-width: 768px) {
+  .eclipse-freetalk-card.eclipse-freetalk-card--staged {
+    max-width: min(680px, calc(100vw - 8rem));
+  }
+}
+
+.eclipse-freetalk-card--staged {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.eclipse-freetalk-card-staged {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.eclipse-freetalk-card-staged-label {
+  margin-right: 0.35rem;
+  color: var(--text-tertiary);
+}
+
+.eclipse-freetalk-card-staged-text {
+  font-family: var(--font-content, 'Libre Caslon Text', serif);
+  color: color-mix(in srgb, var(--mode-freetalk) 35%, var(--text-primary));
+}
+
+/* Phones keep the narrow card that clears the close button, so the question
+   gets a second line there instead of being cut after three words. */
+@media (max-width: 767px) {
+  .eclipse-freetalk-card-staged {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    white-space: normal;
+  }
 }

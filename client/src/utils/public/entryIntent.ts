@@ -228,6 +228,21 @@ export function stashAskPrefill(tag: string): void {
   announcePrefill();
 }
 
+/**
+ * Non-consuming read of the staged ask tag. The anchor seed is selected only
+ * when Free Talk actually opens (a routing-time selection would make the gold
+ * door begin the story at the anchor chapter instead of chapter 1), and that
+ * read must not disturb the composer's later consume.
+ */
+export function peekAskPrefillTag(): string | null {
+  try {
+    if (typeof sessionStorage === 'undefined') return null;
+    return sessionStorage.getItem(SS_ASK_PREFILL_KEY);
+  } catch {
+    return null;
+  }
+}
+
 /** One-shot read of the staged prefill tag (clears on read). */
 export function consumeAskPrefill(): string | null {
   try {
@@ -268,6 +283,41 @@ export function consumeCouncilPrefill(): string | null {
     const text = sessionStorage.getItem(SS_COUNCIL_PREFILL_KEY);
     if (text !== null) sessionStorage.removeItem(SS_COUNCIL_PREFILL_KEY);
     return text;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Non-consuming read of whatever question is staged right now. The mode
+ * ceremony shows the visitor their own words before they pick a door, and the
+ * composer still consumes the stash later, so this must not clear anything.
+ * `resolveKey` is only needed for the two tags that name a translated string
+ * rather than a table entry; without it those read as nothing staged.
+ */
+export interface StagedQuestion {
+  text: string;
+  source: 'ask' | 'council';
+}
+
+export function peekStagedQuestion(
+  figureId: string | null,
+  lang: string,
+  resolveKey?: (key: string) => string
+): StagedQuestion | null {
+  try {
+    if (typeof sessionStorage === 'undefined') return null;
+    // Same precedence as the composer: council text wins over an ask tag.
+    const councilText = sessionStorage.getItem(SS_COUNCIL_PREFILL_KEY);
+    if (councilText) return { text: councilText, source: 'council' };
+    const prefill = resolveAskPrefill(
+      sessionStorage.getItem(SS_ASK_PREFILL_KEY),
+      figureId,
+      lang
+    );
+    if (!prefill) return null;
+    const text = prefill.kind === 'text' ? prefill.text : resolveKey?.(prefill.key) ?? '';
+    return text ? { text, source: 'ask' } : null;
   } catch {
     return null;
   }

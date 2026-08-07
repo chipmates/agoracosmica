@@ -55,8 +55,9 @@ import PostQuestVerdictCard from '../components/QuestVerdictCard/PostQuestVerdic
 import { getPendingQuestVerdict, clearPendingQuestVerdict } from '../utils/questVerdict';
 import { restartQuest } from '../utils/questRestart';
 import { LocalStorageAdapter } from '../storage/localAdapter';
-import { readFigureIntent, clearFigureIntent, readCouncilIntent, clearCouncilIntent, readAskIntent, clearAskIntent, stashAskPrefill, stageCouncilHandoff, readStoryIntent, clearStoryIntent } from '../utils/public/entryIntent';
-import { getHeroEntrySeedId } from '../data/public/heroEntry';
+import { readFigureIntent, clearFigureIntent, readCouncilIntent, clearCouncilIntent, readAskIntent, clearAskIntent, stashAskPrefill, stageCouncilHandoff, readStoryIntent, clearStoryIntent, peekAskPrefillTag } from '../utils/public/entryIntent';
+import { resolveAnchorSeedId } from '../data/public/heroEntry';
+import { CEREMONY_CARRIED_ENTRY } from '../config/features';
 import { preferencesAdapter } from '../storage/preferencesAdapter';
 import { readHistoryMessages } from '../services/history/historyEncryption';
 import { registerSessionControllerHandlers } from '../controllers/sessionControllerRegistry';
@@ -134,6 +135,9 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
   // Debounce ref for fetchHistory calls
   const fetchHistoryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const handleModeSelectRef = useRef<(mode: string, force?: boolean) => void>(() => {});
+  // Anchor selection is deferred to the moment Free Talk opens; the callback
+  // is defined far below handleModeSelect, so it rides a ref like the one above.
+  const selectAnchorSeedRef = useRef<(figureId: string, tag: string) => void>(() => {});
   // Timestamp of last handleSeedSelect call — Effect#14 skips within 500ms to prevent double-firing
   const lastSeedSelectTimeRef = useRef(0);
   // Flag: when true, handleSelectFigure is handling mode — Effect#14 must not interfere
@@ -677,6 +681,19 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
             console.warn('[handleModeSelect] Quest auto-reset check failed', e);
           }
         }
+      }
+    }
+
+    // Deferred anchor: a staged landing question names the seed that grounds
+    // the first reply, but selecting it any earlier would make the gold door
+    // begin the story at the anchor chapter instead of chapter 1. Select it
+    // here, where Free Talk actually opens, for the tag's own figure only.
+    if (mode === 'free_conversation') {
+      const stagedTag = peekAskPrefillTag();
+      const figureId = useDomainStore.getState().figures.selectedId;
+      if (stagedTag && figureId &&
+          (!stagedTag.startsWith('f:') || stagedTag.startsWith(`f:${figureId}:`))) {
+        selectAnchorSeedRef.current(figureId, stagedTag);
       }
     }
 
@@ -1384,7 +1401,7 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
   // the persisted preference both have to be written: the session controller
   // and the default-seed loader read the preference back a moment later, so a
   // store-only selection is overwritten by the figure's default seed.
-  const selectSeedForFigure = useCallback((figureId: string, seedId: number): boolean => {
+  const selectSeedForFigure = useCallback((figureId: string, seedId: number | string): boolean => {
     const seeds = useDomainStore.getState().seeds.byFigure[figureId] ?? [];
     const seed = seeds.find((candidate) => String(candidate.id) === String(seedId));
     if (!seed) return false;
@@ -1396,14 +1413,70 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
 
   // The seed a landing question is anchored to. Selected quietly on the ask
   // path so the first reply stands on the teaching that answers the question
-  // instead of whichever seed the figure defaults to. No-op for a figure with
-  // no entry question, or before its seeds have loaded.
-  const selectHeroAnchorSeed = useCallback((figureId: string): void => {
-    const anchorId = getHeroEntrySeedId(figureId);
+  // instead of whichever seed the figure defaults to. Only some tags name a
+  // question with such a teaching: a null anchor means select nothing, because
+  // the wrong anchor grounds the reply in material about another question.
+  const selectAnchorSeed = useCallback((figureId: string, tag: string): void => {
+    const anchorId = resolveAnchorSeedId(figureId, tag);
     if (anchorId !== null) selectSeedForFigure(figureId, anchorId);
   }, [selectSeedForFigure]);
+  selectAnchorSeedRef.current = selectAnchorSeed;
 
-  const handleSelectFigure = useCallback(async (figure: any) => {
+  // A question or chapter staged by a public-page door, routed onto the figure
+  // that is now selected. Returns true when an intent was consumed. Both figure
+  // paths call it, including the same-figure re-select: an unconsumed tag would
+  // survive and misfire on the next figure the visitor picks.
+  const routeStagedEntryIntent = useCallback((figureId: string, direct = false): boolean => {
+    // Effect#14 must not race the mode this sets.
+    lastSeedSelectTimeRef.current = Date.now();
+
+    const askIntent = readAskIntent();
+    if (askIntent) {
+      clearAskIntent();
+      const toCeremony = CEREMONY_CARRIED_ENTRY && !direct;
+      if (toCeremony) {
+        // Leave free_conversation before the stash is announced: a composer
+        // still mounted in that mode would consume the question on the spot,
+        // and the ceremony would have nothing left to show.
+        useDomainStore.getState().setMode(ConversationMode.INTRODUCTION);
+      }
+      stashAskPrefill(askIntent);
+      resetConversation();
+      if (toCeremony) {
+        setModeSelectorVisible(true);
+      } else {
+        handleModeSelect('free_conversation', true);
+      }
+      // handleModeSelect clears the suppression flag on entry, but Effect#14
+      // would then see a fresh figure+seed with no stored mode and open the
+      // selector over the conversation. Re-assert it: the destination is
+      // settled, or the visitor is standing in front of it.
+      figureSelectHandlingModeRef.current = true;
+      return true;
+    }
+
+    // Story deep-link from the hero's chapter beat: open story mode straight
+    // at the chapter that was clicked. Chapter N is this figure's seed N.
+    const storyIntent = readStoryIntent();
+    if (storyIntent) {
+      clearStoryIntent();
+      if (selectSeedForFigure(figureId, storyIntent.chapter)) {
+        setStoryData(null);
+        resetConversation();
+        handleModeSelect('introduction', true);
+        // Same reason as the ask branch: the mode choice IS made, so Effect#14
+        // must not reopen the selector over the story.
+        figureSelectHandlingModeRef.current = true;
+        return true;
+      }
+    }
+    return false;
+  }, [selectSeedForFigure, setStoryData, setModeSelectorVisible,
+      resetConversation, handleModeSelect]);
+
+  // `direct` marks a destination the visitor already chose inside the app, so
+  // the mode ceremony is not offered a second time.
+  const handleSelectFigure = useCallback(async (figure: any, options?: { direct?: boolean }) => {
     if (import.meta.env.DEV) {
       console.log('[handleSelectFigure] called', {
         figureId: figure?.id,
@@ -1412,9 +1485,11 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
       });
     }
 
-    // Same figure re-selected — just close the carousel
+    // Same figure re-selected — close the carousel, but route anything staged
+    // for this figure first instead of dropping it.
     if (selectedFigure && figure.id === selectedFigure.id) {
       setFigureCarousel(false);
+      routeStagedEntryIntent(figure.id, options?.direct);
       return;
     }
 
@@ -1443,45 +1518,12 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
 
     useDomainStore.getState().markVisited();
 
-    // Homepage ask-link: the visitor already chose the talk door on the
-    // marketing page, so skip the mode choice entirely and open Free Talk.
-    // The consumed tag is staged for the composer, which prefills the
-    // promised question so the first turn is one tap away. Runs for first
-    // timers and returning visitors alike (both select paths land here).
-    const askIntent = readAskIntent();
-    if (askIntent) {
-      clearAskIntent();
-      stashAskPrefill(askIntent);
-      // Silent anchor: the landing question has one teaching that answers it,
-      // so that seed becomes the conversation's context instead of whichever
-      // seed the figure defaults to. Never shown, only selected.
-      selectHeroAnchorSeed(figure.id);
-      resetConversation();
-      handleModeSelect('free_conversation', true);
-      // handleModeSelect clears the suppression flag on entry, but Effect#14
-      // would then see a fresh figure+seed with no stored mode and open the
-      // selector over the conversation. Re-assert the flag: the mode choice
-      // IS made. The next handleModeSelect from any path clears it again,
-      // same lifecycle as the keep-until-choice selector path below.
-      figureSelectHandlingModeRef.current = true;
-      return;
-    }
-
-    // Story deep-link from the hero's chapter beat: open story mode straight
-    // at the chapter that was clicked. Chapter N is this figure's seed N.
-    const storyIntent = readStoryIntent();
-    if (storyIntent) {
-      clearStoryIntent();
-      if (selectSeedForFigure(figure.id, storyIntent.chapter)) {
-        setStoryData(null);
-        resetConversation();
-        handleModeSelect('introduction', true);
-        // Same reason as the ask branch: the mode choice IS made, so Effect#14
-        // must not reopen the selector over the story.
-        figureSelectHandlingModeRef.current = true;
-        return;
-      }
-    }
+    // Public-page doors: the visitor arrives carrying a question or a chapter.
+    // The consumed tag is staged for the composer, which prefills the promised
+    // question so the first turn is one tap away, and the destination follows
+    // what they chose. Runs for first timers and returning visitors alike
+    // (both select paths land here).
+    if (routeStagedEntryIntent(figure.id, options?.direct)) return;
 
     // Reset mode to default before showing ModeSelector
     // This prevents the previous figure's mode (e.g., prism) from leaking into the new figure's UI
@@ -1518,7 +1560,7 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
         // This prevents Effect#14 from overriding the ModeSelector
       }
     }
-  }, [selectedFigure, selectFigure, setFigureCarousel, selectHeroAnchorSeed, selectSeedForFigure,
+  }, [selectedFigure, selectFigure, setFigureCarousel, routeStagedEntryIntent,
       setSelectedSeed, setStoryData, setModeSelectorVisible, resetConversation, handleModeSelect]);
 
   const handleSeedSelect = useCallback((seed: any, forceMode?: string) => {
@@ -1649,7 +1691,8 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
         handleModeSelect('free_conversation', true);
         return;
       }
-      await handleSelectFigure(figure);
+      // Direct: taking the end card IS the choice, so no second ceremony.
+      await handleSelectFigure(figure, { direct: true });
     },
     [selectedFigure, handleSelectFigure, handleModeSelect, resetConversation]
   );

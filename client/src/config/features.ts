@@ -19,3 +19,18 @@ export const STORY_DOWNLOADS_ENABLED: boolean =
     : import.meta.env.VITE_STORY_DOWNLOADS === 'false'
       ? false
       : import.meta.env.DEV;
+
+/**
+ * Carried-question arrivals land at the mode ceremony instead of going straight
+ * to Free Talk. The question stays staged either way, so the composer still
+ * gets it once Free Talk opens.
+ *
+ * On in dev, off in production builds. `VITE_CEREMONY_CARRIED_ENTRY=true` turns
+ * it on for a production build, `false` forces it off anywhere.
+ */
+export const CEREMONY_CARRIED_ENTRY: boolean =
+  import.meta.env.VITE_CEREMONY_CARRIED_ENTRY === 'true'
+    ? true
+    : import.meta.env.VITE_CEREMONY_CARRIED_ENTRY === 'false'
+      ? false
+      : import.meta.env.DEV;

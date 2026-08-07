@@ -1142,12 +1142,16 @@
     },
     "doors": {
       "title": "How do you want to start with {name}?",
+      "standardMarker": "Most people start here",
       "storyTitle": "Begin the story",
-      "storyBody": "It starts with a narrated scene from a life. You talk it through, hear it debated, then make it yours.",
+      "storyBody": "It starts with a narrated scene from a life. The story lays the ground for everything after. You talk it through, hear it debated, then make it yours.",
       "storyMeta": "Four chapters. The first takes around 15 minutes.",
+      "storyMetaTimed": "Four chapters. The first takes around {minutes} minutes.",
       "talkTitle": "Just ask something",
-      "talkBody": "No path, no chapters. Bring a question and the Echo answers.",
+      "talkTitleStaged": "Ask your question",
+      "talkBody": "Your question sets the direction. Good when time is short, or when something is already on your mind.",
       "talkMeta": "Right now. 30 free messages a day.",
+      "stagedLabel": "Your question is waiting:",
       "allWays": "See all the ways",
       "arcEyebrow": "The learning arc · Chapter 1 of 4"
     }
