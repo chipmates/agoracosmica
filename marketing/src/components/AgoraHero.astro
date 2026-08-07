@@ -1,13 +1,16 @@
 ---
-// The merged landing hero: plate portrait, four-beat spine, prefilled
-// question, thirty-link shelf. Ships complete in markup (the ignition
-// choreography in the client script only replays what is already here).
+// The merged landing hero: plate portrait, four-beat spine, one gold door,
+// thirty-link shelf. Ships complete in markup (the ignition choreography in
+// the client script only replays what is already here).
 // The shelf anchors are real figure-page links; script intercepts clicks
 // to re-key the hero in place.
 import { getFiguresCatalog } from '@client/data/public/figuresCatalog';
 import { figureIdToSlug } from '@client/data/public/slugMap';
 import manifest from '@client/data/image-manifest.json';
 import { figureImage, figureSrcset } from '../lib/figureImages';
+import { getSeedsFor } from '../lib/seeds';
+import { getStoryChapter } from '../lib/stories';
+import { cleanDisplayText } from '../lib/figureWorld';
 import type { Lang } from '../i18n';
 import '../styles/night-hero.css';
 
@@ -50,6 +53,24 @@ const figures = getFiguresCatalog().map((f) => ({
 
 const figuresBase = de ? '/de/figures/' : '/figures/';
 
+// Chapter one, per figure, straight out of the produced catalogs: the title
+// the twelve-chapter ledger already uses for chapter n (seed n) and the
+// runtime the story file reports. Nothing here is written by hand, and a
+// figure missing either half simply drops that half of the line.
+const chapterWord = de ? 'Kapitel' : 'Chapter';
+const minWord = de ? 'Min.' : 'min';
+function chapterOneBeat(id: string): string {
+  const title = cleanDisplayText(getSeedsFor(id, lang)[0]?.title);
+  const minutes = getStoryChapter(id, lang, 1)?.minutes;
+  let line = `${chapterWord} 1`;
+  if (title) line += `: ${title}`;
+  if (minutes) line += `  ·  ${minutes} ${minWord}`;
+  return line;
+}
+// Handed to the client script so a shelf pick re-keys the beat from the same
+// build-time data instead of a second, hand-kept table.
+const chapterBeats = Object.fromEntries(figures.map(f => [f.id, chapterOneBeat(f.id)]));
+
 // The default figure the page ships with. Strings match the client script's
 // table for aurelius, so the first re-key swaps nothing.
 const S = de
@@ -64,9 +85,8 @@ const S = de
       qkick: 'Wohin sein Weg führt',
       promise: 'Du lernst, deine erste Reaktion zu hinterfragen.',
       chapKick: 'Sein erstes Kapitel',
-      chap: 'Eine Lehre, als Geschichte erzählt. Kapitel eins anhören',
-      askLbl: 'Deine erste Frage',
-      q: 'Wie halte ich kleine Ärgernisse davon ab, mir den ganzen Tag zu nehmen?',
+      chap: chapterOneBeat('aurelius'),
+      begin: 'Mit Mark Aurel beginnen',
       free: '30 kostenlose Nachrichten pro Tag. Ohne Anmeldung.',
       disc: 'Ein Echo, keine Aufnahme. Gemalt, nicht fotografiert.',
       trust: 'Gemeinnützig · Open Source · Keine Tracking-Cookies, kein Profiling',
@@ -85,9 +105,8 @@ const S = de
       qkick: 'Where his path leads',
       promise: 'You will learn to question your first reaction.',
       chapKick: 'His first chapter',
-      chap: 'A teaching, told as a story. Play chapter one',
-      askLbl: 'Your first question',
-      q: 'How do I stop small annoyances from taking my whole day?',
+      chap: chapterOneBeat('aurelius'),
+      begin: 'Begin with Marcus Aurelius',
       free: '30 free messages a day. No signup needed.',
       disc: 'An Echo, not a recording. Painted, not photographed.',
       trust: 'Nonprofit · Open Source · No tracking cookies, no profiling',
@@ -107,7 +126,7 @@ const S = de
   })();
 </script>
 
-<div class="mh" data-figrev={figuresRev}>
+<div class="mh" data-figrev={figuresRev} data-chapters={JSON.stringify(chapterBeats)}>
   <section class="hero" aria-labelledby="h1">
     <canvas class="dustlayer" id="dust" aria-hidden="true"></canvas>
     <div class="wrap">
@@ -171,17 +190,16 @@ const S = de
               <span id="chapTxt">{S.chap}</span><span class="chapter__go">&rarr;</span>
             </a>
           </li>
-          <li class="labelled">
-            <p class="caps blabel gold" id="askLbl">{S.askLbl}</p>
+          <li class="beat--door">
             <a
-              class="ask"
-              id="ask"
-              href={`/app?figure=${figureIdToSlug['aurelius']}&lang=${lang}&ask=f:aurelius:1`}
+              class="begin pub-cta__button"
+              id="begin"
+              href={`/app?figure=${figureIdToSlug['aurelius']}&lang=${lang}`}
               data-agc-cta="start-exploring"
               data-agc-figure="aurelius"
+              data-agc-door="home_begin"
             >
-              <q id="q">{S.q}</q>
-              <span class="ask__go"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1l7 7-7 7-1.4-1.4L11.2 9H1V7h10.2L6.6 2.4z"/></svg></span>
+              <span id="beginLbl">{S.begin}</span>
             </a>
           </li>
         </ol>
@@ -224,3 +242,55 @@ const S = de
 </div>
 
 <script src="../scripts/agora-hero.js"></script>
+
+<style is:global>
+  /* The one gold door. It is the site's primary /app button (.pub-cta__button),
+     re-fitted to the hero's spine: the plate radius of the surrounding skin, a
+     width that follows its own label, and the ignition's cool state. */
+  .mh .begin {
+    width: fit-content;
+    /* the shortest name is four letters, and a gold chip that narrow stops
+       reading as the page's one door */
+    min-width: 15rem;
+    max-width: 100%;
+    padding: 0.85rem 1.7rem;
+    border-radius: var(--plate-radius);
+    line-height: 1.3;
+    text-wrap: balance;
+  }
+  /* the last beat lands, so it gets a breath the others do not */
+  .mh .beats > li.beat--door { margin-top: 0.3rem; }
+  /* the node belongs on the plate, not above it */
+  .mh .beats > li.beat--door::before { top: 21px; }
+
+  /* Ignition beat two: the stream off the portrait used to write a question.
+     It writes this label now, so the plate stays quiet until the gold lands. */
+  .settling .mh .begin {
+    transition: background 0.5s ease, color 0.5s ease, box-shadow 0.5s ease,
+      transform 0.25s ease;
+  }
+  .settling .mh .begin.cool {
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    box-shadow: inset 0 0 0 1px var(--keyline);
+  }
+  .settling .mh .begin w {
+    opacity: 0.13;
+    filter: blur(1.6px);
+    transition: opacity 0.34s ease, filter 0.34s ease;
+  }
+  .settling .mh .begin w.in { opacity: 1; filter: none; }
+
+  @media (max-width: 899px) {
+    /* full width on a phone: the reading column is narrow and German names run
+       long, so the door takes the column instead of ragging inside it */
+    .mh .begin {
+      width: 100%;
+      min-width: 0;
+      padding: 0.8rem 1rem;
+      font-size: 0.9rem;
+    }
+    .mh .beats > li.beat--door { margin-top: 0.2rem; }
+    .mh .beats > li.beat--door::before { top: 19px; }
+  }
+</style>

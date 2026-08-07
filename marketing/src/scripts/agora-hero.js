@@ -36,130 +36,76 @@ var trail = function (id) {
   return CDN + '/trailers/figures/' + id + '/' + LANG + '/' + id + '_trailer_' + LANG + '.mp3';
 };
 
+/* the chapter-one beat per figure, localised at build time from the produced
+   story + seed catalogs (see AgoraHero.astro). Real data only: a figure the
+   build could not resolve simply keeps the beat that is already on screen. */
+var CHAP = {};
+try { CHAP = JSON.parse(mhRoot.dataset.chapters || '{}'); } catch (e) { CHAP = {}; }
+
 /* ---------- the thirty ----------
    id, slug, name EN, name DE, tradition EN, tradition DE,
-   promise EN, promise DE, question EN, question DE                       */
+   promise EN, promise DE                                                 */
 var RAW = [
 ['laozi','laozi','Laozi','Laozi','Taoism','Taoismus',
- 'You will learn to act without forcing.','Du lernst, ohne Zwang zu handeln.',
- 'I push and push and nothing moves. What would you do instead?',
- 'Ich drücke und drücke, und nichts bewegt sich. Was würdest du tun?'],
+ 'You will learn to act without forcing.','Du lernst, ohne Zwang zu handeln.'],
 ['angelou','maya-angelou','Maya Angelou','Maya Angelou','Poetry and Civil Rights','Poesie und Bürgerrechte',
- 'You will learn to find your own voice.','Du lernst, deine eigene Stimme zu finden.',
- 'I go quiet where I should speak. How do I get my voice back?',
- 'Wo ich reden sollte, werde ich still. Wie finde ich meine Stimme wieder?'],
+ 'You will learn to find your own voice.','Du lernst, deine eigene Stimme zu finden.'],
 ['austen','jane-austen','Jane Austen','Jane Austen','Literary Realism','Literarischer Realismus',
- 'You will learn to read what people do not say.','Du lernst, zu lesen, was Menschen nicht sagen.',
- 'I never know if people actually like me or are just being polite.',
- 'Ich weiß nie, ob Leute mich mögen oder einfach nur höflich sind.'],
+ 'You will learn to read what people do not say.','Du lernst, zu lesen, was Menschen nicht sagen.'],
 ['aurelius','marcus-aurelius','Marcus Aurelius','Mark Aurel','Stoicism','Stoizismus',
- 'You will learn to question your first reaction.','Du lernst, deine erste Reaktion zu hinterfragen.',
- 'How do I stop small annoyances from taking my whole day?',
- 'Wie halte ich kleine Ärgernisse davon ab, mir den ganzen Tag zu nehmen?'],
+ 'You will learn to question your first reaction.','Du lernst, deine erste Reaktion zu hinterfragen.'],
 ['beauvoir','simone-de-beauvoir','Simone de Beauvoir','Simone de Beauvoir','Existentialist Feminism','Existentialistischer Feminismus',
- 'You will learn to see how you were made.','Du lernst, zu erkennen, wie du gemacht wurdest.',
- 'How much of what I want is actually mine?',
- 'Wie viel von dem, was ich will, ist wirklich meins?'],
+ 'You will learn to see how you were made.','Du lernst, zu erkennen, wie du gemacht wurdest.'],
 ['bingen','hildegard-von-bingen','Hildegard von Bingen','Hildegard von Bingen','Christian Mysticism','Christliche Mystik',
- 'You will learn to notice the life in things.','Du lernst, das Leben in den Dingen wahrzunehmen.',
- 'I feel burned out. Does anything grow back after that?',
- 'Ich fühle mich ausgebrannt. Wächst danach noch mal etwas?'],
+ 'You will learn to notice the life in things.','Du lernst, das Leben in den Dingen wahrzunehmen.'],
 ['campbell','joseph-campbell','Joseph Campbell','Joseph Campbell','Comparative Mythology','Vergleichende Mythologie',
- 'You will learn to read your own turning points.','Du lernst, deine eigenen Wendepunkte zu lesen.',
- 'I am in the middle of a big change. What is this part called?',
- 'Ich stecke mitten in einer großen Veränderung. Wie nennt man diesen Teil?'],
+ 'You will learn to read your own turning points.','Du lernst, deine eigenen Wendepunkte zu lesen.'],
 ['zenji','dogen-zenji','Dōgen Zenji','Dōgen Zenji','Zen Buddhism','Zen-Buddhismus',
- 'You will learn to stop chasing the next moment.','Du lernst, dem nächsten Augenblick nicht mehr nachzujagen.',
- 'Most of my day is chores. Is that time just lost?',
- 'Mein Tag besteht meistens aus Kleinkram. Ist diese Zeit verloren?'],
+ 'You will learn to stop chasing the next moment.','Du lernst, dem nächsten Augenblick nicht mehr nachzujagen.'],
 ['dickinson','emily-dickinson','Emily Dickinson','Emily Dickinson','American Poetry','Amerikanische Poesie',
- 'You will learn to tell the truth slant.','Du lernst, die Wahrheit schräg zu sagen.',
- 'How do I say a hard thing without breaking the person who hears it?',
- 'Wie sage ich etwas Schweres, ohne den zu zerbrechen, der es hört?'],
+ 'You will learn to tell the truth slant.','Du lernst, die Wahrheit schräg zu sagen.'],
 ['einstein','albert-einstein','Albert Einstein','Albert Einstein','Theoretical Physics','Theoretische Physik',
- 'You will learn to stay amazed.','Du lernst, das Staunen zu behalten.',
- 'I used to be curious about everything. When did that stop?',
- 'Früher war ich auf alles neugierig. Wann hat das aufgehört?'],
+ 'You will learn to stay amazed.','Du lernst, das Staunen zu behalten.'],
 ['eckhart','meister-eckhart','Meister Eckhart','Meister Eckhart','Christian Mysticism','Christliche Mystik',
- 'You will learn to love without a why.','Du lernst, ohne Warum zu lieben.',
- 'I hold on too tight to the people I love. How do I loosen it?',
- 'Ich halte die Menschen, die ich liebe, zu fest. Wie lasse ich locker?'],
+ 'You will learn to love without a why.','Du lernst, ohne Warum zu lieben.'],
 ['galilei','galileo-galilei','Galileo Galilei','Galileo Galilei','Natural Philosophy','Naturphilosophie',
- 'You will learn to test what you are told.','Du lernst, zu prüfen, was man dir sagt.',
- 'Everyone around me is sure. How do I check for myself?',
- 'Alle um mich herum sind sich sicher. Wie prüfe ich es selbst?'],
+ 'You will learn to test what you are told.','Du lernst, zu prüfen, was man dir sagt.'],
 ['gandhi','mahatma-gandhi','Mohandas Gandhi','Mohandas Gandhi','Nonviolent Resistance','Gewaltloser Widerstand',
- 'You will learn to stay willing to be wrong.','Du lernst, für den eigenen Irrtum offen zu bleiben.',
- 'How do I argue with someone without needing to win?',
- 'Wie streite ich mit jemandem, ohne gewinnen zu müssen?'],
+ 'You will learn to stay willing to be wrong.','Du lernst, für den eigenen Irrtum offen zu bleiben.'],
 ['goethe','johann-wolfgang-von-goethe','Johann Wolfgang von Goethe','Johann Wolfgang von Goethe','German Classicism','Weimarer Klassik',
- 'You will learn to stay with one thing.','Du lernst, bei einer Sache zu bleiben.',
- 'I read a lot and understand little. What am I doing wrong?',
- 'Ich lese viel und verstehe wenig. Was mache ich falsch?'],
+ 'You will learn to stay with one thing.','Du lernst, bei einer Sache zu bleiben.'],
 ['gautama','siddhartha-gautama','Siddhartha Gautama','Siddhartha Gautama','Buddhism','Buddhismus',
- 'You will learn to watch wanting rise and fade.','Du lernst, das Verlangen kommen und gehen zu sehen.',
- 'My life is good and I still feel unsatisfied. What is wrong with me?',
- 'Mir geht es gut, und trotzdem fehlt etwas. Was stimmt nicht mit mir?'],
+ 'You will learn to watch wanting rise and fade.','Du lernst, das Verlangen kommen und gehen zu sehen.'],
 ['jung','carl-gustav-jung','Carl Gustav Jung','Carl Gustav Jung','Depth Psychology','Tiefenpsychologie',
- 'You will learn to meet your own shadow.','Du lernst, deinem eigenen Schatten zu begegnen.',
- 'Why does one particular person get under my skin so fast?',
- 'Warum geht mir ausgerechnet ein Mensch so schnell unter die Haut?'],
+ 'You will learn to meet your own shadow.','Du lernst, deinem eigenen Schatten zu begegnen.'],
 ['kahlo','frida-kahlo','Frida Kahlo','Frida Kahlo','Art and Identity','Kunst und Identität',
- 'You will learn to look at yourself without flinching.','Du lernst, dich selbst anzusehen, ohne zurückzuschrecken.',
- 'How do I make something out of pain without pretending it is fine?',
- 'Wie mache ich aus Schmerz etwas, ohne so zu tun, als wäre alles gut?'],
+ 'You will learn to look at yourself without flinching.','Du lernst, dich selbst anzusehen, ohne zurückzuschrecken.'],
 ['king','martin-luther-king-jr','Martin Luther King Jr.','Martin Luther King Jr.','Civil Rights and Theology','Bürgerrechte und Theologie',
- 'You will learn to hold on when nothing moves yet.','Du lernst, dranzubleiben, wenn sich noch nichts bewegt.',
- 'How do I keep going when nothing I do seems to matter?',
- 'Wie mache ich weiter, wenn nichts von dem, was ich tue, etwas ändert?'],
+ 'You will learn to hold on when nothing moves yet.','Du lernst, dranzubleiben, wenn sich noch nichts bewegt.'],
 ['lovelace','ada-lovelace','Ada Lovelace','Ada Lovelace','Mathematics and Computing','Mathematik und Computing',
- 'You will learn where the machine stops and you begin.','Du lernst, wo die Maschine aufhört und du anfängst.',
- 'They say a machine will do my job. Could it do the part that is mine?',
- 'Angeblich macht bald eine Maschine meinen Job. Auch den Teil, der wirklich meiner ist?'],
+ 'You will learn where the machine stops and you begin.','Du lernst, wo die Maschine aufhört und du anfängst.'],
 ['mandela','nelson-mandela','Nelson Mandela','Nelson Mandela','Ubuntu and Liberation','Ubuntu und Befreiung',
- 'You will learn to free yourself from bitterness.','Du lernst, dich von Bitterkeit zu befreien.',
- 'Someone took years from me. How do I stop carrying it?',
- 'Jemand hat mir Jahre genommen. Wie höre ich auf, das zu tragen?'],
+ 'You will learn to free yourself from bitterness.','Du lernst, dich von Bitterkeit zu befreien.'],
 ['mozart','wolfgang-amadeus-mozart','Wolfgang Amadeus Mozart','Wolfgang Amadeus Mozart','Classical Music','Klassische Musik',
- 'You will learn to find freedom inside the rules.','Du lernst, Freiheit in den Regeln zu finden.',
- 'When did the thing I loved doing turn into work?',
- 'Wann ist das, was ich geliebt habe, zu Arbeit geworden?'],
+ 'You will learn to find freedom inside the rules.','Du lernst, Freiheit in den Regeln zu finden.'],
 ['blake','william-blake','William Blake','William Blake','Visionary Poetry','Visionäre Poesie',
- 'You will learn to hold your opposites together.','Du lernst, deine Gegensätze zusammenzuhalten.',
- 'Two parts of me want opposite things. Do I have to give one up?',
- 'Zwei Seiten in mir wollen genau das Gegenteil. Muss ich eine aufgeben?'],
+ 'You will learn to hold your opposites together.','Du lernst, deine Gegensätze zusammenzuhalten.'],
 ['nietzsche','friedrich-nietzsche','Friedrich Nietzsche','Friedrich Nietzsche','Existential Philosophy','Existenzphilosophie',
- 'You will learn to build your own meaning.','Du lernst, deinen eigenen Sinn zu bauen.',
- 'Nothing I was handed to believe holds. What now?',
- 'Nichts, was man mir zu glauben gab, trägt noch. Was jetzt?'],
+ 'You will learn to build your own meaning.','Du lernst, deinen eigenen Sinn zu bauen.'],
 ['plato','plato','Plato','Platon','Classical Philosophy','Klassische Philosophie',
- 'You will learn to examine your own life.','Du lernst, dein eigenes Leben zu prüfen.',
- 'How do I know if I actually believe what I say I believe?',
- 'Woher weiß ich, ob ich wirklich glaube, was ich zu glauben sage?'],
+ 'You will learn to examine your own life.','Du lernst, dein eigenes Leben zu prüfen.'],
 ['rumi','rumi','Rumi','Rumi','Sufi Mysticism','Sufi-Mystik',
- 'You will learn to let your longing guide you.','Du lernst, dich von deiner Sehnsucht führen zu lassen.',
- 'I miss something I cannot name. What is it?',
- 'Mir fehlt etwas, das ich nicht benennen kann. Was ist es?'],
+ 'You will learn to let your longing guide you.','Du lernst, dich von deiner Sehnsucht führen zu lassen.'],
 ['schopenhauer','arthur-schopenhauer','Arthur Schopenhauer','Arthur Schopenhauer','Philosophy of Will','Willensphilosophie',
- 'You will learn to look behind your own restlessness.','Du lernst, hinter deine eigene Unruhe zu schauen.',
- 'Why is the satisfaction always shorter than the wanting?',
- 'Warum ist die Zufriedenheit immer kürzer als das Wollen?'],
+ 'You will learn to look behind your own restlessness.','Du lernst, hinter deine eigene Unruhe zu schauen.'],
 ['shakespeare','william-shakespeare','William Shakespeare','William Shakespeare','Renaissance Drama','Renaissance-Drama',
- 'You will learn to use what you saw too late.','Du lernst zu nutzen, was du zu spät gesehen hast.',
- 'I saw it clearly only after it was over. What good is that?',
- 'Ich habe es erst verstanden, als es vorbei war. Was nützt mir das?'],
+ 'You will learn to use what you saw too late.','Du lernst zu nutzen, was du zu spät gesehen hast.'],
 ['woolf','virginia-woolf','Virginia Woolf','Virginia Woolf','Modernist Literature','Modernistische Literatur',
- 'You will learn to defend the hour that is yours.','Du lernst, die Stunde zu verteidigen, die dir gehört.',
- 'I never get an hour that is really mine. Does that matter?',
- 'Ich habe nie eine Stunde, die wirklich mir gehört. Ist das schlimm?'],
+ 'You will learn to defend the hour that is yours.','Du lernst, die Stunde zu verteidigen, die dir gehört.'],
 ['tubman','harriet-tubman','Harriet Tubman','Harriet Tubman','Liberation and Faith','Befreiung und Glaube',
- 'You will learn to act before fear stops you.','Du lernst, zu handeln, bevor die Angst dich aufhält.',
- 'I know what I have to do and I keep not doing it. How do you move?',
- 'Ich weiß, was ich tun muss, und tue es doch nicht. Wie kommst du in Bewegung?'],
+ 'You will learn to act before fear stops you.','Du lernst, zu handeln, bevor die Angst dich aufhält.'],
 ['vinci','leonardo-da-vinci','Leonardo da Vinci','Leonardo da Vinci','Renaissance Polymath','Renaissance-Universalgelehrter',
- 'You will learn to connect what looks unrelated.','Du lernst zu verbinden, was nicht zusammengehört.',
- 'I am curious about everything and finish nothing. Is that a flaw?',
- 'Ich interessiere mich für alles und bringe nichts zu Ende. Ist das ein Fehler?']
+ 'You will learn to connect what looks unrelated.','Du lernst zu verbinden, was nicht zusammengehört.']
 ];
 
 var FEM = { angelou:1, austen:1, beauvoir:1, bingen:1, dickinson:1, kahlo:1,
@@ -175,7 +121,7 @@ var FOCAL = { laozi:27, campbell:36, zenji:40, goethe:40, jung:40,
 
 var F = RAW.map(function (a) {
   return { id:a[0], slug:a[1], name: DE ? a[3] : a[2], trad: DE ? a[5] : a[4],
-           promise: DE ? a[7] : a[6], q: DE ? a[9] : a[8], fem: !!FEM[a[0]] };
+           promise: DE ? a[7] : a[6], fem: !!FEM[a[0]] };
 });
 var byId = {}; F.forEach(function (f) { byId[f.id] = f; });
 
@@ -187,8 +133,7 @@ var T = DE ? {
   play:'Das Echo hören', playing:'Läuft',
   qkickM:'Wohin sein Weg führt', qkickF:'Wohin ihr Weg führt',
   chapKickM:'Sein erstes Kapitel', chapKickF:'Ihr erstes Kapitel',
-  chap:'Eine Lehre, als Geschichte erzählt. Kapitel eins anhören',
-  askLbl:'Deine erste Frage',
+  begin:function (n) { return 'Mit ' + n + ' beginnen'; },
   free:'30 kostenlose Nachrichten pro Tag. Ohne Anmeldung.',
   disc:'Ein Echo, keine Aufnahme. Gemalt, nicht fotografiert.',
   trust:'Gemeinnützig · Open Source · Keine Tracking-Cookies, kein Profiling',
@@ -206,8 +151,7 @@ var T = DE ? {
   play:'Hear the Echo', playing:'Playing',
   qkickM:'Where his path leads', qkickF:'Where her path leads',
   chapKickM:'His first chapter', chapKickF:'Her first chapter',
-  chap:'A teaching, told as a story. Play chapter one',
-  askLbl:'Your first question',
+  begin:function (n) { return 'Begin with ' + n; },
   free:'30 free messages a day. No signup needed.',
   disc:'An Echo, not a recording. Painted, not photographed.',
   trust:'Nonprofit · Open Source · No tracking cookies, no profiling',
@@ -234,8 +178,6 @@ if (DE) {
   html('h1', T.h1);
   txt('sub', T.sub);
   txt('playLbl', T.play);
-  txt('chapTxt', T.chap);
-  txt('askLbl', T.askLbl);
   txt('free', T.free);
   txt('discl', T.disc);
   txt('trust', T.trust);
@@ -276,14 +218,15 @@ function paint(id) {
   $('nm').textContent = f.name;
   $('tr').textContent = f.trad;
   $('qkick').textContent = f.fem ? T.qkickF : T.qkickM;
-  /* the tag names THIS figure's question, so the app prefills what was clicked */
-  askEl.href = '/app?figure=' + f.slug + '&lang=' + LANG + '&ask=f:' + f.id + ':1';
-  askEl.setAttribute('data-agc-figure', id);
+  /* the one door: figure only, so the app opens on THIS figure's ways in */
+  beginEl.href = '/app?figure=' + f.slug + '&lang=' + LANG;
+  beginEl.setAttribute('data-agc-figure', id);
   $('chapKick').textContent = f.fem ? T.chapKickF : T.chapKickM;
+  if (CHAP[id]) $('chapTxt').textContent = CHAP[id];
   chapEl.href = '/app?figure=' + f.slug + '&lang=' + LANG + '&mode=story&chapter=1';
   chapEl.setAttribute('data-agc-figure', id);
   $('promise').innerHTML = '<em>' + f.promise + '</em>';
-  words($('q'), f.q);
+  words($('beginLbl'), T.begin(f.name));
   shot.alt = '';
   shot.style.setProperty('--focal', (FOCAL[id] || 50) + '%');
   [].forEach.call(rail.children, function (a) {
@@ -303,20 +246,21 @@ function paint(id) {
    underneath and the dust hands it back. The reading column never waits: every
    word of the hero is in the markup and legible at t=0.
 
-   Beat two, the question (~1.3s). A thin stream of the same gold lifts off the
+   Beat two, the door (~1.3s). A thin stream of the same gold lifts off the
    settled face, sweeps into the lit spine, runs down it past the beats and
-   splashes into the question card. The question is written in its wake.
+   splashes into the gold button. Its label is written in the stream's wake and
+   the plate turns from quiet to gold as the last grain lands.
 
    Then the canvas is cleared and the loop stops. Nothing floats afterward.
 
-   No script, or reduced motion: the painting is present and the question is
+   No script, or reduced motion: the painting is present and the door is
    written from the first byte. Nothing is ever hidden from a crawler.
    ============================================================ */
 var heroEl = document.querySelector('.hero');
 var cv = $('dust'), ctx = cv.getContext('2d');
 var W = 0, H = 0, DPR = 1;
 var face = [], stream = [], raf = 0, t0 = 0, running = false;
-var qWords = [], askEl = $('ask'), chapEl = $('chapDoor'), askLi = askEl.closest('li');
+var qWords = [], beginEl = $('begin'), chapEl = $('chapDoor'), beginLi = beginEl.closest('li');
 var seed = 20260728;
 function rnd() { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; }
 
@@ -336,7 +280,7 @@ var FLY     = 1150,               /* how long one grain travels */
    the stream is rebuilt against the layout as it stands and runs. */
 var qAt = Q_AT,                   /* when beat two opens on this run */
     stopAt = END,                 /* where the running timeline ends */
-    qParked = false,              /* beat two is waiting for its card */
+    qParked = false,              /* beat two is waiting for its door */
     qDue = false,                 /* it came into view mid-beat-one */
     qWatching = false;
 
@@ -344,7 +288,7 @@ var GOLD = [236, 198, 116], GOLDCSS = 'rgb(236,198,116)';
 function ease(x) { return 1 - Math.pow(1 - x, 3); }
 function sstep(a, b, x) { var t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); }
 
-/* The question is one <w> per word, so the words can arrive one at a time.
+/* The label is one <w> per word, so the words can arrive one at a time.
    The markup ships plain text: this only re-wraps what is already there. */
 function words(el, text) {
   el.textContent = '';
@@ -444,10 +388,10 @@ function pickIdx(cum, total) {
 
 /* Beat two. The stream leaves the lit planes of the face, is bent into the
    spine by its first control point, runs down the spine on its second, and
-   lands on the words of the question. */
+   lands on the words of the door's label. */
 function buildStream(g) {
   stream = [];
-  var hr = heroEl.getBoundingClientRect(), qEl = $('q');
+  var hr = heroEl.getBoundingClientRect(), qEl = $('beginLbl');
   var lines = [], rl = qEl.getClientRects();
   for (var i = 0; i < rl.length; i++) {
     if (rl[i].width < 4 || rl[i].height < 4) continue;
@@ -457,7 +401,7 @@ function buildStream(g) {
   var beats = boxOf(heroEl.querySelector('.beats'));
   var spineX = beats.x + 5;                       /* the gold hairline itself */
   var spineTop = beats.y + 12;
-  var ask = boxOf(askEl);
+  var door = boxOf(beginEl);
 
   var pool = [], cum = [], acc = 0, m = g.m;
   if (g.data) {
@@ -492,7 +436,7 @@ function buildStream(g) {
          into the reading column early and runs DOWN it rather than cutting
          across the middle of the hero */
       c1x: spineX + (sx - spineX) * (0.09 + rnd() * 0.13), c1y: spineTop + rnd() * 74,
-      c2x: spineX + 4 + (rnd() - 0.35) * 26, c2y: ask.y - 34 + rnd() * 46,
+      c2x: spineX + 4 + (rnd() - 0.35) * 26, c2y: door.y - 34 + rnd() * 46,
       del: Math.pow(rnd(), 0.9) * Q_SPREAD,
       dur: Q_FLY[0] + rnd() * (Q_FLY[1] - Q_FLY[0]),
       s: 0.62 + rnd() * 1.5,
@@ -561,8 +505,8 @@ function reveal(tt) {
   var frac = Math.min(1, Math.max(0, (tt - qAt - 60) / (Q_SPREAD + Q_FLY[0])));
   var upto = Math.round(frac * (qWords.length + 1.2));
   for (var i = 0; i < qWords.length; i++) qWords[i].classList.toggle('in', i < upto);
-  askEl.classList.toggle('cool', frac < 0.5);
-  if (askLi) askLi.classList.toggle('dim', frac < 0.3);
+  beginEl.classList.toggle('cool', frac < 0.5);
+  if (beginLi) beginLi.classList.toggle('dim', frac < 0.3);
 }
 
 function renderAt(tt) {
@@ -589,11 +533,11 @@ function loop(ts) {
   raf = requestAnimationFrame(loop);
 }
 
-/* the resolved state: the painting present, the question written */
+/* the resolved state: the painting present, the door written */
 function arrive() {
   for (var i = 0; i < qWords.length; i++) qWords[i].classList.add('in');
-  askEl.classList.remove('cool');
-  if (askLi) askLi.classList.remove('dim');
+  beginEl.classList.remove('cool');
+  if (beginLi) beginLi.classList.remove('dim');
   qParked = false;
   shot.classList.remove('gone');
   shot.style.transition = '';
@@ -601,7 +545,7 @@ function arrive() {
   document.documentElement.classList.remove('settling');
 }
 
-/* beat one is resolved: the painting is present, the question still waits.
+/* beat one is resolved: the painting is present, the door still waits.
    The root keeps its marker, which is what holds the words unlit. */
 function faceArrived() {
   shot.classList.remove('gone');
@@ -615,7 +559,7 @@ function inView(el, frac) {
   return vis >= Math.min(r.height, vh) * frac;
 }
 
-/* beat two, once, when the card the stream writes is actually on screen */
+/* beat two, once, when the door the stream writes is actually on screen */
 function watchQuestion() {
   if (qWatching) return;
   qWatching = true;
@@ -626,7 +570,7 @@ function watchQuestion() {
     if (running) { qDue = true; return; }
     runQuestion();
   }, { threshold: 0.55 });
-  io.observe(askEl);
+  io.observe(beginEl);
 }
 
 function runQuestion() {
@@ -656,7 +600,7 @@ function ignite() {
   if (!g) { arrive(); return; }
   buildFace(g);
   qParked = FREEZE === null && 'IntersectionObserver' in window &&
-            !inView(askEl, 0.55);
+            !inView(beginEl, 0.55);
   qDue = false;
   /* parked, beat two's clock sits at the end of beat one, so not a word of the
      question is written and no grain is released until the reader arrives */
