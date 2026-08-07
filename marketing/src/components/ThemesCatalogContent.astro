@@ -1,8 +1,10 @@
 ---
-// The themes index: eight life questions as type, then every one of the 55
-// council questions as a working door, grouped under the question it belongs
-// to. The cards stay type and hairline ink; the page's one plate is the
-// opening council's own, and it sits directly over the CTA that opens it.
+// The themes index routes, the theme pages sell. Eight life questions as
+// type, then the question of the day, then the 55 council questions grouped
+// under the question they belong to: the first three of each group open, the
+// rest one tap away, and the whole pool served in the markup either way. The
+// cards stay type and hairline ink; the page's one plate is the opening
+// council's own, and it sits directly over the door that opens it.
 
 import Breadcrumbs from './Breadcrumbs.astro';
 import ThemeCard from './ThemeCard.astro';
@@ -27,6 +29,7 @@ import {
 import { getThemeVoices } from '@client/data/public/themeVoices';
 import { figureIdToSlug } from '@client/data/public/slugMap';
 import { localizedShortName } from './figureNames';
+import { runtimeMinutes } from '../lib/councilRuntime';
 
 interface Props {
   lang: Lang;
@@ -44,16 +47,28 @@ const indexAnswer = [
   t('themes.indexAnswerClose'),
 ].join(' ');
 
-const groups = THEMES.map(theme => ({
-  theme,
-  question: t(`themes.${theme.id}.question`),
-  items: getThemeCouncilsRanked(theme.id).map<DoorItem>(c => ({
+// Three per group stay open. The rest sit one tap behind a panel, in the
+// markup the whole time, and the group's own theme page carries them all as
+// working doors with the answers around them.
+const OPEN_PER_GROUP = 3;
+const groups = THEMES.map(theme => {
+  const items = getThemeCouncilsRanked(theme.id).map<DoorItem>(c => ({
     councilId: c.id,
     question: getLocalizedQuestion(c, lang),
     figureId: c.moderator.id,
-  })),
-}));
+  }));
+  return {
+    theme,
+    question: t(`themes.${theme.id}.question`),
+    items,
+    head: items.slice(0, OPEN_PER_GROUP),
+    tail: items.slice(OPEN_PER_GROUP),
+  };
+});
 const totalQuestions = groups.reduce((n, g) => n + g.items.length, 0);
+
+const moreQuestionsLabel = (n: number): string =>
+  lang === 'de' ? `Die anderen ${n} Fragen` : `The other ${n} questions`;
 
 // Build-day pick, so the panel is a real question before JS runs. The island
 // re-picks against the visitor's own day once it hydrates.
@@ -129,7 +144,16 @@ const OPENING_PLATE = 'the-question-behind-every-question';
               {group.question}
             </a>
           </h3>
-          <QuestionDoors items={group.items} lang={lang} door="themes_question" />
+          <QuestionDoors items={group.head} lang={lang} door="themes_question" />
+          {group.tail.length > 0 && (
+            <details class="tq-pool__more">
+              <summary class="tq-pool__summary">
+                <span>{moreQuestionsLabel(group.tail.length)}</span>
+                <span class="tq-pool__arrow" aria-hidden="true">▼</span>
+              </summary>
+              <QuestionDoors items={group.tail} lang={lang} door="themes_question" />
+            </details>
+          )}
         </div>
       ))}
     </div>
@@ -143,11 +167,15 @@ const OPENING_PLATE = 'the-question-behind-every-question';
 
   <ThemePlate councilId={opener.id} ink="house" lang={lang} />
 
+  <!-- The index closes on the one thing it can hand over whole. The daily
+       question above stays the page's only featured ask door. -->
   <ThemeCTA
     lang={lang}
     councilId={opener.id}
     question={getLocalizedQuestion(opener, lang)}
     figureId={opener.moderator.id}
+    minutes={runtimeMinutes(opener.id, lang)}
+    showAsk={false}
   />
 </div>
 
@@ -182,8 +210,30 @@ const OPENING_PLATE = 'the-question-behind-every-question';
   }
 
   .tq-pool { display: flex; flex-direction: column; gap: 1.75rem; }
-  .tq-pool__group { display: flex; flex-direction: column; gap: 0.6rem; }
-  .tq-pool__head { margin: 0; }
+  .tq-pool__group { display: flex; flex-direction: column; gap: 0.4rem; }
+  .tq-pool__head { margin: 0 0 0.2rem; }
+
+  /* The rest of a group's questions: one tap away, always in the markup. */
+  .tq-pool__more > summary { list-style: none; cursor: pointer; }
+  .tq-pool__more > summary::-webkit-details-marker { display: none; }
+  .tq-pool__summary {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: var(--text-sm);
+    letter-spacing: 0.06em;
+    color: var(--gold-primary);
+  }
+  .tq-pool__summary:hover { color: var(--gold-hover); }
+  .tq-pool__arrow {
+    font-size: 0.7rem;
+    color: var(--gold-deep);
+    transition: transform var(--transition-fast);
+  }
+  .tq-pool__more[open] .tq-pool__arrow { transform: rotate(180deg); }
+  .tq-pool__more[open] .tq-doors { margin-top: 0.4rem; }
   .tq-pool__link {
     display: inline-flex;
     align-items: center;

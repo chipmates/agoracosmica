@@ -1,50 +1,66 @@
 ---
-// Theme-page closing CTA, inverted: the primary door is a prefilled question
-// (one tap, the Echo replies first), the debate is second, browsing figures
-// third. Exactly one gold primary lives here, and the theme pages suppress
-// the layout's sticky bar, so the page never doubles the same action.
+// Theme-page closing doors. The debate is the gold primary: it is the one
+// thing the page can hand over whole, and its real runtime is printed on the
+// door. Asking the question yourself is the quiet second door, browsing
+// figures the third. Exactly one gold primary lives here, and the theme pages
+// suppress the layout's sticky bar, so the page never doubles the same action.
 
 import type { Lang } from '../i18n';
 import { getT } from '../i18n';
 import { publicUrl } from '../lib/urls';
+import { hearDebateLabel } from '../lib/councilRuntime';
 import { figureIdToSlug } from '@client/data/public/slugMap';
-import { localizedShortName } from './figureNames';
 
 interface Props {
   lang: Lang;
   councilId: string;
   question: string;
   figureId: string;
+  /** Real level-1 runtime in minutes. Null keeps the door duration-less. */
+  minutes?: number | null;
+  /** The index routes instead of selling, so it takes the debate door alone. */
+  showAsk?: boolean;
 }
 
-const { lang, councilId, question, figureId } = Astro.props;
+const { lang, councilId, question, figureId, minutes = null, showAsk = true } = Astro.props;
 const t = getT(lang);
 const slug = figureIdToSlug[figureId] || figureId;
-const name = localizedShortName(figureId, lang);
 const askHref = `/app?figure=${slug}&q=${councilId}&lang=${lang}`;
 const debateHref = `/app?council=${councilId}&lang=${lang}`;
+
+const leadDebate =
+  lang === 'de'
+    ? 'Diese Frage kannst du von vorne bis hinten ausdiskutiert hören.'
+    : 'You can hear this one argued out, start to finish.';
+const leadAsk =
+  lang === 'de'
+    ? 'Oder du stellst sie selbst und bekommst eine Antwort.'
+    : 'Or ask it yourself and get an answer back.';
+const lead = showAsk ? `${leadDebate} ${leadAsk}` : leadDebate;
 ---
 <section class="tq-cta">
-  <p class="tq-cta__lead">{t('themes.ctaLead')}</p>
+  <p class="tq-cta__lead">{lead}</p>
   <p class="tq-cta__q">{question}</p>
   <a
     class="pub-cta__button tq-cta__button"
-    href={askHref}
+    href={debateHref}
     data-agc-cta="start-exploring"
-    data-agc-figure={figureId}
-    data-agc-door="theme_cta"
+    data-agc-council={councilId}
+    data-agc-door="theme_debate_cta"
   >
-    {t('themes.ctaPrimary', 'Ask {name} this').replace('{name}', name)}
+    {hearDebateLabel(minutes, lang)}
   </a>
   <p class="tq-cta__alt">
-    <a
-      class="pub-textlink"
-      href={debateHref}
-      data-agc-cta="start-exploring"
-      data-agc-council={councilId}
-      data-agc-door="theme_cta_debate"
-    >{t('themes.ctaSecondary')}</a>
-    <span class="tq-cta__sep" aria-hidden="true">·</span>
+    {showAsk && (
+      <a
+        class="pub-textlink"
+        href={askHref}
+        data-agc-cta="start-exploring"
+        data-agc-figure={figureId}
+        data-agc-door="theme_ask_cta"
+      >{t('themes.askThis')}</a>
+    )}
+    {showAsk && <span class="tq-cta__sep" aria-hidden="true">·</span>}
     <a class="pub-textlink" href={publicUrl(lang, '/figures')}>{t('themes.allFigures')}</a>
   </p>
   <p class="tq-cta__trust">{t('cta.trust')}</p>

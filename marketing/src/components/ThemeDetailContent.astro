@@ -1,8 +1,9 @@
 ---
-// Full body for a theme detail page, in ten blocks: hero question, the
-// answer-first paragraph, the answers paired one-to-one with the curated
-// voices, the ask-it-yourself doors, the featured debate plus the open rail,
-// attributed quotes, the substance layer, the lattice, and the CTA.
+// Full body for a theme detail page, in seven sections: the question, the
+// answers side by side, the debate you can hear, the questions you can ask,
+// the depth layer, the minds behind the answers, and the closing doors.
+// One section, one job, one kind of action, so no block asks the visitor to
+// choose between two doors that lead to different places.
 // CouncilHero embeds the only React island (council preview audio).
 
 import Breadcrumbs from './Breadcrumbs.astro';
@@ -20,6 +21,7 @@ import ThemeStyles from './ThemeStyles.astro';
 import { getT } from '../i18n';
 import type { Lang } from '../i18n';
 import { publicUrl } from '../lib/urls';
+import { runtimeMinutes, hearDebateLabel, shortMinutes } from '../lib/councilRuntime';
 import {
   type ThemeId,
   type CatalogCouncil,
@@ -37,7 +39,6 @@ import { getThemeVoices } from '@client/data/public/themeVoices';
 import { themeSeedCrossRef } from '@client/data/public/themeSeedCrossRef';
 import { getFigureById } from '@client/data/public/figuresCatalog';
 import { figureIdToSlug } from '@client/data/public/slugMap';
-import { localizedShortName } from './figureNames';
 import publicEn from '@client/assets/translations/public-en.json';
 import publicDe from '@client/assets/translations/public-de.json';
 
@@ -67,29 +68,6 @@ const EXTRA_SELF_QUESTIONS = [
   'what-does-your-anger-want',
   'the-discipline-of-seeing',
 ];
-
-// Real runtimes, summed from the shipped level-1 segment manifests. Both
-// languages, because the German reads roughly ten percent longer.
-type Manifest = { segments: { duration?: number }[] };
-const manifestModules = {
-  en: import.meta.glob<{ default: Manifest }>(
-    '../../../client/src/assets/councils/*/level-1/en/manifest-en.json',
-    { eager: true },
-  ),
-  de: import.meta.glob<{ default: Manifest }>(
-    '../../../client/src/assets/councils/*/level-1/de/manifest-de.json',
-    { eager: true },
-  ),
-};
-
-function runtimeMinutes(councilId: string, l: Lang): number | null {
-  const entry = Object.entries(manifestModules[l]).find(([path]) =>
-    path.includes(`/councils/${councilId}/level-1/`),
-  );
-  if (!entry) return null;
-  const total = entry[1].default.segments.reduce((sum, s) => sum + (s.duration ?? 0), 0);
-  return total > 0 ? Math.round(total / 60) : null;
-}
 
 // The attribution always comes from the figure catalog, never from the
 // extracted figureName: the German seed file for one figure carries the string
@@ -161,11 +139,32 @@ const typeLabel = (type: CatalogCouncil['type']): string =>
 
 const featuredMinutes = featured ? runtimeMinutes(featured.id, lang) : null;
 const featuredStation = featured ? stationOf(featured.id) : null;
+// The full caption promises a first minute you can play right here, so it only
+// runs where the featured card actually carries a preview clip. Everywhere
+// else the section keeps the same opening sentence and drops the promise.
+const featuredHasPreview = featured ? hasCouncilPreview(featured.id) : false;
+const hearCaption = featuredHasPreview
+  ? t('themes.hearCaption')
+  : lang === 'de'
+    ? 'Vier Echos nehmen die Frage auseinander.'
+    : 'Four Echoes take the question apart.';
 
-function doorHref(councilId: string, figureId: string): string {
-  const slug = figureIdToSlug[figureId] || figureId;
-  return `/app?figure=${slug}&q=${councilId}&lang=${lang}`;
-}
+const debateHref = (councilId: string): string => `/app?council=${councilId}&lang=${lang}`;
+
+const otherDebatesLabel =
+  lang === 'de'
+    ? `Die anderen ${rail.length} Debatten zu dieser Frage`
+    : `The other ${rail.length} debates on this question`;
+
+// The ask doors carry the question through to the app, where the visitor
+// still picks how they want to talk. So the caption promises a carried
+// question, not a single tap.
+const askCaption =
+  lang === 'de'
+    ? 'Jede Frage öffnet ein Gespräch mit dem Echo, das diese Debatte leitet. Deine Frage kommt mit, du stehst nie vor einem leeren Feld.'
+    : 'Each question below opens a conversation with the person who leads that debate. Your question comes along, so you never face a blank box.';
+
+const depthLabel = lang === 'de' ? 'Tiefer einsteigen' : 'Going deeper';
 
 const isSelfTheme = themeId === 'who-am-i';
 const askCouncils: CatalogCouncil[] = isSelfTheme
@@ -282,20 +281,13 @@ const heroFacts = [
          invites anyone to talk to one, not after. -->
     <EchoNote variant="theme" lang={lang} />
 
-    <!-- Block 5: ask it yourself. -->
-    {askItems.length > 0 && (
-      <section class="tq-section">
-        <h2 class="tq-h2">{isSelfTheme ? t('themes.askLabelSelf') : t('themes.askLabel')}</h2>
-        <p class="tq-note">{t('themes.askCaption')}</p>
-        <QuestionDoors items={askItems} lang={lang} door="theme_ask" />
-      </section>
-    )}
-
-    <!-- Block 6: hear it argued. -->
+    <!-- Section 3: hear it argued. The signature section. One featured debate
+         behind one gold door that prints its real runtime, then every other
+         debate as a single-door row. No row offers two destinations. -->
     {featured && (
       <section class="tq-section">
         <h2 class="tq-h2">{t('themes.hearLabel')}</h2>
-        <p class="tq-note">{t('themes.hearCaption')}</p>
+        <p class="tq-note">{hearCaption}</p>
         <!-- The featured debate's own plate, over the card that opens it. -->
         <ThemePlate themeId={themeId} slot="debate" lang={lang} />
         <CouncilHero
@@ -303,93 +295,116 @@ const heroFacts = [
           lang={lang}
           headingLevel="h3"
           typeLabel={typeLabel(featured.type)}
-          runtimeLabel={featuredMinutes
-            ? t('themes.runtime').replace('{minutes}', String(featuredMinutes))
-            : undefined}
           stationLabel={featuredStation
             ? t('themes.station').replace('{n}', String(featuredStation))
             : undefined}
-          openHref={`/app?council=${featured.id}&lang=${lang}`}
-          openLabel={t('themes.openDebate')}
-          askHref={doorHref(featured.id, featured.moderator.id)}
-          askLabel={t('themes.askThis')}
-          askFigureId={featured.moderator.id}
         />
+        <p class="tq-hear__door">
+          <a
+            class="pub-cta__button tq-hear__button"
+            href={debateHref(featured.id)}
+            data-agc-cta="start-exploring"
+            data-agc-council={featured.id}
+            data-agc-door="theme_debate"
+          >{hearDebateLabel(featuredMinutes, lang)}</a>
+        </p>
 
         {rail.length > 0 && (
           <>
-            <h3 class="tq-h3">
-              {t('themes.allDebates').replace('{count}', String(ranked.length))}
-            </h3>
+            <h3 class="tq-h3">{otherDebatesLabel}</h3>
             <ol class="tq-rail">
-              {rail.map(council => (
-                <li class="tq-rail__item">
-                  <p class="tq-rail__title">{getLocalizedTitle(council, lang)}</p>
-                  <p class="tq-rail__hook">{getLocalizedHook(council, lang)}</p>
-                  <p class="tq-rail__meta">
-                    <span>{[council.moderator, ...council.participants]
-                      .map(p => getShortDisplayName(p.id))
-                      .join(' · ')}</span>
-                  </p>
-                  <p class="tq-rail__doors">
+              {rail.map(council => {
+                const mins = shortMinutes(runtimeMinutes(council.id, lang), lang);
+                return (
+                  <li class="tq-rail__item">
                     <a
-                      class="pub-textlink"
-                      href={`/app?council=${council.id}&lang=${lang}`}
+                      class="tq-rail__link"
+                      href={debateHref(council.id)}
                       data-agc-cta="start-exploring"
                       data-agc-council={council.id}
                       data-agc-door="theme_debate"
-                    >{t('themes.openDebate')}</a>
-                    <span class="tq-rail__sep" aria-hidden="true">·</span>
-                    <a
-                      class="pub-textlink"
-                      href={doorHref(council.id, council.moderator.id)}
-                      data-agc-cta="start-exploring"
-                      data-agc-figure={council.moderator.id}
-                      data-agc-door="theme_ask_rail"
-                    >{t('themes.askThis')}</a>
-                  </p>
-                </li>
-              ))}
+                    >
+                      <span class="tq-rail__title">{getLocalizedTitle(council, lang)}</span>
+                      <span class="tq-rail__hook">{getLocalizedHook(council, lang)}</span>
+                      <span class="tq-rail__meta">
+                        {[council.moderator, ...council.participants]
+                          .map(p => getShortDisplayName(p.id))
+                          .join(' · ')}
+                      </span>
+                      <span class="tq-rail__go">
+                        {t('themes.openDebate')}
+                        {mins && <span class="tq-rail__sep" aria-hidden="true">·</span>}
+                        {mins}
+                      </span>
+                    </a>
+                  </li>
+                );
+              })}
             </ol>
           </>
         )}
       </section>
     )}
 
-    <!-- Block 7: in their own words. -->
-    {quotes.length >= 2 && (
+    <!-- Section 4: make it yours. Every ask door on the page lives here, and
+         nowhere else, so the same question is never offered four ways. -->
+    {askItems.length > 0 && (
       <section class="tq-section">
-        <h2 class="tq-h2">{t('themes.quotesLabel')}</h2>
-        <p class="tq-note">{t('themes.quotesCaption')}</p>
-        <div class="tq-quotes">
-          {quotes.map(q => (
-            <figure class="tq-quote">
-              <blockquote class="tq-quote__text">{q.quote}</blockquote>
-              <figcaption class="tq-quote__cite">
-                <a
-                  class="tq-quote__name"
-                  href={publicUrl(lang, `/figures/${figureIdToSlug[q.figureId] || q.figureId}`)}
-                >{getFigureById(q.figureId, lang)?.name ?? q.figureName}</a>
-                <span class="tq-quote__sep" aria-hidden="true">·</span>
-                <span class="tq-quote__src">
-                  {t('themes.fromTeaching', 'from {title}').replace('{title}', q.seedTitle)}
-                </span>
-              </figcaption>
-            </figure>
-          ))}
-        </div>
+        <h2 class="tq-h2">{isSelfTheme ? t('themes.askLabelSelf') : t('themes.askLabel')}</h2>
+        <p class="tq-note">{askCaption}</p>
+        <QuestionDoors items={askItems} lang={lang} door="theme_ask" />
       </section>
     )}
 
-    <!-- Block 8: the substance layer. -->
-    {substance.map(block => (
+    <!-- Section 5: the depth layer. The quotes stay open because they are
+         short, the long answers tier into panels. Native details, so every
+         word stays in the markup whether or not a panel is open. -->
+    {(quotes.length >= 2 || substance.length > 0) && (
       <section class="tq-section">
-        <h2 class="tq-h2">{block.q}</h2>
-        <p class="tq-prose-p">{block.a}</p>
-      </section>
-    ))}
+        <h2 class="tq-h2">{depthLabel}</h2>
 
-    <!-- Block 9: the lattice. -->
+        {quotes.length >= 2 && (
+          <>
+            <h3 class="tq-h3 tq-h3--first">{t('themes.quotesLabel')}</h3>
+            <p class="tq-note">{t('themes.quotesCaption')}</p>
+            <div class="tq-quotes">
+              {quotes.map(q => (
+                <figure class="tq-quote">
+                  <blockquote class="tq-quote__text">{q.quote}</blockquote>
+                  <figcaption class="tq-quote__cite">
+                    <a
+                      class="tq-quote__name"
+                      href={publicUrl(lang, `/figures/${figureIdToSlug[q.figureId] || q.figureId}`)}
+                    >{getFigureById(q.figureId, lang)?.name ?? q.figureName}</a>
+                    <span class="tq-quote__sep" aria-hidden="true">·</span>
+                    <span class="tq-quote__src">
+                      {t('themes.fromTeaching', 'from {title}').replace('{title}', q.seedTitle)}
+                    </span>
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
+          </>
+        )}
+
+        {substance.length > 0 && (
+          <div class="tq-depth">
+            {substance.map(block => (
+              <details class="tq-depth__item">
+                <summary class="tq-depth__summary">
+                  <h3 class="tq-depth__q">{block.q}</h3>
+                  <span class="tq-depth__arrow" aria-hidden="true">▼</span>
+                </summary>
+                <p class="tq-depth__a">{block.a}</p>
+              </details>
+            ))}
+          </div>
+        )}
+      </section>
+    )}
+
+    <!-- Section 6: the minds. Names, and the pages behind them. The ask doors
+         that used to sit on every card now live in section 4 only. -->
     {voices.length > 0 && (
       <section class="tq-section">
         <h2 class="tq-h2">{t('themes.voicesLabel')}</h2>
@@ -398,11 +413,6 @@ const heroFacts = [
           {voices.map(voice => {
             const figure = getFigureById(voice.figureId, lang);
             const slug = figureIdToSlug[voice.figureId] || voice.figureId;
-            // The voice's own debate in this theme when there is one, else
-            // the featured debate, so every card carries a working door.
-            const own = ranked.find(c => c.moderator.id === voice.figureId)
-              ?? ranked.find(c => c.participants.some(p => p.id === voice.figureId))
-              ?? featured;
             return (
               <li class="tq-grid__item">
                 <a class="tq-grid__link" href={publicUrl(lang, `/figures/${slug}`)}>
@@ -418,15 +428,6 @@ const heroFacts = [
                   <span class="tq-grid__name">{figure?.name ?? getShortDisplayName(voice.figureId)}</span>
                   <span class="tq-grid__stance">{lang === 'de' ? voice.stanceDe : voice.stance}</span>
                 </a>
-                {own && (
-                  <a
-                    class="tq-grid__ask"
-                    href={doorHref(own.id, voice.figureId)}
-                    data-agc-cta="start-exploring"
-                    data-agc-figure={voice.figureId}
-                    data-agc-door="theme_voice_ask"
-                  >{t('themes.askVoice').replace('{name}', localizedShortName(voice.figureId, lang))}</a>
-                )}
               </li>
             );
           })}
@@ -434,32 +435,32 @@ const heroFacts = [
       </section>
     )}
 
-    {relatedThemeIds.length > 0 && (
-      <section class="tq-section">
-        <h2 class="tq-h2">{t('themes.relatedLabel')}</h2>
-        <ul class="tq-related">
-          {relatedThemeIds.map(relId => (
-            <li>
-              <a class="tq-related__link" href={publicUrl(lang, `/themes/${relId}`)}>
-                {t(`themes.${relId}.question`)}
-              </a>
-            </li>
-          ))}
-        </ul>
-        <p class="tq-note">
-          <a class="pub-textlink" href={publicUrl(lang, '/figures')}>{t('themes.allFigures')}</a>
-        </p>
-      </section>
-    )}
-
-    <!-- Block 10: the CTA, primary door first. -->
+    <!-- Section 7: the closing doors. The debate is the gold one, asking is
+         the quiet second, and the neighbouring questions are the way on for
+         anyone who wants neither. -->
     {featured && (
       <ThemeCTA
         lang={lang}
         councilId={featured.id}
         question={getLocalizedQuestion(featured, lang)}
         figureId={featured.moderator.id}
+        minutes={featuredMinutes}
       />
+    )}
+
+    {relatedThemeIds.length > 0 && (
+      <nav class="tq-next" aria-labelledby="tq-next-head">
+        <h2 class="tq-next__head" id="tq-next-head">{t('themes.relatedLabel')}</h2>
+        <ul class="tq-next__list">
+          {relatedThemeIds.map(relId => (
+            <li>
+              <a class="tq-next__link" href={publicUrl(lang, `/themes/${relId}`)}>
+                {t(`themes.${relId}.question`)}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
     )}
   </div>
 </div>
@@ -522,44 +523,109 @@ const heroFacts = [
     .tq-voice__portrait img { width: 56px; height: 56px; }
   }
 
-  /* ── The debate rail ── */
+  /* ── The featured debate's door ── */
+  .tq-hear__door { margin: 1.5rem 0 0; text-align: center; }
+  .tq-hear__button { display: inline-flex; min-height: 48px; }
+
+  /* ── The debate rail: one row, one destination ── */
   .tq-rail { list-style: none; margin: 0; padding: 0; }
   .tq-rail__item {
-    padding: 1.1rem 0;
     border-top: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-12), transparent);
   }
+  .tq-rail__link {
+    display: block;
+    padding: 1.1rem 0.85rem;
+    margin: 0 -0.85rem;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    transition: background var(--transition-fast);
+  }
+  .tq-rail__link:hover,
+  .tq-rail__link:focus-visible {
+    background: color-mix(in srgb, var(--bg-highlight) var(--a-45), transparent);
+  }
   .tq-rail__title {
-    margin: 0;
+    display: block;
     font-family: var(--font-content, 'Libre Caslon Text', serif);
     font-size: var(--text-md);
     font-weight: var(--weight-bold);
     color: var(--text-primary);
   }
+  .tq-rail__link:hover .tq-rail__title { color: var(--gold-primary); }
   .tq-rail__hook {
-    margin: 0.3rem 0 0;
+    display: block;
+    margin-top: 0.3rem;
     font-family: var(--font-content, 'Libre Caslon Text', serif);
     font-size: var(--text-base);
     line-height: var(--leading-relaxed);
     color: var(--text-secondary);
   }
   .tq-rail__meta {
-    margin: 0.45rem 0 0;
+    display: block;
+    margin-top: 0.45rem;
     font-family: var(--font-ui, 'Space Grotesk', sans-serif);
     font-size: var(--text-xs);
     letter-spacing: 0.08em;
     color: var(--text-tertiary);
   }
-  .tq-rail__doors {
-    margin: 0.6rem 0 0;
+  .tq-rail__go {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.4rem;
+    margin-top: 0.55rem;
+    min-height: 24px;
     font-family: var(--font-ui, 'Space Grotesk', sans-serif);
     font-size: var(--text-sm);
+    letter-spacing: 0.06em;
+    color: var(--gold-primary);
   }
-  .tq-rail__doors a { min-height: 44px; display: inline-flex; align-items: center; }
+  .tq-rail__link:hover .tq-rail__go { color: var(--gold-hover); }
   .tq-rail__sep { color: var(--text-dim); }
+
+  /* ── The depth panels ── */
+  .tq-h3--first { margin-top: 1.25rem; }
+  .tq-depth { margin-top: 1.75rem; }
+  .tq-depth__item {
+    border-top: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-12), transparent);
+  }
+  .tq-depth__item:last-child {
+    border-bottom: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-12), transparent);
+  }
+  .tq-depth__summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: 56px;
+    padding: 0.85rem 0;
+    cursor: pointer;
+    list-style: none;
+  }
+  .tq-depth__summary::-webkit-details-marker { display: none; }
+  .tq-depth__q {
+    margin: 0;
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: var(--text-md);
+    font-weight: var(--weight-bold);
+    line-height: var(--leading-normal);
+    color: var(--text-primary);
+  }
+  .tq-depth__summary:hover .tq-depth__q { color: var(--gold-primary); }
+  .tq-depth__arrow {
+    flex: 0 0 auto;
+    font-size: 0.7rem;
+    color: var(--gold-deep);
+    transition: transform var(--transition-fast);
+  }
+  .tq-depth__item[open] .tq-depth__arrow { transform: rotate(180deg); }
+  .tq-depth__a {
+    margin: 0 0 1.25rem;
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: var(--text-md);
+    line-height: var(--leading-loose);
+    color: var(--text-secondary);
+  }
 
   /* ── Quotes ── */
   .tq-quotes { display: flex; flex-direction: column; gap: 1.4rem; }
@@ -632,35 +698,51 @@ const heroFacts = [
     text-transform: uppercase;
     color: var(--gold-deep);
   }
-  .tq-grid__ask {
-    margin-top: auto;
+  /* ── The way on: quiet nav, not a third offer ── */
+  .tq-next {
+    margin: 1.5rem auto 0;
+    padding-top: 1.4rem;
+    max-width: 44rem;
+    text-align: center;
+    border-top: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-12), transparent);
+  }
+  .tq-next__head {
+    margin: 0 0 0.25rem;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-weight: var(--weight-medium);
+    font-size: var(--text-xs);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+  }
+  .tq-next__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    column-gap: 1.4rem;
+  }
+  .tq-next__link {
     display: inline-flex;
     align-items: center;
     min-height: 44px;
-    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
-    font-size: var(--text-sm);
-    color: var(--gold-primary);
-    text-decoration: none;
-    border-bottom: 1px solid color-mix(in srgb, var(--gold-primary) var(--a-30), transparent);
-    align-self: flex-start;
-  }
-  .tq-grid__ask:hover { color: var(--gold-hover); }
-
-  .tq-related { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
-  .tq-related__link {
-    display: flex;
-    align-items: center;
-    min-height: 44px;
-    padding: 0.5rem 0.85rem;
-    border: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-12), transparent);
-    border-radius: var(--radius-sm);
     font-family: var(--font-content, 'Libre Caslon Text', serif);
     font-size: var(--text-base);
-    color: var(--text-primary);
-    text-decoration: none;
+    line-height: var(--leading-normal);
+    color: var(--text-secondary);
+    text-decoration: underline;
+    text-decoration-color: color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.3em;
   }
-  .tq-related__link:hover {
+  .tq-next__link:hover {
     color: var(--gold-primary);
-    border-color: color-mix(in srgb, var(--gold-primary) var(--a-40), transparent);
+    text-decoration-color: var(--gold-primary);
+  }
+  @media (max-width: 640px) {
+    .tq-next__list { flex-direction: column; }
   }
 </style>
