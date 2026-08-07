@@ -705,6 +705,12 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Both labels ship, one shows. display:none keeps the hidden one out of the
+   accessibility tree too. */
+.nav-button-label .nav-label-short {
+  display: none;
+}
+
 /* Hover state for better visibility */
 .nav-button-container:hover .nav-button-label {
   opacity: 1;
@@ -732,35 +738,14 @@
     font-weight: 700; /* Extra bold for tiny screens */
   }
 
-  /* 2025 RESPONSIVE LABELS: Language-aware shortened text on small screens */
-  /* Use data attributes to identify which labels to shorten */
-
-  /* Audiolibrary → Stories (universal, works in all languages) */
-  .nav-button-label[data-label="audiolibrary"] {
-    font-size: 0; /* Hide original text */
+  /* Short labels swap in below 480px. The text comes from the translation
+     files, so no language is hardcoded here. */
+  .nav-button-label .nav-label-full {
+    display: none;
   }
 
-  .nav-button-label[data-label="audiolibrary"]::after {
-    content: "Stories"; /* Universal - used in Instagram, TikTok, etc. */
-    font-size: 0.85rem; /* Show shortened text */
-  }
-
-  /* Settings - Language-aware */
-  .nav-button-label[data-label="settings"] {
-    font-size: 0; /* Hide original text */
-  }
-
-  /* English: Keep "Settings" (8 letters = short enough, industry standard) */
-  :lang(en) .nav-button-label[data-label="settings"]::after,
-  .nav-button-label[data-label="settings"]::after {
-    content: "Settings"; /* Default to English */
-    font-size: 0.85rem;
-  }
-
-  /* German: Shorten "Einstellungen" (14 letters) → "Optionen" (8 letters) */
-  :lang(de) .nav-button-label[data-label="settings"]::after {
-    content: "Optionen";
-    font-size: 0.85rem;
+  .nav-button-label .nav-label-short {
+    display: inline;
   }
 }
 

@@ -28,9 +28,9 @@ export interface Message {
 
 /**
  * What a chat LLM request is: the auto greeting that opens a chat, a turn the
- * visitor typed, or the carried question of the prefilled entry flow (reserved,
- * not emitted yet). Rides along on the request as a label; it never changes the
- * prompt or the routing.
+ * visitor typed, or the carried question they chose before the conversation
+ * opened. Rides along on the request as a label; it never changes the prompt or
+ * the routing (the carried question's `entry` field does that).
  */
 export type ChatTurnKind = 'greeting' | 'turn' | 'prefilled';
 
@@ -256,10 +256,15 @@ export const generateResponse = async ({
       processedSeedData = seedDataProcessor.processSeedConversationData(seedData, allSeeds, figureMeta, selectedLanguage);
     } else if (currentMode === 'free_conversation') {
       // The selected seed doubles as the anchor: an ask-intent arrival has
-      // its question's seed on record, a default arrival sits on seed 1.
+      // its question's seed on record, a default arrival sits on seed 1. A
+      // carried question that names no teaching of its own suppresses the
+      // anchor instead, because a wrong teaching grounds an answer worse than
+      // none does.
+      const anchor = entry === 'carried'
+        ? anchorSeedId
+        : useDomainStore.getState().seeds.selectedId;
       processedSeedData = seedDataProcessor.processFreeConversationData(
-        allSeeds, figureMeta, selectedLanguage,
-        useDomainStore.getState().seeds.selectedId ?? undefined
+        allSeeds, figureMeta, selectedLanguage, anchor ?? undefined
       );
     }
 
@@ -279,6 +284,7 @@ export const generateResponse = async ({
       onToolCall,
       signal,
       turnKind,
+      entry,
     });
 
     const perfResult = performanceMonitor.endRequest(perfMetrics, true);

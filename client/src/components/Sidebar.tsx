@@ -11,7 +11,7 @@ import OptimizedImage from './OptimizedImage';
 import { getHistoricalFigures } from '../api/figures';
 import { useTranslation } from '../hooks/useTranslation';
 import { useLiquidGlass } from '../hooks/useLiquidGlass';
-import { Figure, Seed } from '../types/global';
+import { Figure } from '../types/global';
 import RenderCounter from '../dev/RenderCounter';
 
 // Type definitions
@@ -35,11 +35,8 @@ interface CouncilConfig {
 interface SidebarProps {
   selectedFigure: Figure | null;
   onSelectFigure: (figure: Figure) => void;
-  onOpenHistoryModal?: () => void;
-  onSelectSeed?: (seed: Seed) => void;
   isOpen: boolean;
   onClose: () => void;
-  onOpenModeSelector: () => void;
   hideOnDesktop?: boolean;
   isCouncilMode?: boolean;
   councilConfig?: CouncilConfig | null;
@@ -76,7 +73,6 @@ const Sidebar: FC<SidebarProps> = ({
   
   const [isCarouselOpen, setIsCarouselOpen] = useState<boolean>(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
-  const [settingsInitialTab, setSettingsInitialTab] = useState<string | undefined>(undefined);
   const [isMobileOrTablet, setIsMobileOrTablet] = useState<boolean>(window.innerWidth < 1024);
   const [showFigurePreview, setShowFigurePreview] = useState<boolean>(false);
   const [previewFigures, setPreviewFigures] = useState<Figure[]>([]);
@@ -118,17 +114,6 @@ const Sidebar: FC<SidebarProps> = ({
     return () => {
       cancelAnimationFrame(rafId);
     };
-  }, []);
-
-  // Listen for programmatic settings open requests (e.g. from RateLimitModal BYOK CTA)
-  useEffect(() => {
-    const handleOpenSettings = (e: Event) => {
-      const tab = (e as CustomEvent).detail?.tab;
-      setSettingsInitialTab(tab || undefined);
-      setIsSettingsOpen(true);
-    };
-    window.addEventListener('openSettingsRequest', handleOpenSettings);
-    return () => window.removeEventListener('openSettingsRequest', handleOpenSettings);
   }, []);
 
   // 2025 DISCOVERABILITY: Pulse hint for first-time users (clean, no tooltip)
@@ -626,7 +611,12 @@ const Sidebar: FC<SidebarProps> = ({
                 buttonRef={libraryButtonRef}
                 onButtonClick={() => onClose()}
               />
-              <span className="nav-button-label" data-label="audiolibrary">{tNode('navigation.audioLibrary')}</span>
+              {/* Short label is a translation key, not a CSS content swap, so
+                  every language keeps one source of truth. */}
+              <span className="nav-button-label">
+                <span className="nav-label-full">{tNode('navigation.audioLibrary')}</span>
+                <span className="nav-label-short">{tNode('navigation.short.audioLibrary')}</span>
+              </span>
             </div>
 
             <div className="nav-button-container">
@@ -662,7 +652,10 @@ const Sidebar: FC<SidebarProps> = ({
                   />
                 </div>
               </button>
-              <span className="nav-button-label" data-label="settings">{tNode('navigation.settings')}</span>
+              <span className="nav-button-label">
+                <span className="nav-label-full">{tNode('navigation.settings')}</span>
+                <span className="nav-label-short">{tNode('navigation.short.settings')}</span>
+              </span>
             </div>
           </nav>
         </div>
@@ -672,8 +665,7 @@ const Sidebar: FC<SidebarProps> = ({
         <Suspense fallback={null}>
           <SettingsModal
             isOpen={isSettingsOpen}
-            onClose={() => { setIsSettingsOpen(false); setSettingsInitialTab(undefined); }}
-            initialTab={settingsInitialTab}
+            onClose={() => setIsSettingsOpen(false)}
           />
         </Suspense>
       )}

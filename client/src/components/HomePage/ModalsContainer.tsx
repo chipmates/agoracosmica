@@ -3,8 +3,8 @@ const HistoryModal = lazy(() => import('../HistoryModal'));
 import ModeSelectorMini from '../ModeSelectorMini';
 import SeedsModal from '../SeedsModal';
 const WelcomeDisclosureModal = lazy(() => import('../WelcomeDisclosureModal'));
-// V2 = the night gallery (design blessed 2026-07-23). V1 stays as the instant
-// fallback: swap the import path back to '../WisdomGalleryModal' to revert.
+// V2 = the night gallery (design blessed 2026-07-23). V1 is gone, so this is
+// the only gallery; the name stays for the props contract below.
 const WisdomGalleryModal = lazy(() => import('../WisdomGalleryModalV2'));
 
 import RenderCounter from '../../dev/RenderCounter';

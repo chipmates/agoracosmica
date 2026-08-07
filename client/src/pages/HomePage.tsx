@@ -37,6 +37,7 @@ import {
   markReplyDispatchStart,
   replyTimeBucketSinceDispatch,
   hasFiredFunnelStep,
+  hasFiredFirstTurn,
   firstReplyFailReason,
   noteChatTurn,
 } from '../utils/funnelBeacon';
@@ -55,9 +56,9 @@ import PostQuestVerdictCard from '../components/QuestVerdictCard/PostQuestVerdic
 import { getPendingQuestVerdict, clearPendingQuestVerdict } from '../utils/questVerdict';
 import { restartQuest } from '../utils/questRestart';
 import { LocalStorageAdapter } from '../storage/localAdapter';
-import { readFigureIntent, clearFigureIntent, readCouncilIntent, clearCouncilIntent, readAskIntent, clearAskIntent, stashAskPrefill, stageCouncilHandoff, readStoryIntent, clearStoryIntent, peekAskPrefillTag } from '../utils/public/entryIntent';
+import { readFigureIntent, clearFigureIntent, readCouncilIntent, clearCouncilIntent, readAskIntent, clearAskIntent, stashAskPrefill, stageCouncilHandoff, readStoryIntent, clearStoryIntent, peekAskPrefillTag, consumeComposerStagedOrigin, beginCarriedThread } from '../utils/public/entryIntent';
 import { resolveAnchorSeedId } from '../data/public/heroEntry';
-import { CEREMONY_CARRIED_ENTRY } from '../config/features';
+import { CEREMONY_CARRIED_ENTRY, NAV_BATCH } from '../config/features';
 import { preferencesAdapter } from '../storage/preferencesAdapter';
 import { readHistoryMessages } from '../services/history/historyEncryption';
 import { registerSessionControllerHandlers } from '../controllers/sessionControllerRegistry';
@@ -288,6 +289,7 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
     handleModeSelectorOpen,
     handleModeSelectorClose,
     handleFigureCarouselOpen,
+    handleFigureCarouselClose,
     handleWisdomGalleryClose,
     handleWisdomGalleryOpen,
     handleWisdomGalleryCloseComplete,
@@ -649,6 +651,17 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
   const handleModeSelect = useCallback(async (mode: string, force = false) => {
     figureSelectHandlingModeRef.current = false;
 
+    // Funnel: anonymous volume, per occurrence, no consent gate and no
+    // one-shot. Mode picks are no longer a conversion (picking a chapter said
+    // nothing about whether anyone stayed), so this counter is all that is
+    // left of them. It sits at the chokepoint every mode start passes through,
+    // so quicklinks, smart actions, deep links and the header chip count too,
+    // not only picks made in the selector.
+    sendFunnelBeacon('mode_selected', {
+      figureId: useDomainStore.getState().figures.selectedId ?? undefined,
+      mode,
+    });
+
     if (mode === 'challenge') {
       const state = useDomainStore.getState();
       const figureId = state.figures.selectedId;
@@ -694,6 +707,10 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
       if (stagedTag && figureId &&
           (!stagedTag.startsWith('f:') || stagedTag.startsWith(`f:${figureId}:`))) {
         selectAnchorSeedRef.current(figureId, stagedTag);
+        // The anchor is part of THIS mode choice, not a fresh figure+seed
+        // pick: without the flag, Effect#14 sees the new pair and re-opens
+        // the mode wall over the conversation the visitor just entered.
+        figureSelectHandlingModeRef.current = true;
       }
     }
 
@@ -909,10 +926,28 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
         // so this beacon is the only server-visible signal a conversation
         // started. One-shot via tab-scoped sessionStorage, gated on the submit
         // (the assistant has not replied yet), never on assistant count.
-        sendFunnelBeaconOnce('first_turn', {
+        //
+        // A send whose text came from a staged question is never a typed first
+        // turn. The two steps are separate one-shots, so a visitor who later
+        // types something of their own still fires first_turn.
+        const stagedOrigin = consumeComposerStagedOrigin();
+        sendFunnelBeaconOnce(stagedOrigin ? 'first_turn_prefilled' : 'first_turn', {
           figureId: figureIdentifier,
           mode: normalizedMode ?? '',
         });
+
+        // The carried question opens this conversation: the send itself is
+        // labeled 'prefilled' and the first few turns tell the model the
+        // question was chosen before the two of them ever spoke.
+        if (stagedOrigin) {
+          const state = useDomainStore.getState();
+          beginCarriedThread(
+            state.conversation.historyKey,
+            stagedOrigin.anchorSeedId,
+            normalizedMode ?? '',
+            state.conversation.messages.filter((m) => m?.role === 'user').length,
+          );
+        }
 
         // Depth of the chat this turn belongs to. Counted in memory and
         // emitted once, as a bucket, when the chat is left behind — so a
@@ -1102,10 +1137,10 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
           // success or error never double-fires. Bucket = coarse
           // time-to-failure since dispatch, never raw milliseconds.
           //
-          // Gated on first_turn for the same reason as the success variant: a
-          // failed auto-greeting stream must not count as a first_reply before
-          // the visitor has sent a turn.
-          if (hasFiredFunnelStep('first_turn')) {
+          // Gated on the first user turn for the same reason as the success
+          // variant: a failed auto-greeting stream must not count as a
+          // first_reply before the visitor has sent anything.
+          if (hasFiredFirstTurn()) {
             // Read before the beacon below marks first_reply as fired: a
             // failure on a later turn is not a first-reply failure.
             const firstReplyAlreadyLanded = hasFiredFunnelStep('first_reply');
@@ -1127,7 +1162,7 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
           // Typed, then the stream was cancelled before any reply arrived. It
           // costs the visitor the same as an error, so it belongs in the same
           // counter under its own reason.
-          if (hasFiredFunnelStep('first_turn') && !hasFiredFunnelStep('first_reply')) {
+          if (hasFiredFirstTurn() && !hasFiredFunnelStep('first_reply')) {
             sendFunnelBeaconOnce('first_reply_failed', {
               outcome: 'abort',
               bucket: replyTimeBucketSinceDispatch(),
@@ -1723,7 +1758,8 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
       handleCouncilGoDeeper,
       handlePrismClose,
       handleModeSelectorOpen,
-      handleFigureCarouselOpen
+      handleFigureCarouselOpen,
+      handleFigureCarouselClose
     }),
     [
       showFigureCarousel,
@@ -1744,7 +1780,8 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
       handleCouncilGoDeeper,
       handlePrismClose,
       handleModeSelectorOpen,
-      handleFigureCarouselOpen
+      handleFigureCarouselOpen,
+      handleFigureCarouselClose
     ]
   );
 
@@ -1779,13 +1816,31 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
     [tString, MODES, getTranslatedFigureName, getCurrentSeedName]
   );
 
+  // A returning visitor's archive was unreachable until they started something
+  // new. Same stored-history signal the resume path uses: the mode preference
+  // is the reliable one, the conversation messages sit in IndexedDB.
+  const selectedFigureHasStoredHistory = useMemo(() => {
+    if (!NAV_BATCH) return false;
+    const figureId = selectedFigure?.id;
+    if (!figureId) return false;
+    if (LocalStorageAdapter.getString(STORAGE_KEYS.getFreeTalkHistory(figureId))) return true;
+    const seedId = selectedSeed?.id != null ? String(selectedSeed.id) : null;
+    if (!seedId) return false;
+    return (
+      !!modeStateManager.getStoredMode(figureId, seedId) ||
+      !!LocalStorageAdapter.getString(STORAGE_KEYS.getStarSeedHistory(figureId, seedId)) ||
+      !!LocalStorageAdapter.getString(STORAGE_KEYS.getChallengeHistory(figureId, seedId))
+    );
+  }, [selectedFigure?.id, selectedSeed?.id]);
+
   const mainContentQuickActions = useMemo(
     () => ({
-      showQuickLinkBar: !showFigureCarousel && !isCouncilMode && (conversationStartedFinal || derivedConversationStarted),
+      showQuickLinkBar: !showFigureCarousel && !isCouncilMode &&
+        (conversationStartedFinal || derivedConversationStarted || selectedFigureHasStoredHistory),
       handleQuickAction,
       handleHistoryModalOpen
     }),
-    [showFigureCarousel, isCouncilMode, conversationStartedFinal, derivedConversationStarted, handleQuickAction, handleHistoryModalOpen]
+    [showFigureCarousel, isCouncilMode, conversationStartedFinal, derivedConversationStarted, selectedFigureHasStoredHistory, handleQuickAction, handleHistoryModalOpen]
   );
 
   useEffect(() => scheduleRenderLog('initial-mount'), [scheduleRenderLog]);
@@ -1838,11 +1893,8 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
       <Sidebar
         selectedFigure={selectedFigure}
         onSelectFigure={handleSelectFigure}
-        onOpenHistoryModal={handleHistoryModalOpen}
-        onSelectSeed={handleSeedSelect}
         isOpen={isMenuOpen}
         onClose={handleMenuClose}
-        onOpenModeSelector={handleModeSelectorOpen}
         hideOnDesktop={showFigureCarousel}
         isCouncilMode={isCouncilMode}
         councilConfig={councilConfig}

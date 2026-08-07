@@ -51,6 +51,11 @@ const VALID_STEPS = new Set([
   'cinematic_end',
   'welcome_shown',
   'first_turn',
+  // The activation moment for a send the visitor did not type: the question
+  // came from a public page and arrived in the composer. One-shot per tab like
+  // first_turn, and never instead of it — the two split the same total, so
+  // first_turn keeps its typed-only meaning.
+  'first_turn_prefilled',
   'figure_selected',
   'mode_selected',
   'first_reply',
@@ -69,6 +74,10 @@ const VALID_STEPS = new Set([
   // the "never opens vs opens and flees" gap between sidebar tap and the
   // playback started beacon.
   'council_open',
+  // A way out of a conversation was taken, per-occurrence volume counter. The
+  // mode slot names which one: the provenance chip and the chapter door emit
+  // it now, the rest of the corridor affordances follow.
+  'nav_open',
   // Free-tier bot check, per-occurrence volume counters. turnstile_failed
   // carries why it ended without a token. turnstile_started is the denominator
   // (one per widget render), turnstile_abandoned counts a check still pending
@@ -118,6 +127,9 @@ const VALID_OUTCOMES = new Set([
 // validated like routes/page.ts; figure ids against a tight slug shape.
 const PATH_RE = /^\/[A-Za-z0-9/_-]{0,60}$/;
 const FIGURE_RE = /^[A-Za-z0-9_-]{1,64}$/;
+// blob3 holds a conversation mode on most steps, the arrival class on
+// welcome_shown (generic / figure / ask / council / chapter) and the
+// affordance name on nav_open. All of them are short lowercase labels.
 const MODE_RE = /^[a-z_]{1,40}$/;
 const VALID_LANGS = new Set(['en', 'de']);
 

@@ -36,6 +36,7 @@ interface SessionSlice {
   handlePrismClose: () => void;
   handleModeSelectorOpen: () => void;
   handleFigureCarouselOpen: () => void;
+  handleFigureCarouselClose: () => void;
 }
 
 interface AppSlice {
@@ -120,6 +121,7 @@ const MainContentContainer: React.FC<MainContentContainerProps> = ({
         onPrismClose={session.handlePrismClose}
         onChooseMode={session.handleModeSelectorOpen}
         onChooseFigure={session.handleFigureCarouselOpen}
+        onCarouselClose={session.handleFigureCarouselClose}
       />
     </>
   );

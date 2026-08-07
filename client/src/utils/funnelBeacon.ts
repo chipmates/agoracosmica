@@ -1,11 +1,14 @@
 // Anonymous funnel-step beacon (Waves 1-2)
 // One-shot steps fire once per tab: cinematic_start / cinematic_end
-// (LoginPage), welcome_shown (WelcomeDisclosureModal), first_turn (HomePage),
+// (LoginPage), welcome_shown (WelcomeDisclosureModal), first_turn and
+// first_turn_prefilled (HomePage, one or the other per send),
 // first_reply (useConversationEffects chunk handler, error variant from the
 // HomePage dispatch error path), first_reply_failed (HomePage, alongside the
 // error variant and on an abandoned stream). Volume steps fire on every
 // occurrence, no dedup: figure_selected (HomePage.handleSelectFigure),
-// mode_selected (ModeSelectorMini), chat_depth (flushed here on chat switch
+// mode_selected (HomePage.handleModeSelect, the mode chokepoint), nav_open
+// (the ways out of a conversation),
+// chat_depth (flushed here on chat switch
 // and unload) and the turnstile_* family (services/proxy/turnstile.ts).
 // The marketing pages' cta_click fires from agc-public.js with the same
 // payload shape.
@@ -30,6 +33,10 @@ export type FunnelStep =
   | 'cinematic_end'
   | 'welcome_shown'
   | 'first_turn'
+  // The same activation moment for a send the visitor did not type: they
+  // clicked the question on a public page and it arrived in the composer.
+  // Its own one-shot, so a later typed send still fires first_turn.
+  | 'first_turn_prefilled'
   | 'figure_selected'
   | 'mode_selected'
   | 'first_reply'
@@ -47,6 +54,10 @@ export type FunnelStep =
   // Council revision: catalog opens (per-occurrence volume counter). With
   // playback 'started' this separates "never opens" from "opens and flees".
   | 'council_open'
+  // A way out of the conversation was taken (per-occurrence volume counter).
+  // The mode slot names which one: provenance_chip, chapter_door, and the
+  // rest of the corridor affordances as they land.
+  | 'nav_open'
   // Free-tier bot check (per-occurrence volume counters, like figure_selected):
   // how often the check runs at all, how often it asks for a tap, how often
   // that tap lands, and how often the check kills the message instead.
@@ -270,6 +281,16 @@ function markFired(step: FunnelStep): void {
  */
 export function hasFiredFunnelStep(step: FunnelStep): boolean {
   return alreadyFired(step);
+}
+
+/**
+ * Has this tab had its first user turn at all, typed or carried? The reply
+ * counters gate on this rather than on first_turn alone: a carried question is
+ * a real turn that simply was not typed, and gating on first_turn would drop
+ * every carried conversation out of first_reply.
+ */
+export function hasFiredFirstTurn(): boolean {
+  return alreadyFired('first_turn') || alreadyFired('first_turn_prefilled');
 }
 
 interface FunnelFields {

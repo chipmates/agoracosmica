@@ -323,6 +323,136 @@ export function peekStagedQuestion(
   }
 }
 
+/** True while a staged question is still waiting in sessionStorage. */
+export function hasStagedQuestion(): boolean {
+  try {
+    if (typeof sessionStorage === 'undefined') return false;
+    if (sessionStorage.getItem(SS_COUNCIL_PREFILL_KEY)) return true;
+    const tag = sessionStorage.getItem(SS_ASK_PREFILL_KEY);
+    return !!tag && isValidAskTag(tag);
+  } catch {
+    return false;
+  }
+}
+
+// ============================================
+// The carried question, once it leaves storage
+// ============================================
+//
+// From here on the carried question lives in memory only, for this tab: which
+// composer content came from a staged question, and which conversation that
+// question opened. None of it is persisted, so a reload ends the carry.
+
+/**
+ * The composer's current text came from a staged question. Editing it keeps
+ * the origin (an edited carried question is still carried); emptying the box
+ * breaks it. `anchorSeedId` is the teaching that grounds the question, or null
+ * when it has none.
+ */
+let composerStagedOrigin: { anchorSeedId: string | null } | null = null;
+
+export function markComposerStagedOrigin(anchorSeedId: string | null): void {
+  composerStagedOrigin = { anchorSeedId };
+}
+
+export function clearComposerStagedOrigin(): void {
+  composerStagedOrigin = null;
+}
+
+/** Read the origin and clear it. The send owns it from that point on. */
+export function consumeComposerStagedOrigin(): { anchorSeedId: string | null } | null {
+  const origin = composerStagedOrigin;
+  composerStagedOrigin = null;
+  return origin;
+}
+
+/**
+ * A carried question is in play when it is still staged OR already sitting in
+ * the composer. The composer consumes the stash the moment it fills, so
+ * neither half alone answers the question.
+ */
+export function hasCarriedQuestionPending(): boolean {
+  return composerStagedOrigin !== null || hasStagedQuestion();
+}
+
+/** How many user turns of a carried conversation keep the entry signal. */
+export const CARRIED_DIRECTIVE_TURNS = 3;
+
+export interface CarriedThread {
+  /** The conversation the carried question opened. */
+  threadKey: string;
+  /** The teaching that grounds it, or null when the question has none. */
+  anchorSeedId: string | null;
+  /** The conversation mode it opened in. */
+  mode: string;
+  /** Which user turn the carried question itself was. */
+  startTurn: number;
+}
+
+let carriedThread: CarriedThread | null = null;
+
+/** Announced when a carried question opens a conversation. */
+export const CARRIED_THREAD_EVENT = 'agc:carried-thread';
+
+export function beginCarriedThread(
+  threadKey: string | null,
+  anchorSeedId: string | null,
+  mode: string,
+  startTurn: number
+): void {
+  carriedThread = { threadKey: threadKey ?? '', anchorSeedId, mode, startTurn };
+  try {
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event(CARRIED_THREAD_EVENT));
+    }
+  } catch {
+    // no-op — the surfaces that care also re-read on every message
+  }
+}
+
+export function readCarriedThread(): CarriedThread | null {
+  return carriedThread;
+}
+
+const matchesCarriedThread = (threadKey: string | null): boolean =>
+  carriedThread !== null && carriedThread.threadKey === (threadKey ?? '');
+
+/** True for the send that carried the question in, and only that one. */
+export function isCarriedFirstTurn(threadKey: string | null, userTurnCount: number): boolean {
+  return matchesCarriedThread(threadKey) && userTurnCount === carriedThread!.startTurn;
+}
+
+/**
+ * True while the conversation still carries the entry signal: the carried send
+ * and the turns right after it, in the mode it opened in.
+ */
+export function isCarriedEntryTurn(threadKey: string | null, userTurnCount: number): boolean {
+  if (!matchesCarriedThread(threadKey)) return false;
+  if (carriedThread!.mode !== 'free_conversation') return false;
+  return userTurnCount >= carriedThread!.startTurn
+    && userTurnCount < carriedThread!.startTurn + CARRIED_DIRECTIVE_TURNS;
+}
+
+/**
+ * Which arrival a first-timer's consent screen belongs to. Non-consuming, so
+ * the routing that runs later still finds every intent it needs.
+ */
+export type EntryClass = 'council' | 'ask' | 'chapter' | 'figure' | 'generic';
+
+export function classifyEntryForFunnel(): EntryClass {
+  try {
+    if (typeof sessionStorage === 'undefined') return 'generic';
+    const ask = sessionStorage.getItem(SS_ASK_KEY);
+    if (sessionStorage.getItem(SS_COUNCIL_KEY) || ask === 'council') return 'council';
+    if (ask && isValidAskTag(ask)) return 'ask';
+    if (readStoryIntent()) return 'chapter';
+    if (sessionStorage.getItem(SS_FIGURE_KEY)) return 'figure';
+    return 'generic';
+  } catch {
+    return 'generic';
+  }
+}
+
 /**
  * Story deep-link — the hero's "Chapter 1 of 12" beat. Only the mode name and
  * the chapter number ride the URL; the chapter maps to the figure's seed of the

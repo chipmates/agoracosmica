@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, FC, MouseEvent, KeyboardEvent } from 'react';
 import { useSwipeable } from 'react-swipeable';
 import { getHistoricalFigures, type TranslatedFigure } from '../api/figures';
-import { CategoryTab, ActionButton } from './Button';
+import { CategoryTab, ActionButton, CloseButton } from './Button';
 import { BookOpen, Check, Sparkle, Play, Pause } from "@phosphor-icons/react";
 import OptimizedImage from './OptimizedImage';
 import { loadFigureImageV2, getBestImageFromMetadata } from '../utils/imageLoaderV2';
@@ -9,6 +9,7 @@ import { useTranslation } from '../hooks/useTranslation';
 import WisdomMapModal from './WisdomMapModal';
 import type { Figure, Seed } from '../types/global';
 import { useFigureTrailer } from '../hooks/useFigureTrailer';
+import { NAV_BATCH } from '../config/features';
 import './FigureCarousel.css';
 
 interface FigureCarouselProps {
@@ -536,9 +537,19 @@ const FigureCarousel: FC<FigureCarouselProps> = ({
     <>
       <div
         id="figure-carousel"
-        className={`figure-carousel ${windowWidth>=1601?'extra-large-screen':''}`}
+        className={`figure-carousel ${windowWidth>=1601?'extra-large-screen':''} ${NAV_BATCH?'has-exit':''}`}
         {...handlers}
       >
+        {/* The carousel fills the screen and hides the rail, so it has to carry
+            its own exit. ESC alone leaves phones with no way out. */}
+        {NAV_BATCH && (
+          <CloseButton
+            onClick={onClose}
+            className="figure-carousel-close"
+            ariaLabel={tString('common.close', 'Close')}
+          />
+        )}
+
         {/* MOBILE LAYOUT */}
         {windowWidth<768 && (
           <>

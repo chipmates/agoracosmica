@@ -19,6 +19,8 @@ import { cleanTextForTts } from '../utils/ttsTextCleaner';
 import { QUEST_TOOLS, type AwardSeedArgs } from '../services/llm/questTools';
 import { markSeedAsGathered } from '../services/seedAcquisition/SeedAcquisitionManager';
 import { setPendingQuestVerdict } from '../utils/questVerdict';
+import { isCarriedFirstTurn, isCarriedEntryTurn, readCarriedThread } from '../utils/public/entryIntent';
+import { ANSWER_FIRST_REPLY } from '../config/features';
 
 const DEFAULT_LANGUAGE = 'english';
 
@@ -543,6 +545,16 @@ export const createLegacyConversationStream = () => {
         hasTools: !!questTools
       });
     }
+    // Which turn of this conversation the visitor is on. The carried question
+    // is one specific user turn, so the count is what tells the label and the
+    // entry signal apart from every later send.
+    const threadKey = useDomainStore.getState().conversation.historyKey;
+    const userTurnCount = conversationHistory.filter((m) => m.role === 'user').length;
+    const isCarriedSend = !isInitial && isCarriedFirstTurn(threadKey, userTurnCount);
+    const carriesEntry = !isInitial
+      && ANSWER_FIRST_REPLY
+      && isCarriedEntryTurn(threadKey, userTurnCount);
+
     await generateResponse({
       messages: payload,
       instructions: instructionPayload,
@@ -553,8 +565,13 @@ export const createLegacyConversationStream = () => {
       onToolCall: questToolHandler,
       signal,
       // isInitial is the auto greeting that opens a chat: same LLM request as
-      // any other, but nobody typed it.
-      turnKind: isInitial ? 'greeting' : 'turn',
+      // any other, but nobody typed it. 'prefilled' is the send that carried a
+      // question in. Labels only, and unflagged: they describe what happened.
+      turnKind: isInitial ? 'greeting' : (isCarriedSend ? 'prefilled' : 'turn'),
+      // Behavior, not a label: it changes how the figure opens.
+      ...(carriesEntry
+        ? { entry: 'carried' as const, anchorSeedId: readCarriedThread()?.anchorSeedId ?? null }
+        : {}),
     });
 
     // Stream complete — flush any remaining TTS jobs immediately

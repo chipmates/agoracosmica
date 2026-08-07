@@ -578,7 +578,11 @@
     "emptyState": "Choose a topic to begin your conversation.",
     "reviewMode": "Summary",
     "seeker": "Seeker",
-    "stopVoice": "Stop voice"
+    "stopVoice": "Stop voice",
+    "provenance": {
+      "chip": "From chapter {n} of the story",
+      "door": "Hear chapter {n} of the story"
+    }
   },
   "history": {
     "title": "{figure}'s Dialogues",
@@ -629,6 +633,10 @@
     "curatedDebates": "Curated Debates",
     "userProfile": "User profile",
     "logout": "Logout",
+    "short": {
+      "audioLibrary": "Stories",
+      "settings": "Settings"
+    },
     "tabs": {
       "cosmos": "Cosmos",
       "echoes": "Echoes",
@@ -654,6 +662,7 @@
     "freetalk": "Talk",
     "listenPrism": "Listen to Prism",
     "startFree Talk": "Free Talk",
+    "startFreetalk": "Free Talk",
     "listenToStory": "Listen to Story"
   },
   "figures": {

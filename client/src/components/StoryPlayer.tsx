@@ -5,7 +5,6 @@ import { useUIStore } from '../stores/uiStore';
 import { useTranslation } from '../hooks/useTranslation';
 import { Headphones, Info, CaretDown, CaretUp, Play, TrendUp, Trophy, Sparkle, BookOpen, BookBookmark, CheckCircle, Scroll } from '@phosphor-icons/react';
 import StoryAudioPlayer from './StoryAudioPlayer';
-import AudioLibraryModal from './AudioLibrary/AudioLibraryModal';
 import Button from './Button/Button';
 import HelperPopup from './HelperPopup/HelperPopup';
 import { StoryFactCheckPanel } from './FactCheck';
@@ -132,8 +131,6 @@ const StoryPlayer: FC<StoryPlayerProps> = ({
   const language = useDomainStore((state) => state.language.current);
   const { t, tString, tNode, tArray } = useTranslation();
   
-  // State for audio library modal
-  const [isAudioLibraryOpen, setIsAudioLibraryOpen] = useState<boolean>(false);
   // State for story helper popup
   const [showStoryHelp, setShowStoryHelp] = useState<boolean>(false);
   const [showFullDisclaimer, setShowFullDisclaimer] = useState<boolean>(false);
@@ -592,7 +589,7 @@ const StoryPlayer: FC<StoryPlayerProps> = ({
   useEffect(() => {
     if (!shouldShowAudioPlayer) return;
     // Don't capture shortcuts when overlays are open
-    if (showStoryHelp || showFactCheck || showForeword || isAudioLibraryOpen) return;
+    if (showStoryHelp || showFactCheck || showForeword) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
       // Don't capture when user is typing in an input
@@ -629,7 +626,7 @@ const StoryPlayer: FC<StoryPlayerProps> = ({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [shouldShowAudioPlayer, isHighlightingAvailable, activeParagraphIndex, audioTimeSeconds, paragraphs.length, seekToParagraph, showStoryHelp, showFactCheck, showForeword, isAudioLibraryOpen]);
+  }, [shouldShowAudioPlayer, isHighlightingAvailable, activeParagraphIndex, audioTimeSeconds, paragraphs.length, seekToParagraph, showStoryHelp, showFactCheck, showForeword]);
 
   // --- Offline copy of this episode ---
   // Always mp3: the webm the player streams is smaller but useless outside a
@@ -878,12 +875,6 @@ const StoryPlayer: FC<StoryPlayerProps> = ({
           </div>
         )}
       </div>
-      
-      {/* Audio Library Modal */}
-      <AudioLibraryModal 
-        isOpen={isAudioLibraryOpen}
-        onClose={() => setIsAudioLibraryOpen(false)}
-      />
       
       {/* Story Helper Popup - Reusing AudioLibrary helper content */}
       {showStoryHelp && (

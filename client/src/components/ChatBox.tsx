@@ -15,6 +15,10 @@ import { Flag, SpeakerSlash } from '@phosphor-icons/react';
 import { preferencesIndexedDbAdapter } from '../storage/preferencesIndexedDbAdapter';
 import { ttsScheduler } from '../controllers/conversationStreamDriver';
 import { cleanupAudioResources } from '../services/audioService';
+import { useDomainStore } from '../stores';
+import { readCarriedThread, hasCarriedQuestionPending, CARRIED_THREAD_EVENT } from '../utils/public/entryIntent';
+import { ANSWER_FIRST_REPLY, ANSWER_PROVENANCE } from '../config/features';
+import { ProvenanceChip, ChapterDoor } from './ProvenanceChip';
 
 interface UserProfile {
   name: string | null;
@@ -51,6 +55,18 @@ const ChatBox: FC<ChatBoxProps> = ({
   const chatBoxRef = useRef<HTMLDivElement>(null);
   const [showVoiceHelper, setShowVoiceHelper] = useState<boolean>(false);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+
+  // Carried-question provenance. The record lives outside React (a send writes
+  // it), so this listens for the one moment it changes.
+  const historyKey = useDomainStore((state) => state.conversation.historyKey);
+  const selectedMode = useDomainStore((state) => state.mode.selected);
+  const [carriedThread, setCarriedThread] = useState(readCarriedThread);
+
+  useEffect(() => {
+    const sync = () => setCarriedThread(readCarriedThread());
+    window.addEventListener(CARRIED_THREAD_EVENT, sync);
+    return () => window.removeEventListener(CARRIED_THREAD_EVENT, sync);
+  }, []);
 
   // Detect mobile for voice helper
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -184,7 +200,7 @@ const ChatBox: FC<ChatBoxProps> = ({
   
   // Filter out hidden messages from display and deduplicate
   const visibleMessages = messages.filter(message => !message.hidden);
-  
+
   // Deduplicate only consecutive identical messages (e.g. streaming duplicates)
   // Non-consecutive repeats are legitimate (user may ask the same question twice)
   const deduplicatedMessages = visibleMessages.filter((current, index) => {
@@ -196,7 +212,38 @@ const ChatBox: FC<ChatBoxProps> = ({
       prev.speakerName === current.speakerName
     );
   });
-  
+
+  const renderedMessages = deduplicatedMessages.filter(
+    message => message.content && message.content.trim()
+  );
+
+  // The greeting is being held back for a question the visitor is reading.
+  const carriedQuestionWaiting = ANSWER_FIRST_REPLY
+    && selectedMode === 'free_conversation'
+    && hasCarriedQuestionPending();
+
+  // The chapter behind a carried question. Only a question with a real anchor
+  // has one, and only in the conversation it opened.
+  const chapter = (() => {
+    if (!ANSWER_PROVENANCE || !carriedThread || selectedMode !== 'free_conversation') return null;
+    if (carriedThread.threadKey !== (historyKey ?? '')) return null;
+    const n = Number(carriedThread.anchorSeedId);
+    return Number.isInteger(n) && n >= 1 && n <= 12 ? n : null;
+  })();
+
+  // The chip belongs to the reply that answered the carried question: the
+  // first thing the figure said after that send.
+  const chipIndex = (() => {
+    if (chapter === null || !carriedThread) return -1;
+    let userTurns = 0;
+    for (let i = 0; i < renderedMessages.length; i++) {
+      const role = renderedMessages[i].role;
+      if (role === 'user') userTurns += 1;
+      else if (role === 'assistant' && userTurns >= carriedThread.startTurn) return i;
+    }
+    return -1;
+  })();
+
   return (
     <div className="chatbox-container">
       {/* Top gradient fade for scrolled content */}
@@ -210,18 +257,19 @@ const ChatBox: FC<ChatBoxProps> = ({
         role="log"
         aria-live="polite"
       >
-        {/* Empty state - only show if no messages and not loading */}
-        {deduplicatedMessages.length === 0 && !isLoading && (
+        {/* Empty state - only show if no messages and not loading. A carried
+            question waiting in the composer is not an empty conversation, so
+            the prompt to choose a topic would only contradict it. */}
+        {deduplicatedMessages.length === 0 && !isLoading && !carriedQuestionWaiting && (
           <div className="empty-chat-state">
             <p className="empty-chat-message">
               {tNode('chat.emptyState')}
             </p>
           </div>
         )}
-        
+
         {/* Message list */}
-        {deduplicatedMessages
-          .filter(message => message.content && message.content.trim())
+        {renderedMessages
           .map((message, index) => (
             <div
               key={index}
@@ -283,6 +331,9 @@ const ChatBox: FC<ChatBoxProps> = ({
                 <div className="message-content">
                   {renderMessageContent(message.content)}
                 </div>
+                {chapter !== null && index === chipIndex && (
+                  <ProvenanceChip chapter={chapter} />
+                )}
                 {(message.role === 'assistant' || message.role === 'council') && (
                   <button
                     className="report-content-btn"
@@ -305,8 +356,18 @@ const ChatBox: FC<ChatBoxProps> = ({
                   bubble, which matters most on mobile. */}
             </div>
           ))}
+
+        {/* Standing door into the chapter behind the carried question. It sits
+            at the end of the log, which the chat scrolls to after every reply,
+            so it stays reachable without covering a word of the conversation
+            or borrowing height from the composer. */}
+        {chapter !== null && (
+          <div className="chapter-door-row">
+            <ChapterDoor chapter={chapter} />
+          </div>
+        )}
       </div>
-      
+
       {/* Stop voice: visible while the Echo speaks. Cancels upstream TTS
           generation BEFORE stopping playback, so a straggler chunk finishing
           after the stop cannot re-take audio focus. */}

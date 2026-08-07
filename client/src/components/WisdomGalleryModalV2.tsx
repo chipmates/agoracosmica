@@ -7,8 +7,7 @@
  * mobile (no swipe-hidden faces), Nietzsche gazing into the triptych on
  * desktop, See-all persisting beside Select.
  *
- * Same props contract as WisdomGalleryModal (V1, kept as fallback): swap the
- * lazy import in ModalsContainer to switch versions.
+ * Mounted lazily from ModalsContainer under the name WisdomGalleryModal.
  */
 
 import React, { useState, useEffect, useCallback, useRef, FC } from 'react';

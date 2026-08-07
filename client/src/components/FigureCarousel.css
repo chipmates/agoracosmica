@@ -46,9 +46,33 @@
   padding-right: env(safe-area-inset-right, 0px);
   box-sizing: border-box;
 }
+/* Exit control: top-right is the app's dismissal grammar, and it keeps the
+   corner clear of the bottom-center bot-check zone. */
+.figure-carousel .figure-carousel-close {
+  position: absolute;
+  top: calc(env(safe-area-inset-top, 0px) + 6px);
+  right: calc(env(safe-area-inset-right, 0px) + 6px);
+  z-index: var(--z-critical);
+}
+
+/* Phones run the category pills edge to edge, so the exit needs its corner
+   reserved or it lands on the last pill. */
+@media (max-width: 767px) {
+  .figure-carousel.has-exit .categories-section {
+    padding-right: 56px;
+  }
+}
+
+@media (min-width: 1025px) {
+  .figure-carousel .figure-carousel-close {
+    top: 16px;
+    right: 16px;
+  }
+}
+
 .categories-section {
-  display:flex; 
-  justify-content:center; 
+  display:flex;
+  justify-content:center;
   align-items: center;
   padding: 16px 0;
   background-color: var(--primary-deep);

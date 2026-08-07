@@ -6,7 +6,6 @@ import OptimizedFigureImage from './OptimizedFigureImage';
 import { isStoryCompleted, isPrismCompleted, STORAGE_KEYS } from '../utils/storageKeysV2';
 import { isFirstContactForFigure, resolveNodeState } from '../utils/flowDecisions';
 import { LocalStorageAdapter } from '../storage/localAdapter';
-import { sendFunnelBeacon } from '../utils/funnelBeacon';
 import { peekStagedQuestion } from '../utils/public/entryIntent';
 import useTranslation from '../hooks/useTranslation';
 import type { Figure, Seed } from '../types/global';
@@ -228,15 +227,6 @@ const ModeSelectorMini: FC<ModeSelectorMiniProps> = ({
   const handleModeSelect = (mode: string) => {
     if (import.meta.env.DEV) console.log('[ModeSelectorMini] handleModeSelect called with:', mode);
     if (isClosingRef.current) return;
-
-    // Funnel: anonymous volume, per occurrence, no consent gate and no
-    // one-shot. Mode picks are no longer a conversion (picking a chapter said
-    // nothing about whether anyone stayed), so this counter is all that is
-    // left of them.
-    sendFunnelBeacon('mode_selected', {
-      figureId: selectedFigure?.id,
-      mode,
-    });
 
     saveVisitedMode(mode);
 

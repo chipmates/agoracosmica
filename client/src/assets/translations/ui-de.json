@@ -582,7 +582,11 @@
     "emptyState": "Wähle ein Thema, um das Gespräch zu beginnen.",
     "reviewMode": "Zusammenfassung",
     "seeker": "Suchender",
-    "stopVoice": "Stimme stoppen"
+    "stopVoice": "Stimme stoppen",
+    "provenance": {
+      "chip": "Aus Kapitel {n} der Geschichte",
+      "door": "Kapitel {n} der Geschichte hören"
+    }
   },
   "history": {
     "title": "Dialoge mit {figure}",
@@ -633,6 +637,10 @@
     "curatedDebates": "Kuratierte Debatten",
     "userProfile": "Benutzerprofil",
     "logout": "Abmelden",
+    "short": {
+      "audioLibrary": "Stories",
+      "settings": "Optionen"
+    },
     "tabs": {
       "cosmos": "Kosmos",
       "echoes": "Echos",
@@ -656,6 +664,7 @@
     "modes": "Modi",
     "listenPrism": "Prisma anhören",
     "startFree Talk": "Free Talk",
+    "startFreetalk": "Free Talk",
     "listenToStory": "Geschichte anhören"
   },
   "figures": {

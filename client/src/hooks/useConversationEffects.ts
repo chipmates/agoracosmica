@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { cleanupAudioResources } from '../services/audioService';
 import { LocalStorageAdapter } from '../storage/localAdapter';
-import { sendFunnelBeaconOnce, replyTimeBucketSinceDispatch, hasFiredFunnelStep } from '../utils/funnelBeacon';
+import { sendFunnelBeaconOnce, replyTimeBucketSinceDispatch, hasFiredFirstTurn } from '../utils/funnelBeacon';
 import type { Figure, Seed } from '../types/global';
 
 interface UseConversationEffectsParams {
@@ -157,12 +157,13 @@ export const useConversationEffects = (params: UseConversationEffectsParams) => 
       // fire. Bucket = coarse time since dispatch start (indices 0-4),
       // never raw milliseconds.
       //
-      // Gated on first_turn: a figure's auto-greeting (initiateConversation on
-      // mode select) dispatches this same assistant-chunk event before the
-      // visitor has typed. Counting that as a reply makes first_reply outrun
-      // first_turn (more replies than messages — impossible), so only count a
-      // chunk that arrived after a real user turn.
-      if (hasFiredFunnelStep('first_turn')) {
+      // Gated on the first user turn, typed or carried: a figure's
+      // auto-greeting (initiateConversation on mode select) dispatches this
+      // same assistant-chunk event before the visitor has sent anything.
+      // Counting that as a reply makes first_reply outrun the turn counters
+      // (more replies than messages — impossible), so only count a chunk that
+      // arrived after a real user turn.
+      if (hasFiredFirstTurn()) {
         sendFunnelBeaconOnce('first_reply', {
           outcome: '200',
           bucket: replyTimeBucketSinceDispatch(),

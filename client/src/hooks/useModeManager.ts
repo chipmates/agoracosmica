@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { modeStateManager } from '../utils/modeStateManager';
 import { storyIntegrationManager } from '../services/StoryIntegrationManager';
 import {
@@ -10,6 +10,8 @@ import { Figure, Seed, ConversationMode, Language } from '../types/global';
 import { LocalStorageAdapter } from '../storage/localAdapter';
 import { readHistoryMessages } from '../services/history/historyEncryption';
 import { useDomainStore, useModeActions, useConversationActions } from '../stores';
+import { hasCarriedQuestionPending } from '../utils/public/entryIntent';
+import { ANSWER_FIRST_REPLY, SITTER_GREETING_FALLBACK_MS } from '../config/features';
 
 interface CouncilConfig {
   [key: string]: any;
@@ -66,8 +68,24 @@ export function useModeManager({
   const { setMode: setZustandMode } = useModeActions();
   const { resetConversationState, setConversationStarted: setConversationStartedAction } = useConversationActions();
 
+  // A carried question holds the greeting back, but only for as long as the
+  // visitor is reading. This is the timer that gives up waiting.
+  const greetingSitterRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const cancelGreetingSitter = useCallback((): void => {
+    if (greetingSitterRef.current !== null) {
+      clearTimeout(greetingSitterRef.current);
+      greetingSitterRef.current = null;
+    }
+  }, []);
+
+  useEffect(() => cancelGreetingSitter, [cancelGreetingSitter]);
+
   const handleModeSelect = useCallback((mode: ConversationMode, force = false): void => {
     if (import.meta.env.DEV) console.log('[useModeManager] handleModeSelect called with:', mode, 'force:', force);
+
+    // Any mode change ends the wait, whatever it was waiting for.
+    cancelGreetingSitter();
 
     // Read CURRENT mode from Zustand (always fresh, no stale closure)
     const currentMode = useDomainStore.getState().mode.selected;
@@ -305,14 +323,46 @@ export function useModeManager({
       // Only trigger initial conversation if NO history exists
       if (!hasExistingHistory) {
         const figureIdHint = figureId || '';
-        initiateConversation(code, figureIdHint)
-          .then(() => {
-            // Avoid duplicating any message appends here; the service/controller own it.
-          })
-          .catch((err: Error) => {
-            console.error('Error sending initial prompt:', err);
-            useDomainStore.getState().setAppLoading(false);
-          });
+        const playGreeting = (): void => {
+          initiateConversation(code, figureIdHint)
+            .then(() => {
+              // Avoid duplicating any message appends here; the service/controller own it.
+            })
+            .catch((err: Error) => {
+              console.error('Error sending initial prompt:', err);
+              useDomainStore.getState().setAppLoading(false);
+            });
+        };
+
+        // A carried question is answered, not greeted: the figure's first
+        // words have to be the reply. The greeting still plays for a visitor
+        // who reads the question in the box and sits with it.
+        const carriedQuestionWaiting = ANSWER_FIRST_REPLY
+          && currentMode === 'free_conversation'
+          && hasCarriedQuestionPending();
+
+        if (carriedQuestionWaiting) {
+          cancelGreetingSitter();
+          // Nothing is loading, so the chat has to be open: the composer only
+          // mounts once the conversation counts as started.
+          useDomainStore.getState().setAppLoading(false);
+          useDomainStore.getState().setConversationStarted(true);
+          setConversationStartedAction(true);
+          greetingSitterRef.current = setTimeout(() => {
+            greetingSitterRef.current = null;
+            const live = useDomainStore.getState();
+            // Still the same empty conversation, still unsent, nothing in
+            // flight. Anything else means the wait is over.
+            if (live.mode.selected !== 'free_conversation') return;
+            if (live.figures.selectedId !== figureIdHint) return;
+            if (live.conversation.messages.length > 0) return;
+            if (live.conversation.pendingRequestId) return;
+            if (!hasCarriedQuestionPending()) return;
+            playGreeting();
+          }, SITTER_GREETING_FALLBACK_MS);
+        } else {
+          playGreeting();
+        }
       } else {
         // CRITICAL: Explicitly load history for the new mode
         // Don't just assume controller will detect it - we just cleared messages!

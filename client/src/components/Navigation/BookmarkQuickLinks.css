@@ -158,6 +158,12 @@
     z-index: var(--z-dropdown); /* 141 */ /* Ensure visibility above mobile header */
   }
   
+  /* Before a conversation starts the header carries no mode chip, so the pull
+     that lines the bookmarks up with it would slide them under the FAB. */
+  .bookmark-quick-links.bookmark-quick-links--fresh {
+    margin-top: 0;
+  }
+
   .bookmark-tab {
     width: 88px; /* DE labels (Weisheit) need the room at mobile size */
     height: 30px;

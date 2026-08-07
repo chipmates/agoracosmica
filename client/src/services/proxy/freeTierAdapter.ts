@@ -9,6 +9,7 @@ import {
   performanceMonitor,
 } from '../audio/llm/llmUtils';
 import type { Message, LLMResponse, ChatTurnKind } from '../audio/llm/index';
+import type { CarriedEntry } from '../audio/instructionProcessor';
 import { probeField } from '../../utils/probeSession';
 import { useDomainStore } from '../../stores/domainStore';
 
@@ -147,6 +148,8 @@ interface FreeTierOptions {
   onToolCall?: (toolCall: { name: string; arguments: string; id?: string }) => void;
   signal?: AbortSignal;
   turnKind?: ChatTurnKind;
+  /** Behavior trigger for the carried-question entry flow, never a label. */
+  entry?: CarriedEntry;
 }
 
 /**
@@ -256,6 +259,7 @@ export async function generateFreeTierResponse({
   onToolCall,
   signal,
   turnKind,
+  entry,
 }: FreeTierOptions): Promise<LLMResponse> {
   const perfMetrics = performanceMonitor.startRequest();
 
@@ -285,6 +289,10 @@ export async function generateFreeTierResponse({
     requestBody.kind = turnKind ?? 'turn';
     const probe = probeField();
     if (probe) requestBody.probe = probe;
+
+    // Not a label: the worker's prompt loader reads this and tells the figure
+    // to answer the carried question outright. Analytics never sees it.
+    if (entry) requestBody.entry = entry;
 
     if (seedId) requestBody.seedId = seedId;
     if (seedData) requestBody.seedData = seedData;

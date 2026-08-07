@@ -1,6 +1,6 @@
 import React, { FC, lazy, Suspense } from 'react';
 import { createPortal } from 'react-dom';
-import { Sparkle } from "@phosphor-icons/react";
+import { Sparkle, CaretDown } from "@phosphor-icons/react";
 import FigureCarousel from '../FigureCarousel';
 import CosmicCouncilHeader from '../CosmicCouncil/CosmicCouncilHeader';
 import CosmicCouncilLoaderIntegration from '../CosmicCouncil/CosmicCouncilLoaderIntegration';
@@ -15,6 +15,7 @@ import { BookmarkQuickLinks } from '../Navigation';
 import styles from './MainContent.module.css';
 import { Figure, Seed, ConversationMode } from '../../types/global';
 import { getDisplayShortName } from '../../utils/figureDisplayName';
+import { NAV_BATCH } from '../../config/features';
 
 // Type definitions
 interface ServiceConfig {
@@ -103,6 +104,9 @@ interface MainContentProps {
   // Empty-state escape hatches (reopen the choice the user closed)
   onChooseMode: () => void;
   onChooseFigure: () => void;
+
+  // Carousel dismissal (the store instance owns no close state of its own)
+  onCarouselClose: () => void;
 }
 
 /**
@@ -157,7 +161,9 @@ const MainContent: FC<MainContentProps> = ({
 
   // Empty-state escape hatches
   onChooseMode,
-  onChooseFigure
+  onChooseFigure,
+
+  onCarouselClose
 }) => {
   return (
     <main
@@ -192,7 +198,7 @@ const MainContent: FC<MainContentProps> = ({
       {showFigureCarousel ? (
         <FigureCarousel
           isOpen={true}
-          onClose={() => {}}
+          onClose={NAV_BATCH ? onCarouselClose : () => {}}
           onSelectFigure={handleSelectFigure}
           selectedFigure={selectedFigure}
         />
@@ -224,44 +230,67 @@ const MainContent: FC<MainContentProps> = ({
                     <span className="seed-name-text">{' '}</span>
                   </div>
                 )}
-                {conversationStartedFinal && selectedMode && (
-                  <div
-                    className="mode-indicator"
-                    key={`mode-${selectedMode}`}
-                    style={{
-                      '--mode-line-color': `var(--${MODES.find(mode => mode.id === selectedMode)?.color ?? 'gold'}-base)`
-                    } as React.CSSProperties}
-                  >
-                    {MODES.find(mode => mode.id === selectedMode) && (() => {
-                      const currentMode = MODES.find(mode => mode.id === selectedMode)!;
-                      return (
-                        <>
-                          {React.createElement(currentMode.icon, {
-                            size: 20,
-                            weight: "duotone",
-                            style: {
-                              marginRight: '8px',
-                              color: `var(--${currentMode.color}-base)`
-                            }
-                          })}
-                          <span className="mode-indicator-label">
-                            {currentMode.label}
-                          </span>
-                        </>
-                      );
-                    })()}
-                  </div>
-                )}
+                {conversationStartedFinal && selectedMode && (() => {
+                  const currentMode = MODES.find(mode => mode.id === selectedMode);
+                  const lineStyle = {
+                    '--mode-line-color': `var(--${currentMode?.color ?? 'gold'}-base)`
+                  } as React.CSSProperties;
+
+                  const chipBody = currentMode ? (
+                    <>
+                      {React.createElement(currentMode.icon, {
+                        size: 20,
+                        weight: "duotone",
+                        style: {
+                          marginRight: '8px',
+                          color: `var(--${currentMode.color}-base)`
+                        }
+                      })}
+                      <span className="mode-indicator-label">
+                        {currentMode.label}
+                      </span>
+                      {NAV_BATCH && (
+                        <CaretDown size={13} weight="bold" className="mode-indicator-caret" aria-hidden="true" />
+                      )}
+                    </>
+                  ) : null;
+
+                  // The chip is the only door back to the mode selector from a
+                  // running mode, so it has to be pressable, not decoration.
+                  return NAV_BATCH ? (
+                    <button
+                      type="button"
+                      className="mode-indicator mode-indicator-button"
+                      key={`mode-${selectedMode}`}
+                      style={lineStyle}
+                      onClick={() => handleQuickAction('modes')}
+                      aria-haspopup="dialog"
+                      aria-label={t('modes.doors.allWays')}
+                      title={t('modes.doors.allWays')}
+                    >
+                      {chipBody}
+                    </button>
+                  ) : (
+                    <div
+                      className="mode-indicator"
+                      key={`mode-${selectedMode}`}
+                      style={lineStyle}
+                    >
+                      {chipBody}
+                    </div>
+                  );
+                })()}
               </div>
             )}
 
             {/* Bookmark Quick Links */}
             {showQuickLinkBar && (
               <BookmarkQuickLinks
-                currentMode={(selectedMode as ConversationMode) ?? undefined}
+                currentMode={conversationStartedFinal ? (selectedMode as ConversationMode) ?? undefined : undefined}
                 onActionClick={handleQuickAction}
                 onHistoryClick={handleHistoryModalOpen}
                 isVisible={true}
+                className={conversationStartedFinal ? '' : 'bookmark-quick-links--fresh'}
               />
             )}
 

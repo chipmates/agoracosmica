@@ -38,7 +38,9 @@ interface Bookmark {
 }
 
 interface BookmarkQuickLinksProps {
-  currentMode: ConversationMode;
+  // Absent before a conversation started: the fresh-state bar shows History
+  // alone, the next-path page only exists once a mode is truly running.
+  currentMode?: ConversationMode;
   onActionClick: (action: ActionType) => void;
   onHistoryClick: () => void;
   isVisible?: boolean;

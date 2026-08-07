@@ -70,13 +70,6 @@ if (import.meta.env.DEV) {
 // import './styles/viewport-fixes.css';     // 371 lines of PWA handling - DISABLED
 // import './styles/layout-overrides.css';   // 237 lines of conflict fixes - NOT NEEDED
 
-// Extend window interface for global settings modal
-declare global {
-  interface Window {
-    openSettingsModal: (tab?: string) => void;
-  }
-}
-
 // Catch-all redirect that preserves the current URL's search string. Default
 // <Navigate to="/" /> drops query params, which would lose the gclid on
 // landings that fall through to the catch-all (e.g. unknown sub-path with
@@ -254,14 +247,6 @@ function App(): React.ReactElement {
     // Initialize battery monitoring for animation optimization
     initBatteryMonitoring();
     
-    // Set up global access to settings for notifications
-    window.openSettingsModal = (tab?: string) => {
-      // Dispatch an event that components can listen for
-      window.dispatchEvent(new CustomEvent('openSettingsRequest', { 
-        detail: { tab: tab || 'voice' }
-      }));
-    };
-
     // Mobile audio restrictions REMOVED (October 2025)
     // With self-hosted TTS + STT on GEX130, mobile users now have audio enabled by default.
 

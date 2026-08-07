@@ -7,7 +7,17 @@ import ProcessingLoader from './ProcessingLoader';
 import { ttsScheduler } from '../controllers/conversationStreamDriver';
 import { getOrRollConversationSessionId, sendSessionEndBeacon } from '../services/audio/tts/ttsSessions';
 import { preferTextInput, saveInputPreference, registerInputToggleShortcut, hasExplicitInputPreference } from '../utils/inputMethodDetection';
-import { consumeAskPrefill, consumeCouncilPrefill, resolveAskPrefill, hasEntryTextFirst, PREFILL_STAGED_EVENT } from '../utils/public/entryIntent';
+import {
+  consumeAskPrefill,
+  consumeCouncilPrefill,
+  resolveAskPrefill,
+  hasEntryTextFirst,
+  markComposerStagedOrigin,
+  clearComposerStagedOrigin,
+  PREFILL_STAGED_EVENT,
+} from '../utils/public/entryIntent';
+import { resolveAnchorSeedId } from '../data/public/heroEntry';
+import { useUIStore } from '../stores/uiStore';
 import { loadServiceConfig } from '../services/audio/config/serviceConfig';
 import { useTranslation } from '../hooks/useTranslation';
 import { useAutoplayGate } from '../hooks/useAutoplayGate';
@@ -90,20 +100,28 @@ const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure,
   // is resolved here in the app's own language.
   const selectedModeForPrefill = useDomainStore((state) => state.mode.selected);
   const selectedFigureIdForPrefill = useDomainStore((state) => state.figures.selectedId);
+  const modeSelectorOpen = useUIStore((state) => state.modals.modeSelectorOpen);
 
   const applyStagedPrefill = useCallback(() => {
     // Read the live state, not the render's: the staging event can arrive
     // between renders.
     if (useDomainStore.getState().mode.selected !== 'free_conversation') return;
-    // Council end-state handoff: the heard question, staged as free text.
+    // The mode ceremony is still open: the visitor has not chosen a door yet,
+    // so the question stays staged. Taking it now would consume it behind the
+    // overlay and lose it for whoever picks the story first.
+    if (useUIStore.getState().modals.modeSelectorOpen) return;
+    const figureId = useDomainStore.getState().figures.selectedId;
+    // Council end-state handoff: the heard question, staged as free text. A
+    // council question names no teaching, so it carries no anchor.
     const councilQuestion = consumeCouncilPrefill();
     if (councilQuestion) {
       setMessage(councilQuestion);
       setUseTextInput(true);
+      markComposerStagedOrigin(null);
       return;
     }
-    const figureId = useDomainStore.getState().figures.selectedId;
-    const prefill = resolveAskPrefill(consumeAskPrefill(), figureId, language);
+    const tag = consumeAskPrefill();
+    const prefill = resolveAskPrefill(tag, figureId, language);
     if (!prefill) return;
     const question = prefill.kind === 'text'
       ? prefill.text
@@ -111,6 +129,12 @@ const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure,
     if (question) {
       setMessage(question);
       setUseTextInput(true);
+      // Same figure guard the anchor selection uses: a tag naming another
+      // figure grounds nothing here.
+      const ownTag = !!tag && (!tag.startsWith('f:') || tag.startsWith(`f:${figureId}:`));
+      markComposerStagedOrigin(
+        ownTag && figureId ? resolveAnchorSeedId(figureId, tag!) : null
+      );
     }
   }, [language, tString]);
 
@@ -118,10 +142,11 @@ const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure,
   // on mount, when the mode or figure settles, and on the staging event itself
   // (a returning visitor can already be in Free Talk with the same figure, and
   // then neither of the other two ever fires). The stash clears on read, so
-  // whichever arrives first wins and the rest are no-ops.
+  // whichever arrives first wins and the rest are no-ops. Closing the ceremony
+  // re-runs it, which is how a question held back above finally lands.
   useEffect(() => {
     applyStagedPrefill();
-  }, [selectedModeForPrefill, selectedFigureIdForPrefill, applyStagedPrefill]);
+  }, [selectedModeForPrefill, selectedFigureIdForPrefill, modeSelectorOpen, applyStagedPrefill]);
 
   useEffect(() => {
     window.addEventListener(PREFILL_STAGED_EVENT, applyStagedPrefill);
@@ -483,6 +508,9 @@ const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure,
       if (shouldUseController) {
         const transcript = result?.transcription?.trim() ?? '';
         if (transcript) {
+          // Spoken words are the visitor's own, whatever is still sitting in
+          // the text box.
+          clearComposerStagedOrigin();
           await onSubmitMessage?.(transcript);
 
           const pending = useDomainStore.getState().conversation.pendingRequestId;
@@ -646,7 +674,13 @@ const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure,
                 ref={textareaRef}
                 className="text-input"
                 value={message}
-                onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setMessage(e.target.value)}
+                onChange={(e: ChangeEvent<HTMLTextAreaElement>) => {
+                  // Editing a carried question leaves it carried. Emptying the
+                  // box is the one act that makes the next send the visitor's
+                  // own typing.
+                  if (e.target.value === '') clearComposerStagedOrigin();
+                  setMessage(e.target.value);
+                }}
                 onKeyDown={handleKeyDown}
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => setIsFocused(false)}

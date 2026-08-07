@@ -1,0 +1,102 @@
+/* src/components/ProvenanceChip.css
+   Two quiet ways into the chapter behind a carried question: the chip under
+   the reply that answered it, and the standing door on the chat plate. Both
+   stay under the reply's own weight, so neither competes with the figure. */
+
+.provenance-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  /* Sits inside the reply bubble, so the tap target grows downward with
+     padding instead of pushing the text around. */
+  min-height: 44px;
+  margin-top: 6px;
+  padding: 4px 0;
+  background: none;
+  border: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--gold-deep) 45%, transparent);
+  border-radius: 0;
+  color: var(--gold-primary);
+  font-family: inherit;
+  font-size: 0.8rem;
+  letter-spacing: 0.02em;
+  text-align: left;
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.provenance-chip:hover,
+.provenance-chip:focus-visible {
+  color: var(--gold-hover);
+  border-bottom-color: color-mix(in srgb, var(--gold-subtle) 75%, transparent);
+}
+
+.provenance-chip:focus-visible {
+  outline: 2px solid var(--gold-subtle);
+  outline-offset: 3px;
+}
+
+.provenance-chip-text {
+  line-height: 1.3;
+}
+
+/* Standing door: last row of the log, which the chat scrolls to after every
+   reply. Never over the text, never in the bottom-edge lane the bot check
+   takes, and it borrows no height from the composer. */
+/* Indented to the figure's own column: avatar width plus its 4px gap, less
+   the wrapper's -1rem pull. The door lines up with the replies it follows. */
+.chapter-door-row {
+  display: flex;
+  justify-content: flex-start;
+  padding-left: calc(var(--avatar-mobile) + 4px - 1rem);
+}
+
+@media (min-width: 768px) {
+  .chapter-door-row {
+    padding-left: calc(var(--avatar-tablet) + 4px - 1rem);
+  }
+}
+
+@media (min-width: 1200px) {
+  .chapter-door-row {
+    padding-left: calc(var(--avatar-desktop) + 4px - 1rem);
+  }
+}
+
+.chapter-door {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 8px 14px;
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 42%, transparent);
+  border-radius: 4px; /* plate doctrine: action on content = squared mark */
+  background: color-mix(in srgb, var(--bg-primary) 92%, var(--gold-subtle));
+  color: var(--gold-primary);
+  font-family: inherit;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.chapter-door:hover,
+.chapter-door:focus-visible {
+  border-color: color-mix(in srgb, var(--gold-subtle) 70%, transparent);
+  color: var(--gold-hover);
+}
+
+.chapter-door:focus-visible {
+  outline: 2px solid var(--gold-subtle);
+  outline-offset: 2px;
+}
+
+.chapter-door-text {
+  line-height: 1.2;
+}
+
+@media (max-width: 600px) {
+  .chapter-door {
+    padding: 8px 12px;
+    font-size: 0.78rem;
+  }
+}

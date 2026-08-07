@@ -11,6 +11,7 @@ import { HISTORY_PREFIXES } from '../utils/userState';
 import { sendEntryBeacon } from '../utils/entryBeacon';
 import { sendSignupBeacon } from '../utils/signupBeacon';
 import { sendFunnelBeaconOnce } from '../utils/funnelBeacon';
+import { classifyEntryForFunnel } from '../utils/public/entryIntent';
 import { sendConversion } from '../utils/public/gclidCapture';
 
 interface WelcomeDisclosureModalProps {
@@ -130,9 +131,11 @@ const WelcomeDisclosureModal: FC<WelcomeDisclosureModalProps> = ({ isOpen, onCom
   }, [isOpen]);
 
   // Funnel: the consent screen opened (the top of the consent funnel;
-  // welcome_shown minus entry = consent-abandon rate). One-shot per tab.
+  // welcome_shown minus entry = consent-abandon rate). One-shot per tab. The
+  // mode slot carries which door the visitor came through, so the abandon rate
+  // can be read per arrival instead of as one number.
   useEffect(() => {
-    if (isOpen) sendFunnelBeaconOnce('welcome_shown');
+    if (isOpen) sendFunnelBeaconOnce('welcome_shown', { mode: classifyEntryForFunnel() });
   }, [isOpen]);
 
   // Battery optimization — pause animations when tab is backgrounded

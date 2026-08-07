@@ -210,6 +210,35 @@
   color: var(--mode-line-color, var(--gold-primary));
 }
 
+/* The chip doubles as the door back to the mode selector. Scoped to
+   .chat-header so the 44px target survives the mobile margin overrides. */
+.chat-header .mode-indicator-button {
+  background: none;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  min-height: 44px;
+  padding: 0 10px;
+  margin-top: 0;
+  margin-bottom: 0;
+  color: inherit;
+  transition: background-color 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.chat-header .mode-indicator-button:hover,
+.chat-header .mode-indicator-button:focus-visible {
+  background-color: color-mix(in srgb, var(--mode-line-color, var(--gold-primary)) 12%, transparent);
+}
+
+.chat-header .mode-indicator-caret {
+  margin-left: 6px;
+  color: var(--mode-line-color, var(--gold-primary));
+  opacity: 0.75;
+  flex-shrink: 0;
+}
+
 /* Desktop-only chatbox container styles - mobile handles its own margins.
    Material lives in ChatBox.css (the plate card); this block keeps layout only.
    The old background-color: var(--text-tertiary) khaki slab is gone. */
