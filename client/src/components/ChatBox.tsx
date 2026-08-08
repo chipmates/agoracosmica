@@ -17,8 +17,9 @@ import { ttsScheduler } from '../controllers/conversationStreamDriver';
 import { cleanupAudioResources } from '../services/audioService';
 import { useDomainStore } from '../stores';
 import { readCarriedThread, hasCarriedQuestionPending, CARRIED_THREAD_EVENT } from '../utils/public/entryIntent';
-import { ANSWER_FIRST_REPLY, ANSWER_PROVENANCE } from '../config/features';
+import { ANSWER_FIRST_REPLY, ANSWER_PROVENANCE, QUIET_PLATE_PRESENCE } from '../config/features';
 import { ProvenanceChip, ChapterDoor } from './ProvenanceChip';
+import QuietPlatePresence from './QuietPlatePresence';
 import RoomContainer from './RoomContainer';
 
 interface UserProfile {
@@ -61,6 +62,8 @@ const ChatBoxSurface: FC<ChatBoxProps> = ({
   // it), so this listens for the one moment it changes.
   const historyKey = useDomainStore((state) => state.conversation.historyKey);
   const selectedMode = useDomainStore((state) => state.mode.selected);
+  const selectedFigureId = useDomainStore((state) => state.figures.selectedId);
+  const pendingRequestId = useDomainStore((state) => state.conversation.pendingRequestId);
   const [carriedThread, setCarriedThread] = useState(readCarriedThread);
 
   useEffect(() => {
@@ -223,6 +226,15 @@ const ChatBoxSurface: FC<ChatBoxProps> = ({
     && selectedMode === 'free_conversation'
     && hasCarriedQuestionPending();
 
+  // The quiet stage keeps the figure's presence for exactly as long as the
+  // wait lasts. A send, the sitter greeting, or anything else in flight ends
+  // it, and the presence is gone before the first word lands.
+  const quietPresenceLit = QUIET_PLATE_PRESENCE
+    && carriedQuestionWaiting
+    && deduplicatedMessages.length === 0
+    && !isLoading
+    && !pendingRequestId;
+
   // The chapter behind a carried question. Only a question with a real anchor
   // has one, and only in the conversation it opened.
   const chapter = (() => {
@@ -247,6 +259,12 @@ const ChatBoxSurface: FC<ChatBoxProps> = ({
 
   return (
     <div className="chatbox-container">
+      {/* Dim presence for the stage a carried question waits on. Its own layer
+          under the log, so it cannot touch the composer or the reply. */}
+      {QUIET_PLATE_PRESENCE && (
+        <QuietPlatePresence figureId={selectedFigureId} active={quietPresenceLit} />
+      )}
+
       {/* Top gradient fade for scrolled content */}
       <div className="chatbox-fade-top" />
       

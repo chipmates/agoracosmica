@@ -1,0 +1,73 @@
+/* Dim presence on the quiet plate (QuietPlatePresence.tsx). Its own absolute
+   layer inside the chat plate, painted under the log and clipped by the plate's
+   own overflow, so it can neither be clicked nor move a pixel of the
+   conversation when it arrives or leaves. */
+.quiet-plate-presence {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: min(64%, 520px);
+  height: min(96%, 640px);
+  transform: translateX(-50%) translateY(8px);
+  z-index: var(--z-base);
+  pointer-events: none;
+  opacity: 0;
+  /* The top of the portrait has to reach the plate as darkness, not as a cut
+     edge: the crop line would otherwise read as a band across the stage. */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 26%);
+  mask-image: linear-gradient(to bottom, transparent 0%, black 26%);
+  /* Leaving is quicker than arriving: the conversation has started and nothing
+     should still be dissolving behind the first words. */
+  transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+}
+
+/* Deliberately far below the text: the plate is unlit, the figure is a
+   suggestion in it, and the question in the composer stays the loudest thing
+   on screen. */
+.quiet-plate-presence--lit {
+  opacity: 0.16;
+  transform: translateX(-50%) translateY(0);
+  transition: opacity 2s var(--transition-bezier), transform 2s var(--transition-bezier);
+}
+
+.quiet-plate-presence-figure {
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* Cooled and softened so the portrait reads as presence, not as an image
+     someone pasted behind the chat. */
+  filter: grayscale(0.45) brightness(0.82) contrast(0.92) blur(2px);
+  /* No edges at the sides either, while the shoulders carry down to the
+     plate's own bottom edge, so the figure stands in the room instead of
+     floating in the middle of it. */
+  -webkit-mask-image: radial-gradient(
+    ellipse 52% 96% at 50% 28%,
+    black 40%,
+    transparent 88%
+  );
+  mask-image: radial-gradient(
+    ellipse 52% 96% at 50% 28%,
+    black 40%,
+    transparent 88%
+  );
+}
+
+.quiet-plate-presence-figure img {
+  object-fit: cover;
+  object-position: center 10%;
+}
+
+/* Phones: the plate is narrower and the composer sits close under it, so the
+   presence takes less height and stays on the empty middle. */
+@media (max-width: 640px) {
+  .quiet-plate-presence {
+    width: min(88%, 360px);
+    height: min(78%, 470px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .quiet-plate-presence {
+    transition: none;
+  }
+}
