@@ -118,8 +118,12 @@ export const COUNCIL_OILS: boolean =
  * instead of standing empty. Decorative only: it takes no click, no layout, and
  * it leaves the moment the conversation speaks.
  *
- * Off everywhere, dev included, because both stages are being compared side by
- * side. `VITE_QUIET_PLATE_PRESENCE=true` is the only way to see the presence.
+ * On in dev, off in production builds. `VITE_QUIET_PLATE_PRESENCE=true` turns
+ * it on for a production build, `false` forces it off anywhere.
  */
 export const QUIET_PLATE_PRESENCE: boolean =
-  import.meta.env.VITE_QUIET_PLATE_PRESENCE === 'true';
+  import.meta.env.VITE_QUIET_PLATE_PRESENCE === 'true'
+    ? true
+    : import.meta.env.VITE_QUIET_PLATE_PRESENCE === 'false'
+      ? false
+      : import.meta.env.DEV;
