@@ -128,6 +128,7 @@ const worldLine = [
     </p>
 
     <p class="pub-fig-hero__world">{worldLine}</p>
+    <p class="pub-fig-hero__caption pub-fig-hero__caption--end">{t('figures.echoGloss')}</p>
   </div>
 </section>
 
@@ -195,6 +196,18 @@ const worldLine = [
     text-decoration: none;
     color: var(--gold-primary);
     border-color: color-mix(in srgb, var(--gold-primary) var(--a-45, 45%), transparent);
+  }
+  /* One caption, two homes: desktop keeps it under the portrait, phones show
+     it at the hero's end instead. Exactly one is displayed per viewport, so
+     assistive tech hears the disclosure once. */
+  .pub-fig-hero__caption--end { display: none; }
+  @media (max-width: 819.98px) {
+    .pub-fig-hero__figure .pub-fig-hero__caption { display: none; }
+    .pub-fig-hero__caption--end {
+      display: block;
+      margin: 1.1rem auto 0;
+      text-align: center;
+    }
   }
   @media (min-width: 820px) {
     /* the caption belongs to the portrait column, so it keeps its width */
