@@ -62,7 +62,8 @@
     "dontShowAgain": "Don't show this again",
     "review": "Review",
     "help": "Help",
-    "disabled": "Disabled"
+    "disabled": "Disabled",
+    "thisEcho": "this Echo"
   },
   "categories": {
     "sage": "SAGE",
@@ -1128,6 +1129,8 @@
       "interact": "interact",
       "talk": "talk",
       "chapterLabel": "Chapter",
+      "nodeStateActive": "currently active",
+      "nodeStateCompleted": "completed",
       "story": {
         "title": "Story",
         "description": "15-min narrated biography • Start here for context"
@@ -1267,6 +1270,7 @@
     "somethingWentWrong": "Something went wrong",
     "retry": "Retry",
     "errorDetails": "Error Details",
+    "audioLoadFailed": "The audio could not be loaded. Please try again.",
     "network": {
       "offline": "You are offline. Some features may not work.",
       "reconnected": "Connection restored",

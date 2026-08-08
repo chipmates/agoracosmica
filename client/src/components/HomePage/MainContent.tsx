@@ -256,6 +256,13 @@ const MainContent: FC<MainContentProps> = ({
                     </>
                   ) : null;
 
+                  // WCAG 2.5.3: the visible mode word has to open the
+                  // accessible name, or voice control cannot target the chip.
+                  const allWaysLabel = String(t('modes.doors.allWays'));
+                  const chipAccessibleName = currentMode?.label
+                    ? `${currentMode.label}. ${allWaysLabel}`
+                    : allWaysLabel;
+
                   // The chip is the only door back to the mode selector from a
                   // running mode, so it has to be pressable, not decoration.
                   if (!NAV_BATCH) {
@@ -281,7 +288,7 @@ const MainContent: FC<MainContentProps> = ({
                         handleQuickAction('modes');
                       }}
                       aria-haspopup="dialog"
-                      aria-label={t('modes.doors.allWays')}
+                      aria-label={chipAccessibleName}
                       title={t('modes.doors.allWays')}
                     >
                       {chipBody}

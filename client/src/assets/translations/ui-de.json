@@ -60,7 +60,8 @@
     "gotIt": "Verstanden!",
     "dontShowAgain": "Nicht mehr anzeigen",
     "review": "Überprüfen",
-    "disabled": "Deaktiviert"
+    "disabled": "Deaktiviert",
+    "thisEcho": "diesem Echo"
   },
   "categories": {
     "sage": "WEISE",
@@ -1125,11 +1126,13 @@
       "descriptionWithSeed": "Wie möchtest du '{seedTitle}' mit {figureName} erkunden?",
       "freetalkCta": "Sprich frei,",
       "freetalkCtaSub": "worüber du willst.",
-      "chapterDivider": "oder wähle dein Lern-Kapitel",
+      "chapterDivider": "oder wähle dein Lernkapitel",
       "listen": "Zuhören",
       "interact": "Mitmachen",
       "talk": "Sprechen",
       "chapterLabel": "Kapitel",
+      "nodeStateActive": "gerade aktiv",
+      "nodeStateCompleted": "abgeschlossen",
       "story": {
         "title": "Story",
         "description": "15-Min Biografie mit Erzählung • Hier beginnen"
@@ -1269,6 +1272,7 @@
     "somethingWentWrong": "Etwas ist schiefgelaufen",
     "retry": "Erneut versuchen",
     "errorDetails": "Fehlerdetails",
+    "audioLoadFailed": "Das Audio konnte nicht geladen werden. Bitte versuche es erneut.",
     "network": {
       "offline": "Du bist offline. Einige Funktionen sind nicht verfügbar.",
       "reconnected": "Verbindung wiederhergestellt",

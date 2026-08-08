@@ -160,6 +160,14 @@ const ModeSelectorMini: FC<ModeSelectorMiniProps> = ({
     });
   };
 
+  // Screen-reader tail for a node's state. Translated, since the node label
+  // itself is and a mixed-language name reads as noise.
+  const nodeStateSuffix = (state: ReturnType<typeof getNodeState>): string => {
+    if (state === 'active') return `, ${tString('modes.selector.nodeStateActive', 'currently active')}`;
+    if (state === 'completed') return `, ${tString('modes.selector.nodeStateCompleted', 'completed')}`;
+    return '';
+  };
+
   // Determine sun click target: current mode, or Story as default
   const getSunTargetMode = (): string => {
     if (selectedMode && selectedMode !== 'free_conversation') return selectedMode;
@@ -284,7 +292,7 @@ const ModeSelectorMini: FC<ModeSelectorMiniProps> = ({
             )}
             <h2 id="mode-selector-title" className="doors-title">
               {tString('modes.doors.title', 'How do you want to start with {name}?')
-                .replace('{name}', selectedFigure?.name || 'this Echo')}
+                .replace('{name}', selectedFigure?.name || tString('common.thisEcho', 'this Echo'))}
             </h2>
             {/* No seed subtitle here: the doors are first contact, and the
                 auto-defaulted wisdom name ("1. Der unbearbeitete Block") reads
@@ -443,7 +451,7 @@ const ModeSelectorMini: FC<ModeSelectorMiniProps> = ({
                     role="radio"
                     tabIndex={0}
                     aria-checked={state === 'active' ? 'true' : 'false'}
-                    aria-label={`${tString(mode.titleKey)} — ${tString(mode.descKey)}${state === 'active' ? ', currently active' : ''}${state === 'completed' ? ', completed' : ''}`}
+                    aria-label={`${tString(mode.titleKey)}. ${tString(mode.descKey)}${nodeStateSuffix(state)}`}
                   >
                     <div className="eclipse-node-icon">
                       <IconComponent size={nodeIconSize} weight="duotone" />

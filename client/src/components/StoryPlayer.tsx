@@ -824,7 +824,7 @@ const StoryPlayerSurface: FC<StoryPlayerProps> = ({
               {tString('modes.selector.chapterLabel', 'Chapter')} 2 · {tString('modes.selector.wisdom.title', 'Wisdom')}
             </p>
             <p className="story-handoff__title">
-              {tString('storyPlayer.handoffTitle', 'Talk it through with {name}').replace('{name}', figureName || 'this Echo')}
+              {tString('storyPlayer.handoffTitle', 'Talk it through with {name}').replace('{name}', figureName || tString('common.thisEcho', 'this Echo'))}
             </p>
             <p className="story-handoff__body">{tNode('storyPlayer.handoffBody')}</p>
             <div className="story-handoff__actions">
