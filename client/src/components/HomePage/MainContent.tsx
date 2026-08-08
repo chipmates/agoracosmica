@@ -1,6 +1,6 @@
-import React, { FC, lazy, Suspense, useCallback, useState } from 'react';
+import React, { FC, lazy, Suspense } from 'react';
 import { createPortal } from 'react-dom';
-import { Sparkle, CaretDown, CheckCircle } from "@phosphor-icons/react";
+import { Sparkle, CaretDown } from "@phosphor-icons/react";
 import FigureCarousel from '../FigureCarousel';
 import CosmicCouncilHeader from '../CosmicCouncil/CosmicCouncilHeader';
 import CosmicCouncilLoaderIntegration from '../CosmicCouncil/CosmicCouncilLoaderIntegration';
@@ -10,8 +10,6 @@ import ProcessingLoader from '../ProcessingLoader';
 const StoryPlayer = lazy(() => import('../StoryPlayer'));
 const PrismPlayer = lazy(() => import('../PrismPlayer').then(m => ({ default: m.PrismPlayer })));
 const LiveCouncilPlayer = lazy(() => import('../LiveCouncilPlayer').then(m => ({ default: m.LiveCouncilPlayer })));
-const StoryFactCheckPanel = lazy(() => import('../FactCheck').then(m => ({ default: m.StoryFactCheckPanel })));
-const FactCheckModal = lazy(() => import('../FactCheck').then(m => ({ default: m.FactCheckModal })));
 import ErrorBoundary from '../ErrorBoundary';
 import { BookmarkQuickLinks } from '../Navigation';
 import styles from './MainContent.module.css';
@@ -168,20 +166,6 @@ const MainContent: FC<MainContentProps> = ({
 
   onCarouselClose
 }) => {
-  // Facts in the talking modes. Story mode has carried this door since the
-  // start; wisdom, quest, prism and free talk make live claims and had none.
-  const [factsOpen, setFactsOpen] = useState(false);
-  const factsSeedNumber = selectedSeed
-    ? (typeof selectedSeed.id === 'number' ? selectedSeed.id : parseInt(String(selectedSeed.id), 10) || 0)
-    : 0;
-  // Free talk is not held in a chapter, so its facts are the figure's own.
-  const factsShowsSeedPanel = selectedMode !== 'free_conversation' && factsSeedNumber > 0;
-  const openFacts = useCallback(() => {
-    sendFunnelBeacon('nav_open', { figureId: selectedFigure?.id, mode: 'facts_chat' });
-    setFactsOpen(true);
-  }, [selectedFigure?.id]);
-  const closeFacts = useCallback(() => setFactsOpen(false), []);
-
   return (
     <main
       id="main-content"
@@ -286,39 +270,22 @@ const MainContent: FC<MainContentProps> = ({
                     );
                   }
 
-                  // Both doors out of a running conversation share one row:
-                  // back to the ways, and into the facts behind what is said.
                   return (
-                    <div className={styles.headerActions}>
-                      <button
-                        type="button"
-                        className="mode-indicator mode-indicator-button"
-                        key={`mode-${selectedMode}`}
-                        style={lineStyle}
-                        onClick={() => {
-                          sendFunnelBeacon('nav_open', { figureId: selectedFigure?.id, mode: 'chip' });
-                          handleQuickAction('modes');
-                        }}
-                        aria-haspopup="dialog"
-                        aria-label={t('modes.doors.allWays')}
-                        title={t('modes.doors.allWays')}
-                      >
-                        {chipBody}
-                      </button>
-                      {selectedFigure && (
-                        <button
-                          type="button"
-                          className={styles.factsButton}
-                          onClick={openFacts}
-                          aria-haspopup="dialog"
-                          aria-label={t('factCheck.facts')}
-                          title={t('factCheck.facts')}
-                        >
-                          <CheckCircle size={18} weight="duotone" aria-hidden="true" />
-                          <span className={styles.factsButtonLabel}>{t('factCheck.facts')}</span>
-                        </button>
-                      )}
-                    </div>
+                    <button
+                      type="button"
+                      className="mode-indicator mode-indicator-button"
+                      key={`mode-${selectedMode}`}
+                      style={lineStyle}
+                      onClick={() => {
+                        sendFunnelBeacon('nav_open', { figureId: selectedFigure?.id, mode: 'chip' });
+                        handleQuickAction('modes');
+                      }}
+                      aria-haspopup="dialog"
+                      aria-label={t('modes.doors.allWays')}
+                      title={t('modes.doors.allWays')}
+                    >
+                      {chipBody}
+                    </button>
                   );
                 })()}
               </div>
@@ -461,26 +428,6 @@ const MainContent: FC<MainContentProps> = ({
               </>
             )}
 
-            {/* Facts, from the header door. Both surfaces portal to the body,
-                so nothing lands in this column. */}
-            {NAV_BATCH && factsOpen && selectedFigure && (
-              <Suspense fallback={null}>
-                {factsShowsSeedPanel ? (
-                  <StoryFactCheckPanel
-                    figureId={selectedFigure.id}
-                    figureName={selectedFigure.name}
-                    storyNumber={factsSeedNumber}
-                    onClose={closeFacts}
-                  />
-                ) : (
-                  <FactCheckModal
-                    figureId={selectedFigure.id}
-                    figureName={selectedFigure.name}
-                    onClose={closeFacts}
-                  />
-                )}
-              </Suspense>
-            )}
           </div>
         </>
       )}
