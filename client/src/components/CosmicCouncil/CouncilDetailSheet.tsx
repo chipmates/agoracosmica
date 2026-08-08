@@ -6,6 +6,8 @@ import useTranslation from '../../hooks/useTranslation';
 import { useFocusTrap } from '../../hooks/useFocusTrap';
 import { useCouncilProgress } from '../../hooks/useCouncilProgress';
 import { getCouncilPlate } from './plates';
+import { getCouncilOil } from './oils';
+import { COUNCIL_OILS } from '../../config/features';
 import { inkStyle } from './CouncilPlate';
 import CouncilArtLightbox from './CouncilArtLightbox';
 import {
@@ -37,6 +39,7 @@ const CouncilDetailSheet: FC<CouncilDetailSheetProps> = ({ council, onClose, onP
   if (!council) return null;
 
   const plate = getCouncilPlate(council.id);
+  const oil = COUNCIL_OILS ? getCouncilOil(council.id) : undefined;
 
   const title = getLocalizedTitle(council, language);
   const question = getLocalizedQuestion(council, language);
@@ -71,9 +74,9 @@ const CouncilDetailSheet: FC<CouncilDetailSheetProps> = ({ council, onClose, onP
         tabIndex={-1}
         style={{ borderTopColor: `var(${accentVar})` }}
       >
-        {/* The plate band: art shown generously, one tap opens the full
-            uncropped engraving in the lightbox */}
-        {plate && (
+        {/* The plate band: art shown generously, one tap opens the whole
+            uncropped work in the lightbox */}
+        {(oil || plate) && (
           <button
             type="button"
             className="council-detail-sheet__plate-band"
@@ -85,11 +88,25 @@ const CouncilDetailSheet: FC<CouncilDetailSheetProps> = ({ council, onClose, onP
               aria-hidden="true"
               style={{ background: `color-mix(in srgb, var(${accentVar}) 8%, var(--bg-card))` }}
             />
-            <span
-              className="council-detail-sheet__plate-band-ink"
-              aria-hidden="true"
-              style={inkStyle(accentVar, plate.wide, plate.focal)}
-            />
+            {oil ? (
+              <img
+                className="council-detail-sheet__plate-band-oil"
+                src={oil.wide}
+                alt=""
+                loading="lazy"
+                decoding="async"
+                style={oil.wideMasked ? undefined : { objectPosition: oil.bandFocal }}
+                data-whole={oil.wideMasked ? 'true' : undefined}
+              />
+            ) : (
+              plate && (
+                <span
+                  className="council-detail-sheet__plate-band-ink"
+                  aria-hidden="true"
+                  style={inkStyle(accentVar, plate.wide, plate.focal)}
+                />
+              )
+            )}
             <span className="council-detail-sheet__plate-band-note">
               {tString('cosmicCouncil.artwork.note', 'The Artwork')}
             </span>

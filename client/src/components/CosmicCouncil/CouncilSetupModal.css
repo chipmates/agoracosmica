@@ -2710,6 +2710,23 @@
   display: none;
 }
 
+/* The oil: the painting itself, not a mask over the accent. It carries its own
+   colour, so nothing tints it and the theme accent stays on the chrome.
+   object-position comes from the crop sheet that composed the tier, so the
+   touch point stays in frame when the card's ratio pulls away from the
+   asset's. */
+.council-card__plate-oil {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* The tone under an oil is the box the image loads into, so a slow fetch shows
+   the card's own wash rather than a hole. Under a work shown whole it is also
+   the field the painting stands on. */
+
 /* Councils still on the legacy artwork sit in the same window. Those SVGs fit
    their box instead of covering it, so the layer is held to the band the
    cartouche leaves free, or the art would centre itself behind the band. */
@@ -2812,6 +2829,87 @@
 }
 
 /* ============================================================
+   OIL CARD ANATOMY (2026-08 council oils)
+   The cartouche geometry above was cut for engravings, where a
+   band over the foot costs line work and nothing else. A
+   painting composes its subject into the middle of the canvas,
+   so the same band left a card the top two fifths of its crop
+   and deleted the picture on four of them.
+
+   A card carrying a painting therefore changes shape: the
+   picture takes a window nothing overlaps, the label sits under
+   it as a predella, and the window holds one ratio at every
+   width so no crop is re-cut by the card. Every rule below
+   hangs off the oil plate, so an engraving card is untouched.
+   ============================================================ */
+
+.council-card:has(.council-card__plate--oil) {
+  /* height comes from the picture plus the label, not from a floor set by how
+     much art had to survive under a band */
+  min-height: 0;
+  padding: 0;
+}
+
+/* The picture window: the wide tier's own 16:9, held exactly, so the crop is
+   shown whole and every picture in a rail hangs at the same height. A rail
+   stretches its short cards to its tallest; that slack goes to the label, where
+   the cast line already pins itself to the foot, never to the picture, which
+   would leave one painting in a row cropped tighter than its neighbours. */
+.council-card__plate--oil {
+  position: relative;
+  inset: auto;
+  flex: 0 0 auto;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 7px 7px 0 0;
+}
+
+/* A single-surface work refused a wide cut at the bake, so the card refuses one
+   too: the whole canvas stands on the card's own night, as in the sheet band.
+   The shadow is what makes it read as a canvas hung on the night rather than a
+   picture that failed to fill its box, and it needs no box of its own. */
+.council-card__plate--oil[data-whole='true'] .council-card__plate-oil {
+  object-fit: contain;
+  object-position: 50% 50%;
+  filter: drop-shadow(0 2px 8px color-mix(in srgb, var(--utility-pure-black) 60%, transparent));
+}
+
+.council-card__plate--oil .council-card__plate-tone {
+  background: color-mix(in srgb, var(--card-accent) 10%, var(--bg-card));
+}
+
+/* The field a whole work stands on stays quieter than the label under it, so
+   the eye reads painting first and mat second. */
+.council-card__plate--oil[data-whole='true'] .council-card__plate-tone {
+  background: color-mix(in srgb, var(--card-accent) 6%, var(--bg-primary));
+}
+
+/* The keyline becomes the picture's frame. No bottom edge: the predella's own
+   hairline is already there and two rules read as a seam. */
+.council-card__plate--oil .council-card__plate-keyline {
+  inset: 0;
+  border-radius: 7px 7px 0 0;
+  border-bottom: none;
+}
+
+/* The predella: same material as the cartouche it replaces, moved out from
+   under the picture. Opacity still matters, it carries all the type. */
+.council-card:has(.council-card__plate--oil) .council-card__content {
+  flex: 1 1 auto;
+  margin: 0;
+  padding: 0.65rem 1rem 0.8rem;
+  background: color-mix(in srgb, var(--card-accent) 13%, var(--bg-card));
+  border: none;
+  border-top: 1px solid color-mix(in srgb, var(--cosmic-silver) 20%, transparent);
+  border-radius: 0 0 7px 7px;
+}
+
+.council-card:has(.council-card__plate--oil) .council-card__accent-bar {
+  left: 1rem;
+  right: 1rem;
+}
+
+/* ============================================================
    SHEET PLATE BAND + FULL-PLATE LIGHTBOX (council art arc)
    ============================================================ */
 
@@ -2845,6 +2943,23 @@
   -webkit-mask-size: cover;
   mask-size: cover;
   opacity: 0.92;
+}
+
+/* The oil in the sheet band. Same window as the ink, but the painting is the
+   picture rather than a mask, so it covers with its band focal instead of
+   being tinted. A single-surface work is contained: the bake refused to cut
+   it, and a band must not cut it either. */
+.council-detail-sheet__plate-band-oil {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.council-detail-sheet__plate-band-oil[data-whole='true'] {
+  object-fit: contain;
+  object-position: 50% 50%;
 }
 
 .council-detail-sheet__plate-band-note {
@@ -2896,6 +3011,20 @@
 
 .council-art-lightbox__plate {
   position: relative;
+}
+
+/* The whole painting, alone on the night. No box is declared around it: it
+   takes its own proportion and stops at whichever viewport edge it reaches
+   first, so nothing is ever letterboxed or cropped in the one view whose
+   whole job is to show the work entire. */
+.council-art-lightbox__oil {
+  display: block;
+  max-width: min(92vw, 1100px);
+  max-height: 78vh;
+  width: auto;
+  height: auto;
+  border-radius: var(--radius-sm, 6px);
+  border: 1px solid color-mix(in srgb, var(--cosmic-silver) 22%, transparent);
 }
 
 .council-art-lightbox__tone {

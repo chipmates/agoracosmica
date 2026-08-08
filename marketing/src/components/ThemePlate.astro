@@ -1,21 +1,28 @@
 ---
-// A council ink plate as a band on a theme page.
+// A council plate as a band on a theme page, in oil or in ink.
 //
-// The plate is a grayscale master whose marks live in the alpha channel, so
-// the band paints the theme ink and the plate only shapes it. Same technique
-// as the council cards in the app: no colour is ever baked into the asset.
-// Files, crops and the pick come from scripts/extract-plates.mjs.
+// An oil is the picture itself: opaque colour, cropped in the bake, shown as
+// an image. An ink plate is the opposite, a grayscale master whose marks live
+// in the alpha channel, so the band paints the theme ink and the plate only
+// shapes it. A theme that has an oil wears it; the rest keep their engraving.
+// Oil files come from the council-oils bake, ink from scripts/extract-plates.mjs.
 //
-// The band is also a door: pressing it opens the whole plate at its own
+// The band is also a door: pressing it opens the whole work at its own
 // proportion, the way the council sheet does in the app. The viewer itself is
 // one <PlateLightbox /> per page, shared by every band on it.
 //
-// The credit line under each band is the institution's own record, verbatim.
+// The credit line under each band is the institution's own record. The rights
+// token in it is that object's own, never a house default: the pool mixes
+// museum CC0 dedications, Public Domain Mark records and PD-Art reproductions.
 
 import platePicks from '../lib/platePicks.json';
 import { PLATE_CREDITS } from '@client/components/CosmicCouncil/plates/credits';
+import { shortRights, creditLineOf } from '@client/components/CosmicCouncil/plates/rights';
+import { getCouncilOil, getThemeLeadOil } from '@client/components/CosmicCouncil/oils';
+import { BLESSED_BY_THEME, type ThemeId } from '@client/data/councilCatalog';
 import type { Lang } from '../i18n';
 import '../styles/plates.css';
+import '../styles/oils.css';
 
 interface PlateEntry {
   full: { src: string; width: number; height: number };
@@ -40,33 +47,98 @@ interface Props {
 
 const { themeId, slot, councilId, ink = 'theme', lang } = Astro.props;
 const manifest = platePicks as Manifest;
+
+// The oil, where the theme has one. The lead band opens the page with the
+// painting chosen for the theme itself; the debate band wears the featured
+// council's own, which is the council the card under it opens.
+const featuredId = themeId ? BLESSED_BY_THEME[themeId as ThemeId] : undefined;
+const oil = councilId
+  ? getCouncilOil(councilId)
+  : themeId && slot === 'lead'
+    ? getThemeLeadOil(themeId)
+    : themeId && slot === 'debate' && featuredId
+      ? getCouncilOil(featuredId)
+      : undefined;
+
 const plateId =
   councilId ?? (themeId && slot ? manifest.picks[themeId]?.[slot] : undefined);
 // A plate the extraction script did not produce simply leaves no band behind.
-const plate = plateId ? manifest.plates[plateId] : undefined;
-const credit = plateId ? PLATE_CREDITS[plateId] : undefined;
+const plate = plateId && !oil ? manifest.plates[plateId] : undefined;
+const credit = plateId && !oil ? PLATE_CREDITS[plateId] : undefined;
+
 // Two plates carry no date in the museum record, so the artist line is built
-// from the parts that exist instead of printing an empty one.
-const creditLine = credit
-  ? [
-      credit.institution,
-      credit.title,
-      [credit.artist, credit.date].filter(Boolean).join(', '),
-      'CC0',
-    ]
-      .filter(Boolean)
-      .join(' · ')
-  : '';
+// from the parts that exist instead of printing an empty one. The rights token
+// is the record's own: these works are a mix of museum CC0 dedications, Public
+// Domain Mark records and public-domain reproductions, and one token for all
+// three would misstate two of them.
+const creditLine = oil
+  ? creditLineOf({
+      institution: oil.institution,
+      title: oil.title,
+      artist: oil.artist,
+      date: oil.year,
+      rights: oil.rights,
+    })
+  : credit
+    ? creditLineOf({
+        institution: credit.institution,
+        title: credit.title,
+        artist: credit.artist,
+        date: credit.date,
+        rights: shortRights(credit.rights),
+      })
+    : '';
+const objectUrl = oil ? oil.objectUrl : credit?.objectUrl;
+
 // What the button announces: the work, by name, in the visitor's language.
-const named = credit
-  ? credit.artist
+const work = oil ?? credit;
+const named = work
+  ? work.artist
     ? lang === 'de'
-      ? `${credit.title} von ${credit.artist}`
-      : `${credit.title} by ${credit.artist}`
-    : credit.title
+      ? `${work.title} von ${work.artist}`
+      : `${work.title} by ${work.artist}`
+    : work.title
   : '';
 const openLabel = lang === 'de' ? `Kunstwerk öffnen, ${named}` : `Open the artwork, ${named}`;
 ---
+{oil && (
+  <figure class="tq-plate tq-plate--oil" data-theme={ink === 'house' ? undefined : themeId} data-oil={oil.id}>
+    {/* Ships disabled so a visitor without the viewer never meets a dead
+        control. /plate-lightbox.js enables every band it can drive. */}
+    <button
+      type="button"
+      class="tq-plate__open"
+      disabled
+      data-plate-open
+      data-plate-oil
+      data-plate-full={oil.full}
+      data-plate-credit={creditLine}
+      data-plate-href={objectUrl}
+      aria-label={openLabel}
+    >
+      <span class="tq-plate__frame" aria-hidden="true">
+        <span class="tq-plate__tone"></span>
+        <img
+          class="tq-plate__oil"
+          src={oil.wide}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          data-whole={oil.wideMasked ? 'true' : undefined}
+        />
+        <span class="tq-plate__keyline"></span>
+      </span>
+    </button>
+    <figcaption class="tq-plate__credit">
+      <a
+        class="tq-plate__source"
+        href={objectUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+      >{creditLine}</a>
+    </figcaption>
+  </figure>
+)}
 {plate && (
   <figure
     class="tq-plate"
@@ -158,6 +230,12 @@ const openLabel = lang === 'de' ? `Kunstwerk öffnen, ${named}` : `Open the artw
     overflow: hidden;
     border-radius: var(--radius-sm);
   }
+  /* An oil band takes the plate's own 16/9. The ink band can hold 12/5
+     because covering a mask of an engraving costs marks; covering an oil
+     costs 25.9% of its height, and on a portrait-derived crop that is a head.
+     The crop was composed and verified at 16/9, so the band shows that and
+     never cuts a second time. */
+  .tq-plate--oil .tq-plate__frame { aspect-ratio: 16 / 9; }
   /* The paper the marks sit on, a breath warmer than the page. */
   .tq-plate__tone {
     position: absolute;

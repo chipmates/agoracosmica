@@ -5,16 +5,24 @@ import useTranslation from '../../hooks/useTranslation';
 import { useFocusTrap } from '../../hooks/useFocusTrap';
 import { CatalogCouncil, getLocalizedTitle, getThemeAccentVar } from '../../data/councilCatalog';
 import { getCouncilPlate } from './plates';
+import { getCouncilOil } from './oils';
+import { COUNCIL_OILS } from '../../config/features';
 import { inkStyle } from './CouncilPlate';
+import { shortRights, creditLineOf } from './plates/rights';
 
 /**
- * Full-plate viewer: the entire uncropped engraving alone on the night,
- * credit line beneath, tap anywhere to close.
+ * Full-plate viewer: the entire uncropped work alone on the night, credit line
+ * beneath, tap anywhere to close.
  *
- * Full masters live in plates/full/<council-id>.ts and load on open only.
- * Both globs tolerate absent files: a council without a full plate shows its
- * wide card master, and the credit line waits for plates/credits.ts, so the
- * viewer upgrades itself as assets land without a code change.
+ * An oil brings its own full tier and its own credit record, so it needs
+ * neither glob. Engravings keep both: full masters live in
+ * plates/full/<council-id>.ts and load on open only, and both globs tolerate
+ * absent files, so a council without a full plate shows its wide card master
+ * and the credit line waits for plates/credits.ts.
+ *
+ * The rights token is never assumed. Half these works are museum CC0
+ * dedications and half are public-domain reproductions, so the line prints
+ * whatever the object's own record asserts.
  */
 
 interface FullPlate {
@@ -55,6 +63,7 @@ const CouncilArtLightbox: FC<CouncilArtLightboxProps> = ({ council, onClose }) =
   const [plate, setPlate] = useState<{ src: string; aspect: number } | null>(null);
 
   const cardPlate = getCouncilPlate(council.id);
+  const oil = COUNCIL_OILS ? getCouncilOil(council.id) : undefined;
   const credit = PLATE_CREDITS[council.id];
   const accentVar = getThemeAccentVar(council.theme);
   const title = getLocalizedTitle(council, language);
@@ -62,6 +71,7 @@ const CouncilArtLightbox: FC<CouncilArtLightboxProps> = ({ council, onClose }) =
   useEffect(() => {
     let alive = true;
     setPlate(null);
+    if (oil) return;
     const loader = fullModules[`./plates/full/${council.id}.ts`];
     if (loader) {
       loader()
@@ -101,7 +111,29 @@ const CouncilArtLightbox: FC<CouncilArtLightboxProps> = ({ council, onClose }) =
         ariaLabel={tString('common.close', 'Close')}
         className="council-art-lightbox__close"
       />
-      {plate && (
+      {oil && (
+        <div className="council-art-lightbox__stage">
+          {/* The painting sizes itself: no box is declared for it, so it can
+              never be letterboxed inside one that guessed its proportion. */}
+          <img className="council-art-lightbox__oil" src={oil.full} alt={oil.title} />
+          <a
+            className="council-art-lightbox__credit"
+            href={oil.objectUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={e => e.stopPropagation()}
+          >
+            {creditLineOf({
+              institution: oil.institution,
+              title: oil.title,
+              artist: oil.artist,
+              date: oil.year,
+              rights: oil.rights,
+            })}
+          </a>
+        </div>
+      )}
+      {!oil && plate && (
         <div className="council-art-lightbox__stage">
           <div
             className="council-art-lightbox__plate"
@@ -128,7 +160,13 @@ const CouncilArtLightbox: FC<CouncilArtLightboxProps> = ({ council, onClose }) =
               rel="noopener noreferrer"
               onClick={e => e.stopPropagation()}
             >
-              {credit.institution} · {credit.title} · {credit.artist}, {credit.date} · CC0
+              {creditLineOf({
+                institution: credit.institution,
+                title: credit.title,
+                artist: credit.artist,
+                date: credit.date,
+                rights: shortRights(credit.rights),
+              })}
             </a>
           )}
         </div>

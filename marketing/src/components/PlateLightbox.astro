@@ -38,6 +38,11 @@ const closeLabel = lang === 'de' ? 'Schließen' : 'Close';
       <div class="tq-lightbox__ink" data-plate-ink-layer></div>
       <div class="tq-lightbox__keyline"></div>
     </div>
+    {/* An oil is the picture, not a mask over the ink, and it needs no box:
+        it takes its own proportion and stops at whichever viewport edge it
+        reaches first, so the one view whose job is the whole work never
+        crops or letterboxes it. */}
+    <img class="tq-lightbox__oil" data-plate-oil-layer alt="" hidden />
     <a
       class="tq-lightbox__credit"
       data-plate-credit-link
@@ -104,6 +109,19 @@ const closeLabel = lang === 'de' ? 'Schließen' : 'Close';
   /* Width and proportion are set from the plate that was opened, so the box
      is the engraving's own shape and never a letterbox around it. */
   .tq-lightbox__plate { position: relative; }
+
+  /* An oil declares no box at all, so nothing can guess its proportion
+     wrongly. Width-capped and height-capped only against the viewport. */
+  .tq-lightbox__oil {
+    display: block;
+    max-width: min(92vw, 1100px);
+    max-height: 78vh;
+    width: auto;
+    height: auto;
+    border-radius: var(--radius-sm);
+    border: 1px solid color-mix(in srgb, var(--star-blue-light) var(--a-15), transparent);
+  }
+  .tq-lightbox__oil[hidden] { display: none; }
   .tq-lightbox__tone {
     position: absolute;
     inset: 0;

@@ -14,22 +14,34 @@
 
   var stage = dialog.querySelector('[data-plate-stage]');
   var ink = dialog.querySelector('[data-plate-ink-layer]');
+  var oil = dialog.querySelector('[data-plate-oil-layer]');
   var credit = dialog.querySelector('[data-plate-credit-link]');
   var trigger = null;
 
   function open(button) {
     trigger = button;
-    var aspect = parseFloat(button.getAttribute('data-plate-aspect')) || 1;
-    // The plate takes the largest box its own proportion allows, capped so a
-    // wide engraving never runs past the viewport on either axis.
-    stage.style.aspectRatio = String(aspect);
-    stage.style.width = 'min(92vw, 1100px, ' + (78 * aspect).toFixed(1) + 'vh)';
-    dialog.setAttribute('data-ink', button.getAttribute('data-plate-ink') || 'house');
-
     var src = button.getAttribute('data-plate-full');
-    var mask = 'url("' + src + '")';
-    ink.style.webkitMaskImage = mask;
-    ink.style.maskImage = mask;
+    // An oil carries its own colour and its own proportion, so it replaces the
+    // mask stage entirely rather than being poured into a box sized from an
+    // aspect the button had to declare.
+    var isOil = button.hasAttribute('data-plate-oil');
+    stage.hidden = isOil;
+    if (oil) {
+      oil.hidden = !isOil;
+      if (isOil) oil.src = src;
+    }
+
+    if (!isOil) {
+      var aspect = parseFloat(button.getAttribute('data-plate-aspect')) || 1;
+      // The plate takes the largest box its own proportion allows, capped so a
+      // wide engraving never runs past the viewport on either axis.
+      stage.style.aspectRatio = String(aspect);
+      stage.style.width = 'min(92vw, 1100px, ' + (78 * aspect).toFixed(1) + 'vh)';
+      var mask = 'url("' + src + '")';
+      ink.style.webkitMaskImage = mask;
+      ink.style.maskImage = mask;
+    }
+    dialog.setAttribute('data-ink', button.getAttribute('data-plate-ink') || 'house');
 
     var line = button.getAttribute('data-plate-credit') || '';
     var href = button.getAttribute('data-plate-href') || '';
