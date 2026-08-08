@@ -22,26 +22,28 @@ export default defineConfig({
   // Auto-generates SHA-256 hashes for every inline <script> Astro emits
   // (the astro:visible/astro:idle bootstrap blocks and the island runtime)
   // and injects them into a per-page <meta http-equiv="Content-Security-Policy">.
-  // The hashes are deterministic per Astro version; the unique set is small
-  // enough to also enumerate in client/public/_headers script-src so the
-  // response-header CSP (AND-enforced with meta) allows the same inline blocks.
+  // This block is the source of truth for the script hashes: the same list in
+  // client/public/_headers is derived from it, and both policies AND-enforce,
+  // so a hash present in one and missing from the other kills the script in
+  // every browser while dev keeps working. Regenerate the derived list with
+  // `node scripts/check-csp.mjs --write` from client/; the plain run of that
+  // script is a build gate that fails on any inline script the merged policy
+  // would block.
   security: {
     csp: {
-      // Style-src in the meta tag must be at least as permissive as the
-      // response-header style-src ('self' 'unsafe-inline'), otherwise the
-      // AND-merge between meta and header blocks inline styles that React
-      // islands inject at runtime. Script-src stays strict (auto-hashed).
+      // Astro adds a hash per inline <style> it emits, and a hash in the list
+      // makes the browser ignore 'unsafe-inline'. So this directive is strict
+      // in practice: an inline style has to be hashed or it is blocked, which
+      // is why validate-seo.mjs rejects style="" attributes in built HTML.
       styleDirective: {
         resources: ["'self'", "'unsafe-inline'"],
       },
       // Astro only auto-hashes its own emitted scripts, not authored is:inline
       // ones. The homepage pre-paint marker (AgoraHero) must run before first
-      // paint, so it stays inline and its hash is added here by hand. The
-      // response-header CSP in client/public/_headers lists the same hash;
-      // both policies AND-enforce, so a miss on either side blocks the script
-      // (that exact miss shipped once: header yes, meta no, script dead in
-      // every browser). If the script text changes, recompute the hash in BOTH
-      // places: echo -n '<script text>' | openssl dgst -sha256 -binary | base64
+      // paint, so it stays inline and its hash is added here by hand. If the
+      // script text changes, recompute it here:
+      //   echo -n '<script text>' | openssl dgst -sha256 -binary | base64
+      // then rebuild and run check-csp.mjs --write to carry it to _headers.
       scriptDirective: {
         hashes: ['sha256-i/ofomzmMjJLegES6OLDsJfA4wJAI3UQ8UCNyC3zlcY='],
       },

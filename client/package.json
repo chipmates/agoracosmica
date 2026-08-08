@@ -19,12 +19,15 @@
     "@types/node": "^24.12.2",
     "@types/react": "^18.3.28",
     "@types/react-dom": "^18.3.7",
+    "@typescript-eslint/eslint-plugin": "^8.66.0",
+    "@typescript-eslint/parser": "^8.66.0",
     "@vitejs/plugin-basic-ssl": "^2.3.0",
     "@vitejs/plugin-react": "^4.7.0",
     "@vitest/coverage-v8": "^4.1.8",
     "@vitest/ui": "^4.1.8",
     "eslint": "^8.57.1",
     "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
     "fake-indexeddb": "^6.2.5",
     "jsdom": "^26.1.0",
     "rollup": "4.60.3",
@@ -35,17 +38,19 @@
   "scripts": {
     "dev": "vite",
     "start": "vite",
-    "build": "node scripts/setup-assets.mjs && node scripts/extract-public-data.mjs && vite build && (cd ../marketing && pnpm install --prefer-frozen-lockfile && pnpm build) && node scripts/merge-marketing.mjs && node scripts/generate-sitemap.mjs && node scripts/check-asset-names.mjs",
+    "build": "node scripts/setup-assets.mjs && node scripts/extract-public-data.mjs && vite build && (cd ../marketing && pnpm install --prefer-frozen-lockfile && pnpm build) && node scripts/merge-marketing.mjs && node scripts/generate-sitemap.mjs && node scripts/check-asset-names.mjs && node scripts/check-csp.mjs",
     "build:self-host": "node scripts/setup-assets.mjs && node scripts/extract-public-data.mjs && vite build",
     "build:extract": "node scripts/extract-public-data.mjs",
     "build:client": "vite build",
-    "build:marketing": "cd ../marketing && pnpm build && cd ../client && node scripts/merge-marketing.mjs && node scripts/check-asset-names.mjs",
+    "build:marketing": "cd ../marketing && pnpm build && cd ../client && node scripts/merge-marketing.mjs && node scripts/check-asset-names.mjs && node scripts/check-csp.mjs",
     "preview": "vite preview",
     "lint": "eslint .",
     "preinstall": "node check-pkgmgr.js",
     "setup:assets": "node scripts/setup-assets.mjs",
     "test": "vitest",
-    "test:unit": "vitest run"
+    "test:unit": "vitest run",
+    "check:csp": "node scripts/check-csp.mjs",
+    "test:csp": "node scripts/csp-probe.mjs"
   },
   "browserslist": {
     "production": [

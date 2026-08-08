@@ -105,23 +105,6 @@ html[lang=de] .mh h1{font-size:clamp(1.75rem,2.7vw,2.4rem)}
 .chapter__go{margin-left:.45em;color:var(--gold-primary)}
 .chapter:hover{color:var(--text-primary)}
 
-/* SPEAK: the climax. The warmest plate on the page. */
-.ask{display:flex;align-items:center;gap:1rem;text-decoration:none;
-  padding:1rem 1rem 1rem 1.15rem;border-radius:var(--plate-radius-soft);
-  background:linear-gradient(150deg,
-    color-mix(in srgb,var(--gold-primary) var(--a-12),var(--bg-card)) 0%,
-    var(--bg-card) 64%);
-  border:1px solid var(--keyline-strong);
-  box-shadow:0 14px 40px -18px color-mix(in srgb,var(--gold-primary) var(--a-50),transparent),
-    inset 0 1px 0 var(--keyline-inner);
-  transition:border-color .25s ease,transform .25s ease}
-.ask:hover{border-color:var(--gold-primary);transform:translateY(-2px)}
-.ask q{font-family:var(--font-content);font-size:1.18rem;line-height:1.36;quotes:none;
-  color:var(--text-primary)}
-.ask__go{flex:0 0 44px;width:44px;height:44px;border-radius:50%;display:grid;
-  place-items:center;background:var(--gold-primary)}
-.ask__go svg{width:17px;height:17px;fill:var(--bg-void)}
-
 /* ---------- fine print, on a rule ---------- */
 .fine{margin-top:1.05rem;padding-top:.8rem;border-top:1px solid var(--keyline-soft);
   display:flex;flex-wrap:wrap;align-items:baseline;gap:.35rem 1.2rem}
@@ -163,16 +146,6 @@ html[lang=de] .mh h1{font-size:clamp(1.75rem,2.7vw,2.4rem)}
 /* THE IGNITION, beat two: the same dust runs down the spine and the question
    arrives with it. Every word is in the markup: script only wraps and re-keys. */
 .mh w{display:inline-block;opacity:1}
-.settling .ask q w{opacity:.13;filter:blur(1.6px);
-  transition:opacity .34s ease,filter .34s ease}
-.settling .ask q w.in{opacity:1;filter:none}
-/* the plate is cool until its question is written */
-.settling .ask.cool{border-color:var(--keyline-soft);
-  background:var(--bg-card);box-shadow:none}
-.settling .ask{transition:border-color .5s ease,background .5s ease,box-shadow .5s ease,
-  transform .25s ease}
-.settling .ask.cool .ask__go{background:color-mix(in srgb,var(--gold-primary) var(--a-30),var(--bg-astral))}
-.ask__go{transition:background .5s ease}
 /* a node the stream has not reached yet is unlit */
 .settling .beats>li.dim::before{background:var(--bg-astral);
   border-color:var(--keyline-soft);box-shadow:none}
@@ -254,9 +227,6 @@ html[lang=de] .mh h1{font-size:clamp(1.75rem,2.7vw,2.4rem)}
   .promise{font-size:1.02rem;line-height:1.36}
   .play{min-height:46px;font-size:.85rem}
   .chapter{font-size:.82rem;padding:.82rem 0}
-  .ask{padding:.72rem .72rem .72rem .85rem;gap:.6rem}
-  .ask q{font-size:1.02rem;line-height:1.32}
-  .ask__go{flex-basis:40px;width:40px;height:40px}
   .fine{margin-top:.85rem;padding-top:.7rem;display:block}
   .free{font-size:.82rem}
   .disc{font-size:.75rem}
@@ -286,7 +256,6 @@ html[lang=de] .mh h1{font-size:clamp(1.75rem,2.7vw,2.4rem)}
   html[lang=de] .mh h1{font-size:1.9rem}
   .sub{font-size:.95rem}
   .promise{font-size:1.12rem}
-  .ask q{font-size:1.1rem}
   .pcap__nm{font-size:1.25rem}
 }
 
@@ -403,7 +372,6 @@ html[lang=de] .mh h1{font-size:clamp(1.75rem,2.7vw,2.4rem)}
   .mh h1{font-size:3rem}
   html[lang=de] .mh h1{font-size:2.5rem}
   .promise{font-size:1.22rem}
-  .ask q{font-size:1.22rem}
 }
 
 @media (prefers-reduced-motion:reduce){

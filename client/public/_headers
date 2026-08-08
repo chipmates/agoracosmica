@@ -1,4 +1,9 @@
 # Security headers for Cloudflare Pages
+#
+# The script-src sha256 list is derived, not authored. Astro generates it into
+# each page's meta CSP from the scripts it inlined; this header CSP AND-enforces
+# with that meta tag, so both lists have to carry every hash. Regenerate with
+# `node scripts/check-csp.mjs --write` from client/ instead of editing by hand.
 /*
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
