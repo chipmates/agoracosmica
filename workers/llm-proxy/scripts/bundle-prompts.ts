@@ -2,23 +2,35 @@
 // Build-time script: reads all instruction JSONs → generates prompts/instructions.ts
 // Run: npx tsx scripts/bundle-prompts.ts
 
-import { readFileSync, readdirSync, writeFileSync } from 'fs';
+import { existsSync, readFileSync, readdirSync, writeFileSync } from 'fs';
 import { join, resolve } from 'path';
 
-const INSTRUCTIONS_DIR = resolve(__dirname, '../../client/src/assets/instructions');
+// scripts/ → llm-proxy → workers → agoracosmica → client/src/assets/instructions
+const INSTRUCTIONS_DIR = resolve(__dirname, '../../../client/src/assets/instructions');
 const OUTPUT_FILE = resolve(__dirname, '../src/prompts/instructions.ts');
 
 const MODES = ['free_conversation', 'seed_conversation', 'seed_challenge'];
 
+// A silently thin bundle serves stale prompts to the free tier, so refuse to
+// write one. Raise if the roster ever shrinks on purpose.
+const MIN_EXPECTED_ENTRIES = 60;
+
 function main() {
+  if (!existsSync(INSTRUCTIONS_DIR)) {
+    console.error(`ERROR: instructions directory not found: ${INSTRUCTIONS_DIR}`);
+    process.exit(1);
+  }
+
   const figures = readdirSync(INSTRUCTIONS_DIR, { withFileTypes: true })
     .filter(d => d.isDirectory())
     .map(d => d.name)
     .sort();
 
   console.log(`Bundling instructions for ${figures.length} figures...`);
+  console.log(`  source: ${INSTRUCTIONS_DIR}`);
 
   const entries: Record<string, string> = {};
+  const skipped: string[] = [];
   let totalSize = 0;
 
   for (const figure of figures) {
@@ -30,6 +42,7 @@ function main() {
         const system = parsed.system;
         if (typeof system !== 'string') {
           console.warn(`  SKIP ${figure}/${mode}: no "system" field`);
+          skipped.push(`${figure}/${mode}`);
           continue;
         }
         const key = `${figure}:${mode}`;
@@ -38,8 +51,16 @@ function main() {
         console.log(`  ${key} (${(system.length / 1024).toFixed(1)}KB)`);
       } catch (err) {
         console.warn(`  SKIP ${figure}/${mode}: ${(err as Error).message}`);
+        skipped.push(`${figure}/${mode}`);
       }
     }
+  }
+
+  if (Object.keys(entries).length < MIN_EXPECTED_ENTRIES) {
+    console.error(
+      `ERROR: only ${Object.keys(entries).length} entries (expected >= ${MIN_EXPECTED_ENTRIES}). Refusing to write a thin bundle.`
+    );
+    process.exit(1);
   }
 
   // Generate TypeScript file
@@ -53,6 +74,7 @@ export const INSTRUCTIONS: Record<string, string> = ${JSON.stringify(entries, nu
   writeFileSync(OUTPUT_FILE, output, 'utf-8');
   console.log(`\nWrote ${OUTPUT_FILE}`);
   console.log(`  ${Object.keys(entries).length} entries, ${(totalSize / 1024).toFixed(0)}KB`);
+  if (skipped.length) console.log(`  skipped: ${skipped.join(', ')}`);
 }
 
 main();
