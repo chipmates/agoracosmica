@@ -95,6 +95,11 @@ export function useCouncilPreview(): CouncilPreviewControls {
 
       el.pause();
       el.onplaying = () => setStatus('playing');
+      // Audio focus pauses this element when another player starts, and that
+      // path never runs through toggle. Without this the button keeps saying
+      // Pause over silence. Only playing steps back, so a pause queued by the
+      // line above can never undo the loading state set below.
+      el.onpause = () => setStatus(s => (s === 'playing' ? 'idle' : s));
       el.onended = () => { setStatus('idle'); setActiveId(null); };
       el.onerror = () => { setStatus('error'); setActiveId(null); };
       el.src = getPublicCouncilPreviewUrl(councilId, language === 'de' ? 'de' : 'en', previewExt());

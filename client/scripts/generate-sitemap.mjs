@@ -129,6 +129,11 @@ const THEMES_CATALOG_MOD = gitLastModified(
   'marketing/src/pages/de/themes/index.astro',
   'marketing/src/components/ThemesCatalogContent.astro',
 );
+const AUDIO_CATALOG_MOD = gitLastModified(
+  'marketing/src/pages/audio.astro',
+  'marketing/src/pages/de/audio.astro',
+  'marketing/src/components/AudioLibraryContent.astro',
+);
 const FIGURE_TEMPLATE_MOD = gitLastModified(
   'marketing/src/pages/figures/[slug].astro',
   'marketing/src/pages/de/figures/[slug].astro',
@@ -184,6 +189,8 @@ urls.push(url('/figures', '0.9', FIGURES_CATALOG_MOD, 'weekly'));
 urls.push(deUrl('/figures', '0.9', FIGURES_CATALOG_MOD, 'weekly'));
 urls.push(url('/themes', '0.9', THEMES_CATALOG_MOD, 'weekly'));
 urls.push(deUrl('/themes', '0.9', THEMES_CATALOG_MOD, 'weekly'));
+urls.push(url('/audio', '0.8', AUDIO_CATALOG_MOD, 'weekly'));
+urls.push(deUrl('/audio', '0.8', AUDIO_CATALOG_MOD, 'weekly'));
 
 // Figure detail pages
 for (const slug of FIGURE_SLUGS) {

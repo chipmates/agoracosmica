@@ -7,6 +7,7 @@
 // boot-time detectBrowserLanguage() opens the app in the page's language.
 // Language is a real preference and is meant to persist.
 
+import { AUDIO_LIBRARY_ENTRY } from '../../config/features';
 import { LocalStorageAdapter } from '../../storage/localAdapter';
 import { figureSlugToId } from '../../data/public/slugMap';
 import { getHeroEntryQuestion, hasHeroEntry } from '../../data/public/heroEntry';
@@ -19,6 +20,7 @@ const SS_ASK_PREFILL_KEY = 'agc_ask_prefill';
 const SS_COUNCIL_PREFILL_KEY = 'agc_council_prefill';
 const SS_MODE_KEY = 'agc_intended_mode';
 const SS_CHAPTER_KEY = 'agc_intended_chapter';
+const SS_LIBRARY_KEY = 'agc_intended_library';
 const SS_TEXT_FIRST_KEY = 'agc_entry_text_first';
 
 // Ask tags. A tag NAMES a curated question, it never carries one: no free text
@@ -437,7 +439,7 @@ export function isCarriedEntryTurn(threadKey: string | null, userTurnCount: numb
  * Which arrival a first-timer's consent screen belongs to. Non-consuming, so
  * the routing that runs later still finds every intent it needs.
  */
-export type EntryClass = 'council' | 'ask' | 'chapter' | 'figure' | 'generic';
+export type EntryClass = 'council' | 'ask' | 'chapter' | 'figure' | 'library' | 'generic';
 
 export function classifyEntryForFunnel(): EntryClass {
   try {
@@ -447,6 +449,8 @@ export function classifyEntryForFunnel(): EntryClass {
     if (ask && isValidAskTag(ask)) return 'ask';
     if (readStoryIntent()) return 'chapter';
     if (sessionStorage.getItem(SS_FIGURE_KEY)) return 'figure';
+    // Last before generic, so no arrival that already had a class changes one.
+    if (readLibraryIntent()) return 'library';
     return 'generic';
   } catch {
     return 'generic';
@@ -485,6 +489,58 @@ export function clearStoryIntent(): void {
   } catch {
     // no-op
   }
+}
+
+/**
+ * Audio-library deep-link — the public audio page's own door. It carries no
+ * figure and no question, so it is staged in a key of its own and never
+ * competes with the story chapter the mode key holds.
+ */
+export function readLibraryIntent(): boolean {
+  try {
+    return typeof sessionStorage !== 'undefined'
+      && sessionStorage.getItem(SS_LIBRARY_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+/** Clears the library intent. Call once routing has consumed it. */
+export function clearLibraryIntent(): void {
+  try {
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.removeItem(SS_LIBRARY_KEY);
+    }
+  } catch {
+    // no-op
+  }
+}
+
+/**
+ * Announced when routing releases a staged library intent. The rail button owns
+ * the library modal, so it is the one that opens it, exactly as it does on a
+ * click. Released only after the welcome step, so a first-timer consents first.
+ */
+export const AUDIO_LIBRARY_EVENT = 'agc:audio-library';
+
+let audioLibraryRequested = false;
+
+export function requestAudioLibrary(): void {
+  audioLibraryRequested = true;
+  try {
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event(AUDIO_LIBRARY_EVENT));
+    }
+  } catch {
+    // no-op — the rail button also drains the request when it mounts
+  }
+}
+
+/** True once, for whoever opens the library. Never re-opens it later. */
+export function consumeAudioLibraryRequest(): boolean {
+  if (!audioLibraryRequested) return false;
+  audioLibraryRequested = false;
+  return true;
 }
 
 /**
@@ -573,6 +629,11 @@ export function captureEntryIntentFromUrl(): void {
         sessionStorage.setItem(SS_MODE_KEY, 'story');
         sessionStorage.setItem(SS_CHAPTER_KEY, String(chapter));
       }
+    }
+    // Audio-library deep-link, on the same allowlist. Its own key, so a link
+    // that also carries a figure or a question loses neither.
+    if (modeParam === 'library' && AUDIO_LIBRARY_ENTRY) {
+      sessionStorage.setItem(SS_LIBRARY_KEY, '1');
     }
     if (figureParam || councilParam || askParam || questionParam || modeParam) {
       markEntryTextFirst();

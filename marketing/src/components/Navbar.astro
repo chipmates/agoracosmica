@@ -23,6 +23,7 @@ const langSwitchUrl = otherLang === 'de' ? `/de${basePath}` : basePath;
 const navLinks = [
   { to: publicUrl(lang, '/figures'), label: t('nav.figures') },
   { to: publicUrl(lang, '/themes'), label: t('nav.themes') },
+  { to: publicUrl(lang, '/audio'), label: t('nav.audio') },
   { to: publicUrl(lang, '/about'), label: t('nav.about') },
   { to: publicUrl(lang, lang === 'de' ? '/about/#kontakt' : '/about/#contact'), label: t('nav.contact') },
 ];
@@ -49,7 +50,7 @@ const isActive = (path: string) => currentPath === path || currentPath === path.
       </span>
     </a>
 
-    <nav class="pub-navbar__nav" id="pub-nav" aria-label="Main navigation">
+    <nav class="pub-navbar__nav" id="pub-nav" aria-label={t('nav.mainAria')}>
       {navLinks.map(link => (
         <a
           href={link.to}
@@ -158,11 +159,18 @@ const isActive = (path: string) => currentPath === path || currentPath === path.
     flex-direction: column;
     line-height: 1.2;
   }
-  /* Narrow screens keep the wordmark alone. The German tagline wraps to two
-     lines at this width, which would push the bar taller than it is on every
-     other page. */
-  @media (max-width: 620px) {
+  /* Below the desktop bar the wordmark stands alone. The German tagline is the
+     widest thing in the lockup, and keeping it here is what pushed the whole
+     bar into a multi-line wrap through the tablet band. */
+  @media (max-width: 900px) {
     .pub-navbar__logo-tagline { display: none; }
+  }
+  /* The last stretch before the burger takes over at 640. Five links, the
+     language switch and the CTA only fit here with the gaps closed up, and
+     German sets every label at its longest. Class-stacked to beat the layout
+     stylesheet's 1.5rem regardless of bundle order. */
+  @media (min-width: 641px) and (max-width: 800px) {
+    .pub-navbar .pub-navbar__inner .pub-navbar__nav { gap: 0.85rem; }
   }
 
   /* Background fix for the open mobile menu. public-layout.css sets

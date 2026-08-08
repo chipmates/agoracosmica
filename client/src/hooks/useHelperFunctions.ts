@@ -3,7 +3,15 @@ import { getHistoricalFigures } from '../api/figures';
 import { completeOnboarding } from '../utils/userState';
 import { Figure, Seed, Language, ConversationMode } from '../types/global';
 import { useDomainStore } from '../stores';
-import { readFigureIntent, clearFigureIntent, readCouncilIntent, clearCouncilIntent } from '../utils/public/entryIntent';
+import {
+  readFigureIntent,
+  clearFigureIntent,
+  readCouncilIntent,
+  clearCouncilIntent,
+  readLibraryIntent,
+  clearLibraryIntent,
+  requestAudioLibrary,
+} from '../utils/public/entryIntent';
 
 interface HelperFunctionsParams {
   selectedFigure: Figure | null;
@@ -113,6 +121,12 @@ export function useHelperFunctions({
   // page) opens that council; a figure intent (figure page) lands on that
   // figure's mode selector; otherwise the WisdomGallery opens as before.
   const routeAfterOnboarding = useCallback((): void => {
+    // Audio-library deep-link: the library opens over whatever this arrival
+    // would otherwise land on, so closing it leaves the visitor somewhere real.
+    if (readLibraryIntent()) {
+      clearLibraryIntent();
+      requestAudioLibrary();
+    }
     // Council deep-link from a theme page: open that council, skip the gallery.
     const intendedCouncil = readCouncilIntent();
     if (intendedCouncil) {

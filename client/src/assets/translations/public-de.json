@@ -2,12 +2,14 @@
   "nav": {
     "figures": "Menschen",
     "themes": "Themen",
+    "audio": "Audio",
     "about": "\u00dcber uns",
     "contact": "Kontakt",
     "whyEchoes": "Warum wir sie Echos nennen",
     "startExploring": "Jetzt entdecken",
     "menu": "Men\u00fc",
-    "closeMenu": "Men\u00fc schlie\u00dfen"
+    "closeMenu": "Men\u00fc schlie\u00dfen",
+    "mainAria": "Hauptnavigation"
   },
   "footer": {
     "impressum": "Impressum",
@@ -24,6 +26,7 @@
     "home": "Start",
     "figures": "Menschen",
     "themes": "Themen",
+    "audio": "Audio",
     "about": "\u00dcber uns",
     "contact": "Kontakt"
   },

@@ -1,0 +1,760 @@
+---
+// The public home of the audio corpus, in seven sections: what this is, the
+// door into the library, the thirty narrated lives, the fifty five debates,
+// the dialogues, the honest note about the voices, and the closing door.
+// One section, one job, same discipline as the theme pages.
+//
+// Every duration on this page is measured: chapter and life runtimes come from
+// the produced story audio, debate runtimes from the shipped segment
+// manifests. A missing measurement prints nothing rather than a guess.
+// The preview player appears only on the debates that really have a clip.
+
+import Breadcrumbs from './Breadcrumbs.astro';
+import CouncilPreviewButton from '../islands/CouncilPreviewButton';
+import { getT } from '../i18n';
+import type { Lang } from '../i18n';
+import { publicUrl } from '../lib/urls';
+import { STRATA } from './figureStrata';
+import { localizedShortName } from './figureNames';
+import { getSeedsFor } from '../lib/seeds';
+import {
+  chapterMinutes,
+  figureMinutes,
+  totalStoryHours,
+  longRuntimeLabel,
+  shortRuntimeLabel,
+} from '../lib/storyRuntime';
+import { runtimeMinutes, hearDebateLabel, shortMinutes } from '../lib/councilRuntime';
+import {
+  THEMES,
+  councilCatalog,
+  getThemeCouncilsRanked,
+  getLocalizedTitle,
+  getLocalizedQuestion,
+  getShortDisplayName,
+} from '@client/data/councilCatalog';
+import { hasCouncilPreview } from '@client/data/public/councilPreviews';
+import { getFigureById } from '@client/data/public/figuresCatalog';
+import { figureIdToSlug } from '@client/data/public/slugMap';
+import { getPublicCouncilPreviewUrl } from '@client/utils/public/publicMediaUrl';
+import { cleanDisplayText } from '../lib/figureWorld';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const de = lang === 'de';
+const t = getT(lang);
+
+const CHAPTERS_PER_FIGURE = 12;
+
+// The thirty lives in the site's own order, era band by era band, so the list
+// is walkable instead of thirty flat rows.
+const bands = STRATA.map(stratum => ({
+  id: stratum.id,
+  label: de ? stratum.de.short : stratum.en.short,
+  span: de ? stratum.de.span : stratum.en.span,
+  figures: stratum.figures.map(figureId => {
+    const figure = getFigureById(figureId, lang);
+    const slug = figureIdToSlug[figureId] || figureId;
+    const seeds = getSeedsFor(figureId, lang);
+    const minutes = figureMinutes(figureId, lang);
+    return {
+      id: figureId,
+      slug,
+      name: figure?.name ?? getShortDisplayName(figureId),
+      short: localizedShortName(figureId, lang),
+      tradition: figure?.tradition ?? '',
+      runtime: longRuntimeLabel(minutes, lang),
+      chapters: Array.from({ length: CHAPTERS_PER_FIGURE }, (_, i) => {
+        const n = i + 1;
+        return {
+          n,
+          title: cleanDisplayText(seeds[i]?.title) || `${de ? 'Kapitel' : 'Chapter'} ${n}`,
+          runtime: shortRuntimeLabel(chapterMinutes(figureId, lang, n), lang),
+        };
+      }),
+    };
+  }),
+}));
+
+const figureCount = bands.reduce((n, band) => n + band.figures.length, 0);
+const chapterCount = figureCount * CHAPTERS_PER_FIGURE;
+const storyHours = totalStoryHours(lang);
+
+// The debates that carry a produced clip lead the section, because they are the
+// only ones this page can let you hear without leaving it.
+const withClip = councilCatalog.filter(council => hasCouncilPreview(council.id));
+const debateCount = councilCatalog.length;
+
+const debateGroups = THEMES.map(theme => ({
+  id: theme.id,
+  name: t(`themes.${theme.id}.name`),
+  councils: getThemeCouncilsRanked(theme.id).map(council => ({
+    id: council.id,
+    title: getLocalizedTitle(council, lang),
+    question: cleanDisplayText(getLocalizedQuestion(council, lang)),
+    runtime: shortMinutes(runtimeMinutes(council.id, lang), lang),
+  })),
+}));
+
+const libraryHref = `/app?mode=library&lang=${lang}`;
+
+const en = {
+  eyebrow: 'The audio library',
+  h1: 'Can I listen to philosophy instead of reading it?',
+  answer:
+    'Yes, and most of this library was made to be heard. Thirty lives are told across twelve chapters each, in the first person, in the Echo voice of the person whose life it is. Fifty-five questions are argued out loud by four voices who disagree. All of it plays inside the app.',
+  disclosure:
+    'Every voice here is an AI Echo. The speech is synthesized, so nothing you hear is a recording of the real person.',
+  doorTitle: 'Open the audio library',
+  doorText:
+    'The library sits inside the app. Choose a person, choose a chapter, press play. Nothing to install and no signup.',
+  doorLabel: 'Open the audio library',
+  storiesTitle: 'Thirty lives, told from the inside',
+  storiesLead:
+    'Each life runs twelve chapters, first to last. One chapter is one scene, and the Echo tells it as the person who lived it. Open a name to see all twelve and start wherever you like.',
+  chaptersLabel: 'All twelve chapters',
+  startLabel: 'Hear chapter 1',
+  debatesTitle: 'Fifty-five questions, argued out loud',
+  debatesLead:
+    'A council is four Echo voices working through one question, one of them moderating. Every debate has a second, deeper round behind it. They are produced in advance, so a debate runs from beginning to end without you steering it. These first ones carry a clip you can hear right here.',
+  debatesAllLabel: 'All 55 debates',
+  debatesAllLead: 'Grouped under the eight questions they belong to.',
+  prismsTitle: 'And a dialogue behind every chapter',
+  prismsLead:
+    'A prism takes one idea out of one chapter and puts four voices around it. They do not agree. Twelve for each person, so three hundred and sixty in all, and the way in is that person’s own page.',
+  prismsLink: 'Browse the thirty',
+  honestTitle: 'What you are hearing',
+  honestParas: [
+    'Every voice in this library is an Echo voice. We write the text from the record, a speech model reads it, and what comes out is an interpretation. It is never a recording, and never a claim to speak for the real person.',
+    'The audio plays inside the app. There is no feed to subscribe to. If you used to follow this in a podcast app, it did not go away, it lives here now.',
+  ],
+  closeTitle: 'Start with one chapter',
+  closeText:
+    'The shortest way in is one chapter of one life. That is usually enough to know whether this is for you.',
+  scaleChapters: 'narrated chapters',
+  scaleHours: 'hours of listening',
+  scaleDebates: 'debates',
+  scaleDialogues: 'prism dialogues',
+  linkFigures: 'The thirty',
+  linkThemes: 'The eight questions',
+  linkEchoes: 'Why we call them Echoes',
+};
+
+const deCopy = {
+  eyebrow: 'Die Audiothek',
+  h1: 'Kann ich Philosophie hören statt lesen?',
+  answer:
+    'Ja, das meiste hier ist zum Hören gemacht. Dreißig Leben, erzählt in je zwölf Kapiteln, in der Ich-Form und mit der KI-Stimme des Echos, um dessen Leben es geht. Fünfundfünfzig Fragen, die vier Stimmen laut ausdiskutieren. Alles läuft in der App.',
+  disclosure:
+    'Jede Stimme hier ist ein KI-Echo. Die Stimmen sind synthetisch erzeugt, nichts davon ist eine Aufnahme der echten Person.',
+  doorTitle: 'Die Audiothek öffnen',
+  doorText:
+    'Die Audiothek liegt in der App. Menschen auswählen, Kapitel auswählen, abspielen. Nichts zu installieren und keine Anmeldung.',
+  doorLabel: 'Audiothek öffnen',
+  storiesTitle: 'Dreißig Leben, von innen erzählt',
+  storiesLead:
+    'Jedes Leben läuft über zwölf Kapitel, von vorn bis hinten. Ein Kapitel ist eine Szene, und das Echo erzählt sie als der Mensch, der sie erlebt hat. Öffne einen Namen, dann stehen alle zwölf da und du fängst an, wo du willst.',
+  chaptersLabel: 'Alle zwölf Kapitel',
+  startLabel: 'Kapitel 1 hören',
+  debatesTitle: 'Fünfundfünfzig Fragen, laut ausdiskutiert',
+  debatesLead:
+    'Ein Council sind vier KI-Echos, die eine Frage durchgehen, eines davon moderiert. Hinter jeder Debatte liegt eine zweite, tiefere Runde. Die Debatten sind vorproduziert und laufen von Anfang bis Ende durch, ohne dass du sie lenkst. Die ersten hier haben einen Ausschnitt, den du direkt anhören kannst.',
+  debatesAllLabel: 'Alle 55 Debatten',
+  debatesAllLead: 'Gruppiert nach den acht Fragen, zu denen sie gehören.',
+  prismsTitle: 'Und hinter jedem Kapitel ein Gespräch',
+  prismsLead:
+    'Ein Prisma nimmt eine Idee aus einem Kapitel und stellt vier Stimmen darum herum. Sie sind sich nicht einig. Zwölf pro Mensch, also dreihundertsechzig insgesamt, und der Weg hinein führt über die Seite des jeweiligen Menschen.',
+  prismsLink: 'Die dreißig ansehen',
+  honestTitle: 'Was du da hörst',
+  honestParas: [
+    'Jede Stimme in dieser Audiothek ist eine Echo-Stimme. Wir schreiben den Text aus dem, was belegt ist, ein Sprachmodell liest ihn vor, und heraus kommt eine Deutung. Nie eine Aufnahme, und nie der Anspruch, für den echten Menschen zu sprechen.',
+    'Das Audio läuft in der App. Einen Feed zum Abonnieren gibt es nicht. Wer das früher in einer Podcast-App gehört hat: Es ist nicht weg, es liegt jetzt hier.',
+  ],
+  closeTitle: 'Fang mit einem Kapitel an',
+  closeText:
+    'Der kürzeste Weg hinein ist ein Kapitel aus einem Leben. Danach weißt du meistens, ob das etwas für dich ist.',
+  scaleChapters: 'erzählte Kapitel',
+  scaleHours: 'Stunden zum Hören',
+  scaleDebates: 'Debatten',
+  scaleDialogues: 'Prisma-Gespräche',
+  linkFigures: 'Die dreißig',
+  linkThemes: 'Die acht Fragen',
+  linkEchoes: 'Warum wir sie Echos nennen',
+};
+
+const c = de ? deCopy : en;
+
+// The scale band. Every entry is counted or measured at build time, and the
+// hours line drops out entirely when the audio is not on this machine.
+const scale = [
+  { n: String(chapterCount), label: c.scaleChapters },
+  ...(storyHours ? [{ n: String(storyHours), label: c.scaleHours }] : []),
+  { n: String(debateCount), label: c.scaleDebates },
+  { n: String(chapterCount), label: c.scaleDialogues },
+];
+---
+<div class="pub-content aud">
+  <Breadcrumbs lang={lang} items={[{ label: t('breadcrumbs.audio') }]} />
+
+  <header class="aud-hero">
+    <p class="aud-hero__eyebrow">{c.eyebrow}</p>
+    <h1 class="aud-hero__title">{c.h1}</h1>
+    <p class="aud-answer">{c.answer}</p>
+    <p class="aud-hero__ai">{c.disclosure}</p>
+  </header>
+
+  <section class="aud-section aud-door">
+    <h2 class="pub-section__title">{c.doorTitle}</h2>
+    <p class="pub-section__text">{c.doorText}</p>
+    <a
+      class="pub-cta__button aud-door__button"
+      href={libraryHref}
+      data-agc-cta="start-exploring"
+      data-agc-door="audio_open"
+    >{c.doorLabel}</a>
+    <ul class="aud-scale">
+      {scale.map(item => (
+        <li class="aud-scale__item">
+          <span class="aud-scale__n">{item.n}</span>
+          <span class="aud-scale__label">{item.label}</span>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="aud-section">
+    <h2 class="pub-section__title">{c.storiesTitle}</h2>
+    <p class="pub-section__text">{c.storiesLead}</p>
+    {bands.map(band => (
+      <div class="aud-band">
+        <h3 class="aud-band__head">
+          <span class="aud-band__name">{band.label}</span>
+          <span class="aud-band__span">{band.span}</span>
+        </h3>
+        <ul class="aud-lives">
+          {band.figures.map(figure => (
+            <li class="aud-life">
+              <!-- Identity line first, then the express door beside it, then
+                   the twelve one tap behind. Three stacked lines per figure
+                   read as a wall over thirty of them. -->
+              <div class="aud-life__head">
+                <a class="aud-life__name" href={publicUrl(lang, `/figures/${figure.slug}`)}>
+                  {figure.name}
+                </a>
+                <span class="aud-life__meta">
+                  {[figure.tradition, figure.runtime].filter(Boolean).join('  ·  ')}
+                </span>
+                <a
+                  class="aud-life__start"
+                  href={`/app?figure=${figure.slug}&lang=${lang}&mode=story&chapter=1`}
+                  data-agc-cta="start-exploring"
+                  data-agc-figure={figure.id}
+                  data-agc-door="audio_story_start"
+                ><span class="aud-life__start-label">{`${c.startLabel} →`}</span></a>
+              </div>
+              <details class="aud-life__more">
+                <summary class="aud-life__summary">
+                  <span>{c.chaptersLabel}</span>
+                  <span class="aud-life__arrow" aria-hidden="true">▼</span>
+                </summary>
+                <ol class="aud-chapters">
+                  {figure.chapters.map(chapter => (
+                    <li class="aud-chapter">
+                      <a
+                        class="aud-chapter__link"
+                        href={`/app?figure=${figure.slug}&lang=${lang}&mode=story&chapter=${chapter.n}`}
+                        data-agc-cta="start-exploring"
+                        data-agc-figure={figure.id}
+                        data-agc-door="audio_chapter"
+                      >
+                        <span class="aud-chapter__n">{chapter.n}</span>
+                        <span class="aud-chapter__title">{chapter.title}</span>
+                        {chapter.runtime && (
+                          <span class="aud-chapter__runtime">{chapter.runtime}</span>
+                        )}
+                      </a>
+                    </li>
+                  ))}
+                </ol>
+              </details>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))}
+  </section>
+
+  <section class="aud-section">
+    <h2 class="pub-section__title">{c.debatesTitle}</h2>
+    <p class="pub-section__text">{c.debatesLead}</p>
+
+    <ul class="aud-clips">
+      {withClip.map(council => {
+        const minutes = runtimeMinutes(council.id, lang);
+        return (
+          <li class="aud-clip">
+            <h3 class="aud-clip__title">{getLocalizedTitle(council, lang)}</h3>
+            <p class="aud-clip__question">{cleanDisplayText(getLocalizedQuestion(council, lang))}</p>
+            <p class="aud-clip__cast">
+              {[council.moderator, ...council.participants]
+                .map(p => localizedShortName(p.id, lang))
+                .join(', ')}
+            </p>
+            <div class="aud-clip__player">
+              <CouncilPreviewButton client:visible councilId={council.id} lang={lang} />
+              <noscript>
+                <a class="pub-textlink" href={getPublicCouncilPreviewUrl(council.id, lang, 'mp3')}>
+                  {de ? 'Ausschnitt anhören (MP3)' : 'Hear the clip (MP3)'}
+                </a>
+              </noscript>
+            </div>
+            <p class="aud-clip__door">
+              <a
+                class="aud-clip__link"
+                href={`/app?council=${council.id}&lang=${lang}`}
+                data-agc-cta="start-exploring"
+                data-agc-council={council.id}
+                data-agc-door="audio_debate_clip"
+              ><span class="aud-clip__link-label">{`${hearDebateLabel(minutes, lang)} →`}</span></a>
+            </p>
+          </li>
+        );
+      })}
+    </ul>
+
+    <h3 class="aud-h3">{c.debatesAllLabel}</h3>
+    <p class="pub-section__text aud-note">{c.debatesAllLead}</p>
+    <div class="aud-groups">
+      {debateGroups.map(group => (
+        <div class="aud-group">
+          <h4 class="aud-group__head">
+            <a class="aud-group__link" href={publicUrl(lang, `/themes/${group.id}`)}>{group.name}</a>
+          </h4>
+          <ul class="aud-debates">
+            {group.councils.map(council => (
+              <li class="aud-debate">
+                <a
+                  class="aud-debate__link"
+                  href={`/app?council=${council.id}&lang=${lang}`}
+                  data-agc-cta="start-exploring"
+                  data-agc-council={council.id}
+                  data-agc-door="audio_debate"
+                >
+                  <span class="aud-debate__line">
+                    <span class="aud-debate__title">{council.title}</span>
+                    {council.runtime && <span class="aud-debate__runtime">{council.runtime}</span>}
+                  </span>
+                  <span class="aud-debate__question">{council.question}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="aud-section">
+    <h2 class="pub-section__title">{c.prismsTitle}</h2>
+    <p class="pub-section__text">{c.prismsLead}</p>
+    <p class="pub-section__text">
+      <a class="pub-textlink" href={publicUrl(lang, '/figures')}>{c.prismsLink}</a>
+    </p>
+  </section>
+
+  <section class="aud-section aud-honest">
+    <h2 class="pub-section__title">{c.honestTitle}</h2>
+    {c.honestParas.map(p => <p class="pub-section__text">{p}</p>)}
+    <p class="pub-section__text">
+      <a class="pub-textlink" href={publicUrl(lang, '/echoes')}>{c.linkEchoes}</a>
+    </p>
+  </section>
+
+  <section class="aud-section aud-close">
+    <h2 class="pub-section__title">{c.closeTitle}</h2>
+    <p class="pub-section__text">{c.closeText}</p>
+    <a
+      class="pub-cta__button aud-door__button"
+      href={libraryHref}
+      data-agc-cta="start-exploring"
+      data-agc-door="audio_open_close"
+    >{c.doorLabel}</a>
+    <p class="pub-section__text aud-links">
+      <a class="pub-textlink" href={publicUrl(lang, '/figures')}>{c.linkFigures}</a>
+      {' · '}
+      <a class="pub-textlink" href={publicUrl(lang, '/themes')}>{c.linkThemes}</a>
+    </p>
+  </section>
+</div>
+
+<style>
+  /* Scoped to this page. Brand design tokens only, no new global rules. */
+  .aud {
+    max-width: 50rem;
+    margin: 0 auto;
+    padding: 2.5rem 1.25rem 3.5rem;
+  }
+  .aud-hero {
+    max-width: 42rem;
+    margin: 0 auto 2.75rem;
+  }
+  .aud-hero__eyebrow {
+    margin: 0 0 0.6rem;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: 0.6875rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--gold-deep);
+  }
+  .aud-hero__title {
+    margin: 0 0 1.25rem;
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-weight: var(--weight-bold);
+    font-size: clamp(1.8rem, 1.3rem + 2.2vw, 2.5rem);
+    line-height: 1.15;
+    color: var(--gold-subtle);
+    text-wrap: balance;
+  }
+  .aud-answer {
+    margin: 0;
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: var(--text-primary);
+  }
+  .aud-hero__ai {
+    margin: 1rem 0 0;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: var(--text-sm);
+    line-height: 1.55;
+    color: var(--text-tertiary);
+  }
+
+  .aud-section {
+    max-width: 42rem;
+    margin: 0 auto 3rem;
+  }
+  .aud-note {
+    color: var(--text-tertiary);
+    font-size: var(--text-sm);
+  }
+  .aud-h3 {
+    margin: 2.25rem 0 0.4rem;
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-weight: var(--weight-regular, 400);
+    font-size: 1.25rem;
+    color: var(--gold-subtle);
+  }
+
+  /* The library door and its measured scale band. */
+  .aud-door {
+    padding: 1.6rem 1.5rem 1.8rem;
+    border: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-25, 25%), transparent);
+    border-radius: var(--plate-radius, 4px);
+    background: color-mix(in srgb, var(--bg-card) var(--a-45, 45%), transparent);
+  }
+  .aud-door__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    margin-top: 0.4rem;
+  }
+  .aud-scale {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr));
+    gap: 0.9rem 1.2rem;
+    margin: 1.6rem 0 0;
+    padding: 1.2rem 0 0;
+    list-style: none;
+    border-top: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-12, 12%), transparent);
+  }
+  .aud-scale__item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+  .aud-scale__n {
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: 1.5rem;
+    line-height: 1.1;
+    color: var(--gold-subtle);
+  }
+  .aud-scale__label {
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: 0.76rem;
+    line-height: 1.45;
+    color: var(--text-tertiary);
+  }
+
+  /* Thirty lives, band by band. */
+  .aud-band { margin-top: 2rem; }
+  .aud-band__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.2rem 0.7rem;
+    margin: 0 0 0.6rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-12, 12%), transparent);
+  }
+  .aud-band__name {
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold-deep);
+  }
+  .aud-band__span {
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: 0.72rem;
+    color: var(--text-dim);
+  }
+  .aud-lives {
+    display: flex;
+    flex-direction: column;
+    gap: 1.15rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .aud-life__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0 1rem;
+  }
+  .aud-life__name {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: 1.15rem;
+    line-height: 1.35;
+    color: var(--gold-subtle);
+    text-decoration: none;
+  }
+  .aud-life__name:hover,
+  .aud-life__name:focus-visible { color: var(--gold-hover); }
+  .aud-life__meta {
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+  }
+  /* The 44px target is the anchor box; the hairline sits on the label inside
+     it, or it would draw a stray rule at the bottom of the target. */
+  .aud-life__start {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    margin-left: auto;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: 0.8rem;
+    white-space: nowrap;
+    color: var(--gold-primary);
+    text-decoration: none;
+  }
+  .aud-life__start-label {
+    border-bottom: 1px solid color-mix(in srgb, var(--gold-primary) var(--a-35, 35%), transparent);
+  }
+  .aud-life__start:hover,
+  .aud-life__start:focus-visible { color: var(--gold-hover); }
+  .aud-life__more { margin-top: -0.2rem; }
+  .aud-life__more > summary { list-style: none; cursor: pointer; }
+  .aud-life__more > summary::-webkit-details-marker { display: none; }
+  .aud-life__summary {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold-deep);
+  }
+  .aud-life__summary:hover { color: var(--gold-primary); }
+  .aud-life__arrow {
+    font-size: 0.6rem;
+    transition: transform var(--transition-fast);
+  }
+  .aud-life__more[open] .aud-life__arrow { transform: rotate(180deg); }
+
+  .aud-chapters {
+    margin: 0.2rem 0 0.4rem;
+    padding: 0;
+    list-style: none;
+    border-left: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-12, 12%), transparent);
+  }
+  .aud-chapter__link {
+    display: grid;
+    grid-template-columns: 1.6rem 1fr auto;
+    align-items: baseline;
+    gap: 0.2rem 0.6rem;
+    min-height: 44px;
+    padding: 0.35rem 0 0.35rem 0.9rem;
+    text-decoration: none;
+  }
+  .aud-chapter__n {
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: 0.72rem;
+    color: var(--gold-deep);
+  }
+  .aud-chapter__title {
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: 0.98rem;
+    line-height: 1.45;
+    color: var(--text-secondary);
+    min-width: 0;
+  }
+  .aud-chapter__link:hover .aud-chapter__title,
+  .aud-chapter__link:focus-visible .aud-chapter__title { color: var(--gold-primary); }
+  .aud-chapter__runtime {
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: 0.7rem;
+    white-space: nowrap;
+    color: var(--text-dim);
+  }
+
+  /* The debates that carry a clip. */
+  .aud-clips {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin: 1.4rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .aud-clip {
+    padding: 1rem 1.1rem;
+    border: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-20, 20%), transparent);
+    border-radius: var(--plate-radius, 4px);
+    background: color-mix(in srgb, var(--bg-card) var(--a-45, 45%), transparent);
+  }
+  .aud-clip__title {
+    margin: 0 0 0.35rem;
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-weight: var(--weight-regular, 400);
+    font-size: 1.1rem;
+    line-height: 1.3;
+    color: var(--gold-subtle);
+  }
+  .aud-clip__question {
+    margin: 0 0 0.4rem;
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: 0.98rem;
+    line-height: 1.6;
+    color: var(--text-primary);
+  }
+  .aud-clip__cast {
+    margin: 0 0 0.7rem;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: 0.74rem;
+    line-height: 1.5;
+    color: var(--text-tertiary);
+  }
+  .aud-clip__player { margin-bottom: 0.4rem; }
+  .aud-clip__door { margin: 0; }
+  .aud-clip__link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: 0.95rem;
+    color: var(--gold-primary);
+    text-decoration: none;
+  }
+  .aud-clip__link-label {
+    border-bottom: 1px solid color-mix(in srgb, var(--gold-primary) var(--a-35, 35%), transparent);
+  }
+  .aud-clip__link:hover,
+  .aud-clip__link:focus-visible { color: var(--gold-hover); }
+
+  /* All fifty five, under the question they belong to. */
+  .aud-groups {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-top: 1rem;
+  }
+  .aud-group__head { margin: 0 0 0.3rem; }
+  .aud-group__link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold-deep);
+    text-decoration: none;
+  }
+  .aud-group__link:hover { color: var(--gold-primary); }
+  .aud-debates {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  /* Title and runtime on one line, the question under them. A single flowing
+     row leaves every question starting at a different x. */
+  .aud-debate__link {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    min-height: 44px;
+    padding: 0.55rem 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-12, 12%), transparent);
+    text-decoration: none;
+  }
+  .aud-debate__line {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.6rem;
+  }
+  .aud-debate__title {
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: 1rem;
+    line-height: 1.35;
+    color: var(--gold-subtle);
+  }
+  .aud-debate__link:hover .aud-debate__title,
+  .aud-debate__link:focus-visible .aud-debate__title { color: var(--gold-primary); }
+  .aud-debate__question {
+    font-size: 0.86rem;
+    line-height: 1.5;
+    color: var(--text-tertiary);
+    max-width: 62ch;
+  }
+  .aud-debate__runtime {
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: 0.7rem;
+    white-space: nowrap;
+    color: var(--text-dim);
+  }
+
+  .aud-honest .pub-section__text { color: var(--text-secondary); }
+  .aud-close {
+    border-top: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-20, 20%), transparent);
+    padding-top: 2.25rem;
+    text-align: center;
+  }
+  .aud-links { margin-top: 1.5rem; }
+
+  @media (max-width: 640px) {
+    .aud { padding-left: 1rem; padding-right: 1rem; }
+    .aud-door { padding: 1.3rem 1.1rem 1.5rem; }
+    .aud-door__button { width: 100%; }
+    /* Narrow, the head line wraps, so the express door drops to its own row.
+       Pushed right it would sit alone against the edge, away from the toggle
+       under it. Both controls stay on the left rail instead. */
+    .aud-life__start { margin-left: 0; }
+  }
+</style>

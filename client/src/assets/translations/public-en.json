@@ -2,12 +2,14 @@
   "nav": {
     "figures": "Figures",
     "themes": "Themes",
+    "audio": "Audio",
     "about": "About",
     "contact": "Contact",
     "whyEchoes": "Why we call them Echoes",
     "startExploring": "Start Exploring",
     "menu": "Menu",
-    "closeMenu": "Close menu"
+    "closeMenu": "Close menu",
+    "mainAria": "Main navigation"
   },
   "footer": {
     "impressum": "Imprint",
@@ -24,6 +26,7 @@
     "home": "Home",
     "figures": "Figures",
     "themes": "Themes",
+    "audio": "Audio",
     "about": "About",
     "contact": "Contact"
   },

@@ -1,0 +1,48 @@
+---
+import Public from '../../layouts/Public.astro';
+import AudioLibraryContent from '../../components/AudioLibraryContent.astro';
+import { getT } from '../../i18n';
+import { itemListSchema, breadcrumbSchema } from '../../lib/schemas';
+import { canonicalUrl, publicUrl, SITE_URL } from '../../lib/urls';
+import { STRATA } from '../../components/figureStrata';
+import { getFigureById } from '@client/data/public/figuresCatalog';
+import { figureIdToSlug } from '@client/data/public/slugMap';
+
+const lang = 'de' as const;
+const t = getT(lang);
+
+// Die Einträge sind die dreißig Leben, jedes verlinkt auf die Seite, die für
+// dieses Leben die kanonische ist. Das Audio selbst steht nicht in der Liste:
+// seine URLs sind Inhaltsdateien, keine Seiten.
+const lifeItems = STRATA.flatMap(stratum =>
+  stratum.figures.map(figureId => {
+    const slug = figureIdToSlug[figureId] || figureId;
+    const figure = getFigureById(figureId, lang);
+    return {
+      name: figure?.name ?? slug,
+      url: canonicalUrl(publicUrl(lang, `/figures/${slug}`)),
+      description: figure?.learn,
+    };
+  }),
+);
+
+const schemas = [
+  itemListSchema(lifeItems),
+  breadcrumbSchema([
+    { name: t('breadcrumbs.home'), url: `${SITE_URL}/de/` },
+    { name: t('breadcrumbs.audio'), url: `${SITE_URL}/de/audio` },
+  ]),
+];
+---
+<Public
+  title="Philosophie zum Hören: 360 Kapitel, 55 Debatten"
+  fullTitle="Philosophie zum Hören: 360 Kapitel, 55 Debatten"
+  ogTitle="Philosophie zum Hören: 360 Kapitel, 55 Debatten | Agora Cosmica"
+  description="Dreißig Leben in je zwölf Kapiteln erzählt, 55 laut ausdiskutierte Fragen und 360 Gespräche mit vier Stimmen. Jede Stimme ein KI-Echo, alles in der App."
+  canonicalPath="/audio"
+  lang={lang}
+  stickyCta={false}
+  schemas={schemas}
+>
+  <AudioLibraryContent lang={lang} />
+</Public>

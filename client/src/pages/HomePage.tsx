@@ -56,7 +56,7 @@ import PostQuestVerdictCard from '../components/QuestVerdictCard/PostQuestVerdic
 import { getPendingQuestVerdict, clearPendingQuestVerdict } from '../utils/questVerdict';
 import { restartQuest } from '../utils/questRestart';
 import { LocalStorageAdapter } from '../storage/localAdapter';
-import { readFigureIntent, clearFigureIntent, readCouncilIntent, clearCouncilIntent, readAskIntent, clearAskIntent, stashAskPrefill, stageCouncilHandoff, readStoryIntent, clearStoryIntent, peekAskPrefillTag, consumeComposerStagedOrigin, beginCarriedThread } from '../utils/public/entryIntent';
+import { readFigureIntent, clearFigureIntent, readCouncilIntent, clearCouncilIntent, readAskIntent, clearAskIntent, stashAskPrefill, stageCouncilHandoff, readStoryIntent, clearStoryIntent, readLibraryIntent, clearLibraryIntent, requestAudioLibrary, peekAskPrefillTag, consumeComposerStagedOrigin, beginCarriedThread } from '../utils/public/entryIntent';
 import { resolveAnchorSeedId } from '../data/public/heroEntry';
 import { CEREMONY_CARRIED_ENTRY, NAV_BATCH } from '../config/features';
 import { preferencesAdapter } from '../storage/preferencesAdapter';
@@ -420,6 +420,12 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
       // the deep-link silently dropped the visitor into the gallery. This
       // consumes it without re-showing the consent gate. First-timers are
       // unaffected: they still consume intent via the welcome "Begin".
+      // Audio-library deep-link. Released before the branches below, so the
+      // library opens over whatever destination this arrival already had.
+      if (readLibraryIntent()) {
+        clearLibraryIntent();
+        requestAudioLibrary();
+      }
       const intendedCouncil = readCouncilIntent();
       const intendedFigureId = readFigureIntent();
       const intendedFigure = intendedFigureId ? getFigureById(intendedFigureId) : undefined;
