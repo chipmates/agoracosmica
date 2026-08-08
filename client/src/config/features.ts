@@ -81,3 +81,45 @@ export const NAV_BATCH: boolean =
     : import.meta.env.VITE_NAV_BATCH === 'false'
       ? false
       : import.meta.env.DEV;
+
+/**
+ * `?mode=library` opens the audio library once the visitor is past the welcome
+ * step, through the same rail button that opens it from the sidebar. Off means
+ * the mode name is simply not allowlisted, so the link lands in the app the way
+ * any other arrival does.
+ *
+ * On in dev, off in production builds. `VITE_AUDIO_LIBRARY_ENTRY=true` turns it
+ * on for a production build, `false` forces it off anywhere.
+ */
+export const AUDIO_LIBRARY_ENTRY: boolean =
+  import.meta.env.VITE_AUDIO_LIBRARY_ENTRY === 'true'
+    ? true
+    : import.meta.env.VITE_AUDIO_LIBRARY_ENTRY === 'false'
+      ? false
+      : import.meta.env.DEV;
+
+/**
+ * Council cards and theme bands wear the baked oil paintings instead of the
+ * July ink engravings, wherever a council has a baked pick. Councils without
+ * one keep their engraving either way, so the wall is never half empty.
+ *
+ * On in dev, off in production builds. `VITE_COUNCIL_OILS=true` turns it on
+ * for a production build, `false` forces it off anywhere.
+ */
+export const COUNCIL_OILS: boolean =
+  import.meta.env.VITE_COUNCIL_OILS === 'true'
+    ? true
+    : import.meta.env.VITE_COUNCIL_OILS === 'false'
+      ? false
+      : import.meta.env.DEV;
+
+/**
+ * The stage a carried question waits on carries a dim presence of the figure
+ * instead of standing empty. Decorative only: it takes no click, no layout, and
+ * it leaves the moment the conversation speaks.
+ *
+ * Off everywhere, dev included, because both stages are being compared side by
+ * side. `VITE_QUIET_PLATE_PRESENCE=true` is the only way to see the presence.
+ */
+export const QUIET_PLATE_PRESENCE: boolean =
+  import.meta.env.VITE_QUIET_PLATE_PRESENCE === 'true';
