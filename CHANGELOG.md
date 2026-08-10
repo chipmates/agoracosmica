@@ -8,8 +8,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+---
+
+## [1.2.0] - 2026-08-10
+
+The public pages were rebuilt around questions and paths. The homepage, every figure page, and every theme page now lead with one clear way in, real oil paintings hang on the themes and councils, and the audio library got its own front door at `/audio/`. Underneath, the app received its full visual redesign and a set of accessibility, privacy, and measurement improvements.
+
 ### Added
 
+- **An audio library page.** `/audio/` and `/de/audio/` answer whether you can listen instead of read: what exists (chapters, debates, dialogues, with measured counts and hours), how the Echo voices are synthesized, and a direct door into the in-app Audiothek. Every number on the page is measured from the catalog, not estimated.
+- **Oil paintings on themes and councils.** All 55 council debates and all 8 theme pages carry public-domain oil paintings, each verified against the holding museum's own rights statement at file level, each shown whole in a tap-to-open lightbox with the museum's verbatim credit line. Images serve from the CDN, so the app bundle carries no painting bytes. One painting appears in exactly one place, enforced at build time.
+- **System media controls for Echo audio.** Story chapters, the Audiothek, and dialogue players integrate with the lock screen and headphone keys, with disclosed KI-Echo metadata and artwork.
+- **A guided bot check.** When the free-tier security check needs a tap, the visitor now gets visible guidance instead of a silent stall, and the check's outcomes are counted in aggregate so its cost is measurable.
+- **Finer funnel labels, same privacy class.** The aggregate chat counter now distinguishes an automatic greeting from a typed turn and records conversation depth as coarse buckets. Keyless rows, no join keys, unchanged scope in [docs/MEASUREMENT.md](docs/MEASUREMENT.md).
+- **Carried-question machinery behind feature flags, off in production.** Routing a question from a landing page through the mode ceremony, answering it first instead of greeting, naming the story chapter that grounds the answer, and additional navigation affordances are all built and dark, pending measured reads.
 - **Population-level entry funnel counters.** Five new anonymous events (CTA click, intro started, intro finished or skipped with a coarse dwell bucket, consent screen shown, first message sent) light up the dark zone between a page view and a first conversation. Same privacy class as the existing counters: keyless aggregate rows, no join key between steps, timing only as a bucket index, one-shot per tab via sessionStorage. Disclosed in [docs/MEASUREMENT.md](docs/MEASUREMENT.md); the stats dashboard funnel shows the new stages as they receive data.
 - **Why we call them Echoes.** The strongest question about the project, putting words in the mouths of real people who cannot consent, now has a public answer in three tiers: a homepage FAQ entry with a longer unfold, a full essay at `/echoes` (German at `/de/echoes`), and a repo mirror in [docs/WHY-ECHOES.md](docs/WHY-ECHOES.md) linked from the README. The Echo note on figure and theme pages and the in-app Echo explainer in Settings link to the essay. The essay's history sections fold on the page so the question and the design answer lead.
 
@@ -17,6 +29,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 
+- **The homepage leads with one door.** The hero pairs the portrait with where the path leads and the first chapter's real length, and offers a single gold begin button. The ask-a-question card left the hero.
+- **Figure pages rebuilt around the path.** Who the person was, why the Echo is trustworthy, then the path: a sequential chapter rail with per-chapter honesty panels, the AI disclosure as the portrait's caption, and one begin door instead of scattered ask entries.
+- **Theme pages give each section one job.** Question first, the voices who answer it, the debates with their real summed runtimes, and the painting that holds the room.
+- **The complete visual redesign is live.** The app's surfaces, the council wall, the players, and the landing pages share one design language.
+- **The facts panel opens from every talk mode**, and its gate respects the visitor's consent state.
+- **Captions name the Echo, not the person.** Where an ask surface said the historical figure would answer, it now says the Echo does.
+- **The wisdom map reads on phones.** Wide constellations turn upright on portrait screens, and chat text is sized for mobile reading.
+- **The ad-measurement consent card asks a two-way question.** Accept or decline, each one tap, no third path that leaves the question hanging.
+- **Chunk names are neutral.** Content blockers mistook internal bundle names for ad-tech and broke unrelated page sections. Measurement code and UI code no longer share a fate.
+- **Public URLs normalize to one trailing-slash canonical form.**
 - **Helper popups follow the dialog keyboard contract.** Focus moves in on open, Tab stays inside, Escape closes, and focus returns to the trigger. Before this, the Echo explainer could be opened but not read by keyboard.
 - **Public docs and in-app copy aligned with what the code does.** Rate limiting is described as eventually consistent rather than atomic, the BYOK wording everywhere is stored-on-device and sent only to OpenRouter, the settings privacy text names the anonymous en/de label in the aggregate counters, the jailbreak pattern count matches across docs, and the catalog tables say 55 questions rather than 55 themes.
 - **German landing copy reads like German.** A native-reader sweep replaced word-for-word transfers from the English source across the homepage, FAQ, About page, theme intros, and figure descriptions. No facts, names, or numbers changed.
@@ -26,11 +48,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - **Dismissing the consent prompt now also clears the stored click ID.** With no consent surface left in the session, there is nothing the ID could be kept for.
 - Cookie policy now lists every ad-related storage key (`agc_paid`, `agc_ad_prompt_dismissed`, `agc_conv_fired_*`) and explains the withdrawal control.
 
+### Removed
+
+- **The podcast is retired.** Both feeds return 410 Gone, and the site no longer links the shows or carries podcast structured data. The narrated chapters stay fully listenable in the app and the audio library.
+
 ### Fixed
 
+- **A streaming NUL byte no longer corrupts prerendered pages.** A react-dom 18 streaming edge case could write a stray control character into built HTML.
+- Audio preview buttons no longer show a playing state while paused.
+- An audio error surfaced as "[object Event]" now reads as a sentence.
 - **The app no longer crashes on a storage-blocked browser.** Five load-bearing paths (the login handoff, the home-page init, the mode selector, the wisdom-map and the sidebar) read storage without a guard, so a browser with localStorage or sessionStorage disabled dropped the whole app to the error screen. Each read now degrades to a sensible default.
-- **German podcast links go to the German show.** The site footer hardcoded the English Spotify, YouTube, and Apple Podcasts links on every page; it now picks the show by language.
-- The English privacy policy is now listed in the sitemap, the homepages advertise their RSS feed for podcast-directory discovery, and the /echoes essay carries Article structured data to match the theme pages.
+- The English privacy policy is now listed in the sitemap, and the /echoes essay carries Article structured data to match the theme pages.
 - A consent recorded under an older consent version now counts as undecided, so a future change of consent scope re-prompts instead of silently relying on the old record. The same version rule now also guards the grant check itself.
 - A seed the user picked is restored again when returning to a figure (a string-versus-number id mismatch silently reset the choice).
 - Clear-all-history now removes prism transcripts and legacy-format history it used to leave behind, and a reset of help hints stays reset across reloads.
@@ -284,6 +312,7 @@ Initial public release. Live at 07:18 CEST (05:18 UTC).
 
 ---
 
-[Unreleased]: https://github.com/chipmates/agoracosmica/compare/v1.0.1...HEAD
+[Unreleased]: https://github.com/chipmates/agoracosmica/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/chipmates/agoracosmica/compare/v1.1.2...v1.2.0
 [1.0.1]: https://github.com/chipmates/agoracosmica/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/chipmates/agoracosmica/releases/tag/v1.0.0
