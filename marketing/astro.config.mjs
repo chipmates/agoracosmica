@@ -39,13 +39,19 @@ export default defineConfig({
         resources: ["'self'", "'unsafe-inline'"],
       },
       // Astro only auto-hashes its own emitted scripts, not authored is:inline
-      // ones. The homepage pre-paint marker (AgoraHero) must run before first
-      // paint, so it stays inline and its hash is added here by hand. If the
-      // script text changes, recompute it here:
+      // ones. The homepage pre-paint marker and the returning-visitor forward
+      // (both AgoraHero) must run before first paint, so they stay inline and
+      // their hashes are added here by hand. If a script text changes,
+      // recompute it here:
       //   echo -n '<script text>' | openssl dgst -sha256 -binary | base64
       // then rebuild and run check-csp.mjs --write to carry it to _headers.
       scriptDirective: {
-        hashes: ['sha256-i/ofomzmMjJLegES6OLDsJfA4wJAI3UQ8UCNyC3zlcY='],
+        hashes: [
+          // returning-visitor forward
+          'sha256-A8NUHhsua1tqctjSRQ8Dm0bH3kI2fxxxBOPUfC7yDCM=',
+          // pre-paint marker
+          'sha256-i/ofomzmMjJLegES6OLDsJfA4wJAI3UQ8UCNyC3zlcY=',
+        ],
       },
     },
   },

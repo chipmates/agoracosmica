@@ -117,6 +117,30 @@ const S = de
 
 ---
 <script is:inline>
+  /* Returning-visitor forward: a browser that already holds the app's local
+     consent record skips the marketing homepage (progress is origin-scoped,
+     only the entry URL differs between a restored and a fresh window). Once
+     per tab, so a deliberate revisit stays. ?stay=1 keeps the homepage and
+     pins the tab. No script, blocked storage or no record: the page renders
+     as for any first visit. */
+  (function () {
+    try {
+      var q = new URLSearchParams(location.search);
+      if (q.has('stay') || sessionStorage.getItem('agc_home') === '1') {
+        sessionStorage.setItem('agc_home', '1');
+        return;
+      }
+      if (!localStorage.getItem('agb_consent')) return;
+      sessionStorage.setItem('agc_home', '1');
+      q.set('entry', 'return');
+      location.replace('/app/?' + q.toString());
+    } catch (e) {
+      /* fall through to the homepage */
+    }
+  })();
+</script>
+
+<script is:inline>
   /* Pre-paint marker: hands the painting to the motion layer. No script and
      reduced motion both keep the finished hero, nothing is ever hidden. */
   (function () {

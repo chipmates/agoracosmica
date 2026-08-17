@@ -8,6 +8,7 @@
 // Language is a real preference and is meant to persist.
 
 import { AUDIO_LIBRARY_ENTRY } from '../../config/features';
+import { sendFunnelBeaconOnce } from '../funnelBeacon';
 import { LocalStorageAdapter } from '../../storage/localAdapter';
 import { figureSlugToId } from '../../data/public/slugMap';
 import { getHeroEntryQuestion, hasHeroEntry } from '../../data/public/heroEntry';
@@ -589,6 +590,11 @@ export function hasEntryTextFirst(): boolean {
  * catalog) and ?mode=story&chapter={1-12}. Every one of them is an identifier
  * the app resolves at render time, so nothing a stranger writes into a link
  * can reach the composer or the model.
+ *
+ * ?entry=return is the homepage's returning-visitor forward marker. It stages
+ * nothing and only feeds an anonymous one-shot counter, gated on the consent
+ * record the forward keys off, so a shared or bookmarked forward URL never
+ * inflates it.
  */
 export function captureEntryIntentFromUrl(): void {
   try {
@@ -601,7 +607,8 @@ export function captureEntryIntentFromUrl(): void {
     const questionParam = params.get('q');
     const modeParam = params.get('mode');
     const chapterParam = params.get('chapter');
-    if (!figureParam && !councilParam && !langParam && !askParam && !questionParam && !modeParam) {
+    const entryParam = params.get('entry');
+    if (!figureParam && !councilParam && !langParam && !askParam && !questionParam && !modeParam && !entryParam) {
       return;
     }
     if (figureParam) {
@@ -635,6 +642,17 @@ export function captureEntryIntentFromUrl(): void {
     if (modeParam === 'library' && AUDIO_LIBRARY_ENTRY) {
       sessionStorage.setItem(SS_LIBRARY_KEY, '1');
     }
+    // The homepage's returning-visitor forward. Counted only when the consent
+    // record the redirect keys off is really present in this browser.
+    if (entryParam === 'return') {
+      try {
+        if (localStorage.getItem('agb_consent') !== null) {
+          sendFunnelBeaconOnce('return_visit');
+        }
+      } catch {
+        // storage blocked — no row rather than a guessed one
+      }
+    }
     if (figureParam || councilParam || askParam || questionParam || modeParam) {
       markEntryTextFirst();
     }
@@ -662,6 +680,7 @@ export function captureEntryIntentFromUrl(): void {
     params.delete('q');
     params.delete('mode');
     params.delete('chapter');
+    params.delete('entry');
     const qs = params.toString();
     window.history.replaceState(
       {},

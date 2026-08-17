@@ -90,6 +90,10 @@ const VALID_STEPS = new Set([
   'turnstile_failed',
   'turnstile_abandoned',
   'turnstile_token_aged',
+  // The homepage recognized a returning browser (consent record present) and
+  // forwarded it straight into the app. One-shot per tab on the client; the
+  // row carries language only.
+  'return_visit',
   ...CONSENT_STEPS,
 ]);
 

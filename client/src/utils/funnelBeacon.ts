@@ -4,7 +4,9 @@
 // first_turn_prefilled (HomePage, one or the other per send),
 // first_reply (useConversationEffects chunk handler, error variant from the
 // HomePage dispatch error path), first_reply_failed (HomePage, alongside the
-// error variant and on an abandoned stream). Volume steps fire on every
+// error variant and on an abandoned stream), return_visit
+// (captureEntryIntentFromUrl, the homepage's returning-visitor forward).
+// Volume steps fire on every
 // occurrence, no dedup: figure_selected (HomePage.handleSelectFigure),
 // mode_selected (HomePage.handleModeSelect, the mode chokepoint), nav_open
 // (the ways out of a conversation),
@@ -29,6 +31,10 @@ const API_BASE = import.meta.env.VITE_FREE_TIER_API_URL || '';
 
 export type FunnelStep =
   | 'cta_click'
+  // The homepage recognized a returning browser (consent record present) and
+  // forwarded it straight into the app. Fired by the boot-time URL capture,
+  // one-shot per tab. Carries language only.
+  | 'return_visit'
   | 'cinematic_start'
   | 'cinematic_end'
   | 'welcome_shown'
