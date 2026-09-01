@@ -24,6 +24,7 @@ import {
 import { normalizeFigureName } from '../utils/nameUtils';
 import { STORY_DOWNLOADS_ENABLED } from '../config/features';
 import { sendFunnelBeacon } from '../utils/funnelBeacon';
+import { chapterFromSeedId } from '../utils/playbackBeacon';
 import { Seed } from '../types/global';
 // Manifest no longer needed - using direct path construction
 // SimpleBar removed - using native CSS scrollbar system from index.css
@@ -635,12 +636,12 @@ const StoryPlayerSurface: FC<StoryPlayerProps> = ({
   const { getTranslatedSeedTitle } = useSeedTranslation();
   const downloadFigureId = normalizeFigureName(figure);
 
-  const seedNumber = React.useMemo(() => {
-    const raw = selectedSeed?.id;
-    if (raw == null) return null;
-    const match = String(raw).match(/(\d+)\s*$/);
-    return match ? Number(match[1]) : null;
-  }, [selectedSeed]);
+  // The episode number inside the seed id: it names the audio file, orders the
+  // catalog, and labels the playback beacon's chapter.
+  const seedNumber = React.useMemo(
+    () => chapterFromSeedId(selectedSeed?.id),
+    [selectedSeed]
+  );
 
   const episodeTitle = React.useMemo(() => {
     if (seedNumber == null) return '';
@@ -780,7 +781,7 @@ const StoryPlayerSurface: FC<StoryPlayerProps> = ({
               onPlayStateChange={handlePlayStateChange}
               seekToTime={seekTarget}
               togglePlayRequest={togglePlayRequest}
-              playbackBeacon={{ type: 'story', figureId: figure, mode: 'story' }}
+              playbackBeacon={{ type: 'story', figureId: figure, mode: 'story', chapter: seedNumber }}
               figureId={downloadFigureId}
               mediaTitle={episodeTitle}
             />

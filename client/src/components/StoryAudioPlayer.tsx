@@ -19,8 +19,8 @@ interface StoryAudioPlayerProps {
   togglePlayRequest?: number;
   /** Engagement-funnel beacon context — forwarded to useAudio for the
    *  'started' event on first play. Caller must provide content type +
-   *  optional figureId. */
-  playbackBeacon?: { type: PlaybackContentType; figureId?: string; mode?: string };
+   *  optional figureId, and on stories the chapter ordinal. */
+  playbackBeacon?: { type: PlaybackContentType; figureId?: string; mode?: string; chapter?: number };
   /** Figure whose Echo is speaking. Drives lock screen artwork and artist. */
   figureId?: string;
   /** Episode title for the lock screen. */

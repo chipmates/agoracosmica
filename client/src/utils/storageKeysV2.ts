@@ -3,7 +3,7 @@
 
 import { ConversationMode } from '../types/global';
 import { LocalStorageAdapter } from '../storage/localAdapter';
-import { sendPlaybackBeacon, detectCurrentLanguage } from './playbackBeacon';
+import { sendPlaybackBeacon, detectCurrentLanguage, chapterFromSeedId } from './playbackBeacon';
 
 /**
  * Storage key generators for different conversation contexts
@@ -143,7 +143,13 @@ export const markStoryCompleted = (figureId: string, seedId: string | number): v
   // Prismatic Bloom: notify that a mode was completed
   window.dispatchEvent(new CustomEvent('bloomModeCompleted', { detail: { figureId } }));
   // Anonymous content-completion analytics beacon
-  sendPlaybackBeacon({ type: 'story', figureId, mode: 'story', language: detectCurrentLanguage() });
+  sendPlaybackBeacon({
+    type: 'story',
+    figureId,
+    mode: 'story',
+    chapter: chapterFromSeedId(seedId),
+    language: detectCurrentLanguage(),
+  });
 };
 
 /**

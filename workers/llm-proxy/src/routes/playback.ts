@@ -20,6 +20,7 @@ interface PlaybackPayload {
   mode?: string;
   language?: string;
   bucket?: number;
+  chapter?: number;
   probe?: unknown;
 }
 
@@ -45,6 +46,12 @@ const TERMINAL_EVENTS = new Set(['completed', 'ended']);
 // double1 only ever holds a small bucket index, never raw seconds. Six
 // buckets (0-14s through 1800s+); anything else collapses to 0.
 const MAX_BUCKET = 5;
+
+// Which chapter of a figure's story was played. A small ordinal from the
+// content catalog, bounded so the label can only ever be one of a handful of
+// known values and nothing free-form can ride in. Out of range means the
+// chapter is simply not labelled.
+const MAX_CHAPTER = 99;
 const VALID_MODES = new Set(['story', 'wisdom', 'prism', 'quest', 'freetalk', 'council', 'foreword']);
 const VALID_LANGS = new Set(['en', 'de']);
 const FIGURE_ID_RE = /^[a-z0-9-]{1,40}$/;
@@ -109,6 +116,15 @@ export async function handlePlayback(request: Request, env: Env): Promise<Respon
     ? payload.bucket
     : 0;
 
+  // Stays empty unless a client sent a chapter in range, so "no chapter" and
+  // "chapter 0" never collapse into each other.
+  const chapter = (typeof payload.chapter === 'number'
+    && Number.isInteger(payload.chapter)
+    && payload.chapter >= 0
+    && payload.chapter <= MAX_CHAPTER)
+    ? String(payload.chapter)
+    : '';
+
   trackPlayback(env, {
     type: payload.type,
     figureId,
@@ -118,6 +134,7 @@ export async function handlePlayback(request: Request, env: Env): Promise<Respon
     device: readDevice(request),
     event,
     bucket: TERMINAL_EVENTS.has(event) ? bucket : 0,
+    chapter,
     probe: readProbe(payload.probe),
   });
 

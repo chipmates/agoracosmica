@@ -147,13 +147,18 @@ export function trackSession(
  * rate and funnel over time.
  *
  * dataset: agora_llm
- * blobs: ['playback', figureId, mode, language, type, device, country, event, probe]
+ * blobs: ['playback', figureId, mode, language, type, device, country, event, probe, chapter]
  * doubles: [bucket]  — a coarse bucket INDEX of the seconds actually listened
  *                      (0 = 0-14s, 1 = 15-59s, 2 = 60-179s, 3 = 180-599s,
  *                      4 = 600-1799s, 5 = 1800s+), written on the terminal
  *                      events only and 0 on every other event. Never raw
  *                      seconds and never a playhead position.
  * indexes: ['playback']
+ *
+ * blob10 is the chapter ordinal within the figure's story, so listening can be
+ * ranked per chapter and not only per figure. It is a content label from the
+ * catalog, bounded by the route, and empty on every content type that has no
+ * chapters and on every row written before the label existed.
  *
  * Backward compat: rows written before 2026-05-08 evening have empty blob8.
  * Treat empty blob8 as 'completed' in queries (the only event type that
@@ -170,6 +175,7 @@ export function trackPlayback(
     device: string;
     event: string;
     bucket: number;
+    chapter: string;
     probe: string;
   }
 ): void {
@@ -185,6 +191,7 @@ export function trackPlayback(
         data.country,
         data.event,
         data.probe,
+        data.chapter,
       ],
       doubles: [data.bucket],
       indexes: ['playback'],

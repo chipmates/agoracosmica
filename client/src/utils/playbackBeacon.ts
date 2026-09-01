@@ -33,6 +33,27 @@ interface PlaybackPayload {
   language?: string;
   /** Coarse listened-time bucket index. Only read on the terminal events. */
   bucket?: number;
+  /**
+   * Which chapter of the figure's story this track is, so listening can be
+   * ranked per chapter and not only per figure. A small ordinal from the
+   * catalog, the same number the episode file is named after. It says nothing
+   * about who is listening, only which piece of content was played.
+   */
+  chapter?: number;
+}
+
+/**
+ * Read the chapter ordinal off a seed id. Seed ids end in the episode number
+ * ('aurelius-3' or 3 alike), which is what names the audio file and what the
+ * catalog orders by. Returns undefined when there is no number to read, so an
+ * unknown chapter stays absent rather than becoming a zero.
+ */
+export function chapterFromSeedId(seedId: string | number | null | undefined): number | undefined {
+  if (seedId == null) return undefined;
+  const match = String(seedId).match(/(\d+)\s*$/);
+  if (!match) return undefined;
+  const value = Number(match[1]);
+  return Number.isInteger(value) ? value : undefined;
 }
 
 /**
@@ -71,6 +92,7 @@ export function sendPlaybackBeacon(
       mode: payload.mode,
       language: payload.language,
       bucket: payload.bucket,
+      chapter: payload.chapter,
       probe: probeField(),
     });
 
@@ -170,6 +192,8 @@ interface ListenContext {
   type: PlaybackContentType;
   figureId?: string;
   mode?: string;
+  /** Chapter ordinal, on story tracks. See PlaybackPayload.chapter. */
+  chapter?: number;
 }
 
 interface TrackListen {
@@ -226,6 +250,7 @@ function emit(state: TrackListen, event: PlaybackEvent, transport: PlaybackTrans
       figureId: state.ctx.figureId,
       mode: state.ctx.mode,
       language: detectCurrentLanguage(),
+      chapter: state.ctx.chapter,
       // Only the terminal events carry a bucket; the worker pins the rest to 0.
       bucket: event === 'completed' || event === 'ended' ? listenBucket(state.played) : undefined,
     },

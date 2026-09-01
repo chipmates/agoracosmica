@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-interface Sent { step?: string; event?: string; bucket?: number; mode?: string; type?: string }
+interface Sent { step?: string; event?: string; bucket?: number; mode?: string; type?: string; chapter?: number }
 const sent: Sent[] = [];
 
 vi.stubGlobal('fetch', vi.fn((_url: string, init: { body: string }) => {
@@ -9,6 +9,7 @@ vi.stubGlobal('fetch', vi.fn((_url: string, init: { body: string }) => {
 }));
 
 import {
+  chapterFromSeedId,
   listenBucket,
   listenTrackKey,
   noteListenPlay,
@@ -17,7 +18,7 @@ import {
   noteListenEnded,
 } from '../../utils/playbackBeacon';
 
-const ctx = { type: 'story' as const, figureId: 'aurelius', mode: 'story' };
+const ctx = { type: 'story' as const, figureId: 'aurelius', mode: 'story', chapter: 4 };
 
 describe('listenBucket', () => {
   it('maps seconds to the six documented buckets', () => {
@@ -33,6 +34,22 @@ describe('listenBucket', () => {
     expect(listenBucket(1799)).toBe(4);
     expect(listenBucket(1800)).toBe(5);
     expect(listenBucket(99999)).toBe(5);
+  });
+});
+
+describe('chapterFromSeedId', () => {
+  it('reads the episode ordinal off either id shape', () => {
+    expect(chapterFromSeedId('aurelius-3')).toBe(3);
+    expect(chapterFromSeedId('aurelius_12')).toBe(12);
+    expect(chapterFromSeedId(7)).toBe(7);
+    expect(chapterFromSeedId('0')).toBe(0);
+  });
+
+  it('leaves an unreadable id unlabelled rather than zero', () => {
+    expect(chapterFromSeedId(undefined)).toBeUndefined();
+    expect(chapterFromSeedId(null)).toBeUndefined();
+    expect(chapterFromSeedId('')).toBeUndefined();
+    expect(chapterFromSeedId('aurelius')).toBeUndefined();
   });
 });
 
@@ -64,6 +81,9 @@ describe('listen tracker', () => {
     expect(terminal).toHaveLength(1);
     expect(terminal[0].event).toBe('completed');
     expect(terminal[0].bucket).toBe(3); // ~200s heard
+    // Every playback row in the lifecycle carries the chapter, so the quarter
+    // marks and the terminal row can be ranked against the same content.
+    expect(sent.filter((s) => s.event).every((s) => s.chapter === 4)).toBe(true);
     // The engaged listened arm rode along with the first quarter.
     expect(sent.filter((s) => s.step === 'engaged').map((s) => s.mode)).toEqual(['listened']);
   });

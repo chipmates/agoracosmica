@@ -19,6 +19,8 @@ interface PlaybackBeaconContext {
   type: PlaybackContentType;
   figureId?: string;
   mode?: string;
+  /** Chapter ordinal on story tracks, so listening ranks per chapter. */
+  chapter?: number;
 }
 
 interface UseAudioOptions {
@@ -191,6 +193,7 @@ const useAudio = (audioUrl: string | null | undefined, options: UseAudioOptions 
           event: 'started',
           figureId: ctx.figureId,
           mode: ctx.mode,
+          chapter: ctx.chapter,
           language: detectCurrentLanguage(),
         });
       }
