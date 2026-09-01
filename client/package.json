@@ -49,6 +49,9 @@
     "setup:assets": "node scripts/setup-assets.mjs",
     "test": "vitest",
     "test:unit": "vitest run",
+    "test:e2e": "node tests/e2e/run.mjs",
+    "test:e2e:ceremony": "node tests/e2e/run-ceremony.mjs",
+    "dev:flags-off": "VITE_CEREMONY_CARRIED_ENTRY=false VITE_ANSWER_FIRST_REPLY=false VITE_ANSWER_PROVENANCE=false VITE_NAV_BATCH=false VITE_AUDIO_LIBRARY_ENTRY=false VITE_COUNCIL_OILS=false VITE_QUIET_PLATE_PRESENCE=false vite",
     "check:csp": "node scripts/check-csp.mjs",
     "test:csp": "node scripts/csp-probe.mjs"
   },

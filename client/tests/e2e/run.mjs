@@ -1,101 +1,30 @@
 // E2E flow suite — the executable "don't break anything" net for the app's
 // money path, the story→Chapter-2 handoff, and the gclid consent guards.
 //
-// Prerequisites (run from client/):
-//   1. pnpm dev                                  → https://localhost:5174 (or :5173)
-//   2. cd ../workers/llm-proxy && npx wrangler dev --port 8788
-// Then:  node tests/e2e/run.mjs
+// This is the flag-OFF arm: it asserts the behavior production ships today.
+// A carried question lands straight in Free Talk here, so the suite fails on a
+// flag-on server by design. The flag-on twin is run-ceremony.mjs.
 //
-// Playwright is resolved from the repo's nightagora package on purpose: the
-// client package adds no new dependency for this suite.
+// Prerequisites (run from client/):
+//   1. pnpm dev:flags-off              (dev server with every dark flag off)
+//   2. cd ../workers/llm-proxy && npx wrangler dev --port 8788
+// Then:  pnpm test:e2e
 
-import { createRequire } from 'node:module'
-const require = createRequire(new URL('../../../nightagora/package.json', import.meta.url))
-const { chromium } = require('playwright')
+import {
+  chromium,
+  check,
+  dismissHelpers,
+  findBase,
+  newPage,
+  passGate,
+  report,
+  sendComposer,
+  spec,
+  warn,
+} from './harness.mjs'
 
-const CANDIDATE_PORTS = [5174, 5173]
 const GCLID = 'E2ETESTGCLID1234567890'
 const CONSENT_GRANTED = JSON.stringify({ granted: true, version: '1.0.0', timestamp: 0 })
-
-let base = null
-const results = []
-let currentSpec = null
-let failures = 0
-
-import { mkdirSync } from 'node:fs'
-const SHOTS = new URL('./failures/', import.meta.url).pathname
-mkdirSync(SHOTS, { recursive: true })
-let activePage = null
-
-function spec(name) {
-  currentSpec = { name, checks: [], warns: [] }
-  results.push(currentSpec)
-}
-async function check(cond, msg) {
-  currentSpec.checks.push({ ok: !!cond, msg })
-  if (!cond) {
-    failures++
-    if (activePage) {
-      const file = `${SHOTS}${currentSpec.name}-${currentSpec.checks.length}.png`
-      await activePage.screenshot({ path: file }).catch(() => {})
-      currentSpec.warns.push(`failure shot: ${file}`)
-    }
-  }
-}
-function warn(msg) {
-  currentSpec.warns.push(msg)
-}
-
-async function newPage(browser, path, { seedStorage } = {}) {
-  const ctx = await browser.newContext({
-    ignoreHTTPSErrors: true,
-    viewport: { width: 1440, height: 900 },
-    locale: 'de-DE',
-  })
-  const page = await ctx.newPage()
-  activePage = page
-  const consoleIssues = []
-  page.on('console', (m) => {
-    const text = m.text()
-    if (/does not recognize|Each child in a list|Cannot update a component/.test(text)) {
-      consoleIssues.push(text.slice(0, 160))
-    }
-  })
-  if (seedStorage) {
-    // Storage is origin-scoped: open the origin first, then seed, then navigate.
-    await page.goto(`${base}/app`, { waitUntil: 'domcontentloaded' })
-    await page.evaluate((entries) => {
-      for (const [area, key, value] of entries) {
-        ;(area === 'local' ? localStorage : sessionStorage).setItem(key, value)
-      }
-    }, seedStorage)
-  }
-  await page.goto(`${base}${path}`, { waitUntil: 'domcontentloaded' })
-  await page.waitForTimeout(2500)
-  return { page, ctx, consoleIssues }
-}
-
-async function passGate(page) {
-  await page.keyboard.press('Escape')
-  await page.waitForTimeout(600)
-  const gate = page.getByRole('button', { name: /Jetzt entdecken/i })
-  await gate.waitFor({ state: 'visible', timeout: 15000 })
-  await gate.click()
-  await page.waitForTimeout(1500)
-}
-
-async function dismissHelpers(page, rounds = 2) {
-  for (let i = 0; i < rounds; i++) {
-    const btn = page.getByRole('button', { name: /Verstanden|Entdeckung beginnen/i })
-    try {
-      await btn.first().waitFor({ state: 'visible', timeout: 2500 })
-      await btn.first().click()
-      await page.waitForTimeout(500)
-    } catch {
-      return
-    }
-  }
-}
 
 // ---------- Spec 1: money path (DE): boot → gate → gallery → deep link → prefill → send → reply
 async function moneyPath(browser) {
@@ -124,11 +53,7 @@ async function moneyPath(browser) {
   const prefill = await composer.inputValue().catch(() => '')
   await check(prefill.length > 10, `ask=hero stages a question in the text composer (got: "${prefill.slice(0, 40)}…")`)
 
-  const replyPromise = b.page
-    .waitForResponse((r) => r.url().includes('/v1/chat'), { timeout: 30000 })
-    .catch(() => null)
-  await composer.press('Enter')
-  const reply = await replyPromise
+  const reply = await sendComposer(b.page, composer)
   const status = reply ? reply.status() : null
   // 429 = the dev worker's DEV_RATE_LIMIT — the pipeline is wired, quota is spent.
   await check(status === 200 || status === 429, `sending the staged question reaches /v1/chat (status: ${status})`)
@@ -248,33 +173,17 @@ async function gclidGuards(browser) {
 
 // ---------- main
 const probe = await chromium.launch()
-for (const port of CANDIDATE_PORTS) {
-  const p = await probe.newPage({ ignoreHTTPSErrors: true })
-  try {
-    await p.goto(`https://localhost:${port}/app`, { timeout: 4000 })
-    base = `https://localhost:${port}`
-    await p.close()
-    break
-  } catch {
-    await p.close()
-  }
-}
+const base = await findBase(probe)
 if (!base) {
   await probe.close()
   console.error('No dev server found on :5174/:5173.\nStart it with: pnpm dev  (and the worker: cd ../workers/llm-proxy && npx wrangler dev --port 8788)')
   process.exit(2)
 }
-console.log(`e2e against ${base}`)
+console.log(`e2e (flags off) against ${base}`)
 
 await moneyPath(probe)
 await storyHandoff(probe)
 await gclidGuards(probe)
 await probe.close()
 
-for (const r of results) {
-  console.log(`\n■ ${r.name}`)
-  for (const c of r.checks) console.log(`  ${c.ok ? '✓' : '✗'} ${c.msg}`)
-  for (const w of r.warns) console.log(`  ⚠ ${w}`)
-}
-console.log(`\n${failures === 0 ? 'ALL GREEN' : `${failures} FAILURE(S)`}`)
-process.exit(failures === 0 ? 0 : 1)
+process.exit(report())
