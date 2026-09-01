@@ -34,6 +34,7 @@ const S = de
 
 interface Block {
   h2: string;
+  /** Newlines split into paragraphs, so a long answer is not one wall of type. */
   body: string;
   bullets: string[];
   chapter?: number;
@@ -60,7 +61,9 @@ for (const pair of qa?.pairs.slice(1) ?? []) {
     {blocks.map(b => (
       <section class="pub-section fig-concept">
         <h2 class="pub-section__title">{b.h2}</h2>
-        <p class="pub-section__text">{b.body}</p>
+        {b.body.split('\n').map(p => p.trim()).filter(Boolean).map(p => (
+          <p class="pub-section__text">{p}</p>
+        ))}
         {b.bullets.length > 0 && (
           <ul class="fig-concept__points">
             {b.bullets.map(p => <li>{p}</li>)}

@@ -60,6 +60,20 @@ Each interaction in Agora Cosmica orbits one figure. The four educational chapte
 
 ---
 
+## Explore the library
+
+Every public page reads without an account.
+
+- [Marcus Aurelius](https://agoracosmica.org/figures/marcus-aurelius/): his life in twelve chapters, plus the Stoic teachings behind it
+- [Meister Eckhart](https://agoracosmica.org/figures/meister-eckhart/): detachment, letting go, and the ground of the soul
+- [What is the meaning of life?](https://agoracosmica.org/themes/meaning-purpose/): four answers, set against each other
+- [Stoicism](https://agoracosmica.org/stoicism/): what it is and how people practice it
+- [The hero's journey](https://agoracosmica.org/the-heros-journey/): the pattern Joseph Campbell traced across world myths
+- [Audio library](https://agoracosmica.org/audio/): 360 narrated chapters and 55 debates, every voice an AI Echo
+- [Mark Aurel](https://agoracosmica.org/de/figures/marcus-aurelius/): the same figure page in German
+
+---
+
 ## Features
 
 **Content**

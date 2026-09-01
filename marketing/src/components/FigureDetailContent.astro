@@ -125,6 +125,38 @@ const hubLinkLabel = isPhiloFigure
 // Same array drives the FAQPage JSON-LD in the route, so DOM and schema match.
 const poemsFaq = figureId === 'dickinson' ? (de ? dickinsonPoemsFaqDe : dickinsonPoemsFaqEn) : null;
 
+// Deep pages that belong to one figure: the child page under their own slug, or
+// the topic page their work is the entry point for. Same visual pattern as the
+// Dickinson poems link above, so a figure gains a route down without a new
+// component. Keyed per language because not every deep page has both.
+const DEEP_LINKS: Record<string, { en?: { href: string; label: string }[]; de?: { href: string; label: string }[] }> = {
+  blake: {
+    en: [{ href: '/figures/william-blake/poems/', label: "Read William Blake's poems →" }],
+  },
+  shakespeare: {
+    en: [{ href: '/figures/william-shakespeare/sonnets/', label: "Read Shakespeare's sonnets →" }],
+  },
+  rumi: {
+    en: [{ href: '/figures/rumi/poems/', label: "Read Rumi's poems →" }],
+  },
+  plato: {
+    de: [
+      { href: '/de/figures/plato/hoehlengleichnis/', label: 'Das Höhlengleichnis, einfach erklärt →' },
+      { href: '/de/figures/plato/ideenlehre/', label: 'Die Ideenlehre, und was Platon damit meinte →' },
+    ],
+  },
+  campbell: {
+    en: [{ href: '/the-heros-journey/', label: "The hero's journey, from call to return →" }],
+    de: [{ href: '/de/heldenreise/', label: 'Die Heldenreise, vom Ruf bis zur Rückkehr →' }],
+  },
+  aurelius: {
+    en: [{ href: '/stoicism/', label: 'Stoicism, what it is and how people practice it →' }],
+    de: [{ href: '/de/stoizismus/', label: 'Stoizismus, was er ist und wie man ihn übt →' }],
+  },
+};
+const deepLinks = DEEP_LINKS[figureId]?.[lang] ?? [];
+const deepLinksLead = de ? 'Zu einem Thema tiefer:' : 'Go deeper on one thing:';
+
 const S = de
   ? {
       hubLead: 'Weiter erkunden: ',
@@ -203,6 +235,17 @@ if (figure.essence) {
           <h3 class="pub-figure__qa-q">{item.q}</h3>
           <p class="pub-section__text">{item.a}</p>
         </div>
+      ))}
+    </section>
+  )}
+
+  {deepLinks.length > 0 && (
+    <section class="pub-section">
+      <h3 class="fig-related__title">{deepLinksLead}</h3>
+      {deepLinks.map(link => (
+        <p class="pub-section__text pub-figure__poems-link">
+          <a class="pub-textlink" href={link.href}>{link.label}</a>
+        </p>
       ))}
     </section>
   )}

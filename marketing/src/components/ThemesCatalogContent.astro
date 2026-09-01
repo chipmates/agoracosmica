@@ -91,6 +91,27 @@ const opener = councilCatalog.find(c => c.id === COUNCIL_SEQUENCE[0]) ?? council
 // plate on purpose: the closing band is, and the two would say the same thing
 // twice.
 const OPENING_PLATE = 'the-question-behind-every-question';
+
+// The deep pages a big question can land on: one idea worked out at length,
+// or a poet's own text. Language-specific, because these exist per language
+// rather than as translated twins.
+const deeperHeading = lang === 'de' ? 'Eine Frage, ganz ausgearbeitet' : 'One idea, worked out in full';
+const deeper = lang === 'de'
+  ? [
+      { label: 'Die Heldenreise', href: '/de/heldenreise/' },
+      { label: 'Stoizismus', href: '/de/stoizismus/' },
+      { label: 'Platons Höhlengleichnis', href: '/de/figures/plato/hoehlengleichnis/' },
+      { label: 'Platons Ideenlehre', href: '/de/figures/plato/ideenlehre/' },
+    ]
+  : [
+      { label: "The hero's journey", href: '/the-heros-journey/' },
+      { label: 'Stoicism', href: '/stoicism/' },
+      { label: 'Talk to historical figures', href: '/talk-to-historical-figures/' },
+      { label: "Emily Dickinson's poems", href: '/figures/emily-dickinson/poems/' },
+      { label: "William Blake's poems", href: '/figures/william-blake/poems/' },
+      { label: "Shakespeare's sonnets", href: '/figures/william-shakespeare/sonnets/' },
+      { label: "Rumi's poems", href: '/figures/rumi/poems/' },
+    ];
 ---
 <ThemeStyles />
 <div class="pub-content tq-index">
@@ -160,6 +181,13 @@ const OPENING_PLATE = 'the-question-behind-every-question';
   </section>
 
   <section class="tq-section">
+    <h2 class="tq-h2">{deeperHeading}</h2>
+    <ul class="tq-readon">
+      {deeper.map(link => <li><a href={link.href}>{link.label}</a></li>)}
+    </ul>
+  </section>
+
+  <section class="tq-section">
     <p class="tq-note">
       <a class="pub-textlink" href={publicUrl(lang, '/figures')}>{t('themes.allFigures')}</a>
     </p>
@@ -208,6 +236,27 @@ const OPENING_PLATE = 'the-question-behind-every-question';
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 0.75rem;
   }
+
+  /* Deep-page rail. Same shape as the figures index closer list. */
+  .tq-readon {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+    margin: 0.8rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .tq-readon a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: var(--text-sm);
+    color: var(--gold-primary);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .tq-readon a:hover { color: var(--gold-hover); }
 
   .tq-pool { display: flex; flex-direction: column; gap: 1.75rem; }
   .tq-pool__group { display: flex; flex-direction: column; gap: 0.4rem; }

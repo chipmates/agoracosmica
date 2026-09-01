@@ -62,6 +62,11 @@ export const figurePageContent: Record<string, { en: FigurePageLang; de: FigureP
           body:
             "The shadow is what Jung called 'the thing a person has no wish to be'. It is everything about you that got pushed out of sight. The traits your family disliked. The wishes you learned to be ashamed of. Even strengths you never let yourself use. Jung did not want you to kill it. He wanted you to know it. What you refuse to look at runs you anyway, and a lot of your unused power is sitting in there.",
         },
+        {
+          h2: 'Shadow work, explained',
+          body:
+            "Shadow work means turning toward the parts of yourself you pushed away. The shadow forms early. As a child you pick up which feelings are welcome and which are not, and the rest goes underground. It shows up as anger far bigger than its cause, or as a sharp dislike of someone who has done nothing to you. That is where the work starts.\nJung's advice was to follow the strong reaction instead of explaining it away. What exactly bothers you about this person, and where do you know that from in yourself? Dreams help, writing helps, and so does a partner who keeps asking questions. The goal is not to get rid of the shadow. It is to know it, so it stops steering from behind. You can talk one of those questions through with the Jung AI Echo. It is an interpretation of his writing, not therapy and not a recording.",
+        },
       ],
       ideaQuestion: 'The parts of me I keep out of sight, how do I meet them without falling apart?',
       works: [
@@ -86,6 +91,11 @@ export const figurePageContent: Record<string, { en: FigurePageLang; de: FigureP
           seedId: 4,
           body:
             "Der Schatten ist das, was Jung 'die Sache, die ein Mensch nicht sein will' nannte. Es ist alles an dir, was aus dem Blick geschoben wurde. Eigenschaften, die deine Familie nicht mochte. Wünsche, für die du dich schämen solltest. Sogar Stärken, die du nie benutzt hast. Jung wollte nicht, dass du ihn loswirst. Er wollte, dass du ihn kennst. Was du nicht anschaust, steuert dich trotzdem, und ein großer Teil deiner ungenutzten Kraft steckt genau dort.",
+        },
+        {
+          h2: 'Schattenarbeit nach C. G. Jung',
+          body:
+            'Schattenarbeit heißt, die Teile von dir anzuschauen, die du lange weggeschoben hast. Der Schatten entsteht früh. Als Kind lernst du, welche Gefühle willkommen sind und welche nicht, und der Rest wandert nach unten. Weg ist er damit nicht. Er meldet sich als Wut, die viel zu groß ist für den Anlass, oder als heftige Abneigung gegen jemanden, der dir nichts getan hat. Genau da fängt die Arbeit an.\nJung riet, der starken Reaktion nachzugehen statt sie wegzuerklären. Was genau stört dich an diesem Menschen, und woher kennst du das von dir selbst? Träume, ein Notizbuch und jemand, der nachfragt, helfen dabei. Das Ziel ist nicht, den Schatten loszuwerden. Es ist, ihn zu kennen, damit er dich nicht mehr heimlich steuert. Eine dieser Fragen kannst du mit dem KI-Echo von Jung durchsprechen. Das Echo ist eine Deutung seiner Schriften, keine Therapie und keine Aufnahme.',
         },
         {
           h2: 'Carl Gustav Jung einfach erklärt',
