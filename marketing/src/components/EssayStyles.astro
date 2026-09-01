@@ -1,0 +1,313 @@
+---
+// Shared type scale for the long-form explainer and poetry pages (hero's
+// journey, stoicism, the Plato student pages, the poem selections, the
+// talk-to-historical-figures category page). Rendered per page, global like
+// ThemeStyles.astro, because several pages share these classes and Astro only
+// bundles a component's styles into pages that render it.
+---
+<style is:global>
+  .esy {
+    max-width: 46rem;
+    margin: 0 auto;
+    padding: 2.5rem 1.25rem 4rem;
+  }
+
+  /* Hero */
+  .esy-hero {
+    margin: 1.5rem 0 3rem;
+  }
+  .esy-hero__eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: var(--text-xs);
+    color: var(--gold-primary);
+    margin: 0 0 0.4rem;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  }
+  .esy-hero__title {
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: clamp(2rem, 5vw, 2.9rem);
+    line-height: 1.1;
+    margin: 0 0 0.75rem;
+    color: var(--text-primary);
+  }
+  .esy-hero__lead {
+    color: var(--text-secondary);
+    font-size: var(--text-md);
+    line-height: var(--leading-loose);
+    margin: 0;
+    max-width: 38rem;
+  }
+
+  /* Sections */
+  .esy-section {
+    margin: 0 0 3rem;
+  }
+  .esy-h2 {
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: clamp(1.4rem, 3.5vw, 1.85rem);
+    color: var(--gold-primary);
+    margin: 0 0 1rem;
+    line-height: 1.25;
+  }
+  .esy-h3 {
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-weight: var(--weight-medium);
+    font-size: var(--text-md);
+    letter-spacing: 0.04em;
+    color: var(--gold-subtle);
+    margin: 2rem 0 0.75rem;
+  }
+  .esy-p {
+    color: var(--text-secondary);
+    font-size: var(--text-base);
+    line-height: var(--leading-loose);
+    margin: 0 0 1rem;
+    max-width: 40rem;
+  }
+  .esy-p strong {
+    color: var(--text-primary);
+    font-weight: var(--weight-semibold);
+  }
+  .esy-p a,
+  .esy-list a {
+    color: var(--gold-primary);
+    text-decoration: none;
+    border-bottom: 1px solid color-mix(in srgb, var(--gold-primary) 40%, transparent);
+  }
+  .esy-p a:hover,
+  .esy-list a:hover {
+    border-bottom-color: var(--gold-primary);
+  }
+
+  /* Quote (short, attributed, primary-source) */
+  .esy-quote {
+    margin: 1.75rem 0;
+    padding: 1.1rem 1.4rem;
+    border-left: 2px solid color-mix(in srgb, var(--gold-subtle) 50%, transparent);
+    background: color-mix(in srgb, var(--bg-card) 45%, transparent);
+  }
+  .esy-quote p {
+    font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-size: var(--text-md);
+    line-height: var(--leading-loose);
+    color: var(--text-primary);
+    margin: 0;
+  }
+  .esy-quote cite {
+    display: block;
+    margin-top: 0.7rem;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-style: normal;
+    font-size: var(--text-xs);
+    letter-spacing: 0.05em;
+    color: var(--text-tertiary);
+  }
+
+  /* Numbered stage / step list */
+  .esy-stages {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    counter-reset: esy-stage;
+  }
+  .esy-stages > li {
+    counter-increment: esy-stage;
+    position: relative;
+    padding: 0 0 1.4rem 3rem;
+  }
+  .esy-stages > li::before {
+    content: counter(esy-stage);
+    position: absolute;
+    left: 0;
+    top: 0.1rem;
+    width: 2rem;
+    height: 2rem;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    border: 1px solid color-mix(in srgb, var(--gold-subtle) 45%, transparent);
+    color: var(--gold-primary);
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: var(--text-sm);
+  }
+  /* Continuous 1-17 numbering across the three act lists. Fixed classes, not a
+     style attribute: the CSP forbids inline style="" in built HTML. */
+  .esy-stages--start-5 {
+    counter-reset: esy-stage 5;
+  }
+  .esy-stages--start-11 {
+    counter-reset: esy-stage 11;
+  }
+  .esy-stage__name {
+    display: block;
+    color: var(--text-primary);
+    font-weight: var(--weight-medium);
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: var(--text-base);
+    margin: 0 0 0.25rem;
+  }
+  .esy-stage__desc {
+    color: var(--text-secondary);
+    font-size: var(--text-base);
+    line-height: var(--leading-relaxed);
+    margin: 0;
+    max-width: 38rem;
+  }
+
+  /* Plain bullet list in essay voice */
+  .esy-list {
+    margin: 0 0 1rem;
+    padding-left: 1.2rem;
+    color: var(--text-secondary);
+    font-size: var(--text-base);
+    line-height: var(--leading-loose);
+    max-width: 40rem;
+  }
+  .esy-list > li {
+    margin-bottom: 0.55rem;
+  }
+  .esy-list > li::marker {
+    color: var(--gold-subtle);
+  }
+
+  /* Term + definition rows (concepts) */
+  .esy-terms {
+    margin: 0;
+  }
+  .esy-terms dt {
+    color: var(--text-primary);
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-weight: var(--weight-medium);
+    font-size: var(--text-base);
+    margin: 1.25rem 0 0.25rem;
+  }
+  .esy-terms dd {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: var(--text-base);
+    line-height: var(--leading-relaxed);
+    max-width: 38rem;
+  }
+
+  /* FAQ */
+  .esy-faq {
+    border-top: 1px solid color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+    padding-top: 2rem;
+  }
+  .esy-faq__q {
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-weight: var(--weight-medium);
+    font-size: var(--text-md);
+    color: var(--text-primary);
+    margin: 1.75rem 0 0.5rem;
+  }
+  .esy-faq__a {
+    color: var(--text-secondary);
+    font-size: var(--text-base);
+    line-height: var(--leading-relaxed);
+    margin: 0;
+    max-width: 40rem;
+  }
+
+  /* Poem reading layer (poems / sonnets / passages pages). Mirrors the
+     Dickinson poems page treatment so the poetry surfaces read as one family. */
+  .esy-poemlist {
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+  }
+  .esy-poem {
+    border-left: 2px solid color-mix(in srgb, var(--gold-subtle) 30%, transparent);
+    padding-left: 1.5rem;
+  }
+  .esy-poem__summary {
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0.4rem 0;
+    gap: 0.65rem;
+    font-size: 0.84rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--gold-subtle);
+    font-weight: var(--weight-medium);
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    transition: color 0.15s ease;
+  }
+  .esy-poem__summary::-webkit-details-marker {
+    display: none;
+  }
+  .esy-poem__summary::before {
+    content: '+';
+    color: var(--gold-primary);
+    font-size: 1.05rem;
+    line-height: 1;
+  }
+  .esy-poem[open] > .esy-poem__summary::before {
+    content: '\2212';
+  }
+  .esy-poem__summary:hover {
+    color: var(--gold-hover);
+  }
+  .esy-poem[open] > .esy-poem__summary {
+    color: var(--gold-primary);
+  }
+  .esy-poem__intro {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    line-height: var(--leading-relaxed);
+    font-style: italic;
+    margin: 0.9rem 0 0;
+    max-width: 34rem;
+  }
+  .esy-poem__text {
+    font-family: 'Iowan Old Style', Palatino, Georgia, 'Times New Roman', serif;
+    font-size: 1.16rem;
+    line-height: 1.75;
+    color: var(--text-primary);
+    margin-top: 1.05rem;
+  }
+  .esy-poem__stanza {
+    margin: 0 0 1em;
+  }
+  .esy-poem__stanza:last-child {
+    margin-bottom: 0;
+  }
+  /* One block per verse line, with a hanging indent so a wrapped line is
+     visually distinct from the next verse line on narrow screens. pre-wrap
+     keeps the edition's own leading spaces (couplet indents). */
+  .esy-poem__line {
+    display: block;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    padding-left: 1.1em;
+    text-indent: -1.1em;
+  }
+
+  /* Sources / footer note */
+  .esy-sources {
+    border-top: 1px solid color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+    padding-top: 1.5rem;
+  }
+  .esy-sources p {
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+    line-height: var(--leading-relaxed);
+    margin: 0 0 0.75rem;
+  }
+
+  @media (max-width: 560px) {
+    .esy-stages > li {
+      padding-left: 2.6rem;
+    }
+    .esy-poem {
+      padding-left: 1rem;
+    }
+    .esy-poem__text {
+      font-size: 1.05rem;
+    }
+  }
+</style>

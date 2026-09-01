@@ -1,0 +1,311 @@
+---
+// Die Heldenreise, erklärt aus der Primärquelle: Joseph Campbell, The Hero
+// with a Thousand Faces (1949), auf Deutsch als "Der Heros in tausend
+// Gestalten" erschienen. Die Stationsnamen folgen Campbells eigenen
+// Kapitelüberschriften, hier mit erklärenden deutschen Bezeichnungen und dem
+// englischen Original in Klammern. Kein wörtliches Zitat: die deutsche
+// Übersetzung ist urheberrechtlich geschützt, also wird paraphrasiert.
+// EN/DE cross-slug pair: /the-heros-journey <-> /de/heldenreise (altEn/altDe).
+
+import Public from '../../layouts/Public.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import EssayStyles from '../../components/EssayStyles.astro';
+import EssayInvite from '../../components/EssayInvite.astro';
+import { figureImage } from '../../lib/figureImages';
+import { articleSchema, breadcrumbSchema, faqSchema } from '../../lib/schemas';
+import { canonicalUrl, SITE_URL } from '../../lib/urls';
+
+const lang = 'de' as const;
+const PAGE_PATH = '/de/heldenreise';
+const PAGE_URL = canonicalUrl(PAGE_PATH);
+
+const metaTitle = 'Die Heldenreise: Campbells Stationen erklärt';
+const metaDescription =
+  'Die Heldenreise nach Joseph Campbell, direkt aus dem Buch erklärt: die drei Bewegungen, alle 17 Stationen und wie du das Muster im eigenen Leben liest.';
+
+const DEPARTURE = [
+  {
+    name: 'Der Ruf des Abenteuers (The Call to Adventure)',
+    desc: 'Etwas stört den gewohnten Tag. Ein Bote taucht auf, ein Zufall öffnet eine unbekannte Welt, und das vertraute Leben reicht plötzlich nicht mehr.',
+  },
+  {
+    name: 'Die Verweigerung des Rufs (Refusal of the Call)',
+    desc: 'Der Held zögert oder sagt nein. Für Campbell ist das eine echte Gefahr: Ein Leben, das seinen Ruf dauerhaft überhört, trocknet in den eigenen Routinen aus.',
+  },
+  {
+    name: 'Übernatürliche Hilfe (Supernatural Aid)',
+    desc: 'Sobald der Held sich entscheidet, erscheint eine schützende Gestalt. Eine alte Frau, ein Zauberer, ein Mentor mit Rat und einem Amulett für den Weg.',
+  },
+  {
+    name: 'Das Überschreiten der ersten Schwelle (The Crossing of the First Threshold)',
+    desc: 'Am Rand der bekannten Welt steht ein Wächter. Wer an ihm vorbeikommt, lässt die Regeln von zu Hause hinter sich und betritt Land ohne Karte.',
+  },
+  {
+    name: 'Der Bauch des Wals (The Belly of the Whale)',
+    desc: 'Das Unbekannte verschluckt den Helden, und es sieht aus wie ein Ende. Campbell liest es als Durchgang: der Punkt, ab dem es kein Zurück gibt.',
+  },
+];
+const INITIATION = [
+  {
+    name: 'Der Weg der Prüfungen (The Road of Trials)',
+    desc: 'Eine Kette von Proben, an denen der Held immer wieder fast scheitert. Hier zahlen sich die Helfer und Amulette vom Anfang aus.',
+  },
+  {
+    name: 'Die Begegnung mit der Göttin (The Meeting with the Goddess)',
+    desc: 'Am tiefsten Punkt eine Begegnung mit einer Gestalt, in der alles zusammenkommt, was der Held lieben oder werden könnte. Der Mythos zeigt sie oft als Hochzeit.',
+  },
+  {
+    name: 'Die Frau als Verführerin (Woman as the Temptress)',
+    desc: 'So nennt Campbell den Moment, in dem die Reise beinahe gegen Bequemlichkeit eingetauscht wird. Die Versuchung ist weniger eine Person als der Sog, hier stehen zu bleiben.',
+  },
+  {
+    name: 'Die Versöhnung mit dem Vater (Atonement with the Father)',
+    desc: 'Die Konfrontation mit dem, was im Leben des Helden die letzte Macht hat. Aus Angst wird Verstehen, und das alte Selbst überlebt die Begegnung nicht.',
+  },
+  {
+    name: 'Apotheose (Apotheosis)',
+    desc: 'Ein Zustand jenseits der alten Gegensätze. Vor der letzten Aufgabe ruht der Held jenseits von Furcht und Begehren.',
+  },
+  {
+    name: 'Die entscheidende Gabe (The Ultimate Boon)',
+    desc: 'Das, wofür die ganze Reise da war. Das Elixier, das Feuer, der Gral: die Sache, die die wartende Welt erneuern kann.',
+  },
+];
+const RETURN = [
+  {
+    name: 'Die Verweigerung der Rückkehr (Refusal of the Return)',
+    desc: 'Warum überhaupt zurückgehen? Campbell erinnert daran, dass selbst der Buddha nach dem Erwachen zweifelte, ob sich die Botschaft vermitteln lässt.',
+  },
+  {
+    name: 'Die magische Flucht (The Magic Flight)',
+    desc: 'Wurde die Gabe gegen den Willen ihres Hüters genommen, wird die Rückkehr zur Verfolgungsjagd, mit Hindernissen, die der Fliehende hinter sich wirft.',
+  },
+  {
+    name: 'Die Rettung von außen (Rescue from Without)',
+    desc: 'Manchmal muss die Welt ihren Helden holen kommen. Die Hilfe kommt dann von der gewöhnlichen Seite der Schwelle.',
+  },
+  {
+    name: 'Die Rückkehr über die Schwelle (The Crossing of the Return Threshold)',
+    desc: 'Im Alltag die schwerste Station: das Gefundene in eine Welt zurücktragen, die sich nicht verändert hat, während du dich verändert hast.',
+  },
+  {
+    name: 'Herr der zwei Welten (Master of the Two Worlds)',
+    desc: 'Die Freiheit, zwischen beiden Welten zu wechseln, ohne eine davon zu beschädigen. Können im äußeren Leben und im inneren.',
+  },
+  {
+    name: 'Freiheit zum Leben (Freedom to Live)',
+    desc: 'Der Endzustand. Leben ohne Angst vor dem Tod, ohne Klammern an das Gestern und ohne Greifen nach dem Morgen.',
+  },
+];
+
+const faq = [
+  {
+    q: 'Woher kommt die Heldenreise?',
+    a: 'Aus Joseph Campbells Buch The Hero with a Thousand Faces von 1949, auf Deutsch als Der Heros in tausend Gestalten erschienen. Campbell verglich Mythen aus vielen Kulturen und beschrieb ein wiederkehrendes Muster, das er Monomythos nannte. Das Wort lieh er sich bei James Joyce.',
+  },
+  {
+    q: 'Wie viele Stationen hat die Heldenreise?',
+    a: 'Campbell selbst beschreibt 17 Stationen in drei Bewegungen: Aufbruch, Initiation und Rückkehr. Spätere Fassungen kürzen die Liste. Die Drehbuch-Version von Christopher Vogler kommt zum Beispiel mit 12 aus.',
+  },
+  {
+    q: 'Folgt jede Geschichte der Heldenreise?',
+    a: 'Nein. Campbell hielt das Muster für tief im Mythos verankert, aber die Forschung hat früh gefragt, wie universell es wirklich ist. Am meisten taugt es als Brille, die du an eine Geschichte oder an ein Stück deines eigenen Lebens hältst, nicht als Naturgesetz.',
+  },
+];
+
+const ogImage = figureImage('campbell', 'main', 1200);
+const schemas = [
+  articleSchema({
+    title: metaTitle,
+    description: metaDescription,
+    url: PAGE_URL,
+    lang,
+    image: ogImage,
+    datePublished: '2026-09-01',
+  }),
+  breadcrumbSchema([
+    { name: 'Start', url: `${SITE_URL}/de/` },
+    { name: 'Die Heldenreise', url: PAGE_URL },
+  ]),
+  faqSchema(faq, PAGE_URL),
+];
+---
+<Public
+  title={metaTitle}
+  fullTitle={metaTitle}
+  ogTitle={`${metaTitle} | Agora Cosmica`}
+  description={metaDescription}
+  canonicalPath={PAGE_PATH}
+  lang={lang}
+  ogType="article"
+  ogImage={ogImage}
+  ogImageAlt="KI-generiertes Porträt: Joseph Campbell"
+  altEn="/the-heros-journey"
+  altDe="/de/heldenreise"
+  stickyCta={false}
+  schemas={schemas}
+>
+  <EssayStyles />
+  <div class="pub-content esy">
+    <Breadcrumbs lang={lang} items={[{ label: 'Die Heldenreise' }]} />
+
+    <header class="esy-hero">
+      <p class="esy-hero__eyebrow">Ein Muster, tausend Gestalten</p>
+      <h1 class="esy-hero__title">Die Heldenreise</h1>
+      <p class="esy-hero__lead">
+        1949 veröffentlichte <a href="/de/figures/joseph-campbell/">Joseph
+        Campbell</a> The Hero with a Thousand Faces, eine Studie über Mythen aus
+        allen Teilen der Welt. Seine These: Unter der Oberfläche erzählen sie
+        eine einzige Geschichte. Ein Mensch verlässt die vertraute Welt,
+        übersteht einen Weg voller Prüfungen, gewinnt etwas von echtem Wert und
+        trägt es nach Hause. Diese Seite geht das Muster so durch, wie Campbell
+        selbst es aufgebaut hat.
+      </p>
+    </header>
+
+    <section class="esy-section">
+      <h2 class="esy-h2">Was ist die Heldenreise?</h2>
+      <p class="esy-p">
+        Die Heldenreise ist Campbells Name für ein Erzählmuster, das er in
+        Mythen, Sagen und religiösen Geschichten wiederfand. Er nannte es den
+        Monomythos, ein Wort aus James Joyces Finnegans Wake. Ganz am Anfang des
+        Buchs fasst er das Muster in einem einzigen Satz zusammen: Ein Held
+        verlässt die Welt des Alltags und betritt einen Raum voller Wunder. Dort
+        begegnen ihm fremde Kräfte, er besteht sie und erringt einen
+        entscheidenden Sieg. Dann kehrt er zurück, mit einer Gabe, die auch den
+        anderen hilft.
+      </p>
+      <p class="esy-p">
+        Seine Beispiele reichen von Prometheus und Jason bis zu Mose und dem
+        Buddha. Die Behauptung war nie, dass Erzähler voneinander abschreiben.
+        Sondern dass immer wieder derselbe tiefe Durchgang beschrieben wird,
+        weil Menschen ihn wirklich erleben: Jede echte Veränderung verlangt,
+        eine vertraute Welt zu verlassen, eine schwere Mitte auszuhalten und
+        verwandelt zurückzukommen.
+      </p>
+    </section>
+
+    <section class="esy-section">
+      <h2 class="esy-h2">Die Form: drei Bewegungen</h2>
+      <p class="esy-p">
+        Den Kern des Musters nennt Campbell die Keimzelle des Monomythos: <strong>Aufbruch</strong>, <strong>Initiation</strong>, <strong>Rückkehr</strong>.
+        Der Held verlässt die gewohnte Welt, wird in
+        einer fremderen verwandelt und bringt etwas zurück, das die Gemeinschaft
+        braucht. Alles Weitere im Buch ist die Entfaltung dieser drei Bewegungen
+        in siebzehn Stationen.
+      </p>
+      <p class="esy-p">
+        Nicht jeder Mythos enthält alle siebzehn. Das sagt Campbell selbst ganz
+        deutlich. Manche Geschichten verweilen bei einer Station und
+        überspringen fünf andere, manche wiederholen eine Station in neuen
+        Kostümen. Die volle Reihenfolge ist ein Gesamtbild: die Reise, wie sie
+        aussähe, wenn nichts fehlte. Die deutschen Namen unten sind unsere
+        erklärenden Übersetzungen, in Klammern steht jeweils Campbells
+        Originalbegriff.
+      </p>
+    </section>
+
+    <section class="esy-section">
+      <h2 class="esy-h2">Die siebzehn Stationen</h2>
+
+      <h3 class="esy-h3">Aufbruch</h3>
+      <ol class="esy-stages">
+        {DEPARTURE.map(s => (
+          <li>
+            <span class="esy-stage__name">{s.name}</span>
+            <p class="esy-stage__desc">{s.desc}</p>
+          </li>
+        ))}
+      </ol>
+
+      <h3 class="esy-h3">Initiation</h3>
+      <ol class="esy-stages esy-stages--start-5">
+        {INITIATION.map(s => (
+          <li>
+            <span class="esy-stage__name">{s.name}</span>
+            <p class="esy-stage__desc">{s.desc}</p>
+          </li>
+        ))}
+      </ol>
+
+      <h3 class="esy-h3">Rückkehr</h3>
+      <ol class="esy-stages esy-stages--start-11">
+        {RETURN.map(s => (
+          <li>
+            <span class="esy-stage__name">{s.name}</span>
+            <p class="esy-stage__desc">{s.desc}</p>
+          </li>
+        ))}
+      </ol>
+    </section>
+
+    <section class="esy-section">
+      <h2 class="esy-h2">Was die Heldenreise nicht ist</h2>
+      <p class="esy-p">
+        Sie ist keine Schreibformel. Campbell beschrieb Mythen, er schrieb keine
+        Drehbuchanleitung, und er las die Stationen als Bilder eines inneren
+        Durchgangs, nicht als Kästchen zum Abhaken. Sie steht auch nicht über
+        jeder Kritik. Die Erzählforschung hat angemerkt, dass Campbell Beispiele
+        wählte, die passten, und andere überging. Und Stationsnamen wie Die Frau
+        als Verführerin tragen die Annahmen von 1949 darüber in sich, wer ein
+        Held ist. Das Muster taugt als Brille, nicht als Naturgesetz.
+      </p>
+    </section>
+
+    <section class="esy-section">
+      <h2 class="esy-h2">Wo dir das Muster heute begegnet</h2>
+      <p class="esy-p">
+        George Lucas hat offen gesagt, dass Campbells Buch Star Wars geprägt
+        hat, und spätestens damit kam der Monomythos in jede Filmhochschule.
+        Christopher Vogler verdichtete ihn zu einem Studio-Memo, aus dem The
+        Writer's Journey wurde, die 12-Stationen-Fassung, die heute in den
+        meisten Drehbuchkursen gelehrt wird. Unter unzähligen Filmen und Spielen
+        liegt dieser Bogen.
+      </p>
+      <p class="esy-p">
+        Campbell selbst wollte mehr als Handlungsmuster. Er hielt die Mythen für
+        Landkarten innerer Veränderung, mit denen du deine eigenen Wendepunkte
+        lesen kannst. Den Ruf, den du überhört hast. Die Schwelle, die du
+        endlich überschritten hast. Die Rückkehr, die zu Hause niemand ganz
+        verstand. Genau diese Lesart nimmt
+        seine <a href="/de/figures/joseph-campbell/">Figurenseite</a> auf, und du
+        kannst sie seinem Echo direkt vorlegen.
+      </p>
+    </section>
+
+    <section class="esy-section esy-faq">
+      <h2 class="esy-h2">Häufige Fragen</h2>
+      {faq.map(item => (
+        <>
+          <h3 class="esy-faq__q">{item.q}</h3>
+          <p class="esy-faq__a">{item.a}</p>
+        </>
+      ))}
+    </section>
+
+    <EssayInvite
+      lang={lang}
+      line="Joseph Campbell hat ein Leben mit diesen Geschichten verbracht. Auf Agora Cosmica kannst du sein Leben in Kapiteln hören, seine Kernideen in Ruhe durchgehen und die Heldenreise mit seinem Echo durchsprechen, einer KI-Stimme, die in seinem echten Werk verankert ist. Sie bleibt eine Interpretation, nie der Mensch selbst."
+      href="/app?figure=joseph-campbell&lang=de"
+      buttonLabel="Sprich mit seinem Echo darüber"
+      figureId="campbell"
+      portraitAlt="KI-generiertes Porträt von Joseph Campbell"
+      moreLinks={[
+        { label: 'Joseph Campbell, der Mensch', href: '/de/figures/joseph-campbell/' },
+        { label: 'Was ist der Sinn des Lebens?', href: '/de/themes/meaning-purpose/' },
+        { label: 'Wer bin ich wirklich?', href: '/de/themes/who-am-i/' },
+      ]}
+    />
+
+    <footer class="esy-sources">
+      <p>
+        Quelle: Joseph Campbell, The Hero with a Thousand Faces, zuerst 1949 bei
+        Pantheon Books erschienen, auf Deutsch als Der Heros in tausend
+        Gestalten. Die Stationsnamen folgen Campbells eigenen
+        Kapitelüberschriften, die deutschen Bezeichnungen sind unsere
+        erklärenden Übersetzungen. Beschreibungen und Einordnung stammen von
+        uns.
+      </p>
+    </footer>
+  </div>
+</Public>

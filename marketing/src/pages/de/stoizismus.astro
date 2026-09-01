@@ -1,0 +1,268 @@
+---
+// Stoizismus-Erklärseite: was die Schule lehrt und wie man sie übt, mit
+// Brücke zur Mark-Aurel-Figurenseite. Alles aus den erhaltenen Primärtexten
+// (Epiktet, Seneca, Mark Aurel) zusammengefasst, ohne wörtliche Zitate, also
+// ohne Berührung von Übersetzungs-Urheberrechten.
+// EN/DE cross-slug pair: /stoicism <-> /de/stoizismus (altEn/altDe).
+
+import Public from '../../layouts/Public.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import EssayStyles from '../../components/EssayStyles.astro';
+import EssayInvite from '../../components/EssayInvite.astro';
+import { figureImage } from '../../lib/figureImages';
+import { articleSchema, breadcrumbSchema, faqSchema } from '../../lib/schemas';
+import { canonicalUrl, SITE_URL } from '../../lib/urls';
+
+const lang = 'de' as const;
+const PAGE_PATH = '/de/stoizismus';
+const PAGE_URL = canonicalUrl(PAGE_PATH);
+
+const metaTitle = 'Was ist Stoizismus? Lehre und Praxis erklärt';
+const metaDescription =
+  'Was der Stoizismus lehrt und wie man ihn übt: was in deiner Macht steht, die vier Tugenden, die täglichen Übungen und die Rolle von Mark Aurel.';
+
+const PRACTICES = [
+  {
+    name: 'Den Tag vorwegnehmen',
+    desc: 'Mark Aurel beginnt eines seiner Notizbücher mit der morgendlichen Erinnerung, dass ihm heute schwierige Menschen begegnen werden, und dass sie aus Unwissen handeln, nicht aus Bosheit. Wer den Tag vorher durchgeht, nimmt ihm die Möglichkeit zum Hinterhalt.',
+  },
+  {
+    name: 'Die Pause vor der Zustimmung',
+    desc: 'Ein Eindruck trifft ein: eine Kränkung, eine Angst, ein Verlangen. Stoiker trainieren eine Lücke zwischen Eindruck und Antwort, gerade lang genug für die Frage, ob das Urteil darin überhaupt stimmt.',
+  },
+  {
+    name: 'Der Abendrückblick',
+    desc: 'Seneca beschreibt, wie er vor dem Schlaf seinen ganzen Tag prüft: was er schlecht gemacht hat, was gut, was liegen blieb. Keine Selbstbestrafung, nur eine ehrliche Bilanz, dann Ruhe.',
+  },
+  {
+    name: 'An dich selbst schreiben',
+    desc: 'Die Selbstbetrachtungen sind kein Buch, das Mark Aurel für uns geschrieben hat. Es sind Notizen an sich selbst, dieselben wenigen Wahrheiten, so lange bearbeitet, bis sie trugen. Eine private Seite leistet heute dasselbe.',
+  },
+  {
+    name: 'Verluste sanft proben',
+    desc: 'Seneca riet, sich die gefürchteten Verluste im Voraus und in kleinen Dosen vorzustellen. Nicht um den Tag zu verdunkeln, sondern damit nichts Geliebtes achtlos gehalten wird und nichts, das geht, dich völlig überrascht.',
+  },
+  {
+    name: 'Der Blick von oben',
+    desc: 'Mark Aurel stellt sich die menschlichen Dinge aus großer Höhe vor: Heere, Feste, Prozesse, alles winzig und kurz. Die Übung schrumpft den Lärm, bis das Wichtige wieder sichtbar ist.',
+  },
+  {
+    name: 'Kleine Entbehrungen üben',
+    desc: 'Seneca empfahl, ein paar Tage mit einfachem Essen und grober Kleidung zu leben und sich dabei zu fragen, ob das je zu fürchten war. Der Komfort kehrt zurück, die Angst kommt kleiner wieder.',
+  },
+];
+
+const faq = [
+  {
+    q: 'Ist Stoizismus eine Religion?',
+    a: 'Nein, eine philosophische Schule. Die alten Stoiker sprachen von einer vernünftigen Ordnung in der Natur, aber die Praxis selbst verlangt keinen bestimmten Glauben. Menschen mit ganz verschiedenen Überzeugungen üben sie heute.',
+  },
+  {
+    q: 'Was soll ich zuerst lesen?',
+    a: 'Das Handbüchlein der Moral von Epiktet ist kurz und der klassische Einstieg. Die Selbstbetrachtungen von Mark Aurel zeigen die Praxis aus einem arbeitenden Leben heraus. Senecas Briefe sind der wärmste Weg hinein. Alle drei gibt es in gemeinfreien Übersetzungen.',
+  },
+  {
+    q: 'Heißt Stoizismus, Gefühle zu verstecken?',
+    a: 'Nein. Das Alltagswort stoisch ist zu unbewegt verrutscht, aber die Schule lehrte fast das Gegenteil: das Gefühl ansehen und das Urteil darin prüfen. Angst und Wut verlieren so ihren Griff, ruhigere Gefühle bekommen Raum.',
+  },
+];
+
+const ogImage = figureImage('aurelius', 'main', 1200);
+const schemas = [
+  articleSchema({
+    title: metaTitle,
+    description: metaDescription,
+    url: PAGE_URL,
+    lang,
+    image: ogImage,
+    datePublished: '2026-09-01',
+  }),
+  breadcrumbSchema([
+    { name: 'Start', url: `${SITE_URL}/de/` },
+    { name: 'Stoizismus', url: PAGE_URL },
+  ]),
+  faqSchema(faq, PAGE_URL),
+];
+---
+<Public
+  title={metaTitle}
+  fullTitle={metaTitle}
+  ogTitle={`${metaTitle} | Agora Cosmica`}
+  description={metaDescription}
+  canonicalPath={PAGE_PATH}
+  lang={lang}
+  ogType="article"
+  ogImage={ogImage}
+  ogImageAlt="KI-generiertes Porträt: Mark Aurel"
+  altEn="/stoicism"
+  altDe="/de/stoizismus"
+  stickyCta={false}
+  schemas={schemas}
+>
+  <EssayStyles />
+  <div class="pub-content esy">
+    <Breadcrumbs lang={lang} items={[{ label: 'Stoizismus' }]} />
+
+    <header class="esy-hero">
+      <p class="esy-hero__eyebrow">Eine Praxis, keine Pose</p>
+      <h1 class="esy-hero__title">Was ist Stoizismus?</h1>
+      <p class="esy-hero__lead">
+        Der Stoizismus ist eine philosophische Schule aus dem alten Griechenland
+        und Rom mit einer einfachen, fordernden Grundidee: Das meiste, was
+        geschieht, liegt nicht in deiner Hand. Was du daraus machst, liegt immer
+        darin. Deine Urteile, deine Absichten, deine Antworten. Alles andere,
+        vom Ruf bis zur Gesundheit, kannst du pflegen, aber nie besitzen. Um
+        diese Idee herum bauten die Stoiker tägliche Übungen, die Menschen bis
+        heute fast unverändert benutzen.
+      </p>
+    </header>
+
+    <section class="esy-section">
+      <h2 class="esy-h2">Woher der Stoizismus kommt</h2>
+      <p class="esy-p">
+        Um 300 v. Chr. begann in Athen ein Kaufmann namens Zenon von Kition zu
+        lehren. Die überlieferte Geschichte erzählt von einem Schiffbruch: Er
+        verlor alles, geriet in eine Buchhandlung und fand dort die
+        Philosophie. Gelehrt hat er in der Stoa Poikile, der bemalten
+        Säulenhalle am Markt. Seine Schüler hießen die Leute von der Halle.
+        Mehr steckt im Namen nicht.
+      </p>
+      <p class="esy-p">
+        Die Schule bestand über Jahrhunderte. Zenon, Kleanthes und Chrysippos
+        bauten ihr System in Griechenland, doch fast alle ihre Bücher sind
+        verloren. Was erhalten ist, stammt von drei Römern. Seneca, Staatsmann,
+        hinterließ Essays und Briefe. Epiktet, der versklavt war und später als
+        Freigelassener Philosophie lehrte, hinterließ Vorlesungen, die sein
+        Schüler Arrian mitschrieb, dazu ein kurzes Handbuch.
+        Und <a href="/de/figures/marcus-aurelius/">Mark Aurel</a>, der Kaiser,
+        hinterließ ein privates Notizbuch, das nie für fremde Augen gedacht
+        war. Wir nennen es die Selbstbetrachtungen. Er nannte es schlicht "an
+        sich selbst".
+      </p>
+    </section>
+
+    <section class="esy-section">
+      <h2 class="esy-h2">Was der Stoizismus lehrt</h2>
+      <dl class="esy-terms">
+        <dt>Was in deiner Macht steht, und was nicht</dt>
+        <dd>
+          Epiktet eröffnet sein Handbuch damit: Einiges liegt bei uns, das
+          meiste nicht. Bei uns liegen Urteil, Absicht, Wollen, Antwort. Nicht
+          bei uns liegen Körper, Besitz, Ruf, andere Menschen. Unglück, lehrte
+          er, entsteht aus dem Verwechseln der beiden Listen.
+        </dd>
+        <dt>Nur die Tugend ist wirklich gut</dt>
+        <dd>
+          Vier Haltungen tragen die ganze Praxis: praktische Weisheit,
+          Gerechtigkeit, Mut und Mäßigung. Gesundheit und Geld darf man
+          anstreben, sagten die Stoiker, aber sie sind Material, keine Güter.
+          Was du damit tust, ist das Gute oder der Schaden.
+        </dd>
+        <dt>Urteile erschüttern uns, nicht Ereignisse</dt>
+        <dd>
+          Was dich trifft, ist selten das Ereignis selbst. Es ist das Urteil,
+          das du daran heftest. Ändere das Urteil, und das Ereignis wird
+          bearbeitbar. Das ist das Scharnier der ganzen Schule, und der Grund,
+          warum die moderne kognitive Therapie die Stoiker zu ihren Vorfahren
+          zählt.
+        </dd>
+        <dt>Der Natur gemäß leben</dt>
+        <dd>
+          Für Stoiker heißt das: leben als das, was du bist, ein vernünftiges
+          Wesen unter Menschen. Aus Überlegung handeln statt aus Impuls, und
+          die Menschen um dich als Verwandte behandeln, nicht als Hindernisse.
+        </dd>
+        <dt>Fühlen ja, beherrscht werden nein</dt>
+        <dd>
+          Der Stoizismus hat nie verlangt, nichts mehr zu fühlen. Er verlangt,
+          die Überzeugungen im Innern der Gefühle zu prüfen. Trauer, Angst und
+          Wut auf falschen Urteilen verlieren unter der Prüfung ihre Kraft, und
+          ruhigere Gefühle, auch Freude, bekommen Platz.
+        </dd>
+      </dl>
+    </section>
+
+    <section class="esy-section">
+      <h2 class="esy-h2">Wie man Stoizismus übt</h2>
+      <p class="esy-p">
+        Der Stoizismus hat überlebt, weil er Praxis ist, nicht Theorie zum
+        Bewundern. Das sind die klassischen Übungen, jede aus den erhaltenen
+        Texten gezogen, jede klein genug für heute.
+      </p>
+      <ol class="esy-stages">
+        {PRACTICES.map(s => (
+          <li>
+            <span class="esy-stage__name">{s.name}</span>
+            <p class="esy-stage__desc">{s.desc}</p>
+          </li>
+        ))}
+      </ol>
+    </section>
+
+    <section class="esy-section">
+      <h2 class="esy-h2">Was Stoizismus nicht ist</h2>
+      <p class="esy-p">
+        Er ist kein Zähnezusammenbeißen. Das Alltagswort stoisch ist zu
+        "unterdrückt Gefühle" verrutscht, dabei lehrte die Schule beinahe das
+        Gegenteil: das Gefühl gerade ansehen und das Urteil darin befragen. Er
+        ist auch keine Passivität. Mark Aurel regierte ein Reich durch Pest und
+        Krieg, Seneca arbeitete im Zentrum der römischen Politik, Epiktet baute
+        sich ein Leben aus der Sklaverei auf. Die Praxis war das, was sie unter
+        Druck handlungsfähig hielt, kein Grund, das Handeln einzustellen.
+      </p>
+    </section>
+
+    <section class="esy-section">
+      <h2 class="esy-h2">Mark Aurel, der Stoiker zum Anhören</h2>
+      <p class="esy-p">
+        Das seltsamste Dokument des Stoizismus ist das private Notizbuch des
+        mächtigsten Mannes seiner Zeit. Nachts, im Feldlager an der Nordgrenze,
+        schrieb Mark Aurel sich dieselben Erinnerungen auf, die ein nervöser
+        Pendler brauchen könnte: Dir begegnen heute anstrengende Menschen,
+        deine Zeit ist kurz, ganz dein ist nur dein Urteil. Er schrieb kein
+        Buch. Er hielt sich selbst ehrlich.
+      </p>
+      <p class="esy-p">
+        Seine <a href="/de/figures/marcus-aurelius/">Figurenseite</a> erzählt
+        dieses Leben in Kapiteln und legt seine Kernlehren aus. Die Frage, die
+        er jedem Leser mitgibt, ist dieselbe, die sein Echo dir stellen wird:
+        Was genau hast du dir gerade erzählt, bevor du reagiert hast?
+      </p>
+    </section>
+
+    <section class="esy-section esy-faq">
+      <h2 class="esy-h2">Häufige Fragen</h2>
+      {faq.map(item => (
+        <>
+          <h3 class="esy-faq__q">{item.q}</h3>
+          <p class="esy-faq__a">{item.a}</p>
+        </>
+      ))}
+    </section>
+
+    <EssayInvite
+      lang={lang}
+      line="Auf Agora Cosmica kannst du das Leben von Mark Aurel in Kapiteln hören, die Lehren hinter dieser Seite in Ruhe durchgehen und deine eigene Lage seinem Echo vorlegen, einer KI-Stimme, die in seinen echten Texten verankert ist. Sie bleibt eine Interpretation, nie der Mensch selbst."
+      href="/app?figure=marcus-aurelius&lang=de"
+      buttonLabel="Lerne vom Echo von Mark Aurel"
+      figureId="aurelius"
+      portraitAlt="KI-generiertes Porträt von Mark Aurel"
+      moreLinks={[
+        { label: 'Mark Aurel, der Mensch', href: '/de/figures/marcus-aurelius/' },
+        { label: 'Was ist ein moralisches Leben?', href: '/de/themes/moral-life/' },
+        { label: 'Was ist der Sinn des Lebens?', href: '/de/themes/meaning-purpose/' },
+      ]}
+    />
+
+    <footer class="esy-sources">
+      <p>
+        Quellen: Die Lehren oben sind aus den erhaltenen stoischen Texten
+        zusammengefasst, vor allem aus dem Handbüchlein und den Lehrgesprächen
+        Epiktets, den Briefen und Essays Senecas und den Selbstbetrachtungen
+        Mark Aurels. Nichts auf dieser Seite ist ein wörtliches Zitat. Die
+        Schiffbruch-Geschichte über Zenon überliefert Diogenes Laertios, sie
+        wird hier als Tradition erzählt, nicht als Gewissheit.
+      </p>
+    </footer>
+  </div>
+</Public>

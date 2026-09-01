@@ -1,0 +1,281 @@
+---
+// Platons Höhlengleichnis (Politeia, Buch 7), für Schüler erklärt. Eigene
+// Nacherzählung ohne wörtliche Zitate, damit keine Übersetzung berührt wird.
+// Deutschsprachige Einzelseite ohne EN-Zwilling: hreflang zeigt selbstbezüglich
+// auf diese Seite (validate-seo verlangt den Block auf jeder Nicht-Legal-Seite,
+// und die Allowlist dort ist eine geteilte Datei, die dieser Build nicht
+// anfasst).
+
+import Public from '../../../../layouts/Public.astro';
+import Breadcrumbs from '../../../../components/Breadcrumbs.astro';
+import EssayStyles from '../../../../components/EssayStyles.astro';
+import EssayInvite from '../../../../components/EssayInvite.astro';
+import { figureImage } from '../../../../lib/figureImages';
+import { getT } from '../../../../i18n';
+import { articleSchema, breadcrumbSchema, faqSchema } from '../../../../lib/schemas';
+import { canonicalUrl, SITE_URL } from '../../../../lib/urls';
+
+const lang = 'de' as const;
+const t = getT(lang);
+const PAGE_PATH = '/de/figures/plato/hoehlengleichnis';
+const PAGE_URL = canonicalUrl(PAGE_PATH);
+
+const metaTitle = 'Platons Höhlengleichnis einfach erklärt';
+const metaDescription =
+  'Platons Höhlengleichnis aus der Politeia, Buch 7, Schritt für Schritt erklärt: das Bild, der Aufstieg, die Rückkehr und was Platon damit sagen will.';
+
+const STEPS = [
+  {
+    name: 'Das Bild',
+    desc: 'Gefangene sitzen seit ihrer Kindheit gefesselt in einer Höhle und sehen nur Schatten auf der Wand vor sich.',
+  },
+  {
+    name: 'Die Befreiung',
+    desc: 'Einer wird losgebunden, dreht sich um und sieht zum ersten Mal das Feuer und die Gegenstände, die die Schatten werfen.',
+  },
+  {
+    name: 'Der Aufstieg',
+    desc: 'Er wird den steilen Gang hinauf ans Tageslicht gebracht. Erst geblendet, lernt er nach und nach, die wirkliche Welt zu sehen, zuletzt die Sonne selbst.',
+  },
+  {
+    name: 'Die Rückkehr',
+    desc: 'Er steigt zurück in die Höhle, um die anderen zu befreien. Dort hält man ihn für verdorben, und man droht dem, der sie losmachen will.',
+  },
+];
+
+const faq = [
+  {
+    q: 'In welchem Werk steht das Höhlengleichnis?',
+    a: 'In Platons Politeia, dem Dialog über den Staat und die Gerechtigkeit, am Anfang des siebten Buchs (Stephanus-Seiten 514a bis 517a). Sokrates erzählt das Bild seinem Gesprächspartner Glaukon, direkt nach dem Sonnen- und dem Liniengleichnis.',
+  },
+  {
+    q: 'Was bedeutet die Sonne im Höhlengleichnis?',
+    a: 'Die Sonne steht für die Idee des Guten. So wie die Sonne alles sichtbar macht und wachsen lässt, macht das Gute für Platon alles Erkennbare erkennbar. Sie ist das Letzte, was der Aufsteigende sehen lernt, und das Schwerste.',
+  },
+  {
+    q: 'Warum kehrt der Befreite in die Höhle zurück?',
+    a: 'Weil Erkenntnis für Platon verpflichtet. Wer den Aufstieg geschafft hat, soll nicht oben bleiben, sondern hinuntergehen und beim Befreien helfen, auch wenn er dafür ausgelacht wird. In der Drohung gegen den Rückkehrer klingt das Schicksal von Platons Lehrer Sokrates an, der in Athen zum Tod verurteilt wurde.',
+  },
+];
+
+const ogImage = figureImage('plato', 'main', 1200);
+const schemas = [
+  articleSchema({
+    title: metaTitle,
+    description: metaDescription,
+    url: PAGE_URL,
+    lang,
+    image: ogImage,
+    datePublished: '2026-09-01',
+  }),
+  breadcrumbSchema([
+    { name: 'Start', url: `${SITE_URL}/de/` },
+    { name: t('breadcrumbs.figures'), url: `${SITE_URL}/de/figures/` },
+    { name: 'Platon', url: `${SITE_URL}/de/figures/plato/` },
+    { name: 'Höhlengleichnis', url: PAGE_URL },
+  ]),
+  faqSchema(faq, PAGE_URL),
+];
+---
+<Public
+  title={metaTitle}
+  fullTitle={metaTitle}
+  ogTitle={`${metaTitle} | Agora Cosmica`}
+  description={metaDescription}
+  canonicalPath={PAGE_PATH}
+  lang={lang}
+  ogType="article"
+  ogImage={ogImage}
+  ogImageAlt="KI-generiertes Porträt: Platon"
+  noHreflang={true}
+  stickyCta={false}
+  schemas={schemas}
+>
+  <EssayStyles />
+  <div class="pub-content esy">
+    <Breadcrumbs
+      lang={lang}
+      items={[
+        { label: t('breadcrumbs.figures'), path: '/figures' },
+        { label: 'Platon', path: '/figures/plato' },
+        { label: 'Höhlengleichnis' },
+      ]}
+    />
+
+    <header class="esy-hero">
+      <p class="esy-hero__eyebrow">Politeia, siebtes Buch</p>
+      <h1 class="esy-hero__title">Das Höhlengleichnis</h1>
+      <p class="esy-hero__lead">
+        Das berühmteste Bild der Philosophie ist ein Gedankenexperiment
+        von <a href="/de/figures/plato/">Platon</a>: Menschen, die ihr ganzes Leben
+        gefesselt in einer Höhle sitzen und Schatten für die Wirklichkeit
+        halten. Es steht am Anfang des siebten Buchs der Politeia und erzählt
+        in vier Schritten, was Erkenntnis kostet und warum sie sich lohnt. Hier
+        ist das Gleichnis so, dass du es für Unterricht, Klausur oder dich
+        selbst greifen kannst.
+      </p>
+    </header>
+
+    <section class="esy-section">
+      <h2 class="esy-h2">Die vier Schritte in Kürze</h2>
+      <ol class="esy-stages">
+        {STEPS.map(s => (
+          <li>
+            <span class="esy-stage__name">{s.name}</span>
+            <p class="esy-stage__desc">{s.desc}</p>
+          </li>
+        ))}
+      </ol>
+    </section>
+
+    <section class="esy-section">
+      <h2 class="esy-h2">Das Bild: Gefangene in einer Höhle</h2>
+      <p class="esy-p">
+        Stell dir eine unterirdische Höhle vor, sagt Sokrates zu Glaukon. Darin
+        sitzen Menschen, seit ihrer Kindheit an Beinen und Hals gefesselt. Sie
+        können den Kopf nicht drehen und sehen ihr Leben lang nur die Wand vor
+        sich. Hinter ihnen, weiter oben, brennt ein Feuer. Zwischen Feuer und
+        Gefangenen verläuft ein Weg mit einer kleinen Mauer, und hinter dieser
+        Mauer tragen Leute allerlei Gegenstände vorbei: Figuren von Menschen,
+        von Tieren, Geräte aus Holz und Stein.
+      </p>
+      <p class="esy-p">
+        Auf der Wand vor den Gefangenen erscheinen also nur die Schatten dieser
+        Gegenstände, und von den Stimmen der Träger hören sie nur das Echo. Da
+        sie nie etwas anderes gesehen haben, halten sie die Schatten für die
+        Dinge selbst. Sie entwickeln sogar einen Ehrgeiz darin: Wer die
+        Schatten am besten vorhersagen kann, gilt unter ihnen als klug. Das ist
+        keine Horrorgeschichte. Es ist, sagt Sokrates, ein Bild von uns.
+      </p>
+    </section>
+
+    <section class="esy-section">
+      <h2 class="esy-h2">Die Befreiung: einer dreht sich um</h2>
+      <p class="esy-p">
+        Nun wird einer der Gefangenen losgebunden und gezwungen, aufzustehen
+        und sich umzudrehen. Alles daran tut weh. Das Feuer blendet ihn, die
+        Gegenstände hinter der Mauer kann er kaum erkennen, und wenn man ihm
+        sagt, dass er bisher nur Nichtigkeiten gesehen hat, glaubt er es nicht.
+        Die Schatten waren doch sein ganzes Leben schärfer und vertrauter als
+        dieses grelle Zeug.
+      </p>
+      <p class="esy-p">
+        Platon versteckt in dieser Szene eine ehrliche Beobachtung über das
+        Lernen: Die erste Begegnung mit einer tieferen Erklärung fühlt sich
+        schlechter an als der alte Irrtum. Wer umdenken muss, sieht zunächst
+        weniger als vorher, nicht mehr.
+      </p>
+    </section>
+
+    <section class="esy-section">
+      <h2 class="esy-h2">Der Aufstieg ans Licht</h2>
+      <p class="esy-p">
+        Dann wird der Befreite den steilen, rauen Gang hinaufgezogen, hinaus
+        ins Sonnenlicht. Wieder ist er geblendet, diesmal völlig. Sehen lernt
+        er stufenweise: zuerst die Schatten der Dinge, dann ihre Spiegelungen
+        im Wasser, dann die Dinge selbst, dann den Nachthimmel mit Mond und
+        Sternen. Zuletzt kann er in die Sonne selbst blicken und begreift, dass
+        sie es ist, die Jahreszeiten und Jahre lenkt und alles Sichtbare
+        hervorbringt. Sogar die Schatten unten in der Höhle gab es nur wegen
+        ihr.
+      </p>
+      <p class="esy-p">
+        Jetzt erst versteht er, was er vorher gesehen hat. Und wenn er an sein
+        altes Leben denkt, an die Preise für das beste Schattenraten, will er
+        um keinen Preis zurück in diesen Wettbewerb.
+      </p>
+    </section>
+
+    <section class="esy-section">
+      <h2 class="esy-h2">Die Rückkehr in die Höhle</h2>
+      <p class="esy-p">
+        Trotzdem schickt Platon ihn zurück. Der Aufgestiegene steigt wieder
+        hinab, um die anderen zu befreien, und nun blamiert er sich: Seine
+        Augen sind an das Dunkel nicht mehr gewöhnt, im Schattenraten verliert
+        er gegen jeden. Die Gefangenen ziehen den Schluss, der Aufstieg habe
+        ihm die Augen verdorben, und wer versucht, sie loszubinden, dem drohen
+        sie mit dem Tod.
+      </p>
+      <p class="esy-p">
+        In diesem letzten Satz steckt Geschichte. Platons Lehrer Sokrates wurde
+        in Athen angeklagt und hingerichtet, unter anderem weil er die Jungen
+        mit seinen Fragen verunsichert habe. Das Höhlengleichnis ist auch
+        Platons Antwort darauf, was Athen mit seinem unbequemsten Frager
+        gemacht hat.
+      </p>
+    </section>
+
+    <section class="esy-section">
+      <h2 class="esy-h2">Was Platon damit sagen will</h2>
+      <p class="esy-p">
+        Direkt nach dem Bild löst Sokrates es auf. Die Höhle ist die Welt, wie
+        sie unseren Sinnen erscheint. Der Aufstieg ist der Weg der Erkenntnis,
+        hinauf aus bloßen Meinungen zu dem, was wirklich ist. Die Sonne steht
+        für die Idee des Guten, die höchste der Ideen: So wie die Sonne alles
+        sichtbar macht, macht das Gute alles Erkennbare erkennbar. Wie Platon
+        sich diese Ideen genau denkt, erklärt die eigene Seite
+        zur <a href="/de/figures/plato/ideenlehre/">Ideenlehre</a>.
+      </p>
+      <p class="esy-p">
+        Bildung ist für Platon deshalb keine Abfüllstation. Man gießt kein
+        Wissen in leere Köpfe, sagt er, sondern dreht den ganzen Menschen um,
+        bis er in die richtige Richtung schaut. Die Fähigkeit zu sehen ist
+        schon da. Was fehlt, ist die Umwendung. Und wer sie geschafft hat,
+        trägt Verantwortung: zurückgehen, aushalten, ausgelacht zu werden, und
+        beim Losbinden helfen.
+      </p>
+    </section>
+
+    <section class="esy-section">
+      <h2 class="esy-h2">Warum es dich heute noch angeht</h2>
+      <p class="esy-p">
+        Ersetze die Höhlenwand durch einen Bildschirm, und das Gleichnis wird
+        unangenehm aktuell. Ein Feed zeigt dir eine sortierte, zugeschnittene
+        Auswahl der Welt, und wer nur ihn kennt, hält die Auswahl für das
+        Ganze. Platon fragt nicht, ob du in einer Höhle sitzt. Er fragt, woran
+        du es merken würdest, und ob du die Kränkung aushältst, die zum
+        Herausklettern gehört: zugeben, dass ein Stück des eigenen Weltbilds
+        ein Schatten war.
+      </p>
+      <p class="esy-p">
+        Genau dafür ist das Bild seit zweieinhalb Jahrtausenden gut. Es macht
+        aus der abstrakten Frage nach Wahrheit eine Geschichte mit Muskelkater,
+        Blendung und Spott, die jeder wiedererkennt, der je etwas Liebgewonnenes
+        umlernen musste.
+      </p>
+    </section>
+
+    <section class="esy-section esy-faq">
+      <h2 class="esy-h2">Häufige Fragen</h2>
+      {faq.map(item => (
+        <>
+          <h3 class="esy-faq__q">{item.q}</h3>
+          <p class="esy-faq__a">{item.a}</p>
+        </>
+      ))}
+    </section>
+
+    <EssayInvite
+      lang={lang}
+      line="Auf Agora Cosmica kannst du Platons Leben in Kapiteln hören und das Höhlengleichnis mit seinem Echo durchsprechen, einer KI-Stimme, die in seinen echten Dialogen verankert ist. Sie bleibt eine Interpretation, nie der Mensch selbst. Frag sie, was deine Höhle ist."
+      href="/app?figure=plato&lang=de"
+      buttonLabel="Sprich mit Platons Echo"
+      figureId="plato"
+      portraitAlt="KI-generiertes Porträt von Platon"
+      moreLinks={[
+        { label: 'Platon, der Mensch', href: '/de/figures/plato/' },
+        { label: 'Die Ideenlehre erklärt', href: '/de/figures/plato/ideenlehre/' },
+        { label: 'Was ist ein moralisches Leben?', href: '/de/themes/moral-life/' },
+      ]}
+    />
+
+    <footer class="esy-sources">
+      <p>
+        Quelle: Platon, Politeia, Anfang des siebten Buchs (Stephanus-Seiten
+        514a bis 517a), im Anschluss an das Sonnen- und das Liniengleichnis im
+        sechsten Buch. Diese Seite erzählt das Gleichnis mit eigenen Worten
+        nach, ohne wörtliche Zitate aus einer bestimmten Übersetzung.
+      </p>
+    </footer>
+  </div>
+</Public>

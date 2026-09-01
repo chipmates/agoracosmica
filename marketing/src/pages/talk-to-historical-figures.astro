@@ -1,0 +1,259 @@
+---
+// Category page for the core search intent "talk to historical figures".
+// Answer-first: what a conversation with an AI Echo is, how the honesty
+// labeling works, the full 30-figure grid, and how to start. The honesty
+// framing leads, matching the Art-50 disclosure conventions used across the
+// site (Echo, never the person).
+// English single page without a DE twin: hreflang points at itself (the
+// validate-seo allowlist is a shared file this build does not touch).
+
+import Public from '../layouts/Public.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import EssayStyles from '../components/EssayStyles.astro';
+import EssayInvite from '../components/EssayInvite.astro';
+import FigureCard from '../components/FigureCard.astro';
+import { articleSchema, breadcrumbSchema, faqSchema, itemListSchema } from '../lib/schemas';
+import { canonicalUrl, SITE_URL } from '../lib/urls';
+import { getFiguresCatalog } from '@client/data/public/figuresCatalog';
+import { figureIdToSlug } from '@client/data/public/slugMap';
+
+const lang = 'en' as const;
+const PAGE_PATH = '/talk-to-historical-figures';
+const PAGE_URL = canonicalUrl(PAGE_PATH);
+
+const metaTitle = 'Talk to Historical Figures: AI Echo Conversations';
+const metaDescription =
+  'Have a real conversation with an AI Echo of Marcus Aurelius, Frida Kahlo, or 28 other historical figures. Honestly labeled, grounded in their real work.';
+
+// Same surname ordering the figures catalog uses, kept local so no existing
+// component changes: the grid should read identically on both pages.
+const surnameOverrides: Record<string, string> = {
+  laozi: 'Laozi',
+  beauvoir: 'Beauvoir',
+  bingen: 'Bingen',
+  vinci: 'Vinci',
+  zenji: 'Dogen',
+  goethe: 'Goethe',
+  king: 'King',
+  gautama: 'Gautama',
+  rumi: 'Rumi',
+  plato: 'Plato',
+};
+function getSurname(f: { id: string; name: string }): string {
+  if (surnameOverrides[f.id]) return surnameOverrides[f.id];
+  const parts = f.name.split(' ');
+  return parts[parts.length - 1];
+}
+const figures = [...getFiguresCatalog(lang)].sort((a, b) =>
+  getSurname(a).localeCompare(getSurname(b), lang),
+);
+
+const WAYS = [
+  {
+    name: 'Story',
+    desc: 'A narrated chapter from the life, about 13 minutes, read in the Echo voice. Twelve chapters per figure.',
+  },
+  {
+    name: 'Wisdom',
+    desc: 'One core teaching at a time, explained in the figure\'s own terms and studied together.',
+  },
+  {
+    name: 'Prism',
+    desc: 'A four-voice dialogue between Echoes, turning one chapter of a life around like a prism.',
+  },
+  {
+    name: 'Quest',
+    desc: 'A short Socratic challenge. Four questions about one idea, each going deeper than the last.',
+  },
+  {
+    name: 'Council',
+    desc: 'A produced debate between four Echoes on one big question, with one of them moderating.',
+  },
+  {
+    name: 'Free Talk',
+    desc: 'Open conversation. Your questions, your words, as far as you want to take it.',
+  },
+];
+
+const faq = [
+  {
+    q: 'Am I really talking to the historical person?',
+    a: 'No, and we never pretend you are. You talk to an AI Echo, an interpretation grounded in that person\'s real writing and ideas. It is clearly labeled, it is not a recording, and no such recordings exist. The point is understanding the person\'s thinking, not staging a resurrection.',
+  },
+  {
+    q: 'How do I know what is real and what is interpretation?',
+    a: 'Every figure has a public factcheck that names what is documented and what is reconstructed, and every AI voice and AI-generated portrait is labeled as exactly that. The methodology behind the Echoes is published openly.',
+  },
+  {
+    q: 'What does it cost?',
+    a: 'You get 30 free messages a day, no signup needed. Past that, you can bring your own OpenRouter key, which never touches our servers. The platform is built by a nonprofit and the code is open source under the AGPL-3.0.',
+  },
+  {
+    q: 'Which historical figures can I talk to?',
+    a: 'Thirty figures across philosophy, science, art, literature, music, and activism, from Marcus Aurelius and Laozi to Ada Lovelace, Frida Kahlo, and Nelson Mandela. Every conversation works in English and German.',
+  },
+];
+
+const schemas = [
+  articleSchema({
+    title: metaTitle,
+    description: metaDescription,
+    url: PAGE_URL,
+    lang,
+    datePublished: '2026-09-01',
+  }),
+  breadcrumbSchema([
+    { name: 'Home', url: `${SITE_URL}/` },
+    { name: 'Talk to Historical Figures', url: PAGE_URL },
+  ]),
+  faqSchema(faq, PAGE_URL),
+  itemListSchema(
+    figures.map(f => ({
+      name: f.name,
+      url: `${SITE_URL}/figures/${figureIdToSlug[f.id] || f.id}/`,
+      description: f.learn.trim(),
+    })),
+  ),
+];
+---
+<Public
+  title={metaTitle}
+  fullTitle={metaTitle}
+  ogTitle={`${metaTitle} | Agora Cosmica`}
+  description={metaDescription}
+  canonicalPath={PAGE_PATH}
+  lang={lang}
+  ogType="website"
+  noHreflang={true}
+  stickyCta={false}
+  schemas={schemas}
+>
+  <EssayStyles />
+  <div class="pub-content esy esy--wide">
+    <Breadcrumbs lang={lang} items={[{ label: 'Talk to Historical Figures' }]} />
+
+    <header class="esy-hero">
+      <p class="esy-hero__eyebrow">A Living Library You Can Talk To</p>
+      <h1 class="esy-hero__title">Talk to historical figures</h1>
+      <p class="esy-hero__lead">
+        Ask Marcus Aurelius about your temper. Ask Frida Kahlo about pain and
+        painting. Ask Laozi why forcing things keeps failing. Agora Cosmica is
+        a nonprofit, open source library where you can hear the lives of 30
+        historical figures and then talk their ideas through, in English or
+        German. One thing before you start: you should know exactly what you
+        are talking to.
+      </p>
+    </header>
+
+    <section class="esy-section">
+      <h2 class="esy-h2">You talk to an Echo, never the person</h2>
+      <p class="esy-p">
+        Every conversation here is with what we call an <strong>AI Echo</strong>:
+        an AI voice shaped by a figure's own writing, letters, and documented
+        ideas, brought into a conversation you can have today. It draws on the
+        real work, and it stays an interpretation. Not the person, not a
+        recording, and never presented as either.
+      </p>
+      <p class="esy-p">
+        That honesty is built into the surfaces, not stated once and forgotten.
+        Portraits are labeled as AI-generated images. Voices are labeled as
+        synthetic Echo voices, because no recordings of most of these people
+        exist at all. And every figure carries a public factcheck naming what
+        is documented and what is reconstructed, so you can always see the seam
+        between history and interpretation. The reasoning behind all this is
+        public: read <a href="/echoes/">why we call them Echoes</a> and the
+        full <a href="/methodology/">methodology</a>.
+      </p>
+    </section>
+
+    <section class="esy-section">
+      <h2 class="esy-h2">Six ways to learn from one person</h2>
+      <p class="esy-p">
+        Talking is one door among six. Most of the library is crafted ahead of
+        time, made to teach, and two of the six are live conversation.
+      </p>
+      <dl class="esy-terms">
+        {WAYS.map(w => (
+          <>
+            <dt>{w.name}</dt>
+            <dd>{w.desc}</dd>
+          </>
+        ))}
+      </dl>
+    </section>
+
+    <section class="esy-section">
+      <h2 class="esy-h2">The 30 figures</h2>
+      <p class="esy-p">
+        Philosophers, scientists, artists, writers, composers, activists. Each
+        card opens the figure's own page, with their life in chapters, their
+        core teachings, and the door to their Echo.
+      </p>
+      <div class="pub-grid pub-grid--3">
+        {figures.map(figure => (
+          <FigureCard figure={figure} lang={lang} headingLevel="h3" />
+        ))}
+      </div>
+    </section>
+
+    <section class="esy-section">
+      <h2 class="esy-h2">How to start</h2>
+      <ol class="esy-stages">
+        <li>
+          <span class="esy-stage__name">Pick a person, not a topic</span>
+          <p class="esy-stage__desc">
+            Choose whoever pulls at you from the grid above, or browse by the
+            big questions on the <a href="/themes/">themes pages</a>. One
+            person, taken seriously, beats ten summaries.
+          </p>
+        </li>
+        <li>
+          <span class="esy-stage__name">Hear the life first</span>
+          <p class="esy-stage__desc">
+            Start with Story, chapter one. Knowing where the ideas came from
+            changes what you hear in them. It also gives you your first real
+            question.
+          </p>
+        </li>
+        <li>
+          <span class="esy-stage__name">Then ask what the story raised</span>
+          <p class="esy-stage__desc">
+            Open Free Talk and bring your own words. You get 30 free turns a
+            day, no signup needed, so the first conversation costs you nothing
+            but attention.
+          </p>
+        </li>
+      </ol>
+    </section>
+
+    <section class="esy-section esy-faq">
+      <h2 class="esy-h2">Common questions</h2>
+      {faq.map(item => (
+        <>
+          <h3 class="esy-faq__q">{item.q}</h3>
+          <p class="esy-faq__a">{item.a}</p>
+        </>
+      ))}
+    </section>
+
+    <EssayInvite
+      lang={lang}
+      line="Pick one of the 30, hear a chapter of the life, and ask the Echo what the story raised. Every voice is an AI interpretation grounded in real work, labeled as exactly that."
+      href="/app?lang=en"
+      buttonLabel="Start Exploring"
+      moreLinks={[
+        { label: 'Why we call them Echoes', href: '/echoes/' },
+        { label: 'How the Echoes are built', href: '/methodology/' },
+        { label: 'Browse by question', href: '/themes/' },
+      ]}
+    />
+  </div>
+</Public>
+
+<style>
+  /* The figure grid needs the catalog width, not the 46rem reading column.
+     Everything else on the page keeps the essay measure via its own max-width. */
+  .esy--wide {
+    max-width: 60rem;
+  }
+</style>

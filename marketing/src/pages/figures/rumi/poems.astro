@@ -1,0 +1,270 @@
+---
+// Rumi: a small selection of Masnavi passages in an early public-domain
+// English translation, with the translator and edition named on the page.
+// The texts are E. H. Whinfield's rendering of the Masnavi, as selected and
+// printed in F. Hadland Davis, The Persian Mystics: Jalálu'd-dín Rúmí (Wisdom
+// of the East, first published 1907), Project Gutenberg ebook 45159, whose
+// preface credits the Masnavi quotations to Whinfield. Inserted verbatim by
+// script, never retyped by hand. Only the Masnavi section of that volume is
+// used, so every passage on this page shares one confident attribution. The
+// selection is deliberately small: fewer passages beat any doubtful one.
+// English single page without a DE twin: hreflang points at itself (the
+// validate-seo allowlist is a shared file this build does not touch).
+
+import Public from '../../../layouts/Public.astro';
+import Breadcrumbs from '../../../components/Breadcrumbs.astro';
+import EssayStyles from '../../../components/EssayStyles.astro';
+import EssayInvite from '../../../components/EssayInvite.astro';
+import { figureImage } from '../../../lib/figureImages';
+import { breadcrumbSchema } from '../../../lib/schemas';
+import { canonicalUrl, SITE_URL } from '../../../lib/urls';
+
+const lang = 'en' as const;
+const PAGE_PATH = '/figures/rumi/poems';
+const PAGE_URL = canonicalUrl(PAGE_PATH);
+
+const metaTitle = "Rumi's Poems in Early English Translation";
+const metaDescription =
+  "Eight short passages from Rumi's Masnavi in E. H. Whinfield's public domain translation, each with a short introduction and the edition named.";
+
+// Verbatim texts from Project Gutenberg ebook 45159 (see header). Inserted by
+// the extraction script, never retyped by hand.
+const POEMS: Record<string, { text: string }> = {
+  "sorrow": {
+    "text": "Through grief my days are as labour and sorrow,\nMy days move on, hand in hand with anguish.\nYet, though my days vanish thus, 'tis no matter,\nDo Thou abide, O Incomparable Pure One."
+  },
+  "music": {
+    "text": "Hail to thee, then, O LOVE, sweet madness!\nThou who healest all our infirmities!\nWho art the Physician of our pride and self conceit!\nWho art our Plato and our Galen!\nLove exalts our earthly bodies to heaven,\nAnd makes the very hills to dance with joy!\nO lover, 'twas Love that gave life to Mount Sinai,\nWhen \"it quaked, and Moses fell down in a swoon.\"\nDid my Beloved only touch me with His lips,\nI too, like a flute, would burst out into melody."
+  },
+  "silence": {
+    "text": "Love is the astrolabe of God's mysteries.\nA lover may hanker after this love or that love,\nBut at the last he is drawn to the KING of Love.\nHowever much we describe and explain Love,\nWhen we fall in love we are ashamed of our words.\nExplanation by the tongue makes most things clear,\nBut Love unexplained is better."
+  },
+  "rose": {
+    "text": "When the rose has faded and the garden is withered,\nThe song of the nightingale is no longer to be heard.\nThe BELOVED is all in all, the lover only veils Him;\nThe BELOVED is all that lives, the lover a dead thing.\nWhen the lover feels no longer LOVE'S quickening,\nHe becomes like a bird who has lost its wings. Alas!\nHow can I retain my senses about me,\nWhen the BELOVED shows not the Light of His countenance?"
+  },
+  "pain": {
+    "text": "Pain is a treasure, for it contains mercies;\nThe kernel is soft when the rind is scraped off.\nO brother, the place of darkness and cold\nIs the fountain of Life and the cup of ecstasy.\nSo also is endurance of pain and sickness and disease.\nFor from abasement proceeds exaltation.\nThe spring seasons are hidden in the autumns,\nAnd the autumns are charged with springs."
+  },
+  "waters": {
+    "text": "The sea itself is one thing, the foam another;\nNeglect the foam, and regard the sea with your eyes.\nWaves of foam rise from the sea night and day.\nYou look at the foam ripples and not at the mighty sea.\nWe, like boats, are tossed hither and thither,\nWe are blind though we are on the bright ocean.\nAh! you who are asleep in the boat of the body,\nYou see the water; behold the Water of waters!\nUnder the water you see there is another Water moving it.\nWithin the spirit is a Spirit that calls it.\n\nWhen you have accepted the Light, O beloved,\nWhen you behold what is veiled without a veil,\nLike a star you will walk upon the heavens."
+  },
+  "wherelove": {
+    "text": "A damsel said to her lover, \"O fond youth,\nYou have visited many cities in your travels;\nWhich of those cities seems most delightful to you?\"\nHe made answer, \"The city wherein my love dwells,\nIn whatever nook my queen alights;\nThough it be as the eye of a needle, 'tis a wide plain;\nWherever her Yusuf-like face shines as a moon,\nThough it be the bottom of a well, 'tis Paradise.\nWith thee, my love, hell itself were heaven.\nWith thee a prison would be a rose-garden.\nWith thee hell would be a mansion of delight,\nWithout thee lilies and roses would be as flames of fire!\""
+  },
+  "resignation": {
+    "text": "Whoso recognises and confesses his own defects\nIs hastening in the way that leads to Perfection!\nBut he advances not towards the Almighty\nWho fancies himself to be perfect."
+  }
+};
+
+const PASSAGES = [
+  {
+    key: 'sorrow',
+    title: 'Sorrow Quenched in the Beloved',
+    intro:
+      'Four lines of grief with one request inside them: the days can burn away, if what they burned toward remains.',
+  },
+  {
+    key: 'music',
+    title: 'The Music of Love',
+    intro:
+      'Love greeted as a sweet madness and a physician. Rumi names Plato and Galen, the two great healers of Greek learning, and says love outdoes them both.',
+  },
+  {
+    key: 'silence',
+    title: 'The Silence of Love',
+    intro:
+      'The astrolabe line is the most quoted in the book: an instrument for reading heavens you cannot touch. Then the admission every honest writer on love arrives at.',
+  },
+  {
+    key: 'rose',
+    title: 'When the Rose Has Faded',
+    intro:
+      'The lover matters here only as a veil over what he loves. Without the quickening of love, a bird that has lost its wings.',
+  },
+  {
+    key: 'pain',
+    title: 'Pain Is a Treasure',
+    intro:
+      "The hard center of Rumi's teaching on suffering: the cold, dark places are where the fountain starts, and autumns come charged with springs.",
+  },
+  {
+    key: 'waters',
+    title: 'Behold the Water of Waters',
+    intro:
+      'Sea and foam: the visible world as spray thrown up by something vaster. Asleep in the boat of the body is the image to keep.',
+  },
+  {
+    key: 'wherelove',
+    title: 'Where Love Is',
+    intro:
+      'A traveler is asked which city is the most delightful. The answer makes geography beside the point.',
+  },
+  {
+    key: 'resignation',
+    title: 'Resignation the Way to Perfection',
+    intro:
+      'Four lines on why admitting a fault is movement and feeling finished is the dead end.',
+  },
+];
+
+const rumi = {
+  '@type': 'Person',
+  '@id': `${PAGE_URL}#person`,
+  name: 'Rumi',
+  alternateName: "Jalálu'd-dín Rúmí",
+  birthDate: '1207',
+  deathDate: '1273',
+  sameAs: ['https://en.wikipedia.org/wiki/Rumi', 'https://www.wikidata.org/wiki/Q43347'],
+};
+const schemas = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: metaTitle,
+    url: PAGE_URL,
+    about: rumi,
+    inLanguage: 'en',
+    isPartOf: { '@type': 'WebSite', name: 'Agora Cosmica', url: SITE_URL },
+    mainEntity: {
+      '@type': 'ItemList',
+      itemListElement: PASSAGES.map((p, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        item: {
+          '@type': 'CreativeWork',
+          name: p.title,
+          inLanguage: 'en',
+          author: rumi,
+          translator: { '@type': 'Person', name: 'E. H. Whinfield' },
+        },
+      })),
+    },
+  },
+  breadcrumbSchema([
+    { name: 'Home', url: `${SITE_URL}/` },
+    { name: 'Figures', url: `${SITE_URL}/figures/` },
+    { name: 'Rumi', url: `${SITE_URL}/figures/rumi/` },
+    { name: 'Poems', url: PAGE_URL },
+  ]),
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What is the Masnavi?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: "Rumi's vast spiritual poem in rhymed couplets, six books composed across the last years of his life and left unfinished at his death in 1273. It teaches Sufi ideas through stories, parables, and songs, and it earned the nickname of the Persian Quran.",
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Whose translation is used on this page?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: "E. H. Whinfield's public domain rendering of the Masnavi, in the selection printed in F. Hadland Davis's The Persian Mystics: Jalálu'd-dín Rúmí, first published in 1907. Victorian English, so expect thee and thou. Modern translations differ, and the Persian original is the real thing.",
+        },
+      },
+    ],
+  },
+];
+---
+<Public
+  title={metaTitle}
+  fullTitle={metaTitle}
+  ogTitle={`${metaTitle} | Agora Cosmica`}
+  description={metaDescription}
+  canonicalPath={PAGE_PATH}
+  lang={lang}
+  ogType="article"
+  ogImage={figureImage('rumi', 'main', 1200)}
+  ogImageAlt="AI-generated portrait: Rumi"
+  noHreflang={true}
+  stickyCta={false}
+  schemas={schemas}
+>
+  <EssayStyles />
+  <div class="pub-content esy">
+    <Breadcrumbs
+      lang={lang}
+      items={[
+        { label: 'Figures', path: '/figures' },
+        { label: 'Rumi', path: '/figures/rumi' },
+        { label: 'Poems' },
+      ]}
+    />
+
+    <header class="esy-hero">
+      <p class="esy-hero__eyebrow">In early translation</p>
+      <h1 class="esy-hero__title">Rumi</h1>
+      <p class="esy-hero__lead">
+        1207-1273 · the Persian world and Konya. Jalálu'd-dín Rúmí was a
+        scholar of law who met a wandering dervish named Shams and became the
+        best known mystic poet on earth. His Masnavi runs to six books of
+        rhymed couplets and was left unfinished at his death. Here is a small
+        selection from it, in an early public domain translation, each passage
+        with a line of introduction.
+      </p>
+    </header>
+
+    <section class="esy-section">
+      <h2 class="esy-h2">About this translation</h2>
+      <p class="esy-p">
+        The passages below are <strong>E. H. Whinfield's</strong> rendering of
+        the Masnavi, in the selection printed in F. Hadland Davis, The Persian
+        Mystics: Jalálu'd-dín Rúmí (Wisdom of the East series, first published
+        1907), whose preface credits its Masnavi quotations to Whinfield. The
+        titles are that volume's, the texts are reproduced verbatim, and the
+        capitalized BELOVED is the Sufi name for God.
+      </p>
+      <p class="esy-p">
+        Fair warning: this is Victorian English, thee and thou included. It is
+        also honest, public domain, and checkable line by line, which much
+        modern Rumi on the internet is not. We kept the selection small on
+        purpose. Every passage here can be traced to the named edition, and a
+        shorter true page beats a longer doubtful one.
+      </p>
+    </section>
+
+    <section class="esy-section">
+      <h2 class="esy-h2">Eight passages from the Masnavi</h2>
+      <div class="esy-poemlist">
+        {PASSAGES.map((p, i) => (
+          <details class="esy-poem" open={i === 0}>
+            <summary class="esy-poem__summary">{p.title}</summary>
+            <p class="esy-poem__intro">{p.intro}</p>
+            <div class="esy-poem__text">{POEMS[p.key].text.split('\n\n').map(stanza => (<div class="esy-poem__stanza">{stanza.split('\n').map(line => (<span class="esy-poem__line">{line}</span>))}</div>))}</div>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <EssayInvite
+      lang={lang}
+      line="You have just read Rumi in translation. On Agora Cosmica you can hear his life told in chapters, sit with the teachings behind these lines, and talk them through with his Echo, an AI voice grounded in his real work. An interpretation, never the man himself."
+      href="/app?figure=rumi&lang=en"
+      buttonLabel="Learn from his Echo"
+      figureId="rumi"
+      portraitAlt="AI-generated portrait of Rumi"
+      moreLinks={[
+        { label: 'Rumi, the figure', href: '/figures/rumi/' },
+        { label: 'What is love, really?', href: '/themes/love-connection/' },
+        { label: "Shakespeare's sonnets", href: '/figures/william-shakespeare/sonnets/' },
+      ]}
+    />
+
+    <footer class="esy-sources">
+      <p>
+        Source: F. Hadland Davis, The Persian Mystics: Jalálu'd-dín Rúmí,
+        Wisdom of the East series, John Murray, London, first published 1907.
+        The Gutenberg text (ebook 45159) follows the 1920 printing. Its
+        preface states that the Masnavi quotations are used by permission of
+        E. H. Whinfield, from his rendering of the Masnavi in Trübner's
+        Oriental Series. All passages above come from that volume's Masnavi
+        section and are reproduced verbatim. Translator and author are long
+        out of copyright. The introductions are ours.
+      </p>
+    </footer>
+  </div>
+</Public>

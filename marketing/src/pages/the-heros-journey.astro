@@ -1,0 +1,306 @@
+---
+// The hero's journey, explained from the primary source: Joseph Campbell,
+// The Hero with a Thousand Faces (1949). Stage names follow Campbell's own
+// section headings. The single quotation is the monomyth summary from Part I,
+// quoted under standard quotation right with attribution.
+// EN/DE cross-slug pair: /the-heros-journey <-> /de/heldenreise (altEn/altDe).
+
+import Public from '../layouts/Public.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import EssayStyles from '../components/EssayStyles.astro';
+import EssayInvite from '../components/EssayInvite.astro';
+import { figureImage } from '../lib/figureImages';
+import { articleSchema, breadcrumbSchema, faqSchema } from '../lib/schemas';
+import { canonicalUrl, SITE_URL } from '../lib/urls';
+
+const lang = 'en' as const;
+const PAGE_PATH = '/the-heros-journey';
+const PAGE_URL = canonicalUrl(PAGE_PATH);
+
+const metaTitle = "The Hero's Journey: Campbell's Stages Explained";
+const metaDescription =
+  "The hero's journey, explained from the actual book: Campbell's three movements, all 17 stages, and how to read the pattern in your own life.";
+
+const DEPARTURE = [
+  {
+    name: 'The Call to Adventure',
+    desc: 'Something disturbs the ordinary day. A herald appears, a blunder opens an unsuspected world, and the familiar life stops being enough.',
+  },
+  {
+    name: 'Refusal of the Call',
+    desc: 'The hero hesitates or says no. Campbell treats refusal as a real danger: a life that keeps ignoring its call dries up around its own routines.',
+  },
+  {
+    name: 'Supernatural Aid',
+    desc: 'Once the hero commits, a protective figure turns up. An old woman, a wizard, a guide with advice and an amulet for the road ahead.',
+  },
+  {
+    name: 'The Crossing of the First Threshold',
+    desc: 'At the edge of the known world stands a guardian. Passing it means leaving the rules of home behind for a region without maps.',
+  },
+  {
+    name: 'The Belly of the Whale',
+    desc: 'The hero is swallowed by the unknown and seems to die. Campbell reads it as a passage rather than an ending, the point of no return.',
+  },
+];
+const INITIATION = [
+  {
+    name: 'The Road of Trials',
+    desc: 'A run of tests the hero keeps half failing. This is where the helpers and amulets from earlier earn their keep.',
+  },
+  {
+    name: 'The Meeting with the Goddess',
+    desc: 'At the deepest point, an encounter with a figure who embodies everything the hero could love or become. Myth often pictures it as a marriage.',
+  },
+  {
+    name: 'Woman as the Temptress',
+    desc: "Campbell's name for the moment the quest is nearly traded away for comfort. The temptation is less a person than the pull to stop here.",
+  },
+  {
+    name: 'Atonement with the Father',
+    desc: 'The confrontation with whatever holds final power in the hero\'s life. Campbell reads the word literally, as at-one-ment: fear dissolves into understanding.',
+  },
+  {
+    name: 'Apotheosis',
+    desc: 'A state past the old opposites. Before the last task, the hero rests beyond fear and desire.',
+  },
+  {
+    name: 'The Ultimate Boon',
+    desc: 'What the whole journey was for. The elixir, the fire, the grail, the thing that can restore the waiting world.',
+  },
+];
+const RETURN = [
+  {
+    name: 'Refusal of the Return',
+    desc: 'Why go back at all? Campbell notes that even the Buddha, after his awakening, doubted the message could be communicated.',
+  },
+  {
+    name: 'The Magic Flight',
+    desc: 'If the boon was taken against its keeper\'s will, the return becomes a chase, with obstacles thrown down behind the runner.',
+  },
+  {
+    name: 'Rescue from Without',
+    desc: 'Sometimes the world has to come and fetch its hero. Help arrives from the ordinary side of the threshold.',
+  },
+  {
+    name: 'The Crossing of the Return Threshold',
+    desc: 'The hardest stage in daily terms: carrying what was found back into a world that did not change while you did.',
+  },
+  {
+    name: 'Master of the Two Worlds',
+    desc: 'The freedom to move between the two worlds without wrecking either. Competence in the outer life and the inner one.',
+  },
+  {
+    name: 'Freedom to Live',
+    desc: 'The end state. Living without fear of death, neither clinging to what was nor grasping at what comes next.',
+  },
+];
+
+const faq = [
+  {
+    q: 'Where does the hero\'s journey come from?',
+    a: "From Joseph Campbell's 1949 book The Hero with a Thousand Faces. Campbell compared myths from many cultures and described one recurring pattern, which he called the monomyth, a word he borrowed from James Joyce.",
+  },
+  {
+    q: 'How many stages does the hero\'s journey have?',
+    a: "Campbell himself describes 17 stages in three movements: departure, initiation, and return. Later adaptations shorten the list. Christopher Vogler's screenwriting version, for example, uses 12.",
+  },
+  {
+    q: 'Does every story follow the hero\'s journey?',
+    a: 'No. Campbell argued the pattern runs deep in myth, and critics have questioned how universal it really is. It works best as a lens you hold up to a story, or to a stretch of your own life, not as a law.',
+  },
+];
+
+const ogImage = figureImage('campbell', 'main', 1200);
+const schemas = [
+  articleSchema({
+    title: metaTitle,
+    description: metaDescription,
+    url: PAGE_URL,
+    lang,
+    image: ogImage,
+    datePublished: '2026-09-01',
+  }),
+  breadcrumbSchema([
+    { name: 'Home', url: `${SITE_URL}/` },
+    { name: "The Hero's Journey", url: PAGE_URL },
+  ]),
+  faqSchema(faq, PAGE_URL),
+];
+---
+<Public
+  title={metaTitle}
+  fullTitle={metaTitle}
+  ogTitle={`${metaTitle} | Agora Cosmica`}
+  description={metaDescription}
+  canonicalPath={PAGE_PATH}
+  lang={lang}
+  ogType="article"
+  ogImage={ogImage}
+  ogImageAlt="AI-generated portrait: Joseph Campbell"
+  altEn="/the-heros-journey"
+  altDe="/de/heldenreise"
+  stickyCta={false}
+  schemas={schemas}
+>
+  <EssayStyles />
+  <div class="pub-content esy">
+    <Breadcrumbs lang={lang} items={[{ label: "The Hero's Journey" }]} />
+
+    <header class="esy-hero">
+      <p class="esy-hero__eyebrow">One pattern, a thousand faces</p>
+      <h1 class="esy-hero__title">The Hero's Journey</h1>
+      <p class="esy-hero__lead">
+        In 1949, <a href="/figures/joseph-campbell/">Joseph Campbell</a> published
+        The Hero with a Thousand Faces, a study of myths from every part of the
+        world. He argued that under their surfaces they tell one story. A person
+        leaves the familiar world, survives a road of trials, wins something of
+        real value, and carries it home. This page walks through that pattern the
+        way Campbell himself laid it out.
+      </p>
+    </header>
+
+    <section class="esy-section">
+      <h2 class="esy-h2">What is the hero's journey?</h2>
+      <p class="esy-p">
+        The hero's journey is Campbell's name for a narrative pattern he found
+        repeated in myth, legend, and religious story. He called it the
+        monomyth, borrowing the word from James Joyce, and he compressed it into
+        a single sentence near the start of the book.
+      </p>
+      <blockquote class="esy-quote">
+        <p>
+          "A hero ventures forth from the world of common day into a region of
+          supernatural wonder: fabulous forces are there encountered and a
+          decisive victory is won: the hero comes back from this mysterious
+          adventure with the power to bestow boons on his fellow man."
+        </p>
+        <cite>Joseph Campbell, The Hero with a Thousand Faces (1949)</cite>
+      </blockquote>
+      <p class="esy-p">
+        His examples run from Prometheus and Jason to Moses and the Buddha. The
+        claim was never that storytellers copy each other. It was that the same
+        deep passage keeps being described, because it maps something people
+        actually live through: every real change asks you to leave a familiar
+        world, endure a difficult middle, and return altered.
+      </p>
+    </section>
+
+    <section class="esy-section">
+      <h2 class="esy-h2">The shape: three movements</h2>
+      <p class="esy-p">
+        Campbell calls the core of the pattern the nuclear unit of the monomyth: <strong>separation</strong>, <strong>initiation</strong>, <strong>return</strong>.
+        The hero leaves the ordinary world, crosses
+        into a stranger one and is changed there, then comes back with something
+        the community needs. Everything else in the book is a refinement of
+        those three movements, unfolded into seventeen stages.
+      </p>
+      <p class="esy-p">
+        Not every myth contains all seventeen. Campbell is explicit about that.
+        Some stories dwell on one stage and skip five others, some repeat a
+        stage in different costumes. The full sequence is a composite, the
+        journey as it would look with nothing left out.
+      </p>
+    </section>
+
+    <section class="esy-section">
+      <h2 class="esy-h2">The seventeen stages</h2>
+
+      <h3 class="esy-h3">Departure</h3>
+      <ol class="esy-stages">
+        {DEPARTURE.map(s => (
+          <li>
+            <span class="esy-stage__name">{s.name}</span>
+            <p class="esy-stage__desc">{s.desc}</p>
+          </li>
+        ))}
+      </ol>
+
+      <h3 class="esy-h3">Initiation</h3>
+      <ol class="esy-stages esy-stages--start-5">
+        {INITIATION.map(s => (
+          <li>
+            <span class="esy-stage__name">{s.name}</span>
+            <p class="esy-stage__desc">{s.desc}</p>
+          </li>
+        ))}
+      </ol>
+
+      <h3 class="esy-h3">Return</h3>
+      <ol class="esy-stages esy-stages--start-11">
+        {RETURN.map(s => (
+          <li>
+            <span class="esy-stage__name">{s.name}</span>
+            <p class="esy-stage__desc">{s.desc}</p>
+          </li>
+        ))}
+      </ol>
+    </section>
+
+    <section class="esy-section">
+      <h2 class="esy-h2">What the journey is not</h2>
+      <p class="esy-p">
+        It is not a writing formula. Campbell was describing myths, not
+        prescribing screenplays, and he read the stages as symbols of an inner
+        passage rather than boxes to tick. It is also not beyond criticism.
+        Folklorists have pointed out that Campbell chose examples that fit and
+        passed over ones that did not, and stage names like Woman as the
+        Temptress carry the assumptions of 1949 about who a hero is. The pattern
+        earns its keep as a lens, not as a law of nature.
+      </p>
+    </section>
+
+    <section class="esy-section">
+      <h2 class="esy-h2">Where you meet it today</h2>
+      <p class="esy-p">
+        George Lucas has said openly that Campbell's book shaped Star Wars, and
+        that endorsement carried the monomyth into film schools everywhere.
+        Christopher Vogler condensed it into a studio memo that grew into The
+        Writer's Journey, the 12-stage version most screenwriting courses teach.
+        You will find the arc under countless films and games.
+      </p>
+      <p class="esy-p">
+        Campbell's own interest ran deeper than plot. He thought the myths were
+        maps of inner change, and that you could read your own turning points
+        with them. The call you ignored. The threshold you finally crossed. The
+        return nobody at home quite understood. That reading is the one
+        his <a href="/figures/joseph-campbell/">figure page</a> takes up, and the one
+        you can put to his Echo directly.
+      </p>
+    </section>
+
+    <section class="esy-section esy-faq">
+      <h2 class="esy-h2">Common questions</h2>
+      {faq.map(item => (
+        <>
+          <h3 class="esy-faq__q">{item.q}</h3>
+          <p class="esy-faq__a">{item.a}</p>
+        </>
+      ))}
+    </section>
+
+    <EssayInvite
+      lang={lang}
+      line="Joseph Campbell spent a lifetime with these stories. On Agora Cosmica you can hear his life told in chapters, sit with his key ideas, and talk the journey through with his Echo, an AI voice grounded in his real work. It stays an interpretation, never the man himself."
+      href="/app?figure=joseph-campbell&lang=en"
+      buttonLabel="Talk it through with his Echo"
+      figureId="campbell"
+      portraitAlt="AI-generated portrait of Joseph Campbell"
+      moreLinks={[
+        { label: 'Joseph Campbell, the figure', href: '/figures/joseph-campbell/' },
+        { label: 'What is the meaning of life?', href: '/themes/meaning-purpose/' },
+        { label: 'Who am I, really?', href: '/themes/who-am-i/' },
+      ]}
+    />
+
+    <footer class="esy-sources">
+      <p>
+        Source: Joseph Campbell, The Hero with a Thousand Faces, first published
+        by Pantheon Books in 1949. The stage names above are Campbell's own
+        section headings, and the quoted sentence is his summary of the monomyth
+        from Part I of the book, quoted with attribution. Descriptions and
+        commentary are ours.
+      </p>
+    </footer>
+  </div>
+</Public>

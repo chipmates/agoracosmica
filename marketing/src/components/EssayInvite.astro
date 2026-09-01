@@ -1,0 +1,121 @@
+---
+// Closing app door for the explainer and poetry pages. Same promise shape as
+// the Dickinson poems invite: one honest line about the Echo, one gold button,
+// the trust and free-tier reassure lines, then quiet follow-on links. The
+// conversion fire lives in PublicScript's data-agc-cta delegation, exactly as
+// on every other marketing surface.
+
+import StaticImage from './StaticImage.astro';
+import type { Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+  /** The honest one-paragraph bridge into the app. Names the Echo, never the person. */
+  line: string;
+  href: string;
+  buttonLabel: string;
+  /** Figure id for conversion metadata + the small portrait. Omit for generic doors. */
+  figureId?: string;
+  /** Accessible name for the portrait; required when figureId is set. */
+  portraitAlt?: string;
+  /** Quiet follow-on links rendered under the reassure lines. */
+  moreLinks?: { label: string; href: string }[];
+}
+
+const { lang, line, href, buttonLabel, figureId, portraitAlt, moreLinks = [] } = Astro.props;
+
+const eyebrow =
+  lang === 'de' ? 'Eine lebendige Bibliothek, mit der du sprechen kannst' : 'A Living Library You Can Talk To';
+const trust =
+  lang === 'de'
+    ? 'Non-Profit · Open Source · Keine Tracking-Cookies, kein Profiling'
+    : 'Nonprofit · Open Source · No tracking cookies, no profiling';
+const freeNote =
+  lang === 'de'
+    ? '30 kostenlose Nachrichten pro Tag. Ohne Anmeldung.'
+    : '30 free messages a day. No signup needed.';
+---
+<aside class="esy-invite">
+  {figureId && (
+    <div class="esy-invite__portrait">
+      <StaticImage figureId={figureId} type="thumbnail" alt={portraitAlt ?? ''} loading="lazy" width={96} height={96} />
+    </div>
+  )}
+  <p class="esy-invite__eyebrow">{eyebrow}</p>
+  <p class="esy-invite__line">{line}</p>
+  <a class="esy-invite__button pub-cta__button" href={href} data-agc-cta="start-exploring" data-agc-figure={figureId}>
+    {buttonLabel}
+  </a>
+  <p class="esy-invite__reassure">{trust}</p>
+  <p class="esy-invite__reassure">{freeNote}</p>
+  {moreLinks.length > 0 && (
+    <p class="esy-invite__more">
+      {moreLinks.map((l, i) => (
+        <>
+          {i > 0 && <span class="esy-invite__sep" aria-hidden="true">·</span>}
+          <a class="pub-textlink" href={l.href}>{l.label}</a>
+        </>
+      ))}
+    </p>
+  )}
+</aside>
+
+<style is:global>
+  .esy-invite {
+    margin: 1.5rem auto 2.75rem;
+    max-width: 36rem;
+    text-align: center;
+    padding: 2.25rem 1.5rem;
+    border-top: 1px solid color-mix(in srgb, var(--gold-subtle) 22%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, var(--gold-subtle) 22%, transparent);
+  }
+  .esy-invite__portrait {
+    width: 72px;
+    margin: 0 auto 1.1rem;
+  }
+  .esy-invite__portrait img {
+    display: block;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid color-mix(in srgb, var(--gold-subtle) 40%, transparent);
+  }
+  .esy-invite__eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: var(--text-xs);
+    color: var(--gold-primary);
+    margin: 0 0 0.9rem;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  }
+  .esy-invite__line {
+    font-size: var(--text-md);
+    line-height: var(--leading-loose);
+    color: var(--text-primary);
+    margin: 0 auto 1.6rem;
+    max-width: 32rem;
+  }
+  .esy-invite__button {
+    display: inline-block;
+  }
+  .esy-invite__reassure {
+    color: var(--text-secondary);
+    font-size: var(--text-xs);
+    line-height: 1.5;
+    margin: 0.85rem 0 0;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  }
+  .esy-invite__reassure + .esy-invite__reassure {
+    margin-top: 0.15rem;
+  }
+  .esy-invite__more {
+    margin: 1.4rem 0 0;
+    font-size: var(--text-sm);
+    line-height: 2;
+  }
+  .esy-invite__sep {
+    color: var(--text-tertiary);
+    margin: 0 0.55rem;
+  }
+</style>

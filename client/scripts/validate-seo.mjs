@@ -22,7 +22,9 @@ const TITLE_OVER60_OK = new Set(['de/figures/index.html']);
 // the sitemap generator's deliberate omission. The 404 page is excluded too:
 // hreflang annotations belong on indexable 200-status pages only, and CF Pages
 // serves 404.html with HTTP 404.
-const NO_HREFLANG = new Set(['privacy', 'impressum', 'datenschutz', 'cookie-policy', 'nutzungsbedingungen', '404', 'figures/emily-dickinson/poems']);
+const NO_HREFLANG = new Set(['privacy', 'impressum', 'datenschutz', 'cookie-policy', 'nutzungsbedingungen', '404', 'figures/emily-dickinson/poems',
+  'figures/william-blake/poems', 'figures/william-shakespeare/sonnets', 'figures/rumi/poems',
+  'talk-to-historical-figures', 'de/figures/plato/hoehlengleichnis', 'de/figures/plato/ideenlehre']);
 
 function walk(dir) {
   const out = [];

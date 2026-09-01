@@ -74,7 +74,9 @@ const slash = (p) => (p === '/' ? '/' : p.endsWith('/') ? p : `${p}/`);
 // privacy policy is the lone English page (its DE counterpart is /datenschutz,
 // reached via a 301, so they share no hreflang signal by design). The terms
 // pages (/nutzungsbedingungen + /terms) are a cross-slug hreflang pair below.
-const NO_HREFLANG_PATHS = new Set(['/impressum', '/datenschutz', '/cookie-policy', '/privacy', '/figures/emily-dickinson/poems']);
+const NO_HREFLANG_PATHS = new Set(['/impressum', '/datenschutz', '/cookie-policy', '/privacy', '/figures/emily-dickinson/poems',
+  '/figures/william-blake/poems', '/figures/william-shakespeare/sonnets', '/figures/rumi/poems',
+  '/talk-to-historical-figures', '/de/figures/plato/hoehlengleichnis', '/de/figures/plato/ideenlehre']);
 
 function url(rawPath, priority, lastmod, changefreq = 'monthly') {
   const isLegalDe = NO_HREFLANG_PATHS.has(rawPath);
@@ -202,6 +204,16 @@ for (const slug of FIGURE_SLUGS) {
 // Emily Dickinson poems page (corpus/flagship; EN-only, no hreflang twin)
 urls.push(url('/figures/emily-dickinson/poems', '0.6', gitLastModified('marketing/src/pages/figures/emily-dickinson/poems.astro')));
 
+// Poem and sonnet source pages on the Dickinson pattern (single-language,
+// no hreflang twin) plus the EN-only category page and the DE-only Plato
+// school pages.
+urls.push(url('/figures/william-blake/poems', '0.6', gitLastModified('marketing/src/pages/figures/william-blake/poems.astro')));
+urls.push(url('/figures/william-shakespeare/sonnets', '0.6', gitLastModified('marketing/src/pages/figures/william-shakespeare/sonnets.astro')));
+urls.push(url('/figures/rumi/poems', '0.6', gitLastModified('marketing/src/pages/figures/rumi/poems.astro')));
+urls.push(url('/talk-to-historical-figures', '0.7', gitLastModified('marketing/src/pages/talk-to-historical-figures.astro')));
+urls.push(url('/de/figures/plato/hoehlengleichnis', '0.6', gitLastModified('marketing/src/pages/de/figures/plato/hoehlengleichnis.astro')));
+urls.push(url('/de/figures/plato/ideenlehre', '0.6', gitLastModified('marketing/src/pages/de/figures/plato/ideenlehre.astro')));
+
 // Open-source philosophy app (product-category positioning; EN + DE twin)
 const CATEGORY_MOD = gitLastModified(
   'marketing/src/pages/open-source-philosophy-app.astro',
@@ -235,6 +247,18 @@ const PHILO_HUB_MOD = gitLastModified(
   'marketing/src/components/PhilosophyHubContent.astro',
 );
 urls.push(...crossPair('/ai-philosophy-tutor', '/de/philosophie-lernen', '0.8', PHILO_HUB_MOD, 'weekly'));
+
+// Topic explainer pages (cross-slug EN/DE twins like the hubs above)
+const HEROS_JOURNEY_MOD = gitLastModified(
+  'marketing/src/pages/the-heros-journey.astro',
+  'marketing/src/pages/de/heldenreise.astro',
+);
+urls.push(...crossPair('/the-heros-journey', '/de/heldenreise', '0.7', HEROS_JOURNEY_MOD));
+const STOICISM_MOD = gitLastModified(
+  'marketing/src/pages/stoicism.astro',
+  'marketing/src/pages/de/stoizismus.astro',
+);
+urls.push(...crossPair('/stoicism', '/de/stoizismus', '0.7', STOICISM_MOD));
 
 // Methodology / editorial-standards page (trust + E-E-A-T). Cross-slug EN/DE
 // twin (/methodology vs /de/methodik), so crossPair() like the hubs.

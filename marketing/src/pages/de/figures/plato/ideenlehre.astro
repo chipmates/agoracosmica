@@ -1,0 +1,270 @@
+---
+// Platons Ideenlehre, für Schüler erklärt. Eigene Darstellung ohne wörtliche
+// Zitate, damit keine Übersetzung berührt wird. Deutschsprachige Einzelseite
+// ohne EN-Zwilling: hreflang zeigt selbstbezüglich auf diese Seite (siehe
+// Anmerkung in hoehlengleichnis.astro).
+
+import Public from '../../../../layouts/Public.astro';
+import Breadcrumbs from '../../../../components/Breadcrumbs.astro';
+import EssayStyles from '../../../../components/EssayStyles.astro';
+import EssayInvite from '../../../../components/EssayInvite.astro';
+import { figureImage } from '../../../../lib/figureImages';
+import { getT } from '../../../../i18n';
+import { articleSchema, breadcrumbSchema, faqSchema } from '../../../../lib/schemas';
+import { canonicalUrl, SITE_URL } from '../../../../lib/urls';
+
+const lang = 'de' as const;
+const t = getT(lang);
+const PAGE_PATH = '/de/figures/plato/ideenlehre';
+const PAGE_URL = canonicalUrl(PAGE_PATH);
+
+const metaTitle = 'Platons Ideenlehre einfach erklärt';
+const metaDescription =
+  'Platons Ideenlehre für Schüler erklärt: die zwei Welten, das Beispiel vom Kreis, die Teilhabe, die Idee des Guten und die bekanntesten Einwände.';
+
+const faq = [
+  {
+    q: 'Was ist eine Idee bei Platon?',
+    a: 'Nicht ein Einfall in einem Kopf, sondern ein vollkommenes, unveränderliches Urbild, das unabhängig von uns besteht. Die vielen schönen Dinge kommen und gehen, das Schöne selbst bleibt. Erkennbar sind Ideen nicht mit den Augen, sondern mit dem Denken.',
+  },
+  {
+    q: 'Steht die Ideenlehre in einem bestimmten Buch?',
+    a: 'Nein. Platon hat sie nie als System aufgeschrieben. Sie wird in mehreren Dialogen entwickelt, vor allem in Phaidon, Politeia, Symposion und Phaidros. Das Wort Ideenlehre ist ein Etikett späterer Leser.',
+  },
+  {
+    q: 'Was hat das Höhlengleichnis mit der Ideenlehre zu tun?',
+    a: 'Es ist ihr berühmtestes Bild. Die Schatten in der Höhle stehen für die Sinnenwelt, der Aufstieg ans Licht für den Weg zu den Ideen, die Sonne für die Idee des Guten. Wer das Gleichnis verstanden hat, hat die Grundfigur der Ideenlehre vor Augen.',
+  },
+];
+
+const ogImage = figureImage('plato', 'main', 1200);
+const schemas = [
+  articleSchema({
+    title: metaTitle,
+    description: metaDescription,
+    url: PAGE_URL,
+    lang,
+    image: ogImage,
+    datePublished: '2026-09-01',
+  }),
+  breadcrumbSchema([
+    { name: 'Start', url: `${SITE_URL}/de/` },
+    { name: t('breadcrumbs.figures'), url: `${SITE_URL}/de/figures/` },
+    { name: 'Platon', url: `${SITE_URL}/de/figures/plato/` },
+    { name: 'Ideenlehre', url: PAGE_URL },
+  ]),
+  faqSchema(faq, PAGE_URL),
+];
+---
+<Public
+  title={metaTitle}
+  fullTitle={metaTitle}
+  ogTitle={`${metaTitle} | Agora Cosmica`}
+  description={metaDescription}
+  canonicalPath={PAGE_PATH}
+  lang={lang}
+  ogType="article"
+  ogImage={ogImage}
+  ogImageAlt="KI-generiertes Porträt: Platon"
+  noHreflang={true}
+  stickyCta={false}
+  schemas={schemas}
+>
+  <EssayStyles />
+  <div class="pub-content esy">
+    <Breadcrumbs
+      lang={lang}
+      items={[
+        { label: t('breadcrumbs.figures'), path: '/figures' },
+        { label: 'Platon', path: '/figures/plato' },
+        { label: 'Ideenlehre' },
+      ]}
+    />
+
+    <header class="esy-hero">
+      <p class="esy-hero__eyebrow">Urbilder und Abbilder</p>
+      <h1 class="esy-hero__title">Die Ideenlehre</h1>
+      <p class="esy-hero__lead">
+        Warum nennst du ganz verschiedene Dinge, einen Menschen, eine Tat, ein
+        Bild, mit demselben Wort schön? <a href="/de/figures/plato/">Platon</a> antwortet
+        mit dem kühnsten Gedanken der antiken Philosophie: Hinter den
+        vielen schönen Dingen steht ein einziges Urbild, das Schöne selbst. Es
+        verändert sich nicht, es vergeht nicht, und nur das Denken kann es
+        erreichen. Diese Seite erklärt die Ideenlehre so, dass du sie für
+        Unterricht, Klausur oder eigene Fragen greifen kannst.
+      </p>
+    </header>
+
+    <section class="esy-section">
+      <h2 class="esy-h2">Die Grundidee: zwei Ebenen der Wirklichkeit</h2>
+      <p class="esy-p">
+        Platon unterscheidet zwei Ebenen. Die eine ist die Welt, die du siehst,
+        hörst und anfasst. In ihr wird alles und bleibt nichts: Menschen
+        altern, Blumen verblühen, Staaten steigen auf und zerfallen. Über sie
+        gibt es deshalb, streng genommen, keine sichere Erkenntnis, nur
+        Meinungen, die morgen veralten können.
+      </p>
+      <p class="esy-p">
+        Die andere Ebene ist die Welt der Ideen. Eine Idee ist bei Platon kein
+        Einfall, den jemand hat, sondern ein vollkommenes Muster, das
+        unabhängig von allen Köpfen besteht: das Schöne selbst, das Gerechte
+        selbst, das Gleiche selbst. Ideen entstehen nicht und vergehen nicht.
+        Genau deshalb, sagt Platon, sind sie das Einzige, worüber es echtes
+        Wissen geben kann. Die Sinne erreichen sie nie, das Denken kann es.
+      </p>
+    </section>
+
+    <section class="esy-section">
+      <h2 class="esy-h2">Ein Beispiel: der Kreis</h2>
+      <p class="esy-p">
+        Zeichne einen Kreis. Egal wie sorgfältig du bist, unter der Lupe ist
+        die Linie krumm, zu dick, irgendwo offen. Einen vollkommenen Kreis hat
+        noch nie jemand gesehen. Und trotzdem rechnet die Geometrie seit
+        Jahrtausenden mit ihm, beweist Sätze über ihn und irrt sich nicht. Was
+        die Geometrie meint, ist offenbar nicht die Kreidespur an der Tafel,
+        sondern der Kreis selbst.
+      </p>
+      <p class="esy-p">
+        Genau so, sagt Platon, verhält es sich mit dem Schönen, dem Gerechten,
+        dem Guten. Jede schöne Sache ist eine etwas wacklige Zeichnung. Das
+        Urbild, an dem du sie misst, ohne es je gesehen zu haben, ist die Idee.
+      </p>
+    </section>
+
+    <section class="esy-section">
+      <h2 class="esy-h2">Teilhabe: wie die zwei Ebenen zusammenhängen</h2>
+      <p class="esy-p">
+        Wie kommt das Urbild in die Dinge? Platons Wort dafür ist Teilhabe, auf
+        Griechisch Methexis. Ein Ding ist schön, weil und solange es am
+        Schönen selbst teilhat, so wie eine Zeichnung ein Kreis ist, weil und
+        soweit sie dem Kreis selbst nahekommt. Die Dinge sind Abbilder, die
+        Ideen ihre Urbilder.
+      </p>
+      <p class="esy-p">
+        Das erklärt auch, warum ein Ding aufhören kann, schön zu sein, ohne
+        dass das Schöne selbst dabei Schaden nimmt. Das Abbild verliert seinen
+        Anteil, das Urbild bleibt, was es ist. Wie genau diese Teilhabe
+        funktioniert, hat Platon selbst als offene und schwierige Frage
+        behandelt. Dazu unten mehr.
+      </p>
+    </section>
+
+    <section class="esy-section">
+      <h2 class="esy-h2">Die Idee des Guten</h2>
+      <p class="esy-p">
+        Die Ideen bilden für Platon eine Ordnung, und an ihrer Spitze steht die
+        Idee des Guten. In der Politeia vergleicht er sie mit der Sonne: So wie
+        die Sonne den Dingen Sichtbarkeit gibt und dem Auge das Sehen, gibt das
+        Gute den Ideen ihre Erkennbarkeit und dem Denken seine Kraft. Wer
+        wissen will, was etwas wirklich ist, muss am Ende verstehen, wozu es
+        gut ist.
+      </p>
+      <p class="esy-p">
+        Anschaulich wird dieser Aufstieg im berühmtesten Bild der Philosophie,
+        dem <a href="/de/figures/plato/hoehlengleichnis/">Höhlengleichnis</a>:
+        Der Weg aus der Höhle ans Licht ist der Weg von den Abbildern zu den
+        Ideen, und die Sonne, in die der Befreite zuletzt blickt, ist das Gute.
+      </p>
+    </section>
+
+    <section class="esy-section">
+      <h2 class="esy-h2">Woher kennen wir die Ideen?</h2>
+      <p class="esy-p">
+        Wenn kein Auge je das Gleiche selbst gesehen hat, woher weißt du dann,
+        was gleich bedeutet? Platons Antwort ist die Wiedererinnerung, auf
+        Griechisch Anamnesis: Die Seele hat die Ideen vor der Geburt geschaut,
+        und Lernen heißt, Verschüttetes wiederzufinden. Im Dialog Menon führt
+        Sokrates das vor. Er stellt einem Sklaven, der nie Geometrie gelernt
+        hat, nur Fragen, und Schritt für Schritt findet der Junge selbst
+        heraus, wie man die Fläche eines Quadrats verdoppelt.
+      </p>
+      <p class="esy-p">
+        Ob man die Vorgeburtsgeschichte wörtlich nimmt oder als Bild: Der Kern
+        ist prüfbar. Mathematische Einsicht steckt nicht in den Sinnen, sie
+        wird im Denken geweckt. Genau diese Erfahrung, dass dir beim Verstehen
+        etwas aufgeht, statt dass es hineingeschüttet wird, nimmt Platon ernst.
+      </p>
+    </section>
+
+    <section class="esy-section">
+      <h2 class="esy-h2">Wo Platon davon erzählt</h2>
+      <ul class="esy-list">
+        <li>
+          Im <strong>Phaidon</strong> tragen die Ideen die Argumente über die
+          Unsterblichkeit der Seele, erzählt am Tag von Sokrates' Hinrichtung.
+        </li>
+        <li>
+          In der <strong>Politeia</strong> stehen Sonnen-, Linien- und
+          Höhlengleichnis, die die Ideen und das Gute ins Bild setzen.
+        </li>
+        <li>
+          Im <strong>Symposion</strong> beschreibt die Seherin Diotima einen
+          Aufstieg der Liebe, von einem schönen Menschen über schöne Seelen und
+          Einsichten bis zum Schönen selbst.
+        </li>
+        <li>
+          Im <strong>Phaidros</strong> schaut die Seele im Bild des
+          geflügelten Gespanns die Ideen, bevor sie zur Welt kommt.
+        </li>
+      </ul>
+      <p class="esy-p">
+        Ein Lehrbuch mit dem Titel Ideenlehre hat Platon nie geschrieben. Er
+        hat die Gedanken in Gesprächen entwickelt, mit Anläufen, Bildern und
+        offenen Enden. Das Etikett stammt von späteren Lesern.
+      </p>
+    </section>
+
+    <section class="esy-section">
+      <h2 class="esy-h2">Die bekanntesten Einwände</h2>
+      <p class="esy-p">
+        Der schärfste frühe Kritiker der Ideenlehre ist Platon selbst. Im
+        Dialog Parmenides lässt er einen jungen Sokrates die Ideen verteidigen
+        und in ernste Schwierigkeiten geraten: Wovon genau gibt es Ideen? Wie
+        kann ein Urbild ganz in vielen Dingen zugleich sein? Und droht kein
+        Ende, wenn man für die Ähnlichkeit zwischen Ding und Idee wieder eine
+        Idee braucht, und für diese wieder eine? Diesen Regress hat später
+        Aristoteles unter dem Stichwort vom dritten Menschen berühmt gemacht.
+      </p>
+      <p class="esy-p">
+        Aristoteles, zwanzig Jahre Schüler an Platons Akademie, fügte seinen
+        eigenen Einwand hinzu: Die Ideen verdoppelten die Welt, statt sie zu
+        erklären, und hälfen nicht zu verstehen, wie Dinge entstehen und sich
+        verändern. Dass die Schule ihre Gründungslehre selbst so hart geprüft
+        hat, ist keine Schwäche der Philosophie. Es ist ihre Arbeitsweise.
+      </p>
+    </section>
+
+    <section class="esy-section esy-faq">
+      <h2 class="esy-h2">Häufige Fragen</h2>
+      {faq.map(item => (
+        <>
+          <h3 class="esy-faq__q">{item.q}</h3>
+          <p class="esy-faq__a">{item.a}</p>
+        </>
+      ))}
+    </section>
+
+    <EssayInvite
+      lang={lang}
+      line="Auf Agora Cosmica kannst du Platons Leben in Kapiteln hören und die Ideenlehre mit seinem Echo durchsprechen, einer KI-Stimme, die in seinen echten Dialogen verankert ist. Sie bleibt eine Interpretation, nie der Mensch selbst. Bring ihr deinen härtesten Einwand mit."
+      href="/app?figure=plato&lang=de"
+      buttonLabel="Sprich mit Platons Echo"
+      figureId="plato"
+      portraitAlt="KI-generiertes Porträt von Platon"
+      moreLinks={[
+        { label: 'Platon, der Mensch', href: '/de/figures/plato/' },
+        { label: 'Das Höhlengleichnis erklärt', href: '/de/figures/plato/hoehlengleichnis/' },
+        { label: 'Was ist ein moralisches Leben?', href: '/de/themes/moral-life/' },
+      ]}
+    />
+
+    <footer class="esy-sources">
+      <p>
+        Quellen: Platons Dialoge Phaidon, Politeia (Bücher 6 und 7), Symposion,
+        Phaidros, Menon und Parmenides, dazu die Kritik des Aristoteles in der
+        Metaphysik. Diese Seite gibt die Gedanken mit eigenen Worten wieder,
+        ohne wörtliche Zitate aus einer bestimmten Übersetzung.
+      </p>
+    </footer>
+  </div>
+</Public>

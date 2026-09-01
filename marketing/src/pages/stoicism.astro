@@ -1,0 +1,264 @@
+---
+// Stoicism explainer: what the school teaches and how people practice it,
+// bridging to the Marcus Aurelius figure page. Everything is summarized from
+// the surviving primary texts (Epictetus, Seneca, Marcus Aurelius) with no
+// verbatim quotations, so no translation copyright is touched.
+// EN/DE cross-slug pair: /stoicism <-> /de/stoizismus (altEn/altDe).
+
+import Public from '../layouts/Public.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import EssayStyles from '../components/EssayStyles.astro';
+import EssayInvite from '../components/EssayInvite.astro';
+import { figureImage } from '../lib/figureImages';
+import { articleSchema, breadcrumbSchema, faqSchema } from '../lib/schemas';
+import { canonicalUrl, SITE_URL } from '../lib/urls';
+
+const lang = 'en' as const;
+const PAGE_PATH = '/stoicism';
+const PAGE_URL = canonicalUrl(PAGE_PATH);
+
+const metaTitle = 'What Is Stoicism? The Teachings and the Practice';
+const metaDescription =
+  'What Stoicism teaches and how people practice it: the dichotomy of control, the four virtues, the daily exercises, and where Marcus Aurelius fits in.';
+
+const PRACTICES = [
+  {
+    name: 'Preview the day',
+    desc: 'Marcus Aurelius opens one of his notebooks by reminding himself, in the morning, that he will meet difficult people before nightfall, and that they act from ignorance, not malice. Rehearsing the day removes its power to ambush you.',
+  },
+  {
+    name: 'Pause before you assent',
+    desc: 'An impression arrives: an insult, a fear, a craving. Stoics train a gap between the impression and the response, long enough to ask whether the judgment inside it is actually true.',
+  },
+  {
+    name: 'Review the evening',
+    desc: 'Seneca describes examining his whole day before sleep: what he did badly, what he did well, what he left undone. No punishment, just an honest ledger, then rest.',
+  },
+  {
+    name: 'Write to yourself',
+    desc: 'The Meditations are not a book Marcus wrote for us. They are notes to himself, the same few truths worked over until they held. A private page does the same work today.',
+  },
+  {
+    name: 'Rehearse loss gently',
+    desc: 'Seneca advised imagining, in advance and in small doses, the losses you fear. Not to darken the day, but so that nothing you love is held carelessly and nothing that leaves takes you wholly by surprise.',
+  },
+  {
+    name: 'Take the view from above',
+    desc: 'Marcus pictures human affairs from far overhead: armies, feasts, lawsuits, all of it tiny and brief. The exercise shrinks the noise until what matters is visible again.',
+  },
+  {
+    name: 'Practice small discomforts',
+    desc: 'Seneca recommended setting aside a few days of plain food and rough clothes while asking yourself whether this was ever worth fearing. Comfort returns afterward, and fear comes back smaller.',
+  },
+];
+
+const faq = [
+  {
+    q: 'Is Stoicism a religion?',
+    a: 'No. It is a school of philosophy. The old Stoics spoke of a rational order running through nature, but the practice itself asks for no particular belief, and people of many faiths and none use it today.',
+  },
+  {
+    q: 'What should I read first?',
+    a: "The Enchiridion of Epictetus is a short handbook and the classic starting point. The Meditations of Marcus Aurelius show the practice from inside a working life. Seneca's letters are the warmest way in. All three survive in public domain translations.",
+  },
+  {
+    q: 'Is Stoicism about hiding your feelings?',
+    a: 'No. The lowercase word stoic has drifted to mean unemotional, but the school never taught suppression. It taught examining the judgments underneath emotions, so that fear and anger lose their grip and steadier feelings get room.',
+  },
+];
+
+const ogImage = figureImage('aurelius', 'main', 1200);
+const schemas = [
+  articleSchema({
+    title: metaTitle,
+    description: metaDescription,
+    url: PAGE_URL,
+    lang,
+    image: ogImage,
+    datePublished: '2026-09-01',
+  }),
+  breadcrumbSchema([
+    { name: 'Home', url: `${SITE_URL}/` },
+    { name: 'Stoicism', url: PAGE_URL },
+  ]),
+  faqSchema(faq, PAGE_URL),
+];
+---
+<Public
+  title={metaTitle}
+  fullTitle={metaTitle}
+  ogTitle={`${metaTitle} | Agora Cosmica`}
+  description={metaDescription}
+  canonicalPath={PAGE_PATH}
+  lang={lang}
+  ogType="article"
+  ogImage={ogImage}
+  ogImageAlt="AI-generated portrait: Marcus Aurelius"
+  altEn="/stoicism"
+  altDe="/de/stoizismus"
+  stickyCta={false}
+  schemas={schemas}
+>
+  <EssayStyles />
+  <div class="pub-content esy">
+    <Breadcrumbs lang={lang} items={[{ label: 'Stoicism' }]} />
+
+    <header class="esy-hero">
+      <p class="esy-hero__eyebrow">A practice, not a pose</p>
+      <h1 class="esy-hero__title">What Is Stoicism?</h1>
+      <p class="esy-hero__lead">
+        Stoicism is a school of philosophy from ancient Greece and Rome that
+        teaches a simple, demanding idea: you do not control most of what
+        happens, but you always control what you make of it. Your judgments,
+        your aims, your responses. Everything else, from your reputation to
+        your health, can be worked on but never owned. Around that idea the
+        Stoics built a set of daily practices that people still use, unchanged,
+        two thousand years later.
+      </p>
+    </header>
+
+    <section class="esy-section">
+      <h2 class="esy-h2">Where Stoicism comes from</h2>
+      <p class="esy-p">
+        Around 300 BCE a merchant named Zeno of Citium began teaching in
+        Athens. The story handed down says he was shipwrecked, lost everything,
+        wandered into a bookshop, and met philosophy there. He taught at the
+        Stoa Poikile, the painted porch on the market square, and his students
+        were called the people of the porch. That is all the name means.
+      </p>
+      <p class="esy-p">
+        The school ran for centuries. Zeno, Cleanthes, and Chrysippus built its
+        system in Greece, but almost all their books are lost. What survives
+        comes from three Romans. Seneca, a statesman, left essays and letters.
+        Epictetus, who had been enslaved and later taught philosophy as a freed
+        man, left lectures his student Arrian wrote down, along with a short
+        handbook. And <a href="/figures/marcus-aurelius/">Marcus Aurelius</a>,
+        the emperor, left a private notebook never meant for anyone else. We
+        call it the Meditations. He called it something closer to "to himself".
+      </p>
+    </section>
+
+    <section class="esy-section">
+      <h2 class="esy-h2">What Stoicism teaches</h2>
+      <dl class="esy-terms">
+        <dt>The dichotomy of control</dt>
+        <dd>
+          Epictetus opens his handbook with it: some things are up to us, most
+          things are not. Up to us are judgment, intention, desire, response.
+          Not up to us are our bodies, our property, our reputations, other
+          people. Misery, he taught, comes from confusing the two lists.
+        </dd>
+        <dt>Virtue is the only true good</dt>
+        <dd>
+          Four qualities carry the whole practice: practical wisdom, justice,
+          courage, and moderation. Health and money are worth pursuing, the
+          Stoics said, but they are materials, not goods. What you do with them
+          is the good or the harm.
+        </dd>
+        <dt>Judgments disturb us, not events</dt>
+        <dd>
+          The thing that shakes you is rarely the event itself. It is the
+          verdict you attach to it. Change the verdict and the event becomes
+          workable. This is the hinge of the whole school, and the reason
+          modern cognitive therapy names the Stoics among its ancestors.
+        </dd>
+        <dt>Live according to nature</dt>
+        <dd>
+          For a Stoic this means living as what you are: a reasoning being
+          among other people. Act on reason rather than impulse, and treat the
+          people around you as kin rather than obstacles.
+        </dd>
+        <dt>Feel, but do not be ruled</dt>
+        <dd>
+          Stoicism never asked anyone to stop feeling. It asked them to examine
+          the beliefs inside their feelings. Grief, fear, and anger built on
+          false verdicts lose their force under examination, and steadier
+          feelings, including joy, get room to grow.
+        </dd>
+      </dl>
+    </section>
+
+    <section class="esy-section">
+      <h2 class="esy-h2">How people practice Stoicism</h2>
+      <p class="esy-p">
+        Stoicism survived because it is a practice, not a theory to admire.
+        These are the classic exercises, each one drawn from the surviving
+        texts, each one small enough to try today.
+      </p>
+      <ol class="esy-stages">
+        {PRACTICES.map(s => (
+          <li>
+            <span class="esy-stage__name">{s.name}</span>
+            <p class="esy-stage__desc">{s.desc}</p>
+          </li>
+        ))}
+      </ol>
+    </section>
+
+    <section class="esy-section">
+      <h2 class="esy-h2">What Stoicism is not</h2>
+      <p class="esy-p">
+        It is not gritting your teeth. The lowercase word stoic has come to
+        mean suppressing emotion, and the school taught nearly the opposite:
+        look straight at the emotion and question the judgment inside it. It is
+        also not passivity. Marcus governed an empire through plague and war,
+        Seneca worked at the center of Roman politics, and Epictetus rebuilt a
+        life from slavery. The practice was what let them act well under
+        pressure, not a reason to stop acting.
+      </p>
+    </section>
+
+    <section class="esy-section">
+      <h2 class="esy-h2">Marcus Aurelius, the Stoic you can hear out</h2>
+      <p class="esy-p">
+        The strangest document in Stoicism is the private notebook of the most
+        powerful man of his age. At night, in camp on the northern frontier,
+        Marcus Aurelius wrote himself the same reminders an anxious commuter
+        might need: you will meet frustrating people today, your time is short,
+        your opinion is the only thing fully yours. He was not writing a book.
+        He was keeping himself honest.
+      </p>
+      <p class="esy-p">
+        His <a href="/figures/marcus-aurelius/">figure page</a> tells that life
+        in chapters and lays out his core teachings. The question he keeps
+        handing every reader is the one his Echo will put to you: before you
+        react, what exactly did you just tell yourself?
+      </p>
+    </section>
+
+    <section class="esy-section esy-faq">
+      <h2 class="esy-h2">Common questions</h2>
+      {faq.map(item => (
+        <>
+          <h3 class="esy-faq__q">{item.q}</h3>
+          <p class="esy-faq__a">{item.a}</p>
+        </>
+      ))}
+    </section>
+
+    <EssayInvite
+      lang={lang}
+      line="On Agora Cosmica you can hear the life of Marcus Aurelius told in chapters, sit with the teachings behind this page, and put your own situation to his Echo, an AI voice grounded in his real writing. It stays an interpretation, never the man himself."
+      href="/app?figure=marcus-aurelius&lang=en"
+      buttonLabel="Learn from Echo of Marcus Aurelius"
+      figureId="aurelius"
+      portraitAlt="AI-generated portrait of Marcus Aurelius"
+      moreLinks={[
+        { label: 'Marcus Aurelius, the figure', href: '/figures/marcus-aurelius/' },
+        { label: 'What is a moral life?', href: '/themes/moral-life/' },
+        { label: 'What is the meaning of life?', href: '/themes/meaning-purpose/' },
+      ]}
+    />
+
+    <footer class="esy-sources">
+      <p>
+        Sources: the teachings above are summarized from the surviving Stoic
+        texts, chiefly the Enchiridion and Discourses of Epictetus, the letters
+        and essays of Seneca, and the Meditations of Marcus Aurelius. Nothing
+        on this page is a verbatim quotation. The shipwreck story about Zeno
+        comes down to us from Diogenes Laertius and is told as tradition, not
+        certainty.
+      </p>
+    </footer>
+  </div>
+</Public>
