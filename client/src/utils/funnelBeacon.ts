@@ -12,8 +12,11 @@
 // (the ways out of a conversation),
 // chat_depth (flushed here on chat switch
 // and unload) and the turnstile_* family (services/proxy/turnstile.ts).
-// The marketing pages' cta_click fires from agc-public.js with the same
-// payload shape.
+// engaged fires at most twice per tab, from the first_turn one-shot and from
+// the listen tracker in utils/playbackBeacon.ts. paid_arrival fires once per
+// pageview from utils/pageBeacon.ts.
+// The marketing pages' cta_click and paid_arrival fire from agc-public.js with
+// the same payload shape.
 //
 // Privacy: keyless aggregate counter only. No clientId, no gclid, no IP, no
 // raw milliseconds — timing leaves the browser only as a coarse bucket index.
@@ -77,7 +80,18 @@ export type FunnelStep =
   // A token aged out AFTER the check had already succeeded. Deliberately its
   // own step: it is housekeeping, not a lost message, and folding it into
   // turnstile_failed drowned the real failures at roughly 14 to 1.
-  | 'turnstile_token_aged';
+  | 'turnstile_token_aged'
+  // The visit did something rather than only arriving. The arm rides in the
+  // mode slot and says which half of the product it was. At most two per tab:
+  // the arm that qualified first, then 'both' if the other one follows.
+  | 'engaged'
+  // The landing URL carried the paid-ads parameter. One per pageview,
+  // language and the edge dimensions only, so the row describes the parameter
+  // rather than the person who clicked it.
+  | 'paid_arrival';
+
+/** Which half of the product a visit engaged with, in the engaged mode slot. */
+export type EngagedArm = 'typed' | 'listened' | 'both';
 
 export type CinematicOutcome = 'watched' | 'skipped';
 
@@ -352,6 +366,11 @@ export function sendFunnelBeaconOnce(step: FunnelStep, fields: FunnelFields = {}
     if (alreadyFired(step)) return;
     markFired(step);
     postFunnel(step, fields);
+    // The typed arm of engaged qualifies on exactly this moment, so it hangs
+    // off the first_turn one-shot rather than re-deriving the condition at the
+    // call site. A carried question is a real turn but nobody typed it, so
+    // first_turn_prefilled deliberately does not qualify.
+    if (step === 'first_turn') noteEngagedTyped();
   } catch {
     // Silent fail
   }
@@ -370,4 +389,64 @@ export function sendFunnelBeacon(step: FunnelStep, fields: FunnelFields = {}): v
   } catch {
     // Silent fail
   }
+}
+
+// ============================================
+// engaged
+// ============================================
+
+/**
+ * Seconds of one story or teaching track that count as listening rather than
+ * sampling. FROZEN: this number is the meaning of every engaged row already
+ * written, so changing it makes the trend uncomparable across the change.
+ * The quarter mark qualifies too, whichever comes first, so a short track can
+ * qualify on its own terms.
+ */
+export const ENGAGED_LISTEN_SECONDS = 120;
+
+// Tab memory only, deliberately not sessionStorage: a reload is a new document
+// and starts a new count rather than carrying an old one. Each arm fires at
+// most once, so at most two rows ever leave a tab.
+let engagedTyped = false;
+let engagedListened = false;
+let engagedRows = 0;
+
+function emitEngaged(arm: EngagedArm): void {
+  sendFunnelBeacon('engaged', { mode: arm });
+}
+
+function qualifyEngaged(arm: Exclude<EngagedArm, 'both'>): void {
+  if (engagedRows === 0) {
+    engagedRows = 1;
+    emitEngaged(arm);
+    return;
+  }
+  if (engagedRows === 1) {
+    engagedRows = 2;
+    emitEngaged('both');
+  }
+}
+
+/**
+ * The visit typed its first turn. Called from the first_turn one-shot, so the
+ * condition lives in exactly one place.
+ */
+export function noteEngagedTyped(): void {
+  if (engagedTyped) return;
+  engagedTyped = true;
+  qualifyEngaged('typed');
+}
+
+/** Seconds heard on one story or teaching track, reported as they accumulate. */
+export function noteEngagedListenSeconds(seconds: number): void {
+  if (engagedListened || seconds < ENGAGED_LISTEN_SECONDS) return;
+  engagedListened = true;
+  qualifyEngaged('listened');
+}
+
+/** A story or teaching track passed its first quarter. */
+export function noteEngagedListenMilestone(): void {
+  if (engagedListened) return;
+  engagedListened = true;
+  qualifyEngaged('listened');
 }

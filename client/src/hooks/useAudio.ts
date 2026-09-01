@@ -1,5 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
-import { sendPlaybackBeacon, detectCurrentLanguage } from '../utils/playbackBeacon';
+import {
+  sendPlaybackBeacon,
+  detectCurrentLanguage,
+  listenTrackKey,
+  noteListenPlay,
+  noteListenPause,
+  noteListenProgress,
+  noteListenEnded,
+} from '../utils/playbackBeacon';
 import type { PlaybackContentType } from '../utils/playbackBeacon';
 import { bindAudioElement } from '../services/audio/audioFocus';
 
@@ -23,8 +31,11 @@ interface UseAudioOptions {
    * Optional content-playback beacon context. When provided, a fire-and-forget
    * 'started' beacon is sent on the first `play` event after each URL change,
    * for engagement-funnel analytics. Idempotent per URL — pause/resume does
-   * not refire. The 'completed' beacon is sent separately by the mark*Completed
-   * helpers in storageKeysV2.ts (same trigger as the gamification star award).
+   * not refire. The same context drives the listen tracker in playbackBeacon.ts,
+   * which adds the quarter marks and one terminal event per track per tab. The
+   * mark*Completed helpers in storageKeysV2.ts keep sending their own
+   * 'completed' beacon on the gamification star award, which is a separate
+   * trigger from the terminal event here.
    */
   playbackBeacon?: PlaybackBeaconContext;
 }
@@ -143,13 +154,24 @@ const useAudio = (audioUrl: string | null | undefined, options: UseAudioOptions 
       }
     }, { signal });
 
+    // Key for the listen tracker's tab-scoped state. Null whenever there is no
+    // beacon context or no URL, which is what keeps the tracker off every
+    // player that does not report playback.
+    const listenKey = playbackBeaconRef.current && audioUrl
+      ? listenTrackKey(playbackBeaconRef.current, audioUrl)
+      : null;
+
     audioEl.addEventListener('timeupdate', () => {
       setCurrentTime(audioEl.currentTime);
       const calcProgress = (audioEl.currentTime / audioEl.duration) * 100;
       setProgress(isNaN(calcProgress) ? 0 : calcProgress);
+      if (listenKey) noteListenProgress(listenKey, audioEl.currentTime, audioEl.duration);
     }, { signal });
 
     audioEl.addEventListener('ended', () => {
+      // Before the state reset below, which zeroes the playhead the tracker
+      // needs to tell a finished track from an abandoned one.
+      if (listenKey) noteListenEnded(listenKey, audioEl.currentTime, audioEl.duration);
       setIsPlaying(false);
       setProgress(0);
       setCurrentTime(0);
@@ -172,8 +194,12 @@ const useAudio = (audioUrl: string | null | undefined, options: UseAudioOptions 
           language: detectCurrentLanguage(),
         });
       }
+      if (listenKey && ctx) noteListenPlay(listenKey, ctx);
     }, { signal });
-    audioEl.addEventListener('pause', () => setIsPlaying(false), { signal });
+    audioEl.addEventListener('pause', () => {
+      setIsPlaying(false);
+      if (listenKey) noteListenPause(listenKey);
+    }, { signal });
 
     audioEl.addEventListener('error', (e: Event) => {
       console.error('Audio error:', audioEl.error?.code, audioEl.error?.message);
@@ -228,6 +254,10 @@ const useAudio = (audioUrl: string | null | undefined, options: UseAudioOptions 
       if (audioRef.current && !audioRef.current.paused) {
         audioRef.current.pause();
       }
+      // The pause event above is queued and the abort below removes the
+      // listener before it lands, so the tracker's clock is stopped by hand.
+      // Without this a track left behind by a URL change stays armed.
+      if (listenKey) noteListenPause(listenKey);
       abortController.abort(); // Removes all event listeners attached with this signal
     };
   }, [audioUrl, autoplay, initialVolume]);

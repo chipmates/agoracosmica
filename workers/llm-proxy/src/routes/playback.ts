@@ -1,10 +1,13 @@
 // Anonymous content playback beacon
-// Fires from the client when an audio track starts playing (story, teaching,
-// prism, council, foreword). Lets the dashboard answer "which content actually
+// Fires from the client through a track's listening lifecycle (story, teaching,
+// prism, council, foreword): it started, it passed each quarter, and it either
+// finished or stopped short. Lets the dashboard answer "which content actually
 // gets listened to" — pre-rendered audio is served from R2 directly and never
 // touches our worker layer otherwise.
 //
-// Privacy: aggregate counter only. No user dimension. No IP retention.
+// Privacy: aggregate counter only. No user dimension. No IP retention. Time
+// listened arrives as a coarse bucket index, never as seconds and never as a
+// playhead position, and there is no key tying a track's rows together.
 // Same legal posture as the rest of analytics — see docs/MEASUREMENT.md.
 
 import { trackPlayback, readCountry, readDevice, readProbe } from '../utils/analytics';
@@ -12,15 +15,36 @@ import type { Env } from '../utils/types';
 
 interface PlaybackPayload {
   type: 'story' | 'teaching' | 'prism' | 'council' | 'foreword';
-  event?: 'started' | 'completed';
+  event?: 'started' | 'progress_25' | 'progress_50' | 'progress_75' | 'completed' | 'ended';
   figureId?: string;
   mode?: string;
   language?: string;
+  bucket?: number;
   probe?: unknown;
 }
 
 const VALID_TYPES = new Set(['story', 'teaching', 'prism', 'council', 'foreword']);
-const VALID_EVENTS = new Set(['started', 'completed']);
+// The listening lifecycle of one track: it began, it passed each quarter of
+// its length, and it either ran to the end ('completed') or stopped short
+// ('ended'). Old clients send only 'started' and 'completed', which still
+// mean exactly what they meant before.
+const VALID_EVENTS = new Set([
+  'started',
+  'progress_25',
+  'progress_50',
+  'progress_75',
+  'completed',
+  'ended',
+]);
+
+// The two ways a track's listening ends. Only these carry the listened-time
+// bucket: on any other event the slot stays 0, so a milestone row can never be
+// mistaken for a finished listen.
+const TERMINAL_EVENTS = new Set(['completed', 'ended']);
+
+// double1 only ever holds a small bucket index, never raw seconds. Six
+// buckets (0-14s through 1800s+); anything else collapses to 0.
+const MAX_BUCKET = 5;
 const VALID_MODES = new Set(['story', 'wisdom', 'prism', 'quest', 'freetalk', 'council', 'foreword']);
 const VALID_LANGS = new Set(['en', 'de']);
 const FIGURE_ID_RE = /^[a-z0-9-]{1,40}$/;
@@ -76,6 +100,15 @@ export async function handlePlayback(request: Request, env: Env): Promise<Respon
     ? payload.event
     : 'completed';
 
+  // Out-of-range or non-integer buckets collapse to 0 rather than dropping the
+  // row: the count of finished listens matters more than the length label.
+  const bucket = (typeof payload.bucket === 'number'
+    && Number.isInteger(payload.bucket)
+    && payload.bucket >= 0
+    && payload.bucket <= MAX_BUCKET)
+    ? payload.bucket
+    : 0;
+
   trackPlayback(env, {
     type: payload.type,
     figureId,
@@ -84,6 +117,7 @@ export async function handlePlayback(request: Request, env: Env): Promise<Respon
     country: readCountry(request),
     device: readDevice(request),
     event,
+    bucket: TERMINAL_EVENTS.has(event) ? bucket : 0,
     probe: readProbe(payload.probe),
   });
 

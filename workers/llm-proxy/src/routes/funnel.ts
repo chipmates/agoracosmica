@@ -1,8 +1,9 @@
 // Anonymous funnel-step beacon
-// Fires from the marketing pages (cta_click via agc-public.js, the
-// ad_consent_* counters via the AdConsentPrompt island) and from the client
-// app (cinematic_start / cinematic_end / welcome_shown / first_turn /
-// figure_selected / mode_selected / first_reply via utils/funnelBeacon.ts).
+// Fires from the marketing pages (cta_click and paid_arrival via
+// agc-public.js, the ad_consent_* counters via the AdConsentPrompt island) and
+// from the client app (cinematic_start / cinematic_end / welcome_shown /
+// first_turn / figure_selected / mode_selected / first_reply / engaged via
+// utils/funnelBeacon.ts).
 // Lights up the dark zone between the page-load beacon and the entry/signup
 // beacons: does the intro play, is it watched or skipped, does the consent
 // screen open, does a first conversation start, does the first reply arrive.
@@ -94,8 +95,26 @@ const VALID_STEPS = new Set([
   // forwarded it straight into the app. One-shot per tab on the client; the
   // row carries language only.
   'return_visit',
+  // The visit did something rather than only arriving: a first typed turn, or
+  // enough listening to count as listening. The arm rides in the mode slot.
+  // At most two per tab (the first arm, then 'both' if the other one follows).
+  'engaged',
+  // A paid-ad arrival: the landing URL carried the paid parameter. One per
+  // pageview, standard dimensions only, so it describes the parameter and not
+  // the person who clicked.
+  'paid_arrival',
   ...CONSENT_STEPS,
 ]);
+
+// Which half of the product the visit engaged with, in the mode slot on
+// 'engaged'. A closed vocabulary: an engaged row without one of these three
+// cannot be read and would inflate the total, so it is dropped instead.
+const ENGAGED_ARMS = new Set(['typed', 'listened', 'both']);
+
+// Steps whose row is the step name and the standard edge dimensions, nothing
+// else: no path, no figure, no mode. Deliberately not COUNTER_ONLY_STEPS,
+// which keeps the sanitized path.
+const DIMENSIONLESS_STEPS = new Set(['paid_arrival']);
 
 // Counter-only steps: the row is the step name, the sanitized page path the
 // question appeared on, the interface language, the country and device class
@@ -132,8 +151,9 @@ const VALID_OUTCOMES = new Set([
 const PATH_RE = /^\/[A-Za-z0-9/_-]{0,60}$/;
 const FIGURE_RE = /^[A-Za-z0-9_-]{1,64}$/;
 // blob3 holds a conversation mode on most steps, the arrival class on
-// welcome_shown (generic / figure / ask / council / chapter) and the
-// affordance name on nav_open. All of them are short lowercase labels.
+// welcome_shown (generic / figure / ask / council / chapter), the affordance
+// name on nav_open and the arm on engaged. All of them are short lowercase
+// labels.
 const MODE_RE = /^[a-z_]{1,40}$/;
 const VALID_LANGS = new Set(['en', 'de']);
 
@@ -189,6 +209,11 @@ export async function handleFunnel(request: Request, env: Env): Promise<Response
   const mode = (typeof payload.mode === 'string' && MODE_RE.test(payload.mode))
     ? payload.mode
     : '';
+  // The arm is the whole content of an engaged row, so an unreadable one is
+  // dropped rather than stored blank.
+  if (step === 'engaged' && !ENGAGED_ARMS.has(mode)) {
+    return new Response(null, { status: 204 });
+  }
   const lang = (typeof payload.language === 'string') && VALID_LANGS.has(payload.language.slice(0, 2).toLowerCase())
     ? payload.language.slice(0, 2).toLowerCase()
     : '';
@@ -205,19 +230,22 @@ export async function handleFunnel(request: Request, env: Env): Promise<Response
 
   const counterOnly = COUNTER_ONLY_STEPS.has(step);
   const timedCounter = TIMED_COUNTER_STEPS.has(step);
+  const dimensionless = DIMENSIONLESS_STEPS.has(step);
   let outBucket = !counterOnly || timedCounter ? bucket : 0;
   if (timedCounter && outBucket > CONSENT_MAX_BUCKET) outBucket = 0;
+  if (dimensionless) outBucket = 0;
 
   trackFunnel(env, {
     step,
     // Path only on the counter-only steps, so a figure id can never ride
-    // along with a consent answer.
-    ref: counterOnly ? path : ref,
-    mode: counterOnly ? '' : mode,
+    // along with a consent answer, and nothing at all on the dimensionless
+    // ones (a forged payload cannot attach a path to them either).
+    ref: dimensionless ? '' : (counterOnly ? path : ref),
+    mode: counterOnly || dimensionless ? '' : mode,
     language: lang,
     // '200', never '', so a counter row stays recognizable as a funnel row
     // (the dashboard tells conversion rows apart by an empty outcome slot).
-    outcome: counterOnly ? '200' : outcome,
+    outcome: counterOnly || dimensionless ? '200' : outcome,
     bucket: outBucket,
     country: readCountry(request),
     device: readDevice(request),

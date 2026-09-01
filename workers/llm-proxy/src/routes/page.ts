@@ -6,12 +6,16 @@
 // Privacy: aggregate counter only. No user dimension. No IP retention.
 // Same legal posture as the rest of analytics — see docs/MEASUREMENT.md.
 
-import { trackPageView, readCountry, readDevice, readProbe } from '../utils/analytics';
+import { trackPageView, readCountry, readDevice, readProbe, readLanding } from '../utils/analytics';
 import type { Env } from '../utils/types';
 
 interface PagePayload {
   path?: string;
   language?: string;
+  // Set when this pageview opened the visit (no referrer, or one from another
+  // host). Optional: clients that do not send it get an unmarked row, which is
+  // what every row written before the flag existed looks like.
+  landing?: unknown;
   probe?: unknown;
 }
 
@@ -60,6 +64,7 @@ export async function handlePage(request: Request, env: Env): Promise<Response> 
     language: lang,
     country: readCountry(request),
     device: readDevice(request),
+    landing: readLanding(payload.landing),
     probe: readProbe(payload.probe),
   });
 

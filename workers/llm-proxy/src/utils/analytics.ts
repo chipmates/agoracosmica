@@ -53,6 +53,19 @@ export function readProbe(value: unknown): string {
 }
 
 /**
+ * blob8 on page rows: this pageview opened the visit. Like PROBE_LABEL it is a
+ * constant, the same string on every marked row, so it adds no user dimension.
+ * The client decides it from the referrer of the document it is running in,
+ * which is a property of the pageview and needs nothing stored.
+ */
+export const LANDING_LABEL = 'landing';
+
+/** Read the landing marker off a beacon payload field. Anything else is ''. */
+export function readLanding(value: unknown): string {
+  return (value === 1 || value === true || value === '1') ? LANDING_LABEL : '';
+}
+
+/**
  * Track an LLM proxy event (chat/council/summary).
  * dataset: agora_llm
  * blobs: [endpoint, figureId, mode, language, status, device, country, kind, probe]
@@ -135,6 +148,11 @@ export function trackSession(
  *
  * dataset: agora_llm
  * blobs: ['playback', figureId, mode, language, type, device, country, event, probe]
+ * doubles: [bucket]  — a coarse bucket INDEX of the seconds actually listened
+ *                      (0 = 0-14s, 1 = 15-59s, 2 = 60-179s, 3 = 180-599s,
+ *                      4 = 600-1799s, 5 = 1800s+), written on the terminal
+ *                      events only and 0 on every other event. Never raw
+ *                      seconds and never a playhead position.
  * indexes: ['playback']
  *
  * Backward compat: rows written before 2026-05-08 evening have empty blob8.
@@ -151,6 +169,7 @@ export function trackPlayback(
     country: string;
     device: string;
     event: string;
+    bucket: number;
     probe: string;
   }
 ): void {
@@ -167,7 +186,7 @@ export function trackPlayback(
         data.event,
         data.probe,
       ],
-      doubles: [0],
+      doubles: [data.bucket],
       indexes: ['playback'],
     });
   } catch {
@@ -179,8 +198,15 @@ export function trackPlayback(
  * Track a page-load beacon. Fires once on App mount in the client, before any
  * user interaction. Lets the dashboard show arrivals over time.
  * dataset: agora_llm
- * blobs: ['page', path, '', language, '200', device, country, '', probe]
+ * blobs: ['page', path, '', language, '200', device, country, landing, probe]
  * indexes: ['page']
+ *
+ * blob8 is 'landing' when this pageview opened the visit (no referrer, or a
+ * referrer from another host) and '' otherwise, so an arrival can be told
+ * apart from a click deeper into the same site. It is a property of the
+ * pageview, not of the visitor, and nothing is stored to derive it. Rows
+ * written before the flag existed have '' here, which reads as "not known to
+ * be a landing" rather than as "not a landing".
  */
 export function trackPageView(
   env: Env,
@@ -189,12 +215,13 @@ export function trackPageView(
     language: string;
     country: string;
     device: string;
+    landing: string;
     probe: string;
   }
 ): void {
   try {
     env.ANALYTICS.writeDataPoint({
-      blobs: ['page', data.path, '', data.language, '200', data.device, data.country, '', data.probe],
+      blobs: ['page', data.path, '', data.language, '200', data.device, data.country, data.landing, data.probe],
       doubles: [0],
       indexes: ['page'],
     });
@@ -276,11 +303,14 @@ export function trackSignup(
  * mode_selected count every occurrence (volume counters, same row shape).
  *
  * dataset: agora_llm
- * blobs: [step, figureId|path|'', mode|'', language, outcome, device, country, '', probe]
+ * blobs: [step, figureId|path|'', mode|arm|'', language, outcome, device, country, '', probe]
  * doubles: [bucket]  — a coarse bucket INDEX (cinematic dwell 0-3,
  *                      first_reply reply-time 0-4, chat_depth 0-3), never raw
  *                      milliseconds and never a per-chat message count
  * indexes: [step]
+ *
+ * blob3 holds the arm on 'engaged' (typed / listened / both) instead of a
+ * conversation mode: the same slot, a different closed vocabulary.
  *
  * blob6 carries the coarse device class (keeps country at blob7 across all
  * event types); blob8 stays empty (it belongs to playback rows).

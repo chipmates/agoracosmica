@@ -5,7 +5,8 @@
 // Responsibilities:
 //   - Capture gclid from URL into sessionStorage so the app can offer ad-
 //     measurement consent and (only if granted) report the conversion
-//   - Fire the anonymous page-load beacon (/v1/page)
+//   - Fire the anonymous page-load beacon (/v1/page), flagged when the pageview
+//     opened the visit, plus the paid-arrival counter on a paid landing URL
 //   - Click handlers on [data-agc-cta] elements (entry intent)
 //   - Mobile burger menu toggle in the navbar
 //
@@ -45,6 +46,14 @@
   var CONV_URL = 'https://llm.agoracosmica.org/api/conversions';
   var FUNNEL_URL = 'https://llm.agoracosmica.org/v1/funnel';
 
+  // The paid-ads parameter on this URL. Deliberately the URL only, never the
+  // persisted paid flag: the arrival counter below counts the click that
+  // carried the parameter, not every later page of the same visit.
+  function hasPaidParam() {
+    try { return new URLSearchParams(window.location.search).get('p') === '1'; }
+    catch (e) { return false; }
+  }
+
   function captureGclidFromUrl() {
     try {
       var params = new URLSearchParams(window.location.search);
@@ -53,7 +62,7 @@
       // (it runs at parse, before the app island's guard), so it must own the
       // paid suppression itself and never leave a paid gclid for the SPA to
       // adopt. Forwarding a paid gclid without consent would be unlawful.
-      if (params.get('p') === '1') {
+      if (hasPaidParam()) {
         sessionStorage.setItem(SS_PAID, '1');
         sessionStorage.removeItem(SS_GCLID);
         return;
@@ -167,6 +176,18 @@
     } catch (e) { /* no-op */ }
   }
 
+  // Did this pageview open the visit? No referrer at all, or one from another
+  // host. The marketing site is a multi-page app, so every pageview is a fresh
+  // document and this is a property of that document, read at parse and never
+  // stored. Same rule in the app (client/src/utils/pageBeacon.ts), so the flag
+  // means the same thing on both surfaces.
+  function isLandingPageview() {
+    try {
+      if (!document.referrer) return true;
+      return new URL(document.referrer).host !== window.location.host;
+    } catch (e) { return false; }
+  }
+
   function sendPageBeacon() {
     try {
       var docLang = (document.documentElement.lang || 'en').toLowerCase();
@@ -178,6 +199,7 @@
         body: JSON.stringify({
           path: window.location.pathname,
           language: language,
+          landing: isLandingPageview() ? 1 : undefined,
           probe: probeField(),
         }),
         keepalive: true,
@@ -185,8 +207,35 @@
     } catch (e) { /* no-op */ }
   }
 
+  // Anonymous counter for paid-ad arrivals: the landing URL carried the paid
+  // parameter. Language and the dimensions the edge derives, nothing else, so
+  // the row describes the parameter and not the person who clicked it. The
+  // paid split never captures a click ID, and this changes nothing about that.
+  function sendPaidArrivalBeacon() {
+    try {
+      var docLang = (document.documentElement.lang || 'en').toLowerCase();
+      var body = JSON.stringify({
+        step: 'paid_arrival',
+        language: docLang.indexOf('de') === 0 ? 'de' : 'en',
+        probe: probeField(),
+      });
+      // Absolute worker URL on purpose, same reason as the page beacon above.
+      if (navigator.sendBeacon &&
+          navigator.sendBeacon(FUNNEL_URL, new Blob([body], { type: 'text/plain' }))) {
+        return;
+      }
+      fetch(FUNNEL_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: body,
+        keepalive: true,
+      }).catch(function () { /* never surface */ });
+    } catch (e) { /* no-op */ }
+  }
+
   captureGclidFromUrl();
   sendPageBeacon();
+  if (hasPaidParam()) sendPaidArrivalBeacon();
 
   document.addEventListener('click', function (e) {
     var target = e.target instanceof Element ? e.target.closest('[data-agc-cta]') : null;
