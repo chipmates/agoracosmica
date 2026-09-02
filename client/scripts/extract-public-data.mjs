@@ -86,6 +86,14 @@ function readText(path) {
   try { return readFileSync(path, 'utf-8'); } catch { return null; }
 }
 
+// Teasers on the public figure pages only; the story text is untouched.
+// Leading sentences listed here trip ad-network content classifiers.
+const TEASER_SKIP = { 'kahlo/en/3': 1, 'kahlo/de/3': 1 };
+function dropSentences(text, n) {
+  const parts = text.trim().split(/(?<=[.!?])\s+/);
+  return parts.slice(n).join(' ');
+}
+
 function firstNSentences(text, n) {
   if (!text) return '';
   const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
@@ -174,12 +182,14 @@ function extractStories() {
         const words = wordCount(txt);
         totalWords += words;
         const lines = txt.trim().split('\n').filter(l => l.trim());
-        const firstLine = lines[0] || '';
+        const skip = TEASER_SKIP[`${id}/${lang}/${seg}`] || 0;
+        const teaserText = skip ? dropSentences(txt, skip) : txt;
+        const firstLine = skip ? dropSentences(lines[0] || '', skip) : (lines[0] || '');
         // For segment 0, first line is the title ("A Note on...")
         // For segments 1+, first line is the narrative opening
         const hook = seg === 0
           ? firstNSentences(lines.slice(2).join(' '), 2)
-          : firstNSentences(txt, 2);
+          : firstNSentences(teaserText, 2);
 
         chapters.push({
           segment: seg,
