@@ -1,4 +1,11 @@
-import { getServers, TIMEOUTS, HEALTH_TTL_SECONDS, KV_KEY } from './config';
+import {
+  getServers,
+  TIMEOUTS,
+  HEALTH_TTL_SECONDS,
+  HEALTH_STALE_SECONDS,
+  HEALTH_KV_TTL_SECONDS,
+  KV_KEY,
+} from './config';
 import type { Env, HealthData, ServerInfo, CachedHealth } from './types';
 
 /** Read cached health from KV. Returns null fields if no cache exists. */
@@ -10,6 +17,12 @@ export async function getCachedHealth(env: Env): Promise<CachedHealth> {
   } catch {
     return { fsn1: null, nbg1: null, updatedAt: 0 };
   }
+}
+
+/** Age of a snapshot in seconds. Infinity when it was never written. */
+function snapshotAge(cached: CachedHealth): number {
+  if (!cached.updatedAt) return Infinity;
+  return (Date.now() - cached.updatedAt) / 1000;
 }
 
 /** Fetch health from a single server. Returns null on failure. */
@@ -50,16 +63,21 @@ export async function selectServers(
   sessionId: string | null
 ): Promise<[ServerInfo, ServerInfo]> {
   const cached = await getCachedHealth(env);
+  const fresh = snapshotAge(cached) < HEALTH_STALE_SECONDS;
   const servers = getServers(env);
 
-  const fsn1: ServerInfo = { ...servers.fsn1, health: cached.fsn1 };
-  const nbg1: ServerInfo = { ...servers.nbg1, health: cached.nbg1 };
+  const fsn1: ServerInfo = { ...servers.fsn1, health: fresh ? cached.fsn1 : null };
+  const nbg1: ServerInfo = { ...servers.nbg1, health: fresh ? cached.nbg1 : null };
 
   if (sessionId) {
     const primary = hashToOrigin(sessionId) === 0 ? fsn1 : nbg1;
     const fallback = primary.id === 'fsn1' ? nbg1 : fsn1;
     return [primary, fallback];
   }
+
+  // Stale snapshot carries no load signal, so keep the deterministic default
+  // instead of comparing two zeroes. proxy.ts still fails over on a dead origin.
+  if (!fresh) return [fsn1, nbg1];
 
   const fsn1Slots = cached.fsn1?.gpu_slots.available ?? 0;
   const nbg1Slots = cached.nbg1?.gpu_slots.available ?? 0;
@@ -83,12 +101,15 @@ function hashToOrigin(sessionId: string): 0 | 1 {
   return (h & 1) as 0 | 1;
 }
 
-/** Refresh health for both servers and write to KV. Runs in waitUntil(). */
-export async function refreshHealth(env: Env): Promise<void> {
+/**
+ * Refresh health for both servers and write to KV. Returns the snapshot that is
+ * current afterwards, so a caller needing the values can use them directly: KV
+ * is eventually consistent, a read right after the put can still miss.
+ */
+export async function refreshHealth(env: Env): Promise<CachedHealth> {
   // Skip if recently refreshed
   const cached = await getCachedHealth(env);
-  const age = (Date.now() - cached.updatedAt) / 1000;
-  if (age < HEALTH_TTL_SECONDS) return;
+  if (snapshotAge(cached) < HEALTH_TTL_SECONDS) return cached;
 
   const servers = getServers(env);
   const [fsn1Health, nbg1Health] = await Promise.all([
@@ -103,13 +124,22 @@ export async function refreshHealth(env: Env): Promise<void> {
   };
 
   await env.HEALTH_CACHE.put(KV_KEY, JSON.stringify(updated), {
-    expirationTtl: 120, // KV auto-expires after 2 min if worker stops refreshing
+    expirationTtl: HEALTH_KV_TTL_SECONDS,
   });
+
+  return updated;
 }
 
-/** Build aggregated health response for GET /v1/audio/health */
+/**
+ * Build aggregated health response for GET /v1/audio/health.
+ *
+ * Probes the origins inline when the snapshot is stale. This route is a spot
+ * check, usually on an idle worker whose KV entry has expired, so reading the
+ * cache alone would report "unknown" for two servers that are up.
+ */
 export async function getAggregatedHealth(env: Env): Promise<Response> {
-  const cached = await getCachedHealth(env);
+  const cached = await refreshHealth(env);
+  const age = snapshotAge(cached);
   return new Response(
     JSON.stringify({
       servers: {
@@ -117,6 +147,7 @@ export async function getAggregatedHealth(env: Env): Promise<Response> {
         nbg1: cached.nbg1 ? { status: 'healthy', gpu_slots: cached.nbg1.gpu_slots } : { status: 'unknown' },
       },
       updatedAt: cached.updatedAt ? new Date(cached.updatedAt).toISOString() : null,
+      ageSeconds: Number.isFinite(age) ? Math.round(age) : null,
     }),
     { status: 200, headers: { 'Content-Type': 'application/json' } }
   );

@@ -16,6 +16,12 @@ export const TIMEOUTS = {
 /** Minimum seconds between KV health refreshes */
 export const HEALTH_TTL_SECONDS = 15;
 
+/** Beyond this age a snapshot is no load signal any more: GPU slots move in seconds. */
+export const HEALTH_STALE_SECONDS = 60;
+
+/** KV expiry for the snapshot, so it self-clears if the worker stops refreshing. */
+export const HEALTH_KV_TTL_SECONDS = 120;
+
 export const KV_KEY = 'server-health';
 
 /** Headers to pass through from upstream response */

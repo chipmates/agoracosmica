@@ -24,9 +24,6 @@ export default {
     const url = new URL(request.url);
     const path = url.pathname;
 
-    // Refresh health async after every request
-    ctx.waitUntil(refreshHealth(env));
-
     // --- Routes ---
 
     // Worker health (static)
@@ -36,7 +33,8 @@ export default {
       });
     }
 
-    // Aggregated server health
+    // Aggregated server health. Refreshes inline when stale, so it must sit
+    // above the fire-and-forget refresh below or both would probe at once.
     if (path === '/v1/audio/health' && request.method === 'GET') {
       const res = await getAggregatedHealth(env);
       // Add CORS headers
@@ -46,6 +44,9 @@ export default {
       }
       return new Response(res.body, { status: res.status, headers });
     }
+
+    // Keep the snapshot warm off the critical path of the audio routes
+    ctx.waitUntil(refreshHealth(env));
 
     // Story archive — streams one figure + language as a ZIP straight from R2.
     // HEAD serves the same headers for the client's availability + size probe.
