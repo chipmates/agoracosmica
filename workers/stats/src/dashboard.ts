@@ -870,6 +870,26 @@ const RANGE_LABEL = { 1: 'last 24h', 7: 'last 7 days', 30: 'last 30 days', 365: 
 // from env.LAUNCH_EPOCH_SECONDS. 0 = no floor, no label.
 const LAUNCH_EPOCH_SECONDS = __LAUNCH_EPOCH_SECONDS__;
 
+// The engaged-session beacon (North Star v2) and the listening lifecycle went
+// live on this date. Any window reaching further back holds no rows for them,
+// so the series is partial there and a previous-period delta against a window
+// that predates the beacon would read as growth from zero.
+const NS2_LIVE_DATE = '2026-09-01';
+const NS2_LIVE_MS = Date.parse(NS2_LIVE_DATE + 'T00:00:00Z');
+
+// Rows whose in-house probe marker is set are the owner's own testing. The
+// events carrying this marker (engaged, playback, page, paid_arrival) are
+// filtered on it here, matching internal/ops/stats-pull.mjs exactly so the
+// dashboard and the Monday pull can never disagree. The older counters on the
+// same tabs predate the filter and are NOT deflated, so the two are not
+// directly comparable.
+const NOT_PROBE = "blob9 != 'probe'";
+
+// Coarse listened-time buckets (double1 on a terminal playback row). Index 0
+// is 0-14s, which the ex-zero filter cannot separate from an unwritten slot,
+// so it never appears. Same six labels as the Monday pull.
+const LISTEN_BUCKET_LABELS = ['under 15s', '15-59s', '1-3m', '3-10m', '10-30m', '30m+'];
+
 // --- State ---
 let S = {
   tab: 'overview',
@@ -1281,13 +1301,13 @@ function engagementPoolHtml(label, stages, note) {
 // works exactly as in ghostFunnelHtml (zero rows in both periods means the
 // beacon has produced nothing yet, so the rung says so instead of drawing an
 // empty bar that reads as failure).
-function ladderHtml(rungs) {
+function ladderHtml(rungs, ariaLabel) {
   if (!rungs || rungs.length === 0) return '';
   var base = 1;
   for (var k = 0; k < rungs.length; k++) {
     base = Math.max(base, Number(rungs[k].value) || 0, Number(rungs[k].prev) || 0);
   }
-  var out = '<div class="fbar-list" role="list" aria-label="Ad engagement ladder">';
+  var out = '<div class="fbar-list" role="list" aria-label="' + (ariaLabel || 'Ad engagement ladder') + '">';
   for (var i = 0; i < rungs.length; i++) {
     var s = rungs[i];
     var v = Number(s.value) || 0;
@@ -1456,6 +1476,37 @@ function figuresTableHtml(picks, chats, completions) {
     return [esc(cap(x.figure)), fmt(x.picks), fmt(x.chats), fmt(x.comps)];
   });
   return tableHtml(['Figure', 'Picks', 'Chats', 'Completions'], rowsHtml);
+}
+
+// Listening leaderboard: starts joined to audio finishes on one dimension
+// (figure or chapter). Two independent counters, so the join happens here
+// rather than in SQL. The finish rate follows the same small-base rule as
+// everywhere else, and a row whose dimension slot is empty is named for what
+// it is (a row written before the label shipped) instead of being dropped or
+// silently read as a zero ordinal.
+function listenTableHtml(dimLabel, startRows, finishRows, key, labelFn, emptyLabel) {
+  var starts = byKey(startRows, key, emptyLabel);
+  var finishes = byKey(finishRows, key, emptyLabel);
+  var keys = Object.keys(starts);
+  Object.keys(finishes).forEach(function(k) { if (keys.indexOf(k) < 0) keys.push(k); });
+  if (keys.length === 0) return '<div class="empty-state">No listening rows for this period</div>';
+  // Most-started first, with the unlabelled bucket pinned last so it never
+  // heads a ranking it is not part of.
+  keys.sort(function(a, b) {
+    if (a === emptyLabel) return 1;
+    if (b === emptyLabel) return -1;
+    return (starts[b] || 0) - (starts[a] || 0);
+  });
+  // With no finish rows anywhere in the table the finish counter has produced
+  // nothing yet, and a 0% per row would claim nobody finished. Blank the whole
+  // rate column instead until the first finish lands.
+  var anyFinish = Object.keys(finishes).some(function(k) { return (finishes[k] || 0) > 0; });
+  var body = keys.slice(0, 14).map(function(k) {
+    var s = starts[k] || 0;
+    var f = finishes[k] || 0;
+    return [esc(labelFn ? labelFn(k) : k), fmt(s), fmt(f), anyFinish ? shareText(f, s) : '--'];
+  });
+  return tableHtml([dimLabel, 'Starts', 'Finished', 'Finish rate'], body);
 }
 
 // Interior zero-fill for time-bucketed GROUP BY rows. Analytics Engine omits
@@ -1675,6 +1726,41 @@ function sparkPoints() {
 function prevRange() {
   // Previous equivalent period for delta comparison
   return "BETWEEN NOW() - INTERVAL '" + (S.range * 2) + "' DAY AND NOW() - INTERVAL '" + S.range + "' DAY";
+}
+
+// How much of the selected window the 2026-09-01 beacons actually cover.
+// 'partial' means the window reaches back before they existed, so the count is
+// a floor. 'prevUsable' means the previous period overlaps them at all: when it
+// does not, the delta is suppressed rather than printed as growth from zero.
+function ns2Coverage() {
+  var day = 86400000;
+  var end = Date.now();
+  var start = end - S.range * day;
+  return {
+    partial: start < NS2_LIVE_MS,
+    coveredDays: Math.max(0, end - Math.max(start, NS2_LIVE_MS)) / day,
+    prevUsable: start > NS2_LIVE_MS,
+  };
+}
+
+// Group rows into { label: count }. Empty labels fall into the caller's chosen
+// bucket name rather than colliding with a real value.
+function byKey(list, field, emptyLabel) {
+  var out = {};
+  (list || []).forEach(function(row) {
+    var k = row[field];
+    if (k === '' || k == null) k = emptyLabel || 'untagged';
+    out[k] = (out[k] || 0) + Number(row.c || 0);
+  });
+  return out;
+}
+
+// A share as text, with the same small-base rule the rest of the file uses: a
+// percentage off fewer than 20 is Poisson noise, so print the raw fraction.
+function shareText(num, den) {
+  if (!den) return '--';
+  if (den < 20) return fmt(num) + ' of ' + fmt(den);
+  return Math.round(num / den * 100) + '%';
 }
 
 async function batch(queries) {
@@ -1905,6 +1991,17 @@ async function loadOverview() {
     // funnel (does mobile underconvert). Batch total after these: 51 of 64. ---
     { sql: "SELECT blob6 as device, COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND blob6 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY device ORDER BY c DESC", dataset: 'agora_llm' },
     { sql: "SELECT blob6 as device, COUNT() as c FROM agora_llm WHERE blob1 IN ('chat','council','summary') AND blob5 = '200' AND blob6 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY device ORDER BY c DESC", dataset: 'agora_llm' },
+    // --- North Star v2, engaged sessions (APPENDED at the end; reads are
+    // positional, so new queries must never be inserted mid-array). r[51..53].
+    // A tab that typed a first message or crossed the listening threshold emits
+    // one row with its arm, then a second 'both' row if the other arm follows.
+    // The session total is therefore typed + listened, never the raw row count.
+    // Same SQL as internal/ops/stats-pull.mjs 'engaged_arms', probe filter
+    // included, so the dashboard and the Monday pull cannot drift.
+    // Batch total after these: 54 of the 64 cap. ---
+    { sql: "SELECT blob3 as arm, COUNT() as c FROM agora_llm WHERE blob1 = 'engaged' AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY arm", dataset: 'agora_llm' },
+    { sql: "SELECT blob3 as arm, COUNT() as c FROM agora_llm WHERE blob1 = 'engaged' AND " + NOT_PROBE + " AND timestamp " + prevRange() + " GROUP BY arm", dataset: 'agora_llm' },
+    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE blob1 = 'engaged' AND blob3 IN ('typed','listened') AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
   ];
 
   var r = await batch(queries);
@@ -2033,6 +2130,17 @@ async function loadOverview() {
   // Entry 20" — an impossible funnel that self-healed on the next refresh). Same
   // query in, same query out: Marketing and App can never disagree now.
   var appArrivals = appArrivalsFromPaths;
+  // North Star v2 reads (appended queries r[51..53]). An engaged session is one
+  // tab that did something: the first arm it reaches writes 'typed' or
+  // 'listened', and only if the other arm follows does a second 'both' row
+  // land. Summing typed + listened is therefore the session count; adding
+  // 'both' would count the same tab twice.
+  var engagedArms = byKey(rows(r[51]), 'arm', 'unlabelled');
+  var engagedArmsPrev = byKey(rows(r[52]), 'arm', 'unlabelled');
+  var engaged = (engagedArms.typed || 0) + (engagedArms.listened || 0);
+  var engagedPrev = (engagedArmsPrev.typed || 0) + (engagedArmsPrev.listened || 0);
+  var sparkEngaged = rows(r[53]).map(function(x) { return x.c; });
+  var ns2 = ns2Coverage();
   // bouncePct/bounceSub removed with the Arrivals hero KPI — the metric mixed
   // marketing-page bounces and login-page bounces into a single misleading
   // percentage. Per-stage drop-off lives in the Funnel below.
@@ -2072,9 +2180,38 @@ async function loadOverview() {
   // only event a click-flood or bot cannot inflate. Raw Visits is shown but
   // explicitly captioned as mixed/unfiltered so it is never read as success.
   html += '<div class="section-divider" style="grid-column:1/-1">Pulse &middot; ' + RANGE_LABEL[S.range] + '</div>';
-  html += kpi('Conversations', chats, { hero: true, spark: sparkChats, sparkColor: '#5B8BD4', delta: chatsPrev, sub: 'real chat messages. the one that means it worked' });
+  html += kpi('Conversations (v1)', chats, { hero: true, spark: sparkChats, sparkColor: '#5B8BD4', delta: chatsPrev, sub: 'real chat messages. the one that means it worked' });
+  // NORTH STAR v2: engaged sessions, beside v1 rather than replacing it while
+  // the two run in parallel. Signed definition (PRE-REG section 10): a tab that
+  // sent a first message, or crossed the listening threshold of 120 seconds or
+  // the first quarter, whichever came first.
+  var engagedArmSub;
+  if (engaged === 0) {
+    engagedArmSub = 'no arm rows yet. live since ' + NS2_LIVE_DATE;
+  } else {
+    engagedArmSub = 'typed ' + fmt(engagedArms.typed || 0) + ', listened ' + fmt(engagedArms.listened || 0) +
+      (engagedArms.both ? ', did both ' + fmt(engagedArms.both) : '') + '. live since ' + NS2_LIVE_DATE;
+  }
+  var engagedOpts = { hero: true, sub: engagedArmSub };
+  if (sparkEngaged.length > 1) { engagedOpts.spark = sparkEngaged; engagedOpts.sparkColor = '#68C397'; }
+  // A previous period that ends before the beacon existed holds structural
+  // zeros, so no delta is shown against it.
+  if (ns2.prevUsable) engagedOpts.delta = engagedPrev;
+  html += kpi('Engaged Sessions (v2)', (engaged === 0 && engagedPrev === 0) ? '--' : engaged, engagedOpts);
   html += kpi('New Signups', signups, { hero: true, delta: signupsPrev, sub: 'genuinely new accounts' });
   html += kpi('Raw Visits', arrivals, { sub: 'mixed: ads + bots, no source split by design' });
+  // Standing note on what the v2 number can and cannot mean yet. Partial-window
+  // and no-previous-period cases are spelled out rather than left to the reader.
+  var ns2Note = 'North Star v2 counts sessions, one row per tab per arm, and is probe filtered. ' +
+    'Conversations (v1) counts chat messages and is not probe filtered, so the two are different populations and must not be divided into each other. ';
+  if (ns2.partial) {
+    ns2Note += 'The beacon went live ' + NS2_LIVE_DATE + ', so only about ' + Math.max(1, Math.round(ns2.coveredDays)) +
+      ' of the ' + S.range + ' days in this window can hold a row. The count is a floor, not a trend. ';
+  }
+  if (!ns2.prevUsable) {
+    ns2Note += 'The previous period ends before the beacon existed, so no delta is shown. A complete week over week read starts 2026-09-08.';
+  }
+  html += '<div class="hint-banner" style="grid-column:1/-1;margin-top:2px">' + ns2Note + '</div>';
   html += decisionLine(chats, signups, arrivals, sessions);
 
   // Hero KPIs removed 2026-05-25: the previous Arrivals/Sessions/Conversations
@@ -2458,6 +2595,35 @@ async function loadProduct() {
     { sql: "SELECT blob3 as mode, COUNT() as c FROM agora_llm WHERE blob1 = 'mode_selected' AND blob3 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY mode ORDER BY c DESC", dataset: 'agora_llm' },
     // Organic figure picks (funnel figure_selected, per-occurrence), top 10
     { sql: "SELECT blob2 as figure, COUNT() as c FROM agora_llm WHERE blob1 = 'figure_selected' AND blob2 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY figure ORDER BY c DESC LIMIT 10", dataset: 'agora_llm' },
+    // --- Listening lifecycle, r[36..42] (APPENDED at the end; reads are
+    // positional, so new queries must never be inserted mid-array). Every
+    // definition here is copied from internal/ops/stats-pull.mjs so the
+    // dashboard and the Monday pull cannot disagree:
+    //   lifecycle + per-figure  = story and teaching only, probe filtered
+    //   audio finish            = completed AND double1 > 0 (a terminal row
+    //                             carrying a listened bucket), ALL content
+    //                             types, which is the Monday pull's definition
+    //   buckets                 = terminal rows with a bucket above zero
+    // blob10 is the chapter ordinal on story rows. It is empty on rows written
+    // before the label shipped, which reads as unlabelled, never as chapter 0.
+    { sql: "SELECT blob8 as state, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND blob5 IN ('story','teaching') AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY state ORDER BY c DESC", dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND blob8 = 'completed' AND double1 > 0 AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT double1 as bucket, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND blob8 IN ('completed','ended') AND double1 > 0 AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY bucket ORDER BY bucket ASC", dataset: 'agora_llm' },
+    { sql: "SELECT blob2 as figure, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND blob8 = 'started' AND blob5 IN ('story','teaching') AND blob2 != '' AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY figure ORDER BY c DESC LIMIT 12", dataset: 'agora_llm' },
+    { sql: "SELECT blob2 as figure, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND blob8 = 'completed' AND double1 > 0 AND blob5 IN ('story','teaching') AND blob2 != '' AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY figure ORDER BY c DESC LIMIT 12", dataset: 'agora_llm' },
+    { sql: "SELECT blob10 as chapter, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND blob8 = 'started' AND blob5 = 'story' AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY chapter ORDER BY c DESC LIMIT 20", dataset: 'agora_llm' },
+    { sql: "SELECT blob10 as chapter, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND blob8 = 'completed' AND double1 > 0 AND blob5 = 'story' AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY chapter ORDER BY c DESC LIMIT 20", dataset: 'agora_llm' },
+    // --- Free-tier bot check, r[43..48]. Per-occurrence counters, NOT probe
+    // filtered, matching the Monday pull (the turnstile steps are queried raw
+    // there too). turnstile_token_aged is kept out of the failure family on
+    // purpose: it is a token expiring after a check already succeeded.
+    // Batch total after these: 49 of the 64 cap. ---
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'turnstile_started' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'turnstile_interactive' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'turnstile_solved' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'turnstile_token_aged' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT blob5 as outcome, COUNT() as c FROM agora_llm WHERE blob1 = 'turnstile_failed' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY outcome ORDER BY c DESC", dataset: 'agora_llm' },
+    { sql: "SELECT blob5 as outcome, COUNT() as c FROM agora_llm WHERE blob1 = 'turnstile_abandoned' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY outcome ORDER BY c DESC", dataset: 'agora_llm' },
   ];
 
   var r = await batch(queries);
@@ -2495,6 +2661,21 @@ async function loadProduct() {
   // Wave-2 organic-pick reads (appended queries r[34..35]).
   var organicModes = rows(r[34]);
   var organicFigures = rows(r[35]);
+  // Listening reads (appended queries r[36..42]).
+  var listenLife = byKey(rows(r[36]), 'state', 'unlabelled');
+  var audioFinishes = val(r[37]);
+  var listenBuckets = byKey(rows(r[38]), 'bucket', '0');
+  var listenFigStarts = rows(r[39]);
+  var listenFigFinish = rows(r[40]);
+  var listenChapStarts = rows(r[41]);
+  var listenChapFinish = rows(r[42]);
+  // Bot-check reads (appended queries r[43..48]).
+  var tsStarted = val(r[43]);
+  var tsInteractive = val(r[44]);
+  var tsSolved = val(r[45]);
+  var tsAged = val(r[46]);
+  var tsFailed = rows(r[47]);
+  var tsAbandoned = rows(r[48]);
   var totalPlayback = playbackByType.reduce(function(s, x) { return s + x.c; }, 0);
   var completionRate = playbackStarted > 0 ? Math.round((totalPlayback / playbackStarted) * 100) : null;
   var totalLlm = chats + councils + summaries;
@@ -2623,6 +2804,133 @@ async function loadProduct() {
   if (playbackByLang.length > 0) {
     html += chartCard('Completion Language', donutSvg(playbackByLang.map(function(r) { return { key: r.lang || 'unknown', c: r.c }; }), COLORS.lang, function(l) { return l === 'de' ? 'Deutsch' : (l === 'en' ? 'English' : 'Unknown'); }), '');
   }
+  html += '</div>';
+
+  // === LISTENING (the reception arm, lifecycle beacons live 2026-09-01) ===
+  // Content Consumption above counts every content type on the legacy
+  // completion semantics. This section is the audio lifecycle a track reports
+  // for itself: it started, it passed each quarter, and it either finished or
+  // stopped short. Story and teaching only, probe filtered, definitions copied
+  // from the Monday pull.
+  var listenStarted = listenLife.started || 0;
+  var listenEnded = listenLife.ended || 0;
+  html += '<div class="section-divider">Listening</div>';
+  var listenHint = 'Rows are tracks, not listeners. One person playing three chapters writes three starts, and nothing ties a track back to a visit, so read this as how content performs and never as how many people listened. ' +
+    'The lifecycle covers stories and teachings only. Finished counts a terminal row carrying a listened bucket, across every content type, which is how the Monday pull counts it, so the finish rate can read high against a stories-and-teachings denominator. ' +
+    'Rows written before ' + NS2_LIVE_DATE + ' have no milestone or bucket at all, so any window reaching back before then undercounts everything here except starts.';
+  html += '<div class="hint-banner">' + listenHint + '</div>';
+  // A zero here would claim nobody finished, when on a young beacon the truth
+  // is that the counter has produced no rows yet. Both cases show the awaiting
+  // marker instead, exactly as the funnel and ladder stages do.
+  var awaitTerminal = 'awaiting first terminal row. beacon live since ' + NS2_LIVE_DATE;
+  html += '<div class="grid">';
+  html += kpi('Tracks Started', listenStarted, { hero: true, sub: 'story and teaching first-plays, probe filtered' });
+  html += kpi('Audio Finishes', audioFinishes === 0 ? '--' : audioFinishes, {
+    sub: audioFinishes === 0 ? awaitTerminal : 'terminal row carrying a listened bucket, all content types',
+  });
+  html += kpi('Stopped Short', listenEnded === 0 ? '--' : listenEnded, {
+    sub: listenEnded === 0 ? awaitTerminal : 'playback ended before the track did',
+  });
+  html += kpi('Finish Rate', audioFinishes === 0 ? '--' : shareText(audioFinishes, listenStarted), {
+    sub: audioFinishes === 0
+      ? 'no finish rows yet, so there is no rate to read'
+      : (listenStarted < 20 ? 'raw count, needs 20+ starts for a rate' : 'finishes over starts, mixed denominators'),
+    valColor: audioFinishes === 0 ? 'var(--dim)' : undefined,
+  });
+
+  // The lifecycle as one shared axis. Deliberately no ghost bars: the previous
+  // period predates the milestone beacons for now, so a ghost would draw the
+  // beacon's ship date as a collapse.
+  var listenRungs = [
+    // Short, uniform rung labels on purpose: the label column is narrow on a
+    // phone, and a long one squeezes the track until the awaiting note clips.
+    { label: 'Started', value: listenStarted, sub: 'first play', pending: 'playback started' },
+    { label: '25% heard', value: listenLife.progress_25 || 0, sub: 'quarter', pending: 'progress_25' },
+    { label: '50% heard', value: listenLife.progress_50 || 0, sub: 'half', pending: 'progress_50' },
+    { label: '75% heard', value: listenLife.progress_75 || 0, sub: 'three quarters', pending: 'progress_75' },
+    { label: 'Finished', value: listenLife.completed || 0, sub: 'incl. legacy mark', pending: 'completed' },
+    { label: 'Ended early', value: listenEnded, sub: 'stopped short', pending: 'ended' },
+  ];
+  var quarterLine = (listenLife.progress_25 || 0) === 0
+    ? 'No quarter milestone rows yet, so there is no hold rate to read.'
+    : 'Reached a quarter: ' + shareText(listenLife.progress_25 || 0, listenStarted) + ' of starts.';
+  var listenLadderNote = '<div style="margin-top:8px;font-size:11px;color:var(--dim);line-height:1.4">' +
+    'The three milestone rungs sit inside one track, so they do nest. Finished and Ended early are the two ways the same track stops, so they sit side by side and never sum with the milestones. ' +
+    quarterLine + ' ' +
+    'The Finished rung counts every completed row, including the legacy gamification mark that carries no listened time, while the Audio Finishes card above counts only the rows that carry one.' +
+    '</div>';
+  html += chartCard('Listening lifecycle', ladderHtml(listenRungs, 'Listening lifecycle') + listenLadderNote, 'card-full');
+
+  // Time actually heard, from the bucket on terminal rows. Bucket 0 (under 15
+  // seconds) is filtered out by the same ex-zero guard the Monday pull uses,
+  // because an unwritten slot and a genuine sub-15s listen are the same value.
+  var bucketItems = [];
+  for (var bi = 1; bi < LISTEN_BUCKET_LABELS.length; bi++) {
+    var bc = listenBuckets[String(bi)] || listenBuckets[bi] || 0;
+    if (bc > 0) bucketItems.push({ label: LISTEN_BUCKET_LABELS[bi], c: bc });
+  }
+  var bucketNote = '<div class="kpi-sub" style="margin-top:6px;display:block">Time the audio actually ran, in coarse buckets, on the row that ended the track. The under 15s bucket cannot be told apart from an unwritten slot, so it is excluded and short listens are missing from this chart.</div>';
+  html += chartCard('Time actually heard',
+    (bucketItems.length > 0 ? barsHtml(bucketItems, 'var(--s-story)') : '<div class="empty-state" style="padding:30px 0">-- awaiting first terminal row with a listened bucket</div>') + bucketNote,
+    'card-wide');
+
+  html += chartCard('Listening by figure',
+    listenTableHtml('Figure', listenFigStarts, listenFigFinish, 'figure', cap, 'unlabelled') +
+    '<div class="kpi-sub" style="margin-top:6px;display:block">Stories and teachings only. The finish rate shows a raw fraction under 20 starts, and stays blank while the finish counter has produced no rows at all.</div>',
+    'card-wide');
+
+  // Chapter ranking. blob10 carries the ordinal on story rows only; an empty
+  // slot is a row from before the label shipped and is named unlabelled, never
+  // folded into chapter 0.
+  var chapUnlabelled = byKey(listenChapStarts, 'chapter', 'unlabelled').unlabelled || 0;
+  var chapNote = chapUnlabelled > 0
+    ? 'Rows with no chapter label are stories played before the label shipped on ' + NS2_LIVE_DATE + '. They are listed as unlabelled, never as chapter 0, and they are the reason a chapter ranking on an older window looks empty.'
+    : 'Stories only. Prisms, councils and forewords have no chapters and are absent by design.';
+  html += chartCard('Listening by chapter',
+    listenTableHtml('Chapter', listenChapStarts, listenChapFinish, 'chapter', function(c) {
+      return c === 'unlabelled' ? 'unlabelled' : 'Chapter ' + c;
+    }, 'unlabelled') +
+    '<div class="kpi-sub" style="margin-top:6px;display:block">' + chapNote + '</div>',
+    'card-wide');
+  html += '</div>';
+
+  // === FREE-TIER BOT CHECK ===
+  // The gate in front of a free-tier message. Every counter here is a row per
+  // occurrence, so the ratios are indicative rather than exact.
+  html += '<div class="section-divider">Free-tier bot check</div>';
+  html += '<div class="hint-banner">Counter semantics are per row, so one session can emit several rows, and the error class may include benign auto retries. Every ratio here is indicative until per-session dedup is verified. Token aged sits outside the failure family on purpose: it is a token expiring after a check already succeeded, so it costs nobody a message, and counting it as a failure used to bury the real ones. These counters are not probe filtered, matching the Monday pull.</div>';
+  var tsFailTotal = tsFailed.reduce(function(s, x) { return s + Number(x.c || 0); }, 0);
+  var tsAbandTotal = tsAbandoned.reduce(function(s, x) { return s + Number(x.c || 0); }, 0);
+  html += '<div class="grid">';
+  html += kpi('Checks Started', tsStarted, { hero: true, sub: 'one row per widget render, the denominator' });
+  html += kpi('Escalated to a Tap', tsInteractive, { sub: 'escalation ' + shareText(tsInteractive, tsStarted) + ' of checks started' });
+  html += kpi('Tap Landed', tsSolved, { sub: 'solved ' + shareText(tsSolved, tsInteractive) + ' of escalations' });
+  html += kpi('Failed', tsFailTotal, { sub: tsFailTotal > 0 ? 'ended without a token' : 'no failures this period', valColor: tsFailTotal > 0 ? '#E97451' : '#68C397' });
+  html += kpi('Abandoned', tsAbandTotal, { sub: 'page went away with the check still running' });
+  html += kpi('Token Aged', tsAged, { sub: 'expired after a successful check. housekeeping, not a failure' });
+
+  var tsRungs = [
+    { label: 'Started', value: tsStarted, sub: 'widget rendered', pending: 'turnstile_started' },
+    { label: 'Escalated', value: tsInteractive, sub: 'a tap was asked for', pending: 'turnstile_interactive' },
+    { label: 'Solved', value: tsSolved, sub: 'the tap landed', pending: 'turnstile_solved' },
+  ];
+  var tsNote = '<div style="margin-top:8px;font-size:11px;color:var(--dim);line-height:1.4">' +
+    'Escalated and Solved do nest inside Started, but only per row, and a single session can render the widget more than once. ' +
+    'Escalation ' + shareText(tsInteractive, tsStarted) + ' of starts, solve ' + shareText(tsSolved, tsInteractive) + ' of escalations. ' +
+    'Failures and abandons are counted apart because a check can end without a token for reasons that never reached a person.' +
+    '</div>';
+  html += chartCard('Bot check, start to solve', ladderHtml(tsRungs, 'Bot check ladder') + tsNote, 'card-full');
+
+  var tsFailItems = aggregateByLabel(tsFailed.map(function(x) { return { label: x.outcome || 'unlabelled', c: x.c }; }));
+  html += chartCard('Failed by reason',
+    (tsFailItems.length > 0 ? barsHtml(tsFailItems, 'var(--s-quest)') : '<div class="empty-state" style="padding:30px 0">No failures ' + RANGE_LABEL[S.range] + '</div>') +
+    '<div class="kpi-sub" style="margin-top:6px;display:block">The error class can include a widget retrying itself, which nobody experiences as a lost message.</div>',
+    'card-half');
+  var tsAbandItems = aggregateByLabel(tsAbandoned.map(function(x) { return { label: x.outcome === 'interactive' ? 'tap never came' : x.outcome === 'pending' ? 'widget never appeared' : (x.outcome || 'unlabelled'), c: x.c }; }));
+  html += chartCard('Abandoned by state',
+    (tsAbandItems.length > 0 ? barsHtml(tsAbandItems, 'var(--s-wisdom)') : '<div class="empty-state" style="padding:30px 0">No abandons ' + RANGE_LABEL[S.range] + '</div>') +
+    '<div class="kpi-sub" style="margin-top:6px;display:block">A check still pending when the page went away. The state says whether a tap was waiting or the widget had not appeared yet.</div>',
+    'card-half');
   html += '</div>';
 
   // === LLM CAPACITY (chat-side rate limits + global config) ===
@@ -2853,6 +3161,20 @@ async function loadAdGrants() {
     { sql: "SELECT blob7 as country, COUNT() as c FROM agora_llm WHERE blob1 IN ('chat','council','summary') AND blob5 = '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY country ORDER BY c DESC LIMIT 10", dataset: 'agora_llm' },
     // blob6 != '' drops the pre-device untagged rows, mirroring the country panels.
     { sql: "SELECT blob6 as device, COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND blob6 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY device ORDER BY c DESC", dataset: 'agora_llm' },
+    // --- Attribution counters, r[36..40] (APPENDED at the end; reads are
+    // positional, so new queries must never be inserted mid-array). Same SQL as
+    // the Monday pull's paid_arrivals and landings, probe filter included.
+    // paid_arrival is a click that carried the paid parameter and nothing else:
+    // no path, no figure, no click id. The landing bit says a pageview opened
+    // the visit, which is a property of the pageview, not of the visitor. The
+    // ex-probe arrivals count is the matching denominator for the landing
+    // share (Raw Visits above is raw, so the two must not be divided).
+    // Batch total after these: 41 of the 64 cap. ---
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'paid_arrival' AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'paid_arrival' AND " + NOT_PROBE + " AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND blob8 = 'landing' AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND blob8 = 'landing' AND " + NOT_PROBE + " AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
   ];
 
   var r = await batch(queries);
@@ -2887,6 +3209,10 @@ async function loadAdGrants() {
   var topCountriesAll = rows(r[33]);
   var topCountriesChat = rows(r[34]);
   var deviceArrivals = rows(r[35]);
+  // Attribution reads (appended queries r[36..40]).
+  var paidArrivals = val(r[36]), paidArrivalsPrev = val(r[37]);
+  var landings = val(r[38]), landingsPrev = val(r[39]);
+  var arrivalsExProbe = val(r[40]);
 
   // A decision is a yes or a no. Closing the card is not an answer, so it stays
   // out of the decisions denominator and gets its own share instead.
@@ -3008,6 +3334,30 @@ async function loadAdGrants() {
   // with Top Countries.
   var deviceArrivalItems = aggregateByLabel(deviceArrivals.map(function(r) { return { label: cap(r.device || 'unknown'), c: r.c }; }));
   html += chartCard('Device (all visits)', barsHtml(deviceArrivalItems, 'var(--s-wisdom)'), '');
+  html += '</div>';
+
+  // ── ATTRIBUTION (what the URL said, never who clicked) ──
+  // The only two source-shaped numbers we hold, and both describe the request
+  // rather than the person. They sit under Traffic because that is where
+  // arrivals are read, and they change nothing about the no-source-split rule
+  // above: neither one is a channel report and neither is a conversion.
+  var attrNs2 = ns2Coverage();
+  html += '<div class="section-divider">Attribution</div>';
+  var attrHint = 'Paid arrivals count a pageview whose landing URL carried the paid parameter. That is reach, and only reach: paid campaigns are deliberately not tracked for conversions, so nothing here says what a paid click went on to do, and no conversion number for paid exists anywhere on this dashboard. ' +
+    'Landing pageviews are the pageviews that opened a visit, decided from the referrer of the document itself with nothing stored. ' +
+    'Rows written before either flag shipped carry an empty slot, which reads as not known to be one rather than as not one, so any window reaching back that far undercounts both. ' +
+    'Both counters are probe filtered while Raw Visits above is not, so the two must not be divided into each other.';
+  if (!attrNs2.prevUsable) {
+    attrHint += ' Both flags went live ' + NS2_LIVE_DATE + ' and the previous period ends before that, so no delta is shown against a window that could hold nothing.';
+  }
+  html += '<div class="hint-banner">' + attrHint + '</div>';
+  html += '<div class="grid">';
+  var paidOpts = { hero: true, sub: 'clicks that arrived with the paid parameter. reach only, never a conversion' };
+  var landingOpts = { sub: 'pageviews that opened a visit, ' + shareText(landings, arrivalsExProbe) + ' of probe-filtered arrivals (' + fmt(arrivalsExProbe) + ')' };
+  if (attrNs2.prevUsable) { paidOpts.delta = paidArrivalsPrev; landingOpts.delta = landingsPrev; }
+  html += kpi('Paid Arrivals', paidArrivals, paidOpts);
+  html += kpi('Landing Pageviews', landings, landingOpts);
+  html += '<div class="card"><div class="kpi-label">Paid, honestly</div><div style="margin-top:8px;font-size:0.8125rem;color:var(--tx2);line-height:1.5">The paid counter exists so paid reach can be read as a number without any of it being attached to a person. Judge paid on the Google Ads console, where the spend lives, and judge the product on the funnel, never by joining the two here.</div></div>';
   html += '</div>';
 
   // Content Reach removed: "Completions by Type" was SQL-identical to the
