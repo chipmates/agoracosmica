@@ -38,22 +38,86 @@ export function getEffectiveLimit(env: Env, endpoint: RateLimitEndpoint): number
 export const LLM_CONFIG = {
   MAX_OUTPUT_TOKENS: 1500,
   DEFAULT_TEMPERATURE: 1,
-  // Persona-collapse mitigation for figure impersonation (deep-research-persona-collapse).
-  // Applied to /v1/chat only — council/summary keep model defaults.
-  DEFAULT_PRESENCE_PENALTY: 1.5,
   MAX_CLIENT_MESSAGES: 100,
   MAX_MESSAGE_CHARS: 4000,
 } as const;
 
 // Scope: custom councils only (/v1/council). Curated councils use pre-generated audio.
-// System prompt sized to fit moderator + 3 participants × ~11KB formatted voice profiles
-// + ~6KB instruction template ≈ 50KB worst case, plus headroom.
+// The cap counts the CLIENT-supplied systemPrompt alone (UTF-16 code units), not
+// the safety preamble the worker prepends. German voice profiles run ~3KB longer
+// per roster than English and the widest measured German council reaches ~59.5KB,
+// so 60,000 left under 1% headroom; 90,000 keeps a wordier roster inside the cap
+// and still bounds a single council's input cost to fractions of a cent.
 export const COUNCIL_LLM_CONFIG = {
   MAX_OUTPUT_TOKENS: 4000,
   DEFAULT_TEMPERATURE: 0.8,
-  MAX_SYSTEM_PROMPT_CHARS: 60_000,
+  MAX_SYSTEM_PROMPT_CHARS: 90_000,
   MAX_USER_MESSAGE_CHARS: 2000,
 } as const;
+
+// Free-tier serving models. Which one answers is a deployment variable
+// (FREE_TIER_MODEL), never a code edit, so the switch arms and reverts without
+// a rebuild. BYOK requests never reach this worker.
+export type ServingModelKey = 'qwen3-235b' | 'dsv4-pro';
+
+export interface ServingModel {
+  key: ServingModelKey;
+  /** Nebius model id. */
+  id: string;
+  /** Machine-readable model label for the EU AI Act Art. 50(2) header. */
+  disclosureLabel: string;
+  /** presence_penalty on /v1/chat. Persona-collapse mitigation, tuned per model. */
+  chatPresencePenalty: number;
+  /** Extra top-level request fields, e.g. the reasoning switch. */
+  extras: Record<string, unknown>;
+  /** Nebius list price in USD per 1M tokens. Feeds the spend governor. */
+  pricePer1M: { input: number; output: number };
+  /** Whether this model's token spend counts against the governor. */
+  metered: boolean;
+}
+
+export const SERVING_MODELS: Record<ServingModelKey, ServingModel> = {
+  'qwen3-235b': {
+    key: 'qwen3-235b',
+    id: 'Qwen/Qwen3-235B-A22B-Instruct-2507',
+    disclosureLabel: 'Qwen3-235B-A22B-Instruct',
+    chatPresencePenalty: 1.5,
+    extras: {},
+    pricePer1M: { input: 0.087, output: 0.35 },
+    metered: false,
+  },
+  'dsv4-pro': {
+    key: 'dsv4-pro',
+    // Nebius publishes no dated snapshot for V4 Pro, so this alias is what the
+    // evaluation ran against. NEBIUS_MODEL_PRO pins a dated id the day one exists.
+    id: 'deepseek-ai/DeepSeek-V4-Pro',
+    disclosureLabel: 'DeepSeek-V4-Pro',
+    // The 1.5 penalty is Qwen-tuned and degrades this model.
+    chatPresencePenalty: 0,
+    // Reasoning is on by default here; without the switch, thinking tags leak
+    // into councils. thinking:{type:"disabled"} does not work on this endpoint.
+    extras: { chat_template_kwargs: { thinking: false } },
+    pricePer1M: { input: 1.75, output: 3.5 },
+    metered: true,
+  },
+};
+
+// Daily spend ceiling for the metered model, counted from real token usage at
+// Nebius list price. Hard cap serves the unmetered fallback for the rest of the
+// day (yesterday's quality, not an outage); the soft alert only reports. Sized
+// well above realistic volume: the cap is an abuse valve, not a budget dial.
+export const SPEND_GOVERNOR = {
+  HARD_CAP_USD: 20,
+  SOFT_ALERT_USD: 10,
+  /** Counter day boundary. Matches the operating timezone, not UTC. */
+  TIMEZONE: 'Europe/Berlin',
+  /** Two days, so a counter key outlives the day it belongs to. */
+  COUNTER_TTL_SECONDS: 172_800,
+} as const;
+
+// First-token deadline before a request is re-issued on the fallback model.
+// Measured first-chunk latency is ~1.2s, so 5s is a stall rather than a slow turn.
+export const TTFT_FALLBACK_MS = 5_000;
 
 export const JWT_CONFIG = {
   EXPIRY_SECONDS: 600, // 10 minutes — client auto-refreshes 5min before expiry (sessionManager.ts)

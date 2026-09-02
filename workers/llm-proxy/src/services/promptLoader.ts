@@ -2,6 +2,7 @@
 // Phase 1: prompts are bundled at build time in prompts/instructions.ts
 
 import { INSTRUCTIONS } from '../prompts/instructions';
+import { applyProfileRules, type PromptProfile } from '../prompts/responseRules';
 import { SAFETY_PREAMBLE } from '../utils/safety';
 
 // Map language codes to full names for the LLM
@@ -54,12 +55,16 @@ function buildCarriedDirective(userMessageCount: number, hasAnchor: boolean): st
 }
 
 /**
- * Build the complete system prompt for a figure + mode + language + optional seed data
+ * Build the complete system prompt for a figure + mode + language + optional
+ * seed data. The profile decides which response rules ride along, and is
+ * resolved from the serving model so both the primary and the fallback answer
+ * under the same rules.
  */
 export function buildSystemPrompt(
   figureId: string,
   mode: string,
   language: string,
+  profile: PromptProfile,
   seedDataJson?: string,
   carried?: CarriedEntry
 ): string | null {
@@ -71,11 +76,11 @@ export function buildSystemPrompt(
     return null;
   }
 
-  let prompt = instruction;
+  let prompt = applyProfileRules(instruction, mode, profile);
 
   // The anchor pointer only resolves once the seed block is actually injected.
   const hasAnchorSeed = !!seedDataJson
-    && instruction.includes('{{SEED_DATA}}')
+    && prompt.includes('{{SEED_DATA}}')
     && /"anchorSeed"\s*:/.test(seedDataJson);
 
   // Inject seed data: prepend as a labeled JSON block before the instruction.

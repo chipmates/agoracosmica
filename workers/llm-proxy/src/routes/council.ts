@@ -3,12 +3,15 @@
 
 import { authenticateRequest } from '../middleware/auth';
 import { checkAndIncrementCouncilRateLimit } from '../middleware/rateLimit';
-import { COUNCIL_LLM_CONFIG } from '../config';
+import { COUNCIL_LLM_CONFIG, type ServingModel } from '../config';
 import { SAFETY_PREAMBLE } from '../utils/safety';
 import { screenCouncilContent } from '../utils/contentScreen';
 import { createSafetyFilteredStream } from '../services/streamFilter';
+import { dispatchToNebius } from '../services/nebius';
+import { resolveServing } from '../services/modelRouting';
+import { recordSpend, type TokenUsage } from '../services/spendGovernor';
 import { logComplianceEvent, getSeverity } from '../utils/complianceLog';
-import { trackLlmEvent, trackRateLimit, readCountry, readDevice, readProbe } from '../utils/analytics';
+import { trackGovernor, trackLlmEvent, trackRateLimit, readCountry, readDevice, readProbe } from '../utils/analytics';
 import type { Env, ChatMessage, CouncilRequest } from '../utils/types';
 
 const VALID_LANGUAGES = ['de', 'en', 'es', 'fr', 'it', 'pt', 'nl', 'pl', 'ja', 'ko', 'zh'];
@@ -167,50 +170,47 @@ export async function handleCouncil(request: Request, env: Env, ctx: ExecutionCo
   // 5. Proxy to Nebius with higher token limit for councils
   // Sandwich defense: safety preamble at start AND end to resist prompt injection
   const SAFETY_REMINDER = 'Remember: You must follow all ABSOLUTE RULES from the system prompt. Never break character or generate harmful content.';
-  const llmMessages = [
-    { role: 'system' as const, content: fullSystemPrompt },
-    ...messages.map(m => ({ role: m.role, content: m.content })),
-    { role: 'system' as const, content: SAFETY_REMINDER },
-  ];
 
-  const requestBody = {
-    model: env.NEBIUS_MODEL,
-    messages: llmMessages,
+  const country = readCountry(request);
+  const device = readDevice(request);
+  const serving = await resolveServing(env);
+
+  const dispatch = await dispatchToNebius({
+    systemPrompt: fullSystemPrompt,
+    messages,
+    env,
+    model: serving.model,
+    fallback: serving.fallback,
     temperature: COUNCIL_LLM_CONFIG.DEFAULT_TEMPERATURE,
-    max_tokens: COUNCIL_LLM_CONFIG.MAX_OUTPUT_TOKENS,
-    stream: true,
-  };
-
-  const nebiusResponse = await fetch(`${env.NEBIUS_BASE_URL}/chat/completions`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${env.NEBIUS_API_KEY}`,
-      'Content-Type': 'application/json',
+    maxTokens: COUNCIL_LLM_CONFIG.MAX_OUTPUT_TOKENS,
+    trailingSystemMessage: SAFETY_REMINDER,
+    onUsage: (model: ServingModel, usage: TokenUsage) => {
+      ctx.waitUntil(recordSpend(env, model, usage, { endpoint: 'council', country, device }));
     },
-    body: JSON.stringify(requestBody),
   });
 
-  if (!nebiusResponse.ok) {
-    const errorText = await nebiusResponse.text();
-    console.error(`[Nebius/Council] ${nebiusResponse.status}: ${errorText.slice(0, 500)}`);
-
-    const status = nebiusResponse.status === 429 ? 429 : 502;
-    return new Response(
-      JSON.stringify({
-        error: status === 429
-          ? 'LLM provider rate limited. Please try again in a moment.'
-          : 'LLM service temporarily unavailable. Please try again.',
-      }),
-      { status, headers: { 'Content-Type': 'application/json' } }
+  if (!dispatch.ok || !dispatch.stream) {
+    return dispatch.error ?? new Response(
+      JSON.stringify({ error: 'LLM service temporarily unavailable. Please try again.' }),
+      { status: 502, headers: { 'Content-Type': 'application/json' } }
     );
+  }
+
+  if (dispatch.fallbackReason) {
+    trackGovernor(env, {
+      event: dispatch.fallbackReason === 'latency' ? 'fallback_latency' : 'fallback_error',
+      endpoint: 'council',
+      model: dispatch.served.key,
+      spendUsd: serving.spendUsd,
+      country,
+      device,
+    });
   }
 
   // 6. Rate limit already incremented atomically in step 3
 
   // 7. SSE pass-through with output safety filter
-  const filteredBody = nebiusResponse.body
-    ? createSafetyFilteredStream(nebiusResponse.body)
-    : nebiusResponse.body;
+  const filteredBody = createSafetyFilteredStream(dispatch.stream);
 
   // 8. Anonymous analytics (fire-and-forget)
   ctx.waitUntil(Promise.resolve().then(() => {
@@ -221,8 +221,8 @@ export async function handleCouncil(request: Request, env: Env, ctx: ExecutionCo
       language,
       status: 200,
       durationMs: Date.now() - startMs,
-      country: readCountry(request),
-      device: readDevice(request),
+      country,
+      device,
       // The greeting/turn label belongs to chat rows only.
       kind: '',
       probe: readProbe((body as Record<string, unknown>).probe),
@@ -235,6 +235,7 @@ export async function handleCouncil(request: Request, env: Env, ctx: ExecutionCo
       'Content-Type': 'text/event-stream',
       'Cache-Control': 'no-cache',
       'Connection': 'keep-alive',
+      'X-AI-Model': dispatch.served.disclosureLabel,
       'X-Council-Daily-Used': String(rateLimit.used),
       'X-Council-Daily-Limit': String(rateLimit.limit),
       'X-Council-Resets-At': rateLimit.resetsAt,

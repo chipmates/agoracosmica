@@ -13,6 +13,7 @@ import { handlePage } from './routes/page';
 import { handleEntry } from './routes/entry';
 import { handleSignup } from './routes/signup';
 import { handleFunnel } from './routes/funnel';
+import { primaryModel } from './services/modelRouting';
 import type { Env } from './utils/types';
 
 function getCorsHeaders(request: Request, env: Env): Record<string, string> {
@@ -38,20 +39,24 @@ function getCorsHeaders(request: Request, env: Env): Record<string, string> {
   };
 }
 
-// EU AI Act Art. 50 Abs. 2: machine-readable AI content disclosure
-const AI_DISCLOSURE_HEADERS: Record<string, string> = {
-  'X-AI-Generated': 'true',
-  'X-AI-Model': 'Qwen3-235B-A22B-Instruct',
-  'X-AI-Provider': 'ChipMates gGmbH',
-};
+// EU AI Act Art. 50 Abs. 2: machine-readable AI content disclosure. The model
+// name follows the free tier's primary model; a generating route that served
+// something else (fallback) sets its own X-AI-Model and keeps it.
+function aiDisclosureHeaders(env: Env): Record<string, string> {
+  return {
+    'X-AI-Generated': 'true',
+    'X-AI-Model': primaryModel(env).disclosureLabel,
+    'X-AI-Provider': 'ChipMates gGmbH',
+  };
+}
 
-function withCors(response: Response, corsHeaders: Record<string, string>): Response {
+function withCors(response: Response, corsHeaders: Record<string, string>, env: Env): Response {
   const headers = new Headers(response.headers);
   for (const [key, value] of Object.entries(corsHeaders)) {
     headers.set(key, value);
   }
-  for (const [key, value] of Object.entries(AI_DISCLOSURE_HEADERS)) {
-    headers.set(key, value);
+  for (const [key, value] of Object.entries(aiDisclosureHeaders(env))) {
+    if (!headers.has(key)) headers.set(key, value);
   }
   headers.set('X-Content-Type-Options', 'nosniff');
   return new Response(response.body, {
@@ -110,7 +115,7 @@ export default {
         );
       }
 
-      return withCors(response, corsHeaders);
+      return withCors(response, corsHeaders, env);
     } catch (error) {
       console.error('[Worker] Unhandled error:', error);
       const errorResponse = new Response(
@@ -119,7 +124,7 @@ export default {
         }),
         { status: 500, headers: { 'Content-Type': 'application/json' } }
       );
-      return withCors(errorResponse, corsHeaders);
+      return withCors(errorResponse, corsHeaders, env);
     }
   },
 };

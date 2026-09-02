@@ -4,13 +4,17 @@ import { authenticateRequest } from '../middleware/auth';
 import { validateChatRequest } from '../middleware/validation';
 import { checkAndIncrementRateLimit } from '../middleware/rateLimit';
 import { buildSystemPrompt } from '../services/promptLoader';
-import { proxyToNebius } from '../services/nebius';
+import { dispatchToNebius } from '../services/nebius';
+import { resolveServing } from '../services/modelRouting';
+import { recordSpend } from '../services/spendGovernor';
+import { AWARD_RETRY_DIRECTIVE, createAwardGuardedStream } from '../services/awardGuard';
 import { screenCouncilContent } from '../utils/contentScreen';
 import { createSafetyFilteredStream } from '../services/streamFilter';
 import { logComplianceEvent, getSeverity } from '../utils/complianceLog';
-import { trackLlmEvent, trackRateLimit, readCountry, readDevice, readProbe } from '../utils/analytics';
-import { LLM_CONFIG } from '../config';
-import type { Env } from '../utils/types';
+import { trackGovernor, trackLlmEvent, trackRateLimit, readCountry, readDevice, readProbe } from '../utils/analytics';
+import type { ServingModel } from '../config';
+import type { TokenUsage } from '../services/spendGovernor';
+import type { Env, ToolDefinition } from '../utils/types';
 
 // Which kind of chat request this is, in blob8 of the chat row. The auto
 // greeting that opens a chat is an LLM request like any other, so without a
@@ -111,14 +115,18 @@ export async function handleChat(request: Request, env: Env, ctx: ExecutionConte
     );
   }
 
-  // 4. Build system prompt from bundled instructions
+  // 4. Resolve the serving model, then build the prompt its profile calls for
+  const country = readCountry(request);
+  const device = readDevice(request);
+  const serving = await resolveServing(env);
+
   // seedData: client sends processed seed data (targetSeed, seedsOverview, etc.)
   // Instructions remain server-owned — only the content data comes from client
   const seedDataJson = seedData ? JSON.stringify(seedData) : undefined;
   const carried = carriedEntry
     ? { userMessageCount: messages.filter(m => m.role === 'user').length }
     : undefined;
-  const systemPrompt = buildSystemPrompt(figureId, mode, language, seedDataJson, carried);
+  const systemPrompt = buildSystemPrompt(figureId, mode, language, serving.profile, seedDataJson, carried);
   if (!systemPrompt) {
     return new Response(
       JSON.stringify({ error: `No instructions found for ${figureId}/${mode}` }),
@@ -127,45 +135,90 @@ export async function handleChat(request: Request, env: Env, ctx: ExecutionConte
   }
 
   // 5. Proxy to Nebius with SSE pass-through
-  const nebiusResponse = await proxyToNebius({
+  const meter = (model: ServingModel, usage: TokenUsage) => {
+    ctx.waitUntil(recordSpend(env, model, usage, { endpoint: 'chat', country, device }));
+  };
+  const dispatchOptions = {
     systemPrompt,
     messages,
     env,
+    model: serving.model,
+    fallback: serving.fallback,
     tools,
-    presencePenalty: LLM_CONFIG.DEFAULT_PRESENCE_PENALTY,
-  });
+    usePresencePenalty: true,
+    onUsage: meter,
+  };
+  const dispatch = await dispatchToNebius(dispatchOptions);
 
-  // 6. Rate limit already incremented atomically in step 3
-
-  // 7. Add quota headers to response
-  const headers = new Headers(nebiusResponse.headers);
-  headers.set('X-Quota-Daily-Used', String(rateLimit.daily.used));
-  headers.set('X-Quota-Daily-Limit', String(rateLimit.daily.limit));
-  headers.set('X-Quota-Resets-At', rateLimit.resetsAt);
-
-  // 8. Apply output safety filter on SSE stream
-  const filteredBody = nebiusResponse.body
-    ? createSafetyFilteredStream(nebiusResponse.body)
-    : nebiusResponse.body;
-
-  // 9. Anonymous analytics (fire-and-forget)
-  ctx.waitUntil(Promise.resolve().then(() => {
+  const track = (status: number) => {
     trackLlmEvent(env, {
       endpoint: 'chat',
       figureId,
       mode,
       language,
-      status: nebiusResponse.status,
+      status,
       durationMs: Date.now() - startMs,
-      country: readCountry(request),
-      device: readDevice(request),
+      country,
+      device,
       kind,
       probe,
     });
-  }));
+  };
 
-  return new Response(filteredBody, {
-    status: nebiusResponse.status,
-    headers,
-  });
+  if (!dispatch.ok || !dispatch.stream) {
+    const failure = dispatch.error ?? new Response(
+      JSON.stringify({ error: 'LLM service temporarily unavailable. Please try again.' }),
+      { status: 502, headers: { 'Content-Type': 'application/json' } }
+    );
+    ctx.waitUntil(Promise.resolve().then(() => track(failure.status)));
+    return failure;
+  }
+
+  if (dispatch.fallbackReason) {
+    trackGovernor(env, {
+      event: dispatch.fallbackReason === 'latency' ? 'fallback_latency' : 'fallback_error',
+      endpoint: 'chat',
+      model: dispatch.served.key,
+      spendUsd: serving.spendUsd,
+      country,
+      device,
+    });
+  }
+
+  // 6. Rate limit already incremented atomically in step 3
+
+  // 7. Add quota headers to response
+  const headers = new Headers({ 'Content-Type': 'text/event-stream' });
+  headers.set('Cache-Control', 'no-cache');
+  headers.set('Connection', 'keep-alive');
+  headers.set('X-AI-Model', dispatch.served.disclosureLabel);
+  headers.set('X-Quota-Daily-Used', String(rateLimit.daily.used));
+  headers.set('X-Quota-Daily-Limit', String(rateLimit.daily.limit));
+  headers.set('X-Quota-Resets-At', rateLimit.resetsAt);
+
+  // 8. Guard a silent quest verdict, then apply the output safety filter
+  const guarded = awardsSeed(tools)
+    ? createAwardGuardedStream(
+      dispatch.stream,
+      async () => {
+        const retry = await dispatchToNebius({
+          ...dispatchOptions,
+          model: dispatch.served,
+          fallback: undefined,
+          trailingSystemMessage: AWARD_RETRY_DIRECTIVE,
+        });
+        return retry.ok ? retry.stream : null;
+      },
+    )
+    : dispatch.stream;
+
+  // 9. Anonymous analytics (fire-and-forget)
+  ctx.waitUntil(Promise.resolve().then(() => track(200)));
+
+  return new Response(createSafetyFilteredStream(guarded), { status: 200, headers });
+}
+
+/** Quest turns are the only ones that can end in an award. */
+function awardsSeed(tools: ToolDefinition[] | undefined): boolean {
+  return !!tools?.some(t => t.function.name === 'award_seed');
 }

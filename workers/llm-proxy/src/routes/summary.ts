@@ -2,7 +2,8 @@
 
 import { authenticateRequest } from '../middleware/auth';
 import { checkAndIncrementSummaryRateLimit } from '../middleware/rateLimit';
-import { proxyToNebius } from '../services/nebius';
+import { dispatchToNebius } from '../services/nebius';
+import { fallbackModel } from '../services/modelRouting';
 import { screenCouncilContent } from '../utils/contentScreen';
 import { createSafetyFilteredStream } from '../services/streamFilter';
 import { logComplianceEvent, getSeverity } from '../utils/complianceLog';
@@ -143,34 +144,24 @@ export async function handleSummary(request: Request, env: Env, ctx: ExecutionCo
   const figureName = figureId.charAt(0).toUpperCase() + figureId.slice(1);
   const systemPrompt = buildSummaryPrompt(figureName, seedTitle);
 
-  // 5. Proxy to Nebius
-  const nebiusResponse = await proxyToNebius({
+  // 5. Proxy to Nebius. A recap is not a conversation turn: no figure voice, no
+  // mode evaluation behind it, so it stays on the model it has always used.
+  const dispatch = await dispatchToNebius({
     systemPrompt,
     messages: [{ role: 'user', content: history }],
     env,
+    model: fallbackModel(env),
     maxTokens: 4000,
     temperature: 0.7,
   });
 
-  // 6. Add rate limit headers
-  const headers = new Headers(nebiusResponse.headers);
-  headers.set('X-Summary-Daily-Used', String(rateLimit.used));
-  headers.set('X-Summary-Daily-Limit', String(rateLimit.limit));
-  headers.set('X-Summary-Resets-At', rateLimit.resetsAt);
-
-  // 7. Apply output safety filter
-  const filteredBody = nebiusResponse.body
-    ? createSafetyFilteredStream(nebiusResponse.body)
-    : nebiusResponse.body;
-
-  // 8. Anonymous analytics (fire-and-forget)
-  ctx.waitUntil(Promise.resolve().then(() => {
+  const track = (status: number) => {
     trackLlmEvent(env, {
       endpoint: 'summary',
       figureId,
       mode: 'summary',
       language,
-      status: nebiusResponse.status,
+      status,
       durationMs: Date.now() - startMs,
       country: readCountry(request),
       device: readDevice(request),
@@ -178,10 +169,33 @@ export async function handleSummary(request: Request, env: Env, ctx: ExecutionCo
       kind: '',
       probe: readProbe((body as Record<string, unknown>).probe),
     });
-  }));
+  };
 
-  return new Response(filteredBody, {
-    status: nebiusResponse.status,
-    headers,
+  if (!dispatch.ok || !dispatch.stream) {
+    const failure = dispatch.error ?? new Response(
+      JSON.stringify({ error: 'LLM service temporarily unavailable. Please try again.' }),
+      { status: 502, headers: { 'Content-Type': 'application/json' } }
+    );
+    ctx.waitUntil(Promise.resolve().then(() => track(failure.status)));
+    return failure;
+  }
+
+  // 6. Add rate limit headers
+  const headers = new Headers({
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-cache',
+    'Connection': 'keep-alive',
   });
+  headers.set('X-AI-Model', dispatch.served.disclosureLabel);
+  headers.set('X-Summary-Daily-Used', String(rateLimit.used));
+  headers.set('X-Summary-Daily-Limit', String(rateLimit.limit));
+  headers.set('X-Summary-Resets-At', rateLimit.resetsAt);
+
+  // 7. Apply output safety filter
+  const filteredBody = createSafetyFilteredStream(dispatch.stream);
+
+  // 8. Anonymous analytics (fire-and-forget)
+  ctx.waitUntil(Promise.resolve().then(() => track(200)));
+
+  return new Response(filteredBody, { status: 200, headers });
 }

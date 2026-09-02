@@ -32,6 +32,11 @@ preview_id = "85c3e8f1fbab465ca47e3775d67278a5"
 ALLOWED_ORIGINS = "https://agoracosmica.org,https://www.agoracosmica.org"
 NEBIUS_MODEL = "Qwen/Qwen3-235B-A22B-Instruct-2507"
 NEBIUS_BASE_URL = "https://api.studio.nebius.com/v1"
+# Free-tier primary model. "qwen" (or any other value) serves NEBIUS_MODEL;
+# "deepseek" arms the switch, which also serves the listen-cap response rules on
+# both models and activates the daily spend governor. NEBIUS_MODEL stays the
+# fallback either way. Optional: NEBIUS_MODEL_PRO pins a dated snapshot id.
+FREE_TIER_MODEL = "qwen"
 
 # Secrets (set via wrangler secret put):
 # - NEBIUS_API_KEY

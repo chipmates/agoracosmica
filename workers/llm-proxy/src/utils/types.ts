@@ -11,6 +11,13 @@ export interface Env {
   ALLOWED_ORIGINS: string;
   NEBIUS_MODEL: string;
   NEBIUS_BASE_URL: string;
+  // Which model the free tier asks first. "deepseek" arms the switch; unset or
+  // anything else serves NEBIUS_MODEL, which is also the fallback either way.
+  // See services/modelRouting.ts.
+  FREE_TIER_MODEL?: string;
+  // Optional id override for the armed model, so a dated snapshot can be pinned
+  // without a rebuild. Unset uses the id in config.ts:SERVING_MODELS.
+  NEBIUS_MODEL_PRO?: string;
   // Dev-only: when set in .dev.vars, overrides every per-IP daily cap (chat/council/summary)
   // to this integer. Never defined in production wrangler.toml. See config.ts:getEffectiveLimit.
   DEV_RATE_LIMIT?: string;

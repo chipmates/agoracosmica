@@ -358,6 +358,41 @@ export function trackFunnel(
 }
 
 /**
+ * Track a spend-governor threshold crossing or an availability fallback.
+ * dataset: agora_llm
+ * blobs: ['governor', event, endpoint, model, '', device, country]
+ * doubles: [spendUsd]  — day-to-date metered spend in USD at the moment of the
+ *                        event, an aggregate day total and never per visitor
+ * indexes: ['governor']
+ *
+ * event is one of soft_alert, hard_trip, fallback_error, fallback_latency.
+ * blob5 (the status slot on other rows) stays empty: these rows describe a
+ * routing decision, not an HTTP result. blob6/blob7 keep device and country
+ * pinned where every other event type has them.
+ */
+export function trackGovernor(
+  env: Env,
+  data: {
+    event: 'soft_alert' | 'hard_trip' | 'fallback_error' | 'fallback_latency';
+    endpoint: string;
+    model: string;
+    spendUsd: number;
+    country: string;
+    device: string;
+  }
+): void {
+  try {
+    env.ANALYTICS.writeDataPoint({
+      blobs: ['governor', data.event, data.endpoint, data.model, '', data.device, data.country],
+      doubles: [data.spendUsd],
+      indexes: ['governor'],
+    });
+  } catch {
+    // Analytics must never break the request path
+  }
+}
+
+/**
  * Track a rate limit hit (429).
  * dataset: agora_llm
  * blobs: ['ratelimit', endpoint, reason, '', '429', device, country]
