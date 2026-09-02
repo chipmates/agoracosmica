@@ -1,10 +1,12 @@
 {
   "name": "agora-cosmica-llm-worker",
   "version": "1.0.0",
-  "description": "Free-tier LLM proxy — Cloudflare Worker → Nebius Token Factory",
+  "description": "Free-tier LLM proxy \u2014 Cloudflare Worker \u2192 Nebius Token Factory",
   "private": true,
   "scripts": {
     "dev": "wrangler dev",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx test/run.ts",
     "deploy": "wrangler deploy",
     "build:prompts": "npx tsx scripts/bundle-prompts.ts",
     "prebuild": "npm run build:prompts",
