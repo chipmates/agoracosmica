@@ -10,6 +10,13 @@ NEBIUS_API_KEY=your-nebius-api-key-here
 # In production, set via: wrangler secret put JWT_SIGNING_KEY
 JWT_SIGNING_KEY=dev-signing-key-not-for-production-use-only
 
+# Salt for the one-way IP hashes (compliance log + per-address rate counters).
+# Raw addresses are never stored; this salt is what makes the digests unlinkable.
+# Generate with: openssl rand -hex 32
+# In production, set via: wrangler secret put IP_HASH_SALT
+# Optional everywhere: when unset the worker falls back to JWT_SIGNING_KEY.
+IP_HASH_SALT=dev-ip-hash-salt-not-for-production-use-only
+
 # Cloudflare Turnstile secret key (anti-bot challenge on /v1/session).
 # Get one at https://dash.cloudflare.com/?to=/:account/turnstile.
 # Production uses real key; dev can leave empty if not testing the Turnstile path.

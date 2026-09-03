@@ -92,10 +92,15 @@ export async function handleChat(request: Request, env: Env, ctx: ExecutionConte
   // 3. Check rate limits (increments counter; see rateLimit.ts for race caveats)
   const rateLimit = await checkAndIncrementRateLimit(request, env, authResult.payload);
   if (!rateLimit.allowed) {
-    trackRateLimit(env, 'chat', rateLimit.reason === 'global' ? 'global' : 'daily', readCountry(request), readDevice(request));
+    const limitLabel = rateLimit.reason === 'global' || rateLimit.reason === 'ip_ceiling'
+      ? rateLimit.reason
+      : 'daily';
+    trackRateLimit(env, 'chat', limitLabel, readCountry(request), readDevice(request));
     const errorMsg = rateLimit.reason === 'global'
       ? 'Free tier is temporarily at capacity. Set up your own API key for unlimited access.'
-      : 'Daily message limit reached. Your conversations will resume tomorrow.';
+      : rateLimit.reason === 'ip_ceiling'
+        ? 'Too many messages from this network today. Your conversations will resume tomorrow.'
+        : 'Daily message limit reached. Your conversations will resume tomorrow.';
     return new Response(
       JSON.stringify({
         error: errorMsg,

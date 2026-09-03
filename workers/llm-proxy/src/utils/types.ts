@@ -18,6 +18,14 @@ export interface Env {
   // Optional id override for the armed model, so a dated snapshot can be pinned
   // without a rebuild. Unset uses the id in config.ts:SERVING_MODELS.
   NEBIUS_MODEL_PRO?: string;
+  // Daily spend ceiling and soft-alert threshold for the metered model, in USD.
+  // Deployment values (wrangler.toml [vars], or secrets later) so the figures
+  // live in one place. Unset falls back to the floor in config.ts.
+  GOVERNOR_HARD_USD?: string;
+  GOVERNOR_SOFT_USD?: string;
+  // Dedicated salt for one-way IP identifiers. Falls back to JWT_SIGNING_KEY
+  // when unset. See utils/ipHash.ts.
+  IP_HASH_SALT?: string;
   // Dev-only: when set in .dev.vars, overrides every per-IP daily cap (chat/council/summary)
   // to this integer. Never defined in production wrangler.toml. See config.ts:getEffectiveLimit.
   DEV_RATE_LIMIT?: string;
@@ -95,7 +103,9 @@ export interface RateLimitResult {
   daily: { used: number; limit: number };
   resetsAt: string; // ISO timestamp of daily reset
   retryAfterSeconds: number; // seconds until resetsAt (for Retry-After header)
-  reason?: 'per_ip' | 'global'; // set when allowed=false
+  // Set when allowed=false. 'per_ip' is the per-identity bucket (legacy name,
+  // kept because the client branches on it); 'ip_ceiling' is the per-IP bucket.
+  reason?: 'per_ip' | 'global' | 'ip_ceiling';
 }
 
 export interface EndpointRateLimitResult {

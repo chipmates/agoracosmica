@@ -401,7 +401,7 @@ export function trackGovernor(
 export function trackRateLimit(
   env: Env,
   endpoint: string,
-  reason: 'daily' | 'global' | 'council' | 'summary' | 'conversions',
+  reason: 'daily' | 'global' | 'ip_ceiling' | 'council' | 'summary' | 'conversions',
   country: string,
   device: string,
 ): void {

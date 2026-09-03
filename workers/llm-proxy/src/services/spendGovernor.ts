@@ -8,7 +8,12 @@
 // concurrent writers can undercount by one request's worth. At a cap sized far
 // above real volume that is noise, and the counter only ever undercounts.
 
-import { SPEND_GOVERNOR, type ServingModel } from '../config';
+import {
+  SPEND_GOVERNOR,
+  governorHardCapUsd,
+  governorSoftAlertUsd,
+  type ServingModel,
+} from '../config';
 import { trackGovernor } from '../utils/analytics';
 import type { Env } from '../utils/types';
 
@@ -58,8 +63,8 @@ export function spendDayKey(now: Date = new Date()): string {
   }
 }
 
-export function isOverHardCap(usd: number): boolean {
-  return usd >= SPEND_GOVERNOR.HARD_CAP_USD;
+export function isOverHardCap(env: Env, usd: number): boolean {
+  return usd >= governorHardCapUsd(env);
 }
 
 export function usageCostUsd(model: ServingModel, usage: TokenUsage): number {
@@ -96,8 +101,8 @@ export async function recordSpend(
   const total = stored.u + microUsd;
   const totalUsd = total / 1_000_000;
 
-  const crossedSoft = stored.s === 0 && totalUsd >= SPEND_GOVERNOR.SOFT_ALERT_USD;
-  const crossedHard = stored.h === 0 && totalUsd >= SPEND_GOVERNOR.HARD_CAP_USD;
+  const crossedSoft = stored.s === 0 && totalUsd >= governorSoftAlertUsd(env);
+  const crossedHard = stored.h === 0 && totalUsd >= governorHardCapUsd(env);
 
   await env.RATE_LIMITS.put(
     key,

@@ -66,7 +66,7 @@ export async function resolveServing(env: Env): Promise<Serving> {
   }
 
   const spend = await readSpend(env);
-  if (isOverHardCap(spend.usd)) {
+  if (isOverHardCap(env, spend.usd)) {
     return { model: fallback, profile, governorTripped: true, spendUsd: spend.usd };
   }
 

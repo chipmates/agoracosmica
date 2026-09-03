@@ -167,7 +167,7 @@
       "hint": "Klicke auf einen Bereich, um die Einstellungen zu erweitern und anzupassen",
       "manageKeys": "Keys verwalten",
       "selfHosted": "Selbst gehostet",
-      "aiModelBadgeFree": "Qwen3 235B · Frei",
+      "aiModelBadgeFree": "Gehostet in der EU · Frei",
       "aiModelBadgeByok": "Qwen3 235B · Eigener Key"
     },
     "tooltips": {
@@ -1756,11 +1756,11 @@
       },
       "aiModels": {
         "title": "KI-Modelle",
-        "description": "Gleiches Modell auf beiden Wegen. Du wählst den Anbieter.",
+        "description": "Du wählst den Anbieter. Das Modell im kostenlosen Tarif wählen wir.",
         "points": [
-          "Qwen3 235B für kostenlosen Tarif und eigenen Key gleichermaßen",
+          "Kostenloser Tarif: wir wählen das Modell und tauschen es, wenn ein besseres kommt",
           "Kostenlos: über Nebius (Finnland, EU). AVV unterschrieben, ZDR aktiviert.",
-          "Eigener Key: über OpenRouter. ZDR-Routing standardmäßig an."
+          "Eigener Key: Qwen3 235B über OpenRouter. ZDR-Routing standardmäßig an."
         ]
       }
     },

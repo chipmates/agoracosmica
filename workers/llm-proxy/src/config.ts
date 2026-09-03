@@ -7,6 +7,13 @@ export const RATE_LIMITS = {
   GLOBAL_DAILY: 15_000,
   COUNCIL_DAILY_PER_IP: 1,
   SUMMARY_DAILY_PER_IP: 2,
+  // Second bucket beside the per-identity one, keyed by hashed IP. Sized ten
+  // identities wide so shared-exit users never meet it while identity rotation
+  // from one address stops at the eleventh fresh UUID.
+  CHAT_DAILY_PER_IP: 300,
+  // Session mints per IP per clock hour. A mint is a Turnstile solve plus a
+  // JWT, so this bounds how fast one address can manufacture identities.
+  SESSION_HOURLY_PER_IP: 120,
   // Emergency brakes, not throttles: sized ~1000x current organic volume so no
   // real user can ever hit them (council is 1/day per identity, so tripping
   // the brake organically needs 1000 distinct users in one day). They exist
@@ -104,16 +111,36 @@ export const SERVING_MODELS: Record<ServingModelKey, ServingModel> = {
 
 // Daily spend ceiling for the metered model, counted from real token usage at
 // Nebius list price. Hard cap serves the unmetered fallback for the rest of the
-// day (yesterday's quality, not an outage); the soft alert only reports. Sized
-// well above realistic volume: the cap is an abuse valve, not a budget dial.
+// day (yesterday's quality, not an outage); the soft alert only reports.
+//
+// The two figures are deployment values (GOVERNOR_HARD_USD, GOVERNOR_SOFT_USD),
+// so they live in one place and can move from wrangler.toml to a secret without
+// a code change. The constants below are only the floor for a deployment that
+// defines neither: deliberately low, so a missing var costs a day of model
+// quality rather than budget.
 export const SPEND_GOVERNOR = {
-  HARD_CAP_USD: 20,
-  SOFT_ALERT_USD: 10,
+  FLOOR_HARD_CAP_USD: 1,
+  FLOOR_SOFT_ALERT_USD: 0.5,
   /** Counter day boundary. Matches the operating timezone, not UTC. */
   TIMEZONE: 'Europe/Berlin',
   /** Two days, so a counter key outlives the day it belongs to. */
   COUNTER_TTL_SECONDS: 172_800,
 } as const;
+
+/** Positive finite USD amount from a var, or the floor when it is absent or junk. */
+function usdVar(raw: string | undefined, floor: number): number {
+  if (raw === undefined) return floor;
+  const parsed = parseFloat(raw);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : floor;
+}
+
+export function governorHardCapUsd(env: Env): number {
+  return usdVar(env.GOVERNOR_HARD_USD, SPEND_GOVERNOR.FLOOR_HARD_CAP_USD);
+}
+
+export function governorSoftAlertUsd(env: Env): number {
+  return usdVar(env.GOVERNOR_SOFT_USD, SPEND_GOVERNOR.FLOOR_SOFT_ALERT_USD);
+}
 
 // First-token deadline before a request is re-issued on the fallback model.
 // Measured first-chunk latency is ~1.2s, so 5s is a stall rather than a slow turn.

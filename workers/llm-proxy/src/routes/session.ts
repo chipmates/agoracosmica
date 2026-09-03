@@ -13,8 +13,9 @@
 //     (10 min TTL, in-memory only on client).
 
 import { verifyTurnstileToken } from '../services/turnstile';
+import { checkAndIncrementSessionRateLimit } from '../middleware/rateLimit';
 import { signJWT, createJWTPayload } from '../utils/jwt';
-import { trackSession, readCountry, readDevice } from '../utils/analytics';
+import { trackSession, trackRateLimit, readCountry, readDevice } from '../utils/analytics';
 import type { Env } from '../utils/types';
 
 const UUID_V4_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -51,6 +52,27 @@ export async function handleSession(request: Request, env: Env): Promise<Respons
   const isDev = turnstileToken === 'dev-test-token' && !env.TURNSTILE_SECRET_KEY && (!ip || isLoopback);
 
   if (!isDev) {
+    // Ahead of the Turnstile call: minting is the step that creates identities,
+    // so the address ceiling has to bite before a solve is paid for.
+    const mintLimit = await checkAndIncrementSessionRateLimit(request, env);
+    if (!mintLimit.allowed) {
+      trackRateLimit(env, 'session', 'ip_ceiling', readCountry(request), readDevice(request));
+      return new Response(
+        JSON.stringify({
+          error: 'Too many sessions from this network. Please try again later.',
+          reason: 'ip_ceiling',
+          resetsAt: mintLimit.resetsAt,
+        }),
+        {
+          status: 429,
+          headers: {
+            'Content-Type': 'application/json',
+            'Retry-After': String(mintLimit.retryAfterSeconds),
+          },
+        }
+      );
+    }
+
     const verification = await verifyTurnstileToken(
       turnstileToken,
       env.TURNSTILE_SECRET_KEY,

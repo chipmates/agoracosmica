@@ -1,15 +1,39 @@
-// KV-based rate limiting (daily per identity, global daily)
+// KV-based rate limiting (daily per identity, per address, global daily)
 //
-// Counters are keyed by JWT subject (UUID v4 from session.ts), NOT by IP.
-// This isolates each user/device into their own bucket regardless of how
-// many users share a public IP via CGNAT. The legacy IP-keyed counters
+// The quota a visitor feels is keyed by JWT subject (UUID v4 from session.ts),
+// NOT by IP. This isolates each user/device into their own bucket regardless of
+// how many users share a public IP via CGNAT. The legacy IP-keyed counters
 // (`rate:ip:...`) are no longer written; existing keys TTL-expire in 24h.
+//
+// A far wider per-address ceiling sits beside it. Rotating the UUID resets the
+// per-identity bucket, so without this second bucket one machine could mint
+// identities all day. Addresses are hashed, never stored (see utils/ipHash.ts).
 
 import { RATE_LIMITS, getEffectiveLimit } from '../config';
+import { hashIp, ipHashSalt, readClientIp } from '../utils/ipHash';
 import type { Env, JWTPayload, RateLimitResult, EndpointRateLimitResult } from '../utils/types';
 
 function getDateKey(): string {
   return new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+}
+
+/** Fixed clock-hour window, UTC. Matches the daily key's granularity one level down. */
+function getHourKey(): string {
+  return new Date().toISOString().slice(0, 13); // YYYY-MM-DDTHH
+}
+
+function getHourlyResetTime(): string {
+  const next = new Date();
+  next.setUTCMinutes(0, 0, 0);
+  next.setUTCHours(next.getUTCHours() + 1);
+  return next.toISOString();
+}
+
+/** KV key for one address bucket, or null when the edge supplied no address. */
+async function ipCounterKey(request: Request, env: Env, prefix: string, window: string): Promise<string | null> {
+  const ip = readClientIp(request);
+  if (!ip) return null;
+  return `${prefix}:${await hashIp(ip, ipHashSalt(env), 'ratelimit')}:${window}`;
 }
 
 function getDailyResetTime(): string {
@@ -39,7 +63,7 @@ function secondsUntil(isoTimestamp: string): number {
  * true atomicity). Deferred post-launch — see PRODUCTION-ROADMAP.md.
  */
 export async function checkAndIncrementRateLimit(
-  _request: Request,
+  request: Request,
   env: Env,
   payload: JWTPayload,
 ): Promise<RateLimitResult> {
@@ -48,29 +72,35 @@ export async function checkAndIncrementRateLimit(
 
   const dailyKey = `rate:sub:${subject}:${dateKey}`;
   const globalKey = `global:${dateKey}`;
+  const ipKey = await ipCounterKey(request, env, 'ipcap:chat', dateKey);
 
-  const [dailyStr, globalStr] = await Promise.all([
+  const [dailyStr, globalStr, ipStr] = await Promise.all([
     env.RATE_LIMITS.get(dailyKey),
     env.RATE_LIMITS.get(globalKey),
+    ipKey ? env.RATE_LIMITS.get(ipKey) : Promise.resolve(null),
   ]);
 
   const dailyUsed = dailyStr ? parseInt(dailyStr, 10) || 0 : 0;
   const globalUsed = globalStr ? parseInt(globalStr, 10) || 0 : 0;
+  const ipUsed = ipStr ? parseInt(ipStr, 10) || 0 : 0;
   const dailyLimit = getEffectiveLimit(env, 'chat');
   const resetsAt = getDailyResetTime();
   const retryAfterSeconds = secondsUntil(resetsAt);
 
   const overPerIdentity = dailyUsed >= dailyLimit;
   const overGlobal = globalUsed >= RATE_LIMITS.GLOBAL_DAILY;
-  if (overPerIdentity || overGlobal) {
+  const overIp = ipKey !== null && ipUsed >= RATE_LIMITS.CHAT_DAILY_PER_IP;
+  if (overPerIdentity || overGlobal || overIp) {
     return {
       allowed: false,
+      // The visitor's own numbers either way: the address ceiling is a brake on
+      // rotation, not a quota anyone is meant to read off their screen.
       daily: { used: dailyUsed, limit: dailyLimit },
       resetsAt,
       retryAfterSeconds,
-      // If both are tripped, per-identity wins — the user's personal cap is
+      // If several are tripped, per-identity wins — the user's personal cap is
       // the more actionable explanation (BYOK fixes it; global cap doesn't).
-      reason: overPerIdentity ? 'per_ip' : 'global',
+      reason: overPerIdentity ? 'per_ip' : overGlobal ? 'global' : 'ip_ceiling',
     };
   }
 
@@ -80,6 +110,9 @@ export async function checkAndIncrementRateLimit(
   await Promise.all([
     env.RATE_LIMITS.put(dailyKey, dailyCount.toString(), { expirationTtl: 86400 }),
     env.RATE_LIMITS.put(globalKey, globalCount.toString(), { expirationTtl: 86400 }),
+    ipKey
+      ? env.RATE_LIMITS.put(ipKey, (ipUsed + 1).toString(), { expirationTtl: 86400 })
+      : Promise.resolve(),
   ]);
 
   return {
@@ -88,6 +121,34 @@ export async function checkAndIncrementRateLimit(
     resetsAt,
     retryAfterSeconds,
   };
+}
+
+/**
+ * Per-address ceiling on session minting. Counted per clock hour, before the
+ * Turnstile call, so a flood is refused without paying for a verification.
+ * Returns allowed=true unmodified when the edge supplied no address.
+ */
+export async function checkAndIncrementSessionRateLimit(
+  request: Request,
+  env: Env,
+): Promise<EndpointRateLimitResult> {
+  const hourKey = getHourKey();
+  const limit = RATE_LIMITS.SESSION_HOURLY_PER_IP;
+  const resetsAt = getHourlyResetTime();
+  const retryAfterSeconds = secondsUntil(resetsAt);
+
+  const key = await ipCounterKey(request, env, 'ipcap:session', hourKey);
+  if (!key) return { allowed: true, used: 0, limit, resetsAt, retryAfterSeconds };
+
+  const raw = await env.RATE_LIMITS.get(key);
+  const used = raw ? parseInt(raw, 10) || 0 : 0;
+  if (used >= limit) {
+    return { allowed: false, used, limit, resetsAt, retryAfterSeconds };
+  }
+
+  const count = used + 1;
+  await env.RATE_LIMITS.put(key, count.toString(), { expirationTtl: 3600 });
+  return { allowed: true, used: count, limit, resetsAt, retryAfterSeconds };
 }
 
 export async function checkAndIncrementCouncilRateLimit(

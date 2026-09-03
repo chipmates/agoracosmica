@@ -6,6 +6,7 @@
  * IP addresses are always hashed (DSGVO Datenminimierung).
  */
 
+import { hashIp, ipHashSalt } from './ipHash';
 import type { Env } from './types';
 
 export interface ComplianceEvent {
@@ -44,13 +45,6 @@ export function getSeverity(type: string, category: string): 'P1' | 'P2' | 'P3' 
   return SEVERITY_MAP[category] || 'P4';
 }
 
-async function hashIP(ip: string, salt: string): Promise<string> {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(`compliance:${ip}:${salt}`);
-  const hash = await crypto.subtle.digest('SHA-256', data);
-  return Array.from(new Uint8Array(hash)).slice(0, 16).map(b => b.toString(16).padStart(2, '0')).join('');
-}
-
 /**
  * Log a compliance event to KV. Never throws — logging must not break requests.
  */
@@ -61,7 +55,7 @@ export async function logComplianceEvent(
 ): Promise<void> {
   try {
     const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
-    const ipHash = await hashIP(ip, env.JWT_SIGNING_KEY);
+    const ipHash = await hashIp(ip, ipHashSalt(env), 'compliance');
     const timestamp = new Date().toISOString();
 
     const fullEvent: ComplianceEvent = {

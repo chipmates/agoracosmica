@@ -3,7 +3,15 @@
 // No framework: each case throws on failure and the runner reports the tally,
 // so the suite runs anywhere tsx does.
 
-import { COUNCIL_LLM_CONFIG, SERVING_MODELS, SPEND_GOVERNOR, TTFT_FALLBACK_MS } from '../src/config';
+import {
+  COUNCIL_LLM_CONFIG,
+  RATE_LIMITS,
+  SERVING_MODELS,
+  SPEND_GOVERNOR,
+  TTFT_FALLBACK_MS,
+  governorHardCapUsd,
+  governorSoftAlertUsd,
+} from '../src/config';
 import { INSTRUCTIONS } from '../src/prompts/instructions';
 import {
   LIVE_CHAT_SAFETY_RULES,
@@ -14,9 +22,13 @@ import {
 import { buildSystemPrompt } from '../src/services/promptLoader';
 import { fallbackModel, primaryModel, promptProfileFor, resolveServing } from '../src/services/modelRouting';
 import { isOverHardCap, readSpend, recordSpend, spendDayKey, usageCostUsd } from '../src/services/spendGovernor';
+import {
+  checkAndIncrementRateLimit,
+  checkAndIncrementSessionRateLimit,
+} from '../src/middleware/rateLimit';
 import { createAwardGuardedStream } from '../src/services/awardGuard';
 import { dispatchToNebius } from '../src/services/nebius';
-import type { Env } from '../src/utils/types';
+import type { Env, JWTPayload } from '../src/utils/types';
 
 // ---------------------------------------------------------------------------
 // Harness
@@ -62,6 +74,7 @@ function fakeEnv(overrides: Partial<Env> = {}): Env {
     NEBIUS_API_KEY: 'test-key',
     NEBIUS_BASE_URL: 'https://example.invalid/v1',
     NEBIUS_MODEL: 'Qwen/Qwen3-235B-A22B-Instruct-2507',
+    JWT_SIGNING_KEY: 'test-signing-key',
     ALLOWED_ORIGINS: '',
     ...overrides,
   } as unknown as Env;
@@ -69,6 +82,24 @@ function fakeEnv(overrides: Partial<Env> = {}): Env {
 
 const ARMED = fakeEnv({ FREE_TIER_MODEL: 'deepseek' });
 const UNARMED = fakeEnv();
+
+// Ceilings for the governor cases. Test figures on purpose, not the deployment's:
+// what the suite proves is that the worker reads the vars at all.
+const TEST_HARD_USD = 15;
+const TEST_SOFT_USD = 5;
+const governedEnv = (): Env => fakeEnv({
+  FREE_TIER_MODEL: 'deepseek',
+  GOVERNOR_HARD_USD: String(TEST_HARD_USD),
+  GOVERNOR_SOFT_USD: String(TEST_SOFT_USD),
+});
+
+const fakeRequest = (ip?: string): Request =>
+  new Request('https://example.invalid/v1/chat', {
+    method: 'POST',
+    headers: ip ? { 'CF-Connecting-IP': ip } : {},
+  });
+
+const fakeIdentity = (sub: string): JWTPayload => ({ sub, iat: 0, exp: 0 });
 
 function sse(lines: string[]): ReadableStream<Uint8Array> {
   const encoder = new TextEncoder();
@@ -207,6 +238,17 @@ async function main(): Promise<number> {
     assertEqual(Object.keys(INSTRUCTIONS).length, 90, 'bundle size');
   });
 
+  await test('both profiles disclose the Echo when asked, and no longer refuse to', () => {
+    const DISCLOSURE = 'say plainly that you are an AI Echo, an interpretation and not the person';
+    const RETIRED = 'Never break character';
+    for (const profile of ['shipped', 'listen-cap'] as const) {
+      const prompt = buildSystemPrompt('aurelius', 'free_conversation', 'en', profile);
+      assert(prompt, `no prompt for ${profile}`);
+      assert(prompt!.includes(DISCLOSURE), `${profile} is missing the disclosure sentence`);
+      assert(!prompt!.includes(RETIRED), `${profile} still carries the retired sentence`);
+    }
+  });
+
   await test('the seed block and language directive survive the rewrite', () => {
     const prompt = buildSystemPrompt(
       'kahlo', 'seed_conversation', 'de', 'listen-cap',
@@ -235,19 +277,32 @@ async function main(): Promise<number> {
     assertEqual(usageCostUsd(SERVING_MODELS['qwen3-235b'], { promptTokens: 0, completionTokens: 0 }), 0, 'zero usage');
   });
 
-  await test('the hard cap trips only at the ceiling', () => {
-    assertEqual(isOverHardCap(SPEND_GOVERNOR.HARD_CAP_USD - 0.01), false, 'below cap');
-    assertEqual(isOverHardCap(SPEND_GOVERNOR.HARD_CAP_USD), true, 'at cap');
-    assert(SPEND_GOVERNOR.SOFT_ALERT_USD < SPEND_GOVERNOR.HARD_CAP_USD, 'soft alert below hard cap');
+  await test('the ceilings come from the environment, and trip only at the ceiling', () => {
+    const env = governedEnv();
+    assertEqual(governorHardCapUsd(env), TEST_HARD_USD, 'hard cap from the var');
+    assertEqual(governorSoftAlertUsd(env), TEST_SOFT_USD, 'soft alert from the var');
+    assertEqual(isOverHardCap(env, TEST_HARD_USD - 0.01), false, 'below cap');
+    assertEqual(isOverHardCap(env, TEST_HARD_USD), true, 'at cap');
+    assert(governorSoftAlertUsd(env) < governorHardCapUsd(env), 'soft alert below hard cap');
+  });
+
+  await test('a missing or unreadable ceiling falls back to the floor in code', () => {
+    const bare = fakeEnv({ FREE_TIER_MODEL: 'deepseek' });
+    assertEqual(governorHardCapUsd(bare), SPEND_GOVERNOR.FLOOR_HARD_CAP_USD, 'hard floor');
+    assertEqual(governorSoftAlertUsd(bare), SPEND_GOVERNOR.FLOOR_SOFT_ALERT_USD, 'soft floor');
+    const junk = fakeEnv({ GOVERNOR_HARD_USD: 'twenty', GOVERNOR_SOFT_USD: '-3' });
+    assertEqual(governorHardCapUsd(junk), SPEND_GOVERNOR.FLOOR_HARD_CAP_USD, 'hard floor on junk');
+    assertEqual(governorSoftAlertUsd(junk), SPEND_GOVERNOR.FLOOR_SOFT_ALERT_USD, 'soft floor on junk');
+    assert(SPEND_GOVERNOR.FLOOR_SOFT_ALERT_USD < SPEND_GOVERNOR.FLOOR_HARD_CAP_USD, 'floor ordering');
   });
 
   await test('crossing a threshold writes one stats row, and only one', async () => {
     analyticsRows.length = 0;
-    const env = fakeEnv({ FREE_TIER_MODEL: 'deepseek' });
+    const env = governedEnv();
     const model = SERVING_MODELS['dsv4-pro'];
     const context = { endpoint: 'chat', country: 'DE', device: 'desktop' };
-    // 4M output tokens = $14, over the soft alert and under the hard cap.
-    await recordSpend(env, model, { promptTokens: 0, completionTokens: 4_000_000 }, context);
+    // 2M output tokens = $7, over the soft alert and under the hard cap.
+    await recordSpend(env, model, { promptTokens: 0, completionTokens: 2_000_000 }, context);
     assertEqual(analyticsRows.length, 1, 'one row after the soft crossing');
     assertEqual(analyticsRows[0].blobs[0], 'governor', 'row type');
     assertEqual(analyticsRows[0].blobs[1], 'soft_alert', 'event');
@@ -259,7 +314,7 @@ async function main(): Promise<number> {
     assertEqual(analyticsRows.length, 2, 'the hard trip is its own row');
     assertEqual(analyticsRows[1].blobs[1], 'hard_trip', 'event');
     const state = await readSpend(env);
-    assert(state.usd >= SPEND_GOVERNOR.HARD_CAP_USD, 'day total');
+    assert(state.usd >= governorHardCapUsd(env), 'day total');
     assertEqual(state.hardAlerted, true, 'hard flag persisted');
   });
 
@@ -272,7 +327,7 @@ async function main(): Promise<number> {
   });
 
   await test('over the cap, the request is served by the fallback', async () => {
-    const env = fakeEnv({ FREE_TIER_MODEL: 'deepseek' });
+    const env = governedEnv();
     const before = await resolveServing(env);
     assertEqual(before.model.key, 'dsv4-pro', 'primary before the trip');
     assertEqual(before.fallback?.key, 'qwen3-235b', 'fallback armed');
@@ -283,6 +338,77 @@ async function main(): Promise<number> {
     assertEqual(after.model.key, 'qwen3-235b', 'model after the trip');
     assertEqual(after.governorTripped, true, 'trip flag');
     assertEqual(after.profile, 'listen-cap', 'the fallback keeps the same rules');
+  });
+
+  // -------------------------------------------------------------------------
+  // Rate limits: the per-identity quota and the per-address ceilings beside it
+  // -------------------------------------------------------------------------
+
+  await test('one identity spends its daily quota and then gets a 429', async () => {
+    const env = fakeEnv();
+    const request = fakeRequest('203.0.113.7');
+    const identity = fakeIdentity('11111111-1111-4111-8111-111111111111');
+    for (let i = 1; i <= RATE_LIMITS.DAILY_PER_IP; i++) {
+      const result = await checkAndIncrementRateLimit(request, env, identity);
+      assertEqual(result.allowed, true, `request ${i} should pass`);
+      assertEqual(result.daily.used, i, `used after request ${i}`);
+    }
+    const over = await checkAndIncrementRateLimit(request, env, identity);
+    assertEqual(over.allowed, false, 'the 31st request');
+    assertEqual(over.reason, 'per_ip', 'reason');
+    assertEqual(over.daily.limit, RATE_LIMITS.DAILY_PER_IP, 'limit reported');
+  });
+
+  await test('fresh identities from one address stop at the address ceiling', async () => {
+    const env = fakeEnv();
+    const request = fakeRequest('203.0.113.9');
+    const perIdentity = RATE_LIMITS.DAILY_PER_IP;
+    const identities = RATE_LIMITS.CHAT_DAILY_PER_IP / perIdentity;
+    let served = 0;
+    for (let n = 0; n < identities; n++) {
+      const identity = fakeIdentity(`2222222${n}-2222-4222-8222-222222222222`);
+      for (let i = 0; i < perIdentity; i++) {
+        const result = await checkAndIncrementRateLimit(request, env, identity);
+        assertEqual(result.allowed, true, `identity ${n} request ${i}`);
+        served++;
+      }
+    }
+    assertEqual(served, RATE_LIMITS.CHAT_DAILY_PER_IP, 'requests served before the ceiling');
+    // The eleventh identity is brand new and still refused: the second bucket
+    // is what a UUID cycler runs into.
+    const cycler = await checkAndIncrementRateLimit(request, env, fakeIdentity('33333333-3333-4333-8333-333333333333'));
+    assertEqual(cycler.allowed, false, 'the request past the ceiling');
+    assertEqual(cycler.reason, 'ip_ceiling', 'reason');
+    assertEqual(cycler.daily.used, 0, 'the visitor still sees their own quota');
+    // Another address is untouched by the first one's ceiling.
+    const elsewhere = await checkAndIncrementRateLimit(
+      fakeRequest('198.51.100.4'), env, fakeIdentity('44444444-4444-4444-8444-444444444444'));
+    assertEqual(elsewhere.allowed, true, 'a different address');
+  });
+
+  await test('an address without a CF header is never held against anyone', async () => {
+    const env = fakeEnv();
+    const headless = fakeRequest();
+    for (let n = 0; n <= RATE_LIMITS.CHAT_DAILY_PER_IP; n++) {
+      const result = await checkAndIncrementRateLimit(headless, env, fakeIdentity(`5555555${n}-5555-4555-8555-555555555555`));
+      assertEqual(result.allowed, true, `headless request ${n}`);
+    }
+  });
+
+  await test('session minting from one address stops at the hourly ceiling', async () => {
+    const env = fakeEnv();
+    const request = fakeRequest('203.0.113.11');
+    for (let i = 1; i <= RATE_LIMITS.SESSION_HOURLY_PER_IP; i++) {
+      const result = await checkAndIncrementSessionRateLimit(request, env);
+      assertEqual(result.allowed, true, `mint ${i} should pass`);
+      assertEqual(result.used, i, `used after mint ${i}`);
+    }
+    const over = await checkAndIncrementSessionRateLimit(request, env);
+    assertEqual(over.allowed, false, 'the 21st mint');
+    assertEqual(over.limit, RATE_LIMITS.SESSION_HOURLY_PER_IP, 'limit reported');
+    assert(over.retryAfterSeconds > 0 && over.retryAfterSeconds <= 3600, 'retry lands inside the hour');
+    const elsewhere = await checkAndIncrementSessionRateLimit(fakeRequest('198.51.100.6'), env);
+    assertEqual(elsewhere.allowed, true, 'a different address');
   });
 
   // -------------------------------------------------------------------------

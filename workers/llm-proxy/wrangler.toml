@@ -37,11 +37,20 @@ NEBIUS_BASE_URL = "https://api.studio.nebius.com/v1"
 # both models and activates the daily spend governor. NEBIUS_MODEL stays the
 # fallback either way. Optional: NEBIUS_MODEL_PRO pins a dated snapshot id.
 FREE_TIER_MODEL = "qwen"
+# Daily spend ceiling for the metered model and the soft alert below it, in USD.
+# The only place these figures live: src/config.ts carries a low floor for a
+# deployment that sets neither, never the operating numbers. Change them with
+# `wrangler deploy`, or move them to secrets of the same names, no code edit.
+GOVERNOR_HARD_USD = "20"
+GOVERNOR_SOFT_USD = "10"
 
 # Secrets (set via wrangler secret put):
 # - NEBIUS_API_KEY
 # - TURNSTILE_SECRET_KEY
 # - JWT_SIGNING_KEY (openssl rand -hex 32)
+# - IP_HASH_SALT (openssl rand -hex 32) — salts the one-way address hashes used
+#   by the compliance log and the per-address counters. Until it is set the
+#   worker falls back to JWT_SIGNING_KEY, so setting it rotates those hashes once.
 
 # Routes for llm.agoracosmica.org are configured via the Cloudflare
 # dashboard (Workers > Triggers > Custom Domains), not via wrangler.

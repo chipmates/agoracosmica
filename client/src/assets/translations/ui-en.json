@@ -169,7 +169,7 @@
       "hint": "Click any section below to expand and modify settings",
       "manageKeys": "Manage Keys",
       "selfHosted": "Self-hosted",
-      "aiModelBadgeFree": "Qwen3 235B · Free",
+      "aiModelBadgeFree": "Hosted in the EU · Free",
       "aiModelBadgeByok": "Qwen3 235B · Your key"
     },
     "tooltips": {
@@ -1754,11 +1754,11 @@
       },
       "aiModels": {
         "title": "AI Models",
-        "description": "Same model on both paths. Your choice of provider.",
+        "description": "You pick the provider. We pick the free tier model.",
         "points": [
-          "Qwen3 235B for free tier and your-own-key alike",
+          "Free tier: we choose the model and swap it when a better one arrives",
           "Free: via Nebius (Finland, EU). DPA signed, ZDR enabled.",
-          "Your key: via OpenRouter. ZDR routing on by default."
+          "Your key: Qwen3 235B via OpenRouter. ZDR routing on by default."
         ]
       }
     },
