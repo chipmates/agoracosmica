@@ -147,7 +147,7 @@ As a nonprofit, we do not currently offer a paid bug bounty. We can offer:
 - **Prompt-injection defense.** Multi-layer screening pre-LLM-call (jailbreak detection, system-prompt-extraction patterns, harmful content).
 - **Rate limiting.** **Per-identity (UUID-based) for the chat quota, KV-backed 24-hour windows**, plus a global wallet-level daily cap. Short-lived plain-IP keys (1-hour TTL) exist only as flood brakes on the anonymous beacon and conversion routes and never enter analytics.
 - **Edge auth on origins.** Two-token defense (X-Origin-Verify Worker secret + X-Admin-Token) on FSN1+NBG1 nginx. Protects against direct-to-origin abuse with leaked bearers.
-- **Data residency.** EU only. Nebius (Finland), Hetzner (Germany, Falkenstein and Nürnberg).
+- **Data residency.** Hetzner (Germany, Falkenstein and Nürnberg) for audio, Cloudflare for the edge, Nebius for free-tier inference: the primary model in the United Kingdom under the EU adequacy decision, the fallback model in Finland.
 - **Zero Data Retention.** Verified by daily cron audits. No conversation, audio, or text is persisted server-side.
 - **No per-request server logging.** Diagnostic windows are bounded and wiped after. Standing nginx access-log capture is disabled in production. Aligned with our aggregate-only, no-profiling posture: event counters carry no per-user dimension. The one named exception, the opt-in gclid forward for ad arrivals, never enters analytics; see [docs/MEASUREMENT.md](docs/MEASUREMENT.md).
 - **Access control on staging.** All non-production URLs are gated by Cloudflare Access.

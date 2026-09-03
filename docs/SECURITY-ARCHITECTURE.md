@@ -40,7 +40,7 @@ Per GDPR Article 28 transparency, the user-data processors are:
 | Subprocessor | Purpose | Jurisdiction |
 |--------------|---------|--------------|
 | **Cloudflare** | Edge hosting (Pages, Workers), object storage (R2) | EU edge, R2 in Western Europe |
-| **Nebius** | Free-tier LLM inference (Qwen3-235B) | Finland (EU) |
+| **Nebius** | Free-tier LLM inference (DeepSeek V4 Pro, Qwen3-235B fallback) | United Kingdom (EU adequacy decision) for the primary model, Finland (EU) for the fallback |
 | **Hetzner** | Self-hosted TTS and STT GPU servers | Germany (Falkenstein, Nürnberg) |
 | **OpenRouter** | BYOK gateway (you choose the downstream provider) | US, ZDR-capable EU providers selectable |
 
@@ -65,7 +65,7 @@ The system architecture is shown in the [README diagram](../README.md#architectu
 | Use | Algorithm | Detail |
 |-----|-----------|--------|
 | **API-key encryption at rest** | AES-256-GCM | 96-bit random nonce, GCM authentication tag prevents tampering |
-| **Key derivation** | PBKDF2-HMAC-SHA256 | 600,000 iterations on desktop, 100,000 on mobile (battery trade-off) |
+| **Device key** | Non-extractable AES-256-GCM CryptoKey in IndexedDB | The browser will not hand the key back to any script; records written before September 2026 migrate on first load. Conversation history and preferences still derive their key from the older stored secret with PBKDF2-HMAC-SHA256 until their own migration lands |
 | **Session tokens** | HMAC-SHA256 JWT | Strict `alg` validation, UUID-bound subject (not IP-bound), 30-min TTL |
 | **Transit** | TLS 1.3 | HSTS with `includeSubDomains` |
 

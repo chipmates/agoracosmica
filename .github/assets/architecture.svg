@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 628" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Agora Cosmica architecture diagram. Three tiers: your browser holds all user data and the encrypted BYOK key. Cloudflare Workers act as thin proxies with no user data and no per-request logs. Backends include Nebius in Finland for the free tier, OpenRouter for BYOK inference with ZDR providers available, Hetzner GPUs in Germany for self-hosted live audio, and Cloudflare R2 in EU storage for pre-recorded media. A fourth self-host row shows the same app running from docker compose with a local LLM via Ollama, vLLM, or LM Studio, so conversations stay on your machine.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 628" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Agora Cosmica architecture diagram. Three tiers: your browser holds all user data and the encrypted BYOK key. Cloudflare Workers act as thin proxies with no user data and no per-request logs. Backends include Nebius in the United Kingdom and Finland for the free tier, OpenRouter for BYOK inference with ZDR providers available, Hetzner GPUs in Germany for self-hosted live audio, and Cloudflare R2 in EU storage for pre-recorded media. A fourth self-host row shows the same app running from docker compose with a local LLM via Ollama, vLLM, or LM Studio, so conversations stay on your machine.">
   <defs>
     <radialGradient id="bg" cx="50%" cy="35%" r="80%">
       <stop offset="0%" stop-color="#1c2452"/>
@@ -150,7 +150,7 @@
     <rect x="312" y="432" width="245" height="96" rx="12" class="panel-box" filter="url(#lift)"/>
     <text x="340" y="466" class="label box-title">Nebius</text>
     <text x="340" y="495" class="label box-sub">Free tier · 30 msg/day</text>
-    <text x="340" y="519" class="label box-sub">EU (Finland)</text>
+    <text x="340" y="519" class="label box-sub">UK / Finland</text>
 
     <!-- Hetzner GEX130 GPUs -->
     <rect x="576" y="432" width="266" height="96" rx="12" class="panel-box" filter="url(#lift)"/>

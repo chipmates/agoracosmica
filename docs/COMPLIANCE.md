@@ -39,7 +39,7 @@ Legitimate interest (Art. 6(1)(f) GDPR) for providing philosophical dialogue ser
 | Provider | Service | Location | DPA |
 |----------|---------|----------|-----|
 | Cloudflare | Pages, Workers, R2, KV | EU edge (R2 in Western Europe) | DPA via Cloudflare dashboard |
-| Nebius | LLM inference (free tier) | Finland (EU) | Zero Data Retention enabled |
+| Nebius | LLM inference (free tier) | United Kingdom (primary model) and Finland (EU, fallback model) | Zero Data Retention enabled in both regions |
 | Hetzner | GPU servers (TTS/STT) | Germany (Falkenstein, Nürnberg) | German company, GDPR-native |
 | OpenRouter | LLM inference (BYOK) | US-based router. User picks downstream provider, can select ZDR-capable EU providers. | User's direct relationship |
 
@@ -144,11 +144,11 @@ All data processing occurs within the European Union.
 | Worker execution | Cloudflare EU edge network | Cloudflare Workers |
 | Object storage | Western Europe | Cloudflare R2 |
 | Audio processing | Germany (Falkenstein, Nürnberg) | Hetzner |
-| LLM (free tier) | Finland | Nebius |
+| LLM (free tier) | United Kingdom or Finland, depending on the model that answers | Nebius |
 | Safety logs | EU edge | Cloudflare KV |
 | User data | User's device | Browser (IndexedDB) |
 
-No data is transferred outside the EU by ChipMates. BYOK users who choose a non-EU model via OpenRouter make that decision independently.
+The only transfer outside the EEA that ChipMates makes is free-tier inference on the primary model, which Nebius serves from the United Kingdom under the European Commission adequacy decision of 19 December 2025, valid until 27 December 2031. The fallback model runs in Finland. Everything else stays in the EEA. BYOK users who choose a non-EU model via OpenRouter make that decision independently.
 
 ---
 

@@ -166,6 +166,9 @@ const DatenschutzPage: FC = () => {
           <p>
             <strong>EU-US Trans-Atlantic Data Privacy Framework:</strong> Bestimmte Unternehmen in den USA bieten durch das Data Privacy Framework (DPF) ein anerkanntes Datenschutzniveau, das im Rahmen eines Angemessenheitsbeschlusses als sicher anerkannt wurde.
           </p>
+          <p>
+            <strong>Vereinigtes Königreich (KI-Inferenz im kostenlosen Modus):</strong> Das primär eingesetzte Modell des kostenlosen Modus wird von Nebius aus einem Rechenzentrum im Vereinigten Königreich bereitgestellt. Übermittelt werden der Text Ihrer Nachrichten und die Antwort des Modells, kein Name, keine Kontodaten und keine IP-Adresse. Das Vereinigte Königreich ist von der Europäischen Kommission als Land mit angemessenem Datenschutzniveau anerkannt (Angemessenheitsbeschluss nach Art. 45 DSGVO, am 19. Dezember 2025 verlängert und gültig bis zum 27. Dezember 2031). Diese Übermittlung bedarf daher keiner zusätzlichen Garantien. Sollte der Beschluss außer Kraft treten, gelten die Standardvertragsklauseln aus dem Auftragsverarbeitungsvertrag mit Nebius als Garantie. Das Ausweichmodell läuft in Finnland (EWR).
+          </p>
         </section>
 
         <section className="legal-section">
@@ -239,7 +242,7 @@ const DatenschutzPage: FC = () => {
           <p><strong>Verarbeitungszweck:</strong> Bereitstellung des KI-gestützten Bildungsdienstes (Art. 6 Abs. 1 lit. b DSGVO, Vertragserfüllung).</p>
           <p><strong>Auftragsverarbeiter:</strong></p>
           <ul>
-            <li>Nebius B.V. (Niederlande), Verarbeitung in eu-north1 (Finnland, EWR). Zweck: KI-Inferenz (Textgenerierung) im kostenlosen Modus. Keine Datenaufbewahrung (Zero Data Retention aktiviert). Kein Training mit Nutzerdaten. Auftragsverarbeitungsvertrag in den Nebius-Nutzungsbedingungen integriert.</li>
+            <li>Nebius B.V. (Niederlande), Verarbeitung in uk-south1 (Vereinigtes Königreich) und eu-north1 (Finnland, EWR). Zweck: KI-Inferenz (Textgenerierung) im kostenlosen Modus. Das primär eingesetzte Modell antwortet aus dem Vereinigten Königreich. Das Ausweichmodell in Finnland antwortet, wenn das Tagesbudget des primären Modells aufgebraucht oder das Modell nicht erreichbar ist. Keine Datenaufbewahrung (Zero Data Retention aktiviert, von Nebius für unser gesamtes Organisationskonto und alle Regionen angewendet). Kein Training mit Nutzerdaten. Auftragsverarbeitungsvertrag in den Nebius-Nutzungsbedingungen integriert.</li>
             <li>OpenRouter, Inc. (USA). Zweck: API-Routing für KI-Inferenz im BYOK-Modus (Bring Your Own Key). Nutzer stellen ihren eigenen API-Schlüssel bereit, der ausschließlich lokal im Browser gespeichert wird. OpenRouter leitet Anfragen an den gewählten KI-Anbieter weiter. Datenschutzrichtlinie: <a href="https://openrouter.ai/privacy">https://openrouter.ai/privacy</a>.</li>
             <li>Cloudflare, Inc. (USA), Verarbeitung überwiegend in Europa. Zweck: API-Proxy, Sicherheit (WAF, Bot-Schutz), Rate Limiting. Auftragsverarbeitungsvertrag im Cloudflare Dashboard abrufbar. EU Cloud Code of Conduct Compliance Mark.</li>
           </ul>
@@ -312,7 +315,7 @@ const DatenschutzPage: FC = () => {
               <tr>
                 <td style={{ padding: '0.5rem' }}>Nebius B.V.</td>
                 <td style={{ padding: '0.5rem' }}>KI-Inferenz (kostenloser Modus)</td>
-                <td style={{ padding: '0.5rem' }}>eu-north1, Finnland (EWR)</td>
+                <td style={{ padding: '0.5rem' }}>uk-south1 (Vereinigtes Königreich, primäres Modell) und eu-north1 (Finnland, EWR, Ausweichmodell)</td>
               </tr>
               <tr>
                 <td style={{ padding: '0.5rem' }}>OpenRouter, Inc.</td>

@@ -3,7 +3,7 @@ import Public from '../layouts/Public.astro';
 import LegalDoc from '../components/legal/LegalDoc.astro';
 
 const title = 'Privacy Policy';
-const lastUpdated = 'Last updated: 10 June 2026';
+const lastUpdated = 'Last updated: 3 September 2026';
 const description = 'Privacy Policy of ChipMates gemeinnützige GmbH for the Agora Cosmica platform. GDPR-compliant information on data processing, processors, and the rights of data subjects.';
 ---
 <Public
@@ -131,6 +131,9 @@ const description = 'Privacy Policy of ChipMates gemeinnützige GmbH for the Ago
       <p>
         <strong>EU-US Trans-Atlantic Data Privacy Framework:</strong> Certain companies in the USA provide a recognized level of data protection through the Data Privacy Framework (DPF), which has been recognized as safe within the scope of an adequacy decision.
       </p>
+      <p>
+        <strong>United Kingdom (AI inference in the free mode):</strong> The primary model of the free mode is served by Nebius from a data center in the United Kingdom. What is transferred is the text of your messages and the model's reply, no name, no account data and no IP address. The European Commission recognizes the United Kingdom as providing an adequate level of data protection (adequacy decision under Art. 45 GDPR, renewed on 19 December 2025 and in force until 27 December 2031), so this transfer requires no additional safeguards. Should that decision lapse, the standard contractual clauses contained in our data processing agreement with Nebius apply as the safeguard. The fallback model runs in Finland (EEA).
+      </p>
     </section>
 
     <section>
@@ -200,7 +203,7 @@ const description = 'Privacy Policy of ChipMates gemeinnützige GmbH for the Ago
       <p><strong>Purpose of processing:</strong> Provision of the AI-powered educational service (Art. 6(1)(b) GDPR, performance of a contract).</p>
       <p><strong>Processors:</strong></p>
       <ul>
-        <li>Nebius B.V. (Netherlands), processing in eu-north1 (Finland, EEA). Purpose: AI inference (text generation) in the free mode. No data retention (Zero Data Retention enabled). No training on user data. The data processing agreement is integrated into the Nebius terms of use.</li>
+        <li>Nebius B.V. (Netherlands), processing in uk-south1 (United Kingdom) and eu-north1 (Finland, EEA). Purpose: AI inference (text generation) in the free mode. The primary model answers from the United Kingdom. The fallback model in Finland answers when the primary model's daily budget is used up or the model is unavailable. No data retention (Zero Data Retention enabled, which Nebius applies to our whole organization account and to every region). No training on user data. The data processing agreement is integrated into the Nebius terms of use.</li>
         <li>OpenRouter, Inc. (USA). Purpose: API routing for AI inference in BYOK mode (bring your own key). Users provide their own API key, which is stored exclusively locally in the browser. OpenRouter forwards requests to the selected AI provider. Privacy policy: <a href="https://openrouter.ai/privacy">https://openrouter.ai/privacy</a>.</li>
         <li>Cloudflare, Inc. (USA), processing predominantly in Europe. Purpose: API proxy, security (WAF, bot protection), rate limiting. The data processing agreement is available in the Cloudflare dashboard. EU Cloud Code of Conduct compliance mark.</li>
       </ul>
@@ -269,7 +272,7 @@ const description = 'Privacy Policy of ChipMates gemeinnützige GmbH for the Ago
           <tr>
             <td>Nebius B.V.</td>
             <td>AI inference (free mode)</td>
-            <td>eu-north1, Finland (EEA)</td>
+            <td>uk-south1 (United Kingdom, primary model) and eu-north1 (Finland, EEA, fallback model)</td>
           </tr>
           <tr>
             <td>OpenRouter, Inc.</td>
