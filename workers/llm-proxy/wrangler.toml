@@ -36,7 +36,7 @@ NEBIUS_BASE_URL = "https://api.studio.nebius.com/v1"
 # "deepseek" arms the switch, which also serves the listen-cap response rules on
 # both models and activates the daily spend governor. NEBIUS_MODEL stays the
 # fallback either way. Optional: NEBIUS_MODEL_PRO pins a dated snapshot id.
-FREE_TIER_MODEL = "qwen"
+FREE_TIER_MODEL = "deepseek"
 # Daily spend ceiling for the metered model and the soft alert below it, in USD.
 # The only place these figures live: src/config.ts carries a low floor for a
 # deployment that sets neither, never the operating numbers. Change them with
