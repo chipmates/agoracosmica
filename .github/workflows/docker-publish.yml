@@ -110,7 +110,7 @@ jobs:
           cache-to: type=gha,mode=max,scope=${{ matrix.image.name }}
 
       - name: Generate SBOM attestation
-        uses: actions/attest-sbom@v1
+        uses: actions/attest-sbom@v4
         if: github.event_name == 'push'
         with:
           subject-name: ghcr.io/chipmates/${{ matrix.image.name }}
