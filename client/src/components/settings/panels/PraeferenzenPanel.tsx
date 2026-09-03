@@ -99,9 +99,11 @@ const PraeferenzenPanel: FC<PraeferenzenPanelProps> = ({
     return tString('settings.preferences.selfHosted', 'Self-hosted');
   };
 
+  // The free-tier badge must hold whichever model the worker is serving, and
+  // those are not all in the EU. The panel itself names the model and the country.
   const getAiModelBadge = (): string => hasByokKey
     ? tString('settings.preferences.aiModelBadgeByok', 'Qwen3 235B · Your key')
-    : tString('settings.preferences.aiModelBadgeFree', 'Qwen3 235B · Free');
+    : tString('settings.preferences.aiModelBadgeFree', 'Europe · Free tier');
 
   return (
     <div className={styles.tabPanel}>

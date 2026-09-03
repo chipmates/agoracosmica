@@ -45,6 +45,18 @@ export interface SpendContext {
   device: string;
 }
 
+/** What one response did to the day's thresholds. Feeds the operator alerts. */
+export interface SpendCrossing {
+  /** The counter's day, so an alert can be held to one per day. */
+  dayKey: string;
+  /** Day-to-date metered spend in USD after this response. */
+  spendUsd: number;
+  /** The model that just answered. */
+  model: ServingModel;
+  crossedSoft: boolean;
+  crossedHard: boolean;
+}
+
 /**
  * The counter's day, in the operating timezone rather than UTC, so a reset
  * lands at local midnight and daylight saving is handled for us.
@@ -60,6 +72,49 @@ export function spendDayKey(now: Date = new Date()): string {
   } catch {
     // A runtime without timezone data still needs a stable daily key.
     return now.toISOString().slice(0, 10);
+  }
+}
+
+/** Offset of the operating timezone at an instant, in milliseconds. */
+function zoneOffsetMs(at: Date): number {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: SPEND_GOVERNOR.TIMEZONE,
+    hour12: false,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  }).formatToParts(at);
+  const field = (type: string) => Number(parts.find(p => p.type === type)?.value ?? '0');
+  const wall = Date.UTC(
+    field('year'), field('month') - 1, field('day'),
+    field('hour') % 24, field('minute'), field('second'),
+  );
+  return wall - at.getTime();
+}
+
+/**
+ * When the day's counter rolls over: the next midnight in the operating
+ * timezone. Read-only, so the client can be told without touching KV.
+ */
+export function spendResetsAt(now: Date = new Date()): string {
+  try {
+    const offset = zoneOffsetMs(now);
+    const wall = new Date(now.getTime() + offset);
+    const nextWallMidnight = Date.UTC(
+      wall.getUTCFullYear(), wall.getUTCMonth(), wall.getUTCDate() + 1,
+    );
+    // A daylight-saving shift between now and the boundary moves the instant,
+    // so the offset is re-read at the boundary itself.
+    const settled = nextWallMidnight - zoneOffsetMs(new Date(nextWallMidnight - offset));
+    return new Date(settled).toISOString();
+  } catch {
+    const utcMidnight = new Date(now);
+    utcMidnight.setUTCDate(utcMidnight.getUTCDate() + 1);
+    utcMidnight.setUTCHours(0, 0, 0, 0);
+    return utcMidnight.toISOString();
   }
 }
 
@@ -83,7 +138,8 @@ export async function readSpend(env: Env, now: Date = new Date()): Promise<Spend
 /**
  * Add one response's cost to the day and emit a stats row the first time the
  * day crosses either threshold. Call from ctx.waitUntil: it must not sit in
- * front of the stream.
+ * front of the stream. Returns what the day crossed, so the caller can alert
+ * on it without this module knowing about notification channels.
  */
 export async function recordSpend(
   env: Env,
@@ -91,12 +147,16 @@ export async function recordSpend(
   usage: TokenUsage,
   context: SpendContext,
   now: Date = new Date(),
-): Promise<void> {
-  if (!model.metered) return;
+): Promise<SpendCrossing> {
+  const dayKey = spendDayKey(now);
+  const quiet: SpendCrossing = {
+    dayKey, spendUsd: 0, model, crossedSoft: false, crossedHard: false,
+  };
+  if (!model.metered) return quiet;
   const microUsd = Math.round(usageCostUsd(model, usage) * 1_000_000);
-  if (microUsd <= 0) return;
+  if (microUsd <= 0) return quiet;
 
-  const key = COUNTER_PREFIX + spendDayKey(now);
+  const key = COUNTER_PREFIX + dayKey;
   const stored = parseStored(await env.RATE_LIMITS.get(key));
   const total = stored.u + microUsd;
   const totalUsd = total / 1_000_000;
@@ -120,6 +180,8 @@ export async function recordSpend(
   if (crossedHard) {
     trackGovernor(env, { event: 'hard_trip', model: model.key, spendUsd: totalUsd, ...context });
   }
+
+  return { dayKey, spendUsd: totalUsd, model, crossedSoft, crossedHard };
 }
 
 function parseStored(raw: string | null): StoredSpend {

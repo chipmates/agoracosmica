@@ -7,6 +7,7 @@ import { createPreferencesSlice } from './slices/preferencesSlice';
 import { createFirstVisitSlice } from './slices/firstVisitSlice';
 import { createVoicePreferencesSlice } from './slices/voicePreferencesSlice';
 import { isEnglishEngine } from '../services/audio/voices/voiceDefinitions';
+import type { FreeTierState } from '../utils/freeTierState';
 
 const debugLog = (...args: any[]) => {
   if (import.meta.env.DEV) {
@@ -73,6 +74,7 @@ const createInitialState = () => ({
     loaded: false,
     council: { used: 0, limit: 1, loaded: false },
     summary: { used: 0, limit: 2, loaded: false },
+    freeTier: null,
   },
   rateLimitModal: {
     isOpen: false,
@@ -282,6 +284,10 @@ export const useDomainStore = create<DomainSlices>()(
         setIsFreeTier: (isFreeTier: boolean) =>
           set((state: DomainSlices) => ({
             quota: { ...state.quota, isFreeTier },
+          })),
+        setFreeTierState: (freeTier: FreeTierState | null) =>
+          set((state: DomainSlices) => ({
+            quota: { ...state.quota, freeTier },
           })),
         openRateLimitModal: (endpoint: 'chat' | 'council' | 'summary', resetsAt: string | null, limit: number | null = null) =>
           set(() => ({

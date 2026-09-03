@@ -4,9 +4,14 @@
 // selects the primary model, and everything else here follows from it. Unset,
 // the worker serves exactly what it served before this file existed.
 
-import { SERVING_MODELS, type ServingModel } from '../config';
+import {
+  SERVING_MODELS,
+  type ServingModel,
+  type ServingModelKey,
+  type ServingRegion,
+} from '../config';
 import type { PromptProfile } from '../prompts/responseRules';
-import { readSpend, isOverHardCap } from './spendGovernor';
+import { readSpend, isOverHardCap, spendResetsAt } from './spendGovernor';
 import type { Env } from '../utils/types';
 
 /** The only value that arms the switch. Anything else keeps the fallback model. */
@@ -76,5 +81,57 @@ export async function resolveServing(env: Env): Promise<Serving> {
     profile,
     governorTripped: false,
     spendUsd: spend.usd,
+  };
+}
+
+/** One model as the client sees it: identifiers only, never an id or a price. */
+export interface ServedModelState {
+  key: ServingModelKey;
+  label: string;
+  region: ServingRegion;
+}
+
+/**
+ * What the free tier is doing right now, read-only. The client renders it, so
+ * everything here is an identifier it can translate: no ids, no dollar figures.
+ */
+export interface FreeTierState {
+  primary: ServedModelState;
+  /** Null when the primary is also the fallback, so there is nothing to switch to. */
+  fallback: ServedModelState | null;
+  governor: {
+    /** True when a metered model is the primary, so the budget applies at all. */
+    armed: boolean;
+    /** True when today's counter already sent requests to the fallback. */
+    tripped: boolean;
+    /** Next midnight in the operating timezone, when the counter rolls over. */
+    resetsAt: string;
+  };
+  /** The model that would answer a request made at this moment. */
+  serving: ServedModelState;
+}
+
+function describe(model: ServingModel): ServedModelState {
+  return { key: model.key, label: model.label, region: model.region };
+}
+
+/**
+ * Resolve the state without writing anything: the same read the router already
+ * does, so a client asking costs one KV get and never moves the counter.
+ */
+export async function freeTierState(env: Env): Promise<FreeTierState> {
+  const serving = await resolveServing(env);
+  const primary = primaryModel(env);
+  const fallback = fallbackModel(env);
+
+  return {
+    primary: describe(primary),
+    fallback: fallback.key === primary.key ? null : describe(fallback),
+    governor: {
+      armed: isSwitchArmed(env),
+      tripped: serving.governorTripped,
+      resetsAt: spendResetsAt(),
+    },
+    serving: describe(serving.model),
   };
 }

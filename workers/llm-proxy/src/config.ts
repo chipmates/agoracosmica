@@ -67,12 +67,21 @@ export const COUNCIL_LLM_CONFIG = {
 // a rebuild. BYOK requests never reach this worker.
 export type ServingModelKey = 'qwen3-235b' | 'dsv4-pro';
 
+/** Provider region a model is served from. The client turns it into a place name. */
+export type ServingRegion = 'eu-north1' | 'uk-south1';
+
 export interface ServingModel {
   key: ServingModelKey;
   /** Nebius model id. */
   id: string;
   /** Machine-readable model label for the EU AI Act Art. 50(2) header. */
   disclosureLabel: string;
+  /** Stable identifier the client translates into a display name. */
+  label: string;
+  /** Human name for operator messages, which are never translated. */
+  displayName: string;
+  /** Where the provider serves this model. Shown to the user, so it must be exact. */
+  region: ServingRegion;
   /** presence_penalty on /v1/chat. Persona-collapse mitigation, tuned per model. */
   chatPresencePenalty: number;
   /** Extra top-level request fields, e.g. the reasoning switch. */
@@ -88,6 +97,9 @@ export const SERVING_MODELS: Record<ServingModelKey, ServingModel> = {
     key: 'qwen3-235b',
     id: 'Qwen/Qwen3-235B-A22B-Instruct-2507',
     disclosureLabel: 'Qwen3-235B-A22B-Instruct',
+    label: 'qwen3-235b',
+    displayName: 'Qwen3 235B',
+    region: 'eu-north1',
     chatPresencePenalty: 1.5,
     extras: {},
     pricePer1M: { input: 0.087, output: 0.35 },
@@ -99,6 +111,9 @@ export const SERVING_MODELS: Record<ServingModelKey, ServingModel> = {
     // evaluation ran against. NEBIUS_MODEL_PRO pins a dated id the day one exists.
     id: 'deepseek-ai/DeepSeek-V4-Pro',
     disclosureLabel: 'DeepSeek-V4-Pro',
+    label: 'deepseek-v4-pro',
+    displayName: 'DeepSeek V4 Pro',
+    region: 'uk-south1',
     // The 1.5 penalty is Qwen-tuned and degrades this model.
     chatPresencePenalty: 0,
     // Reasoning is on by default here; without the switch, thinking tags leak
@@ -125,6 +140,14 @@ export const SPEND_GOVERNOR = {
   TIMEZONE: 'Europe/Berlin',
   /** Two days, so a counter key outlives the day it belongs to. */
   COUNTER_TTL_SECONDS: 172_800,
+} as const;
+
+// Operator alerts for the free-tier switch, pushed to Telegram beside the
+// stats rows. The two daily events are already written once a day, so only the
+// availability events need collapsing: one message per event type per window,
+// which keeps a provider wobble from filling the chat.
+export const TELEGRAM_ALERTS = {
+  FALLBACK_WINDOW_SECONDS: 600,
 } as const;
 
 /** Positive finite USD amount from a var, or the floor when it is absent or junk. */

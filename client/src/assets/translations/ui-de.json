@@ -167,7 +167,7 @@
       "hint": "Klicke auf einen Bereich, um die Einstellungen zu erweitern und anzupassen",
       "manageKeys": "Keys verwalten",
       "selfHosted": "Selbst gehostet",
-      "aiModelBadgeFree": "Gehostet in der EU · Frei",
+      "aiModelBadgeFree": "Europa · Kostenlos",
       "aiModelBadgeByok": "Qwen3 235B · Eigener Key"
     },
     "tooltips": {
@@ -316,6 +316,18 @@
       "modelTagline": "Frontier-Klasse. Gleiches Modell im kostenlosen Tarif und mit deinem eigenen Key.",
       "statusFree": "Kostenloser Tarif aktiv. 30 Gespräche pro Tag.",
       "statusByok": "Dein OpenRouter-Key ist aktiv. Kein Tageslimit.",
+      "servedIn": "Serverstandort: {region}",
+      "afterBudget": "Nach dem Tagesbudget: {model}, {region}",
+      "budgetWithin": "Heute: im Budget",
+      "budgetReached": "Budget erreicht, {model} antwortet bis Mitternacht",
+      "models": {
+        "qwen3-235b": "Qwen3 235B",
+        "deepseek-v4-pro": "DeepSeek V4 Pro"
+      },
+      "regions": {
+        "eu-north1": "Finnland (EU)",
+        "uk-south1": "Vereinigtes Königreich"
+      },
       "keySectionTitle": "Eigenen Key nutzen (optional)",
       "keySectionIntro": "Füge einen OpenRouter-Key hinzu, um das Tageslimit zu überspringen. Du siehst und kontrollierst deine Nutzung.",
       "aboutOpenRouter": {

@@ -5,8 +5,9 @@ import { validateChatRequest } from '../middleware/validation';
 import { checkAndIncrementRateLimit } from '../middleware/rateLimit';
 import { buildSystemPrompt } from '../services/promptLoader';
 import { dispatchToNebius } from '../services/nebius';
-import { resolveServing } from '../services/modelRouting';
+import { fallbackModel, resolveServing } from '../services/modelRouting';
 import { recordSpend } from '../services/spendGovernor';
+import { alertFallback, alertSpendCrossing } from '../services/telegram';
 import { AWARD_RETRY_DIRECTIVE, createAwardGuardedStream } from '../services/awardGuard';
 import { screenCouncilContent } from '../utils/contentScreen';
 import { createSafetyFilteredStream } from '../services/streamFilter';
@@ -141,7 +142,10 @@ export async function handleChat(request: Request, env: Env, ctx: ExecutionConte
 
   // 5. Proxy to Nebius with SSE pass-through
   const meter = (model: ServingModel, usage: TokenUsage) => {
-    ctx.waitUntil(recordSpend(env, model, usage, { endpoint: 'chat', country, device }));
+    ctx.waitUntil(
+      recordSpend(env, model, usage, { endpoint: 'chat', country, device })
+        .then(crossing => alertSpendCrossing(env, crossing, fallbackModel(env))),
+    );
   };
   const dispatchOptions = {
     systemPrompt,
@@ -180,14 +184,16 @@ export async function handleChat(request: Request, env: Env, ctx: ExecutionConte
   }
 
   if (dispatch.fallbackReason) {
+    const event = dispatch.fallbackReason === 'latency' ? 'fallback_latency' : 'fallback_error';
     trackGovernor(env, {
-      event: dispatch.fallbackReason === 'latency' ? 'fallback_latency' : 'fallback_error',
+      event,
       endpoint: 'chat',
       model: dispatch.served.key,
       spendUsd: serving.spendUsd,
       country,
       device,
     });
+    ctx.waitUntil(alertFallback(env, { event, served: dispatch.served, spendUsd: serving.spendUsd }));
   }
 
   // 6. Rate limit already incremented atomically in step 3
@@ -197,6 +203,7 @@ export async function handleChat(request: Request, env: Env, ctx: ExecutionConte
   headers.set('Cache-Control', 'no-cache');
   headers.set('Connection', 'keep-alive');
   headers.set('X-AI-Model', dispatch.served.disclosureLabel);
+  headers.set('X-Model', dispatch.served.label);
   headers.set('X-Quota-Daily-Used', String(rateLimit.daily.used));
   headers.set('X-Quota-Daily-Limit', String(rateLimit.daily.limit));
   headers.set('X-Quota-Resets-At', rateLimit.resetsAt);

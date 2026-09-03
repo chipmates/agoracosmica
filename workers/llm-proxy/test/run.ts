@@ -8,6 +8,7 @@ import {
   RATE_LIMITS,
   SERVING_MODELS,
   SPEND_GOVERNOR,
+  TELEGRAM_ALERTS,
   TTFT_FALLBACK_MS,
   governorHardCapUsd,
   governorSoftAlertUsd,
@@ -20,14 +21,21 @@ import {
   applyProfileRules,
 } from '../src/prompts/responseRules';
 import { buildSystemPrompt } from '../src/services/promptLoader';
-import { fallbackModel, primaryModel, promptProfileFor, resolveServing } from '../src/services/modelRouting';
-import { isOverHardCap, readSpend, recordSpend, spendDayKey, usageCostUsd } from '../src/services/spendGovernor';
+import { fallbackModel, freeTierState, primaryModel, promptProfileFor, resolveServing } from '../src/services/modelRouting';
+import {
+  isOverHardCap, readSpend, recordSpend, spendDayKey, spendResetsAt, usageCostUsd,
+} from '../src/services/spendGovernor';
+import { alertFallback, alertSpendCrossing } from '../src/services/telegram';
 import {
   checkAndIncrementRateLimit,
   checkAndIncrementSessionRateLimit,
 } from '../src/middleware/rateLimit';
 import { createAwardGuardedStream } from '../src/services/awardGuard';
 import { dispatchToNebius } from '../src/services/nebius';
+import { handleChat } from '../src/routes/chat';
+import { handleQuota } from '../src/routes/quota';
+import { signJWT } from '../src/utils/jwt';
+import worker from '../src/index';
 import type { Env, JWTPayload } from '../src/utils/types';
 
 // ---------------------------------------------------------------------------
@@ -58,11 +66,28 @@ function assertEqual(actual: unknown, expected: unknown, message: string): void 
 // ---------------------------------------------------------------------------
 
 function fakeKv(): KVNamespace {
+  return auditedKv().kv;
+}
+
+/** A KV that also records every key written, so a read path can be proven read-only. */
+function auditedKv(): { kv: KVNamespace; puts: string[] } {
   const store = new Map<string, string>();
-  return {
+  const puts: string[] = [];
+  const kv = {
     get: async (key: string) => store.get(key) ?? null,
-    put: async (key: string, value: string) => { store.set(key, value); },
+    put: async (key: string, value: string) => { puts.push(key); store.set(key, value); },
   } as unknown as KVNamespace;
+  return { kv, puts };
+}
+
+/** Collects the background work a route hands off, so a test can await it. */
+function fakeCtx(): { ctx: ExecutionContext; pending: Promise<unknown>[] } {
+  const pending: Promise<unknown>[] = [];
+  const ctx = {
+    waitUntil: (work: Promise<unknown>) => { pending.push(work); },
+    passThroughOnException: () => { /* no-op */ },
+  } as unknown as ExecutionContext;
+  return { ctx, pending };
 }
 
 const analyticsRows: { blobs: unknown[]; doubles: unknown[]; indexes: unknown[] }[] = [];
@@ -341,6 +366,76 @@ async function main(): Promise<number> {
   });
 
   // -------------------------------------------------------------------------
+  // The free-tier state the client renders
+  // -------------------------------------------------------------------------
+
+  await test('unarmed: the state names one model and nothing to switch to', async () => {
+    const state = await freeTierState(UNARMED);
+    assertEqual(state.primary.key, 'qwen3-235b', 'primary key');
+    assertEqual(state.primary.label, 'qwen3-235b', 'primary label');
+    assertEqual(state.primary.region, 'eu-north1', 'primary region');
+    assertEqual(state.fallback, null, 'fallback');
+    assertEqual(state.governor.armed, false, 'armed');
+    assertEqual(state.governor.tripped, false, 'tripped');
+    assertEqual(state.serving.key, 'qwen3-235b', 'serving key');
+  });
+
+  await test('armed: the state names both models and where each is served', async () => {
+    const state = await freeTierState(governedEnv());
+    assertEqual(state.primary.label, 'deepseek-v4-pro', 'primary label');
+    assertEqual(state.primary.region, 'uk-south1', 'primary region');
+    assertEqual(state.fallback?.label, 'qwen3-235b', 'fallback label');
+    assertEqual(state.fallback?.region, 'eu-north1', 'fallback region');
+    assertEqual(state.governor.armed, true, 'armed');
+    assertEqual(state.governor.tripped, false, 'tripped');
+    assertEqual(state.serving.key, 'dsv4-pro', 'serving key');
+    assert(new Date(state.governor.resetsAt).getTime() > Date.now(), 'the reset is in the future');
+  });
+
+  await test('the state carries identifiers only: no provider ids, no dollar figures', async () => {
+    const serialized = JSON.stringify(await freeTierState(governedEnv()));
+    assert(!serialized.includes('deepseek-ai/'), 'a provider model id leaked');
+    assert(!serialized.includes('Qwen/'), 'a provider model id leaked');
+    assert(!serialized.includes('usd') && !serialized.includes('Usd'), 'a spend figure leaked');
+    assertEqual(serialized.includes(String(TEST_HARD_USD)), false, 'the ceiling leaked');
+  });
+
+  await test('armed and spent: the state says the fallback is answering', async () => {
+    const env = governedEnv();
+    await recordSpend(env, SERVING_MODELS['dsv4-pro'], { promptTokens: 0, completionTokens: 9_000_000 }, {
+      endpoint: 'chat', country: 'DE', device: 'desktop',
+    });
+    const state = await freeTierState(env);
+    assertEqual(state.governor.tripped, true, 'tripped');
+    assertEqual(state.serving.key, 'qwen3-235b', 'serving key');
+    assertEqual(state.primary.key, 'dsv4-pro', 'the primary is still named');
+    assertEqual(state.fallback?.key, 'qwen3-235b', 'the fallback is still named');
+  });
+
+  await test('reading the state is a read: it never writes to KV', async () => {
+    const audited = auditedKv();
+    const env = fakeEnv({
+      FREE_TIER_MODEL: 'deepseek',
+      GOVERNOR_HARD_USD: String(TEST_HARD_USD),
+      GOVERNOR_SOFT_USD: String(TEST_SOFT_USD),
+      RATE_LIMITS: audited.kv,
+    });
+    await freeTierState(env);
+    await freeTierState(env);
+    assertEqual(audited.puts.length, 0, `writes during a state read: ${audited.puts.join(', ')}`);
+  });
+
+  await test('the counter rolls over at local midnight, not UTC midnight', () => {
+    const summer = spendResetsAt(new Date('2026-07-15T09:00:00Z'));
+    assertEqual(summer, '2026-07-15T22:00:00.000Z', 'summer boundary');
+    const winter = spendResetsAt(new Date('2026-01-15T09:00:00Z'));
+    assertEqual(winter, '2026-01-15T23:00:00.000Z', 'winter boundary');
+    const reset = new Date(summer);
+    assertEqual(spendDayKey(new Date(reset.getTime() - 1000)), '2026-07-15', 'the second before is today');
+    assertEqual(spendDayKey(reset), '2026-07-16', 'the reset instant is tomorrow');
+  });
+
+  // -------------------------------------------------------------------------
   // Rate limits: the per-identity quota and the per-address ceilings beside it
   // -------------------------------------------------------------------------
 
@@ -552,6 +647,178 @@ async function main(): Promise<number> {
     });
     assertEqual(result.ok, false, 'dispatch failed');
     assertEqual(result.error?.status, 502, 'client status');
+  });
+
+  // -------------------------------------------------------------------------
+  // Operator alerts: one line per event, and flood control in front of them
+  // -------------------------------------------------------------------------
+
+  const TEST_BOT_TOKEN = 'test-bot-token';
+  const TEST_CHAT_ID = '-1000000000';
+  const telegramEnv = (overrides: Partial<Env> = {}): Env => fakeEnv({
+    TELEGRAM_BOT_TOKEN: TEST_BOT_TOKEN,
+    TELEGRAM_CHAT_ID: TEST_CHAT_ID,
+    ...overrides,
+  });
+
+  const stubTelegram = (): { url: string; body: Record<string, unknown> }[] => {
+    const calls: { url: string; body: Record<string, unknown> }[] = [];
+    globalThis.fetch = (async (url: string, init: RequestInit) => {
+      calls.push({ url: String(url), body: JSON.parse(String(init.body)) as Record<string, unknown> });
+      return new Response('{"ok":true}', { status: 200 });
+    }) as unknown as typeof fetch;
+    return calls;
+  };
+
+  const crossing = (over: Partial<{
+    dayKey: string; spendUsd: number; crossedSoft: boolean; crossedHard: boolean;
+  }> = {}) => ({
+    dayKey: '2026-09-03',
+    spendUsd: 10.24,
+    model: SERVING_MODELS['dsv4-pro'],
+    crossedSoft: false,
+    crossedHard: false,
+    ...over,
+  });
+
+  await test('the budget alerts name the spend and the model, once per day each', async () => {
+    const calls = stubTelegram();
+    const env = telegramEnv();
+
+    await alertSpendCrossing(env, crossing({ crossedSoft: true }));
+    await alertSpendCrossing(env, crossing({ crossedSoft: true }));
+    assertEqual(calls.length, 1, 'soft alerts sent');
+    assertEqual(calls[0].url, `https://api.telegram.org/bot${TEST_BOT_TOKEN}/sendMessage`, 'Bot API endpoint');
+    assertEqual(calls[0].body.chat_id, TEST_CHAT_ID, 'chat id');
+    assertEqual(
+      calls[0].body.text,
+      'Free tier: soft alert at 10.24 USD day to date, DeepSeek V4 Pro still answering',
+      'soft line',
+    );
+
+    await alertSpendCrossing(env, crossing({ crossedHard: true, spendUsd: 20.03 }));
+    assertEqual(calls.length, 2, 'hard trips sent');
+    assertEqual(
+      calls[1].body.text,
+      'Free tier: daily budget reached at 20.03 USD, Qwen3 235B answers until midnight',
+      'hard line',
+    );
+
+    await alertSpendCrossing(env, crossing({ dayKey: '2026-09-04', crossedSoft: true }));
+    assertEqual(calls.length, 3, 'the next day alerts again');
+  });
+
+  await test('a wobble is one message per window, and each event type has its own', async () => {
+    const calls = stubTelegram();
+    const env = telegramEnv();
+    const served = SERVING_MODELS['qwen3-235b'];
+
+    for (let i = 0; i < 5; i++) {
+      await alertFallback(env, { event: 'fallback_error', served, spendUsd: 12.4 });
+    }
+    assertEqual(calls.length, 1, 'error alerts inside one window');
+    assertEqual(
+      calls[0].body.text,
+      'Free tier: primary model failed, Qwen3 235B answering, 12.40 USD day to date',
+      'error line',
+    );
+
+    await alertFallback(env, { event: 'fallback_latency', served, spendUsd: 12.4 });
+    assertEqual(calls.length, 2, 'the other event type has its own window');
+    assertEqual(
+      calls[1].body.text,
+      'Free tier: primary model stalled, Qwen3 235B answering, 12.40 USD day to date',
+      'latency line',
+    );
+    assert(TELEGRAM_ALERTS.FALLBACK_WINDOW_SECONDS >= 600, 'the window collapses a burst');
+  });
+
+  await test('without the bot token nothing is sent and nothing is claimed', async () => {
+    const calls = stubTelegram();
+    const audited = auditedKv();
+    const env = fakeEnv({ TELEGRAM_CHAT_ID: TEST_CHAT_ID, RATE_LIMITS: audited.kv });
+    await alertSpendCrossing(env, crossing({ crossedSoft: true, crossedHard: true }));
+    await alertFallback(env, { event: 'fallback_error', served: SERVING_MODELS['qwen3-235b'], spendUsd: 1 });
+    assertEqual(calls.length, 0, 'messages sent');
+    assertEqual(audited.puts.length, 0, 'flood-control keys written');
+  });
+
+  await test('a Telegram outage never reaches the request path', async () => {
+    globalThis.fetch = (async () => { throw new Error('telegram down'); }) as unknown as typeof fetch;
+    await alertFallback(telegramEnv(), {
+      event: 'fallback_error', served: SERVING_MODELS['qwen3-235b'], spendUsd: 0,
+    });
+  });
+
+  // -------------------------------------------------------------------------
+  // Routes: what the browser is told about the model
+  // -------------------------------------------------------------------------
+
+  const IDENTITY = '66666666-6666-4666-8666-666666666666';
+  const bearer = async (env: Env): Promise<string> => {
+    const nowSeconds = Math.floor(Date.now() / 1000);
+    return signJWT({ sub: IDENTITY, iat: nowSeconds, exp: nowSeconds + 600 }, env.JWT_SIGNING_KEY);
+  };
+
+  await test('a chat response names the model that answered', async () => {
+    stubFetch(() => sseResponse([CONTENT_FRAME('hello'), DONE_FRAME]));
+    const env = fakeEnv();
+    const { ctx, pending } = fakeCtx();
+    const response = await handleChat(
+      new Request('https://example.invalid/v1/chat', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${await bearer(env)}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          figureId: 'aurelius',
+          mode: 'free_conversation',
+          language: 'en',
+          messages: [{ role: 'user', content: 'What holds a day together?' }],
+        }),
+      }),
+      env,
+      ctx,
+    );
+    assertEqual(response.status, 200, 'status');
+    assertEqual(response.headers.get('X-Model'), 'qwen3-235b', 'X-Model');
+    assertEqual(response.headers.get('X-AI-Model'), 'Qwen3-235B-A22B-Instruct', 'X-AI-Model stays the disclosure label');
+    await response.body?.cancel();
+    await Promise.all(pending);
+  });
+
+  await test('the model header is exposed to the browser', async () => {
+    const env = fakeEnv({ ALLOWED_ORIGINS: 'https://agoracosmica.org' });
+    const { ctx } = fakeCtx();
+    const preflight = await worker.fetch(
+      new Request('https://llm.invalid/v1/chat', {
+        method: 'OPTIONS',
+        headers: { Origin: 'https://agoracosmica.org' },
+      }),
+      env,
+      ctx,
+    );
+    const exposed = (preflight.headers.get('Access-Control-Expose-Headers') || '')
+      .split(',').map(name => name.trim());
+    assert(exposed.includes('X-Model'), 'X-Model is not exposed through CORS');
+  });
+
+  await test('the quota response carries the free-tier state beside the counters', async () => {
+    const env = fakeEnv();
+    const response = await handleQuota(
+      new Request('https://example.invalid/v1/quota', {
+        method: 'GET',
+        headers: { Authorization: `Bearer ${await bearer(env)}` },
+      }),
+      env,
+    );
+    assertEqual(response.status, 200, 'status');
+    const body = await response.json() as {
+      daily: { limit: number };
+      freeTier: { serving: { label: string }; fallback: unknown; governor: { armed: boolean } };
+    };
+    assertEqual(body.daily.limit, RATE_LIMITS.DAILY_PER_IP, 'the counters are still there');
+    assertEqual(body.freeTier.serving.label, 'qwen3-235b', 'serving label');
+    assertEqual(body.freeTier.fallback, null, 'fallback');
+    assertEqual(body.freeTier.governor.armed, false, 'armed');
   });
 
   globalThis.fetch = realFetch;

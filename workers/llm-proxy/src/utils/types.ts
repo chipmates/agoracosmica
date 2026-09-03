@@ -26,6 +26,10 @@ export interface Env {
   // Dedicated salt for one-way IP identifiers. Falls back to JWT_SIGNING_KEY
   // when unset. See utils/ipHash.ts.
   IP_HASH_SALT?: string;
+  // Operator alerts on the free-tier switch. The token is a secret, the chat id
+  // a var. Without both, services/telegram.ts sends nothing and says nothing.
+  TELEGRAM_BOT_TOKEN?: string;
+  TELEGRAM_CHAT_ID?: string;
   // Dev-only: when set in .dev.vars, overrides every per-IP daily cap (chat/council/summary)
   // to this integer. Never defined in production wrangler.toml. See config.ts:getEffectiveLimit.
   DEV_RATE_LIMIT?: string;

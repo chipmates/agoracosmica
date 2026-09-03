@@ -8,8 +8,9 @@ import { SAFETY_PREAMBLE } from '../utils/safety';
 import { screenCouncilContent } from '../utils/contentScreen';
 import { createSafetyFilteredStream } from '../services/streamFilter';
 import { dispatchToNebius } from '../services/nebius';
-import { resolveServing } from '../services/modelRouting';
+import { fallbackModel, resolveServing } from '../services/modelRouting';
 import { recordSpend, type TokenUsage } from '../services/spendGovernor';
+import { alertFallback, alertSpendCrossing } from '../services/telegram';
 import { logComplianceEvent, getSeverity } from '../utils/complianceLog';
 import { trackGovernor, trackLlmEvent, trackRateLimit, readCountry, readDevice, readProbe } from '../utils/analytics';
 import type { Env, ChatMessage, CouncilRequest } from '../utils/types';
@@ -185,7 +186,10 @@ export async function handleCouncil(request: Request, env: Env, ctx: ExecutionCo
     maxTokens: COUNCIL_LLM_CONFIG.MAX_OUTPUT_TOKENS,
     trailingSystemMessage: SAFETY_REMINDER,
     onUsage: (model: ServingModel, usage: TokenUsage) => {
-      ctx.waitUntil(recordSpend(env, model, usage, { endpoint: 'council', country, device }));
+      ctx.waitUntil(
+        recordSpend(env, model, usage, { endpoint: 'council', country, device })
+          .then(crossing => alertSpendCrossing(env, crossing, fallbackModel(env))),
+      );
     },
   });
 
@@ -197,14 +201,16 @@ export async function handleCouncil(request: Request, env: Env, ctx: ExecutionCo
   }
 
   if (dispatch.fallbackReason) {
+    const event = dispatch.fallbackReason === 'latency' ? 'fallback_latency' : 'fallback_error';
     trackGovernor(env, {
-      event: dispatch.fallbackReason === 'latency' ? 'fallback_latency' : 'fallback_error',
+      event,
       endpoint: 'council',
       model: dispatch.served.key,
       spendUsd: serving.spendUsd,
       country,
       device,
     });
+    ctx.waitUntil(alertFallback(env, { event, served: dispatch.served, spendUsd: serving.spendUsd }));
   }
 
   // 6. Rate limit already incremented atomically in step 3
@@ -236,6 +242,7 @@ export async function handleCouncil(request: Request, env: Env, ctx: ExecutionCo
       'Cache-Control': 'no-cache',
       'Connection': 'keep-alive',
       'X-AI-Model': dispatch.served.disclosureLabel,
+      'X-Model': dispatch.served.label,
       'X-Council-Daily-Used': String(rateLimit.used),
       'X-Council-Daily-Limit': String(rateLimit.limit),
       'X-Council-Resets-At': rateLimit.resetsAt,

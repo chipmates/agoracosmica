@@ -169,7 +169,7 @@
       "hint": "Click any section below to expand and modify settings",
       "manageKeys": "Manage Keys",
       "selfHosted": "Self-hosted",
-      "aiModelBadgeFree": "Hosted in the EU · Free",
+      "aiModelBadgeFree": "Europe · Free tier",
       "aiModelBadgeByok": "Qwen3 235B · Your key"
     },
     "tooltips": {
@@ -318,6 +318,18 @@
       "modelTagline": "Frontier-class. Same model on free tier and with your own key.",
       "statusFree": "Free tier active. 30 conversations per day.",
       "statusByok": "Your OpenRouter key is active. No daily limit.",
+      "servedIn": "Server location: {region}",
+      "afterBudget": "After the daily budget: {model}, {region}",
+      "budgetWithin": "Today: within the budget",
+      "budgetReached": "Budget reached, {model} answers until midnight",
+      "models": {
+        "qwen3-235b": "Qwen3 235B",
+        "deepseek-v4-pro": "DeepSeek V4 Pro"
+      },
+      "regions": {
+        "eu-north1": "Finland (EU)",
+        "uk-south1": "United Kingdom"
+      },
       "keySectionTitle": "Use your own key (optional)",
       "keySectionIntro": "Add an OpenRouter key to bypass the free-tier limit. You see and control your usage.",
       "aboutOpenRouter": {

@@ -12,6 +12,7 @@ import type { Message, LLMResponse, ChatTurnKind } from '../audio/llm/index';
 import type { CarriedEntry } from '../audio/instructionProcessor';
 import { probeField } from '../../utils/probeSession';
 import { useDomainStore } from '../../stores/domainStore';
+import { parseFreeTierState } from '../../utils/freeTierState';
 
 const FREE_TIER_API_URL = import.meta.env.VITE_FREE_TIER_API_URL || '';
 
@@ -116,6 +117,7 @@ export async function fetchQuota(): Promise<void> {
         daily?: { used?: number; limit?: number; resetsAt?: string };
         council?: { used?: number; limit?: number };
         summary?: { used?: number; limit?: number };
+        freeTier?: unknown;
       };
       if (data.daily) {
         useDomainStore.getState().setQuota(
@@ -130,6 +132,10 @@ export async function fetchQuota(): Promise<void> {
       if (data.summary) {
         useDomainStore.getState().setEndpointQuota('summary', data.summary.used ?? 0, data.summary.limit ?? 2);
       }
+      // Which model is serving and whether today's budget is spent. Null on an
+      // older worker, which leaves the settings panel showing no model name
+      // rather than a stale one.
+      useDomainStore.getState().setFreeTierState(parseFreeTierState(data.freeTier));
     }
   } catch {
     // Non-critical: counter just won't show until first message

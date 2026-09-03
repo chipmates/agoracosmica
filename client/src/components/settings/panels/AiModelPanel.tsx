@@ -9,6 +9,8 @@ import { llmService } from '../../../services/llm/llmService';
 import {
   loadServiceConfig, saveServiceConfig, LLM_SERVICES,
 } from '../../../services/audio/config/serviceConfig';
+import { useDomainStore } from '../../../stores/domainStore';
+import { describeFreeTier } from '../../../utils/freeTierState';
 import { RippleButton } from '../../Button';
 
 interface AiModelPanelProps {
@@ -55,8 +57,13 @@ interface KeyState {
   isDirty: boolean;
 }
 
+// The BYOK route is pinned to one OpenRouter model, so its name is a client
+// constant. The free tier's name is not: the worker reports which model serves.
+const BYOK_MODEL = LLM_SERVICES.OPENROUTER.models.QWEN3_235B;
+
 const AiModelPanel: FC<AiModelPanelProps> = ({ SettingCard, CATEGORY_ICONS }) => {
-  const { tString, tNode } = useTranslation();
+  const { t, tString, tNode } = useTranslation();
+  const freeTier = useDomainStore((state) => state.quota.freeTier);
 
   const [openRouterKey, setOpenRouterKey] = useState<KeyState>({
     value: '',
@@ -108,6 +115,47 @@ const AiModelPanel: FC<AiModelPanelProps> = ({ SettingCard, CATEGORY_ICONS }) =>
   }, []);
 
   const isByokActive = openRouterKey.validationStatus === 'valid';
+
+  // The free tier's model, its region, and the day's budget, as the worker
+  // reported them. Absent until /v1/quota answers, and never read for a BYOK
+  // user: their key decides the model, not our routing.
+  const serving = !isByokActive && freeTier ? describeFreeTier(freeTier) : null;
+  const modelName = (label: string) => tString(`settings.aiModelKey.models.${label}`, label);
+  const regionName = (region: string) => tString(`settings.aiModelKey.regions.${region}`, region);
+  const filled = (key: string, values: Record<string, string>): string => {
+    const text = t(key, values);
+    return typeof text === 'string' ? text : key;
+  };
+
+  const currentModel = isByokActive
+    ? LLM_SERVICES.OPENROUTER.displayNames[BYOK_MODEL]
+    : serving && modelName(serving.now.label);
+
+  // Where the answering model runs, and what takes over. Quiet: they describe
+  // the setup, not what changed today.
+  const servingLines = serving
+    ? [
+      filled('settings.aiModelKey.servedIn', { region: regionName(serving.now.region) }),
+      ...(serving.after
+        ? [filled('settings.aiModelKey.afterBudget', {
+          model: modelName(serving.after.label),
+          region: regionName(serving.after.region),
+        })]
+        : []),
+    ]
+    : [];
+
+  // Today's budget. Brighter than the lines above it: this one can change while
+  // the panel is open, and it is the reason the model above may have changed.
+  const budgetLine = serving?.budget === 'within'
+    ? tString('settings.aiModelKey.budgetWithin', 'Today: within the budget')
+    : serving?.budget === 'reached'
+      ? filled('settings.aiModelKey.budgetReached', { model: modelName(serving.now.label) })
+      : '';
+
+  // The tagline claims one model across both routes, which only holds while the
+  // free tier and BYOK run the same one.
+  const showTagline = isByokActive || serving === null || serving.budget === null;
 
   const handleKeyChange = (value: string) => {
     setOpenRouterKey(prev => ({
@@ -530,31 +578,59 @@ const AiModelPanel: FC<AiModelPanelProps> = ({ SettingCard, CATEGORY_ICONS }) =>
         <div style={{ ...kickerStyle, marginBottom: '10px' }}>
           {tNode('settings.aiModelKey.currentlyUsing')}
         </div>
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px',
-          marginBottom: '6px',
-        }}>
-          <Sparkle size={18} weight="fill" style={{ flexShrink: 0, color: 'var(--gold-deep)' }} />
-          <span style={{
-            fontFamily: 'var(--font-content)',
-            fontSize: '19px',
-            fontWeight: 400,
-            color: 'var(--gold-primary)',
-            letterSpacing: '0.01em',
+        {currentModel && (
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            marginBottom: '6px',
           }}>
-            Qwen3 235B
-          </span>
-        </div>
-        <div style={{
-          fontSize: '13px',
-          color: INK_BODY,
-          lineHeight: 1.5,
-          marginBottom: '10px',
-        }}>
-          {tNode('settings.aiModelKey.modelTagline')}
-        </div>
+            <Sparkle size={18} weight="fill" style={{ flexShrink: 0, color: 'var(--gold-deep)' }} />
+            <span style={{
+              fontFamily: 'var(--font-content)',
+              fontSize: '19px',
+              fontWeight: 400,
+              color: 'var(--gold-primary)',
+              letterSpacing: '0.01em',
+            }}>
+              {currentModel}
+            </span>
+          </div>
+        )}
+        {showTagline && (
+          <div style={{
+            fontSize: '13px',
+            color: INK_BODY,
+            lineHeight: 1.5,
+            marginBottom: '10px',
+          }}>
+            {tNode('settings.aiModelKey.modelTagline')}
+          </div>
+        )}
+        {servingLines.length > 0 && (
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '3px',
+            fontSize: '13px',
+            color: INK_QUIET,
+            lineHeight: 1.5,
+            marginBottom: budgetLine ? '6px' : '10px',
+          }}>
+            {servingLines.map((text) => <span key={text}>{text}</span>)}
+          </div>
+        )}
+        {budgetLine && (
+          <div style={{
+            fontSize: '13px',
+            color: INK_BODY,
+            fontWeight: 500,
+            lineHeight: 1.5,
+            marginBottom: '10px',
+          }}>
+            {budgetLine}
+          </div>
+        )}
         <div style={{
           display: 'flex',
           alignItems: 'center',

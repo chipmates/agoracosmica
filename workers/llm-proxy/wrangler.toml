@@ -43,11 +43,16 @@ FREE_TIER_MODEL = "qwen"
 # `wrangler deploy`, or move them to secrets of the same names, no code edit.
 GOVERNOR_HARD_USD = "20"
 GOVERNOR_SOFT_USD = "10"
+# Where the free-tier switch alerts land. The chat id is an address, not a
+# credential; the bot token beside it is a secret. Without the token the worker
+# sends nothing. Empty or absent turns the alerts off without a code change.
+TELEGRAM_CHAT_ID = "-5033097830"
 
 # Secrets (set via wrangler secret put):
 # - NEBIUS_API_KEY
 # - TURNSTILE_SECRET_KEY
 # - JWT_SIGNING_KEY (openssl rand -hex 32)
+# - TELEGRAM_BOT_TOKEN — the alert bot's Bot API token. Unset, no alert is sent.
 # - IP_HASH_SALT (openssl rand -hex 32) — salts the one-way address hashes used
 #   by the compliance log and the per-address counters. Until it is set the
 #   worker falls back to JWT_SIGNING_KEY, so setting it rotates those hashes once.

@@ -1,5 +1,6 @@
 import { ConversationMode, Figure, Message, Seed, User, Language } from '../../types/global';
 import type { LanguageSlice } from './languageSlice';
+import type { FreeTierState } from '../../utils/freeTierState';
 
 type ServiceConfig = Record<string, unknown>;
 type StoryData = Record<string, unknown> | null;
@@ -201,6 +202,9 @@ export interface QuotaSliceState {
     // Used to gate the Start Council and Generate Summary buttons individually.
     council: { used: number; limit: number; loaded: boolean };
     summary: { used: number; limit: number; loaded: boolean };
+    // Which model serves the free tier and whether today's budget is spent.
+    // Null until /v1/quota answers, so the UI never guesses a model name.
+    freeTier: FreeTierState | null;
   };
   rateLimitModal: {
     isOpen: boolean;
@@ -221,6 +225,7 @@ export interface QuotaSliceActions {
   setQuota: (used: number, limit: number, resetsAt: string) => void;
   setEndpointQuota: (endpoint: 'council' | 'summary', used: number, limit: number) => void;
   setIsFreeTier: (isFreeTier: boolean) => void;
+  setFreeTierState: (state: FreeTierState | null) => void;
   openRateLimitModal: (endpoint: RateLimitEndpoint, resetsAt: string | null, limit?: number | null) => void;
   closeRateLimitModal: () => void;
   openByokModal: (endpoint?: RateLimitEndpoint, required?: boolean) => void;
