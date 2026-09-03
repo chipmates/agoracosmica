@@ -1,0 +1,41 @@
+version: 2
+
+updates:
+  # One entry per package directory, since the repo has no pnpm workspace root
+  # and every package carries its own lockfile. Dependabot opens a separate PR
+  # per directory.
+  - package-ecosystem: "npm"
+    directories:
+      - "/client"
+      - "/marketing"
+      - "/workers/llm-proxy"
+      - "/workers/audio-proxy"
+      - "/workers/community"
+      - "/workers/stats"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    groups:
+      # Minor and patch travel together; anything major falls outside the group
+      # and gets its own PR, so a breaking bump is reviewed on its own.
+      minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    groups:
+      actions-minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"

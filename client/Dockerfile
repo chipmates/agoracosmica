@@ -4,7 +4,7 @@
 # Runtime stage is unprivileged nginx serving the static output on 8080.
 
 # --- Build stage -----------------------------------------------------------
-FROM node:20-alpine AS builder
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 

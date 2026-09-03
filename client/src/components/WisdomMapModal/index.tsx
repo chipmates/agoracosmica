@@ -888,7 +888,7 @@ const WisdomMapModal: FC<WisdomMapModalProps> = ({
   };
 
   const handleSeedSelect = (s: Seed, mode?: string): void => {
-    onSeedSelect && onSeedSelect(s, mode);
+    onSeedSelect?.(s, mode);
     onClose();
   };
   

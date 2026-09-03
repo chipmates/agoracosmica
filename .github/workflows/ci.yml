@@ -8,14 +8,15 @@ on:
   workflow_dispatch:
 
 env:
-  NODE_VERSION: '22'
-  PNPM_VERSION: '8'
+  # Matches the `packageManager` field in client/package.json, the only pnpm
+  # pin the repo declares. The Node version comes from .nvmrc.
+  PNPM_VERSION: '8.15.5'
 
 jobs:
   check:
     name: Tests + Build
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
 
     steps:
       - name: Checkout
@@ -24,24 +25,54 @@ jobs:
           lfs: true
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v4
         with:
           version: ${{ env.PNPM_VERSION }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version-file: .nvmrc
           cache: 'pnpm'
-          cache-dependency-path: client/pnpm-lock.yaml
+          cache-dependency-path: |
+            client/pnpm-lock.yaml
+            marketing/pnpm-lock.yaml
 
-      - name: Install dependencies
+      - name: Install client dependencies
         working-directory: ./client
+        run: pnpm install --frozen-lockfile
+
+      # Marketing has its own lockfile. `pnpm build` installs it too, but the
+      # marketing type check below runs before the build.
+      - name: Install marketing dependencies
+        working-directory: ./marketing
         run: pnpm install --frozen-lockfile
 
       - name: Setup assets (downloads content from CDN)
         working-directory: ./client
         run: pnpm setup:assets
+
+      # figuresCatalog.ts and themeSeedCrossRef.ts are generated and gitignored.
+      # Marketing imports the catalog, so both type checks need them on disk.
+      - name: Extract public data
+        working-directory: ./client
+        run: pnpm build:extract
+
+      - name: Type check client
+        working-directory: ./client
+        run: pnpm exec tsc --noEmit
+
+      # Advisory for now: the astro strictest preset reports pre-existing
+      # findings here. Drop continue-on-error once they are cleared.
+      - name: Type check marketing
+        working-directory: ./marketing
+        run: pnpm exec tsc --noEmit
+        continue-on-error: true
+
+      # Errors fail the build, warnings do not (eslint exits 0 on warnings).
+      - name: Lint client
+        working-directory: ./client
+        run: pnpm lint
 
       - name: Run unit tests
         working-directory: ./client
@@ -50,6 +81,54 @@ jobs:
       - name: Build
         working-directory: ./client
         run: pnpm build
+
+  workers:
+    name: Worker ${{ matrix.worker }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - worker: llm-proxy
+            tests: true
+          - worker: audio-proxy
+            tests: true
+          - worker: community
+            tests: false
+          - worker: stats
+            tests: false
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: 'pnpm'
+          cache-dependency-path: workers/${{ matrix.worker }}/pnpm-lock.yaml
+
+      # There is no workspace root: every worker installs from its own lockfile.
+      - name: Install dependencies
+        working-directory: ./workers/${{ matrix.worker }}
+        run: pnpm install --frozen-lockfile
+
+      - name: Type check
+        working-directory: ./workers/${{ matrix.worker }}
+        run: pnpm run typecheck
+
+      - name: Tests
+        if: matrix.tests
+        working-directory: ./workers/${{ matrix.worker }}
+        run: pnpm test
 
   docker-build:
     name: Docker build (self-host image)

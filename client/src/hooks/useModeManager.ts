@@ -104,9 +104,9 @@ export function useModeManager({
     // Reset council mode when switching modes
     if (isCouncilMode && setIsCouncilMode) {
       setIsCouncilMode(false);
-      setCouncilConfig && setCouncilConfig(null);
-      setCurrentSpeaker && setCurrentSpeaker(null);
-      setCouncilPhase && setCouncilPhase('foundations');
+      setCouncilConfig?.(null);
+      setCurrentSpeaker?.(null);
+      setCouncilPhase?.('foundations');
     }
 
     // Read fresh figure/seed from Zustand (avoids stale closure on figure switch)

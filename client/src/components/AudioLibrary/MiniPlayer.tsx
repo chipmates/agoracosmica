@@ -22,13 +22,18 @@ interface CurrentPlayback {
   figureName?: string;
 }
 
+// Each event carries a different payload, so the parameter list stays open.
+// `never[]` is what keeps every concrete handler assignable under
+// strictFunctionTypes.
+type AudioEventHandler = (...args: never[]) => void;
+
 interface AudioService {
   getCurrentPlayback: () => CurrentPlayback | null;
   getPlaybackState: () => PlaybackState;
   pause: () => void;
   resume: () => void;
-  on: (event: string, handler: Function) => void;
-  off: (event: string, handler: Function) => void;
+  on: (event: string, handler: AudioEventHandler) => void;
+  off: (event: string, handler: AudioEventHandler) => void;
 }
 
 interface MiniPlayerProps {
