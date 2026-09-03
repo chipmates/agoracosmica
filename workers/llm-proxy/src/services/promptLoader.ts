@@ -2,7 +2,7 @@
 // Phase 1: prompts are bundled at build time in prompts/instructions.ts
 
 import { INSTRUCTIONS } from '../prompts/instructions';
-import { applyProfileRules, type PromptProfile } from '../prompts/responseRules';
+import { DISTRESS_RULES, applyProfileRules, type PromptProfile } from '../prompts/responseRules';
 import { SAFETY_PREAMBLE } from '../utils/safety';
 
 // Map language codes to full names for the LLM
@@ -60,13 +60,20 @@ function buildCarriedDirective(userMessageCount: number, hasAnchor: boolean): st
  * resolved from the serving model so both the primary and the fallback answer
  * under the same rules.
  */
+/** Per-turn switches the screen sets; none of them depend on the profile. */
+export interface PromptOptions {
+  /** The visitor sounds like they cannot go on: the crisis rules ride this turn. */
+  distress?: boolean;
+}
+
 export function buildSystemPrompt(
   figureId: string,
   mode: string,
   language: string,
   profile: PromptProfile,
   seedDataJson?: string,
-  carried?: CarriedEntry
+  carried?: CarriedEntry,
+  options?: PromptOptions
 ): string | null {
   const key = `${figureId}:${mode}`;
   const instruction = INSTRUCTIONS[key];
@@ -110,5 +117,11 @@ export function buildSystemPrompt(
     ? `\n\nIMPORTANT: The user speaks ${langName}. You MUST respond entirely in ${langName}. Use proper ${langName} grammar, spelling, and natural phrasing. Never mix languages.`
     : '';
 
-  return SAFETY_PREAMBLE + '\n' + prompt + languageDirective;
+  // Forced in for the turn, after the profile rules, so no profile and no
+  // model can leave a visitor in distress without the referral.
+  const crisisBlock = options?.distress
+    ? '\n\n<crisis-rules priority="absolute">\n' + DISTRESS_RULES.join('\n') + '\n</crisis-rules>'
+    : '';
+
+  return SAFETY_PREAMBLE + '\n' + prompt + crisisBlock + languageDirective;
 }

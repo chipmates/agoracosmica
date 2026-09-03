@@ -504,7 +504,7 @@
         "trustOpenSource": "Open Source (AGPL-3.0)",
         "trustOpenSourceAria": "Open Source unter AGPL-3.0. Quellcode auf GitHub ansehen. Öffnet in neuem Tab.",
         "trustNoTracking": "Keine Tracking-Cookies, kein Profiling",
-        "trustProof": "Deine Gespräche werden nie auf unseren Servern gespeichert. Server in Deutschland und Finnland, täglich automatisch geprüft.",
+        "trustProof": "Deine Gespräche werden nie auf unseren Servern gespeichert. Server in Deutschland, Finnland und dem Vereinigten Königreich, täglich automatisch geprüft.",
         "clearAllButton": "Alle meine Daten löschen",
         "clearAllConfirm": "Dies löscht alle deine Gespräche, deinen OpenRouter-Key und alle Einstellungen auf diesem Gerät. Die App wird neu geladen. Fortfahren?"
       },
@@ -525,7 +525,7 @@
         },
         "nebius": {
           "name": "Nebius",
-          "region": "Finnland (EU)",
+          "region": "Vereinigtes Königreich und Finnland (EU)",
           "purpose": "LLM für kostenlosen Tarif",
           "status": "AVV + ZDR aktiviert"
         },
@@ -607,6 +607,10 @@
     "reviewMode": "Zusammenfassung",
     "seeker": "Suchender",
     "stopVoice": "Stimme stoppen",
+    "crisisFooter": "Ein schweres Thema. Wenn es dich gerade selbst betrifft, gibt es Menschen, die helfen.",
+    "crisisBanner": "Du musst das nicht allein tragen.",
+    "crisisElsewhere": "Anderswo:",
+    "crisisDismiss": "Schließen",
     "provenance": {
       "chip": "Aus Kapitel {n} der Geschichte",
       "door": "Kapitel {n} der Geschichte hören"
@@ -1342,7 +1346,7 @@
       "messageTooLong": "Deine Nachricht ist etwas zu lang. Bitte kürze sie, oder hinterlege deinen OpenRouter-Schlüssel in den Einstellungen für unbegrenzte Länge.",
       "tooManyMessages": "Diese Unterhaltung hat ihre maximale Länge erreicht. Starte eine neue, um fortzufahren.",
       "contentSafety": "Darauf kann ich nicht eingehen. Bitte formuliere es anders.",
-      "contentSafetyCrisis": "Hierfür braucht es Unterstützung, die über ein philosophisches Gespräch hinausgeht. Bitte wende dich an eine Krisenhotline.",
+      "contentSafetyCrisis": "Was du geschrieben hast, zählt, und es ist mehr, als ein Gespräch hier tragen kann. Bitte sprich heute mit jemandem. Die Telefonseelsorge ist kostenlos und anonym unter 0800 111 0 111, zu jeder Uhrzeit. Du bist hier jederzeit wieder willkommen.",
       "freeTierAtCapacity": "Der freie Zugang ist gerade ausgelastet. Hinterlege deinen OpenRouter-Schlüssel in den Einstellungen für ununterbrochenen Zugriff.",
       "dailyLimit": "Tägliches Nachrichtenlimit erreicht. Deine Unterhaltungen werden morgen fortgesetzt.",
       "llmDown": "Kurzzeitig nicht erreichbar. Bitte versuche es gleich nochmal.",
@@ -1411,7 +1415,7 @@
   "legal": {
     "privacy": {
       "title": "Datenschutzerklärung",
-      "lastUpdated": "Stand: 10. Juni 2026"
+      "lastUpdated": "Stand: 3. September 2026"
     },
     "imprint": {
       "title": "Impressum",
@@ -1771,7 +1775,7 @@
         "description": "Du wählst den Anbieter. Das Modell im kostenlosen Tarif wählen wir.",
         "points": [
           "Kostenloser Tarif: wir wählen das Modell und tauschen es, wenn ein besseres kommt",
-          "Kostenlos: über Nebius (Finnland, EU). AVV unterschrieben, ZDR aktiviert.",
+          "Kostenlos: über Nebius (Vereinigtes Königreich und Finnland, EU). AVV unterschrieben, ZDR aktiviert.",
           "Eigener Key: Qwen3 235B über OpenRouter. ZDR-Routing standardmäßig an."
         ]
       }

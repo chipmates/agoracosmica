@@ -5,6 +5,8 @@ import OptimizedFigureImage from './OptimizedFigureImage';
 import { sanitizeContent } from '../utils/sanitizeContent';
 import { getDisplayShortName } from '../utils/figureDisplayName';
 import { useTranslation } from '../hooks/useTranslation';
+import { CrisisNote } from './CrisisNote';
+import { clearCrisisNote, dismissCrisisNote, readCrisisNote, resetConversationCrisisNote, subscribeCrisisNote } from '../services/safety/crisisNote';
 import VoiceInteractionHelper from './VoiceInteractionHelper';
 
 // Helper doctrine (2026-07-23): first-time popups must not cover content. The
@@ -53,7 +55,7 @@ const ChatBoxSurface: FC<ChatBoxProps> = ({
   isReviewMode = false,
   isAudioPlaying = false,
 }) => {
-  const { tString, tNode } = useTranslation();
+  const { tString, tNode, language } = useTranslation();
   const chatBoxRef = useRef<HTMLDivElement>(null);
   const [showVoiceHelper, setShowVoiceHelper] = useState<boolean>(false);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
@@ -65,6 +67,12 @@ const ChatBoxSurface: FC<ChatBoxProps> = ({
   const selectedFigureId = useDomainStore((state) => state.figures.selectedId);
   const pendingRequestId = useDomainStore((state) => state.conversation.pendingRequestId);
   const [carriedThread, setCarriedThread] = useState(readCarriedThread);
+  const [crisisNote, setCrisisNote] = useState(readCrisisNote);
+  useEffect(() => subscribeCrisisNote(() => setCrisisNote(readCrisisNote())), []);
+  // A new conversation drops the topical line; a new figure drops everything.
+  // The distress banner belongs to the visit, so a mode switch keeps it.
+  useEffect(() => { resetConversationCrisisNote(); }, [historyKey]);
+  useEffect(() => { clearCrisisNote(); }, [selectedFigureId]);
 
   useEffect(() => {
     const sync = () => setCarriedThread(readCarriedThread());
@@ -265,6 +273,13 @@ const ChatBoxSurface: FC<ChatBoxProps> = ({
         <QuietPlatePresence figureId={selectedFigureId} active={quietPresenceLit} />
       )}
 
+      {/* Crisis note above the log, where nothing floats across it: the quiet
+          footer once when the subject came up, the banner for the session when
+          the visitor sounded like they cannot go on. */}
+      {crisisNote && (
+        <CrisisNote note={crisisNote} language={language} onDismiss={dismissCrisisNote} />
+      )}
+
       {/* Top gradient fade for scrolled content */}
       <div className="chatbox-fade-top" />
       
@@ -385,7 +400,9 @@ const ChatBoxSurface: FC<ChatBoxProps> = ({
             <ChapterDoor chapter={chapter} />
           </div>
         )}
+
       </div>
+
 
       {/* Stop voice: visible while the Echo speaks. Cancels upstream TTS
           generation BEFORE stopping playback, so a straggler chunk finishing

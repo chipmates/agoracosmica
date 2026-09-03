@@ -803,3 +803,47 @@
     animation: none;
   }
 }
+
+/* Crisis note, above the log where nothing floats across it: the quiet line
+   once when the subject came up, the banner for the visit when the visitor
+   sounded like they cannot go on. Both closable, neither in the voice. */
+.crisis-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 8px 12px 4px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-30), transparent);
+  background: color-mix(in srgb, var(--gold-subtle) var(--a-15), transparent);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+.crisis-note--banner {
+  border-color: color-mix(in srgb, var(--gold-primary) var(--a-30), transparent);
+  background: color-mix(in srgb, var(--gold-primary) var(--a-15), transparent);
+  color: var(--text-primary);
+}
+.chatbox-container .crisis-note__text { flex: 1 1 auto; text-align: left; hyphens: manual; }
+.crisis-note__line { display: block; margin-top: 4px; }
+.crisis-note__link { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+
+.crisis-note__dismiss {
+  flex: 0 0 auto;
+  min-width: 44px;
+  min-height: 44px;
+  margin: -12px -8px -12px 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  border-radius: 12px;
+}
+.crisis-note__dismiss:focus-visible {
+  outline: 2px solid var(--gold-primary);
+  outline-offset: 2px;
+}

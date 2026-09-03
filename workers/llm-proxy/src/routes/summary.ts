@@ -4,7 +4,7 @@ import { authenticateRequest } from '../middleware/auth';
 import { checkAndIncrementSummaryRateLimit } from '../middleware/rateLimit';
 import { dispatchToNebius } from '../services/nebius';
 import { fallbackModel } from '../services/modelRouting';
-import { screenCouncilContent } from '../utils/contentScreen';
+import { isInjection, screenCouncilContent } from '../utils/contentScreen';
 import { createSafetyFilteredStream } from '../services/streamFilter';
 import { logComplianceEvent, getSeverity } from '../utils/complianceLog';
 import { trackLlmEvent, trackRateLimit, readCountry, readDevice, readProbe } from '../utils/analytics';
@@ -75,6 +75,52 @@ Write in the SAME LANGUAGE as the conversation. If German, summarize in German. 
 - Do NOT start with a title like "Summary of..." since the UI already provides one. Start directly with the first section header.`;
 }
 
+
+/**
+ * The client formats each turn as "Human [mode] (ISO time): text" or
+ * "Assistant [mode] (ISO time): text", joined by blank lines. The head ends at
+ * the first ": " after the timestamp, whose own colons never carry a space.
+ */
+const TURN_HEAD = /^(Human|Assistant)\b[^\n]*?: /;
+const SUMMARY_SCREEN_TURNS = 6;
+
+/**
+ * Screen only the last few user turns of a formatted history. A segment that
+ * starts with neither head (a blank line inside a turn) is treated as the
+ * visitor's text, never skipped. Figure segments are checked only for prompt
+ * injection, so a caller cannot launder an attack under an "Assistant:" label
+ * while a story about Woolf still summarises. Returns the history with every
+ * blocked segment removed, or null when nothing usable is left, plus the
+ * category of the first blocked segment for the compliance log.
+ */
+export function screenSummaryHistory(history: string): { history: string | null; droppedCategory?: string } {
+  const segments = history.split(/\n\n(?=(?:Human|Assistant)\b[^\n]*?: )/);
+  const isUser = (seg: string) => !/^Assistant\b[^\n]*?: /.test(seg);
+  const userIndexes = segments.map((seg, i) => (isUser(seg) ? i : -1)).filter(i => i >= 0);
+  const recent = new Set(userIndexes.slice(-SUMMARY_SCREEN_TURNS));
+  let droppedCategory: string | undefined;
+  const kept = segments.filter((seg, i) => {
+    const text = seg.replace(TURN_HEAD, '');
+    if (isUser(seg)) {
+      if (!recent.has(i)) return true;
+      const result = screenCouncilContent('', [{ role: 'user', content: text }]);
+      if (result.blocked) {
+        droppedCategory = droppedCategory ?? (result.category || 'unknown');
+        return false;
+      }
+      return true;
+    }
+    if (isInjection(text)) {
+      droppedCategory = droppedCategory ?? 'jailbreak';
+      return false;
+    }
+    return true;
+  });
+  const userLeft = kept.some(seg => isUser(seg) && seg.replace(TURN_HEAD, '').trim().length > 0);
+  if (!userLeft) return { history: null, droppedCategory };
+  return { history: kept.join('\n\n'), droppedCategory };
+}
+
 export async function handleSummary(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
   const startMs = Date.now();
 
@@ -103,20 +149,26 @@ export async function handleSummary(request: Request, env: Env, ctx: ExecutionCo
 
   const { figureId, seedTitle, language, history } = validation.data;
 
-  // 2b. Content safety screen on history text
-  const contentCheck = screenCouncilContent('', [{ role: 'user', content: history }]);
-  if (contentCheck.blocked) {
+  // 2b. Content safety screen on the visitor's own recent turns. The figure's
+  // words are never screened: a story about Woolf is not a visitor in danger,
+  // and a recap that fails on a screening rule is a bad trade. A blocked turn
+  // is dropped from the history and the recap is built from what remains.
+  const screened = screenSummaryHistory(history);
+  if (screened.droppedCategory) {
     void logComplianceEvent(request, env, {
       type: 'input_blocked',
-      severity: getSeverity('input_blocked', contentCheck.category || 'unknown'),
-      category: contentCheck.category || 'unknown',
+      severity: getSeverity('input_blocked', screened.droppedCategory),
+      category: screened.droppedCategory,
       figureId,
     });
+  }
+  if (screened.history === null) {
     return new Response(
       JSON.stringify({ error: 'content_safety', message: 'Summary could not be generated.' }),
       { status: 422, headers: { 'Content-Type': 'application/json' } }
     );
   }
+  const screenedHistory = screened.history;
 
   // 3. Check summary-specific rate limit (2/day per identity; see rateLimit.ts for race caveats)
   const rateLimit = await checkAndIncrementSummaryRateLimit(request, env, authResult.payload);
@@ -148,7 +200,7 @@ export async function handleSummary(request: Request, env: Env, ctx: ExecutionCo
   // mode evaluation behind it, so it stays on the model it has always used.
   const dispatch = await dispatchToNebius({
     systemPrompt,
-    messages: [{ role: 'user', content: history }],
+    messages: [{ role: 'user', content: screenedHistory }],
     env,
     model: fallbackModel(env),
     maxTokens: 4000,

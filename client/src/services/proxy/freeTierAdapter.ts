@@ -2,6 +2,7 @@
 // Mirrors llmAdapter.ts pattern but sends figureId + mode instead of instructions
 
 import { getSessionToken, invalidateToken } from './sessionManager';
+import { readCrisisHeaders } from '../safety/crisisNote';
 import { fetchWithTimeout } from '../../utils/fetchWithTimeout';
 import {
   TextChunker,
@@ -305,6 +306,7 @@ export async function generateFreeTierResponse({
     if (tools && tools.length > 0) requestBody.tools = tools;
 
     const response = await fetchWithSessionRetry(`${FREE_TIER_API_URL}/v1/chat`, requestBody, signal, 'chat');
+    readCrisisHeaders(response.headers);
 
     // Extract quota headers from response (update store for turn counter)
     updateQuotaFromHeaders(response);
@@ -362,6 +364,7 @@ export async function generateFreeTierCouncilResponse({
     };
 
     const response = await fetchWithSessionRetry(`${FREE_TIER_API_URL}/v1/council`, requestBody, signal, 'council');
+    readCrisisHeaders(response.headers);
 
     updateCouncilQuotaFromHeaders(response);
 

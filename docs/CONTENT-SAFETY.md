@@ -25,11 +25,13 @@ The platform uses eight defense layers, from client-side detection to server-sid
 
 ### Categories
 
-The screening system covers these categories with around 85 regex patterns (39 client-side, 48 server-side) in English, German, Spanish, and French:
+The screening system covers these categories with the same pattern lists on both sides, browser and edge, in English, German, Spanish, and French. The edge additionally rejects invisible characters and control-character floods. Self-harm is screened in tiers, described in [CRISIS-PROTOCOL.md](CRISIS-PROTOCOL.md): a first-person statement about the visitor's own safety stops the turn, soft distress and topical mentions are answered with crisis resources attached.
 
 | Category | Examples | Response |
 |----------|----------|----------|
-| **Self-harm** | Direct phrases, method descriptions, crisis language | Crisis resources displayed |
+| **Self-harm, first person** | The visitor about their own safety, now | Conversation stops, crisis resources displayed |
+| **Self-harm, soft distress** | "I can't do this anymore" and its kin | Answered, crisis rules forced into the prompt, helpline banner |
+| **Self-harm, topical** | Suicide as a subject: history, philosophy, a figure's life | Answered, helpline line under the reply |
 | **Harm to others** | Violence, threats, attack methods | Policy block |
 | **Child exploitation (CSAM)** | Any related content | Immediate block + log |
 | **Terrorism and weapons** | Bomb-making, mass violence | Policy block |
@@ -39,11 +41,16 @@ The screening system covers these categories with around 85 regex patterns (39 c
 
 ### Crisis Resources
 
-When self-harm patterns are detected, the platform displays helpline information instead of blocking:
+A first-person statement about the visitor's own safety stops the conversation and shows helplines. Soft distress and the subject as a topic are answered with helplines attached:
 
-- **Germany:** Telefonseelsorge (0800 111 0 111 / 0800 111 0 222)
+- **Germany:** Telefonseelsorge (0800 111 0 111 / 0800 111 0 222), Kinder- und Jugendtelefon (116 111)
+- **Austria:** Telefonseelsorge (142)
+- **Switzerland:** Die Dargebotene Hand (143)
 - **United States:** 988 Suicide and Crisis Lifeline
-- **Other countries:** [befrienders.org](https://www.befrienders.org/) lists local helplines worldwide
+- **United Kingdom and Ireland:** Samaritans (116 123)
+- **Everywhere else:** the [IASP directory](https://www.iasp.info/resources/Crisis_Centres/) lists crisis centres by country
+
+The line for the visitor's country comes first. The worker sends only a country code, never a number; the list lives in the app.
 
 The goal is help, not punishment. Users in distress see resources, not error messages.
 

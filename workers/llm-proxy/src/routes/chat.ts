@@ -83,7 +83,7 @@ export async function handleChat(request: Request, env: Env, ctx: ExecutionConte
         error: 'content_safety',
         responseType: contentCheck.responseType || 'policy',
         message: isCrisis
-          ? 'This conversation needs support beyond what a philosophical dialogue can offer. Please reach out to a crisis helpline.'
+          ? 'What you wrote matters, and it is more than a conversation here can hold. Please talk to someone today. You are welcome back here whenever you want.'
           : 'This request cannot be processed. Would you like to discuss a philosophical topic instead?',
       }),
       { status: 422, headers: { 'Content-Type': 'application/json' } }
@@ -132,7 +132,9 @@ export async function handleChat(request: Request, env: Env, ctx: ExecutionConte
   const carried = carriedEntry
     ? { userMessageCount: messages.filter(m => m.role === 'user').length }
     : undefined;
-  const systemPrompt = buildSystemPrompt(figureId, mode, language, serving.profile, seedDataJson, carried);
+  // Soft distress: the crisis rules ride this turn whatever the profile.
+  const distress = contentCheck.tier === 'distress';
+  const systemPrompt = buildSystemPrompt(figureId, mode, language, serving.profile, seedDataJson, carried, { distress });
   if (!systemPrompt) {
     return new Response(
       JSON.stringify({ error: `No instructions found for ${figureId}/${mode}` }),
@@ -204,6 +206,12 @@ export async function handleChat(request: Request, env: Env, ctx: ExecutionConte
   headers.set('Connection', 'keep-alive');
   headers.set('X-AI-Model', dispatch.served.disclosureLabel);
   headers.set('X-Model', dispatch.served.label);
+  // Resources ride the answer, never a number: the client keeps the list and
+  // picks by the country the edge saw. Distress adds the banner's own header.
+  if (contentCheck.tier === 'distress' || contentCheck.tier === 'topical') {
+    headers.set('X-Crisis-Resources', country);
+  }
+  if (distress) headers.set('X-Distress', 'soft');
   headers.set('X-Quota-Daily-Used', String(rateLimit.daily.used));
   headers.set('X-Quota-Daily-Limit', String(rateLimit.daily.limit));
   headers.set('X-Quota-Resets-At', rateLimit.resetsAt);

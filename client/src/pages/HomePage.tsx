@@ -866,6 +866,10 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
       // Content safety screen for all conversation modes
       const safetyResult = screenContent(text);
       if (!safetyResult.safe) {
+        if (safetyResult.responseType === 'policy') {
+          setError(tString('errors.contentSafety', 'This request cannot be processed. Would you like to discuss a philosophical topic instead?'));
+          return;
+        }
         const msg = language === 'de'
           ? safetyResult.crisisResources.message.de
           : safetyResult.crisisResources.message.en;

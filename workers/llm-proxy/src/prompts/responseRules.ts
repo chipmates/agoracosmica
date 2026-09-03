@@ -90,6 +90,18 @@ export const WISDOM_RULES_LISTEN_CAP = [
  * safety-calibration rule reserves a referral for actual crisis, and an early
  * referral in an ordinary rough patch is itself a rule break.
  */
+/**
+ * Served on a turn the screen flagged as soft distress, whatever the profile
+ * and whatever the mode. The screen decides per turn, so the exception the
+ * Free Talk comment above describes (an early referral in an ordinary rough
+ * patch) does not apply: the visitor has just said they cannot go on.
+ */
+export const DISTRESS_RULES = [
+  RULE_WARMTH,
+  RULE_CRISIS_REFERRAL_FIRST,
+  RULE_NO_MEANS_IMAGERY,
+];
+
 export const LIVE_CHAT_SAFETY_RULES = [
   RULE_ECHO_HONESTY,
   RULE_NO_INVENTED_SPECIFICS,

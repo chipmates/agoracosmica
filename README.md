@@ -89,7 +89,7 @@ Every public page reads without an account.
 - **Built on learning science**: the 4-chapter arc is informed by Kolb's experiential cycle, Bloom's taxonomy, and retrieval practice.
 
 **Privacy by design**
-- **BYOK encryption**: bring your own OpenRouter key, encrypted locally with AES-256-GCM, never stored on our servers.
+- **BYOK encryption**: bring your own OpenRouter key, encrypted in your browser with AES-256-GCM under a device key the browser will not hand back to any script, never stored on our servers. [What that protects](docs/THREAT-MODEL.md)
 - **Free tier without signup**: 30 messages a day via our Cloudflare Worker, no account required.
 - **No behavioral tracking**: no tracking cookies, no third-party analytics, no per-request access logs of our own, no IP retention in analytics, no cross-session profiles. We do collect anonymous aggregate counters to keep the service running and improve it. [docs/MEASUREMENT.md](docs/MEASUREMENT.md) lists exactly what gets counted, what never does, and the one exception we name upfront: for visitors who arrive from one of our free nonprofit Google Ad Grants ads and opt in, we forward the Google click ID (gclid) to Google Ads so that ad can be credited with the visit.
 - **Self-hosted speech**: live text-to-speech and speech-to-text run on our own GPU servers in Germany.
@@ -97,7 +97,7 @@ Every public page reads without an account.
 
 **Built for everyone**
 - **WCAG 2.2 AA**: keyboard navigation, screen reader support, 44 px touch targets. [Accessibility](docs/ACCESSIBILITY.md)
-- **Content safety**: multi-layer screening, crisis resources, jailbreak detection, PII protection. [Safety](docs/CONTENT-SAFETY.md)
+- **Content safety**: pattern screening in the browser and at the edge, crisis resources, jailbreak detection, and a PII warning before you send. [Safety](docs/CONTENT-SAFETY.md), [Crisis protocol](docs/CRISIS-PROTOCOL.md)
 - **EU compliance**: GDPR, EU AI Act Article 50, German youth protection (JMStV). [Compliance](docs/COMPLIANCE.md)
 
 ---
@@ -132,10 +132,10 @@ Boots the React app at [localhost:5173](http://localhost:5173). UI and static co
 
 ## Architecture
 
-Your data stays in your browser. Cloudflare Workers act as thin proxies (rate limiting, safety screening, load routing) and hold no user data or per-request logs. LLM inference uses Qwen3 235B for everyone. The free tier runs on Nebius in Finland. With your own OpenRouter key, requests are auto-routed to the best available provider with zero data retention enabled by default (configurable in settings). Live speech runs on our own GPU servers in Germany: Kokoro TTS for English, F5 and Qwen3-TTS for German, Faster-Whisper for speech-to-text. Pre-recorded audio is stored on Cloudflare R2 in the EU (Western Europe) and served via global CDN.
+Your data stays in your browser. Cloudflare Workers act as thin proxies (rate limiting, safety screening, load routing) and hold no user data or per-request logs. LLM inference uses Qwen3 235B for everyone. The free tier runs on Nebius, the primary model in the United Kingdom under the EU adequacy decision and the fallback model in Finland. With your own OpenRouter key, requests are auto-routed to the best available provider with zero data retention enabled by default (configurable in settings). Live speech runs on our own GPU servers in Germany: Kokoro TTS for English, F5 and Qwen3-TTS for German, Faster-Whisper for speech-to-text. Pre-recorded audio is stored on Cloudflare R2 in the EU (Western Europe) and served via global CDN.
 
 <p align="center">
-  <img src=".github/assets/architecture.svg" alt="Agora Cosmica architecture: browser holds all user data, Cloudflare Workers act as thin proxies, backends include Nebius in Finland, OpenRouter for BYOK, Hetzner GPUs in Germany for live audio, and Cloudflare R2 for pre-recorded media" width="100%" />
+  <img src=".github/assets/architecture.svg" alt="Agora Cosmica architecture: browser holds all user data, Cloudflare Workers act as thin proxies, backends include Nebius in the United Kingdom and Finland, OpenRouter for BYOK, Hetzner GPUs in Germany for live audio, and Cloudflare R2 for pre-recorded media" width="100%" />
 </p>
 
 [Security architecture](docs/SECURITY-ARCHITECTURE.md) · [Self-hosting guide](docs/SELF-HOSTING.md)

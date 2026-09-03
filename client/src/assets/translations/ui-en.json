@@ -506,7 +506,7 @@
         "trustOpenSource": "Open Source (AGPL-3.0)",
         "trustOpenSourceAria": "Open Source under AGPL-3.0. Read the source code on GitHub. Opens in a new tab.",
         "trustNoTracking": "No tracking cookies, no profiling",
-        "trustProof": "Your conversations are never stored on our servers. Servers in Germany and Finland, automatically checked every day.",
+        "trustProof": "Your conversations are never stored on our servers. Servers in Germany, Finland and the United Kingdom, automatically checked every day.",
         "clearAllButton": "Clear all my data",
         "clearAllConfirm": "This deletes all your conversations, your OpenRouter key, and every setting on this device. The app will reload. Continue?"
       },
@@ -527,7 +527,7 @@
         },
         "nebius": {
           "name": "Nebius",
-          "region": "Finland (EU)",
+          "region": "United Kingdom and Finland (EU)",
           "purpose": "Free-tier LLM",
           "status": "DPA + ZDR enabled"
         },
@@ -603,6 +603,10 @@
     "reviewMode": "Summary",
     "seeker": "Seeker",
     "stopVoice": "Stop voice",
+    "crisisFooter": "This is a heavy subject. If it is close to home right now, there are people who can help.",
+    "crisisBanner": "You do not have to carry this alone.",
+    "crisisElsewhere": "Elsewhere:",
+    "crisisDismiss": "Close",
     "provenance": {
       "chip": "From chapter {n} of the story",
       "door": "Hear chapter {n} of the story"
@@ -1340,7 +1344,7 @@
       "messageTooLong": "Your message is a bit long. Try shortening it, or add your OpenRouter key in Settings for unlimited length.",
       "tooManyMessages": "This conversation has reached its maximum length. Start a new one to continue.",
       "contentSafety": "I can't engage with that. Please rephrase.",
-      "contentSafetyCrisis": "This conversation needs support beyond what a philosophical dialogue can offer. Please reach out to a crisis helpline.",
+      "contentSafetyCrisis": "What you wrote matters, and it is more than a conversation here can hold. Please talk to someone today. Telefonseelsorge is free and anonymous on 0800 111 0 111, any hour. You are welcome back here whenever you want.",
       "freeTierAtCapacity": "Free tier is at capacity right now. Add your OpenRouter key in Settings for uninterrupted access.",
       "dailyLimit": "Daily message limit reached. Your conversations resume tomorrow.",
       "llmDown": "Briefly unavailable. Please try again in a moment.",
@@ -1409,7 +1413,7 @@
   "legal": {
     "privacy": {
       "title": "Privacy Policy",
-      "lastUpdated": "Last updated: June 10, 2026"
+      "lastUpdated": "Last updated: September 3, 2026"
     },
     "imprint": {
       "title": "Impressum",
@@ -1769,7 +1773,7 @@
         "description": "You pick the provider. We pick the free tier model.",
         "points": [
           "Free tier: we choose the model and swap it when a better one arrives",
-          "Free: via Nebius (Finland, EU). DPA signed, ZDR enabled.",
+          "Free: via Nebius (United Kingdom and Finland, EU). DPA signed, ZDR enabled.",
           "Your key: Qwen3 235B via OpenRouter. ZDR routing on by default."
         ]
       }

@@ -6,6 +6,7 @@ import { checkAndIncrementCouncilRateLimit } from '../middleware/rateLimit';
 import { COUNCIL_LLM_CONFIG, type ServingModel } from '../config';
 import { SAFETY_PREAMBLE } from '../utils/safety';
 import { screenCouncilContent } from '../utils/contentScreen';
+import { DISTRESS_RULES } from '../prompts/responseRules';
 import { createSafetyFilteredStream } from '../services/streamFilter';
 import { dispatchToNebius } from '../services/nebius';
 import { fallbackModel, resolveServing } from '../services/modelRouting';
@@ -106,10 +107,10 @@ export async function handleCouncil(request: Request, env: Env, ctx: ExecutionCo
     );
   }
 
-  const { systemPrompt, language, messages } = validation.data;
+  const { systemPrompt: requestedSystemPrompt, language, messages } = validation.data;
 
   // 2b. Layer 2: Server-side content safety screen
-  const contentCheck = screenCouncilContent(systemPrompt, messages);
+  const contentCheck = screenCouncilContent(requestedSystemPrompt, messages);
   if (contentCheck.blocked) {
     void logComplianceEvent(request, env, {
       type: 'input_blocked',
@@ -122,21 +123,10 @@ export async function handleCouncil(request: Request, env: Env, ctx: ExecutionCo
       error: 'content_safety',
       responseType: contentCheck.responseType || 'policy',
       message: isCrisis
-        ? 'This topic requires support beyond what a philosophical council can offer. Please reach out to a crisis helpline.'
+        ? 'What you wrote matters, and it is more than a council here can hold. Please talk to someone today. You are welcome back here whenever you want.'
         : 'This topic cannot be processed. Please choose a different council topic.',
     };
-    if (isCrisis) {
-      responseBody.resources = {
-        de: [
-          { name: 'Telefonseelsorge', contact: '0800 111 0 111 / 0800 111 0 222', note: '24/7, kostenlos, anonym' },
-          { name: 'Kinder- und Jugendtelefon', contact: '116 111', note: 'Für Kinder und Jugendliche' },
-        ],
-        en: [
-          { name: '988 Suicide & Crisis Lifeline', contact: '988', note: 'Call or text (USA)' },
-          { name: 'Samaritans', contact: '116 123', note: '24/7, free (UK & Ireland)' },
-        ],
-      };
-    }
+    // Helplines are rendered by the client from its own list, by country.
     return new Response(
       JSON.stringify(responseBody),
       { status: 422, headers: { 'Content-Type': 'application/json' } }
@@ -166,6 +156,12 @@ export async function handleCouncil(request: Request, env: Env, ctx: ExecutionCo
   }
 
   // 4. Build system prompt: safety preamble + client-provided instruction
+  // A council question in soft distress gets the same crisis rules a chat turn
+  // gets, appended to the template the client sent.
+  const crisisBlock = contentCheck.tier === 'distress'
+    ? '\n\n<crisis-rules priority="absolute">\n' + DISTRESS_RULES.join('\n') + '\n</crisis-rules>'
+    : '';
+  const systemPrompt = requestedSystemPrompt + crisisBlock;
   const fullSystemPrompt = SAFETY_PREAMBLE + '\n' + systemPrompt;
 
   // 5. Proxy to Nebius with higher token limit for councils
@@ -243,6 +239,8 @@ export async function handleCouncil(request: Request, env: Env, ctx: ExecutionCo
       'Connection': 'keep-alive',
       'X-AI-Model': dispatch.served.disclosureLabel,
       'X-Model': dispatch.served.label,
+      ...(contentCheck.tier === 'distress' || contentCheck.tier === 'topical' ? { 'X-Crisis-Resources': country } : {}),
+      ...(contentCheck.tier === 'distress' ? { 'X-Distress': 'soft' } : {}),
       'X-Council-Daily-Used': String(rateLimit.used),
       'X-Council-Daily-Limit': String(rateLimit.limit),
       'X-Council-Resets-At': rateLimit.resetsAt,

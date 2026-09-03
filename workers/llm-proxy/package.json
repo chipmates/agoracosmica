@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "wrangler dev",
     "typecheck": "tsc --noEmit",
-    "test": "tsx test/run.ts",
+    "test": "tsx test/run.ts && tsx test/crisisScreen.ts && tsx test/reviewCorpus.ts",
     "deploy": "wrangler deploy",
     "build:prompts": "npx tsx scripts/bundle-prompts.ts",
     "prebuild": "npm run build:prompts",
