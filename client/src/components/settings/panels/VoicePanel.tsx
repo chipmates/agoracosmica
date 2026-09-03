@@ -19,7 +19,9 @@ import {
   Globe,
   Bird,
   Sun,
-  Fire
+  Fire,
+  Circle,
+  CheckCircle
 } from '@phosphor-icons/react';
 import ToggleSwitch from '../../ToggleSwitch';
 import { useTranslation } from '../../../hooks/useTranslation';
@@ -30,10 +32,15 @@ import { bindAudioElement } from '../../../services/audio/audioFocus';
 import {
   getGermanTechnicalVoice,
   getKokoroTechnicalVoice,
+  QWEN_ENGLISH_TECHNICAL_VOICES,
+  resolveEnglishEngine,
   type GermanVoice,
-  type EnglishVoice
+  type EnglishVoice,
+  type EnglishEngine
 } from '../../../services/audio/voices';
+import { isLocalModeEnglishTts } from '../../../services/audio/voices/voiceResolver';
 import { useDomainStore } from '../../../stores/domainStore';
+import { EN_VOICE_ENGINE_CHOICE } from '../../../config/features';
 import CollapsibleSection from '../CollapsibleSection';
 
 interface CosmicTextProps {
@@ -88,6 +95,8 @@ interface CosmicVoice {
   id: string;
   name: string;
   icon: ReactNode;
+  /** Set when the card's id is already the id the gateway expects. */
+  technical?: string;
 }
 
 // ============================================
@@ -128,6 +137,27 @@ const ENGLISH_MALE_VOICES: CosmicVoice[] = [
   { id: 'jupiter', name: 'Jupiter', icon: <Planet size={18} weight="fill" /> },
   { id: 'saturn', name: 'Saturn', icon: <Planet size={18} weight="duotone" /> },
   { id: 'mercury', name: 'Mercury', icon: <Lightning size={18} weight="fill" /> },
+];
+
+// ============================================
+// English Voice Cards (Qwen on GEX130, one voice per gender)
+// ============================================
+
+// Gender icons rather than the cosmic ones: this cast has no female/male
+// grouping above it, so the card itself has to say who speaks in it.
+const QWEN_ENGLISH_VOICE_CARDS: CosmicVoice[] = [
+  {
+    id: QWEN_ENGLISH_TECHNICAL_VOICES.lyra,
+    technical: QWEN_ENGLISH_TECHNICAL_VOICES.lyra,
+    name: 'Lyra',
+    icon: <GenderFemale size={18} />,
+  },
+  {
+    id: QWEN_ENGLISH_TECHNICAL_VOICES.solaris,
+    technical: QWEN_ENGLISH_TECHNICAL_VOICES.solaris,
+    name: 'Solaris',
+    icon: <GenderMale size={18} />,
+  },
 ];
 
 const PREVIEW_TEXT_EN = "The ideas of great minds are bridges between times and worlds, waiting only to be heard.";
@@ -224,9 +254,56 @@ const VOICE_PLATE_CSS = `
   border-color: color-mix(in srgb, var(--gold-deep) 32%, transparent);
   cursor: not-allowed;
 }
+.voice-engine-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 8px;
+}
+.voice-engine-btn {
+  min-height: 44px;
+  padding: 12px 14px;
+  text-align: left;
+  background: color-mix(in srgb, var(--bg-card) 82%, var(--bg-void));
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 40%, transparent);
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+.voice-engine-btn:hover:not(.voice-engine-btn--chosen) {
+  background: color-mix(in srgb, var(--gold-subtle) 12%, transparent);
+  border-color: color-mix(in srgb, var(--gold-deep) 85%, transparent);
+}
+.voice-engine-btn:focus-visible {
+  outline: 1.5px dashed var(--gold-primary);
+  outline-offset: 3px;
+}
+.voice-engine-btn--chosen {
+  background: color-mix(in srgb, var(--bg-card) 88%, var(--gold-deep));
+  border-color: var(--gold-primary);
+  cursor: default;
+}
+.voice-engine-btn--locked {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.voice-engine-btn__name {
+  font-family: var(--font-content);
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  margin-bottom: 4px;
+}
+.voice-engine-btn__note {
+  font-size: 13px;
+  line-height: 1.45;
+}
 @media (prefers-reduced-motion: reduce) {
   .voice-plate-btn { transition: none; }
   .voice-plate-btn:active:not(:disabled) { transform: none; }
+  .voice-engine-btn { transition: none; }
 }
 `;
 
@@ -273,6 +350,15 @@ const VoicePanel: FC<VoicePanelProps> = ({
     }))
   );
   const saveVoicePreferences = useDomainStore((state) => state.saveVoicePreferences);
+  // Unset until the visitor picks, so the plate shows the default as chosen.
+  const storedEngine = resolveEnglishEngine(useDomainStore((state) => state.englishEngine));
+  const setEnglishEngine = useDomainStore((state) => state.setEnglishEngine);
+  const showEngineChoice = EN_VOICE_ENGINE_CHOICE;
+  // Local Mode runs Kokoro for English, so the choice is shown but frozen and
+  // the stored pick is left alone until Local Mode goes off.
+  const localModeEnglish = showEngineChoice && isLocalModeEnglishTts();
+  const englishEngine = localModeEnglish ? 'kokoro' : storedEngine;
+  const onQwenEnglish = showEngineChoice && englishEngine === 'qwen';
 
   // Current language determines which voice set to show
   const language = useDomainStore((state) => state.language.current);
@@ -330,9 +416,10 @@ const VoicePanel: FC<VoicePanelProps> = ({
 
     // 2) Fallback: live self-hosted TTS.
     try {
-      const technicalId = voiceLanguage === 'german'
-        ? getGermanTechnicalVoice(voice.id as GermanVoice)
-        : getKokoroTechnicalVoice(voice.id as EnglishVoice);
+      const technicalId = voice.technical
+        ?? (voiceLanguage === 'german'
+          ? getGermanTechnicalVoice(voice.id as GermanVoice)
+          : getKokoroTechnicalVoice(voice.id as EnglishVoice));
       const previewText = voiceLanguage === 'german' ? PREVIEW_TEXT_DE : PREVIEW_TEXT_EN;
       const langCode = voiceLanguage === 'german' ? 'de' : 'en';
 
@@ -399,6 +486,122 @@ const VoicePanel: FC<VoicePanelProps> = ({
       });
     }
   };
+
+  // Engine choice for English. German runs one stack, so it has no plate here.
+  const renderEngineChoice = (): ReactNode => {
+    const engines: { id: EnglishEngine; name: string; note: string }[] = [
+      {
+        id: 'qwen',
+        name: tString('settings.voice.engine.qwenLabel', 'Qwen'),
+        note: tString(
+          'settings.voice.engine.qwenNote',
+          'Our newest English voices. One voice per figure, picked by gender.'
+        ),
+      },
+      {
+        id: 'kokoro',
+        name: tString('settings.voice.engine.kokoroLabel', 'Kokoro'),
+        note: tString(
+          'settings.voice.engine.kokoroNote',
+          'The earlier cast. Ten voices you can pick from.'
+        ),
+      },
+    ];
+
+    return (
+      <div style={{ marginTop: '4px', marginBottom: '4px' }}>
+        <h4 style={{ ...kickerStyle, margin: '0 0 12px' }}>
+          {tNode('settings.voice.engine.title')}
+        </h4>
+
+        <div className="voice-engine-grid">
+          {engines.map(engine => {
+            const chosen = englishEngine === engine.id;
+            return (
+              <button
+                key={engine.id}
+                type="button"
+                onClick={() => setEnglishEngine(engine.id)}
+                aria-pressed={chosen}
+                disabled={localModeEnglish}
+                className={`voice-engine-btn${chosen ? ' voice-engine-btn--chosen' : ''}${localModeEnglish ? ' voice-engine-btn--locked' : ''}`}
+              >
+                <span style={{
+                  display: 'flex',
+                  flexShrink: 0,
+                  marginTop: '2px',
+                  color: chosen ? 'var(--gold-primary)' : 'var(--gold-deep)',
+                }}>
+                  {chosen ? <CheckCircle size={18} weight="fill" /> : <Circle size={18} />}
+                </span>
+                <span>
+                  <span
+                    className="voice-engine-btn__name"
+                    style={{
+                      display: 'block',
+                      color: chosen ? 'var(--gold-primary)' : 'var(--text-primary)',
+                    }}
+                  >
+                    {engine.name}
+                  </span>
+                  <span className="voice-engine-btn__note" style={{ display: 'block', color: INK_BODY }}>
+                    {engine.note}
+                  </span>
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        <p style={{ margin: '10px 0 0', fontSize: '13px', lineHeight: 1.5, color: INK_QUIET }}>
+          {localModeEnglish
+            ? tString(
+                'settings.voice.engine.localModeNote',
+                'Local Mode uses Kokoro for English, so the choice waits until you turn Local Mode voice off.'
+              )
+            : tString(
+                'settings.voice.engine.help',
+                'Both run on our own servers. The opening message follows your choice, so it always matches the voice that answers.'
+              )}
+        </p>
+      </div>
+    );
+  };
+
+  // Fixed Qwen cast: nothing to pick, so the plates carry a preview only.
+  const renderQwenEnglishCast = (): ReactNode => (
+    <div style={{ marginTop: '20px' }}>
+      <h4 style={{ ...kickerStyle, margin: '0 0 12px' }}>
+        {tNode('settings.voice.engine.qwenCastTitle')}
+      </h4>
+
+      <p style={{ margin: '0 0 12px', fontSize: '13px', lineHeight: 1.5, color: INK_BODY }}>
+        {tString(
+          'settings.voice.engine.qwenCastNote',
+          'Female figures speak as Lyra, male figures as Solaris.'
+        )}
+      </p>
+
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: isMobileOrTablet() ? '1fr' : 'repeat(auto-fit, minmax(180px, 1fr))',
+        gap: '8px'
+      }}>
+        {QWEN_ENGLISH_VOICE_CARDS.map(voice => (
+          <CosmicVoiceCard
+            key={voice.id}
+            voice={voice}
+            selected={true}
+            previewing={previewingVoice === voice.id}
+            onPreview={() => handlePreview(voice, 'english')}
+            onSelect={() => undefined}
+            showPreview={true}
+            showSelect={false}
+          />
+        ))}
+      </div>
+    </div>
+  );
 
   // Render voice grid for a language
   const renderVoiceSection = (
@@ -539,6 +742,9 @@ const VoicePanel: FC<VoicePanelProps> = ({
             </span>
           </div>
 
+          {/* Engine choice sits above the cast: it decides which cast shows. */}
+          {!isGerman && showEngineChoice && renderEngineChoice()}
+
           {/* Voice selection based on current language */}
           {isGerman
             ? renderVoiceSection(
@@ -549,14 +755,16 @@ const VoicePanel: FC<VoicePanelProps> = ({
                 selectedGermanMale,
                 handleSelectGermanVoice
               )
-            : renderVoiceSection(
-                'english',
-                ENGLISH_FEMALE_VOICES,
-                ENGLISH_MALE_VOICES,
-                selectedEnglishFemale,
-                selectedEnglishMale,
-                handleSelectEnglishVoice
-              )
+            : onQwenEnglish
+              ? renderQwenEnglishCast()
+              : renderVoiceSection(
+                  'english',
+                  ENGLISH_FEMALE_VOICES,
+                  ENGLISH_MALE_VOICES,
+                  selectedEnglishFemale,
+                  selectedEnglishMale,
+                  handleSelectEnglishVoice
+                )
           }
 
           {/* Speed control */}
@@ -633,6 +841,8 @@ interface CosmicVoiceCardProps {
   onPreview: () => void;
   onSelect: () => void;
   showPreview?: boolean;
+  /** Off for a cast with one voice per gender, where there is nothing to pick. */
+  showSelect?: boolean;
 }
 
 const CosmicVoiceCard: FC<CosmicVoiceCardProps> = ({
@@ -641,7 +851,8 @@ const CosmicVoiceCard: FC<CosmicVoiceCardProps> = ({
   previewing,
   onPreview,
   onSelect,
-  showPreview = true
+  showPreview = true,
+  showSelect = true
 }) => {
   const { tNode } = useTranslation();
 
@@ -676,7 +887,7 @@ const CosmicVoiceCard: FC<CosmicVoiceCardProps> = ({
 
       <div style={{
         display: 'grid',
-        gridTemplateColumns: showPreview ? '1fr 1fr' : '1fr',
+        gridTemplateColumns: showPreview && showSelect ? '1fr 1fr' : '1fr',
         gap: '6px'
       }}>
         {showPreview && (
@@ -689,13 +900,15 @@ const CosmicVoiceCard: FC<CosmicVoiceCardProps> = ({
             {previewing ? tNode('settings.voice.voiceSelection.playing') : tNode('settings.voice.voiceSelection.preview')}
           </button>
         )}
-        <button
-          onClick={onSelect}
-          disabled={selected}
-          className={`voice-plate-btn ${selected ? 'voice-plate-btn--chosen' : 'voice-plate-btn--select'}`}
-        >
-          {selected ? <><Check size={16} weight="bold" /> {tNode('settings.voice.voiceSelection.selected')}</> : tNode('settings.voice.voiceSelection.select')}
-        </button>
+        {showSelect && (
+          <button
+            onClick={onSelect}
+            disabled={selected}
+            className={`voice-plate-btn ${selected ? 'voice-plate-btn--chosen' : 'voice-plate-btn--select'}`}
+          >
+            {selected ? <><Check size={16} weight="bold" /> {tNode('settings.voice.voiceSelection.selected')}</> : tNode('settings.voice.voiceSelection.select')}
+          </button>
+        )}
       </div>
     </div>
   );

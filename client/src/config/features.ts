@@ -127,3 +127,15 @@ export const QUIET_PLATE_PRESENCE: boolean =
     : import.meta.env.VITE_QUIET_PLATE_PRESENCE === 'false'
       ? false
       : import.meta.env.DEV;
+
+/**
+ * English gets a voice engine choice: Qwen as the default, Kokoro still
+ * selectable with its cast unchanged. The pre-rendered greetings follow the
+ * same setting from a versioned R2 keyspace, so greeting and live reply never
+ * come from different engines.
+ *
+ * Off everywhere, dev included. `VITE_EN_VOICE_ENGINE_CHOICE=true` is the only
+ * way to see the surface; off means Kokoro, today's paths, no new UI.
+ */
+export const EN_VOICE_ENGINE_CHOICE: boolean =
+  import.meta.env.VITE_EN_VOICE_ENGINE_CHOICE === 'true';

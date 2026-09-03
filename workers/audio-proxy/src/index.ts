@@ -4,6 +4,7 @@ import { selectServers, refreshHealth, getAggregatedHealth } from './health';
 import { proxyWithFailover, proxyWithFailoverFromBuffer } from './proxy';
 import { checkAudioRateLimit, buildRateLimitResponse } from './rateLimit';
 import { handleStoryArchive } from './storyArchive';
+import { buildKokoroFallbackBody } from './ttsEngine';
 import type { Env } from './types';
 
 const STORY_ARCHIVE_PREFIX = '/v1/audio/story-archive/';
@@ -84,10 +85,11 @@ export default {
       // Extract language and model from request body for tier-aware limiting
       let language = 'English';
       let model = 'unknown';
+      let parsedBody: Record<string, unknown> | null = null;
       try {
-        const parsed = JSON.parse(new TextDecoder().decode(bodyBuffer));
-        if (parsed.language === 'German') language = 'German';
-        if (typeof parsed.model === 'string') model = parsed.model;
+        parsedBody = JSON.parse(new TextDecoder().decode(bodyBuffer)) as Record<string, unknown>;
+        if (parsedBody.language === 'German') language = 'German';
+        if (typeof parsedBody.model === 'string') model = parsedBody.model;
       } catch { /* default to English on parse failure */ }
 
       // Load-test bypass: authenticated calls that match LOAD_TEST_BYPASS_KEY
@@ -116,11 +118,17 @@ export default {
 
       const sessionId = request.headers.get('X-Session-Id');
       const [primary, fallback] = await selectServers(env, sessionId);
-      const response = await proxyWithFailoverFromBuffer(bodyBuffer, request, primary, fallback, env, TIMEOUTS.TTS);
+      // English on a Qwen voice can be re-asked as Kokoro when no origin serves
+      // it, so a Qwen outage costs the timbre rather than the audio.
+      const kokoroFallbackBody = buildKokoroFallbackBody(parsedBody);
+      const response = await proxyWithFailoverFromBuffer(
+        bodyBuffer, request, primary, fallback, env, TIMEOUTS.TTS, kokoroFallbackBody,
+      );
 
       // Anonymous analytics (fire-and-forget, never blocks response)
       const server = response.headers.get('X-Audio-Server') || 'unknown';
       const upstreamModel = response.headers.get('x-model') || model;
+      const engineFallback = response.headers.get('X-TTS-Engine-Fallback') ? 'engine-fallback' : '';
       const country = readCountry(request);
       ctx.waitUntil(Promise.resolve().then(() => {
         env.ANALYTICS.writeDataPoint({
@@ -130,7 +138,7 @@ export default {
             server,
             String(response.status),
             'speech',
-            '',
+            engineFallback,
             country,
           ],
           doubles: [Date.now() - startMs],

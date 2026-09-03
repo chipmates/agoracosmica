@@ -1,8 +1,12 @@
 // src/stores/slices/voicePreferencesSlice.ts
 // Voice Preferences Slice - German and English voice selection
 
-import type { GermanVoice, EnglishVoice } from '../../services/audio/voices/voiceDefinitions';
-import { GERMAN_DEFAULTS, ENGLISH_DEFAULTS } from '../../services/audio/voices/voiceDefinitions';
+import type { GermanVoice, EnglishVoice, EnglishEngine } from '../../services/audio/voices/voiceDefinitions';
+import {
+  GERMAN_DEFAULTS,
+  ENGLISH_DEFAULTS,
+  isEnglishEngine
+} from '../../services/audio/voices/voiceDefinitions';
 
 // Legacy type aliases for migration compatibility
 import type { OpenAIVoice, KokoroVoice } from '../../services/audio/voices/voiceDefinitions';
@@ -20,6 +24,12 @@ export interface VoicePreferencesState {
     maleVoice: EnglishVoice;
     femaleVoice: EnglishVoice;
   };
+  /**
+   * Which stack renders English, and null until the visitor picks one. Only an
+   * explicit pick is stored, so everyone else follows the current default
+   * instead of being frozen on whatever it was when they first loaded.
+   */
+  englishEngine: EnglishEngine | null;
   // Legacy aliases (point to same data — kept for backwards compat during migration)
   openai: {
     maleVoice: GermanVoice;
@@ -39,6 +49,7 @@ export interface VoicePreferencesActions {
   saveVoicePreferences: (preferences: Partial<VoicePreferencesState>) => void;
   updateGermanPreferences: (maleVoice?: GermanVoice, femaleVoice?: GermanVoice) => void;
   updateEnglishPreferences: (maleVoice?: EnglishVoice, femaleVoice?: EnglishVoice) => void;
+  setEnglishEngine: (engine: EnglishEngine) => void;
   // Legacy aliases
   updateOpenAIPreferences: (maleVoice?: OpenAIVoice, femaleVoice?: OpenAIVoice) => void;
   updateKokoroPreferences: (maleVoice?: KokoroVoice, femaleVoice?: KokoroVoice) => void;
@@ -63,6 +74,7 @@ const getDefaultPreferencesInternal = (): VoicePreferencesState => {
   return {
     german,
     english,
+    englishEngine: null,
     openai: german,
     kokoro: english
   };
@@ -138,7 +150,11 @@ const bootstrapVoicePreferences = (): VoicePreferencesState => {
         : ENGLISH_DEFAULTS.female
     };
 
-    return { german, english, openai: german, kokoro: english };
+    // Anything but a real engine name means the visitor never picked one, which
+    // covers every blob written before the choice existed.
+    const englishEngine = isEnglishEngine(parsed.englishEngine) ? parsed.englishEngine : null;
+
+    return { german, english, englishEngine, openai: german, kokoro: english };
 
   } catch (error) {
     console.error('❌ [VoicePrefs] Error loading preferences:', error);
@@ -159,6 +175,7 @@ export const createVoicePreferencesSlice = (
     // Initial state
     german: initial.german,
     english: initial.english,
+    englishEngine: initial.englishEngine,
     openai: initial.german,  // Legacy alias
     kokoro: initial.english, // Legacy alias
 
@@ -166,7 +183,8 @@ export const createVoicePreferencesSlice = (
     loadVoicePreferences: () => {
       const german = get().german;
       const english = get().english;
-      return { german, english, openai: german, kokoro: english };
+      const englishEngine = get().englishEngine;
+      return { german, english, englishEngine, openai: german, kokoro: english };
     },
 
     saveVoicePreferences: (preferences: Partial<VoicePreferencesState>) => {
@@ -183,12 +201,19 @@ export const createVoicePreferencesSlice = (
         ...(preferences.english || preferences.kokoro)
       };
 
+      // The engine is deliberately not written here: setEnglishEngine is its
+      // only writer, so it is stored when and only when someone picks it.
       set(() => ({
         german: newGerman,
         english: newEnglish,
         openai: newGerman,
         kokoro: newEnglish
       }));
+    },
+
+    setEnglishEngine: (engine: EnglishEngine) => {
+      if (!isEnglishEngine(engine)) return;
+      set(() => ({ englishEngine: engine }));
     },
 
     updateGermanPreferences: (maleVoice?: GermanVoice, femaleVoice?: GermanVoice) => {
@@ -225,6 +250,7 @@ export const createVoicePreferencesSlice = (
       set(() => ({
         german: defaults.german,
         english: defaults.english,
+        englishEngine: defaults.englishEngine,
         openai: defaults.german,
         kokoro: defaults.english
       }));

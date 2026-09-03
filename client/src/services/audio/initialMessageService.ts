@@ -19,6 +19,7 @@ import {
   type ConversationMode,
   type SupportedLanguage
 } from './initialMessagePathBuilder';
+import { getEnglishEngine } from './voices/voiceResolver';
 
 /**
  * Initial Message metadata and content
@@ -134,12 +135,14 @@ class InitialMessageService {
       return null; // Fall back to LLM generation
     }
 
-    // Get paths with language fallback
+    // The greeting has to come from the same stack as the replies that follow
+    // it, so the clip set follows the visitor's engine setting.
     const { path: audioPath, language: resolvedLanguage } = initialMessagePathBuilder.getPathWithFallback(
       figure,
       mode,
       seedId,
-      language
+      language,
+      getEnglishEngine()
     );
 
     const textPath = initialMessagePathBuilder.getTextPath(figure, mode, seedId, resolvedLanguage);

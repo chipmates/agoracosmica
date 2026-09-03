@@ -6,6 +6,7 @@ import { createLanguageSlice } from './slices/languageSlice';
 import { createPreferencesSlice } from './slices/preferencesSlice';
 import { createFirstVisitSlice } from './slices/firstVisitSlice';
 import { createVoicePreferencesSlice } from './slices/voicePreferencesSlice';
+import { isEnglishEngine } from '../services/audio/voices/voiceDefinitions';
 
 const debugLog = (...args: any[]) => {
   if (import.meta.env.DEV) {
@@ -326,6 +327,12 @@ export const useDomainStore = create<DomainSlices>()(
             discoveryCount: persisted.discoveryCount ?? currentState.discoveryCount,
             german: persisted.german ?? currentState.german,
             english: persisted.english ?? currentState.english,
+            // Absent for anyone who never picked an engine, which is every blob
+            // written before the choice existed. Those stay unset and follow
+            // the default rather than being pinned to it.
+            englishEngine: isEnglishEngine(persisted.englishEngine)
+              ? persisted.englishEngine
+              : null,
             openai: persisted.openai ?? currentState.openai,
             kokoro: persisted.kokoro ?? currentState.kokoro,
           };
@@ -373,6 +380,10 @@ export const useDomainStore = create<DomainSlices>()(
           // Voice preferences (from voicePreferencesSlice)
           german: state.german,
           english: state.english,
+          // Written only once someone picks an engine. Persisting the resolved
+          // default instead would freeze every visitor on the default that was
+          // current when they first loaded.
+          ...(isEnglishEngine(state.englishEngine) ? { englishEngine: state.englishEngine } : {}),
           openai: state.openai,
           kokoro: state.kokoro,
           // Exclude: session, conversation, council (all temporary runtime state)

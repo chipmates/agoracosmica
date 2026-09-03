@@ -11,8 +11,22 @@
 
 export type ConversationMode = 'wisdom' | 'freetalk' | 'quest';
 export type SupportedLanguage = 'en' | 'de';
+export type TtsEngine = 'qwen' | 'kokoro';
 
 export const SUPPORTED_LANGUAGES: readonly SupportedLanguage[] = ['en', 'de'];
+
+/**
+ * Keyspace revision for the English clips cut on the Qwen stack. R2 serves
+ * initial messages with a 1-year immutable edge cache, so a second set needs a
+ * key nobody has cached rather than an overwrite. Same move as the figure image
+ * revisions (`main-<rev>/`), one level up because a whole set changes at once.
+ *
+ * Bump this when the English Qwen set is re-cut. The Kokoro set keeps the
+ * unversioned root, so a rollback is the flag, not an upload.
+ */
+export const QWEN_EN_REV = 'q1';
+const QWEN_EN_ROOT = `initial-messages-${QWEN_EN_REV}`;
+const DEFAULT_ROOT = 'initial-messages';
 
 function sanitizeFigureId(figure: string): string {
   // Only allow lowercase alphanumeric characters (valid figure IDs are like 'plato', 'laozi', 'vinci')
@@ -20,6 +34,14 @@ function sanitizeFigureId(figure: string): string {
     throw new Error(`Invalid figure ID: ${figure}`);
   }
   return figure;
+}
+
+/**
+ * Only the English audio moved. German is Qwen already and its clips never
+ * left the unversioned root, and the texts are engine independent.
+ */
+function audioRoot(language: SupportedLanguage, engine: TtsEngine): string {
+  return language === 'en' && engine === 'qwen' ? QWEN_EN_ROOT : DEFAULT_ROOT;
 }
 
 export const initialMessagePathBuilder = {
@@ -30,11 +52,17 @@ export const initialMessagePathBuilder = {
    * @param mode - Conversation mode
    * @param seedId - Seed ID (1-12) for wisdom/quest, null for freetalk
    * @param language - Language code (en/de)
+   * @param engine - Stack that cut the clip. Defaults to the Kokoro set, so a
+   *                 caller that knows nothing about engines gets today's path.
    * @returns Path relative to media base URL
    *
    * @example
    * getAudioPath('plato', 'wisdom', 1, 'en')
    * // → 'initial-messages/plato/en/wisdom/seed_01.webm'
+   *
+   * @example
+   * getAudioPath('plato', 'wisdom', 1, 'en', 'qwen')
+   * // → 'initial-messages-q1/plato/en/wisdom/seed_01.webm'
    *
    * @example
    * getAudioPath('laozi', 'freetalk', null, 'de')
@@ -44,15 +72,16 @@ export const initialMessagePathBuilder = {
     figure: string,
     mode: ConversationMode,
     seedId: number | null,
-    language: SupportedLanguage = 'en'
+    language: SupportedLanguage = 'en',
+    engine: TtsEngine = 'kokoro'
   ): string {
     // Build filename based on mode
     const filename = mode === 'freetalk'
       ? 'greeting.webm'
       : `seed_${String(seedId).padStart(2, '0')}.webm`;
 
-    // Path pattern: initial-messages/{figure}/{lang}/{mode}/{file}.webm
-    return `initial-messages/${sanitizeFigureId(figure)}/${language}/${mode}/${filename}`;
+    // Path pattern: {root}/{figure}/{lang}/{mode}/{file}.webm
+    return `${audioRoot(language, engine)}/${sanitizeFigureId(figure)}/${language}/${mode}/${filename}`;
   },
 
   /**
@@ -60,6 +89,9 @@ export const initialMessagePathBuilder = {
    *
    * Same as audio path but with .txt extension
    * Text files are in docs folder locally, will be in Cloudflare for production
+   *
+   * Engine independent: both English sets speak the same text, so the texts
+   * were never re-uploaded under the versioned root.
    *
    * @param figure - Figure ID
    * @param mode - Conversation mode
@@ -78,7 +110,7 @@ export const initialMessagePathBuilder = {
       : `seed_${String(seedId).padStart(2, '0')}.txt`;
 
     // Same pattern as audio, just .txt instead of .webm
-    return `initial-messages/${sanitizeFigureId(figure)}/${language}/${mode}/${filename}`;
+    return `${DEFAULT_ROOT}/${sanitizeFigureId(figure)}/${language}/${mode}/${filename}`;
   },
 
   /**
@@ -91,6 +123,7 @@ export const initialMessagePathBuilder = {
    * @param mode - Conversation mode
    * @param seedId - Seed ID (null for freetalk)
    * @param preferredLanguage - User's preferred language
+   * @param engine - Stack that cut the clip (English only)
    * @returns Path and resolved language
    *
    * @example
@@ -101,11 +134,12 @@ export const initialMessagePathBuilder = {
     figure: string,
     mode: ConversationMode,
     seedId: number | null,
-    preferredLanguage: SupportedLanguage
+    preferredLanguage: SupportedLanguage,
+    engine: TtsEngine = 'kokoro'
   ): { path: string; language: SupportedLanguage } {
     // For MVP: All files exist in both EN and DE
     // In future, could add HEAD request to check existence
-    const path = this.getAudioPath(figure, mode, seedId, preferredLanguage);
+    const path = this.getAudioPath(figure, mode, seedId, preferredLanguage, engine);
 
     return {
       path,

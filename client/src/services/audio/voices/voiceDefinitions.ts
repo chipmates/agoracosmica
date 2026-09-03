@@ -120,6 +120,83 @@ export const ENGLISH_DEFAULTS = {
 } as const;
 
 // ============================================
+// ENGLISH VOICES ON THE QWEN STACK
+// ============================================
+
+/**
+ * Which stack renders English. German is Qwen-only and carries no choice.
+ */
+export type EnglishEngine = 'qwen' | 'kokoro';
+
+export type QwenEnglishVoice =
+  | 'lyra' | 'andromeda' | 'astra' | 'vega' | 'ceres'
+  | 'solaris' | 'phoenix' | 'hyperion' | 'umbra' | 'corvus';
+
+/**
+ * Ten English voices on the Qwen stack, 5 per gender. Every id added here also
+ * needs a Kokoro counterpart in the audio-proxy fallback map.
+ */
+export const QWEN_ENGLISH_TECHNICAL_VOICES = {
+  // Female
+  lyra: 'en_lyra',
+  andromeda: 'en_andromeda',
+  astra: 'en_astra',
+  vega: 'en_vega',
+  ceres: 'en_ceres',
+  // Male
+  solaris: 'en_solaris',
+  phoenix: 'en_phoenix',
+  hyperion: 'en_hyperion',
+  umbra: 'en_umbra',
+  corvus: 'en_corvus',
+} as const;
+
+/**
+ * Council rotation order: the one-to-one default leads, then the blind-test
+ * ranking. A two-figure council therefore sounds like a one-to-one pair.
+ */
+export const QWEN_ENGLISH_VOICES = {
+  female: ['lyra', 'andromeda', 'astra', 'vega', 'ceres'] as const,
+  male: ['solaris', 'phoenix', 'hyperion', 'umbra', 'corvus'] as const
+} as const;
+
+export const QWEN_ENGLISH_DEFAULTS = {
+  male: 'solaris' as QwenEnglishVoice,
+  female: 'lyra' as QwenEnglishVoice
+} as const;
+
+/** Engine a visitor gets when they never made a choice and the surface is live. */
+export const ENGLISH_ENGINE_DEFAULT: EnglishEngine = 'qwen';
+
+export function isEnglishEngine(value: unknown): value is EnglishEngine {
+  return value === 'qwen' || value === 'kokoro';
+}
+
+/**
+ * Only an explicit pick is ever stored, so anything else means "never chose"
+ * and follows the default, whatever the default becomes.
+ */
+export function resolveEnglishEngine(stored: unknown): EnglishEngine {
+  return isEnglishEngine(stored) ? stored : ENGLISH_ENGINE_DEFAULT;
+}
+
+/**
+ * Technical Qwen English voice id from a cosmic name.
+ */
+export function getQwenEnglishVoiceId(voiceName: QwenEnglishVoice | string): string {
+  return QWEN_ENGLISH_TECHNICAL_VOICES[voiceName as QwenEnglishVoice]
+    || QWEN_ENGLISH_TECHNICAL_VOICES.solaris;
+}
+
+/**
+ * The one-to-one Qwen voice for a figure's gender. Councils rotate the wider
+ * cast instead, see getVoicesForCouncil.
+ */
+export function getQwenEnglishTechnicalVoice(gender: Gender): string {
+  return getQwenEnglishVoiceId(QWEN_ENGLISH_DEFAULTS[gender]);
+}
+
+// ============================================
 // Legacy aliases (for migration from old openai/kokoro naming)
 // ============================================
 

@@ -56,8 +56,10 @@ export async function localModeTTS(
   const kokoroBase = (urlOverrides?.kokoroUrl?.trim() || localTtsKokoroUrl).replace(/\/+$/, '');
   const qwenBase = (urlOverrides?.qwenUrl?.trim() || localTtsQwenUrl).replace(/\/+$/, '');
   const endpoint = de ? qwenBase : kokoroBase;
+  // Belt and braces: the resolver already reports Kokoro while Local Mode TTS
+  // is on, and the local EN container speaks nothing else.
   const voiceId =
-    explicitVoice || getVoiceForNormalMode(figureName, 'kokoro', councilMapping, language);
+    explicitVoice || getVoiceForNormalMode(figureName, 'kokoro', councilMapping, language, 'kokoro');
 
   // Format choice: iOS Safari plays MP3 reliably via HTML5 audio; WAV from
   // blob URLs is flaky (first sample plays then `ended` fires early). Both

@@ -216,6 +216,17 @@
         "selected": "Selected",
         "scopeNote": "These voices power live conversations with the figures. Stories, prisms and councils come with their own handpicked narrators.",
         "openaiPreviewCost": "Preview uses OpenAI API and costs credits (~$0.015 per preview). Use sparingly."
+      },
+      "engine": {
+        "title": "Voice Engine",
+        "qwenLabel": "Qwen",
+        "qwenNote": "Our newest English voices. One voice per figure, picked by gender.",
+        "kokoroLabel": "Kokoro",
+        "kokoroNote": "The earlier cast. Ten voices you can pick from.",
+        "qwenCastTitle": "The Voices",
+        "qwenCastNote": "Female figures speak as Lyra, male figures as Solaris.",
+        "help": "Both run on our own servers. The opening message follows your choice, so it always matches the voice that answers.",
+        "localModeNote": "Local Mode uses Kokoro for English, so the choice waits until you turn Local Mode voice off."
       }
     },
     "speech": {

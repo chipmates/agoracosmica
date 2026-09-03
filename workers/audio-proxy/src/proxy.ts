@@ -21,6 +21,10 @@ export async function proxyWithFailover(
 /**
  * Same as proxyWithFailover but accepts a pre-buffered body.
  * Used when the body was already read for language extraction (TTS rate limiting).
+ *
+ * `degradedBody` is the same request rewritten for the stack that is always
+ * there (English Qwen voice → its Kokoro counterpart). It is tried only after
+ * both origins refused the original, so a healthy Qwen is never bypassed.
  */
 export async function proxyWithFailoverFromBuffer(
   body: ArrayBuffer,
@@ -28,13 +32,23 @@ export async function proxyWithFailoverFromBuffer(
   primary: ServerInfo,
   fallback: ServerInfo,
   env: Env,
-  timeoutMs: number
+  timeoutMs: number,
+  degradedBody?: ArrayBuffer | null
 ): Promise<Response> {
   const primaryResult = await tryUpstream(request, body, primary, env, timeoutMs);
   if (primaryResult) return primaryResult;
 
   const fallbackResult = await tryUpstream(request, body, fallback, env, timeoutMs);
   if (fallbackResult) return fallbackResult;
+
+  if (degradedBody) {
+    for (const server of [primary, fallback]) {
+      const degraded = await tryUpstream(request, degradedBody, server, env, timeoutMs, {
+        'X-TTS-Engine-Fallback': 'kokoro',
+      });
+      if (degraded) return degraded;
+    }
+  }
 
   // Both failed
   return new Response(JSON.stringify({ error: 'Both audio servers unavailable' }), {
@@ -48,7 +62,8 @@ async function tryUpstream(
   body: ArrayBuffer,
   server: ServerInfo,
   env: Env,
-  timeoutMs: number
+  timeoutMs: number,
+  extraHeaders?: Record<string, string>
 ): Promise<Response | null> {
   try {
     const url = new URL(request.url);
@@ -83,6 +98,9 @@ async function tryUpstream(
       if (value) responseHeaders.set(name, value);
     }
     responseHeaders.set('X-Audio-Server', server.id);
+    for (const [name, value] of Object.entries(extraHeaders ?? {})) {
+      responseHeaders.set(name, value);
+    }
 
     return new Response(upstreamResponse.body, {
       status: upstreamResponse.status,
