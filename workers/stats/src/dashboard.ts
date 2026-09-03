@@ -890,6 +890,16 @@ const NOT_PROBE = "blob9 != 'probe'";
 // so it never appears. Same six labels as the Monday pull.
 const LISTEN_BUCKET_LABELS = ['under 15s', '15-59s', '1-3m', '3-10m', '10-30m', '30m+'];
 
+// Spend-governor events, in escalation order. The threshold pair is written
+// once per day at the first crossing, so those two counters read as days. The
+// fallback pair is one row per request that moved to the standby model.
+const GOVERNOR_EVENTS = [
+  { key: 'soft_alert', label: 'Soft Alerts', one: 'Soft alert', sub: 'days the warning line was crossed', tone: 'var(--warn)' },
+  { key: 'hard_trip', label: 'Hard Trips', one: 'Hard trip', sub: 'days the cap moved traffic to the standby', tone: 'var(--err)' },
+  { key: 'fallback_error', label: 'Fallback on Error', one: 'Fallback on error', sub: 'requests the primary could not serve', tone: 'var(--err)' },
+  { key: 'fallback_latency', label: 'Fallback on Latency', one: 'Fallback on latency', sub: 'requests the primary was too slow for', tone: 'var(--warn)' },
+];
+
 // --- State ---
 let S = {
   tab: 'overview',
@@ -943,6 +953,23 @@ function worstTier(ps) { var o = { ok: 0, warn: 1, err: 2 }; var w = 'ok'; for (
 
 function now() { return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }); }
 
+// Analytics Engine hands back a naive UTC stamp ("2026-09-03 12:34:56"), which
+// a browser reads as local time unless the Z is stamped on first.
+function aeTime(raw) {
+  var s = String(raw || '');
+  if (!s) return 'unknown time';
+  var d = new Date(s.indexOf('Z') < 0 ? s.replace(' ', 'T') + 'Z' : s);
+  if (isNaN(d.getTime())) return esc(s);
+  return d.toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+
+function governorLabel(key) {
+  for (var i = 0; i < GOVERNOR_EVENTS.length; i++) {
+    if (GOVERNOR_EVENTS[i].key === key) return GOVERNOR_EVENTS[i].one;
+  }
+  return key || 'unlabelled';
+}
+
 function iv() { return String(S.range); }
 
 // Sparkline: monotone cubic interpolation
@@ -982,11 +1009,14 @@ function sparkSvg(pts, w, h, color) {
 // Delta HTML. At single-digit scale a percentage off a tiny base is Poisson
 // noise (1 -> 0 reads as a terrifying -100%), so below a small base we show the
 // absolute change only, never a dramatic colored percent.
-function deltaHtml(cur, prev) {
+// 'invert' flips the colour for counters where up is the bad direction (a rising
+// fallback count must never render green), same rule as rateCard: the arrow
+// follows the sign, the colour follows whether the move is good.
+function deltaHtml(cur, prev, invert) {
   if (prev == null || (prev === 0 && cur === 0)) return '<span class="kpi-delta flat">-</span>';
   const diff = cur - prev;
   if (diff === 0) return '<span class="kpi-delta flat">~0</span>';
-  const cls = diff > 0 ? 'up' : 'down';
+  const cls = (invert ? diff < 0 : diff > 0) ? 'up' : 'down';
   const arrow = diff > 0 ? '&#9650;' : '&#9660;';
   const sign = diff > 0 ? '+' : '';
   // Small-base guard: with prev under 5, or a change of a single event, the
@@ -1060,7 +1090,7 @@ function kpi(label, value, opts) {
   const interClass = opts.click ? ' card-interactive' : '';
   const clickAttr = opts.click ? ' onclick="' + opts.click + '" tabindex="0" role="button"' : '';
   const sparkHtml = opts.spark ? '<div class="kpi-spark">' + sparkSvg(opts.spark, 72, 28, opts.sparkColor || '#D4A539') + '</div>' : '';
-  const deltaStr = opts.delta !== undefined ? deltaHtml(value, opts.delta) : '';
+  const deltaStr = opts.delta !== undefined ? deltaHtml(value, opts.delta, opts.deltaInvert) : '';
   const subStr = opts.sub ? '<span class="kpi-sub">' + opts.sub + '</span>' : '';
   const valStr = typeof value === 'string' ? value : fmt(value);
   const valColor = opts.valColor ? ' style="color:' + opts.valColor + '"' : '';
@@ -2624,6 +2654,18 @@ async function loadProduct() {
     { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'turnstile_token_aged' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
     { sql: "SELECT blob5 as outcome, COUNT() as c FROM agora_llm WHERE blob1 = 'turnstile_failed' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY outcome ORDER BY c DESC", dataset: 'agora_llm' },
     { sql: "SELECT blob5 as outcome, COUNT() as c FROM agora_llm WHERE blob1 = 'turnstile_abandoned' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY outcome ORDER BY c DESC", dataset: 'agora_llm' },
+    // --- Spend governor, r[49..52] (APPENDED at the end; reads are positional,
+    // so new queries must never be inserted mid-array). Governor rows are
+    // written server side and carry no probe slot at all, so there is nothing
+    // to filter, which is also how the rate-limit counters in this same section
+    // are read. blob2 is the event, blob3 the endpoint, blob4 the serving model.
+    // The third query carries no window on purpose: "has this counter ever
+    // written a row" is the only thing that tells an honest zero apart from a
+    // governor that is not armed yet. Batch total after these: 53 of the 64 cap.
+    { sql: "SELECT blob2 as event, COUNT() as c FROM agora_llm WHERE blob1 = 'governor' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY event ORDER BY c DESC", dataset: 'agora_llm' },
+    { sql: "SELECT blob2 as event, COUNT() as c FROM agora_llm WHERE blob1 = 'governor' AND timestamp " + prevRange() + " GROUP BY event ORDER BY c DESC", dataset: 'agora_llm' },
+    { sql: "SELECT blob2 as event, COUNT() as c FROM agora_llm WHERE blob1 = 'governor' GROUP BY event ORDER BY c DESC", dataset: 'agora_llm' },
+    { sql: "SELECT timestamp as t, blob2 as event, blob3 as endpoint, blob4 as model, double1 as spend FROM agora_llm WHERE blob1 = 'governor' ORDER BY timestamp DESC LIMIT 1", dataset: 'agora_llm' },
   ];
 
   var r = await batch(queries);
@@ -2676,6 +2718,11 @@ async function loadProduct() {
   var tsAged = val(r[46]);
   var tsFailed = rows(r[47]);
   var tsAbandoned = rows(r[48]);
+  // Governor reads (appended queries r[49..52]).
+  var govPeriod = byKey(rows(r[49]), 'event', 'unlabelled');
+  var govPrev = byKey(rows(r[50]), 'event', 'unlabelled');
+  var govEver = byKey(rows(r[51]), 'event', 'unlabelled');
+  var govLast = rows(r[52])[0] || null;
   var totalPlayback = playbackByType.reduce(function(s, x) { return s + x.c; }, 0);
   var completionRate = playbackStarted > 0 ? Math.round((totalPlayback / playbackStarted) * 100) : null;
   var totalLlm = chats + councils + summaries;
@@ -2937,6 +2984,53 @@ async function loadProduct() {
   // Audio rate limits + audio activity moved to the dedicated Audio tab.
   html += '<div class="section-divider">Capacity</div>';
   html += '<div class="grid">';
+
+  // === SPEND GOVERNOR ===
+  // The rows arrive only once the free-tier model flip is armed, so a counter
+  // that has never written shows the awaiting marker and never a zero.
+  html += '<div class="section-divider" style="grid-column:1/-1;margin-top:0;padding-left:14px">Spend governor</div>';
+  // A counter counts as written when any of the three governor queries saw it,
+  // so one failed query can never blank a family that has real rows.
+  function govWrote(key) {
+    return (govEver[key] || 0) > 0 || (govPeriod[key] || 0) > 0 || (govPrev[key] || 0) > 0;
+  }
+  var govArmed = !!govLast || GOVERNOR_EVENTS.some(function(g) { return govWrote(g.key); });
+  var govHint = 'Soft alert and hard trip are written once per day, at the first crossing, so they count days and never requests. The fallback pair is one row per request that moved to the standby model. After a hard trip the rest of the day goes straight to the standby with no fallback row, so the two families never sum. Chat rows carry no model, so chat requests cannot be split by which model served them.';
+  if (!govArmed) govHint += ' Nothing has been written yet. The governor arms with the free-tier model flip.';
+  html += '<div class="hint-banner" style="grid-column:1/-1;margin-bottom:0">' + govHint + '</div>';
+
+  GOVERNOR_EVENTS.forEach(function(g) {
+    if (!govWrote(g.key)) {
+      html += kpi(g.label, '--', { sub: 'awaiting first ' + g.key, valColor: 'var(--dim)' });
+      return;
+    }
+    var v = govPeriod[g.key] || 0;
+    html += kpi(g.label, v, {
+      delta: govPrev[g.key] || 0,
+      deltaInvert: true,
+      sub: g.sub,
+      valColor: v > 0 ? g.tone : 'var(--ok)',
+    });
+  });
+
+  var govLastBody, govLastNote;
+  if (govLast) {
+    govLastBody = '<div class="kpi-value" style="font-size:1.375rem">' + esc(governorLabel(govLast.event)) + '</div>' +
+      '<div class="kpi-sub" style="display:block;margin-top:4px">' + aeTime(govLast.t) +
+      ' on ' + esc(govLast.model || 'unlabelled model') +
+      (govLast.endpoint ? ', ' + esc(govLast.endpoint) : '') + '</div>' +
+      // double1 is the day-to-date metered spend in USD at the moment the row fired.
+      (Number.isFinite(Number(govLast.spend)) ? '<div class="kpi-sub" style="display:block;margin-top:4px">Spend that day when it fired: $' + Number(govLast.spend).toFixed(2) + '</div>' : '');
+    govLastNote = 'The most recent row overall, not only the selected period. The model is the one the row was written for, which on a fallback is the standby that answered.';
+  } else {
+    govLastBody = '<div class="empty-state" style="padding:24px 0">-- awaiting first governor row</div>';
+    govLastNote = 'The governor arms with the free-tier model flip.';
+  }
+  html += chartCard('Last governor event', govLastBody +
+    '<div class="kpi-sub" style="margin-top:6px;display:block">' + govLastNote + '</div>',
+    'card-wide');
+
+  html += '<div class="section-divider" style="grid-column:1/-1;padding-left:14px">Rate limits</div>';
 
   if (totalRlLlm > 0) {
     var llmDonut = donutSvg(rlLlm.map(function(r) { return { key: r.reason, c: r.c }; }), COLORS.rl, function(r) { return r === 'daily' ? 'Daily' : r === 'global' ? 'Global' : cap(r); }, 60);
