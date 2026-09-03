@@ -12,7 +12,7 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260317.1",
     "typescript": "^5.8.3",
-    "wrangler": "^4.114.0"
+    "wrangler": "^4.127.1"
   },
   "pnpm": {
     "overrides": {
