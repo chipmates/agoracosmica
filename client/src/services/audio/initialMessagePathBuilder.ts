@@ -19,13 +19,13 @@ export const SUPPORTED_LANGUAGES: readonly SupportedLanguage[] = ['en', 'de'];
  * Keyspace revision for the English clips cut on the Qwen stack. R2 serves
  * initial messages with a 1-year immutable edge cache, so a second set needs a
  * key nobody has cached rather than an overwrite. Same move as the figure image
- * revisions (`main-<rev>/`), one level up because a whole set changes at once.
+ * revisions (`thumbnail-<rev>/`): the token sits on the language segment,
+ * because the media host serves only its known top-level prefixes.
  *
  * Bump this when the English Qwen set is re-cut. The Kokoro set keeps the
  * unversioned root, so a rollback is the flag, not an upload.
  */
 export const QWEN_EN_REV = 'q1';
-const QWEN_EN_ROOT = `initial-messages-${QWEN_EN_REV}`;
 const DEFAULT_ROOT = 'initial-messages';
 
 function sanitizeFigureId(figure: string): string {
@@ -40,8 +40,8 @@ function sanitizeFigureId(figure: string): string {
  * Only the English audio moved. German is Qwen already and its clips never
  * left the unversioned root, and the texts are engine independent.
  */
-function audioRoot(language: SupportedLanguage, engine: TtsEngine): string {
-  return language === 'en' && engine === 'qwen' ? QWEN_EN_ROOT : DEFAULT_ROOT;
+function audioLanguageSegment(language: SupportedLanguage, engine: TtsEngine): string {
+  return language === 'en' && engine === 'qwen' ? `en-${QWEN_EN_REV}` : language;
 }
 
 export const initialMessagePathBuilder = {
@@ -62,7 +62,7 @@ export const initialMessagePathBuilder = {
    *
    * @example
    * getAudioPath('plato', 'wisdom', 1, 'en', 'qwen')
-   * // → 'initial-messages-q1/plato/en/wisdom/seed_01.webm'
+   * // → 'initial-messages/plato/en-q1/wisdom/seed_01.webm'
    *
    * @example
    * getAudioPath('laozi', 'freetalk', null, 'de')
@@ -80,8 +80,8 @@ export const initialMessagePathBuilder = {
       ? 'greeting.webm'
       : `seed_${String(seedId).padStart(2, '0')}.webm`;
 
-    // Path pattern: {root}/{figure}/{lang}/{mode}/{file}.webm
-    return `${audioRoot(language, engine)}/${sanitizeFigureId(figure)}/${language}/${mode}/${filename}`;
+    // Path pattern: initial-messages/{figure}/{lang or lang-rev}/{mode}/{file}.webm
+    return `${DEFAULT_ROOT}/${sanitizeFigureId(figure)}/${audioLanguageSegment(language, engine)}/${mode}/${filename}`;
   },
 
   /**

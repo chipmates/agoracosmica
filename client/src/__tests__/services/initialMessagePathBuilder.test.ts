@@ -29,12 +29,12 @@ describe('initialMessagePathBuilder — engine selection', () => {
     );
   });
 
-  it('moves English to the versioned root for Qwen', () => {
+  it('moves English to the versioned language segment for Qwen', () => {
     expect(B.getAudioPath('plato', 'wisdom', 1, 'en', 'qwen')).toBe(
-      `initial-messages-${QWEN_EN_REV}/plato/en/wisdom/seed_01.webm`
+      `initial-messages/plato/en-${QWEN_EN_REV}/wisdom/seed_01.webm`
     );
     expect(B.getAudioPath('woolf', 'freetalk', null, 'en', 'qwen')).toBe(
-      `initial-messages-${QWEN_EN_REV}/woolf/en/freetalk/greeting.webm`
+      `initial-messages/woolf/en-${QWEN_EN_REV}/freetalk/greeting.webm`
     );
   });
 
@@ -52,7 +52,7 @@ describe('initialMessagePathBuilder — engine selection', () => {
 
   it('passes the engine through the language fallback', () => {
     expect(B.getPathWithFallback('rumi', 'quest', 7, 'en', 'qwen')).toEqual({
-      path: `initial-messages-${QWEN_EN_REV}/rumi/en/quest/seed_07.webm`,
+      path: `initial-messages/rumi/en-${QWEN_EN_REV}/quest/seed_07.webm`,
       language: 'en',
     });
     expect(B.getPathWithFallback('rumi', 'quest', 7, 'en')).toEqual({
