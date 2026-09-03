@@ -1,145 +1,234 @@
 // client/src/services/storage/deviceKeyManager.ts
 //
-// Device-based encryption key management (2025 best practices)
-// Generates and securely stores a device-specific encryption key for API key encryption
+// Per-device encryption key material held in IndexedDB.
 
 import { openDB, DBSchema, IDBPDatabase } from 'idb';
+
+/**
+ * Legacy record: base64 key material read back as a string.
+ *
+ * Still written and read by the history and profile encryption paths, which
+ * derive an AES key from it with PBKDF2. Those two paths keep this record alive,
+ * so it is never deleted here. The API-key store no longer uses it.
+ */
+interface LegacyKeyRecord {
+  id: 'encryption-key';
+  value: string;
+  created: number;
+  version: number;
+}
+
+/**
+ * Current record: the AES-256-GCM key itself, non-extractable.
+ *
+ * Structured clone stores the key handle, not its bytes. Script on this origin
+ * can encrypt and decrypt with it but cannot read the raw key out and replay it
+ * somewhere else.
+ */
+interface CryptoKeyRecord {
+  id: 'device-crypto-key';
+  cryptoKey: CryptoKey;
+  created: number;
+  version: number;
+}
+
+type DeviceKeyRecord = LegacyKeyRecord | CryptoKeyRecord;
 
 interface DeviceKeyDB extends DBSchema {
   deviceKey: {
     key: string;
-    value: {
-      id: 'encryption-key';
-      value: string;      // Base64-encoded 256-bit random key
-      created: number;    // Timestamp when key was created
-      version: number;    // Key version (for future rotation)
-    };
+    value: DeviceKeyRecord;
   };
 }
 
-/**
- * DeviceKeyManager
- *
- * Manages a device-specific encryption key stored separately from encrypted data.
- * This provides defense-in-depth: even if API keys database is compromised,
- * attacker also needs the device key database.
- *
- * Security Properties:
- * - 256-bit random key (cryptographically secure)
- * - Stored in separate IndexedDB database
- * - Persists across browser sessions (good UX)
- * - Separated from encrypted data (defense in depth)
- * - One-time generation on first use
- *
- * @see OWASP Cryptographic Storage Cheat Sheet (2025)
- */
+const isCryptoKeyRecord = (record: DeviceKeyRecord | undefined): record is CryptoKeyRecord =>
+  !!record && 'cryptoKey' in record;
+
+const isLegacyKeyRecord = (record: DeviceKeyRecord | undefined): record is LegacyKeyRecord =>
+  !!record && 'value' in record && typeof record.value === 'string';
+
 class DeviceKeyManager {
   private readonly DB_NAME = 'AgoraCosmicaDeviceKey';
   private readonly DB_VERSION = 1;
   private readonly STORE_NAME = 'deviceKey';
-  private readonly KEY_ID = 'encryption-key';
+  private readonly LEGACY_KEY_ID = 'encryption-key';
+  private readonly CRYPTO_KEY_ID = 'device-crypto-key';
 
-  // Cache the key in memory to avoid repeated IndexedDB reads
-  private cachedKey: string | null = null;
+  private cachedLegacyKey: string | null = null;
+  private cachedCryptoKey: CryptoKey | null = null;
+
+  // One connection and one in-flight generation per page, so concurrent callers
+  // never open a second database or race two fresh keys against each other.
+  private dbPromise: Promise<IDBPDatabase<DeviceKeyDB>> | null = null;
+  private cryptoKeyPromise: Promise<CryptoKey> | null = null;
 
   /**
-   * Get or generate device encryption key
+   * The device AES-256-GCM key, generated on first use.
    *
-   * @returns Base64-encoded 256-bit random key
-   * @throws Error if key generation fails
+   * @throws Error if crypto.subtle is unavailable (insecure context)
    */
-  async getDeviceKey(): Promise<string> {
-    // Return cached key if available
-    if (this.cachedKey) {
-      return this.cachedKey;
+  async getEncryptionKey(): Promise<CryptoKey> {
+    if (this.cachedCryptoKey) {
+      return this.cachedCryptoKey;
     }
+    if (!this.cryptoKeyPromise) {
+      this.cryptoKeyPromise = this.loadOrCreateCryptoKey().finally(() => {
+        this.cryptoKeyPromise = null;
+      });
+    }
+    return this.cryptoKeyPromise;
+  }
 
+  /**
+   * Read the legacy key without creating one.
+   *
+   * Returns null when no legacy record exists, which is the signal that nothing
+   * was ever written with the old derivation and there is nothing to migrate.
+   */
+  async peekLegacyKey(): Promise<string | null> {
+    if (this.cachedLegacyKey) {
+      return this.cachedLegacyKey;
+    }
     const db = await this.getDB();
-    let record = await db.get(this.STORE_NAME, this.KEY_ID);
-
-    if (!record) {
-      // First-time setup: Generate new device key
-      const key = this.generateStrongKey();
-
-      record = {
-        id: this.KEY_ID,
-        value: key,
-        created: Date.now(),
-        version: 1
-      };
-
-      await db.put(this.STORE_NAME, record);
+    const record = await db.get(this.STORE_NAME, this.LEGACY_KEY_ID);
+    if (!isLegacyKeyRecord(record)) {
+      return null;
     }
-
-    // Cache for performance
-    this.cachedKey = record.value;
+    this.cachedLegacyKey = record.value;
     return record.value;
   }
 
   /**
-   * Generate cryptographically strong 256-bit random key
+   * Legacy key material, created on first use.
    *
-   * Uses Web Crypto API's getRandomValues for cryptographic quality randomness.
-   *
-   * @returns Base64-encoded 256-bit random key
+   * Kept for the history and profile encryption paths, which still derive from a
+   * string with PBKDF2. New code should use getEncryptionKey().
    */
-  private generateStrongKey(): string {
-    // Generate 256 bits (32 bytes) of cryptographic randomness
-    const randomBytes = crypto.getRandomValues(new Uint8Array(32));
+  async getDeviceKey(): Promise<string> {
+    const existing = await this.peekLegacyKey();
+    if (existing) {
+      return existing;
+    }
 
-    // Convert to base64 for storage
-    return btoa(String.fromCharCode(...randomBytes));
+    const value = this.generateStrongKey();
+    const db = await this.getDB();
+
+    // Read and write in one transaction so a second tab reaching this branch at
+    // the same time adopts the first key rather than overwriting it.
+    const tx = db.transaction(this.STORE_NAME, 'readwrite');
+    const stored = await tx.store.get(this.LEGACY_KEY_ID);
+    if (isLegacyKeyRecord(stored)) {
+      await tx.done;
+      this.cachedLegacyKey = stored.value;
+      return stored.value;
+    }
+    await tx.store.put({ id: this.LEGACY_KEY_ID, value, created: Date.now(), version: 1 });
+    await tx.done;
+
+    this.cachedLegacyKey = value;
+    return value;
   }
 
   /**
-   * Clear cached key from memory
-   *
-   * Call this on logout or security-sensitive operations.
-   * Forces re-read from IndexedDB on next getDeviceKey() call.
+   * Clear cached key material from memory.
    */
   clearCache(): void {
-    this.cachedKey = null;
+    this.cachedLegacyKey = null;
+    this.cachedCryptoKey = null;
   }
 
   /**
-   * Delete device key (use with caution!)
+   * Delete all device key material.
    *
-   * WARNING: This will make all encrypted API keys unrecoverable.
-   * Only use when user explicitly wants to clear all data.
+   * WARNING: everything encrypted with it becomes unrecoverable.
    */
   async deleteDeviceKey(): Promise<void> {
     const db = await this.getDB();
-    await db.delete(this.STORE_NAME, this.KEY_ID);
-    this.cachedKey = null;
+    await db.delete(this.STORE_NAME, this.LEGACY_KEY_ID);
+    await db.delete(this.STORE_NAME, this.CRYPTO_KEY_ID);
+    this.clearCache();
   }
 
   /**
-   * Get device key metadata (without revealing the key)
+   * Key metadata without exposing key material.
    */
   async getKeyMetadata(): Promise<{ created: number; version: number } | null> {
     const db = await this.getDB();
-    const record = await db.get(this.STORE_NAME, this.KEY_ID);
+    const record =
+      (await db.get(this.STORE_NAME, this.CRYPTO_KEY_ID)) ??
+      (await db.get(this.STORE_NAME, this.LEGACY_KEY_ID));
 
     if (!record) return null;
 
-    return {
-      created: record.created,
-      version: record.version
-    };
+    return { created: record.created, version: record.version };
   }
 
   // ============================================
   // Private Helper Methods
   // ============================================
 
-  private async getDB(): Promise<IDBPDatabase<DeviceKeyDB>> {
-    return openDB<DeviceKeyDB>(this.DB_NAME, this.DB_VERSION, {
-      upgrade(db) {
-        if (!db.objectStoreNames.contains('deviceKey')) {
-          db.createObjectStore('deviceKey', { keyPath: 'id' });
-        }
-      }
+  private async loadOrCreateCryptoKey(): Promise<CryptoKey> {
+    if (typeof crypto === 'undefined' || !crypto.subtle) {
+      throw new Error(
+        '[DeviceKey] crypto.subtle unavailable — secure context required. ' +
+        'Ensure HTTPS or localhost.'
+      );
+    }
+
+    const db = await this.getDB();
+    const existing = await db.get(this.STORE_NAME, this.CRYPTO_KEY_ID);
+    if (isCryptoKeyRecord(existing)) {
+      this.cachedCryptoKey = existing.cryptoKey;
+      return existing.cryptoKey;
+    }
+
+    // Generated before the transaction opens: an IndexedDB transaction closes as
+    // soon as the microtask queue drains without a pending request, so it cannot
+    // stay open across an unrelated await.
+    const candidate = await crypto.subtle.generateKey(
+      { name: 'AES-GCM', length: 256 },
+      false,
+      ['encrypt', 'decrypt']
+    );
+
+    const tx = db.transaction(this.STORE_NAME, 'readwrite');
+    const stored = await tx.store.get(this.CRYPTO_KEY_ID);
+    if (isCryptoKeyRecord(stored)) {
+      await tx.done;
+      this.cachedCryptoKey = stored.cryptoKey;
+      return stored.cryptoKey;
+    }
+    await tx.store.put({
+      id: this.CRYPTO_KEY_ID,
+      cryptoKey: candidate,
+      created: Date.now(),
+      version: 2
     });
+    await tx.done;
+
+    this.cachedCryptoKey = candidate;
+    return candidate;
+  }
+
+  private generateStrongKey(): string {
+    const randomBytes = crypto.getRandomValues(new Uint8Array(32));
+    return btoa(String.fromCharCode(...randomBytes));
+  }
+
+  private getDB(): Promise<IDBPDatabase<DeviceKeyDB>> {
+    if (!this.dbPromise) {
+      this.dbPromise = openDB<DeviceKeyDB>(this.DB_NAME, this.DB_VERSION, {
+        upgrade(db) {
+          if (!db.objectStoreNames.contains('deviceKey')) {
+            db.createObjectStore('deviceKey', { keyPath: 'id' });
+          }
+        }
+      }).catch((error) => {
+        this.dbPromise = null;
+        throw error;
+      });
+    }
+    return this.dbPromise;
   }
 }
 

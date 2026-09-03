@@ -1,112 +1,85 @@
 // client/src/services/storage/keyStorageService.ts
 //
-// Secure API key storage with AES-256-GCM encryption (2025 best practices)
-// All keys are encrypted at rest using device-specific encryption key
+// API key storage, encrypted at rest with AES-256-GCM under the device key.
 
 import { openDB, DBSchema, IDBPDatabase } from 'idb';
 import { deviceKeyManager } from './deviceKeyManager';
 
-// Database schema
+type Provider = 'openrouter' | 'openai' | 'deepinfra' | 'custom-llm'; // 'deepinfra' kept for migration (legacy keys)
+
+/** Record shape written by the current code path. Anything lower is legacy. */
+const RECORD_VERSION = 2;
+
+/**
+ * Iteration counts a legacy record may have been written with, newest first.
+ *
+ * Records that predate the stored `iterations` field used whichever count the
+ * device-class heuristic picked at save time, and that classification could flip
+ * between save and load. Only the legacy read path needs this.
+ */
+const LEGACY_ITERATIONS = [600000, 100000];
+
+/** One write per hour of use instead of one per read. */
+const LAST_USED_INTERVAL_MS = 60 * 60 * 1000;
+
+interface StoredKey {
+  id: Provider;
+  value: string;           // AES-256-GCM ciphertext as JSON, or base64 for the oldest legacy records
+  encrypted: boolean;      // legacy records may be false (base64 fallback); current records are always true
+  v?: number;              // RECORD_VERSION = device CryptoKey. absent = legacy PBKDF2 record
+  salt?: number[];         // legacy only: PBKDF2 salt
+  iterations?: number;     // legacy only: PBKDF2 iterations used at save time
+  timestamp: number;       // when stored
+  valid?: boolean;         // last validation result
+  lastUsed?: number;       // last usage timestamp
+  lastValidated?: string;  // ISO timestamp of last validation
+}
+
 interface KeysDB extends DBSchema {
   keys: {
     key: string;
-    value: {
-      id: 'openrouter' | 'openai' | 'deepinfra' | 'custom-llm'; // 'deepinfra' kept for migration (legacy keys)
-      value: string;           // Encrypted API key (AES-256-GCM) or base64 fallback
-      encrypted: boolean;      // true = AES-256-GCM, false = base64 fallback (insecure context)
-      salt: number[];          // Salt for PBKDF2 (empty for fallback)
-      iterations?: number;     // PBKDF2 iterations used at save time (absent = legacy record, device-class dependent)
-      timestamp: number;       // When stored
-      valid?: boolean;         // Last validation result
-      lastUsed?: number;       // Last usage timestamp
-      lastValidated?: string;  // ISO timestamp of last validation
-    };
+    value: StoredKey;
   };
 }
 
 /**
  * KeyStorageService
  *
- * Secure storage for API keys with mandatory encryption using 2025 best practices:
- * - AES-256-GCM encryption (NIST approved, quantum-resistant)
- * - PBKDF2-HMAC-SHA256 with 600,000 iterations (OWASP 2023-2025)
- * - Separate device key storage (defense in depth)
- * - Web Crypto API (constant-time operations)
+ * API keys are encrypted with a non-extractable AES-256-GCM key held in
+ * IndexedDB. The key handle can be used on this origin but its bytes cannot be
+ * read out, so a script that reaches the database still cannot lift the key and
+ * replay it elsewhere. Code already running on this origin can use the key in
+ * place; the CSP is the defence for that case.
  *
- * Security Properties:
- * ✅ Encrypted at rest in IndexedDB
- * ✅ Separate encryption key database
- * ✅ 256-bit key derivation
- * ✅ Random salt per key
- * ✅ Authenticated encryption (GCM mode)
- * ✅ No plaintext storage option
- *
- * @see OWASP Cryptographic Storage Cheat Sheet (2025)
- * @see NIST SP 800-132 (PBKDF2 Recommendations)
+ * @see docs/THREAT-MODEL.md
  */
 class KeyStorageService {
   private readonly DB_NAME = 'AgoraCosmicaKeys';
   private readonly DB_VERSION = 1;
 
-  /**
-   * PBKDF2 iterations - mobile-aware
-   *
-   * OWASP 2023-2025 recommendation: 600,000 iterations for PBKDF2-HMAC-SHA256
-   * Mobile: Reduced to 100,000 to prevent browser hangs (still NIST compliant)
-   */
-  private get PBKDF2_ITERATIONS(): number {
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-      (navigator.maxTouchPoints && navigator.maxTouchPoints > 2);
-    return isMobile ? 100000 : 600000;
-  }
+  private dbPromise: Promise<IDBPDatabase<KeysDB>> | null = null;
+  private migrationPromise: Promise<void> | null = null;
 
   /**
-   * Save API key with mandatory AES-256-GCM encryption
+   * Save an API key, encrypted with the device key.
    *
-   * @param provider - 'openrouter', 'openai', or 'deepinfra' (legacy)
-   * @param apiKey - The API key to store (will be encrypted)
-   * @param options - Optional metadata
-   * @throws Error if encryption fails
+   * @throws Error if crypto.subtle is unavailable or encryption fails
    */
   async saveKey(
-    provider: 'openrouter' | 'openai' | 'deepinfra' | 'custom-llm',
+    provider: Provider,
     apiKey: string,
     options?: { provider?: string; lastValidated?: string }
   ): Promise<void> {
+    this.requireSubtleCrypto();
+
     const db = await this.getDB();
+    const deviceKey = await deviceKeyManager.getEncryptionKey();
 
-    // Check if Web Crypto API is available (requires secure context)
-    const hasCryptoSubtle = typeof crypto !== 'undefined' && crypto.subtle;
-
-    if (!hasCryptoSubtle) {
-      throw new Error(
-        '[KeyStorage] crypto.subtle unavailable — secure context required. ' +
-        'API keys cannot be stored without encryption. Ensure HTTPS or localhost.'
-      );
-    }
-
-    // Get device encryption key (auto-generated on first use)
-    const deviceKey = await deviceKeyManager.getDeviceKey();
-
-    // Generate random salt (16 bytes = 128 bits)
-    const salt = crypto.getRandomValues(new Uint8Array(16));
-
-    // Derive encryption key using PBKDF2
-    const derivedKey = await this.deriveKey(deviceKey, salt);
-
-    // Encrypt API key using AES-256-GCM
-    const encrypted = await this.encryptAES(apiKey, derivedKey);
-
-    // Store encrypted key
     await db.put('keys', {
       id: provider,
-      value: encrypted,
-      encrypted: true,  // Always true (no plaintext option)
-      salt: Array.from(salt),
-      // Stored per record: the device-class heuristic (mobile vs desktop) can
-      // flip between save and load, and a key derived with one count can never
-      // be decrypted with the other.
-      iterations: this.PBKDF2_ITERATIONS,
+      value: await this.encryptAES(apiKey, deviceKey),
+      encrypted: true,
+      v: RECORD_VERSION,
       timestamp: Date.now(),
       valid: true,
       ...(options?.lastValidated && { lastValidated: options.lastValidated })
@@ -114,66 +87,39 @@ class KeyStorageService {
   }
 
   /**
-   * Retrieve and decrypt API key
+   * Retrieve and decrypt an API key.
    *
-   * @param provider - 'openrouter', 'openai', or 'deepinfra' (legacy)
    * @returns Decrypted API key or null if not found
-   * @throws Error if decryption fails
+   * @throws Error if crypto.subtle is unavailable or decryption fails
    */
-  async getKey(provider: 'openrouter' | 'openai' | 'deepinfra' | 'custom-llm'): Promise<string | null> {
+  async getKey(provider: Provider): Promise<string | null> {
+    this.requireSubtleCrypto();
+    await this.ensureMigrated();
+
     const db = await this.getDB();
     const record = await db.get('keys', provider);
-
     if (!record) return null;
 
-    // Migrate legacy unencrypted (base64) records to encrypted storage
-    if (!record.encrypted) {
-      const decoded = atob(record.value);
-      const hasCryptoSubtle = typeof crypto !== 'undefined' && crypto.subtle;
-      if (hasCryptoSubtle) {
-        // Re-save with encryption, then return
-        await this.saveKey(provider, decoded);
-      }
-      await this.updateLastUsed(provider);
-      return decoded;
+    if (record.v === RECORD_VERSION) {
+      const deviceKey = await deviceKeyManager.getEncryptionKey();
+      const plaintext = await this.decryptAES(record.value, deviceKey);
+      await this.touchLastUsed(db, record);
+      return plaintext;
     }
 
-    // Get device encryption key
-    const deviceKey = await deviceKeyManager.getDeviceKey();
-
-    // Derive decryption key using stored salt. Records written before the
-    // iterations field used the device-class count of the day; if the
-    // classification has flipped since (UA change, touch-points change), the
-    // current count fails, so legacy records retry the other count and
-    // re-save with the count stored explicitly.
-    const salt = new Uint8Array(record.salt);
-    let decrypted: string;
-    if (record.iterations) {
-      const derivedKey = await this.deriveKey(deviceKey, salt, record.iterations);
-      decrypted = await this.decryptAES(record.value, derivedKey);
-    } else {
-      try {
-        const derivedKey = await this.deriveKey(deviceKey, salt);
-        decrypted = await this.decryptAES(record.value, derivedKey);
-      } catch {
-        const alternate = this.PBKDF2_ITERATIONS === 600000 ? 100000 : 600000;
-        const retryKey = await this.deriveKey(deviceKey, salt, alternate);
-        decrypted = await this.decryptAES(record.value, retryKey);
-      }
-      // Migrate: re-save so the record carries its iteration count from now on.
-      await this.saveKey(provider, decrypted);
-    }
-
-    // Update last used timestamp
-    await this.updateLastUsed(provider);
-
-    return decrypted;
+    // Left behind by a migration that could not finish, or written by an older
+    // tab still running. Read it the old way, then rewrite it under the device
+    // key so this branch is never taken for the record again.
+    const plaintext = await this.decryptLegacyRecord(record);
+    await this.rewriteUnderDeviceKey(db, record, plaintext);
+    return plaintext;
   }
 
   /**
    * Check if key exists
    */
-  async hasKey(provider: 'openrouter' | 'openai' | 'deepinfra' | 'custom-llm'): Promise<boolean> {
+  async hasKey(provider: Provider): Promise<boolean> {
+    await this.ensureMigrated();
     const db = await this.getDB();
     const record = await db.get('keys', provider);
     return !!record;
@@ -182,12 +128,13 @@ class KeyStorageService {
   /**
    * Get key metadata without retrieving the actual key
    */
-  async getKeyMetadata(provider: 'openrouter' | 'openai' | 'deepinfra' | 'custom-llm'): Promise<{
+  async getKeyMetadata(provider: Provider): Promise<{
     valid?: boolean;
     lastUsed?: number;
     lastValidated?: string;
     timestamp: number;
   } | null> {
+    await this.ensureMigrated();
     const db = await this.getDB();
     const record = await db.get('keys', provider);
 
@@ -208,7 +155,7 @@ class KeyStorageService {
    * they can never disagree about whether BYOK is active. A record is only
    * stored after a successful test, and markInvalid flips it off on rejection.
    */
-  async hasUsableKey(provider: 'openrouter' | 'openai' | 'deepinfra' | 'custom-llm'): Promise<boolean> {
+  async hasUsableKey(provider: Provider): Promise<boolean> {
     const meta = await this.getKeyMetadata(provider);
     return meta !== null && meta.valid !== false;
   }
@@ -219,7 +166,7 @@ class KeyStorageService {
    * Note: This only deletes the encrypted key from IndexedDB.
    * The device encryption key remains for other keys.
    */
-  async deleteKey(provider: 'openrouter' | 'openai' | 'deepinfra' | 'custom-llm'): Promise<void> {
+  async deleteKey(provider: Provider): Promise<void> {
     const db = await this.getDB();
     await db.delete('keys', provider);
   }
@@ -237,7 +184,7 @@ class KeyStorageService {
   /**
    * Mark key as invalid (after failed validation)
    */
-  async markInvalid(provider: 'openrouter' | 'openai' | 'deepinfra' | 'custom-llm'): Promise<void> {
+  async markInvalid(provider: Provider): Promise<void> {
     const db = await this.getDB();
     const record = await db.get('keys', provider);
     if (record) {
@@ -246,56 +193,147 @@ class KeyStorageService {
     }
   }
 
+  /**
+   * Re-encrypt legacy records under the device key. Runs once per page.
+   *
+   * Each record is rewritten by a single put, so a record is either fully legacy
+   * or fully current and never something in between. A record that cannot be
+   * decrypted is left exactly as it was, so an interrupted or partly failed run
+   * loses nothing and the next load retries it.
+   */
+  async ensureMigrated(): Promise<void> {
+    if (!this.migrationPromise) {
+      this.migrationPromise = this.migrateLegacyRecords().catch((error) => {
+        console.warn('[KeyStorage] Legacy record migration failed', error);
+      });
+    }
+    return this.migrationPromise;
+  }
+
   // ============================================
   // Private Helper Methods
   // ============================================
 
-  private async getDB(): Promise<IDBPDatabase<KeysDB>> {
-    return openDB<KeysDB>(this.DB_NAME, this.DB_VERSION, {
-      upgrade(db) {
-        if (!db.objectStoreNames.contains('keys')) {
-          db.createObjectStore('keys', { keyPath: 'id' });
-        }
-      }
-    });
+  private requireSubtleCrypto(): void {
+    if (typeof crypto === 'undefined' || !crypto.subtle) {
+      throw new Error(
+        '[KeyStorage] crypto.subtle unavailable — secure context required. ' +
+        'API keys cannot be stored without encryption. Ensure HTTPS or localhost.'
+      );
+    }
   }
 
-  private async updateLastUsed(provider: 'openrouter' | 'openai' | 'deepinfra' | 'custom-llm'): Promise<void> {
+  private getDB(): Promise<IDBPDatabase<KeysDB>> {
+    if (!this.dbPromise) {
+      this.dbPromise = openDB<KeysDB>(this.DB_NAME, this.DB_VERSION, {
+        upgrade(db) {
+          if (!db.objectStoreNames.contains('keys')) {
+            db.createObjectStore('keys', { keyPath: 'id' });
+          }
+        }
+      }).catch((error) => {
+        this.dbPromise = null;
+        throw error;
+      });
+    }
+    return this.dbPromise;
+  }
+
+  private async migrateLegacyRecords(): Promise<void> {
+    if (typeof crypto === 'undefined' || !crypto.subtle) return;
+
     const db = await this.getDB();
-    const record = await db.get('keys', provider);
-    if (record) {
-      record.lastUsed = Date.now();
-      await db.put('keys', record);
+    const legacy = (await db.getAll('keys')).filter((record) => record.v !== RECORD_VERSION);
+    if (legacy.length === 0) return;
+
+    for (const record of legacy) {
+      try {
+        const plaintext = await this.decryptLegacyRecord(record);
+        await this.rewriteUnderDeviceKey(db, record, plaintext);
+      } catch (error) {
+        console.warn(`[KeyStorage] Could not migrate stored key for ${record.id}`, error);
+      }
     }
   }
 
   /**
-   * Derive encryption key from device key using PBKDF2
-   *
-   * OWASP 2023-2025 recommendation: 600,000 iterations for PBKDF2-HMAC-SHA256
-   * (6x increase from 2021 standard due to GPU performance improvements)
-   *
-   * @param deviceKey - Base64-encoded device key
-   * @param salt - Random salt (16 bytes)
-   * @returns CryptoKey for AES-256-GCM
+   * Read a record written before the device key existed: either the oldest
+   * base64 fallback, or AES-256-GCM under a key derived from the legacy string
+   * with PBKDF2. Records saved before the iteration count was stored are tried
+   * against both counts that were ever used.
    */
-  private async deriveKey(deviceKey: string, salt: Uint8Array<ArrayBuffer>, iterations?: number): Promise<CryptoKey> {
-    const encoder = new TextEncoder();
+  private async decryptLegacyRecord(record: StoredKey): Promise<string> {
+    if (!record.encrypted) {
+      return atob(record.value);
+    }
+
+    const legacyKey = await deviceKeyManager.peekLegacyKey();
+    if (!legacyKey) {
+      throw new Error('[KeyStorage] Legacy device key is gone, stored key cannot be decrypted.');
+    }
+
+    const salt = new Uint8Array(record.salt ?? []);
+    const attempts = record.iterations ? [record.iterations] : LEGACY_ITERATIONS;
+
+    let lastError: unknown;
+    for (const iterations of attempts) {
+      try {
+        const derived = await this.deriveLegacyKey(legacyKey, salt, iterations);
+        return await this.decryptAES(record.value, derived);
+      } catch (error) {
+        lastError = error;
+      }
+    }
+    throw lastError;
+  }
+
+  /**
+   * Replace a legacy record with one encrypted under the device key, keeping the
+   * metadata the record already carried. One put, so the swap is atomic.
+   */
+  private async rewriteUnderDeviceKey(
+    db: IDBPDatabase<KeysDB>,
+    record: StoredKey,
+    plaintext: string
+  ): Promise<void> {
+    const deviceKey = await deviceKeyManager.getEncryptionKey();
+    await db.put('keys', {
+      id: record.id,
+      value: await this.encryptAES(plaintext, deviceKey),
+      encrypted: true,
+      v: RECORD_VERSION,
+      timestamp: record.timestamp,
+      lastUsed: Date.now(),
+      ...(record.valid !== undefined && { valid: record.valid }),
+      ...(record.lastValidated && { lastValidated: record.lastValidated })
+    });
+  }
+
+  private async touchLastUsed(db: IDBPDatabase<KeysDB>, record: StoredKey): Promise<void> {
+    const now = Date.now();
+    if (record.lastUsed && now - record.lastUsed < LAST_USED_INTERVAL_MS) return;
+    await db.put('keys', { ...record, lastUsed: now });
+  }
+
+  /**
+   * Legacy PBKDF2 derivation. Read path only, for records that predate the
+   * device key. Nothing is written with it.
+   */
+  private async deriveLegacyKey(
+    legacyKey: string,
+    salt: Uint8Array<ArrayBuffer>,
+    iterations: number
+  ): Promise<CryptoKey> {
     const keyMaterial = await crypto.subtle.importKey(
       'raw',
-      encoder.encode(deviceKey),
+      new TextEncoder().encode(legacyKey),
       'PBKDF2',
       false,
       ['deriveKey']
     );
 
     return crypto.subtle.deriveKey(
-      {
-        name: 'PBKDF2',
-        salt: salt,
-        iterations: iterations ?? this.PBKDF2_ITERATIONS,
-        hash: 'SHA-256'
-      },
+      { name: 'PBKDF2', salt, iterations, hash: 'SHA-256' },
       keyMaterial,
       { name: 'AES-GCM', length: 256 },
       false,
@@ -304,27 +342,21 @@ class KeyStorageService {
   }
 
   /**
-   * Encrypt using AES-256-GCM
+   * Encrypt with AES-256-GCM. GCM is authenticated, so tampering with the
+   * stored bytes fails the decrypt rather than returning garbage.
    *
-   * GCM mode provides both encryption and authentication (AEAD).
-   * This prevents tampering with encrypted data.
-   *
-   * @param text - Plaintext to encrypt
-   * @param key - Derived encryption key
-   * @returns JSON string with IV and encrypted data
+   * @returns JSON string with the IV and the ciphertext
    */
   private async encryptAES(text: string, key: CryptoKey): Promise<string> {
-    // Generate random IV (12 bytes = 96 bits, NIST recommendation for GCM)
-    const iv = crypto.getRandomValues(new Uint8Array(12));
-    const encoder = new TextEncoder();
+    const iv = crypto.getRandomValues(new Uint8Array(12)); // 96-bit nonce, NIST recommendation for GCM
 
     const encrypted = await crypto.subtle.encrypt(
-      { name: 'AES-GCM', iv: iv },
+      { name: 'AES-GCM', iv },
       key,
-      encoder.encode(text)
+      new TextEncoder().encode(text)
     );
 
-    // Store IV with encrypted data (IV can be public, doesn't need to be secret)
+    // The IV is stored next to the ciphertext. It does not need to be secret.
     return JSON.stringify({
       iv: Array.from(iv),
       data: Array.from(new Uint8Array(encrypted))
@@ -332,12 +364,9 @@ class KeyStorageService {
   }
 
   /**
-   * Decrypt using AES-256-GCM
+   * Decrypt AES-256-GCM output from encryptAES().
    *
-   * @param encryptedData - JSON string from encryptAES()
-   * @param key - Derived decryption key
-   * @returns Decrypted plaintext
-   * @throws Error if decryption fails (wrong key, tampered data, etc.)
+   * @throws Error if the key is wrong or the data was tampered with
    */
   private async decryptAES(encryptedData: string, key: CryptoKey): Promise<string> {
     const { iv, data } = JSON.parse(encryptedData);
@@ -348,8 +377,7 @@ class KeyStorageService {
       new Uint8Array(data)
     );
 
-    const decoder = new TextDecoder();
-    return decoder.decode(decrypted);
+    return new TextDecoder().decode(decrypted);
   }
 }
 
