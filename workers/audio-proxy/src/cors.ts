@@ -1,6 +1,6 @@
 import type { Env } from './types';
 
-const EXPOSE_HEADERS = 'X-Model, X-Inference-Ms, X-Total-Ms, X-Audio-Server, X-RateLimit-Daily, X-RateLimit-GpuLoad, X-TTS-Backend, X-TTS-Engine-Fallback, X-TTS-Session-Expires-In, X-Archive-Bytes, Content-Disposition, Content-Length';
+const EXPOSE_HEADERS = 'X-Model, X-Inference-Ms, X-Total-Ms, X-Audio-Server, X-RateLimit-Daily, X-RateLimit-GpuLoad, X-TTS-Backend, X-TTS-Engine-Fallback, X-TTS-Session-Expires-In, X-Preprocessed, X-Archive-Bytes, Content-Disposition, Content-Length';
 
 function getAllowedOrigins(env: Env): string[] {
   return env.ALLOWED_ORIGINS.split(',').map((o) => o.trim());

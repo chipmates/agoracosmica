@@ -31,6 +31,7 @@ export const PASSTHROUGH_HEADERS = [
   'x-total-ms',
   'x-tts-backend',
   'x-tts-session-expires-in',
+  'x-preprocessed',
   'content-type',
   'content-length',
 ] as const;
