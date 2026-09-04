@@ -99,6 +99,14 @@ const VALID_STEPS = new Set([
   // enough listening to count as listening. The arm rides in the mode slot.
   // At most two per tab (the first arm, then 'both' if the other one follows).
   'engaged',
+  // Ask while listening, per-occurrence volume counters. shown = the bar
+  // arrived under a paused chapter (once per chapter play, deduped on the
+  // client so a pause for a sip cannot bury the take rate), sent = a question
+  // went out, resumed = the chapter was picked up again after an answer. The
+  // row carries the figure id and 'story' in the mode slot.
+  'ask_listen_shown',
+  'ask_listen_sent',
+  'ask_listen_resumed',
   // A paid-ad arrival: the landing URL carried the paid parameter. One per
   // pageview, standard dimensions only, so it describes the parameter and not
   // the person who clicked.

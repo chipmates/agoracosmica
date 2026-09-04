@@ -735,3 +735,60 @@
     animation: none !important;
   }
 }
+/* --- Ask while listening ---------------------------------------------- */
+
+/* The sheet sits in the flow at the bottom of the reading and grows upward
+   from a fixed edge, so the transcript shrinks instead of being covered and
+   the keyboard behaves the way it does for the composer. At least two lines of
+   the paused paragraph stay on screen in every state. */
+.story-content--asking {
+  gap: var(--space-sm);
+}
+
+.story-content--asking .story-scrollable-native {
+  height: auto;
+  flex: 1 1 auto;
+  min-height: 5.5rem;
+}
+
+/* The sheet keeps the height it needs and the reading gives way, never the
+   other way round. Past 62% it scrolls inside itself, so two lines of the
+   paused paragraph survive even a long answer. */
+.story-content--asking .ask-sheet {
+  flex: 0 0 auto;
+  max-height: 70%;
+  overflow-y: auto;
+}
+
+/* From 1024px the open sheet docks beside the transcript. The 65ch measure
+   still fits next to a 360px column, so the reading keeps its line length. */
+@media (min-width: 1024px) {
+  .story-content--docked {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 360px;
+    grid-template-rows: minmax(0, 1fr);
+    gap: var(--space-lg);
+  }
+
+  .story-content--docked .story-scrollable-native {
+    min-height: 0;
+  }
+
+  .story-content--docked .ask-sheet {
+    max-height: 100%;
+    align-self: start;
+  }
+}
+
+/* The plate follows the room: the lit paragraph takes the accent of the state
+   the surface is standing in, mint while asking, gold once woven. */
+.room-container[data-room-state='asking'] .story-text p.story-paragraph--active,
+.room-container[data-room-state='voice'] .story-text p.story-paragraph--active,
+.room-container[data-room-state='woven'] .story-text p.story-paragraph--active {
+  border-left-color: color-mix(in srgb, var(--room-accent) 60%, transparent);
+}
+
+/* A paragraph that carries a mark keeps the note tight under its own lines. */
+.story-text p:has(+ .ask-mark) {
+  margin-bottom: var(--space-md);
+}

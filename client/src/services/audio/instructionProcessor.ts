@@ -100,8 +100,10 @@ export interface InstructionOptions {
   entry?: CarriedEntry;
   /** User messages in the payload. 1 means this is the carried question itself. */
   userMessageCount?: number;
-  /** The conversation mode, when the caller knows it. */
+  /** The conversation mode, when the caller knows it. Wins over the store. */
   mode?: string;
+  /** Set when the question was asked from a paused chapter. */
+  aside?: boolean;
 }
 
 // BYOK requests never reach the worker, so the answer-first directive lives
@@ -125,6 +127,42 @@ const buildCarriedDirective = (userMessageCount: number, hasAnchor: boolean): st
     hasAnchor ? ANSWERED_REPLY_ANCHOR : ANSWERED_REPLY_UNGROUNDED,
     ANSWERED_REPLY_CLOSE,
   ].join(' ');
+};
+
+// ============================================
+// Aside rules (BYOK parity)
+// ============================================
+
+// A question asked while a chapter is paused. The listener is going back to the
+// telling, so the answer is short, ends on a statement, and knows nothing past
+// the paragraph they stopped on. BYOK requests never reach the worker, so these
+// rules live here as well as in workers/llm-proxy/src/services/promptLoader.ts.
+// The two texts must stay identical.
+export const ASIDE_RULES = [
+  '<rule id="aside-length">40 to 70 words. Two to four sentences. Overrides the length rule.</rule>',
+  '<rule id="aside-no-handover">Do not end with a question. They are going back to the chapter. Overrides the handover rule.</rule>',
+  '<rule id="aside-horizon">The story text you were given is everything they have heard, and its last paragraph is where they stopped. Answer from that and from your own life. Never mention or hint at anything past it. If they ask what happens next, say you would rather they hear it.</rule>',
+  '<rule id="aside-no-meta">Never mention pausing, the app, players or the recording. Answer the thing they asked.</rule>',
+];
+
+const ASIDE_BLOCK =
+  '<aside-rules priority="absolute">\n' + ASIDE_RULES.join('\n') + '\n</aside-rules>';
+
+/**
+ * Appends the aside rules when the question came from a paused chapter. No-op
+ * on every other request, idempotent, and it leaves the carried directive
+ * alone: an ask never carries an entry, but the two blocks can coexist.
+ */
+export const applyAsideRules = (
+  instructions: string,
+  options: InstructionOptions = {}
+): string => {
+  if (!options.aside) return instructions;
+  if (options.mode !== undefined && options.mode !== INSTRUCTION_MODES.FREE_CONVERSATION) {
+    return instructions;
+  }
+  if (instructions.includes('<aside-rules')) return instructions;
+  return `${instructions}\n\n${ASIDE_BLOCK}`;
 };
 
 /**
@@ -179,7 +217,11 @@ const processSeedData = (
   
   try {
     // Get mode and figure from Zustand or default
-    const selectedMode = useDomainStore.getState().mode.selected || INSTRUCTION_MODES.FREE_CONVERSATION;
+    // An ask is generated while the story player is on screen, so the store's
+    // mode is not the mode of the request. An explicit mode wins.
+    const selectedMode = options.mode
+      || useDomainStore.getState().mode.selected
+      || INSTRUCTION_MODES.FREE_CONVERSATION;
     const selectedFigure = useDomainStore.getState().figures.selectedId || '';
     
     // Get all seeds for this figure from Zustand store (primary) or window cache (fallback)
@@ -372,11 +414,11 @@ export const fetchInstructions = async (
     }
 
     const carried = { ...options, mode: validMode };
-    if (seedData) {
-      return applyCarriedEntry(processSeedData(instructions.system, seedData, options), carried);
-    }
+    const base = seedData
+      ? processSeedData(instructions.system, seedData, options)
+      : instructions.system;
 
-    return applyCarriedEntry(instructions.system, carried);
+    return applyAsideRules(applyCarriedEntry(base, carried), carried);
   } catch (error) {
     throw new Error(`Failed to fetch instructions for ${figure}`);
   }

@@ -157,6 +157,8 @@ interface FreeTierOptions {
   turnKind?: ChatTurnKind;
   /** Behavior trigger for the carried-question entry flow, never a label. */
   entry?: CarriedEntry;
+  /** Behavior trigger for a question asked from a paused chapter, never a label. */
+  aside?: boolean;
 }
 
 /**
@@ -267,6 +269,7 @@ export async function generateFreeTierResponse({
   signal,
   turnKind,
   entry,
+  aside,
 }: FreeTierOptions): Promise<LLMResponse> {
   const perfMetrics = performanceMonitor.startRequest();
 
@@ -300,6 +303,10 @@ export async function generateFreeTierResponse({
     // Not a label: the worker's prompt loader reads this and tells the figure
     // to answer the carried question outright. Analytics never sees it.
     if (entry) requestBody.entry = entry;
+
+    // Also not a label: the prompt loader reads this and adds the aside rules,
+    // which hold the answer short and inside what the listener has heard.
+    if (aside) requestBody.aside = true;
 
     if (seedId) requestBody.seedId = seedId;
     if (seedData) requestBody.seedData = seedData;

@@ -25,6 +25,15 @@ interface StoryAudioPlayerProps {
   figureId?: string;
   /** Episode title for the lock screen. */
   mediaTitle?: string;
+  /**
+   * While an answer speaks over a paused chapter, the lock screen shows the
+   * answer instead of the episode. The chapter keeps the Media Session either
+   * way, so there is never a second owner to hand it over to: transport goes to
+   * the answer, the position bar goes quiet, and the chapter does not move.
+   */
+  sessionOverride?: { title: string; isPlaying: boolean; onTogglePlay: () => void };
+  /** Incrementing counter that resumes the chapter. Ignored while playing. */
+  playRequest?: number;
 }
 
 const StoryAudioPlayer: FC<StoryAudioPlayerProps> = ({
@@ -38,7 +47,9 @@ const StoryAudioPlayer: FC<StoryAudioPlayerProps> = ({
   togglePlayRequest,
   playbackBeacon,
   figureId,
-  mediaTitle
+  mediaTitle,
+  sessionOverride,
+  playRequest
 }) => {
   const { tString } = useTranslation();
   const {
@@ -53,6 +64,7 @@ const StoryAudioPlayer: FC<StoryAudioPlayerProps> = ({
     togglePlay,
     seek,
     changePlaybackRate,
+    audioRef,
   } = useAudio(audioUrl, {
     autoplay: false,
     initialVolume: 1.0,
@@ -96,6 +108,39 @@ const StoryAudioPlayer: FC<StoryAudioPlayerProps> = ({
     }
   }, [togglePlayRequest, togglePlay]);
 
+  // Resume after an answer: the narration fades back in instead of cutting in
+  // at full level, which is what makes the return feel like one telling.
+  const fadeFrameRef = useRef<number | null>(null);
+  const fadeInPlayback = useCallback((durationMs = 300): void => {
+    const element = audioRef.current;
+    if (!element) return;
+    if (fadeFrameRef.current !== null) cancelAnimationFrame(fadeFrameRef.current);
+
+    element.volume = 0;
+    const startedAt = performance.now();
+    const step = (now: number): void => {
+      const ratio = Math.min((now - startedAt) / durationMs, 1);
+      element.volume = ratio;
+      fadeFrameRef.current = ratio < 1 ? requestAnimationFrame(step) : null;
+    };
+    fadeFrameRef.current = requestAnimationFrame(step);
+  }, [audioRef]);
+
+  useEffect(() => () => {
+    if (fadeFrameRef.current !== null) cancelAnimationFrame(fadeFrameRef.current);
+  }, []);
+
+  // Handle external play requests. Unlike togglePlayRequest this only ever
+  // plays, so a resume that arrives on a playing chapter is a no-op.
+  const playRequestRef = useRef<number>(0);
+  useEffect(() => {
+    if (!playRequest || playRequest === playRequestRef.current) return;
+    playRequestRef.current = playRequest;
+    if (isPlaying) return;
+    fadeInPlayback();
+    void togglePlay();
+  }, [playRequest, isPlaying, togglePlay, fadeInPlayback]);
+
   const progressSliderRef = useRef<HTMLInputElement>(null);
 
   // State for first-time play button highlight
@@ -135,20 +180,26 @@ const StoryAudioPlayer: FC<StoryAudioPlayerProps> = ({
     seek(Math.min(Math.max(newPercent, 0), 100));
   }, [currentTimeSeconds, durationSeconds, seek]);
 
-  // Lock screen / OS transport controls for the story episode
+  // Lock screen / OS transport controls for the story episode. An override
+  // swaps what the controls act on without changing who owns the session:
+  // duration 0 keeps the position bar out, and every seek is dropped so the
+  // chapter cannot move while the answer speaks.
+  const overridden = Boolean(sessionOverride);
   useMediaSession({
-    title: mediaTitle ?? '',
+    title: sessionOverride ? sessionOverride.title : (mediaTitle ?? ''),
     figureId: figureId ?? '',
-    isPlaying,
-    currentTimeSeconds,
-    durationSeconds,
-    playbackRate,
-    onTogglePlay: togglePlay,
-    onSkipBack: () => handleSkip(-15),
-    onSkipForward: () => handleSkip(15),
-    onSeekTo: (seconds: number) => {
-      if (durationSeconds > 0) seek((seconds / durationSeconds) * 100);
-    },
+    isPlaying: sessionOverride ? sessionOverride.isPlaying : isPlaying,
+    currentTimeSeconds: overridden ? 0 : currentTimeSeconds,
+    durationSeconds: overridden ? 0 : durationSeconds,
+    playbackRate: overridden ? 1 : playbackRate,
+    onTogglePlay: sessionOverride ? sessionOverride.onTogglePlay : togglePlay,
+    onSkipBack: overridden ? () => {} : () => handleSkip(-15),
+    onSkipForward: overridden ? () => {} : () => handleSkip(15),
+    onSeekTo: overridden
+      ? undefined
+      : (seconds: number) => {
+          if (durationSeconds > 0) seek((seconds / durationSeconds) * 100);
+        },
     enabled: Boolean(figureId && audioUrl),
   });
 

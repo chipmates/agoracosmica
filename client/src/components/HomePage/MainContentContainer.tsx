@@ -33,6 +33,7 @@ interface SessionSlice {
   handleCouncilPlayerClose: () => void;
   handleCouncilHandoff: (figureId: string, question: string) => Promise<void> | void;
   handleCouncilGoDeeper: (councilId: string) => void;
+  handleAskCarry: (exchanges: { question: string; answer: string }[]) => Promise<void> | void;
   handlePrismClose: () => void;
   handleModeSelectorOpen: () => void;
   handleFigureCarouselOpen: () => void;
@@ -118,6 +119,7 @@ const MainContentContainer: React.FC<MainContentContainerProps> = ({
         onCouncilPlayerClose={session.handleCouncilPlayerClose}
         onCouncilHandoff={session.handleCouncilHandoff}
         onCouncilGoDeeper={session.handleCouncilGoDeeper}
+        onAskCarry={session.handleAskCarry}
         onPrismClose={session.handlePrismClose}
         onChooseMode={session.handleModeSelectorOpen}
         onChooseFigure={session.handleFigureCarouselOpen}

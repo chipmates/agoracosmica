@@ -22,14 +22,25 @@ import {
   getEpisodeTranscriptUrl
 } from '../services/mediaDownload';
 import { normalizeFigureName } from '../utils/nameUtils';
-import { STORY_DOWNLOADS_ENABLED } from '../config/features';
+import { ASK_WHILE_LISTENING, STORY_DOWNLOADS_ENABLED } from '../config/features';
 import { sendFunnelBeacon } from '../utils/funnelBeacon';
 import { chapterFromSeedId } from '../utils/playbackBeacon';
+import { ttsScheduler } from '../controllers/conversationStreamDriver';
+import { cleanupAudioResources } from '../services/audioService';
+import { askDriver } from '../services/ask/askDriver';
+import { useAskWhileListening } from '../hooks/useAskWhileListening';
+import type { AskAnchor, AskExchange } from '../hooks/useAskWhileListening';
+import { ASK_RESUME_RUNUP_S } from '../config/askWhileListening';
+import AskBar from './AskWhileListening/AskBar';
+import AskSheet from './AskWhileListening/AskSheet';
+import AskMark from './AskWhileListening/AskMark';
+import type { RoomState } from './RoomContainer';
 import { Seed } from '../types/global';
 // Manifest no longer needed - using direct path construction
 // SimpleBar removed - using native CSS scrollbar system from index.css
 import './StoryPlayer.css';
 import './StoryAudioPlayer.css';
+import './AskWhileListening/AskWhileListening.css';
 
 import type { StoryTimestamps } from '../services/StoryService';
 
@@ -53,8 +64,46 @@ interface StoryPlayerProps {
    *  to talk the same seed through (seed_conversation). Omit on hidden
    *  audio-only instances so the card and its beacons stay silent. */
   onTalkChapter2?: () => void;
+  /** Ask while listening: moves a paused-chapter exchange into Free Talk.
+   *  Present only on the visible instance, so the hidden audio-only twin
+   *  never mounts the ask surface. */
+  onAskCarry?: (exchanges: AskExchange[]) => Promise<void> | void;
   selectedSeed?: Seed;
   style?: React.CSSProperties;
+}
+
+/** What the outer wrapper needs from the surface to name the room. */
+interface StoryPlayerSurfaceProps extends StoryPlayerProps {
+  atChapterEnd: boolean;
+  onRoomState: (room: RoomState | null) => void;
+}
+
+/** Which room an ask state stands in. */
+function roomForAskState(state: string): RoomState | null {
+  switch (state) {
+    case 'recording':
+      return 'voice';
+    case 'armed':
+    case 'composing':
+    case 'pending':
+    case 'answering':
+    case 'answered':
+    case 'failed':
+    case 'limited':
+      return 'asking';
+    case 'resuming':
+    case 'woven':
+      return 'woven';
+    default:
+      return null;
+  }
+}
+
+/** One pause, one margin note, however many questions it held. */
+interface StoryAskMark {
+  key: string;
+  paragraphIndex: number;
+  exchanges: AskExchange[];
 }
 
 interface StoryPlayerState {
@@ -119,15 +168,18 @@ function storyPlayerReducer(state: StoryPlayerState, action: StoryPlayerAction):
   }
 }
 
-const StoryPlayerSurface: FC<StoryPlayerProps> = ({
+const StoryPlayerSurface: FC<StoryPlayerSurfaceProps> = ({
   figure,
   figureName,
   storyData,
   onComplete,
   onError,
   onTalkChapter2,
+  onAskCarry,
   selectedSeed,
-  style
+  style,
+  atChapterEnd,
+  onRoomState
 }) => {
   // Get current language from Zustand store
   const language = useDomainStore((state) => state.language.current);
@@ -151,8 +203,13 @@ const StoryPlayerSurface: FC<StoryPlayerProps> = ({
   const [seekTarget, setSeekTarget] = useState<number | null>(null);
   // Toggle play counter: incrementing triggers play/pause in StoryAudioPlayer
   const [togglePlayRequest, setTogglePlayRequest] = useState<number>(0);
+  // Play counter: incrementing plays only when paused (the ask resume path)
+  const [playRequest, setPlayRequest] = useState<number>(0);
+  // Has this chapter sounded in this session? A reader who never pressed play
+  // is not sold an audio detour.
+  const [hasPlayed, setHasPlayed] = useState<boolean>(false);
   // Ref for active paragraph auto-scroll
-  const activeParagraphRef = useRef<HTMLParagraphElement>(null);
+  const activeParagraphRef = useRef<HTMLParagraphElement | null>(null);
 
   // Auto-clear seekTarget after it's been consumed by StoryAudioPlayer
   // Parent effects run after child effects, so the seek is performed first
@@ -170,6 +227,7 @@ const StoryPlayerSurface: FC<StoryPlayerProps> = ({
 
   const handlePlayStateChange = useCallback((playing: boolean) => {
     setAudioIsPlaying(playing);
+    if (playing) setHasPlayed(true);
   }, []);
 
   // Chapter-2 handoff: the story's end is the most engaged moment a visitor
@@ -661,6 +719,133 @@ const StoryPlayerSurface: FC<StoryPlayerProps> = ({
   const audioBytes = useFileSize(audioDownloadUrl);
   const audioSizeLabel = audioBytes ? formatFileSize(audioBytes, language) : null;
 
+  // --- Ask while listening ---
+  // The invitation lives where the handoff lives: the visible instance only,
+  // and only on a chapter that has audio to pause in the first place.
+  const askEnabled = ASK_WHILE_LISTENING && Boolean(onTalkChapter2) && Boolean(shouldShowAudioPlayer);
+  const modeSelectorOpen = useUIStore((s) => s.modals.modeSelectorOpen);
+  const askOverlayOpen = showStoryHelp || showFactCheck || showForeword || modeSelectorOpen;
+
+  const askAnchorRef = useRef<AskAnchor | null>(null);
+  const askSpeakingRef = useRef<boolean>(false);
+  const anchoredParagraphRef = useRef<HTMLParagraphElement | null>(null);
+  const [askMarks, setAskMarks] = useState<StoryAskMark[]>([]);
+  const [resumeAnnounced, setResumeAnnounced] = useState<boolean>(false);
+
+  // Resume in the stop-voice pill's order (cancel the jobs, then drop the
+  // audio), then a breath before the paused second, clamped to the anchored
+  // paragraph so the chapter never falls back into the one before it.
+  const handleAskResume = useCallback((seconds: number) => {
+    askDriver.stopVoice();
+    const index = askAnchorRef.current?.paragraphIndex ?? null;
+    const paragraphStart =
+      index !== null && isHighlightingAvailable ? (seekToParagraph(index) ?? 0) : 0;
+    setSeekTarget(Math.max(paragraphStart, seconds - ASK_RESUME_RUNUP_S));
+    setPlayRequest((n) => n + 1);
+  }, [isHighlightingAvailable, seekToParagraph]);
+
+  const handleAskCarry = useCallback((exchanges: AskExchange[]) => {
+    void onAskCarry?.(exchanges);
+  }, [onAskCarry]);
+
+  // The catalog's display name already carries the Echo prefix ("Echo von Mark Aurel");
+  // the ask strings add their own, so they get the plain name.
+  const askPlainName = (figureName || figure).replace(/^Echo (von|of) /i, '');
+  const ask = useAskWhileListening({
+    enabled: askEnabled,
+    figureId: figure,
+    figureName: figureName || figure,
+    seedId: String(selectedSeed?.id ?? ''),
+    chapter: seedNumber ?? 0,
+    language,
+    paragraphs,
+    activeParagraphIndex,
+    isHighlightingAvailable,
+    audioTimeSeconds,
+    audioDurationSeconds,
+    isPlaying: audioIsPlaying,
+    hasPlayed,
+    atChapterEnd,
+    overlayOpen: askOverlayOpen,
+    onResume: handleAskResume,
+    onCarry: handleAskCarry,
+    driver: askDriver
+  });
+
+  askAnchorRef.current = ask.anchor;
+  askSpeakingRef.current = ask.speaking;
+
+  // The room the surface stands in, for the wrapper above it.
+  const askRoom = askEnabled ? roomForAskState(ask.state) : null;
+  useEffect(() => {
+    onRoomState(askRoom);
+  }, [askRoom, onRoomState]);
+
+  // The chapter took the room back from somewhere else (lock screen, another
+  // tab's transport, the play button). Whatever the Echo was saying stops.
+  const askWasPlayingRef = useRef<boolean>(false);
+  useEffect(() => {
+    const rose = audioIsPlaying && !askWasPlayingRef.current;
+    askWasPlayingRef.current = audioIsPlaying;
+    if (rose && askSpeakingRef.current) {
+      ttsScheduler.cancelAll();
+      cleanupAudioResources();
+    }
+  }, [audioIsPlaying]);
+
+  // The marks are the player's, not the machine's: they outlive the pause that
+  // made them and stay until the chapter or the language changes.
+  useEffect(() => {
+    const anchor = ask.anchor;
+    if (!anchor || ask.exchanges.length === 0) return;
+    const key = `${anchor.paragraphIndex}:${Math.round(anchor.seconds * 10)}`;
+    setAskMarks((previous) => {
+      const entry: StoryAskMark = {
+        key,
+        paragraphIndex: anchor.paragraphIndex,
+        exchanges: ask.exchanges
+      };
+      const index = previous.findIndex((mark) => mark.key === key);
+      if (index === -1) return [...previous, entry];
+      const next = previous.slice();
+      next[index] = entry;
+      return next;
+    });
+  }, [ask.anchor, ask.exchanges]);
+
+  useEffect(() => {
+    setAskMarks([]);
+    setHasPlayed(false);
+  }, [figure, selectedSeed?.id, language]);
+
+  const askSheetOpen =
+    askEnabled &&
+    ask.state !== 'listening' &&
+    ask.state !== 'paused' &&
+    ask.state !== 'armed' &&
+    ask.state !== 'woven' &&
+    ask.state !== 'resuming' &&
+    ask.state !== 'chapterend';
+
+  // Opening the sheet brings the paused paragraph back into view; resuming
+  // hands the focus to it and says so once.
+  useEffect(() => {
+    if (!askEnabled) return;
+    if (askSheetOpen) {
+      // The sheet grows as the answer lands, so the anchored paragraph is
+      // pulled back into view on every step, not only on the first open.
+      anchoredParagraphRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      return;
+    }
+    if (ask.state !== 'resuming') return;
+    setResumeAnnounced(true);
+    anchoredParagraphRef.current?.focus?.();
+    const timer = setTimeout(() => setResumeAnnounced(false), 4000);
+    return () => clearTimeout(timer);
+  }, [ask.state, askEnabled, askSheetOpen]);
+
+  const askQuestion = ask.exchanges[ask.exchanges.length - 1]?.question ?? '';
+
   // Display nothing if we don't have valid story data to show
   if (!storyData) {
     return null;
@@ -784,6 +969,16 @@ const StoryPlayerSurface: FC<StoryPlayerProps> = ({
               playbackBeacon={{ type: 'story', figureId: figure, mode: 'story', chapter: seedNumber }}
               figureId={downloadFigureId}
               mediaTitle={episodeTitle}
+              playRequest={playRequest}
+              sessionOverride={
+                askEnabled && ask.state === 'answering'
+                  ? {
+                      title: askQuestion,
+                      isPlaying: ask.speaking,
+                      onTogglePlay: ask.stopVoice
+                    }
+                  : undefined
+              }
             />
 
             {/* Paragraph progress indicator */}
@@ -841,7 +1036,13 @@ const StoryPlayerSurface: FC<StoryPlayerProps> = ({
 
         {/* Story Content - always show if available */}
         {paragraphs.length > 0 && (
-          <div className="story-content">
+          <div
+            className={[
+              'story-content',
+              askEnabled && (ask.state === 'armed' || askSheetOpen) ? 'story-content--asking' : '',
+              askSheetOpen ? 'story-content--docked' : ''
+            ].filter(Boolean).join(' ')}
+          >
             <div className="story-scrollable-native scrollbar-gold" onScroll={handleStoryScroll}>
               <div className="story-text">
                 {paragraphs.map((paragraph, idx) => {
@@ -851,10 +1052,17 @@ const StoryPlayerSurface: FC<StoryPlayerProps> = ({
                   if (paragraph.trim() === '---') {
                     return <hr key={idx} className="story-paragraph-separator" aria-hidden="true" />;
                   }
+                  // While the sheet is open its exchange lives in the sheet, not in the margin.
+                  const marks = askSheetOpen
+                    ? askMarks.filter((mark) => mark.paragraphIndex === idx && mark.paragraphIndex !== ask.anchor?.paragraphIndex)
+                    : askMarks.filter((mark) => mark.paragraphIndex === idx);
                   return (
+                    <React.Fragment key={idx}>
                     <p
-                      key={idx}
-                      ref={activeParagraphIndex === idx ? activeParagraphRef : undefined}
+                      ref={(node) => {
+                        if (activeParagraphIndex === idx) activeParagraphRef.current = node;
+                        if (ask.anchor?.paragraphIndex === idx) anchoredParagraphRef.current = node;
+                      }}
                       className={[
                         'story-paragraph',
                         activeParagraphIndex === idx ? 'story-paragraph--active' : '',
@@ -870,10 +1078,50 @@ const StoryPlayerSurface: FC<StoryPlayerProps> = ({
                     >
                       {paragraph}
                     </p>
+                    {marks.map((mark) => (
+                      <AskMark
+                        key={mark.key}
+                        exchanges={mark.exchanges}
+                        figureName={askPlainName}
+                      />
+                    ))}
+                    </React.Fragment>
                   );
                 })}
               </div>
             </div>
+
+            {askEnabled && ask.state === 'armed' && (
+              <AskBar figureName={askPlainName} onOpen={ask.openComposer} />
+            )}
+
+            {askSheetOpen && (
+              <AskSheet
+                state={ask.state}
+                figureName={askPlainName}
+                language={language}
+                draft={ask.draft}
+                exchanges={ask.exchanges}
+                speaking={ask.speaking}
+                notice={ask.notice}
+                showHint={ask.showHint}
+                onDraftChange={ask.setDraft}
+                onSend={ask.send}
+                onClose={ask.closeSheet}
+                onRecordingChange={ask.setRecording}
+                onStopVoice={ask.stopVoice}
+                onResume={ask.resume}
+                onAskAnother={ask.askAnother}
+                onRetry={ask.retry}
+                onCarry={onAskCarry ? ask.carry : undefined}
+              />
+            )}
+
+            {resumeAnnounced && (
+              <p className="sr-only" role="status">
+                {tString('askListen.resumedLive', 'The chapter continues.')}
+              </p>
+            )}
           </div>
         )}
       </div>
@@ -1092,6 +1340,8 @@ const StoryPlayerSurface: FC<StoryPlayerProps> = ({
 // threading state back out. The wrapper is layout-neutral (display: contents).
 const StoryPlayer: FC<StoryPlayerProps> = (props) => {
   const [atChapterEnd, setAtChapterEnd] = useState<boolean>(false);
+  // The ask states the surface derives: asking, voice, woven.
+  const [askRoom, setAskRoom] = useState<RoomState | null>(null);
 
   useEffect(() => {
     const sync = (e: Event) => setAtChapterEnd(Boolean((e as CustomEvent).detail?.visible));
@@ -1100,8 +1350,8 @@ const StoryPlayer: FC<StoryPlayerProps> = (props) => {
   }, []);
 
   return (
-    <RoomContainer state={atChapterEnd ? 'chapterend' : undefined}>
-      <StoryPlayerSurface {...props} />
+    <RoomContainer state={atChapterEnd ? 'chapterend' : (askRoom ?? undefined)}>
+      <StoryPlayerSurface {...props} atChapterEnd={atChapterEnd} onRoomState={setAskRoom} />
     </RoomContainer>
   );
 };

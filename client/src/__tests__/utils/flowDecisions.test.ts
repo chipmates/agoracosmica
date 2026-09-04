@@ -21,6 +21,15 @@ import {
   resolveAskPrefill,
   stashAskPrefill,
   consumeAskPrefill,
+  carryStoryExchange,
+  readCarriedThread,
+  isCarriedEntryTurn,
+  isCarriedFirstTurn,
+  beginCarriedThread,
+  markComposerStagedOrigin,
+  consumeComposerStagedOrigin,
+  CARRIED_THREAD_EVENT,
+  type CarriedExchange,
 } from '../../utils/public/entryIntent';
 import { heroEntries, getHeroEntry } from '../../data/public/heroEntry';
 
@@ -367,5 +376,88 @@ describe('reachedDeepenedTurns', () => {
 
   it('stays true past the third user message', () => {
     expect(reachedDeepenedTurns([user, user, user, user, user])).toBe(true);
+  });
+});
+
+
+describe('carryStoryExchange', () => {
+  const exchange = (n: number): CarriedExchange => ({
+    question: `question ${n}`,
+    answer: `answer ${n}`,
+  });
+
+  beforeEach(() => {
+    sessionStorage.clear();
+    // The module keeps the carried thread in memory; reset it between cases.
+    beginCarriedThread(null, null, '', 0);
+  });
+
+  it('opens a Free Talk continuation anchored on the chapter seed', () => {
+    carryStoryExchange([exchange(1)], 'aurelius-3', { threadKey: 'freetalk_aurelius' });
+    expect(readCarriedThread()).toEqual({
+      threadKey: 'freetalk_aurelius',
+      anchorSeedId: 'aurelius-3',
+      mode: 'free_conversation',
+      startTurn: 2,
+    });
+  });
+
+  it('the continuation starts after the carried turns, however many there were', () => {
+    carryStoryExchange([exchange(1), exchange(2), exchange(3)], 'aurelius-3', {
+      threadKey: 'freetalk_aurelius',
+    });
+    expect(readCarriedThread()?.startTurn).toBe(4);
+    // The three carried turns are history, not the carried send.
+    expect(isCarriedFirstTurn('freetalk_aurelius', 3)).toBe(false);
+    expect(isCarriedFirstTurn('freetalk_aurelius', 4)).toBe(true);
+  });
+
+  it('the entry signal covers the next turns and stops', () => {
+    carryStoryExchange([exchange(1)], 'aurelius-3', { threadKey: 'freetalk_aurelius' });
+    expect(isCarriedEntryTurn('freetalk_aurelius', 1)).toBe(false);
+    expect(isCarriedEntryTurn('freetalk_aurelius', 2)).toBe(true);
+    expect(isCarriedEntryTurn('freetalk_aurelius', 4)).toBe(true);
+    expect(isCarriedEntryTurn('freetalk_aurelius', 5)).toBe(false);
+    expect(isCarriedEntryTurn('freetalk_kahlo', 2)).toBe(false);
+  });
+
+  it('hands over the keyboard by default, and yields it when told to', () => {
+    carryStoryExchange([exchange(1)], 'aurelius-3', { threadKey: 'freetalk_aurelius' });
+    expect(hasEntryTextFirst()).toBe(true);
+
+    sessionStorage.clear();
+    carryStoryExchange([exchange(1)], 'aurelius-3', {
+      threadKey: 'freetalk_aurelius',
+      typed: false,
+    });
+    expect(hasEntryTextFirst()).toBe(false);
+  });
+
+  it('a chapter with no seed still carries, with no anchor', () => {
+    carryStoryExchange([exchange(1)], null, { threadKey: 'freetalk_jung' });
+    expect(readCarriedThread()?.anchorSeedId).toBeNull();
+    expect(readCarriedThread()?.mode).toBe('free_conversation');
+  });
+
+  it('announces the thread so the standing surfaces re-read', () => {
+    let heard = 0;
+    const listener = () => { heard += 1; };
+    window.addEventListener(CARRIED_THREAD_EVENT, listener);
+    carryStoryExchange([exchange(1)], 'aurelius-3', { threadKey: 'freetalk_aurelius' });
+    window.removeEventListener(CARRIED_THREAD_EVENT, listener);
+    expect(heard).toBe(1);
+  });
+});
+
+describe('composer staged origin', () => {
+  it('a staged question is not the visitor own words unless it says so', () => {
+    markComposerStagedOrigin('aurelius-3');
+    expect(consumeComposerStagedOrigin()).toEqual({ anchorSeedId: 'aurelius-3', ownWords: false });
+    expect(consumeComposerStagedOrigin()).toBeNull();
+  });
+
+  it('own words survive the staging rail', () => {
+    markComposerStagedOrigin(null, true);
+    expect(consumeComposerStagedOrigin()).toEqual({ anchorSeedId: null, ownWords: true });
   });
 });

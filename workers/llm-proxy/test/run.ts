@@ -20,7 +20,7 @@ import {
   WISDOM_RULE_IDS,
   applyProfileRules,
 } from '../src/prompts/responseRules';
-import { buildSystemPrompt } from '../src/services/promptLoader';
+import { ASIDE_RULES, buildSystemPrompt } from '../src/services/promptLoader';
 import { fallbackModel, freeTierState, primaryModel, promptProfileFor, resolveServing } from '../src/services/modelRouting';
 import {
   isOverHardCap, readSpend, recordSpend, spendDayKey, spendResetsAt, usageCostUsd,
@@ -272,6 +272,56 @@ async function main(): Promise<number> {
       assert(prompt!.includes(DISCLOSURE), `${profile} is missing the disclosure sentence`);
       assert(!prompt!.includes(RETIRED), `${profile} still carries the retired sentence`);
     }
+  });
+
+  await test('the aside rules ride only when asked, and only on Free Talk', () => {
+    const ASIDE_OPEN = '<aside-rules priority="absolute">';
+    const asked = buildSystemPrompt('aurelius', 'free_conversation', 'en', 'listen-cap', undefined, undefined, { aside: true });
+    assert(asked, 'no prompt');
+    assert(asked!.includes(ASIDE_OPEN), 'the block is missing');
+    for (const rule of ASIDE_RULES) {
+      assertEqual(asked!.split(rule).length, 2, `rule added ${rule.slice(0, 24)} other than once`);
+    }
+
+    for (const options of [undefined, {}, { distress: true }, { aside: false }]) {
+      const prompt = buildSystemPrompt('aurelius', 'free_conversation', 'en', 'listen-cap', undefined, undefined, options);
+      assert(!prompt!.includes(ASIDE_OPEN), `the block rode along on ${JSON.stringify(options)}`);
+    }
+
+    for (const mode of ['seed_conversation', 'seed_challenge', 'introduction']) {
+      const prompt = buildSystemPrompt('aurelius', mode, 'en', 'listen-cap', undefined, undefined, { aside: true });
+      if (prompt) assert(!prompt.includes(ASIDE_OPEN), `${mode} took the block`);
+    }
+  });
+
+  await test('an aside keeps the profile honesty rules and the language directive', () => {
+    const prompt = buildSystemPrompt('aurelius', 'free_conversation', 'de', 'listen-cap', undefined, undefined, { aside: true });
+    assert(prompt, 'no prompt');
+    assert(prompt!.startsWith('You are an educational AI'), 'safety preamble is not first');
+    assert(prompt!.includes('id="echo-honesty"'), 'echo honesty rule lost');
+    assert(prompt!.includes('id="no-invented-specifics"'), 'fabrication rule lost');
+    assert(prompt!.includes('MUST respond entirely in German'), 'language directive lost');
+    assert(
+      prompt!.indexOf('<aside-rules') > prompt!.indexOf('</response-rules>'),
+      'the aside block has to sit after the profile rules to override them',
+    );
+    assert(
+      prompt!.indexOf('<aside-rules') < prompt!.indexOf('MUST respond entirely in German'),
+      'the language directive stays last',
+    );
+  });
+
+  await test('the crisis referral outranks an aside on the same turn', () => {
+    const prompt = buildSystemPrompt(
+      'aurelius', 'free_conversation', 'en', 'listen-cap', undefined, undefined,
+      { aside: true, distress: true },
+    );
+    assert(prompt!.includes('<crisis-rules priority="absolute">'), 'crisis block missing');
+    assert(prompt!.includes('<aside-rules priority="absolute">'), 'aside block missing');
+    assert(
+      prompt!.indexOf('<crisis-rules') < prompt!.indexOf('<aside-rules'),
+      'the referral has to be read before the length cap',
+    );
   });
 
   await test('the seed block and language directive survive the rewrite', () => {
@@ -781,6 +831,67 @@ async function main(): Promise<number> {
     assertEqual(response.status, 200, 'status');
     assertEqual(response.headers.get('X-Model'), 'qwen3-235b', 'X-Model');
     assertEqual(response.headers.get('X-AI-Model'), 'Qwen3-235B-A22B-Instruct', 'X-AI-Model stays the disclosure label');
+    await response.body?.cancel();
+    await Promise.all(pending);
+  });
+
+  await test('an aside request carries the rules into the prompt and the label into the row', async () => {
+    analyticsRows.length = 0;
+    const seen = stubFetch(() => sseResponse([CONTENT_FRAME('I waited.'), DONE_FRAME]));
+    const env = fakeEnv();
+    const { ctx, pending } = fakeCtx();
+    const response = await handleChat(
+      new Request('https://example.invalid/v1/chat', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${await bearer(env)}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          figureId: 'aurelius',
+          mode: 'free_conversation',
+          language: 'en',
+          kind: 'aside',
+          aside: true,
+          messages: [
+            { role: 'assistant', content: 'He looked at the boy for a long time.' },
+            { role: 'user', content: 'Why did he forgive him?' },
+          ],
+        }),
+      }),
+      env,
+      ctx,
+    );
+    assertEqual(response.status, 200, 'status');
+    const sent = seen[0].messages as { role: string; content: string }[];
+    assertEqual(sent[0].role, 'system', 'first message');
+    assert(sent[0].content.includes('<aside-rules priority="absolute">'), 'the aside block never reached the model');
+    await response.body?.cancel();
+    await Promise.all(pending);
+    const chatRow = analyticsRows.find(row => row.blobs[0] === 'chat');
+    assert(chatRow, 'no chat row');
+    assertEqual(chatRow!.blobs[7], 'aside', 'the kind label');
+  });
+
+  await test('a chat request without the field gets no aside rules', async () => {
+    const seen = stubFetch(() => sseResponse([CONTENT_FRAME('hello'), DONE_FRAME]));
+    const env = fakeEnv();
+    const { ctx, pending } = fakeCtx();
+    const response = await handleChat(
+      new Request('https://example.invalid/v1/chat', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${await bearer(env)}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          figureId: 'aurelius',
+          mode: 'free_conversation',
+          language: 'en',
+          // A truthy non-true value must not arm it either.
+          aside: 'true',
+          messages: [{ role: 'user', content: 'What holds a day together?' }],
+        }),
+      }),
+      env,
+      ctx,
+    );
+    const sent = seen[0].messages as { role: string; content: string }[];
+    assert(!sent[0].content.includes('<aside-rules'), 'the aside block rode along uninvited');
     await response.body?.cancel();
     await Promise.all(pending);
   });

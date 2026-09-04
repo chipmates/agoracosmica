@@ -180,6 +180,47 @@
   line-height: 1.25;
 }
 
+/* Seed gathered: the star this figure earned on this seed, marked where the
+   seed is already named. Same glow language as the Wisdom map's bloom, carried
+   on the text itself because .seed-name clips its own overflow for the clamp. */
+.seed-name-gathered .seed-name-text {
+  color: var(--gold-primary);
+  text-shadow: 0 0 8px color-mix(in srgb, var(--gold-subtle) 22%, transparent);
+}
+
+.seed-name-pulsing .seed-name-text {
+  animation: seed-gathered-pulse 4s ease-in-out 3;
+}
+
+/* A breath in the glow, not a size change: the header holds its line box. */
+@keyframes seed-gathered-pulse {
+  0%, 100% {
+    text-shadow: 0 0 8px color-mix(in srgb, var(--gold-subtle) 22%, transparent);
+  }
+  50% {
+    text-shadow: 0 0 14px color-mix(in srgb, var(--gold-subtle) 42%, transparent);
+  }
+}
+
+/* The one line under the gathered star. Quiet, not a banner. */
+.seed-gathered-line {
+  margin: 3px auto 0 auto;
+  max-width: 90%;
+  width: fit-content;
+  text-align: center;
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: calc(var(--seed-name-font-size) * 0.72);
+  letter-spacing: 0.04em;
+  line-height: 1.35;
+  color: var(--gold-deep);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .seed-name-pulsing .seed-name-text {
+    animation: none;
+  }
+}
+
 /* Mode Indicator: a tracked small-caps kicker in the chapter's own color.
    The color arrives per-mode via --mode-line-color (set in MainContent). */
 .mode-indicator {

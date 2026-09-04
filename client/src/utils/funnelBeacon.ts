@@ -14,7 +14,9 @@
 // and unload) and the turnstile_* family (services/proxy/turnstile.ts).
 // engaged fires at most twice per tab, from the first_turn one-shot and from
 // the listen tracker in utils/playbackBeacon.ts. paid_arrival fires once per
-// pageview from utils/pageBeacon.ts.
+// pageview from utils/pageBeacon.ts. The ask_listen_* trio fires from the
+// paused-chapter ask (hooks/useAskWhileListening.ts), shown deduped per
+// chapter play by the hook itself.
 // The marketing pages' cta_click and paid_arrival fire from agc-public.js with
 // the same payload shape.
 //
@@ -88,7 +90,15 @@ export type FunnelStep =
   // The landing URL carried the paid-ads parameter. One per pageview,
   // language and the edge dimensions only, so the row describes the parameter
   // rather than the person who clicked it.
-  | 'paid_arrival';
+  | 'paid_arrival'
+  // Ask while listening (per-occurrence volume counters, like handoff_shown).
+  // shown = the ask bar arrived under a paused chapter, sent = a question went
+  // out, resumed = the chapter was picked up again after the answer. shown is
+  // deduped per chapter play at the call site rather than per tab: a bar that
+  // arms on every sip would bury the take rate.
+  | 'ask_listen_shown'
+  | 'ask_listen_sent'
+  | 'ask_listen_resumed';
 
 /** Which half of the product a visit engaged with, in the engaged mode slot. */
 export type EngagedArm = 'typed' | 'listened' | 'both';

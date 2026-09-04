@@ -56,11 +56,11 @@ import PostQuestVerdictCard from '../components/QuestVerdictCard/PostQuestVerdic
 import { getPendingQuestVerdict, clearPendingQuestVerdict } from '../utils/questVerdict';
 import { restartQuest } from '../utils/questRestart';
 import { LocalStorageAdapter } from '../storage/localAdapter';
-import { readFigureIntent, clearFigureIntent, readCouncilIntent, clearCouncilIntent, readAskIntent, clearAskIntent, stashAskPrefill, stageCouncilHandoff, readStoryIntent, clearStoryIntent, readLibraryIntent, clearLibraryIntent, requestAudioLibrary, peekAskPrefillTag, consumeComposerStagedOrigin, beginCarriedThread } from '../utils/public/entryIntent';
+import { readFigureIntent, clearFigureIntent, readCouncilIntent, clearCouncilIntent, readAskIntent, clearAskIntent, stashAskPrefill, stageCouncilHandoff, readStoryIntent, clearStoryIntent, readLibraryIntent, clearLibraryIntent, requestAudioLibrary, peekAskPrefillTag, consumeComposerStagedOrigin, beginCarriedThread, carryStoryExchange, type CarriedExchange } from '../utils/public/entryIntent';
 import { resolveAnchorSeedId } from '../data/public/heroEntry';
-import { CEREMONY_CARRIED_ENTRY, NAV_BATCH } from '../config/features';
+import { ASK_WHILE_LISTENING, CEREMONY_CARRIED_ENTRY, NAV_BATCH } from '../config/features';
 import { preferencesAdapter } from '../storage/preferencesAdapter';
-import { readHistoryMessages } from '../services/history/historyEncryption';
+import { encryptHistory, readHistoryMessages } from '../services/history/historyEncryption';
 import { registerSessionControllerHandlers } from '../controllers/sessionControllerRegistry';
 import { registerConversationControllerHandlers } from '../controllers/conversationControllerRegistry';
 import { createLegacyConversationStream } from '../controllers/conversationStreamDriver';
@@ -939,9 +939,12 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
         //
         // A send whose text came from a staged question is never a typed first
         // turn. The two steps are separate one-shots, so a visitor who later
-        // types something of their own still fires first_turn.
+        // types something of their own still fires first_turn. A staged
+        // question the visitor wrote themselves is the exception: the rail it
+        // travelled does not make it somebody else's words.
         const stagedOrigin = consumeComposerStagedOrigin();
-        sendFunnelBeaconOnce(stagedOrigin ? 'first_turn_prefilled' : 'first_turn', {
+        const prefilled = !!stagedOrigin && !stagedOrigin.ownWords;
+        sendFunnelBeaconOnce(prefilled ? 'first_turn_prefilled' : 'first_turn', {
           figureId: figureIdentifier,
           mode: normalizedMode ?? '',
         });
@@ -1742,6 +1745,64 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
     [selectedFigure, handleSelectFigure, handleModeSelect, resetConversation]
   );
 
+  // Ask-while-listening carry: the exchange the listener had with the paused
+  // chapter moves into Free Talk as messages, not as a re-typed question. The
+  // append runs before the mode switch so the hydration that follows finds a
+  // thread with history and skips the greeting.
+  const handleAskCarry = useCallback(
+    async (exchanges: CarriedExchange[]) => {
+      const figureId = selectedFigure?.id;
+      if (!ASK_WHILE_LISTENING || !figureId || exchanges.length === 0) return;
+
+      const threadKey = STORAGE_KEYS.getFreeTalkHistory(figureId);
+      const stamp = new Date().toISOString();
+      const carried = exchanges.flatMap((exchange) => ([
+        {
+          role: 'user' as const,
+          content: exchange.question,
+          timestamp: stamp,
+          mode: ConversationMode.FREE_CONVERSATION,
+        },
+        {
+          role: 'assistant' as const,
+          content: exchange.answer,
+          figureName: selectedFigure?.name,
+          timestamp: stamp,
+          mode: ConversationMode.FREE_CONVERSATION,
+        },
+      ]));
+
+      try {
+        const stored = await readHistoryMessages<Record<string, unknown>>(threadKey);
+        const merged = [...(stored ?? []), ...carried];
+        // Encrypt before the WAL op, so the log never holds plaintext.
+        const value = await encryptHistory(merged);
+        // The storage barrel is loaded here rather than imported, the way the
+        // history layer does, so it stays out of this page's static graph.
+        const { runWithWal } = await import('../storage');
+        await runWithWal(
+          [{ type: 'put', store: 'history', key: threadKey, value }],
+          async () => undefined,
+        );
+      } catch (error) {
+        console.error('[HomePage] Failed to carry the paused exchange into Free Talk', error);
+        return;
+      }
+
+      carryStoryExchange(exchanges, selectedSeed?.id != null ? String(selectedSeed.id) : null, {
+        threadKey,
+      });
+      sendFunnelBeacon('nav_open', { figureId, mode: 'ask_carry' });
+
+      // Same figure is already selected, so handleSelectFigure would early
+      // return before its ask branch: run the council handoff's tail directly.
+      clearAskIntent();
+      resetConversation();
+      handleModeSelect('free_conversation', true);
+    },
+    [selectedFigure, selectedSeed, handleModeSelect, resetConversation]
+  );
+
   // "Tiefer eintauchen" from the council end state: same council, level 2.
   const handleCouncilGoDeeper = useCallback((councilId: string) => {
     setCouncilPlayerId(councilId);
@@ -1766,6 +1827,7 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
       handleCouncilPlayerClose,
       handleCouncilHandoff,
       handleCouncilGoDeeper,
+      handleAskCarry,
       handlePrismClose,
       handleModeSelectorOpen,
       handleFigureCarouselOpen,
@@ -1788,6 +1850,7 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
       handleCouncilPlayerClose,
       handleCouncilHandoff,
       handleCouncilGoDeeper,
+      handleAskCarry,
       handlePrismClose,
       handleModeSelectorOpen,
       handleFigureCarouselOpen,

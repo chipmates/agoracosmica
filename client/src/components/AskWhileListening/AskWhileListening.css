@@ -1,0 +1,495 @@
+/* src/components/AskWhileListening/AskWhileListening.css
+   The ask surface inside a paused chapter. Every colour comes from the room it
+   stands in: mint while the question is open, gold once the answer is woven
+   back into the reading. The placement (in-flow sheet, docked column) lives in
+   StoryPlayer.css, where the transcript that has to shrink for it lives. */
+
+/* The app-wide justify block in index.css reaches every paragraph inside
+   .main-content and outranks any practical class selector here. Justified copy
+   in a 360px column hyphenates badly, so the ask surface opts out. */
+.ask-sheet p,
+.ask-mark p {
+  text-align: left !important;
+  hyphens: none !important;
+  word-break: normal !important;
+}
+
+/* ---------------------------------------------------------------- the bar */
+
+.ask-bar {
+  width: 100%;
+  padding: var(--space-sm) 0 var(--space-xs);
+}
+
+.ask-bar__button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  width: 100%;
+  min-height: 56px;
+  padding: 0 var(--space-md);
+  border: 1px solid color-mix(in srgb, var(--room-accent, var(--gold-base)) 35%, transparent);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--room-accent, var(--gold-base)) 8%, transparent);
+  color: var(--cosmic-text-primary);
+  font-family: var(--font-ui);
+  font-size: var(--text-base);
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+  transition: background var(--transition-base), border-color var(--transition-base);
+}
+
+.ask-bar__button:hover,
+.ask-bar__button:focus-visible {
+  background: color-mix(in srgb, var(--room-accent, var(--gold-base)) 14%, transparent);
+  border-color: color-mix(in srgb, var(--room-accent, var(--gold-base)) 55%, transparent);
+}
+
+.ask-bar__button svg {
+  color: var(--room-accent, var(--gold-base));
+  flex-shrink: 0;
+}
+
+.ask-bar__label {
+  text-align: left;
+}
+
+/* -------------------------------------------------------------- the sheet */
+
+.ask-sheet {
+  /* Sticks to the bottom edge of the story scroll container: the transcript
+     scrolls above it and the action row is always reachable. */
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  width: 100%;
+  max-height: min(78dvh, 640px);
+  padding: var(--space-md);
+  border: 1px solid color-mix(in srgb, var(--room-accent, var(--gold-base)) 32%, transparent);
+  border-radius: var(--radius-md);
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--bg-card) 96%, var(--room-accent, var(--gold-base))) 0%,
+    var(--bg-deep-space) 92%
+  );
+  box-shadow: 0 -12px 32px color-mix(in srgb, var(--bg-deep-space-darker) 70%, transparent);
+  color: var(--cosmic-text-primary);
+  font-family: var(--font-ui);
+}
+
+/* The interactive bot check is fixed bottom-center, over the action row. */
+.ask-sheet--turnstile {
+  padding-bottom: 6rem;
+}
+
+.ask-sheet__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.ask-sheet__eyebrow {
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--room-accent, var(--gold-base));
+}
+
+.ask-sheet__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin: calc(var(--space-sm) * -1) calc(var(--space-sm) * -1) calc(var(--space-sm) * -1) 0;
+  border: none;
+  background: none;
+  color: var(--cosmic-text-tertiary);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+}
+
+.ask-sheet__close:hover,
+.ask-sheet__close:focus-visible {
+  color: var(--cosmic-text-primary);
+}
+
+.ask-sheet__security {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--cosmic-text-secondary);
+}
+
+/* ----------------------------------------------------------- the composer */
+
+.ask-composer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.ask-composer__row {
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-sm);
+}
+
+.ask-composer__field {
+  flex: 1;
+  min-height: 48px;
+  padding: 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--room-accent, var(--gold-base)) 28%, transparent);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--bg-deep-space) 70%, transparent);
+  color: var(--cosmic-text-primary);
+  font-family: var(--font-ui);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  resize: none;
+}
+
+.ask-composer__field::placeholder {
+  color: var(--cosmic-text-tertiary);
+}
+
+.ask-composer__field:focus-visible {
+  outline: none;
+  border-color: color-mix(in srgb, var(--room-accent, var(--gold-base)) 60%, transparent);
+}
+
+.ask-composer__mic {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  min-height: 48px;
+  flex-shrink: 0;
+  border: 1px solid color-mix(in srgb, var(--room-accent, var(--gold-base)) 35%, transparent);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--room-accent, var(--gold-base)) 10%, transparent);
+  color: var(--room-accent, var(--gold-base));
+  cursor: pointer;
+}
+
+.ask-composer__mic:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.ask-composer__mic--recording {
+  background: color-mix(in srgb, var(--coral-base) 20%, transparent);
+  border-color: color-mix(in srgb, var(--coral-base) 55%, transparent);
+  color: var(--coral-light);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ask-composer__mic--recording {
+    animation: ask-pulse 1.6s ease-in-out infinite;
+  }
+}
+
+@keyframes ask-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--coral-base) 40%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--coral-base) 0%, transparent);
+  }
+}
+
+.ask-composer__status,
+.ask-composer__hint,
+.ask-composer__note {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+  color: var(--cosmic-text-secondary);
+}
+
+.ask-composer__note {
+  color: var(--color-warning);
+}
+
+.ask-composer__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-md);
+}
+
+.ask-composer__counter {
+  font-size: var(--text-xs);
+  color: var(--cosmic-text-tertiary);
+}
+
+.ask-composer__send {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  min-height: 48px;
+  padding: 0 var(--space-lg);
+  border: 1px solid color-mix(in srgb, var(--room-accent, var(--gold-base)) 50%, transparent);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--room-accent, var(--gold-base)) 18%, transparent);
+  color: var(--cosmic-text-primary);
+  font-family: var(--font-ui);
+  font-size: var(--text-base);
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+}
+
+.ask-composer__send:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+/* ------------------------------------------------------------- the answer */
+
+.ask-answer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  min-height: 0;
+}
+
+.ask-answer__pair {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.ask-answer__question {
+  margin: 0;
+  font-size: var(--text-base);
+  line-height: var(--leading-relaxed);
+  color: var(--cosmic-text-secondary);
+}
+
+.ask-answer__you {
+  color: var(--room-accent, var(--gold-base));
+  font-weight: var(--weight-medium);
+}
+
+.ask-answer__body {
+  border-left: 2px solid color-mix(in srgb, var(--room-accent, var(--gold-base)) 45%, transparent);
+  padding-left: 0.75rem;
+}
+
+.ask-answer__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin: 0;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--room-accent, var(--gold-base));
+}
+
+.ask-answer__pulse {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--room-accent, var(--gold-base));
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ask-answer__pulse {
+    animation: ask-speaking 1.4s ease-in-out infinite;
+  }
+}
+
+@keyframes ask-speaking {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.ask-answer__chip {
+  margin: 0 0 var(--space-xs);
+  font-size: var(--text-xs);
+  letter-spacing: 0.04em;
+  color: var(--cosmic-text-tertiary);
+}
+
+.ask-answer__text {
+  margin: 0;
+  font-family: var(--font-content);
+  font-size: var(--text-base);
+  line-height: var(--leading-relaxed);
+  color: var(--cosmic-text-primary);
+}
+
+.ask-answer__thinking,
+.ask-answer__notice {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--cosmic-text-secondary);
+}
+
+.ask-answer__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.ask-answer__stop,
+.ask-answer__retry {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  align-self: center;
+  min-height: 44px;
+  padding: 0 var(--space-lg);
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 45%, transparent);
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--bg-highlight) 70%, transparent);
+  color: var(--cosmic-text-primary);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+
+.ask-answer__resume {
+  min-height: 48px;
+}
+
+.ask-answer__carry,
+.ask-answer__another {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  min-height: 44px;
+  border: none;
+  background: none;
+  color: var(--cosmic-text-secondary);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+
+.ask-answer__carry {
+  color: var(--gold-primary);
+}
+
+.ask-answer__carry:hover,
+.ask-answer__carry:focus-visible,
+.ask-answer__another:hover,
+.ask-answer__another:focus-visible {
+  color: var(--gold-hover);
+}
+
+/* --------------------------------------------------------------- the mark */
+
+.ask-mark {
+  display: block;
+  margin: 0 0 var(--space-lg);
+  padding-left: 0.75rem;
+}
+
+.ask-mark__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  min-height: 44px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--gold-primary);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  text-align: left;
+  cursor: pointer;
+}
+
+.ask-mark__toggle:hover,
+.ask-mark__toggle:focus-visible {
+  color: var(--gold-hover);
+}
+
+.ask-mark__separator {
+  color: var(--cosmic-text-tertiary);
+}
+
+.ask-mark__action {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.ask-mark__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-top: var(--space-xs);
+  padding: var(--space-sm) 0 var(--space-sm) 0.75rem;
+  border-left: 2px solid color-mix(in srgb, var(--gold-base) 40%, transparent);
+  font-family: var(--font-ui);
+}
+
+.ask-mark__question,
+.ask-mark__header,
+.ask-mark__answer {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+}
+
+.ask-mark__question {
+  color: var(--cosmic-text-secondary);
+}
+
+.ask-mark__you,
+.ask-mark__header {
+  color: var(--gold-base);
+  font-weight: var(--weight-medium);
+}
+
+.ask-mark__answer {
+  font-family: var(--font-content);
+  color: var(--cosmic-text-primary);
+}
+
+/* A long answer scrolls inside the sheet; Weiterhören stays in reach. */
+.ask-answer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  min-height: 0;
+}
+.ask-answer__pairs {
+  min-height: 0;
+  max-height: min(42dvh, 360px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 0.25rem;
+}
+
+/* The transcript's drop cap and hyphenation must not reach the ask surface. */
+.story-text .ask-mark p::first-letter,
+.story-text .ask-sheet p::first-letter {
+  font-size: inherit !important;
+  font-family: inherit !important;
+  font-weight: inherit !important;
+  line-height: inherit !important;
+  color: inherit !important;
+  float: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+.ask-composer__field,
+.ask-composer__field:focus-visible {
+  hyphens: none !important;
+  text-align: left !important;
+  word-break: normal !important;
+}

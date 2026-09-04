@@ -22,14 +22,20 @@ import type { Env, ToolDefinition } from '../utils/types';
 // label the Conversations total cannot be split into machine and human. Read
 // off the raw body rather than through validation: it is a label with no
 // effect on the prompt, and an unknown value collapses to ''.
-// 'prefilled' is reserved for the carried-question entry flow.
-const VALID_CHAT_KINDS = new Set(['greeting', 'turn', 'prefilled']);
+// 'prefilled' is reserved for the carried-question entry flow, 'aside' for a
+// question asked while a chapter is paused.
+const VALID_CHAT_KINDS = new Set(['greeting', 'turn', 'prefilled', 'aside']);
 
 // How the conversation was entered. Unlike `kind` this is a behavior trigger,
 // not a label: 'carried' switches the free-talk prompt to answer-first. It is
 // the only accepted value, anything else counts as absent, and it never reaches
 // analytics.
 const CARRIED_ENTRY = 'carried';
+
+// A question asked from a paused chapter. Like `entry` this is a behavior
+// trigger, not a label: it adds the aside rules to the prompt. Only the literal
+// true is accepted, and it never reaches analytics.
+const ASIDE_FIELD = 'aside';
 
 export async function handleChat(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
   const startMs = Date.now();
@@ -65,6 +71,7 @@ export async function handleChat(request: Request, env: Env, ctx: ExecutionConte
     : '';
   const probe = readProbe(rawBody.probe);
   const carriedEntry = rawBody.entry === CARRIED_ENTRY;
+  const aside = rawBody[ASIDE_FIELD] === true;
 
   // 2b. Content safety screen on user messages
   const contentCheck = screenCouncilContent('', messages);
@@ -134,7 +141,7 @@ export async function handleChat(request: Request, env: Env, ctx: ExecutionConte
     : undefined;
   // Soft distress: the crisis rules ride this turn whatever the profile.
   const distress = contentCheck.tier === 'distress';
-  const systemPrompt = buildSystemPrompt(figureId, mode, language, serving.profile, seedDataJson, carried, { distress });
+  const systemPrompt = buildSystemPrompt(figureId, mode, language, serving.profile, seedDataJson, carried, { distress, aside });
   if (!systemPrompt) {
     return new Response(
       JSON.stringify({ error: `No instructions found for ${figureId}/${mode}` }),

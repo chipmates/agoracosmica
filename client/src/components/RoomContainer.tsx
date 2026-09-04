@@ -10,11 +10,9 @@ import './RoomContainer.css';
 /**
  * The eight states the room can hold.
  *
- * `voice` (the visitor is speaking) and `woven` (the answer folded back into
- * the reading) are declared but not derived yet: the recording flag lives in
- * the composer's local state and the woven layout is not built, so nothing
- * assigns them. They stay in the type so the rooms that arrive later name
- * themselves the same way.
+ * `asking`, `voice` (the visitor is speaking) and `woven` (the answer folded
+ * back into the reading) are assigned by the story surface while a question is
+ * open on a paused chapter; every other state follows from the selected mode.
  */
 export type RoomState =
   | 'story'

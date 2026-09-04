@@ -7,7 +7,7 @@ import { keyStorage } from '../../storage/keyStorageService';
 import { useDomainStore } from '../../../stores/domainStore';
 import { LLM_SERVICES } from '../config/serviceConfig';
 import seedDataProcessor from '../../seedDataProcessor';
-import { applyCarriedEntry, type CarriedEntry } from '../instructionProcessor';
+import { applyCarriedEntry, applyAsideRules, type CarriedEntry } from '../instructionProcessor';
 import {
   validateAndPreprocessMessages,
   performanceMonitor,
@@ -32,7 +32,7 @@ export interface Message {
  * opened. Rides along on the request as a label; it never changes the prompt or
  * the routing (the carried question's `entry` field does that).
  */
-export type ChatTurnKind = 'greeting' | 'turn' | 'prefilled';
+export type ChatTurnKind = 'greeting' | 'turn' | 'prefilled' | 'aside';
 
 export interface PresetResponse {
   response: string;
@@ -72,6 +72,17 @@ export interface GenerateResponseOptions {
   entry?: CarriedEntry;
   /** The teaching that grounds the carried question. null suppresses it. */
   anchorSeedId?: string | number | null;
+  /**
+   * The mode this request runs in. Given, it wins over the store: an aside is
+   * generated while a story player is on screen, where the store's mode
+   * describes the room, not the request.
+   */
+  mode?: string;
+  /**
+   * Set when the question was asked from a paused chapter. Like `entry` this is
+   * a behavior trigger, not a label: it adds the aside rules to the prompt.
+   */
+  aside?: boolean;
 }
 
 // ============================================
@@ -92,7 +103,9 @@ export const generateResponse = async ({
   signal,
   turnKind,
   entry,
-  anchorSeedId
+  anchorSeedId,
+  mode,
+  aside
 }: GenerateResponseOptions): Promise<LLMResponse> => {
   const perfMetrics = performanceMonitor.startRequest();
 
@@ -154,12 +167,17 @@ export const generateResponse = async ({
       try {
         // These requests never reach the worker, so the carried-question
         // directive is applied here instead of in the proxy's prompt loader.
-        const byokInstructions = applyCarriedEntry(instructions, {
+        const directiveOptions = {
           entry,
+          aside,
           anchorSeedId,
-          mode: useDomainStore.getState().mode.selected ?? undefined,
+          mode: mode ?? useDomainStore.getState().mode.selected ?? undefined,
           userMessageCount: processedMessages.filter(m => m.role === 'user').length,
-        });
+        };
+        const byokInstructions = applyAsideRules(
+          applyCarriedEntry(instructions, directiveOptions),
+          directiveOptions,
+        );
         const result = await generateBYOKResponse({
           messages: processedMessages,
           instructions: byokInstructions,
@@ -240,8 +258,8 @@ export const generateResponse = async ({
 
     // Map ConversationMode enum to instruction file mode
     // 'challenge' → 'seed_challenge' (matches instruction file naming)
-    const storeMode = useDomainStore.getState().mode.selected || 'free_conversation';
-    const currentMode = storeMode === 'challenge' ? 'seed_challenge' : storeMode;
+    const requestMode = mode || useDomainStore.getState().mode.selected || 'free_conversation';
+    const currentMode = requestMode === 'challenge' ? 'seed_challenge' : requestMode;
 
     // Process seed data for the free-tier path (same processing as BYOK via instructionProcessor)
     // This gives the worker the structured seed data (targetSeed, seedsOverview, etc.)
@@ -285,6 +303,7 @@ export const generateResponse = async ({
       signal,
       turnKind,
       entry,
+      aside,
     });
 
     const perfResult = performanceMonitor.endRequest(perfMetrics, true);

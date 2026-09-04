@@ -139,3 +139,19 @@ export const QUIET_PLATE_PRESENCE: boolean =
  */
 export const EN_VOICE_ENGINE_CHOICE: boolean =
   import.meta.env.VITE_EN_VOICE_ENGINE_CHOICE === 'true';
+
+/**
+ * Ask while listening: a paused chapter offers one quiet line under the plate,
+ * the question is answered in the Echo voice from what has been heard so far,
+ * and the chapter picks up a breath before the paused second. The exchange can
+ * be carried into Free Talk.
+ *
+ * On in dev, off in production builds. `VITE_ASK_WHILE_LISTENING=true` turns it
+ * on for a production build, `false` forces it off anywhere.
+ */
+export const ASK_WHILE_LISTENING: boolean =
+  import.meta.env.VITE_ASK_WHILE_LISTENING === 'true'
+    ? true
+    : import.meta.env.VITE_ASK_WHILE_LISTENING === 'false'
+      ? false
+      : import.meta.env.DEV;

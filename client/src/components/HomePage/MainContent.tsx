@@ -1,4 +1,4 @@
-import React, { FC, lazy, Suspense } from 'react';
+import React, { FC, lazy, Suspense, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Sparkle, CaretDown } from "@phosphor-icons/react";
 import FigureCarousel from '../FigureCarousel';
@@ -16,7 +16,7 @@ import styles from './MainContent.module.css';
 import { Figure, Seed, ConversationMode } from '../../types/global';
 import { getDisplayShortName } from '../../utils/figureDisplayName';
 import { sendFunnelBeacon } from '../../utils/funnelBeacon';
-import { NAV_BATCH } from '../../config/features';
+import { ASK_WHILE_LISTENING, NAV_BATCH } from '../../config/features';
 
 // Type definitions
 interface ServiceConfig {
@@ -108,7 +108,18 @@ interface MainContentProps {
 
   // Carousel dismissal (the store instance owns no close state of its own)
   onCarouselClose: () => void;
+
+  // Ask while listening: the paused-chapter exchange moves into Free Talk.
+  // Handed only to the visible story player, so the hidden audio-only instance
+  // can never mount the ask surface.
+  onAskCarry: (exchanges: { question: string; answer: string }[]) => Promise<void> | void;
 }
+
+/** How long the gathered mark holds its pulse before it settles, in ms. */
+const SEED_GATHERED_PULSE_MS = 12000;
+
+/** The seed-moment line. The ask surface owns the key and the wording. */
+const SEED_GATHERED_KEY = 'askListen.seedMoment';
 
 /**
  * Main content area component extracted from HomePage
@@ -164,8 +175,43 @@ const MainContent: FC<MainContentProps> = ({
   onChooseMode,
   onChooseFigure,
 
-  onCarouselClose
+  onCarouselClose,
+  onAskCarry
 }) => {
+  // The star gathered by this figure on this seed. The completion event names
+  // only the figure, so the seed comes from what is open at the time.
+  const [gatheredSeedKey, setGatheredSeedKey] = useState<string | null>(null);
+  const seedKey = selectedFigure?.id && selectedSeed?.id != null
+    ? `${selectedFigure.id}:${selectedSeed.id}`
+    : null;
+
+  useEffect(() => {
+    if (!ASK_WHILE_LISTENING || !selectedFigure?.id || !seedKey) return;
+    const figureId = selectedFigure.id;
+    const onBloom = (event: Event) => {
+      const detail = (event as CustomEvent<{ figureId?: string }>).detail;
+      if (detail?.figureId !== figureId) return;
+      setGatheredSeedKey(seedKey);
+    };
+    window.addEventListener('bloomModeCompleted', onBloom);
+    return () => window.removeEventListener('bloomModeCompleted', onBloom);
+  }, [selectedFigure?.id, seedKey]);
+
+  // The pulse settles on its own; the line stays as the quiet confirmation.
+  const [pulsing, setPulsing] = useState(false);
+  useEffect(() => {
+    if (!gatheredSeedKey) return;
+    setPulsing(true);
+    const timer = window.setTimeout(() => setPulsing(false), SEED_GATHERED_PULSE_MS);
+    return () => window.clearTimeout(timer);
+  }, [gatheredSeedKey]);
+
+  const seedGathered = ASK_WHILE_LISTENING && !!seedKey && gatheredSeedKey === seedKey;
+  const gatheredLine = t(SEED_GATHERED_KEY);
+  // A missing key comes back as the key itself, which is not a sentence to put
+  // on screen.
+  const showGatheredLine = seedGathered && gatheredLine !== SEED_GATHERED_KEY;
+
   return (
     <main
       id="main-content"
@@ -223,9 +269,19 @@ const MainContent: FC<MainContentProps> = ({
               <div className="chat-header" key={`header-${selectedFigure?.id || 'none'}-${selectedSeed?.id || 'none'}-${selectedMode || 'none'}`}>
                 <h1 className="figure-name">{getDisplayShortName(getTranslatedFigureName())}</h1>
                 {selectedSeed && selectedMode !== 'free_conversation' ? (
-                  <div className="seed-name" key={`seed-${selectedMode || 'default'}-${selectedSeed.id}`}>
-                    <span className="seed-name-text">{getCurrentSeedName()}</span>
-                  </div>
+                  <>
+                    <div
+                      className={`seed-name${seedGathered ? ' seed-name-gathered' : ''}${seedGathered && pulsing ? ' seed-name-pulsing' : ''}`}
+                      key={`seed-${selectedMode || 'default'}-${selectedSeed.id}`}
+                    >
+                      <span className="seed-name-text">{getCurrentSeedName()}</span>
+                    </div>
+                    {showGatheredLine && (
+                      // No live region: the star is a quiet mark, never an
+                      // interruption of whatever is being read or spoken.
+                      <p className="seed-gathered-line">{gatheredLine}</p>
+                    )}
+                  </>
                 ) : (
                   <div className="seed-name" aria-hidden="true" style={{ visibility: 'hidden' }}>
                     <span className="seed-name-text">{' '}</span>
@@ -389,6 +445,7 @@ const MainContent: FC<MainContentProps> = ({
                         onError={(err: Error) => setError(err.message)}
                         onTalkChapter2={() => handleQuickAction('seeds')}
                         selectedSeed={selectedSeed ?? undefined}
+                        onAskCarry={ASK_WHILE_LISTENING ? onAskCarry : undefined}
                       />
                     </Suspense>
                   </ErrorBoundary>

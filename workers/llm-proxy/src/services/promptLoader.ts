@@ -64,7 +64,25 @@ function buildCarriedDirective(userMessageCount: number, hasAnchor: boolean): st
 export interface PromptOptions {
   /** The visitor sounds like they cannot go on: the crisis rules ride this turn. */
   distress?: boolean;
+  /** The question was asked from a paused chapter: the aside rules ride this turn. */
+  aside?: boolean;
 }
+
+// A question asked while a chapter is paused. The listener is going back to the
+// telling, so the answer is short, ends on a statement, and knows nothing past
+// the paragraph they stopped on: the story text in the payload is the whole
+// horizon. Kept in step with the BYOK mirror in
+// client/src/services/audio/instructionProcessor.ts, which runs the same rules
+// for requests that never reach this worker.
+export const ASIDE_RULES = [
+  '<rule id="aside-length">40 to 70 words. Two to four sentences. Overrides the length rule.</rule>',
+  '<rule id="aside-no-handover">Do not end with a question. They are going back to the chapter. Overrides the handover rule.</rule>',
+  '<rule id="aside-horizon">The story text you were given is everything they have heard, and its last paragraph is where they stopped. Answer from that and from your own life. Never mention or hint at anything past it. If they ask what happens next, say you would rather they hear it.</rule>',
+  '<rule id="aside-no-meta">Never mention pausing, the app, players or the recording. Answer the thing they asked.</rule>',
+];
+
+/** The mode an aside rides in. Every other mode ignores the switch. */
+const ASIDE_MODE = 'free_conversation';
 
 export function buildSystemPrompt(
   figureId: string,
@@ -123,5 +141,11 @@ export function buildSystemPrompt(
     ? '\n\n<crisis-rules priority="absolute">\n' + DISTRESS_RULES.join('\n') + '\n</crisis-rules>'
     : '';
 
-  return SAFETY_PREAMBLE + '\n' + prompt + crisisBlock + languageDirective;
+  // Appended like the crisis block, so it outranks the mode's own length and
+  // handover rules while the profile's honesty rules stay in force.
+  const asideBlock = options?.aside && mode === ASIDE_MODE
+    ? '\n\n<aside-rules priority="absolute">\n' + ASIDE_RULES.join('\n') + '\n</aside-rules>'
+    : '';
+
+  return SAFETY_PREAMBLE + '\n' + prompt + crisisBlock + asideBlock + languageDirective;
 }

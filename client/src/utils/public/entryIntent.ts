@@ -352,10 +352,20 @@ export function hasStagedQuestion(): boolean {
  * breaks it. `anchorSeedId` is the teaching that grounds the question, or null
  * when it has none.
  */
-let composerStagedOrigin: { anchorSeedId: string | null } | null = null;
+export interface ComposerStagedOrigin {
+  /** The teaching that grounds the question, or null when it has none. */
+  anchorSeedId: string | null;
+  /**
+   * The visitor wrote or spoke this question themselves, it was only routed
+   * through the staging rail. Activation counts it as a typed first turn.
+   */
+  ownWords: boolean;
+}
 
-export function markComposerStagedOrigin(anchorSeedId: string | null): void {
-  composerStagedOrigin = { anchorSeedId };
+let composerStagedOrigin: ComposerStagedOrigin | null = null;
+
+export function markComposerStagedOrigin(anchorSeedId: string | null, ownWords = false): void {
+  composerStagedOrigin = { anchorSeedId, ownWords };
 }
 
 export function clearComposerStagedOrigin(): void {
@@ -363,7 +373,7 @@ export function clearComposerStagedOrigin(): void {
 }
 
 /** Read the origin and clear it. The send owns it from that point on. */
-export function consumeComposerStagedOrigin(): { anchorSeedId: string | null } | null {
+export function consumeComposerStagedOrigin(): ComposerStagedOrigin | null {
   const origin = composerStagedOrigin;
   composerStagedOrigin = null;
   return origin;
@@ -415,6 +425,48 @@ export function beginCarriedThread(
 
 export function readCarriedThread(): CarriedThread | null {
   return carriedThread;
+}
+
+/**
+ * One question and its answer from a paused chapter, on its way into Free Talk.
+ * Structural on purpose: the ask machine's own exchange type carries more, and
+ * only these two fields make the crossing.
+ */
+export interface CarriedExchange {
+  question: string;
+  answer: string;
+}
+
+export interface CarryStoryOptions {
+  /** The Free Talk thread the exchange was appended to. */
+  threadKey?: string | null;
+  /**
+   * The continuation opens on the keyboard. True by default: taking the carry
+   * is the choice to write, whichever way the question in the chapter arrived.
+   */
+  typed?: boolean;
+}
+
+/**
+ * Carry a paused chapter's exchange into Free Talk. The messages themselves are
+ * already in the thread by the time this runs, so what is registered here is
+ * only where the continuation picks up: the next typed turn is the one after
+ * the carried ones, which is what keeps the figure continuing instead of
+ * answering the chapter question a second time.
+ */
+export function carryStoryExchange(
+  exchanges: CarriedExchange[],
+  seedId: string | null,
+  options: CarryStoryOptions = {}
+): void {
+  const priorUserTurns = exchanges.length;
+  beginCarriedThread(
+    options.threadKey ?? null,
+    seedId,
+    'free_conversation',
+    priorUserTurns + 1
+  );
+  if (options.typed !== false) markEntryTextFirst();
 }
 
 const matchesCarriedThread = (threadKey: string | null): boolean =>
