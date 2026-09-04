@@ -25,9 +25,10 @@ vi.mock('../../utils/funnelBeacon', () => ({
     (error as { status?: number } | null)?.status === 429 ? 'quota' : 'upstream',
 }));
 
+const openRateLimitModal = vi.fn();
 vi.mock('../../stores/domainStore', () => ({
   useDomainStore: Object.assign(() => undefined, {
-    getState: () => ({ quota: shared.quota }),
+    getState: () => ({ quota: shared.quota, openRateLimitModal }),
   }),
 }));
 
@@ -345,6 +346,7 @@ describe('useAskWhileListening', () => {
 
     expect(view.view.result.current.state).toBe('limited');
     expect(view.view.result.current.notice).toBe('quotaSpent');
+    expect(openRateLimitModal).toHaveBeenCalledWith('chat', null, 30);
     expect(fake.calls).toHaveLength(0);
     expect(shared.beacons).not.toContain('ask_listen_sent');
   });

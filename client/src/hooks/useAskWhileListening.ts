@@ -350,6 +350,11 @@ export function useAskWhileListening(args: UseAskArgs): UseAskResult {
           const spent = quota.isFreeTier && quota.loaded && quota.limit - quota.used <= 0;
           setNotice(spent ? 'quotaSpent' : 'capacity');
           setState('limited');
+          // The daily limit gets the same door as the composer: the modal that
+          // explains it and offers a key. The chapter stays paused under it.
+          if (spent) {
+            useDomainStore.getState().openRateLimitModal('chat', quota.resetsAt, quota.limit);
+          }
           return;
         }
         setNotice(typeof navigator !== 'undefined' && navigator.onLine === false ? 'offline' : 'error');
@@ -438,12 +443,13 @@ export function useAskWhileListening(args: UseAskArgs): UseAskResult {
     if (!question) return;
     setShowHint(false);
 
-    // Pre-checked the way the composer does, so a spent quota is a line inside
-    // the sheet and never a modal over the chapter.
+    // Pre-checked the way the composer does: a spent quota is a line inside
+    // the sheet plus the rate-limit modal that offers a key, no request leaves.
     const quota = useDomainStore.getState().quota;
     if (quota.isFreeTier && quota.loaded && quota.limit - quota.used <= 0) {
       setNotice('quotaSpent');
       setState('limited');
+      useDomainStore.getState().openRateLimitModal('chat', quota.resetsAt, quota.limit);
       return;
     }
     if (typeof navigator !== 'undefined' && navigator.onLine === false) {
