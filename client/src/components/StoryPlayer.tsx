@@ -3,7 +3,7 @@ import React, { useReducer, useEffect, useRef, useState, useCallback, FC } from 
 import { useDomainStore } from '../stores/domainStore';
 import { useUIStore } from '../stores/uiStore';
 import { useTranslation } from '../hooks/useTranslation';
-import { Headphones, Info, CaretDown, CaretUp, Play, TrendUp, Trophy, Sparkle, BookOpen, BookBookmark, CheckCircle, Scroll } from '@phosphor-icons/react';
+import { Headphones, Info, CaretDown, CaretUp, Play, TrendUp, Trophy, Sparkle, BookOpen, BookBookmark, CheckCircle, Scroll, ChatCircleDots } from '@phosphor-icons/react';
 import StoryAudioPlayer from './StoryAudioPlayer';
 import Button from './Button/Button';
 import HelperPopup from './HelperPopup/HelperPopup';
@@ -1168,7 +1168,28 @@ const StoryPlayerSurface: FC<StoryPlayerSurfaceProps> = ({
                   {tNode('helpers.audioLibrary.welcome.sections.overview.text')}
                 </p>
               </div>
-              
+
+              {/* Ask along the way, only while the feature is live */}
+              {ASK_WHILE_LISTENING && (
+                <div style={{ marginBottom: '1rem' }}>
+                  <h4 style={{
+                    color: 'var(--gold-subtle)',
+                    marginBottom: '0.5rem',
+                    fontSize: '1rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    fontWeight: 600
+                  }}>
+                    <ChatCircleDots size={18} style={{ color: 'var(--gold-subtle)' }} />
+                    {tNode('helpers.audioLibrary.welcome.sections.ask.title')}
+                  </h4>
+                  <p style={{ margin: 0, opacity: 0.9, paddingLeft: '26px', lineHeight: 1.5 }}>
+                    {tNode('helpers.audioLibrary.welcome.sections.ask.text')}
+                  </p>
+                </div>
+              )}
+
               {/* Progressive Journey */}
               <div style={{ marginBottom: '1rem' }}>
                 <h4 style={{

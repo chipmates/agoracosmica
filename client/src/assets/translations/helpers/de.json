@@ -84,6 +84,10 @@
           "title": "Was dich erwartet",
           "text": "Die Figur erzählt ihre eigene Lebensweisheit als Ich-Erzählung. 10 bis 15 Minuten, historisch fundiert."
         },
+        "ask": {
+          "title": "Fragen zwischendurch",
+          "text": "Halte die Geschichte an und frag die Figur, was dir gerade durch den Kopf geht. Sie antwortet mit ihrer Echo-Stimme, und das Kapitel geht danach genau dort weiter."
+        },
         "journey": {
           "title": "12 Geschichten, die aufeinander aufbauen",
           "points": [
