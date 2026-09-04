@@ -1,5 +1,5 @@
 import { FC, MouseEvent as ReactMouseEvent, RefObject } from 'react';
-import OptimizedImage from '../OptimizedImage';
+import SidebarIcon from '../SidebarIcon';
 import useTranslation from '../../hooks/useTranslation';
 import CosmicCouncilIntegration from './CosmicCouncilIntegration';
 import { useUIStore } from '../../stores/uiStore';
@@ -89,14 +89,11 @@ export const CosmicCouncilSidebarButton: FC<CosmicCouncilSidebarButtonProps> = (
         aria-label={tString('navigation.council', 'Council')}
       >
         <div className="button-frame">
-          <OptimizedImage 
-            src="council"
-            type="ui"
-            purpose="icon"
-            priority={true}
-            className={`button-icon ${isHovered ? 'hover' : ''}`}
-            alt="Cosmic Council"
-          />
+          <SidebarIcon
+          name="council"
+          className={`button-icon ${isHovered ? 'hover' : ''}`}
+          alt="Cosmic Council"
+        />
         </div>
       </button>
       

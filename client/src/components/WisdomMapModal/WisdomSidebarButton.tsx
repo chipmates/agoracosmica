@@ -1,5 +1,5 @@
 import { FC, MouseEvent as ReactMouseEvent, RefObject } from 'react';
-import OptimizedImage from '../OptimizedImage';
+import SidebarIcon from '../SidebarIcon';
 import useTranslation from '../../hooks/useTranslation';
 import { useUIStore } from '../../stores/uiStore';
 
@@ -43,11 +43,8 @@ export const WisdomSidebarButton: FC<WisdomSidebarButtonProps> = ({
       aria-label={tString('navigation.wisdom', 'Wisdom')}
     >
       <div className="button-frame">
-        <OptimizedImage
-          src="paths"
-          type="ui"
-          purpose="icon"
-          priority={true}
+        <SidebarIcon
+          name="paths"
           className={`button-icon ${isHovered ? 'hover' : ''}`}
           alt="Wisdom"
         />

@@ -1,6 +1,6 @@
 import { FC, useState, useEffect, MouseEvent as ReactMouseEvent, RefObject } from 'react';
 import AudioLibraryModal from './AudioLibraryModal';
-import OptimizedImage from '../OptimizedImage';
+import SidebarIcon from '../SidebarIcon';
 import useTranslation from '../../hooks/useTranslation';
 import { Figure } from '../../types/global';
 import { AUDIO_LIBRARY_EVENT, consumeAudioLibraryRequest } from '../../utils/public/entryIntent';
@@ -59,14 +59,11 @@ export const AudioLibrarySidebarButton: FC<AudioLibrarySidebarButtonProps> = ({
         aria-label={tString('navigation.audioLibrary', 'Audio Library')}
       >
         <div className="button-frame">
-          <OptimizedImage 
-            src="library"
-            type="ui"
-            purpose="icon"
-            priority={true}
-            className={`button-icon ${isHovered ? 'hover' : ''}`}
-            alt="Audio Library"
-          />
+          <SidebarIcon
+          name="library"
+          className={`button-icon ${isHovered ? 'hover' : ''}`}
+          alt="Audio Library"
+        />
         </div>
       </button>
       

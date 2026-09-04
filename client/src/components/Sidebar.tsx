@@ -8,6 +8,7 @@ import { CosmicCouncilSidebarButton } from './CosmicCouncil/CosmicCouncilSidebar
 import { WisdomSidebarButton } from './WisdomMapModal/WisdomSidebarButton';
 import { CloseButton } from './Button';
 import OptimizedImage from './OptimizedImage';
+import SidebarIcon from './SidebarIcon';
 import { getHistoricalFigures } from '../api/figures';
 import { useTranslation } from '../hooks/useTranslation';
 import { useLiquidGlass } from '../hooks/useLiquidGlass';
@@ -528,11 +529,8 @@ const Sidebar: FC<SidebarProps> = ({
                   // Council Mode Display
                   <div className="council-mode-display">
                     <div className="council-title-container">
-                      <OptimizedImage
-                        src="council"
-                        type="ui"
-                        purpose="icon"
-                        priority={true}
+                      <SidebarIcon
+                        name="council"
                         className="council-title-icon-large"
                         alt="Council"
                       />
@@ -642,11 +640,8 @@ const Sidebar: FC<SidebarProps> = ({
                 aria-label={tString('navigation.settings', 'Settings')}
               >
                 <div className="button-frame">
-                  <OptimizedImage
-                    src="settings"
-                    type="ui"
-                    purpose="icon"
-                    priority={true}
+                  <SidebarIcon
+                    name="settings"
                     className={`button-icon ${settingsHover ? 'hover' : ''}`}
                     alt="Settings"
                   />
