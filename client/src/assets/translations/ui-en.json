@@ -315,13 +315,13 @@
       "title": "Your Key & AI Model",
       "description": "Your optional OpenRouter key and the model that powers your conversations",
       "currentlyUsing": "Currently using",
-      "modelTagline": "Frontier-class. Same model on free tier and with your own key.",
-      "statusFree": "Free tier active. 30 conversations per day.",
+      "modelTagline": "Frontier-class, picked by us for the free tier. With your own key you choose the model.",
+      "statusFree": "Free tier active. 30 free messages a day.",
       "statusByok": "Your OpenRouter key is active. No daily limit.",
       "servedIn": "Server location: {region}",
-      "afterBudget": "After the daily budget: {model}, {region}",
-      "budgetWithin": "Today: within the budget",
-      "budgetReached": "Budget reached, {model} answers until midnight",
+      "afterBudget": "Once our shared daily budget for it is spent, everyone gets {model}, {region}, until midnight",
+      "budgetWithin": "Today: within the shared budget",
+      "budgetReached": "Shared budget reached, {model} answers until midnight",
       "models": {
         "qwen3-235b": "Qwen3 235B",
         "deepseek-v4-pro": "DeepSeek V4 Pro"

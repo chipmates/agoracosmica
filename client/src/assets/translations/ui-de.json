@@ -313,13 +313,13 @@
       "title": "Dein Key & KI-Modell",
       "description": "Dein optionaler OpenRouter-Key und das Modell hinter deinen Gesprächen",
       "currentlyUsing": "Aktuell aktiv",
-      "modelTagline": "Frontier-Klasse. Gleiches Modell im kostenlosen Tarif und mit deinem eigenen Key.",
-      "statusFree": "Kostenloser Tarif aktiv. 30 Gespräche pro Tag.",
+      "modelTagline": "Frontier-Klasse, von uns für den kostenlosen Tarif gewählt. Mit eigenem Key wählst du das Modell.",
+      "statusFree": "Kostenloser Tarif aktiv. 30 kostenlose Nachrichten pro Tag.",
       "statusByok": "Dein OpenRouter-Key ist aktiv. Kein Tageslimit.",
       "servedIn": "Serverstandort: {region}",
-      "afterBudget": "Nach dem Tagesbudget: {model}, {region}",
-      "budgetWithin": "Heute: im Budget",
-      "budgetReached": "Budget erreicht, {model} antwortet bis Mitternacht",
+      "afterBudget": "Wenn unser gemeinsames Tagesbudget dafür aufgebraucht ist, antwortet für alle bis Mitternacht {model}, {region}",
+      "budgetWithin": "Heute: im gemeinsamen Budget",
+      "budgetReached": "Gemeinsames Budget erreicht, {model} antwortet bis Mitternacht",
       "models": {
         "qwen3-235b": "Qwen3 235B",
         "deepseek-v4-pro": "DeepSeek V4 Pro"
