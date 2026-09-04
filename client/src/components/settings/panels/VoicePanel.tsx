@@ -33,10 +33,12 @@ import {
   getGermanTechnicalVoice,
   getKokoroTechnicalVoice,
   QWEN_ENGLISH_TECHNICAL_VOICES,
+  QWEN_ENGLISH_VOICES,
   resolveEnglishEngine,
   type GermanVoice,
   type EnglishVoice,
-  type EnglishEngine
+  type EnglishEngine,
+  type QwenEnglishVoice
 } from '../../../services/audio/voices';
 import { isLocalModeEnglishTts } from '../../../services/audio/voices/voiceResolver';
 import { useDomainStore } from '../../../stores/domainStore';
@@ -92,11 +94,14 @@ interface VoicePanelProps {
 }
 
 interface CosmicVoice {
+  /** Card key: the preview file on R2 and the selection state. */
   id: string;
   name: string;
   icon: ReactNode;
   /** Set when the card's id is already the id the gateway expects. */
   technical?: string;
+  /** Stored preference name, when the card id is the gateway id instead. */
+  cosmic?: string;
 }
 
 // ============================================
@@ -140,25 +145,28 @@ const ENGLISH_MALE_VOICES: CosmicVoice[] = [
 ];
 
 // ============================================
-// English Voice Cards (Qwen on GEX130, one voice per gender)
+// English Voice Cards (Qwen on GEX130, five per gender)
 // ============================================
 
-// Gender icons rather than the cosmic ones: this cast has no female/male
-// grouping above it, so the card itself has to say who speaks in it.
-const QWEN_ENGLISH_VOICE_CARDS: CosmicVoice[] = [
-  {
-    id: QWEN_ENGLISH_TECHNICAL_VOICES.lyra,
-    technical: QWEN_ENGLISH_TECHNICAL_VOICES.lyra,
-    name: 'Lyra',
-    icon: <GenderFemale size={18} />,
-  },
-  {
-    id: QWEN_ENGLISH_TECHNICAL_VOICES.solaris,
-    technical: QWEN_ENGLISH_TECHNICAL_VOICES.solaris,
-    name: 'Solaris',
-    icon: <GenderMale size={18} />,
-  },
-];
+// The Qwen English cast carries the same ten cosmic names as the German one,
+// so name and icon come from there rather than being written twice.
+const COSMIC_CARDS_BY_NAME: Record<string, CosmicVoice> = Object.fromEntries(
+  [...GERMAN_FEMALE_VOICES, ...GERMAN_MALE_VOICES].map(voice => [voice.id, voice])
+);
+
+// The card id stays the gateway id: it also keys the R2 preview file, and the
+// bare cosmic names there belong to the German recordings.
+const qwenEnglishCard = (cosmic: QwenEnglishVoice): CosmicVoice => ({
+  id: QWEN_ENGLISH_TECHNICAL_VOICES[cosmic],
+  technical: QWEN_ENGLISH_TECHNICAL_VOICES[cosmic],
+  cosmic,
+  name: COSMIC_CARDS_BY_NAME[cosmic].name,
+  icon: COSMIC_CARDS_BY_NAME[cosmic].icon,
+});
+
+// Ranked order, the one-to-one default first.
+const QWEN_ENGLISH_FEMALE_VOICES: CosmicVoice[] = QWEN_ENGLISH_VOICES.female.map(qwenEnglishCard);
+const QWEN_ENGLISH_MALE_VOICES: CosmicVoice[] = QWEN_ENGLISH_VOICES.male.map(qwenEnglishCard);
 
 const PREVIEW_TEXT_EN = "The ideas of great minds are bridges between times and worlds, waiting only to be heard.";
 const PREVIEW_TEXT_DE = "Die Ideen großer Köpfe sind Brücken zwischen Zeiten und Welten, sie warten nur darauf, gehört zu werden.";
@@ -346,10 +354,12 @@ const VoicePanel: FC<VoicePanelProps> = ({
   const voicePrefs = useDomainStore(
     useShallow((state) => ({
       german: state.german,
-      english: state.english
+      english: state.english,
+      qwenEnglish: state.qwenEnglishVoices
     }))
   );
   const saveVoicePreferences = useDomainStore((state) => state.saveVoicePreferences);
+  const updateQwenEnglishPreferences = useDomainStore((state) => state.updateQwenEnglishPreferences);
   // Unset until the visitor picks, so the plate shows the default as chosen.
   const storedEngine = resolveEnglishEngine(useDomainStore((state) => state.englishEngine));
   const setEnglishEngine = useDomainStore((state) => state.setEnglishEngine);
@@ -369,6 +379,8 @@ const VoicePanel: FC<VoicePanelProps> = ({
   const [selectedGermanMale, setSelectedGermanMale] = useState<GermanVoice>(voicePrefs.german.maleVoice);
   const [selectedEnglishFemale, setSelectedEnglishFemale] = useState<EnglishVoice>(voicePrefs.english.femaleVoice);
   const [selectedEnglishMale, setSelectedEnglishMale] = useState<EnglishVoice>(voicePrefs.english.maleVoice);
+  const [selectedQwenFemale, setSelectedQwenFemale] = useState<QwenEnglishVoice>(voicePrefs.qwenEnglish.female);
+  const [selectedQwenMale, setSelectedQwenMale] = useState<QwenEnglishVoice>(voicePrefs.qwenEnglish.male);
 
   // Preview voice — prefers the R2-cached sample (rendered at speed 1.00)
   // and applies the user's current speed via playbackRate. Falls back to
@@ -487,6 +499,20 @@ const VoicePanel: FC<VoicePanelProps> = ({
     }
   };
 
+  // Select Qwen English voice and save. The card id is the gateway id, the
+  // stored pick is the cosmic name.
+  const handleSelectQwenEnglishVoice = (voice: CosmicVoice) => {
+    const cosmic = (voice.cosmic ?? voice.id) as QwenEnglishVoice;
+
+    if (QWEN_ENGLISH_FEMALE_VOICES.some(v => v.id === voice.id)) {
+      setSelectedQwenFemale(cosmic);
+      updateQwenEnglishPreferences(undefined, cosmic);
+    } else {
+      setSelectedQwenMale(cosmic);
+      updateQwenEnglishPreferences(cosmic, undefined);
+    }
+  };
+
   // Engine choice for English. German runs one stack, so it has no plate here.
   const renderEngineChoice = (): ReactNode => {
     const engines: { id: EnglishEngine; name: string; note: string }[] = [
@@ -568,41 +594,6 @@ const VoicePanel: FC<VoicePanelProps> = ({
     );
   };
 
-  // Fixed Qwen cast: nothing to pick, so the plates carry a preview only.
-  const renderQwenEnglishCast = (): ReactNode => (
-    <div style={{ marginTop: '20px' }}>
-      <h4 style={{ ...kickerStyle, margin: '0 0 12px' }}>
-        {tNode('settings.voice.engine.qwenCastTitle')}
-      </h4>
-
-      <p style={{ margin: '0 0 12px', fontSize: '13px', lineHeight: 1.5, color: INK_BODY }}>
-        {tString(
-          'settings.voice.engine.qwenCastNote',
-          'Female figures speak as Lyra, male figures as Solaris.'
-        )}
-      </p>
-
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: isMobileOrTablet() ? '1fr' : 'repeat(auto-fit, minmax(180px, 1fr))',
-        gap: '8px'
-      }}>
-        {QWEN_ENGLISH_VOICE_CARDS.map(voice => (
-          <CosmicVoiceCard
-            key={voice.id}
-            voice={voice}
-            selected={true}
-            previewing={previewingVoice === voice.id}
-            onPreview={() => handlePreview(voice, 'english')}
-            onSelect={() => undefined}
-            showPreview={true}
-            showSelect={false}
-          />
-        ))}
-      </div>
-    </div>
-  );
-
   // Render voice grid for a language
   const renderVoiceSection = (
     voiceLanguage: 'german' | 'english',
@@ -610,12 +601,19 @@ const VoicePanel: FC<VoicePanelProps> = ({
     maleVoices: CosmicVoice[],
     selectedFemale: string,
     selectedMale: string,
-    onSelect: (voice: CosmicVoice) => void
+    onSelect: (voice: CosmicVoice) => void,
+    note?: string
   ) => (
     <div style={{ marginTop: '20px' }}>
       <h4 style={{ ...kickerStyle, margin: '0 0 16px' }}>
         {tNode('settings.voice.voiceSelection.title')}
       </h4>
+
+      {note && (
+        <p style={{ margin: '0 0 16px', fontSize: '13px', lineHeight: 1.5, color: INK_BODY }}>
+          {note}
+        </p>
+      )}
 
       {/* Female Voices */}
       <CollapsibleSection
@@ -756,7 +754,18 @@ const VoicePanel: FC<VoicePanelProps> = ({
                 handleSelectGermanVoice
               )
             : onQwenEnglish
-              ? renderQwenEnglishCast()
+              ? renderVoiceSection(
+                  'english',
+                  QWEN_ENGLISH_FEMALE_VOICES,
+                  QWEN_ENGLISH_MALE_VOICES,
+                  QWEN_ENGLISH_TECHNICAL_VOICES[selectedQwenFemale],
+                  QWEN_ENGLISH_TECHNICAL_VOICES[selectedQwenMale],
+                  handleSelectQwenEnglishVoice,
+                  tString(
+                    'settings.voice.engine.qwenCastNote',
+                    'Pick the voice that answers for female figures and the one for male figures. The opening line follows your pick.'
+                  )
+                )
               : renderVoiceSection(
                   'english',
                   ENGLISH_FEMALE_VOICES,

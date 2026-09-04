@@ -218,11 +218,10 @@
       "engine": {
         "title": "Stimm-Engine",
         "qwenLabel": "Qwen",
-        "qwenNote": "Unsere neuesten englischen Stimmen. Eine Stimme je Persönlichkeit, nach Geschlecht gewählt.",
+        "qwenNote": "Unsere neuesten englischen Stimmen. Fünf für weibliche Persönlichkeiten, fünf für männliche.",
         "kokoroLabel": "Kokoro",
         "kokoroNote": "Der bisherige Satz. Zehn Stimmen zur Auswahl.",
-        "qwenCastTitle": "Die Stimmen",
-        "qwenCastNote": "Weibliche Persönlichkeiten sprechen als Lyra, männliche als Solaris.",
+        "qwenCastNote": "Wähle die Stimme, die für weibliche Persönlichkeiten antwortet, und die für männliche. Die Begrüßung folgt deiner Wahl.",
         "help": "Beide laufen auf unseren eigenen Servern. Die Begrüßung folgt deiner Wahl, damit sie immer zur antwortenden Stimme passt.",
         "localModeNote": "Local Mode nutzt Kokoro für Englisch, die Wahl wartet also, bis du die lokale Sprachausgabe ausschaltest."
       }

@@ -410,3 +410,257 @@ describe('engine persistence — only an explicit pick is written', () => {
     expect(getEnglishEngine()).toBe('qwen');
   });
 });
+
+// The Qwen English cast carries five voices per gender. A pick has to reach the
+// reply, the council seat and the opening line, and the pre-rendered en-q1 clips
+// were cut with the gender defaults only.
+describe('shouldUsePregeneratedGreeting — the clip set was cut with the defaults', () => {
+  it('accepts the Qwen default for each gender', async () => {
+    const { shouldUsePregeneratedGreeting } = await import(
+      '../../services/audio/initialMessagePathBuilder'
+    );
+
+    expect(shouldUsePregeneratedGreeting('qwen', 'female', 'lyra')).toBe(true);
+    expect(shouldUsePregeneratedGreeting('qwen', 'male', 'solaris')).toBe(true);
+  });
+
+  it('rejects any other Qwen pick, so the greeting is spoken live', async () => {
+    const { shouldUsePregeneratedGreeting } = await import(
+      '../../services/audio/initialMessagePathBuilder'
+    );
+
+    expect(shouldUsePregeneratedGreeting('qwen', 'female', 'vega')).toBe(false);
+    expect(shouldUsePregeneratedGreeting('qwen', 'male', 'umbra')).toBe(false);
+    // A voice from the other section is not the default either.
+    expect(shouldUsePregeneratedGreeting('qwen', 'female', 'solaris')).toBe(false);
+    expect(shouldUsePregeneratedGreeting('qwen', 'male', undefined)).toBe(false);
+  });
+
+  it('keeps the Kokoro rule as it was', async () => {
+    const { shouldUsePregeneratedGreeting } = await import(
+      '../../services/audio/initialMessagePathBuilder'
+    );
+
+    expect(shouldUsePregeneratedGreeting('kokoro', 'female', 'stella')).toBe(true);
+    expect(shouldUsePregeneratedGreeting('kokoro', 'male', 'orion')).toBe(true);
+    expect(shouldUsePregeneratedGreeting('kokoro', 'female', 'celeste')).toBe(false);
+    expect(shouldUsePregeneratedGreeting('kokoro', 'male', 'saturn')).toBe(false);
+  });
+});
+
+describe('Qwen English picks — one voice per gender', () => {
+  beforeEach(() => {
+    vi.resetModules();
+    window.localStorage.clear();
+    vi.stubEnv('VITE_EN_VOICE_ENGINE_CHOICE', 'true');
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.resetModules();
+    window.localStorage.clear();
+  });
+
+  it('answers with the picked voice for the figure gender', async () => {
+    const { useDomainStore } = await import('../../stores/domainStore');
+    const { getVoiceForNormalMode } = await import('../../services/audio/voices/voiceResolver');
+
+    useDomainStore.setState({
+      englishEngine: 'qwen',
+      qwenEnglishVoices: { male: 'umbra', female: 'vega' },
+    });
+
+    expect(getVoiceForNormalMode('plato', 'kokoro', null, 'en')).toBe('en_umbra');
+    expect(getVoiceForNormalMode('woolf', 'kokoro', null, 'en')).toBe('en_vega');
+  });
+
+  it('falls back to the gender default when nothing is stored', async () => {
+    const { useDomainStore } = await import('../../stores/domainStore');
+    const { getVoiceForNormalMode } = await import('../../services/audio/voices/voiceResolver');
+
+    useDomainStore.setState({ englishEngine: 'qwen' });
+
+    expect(useDomainStore.getState().qwenEnglishVoices).toEqual({ male: 'solaris', female: 'lyra' });
+    expect(getVoiceForNormalMode('plato', 'kokoro', null, 'en')).toBe('en_solaris');
+    expect(getVoiceForNormalMode('woolf', 'kokoro', null, 'en')).toBe('en_lyra');
+  });
+
+  it('falls back to the gender default for a value that is not a voice of that gender', async () => {
+    const { useDomainStore } = await import('../../stores/domainStore');
+    const { getVoiceForNormalMode } = await import('../../services/audio/voices/voiceResolver');
+
+    useDomainStore.setState({
+      englishEngine: 'qwen',
+      // A stale name and a voice from the other section.
+      qwenEnglishVoices: { male: 'stella', female: 'solaris' } as never,
+    });
+
+    expect(getVoiceForNormalMode('plato', 'kokoro', null, 'en')).toBe('en_solaris');
+    expect(getVoiceForNormalMode('woolf', 'kokoro', null, 'en')).toBe('en_lyra');
+  });
+
+  it('leaves the Kokoro pick and the German pick alone', async () => {
+    const { useDomainStore } = await import('../../stores/domainStore');
+    const { getVoiceForNormalMode } = await import('../../services/audio/voices/voiceResolver');
+    const { ENGLISH_TECHNICAL_VOICES, GERMAN_TECHNICAL_VOICES } = await import(
+      '../../services/audio/voices/voiceDefinitions'
+    );
+
+    useDomainStore.setState({
+      englishEngine: 'kokoro',
+      english: { maleVoice: 'saturn', femaleVoice: 'celeste' },
+      qwenEnglishVoices: { male: 'umbra', female: 'vega' },
+    });
+
+    expect(getVoiceForNormalMode('plato', 'kokoro', null, 'en')).toBe(ENGLISH_TECHNICAL_VOICES.saturn);
+    expect(getVoiceForNormalMode('woolf', 'kokoro', null, 'en')).toBe(ENGLISH_TECHNICAL_VOICES.celeste);
+    expect(getVoiceForNormalMode('plato', 'kokoro', null, 'de')).toBe(GERMAN_TECHNICAL_VOICES.solaris);
+  });
+
+  it('sends the greeting live for a pick the clip set never heard', async () => {
+    const { useDomainStore } = await import('../../stores/domainStore');
+    const { isUsingDefaultVoice } = await import('../../services/audio/voices/voiceResolver');
+
+    useDomainStore.setState({
+      englishEngine: 'qwen',
+      qwenEnglishVoices: { male: 'solaris', female: 'lyra' },
+    });
+    expect(isUsingDefaultVoice('plato', 'en')).toBe(true);
+    expect(isUsingDefaultVoice('woolf', 'en')).toBe(true);
+
+    useDomainStore.setState({ qwenEnglishVoices: { male: 'umbra', female: 'vega' } });
+    expect(isUsingDefaultVoice('plato', 'en')).toBe(false);
+    expect(isUsingDefaultVoice('woolf', 'en')).toBe(false);
+  });
+
+  it('keeps a pick across a reload and never writes it into the Kokoro slot', async () => {
+    const first = await import('../../stores/domainStore');
+    first.useDomainStore.getState().updateQwenEnglishPreferences('corvus', 'ceres');
+
+    const persisted = JSON.parse(window.localStorage.getItem('agora-cosmica-store') || '{}');
+    expect(persisted.state.qwenEnglishVoices).toEqual({ male: 'corvus', female: 'ceres' });
+    expect(persisted.state.english).toEqual({ maleVoice: 'orion', femaleVoice: 'stella' });
+
+    // Fresh module graph over the same storage is the reload.
+    vi.resetModules();
+    const { useDomainStore } = await import('../../stores/domainStore');
+    const { getVoiceForNormalMode } = await import('../../services/audio/voices/voiceResolver');
+
+    useDomainStore.setState({ englishEngine: 'qwen' });
+    expect(getVoiceForNormalMode('plato', 'kokoro', null, 'en')).toBe('en_corvus');
+    expect(getVoiceForNormalMode('woolf', 'kokoro', null, 'en')).toBe('en_ceres');
+  });
+});
+
+describe('getVoicesForCouncil — the Qwen rotation starts at the picks', () => {
+  beforeEach(() => {
+    vi.resetModules();
+    window.localStorage.clear();
+    vi.stubEnv('VITE_EN_VOICE_ENGINE_CHOICE', 'true');
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.resetModules();
+    window.localStorage.clear();
+  });
+
+  it('seats the picked voice first and keeps every seat distinct', async () => {
+    const { useDomainStore } = await import('../../stores/domainStore');
+    const { getVoicesForCouncil } = await import('../../services/audio/voices/voiceResolver');
+
+    useDomainStore.setState({
+      englishEngine: 'qwen',
+      qwenEnglishVoices: { male: 'umbra', female: 'vega' },
+    });
+
+    const mapping = getVoicesForCouncil(['plato', 'woolf', 'rumi', 'laozi'], 'kokoro', 'en');
+    const seated = Object.values(mapping);
+
+    expect(mapping.plato).toBe('en_umbra');
+    expect(mapping.woolf).toBe('en_vega');
+    expect(new Set(seated).size).toBe(seated.length);
+    expect(seated.every((v) => v.startsWith('en_'))).toBe(true);
+  });
+
+  it('never repeats a voice in an all-male council built off a pick', async () => {
+    const { useDomainStore } = await import('../../stores/domainStore');
+    const { getVoicesForCouncil } = await import('../../services/audio/voices/voiceResolver');
+
+    useDomainStore.setState({
+      englishEngine: 'qwen',
+      qwenEnglishVoices: { male: 'corvus', female: 'lyra' },
+    });
+
+    const mapping = getVoicesForCouncil(['plato', 'rumi', 'laozi', 'goethe'], 'kokoro', 'en');
+    const seated = Object.values(mapping);
+
+    expect(mapping.plato).toBe('en_corvus');
+    expect(seated).toHaveLength(4);
+    expect(new Set(seated).size).toBe(4);
+  });
+
+  it('leaves the Kokoro and German councils where they were', async () => {
+    const { useDomainStore } = await import('../../stores/domainStore');
+    const { getVoicesForCouncil } = await import('../../services/audio/voices/voiceResolver');
+    const { GERMAN_TECHNICAL_VOICES } = await import('../../services/audio/voices/voiceDefinitions');
+
+    useDomainStore.setState({
+      englishEngine: 'kokoro',
+      qwenEnglishVoices: { male: 'umbra', female: 'vega' },
+    });
+    const kokoro = getVoicesForCouncil(['plato', 'woolf', 'rumi', 'laozi'], 'kokoro', 'en');
+    expect(Object.values(kokoro).some((v) => v.startsWith('en_'))).toBe(false);
+
+    useDomainStore.setState({ englishEngine: 'qwen' });
+    const german = getVoicesForCouncil(['plato', 'woolf'], 'kokoro', 'de');
+    expect(german.plato).toBe(GERMAN_TECHNICAL_VOICES.solaris);
+    expect(german.woolf).toBe(GERMAN_TECHNICAL_VOICES.lyra);
+  });
+});
+
+describe('voice preferences slice — the Qwen picks', () => {
+  beforeEach(() => {
+    vi.resetModules();
+    window.localStorage.clear();
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.resetModules();
+    window.localStorage.clear();
+  });
+
+  it('starts every visitor on the gender defaults', async () => {
+    const { createVoicePreferencesSlice } = await import(
+      '../../stores/slices/voicePreferencesSlice'
+    );
+    const slice = createVoicePreferencesSlice(() => undefined, () => undefined);
+
+    expect(slice.qwenEnglishVoices).toEqual({ male: 'solaris', female: 'lyra' });
+  });
+
+  it('reads a stored pick and repairs a value outside its gender', async () => {
+    window.localStorage.setItem(
+      'voicePreferences',
+      JSON.stringify({ qwenEnglishVoices: { male: 'phoenix', female: 'umbra' } })
+    );
+
+    const { createVoicePreferencesSlice } = await import(
+      '../../stores/slices/voicePreferencesSlice'
+    );
+    const slice = createVoicePreferencesSlice(() => undefined, () => undefined);
+
+    expect(slice.qwenEnglishVoices).toEqual({ male: 'phoenix', female: 'lyra' });
+  });
+
+  it('updates one gender without touching the other', async () => {
+    const { useDomainStore } = await import('../../stores/domainStore');
+
+    useDomainStore.getState().updateQwenEnglishPreferences(undefined, 'astra');
+    expect(useDomainStore.getState().qwenEnglishVoices).toEqual({ male: 'solaris', female: 'astra' });
+
+    useDomainStore.getState().updateQwenEnglishPreferences('hyperion');
+    expect(useDomainStore.getState().qwenEnglishVoices).toEqual({ male: 'hyperion', female: 'astra' });
+  });
+});

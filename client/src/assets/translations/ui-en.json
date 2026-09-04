@@ -220,11 +220,10 @@
       "engine": {
         "title": "Voice Engine",
         "qwenLabel": "Qwen",
-        "qwenNote": "Our newest English voices. One voice per figure, picked by gender.",
+        "qwenNote": "Our newest English voices. Five for female figures, five for male.",
         "kokoroLabel": "Kokoro",
         "kokoroNote": "The earlier cast. Ten voices you can pick from.",
-        "qwenCastTitle": "The Voices",
-        "qwenCastNote": "Female figures speak as Lyra, male figures as Solaris.",
+        "qwenCastNote": "Pick the voice that answers for female figures and the one for male figures. The opening line follows your pick.",
         "help": "Both run on our own servers. The opening message follows your choice, so it always matches the voice that answers.",
         "localModeNote": "Local Mode uses Kokoro for English, so the choice waits until you turn Local Mode voice off."
       }

@@ -188,12 +188,28 @@ export function getQwenEnglishVoiceId(voiceName: QwenEnglishVoice | string): str
     || QWEN_ENGLISH_TECHNICAL_VOICES.solaris;
 }
 
+export function isQwenEnglishVoice(value: unknown): value is QwenEnglishVoice {
+  return typeof value === 'string' && value in QWEN_ENGLISH_TECHNICAL_VOICES;
+}
+
 /**
- * The one-to-one Qwen voice for a figure's gender. Councils rotate the wider
- * cast instead, see getVoicesForCouncil.
+ * A stored pick counts only inside its own gender, so anything else (an old
+ * value, a hand-edited blob, a voice from the other section) falls back to the
+ * default for that gender rather than to a voice of the wrong sex.
  */
-export function getQwenEnglishTechnicalVoice(gender: Gender): string {
-  return getQwenEnglishVoiceId(QWEN_ENGLISH_DEFAULTS[gender]);
+export function resolveQwenEnglishVoice(stored: unknown, gender: Gender): QwenEnglishVoice {
+  const pool: readonly QwenEnglishVoice[] = QWEN_ENGLISH_VOICES[gender];
+  return pool.includes(stored as QwenEnglishVoice)
+    ? (stored as QwenEnglishVoice)
+    : QWEN_ENGLISH_DEFAULTS[gender];
+}
+
+/**
+ * The picked Qwen voice for a figure's gender. Councils rotate the wider cast
+ * instead, see getVoicesForCouncil.
+ */
+export function getQwenEnglishTechnicalVoice(gender: Gender, stored?: unknown): string {
+  return getQwenEnglishVoiceId(resolveQwenEnglishVoice(stored, gender));
 }
 
 // ============================================

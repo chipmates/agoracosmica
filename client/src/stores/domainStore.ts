@@ -6,7 +6,7 @@ import { createLanguageSlice } from './slices/languageSlice';
 import { createPreferencesSlice } from './slices/preferencesSlice';
 import { createFirstVisitSlice } from './slices/firstVisitSlice';
 import { createVoicePreferencesSlice } from './slices/voicePreferencesSlice';
-import { isEnglishEngine } from '../services/audio/voices/voiceDefinitions';
+import { isEnglishEngine, resolveQwenEnglishVoice } from '../services/audio/voices/voiceDefinitions';
 import type { FreeTierState } from '../utils/freeTierState';
 
 const debugLog = (...args: any[]) => {
@@ -333,6 +333,12 @@ export const useDomainStore = create<DomainSlices>()(
             discoveryCount: persisted.discoveryCount ?? currentState.discoveryCount,
             german: persisted.german ?? currentState.german,
             english: persisted.english ?? currentState.english,
+            // Missing for every blob written before the Qwen picker, and a
+            // value outside its gender's cast resolves to the default.
+            qwenEnglishVoices: {
+              male: resolveQwenEnglishVoice(persisted.qwenEnglishVoices?.male, 'male'),
+              female: resolveQwenEnglishVoice(persisted.qwenEnglishVoices?.female, 'female'),
+            },
             // Absent for anyone who never picked an engine, which is every blob
             // written before the choice existed. Those stay unset and follow
             // the default rather than being pinned to it.
@@ -386,6 +392,7 @@ export const useDomainStore = create<DomainSlices>()(
           // Voice preferences (from voicePreferencesSlice)
           german: state.german,
           english: state.english,
+          qwenEnglishVoices: state.qwenEnglishVoices,
           // Written only once someone picks an engine. Persisting the resolved
           // default instead would freeze every visitor on the default that was
           // current when they first loaded.

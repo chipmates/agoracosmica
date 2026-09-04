@@ -1,11 +1,15 @@
 // src/stores/slices/voicePreferencesSlice.ts
 // Voice Preferences Slice - German and English voice selection
 
-import type { GermanVoice, EnglishVoice, EnglishEngine } from '../../services/audio/voices/voiceDefinitions';
+import type {
+  GermanVoice, EnglishVoice, EnglishEngine, QwenEnglishVoice
+} from '../../services/audio/voices/voiceDefinitions';
 import {
   GERMAN_DEFAULTS,
   ENGLISH_DEFAULTS,
-  isEnglishEngine
+  QWEN_ENGLISH_DEFAULTS,
+  isEnglishEngine,
+  resolveQwenEnglishVoice
 } from '../../services/audio/voices/voiceDefinitions';
 
 // Legacy type aliases for migration compatibility
@@ -23,6 +27,14 @@ export interface VoicePreferencesState {
   english: {
     maleVoice: EnglishVoice;
     femaleVoice: EnglishVoice;
+  };
+  /**
+   * The Qwen English cast, one pick per gender. Separate from `english`, which
+   * stays the Kokoro pick, so switching stacks never loses the other choice.
+   */
+  qwenEnglishVoices: {
+    male: QwenEnglishVoice;
+    female: QwenEnglishVoice;
   };
   /**
    * Which stack renders English, and null until the visitor picks one. Only an
@@ -49,6 +61,7 @@ export interface VoicePreferencesActions {
   saveVoicePreferences: (preferences: Partial<VoicePreferencesState>) => void;
   updateGermanPreferences: (maleVoice?: GermanVoice, femaleVoice?: GermanVoice) => void;
   updateEnglishPreferences: (maleVoice?: EnglishVoice, femaleVoice?: EnglishVoice) => void;
+  updateQwenEnglishPreferences: (male?: QwenEnglishVoice, female?: QwenEnglishVoice) => void;
   setEnglishEngine: (engine: EnglishEngine) => void;
   // Legacy aliases
   updateOpenAIPreferences: (maleVoice?: OpenAIVoice, femaleVoice?: OpenAIVoice) => void;
@@ -74,6 +87,10 @@ const getDefaultPreferencesInternal = (): VoicePreferencesState => {
   return {
     german,
     english,
+    qwenEnglishVoices: {
+      male: QWEN_ENGLISH_DEFAULTS.male,
+      female: QWEN_ENGLISH_DEFAULTS.female
+    },
     englishEngine: null,
     openai: german,
     kokoro: english
@@ -150,11 +167,18 @@ const bootstrapVoicePreferences = (): VoicePreferencesState => {
         : ENGLISH_DEFAULTS.female
     };
 
+    // Absent for every blob written before the Qwen picker, and a value that is
+    // not a voice of that gender falls back to the gender default.
+    const qwenEnglishVoices = {
+      male: resolveQwenEnglishVoice(parsed.qwenEnglishVoices?.male, 'male'),
+      female: resolveQwenEnglishVoice(parsed.qwenEnglishVoices?.female, 'female')
+    };
+
     // Anything but a real engine name means the visitor never picked one, which
     // covers every blob written before the choice existed.
     const englishEngine = isEnglishEngine(parsed.englishEngine) ? parsed.englishEngine : null;
 
-    return { german, english, englishEngine, openai: german, kokoro: english };
+    return { german, english, qwenEnglishVoices, englishEngine, openai: german, kokoro: english };
 
   } catch (error) {
     console.error('❌ [VoicePrefs] Error loading preferences:', error);
@@ -175,6 +199,7 @@ export const createVoicePreferencesSlice = (
     // Initial state
     german: initial.german,
     english: initial.english,
+    qwenEnglishVoices: initial.qwenEnglishVoices,
     englishEngine: initial.englishEngine,
     openai: initial.german,  // Legacy alias
     kokoro: initial.english, // Legacy alias
@@ -183,8 +208,9 @@ export const createVoicePreferencesSlice = (
     loadVoicePreferences: () => {
       const german = get().german;
       const english = get().english;
+      const qwenEnglishVoices = get().qwenEnglishVoices;
       const englishEngine = get().englishEngine;
-      return { german, english, englishEngine, openai: german, kokoro: english };
+      return { german, english, qwenEnglishVoices, englishEngine, openai: german, kokoro: english };
     },
 
     saveVoicePreferences: (preferences: Partial<VoicePreferencesState>) => {
@@ -200,12 +226,17 @@ export const createVoicePreferencesSlice = (
         ...currentEnglish,
         ...(preferences.english || preferences.kokoro)
       };
+      const newQwenEnglish = {
+        ...get().qwenEnglishVoices,
+        ...(preferences.qwenEnglishVoices || {})
+      };
 
       // The engine is deliberately not written here: setEnglishEngine is its
       // only writer, so it is stored when and only when someone picks it.
       set(() => ({
         german: newGerman,
         english: newEnglish,
+        qwenEnglishVoices: newQwenEnglish,
         openai: newGerman,
         kokoro: newEnglish
       }));
@@ -236,6 +267,16 @@ export const createVoicePreferencesSlice = (
       get().saveVoicePreferences({ english: updated });
     },
 
+    updateQwenEnglishPreferences: (male?: QwenEnglishVoice, female?: QwenEnglishVoice) => {
+      if (!male && !female) return;
+      const current = get().qwenEnglishVoices;
+      const updated = {
+        male: male ? resolveQwenEnglishVoice(male, 'male') : current.male,
+        female: female ? resolveQwenEnglishVoice(female, 'female') : current.female
+      };
+      get().saveVoicePreferences({ qwenEnglishVoices: updated });
+    },
+
     // Legacy aliases
     updateOpenAIPreferences: (maleVoice?: OpenAIVoice, femaleVoice?: OpenAIVoice) => {
       get().updateGermanPreferences(maleVoice as GermanVoice, femaleVoice as GermanVoice);
@@ -250,6 +291,7 @@ export const createVoicePreferencesSlice = (
       set(() => ({
         german: defaults.german,
         english: defaults.english,
+        qwenEnglishVoices: defaults.qwenEnglishVoices,
         englishEngine: defaults.englishEngine,
         openai: defaults.german,
         kokoro: defaults.english

@@ -9,6 +9,12 @@
  * Created: October 16, 2025
  */
 
+import {
+  ENGLISH_DEFAULTS,
+  QWEN_ENGLISH_DEFAULTS,
+  type Gender
+} from './voices/voiceDefinitions';
+
 export type ConversationMode = 'wisdom' | 'freetalk' | 'quest';
 export type SupportedLanguage = 'en' | 'de';
 export type TtsEngine = 'qwen' | 'kokoro';
@@ -200,6 +206,32 @@ export const initialMessagePathBuilder = {
     return SUPPORTED_LANGUAGES.includes(language as SupportedLanguage);
   }
 };
+
+/**
+ * English only: which voice each pre-rendered English clip set was cut with.
+ * German runs one stack and follows its own defaults.
+ */
+const GREETING_CLIP_VOICES: Record<TtsEngine, Record<Gender, string>> = {
+  qwen: { male: QWEN_ENGLISH_DEFAULTS.male, female: QWEN_ENGLISH_DEFAULTS.female },
+  kokoro: { male: ENGLISH_DEFAULTS.male, female: ENGLISH_DEFAULTS.female }
+};
+
+/**
+ * Whether the pre-rendered English greeting may be used for this pick. Only the
+ * gender defaults were rendered, so any other pick has to be spoken live or the
+ * opening line and the reply would come from two different voices.
+ *
+ * @param engine - Stack that renders English for this visitor
+ * @param gender - Figure's gender
+ * @param pickedVoice - Cosmic voice name picked for that gender
+ */
+export function shouldUsePregeneratedGreeting(
+  engine: TtsEngine,
+  gender: Gender,
+  pickedVoice: string | null | undefined
+): boolean {
+  return pickedVoice === GREETING_CLIP_VOICES[engine][gender];
+}
 
 /**
  * Type guard for conversation mode

@@ -13,11 +13,12 @@
 import {
   type GermanVoice, type EnglishVoice, type Gender, type EnglishEngine,
   GERMAN_VOICES, ENGLISH_VOICES, QWEN_ENGLISH_VOICES,
-  GERMAN_DEFAULTS, ENGLISH_DEFAULTS,
+  GERMAN_DEFAULTS,
   getGermanTechnicalVoice, getKokoroTechnicalVoice,
   getQwenEnglishTechnicalVoice, getQwenEnglishVoiceId,
-  resolveEnglishEngine
+  resolveEnglishEngine, resolveQwenEnglishVoice
 } from './voiceDefinitions';
+import { shouldUsePregeneratedGreeting } from '../initialMessagePathBuilder';
 import { useDomainStore } from '../../../stores/domainStore';
 import { getFigureGender } from '../../../utils/figureGender';
 import { councilLog, councilWarn } from '../../council/logger';
@@ -136,10 +137,10 @@ function getVoiceForGender(
     return getGermanTechnicalVoice(cosmicVoice);
   }
 
-  // Qwen English is one voice per gender, the same rule the German path uses
-  // to reach its cloned cast. Kokoro keeps the per-voice preference.
+  // Qwen English carries its own pick per gender, kept apart from the Kokoro
+  // one so a stack switch never loses the other choice.
   if ((engineOverride ?? getEnglishEngine()) === 'qwen') {
-    return getQwenEnglishTechnicalVoice(gender);
+    return getQwenEnglishTechnicalVoice(gender, state.qwenEnglishVoices?.[gender]);
   }
 
   const prefs = state.english || state.kokoro;
@@ -166,18 +167,27 @@ export function isUsingDefaultVoice(figureId: string, language?: string): boolea
     return userVoice === GERMAN_DEFAULTS[gender as 'male' | 'female'];
   }
 
-  // Qwen English has nothing to deviate from: one voice per gender, and the
-  // pre-rendered clips were cut with it.
-  if (getEnglishEngine() === 'qwen') return true;
+  // Both English sets were pre-rendered with their gender defaults only, so
+  // anything else has to be spoken live in the picked voice.
+  if (getEnglishEngine() === 'qwen') {
+    const picked = resolveQwenEnglishVoice(state.qwenEnglishVoices?.[gender], gender);
+    return shouldUsePregeneratedGreeting('qwen', gender, picked);
+  }
 
   const prefs = state.english || state.kokoro;
   const userVoice = prefs[`${gender}Voice`] as EnglishVoice;
-  return userVoice === ENGLISH_DEFAULTS[gender as 'male' | 'female'];
+  return shouldUsePregeneratedGreeting('kokoro', gender, userVoice);
 }
 
 // ============================================
 // COUNCIL MODE: Fixed Variety
 // ============================================
+
+/** Same pool, rotated so `first` leads and the ranked order follows. */
+function leadWith(pool: readonly string[], first: string): readonly string[] {
+  if (!pool.includes(first)) return pool;
+  return [first, ...pool.filter(voice => voice !== first)];
+}
 
 /**
  * Get voices for council (fixed rotation for variety)
@@ -209,11 +219,17 @@ export function getVoicesForCouncil(
   // one in reserve.
   const englishQwen = voiceLang === 'english' && getEnglishEngine() === 'qwen';
 
+  // The Qwen rotation starts at the visitor's own pick, so the first voice a
+  // council seats is the one they hear in a one-to-one conversation.
+  const qwenPrefs = useDomainStore.getState().qwenEnglishVoices;
   const councilVoices: { male: readonly string[]; female: readonly string[] } =
     voiceLang === 'german'
       ? { male: GERMAN_VOICES.male, female: GERMAN_VOICES.female }
       : englishQwen
-        ? { male: QWEN_ENGLISH_VOICES.male, female: QWEN_ENGLISH_VOICES.female }
+        ? {
+            male: leadWith(QWEN_ENGLISH_VOICES.male, resolveQwenEnglishVoice(qwenPrefs?.male, 'male')),
+            female: leadWith(QWEN_ENGLISH_VOICES.female, resolveQwenEnglishVoice(qwenPrefs?.female, 'female'))
+          }
         : { male: ENGLISH_VOICES.male, female: ENGLISH_VOICES.female };
 
   const getTechnical: (voiceName: string) => string =
