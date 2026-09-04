@@ -27,7 +27,7 @@
     "@vitest/ui": "^4.1.8",
     "eslint": "^8.57.1",
     "eslint-plugin-react": "^7.37.5",
-    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
     "fake-indexeddb": "^6.2.5",
     "jsdom": "^30.0.1",
     "rollup": "4.60.3",
