@@ -271,6 +271,14 @@ export const performanceMonitor = new PerformanceMonitor();
 // -------------------------------------------------------
 // 10. TextChunker
 // -------------------------------------------------------
+/**
+ * Sentence-final punctuation that does not end a sentence: a one- or two-digit
+ * ordinal or day, a Roman numeral after a space, or a title abbreviation in
+ * either language. Kept short on purpose; a false merge only lengthens a chunk.
+ */
+const NON_TERMINAL_TAIL =
+  /(?:(?:^|[^\d])\d{1,2}\.|\s[IVX]{1,5}\.|\b(?:Dr|Mr|Mrs|Ms|St|Nr|Hl|Prof|ca|bzw|usw|vs|z\.B|d\.h|e\.g|i\.e)\.)$/;
+
 export class TextChunker {
   private params: ChunkParams;
   private currentBuffer: string;
@@ -471,21 +479,31 @@ export class TextChunker {
     const text = this.currentBuffer;
     const pattern = /([^.!?。！？]+[.!?。！？])([\s\n]*)/g;
 
+    // A period after a day or regnal numeral ("am 13. Mai", "Ludwig XIV. baute")
+    // or a title ("Dr. King") is not a sentence end. Such a piece waits for the
+    // next one, so the gateway sees the ordinal with the word it belongs to.
     let lastIndex = 0;
+    let pending = '';
     let match;
     while ((match = pattern.exec(text)) !== null) {
       const sentenceRaw = match[1] + match[2];
-      this.sentenceQueue.push(sentenceRaw);
+      pending += sentenceRaw;
+      if (NON_TERMINAL_TAIL.test(match[1])) {
+        continue;
+      }
+      this.sentenceQueue.push(pending);
+      pending = '';
       lastIndex = pattern.lastIndex;
     }
 
     if (flushAll) {
-      const leftover = text.slice(lastIndex);
+      const leftover = pending + text.slice(lastIndex + pending.length);
       if (leftover.trim()) {
         this.sentenceQueue.push(leftover);
       }
       this.currentBuffer = '';
     } else {
+      // Unfinished sentences, including a held non-terminal piece, stay buffered.
       this.currentBuffer = text.slice(lastIndex);
     }
   }
