@@ -16,6 +16,11 @@ updates:
       interval: "weekly"
       day: "monday"
     open-pull-requests-limit: 5
+    ignore:
+      # 6.x needs Vite 8 as its peer and imports vite/internal, which Vite 7
+      # does not ship. Lift this with the Vite 8 migration.
+      - dependency-name: "@vitejs/plugin-react"
+        update-types: ["version-update:semver-major"]
     groups:
       # Minor and patch travel together; anything major falls outside the group
       # and gets its own PR, so a breaking bump is reviewed on its own.
