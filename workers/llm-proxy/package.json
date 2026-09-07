@@ -17,7 +17,7 @@
     "@cloudflare/workers-types": "^4.20260317.1",
     "tsx": "^4.23.13",
     "typescript": "^5.8.3",
-    "wrangler": "^4.114.0"
+    "wrangler": "^4.129.0"
   },
   "pnpm": {
     "overrides": {
