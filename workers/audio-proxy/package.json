@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Audio proxy — load-aware routing + failover across 2 GEX130 servers",
   "private": true,
+  "packageManager": "pnpm@8.15.5",
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
@@ -12,7 +13,7 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260317.1",
-    "tsx": "^4.19.0",
+    "tsx": "^4.23.13",
     "typescript": "^5.8.3",
     "wrangler": "^4.114.0"
   },

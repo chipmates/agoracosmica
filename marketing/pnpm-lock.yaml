@@ -15,8 +15,8 @@ overrides:
 
 dependencies:
   '@astrojs/react':
-    specifier: ^6.0.1
-    version: 6.0.1(@types/react-dom@18.3.7)(@types/react@18.3.29)(react-dom@18.3.1)(react@18.3.1)
+    specifier: ^6.0.5
+    version: 6.0.5(@types/react-dom@18.3.7)(@types/react@18.3.29)(react-dom@18.3.1)(react@18.3.1)
   '@astrojs/sitemap':
     specifier: ^3.7.2
     version: 3.7.2
@@ -169,6 +169,19 @@ packages:
       unified: 11.0.5
     dev: false
 
+  /@astrojs/internal-helpers@0.11.0:
+    resolution: {integrity: sha512-3rzxJ+xbo0+8YyqOzLziIN32wmsHdCjEVz2sGOpRxJ+Ben/KiLph4ItxBy1abEL+E8fkRzqjg0rfXmaHJGw9JA==}
+    dependencies:
+      '@types/hast': 3.0.4
+      '@types/mdast': 4.0.4
+      js-yaml: 4.3.1
+      picomatch: 4.0.5
+      retext-smartypants: 6.2.0
+      shiki: 4.1.0
+      smol-toml: 1.6.1
+      unified: 11.0.5
+    dev: false
+
   /@astrojs/markdown-satteri@0.3.4:
     resolution: {integrity: sha512-6Lvt/bQZEBW+zzdhPblvfZEy5PGEYJaUsUqaCgwHeRPxZJL1gc9I+DRLKWJjjYTWDzVUTzXlMq4WwSK+X34CVw==}
     dependencies:
@@ -186,8 +199,8 @@ packages:
       prismjs: 1.30.0
     dev: false
 
-  /@astrojs/react@6.0.1(@types/react-dom@18.3.7)(@types/react@18.3.29)(react-dom@18.3.1)(react@18.3.1):
-    resolution: {integrity: sha512-Afs1sEm72P2plDnrOGxmIteJ7bjx/VqxlcaQLNip5eHJ5tIvKUORQetC9UKcvgwKnj51t60HWl5mOANkOsWs4w==}
+  /@astrojs/react@6.0.5(@types/react-dom@18.3.7)(@types/react@18.3.29)(react-dom@18.3.1)(react@18.3.1):
+    resolution: {integrity: sha512-LiXkrO6mLxZ4dbUcLqiuasDd24fmO776NWPJZFUwu6fKP9rmxF3lt9BGo96d2M3B4/Ayy2YYe85evn5lETnokw==}
     engines: {node: '>=22.12.0'}
     peerDependencies:
       '@types/react': ^17.0.50 || ^18.0.21 || ^19.0.0
@@ -195,7 +208,7 @@ packages:
       react: ^17.0.2 || ^18.0.0 || ^19.0.0
       react-dom: ^17.0.2 || ^18.0.0 || ^19.0.0
     dependencies:
-      '@astrojs/internal-helpers': 0.10.1
+      '@astrojs/internal-helpers': 0.11.0
       '@types/react': 18.3.29
       '@types/react-dom': 18.3.7(@types/react@18.3.29)
       '@vitejs/plugin-react': 5.2.0(vite@8.1.5)

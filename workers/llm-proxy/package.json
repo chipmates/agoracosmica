@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Free-tier LLM proxy \u2014 Cloudflare Worker \u2192 Nebius Token Factory",
   "private": true,
+  "packageManager": "pnpm@8.15.5",
   "scripts": {
     "dev": "wrangler dev",
     "typecheck": "tsc --noEmit",
@@ -14,7 +15,7 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260317.1",
-    "tsx": "^4.19.0",
+    "tsx": "^4.23.13",
     "typescript": "^5.8.3",
     "wrangler": "^4.114.0"
   },
