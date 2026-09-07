@@ -361,7 +361,7 @@ function App(): React.ReactElement {
     setTimeout(cleanupOverlays, 100);
   };
 
-  // Create router with future flags — memoized to prevent recreation on unrelated re-renders
+  // Memoized so unrelated re-renders do not rebuild the router
   const router = useMemo(() => createBrowserRouter([
     {
       path: "/",
@@ -435,16 +435,7 @@ function App(): React.ReactElement {
     // marketing homepage owns /. basename keeps React Router matching the
     // index route against location.pathname "/app" instead of bouncing to
     // the catch-all and redirecting out to the static homepage.
-    basename: "/app",
-    // Add future flags to prepare for React Router v7
-    future: {
-      // v7_startTransition: true, // Not yet in type definitions
-      v7_relativeSplatPath: true,
-      v7_fetcherPersist: true,
-      v7_normalizeFormMethod: true,
-      v7_partialHydration: true,
-      v7_skipActionErrorRevalidation: true
-    } as any // Type assertion for forward compatibility
+    basename: "/app"
   }), [isLoggedIn, showTestModal]);
 
   return <RouterProvider router={router} />;
