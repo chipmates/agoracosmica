@@ -10,6 +10,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ---
 
+## [1.3.1] - 2026-09-08
+
+### Fixed
+
+- **The council wall shows its paintings.** The public-domain oil paintings for the 55 councils shipped in August behind a build flag that defaulted off in production, so the live wall kept the July engravings. The flag now defaults on in every build.
+
+---
+
 ## [1.3.0] - 2026-09-08
 
 The free tier moved to a new model with a daily budget behind it, English got a second voice engine and a voice picker, and story chapters learned to take a question mid-listen. Around that: a safety screen that tells distress from scholarship, a hardened store for your own API key, ten public pages for what people search, and a CI that checks what ships.

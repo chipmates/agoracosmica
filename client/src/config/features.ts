@@ -103,15 +103,10 @@ export const AUDIO_LIBRARY_ENTRY: boolean =
  * July ink engravings, wherever a council has a baked pick. Councils without
  * one keep their engraving either way, so the wall is never half empty.
  *
- * On in dev, off in production builds. `VITE_COUNCIL_OILS=true` turns it on
- * for a production build, `false` forces it off anywhere.
+ * On in every build. `VITE_COUNCIL_OILS=false` forces it off anywhere.
  */
 export const COUNCIL_OILS: boolean =
-  import.meta.env.VITE_COUNCIL_OILS === 'true'
-    ? true
-    : import.meta.env.VITE_COUNCIL_OILS === 'false'
-      ? false
-      : import.meta.env.DEV;
+  import.meta.env.VITE_COUNCIL_OILS !== 'false';
 
 /**
  * The stage a carried question waits on carries a dim presence of the figure
