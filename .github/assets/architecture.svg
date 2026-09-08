@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 628" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Agora Cosmica architecture diagram. Three tiers: your browser holds all user data and the encrypted BYOK key. Cloudflare Workers act as thin proxies with no user data and no per-request logs. Backends include Nebius in the United Kingdom and Finland for the free tier, OpenRouter for BYOK inference with ZDR providers available, Hetzner GPUs in Germany for self-hosted live audio, and Cloudflare R2 in EU storage for pre-recorded media. A fourth self-host row shows the same app running from docker compose with a local LLM via Ollama, vLLM, or LM Studio, so conversations stay on your machine.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 628" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Agora Cosmica architecture diagram. Three tiers: your browser holds all user data and the encrypted BYOK key. Two Cloudflare Workers act as thin proxies with no user data and no per-request logs, next to the media CDN that serves pre-recorded audio. Backends include Nebius in the United Kingdom and Finland for the free tier, OpenRouter for BYOK inference with ZDR providers available, Hetzner GPUs in Germany for self-hosted live audio, and Cloudflare R2 in EU storage for pre-recorded media. A fourth self-host row shows the same app running from docker compose with a local LLM via Ollama, vLLM, or LM Studio, so conversations stay on your machine.">
   <defs>
     <radialGradient id="bg" cx="50%" cy="35%" r="80%">
       <stop offset="0%" stop-color="#1c2452"/>
@@ -77,7 +77,7 @@
   <g>
     <rect x="48" y="58" width="1104" height="86" rx="12" class="panel-box" stroke-width="1.5" stroke-opacity="0.9" filter="url(#lift)"/>
     <text x="76" y="92" class="label box-title">Browser</text>
-    <text x="76" y="124" class="label box-sub">React 18 · TypeScript · Vite · Zustand · IndexedDB encrypted with AES-256-GCM</text>
+    <text x="76" y="124" class="label box-sub">React 18 · TypeScript · Vite · Zustand · keys and history AES-256-GCM encrypted in IndexedDB</text>
 
     <!-- Lock badge right side -->
     <g transform="translate(1024, 75)">
@@ -99,7 +99,7 @@
 
   <!-- ===== TIER 2: EDGE ===== -->
   <!-- Each proxy spans exactly the backends it talks to -->
-  <text x="48" y="200" class="tier-label">EDGE · CLOUDFLARE WORKERS</text>
+  <text x="48" y="200" class="tier-label">EDGE · CLOUDFLARE</text>
 
   <g>
     <!-- LLM Proxy → OpenRouter + Nebius -->
@@ -114,10 +114,10 @@
     <text x="604" y="275" class="label box-sub">GPU-aware rate limits</text>
     <text x="604" y="299" class="label box-sub">Server failover</text>
 
-    <!-- Media Gateway → Cloudflare R2 -->
+    <!-- Media CDN → Cloudflare R2 -->
     <rect x="861" y="212" width="291" height="96" rx="12" class="panel-box" filter="url(#lift)"/>
-    <text x="889" y="246" class="label box-title">Media Gateway</text>
-    <text x="889" y="275" class="label box-sub">Streams pre-recorded audio</text>
+    <text x="889" y="246" class="label box-title">Media CDN</text>
+    <text x="889" y="275" class="label box-sub">Serves pre-recorded audio</text>
     <text x="889" y="299" class="label box-sub">From EU storage</text>
   </g>
 
