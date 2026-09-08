@@ -1,5 +1,5 @@
 <p align="center">
-  <img src=".github/assets/logo.svg" alt="Agora Cosmica" width="160" />
+  <img src=".github/assets/logo.svg" alt="Agora Cosmica" width="140" />
 </p>
 
 <h1 align="center">Agora Cosmica</h1>
@@ -11,110 +11,128 @@
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-AGPL--3.0-blue?style=flat-square" alt="License: AGPL-3.0" /></a>
-  <a href="#"><img src="https://img.shields.io/badge/TypeScript-strict-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript: strict" /></a>
-  <a href="docs/ACCESSIBILITY.md"><img src="https://img.shields.io/badge/WCAG-2.2%20AA-green?style=flat-square" alt="WCAG 2.2 AA" /></a>
-  <a href="docs/COMPLIANCE.md"><img src="https://img.shields.io/badge/EU-Compliant-blue?style=flat-square" alt="EU Compliant" /></a>
   <a href="https://securityheaders.com/?q=https%3A%2F%2Fagoracosmica.org&followRedirects=on"><img src="https://img.shields.io/badge/Security%20Headers-A%2B-brightgreen?style=flat-square" alt="Security Headers: A+" /></a>
   <a href="docs/SELF-HOSTING.md"><img src="https://img.shields.io/badge/Self--host-Docker-2496ED?style=flat-square&logo=docker&logoColor=white" alt="Self-host with Docker" /></a>
 </p>
 
 <p align="center">
-  <a href="https://agoracosmica.org">Live App</a> ·
-  <a href="#quick-start">Quick Start</a> ·
-  <a href="#architecture">Architecture</a> ·
-  <a href="CONTRIBUTING.md">Contribute</a> ·
+  <a href="https://agoracosmica.org">Open the library</a> ·
+  <a href="docs/TOUR.md">Tour</a> ·
+  <a href="#run-it-yourself">Quick start</a> ·
+  <a href="docs/SELF-HOSTING.md">Self-hosting</a> ·
+  <a href="CONTRIBUTING.md">Contributing</a> ·
   <a href="CHANGELOG.md">Changelog</a>
 </p>
 
-<p align="center">
-  <sub>⭐ If you find this interesting, a star is the simplest way to help us reach more people.</sub>
-</p>
-
----
-
-Agora Cosmica is a Living Library for wisdom from history. Learn from thirty figures, from Marcus Aurelius to Ada Lovelace, Rumi to Frida Kahlo, each with their own researched voice and twelve wisdom teachings. The platform pairs hundreds of pre-recorded narrative episodes and multi-figure dialogues with live AI conversation. Live speech (text-to-speech and speech-to-text) runs on our own GPU servers in Germany. [See all 30 figures →](https://agoracosmica.org/figures)
-
-30 free messages a day, no signup required. Bilingual English and German. On the path to community-driven development: anyone can vote on what gets added next, right inside the app.
+Thirty figures across 2,500 years. Each has twelve narrated chapters of their life, twelve teachings to talk through, and an Echo to talk to, even mid-chapter.
 
 <p align="center">
-  <strong>Try it, no signup: <a href="https://agoracosmica.org">agoracosmica.org</a></strong>
+  <a href="https://agoracosmica.org"><img src=".github/assets/demo.webp" alt="Agora Cosmica in use: the figure gallery, Marcus Aurelius chosen and his chapter rail, a story chapter playing, the chapter paused with a typed question and the Echo's answer, then a council of four convened" width="100%" /></a><br/>
+  <sub>Listen to a life. Pause when a question comes up. Hear the Echo answer, then pick up the story.</sub><br/>
+  <sub><a href="https://agoracosmica.org">agoracosmica.org</a>: 30 free messages a day, no account, English or German.</sub>
 </p>
+
+The figures run from Laozi to Martin Luther King Jr. The voice that answers is an AI Echo, an interpretation grounded in primary works and historical context, and the app labels it as one throughout. A factcheck per figure separates what is documented from what is recreated.
+
+---
+
+## One figure, six formats
+
+Everything orbits one figure at a time. Pick Marcus Aurelius and there are six ways to spend an evening with him. Four chapters build on each other (receive, explore, connect, prove), and two open formats sit beside them.
+
+| Format | What happens | Type |
+|---|---|---|
+| Story | A chapter of the figure's life, narrated, about 13 minutes, text alongside | Recorded |
+| Wisdom | You talk through one teaching with the Echo | Live |
+| Prism | The figure works through the same teaching with three other thinkers | Recorded |
+| Quest | A Socratic test of what you took from the teaching | Live |
+| Free Talk | Open conversation, typed or spoken | Live |
+| Council | Four figures on one question: a moderator and three voices, at two depth levels | Recorded |
+
+That is 360 story chapters, 360 teachings, 360 prism dialogues and 110 council recordings on 55 questions in each language. The stories, prisms and councils all come with audio, and the stories alone run 79 hours in English and 86 in German. [See all thirty figures](https://agoracosmica.org/figures) or [browse the audio library](https://agoracosmica.org/audio/).
+
+<details>
+<summary>The thirty, roughly in order of birth</summary>
+
+Laozi, Siddhartha Gautama, Plato, Marcus Aurelius, Hildegard von Bingen, Dōgen Zenji, Rumi, Meister Eckhart, Leonardo da Vinci, Galileo Galilei, William Shakespeare, Johann Wolfgang von Goethe, Wolfgang Amadeus Mozart, William Blake, Jane Austen, Arthur Schopenhauer, Ada Lovelace, Harriet Tubman, Emily Dickinson, Friedrich Nietzsche, Mohandas Gandhi, Carl Gustav Jung, Albert Einstein, Virginia Woolf, Joseph Campbell, Frida Kahlo, Simone de Beauvoir, Nelson Mandela, Maya Angelou, Martin Luther King Jr.
+
+</details>
+
+Hear the live Echo voices, Qwen3-TTS on our own speech servers:
+
+| English | German |
+|---|---|
+| [Shakespeare's Echo voice](.github/assets/audio/echo-shakespeare-en.mp3) | [Nietzsche's Echo voice](.github/assets/audio/echo-nietzsche-de.mp3) |
+| [Ada Lovelace's Echo voice](.github/assets/audio/echo-lovelace-en.mp3) | [Hildegard von Bingen's Echo voice](.github/assets/audio/echo-hildegard-de.mp3) |
+
+---
+
+## Ask while you listen
+
+Pause a chapter and one line appears under the player: ask him something. Type it or say it. The answer comes back in the same Echo voice, built from what you have heard so far, and the chapter picks up a breath before the second you stopped it. If the exchange is going somewhere, carry it on as Free Talk.
 
 <p align="center">
-  <a href="https://agoracosmica.org"><img src=".github/assets/demo.webp" alt="Agora Cosmica in action: choose a figure, move through Story and Wisdom, listen to a narrated chapter, and convene a council of four" width="100%" /></a>
+  <img src=".github/assets/tour/06-ask-while-listening.webp" alt="A story chapter paused, a typed question in the ask bar under the player, and the Echo's answer as text" width="100%" /><br/>
+  <sub>Pause a chapter, ask the figure, hear the Echo answer, and the chapter picks up where it stopped.</sub>
 </p>
+
+New in [1.3.0](CHANGELOG.md), along with an English voice engine choice: Qwen3-TTS or Kokoro, five voices per gender each.
+
+---
+
+## What's documented, what's recreated
 
 <p align="center">
-  <sub>🔊 <strong>Hear the self-hosted Echo voices</strong> (AI Echoes, about 10 seconds each)</sub><br/>
-  <sub>German, Qwen3-TTS: <a href=".github/assets/audio/echo-nietzsche-de.mp3">Nietzsche (Solaris)</a> · <a href=".github/assets/audio/echo-hildegard-de.mp3">Hildegard von Bingen (Lyra)</a></sub><br/>
-  <sub>English, Kokoro: <a href=".github/assets/audio/echo-shakespeare-en.mp3">Shakespeare (Orion blend)</a> · <a href=".github/assets/audio/echo-lovelace-en.mp3">Ada Lovelace (Stella)</a></sub>
+  <img src=".github/assets/tour/11-facts.webp" alt="The facts panel for a story chapter: the date and place, what is documented, what is recreated, and the sources one tap away" width="100%" /><br/>
+  <sub>For every chapter: what the record supports, what was written for the story, and the sources one tap away.</sub>
 </p>
 
----
+Every figure is an AI Echo, and the app says so where it counts: on the welcome screen, in the name on every figure, and in the `X-AI-Generated` header on every API response. [Why we call them Echoes](docs/WHY-ECHOES.md) takes the hardest question about the project seriously: whether it is right to put words in the mouths of people who cannot consent.
 
-## How it works
+The browser screens what you type, and the edge screens it again before it reaches a model. Self-harm screening runs in tiers: if someone writes about their own distress, the turn stops and crisis resources appear, while a question about the Stoics or Virginia Woolf gets an answer. Jailbreak patterns are blocked, and you get a warning before you send an email address or a phone number. [Content safety](docs/CONTENT-SAFETY.md) lists the layers, and [the crisis protocol](docs/CRISIS-PROTOCOL.md) says what triggers what.
 
-Each interaction in Agora Cosmica orbits one figure. The four educational chapters (Story, Wisdom, Prism, Quest) form a learning arc informed by education research (Kolb's experiential cycle, Bloom's taxonomy, retrieval practice): receive, explore, connect, prove. Each chapter prepares the next. Free Talk and Council sit alongside as open-ended formats.
-
-**[Take a tour →](docs/TOUR.md)**
+The interface targets WCAG 2.2 AA: keyboard paths, screen reader labels, 44 px touch targets. The touch-target check runs in development, with no CI gate for it yet. [Accessibility](docs/ACCESSIBILITY.md) has the rest.
 
 ---
 
-## Explore the library
+## What the code does with your data
 
-Every public page reads without an account.
+You enter with one click on a consent screen (16 or older, and the terms). There is no account. Conversation history, your profile and any API key you add live in IndexedDB in your browser, encrypted at rest with AES-256-GCM. The API key sits under a device key the browser marks non-extractable: a script on the page can use it and cannot read it out. [The threat model](docs/THREAT-MODEL.md) says what that protects against and what it does not.
 
-- [Marcus Aurelius](https://agoracosmica.org/figures/marcus-aurelius/): his life in twelve chapters, plus the Stoic teachings behind it
-- [Meister Eckhart](https://agoracosmica.org/figures/meister-eckhart/): detachment, letting go, and the ground of the soul
-- [What is the meaning of life?](https://agoracosmica.org/themes/meaning-purpose/): four answers, set against each other
-- [Stoicism](https://agoracosmica.org/stoicism/): what it is and how people practice it
-- [The hero's journey](https://agoracosmica.org/the-heros-journey/): the pattern Joseph Campbell traced across world myths
-- [Audio library](https://agoracosmica.org/audio/): 360 narrated chapters and 55 debates, every voice an AI Echo
-- [Mark Aurel](https://agoracosmica.org/de/figures/marcus-aurelius/): the same figure page in German
+The free tier is 30 messages a day per device. They pass through a Cloudflare Worker to DeepSeek V4 Pro at Nebius in the United Kingdom, with Qwen3-235B in Finland as the fallback when the day's shared budget is spent, the primary errors, or the first token takes longer than five seconds. Each reply names the model that answered. Every free reply costs us money at a provider, which is why the day has a budget behind it. The worker keeps no per-request log. With your own OpenRouter key, requests go from your browser to OpenRouter directly, pinned to one model with zero data retention on by default, and the key never reaches us.
 
----
+Live speech runs on Qwen3-TTS for English and German on our own GPU servers in Germany, with faster-whisper for speech-to-text. The recorded catalog is served from Cloudflare R2 in Western Europe.
 
-## Features
+What we count is aggregate, with no user dimension and no key that joins two rows. The only cookies on the site are Cloudflare's bot-detection ones. One exception, named up front: visitors from our free nonprofit Google Ad Grants ads carry a click id, and if they opt in (off by default, revocable in Settings) the worker forwards it to Google Ads at a conversion step. It never enters our own counters. [What we measure](docs/MEASUREMENT.md) lists every counter, [Security architecture](docs/SECURITY-ARCHITECTURE.md) the data flows and subprocessors, [Compliance](docs/COMPLIANCE.md) the GDPR, EU AI Act Article 50 and youth protection (JMStV, 16+) posture. All of it is checkable against the code in this repository, which is the reason the code is public.
 
-**Content**
-- **Six ways to engage**: 4 educational chapters (Story, Wisdom, Prism, Quest) plus Free Talk and Council. [How they work](docs/CHAPTERS.md)
-- **Crafted catalog**: 360 stories, 360 prism dialogues, 110 four-figure council debates (55 questions, two depth levels each), all with time-synced audio.
-- **30 figures · 12 teachings each**: 360 wisdom teachings spanning 2,500 years of human thought. [Browse the figures](https://agoracosmica.org/figures)
-- **Fully bilingual**: English and German across all content, UI, and audio.
+<p align="center">
+  <img src=".github/assets/architecture.svg" alt="Architecture: your device keeps your keys and history in IndexedDB, encrypted with AES-256-GCM. Cloudflare Workers act as thin proxies for chat and audio, with no per-request logs and no user data at rest, next to the media CDN that serves pre-recorded audio from EU storage. Backends: OpenRouter for your own key, Nebius in the United Kingdom and Finland for the free tier, Hetzner GPUs in Germany for live audio, Cloudflare R2 for pre-recorded audio. Or self-host with docker compose and your own LLM." width="100%" />
+</p>
 
-**Honest by design**
-- **Echo framing**: every figure is presented as an AI Echo (an AI-rendered portrayal), never claimed to be a real recording or to speak for the actual person. [Why we call them Echoes](docs/WHY-ECHOES.md)
-- **Factcheck transparency**: each figure has a per-figure factcheck listing what's historically verified versus what's recreated for narrative.
-- **Open source under AGPL-3.0**: the privacy and architecture claims are verifiable by reading the code.
-- **Built on learning science**: the 4-chapter arc is informed by Kolb's experiential cycle, Bloom's taxonomy, and retrieval practice.
+<details>
+<summary>Every route, and every limit</summary>
 
-**Privacy by design**
-- **BYOK encryption**: bring your own OpenRouter key, encrypted in your browser with AES-256-GCM under a device key the browser will not hand back to any script, never stored on our servers. [What that protects](docs/THREAT-MODEL.md)
-- **Free tier without signup**: 30 messages a day via our Cloudflare Worker, no account required.
-- **No behavioral tracking**: no tracking cookies, no third-party analytics, no per-request access logs of our own, no IP retention in analytics, no cross-session profiles. We do collect anonymous aggregate counters to keep the service running and improve it. [docs/MEASUREMENT.md](docs/MEASUREMENT.md) lists exactly what gets counted, what never does, and the one exception we name upfront: for visitors who arrive from one of our free nonprofit Google Ad Grants ads and opt in, we forward the Google click ID (gclid) to Google Ads so that ad can be credited with the visit.
-- **Self-hosted speech**: live text-to-speech and speech-to-text run on our own GPU servers in Germany.
-- **EU-first hosting**: live audio in Germany, pre-recorded audio on Cloudflare R2.
+| Your setup | Where the request goes |
+|---|---|
+| Hosted free tier | Browser, through our Cloudflare Worker, to Nebius: DeepSeek V4 Pro in the United Kingdom, Qwen3-235B in Finland as the fallback |
+| Your own OpenRouter key | Browser directly to OpenRouter, pinned to Qwen3 235B, zero data retention on by default, our worker outside the path |
+| Local Mode | An OpenAI-compatible endpoint you run, set in Settings, with local speech set up separately |
 
-**Built for everyone**
-- **WCAG 2.2 AA**: keyboard navigation, screen reader support, 44 px touch targets. [Accessibility](docs/ACCESSIBILITY.md)
-- **Content safety**: pattern screening in the browser and at the edge, crisis resources, jailbreak detection, and a PII warning before you send. [Safety](docs/CONTENT-SAFETY.md), [Crisis protocol](docs/CRISIS-PROTOCOL.md)
-- **EU compliance**: GDPR, EU AI Act Article 50, German youth protection (JMStV). [Compliance](docs/COMPLIANCE.md)
+| Limit | Allowance |
+|---|---|
+| Chat, per device identity | 30 messages a day |
+| Chat, per hashed address | 300 requests a day |
+| Chat, shared across everyone | 15,000 requests a day |
+| Custom councils and conversation summaries, per identity | 1 and 2 a day |
+| Session tokens, per address | 120 an hour, each valid for ten minutes |
+
+The fallback model answers in three cases: the day's inference budget is spent, the primary model errors, or the first token has not arrived after five seconds. The budget counts real provider token usage and rolls over at midnight in Berlin. Every number here is in [`workers/llm-proxy/src/config.ts`](workers/llm-proxy/src/config.ts).
+
+</details>
 
 ---
 
-## Who can use this, and how?
-
-Most people just visit **[agoracosmica.org](https://agoracosmica.org)**: free, no signup, 30 messages a day. This repository is for **auditing the privacy claims** by reading the code, **contributing** (translations, bug fixes, accessibility), or **running a local copy** for personal study.
-
-**Star the repo** to follow privacy-first AI architecture, self-hosted speech tooling, ethical historical-character AI design, and nonprofit alternatives to engagement-driven AI products.
-
-**Two licenses, one project.** Code is **[AGPL-3.0](LICENSE)** (fork freely, copyleft applies to public network deployments). Content (stories, voices, factchecks, artwork) is **© ChipMates gemeinnützige GmbH** at launch, transitioning to **CC-BY 4.0 within 6 to 12 months**. See [CONTENT-LICENSE.md](CONTENT-LICENSE.md) for full terms.
-
-**Schools and universities** are welcome to use Agora Cosmica with their students. For **self-hosting on your own infrastructure**, `docker compose up` and you're running. See [SELF-HOSTING.md](docs/SELF-HOSTING.md) for the five-minute guide.
-
----
-
-## Quick Start
+## Run it yourself
 
 ```bash
 git clone https://github.com/chipmates/agoracosmica.git
@@ -122,53 +140,32 @@ cd agoracosmica/client
 pnpm install && pnpm setup:assets && pnpm dev
 ```
 
-Boots the React app at [localhost:5173](http://localhost:5173). UI and static content load against the production CDN. Live AI chat and audio require running the workers locally or pointing them at production via env vars. See [CONTRIBUTING.md](CONTRIBUTING.md) for the full setup.
+**Node.js 22 and pnpm 8.15.5**, both pinned. The app comes up on [localhost:5173](http://localhost:5173). The content (stories, prisms, factchecks, voice profiles) is fetched from the production CDN at setup and stays out of the repository under the content licence below. [CONTRIBUTING.md](CONTRIBUTING.md) has the rest of the setup and the pre-PR checks.
 
-**Requirements**: Node.js 20+, pnpm 8+.
+```bash
+git clone https://github.com/chipmates/agoracosmica.git
+cd agoracosmica
+docker compose up -d
+```
 
-**Or run everything locally:** Local Mode (v1.1.1) lets you point the app at any OpenAI-compatible LLM endpoint (LM Studio, Ollama, vLLM) and runs the audio stack (Kokoro EN, Qwen3-TTS DE, Whisper STT) in our published docker images. With both Local Mode and docker self-host, no conversation, voice, or text data leaves your machine. See [SELF-HOSTING.md](docs/SELF-HOSTING.md#3-add-a-local-llm-optional).
-
----
-
-## Architecture
-
-Your data stays in your browser. Cloudflare Workers act as thin proxies (rate limiting, safety screening, load routing) and hold no user data or per-request logs. LLM inference uses Qwen3 235B for everyone. The free tier runs on Nebius, the primary model in the United Kingdom under the EU adequacy decision and the fallback model in Finland. With your own OpenRouter key, requests are auto-routed to the best available provider with zero data retention enabled by default (configurable in settings). Live speech runs on our own GPU servers in Germany: Kokoro TTS for English, F5 and Qwen3-TTS for German, Faster-Whisper for speech-to-text. Pre-recorded audio is stored on Cloudflare R2 in the EU (Western Europe) and served via global CDN.
-
-<p align="center">
-  <img src=".github/assets/architecture.svg" alt="Agora Cosmica architecture: browser holds all user data, Cloudflare Workers act as thin proxies, backends include Nebius in the United Kingdom and Finland, OpenRouter for BYOK, Hetzner GPUs in Germany for live audio, and Cloudflare R2 for pre-recorded media" width="100%" />
-</p>
-
-[Security architecture](docs/SECURITY-ARCHITECTURE.md) · [Self-hosting guide](docs/SELF-HOSTING.md)
+The app on port 8080, with Kokoro for English speech and Whisper for transcription beside it. `--profile nvidia` adds Qwen3-TTS for German, and a script does the same natively on Apple Silicon. Chat needs your own OpenRouter key or a local model: point Local Mode at any OpenAI-compatible endpoint you run (LM Studio, Ollama, vLLM, llama.cpp) and the conversation stays on your machine. Two limits before you start: self-hosted English speech is Kokoro only, since there is no English Qwen3-TTS image yet, and **the browser still fetches the catalog from our CDN unless you mirror it.** [Self-hosting guide](docs/SELF-HOSTING.md).
 
 ---
 
-## Built by a German nonprofit
+## Where to start
 
-Agora Cosmica is built by ChipMates gemeinnützige GmbH, a German nonprofit. Charitable status means we answer to a public-benefit mission, not investors. Every cent goes back into making wisdom accessible.
+Never used it: [agoracosmica.org](https://agoracosmica.org). Nothing to install.
 
----
+Checking the claims: every free-tier number above is in `workers/llm-proxy/src/config.ts`, [the security architecture](docs/SECURITY-ARCHITECTURE.md) maps every data flow, and this is the code that runs in production.
 
-## Contributing
+Helping: the [good first issues](https://github.com/chipmates/agoracosmica/labels/good%20first%20issue) are open, around accessible names and unit tests. Translators want `ui-en.json` and its German twin in `client/src/assets/translations/`, and a change to one lands in both. A historian who finds an error in a factcheck can open an issue with the source. Teachers who want a chapter and its factcheck in class can write to us with the intended use, since the content needs permission to redistribute until it moves to CC-BY. Questions go in [Discussions](https://github.com/chipmates/agoracosmica/discussions). Inside the app, a Community panel already counts voting power from the teachings you complete, and voting itself opens later.
 
-We welcome contributions from developers, translators, historians, and philosophers. Non-technical contributors can shape the roadmap through the Community panel inside the app, no GitHub account needed.
-
-[Contributing Guide](CONTRIBUTING.md) · [Code of Conduct](CODE_OF_CONDUCT.md) · [Security Policy](SECURITY.md)
+[Contributing guide](CONTRIBUTING.md) · [Code of conduct](CODE_OF_CONDUCT.md) · [Security policy](SECURITY.md), for vulnerabilities
 
 ---
 
-## Building this with you
+## Who runs it
 
-We're early in this journey and we'll make mistakes. When we oversimplify, misrepresent, or miss the mark, tell us at **agoracosmica@chipmates.ai**. We're not building for you, but with you.
+ChipMates gemeinnützige GmbH, a registered German nonprofit: a limited company bound to a charitable purpose under German tax law, with one project, this one. When we oversimplify a figure or misread a source, write to [agoracosmica@chipmates.ai](mailto:agoracosmica@chipmates.ai).
 
----
-
-## License
-
-- **Code**: [AGPL-3.0](LICENSE). Copyleft applies to network deployments.
-- **Content**: © ChipMates gemeinnützige GmbH at launch, transitioning to CC-BY 4.0 within 6 to 12 months. See [CONTENT-LICENSE.md](CONTENT-LICENSE.md).
-
----
-
-<p align="center">
-  <em>Nonprofit · Open Source · No tracking cookies, no profiling</em>
-</p>
+Code is [AGPL-3.0](LICENSE). Copyleft applies to network deployments. Content (stories, prism dialogues, council debates, factchecks, voice profiles, instruction prompts, images, audio) is copyright ChipMates gemeinnützige GmbH at launch and moves to CC-BY 4.0 within 6 to 12 months of the May 2026 launch. [CONTENT-LICENSE.md](CONTENT-LICENSE.md) has the terms and the attribution format.
