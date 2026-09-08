@@ -1,73 +1,62 @@
-# Security Policy
+# Security policy
 
-We take the security of Agora Cosmica seriously. This document explains how to
-report vulnerabilities, what we commit to in return, and what is in scope.
+This page is for anyone who finds a flaw in Agora Cosmica. It says where to send it, what happens next, what is in scope, and which reports we already know about. If you came instead to check the product's claims against the code, [the security architecture](docs/SECURITY-ARCHITECTURE.md) has the data flows and subprocessors, and [the threat model](docs/THREAT-MODEL.md) has the browser side in detail.
 
 If you are a security researcher: thank you. We rely on people like you.
 
 ---
 
-## Reporting a Vulnerability
+## Reporting a vulnerability
 
-**Please do not report security issues via public GitHub issues, discussions, or
-social media.** Quiet first, public later.
+Please do not report security issues through public GitHub issues, discussions, or social media. Quiet first, public later.
 
-**Preferred channels** (either works):
+Either channel works:
 
-- **GitHub Security Advisory** (private, recommended): [open one here](https://github.com/chipmates/agoracosmica/security/advisories/new)
+- **GitHub Security Advisory**, the private channel we prefer: [open one here](https://github.com/chipmates/agoracosmica/security/advisories/new)
 - **Email**: [security@chipmates.ai](mailto:security@chipmates.ai)
 
-Include where possible: a description, reproduction steps, the affected URL or
-file, and the impact you observed. Proof-of-concept code is welcome but optional.
-Encrypted email is fine but not required for initial contact.
+Include what you have: a description, reproduction steps, the affected URL or file, and the impact you observed. Proof-of-concept code is welcome and optional. Encrypted email is fine and not required for first contact.
 
 ---
 
-## Response Commitment
+## Response commitment
 
 | Stage | Timeline |
 |---|---|
-| Acknowledgment of receipt | within **48 hours** |
-| Initial severity assessment | within **7 days** |
-| Fix shipped (Critical / High) | within **30 days** |
-| Fix shipped (Medium / Low) | within **90 days** |
-| Coordinated public disclosure | **90 days** from report, or sooner if a fix is live and you agree |
+| Acknowledgment of receipt | within 48 hours |
+| Initial severity assessment | within 7 days |
+| Fix shipped (critical or high) | within 30 days |
+| Fix shipped (medium or low) | within 90 days |
+| Coordinated public disclosure | 90 days from the report, or sooner if a fix is live and you agree |
 
-We are a small nonprofit team. If we are going to miss a window, we will tell
-you why and propose a new one.
+We are a small nonprofit team. If we are going to miss a window, we say why and propose a new one.
+
+A report usually runs like this:
+
+```
+Day 0         You report (GitHub Security Advisory or email)
+Day 0 to 2    We acknowledge receipt and open a private tracking issue
+Day 2 to 9    We reproduce, assess severity, and confirm scope
+Day 9 to 39   We ship a fix to production (critical or high)
+Day 9 to 99   We ship a fix to production (medium or low)
+By day 90     Coordinated public disclosure, with credit
+```
+
+We may ask for an embargo extension on a complex issue. We will never extend one silently or on our own.
 
 ---
 
-## Disclosure Timeline
+## Safe harbor
 
-A typical report flows like this:
+We support good-faith security research and will not pursue legal action against researchers who:
 
-```
-Day 0       You report (GitHub Security Advisory or email)
-Day 0–2     We acknowledge receipt and open a private tracking issue
-Day 2–9     We reproduce, assess severity, and confirm scope
-Day 9–39    We ship a fix to production (Critical / High)
-Day 9–99    We ship a fix to production (Medium / Low)
-Day ≤90     Coordinated public disclosure with credit
-```
-
-We may request an embargo extension for complex issues. We will never extend
-silently or unilaterally.
-
----
-
-## Safe Harbor
-
-We support good-faith security research. We will not pursue legal action against
-researchers who:
-
-- Make a good-faith effort to avoid privacy violations, data destruction, or service degradation
+- Make a good-faith effort to avoid privacy violations, data destruction, and service degradation
 - Only interact with accounts they own or have explicit permission to access
-- Do not exfiltrate data beyond the minimum needed to demonstrate the issue
+- Take no more data than a demonstration of the issue needs
 - Give us reasonable time to investigate and fix before public disclosure
-- Do not exploit findings beyond demonstration
+- Stop at demonstration
 
-This policy is aligned with [disclose.io](https://disclose.io) Core Terms.
+This policy follows the [disclose.io](https://disclose.io) core terms.
 
 ---
 
@@ -75,120 +64,105 @@ This policy is aligned with [disclose.io](https://disclose.io) Core Terms.
 
 ### In scope
 
-- Source code in this repository (AGPL-3.0, public)
-- `agoracosmica.org` and subdomains
-- API endpoints under `*.agoracosmica.org` (LLM proxy, audio proxy, media gateway)
-- Self-hosted audio at `fsn1.agoracosmica.org` and `nbg1.agoracosmica.org`
+- The source code in this repository (AGPL-3.0)
+- `agoracosmica.org` and its subdomains
+- The API endpoints under `*.agoracosmica.org`: the LLM proxy, the audio proxy, the media gateway
+- The speech servers at `fsn1.agoracosmica.org` and `nbg1.agoracosmica.org`
 
 ### Out of scope
 
 - **Third-party services.** Report to Cloudflare, Nebius, OpenRouter, or Hetzner directly.
-- **Vulnerabilities in dependencies.** Report upstream. We will bump on disclosure.
-- **Availability testing.** Do not perform any testing (DoS, DDoS, fuzzing at scale, brute-force) that may degrade service for other users.
-- **Social engineering** of staff, partners, or users.
-- **Physical attacks** on our infrastructure.
-- **AI hallucination or factual errors** in responses. We treat these as content quality, not security.
-- **Issues requiring browser compromise** (extensions, malware, MITM below TLS).
+- **Vulnerabilities in dependencies.** Report upstream. We bump on disclosure.
+- **Availability testing.** No DoS, DDoS, fuzzing at scale, or brute force. It degrades the service for everyone else on it.
+- **Social engineering** of the team, of partners, or of users.
+- **Physical attacks** on infrastructure.
+- **Hallucination and factual errors** in a figure's answers. We treat those as content quality. A normal issue is the right place for them.
+- **Findings that need a compromised browser** (extensions, malware, interception below TLS).
 
-### Common false positives (not security issues)
+### Reports we close as informational
 
-To save you time, these are the recurring reports we close as informational:
+To save you time, these are the recurring ones:
 
-- **Missing security headers on static asset endpoints** where another header (CSP, X-Content-Type-Options) already provides the relevant protection.
-- **Email server configuration** (SPF, DKIM, DMARC) on transactional addresses that do not send mail.
-- **`agoracosmica.org` resolving to a Cloudflare IP.** This is intentional. Origin IPs are protected.
-- **Rate-limit window bypass via different identifiers.** Our rate limit is per-identity (UUID), and refreshing the identity is intended user behavior. The wallet-level global cap is the backstop.
-- **`X-Powered-By` or framework fingerprinting.** Not considered a vulnerability on its own.
-- **Self-XSS** that requires the user to paste attacker-supplied JavaScript into their own console.
+- **Missing security headers on static asset endpoints**, where another header already provides the protection that matters there.
+- **Email configuration (SPF, DKIM, DMARC)** on addresses that send no mail.
+- **`agoracosmica.org` resolving to a Cloudflare address.** That is intentional. Origin addresses stay behind it.
+- **Resetting the daily quota by rotating an identifier.** The chat quota is keyed to a UUID the browser holds, so clearing it does start a fresh counter. Two ceilings sit behind that: a daily cap per hashed address, and an hourly cap on how fast one address can mint sessions. A global daily cap is the backstop.
+- **`X-Powered-By` or framework fingerprinting** on its own.
+- **Self-XSS** that needs someone to paste attacker-supplied JavaScript into their own console.
 
 ---
 
-## Threat Model
+## What we defend
 
-We design to protect against:
+- **Confidentiality of your data.** A bring-your-own-key API key is encrypted at rest in your browser and travels only to OpenRouter. Conversations stay in your browser. Free-tier messages pass through our proxy over TLS on their way to the inference provider, and are neither logged nor stored there.
+- **Integrity of model output.** Output is sanitized on every render path, and the response stream is scanned as it passes through.
+- **Availability of the free tier.** Rate limits per identity, per address and across everyone, content screening before a message reaches a model, and a daily inference budget behind the whole thing.
+- **Identifiability.** No accounts, no email, no name. The free-tier identity is a UUID your own browser generates, and addresses are hashed with a salt before anything is written down.
 
-- **Confidentiality** of your data: BYOK API keys are encrypted at rest and never transit our servers. Conversations stay in your browser and are never stored on our servers (free-tier messages pass through our proxy over TLS to reach the AI provider, never logged or stored there)
-- **Integrity** of LLM responses (output sanitization, prompt-injection screening)
-- **Availability** of the free tier (rate limits, content safety pre-filtering)
-- **Identifiability** of users (no PII collection, no IP tracking, hashed device identifiers only)
+## What we do not defend against
 
-We explicitly do **not** defend against:
+- Browser-level compromise, such as an extension reading IndexedDB
+- Device theft. The data lives on your device. That is the design.
+- Network surveillance below TLS
+- Hallucination. Figure guardrails and factchecks reduce it. We do not claim immunity.
 
-- Browser-level compromise (extensions reading IndexedDB)
-- Device theft. Data lives on your device. That is the design.
-- Network-level surveillance *below* TLS
-- AI hallucination. We minimize via figure guardrails and fact-checks, but do not claim immunity.
+[The threat model](docs/THREAT-MODEL.md) works the first of those through in detail, including what a non-extractable key does and does not buy.
 
 ---
 
 ## Recognition
 
-We credit reporters in release notes and in the **Acknowledgments** section
-below, unless you prefer to remain anonymous.
+We credit reporters in release notes and in the acknowledgments below, unless you would rather stay anonymous.
 
-As a nonprofit, we do not currently offer a paid bug bounty. We can offer:
-
-- Public credit (if you want it)
-- A signed letter of acknowledgment for your portfolio
-- A small thank-you (stickers, swag), which we are working on
+As a nonprofit we run no paid bug bounty. What we can offer is public credit if you want it, a signed letter of acknowledgment for your portfolio, and a small thank-you in the post.
 
 ---
 
-## Security Posture
+## Security posture
 
-### What we do (technical summary)
+A summary. [The security architecture](docs/SECURITY-ARCHITECTURE.md) has the full version, and all of it is checkable against the code in this repository.
 
-- **At-rest encryption.** AES-256-GCM with PBKDF2-HMAC-SHA256 (600k iterations desktop, 100k mobile) for API keys in IndexedDB.
-- **In-transit.** TLS-only, HSTS with `includeSubDomains`.
-- **Browser hardening.** Strict CSP (no `unsafe-eval`, `frame-ancestors 'none'`, `object-src 'none'`), full security header set.
-- **Authentication.** HMAC-SHA256 JWT with strict alg validation, **UUID-bound subjects** (per-client identity in localStorage), Turnstile-gated issuance.
-- **BYOK isolation.** Your OpenRouter API key transits browser to OpenRouter directly. It never touches our servers.
-- **Output safety.** DOMPurify sanitization on every LLM render path, with strict tag and attribute allowlists.
-- **Prompt-injection defense.** Multi-layer screening pre-LLM-call (jailbreak detection, system-prompt-extraction patterns, harmful content).
-- **Rate limiting.** **Per-identity (UUID-based) for the chat quota, KV-backed 24-hour windows**, plus a global wallet-level daily cap. Short-lived plain-IP keys (1-hour TTL) exist only as flood brakes on the anonymous beacon and conversion routes and never enter analytics.
-- **Edge auth on origins.** Two-token defense (X-Origin-Verify Worker secret + X-Admin-Token) on FSN1+NBG1 nginx. Protects against direct-to-origin abuse with leaked bearers.
-- **Data residency.** Hetzner (Germany, Falkenstein and Nürnberg) for audio, Cloudflare for the edge, Nebius for free-tier inference: the primary model in the United Kingdom under the EU adequacy decision, the fallback model in Finland.
-- **Zero Data Retention.** Verified by daily cron audits. No conversation, audio, or text is persisted server-side.
-- **No per-request server logging.** Diagnostic windows are bounded and wiped after. Standing nginx access-log capture is disabled in production. Aligned with our aggregate-only, no-profiling posture: event counters carry no per-user dimension. The one named exception, the opt-in gclid forward for ad arrivals, never enters analytics; see [docs/MEASUREMENT.md](docs/MEASUREMENT.md).
-- **Access control on staging.** All non-production URLs are gated by Cloudflare Access.
-
-For the full architecture: [docs/SECURITY-ARCHITECTURE.md](docs/SECURITY-ARCHITECTURE.md).
+- **At-rest encryption.** The API key is encrypted with AES-256-GCM under a device key the browser marks non-extractable, so a script on the page can use it and cannot read it out. Conversation history and the local profile are encrypted with AES-256-GCM under a key derived with PBKDF2-HMAC-SHA256 (600,000 iterations) from a device secret in the same database.
+- **In transit.** TLS only, HSTS with `includeSubDomains`.
+- **Browser hardening.** A strict Content Security Policy (no `unsafe-eval`, no blanket `unsafe-inline` for scripts, `frame-ancestors` and `object-src` set to `none`) and the full response header set.
+- **Authentication.** HMAC-SHA256 JWT with strict `alg` validation. The subject is a UUID the browser generates, which keeps people behind one shared address in separate quotas, and the token is issued only after a Cloudflare Turnstile check and lives ten minutes.
+- **Key isolation.** A bring-your-own OpenRouter key goes from the browser to OpenRouter directly. Our workers are not on that path.
+- **Output safety.** DOMPurify on every path that renders model output, with strict tag and attribute allowlists.
+- **Prompt-injection defense.** Layered screening before the call reaches a model: jailbreak patterns, system-prompt extraction, unicode obfuscation, harmful content.
+- **Rate limiting.** 30 messages a day per identity, 300 chat requests a day per hashed address, and 15,000 a day across everyone, all in KV counters on a 24-hour window. Session mints are capped at 120 per address per hour. Short-lived plain-address keys (one-hour TTL) exist only as flood brakes on the anonymous beacon and conversion routes, and never enter analytics.
+- **Spend governor.** Free-tier inference runs under a daily budget counted from real provider token usage. Above the cap the worker serves the unmetered fallback model for the rest of the day, so a spent budget shows up as a change of model.
+- **Edge auth on the origins.** The two speech servers require both an `X-Origin-Verify` secret stamped by the worker and an operator token, so a leaked bearer alone does not reach the origin.
+- **Data residency.** Cloudflare at the edge, Cloudflare R2 in Western Europe for recorded audio, Hetzner in Germany (Falkenstein and Nürnberg) for live speech, Nebius for free-tier inference: the primary model in the United Kingdom under the EU adequacy decision, the fallback in Finland.
+- **Zero data retention.** A daily cron audit on the speech servers verifies that no conversation, audio, or text is kept past its serving window.
+- **No per-request server logging.** Diagnostic windows are bounded and wiped afterwards, and standing nginx access-log capture is off in production. Event counters carry no per-user dimension. The one named exception, the opt-in forward of a Google ad click id, never enters our own counters. [What we measure](docs/MEASUREMENT.md) lists every one of them.
+- **Access control on staging.** Every non-production URL sits behind Cloudflare Access.
 
 ### External validation
 
 Independent third-party scanners. Run them any time:
 
-- **[SecurityHeaders.com](https://securityheaders.com/?q=https%3A%2F%2Fagoracosmica.org&followRedirects=on)** · HTTP security headers (CSP, HSTS, etc.). Currently **A+**.
-- **[SSL Labs](https://www.ssllabs.com/ssltest/analyze.html?d=agoracosmica.org)** · TLS configuration. Currently **A+**.
-- **[Mozilla Observatory](https://observatory.mozilla.org/analyze/agoracosmica.org)** · web security scan.
-- **[Hardenize](https://hardenize.com/report/agoracosmica.org)** · DNS, email, TLS depth audit.
+- **[SecurityHeaders.com](https://securityheaders.com/?q=https%3A%2F%2Fagoracosmica.org&followRedirects=on)**, the HTTP security header set. A+ as of September 2026.
+- **[SSL Labs](https://www.ssllabs.com/ssltest/analyze.html?d=agoracosmica.org)**, the TLS configuration.
+- **[MDN Observatory](https://developer.mozilla.org/en-US/observatory/analyze?host=agoracosmica.org)**, a general web security scan.
+- **[Hardenize](https://hardenize.com/report/agoracosmica.org)**, DNS, email and TLS in depth.
 
 ### Audit transparency
 
-This codebase is open source under AGPL-3.0. Anyone can audit it. We have not
-yet commissioned an independent third-party security audit, and we plan to as
-funding allows. Until then our public security posture relies on:
+This codebase is open source under AGPL-3.0, so anyone can audit it. We have not commissioned an independent third-party security audit and plan to as funding allows. Until then the public posture rests on the configuration scans above, open code review by anyone reading the repository, internal review against OWASP ASVS L2 and the OWASP LLM Top 10, and this coordinated-disclosure program.
 
-- The external configuration scans above
-- Open code review by the community
-- Internal review against OWASP ASVS L2 and OWASP LLM Top 10
-- This coordinated-disclosure program
-
-If you have conducted a security review of this codebase, we would gladly
-publish your findings, with attribution if you wish.
+If you have run a security review of this codebase, we will publish your findings, with attribution if you want it.
 
 ---
 
-## Supported Versions
+## Supported versions
 
-| Version | Status |
+| Version | Security fixes |
 |---|---|
-| `main` | ✅ Active development, receives all security fixes |
-| Tagged releases | ⚠️ For security patches, use `main`. Older tags are not separately maintained. |
+| `main` | Yes. Every fix lands here first |
+| 1.3.0, the current release | Yes, through the next release |
+| 1.2.x and older tags | No. Update before reporting |
 
-Only the `main` branch of this repository is officially supported. If you are
-running a fork or a tagged release, please rebase or update before reporting
-issues you cannot reproduce on `main`.
+Only `main` is officially supported. If you run a fork or an older tag, please rebase or update before reporting something you cannot reproduce on `main`.
 
 ---
 
@@ -197,10 +171,3 @@ issues you cannot reproduce on `main`.
 We thank the following researchers for responsibly disclosed reports:
 
 *Be the first.*
-
----
-
-## Versioning
-
-This security policy applies to the current `main` branch. Older releases are
-not separately maintained. Please test against `main`.
