@@ -31,14 +31,14 @@ body:
   - type: dropdown
     id: mode
     attributes:
-      label: Which mode were you using?
+      label: Where were you?
       options:
-        - Story Mode
-        - Wisdom Mode (Seed Conversation)
-        - Quest Mode (Seed Challenge)
+        - Story
+        - Wisdom
+        - Prism
+        - Quest
         - Free Talk
         - Council
-        - Prism
         - Settings / Navigation
         - Not applicable
     validations:
