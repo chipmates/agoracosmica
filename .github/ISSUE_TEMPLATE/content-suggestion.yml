@@ -1,21 +1,22 @@
-name: Content Suggestion
-description: Suggest a new figure, council topic, factcheck correction, or content improvement
+name: Content suggestion
+description: Suggest a figure, a council question, a factcheck correction, or another content change
 labels: ["content"]
 body:
   - type: markdown
     attributes:
       value: |
-        Help us improve the content in Agora Cosmica. Whether it's a new figure suggestion, a historical correction, or a council topic idea, we appreciate your input.
+        The library holds 30 figures, each with twelve story chapters, twelve teachings, twelve prism dialogues and a factcheck, in English and German. Corrections and additions to any of that are welcome here.
 
   - type: dropdown
     id: type
     attributes:
-      label: Type of Suggestion
+      label: Type of suggestion
       options:
-        - New figure suggestion
+        - New figure
         - Historical correction (factcheck)
-        - Council topic idea
-        - Story improvement
+        - Council question
+        - Story chapter improvement
+        - Teaching or prism improvement
         - Translation correction
         - Other content
     validations:
@@ -25,8 +26,8 @@ body:
     id: description
     attributes:
       label: Description
-      description: Describe your suggestion in detail.
-      placeholder: "I noticed that... / It would be great to add..."
+      description: Describe the suggestion. For a correction, name the figure and the chapter or factcheck line it applies to.
+      placeholder: "I noticed that... / It would be good to add..."
     validations:
       required: true
 
@@ -34,8 +35,8 @@ body:
     id: sources
     attributes:
       label: Sources
-      description: If suggesting a correction or new figure, please include academic or authoritative sources.
-      placeholder: "According to [Book/Paper/Source]..."
+      description: For a correction or a new figure, cite academic or otherwise authoritative sources. A correction with a source moves fast.
+      placeholder: "According to [book, paper, or archive]..."
     validations:
       required: false
 

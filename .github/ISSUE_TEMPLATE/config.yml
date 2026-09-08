@@ -1,8 +1,8 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Questions & Discussions
+  - name: Questions and discussions
     url: https://github.com/chipmates/agoracosmica/discussions
-    about: Ask questions, share ideas, or discuss philosophy in our community discussions.
-  - name: Security Vulnerability
+    about: Ask a question, share an idea, or talk philosophy with the community.
+  - name: Security vulnerability
     url: https://github.com/chipmates/agoracosmica/blob/main/SECURITY.md
-    about: Please report security issues privately. Do not use public issues.
+    about: Report security issues privately. Do not open a public issue for them.

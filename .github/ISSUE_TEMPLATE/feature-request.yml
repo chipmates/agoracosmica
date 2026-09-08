@@ -1,18 +1,18 @@
-name: Feature Request
-description: Suggest an idea or improvement
+name: Feature request
+description: Suggest an idea or an improvement
 labels: ["enhancement"]
 body:
   - type: markdown
     attributes:
       value: |
-        We'd love to hear your ideas. Please describe what you'd like to see in Agora Cosmica.
+        Tell us what you would like Agora Cosmica to do. If the idea is still open-ended, [Discussions](https://github.com/chipmates/agoracosmica/discussions) is the better room for it.
 
   - type: textarea
     id: description
     attributes:
       label: Description
       description: What would you like to happen?
-      placeholder: "It would be great if..."
+      placeholder: "It would be good if..."
     validations:
       required: true
 
@@ -20,8 +20,8 @@ body:
     id: motivation
     attributes:
       label: Motivation
-      description: Why is this important? What problem does it solve?
-      placeholder: "Currently I have to... but it would be better if..."
+      description: Why does this matter? What does it make possible that is awkward today?
+      placeholder: "Right now I have to... and that means..."
     validations:
       required: true
 
@@ -31,9 +31,9 @@ body:
       label: Area
       options:
         - Conversations (Wisdom, Quest, Free Talk)
-        - Content (Stories, Councils, Prisms)
+        - Content (Story, Prism, Council)
         - Figures (new figures, corrections)
-        - Audio (TTS, STT)
+        - Audio (speech and transcription)
         - UI / Navigation
         - Accessibility
         - Translations / Localization
@@ -46,15 +46,15 @@ body:
   - type: textarea
     id: alternatives
     attributes:
-      label: Alternatives Considered
-      description: Have you considered any alternative solutions or workarounds?
+      label: Alternatives considered
+      description: Any workaround you already use, or another shape this could take.
     validations:
       required: false
 
   - type: textarea
     id: context
     attributes:
-      label: Additional Context
+      label: Additional context
       description: Screenshots, mockups, links, or anything else that helps explain the request.
     validations:
       required: false

@@ -1,25 +1,25 @@
-name: Bug Report
+name: Bug report
 description: Report something that isn't working correctly
 labels: ["bug"]
 body:
   - type: markdown
     attributes:
       value: |
-        Thanks for reporting a bug. Please fill out the sections below so we can reproduce and fix the issue.
+        Thanks for reporting a bug. The sections below are what we need to reproduce it.
 
   - type: textarea
     id: description
     attributes:
       label: Description
       description: What happened? What did you expect to happen instead?
-      placeholder: "When I click X, Y happens instead of Z."
+      placeholder: "When I click X, I get Y. I expected Z."
     validations:
       required: true
 
   - type: textarea
     id: steps
     attributes:
-      label: Steps to Reproduce
+      label: Steps to reproduce
       description: How can we reproduce this?
       placeholder: |
         1. Go to '...'
@@ -73,10 +73,12 @@ body:
   - type: dropdown
     id: tier
     attributes:
-      label: Using free tier or BYOK?
+      label: How was chat set up?
       options:
         - Free tier (no API key)
-        - BYOK (own OpenRouter key)
+        - Own OpenRouter key (BYOK)
+        - Local Mode (a model you run)
+        - Self-hosted instance
         - Not applicable
     validations:
       required: true
@@ -85,15 +87,15 @@ body:
     id: screenshots
     attributes:
       label: Screenshots
-      description: If applicable, add screenshots to help explain the problem.
+      description: If a picture shows the problem faster than a paragraph, add it here.
     validations:
       required: false
 
   - type: textarea
     id: console
     attributes:
-      label: Console Errors
-      description: Open browser DevTools (F12), check the Console tab, and paste any errors here.
+      label: Console errors
+      description: Open your browser's developer tools, check the Console tab, and paste anything red in here.
       render: shell
     validations:
       required: false
