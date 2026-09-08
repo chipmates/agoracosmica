@@ -64,7 +64,7 @@ Agora Cosmica is a **general-purpose AI system interface** (not high-risk). It d
 | **AI disclosure** | Consent modal clearly states content is AI-generated |
 | **Naming convention** | All figures prefixed with "Echo of" to signal non-human origin |
 | **HTTP headers** | `X-AI-Generated`, `X-AI-Model`, `X-AI-Provider` on all API responses |
-| **Consent flow** | WelcomeDisclosureModal with explicit AI acknowledgment; AdConsentPrompt for opt-in ad-click measurement (Google ad arrivals only) |
+| **Consent flow** | WelcomeDisclosureModal with explicit AI acknowledgment; ArrivalChoice for opt-in ad-click measurement (Google ad arrivals only) |
 | **Timeline** | Compliant ahead of Aug 2026 enforcement deadline |
 
 ### Content Marking

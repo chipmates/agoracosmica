@@ -125,7 +125,7 @@ All should return JSON.
 
 This is the heavy step. Running the LLM locally means the conversation itself never reaches any external service, but it needs real hardware.
 
-**The model we recommend:** [`Smoffyy/Qwen3.6-27B-Instruct-Revised-GGUF`](https://huggingface.co/Smoffyy/Qwen3.6-27B-Instruct-Revised-GGUF), **Q4_K_M** variant (~16 GB). It's a compact 27B that runs on a single GPU. Our hosted free tier uses a larger model (Qwen3-235B), and in our own tests the two come out about even on these conversations. Holds the Custom Council `SPEAKER :: dialogue` format cleanly and supports tool calling so Quest mode's `award_seed` still fires.
+**The model we recommend:** [`Smoffyy/Qwen3.6-27B-Instruct-Revised-GGUF`](https://huggingface.co/Smoffyy/Qwen3.6-27B-Instruct-Revised-GGUF), **Q4_K_M** variant (~16 GB). It's a compact 27B that runs on a single GPU. Our hosted free tier runs DeepSeek V4 Pro with Qwen3-235B as the fallback, and in our own tests this compact model comes out about even with the 235B on these conversations. Holds the Custom Council `SPEAKER :: dialogue` format cleanly and supports tool calling so Quest mode's `award_seed` still fires.
 
 **Hardware floor:**
 - 32 GB unified RAM on Apple Silicon, or
@@ -216,7 +216,7 @@ The audio and STT containers ship with CORS enabled by default. The MLX wrapper 
 
 **Build from source.** The default `docker-compose.yml` pulls a prebuilt image from GHCR. To build locally instead, comment the `image:` line and uncomment the `build:` block under the `app` service, then `docker compose up --build -d`. First build takes two to three minutes (pnpm install, pnpm build, a one-time content fetch from the CDN into the build context).
 
-**LAN deployment.** If you have one box (NVIDIA workstation or M-series Mac) running the full audio stack, every other device on the same LAN can point its Local Mode toggles at that box. In each device's Settings → Local Mode, paste `http://your-homelab.local:8880` (Kokoro), `http://your-homelab.local:8887` (Qwen), and `http://your-homelab.local:8000` (Whisper). CORS is already configured. The companion repo [`chipmates/f5-server`](https://github.com/chipmates/f5-server) packages our production F5-TTS deployment for operators who specifically want F5.
+**LAN deployment.** If you have one box (NVIDIA workstation or M-series Mac) running the full audio stack, every other device on the same LAN can point its Local Mode toggles at that box. In each device's Settings → Local Mode, paste `http://your-homelab.local:8880` (Kokoro), `http://your-homelab.local:8887` (Qwen), and `http://your-homelab.local:8000` (Whisper). CORS is already configured. The companion repo [`chipmates/f5-server`](https://github.com/chipmates/f5-server) packages a standalone F5-TTS server for operators who specifically want that engine. It is no longer part of our production stack.
 
 ---
 
@@ -228,7 +228,7 @@ Content (stories, prism dialogues, council debates, factchecks, voice profiles, 
 
 The self-host image deliberately ships no authored text content. The build sets `VITE_SELF_HOST=true`, which makes `extract-public-data.mjs` emit empty values for every authored field (figure bios, learn lines, seed summaries, seed quotes, voice essences, key concepts, theme cross-refs). Identifiers ship (figure ids and names, seed ids and titles, the hardcoded short tradition labels). Everything authored is runtime-fetched from `AGORA_MEDIA_BASE_URL` when the app needs it. A self-host instance is content-equivalent to agoracosmica.org without holding a redistributable copy.
 
-**For commercial self-host:** the F5-TTS German fine-tuning is CC-BY-NC-4.0 (non-commercial only). Our production primary is Qwen3-TTS, which is fine commercially. F5 is the overflow tier and the only piece with the NC restriction. If your use is non-commercial (personal, research, nonprofit), the NC license doesn't restrict you.
+**For commercial self-host:** everything in the published images is fine commercially. Our production speech runs on Qwen3-TTS for both languages. The optional F5-TTS German fine-tuning in the companion repo is CC-BY-NC-4.0 (non-commercial only) and is the one piece with that restriction. If your use is non-commercial (personal, research, nonprofit), the NC license doesn't restrict you.
 
 ---
 
