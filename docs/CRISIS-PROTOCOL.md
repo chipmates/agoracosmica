@@ -2,9 +2,9 @@
 
 We built a place to talk about hard things: grief, meaning, death, the life you think you want. Sometimes a visitor is not asking about a hard thing. They are in one. This page says what happens then, in plain words, and where the limits are.
 
-## What we are not
+## The limits
 
-Agora Cosmica is not counselling and it is not supervised by a clinician. Nobody reads your conversations, and no person is watching in real time. The numbers below reach a person.
+Agora Cosmica is a library you can talk to. It is not counselling, and no clinician supervises it. Nobody reads your conversations, and no person is watching in real time. The numbers below reach a person.
 
 ## The helplines
 
@@ -18,11 +18,11 @@ Agora Cosmica is not counselling and it is not supervised by a clinician. Nobody
 | United Kingdom and Ireland | Samaritans, 116 123 | Any hour, free |
 | Everywhere else | The International Association for Suicide Prevention lists crisis centres by country at iasp.info | |
 
-The app shows the line for the country your connection comes from first, then the worldwide directory. It never sends your message anywhere to decide that.
+The app shows the line for your country first, then the worldwide directory. It reads that from the country our edge sees on the answer, or from your browser's own language setting when there is no answer to read it from. It never sends your message anywhere to decide that.
 
 ## What triggers what
 
-The screen reads what you type, in the browser and again at our edge, before anything reaches the language model. It asks two questions.
+The screen reads what you type, in the browser and again at our edge, before anything reaches the language model. It asks three questions.
 
 **Are you talking about your own safety, right now?** A first-person statement such as "I want to die", "Ich habe Suizidgedanken" or "je veux mourir" stops the conversation and shows the helplines. The figure does not answer. You are welcome back whenever you want.
 
@@ -34,7 +34,7 @@ This is pattern matching, fullest in English and German, with a smaller set in S
 
 ## What the figures are told
 
-On the free tier these rules are served on every model and every mode when the screen flags distress. If you bring your own key or run the app locally, your messages do not pass through our edge, and this page's screening happens only in your browser. Quoted from the code:
+On the free tier these rules are served on every model and in every format when the screen flags distress. If you bring your own key or run the app locally, your messages do not pass through our edge. The browser screen still stops a first-person statement and shows the helplines, and the forced rules and the banner, which ride on our edge's answer, are not there. Quoted from the code:
 
 > When the visitor sounds hopeless, unsafe, or as if they would rather not be here, name one person in their life or a helpline they can reach today BEFORE anything from your own practice. Your practices may follow the referral. They never replace it.
 
@@ -44,7 +44,7 @@ On the free tier these rules are served on every model and every mode when the s
 
 ## What we log
 
-A category, a timestamp, a hashed connection address, the figure, the mode and the language, kept for ninety days. Never the text you wrote. The full list is in [CONTENT-SAFETY.md](CONTENT-SAFETY.md).
+A category, a timestamp, a hashed connection address, the figure, the format and the language, kept for ninety days. Never the text you wrote. The full list is in [CONTENT-SAFETY.md](CONTENT-SAFETY.md).
 
 ## Age
 

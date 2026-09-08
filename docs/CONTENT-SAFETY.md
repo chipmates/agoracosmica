@@ -1,47 +1,49 @@
-# Content Safety
+# Content safety
 
-Agora Cosmica implements multi-layer content safety to protect users, comply with German and EU law, and ensure philosophical dialogues remain constructive.
+How a message is screened on its way to a model and back, what each layer looks for, and what a visitor sees when a layer fires. Written for anyone who has to judge the platform before letting people use it, and for contributors who touch the screening code. The self-harm tiers have their own page, [CRISIS-PROTOCOL.md](CRISIS-PROTOCOL.md), in plain words.
 
----
-
-## Safety Layers
-
-The platform uses eight defense layers, from client-side detection to server-side screening and response validation.
-
-| Layer | Location | Purpose |
-|-------|----------|---------|
-| 1. **Client-side screening** | Browser | Pre-send detection of harmful patterns |
-| 2. **PII detection** | Browser | Warns users before sending personal information |
-| 3. **Server-side screening** | CF Worker | Blocks requests matching safety patterns |
-| 4. **Jailbreak detection** | CF Worker | Detects prompt injection and role-play escapes |
-| 5. **System prompt constraints** | CF Worker | Figures refuse harmful topics in-character |
-| 6. **Response validation** | CF Worker | Filters harmful patterns from LLM output |
-| 7. **Output stream scanning** | CF Worker | Real-time scanning of streamed responses |
-| 8. **Compliance logging** | CF Worker | All safety events logged for review |
+Two files hold almost all of it: [`client/src/utils/contentSafety.ts`](../client/src/utils/contentSafety.ts) in the browser and [`workers/llm-proxy/src/utils/contentScreen.ts`](../workers/llm-proxy/src/utils/contentScreen.ts) at the edge.
 
 ---
 
-## Content Screening
+## The layers
 
-### Categories
+| Layer | Where | What it does |
+|---|---|---|
+| 1. Input screen | Browser | Matches the pattern lists before a message is sent |
+| 2. Personal data warning | Browser | Warns before an email address, a phone number, a card number or an IBAN is sent |
+| 3. Input screen | Worker | The same lists again, independently, plus invisible-character checks |
+| 4. Jailbreak patterns | Both | Part of the same policy list: instruction overrides, role-play escapes, token injection, prompt extraction |
+| 5. Prompt constraints | Worker | A safety preamble plus each figure's own rules, ahead of every reply |
+| 6. Crisis rules | Worker | Three rules forced into the prompt for the turn when the screen flags distress |
+| 7. Output scan | Worker | The streamed reply is read as it arrives and cut off on an absolute violation |
+| 8. Compliance log | Worker | Category, timestamp and metadata for every safety event, 90 days |
 
-The screening system covers these categories with the same pattern lists on both sides, browser and edge, in English, German, Spanish, and French. The edge additionally rejects invisible characters and control-character floods. Self-harm is screened in tiers, described in [CRISIS-PROTOCOL.md](CRISIS-PROTOCOL.md): a first-person statement about the visitor's own safety stops the turn, soft distress and topical mentions are answered with crisis resources attached.
+The browser layer saves a round trip and shapes what the visitor sees. The worker layer is the one that counts, since a self-hosted or modified client cannot be trusted to run it.
+
+---
+
+## What the screening covers
+
+The two sides carry the same lists, in English, German, Spanish and French: 70 pattern checks in the browser, and 74 at the edge, where four more reject invisible characters, mathematical alphanumerics, unicode tag characters and control-character floods. Self-harm is screened in three tiers, which is what lets a question about the Stoics through while a first-person statement stops the turn.
 
 | Category | Examples | Response |
-|----------|----------|----------|
-| **Self-harm, first person** | The visitor about their own safety, now | Conversation stops, crisis resources displayed |
+|---|---|---|
+| **Self-harm, first person** | The visitor about their own safety, now | Conversation stops, crisis resources shown |
 | **Self-harm, soft distress** | "I can't do this anymore" and its kin | Answered, crisis rules forced into the prompt, helpline banner |
 | **Self-harm, topical** | Suicide as a subject: history, philosophy, a figure's life | Answered, helpline line under the reply |
 | **Harm to others** | Violence, threats, attack methods | Policy block |
-| **Child exploitation (CSAM)** | Any related content | Immediate block + log |
+| **Child exploitation** | Any related content | Immediate block and log |
 | **Terrorism and weapons** | Bomb-making, mass violence | Policy block |
-| **Hate speech (§130 StGB)** | Holocaust denial, antisemitism, anti-immigrant incitement | Policy block |
+| **Hate speech (§130 StGB)** | Holocaust denial, antisemitism, incitement against a group | Policy block |
 | **Violence glorification (§131 StGB)** | Crime instructions, glorification of violence | Policy block |
 | **Sexual content (§184 StGB)** | Explicit sexual content | Policy block |
 
-### Crisis Resources
+A policy block returns a plain sentence and an invitation to ask something else. It names no category, so the screen gives nothing away to somebody probing it.
 
-A first-person statement about the visitor's own safety stops the conversation and shows helplines. Soft distress and the subject as a topic are answered with helplines attached:
+### Crisis resources
+
+A first-person statement about the visitor's own safety stops the conversation and shows helplines. Soft distress and the subject as a topic are answered with helplines attached.
 
 - **Germany:** Telefonseelsorge (0800 111 0 111 / 0800 111 0 222), Kinder- und Jugendtelefon (116 111)
 - **Austria:** Telefonseelsorge (142)
@@ -50,112 +52,100 @@ A first-person statement about the visitor's own safety stops the conversation a
 - **United Kingdom and Ireland:** Samaritans (116 123)
 - **Everywhere else:** the [IASP directory](https://www.iasp.info/resources/Crisis_Centres/) lists crisis centres by country
 
-The line for the visitor's country comes first. The worker sends only a country code, never a number; the list lives in the app.
+The line for the visitor's country comes first. The worker sends a country code and nothing else. The list itself lives in the app, in `contentSafety.ts`, which is also where a correction to a number belongs.
 
-The goal is help, not punishment. Users in distress see resources, not error messages.
+A visitor in distress sees resources and a sentence saying they are welcome back. That is the point of the tiers.
 
 ---
 
-## Jailbreak Detection
+## Jailbreak detection
 
-The system detects common prompt injection and jailbreak techniques:
-
-| Technique | Detection |
-|-----------|-----------|
-| **Direct override** | "Ignore previous instructions," "forget your rules" |
-| **Role-play escape** | "DAN mode," "developer mode," "GODMODE" |
+| Technique | What is matched |
+|---|---|
+| **Direct override** | "Ignore previous instructions", "forget your rules" |
+| **Role-play escape** | "DAN mode", "developer mode", "GODMODE" |
 | **Token injection** | ChatML tokens (`<\|im_start\|>`, `[INST]`), XML injection |
-| **System prompt extraction** | "Show your instructions," "what is your system prompt" |
-| **Unicode obfuscation** | Homoglyph substitution, zero-width characters |
-| **L33tspeak variants** | Patterns from known public jailbreak prompt collections (BASI, L1B3RT4S, and similar) |
+| **Prompt extraction** | "Show your instructions", "what is your system prompt" |
+| **Fake policy headers** | Text posing as a system or policy update inside the message |
+| **Unicode obfuscation** | Homoglyphs, zero-width characters, mathematical alphanumerics |
+| **Leetspeak variants** | Spellings from public jailbreak prompt collections |
 
-Detected jailbreak attempts are logged and blocked with a neutral response.
-
----
-
-## PII Detection
-
-Before sending a message, the client scans for personally identifiable information:
-
-| PII Type | Detection | Action |
-|----------|-----------|--------|
-| Email addresses | Regex pattern | Warning displayed |
-| Phone numbers | International format detection | Warning displayed |
-| Credit card numbers | Pattern match (4-group format) | Warning displayed |
-
-PII detection is advisory, not blocking. Users can choose to send the message after seeing the warning. The goal is awareness, not restriction.
+A match is logged and answered with a neutral message.
 
 ---
 
-## Figure Safety
+## Personal data warning
 
-Each figure has a risk assessment and tailored guardrails built into their instruction set:
+Before a message is sent, the browser checks it for four patterns.
 
-### Instruction-Level Protections
+| Pattern | How it is matched | What happens |
+|---|---|---|
+| Email address | Standard address shape | Warning |
+| Phone number | German formats: `+49`, `0049`, or a leading zero | Warning |
+| Credit card number | Four groups of four digits | Warning |
+| IBAN | German IBAN shape | Warning |
 
-- **No medical, legal, or financial advice.** Figures redirect to professionals.
-- **Historical boundary awareness.** Figures acknowledge what they cannot know beyond their era.
-- **No-harm policy.** Figures refuse to discuss methods of violence or self-harm.
-- **Philosophical framing.** Difficult topics (suffering, death, despair) are addressed through the figure's philosophical lens, not as personal guidance.
-
-### Council Safety Classifications
-
-| Level | Description | User Experience |
-|-------|-------------|-----------------|
-| **Moderate** | General philosophical discussion | Standard playback |
-| **Sensitive** | Topics that may resonate personally | Brief content note |
-| **Deep** | Grief, pain, existential crisis | Disclaimer before playback |
+The warning is advisory. A visitor who means to send the message can send it. The aim is to catch the moment someone types their own phone number into a conversation with a philosopher without thinking about where it goes.
 
 ---
 
-## Compliance Logging
+## Figure safety
 
-All safety events are logged server-side for review and legal compliance.
+Two things shape what a figure will answer: the safety preamble at the front of every prompt, and the figure's own instruction set. All 30 instruction sets carry the advice boundary and the crisis calibration below.
 
-| Field | Description |
-|-------|-------------|
-| **Category** | Which screening rule triggered |
-| **Timestamp** | When the event occurred |
-| **IP hash** | One-way hash, not raw IP |
-| **Event type** | Block, warning, crisis resource shown |
-| **Retention** | 90 days (Cloudflare KV TTL) |
+- **No medical, legal or financial advice.** Figures share perspective and redirect to professionals.
+- **Crisis language stays reserved for crisis.** A rough week is answered as a rough week. The referral phrasing is for explicit self-harm, severe abuse or immediate danger.
+- **Historical boundary.** Figures acknowledge what they cannot know beyond their own era.
+- **No methods.** Figures refuse to describe methods of violence or self-harm.
+- **Difficult subjects stay philosophical.** Suffering, death and despair are answered through the figure's own tradition, with the advice boundary above still in force.
 
-Logs do **not** contain message content, user identifiers, or conversation context. Only the category and metadata are recorded.
+### Council tiers
 
----
-
-## German Law Compliance
-
-### §130 StGB (Volksverhetzung / Hate Speech)
-
-Server-side and client-side patterns detect Holocaust denial, antisemitic content, and incitement against protected groups.
-
-### §131 StGB (Gewaltdarstellung / Violence Glorification)
-
-Detection of crime instructions, glorification of violence, and "recipe" format instructions for harmful acts.
-
-### §184 StGB (Jugendgefährdende Inhalte / Youth-Endangering Content)
-
-Explicit sexual content is detected and blocked.
-
-### JMStV (Jugendmedienschutz-Staatsvertrag)
-
-- `age-de.xml` declaration (rated age **16+**)
-- Content screening active for all users
-- Figure risk assessment per character
-- Jugendschutzbeauftragter (Youth Protection Officer) appointed: Rechtsanwalt Jan Müller, IT-Recht Kanzlei. Contact details on the [Impressum page](https://agoracosmica.org/impressum#jugendschutz) (`jugendschutzbeauftragter@it-recht-kanzlei.de`)
+Each of the 55 council questions carries a tier in the catalog, and both depth levels of a question share it. 28 are standard, 18 sensitive and 9 deep. A sensitive council shows "Sensitive topic" on its detail sheet, a deep one shows "Contains difficult themes", both before playback starts.
 
 ---
 
-## Report and Appeals
+## The compliance log
 
-Users can report concerning content via the **"Inhalt melden"** (Report Content) button in conversation views. Reports are logged for review and routed to `agoracosmica@chipmates.ai`.
+Every safety event is written server side, for review and for the JMStV record.
 
-If you believe content was blocked or filtered in error, contact `support@chipmates.ai` with the request context. We will respond within 5 business days.
+| Field | What it holds |
+|---|---|
+| **Type** | Input blocked, output blocked, or jailbreak attempt |
+| **Severity** | P1 to P4, derived from the category |
+| **Category** | Which screening rule matched |
+| **Timestamp** | When it happened |
+| **IP hash** | A salted one-way hash, never the address |
+| **Figure, format, language** | Context for reading the log |
+| **Retention** | 90 days, as a Cloudflare KV TTL |
+
+The log holds no message content, no visitor identifier and no conversation context.
 
 ---
 
-For the underlying technical security architecture (rate limits, edge auth, encryption), see [SECURITY-ARCHITECTURE.md](SECURITY-ARCHITECTURE.md).
+## German law
+
+**§130 StGB (Volksverhetzung).** Patterns on both sides match Holocaust denial, antisemitic content and incitement against protected groups.
+
+**§131 StGB (Gewaltdarstellung).** Crime instructions, glorification of violence, and recipe-style instructions for harmful acts.
+
+**§184 StGB.** Explicit sexual content is blocked.
+
+**§4 JMStV.** The absolute violations, a short and deliberately tight list, are also scanned in the outgoing stream, so a model that produces one is cut off mid-reply.
+
+**JMStV in general.** The site carries an `age-de.xml` declaration rated 16 and up, screening runs for everyone, and a youth protection officer is appointed under §7 JMStV and named on the [Impressum page](https://agoracosmica.org/impressum#jugendschutz). See [COMPLIANCE.md](COMPLIANCE.md).
+
+---
+
+## Reporting and appeals
+
+Every reply carries a report button. It opens an email to `agoracosmica@chipmates.ai` with the reported passage, the figure and the time, from the visitor's own mail program. Nothing about a report reaches our servers on its own.
+
+If a message was blocked and should not have been, write to the same address with the sentence that was stopped. We answer within five business days and change the patterns when they are wrong.
+
+---
+
+For the technical security architecture (rate limits, edge auth, encryption), see [SECURITY-ARCHITECTURE.md](SECURITY-ARCHITECTURE.md).
 
 For vulnerability reporting, see [SECURITY.md](../SECURITY.md).
 

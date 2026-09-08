@@ -1,6 +1,6 @@
 # Code of Conduct
 
-## Our Commitment
+## Our commitment
 
 Agora Cosmica is a project by ChipMates gemeinnützige GmbH, a German nonprofit. We are building a space where philosophical wisdom is accessible to everyone. This extends to how we work together as a community.
 
@@ -8,7 +8,7 @@ We are committed to making participation in this project a respectful, construct
 
 ---
 
-## Expected Behavior
+## Expected behavior
 
 - **Be respectful.** Treat others the way you want to be treated. Disagreement is fine, disrespect is not.
 - **Be constructive.** Offer helpful feedback. Focus on the work, not the person.
@@ -18,7 +18,7 @@ We are committed to making participation in this project a respectful, construct
 
 ---
 
-## Unacceptable Behavior
+## Unacceptable behavior
 
 - Personal attacks, insults, or deliberately inflammatory comments
 - Unwelcome or inappropriate contact of any kind
@@ -51,7 +51,7 @@ All reports will be handled with discretion and respect for the privacy of every
 
 ## Attribution
 
-This Code of Conduct is adapted from the [Contributor Covenant](https://www.contributor-covenant.org), version 2.1.
+This Code of Conduct is adapted from the [Contributor Covenant, version 2.1](https://www.contributor-covenant.org/version/2/1/code_of_conduct/).
 
 ---
 

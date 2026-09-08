@@ -1,53 +1,54 @@
-# EU Compliance
+# Compliance
 
-Agora Cosmica complies with European data protection, AI transparency, and youth protection regulations. The platform is operated by ChipMates gemeinnützige GmbH, a registered German nonprofit.
+What Agora Cosmica does to meet European data protection, AI transparency and German youth protection law, with the file or the page that carries each measure. Written for a lawyer, a data protection officer, or a school deciding whether a class can use the platform. The technical detail is in [SECURITY-ARCHITECTURE.md](SECURITY-ARCHITECTURE.md), every counter we write is listed in [MEASUREMENT.md](MEASUREMENT.md), and the safety screening is described in [CONTENT-SAFETY.md](CONTENT-SAFETY.md).
+
+The platform is operated by ChipMates gemeinnützige GmbH, a registered German nonprofit.
 
 ---
 
-## GDPR (General Data Protection Regulation)
+## GDPR
 
-### Data Controller
+### Controller
 
-**ChipMates gemeinnützige GmbH** (gemeinnützige GmbH)
-Germany
+ChipMates gemeinnützige GmbH, Germany. The full operator details are on the [Impressum page](https://agoracosmica.org/impressum).
 
-### Lawful Basis
+### Lawful basis
 
-Legitimate interest (Art. 6(1)(f) GDPR) for providing philosophical dialogue services.
+Legitimate interest under Art. 6(1)(f) GDPR, for providing a philosophical dialogue service.
 
-### Data Minimization
+### Data minimization
 
-| Principle | Implementation |
-|-----------|---------------|
-| **No registration** | No email, no password, no account data. The one personal-data exception is the opt-in Google ad click ID (gclid), see [MEASUREMENT.md](MEASUREMENT.md) |
-| **No tracking cookies** | No analytics cookies, no behavior tracking |
-| **Local storage** | Conversations in IndexedDB on user's device |
-| **Minimal logging** | Safety events only (category + timestamp + IP hash), 90-day retention |
-| **No profiling** | No user profiles built, no recommendations based on behavior |
+| Principle | How it works |
+|---|---|
+| **No registration** | No email, no password, no account data. The one personal-data exception is the opt-in Google ad click id, see [MEASUREMENT.md](MEASUREMENT.md) |
+| **No tracking cookies** | No analytics cookies, no behavioral tracking |
+| **On the device** | Conversations, the local profile and any API key stay in the browser's IndexedDB |
+| **Minimal logging** | Safety events only: category, timestamp, hashed address, figure, format and language. 90-day retention |
+| **No profiling** | No user profile is built, and nothing is recommended from past behavior |
 
-### Data Subject Rights
+### Data subject rights
 
-| Right | Implementation |
-|-------|---------------|
-| **Access** | All user data is local (IndexedDB), user has full access |
-| **Deletion** | "Clear History" deletes all local data immediately |
-| **Portability** | All local data is plain JSON in IndexedDB and exportable via browser DevTools today. An in-app one-click export is on the post-launch roadmap. |
-| **Objection** | No processing to object to (data stays on device) |
+| Right | How it is served |
+|---|---|
+| **Access** | Everything a visitor writes stays on their own device, so they hold it already |
+| **Erasure** | "Clear history" removes a conversation. Settings carries a clear-all that wipes the local stores |
+| **Portability** | We hold no copy to hand over. On the device, history, profile and API key are encrypted under a device key, so a raw IndexedDB dump is not readable elsewhere. An in-app export is not built |
+| **Objection** | A free-tier message goes to an inference provider to be answered. A visitor who does not want that can bring their own key or run the app locally, which takes our proxy out of the path |
 
-### Sub-Processors
+### Sub-processors
 
 | Provider | Service | Location | DPA |
-|----------|---------|----------|-----|
+|---|---|---|---|
 | Cloudflare | Pages, Workers, R2, KV | EU edge (R2 in Western Europe) | DPA via Cloudflare dashboard |
-| Nebius | LLM inference (free tier) | United Kingdom (primary model) and Finland (EU, fallback model) | Zero Data Retention enabled in both regions |
-| Hetzner | GPU servers (TTS/STT) | Germany (Falkenstein, Nürnberg) | German company, GDPR-native |
-| OpenRouter | LLM inference (BYOK) | US-based router. User picks downstream provider, can select ZDR-capable EU providers. | User's direct relationship |
+| Nebius | LLM inference (free tier) | United Kingdom (primary model) and Finland (EU, fallback model) | Zero data retention enabled in both regions |
+| Hetzner | GPU servers (speech synthesis and transcription) | Germany (Falkenstein, Nürnberg) | German company, GDPR-native |
+| OpenRouter | LLM inference (your own key) | US-based router. The visitor picks the downstream provider and can select a provider with zero data retention in the EU | The visitor's own relationship |
 
-### Cookie Policy
+### Cookies
 
-**No tracking cookies.** Cloudflare sets strictly-necessary cookies (`__cf_bm`, `cf_clearance`, `__cflb`) for bot detection and load balancing. These are exempt from consent under ePrivacy Directive Article 5(3) and §25(2) TDDDG.
+**No tracking cookies.** Cloudflare sets strictly necessary bot-detection cookies (`__cf_bm`, `cf_clearance`) at the edge. These are exempt from consent under ePrivacy Directive Article 5(3) and §25(2) TDDDG.
 
-All other client-side storage uses IndexedDB and localStorage, both technically necessary for app functionality and not cookies under the ePrivacy framework. No third-party analytics, no marketing trackers, no cross-session user profiling. Aggregate, anonymous event counters are written server-side to support service operation and nonprofit reach measurement; see [MEASUREMENT.md](MEASUREMENT.md) for the exact list, including the opt-in ad-click measurement for Google ad arrivals.
+All other client-side storage is IndexedDB and localStorage, technically necessary for the app to run and not cookies under the ePrivacy framework. There are no third-party analytics and no marketing trackers. Aggregate, anonymous event counters are written server side to operate the service and to measure nonprofit reach. [MEASUREMENT.md](MEASUREMENT.md) lists every one of them, including the opt-in ad-click measurement for visitors who arrive from a Google ad.
 
 ---
 
@@ -55,118 +56,89 @@ All other client-side storage uses IndexedDB and localStorage, both technically 
 
 ### Classification
 
-Agora Cosmica is a **general-purpose AI system interface** (not high-risk). It does not perform biometric analysis, emotion recognition, or automated decision-making.
+Agora Cosmica is a general-purpose AI system interface, not a high-risk system. It performs no biometric analysis, no emotion recognition and no automated decision about a person.
 
-### Art. 50 Compliance (Transparency)
+### Art. 50 transparency
 
-| Requirement | Implementation |
-|-------------|---------------|
-| **AI disclosure** | Consent modal clearly states content is AI-generated |
-| **Naming convention** | All figures prefixed with "Echo of" to signal non-human origin |
-| **HTTP headers** | `X-AI-Generated`, `X-AI-Model`, `X-AI-Provider` on all API responses |
-| **Consent flow** | WelcomeDisclosureModal with explicit AI acknowledgment; ArrivalChoice for opt-in ad-click measurement (Google ad arrivals only) |
-| **Timeline** | Compliant ahead of Aug 2026 enforcement deadline |
+| Requirement | How it works |
+|---|---|
+| **AI disclosure** | The welcome screen states that responses are AI generated, before the first conversation |
+| **Naming** | Figures are named "Echo of ..." in the app, an interpretation rather than the person |
+| **HTTP headers** | `X-AI-Generated`, `X-AI-Model` and `X-AI-Provider` on API responses, set in [`workers/llm-proxy/src/index.ts`](../workers/llm-proxy/src/index.ts) |
+| **Consent flow** | WelcomeDisclosureModal carries the AI acknowledgment. ArrivalChoice carries the opt-in for ad-click measurement, and only visitors arriving from a Google ad ever see it |
+| **In place since** | Before the August 2026 transparency deadline |
 
-### Content Marking
+### Content marking
 
-Every AI-generated response includes machine-readable headers identifying:
-- That the content is AI-generated
-- Which model produced it
-- Which provider processed the request
+Every response from the free tier carries machine-readable headers naming three things: that the content is AI generated, which model produced it, and which provider processed the request. The model named in the header is the one that actually answered, primary or fallback.
 
 ---
 
-## German Youth Protection (Jugendschutz)
+## German youth protection (Jugendschutz)
 
-### JMStV (Jugendmedienschutz-Staatsvertrag)
+### JMStV
 
-| Requirement | Implementation |
-|-------------|---------------|
-| **Age rating** | `age-de.xml` declaration: rated **16+** |
-| **Content screening** | ~85 patterns for §130/§131/§184 StGB content (39 client-side, 48 server-side) |
-| **Jailbreak detection** | GODMODE, DAN, token injection, Unicode obfuscation |
-| **Output scanning** | Real-time stream scanning for harmful content |
-| **Figure risk assessment** | Per-figure safety metadata |
-| **Report mechanism** | "Inhalt melden" button in conversations |
-| **Compliance logging** | KV-based, 90-day retention |
+| Requirement | How it works |
+|---|---|
+| **Age rating** | An `age-de.xml` declaration at the site root, default age 16 |
+| **Content screening** | 70 pattern checks in the browser and 74 at the edge, covering the §130, §131 and §184 StGB categories, self-harm in tiers, and jailbreak attempts. See [CONTENT-SAFETY.md](CONTENT-SAFETY.md) |
+| **Jailbreak detection** | Instruction overrides, role-play escapes, special-token injection, prompt extraction, unicode obfuscation |
+| **Output scanning** | Streamed replies are scanned as they arrive and cut off on a §4 JMStV violation |
+| **Council content tiers** | Each of the 55 council questions carries a tier. 18 are marked sensitive and 9 deep, and the detail sheet says so before playback |
+| **Report route** | A report button on every reply opens an email to `agoracosmica@chipmates.ai` with the passage quoted |
+| **Compliance log** | Safety events in Cloudflare KV, 90-day TTL |
 
-### Consent and Age Verification
+### Consent and age
 
-The WelcomeDisclosureModal requires:
-- Age 16+ confirmation (Art. 8 GDPR / §16 DSGVO)
-- Terms of Service acceptance
-- AI-generated content acknowledgment
+The welcome screen asks for three confirmations before the first conversation: that the visitor is 16 or older (Art. 8 GDPR), that they accept the terms, and that they understand responses are AI generated.
 
-### Impressum (§5 TMG / §18 MStV)
+### Impressum (§5 DDG / §18 MStV)
 
-The Impressum page includes all legally required information:
-- Company details (ChipMates gemeinnützige GmbH)
-- MStV disclosure (media state treaty)
-- KI-Hinweis (AI disclosure)
-- OS-Plattform link (EU online dispute resolution)
-- Jugendschutzbeauftragter (Youth Protection Officer): Rechtsanwalt Jan Müller, IT-Recht Kanzlei. Appointed per §7 JMStV. Contact `jugendschutzbeauftragter@it-recht-kanzlei.de`
+The [Impressum page](https://agoracosmica.org/impressum) carries the operator details, the person responsible under §18 (2) MStV, the AI note, a consumer dispute resolution section, and the youth protection officer appointed under §7 JMStV with a direct email address.
 
 ---
 
-## Terms of Service
+## Terms of service
 
-Available at `/nutzungsbedingungen` (German; `/terms` redirects there). An English version is planned.
+German at `/nutzungsbedingungen`, English at `/terms`, thirteen sections each. The AI notice in §2 is the part a reviewer usually wants: the chat is operated entirely by an AI system, the figures are simulations and not authentic reproductions of what those people said, generated content can be factually wrong, and the service is not professional advice of any kind. The rest covers scope, the age requirement, rules of use, intellectual property, data protection, protection of minors, liability, blocking, content moderation and reporting, applicable law, and contact.
 
-Key provisions (13 sections):
-- User owns their API key
-- ChipMates not liable for LLM outputs
-- Content policy (no hate speech, self-harm, illegal content)
-- AI-generated content disclaimer
-- Limitation of liability
+## Privacy policy
+
+German at `/datenschutz`, English at `/privacy`. It covers the chat processing, speech synthesis and transcription, minors under Art. 8 GDPR, the processor table, and technically necessary storage under §25 (2) TDDDG.
 
 ---
 
-## Privacy Policy (Datenschutzerklärung)
+## Data residency
 
-Available at `/datenschutz` (German) and `/privacy` (English).
-
-Covers:
-- KI-Chat data processing
-- Audio processing (TTS/STT)
-- Minderjährige (minors, Art. 8 DSGVO)
-- Auftragsverarbeiter table (sub-processors)
-- Technically necessary storage (§25 TDDDG)
-
----
-
-## Data Residency
-
-All data processing occurs within the European Union.
-
-| Data Type | Location | Provider |
-|-----------|----------|----------|
+| Data | Location | Provider |
+|---|---|---|
 | Frontend | EU edge | Cloudflare Pages |
 | Worker execution | Cloudflare EU edge network | Cloudflare Workers |
 | Object storage | Western Europe | Cloudflare R2 |
-| Audio processing | Germany (Falkenstein, Nürnberg) | Hetzner |
-| LLM (free tier) | United Kingdom or Finland, depending on the model that answers | Nebius |
+| Speech synthesis and transcription | Germany (Falkenstein, Nürnberg) | Hetzner |
+| LLM, free tier | United Kingdom or Finland, depending on which model answers | Nebius |
 | Safety logs | EU edge | Cloudflare KV |
-| User data | User's device | Browser (IndexedDB) |
+| Visitor data | The visitor's own device | Browser (IndexedDB) |
 
-The only transfer outside the EEA that ChipMates makes is free-tier inference on the primary model, which Nebius serves from the United Kingdom under the European Commission adequacy decision of 19 December 2025, valid until 27 December 2031. The fallback model runs in Finland. Everything else stays in the EEA. BYOK users who choose a non-EU model via OpenRouter make that decision independently.
-
----
-
-## Accessibility (BFSG / EAA)
-
-The German Barrierefreiheitsstärkungsgesetz (BFSG, implementing the EU Accessibility Act) applies to consumer-facing digital services from June 2025. Agora Cosmica is built to WCAG 2.2 AA standards (see [ACCESSIBILITY.md](ACCESSIBILITY.md) for technical detail).
-
-A formal **Barrierefreiheitserklärung** (Accessibility Statement) page is on the post-launch roadmap. Until that page is published, the technical claims in ACCESSIBILITY.md describe our current implementation.
+The one transfer outside the EEA that ChipMates makes is free-tier inference on the primary model, which Nebius serves from the United Kingdom under the European Commission's adequacy decision for the UK, renewed in December 2025. The fallback model runs in Finland. Everything else stays in the EEA. A visitor who brings their own key and picks a non-EU provider through OpenRouter makes that decision themselves.
 
 ---
 
-## Digital Services Act (DSA)
+## Accessibility (BFSG and EAA)
 
-Agora Cosmica is a small platform far below the VLOP threshold. We implement:
+The German Barrierefreiheitsstärkungsgesetz, which implements the EU Accessibility Act, applies to consumer-facing digital services from June 2025. The interface is built to WCAG 2.2 AA as a target, and [ACCESSIBILITY.md](ACCESSIBILITY.md) says which practices are in the code and which checks run by hand.
 
-- **Notice and action**: "Inhalt melden" (Report Content) button in conversations, routed to `agoracosmica@chipmates.ai`
-- **Terms and Conditions** clearly labeled and accessible
-- **Statement of reasons** when content is blocked (the user sees why)
+A formal Barrierefreiheitserklärung page is not published. Until it is, ACCESSIBILITY.md is the honest description of where the interface stands, and accessibility problems can be reported to `agoracosmica@chipmates.ai`.
+
+---
+
+## Digital Services Act
+
+Agora Cosmica is a small platform, far below the very large online platform threshold. Three things are in place:
+
+- **Notice and action.** A report button on every reply opens an email to `agoracosmica@chipmates.ai` with the reported passage, the figure and the time.
+- **Terms.** Clearly labeled, linked from the welcome screen and the footer, in German and English.
+- **A route back.** A blocked request gets a plain message and an invitation to ask something else. A visitor who thinks a block was wrong can write to the same address, and [CONTENT-SAFETY.md](CONTENT-SAFETY.md) says what triggers a block in the first place.
 
 ---
 
