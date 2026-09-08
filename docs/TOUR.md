@@ -60,8 +60,8 @@ Everything orbits one figure at a time. Four chapters build on each other (Story
 </p>
 
 <p align="center">
-  <img src="../.github/assets/tour/09-council-wall.webp" alt="The council wall: engraving plates for recorded councils, each naming its question and its four voices" width="100%" /><br/>
-  <em>Or take one of the recorded councils: 55 questions, four voices each, at two depth levels, on a wall of engraving plates.</em>
+  <img src="../.github/assets/tour/09-council-wall.webp" alt="The council wall: a public-domain painting on every recorded council, each card naming its question and its four voices" width="100%" /><br/>
+  <em>Or take one of the recorded councils: 55 questions, four voices each, at two depth levels, each under a public-domain painting with its museum credit a tap away.</em>
 </p>
 
 ## See the receipts
