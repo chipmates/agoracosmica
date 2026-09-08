@@ -10,6 +10,45 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ---
 
+## [1.3.0] - 2026-09-08
+
+The free tier moved to a new model with a daily budget behind it, English got a second voice engine and a voice picker, and story chapters learned to take a question mid-listen. Around that: a safety screen that tells distress from scholarship, a hardened store for your own API key, ten public pages for what people search, and a CI that checks what ships.
+
+### Added
+
+- **Ask while you listen.** Pause a story chapter, ask the figure a question by voice or text, hear the Echo answer, and the chapter resumes where it stopped. The exchange can carry on as a normal conversation afterwards. The story helper mentions it, and a listener who runs out of daily turns mid-question gets the same add-your-own-key door as everywhere else.
+- **An English voice engine choice.** English live speech now runs on Qwen3-TTS by default, with five voices per gender and a preview for each, the choice German already had. Kokoro stays selectable in voice settings.
+- **A model switch for the free tier, with a spend governor.** The free tier now answers with DeepSeek V4 Pro under a daily budget. When the budget is spent or the primary model stalls, requests fall back to Qwen3-235B. Settings and every reply name whichever model actually answered and say when the day's shared budget is used up. Operators get an alert on budget and fallback events.
+- **Ten public pages for what people search.** Full public-domain poems by Blake, Shakespeare, and Rumi with the edition and translator cited, explainers on the hero's journey and Stoicism, two German Plato pages, and a page that explains what the product is. The hub pages link to them.
+- **Listening counters.** Story playback reports how far people listen and which chapter they played, as aggregate counts only, the same privacy class as every other counter in [docs/MEASUREMENT.md](docs/MEASUREMENT.md).
+- **A plain answer to "are you an AI?"** A figure asked sincerely whether it is an AI now says so instead of deflecting.
+- **CI that checks what ships.** Every push type-checks the client and each worker, lints the client with errors blocking, and runs the worker test suites before building. Dependabot checks dependencies weekly.
+
+### Changed
+
+- **Returning visitors go straight into the app.** A visitor who already gave consent lands in the app instead of on the homepage, once per tab. `?stay=1` still shows the homepage.
+- **Where free-tier inference runs is stated correctly.** The privacy pages, the compliance docs, and the architecture diagram now say that free-tier messages are processed primarily in the United Kingdom, with Finland as the fallback. A disclosure fix, nothing about the data changed.
+- **Titles that match how people search.** Several figure and theme pages carry rewritten titles and headings, and the Jung page gained a real shadow-work section. Six figure pages run search-phrase titles against six controls in a pre-registered test, read in October.
+- **Sharper sidebar icons.** The four sidebar icons are redrawn as SVG, smaller to load and crisp at any size, with a calmer wisdom icon.
+- **Dependencies.** React Router 7, the Vite React plugin at 5.2 (the next major waits for Vite 8), and a round of GitHub Actions majors. The backend packages now declare their pnpm version, so CI and Dependabot agree on the lockfile.
+
+### Fixed
+
+- The text-to-speech chunker no longer cuts a numbered item like "3." or an abbreviated title mid-word, which could garble the audio.
+- The audio health check reports what it just measured instead of a reading up to two minutes old, so a healthy voice server is picked more reliably.
+- A second set of pre-recorded greetings sits under the served media prefix now, so it is reachable.
+- One figure page's chapter teaser opened on a sentence that made ad networks restrict the page. The teaser now starts one sentence later, in the chapter's own words. The story text and audio are unchanged.
+- The marketing site installs hoisted like the client, so its prerender step stays inside its own package.
+
+### Security
+
+- **Your own API key is harder to steal.** The key that encrypts a bring-your-own key now lives in the browser's non-exportable crypto storage instead of a readable string, so a script on the page cannot read it out. Existing keys migrate on their own. [docs/THREAT-MODEL.md](docs/THREAT-MODEL.md) explains what this protects against.
+- **Self-harm screening in tiers.** The screen stops a conversation when someone expresses their own distress and no longer blocks academic or literary questions about suicide, the Stoics and Virginia Woolf included. [docs/CONTENT-SAFETY.md](docs/CONTENT-SAFETY.md) and the new [docs/CRISIS-PROTOCOL.md](docs/CRISIS-PROTOCOL.md) say what triggers what.
+- **Rate limits by address.** Address-level limits stop a visitor from resetting a daily quota by rotating identifiers.
+- Seven dependencies received version floors to close known advisories, and browserslist moved past two more.
+
+---
+
 ## [1.2.0] - 2026-08-10
 
 The public pages were rebuilt around questions and paths. The homepage, every figure page, and every theme page now lead with one clear way in, real oil paintings hang on the themes and councils, and the audio library got its own front door at `/audio/`. Underneath, the app received its full visual redesign and a set of accessibility, privacy, and measurement improvements.
