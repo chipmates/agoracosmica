@@ -38,7 +38,7 @@ import { createStack, type Stack } from '../stack'
 import { GRADES, type Grade } from '../stack/grade'
 import { isTierName, type TierName } from '../stack/tier'
 import { ASSET_BASE } from '../stack/materials'
-import type { ModelAsset } from '../stack/models'
+import type { ModelAsset, ModelPlacement } from '../stack/models'
 import type { SkyProbe } from '../stack/hdri'
 import { loadManifest, type ManifestEntry } from '../manifest'
 
@@ -77,6 +77,13 @@ const indexEl = document.getElementById('index') as HTMLElement
 
 const asked = new URLSearchParams(location.search)
 const tierAsked = asked.get('tier')
+/* THE COUNT THE LIBRARY'S ONE PERFORMANCE CLAIM IS PROVED WITH. `?scatter=n`
+   lays n bodies as one InstancedMesh per mesh, `?copies=n` lays n clones,
+   and the card prints the draw calls both ways: the claim that a hundred
+   stones are one upload and one draw is then a number on a frame rather
+   than a sentence in a file. */
+const scatterN = Number(asked.get('scatter') ?? 0)
+const copiesN = Number(asked.get('copies') ?? 0)
 
 const scene = new Scene()
 const camera = new PerspectiveCamera(38, innerWidth / innerHeight, 0.02, 120)
@@ -283,7 +290,25 @@ async function show(slug: string): Promise<void> {
   let entry: ManifestEntry | undefined
   try {
     asset = await stack.models.load(slug)
-    standing = await stack.models.place(slug, { position: [0, 0, 0], snap: 'ground' })
+    const many = scatterN || copiesN
+    if (many) {
+      const side = Math.ceil(Math.sqrt(many))
+      const step = Math.max(0.4, Math.max(asset.size.x, asset.size.z) * 1.4)
+      const at: ModelPlacement[] = []
+      for (let i = 0; i < many; i++) {
+        const x = ((i % side) - (side - 1) / 2) * step
+        const z = (Math.floor(i / side) - (side - 1) / 2) * step
+        at.push({ position: [x, 0, z], rotation: (i * 2.39996) % (Math.PI * 2), snap: 'ground' })
+      }
+      if (scatterN) {
+        standing = await stack.models.scatter(slug, at)
+      } else {
+        standing = new Object3D()
+        for (const one of at) standing.add(await stack.models.place(slug, one))
+      }
+    } else {
+      standing = await stack.models.place(slug, { position: [0, 0, 0], snap: 'ground' })
+    }
     scene.add(standing)
     entry = asset.entry
   } catch (err) {
@@ -322,7 +347,13 @@ async function show(slug: string): Promise<void> {
   const metre = rulerLength >= 1 ? `${rulerLength} m` : `${Math.round(rulerLength * 100)} cm`
   const band =
     rulerLength >= 1 ? `${rulerLength * 10} cm` : `${Math.round(rulerLength * 100) / 10} cm`
+  const many = scatterN || copiesN
+  const spread = many
+    ? `${many} bodies, ${many === scatterN ? 'instanced' : 'cloned'}, ` +
+      `${cost.draws} draws and ${cost.triangles.toLocaleString('en')} triangles in the frame · `
+    : ''
   numbersEl.textContent =
+    spread +
     `${b[0]} by ${b[1]} by ${b[2]} m, measured off the file · ` +
     `${asset.tris.toLocaleString('en')} triangles · ` +
     `${entry.gltf?.resolution ?? '?'} maps at about ${asset.texelsPerMetre} texels per metre` +
