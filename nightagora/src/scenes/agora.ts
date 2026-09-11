@@ -134,6 +134,11 @@ const FIRE = { x: 0, y: -0.45, z: -5.6 } // the light anchor sits low in the bow
 const COURT_R = 12.6 // the temenos: where the polished marble stops
 const GROUND_R = 86 // and how far the ground carries on past it
 const TAU = Math.PI * 2
+/* how far a library set travels once around a lathe, in metres. A photograph
+   is measured in metres and a lathe's own u runs 0 to 1, so the two only meet
+   through the real circumference of the thing being dressed. */
+const SHAFT_ROUND = 2.64 // a column at its widest
+const BOWL_ROUND = 3.44 // the fire bowl at its lip
 
 /** the empty seats around the fire, in world space. The circle has one gap,
     at the near side, and the gap is where the visitor is sitting. */
@@ -771,7 +776,19 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
     const up = smoothstep(0.02, 0.3, hLocal)
     const hammer = vn(vec3(world.x.mul(55), world.y.mul(64), world.z.mul(55)))
     const patina = vn(vec3(world.x.mul(9), world.y.mul(8), world.z.mul(9)))
-    const alb = mix(c3(BRONZE), hex3('#334239'), smoothstep(0.5, 0.79, patina).mul(0.7)).mul(hammer.mul(0.34).add(0.74))
+    /* the library's dark bronze, over the bowl's own three scales and not in
+       place of them: the patina at 9 cm, the hammer at 1.6 cm and the chased
+       strokes below the lip are the art's, and the set multiplies a ratio
+       around one into them. */
+    const bronzeDetail = rig.stack.detail(bowlMat, 'bronze-dark', {
+      at: world,
+      uv: vec2(uv().x.mul(BOWL_ROUND), hLocal),
+      macro: 0.5,
+      fade: [10, 26],
+    })
+    const alb = mix(c3(BRONZE), hex3('#334239'), smoothstep(0.5, 0.79, patina).mul(0.7))
+      .mul(hammer.mul(0.34).add(0.74))
+      .mul(bronzeDetail.albedo)
     let colr: N = c3(COLUMN_INK, 0.5).add(c3(SKY_AMB, 0.03).mul(max(normal.y, 0).mul(0.6).add(0.3)))
     colr = colr.add(
       alb.mul(c3(FIRE_WARM)).mul(firelight(world, 4.4, 0.55)).mul(facing(world, normal, 1.6)).mul(float(0.22).add(up.mul(1.5)))
@@ -1027,6 +1044,19 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
     const joint = oneMinus(smoothstep(0.008, 0.025, bed)).mul(shaftMask)
     const grain = vn(vec3(world.x.mul(5.2), world.y.mul(2.8), world.z.mul(5.2)))
     colr = colr.mul(grain.mul(0.18).add(0.9)).mul(oneMinus(joint.mul(0.21)))
+    /* the library's pale limestone, on the stone the art already authored as
+       pale stone. A column is read around its own circumference and up its
+       own height, never off the ground plane it stands on, and it takes the
+       set's albedo only: the flutes are cut by the normal above and a
+       photograph's relief has no business bending them. */
+    colr = colr.mul(
+      rig.stack.detail(shaftMat, 'limestone-pale', {
+        at: world,
+        uv: vec2(uv().x.mul(SHAFT_ROUND), hLocal),
+        macro: 0.55,
+        fade: [14, 40],
+      }).albedo
+    )
     shaftMat.colorNode = shoulder(haze(colr, dCam, 9, 32)).add(dith(0.0022)).mul(uR)
   }
 
