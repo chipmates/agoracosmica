@@ -1,0 +1,523 @@
+{
+  "schema_version": "1.0",
+  "slug": "flywheel",
+  "name_en": "Balanced flywheel study",
+  "name_de": "Studie eines ausgewuchteten Schwungrads",
+  "status": "complete",
+  "scope": "Complete modern four-weight flywheel demonstration selected from the balanced-rotation questions on Madrid I114r. The rigid four-spoke arrangement is an explicit assumption, not a tracing of one labelled variant.",
+  "gaps": [],
+  "folio": [
+    {
+      "codex": "Codex Madrid I",
+      "folio": "114r",
+      "holder": "Biblioteca Nacional de España",
+      "catalogue_reference": "MSS/8937, Madrid I f. 114 r",
+      "catalogue_url": "https://www.leonardodigitale.com/sfoglia/madrid-I/0114-r/",
+      "verification": "verified",
+      "commission_reference": null,
+      "correction": null,
+      "date": {
+        "range": "1492 to1497",
+        "certainty": "B",
+        "source": "BNE-DATE",
+        "note": "Approximate manuscript dating, not a dated completion record."
+      },
+      "image_url": "https://backend.leonardodigitale.com/images/books/22/2889/sheet_20190205095542344302.jpg",
+      "image_licence_quote": null,
+      "licence_source": "EL-TERMS",
+      "verification_note": "Edition foliation and text verified through e-Leo. Original-holder service may be unavailable. e-Leo viewer is an authorised-edition resource, not the original holding institution."
+    }
+  ],
+  "scale_m": {
+    "x": 1.4,
+    "y": 1.1,
+    "z": 1.4,
+    "certainty": "C",
+    "source": "A-GEOM",
+    "note": "Full swept bound. All chosen dimensions are modern explanatory assumptions, never claimed measurements of a historical machine."
+  },
+  "frame": {
+    "handedness": "right",
+    "units": "m",
+    "up": "+Y",
+    "forward": "+Z",
+    "origin": "Centre of base block",
+    "ground_y_m": -0.05,
+    "transforms": "All part positions relative to their named parent. Joint q is an extra rotation or translation about the declared parent-frame pivot applied to the rest transform. Children inherit it once."
+  },
+  "assumptions": [
+    {
+      "id": "A-GEOM",
+      "statement": "Every numerical part size, position, orientation and support arrangement in parts is a declared modern modelling choice unless a separate primary source is explicitly attached. Materials marked assumed are plausible period choices. They are not measured from any museum replica.",
+      "reason": "Leonardo did not provide a manufacturing drawing with all dimensions."
+    },
+    {
+      "id": "A-MOTION",
+      "statement": "The stated rates and loads are slow modern demonstration choices. They do not reproduce a measured speed in Leonardo s workshop.",
+      "reason": "No historical operating record was located."
+    },
+    {
+      "id": "A-DETAIL",
+      "statement": "The fixed support is bored to radius 0.045 m around the radius 0.04 m rotor shaft. Its lower thrust pad ends at y=0.60 m, tangent to the shaft end. Bearing friction is not quantified.",
+      "reason": "Complete the numerical modern demonstration without presenting invented details as Leonardo dimensions."
+    }
+  ],
+  "parts": [
+    {
+      "id": "base",
+      "parent": "world",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 1,
+        "y": 0.1,
+        "z": 1
+      },
+      "position_m": [
+        0,
+        0,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "basis": "assumed",
+        "source": "A-GEOM",
+        "class": "oak"
+      },
+      "certainty": "C",
+      "source": "A-GEOM"
+    },
+    {
+      "id": "support",
+      "parent": "base",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [
+            -0.3,
+            0.045
+          ],
+          [
+            -0.3,
+            0.06
+          ],
+          [
+            0.3,
+            0.06
+          ],
+          [
+            0.3,
+            0.045
+          ]
+        ],
+        "segments": 96,
+        "axis": "+Y",
+        "closure": "Close last point to first. Revolve closed section through 2*pi. Ends are annular, bore remains open."
+      },
+      "position_m": [
+        0,
+        0.35,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "basis": "assumed",
+        "source": "A-GEOM",
+        "class": "oak"
+      },
+      "certainty": "C",
+      "source": "A-GEOM"
+    },
+    {
+      "id": "rotor",
+      "parent": "base",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.04,
+        "height": 0.4
+      },
+      "position_m": [
+        0,
+        0.8,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "basis": "assumed",
+        "source": "A-GEOM",
+        "class": "wrought iron"
+      },
+      "certainty": "C",
+      "source": "A-GEOM"
+    },
+    {
+      "id": "spoke-x",
+      "parent": "rotor",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 1.2,
+        "y": 0.03,
+        "z": 0.04
+      },
+      "position_m": [
+        0,
+        0,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "basis": "assumed",
+        "source": "A-GEOM",
+        "class": "oak"
+      },
+      "certainty": "C",
+      "source": "A-GEOM"
+    },
+    {
+      "id": "spoke-z",
+      "parent": "rotor",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.04,
+        "y": 0.03,
+        "z": 1.2
+      },
+      "position_m": [
+        0,
+        0,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "basis": "assumed",
+        "source": "A-GEOM",
+        "class": "oak"
+      },
+      "certainty": "C",
+      "source": "A-GEOM"
+    },
+    {
+      "id": "weight-0",
+      "parent": "rotor",
+      "shape": "sphere",
+      "dimensions_m": {
+        "radius": 0.07
+      },
+      "position_m": [
+        0.6,
+        0,
+        0.0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "basis": "assumed",
+        "source": "A-GEOM",
+        "class": "stone"
+      },
+      "certainty": "C",
+      "source": "A-GEOM"
+    },
+    {
+      "id": "weight-1",
+      "parent": "rotor",
+      "shape": "sphere",
+      "dimensions_m": {
+        "radius": 0.07
+      },
+      "position_m": [
+        3.6739403974420595e-17,
+        0,
+        0.6
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "basis": "assumed",
+        "source": "A-GEOM",
+        "class": "stone"
+      },
+      "certainty": "C",
+      "source": "A-GEOM"
+    },
+    {
+      "id": "weight-2",
+      "parent": "rotor",
+      "shape": "sphere",
+      "dimensions_m": {
+        "radius": 0.07
+      },
+      "position_m": [
+        -0.6,
+        0,
+        7.347880794884119e-17
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "basis": "assumed",
+        "source": "A-GEOM",
+        "class": "stone"
+      },
+      "certainty": "C",
+      "source": "A-GEOM"
+    },
+    {
+      "id": "weight-3",
+      "parent": "rotor",
+      "shape": "sphere",
+      "dimensions_m": {
+        "radius": 0.07
+      },
+      "position_m": [
+        -1.1021821192326178e-16,
+        0,
+        -0.6
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "basis": "assumed",
+        "source": "A-GEOM",
+        "class": "stone"
+      },
+      "certainty": "C",
+      "source": "A-GEOM"
+    },
+    {
+      "id": "thrust-pad",
+      "parent": "base",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.06,
+        "height": 0.04
+      },
+      "position_m": [
+        0,
+        0.58,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "A-GEOM"
+      },
+      "certainty": "C",
+      "source": "A-GEOM"
+    }
+  ],
+  "joints": [
+    {
+      "id": "q",
+      "type": "revolute",
+      "parent": "base",
+      "child": "rotor",
+      "axis": [
+        0,
+        1,
+        0
+      ],
+      "pivot_m": [
+        0,
+        0.8,
+        0
+      ],
+      "limits": null,
+      "ratio": null,
+      "source": "A-MOTION",
+      "certainty": "C",
+      "notes": ""
+    }
+  ],
+  "drive": {
+    "type": "human",
+    "input_joint": "q",
+    "input_rate": {
+      "value": 0.5235987755982988,
+      "unit": "rad/s",
+      "certainty": "C",
+      "source": "A-MOTION",
+      "note": "Visible external hand input maintains5rpm at q. The drive supplies drag losses. No self-driving motion is claimed."
+    },
+    "justification": "Visible external hand input maintains5rpm at q. The drive supplies drag losses. No self-driving motion is claimed.",
+    "source": "A-MOTION"
+  },
+  "motion": {
+    "period_s": 12,
+    "loop": true,
+    "initial_states": {
+      "q": 0
+    },
+    "phases": [
+      {
+        "name": "Maintained rotation",
+        "start_s": 0,
+        "duration_s": 12,
+        "joint_values": {
+          "q": "pi*t/6"
+        },
+        "interpolation": "linear"
+      }
+    ],
+    "visitor_12s": "One slow turn. Angle accumulates. Continuous human input is named on the label."
+  },
+  "animation_notes": [
+    "No bounce, no hidden energy recharge and no invisible reset.",
+    "All independent joints are in the schedule. Rigid descendants follow their parent.",
+    "Use the specified SI time without cinematic speed-up."
+  ],
+  "label_en": "After Madrid I 114r. This modern flywheel demonstration stores energy supplied by a person.",
+  "label_de": "Nach Madrid I 114r. Dieses heutige Schwungradmodell speichert Energie, die ein Mensch zuführt.",
+  "page": {
+    "path": "pages/flywheel.md",
+    "sections": [
+      "folio",
+      "mechanism",
+      "purpose",
+      "build_history",
+      "tests",
+      "arithmetic",
+      "myth",
+      "sources"
+    ]
+  },
+  "sources": [
+    {
+      "id": "BNE-DATE",
+      "title": "Códice Madrid I, análisis de mecanismos",
+      "author_or_institution": "Rubio and colleagues",
+      "year": 2024,
+      "url": "https://www.tecnicaindustrial.es/codice-madrid-i-un-analisis-de-los-mecanismos-del-primer-tratado-completo-de-sistemas-mecanicos/",
+      "accessed": "2026-09-08",
+      "supports": "Dating of Madrid I1492 to1497",
+      "source_type": "research",
+      "limitations": "Indexed scholarly article text. Date is approximate."
+    },
+    {
+      "id": "EL-TERMS",
+      "title": "Descrizione del progetto",
+      "author_or_institution": "Biblioteca Leonardiana",
+      "year": null,
+      "url": "https://www.leonardodigitale.com/descrizione-del-progetto/",
+      "accessed": "2026-09-08",
+      "supports": "e-Leo terms and edition provenance",
+      "source_type": "holder",
+      "limitations": "e-Leo holds editions and authorised facsimiles, not all original manuscripts."
+    },
+    {
+      "id": "EL-FLY",
+      "title": "Madrid I 0114 r facsimile and transcription",
+      "author_or_institution": "Biblioteca Leonardiana, e-Leo",
+      "year": null,
+      "url": "https://www.leonardodigitale.com/sfoglia/madrid-I/0114-r/",
+      "accessed": "2026-09-08",
+      "supports": "Folio identification and inspected Italian transcription",
+      "source_type": "primary",
+      "limitations": "Viewer metadata decoded and ordinary read endpoint queried with bookId=22,sheetId=2889. No image downloaded. Original holder catalogue checked where accessible."
+    },
+    {
+      "id": "FLY-M",
+      "title": "Machines, software and studies",
+      "author_or_institution": "Mario Taddei",
+      "year": null,
+      "url": "https://www.mariotaddei.net/machines-softwares-studies/",
+      "accessed": "2026-09-08",
+      "supports": "Reconstructor labels flywheel Madrid I114r",
+      "source_type": "primary",
+      "limitations": "Author inventory identifies his own reconstructions. Geometry is not reused."
+    },
+    {
+      "id": "BNE",
+      "title": "Tratado de estática y mecánica, Codex Madrid I",
+      "author_or_institution": "Biblioteca Nacional de España",
+      "year": null,
+      "url": "https://datos.bne.es/edicion/biam0000011018",
+      "accessed": "2026-09-08",
+      "supports": "MSS/8937 and original holder",
+      "source_type": "holder",
+      "limitations": "Catalogue visible in indexed result. Direct fetch returned403. Folio texts checked independently through e-Leo."
+    },
+    {
+      "id": "BNE-LEAF",
+      "title": "El imaginario de Leonardo exhibition leaflet",
+      "author_or_institution": "Biblioteca Nacional de España",
+      "year": 2012,
+      "url": "https://www.bne.gob.es/es/Micrositios/Guias/FolletosExposiciones/resources/docs/FolletoExpoLeonardo.pdf",
+      "accessed": "2026-09-08",
+      "supports": "Madrid I10r gears and chains,26r bearings",
+      "source_type": "holder",
+      "limitations": "Indexed PDF text inspected. Direct fetch timed out. Does not identify20v as26r."
+    }
+  ],
+  "research": {
+    "identification": "Madrid I114r [EL-FLY].",
+    "sheet_vs_reconstruction": "Six motion arrangements and the relation between driving and driven bodies are discussed [EL-FLY]. Mario Taddei lists a flywheel reconstruction [FLY-M]. This four-weight stand is independent modern explanatory geometry.",
+    "dimensions": "No explicit physical dimensions or Richter number verified [EL-FLY]. No braccio conversion made.",
+    "claims": {
+      "claimed_by_leonardo": "Leonardo compares balanced and unbalanced rotating weights and rejects the driven body as its own source [EL-FLY].",
+      "tested_by_leonardo": "No dated experiment by Leonardo was verified in the sources listed here. This is an evidence gap, not proof that he never tried it.",
+      "built_in_lifetime": "No lifetime build verified. Modern reconstructor inventory does not prove one [FLY-M].",
+      "later_tests": "No measured modern test found for this exact study."
+    },
+    "physics": {
+      "formulas": [
+        "I_weights=sum(m*r^2)",
+        "E_weights=0.5*I_weights*omega^2"
+      ],
+      "inputs": [
+        "Four stone masses3.5kg each [C,A-MOTION], radius0.07m implies approximate density2436kg/m³",
+        "r0.6m [C,A-GEOM]",
+        "omega=pi/6rad/s [C,A-MOTION]"
+      ],
+      "results": [
+        "I_weights5.04kg m²",
+        "E_weights0.6909J"
+      ],
+      "limits": "Lower-bound point-mass calculation excludes finite ball radii, shaft and spokes. No claim of original mass or power gain.",
+      "verdict_en": "A flywheel stores supplied work and gives it back with losses.",
+      "verdict_de": "Ein Schwungrad speichert zugeführte Arbeit und gibt sie mit Verlusten wieder ab."
+    },
+    "myths": {
+      "claim": "A flywheel creates power",
+      "earliest_source_located": "Unknown.",
+      "correction": "Stored rotational energy comes from its driver. The source itself distinguishes cause and driven motion [EL-FLY]."
+    },
+    "confidence": "High transcription. Low exact original geometry. Modern demonstration complete within stated scope."
+  }
+}

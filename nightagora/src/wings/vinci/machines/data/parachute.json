@@ -1,0 +1,769 @@
+{
+  "schema_version": "1.0",
+  "slug": "parachute",
+  "name_en": "Pyramidal parachute",
+  "name_de": "Pyramidenfallschirm",
+  "status": "complete",
+  "scope": "Fully dimensioned static canopy, frame, four suspension ropes and harness ring. Deployment and safe human use are outside this display specification.",
+  "gaps": [
+    "Historical suspension lengths, cloth density, joint construction and frame cross sections unknown and assumed.",
+    "No deployment simulation or structural certification.",
+    "Holder-specific image licence terms not verified."
+  ],
+  "folio": [
+    {
+      "codex": "Codex Atlanticus",
+      "folio": "1058v",
+      "holder": "Veneranda Biblioteca Ambrosiana",
+      "catalogue_reference": "Codex Atlanticus, f.1058 verso",
+      "catalogue_url": "https://www.ambrosiana.it/scopri/capolavori/codice-atlantico/",
+      "verification": "verified",
+      "commission_reference": "1058v",
+      "correction": null,
+      "date": {
+        "range": "about1485",
+        "certainty": "B",
+        "source": "s-vietti",
+        "note": "Modern dating, not a written date on this excerpt."
+      },
+      "image_url": "https://backend.leonardodigitale.com/images/books/21/1314/sheet_20190204173103193861.jpg",
+      "image_licence_quote": null,
+      "licence_source": null
+    }
+  ],
+  "scale_m": {
+    "x": 7.08,
+    "y": 10.34,
+    "z": 7.08,
+    "certainty": "C",
+    "source": "a-geometry",
+    "note": "Static envelope, origin at floor. No descent translation. Exact cloth base and height7.0032m are dimensioned under the explicit Florentine conversion."
+  },
+  "frame": {
+    "handedness": "right",
+    "units": "m",
+    "up": "+Y",
+    "forward": "+Z",
+    "origin": "Ground projection of central assembly. Local transforms relative to parent. Ground y=0."
+  },
+  "assumptions": [
+    {
+      "id": "a-physics",
+      "statement": "For the displayed aerodynamic comparison use100kg total suspended mass,49m2 projected area, rho1.225kg/m3, g9.81m/s2 and Cd1.2. Cd0.8and1.6 are sensitivity bounds. A second165kg scenario is80kg assumed pilot plus85kg reported replica. Mass is an explicit aerodynamic scenario, not inferred from the geometric mesh.",
+      "reason": "No measured drag coefficient or structural mass breakdown for this exact geometry was located."
+    },
+    {
+      "id": "a-display",
+      "statement": "Static documentary placement at the origin. No inferred motion.",
+      "reason": "Prevents an unfinished study appearing to be a working mechanism."
+    },
+    {
+      "id": "a-geometry",
+      "statement": "Every numeric dimension, coordinate, orientation, mesh subdivision, tube radius and repeated-element placement in parts is an explicit modern modelling choice except quantities explicitly identified as Leonardo dimensions in the part notes. These values are the complete procedural definition.",
+      "reason": "The folio does not specify fabrication geometry. The model is newly specified from the sheet and never copied from a replica."
+    },
+    {
+      "id": "a-motion",
+      "statement": "Every motion limit, pivot, period and rate below is a modern demonstration assumption unless a source is named. All fixed children follow their parent rigidly.",
+      "reason": "No historical operating rate is measured."
+    },
+    {
+      "id": "a-part-canopy",
+      "statement": "C construction of canopy: mesh. 5 vertices and 4 faces, local XYZ bounds [[-3.5016, 3.5016], [3.3, 10.3032], [-3.5016, 3.5016]]. Dimensions {\"nominal_thickness\": 0.0004}. Parent-local position [0, 0, 0] m and intrinsic XYZ rotation [0, 0, 0] rad. The part object contains the exact numerical construction and its evidence classification.",
+      "reason": "Explicit numerical geometry for canopy. Source classification is in the part."
+    },
+    {
+      "id": "a-part-frame-0",
+      "statement": "C construction of frame-0: tube. Radius 0.018 m. 2 centreline points, endpoints [-3.5016, 3.3, -3.5016] and [3.5016, 3.3, -3.5016]. Dimensions {\"radius\": 0.018}. Parent-local position [0, 0, 0] m and intrinsic XYZ rotation [0, 0, 0] rad. The part object contains the exact numerical construction and its evidence classification.",
+      "reason": "Explicit numerical geometry for frame-0. Source classification is in the part."
+    },
+    {
+      "id": "a-part-frame-1",
+      "statement": "C construction of frame-1: tube. Radius 0.018 m. 2 centreline points, endpoints [3.5016, 3.3, -3.5016] and [3.5016, 3.3, 3.5016]. Dimensions {\"radius\": 0.018}. Parent-local position [0, 0, 0] m and intrinsic XYZ rotation [0, 0, 0] rad. The part object contains the exact numerical construction and its evidence classification.",
+      "reason": "Explicit numerical geometry for frame-1. Source classification is in the part."
+    },
+    {
+      "id": "a-part-frame-2",
+      "statement": "C construction of frame-2: tube. Radius 0.018 m. 2 centreline points, endpoints [3.5016, 3.3, 3.5016] and [-3.5016, 3.3, 3.5016]. Dimensions {\"radius\": 0.018}. Parent-local position [0, 0, 0] m and intrinsic XYZ rotation [0, 0, 0] rad. The part object contains the exact numerical construction and its evidence classification.",
+      "reason": "Explicit numerical geometry for frame-2. Source classification is in the part."
+    },
+    {
+      "id": "a-part-frame-3",
+      "statement": "C construction of frame-3: tube. Radius 0.018 m. 2 centreline points, endpoints [-3.5016, 3.3, 3.5016] and [-3.5016, 3.3, -3.5016]. Dimensions {\"radius\": 0.018}. Parent-local position [0, 0, 0] m and intrinsic XYZ rotation [0, 0, 0] rad. The part object contains the exact numerical construction and its evidence classification.",
+      "reason": "Explicit numerical geometry for frame-3. Source classification is in the part."
+    },
+    {
+      "id": "a-part-harness",
+      "statement": "C construction of harness: torus. Dimensions {\"major_radius\": 0.18, \"tube_radius\": 0.015, \"plane\": \"XZ\"}. Parent-local position [0, 0.9, 0] m and intrinsic XYZ rotation [0, 0, 0] rad. The part object contains the exact numerical construction and its evidence classification.",
+      "reason": "Explicit numerical geometry for harness. Source classification is in the part."
+    },
+    {
+      "id": "a-part-suspension-0",
+      "statement": "C construction of suspension-0: tube. Radius 0.007 m. 2 centreline points, endpoints [-3.5016, 3.3, -3.5016] and [-0.12727922061357855, 0.9, -0.12727922061357855]. Dimensions {\"radius\": 0.007}. Parent-local position [0, 0, 0] m and intrinsic XYZ rotation [0, 0, 0] rad. The part object contains the exact numerical construction and its evidence classification.",
+      "reason": "Explicit numerical geometry for suspension-0. Source classification is in the part."
+    },
+    {
+      "id": "a-part-suspension-1",
+      "statement": "C construction of suspension-1: tube. Radius 0.007 m. 2 centreline points, endpoints [3.5016, 3.3, -3.5016] and [0.12727922061357855, 0.9, -0.12727922061357855]. Dimensions {\"radius\": 0.007}. Parent-local position [0, 0, 0] m and intrinsic XYZ rotation [0, 0, 0] rad. The part object contains the exact numerical construction and its evidence classification.",
+      "reason": "Explicit numerical geometry for suspension-1. Source classification is in the part."
+    },
+    {
+      "id": "a-part-suspension-2",
+      "statement": "C construction of suspension-2: tube. Radius 0.007 m. 2 centreline points, endpoints [3.5016, 3.3, 3.5016] and [0.12727922061357855, 0.9, 0.12727922061357855]. Dimensions {\"radius\": 0.007}. Parent-local position [0, 0, 0] m and intrinsic XYZ rotation [0, 0, 0] rad. The part object contains the exact numerical construction and its evidence classification.",
+      "reason": "Explicit numerical geometry for suspension-2. Source classification is in the part."
+    },
+    {
+      "id": "a-part-suspension-3",
+      "statement": "C construction of suspension-3: tube. Radius 0.007 m. 2 centreline points, endpoints [-3.5016, 3.3, 3.5016] and [-0.12727922061357855, 0.9, 0.12727922061357855]. Dimensions {\"radius\": 0.007}. Parent-local position [0, 0, 0] m and intrinsic XYZ rotation [0, 0, 0] rad. The part object contains the exact numerical construction and its evidence classification.",
+      "reason": "Explicit numerical geometry for suspension-3. Source classification is in the part."
+    }
+  ],
+  "parts": [
+    {
+      "id": "canopy",
+      "parent": "world",
+      "shape": {
+        "type": "mesh",
+        "vertices_m": [
+          [
+            -3.5016,
+            3.3,
+            -3.5016
+          ],
+          [
+            3.5016,
+            3.3,
+            -3.5016
+          ],
+          [
+            3.5016,
+            3.3,
+            3.5016
+          ],
+          [
+            -3.5016,
+            3.3,
+            3.5016
+          ],
+          [
+            0,
+            10.3032,
+            0
+          ]
+        ],
+        "faces": [
+          [
+            0,
+            1,
+            4
+          ],
+          [
+            1,
+            2,
+            4
+          ],
+          [
+            2,
+            3,
+            4
+          ],
+          [
+            3,
+            0,
+            4
+          ]
+        ],
+        "double_sided": true
+      },
+      "dimensions_m": {
+        "nominal_thickness": 0.0004
+      },
+      "position_m": [
+        0,
+        0,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "sealed linen",
+        "basis": "documented",
+        "source": "s-folio"
+      },
+      "certainty": "C",
+      "source": "a-part-canopy",
+      "notes": "Square side and vertical height both12braccia x0.5836m=7.0032m [s-folio]. Assumed fabric thickness and elevation. No bottom cloth panel."
+    },
+    {
+      "id": "frame-0",
+      "parent": "world",
+      "shape": {
+        "type": "tube",
+        "centreline_m": [
+          [
+            -3.5016,
+            3.3,
+            -3.5016
+          ],
+          [
+            3.5016,
+            3.3,
+            -3.5016
+          ]
+        ],
+        "radius_m": 0.018,
+        "caps": true
+      },
+      "dimensions_m": {
+        "radius": 0.018
+      },
+      "position_m": [
+        0,
+        0,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "a-geometry"
+      },
+      "certainty": "C",
+      "source": "a-part-frame-0",
+      "notes": ""
+    },
+    {
+      "id": "frame-1",
+      "parent": "world",
+      "shape": {
+        "type": "tube",
+        "centreline_m": [
+          [
+            3.5016,
+            3.3,
+            -3.5016
+          ],
+          [
+            3.5016,
+            3.3,
+            3.5016
+          ]
+        ],
+        "radius_m": 0.018,
+        "caps": true
+      },
+      "dimensions_m": {
+        "radius": 0.018
+      },
+      "position_m": [
+        0,
+        0,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "a-geometry"
+      },
+      "certainty": "C",
+      "source": "a-part-frame-1",
+      "notes": ""
+    },
+    {
+      "id": "frame-2",
+      "parent": "world",
+      "shape": {
+        "type": "tube",
+        "centreline_m": [
+          [
+            3.5016,
+            3.3,
+            3.5016
+          ],
+          [
+            -3.5016,
+            3.3,
+            3.5016
+          ]
+        ],
+        "radius_m": 0.018,
+        "caps": true
+      },
+      "dimensions_m": {
+        "radius": 0.018
+      },
+      "position_m": [
+        0,
+        0,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "a-geometry"
+      },
+      "certainty": "C",
+      "source": "a-part-frame-2",
+      "notes": ""
+    },
+    {
+      "id": "frame-3",
+      "parent": "world",
+      "shape": {
+        "type": "tube",
+        "centreline_m": [
+          [
+            -3.5016,
+            3.3,
+            3.5016
+          ],
+          [
+            -3.5016,
+            3.3,
+            -3.5016
+          ]
+        ],
+        "radius_m": 0.018,
+        "caps": true
+      },
+      "dimensions_m": {
+        "radius": 0.018
+      },
+      "position_m": [
+        0,
+        0,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "a-geometry"
+      },
+      "certainty": "C",
+      "source": "a-part-frame-3",
+      "notes": ""
+    },
+    {
+      "id": "harness",
+      "parent": "world",
+      "shape": "torus",
+      "dimensions_m": {
+        "major_radius": 0.18,
+        "tube_radius": 0.015,
+        "plane": "XZ"
+      },
+      "position_m": [
+        0,
+        0.9,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "leather",
+        "basis": "assumed",
+        "source": "a-geometry"
+      },
+      "certainty": "C",
+      "source": "a-part-harness",
+      "notes": ""
+    },
+    {
+      "id": "suspension-0",
+      "parent": "world",
+      "shape": {
+        "type": "tube",
+        "centreline_m": [
+          [
+            -3.5016,
+            3.3,
+            -3.5016
+          ],
+          [
+            -0.12727922061357855,
+            0.9,
+            -0.12727922061357855
+          ]
+        ],
+        "radius_m": 0.007,
+        "caps": true
+      },
+      "dimensions_m": {
+        "radius": 0.007
+      },
+      "position_m": [
+        0,
+        0,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "hemp rope",
+        "basis": "assumed",
+        "source": "a-geometry"
+      },
+      "certainty": "C",
+      "source": "a-part-suspension-0",
+      "notes": ""
+    },
+    {
+      "id": "suspension-1",
+      "parent": "world",
+      "shape": {
+        "type": "tube",
+        "centreline_m": [
+          [
+            3.5016,
+            3.3,
+            -3.5016
+          ],
+          [
+            0.12727922061357855,
+            0.9,
+            -0.12727922061357855
+          ]
+        ],
+        "radius_m": 0.007,
+        "caps": true
+      },
+      "dimensions_m": {
+        "radius": 0.007
+      },
+      "position_m": [
+        0,
+        0,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "hemp rope",
+        "basis": "assumed",
+        "source": "a-geometry"
+      },
+      "certainty": "C",
+      "source": "a-part-suspension-1",
+      "notes": ""
+    },
+    {
+      "id": "suspension-2",
+      "parent": "world",
+      "shape": {
+        "type": "tube",
+        "centreline_m": [
+          [
+            3.5016,
+            3.3,
+            3.5016
+          ],
+          [
+            0.12727922061357855,
+            0.9,
+            0.12727922061357855
+          ]
+        ],
+        "radius_m": 0.007,
+        "caps": true
+      },
+      "dimensions_m": {
+        "radius": 0.007
+      },
+      "position_m": [
+        0,
+        0,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "hemp rope",
+        "basis": "assumed",
+        "source": "a-geometry"
+      },
+      "certainty": "C",
+      "source": "a-part-suspension-2",
+      "notes": ""
+    },
+    {
+      "id": "suspension-3",
+      "parent": "world",
+      "shape": {
+        "type": "tube",
+        "centreline_m": [
+          [
+            -3.5016,
+            3.3,
+            3.5016
+          ],
+          [
+            -0.12727922061357855,
+            0.9,
+            0.12727922061357855
+          ]
+        ],
+        "radius_m": 0.007,
+        "caps": true
+      },
+      "dimensions_m": {
+        "radius": 0.007
+      },
+      "position_m": [
+        0,
+        0,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "hemp rope",
+        "basis": "assumed",
+        "source": "a-geometry"
+      },
+      "certainty": "C",
+      "source": "a-part-suspension-3",
+      "notes": ""
+    }
+  ],
+  "joints": [],
+  "drive": {
+    "type": "none",
+    "input_rate": {
+      "value": 0,
+      "unit": "rad/s",
+      "certainty": "C",
+      "source": "a-display",
+      "note": "Static evidence display."
+    },
+    "justification": "Unresolved mechanism is not animated.",
+    "source": "a-display"
+  },
+  "motion": {
+    "period_s": null,
+    "loop": false,
+    "phases": [],
+    "visitor_12s": "The evidence display remains still."
+  },
+  "animation_notes": [
+    "No undocumented flight, lift, bounce, mechanism or invisible reset.",
+    "Static suspended study. Do not animate a drop as safe, or invisibly reset the canopy.",
+    "Keep the base open. Four equilateral7m cloth panels produce a different pyramid height and must not replace the12by12braccia geometry."
+  ],
+  "label_en": "Reconstructed from Codex Atlanticus f. 1058v. Modern versions descended in 2000 and 2008.",
+  "label_de": "Rekonstruktion nach Codex Atlanticus, Blatt 1058v. Moderne Fassungen wurden 2000 und 2008 erprobt.",
+  "page": {
+    "path": "pages/parachute.md",
+    "sections": [
+      "folio",
+      "mechanism",
+      "purpose",
+      "build_history",
+      "tests",
+      "arithmetic",
+      "myth",
+      "sources"
+    ]
+  },
+  "sources": [
+    {
+      "id": "s-folio",
+      "title": "Codex Atlanticus f. 1058v, transcription",
+      "author_or_institution": "Biblioteca Leonardiana, e-Leo",
+      "year": null,
+      "url": "https://www.leonardodigitale.com/sfoglia/codice-atlantico/1058-v/",
+      "accessed": "2026-09-08",
+      "supports": "Exact dimension statement read through public sheet endpoint.",
+      "source_type": "primary",
+      "limitations": ""
+    },
+    {
+      "id": "s-holder",
+      "title": "Codice Atlantico, f. 1058 verso",
+      "author_or_institution": "Veneranda Biblioteca Ambrosiana",
+      "year": null,
+      "url": "https://www.ambrosiana.it/scopri/capolavori/codice-atlantico/",
+      "accessed": "2026-09-08",
+      "supports": "Holder explicitly identifies parachute above beating-wing studies.",
+      "source_type": "holder",
+      "limitations": ""
+    },
+    {
+      "id": "s-model",
+      "title": "Paracadute, IGB-423",
+      "author_or_institution": "Museo Nazionale Scienza e Tecnologia Leonardo da Vinci",
+      "year": null,
+      "url": "https://collezioni-online.museoscienza.org/detail/IT-MUST-NTR001-008405/paracadute",
+      "accessed": "2026-09-08",
+      "supports": "Soldatini and Somenzi, 1952 to 1953. Cotton model cover and wooden dummy.",
+      "source_type": "museum",
+      "limitations": ""
+    },
+    {
+      "id": "s-nicholas",
+      "title": "Leap of Faith",
+      "author_or_institution": "WIRED",
+      "year": 2000,
+      "url": "https://www.wired.com/2000/06/leap-of-faith/",
+      "accessed": "2026-09-08",
+      "supports": "Contemporary 28 June 2000 report of Nicholas parachute descent.",
+      "source_type": "secondary",
+      "limitations": "Article metadata and indexed opening inspected."
+    },
+    {
+      "id": "s-vietti",
+      "title": "Un Suisse saute de 650 mètres avec le parachute de Léonard de Vinci",
+      "author_or_institution": "AFP, La Dépêche",
+      "year": 2008,
+      "url": "https://www.ladepeche.fr/article/2008/04/26/450850-suisse-saute-650-metres-parachute-leonard-vinci.html",
+      "accessed": "2026-09-08",
+      "supports": "Direct interview with Vietti-Teppa. Modern fabric, four 7 m equilateral faces, mesh base, 650 m exit, 600 m opening, no rigid frame, no steering. Nicholas 80 kg frame reported.",
+      "source_type": "primary",
+      "limitations": ""
+    },
+    {
+      "id": "s-85kg",
+      "title": "Un británico prueba con éxito el paracaídas de Leonardo da Vinci",
+      "author_or_institution": "Servimedia",
+      "year": 2000,
+      "url": "https://www.servimedia.es/noticias/britanico-prueba-exito-paracaidas-leonardo-da-vinci-disenado-hace-mas-500-anos/1411048484",
+      "accessed": "2026-09-08",
+      "supports": "Contemporary report 85 kg parachute.",
+      "source_type": "secondary",
+      "limitations": "BBC-derived report conflates safe landing with use of the original canopy. AFP 2008 clarifies reserve landing. Retain mass discrepancy 80 versus 85 kg."
+    },
+    {
+      "id": "s-drag",
+      "title": "Terminal Velocity",
+      "author_or_institution": "Tom Benson, NASA Glenn",
+      "year": null,
+      "url": "https://www.grc.nasa.gov/www/k-12/VirtualAero/BottleRocket/airplane/termvr.html",
+      "accessed": "2026-09-08",
+      "supports": "Force-balance terminal descent equation.",
+      "source_type": "primary",
+      "limitations": ""
+    },
+    {
+      "id": "s-white",
+      "title": "The Invention of the Parachute",
+      "author_or_institution": "Lynn White Jr.",
+      "year": 1968,
+      "url": "https://www.degruyterbrill.com/document/doi/10.1525/9780520378070-013/html",
+      "accessed": "2026-09-08",
+      "supports": "Bibliographic identification of research challenging Leonardo priority.",
+      "source_type": "research",
+      "limitations": "Publisher bibliography inspected. Full chapter unavailable. Earlier Italian drawings supported separately by CSPA."
+    },
+    {
+      "id": "s-history",
+      "title": "History of Parachuting and CSPA",
+      "author_or_institution": "Canadian Sport Parachuting Association",
+      "year": null,
+      "url": "https://www.cspa.ca/en/node/228",
+      "accessed": "2026-09-08",
+      "supports": "Institutional history reports anonymous Italian parachute drawings dated about 1470, earlier than Leonardo.",
+      "source_type": "primary",
+      "limitations": ""
+    },
+    {
+      "id": "s-richter",
+      "title": "The Notebooks of Leonardo da Vinci, section 1126 footnote",
+      "author_or_institution": "Jean Paul Richter, editor",
+      "year": 1883,
+      "url": "https://www.gutenberg.org/ebooks/4999",
+      "accessed": "2026-09-08",
+      "supports": "Section 1126 footnote identifies a parachute sketch and refers readers to Saggio plate XVI and Hermann Grothe 1874 page 50.",
+      "source_type": "primary",
+      "limitations": "This is a cross-reference footnote, not the folio transcription giving 12 braccia dimensions. It establishes located publication references, not historical priority."
+    }
+  ],
+  "research": {
+    "identification": "CA 1058v is correct [s-holder].",
+    "sheet_vs_reconstruction": [
+      "Sheet gives a person beneath a sealed-linen pyramidal canopy and a 12 braccia dimension statement [s-folio].",
+      "Soldatini and Somenzi 1952 to 1953 supplied the detailed wooden model frame, cotton cover and dummy [s-model].",
+      "Nicholas 2000 used a heavy version and finished under a conventional reserve. Vietti-Teppa 2008 landed with modern fabric, four equilateral 7 m sides and a mesh base without the rigid frame [s-nicholas,s-vietti].",
+      "The commissioned model uses the literal square-base and vertical-height reading, never replica photographs [a-geometry]."
+    ],
+    "dimensions": {
+      "quote": "che sia 12 braccia per faccia e alto 12",
+      "folio": "CA 1058v",
+      "richter_number": "1126, footnote cross-reference only",
+      "richter_note": "Richter 1883 section 1126 footnote mentions a parachute sketch and references Saggio plate XVI and Grothe 1874 page 50. The 12 braccia wording is verified directly on CA1058v in e-Leo, not assigned to the body of Richter section 1126 [s-richter,s-folio].",
+      "conversion": "12x 0.5836=7.0032 m side and vertical height. The quoted material is pannolino intasato, sealed linen [s-folio]."
+    },
+    "claims": {
+      "claimed": "A man under this canopy could descend from any great height without injury [s-folio].",
+      "tested": "The inspected note is a proposal, not a dated test result [s-folio].",
+      "built_lifetime": "No documented lifetime build or jump located.",
+      "later": "Nicholas 2000 airborne descent followed by reserve landing. Vietti-Teppa 26 April 2008 direct landing at Payerne after 650 m helicopter exit. Reports distinguish 80 kg versus 85 kg for Nicholas apparatus. Neither is an instrumented test of this precise cloth/structure model [s-vietti,s-85kg]."
+    },
+    "physics": {
+      "formula": "D=0.5*rho*Cd*A*v^2=mg. v=sqrt(2 mg/(rho*Cd*A)).",
+      "inputs": "A 49 m 2 is the rounded 7x 7 m projected opening, not the sum of four cloth triangles. All other inputs are explicit a-physics assumptions except the reported 85 kg replica mass.",
+      "results": "100 kg,Cd 1.2 gives 5.219 m/s. Cd 0.8 gives 6.392 m/s andCd 1.6 gives 4.520 m/s.165 kg,Cd 1.2 gives 6.704 m/s. Equivalent free-fall heights v^2/(2g) are 1.39 m and 2.29 m for 100 and 165 kg. A seven-metre equilateral-face pyramid has vertical height 7/sqrt(2)=4.95 m, unlike Leonardo 12 braccia vertical reading.",
+      "limitations": "Terminal descent only. Excludes opening shock, oscillation, ground wind, fabric permeability and impact injury. Cd is deliberately assumed, not a measured Leonardo coefficient.",
+      "verdict_en": "A 7 by 7 m canopy at 100 kg gives about 5.2 m/s in this assumed drag model.",
+      "verdict_de": "Eine 7 mal 7 m große Kappe sinkt bei 100 kg in diesem angenommenen Widerstandsmodell mit etwa 5,2 m/s."
+    },
+    "myths": [
+      {
+        "claim": "Leonardo invented the parachute and the 2000 replica landed intact.",
+        "earliest_located": "The earliest explicit first-parachute attribution actually located here is the contemporary Servimedia 28 June 2000 report. It is not claimed to be the historical first such attribution [s-85kg].",
+        "correction": "The CSPA history reports earlier Italian drawings about 1470. AFP distinguishes Nicholas reserve landing from Vietti-Teppa modern canopy landing [s-history,s-vietti]."
+      }
+    ],
+    "confidence": "High folio and 12 braccia text. Medium date and test narrative. Low assumed Cd and mass. No safety claim.",
+    "geometry_validation": {
+      "method": "Local primitive and mesh geometry transformed through the specified joint hierarchy. Forty-nine poses across 12 seconds, or one static pose. Tube centreline bounds conservatively expanded by radius. Analytic motion extrema and attachment clearances are given in animation_notes.",
+      "sampled_world_min_m": [
+        -3.5196,
+        0.885,
+        -3.5196
+      ],
+      "sampled_world_max_m": [
+        3.5196,
+        10.3032,
+        3.5196
+      ],
+      "result": "All tested swept points are inside the declared conservative bounding box. Geometry defines a C exhibit interpretation, not structural certification."
+    },
+    "publication_cross_reference": "Richter 1883, section 1126 footnote, supplies a located reference to Hermann Grothe, Leonardo da Vinci als Ingenieur, Berlin 1874, page 50, and Saggio plate XVI. Those referenced pages were not independently inspected. This is not evidence that either publication first circulated the sketch [s-richter]."
+  }
+}

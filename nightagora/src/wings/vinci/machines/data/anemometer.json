@@ -1,0 +1,1240 @@
+{
+  "schema_version": "1.0",
+  "slug": "anemometer",
+  "name_en": "Hinged-plate anemometer",
+  "name_de": "Windmesser mit Klappplatte",
+  "status": "complete",
+  "scope": "Complete uncalibrated pressure-plate indicator on an assumed support. No clock or distance integrator is reconstructed.",
+  "gaps": [
+    "No historical dimensions or calibration verified.",
+    "Clock coupling mentioned in text is outside this plate-indicator scope.",
+    "Holder image terms not verified."
+  ],
+  "folio": [
+    {
+      "codex": "Codex Atlanticus",
+      "folio": "675r",
+      "holder": "Veneranda Biblioteca Ambrosiana",
+      "catalogue_reference": "CA675r, old249v a/b, Leonardo//thek@ ATL.1349.1",
+      "catalogue_url": "https://teche.museogalileo.it/leonardo/foglio/index.html?lang=it&num=ATL.1349.1",
+      "verification": "verified",
+      "commission_reference": "anemometer, unspecified folio",
+      "correction": null,
+      "date": {
+        "range": "about1487 to1490",
+        "certainty": "B",
+        "source": "s-holder"
+      },
+      "image_url": "https://backend.leonardodigitale.com/images/books/21/2585/sheet_20190204175718530098.jpg",
+      "image_licence_quote": null,
+      "licence_source": null
+    }
+  ],
+  "scale_m": {
+    "x": 0.74,
+    "y": 0.86,
+    "z": 0.74,
+    "certainty": "C",
+    "source": "a-geometry",
+    "note": "Conservative world bounds X [-0.37,0.37], Y [0,0.86], Z [-0.37,0.37]. Frame including scale ticks reaches Z=-0.3415 m. Vane rotates 0 to 30 degrees in the schedule about world [0,0.76,0], with radius at most 0.300002 m. Its swept Z reaches about -0.151 m. Wind travels along -Z."
+  },
+  "frame": {
+    "handedness": "right",
+    "units": "m",
+    "up": "+Y",
+    "forward": "+Z",
+    "origin": "Ground projection of central assembly. Local transforms relative to parent. Ground y=0."
+  },
+  "assumptions": [
+    {
+      "id": "a-physics",
+      "statement": "Plate width0.2m,length0.3m,area0.06m2,mass0.12kg,centre of mass and pressure0.15m from hinge. rho1.225kg/m3,g9.81m/s2,Cd1.2 assumed. Normal pressure approximated from normal wind speed V*cos(theta).",
+      "reason": "An explicit teaching approximation without historical calibration or wind-tunnel data."
+    },
+    {
+      "id": "a-display",
+      "statement": "Assembly placement is fixed in the room. Only the explicit joints move. No whole-machine travel is inferred.",
+      "reason": "Prevents an unfinished study appearing to be a working mechanism."
+    },
+    {
+      "id": "a-geometry",
+      "statement": "Every numeric dimension, coordinate, orientation, mesh subdivision, tube radius and repeated-element placement in parts is an explicit modern modelling choice except quantities explicitly identified as Leonardo dimensions in the part notes. These values are the complete procedural definition.",
+      "reason": "The folio does not specify fabrication geometry. The model is newly specified from the sheet and never copied from a replica."
+    },
+    {
+      "id": "a-motion",
+      "statement": "Every motion limit, pivot, period and rate below is a modern demonstration assumption unless a source is named. All fixed children follow their parent rigidly.",
+      "reason": "No historical operating rate is measured."
+    },
+    {
+      "id": "a-part-base",
+      "statement": "C construction of base: box. Dimensions {\"x\": 0.7, \"y\": 0.05, \"z\": 0.4}. Parent-local position [0, 0.025, 0] m and intrinsic XYZ rotation [0, 0, 0] rad. The part object contains the exact numerical construction and its evidence classification.",
+      "reason": "Explicit numerical geometry for base. Source classification is in the part."
+    },
+    {
+      "id": "a-part-post",
+      "statement": "C construction of post: box. Dimensions {\"x\": 0.045, \"y\": 0.73, \"z\": 0.045}. Parent-local position [-0.27, 0.415, 0] m and intrinsic XYZ rotation [0, 0, 0] rad. The part object contains the exact numerical construction and its evidence classification.",
+      "reason": "Explicit numerical geometry for post. Source classification is in the part."
+    },
+    {
+      "id": "a-part-rail",
+      "statement": "C construction of rail: box. Dimensions {\"x\": 0.6, \"y\": 0.04, \"z\": 0.045}. Parent-local position [0, 0.8, 0] m and intrinsic XYZ rotation [0, 0, 0] rad. The part object contains the exact numerical construction and its evidence classification.",
+      "reason": "Explicit numerical geometry for rail. Source classification is in the part."
+    },
+    {
+      "id": "a-part-vane",
+      "statement": "C construction of vane: box. Dimensions {\"x\": 0.2, \"y\": 0.3, \"z\": 0.002}. Parent-local position [0, -0.19, 0] m and intrinsic XYZ rotation [0, 0, 0] rad. The part object contains the exact numerical construction and its evidence classification.",
+      "reason": "Explicit numerical geometry for vane. Source classification is in the part."
+    },
+    {
+      "id": "a-part-quadrant",
+      "statement": "C construction of quadrant: tube. Radius 0.008 m. 33 centreline points, endpoints [0.14, 0.44, -0.0] and [0.14, 0.76, -0.32]. Dimensions {\"radius\": 0.008}. Parent-local position [0, 0, 0] m and intrinsic XYZ rotation [0, 0, 0] rad. The part object contains the exact numerical construction and its evidence classification.",
+      "reason": "Explicit numerical geometry for quadrant. Source classification is in the part."
+    },
+    {
+      "id": "a-part-tick-0",
+      "statement": "C construction of tick-0: tube. Radius 0.0015 m. 2 centreline points, endpoints [0.145, 0.45, -0.0] and [0.145, 0.42, -0.0]. Dimensions {\"radius\": 0.0015}. Parent-local position [0, 0, 0] m and intrinsic XYZ rotation [0, 0, 0] rad. The part object contains the exact numerical construction and its evidence classification.",
+      "reason": "Explicit numerical geometry for tick-0. Source classification is in the part."
+    },
+    {
+      "id": "a-part-tick-1",
+      "statement": "C construction of tick-1: tube. Radius 0.0015 m. 2 centreline points, endpoints [0.145, 0.46056299385038885, -0.08023390398178143] and [0.145, 0.43158521906171676, -0.08799847533485705]. Dimensions {\"radius\": 0.0015}. Parent-local position [0, 0, 0] m and intrinsic XYZ rotation [0, 0, 0] rad. The part object contains the exact numerical construction and its evidence classification.",
+      "reason": "Explicit numerical geometry for tick-1. Source classification is in the part."
+    },
+    {
+      "id": "a-part-tick-2",
+      "statement": "C construction of tick-2: tube. Radius 0.0015 m. 2 centreline points, endpoints [0.145, 0.491532124826824, -0.15499999999999997] and [0.145, 0.46555136271329084, -0.16999999999999998]. Dimensions {\"radius\": 0.0015}. Parent-local position [0, 0, 0] m and intrinsic XYZ rotation [0, 0, 0] rad. The part object contains the exact numerical construction and its evidence classification.",
+      "reason": "Explicit numerical geometry for tick-2. Source classification is in the part."
+    },
+    {
+      "id": "a-part-tick-3",
+      "statement": "C construction of tick-3: tube. Radius 0.0015 m. 2 centreline points, endpoints [0.145, 0.5407968978321702, -0.2192031021678297] and [0.145, 0.5195836943965738, -0.24041630560342617]. Dimensions {\"radius\": 0.0015}. Parent-local position [0, 0, 0] m and intrinsic XYZ rotation [0, 0, 0] rad. The part object contains the exact numerical construction and its evidence classification.",
+      "reason": "Explicit numerical geometry for tick-3. Source classification is in the part."
+    },
+    {
+      "id": "a-part-tick-4",
+      "statement": "C construction of tick-4: tube. Radius 0.0015 m. 2 centreline points, endpoints [0.145, 0.605, -0.26846787517317594] and [0.145, 0.59, -0.29444863728670917]. Dimensions {\"radius\": 0.0015}. Parent-local position [0, 0, 0] m and intrinsic XYZ rotation [0, 0, 0] rad. The part object contains the exact numerical construction and its evidence classification.",
+      "reason": "Explicit numerical geometry for tick-4. Source classification is in the part."
+    },
+    {
+      "id": "a-part-tick-5",
+      "statement": "C construction of tick-5: tube. Radius 0.0015 m. 2 centreline points, endpoints [0.145, 0.6797660960182186, -0.29943700614961116] and [0.145, 0.672001524665143, -0.32841478093828325]. Dimensions {\"radius\": 0.0015}. Parent-local position [0, 0, 0] m and intrinsic XYZ rotation [0, 0, 0] rad. The part object contains the exact numerical construction and its evidence classification.",
+      "reason": "Explicit numerical geometry for tick-5. Source classification is in the part."
+    },
+    {
+      "id": "a-part-tick-6",
+      "statement": "C construction of tick-6: tube. Radius 0.0015 m. 2 centreline points, endpoints [0.145, 0.76, -0.31] and [0.145, 0.76, -0.34]. Dimensions {\"radius\": 0.0015}. Parent-local position [0, 0, 0] m and intrinsic XYZ rotation [0, 0, 0] rad. The part object contains the exact numerical construction and its evidence classification.",
+      "reason": "Explicit numerical geometry for tick-6. Source classification is in the part."
+    },
+    {
+      "id": "a-attachment-review",
+      "statement": "Pin radius 0.0035 m and length 0.30 m. Fixed eyes at X=+/-0.12 m have major/tube radii 0.008/0.003 m. Moving eyes at X=+/-0.07 m have radii 0.006/0.002 m. Hangers radius 0.004 m span rail-local Y 0 to -0.03 m. Quadrant bracket radius 0.006 m follows its listed four world points. All torus planes are YZ.",
+      "reason": "C hinge and scale support geometry closes otherwise floating attachments."
+    },
+    {
+      "id": "a-part-hinge-pin",
+      "statement": "C construction of hinge-pin: cylinder. Dimensions {\"radius\": 0.0035, \"height\": 0.3}. Parent-local position [0, -0.04, 0] m and intrinsic XYZ rotation [0, 0, 1.5707963267948966] rad. The part object contains the exact numerical construction and its evidence classification.",
+      "reason": "Explicit C display geometry for hinge-pin. It is not a recovered historical dimension."
+    },
+    {
+      "id": "a-part-fixed-hinge-eye--1",
+      "statement": "C construction of fixed-hinge-eye--1: torus. Dimensions {\"major_radius\": 0.008, \"tube_radius\": 0.003, \"plane\": \"YZ\"}. Parent-local position [-0.12, -0.04, 0] m and intrinsic XYZ rotation [0, 0, 0] rad. The part object contains the exact numerical construction and its evidence classification.",
+      "reason": "Explicit C display geometry for fixed-hinge-eye--1. It is not a recovered historical dimension."
+    },
+    {
+      "id": "a-part-hinge-hanger--1",
+      "statement": "C construction of hinge-hanger--1: tube. Radius 0.004 m. 2 centreline points, endpoints [-0.12, 0, 0] and [-0.12, -0.03, 0]. Dimensions {\"radius\": 0.004}. Parent-local position [0, 0, 0] m and intrinsic XYZ rotation [0, 0, 0] rad. The part object contains the exact numerical construction and its evidence classification.",
+      "reason": "Explicit C display geometry for hinge-hanger--1. It is not a recovered historical dimension."
+    },
+    {
+      "id": "a-part-moving-hinge-eye--1",
+      "statement": "C construction of moving-hinge-eye--1: torus. Dimensions {\"major_radius\": 0.006, \"tube_radius\": 0.002, \"plane\": \"YZ\"}. Parent-local position [-0.07, 0.15, 0] m and intrinsic XYZ rotation [0, 0, 0] rad. The part object contains the exact numerical construction and its evidence classification.",
+      "reason": "Explicit C display geometry for moving-hinge-eye--1. It is not a recovered historical dimension."
+    },
+    {
+      "id": "a-part-fixed-hinge-eye-1",
+      "statement": "C construction of fixed-hinge-eye-1: torus. Dimensions {\"major_radius\": 0.008, \"tube_radius\": 0.003, \"plane\": \"YZ\"}. Parent-local position [0.12, -0.04, 0] m and intrinsic XYZ rotation [0, 0, 0] rad. The part object contains the exact numerical construction and its evidence classification.",
+      "reason": "Explicit C display geometry for fixed-hinge-eye-1. It is not a recovered historical dimension."
+    },
+    {
+      "id": "a-part-hinge-hanger-1",
+      "statement": "C construction of hinge-hanger-1: tube. Radius 0.004 m. 2 centreline points, endpoints [0.12, 0, 0] and [0.12, -0.03, 0]. Dimensions {\"radius\": 0.004}. Parent-local position [0, 0, 0] m and intrinsic XYZ rotation [0, 0, 0] rad. The part object contains the exact numerical construction and its evidence classification.",
+      "reason": "Explicit C display geometry for hinge-hanger-1. It is not a recovered historical dimension."
+    },
+    {
+      "id": "a-part-moving-hinge-eye-1",
+      "statement": "C construction of moving-hinge-eye-1: torus. Dimensions {\"major_radius\": 0.006, \"tube_radius\": 0.002, \"plane\": \"YZ\"}. Parent-local position [0.07, 0.15, 0] m and intrinsic XYZ rotation [0, 0, 0] rad. The part object contains the exact numerical construction and its evidence classification.",
+      "reason": "Explicit C display geometry for moving-hinge-eye-1. It is not a recovered historical dimension."
+    },
+    {
+      "id": "a-part-quadrant-bracket",
+      "statement": "C construction of quadrant-bracket: tube. Radius 0.006 m. 4 centreline points, endpoints [0.14, 0.44, 0] and [0.14, 0.76, -0.32]. Dimensions {\"radius\": 0.006}. Parent-local position [0, 0, 0] m and intrinsic XYZ rotation [0, 0, 0] rad. The part object contains the exact numerical construction and its evidence classification.",
+      "reason": "Explicit C display geometry for quadrant-bracket. It is not a recovered historical dimension."
+    }
+  ],
+  "parts": [
+    {
+      "id": "base",
+      "parent": "world",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.7,
+        "y": 0.05,
+        "z": 0.4
+      },
+      "position_m": [
+        0,
+        0.025,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "a-geometry"
+      },
+      "certainty": "C",
+      "source": "a-part-base",
+      "notes": ""
+    },
+    {
+      "id": "post",
+      "parent": "world",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.045,
+        "y": 0.73,
+        "z": 0.045
+      },
+      "position_m": [
+        -0.27,
+        0.415,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "a-geometry"
+      },
+      "certainty": "C",
+      "source": "a-part-post",
+      "notes": ""
+    },
+    {
+      "id": "rail",
+      "parent": "world",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.6,
+        "y": 0.04,
+        "z": 0.045
+      },
+      "position_m": [
+        0,
+        0.8,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "a-geometry"
+      },
+      "certainty": "C",
+      "source": "a-part-rail",
+      "notes": ""
+    },
+    {
+      "id": "vane",
+      "parent": "rail",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.2,
+        "y": 0.3,
+        "z": 0.002
+      },
+      "position_m": [
+        0,
+        -0.19,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "thin wooden plate",
+        "basis": "assumed",
+        "source": "a-geometry"
+      },
+      "certainty": "C",
+      "source": "a-part-vane",
+      "notes": "Top-edge hinge centre(0,.76,0). Box centre is0.15m below pivot. Assumed mass0.12kg."
+    },
+    {
+      "id": "quadrant",
+      "parent": "world",
+      "shape": {
+        "type": "tube",
+        "centreline_m": [
+          [
+            0.14,
+            0.44,
+            -0.0
+          ],
+          [
+            0.14,
+            0.4403854540143448,
+            -0.015701655784773765
+          ],
+          [
+            0.14,
+            0.441540887464897,
+            -0.031365484905459394
+          ],
+          [
+            0.14,
+            0.44346351681127005,
+            -0.04695375182571576
+          ],
+          [
+            0.14,
+            0.44614871027096625,
+            -0.06242890304516104
+          ],
+          [
+            0.14,
+            0.44958999897774593,
+            -0.07775365756904444
+          ],
+          [
+            0.14,
+            0.45377909256569315,
+            -0.09289109672142795
+          ],
+          [
+            0.14,
+            0.45870589914143334,
+            -0.10780475308551042
+          ],
+          [
+            0.14,
+            0.4643585495963882,
+            -0.12245869835682874
+          ],
+          [
+            0.14,
+            0.4707234262004981,
+            -0.13681762989769028
+          ],
+          [
+            0.14,
+            0.4777851954085264,
+            -0.15084695578431925
+          ],
+          [
+            0.14,
+            0.4855268447999129,
+            -0.16451287814183094
+          ],
+          [
+            0.14,
+            0.4939297240631855,
+            -0.1777824745662727
+          ],
+          [
+            0.14,
+            0.5029735899261936,
+            -0.1906237774375787
+          ],
+          [
+            0.14,
+            0.5126366549239242,
+            -0.20300585093236656
+          ],
+          [
+            0.14,
+            0.5228956398864131,
+            -0.21489886555104587
+          ],
+          [
+            0.14,
+            0.5337258300203047,
+            -0.22627416997969518
+          ],
+          [
+            0.14,
+            0.5451011344489541,
+            -0.23710436011358693
+          ],
+          [
+            0.14,
+            0.5569941490676334,
+            -0.24736334507607585
+          ],
+          [
+            0.14,
+            0.5693762225624213,
+            -0.25702641007380633
+          ],
+          [
+            0.14,
+            0.5822175254337273,
+            -0.2660702759368145
+          ],
+          [
+            0.14,
+            0.5954871218581691,
+            -0.2744731552000871
+          ],
+          [
+            0.14,
+            0.6091530442156807,
+            -0.2822148045914736
+          ],
+          [
+            0.14,
+            0.6231823701023097,
+            -0.2892765737995019
+          ],
+          [
+            0.14,
+            0.6375413016431712,
+            -0.2956414504036118
+          ],
+          [
+            0.14,
+            0.6521952469144896,
+            -0.30129410085856667
+          ],
+          [
+            0.14,
+            0.6671089032785721,
+            -0.30622090743430685
+          ],
+          [
+            0.14,
+            0.6822463424309555,
+            -0.3104100010222541
+          ],
+          [
+            0.14,
+            0.697571096954839,
+            -0.31385128972903376
+          ],
+          [
+            0.14,
+            0.7130462481742843,
+            -0.31653648318872996
+          ],
+          [
+            0.14,
+            0.7286345150945406,
+            -0.318459112535103
+          ],
+          [
+            0.14,
+            0.7442983442152262,
+            -0.3196145459856552
+          ],
+          [
+            0.14,
+            0.76,
+            -0.32
+          ]
+        ],
+        "radius_m": 0.008,
+        "caps": true
+      },
+      "dimensions_m": {
+        "radius": 0.008
+      },
+      "position_m": [
+        0,
+        0,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "a-geometry"
+      },
+      "certainty": "C",
+      "source": "a-part-quadrant",
+      "notes": ""
+    },
+    {
+      "id": "tick-0",
+      "parent": "world",
+      "shape": {
+        "type": "tube",
+        "centreline_m": [
+          [
+            0.145,
+            0.45,
+            -0.0
+          ],
+          [
+            0.145,
+            0.42,
+            -0.0
+          ]
+        ],
+        "radius_m": 0.0015,
+        "caps": true
+      },
+      "dimensions_m": {
+        "radius": 0.0015
+      },
+      "position_m": [
+        0,
+        0,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "dark ink marker",
+        "basis": "assumed",
+        "source": "a-geometry"
+      },
+      "certainty": "C",
+      "source": "a-part-tick-0",
+      "notes": ""
+    },
+    {
+      "id": "tick-1",
+      "parent": "world",
+      "shape": {
+        "type": "tube",
+        "centreline_m": [
+          [
+            0.145,
+            0.46056299385038885,
+            -0.08023390398178143
+          ],
+          [
+            0.145,
+            0.43158521906171676,
+            -0.08799847533485705
+          ]
+        ],
+        "radius_m": 0.0015,
+        "caps": true
+      },
+      "dimensions_m": {
+        "radius": 0.0015
+      },
+      "position_m": [
+        0,
+        0,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "dark ink marker",
+        "basis": "assumed",
+        "source": "a-geometry"
+      },
+      "certainty": "C",
+      "source": "a-part-tick-1",
+      "notes": ""
+    },
+    {
+      "id": "tick-2",
+      "parent": "world",
+      "shape": {
+        "type": "tube",
+        "centreline_m": [
+          [
+            0.145,
+            0.491532124826824,
+            -0.15499999999999997
+          ],
+          [
+            0.145,
+            0.46555136271329084,
+            -0.16999999999999998
+          ]
+        ],
+        "radius_m": 0.0015,
+        "caps": true
+      },
+      "dimensions_m": {
+        "radius": 0.0015
+      },
+      "position_m": [
+        0,
+        0,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "dark ink marker",
+        "basis": "assumed",
+        "source": "a-geometry"
+      },
+      "certainty": "C",
+      "source": "a-part-tick-2",
+      "notes": ""
+    },
+    {
+      "id": "tick-3",
+      "parent": "world",
+      "shape": {
+        "type": "tube",
+        "centreline_m": [
+          [
+            0.145,
+            0.5407968978321702,
+            -0.2192031021678297
+          ],
+          [
+            0.145,
+            0.5195836943965738,
+            -0.24041630560342617
+          ]
+        ],
+        "radius_m": 0.0015,
+        "caps": true
+      },
+      "dimensions_m": {
+        "radius": 0.0015
+      },
+      "position_m": [
+        0,
+        0,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "dark ink marker",
+        "basis": "assumed",
+        "source": "a-geometry"
+      },
+      "certainty": "C",
+      "source": "a-part-tick-3",
+      "notes": ""
+    },
+    {
+      "id": "tick-4",
+      "parent": "world",
+      "shape": {
+        "type": "tube",
+        "centreline_m": [
+          [
+            0.145,
+            0.605,
+            -0.26846787517317594
+          ],
+          [
+            0.145,
+            0.59,
+            -0.29444863728670917
+          ]
+        ],
+        "radius_m": 0.0015,
+        "caps": true
+      },
+      "dimensions_m": {
+        "radius": 0.0015
+      },
+      "position_m": [
+        0,
+        0,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "dark ink marker",
+        "basis": "assumed",
+        "source": "a-geometry"
+      },
+      "certainty": "C",
+      "source": "a-part-tick-4",
+      "notes": ""
+    },
+    {
+      "id": "tick-5",
+      "parent": "world",
+      "shape": {
+        "type": "tube",
+        "centreline_m": [
+          [
+            0.145,
+            0.6797660960182186,
+            -0.29943700614961116
+          ],
+          [
+            0.145,
+            0.672001524665143,
+            -0.32841478093828325
+          ]
+        ],
+        "radius_m": 0.0015,
+        "caps": true
+      },
+      "dimensions_m": {
+        "radius": 0.0015
+      },
+      "position_m": [
+        0,
+        0,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "dark ink marker",
+        "basis": "assumed",
+        "source": "a-geometry"
+      },
+      "certainty": "C",
+      "source": "a-part-tick-5",
+      "notes": ""
+    },
+    {
+      "id": "tick-6",
+      "parent": "world",
+      "shape": {
+        "type": "tube",
+        "centreline_m": [
+          [
+            0.145,
+            0.76,
+            -0.31
+          ],
+          [
+            0.145,
+            0.76,
+            -0.34
+          ]
+        ],
+        "radius_m": 0.0015,
+        "caps": true
+      },
+      "dimensions_m": {
+        "radius": 0.0015
+      },
+      "position_m": [
+        0,
+        0,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "dark ink marker",
+        "basis": "assumed",
+        "source": "a-geometry"
+      },
+      "certainty": "C",
+      "source": "a-part-tick-6",
+      "notes": ""
+    },
+    {
+      "id": "hinge-pin",
+      "parent": "rail",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.0035,
+        "height": 0.3
+      },
+      "position_m": [
+        0,
+        -0.04,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        1.5707963267948966
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "a-geometry"
+      },
+      "certainty": "C",
+      "source": "a-geometry",
+      "notes": "Fixed pin along X, centred on the plate-tilt axis."
+    },
+    {
+      "id": "fixed-hinge-eye--1",
+      "parent": "rail",
+      "shape": "torus",
+      "dimensions_m": {
+        "major_radius": 0.008,
+        "tube_radius": 0.003,
+        "plane": "YZ"
+      },
+      "position_m": [
+        -0.12,
+        -0.04,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "a-geometry"
+      },
+      "certainty": "C",
+      "source": "a-geometry",
+      "notes": "Stationary bearing eye. Inner radius 0.005 m clears the 0.0035 m pin."
+    },
+    {
+      "id": "hinge-hanger--1",
+      "parent": "rail",
+      "shape": {
+        "type": "tube",
+        "centreline_m": [
+          [
+            -0.12,
+            0,
+            0
+          ],
+          [
+            -0.12,
+            -0.03,
+            0
+          ]
+        ],
+        "radius_m": 0.004,
+        "caps": true
+      },
+      "dimensions_m": {
+        "radius": 0.004
+      },
+      "position_m": [
+        0,
+        0,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "a-geometry"
+      },
+      "certainty": "C",
+      "source": "a-geometry",
+      "notes": "Connects rail to fixed eye without entering its bore."
+    },
+    {
+      "id": "moving-hinge-eye--1",
+      "parent": "vane",
+      "shape": "torus",
+      "dimensions_m": {
+        "major_radius": 0.006,
+        "tube_radius": 0.002,
+        "plane": "YZ"
+      },
+      "position_m": [
+        -0.07,
+        0.15,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "a-geometry"
+      },
+      "certainty": "C",
+      "source": "a-geometry",
+      "notes": "Moves with the vane around the fixed pin. Inner radius 0.004 m gives 0.0005 m pin clearance."
+    },
+    {
+      "id": "fixed-hinge-eye-1",
+      "parent": "rail",
+      "shape": "torus",
+      "dimensions_m": {
+        "major_radius": 0.008,
+        "tube_radius": 0.003,
+        "plane": "YZ"
+      },
+      "position_m": [
+        0.12,
+        -0.04,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "a-geometry"
+      },
+      "certainty": "C",
+      "source": "a-geometry",
+      "notes": "Stationary bearing eye. Inner radius 0.005 m clears the 0.0035 m pin."
+    },
+    {
+      "id": "hinge-hanger-1",
+      "parent": "rail",
+      "shape": {
+        "type": "tube",
+        "centreline_m": [
+          [
+            0.12,
+            0,
+            0
+          ],
+          [
+            0.12,
+            -0.03,
+            0
+          ]
+        ],
+        "radius_m": 0.004,
+        "caps": true
+      },
+      "dimensions_m": {
+        "radius": 0.004
+      },
+      "position_m": [
+        0,
+        0,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "a-geometry"
+      },
+      "certainty": "C",
+      "source": "a-geometry",
+      "notes": "Connects rail to fixed eye without entering its bore."
+    },
+    {
+      "id": "moving-hinge-eye-1",
+      "parent": "vane",
+      "shape": "torus",
+      "dimensions_m": {
+        "major_radius": 0.006,
+        "tube_radius": 0.002,
+        "plane": "YZ"
+      },
+      "position_m": [
+        0.07,
+        0.15,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "a-geometry"
+      },
+      "certainty": "C",
+      "source": "a-geometry",
+      "notes": "Moves with the vane around the fixed pin. Inner radius 0.004 m gives 0.0005 m pin clearance."
+    },
+    {
+      "id": "quadrant-bracket",
+      "parent": "world",
+      "shape": {
+        "type": "tube",
+        "centreline_m": [
+          [
+            0.14,
+            0.44,
+            0
+          ],
+          [
+            0.14,
+            0.8,
+            0
+          ],
+          [
+            0.14,
+            0.8,
+            -0.32
+          ],
+          [
+            0.14,
+            0.76,
+            -0.32
+          ]
+        ],
+        "radius_m": 0.006,
+        "caps": true
+      },
+      "dimensions_m": {
+        "radius": 0.006
+      },
+      "position_m": [
+        0,
+        0,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "a-geometry"
+      },
+      "certainty": "C",
+      "source": "a-geometry",
+      "notes": "Joins both ends of the scale arc to the overhead rail. Outside the vane X extent."
+    }
+  ],
+  "joints": [
+    {
+      "id": "plate-tilt",
+      "type": "hinge",
+      "parent": "rail",
+      "child": "vane",
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "pivot_m": [
+        0,
+        -0.04,
+        0
+      ],
+      "limits": [
+        0,
+        1.0471975511965976
+      ],
+      "ratio": null,
+      "source": "a-motion",
+      "certainty": "C",
+      "notes": "Vane is a box whose local centre is0.15m below hinge. Apply T(pivot) Rx(q) T(0,-0.15,0). Top-edge location follows rail."
+    }
+  ],
+  "drive": {
+    "type": "wind",
+    "input_rate": {
+      "value": 4.21852,
+      "unit": "m/s",
+      "certainty": "C",
+      "source": "a-physics",
+      "note": "Peak assumed wind speed corresponds to30degree plate deflection. Wind(t) follows torque relation in motion."
+    },
+    "justification": "Slow quasi-static wind cycle illustrates an uncalibrated plate. Rate and aerodynamic coefficient are assumed.",
+    "source": "a-motion"
+  },
+  "motion": {
+    "period_s": 12,
+    "loop": true,
+    "initial_states": {
+      "plate-tilt": 0
+    },
+    "phases": [
+      {
+        "name": "Wind builds and fades",
+        "start_s": 0,
+        "duration_s": 12,
+        "joint_values": {
+          "plate-tilt": "q(t)=(pi/12)*(1-cos(2*pi*t/12)), radians. t seconds. Wind magnitude V(t)=sqrt(2*0.12*9.81*sin(q)/(1.225*1.2*0.06*cos(q)^2)), m/s toward-Z. Atq=0,V=0."
+        },
+        "interpolation": "explicit cosine, quasi-static"
+      }
+    ],
+    "visitor_12s": "The vane opens smoothly to30degrees and returns once. It reads force, with no invented historical speed scale."
+  },
+  "animation_notes": [
+    "No undocumented flight, lift, bounce, mechanism or invisible reset.",
+    "The shown motion is quasi-static. Do not add bounce, direct proportionality between angle and wind speed, or a numbered historical metres-per-second scale.",
+    "No propeller or cups. The museum English name Propeller anemometer is inconsistent with its hinged-plate description.",
+    "Apply vane transform T([0,-0.04,0])*Rx(q)*T([0,-0.15,0]) relative to rail. Moving eyes inherit the vane transform, fixed pin and eyes inherit rail. Vane X extent +/-0.10 m clears the fixed eyes at +/-0.12 m and quadrant frame at X=0.14 m. Hinge eyes top y=0.771 m remains below rail bottom y=0.78 m except attached hangers."
+  ],
+  "label_en": "Reconstructed from Codex Atlanticus f. 675r. The plate indicates wind force.",
+  "label_de": "Rekonstruktion nach Codex Atlanticus, Blatt 675r. Die Platte zeigt die Windkraft an.",
+  "page": {
+    "path": "pages/anemometer.md",
+    "sections": [
+      "folio",
+      "mechanism",
+      "purpose",
+      "build_history",
+      "tests",
+      "arithmetic",
+      "myth",
+      "sources"
+    ]
+  },
+  "sources": [
+    {
+      "id": "s-folio",
+      "title": "Codex Atlanticus f. 675r, transcription",
+      "author_or_institution": "Biblioteca Leonardiana, e-Leo",
+      "year": null,
+      "url": "https://www.leonardodigitale.com/sfoglia/codice-atlantico/0675-r/",
+      "accessed": "2026-09-08",
+      "supports": "Wind measurement caption and instruction to pair with a clock. Transcription inspected.",
+      "source_type": "primary",
+      "limitations": ""
+    },
+    {
+      "id": "s-holder",
+      "title": "Codice Atlantico Foglio 675r",
+      "author_or_institution": "Museo Galileo and Veneranda Biblioteca Ambrosiana, Leonardo//thek@",
+      "year": null,
+      "url": "https://teche.museogalileo.it/leonardo/foglio/index.html?lang=it&num=ATL.1349.1",
+      "accessed": "2026-09-08",
+      "supports": "675r=old 249 versoa/b. Pressure anemometer, hygrometer and speed measurement notes.",
+      "source_type": "holder",
+      "limitations": "Indexed catalogue text inspected. Current interface sometimes returns an empty shell."
+    },
+    {
+      "id": "s-model",
+      "title": "Propeller anemometer, OA 00000041",
+      "author_or_institution": "Museo Leonardiano di Vinci",
+      "year": null,
+      "url": "https://museoleonardiano.it/en/opera/propeller-anemometer/",
+      "accessed": "2026-09-08",
+      "supports": "IBM Italia 1952 model fromCA 675r. Despite English title, description is a hinged vane, not propeller.",
+      "source_type": "museum",
+      "limitations": ""
+    },
+    {
+      "id": "s-history",
+      "title": "Windvanes and anemometers",
+      "author_or_institution": "Museo Galileo",
+      "year": null,
+      "url": "https://catalogue.museogalileo.it/multimedia/WindvanesAnemometersBis.html",
+      "accessed": "2026-09-08",
+      "supports": "Alberti described a tablet anemometer in 1450 before Leonardo.",
+      "source_type": "museum",
+      "limitations": ""
+    },
+    {
+      "id": "s-drag",
+      "title": "Terminal Velocity",
+      "author_or_institution": "NASA Glenn",
+      "year": null,
+      "url": "https://www.grc.nasa.gov/www/k-12/VirtualAero/BottleRocket/airplane/termvr.html",
+      "accessed": "2026-09-08",
+      "supports": "Quadratic aerodynamic force relation. The inclined plate torque model is this dossier’s explicit approximation.",
+      "source_type": "primary",
+      "limitations": ""
+    }
+  ],
+  "research": {
+    "identification": "CA 675r, older 249v a/b, verified in the holder-backed joint catalogue and e-Leo [s-holder,s-folio].",
+    "sheet_vs_reconstruction": [
+      "The sheet shows a pressure vane beside other instruments and asks for a clock [s-holder,s-folio].",
+      "IBM Italia 1952 created a wooden and copper model. The present metric frame, tick positions and aerodynamic calibration are independent modern choices, not copied dimensions [s-model,a-geometry]."
+    ],
+    "dimensions": {
+      "quote": "A misurare quanta via si vada per ora col corso d’un vento.",
+      "folio": "CA 675r",
+      "richter_number": null,
+      "richter_note": "Catalogue connects sheet to Richter 1125A, but a dimension statement for this vane is not verified.",
+      "conversion": "No historical linear dimension found. No braccio conversion applied."
+    },
+    "claims": {
+      "claimed": "Measure distance carried per hour by wind, with a clock [s-folio].",
+      "tested": "No quantitative calibration test verified.",
+      "built_lifetime": "No securely documented lifetime instrument located.",
+      "later": "IBM 1952 is a display reconstruction, not a reported calibration campaign [s-model]."
+    },
+    "physics": {
+      "formula": "Approximate plate normal force F=0.5*rho*Cd*A*(V*cos(theta))^2. Torque balance F*l/2 =m*g*l/2*sin(theta). V=sqrt(2*m*g*sin(theta)/(rho*Cd*A*cos(theta)^2)).",
+      "inputs": "Every numeric input in a-physics. General drag equation s-drag.",
+      "results": "At theta 30 degrees and the given 0.12 kg, 0.06 m 2 plate, V=4.219 m/s. F=0.5886 N, gravitational restoring torque 0.08829 N m. Angle is not proportional to speed.",
+      "limitations": "Real plate coefficient varies with inclination and Reynolds number. Hinge friction and gust dynamics omitted. No historical calibration claim.",
+      "verdict_en": "A 30 degree tilt corresponds to about 4.2 m/s only under this assumed calibration.",
+      "verdict_de": "30 Grad Ausschlag entsprechen nur mit dieser angenommenen Kalibrierung etwa 4,2 m/s."
+    },
+    "myths": [
+      {
+        "claim": "Leonardo invented the anemometer.",
+        "earliest_located": "No dated first attribution verified.",
+        "correction": "Museo Galileo credits Alberti’s 1450 tablet description before Leonardo [s-history]."
+      }
+    ],
+    "confidence": "High folio and instrument principle. Conditional calibration. All physical construction dimensions assumed.",
+    "geometry_validation": {
+      "method": "Local primitive and mesh geometry transformed through the specified joint hierarchy. Forty-nine poses across 12 seconds, or one static pose. Tube centreline bounds conservatively expanded by radius. Analytic motion extrema and attachment clearances are given in animation_notes.",
+      "sampled_world_min_m": [
+        -0.35,
+        0.0,
+        -0.3415
+      ],
+      "sampled_world_max_m": [
+        0.35,
+        0.82,
+        0.2
+      ],
+      "result": "All tested swept points are inside the declared conservative bounding box. Geometry defines a C exhibit interpretation, not structural certification."
+    }
+  }
+}

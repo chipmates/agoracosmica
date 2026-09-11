@@ -1,0 +1,2567 @@
+{
+  "schema_version": "1.0",
+  "slug": "ball-bearing",
+  "name_en": "Thrust ball bearing",
+  "name_de": "Axialkugellager",
+  "status": "complete",
+  "scope": "Complete schematic eight-ball thrust bearing with eight rolling separators. Contact geometry is a modern interpretation of Madrid I20v, not a manufactured reconstruction of a museum model.",
+  "gaps": [],
+  "folio": [
+    {
+      "codex": "Codex Madrid I",
+      "folio": "20v",
+      "holder": "Biblioteca Nacional de España",
+      "catalogue_reference": "MSS/8937, Madrid I f. 20 v",
+      "catalogue_url": "https://www.leonardodigitale.com/sfoglia/madrid-I/0020-v/",
+      "verification": "verified",
+      "commission_reference": null,
+      "correction": null,
+      "date": {
+        "range": "1492 to1497",
+        "certainty": "B",
+        "source": "BNE-DATE",
+        "note": "Approximate manuscript dating, not a dated completion record."
+      },
+      "image_url": "https://backend.leonardodigitale.com/images/books/22/2718/sheet_20190205095335500504.jpg",
+      "image_licence_quote": null,
+      "licence_source": "EL-TERMS",
+      "verification_note": "Edition foliation and text verified through e-Leo. Original-holder service may be unavailable. e-Leo viewer is an authorised-edition resource, not the original holding institution."
+    }
+  ],
+  "scale_m": {
+    "x": 0.9,
+    "y": 0.36,
+    "z": 0.9,
+    "certainty": "C",
+    "source": "A-GEOM",
+    "note": "Full swept bound. All chosen dimensions are modern explanatory assumptions, never claimed measurements of a historical machine."
+  },
+  "frame": {
+    "handedness": "right",
+    "units": "m",
+    "up": "+Y",
+    "forward": "+Z",
+    "origin": "Centre of base block",
+    "ground_y_m": -0.05,
+    "transforms": "All part positions relative to their named parent. Joint q is an extra rotation or translation about the declared parent-frame pivot applied to the rest transform. Children inherit it once."
+  },
+  "assumptions": [
+    {
+      "id": "A-GEOM",
+      "statement": "Every numerical part size, position, orientation and support arrangement in parts is a declared modern modelling choice unless a separate primary source is explicitly attached. Materials marked assumed are plausible period choices. They are not measured from any museum replica.",
+      "reason": "Leonardo did not provide a manufacturing drawing with all dimensions."
+    },
+    {
+      "id": "A-MOTION",
+      "statement": "The stated rates and loads are slow modern demonstration choices. They do not reproduce a measured speed in Leonardo s workshop.",
+      "reason": "No historical operating record was located."
+    },
+    {
+      "id": "A-DETAIL",
+      "statement": "The carrier has eight radius 0.004 m radial axles supporting the separator bores of radius 0.006 m. The central fixed post has radius 0.014 m. Carrier and upper plate have radius 0.016 m central bores. These are modern supporting details, not measured manuscript dimensions.",
+      "reason": "Complete the numerical modern demonstration without presenting invented details as Leonardo dimensions."
+    }
+  ],
+  "parts": [
+    {
+      "id": "base",
+      "parent": "world",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.9,
+        "y": 0.1,
+        "z": 0.9
+      },
+      "position_m": [
+        0,
+        0,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "basis": "assumed",
+        "source": "A-GEOM",
+        "class": "oak"
+      },
+      "certainty": "C",
+      "source": "A-GEOM"
+    },
+    {
+      "id": "lower-plate",
+      "parent": "base",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.39,
+        "height": 0.04
+      },
+      "position_m": [
+        0,
+        0.1,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "basis": "assumed",
+        "source": "A-GEOM",
+        "class": "oak"
+      },
+      "certainty": "C",
+      "source": "A-GEOM"
+    },
+    {
+      "id": "upper-plate",
+      "parent": "base",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [
+            -0.02,
+            0.016
+          ],
+          [
+            -0.02,
+            0.39
+          ],
+          [
+            0.02,
+            0.39
+          ],
+          [
+            0.02,
+            0.016
+          ]
+        ],
+        "segments": 96,
+        "axis": "+Y",
+        "closure": "Close last point to first. Revolve closed section through 2*pi. Ends are annular, bore remains open."
+      },
+      "position_m": [
+        0,
+        0.29,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "basis": "assumed",
+        "source": "A-GEOM",
+        "class": "oak"
+      },
+      "certainty": "C",
+      "source": "A-GEOM"
+    },
+    {
+      "id": "carrier",
+      "parent": "base",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "closed_axial_radial_profile": [
+          [
+            -0.01,
+            0.016
+          ],
+          [
+            -0.01,
+            0.025
+          ],
+          [
+            0.01,
+            0.025
+          ],
+          [
+            0.01,
+            0.016
+          ]
+        ],
+        "segments": 96,
+        "axis": "+Y",
+        "closure": "Close last point to first. Revolve closed section through 2*pi. Ends are annular, bore remains open."
+      },
+      "position_m": [
+        0,
+        0.195,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "basis": "assumed",
+        "source": "A-GEOM",
+        "class": "oak"
+      },
+      "certainty": "C",
+      "source": "A-GEOM"
+    },
+    {
+      "id": "ball-0",
+      "parent": "carrier",
+      "shape": "sphere",
+      "dimensions_m": {
+        "radius": 0.075
+      },
+      "position_m": [
+        0.3,
+        0,
+        0.0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "basis": "documented",
+        "source": "EL-BEAR",
+        "class": "oak"
+      },
+      "certainty": "C",
+      "source": "A-GEOM"
+    },
+    {
+      "id": "separator-0",
+      "parent": "carrier",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "segments": 64,
+        "closed_axial_radial_profile": [
+          [
+            -0.04,
+            0.006
+          ],
+          [
+            -0.04,
+            0.0513621
+          ],
+          [
+            -0.0375,
+            0.0498531
+          ],
+          [
+            -0.035,
+            0.0484725
+          ],
+          [
+            -0.0325,
+            0.0472125
+          ],
+          [
+            -0.03,
+            0.0460664
+          ],
+          [
+            -0.0275,
+            0.0450286
+          ],
+          [
+            -0.025,
+            0.0440944
+          ],
+          [
+            -0.0225,
+            0.0432596
+          ],
+          [
+            -0.02,
+            0.0425209
+          ],
+          [
+            -0.0175,
+            0.0418753
+          ],
+          [
+            -0.015,
+            0.0413203
+          ],
+          [
+            -0.0125,
+            0.040854
+          ],
+          [
+            -0.01,
+            0.0404747
+          ],
+          [
+            -0.0075,
+            0.040181
+          ],
+          [
+            -0.005,
+            0.0399719
+          ],
+          [
+            -0.0025,
+            0.0398467
+          ],
+          [
+            0.0,
+            0.039805
+          ],
+          [
+            0.0025,
+            0.0398467
+          ],
+          [
+            0.005,
+            0.0399719
+          ],
+          [
+            0.0075,
+            0.040181
+          ],
+          [
+            0.01,
+            0.0404747
+          ],
+          [
+            0.0125,
+            0.040854
+          ],
+          [
+            0.015,
+            0.0413203
+          ],
+          [
+            0.0175,
+            0.0418753
+          ],
+          [
+            0.02,
+            0.0425209
+          ],
+          [
+            0.0225,
+            0.0432596
+          ],
+          [
+            0.025,
+            0.0440944
+          ],
+          [
+            0.0275,
+            0.0450286
+          ],
+          [
+            0.03,
+            0.0460664
+          ],
+          [
+            0.0325,
+            0.0472125
+          ],
+          [
+            0.035,
+            0.0484725
+          ],
+          [
+            0.0375,
+            0.0498531
+          ],
+          [
+            0.04,
+            0.0513621
+          ],
+          [
+            0.04,
+            0.006
+          ]
+        ],
+        "closure": "Close last to first and revolve through 2*pi about +Y. Annular end caps leave radius 0.006 m axial bore."
+      },
+      "position_m": [
+        0.2560660171779821,
+        0,
+        0.10606601717798213
+      ],
+      "orientation_rad": [
+        1.5707963267948966,
+        0,
+        -1.1780972450961724
+      ],
+      "material": {
+        "basis": "assumed",
+        "source": "A-GEOM",
+        "class": "oak"
+      },
+      "certainty": "C",
+      "source": "A-GEOM",
+      "notes": "First profile coordinate is axial localY. Second is radius. Surface joining ring samples and end caps fully defines mesh. Separator profile and placement are modern. It is allowed to slide at sphere contact and is not asserted perfectly conjugate."
+    },
+    {
+      "id": "ball-1",
+      "parent": "carrier",
+      "shape": "sphere",
+      "dimensions_m": {
+        "radius": 0.075
+      },
+      "position_m": [
+        0.21213203435596426,
+        0,
+        0.21213203435596423
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "basis": "documented",
+        "source": "EL-BEAR",
+        "class": "oak"
+      },
+      "certainty": "C",
+      "source": "A-GEOM"
+    },
+    {
+      "id": "separator-1",
+      "parent": "carrier",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "segments": 64,
+        "closed_axial_radial_profile": [
+          [
+            -0.04,
+            0.006
+          ],
+          [
+            -0.04,
+            0.0513621
+          ],
+          [
+            -0.0375,
+            0.0498531
+          ],
+          [
+            -0.035,
+            0.0484725
+          ],
+          [
+            -0.0325,
+            0.0472125
+          ],
+          [
+            -0.03,
+            0.0460664
+          ],
+          [
+            -0.0275,
+            0.0450286
+          ],
+          [
+            -0.025,
+            0.0440944
+          ],
+          [
+            -0.0225,
+            0.0432596
+          ],
+          [
+            -0.02,
+            0.0425209
+          ],
+          [
+            -0.0175,
+            0.0418753
+          ],
+          [
+            -0.015,
+            0.0413203
+          ],
+          [
+            -0.0125,
+            0.040854
+          ],
+          [
+            -0.01,
+            0.0404747
+          ],
+          [
+            -0.0075,
+            0.040181
+          ],
+          [
+            -0.005,
+            0.0399719
+          ],
+          [
+            -0.0025,
+            0.0398467
+          ],
+          [
+            0.0,
+            0.039805
+          ],
+          [
+            0.0025,
+            0.0398467
+          ],
+          [
+            0.005,
+            0.0399719
+          ],
+          [
+            0.0075,
+            0.040181
+          ],
+          [
+            0.01,
+            0.0404747
+          ],
+          [
+            0.0125,
+            0.040854
+          ],
+          [
+            0.015,
+            0.0413203
+          ],
+          [
+            0.0175,
+            0.0418753
+          ],
+          [
+            0.02,
+            0.0425209
+          ],
+          [
+            0.0225,
+            0.0432596
+          ],
+          [
+            0.025,
+            0.0440944
+          ],
+          [
+            0.0275,
+            0.0450286
+          ],
+          [
+            0.03,
+            0.0460664
+          ],
+          [
+            0.0325,
+            0.0472125
+          ],
+          [
+            0.035,
+            0.0484725
+          ],
+          [
+            0.0375,
+            0.0498531
+          ],
+          [
+            0.04,
+            0.0513621
+          ],
+          [
+            0.04,
+            0.006
+          ]
+        ],
+        "closure": "Close last to first and revolve through 2*pi about +Y. Annular end caps leave radius 0.006 m axial bore."
+      },
+      "position_m": [
+        0.10606601717798216,
+        0,
+        0.2560660171779821
+      ],
+      "orientation_rad": [
+        1.5707963267948966,
+        0,
+        -0.39269908169872414
+      ],
+      "material": {
+        "basis": "assumed",
+        "source": "A-GEOM",
+        "class": "oak"
+      },
+      "certainty": "C",
+      "source": "A-GEOM",
+      "notes": "First profile coordinate is axial localY. Second is radius. Surface joining ring samples and end caps fully defines mesh. Separator profile and placement are modern. It is allowed to slide at sphere contact and is not asserted perfectly conjugate."
+    },
+    {
+      "id": "ball-2",
+      "parent": "carrier",
+      "shape": "sphere",
+      "dimensions_m": {
+        "radius": 0.075
+      },
+      "position_m": [
+        1.8369701987210297e-17,
+        0,
+        0.3
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "basis": "documented",
+        "source": "EL-BEAR",
+        "class": "oak"
+      },
+      "certainty": "C",
+      "source": "A-GEOM"
+    },
+    {
+      "id": "separator-2",
+      "parent": "carrier",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "segments": 64,
+        "closed_axial_radial_profile": [
+          [
+            -0.04,
+            0.006
+          ],
+          [
+            -0.04,
+            0.0513621
+          ],
+          [
+            -0.0375,
+            0.0498531
+          ],
+          [
+            -0.035,
+            0.0484725
+          ],
+          [
+            -0.0325,
+            0.0472125
+          ],
+          [
+            -0.03,
+            0.0460664
+          ],
+          [
+            -0.0275,
+            0.0450286
+          ],
+          [
+            -0.025,
+            0.0440944
+          ],
+          [
+            -0.0225,
+            0.0432596
+          ],
+          [
+            -0.02,
+            0.0425209
+          ],
+          [
+            -0.0175,
+            0.0418753
+          ],
+          [
+            -0.015,
+            0.0413203
+          ],
+          [
+            -0.0125,
+            0.040854
+          ],
+          [
+            -0.01,
+            0.0404747
+          ],
+          [
+            -0.0075,
+            0.040181
+          ],
+          [
+            -0.005,
+            0.0399719
+          ],
+          [
+            -0.0025,
+            0.0398467
+          ],
+          [
+            0.0,
+            0.039805
+          ],
+          [
+            0.0025,
+            0.0398467
+          ],
+          [
+            0.005,
+            0.0399719
+          ],
+          [
+            0.0075,
+            0.040181
+          ],
+          [
+            0.01,
+            0.0404747
+          ],
+          [
+            0.0125,
+            0.040854
+          ],
+          [
+            0.015,
+            0.0413203
+          ],
+          [
+            0.0175,
+            0.0418753
+          ],
+          [
+            0.02,
+            0.0425209
+          ],
+          [
+            0.0225,
+            0.0432596
+          ],
+          [
+            0.025,
+            0.0440944
+          ],
+          [
+            0.0275,
+            0.0450286
+          ],
+          [
+            0.03,
+            0.0460664
+          ],
+          [
+            0.0325,
+            0.0472125
+          ],
+          [
+            0.035,
+            0.0484725
+          ],
+          [
+            0.0375,
+            0.0498531
+          ],
+          [
+            0.04,
+            0.0513621
+          ],
+          [
+            0.04,
+            0.006
+          ]
+        ],
+        "closure": "Close last to first and revolve through 2*pi about +Y. Annular end caps leave radius 0.006 m axial bore."
+      },
+      "position_m": [
+        -0.10606601717798211,
+        0,
+        0.2560660171779821
+      ],
+      "orientation_rad": [
+        1.5707963267948966,
+        0,
+        0.39269908169872414
+      ],
+      "material": {
+        "basis": "assumed",
+        "source": "A-GEOM",
+        "class": "oak"
+      },
+      "certainty": "C",
+      "source": "A-GEOM",
+      "notes": "First profile coordinate is axial localY. Second is radius. Surface joining ring samples and end caps fully defines mesh. Separator profile and placement are modern. It is allowed to slide at sphere contact and is not asserted perfectly conjugate."
+    },
+    {
+      "id": "ball-3",
+      "parent": "carrier",
+      "shape": "sphere",
+      "dimensions_m": {
+        "radius": 0.075
+      },
+      "position_m": [
+        -0.21213203435596423,
+        0,
+        0.21213203435596426
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "basis": "documented",
+        "source": "EL-BEAR",
+        "class": "oak"
+      },
+      "certainty": "C",
+      "source": "A-GEOM"
+    },
+    {
+      "id": "separator-3",
+      "parent": "carrier",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "segments": 64,
+        "closed_axial_radial_profile": [
+          [
+            -0.04,
+            0.006
+          ],
+          [
+            -0.04,
+            0.0513621
+          ],
+          [
+            -0.0375,
+            0.0498531
+          ],
+          [
+            -0.035,
+            0.0484725
+          ],
+          [
+            -0.0325,
+            0.0472125
+          ],
+          [
+            -0.03,
+            0.0460664
+          ],
+          [
+            -0.0275,
+            0.0450286
+          ],
+          [
+            -0.025,
+            0.0440944
+          ],
+          [
+            -0.0225,
+            0.0432596
+          ],
+          [
+            -0.02,
+            0.0425209
+          ],
+          [
+            -0.0175,
+            0.0418753
+          ],
+          [
+            -0.015,
+            0.0413203
+          ],
+          [
+            -0.0125,
+            0.040854
+          ],
+          [
+            -0.01,
+            0.0404747
+          ],
+          [
+            -0.0075,
+            0.040181
+          ],
+          [
+            -0.005,
+            0.0399719
+          ],
+          [
+            -0.0025,
+            0.0398467
+          ],
+          [
+            0.0,
+            0.039805
+          ],
+          [
+            0.0025,
+            0.0398467
+          ],
+          [
+            0.005,
+            0.0399719
+          ],
+          [
+            0.0075,
+            0.040181
+          ],
+          [
+            0.01,
+            0.0404747
+          ],
+          [
+            0.0125,
+            0.040854
+          ],
+          [
+            0.015,
+            0.0413203
+          ],
+          [
+            0.0175,
+            0.0418753
+          ],
+          [
+            0.02,
+            0.0425209
+          ],
+          [
+            0.0225,
+            0.0432596
+          ],
+          [
+            0.025,
+            0.0440944
+          ],
+          [
+            0.0275,
+            0.0450286
+          ],
+          [
+            0.03,
+            0.0460664
+          ],
+          [
+            0.0325,
+            0.0472125
+          ],
+          [
+            0.035,
+            0.0484725
+          ],
+          [
+            0.0375,
+            0.0498531
+          ],
+          [
+            0.04,
+            0.0513621
+          ],
+          [
+            0.04,
+            0.006
+          ]
+        ],
+        "closure": "Close last to first and revolve through 2*pi about +Y. Annular end caps leave radius 0.006 m axial bore."
+      },
+      "position_m": [
+        -0.2560660171779821,
+        0,
+        0.10606601717798217
+      ],
+      "orientation_rad": [
+        1.5707963267948966,
+        0,
+        1.1780972450961724
+      ],
+      "material": {
+        "basis": "assumed",
+        "source": "A-GEOM",
+        "class": "oak"
+      },
+      "certainty": "C",
+      "source": "A-GEOM",
+      "notes": "First profile coordinate is axial localY. Second is radius. Surface joining ring samples and end caps fully defines mesh. Separator profile and placement are modern. It is allowed to slide at sphere contact and is not asserted perfectly conjugate."
+    },
+    {
+      "id": "ball-4",
+      "parent": "carrier",
+      "shape": "sphere",
+      "dimensions_m": {
+        "radius": 0.075
+      },
+      "position_m": [
+        -0.3,
+        0,
+        3.6739403974420595e-17
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "basis": "documented",
+        "source": "EL-BEAR",
+        "class": "oak"
+      },
+      "certainty": "C",
+      "source": "A-GEOM"
+    },
+    {
+      "id": "separator-4",
+      "parent": "carrier",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "segments": 64,
+        "closed_axial_radial_profile": [
+          [
+            -0.04,
+            0.006
+          ],
+          [
+            -0.04,
+            0.0513621
+          ],
+          [
+            -0.0375,
+            0.0498531
+          ],
+          [
+            -0.035,
+            0.0484725
+          ],
+          [
+            -0.0325,
+            0.0472125
+          ],
+          [
+            -0.03,
+            0.0460664
+          ],
+          [
+            -0.0275,
+            0.0450286
+          ],
+          [
+            -0.025,
+            0.0440944
+          ],
+          [
+            -0.0225,
+            0.0432596
+          ],
+          [
+            -0.02,
+            0.0425209
+          ],
+          [
+            -0.0175,
+            0.0418753
+          ],
+          [
+            -0.015,
+            0.0413203
+          ],
+          [
+            -0.0125,
+            0.040854
+          ],
+          [
+            -0.01,
+            0.0404747
+          ],
+          [
+            -0.0075,
+            0.040181
+          ],
+          [
+            -0.005,
+            0.0399719
+          ],
+          [
+            -0.0025,
+            0.0398467
+          ],
+          [
+            0.0,
+            0.039805
+          ],
+          [
+            0.0025,
+            0.0398467
+          ],
+          [
+            0.005,
+            0.0399719
+          ],
+          [
+            0.0075,
+            0.040181
+          ],
+          [
+            0.01,
+            0.0404747
+          ],
+          [
+            0.0125,
+            0.040854
+          ],
+          [
+            0.015,
+            0.0413203
+          ],
+          [
+            0.0175,
+            0.0418753
+          ],
+          [
+            0.02,
+            0.0425209
+          ],
+          [
+            0.0225,
+            0.0432596
+          ],
+          [
+            0.025,
+            0.0440944
+          ],
+          [
+            0.0275,
+            0.0450286
+          ],
+          [
+            0.03,
+            0.0460664
+          ],
+          [
+            0.0325,
+            0.0472125
+          ],
+          [
+            0.035,
+            0.0484725
+          ],
+          [
+            0.0375,
+            0.0498531
+          ],
+          [
+            0.04,
+            0.0513621
+          ],
+          [
+            0.04,
+            0.006
+          ]
+        ],
+        "closure": "Close last to first and revolve through 2*pi about +Y. Annular end caps leave radius 0.006 m axial bore."
+      },
+      "position_m": [
+        -0.25606601717798216,
+        0,
+        -0.1060660171779821
+      ],
+      "orientation_rad": [
+        1.5707963267948966,
+        0,
+        1.9634954084936207
+      ],
+      "material": {
+        "basis": "assumed",
+        "source": "A-GEOM",
+        "class": "oak"
+      },
+      "certainty": "C",
+      "source": "A-GEOM",
+      "notes": "First profile coordinate is axial localY. Second is radius. Surface joining ring samples and end caps fully defines mesh. Separator profile and placement are modern. It is allowed to slide at sphere contact and is not asserted perfectly conjugate."
+    },
+    {
+      "id": "ball-5",
+      "parent": "carrier",
+      "shape": "sphere",
+      "dimensions_m": {
+        "radius": 0.075
+      },
+      "position_m": [
+        -0.2121320343559643,
+        0,
+        -0.21213203435596423
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "basis": "documented",
+        "source": "EL-BEAR",
+        "class": "oak"
+      },
+      "certainty": "C",
+      "source": "A-GEOM"
+    },
+    {
+      "id": "separator-5",
+      "parent": "carrier",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "segments": 64,
+        "closed_axial_radial_profile": [
+          [
+            -0.04,
+            0.006
+          ],
+          [
+            -0.04,
+            0.0513621
+          ],
+          [
+            -0.0375,
+            0.0498531
+          ],
+          [
+            -0.035,
+            0.0484725
+          ],
+          [
+            -0.0325,
+            0.0472125
+          ],
+          [
+            -0.03,
+            0.0460664
+          ],
+          [
+            -0.0275,
+            0.0450286
+          ],
+          [
+            -0.025,
+            0.0440944
+          ],
+          [
+            -0.0225,
+            0.0432596
+          ],
+          [
+            -0.02,
+            0.0425209
+          ],
+          [
+            -0.0175,
+            0.0418753
+          ],
+          [
+            -0.015,
+            0.0413203
+          ],
+          [
+            -0.0125,
+            0.040854
+          ],
+          [
+            -0.01,
+            0.0404747
+          ],
+          [
+            -0.0075,
+            0.040181
+          ],
+          [
+            -0.005,
+            0.0399719
+          ],
+          [
+            -0.0025,
+            0.0398467
+          ],
+          [
+            0.0,
+            0.039805
+          ],
+          [
+            0.0025,
+            0.0398467
+          ],
+          [
+            0.005,
+            0.0399719
+          ],
+          [
+            0.0075,
+            0.040181
+          ],
+          [
+            0.01,
+            0.0404747
+          ],
+          [
+            0.0125,
+            0.040854
+          ],
+          [
+            0.015,
+            0.0413203
+          ],
+          [
+            0.0175,
+            0.0418753
+          ],
+          [
+            0.02,
+            0.0425209
+          ],
+          [
+            0.0225,
+            0.0432596
+          ],
+          [
+            0.025,
+            0.0440944
+          ],
+          [
+            0.0275,
+            0.0450286
+          ],
+          [
+            0.03,
+            0.0460664
+          ],
+          [
+            0.0325,
+            0.0472125
+          ],
+          [
+            0.035,
+            0.0484725
+          ],
+          [
+            0.0375,
+            0.0498531
+          ],
+          [
+            0.04,
+            0.0513621
+          ],
+          [
+            0.04,
+            0.006
+          ]
+        ],
+        "closure": "Close last to first and revolve through 2*pi about +Y. Annular end caps leave radius 0.006 m axial bore."
+      },
+      "position_m": [
+        -0.1060660171779823,
+        0,
+        -0.25606601717798205
+      ],
+      "orientation_rad": [
+        1.5707963267948966,
+        0,
+        2.7488935718910685
+      ],
+      "material": {
+        "basis": "assumed",
+        "source": "A-GEOM",
+        "class": "oak"
+      },
+      "certainty": "C",
+      "source": "A-GEOM",
+      "notes": "First profile coordinate is axial localY. Second is radius. Surface joining ring samples and end caps fully defines mesh. Separator profile and placement are modern. It is allowed to slide at sphere contact and is not asserted perfectly conjugate."
+    },
+    {
+      "id": "ball-6",
+      "parent": "carrier",
+      "shape": "sphere",
+      "dimensions_m": {
+        "radius": 0.075
+      },
+      "position_m": [
+        -5.510910596163089e-17,
+        0,
+        -0.3
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "basis": "documented",
+        "source": "EL-BEAR",
+        "class": "oak"
+      },
+      "certainty": "C",
+      "source": "A-GEOM"
+    },
+    {
+      "id": "separator-6",
+      "parent": "carrier",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "segments": 64,
+        "closed_axial_radial_profile": [
+          [
+            -0.04,
+            0.006
+          ],
+          [
+            -0.04,
+            0.0513621
+          ],
+          [
+            -0.0375,
+            0.0498531
+          ],
+          [
+            -0.035,
+            0.0484725
+          ],
+          [
+            -0.0325,
+            0.0472125
+          ],
+          [
+            -0.03,
+            0.0460664
+          ],
+          [
+            -0.0275,
+            0.0450286
+          ],
+          [
+            -0.025,
+            0.0440944
+          ],
+          [
+            -0.0225,
+            0.0432596
+          ],
+          [
+            -0.02,
+            0.0425209
+          ],
+          [
+            -0.0175,
+            0.0418753
+          ],
+          [
+            -0.015,
+            0.0413203
+          ],
+          [
+            -0.0125,
+            0.040854
+          ],
+          [
+            -0.01,
+            0.0404747
+          ],
+          [
+            -0.0075,
+            0.040181
+          ],
+          [
+            -0.005,
+            0.0399719
+          ],
+          [
+            -0.0025,
+            0.0398467
+          ],
+          [
+            0.0,
+            0.039805
+          ],
+          [
+            0.0025,
+            0.0398467
+          ],
+          [
+            0.005,
+            0.0399719
+          ],
+          [
+            0.0075,
+            0.040181
+          ],
+          [
+            0.01,
+            0.0404747
+          ],
+          [
+            0.0125,
+            0.040854
+          ],
+          [
+            0.015,
+            0.0413203
+          ],
+          [
+            0.0175,
+            0.0418753
+          ],
+          [
+            0.02,
+            0.0425209
+          ],
+          [
+            0.0225,
+            0.0432596
+          ],
+          [
+            0.025,
+            0.0440944
+          ],
+          [
+            0.0275,
+            0.0450286
+          ],
+          [
+            0.03,
+            0.0460664
+          ],
+          [
+            0.0325,
+            0.0472125
+          ],
+          [
+            0.035,
+            0.0484725
+          ],
+          [
+            0.0375,
+            0.0498531
+          ],
+          [
+            0.04,
+            0.0513621
+          ],
+          [
+            0.04,
+            0.006
+          ]
+        ],
+        "closure": "Close last to first and revolve through 2*pi about +Y. Annular end caps leave radius 0.006 m axial bore."
+      },
+      "position_m": [
+        0.1060660171779822,
+        0,
+        -0.2560660171779821
+      ],
+      "orientation_rad": [
+        1.5707963267948966,
+        0,
+        3.5342917352885177
+      ],
+      "material": {
+        "basis": "assumed",
+        "source": "A-GEOM",
+        "class": "oak"
+      },
+      "certainty": "C",
+      "source": "A-GEOM",
+      "notes": "First profile coordinate is axial localY. Second is radius. Surface joining ring samples and end caps fully defines mesh. Separator profile and placement are modern. It is allowed to slide at sphere contact and is not asserted perfectly conjugate."
+    },
+    {
+      "id": "ball-7",
+      "parent": "carrier",
+      "shape": "sphere",
+      "dimensions_m": {
+        "radius": 0.075
+      },
+      "position_m": [
+        0.2121320343559642,
+        0,
+        -0.2121320343559643
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "basis": "documented",
+        "source": "EL-BEAR",
+        "class": "oak"
+      },
+      "certainty": "C",
+      "source": "A-GEOM"
+    },
+    {
+      "id": "separator-7",
+      "parent": "carrier",
+      "shape": "profile of revolution",
+      "dimensions_m": {
+        "segments": 64,
+        "closed_axial_radial_profile": [
+          [
+            -0.04,
+            0.006
+          ],
+          [
+            -0.04,
+            0.0513621
+          ],
+          [
+            -0.0375,
+            0.0498531
+          ],
+          [
+            -0.035,
+            0.0484725
+          ],
+          [
+            -0.0325,
+            0.0472125
+          ],
+          [
+            -0.03,
+            0.0460664
+          ],
+          [
+            -0.0275,
+            0.0450286
+          ],
+          [
+            -0.025,
+            0.0440944
+          ],
+          [
+            -0.0225,
+            0.0432596
+          ],
+          [
+            -0.02,
+            0.0425209
+          ],
+          [
+            -0.0175,
+            0.0418753
+          ],
+          [
+            -0.015,
+            0.0413203
+          ],
+          [
+            -0.0125,
+            0.040854
+          ],
+          [
+            -0.01,
+            0.0404747
+          ],
+          [
+            -0.0075,
+            0.040181
+          ],
+          [
+            -0.005,
+            0.0399719
+          ],
+          [
+            -0.0025,
+            0.0398467
+          ],
+          [
+            0.0,
+            0.039805
+          ],
+          [
+            0.0025,
+            0.0398467
+          ],
+          [
+            0.005,
+            0.0399719
+          ],
+          [
+            0.0075,
+            0.040181
+          ],
+          [
+            0.01,
+            0.0404747
+          ],
+          [
+            0.0125,
+            0.040854
+          ],
+          [
+            0.015,
+            0.0413203
+          ],
+          [
+            0.0175,
+            0.0418753
+          ],
+          [
+            0.02,
+            0.0425209
+          ],
+          [
+            0.0225,
+            0.0432596
+          ],
+          [
+            0.025,
+            0.0440944
+          ],
+          [
+            0.0275,
+            0.0450286
+          ],
+          [
+            0.03,
+            0.0460664
+          ],
+          [
+            0.0325,
+            0.0472125
+          ],
+          [
+            0.035,
+            0.0484725
+          ],
+          [
+            0.0375,
+            0.0498531
+          ],
+          [
+            0.04,
+            0.0513621
+          ],
+          [
+            0.04,
+            0.006
+          ]
+        ],
+        "closure": "Close last to first and revolve through 2*pi about +Y. Annular end caps leave radius 0.006 m axial bore."
+      },
+      "position_m": [
+        0.25606601717798205,
+        0,
+        -0.10606601717798231
+      ],
+      "orientation_rad": [
+        1.5707963267948966,
+        0,
+        4.319689898685965
+      ],
+      "material": {
+        "basis": "assumed",
+        "source": "A-GEOM",
+        "class": "oak"
+      },
+      "certainty": "C",
+      "source": "A-GEOM",
+      "notes": "First profile coordinate is axial localY. Second is radius. Surface joining ring samples and end caps fully defines mesh. Separator profile and placement are modern. It is allowed to slide at sphere contact and is not asserted perfectly conjugate."
+    },
+    {
+      "id": "separator-axle-0",
+      "parent": "carrier",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.004,
+        "height": 0.302163859753386
+      },
+      "position_m": [
+        0.16267849105816432,
+        0,
+        0.06738363730268193
+      ],
+      "orientation_rad": [
+        1.5707963267948966,
+        0,
+        -1.1780972450961724
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "A-GEOM"
+      },
+      "certainty": "C",
+      "source": "A-GEOM"
+    },
+    {
+      "id": "separator-axle-1",
+      "parent": "carrier",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.004,
+        "height": 0.302163859753386
+      },
+      "position_m": [
+        0.06738363730268195,
+        0,
+        0.16267849105816432
+      ],
+      "orientation_rad": [
+        1.5707963267948966,
+        0,
+        -0.39269908169872414
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "A-GEOM"
+      },
+      "certainty": "C",
+      "source": "A-GEOM"
+    },
+    {
+      "id": "separator-axle-2",
+      "parent": "carrier",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.004,
+        "height": 0.302163859753386
+      },
+      "position_m": [
+        -0.06738363730268193,
+        0,
+        0.16267849105816432
+      ],
+      "orientation_rad": [
+        1.5707963267948966,
+        0,
+        0.39269908169872414
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "A-GEOM"
+      },
+      "certainty": "C",
+      "source": "A-GEOM"
+    },
+    {
+      "id": "separator-axle-3",
+      "parent": "carrier",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.004,
+        "height": 0.302163859753386
+      },
+      "position_m": [
+        -0.16267849105816432,
+        0,
+        0.06738363730268196
+      ],
+      "orientation_rad": [
+        1.5707963267948966,
+        0,
+        1.1780972450961724
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "A-GEOM"
+      },
+      "certainty": "C",
+      "source": "A-GEOM"
+    },
+    {
+      "id": "separator-axle-4",
+      "parent": "carrier",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.004,
+        "height": 0.302163859753386
+      },
+      "position_m": [
+        -0.16267849105816434,
+        0,
+        -0.06738363730268192
+      ],
+      "orientation_rad": [
+        1.5707963267948966,
+        0,
+        1.9634954084936207
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "A-GEOM"
+      },
+      "certainty": "C",
+      "source": "A-GEOM"
+    },
+    {
+      "id": "separator-axle-5",
+      "parent": "carrier",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.004,
+        "height": 0.302163859753386
+      },
+      "position_m": [
+        -0.06738363730268203,
+        0,
+        -0.1626784910581643
+      ],
+      "orientation_rad": [
+        1.5707963267948966,
+        0,
+        2.7488935718910685
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "A-GEOM"
+      },
+      "certainty": "C",
+      "source": "A-GEOM"
+    },
+    {
+      "id": "separator-axle-6",
+      "parent": "carrier",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.004,
+        "height": 0.302163859753386
+      },
+      "position_m": [
+        0.06738363730268197,
+        0,
+        -0.16267849105816432
+      ],
+      "orientation_rad": [
+        1.5707963267948966,
+        0,
+        3.5342917352885177
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "A-GEOM"
+      },
+      "certainty": "C",
+      "source": "A-GEOM"
+    },
+    {
+      "id": "separator-axle-7",
+      "parent": "carrier",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.004,
+        "height": 0.302163859753386
+      },
+      "position_m": [
+        0.1626784910581643,
+        0,
+        -0.06738363730268204
+      ],
+      "orientation_rad": [
+        1.5707963267948966,
+        0,
+        4.319689898685965
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "A-GEOM"
+      },
+      "certainty": "C",
+      "source": "A-GEOM"
+    },
+    {
+      "id": "central-post",
+      "parent": "base",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.014,
+        "height": 0.26
+      },
+      "position_m": [
+        0,
+        0.18,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "A-GEOM"
+      },
+      "certainty": "C",
+      "source": "A-GEOM"
+    }
+  ],
+  "joints": [
+    {
+      "id": "q-top",
+      "type": "revolute",
+      "parent": "base",
+      "child": "upper-plate",
+      "axis": [
+        0,
+        1,
+        0
+      ],
+      "pivot_m": [
+        0,
+        0.29,
+        0
+      ],
+      "limits": null,
+      "ratio": null,
+      "source": "A-MOTION",
+      "certainty": "C",
+      "notes": ""
+    },
+    {
+      "id": "q-carrier",
+      "type": "revolute",
+      "parent": "base",
+      "child": "carrier",
+      "axis": [
+        0,
+        1,
+        0
+      ],
+      "pivot_m": [
+        0,
+        0.195,
+        0
+      ],
+      "limits": null,
+      "ratio": null,
+      "source": "A-MOTION",
+      "certainty": "C",
+      "notes": ""
+    },
+    {
+      "id": "spin-0",
+      "type": "revolute",
+      "parent": "carrier",
+      "child": "ball-0",
+      "axis": [
+        1.0,
+        0,
+        0.0
+      ],
+      "pivot_m": [
+        0.3,
+        0,
+        0.0
+      ],
+      "limits": null,
+      "ratio": null,
+      "source": "A-MOTION",
+      "certainty": "C",
+      "notes": "Ball no-slip rotation at upper and lower plate contacts."
+    },
+    {
+      "id": "sep-0",
+      "type": "revolute",
+      "parent": "carrier",
+      "child": "separator-0",
+      "axis": [
+        0.9238795325112867,
+        0,
+        0.3826834323650898
+      ],
+      "pivot_m": [
+        0.2560660171779821,
+        0,
+        0.10606601717798213
+      ],
+      "limits": null,
+      "ratio": null,
+      "source": "A-MOTION",
+      "certainty": "C",
+      "notes": "Illustrative separator spin matched at midsection only. Off-equator slip possible."
+    },
+    {
+      "id": "spin-1",
+      "type": "revolute",
+      "parent": "carrier",
+      "child": "ball-1",
+      "axis": [
+        0.7071067811865476,
+        0,
+        0.7071067811865475
+      ],
+      "pivot_m": [
+        0.21213203435596426,
+        0,
+        0.21213203435596423
+      ],
+      "limits": null,
+      "ratio": null,
+      "source": "A-MOTION",
+      "certainty": "C",
+      "notes": "Ball no-slip rotation at upper and lower plate contacts."
+    },
+    {
+      "id": "sep-1",
+      "type": "revolute",
+      "parent": "carrier",
+      "child": "separator-1",
+      "axis": [
+        0.38268343236508984,
+        0,
+        0.9238795325112867
+      ],
+      "pivot_m": [
+        0.10606601717798216,
+        0,
+        0.2560660171779821
+      ],
+      "limits": null,
+      "ratio": null,
+      "source": "A-MOTION",
+      "certainty": "C",
+      "notes": "Illustrative separator spin matched at midsection only. Off-equator slip possible."
+    },
+    {
+      "id": "spin-2",
+      "type": "revolute",
+      "parent": "carrier",
+      "child": "ball-2",
+      "axis": [
+        6.123233995736766e-17,
+        0,
+        1.0
+      ],
+      "pivot_m": [
+        1.8369701987210297e-17,
+        0,
+        0.3
+      ],
+      "limits": null,
+      "ratio": null,
+      "source": "A-MOTION",
+      "certainty": "C",
+      "notes": "Ball no-slip rotation at upper and lower plate contacts."
+    },
+    {
+      "id": "sep-2",
+      "type": "revolute",
+      "parent": "carrier",
+      "child": "separator-2",
+      "axis": [
+        -0.3826834323650897,
+        0,
+        0.9238795325112867
+      ],
+      "pivot_m": [
+        -0.10606601717798211,
+        0,
+        0.2560660171779821
+      ],
+      "limits": null,
+      "ratio": null,
+      "source": "A-MOTION",
+      "certainty": "C",
+      "notes": "Illustrative separator spin matched at midsection only. Off-equator slip possible."
+    },
+    {
+      "id": "spin-3",
+      "type": "revolute",
+      "parent": "carrier",
+      "child": "ball-3",
+      "axis": [
+        -0.7071067811865475,
+        0,
+        0.7071067811865476
+      ],
+      "pivot_m": [
+        -0.21213203435596423,
+        0,
+        0.21213203435596426
+      ],
+      "limits": null,
+      "ratio": null,
+      "source": "A-MOTION",
+      "certainty": "C",
+      "notes": "Ball no-slip rotation at upper and lower plate contacts."
+    },
+    {
+      "id": "sep-3",
+      "type": "revolute",
+      "parent": "carrier",
+      "child": "separator-3",
+      "axis": [
+        -0.9238795325112867,
+        0,
+        0.3826834323650899
+      ],
+      "pivot_m": [
+        -0.2560660171779821,
+        0,
+        0.10606601717798217
+      ],
+      "limits": null,
+      "ratio": null,
+      "source": "A-MOTION",
+      "certainty": "C",
+      "notes": "Illustrative separator spin matched at midsection only. Off-equator slip possible."
+    },
+    {
+      "id": "spin-4",
+      "type": "revolute",
+      "parent": "carrier",
+      "child": "ball-4",
+      "axis": [
+        -1.0,
+        0,
+        1.2246467991473532e-16
+      ],
+      "pivot_m": [
+        -0.3,
+        0,
+        3.6739403974420595e-17
+      ],
+      "limits": null,
+      "ratio": null,
+      "source": "A-MOTION",
+      "certainty": "C",
+      "notes": "Ball no-slip rotation at upper and lower plate contacts."
+    },
+    {
+      "id": "sep-4",
+      "type": "revolute",
+      "parent": "carrier",
+      "child": "separator-4",
+      "axis": [
+        -0.9238795325112868,
+        0,
+        -0.38268343236508967
+      ],
+      "pivot_m": [
+        -0.25606601717798216,
+        0,
+        -0.1060660171779821
+      ],
+      "limits": null,
+      "ratio": null,
+      "source": "A-MOTION",
+      "certainty": "C",
+      "notes": "Illustrative separator spin matched at midsection only. Off-equator slip possible."
+    },
+    {
+      "id": "spin-5",
+      "type": "revolute",
+      "parent": "carrier",
+      "child": "ball-5",
+      "axis": [
+        -0.7071067811865477,
+        0,
+        -0.7071067811865475
+      ],
+      "pivot_m": [
+        -0.2121320343559643,
+        0,
+        -0.21213203435596423
+      ],
+      "limits": null,
+      "ratio": null,
+      "source": "A-MOTION",
+      "certainty": "C",
+      "notes": "Ball no-slip rotation at upper and lower plate contacts."
+    },
+    {
+      "id": "sep-5",
+      "type": "revolute",
+      "parent": "carrier",
+      "child": "separator-5",
+      "axis": [
+        -0.38268343236509034,
+        0,
+        -0.9238795325112865
+      ],
+      "pivot_m": [
+        -0.1060660171779823,
+        0,
+        -0.25606601717798205
+      ],
+      "limits": null,
+      "ratio": null,
+      "source": "A-MOTION",
+      "certainty": "C",
+      "notes": "Illustrative separator spin matched at midsection only. Off-equator slip possible."
+    },
+    {
+      "id": "spin-6",
+      "type": "revolute",
+      "parent": "carrier",
+      "child": "ball-6",
+      "axis": [
+        -1.8369701987210297e-16,
+        0,
+        -1.0
+      ],
+      "pivot_m": [
+        -5.510910596163089e-17,
+        0,
+        -0.3
+      ],
+      "limits": null,
+      "ratio": null,
+      "source": "A-MOTION",
+      "certainty": "C",
+      "notes": "Ball no-slip rotation at upper and lower plate contacts."
+    },
+    {
+      "id": "sep-6",
+      "type": "revolute",
+      "parent": "carrier",
+      "child": "separator-6",
+      "axis": [
+        0.38268343236509,
+        0,
+        -0.9238795325112866
+      ],
+      "pivot_m": [
+        0.1060660171779822,
+        0,
+        -0.2560660171779821
+      ],
+      "limits": null,
+      "ratio": null,
+      "source": "A-MOTION",
+      "certainty": "C",
+      "notes": "Illustrative separator spin matched at midsection only. Off-equator slip possible."
+    },
+    {
+      "id": "spin-7",
+      "type": "revolute",
+      "parent": "carrier",
+      "child": "ball-7",
+      "axis": [
+        0.7071067811865474,
+        0,
+        -0.7071067811865477
+      ],
+      "pivot_m": [
+        0.2121320343559642,
+        0,
+        -0.2121320343559643
+      ],
+      "limits": null,
+      "ratio": null,
+      "source": "A-MOTION",
+      "certainty": "C",
+      "notes": "Ball no-slip rotation at upper and lower plate contacts."
+    },
+    {
+      "id": "sep-7",
+      "type": "revolute",
+      "parent": "carrier",
+      "child": "separator-7",
+      "axis": [
+        0.9238795325112865,
+        0,
+        -0.3826834323650904
+      ],
+      "pivot_m": [
+        0.25606601717798205,
+        0,
+        -0.10606601717798231
+      ],
+      "limits": null,
+      "ratio": null,
+      "source": "A-MOTION",
+      "certainty": "C",
+      "notes": "Illustrative separator spin matched at midsection only. Off-equator slip possible."
+    }
+  ],
+  "drive": {
+    "type": "human",
+    "input_joint": "q-top",
+    "input_rate": {
+      "value": 0.08726646259971647,
+      "unit": "rad/s",
+      "certainty": "C",
+      "source": "A-MOTION",
+      "note": "A demonstrator continuously turns q-top at0.833rpm. The carrier runs at half its rate by ideal equal-radius plate contact."
+    },
+    "justification": "A demonstrator continuously turns q-top at0.833rpm. The carrier runs at half its rate by ideal equal-radius plate contact.",
+    "source": "A-MOTION"
+  },
+  "motion": {
+    "period_s": 72,
+    "loop": true,
+    "initial_states": {
+      "q-top": 0,
+      "q-carrier": 0,
+      "spin-0": 0,
+      "sep-0": 0,
+      "spin-1": 0,
+      "sep-1": 0,
+      "spin-2": 0,
+      "sep-2": 0,
+      "spin-3": 0,
+      "sep-3": 0,
+      "spin-4": 0,
+      "sep-4": 0,
+      "spin-5": 0,
+      "sep-5": 0,
+      "spin-6": 0,
+      "sep-6": 0,
+      "spin-7": 0,
+      "sep-7": 0
+    },
+    "phases": [
+      {
+        "name": "Externally driven rolling",
+        "start_s": 0,
+        "duration_s": 72,
+        "joint_values": {
+          "q-top": "pi*t/36",
+          "q-carrier": "pi*t/72",
+          "spin-0": "-pi*t/18",
+          "sep-0": "0.30381976571384123*t",
+          "spin-1": "-pi*t/18",
+          "sep-1": "0.30381976571384123*t",
+          "spin-2": "-pi*t/18",
+          "sep-2": "0.30381976571384123*t",
+          "spin-3": "-pi*t/18",
+          "sep-3": "0.30381976571384123*t",
+          "spin-4": "-pi*t/18",
+          "sep-4": "0.30381976571384123*t",
+          "spin-5": "-pi*t/18",
+          "sep-5": "0.30381976571384123*t",
+          "spin-6": "-pi*t/18",
+          "sep-6": "0.30381976571384123*t",
+          "spin-7": "-pi*t/18",
+          "sep-7": "0.30381976571384123*t"
+        },
+        "interpolation": "linear"
+      }
+    ],
+    "visitor_12s": "The top turns60degrees and the ball centres30degrees. External hand input continues. Unwrapped rotations carry across loops."
+  },
+  "animation_notes": [
+    "No bounce, no hidden energy recharge and no invisible reset.",
+    "All independent joints are in the schedule. Rigid descendants follow their parent.",
+    "Use the specified SI time without cinematic speed-up.",
+    "Plate contacts are ideal no-slip rolling. Separator spin matches the equatorial contact only and permits slip elsewhere on its curved surface. Do not describe the separator pair as an exact conjugate gear. The constant externally supplied drive replaces unmodelled friction losses."
+  ],
+  "label_en": "From Madrid I 20v. Eight wooden balls are kept apart by eight pivoted wheels.",
+  "label_de": "Nach Madrid I 20v. Acht Holzkugeln werden durch acht gelagerte Rollen getrennt.",
+  "page": {
+    "path": "pages/ball-bearing.md",
+    "sections": [
+      "folio",
+      "mechanism",
+      "purpose",
+      "build_history",
+      "tests",
+      "arithmetic",
+      "myth",
+      "sources"
+    ]
+  },
+  "sources": [
+    {
+      "id": "BNE-DATE",
+      "title": "Códice Madrid I, análisis de mecanismos",
+      "author_or_institution": "Rubio and colleagues",
+      "year": 2024,
+      "url": "https://www.tecnicaindustrial.es/codice-madrid-i-un-analisis-de-los-mecanismos-del-primer-tratado-completo-de-sistemas-mecanicos/",
+      "accessed": "2026-09-08",
+      "supports": "Dating of Madrid I1492 to1497",
+      "source_type": "research",
+      "limitations": "Indexed scholarly article text. Date is approximate."
+    },
+    {
+      "id": "EL-TERMS",
+      "title": "Descrizione del progetto",
+      "author_or_institution": "Biblioteca Leonardiana",
+      "year": null,
+      "url": "https://www.leonardodigitale.com/descrizione-del-progetto/",
+      "accessed": "2026-09-08",
+      "supports": "e-Leo terms and edition provenance",
+      "source_type": "holder",
+      "limitations": "e-Leo holds editions and authorised facsimiles, not all original manuscripts."
+    },
+    {
+      "id": "EL-BEAR",
+      "title": "Madrid I 0020 v facsimile and transcription",
+      "author_or_institution": "Biblioteca Leonardiana, e-Leo",
+      "year": null,
+      "url": "https://www.leonardodigitale.com/sfoglia/madrid-I/0020-v/",
+      "accessed": "2026-09-08",
+      "supports": "Folio identification and inspected Italian transcription",
+      "source_type": "primary",
+      "limitations": "Viewer metadata decoded and ordinary read endpoint queried with bookId=22,sheetId=2718. No image downloaded. Original holder catalogue checked where accessible."
+    },
+    {
+      "id": "BEARING-M",
+      "title": "Cuscinetto volvente reggispinta",
+      "author_or_institution": "Museo Leonardiano",
+      "year": 2010,
+      "url": "https://museoleonardiano.it/opera/cuscinetto-volvente-reggispinta/",
+      "accessed": "2026-09-08",
+      "supports": "Madrid I20v, Etruria Musei2010, eight balls and eight separators",
+      "source_type": "museum",
+      "limitations": "Read online. Modern interpretation is not proof of a lifetime build."
+    },
+    {
+      "id": "BNE",
+      "title": "Tratado de estática y mecánica, Codex Madrid I",
+      "author_or_institution": "Biblioteca Nacional de España",
+      "year": null,
+      "url": "https://datos.bne.es/edicion/biam0000011018",
+      "accessed": "2026-09-08",
+      "supports": "MSS/8937 and original holder",
+      "source_type": "holder",
+      "limitations": "Catalogue visible in indexed result. Direct fetch returned403. Folio texts checked independently through e-Leo."
+    },
+    {
+      "id": "BNE-LEAF",
+      "title": "El imaginario de Leonardo exhibition leaflet",
+      "author_or_institution": "Biblioteca Nacional de España",
+      "year": 2012,
+      "url": "https://www.bne.gob.es/es/Micrositios/Guias/FolletosExposiciones/resources/docs/FolletoExpoLeonardo.pdf",
+      "accessed": "2026-09-08",
+      "supports": "Madrid I10r gears and chains,26r bearings",
+      "source_type": "holder",
+      "limitations": "Indexed PDF text inspected. Direct fetch timed out. Does not identify20v as26r."
+    }
+  ],
+  "research": {
+    "identification": "Madrid I20v verified in e-Leo. BNE leaflet names26r as another bearing sheet. It does not correct20v [EL-BEAR,BNE-LEAF].",
+    "sheet_vs_reconstruction": "Leonardo names eight wooden balls and eight pivoted wheels [EL-BEAR]. Etruria Musei made a2010 model [BEARING-M]. Plates, sizes and separator profile here are modern.",
+    "dimensions": "“son palle di legnio” [EL-BEAR] specifies wood, not dimensions. No numerical size or Richter number verified. No braccio conversion applies.",
+    "claims": {
+      "claimed_by_leonardo": "Keep balls positioned while allowing turning [EL-BEAR].",
+      "tested_by_leonardo": "No dated experiment by Leonardo was verified in the sources listed here. This is an evidence gap, not proof that he never tried it.",
+      "built_in_lifetime": "No lifetime build record located.2010 model is later [BEARING-M].",
+      "later_tests": "No measured friction coefficient or service-life test was located. The modern model is not such a test [BEARING-M]."
+    },
+    "physics": {
+      "formulas": [
+        "v_top=Omega*R",
+        "v_centre=v_top/2",
+        "omega_ball=-Omega*R/(2*r)"
+      ],
+      "inputs": [
+        "R0.30m,r0.075m [C,A-GEOM]",
+        "Omega=pi/36rad/s [C,A-MOTION]"
+      ],
+      "results": [
+        "Top tangential speed0.0262m/s",
+        "Centre speed0.0131m/s",
+        "Ball spin0.17453rad/s"
+      ],
+      "limits": "Ideal plate rolling. Separator off-equator slip, contact stress, wood compliance and wear are not solved.",
+      "verdict_en": "Rolling separates the contact motion, but does not abolish friction.",
+      "verdict_de": "Abrollen verändert die Kontaktbewegung, beseitigt die Reibung aber nicht."
+    },
+    "myths": {
+      "claim": "A frictionless modern bearing invented in finished form",
+      "earliest_source_located": "No historical first located.",
+      "correction": "The sheet is a study with wooden balls, not a precision steel bearing [EL-BEAR]."
+    },
+    "confidence": "High folio and material. ClassC numerical interpretation. Medium ideal plate kinematics, unresolved separator friction."
+  }
+}

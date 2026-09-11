@@ -1,0 +1,2011 @@
+{
+  "schema_version": "1.0",
+  "slug": "multi-barrel-gun",
+  "name_en": "Three-bank organ gun",
+  "name_de": "Orgelgeschütz mit drei Rohrreihen",
+  "status": "complete",
+  "scope": "Complete procedural educational interpretation of the three-bank indexing carriage. Solid inert barrels, no firing or loading simulation. All metric sizes and manual indexing timing are modern assumptions.",
+  "gaps": [
+    "Historical dimensions, firing sequence duration and loading time are unknown. These are not asserted by the dimensioned exhibit interpretation."
+  ],
+  "folio": [
+    {
+      "codex": "Codex Atlanticus",
+      "folio": "157r",
+      "holder": "Veneranda Biblioteca Ambrosiana",
+      "catalogue_reference": "Codex Atlanticus f.157r; e-Leo book21, sheet1549",
+      "catalogue_url": "https://www.leonardodigitale.com/sfoglia/codice-atlantico/0157-r/",
+      "verification": "verified",
+      "commission_reference": "157r",
+      "correction": null,
+      "date": "Circa1480 to1490, B broad reconstruction dating, exact year unresolved.",
+      "image_url": "https://backend.leonardodigitale.com/images/books/21/1549/sheet_20190204173535135230.jpg",
+      "image_licence_quote": "Ogni utilizzo a scopo di studio o di natura editoriale deve essere richiesto a Mondadori Portfolio",
+      "licence_source": "https://www.ambrosiana.it/scopri/capolavori/richiesta-immagini/"
+    }
+  ],
+  "scale_m": {
+    "x": 2.5,
+    "y": 2.55,
+    "z": 3.2,
+    "certainty": "C",
+    "source": "A1",
+    "note": "Conservative swept bounds X [-1.25,1.25], Y [0,2.55], Z [-2,1.2]. Exact maximum barrel radial sweep about X is sqrt((0.595+0.035)^2+0.45^2)=0.774209274 m. It reaches world Y [0.685790726,2.234209274], leaving 0.005790726 m above chassis. Moving X extent is [-1.17,1.17]. Wheel bottom is Y=0, trails reach Z=-2."
+  },
+  "frame": {
+    "handedness": "right",
+    "up": "+Y",
+    "forward": "+Z",
+    "origin": "Ground below centre of assembly. Local part transforms are relative to parent."
+  },
+  "assumptions": [
+    {
+      "id": "A0",
+      "statement": "No historical scale or performance is inferred from a modern replica.",
+      "reason": "The sheet and museum models are distinct evidence."
+    },
+    {
+      "id": "A1",
+      "statement": "All dimensions and XYZ placements in parts are original exhibit choices in metres. Barrel spacing 0.15, barrel length 0.90, solid radius 0.035, eleven per bank, three banks 120 degrees apart. Frame width 1.8, wheel radius 0.50. Trail centre height 0.50 gives 0.055 vertical overlap with chassis. Shaft radius 0.055, length 2.34, world centre [0,1.46,0]. Endplate X intervals [-0.845,-0.795] and [0.795,0.845] leave 0.035 clearance to the uprights. Upright bore is a clockwise 32-sided polygon with circumradius 0.056 and centre [0,0.36,0] in each upright frame. Every remaining part dimension and transform is explicitly listed in its A1-tagged part. These are not measured historic calibres or dimensions.",
+      "reason": "The image identifies topology and counts, not a metric shop drawing."
+    },
+    {
+      "id": "A2",
+      "statement": "Manual indexing through 120 degrees takes 12 s, with 6 s rest before each index, repeated three times. Smoothstep gives maximum angular rate 0.2617993878 rad/s. This is an interpretive turning speed, not a documented gun rate. One shaft turn is a 1:1 handbar turn.",
+      "reason": "No historical gearing or timing specified. Index directly by hand on the shaft, no invented speed multiplication."
+    }
+  ],
+  "parts": [
+    {
+      "id": "chassis",
+      "parent": "world",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 1.8,
+        "y": 0.16,
+        "z": 1.35
+      },
+      "position_m": [
+        0,
+        0.6,
+        -0.35
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "A1"
+      },
+      "certainty": "C",
+      "source": "A1",
+      "notes": ""
+    },
+    {
+      "id": "trail-left",
+      "parent": "world",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.12,
+        "y": 0.15,
+        "z": 1.2
+      },
+      "position_m": [
+        -0.48,
+        0.5,
+        -1.4
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "A1"
+      },
+      "certainty": "C",
+      "source": "A1",
+      "notes": ""
+    },
+    {
+      "id": "trail-right",
+      "parent": "world",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.12,
+        "y": 0.15,
+        "z": 1.2
+      },
+      "position_m": [
+        0.48,
+        0.5,
+        -1.4
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "A1"
+      },
+      "certainty": "C",
+      "source": "A1",
+      "notes": ""
+    },
+    {
+      "id": "axle",
+      "parent": "world",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.06,
+        "height": 2.25
+      },
+      "position_m": [
+        0,
+        0.5,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        1.5707963267948966
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "A1"
+      },
+      "certainty": "C",
+      "source": "A1",
+      "notes": ""
+    },
+    {
+      "id": "wheel--1",
+      "parent": "world",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.5,
+        "height": 0.08
+      },
+      "position_m": [
+        -1.08,
+        0.5,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        1.5707963267948966
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "A1"
+      },
+      "certainty": "C",
+      "source": "A1",
+      "notes": ""
+    },
+    {
+      "id": "upright--1",
+      "parent": "world",
+      "shape": "profile",
+      "dimensions_m": {
+        "plane": "YZ",
+        "outer_vertices_yz": [
+          [
+            -0.44,
+            -0.1
+          ],
+          [
+            0.44,
+            -0.1
+          ],
+          [
+            0.44,
+            0.1
+          ],
+          [
+            -0.44,
+            0.1
+          ]
+        ],
+        "hole_vertices_yz": [
+          [
+            0.416,
+            -0.0
+          ],
+          [
+            0.4149239757025809,
+            -0.010925058032903182
+          ],
+          [
+            0.41173725382063203,
+            -0.021430272212445027
+          ],
+          [
+            0.4065622982889425,
+            -0.031111933049097724
+          ],
+          [
+            0.3995979797464467,
+            -0.03959797974644666
+          ],
+          [
+            0.3911119330490977,
+            -0.04656229828894253
+          ],
+          [
+            0.381430272212445,
+            -0.05173725382063206
+          ],
+          [
+            0.37092505803290315,
+            -0.0549239757025809
+          ],
+          [
+            0.36,
+            -0.056
+          ],
+          [
+            0.3490749419670968,
+            -0.0549239757025809
+          ],
+          [
+            0.33856972778755495,
+            -0.05173725382063206
+          ],
+          [
+            0.3288880669509023,
+            -0.04656229828894254
+          ],
+          [
+            0.32040202025355335,
+            -0.03959797974644667
+          ],
+          [
+            0.31343770171105745,
+            -0.031111933049097724
+          ],
+          [
+            0.30826274617936794,
+            -0.021430272212445034
+          ],
+          [
+            0.3050760242974191,
+            -0.010925058032903202
+          ],
+          [
+            0.304,
+            -6.858022075225178e-18
+          ],
+          [
+            0.3050760242974191,
+            0.010925058032903188
+          ],
+          [
+            0.30826274617936794,
+            0.021430272212445024
+          ],
+          [
+            0.31343770171105745,
+            0.03111193304909771
+          ],
+          [
+            0.3204020202535533,
+            0.03959797974644666
+          ],
+          [
+            0.3288880669509023,
+            0.04656229828894253
+          ],
+          [
+            0.33856972778755495,
+            0.051737253820632045
+          ],
+          [
+            0.34907494196709676,
+            0.054923975702580896
+          ],
+          [
+            0.36,
+            0.056
+          ],
+          [
+            0.37092505803290315,
+            0.0549239757025809
+          ],
+          [
+            0.381430272212445,
+            0.05173725382063205
+          ],
+          [
+            0.3911119330490977,
+            0.046562298288942545
+          ],
+          [
+            0.3995979797464466,
+            0.039597979746446674
+          ],
+          [
+            0.4065622982889425,
+            0.031111933049097724
+          ],
+          [
+            0.41173725382063203,
+            0.021430272212445062
+          ],
+          [
+            0.4149239757025809,
+            0.01092505803290321
+          ]
+        ],
+        "extrusion_axis": [
+          1,
+          0,
+          0
+        ],
+        "extrusion_min": -0.06,
+        "extrusion_max": 0.06
+      },
+      "position_m": [
+        -0.94,
+        1.1,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "A1"
+      },
+      "certainty": "C",
+      "source": "A1",
+      "notes": "Extrude the polygon with its clockwise 32-sided hole. The hole centre is [0,0.36,0] in this part frame, on the world shaft axis y=1.46, z=0. The inscribed bore radius is 0.0557303 m, above the 0.055 m shaft radius."
+    },
+    {
+      "id": "wheel-1",
+      "parent": "world",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.5,
+        "height": 0.08
+      },
+      "position_m": [
+        1.08,
+        0.5,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        1.5707963267948966
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "A1"
+      },
+      "certainty": "C",
+      "source": "A1",
+      "notes": ""
+    },
+    {
+      "id": "upright-1",
+      "parent": "world",
+      "shape": "profile",
+      "dimensions_m": {
+        "plane": "YZ",
+        "outer_vertices_yz": [
+          [
+            -0.44,
+            -0.1
+          ],
+          [
+            0.44,
+            -0.1
+          ],
+          [
+            0.44,
+            0.1
+          ],
+          [
+            -0.44,
+            0.1
+          ]
+        ],
+        "hole_vertices_yz": [
+          [
+            0.416,
+            -0.0
+          ],
+          [
+            0.4149239757025809,
+            -0.010925058032903182
+          ],
+          [
+            0.41173725382063203,
+            -0.021430272212445027
+          ],
+          [
+            0.4065622982889425,
+            -0.031111933049097724
+          ],
+          [
+            0.3995979797464467,
+            -0.03959797974644666
+          ],
+          [
+            0.3911119330490977,
+            -0.04656229828894253
+          ],
+          [
+            0.381430272212445,
+            -0.05173725382063206
+          ],
+          [
+            0.37092505803290315,
+            -0.0549239757025809
+          ],
+          [
+            0.36,
+            -0.056
+          ],
+          [
+            0.3490749419670968,
+            -0.0549239757025809
+          ],
+          [
+            0.33856972778755495,
+            -0.05173725382063206
+          ],
+          [
+            0.3288880669509023,
+            -0.04656229828894254
+          ],
+          [
+            0.32040202025355335,
+            -0.03959797974644667
+          ],
+          [
+            0.31343770171105745,
+            -0.031111933049097724
+          ],
+          [
+            0.30826274617936794,
+            -0.021430272212445034
+          ],
+          [
+            0.3050760242974191,
+            -0.010925058032903202
+          ],
+          [
+            0.304,
+            -6.858022075225178e-18
+          ],
+          [
+            0.3050760242974191,
+            0.010925058032903188
+          ],
+          [
+            0.30826274617936794,
+            0.021430272212445024
+          ],
+          [
+            0.31343770171105745,
+            0.03111193304909771
+          ],
+          [
+            0.3204020202535533,
+            0.03959797974644666
+          ],
+          [
+            0.3288880669509023,
+            0.04656229828894253
+          ],
+          [
+            0.33856972778755495,
+            0.051737253820632045
+          ],
+          [
+            0.34907494196709676,
+            0.054923975702580896
+          ],
+          [
+            0.36,
+            0.056
+          ],
+          [
+            0.37092505803290315,
+            0.0549239757025809
+          ],
+          [
+            0.381430272212445,
+            0.05173725382063205
+          ],
+          [
+            0.3911119330490977,
+            0.046562298288942545
+          ],
+          [
+            0.3995979797464466,
+            0.039597979746446674
+          ],
+          [
+            0.4065622982889425,
+            0.031111933049097724
+          ],
+          [
+            0.41173725382063203,
+            0.021430272212445062
+          ],
+          [
+            0.4149239757025809,
+            0.01092505803290321
+          ]
+        ],
+        "extrusion_axis": [
+          1,
+          0,
+          0
+        ],
+        "extrusion_min": -0.06,
+        "extrusion_max": 0.06
+      },
+      "position_m": [
+        0.94,
+        1.1,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "A1"
+      },
+      "certainty": "C",
+      "source": "A1",
+      "notes": "Extrude the polygon with its clockwise 32-sided hole. The hole centre is [0,0.36,0] in this part frame, on the world shaft axis y=1.46, z=0. The inscribed bore radius is 0.0557303 m, above the 0.055 m shaft radius."
+    },
+    {
+      "id": "drum",
+      "parent": "chassis",
+      "shape": "profile",
+      "dimensions_m": {
+        "profile": "circle in YZ plane, centre [0,0], radius 0.055, extrude along X from -1.17 to 1.17",
+        "radius": 0.055,
+        "extrusion_length": 2.34
+      },
+      "position_m": [
+        0,
+        0.86,
+        0.35
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "A1"
+      },
+      "certainty": "C",
+      "source": "A1",
+      "notes": "The circular shaft geometry has axis +X. Its part frame stays world-aligned at rest. Its extended end intersects the handbar."
+    },
+    {
+      "id": "bank-0",
+      "parent": "drum",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 1.68,
+        "y": 0.08,
+        "z": 0.98
+      },
+      "position_m": [
+        0,
+        0.52,
+        0.0
+      ],
+      "orientation_rad": [
+        0.0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "A1"
+      },
+      "certainty": "C",
+      "source": "A1",
+      "notes": ""
+    },
+    {
+      "id": "barrel-0-0",
+      "parent": "drum",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.035,
+        "height": 0.9
+      },
+      "position_m": [
+        -0.75,
+        0.595,
+        0.0
+      ],
+      "orientation_rad": [
+        1.5707963267948966,
+        0,
+        0
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "A1"
+      },
+      "certainty": "C",
+      "source": "A1",
+      "notes": "Solid cylinder. No chamber, ignition, propellant, loading geometry or projectile."
+    },
+    {
+      "id": "barrel-0-1",
+      "parent": "drum",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.035,
+        "height": 0.9
+      },
+      "position_m": [
+        -0.6,
+        0.595,
+        0.0
+      ],
+      "orientation_rad": [
+        1.5707963267948966,
+        0,
+        0
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "A1"
+      },
+      "certainty": "C",
+      "source": "A1",
+      "notes": "Solid cylinder. No chamber, ignition, propellant, loading geometry or projectile."
+    },
+    {
+      "id": "barrel-0-2",
+      "parent": "drum",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.035,
+        "height": 0.9
+      },
+      "position_m": [
+        -0.45,
+        0.595,
+        0.0
+      ],
+      "orientation_rad": [
+        1.5707963267948966,
+        0,
+        0
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "A1"
+      },
+      "certainty": "C",
+      "source": "A1",
+      "notes": "Solid cylinder. No chamber, ignition, propellant, loading geometry or projectile."
+    },
+    {
+      "id": "barrel-0-3",
+      "parent": "drum",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.035,
+        "height": 0.9
+      },
+      "position_m": [
+        -0.30000000000000004,
+        0.595,
+        0.0
+      ],
+      "orientation_rad": [
+        1.5707963267948966,
+        0,
+        0
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "A1"
+      },
+      "certainty": "C",
+      "source": "A1",
+      "notes": "Solid cylinder. No chamber, ignition, propellant, loading geometry or projectile."
+    },
+    {
+      "id": "barrel-0-4",
+      "parent": "drum",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.035,
+        "height": 0.9
+      },
+      "position_m": [
+        -0.15000000000000002,
+        0.595,
+        0.0
+      ],
+      "orientation_rad": [
+        1.5707963267948966,
+        0,
+        0
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "A1"
+      },
+      "certainty": "C",
+      "source": "A1",
+      "notes": "Solid cylinder. No chamber, ignition, propellant, loading geometry or projectile."
+    },
+    {
+      "id": "barrel-0-5",
+      "parent": "drum",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.035,
+        "height": 0.9
+      },
+      "position_m": [
+        0.0,
+        0.595,
+        0.0
+      ],
+      "orientation_rad": [
+        1.5707963267948966,
+        0,
+        0
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "A1"
+      },
+      "certainty": "C",
+      "source": "A1",
+      "notes": "Solid cylinder. No chamber, ignition, propellant, loading geometry or projectile."
+    },
+    {
+      "id": "barrel-0-6",
+      "parent": "drum",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.035,
+        "height": 0.9
+      },
+      "position_m": [
+        0.1499999999999999,
+        0.595,
+        0.0
+      ],
+      "orientation_rad": [
+        1.5707963267948966,
+        0,
+        0
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "A1"
+      },
+      "certainty": "C",
+      "source": "A1",
+      "notes": "Solid cylinder. No chamber, ignition, propellant, loading geometry or projectile."
+    },
+    {
+      "id": "barrel-0-7",
+      "parent": "drum",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.035,
+        "height": 0.9
+      },
+      "position_m": [
+        0.30000000000000004,
+        0.595,
+        0.0
+      ],
+      "orientation_rad": [
+        1.5707963267948966,
+        0,
+        0
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "A1"
+      },
+      "certainty": "C",
+      "source": "A1",
+      "notes": "Solid cylinder. No chamber, ignition, propellant, loading geometry or projectile."
+    },
+    {
+      "id": "barrel-0-8",
+      "parent": "drum",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.035,
+        "height": 0.9
+      },
+      "position_m": [
+        0.44999999999999996,
+        0.595,
+        0.0
+      ],
+      "orientation_rad": [
+        1.5707963267948966,
+        0,
+        0
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "A1"
+      },
+      "certainty": "C",
+      "source": "A1",
+      "notes": "Solid cylinder. No chamber, ignition, propellant, loading geometry or projectile."
+    },
+    {
+      "id": "barrel-0-9",
+      "parent": "drum",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.035,
+        "height": 0.9
+      },
+      "position_m": [
+        0.5999999999999999,
+        0.595,
+        0.0
+      ],
+      "orientation_rad": [
+        1.5707963267948966,
+        0,
+        0
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "A1"
+      },
+      "certainty": "C",
+      "source": "A1",
+      "notes": "Solid cylinder. No chamber, ignition, propellant, loading geometry or projectile."
+    },
+    {
+      "id": "barrel-0-10",
+      "parent": "drum",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.035,
+        "height": 0.9
+      },
+      "position_m": [
+        0.75,
+        0.595,
+        0.0
+      ],
+      "orientation_rad": [
+        1.5707963267948966,
+        0,
+        0
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "A1"
+      },
+      "certainty": "C",
+      "source": "A1",
+      "notes": "Solid cylinder. No chamber, ignition, propellant, loading geometry or projectile."
+    },
+    {
+      "id": "bank-1",
+      "parent": "drum",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 1.68,
+        "y": 0.08,
+        "z": 0.98
+      },
+      "position_m": [
+        0,
+        -0.2599999999999999,
+        0.45033320996790815
+      ],
+      "orientation_rad": [
+        2.0943951023931953,
+        0,
+        0
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "A1"
+      },
+      "certainty": "C",
+      "source": "A1",
+      "notes": ""
+    },
+    {
+      "id": "barrel-1-0",
+      "parent": "drum",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.035,
+        "height": 0.9
+      },
+      "position_m": [
+        -0.75,
+        -0.2974999999999999,
+        0.515285115251741
+      ],
+      "orientation_rad": [
+        3.665191429188092,
+        0,
+        0
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "A1"
+      },
+      "certainty": "C",
+      "source": "A1",
+      "notes": "Solid cylinder. No chamber, ignition, propellant, loading geometry or projectile."
+    },
+    {
+      "id": "barrel-1-1",
+      "parent": "drum",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.035,
+        "height": 0.9
+      },
+      "position_m": [
+        -0.6,
+        -0.2974999999999999,
+        0.515285115251741
+      ],
+      "orientation_rad": [
+        3.665191429188092,
+        0,
+        0
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "A1"
+      },
+      "certainty": "C",
+      "source": "A1",
+      "notes": "Solid cylinder. No chamber, ignition, propellant, loading geometry or projectile."
+    },
+    {
+      "id": "barrel-1-2",
+      "parent": "drum",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.035,
+        "height": 0.9
+      },
+      "position_m": [
+        -0.45,
+        -0.2974999999999999,
+        0.515285115251741
+      ],
+      "orientation_rad": [
+        3.665191429188092,
+        0,
+        0
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "A1"
+      },
+      "certainty": "C",
+      "source": "A1",
+      "notes": "Solid cylinder. No chamber, ignition, propellant, loading geometry or projectile."
+    },
+    {
+      "id": "barrel-1-3",
+      "parent": "drum",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.035,
+        "height": 0.9
+      },
+      "position_m": [
+        -0.30000000000000004,
+        -0.2974999999999999,
+        0.515285115251741
+      ],
+      "orientation_rad": [
+        3.665191429188092,
+        0,
+        0
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "A1"
+      },
+      "certainty": "C",
+      "source": "A1",
+      "notes": "Solid cylinder. No chamber, ignition, propellant, loading geometry or projectile."
+    },
+    {
+      "id": "barrel-1-4",
+      "parent": "drum",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.035,
+        "height": 0.9
+      },
+      "position_m": [
+        -0.15000000000000002,
+        -0.2974999999999999,
+        0.515285115251741
+      ],
+      "orientation_rad": [
+        3.665191429188092,
+        0,
+        0
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "A1"
+      },
+      "certainty": "C",
+      "source": "A1",
+      "notes": "Solid cylinder. No chamber, ignition, propellant, loading geometry or projectile."
+    },
+    {
+      "id": "barrel-1-5",
+      "parent": "drum",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.035,
+        "height": 0.9
+      },
+      "position_m": [
+        0.0,
+        -0.2974999999999999,
+        0.515285115251741
+      ],
+      "orientation_rad": [
+        3.665191429188092,
+        0,
+        0
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "A1"
+      },
+      "certainty": "C",
+      "source": "A1",
+      "notes": "Solid cylinder. No chamber, ignition, propellant, loading geometry or projectile."
+    },
+    {
+      "id": "barrel-1-6",
+      "parent": "drum",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.035,
+        "height": 0.9
+      },
+      "position_m": [
+        0.1499999999999999,
+        -0.2974999999999999,
+        0.515285115251741
+      ],
+      "orientation_rad": [
+        3.665191429188092,
+        0,
+        0
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "A1"
+      },
+      "certainty": "C",
+      "source": "A1",
+      "notes": "Solid cylinder. No chamber, ignition, propellant, loading geometry or projectile."
+    },
+    {
+      "id": "barrel-1-7",
+      "parent": "drum",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.035,
+        "height": 0.9
+      },
+      "position_m": [
+        0.30000000000000004,
+        -0.2974999999999999,
+        0.515285115251741
+      ],
+      "orientation_rad": [
+        3.665191429188092,
+        0,
+        0
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "A1"
+      },
+      "certainty": "C",
+      "source": "A1",
+      "notes": "Solid cylinder. No chamber, ignition, propellant, loading geometry or projectile."
+    },
+    {
+      "id": "barrel-1-8",
+      "parent": "drum",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.035,
+        "height": 0.9
+      },
+      "position_m": [
+        0.44999999999999996,
+        -0.2974999999999999,
+        0.515285115251741
+      ],
+      "orientation_rad": [
+        3.665191429188092,
+        0,
+        0
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "A1"
+      },
+      "certainty": "C",
+      "source": "A1",
+      "notes": "Solid cylinder. No chamber, ignition, propellant, loading geometry or projectile."
+    },
+    {
+      "id": "barrel-1-9",
+      "parent": "drum",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.035,
+        "height": 0.9
+      },
+      "position_m": [
+        0.5999999999999999,
+        -0.2974999999999999,
+        0.515285115251741
+      ],
+      "orientation_rad": [
+        3.665191429188092,
+        0,
+        0
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "A1"
+      },
+      "certainty": "C",
+      "source": "A1",
+      "notes": "Solid cylinder. No chamber, ignition, propellant, loading geometry or projectile."
+    },
+    {
+      "id": "barrel-1-10",
+      "parent": "drum",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.035,
+        "height": 0.9
+      },
+      "position_m": [
+        0.75,
+        -0.2974999999999999,
+        0.515285115251741
+      ],
+      "orientation_rad": [
+        3.665191429188092,
+        0,
+        0
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "A1"
+      },
+      "certainty": "C",
+      "source": "A1",
+      "notes": "Solid cylinder. No chamber, ignition, propellant, loading geometry or projectile."
+    },
+    {
+      "id": "bank-2",
+      "parent": "drum",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 1.68,
+        "y": 0.08,
+        "z": 0.98
+      },
+      "position_m": [
+        0,
+        -0.26000000000000023,
+        -0.450333209967908
+      ],
+      "orientation_rad": [
+        4.1887902047863905,
+        0,
+        0
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "A1"
+      },
+      "certainty": "C",
+      "source": "A1",
+      "notes": ""
+    },
+    {
+      "id": "barrel-2-0",
+      "parent": "drum",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.035,
+        "height": 0.9
+      },
+      "position_m": [
+        -0.75,
+        -0.29750000000000026,
+        -0.5152851152517408
+      ],
+      "orientation_rad": [
+        5.759586531581287,
+        0,
+        0
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "A1"
+      },
+      "certainty": "C",
+      "source": "A1",
+      "notes": "Solid cylinder. No chamber, ignition, propellant, loading geometry or projectile."
+    },
+    {
+      "id": "barrel-2-1",
+      "parent": "drum",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.035,
+        "height": 0.9
+      },
+      "position_m": [
+        -0.6,
+        -0.29750000000000026,
+        -0.5152851152517408
+      ],
+      "orientation_rad": [
+        5.759586531581287,
+        0,
+        0
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "A1"
+      },
+      "certainty": "C",
+      "source": "A1",
+      "notes": "Solid cylinder. No chamber, ignition, propellant, loading geometry or projectile."
+    },
+    {
+      "id": "barrel-2-2",
+      "parent": "drum",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.035,
+        "height": 0.9
+      },
+      "position_m": [
+        -0.45,
+        -0.29750000000000026,
+        -0.5152851152517408
+      ],
+      "orientation_rad": [
+        5.759586531581287,
+        0,
+        0
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "A1"
+      },
+      "certainty": "C",
+      "source": "A1",
+      "notes": "Solid cylinder. No chamber, ignition, propellant, loading geometry or projectile."
+    },
+    {
+      "id": "barrel-2-3",
+      "parent": "drum",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.035,
+        "height": 0.9
+      },
+      "position_m": [
+        -0.30000000000000004,
+        -0.29750000000000026,
+        -0.5152851152517408
+      ],
+      "orientation_rad": [
+        5.759586531581287,
+        0,
+        0
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "A1"
+      },
+      "certainty": "C",
+      "source": "A1",
+      "notes": "Solid cylinder. No chamber, ignition, propellant, loading geometry or projectile."
+    },
+    {
+      "id": "barrel-2-4",
+      "parent": "drum",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.035,
+        "height": 0.9
+      },
+      "position_m": [
+        -0.15000000000000002,
+        -0.29750000000000026,
+        -0.5152851152517408
+      ],
+      "orientation_rad": [
+        5.759586531581287,
+        0,
+        0
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "A1"
+      },
+      "certainty": "C",
+      "source": "A1",
+      "notes": "Solid cylinder. No chamber, ignition, propellant, loading geometry or projectile."
+    },
+    {
+      "id": "barrel-2-5",
+      "parent": "drum",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.035,
+        "height": 0.9
+      },
+      "position_m": [
+        0.0,
+        -0.29750000000000026,
+        -0.5152851152517408
+      ],
+      "orientation_rad": [
+        5.759586531581287,
+        0,
+        0
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "A1"
+      },
+      "certainty": "C",
+      "source": "A1",
+      "notes": "Solid cylinder. No chamber, ignition, propellant, loading geometry or projectile."
+    },
+    {
+      "id": "barrel-2-6",
+      "parent": "drum",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.035,
+        "height": 0.9
+      },
+      "position_m": [
+        0.1499999999999999,
+        -0.29750000000000026,
+        -0.5152851152517408
+      ],
+      "orientation_rad": [
+        5.759586531581287,
+        0,
+        0
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "A1"
+      },
+      "certainty": "C",
+      "source": "A1",
+      "notes": "Solid cylinder. No chamber, ignition, propellant, loading geometry or projectile."
+    },
+    {
+      "id": "barrel-2-7",
+      "parent": "drum",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.035,
+        "height": 0.9
+      },
+      "position_m": [
+        0.30000000000000004,
+        -0.29750000000000026,
+        -0.5152851152517408
+      ],
+      "orientation_rad": [
+        5.759586531581287,
+        0,
+        0
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "A1"
+      },
+      "certainty": "C",
+      "source": "A1",
+      "notes": "Solid cylinder. No chamber, ignition, propellant, loading geometry or projectile."
+    },
+    {
+      "id": "barrel-2-8",
+      "parent": "drum",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.035,
+        "height": 0.9
+      },
+      "position_m": [
+        0.44999999999999996,
+        -0.29750000000000026,
+        -0.5152851152517408
+      ],
+      "orientation_rad": [
+        5.759586531581287,
+        0,
+        0
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "A1"
+      },
+      "certainty": "C",
+      "source": "A1",
+      "notes": "Solid cylinder. No chamber, ignition, propellant, loading geometry or projectile."
+    },
+    {
+      "id": "barrel-2-9",
+      "parent": "drum",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.035,
+        "height": 0.9
+      },
+      "position_m": [
+        0.5999999999999999,
+        -0.29750000000000026,
+        -0.5152851152517408
+      ],
+      "orientation_rad": [
+        5.759586531581287,
+        0,
+        0
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "A1"
+      },
+      "certainty": "C",
+      "source": "A1",
+      "notes": "Solid cylinder. No chamber, ignition, propellant, loading geometry or projectile."
+    },
+    {
+      "id": "barrel-2-10",
+      "parent": "drum",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.035,
+        "height": 0.9
+      },
+      "position_m": [
+        0.75,
+        -0.29750000000000026,
+        -0.5152851152517408
+      ],
+      "orientation_rad": [
+        5.759586531581287,
+        0,
+        0
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "assumed",
+        "source": "A1"
+      },
+      "certainty": "C",
+      "source": "A1",
+      "notes": "Solid cylinder. No chamber, ignition, propellant, loading geometry or projectile."
+    },
+    {
+      "id": "triangle--1",
+      "parent": "drum",
+      "shape": "mesh",
+      "dimensions_m": {
+        "vertices": [
+          [
+            -0.845,
+            0.67,
+            0.0
+          ],
+          [
+            -0.845,
+            -0.3349999999999999,
+            0.580237020535574
+          ],
+          [
+            -0.845,
+            -0.3350000000000003,
+            -0.5802370205355738
+          ],
+          [
+            -0.7949999999999999,
+            0.67,
+            0.0
+          ],
+          [
+            -0.7949999999999999,
+            -0.3349999999999999,
+            0.580237020535574
+          ],
+          [
+            -0.7949999999999999,
+            -0.3350000000000003,
+            -0.5802370205355738
+          ]
+        ],
+        "faces": [
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            3,
+            4,
+            5
+          ],
+          [
+            0,
+            1,
+            4
+          ],
+          [
+            0,
+            4,
+            3
+          ],
+          [
+            1,
+            2,
+            5
+          ],
+          [
+            1,
+            5,
+            4
+          ],
+          [
+            2,
+            0,
+            3
+          ],
+          [
+            2,
+            3,
+            5
+          ]
+        ]
+      },
+      "position_m": [
+        0,
+        0,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "A1"
+      },
+      "certainty": "C",
+      "source": "A1",
+      "notes": ""
+    },
+    {
+      "id": "triangle-1",
+      "parent": "drum",
+      "shape": "mesh",
+      "dimensions_m": {
+        "vertices": [
+          [
+            0.7949999999999999,
+            0.67,
+            0.0
+          ],
+          [
+            0.7949999999999999,
+            -0.3349999999999999,
+            0.580237020535574
+          ],
+          [
+            0.7949999999999999,
+            -0.3350000000000003,
+            -0.5802370205355738
+          ],
+          [
+            0.845,
+            0.67,
+            0.0
+          ],
+          [
+            0.845,
+            -0.3349999999999999,
+            0.580237020535574
+          ],
+          [
+            0.845,
+            -0.3350000000000003,
+            -0.5802370205355738
+          ]
+        ],
+        "faces": [
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            3,
+            4,
+            5
+          ],
+          [
+            0,
+            1,
+            4
+          ],
+          [
+            0,
+            4,
+            3
+          ],
+          [
+            1,
+            2,
+            5
+          ],
+          [
+            1,
+            5,
+            4
+          ],
+          [
+            2,
+            0,
+            3
+          ],
+          [
+            2,
+            3,
+            5
+          ]
+        ]
+      },
+      "position_m": [
+        0,
+        0,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "A1"
+      },
+      "certainty": "C",
+      "source": "A1",
+      "notes": ""
+    },
+    {
+      "id": "handbar",
+      "parent": "drum",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.1,
+        "y": 0.46,
+        "z": 0.07
+      },
+      "position_m": [
+        1.12,
+        0,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "A1"
+      },
+      "certainty": "C",
+      "source": "A1",
+      "notes": ""
+    }
+  ],
+  "joints": [
+    {
+      "id": "index",
+      "type": "revolute",
+      "parent": "chassis",
+      "child": "drum",
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "pivot_m": [
+        0,
+        0.86,
+        0.35
+      ],
+      "limits": null,
+      "ratio": null,
+      "source": "A2",
+      "certainty": "C",
+      "notes": "Motion rotates drum local frame about its own origin. Chassis is static. Shaft indexing is manual, with no specified gear reduction."
+    }
+  ],
+  "drive": {
+    "type": "human",
+    "input_rate": {
+      "value": 0.2617993877991494,
+      "unit": "rad/s",
+      "certainty": "C",
+      "source": "A2",
+      "note": "Peak rate at index joint,2.5rpm. Mean during each moving phase1.667rpm. Manual shaft input1:1."
+    },
+    "justification": "A2 chosen slow index, no historical rate claimed.",
+    "source": "A2"
+  },
+  "motion": {
+    "period_s": 54,
+    "loop": true,
+    "initial_state": {
+      "index": 0
+    },
+    "phases": [
+      {
+        "name": "Hold bank-0 uppermost",
+        "start_s": 0,
+        "duration_s": 6,
+        "joint_values": {
+          "index": 0.0
+        },
+        "interpolation": "linear"
+      },
+      {
+        "name": "Index to next bank",
+        "start_s": 6,
+        "duration_s": 12,
+        "joint_values": {
+          "index": "0.0 + (2*pi/3)*(3*(t/12)^2-2*(t/12)^3)"
+        },
+        "interpolation": "explicit formula, evaluated directly once"
+      },
+      {
+        "name": "Hold bank-2 uppermost",
+        "start_s": 18,
+        "duration_s": 6,
+        "joint_values": {
+          "index": 2.0943951023931953
+        },
+        "interpolation": "linear"
+      },
+      {
+        "name": "Index to next bank",
+        "start_s": 24,
+        "duration_s": 12,
+        "joint_values": {
+          "index": "2.0943951023931953 + (2*pi/3)*(3*(t/12)^2-2*(t/12)^3)"
+        },
+        "interpolation": "explicit formula, evaluated directly once"
+      },
+      {
+        "name": "Hold bank-1 uppermost",
+        "start_s": 36,
+        "duration_s": 6,
+        "joint_values": {
+          "index": 4.1887902047863905
+        },
+        "interpolation": "linear"
+      },
+      {
+        "name": "Index to next bank",
+        "start_s": 42,
+        "duration_s": 12,
+        "joint_values": {
+          "index": "4.1887902047863905 + (2*pi/3)*(3*(t/12)^2-2*(t/12)^3)"
+        },
+        "interpolation": "explicit formula, evaluated directly once"
+      }
+    ],
+    "formula_symbols": "t is seconds since start of the current phase, pi=3.141592653589793. Evaluate the explicit smoothstep expression once, without applying a second interpolation. Preserve unwrapped angle across loops, adding 2*pi per cycle. All non-jointed parts stay fixed relative to parent. Positive rotation about +X presents banks in order bank-0, bank-2, bank-1, bank-0.",
+    "visitor_12s": "From cycle start,6s rest then the first60degrees of the120degree index. No shots. A full set of three indexes takes54s."
+  },
+  "animation_notes": [
+    "No bounce or theatrical recoil.",
+    "No hidden motor, invisible spring rewind or unsupported motion.",
+    "Modern replica photographs are not geometry sources.",
+    "Do not show automatic fire, self-loading or cooling in a fixed number of seconds.",
+    "Wheels stay still. The triangular banks turn as one rigid drum.",
+    "All geometry is newly specified from the folio topology. Modern museum models are comparison history only.",
+    "Geometry clearance: the barrel sweep clears chassis by 0.005790726 m. Rotating endplates clear upright inner faces by 0.035 m. The shaft passes through explicit 32-sided bores. Render parts rigidly. Do not rescale or double-apply the index rotation."
+  ],
+  "label_en": "Three-bank gun study, Codex Atlanticus157r. The note specifies33barrels and11shots at a time.",
+  "label_de": "Geschützstudie mit drei Rohrreihen, Codex Atlanticus157r. Die Notiz nennt33Rohre und11Schüsse zugleich.",
+  "page": {
+    "path": "pages/multi-barrel-gun.md",
+    "sections": [
+      "folio",
+      "mechanism",
+      "purpose",
+      "build_history",
+      "tests",
+      "arithmetic",
+      "myth",
+      "sources"
+    ]
+  },
+  "sources": [
+    {
+      "id": "E157",
+      "title": "CA157r, image and transcription",
+      "author_or_institution": "Biblioteca Leonardiana, e-Leo",
+      "year": null,
+      "url": "https://www.leonardodigitale.com/sfoglia/codice-atlantico/0157-r/",
+      "accessed": "2026-09-08",
+      "supports": "Three separate gun concepts, wording33 and11",
+      "source_type": "primary",
+      "limitations": "Read sheet endpointbook21 sheet1549 and visually inspected711055byte folio image in memory."
+    },
+    {
+      "id": "LIC",
+      "title": "Richiesta immagini",
+      "author_or_institution": "Veneranda Biblioteca Ambrosiana",
+      "year": null,
+      "url": "https://www.ambrosiana.it/scopri/capolavori/richiesta-immagini/",
+      "accessed": "2026-09-08",
+      "supports": "Holder reproduction terms",
+      "source_type": "holder",
+      "limitations": ""
+    },
+    {
+      "id": "FAN",
+      "title": "Mitragliera a ventaglio, IBM Italia1952",
+      "author_or_institution": "Museo Leonardiano",
+      "year": 1952,
+      "url": "https://museoleonardiano.it/opera/page/7/",
+      "accessed": "2026-09-08",
+      "supports": "Ten-barrel fan reconstruction is a different study onCA157r",
+      "source_type": "museum",
+      "limitations": ""
+    },
+    {
+      "id": "IBM",
+      "title": "Leonardo da Vinci exhibition, Syracuse Museum bulletin p7",
+      "author_or_institution": "Syracuse Museum, modified Metropolitan Museum of Art release",
+      "year": null,
+      "url": "https://nyheritage.contentdm.oclc.org/digital/api/collection/p16694coll230/id/6064/download",
+      "accessed": "2026-09-08",
+      "supports": "Primary evidence for promotional claims, Guatelli series acquired by IBM1951",
+      "source_type": "primary",
+      "limitations": "Undated excerpt, after6April1952. Its1938 exhibition date and36barrel claim are not accepted as factual corrections."
+    }
+  ],
+  "research": {
+    "identification": "[E157] Verified 157 r image and transcription. Contains three related studies, not one hybrid gun. This spec scopes the upper 33 barrel carriage.",
+    "sheet_vs_reconstruction": [
+      "[E157] Text:33 barrels,11 at a time. Image shows triangular bank assembly and separate fan and smaller carriage studies. Sizes, trunnion bearings, stock thickness and timing above areA1/A2 assumptions.",
+      "[FAN] IBM Italia1952 model has10 fan-arranged barrels from another drawing on the same sheet. Do not merge the fan into the33barrel drum.",
+      "[IBM] The undated post1952 Syracuse promotional leaflet says three tiers of twelve. This contradicts the explicit33/11 wording. Use the folio. Its1938Milan date also needs correction to documented1939 context, not blind copying."
+    ],
+    "dimensions": "[E157] \"In su questo carro sie 33 scoppietti che se ne trae undici per volta.\" This is a count, not a calibre or length. No metric conversion or applicable Richter entry verified. Every metric part dimension isA1.",
+    "claims": {
+      "claimed": "Eleven shots at a time from33 barrels [E157].",
+      "tested": "No experiment record secured.",
+      "lifetime": "No build record secured for this exact three-bank design.",
+      "since": "Modern1952 fan model [FAN] and IBM display tradition [IBM] are reconstructions. No measured firing-cycle trial secured."
+    },
+    "physics": {
+      "formula": "Bank count=33/11=3. Index=2*pi/3rad. A2 cycle=3*(6+12)=54s. For smoothstep s(u)=3u²-2u³, maxds/du=1.5.",
+      "inputs": "Counts fromE157.12s index and6s dwell areA2. No gear ratio given on sheet, direct manual1:1 is assumed.",
+      "result": "Mean index rate0.17453rad/s=1.667rpm. Peak0.26180rad/s=2.5rpm. At12s from start, indexpi/3rad. The54s display cycle is not a firing rate. Real firing/cleaning/reloading is unresolved.",
+      "label_en": "Thirty-three barrels form three banks. Their turning cycle does not establish a firing rate.",
+      "label_de": "Dreiunddreißig Rohre bilden drei Reihen. Aus ihrer Drehbewegung folgt keine Feuergeschwindigkeit.",
+      "geometry_check": "A1 geometry: moving radial maximum 0.774209274 m, shaft height 1.46 m and chassis top 0.68 m leave 0.005790726 m clearance. Shaft X span [-1.17,1.17] intersects the handbar. Endplates leave 0.035 m axial clearance to the upright faces. Conservative bounds contain the full rotation."
+    },
+    "myths": "[IBM] The post 1952 promotional leaflet is a located early source of the machine-gun comparison and the incorrect 36 barrel count. Earliest historical machine-gun invention claim not established. This is a manually served multiple gun, not a self-loading automatic weapon.",
+    "confidence": "High folio and counts. Complete scoped inert geometry and indexing, all sizes/timingC. Unknown firing performance."
+  }
+}

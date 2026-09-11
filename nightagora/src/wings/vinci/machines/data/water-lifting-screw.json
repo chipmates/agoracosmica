@@ -1,0 +1,1798 @@
+{
+  "schema_version": "1.0",
+  "slug": "water-lifting-screw",
+  "name_en": "Archimedean screw and water lifting",
+  "name_de": "Wasserschnecke und Wasserhebung",
+  "status": "complete",
+  "scope": "One manually driven, open-ended helical tube screw from the family on 6r. The other pumps on the sheet are catalogue context, not merged into one invented machine.",
+  "gaps": [
+    "The sheet carries no writing and does not establish a tube diameter, pitch, flow rate, material or efficiency.",
+    "The exact human-drive connections in the sheet are not dimensioned. Here the hand crank acts directly on the shaft.",
+    "Other water-raising mechanisms on6r and the unworkable recirculating arrangement1068v require separate geometry before display.",
+    "No holder licence quote obtained."
+  ],
+  "folio": [
+    {
+      "codex": "Codex Atlanticus",
+      "folio": "6r",
+      "holder": "Veneranda Biblioteca Ambrosiana",
+      "catalogue_reference": "Codex Atlanticus f. 6r",
+      "catalogue_url": "https://www.leonardodigitale.com/sfoglia/codice-atlantico/0006-r/",
+      "verification": "verified",
+      "commission_reference": "Archimedean screw and water-lifting machines",
+      "correction": null,
+      "date": {
+        "range": "about 1480",
+        "certainty": "B",
+        "note": "Approximate contextual date, not a dated inscription."
+      },
+      "image_url": "https://backend.leonardodigitale.com/images/books/21/1009/sheet_20190204172513382122.jpg",
+      "image_licence_quote": null,
+      "licence_source": null
+    }
+  ],
+  "scale_m": {
+    "x": 1.4,
+    "y": 2.15,
+    "z": 3.6,
+    "certainty": "C",
+    "source": "geometry",
+    "note": "Conservative swept envelope x +/-0.7 m, y0 to2.15 m, z -1.6 to2 m. The hand crank sweeps above the tube. Numerical sampling over61 poses found max y2.07236 m."
+  },
+  "frame": {
+    "handedness": "right",
+    "unit": "m",
+    "up": "+Y",
+    "forward": "+Z",
+    "origin": "Floor centre below the assembly",
+    "ground_y_m": 0
+  },
+  "assumptions": [
+    {
+      "id": "geometry",
+      "statement": "All numerical procedural dimensions, positions, angles and chosen material classes in parts and joints are modern modelling assumptions. They do not measure Leonardo’s sheet or any museum replica.",
+      "reason": "The sheet does not dimension a complete assembly."
+    },
+    {
+      "id": "physics-assumption",
+      "statement": "Every numerical physics input explicitly tagged C is an illustrative modern assumption, not a historical measurement.",
+      "reason": "Distinguish calculations from evidence."
+    }
+  ],
+  "parts": [
+    {
+      "id": "base",
+      "parent": "world",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 1.4,
+        "y": 0.1,
+        "z": 3.6
+      },
+      "position_m": [
+        0,
+        0.05,
+        0.2
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry"
+    },
+    {
+      "id": "lower-bearing",
+      "parent": "world",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.65,
+        "y": 0.18,
+        "z": 0.18
+      },
+      "position_m": [
+        0,
+        0.32,
+        -1.05
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry"
+    },
+    {
+      "id": "upper-bearing",
+      "parent": "world",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.65,
+        "y": 0.18,
+        "z": 0.18
+      },
+      "position_m": [
+        0,
+        1.52,
+        1.028
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry"
+    },
+    {
+      "id": "support",
+      "parent": "world",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.15,
+        "y": 1.3,
+        "z": 0.15
+      },
+      "position_m": [
+        0.27,
+        0.75,
+        1.028
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry"
+    },
+    {
+      "id": "support2",
+      "parent": "world",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.15,
+        "y": 1.3,
+        "z": 0.15
+      },
+      "position_m": [
+        -0.27,
+        0.75,
+        1.028
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry"
+    },
+    {
+      "id": "rotor",
+      "parent": "lower-bearing",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.045,
+        "height": 0.1
+      },
+      "position_m": [
+        0,
+        0,
+        0
+      ],
+      "orientation_rad": [
+        1.0471975511965976,
+        0,
+        0
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry"
+    },
+    {
+      "id": "shaft",
+      "parent": "rotor",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.025,
+        "height": 2.65
+      },
+      "position_m": [
+        0,
+        1.325,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry"
+    },
+    {
+      "id": "crank",
+      "parent": "rotor",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.36,
+        "y": 0.035,
+        "z": 0.035
+      },
+      "position_m": [
+        0.18,
+        2.65,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry"
+    },
+    {
+      "id": "handle",
+      "parent": "rotor",
+      "shape": "cylinder",
+      "dimensions_m": {
+        "radius": 0.018,
+        "height": 0.2
+      },
+      "position_m": [
+        0.36,
+        2.75,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry"
+    },
+    {
+      "id": "helical-tube",
+      "parent": "rotor",
+      "shape": {
+        "type": "tube",
+        "centreline_m": [
+          [
+            0.18,
+            0,
+            0
+          ],
+          [
+            0.17654135,
+            0.0125,
+            0.03511626
+          ],
+          [
+            0.16629832,
+            0.025,
+            0.06888302
+          ],
+          [
+            0.14966453,
+            0.0375,
+            0.10000264
+          ],
+          [
+            0.12727922,
+            0.05,
+            0.12727922
+          ],
+          [
+            0.10000264,
+            0.0625,
+            0.14966453
+          ],
+          [
+            0.06888302,
+            0.075,
+            0.16629832
+          ],
+          [
+            0.03511626,
+            0.0875,
+            0.17654135
+          ],
+          [
+            0,
+            0.1,
+            0.18
+          ],
+          [
+            -0.03511626,
+            0.1125,
+            0.17654135
+          ],
+          [
+            -0.06888302,
+            0.125,
+            0.16629832
+          ],
+          [
+            -0.10000264,
+            0.1375,
+            0.14966453
+          ],
+          [
+            -0.12727922,
+            0.15,
+            0.12727922
+          ],
+          [
+            -0.14966453,
+            0.1625,
+            0.10000264
+          ],
+          [
+            -0.16629832,
+            0.175,
+            0.06888302
+          ],
+          [
+            -0.17654135,
+            0.1875,
+            0.03511626
+          ],
+          [
+            -0.18,
+            0.2,
+            0
+          ],
+          [
+            -0.17654135,
+            0.2125,
+            -0.03511626
+          ],
+          [
+            -0.16629832,
+            0.225,
+            -0.06888302
+          ],
+          [
+            -0.14966453,
+            0.2375,
+            -0.10000264
+          ],
+          [
+            -0.12727922,
+            0.25,
+            -0.12727922
+          ],
+          [
+            -0.10000264,
+            0.2625,
+            -0.14966453
+          ],
+          [
+            -0.06888302,
+            0.275,
+            -0.16629832
+          ],
+          [
+            -0.03511626,
+            0.2875,
+            -0.17654135
+          ],
+          [
+            0,
+            0.3,
+            -0.18
+          ],
+          [
+            0.03511626,
+            0.3125,
+            -0.17654135
+          ],
+          [
+            0.06888302,
+            0.325,
+            -0.16629832
+          ],
+          [
+            0.10000264,
+            0.3375,
+            -0.14966453
+          ],
+          [
+            0.12727922,
+            0.35,
+            -0.12727922
+          ],
+          [
+            0.14966453,
+            0.3625,
+            -0.10000264
+          ],
+          [
+            0.16629832,
+            0.375,
+            -0.06888302
+          ],
+          [
+            0.17654135,
+            0.3875,
+            -0.03511626
+          ],
+          [
+            0.18,
+            0.4,
+            0
+          ],
+          [
+            0.17654135,
+            0.4125,
+            0.03511626
+          ],
+          [
+            0.16629832,
+            0.425,
+            0.06888302
+          ],
+          [
+            0.14966453,
+            0.4375,
+            0.10000264
+          ],
+          [
+            0.12727922,
+            0.45,
+            0.12727922
+          ],
+          [
+            0.10000264,
+            0.4625,
+            0.14966453
+          ],
+          [
+            0.06888302,
+            0.475,
+            0.16629832
+          ],
+          [
+            0.03511626,
+            0.4875,
+            0.17654135
+          ],
+          [
+            0,
+            0.5,
+            0.18
+          ],
+          [
+            -0.03511626,
+            0.5125,
+            0.17654135
+          ],
+          [
+            -0.06888302,
+            0.525,
+            0.16629832
+          ],
+          [
+            -0.10000264,
+            0.5375,
+            0.14966453
+          ],
+          [
+            -0.12727922,
+            0.55,
+            0.12727922
+          ],
+          [
+            -0.14966453,
+            0.5625,
+            0.10000264
+          ],
+          [
+            -0.16629832,
+            0.575,
+            0.06888302
+          ],
+          [
+            -0.17654135,
+            0.5875,
+            0.03511626
+          ],
+          [
+            -0.18,
+            0.6,
+            0
+          ],
+          [
+            -0.17654135,
+            0.6125,
+            -0.03511626
+          ],
+          [
+            -0.16629832,
+            0.625,
+            -0.06888302
+          ],
+          [
+            -0.14966453,
+            0.6375,
+            -0.10000264
+          ],
+          [
+            -0.12727922,
+            0.65,
+            -0.12727922
+          ],
+          [
+            -0.10000264,
+            0.6625,
+            -0.14966453
+          ],
+          [
+            -0.06888302,
+            0.675,
+            -0.16629832
+          ],
+          [
+            -0.03511626,
+            0.6875,
+            -0.17654135
+          ],
+          [
+            0,
+            0.7,
+            -0.18
+          ],
+          [
+            0.03511626,
+            0.7125,
+            -0.17654135
+          ],
+          [
+            0.06888302,
+            0.725,
+            -0.16629832
+          ],
+          [
+            0.10000264,
+            0.7375,
+            -0.14966453
+          ],
+          [
+            0.12727922,
+            0.75,
+            -0.12727922
+          ],
+          [
+            0.14966453,
+            0.7625,
+            -0.10000264
+          ],
+          [
+            0.16629832,
+            0.775,
+            -0.06888302
+          ],
+          [
+            0.17654135,
+            0.7875,
+            -0.03511626
+          ],
+          [
+            0.18,
+            0.8,
+            0
+          ],
+          [
+            0.17654135,
+            0.8125,
+            0.03511626
+          ],
+          [
+            0.16629832,
+            0.825,
+            0.06888302
+          ],
+          [
+            0.14966453,
+            0.8375,
+            0.10000264
+          ],
+          [
+            0.12727922,
+            0.85,
+            0.12727922
+          ],
+          [
+            0.10000264,
+            0.8625,
+            0.14966453
+          ],
+          [
+            0.06888302,
+            0.875,
+            0.16629832
+          ],
+          [
+            0.03511626,
+            0.8875,
+            0.17654135
+          ],
+          [
+            0,
+            0.9,
+            0.18
+          ],
+          [
+            -0.03511626,
+            0.9125,
+            0.17654135
+          ],
+          [
+            -0.06888302,
+            0.925,
+            0.16629832
+          ],
+          [
+            -0.10000264,
+            0.9375,
+            0.14966453
+          ],
+          [
+            -0.12727922,
+            0.95,
+            0.12727922
+          ],
+          [
+            -0.14966453,
+            0.9625,
+            0.10000264
+          ],
+          [
+            -0.16629832,
+            0.975,
+            0.06888302
+          ],
+          [
+            -0.17654135,
+            0.9875,
+            0.03511626
+          ],
+          [
+            -0.18,
+            1,
+            0
+          ],
+          [
+            -0.17654135,
+            1.0125,
+            -0.03511626
+          ],
+          [
+            -0.16629832,
+            1.025,
+            -0.06888302
+          ],
+          [
+            -0.14966453,
+            1.0375,
+            -0.10000264
+          ],
+          [
+            -0.12727922,
+            1.05,
+            -0.12727922
+          ],
+          [
+            -0.10000264,
+            1.0625,
+            -0.14966453
+          ],
+          [
+            -0.06888302,
+            1.075,
+            -0.16629832
+          ],
+          [
+            -0.03511626,
+            1.0875,
+            -0.17654135
+          ],
+          [
+            0,
+            1.1,
+            -0.18
+          ],
+          [
+            0.03511626,
+            1.1125,
+            -0.17654135
+          ],
+          [
+            0.06888302,
+            1.125,
+            -0.16629832
+          ],
+          [
+            0.10000264,
+            1.1375,
+            -0.14966453
+          ],
+          [
+            0.12727922,
+            1.15,
+            -0.12727922
+          ],
+          [
+            0.14966453,
+            1.1625,
+            -0.10000264
+          ],
+          [
+            0.16629832,
+            1.175,
+            -0.06888302
+          ],
+          [
+            0.17654135,
+            1.1875,
+            -0.03511626
+          ],
+          [
+            0.18,
+            1.2,
+            0
+          ],
+          [
+            0.17654135,
+            1.2125,
+            0.03511626
+          ],
+          [
+            0.16629832,
+            1.225,
+            0.06888302
+          ],
+          [
+            0.14966453,
+            1.2375,
+            0.10000264
+          ],
+          [
+            0.12727922,
+            1.25,
+            0.12727922
+          ],
+          [
+            0.10000264,
+            1.2625,
+            0.14966453
+          ],
+          [
+            0.06888302,
+            1.275,
+            0.16629832
+          ],
+          [
+            0.03511626,
+            1.2875,
+            0.17654135
+          ],
+          [
+            0,
+            1.3,
+            0.18
+          ],
+          [
+            -0.03511626,
+            1.3125,
+            0.17654135
+          ],
+          [
+            -0.06888302,
+            1.325,
+            0.16629832
+          ],
+          [
+            -0.10000264,
+            1.3375,
+            0.14966453
+          ],
+          [
+            -0.12727922,
+            1.35,
+            0.12727922
+          ],
+          [
+            -0.14966453,
+            1.3625,
+            0.10000264
+          ],
+          [
+            -0.16629832,
+            1.375,
+            0.06888302
+          ],
+          [
+            -0.17654135,
+            1.3875,
+            0.03511626
+          ],
+          [
+            -0.18,
+            1.4,
+            0
+          ],
+          [
+            -0.17654135,
+            1.4125,
+            -0.03511626
+          ],
+          [
+            -0.16629832,
+            1.425,
+            -0.06888302
+          ],
+          [
+            -0.14966453,
+            1.4375,
+            -0.10000264
+          ],
+          [
+            -0.12727922,
+            1.45,
+            -0.12727922
+          ],
+          [
+            -0.10000264,
+            1.4625,
+            -0.14966453
+          ],
+          [
+            -0.06888302,
+            1.475,
+            -0.16629832
+          ],
+          [
+            -0.03511626,
+            1.4875,
+            -0.17654135
+          ],
+          [
+            0,
+            1.5,
+            -0.18
+          ],
+          [
+            0.03511626,
+            1.5125,
+            -0.17654135
+          ],
+          [
+            0.06888302,
+            1.525,
+            -0.16629832
+          ],
+          [
+            0.10000264,
+            1.5375,
+            -0.14966453
+          ],
+          [
+            0.12727922,
+            1.55,
+            -0.12727922
+          ],
+          [
+            0.14966453,
+            1.5625,
+            -0.10000264
+          ],
+          [
+            0.16629832,
+            1.575,
+            -0.06888302
+          ],
+          [
+            0.17654135,
+            1.5875,
+            -0.03511626
+          ],
+          [
+            0.18,
+            1.6,
+            0
+          ],
+          [
+            0.17654135,
+            1.6125,
+            0.03511626
+          ],
+          [
+            0.16629832,
+            1.625,
+            0.06888302
+          ],
+          [
+            0.14966453,
+            1.6375,
+            0.10000264
+          ],
+          [
+            0.12727922,
+            1.65,
+            0.12727922
+          ],
+          [
+            0.10000264,
+            1.6625,
+            0.14966453
+          ],
+          [
+            0.06888302,
+            1.675,
+            0.16629832
+          ],
+          [
+            0.03511626,
+            1.6875,
+            0.17654135
+          ],
+          [
+            0,
+            1.7,
+            0.18
+          ],
+          [
+            -0.03511626,
+            1.7125,
+            0.17654135
+          ],
+          [
+            -0.06888302,
+            1.725,
+            0.16629832
+          ],
+          [
+            -0.10000264,
+            1.7375,
+            0.14966453
+          ],
+          [
+            -0.12727922,
+            1.75,
+            0.12727922
+          ],
+          [
+            -0.14966453,
+            1.7625,
+            0.10000264
+          ],
+          [
+            -0.16629832,
+            1.775,
+            0.06888302
+          ],
+          [
+            -0.17654135,
+            1.7875,
+            0.03511626
+          ],
+          [
+            -0.18,
+            1.8,
+            0
+          ],
+          [
+            -0.17654135,
+            1.8125,
+            -0.03511626
+          ],
+          [
+            -0.16629832,
+            1.825,
+            -0.06888302
+          ],
+          [
+            -0.14966453,
+            1.8375,
+            -0.10000264
+          ],
+          [
+            -0.12727922,
+            1.85,
+            -0.12727922
+          ],
+          [
+            -0.10000264,
+            1.8625,
+            -0.14966453
+          ],
+          [
+            -0.06888302,
+            1.875,
+            -0.16629832
+          ],
+          [
+            -0.03511626,
+            1.8875,
+            -0.17654135
+          ],
+          [
+            0,
+            1.9,
+            -0.18
+          ],
+          [
+            0.03511626,
+            1.9125,
+            -0.17654135
+          ],
+          [
+            0.06888302,
+            1.925,
+            -0.16629832
+          ],
+          [
+            0.10000264,
+            1.9375,
+            -0.14966453
+          ],
+          [
+            0.12727922,
+            1.95,
+            -0.12727922
+          ],
+          [
+            0.14966453,
+            1.9625,
+            -0.10000264
+          ],
+          [
+            0.16629832,
+            1.975,
+            -0.06888302
+          ],
+          [
+            0.17654135,
+            1.9875,
+            -0.03511626
+          ],
+          [
+            0.18,
+            2,
+            0
+          ],
+          [
+            0.17654135,
+            2.0125,
+            0.03511626
+          ],
+          [
+            0.16629832,
+            2.025,
+            0.06888302
+          ],
+          [
+            0.14966453,
+            2.0375,
+            0.10000264
+          ],
+          [
+            0.12727922,
+            2.05,
+            0.12727922
+          ],
+          [
+            0.10000264,
+            2.0625,
+            0.14966453
+          ],
+          [
+            0.06888302,
+            2.075,
+            0.16629832
+          ],
+          [
+            0.03511626,
+            2.0875,
+            0.17654135
+          ],
+          [
+            0,
+            2.1,
+            0.18
+          ],
+          [
+            -0.03511626,
+            2.1125,
+            0.17654135
+          ],
+          [
+            -0.06888302,
+            2.125,
+            0.16629832
+          ],
+          [
+            -0.10000264,
+            2.1375,
+            0.14966453
+          ],
+          [
+            -0.12727922,
+            2.15,
+            0.12727922
+          ],
+          [
+            -0.14966453,
+            2.1625,
+            0.10000264
+          ],
+          [
+            -0.16629832,
+            2.175,
+            0.06888302
+          ],
+          [
+            -0.17654135,
+            2.1875,
+            0.03511626
+          ],
+          [
+            -0.18,
+            2.2,
+            0
+          ],
+          [
+            -0.17654135,
+            2.2125,
+            -0.03511626
+          ],
+          [
+            -0.16629832,
+            2.225,
+            -0.06888302
+          ],
+          [
+            -0.14966453,
+            2.2375,
+            -0.10000264
+          ],
+          [
+            -0.12727922,
+            2.25,
+            -0.12727922
+          ],
+          [
+            -0.10000264,
+            2.2625,
+            -0.14966453
+          ],
+          [
+            -0.06888302,
+            2.275,
+            -0.16629832
+          ],
+          [
+            -0.03511626,
+            2.2875,
+            -0.17654135
+          ],
+          [
+            0,
+            2.3,
+            -0.18
+          ],
+          [
+            0.03511626,
+            2.3125,
+            -0.17654135
+          ],
+          [
+            0.06888302,
+            2.325,
+            -0.16629832
+          ],
+          [
+            0.10000264,
+            2.3375,
+            -0.14966453
+          ],
+          [
+            0.12727922,
+            2.35,
+            -0.12727922
+          ],
+          [
+            0.14966453,
+            2.3625,
+            -0.10000264
+          ],
+          [
+            0.16629832,
+            2.375,
+            -0.06888302
+          ],
+          [
+            0.17654135,
+            2.3875,
+            -0.03511626
+          ],
+          [
+            0.18,
+            2.4,
+            0
+          ]
+        ],
+        "inner_radius_m": 0.04,
+        "outer_radius_m": 0.044,
+        "open_ends": true
+      },
+      "dimensions_m": {
+        "inner_radius": 0.04,
+        "outer_radius": 0.044
+      },
+      "position_m": [
+        0,
+        0,
+        0
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "leather",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry"
+    },
+    {
+      "id": "lower-trough-base",
+      "parent": "world",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 1.1,
+        "y": 0.06,
+        "z": 0.9
+      },
+      "position_m": [
+        0,
+        0.13,
+        -1.05
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry"
+    },
+    {
+      "id": "lower-wall-l",
+      "parent": "world",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.04,
+        "y": 0.2,
+        "z": 0.9
+      },
+      "position_m": [
+        -0.55,
+        0.23,
+        -1.05
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry"
+    },
+    {
+      "id": "lower-wall-r",
+      "parent": "world",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.04,
+        "y": 0.2,
+        "z": 0.9
+      },
+      "position_m": [
+        0.55,
+        0.23,
+        -1.05
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry"
+    },
+    {
+      "id": "lower-wall-front",
+      "parent": "world",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 1.1,
+        "y": 0.2,
+        "z": 0.04
+      },
+      "position_m": [
+        0,
+        0.23,
+        -0.6000000000000001
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry"
+    },
+    {
+      "id": "lower-wall-back",
+      "parent": "world",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 1.1,
+        "y": 0.2,
+        "z": 0.04
+      },
+      "position_m": [
+        0,
+        0.23,
+        -1.5
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry"
+    },
+    {
+      "id": "upper-trough-base",
+      "parent": "world",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.7,
+        "y": 0.06,
+        "z": 0.7
+      },
+      "position_m": [
+        0,
+        1.19,
+        1.05
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry"
+    },
+    {
+      "id": "upper-wall-l",
+      "parent": "world",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.04,
+        "y": 0.2,
+        "z": 0.7
+      },
+      "position_m": [
+        -0.35,
+        1.29,
+        1.05
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry"
+    },
+    {
+      "id": "upper-wall-r",
+      "parent": "world",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.04,
+        "y": 0.2,
+        "z": 0.7
+      },
+      "position_m": [
+        0.35,
+        1.29,
+        1.05
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry"
+    },
+    {
+      "id": "upper-wall-front",
+      "parent": "world",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.7,
+        "y": 0.2,
+        "z": 0.04
+      },
+      "position_m": [
+        0,
+        1.29,
+        1.4
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry"
+    },
+    {
+      "id": "upper-wall-back",
+      "parent": "world",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.7,
+        "y": 0.2,
+        "z": 0.04
+      },
+      "position_m": [
+        0,
+        1.29,
+        0.7000000000000001
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry"
+    }
+  ],
+  "joints": [
+    {
+      "id": "turn",
+      "type": "revolute",
+      "parent": "lower-bearing",
+      "child": "rotor",
+      "axis": [
+        0,
+        0.5,
+        0.8660254037844386
+      ],
+      "pivot_m": [
+        0,
+        0,
+        0
+      ],
+      "limits": null,
+      "ratio": null,
+      "source": "geometry",
+      "certainty": "C",
+      "notes": "Joint values add to the listed rest orientation. Positions are pivot-local for moving roots. Fixed children inherit motion."
+    }
+  ],
+  "drive": {
+    "type": "crank",
+    "input_rate": {
+      "value": 0.5235987755982988,
+      "unit": "rad/s",
+      "certainty": "C",
+      "source": "geometry",
+      "note": "5 rpm, one turn in12 seconds"
+    },
+    "justification": "Direct hand crank on joint turn. Rate selected to show the helix calmly. It is not a historical measured rate.",
+    "source": "geometry"
+  },
+  "motion": {
+    "period_s": 12,
+    "loop": true,
+    "initial_states": {
+      "turn": 0
+    },
+    "phases": [
+      {
+        "name": "Steady rotation",
+        "start_s": 0,
+        "duration_s": 12,
+        "joint_values": {
+          "turn": "pi*t/6"
+        },
+        "interpolation": "linear"
+      }
+    ],
+    "visitor_12s": "The crank and helical tube turn once. t is local seconds and pi=3.141592653589793. Accumulate angle after each loop. Flow is not represented by scripted rising particles."
+  },
+  "animation_notes": [
+    "No bounce or decorative motion.",
+    "Do not animate a mechanism missing from the evidence.",
+    "The open-ended tube rotates as a rigid assembly around its own axis. Water is not rigidly attached to it.",
+    "No perpetual recirculation. Human work is supplied at the crank.",
+    "No assumed volumetric output is shown in motion. Numerical output below is an explicitly assumed bucket-volume example.",
+    "Tube material leather and timber supports are C assumptions. The shaft axis rises30 degrees above horizontal."
+  ],
+  "label_en": "Interpretation of a water screw on Codex Atlanticus 6r. Dimensions and operating rate are modern assumptions.",
+  "label_de": "Deutung einer Wasserschnecke auf Codex Atlanticus 6r. Maße und Drehzahl sind heutige Annahmen.",
+  "page": {
+    "path": "pages/water-lifting-screw.md",
+    "sections": [
+      "folio",
+      "mechanism",
+      "purpose",
+      "build_history",
+      "tests",
+      "arithmetic",
+      "myth",
+      "sources"
+    ]
+  },
+  "sources": [
+    {
+      "id": "folio",
+      "title": "Biblioteca Leonardiana: Codex Atlanticus 6r",
+      "author_or_institution": "Biblioteca Leonardiana",
+      "year": null,
+      "url": "https://www.leonardodigitale.com/sfoglia/codice-atlantico/0006-r/",
+      "accessed": "2026-09-08",
+      "supports": "Digital edition identifies 0006r, sheet1009. Text records no writing.",
+      "source_type": "primary",
+      "limitations": "Page record and transcription inspected. Exact holder viewer unavailable. Image URL recorded."
+    },
+    {
+      "id": "galileo",
+      "title": "Museo Galileo: Study of a self-powered water-lifting machine",
+      "author_or_institution": "Museo Galileo",
+      "year": null,
+      "url": "https://mostre.museogalileo.it/motoperpetuo/en/leonardo-en/studies-by-the-young-leonardo/study-of-a-self-powered-water-lifting-machine.html",
+      "accessed": "2026-09-08",
+      "supports": "Related Archimedean screw study1068v, about1480, and its attempted recirculation.",
+      "source_type": "museum",
+      "limitations": "Text inspected. No reconstruction geometry copied."
+    },
+    {
+      "id": "museum",
+      "title": "Museo Nazionale Scienza e Tecnologia: Leonardo Machines and Instruments",
+      "author_or_institution": "Museo Nazionale Scienza e Tecnologia",
+      "year": null,
+      "url": "https://artsandculture.google.com/story/dgVR896GHdGCKA",
+      "accessed": "2026-09-08",
+      "supports": "Leonardo’s machinery in the earlier engineering tradition and water raising.",
+      "source_type": "museum",
+      "limitations": "Text inspected. No reconstruction geometry copied."
+    },
+    {
+      "id": "ancient",
+      "title": "Vitruvius: On Architecture 10.6",
+      "author_or_institution": "Vitruvius",
+      "year": null,
+      "url": "https://lexundria.com/vitr/10.6/gw",
+      "accessed": "2026-09-08",
+      "supports": "Ancient water screw predates Leonardo.",
+      "source_type": "primary",
+      "limitations": "Ancient text linked and inspected separately."
+    },
+    {
+      "id": "sheet-description",
+      "title": "Ambrosiana exhibition labels recorded by Dong: Machines for raising water",
+      "author_or_institution": "Ambrosiana exhibition labels recorded by Dong",
+      "year": 2019,
+      "url": "https://www.dong.world/2019/06/leonardo-da-vinci-and-the-secrets-of-the-codex-atlanticus/",
+      "accessed": "2026-09-08",
+      "supports": "6r devices include water-driven helical tube, human drive, bellows pump and chain of receptacles.",
+      "source_type": "secondary",
+      "limitations": "Transcription of exhibition labels is secondary, used only for sheet composition, not engineering dimensions."
+    }
+  ],
+  "research": {
+    "identification": "[folio] CA6r, Ambrosiana. The digital edition marks the sheet as without writing.",
+    "sheet_vs_reconstruction": [
+      "[sheet-description] Helical water-raising tubes occur among different pumps on the sheet.",
+      "[geometry] This original procedural screw selects a2.4 m helical tube axis, six turns and direct manual drive. It does not reproduce a museum model. [galileo]1068v is a separate attempted self-powered system."
+    ],
+    "dimensions": {
+      "leonardo_wording": null,
+      "folio": null,
+      "richter_number": null,
+      "note": "No dimensional wording or Richter number has been verified. No historical braccio conversion is asserted."
+    },
+    "claims": {
+      "claimed_by_leonardo": "[sheet-description] Raise water.",
+      "tested_by_leonardo": "No direct test record established in the inspected sources.",
+      "built_in_lifetime": "No construction of this particular design in Leonardo’s lifetime is established. [ancient] The water screw was known in antiquity.",
+      "later_tests": [
+        "No controlled performance test for this chosen6r geometry was found."
+      ]
+    },
+    "physics": {
+      "formula": "Q=V_rev*n, P_water=rho*g*Q*H, P_in=P_water/eta, torque=P_in/omega.",
+      "inputs": [
+        {
+          "value": 0.0005,
+          "unit": "m^3/rev",
+          "certainty": "C",
+          "source": "physics-assumption",
+          "note": "Assumed water volume delivered per screw revolution. This independent flow assumption is not calculated from the tube geometry.",
+          "symbol": "V_rev"
+        },
+        {
+          "value": 0.08333333333333333,
+          "unit": "rev/s",
+          "certainty": "C",
+          "source": "geometry",
+          "note": "Modern model screw rotation rate in revolutions per second, equal to the direct crank rate.",
+          "symbol": "n"
+        },
+        {
+          "value": 1000,
+          "unit": "kg/m^3",
+          "certainty": "C",
+          "source": "physics-assumption",
+          "note": "Assumed density of the water being raised.",
+          "symbol": "rho"
+        },
+        {
+          "value": 9.81,
+          "unit": "m/s^2",
+          "certainty": "C",
+          "source": "physics-assumption",
+          "note": "Assumed gravitational acceleration.",
+          "symbol": "g"
+        },
+        {
+          "value": 1.2,
+          "unit": "m",
+          "certainty": "C",
+          "source": "geometry",
+          "note": "Modern model vertical delivery height between intake and outlet.",
+          "symbol": "H"
+        },
+        {
+          "value": 0.35,
+          "unit": "dimensionless",
+          "certainty": "C",
+          "source": "physics-assumption",
+          "note": "Assumed efficiency from crank input power to gravitational potential energy gained by the water.",
+          "symbol": "eta"
+        },
+        {
+          "value": 0.5235987755982988,
+          "unit": "rad/s",
+          "certainty": "C",
+          "source": "geometry",
+          "note": "Modern model crank and screw angular speed, equal to 2*pi*n.",
+          "symbol": "omega"
+        }
+      ],
+      "result": "Q=0.00004167 m^3/s=2.5 L/min. P_water=0.4905 W. At assumed eta0.35, P_in=1.40 W and torque2.68 N m. Volume per revolution is an independent illustrative assumption, not derived from the tube.",
+      "limitations": "This arithmetic is a conditional illustration, not an experimental result.",
+      "verdict_en": "An assumed delivery of 2.5 litres per minute through 1.2 metres needs about 1.4 watts at 35 percent efficiency.",
+      "verdict_de": "Angenommene 2,5 Liter pro Minute über 1,2 Meter Höhe brauchen bei 35 Prozent Wirkungsgrad etwa 1,4 Watt."
+    },
+    "myths": {
+      "claim": "Leonardo invented the Archimedean screw or made it power itself.",
+      "earliest_source_located": null,
+      "correction": "[ancient] The screw predates him. [galileo]1068v records an attempted self-powered layout. With pump and wheel efficiencies below1, it cannot sustain circulation."
+    },
+    "confidence": "High for folio family, low for historical size and operating performance. Complete at stated modern screw scope."
+  }
+}

@@ -1,0 +1,1798 @@
+{
+  "schema_version": "1.0",
+  "slug": "camera-obscura",
+  "name_en": "Camera obscura notes",
+  "name_de": "Notizen zur Camera obscura",
+  "status": "complete",
+  "scope": "A dimensioned pinhole chamber illustrating the experiment described on D8r. Its compact box size is a modern teaching interpretation of Leonardo’s darkened room.",
+  "gaps": [
+    "Leonardo supplies no room depth or aperture diameter here.",
+    "Not an anatomical reconstruction of Leonardo’s theory of the eye.",
+    "No image-specific holder licence quote obtained."
+  ],
+  "folio": [
+    {
+      "codex": "Paris Manuscript D",
+      "folio": "8r",
+      "holder": "Bibliothèque de l’Institut de France",
+      "catalogue_reference": "Institut de France Ms2175, folio8r. Folio transcription checked in e-leo.",
+      "catalogue_url": "https://www.leonardodigitale.com/sfoglia/manoscritto-d-dell-institut-de-france/0008-r/",
+      "verification": "verified",
+      "commission_reference": "Camera obscura notes",
+      "correction": null,
+      "date": {
+        "range": "about1508 to1509",
+        "certainty": "A",
+        "source": "holder"
+      },
+      "image_url": "https://backend.leonardodigitale.com/images/books/25/4120/sheet_20190416105032098865.JPG",
+      "image_licence_quote": null,
+      "licence_source": null
+    }
+  ],
+  "scale_m": {
+    "x": 1.24,
+    "y": 1.24,
+    "z": 0.64,
+    "certainty": "C",
+    "source": "geometry",
+    "note": "Chamber bounds x +/-0.62, y0 to1.24, z -0.02 to0.62."
+  },
+  "frame": {
+    "handedness": "right",
+    "unit": "m",
+    "up": "+Y",
+    "forward": "+Z",
+    "origin": "Floor centre below the assembly",
+    "ground_y_m": 0
+  },
+  "assumptions": [
+    {
+      "id": "geometry",
+      "statement": "All numerical procedural dimensions, positions, angles and chosen material classes in parts and joints are modern modelling assumptions. They do not measure Leonardo’s sheet or any museum replica.",
+      "reason": "The sheet does not dimension a complete assembly."
+    },
+    {
+      "id": "physics-assumption",
+      "statement": "Every numerical physics input explicitly tagged C is an illustrative modern assumption, not a historical measurement.",
+      "reason": "Distinguish calculations from evidence."
+    }
+  ],
+  "parts": [
+    {
+      "id": "floor",
+      "parent": "world",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 1.24,
+        "y": 0.02,
+        "z": 0.64
+      },
+      "position_m": [
+        0,
+        0.01,
+        0.3
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry"
+    },
+    {
+      "id": "roof",
+      "parent": "world",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 1.24,
+        "y": 0.02,
+        "z": 0.64
+      },
+      "position_m": [
+        0,
+        1.23,
+        0.3
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry"
+    },
+    {
+      "id": "left-wall",
+      "parent": "world",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.02,
+        "y": 1.2,
+        "z": 0.64
+      },
+      "position_m": [
+        -0.61,
+        0.62,
+        0.3
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry"
+    },
+    {
+      "id": "right-wall",
+      "parent": "world",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.02,
+        "y": 1.2,
+        "z": 0.64
+      },
+      "position_m": [
+        0.61,
+        0.62,
+        0.3
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry"
+    },
+    {
+      "id": "back-wall",
+      "parent": "world",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 1.2,
+        "y": 1.2,
+        "z": 0.02
+      },
+      "position_m": [
+        0,
+        0.62,
+        0.61
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry"
+    },
+    {
+      "id": "front-left",
+      "parent": "world",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.54,
+        "y": 1.2,
+        "z": 0.02
+      },
+      "position_m": [
+        -0.33,
+        0.62,
+        -0.01
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry"
+    },
+    {
+      "id": "front-right",
+      "parent": "world",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.54,
+        "y": 1.2,
+        "z": 0.02
+      },
+      "position_m": [
+        0.33,
+        0.62,
+        -0.01
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry"
+    },
+    {
+      "id": "front-bottom",
+      "parent": "world",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.12,
+        "y": 0.54,
+        "z": 0.02
+      },
+      "position_m": [
+        0,
+        0.29,
+        -0.01
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry"
+    },
+    {
+      "id": "front-top",
+      "parent": "world",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 0.12,
+        "y": 0.54,
+        "z": 0.02
+      },
+      "position_m": [
+        0,
+        0.95,
+        -0.01
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "wood",
+        "basis": "assumed",
+        "source": "geometry"
+      },
+      "certainty": "C",
+      "source": "geometry"
+    },
+    {
+      "id": "screen",
+      "parent": "world",
+      "shape": "box",
+      "dimensions_m": {
+        "x": 1.16,
+        "y": 1.16,
+        "z": 0.0002
+      },
+      "position_m": [
+        0,
+        0.62,
+        0.5
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "white paper",
+        "basis": "documented",
+        "source": "folio"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "Material documented. All numerical dimensions remain C assumptions."
+    },
+    {
+      "id": "aperture-plate",
+      "parent": "world",
+      "shape": {
+        "type": "mesh",
+        "vertices_m": [
+          [
+            0.001,
+            0,
+            0
+          ],
+          [
+            0.1,
+            0,
+            0
+          ],
+          [
+            0.000995184726672197,
+            9.80171403295606e-05,
+            0
+          ],
+          [
+            0.09951847266721969,
+            0.009801714032956061,
+            0
+          ],
+          [
+            0.0009807852804032304,
+            0.00019509032201612826,
+            0
+          ],
+          [
+            0.09807852804032305,
+            0.019509032201612826,
+            0
+          ],
+          [
+            0.0009569403357322088,
+            0.00029028467725446234,
+            0
+          ],
+          [
+            0.09569403357322089,
+            0.029028467725446233,
+            0
+          ],
+          [
+            0.0009238795325112868,
+            0.0003826834323650898,
+            0
+          ],
+          [
+            0.09238795325112868,
+            0.03826834323650898,
+            0
+          ],
+          [
+            0.0008819212643483551,
+            0.00047139673682599763,
+            0
+          ],
+          [
+            0.08819212643483551,
+            0.04713967368259977,
+            0
+          ],
+          [
+            0.0008314696123025453,
+            0.0005555702330196022,
+            0
+          ],
+          [
+            0.08314696123025453,
+            0.05555702330196022,
+            0
+          ],
+          [
+            0.000773010453362737,
+            0.0006343932841636455,
+            0
+          ],
+          [
+            0.0773010453362737,
+            0.06343932841636456,
+            0
+          ],
+          [
+            0.0007071067811865476,
+            0.0007071067811865475,
+            0
+          ],
+          [
+            0.07071067811865477,
+            0.07071067811865475,
+            0
+          ],
+          [
+            0.0006343932841636455,
+            0.000773010453362737,
+            0
+          ],
+          [
+            0.06343932841636456,
+            0.0773010453362737,
+            0
+          ],
+          [
+            0.0005555702330196023,
+            0.0008314696123025453,
+            0
+          ],
+          [
+            0.05555702330196023,
+            0.08314696123025453,
+            0
+          ],
+          [
+            0.0004713967368259978,
+            0.000881921264348355,
+            0
+          ],
+          [
+            0.04713967368259978,
+            0.0881921264348355,
+            0
+          ],
+          [
+            0.00038268343236508984,
+            0.0009238795325112868,
+            0
+          ],
+          [
+            0.03826834323650899,
+            0.09238795325112868,
+            0
+          ],
+          [
+            0.00029028467725446234,
+            0.0009569403357322089,
+            0
+          ],
+          [
+            0.029028467725446233,
+            0.0956940335732209,
+            0
+          ],
+          [
+            0.00019509032201612834,
+            0.0009807852804032304,
+            0
+          ],
+          [
+            0.019509032201612833,
+            0.09807852804032305,
+            0
+          ],
+          [
+            9.801714032956078e-05,
+            0.000995184726672197,
+            0
+          ],
+          [
+            0.009801714032956078,
+            0.09951847266721969,
+            0
+          ],
+          [
+            6.123233995736766e-20,
+            0.001,
+            0
+          ],
+          [
+            6.123233995736766e-18,
+            0.1,
+            0
+          ],
+          [
+            -9.801714032956064e-05,
+            0.000995184726672197,
+            0
+          ],
+          [
+            -0.009801714032956065,
+            0.09951847266721969,
+            0
+          ],
+          [
+            -0.0001950903220161282,
+            0.0009807852804032304,
+            0
+          ],
+          [
+            -0.01950903220161282,
+            0.09807852804032305,
+            0
+          ],
+          [
+            -0.0002902846772544622,
+            0.0009569403357322089,
+            0
+          ],
+          [
+            -0.02902846772544622,
+            0.0956940335732209,
+            0
+          ],
+          [
+            -0.00038268343236508973,
+            0.0009238795325112868,
+            0
+          ],
+          [
+            -0.038268343236508975,
+            0.09238795325112868,
+            0
+          ],
+          [
+            -0.0004713967368259977,
+            0.0008819212643483551,
+            0
+          ],
+          [
+            -0.047139673682599775,
+            0.08819212643483551,
+            0
+          ],
+          [
+            -0.000555570233019602,
+            0.0008314696123025455,
+            0
+          ],
+          [
+            -0.0555570233019602,
+            0.08314696123025456,
+            0
+          ],
+          [
+            -0.0006343932841636454,
+            0.0007730104533627371,
+            0
+          ],
+          [
+            -0.06343932841636454,
+            0.07730104533627372,
+            0
+          ],
+          [
+            -0.0007071067811865475,
+            0.0007071067811865476,
+            0
+          ],
+          [
+            -0.07071067811865475,
+            0.07071067811865477,
+            0
+          ],
+          [
+            -0.000773010453362737,
+            0.0006343932841636455,
+            0
+          ],
+          [
+            -0.0773010453362737,
+            0.06343932841636456,
+            0
+          ],
+          [
+            -0.0008314696123025454,
+            0.0005555702330196022,
+            0
+          ],
+          [
+            -0.08314696123025454,
+            0.05555702330196022,
+            0
+          ],
+          [
+            -0.000881921264348355,
+            0.00047139673682599785,
+            0
+          ],
+          [
+            -0.0881921264348355,
+            0.04713967368259979,
+            0
+          ],
+          [
+            -0.0009238795325112868,
+            0.0003826834323650899,
+            0
+          ],
+          [
+            -0.09238795325112868,
+            0.03826834323650899,
+            0
+          ],
+          [
+            -0.0009569403357322088,
+            0.0002902846772544624,
+            0
+          ],
+          [
+            -0.09569403357322089,
+            0.02902846772544624,
+            0
+          ],
+          [
+            -0.0009807852804032304,
+            0.0001950903220161286,
+            0
+          ],
+          [
+            -0.09807852804032305,
+            0.01950903220161286,
+            0
+          ],
+          [
+            -0.000995184726672197,
+            9.801714032956083e-05,
+            0
+          ],
+          [
+            -0.09951847266721969,
+            0.009801714032956084,
+            0
+          ],
+          [
+            -0.001,
+            1.2246467991473531e-19,
+            0
+          ],
+          [
+            -0.1,
+            1.2246467991473533e-17,
+            0
+          ],
+          [
+            -0.000995184726672197,
+            -9.801714032956059e-05,
+            0
+          ],
+          [
+            -0.09951847266721969,
+            -0.00980171403295606,
+            0
+          ],
+          [
+            -0.0009807852804032304,
+            -0.00019509032201612837,
+            0
+          ],
+          [
+            -0.09807852804032305,
+            -0.019509032201612837,
+            0
+          ],
+          [
+            -0.0009569403357322089,
+            -0.0002902846772544621,
+            0
+          ],
+          [
+            -0.0956940335732209,
+            -0.029028467725446212,
+            0
+          ],
+          [
+            -0.0009238795325112869,
+            -0.0003826834323650897,
+            0
+          ],
+          [
+            -0.0923879532511287,
+            -0.03826834323650897,
+            0
+          ],
+          [
+            -0.0008819212643483551,
+            -0.00047139673682599763,
+            0
+          ],
+          [
+            -0.08819212643483551,
+            -0.04713967368259977,
+            0
+          ],
+          [
+            -0.0008314696123025455,
+            -0.000555570233019602,
+            0
+          ],
+          [
+            -0.08314696123025456,
+            -0.0555570233019602,
+            0
+          ],
+          [
+            -0.0007730104533627371,
+            -0.0006343932841636453,
+            0
+          ],
+          [
+            -0.07730104533627372,
+            -0.06343932841636453,
+            0
+          ],
+          [
+            -0.0007071067811865477,
+            -0.0007071067811865475,
+            0
+          ],
+          [
+            -0.07071067811865477,
+            -0.07071067811865475,
+            0
+          ],
+          [
+            -0.000634393284163646,
+            -0.0007730104533627366,
+            0
+          ],
+          [
+            -0.0634393284163646,
+            -0.07730104533627367,
+            0
+          ],
+          [
+            -0.0005555702330196022,
+            -0.0008314696123025453,
+            0
+          ],
+          [
+            -0.05555702330196022,
+            -0.08314696123025453,
+            0
+          ],
+          [
+            -0.00047139673682599785,
+            -0.000881921264348355,
+            0
+          ],
+          [
+            -0.04713967368259979,
+            -0.0881921264348355,
+            0
+          ],
+          [
+            -0.0003826834323650903,
+            -0.0009238795325112865,
+            0
+          ],
+          [
+            -0.03826834323650904,
+            -0.09238795325112865,
+            0
+          ],
+          [
+            -0.00029028467725446245,
+            -0.0009569403357322088,
+            0
+          ],
+          [
+            -0.029028467725446247,
+            -0.09569403357322089,
+            0
+          ],
+          [
+            -0.00019509032201612866,
+            -0.0009807852804032304,
+            0
+          ],
+          [
+            -0.019509032201612868,
+            -0.09807852804032303,
+            0
+          ],
+          [
+            -9.801714032956045e-05,
+            -0.000995184726672197,
+            0
+          ],
+          [
+            -0.009801714032956045,
+            -0.09951847266721969,
+            0
+          ],
+          [
+            -1.8369701987210298e-19,
+            -0.001,
+            0
+          ],
+          [
+            -1.8369701987210297e-17,
+            -0.1,
+            0
+          ],
+          [
+            9.801714032956009e-05,
+            -0.000995184726672197,
+            0
+          ],
+          [
+            0.009801714032956009,
+            -0.09951847266721969,
+            0
+          ],
+          [
+            0.0001950903220161283,
+            -0.0009807852804032304,
+            0
+          ],
+          [
+            0.019509032201612833,
+            -0.09807852804032305,
+            0
+          ],
+          [
+            0.00029028467725446207,
+            -0.0009569403357322089,
+            0
+          ],
+          [
+            0.029028467725446205,
+            -0.0956940335732209,
+            0
+          ],
+          [
+            0.00038268343236509,
+            -0.0009238795325112866,
+            0
+          ],
+          [
+            0.038268343236509,
+            -0.09238795325112867,
+            0
+          ],
+          [
+            0.0004713967368259976,
+            -0.0008819212643483551,
+            0
+          ],
+          [
+            0.04713967368259976,
+            -0.08819212643483551,
+            0
+          ],
+          [
+            0.0005555702330196019,
+            -0.0008314696123025455,
+            0
+          ],
+          [
+            0.05555702330196019,
+            -0.08314696123025456,
+            0
+          ],
+          [
+            0.0006343932841636457,
+            -0.0007730104533627369,
+            0
+          ],
+          [
+            0.06343932841636456,
+            -0.07730104533627369,
+            0
+          ],
+          [
+            0.0007071067811865474,
+            -0.0007071067811865477,
+            0
+          ],
+          [
+            0.07071067811865474,
+            -0.07071067811865477,
+            0
+          ],
+          [
+            0.0007730104533627366,
+            -0.000634393284163646,
+            0
+          ],
+          [
+            0.07730104533627367,
+            -0.0634393284163646,
+            0
+          ],
+          [
+            0.0008314696123025453,
+            -0.0005555702330196022,
+            0
+          ],
+          [
+            0.08314696123025453,
+            -0.05555702330196022,
+            0
+          ],
+          [
+            0.0008819212643483549,
+            -0.0004713967368259979,
+            0
+          ],
+          [
+            0.08819212643483548,
+            -0.047139673682599796,
+            0
+          ],
+          [
+            0.0009238795325112865,
+            -0.0003826834323650904,
+            0
+          ],
+          [
+            0.09238795325112865,
+            -0.038268343236509045,
+            0
+          ],
+          [
+            0.0009569403357322088,
+            -0.0002902846772544625,
+            0
+          ],
+          [
+            0.09569403357322089,
+            -0.02902846772544625,
+            0
+          ],
+          [
+            0.0009807852804032304,
+            -0.00019509032201612872,
+            0
+          ],
+          [
+            0.09807852804032303,
+            -0.019509032201612875,
+            0
+          ],
+          [
+            0.000995184726672197,
+            -9.80171403295605e-05,
+            0
+          ],
+          [
+            0.09951847266721969,
+            -0.00980171403295605,
+            0
+          ]
+        ],
+        "faces": [
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            2,
+            3,
+            1
+          ],
+          [
+            2,
+            4,
+            3
+          ],
+          [
+            4,
+            5,
+            3
+          ],
+          [
+            4,
+            6,
+            5
+          ],
+          [
+            6,
+            7,
+            5
+          ],
+          [
+            6,
+            8,
+            7
+          ],
+          [
+            8,
+            9,
+            7
+          ],
+          [
+            8,
+            10,
+            9
+          ],
+          [
+            10,
+            11,
+            9
+          ],
+          [
+            10,
+            12,
+            11
+          ],
+          [
+            12,
+            13,
+            11
+          ],
+          [
+            12,
+            14,
+            13
+          ],
+          [
+            14,
+            15,
+            13
+          ],
+          [
+            14,
+            16,
+            15
+          ],
+          [
+            16,
+            17,
+            15
+          ],
+          [
+            16,
+            18,
+            17
+          ],
+          [
+            18,
+            19,
+            17
+          ],
+          [
+            18,
+            20,
+            19
+          ],
+          [
+            20,
+            21,
+            19
+          ],
+          [
+            20,
+            22,
+            21
+          ],
+          [
+            22,
+            23,
+            21
+          ],
+          [
+            22,
+            24,
+            23
+          ],
+          [
+            24,
+            25,
+            23
+          ],
+          [
+            24,
+            26,
+            25
+          ],
+          [
+            26,
+            27,
+            25
+          ],
+          [
+            26,
+            28,
+            27
+          ],
+          [
+            28,
+            29,
+            27
+          ],
+          [
+            28,
+            30,
+            29
+          ],
+          [
+            30,
+            31,
+            29
+          ],
+          [
+            30,
+            32,
+            31
+          ],
+          [
+            32,
+            33,
+            31
+          ],
+          [
+            32,
+            34,
+            33
+          ],
+          [
+            34,
+            35,
+            33
+          ],
+          [
+            34,
+            36,
+            35
+          ],
+          [
+            36,
+            37,
+            35
+          ],
+          [
+            36,
+            38,
+            37
+          ],
+          [
+            38,
+            39,
+            37
+          ],
+          [
+            38,
+            40,
+            39
+          ],
+          [
+            40,
+            41,
+            39
+          ],
+          [
+            40,
+            42,
+            41
+          ],
+          [
+            42,
+            43,
+            41
+          ],
+          [
+            42,
+            44,
+            43
+          ],
+          [
+            44,
+            45,
+            43
+          ],
+          [
+            44,
+            46,
+            45
+          ],
+          [
+            46,
+            47,
+            45
+          ],
+          [
+            46,
+            48,
+            47
+          ],
+          [
+            48,
+            49,
+            47
+          ],
+          [
+            48,
+            50,
+            49
+          ],
+          [
+            50,
+            51,
+            49
+          ],
+          [
+            50,
+            52,
+            51
+          ],
+          [
+            52,
+            53,
+            51
+          ],
+          [
+            52,
+            54,
+            53
+          ],
+          [
+            54,
+            55,
+            53
+          ],
+          [
+            54,
+            56,
+            55
+          ],
+          [
+            56,
+            57,
+            55
+          ],
+          [
+            56,
+            58,
+            57
+          ],
+          [
+            58,
+            59,
+            57
+          ],
+          [
+            58,
+            60,
+            59
+          ],
+          [
+            60,
+            61,
+            59
+          ],
+          [
+            60,
+            62,
+            61
+          ],
+          [
+            62,
+            63,
+            61
+          ],
+          [
+            62,
+            64,
+            63
+          ],
+          [
+            64,
+            65,
+            63
+          ],
+          [
+            64,
+            66,
+            65
+          ],
+          [
+            66,
+            67,
+            65
+          ],
+          [
+            66,
+            68,
+            67
+          ],
+          [
+            68,
+            69,
+            67
+          ],
+          [
+            68,
+            70,
+            69
+          ],
+          [
+            70,
+            71,
+            69
+          ],
+          [
+            70,
+            72,
+            71
+          ],
+          [
+            72,
+            73,
+            71
+          ],
+          [
+            72,
+            74,
+            73
+          ],
+          [
+            74,
+            75,
+            73
+          ],
+          [
+            74,
+            76,
+            75
+          ],
+          [
+            76,
+            77,
+            75
+          ],
+          [
+            76,
+            78,
+            77
+          ],
+          [
+            78,
+            79,
+            77
+          ],
+          [
+            78,
+            80,
+            79
+          ],
+          [
+            80,
+            81,
+            79
+          ],
+          [
+            80,
+            82,
+            81
+          ],
+          [
+            82,
+            83,
+            81
+          ],
+          [
+            82,
+            84,
+            83
+          ],
+          [
+            84,
+            85,
+            83
+          ],
+          [
+            84,
+            86,
+            85
+          ],
+          [
+            86,
+            87,
+            85
+          ],
+          [
+            86,
+            88,
+            87
+          ],
+          [
+            88,
+            89,
+            87
+          ],
+          [
+            88,
+            90,
+            89
+          ],
+          [
+            90,
+            91,
+            89
+          ],
+          [
+            90,
+            92,
+            91
+          ],
+          [
+            92,
+            93,
+            91
+          ],
+          [
+            92,
+            94,
+            93
+          ],
+          [
+            94,
+            95,
+            93
+          ],
+          [
+            94,
+            96,
+            95
+          ],
+          [
+            96,
+            97,
+            95
+          ],
+          [
+            96,
+            98,
+            97
+          ],
+          [
+            98,
+            99,
+            97
+          ],
+          [
+            98,
+            100,
+            99
+          ],
+          [
+            100,
+            101,
+            99
+          ],
+          [
+            100,
+            102,
+            101
+          ],
+          [
+            102,
+            103,
+            101
+          ],
+          [
+            102,
+            104,
+            103
+          ],
+          [
+            104,
+            105,
+            103
+          ],
+          [
+            104,
+            106,
+            105
+          ],
+          [
+            106,
+            107,
+            105
+          ],
+          [
+            106,
+            108,
+            107
+          ],
+          [
+            108,
+            109,
+            107
+          ],
+          [
+            108,
+            110,
+            109
+          ],
+          [
+            110,
+            111,
+            109
+          ],
+          [
+            110,
+            112,
+            111
+          ],
+          [
+            112,
+            113,
+            111
+          ],
+          [
+            112,
+            114,
+            113
+          ],
+          [
+            114,
+            115,
+            113
+          ],
+          [
+            114,
+            116,
+            115
+          ],
+          [
+            116,
+            117,
+            115
+          ],
+          [
+            116,
+            118,
+            117
+          ],
+          [
+            118,
+            119,
+            117
+          ],
+          [
+            118,
+            120,
+            119
+          ],
+          [
+            120,
+            121,
+            119
+          ],
+          [
+            120,
+            122,
+            121
+          ],
+          [
+            122,
+            123,
+            121
+          ],
+          [
+            122,
+            124,
+            123
+          ],
+          [
+            124,
+            125,
+            123
+          ],
+          [
+            124,
+            126,
+            125
+          ],
+          [
+            126,
+            127,
+            125
+          ],
+          [
+            126,
+            0,
+            127
+          ],
+          [
+            0,
+            1,
+            127
+          ]
+        ],
+        "thickness_m": 0.0003,
+        "extrude_direction": [
+          0,
+          0,
+          1
+        ],
+        "note": "Extrude both boundary loops and connect side faces. Inner radius0.001 m. Outer radius0.10 m."
+      },
+      "dimensions_m": {
+        "thickness": 0.0003
+      },
+      "position_m": [
+        0,
+        0.62,
+        -0.015
+      ],
+      "orientation_rad": [
+        0,
+        0,
+        0
+      ],
+      "material": {
+        "class": "iron",
+        "basis": "documented",
+        "source": "folio"
+      },
+      "certainty": "C",
+      "source": "geometry",
+      "notes": "Material documented. All numerical dimensions remain C assumptions."
+    }
+  ],
+  "joints": [],
+  "drive": {
+    "type": "none",
+    "input_rate": {
+      "value": 0,
+      "unit": "rad/s",
+      "certainty": "C",
+      "source": "geometry",
+      "note": "Static documentary display"
+    },
+    "justification": "No unsupported mechanism animated.",
+    "source": "geometry"
+  },
+  "motion": {
+    "period_s": null,
+    "loop": false,
+    "phases": [],
+    "visitor_12s": "A quiet static chamber. The optically projected image remains still. Any cutaway visibility is a presentation mode and must not be represented as a light-leaking working chamber."
+  },
+  "animation_notes": [
+    "No bounce or decorative motion.",
+    "Do not animate a mechanism missing from the evidence.",
+    "Use straight ray projection through the aperture, not a lens.",
+    "For a virtual source plane3 m before the aperture, map source coordinates (x,y) relative to aperture centre to screen coordinates(-x/6,-y/6). This is an optical rendering rule, not moving geometry.",
+    "If a wall is hidden to show the interior, explain that the physical experiment requires darkness.",
+    "No photographic film, permanent recording, double inversion inside an anatomical eye, or powered projector."
+  ],
+  "label_en": "A modern chamber illustrates the experiment in Manuscript D 8r. Leonardo da Vinci described an inverted image on paper.",
+  "label_de": "Eine heutige Kammer zeigt den Versuch aus Manuskript D 8r. Leonardo da Vinci beschrieb ein umgekehrtes Bild auf Papier.",
+  "page": {
+    "path": "pages/camera-obscura.md",
+    "sections": [
+      "folio",
+      "mechanism",
+      "purpose",
+      "build_history",
+      "tests",
+      "arithmetic",
+      "myth",
+      "sources"
+    ]
+  },
+  "sources": [
+    {
+      "id": "folio",
+      "title": "Biblioteca Leonardiana: Manuscript D 8r",
+      "author_or_institution": "Biblioteca Leonardiana",
+      "year": null,
+      "url": "https://www.leonardodigitale.com/sfoglia/manoscritto-d-dell-institut-de-france/0008-r/",
+      "accessed": "2026-09-08",
+      "supports": "Camera obscura instructions and ray diagram, thin iron plate and white paper.",
+      "source_type": "primary",
+      "limitations": "Public digital edition transcription read in full."
+    },
+    {
+      "id": "holder",
+      "title": "Institut de France: Carnet D",
+      "author_or_institution": "Institut de France",
+      "year": null,
+      "url": "https://minerva.bibliotheque-institutdefrance.fr/expositions/exhibitions/5-carnet-d",
+      "accessed": "2026-09-08",
+      "supports": "Holder Ms2175 and1508 to1509 date.",
+      "source_type": "holder",
+      "limitations": "Text inspected. No reconstruction geometry copied."
+    },
+    {
+      "id": "historical",
+      "title": "Encyclopaedia Britannica1911: Camera Obscura",
+      "author_or_institution": "Encyclopaedia Britannica1911",
+      "year": 1911,
+      "url": "https://en.wikisource.org/wiki/1911_Encyclop%C3%A6dia_Britannica/Camera_Obscura",
+      "accessed": "2026-09-08",
+      "supports": "Historical notice of D8r and Venturi1797, earlier optical tradition.",
+      "source_type": "secondary",
+      "limitations": "Historical source, used as evidence of published claims, not modern scientific authority."
+    }
+  ],
+  "research": {
+    "identification": "[holder,folio] Ms2175(D),8r. Approximate date1508 to1509.",
+    "sheet_vs_reconstruction": [
+      "[folio] A small round hole in very thin iron admits images into darkness, where thin white paper receives them.",
+      "[geometry] The1.2 m chamber,2 mm hole and0.5 m screen distance are modern assumptions. Leonardo describes a room, not this portable box."
+    ],
+    "dimensions": {
+      "leonardo_wording": "la qual vol essere sottilissima e veduta da riverscio, e lo spiracolo detto sia fatto in piastra sottilissima di ferro",
+      "folio": "MsD8r",
+      "richter_number": null,
+      "note": "[folio] Qualitative thickness only. No numerical braccio dimension or Richter number verified."
+    },
+    "claims": {
+      "claimed_by_leonardo": "[folio] Demonstrate intersecting image rays and compare them with vision.",
+      "tested_by_leonardo": "No direct test record established in the inspected sources.",
+      "built_in_lifetime": "[folio] The text gives an experiment and observable outcome. It is not evidence for a surviving camera built by Leonardo.",
+      "later_tests": [
+        "No instrument-specific modern replica test was established. The pinhole construction follows straight-line geometrical optics."
+      ]
+    },
+    "physics": {
+      "formula": "Magnification m = -b/a. Projected height h_i=m*h_o. Geometric blur diameter c = d*(1+b/a).",
+      "inputs": [
+        {
+          "value": 0.5,
+          "unit": "m",
+          "certainty": "C",
+          "source": "geometry",
+          "note": "Modern model distance from the aperture plane to the paper image plane.",
+          "symbol": "b"
+        },
+        {
+          "value": 3,
+          "unit": "m",
+          "certainty": "C",
+          "source": "physics-assumption",
+          "note": "Assumed distance from the object plane to the aperture plane, on the incoming-light side.",
+          "symbol": "a"
+        },
+        {
+          "value": 1.8,
+          "unit": "m",
+          "certainty": "C",
+          "source": "physics-assumption",
+          "note": "Assumed object height in the object plane.",
+          "symbol": "h_o"
+        },
+        {
+          "value": 0.002,
+          "unit": "m",
+          "certainty": "C",
+          "source": "geometry",
+          "note": "Modern model diameter of the circular aperture, used in the geometric blur calculation.",
+          "symbol": "d"
+        }
+      ],
+      "result": "m=-0.5/3=-1/6. A1.8 m object forms an inverted0.30 m image. Geometric aperture blur c=.002*(1+.5/3)=.002333 m, about2.3 mm. Diffraction, illumination and finite object depth omitted.",
+      "limitations": "This arithmetic is a conditional illustration, not an experimental result.",
+      "verdict_en": "At the assumed distances, a 1.8 metre object makes an inverted image 0.30 metres high.",
+      "verdict_de": "Bei den angenommenen Abständen wird ein 1,8 Meter hohes Objekt als umgekehrtes Bild von 0,30 Metern Höhe sichtbar."
+    },
+    "myths": {
+      "claim": "Leonardo invented photography or all camera obscura principles.",
+      "earliest_source_located": "[historical]1911 account points to Venturi’s1797 notice of the manuscript. This is the earliest located publication trail, not a proven first invention claim.",
+      "correction": "[folio] A projected image is not a permanent photographic record. The note does not establish invention of the earlier optical principle."
+    },
+    "confidence": "High for identified text and optical principle. All physical dimensions modern assumptions."
+  }
+}
