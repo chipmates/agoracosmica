@@ -97,17 +97,18 @@ export function roofPart(bench: Bench, o: RoofOptions): Part {
   /* a tier lays the same roof in fewer, larger units. Three courses of hand
      slate at the calm tier is a lie; one course of larger slate is a roof
      seen from further away, which is what a calm tier is. */
-  const coarse = lod >= 3 ? 1 : lod === 2 ? 1.45 : 2.2
-  const slateW = (o.slate?.width ?? 0.26) * coarse
-  const slateL = (o.slate?.length ?? 0.42) * coarse
-  const slateT = o.slate?.thickness ?? 0.009
-  const gauge = (o.gauge ?? 0.15) * coarse
-
   const rise = Math.tan(pitch)
   const half = kind === 'lean' ? D : D / 2
   const eave = half + over
   const ridgeY = eave * rise
   const slopeLength = eave / Math.cos(pitch)
+  /* and a small roof is never laid in big slates: a dormer cap of a metre
+     and a half in six coarse units is a fish, not a roof */
+  const coarse = Math.min(lod >= 3 ? 1 : lod === 2 ? 1.45 : 2.2, Math.max(1, slopeLength / 1.4))
+  const slateW = (o.slate?.width ?? 0.26) * coarse
+  const slateL = (o.slate?.length ?? 0.42) * coarse
+  const slateT = o.slate?.thickness ?? 0.009
+  const gauge = (o.gauge ?? 0.15) * coarse
 
   const slopes: Array<{ sign: 1 | -1 }> = kind === 'lean' ? [{ sign: 1 }] : [{ sign: 1 }, { sign: -1 }]
   const variants = lod >= 2 ? 3 : 1
@@ -144,7 +145,12 @@ export function roofPart(bench: Bench, o: RoofOptions): Part {
         const yaw = between(r, -0.03, 0.03)
         const lift = between(r, -0.0015, 0.0028)
         const m = new Matrix4()
-        q.setFromAxisAngle(axis, -slope.sign * pitch + tilt * slope.sign)
+        /* THE SLATE LIES ON THE SLOPE, which means its own upright axis is the
+           slope's normal: a turn of +pitch about the ridge for the front
+           slope and -pitch for the back. Taken the other way round the plate
+           tips over the ridge and the roof reads as a row of spines, which is
+           what the first dormer frame showed. */
+        q.setFromAxisAngle(axis, slope.sign * (pitch + tilt))
         /* the yaw turns the slate on the slope, about the slope's own
            normal. Taken about its long axis instead, every slate tips like a
            see-saw and the roof reads as fish scales. */
@@ -155,16 +161,19 @@ export function roofPart(bench: Bench, o: RoofOptions): Part {
           slope.sign * Math.sin(pitch) * (slateT / 2 + lift)
         )
         /* the slate is hung by its head, so its middle stands half its own
-           length up the slope from the course line */
+           length up the slope from the course line. The top courses are cut
+           short, because a slate that runs past the ridge meets the other
+           slope's and the crown reads as a row of spikes. */
+        const len = Math.min(slateL, Math.max(gauge * 1.7, slopeLength - d + gauge * 0.35))
         const along = new Vector3(
           0,
-          Math.sin(pitch) * (slateL / 2),
-          -slope.sign * Math.cos(pitch) * (slateL / 2)
+          Math.sin(pitch) * (len / 2),
+          -slope.sign * Math.cos(pitch) * (len / 2)
         )
         m.compose(
           new Vector3(x, y + up.y + along.y, z + up.z + along.z),
           q,
-          new Vector3(between(r, 0.94, 1.02), 1, between(r, 0.97, 1.03))
+          new Vector3(between(r, 0.94, 1.02), 1, (len / slateL) * between(r, 0.97, 1.03))
         )
         const bucket = buckets[(c * 7 + i) % variants]
         if (bucket) bucket.push(m)
@@ -196,13 +205,17 @@ export function roofPart(bench: Bench, o: RoofOptions): Part {
     const ridgeSet = sets.ridge ?? 'terracotta-tiles'
     used.push(ridgeSet)
     const tileL = 0.42 * coarse
-    const n = Math.max(2, Math.round((W + 2 * over) / tileL))
+    /* a hipped roof's ridge is the plan less one hip run at each end: laid
+       the full width the tiles hang in the air past the slopes */
+    const ridgeRun =
+      kind === 'hip' ? Math.max(tileL, W + 2 * over - 2 * eave) : W + 2 * over
+    const n = Math.max(1, Math.round(ridgeRun / tileL))
     const geometry = metreCylinder(0.11, 0.115, tileL * 0.99, 10, 1, true)
     geometry.rotateZ(Math.PI / 2)
     const mesh = new InstancedMesh(geometry, bench.surface(ridgeSet, { roughFloor: 0.6 }), n)
     const m = new Matrix4()
     for (let i = 0; i < n; i++) {
-      const x = -(W + 2 * over) / 2 + (i + 0.5) * ((W + 2 * over) / n)
+      const x = -ridgeRun / 2 + (i + 0.5) * (ridgeRun / n)
       m.compose(
         new Vector3(x, ridgeY + 0.03, 0),
         new Quaternion().setFromAxisAngle(new Vector3(0, 1, 0), between(r, -0.02, 0.02)),

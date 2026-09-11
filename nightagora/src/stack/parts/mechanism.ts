@@ -215,7 +215,16 @@ function lanternPart(
   const stave = o.module * 0.55
   const pieces: BufferGeometry[] = []
   for (const end of [-1, 1] as const) {
-    pieces.push(at(metreCylinder(rp + stave, rp + stave, t * 0.16, 22), [0, 0, (end * t) / 2], [Math.PI / 2, 0, 0]))
+    /* the discs stop just inside the stave circle, so the staves stand proud
+       at the rim: a lantern pinion whose discs cover its staves is a plain
+       wooden wheel and reads as one */
+    pieces.push(
+      at(metreCylinder(rp - stave * 0.25, rp - stave * 0.25, t * 0.14, 22), [0, 0, (end * t) / 2], [
+        Math.PI / 2,
+        0,
+        0,
+      ])
+    )
   }
   for (let i = 0; i < z; i++) {
     const a = (i * 2 * Math.PI) / z

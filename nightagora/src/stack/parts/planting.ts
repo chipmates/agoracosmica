@@ -54,7 +54,9 @@ interface Habit {
   spread: number
   /** 0 is a column, 1 is a dome, 2 is a broad flat head */
   head: number
-  /** how far a new shoot travels in one step, in metres per metre of height */
+  /** how far a new shoot travels in one step, as a fraction of the crown's
+      own point spacing. Around a half is a tree; much more and the branches
+      overshoot their targets */
   step: number
   /** how strongly the shoots lean up (a poplar) or out (an old oak) */
   tropism: number
@@ -75,6 +77,9 @@ interface Habit {
   /** the leaf the atlas draws */
   blade: 'lobed' | 'cordate' | 'palmate' | 'needle' | 'scale'
   bark: string
+  /** how far the bark set is taken off its own measured mean. A plane's
+      bark is pale, and the palest set in the library is paler still. */
+  barkValue: number
 }
 
 /* the five the Loire actually plants, and one bush. Heights, spreads and
@@ -85,97 +90,103 @@ const HABIT: Record<Species, Habit> = {
     crownBase: 0.34,
     spread: 1.05,
     head: 1.6,
-    step: 0.028,
+    step: 0.55,
     tropism: 0.12,
-    points: 900,
+    points: 1400,
     leaf: 0.46,
     nominal: 16,
-    cards: 5,
+    cards: 4,
     green: '#4c6a33',
-    autumn: '#8a6733',
+    autumn: '#7d5a2c',
     evergreen: false,
     blade: 'lobed',
     bark: BARK,
+    barkValue: 1,
   },
   lime: {
     crownBase: 0.26,
     spread: 0.72,
     head: 0.9,
-    step: 0.026,
+    step: 0.55,
     tropism: 0.3,
-    points: 900,
+    points: 1150,
     leaf: 0.4,
     nominal: 14,
-    cards: 5,
+    cards: 3,
     green: '#5b7a3a',
     autumn: '#b39b3d',
     evergreen: false,
     blade: 'cordate',
     bark: BARK,
+    barkValue: 1,
   },
   plane: {
     crownBase: 0.42,
     spread: 0.95,
     head: 1.35,
-    step: 0.028,
+    step: 0.55,
     tropism: 0.16,
-    points: 820,
+    points: 1150,
     leaf: 0.5,
     nominal: 15,
-    cards: 5,
+    cards: 4,
     green: '#587339',
     autumn: '#9c7a38',
     evergreen: false,
     blade: 'palmate',
     bark: 'plaster-lime-aged',
+    barkValue: 0.6,
   },
   yew: {
     crownBase: 0.16,
     spread: 0.86,
     head: 1.1,
-    step: 0.024,
+    step: 0.5,
     tropism: 0.2,
     points: 900,
     leaf: 0.3,
     nominal: 6,
-    cards: 6,
+    cards: 4,
     green: '#28402a',
     autumn: '#28402a',
     evergreen: true,
     blade: 'needle',
     bark: BARK,
+    barkValue: 0.85,
   },
   cypress: {
     crownBase: 0.1,
     spread: 0.24,
     head: 0.35,
-    step: 0.022,
+    step: 0.48,
     tropism: 0.62,
     points: 760,
     leaf: 0.3,
     nominal: 9,
-    cards: 5,
+    cards: 3,
     green: '#2f4531',
     autumn: '#2f4531',
     evergreen: true,
     blade: 'scale',
     bark: BARK,
+    barkValue: 0.9,
   },
   shrub: {
     crownBase: 0.06,
     spread: 1.15,
     head: 1.2,
-    step: 0.05,
+    step: 0.58,
     tropism: 0.22,
     points: 420,
     leaf: 0.24,
     nominal: 1.5,
-    cards: 5,
+    cards: 4,
     green: '#4f6b36',
     autumn: '#7d7a38',
     evergreen: false,
     blade: 'cordate',
     bark: BARK,
+    barkValue: 1,
   },
 }
 
@@ -212,13 +223,23 @@ interface Shoot {
  * points do.
  */
 function grow(h: Habit, height: number, r: () => number, lod: 1 | 2 | 3, stems: number): Shoot[] {
-  const step = h.step * height
-  const attract = step * 8
-  const kill = step * 2.05
   const crownBottom = height * h.crownBase
   const crownTop = height
   const spread = height * h.spread * 0.5
   const count = Math.round(h.points * (lod >= 3 ? 1 : lod === 2 ? 0.62 : 0.34))
+  /* THE THREE RADII ARE THE POINTS' OWN SPACING, not a fraction of the tree.
+     Space colonisation only works when the kill radius sits just under the
+     distance between attraction points: too large and every point is used up
+     on the first pass (a nine metre cypress came out with a hundred and
+     forty shoots), too small and the branches never reach them. So the
+     spacing is computed from the crown the species actually makes and the
+     three radii follow it, which makes the same numbers right for a bush of
+     one metre and an oak of twenty. */
+  const volume = Math.max(0.02, Math.PI * spread * spread * (crownTop - crownBottom) * 0.55)
+  const spacing = Math.cbrt(volume / Math.max(1, count))
+  const step = Math.max(0.05, spacing * h.step)
+  const attract = spacing * 4.2
+  const kill = spacing * 0.88
 
   /* THE CROWN IS THE SHAPE THE SPECIES MAKES. `head` bends the profile: at
      0.35 the widest place is near the top and the tree is a column; at 1.6 it
@@ -553,7 +574,9 @@ export function treePart(bench: Bench, o: TreeOptions): Part {
   const shoots = grow(h, height, r, lod, o.stems ?? (species === 'shrub' ? 5 : 1))
   const sides = lod >= 3 ? 6 : lod === 2 ? 5 : 4
   const barkSet = o.sets?.bark ?? h.bark
-  group.add(body(wood(shoots, sides), bench.surface(barkSet, { roughFloor: 0.82 }), 'wood'))
+  group.add(
+    body(wood(shoots, sides), bench.surface(barkSet, { roughFloor: 0.82, value: h.barkValue }), 'wood')
+  )
 
   /* THE CROWN. Cards at every tip, and only at a tip: a card hung anywhere
      else is the "twig spray floating unattached in open sky" the verdict
@@ -561,7 +584,14 @@ export function treePart(bench: Bench, o: TreeOptions): Part {
      a surface rather than a fog. */
   const generated: string[] = []
   if (season !== 'bare') {
-    const tips = shoots.filter((s, i) => s.parent >= 0 && !shoots.some((c) => c.parent === i))
+    /* A CARD GOES ON EVERY TWIG, not only on the last shoot of a branch. A
+       tree grown to a thousand shoots has only a hundred and fifty true
+       tips, so cards hung on tips alone leave the inside of the crown empty
+       and the light comes straight through it. Every shoot thin enough to be
+       a twig carries leaves, which is also what a tree does. */
+    let thinnest = Infinity
+    for (const s of shoots) thinnest = Math.min(thinnest, s.radius)
+    const tips = shoots.filter((s) => s.parent >= 0 && s.radius <= thinnest * 2.3)
     const cells = lod >= 3 ? 4 : lod === 2 ? 2 : 1
     const size =
       h.leaf *

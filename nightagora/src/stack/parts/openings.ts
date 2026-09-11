@@ -252,8 +252,15 @@ export function windowPart(bench: Bench, o: WindowOptions): Part {
      dark opening": a plane at the back of the reveal, dark, but a SURFACE
      with the helper's three scales on it rather than a black rectangle. */
   const room = bench.surface(sets.room ?? ROOM, { value: 0.052, roughFloor: 0.95 })
-  const back = new Mesh(metrePlane(w, h + rise * 0.2), room)
-  back.position.set(0, (h + rise * 0.2) / 2, -thick + 0.03)
+  /* cut to the OPENING, arch and all. A rectangle behind an ogee head stands
+     up past the stone as a black corner, which is the one thing an arched
+     window must not have behind it. */
+  const opening = clipToHead({ x0: -w / 2, x1: w / 2, y0: 0, y1: h }, inner, spring)
+  const backGeometry = opening ? new ShapeGeometry(opening.shape, 12) : metrePlane(w, h)
+  if (!opening) backGeometry.translate(0, h / 2, 0)
+  shapeUV(backGeometry)
+  const back = new Mesh(backGeometry, room)
+  back.position.set(0, 0, -thick + 0.03)
   back.receiveShadow = true
   back.name = 'the room behind'
   group.add(back)
@@ -289,8 +296,12 @@ export function windowPart(bench: Bench, o: WindowOptions): Part {
       const pane = new ShapeGeometry(outline.shape, 12)
       shapeUV(pane)
       panes.push(at(pane, [0, 0, -reveal]))
-      if (glazing === 'leaded' && lod >= 2) {
-        cames.push(...leadCames(outline.points, quarry, r))
+      if (lod >= 2) {
+        cames.push(
+          ...(glazing === 'leaded'
+            ? leadCames(outline.points, quarry, r)
+            : paneBars(outline.points, quarry))
+        )
       }
     }
     if (panes.length) {
@@ -333,7 +344,7 @@ export function windowPart(bench: Bench, o: WindowOptions): Part {
            stands a millimetre off its neighbour, which is the line a raking
            sun finds and a flat panel never has */
         const t = between(r, 0.026, 0.034)
-        const x = side * (bw * (i + 0.5))
+        const x = -side * (bw * (i + 0.5))
         boards.push(
           at(shiftUV(metreBox(bw - 0.004, leafH, t), x, 0), [
             x,
@@ -343,7 +354,7 @@ export function windowPart(bench: Bench, o: WindowOptions): Part {
         )
       }
       for (const y of [leafH * 0.17, leafH * 0.83]) {
-        straps.push(at(metreBox(leafW * 0.86, 0.055, 0.008), [side * leafW * 0.47, y, 0.036]))
+        straps.push(at(metreBox(leafW * 0.86, 0.055, 0.008), [-side * leafW * 0.47, y, 0.036]))
         /* the pintle the leaf actually turns on */
         straps.push(at(metreCylinder(0.013, 0.013, 0.075, 8), [0, y, 0.02], [Math.PI / 2, 0, 0]))
       }
@@ -488,6 +499,57 @@ function leadCames(outline: Vector2[], quarry: number, r: () => number): BufferG
         }
       }
     }
+  }
+  return bars
+}
+
+/** the upright and level bars of a plain glazed light. Not a lattice: a pane
+    window has a frame and a couple of bars, and without them the light is a
+    black rectangle, which is the hole in the wall a verdict named. */
+function paneBars(outline: Vector2[], pane: number): BufferGeometry[] {
+  let minX = Infinity
+  let maxX = -Infinity
+  let minY = Infinity
+  let maxY = -Infinity
+  for (const p of outline) {
+    minX = Math.min(minX, p.x)
+    maxX = Math.max(maxX, p.x)
+    minY = Math.min(minY, p.y)
+    maxY = Math.max(maxY, p.y)
+  }
+  const bars: BufferGeometry[] = []
+  const run = (from: Vector2, to: Vector2, upright: boolean): void => {
+    const steps = 90
+    let start: number | null = null
+    for (let i = 0; i <= steps; i++) {
+      const t = i / steps
+      const p = new Vector2(from.x + (to.x - from.x) * t, from.y + (to.y - from.y) * t)
+      const inside = i < steps && insidePolygon(p, outline)
+      if (inside && start === null) start = t
+      if (!inside && start !== null) {
+        const a = start
+        const length = (t - a) * (upright ? to.y - from.y : to.x - from.x)
+        if (Math.abs(length) > pane * 0.3) {
+          const mid = (a + t) / 2
+          const bar = upright
+            ? metreBox(0.016, Math.abs(length), 0.014)
+            : metreBox(Math.abs(length), 0.016, 0.014)
+          at(bar, [
+            from.x + (to.x - from.x) * mid,
+            from.y + (to.y - from.y) * mid,
+            0,
+          ])
+          bars.push(bar)
+        }
+        start = null
+      }
+    }
+  }
+  for (let x = minX + pane; x < maxX - pane * 0.4; x += pane) {
+    run(new Vector2(x, minY), new Vector2(x, maxY), true)
+  }
+  for (let y = minY + pane; y < maxY - pane * 0.4; y += pane) {
+    run(new Vector2(minX, y), new Vector2(maxX, y), false)
   }
   return bars
 }

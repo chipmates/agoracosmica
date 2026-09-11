@@ -250,7 +250,7 @@ const SPECIMENS: Record<string, () => Part> = {
   'gear-lantern': () => kit.gear({ kind: 'lantern', module: 0.06, teeth: 9, thickness: 0.22, seed: 33 }),
   'gear-worm': () => kit.gear({ kind: 'worm', module: 0.05, teeth: 1, thickness: 0.1, length: 0.55, seed: 34 }),
   rope: () => kit.hang([-1, 1.5, 0], [1, 1.15, 0], 1.1, { radius: 0.028, seed: 35 }),
-  'rope-fall': () => kit.hang([-2.6, 3.2, 0], [2.6, 2.1, 0], 1.06, { radius: 0.018, seed: 37 }),
+  'rope-fall': () => kit.hang([-2.6, 3.2, 0], [2.6, 2.1, 0], 1.06, { radius: 0.032, seed: 37 }),
   beam: () => kit.beam({ length: 4.2, width: 0.24, depth: 0.2, tenon: 0.12, seed: 36 }),
   'tree-oak': () => kit.tree({ species: 'oak', height: 16, season: 'october', seed: 41 }),
   'tree-oak-bare': () => kit.tree({ species: 'oak', height: 16, season: 'bare', seed: 41 }),
@@ -260,7 +260,7 @@ const SPECIMENS: Record<string, () => Part> = {
   'tree-cypress': () => kit.tree({ species: 'cypress', height: 9, season: 'october', seed: 45 }),
   shrub: () => kit.shrub({ height: 1.5, season: 'october', seed: 46 }),
   grass: () => kit.grass({ width: 4, depth: 4, kind: 'meadow', seed: 47 }),
-  'grass-lawn': () => kit.grass({ width: 4, depth: 4, kind: 'lawn', seed: 48 }),
+  'grass-lawn': () => kit.grass({ width: 3, depth: 3, kind: 'lawn', density: 520, seed: 48 }),
 }
 
 const names = Object.keys(SPECIMENS)

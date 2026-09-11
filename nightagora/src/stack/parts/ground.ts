@@ -177,19 +177,31 @@ export function fencePart(bench: Bench, o: FenceOptions): Part {
     used.push(weaveSet)
     const hazel = bench.surface(weaveSet, { roughFloor: 0.78, value: 0.92 })
     const rods: BufferGeometry[] = []
-    const courses = Math.max(4, Math.round(H / (lod >= 2 ? 0.075 : 0.13)))
+    /* WOVEN CLOSE. A hurdle's rods touch: they are driven down onto the one
+       below so the panel is a wall and not a lattice. Laid at a hand's width
+       apart it reads as a garden trellis, which is a different object and a
+       different century. */
+    const rod = 0.016
+    const courses = Math.max(5, Math.round(H / (rod * (lod >= 3 ? 2.1 : lod === 2 ? 2.6 : 4))))
+    const swing = Math.max(0.055, 0.055 + rod)
     for (let c = 0; c < courses; c++) {
-      const y = (H * (c + 0.5)) / courses
+      const y = rod + (H - rod * 2) * (c / Math.max(1, courses - 1))
       const phase = c % 2 ? 1 : -1
       const points: Vector3[] = []
       for (let i = 0; i <= bays; i++) {
         const x = -L / 2 + i * step
         const side = i % 2 ? phase : -phase
-        points.push(new Vector3(x, y + between(r, -0.008, 0.008), side * 0.055))
+        points.push(new Vector3(x, y + between(r, -0.006, 0.006), side * swing))
       }
       if (points.length < 2) continue
-      const curve = new CatmullRomCurve3(points, false, 'catmullrom', 0.35)
-      const tube = new TubeGeometry(curve, Math.max(8, bays * 3), between(r, 0.011, 0.016), 5, false)
+      const curve = new CatmullRomCurve3(points, false, 'catmullrom', 0.5)
+      const tube = new TubeGeometry(
+        curve,
+        Math.max(10, bays * (lod >= 3 ? 5 : 3)),
+        between(r, rod * 0.82, rod * 1.1),
+        lod >= 3 ? 6 : 4,
+        false
+      )
       rods.push(tube)
     }
     group.add(body(weld(rods), hazel, 'woven rods'))
