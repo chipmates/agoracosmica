@@ -146,7 +146,7 @@ interface Reserve {
 }
 
 /** the tallest house carries six names */
-const RESERVE_SLOTS = 6
+const RESERVE_SLOTS = 7
 
 function createLetteringReserve(): Reserve {
   const extent: N = uniform(new Vector2(1, 1))
@@ -165,13 +165,18 @@ function createLetteringReserve(): Reserve {
     node,
     update(labels, width, height) {
       extent.value.set(width, height)
+      const title = document.getElementById('constellation-plate')
+      const titleRect = title?.classList.contains('lit') ? title.getBoundingClientRect() : null
       for (let i = 0; i < rects.length; i++) {
         const rect = rects[i]
         if (!rect) continue
         const l = labels[i]
         // the chip is a 44px target with its line of type through the
         // middle: the reserve claims the TYPE, not the touch area
-        if (l) rect.value.set(l.x, l.y + 22, Math.max(6, l.half - 4), 9)
+        if (i === RESERVE_SLOTS - 1 && titleRect && labels.length) {
+          rect.value.set(titleRect.x + titleRect.width / 2, titleRect.y + titleRect.height / 2,
+            titleRect.width / 2 + 6, titleRect.height / 2 + 6)
+        } else if (l) rect.value.set(l.x, l.y + 22, Math.max(6, l.half - 4), 9)
         else rect.value.set(-1e4, -1e4, 0, 0)
       }
     },
