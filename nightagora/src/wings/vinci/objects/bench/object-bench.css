@@ -1,0 +1,42 @@
+body[data-phase='bench'] #ui>*,body[data-phase='bench'] #status,body[data-phase='bench'] #brand,body[data-phase='bench'] #rail,body[data-phase='bench'] #hotspots,body[data-phase='bench'] #wing,body[data-phase='bench'] #lobby-plate{display:none!important}
+body[data-phase='bench'] #stage{opacity:1!important}
+.ob{position:fixed;inset:0;z-index:30;pointer-events:none;font-family:Georgia,'Times New Roman',serif;color:#efe9dc;background:#141a19}
+.ob *{box-sizing:border-box}
+.ob button{pointer-events:auto;min-width:44px;min-height:44px;font:inherit;color:inherit;cursor:pointer;background:rgba(18,26,27,.86);border:1px solid rgba(200,186,150,.34);border-radius:0;padding:11px 17px}
+.ob button:focus-visible{outline:2px solid #ddba7a;outline-offset:3px}
+.ob-viewport{position:absolute;inset:0;z-index:0}
+.ob-viewport canvas{width:100%!important;height:100%!important;display:block}
+.ob::before,.ob::after{content:'';position:absolute;left:0;right:0;z-index:1;pointer-events:none}
+.ob::before{top:0;height:230px;background:linear-gradient(to bottom,rgba(9,14,15,.72),rgba(9,14,15,.34) 46%,transparent)}
+.ob::after{bottom:0;height:210px;background:linear-gradient(to top,rgba(9,14,15,.78),rgba(9,14,15,.38) 48%,transparent)}
+.ob-header{z-index:2;position:absolute;left:46px;top:34px;max-width:620px;text-shadow:0 2px 18px rgba(6,14,15,.75)}
+.ob-brand{font:12px/24px Arial,sans-serif;letter-spacing:.26em;margin:0;text-transform:uppercase}
+.ob-kicker{font:11px/1.8 Arial,sans-serif;letter-spacing:.24em;text-transform:uppercase;color:#e4dbc6;margin:14px 0 8px}
+.ob-heading{font-size:40px;font-weight:normal;letter-spacing:-.02em;line-height:1.05;margin:0}
+.ob-hour{font:13px/1.7 Arial,sans-serif;letter-spacing:.1em;color:#e6ddc8;margin:10px 0 0}
+.ob-label{z-index:2;position:absolute;left:46px;bottom:150px;max-width:430px;margin:0;padding:20px 22px;background:rgba(16,24,25,.93);border-left:2px solid #d3a457;font-size:17px;line-height:1.5;pointer-events:auto}
+.ob-drawer{z-index:2;position:absolute;right:46px;top:34px;bottom:150px;width:430px;max-width:calc(100vw - 92px);overflow:auto;pointer-events:auto;background:rgba(14,21,22,.96);border-left:1px solid rgba(200,186,150,.3);padding:26px 28px 22px;scrollbar-width:thin;scrollbar-color:#8d8468 #1b2223}
+.ob-drawer h2{font-size:26px;font-weight:normal;line-height:1.15;margin:0 0 18px}
+.ob-drawer h3{font:11px/1.8 Arial,sans-serif;letter-spacing:.22em;text-transform:uppercase;color:#c7bda6;margin:26px 0 10px}
+.ob-drawer p{font-size:16px;line-height:1.5;margin:0 0 15px}
+.ob-record{border-top:1px solid rgba(200,186,150,.22);margin-top:22px}
+.ob-record p{font:12px/1.65 'SF Mono',Menlo,monospace;color:#b9b2a0;word-break:break-word}
+.ob-footer{z-index:2;position:absolute;left:46px;right:46px;bottom:34px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.ob-station{z-index:2;position:absolute;left:0;bottom:74px;margin:0;font:13px/1.7 Arial,sans-serif;letter-spacing:.08em;color:#ece4d1;text-shadow:0 2px 14px rgba(6,14,15,.9)}
+.ob-rail{display:flex;gap:8px;flex-wrap:wrap}
+.ob-rail button{font:11px/1.5 Arial,sans-serif;letter-spacing:.14em;text-transform:uppercase}
+.ob-rail button[aria-pressed='true']{background:rgba(211,164,87,.2);border-color:#d3a457}
+.ob-certainty{font:11px/1.5 Arial,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#e7c98d}
+.ob-sources{font:11px/1.5 Arial,sans-serif;letter-spacing:.14em;text-transform:uppercase;margin-left:auto}
+@media (max-width:759px){
+  .ob-header{left:20px;right:20px;top:22px;max-width:none}
+  .ob-heading{font-size:27px}
+  .ob-label{left:20px;right:20px;bottom:186px;max-width:none;font-size:15px;padding:15px 17px}
+  .ob-drawer{left:14px;right:14px;top:auto;bottom:14px;width:auto;max-height:72vh;padding:20px 18px 16px}
+  .ob-footer{left:16px;right:16px;bottom:18px;gap:9px;flex-direction:column;align-items:stretch}
+  .ob-station{position:static;order:-1;margin:0 0 4px;font-size:12px}
+  .ob-rail{display:grid;grid-template-columns:1fr 1fr}
+  .ob-certainty,.ob-sources{text-align:center}
+  .ob-rail button{padding:10px 12px;letter-spacing:.1em}
+  .ob-sources{margin-left:0}
+}

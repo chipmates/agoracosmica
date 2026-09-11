@@ -12,6 +12,8 @@
  *   machines  { kind: 'machines', slug }    one of the fourteen machines
  *   table     { kind: 'table', state }      the reading table's seven states
  *   line      { kind: 'line', state }       the timeline's eight states
+ *   object    { kind: 'object', slug }      one built body out of the store,
+ *                                           with `state` naming its station
  *   pictures  { kind: 'pictures', segment } reserved, not built yet
  *
  * `kind` may be left out when a `slug` is given: a slug names a machine and
@@ -29,15 +31,17 @@
 import type { ManifestEntry } from '../manifest'
 import type { Stack } from '../stack'
 
-export const BENCH_KINDS = ['machines', 'table', 'line', 'pictures'] as const
+export const BENCH_KINDS = ['machines', 'table', 'line', 'object', 'pictures'] as const
 export type BenchKind = (typeof BENCH_KINDS)[number]
 
 export interface BenchOptions {
   kind?: string
   /** a machine */
   slug?: string
-  /** a state of the table or of the line */
+  /** a state of the table, of the line, or a station of an object */
   state?: string
+  /** which body the object bench stands, when `slug` is not used for it */
+  object?: string
   /** a segment of the picture bench */
   segment?: string
   lang?: 'en' | 'de'
@@ -78,6 +82,9 @@ const KIND_ID: Record<BenchKind, 'slug' | 'state' | 'segment'> = {
   machines: 'slug',
   table: 'state',
   line: 'state',
+  /* the address of an object names the BODY and not the station: a body is
+     what the bench stands, and its four stations are where the eye goes */
+  object: 'slug',
   pictures: 'segment',
 }
 
@@ -144,6 +151,9 @@ export function createBench(stack: Stack, onLobby: () => void) {
         relight: it.relight,
         reloadOnTier: true,
       }
+    } else if (want === 'object') {
+      const { createObjectBench } = await import('../wings/vinci/objects/bench')
+      made = createObjectBench(stack)
     } else if (want === 'table') {
       const { createTableBench } = await import('../wings/vinci/table/bench')
       made = createTableBench(stack)

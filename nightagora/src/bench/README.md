@@ -28,7 +28,15 @@ window.__forge.state()          // stationId / stationIds / texturesPending
 | `machines` | `slug` | the fourteen machine slugs |
 | `table` | `state` | `closed` `open-83v` `turning` `mirror` `shelf` `open-33r` `phone-open` |
 | `line` | `state` | `line-early` `line-late` `stud-1503` `inscription` `myth-deathbed` `myth-quotes` `grave` `phone-line` |
+| `object` | `slug` | one built body out of the store (`dovecote`), with `state` naming its station |
 | `pictures` | `segment` | reserved; the picture bench has not landed |
+
+The object kind is the odd one and the reason is worth a line: its address
+names the BODY, because a body is what the bench stands, and its four
+stations (`approach` `near` `detail` `phone`) are where the eye goes while it
+stands there. So `/bench/vinci/object/dovecote` opens the dovecote at its
+approach, and `window.__forge.jump('bench', { kind: 'object', slug:
+'dovecote', state: 'detail' })` walks to the joint.
 
 `kind` may be left out when a `slug` is given: a slug names a machine and
 nothing else. `state` is ambiguous between two kinds, so those two say which
@@ -46,6 +54,7 @@ Each kind's own recipes live inside its wing module:
 src/wings/vinci/machines/bench/    the machine bench
 src/wings/vinci/table/bench/       the reading table's bench
 src/wings/vinci/line/bench/        the line, words, myths and grave bench
+src/wings/vinci/objects/bench/     the object bench and its catalogue
 ```
 
 They are there and not here for a reason the layout cannot show: the wing's
