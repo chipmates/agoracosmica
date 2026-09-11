@@ -1,4 +1,4 @@
-import { PerspectiveCamera, Scene, Vector3, WebGPURenderer } from 'three/webgpu'
+import { PerspectiveCamera, Scene, Vector3 } from 'three/webgpu'
 import { createEclipse, type EclipseState } from './scenes/eclipse'
 import { createAgora } from './scenes/agora'
 import { createKeeper } from './scenes/keeper'
@@ -12,6 +12,9 @@ import { WANDERERS } from './content/wanderers'
 import { CONSTELLATIONS, SKY_INVITE } from './content/constellations'
 import { channel } from './core/motion'
 import { mediaUrl } from './content/media'
+import { createStack } from './stack'
+import type { GradeName } from './stack/grade'
+import { isTierName, type TierName } from './stack/tier'
 import { createWingFrame, stationFromHash } from './wings/frame'
 import { WINGS, wingBySlug, wingsOpen, wingsPreparing } from './wings/registry'
 import { wingCount } from './wings/content'
@@ -19,6 +22,17 @@ import { wingCount } from './wings/content'
 type Phase = 'transit' | 'held' | 'descent' | 'agora' | 'wheel' | 'breath' | 'wing'
 /** what the rig may ask for: the phases, plus the wheel with a pane open */
 type ForgeState = Phase | 'pane'
+
+/** every stage of the night names its own look; the table is in stack/grade */
+const LOOK: Record<Phase, GradeName> = {
+  transit: 'cold-moon',
+  held: 'cold-moon',
+  descent: 'falling-plates',
+  agora: 'lapis-ember',
+  wheel: 'gold-on-ink',
+  breath: 'gold-breath',
+  wing: 'first-station',
+}
 
 const stage = document.getElementById('stage')
 const status = document.getElementById('status')
@@ -55,8 +69,34 @@ const scene = new Scene()
 const camera = new PerspectiveCamera(46, innerWidth / innerHeight, 0.1, 200)
 camera.position.set(0, 0, 0)
 
+/* The stack is built before anything is put in the scene: the backend and the
+   tier are facts about the machine, and every scene below asks the tier what
+   it may afford. Top-level await, so no organ is ever constructed against a
+   renderer that does not exist yet. */
+const stack = await createStack({})
+const renderer = stack.renderer
+stage.appendChild(renderer.domElement)
+stack.setScene(scene, camera, 'cold-moon')
+
+/* THE ONE KEY: a low late moon behind the colonnade. It is the only light in
+   the night that casts, and what it casts is what tells the visitor the court
+   is a place with a sky over it and not a set. The fire is not a key: it is
+   an object in the room that happens to glow, and the agora paints it itself. */
+const key = stack.light({
+  // the moon stands low BEHIND the colonnade, so the shadows of the columns
+  // come toward the visitor across the court instead of away from him
+  azimuth: 24,
+  elevation: 21,
+  kelvin: 4300,
+  lux: 22,
+  reach: 54,
+  cascades: [14, 34],
+  ambient: 0.9,
+  sky: { zenith: '#04060e', horizon: '#111c40', ground: '#05060f', stars: 1 },
+})
+
 const eclipse = createEclipse(scene)
-const agora = createAgora(scene)
+const agora = createAgora(scene, { key, stack })
 const keeperScene = createKeeper(keeperEl, reducedMotion, () => keeperExit())
 
 /** The keeper's one way onward: he lifts your gaze to the wheel. */
@@ -84,13 +124,6 @@ const HUB_SPOTS = [
   },
 ]
 
-// WebGL is the proven backend tonight; ?webgpu opts into the newer path
-// until it is verified on real hardware (see FORGE-STATE DEEPEN list).
-const wantWebGPU = location.search.includes('webgpu') && 'gpu' in navigator
-const renderer = new WebGPURenderer({ antialias: true, forceWebGL: !wantWebGPU })
-renderer.setPixelRatio(Math.min(devicePixelRatio, 2))
-renderer.setSize(innerWidth, innerHeight)
-stage.appendChild(renderer.domElement)
 
 let phase: Phase = 'transit'
 let transit = 0
@@ -510,12 +543,25 @@ declare global {
         }
       ) => void
       freeze: (t: number) => void
+      /** the rig and the owner switch tiers without a reload */
+      tier: (name: TierName) => void
       state: () => {
         phase: Phase
         agoraReveal: number
         desc: number
         draws: number
         tris: number
+      }
+      /** what the last two seconds cost, per the stack's own meter */
+      cost: () => {
+        draws: number
+        triangles: number
+        frameMsP50: number
+        frameMsP95: number
+        tier: string
+        backend: string
+        textureMB: number
+        frames: number
       }
     }
   }
@@ -660,6 +706,12 @@ window.__forge = {
     elapsed = t
     frozen = true
   },
+  tier(name) {
+    if (isTierName(name)) stack.tier(name)
+  },
+  cost() {
+    return stack.cost()
+  },
   // the rig's stethoscope: read the live blend state without guessing
   // from pixels (numbers first, then the shot)
   state() {
@@ -686,6 +738,7 @@ const TRANSIT_SECONDS = 2.0
 function setPhase(next: Phase): void {
   phase = next
   document.body.dataset['phase'] = next
+  stack.setScene(scene, camera, LOOK[next])
   if (next === 'held') setStatus('Scroll to enter')
   if (next === 'descent') {
     wakeMusic() // reaching the descent IS the first gesture
@@ -839,7 +892,7 @@ addEventListener('pointermove', (e) => {
 addEventListener('resize', () => {
   camera.aspect = innerWidth / innerHeight
   camera.updateProjectionMatrix()
-  renderer.setSize(innerWidth, innerHeight)
+  stack.setSize(innerWidth, innerHeight)
 })
 
 // ---- the loop ----
@@ -1018,7 +1071,7 @@ function frame(now: number): void {
   const baseRy = camera.rotation.y
   camera.rotation.y -= freeLook * 0.026 - dragYaw - idleYaw
   camera.rotation.x -= freeLookY * 0.018 - dragPitch - idlePitch
-  renderer.render(scene, camera)
+  stack.render(dt)
   camera.rotation.x = baseRx
   camera.rotation.y = baseRy
 }
@@ -1095,16 +1148,8 @@ function bootRoute(): boolean {
   return true
 }
 
-async function main(): Promise<void> {
-  try {
-    await renderer.init()
-  } catch (err) {
-    console.error('renderer init failed', err)
-    setStatus('This night needs a newer browser')
-    return
-  }
+function main(): void {
   if (!bootRoute()) setStatus('First light')
-  console.log(`[na] init ok, gpu=${'gpu' in navigator}, hidden=${document.hidden}`)
   let logged = false
   const origRender = frame
   requestAnimationFrame((t) => {
@@ -1117,4 +1162,4 @@ async function main(): Promise<void> {
   })
 }
 
-void main()
+main()
