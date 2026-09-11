@@ -1,0 +1,66 @@
+#wing[data-wing='vinci'] { --wing-rail-bottom:160px; }
+#wing[data-wing='vinci'] .wing-stage { padding:0; touch-action:none; pointer-events:auto; }
+#wing[data-wing='vinci'] .wing-labels { pointer-events:none; }
+#wing[data-wing='vinci'] .wing-labels > button,#wing[data-wing='vinci'] .vinci-dock { pointer-events:auto; }
+/* the scrim has to end BELOW the last line: at padding 0 its edge cut the
+   descenders of the disclosure line on every desktop frame */
+#wing[data-wing='vinci'] .wing-doorblock { bottom:18px; padding:18px 24px 10px; background:linear-gradient(transparent,rgba(13,19,25,.88) 52%); }
+#wing[data-wing='vinci'] .wing-note { margin-top:6px; font-size:9px; }
+#wing[data-wing='vinci'] .wing-rail-group { padding:0 8px 0 0; background:rgba(16,24,29,.82); border:1px solid #a997732b; border-radius:2px; }
+#wing[data-wing='vinci'] .wing-rail { padding:0; background:none; gap:0; }
+#wing[data-wing='vinci'] .wing-rail-group .wing-lobby { min-width:76px;min-height:44px;padding:8px 12px;border-right:1px solid #a9977355;font-size:9px;letter-spacing:.2em;text-indent:.2em; }
+#wing[data-wing='vinci'] .wing-question { user-select:text; }
+.vinci-heading { position:absolute;left:46px;top:114px;max-width:550px;pointer-events:none;text-shadow:0 2px 20px #14212dcc; }
+.vinci-kicker { font:10px var(--sans);letter-spacing:.27em;color:#f0e8d9; }
+.vinci-title { margin:9px 0 0;font:400 clamp(23px,3vw,37px)/1.14 var(--serif);max-width:530px;color:#fff5e3;text-wrap:balance; }
+.vinci-construction { left:50%;top:43%;transform:translate(-50%,-50%);width:min(560px,calc(100vw - 40px));padding:28px;background:rgba(12,22,29,.92);border:1px solid #aa9b7955;text-align:center; }
+.vinci-construction .vinci-title { font-size:28px; }
+.vinci-status { margin:18px 0 12px;font:10px var(--sans);letter-spacing:.2em;text-transform:uppercase;color:#aaa99f; }
+.vinci-promise,.vinci-threshold { font:16px/1.5 var(--serif);color:#e6e0d2;text-wrap:pretty; }
+.vinci-threshold { margin-top:16px;font-size:13px;color:#c6bfb0; }
+.vinci-source {position:fixed;right:26px;top:22px;min-width:100px;min-height:44px;border:1px solid #c8bda655;background:#16242ecc;color:#eee4d3;font:10px var(--sans);letter-spacing:.15em;text-transform:uppercase;cursor:pointer; }
+.vinci-dot { position:fixed; width:44px;height:44px;transform:translate(-50%,-50%);background:none;border:0;cursor:pointer; }
+.vinci-dot::after {content:'';display:block;width:9px;height:9px;margin:auto;border-radius:50%;background:#d2a557;border:1px solid #f4dab2;box-shadow:0 0 0 5px #242c2877,0 1px 9px #0008; }
+.vinci-dock {position:fixed;left:28px;bottom:226px;width:330px;max-height:calc(100vh - 340px);overflow:auto;overscroll-behavior:contain;background:#101d27f2;border:1px solid #a9977355;padding:22px;color:#eae1d1;scrollbar-width:thin;user-select:text; }
+.vinci-dock[hidden] {display:none; }
+@media(min-aspect-ratio:9/10) {
+  .vinci-dock[data-station='arrival'] {left:auto;right:28px;}
+}
+.vinci-certainty {color:#d2a557;font:10px var(--sans);letter-spacing:.18em;text-transform:uppercase; }
+.vinci-certainty[data-certainty='unknown'] {color:#a8b3b7; }
+.vinci-dock h2 {font:400 24px/1.15 var(--serif);margin:10px 0 16px; }
+.vinci-statement {font:14px/1.55 var(--serif);margin:14px 0; }
+.vinci-certainty-word {display:block;margin-bottom:5px;font:9px/1.4 var(--sans);letter-spacing:.13em;text-transform:uppercase; }
+.vinci-statement[data-certainty='documented'] .vinci-certainty-word {color:#8cba8b; }
+.vinci-statement[data-certainty='reconstructed'] .vinci-certainty-word {color:#d2a557; }
+.vinci-statement[data-certainty='conjectural'] .vinci-certainty-word {color:#df9385; }
+.vinci-statement[data-certainty='unknown'] .vinci-certainty-word {color:#a8b3b7; }
+.vinci-statement[data-certainty='documented'] {border-left:2px solid #8cba8b;padding-left:10px; }
+.vinci-statement[data-certainty='conjectural'] {border-left:2px solid #df9385;padding-left:10px; }
+.vinci-citation {display:block;font:10px/1.5 var(--sans);color:#a8b3b7;overflow-wrap:anywhere;margin:10px 0; }
+/* the hour the station names, on the frame and not only inside the card */
+.vinci-hour { margin:10px 0 0;font:10px/1.5 ui-monospace,monospace;letter-spacing:.02em;color:#e9cd94; }
+.vinci-arithmetic {white-space:pre-wrap;font:12px/1.6 ui-monospace,monospace;color:#edcc8c;border-block:1px solid #a9977333;padding:12px 0; }
+.vinci-leader {position:fixed;inset:0;pointer-events:none; }
+.vinci-leader line {stroke:#d2a55799;stroke-width:1; }
+.vinci-dock:focus-visible,.vinci-source:focus-visible,.vinci-dot:focus-visible {outline:1px solid #edcc8c;outline-offset:3px; }
+@media(max-aspect-ratio:9/10) {
+  #wing[data-wing='vinci'] { --wing-rail-bottom:190px; }
+  .vinci-heading {left:22px;right:22px;top:116px;max-width:none; }
+  .vinci-title {font-size:27px;max-width:335px; }
+  .vinci-kicker {font-size:9px;letter-spacing:.19em; }
+  .vinci-source {right:15px;top:55px;min-width:105px; }
+  #wing[data-wing='vinci'] .wing-doorblock {bottom:14px;padding:17px 16px 0; }
+  #wing[data-wing='vinci'] .wing-question {font-size:14px;line-height:1.32; }
+  #wing[data-wing='vinci'] .wing-door {margin-top:8px; }
+  #wing[data-wing='vinci'] .wing-note {font-size:8px;line-height:1.4;letter-spacing:.1em; }
+  .vinci-dock {left:16px;right:16px;bottom:240px;width:auto;padding:18px;max-height:min(340px,calc(100vh - 330px)); }
+  .vinci-construction {top:43%;left:50%;right:auto;padding:20px; }
+  .vinci-construction .vinci-title {font-size:24px; }
+  .vinci-promise {font-size:14px; }
+}
+
+.vinci-statement[data-certainty='inferred'],.vinci-statement[data-certainty='reconstructed'] {border-left:2px solid #d2a557;padding-left:10px;}
+.vinci-statement[data-certainty='unknown'] {border-left:2px solid #a8b3b7;padding-left:10px;}
+
+#wing[data-wing='vinci'] .wing-rail-group .vinci-source {position:static;flex:0 0 90px;min-width:90px;min-height:44px;padding:8px;border:0;border-left:1px solid #a9977355;background:none;font-size:9px;letter-spacing:.10em; }
