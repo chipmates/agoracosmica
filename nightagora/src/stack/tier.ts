@@ -12,7 +12,8 @@ export interface Tier {
   /** what the cost meter holds this tier to */
   budget: { draws: number; triangles: number; fps: number; textureMB: number }
   pixelRatio: number
-  /** MSAA samples on the scene pass */
+  /** MSAA samples on the scene pass. Mutually exclusive with anything that
+      samples the pass's depth (ao, dof, taa): see `samplesFor()` in post.ts */
   samples: number
   shadow: { on: boolean; mapSize: number; cascades: number; maxFar: number }
   ao: { on: boolean; scale: number }
@@ -33,18 +34,38 @@ export const TIERS: Record<TierName, Tier> = {
     name: 'hero',
     budget: { draws: 300, triangles: 3_000_000, fps: 60, textureMB: 512 },
     pixelRatio: 2,
-    samples: 0,
+    /* THE FRAME'S EDGES ARE MSAA'S JOB AND NOTHING ELSE'S. Four samples on
+       the scene pass is what a stone room with a thousand cut arrises needs,
+       and it is the one anti-aliasing that grades an edge without touching
+       the surface inside it. It costs the three lines below it: occlusion,
+       the lens and the temporal resolve all read the pass's depth, and a
+       multisampled depth cannot be sampled. */
+    samples: 4,
     shadow: { on: true, mapSize: 2048, cascades: 3, maxFar: 60 },
-    ao: { on: true, scale: 1 },
+    /* GTAO OFF, AND IT IS THE FRAME THAT DECIDED IT. Without a temporal
+       resolve its sample rotation stands in the picture as a fine diagonal
+       crosshatch on every surface, which a visitor reads as a dirty screen.
+       Denoised it is softer and still there, and it costs the frame its
+       MSAA. Contact in this museum is carried by the key light's shadow and
+       by the art's own analytic terms, which are exact and never dither.
+       The node stays built and a wing with a normal buffer may switch it
+       back on: `ao.on` forces `samples` to zero when it does. */
+    ao: { on: false, scale: 1 },
     bloom: 'mip',
-    dof: true,
+    /* the lens reads the pass's depth too, and no grade of this lobby asks
+       for it (measured in stage 0.2: it bloats a dome of stars and softens
+       cut stone). A wing with a real room at a real depth turns it on and
+       gives up MSAA for it, or renders its own depth. */
+    dof: false,
     /* MEASURED, not assumed. TAA is in the chain and a wing may pick it, but
        not this museum: every organ of the night moves inside its own shader
        and most materials write their own clip position, so three's velocity
        buffer reports a still pixel for a moving one. The temporal resolve
        then blends unrelated history and turns into a low-pass filter: on the
-       lobby's own frame TAA cost 45 percent of the image's edge energy
-       against the same frame under SMAA. Engraved stone cannot afford that. */
+       lobby's own frame TAA cost 45 percent of the image's edge energy.
+       What runs instead is MSAA on the pass with FXAA on the print behind
+       it, for the aliasing a coverage resolve cannot see: a specular
+       glitter, an alpha cut, a line drawn inside a shader. */
     aa: 'smaa',
     reflection: { on: true, scale: 0.75 },
     grain: true,
@@ -55,11 +76,9 @@ export const TIERS: Record<TierName, Tier> = {
     name: 'standard',
     budget: { draws: 150, triangles: 1_200_000, fps: 60, textureMB: 256 },
     pixelRatio: 2,
-    // GTAO reads the pass's depth texture, and a multisampled depth texture
-    // is not readable in WGSL: occlusion and MSAA cannot share a pass
-    samples: 0,
+    samples: 4,
     shadow: { on: true, mapSize: 1024, cascades: 2, maxFar: 44 },
-    ao: { on: true, scale: 0.5 },
+    ao: { on: false, scale: 0.5 },
     bloom: 'mip',
     dof: false,
     aa: 'smaa',
@@ -72,14 +91,20 @@ export const TIERS: Record<TierName, Tier> = {
     name: 'calm',
     budget: { draws: 60, triangles: 400_000, fps: 60, textureMB: 96 },
     pixelRatio: 1.5,
-    samples: 0,
+    /* a phone resolves MSAA inside the tile, so four samples cost bandwidth
+       the tiler never spends; the calm tier is cheaper in draws, not in
+       edges */
+    samples: 4,
     shadow: { on: false, mapSize: 512, cascades: 1, maxFar: 30 },
     ao: { on: false, scale: 0.5 },
     // the fire without its halo is a different room, not a cheaper one, so
     // the halo stays and only the way it is made gets cheaper
     bloom: 'soft',
     dof: false,
-    aa: 'fxaa',
+    /* the calm tier resolves in the pass and nowhere else: MSAA is the one
+       anti-aliasing that costs no draw call, and the three the print-side
+       resolve would cost are a twentieth of this tier's whole budget */
+    aa: 'none',
     reflection: { on: false, scale: 0.5 },
     grain: true,
     detail: 1,

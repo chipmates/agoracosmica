@@ -1,18 +1,32 @@
 /* THE POST CHAIN — what happens to a frame after the scene has drawn it.
 
-   The order is the order a camera and a lab would put it in, and it is not
-   negotiable: occlusion belongs to the geometry, so it goes first; bloom is
-   what a lens does to a bright source, so it goes on the picture and not on
-   the grade; depth of field is the lens too; anti-aliasing resolves the
-   image; the grade is the print; the grain is the film the print is on.
+   The order is the order a camera and a lab would put it in: occlusion
+   belongs to the geometry, so it goes first; bloom is what a lens does to a
+   bright source, so it goes on the picture and not on the grade; depth of
+   field is the lens too; the grade is the print; the resolve and the grain
+   are the last two things that happen to a print.
 
-     scene ─ AO ─ bloom ─ DOF ─ AA ─ grade ─ vignette ─ grain ─ screen
+     scene ─ AO ─ bloom ─ DOF ─ grade ─ vignette ─ sRGB ─ AA ─ grain ─ screen
+
+   THE RESOLVE SITS AFTER THE PRINT, AND THAT IS NOT A STYLE CHOICE. FXAA
+   and SMAA are edge detectors with thresholds written for display-referred
+   pixels (FXAA's floor is 0.0312, SMAA's is a flat 0.1 on the raw channel
+   delta). Handed the linear HDR frame, a night whose stone sits near 0.02
+   to 0.08 linear presents deltas far under both floors, and the detector
+   discards the edge instead of grading it. So the chain applies the tone
+   map and the sRGB transfer itself, and the resolve reads the print.
 
    Two rules this chain enforces because the museum's register depends on
    them. Bloom is MASKED, never global: it is allowed on warm sources (fire,
    gold) and denied to everything else, which is how the eclipse keeps its
    ring. And occlusion is DENIED to bright pixels: the joins go deeper, the
    fire never dims.
+
+   One hardware fact governs the top of the chain. Occlusion, depth of field
+   and the temporal resolve all SAMPLE the scene pass's depth, and a
+   multisampled depth texture cannot be sampled in WGSL. So a pass carries
+   MSAA or it carries a depth reader, never both, and `samplesFor()` below
+   is the single place that decides.
 
    Every dial is a uniform, so a scene change re-aims the chain instead of
    rebuilding it. Rebuilding costs a shader compile, and a shader compile in
@@ -27,6 +41,7 @@ import { dof } from 'three/addons/tsl/display/DepthOfFieldNode.js'
 import { film } from 'three/addons/tsl/display/FilmNode.js'
 import { fxaa } from 'three/addons/tsl/display/FXAANode.js'
 import { smaa } from 'three/addons/tsl/display/SMAANode.js'
+import { denoise as denoiseNode } from 'three/addons/tsl/display/DenoiseNode.js'
 import { traa } from 'three/addons/tsl/display/TRAANode.js'
 import type { Grade } from './grade'
 import type { Tier } from './tier'
@@ -43,10 +58,12 @@ const {
   output,
   pass,
   pow,
+  renderOutput,
   screenUV,
   smoothstep,
   uniform,
   vec3,
+  vec4,
   velocity,
 } = TSL as unknown as Record<string, N>
 
@@ -107,6 +124,19 @@ function dialsOf(g: Grade): Dials {
   }
 }
 
+/**
+ * How many MSAA samples this tier's scene pass may carry.
+ *
+ * Occlusion, depth of field and the temporal resolve all sample the pass's
+ * depth texture, and WGSL has no way to sample a multisampled depth. A pass
+ * that carries any of the three therefore carries no MSAA, and the tier
+ * table is written so the lobby never asks for both.
+ */
+export function samplesFor(tier: Tier): number {
+  const readsDepth = tier.ao.on || tier.dof || tier.aa === 'taa'
+  return readsDepth ? 0 : tier.samples
+}
+
 export function createPost(
   renderer: WebGPURenderer,
   scene: Scene,
@@ -137,9 +167,7 @@ export function createPost(
     dofBokeh: uniform(d.dofBokeh),
   }
 
-  // occlusion reads this pass's depth, and a multisampled depth texture
-  // cannot be sampled in WGSL: the two are mutually exclusive by hardware
-  const scenePass = pass(scene, camera, { samples: tier.ao.on ? 0 : tier.samples })
+  const scenePass = pass(scene, camera, { samples: samplesFor(tier) })
   if (tier.aa === 'taa') scenePass.setMRT(mrt({ output, velocity }))
 
   const colour: N = scenePass.getTextureNode('output')
@@ -160,7 +188,13 @@ export function createPost(
     aoPass.radius.value = first.ao.distance
     aoPass.thickness.value = first.ao.thickness
     aoPass.scale.value = 1
-    const occ = aoPass.getTextureNode().r
+    /* GTAO takes its samples off a per-pixel rotation, and without a
+       temporal resolve to average them that rotation IS the image: a fine
+       diagonal crosshatch over every surface, which reads as a dirty frame
+       rather than as contact. The spatial denoise is what a chain without
+       TAA has to pay instead. */
+    const denoise = denoiseNode as unknown as N
+    const occ = denoise(aoPass.getTextureNode(), depth, null, camera).r
     const bright = smoothstep(0.5, 1.15, luminance(frame.rgb))
     const guarded = mix(occ, float(1), bright)
     frame = frame.mul(mix(float(1), guarded, u.aoIntensity))
@@ -188,10 +222,10 @@ export function createPost(
   // 3 · the lens: hero only, and only where a grade asks for it
   if (tier.dof) frame = dof(frame, scenePass.getViewZNode('depth'), u.dofFocus, u.dofFocal, u.dofBokeh)
 
-  // 4 · resolve
+  /* 4 · the temporal resolve, and only that one, runs here: it reprojects
+     the LINEAR frame through the velocity buffer, which is geometry and not
+     a threshold, so the print has nothing to tell it. */
   if (tier.aa === 'taa') frame = traa(frame, depth, scenePass.getTextureNode('velocity'), camera)
-  else if (tier.aa === 'smaa') frame = smaa(frame)
-  else if (tier.aa === 'fxaa') frame = fxaa(frame)
 
   // 5 · the print: exposure, lift/gamma/gain, the warm-cool split, saturation
   let c: N = frame.rgb.mul(u.exposure)
@@ -202,13 +236,25 @@ export function createPost(
   c = mix(c, c.mul(splitTint), u.split)
   c = mix(vec3(lum, lum, lum), c, u.saturation)
 
-  // 6 · the vignette, then the film the print is on
+  // 6 · the vignette
   const r = length(screenUV.sub(0.5))
   c = c.mul(float(1).sub(smoothstep(0.34, 0.86, r).mul(u.vignette)))
-  let out: N = vec3(c.r, c.g, c.b)
+
+  /* 7 · the print is made HERE, before the resolve, because an edge
+     detector cannot find an edge it cannot see. `outputColorTransform` is
+     off for the same reason: three would otherwise do this last, after the
+     one node in the chain that needed it done first. */
+  let out: N = renderOutput(vec4(c.r, c.g, c.b, 1))
+
+  // 8 · the resolve, on display-referred pixels
+  if (tier.aa === 'smaa') out = smaa(out)
+  else if (tier.aa === 'fxaa') out = fxaa(out)
+
+  // 9 · the film the print is on
   if (tier.grain) out = film(out, u.grain)
 
   const post = new PostProcessing(renderer)
+  post.outputColorTransform = false
   post.outputNode = out
 
   function setGrade(g: Grade): void {

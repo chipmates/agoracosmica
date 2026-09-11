@@ -82,7 +82,10 @@ export async function createStack(opts: StackOptions = {}): Promise<Stack> {
 
   const renderer = new WebGPURenderer({
     canvas: opts.canvas,
-    antialias: tier.samples > 0,
+    /* the swap chain only ever receives one fullscreen quad, so multisampling
+       it would cost memory to resolve an image that has no edges in it. The
+       MSAA that matters is on the scene pass, per tier. */
+    antialias: false,
     forceWebGL: adapter === null,
   })
   renderer.setPixelRatio(Math.min(devicePixelRatio, tier.pixelRatio))
