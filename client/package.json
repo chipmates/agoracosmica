@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",
-    "dompurify": "^3.4.14",
+    "dompurify": "^3.4.15",
     "idb": "^7.1.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -79,7 +79,7 @@
       "esbuild": "^0.28.1",
       "ws": "^8.20.1",
       "vite": "^7.3.5",
-      "js-yaml": "^4.3.1",
+      "js-yaml": "^4.3.2",
       "@babel/core": "^7.29.6",
       "browserslist": "^4.28.7"
     }

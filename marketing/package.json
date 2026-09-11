@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@astrojs/react": "^6.0.5",
-    "@astrojs/sitemap": "^3.7.2",
+    "@astrojs/sitemap": "^3.7.4",
     "astro": "^7.3.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
@@ -26,9 +26,9 @@
     "overrides": {
       "esbuild": "^0.28.1",
       "vite": "^8.0.13",
-      "js-yaml": "^4.3.1",
+      "js-yaml": "^4.3.2",
       "@babel/core": "^7.29.6",
-      "nanoid": "^3.3.17",
+      "nanoid": "^3.3.18",
       "postcss": "^8.5.23",
       "browserslist": "^4.28.7"
     }
