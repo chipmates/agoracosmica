@@ -555,11 +555,25 @@
     /* a figure holds the whole frame while it is open. The scrim was thin
        enough that the sky's own letterpress read straight through the pane
        on a phone and collided with the names (round 1), so it deepens, and
-       the layer under it steps back with it. */
+       the layer under it steps back with it.
+
+       IT IS ALSO A PLANE, AND NO PLANE IN THIS MUSEUM IS ONE COLOUR. Deep
+       enough to hold a portrait, it measured a range of one or two levels
+       across a 300 px patch, which is flat black with a picture on it. So
+       the scrim carries the same three scales any wall does: a density
+       gradient that opens around the plate and closes at the rim, one broad
+       off-centre veil so the fall is not a clean ellipse, and a fine
+       procedural tooth. No stars: the sky is not what is behind a figure. */
     #figure-pane {
       position: fixed; inset: 0; z-index: 5;
       display: flex; align-items: center; justify-content: center;
-      background: radial-gradient(ellipse 92% 82% at 50% 45%, rgba(2, 3, 8, 0.9) 0%, rgba(2, 3, 8, 0.98) 100%);
+      background-color: rgba(1, 2, 5, 0.95);
+      background-image:
+        url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='168' height='168'%3E%3Cfilter id='t'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.64 0 0 0 0 0.66 0 0 0 0 0.8 0.34 0.34 0.34 0 0'/%3E%3C/filter%3E%3Crect width='168' height='168' filter='url(%23t)' opacity='0.09'/%3E%3C/svg%3E"),
+        radial-gradient(ellipse 46% 44% at 33% 47%, rgba(60, 66, 96, 0.5) 0%, rgba(60, 66, 96, 0) 74%),
+        radial-gradient(ellipse 88% 66% at 44% 50%, rgba(26, 31, 52, 0.55) 0%, rgba(26, 31, 52, 0) 76%),
+        radial-gradient(ellipse 150% 88% at 84% 104%, rgba(20, 24, 44, 0.5) 0%, rgba(20, 24, 44, 0) 56%);
+      background-size: 168px 168px, auto, auto, auto;
       opacity: 0; visibility: hidden; pointer-events: none;
       transition: opacity 0.8s ease, visibility 0s linear 0.8s;
     }
