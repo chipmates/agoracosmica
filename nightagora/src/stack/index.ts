@@ -15,6 +15,7 @@
      stack.reflector(plane, opts)        a planar reflection on that plane
      stack.detail(material, set, scales) the empty-plane helper
      stack.materials.load(name)          a PBR set out of the library
+     stack.models.place(slug, at)        a CC0 model out of the model library
      stack.cost()                        what the last two seconds cost
      stack.tier(name)                    switch
 
@@ -27,6 +28,7 @@ import { applyDetail, type DetailNodes, type DetailScales } from './detail'
 import { GRADES, resolveGrade, type Grade, type GradeName } from './grade'
 import { createKeyLight, type KeyLight, type KeyLightOptions } from './light'
 import { createMaterialLibrary, type MaterialLibrary, type MaterialSet } from './materials'
+import { createModelLibrary, type ModelLibrary } from './models'
 import { loadHDRI, type SkyProbe } from './hdri'
 import { createPost, type PostChain } from './post'
 import { createReflector, type Reflection, type ReflectorOptions } from './reflector'
@@ -38,6 +40,7 @@ export type { Tier, TierName } from './tier'
 export type { Grade, GradeName } from './grade'
 export type { KeyLight } from './light'
 export type { MaterialSet, SampledMaps } from './materials'
+export type { ModelAsset, ModelLibrary, ModelPlacement } from './models'
 export type { SkyProbe } from './hdri'
 export type { CostReading } from './cost'
 
@@ -75,6 +78,9 @@ export interface Stack {
     scales?: DetailScales
   ) => DetailNodes
   materials: MaterialLibrary
+  /** the CC0 models: a window with a reveal, a barrel with staves, a rope
+      that is a rope. Real scale, manifested, cached, instanced on repeat. */
+  models: ModelLibrary
   /** one of the library's three equirectangular skies, as a probe a scene
       hands to `light({ probe })` */
   hdri: (name: string) => Promise<SkyProbe>
@@ -121,6 +127,7 @@ export async function createStack(opts: StackOptions = {}): Promise<Stack> {
   const backend: 'webgpu' | 'webgl2' = adapter === null ? 'webgl2' : 'webgpu'
   const architecture = adapter?.architecture ?? 'webgl2'
   const materials = createMaterialLibrary(tier)
+  const models = createModelLibrary(tier, materials)
   const meter = createCostMeter(renderer)
   const lights: KeyLight[] = []
 
@@ -211,6 +218,7 @@ export async function createStack(opts: StackOptions = {}): Promise<Stack> {
     },
 
     materials,
+    models,
 
     hdri: loadHDRI,
 
@@ -220,7 +228,12 @@ export async function createStack(opts: StackOptions = {}): Promise<Stack> {
         ...meter.read(),
         tier: tierName,
         backend,
-        textureMB: Math.round(materials.textureMB() * 100) / 100,
+        textureMB: Math.round((materials.textureMB() + models.textureMB()) * 100) / 100,
+        models: {
+          loaded: models.loaded().length,
+          tris: models.tris(),
+          textureMB: Math.round(models.textureMB() * 100) / 100,
+        },
         frameMB: Math.round((frameBytes(tier, size.x, size.y, renderer.getPixelRatio()) / (1024 * 1024)) * 10) / 10,
         budget: tier.budget,
       }
@@ -239,6 +252,7 @@ export async function createStack(opts: StackOptions = {}): Promise<Stack> {
       document.body.dataset['tier'] = name
       renderer.setPixelRatio(Math.min(devicePixelRatio, tier.pixelRatio))
       materials.setTier(tier)
+      models.setTier(tier)
       for (const l of lights) l.setTier(tier)
       meter.reset()
       build()
@@ -271,6 +285,7 @@ export async function createStack(opts: StackOptions = {}): Promise<Stack> {
 
     dispose() {
       materials.dispose()
+      models.dispose()
       for (const l of lights) l.dispose()
       lights.length = 0
       chain?.dispose()

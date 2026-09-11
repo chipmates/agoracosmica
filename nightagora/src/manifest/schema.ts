@@ -125,6 +125,43 @@ export interface ManifestEntry {
       second read of the map, turned and at another size, chosen by a mask
       this coarse, removes the lattice. Absent leaves the tiling alone. */
   detile_m?: number
+  /* WHAT A MODEL ADDS. A model is a folder too, so its entry is a family
+     entry, and these five say what a licence line cannot: how big the thing
+     is, where its foot stands, what a wing asks for it by, whether the
+     period could have held it, and how coarse its own maps are. All of them
+     except the last two are MEASURED off the delivered glTF and its buffer,
+     never taken from the catalogue's claim about the source. */
+
+  /** the body's own size in metres, x by y by z, y upright */
+  bounds_m?: [number, number, number]
+  /** the y of its lowest point in its own frame, so a loader can put its
+      foot on the ground rather than its origin */
+  floor_m?: number
+  /** what a wing asks for it by: door, barrel, tool, shrub, rock */
+  category?: string
+  /** one word of honesty about the period a wing puts it in. `generic` is a
+      thing with no period in it either way: a stone, a stump, a plank. */
+  period_fit?: 'plausible-1517' | 'modern' | 'generic'
+  /* named `gltf` and not `model`: `model` is already taken, by the GENERATED
+     class, for what produced an image. */
+  gltf?: {
+    /** the document inside the folder, relative to it */
+    file: string
+    /** the resolution of the set that was taken, `2k` unless the 2K set was
+        over the size cap and the 1K set was taken instead */
+    resolution: string
+    maps: string[]
+    /** what the source's own maps deliver, measured off the file's own uv
+        against its own world area. Under a few hundred, one texel is a
+        centimetre and the room-scale band of the empty-plane rule is simply
+        not in the picture. */
+    texels_per_m: number
+    /** the library set whose macro band is laid over this model where its
+        own maps are too coarse to carry one. Declared for every model; only
+        read for the coarse ones, so the decision stays a measurement. */
+    detail_set?: string
+  }
+
   /** THE BAND A PHOTOGRAPH CANNOT GIVE. A weave is far finer than the plane
       it is laid on can resolve: linen's is 0.7 mm, a sixth of a pixel at the
       distance a wall is read from, so the map averages to its own mean and

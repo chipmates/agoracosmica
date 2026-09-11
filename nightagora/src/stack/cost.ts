@@ -23,8 +23,13 @@ export interface CostReading {
   cpuMsP95: number
   tier: TierName
   backend: 'webgpu' | 'webgl2'
-  /** what the material library is holding, in megabytes */
+  /** what the two libraries are holding, in megabytes */
   textureMB: number
+  /** and what the model library alone is holding: how many prototypes, the
+      triangles every body of them adds up to, and their share of the
+      texture above. A frame's own triangle count is what the renderer drew;
+      this is what the library put in the room. */
+  models: { loaded: number; tris: number; textureMB: number }
   /** what the frame itself is holding: the scene pass's attachments plus the
       post chain's own targets, in megabytes */
   frameMB: number
@@ -66,7 +71,7 @@ export function frameBytes(tier: Tier, width: number, height: number, pixelRatio
 
 export interface CostMeter {
   sample: (frameMs: number, cpuMs: number) => void
-  read: () => Omit<CostReading, 'tier' | 'backend' | 'textureMB' | 'frameMB' | 'budget'>
+  read: () => Omit<CostReading, 'tier' | 'backend' | 'textureMB' | 'frameMB' | 'budget' | 'models'>
   reset: () => void
 }
 
