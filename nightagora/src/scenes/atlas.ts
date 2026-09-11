@@ -92,6 +92,19 @@ const mxNoise: (v: N) => N = (TSL as any).mx_noise_float
 const mxFractal: (v: N, o: number, l: number, d: number, a: number) => N = (TSL as any)
   .mx_fractal_noise_float
 
+// ------------------------------------------------- what this sky draws
+/* THE WALK DECIDES. The six houses were engraved as their figures and the
+   sky was ruled with a graticule; over the stars both read as too much, so
+   the wheel is back to the hairline asterisms on a clean sky. Neither
+   drawing is deleted: each hangs on one flag and comes back in one line. */
+const ENGRAVED_FIGURES: boolean = false
+const GRATICULE: boolean = false
+
+/** how far the hairline figure stands up in the house you are looking at.
+    The burin carried half the drawing while it was on, so the hairline
+    stepped back for it. */
+const HAIR_LIFT = ENGRAVED_FIGURES ? 0.78 : 0.92
+
 // ------------------------------------------------------------- the palette
 /* Gold is a name (law 1). Three golds carry the whole hierarchy: the pale
    hot centre an anchor earns, the body of a named star, and the deeper
@@ -390,8 +403,8 @@ function figureGeometry(
   /* AND THE BURIN, in the same buffer. Two registers, one draw: the phone's
      calm tier is a 60-draw stage, and a second mesh per house spends six of
      them on a shader difference the fragment can carry itself. */
-  const pen = burinFor(c)
-  pen.strokes.forEach((st, si) => {
+  const pen = ENGRAVED_FIGURES ? burinFor(c) : null
+  pen?.strokes.forEach((st, si) => {
     const last = st.points.length - 1
     const anchor = st.points[Math.floor(last / 2)] ?? [0, 0]
     st.points.forEach(([x, y], i) => {
@@ -443,18 +456,20 @@ function figureMaterial(
   mat.blending = AdditiveBlending
   mat.side = DoubleSide
   mat.forceSinglePass = true
-  // Translate a whole burin stroke onto one pixel anchor. Its width and
-  // curve stay continuous; snapping individual vertices would staircase
-  // the line. The viewport is the actual render target, on every tier.
-  mat.vertexNode = Fn(() => {
-    const mvp: N = cameraProjectionMatrix.mul(modelViewMatrix)
-    const clip: N = mvp.mul(vec4(positionGeometry, 1)).toVar()
-    const center: N = mvp.mul(vec4(attribute('aCutCenter', 'vec3') as N, 1)).toVar()
-    const pixel: N = center.xy.div(center.w).mul(0.5).add(0.5).mul(viewportSize)
-    const delta: N = floor(pixel).add(0.5).sub(pixel).mul(2).div(viewportSize)
-      .mul(attribute('aKind', 'float'))
-    return vec4(clip.xy.add(delta.mul(clip.w)), clip.zw)
-  })()
+  if (ENGRAVED_FIGURES) {
+    // Translate a whole burin stroke onto one pixel anchor. Its width and
+    // curve stay continuous; snapping individual vertices would staircase
+    // the line. The viewport is the actual render target, on every tier.
+    mat.vertexNode = Fn(() => {
+      const mvp: N = cameraProjectionMatrix.mul(modelViewMatrix)
+      const clip: N = mvp.mul(vec4(positionGeometry, 1)).toVar()
+      const center: N = mvp.mul(vec4(attribute('aCutCenter', 'vec3') as N, 1)).toVar()
+      const pixel: N = center.xy.div(center.w).mul(0.5).add(0.5).mul(viewportSize)
+      const delta: N = floor(pixel).add(0.5).sub(pixel).mul(2).div(viewportSize)
+        .mul(attribute('aKind', 'float'))
+      return vec4(clip.xy.add(delta.mul(clip.w)), clip.zw)
+    })()
+  }
   const across: N = abs(attribute('aCross', 'float') as N)
   const alongN: N = attribute('aAlong', 'float') as N
   const inkN: N = attribute('aInk', 'float') as N
@@ -473,6 +488,11 @@ function figureMaterial(
   const hairColour = vec3(LINE_GOLD.r, LINE_GOLD.g, LINE_GOLD.b).mul(
     float(0.8).add(core.mul(0.45))
   )
+  if (!ENGRAVED_FIGURES) {
+    mat.colorNode = hairColour
+    mat.opacityNode = hairOpacity.mul(reserve.node)
+    return mat
+  }
 
   // THE CUT: a burin stroke is the whole ribbon, and it carries the glancing
   // gilt an engraver leaves on one edge of a plate.
@@ -1213,64 +1233,68 @@ function createPlate(reserve: Reserve): Plate {
 
   // ------------------------------- the graticule and the gilt ecliptic
   /* Two registers, one buffer: the phone's calm stage is a 60-draw frame,
-     and a hairline's tint is a per-vertex fact, not a second material. */
-  const ink = new ShellInk()
-  const GRID_GAIN = 0.0095
-  for (let lat = -30; lat <= 75; lat += 15) {
-    ink.path(
-      (t) => onShell(t * TAU, lat * DEG),
-      160,
-      lat === 0 ? 0.76 : lat % 30 === 0 ? 0.63 : 0.38,
-      PAPER,
-      GRID_GAIN
-    )
+     and a hairline's tint is a per-vertex fact, not a second material.
+     Both hang on GRATICULE: the walked sky carries no rule over its
+     houses, only the river and the stars. */
+  if (GRATICULE) {
+    const ink = new ShellInk()
+    const GRID_GAIN = 0.0095
+    for (let lat = -30; lat <= 75; lat += 15) {
+      ink.path(
+        (t) => onShell(t * TAU, lat * DEG),
+        160,
+        lat === 0 ? 0.76 : lat % 30 === 0 ? 0.63 : 0.38,
+        PAPER,
+        GRID_GAIN
+      )
+    }
+    for (let lon = 0; lon < 360; lon += 30) {
+      ink.path(
+        (t) => onShell(lon * DEG, (-34 + 116 * t) * DEG),
+        96,
+        lon % 90 === 0 ? 0.62 : 0.4,
+        PAPER,
+        GRID_GAIN
+      )
+    }
+    // the northern degree circle: every tenth division takes the longer cut,
+    // the way a plate is graduated
+    for (let deg = 0; deg < 360; deg += 2) {
+      const major = deg % 10 === 0
+      ink.path(
+        (t) => onShell(deg * DEG, (60 + (t - 0.5) * (major ? 1.15 : 0.5)) * DEG),
+        1,
+        major ? 0.76 : 0.44,
+        PAPER,
+        GRID_GAIN,
+        0.001
+      )
+    }
+    // and one real great circle at the earth's 23.44 degree obliquity,
+    // graduated every degree. It is gilded because it is a measuring edge.
+    const ECL_GAIN = 0.022
+    const obliquity = 23.44 * DEG
+    const onEcliptic = (azimuth: number, off = 0): Vector3 =>
+      onShell(azimuth, off).applyAxisAngle(new Vector3(0, 0, 1), obliquity)
+    ink.path((t) => onEcliptic(t * TAU), 256, 0.72, GOLD, ECL_GAIN, 0.0014)
+    for (let deg = 0; deg < 360; deg++) {
+      const major = deg % 10 === 0
+      const medium = deg % 5 === 0
+      const height = (major ? 1.5 : medium ? 0.9 : 0.36) * DEG
+      ink.path(
+        (t) => onEcliptic(deg * DEG, (t - 0.5) * height),
+        1,
+        major ? 0.88 : medium ? 0.66 : 0.4,
+        GOLD,
+        ECL_GAIN,
+        0.001
+      )
+    }
+    const plate = new Mesh(ink.geometry(), inkMaterial(uReveal, reserve))
+    plate.renderOrder = -7
+    plate.frustumCulled = false
+    group.add(plate)
   }
-  for (let lon = 0; lon < 360; lon += 30) {
-    ink.path(
-      (t) => onShell(lon * DEG, (-34 + 116 * t) * DEG),
-      96,
-      lon % 90 === 0 ? 0.62 : 0.4,
-      PAPER,
-      GRID_GAIN
-    )
-  }
-  // the northern degree circle: every tenth division takes the longer cut,
-  // the way a plate is graduated
-  for (let deg = 0; deg < 360; deg += 2) {
-    const major = deg % 10 === 0
-    ink.path(
-      (t) => onShell(deg * DEG, (60 + (t - 0.5) * (major ? 1.15 : 0.5)) * DEG),
-      1,
-      major ? 0.76 : 0.44,
-      PAPER,
-      GRID_GAIN,
-      0.001
-    )
-  }
-  // and one real great circle at the earth's 23.44 degree obliquity,
-  // graduated every degree. It is gilded because it is a measuring edge.
-  const ECL_GAIN = 0.022
-  const obliquity = 23.44 * DEG
-  const onEcliptic = (azimuth: number, off = 0): Vector3 =>
-    onShell(azimuth, off).applyAxisAngle(new Vector3(0, 0, 1), obliquity)
-  ink.path((t) => onEcliptic(t * TAU), 256, 0.72, GOLD, ECL_GAIN, 0.0014)
-  for (let deg = 0; deg < 360; deg++) {
-    const major = deg % 10 === 0
-    const medium = deg % 5 === 0
-    const height = (major ? 1.5 : medium ? 0.9 : 0.36) * DEG
-    ink.path(
-      (t) => onEcliptic(deg * DEG, (t - 0.5) * height),
-      1,
-      major ? 0.88 : medium ? 0.66 : 0.4,
-      GOLD,
-      ECL_GAIN,
-      0.001
-    )
-  }
-  const plate = new Mesh(ink.geometry(), inkMaterial(uReveal, reserve))
-  plate.renderOrder = -7
-  plate.frustumCulled = false
-  group.add(plate)
 
   return {
     group,
@@ -1875,7 +1899,7 @@ export function createAtlas(scene: Scene): AtlasHandles {
       }
       // a neighbour keeps the ghost of its own figure at the frame edge:
       // enough to say the sky goes on around you, far too little to read
-      p.lineU.value = near * (0.045 + 0.955 * p.focus) * reveal * 0.78
+      p.lineU.value = near * (0.045 + 0.955 * p.focus) * reveal * HAIR_LIFT
       p.drawU.value = draw
       // the engraving belongs to the house you are looking at: a neighbour
       // keeps a whisper of it, so the sky reads as one drawn plate
