@@ -23,6 +23,7 @@
 
 import {
   AdditiveBlending,
+  BackSide,
   BufferGeometry,
   CanvasTexture,
   Color,
@@ -34,6 +35,7 @@ import {
   MeshBasicNodeMaterial,
   PointsNodeMaterial,
   Scene,
+  SphereGeometry,
   Sprite,
   SpriteMaterial,
   Vector2,
@@ -44,12 +46,17 @@ import {
   abs,
   attribute,
   clamp,
+  dot,
   float,
+  fract,
   instancedBufferAttribute,
   length,
   max,
   mix,
   normalize,
+  positionLocal,
+  pow,
+  screenCoordinate,
   screenUV,
   sin,
   smoothstep,
@@ -58,6 +65,7 @@ import {
   vec2,
   vec3,
 } from 'three/tsl'
+import * as TSL from 'three/tsl'
 import { CONSTELLATIONS, type Constellation } from '../content/constellations'
 import { FOUNDING_SEED, mulberry32 } from '../core/seed'
 
@@ -66,6 +74,13 @@ import { FOUNDING_SEED, mulberry32 } from '../core/seed'
     firmament and the camp take, kept to this one alias. */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type N = any
+/* the MaterialX noises are not in the generated overload set; the eclipse
+   and the camp reach them the same way */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const mxNoise: (v: N) => N = (TSL as any).mx_noise_float
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const mxFractal: (v: N, o: number, l: number, d: number, a: number) => N = (TSL as any)
+  .mx_fractal_noise_float
 
 // ------------------------------------------------------------- the palette
 /* Gold is a name (law 1). Three golds carry the whole hierarchy: the pale
@@ -79,6 +94,10 @@ const LINE_GOLD = new Color('#caa45d')
 const CHOIR_COOL = new Color('#b4c8ff')
 const CHOIR_ICE = new Color('#d2ebff')
 const CHOIR_DUST = new Color('#93a8d8')
+
+/** how much light the river is allowed to add to a sky that already has
+    one. The lobby's own dome stays the sky; this is the star cloud on it. */
+const RIVER_GAIN = 0.6
 
 const RADIUS = 46
 /** patch scale on a wide stage; narrow stages compress via aspect */
@@ -990,6 +1009,198 @@ function figureEngraving(c: Constellation, reserve: Reserve): Engraving {
   return { mesh, presence, draw }
 }
 
+// -------------------------------------------------------------- the plate
+/* THE SKY IS A PLATE. Three registers hang on the same shell as the houses,
+   so a chapter change sweeps all of them past you (law 3):
+
+   THE RIVER — the Milky Way, on the same great circle the choir's dust
+   already follows. It is drawn as light that is ADDED to the night, never
+   as a wash laid over it: the lobby owns its own sky and its own horizon,
+   and this shell may only put stars into it. Its grain runs WITH the
+   circle, because isotropic noise across a band is weather, not star
+   clouds; its two banks are unequal; and the dark rift is simply the lane
+   where no light is added, which is what dust actually does.
+
+   THE GRATICULE — declination parallels and their meridians, plus the
+   degree circle in the north. Hairlines: the instrument register.
+
+   THE ECLIPTIC — one real great circle at the earth's 23.44° obliquity,
+   graduated every degree, gilded because it is a measuring edge. */
+
+const SHELL = 150
+const BAND_AZ = 2.35
+const BAND_EL = 0.24
+const DEG = Math.PI / 180
+
+const LAPIS = new Color('#182350')
+const ASH = new Color('#8d93ad')
+
+/** a ribbon laid on the shell. The cross coordinate lets the fragment
+    soften a hairline inside geometry wide enough to sample reliably. */
+class ShellInk {
+  private pos: number[] = []
+  private across: number[] = []
+  private strength: number[] = []
+  private idx: number[] = []
+
+  path(
+    sample: (t: number) => Vector3,
+    segments: number,
+    weight: number,
+    halfWidth = 0.0012
+  ): void {
+    const base = this.pos.length / 3
+    for (let i = 0; i <= segments; i++) {
+      const t = i / segments
+      const d = sample(t).normalize()
+      const before = sample(Math.max(0, t - 0.0001))
+      const after = sample(Math.min(1, t + 0.0001))
+      const tangent = after.sub(before).normalize()
+      const side = new Vector3().crossVectors(d, tangent).normalize()
+      for (const sign of [-1, 1]) {
+        const q = d
+          .clone()
+          .addScaledVector(side, halfWidth * sign)
+          .normalize()
+          .multiplyScalar(SHELL - 2)
+        this.pos.push(q.x, q.y, q.z)
+        this.across.push(sign)
+        this.strength.push(weight)
+      }
+      if (i < segments) {
+        const v = base + i * 2
+        this.idx.push(v, v + 1, v + 2, v + 1, v + 3, v + 2)
+      }
+    }
+  }
+
+  geometry(): BufferGeometry {
+    const g = new BufferGeometry()
+    g.setAttribute('position', new Float32BufferAttribute(this.pos, 3))
+    g.setAttribute('aCross', new Float32BufferAttribute(this.across, 1))
+    g.setAttribute('aStrength', new Float32BufferAttribute(this.strength, 1))
+    g.setIndex(this.idx)
+    g.computeBoundingSphere()
+    return g
+  }
+}
+
+function onShell(azimuth: number, elevation: number): Vector3 {
+  return new Vector3(
+    Math.sin(azimuth) * Math.cos(elevation),
+    Math.sin(elevation),
+    -Math.cos(azimuth) * Math.cos(elevation)
+  )
+}
+
+function inkMaterial(tint: Color, uReveal: N, gain: number, reserve: Reserve): MeshBasicNodeMaterial {
+  const mat = new MeshBasicNodeMaterial({
+    transparent: true,
+    depthWrite: false,
+    side: DoubleSide,
+    blending: AdditiveBlending,
+  })
+  mat.forceSinglePass = true
+  const a: N = abs(attribute('aCross', 'float') as N)
+  const core = smoothstep(0.7, 0.04, a)
+  const skirt = smoothstep(1, 0.14, a).mul(0.16)
+  mat.colorNode = vec3(tint.r, tint.g, tint.b)
+  mat.opacityNode = core
+    .add(skirt)
+    .mul(attribute('aStrength', 'float') as N)
+    .mul(uReveal)
+    .mul(gain)
+    .mul(reserve.node)
+  return mat
+}
+
+interface Plate {
+  group: Group
+  update(reveal: number): void
+}
+
+function createPlate(reserve: Reserve): Plate {
+  const group = new Group()
+  const uReveal: N = uniform(0)
+
+  // ------------------------------------------------------------ the river
+  const riverMat = new MeshBasicNodeMaterial({
+    side: BackSide,
+    transparent: true,
+    depthWrite: false,
+    blending: AdditiveBlending,
+  })
+  {
+    const d: N = normalize(positionLocal)
+    const bn = new Vector3(
+      Math.cos(BAND_AZ) * Math.cos(BAND_EL),
+      Math.sin(BAND_EL),
+      Math.sin(BAND_AZ) * Math.cos(BAND_EL)
+    )
+    const bu = new Vector3().crossVectors(bn, new Vector3(0, 1, 0)).normalize()
+    const bv = new Vector3().crossVectors(bn, bu).normalize()
+    const plane = dot(d, vec3(bn.x, bn.y, bn.z))
+    const alongU = dot(d, vec3(bu.x, bu.y, bu.z))
+    const alongV = dot(d, vec3(bv.x, bv.y, bv.z))
+
+    const fold = mxNoise(vec3(alongU.mul(3.2), alongV.mul(3.2), plane.mul(7)).add(3.7))
+    const offset = plane.add(fold.mul(0.032))
+    const envelope = pow(clamp(float(1).sub(abs(offset).div(0.25)), 0, 1), 1.5)
+
+    // the grain runs WITH the circle: compressing the cross-river axis is
+    // what turns low-frequency noise into torn filaments instead of weather
+    const flow = vec3(alongU.mul(12), alongV.mul(12), offset.mul(62))
+    const cloud = clamp(mxFractal(flow, 3, 2, 0.54, 1).mul(0.82).add(0.48), 0, 1)
+    const threads = clamp(
+      mxNoise(
+        vec3(alongU.mul(37).add(cloud.mul(1.3)), alongV.mul(37), offset.mul(204).add(cloud.mul(1.8)))
+      )
+        .mul(0.5)
+        .add(0.5),
+      0,
+      1
+    )
+    const detail = smoothstep(0.3, 0.72, threads)
+    const cloudLight = pow(cloud, 1.2).mul(0.88).add(detail.mul(0.35)).add(0.12)
+
+    // unequal banks keep the dark lane off the optical middle
+    const wideBank = pow(clamp(float(1).sub(abs(offset.add(0.053)).div(0.132)), 0, 1), 1.3)
+    const thinBank = pow(clamp(float(1).sub(abs(offset.sub(0.052)).div(0.083)), 0, 1), 1.5)
+    const banks = wideBank.mul(0.83).add(thinBank.mul(0.58))
+    const light = banks.mul(cloudLight).mul(0.89).add(envelope.mul(0.085))
+    const ragged = offset.add(0.009).add(fold.mul(0.013)).add(cloud.sub(0.5).mul(0.012))
+    const rift = smoothstep(0.039, 0.004, abs(ragged)).mul(envelope).mul(cloud.mul(0.24).add(0.69))
+
+    // the river dies into the horizon: the lobby's own colonnade and its
+    // warm band own the bottom of this frame, and nothing here may lift it
+    const air = smoothstep(-0.04, 0.34, d.y)
+    let col: N = vec3(LAPIS.r, LAPIS.g, LAPIS.b).mul(light).mul(RIVER_GAIN)
+    col = col.add(vec3(ASH.r, ASH.g, ASH.b).mul(light).mul(detail.mul(0.6).add(0.4)).mul(0.016))
+    col = col.mul(float(1).sub(rift))
+    // stable screen grain dithers the deep-blue ramp where sRGB's steps are
+    // widest, and stays still under reduced motion
+    const grain = fract(
+      sin(dot(screenCoordinate.xy.add(0.5), vec2(12.9898, 78.233))).mul(43758.5453)
+    )
+      .sub(0.5)
+      .mul(0.0011)
+    riverMat.colorNode = clamp(col.mul(air).add(grain.mul(air)), 0, 1)
+    riverMat.opacityNode = uReveal
+  }
+  const river = new Mesh(new SphereGeometry(SHELL, narrow ? 36 : 48, narrow ? 24 : 32), riverMat)
+  river.renderOrder = -9
+  river.frustumCulled = false
+  group.add(river)
+
+  return {
+    group,
+    update(reveal) {
+      uReveal.value = Math.max(0, Math.min(1, reveal))
+      group.visible = reveal > 0.001
+    },
+  }
+}
+
 // ------------------------------------------------------------ the choir
 /* THE CHOIR — the anonymous sky the six houses hang in. One instanced
    field, one draw call, hung on the same dome as the houses so a turn
@@ -1259,6 +1470,8 @@ export function createAtlas(scene: Scene): AtlasHandles {
   scene.add(dome)
   const rand = mulberry32(FOUNDING_SEED)
   const reserve = createLetteringReserve()
+  const plate = createPlate(reserve)
+  dome.add(plate.group)
 
   const starMap = starTexture()
 
@@ -1464,6 +1677,7 @@ export function createAtlas(scene: Scene): AtlasHandles {
     }
     choir.uT.value = reducedMotion ? 0 : elapsed
     choir.uMaster.value = reveal * 0.9
+    plate.update(reveal)
     for (const m of wanderMats) m.opacity = reveal * 0.62
 
     // narrow stages compress every patch so the widest shape still fits
