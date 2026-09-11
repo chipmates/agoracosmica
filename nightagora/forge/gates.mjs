@@ -35,7 +35,7 @@
 import { chromium } from 'playwright'
 import { spawn } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
-import { join, resolve } from 'node:path'
+import { basename, join, resolve } from 'node:path'
 import {
   APP_ROOT,
   assertAdapter,
@@ -63,12 +63,22 @@ const CONE_DIR = 'gates-cones'
 
 /* THE SEALED SPEC, when this checkout is a round's app. It names the wing,
    and the cone corners the judge's packet is owed per station; a checkout
-   with no round above it falls back to the default cone at every station. */
+   with no round above it falls back to the default cone at every station.
+
+   The folder above the app is a round only when the spec says it is: on a
+   plain checkout that folder is the repository itself, and a file dropped
+   there must never be able to decide what a gate run measures. */
 function sealedSpec() {
-  const path = resolve(APP_ROOT, '..', 'spec.json')
+  const here = resolve(APP_ROOT, '..')
+  const path = join(here, 'spec.json')
   if (!existsSync(path)) return null
   try {
-    return JSON.parse(readFileSync(path, 'utf8'))
+    const spec = JSON.parse(readFileSync(path, 'utf8'))
+    if (spec?.round !== basename(here)) {
+      process.stderr.write(`ignoring ${path}: it names round ${String(spec?.round)}, this app stands in ${basename(here)}\n`)
+      return null
+    }
+    return spec
   } catch {
     return null
   }

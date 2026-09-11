@@ -292,8 +292,9 @@ function boxStats(raw) {
 }
 
 function intrusionScan(rows) {
-  if (!rows.length) return { opened: 0, frames: 0, intrusions: [], clear: null, closest: null, notes: ['no frames'] }
+  if (!rows.length) return { opened: 0, frames: 0, intrusions: [], clear: null, closest: null, notes: [], faults: ['no frames'] }
   const notes = []
+  const faults = []
   /* the clear colour is measured, not assumed: the recorder catches the
      page before the app has drawn anything, and that plate is flat */
   const first = rows[0]
@@ -302,7 +303,8 @@ function intrusionScan(rows) {
   // the window opens when the world is standing; what came before is the
   // app's own opening (the intro card, the module in flight), not the walk
   const opened = rows.findIndex((r) => r.energy >= OPEN_ENERGY)
-  if (opened < 0) return { opened: 0, frames: 0, intrusions: [], clear, closest: null, notes: [...notes, 'the world never drew: no frame carries structure'] }
+  if (opened < 0)
+    return { opened: 0, frames: 0, intrusions: [], clear, closest: null, notes, faults: ['the world never drew: no frame carries structure'] }
   if (opened > rows.length * OPEN_SHARE)
     notes.push(`the world first drew at ${frameName(rows[opened].n)}, ${Math.round((100 * opened) / rows.length)} percent into the recording`)
   const window = rows.slice(opened)
@@ -347,11 +349,12 @@ function intrusionScan(rows) {
       energy: +near.energy.toFixed(2),
     },
     notes,
+    faults,
   }
 }
 
 let oscillation = { frames: 0, flagged: 0, clusters: [] }
-let intrusion = { opened: 0, frames: 0, intrusions: [], clear: null, closest: null, notes: [] }
+let intrusion = { opened: 0, frames: 0, intrusions: [], clear: null, closest: null, notes: [], faults: [] }
 if (videos.length) {
   const video = join(OUT, videos[0])
   oscillation = oscillationScan(await grid(video, '', GRID))
@@ -367,7 +370,8 @@ if (videos.length) {
   out(`[motion] oscillation: ${oscillation.flagged} flagged, ${oscillation.clusters.length} cluster(s)`)
 }
 
-for (const n of intrusion.notes) flags.push(n)
+for (const n of intrusion.notes) warnings.push(n)
+for (const n of intrusion.faults ?? []) flags.push(n)
 for (const c of intrusion.intrusions)
   flags.push(`INTRUSION ${c.from} to ${c.to} (${c.frames} frames): ${c.why}, worst ${c.worst.frame} sd ${c.worst.sd} energy ${c.worst.energy}`)
 for (const c of oscillation.clusters)
