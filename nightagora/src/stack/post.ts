@@ -97,6 +97,43 @@ function grainNode(colour: N, amount: N, seed: N): N {
   return colour.add(vec3(r, r, r).mul(amount))
 }
 
+/* THE FILM'S OWN SWITCH, and why it lives here.
+
+   The flicker gate reads temporal stability per pixel over consecutive
+   frames, and this chain reseeds the grain on every one of them by design:
+   without a way to hold the film still, every pixel of every frame moves
+   and the instrument measures its own tooth. `__forge.grain(false)` stops
+   the reseed by taking the dial to zero, `__forge.grain(true)` gives it
+   back, and the gate reports both readings.
+
+   It is installed from this module rather than beside the other forge
+   hooks because the entry point assigns `window.__forge` as one whole
+   object, at a moment the chain cannot depend on: the property below
+   carries the switch onto whatever object lands there, before or after,
+   and onto a chain rebuilt by a tier switch. */
+let filmOff = false
+let switchInstalled = false
+
+function installGrainSwitch(): void {
+  if (switchInstalled || typeof window === 'undefined') return
+  switchInstalled = true
+  const w = window as unknown as Record<string, unknown>
+  const grain = (on: boolean): boolean => {
+    filmOff = on === false
+    return !filmOff
+  }
+  let held = w['__forge'] as Record<string, unknown> | undefined
+  if (held) held['grain'] = grain
+  Object.defineProperty(w, '__forge', {
+    configurable: true,
+    get: () => held,
+    set: (next: unknown) => {
+      held = next as Record<string, unknown> | undefined
+      if (held) held['grain'] = grain
+    },
+  })
+}
+
 export interface PostChain {
   post: PostProcessing
   /** re-aim the chain at another scene's look; the shader is not rebuilt */
@@ -186,6 +223,7 @@ export function createPost(
   tier: Tier,
   asked: Grade | null | undefined
 ): PostChain {
+  installGrainSwitch()
   const first = asked ?? IDENTITY
   const d = dialsOf(first)
   const target = dialsOf(first)
@@ -354,7 +392,8 @@ export function createPost(
     u.cool.value.set(...d.cool)
     u.split.value = d.split
     u.vignette.value = d.vignette
-    u.grain.value = d.grain
+    // the film is the one dial an instrument may hold still (see the switch)
+    u.grain.value = filmOff ? 0 : d.grain
     u.aoIntensity.value = d.aoIntensity
     u.bloomWarmth.value = d.bloomWarmth
     u.dofFocus.value = d.dofFocus
