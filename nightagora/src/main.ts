@@ -240,6 +240,14 @@ for (const s of atlas.stars) {
     'color-mix(in srgb, var(--na-mist) 22%, transparent),' +
     'color-mix(in srgb, var(--na-gold) 44%, transparent))'
   b.appendChild(leaderEl)
+  /* and the marker the leader leaves ON the name: a small open ring, the
+     atlas register's own way of saying this word is an entry */
+  const markEl = document.createElement('span')
+  markEl.setAttribute('aria-hidden', 'true')
+  markEl.style.cssText =
+    'position:absolute;top:13px;right:2px;width:3px;height:3px;border-radius:50%;' +
+    'border:1px solid color-mix(in srgb, var(--na-mist) 52%, transparent);pointer-events:none'
+  b.appendChild(markEl)
   // the name of a person who lived is documented; the star it hangs on is
   // this night's own invention, which is why the anchor is procedural
   b.dataset['naClaim'] = 'documented'
