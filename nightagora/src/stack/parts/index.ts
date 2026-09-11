@@ -29,7 +29,7 @@
      the same roof from further away, never a flat one. */
 
 import type { Stack } from '../index'
-import { Bench, catenary, type Part } from './common'
+import { Bench, catenary, flatten, type Part } from './common'
 import {
   cutInto as cutIntoWall,
   doorPart,
@@ -135,6 +135,9 @@ export interface PartsKit {
   shrub: (o: TreeOptions) => Part
   /** instanced blades over a patch, one draw */
   grass: (o: GrassOptions) => Part
+  /** collapse a built body to one mesh per material, baking its transforms.
+      A station of twenty windows is eight draws instead of eighty. */
+  flatten: (body: Part) => Part
   /** WAIT FOR THE SETS BEFORE BUILDING, and a wing with a big station should.
       A part built while its library is in flight compiles its surfaces twice:
       once as the surface was authored and once with the photograph on it. On
@@ -173,6 +176,7 @@ export function createParts(stack: Stack): PartsKit {
     tree: (o) => treePart(bench, o),
     shrub: (o) => shrubPart(bench, o),
     grass: (o) => grassPart(bench, o),
+    flatten: (part) => flatten(part) as Part,
     ready: async (...sets) => {
       await Promise.all(
         sets.map((name) => stack.materials.load(name).catch(() => undefined))

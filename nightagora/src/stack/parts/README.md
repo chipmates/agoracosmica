@@ -118,6 +118,13 @@ const wider = parts.cutInto(wall, { x: 4.4, base: 5.05, width: 1.15, height: 1.7
 wall for the old one in its parent. `wall.frames` lists where every opening
 ended up, for a wing that fills them itself (`fill: 'none'`).
 
+**A finished wall is welded to one body per material** (`weld: false` keeps the
+pieces separate). Eleven draw calls instead of thirty-one for the wall above,
+and a facade of twenty windows is not a hundred and twenty. `parts.flatten(body)`
+does the same to anything else. The price is that the transforms are baked, so
+a shutter welded this way can no longer be swung afterwards; every angle in
+this kit is a build-time option, so for a wall that is no loss.
+
 ---
 
 ## Roofing
@@ -260,3 +267,9 @@ against whatever is behind them.
 - Every geometry the kit makes carries a **uv measured in metres of its own
   surface**, not a 0..1 box. A brick set read through a box's own 0..1 uv puts
   one tile on a jamb and one tile on a twelve metre wall.
+- **`await parts.ready('slate-roof', 'stone-tuffeau', ...)` before a big
+  station.** A part built while its library is in flight compiles each of its
+  surfaces twice: once as the surface was authored and once with the
+  photograph on it. On WebGPU that is nothing. On the WebGL2 fallback a roof
+  of four heavy sets can spend a minute of main thread on the second pass.
+  Preloaded, each surface compiles once.

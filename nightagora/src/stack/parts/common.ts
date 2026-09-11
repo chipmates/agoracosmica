@@ -232,6 +232,50 @@ export function weld(pieces: BufferGeometry[]): BufferGeometry {
   return merged
 }
 
+/**
+ * COLLAPSE A BUILT BODY TO ONE MESH PER MATERIAL.
+ *
+ * A wall with five windows and a door in it is thirty-one draw calls, and a
+ * facade of twenty windows would be a hundred and twenty against a standard
+ * tier that may spend a hundred and fifty on the whole frame. Nothing about
+ * them needs to be separate: they share four materials between them.
+ *
+ * The price is that the transforms are baked, so a shutter or a leaf welded
+ * this way can no longer be swung afterwards. Every angle in this kit is a
+ * build-time option, so for a wall that is no loss; for a machine whose
+ * joints move it is, which is why this is a call and not a rule. Instanced
+ * meshes (slates, blades, pales, leaves) are left exactly where they are:
+ * they are already one draw each.
+ */
+export function flatten(root: Object3D): Object3D {
+  root.updateMatrixWorld(true)
+  const inv = new Matrix4().copy(root.matrixWorld).invert()
+  const byMaterial = new Map<Material, BufferGeometry[]>()
+  const order: Material[] = []
+  const doomed: Mesh[] = []
+  root.traverse((child: Object3D) => {
+    const mesh = child as Mesh & { isInstancedMesh?: boolean }
+    if (!mesh.isMesh || mesh.isInstancedMesh || Array.isArray(mesh.material)) return
+    const geometry = (mesh.geometry as BufferGeometry).clone()
+    geometry.applyMatrix4(new Matrix4().multiplyMatrices(inv, mesh.matrixWorld))
+    const material = mesh.material as Material
+    const held = byMaterial.get(material)
+    if (held) held.push(geometry)
+    else {
+      byMaterial.set(material, [geometry])
+      order.push(material)
+    }
+    doomed.push(mesh)
+  })
+  for (const mesh of doomed) mesh.removeFromParent()
+  for (const material of order) {
+    const list = byMaterial.get(material)
+    if (!list?.length) continue
+    root.add(body(weld(list), material, `${material.name || 'welded'} x${list.length}`))
+  }
+  return root
+}
+
 /* ── the surfaces ──────────────────────────────────────────────────────── */
 
 /** where a part reads its maps from */

@@ -42,6 +42,7 @@ import {
   between,
   body,
   chamfered,
+  flatten,
   hand,
   metreBox,
   metreCylinder,
@@ -574,7 +575,15 @@ function insidePolygon(p: Vector2, poly: Vector2[]): boolean {
  * the whole read: without it a window is a dark rectangle, and with it the
  * eye sees glass before it can name why.
  */
+const glazings = new Map<string, MeshStandardNodeMaterial>()
+
 function glassMaterial(quarry: number, leaded: boolean, height: number): MeshStandardNodeMaterial {
+  /* one material for every light of the same size and lead: a facade of five
+     equal windows is one glazing, not five, and the whole point of welding a
+     wall is lost if each of its openings brings its own shader */
+  const key = `${quarry}|${leaded ? 'q' : 'p'}|${Math.round(height * 20)}`
+  const held = glazings.get(key)
+  if (held) return held
   const material = new MeshStandardNodeMaterial({
     color: 0x0a0f14,
     roughness: 0.09,
@@ -602,6 +611,7 @@ function glassMaterial(quarry: number, leaded: boolean, height: number): MeshSta
     clamp(uv().y.div(Math.max(0.4, height)), 0, 1)
   )
   material.roughnessNode = float(0.07).add(mx_noise_float(id.mul(3)).mul(0.03))
+  glazings.set(key, material)
   return material
 }
 
@@ -781,6 +791,11 @@ export interface WallOptions {
   openings?: WallOpening[]
   /** a chamfered plinth course at the foot; 0 for none */
   plinth?: number
+  /** collapse the finished wall to one body per material. On by default: a
+      wall is a static thing and thirty-one draw calls for one of them is a
+      fifth of a tier's whole budget. `false` keeps every piece separate for
+      a wing that means to move one. */
+  weld?: boolean
   seed?: number
   lod?: 1 | 2 | 3
 }
@@ -888,6 +903,7 @@ export function wallPart(bench: Bench, o: WallOptions): Wall {
     used.push(...made.userData.part.sets)
   }
 
+  if (o.weld !== false) flatten(group)
   const wall = seal(group, 'wall', `${L} m of wall, ${cuts.length} opening(s) cut`, used) as Wall
   wall.plan = o
   wall.frames = frames
