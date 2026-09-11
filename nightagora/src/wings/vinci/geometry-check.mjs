@@ -27,7 +27,8 @@ const report = {
     'The water reflector returns an inert TSL node; the actual water geometry and reflector-plane transform still execute.',
     'Rail sampling uses the actual clock-driven implementation at 240 Hz; exact capsule/ray checks cover its sampled chords, not a formal continuous-curve proof.',
     'Terrain clearance is measured vertically at every unique camera sample against actual ground/water triangles and the live gradeAt function.',
-    'Shell clearance excludes trees, DOM plates and the camera frustum; it tests the camera centre against the actual shell.',
+    'Shell clearance tests camera-centre capsules against the actual foundation-bearing shell, gate passage, inner-court dressing, entire modern collection, actual entry enclosure, vegetation, road/ground dressing and both complete historic/modern retaining-wall/stair-riser batches. DOM plates and the camera frustum remain excluded from this sampled centre check; the separate saved authority supplies the full continuous near-envelope proof.',
+    'Inner-court structural risers are part of the shared ground retaining batch; both retaining batches are included without selecting or reconstructing alternate triangles. Horizontal ground, water and all collection surfaces receive the existing vertical sample tests, so a route under a pavilion roof cannot silently count as an outdoor route.',
   ],
   terrain: {}, footprint: {}, sun: {}, geometry: [], rail: {}, sources: [], errors, notes,
 };
@@ -93,16 +94,24 @@ async function load(filename) {
       warn: (...values) => notes.push(values.join(' ')),
       error: (...values) => fail('module-console-error', values.join(' ')),
     },
-    performance,
+    // Three factories and wing factories share one typed-array realm in the browser.
+    Float32Array, performance, crypto: globalThis.crypto, TextEncoder: globalThis.TextEncoder,
   }, { timeout: 10000 });
   return exported;
 }
 
-let site, groundModule, shellModule, vegetationModule, waterModule, railModule;
+let site, groundModule, shellModule, gatePassageModule, innerCourtModule, collectionModule, collectionAccessModule, entryPassageModule, roadDressingModule, groundDressingModule, vegetationModule, waterModule, railModule;
 await section('load actual modules', async () => {
   site = await load(`${WING}/site.ts`);
   groundModule = await load(`${WING}/ground.ts`);
   shellModule = await load(`${WING}/shell.ts`);
+  gatePassageModule = await load(`${WING}/gate-passage.ts`);
+  innerCourtModule = await load(`${WING}/inner-court.ts`);
+  collectionModule = await load(`${WING}/collection.ts`);
+  collectionAccessModule = await load(`${WING}/collection-access.ts`);
+  entryPassageModule = await load(`${WING}/entry-passage.ts`);
+  roadDressingModule = await load(`${WING}/road-dressing.ts`);
+  groundDressingModule = await load(`${WING}/ground-dressing.ts`);
   vegetationModule = await load(`${WING}/vegetation.ts`);
   waterModule = await load(`${WING}/water.ts`);
   railModule = await load(`${WING}/rail.ts`);
@@ -292,19 +301,26 @@ await section('actual geometry buffers at all tiers', () => {
   for (const tier of ['hero', 'standard', 'calm']) {
     const shell = shellModule.createShell(tier);
     const ground = groundModule.createGround(tier);
+    const gatePassage = gatePassageModule.createGatePassage(tier);
+    const innerCourt = innerCourtModule.createInnerCourtDressing(gradeModule.gradeAt, tier);
+    const collection = collectionModule.createCollection();
+    const collectionAccess = collectionAccessModule.createCollectionAccess();
+    const entryPassage = entryPassageModule.createEntryPassage(tier);
     const vegetation = vegetationModule.createVegetation(gradeModule.gradeAt, tier);
+    const roadDressing = roadDressingModule.createRoadDressing(gradeModule.gradeAt, tier);
+    const groundDressing = groundDressingModule.createGroundDressing(gradeModule.gradeAt, tier);
     const water = waterModule.createWater(new THREE.Scene(), {
       tierName: () => tier,
       reflector: () => ({ node: TSL.vec4(0, 0, 0, 1), dispose() {} }),
     });
-    for (const [name, group] of [['shell', shell], ['ground', ground], ['vegetation', vegetation], ['water', water]]) validateGeometry(name, tier, group);
-    if (tier === 'standard' || tier === 'calm') collisionSets.set(tier, { shell, ground, water });
-    else { dispose(shell); dispose(ground); water.dispose(); }
-    dispose(vegetation);
+    for (const [name, group] of [['shell', shell], ['ground', ground], ['gate-passage', gatePassage], ['inner-court', innerCourt], ['collection', collection], ['collection-access', collectionAccess], ['entry-passage', entryPassage], ['vegetation', vegetation], ['road-dressing', roadDressing], ['ground-dressing', groundDressing], ['water', water]]) validateGeometry(name, tier, group);
+    if (tier === 'standard' || tier === 'calm') collisionSets.set(tier, { shell, ground, gatePassage, innerCourt, collection, collectionAccess, entryPassage, vegetation, roadDressing, groundDressing, water });
+    else { dispose(shell); dispose(ground); dispose(gatePassage); dispose(innerCourt); dispose(collection); dispose(collectionAccess); dispose(entryPassage); dispose(vegetation); dispose(roadDressing); dispose(groundDressing); water.dispose(); }
   }
 });
 
-await section('actual camera rail against actual triangles', () => {
+await section('actual camera rail against actual triangles', async () => {
+  const { createRailGeometryAuthority, collectRailSolids } = await load(`${WING}/rail-proof.ts`);
   const ids = json('src/wings/vinci/data/doors.json').doors.map(door => door.station);
   if (ids.length !== 19 || new Set(ids).size !== 19) throw new Error('Expected nineteen unique canonical station IDs.');
   const paths = [], poses = [], violations = [], collisionGeometry = [], MAX_VIOLATIONS = 80;
@@ -316,13 +332,33 @@ await section('actual camera rail against actual triangles', () => {
     const viewport = narrow ? 'mobile' : 'desktop';
     const tier = narrow ? 'calm' : 'standard', geometry = collisionSets.get(tier);
     if (!geometry) throw new Error(`${tier} geometry was not constructed.`);
-    geometry.shell.traverse(object => { if (object.isMesh) for (const material of Array.isArray(object.material) ? object.material : [object.material]) material.side = THREE.DoubleSide; });
-    const shellIndex = makeIndex(trianglesOf([geometry.shell]), 3, 1);
-    const groundIndex = makeIndex(trianglesOf([geometry.ground, geometry.water], true), 2, 4);
-    collisionGeometry.push({ viewport, tier, shellTriangles: shellIndex.data.count, groundAndWaterTriangles: groundIndex.data.count });
-    const camera = new THREE.PerspectiveCamera();
+    const retaining = geometry.ground.getObjectByName('wing-vinci/retaining');
+    if (!retaining?.isMesh) throw new Error('Actual ground factory is missing its retaining-wall/stair-riser collision batch.');
+    const collectionRetaining = geometry.ground.getObjectByName('wing-vinci/collectionRetaining');
+    if (!collectionRetaining?.isMesh) throw new Error('Actual ground factory is missing its modern collection retaining/cut-wall collision batch.');
+    const architecture = [geometry.shell, geometry.gatePassage, geometry.innerCourt, geometry.collection, geometry.collectionAccess, geometry.entryPassage, geometry.vegetation, geometry.roadDressing, geometry.groundDressing, retaining, collectionRetaining];
+    for (const group of architecture) group.traverse(object => { if (object.isMesh) for (const material of Array.isArray(object.material) ? object.material : [object.material]) material.side = THREE.DoubleSide; });
+    const shellIndex = makeIndex(trianglesOf(architecture), 3, 1);
+    const groundIndex = makeIndex(trianglesOf([geometry.ground, geometry.water, geometry.collection, geometry.collectionAccess, geometry.entryPassage], true), 2, 4);
+    const architectureMeshes = new Map();
+    for (const name of shellIndex.data.names) architectureMeshes.set(name, (architectureMeshes.get(name) ?? 0) + 1);
+    collisionGeometry.push({ viewport, tier, shellTriangles: shellIndex.data.count, groundAndWaterTriangles: groundIndex.data.count,
+      shellCollisionScope: 'Actual foundation-bearing shell, complete gate passage, inner-court dressing, entire collection, entry enclosure, vegetation, road/ground dressing and both historic/modern retaining-wall/stair-riser batches',
+      shellCollisionMeshes: [...architectureMeshes].map(([mesh, triangles]) => ({ mesh, triangles })),
+    });
+    const camera = new THREE.PerspectiveCamera(50, narrow ? 390 / 844 : 1280 / 720, .25, 1100);
+    // Exercise the same per-mesh provenance selector used by the mounted wing.
+    // The index preserves explicit child IDs and supplies these root fallbacks.
+    const collisionScene = new THREE.Group();
+    for (const [name, group] of [['shell', geometry.shell], ['gate-passage', geometry.gatePassage], ['inner-court', geometry.innerCourt], ['collection', geometry.collection], ['collection-access', geometry.collectionAccess], ['terrain', geometry.ground], ['water', geometry.water], ['entry-passage', geometry.entryPassage], ['vegetation', geometry.vegetation], ['road-dressing', geometry.roadDressing], ['ground-dressing', geometry.groundDressing]]) {
+      group.traverse(object => { if (object.isMesh && typeof object.userData.manifestId !== 'string') object.userData.manifestId = `vinci/${name}`; });
+      collisionScene.add(group);
+    }
+    const authority = createRailGeometryAuthority(collectRailSolids(collisionScene));
+    await authority.ready;
+    if (authority.status !== 'verified') throw new Error(authority.failure);
     let clock = 0;
-    const rail = railModule.createRail(camera, () => clock);
+    const rail = railModule.createRail(camera, () => clock, authority);
     rail.set(ids[0], railModule.stationPose(ids[0], narrow), true); rail.update();
     const adjacentItinerary = [...ids, ...ids.slice(0, -1).reverse()];
     // The scrolling rail permits direct station selection. These five IDs
@@ -385,12 +421,12 @@ await section('actual camera rail against actual triangles', () => {
     }
   }
   if (minimumGrade < TERRAIN_CLEARANCE - 1e-6 || minimumMesh < TERRAIN_CLEARANCE - 1e-6 || missingGround) fail('terrain-clearance', 'Camera samples do not all clear the live grade and rendered ground by 0.3 m.', { minimumGradeM: minimumGrade, minimumMeshM: minimumMesh, missingGround });
-  if (minimumShell < SHELL_CLEARANCE - 1e-6) fail('shell-clearance', 'A sampled path chord passes within 0.25 m of the actual DoubleSide shell.', { minimumM: minimumShell });
+  if (minimumShell < SHELL_CLEARANCE - 1e-6) fail('shell-clearance', 'A sampled path chord passes within 0.25 m of the actual DoubleSide shell, gate passage, inner court, collection or historic/modern retaining/stair geometry.', { minimumM: minimumShell });
   if (maxRoll > 1e-8 || maxQuaternionError > 1e-10 || maxAimError > 1e-6) fail('camera-orientation', 'YXZ roll, quaternion norm or final target direction exceeds tolerance.', { maxRoll, maxQuaternionError, maxAimError });
   report.rail = { stationIds: ids, viewportCount: 2, adjacentTransitions: 2 * 2 * (ids.length - 1), directPhysicalTransitions: 40, timeStepSeconds: STEP_SECONDS, transitionObservationSeconds: TRANSITION_SECONDS, shellThresholdM: SHELL_CLEARANCE, terrainThresholdM: TERRAIN_CLEARANCE, collisionGeometry, totalCameraSamples: totalSamples, distinctPositionSamples: uniquePositions, maximumSampleStepM: maxStepM, minimumGradeClearanceM: minimumGrade, minimumMeshClearanceM: Number.isFinite(minimumMesh) ? minimumMesh : null, shellClearanceLowerBoundM: minimumShell, intersectingSampleChords: intersectingChords, maximumYXZRollRadians: maxRoll, maximumQuaternionNormError: maxQuaternionError, maximumAimErrorRadians: maxAimError, missingGroundSamples: missingGround, violationCount, violationExamples: violations, violationExamplesCappedAt: MAX_VIOLATIONS, poses, paths };
 });
 
-for (const { shell, ground, water } of collisionSets.values()) { dispose(shell); dispose(ground); water.dispose(); }
+for (const { shell, ground, gatePassage, innerCourt, collection, collectionAccess, entryPassage, vegetation, roadDressing, groundDressing, water } of collisionSets.values()) { dispose(shell); dispose(ground); dispose(gatePassage); dispose(innerCourt); dispose(collection); dispose(collectionAccess); dispose(entryPassage); dispose(vegetation); dispose(roadDressing); dispose(groundDressing); water.dispose(); }
 report.checkerSha256 = sha(read(`${WING}/geometry-check.mjs`));
 for (const [filename, record] of loaded) {
   const unchangedDuringAudit = sha(fs.readFileSync(filename)) === record.sha256;

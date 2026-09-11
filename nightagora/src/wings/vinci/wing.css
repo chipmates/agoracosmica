@@ -1,5 +1,5 @@
 #wing[data-wing='vinci'] { --wing-rail-bottom:160px; }
-#wing[data-wing='vinci'] .wing-stage { padding:0; touch-action:none; pointer-events:auto; }
+#wing[data-wing='vinci'] .wing-stage { padding:0; touch-action:none; pointer-events:auto; user-select:none; -webkit-user-select:none; }
 #wing[data-wing='vinci'] .wing-labels { pointer-events:none; }
 #wing[data-wing='vinci'] .wing-labels > button,#wing[data-wing='vinci'] .vinci-dock { pointer-events:auto; }
 /* the scrim has to end BELOW the last line: at padding 0 its edge cut the
@@ -46,7 +46,7 @@
 .vinci-dock:focus-visible,.vinci-source:focus-visible,.vinci-dot:focus-visible {outline:1px solid #edcc8c;outline-offset:3px; }
 @media(max-aspect-ratio:9/10) {
   #wing[data-wing='vinci'] { --wing-rail-bottom:190px; }
-  .vinci-heading {left:22px;right:22px;top:116px;max-width:none; }
+  .vinci-heading {left:22px;right:22px;top:84px;max-width:none; }
   .vinci-title {font-size:27px;max-width:335px; }
   .vinci-kicker {font-size:9px;letter-spacing:.19em; }
   .vinci-source {right:15px;top:55px;min-width:105px; }
@@ -64,3 +64,26 @@
 .vinci-statement[data-certainty='unknown'] {border-left:2px solid #a8b3b7;padding-left:10px;}
 
 #wing[data-wing='vinci'] .wing-rail-group .vinci-source {position:static;flex:0 0 90px;min-width:90px;min-height:44px;padding:8px;border:0;border-left:1px solid #a9977355;background:none;font-size:9px;letter-spacing:.10em; }
+
+/* The title's quiet field preserves contrast throughout the whole cone. */
+.vinci-heading:not(.vinci-construction) {padding:14px 18px 16px;margin-left:-18px;background:linear-gradient(105deg,rgba(15,24,30,.91),rgba(15,24,30,.72) 72%,transparent);border-left:1px solid #bea17366;}
+
+.vinci-insertion {font:10px/1.5 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:#d2a557;margin:12px 0 0;}
+
+.vinci-record-toggle {min-height:44px;min-width:44px;width:100%;margin-top:18px;padding:10px 14px;text-align:left;background:transparent;color:#e6d6b8;border:1px solid #a9977366;font:12px var(--sans);cursor:pointer;}
+.vinci-record {border-top:1px solid #a9977344;margin-top:18px;padding-top:8px;}
+.vinci-record[hidden] {display:none;}
+.vinci-record .vinci-statement {font:12px/1.6 var(--sans);overflow-wrap:anywhere;}
+.vinci-hour {font:12px/1.5 var(--sans);letter-spacing:.03em;}
+
+.vinci-human-source {display:block;margin-top:7px;color:#b6bcae;font:12px/1.5 var(--sans);}
+.vinci-record h3 {font:16px/1.3 var(--serif);font-weight:400;color:#eadbc1;}
+.vinci-arithmetic {overflow-wrap:anywhere;}
+
+/* Compact the outdoor phone label while preserving the entire spoken hour. */
+@media(max-aspect-ratio:9/10) {
+  .vinci-heading:not(.vinci-construction) {left:18px;right:auto;top:76px;max-width:calc(100vw - 36px);margin-left:-10px;padding:7px 10px 9px;}
+  .vinci-heading:not(.vinci-construction) .vinci-kicker {margin:0;font-size:8px;line-height:1.5;letter-spacing:.12em;}
+  .vinci-heading:not(.vinci-construction) .vinci-title {margin-top:5px;font-size:24px;line-height:1.1;}
+  .vinci-heading:not(.vinci-construction) .vinci-hour {margin-top:6px;font-size:10px;line-height:1.5;letter-spacing:.01em;}
+}
