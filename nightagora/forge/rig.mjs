@@ -119,11 +119,14 @@ export function assertAdapter(line, want) {
    the assertions cannot drift apart. */
 export const SWATCH_PATH = '/swatches.html'
 export const SWATCH_HOOK = '__forgeSwatch'
+export const MODEL_PATH = '/models.html'
+export const MODEL_HOOK = '__forgeModels'
 
 /**
  * States may be given as JSON, or in the shorthand the briefs are written
  * in: `[transit, held, pane vinci, wing vinci]`, where the first word is the
- * state and the second is its slug. `swatch <set>` is the library's route.
+ * state and the second is its slug. `swatch <set>` is the material library's
+ * route and `model <slug>` is the model library's.
  *
  * JSON may also carry `path` (the address to shoot it at, `/` by default)
  * and `hook` (the window property the rig drives, `__forge` by default).
@@ -144,6 +147,19 @@ export function parseStates(arg) {
     .filter(Boolean)
     .map((s) => {
       const [phase, slug] = s.split(/\s+/)
+      if (phase === 'model') {
+        return {
+          name: `model-${slug}`,
+          phase,
+          opts: { model: slug },
+          // its own address per model, for the reason a swatch has one: a
+          // sweep that switched models inside one page would end holding
+          // the whole library on the GPU at once
+          path: `${MODEL_PATH}?model=${slug}`,
+          hook: MODEL_HOOK,
+          cone: false,
+        }
+      }
       if (phase === 'swatch') {
         return {
           name: `swatch-${slug}`,
