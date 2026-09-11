@@ -13,6 +13,7 @@
 // Environment:
 //   FORGE_BACKEND=webgpu|webgl2  what the app must report (default webgpu)
 //   FORGE_TIER=hero|standard|calm shoot one tier instead of each state's own
+//   FORGE_VP=desktop|mobile      shoot one viewport instead of both
 //   FORGE_CONE=all|<state,state>  also shoot the four look-cone corners of
 //                                 those states, as <viewport>-<tier>-<state>-c1..c4
 //
@@ -116,7 +117,9 @@ try {
   console.log(`server ${said.head.slice(0, 7)} at ${said.root}`)
 
   const browser = await chromium.launch({ args: browserArgs() })
+  const ONE_VP = process.env['FORGE_VP']
   for (const vp of Object.values(VIEWPORTS)) {
+    if (ONE_VP && vp.tag !== ONE_VP) continue
     for (const tier of allTiers) {
       const wanted = states.filter((s) => tiersOf(s).includes(tier))
       if (!wanted.length) continue
