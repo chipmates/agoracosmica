@@ -22,6 +22,7 @@ import { PostProcessing, type Camera, type Scene, type WebGPURenderer } from 'th
 import * as TSL from 'three/tsl'
 import { ao as gtao } from 'three/addons/tsl/display/GTAONode.js'
 import { bloom } from 'three/addons/tsl/display/BloomNode.js'
+import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js'
 import { dof } from 'three/addons/tsl/display/DepthOfFieldNode.js'
 import { film } from 'three/addons/tsl/display/FilmNode.js'
 import { fxaa } from 'three/addons/tsl/display/FXAANode.js'
@@ -129,6 +130,8 @@ export function createPost(
     grain: uniform(d.grain),
     aoIntensity: uniform(d.aoIntensity),
     bloomWarmth: uniform(d.bloomWarmth),
+    bloomStrength: uniform(d.bloomStrength),
+    bloomThreshold: uniform(d.bloomThreshold),
     dofFocus: uniform(d.dofFocus),
     dofFocal: uniform(d.dofFocal),
     dofBokeh: uniform(d.dofBokeh),
@@ -163,16 +166,24 @@ export function createPost(
     frame = frame.mul(mix(float(1), guarded, u.aoIntensity))
   }
 
-  // 2 · bloom, thresholded AND masked: warm sources only
+  // 2 · bloom, thresholded AND masked: warm sources only. The mask is what
+  //     keeps a white corona out of the halo while the fire and the gold
+  //     keep theirs, and it is why this is never a global glow.
   const warm = clamp(frame.r.sub(frame.b).mul(3), 0, 1)
   const mask = mix(float(1), warm, u.bloomWarmth)
-  const bloomPass = bloom(
-    frame.mul(mask),
-    first.bloom.strength,
-    first.bloom.radius,
-    first.bloom.threshold
-  )
-  frame = frame.add(bloomPass)
+  let bloomPass: N = null
+  if (tier.bloom === 'mip') {
+    bloomPass = bloom(frame.mul(mask), first.bloom.strength, first.bloom.radius, first.bloom.threshold)
+    frame = frame.add(bloomPass)
+  } else if (tier.bloom === 'soft') {
+    // one threshold and one quarter-resolution blur: the five-level version
+    // costs eleven more draw calls, which on the calm tier is a fifth of the
+    // whole budget for a halo nobody can tell apart on a phone
+    const lit = frame.rgb.mul(mask)
+    const over = smoothstep(u.bloomThreshold, u.bloomThreshold.add(0.25), luminance(lit))
+    const glow = gaussianBlur(lit.mul(over), null, 6, { resolutionScale: 0.25 })
+    frame = frame.add(glow.mul(u.bloomStrength))
+  }
 
   // 3 · the lens: hero only, and only where a grade asks for it
   if (tier.dof) frame = dof(frame, scenePass.getViewZNode('depth'), u.dofFocus, u.dofFocal, u.dofBokeh)
@@ -253,9 +264,13 @@ export function createPost(
     u.dofFocus.value = d.dofFocus
     u.dofFocal.value = d.dofFocal
     u.dofBokeh.value = d.dofBokeh
-    bloomPass.strength.value = d.bloomStrength
-    bloomPass.radius.value = d.bloomRadius
-    bloomPass.threshold.value = d.bloomThreshold
+    u.bloomStrength.value = d.bloomStrength
+    u.bloomThreshold.value = d.bloomThreshold
+    if (bloomPass) {
+      bloomPass.strength.value = d.bloomStrength
+      bloomPass.radius.value = d.bloomRadius
+      bloomPass.threshold.value = d.bloomThreshold
+    }
   }
 
   /** the first frame must already look like the grade it was asked for */

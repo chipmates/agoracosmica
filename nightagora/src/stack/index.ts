@@ -89,6 +89,10 @@ export async function createStack(opts: StackOptions = {}): Promise<Stack> {
   renderer.setSize(innerWidth, innerHeight)
   renderer.shadowMap.enabled = true
   renderer.shadowMap.type = PCFSoftShadowMap
+  /* the post chain runs several render passes per frame and three clears its
+     counters at the top of each one: without this the meter would report the
+     cost of the last fullscreen quad and call it the frame */
+  renderer.info.autoReset = false
   await renderer.init()
 
   const backend: 'webgpu' | 'webgl2' = adapter === null ? 'webgl2' : 'webgpu'
@@ -161,6 +165,7 @@ export async function createStack(opts: StackOptions = {}): Promise<Stack> {
         tier: tierName,
         backend,
         textureMB: Math.round(materials.textureMB() * 100) / 100,
+        budget: tier.budget,
       }
     },
 
@@ -183,11 +188,12 @@ export async function createStack(opts: StackOptions = {}): Promise<Stack> {
 
     render(dt) {
       if (!scene || !camera) return
+      renderer.info.reset()
       const started = performance.now()
       chain?.update(dt)
       if (chain) chain.post.render()
       else renderer.render(scene, camera)
-      meter.sample(performance.now() - started)
+      meter.sample(dt * 1000, performance.now() - started)
     },
 
     setSize(width, height) {

@@ -16,7 +16,9 @@ export interface Tier {
   samples: number
   shadow: { on: boolean; mapSize: number; cascades: number; maxFar: number }
   ao: { on: boolean; scale: number }
-  bloom: boolean
+  /** 'mip' is the five-level bloom; 'soft' is one threshold and one blur,
+      which is nine draw calls cheaper and, on a phone, indistinguishable */
+  bloom: 'mip' | 'soft' | 'off'
   dof: boolean
   aa: 'taa' | 'smaa' | 'fxaa' | 'none'
   reflection: { on: boolean; scale: number }
@@ -34,7 +36,7 @@ export const TIERS: Record<TierName, Tier> = {
     samples: 0,
     shadow: { on: true, mapSize: 2048, cascades: 3, maxFar: 60 },
     ao: { on: true, scale: 1 },
-    bloom: true,
+    bloom: 'mip',
     dof: true,
     /* MEASURED, not assumed. TAA is in the chain and a wing may pick it, but
        not this museum: every organ of the night moves inside its own shader
@@ -58,7 +60,7 @@ export const TIERS: Record<TierName, Tier> = {
     samples: 0,
     shadow: { on: true, mapSize: 1024, cascades: 2, maxFar: 44 },
     ao: { on: true, scale: 0.5 },
-    bloom: true,
+    bloom: 'mip',
     dof: false,
     aa: 'smaa',
     reflection: { on: true, scale: 0.5 },
@@ -73,7 +75,9 @@ export const TIERS: Record<TierName, Tier> = {
     samples: 0,
     shadow: { on: false, mapSize: 512, cascades: 1, maxFar: 30 },
     ao: { on: false, scale: 0.5 },
-    bloom: true, // the fire without its halo is a different room, not a cheaper one
+    // the fire without its halo is a different room, not a cheaper one, so
+    // the halo stays and only the way it is made gets cheaper
+    bloom: 'soft',
     dof: false,
     aa: 'fxaa',
     reflection: { on: false, scale: 0.5 },

@@ -558,10 +558,13 @@ declare global {
         triangles: number
         frameMsP50: number
         frameMsP95: number
+        cpuMsP50: number
+        cpuMsP95: number
         tier: string
         backend: string
         textureMB: number
         frames: number
+        budget: { draws: number; triangles: number; fps: number; textureMB: number }
       }
     }
   }

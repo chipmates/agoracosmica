@@ -1103,6 +1103,8 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
      silent double of the colonnade: plain instanced geometry, no colour node
      at all, writing no colour and no depth in the beauty pass, drawn only so
      the light can see it. Two draw calls for a colonnade that models form. */
+  const castRoot = new Group()
+  root.add(castRoot)
   function casters(geo: BufferGeometry, items: Item[]): void {
     if (!items.length) return
     const mesh = new InstancedMesh(
@@ -1125,7 +1127,7 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
     mesh.castShadow = true
     mesh.frustumCulled = false
     mesh.renderOrder = -1
-    root.add(mesh)
+    castRoot.add(mesh)
   }
   casters(lathe(columnProfile(), 10), castShafts)
   casters(new RoundedBoxGeometry(1, 0.34, 0.5, 1, 0.018), castBeams)
@@ -1610,6 +1612,9 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
   function update(s: AgoraState): void {
     root.visible = s.reveal > 0.01
     if (!root.visible) return
+    // a tier with no shadows has nothing to cast: the silent double leaves
+    // the frame rather than costing two draw calls for nothing
+    castRoot.visible = rig.stack.tierConfig().shadow.on
 
     const r = s.reveal
     const t = reduced ? 12.4 : s.elapsed

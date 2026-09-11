@@ -4,9 +4,13 @@
 // see. The walk is: eclipse, descent, lobby, wheel, pane, breath, wing,
 // back to the wheel, then the wing's own address cold.
 // Usage: pnpm build && node forge/journey.mjs  (JOURNEY_VP=mobile for the phone)
+// The phone walks the CALM tier, because that is the tier the public gate is
+// measured on: a lobby that only holds together at the hero tier has not been
+// walked by anyone who will actually arrive.
 import { chromium } from 'playwright'
 import { spawn } from 'node:child_process'
 import { mkdirSync } from 'node:fs'
+import { assertAdapter, assertBackend, assertServer, GPU_FLAGS, waitForServer } from './rig.mjs'
 
 const PORT = Number(process.env['FORGE_PORT'] ?? 5199)
 const BASE = `http://localhost:${PORT}`
@@ -15,6 +19,7 @@ const MOBILE = process.env['JOURNEY_VP'] === 'mobile'
 const VP = MOBILE
   ? { width: 390, height: 844, deviceScaleFactor: 2 }
   : { width: 1512, height: 950, deviceScaleFactor: 1 }
+const TIER = process.env['JOURNEY_TIER'] ?? (MOBILE ? 'calm' : 'hero')
 const OUT = new URL(`./shots/${MOBILE ? 'journey-mobile' : 'journey'}/`, import.meta.url).pathname
 
 function startPreview() {
@@ -24,34 +29,29 @@ function startPreview() {
   })
 }
 
-async function waitForServer(url, tries = 60) {
-  for (let i = 0; i < tries; i++) {
-    try {
-      const res = await fetch(url)
-      if (res.ok) return
-    } catch {
-      /* not up yet */
-    }
-    await new Promise((r) => setTimeout(r, 250))
-  }
-  throw new Error('preview server never came up')
-}
-
 mkdirSync(OUT, { recursive: true })
 const server = startPreview()
 try {
   await waitForServer(BASE)
-  const browser = await chromium.launch()
+  const said = await assertServer(BASE)
+  console.log(`[journey] server ${said.head.slice(0, 7)} at ${said.root}, tier ${TIER}`)
+  const browser = await chromium.launch({ args: GPU_FLAGS })
   const page = await browser.newPage({
     viewport: { width: VP.width, height: VP.height },
     deviceScaleFactor: VP.deviceScaleFactor,
   })
+  let firstLine = ''
   page.on('pageerror', (err) => console.error(`[pageerror] ${err.message}`))
   page.on('console', (msg) => {
+    if (msg.text().startsWith('backend=')) firstLine = msg.text()
     if (msg.type() === 'error') console.log(`[console.error] ${msg.text()}`)
   })
-  await page.goto(BASE)
+  await page.goto(`${BASE}/?tier=${TIER}`)
   await page.waitForFunction(() => Boolean(window.__forge))
+  const stamp = await assertBackend(page)
+  assertAdapter(firstLine, process.env['FORGE_BACKEND'] ?? 'webgpu')
+  if (stamp.tier !== TIER) throw new Error(`asked for tier=${TIER}, the app stamped ${stamp.tier}`)
+  console.log(`[journey] ${firstLine}`)
 
   let step = 0
   const state = () =>
@@ -171,7 +171,7 @@ try {
   await shot('wheel-again')
 
   // 7 · the deep link: the wing opens with no overture at all
-  await page.goto(`${BASE}${new URL(url).pathname}`)
+  await page.goto(`${BASE}${new URL(url).pathname}?tier=${TIER}`)
   await page.waitForFunction(() => Boolean(window.__forge))
   if (!(await waitPhase('wing', 12000))) process.exit(1)
   await page.waitForTimeout(1600)
@@ -179,6 +179,9 @@ try {
 
   await browser.close()
   console.log(`journey shots written to forge/shots/${MOBILE ? 'journey-mobile' : 'journey'}/`)
+} catch (err) {
+  console.error(`RIG REFUSED: ${err.message}`)
+  process.exitCode = 1
 } finally {
   server.kill()
 }
