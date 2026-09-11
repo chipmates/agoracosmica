@@ -12,8 +12,13 @@ import { WANDERERS } from './content/wanderers'
 import { CONSTELLATIONS, SKY_INVITE } from './content/constellations'
 import { channel } from './core/motion'
 import { mediaUrl } from './content/media'
+import { createWingFrame, stationFromHash } from './wings/frame'
+import { WINGS, wingBySlug, wingsOpen, wingsPreparing } from './wings/registry'
+import { wingCount } from './wings/content'
 
-type Phase = 'transit' | 'held' | 'descent' | 'agora' | 'sky' | 'breath'
+type Phase = 'transit' | 'held' | 'descent' | 'agora' | 'wheel' | 'breath' | 'wing'
+/** what the rig may ask for: the phases, plus the wheel with a pane open */
+type ForgeState = Phase | 'pane'
 
 const stage = document.getElementById('stage')
 const status = document.getElementById('status')
@@ -26,9 +31,11 @@ const invite = document.getElementById('sky-invite')
 const marks = document.getElementById('chapter-marks')
 const chips = document.getElementById('star-chips')
 const pane = document.getElementById('figure-pane')
+const wingHost = document.getElementById('wing')
+const lobbyPlate = document.getElementById('lobby-plate')
 if (
   !stage || !status || !keeper || !descent || !verse || !voiceDom ||
-  !plate || !invite || !marks || !chips || !pane
+  !plate || !invite || !marks || !chips || !pane || !wingHost
 )
   throw new Error('missing shell')
 const keeperEl: HTMLElement = keeper
@@ -40,6 +47,7 @@ const inviteEl: HTMLElement = invite
 const marksEl: HTMLElement = marks
 const chipsEl: HTMLElement = chips
 const paneEl: HTMLElement = pane
+const wingEl: HTMLElement = wingHost
 
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
@@ -66,7 +74,7 @@ const hotspots = createHotspots(hotspotsHost)
 
 const HUB_SPOTS = [
   {
-    id: 'sky',
+    id: 'wheel',
     label: 'The Sky',
     pos: new Vector3(0, 2.3, -6.2),
     posNarrow: new Vector3(0, 1.75, -5.6),
@@ -190,6 +198,8 @@ const paneDrawn = paneEl.querySelector('.pane-drawn') as HTMLElement | null
 const paneSiblings = paneEl.querySelector('.pane-siblings') as HTMLElement | null
 const panePortrait = paneEl.querySelector('.pane-portrait img') as HTMLImageElement | null
 const paneClose = paneEl.querySelector('.pane-close') as HTMLButtonElement | null
+/** whose pane is open, which is also whose museum the button enters */
+let paneSlug = ''
 
 function openPane(slug: string): void {
   const ci = CONSTELLATIONS.findIndex((c) => c.stars.some((s) => s.slug === slug))
@@ -197,6 +207,7 @@ function openPane(slug: string): void {
   const star = c?.stars.find((s) => s.slug === slug)
   const w = roster.get(slug)
   if (!c || !star || !w) return
+  paneSlug = slug
   if (ci !== chapter) {
     chapter = ci
     chapterChangedAt = elapsed
@@ -208,9 +219,10 @@ function openPane(slug: string): void {
   if (paneTradition) paneTradition.textContent = star.tradition
   if (paneYears) paneYears.textContent = w.years
   if (panePromise) panePromise.textContent = star.promise
-  // no wing is finished yet, so every name carries the honest plate
-  if (paneEnter) paneEnter.hidden = true
-  if (paneDrawn) paneDrawn.hidden = false
+  // the wheel promises only what the register can answer
+  const wing = wingBySlug(slug)
+  if (paneEnter) paneEnter.hidden = !wing
+  if (paneDrawn) paneDrawn.hidden = Boolean(wing)
   if (panePortrait) {
     panePortrait.src = mediaUrl(`/images/figures/${slug}/main/900.webp`)
     panePortrait.alt = `AI-generated portrait of ${w.name}`
@@ -246,7 +258,7 @@ function closePane(): void {
   paneEl.classList.remove('lit')
   document.body.classList.remove('pane-open')
   paneEl.hidden = true
-  if (phase === 'sky') {
+  if (phase === 'wheel') {
     plateEl.classList.add('lit')
     inviteEl.classList.add('lit')
     marksEl.classList.add('lit')
@@ -257,10 +269,7 @@ paneClose?.addEventListener('click', () => closePane())
 paneEl.addEventListener('click', (e) => {
   if (e.target === paneEl) closePane()
 })
-paneEnter?.addEventListener('click', () => {
-  closePane()
-  enterWorld()
-})
+paneEnter?.addEventListener('click', () => enterWing(paneSlug))
 addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && paneOpen) closePane()
 })
@@ -290,7 +299,7 @@ interface ChipPlace {
   above: boolean
 }
 function syncChips(): void {
-  const settled = phase === 'sky' && !paneOpen && elapsed - chapterChangedAt > 0.9
+  const settled = phase === 'wheel' && !paneOpen && elapsed - chapterChangedAt > 0.9
   const places: ChipPlace[] = []
   for (const chip of chipList) {
     const on = settled && chip.chapter === chapter && atlasReveal > 0.6
@@ -355,7 +364,7 @@ function syncChips(): void {
 
 /** From the sky back down to the hearth, the gaze easing all the way. */
 function returnToFire(): void {
-  if (phase !== 'sky') return
+  if (phase !== 'wheel') return
   setPhase('agora')
   lookUp = 1 // land the gaze from above, no snap
   lookTarget = 0
@@ -485,7 +494,7 @@ declare global {
   interface Window {
     __forge?: {
       jump: (
-        p: Phase,
+        p: ForgeState,
         opts?: {
           desc?: number
           transit?: number
@@ -494,6 +503,8 @@ declare global {
           keeper?: number
           chapter?: number
           figure?: string
+          /** which wing a `wing` or `pane` state stands in */
+          slug?: string
           /** Shell close-ups for THE EYES; the journey uses real input. */
           shell?: 'instruments'
         }
@@ -509,16 +520,72 @@ declare global {
     }
   }
 }
-/** One gold breath, then a hard cut into the world that was chosen. */
-function enterWorld(): void {
-  closePane()
-  setPhase('breath')
-  breath.begin(() => setPhase('agora'))
+// ---- THE MUSEUM'S ROUTE: / is the lobby, /w/<slug> is a wing ----
+const wingFrame = createWingFrame(wingEl, () => toLobby())
+let wingSlug = ''
+
+/** A wing's own address, with the station the visitor stood at. */
+function wingPath(): { slug: string; station: number } | null {
+  const m = /^\/w\/([a-z0-9-]{1,64})\/?$/.exec(location.pathname)
+  return m?.[1] === undefined ? null : { slug: m[1], station: stationFromHash() }
 }
 
+/** Stand in a wing. The overture is never replayed to get here. */
+async function openWing(slug: string, at: number): Promise<void> {
+  const entry = wingBySlug(slug)
+  if (!entry) {
+    toLobby()
+    return
+  }
+  wingSlug = slug
+  setPhase('wing') // the room is claimed before its module arrives
+  const mod = await entry.load()
+  if (wingSlug !== slug) return // the visitor left while it loaded
+  wingFrame.open(entry, mod.createWing(), at)
+}
+
+/** One gold breath, then a hard cut into the wing that was chosen. */
+function enterWing(slug: string): void {
+  if (!wingBySlug(slug)) return
+  closePane()
+  setPhase('breath')
+  breath.begin(() => {
+    history.pushState({}, '', `/w/${slug}${location.search}`)
+    void openWing(slug, 0)
+  })
+}
+
+/** The way home lands at the wheel, where the choosing happens, never at
+    the eclipse: a museum whose every entry replays the overture is a
+    museum you see once. */
+function toLobby(): void {
+  wingFrame.close()
+  wingSlug = ''
+  if (location.pathname !== '/') history.pushState({}, '', `/${location.search}`)
+  setPhase('wheel')
+  atlas.snap(chapter)
+  atlasReveal = 1
+  atlas.visible(true)
+  camera.rotation.set(atlas.currentElevation(), 0, 0)
+}
+
+// the browser's own back and forward walk the same two addresses
+addEventListener('popstate', () => {
+  const here = wingPath()
+  if (here) void openWing(here.slug, here.station)
+  else if (phase === 'wing') toLobby()
+})
+
+// the lobby's plate: what the register can answer for, said once
+if (lobbyPlate) lobbyPlate.textContent = wingCount(wingsOpen(), wingsPreparing())
+
 window.__forge = {
-  jump(p, opts = {}) {
+  jump(state, opts = {}) {
     document.body.classList.add('forge') // DOM beats compose instantly
+    // the rig proves the state it ASKED for took, which the phase alone
+    // cannot say: the pane is the wheel with a figure held open
+    document.body.dataset['forge'] = 'pending'
+    const p: Phase = state === 'pane' ? 'wheel' : state
     setPhase(p)
     // each jump is a single composed moment: no scene leaks across
     if (p !== 'breath') breath.stop()
@@ -533,15 +600,15 @@ window.__forge = {
       (p === 'transit' || p === 'held' ? 0
       : p === 'descent' ? smooth(0.2, 0.98, desc) * 0.8
       : p === 'breath' ? 0.12
-      : p === 'sky' ? 0
+      : p === 'wheel' ? 0
       : p === 'agora' ? 1
       : 1)
     flashAt = elapsed - (opts.sinceFlash ?? 999)
     agoraReveal =
-      p === 'agora' || p === 'sky' ? 1
+      p === 'agora' || p === 'wheel' ? 1
       : p === 'descent' ? smooth(0.95, 0.998, desc)
       : 0
-    lookUp = lookTarget = p === 'sky' ? 1 : 0
+    lookUp = lookTarget = p === 'wheel' ? 1 : 0
     camera.position.y = 0
     if (p === 'descent') {
       descentCamera(desc)
@@ -550,7 +617,7 @@ window.__forge = {
       agoraEnteredAt = Math.max(0, elapsed - 2)
       camera.rotation.x = -0.12
     }
-    if (p === 'sky') {
+    if (p === 'wheel') {
       chapter = opts.chapter ?? 0
       atlas.snap(chapter)
       atlasReveal = 1
@@ -559,14 +626,15 @@ window.__forge = {
       setPlate()
       skyDress(true)
       camera.rotation.set(atlas.currentElevation(), 0, 0)
-      if (opts.figure) openPane(opts.figure)
+      const held = state === 'pane' ? (opts.slug ?? opts.figure) : opts.figure
+      if (held) openPane(held)
       else closePane()
     } else {
       atlasReveal = 0
       atlas.visible(false)
       skyDress(false)
     }
-    if (p !== 'agora' && p !== 'sky' && p !== 'descent')
+    if (p !== 'agora' && p !== 'wheel' && p !== 'descent')
       camera.rotation.set(0, 0, 0)
     railEl.hidden = p === 'transit' || p === 'held' || p === 'breath'
     if (opts.keeper) {
@@ -578,6 +646,15 @@ window.__forge = {
     // Additive shell staging, explicitly allowed by the commission's eyes loop.
     instrumentsEl.hidden = opts.shell !== 'instruments'
     railInstruments?.setAttribute('aria-expanded', String(opts.shell === 'instruments'))
+    if (p === 'wing') {
+      // a wing loads its own module, so this state lands a frame later:
+      // the rig waits on the marker rather than on a guessed delay
+      void openWing(opts.slug ?? WINGS[0]?.slug ?? '', 0).then(() => {
+        document.body.dataset['forge'] = state
+      })
+      return
+    }
+    document.body.dataset['forge'] = state
   },
   freeze(t) {
     elapsed = t
@@ -626,7 +703,7 @@ function setPhase(next: Phase): void {
     setStatus('The night agora · scroll to look up')
     verseShow('Questions shine within you')
   }
-  if (next === 'sky') {
+  if (next === 'wheel') {
     setStatus('')
     chapterChangedAt = elapsed
     setPlate()
@@ -635,12 +712,16 @@ function setPhase(next: Phase): void {
   } else {
     skyDress(false)
   }
-  if (next === 'breath') {
+  if (next === 'breath' || next === 'wing') {
     setStatus('')
     verseEl.classList.remove('lit') // the cut carries no letterpress
     railEl.hidden = true
   } else if (musicWoken) {
     railEl.hidden = false
+  }
+  if (next !== 'wing' && wingSlug) {
+    wingSlug = ''
+    wingFrame.close()
   }
   hotspots.set(next === 'agora' ? HUB_SPOTS : [])
   // every stage is the SEATED eye at the origin
@@ -678,7 +759,7 @@ function push(delta: number): void {
   // the wheel of the night: scroll or swipe steps the carousel, wrapping.
   // A short cooldown makes one gesture one step and keeps the look-up
   // momentum from bleeding into the wheel.
-  if (phase === 'sky') {
+  if (phase === 'wheel') {
     if (elapsed - chapterChangedAt < 0.8) return
     if (paneOpen) return
     if (Math.sign(delta) !== Math.sign(skyAcc)) skyAcc = 0
@@ -698,7 +779,7 @@ addEventListener('keydown', (e) => {
   if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') push(160)
   if (e.key === 'ArrowUp' || e.key === 'PageUp') push(-160)
   // in the sky the carousel also answers left and right
-  if (phase === 'sky' && !paneOpen) {
+  if (phase === 'wheel' && !paneOpen) {
     if (e.key === 'ArrowRight') stepChapter(1)
     if (e.key === 'ArrowLeft') stepChapter(-1)
   }
@@ -737,7 +818,7 @@ addEventListener('touchmove', (e) => {
   } else {
     // in the sky a horizontal swipe is the natural carousel gesture; the
     // dominant axis wins so diagonals never double-count
-    push(phase === 'sky' && Math.abs(dx) > Math.abs(dy) ? dx * 3 : dy * 3)
+    push(phase === 'wheel' && Math.abs(dx) > Math.abs(dy) ? dx * 3 : dy * 3)
   }
   touchY = y
   touchX = x
@@ -820,9 +901,11 @@ function frame(now: number): void {
     // looking up, the court is scenery: it still frames the sky from below,
     // but its own embers stop cutting across the wheel's letterpress (and the
     // heaviest fragment shader in the night stops paying full price)
-    : phase === 'sky' ? 0.72
+    : phase === 'wheel' ? 0.72
     : phase === 'descent' ? smooth(0.95, 0.998, desc)
     : 0
+  // a wing owns its own room: the lobby's court strikes fast so nothing
+  // of the fire is left standing behind the first station
   // the fire materializes briskly on arrival (the wait read as lag);
   // every other blend keeps the night's slow breath
   agoraReveal +=
@@ -839,9 +922,9 @@ function frame(now: number): void {
     // sits above the threshold — without the target guard the return
     // bounced straight back into the sky (frame-rate dependent; the
     // slow headless eye never saw it)
-    if (lookTarget > 0.9 && lookUp > 0.93) setPhase('sky')
+    if (lookTarget > 0.9 && lookUp > 0.93) setPhase('wheel')
     if (agoraEnteredAt >= 0 && elapsed - agoraEnteredAt > 0.5) keeperEl.hidden = false
-  } else if (phase !== 'sky') {
+  } else if (phase !== 'wheel') {
     keeperEl.hidden = true
   }
 
@@ -857,7 +940,9 @@ function frame(now: number): void {
     : phase === 'descent' ? smooth(0.2, 0.98, desc) * 0.8
     : phase === 'agora' ? 1
     : phase === 'breath' ? 0.12
-    : phase === 'sky' ? 0
+    : phase === 'wheel' ? 0
+    // a wing stands under a quiet field, never on flat black
+    : phase === 'wing' ? 0.34
     : 1
   skyBirth += (birthTarget - skyBirth) * Math.min(1, dt * (reducedMotion ? 20 : 0.9))
 
@@ -870,9 +955,9 @@ function frame(now: number): void {
     // the anonymous wanderer sparks belong to the birth moment alone:
     // at the hub they read as cheap floating blobs against the true field
     lanterns:
-      phase === 'sky' ? Math.max(0.08, 0.55 * (1 - atlasReveal))
+      phase === 'wheel' ? Math.max(0.08, 0.55 * (1 - atlasReveal))
       : phase === 'agora' ? 0.05
-      : phase === 'breath' ? 0
+      : phase === 'breath' || phase === 'wing' ? 0
       : 0.3,
     sinceFlash: flashAt < 0 ? -1 : elapsed - flashAt,
     elapsed,
@@ -881,14 +966,14 @@ function frame(now: number): void {
 
   // the wheel of the night: the dome carries the six houses around the
   // visitor; the camera only breathes toward the focused elevation
-  if (phase === 'sky') {
+  if (phase === 'wheel') {
     keeperEl.hidden = true
     camera.rotation.y += (0 - camera.rotation.y) * Math.min(1, dt * 2)
     camera.rotation.x +=
       (atlas.currentElevation() - camera.rotation.x) * Math.min(1, dt * 2.2)
   }
   atlasReveal +=
-    ((phase === 'sky' ? 1 : 0) - atlasReveal) * Math.min(1, dt * (reducedMotion ? 20 : 1.4))
+    ((phase === 'wheel' ? 1 : 0) - atlasReveal) * Math.min(1, dt * (reducedMotion ? 20 : 1.4))
   atlas.visible(atlasReveal > 0.005)
   atlas.update(dt, elapsed, camera.aspect, atlasReveal)
   syncChips()
@@ -979,13 +1064,29 @@ addEventListener('pointercancel', () => {
 })
 function freeLookAllowed(): boolean {
   if (reducedMotion || frozen) return false
-  return phase === 'agora' || phase === 'sky'
+  return phase === 'agora' || phase === 'wheel'
 }
 function freeLookTarget(): number {
   return freeLookAllowed() ? pointerNX : 0
 }
 function freeLookYTarget(): number {
   return freeLookAllowed() ? pointerNY : 0
+}
+
+/** A visitor who arrives at /w/<slug> came back for the wing, not for the
+    overture: the eclipse and the descent are skipped whole. */
+function bootRoute(): boolean {
+  const here = wingPath()
+  if (!here || !wingBySlug(here.slug)) return false
+  transit = 1
+  desc = descTarget = 1
+  door = 1
+  agoraReveal = 0
+  skyBirth = 0.34
+  flashAt = -1
+  wakeMusic()
+  void openWing(here.slug, here.station)
+  return true
 }
 
 async function main(): Promise<void> {
@@ -996,7 +1097,7 @@ async function main(): Promise<void> {
     setStatus('This night needs a newer browser')
     return
   }
-  setStatus('First light')
+  if (!bootRoute()) setStatus('First light')
   console.log(`[na] init ok, gpu=${'gpu' in navigator}, hidden=${document.hidden}`)
   let logged = false
   const origRender = frame

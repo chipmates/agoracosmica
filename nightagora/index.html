@@ -151,7 +151,25 @@
     .copy { transition: opacity 1.6s ease; }
     /* the H1 veil belongs to first light alone */
     body:not([data-phase='transit']):not([data-phase='held']) .copy { opacity: 0; }
-    body[data-phase='sky'] .status { opacity: 0.9; }
+    body[data-phase='wheel'] .status { opacity: 0.9; }
+
+    /* the lobby's own plate: how much of the museum stands tonight. It
+       hangs under the masthead, on the way the gaze takes to the wheel */
+    #lobby-plate {
+      position: fixed; left: 0; right: 0;
+      top: calc(62px + env(safe-area-inset-top));
+      z-index: 2; text-align: center; pointer-events: none;
+      font-family: var(--sans);
+      font-size: 9.5px; letter-spacing: 0.3em; text-indent: 0.3em;
+      text-transform: uppercase;
+      color: color-mix(in srgb, var(--na-mist) 74%, transparent);
+      text-shadow: var(--ink-night);
+      opacity: 0; transition: opacity 1.4s ease;
+    }
+    body[data-phase='agora'] #lobby-plate,
+    body[data-phase='wheel'] #lobby-plate { opacity: 1; }
+    body.pane-open #lobby-plate { opacity: 0; }
+    body.forge #lobby-plate { transition: none !important; }
 
     /* ---- the black breath: pure darkness holding the inscription ---- */
     #blackout {
@@ -178,7 +196,7 @@
 
     /* on narrow stages the sky verse steps below the constellation plate */
     @media (max-aspect-ratio: 9/10) {
-      body[data-phase='sky'] #verse { top: 30%; }
+      body[data-phase='wheel'] #verse { top: 30%; }
 
     }
 
@@ -212,6 +230,9 @@
       height: 1px; background: #140b04;
     }
     #goldbreath.lit { opacity: 0.97; }
+    /* the cut owns the whole frame: even the masthead would ghost through
+       the gold at this opacity, and a label inside a cut is a label */
+    body[data-phase='breath'] #veil { visibility: hidden; }
     /* the way out of the gold is a CUT: the class is struck with the
        transition suppressed, so no frame of the lobby dissolves through */
     #goldbreath.cutting { transition: none; }
@@ -996,6 +1017,7 @@
 
   </style>
   <link rel="stylesheet" href="/src/styles/shell.css" />
+  <link rel="stylesheet" href="/src/styles/wing.css" />
 </head>
 <body data-phase="transit">
   <div id="stage" aria-hidden="true"></div>
@@ -1008,6 +1030,7 @@
       <p class="tagline">Thirty Remarkable People · One Night Sky</p>
     </div>
     <p class="status" id="status" role="status">First light</p>
+    <p id="lobby-plate"></p>
     <button id="overture-skip" type="button">Skip the overture · begin at the fire</button>
   </div>
   <div id="descent" hidden>
@@ -1041,7 +1064,7 @@
         <p class="pane-years"></p>
         <p class="pane-promise"></p>
         <p class="pane-ink">An AI Echo · an interpretation, not a recording</p>
-        <button class="pane-enter" type="button" hidden>Enter his night</button>
+        <button class="pane-enter" type="button" hidden>Enter the museum</button>
         <p class="pane-drawn" hidden>This world is still being drawn</p>
         <p class="pane-sib-label"></p>
         <div class="pane-siblings"></div>
@@ -1049,6 +1072,7 @@
     </div>
   </div>
   <div id="hotspots" aria-label="Points in this world"></div>
+  <div id="wing" hidden></div>
   <div id="rail" hidden>
     <button id="rail-sound" type="button" aria-pressed="false">Sound · Off</button>
     <button id="rail-instruments" type="button" aria-haspopup="true" aria-expanded="false">Instruments</button>
