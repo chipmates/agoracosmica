@@ -11,6 +11,38 @@
 
 import { FOUNDING_SEED, mulberry32 } from '../core/seed'
 
+/** a stable hand per stroke. It reads from the stroke's index instead of
+    the scene's seeded sequence, so adding the bow moved no other mark. */
+function wobble(i: number, salt: number): number {
+  const x = Math.sin(i * 127.1 + salt * 311.7) * 43758.5453
+  return x - Math.floor(x) - 0.5
+}
+
+/** A BURIN CUT IS NOT A RULED LINE. Every stroke bows off its own chord,
+    by its own amount and to its own side, which is the difference between
+    an engraved mark and a scratched hairline. */
+function cut(
+  ctx: CanvasRenderingContext2D,
+  x0: number,
+  y0: number,
+  x1: number,
+  y1: number,
+  bow: number
+): void {
+  const dx = x1 - x0
+  const dy = y1 - y0
+  const len = Math.hypot(dx, dy) || 1
+  ctx.beginPath()
+  ctx.moveTo(x0, y0)
+  ctx.quadraticCurveTo(
+    (x0 + x1) / 2 - (dy / len) * bow,
+    (y0 + y1) / 2 + (dx / len) * bow,
+    x1,
+    y1
+  )
+  ctx.stroke()
+}
+
 /** how long the gold holds the whole frame before the cut */
 const HOLD_MS = 640
 
@@ -63,14 +95,19 @@ export function createBreath(): BreathHandles {
       const r1 = r0 + reach * (0.04 + g() * 0.1)
       ctx.strokeStyle = `rgba(255, 248, 228, ${(0.03 + g() * 0.06).toFixed(3)})`
       ctx.lineWidth = 0.8 + g() * 1.2
-      ctx.beginPath()
-      ctx.moveTo(cx + Math.cos(a) * r0, cy + Math.sin(a) * r0)
-      ctx.lineTo(cx + Math.cos(a) * r1, cy + Math.sin(a) * r1)
-      ctx.stroke()
+      cut(
+        ctx,
+        cx + Math.cos(a) * r0,
+        cy + Math.sin(a) * r0,
+        cx + Math.cos(a) * r1,
+        cy + Math.sin(a) * r1,
+        wobble(i, 1) * (r1 - r0) * 0.13
+      )
     }
-    // the rays: light and dark, hand-jittered, deliberately uneven. An
-    // even fan of equal rays is a vector sunburst, not a glory cut by a
-    // hand. Some run to the edge, some barely leave the heart.
+    // the rays: light and dark, hand-jittered, deliberately uneven, and
+    // each one bowed off its own chord. An even fan of equal straight rays
+    // is a vector sunburst, not a glory cut by a hand. Some run to the
+    // edge, some barely leave the heart.
     const RAYS = 116
     for (let i = 0; i < RAYS; i++) {
       const a = (i / RAYS) * Math.PI * 2 + (g() - 0.5) * 0.1
@@ -94,10 +131,14 @@ export function createBreath(): BreathHandles {
       grad.addColorStop(1, `rgba(${tint}, 0)`)
       ctx.strokeStyle = grad
       ctx.lineWidth = lightRay ? 0.8 + g() * 2.6 : 0.8 + g() * 2.8
-      ctx.beginPath()
-      ctx.moveTo(cx + Math.cos(a) * r0, cy + Math.sin(a) * r0)
-      ctx.lineTo(cx + Math.cos(a) * r1, cy + Math.sin(a) * r1)
-      ctx.stroke()
+      cut(
+        ctx,
+        cx + Math.cos(a) * r0,
+        cy + Math.sin(a) * r0,
+        cx + Math.cos(a) * r1,
+        cy + Math.sin(a) * r1,
+        wobble(i, 2) * (r1 - r0) * 0.075
+      )
     }
     // two ruled circles around the light: one language, cut twice
     for (const ring of [0.22, 0.46]) {
