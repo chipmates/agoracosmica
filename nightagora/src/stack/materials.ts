@@ -213,6 +213,10 @@ export interface MaterialLibrary {
   textureMB: () => number
   /** every set that asked for its bytes and did not get them */
   missing: () => Array<{ name: string; reason: string }>
+  /** how many sets have asked for their bytes and are still waiting. A
+      frame drawn while a set is in flight is a DIFFERENT frame, so the rig
+      waits on this rather than on a guessed delay */
+  pending: () => number
   setTier: (tier: Tier) => void
   dispose: () => void
 }
@@ -454,6 +458,7 @@ export function createMaterialLibrary(tier: Tier): MaterialLibrary {
     manifest: () => [...seen.values()],
     textureMB: () => bytes / (1024 * 1024),
     missing: () => [...missing].map(([name, reason]) => ({ name, reason })),
+    pending: () => [...sets.values()].filter((set) => !set.ready.value && !missing.has(set.entry.id.replace(/^library\//, ''))).length,
     setTier(next) {
       budget = texturesFor(next)
     },

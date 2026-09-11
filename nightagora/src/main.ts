@@ -570,6 +570,9 @@ declare global {
         /** where along a wing's rail the visitor stands, and how far it runs */
         station: number
         stations: number
+        /** library sets still in flight; a frame shot over zero is a frame
+            drawn on a surface that is not dressed yet */
+        texturesPending: number
       }
       /** what the last two seconds cost, per the stack's own meter */
       /** every asset the app has resolved, with its class and licence line */
@@ -783,6 +786,7 @@ window.__forge = {
       desc,
       station: wingFrame.station(),
       stations: wingFrame.stations(),
+      texturesPending: stack.materials.pending(),
       // what the last frame actually cost: the rig quotes this instead of
       // guessing from a software-rasterizer fps number
       draws: renderer.info.render.drawCalls,
@@ -983,7 +987,12 @@ function frame(now: number): void {
   last = now
   if (!frozen) elapsed += dt
 
-  if (phase === 'transit') {
+  /* The overture crosses on its own clock, and the eye's clock is frozen:
+     without this line the transit kept travelling while the rig waited out
+     the settle, so the same state shot twice was two different moments of
+     a two second animation and no two folders could be paired. A frozen
+     eye holds the transit where the jump put it. */
+  if (phase === 'transit' && !frozen) {
     transit = reducedMotion ? 1 : Math.min(1, transit + dt / TRANSIT_SECONDS)
     if (transit >= 1) {
       flashAt = elapsed

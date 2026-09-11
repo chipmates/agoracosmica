@@ -84,6 +84,25 @@ async function arrive(page, url, hook) {
   await page.goto(url)
   await page.waitForFunction((h) => Boolean(window[h]), hook)
   await page.waitForTimeout(1800)
+  await dressed(page, hook)
+}
+
+/**
+ * Wait until every library set the page asked for is on the GPU. A stone
+ * whose photograph has not landed draws as it was authored, which is a
+ * DIFFERENT frame: the same state shot on a cold cache and a warm one
+ * measured six levels apart on the court beside the fire. The rig waits on
+ * the app's own count rather than on a guessed delay.
+ */
+async function dressed(page, hook, ms = 20000) {
+  const until = Date.now() + ms
+  while (Date.now() < until) {
+    const left = await page.evaluate((h) => window[h]?.state?.().texturesPending ?? 0, hook)
+    if (!left) return true
+    await page.waitForTimeout(120)
+  }
+  problems.push('the library never finished loading; frames are not comparable')
+  return false
 }
 
 /** the headless GL context can die mid-run on the heavier stages: a lost
@@ -111,10 +130,10 @@ async function jump(page, state, url, settle) {
 
 mkdirSync(OUT, { recursive: true })
 let corners = 0
+const problems = []
 const server = spawn('pnpm', ['exec', 'vite', '--port', String(port), '--strictPort'], {
   stdio: 'ignore',
 })
-const problems = []
 try {
   await waitForServer(BASE)
   const said = await assertServer(BASE)
@@ -162,6 +181,7 @@ try {
         }
         const took = await jump(page, s, BASE, s.settle ?? SETTLE)
         if (!took) problems.push(`[${vp.tag}/${tier}] ${s.name}: the stage never took`)
+        await dressed(page, hookOf(s))
         await page.screenshot({ path: `${OUT}${shotName(vp.tag, tier, s.name)}` })
         const cone = coneFor(s)
         if (!cone) continue
