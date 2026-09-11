@@ -62,6 +62,13 @@ export const vinciHourSpoken: VinciText = {
   en: '15:19 by the sun, 10 October 1517',
   de: '15:19 nach der Sonne, 10. Oktober 1517',
 };
+/** A named sub-view stands at one station but shows another object; its own
+ * line keeps the card and the frame naming the same thing. */
+export const vinciViewNames: Readonly<Record<string, VinciText>> = {
+  gable: { en: 'The north gable, from the meadow', de: 'Der Nordgiebel, von der Wiese aus' },
+  collection: { en: 'The collection ground, below the garden', de: 'Der Sammlungsgrund, unterhalb des Gartens' },
+};
+
 export const vinciCertaintyWords: Record<VinciCertainty, VinciText> = {
   documented: { en: 'documented', de: 'dokumentiert' },
   reconstructed: { en: 'reconstructed', de: 'rekonstruiert' },

@@ -63,7 +63,7 @@
 .vinci-statement[data-certainty='inferred'],.vinci-statement[data-certainty='reconstructed'] {border-left:2px solid #d2a557;padding-left:10px;}
 .vinci-statement[data-certainty='unknown'] {border-left:2px solid #a8b3b7;padding-left:10px;}
 
-#wing[data-wing='vinci'] .wing-rail-group .vinci-source {position:static;flex:0 0 90px;min-width:90px;min-height:44px;padding:8px;border:0;border-left:1px solid #a9977355;background:none;font-size:9px;letter-spacing:.10em; }
+#wing[data-wing='vinci'] .wing-rail-group .vinci-source {position:static;flex:0 0 112px;min-width:112px;white-space:nowrap;min-height:44px;padding:8px;border:0;border-left:1px solid #a9977355;background:none;font-size:9px;letter-spacing:.10em; }
 
 /* The title's quiet field preserves contrast throughout the whole cone. */
 .vinci-heading:not(.vinci-construction) {padding:14px 18px 16px;margin-left:-18px;background:linear-gradient(105deg,rgba(15,24,30,.91),rgba(15,24,30,.72) 72%,transparent);border-left:1px solid #bea17366;}
@@ -86,4 +86,13 @@
   .vinci-heading:not(.vinci-construction) .vinci-kicker {margin:0;font-size:8px;line-height:1.5;letter-spacing:.12em;}
   .vinci-heading:not(.vinci-construction) .vinci-title {margin-top:5px;font-size:24px;line-height:1.1;}
   .vinci-heading:not(.vinci-construction) .vinci-hour {margin-top:6px;font-size:10px;line-height:1.5;letter-spacing:.01em;}
+}
+
+/* The drawer's key rides the desktop rail; a phone has no keyboard to hint at. */
+.vinci-key {display:inline-block;margin-left:8px;padding:1px 5px 2px;border:1px solid #a9977388;border-radius:2px;color:#cdbfa4;font:9px/1 var(--sans);letter-spacing:.06em;vertical-align:baseline;}
+@media(max-aspect-ratio:9/10) {
+  .vinci-key {display:none;}
+  /* the two-line title wants its own measure, not the card's last pixel */
+  .vinci-heading:not(.vinci-construction) {padding-right:16px;}
+  .vinci-heading:not(.vinci-construction) .vinci-title {max-width:320px;}
 }
