@@ -83,6 +83,9 @@ export interface KeyLightOptions {
 export interface KeyLight {
   light: DirectionalLight
   fill: HemisphereLight
+  /** the scene this rig was installed into: the stack keeps one key per
+      scene, so it needs to know which rig a new one replaces */
+  scene: Scene
   direction: Vector3
   colour: Color
   /** 0..1 at the shaded point: 1 in the key, 0 in the shadow of the colonnade */
@@ -97,7 +100,11 @@ export interface KeyLight {
   probe: Texture | null
   setTier: (tier: Tier) => void
   setCamera: (camera: unknown) => void
+  /** takes every object this rig put in the scene back out, releases the
+      shadow maps and the baked probe. Safe to call twice. */
   dispose: () => void
+  /** false once dispose has run, so a stale handle cannot be re-listed */
+  live: () => boolean
 }
 
 /** Kelvin to a linear RGB colour, the usual blackbody approximation. */
@@ -153,15 +160,23 @@ export function createKeyLight(scene: Scene, tier: Tier, opts: KeyLightOptions):
   const light = new DirectionalLight(colour.getHex(), opts.lux / LUX_REF)
   const reach = opts.reach ?? tier.shadow.maxFar
   light.position.copy(dir).multiplyScalar(Math.max(24, reach * 0.8))
-  const target = new Object3D()
-  scene.add(target)
+  /* EVERY OBJECT THIS RIG PUTS IN THE SCENE, so dispose takes all of them
+     out again. A wing that rebuilds its key at each station otherwise
+     leaves a directional light and a target behind per jump, and the far
+     cascade was never removed at all. */
+  const owned: Object3D[] = []
+  const own = <T extends Object3D>(o: T): T => {
+    scene.add(o)
+    owned.push(o)
+    return o
+  }
+  const target = own(new Object3D())
   light.target = target
-  scene.add(light)
+  own(light)
 
   // the fill is the ground's own answer to the sky: it is NOT a second key,
   // it carries no direction of its own beyond up versus down
-  const fill = new HemisphereLight(0x2b3a72, 0x05060f, 0.35)
-  scene.add(fill)
+  const fill = own(new HemisphereLight(0x2b3a72, 0x05060f, 0.35))
 
   const probe: Texture | null = opts.probe
     ? opts.probe
@@ -205,10 +220,8 @@ export function createKeyLight(scene: Scene, tier: Tier, opts: KeyLightOptions):
     const l = isKey ? light : new DirectionalLight(colour.getHex(), 0)
     if (!isKey) {
       l.position.copy(light.position)
-      const t2 = new Object3D()
-      scene.add(t2)
-      l.target = t2
-      scene.add(l)
+      l.target = own(new Object3D())
+      own(l)
     }
     l.castShadow = true
     l.shadow.mapSize.setScalar(tier.shadow.mapSize)
@@ -248,6 +261,7 @@ export function createKeyLight(scene: Scene, tier: Tier, opts: KeyLightOptions):
   setTier(tier)
   const shadowNode: N = shadowAt()
 
+  let alive = true
   const amb = opts.ambient ?? 1
   const probeNode: N | null = probe ? pmremTexture(probe) : null
   const skyColour = c(fill.color)
@@ -278,6 +292,7 @@ export function createKeyLight(scene: Scene, tier: Tier, opts: KeyLightOptions):
     shadowAt,
     ambient,
     key,
+    scene,
     probe,
     setTier,
     setCamera() {
@@ -286,15 +301,21 @@ export function createKeyLight(scene: Scene, tier: Tier, opts: KeyLightOptions):
          them from its station */
     },
     dispose() {
-      scene.remove(light)
-      scene.remove(fill)
-      scene.remove(target)
-      light.dispose()
+      if (!alive) return
+      alive = false
+      for (const o of owned) scene.remove(o)
+      owned.length = 0
+      // a shadow map is a render target, and a cascade holds one each
+      for (const cas of cascades) {
+        cas.light.shadow.dispose()
+        cas.light.dispose()
+      }
       // a baked sky belongs to this light; a library probe is shared and
       // outlives every scene that borrows it
       if (!opts.probe) probe?.dispose()
       if (scene.environment === probe) scene.environment = null
     },
+    live: () => alive,
   }
 }
 

@@ -93,7 +93,7 @@ stack.setScene(scene, camera, 'cold-moon')
    the night that casts, and what it casts is what tells the visitor the court
    is a place with a sky over it and not a set. The fire is not a key: it is
    an object in the room that happens to glow, and the agora paints it itself. */
-const key = stack.light({
+const KEY_OPTIONS = {
   // the moon stands low BEHIND the colonnade, so the shadows of the columns
   // come toward the visitor across the court instead of away from him
   azimuth: 24,
@@ -101,10 +101,11 @@ const key = stack.light({
   kelvin: 4300,
   lux: 22,
   reach: 54,
-  cascades: [14, 34],
+  cascades: [14, 34] as [number, number],
   ambient: 0.9,
   sky: { zenith: '#04060e', horizon: '#111c40', ground: '#05060f', stars: 1 },
-})
+}
+const key = stack.light(KEY_OPTIONS)
 
 const eclipse = createEclipse(scene)
 const agora = createAgora(scene, { key, stack })
@@ -585,6 +586,14 @@ declare global {
       /** the drag envelope of a station, in degrees: the rig shoots the
           four corners of the look cone through this */
       look: (yaw: number, pitch: number) => void
+      /** what the stack is holding: key rigs, and objects in the scene. A
+          wing rebuilds its key at every station, so neither may grow. */
+      lights: () => { rigs: number; sceneObjects: number }
+      /** rebuild the standing scene's key, which is what a wing does when
+          it re-stages a station. The lobby's own materials were compiled
+          against the FIRST rig's shadow node, so the court's shadows go
+          flat after one call: this drives the leak gate, never a visitor. */
+      relight: () => { rigs: number; sceneObjects: number }
       /** 0 to 1 along a wing's rail; outside a wing it does nothing */
       rail: (t: number) => void
       cost: () => {
@@ -771,6 +780,13 @@ window.__forge = {
     // station is the envelope being inspected, not the damping that
     // returns a resting gaze to centre
     forgeLook = yaw === 0 && pitch === 0 ? null : { yaw: yaw * DEG, pitch: pitch * DEG }
+  },
+  lights() {
+    return { rigs: stack.lights(), sceneObjects: stack.sceneObjects() }
+  },
+  relight() {
+    stack.light(KEY_OPTIONS)
+    return { rigs: stack.lights(), sceneObjects: stack.sceneObjects() }
   },
   rail(t) {
     const count = wingFrame.stations()

@@ -52,6 +52,11 @@ export interface Stack {
   architecture: string
   setScene: (scene: Scene, camera: Camera, grade: GradeName | Grade | null | undefined) => void
   light: (opts: KeyLightOptions) => KeyLight
+  /** how many key rigs are installed right now (the leak gate reads this) */
+  lights: () => number
+  /** how many objects stand in the scene right now: a rig that leaks shows
+      here before it shows in a frame */
+  sceneObjects: () => number
   reflector: (plane: Mesh, opts?: ReflectorOptions) => Reflection
   detail: (
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -150,7 +155,20 @@ export async function createStack(opts: StackOptions = {}): Promise<Stack> {
 
     light(o) {
       if (!scene) throw new Error('setScene before light: the key belongs to a scene')
-      const rig = createKeyLight(scene, tier, o)
+      /* ONE KEY PER SCENE, and the list says so. A wing that rebuilds its
+         station keeps calling this, and a rig that is only pushed is a
+         directional light, a target and two shadow maps left in the scene
+         per jump. The replaced rig is disposed and dropped here; a rig the
+         caller disposed itself is dropped too. */
+      const here = scene
+      for (let i = lights.length - 1; i >= 0; i--) {
+        const old = lights[i]
+        if (!old) continue
+        if (old.scene !== here && old.live()) continue
+        if (old.live()) old.dispose()
+        lights.splice(i, 1)
+      }
+      const rig = createKeyLight(here, tier, o)
       if (camera) rig.setCamera(camera)
       lights.push(rig)
       return rig
@@ -203,6 +221,11 @@ export async function createStack(opts: StackOptions = {}): Promise<Stack> {
       build()
     },
 
+    /** how many key rigs the stack is holding. A number a leak cannot hide
+        behind: it is one per live scene, and it does not grow with jumps. */
+    lights: () => lights.length,
+    sceneObjects: () => scene?.children.length ?? 0,
+
     tierName: () => tierName,
     tierConfig: () => tier,
 
@@ -226,6 +249,7 @@ export async function createStack(opts: StackOptions = {}): Promise<Stack> {
     dispose() {
       materials.dispose()
       for (const l of lights) l.dispose()
+      lights.length = 0
       chain?.dispose()
       renderer.dispose()
     },
