@@ -10,7 +10,7 @@
       "prompt": "Thin brick relief, tuffeau quoins and registered cut apertures, intersecting roofs, dormers, chimneys, turret and separate gallery/watchtower. Dossier nominal dimensions with original certainty ranges. No photograph sampled. Shallow 55 mm rebate within declared 35–90 mm assumption; split upper sky reflection and lower dark-room glazing. Existing roughness .18–.23 remains inside dossier interval; no screen-space transmission. Duplicated upper tower shell now shares registered aperture cuts. Connected F16/F17 masonry below the unchanged −2.20 m base: 0.60 m inward thickness [0.45–0.80], actual standard/calm ground boundary lower envelope embedded 50 mm [25–100], full joined miter volume and inherited stone coursing. No surveyed height or opening changes.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "90bb57c7c269ca8d037b8d550a155bf7975a504648e5d62e87e84a10a46e83b9",
+      "sha256": "83119196dedfb3abe85a6bbf8a24db8bb21cfe895f82b4ea43d92aed2bcdea39",
       "note": "Q001 Q015 Q019 Q124 Q127 Q131 Q134 Q175; src/wings/vinci/data/closluce.json; recipe_file=src/wings/vinci/shell.ts; geometry_dependency=vinci/foundation-plinth"
     },
     {
@@ -23,7 +23,7 @@
       "prompt": "Bilinear IGN ground from 165 retained samples; explicit A-SITE court, terrace and assumed street cut; three scales of earth and grass; mapped stream. Conjectural exposed-soil clods, erosion variation and shallow normal relief dress declared vertical cut faces without changing their outlines or heights. Exposed-earth library colour uses two continuous world projections blended by face orientation, preserving the cut geometry and avoiding local strip UV restarts. Reuse the already licensed earth-packed map in the exact street corridors with restrained grey-beige mineral drift, compacted wheel bands, filtered aggregate and fine grit. Keep all actual sampled heights and ground outside the road.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "0d4cf4c78fdc68f66ca66afc6b26cca7ae6eaa47111268c17867d1e07086ca2f",
+      "sha256": "160db963fd1bfd98040146dc86ef99886a034ecae17ba9e73e61f8312091f3ff",
       "note": "IGN Licence Ouverte 2.0; OSM contributors ODbL 1.0; src/wings/vinci/data/terrain.json; recipe_file=src/wings/vinci/ground.ts"
     },
     {
@@ -36,7 +36,7 @@
       "prompt": "Deterministic tapering trunks, unequal forks, terminal sprays and folded October leaves. Placement and size conjectural; no photograph sampled. Add six fixed conjectural middle-distance trees on the northern and western hillside at the six EN positions declared in the planting record, retaining all original near/distant planting and excluding mapped water as well as construction and circulation. All tiers retain the same proposed tree positions; this is scenic modern-garden character, not a period planting map. Connect the existing trunks and knee forks with shared parallel-transported rings and continuous taper normals. The four near trees receive one buttressed collar each, with individually sampled embedded toes. Root shapes and dimensions remain conjectural; all current tree positions and leaf materials are retained. Every same-tier triangle and attribute is retained in two spatial branch clusters plus eight leaf clusters in calm, or four branch clusters plus sixteen leaf clusters in standard/hero. Native per-pass frustum culling uses their bounds; no camera-dependent population or shadow changes.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-10",
-      "sha256": "e985978c7b664671fdc3b35ef54bbae8b6a2e9b727c81ebc77a87e8d73d2fbe3",
+      "sha256": "8561c3674162bc04ae4e72c43968b248d2f49cc0a5127534d42f4572ed2a5ffa",
       "note": "Q119 Q128 Q178 modern planting as character reference; recipe_file=src/wings/vinci/vegetation.ts; connected_trunk_and_knee_rings=parallel_transport; near_trunk_ring_sides=12; near_root_collars=4; root_collar_radius_in_trunk_radii=1.65..3.65; root_toe_embed_m=0.02; next_collar_ring_min_clearance_m=0.20; root_micropositions_shapes_dimensions=conjectural; partition_recipe=src/wings/vinci/dressing-partition.ts; partition_sha256=bd799c2eae138b44b709ec350dbdfb858932421ca3ba4f1407e16a9a42dad3a8; branch_clusters_calm_standard_hero=2,4,4; leaf_clusters_calm_standard_hero=8,16,16; partition_preserves=all_same_tier_attributes_winding_material_transforms_shadows"
     },
     {
@@ -49,7 +49,7 @@
       "prompt": "Conjectural atmospheric sky at the exact computed 1517 sun vector: turbidity4, Rayleigh1.4, cloudScale0.0006, cloudCoverage0.28, cloudDensity0.42, cloudElevation0.35, cloudSpeed0. No weather observation survives; cloud shader parameters are scenic choices, not measured altitude. Displayed horizon colour continues the FogExp2 asymptote at assumed density0.0075/m [0.0075–0.015/m] with an assumed effective column18m [12–24m] and clear elevation12deg [10–16deg]; no terrain extrapolation. Source src/wings/vinci/display-sky-haze.ts. The environment probe rotation is separately corrected to Euler Y=-pi/2 in index.ts to match the actual computed solar azimuth; display haze never enters its radiance.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "74aedc9191b0b96cbe1ffac35a70fa331d8d373770341e8b39f4bbc2dc733c13",
+      "sha256": "0e51ea469c224b90123212b2eee4008112ed5424424a8a48fe661723defda37b",
       "note": "brief/SITE-HOUR.md; three.js SkyMesh MIT; recipe_file=src/wings/vinci/index.ts displayed_haze_recipe=src/wings/vinci/display-sky-haze.ts; sky_display_only=true; fog_density=0.0075; fog_density_assumed_range=0.0075..0.015; environmentRotation_y_rad=-1.5707963267948966; displayed_haze_sha256=80c458f2cb5ccddb7fcedccda5df70e5cdccda7d9ca97d65ebfa6462920f61ef;"
     },
     {
@@ -62,7 +62,7 @@
       "prompt": "Museum camera poses and piecewise exterior circulation in the fixed dossier frame. All poses are exhibition choices. FIFO semantic navigation on measured gate/terrace/stair/apron routes. Bounded physical near-pyramid clearance; measured geometry identity at mount. CSS projection-derived drag with 0.1 second monotone response; explicit inspection entry and return. No ordinary selected request discarded. Static material inspection aliases have separate actual placement audits.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "6cdcbfca7565cfe1beabcfb2ff25f538cd5d8ca479a40b243071b48c68220113",
+      "sha256": "76f0cef0c080e2b9a10a30ba5abadd87664c3531b5929f735e0f9dcbeb6803a1",
       "note": "brief/CONCEPT.md; src/wings/vinci/data/closluce.json; recipe_file=src/wings/vinci/rail.ts; companion_file=src/wings/vinci/input.ts; companion_recipe_ids=vinci/rail-smoothing,vinci/rail-proof,vinci/rail-fingerprint,vinci/rail-projection,vinci/projection-drag,vinci/rail-clearance"
     },
     {
@@ -75,7 +75,7 @@
       "prompt": "Spoken bilingual museum labels with unchanged station names and canonical door questions. Plain source explanations and a separately opened complete record retain the original source chain, dimensional ranges, uncertainty and identical computed-hour arithmetic.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "3c5d2bca8ecf0e19ccad37557c2d8046cfb23d27ef2e16265e08acb67b971f56",
+      "sha256": "246c19d03b189ba1fa74b29c44fb573c118d0fa213c5795a436581670395f385",
       "note": "brief/CONCEPT-OPUS.md; brief/CONCEPT-GPT6.md; src/wings/vinci/data/doors.json; recipe_file=src/wings/vinci/content.ts; visitor_evidence_recipe=src/wings/vinci/evidence-copy.ts; visitor_evidence_sha256=1154b783a9a2b7bddd75d4d1294475ae82dbe74006e4b6ff5c0eb2df9247ed00"
     },
     {
@@ -218,7 +218,7 @@
       "prompt": "Original procedural modern museum insertion at the fixed maquette envelope. Low post-grid pavilions, shallow slate roofs, full-height glazed enclosure, concrete apron, garden stair and water channel. Exact modern approach grade cuts, supported landings and continuous concrete cheek ownership. Museum design, not a claim about1517. Share the existing pale cast-concrete finish across all four roof soffits; keep their downward normals and the sole measured sun. Derive both entrance post heads from the retained inclined canopy underside; keep their centres and buried feet. Provide continuous derived structural support beneath the existing stair cheeks and both landing heads. Keep the maquette walking widths and every finish level.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "36997fdbc813592abda65bd31d3f8ea200589639b006e331b605ab893c00137d",
+      "sha256": "2563a3915e8a11090bc1678e92cf2081ab8a5f8918132bd28410ae6e5a6c0d4c",
       "note": "recipe_file=src/wings/vinci/collection.ts"
     },
     {
@@ -244,7 +244,7 @@
       "prompt": "Original masonry-lined through passage between G1/G5 preserving existing six-step grade and clear width; common3.20m head within assumed2.38–3.22m interval. Stone thresholds at existing heights and outward-open oak leaf with explicit proposed dimensions. No photograph sampled.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "c24a5c746d47ec7c51340c68e0a34d0713cd13a3ada5c6dde63c0b4dc5450ee4",
+      "sha256": "b5481703270f8fad3603e7e4161aae23c0680bd2a868191c66046c393a10f79f",
       "note": "Q134; A-SITE; A-OPENING; recipe_file=src/wings/vinci/gate-passage.ts"
     },
     {
@@ -257,7 +257,7 @@
       "prompt": "Original road surface proposal: mapped alignment Gaussian wheel wear, deterministic sparse gravel and straw, stone gutter at actual F01/F02 foot; no change to retained grades, conjectural dimensions and basis disclosed EN/DE. Distribute fixed gravel candidates in proportion to retained road segment length; grey mineral chips cluster at shoulders and disperse through the compacted earth. Embed every corner in the common grade and reject grade seams. No new paving or drainage alignment. Refine the mapped road material with a boundary-only union mask, removing internal miter seams without altering grade or width; add conjectural 24 cm compacted-mineral variation and warmer grey-beige albedo, quieter in existing wheel bands. Preserve all mounted chips, gutter geometry, physical dimensions and light.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "dbf5e1ce7c614947be0f4580e80995d7d253284cef1b2e9b61dd7c895112f560",
+      "sha256": "731948ba302f7ea8a3f8e30344cad007cf0b65f370168445a3217690fb40fab8",
       "note": "Q019; Q134; OSM-AREA; A-SITE; recipe_file=src/wings/vinci/road-dressing.ts"
     },
     {
@@ -270,7 +270,7 @@
       "prompt": "Original modern museum access from court H0 to terrace H-1.9 along the retained terrace edge. Twelve risers, 0.30m treads, 2m clear width and two0.75m landings with exact grade cuts and continuous concrete cheek ownership. Explicit design ranges and no historic stair claim.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-10",
-      "sha256": "8ce5deb22c6d72e4758287a155ce8cbb8d217fd9053aa216d3f193ef7b8e2d51",
+      "sha256": "4cf421e79bcb00a95ef624fc1763e0f56efe1bd8364dcc7d3a541d776ab4634e",
       "note": "recipe_file=src/wings/vinci/collection-access.ts"
     },
     {
@@ -387,7 +387,7 @@
       "prompt": "Regenerable actual geometry certificate for40 directed routes across five pose families and two viewport families. Includes foundation, entry, vegetation and all dressing; no sky, DOM or shadow-only duplicate.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-10",
-      "sha256": "bc94d4b625b1167ce8f78a841b2c00026b7ca9451e6c18217532c1d7c4e53543",
+      "sha256": "45c083d7e291c47b37feac20fc3434300c12921fe9d74c7d843d214a605ebd5f",
       "note": "recipe_file=src/wings/vinci/data/rail-clearance.json; source_generator=forge/results/final-rail-route-proof.mjs; runtime dependency of vinci/rail"
     },
     {
