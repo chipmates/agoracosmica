@@ -2,7 +2,7 @@
  * floor datum; this module adds construction around it without regrading.
  */
 import { BufferGeometry, Float32BufferAttribute, Group, Mesh } from 'three/webgpu'
-import { float, floor, length, mix, smoothstep, uv } from 'three/tsl'
+import { applyCoursing, courseProvenance } from './masonry-courses'
 import type { TierName } from '../../stack/tier'
 import { dossier, feature, polygon, surveyedHeight, type Quantity } from './site'
 import { createShellSurface, prepareSurfaceGeometry, type ShellSurfaceKind } from './surface'
@@ -79,7 +79,7 @@ export const gatePassageProvenance={
     leaf:{width_m:2.50,height_m:2.45,thickness_m:.065,bottom_m:.06,openAngle_deg:90,
       hingeDistance_m:Math.max(...sides.map(side=>side.end))+.02}},
   derivation:'Project the registered G5 gate centre onto G1, matching the shell cut. Intersect both facade planes with the retained 2.60 m stair sides. Solid masonry fills the derived 0.23–0.37 m jamb-to-lining intervals. Six 0.30 m treads and two 0.500012 m landings retain every existing elevation from +1.00 to 0.00 m. The common +3.20 m head is an explicit choice inside the supplied 2.38–3.22 m opening-height scenario, giving 2.20 m road-side headroom. Masonry returns terminate exactly at the original courtyard edge and retain the surrounding IGN crest. A single proposed 2.50 × 2.45 × 0.065 m oak leaf hinges at the outer end of the court-mouth return and opens 90 degrees into the level court, outside the clear stair corridor. No source establishes these passage details in 1517.',
-  recipe:'Procedural tuffeau quarry mottle, centimetre grain and millimetre pores; metre weathering, centimetre timber structure and submillimetre fibres/checks from createShellSurface. Broad side-face tone is 0.62 of the inherited stone response. Individual vertical boards, cross rails, brace and hinge blocks have member-local metre UVs. No photograph or imported bitmap is sampled. Threshold surfaces use polygon offset at the existing grade, not a raised floor.',
+  recipe:'Hand-set irregular tuffeau coursing over quarry mottle, centimetre grain and millimetre pores; metre weathering, centimetre timber structure and submillimetre fibres/checks from createShellSurface. Broad side-face tone is 0.62 of the inherited stone response. Individual vertical boards, cross rails, brace and hinge blocks have member-local metre UVs. No photograph or imported bitmap is sampled. Threshold surfaces use polygon offset at the existing grade, not a raised floor.',
   label:{
     en:'Reconstructed gate passage. The 2.60 m clear stair and its six 0.1667 m risers retain the proposed +1.00 to 0.00 m descent. Masonry lining, a common +3.20 m head (scenario 2.38–3.22 m), stone thresholds and an outward-open oak leaf are explicit museum proposals. The leaf is 2.50 × 2.45 × 0.065 m (assumed ranges 2.20–2.80 × 2.20–2.65 × 0.045–0.085 m); lining thickness .24 m [.18–.30], soffit .16 m [.12–.22] are construction proposals. Q134 constrains the gallery and timber-gate interpretation, not these dimensions or their presence in 1517. Surrounding IGN heights remain unchanged.',
     de:'Rekonstruierter Tordurchgang. Die 2,60 m lichte Treppe und ihre sechs Steigungen von 0,1667 m behalten den vorgeschlagenen Abstieg von +1,00 auf 0,00 m bei. Mauerwerksauskleidung, eine gemeinsame Durchgangsoberkante auf +3,20 m (Szenario 2,38–3,22 m), Steinschwellen und ein nach außen geöffnetes Eichentor sind ausdrückliche museale Vorschläge. Der Torflügel misst 2,50 × 2,45 × 0,065 m (angenommene Bereiche 2,20–2,80 × 2,20–2,65 × 0,045–0,085 m); Auskleidung 0,24 m [0,18–0,30] und Decke 0,16 m [0,12–0,22] sind Konstruktionsvorschläge. Q134 begrenzt die Interpretation von Galerie und Holztor, belegt jedoch weder diese Maße noch ihren Bestand im Jahr 1517. Die umgebenden IGN-Höhen bleiben unverändert.',
@@ -180,21 +180,16 @@ export function createGatePassage(tier:TierName):Group {
     prepareSurfaceGeometry(geometry,batch.kind,batch.roles)
     const material=createShellSurface(batch.kind)
     material.colorNode=material.colorNode!.mul(darken)
-    if(name==='masonry lining'){
-      const U=uv(),row=floor(U.y.div(.28)),course=U.y.div(.28).fract()
-      const head=U.x.div(.62).add(row.mod(2).mul(.5)).fract()
-      const edge=course.min(float(1).sub(course)).mul(.28).min(head.min(float(1).sub(head)).mul(.62))
-      const pixel=length(U.dFdx()).add(length(U.dFdy())).mul(.6).max(.002)
-      const face=smoothstep(float(.006).sub(pixel),float(.006).add(pixel),edge)
-      material.colorNode=material.colorNode!.mul(mix(float(.70),float(1),face))
-    }
+    // The passage was a machine-cut grid: every course the same height,
+    // every block the same length, every joint the same six millimetres.
+    if(name==='masonry lining')applyCoursing(material as unknown as {colorNode:unknown;normalNode:unknown})
     if(name==='gate ironwork'){material.metalness=.55;material.roughness=.76;material.normalNode=null;material.roughnessNode=null}
     if(surfaceOnly){material.polygonOffset=true;material.polygonOffsetFactor=-1;material.polygonOffsetUnits=-2}
     const mesh=new Mesh(geometry,material);mesh.name=`wing-vinci/gate-passage/${name}`
     mesh.castShadow=!surfaceOnly;mesh.receiveShadow=true;mesh.userData={manifestId:'vinci/gate-passage',labelOccluder:!surfaceOnly}
     group.add(mesh)
   }
-  group.userData={...gatePassageProvenance,tier,triangles:[lining,threshold,oak,hardware].reduce((sum,batch)=>sum+batch.positions.length/9,0),
+  group.userData={...gatePassageProvenance,coursing:courseProvenance,tier,triangles:[lining,threshold,oak,hardware].reduce((sum,batch)=>sum+batch.positions.length/9,0),
     suppressibleEdges:sides.map(side=>({from:xy(at(side.start,side.offset,0)),to:xy(at(side.end,side.offset,0))}))}
   return group
 }
