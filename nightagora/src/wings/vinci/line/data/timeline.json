@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "provenance": {
-    "source_root": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci",
+    "source_root": "program/rounds/wing-vinci",
     "governing_source": "CONCEPT.md",
     "rights_authority": "refs/RIGHTS-CROSSCHECK.md",
     "catalogue_date": "2026-09-08",

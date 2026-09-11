@@ -37853,7 +37853,7 @@
     {
       "id": "DRAWER",
       "title": "Mining catalog, place; supplied source register",
-      "url": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci/refs/MINING-CATALOG-PLACE.md",
+      "url": "program/rounds/wing-vinci/refs/MINING-CATALOG-PLACE.md",
       "role": "secondary synthesis",
       "rights": "Facts only; no image redistribution.",
       "limitations": "No measured interior plan supplied.",
@@ -37862,7 +37862,7 @@
     {
       "id": "RIGHTS",
       "title": "Rights crosscheck: stricter class governs",
-      "url": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci/refs/RIGHTS-CROSSCHECK.md",
+      "url": "program/rounds/wing-vinci/refs/RIGHTS-CROSSCHECK.md",
       "role": "rights rule",
       "rights": "Facts only; no image redistribution.",
       "limitations": "No measured interior plan supplied.",
@@ -37871,7 +37871,7 @@
     {
       "id": "CONCEPT",
       "title": "Converged wing concept and station contract",
-      "url": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci/CONCEPT.md",
+      "url": "program/rounds/wing-vinci/CONCEPT.md",
       "role": "design instruction",
       "rights": "Facts only; no image redistribution.",
       "limitations": "No measured interior plan supplied.",
@@ -38153,7 +38153,7 @@
       "rights": "Thesupermat, CC BY-SA 4.0, via Wikimedia Commons; effective class DG",
       "limitations": "CC BY-SA 4.0 photograph by Thesupermat; retain photographer and licence credit.",
       "retrieved": "2026-09-08",
-      "read_only_file": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci/refs/place/plates/closluce/01-exterior/amboise-chateau-du-clos-luce-001__chateau-du-clos-luce-amboise-private-saint-bris-family__4096x2731.jpg",
+      "read_only_file": "program/rounds/wing-vinci/refs/place/plates/closluce/01-exterior/amboise-chateau-du-clos-luce-001__chateau-du-clos-luce-amboise-private-saint-bris-family__4096x2731.jpg",
       "display_grade": true,
       "licence": "CC BY-SA 4.0",
       "register_ref": "../evidence/plate-register.json"
@@ -38166,7 +38166,7 @@
       "rights": "Thesupermat, CC BY-SA 4.0, via Wikimedia Commons; effective class DG",
       "limitations": "CC BY-SA 4.0 photograph by Thesupermat; retain photographer and licence credit.",
       "retrieved": "2026-09-08",
-      "read_only_file": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci/refs/place/plates/closluce/01-exterior/amboise-chateau-du-clos-luce-006__chateau-du-clos-luce-amboise-private-saint-bris-family__4096x2731.jpg",
+      "read_only_file": "program/rounds/wing-vinci/refs/place/plates/closluce/01-exterior/amboise-chateau-du-clos-luce-006__chateau-du-clos-luce-amboise-private-saint-bris-family__4096x2731.jpg",
       "display_grade": true,
       "licence": "CC BY-SA 4.0",
       "register_ref": "../evidence/plate-register.json"
@@ -38179,7 +38179,7 @@
       "rights": "Thesupermat, CC BY-SA 4.0, via Wikimedia Commons; effective class DG",
       "limitations": "CC BY-SA 4.0 photograph by Thesupermat; retain photographer and licence credit.",
       "retrieved": "2026-09-08",
-      "read_only_file": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci/refs/place/plates/closluce/01-exterior/amboise-chateau-du-clos-luce-007__chateau-du-clos-luce-amboise-private-saint-bris-family__4096x2731.jpg",
+      "read_only_file": "program/rounds/wing-vinci/refs/place/plates/closluce/01-exterior/amboise-chateau-du-clos-luce-007__chateau-du-clos-luce-amboise-private-saint-bris-family__4096x2731.jpg",
       "display_grade": true,
       "licence": "CC BY-SA 4.0",
       "register_ref": "../evidence/plate-register.json"
@@ -38192,7 +38192,7 @@
       "rights": "Thesupermat, CC BY-SA 4.0, via Wikimedia Commons; effective class DG",
       "limitations": "CC BY-SA 4.0 photograph by Thesupermat; retain photographer and licence credit.",
       "retrieved": "2026-09-08",
-      "read_only_file": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci/refs/place/plates/closluce/01-exterior/amboise-chateau-du-clos-luce-010__chateau-du-clos-luce-amboise-private-saint-bris-family__4096x2731.jpg",
+      "read_only_file": "program/rounds/wing-vinci/refs/place/plates/closluce/01-exterior/amboise-chateau-du-clos-luce-010__chateau-du-clos-luce-amboise-private-saint-bris-family__4096x2731.jpg",
       "display_grade": true,
       "licence": "CC BY-SA 4.0",
       "register_ref": "../evidence/plate-register.json"
@@ -38205,7 +38205,7 @@
       "rights": "Wolkenkratzer, CC BY-SA 4.0, via Wikimedia Commons; effective class DG",
       "limitations": "CC BY-SA 4.0 photograph by Wolkenkratzer; retain photographer and licence credit.",
       "retrieved": "2026-09-08",
-      "read_only_file": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci/refs/place/plates/closluce/01-exterior/f-schloss-clos-luce-003b__chateau-du-clos-luce-amboise-private-saint-bris-family__4096x2304.jpg",
+      "read_only_file": "program/rounds/wing-vinci/refs/place/plates/closluce/01-exterior/f-schloss-clos-luce-003b__chateau-du-clos-luce-amboise-private-saint-bris-family__4096x2304.jpg",
       "display_grade": true,
       "licence": "CC BY-SA 4.0",
       "register_ref": "../evidence/plate-register.json"
@@ -38218,7 +38218,7 @@
       "rights": "Manfred Heyde, CC BY-SA 3.0, via Wikimedia Commons; effective class DG",
       "limitations": "CC BY-SA 3.0 photograph by Manfred Heyde; retain photographer and licence credit.",
       "retrieved": "2026-09-08",
-      "read_only_file": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci/refs/place/plates/closluce/01-exterior/closluce04__chateau-du-clos-luce-amboise-private-saint-bris-family__4096x2731.jpg",
+      "read_only_file": "program/rounds/wing-vinci/refs/place/plates/closluce/01-exterior/closluce04__chateau-du-clos-luce-amboise-private-saint-bris-family__4096x2731.jpg",
       "display_grade": true,
       "licence": "CC BY-SA 3.0",
       "register_ref": "../evidence/plate-register.json"
@@ -38231,7 +38231,7 @@
       "rights": "Séraphin-Médéric Mieusement, Public domain, via Wikimedia Commons; effective class RC",
       "limitations": "Mieusement old photograph is sourced to APMH00004136 with GrandPalaisRmn supply credit; retain RC on conflict.",
       "retrieved": "2026-09-08",
-      "read_only_file": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci/refs/place/plates/closluce/05-historic/amboise-clos-luce-mieusement__mediatheque-de-l-architecture-et-du-patrimoine__373x512.jpg",
+      "read_only_file": "program/rounds/wing-vinci/refs/place/plates/closluce/05-historic/amboise-clos-luce-mieusement__mediatheque-de-l-architecture-et-du-patrimoine__373x512.jpg",
       "display_grade": false,
       "licence": "Public domain",
       "register_ref": "../evidence/plate-register.json"
@@ -38244,7 +38244,7 @@
       "rights": "Ceridwen, CC BY-SA 3.0, via Wikimedia Commons; effective class DG",
       "limitations": "CC BY-SA 3.0 photograph by Ceridwen; retain photographer and licence credit.",
       "retrieved": "2026-09-08",
-      "read_only_file": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci/refs/place/plates/closluce/01-exterior/clos-luce-castle-entrance-1__chateau-du-clos-luce-amboise-private-saint-bris-family__4000x2982.jpg",
+      "read_only_file": "program/rounds/wing-vinci/refs/place/plates/closluce/01-exterior/clos-luce-castle-entrance-1__chateau-du-clos-luce-amboise-private-saint-bris-family__4000x2982.jpg",
       "display_grade": true,
       "licence": "CC BY-SA 3.0",
       "register_ref": "../evidence/plate-register.json"
@@ -38257,7 +38257,7 @@
       "rights": "Ceridwen, CC BY-SA 3.0, via Wikimedia Commons; effective class DG",
       "limitations": "CC BY-SA 3.0 photograph by Ceridwen; retain photographer and licence credit.",
       "retrieved": "2026-09-08",
-      "read_only_file": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci/refs/place/plates/closluce/01-exterior/clos-luce-castle-side-facade__chateau-du-clos-luce-amboise-private-saint-bris-family__4000x2642.jpg",
+      "read_only_file": "program/rounds/wing-vinci/refs/place/plates/closluce/01-exterior/clos-luce-castle-side-facade__chateau-du-clos-luce-amboise-private-saint-bris-family__4000x2642.jpg",
       "display_grade": true,
       "licence": "CC BY-SA 3.0",
       "register_ref": "../evidence/plate-register.json"
@@ -38270,7 +38270,7 @@
       "rights": "Ceridwen, CC BY-SA 3.0, via Wikimedia Commons; effective class DG",
       "limitations": "CC BY-SA 3.0 photograph by Ceridwen; retain photographer and licence credit.",
       "retrieved": "2026-09-08",
-      "read_only_file": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci/refs/place/plates/closluce/01-exterior/clos-luce-castle-garden-and-castle-back__chateau-du-clos-luce-amboise-private-saint-bris-family__4000x2638.jpg",
+      "read_only_file": "program/rounds/wing-vinci/refs/place/plates/closluce/01-exterior/clos-luce-castle-garden-and-castle-back__chateau-du-clos-luce-amboise-private-saint-bris-family__4000x2638.jpg",
       "display_grade": true,
       "licence": "CC BY-SA 3.0",
       "register_ref": "../evidence/plate-register.json"
@@ -38283,7 +38283,7 @@
       "rights": "VIGNERON, CC BY 3.0, via Wikimedia Commons; effective class DG",
       "limitations": "CC BY 3.0 photograph by VIGNERON; retain photographer and licence credit.",
       "retrieved": "2026-09-08",
-      "read_only_file": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci/refs/place/plates/closluce/01-exterior/clos-luce-cour-arriere__chateau-du-clos-luce-amboise-private-saint-bris-family__3648x2736.jpg",
+      "read_only_file": "program/rounds/wing-vinci/refs/place/plates/closluce/01-exterior/clos-luce-cour-arriere__chateau-du-clos-luce-amboise-private-saint-bris-family__3648x2736.jpg",
       "display_grade": true,
       "licence": "CC BY 3.0",
       "register_ref": "../evidence/plate-register.json"
@@ -38296,7 +38296,7 @@
       "rights": "Duch, CC BY-SA 4.0, via Wikimedia Commons; effective class DG",
       "limitations": "CC BY-SA 4.0 photograph by Duch; retain photographer and licence credit.",
       "retrieved": "2026-09-08",
-      "read_only_file": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci/refs/place/plates/closluce/01-exterior/clos-luce-tour-de-guet-et-galerie__chateau-du-clos-luce-amboise-private-saint-bris-family__3872x2592.jpg",
+      "read_only_file": "program/rounds/wing-vinci/refs/place/plates/closluce/01-exterior/clos-luce-tour-de-guet-et-galerie__chateau-du-clos-luce-amboise-private-saint-bris-family__3872x2592.jpg",
       "display_grade": true,
       "licence": "CC BY-SA 4.0",
       "register_ref": "../evidence/plate-register.json"
@@ -38309,7 +38309,7 @@
       "rights": "Ogama 10, CC BY-SA 4.0, via Wikimedia Commons; effective class DG",
       "limitations": "CC BY-SA 4.0 photograph by Ogama 10; retain photographer and licence credit.",
       "retrieved": "2026-09-08",
-      "read_only_file": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci/refs/place/plates/closluce/01-exterior/tunnel-du-clos-luce__chateau-du-clos-luce-amboise-private-saint-bris-family__3024x4032.jpg",
+      "read_only_file": "program/rounds/wing-vinci/refs/place/plates/closluce/01-exterior/tunnel-du-clos-luce__chateau-du-clos-luce-amboise-private-saint-bris-family__3024x4032.jpg",
       "display_grade": true,
       "licence": "CC BY-SA 4.0",
       "register_ref": "../evidence/plate-register.json"
@@ -38322,7 +38322,7 @@
       "rights": "Ceridwen, CC BY-SA 3.0, via Wikimedia Commons; effective class DG",
       "limitations": "CC BY-SA 3.0 photograph by Ceridwen; retain photographer and licence credit.",
       "retrieved": "2026-09-08",
-      "read_only_file": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci/refs/place/plates/closluce/02-interior/clos-luce-castle-18th-century-parlour__chateau-du-clos-luce-amboise-private-saint-bris-family__4000x2667.jpg",
+      "read_only_file": "program/rounds/wing-vinci/refs/place/plates/closluce/02-interior/clos-luce-castle-18th-century-parlour__chateau-du-clos-luce-amboise-private-saint-bris-family__4000x2667.jpg",
       "display_grade": true,
       "licence": "CC BY-SA 3.0",
       "register_ref": "../evidence/plate-register.json"
@@ -38335,7 +38335,7 @@
       "rights": "Ceridwen, CC BY-SA 3.0, via Wikimedia Commons; effective class DG",
       "limitations": "CC BY-SA 3.0 photograph by Ceridwen; retain photographer and licence credit.",
       "retrieved": "2026-09-08",
-      "read_only_file": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci/refs/place/plates/closluce/02-interior/clos-luce-castle-dining-room__chateau-du-clos-luce-amboise-private-saint-bris-family__4000x2667.jpg",
+      "read_only_file": "program/rounds/wing-vinci/refs/place/plates/closluce/02-interior/clos-luce-castle-dining-room__chateau-du-clos-luce-amboise-private-saint-bris-family__4000x2667.jpg",
       "display_grade": true,
       "licence": "CC BY-SA 3.0",
       "register_ref": "../evidence/plate-register.json"
@@ -38348,7 +38348,7 @@
       "rights": "Ceridwen, CC BY-SA 3.0, via Wikimedia Commons; effective class DG",
       "limitations": "CC BY-SA 3.0 photograph by Ceridwen; retain photographer and licence credit.",
       "retrieved": "2026-09-08",
-      "read_only_file": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci/refs/place/plates/closluce/02-interior/clos-luce-castle-main-stairs__chateau-du-clos-luce-amboise-private-saint-bris-family__4000x2667.jpg",
+      "read_only_file": "program/rounds/wing-vinci/refs/place/plates/closluce/02-interior/clos-luce-castle-main-stairs__chateau-du-clos-luce-amboise-private-saint-bris-family__4000x2667.jpg",
       "display_grade": true,
       "licence": "CC BY-SA 3.0",
       "register_ref": "../evidence/plate-register.json"
@@ -38361,7 +38361,7 @@
       "rights": "Ceridwen, CC BY-SA 3.0, via Wikimedia Commons; effective class DG",
       "limitations": "CC BY-SA 3.0 photograph by Ceridwen; retain photographer and licence credit.",
       "retrieved": "2026-09-08",
-      "read_only_file": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci/refs/place/plates/closluce/02-interior/clos-luce-castle-kitchen__chateau-du-clos-luce-amboise-private-saint-bris-family__2667x4000.jpg",
+      "read_only_file": "program/rounds/wing-vinci/refs/place/plates/closluce/02-interior/clos-luce-castle-kitchen__chateau-du-clos-luce-amboise-private-saint-bris-family__2667x4000.jpg",
       "display_grade": true,
       "licence": "CC BY-SA 3.0",
       "register_ref": "../evidence/plate-register.json"
@@ -38374,7 +38374,7 @@
       "rights": "Ceridwen, CC BY-SA 3.0, via Wikimedia Commons; effective class DG",
       "limitations": "CC BY-SA 3.0 photograph by Ceridwen; retain photographer and licence credit.",
       "retrieved": "2026-09-08",
-      "read_only_file": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci/refs/place/plates/closluce/02-interior/clos-luce-castle-leonardo-s-room__chateau-du-clos-luce-amboise-private-saint-bris-family__4000x2667.jpg",
+      "read_only_file": "program/rounds/wing-vinci/refs/place/plates/closluce/02-interior/clos-luce-castle-leonardo-s-room__chateau-du-clos-luce-amboise-private-saint-bris-family__4000x2667.jpg",
       "display_grade": true,
       "licence": "CC BY-SA 3.0",
       "register_ref": "../evidence/plate-register.json"
@@ -38387,7 +38387,7 @@
       "rights": "Ceridwen, CC BY-SA 3.0, via Wikimedia Commons; effective class DG",
       "limitations": "CC BY-SA 3.0 photograph by Ceridwen; retain photographer and licence credit.",
       "retrieved": "2026-09-08",
-      "read_only_file": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci/refs/place/plates/closluce/02-interior/clos-luce-castle-marguerite-de-navarre-s-room__chateau-du-clos-luce-amboise-private-saint-bris-family__4000x2667.jpg",
+      "read_only_file": "program/rounds/wing-vinci/refs/place/plates/closluce/02-interior/clos-luce-castle-marguerite-de-navarre-s-room__chateau-du-clos-luce-amboise-private-saint-bris-family__4000x2667.jpg",
       "display_grade": true,
       "licence": "CC BY-SA 3.0",
       "register_ref": "../evidence/plate-register.json"
@@ -38400,7 +38400,7 @@
       "rights": "Duch, CC BY-SA 4.0, via Wikimedia Commons; effective class DG",
       "limitations": "CC BY-SA 4.0 photograph by Duch; retain photographer and licence credit.",
       "retrieved": "2026-09-08",
-      "read_only_file": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci/refs/place/plates/closluce/02-interior/clos-luce-grande-salle-renaissance-poutre-trompe-l-oeil__chateau-du-clos-luce-amboise-private-saint-bris-family__3872x2592.jpg",
+      "read_only_file": "program/rounds/wing-vinci/refs/place/plates/closluce/02-interior/clos-luce-grande-salle-renaissance-poutre-trompe-l-oeil__chateau-du-clos-luce-amboise-private-saint-bris-family__3872x2592.jpg",
       "display_grade": true,
       "licence": "CC BY-SA 4.0",
       "register_ref": "../evidence/plate-register.json"
@@ -38413,7 +38413,7 @@
       "rights": "Duch, CC BY-SA 4.0, via Wikimedia Commons; effective class DG",
       "limitations": "CC BY-SA 4.0 photograph by Duch; retain photographer and licence credit.",
       "retrieved": "2026-09-08",
-      "read_only_file": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci/refs/place/plates/closluce/02-interior/clos-luce-cabinet-de-curiosites-bibliotheque-1__chateau-du-clos-luce-amboise-private-saint-bris-family__3872x2592.jpg",
+      "read_only_file": "program/rounds/wing-vinci/refs/place/plates/closluce/02-interior/clos-luce-cabinet-de-curiosites-bibliotheque-1__chateau-du-clos-luce-amboise-private-saint-bris-family__3872x2592.jpg",
       "display_grade": true,
       "licence": "CC BY-SA 4.0",
       "register_ref": "../evidence/plate-register.json"
@@ -38426,7 +38426,7 @@
       "rights": "Cliciaantao, CC BY-SA 4.0, via Wikimedia Commons; effective class DG",
       "limitations": "CC BY-SA 4.0 photograph by Cliciaantao; retain photographer and licence credit. Sixteenth-century glass confirmed by ARVIVA; assembled after 2011.",
       "retrieved": "2026-09-08",
-      "read_only_file": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci/refs/place/plates/closluce/02-interior/fenetre-clos-luce__chateau-du-clos-luce-amboise-private-saint-bris-family__1536x2304.jpg",
+      "read_only_file": "program/rounds/wing-vinci/refs/place/plates/closluce/02-interior/fenetre-clos-luce__chateau-du-clos-luce-amboise-private-saint-bris-family__1536x2304.jpg",
       "display_grade": true,
       "licence": "CC BY-SA 4.0",
       "register_ref": "../evidence/plate-register.json"
@@ -38439,7 +38439,7 @@
       "rights": "Jacques Le Letty, CC BY-SA 4.0, via Wikimedia Commons; effective class DG",
       "limitations": "CC BY-SA 4.0 photograph by Jacques Le Letty; retain photographer and licence credit. Sixteenth-century glass confirmed by ARVIVA; assembled after 2011.",
       "retrieved": "2026-09-08",
-      "read_only_file": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci/refs/place/plates/closluce/02-interior/chateau-luce-vitraux__chateau-du-clos-luce-amboise-private-saint-bris-family__3000x4000.jpg",
+      "read_only_file": "program/rounds/wing-vinci/refs/place/plates/closluce/02-interior/chateau-luce-vitraux__chateau-du-clos-luce-amboise-private-saint-bris-family__3000x4000.jpg",
       "display_grade": true,
       "licence": "CC BY-SA 4.0",
       "register_ref": "../evidence/plate-register.json"
@@ -38452,7 +38452,7 @@
       "rights": "Ceridwen, CC BY-SA 3.0, via Wikimedia Commons; effective class DG",
       "limitations": "CC BY-SA 3.0 photograph by Ceridwen; retain photographer and licence credit.",
       "retrieved": "2026-09-08",
-      "read_only_file": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci/refs/place/plates/closluce/03-chapel/clos-luce-castle-anne-de-bretagne-s-oratory-ceiling__chateau-du-clos-luce-amboise-private-saint-bris-family__4000x2632.jpg",
+      "read_only_file": "program/rounds/wing-vinci/refs/place/plates/closluce/03-chapel/clos-luce-castle-anne-de-bretagne-s-oratory-ceiling__chateau-du-clos-luce-amboise-private-saint-bris-family__4000x2632.jpg",
       "display_grade": true,
       "licence": "CC BY-SA 3.0",
       "register_ref": "../evidence/plate-register.json"
@@ -38465,7 +38465,7 @@
       "rights": "Abzeronow, CC BY 4.0, via Wikimedia Commons; effective class DG",
       "limitations": "CC BY 4.0 photograph by Abzeronow; retain photographer and licence credit. ARVIVA dates the glass to the sixteenth century.",
       "retrieved": "2026-09-08",
-      "read_only_file": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci/refs/place/plates/closluce/03-chapel/stained-glass-window-in-chapel-in-clos-luce__chateau-du-clos-luce-amboise-private-saint-bris-family__4000x3000.jpg",
+      "read_only_file": "program/rounds/wing-vinci/refs/place/plates/closluce/03-chapel/stained-glass-window-in-chapel-in-clos-luce__chateau-du-clos-luce-amboise-private-saint-bris-family__4000x3000.jpg",
       "display_grade": true,
       "licence": "CC BY 4.0",
       "register_ref": "../evidence/plate-register.json"
@@ -38478,7 +38478,7 @@
       "rights": "Duch, CC BY-SA 4.0, via Wikimedia Commons; effective class DG",
       "limitations": "CC BY-SA 4.0 photograph by Duch; retain photographer and licence credit.",
       "retrieved": "2026-09-08",
-      "read_only_file": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci/refs/place/plates/closluce/04-park/clos-luce-jardin-renaissance__chateau-du-clos-luce-amboise-private-saint-bris-family__3872x2592.jpg",
+      "read_only_file": "program/rounds/wing-vinci/refs/place/plates/closluce/04-park/clos-luce-jardin-renaissance__chateau-du-clos-luce-amboise-private-saint-bris-family__3872x2592.jpg",
       "display_grade": true,
       "licence": "CC BY-SA 4.0",
       "register_ref": "../evidence/plate-register.json"
@@ -38491,7 +38491,7 @@
       "rights": "Duch, CC BY-SA 4.0, via Wikimedia Commons; effective class DG",
       "limitations": "CC BY-SA 4.0 photograph by Duch; retain photographer and licence credit.",
       "retrieved": "2026-09-08",
-      "read_only_file": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci/refs/place/plates/closluce/04-park/clos-luce-pigeonnier__chateau-du-clos-luce-amboise-private-saint-bris-family__2592x3872.jpg",
+      "read_only_file": "program/rounds/wing-vinci/refs/place/plates/closluce/04-park/clos-luce-pigeonnier__chateau-du-clos-luce-amboise-private-saint-bris-family__2592x3872.jpg",
       "display_grade": true,
       "licence": "CC BY-SA 4.0",
       "register_ref": "../evidence/plate-register.json"
@@ -38504,7 +38504,7 @@
       "rights": "Pieter van Everdingen, CC BY-SA 4.0, via Wikimedia Commons; effective class DG",
       "limitations": "CC BY-SA 4.0 photograph by Pieter van Everdingen; retain photographer and licence credit. Room view only; no extraction of unidentified facsimile plates.",
       "retrieved": "2026-09-08",
-      "read_only_file": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci/refs/place/plates/closluce/02-interior/chateau-du-clos-luce-study-of-leonardo-da-vinci-20180501-pve-q1122731__chateau-du-clos-luce-amboise-private-saint-bris-family__2730x4096.jpg",
+      "read_only_file": "program/rounds/wing-vinci/refs/place/plates/closluce/02-interior/chateau-du-clos-luce-study-of-leonardo-da-vinci-20180501-pve-q1122731__chateau-du-clos-luce-amboise-private-saint-bris-family__2730x4096.jpg",
       "display_grade": true,
       "licence": "CC BY-SA 4.0",
       "register_ref": "../evidence/plate-register.json"
@@ -38517,7 +38517,7 @@
       "rights": "our own drawing; base data (c) OpenStreetMap contributors, ODbL; effective class DG",
       "limitations": "Seat-created OSM-derived drawing; attribute OpenStreetMap contributors and ODbL; geometry is present-day inference. Original figure and generation metadata are identified in the plate register; the supplied source-page field was descriptive text, not a URL.",
       "retrieved": "2026-09-08",
-      "read_only_file": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci/refs/place/plates/closluce/00-siteplan/clos-luce-footprint-facade-bearings__our-own-drawing__1530x1870.png",
+      "read_only_file": "program/rounds/wing-vinci/refs/place/plates/closluce/00-siteplan/clos-luce-footprint-facade-bearings__our-own-drawing__1530x1870.png",
       "display_grade": true,
       "licence": "licence ouverte / ODbL / our own work",
       "register_ref": "../evidence/plate-register.json",
@@ -38531,7 +38531,7 @@
       "rights": "IGN, Geoplateforme orthophotography, licence ouverte; outlines (c) OpenStreetMap contributors, ODbL; effective class DG",
       "limitations": "IGN orthophotography under Licence Ouverte Etalab; retain IGN source/date and OpenStreetMap contributors, ODbL, for the outlines. Original figure and generation metadata are identified in the plate register; the supplied source-page field was descriptive text, not a URL.",
       "retrieved": "2026-09-08",
-      "read_only_file": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci/refs/place/plates/closluce/00-siteplan/clos-luce-ortho-manor__ign-geoplateforme__1024x1280.jpg",
+      "read_only_file": "program/rounds/wing-vinci/refs/place/plates/closluce/00-siteplan/clos-luce-ortho-manor__ign-geoplateforme__1024x1280.jpg",
       "display_grade": true,
       "licence": "licence ouverte / ODbL / our own work",
       "register_ref": "../evidence/plate-register.json",
@@ -38545,7 +38545,7 @@
       "rights": "IGN, Geoplateforme orthophotography, licence ouverte; outlines (c) OpenStreetMap contributors, ODbL; effective class DG",
       "limitations": "IGN orthophotography under Licence Ouverte Etalab; retain IGN source/date and OpenStreetMap contributors, ODbL, for the outlines. Original figure and generation metadata are identified in the plate register; the supplied source-page field was descriptive text, not a URL.",
       "retrieved": "2026-09-08",
-      "read_only_file": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci/refs/place/plates/closluce/00-siteplan/clos-luce-ortho-park__ign-geoplateforme__1024x1280.jpg",
+      "read_only_file": "program/rounds/wing-vinci/refs/place/plates/closluce/00-siteplan/clos-luce-ortho-park__ign-geoplateforme__1024x1280.jpg",
       "display_grade": true,
       "licence": "licence ouverte / ODbL / our own work",
       "register_ref": "../evidence/plate-register.json",
@@ -38559,7 +38559,7 @@
       "rights": "IGN, Geoplateforme orthophotography, licence ouverte; effective class DG",
       "limitations": "IGN orthophotography under Licence Ouverte Etalab; retain IGN source and acquisition/update date. Original figure and generation metadata are identified in the plate register; the supplied source-page field was descriptive text, not a URL.",
       "retrieved": "2026-09-08",
-      "read_only_file": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci/refs/place/plates/closluce/00-siteplan/clos-luce-ign-orthophoto__ign-geoplateforme__768x768.jpg",
+      "read_only_file": "program/rounds/wing-vinci/refs/place/plates/closluce/00-siteplan/clos-luce-ign-orthophoto__ign-geoplateforme__768x768.jpg",
       "display_grade": true,
       "licence": "licence ouverte / ODbL / our own work",
       "register_ref": "../evidence/plate-register.json",

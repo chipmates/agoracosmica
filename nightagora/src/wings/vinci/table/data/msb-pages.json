@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "provenance": {
-    "source_root": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci",
+    "source_root": "program/rounds/wing-vinci",
     "governing_source": "CONCEPT.md",
     "rights_authority": "refs/RIGHTS-CROSSCHECK.md",
     "catalogue_date": "2026-09-08",
@@ -2648,7 +2648,7 @@
       "machine_sources": [
         {
           "slug": "double-hull",
-          "dossier": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci-machines/app/dossiers/double-hull.json",
+          "dossier": "program/rounds/wing-vinci-machines/app/dossiers/double-hull.json",
           "relation": "primary_folio",
           "verification": "Dossier cross-reference",
           "folio_source_url": "https://www.leonardodigitale.com/sfoglia/manoscritto-b-dell-institut-de-france/0011-r/"
@@ -2717,7 +2717,7 @@
       "machine_sources": [
         {
           "slug": "double-hull",
-          "dossier": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci-machines/app/dossiers/double-hull.json",
+          "dossier": "program/rounds/wing-vinci-machines/app/dossiers/double-hull.json",
           "relation": "primary_folio",
           "verification": "Dossier cross-reference",
           "folio_source_url": "https://www.leonardodigitale.com/sfoglia/manoscritto-b-dell-institut-de-france/0011-r/"
@@ -7868,7 +7868,7 @@
       "machine_sources": [
         {
           "slug": "steam-cannon",
-          "dossier": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci-machines/app/dossiers/steam-cannon.json",
+          "dossier": "program/rounds/wing-vinci-machines/app/dossiers/steam-cannon.json",
           "relation": "primary_folio",
           "verification": "Dossier cross-reference",
           "folio_source_url": "https://www.leonardodigitale.com/sfoglia/manoscritto-b-dell-institut-de-france/0033-r/"
@@ -7937,7 +7937,7 @@
       "machine_sources": [
         {
           "slug": "steam-cannon",
-          "dossier": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci-machines/app/dossiers/steam-cannon.json",
+          "dossier": "program/rounds/wing-vinci-machines/app/dossiers/steam-cannon.json",
           "relation": "primary_folio",
           "verification": "Dossier cross-reference",
           "folio_source_url": "https://www.leonardodigitale.com/sfoglia/manoscritto-b-dell-institut-de-france/0033-r/"
@@ -11672,7 +11672,7 @@
       "machine_sources": [
         {
           "slug": "revolving-crane",
-          "dossier": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci-machines/app/dossiers/revolving-crane.json",
+          "dossier": "program/rounds/wing-vinci-machines/app/dossiers/revolving-crane.json",
           "relation": "primary_folio",
           "verification": "Dossier cross-reference",
           "folio_source_url": "https://www.leonardodigitale.com/sfoglia/manoscritto-b-dell-institut-de-france/0049-r/"
@@ -11744,7 +11744,7 @@
       "machine_sources": [
         {
           "slug": "revolving-crane",
-          "dossier": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci-machines/app/dossiers/revolving-crane.json",
+          "dossier": "program/rounds/wing-vinci-machines/app/dossiers/revolving-crane.json",
           "relation": "primary_folio",
           "verification": "Dossier cross-reference",
           "folio_source_url": "https://www.leonardodigitale.com/sfoglia/manoscritto-b-dell-institut-de-france/0049-r/"
@@ -11816,7 +11816,7 @@
       "machine_sources": [
         {
           "slug": "revolving-crane",
-          "dossier": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci-machines/app/dossiers/revolving-crane.json",
+          "dossier": "program/rounds/wing-vinci-machines/app/dossiers/revolving-crane.json",
           "relation": "related_context",
           "verification": "Dossier cross-reference",
           "folio_source_url": "https://www.leonardodigitale.com/sfoglia/manoscritto-b-dell-institut-de-france/0049-v/"
@@ -11885,7 +11885,7 @@
       "machine_sources": [
         {
           "slug": "revolving-crane",
-          "dossier": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci-machines/app/dossiers/revolving-crane.json",
+          "dossier": "program/rounds/wing-vinci-machines/app/dossiers/revolving-crane.json",
           "relation": "related_context",
           "verification": "Dossier cross-reference",
           "folio_source_url": "https://www.leonardodigitale.com/sfoglia/manoscritto-b-dell-institut-de-france/0049-v/"
@@ -16828,7 +16828,7 @@
       "machine_sources": [
         {
           "slug": "lathe",
-          "dossier": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci-machines/app/dossiers/lathe.json",
+          "dossier": "program/rounds/wing-vinci-machines/app/dossiers/lathe.json",
           "relation": "related_context",
           "verification": "Editorial related-device link from the manuscript catalog, not the dossier’s primary folio",
           "folio_source_url": "https://www.leonardodigitale.com/sfoglia/manoscritto-b-dell-institut-de-france/0070-v/"
@@ -16897,7 +16897,7 @@
       "machine_sources": [
         {
           "slug": "lathe",
-          "dossier": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci-machines/app/dossiers/lathe.json",
+          "dossier": "program/rounds/wing-vinci-machines/app/dossiers/lathe.json",
           "relation": "related_context",
           "verification": "Editorial related-device link from the manuscript catalog, not the dossier’s primary folio",
           "folio_source_url": "https://www.leonardodigitale.com/sfoglia/manoscritto-b-dell-institut-de-france/0070-v/"
@@ -17674,7 +17674,7 @@
       "machine_sources": [
         {
           "slug": "ornithopter-msb74r",
-          "dossier": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci-machines/app/dossiers/ornithopter-msb74r.json",
+          "dossier": "program/rounds/wing-vinci-machines/app/dossiers/ornithopter-msb74r.json",
           "relation": "primary_folio",
           "verification": "Dossier cross-reference",
           "folio_source_url": "https://www.leonardodigitale.com/sfoglia/manoscritto-b-dell-institut-de-france/0074-r/"
@@ -17743,7 +17743,7 @@
       "machine_sources": [
         {
           "slug": "ornithopter-msb74r",
-          "dossier": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci-machines/app/dossiers/ornithopter-msb74r.json",
+          "dossier": "program/rounds/wing-vinci-machines/app/dossiers/ornithopter-msb74r.json",
           "relation": "primary_folio",
           "verification": "Dossier cross-reference",
           "folio_source_url": "https://www.leonardodigitale.com/sfoglia/manoscritto-b-dell-institut-de-france/0074-r/"
@@ -17812,7 +17812,7 @@
       "machine_sources": [
         {
           "slug": "ornithopter-msb74v",
-          "dossier": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci-machines/app/dossiers/ornithopter-msb74v.json",
+          "dossier": "program/rounds/wing-vinci-machines/app/dossiers/ornithopter-msb74v.json",
           "relation": "primary_folio",
           "verification": "Dossier cross-reference",
           "folio_source_url": "https://www.leonardodigitale.com/sfoglia/manoscritto-b-dell-institut-de-france/0074-v/"
@@ -17881,7 +17881,7 @@
       "machine_sources": [
         {
           "slug": "ornithopter-msb74v",
-          "dossier": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci-machines/app/dossiers/ornithopter-msb74v.json",
+          "dossier": "program/rounds/wing-vinci-machines/app/dossiers/ornithopter-msb74v.json",
           "relation": "primary_folio",
           "verification": "Dossier cross-reference",
           "folio_source_url": "https://www.leonardodigitale.com/sfoglia/manoscritto-b-dell-institut-de-france/0074-v/"
@@ -17950,7 +17950,7 @@
       "machine_sources": [
         {
           "slug": "ornithopter-msb75r",
-          "dossier": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci-machines/app/dossiers/ornithopter-msb75r.json",
+          "dossier": "program/rounds/wing-vinci-machines/app/dossiers/ornithopter-msb75r.json",
           "relation": "primary_folio",
           "verification": "Dossier cross-reference",
           "folio_source_url": "https://www.leonardodigitale.com/sfoglia/manoscritto-b-dell-institut-de-france/0075-r/"
@@ -18019,7 +18019,7 @@
       "machine_sources": [
         {
           "slug": "ornithopter-msb75r",
-          "dossier": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci-machines/app/dossiers/ornithopter-msb75r.json",
+          "dossier": "program/rounds/wing-vinci-machines/app/dossiers/ornithopter-msb75r.json",
           "relation": "primary_folio",
           "verification": "Dossier cross-reference",
           "folio_source_url": "https://www.leonardodigitale.com/sfoglia/manoscritto-b-dell-institut-de-france/0075-r/"
@@ -18914,7 +18914,7 @@
       "machine_sources": [
         {
           "slug": "ornithopter-msb79r",
-          "dossier": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci-machines/app/dossiers/ornithopter-msb79r.json",
+          "dossier": "program/rounds/wing-vinci-machines/app/dossiers/ornithopter-msb79r.json",
           "relation": "primary_folio",
           "verification": "Dossier cross-reference",
           "folio_source_url": "https://www.leonardodigitale.com/sfoglia/manoscritto-b-dell-institut-de-france/0079-r/"
@@ -18985,7 +18985,7 @@
       "machine_sources": [
         {
           "slug": "ornithopter-msb79r",
-          "dossier": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci-machines/app/dossiers/ornithopter-msb79r.json",
+          "dossier": "program/rounds/wing-vinci-machines/app/dossiers/ornithopter-msb79r.json",
           "relation": "primary_folio",
           "verification": "Dossier cross-reference",
           "folio_source_url": "https://www.leonardodigitale.com/sfoglia/manoscritto-b-dell-institut-de-france/0079-r/"
@@ -19174,7 +19174,7 @@
       "machine_sources": [
         {
           "slug": "ornithopter-standing-msb80r",
-          "dossier": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci-machines/app/dossiers/ornithopter-standing-msb80r.json",
+          "dossier": "program/rounds/wing-vinci-machines/app/dossiers/ornithopter-standing-msb80r.json",
           "relation": "primary_folio",
           "verification": "Dossier cross-reference",
           "folio_source_url": "https://www.leonardodigitale.com/sfoglia/manoscritto-b-dell-institut-de-france/0080-r/"
@@ -19243,7 +19243,7 @@
       "machine_sources": [
         {
           "slug": "ornithopter-standing-msb80r",
-          "dossier": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci-machines/app/dossiers/ornithopter-standing-msb80r.json",
+          "dossier": "program/rounds/wing-vinci-machines/app/dossiers/ornithopter-standing-msb80r.json",
           "relation": "primary_folio",
           "verification": "Dossier cross-reference",
           "folio_source_url": "https://www.leonardodigitale.com/sfoglia/manoscritto-b-dell-institut-de-france/0080-r/"
@@ -20036,7 +20036,7 @@
       "machine_sources": [
         {
           "slug": "aerial-screw",
-          "dossier": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci-machines/app/dossiers/aerial-screw.json",
+          "dossier": "program/rounds/wing-vinci-machines/app/dossiers/aerial-screw.json",
           "relation": "primary_folio",
           "verification": "Dossier cross-reference",
           "folio_source_url": "https://www.leonardodigitale.com/sfoglia/manoscritto-b-dell-institut-de-france/0083-v/"
@@ -20105,7 +20105,7 @@
       "machine_sources": [
         {
           "slug": "aerial-screw",
-          "dossier": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci-machines/app/dossiers/aerial-screw.json",
+          "dossier": "program/rounds/wing-vinci-machines/app/dossiers/aerial-screw.json",
           "relation": "primary_folio",
           "verification": "Dossier cross-reference",
           "folio_source_url": "https://www.leonardodigitale.com/sfoglia/manoscritto-b-dell-institut-de-france/0083-v/"
@@ -20260,7 +20260,7 @@
       "machine_sources": [
         {
           "slug": "ornithopter-standing-msb80r",
-          "dossier": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci-machines/app/dossiers/ornithopter-standing-msb80r.json",
+          "dossier": "program/rounds/wing-vinci-machines/app/dossiers/ornithopter-standing-msb80r.json",
           "relation": "related_context",
           "verification": "Dossier cross-reference",
           "folio_source_url": "https://www.leonardodigitale.com/sfoglia/manoscritto-b-dell-institut-de-france/0088-r/"
@@ -20331,7 +20331,7 @@
       "machine_sources": [
         {
           "slug": "ornithopter-standing-msb80r",
-          "dossier": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci-machines/app/dossiers/ornithopter-standing-msb80r.json",
+          "dossier": "program/rounds/wing-vinci-machines/app/dossiers/ornithopter-standing-msb80r.json",
           "relation": "related_context",
           "verification": "Dossier cross-reference",
           "folio_source_url": "https://www.leonardodigitale.com/sfoglia/manoscritto-b-dell-institut-de-france/0088-r/"
@@ -20402,7 +20402,7 @@
       "machine_sources": [
         {
           "slug": "mechanical-wing-test-rig",
-          "dossier": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci-machines/app/dossiers/mechanical-wing-test-rig.json",
+          "dossier": "program/rounds/wing-vinci-machines/app/dossiers/mechanical-wing-test-rig.json",
           "relation": "primary_folio",
           "verification": "Dossier cross-reference",
           "folio_source_url": "https://www.leonardodigitale.com/sfoglia/manoscritto-b-dell-institut-de-france/0088-v/"
@@ -20471,7 +20471,7 @@
       "machine_sources": [
         {
           "slug": "mechanical-wing-test-rig",
-          "dossier": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci-machines/app/dossiers/mechanical-wing-test-rig.json",
+          "dossier": "program/rounds/wing-vinci-machines/app/dossiers/mechanical-wing-test-rig.json",
           "relation": "primary_folio",
           "verification": "Dossier cross-reference",
           "folio_source_url": "https://www.leonardodigitale.com/sfoglia/manoscritto-b-dell-institut-de-france/0088-v/"
@@ -20540,7 +20540,7 @@
       "machine_sources": [
         {
           "slug": "ornithopter-standing-msb80r",
-          "dossier": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci-machines/app/dossiers/ornithopter-standing-msb80r.json",
+          "dossier": "program/rounds/wing-vinci-machines/app/dossiers/ornithopter-standing-msb80r.json",
           "relation": "related_context",
           "verification": "Dossier cross-reference",
           "folio_source_url": "https://www.leonardodigitale.com/sfoglia/manoscritto-b-dell-institut-de-france/0089-r/"
@@ -20611,7 +20611,7 @@
       "machine_sources": [
         {
           "slug": "ornithopter-standing-msb80r",
-          "dossier": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci-machines/app/dossiers/ornithopter-standing-msb80r.json",
+          "dossier": "program/rounds/wing-vinci-machines/app/dossiers/ornithopter-standing-msb80r.json",
           "relation": "related_context",
           "verification": "Dossier cross-reference",
           "folio_source_url": "https://www.leonardodigitale.com/sfoglia/manoscritto-b-dell-institut-de-france/0089-r/"
@@ -22798,7 +22798,7 @@
       "machine_sources": [
         {
           "slug": "camera-obscura",
-          "dossier": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci-machines/app/dossiers/camera-obscura.json",
+          "dossier": "program/rounds/wing-vinci-machines/app/dossiers/camera-obscura.json",
           "relation": "primary_folio",
           "verification": "Dossier cross-reference",
           "folio_source_url": "https://www.leonardodigitale.com/sfoglia/manoscritto-d-dell-institut-de-france/0008-r/"
@@ -22867,7 +22867,7 @@
       "machine_sources": [
         {
           "slug": "camera-obscura",
-          "dossier": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci-machines/app/dossiers/camera-obscura.json",
+          "dossier": "program/rounds/wing-vinci-machines/app/dossiers/camera-obscura.json",
           "relation": "primary_folio",
           "verification": "Dossier cross-reference",
           "folio_source_url": "https://www.leonardodigitale.com/sfoglia/manoscritto-d-dell-institut-de-france/0008-r/"
