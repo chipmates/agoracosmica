@@ -34,19 +34,24 @@ import {
   IcosahedronGeometry,
   InstancedBufferAttribute,
   InstancedBufferGeometry,
+  InstancedMesh,
   LatheGeometry,
+  Matrix4,
   Mesh,
   MeshBasicNodeMaterial,
   PlaneGeometry,
+  Quaternion,
   Scene,
   Sprite,
   SpriteMaterial,
   TorusGeometry,
   Vector2,
+  Vector3,
 } from 'three/webgpu'
 import * as TSL from 'three/tsl'
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js'
 import { mulberry32, FOUNDING_SEED } from '../core/seed'
+import type { KeyLight, Stack } from '../stack'
 
 /* TSL, uncast. A hand-composed node graph cannot be followed by TSL's own
    overload types once it is built out of helpers, so the cast happens once,
@@ -142,6 +147,12 @@ const SEATS: Array<{ x: number; z: number; yaw: number }> = [112, 156, -112, -15
 const WOODPILE = { x: -1.78, z: -4.28 }
 const BASIN = { x: 2.06, z: -4.86 }
 
+/** what the room needs from the stack: the one key, and the tier's own budget */
+export interface AgoraRig {
+  key: KeyLight
+  stack: Stack
+}
+
 export interface AgoraState {
   /** 0..1 fade-in of the ground world after the dark door */
   reveal: number
@@ -154,7 +165,7 @@ export interface AgoraState {
  * The ground hub, material-first. Camera stays at the origin; everything
  * below is staged for the seated eye (pitch -0.12, fov 46).
  */
-export function createAgora(scene: Scene) {
+export function createAgora(scene: Scene, rig: AgoraRig) {
   const root = new Group()
   root.visible = false
   scene.add(root)
@@ -307,6 +318,29 @@ export function createAgora(scene: Scene) {
   //     does and what keeps the letterpress legible over the near floor.
   // ==================================================================
   const stoneMat = new MeshBasicNodeMaterial()
+  const floor0 = new Mesh(new CircleGeometry(GROUND_R, 160), stoneMat)
+  floor0.rotation.x = -Math.PI / 2
+  floor0.position.y = FLOOR_Y
+  root.add(floor0)
+
+  /* THE POLISH IS A REAL MIRROR. A stone floor is a weak mirror, but it is
+     a mirror, and the one thing a screen-space guess always loses is the
+     grazing angle, which on a floor is the only angle that matters. So the
+     court is rendered a second time from behind itself and read back through
+     the fresnel term below. Off on the calm tier, where the second pass is
+     the whole frame budget. */
+  const mirror = rig.stack.tierConfig().reflection.on ? rig.stack.reflector(floor0) : null
+
+  /* the empty-plane law: no plane in this museum is one colour. The court
+     takes its three scales from the library's lapis set. */
+  const courtDetail = rig.stack.detail(stoneMat, 'marble-lapis', { macro: 0.7, fade: [16, 64] })
+
+  /* the moon: 1 where the key reaches the stone, 0 where the colonnade
+     stands in it */
+  const moon = rig.key.shadow
+  const MOON = rig.key.colour
+  const MOONDIR = rig.key.direction
+
   {
     const P = positionWorld
     const d = length(P.xz) // from the visitor's own seat
@@ -404,7 +438,28 @@ export function createAgora(scene: Scene) {
     const polish = mix(float(0.28), float(1.0), court).mul(float(0.78).add(wear.mul(0.55)))
       .mul(cloud.mul(0.65).add(0.3)).mul(slabTint)
       .mul(oneMinus(strata.mul(0.42))).mul(oneMinus(vein.mul(0.2)))
-    colr = colr.add(c3(SKY_REFLECT, 0.062).mul(fres).mul(polish))
+    // what the polish finds when it looks up: the night itself, and where
+    // the mirror is running, the colonnade and the fire standing in it
+    const looked = mirror
+      ? mix(c3(SKY_REFLECT, 1), mirror.node.rgb.mul(1.2), clamp(fres.mul(1.6), 0, 0.7))
+      : c3(SKY_REFLECT, 1)
+    /* THE COLONNADE STANDS IN THE SKY THE FLOOR REFLECTS. This is where the
+       cast shadow belongs first: a column does not stop the fire, it stops
+       the sky, and the polish is what shows it. The term only ever takes
+       light away, so the court cannot get brighter than it was authored. */
+    colr = colr.add(looked.mul(0.062).mul(fres).mul(polish).mul(mix(float(0.22), float(1), moon)))
+    // and a low sheen of the moon itself, kept well under the fire's own
+    // pool: a night court with two lights has no hour
+    const graze = clamp(float(0.18).add(pow(oneMinus(cosT), 2.2).mul(0.95)), 0, 1)
+    colr = colr.add(
+      c3(MOON, 0.012)
+        .mul(moon)
+        .mul(graze)
+        .mul(mix(float(0.5), float(1), court))
+        .mul(oneMinus(groove.mul(0.6)))
+        .mul(cloud.mul(0.5).add(0.62))
+        .mul(oneMinus(clamp(fire.mul(0.5), 0, 0.85)))
+    )
     colr = colr.add(c3(FIRE_WARM, 0.017).mul(fire).mul(fres.mul(0.65).add(0.35)).mul(polish))
     // A brushed polish breaks up the reflected source while the diffuse
     // mineral stays still. The walking lane has the finest surviving sheen.
@@ -476,12 +531,11 @@ export function createAgora(scene: Scene) {
     ao = ao.add(cast(BASIN.x, BASIN.z, 0.19, 0.9).mul(0.24))
     colr = colr.mul(oneMinus(clamp(ao, 0, 0.72)))
 
-    stoneMat.colorNode = shoulder(haze(colr, d, 14, 62)).add(dith(0.0024)).mul(uR)
+    stoneMat.colorNode = shoulder(haze(colr, d, 14, 62))
+      .mul(courtDetail.albedo)
+      .add(dith(0.0024))
+      .mul(uR)
   }
-  const floor0 = new Mesh(new CircleGeometry(GROUND_R, 160), stoneMat)
-  floor0.rotation.x = -Math.PI / 2
-  floor0.position.y = FLOOR_Y
-  root.add(floor0)
 
   // ==================================================================
   // 2 · THE FIRMAMENT IN THE STONE — a whisper only. The stars belong in
@@ -632,6 +686,8 @@ export function createAgora(scene: Scene) {
     const mat = new MeshBasicNodeMaterial()
     const { world, normal, tint, clip: c } = inkVertex()
     mat.vertexNode = c
+    // an instance reads the map at its own world position, never three's
+    mat.receivedShadowPositionNode = world
     const quarry = vn(vec3(world.x.mul(7.5), world.y.mul(4.2), world.z.mul(7.5)))
     const alb = c3(opts.albedo).mul(quarry.mul(0.32).add(0.81))
     const skyTint = mix(vec3(1, 1, 1), alb.mul(1.6), 0.75)
@@ -645,6 +701,14 @@ export function createAgora(scene: Scene) {
       )
     colr = colr.add(
       alb.mul(c3(FIRE_LIT)).mul(firelight(world, 5.6, 2.0)).mul(facing(world, normal, opts.facePow ?? 2.4)).mul(opts.rim)
+    )
+    // the same one key that draws the shafts finds the trim it carries
+    colr = colr.add(
+      alb
+        .mul(c3(MOON, 0.006))
+        .mul(pow(clamp(dot(normal, vec3(MOONDIR.x, MOONDIR.y, MOONDIR.z)), 0, 1), 1.35))
+        .mul(rig.key.shadowAt(world))
+        .mul(tint)
     )
     if (opts.bounce) colr = colr.add(alb.mul(c3(FIRE_WARM, opts.bounce))
       .mul(max(normal.y.negate(), 0).mul(0.5).add(0.5)).mul(uFlick))
@@ -903,6 +967,10 @@ export function createAgora(scene: Scene) {
   {
     const { world, normal, hLocal, tint, clip: c } = inkVertex()
     shaftMat.vertexNode = c
+    /* the shadow LOOKUP would otherwise use three's positionWorld, which
+       cannot know about an instance: every column would read the map at the
+       origin. The field's own world varying is the truth here. */
+    shaftMat.receivedShadowPositionNode = world
     const dCam = length(world.xz)
     // twenty flutes, cut only into the shaft. The normal is rotated about
     // the column's own axis, so each flute gets a lit arris and a dark
@@ -924,6 +992,18 @@ export function createAgora(scene: Scene) {
     let colr: N = c3(COLUMN_INK, 0.42)
       .mul(tint)
       .add(c3(SKY_AMB, 0.0072).mul(skyTint).mul(tint).mul(float(0.5).add(lift.mul(0.9))))
+    // the key finds one side of every shaft. It is a grazing light and it is
+    // weak, which is what a moon is: it draws the round of the column and it
+    // never competes with the fire for the eye.
+    const nlMoon = clamp(dot(nF, vec3(MOONDIR.x, MOONDIR.y, MOONDIR.z)), 0, 1)
+    colr = colr.add(
+      alb
+        .mul(c3(MOON, 0.0075))
+        .mul(pow(nlMoon, 1.35))
+        .mul(rig.key.shadowAt(world))
+        .mul(tint)
+        .mul(float(0.35).add(lift.mul(0.75)))
+    )
     // the fire is LOW, so a shaft is a column of light that dies as it
     // climbs. A column lit evenly to its capital is a column in daylight.
     // The base mouldings sit closest of all and would blaze on their own,
@@ -960,6 +1040,10 @@ export function createAgora(scene: Scene) {
   ]
 
   const shafts: Item[] = []
+  /** the near two registers and the beams they carry: a shadow from the far
+      stoa lands past the temenos where no eye follows it */
+  const castShafts: Item[] = []
+  const castBeams: Item[] = []
   const plinths: Item[] = []
   const echini: Item[] = []
   const abaci: Item[] = []
@@ -975,6 +1059,7 @@ export function createAgora(scene: Scene) {
       const x = Math.sin(a) * reg.r
       const z = -Math.cos(a) * reg.r
       shafts.push({ p: [x, base, z], s: [s, s, s], r: -a, tint: reg.tint })
+      if (reg.r < 20) castShafts.push({ p: [x, base, z], s: [s, s, s], r: -a })
       plinths.push({ p: [x, base - 0.2 * s, z], s: [s, s, s], r: -a, tint: reg.tint })
       echini.push({ p: [x, base + (COL_H + 0.1) * s, z], s: [s, s, s], r: -a, tint: reg.tint })
       abaci.push({ p: [x, base + (COL_H + 0.235) * s, z], s: [s, s, s], r: -a, tint: reg.tint })
@@ -997,6 +1082,7 @@ export function createAgora(scene: Scene) {
         tint: reg.tint,
       })
       const beam = beams[beams.length - 1]!
+      if (reg.r < 20) castBeams.push({ ...beam })
       cornices.push({ ...beam, p: [beam.p[0], beam.p[1] + 0.27 * s, beam.p[2]], s: [chord + 0.3 * s, s, s] })
       fascias.push({ ...beam, p: [beam.p[0], beam.p[1] - 0.12 * s, beam.p[2]], s: [chord + 0.2 * s, s, s] })
       // Two broad treads carry each bay. The central passage stays open.
@@ -1007,6 +1093,43 @@ export function createAgora(scene: Scene) {
       }
     }
   }
+  /* WHAT CASTS, and why it is not the columns themselves.
+
+     Three's shadow pass rebuilds a depth material out of the source
+     material's colorNode alpha. For these hand-written materials that drags
+     the whole colour graph into the shadow pass, including the term that
+     SAMPLES the shadow map, and the map is then read and written inside one
+     synchronisation scope, which WebGPU rejects outright. So what casts is a
+     silent double of the colonnade: plain instanced geometry, no colour node
+     at all, writing no colour and no depth in the beauty pass, drawn only so
+     the light can see it. Two draw calls for a colonnade that models form. */
+  function casters(geo: BufferGeometry, items: Item[]): void {
+    if (!items.length) return
+    const mesh = new InstancedMesh(
+      geo,
+      new MeshBasicNodeMaterial({ colorWrite: false, depthWrite: false }),
+      items.length
+    )
+    const m = new Matrix4()
+    const q = new Quaternion()
+    const axis = new Vector3(0, 1, 0)
+    const pos = new Vector3()
+    const scl = new Vector3()
+    items.forEach((it, i) => {
+      const sc = it.s ?? [1, 1, 1]
+      q.setFromAxisAngle(axis, it.r ?? 0)
+      m.compose(pos.set(it.p[0], it.p[1], it.p[2]), q, scl.set(sc[0], sc[1], sc[2]))
+      mesh.setMatrixAt(i, m)
+    })
+    mesh.instanceMatrix.needsUpdate = true
+    mesh.castShadow = true
+    mesh.frustumCulled = false
+    mesh.renderOrder = -1
+    root.add(mesh)
+  }
+  casters(lathe(columnProfile(), 10), castShafts)
+  casters(new RoundedBoxGeometry(1, 0.34, 0.5, 1, 0.018), castBeams)
+
   field(lathe(columnProfile(), 26), shaftMat, shafts)
   field(new BoxGeometry(0.74, 0.2, 0.74).translate(0, 0.1, 0), dressMat, plinths)
   field(
