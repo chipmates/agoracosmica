@@ -146,3 +146,33 @@ export function parseStates(arg) {
 export function shotName(viewport, tier, state) {
   return `${viewport}-${tier}-${state}.png`
 }
+
+/* THE LOOK CONE. A station is not one frame, it is everything a hand can
+   turn the gaze onto while standing there, and a wall that was never
+   dressed hides in the corner of that envelope. So a state may declare the
+   drag envelope it is judged on, and the rig shoots its four corners. */
+export const DEFAULT_CONE = { yaw: [-35, 35], pitch: [-15, 10] }
+
+/** the four corners of a cone, in the order they are numbered on disk */
+export function coneCorners(cone = DEFAULT_CONE) {
+  const [y0, y1] = cone.yaw ?? DEFAULT_CONE.yaw
+  const [p0, p1] = cone.pitch ?? DEFAULT_CONE.pitch
+  return [
+    { n: 1, yaw: y0, pitch: p1 },
+    { n: 2, yaw: y1, pitch: p1 },
+    { n: 3, yaw: y1, pitch: p0 },
+    { n: 4, yaw: y0, pitch: p0 },
+  ]
+}
+
+/** which states this run shoots corners for: the ones that declare a cone,
+    plus whatever FORGE_CONE names (`all`, or a comma separated list) */
+export function coneFor(state) {
+  if (state.cone === false) return null
+  if (state.cone && typeof state.cone === 'object') return state.cone
+  const asked = (process.env['FORGE_CONE'] ?? '').trim()
+  if (!asked) return state.cone === true ? DEFAULT_CONE : null
+  if (asked === 'all' || asked === '1') return DEFAULT_CONE
+  const names = asked.split(',').map((s) => s.trim())
+  return names.includes(state.name) || names.includes(state.phase) ? DEFAULT_CONE : null
+}

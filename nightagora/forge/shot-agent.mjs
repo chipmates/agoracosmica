@@ -13,6 +13,13 @@
 // Environment:
 //   FORGE_BACKEND=webgpu|webgl2  what the app must report (default webgpu)
 //   FORGE_TIER=hero|standard|calm shoot one tier instead of each state's own
+//   FORGE_CONE=all|<state,state>  also shoot the four look-cone corners of
+//                                 those states, as <viewport>-<tier>-<state>-c1..c4
+//
+// A state may carry its own cone in JSON: { "cone": { "yaw": [-40, 40],
+// "pitch": [-20, 15] } } in degrees, the drag envelope of that station. The
+// default when a spec gives none is yaw plus or minus 35, pitch minus 15 to
+// plus 10.
 //
 // Shots land in forge/shots/<outDir>/<viewport>-<tier>-<name>.png. Every
 // console error and page error is reported at the end. Read the frames.
@@ -25,6 +32,8 @@ import {
   assertBackend,
   assertServer,
   browserArgs,
+  coneCorners,
+  coneFor,
   parseStates,
   shotName,
   VIEWPORTS,
@@ -84,6 +93,7 @@ async function jump(page, state, url, settle) {
 }
 
 mkdirSync(OUT, { recursive: true })
+let corners = 0
 const server = spawn('pnpm', ['exec', 'vite', '--port', String(port), '--strictPort'], {
   stdio: 'ignore',
 })
@@ -128,12 +138,24 @@ try {
         const took = await jump(page, s, BASE, s.settle ?? SETTLE)
         if (!took) problems.push(`[${vp.tag}/${tier}] ${s.name}: the stage never took`)
         await page.screenshot({ path: `${OUT}${shotName(vp.tag, tier, s.name)}` })
+        const cone = coneFor(s)
+        if (!cone) continue
+        // an undressed wall hides in the corner of the envelope, never in
+        // the frame the seat composed: the corners are shot, not sampled
+        for (const c of coneCorners(cone)) {
+          await page.evaluate(([y, p]) => window.__forge.look(y, p), [c.yaw, c.pitch])
+          await page.waitForTimeout(420)
+          await page.screenshot({ path: `${OUT}${shotName(vp.tag, tier, `${s.name}-c${c.n}`)}` })
+          corners++
+        }
+        await page.evaluate(() => window.__forge.look(0, 0))
       }
       await page.close()
     }
   }
   await browser.close()
   console.log(`shots written to forge/shots/${outDir}/`)
+  if (corners) console.log(`cone corners: ${corners}`)
   if (problems.length) {
     console.log('PROBLEMS:')
     for (const p of [...new Set(problems)]) console.log(' ·', p)
