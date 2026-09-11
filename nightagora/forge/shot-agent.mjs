@@ -42,6 +42,9 @@ if (!states.length) {
 const BASE = `http://localhost:${port}`
 const OUT = new URL(`./shots/${outDir}/`, import.meta.url).pathname
 const WANT_BACKEND = process.env['FORGE_BACKEND'] ?? 'webgpu'
+// long enough that no frame is caught mid-transition: the night's slowest
+// letterpress fade is 1.6 s and the Keeper reveals his line word by word
+const SETTLE = Number(process.env['FORGE_SETTLE'] ?? 1700)
 const ONE_TIER = process.env['FORGE_TIER']
 const tiersOf = (s) => (ONE_TIER ? [ONE_TIER] : (s.tiers ?? ['hero']))
 const allTiers = [...new Set(states.flatMap(tiersOf))]
@@ -122,7 +125,7 @@ try {
       if (vp.tag === 'desktop' && tier === allTiers[0]) console.log(firstLine)
 
       for (const s of wanted) {
-        const took = await jump(page, s, BASE, s.settle ?? 450)
+        const took = await jump(page, s, BASE, s.settle ?? SETTLE)
         if (!took) problems.push(`[${vp.tag}/${tier}] ${s.name}: the stage never took`)
         await page.screenshot({ path: `${OUT}${shotName(vp.tag, tier, s.name)}` })
       }
