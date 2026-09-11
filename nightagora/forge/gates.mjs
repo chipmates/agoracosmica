@@ -19,6 +19,11 @@
 //   dependencies   the runtime diff against BASE-DEPS, gated by CANON-DEPS
 //   manifest       the manifest check
 //   honesty        the honesty check
+//   register       the three registers of text: every visitor facing string
+//                  of the label and the drawer, at every station, in both
+//                  languages, refused when it carries a file path, a
+//                  section code, a question id, an error bar, a measured
+//                  range or a number nobody says aloud
 //   cones          the look-cone corners shot, and where they are
 //   leak           the key rigs and the scene's objects over 200 rebuilds
 //   flicker        what the frame does BETWEEN frames: the temporal spread
@@ -671,6 +676,24 @@ if (WING) {
 const drift = (h.failures ?? []).filter((f) => f.includes('disclosure'))
 gate('disclosures verbatim', drift.length === 0, drift.join('; ') || 'every layer matches the canon file')
 
+/* THE REGISTER GATE. Its own instrument on its own dev server, so the port
+   the honesty walk just released has to answer nothing first. */
+let register = null
+if (!(await freePort())) {
+  register = { ok: false, errors: [`port ${PORT} never freed, the register gate was not run`], offences: [] }
+} else {
+  say('  the register gate, on its own server')
+  const run = await json('node', ['forge/register-check.mjs', String(PORT), SURFACE, ...(SLUG ? [SLUG] : []), '--json'], {}, CHECKER_MS)
+  register = run.parsed ?? { ok: false, errors: ['the register check did not answer JSON'], offences: [], raw: run.raw }
+}
+gate(
+  'register',
+  register.ok === true,
+  register.errors?.length
+    ? register.errors.join('; ')
+    : `${register.offences?.length ?? '?'} string(s) refused of ${(register.read?.label ?? 0) + (register.read?.drawer ?? 0)} read`
+)
+
 const failed = lines.filter((l) => l.gate !== false && !l.ok).map((l) => l.name)
 const warned = lines.filter((l) => l.gate === false && !l.ok).map((l) => l.name)
 const report = {
@@ -684,6 +707,7 @@ const report = {
   dependencies: deps,
   manifest: manifest.parsed ?? { error: manifest.raw },
   honesty: { ok: (h.failures?.length ?? 1) === 0, labels: h.labels ?? 0, failures: h.failures ?? [] },
+  register,
   cones: coneReport,
   leak: leakReport,
   flicker,
