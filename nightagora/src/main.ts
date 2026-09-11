@@ -16,6 +16,8 @@ import { createStack } from './stack'
 import type { GradeName } from './stack/grade'
 import { isTierName, type TierName } from './stack/tier'
 import { createWingFrame, stationFromHash } from './wings/frame'
+import { readLabels, type ForgeLabel } from './core/labels'
+import { DISCLOSURES } from './content/disclosures'
 import { WINGS, wingBySlug, wingsOpen, wingsPreparing } from './wings/registry'
 import { wingCount } from './wings/content'
 
@@ -207,6 +209,11 @@ for (const s of atlas.stars) {
   b.type = 'button'
   b.className = 'star-chip'
   b.textContent = w.name
+  // the name of a person who lived is documented; the star it hangs on is
+  // this night's own invention, which is why the anchor is procedural
+  b.dataset['naClaim'] = 'documented'
+  b.dataset['naAnchor'] = 'lobby/register'
+  b.dataset['naAnchorClass'] = 'procedural'
   b.style.visibility = 'hidden'
   b.addEventListener('click', () => openPane(s.slug))
   chipsEl.appendChild(b)
@@ -551,10 +558,23 @@ declare global {
         desc: number
         draws: number
         tris: number
+        /** where along a wing's rail the visitor stands, and how far it runs */
+        station: number
+        stations: number
       }
       /** what the last two seconds cost, per the stack's own meter */
       /** every asset the app has resolved, with its class and licence line */
       manifest: () => Array<{ id: string; class: string; licence: string }>
+      /** every label and control the current station is showing, measured
+          off the live frame, which is what the honesty gate reads */
+      labels: () => ForgeLabel[]
+      /** the canon of the three disclosure layers, for the verbatim diff */
+      disclosures: () => Record<string, { en: string; de: string }>
+      /** the drag envelope of a station, in degrees: the rig shoots the
+          four corners of the look cone through this */
+      look: (yaw: number, pitch: number) => void
+      /** 0 to 1 along a wing's rail; outside a wing it does nothing */
+      rail: (t: number) => void
       cost: () => {
         draws: number
         triangles: number
@@ -636,6 +656,7 @@ window.__forge = {
     // the rig proves the state it ASKED for took, which the phase alone
     // cannot say: the pane is the wheel with a figure held open
     document.body.dataset['forge'] = 'pending'
+    forgeLook = null // a new state is looked at straight on
     const p: Phase = state === 'pane' ? 'wheel' : state
     setPhase(p)
     // each jump is a single composed moment: no scene leaks across
@@ -720,6 +741,23 @@ window.__forge = {
   manifest() {
     return stack.materials.manifest()
   },
+  labels() {
+    return readLabels()
+  },
+  disclosures() {
+    return DISCLOSURES
+  },
+  look(yaw, pitch) {
+    // the rig looks where a hand could look, and past it: the cone of a
+    // station is the envelope being inspected, not the damping that
+    // returns a resting gaze to centre
+    forgeLook = yaw === 0 && pitch === 0 ? null : { yaw: yaw * DEG, pitch: pitch * DEG }
+  },
+  rail(t) {
+    const count = wingFrame.stations()
+    if (!count) return
+    wingFrame.goto(Math.round(Math.min(1, Math.max(0, t)) * (count - 1)))
+  },
   // the rig's stethoscope: read the live blend state without guessing
   // from pixels (numbers first, then the shot)
   state() {
@@ -727,6 +765,8 @@ window.__forge = {
       phase,
       agoraReveal,
       desc,
+      station: wingFrame.station(),
+      stations: wingFrame.stations(),
       // what the last frame actually cost: the rig quotes this instead of
       // guessing from a software-rasterizer fps number
       draws: renderer.info.render.drawCalls,
@@ -1077,8 +1117,10 @@ function frame(now: number): void {
   }
   const baseRx = camera.rotation.x
   const baseRy = camera.rotation.y
-  camera.rotation.y -= freeLook * 0.026 - dragYaw - idleYaw
-  camera.rotation.x -= freeLookY * 0.018 - dragPitch - idlePitch
+  const yaw = forgeLook ? forgeLook.yaw : dragYaw + idleYaw - freeLook * 0.026
+  const pitch = forgeLook ? forgeLook.pitch : dragPitch + idlePitch - freeLookY * 0.018
+  camera.rotation.y += yaw
+  camera.rotation.x += pitch
   stack.render(dt)
   camera.rotation.x = baseRx
   camera.rotation.y = baseRy
@@ -1099,6 +1141,11 @@ addEventListener('pointermove', (e) => {
 // sky keeps its wheel, the descent its rail. Damped, rubber-limited. ----
 let dragYaw = 0
 let dragPitch = 0
+/** radians per degree: the rig speaks in the degrees a cone is written in */
+const DEG = Math.PI / 180
+/** the rig's own gaze, held until it is released, so a shot of a corner is
+    not a shot of a gaze on its way home */
+let forgeLook: { yaw: number; pitch: number } | null = null
 let idleAmt = 0
 let dragVX = 0
 let dragVY = 0

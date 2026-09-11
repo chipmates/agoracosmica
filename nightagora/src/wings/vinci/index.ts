@@ -25,6 +25,10 @@ export function createWing(): WingModule {
       const title = document.createElement('h2')
       title.className = 'wing-plate-title'
       title.textContent = say(WING_TEXT.preparing)
+      // the one thing this wing can state as fact today is its own state
+      title.dataset['naClaim'] = 'documented'
+      title.dataset['naAnchor'] = 'vinci/register'
+      title.dataset['naAnchorClass'] = 'procedural'
       const line = document.createElement('p')
       line.className = 'wing-plate-line'
       line.textContent = say(WING_TEXT.preparingLine)

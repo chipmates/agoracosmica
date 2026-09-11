@@ -48,6 +48,8 @@ export interface WingFrame {
   close(): void
   /** which station is standing, for the rig and for the URL */
   station(): number
+  /** how many this wing has, which is what the motion eye walks */
+  stations(): number
 }
 
 /** The station the URL is standing at, or 0. The hash is the return path. */
@@ -101,6 +103,8 @@ export function createWingFrame(host: HTMLElement, onLobby: () => void): WingFra
 
   const question = el('p', 'wing-question')
   const door = el('a', 'wing-door', say(WING_TEXT.door))
+  // the door is the frame's one persistent mark: it stands at every station
+  door.dataset['naPersistent'] = ''
   door.target = '_blank'
   door.rel = 'noopener'
   // the no-key case, said once and plainly: the free tier is a daily
@@ -170,5 +174,6 @@ export function createWingFrame(host: HTMLElement, onLobby: () => void): WingFra
       host.hidden = true
     },
     station: () => index,
+    stations: () => wing?.stations.length ?? 0,
   }
 }

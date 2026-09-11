@@ -402,6 +402,11 @@ export function createHotspots(container: HTMLElement): HotspotsHandles {
       const b = document.createElement('button')
       b.type = 'button'
       b.className = 'hotspot mark'
+      // a mark of the lobby names a device of this night, not a documented
+      // fact about a place: the wings are where green labels are earned
+      b.dataset['naClaim'] = 'tradition'
+      b.dataset['naAnchor'] = def.id
+      b.dataset['naAnchorClass'] = 'procedural'
       b.style.visibility = 'hidden'
       // the points of a stage light one after another, never all at once
       b.style.setProperty('--in', `${Math.min(0.42, order * 0.07)}s`)

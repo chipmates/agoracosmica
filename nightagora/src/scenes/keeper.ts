@@ -551,6 +551,10 @@ export function createKeeper(
   const dialogue = el('div', 'keeper-dialogue')
   dialogue.setAttribute('aria-live', 'polite')
   const greeting = el('p', 'keeper-line keeper-phrase')
+  // the keeper's one line IS the voice layer of the disclosure
+  greeting.dataset['naClaim'] = 'tradition'
+  greeting.dataset['naDisclosure'] = 'voice'
+  greeting.dataset['naAnchor'] = 'lobby/keeper'
   const beats = el('div', 'keeper-beats')
   beats.setAttribute('aria-hidden', 'true')
   const offersBox = el('div', 'keeper-offers')
@@ -603,6 +607,9 @@ export function createKeeper(
   })
 
   const colophon = el('p', 'keeper-note', COLOPHON)
+  colophon.dataset['naClaim'] = 'tradition'
+  colophon.dataset['naDisclosure'] = 'ink'
+  colophon.dataset['naAnchor'] = 'lobby/keeper'
   host.append(shade, seal, name, role, rule, dialogue, beats, offersBox, form, exitBtn, colophon)
 
   // ---- the theater's state ----

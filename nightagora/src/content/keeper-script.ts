@@ -26,10 +26,13 @@ export interface KeeperScript {
   exitImmediate?: boolean
 }
 
+import { disclosure } from './disclosures'
+
 export const KEEPER_NAME = "Marcus Aurelius · Keeper of Tonight's Fire"
 
-/** Locked verbatim (World Bible disclosure, voice layer). */
-export const GREETING = '"I am not Marcus. I am an echo of what he left behind. Sit anyway."'
+/** The voice layer of the disclosure, read from the canon so the line the
+    keeper speaks and the line the honesty gate checks cannot drift apart. */
+export const GREETING = disclosure('voice')
 
 /** The one honest answer to a question this fire cannot answer. The
     question itself travels with the visitor. */
@@ -39,7 +42,8 @@ export const TYPED_REPLY: string[] = [
   'Your question will travel with you. I will be waiting.',
 ]
 
-export const COLOPHON = 'An AI Echo · An interpretation, not a recording'
+/** The ink layer, from the same canon. */
+export const COLOPHON = disclosure('ink')
 
 /** sessionStorage key: a free-typed question the visitor carries out. */
 export const CARRIED_QUESTION_KEY = 'na-carried-question'

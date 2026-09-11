@@ -972,13 +972,13 @@
   <div id="vignette" aria-hidden="true" style="position: fixed; inset: 0; z-index: 1; pointer-events: none; background: radial-gradient(ellipse 120% 90% at 50% 40%, transparent 52%, rgba(2, 3, 8, 0.62) 100%);"></div>
   <div id="blackout" aria-hidden="true"></div>
   <div id="veil">
-    <p class="brand">Agora Cosmica</p>
+    <p class="brand" data-na-brand data-na-persistent data-na-anchor="lobby/masthead">Agora Cosmica</p>
     <div class="copy">
       <h1><span>A Living Library</span> <span>You Can Talk To</span></h1>
       <p class="tagline">Thirty Remarkable People · One Night Sky</p>
     </div>
     <p class="status" id="status" role="status">First light</p>
-    <p id="lobby-plate"></p>
+    <p id="lobby-plate" data-na-claim="documented" data-na-persistent data-na-anchor="lobby/register" data-na-anchor-class="procedural"></p>
     <button id="overture-skip" type="button">Skip the overture · begin at the fire</button>
   </div>
   <div id="descent" hidden>
@@ -987,8 +987,8 @@
   <p id="verse"></p>
   <div id="keeper" hidden>
     <p class="keeper-name">Marcus Aurelius · Keeper of Tonight's Fire</p>
-    <p class="keeper-line">"I am not Marcus. I am an echo of what he left behind. Sit anyway."</p>
-    <p class="keeper-note">An AI Echo · An interpretation, not a recording</p>
+    <p class="keeper-line" data-na-claim="tradition" data-na-disclosure="voice" data-na-anchor="lobby/keeper" data-na-anchor-class="procedural">"I am not Marcus. I am an echo of what he left behind. Sit anyway."</p>
+    <p class="keeper-note" data-na-claim="tradition" data-na-disclosure="ink" data-na-anchor="lobby/keeper" data-na-anchor-class="procedural">An AI Echo · An interpretation, not a recording</p>
   </div>
   <p id="voice" aria-live="polite"></p>
   <div id="goldbreath" aria-hidden="true"><div class="dark-line"></div></div>
@@ -1004,14 +1004,14 @@
   <div id="figure-pane" hidden>
     <button class="pane-close" type="button">Back to the sky</button>
     <div class="pane-inner">
-      <figure class="pane-portrait"><img alt="" /></figure>
+      <figure class="pane-portrait" data-na-claim="inferred" data-na-anchor="lobby/figure-portraits" data-na-anchor-class="GENERATED"><img alt="" /></figure>
       <div class="pane-text">
         <p class="pane-kicker"></p>
-        <h2 class="pane-name"></h2>
+        <h2 class="pane-name" data-na-claim="documented" data-na-anchor="lobby/register" data-na-anchor-class="procedural"></h2>
         <p class="pane-tradition"></p>
         <p class="pane-years"></p>
         <p class="pane-promise"></p>
-        <p class="pane-ink">An AI Echo · an interpretation, not a recording</p>
+        <p class="pane-ink" data-na-claim="tradition" data-na-disclosure="ink" data-na-anchor="lobby/figure-portraits" data-na-anchor-class="GENERATED">An AI Echo · An interpretation, not a recording</p>
         <button class="pane-enter" type="button" hidden>Enter the museum</button>
         <p class="pane-drawn" hidden>This world is still being drawn</p>
         <p class="pane-sib-label"></p>
@@ -1021,7 +1021,7 @@
   </div>
   <div id="hotspots" aria-label="Points in this world"></div>
   <div id="wing" hidden></div>
-  <div id="rail" hidden>
+  <div id="rail" hidden data-na-persistent data-na-anchor="lobby/rail">
     <button id="rail-sound" type="button" aria-pressed="false">Sound · Off</button>
     <button id="rail-instruments" type="button" aria-haspopup="true" aria-expanded="false">Instruments</button>
   </div>
