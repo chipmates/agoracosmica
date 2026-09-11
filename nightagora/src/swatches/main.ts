@@ -111,7 +111,10 @@ const PLAIN: Grade = {
 const EXPOSURE: Record<string, number> = {
   'sky-overcast': 0.62,
   'sky-afternoon-warm': 0.34,
-  'sky-night-moon': 2.6,
+  /* the moonlit probe carries a real night's levels, and at an exposure that
+     makes its matte ball easy to read the whole frame arrives as daylight.
+     This one is set so the sky is still a night sky. */
+  'sky-night-moon': 0.9,
 }
 /** and what a set is read at under it. A metal returns almost everything the
     sky sends it, so the same exposure that shows an overcast stone as stone
@@ -275,6 +278,17 @@ async function showSet(name: string): Promise<void> {
     /* a metal is judged on what it reflects, so the background it reflects is
        shown sharp; a stone is judged on itself, and a legible landscape
        behind it is only a distraction */
+    /* THE DOME ARRIVES WHOLE ON A METAL AND HELD BACK ON EVERYTHING ELSE, and
+       that is a statement about what a swatch is for. A metal has no albedo
+       to show: it IS what it reflects, and the first reading could not judge
+       one because the probe never arrived. A dielectric does have an albedo,
+       and a dome at full strength lays an even specular veil over it: held
+       whole, the white marble's own veins measured 1.3 per cent of its mean
+       against 2.3 held back, which is the material disappearing under the
+       light. Held back, and the key does the modelling.
+       The background stays blurred for everything but a metal, because a
+       legible landscape behind a stone is something to grade instead of the
+       stone. */
     scene.backgroundBlurriness = metal ? 0 : 0.55
     scene.backgroundIntensity = metal ? 0.5 : 0.16
     scene.environmentIntensity = metal ? 1 : 0.62
