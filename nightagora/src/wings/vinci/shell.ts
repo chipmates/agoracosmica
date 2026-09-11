@@ -61,7 +61,24 @@ function surface(kind:MatKey,library?:MaterialLibrary,valleys:readonly [V3,V3][]
     const n1=mx_noise_float(p.mul(24)); const n2=mx_noise_float(p.add(vec3(.025,0,.02)).mul(24))
     mat.normalNode=normalMap(vec3(n1.sub(n2).mul(.045).mul(density).add(.5),n2.mul(.024).mul(density).add(.5),1),vec2(.65,.65))
   }
-  if(glazing)mat.normalNode=normalMap(vec3(U.x.mul(22).sin().mul(.008).add(.5),U.y.mul(17).sin().mul(.006).add(.5),1),vec2(.25,.25))
+  if(glazing){
+    // Leaded quarries: diamonds on a 0.155 m pitch, 7 mm cames, each quarry
+    // its own tone and its own slight tilt, which is why old glass never
+    // reflects a window's worth of sky as one flat sheet.
+    const pitch=.155,came=.0035,rot=Math.SQRT1_2/pitch
+    const r=vec2(U.x.add(U.y).mul(rot),U.y.sub(U.x).mul(rot))
+    const cell=floor(r),unit=fract(r)
+    const edge=unit.x.min(float(1).sub(unit.x)).min(unit.y.min(float(1).sub(unit.y))).mul(pitch)
+    const pixel=length(U.dFdx()).add(length(U.dFdy())).mul(.5).max(.00005)
+    const held=smoothstep(1.1,2.4,float(pitch).div(pixel))
+    const lead=float(1).sub(smoothstep(float(came).sub(pixel).max(0),float(came).add(pixel),edge)).mul(held)
+    const quarry=(salt:number)=>fract(cell.x.mul(27.13).add(cell.y.mul(41.71)).add(salt).sin().mul(4317.1))
+    const leadColour=new Color(palette.lead)
+    mat.colorNode=colour.mul(quarry(3.1).sub(.5).mul(.17).add(1))
+      .mul(float(1).sub(lead.mul(.45))).add(vec3(leadColour.r,leadColour.g,leadColour.b).mul(lead.mul(.26)))
+    const tilt=vec2(quarry(7.7).sub(.5),quarry(11.3).sub(.5)).mul(held.mul(.16))
+    mat.normalNode=normalMap(vec3(tilt.x.add(U.x.mul(22).sin().mul(.008)).add(.5),tilt.y.add(U.y.mul(17).sin().mul(.006)).add(.5),1),vec2(.25,.25))
+  }
   mat.name=`vinci/${kind}`
   return mat
 }
@@ -332,9 +349,10 @@ function drawOpening(f:Facade,o:Opening,thickness:number,b:Batches):void {
     faceBox(b.dark,f,x+w/2,z+h/2,w,h,.025,-thickness-.24,.55)
     faceBox(b.stone,f,x+w/2,z+h/2,mullion,h,.19,-.02,.91)
     if(h>1.6)faceBox(b.stone,f,x+w/2,transom,w,.105,.20,-.005,.95)
-    const cols=Math.max(2,Math.round(w/.24)),rows=Math.max(2,Math.round(h/.34))
-    for(let i=1;i<cols;i++)faceBox(b.iron,f,x+i*w/cols,z+h/2,.012,h,.019,-.042,.72)
-    for(let i=1;i<rows;i++)faceBox(b.iron,f,x+w/2,z+i*h/rows,w,.013,.02,-.040,.77)
+    // Iron saddle bars hold the leaded panels; the quarries themselves are
+    // in the glass, where a 7 mm came filters instead of aliasing.
+    const bars=Math.max(2,Math.round(h/.44))
+    for(let i=1;i<bars;i++)faceBox(b.iron,f,x+w/2,z+i*h/bars,w,.013,.02,-.040,.77)
     // Small moulding steps and tooth stones produce edge shadows at two scales.
     for(const offset of [.035,.085]) {
       faceBox(b.stone,f,x-offset,z+h/2,.025,h+.05,.065,.095+offset/2)
