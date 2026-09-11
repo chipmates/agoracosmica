@@ -23,6 +23,26 @@
 //
 // Levels are the mean of the three channels, which is how the verdicts read
 // them. No dependency: the PNG decoder is at the bottom of this file.
+//
+// HOW THE FOLDER IS SHOT, and it is not free choice: the base was made from
+// eight named states, and a frame shot at another state is compared against
+// a picture of something else. The wheel is the one that bites, because the
+// base was shot on the ARTISTS constellation and that is index 3 in the
+// content today; at the default index the title is a longer word standing
+// inside the darkest-patch region, and four lines fail for a reason that has
+// nothing to do with the stack. One run per viewport, hero tier:
+//
+//   STATES='[{"name":"transit","phase":"transit","opts":{}},
+//            {"name":"held","phase":"held","opts":{}},
+//            {"name":"descent","phase":"descent","opts":{}},
+//            {"name":"agora","phase":"agora","opts":{}},
+//            {"name":"wheel","phase":"wheel","opts":{"chapter":3}},
+//            {"name":"pane","phase":"pane","opts":{"slug":"vinci"}},
+//            {"name":"breath","phase":"breath","opts":{}},
+//            {"name":"wing","phase":"wing","opts":{"slug":"vinci"}}]'
+//   FORGE_VP=desktop FORGE_TIER=hero node forge/shot-agent.mjs <port> <dir> "$STATES"
+//   FORGE_VP=mobile  FORGE_TIER=hero node forge/shot-agent.mjs <port> <dir> "$STATES"
+//   then drop `-hero-` from every file name, which is what the base carries.
 
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { deflateSync, inflateSync } from 'node:zlib'
