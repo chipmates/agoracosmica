@@ -314,16 +314,25 @@ def main():
             'id': ID, 'scope': SCOPE, 'name': 'The square dovecote',
             'date': DATE, 'app': str(paths.app_root()), 'store': str(paths.store()),
             'models': str(paths.models(SCOPE, ID)),
-            # under four hundred texels a metre the museum's loader lays the
-            # library's own band over the body, which is the empty plane rule
-            'detail_set': 'brick-old-red',
+            # NO DETAIL SET. Under four hundred texels a metre the loader
+            # offers to lay a library band over the body, and that band costs a
+            # whole material set in the frame: measured, the standard tier then
+            # stands at ninety nine per cent of its texture budget with one
+            # building on a lawn. What the band would add at room scale (a
+            # variation about one) the bake already carries per brick, so the
+            # record declines it.
             'label': LABEL, 'certainty': CERTAINTY,
             'category': 'architecture', 'period_fit': 'plausible-1517',
             'script': str(source.relative_to(source.parents[3])),
             'script_sha256': hashlib.sha256(source.read_bytes()).hexdigest(),
             'blend': str(blend), 'work': str(work), 'atlas': str(atlas),
             'measurements': dict(scene['object']),
-            'library': [{'id': e['id'], 'licence': e['licence']} for e in materials.used()],
+            # the sets the script dresses from, read off the store's own
+            # manifest: the export stage opens the blend rather than building
+            # it, so the list cannot come from what this process happened to
+            # load
+            'library': [{'id': f'library/{name}', 'licence': materials.record(name)['licence']}
+                        for name in sorted(set(SETS))],
             'sets': sorted(set(SETS)),
             'maps': ['albedo', 'normal', 'orm'],
             'parts': list(PARTS),
