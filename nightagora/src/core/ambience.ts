@@ -615,8 +615,8 @@ export const ambience = {
   /** Call from a user gesture: browsers only unlock audio there. */
   enable(): void {
     const choice = readChoice()
-    // LAW 1. The bed is STANDARD (a blessed decision, 2026-07-20): a night
-    // with no answer on record takes the wake's offer, because the wake is
+    // LAW 1. The bed is STANDARD: a night with no answer on record takes
+    // the wake's offer, because the wake is
     // itself the visitor's first deliberate gesture and the rail lights the
     // moment it runs. A remembered no is honoured by the caller and by
     // readChoice below, and one press turns it off for good.

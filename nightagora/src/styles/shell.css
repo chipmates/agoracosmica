@@ -163,69 +163,6 @@ body:has(#forward-door.lit) #rail { z-index: 7; }
   letter-spacing: .035em; text-indent: 0; color: var(--press-muted);
 }
 
-/* The contract: a long cut in stone, ample readable ink, one deliberate action. */
-#sitting {
-  width: min(600px, calc(100% - 40px));
-  padding: 36px 46px 24px;
-  bottom: calc(90px + env(safe-area-inset-bottom));
-  text-align: left;
-  border: 0;
-  border-top: 1px solid var(--rule);
-  border-bottom: 1px solid var(--press-hairline);
-  background:
-    radial-gradient(ellipse at 0 0, color-mix(in srgb, var(--na-starlight) 5%, transparent), transparent 70%),
-    linear-gradient(115deg, var(--na-lapis), var(--na-abyss));
-  backdrop-filter: none;
-  box-shadow: 0 20px 60px color-mix(in srgb, var(--na-abyss) 48%, transparent);
-  max-height: calc(100dvh - 128px);
-  overflow-y: auto;
-  overscroll-behavior: contain;
-}
-#sitting::before { inset: 8px; opacity: .6; }
-#sitting .rule { width: 40px; margin: 0 0 24px; }
-#sitting .sitting-stone {
-  font-family: var(--press-display);
-  font-size: 19px;
-  line-height: 1.5;
-  letter-spacing: 0;
-  max-width: none;
-  margin-inline: 0;
-  color: var(--press-white);
-  text-wrap: pretty;
-  hanging-punctuation: first last;
-}
-#sitting .sitting-stone.strong {
-  font-family: var(--press-ui);
-  font-size: 12px; font-weight: 500;
-  text-transform: none;
-  letter-spacing: .04em; text-indent: 0;
-  text-align: left; margin-top: 20px;
-}
-#sitting .gate-declare {
-  font-family: var(--press-ui);
-  font-size: 13px; line-height: 1.6;
-  color: var(--press-muted);
-  margin-top: 22px;
-  max-width: none;
-}
-#sitting .gate-actions { justify-content: flex-start; margin-top: 18px; }
-#sitting .gate-actions button {
-  min-height: 48px;
-  padding: 10px 30px;
-  font-family: var(--press-ui);
-  font-size: 14px; letter-spacing: .06em; text-indent: 0;
-  text-transform: none;
-  color: var(--na-starlight);
-  border-color: var(--rule);
-}
-#sitting .gate-links {
-  margin-top: 12px;
-  font-family: var(--press-ui);
-  font-size: 11px; letter-spacing: .015em;
-  text-transform: none;
-}
-#sitting .gate-links a { display: inline-flex; align-items: center; min-height: 44px; }
-
 /* The last page. The dawn is behind the type, never a veil over it. */
 #forward-door { isolation: isolate; padding-bottom: calc(90px + env(safe-area-inset-bottom)); }
 .door-dawn { z-index: -1; height: 51%; background: linear-gradient(to top, var(--na-abyss), color-mix(in srgb, var(--na-lapis) 88%, transparent) 50%, transparent); }
@@ -279,11 +216,7 @@ body:has(#forward-door.lit) #rail { z-index: 7; }
   #overture-skip { font-size: 11px; margin-top: 9px; letter-spacing: .015em; }
   #rail button { font-size: 12px; gap: 9px; bottom: calc(14px + env(safe-area-inset-bottom)); }
   #rail-sound::before, #rail-instruments::after { width: 26px; height: 26px; }
-  #sitting { padding: 26px 26px 16px; }
-  #sitting .sitting-stone { font-size: 17px; line-height: 1.47; }
-  #sitting .gate-declare { font-size: 12px; }
-  #sitting .gate-links { font-size: 10.5px; }
-  #sitting .sitting-stone.strong { margin-top: 16px; }
+
   #forward-door { padding: 24px 24px calc(105px + env(safe-area-inset-bottom)); }
   .door-title { font-size: 32px; max-width: 100%; }
   .door-kicker { font-size: 10px; gap: 10px; letter-spacing: .12em; text-indent: .12em; }

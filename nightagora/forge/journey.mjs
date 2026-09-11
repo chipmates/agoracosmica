@@ -56,9 +56,6 @@ try {
     page.evaluate(() => ({
       phase: document.body.dataset.phase,
       status: document.getElementById('status')?.textContent ?? '',
-      // his ground is walked: the walk's own number decides when a
-      // station has been reached (a DOM-only read overshoots to the vista)
-      campWalk: window.__forge?.state().campWalk ?? 0,
     }))
   const shot = async (name) => {
     const s = await state()
@@ -89,8 +86,7 @@ try {
   await waitPhase('held')
   await shot('held')
 
-  // 2 · the descent: one black breath, then the questions carry you
-  // down (no stop until the Sitting at the hearth)
+  // 2 · the descent: one gesture, and the plates carry you down
   await wheel(300, 2)
   if (!(await waitPhase('descent', 8000))) process.exit(1)
   await wheel(300, 5, 200)
@@ -120,113 +116,20 @@ try {
   await page.waitForTimeout(2500)
   await shot('sky')
 
-  // 4 · the first night rides the rail: scroll opens Marcus, scroll
-  // again enters his cosmos (zero taps, the founder's law)
+  // 4 · the wheel: open a name, then read its pane
   await page.waitForTimeout(1200)
-  await wheel(300, 1)
+  const chip = page.locator('.star-chip.lit').first()
+  await chip.waitFor({ state: 'visible', timeout: 12000 })
+  await chip.click()
   await page.waitForTimeout(1400)
-  await shot('pane-auto')
-  // one breath now carries you in. A visitor whose scroll lands inside
-  // the rail's cooldown
-  // simply scrolls again; so does the walker (slow headless frames make
-  // scene-time lag wall-time, especially at the mobile pixel ratio).
-  for (let i = 0; i < 12; i++) {
-    const p = await page.evaluate(() => document.body.dataset.phase)
-    if (p === 'camp') break
-    await wheel(300, 1, 500)
-  }
-  const crossed = await waitPhase('camp', 10000)
-  if (crossed) {
+  await shot('pane')
+  await page.locator('.pane-close').click()
+  await page.waitForTimeout(1200)
+  await shot('sky-again')
+  await page.locator('#sky-return').click()
+  if (await waitPhase('agora', 10000)) {
     await page.waitForTimeout(2500)
-    await shot('camp')
-
-    // 5b · HIS GROUND IS WALKED: the same one verb carries the visitor
-    // from the far shore to his tent, and every station is a real frame
-    for (const [name, until] of [
-      ['camp-ford', 0.28],
-      ['camp-gate', 0.42],
-      ['camp-via', 0.57],
-    ]) {
-      for (let i = 0; i < 30; i++) {
-        const s = await state()
-        if ((s.campWalk ?? 0) >= until) break
-        await wheel(240, 1, 90)
-      }
-      await page.waitForTimeout(900)
-      await shot(name)
-    }
-
-    // 6 · the SITTING: the hearth is a PLACE — it opens when the walk
-    // reaches his tent, and asks the night's one contract there
-    for (let i = 0; i < 40; i++) {
-      const s = await state()
-      if ((s.campWalk ?? 0) >= 0.7) break
-      await wheel(240, 1, 90)
-    }
-    const sitting = page.locator('#sitting')
-    await sitting.waitFor({ state: 'visible', timeout: 12000 })
-    await shot('sitting')
-    await page.locator('#sitting-accept').click()
-    await page.waitForTimeout(1500)
-    await shot('hearth-after-sitting')
-
-    // scrolling at the camp must not strand the visitor either
-    await wheel(-300, 6)
-    await page.waitForTimeout(1500)
-    await shot('camp-after-scroll-up')
-    await wheel(300, 6)
-    await page.waitForTimeout(1500)
-    await shot('camp-after-scroll-down')
-
-    // 6b · THE DUSK LAW: the walk's end IS the overlook, and night falls
-    // over his morning there. His morning has to answer the return.
-    try {
-      for (let i = 0; i < 30; i++) {
-        const s = await state()
-        if ((s.campWalk ?? 0) >= 0.96) break
-        await wheel(240, 1, 90)
-      }
-      await page.locator('#dusk-pane').waitFor({ state: 'visible', timeout: 12000 })
-      await page.waitForTimeout(3500)
-      await shot('duskrise')
-      await page.locator('#dusk-return').click()
-      await page.waitForTimeout(3000)
-      await shot('camp-morning-again')
-      const back = await state()
-      if ((back.campWalk ?? 1) > 0.95) {
-        console.log('[journey] the duskrise will not let go: walk still at the vista')
-        await shot('STUCK-dusk-loop')
-      }
-    } catch {
-      console.log('[journey] the sign never rose over the camp')
-      await shot('STUCK-dusk')
-    }
-
-    // 7 · the way home: the hearth keeper walks you back to the fire
-    const exit = page.locator('.keeper-exit')
-    try {
-      await exit.waitFor({ state: 'visible', timeout: 30000 })
-      await exit.click()
-      if (await waitPhase('agora', 10000)) {
-        await page.waitForTimeout(3200)
-        await shot('hub-return')
-      }
-    } catch (err) {
-      console.log('[journey] way-home wait failed:', String(err).split('\n')[0])
-      const k = await page.evaluate(() => {
-        const host = document.getElementById('keeper')
-        const exit = host?.querySelector('.keeper-exit')
-        return {
-          keeperHidden: host?.hidden,
-          mode: host?.dataset.mode,
-          exitInDom: Boolean(exit),
-          exitHidden: exit?.hidden,
-          exitText: exit?.textContent?.trim(),
-        }
-      })
-      console.log('[journey] the way home never opened', JSON.stringify(k))
-      await shot('STUCK-way-home')
-    }
+    await shot('fire-again')
   }
 
   await browser.close()

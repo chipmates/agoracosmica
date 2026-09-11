@@ -22,17 +22,13 @@
       --sans: system-ui, -apple-system, 'Segoe UI', sans-serif;
 
       /* ---- THE PRESS — the shell's one letterpress voice. Every surface of
-         the night reads its ink, its rules and its plates out of this block,
-         the way every lit thing in the camp reads the hour out of one set of
-         uniforms. Nothing below invents a hue: the seven colours above are
-         the whole palette. ---- */
+         the night reads its ink, its rules and its plates out of this block.
+         Nothing below invents a hue: the seven colours above are the whole
+         palette. ---- */
 
       /* type on the night: a hard close shadow so the letter has an edge,
          and a wide soft one so it sits IN the dark instead of on it */
       --ink-night: 0 1px 2px rgba(4, 6, 13, 0.92), 0 2px 26px rgba(4, 6, 13, 0.72);
-      /* type on his morning: the camp is a dawn, so its ink is warm-dark or
-         the letterpress looks pasted on (the same reading keeper-press made) */
-      --ink-day: 0 1px 3px rgba(14, 9, 4, 0.92), 0 2px 24px rgba(14, 9, 4, 0.74);
       /* one hairline weight, two strengths: a rule you read, a rule you feel */
       --rule: color-mix(in srgb, var(--na-gold) 46%, transparent);
       --rule-faint: color-mix(in srgb, var(--na-gold) 20%, transparent);
@@ -61,17 +57,6 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* ---- HIS MORNING TAKES WARM INK — the camp is a dawn, and cool ink on
-       a warm-lit ground makes the letterpress look pasted on. Every line
-       the shell puts over that ground switches its shadow with the hour
-       (the same reading the keeper's own press made). ---- */
-    body[data-phase='camp'] .brand,
-    body[data-phase='camp'] .status,
-    body[data-phase='camp'] #voice,
-    body[data-phase='camp'] #rail button {
-      text-shadow: var(--ink-day);
-    }
-
     /* ---- THE CAPS REGISTER — every letterspaced line in the night, given
        its leading once. A tracked capital never ties to its neighbour, so
        ligatures go, and a wrapped line gets air instead of the browser's
@@ -82,44 +67,27 @@
 .status,
 .plate-kicker,
 .plate-voices,
-.trace-kicker,
-.trace-source,
-.dusk-kicker,
-.drawn-kicker,
-.drawn-status,
 .inst-kicker,
-.chapters-kicker,
-.chapters-ink,
-.chapters-now,
 .pane-kicker,
 .pane-tradition,
 .pane-years,
 .pane-ink,
 .pane-sib-label,
 .pane-drawn,
-.gate-links,
-.sitting-stone,
 .hotspot-label,
-.atlas-site,
-.atlas-deg,
 .star-chip,
 .chapter-btn,
 #sky-invite,
 #chapter-marks,
 #rail button,
-#dusk-return,
 #sky-return,
 #overture-skip,
-.gate-actions button,
 .pane-enter,
 .pane-sibling,
 .pane-close,
 .inst-links button,
 .inst-links a,
-.inst-close,
-.drawn-close,
-.chapters-toggle,
-.chapters-close {
+.inst-close {
       line-height: var(--press-lead);
       font-variant-ligatures: none;
     }
@@ -230,8 +198,6 @@
     }
     #voice.lit { opacity: 0.85; }
     #voice.clean { color: var(--na-starlight); letter-spacing: 0.01em; }
-    /* at the camp the fire owns the left middle: the voice steps lower */
-    body[data-phase='camp'] #voice { top: 72%; }
 
     /* ---- the gold breath: you enter a life through its light ---- */
     #goldbreath {
@@ -252,171 +218,6 @@
 
     body.forge #voice, body.forge #goldbreath { transition: none !important; }
 
-    /* ---- the atlas layer: his ground, annotated the way a survey plate
-       annotates a coast. Letterspaced small caps, one hairline tick, and
-       a bearing — they ink in only while their site holds the frame. ---- */
-    #camp-labels { position: fixed; inset: 0; z-index: 2; pointer-events: none; }
-    /* the label hangs off its site the way a survey plate hangs a name off a
-       coast: the leader runs out of the ground, the name sits on the leader,
-       and the bearing is set beneath it in the smaller register. The walk
-       writes the position straight onto the element, so the composition has
-       to grow out of that one anchor point. */
-    .atlas-label {
-      position: absolute; top: 0; left: 0;
-      display: grid;
-      grid-template-columns: auto auto;
-      align-items: center;
-      column-gap: 9px; row-gap: 2px;
-      transform: translate(-50%, -50%);
-      opacity: 0;
-      transition: opacity 0.7s ease;
-      white-space: nowrap;
-    }
-    .atlas-tick {
-      grid-column: 1; grid-row: 1;
-      width: 30px; height: 1px;
-      background: linear-gradient(90deg,
-        transparent, color-mix(in srgb, var(--na-gold) 68%, transparent));
-    }
-    .atlas-site {
-      grid-column: 2; grid-row: 1;
-      font-family: var(--sans);
-      font-size: 10px; letter-spacing: 0.34em; text-transform: uppercase;
-      color: color-mix(in srgb, var(--na-starlight) 90%, transparent);
-      text-shadow: var(--ink-day);
-    }
-    .atlas-deg {
-      grid-column: 2; grid-row: 2;
-      font-family: var(--sans);
-      font-size: 8.5px; letter-spacing: 0.24em; text-transform: uppercase;
-      color: color-mix(in srgb, var(--na-gold) 66%, transparent);
-      text-shadow: var(--ink-day);
-    }
-    @media (max-width: 720px) {
-      .atlas-site { font-size: 9px; letter-spacing: 0.26em; }
-      .atlas-deg { display: none; }
-      .atlas-tick { width: 16px; }
-    }
-    body.forge .atlas-label { transition: none !important; }
-
-    /* ---- the trace: carved words, marked by a little star ---- */
-    #trace-card {
-      position: fixed; z-index: 3;
-      max-width: 300px;
-      padding: 2px 0 2px 18px;
-      pointer-events: none;
-      text-align: left;
-      transition: opacity 0.4s ease;
-    }
-    #trace-card[hidden] { display: block; opacity: 0; visibility: hidden; }
-    /* the card holds over a lit tent as often as over the dark, so it earns
-       its legibility from its own air, not from a box: an ellipse of the
-       night feathered out long before it has an edge (the keeper's device,
-       because a card here would wall the words off from the wood) */
-    #trace-card::before {
-      content: ''; position: absolute; z-index: -1;
-      left: -30px; right: -40px; top: -30px; bottom: -30px;
-      background: radial-gradient(ellipse 58% 60% at 44% 44%,
-        color-mix(in srgb, var(--na-abyss) 88%, transparent) 0%,
-        color-mix(in srgb, var(--na-abyss) 62%, transparent) 48%,
-        transparent 80%);
-    }
-    /* the knife stroke: bright where the cut began, spent at its foot */
-    #trace-card::after {
-      content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 1px;
-      background: linear-gradient(to bottom,
-        color-mix(in srgb, var(--na-gold) 72%, transparent) 0%,
-        color-mix(in srgb, var(--na-gold) 34%, transparent) 62%,
-        transparent 100%);
-    }
-    /* where and how it was cut: a caption, not a headline. Three lines of
-       tracked gold read as a block of paint, and gold in this night only
-       ever emits or reflects. */
-    .trace-kicker {
-      font-family: var(--sans);
-      font-size: 8.5px; letter-spacing: 0.26em; line-height: 1.75;
-      text-transform: uppercase;
-      color: color-mix(in srgb, var(--mist-warm) 74%, var(--na-starlight));
-      text-shadow: var(--ink-day);
-    }
-    /* the opening quote hangs into the margin, the way a set page does it */
-    .trace-quote {
-      margin-top: 12px; text-indent: -0.42em;
-      font-family: var(--serif); font-style: italic;
-      font-size: 17px; line-height: 1.5;
-      color: var(--na-starlight);
-      text-shadow: var(--ink-day);
-    }
-    .trace-source {
-      margin-top: 12px;
-      font-family: var(--sans);
-      font-size: 8.5px; letter-spacing: 0.26em; line-height: 1.8;
-      text-transform: uppercase;
-      color: color-mix(in srgb, var(--na-mist) 88%, transparent);
-      text-shadow: var(--ink-day);
-    }
-
-    /* ---- the duskrise: His Sky's letterpress, low while the gaze is
-       up. The Dusk Law: to see what you have learned, night must fall ---- */
-    #dusk-pane {
-      position: fixed; left: 50%;
-      bottom: calc(74px + env(safe-area-inset-bottom));
-      transform: translateX(-50%);
-      z-index: 3; width: min(560px, calc(100% - 40px));
-      text-align: center; pointer-events: none;
-      opacity: 0; transition: opacity 1.8s ease;
-    }
-    #dusk-pane.lit { opacity: 1; }
-    #dusk-pane[hidden] { display: none; }
-    /* the duskrise stands over the brightest ground in the night, the lit
-       tent rows: the block takes its own air with it */
-    #dusk-pane::before {
-      content: ''; position: absolute; z-index: -1;
-      left: -8%; right: -8%; top: -34px; bottom: -30px;
-      background: radial-gradient(ellipse 46% 50% at 50% 50%,
-        color-mix(in srgb, var(--na-abyss) 74%, transparent) 0%,
-        color-mix(in srgb, var(--na-abyss) 46%, transparent) 48%,
-        transparent 78%);
-    }
-    .dusk-kicker {
-      font-family: var(--sans);
-      font-size: 10px; letter-spacing: 0.3em; text-indent: 0.3em;
-      text-transform: uppercase; color: var(--na-gold);
-      text-wrap: balance;
-      text-shadow: var(--ink-day);
-    }
-    .dusk-line {
-      margin-top: 12px;
-      font-family: var(--serif); font-style: italic;
-      font-size: clamp(14px, 1.9vw, 17px); line-height: 1.5;
-      color: var(--na-starlight);
-      text-shadow: var(--ink-day);
-    }
-    .dusk-actions {
-      margin-top: 8px;
-      display: flex; align-items: center; justify-content: center;
-      gap: 2px 26px; flex-wrap: wrap;
-    }
-    #dusk-return {
-      background: none; border: none; cursor: pointer;
-      pointer-events: auto;
-      font-family: var(--sans);
-      font-size: 9.5px; letter-spacing: 0.3em; text-indent: 0.3em;
-      text-transform: uppercase;
-      color: color-mix(in srgb, var(--na-mist) 92%, transparent);
-      min-height: 44px; padding: 0 10px;
-      text-shadow: var(--ink-day);
-      transition: color 0.5s ease;
-    }
-    #dusk-return:hover, #dusk-return:focus-visible { color: var(--na-starlight); outline: none; }
-    /* the way onward wears a door's hairline; the way back is a quiet step */
-
-    body.forge #dusk-pane { transition: none !important; }
-
-    /* ---- the return: one diamond-ring breath, the short dawn ---- */
-
-    body.forge #trace-card { transition: none !important; }
-
     /* ---- the descent: one gesture down to the agora, the plates
        turning under the visitor as the world comes closer ---- */
     #descent { position: fixed; inset: 0; z-index: 3; pointer-events: none; }
@@ -432,33 +233,9 @@
         color-mix(in srgb, var(--na-gold) 68%, transparent) 100%);
     }
 
-    /* the one line that carries a legal consequence, so it is set to be
-       read: sentence case, a real measure, and the link marked as a link */
-    .gate-declare {
-      max-width: 44ch; margin-left: auto; margin-right: auto;
-      font-family: var(--sans);
-      font-size: 11.5px; letter-spacing: 0.012em; line-height: 1.62;
-      color: color-mix(in srgb, var(--na-mist) 92%, transparent);
-    }
-    /* the named document never breaks across two lines: half a link on each
-       line reads as two links (round 2, phone) */
-    .gate-declare a {
-      white-space: nowrap;
-      color: var(--na-gold); text-decoration: none;
-      border-bottom: 1px solid color-mix(in srgb, var(--na-gold) 45%, transparent);
-      pointer-events: auto;
-      transition: border-color 0.3s ease;
-    }
-    .gate-declare a:hover, .gate-declare a:focus-visible {
-      border-bottom-color: var(--na-gold); outline: none;
-    }
-    .gate-actions {
-      margin-top: 22px;
-      display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
-    }
     /* ---- the doors of the night: one plate, one sheen, three places
        (the Sitting's own, the figure pane's, the Forward Door's) ---- */
-    .gate-actions button, .pane-enter {
+    .pane-enter {
       position: relative;
       background:
         linear-gradient(to bottom,
@@ -467,49 +244,19 @@
       box-shadow: inset 0 0 24px color-mix(in srgb, var(--na-gold) 6%, transparent);
       transition: border-color 0.3s ease, color 0.3s ease, box-shadow 0.4s ease;
     }
-    .gate-actions button:hover,
-.gate-actions button:focus-visible,
-.pane-enter:hover,
+    .pane-enter:hover,
 .pane-enter:focus-visible {
       box-shadow:
         inset 0 0 30px color-mix(in srgb, var(--na-gold) 11%, transparent),
         0 0 26px color-mix(in srgb, var(--na-gold) 9%, transparent);
     }
-    .gate-actions button {
-      cursor: pointer;
-      border: 1px solid color-mix(in srgb, var(--na-gold) 45%, transparent);
-      min-height: 44px; padding: 12px 26px;
-      font-family: var(--sans);
-      font-size: 10px; letter-spacing: 0.3em; text-indent: 0.3em;
-      text-transform: uppercase; color: var(--na-gold);
-      pointer-events: auto;
-    }
-    .gate-actions button:hover, .gate-actions button:focus-visible { border-color: var(--na-gold); color: var(--na-starlight); outline: none; }
-    .gate-links {
-      margin-top: 20px;
-      font-family: var(--sans);
-      font-size: 9px; letter-spacing: 0.26em;
-      text-transform: uppercase;
-      color: color-mix(in srgb, var(--na-mist) 70%, transparent);
-    }
-    .gate-links a {
-      color: color-mix(in srgb, var(--na-mist) 92%, transparent);
-      text-decoration: none; pointer-events: auto;
-      transition: color 0.3s ease;
-    }
-    .gate-links a:hover, .gate-links a:focus-visible { color: var(--na-gold); outline: none; }
 
-    /* ---- THE PLATES — the three surfaces of the night that are objects and
-       not voices (the contract, the honest placeholder, the instruments).
-       One plate: abyss with the sky still in its top edge, a gold hairline,
-       an inner hairline a breath inside it, corner ticks the way a survey
-       plate is trimmed, and a shadow that seats it on the world. Cut, not
-       carded.
-
-       His nights are NOT in this family. That element ships its own press
-       (id chapters-press) and is deliberately a leaf and not a plate: no
-       box, no border, no shadow. The shell stages it and stays out of it. */
-    #sitting, #drawn-pane, #instruments {
+    /* ---- THE PLATE — the one surface of the night that is an object and
+       not a voice. Abyss with the sky still in its top edge, a gold
+       hairline, an inner hairline a breath inside it, corner ticks the way
+       a survey plate is trimmed, and a shadow that seats it on the world.
+       Cut, not carded. ---- */
+    #instruments {
       background:
         linear-gradient(to bottom, var(--plate-top) 0%, var(--plate-foot) 62%);
       border: 1px solid var(--plate-edge);
@@ -518,7 +265,7 @@
         inset 0 1px 0 color-mix(in srgb, var(--na-gold) 10%, transparent);
       backdrop-filter: blur(6px);
     }
-    #sitting::before, #drawn-pane::before, #instruments::before {
+    #instruments::before {
       content: ''; position: absolute; inset: 5px;
       pointer-events: none;
       background:
@@ -527,96 +274,6 @@
         linear-gradient(var(--rule-faint), var(--rule-faint)) right bottom / 10px 1px no-repeat,
         linear-gradient(var(--rule-faint), var(--rule-faint)) right bottom / 1px 10px no-repeat;
     }
-
-    #sitting {
-      position: fixed; left: 50%; bottom: calc(96px + env(safe-area-inset-bottom));
-      transform: translateX(-50%);
-      width: min(560px, calc(100% - 48px));
-      z-index: 6; text-align: center;
-      padding: 30px 32px 28px;
-    }
-    #sitting[hidden] { display: none; }
-    #sitting .rule { display: block; width: 44px; height: 1px; margin: 0 auto 22px; background: color-mix(in srgb, var(--na-gold) 55%, transparent); }
-    /* THE CONTRACT MUST BE READ. It was set in tracked capitals, which on a
-       phone is seven lines of shouting, and shouting is the one register a
-       reader skips. It is the same words, set to be read: sentence case, a
-       measure that fits the eye, and the one line that has to land kept as
-       a stamp above it. */
-    .sitting-stone {
-      max-width: 46ch; margin: 0 auto;
-      text-align: left;
-      font-family: var(--sans);
-      font-size: 13px; letter-spacing: 0.012em; text-indent: 0;
-      text-transform: none; line-height: 1.68;
-      color: color-mix(in srgb, var(--na-mist) 90%, var(--na-starlight));
-    }
-    /* the one line that has to land is a stamp, so it is centred under the
-       paragraph it stamps, in capitals, alone */
-    .sitting-stone.strong {
-      margin-top: 16px; text-align: center;
-      font-size: 10px; letter-spacing: 0.3em; text-indent: 0.3em;
-      text-transform: uppercase; line-height: 1.6;
-      color: var(--na-starlight);
-    }
-    #sitting .gate-declare { margin-top: 20px; }
-    #sitting .gate-actions { margin-top: 20px; }
-    #sitting .gate-links { margin-top: 16px; }
-
-    /* ---- the being-drawn pane: the honest placeholder, one per future
-       organ (concept phase law) ---- */
-    #drawn-pane {
-      position: fixed; left: 50%; top: 50%;
-      transform: translate(-50%, -50%);
-      width: min(460px, calc(100% - 48px));
-      z-index: 6; text-align: center;
-      padding: 32px 34px 22px;
-    }
-    #drawn-pane[hidden] { display: none; }
-    .drawn-kicker {
-      font-family: var(--sans);
-      font-size: 9px; letter-spacing: 0.32em; text-indent: 0.32em;
-      text-transform: uppercase; color: var(--na-gold);
-    }
-    .drawn-title {
-      margin-top: 14px;
-      font-family: var(--serif);
-      font-size: clamp(20px, 2.4vw, 26px); line-height: 1.2;
-      letter-spacing: 0.01em;
-      color: var(--na-starlight);
-    }
-    /* the promise sits under a hairline: an entry in a catalogue of things
-       not drawn yet, which is exactly what it is */
-    .drawn-promise {
-      position: relative;
-      margin-top: 20px; padding-top: 18px;
-      max-width: 34ch; margin-left: auto; margin-right: auto;
-      font-family: var(--serif); font-style: italic;
-      font-size: 15px; line-height: 1.58;
-      color: color-mix(in srgb, var(--na-mist) 94%, var(--na-starlight));
-    }
-    .drawn-promise::before {
-      content: ''; position: absolute; top: 0; left: 50%;
-      transform: translateX(-50%);
-      width: 34px; height: 1px; background: var(--rule-faint);
-    }
-    .drawn-status {
-      margin-top: 20px;
-      font-family: var(--sans);
-      font-size: 8px; letter-spacing: 0.3em; text-indent: 0.3em;
-      text-transform: uppercase;
-      color: color-mix(in srgb, var(--na-gold) 72%, transparent);
-    }
-    .drawn-close {
-      margin-top: 8px;
-      background: none; border: none; cursor: pointer;
-      min-height: 44px; padding: 8px 16px;
-      font-family: var(--sans);
-      font-size: 9px; letter-spacing: 0.3em; text-indent: 0.3em;
-      text-transform: uppercase;
-      color: color-mix(in srgb, var(--na-mist) 88%, transparent);
-      transition: color 0.3s ease;
-    }
-    .drawn-close:hover, .drawn-close:focus-visible { color: var(--na-gold); outline: none; }
 
     /* ---- the instrument rail: the plain-faced layer, two quiet marks ---- */
     #rail { position: fixed; inset: 0; z-index: 4; pointer-events: none; }
@@ -763,34 +420,6 @@
     .hotspot:focus-visible { outline: none; }
     body.forge .hotspot { transition: none !important; }
 
-    /* the shell's staging for his nights only. The element's own press
-       (chapters-press) ships after this one and owns the composition: it is
-       a leaf, so nothing here gives it a box, an edge or a shadow. */
-    #chapters {
-      position: fixed; left: 50%; transform: translateX(-50%);
-      bottom: calc(76px + env(safe-area-inset-bottom));
-      width: min(560px, calc(100% - 48px));
-      z-index: 6;
-      padding: 22px 26px 18px;
-      background: none; border: none;
-    }
-    #chapters[hidden] { display: none; }
-    .chapters-kicker {
-      font-family: var(--sans);
-      font-size: 9px; letter-spacing: 0.32em; text-indent: 0.32em;
-      text-transform: uppercase; color: var(--na-gold);
-    }
-    .chapters-ink {
-      margin-top: 7px;
-      font-family: var(--sans);
-      font-size: 8px; letter-spacing: 0.24em; line-height: 1.8;
-      text-transform: uppercase;
-      color: color-mix(in srgb, var(--na-mist) 84%, transparent);
-    }
-    .chapters-list {
-      margin-top: 16px;
-      display: flex; flex-wrap: wrap; gap: 6px;
-    }
     /* the numerals are a programme, so they are set square and even: a
        numeral is a mark, not a word, and tracking pushes it off its own tile */
     .chapter-btn {
@@ -809,52 +438,6 @@
       border-color: color-mix(in srgb, var(--na-gold) 78%, transparent);
       color: var(--na-gold);
       box-shadow: inset 0 0 16px color-mix(in srgb, var(--na-gold) 12%, transparent);
-    }
-    .chapters-bar {
-      position: relative; margin-top: 16px;
-      display: flex; align-items: center; gap: 14px;
-      padding-top: 12px;
-      border-top: 1px solid color-mix(in srgb, var(--na-gold) 26%, transparent);
-    }
-    .chapters-progress {
-      position: absolute; top: -1px; left: 0;
-      height: 1px; width: 0%;
-      background: var(--na-gold);
-      box-shadow: 0 0 8px color-mix(in srgb, var(--na-gold) 55%, transparent);
-    }
-    .chapters-toggle {
-      background: none; border: none; cursor: pointer;
-      min-height: 40px; padding: 6px 8px;
-      font-family: var(--sans);
-      font-size: 10px; letter-spacing: 0.3em; text-indent: 0.3em;
-      text-transform: uppercase; color: var(--na-gold);
-      transition: color 0.3s ease;
-    }
-    .chapters-toggle:hover, .chapters-toggle:focus-visible { color: var(--na-starlight); outline: none; }
-    .chapters-now {
-      flex: 1; text-align: right;
-      font-family: var(--sans);
-      font-size: 9px; letter-spacing: 0.24em;
-      text-transform: uppercase;
-      color: color-mix(in srgb, var(--na-mist) 90%, transparent);
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-    .chapters-close {
-      background: none; border: none; cursor: pointer;
-      min-height: 40px; padding: 6px 0 6px 10px;
-      font-family: var(--sans);
-      font-size: 9px; letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: color-mix(in srgb, var(--na-mist) 80%, transparent);
-      transition: color 0.3s ease;
-    }
-    .chapters-close:hover, .chapters-close:focus-visible { color: var(--na-gold); outline: none; }
-
-    /* the beckoning star: the first night points to Marcus, three breaths */
-    .star-chip.beckon { animation: beckon 2.6s ease-in-out 3; }
-    @keyframes beckon {
-      0%, 100% { text-shadow: 0 1px 10px rgba(4, 6, 13, 0.9); color: var(--na-starlight); }
-      50% { text-shadow: 0 0 18px color-mix(in srgb, var(--na-gold) 80%, transparent); color: var(--na-gold); }
     }
 
     /* the impatient way down. It shared a hand's width with the status line,
@@ -939,7 +522,7 @@
     #sky-return {
       position: fixed; left: 50%; transform: translateX(-50%);
       /* clearly ABOVE the invite line: sharing its spot made the way
-         home unreadable and unclickable in practice (the founder, live) */
+         home unreadable and unclickable in practice */
       bottom: calc(92px + env(safe-area-inset-bottom));
       background: none; border: none; cursor: pointer;
       min-height: 44px; padding: 8px 16px;
@@ -1260,45 +843,7 @@
     /* the day register: at his hearth the letterpress floats IN the
        world (no box — it walls the voice off), placed clear of the
        flame and inked deep enough to hold against the dawn */
-    body[data-phase='camp'] #keeper {
-      left: 5vw; right: auto; transform: none;
-      width: min(390px, 34vw); text-align: left;
-      bottom: calc(104px + env(safe-area-inset-bottom));
-      padding: 0 8px;
-    }
-    body[data-phase='camp'] #keeper .keeper-seal { margin-left: 0; }
-    body[data-phase='camp'] #keeper .keeper-rule { margin-left: 0; }
-    body[data-phase='camp'] #keeper .keeper-name { font-size: 17px; }
-    body[data-phase='camp'] #keeper .keeper-line,
-    body[data-phase='camp'] #keeper .keeper-phrase { font-size: 19px; line-height: 1.48; }
-    body[data-phase='camp'] #keeper .keeper-offers { justify-content: flex-start; }
-    body[data-phase='camp'] #keeper .keeper-exit { min-height: 44px; }
-    @media (max-width: 720px) {
-      body[data-phase='camp'] #keeper {
-        left: 50%; transform: translateX(-50%); width: calc(100% - 44px);
-        bottom: calc(100px + env(safe-area-inset-bottom)); text-align: center;
-      }
-      body[data-phase='camp'] #keeper .keeper-seal,
-      body[data-phase='camp'] #keeper .keeper-rule { margin-left: auto; }
-      body[data-phase='camp'] #keeper .keeper-name { font-size: 14px; }
-      body[data-phase='camp'] #keeper .keeper-line,
-      body[data-phase='camp'] #keeper .keeper-phrase { font-size: 16px; line-height: 1.48; }
-      body[data-phase='camp'] #keeper .keeper-offers { justify-content: center; }
-      body[data-phase='camp'] #keeper .keeper-note { letter-spacing: 0.15em; }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      body[data-phase='camp'] #keeper *, #trace-card, #dusk-pane { transition: none !important; animation: none !important; }
-    }
-    body[data-phase='camp'] #keeper .keeper-line,
-    body[data-phase='camp'] #keeper .keeper-phrase,
-    body[data-phase='camp'] #keeper .keeper-ask,
-    body[data-phase='camp'] #keeper .keeper-name,
-    body[data-phase='camp'] #keeper .keeper-note,
-    body[data-phase='camp'] #keeper .keeper-offer,
-    body[data-phase='camp'] #keeper .keeper-exit {
-      text-shadow: 0 1px 6px rgba(12, 10, 6, 0.9), 0 2px 22px rgba(12, 10, 6, 0.75);
-    }
-    body[data-phase='camp'] #keeper[hidden] { display: none; }
+
     .keeper-dialogue { margin-top: 2px; pointer-events: auto; }
     .keeper-ask {
       margin-top: 12px;
@@ -1389,7 +934,7 @@
       .keeper-offers { margin-top: 10px; }
       .keeper-form { margin-top: 4px; }
       #keeper .keeper-note { margin-top: 10px; }
-      body[data-phase='agora'] .status, body[data-phase='camp'] .status { opacity: 0; }
+      body[data-phase='agora'] .status { opacity: 0; }
     }
 
     /* ---- KEYBOARD EYES — a hand on a key gets the same second hairline a
@@ -1398,8 +943,7 @@
        after every rule that clears an outline, so it is the one that lands.
        Elements that ship their own press (the keeper, his nights, the marks)
        own their focus and are not named here. ---- */
-    .gate-actions button:focus-visible,
-.pane-enter:focus-visible,
+    .pane-enter:focus-visible,
 .pane-close:focus-visible,
 .pane-sibling:focus-visible,
 .star-chip:focus-visible,
@@ -1407,12 +951,8 @@
 .inst-links button:focus-visible,
 .inst-links a:focus-visible,
 .inst-close:focus-visible,
-.drawn-close:focus-visible,
-#dusk-return:focus-visible,
 #sky-return:focus-visible,
-#overture-skip:focus-visible,
-.gate-declare a:focus-visible,
-.gate-links a:focus-visible {
+#overture-skip:focus-visible {
       outline: 1px solid color-mix(in srgb, var(--na-gold) 52%, transparent);
       outline-offset: 4px;
     }
@@ -1430,26 +970,13 @@
       .status { font-size: 9px; letter-spacing: 0.26em; text-indent: 0.26em; }
       #overture-skip { font-size: 8.5px; letter-spacing: 0.24em; text-indent: 0.24em; }
 
-      .trace-kicker { font-size: 8px; letter-spacing: 0.22em; }
-      .trace-quote { font-size: 15.5px; }
-      .trace-source { font-size: 8px; letter-spacing: 0.22em; }
-
-      .dusk-kicker { font-size: 9px; letter-spacing: 0.24em; text-indent: 0.24em; }
-      .dusk-actions { margin-top: 4px; gap: 0; }
-
       /* the contract is the one surface on this frame a visitor must read
          to the end, so it keeps its measure and gives up its margins */
-      #sitting { padding: 24px 20px 22px; }
-      .sitting-stone { font-size: 12.5px; line-height: 1.66; }
-      .sitting-stone.strong { font-size: 9.5px; letter-spacing: 0.26em; text-indent: 0.26em; }
-      .gate-declare { font-size: 11px; }
-      .gate-links { font-size: 8.5px; letter-spacing: 0.22em; }
 
       .pane-ink { font-size: 8px; letter-spacing: 0.2em; }
       .pane-tradition { letter-spacing: 0.26em; }
-      .drawn-promise { font-size: 14.5px; }
+
       .inst-links button, .inst-links a { font-size: 9.5px; letter-spacing: 0.22em; text-indent: 0.22em; }
-      .chapters-ink { letter-spacing: 0.2em; }
 
       .stone-text, .stone-strong { font-size: 11px; letter-spacing: 0.26em; text-indent: 0.26em; }
     }
@@ -1464,7 +991,6 @@
 #rail button::before,
 #rail button::after,
 .chapter-btn,
-.gate-actions button,
 .pane-enter { transition: none; }
     }
 
@@ -1484,9 +1010,6 @@
     <p class="status" id="status" role="status">First light</p>
     <button id="overture-skip" type="button">Skip the overture · begin at the fire</button>
   </div>
-  <!-- the stone retired 2026-07-21 (the founder): its words live on at the
-       Sitting, in every figure pane's ink, and in the keeper's own
-       mouth — three tellings were one too many -->
   <div id="descent" hidden>
     <div class="plumb" aria-hidden="true"></div>
   </div>
@@ -1498,19 +1021,6 @@
   </div>
   <p id="voice" aria-live="polite"></p>
   <div id="goldbreath" aria-hidden="true"><div class="dark-line"></div></div>
-  <div id="camp-labels" aria-hidden="true"></div>
-  <div id="trace-card" hidden>
-    <p class="trace-kicker">A trace · kept in the wood</p>
-    <p class="trace-quote">"What stands in the way becomes the way."</p>
-    <p class="trace-source">Meditations 5.20</p>
-  </div>
-  <div id="dusk-pane" hidden>
-    <p class="dusk-kicker">His Sky · The Wisdom Map of Marcus Aurelius</p>
-    <p class="dusk-line"></p>
-    <div class="dusk-actions">
-      <button id="dusk-return" type="button">Return to his morning</button>
-    </div>
-  </div>
   <div id="constellation-plate">
     <p class="plate-kicker"></p>
     <h2 class="plate-name"></h2>
@@ -1539,34 +1049,6 @@
     </div>
   </div>
   <div id="hotspots" aria-label="Points in this world"></div>
-  <div id="chapters" hidden>
-    <p class="chapters-kicker">His Nights · The Story of Marcus Aurelius</p>
-    <p class="chapters-ink">Told in his Echo's voice · An interpretation, not a recording</p>
-    <div class="chapters-list"></div>
-    <div class="chapters-bar">
-      <div class="chapters-progress"></div>
-      <button class="chapters-toggle" type="button">Listen</button>
-      <span class="chapters-now"></span>
-      <button class="chapters-close" type="button">Close</button>
-    </div>
-  </div>
-  <div id="sitting" hidden>
-    <span class="rule" aria-hidden="true"></span>
-    <p class="sitting-stone">These figures are AI interpretations, not the real people. What they say in chat, stories, and audio is AI-generated and can be inaccurate. Their portraits are AI-generated images, not photographs.</p>
-    <p class="sitting-stone strong">Verify anything important.</p>
-    <p class="gate-declare">By tapping the button below, you agree to the <a href="https://agoracosmica.org/terms" target="_blank" rel="noopener">Terms of Service</a> and you are 16 or older.</p>
-    <div class="gate-actions">
-      <button id="sitting-accept" type="button">Sit with him</button>
-    </div>
-    <p class="gate-links"><a href="https://agoracosmica.org/privacy" target="_blank" rel="noopener">Privacy Policy</a> · <a href="https://agoracosmica.org/impressum#jugendschutz" target="_blank" rel="noopener">Youth Protection Officer</a></p>
-  </div>
-  <div id="drawn-pane" hidden>
-    <p class="drawn-kicker"></p>
-    <p class="drawn-title"></p>
-    <p class="drawn-promise"></p>
-    <p class="drawn-status">Still being drawn</p>
-    <button class="drawn-close" type="button">Close</button>
-  </div>
   <div id="rail" hidden>
     <button id="rail-sound" type="button" aria-pressed="false">Sound · Off</button>
     <button id="rail-instruments" type="button" aria-haspopup="true" aria-expanded="false">Instruments</button>
@@ -1574,7 +1056,6 @@
   <div id="instruments" hidden>
     <p class="inst-kicker">The Instruments</p>
     <nav class="inst-links">
-      <button id="inst-library" type="button">The Library</button>
       <a href="https://agoracosmica.org/app?lang=en">Classic Agora Cosmica</a>
       <a href="https://agoracosmica.org/terms" target="_blank" rel="noopener">Terms</a>
       <a href="https://agoracosmica.org/privacy" target="_blank" rel="noopener">Privacy</a>

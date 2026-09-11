@@ -1,8 +1,8 @@
 /* THE ECLIPSE — the overture, and the first thing anyone ever sees of this
    project. A moon swallowing a light.
 
-   THE ONE GLORY (2026-07-25): the corona carries this frame alone, so it
-   is built the way a corona is actually built — a dipole field. Streamers
+   THE ONE GLORY: the corona carries this frame alone, so it is built the
+   way a corona is actually built — a dipole field. Streamers
    crowd the magnetic equator and thin toward the poles, where short fine
    brushes stand instead. The lanes are RIDGED (bright at the zero of an
    angular harmonic stack, dark between), so they read as filaments rather

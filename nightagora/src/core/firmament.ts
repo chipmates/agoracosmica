@@ -1,7 +1,6 @@
 /* THE FIRMAMENT — the night's standard stars, second organ by the rule
-   of two (the eclipse night and the camp dusk both raise it). Ported
-   from concept 01's star shader, then taught to be a SKY rather than a
-   texture (2026-07-21, live with the founder):
+   of two. Ported from the first concept's star shader, then taught to
+   be a SKY rather than a texture:
 
    - THE RIVER OF ALL THOUGHT: a Milky Way band crossing the dome — a
      dense faint river of dust with a soft nebular haze, the one
@@ -634,8 +633,8 @@ export function createFirmament(opts: FirmamentOptions): Firmament {
     float(1),
     heroN
   )
-  // 0.76, not 0.95: the field serves the composition (the founder, live:
-  // "dim them 20 percent more" — the sky is choir, never soloist)
+  // 0.76, not 0.95: the field serves the composition. The sky is a
+  // choir, never a soloist.
   mat.opacityNode = kernel
     .add(glint)
     .add(halo)
@@ -766,7 +765,7 @@ export function createFirmament(opts: FirmamentOptions): Firmament {
     field.visible = master > 0.004
     riverShell.visible = field.visible
     // the heavens turn at a pace felt only across a whole sitting:
-    // faster read as FLOATING on the near bokeh discs (the founder, live)
+    // faster read as FLOATING on the near bokeh discs
     points.rotation.y = reducedMotion ? 0 : elapsed * 0.001
     updateMeteor(elapsed, master)
   }

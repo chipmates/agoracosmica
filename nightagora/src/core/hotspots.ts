@@ -1,6 +1,6 @@
-/* THE MARKS — the selection grammar of the whole night (the founder,
-   2026-07-20, after the Breton example): world-anchored points of interest,
-   one device everywhere, the gold ring-and-bead with a letterpress name.
+/* THE MARKS — the selection grammar of the whole night: world-anchored
+   points of interest, one device everywhere, the gold ring-and-bead with
+   a letterpress name.
 
    The laws this file is carved from:
 

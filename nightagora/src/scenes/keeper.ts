@@ -7,8 +7,8 @@
    is carried to the Forward Door. speak() lets the fire listen. Verbs
    universal, staging sovereign.
 
-   THE PRESS (2026-07-25): this seat owns how the sitting LOOKS as well as
-   how it runs, so the type's own stylesheet ships from here, right below
+   THE PRESS: this seat owns how the sitting LOOKS as well as how it runs,
+   so the type's own stylesheet ships from here, right below
    the shell's. The composition is a column of type with a rhythm: a seal,
    his name, his station, a hairline that breathes with his voice, then
    the words, then the way onward, then the colophon that never lies about
