@@ -23,7 +23,7 @@
 import { PCFSoftShadowMap, Vector2, WebGPURenderer, type Camera, type Mesh, type Scene } from 'three/webgpu'
 import { createCostMeter, frameBytes, type CostReading } from './cost'
 import { applyDetail, type DetailNodes, type DetailScales } from './detail'
-import { GRADES, type Grade, type GradeName } from './grade'
+import { GRADES, resolveGrade, type Grade, type GradeName } from './grade'
 import { createKeyLight, type KeyLight, type KeyLightOptions } from './light'
 import { createMaterialLibrary, type MaterialLibrary, type MaterialSet } from './materials'
 import { loadHDRI, type SkyProbe } from './hdri'
@@ -50,7 +50,7 @@ export interface Stack {
   backend: 'webgpu' | 'webgl2'
   /** what the adapter called the hardware; 'swiftshader' means the CPU */
   architecture: string
-  setScene: (scene: Scene, camera: Camera, grade: GradeName | Grade) => void
+  setScene: (scene: Scene, camera: Camera, grade: GradeName | Grade | null | undefined) => void
   light: (opts: KeyLightOptions) => KeyLight
   reflector: (plane: Mesh, opts?: ReflectorOptions) => Reflection
   detail: (
@@ -125,8 +125,12 @@ export async function createStack(opts: StackOptions = {}): Promise<Stack> {
     chain = createPost(renderer, scene, camera, tier, look)
   }
 
-  function setScene(nextScene: Scene, nextCamera: Camera, grade: GradeName | Grade): void {
-    look = typeof grade === 'string' ? GRADES[grade] : grade
+  function setScene(
+    nextScene: Scene,
+    nextCamera: Camera,
+    grade: GradeName | Grade | null | undefined
+  ): void {
+    look = resolveGrade(grade)
     const same = nextScene === scene && nextCamera === camera
     scene = nextScene
     camera = nextCamera

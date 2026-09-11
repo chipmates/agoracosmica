@@ -41,21 +41,38 @@ export interface Grade {
   dof: DofGrade | null
 }
 
-const base: Grade = {
-  name: 'base',
+/* IDENTITY — the print that changes nothing.
+
+   Neutral is the default and every dial below it has to be earned against a
+   measurement. It is also what an unknown or missing grade name resolves to:
+   a look nobody wrote must show the art as it was authored, never take the
+   frame down with it. */
+export const IDENTITY: Grade = {
+  name: 'identity',
   exposure: 1,
   lift: [0, 0, 0],
   gamma: [1, 1, 1],
   gain: [1, 1, 1],
   saturation: 1,
+  warm: [1, 1, 1],
+  cool: [1, 1, 1],
+  split: 0,
+  vignette: 0,
+  grain: 0,
+  bloom: { strength: 0, radius: 0.4, threshold: 1, warmth: 1 },
+  ao: { intensity: 0, distance: 0.6, thickness: 1 },
+  dof: null,
+}
+
+const base: Grade = {
+  ...IDENTITY,
+  name: 'base',
   warm: [1, 0.94, 0.84],
   cool: [0.82, 0.88, 1],
-  split: 0,
   vignette: 0.18,
   grain: 0.02,
   bloom: { strength: 0.5, radius: 0.4, threshold: 0.72, warmth: 0.85 },
   ao: { intensity: 1, distance: 0.6, thickness: 1 },
-  dof: null,
 }
 
 /** The night's six looks. Every scene of the path names one. */
@@ -175,4 +192,24 @@ export type GradeName = keyof typeof GRADES
 
 export function grade(name: GradeName): Grade {
   return GRADES[name]
+}
+
+const unknown = new Set<string>()
+
+/**
+ * The look a scene asked for, or the identity print when it named one that
+ * does not exist. A grade name arrives from a route, a rig state or a phase
+ * table, so `undefined` is reachable from outside this module and a frame is
+ * never the right place to find out.
+ */
+export function resolveGrade(asked: GradeName | Grade | null | undefined): Grade {
+  if (asked && typeof asked === 'object') return asked
+  const found = asked ? (GRADES as Record<string, Grade>)[asked] : undefined
+  if (found) return found
+  const name = String(asked)
+  if (!unknown.has(name)) {
+    unknown.add(name)
+    console.warn(`grade "${name}" is not in the table; the frame is printed neutral`)
+  }
+  return IDENTITY
 }

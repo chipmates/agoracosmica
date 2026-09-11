@@ -26,7 +26,7 @@ type Phase = 'transit' | 'held' | 'descent' | 'agora' | 'wheel' | 'breath' | 'wi
 type ForgeState = Phase | 'pane'
 
 /** every stage of the night names its own look; the table is in stack/grade */
-const LOOK: Record<Phase, GradeName> = {
+const LOOK = {
   transit: 'cold-moon',
   held: 'cold-moon',
   descent: 'falling-plates',
@@ -34,6 +34,15 @@ const LOOK: Record<Phase, GradeName> = {
   wheel: 'gold-on-ink',
   breath: 'gold-breath',
   wing: 'first-station',
+} satisfies Record<Phase, GradeName>
+
+function isPhase(v: string | null | undefined): v is Phase {
+  return v !== null && v !== undefined && v in LOOK
+}
+
+/** the states the rig may ask for: every phase, plus the pane */
+function isForgeState(v: string | null | undefined): v is ForgeState {
+  return v === 'pane' || isPhase(v)
 }
 
 const stage = document.getElementById('stage')
@@ -652,6 +661,13 @@ if (lobbyPlate) lobbyPlate.textContent = wingCount(wingsOpen(), wingsPreparing()
 
 window.__forge = {
   jump(state, opts = {}) {
+    // a state the museum does not have is a mistake in the rig's own spec:
+    // say so and leave the marker unset, so the eye reports a stage that
+    // never took instead of shooting whatever was on screen
+    if (!isForgeState(state)) {
+      console.warn(`no such state: ${String(state)}`)
+      return
+    }
     document.body.classList.add('forge') // DOM beats compose instantly
     // the rig proves the state it ASKED for took, which the phase alone
     // cannot say: the pane is the wheel with a figure held open
@@ -784,6 +800,12 @@ window.__forge = {
 const TRANSIT_SECONDS = 2.0
 
 function setPhase(next: Phase): void {
+  // the phase arrives from the rig as well as from the night's own verbs, so
+  // a name nobody wrote is reachable: refuse it and keep the stage standing
+  if (!isPhase(next)) {
+    console.warn(`no such phase: ${String(next)}`)
+    return
+  }
   phase = next
   document.body.dataset['phase'] = next
   stack.setScene(scene, camera, LOOK[next])

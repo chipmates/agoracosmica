@@ -43,7 +43,7 @@ import { fxaa } from 'three/addons/tsl/display/FXAANode.js'
 import { smaa } from 'three/addons/tsl/display/SMAANode.js'
 import { denoise as denoiseNode } from 'three/addons/tsl/display/DenoiseNode.js'
 import { traa } from 'three/addons/tsl/display/TRAANode.js'
-import type { Grade } from './grade'
+import { IDENTITY, type Grade } from './grade'
 import type { Tier } from './tier'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -70,7 +70,7 @@ const {
 export interface PostChain {
   post: PostProcessing
   /** re-aim the chain at another scene's look; the shader is not rebuilt */
-  setGrade: (g: Grade) => void
+  setGrade: (g: Grade | null | undefined) => void
   /** ease the dials toward the last grade asked for */
   update: (dt: number) => void
   dispose: () => void
@@ -98,7 +98,11 @@ interface Dials {
   dofBokeh: number
 }
 
-function dialsOf(g: Grade): Dials {
+/* A grade may arrive from outside this module (a route, a rig state, a phase
+   table), so a missing one is reachable and the chain resolves it to the
+   identity print rather than reading dials off nothing. */
+function dialsOf(asked: Grade | null | undefined): Dials {
+  const g = asked ?? IDENTITY
   return {
     exposure: g.exposure,
     lift: [...g.lift],
@@ -150,8 +154,9 @@ export function createPost(
   scene: Scene,
   camera: Camera,
   tier: Tier,
-  first: Grade
+  asked: Grade | null | undefined
 ): PostChain {
+  const first = asked ?? IDENTITY
   const d = dialsOf(first)
   const target = dialsOf(first)
 
@@ -265,7 +270,8 @@ export function createPost(
   post.outputColorTransform = false
   post.outputNode = out
 
-  function setGrade(g: Grade): void {
+  function setGrade(asked: Grade | null | undefined): void {
+    const g = asked ?? IDENTITY
     Object.assign(target, dialsOf(g))
     if (aoPass) {
       aoPass.radius.value = g.ao.distance
