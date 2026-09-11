@@ -145,6 +145,8 @@ export function createEclipse(scene: Scene) {
   const uHalo = uniform(0)
   /** the bead, 0..1 */
   const uFlash = uniform(0)
+  /** the phone's clean stage under the overture's letterpress, 0 elsewhere */
+  const uStage = uniform(0)
 
   // ------------------------------------------------------------- THE DOME
   /* Night is a depth, and the depth is READ near the disc: the sky lifts
@@ -186,14 +188,13 @@ export function createEclipse(scene: Scene) {
     // in, or the two average into plum instead of reading as distant day
     col = col.mul(oneMinus(band.mul(0.38))).add(c3(TWILIGHT, 0.052).mul(band))
 
-    /* THE PHONE KEEPS ITS BOTTOM THIRD DARK. A 390 stage puts the title
-       and both prompts where the ring of day and the corona's skirt land,
-       and the type ends up standing on a warm wash. The band is not
-       deleted, it is stood down under the letterpress, so the stage is
-       clean and the umbra's own horizon still reads above it. */
-    if (narrow) {
-      col = col.mul(mix(float(1), float(0.5), smoothstep(0.62, 0.99, screenUV.y)))
-    }
+    /* THE PHONE KEEPS ITS BOTTOM THIRD DARK, THROUGH THE OVERTURE. A 390
+       stage puts the title and both prompts where the ring of day and the
+       corona's skirt land, and the type ends up standing on a warm wash.
+       The band is not deleted, it is stood down under the letterpress. It
+       comes straight back up as the door opens, because the lobby's own
+       colonnade stands in exactly that band and must keep its light. */
+    col = col.mul(mix(float(1), float(0.5), smoothstep(0.62, 0.99, screenUV.y).mul(uStage)))
     domeMat.colorNode = shoulder(col).add(dither(0.0024))
   }
   const dome = new Mesh(new SphereGeometry(90, seg(64, 40), seg(40, 28)), domeMat)
@@ -741,6 +742,7 @@ export function createEclipse(scene: Scene) {
     disc.position.x = -0.62 * cover
     uIntensity.value = 0.12 + 0.88 * Math.pow(s.transit, 2)
     uTotal.value = ease(0.7, 0.99, s.transit)
+    uStage.value = narrow ? Math.max(0, 1 - s.door * 3) : 0
 
     // the diamond ring: the bead ignites while the corona is still faint,
     // then the corona blooms as the bead dies
