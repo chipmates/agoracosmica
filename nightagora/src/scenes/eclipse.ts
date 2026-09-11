@@ -469,7 +469,7 @@ export function createEclipse(scene: Scene) {
       .mul(uIntensity.mul(0.28).add(0.72))
     photoMat.opacityNode = float(1)
   }
-  const photosphere = new Mesh(new CircleGeometry(1.0, seg(128, 96)), photoMat)
+  const photosphere = new Mesh(new CircleGeometry(1.0, seg(256, 192)), photoMat)
   photosphere.position.z = 0.05
   // between the dome and the corona, explicitly: renderOrder 0 is the
   // default every unordered thing in the night shares, and a sun that
@@ -542,7 +542,12 @@ export function createEclipse(scene: Scene) {
     moonMat.colorNode = col.add(dither(0.0011))
     moonMat.opacityNode = a
   }
-  const disc = new Mesh(new CircleGeometry(1.24, seg(128, 96)), moonMat)
+  /* THE SILHOUETTE THE WHOLE OVERTURE RESTS ON. The limb is drawn in the
+     shader, so its curve is exact wherever the geometry reaches it, but the
+     fan's own chord is what the alpha ramp has to fit inside: at the phone's
+     moon radius 96 segments leave a tenth of a pixel of it and 192 leave a
+     fortieth. Two hundred and fifty six triangles is not a budget. */
+  const disc = new Mesh(new CircleGeometry(1.24, seg(256, 192)), moonMat)
   disc.position.z = 0.15
   disc.renderOrder = 4
   eclipse.add(disc)
