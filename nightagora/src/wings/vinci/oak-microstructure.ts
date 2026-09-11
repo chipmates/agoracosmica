@@ -36,7 +36,7 @@ export function oakFiniteFinish(along:N,across:N,memberSeed:N):{colour:N;roughne
 }
 export const oakFiniteProvenance={
   class:'GENERATED',basis:['A-MATERIAL','brief/building/materials.csv','library/oak-beams','library/oak-beams-reference'],
-  reference:'CC0 1.0 Poly Haven rough_wood preview, Rob Tuytel. Appearance reference only; no texture import or photo sampling.',
+  reference:'CC0 1.0 Poly Haven rough_wood preview. Appearance reference only; no texture import or photo sampling.',
   coordinates:'Existing member-local metre UV, oakSeed, transverse end-grain role and actual geometry unchanged.',
   continuousBody:{acrossScaleM:[.00055,.0012],alongScaleM:[.065,.14],heightAmplitudeM:.000025,colourAmplitude:.30},
   fineFibres:{widthRangeM:[.00036,.000792],lengthRangeM:[.007,.0154],heightAmplitudeM:.000060},
