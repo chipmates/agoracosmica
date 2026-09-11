@@ -21,6 +21,10 @@
 //   honesty        the honesty check
 //   cones          the look-cone corners shot, and where they are
 //   leak           the key rigs and the scene's objects over 200 rebuilds
+//   flicker        what the frame does BETWEEN frames: the temporal spread
+//                  of every pixel over 30 consecutive frames at a held
+//                  camera, with the film off and on, and a pop-in and
+//                  shimmer reading over 120 held gazes across the cone
 //
 // A WING IS NOT A LOBBY WITH ONE STATION. In wing mode it walks the wing's
 // own rail, addressing every station BY ID through the frame's API, and it
@@ -588,6 +592,44 @@ if (WING) {
   )
 }
 
+/* THE FLICKER GATE. Its own instrument, on its own preview server, so it
+   runs like the motion eye does: after this one is down and the port has
+   gone quiet. On a wing it reads the stations the sealed spec names corners
+   for, and its own first, middle and last when no round stands above the
+   app; on the lobby, the two states a visitor stands and looks around in. */
+let flicker = null
+{
+  const stations = SPEC_CONES ? Object.keys(SPEC_CONES) : []
+  if (!(await freePort())) {
+    flicker = { ok: false, error: `port ${PORT} never freed, the flicker gate was not run` }
+  } else {
+    say('  the flicker gate, on its own server')
+    const run = await json(
+      'node',
+      ['forge/flicker.mjs', String(PORT), SURFACE, ...(SLUG ? [SLUG] : []), ...(stations.length ? ['--stations', stations.join(',')] : [])],
+      { FORGE_PORT: String(PORT) }
+    )
+    flicker = run.parsed ?? { ok: false, error: 'the flicker gate did not answer JSON', raw: run.raw }
+  }
+}
+{
+  const read = flicker?.stations ?? []
+  const said = read
+    .map((r) =>
+      r.error
+        ? `${r.station}: ${r.error}`
+        : `${r.station} ${r.state} ${(r.static.filmOff.unstableShare * 100).toFixed(3)} percent, ` +
+          `longest ${r.static.filmOff.longestRegionPx} px, ${r.drag.popEvents} pop(s), ` +
+          `shimmer ${(r.drag.shimmerShare * 100).toFixed(3)} percent`
+    )
+    .join(' | ')
+  const detail = flicker?.error ? flicker.error : said || 'no station was read'
+  /* A STATION DECLARED ALIVE WARNS, IT DOES NOT FAIL (forge/FLICKER-BASE.json
+     carries the names and the reasons). Everything else is a hard gate. */
+  if (flicker?.state === 'WARN') warn('flicker', false, detail)
+  else gate('flicker', flicker?.state === 'PASS', detail)
+}
+
 const honestyArgs = ['forge/honesty-check.mjs', String(PORT), SURFACE, ...(SLUG ? [SLUG] : []), '--json']
 const honesty = await json('node', honestyArgs)
 const h = honesty.parsed ?? { stations: [], failures: ['the honesty check did not answer JSON'], labels: 0 }
@@ -644,6 +686,7 @@ const report = {
   honesty: { ok: (h.failures?.length ?? 1) === 0, labels: h.labels ?? 0, failures: h.failures ?? [] },
   cones: coneReport,
   leak: leakReport,
+  flicker,
   gates: lines,
   ok: failed.length === 0,
   failed,
