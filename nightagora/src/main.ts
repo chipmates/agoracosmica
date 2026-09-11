@@ -571,6 +571,13 @@ declare global {
         /** where along a wing's rail the visitor stands, and how far it runs */
         station: number
         stations: number
+        /** the station standing, and every station, by id: an instrument
+            addresses a station by name, never by an integer into a
+            normalised rail, which repeats the last one */
+        stationId: string
+        stationIds: string[]
+        /** where the door at this station goes, and what it asks */
+        door: { href: string; question: string }
         /** library sets still in flight; a frame shot over zero is a frame
             drawn on a surface that is not dressed yet */
         texturesPending: number
@@ -596,6 +603,9 @@ declare global {
       relight: () => { rigs: number; sceneObjects: number }
       /** 0 to 1 along a wing's rail; outside a wing it does nothing */
       rail: (t: number) => void
+      /** stand at a station by its id. False when this wing has no such
+          station, so a rig reports a station that never took. */
+      station: (id: string) => boolean
       cost: () => {
         draws: number
         triangles: number
@@ -793,6 +803,9 @@ window.__forge = {
     if (!count) return
     wingFrame.goto(Math.round(Math.min(1, Math.max(0, t)) * (count - 1)))
   },
+  station(id) {
+    return wingFrame.gotoId(id)
+  },
   // the rig's stethoscope: read the live blend state without guessing
   // from pixels (numbers first, then the shot)
   state() {
@@ -802,6 +815,9 @@ window.__forge = {
       desc,
       station: wingFrame.station(),
       stations: wingFrame.stations(),
+      stationId: wingFrame.stationId(),
+      stationIds: wingFrame.stationIds(),
+      door: wingFrame.doorHere(),
       texturesPending: stack.materials.pending(),
       // what the last frame actually cost: the rig quotes this instead of
       // guessing from a software-rasterizer fps number

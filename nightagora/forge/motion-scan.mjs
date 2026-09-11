@@ -18,8 +18,14 @@ import { existsSync, mkdirSync, readdirSync, rmSync } from 'node:fs'
 import { join } from 'node:path'
 import { APP_ROOT, assertAdapter, assertBackend, assertServer, browserArgs, waitForServer } from './rig.mjs'
 
-const SLUG = process.argv[2] ?? 'vinci'
-const OUT_NAME = process.argv[3] ?? 'motion'
+const plain = process.argv.slice(2).filter((a) => !a.startsWith('--'))
+const JSON_OUT = process.argv.includes('--json')
+const SLUG = plain[0] ?? 'vinci'
+const OUT_NAME = plain[1] ?? 'motion'
+/* the gates read this scan, so its numbers travel as JSON on stdout and
+   every line of progress goes to stderr: a report with a sentence in front
+   of its first brace cannot be parsed by the caller */
+const out = JSON_OUT ? (line) => process.stderr.write(`${line}\n`) : (line) => console.log(line)
 const PORT = Number(process.env['FORGE_PORT'] ?? 5199)
 const MOBILE = process.env['MOTION_VP'] === 'mobile'
 const TIER = process.env['MOTION_TIER'] ?? (MOBILE ? 'calm' : 'hero')
@@ -43,7 +49,7 @@ let stations = 0
 try {
   await waitForServer(BASE)
   const said = await assertServer(BASE)
-  console.log(`[motion] server ${said.head.slice(0, 7)}, ${MOBILE ? 'phone' : 'desktop'}, tier ${TIER}`)
+  out(`[motion] server ${said.head.slice(0, 7)}, ${MOBILE ? 'phone' : 'desktop'}, tier ${TIER}`)
 
   const browser = await chromium.launch({ args: browserArgs() })
   const ctx = await browser.newContext({
@@ -65,21 +71,27 @@ try {
   const stamp = await assertBackend(page)
   assertAdapter(firstLine, process.env['FORGE_BACKEND'] ?? 'webgpu')
   if (stamp.tier !== TIER) throw new Error(`asked for tier=${TIER}, the app stamped ${stamp.tier}`)
-  console.log(`[motion] ${firstLine}`)
+  out(`[motion] ${firstLine}`)
 
   const state = await page.evaluate(() => window.__forge.state())
   stations = state.stations
   if (state.phase !== 'wing') flags.push(`the deep link did not stand in a wing (phase ${state.phase})`)
   if (!stations) flags.push('the wing reports no station')
-  console.log(`[motion] ${stations} station(s)`)
+  out(`[motion] ${stations} station(s)`)
 
   // forward, then back, on the rail itself
   const steps = Math.max(1, stations)
   const path = []
   for (let i = 0; i < steps; i++) path.push(i)
   for (let i = steps - 2; i >= 0; i--) path.push(i)
+  const ids = state.stationIds ?? []
   for (const i of path) {
-    await page.evaluate(([n, c]) => window.__forge.rail(c < 2 ? 0 : n / (c - 1)), [i, steps])
+    // by id where the wing has one, because the normalised rail rounds and
+    // an integer into it lands on the last station every time
+    const id = ids[i]
+    if (id === undefined)
+      await page.evaluate(([n, c]) => window.__forge.rail(c < 2 ? 0 : n / (c - 1)), [i, steps])
+    else await page.evaluate((s) => window.__forge.station(s), id)
     await page.waitForTimeout(1200)
     const at = await page.evaluate(() => window.__forge.state().station)
     if (at !== i) flags.push(`STUCK: asked for station ${i + 1}, standing at ${at + 1}`)
@@ -131,6 +143,8 @@ function grid(video) {
 }
 
 let clusters = []
+let frameCount = 0
+let flaggedCount = 0
 if (videos.length) {
   const raw = await grid(join(OUT, videos[0]))
   const cell = GRID * GRID
@@ -147,7 +161,9 @@ if (videos.length) {
     }
     if (blinks >= 3) flagged.push({ n: i - 1, cells: blinks })
   }
-  console.log(`[motion] ${count} frames, ${flagged.length} flagged, scanning for clusters`)
+  frameCount = count
+  flaggedCount = flagged.length
+  out(`[motion] ${count} frames, ${flagged.length} flagged, scanning for clusters`)
   // a lone flagged frame is noise; a run of them is a transition that tore
   let run = []
   const close = () => {
@@ -162,16 +178,36 @@ if (videos.length) {
     }
   }
   close()
-  console.log(`[motion] ${clusters.length} cluster(s)`)
+  out(`[motion] ${clusters.length} cluster(s)`)
 }
 
 for (const c of clusters) flags.push(`A-B-A cluster ${c.from} to ${c.to} (${c.frames} frames): read them by eye`)
 
-console.log(`[motion] wing ${SLUG}: ${stations} station(s), frames in forge/shots/${MOBILE ? `${OUT_NAME}-mobile` : OUT_NAME}/`)
+out(`[motion] wing ${SLUG}: ${stations} station(s), frames in forge/shots/${MOBILE ? `${OUT_NAME}-mobile` : OUT_NAME}/`)
 if (flags.length) {
-  console.log('MOTION SCAN FLAGGED:')
-  for (const f of [...new Set(flags)]) console.log(' ·', f)
+  out('MOTION SCAN FLAGGED:')
+  for (const f of [...new Set(flags)]) out(` \u00b7 ${f}`)
   process.exitCode = 1
 } else {
-  console.log('clean: every station reached forward and back, no A-B-A cluster')
+  out('clean: every station reached forward and back, no A-B-A cluster')
 }
+if (JSON_OUT)
+  console.log(
+    JSON.stringify(
+      {
+        wing: SLUG,
+        viewport: MOBILE ? 'mobile' : 'desktop',
+        tier: TIER,
+        stations,
+        frames: frameCount,
+        flagged: flaggedCount,
+        clusters: clusters.length,
+        clusterFrames: clusters,
+        dir: `forge/shots/${MOBILE ? `${OUT_NAME}-mobile` : OUT_NAME}`,
+        flags: [...new Set(flags)],
+        ok: flags.length === 0,
+      },
+      null,
+      2
+    )
+  )

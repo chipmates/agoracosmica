@@ -110,8 +110,13 @@ try {
     if (surface === 'wing') {
       await page.evaluate((s) => window.__forge.jump('wing', { slug: s }), slug)
       await waitFor(page, 'wing')
-      const count = await page.evaluate(() => window.__forge.state().stations)
-      walk.push(...Array.from({ length: Math.max(1, count) }, (_, i) => [`station-${i + 1}`, i]))
+      /* BY ID, THROUGH THE FRAME'S OWN API. An integer handed to the
+         normalised rail (0 to 1) lands on the last station for every
+         index above zero, so a nineteen-station wing was read nineteen
+         times at its last room. */
+      const ids = await page.evaluate(() => window.__forge.state().stationIds ?? [])
+      if (!ids.length) failures.push(`the ${slug} wing reports no station id: it cannot be addressed`)
+      walk.push(...ids.map((id) => [id, id]))
     } else {
       walk.push(...LOBBY)
     }
@@ -120,7 +125,13 @@ try {
       let name
       if (surface === 'wing') {
         name = beat[0]
-        await page.evaluate((i) => window.__forge.rail(i), beat[1])
+        const took = await page.evaluate((id) => window.__forge.station(id), beat[1])
+        if (!took) {
+          failures.push(`${vp.tag}/${name}: the frame refused to stand at this station`)
+          continue
+        }
+        const at = await page.evaluate(() => window.__forge.state().stationId)
+        if (at !== beat[1]) failures.push(`${vp.tag}/${name}: asked for ${beat[1]}, standing at ${at}`)
       } else {
         name = beat[0]
         await page.evaluate(([p, o]) => {

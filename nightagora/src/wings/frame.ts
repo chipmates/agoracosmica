@@ -28,6 +28,10 @@ export interface WingHosts {
 }
 
 export interface WingStation {
+  /** the station's own name in the wing's source, stable across languages
+      and across a rebuild: it is how every instrument addresses a station,
+      because an integer into a normalised rail repeats the last one */
+  id: string
   /** the station's name, already in the page's language */
   name: string
   /** the question its door carries, shown beside the door as text */
@@ -45,11 +49,21 @@ export interface WingModule {
 export interface WingFrame {
   open(entry: WingEntry, wing: WingModule, at: number): void
   goto(index: number): void
+  /** stand at a station by its id. False when this wing has no such
+      station, so a caller can say so instead of shooting the wrong one. */
+  gotoId(id: string): boolean
   close(): void
   /** which station is standing, for the rig and for the URL */
   station(): number
+  /** the id of the station standing, which is what a report names */
+  stationId(): string
+  /** every station's id, in rail order: the walk a machine addresses */
+  stationIds(): string[]
   /** how many this wing has, which is what the motion eye walks */
   stations(): number
+  /** the door as it stands right now: where it goes and what it asks, so a
+      walk can record what a visitor's click would have opened */
+  doorHere(): { href: string; question: string }
 }
 
 /** The station the URL is standing at, or 0. The hash is the return path. */
@@ -119,6 +133,11 @@ export function createWingFrame(host: HTMLElement, onLobby: () => void): WingFra
   let wing: WingModule | null = null
   let index = 0
 
+  /** a station's id, or the position it stands at when a wing predates ids */
+  function idAt(i: number): string {
+    return wing?.stations[i]?.id ?? `station-${i + 1}`
+  }
+
   function paintRail(): void {
     rail.textContent = ''
     const stations = wing?.stations ?? []
@@ -154,6 +173,16 @@ export function createWingFrame(host: HTMLElement, onLobby: () => void): WingFra
       history.replaceState({}, '', url)
   }
 
+  function gotoId(id: string): boolean {
+    const stations = wing?.stations ?? []
+    for (let i = 0; i < stations.length; i++) {
+      if (idAt(i) !== id) continue
+      goto(i)
+      return true
+    }
+    return false
+  }
+
   return {
     open(nextEntry, nextWing, at) {
       entry = nextEntry
@@ -164,6 +193,7 @@ export function createWingFrame(host: HTMLElement, onLobby: () => void): WingFra
       goto(at)
     },
     goto,
+    gotoId,
     close() {
       wing?.stop()
       wing = null
@@ -174,6 +204,12 @@ export function createWingFrame(host: HTMLElement, onLobby: () => void): WingFra
       host.hidden = true
     },
     station: () => index,
+    stationId: () => (wing ? idAt(index) : ''),
+    stationIds: () => (wing?.stations ?? []).map((_, i) => idAt(i)),
     stations: () => wing?.stations.length ?? 0,
+    doorHere: () => ({
+      href: door.href,
+      question: question.textContent ?? '',
+    }),
   }
 }

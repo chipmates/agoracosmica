@@ -14,7 +14,7 @@ const QUESTION = {
 
 export function createWing(): WingModule {
   return {
-    stations: [{ name: say(WING_TEXT.preparing), question: say(QUESTION) }],
+    stations: [{ id: 'preparing', name: say(WING_TEXT.preparing), question: say(QUESTION) }],
     show(_index: number, hosts: WingHosts) {
       hosts.stage.textContent = ''
       const plate = document.createElement('div')
