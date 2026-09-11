@@ -420,6 +420,39 @@ function bezNormal(a: Point, b: Point, c: Point, d: Point, t: number): Point {
   return [-dy / len, dx / len]
 }
 
+/** a Catmull-Rom through a run of points: the way a hand carries a long
+    curve through fixed stations without a corner at each one */
+function throughPoints(pts: Point[], seg: number): Point[] {
+  const out: Point[] = []
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[Math.max(0, i - 1)]
+    const p1 = pts[i]
+    const p2 = pts[i + 1]
+    const p3 = pts[Math.min(pts.length - 1, i + 2)]
+    if (!p0 || !p1 || !p2 || !p3) continue
+    for (let j = 0; j < seg; j++) {
+      const t = j / seg
+      const t2 = t * t
+      const t3 = t2 * t
+      out.push([
+        0.5 *
+          (2 * p1[0] +
+            (-p0[0] + p2[0]) * t +
+            (2 * p0[0] - 5 * p1[0] + 4 * p2[0] - p3[0]) * t2 +
+            (-p0[0] + 3 * p1[0] - 3 * p2[0] + p3[0]) * t3),
+        0.5 *
+          (2 * p1[1] +
+            (-p0[1] + p2[1]) * t +
+            (2 * p0[1] - 5 * p1[1] + 4 * p2[1] - p3[1]) * t2 +
+            (-p0[1] + 3 * p1[1] - 3 * p2[1] + p3[1]) * t3),
+      ])
+    }
+  }
+  const last = pts[pts.length - 1]
+  if (last) out.push(last)
+  return out
+}
+
 class Burin {
   strokes: Stroke[] = []
 
@@ -551,33 +584,82 @@ function cassiopeia(p: Burin, c: Constellation): void {
   }
 }
 
-/* II · TEACHERS, after Corona Borealis. An OPEN circlet: a bowed band, six
-   raised fleurons standing on it, no medallion and no fill. */
+/* II · TEACHERS, after Corona Borealis. A DIADEM. The band follows the arc
+   the six lamps themselves make, a constant drop below them, and on it
+   stands one lily per lamp, all of a height. Open work: no medallion, no
+   fill, and the lamps are never touched by the ink. */
+const CROWN_DROP = 0.62
+
 function crown(p: Burin, c: Constellation): void {
+  const rail = c.stars.map((s): Point => [s.x, s.y - CROWN_DROP])
+  const a0 = rail[0]
+  const a1 = rail[1]
+  const z0 = rail[rail.length - 1]
+  const z1 = rail[rail.length - 2]
+  if (!a0 || !a1 || !z0 || !z1) return
+  const band = throughPoints(
+    [
+      [a0[0] + (a0[0] - a1[0]) * 0.34, a0[1] + (a0[1] - a1[1]) * 0.34],
+      ...rail,
+      [z0[0] + (z0[0] - z1[0]) * 0.34, z0[1] + (z0[1] - z1[1]) * 0.34],
+    ],
+    14
+  )
+  // four rules make a band: the first is the edge, the rest are its face
   for (let k = 0; k < 4; k++) {
-    p.curve(
-      [-1.72, -0.24 - k * 0.055],
-      [-1.2, -0.87 - k * 0.04],
-      [1.15, -0.88 - k * 0.04],
-      [1.76, -0.3 - k * 0.055],
-      k === 0 ? 0.85 : 0.43,
+    p.line(
+      band.map(([x, y]): Point => [x, y - k * 0.05]),
+      k === 0 ? 0.85 : 0.42,
       k === 0 ? 0.2 : 0
     )
   }
-  for (const s of c.stars) {
-    const x = s.x
-    const base = -0.58 + Math.abs(x) * 0.13
-    const h = Math.max(0.24, s.y - base)
-    const tip = s.y - 0.12
-    const mid = base + h * 0.55
-    p.curve([x - 0.19, base], [x - 0.31, mid], [x - 0.1, tip - 0.07], [x - 0.04, tip], 0.74)
-    p.curve([x + 0.19, base], [x + 0.31, mid], [x + 0.1, tip - 0.07], [x + 0.04, tip], 0.74)
-    p.curve([x - 0.11, base], [x - 0.09, mid + 0.02], [x, tip - 0.11], [x, tip - 0.05], 0.35)
-    for (let j = 0; j < 8; j++) {
-      const yy = base + (tip - base - 0.1) * (j / 9)
-      p.line([[x - 0.16, yy], [x - 0.055, yy + 0.055]], 0.3)
+  // the face of the band carries a tone, so it is metal and not a wire
+  for (let i = 2; i < band.length - 2; i += 3) {
+    const pt = band[i]
+    if (!pt) continue
+    p.line([[pt[0] - 0.012, pt[1] - 0.02], [pt[0] + 0.008, pt[1] - 0.128]], 0.24)
+  }
+  // and the two ends roll into a return, so the band stops rather than ends
+  for (const [end, dir] of [[band[0], -1], [band[band.length - 1], 1]] as Array<[Point, number]>) {
+    if (!end) continue
+    p.curve(
+      [end[0], end[1]],
+      [end[0] + dir * 0.19, end[1] + 0.04],
+      [end[0] + dir * 0.15, end[1] - 0.2],
+      [end[0] - dir * 0.01, end[1] - 0.19],
+      0.55
+    )
+  }
+  for (const star of c.stars) {
+    const x = star.x
+    const base = star.y - CROWN_DROP
+    const tip = star.y - 0.12
+    const h = tip - base
+    const mid = base + h * 0.42
+    // the lance
+    p.curve([x, base], [x - 0.03, mid], [x + 0.02, tip - h * 0.2], [x, tip], 0.8)
+    p.hatchLine([x, base + h * 0.42], [x, tip - h * 0.08], 5, -0.033, 0.026, 0.26)
+    // two petals furling out and up, each doubled by a lighter cut
+    for (const s of [-1, 1]) {
+      p.curve(
+        [x + s * 0.03, base + h * 0.1],
+        [x + s * 0.27, base + h * 0.16],
+        [x + s * 0.21, mid + h * 0.22],
+        [x + s * 0.075, tip - h * 0.09],
+        0.7
+      )
+      p.curve(
+        [x + s * 0.03, base + h * 0.1],
+        [x + s * 0.18, base + h * 0.25],
+        [x + s * 0.15, mid + h * 0.18],
+        [x + s * 0.065, tip - h * 0.15],
+        0.34
+      )
     }
-    p.arc(x, base - 0.03, 0.06, 0.09, 0, TAU, 0.5, 0.4)
+    // the waist that binds the three, and the foot set into the band
+    p.line([[x - 0.105, base + h * 0.3], [x + 0.105, base + h * 0.3]], 0.6)
+    p.line([[x - 0.098, base + h * 0.365], [x + 0.098, base + h * 0.365]], 0.34)
+    p.arc(x, base + 0.012, 0.05, 0.026, 0, TAU, 0.5, 0.4)
   }
 }
 
@@ -638,54 +720,71 @@ function cross(p: Burin): void {
   }
 }
 
-/* IV · ARTISTS, after Lyra. Two horns out of a soundbox, the yoke across
-   them, seven strings between yoke and bridge. The frame is drawn around
-   this sky's own four names: the left scroll stands on the first, the
-   middle string runs through the second, the bridge rests on the last two. */
+/* IV · ARTISTS, after Lyra. Two horns rising out of a soundbox to their
+   volutes, the yoke across them, seven strings down to the bridge. The
+   frame is drawn around this sky's own four names: the left volute stands
+   on the first, the middle string runs through the second, the bridge
+   rests on the last two. */
 function lyre(p: Burin): void {
-  const arms: Array<{ foot: Point; scroll: Point; s: number }> = [
-    { foot: [-0.34, -0.74], scroll: [-0.85, 0.95], s: -1 },
-    { foot: [0.74, -0.25], scroll: [0.72, 0.7], s: 1 },
+  const arms: Array<{ a: Point; b: Point; c: Point; d: Point; scroll: Point; s: number }> = [
+    {
+      a: [-0.32, -0.74],
+      b: [-0.88, -0.3],
+      c: [-1.06, 0.46],
+      d: [-0.86, 0.83],
+      scroll: [-0.85, 0.95],
+      s: -1,
+    },
+    {
+      a: [0.72, -0.27],
+      b: [1.02, 0.02],
+      c: [1.0, 0.46],
+      d: [0.83, 0.63],
+      scroll: [0.82, 0.73],
+      s: 1,
+    },
   ]
-  for (const { foot, scroll, s } of arms) {
-    const b: Point = [foot[0] + s * 0.4, foot[1] + 0.46]
-    const c: Point = [scroll[0] + s * 0.3, scroll[1] - 0.62]
-    const d: Point = [scroll[0] + s * 0.09, scroll[1] - 0.15]
+  for (const arm of arms) {
     for (let k = 0; k < 3; k++) {
-      const o = k * 0.036 * s
+      const o = k * 0.032 * arm.s
       p.curve(
-        [foot[0] + o, foot[1]],
-        [b[0] + o, b[1]],
-        [c[0] + o, c[1]],
-        [d[0] + o, d[1]],
-        k === 0 ? 0.9 : 0.42,
+        [arm.a[0] + o, arm.a[1]],
+        [arm.b[0] + o, arm.b[1]],
+        [arm.c[0] + o, arm.c[1]],
+        [arm.d[0] + o, arm.d[1]],
+        k === 0 ? 0.88 : 0.4,
         k === 0 ? 0.25 : 0
       )
     }
-    p.hatchCurve(foot, b, c, d, 16, -s * 0.045, -s * 0.075, 0.32)
-    // the volute, cut twice, tightening inward
-    p.arc(scroll[0], scroll[1], 0.17, 0.16, -0.5, Math.PI * 1.7, 0.75)
-    p.arc(scroll[0], scroll[1], 0.1, 0.095, 0.1, Math.PI * 1.5, 0.4)
+    // a light tone on the shaded inner face only
+    p.hatchCurve(arm.a, arm.b, arm.c, arm.d, 13, arm.s * 0.098, arm.s * 0.05, 0.26, 0.18, 0.84)
+    // the volute: a carved scroll, small enough to read as carving
+    p.arc(arm.scroll[0], arm.scroll[1], 0.105, 0.098, -0.7, Math.PI * 1.55, 0.72)
+    p.arc(arm.scroll[0], arm.scroll[1], 0.055, 0.05, 0.1, Math.PI * 1.35, 0.4)
   }
-  // the yoke: a rule and its shadow line
-  p.curve([-0.74, 0.84], [-0.36, 0.73], [0.22, 0.68], [0.62, 0.62], 0.85, 0.5)
-  p.curve([-0.74, 0.79], [-0.36, 0.68], [0.22, 0.63], [0.62, 0.57], 0.45)
+  // the yoke: a rule and its shadow, and a peg for every string
+  p.curve([-0.78, 0.88], [-0.36, 0.81], [0.3, 0.73], [0.76, 0.66], 0.85, 0.5)
+  p.curve([-0.78, 0.83], [-0.36, 0.76], [0.3, 0.68], [0.76, 0.61], 0.42)
   // the bridge, laid through the two lower names
-  p.line([[-0.34, -0.755], [0.74, -0.265]], 0.8)
-  p.line([[-0.34, -0.805], [0.74, -0.315]], 0.42)
-  // the strings, and the peg each one is wound on
+  p.line([[-0.32, -0.738], [0.72, -0.266]], 0.78)
+  p.line([[-0.32, -0.788], [0.72, -0.316]], 0.4)
   for (let j = 0; j < 7; j++) {
     const u = j / 6
-    const x0 = -0.7 + u * 1.29
-    const y0 = 0.82 - u * 0.23
-    const x1 = -0.3 + u * 1.0
-    const y1 = -0.73 + u * 0.455
-    p.line([[x0, y0], [x1, y1]], j === 3 ? 0.55 : 0.33)
-    p.arc(x0, y0 + 0.035, 0.021, 0.024, 0, TAU, 0.35)
+    const x0 = -0.71 + u * 1.4
+    const y0 = 0.85 - u * 0.21
+    const x1 = -0.28 + u * 0.96
+    const y1 = -0.72 + u * 0.435
+    p.line([[x0, y0], [x1, y1]], j === 3 ? 0.54 : 0.32)
+    p.arc(x0, y0 + 0.032, 0.019, 0.022, 0, TAU, 0.35)
   }
-  // the soundbox under the bridge, its rim hatched from below
-  p.curve([-0.36, -0.8], [-0.2, -1.2], [0.56, -1.05], [0.78, -0.3], 0.8)
-  p.hatchCurve([-0.36, -0.8], [-0.2, -1.2], [0.56, -1.05], [0.78, -0.3], 22, 0.012, 0.075, 0.34)
+  // the soundbox: the shallow bowl the bridge stands on, hung between the
+  // same two joints the horns rise from
+  p.curve([-0.32, -0.74], [-0.2, -1.05], [0.48, -0.95], [0.72, -0.27], 0.72)
+  p.curve([-0.26, -0.76], [-0.15, -0.98], [0.43, -0.89], [0.66, -0.3], 0.36)
+  p.hatchCurve([-0.32, -0.74], [-0.2, -1.05], [0.48, -0.95], [0.72, -0.27], 17, -0.024, -0.05, 0.3)
+  // the rose, an open ring cut into the belly, never a solid disc
+  p.arc(0.18, -0.66, 0.085, 0.055, 0, TAU, 0.42)
+  p.arc(0.18, -0.66, 0.05, 0.032, 0, TAU, 0.28)
 }
 
 /* V · WRITERS, after Cygnus. THE SWAN. Raised wings, the long neck, the
