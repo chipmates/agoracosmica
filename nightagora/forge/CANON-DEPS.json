@@ -1,0 +1,12 @@
+{
+  "note": "Runtime dependencies allowed beyond the base, each with the reason it earned its place. A wing that wants a library adds a line here and the gate stops failing; a wing that adds one quietly does not build. Dev dependencies are listed for the record and are not gated: nothing in them reaches a visitor.",
+  "dependencies": {
+    "three": "The renderer. Every material of this museum is written in its shading language, which is what lets one authored wing run on both backends."
+  },
+  "devDependencies": {
+    "@types/three": "types for the renderer",
+    "playwright": "the rigs: the shots, the walk, the gates",
+    "typescript": "the language",
+    "vite": "the dev server and the bundle"
+  }
+}

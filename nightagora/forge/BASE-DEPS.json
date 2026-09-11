@@ -1,0 +1,13 @@
+{
+  "note": "The dependency floor. Every runtime dependency of the app is diffed against this, and a new one fails the gate unless CANON-DEPS.json names it and says why. The base is the commit that landed the museum's base app.",
+  "base": "146fd04",
+  "dependencies": {
+    "three": "^0.185.1"
+  },
+  "devDependencies": {
+    "@types/three": "^0.185.1",
+    "playwright": "^1.61.1",
+    "typescript": "^5.9.3",
+    "vite": "^8.1.5"
+  }
+}

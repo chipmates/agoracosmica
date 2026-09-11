@@ -13,11 +13,26 @@ import { fileURLToPath } from 'node:url'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 export const APP_ROOT = resolve(HERE, '..')
-/** the store lives beside the program, outside the public repository.
-    NA_ASSET_STORE points the check at a candidate store; the app never
-    reads it, so a fixture can never become the museum's record. */
-export const STORE =
-  process.env.NA_ASSET_STORE ?? resolve(APP_ROOT, '..', '..', 'internal', 'night-agora', 'assets')
+/* THE STORE lives beside the program, outside the public repository. A
+   round's app is a clone several folders deeper than the checkout, so the
+   store is found by walking up rather than by counting folders: a rig that
+   only works from one depth stops working the first time a seat runs it.
+   NA_ASSET_STORE points the check at a candidate store; the app never reads
+   it, so a fixture can never become the museum's record. */
+function findStore(from) {
+  let dir = from
+  for (let up = 0; up < 12; up++) {
+    const inside = join(dir, 'internal', 'night-agora', 'assets')
+    if (existsSync(inside)) return inside
+    if (dir.endsWith('night-agora') && existsSync(join(dir, 'assets'))) return join(dir, 'assets')
+    const parent = resolve(dir, '..')
+    if (parent === dir) break
+    dir = parent
+  }
+  return resolve(from, '..', '..', 'internal', 'night-agora', 'assets')
+}
+
+export const STORE = process.env.NA_ASSET_STORE ?? findStore(APP_ROOT)
 export const MERGED = join(APP_ROOT, 'public', 'na-manifest.json')
 
 const NOT_AN_ASSET = new Set(['manifest.json', '_download-log.json', '.DS_Store'])

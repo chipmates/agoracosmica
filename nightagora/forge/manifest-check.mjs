@@ -221,6 +221,7 @@ if (JSON_OUT)
   console.log(
     JSON.stringify(
       {
+        store: STORE,
         scopes: scopeList,
         assets: assets.length,
         onThePath: [...resolved.keys()],
