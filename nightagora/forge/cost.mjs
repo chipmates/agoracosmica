@@ -20,7 +20,7 @@ try {
   await p.waitForTimeout(1600)
   for (const [name, phase, opts] of [
     ['held', 'held', {}], ['descent', 'descent', { desc: 0.5 }], ['agora', 'agora', {}],
-    ['sky', 'sky', { chapter: 0 }], ['crossing', 'crossing', { crossing: 'portrait' }],
+    ['sky', 'sky', { chapter: 0 }], ['breath', 'breath', {}],
     ['camp-shore', 'camp', { camp: 'shore' }], ['camp-gate', 'camp', { camp: 'gate' }],
     ['camp-via', 'camp', { camp: 'via' }], ['camp-vista', 'camp', { camp: 'vista' }],
   ]) {

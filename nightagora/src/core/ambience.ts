@@ -62,8 +62,8 @@ const ROOMS: Record<string, { db: number; hz: number }> = {
   transit: { db: -7, hz: 7000 },
   held: { db: -7, hz: 7000 },
   descent: { db: -2.5, hz: 14000 },
-  // between two places, with the hatching holding the frame
-  crossing: { db: -3.5, hz: 11000 },
+  // between two places, with the gold holding the frame
+  breath: { db: -3.5, hz: 11000 },
   // his ground has its own fires to listen to
   camp: { db: -1.5, hz: OPEN_HZ },
 }

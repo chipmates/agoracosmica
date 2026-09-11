@@ -126,8 +126,8 @@ try {
   await wheel(300, 1)
   await page.waitForTimeout(1400)
   await shot('pane-auto')
-  // one breath now carries you in (the long crossing rests in the organ
-  // library). A visitor whose scroll lands inside the rail's cooldown
+  // one breath now carries you in. A visitor whose scroll lands inside
+  // the rail's cooldown
   // simply scrolls again; so does the walker (slow headless frames make
   // scene-time lag wall-time, especially at the mobile pixel ratio).
   for (let i = 0; i < 12; i++) {

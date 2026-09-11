@@ -2,7 +2,7 @@ import { PerspectiveCamera, Scene, Vector3, WebGPURenderer } from 'three/webgpu'
 import { createEclipse, type EclipseState } from './scenes/eclipse'
 import { createAgora } from './scenes/agora'
 import { createKeeper } from './scenes/keeper'
-import { createCrossing } from './scenes/crossing'
+import { createBreath } from './scenes/breath'
 import { createCamp, groundDrop } from './scenes/camp'
 import { createAtlas } from './scenes/atlas'
 import { createMandala } from './scenes/mandala'
@@ -16,7 +16,7 @@ import { CONSTELLATIONS, OPEN_WORLD } from './content/constellations'
 import { channel } from './core/motion'
 import { mediaUrl } from './content/media'
 
-type Phase = 'transit' | 'held' | 'descent' | 'agora' | 'sky' | 'crossing' | 'camp'
+type Phase = 'transit' | 'held' | 'descent' | 'agora' | 'sky' | 'breath' | 'camp'
 
 const stage = document.getElementById('stage')
 const status = document.getElementById('status')
@@ -26,7 +26,6 @@ const descentSkip = document.getElementById('descent-skip')
 const verse = document.getElementById('verse')
 const voiceDom = document.getElementById('voice')
 const traceCard = document.getElementById('trace-card')
-const ringflash = document.getElementById('ringflash')
 const plate = document.getElementById('constellation-plate')
 const invite = document.getElementById('sky-invite')
 const marks = document.getElementById('chapter-marks')
@@ -34,7 +33,7 @@ const chips = document.getElementById('star-chips')
 const pane = document.getElementById('figure-pane')
 if (
   !stage || !status || !keeper || !descent || !descentSkip || !verse || !voiceDom ||
-  !traceCard || !ringflash || !plate || !invite || !marks || !chips || !pane
+  !traceCard || !plate || !invite || !marks || !chips || !pane
 )
   throw new Error('missing shell')
 const keeperEl: HTMLElement = keeper
@@ -44,7 +43,6 @@ const descentBeats = Array.from(descentEl.querySelectorAll('.descent-beat')) as 
 const verseEl: HTMLElement = verse
 const voiceEl2: HTMLElement = voiceDom
 const traceEl: HTMLElement = traceCard
-const ringEl: HTMLElement = ringflash
 const plateEl: HTMLElement = plate
 const inviteEl: HTMLElement = invite
 const marksEl: HTMLElement = marks
@@ -67,7 +65,7 @@ function keeperExit(): void {
   if (phase === 'camp') returnFromCamp()
   else if (phase === 'agora') lookTarget = 1
 }
-const crossing = createCrossing(scene, () => setPhase('camp'))
+const breath = createBreath()
 const camp = createCamp(scene)
 const atlas = createAtlas(scene)
 const mandala = createMandala(scene)
@@ -525,18 +523,14 @@ function syncChips(): void {
   }
 }
 
-/** The short-dawn rhyme: one diamond-ring breath carries you home to
-    the fire. */
+/** The way home takes the same one cut the way in takes. */
 function returnFromCamp(): void {
   if (phase !== 'camp') return
-  ringEl.classList.add('lit')
-  window.setTimeout(() => {
+  setPhase('breath')
+  breath.begin(() => {
     setPhase('agora')
-    campReveal = 0 // the cut hides inside the ring's white breath
-    ringEl.classList.remove('lit')
-    ringEl.classList.add('passing')
-    window.setTimeout(() => ringEl.classList.remove('passing'), 1200)
-  }, 460)
+    campReveal = 0 // the cut hides inside the gold
+  })
 }
 
 /** From the sky back down to the hearth, the gaze easing all the way. */
@@ -829,7 +823,6 @@ declare global {
           skyBirth?: number
           sinceFlash?: number
           keeper?: number
-          crossing?: 'hatch' | 'portrait' | 'breath'
           camp?:
             | 'shore'
             | 'ford'
@@ -949,30 +942,19 @@ function syncLabels(): void {
   }
 }
 
+/** One gold breath, then a hard cut into the world that was chosen. */
 function beginCrossing(): void {
-  // one diamond-ring breath, the same perfect transition the return
-  // uses (the founder, 2026-07-20: the long crossing was too long; it rests
-  // in the organ library for a future tournament)
   if (firstNight) {
     firstNight = false
     autoRide = false
     store('na-first', '1')
   }
   closePane()
-  ringEl.classList.add('lit')
-  window.setTimeout(() => {
-    setPhase('camp')
-    ringEl.classList.remove('lit')
-    ringEl.classList.add('passing')
-    window.setTimeout(() => ringEl.classList.remove('passing'), 1200)
-  }, 460)
+  setPhase('breath')
+  breath.begin(() => setPhase('camp'))
 }
 
 addEventListener('click', (e) => {
-  if (phase === 'crossing') {
-    crossing.skip()
-    return
-  }
   if (phase === 'camp') {
     if (duskUp) return
     // the marks are real buttons; this is the generous target around them
@@ -997,7 +979,7 @@ window.__forge = {
     document.body.classList.add('forge') // DOM beats compose instantly
     setPhase(p)
     // each jump is a single composed moment: no scene leaks across
-    if (p !== 'crossing') crossing.stop()
+    if (p !== 'breath') breath.stop()
     if (p !== 'camp') {
       campReveal = 0
       campYield = 0
@@ -1011,7 +993,6 @@ window.__forge = {
       duskEl.classList.remove('lit')
       duskEl.hidden = true
     }
-    ringEl.classList.remove('lit', 'passing')
     transit = opts.transit ?? (p === 'transit' ? 0.5 : 1)
     desc = descTarget = p === 'descent' ? (opts.desc ?? 0.5) : p === 'transit' || p === 'held' ? 0 : 1
     door = p === 'transit' || p === 'held' ? 0 : Math.min(1, desc / 0.18)
@@ -1019,7 +1000,7 @@ window.__forge = {
       opts.skyBirth ??
       (p === 'transit' || p === 'held' ? 0
       : p === 'descent' ? smooth(0.2, 0.98, desc) * 0.8
-      : p === 'crossing' ? 0.12
+      : p === 'breath' ? 0.12
       : p === 'camp' ? 0
       : p === 'sky' ? 0
       : p === 'agora' ? 1
@@ -1057,7 +1038,7 @@ window.__forge = {
     }
     if (p !== 'agora' && p !== 'sky' && p !== 'camp' && p !== 'descent')
       camera.rotation.set(0, 0, 0)
-    railEl.hidden = p === 'transit' || p === 'held'
+    railEl.hidden = p === 'transit' || p === 'held' || p === 'breath'
     if (p === 'camp') {
       campReveal = 1
       campYield = opts.camp === 'hearth' ? 1 : 0
@@ -1124,7 +1105,7 @@ window.__forge = {
       keeperScene.forgeStage(opts.keeper)
       verseEl.classList.remove('lit') // the verse is long gone by the exchange
     }
-    if (p === 'crossing' && opts.crossing) crossing.forgeStage(opts.crossing)
+    if (p === 'breath') breath.forgeStage()
     // Additive shell staging, explicitly allowed by the commission's eyes loop.
     if (opts.shell !== 'nights') chapters.close()
     instrumentsEl.hidden = opts.shell !== 'instruments'
@@ -1193,11 +1174,12 @@ function setPhase(next: Phase): void {
   } else {
     skyDress(false)
   }
-  if (next === 'crossing') {
+  if (next === 'breath') {
     setStatus('')
-    verseEl.classList.remove('lit') // a fast chooser carries no verse across
-    // one short breath only: the voice line needs the frame to itself
-    verseShow('You enter a life through its light', 2900)
+    verseEl.classList.remove('lit') // the cut carries no letterpress
+    railEl.hidden = true
+  } else if (musicWoken) {
+    railEl.hidden = false
   }
   hotspots.set(next === 'camp' ? CAMP_SPOTS : next === 'agora' ? HUB_SPOTS : [])
   drawnEl.hidden = true
@@ -1222,7 +1204,7 @@ function setPhase(next: Phase): void {
     endDusk()
     campDusk = 0
     // the arrival is always the far shore: the walk begins where the
-    // crossing set you down
+    // breath set you down
     campWalk = 0
     campWalkTarget = 0
     campGaze = 0
@@ -1463,7 +1445,7 @@ function frame(now: number): void {
   const revealTarget =
     phase === 'agora' ? 1
     // looking up, the court is scenery: it still frames the sky from below,
-    // but its own embers stop crossing the wheel's letterpress (and the
+    // but its own embers stop cutting across the wheel's letterpress (and the
     // heaviest fragment shader in the night stops paying full price)
     : phase === 'sky' ? 0.72
     : phase === 'descent' ? smooth(0.95, 0.998, desc)
@@ -1553,7 +1535,7 @@ function frame(now: number): void {
   // stars are born at totality and burn FULL at the fire (the hub is
   // the one place the whole firmament belongs to the visitor). In the
   // constellation sky they leave entirely: the six houses own that
-  // night. During the crossing the sky withdraws to ember, and at the
+  // night. Inside the breath the sky withdraws to ember, and at the
   // camp the cosmos raises its own firmament inside its dawn plane.
   // the heavens are earned by the passage: NONE at the eclipse (the
   // corona owns that frame), blooming bit by bit through the descent
@@ -1562,7 +1544,7 @@ function frame(now: number): void {
     phase === 'transit' || phase === 'held' ? 0
     : phase === 'descent' ? smooth(0.2, 0.98, desc) * 0.8
     : phase === 'agora' ? 1
-    : phase === 'crossing' ? 0.12
+    : phase === 'breath' ? 0.12
     : phase === 'camp' ? 0
     : phase === 'sky' ? 0
     : 1
@@ -1579,7 +1561,7 @@ function frame(now: number): void {
     lanterns:
       phase === 'sky' ? Math.max(0.08, 0.55 * (1 - atlasReveal))
       : phase === 'agora' ? 0.05
-      : phase === 'crossing' || phase === 'camp' ? 0
+      : phase === 'breath' || phase === 'camp' ? 0
       : 0.3,
     sinceFlash: flashAt < 0 ? -1 : elapsed - flashAt,
     elapsed,
@@ -1599,13 +1581,6 @@ function frame(now: number): void {
   atlas.visible(atlasReveal > 0.005)
   atlas.update(dt, elapsed, camera.aspect, atlasReveal)
   syncChips()
-
-  // the crossing: the gaze levels out and the hatching carries you
-  if (phase === 'crossing') {
-    camera.rotation.x += (0 - camera.rotation.x) * Math.min(1, dt * 2.2)
-    camera.rotation.y += (0 - camera.rotation.y) * Math.min(1, dt * 2.2)
-    crossing.update(dt, elapsed)
-  }
 
   keeperScene.update(dt)
   ambience.update(dt)
