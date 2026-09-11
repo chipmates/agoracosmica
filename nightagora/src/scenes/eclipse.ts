@@ -724,7 +724,13 @@ export function createEclipse(scene: Scene) {
       uIntensity.value *= 0.3 + 0.7 * k
     }
 
-    firmament.update(s.elapsed, s.skyBirth)
+    /* THE TOTALITY SKY HAS STARS. Inside an umbra the day is gone and the
+       brightest of them come out; without them the night behind the corona
+       has no far distance at all. They are a FLOOR, not a birth: the sky's
+       own bloom still belongs to the descent, and the floor dies the moment
+       the door opens. */
+    const totalityFloor = uTotal.value * Math.max(0, 1 - s.door * 8) * 0.15
+    firmament.update(s.elapsed, Math.max(s.skyBirth, totalityFloor))
     uWand.value = s.skyBirth * s.lanterns
     // a field at zero light is still a draw call, and the wheel is a
     // 60-draw stage on the calm tier
