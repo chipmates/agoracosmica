@@ -338,7 +338,14 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
 
   /* the empty-plane law: no plane in this museum is one colour. The court
      takes its three scales from the library's lapis set. */
-  const courtDetail = rig.stack.detail(stoneMat, 'marble-lapis', { macro: 0.7, fade: [16, 64] })
+  const courtDetail = rig.stack.detail(stoneMat, 'marble-lapis', {
+    macro: 0.7,
+    fade: [16, 64],
+    /* the set's vein network at full strength owns the near court, and this
+       floor's subject is the letterpress standing on it. Six tenths is a
+       marble a visitor can read a sentence over. */
+    maps: 0.6,
+  })
 
   /* the moon: 1 where the key reaches the stone, 0 where the colonnade
      stands in it */
@@ -785,6 +792,9 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
       uv: vec2(uv().x.mul(BOWL_ROUND), hLocal),
       macro: 0.5,
       fade: [10, 26],
+      // the bowl's own patina and hammer are the subject; the cast skin of
+      // the set comes in under them
+      maps: 0.7,
     })
     const alb = mix(c3(BRONZE), hex3('#334239'), smoothstep(0.5, 0.79, patina).mul(0.7))
       .mul(hammer.mul(0.34).add(0.74))
@@ -1053,8 +1063,10 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
       rig.stack.detail(shaftMat, 'limestone-pale', {
         at: world,
         uv: vec2(uv().x.mul(SHAFT_ROUND), hLocal),
-        macro: 0.55,
-        fade: [14, 40],
+        macro: 0.8,
+        // the near colonnade stands at 10 m and the far stoa at 26: a gradient
+        // that had given up by 14 would have dressed nothing a visitor sees
+        fade: [22, 54],
       }).albedo
     )
     shaftMat.colorNode = shoulder(haze(colr, dCam, 9, 32)).add(dith(0.0022)).mul(uR)
