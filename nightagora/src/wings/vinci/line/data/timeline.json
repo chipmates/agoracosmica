@@ -1,0 +1,2210 @@
+{
+  "schema_version": "1.0",
+  "provenance": {
+    "source_root": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci",
+    "governing_source": "CONCEPT.md",
+    "rights_authority": "refs/RIGHTS-CROSSCHECK.md",
+    "catalogue_date": "2026-09-08",
+    "prepared_date": "2026-09-09",
+    "scope": "Data commission. Source assets remain read-only."
+  },
+  "studs": [
+    {
+      "id": "life-01",
+      "catalogue_row": 1,
+      "date": "1452-04-15",
+      "date_precision": "day",
+      "certainty": "documented",
+      "line_en": "Leonardo da Vinci is born. His grandfather records the date and the third hour of the night.",
+      "line_de": "Leonardo da Vinci wird geboren. Sein Großvater notiert das Datum und die dritte Stunde der Nacht.",
+      "document": "Note in the hand of his grandfather Antonio da Vinci: \"Nacque un mio nipote, figliuolo di ser Piero mio figliuolo, a dì 15 aprile in sabato, a ore 3 di notte. Ebbe nome Lionardo.\" Archivio di Stato di Firenze",
+      "holder": "Archivio di Stato di Firenze",
+      "plate_file": null,
+      "source_url": "https://www.treccani.it/enciclopedia/leonardo-da-vinci_(Dizionario-Biografico)/",
+      "station": "line-early",
+      "date_end": null,
+      "date_original": "15 Apr 1452",
+      "date_alternatives": [],
+      "date_label_en": "15 April 1452",
+      "date_label_de": "15. April 1452",
+      "calendar": "Julian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": null,
+      "qualifications_de": null,
+      "sources": [
+        {
+          "url": "https://www.treccani.it/enciclopedia/leonardo-da-vinci_(Dizionario-Biografico)/",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 1"
+        }
+      ],
+      "gaps": [],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 1
+    },
+    {
+      "id": "life-02",
+      "catalogue_row": 2,
+      "date": "1452-04-15",
+      "date_precision": "day",
+      "certainty": "tradition",
+      "line_en": "Tradition places his birth at Anchiano. His grandfather's note names no place.",
+      "line_de": "Der Überlieferung nach wird er in Anchiano geboren. Die Notiz seines Großvaters nennt keinen Ort.",
+      "document": "none. The grandfather's note names no place",
+      "holder": null,
+      "plate_file": null,
+      "source_url": "https://www.treccani.it/enciclopedia/leonardo-da-vinci_(Dizionario-Biografico)/",
+      "station": "line-early",
+      "date_end": null,
+      "date_original": "15 Apr 1452",
+      "date_alternatives": [],
+      "date_label_en": "15 April 1452",
+      "date_label_de": "15. April 1452",
+      "calendar": "Julian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": null,
+      "qualifications_de": null,
+      "sources": [
+        {
+          "url": "https://www.treccani.it/enciclopedia/leonardo-da-vinci_(Dizionario-Biografico)/",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 2"
+        },
+        {
+          "url": "https://en.wikipedia.org/wiki/Leonardo_da_Vinci",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 2"
+        }
+      ],
+      "gaps": [
+        "Present document holder not established by the cited catalog row."
+      ],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 2
+    },
+    {
+      "id": "life-03",
+      "catalogue_row": 3,
+      "date": "1469",
+      "date_precision": "year",
+      "certainty": "documented",
+      "line_en": "A Florentine household declaration lists him as ser Piero's illegitimate son, aged seventeen.",
+      "line_de": "Eine Florentiner Haushaltserklärung führt ihn als unehelichen Sohn des ser Piero auf, siebzehn Jahre alt.",
+      "document": "Catasto declaration: \"Lionardo, figl[i]uolo di detto ser Piero non legiptimo, d'età d'anni 17\"",
+      "holder": "Archivio di Stato di Firenze",
+      "plate_file": null,
+      "source_url": "https://www.treccani.it/enciclopedia/leonardo-da-vinci_(Dizionario-Biografico)/",
+      "station": "line-early",
+      "date_end": null,
+      "date_original": "1469",
+      "date_alternatives": [],
+      "date_label_en": "1469",
+      "date_label_de": "1469",
+      "calendar": "Julian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": null,
+      "qualifications_de": null,
+      "sources": [
+        {
+          "url": "https://www.treccani.it/enciclopedia/leonardo-da-vinci_(Dizionario-Biografico)/",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 3"
+        }
+      ],
+      "gaps": [],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 4
+    },
+    {
+      "id": "life-04",
+      "catalogue_row": 4,
+      "date": "1466",
+      "date_precision": "circa",
+      "certainty": "inferred",
+      "line_en": "He probably trains in Verrocchio's workshop between about 1466 and 1472. No apprenticeship contract survives.",
+      "line_de": "Wahrscheinlich lernt er zwischen etwa 1466 und 1472 in Verrocchios Werkstatt. Ein Lehrvertrag ist nicht erhalten.",
+      "document": "no contract survives. The guild entry of 1472 is the earliest hard anchor",
+      "holder": null,
+      "plate_file": null,
+      "source_url": "https://www.treccani.it/enciclopedia/leonardo-da-vinci_(Dizionario-Biografico)/",
+      "station": "line-early",
+      "date_end": "1472",
+      "date_original": "c. 1466 to 1472",
+      "date_alternatives": [],
+      "date_label_en": "About 1466 to 1472",
+      "date_label_de": "Um 1466 bis 1472",
+      "calendar": "Julian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": null,
+      "qualifications_de": null,
+      "sources": [
+        {
+          "url": "https://www.treccani.it/enciclopedia/leonardo-da-vinci_(Dizionario-Biografico)/",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 4"
+        }
+      ],
+      "gaps": [
+        "Present document holder not established by the cited catalog row."
+      ],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 3
+    },
+    {
+      "id": "life-05",
+      "catalogue_row": 5,
+      "date": "1472",
+      "date_precision": "year",
+      "certainty": "documented",
+      "line_en": "His name enters the records of Florence's painters' company.",
+      "line_de": "Sein Name erscheint in den Aufzeichnungen der Florentiner Malerbruderschaft.",
+      "document": "the company's \"Libro Rosso de' debitori e creditori\"",
+      "holder": null,
+      "plate_file": null,
+      "source_url": "https://www.treccani.it/enciclopedia/leonardo-da-vinci_(Dizionario-Biografico)/",
+      "station": "line-early",
+      "date_end": null,
+      "date_original": "1472",
+      "date_alternatives": [],
+      "date_label_en": "1472",
+      "date_label_de": "1472",
+      "calendar": "Julian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": null,
+      "qualifications_de": null,
+      "sources": [
+        {
+          "url": "https://www.treccani.it/enciclopedia/leonardo-da-vinci_(Dizionario-Biografico)/",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 5"
+        },
+        {
+          "url": "https://it.wikisource.org/wiki/Trattato_della_pittura_(Leonardo_da_Vinci)/Prospetto_cronologico",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 5"
+        }
+      ],
+      "gaps": [
+        "Present document holder not established by the cited catalog row."
+      ],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 5
+    },
+    {
+      "id": "life-06",
+      "catalogue_row": 6,
+      "date": "1473-08-05",
+      "date_precision": "day",
+      "certainty": "documented",
+      "line_en": "He dates a drawing of the Arno valley.",
+      "line_de": "Er datiert eine Zeichnung des Arnotals.",
+      "document": "Leonardo's own inscription on the sheet, Gallerie degli Uffizi, GDSU inv. 8 P recto",
+      "holder": "Gallerie degli Uffizi, GDSU, 8 P recto",
+      "plate_file": null,
+      "source_url": "https://euploos.uffizi.it/inventario-euploos.php?aut=Leonardo+da+Vinci",
+      "station": "line-early",
+      "date_end": null,
+      "date_original": "5 Aug 1473",
+      "date_alternatives": [],
+      "date_label_en": "5 August 1473",
+      "date_label_de": "5. August 1473",
+      "calendar": "Julian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": null,
+      "qualifications_de": null,
+      "sources": [
+        {
+          "url": "https://euploos.uffizi.it/inventario-euploos.php?aut=Leonardo+da+Vinci",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 6"
+        }
+      ],
+      "gaps": [],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 6
+    },
+    {
+      "id": "life-07",
+      "catalogue_row": 7,
+      "date": "1476-04-09",
+      "date_precision": "day",
+      "certainty": "documented",
+      "line_en": "An anonymous accusation names him and three others in a sodomy case. An accusation is not a finding of guilt.",
+      "line_de": "Eine anonyme Anzeige nennt ihn und drei weitere Männer in einem Sodomieverfahren. Eine Anzeige belegt keine Schuld.",
+      "document": "notarised copy among the records of the Ufficiali di Notte e Conservatori dei Monasteri, Archivio di Stato di Firenze",
+      "holder": "Archivio di Stato di Firenze",
+      "plate_file": null,
+      "source_url": "https://en.wikipedia.org/wiki/Jacopo_Saltarelli",
+      "station": "line-early",
+      "date_end": null,
+      "date_original": "9 Apr 1476",
+      "date_alternatives": [],
+      "date_label_en": "9 April 1476",
+      "date_label_de": "9. April 1476",
+      "calendar": "Julian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": null,
+      "qualifications_de": null,
+      "sources": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Jacopo_Saltarelli",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 7"
+        }
+      ],
+      "gaps": [],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 7
+    },
+    {
+      "id": "life-08",
+      "catalogue_row": 8,
+      "date": "1476-06-07",
+      "date_precision": "day",
+      "certainty": "documented",
+      "line_en": "The renewed accusation is dismissed and the accused are absolved.",
+      "line_de": "Die erneute Anzeige wird zurückgewiesen, die Beschuldigten werden freigesprochen.",
+      "document": "same series",
+      "holder": "Archivio di Stato di Firenze",
+      "plate_file": null,
+      "source_url": "https://www.treccani.it/enciclopedia/leonardo-da-vinci_(Dizionario-Biografico)/",
+      "station": "line-early",
+      "date_end": null,
+      "date_original": "7 Jun 1476",
+      "date_alternatives": [],
+      "date_label_en": "7 June 1476",
+      "date_label_de": "7. Juni 1476",
+      "calendar": "Julian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": null,
+      "qualifications_de": null,
+      "sources": [
+        {
+          "url": "https://www.treccani.it/enciclopedia/leonardo-da-vinci_(Dizionario-Biografico)/",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 8"
+        },
+        {
+          "url": "https://en.wikipedia.org/wiki/Jacopo_Saltarelli",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 8"
+        }
+      ],
+      "gaps": [],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 8
+    },
+    {
+      "id": "life-09",
+      "catalogue_row": 9,
+      "date": "1478-01-01",
+      "date_precision": "disputed",
+      "certainty": "inferred",
+      "line_en": "The Signoria commissions an altarpiece. The January day differs between the cited chronologies.",
+      "line_de": "Die Signoria bestellt ein Altarbild. Die zitierten Chronologien nennen unterschiedliche Januartage.",
+      "document": "the Signoria's deliberation; advance of 25 gold florins paid 16 Mar 1478",
+      "holder": null,
+      "plate_file": null,
+      "source_url": "https://it.wikisource.org/wiki/Trattato_della_pittura_(Leonardo_da_Vinci)/Prospetto_cronologico",
+      "station": "line-early",
+      "date_end": null,
+      "date_original": "1 Jan 1478",
+      "date_alternatives": [
+        {
+          "date": "1478-01-10",
+          "source": "CONCEPT-GPT6.md and RIGHTS-CROSSCHECK.md",
+          "note": "Competing January day. Commission retained without pretending date resolved."
+        }
+      ],
+      "date_label_en": "1 January 1478 (disputed)",
+      "date_label_de": "1. Januar 1478 (strittig)",
+      "calendar": "Julian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": "The payment of 16 March is a separate event. January 1 and 10 remain competing readings.",
+      "qualifications_de": "Die Zahlung vom 16. März ist ein eigener Vorgang. Für Januar stehen der 1. und der 10. Tag nebeneinander.",
+      "sources": [
+        {
+          "url": "https://it.wikisource.org/wiki/Trattato_della_pittura_(Leonardo_da_Vinci)/Prospetto_cronologico",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 9"
+        }
+      ],
+      "gaps": [
+        "Present document holder not established by the cited catalog row.",
+        "Competing date readings preserved in date_alternatives."
+      ],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 10
+    },
+    {
+      "id": "life-10",
+      "catalogue_row": 10,
+      "date": "1478",
+      "date_precision": "year",
+      "certainty": "documented",
+      "line_en": "He notes that he has begun two Madonnas. The month is incomplete.",
+      "line_de": "Er notiert, dass er zwei Madonnen begonnen hat. Der Monat ist unvollständig überliefert.",
+      "document": "Leonardo's own note on a drawing in the Uffizi (GDSU 446 E, verify)",
+      "holder": "Gallerie degli Uffizi, GDSU, 446 E (unverified)",
+      "plate_file": null,
+      "source_url": "https://www.treccani.it/enciclopedia/leonardo-da-vinci_(Dizionario-Biografico)/",
+      "station": "line-early",
+      "date_end": null,
+      "date_original": "late 1478",
+      "date_alternatives": [],
+      "date_label_en": "1478",
+      "date_label_de": "1478",
+      "calendar": "Julian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": null,
+      "qualifications_de": null,
+      "sources": [
+        {
+          "url": "https://www.treccani.it/enciclopedia/leonardo-da-vinci_(Dizionario-Biografico)/",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 10"
+        }
+      ],
+      "gaps": [
+        "Document locator or original record not verified. Read document and qualifications before presenting certainty."
+      ],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 9
+    },
+    {
+      "id": "life-11",
+      "catalogue_row": 11,
+      "date": "1481-07",
+      "date_precision": "disputed",
+      "certainty": "inferred",
+      "line_en": "The Adoration commission is recorded in 1481. Its starting date and completion term need qualification.",
+      "line_de": "Der Auftrag zur Anbetung ist 1481 belegt. Beginn und Ausführungsfrist sind unterschiedlich überliefert.",
+      "document": "the convent's contract",
+      "holder": null,
+      "plate_file": null,
+      "source_url": "https://www.treccani.it/enciclopedia/leonardo-da-vinci_(Dizionario-Biografico)/). An older chronology dates the San Donato commission to March 1480 ([it.wikisource](https://it.wikisource.org/wiki/Trattato_della_pittura_(Leonardo_da_Vinci)/Prospetto_cronologico)",
+      "station": "line-early",
+      "date_end": null,
+      "date_original": "Jul 1481",
+      "date_alternatives": [
+        {
+          "date": "1480-03",
+          "source": "Older chronology linked by LIFE catalog"
+        },
+        {
+          "date": "1481-03",
+          "source": "Painting catalog, Adoration entry",
+          "note": "Commission date differs from the July record."
+        }
+      ],
+      "date_label_en": "July 1481 (disputed)",
+      "date_label_de": "Juli 1481 (strittig)",
+      "calendar": "Julian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": "July is the catalog’s record date. Do not turn it into a settled award date or a settled two-year deadline. The holder gives 30 months, against the catalog’s two years.",
+      "qualifications_de": "Juli ist das im Katalog genannte Belegdatum. Es ist kein gesicherter Vergabetermin und belegt keine eindeutige Zweijahresfrist. Das besitzende Museum nennt 30 Monate, der Katalog zwei Jahre.",
+      "sources": [
+        {
+          "url": "https://www.treccani.it/enciclopedia/leonardo-da-vinci_(Dizionario-Biografico)/). An older chronology dates the San Donato commission to March 1480 ([it.wikisource](https://it.wikisource.org/wiki/Trattato_della_pittura_(Leonardo_da_Vinci)/Prospetto_cronologico)",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 11"
+        }
+      ],
+      "gaps": [
+        "Present document holder not established by the cited catalog row.",
+        "Competing date readings preserved in date_alternatives."
+      ],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "contract_term_alternatives": [
+        {
+          "months": 30,
+          "source_url": "https://www.uffizi.it/en/artworks/leonardo-adoration-of-the-magi",
+          "source": "Holder record cited by the governing cross-check"
+        },
+        {
+          "months": 24,
+          "source_url": "https://www.treccani.it/enciclopedia/leonardo-da-vinci_(Dizionario-Biografico)/). An older chronology dates the San Donato commission to March 1480 ([it.wikisource](https://it.wikisource.org/wiki/Trattato_della_pittura_(Leonardo_da_Vinci)/Prospetto_cronologico)",
+          "source": "Two years in the LIFE catalog. Contract not collated."
+        }
+      ],
+      "display_order": 11
+    },
+    {
+      "id": "life-12",
+      "catalogue_row": 12,
+      "date": "1482",
+      "date_precision": "circa",
+      "certainty": "inferred",
+      "line_en": "He probably moves to Milan around this year.",
+      "line_de": "Wahrscheinlich zieht er um dieses Jahr nach Mailand.",
+      "document": "no travel record. The Virgin of the Rocks contract of 25 Apr 1483 is the first hard Milan document",
+      "holder": null,
+      "plate_file": null,
+      "source_url": "https://www.treccani.it/enciclopedia/leonardo-da-vinci_(Dizionario-Biografico)/",
+      "station": "line-early",
+      "date_end": null,
+      "date_original": "c. 1482",
+      "date_alternatives": [],
+      "date_label_en": "About 1482",
+      "date_label_de": "Um 1482",
+      "calendar": "Julian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": null,
+      "qualifications_de": null,
+      "sources": [
+        {
+          "url": "https://www.treccani.it/enciclopedia/leonardo-da-vinci_(Dizionario-Biografico)/",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 12"
+        }
+      ],
+      "gaps": [
+        "Present document holder not established by the cited catalog row."
+      ],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 12
+    },
+    {
+      "id": "life-13",
+      "catalogue_row": 13,
+      "date": "1482",
+      "date_precision": "circa",
+      "certainty": "inferred",
+      "line_en": "An undated draft offers Ludovico Sforza his services as an engineer and artist.",
+      "line_de": "Ein undatierter Entwurf bietet Ludovico Sforza seine Dienste als Ingenieur und Künstler an.",
+      "document": "a draft, undated, in a copyist's hand with Leonardo's corrections. Codex Atlanticus f. 1082 recto (old numbering f. 391 recto-a), Biblioteca Ambrosiana, Milan",
+      "holder": "Veneranda Biblioteca Ambrosiana, Codex Atlanticus 1082r",
+      "plate_file": null,
+      "source_url": "https://ambrosiana.it/en/",
+      "station": "line-early",
+      "date_end": "1484",
+      "date_original": "c. 1482 to 1484",
+      "date_alternatives": [],
+      "date_label_en": "About 1482 to 1484",
+      "date_label_de": "Um 1482 bis 1484",
+      "calendar": "Julian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": null,
+      "qualifications_de": null,
+      "sources": [
+        {
+          "url": "https://ambrosiana.it/en/",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 13"
+        },
+        {
+          "url": "https://www.leonardodigitale.com/sfoglia/codice-atlantico/1082-r/",
+          "supports": "Corrected manuscript locator",
+          "local_source": "refs/RIGHTS-CROSSCHECK.md"
+        }
+      ],
+      "gaps": [],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 13
+    },
+    {
+      "id": "life-14",
+      "catalogue_row": 14,
+      "date": "1483-04-25",
+      "date_precision": "day",
+      "certainty": "documented",
+      "line_en": "He and the de Predis brothers sign the Virgin of the Rocks contract.",
+      "line_de": "Er und die Brüder de Predis unterzeichnen den Vertrag zur Felsgrottenmadonna.",
+      "document": "the notarial contract, Milan",
+      "holder": null,
+      "plate_file": null,
+      "source_url": "https://www.treccani.it/enciclopedia/leonardo-da-vinci_(Dizionario-Biografico)/",
+      "station": "line-early",
+      "date_end": null,
+      "date_original": "25 Apr 1483",
+      "date_alternatives": [],
+      "date_label_en": "25 April 1483",
+      "date_label_de": "25. April 1483",
+      "calendar": "Julian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": null,
+      "qualifications_de": null,
+      "sources": [
+        {
+          "url": "https://www.treccani.it/enciclopedia/leonardo-da-vinci_(Dizionario-Biografico)/",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 14"
+        }
+      ],
+      "gaps": [
+        "Present document holder not established by the cited catalog row."
+      ],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 14
+    },
+    {
+      "id": "life-15",
+      "catalogue_row": 15,
+      "date": "1487",
+      "date_precision": "year",
+      "certainty": "documented",
+      "line_en": "Milan cathedral's accounts record work on a model for its crossing tower.",
+      "line_de": "Die Rechnungen des Mailänder Doms verzeichnen Arbeiten an einem Modell für den Vierungsturm.",
+      "document": "cathedral fabric payments",
+      "holder": "Veneranda Fabbrica del Duomo di Milano",
+      "plate_file": null,
+      "source_url": "https://it.wikisource.org/wiki/Trattato_della_pittura_(Leonardo_da_Vinci)/Prospetto_cronologico",
+      "station": "line-early",
+      "date_end": null,
+      "date_original": "1487",
+      "date_alternatives": [],
+      "date_label_en": "1487",
+      "date_label_de": "1487",
+      "calendar": "Julian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": null,
+      "qualifications_de": null,
+      "sources": [
+        {
+          "url": "https://it.wikisource.org/wiki/Trattato_della_pittura_(Leonardo_da_Vinci)/Prospetto_cronologico",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 15"
+        }
+      ],
+      "gaps": [],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 15
+    },
+    {
+      "id": "life-16",
+      "catalogue_row": 16,
+      "date": "1490-04-23",
+      "date_precision": "day",
+      "certainty": "documented",
+      "line_en": "He begins a book on light and shade and writes that he has resumed the horse.",
+      "line_de": "Er beginnt ein Buch über Licht und Schatten und notiert, dass er die Arbeit am Pferd wieder aufgenommen hat.",
+      "document": "Leonardo's dated note, Paris Ms. C, Institut de France (manuscript confirmed, folio still to verify)",
+      "holder": "Bibliothèque de l’Institut de France, Paris Ms C",
+      "plate_file": null,
+      "source_url": "https://www.treccani.it/enciclopedia/leonardo-da-vinci_(Dizionario-Biografico)/",
+      "station": "line-early",
+      "date_end": null,
+      "date_original": "23 Apr 1490",
+      "date_alternatives": [],
+      "date_label_en": "23 April 1490",
+      "date_label_de": "23. April 1490",
+      "calendar": "Julian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": null,
+      "qualifications_de": null,
+      "sources": [
+        {
+          "url": "https://www.treccani.it/enciclopedia/leonardo-da-vinci_(Dizionario-Biografico)/",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 16"
+        },
+        {
+          "url": "https://www.facsimilefinder.com/facsimiles/notebooks-leonardo-vinci-institut-france-facsimile",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 16"
+        }
+      ],
+      "gaps": [
+        "Document locator or original record not verified. Read document and qualifications before presenting certainty."
+      ],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 16
+    },
+    {
+      "id": "life-17",
+      "catalogue_row": 17,
+      "date": "1490-07-22",
+      "date_precision": "day",
+      "certainty": "documented",
+      "line_en": "Giacomo, later called Salaì, enters his household.",
+      "line_de": "Giacomo, später Salaì genannt, kommt in seinen Haushalt.",
+      "document": "Leonardo's note, same manuscript group (folio verify). The Magdalene's feast is 22 July",
+      "holder": null,
+      "plate_file": null,
+      "source_url": "https://en.wikipedia.org/wiki/Sala%C3%AC",
+      "station": "line-early",
+      "date_end": null,
+      "date_original": "22 Jul 1490",
+      "date_alternatives": [],
+      "date_label_en": "22 July 1490",
+      "date_label_de": "22. Juli 1490",
+      "calendar": "Julian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": null,
+      "qualifications_de": null,
+      "sources": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Sala%C3%AC",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 17"
+        }
+      ],
+      "gaps": [
+        "Document locator or original record not verified. Read document and qualifications before presenting certainty.",
+        "Present document holder not established by the cited catalog row."
+      ],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 17
+    },
+    {
+      "id": "life-18",
+      "catalogue_row": 18,
+      "date": "1493-11",
+      "date_precision": "month",
+      "certainty": "documented",
+      "line_en": "The clay horse is displayed for the Sforza wedding festivities.",
+      "line_de": "Das Tonmodell des Pferdes wird zu den Hochzeitsfeierlichkeiten der Sforza gezeigt.",
+      "document": "Milanese court records",
+      "holder": null,
+      "plate_file": null,
+      "source_url": "https://www.treccani.it/enciclopedia/leonardo-da-vinci_(Dizionario-Biografico)/",
+      "station": "line-early",
+      "date_end": null,
+      "date_original": "Nov 1493",
+      "date_alternatives": [],
+      "date_label_en": "November 1493",
+      "date_label_de": "November 1493",
+      "calendar": "Julian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": null,
+      "qualifications_de": null,
+      "sources": [
+        {
+          "url": "https://www.treccani.it/enciclopedia/leonardo-da-vinci_(Dizionario-Biografico)/",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 18"
+        }
+      ],
+      "gaps": [
+        "Present document holder not established by the cited catalog row."
+      ],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 18
+    },
+    {
+      "id": "life-19",
+      "catalogue_row": 19,
+      "date": "1494-11",
+      "date_precision": "month",
+      "certainty": "documented",
+      "line_en": "Ludovico diverts the bronze reserved for the horse to cannon making.",
+      "line_de": "Ludovico lässt die für das Pferd vorgesehene Bronze für Kanonen verwenden.",
+      "document": "Sforza correspondence",
+      "holder": null,
+      "plate_file": null,
+      "source_url": "https://en.wikipedia.org/wiki/Leonardo_da_Vinci",
+      "station": "line-early",
+      "date_end": null,
+      "date_original": "Nov 1494",
+      "date_alternatives": [],
+      "date_label_en": "November 1494",
+      "date_label_de": "November 1494",
+      "calendar": "Julian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": null,
+      "qualifications_de": null,
+      "sources": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Leonardo_da_Vinci",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 19"
+        }
+      ],
+      "gaps": [
+        "Present document holder not established by the cited catalog row."
+      ],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 19
+    },
+    {
+      "id": "life-20",
+      "catalogue_row": 20,
+      "date": "1497-06-29",
+      "date_precision": "day",
+      "certainty": "documented",
+      "line_en": "The court presses him to finish the Last Supper.",
+      "line_de": "Der Hof drängt ihn, das Abendmahl fertigzustellen.",
+      "document": "ducal note",
+      "holder": null,
+      "plate_file": null,
+      "source_url": "https://www.treccani.it/enciclopedia/leonardo-da-vinci_(Dizionario-Biografico)/",
+      "station": "line-early",
+      "date_end": null,
+      "date_original": "29 Jun 1497",
+      "date_alternatives": [],
+      "date_label_en": "29 June 1497",
+      "date_label_de": "29. Juni 1497",
+      "calendar": "Julian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": null,
+      "qualifications_de": null,
+      "sources": [
+        {
+          "url": "https://www.treccani.it/enciclopedia/leonardo-da-vinci_(Dizionario-Biografico)/",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 20"
+        }
+      ],
+      "gaps": [
+        "Present document holder not established by the cited catalog row."
+      ],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 20
+    },
+    {
+      "id": "life-21",
+      "catalogue_row": 21,
+      "date": "1498-02-09",
+      "date_precision": "day",
+      "certainty": "documented",
+      "line_en": "Luca Pacioli describes the Last Supper as finished.",
+      "line_de": "Luca Pacioli beschreibt das Abendmahl als vollendet.",
+      "document": "Luca Pacioli's dedication to De divina proportione",
+      "holder": null,
+      "plate_file": null,
+      "source_url": "https://www.treccani.it/enciclopedia/leonardo-da-vinci_(Dizionario-Biografico)/",
+      "station": "line-early",
+      "date_end": null,
+      "date_original": "9 Feb 1498",
+      "date_alternatives": [],
+      "date_label_en": "9 February 1498",
+      "date_label_de": "9. Februar 1498",
+      "calendar": "Julian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": null,
+      "qualifications_de": null,
+      "sources": [
+        {
+          "url": "https://www.treccani.it/enciclopedia/leonardo-da-vinci_(Dizionario-Biografico)/",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 21"
+        }
+      ],
+      "gaps": [
+        "Present document holder not established by the cited catalog row."
+      ],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 21
+    },
+    {
+      "id": "life-22",
+      "catalogue_row": 22,
+      "date": "1498-04-21",
+      "date_precision": "day",
+      "certainty": "documented",
+      "line_en": "A secretary reports his promise to finish the Sala delle Asse by September.",
+      "line_de": "Ein Sekretär berichtet von seinem Versprechen, die Sala delle Asse bis September fertigzustellen.",
+      "document": "letter of the ducal secretary (Gualtiero da Bascapè) to Ludovico",
+      "holder": null,
+      "plate_file": null,
+      "source_url": "https://www.treccani.it/enciclopedia/leonardo-da-vinci_(Dizionario-Biografico)/",
+      "station": "line-early",
+      "date_end": null,
+      "date_original": "21 Apr 1498",
+      "date_alternatives": [],
+      "date_label_en": "21 April 1498",
+      "date_label_de": "21. April 1498",
+      "calendar": "Julian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": null,
+      "qualifications_de": null,
+      "sources": [
+        {
+          "url": "https://www.treccani.it/enciclopedia/leonardo-da-vinci_(Dizionario-Biografico)/",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 22"
+        }
+      ],
+      "gaps": [
+        "Present document holder not established by the cited catalog row."
+      ],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 22
+    },
+    {
+      "id": "life-23",
+      "catalogue_row": 23,
+      "date": "1499",
+      "date_precision": "year",
+      "certainty": "documented",
+      "line_en": "Ludovico grants him a vineyard outside Porta Vercellina.",
+      "line_de": "Ludovico schenkt ihm einen Weinberg vor der Porta Vercellina.",
+      "document": "the ducal grant",
+      "holder": null,
+      "plate_file": null,
+      "source_url": "https://it.wikisource.org/wiki/Trattato_della_pittura_(Leonardo_da_Vinci)/Prospetto_cronologico",
+      "station": "line-early",
+      "date_end": null,
+      "date_original": "1499",
+      "date_alternatives": [],
+      "date_label_en": "1499",
+      "date_label_de": "1499",
+      "calendar": "Julian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": null,
+      "qualifications_de": null,
+      "sources": [
+        {
+          "url": "https://it.wikisource.org/wiki/Trattato_della_pittura_(Leonardo_da_Vinci)/Prospetto_cronologico",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 23"
+        }
+      ],
+      "gaps": [
+        "Present document holder not established by the cited catalog row."
+      ],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 23
+    },
+    {
+      "id": "life-24",
+      "catalogue_row": 24,
+      "date": "1499",
+      "date_precision": "year",
+      "certainty": "documented",
+      "line_en": "The French take Milan. Leonardo da Vinci leaves by December.",
+      "line_de": "Die Franzosen nehmen Mailand ein. Leonardo da Vinci verlässt die Stadt spätestens im Dezember.",
+      "document": "Milanese chronicles",
+      "holder": null,
+      "plate_file": null,
+      "source_url": "https://www.treccani.it/enciclopedia/leonardo-da-vinci_(Dizionario-Biografico)/",
+      "station": "line-early",
+      "date_end": null,
+      "date_original": "1499",
+      "date_alternatives": [],
+      "date_label_en": "1499",
+      "date_label_de": "1499",
+      "calendar": "Julian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": null,
+      "qualifications_de": null,
+      "sources": [
+        {
+          "url": "https://www.treccani.it/enciclopedia/leonardo-da-vinci_(Dizionario-Biografico)/",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 24"
+        }
+      ],
+      "gaps": [
+        "Present document holder not established by the cited catalog row."
+      ],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 24
+    },
+    {
+      "id": "life-25",
+      "catalogue_row": 25,
+      "date": "1499",
+      "date_precision": "after",
+      "certainty": "tradition",
+      "line_en": "Sabba da Castiglione later reports that Gascon crossbowmen used the clay horse as a target.",
+      "line_de": "Sabba da Castiglione berichtet später, gascognische Armbrustschützen hätten das Tonpferd als Zielscheibe benutzt.",
+      "document": "Sabba da Castiglione, Ricordi (first ed. Bologna 1546): \"una così nobile & ingegnosa opera esser fatta bersaglio à balestrieri Guasconi\"",
+      "holder": null,
+      "plate_file": null,
+      "source_url": "https://archive.org/details/ricordidimonsign00cast",
+      "station": "line-early",
+      "date_end": null,
+      "date_original": "after 1499",
+      "date_alternatives": [],
+      "date_label_en": "After 1499",
+      "date_label_de": "Nach 1499",
+      "calendar": "Julian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": null,
+      "qualifications_de": null,
+      "sources": [
+        {
+          "url": "https://archive.org/details/ricordidimonsign00cast",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 25"
+        }
+      ],
+      "gaps": [
+        "Present document holder not established by the cited catalog row."
+      ],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 25
+    },
+    {
+      "id": "life-26",
+      "catalogue_row": 26,
+      "date": "1500-03-13",
+      "date_precision": "day",
+      "certainty": "documented",
+      "line_en": "A letter places him in Venice.",
+      "line_de": "Ein Brief belegt seinen Aufenthalt in Venedig.",
+      "document": "letter of Lorenzo Gusnasco da Pavia to Isabella d'Este (verify the writer's name)",
+      "holder": null,
+      "plate_file": null,
+      "source_url": "https://www.treccani.it/enciclopedia/leonardo-da-vinci_(Dizionario-Biografico)/",
+      "station": "line-late",
+      "date_end": null,
+      "date_original": "13 Mar 1500",
+      "date_alternatives": [],
+      "date_label_en": "13 March 1500",
+      "date_label_de": "13. März 1500",
+      "calendar": "Julian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": null,
+      "qualifications_de": null,
+      "sources": [
+        {
+          "url": "https://www.treccani.it/enciclopedia/leonardo-da-vinci_(Dizionario-Biografico)/",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 26"
+        }
+      ],
+      "gaps": [
+        "Document locator or original record not verified. Read document and qualifications before presenting certainty.",
+        "Present document holder not established by the cited catalog row."
+      ],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 1
+    },
+    {
+      "id": "life-27",
+      "catalogue_row": 27,
+      "date": "1502-08-18",
+      "date_precision": "day",
+      "certainty": "documented",
+      "line_en": "Cesare Borgia names him architect and general engineer.",
+      "line_de": "Cesare Borgia ernennt ihn zum Architekten und Generalingenieur.",
+      "document": "Borgia's patent / safe-conduct",
+      "holder": null,
+      "plate_file": null,
+      "source_url": "https://www.treccani.it/enciclopedia/leonardo-da-vinci_(Dizionario-Biografico)/",
+      "station": "line-late",
+      "date_end": null,
+      "date_original": "18 Aug 1502",
+      "date_alternatives": [],
+      "date_label_en": "18 August 1502",
+      "date_label_de": "18. August 1502",
+      "calendar": "Julian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": null,
+      "qualifications_de": null,
+      "sources": [
+        {
+          "url": "https://www.treccani.it/enciclopedia/leonardo-da-vinci_(Dizionario-Biografico)/",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 27"
+        }
+      ],
+      "gaps": [
+        "Present document holder not established by the cited catalog row."
+      ],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 3
+    },
+    {
+      "id": "life-28",
+      "catalogue_row": 28,
+      "date": "1502",
+      "date_precision": "season",
+      "certainty": "inferred",
+      "line_en": "He makes the plan of Imola, generally dated to autumn 1502.",
+      "line_de": "Er zeichnet den Plan von Imola, der gewöhnlich auf Herbst 1502 datiert wird.",
+      "document": "the drawing itself, Royal Collection, Windsor, RCIN 912284 (verified), pen, ink and coloured wash, c. 440 x 602 mm",
+      "holder": "Royal Collection, Windsor, RCIN 912284",
+      "plate_file": null,
+      "source_url": "https://www.rct.uk/collection/themes/exhibitions/leonardo-da-vinci-a-life-in-drawing/the-queens-gallery-palace-of-holyroodhouse/a-map-of-imola",
+      "station": "line-late",
+      "date_end": null,
+      "date_original": "autumn 1502",
+      "date_alternatives": [],
+      "date_label_en": "Autumn 1502",
+      "date_label_de": "Herbst 1502",
+      "calendar": "Julian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": "The drawing survives. Autumn is an approximate dating, and a precise surveying itinerary is not established here.",
+      "qualifications_de": "Die Zeichnung ist erhalten. Herbst ist eine ungefähre Datierung, ein genauer Vermessungsablauf ist hier nicht belegt.",
+      "sources": [
+        {
+          "url": "https://www.rct.uk/collection/themes/exhibitions/leonardo-da-vinci-a-life-in-drawing/the-queens-gallery-palace-of-holyroodhouse/a-map-of-imola",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 28"
+        }
+      ],
+      "gaps": [],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 2
+    },
+    {
+      "id": "life-29",
+      "catalogue_row": 29,
+      "date": "1503-10",
+      "date_precision": "month",
+      "certainty": "documented",
+      "line_en": "Vespucci names the portrait of Lisa del Giocondo and Saint Anne in a dated marginal note.",
+      "line_de": "Vespucci nennt das Porträt der Lisa del Giocondo und die heilige Anna in einer datierten Randnotiz.",
+      "document": "Agostino Vespucci's marginal note: \"Apelles pictor. Ita Leonardus Vincius facit in omnibus suis picturis, ut est caput Lise del Giocondo et Anne matris virginis. Videbimus quid faciet de aula magni consilii, de qua re convenit iam cum vexillifero. 1503 8bris.\" Universitätsbibliothek Heidelberg, shelfmark D 7620 qt. INC (Cicero, Epistulae ad familiares, 1477)",
+      "holder": "Universitätsbibliothek Heidelberg, D 7620 qt. INC",
+      "plate_file": "refs/life/plates/vespucci-note-1503-heidelberg__ub-heidelberg__2500x750.jpg",
+      "source_url": "https://www.uni-heidelberg.de/press/news/press552e.html",
+      "station": "line-late",
+      "date_end": null,
+      "date_original": "Oct 1503",
+      "date_alternatives": [],
+      "date_label_en": "October 1503",
+      "date_label_de": "Oktober 1503",
+      "calendar": "Julian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": null,
+      "qualifications_de": null,
+      "sources": [
+        {
+          "url": "https://www.uni-heidelberg.de/press/news/press552e.html",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 29"
+        }
+      ],
+      "gaps": [],
+      "plate_role": "document image",
+      "licence_line": "Public domain. Marginal note of Agostino Vespucci, October 1503, in Cicero, Epistulae ad familiares (1477). Universitatsbibliothek Heidelberg, shelfmark D 7620 qt. INC.",
+      "plate_pixels": {
+        "width": 2500,
+        "height": 750
+      },
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 4
+    },
+    {
+      "id": "life-30",
+      "catalogue_row": 30,
+      "date": "1504-05-04",
+      "date_precision": "before_or_on",
+      "certainty": "documented",
+      "line_en": "The Anghiari contract records payment and sets a deadline for the cartoon.",
+      "line_de": "Der Anghiari-Vertrag verzeichnet eine Zahlung und setzt eine Frist für den Karton.",
+      "document": "the Signoria's contract",
+      "holder": null,
+      "plate_file": null,
+      "source_url": "https://www.treccani.it/enciclopedia/leonardo-da-vinci_(Dizionario-Biografico)/",
+      "station": "line-late",
+      "date_end": null,
+      "date_original": "by 4 May 1504",
+      "date_alternatives": [],
+      "date_label_en": "By 4 May 1504",
+      "date_label_de": "Spätestens 4. Mai 1504",
+      "calendar": "Julian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": null,
+      "qualifications_de": null,
+      "sources": [
+        {
+          "url": "https://www.treccani.it/enciclopedia/leonardo-da-vinci_(Dizionario-Biografico)/",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 30"
+        }
+      ],
+      "gaps": [
+        "Present document holder not established by the cited catalog row."
+      ],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 5
+    },
+    {
+      "id": "life-31",
+      "catalogue_row": 31,
+      "date": "1504-07-09",
+      "date_precision": "disputed",
+      "certainty": "inferred",
+      "line_en": "He records his father's death. Richter reads 9 July, Herzfeld 7 July.",
+      "line_de": "Er hält den Tod seines Vaters fest. Richter liest den 9. Juli, Herzfeld den 7. Juli.",
+      "document": "Leonardo's own note",
+      "holder": null,
+      "plate_file": null,
+      "source_url": "https://it.wikisource.org/wiki/Trattato_della_pittura_(Leonardo_da_Vinci)/Prospetto_cronologico",
+      "station": "line-late",
+      "date_end": null,
+      "date_original": "9 Jul 1504",
+      "date_alternatives": [
+        {
+          "date": "1504-07-07",
+          "source": "Herzfeld 1906, Arundel 272r"
+        }
+      ],
+      "date_label_en": "9 July 1504 (disputed)",
+      "date_label_de": "9. Juli 1504 (strittig)",
+      "calendar": "Julian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": "The historical editions disagree on the day. Neither translation silently corrects the other.",
+      "qualifications_de": "Die historischen Ausgaben widersprechen sich beim Tag. Keine Übersetzung wird stillschweigend nach der anderen berichtigt.",
+      "sources": [
+        {
+          "url": "https://it.wikisource.org/wiki/Trattato_della_pittura_(Leonardo_da_Vinci)/Prospetto_cronologico",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 31"
+        }
+      ],
+      "gaps": [
+        "Present document holder not established by the cited catalog row.",
+        "Competing date readings preserved in date_alternatives."
+      ],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 6
+    },
+    {
+      "id": "life-32",
+      "catalogue_row": 32,
+      "date": "1506-08-18",
+      "date_precision": "day",
+      "certainty": "documented",
+      "line_en": "Charles d'Amboise asks Florence to let him remain in Milan for two months.",
+      "line_de": "Charles d'Amboise bittet Florenz, ihn zwei Monate in Mailand bleiben zu lassen.",
+      "document": "the letter",
+      "holder": null,
+      "plate_file": null,
+      "source_url": "https://www.treccani.it/enciclopedia/leonardo-da-vinci_(Dizionario-Biografico)/",
+      "station": "line-late",
+      "date_end": null,
+      "date_original": "18 Aug 1506",
+      "date_alternatives": [],
+      "date_label_en": "18 August 1506",
+      "date_label_de": "18. August 1506",
+      "calendar": "Julian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": null,
+      "qualifications_de": null,
+      "sources": [
+        {
+          "url": "https://www.treccani.it/enciclopedia/leonardo-da-vinci_(Dizionario-Biografico)/",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 32"
+        }
+      ],
+      "gaps": [
+        "Present document holder not established by the cited catalog row."
+      ],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 7
+    },
+    {
+      "id": "life-33",
+      "catalogue_row": 33,
+      "date": "1507",
+      "date_precision": "circa",
+      "certainty": "inferred",
+      "line_en": "He develops plans for the Trivulzio equestrian monument, approximately 1507 to 1511.",
+      "line_de": "Er entwickelt Pläne für das Reiterdenkmal Trivulzios, ungefähr zwischen 1507 und 1511.",
+      "document": "the drawings and the cost estimate in the Codex Atlanticus",
+      "holder": "Veneranda Biblioteca Ambrosiana and Royal Collection",
+      "plate_file": null,
+      "source_url": "https://ambrosiana.it/en/",
+      "station": "line-late",
+      "date_end": "1511",
+      "date_original": "c. 1507 to 1511",
+      "date_alternatives": [],
+      "date_label_en": "About 1507 to 1511",
+      "date_label_de": "Um 1507 bis 1511",
+      "calendar": "Julian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": null,
+      "qualifications_de": null,
+      "sources": [
+        {
+          "url": "https://ambrosiana.it/en/",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 33"
+        }
+      ],
+      "gaps": [],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 8
+    },
+    {
+      "id": "life-34",
+      "catalogue_row": 34,
+      "date": "1508",
+      "date_precision": "circa",
+      "certainty": "inferred",
+      "line_en": "Anatomical studies span about 1508 to 1513. Vasari later names della Torre as a collaborator.",
+      "line_de": "Anatomische Studien entstehen etwa zwischen 1508 und 1513. Vasari nennt später della Torre als Mitarbeiter.",
+      "document": "the Windsor anatomical sheets; Vasari's Life",
+      "holder": "Royal Collection, Windsor",
+      "plate_file": null,
+      "source_url": "https://it.wikisource.org/wiki/Le_vite_de%27_pi%C3%B9_eccellenti_pittori,_scultori_e_architettori_(1568)/Lionardo_da_Vinci",
+      "station": "line-late",
+      "date_end": "1513",
+      "date_original": "c. 1508 to 1513",
+      "date_alternatives": [],
+      "date_label_en": "About 1508 to 1513",
+      "date_label_de": "Um 1508 bis 1513",
+      "calendar": "Julian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": null,
+      "qualifications_de": null,
+      "sources": [
+        {
+          "url": "https://it.wikisource.org/wiki/Le_vite_de%27_pi%C3%B9_eccellenti_pittori,_scultori_e_architettori_(1568)/Lionardo_da_Vinci",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 34"
+        }
+      ],
+      "gaps": [],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 9
+    },
+    {
+      "id": "life-35",
+      "catalogue_row": 35,
+      "date": "1513-09-24",
+      "date_precision": "day",
+      "certainty": "documented",
+      "line_en": "He records his departure for Rome with Melzi, Salaì, Lorenzo and il Fanfoia.",
+      "line_de": "Er notiert seine Abreise nach Rom mit Melzi, Salaì, Lorenzo und il Fanfoia.",
+      "document": "Leonardo’s dated note, Paris Ms E 1r. Richter 1465. Catalog Codex Atlanticus reference corrected by the cross-check.",
+      "holder": "Bibliothèque de l’Institut de France, Paris Ms E 1r",
+      "plate_file": null,
+      "source_url": "https://www.treccani.it/enciclopedia/leonardo-da-vinci_(Dizionario-Biografico)/",
+      "station": "line-late",
+      "date_end": null,
+      "date_original": "24 Sep 1513",
+      "date_alternatives": [],
+      "date_label_en": "24 September 1513",
+      "date_label_de": "24. September 1513",
+      "calendar": "Julian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": "Cross-check corrects the catalog’s Codex Atlanticus location to Paris Ms E 1r.",
+      "qualifications_de": "Die Gegenprüfung berichtigt den Katalogverweis auf den Codex Atlanticus zu Paris Ms E 1r.",
+      "sources": [
+        {
+          "url": "https://www.treccani.it/enciclopedia/leonardo-da-vinci_(Dizionario-Biografico)/",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 35"
+        },
+        {
+          "url": "https://www.leonardodigitale.com/sfoglia/manoscritto-e-dell-institut-de-france/0001-r/",
+          "supports": "Corrected manuscript locator",
+          "local_source": "refs/RIGHTS-CROSSCHECK.md"
+        }
+      ],
+      "gaps": [],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 10
+    },
+    {
+      "id": "life-36",
+      "catalogue_row": 36,
+      "date": "1515",
+      "date_precision": "year",
+      "certainty": "tradition",
+      "line_en": "Later writers describe a mechanical lion for a royal entry. Its location and occasion remain uncertain.",
+      "line_de": "Spätere Autoren beschreiben einen mechanischen Löwen für einen königlichen Einzug. Ort und Anlass bleiben unsicher.",
+      "document": "no contemporary record found by this drawer. The story is transmitted by later writers (Lomazzo, then Amoretti). The 19th-century chronology places the lion at Pavia, not Lyon",
+      "holder": null,
+      "plate_file": null,
+      "source_url": "https://it.wikisource.org/wiki/Trattato_della_pittura_(Leonardo_da_Vinci)/Prospetto_cronologico",
+      "station": "line-late",
+      "date_end": null,
+      "date_original": "1515",
+      "date_alternatives": [],
+      "date_label_en": "1515",
+      "date_label_de": "1515",
+      "calendar": "Julian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": null,
+      "qualifications_de": null,
+      "sources": [
+        {
+          "url": "https://it.wikisource.org/wiki/Trattato_della_pittura_(Leonardo_da_Vinci)/Prospetto_cronologico",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 36"
+        }
+      ],
+      "gaps": [
+        "Present document holder not established by the cited catalog row."
+      ],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 11
+    },
+    {
+      "id": "life-37",
+      "catalogue_row": 37,
+      "date": "1516",
+      "date_precision": "year",
+      "certainty": "inferred",
+      "line_en": "He enters the service of Francis I and lives at Cloux.",
+      "line_de": "Er tritt in den Dienst von Franz I. und wohnt in Cloux.",
+      "document": "the royal accounts (not seen by this drawer)",
+      "holder": null,
+      "plate_file": null,
+      "source_url": "https://en.wikipedia.org/wiki/Leonardo_da_Vinci",
+      "station": "line-amboise",
+      "date_end": null,
+      "date_original": "1516",
+      "date_alternatives": [],
+      "date_label_en": "1516",
+      "date_label_de": "1516",
+      "calendar": "Julian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": "The source account was not inspected. The catalog’s pension figure is not asserted in display copy.",
+      "qualifications_de": "Der Quellenbeleg wurde nicht eingesehen. Die Rentensumme des Katalogs wird im Ausstellungstext nicht behauptet.",
+      "sources": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Leonardo_da_Vinci",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 37"
+        },
+        {
+          "url": "https://fr.wikipedia.org/wiki/Ch%C3%A2teau_du_Clos_Luc%C3%A9",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 37"
+        }
+      ],
+      "gaps": [
+        "Document locator or original record not verified. Read document and qualifications before presenting certainty.",
+        "Present document holder not established by the cited catalog row."
+      ],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 1
+    },
+    {
+      "id": "life-38",
+      "catalogue_row": 38,
+      "date": "1517-05-22",
+      "date_precision": "day",
+      "certainty": "documented",
+      "line_en": "A dated note places him at Cloux near Amboise.",
+      "line_de": "Eine datierte Notiz belegt seinen Aufenthalt in Cloux bei Amboise.",
+      "document": "Leonardo’s dated note, Codex Atlanticus 284r, old 103r-b.",
+      "holder": "Veneranda Biblioteca Ambrosiana, Codex Atlanticus 284r",
+      "plate_file": null,
+      "source_url": "https://www.treccani.it/enciclopedia/leonardo-da-vinci_(Dizionario-Biografico)/",
+      "station": "line-amboise",
+      "date_end": null,
+      "date_original": "22 May 1517",
+      "date_alternatives": [],
+      "date_label_en": "22 May 1517",
+      "date_label_de": "22. Mai 1517",
+      "calendar": "Julian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": "This is a dated presence, not proof that no earlier record exists. Modern CA 284r, old 103r-b.",
+      "qualifications_de": "Dies ist ein datierter Aufenthalt, kein Beweis für das Fehlen älterer Belege. Heute CA 284r, früher 103r-b.",
+      "sources": [
+        {
+          "url": "https://www.treccani.it/enciclopedia/leonardo-da-vinci_(Dizionario-Biografico)/",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 38"
+        },
+        {
+          "url": "https://www.leonardodigitale.com/sfoglia/codice-atlantico/0284-r/",
+          "supports": "Corrected manuscript locator",
+          "local_source": "refs/RIGHTS-CROSSCHECK.md"
+        }
+      ],
+      "gaps": [],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 2
+    },
+    {
+      "id": "life-39",
+      "catalogue_row": 39,
+      "date": "1517-10-10",
+      "date_precision": "day",
+      "certainty": "documented",
+      "line_en": "De Beatis records the visit, three paintings and an impairment of Leonardo's right hand.",
+      "line_de": "De Beatis hält den Besuch, drei Gemälde und eine Beeinträchtigung von Leonardos rechter Hand fest.",
+      "document": "travel diary of Antonio de Beatis",
+      "holder": "Biblioteca Nazionale di Napoli, Antonio de Beatis itinerary (shelfmark unverified)",
+      "plate_file": null,
+      "source_url": "https://en.wikipedia.org/wiki/Antonio_de_Beatis",
+      "station": "line-amboise",
+      "date_end": null,
+      "date_original": "10 Oct 1517",
+      "date_alternatives": [],
+      "date_label_en": "10 October 1517",
+      "date_label_de": "10. Oktober 1517",
+      "calendar": "Julian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": "The witness reports an impairment. Diagnosis and the exact visit hour are not documented. The unnamed Florentine portrait is commonly identified as the Mona Lisa, with a commission-history difficulty.",
+      "qualifications_de": "Der Zeuge beschreibt eine Beeinträchtigung. Diagnose und genaue Besuchsstunde sind nicht belegt. Das unbenannte Florentiner Porträt wird gewöhnlich als Mona Lisa identifiziert, bei widersprüchlicher Auftragsgeschichte.",
+      "sources": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Antonio_de_Beatis",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 39"
+        },
+        {
+          "url": "https://monalisa.org/2012/09/08/the-travel-journal-of-antonio-de-beatis/",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 39"
+        }
+      ],
+      "gaps": [],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 3
+    },
+    {
+      "id": "life-40",
+      "catalogue_row": 40,
+      "date": "1519-04-23",
+      "date_precision": "day",
+      "certainty": "documented",
+      "line_en": "He makes his will at Cloux. Its text survives in copies.",
+      "line_de": "Er macht sein Testament in Cloux. Der Text ist in Abschriften erhalten.",
+      "document": "the original is lost. The text survives through copies, including an Italian translation addressed to his half-brother",
+      "holder": null,
+      "plate_file": null,
+      "source_url": "https://artsandculture.google.com/story/leonardo-da-vinci-s-last-days-chateau-royal-d-amboise/hgUh5c-h_1P_KA",
+      "station": "line-amboise",
+      "date_end": null,
+      "date_original": "23 Apr 1519",
+      "date_alternatives": [],
+      "date_label_en": "23 April 1519",
+      "date_label_de": "23. April 1519",
+      "calendar": "Julian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": "The original will is lost. A text transmitted in copies is the evidence.",
+      "qualifications_de": "Das Originaltestament ist verloren. Der in Abschriften überlieferte Text ist der Beleg.",
+      "sources": [
+        {
+          "url": "https://artsandculture.google.com/story/leonardo-da-vinci-s-last-days-chateau-royal-d-amboise/hgUh5c-h_1P_KA",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 40"
+        }
+      ],
+      "gaps": [
+        "Present document holder not established by the cited catalog row."
+      ],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 4
+    },
+    {
+      "id": "life-41",
+      "catalogue_row": 41,
+      "date": "1519-05-02",
+      "date_precision": "day",
+      "certainty": "documented",
+      "line_en": "Leonardo da Vinci dies at Cloux. Melzi reports the death in a letter dated 1 June.",
+      "line_de": "Leonardo da Vinci stirbt in Cloux. Melzi berichtet davon in einem Brief vom 1. Juni.",
+      "document": "Francesco Melzi's letter of 1 June 1519 to Leonardo's brothers",
+      "holder": null,
+      "plate_file": null,
+      "source_url": "https://www.treccani.it/enciclopedia/leonardo-da-vinci_(Dizionario-Biografico)/",
+      "station": "line-amboise",
+      "date_end": null,
+      "date_original": "2 May 1519",
+      "date_alternatives": [],
+      "date_label_en": "2 May 1519",
+      "date_label_de": "2. Mai 1519",
+      "calendar": "Julian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": null,
+      "qualifications_de": null,
+      "sources": [
+        {
+          "url": "https://www.treccani.it/enciclopedia/leonardo-da-vinci_(Dizionario-Biografico)/",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 41"
+        }
+      ],
+      "gaps": [
+        "Present document holder not established by the cited catalog row."
+      ],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 5
+    },
+    {
+      "id": "life-42",
+      "catalogue_row": 42,
+      "date": "1519-08-12",
+      "date_precision": "day",
+      "certainty": "documented",
+      "line_en": "A reported church-register entry dates his burial at Saint-Florentin to this day.",
+      "line_de": "Ein überlieferter Kirchenbucheintrag datiert seine Bestattung in Saint-Florentin auf diesen Tag.",
+      "document": "the burial entry in the church register",
+      "holder": null,
+      "plate_file": null,
+      "source_url": "https://en.wikipedia.org/wiki/Leonardo_da_Vinci",
+      "station": "line-amboise",
+      "date_end": null,
+      "date_original": "12 Aug 1519",
+      "date_alternatives": [],
+      "date_label_en": "12 August 1519",
+      "date_label_de": "12. August 1519",
+      "calendar": "Julian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": "The cited account reports a register entry. The original entry and its present holder were not independently verified.",
+      "qualifications_de": "Die zitierte Darstellung berichtet von einem Registereintrag. Original und heutiger Aufbewahrungsort wurden nicht unabhängig geprüft.",
+      "sources": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Leonardo_da_Vinci",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 42"
+        },
+        {
+          "url": "https://www.italianartsociety.org/2017/08/leonardo-died-on-2-may-1519-it-was-not-though-until-12-august-1519-that-he-was-buried-in-amboise-france/",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 42"
+        }
+      ],
+      "gaps": [
+        "Present document holder not established by the cited catalog row."
+      ],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 6
+    },
+    {
+      "id": "life-43",
+      "catalogue_row": 43,
+      "date": "1570",
+      "date_precision": "circa",
+      "certainty": "inferred",
+      "line_en": "After Melzi's death, the manuscripts pass to his son Orazio.",
+      "line_de": "Nach Melzis Tod gehen die Manuskripte an seinen Sohn Orazio über.",
+      "document": "the family record",
+      "holder": null,
+      "plate_file": null,
+      "source_url": "https://courier.unesco.org/en/articles/strange-vicissitudes-leonardos-manuscripts",
+      "station": "line-amboise",
+      "date_end": null,
+      "date_original": "1570",
+      "date_alternatives": [],
+      "date_label_en": "About 1570",
+      "date_label_de": "Um 1570",
+      "calendar": "Julian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": null,
+      "qualifications_de": null,
+      "sources": [
+        {
+          "url": "https://courier.unesco.org/en/articles/strange-vicissitudes-leonardos-manuscripts",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 43"
+        }
+      ],
+      "gaps": [
+        "Present document holder not established by the cited catalog row."
+      ],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 7
+    },
+    {
+      "id": "life-44",
+      "catalogue_row": 44,
+      "date": "1582",
+      "date_precision": "range",
+      "certainty": "inferred",
+      "line_en": "Pompeo Leoni acquires and rearranges sheets into albums during the 1580s.",
+      "line_de": "Pompeo Leoni erwirbt in den 1580er Jahren Blätter und ordnet sie in Alben neu.",
+      "document": "the Leoni bindings themselves",
+      "holder": null,
+      "plate_file": null,
+      "source_url": "https://courier.unesco.org/en/articles/strange-vicissitudes-leonardos-manuscripts",
+      "station": "line-amboise",
+      "date_end": "1590",
+      "date_original": "1582 to 1590",
+      "date_alternatives": [],
+      "date_label_en": "1582 to 1590",
+      "date_label_de": "1582 bis 1590",
+      "calendar": "Gregorian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": null,
+      "qualifications_de": null,
+      "sources": [
+        {
+          "url": "https://courier.unesco.org/en/articles/strange-vicissitudes-leonardos-manuscripts",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 44"
+        }
+      ],
+      "gaps": [
+        "Present document holder not established by the cited catalog row."
+      ],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 8
+    },
+    {
+      "id": "life-45",
+      "catalogue_row": 45,
+      "date": "1637",
+      "date_precision": "year",
+      "certainty": "documented",
+      "line_en": "Arconati gives the Codex Atlanticus and other manuscripts to the Ambrosiana.",
+      "line_de": "Arconati schenkt der Ambrosiana den Codex Atlanticus und weitere Manuskripte.",
+      "document": "the deed of donation, with its inscribed stone in the Ambrosiana",
+      "holder": "Veneranda Biblioteca Ambrosiana",
+      "plate_file": null,
+      "source_url": "https://en.wikipedia.org/wiki/Codex_Atlanticus",
+      "station": "line-amboise",
+      "date_end": null,
+      "date_original": "1637",
+      "date_alternatives": [],
+      "date_label_en": "1637",
+      "date_label_de": "1637",
+      "calendar": "Gregorian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": null,
+      "qualifications_de": null,
+      "sources": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Codex_Atlanticus",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 45"
+        }
+      ],
+      "gaps": [],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 9
+    },
+    {
+      "id": "life-46",
+      "catalogue_row": 46,
+      "date": "1796",
+      "date_precision": "year",
+      "certainty": "documented",
+      "line_en": "French requisitions take the manuscripts to Paris.",
+      "line_de": "Französische Beschlagnahmungen bringen die Manuskripte nach Paris.",
+      "document": "the requisition lists",
+      "holder": null,
+      "plate_file": null,
+      "source_url": "https://en.wikipedia.org/wiki/Codex_Atlanticus",
+      "station": "line-amboise",
+      "date_end": null,
+      "date_original": "1796",
+      "date_alternatives": [],
+      "date_label_en": "1796",
+      "date_label_de": "1796",
+      "calendar": "Gregorian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": null,
+      "qualifications_de": null,
+      "sources": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Codex_Atlanticus",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 46"
+        }
+      ],
+      "gaps": [
+        "Present document holder not established by the cited catalog row."
+      ],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 10
+    },
+    {
+      "id": "life-47",
+      "catalogue_row": 47,
+      "date": "1815",
+      "date_precision": "year",
+      "certainty": "documented",
+      "line_en": "The Codex Atlanticus returns to Milan. The smaller manuscripts remain in Paris.",
+      "line_de": "Der Codex Atlanticus kehrt nach Mailand zurück. Die kleineren Manuskripte bleiben in Paris.",
+      "document": "the restitution records",
+      "holder": null,
+      "plate_file": null,
+      "source_url": "https://en.wikipedia.org/wiki/Codex_Atlanticus",
+      "station": "line-amboise",
+      "date_end": null,
+      "date_original": "1815",
+      "date_alternatives": [],
+      "date_label_en": "1815",
+      "date_label_de": "1815",
+      "calendar": "Gregorian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": null,
+      "qualifications_de": null,
+      "sources": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Codex_Atlanticus",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 47"
+        }
+      ],
+      "gaps": [
+        "Present document holder not established by the cited catalog row."
+      ],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 11
+    },
+    {
+      "id": "life-48",
+      "catalogue_row": 48,
+      "date": "1863",
+      "date_precision": "year",
+      "certainty": "documented",
+      "line_en": "Houssaye excavates Saint-Florentin and identifies remains as Leonardo's. That identification is unproved.",
+      "line_de": "Houssaye gräbt in Saint-Florentin und deutet gefundene Überreste als diejenigen Leonardos. Die Identifizierung ist unbewiesen.",
+      "document": "the excavation report",
+      "holder": null,
+      "plate_file": null,
+      "source_url": "https://www.atlasobscura.com/places/leonardo-da-vincis-tomb",
+      "station": "line-amboise",
+      "date_end": null,
+      "date_original": "1863",
+      "date_alternatives": [],
+      "date_label_en": "1863",
+      "date_label_de": "1863",
+      "calendar": "Gregorian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": "The excavation and the attribution of the bones are different claims. Only the excavation is documented.",
+      "qualifications_de": "Die Ausgrabung und die Zuordnung der Knochen sind verschiedene Aussagen. Nur die Ausgrabung ist belegt.",
+      "sources": [
+        {
+          "url": "https://www.atlasobscura.com/places/leonardo-da-vincis-tomb",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 48"
+        }
+      ],
+      "gaps": [
+        "Present document holder not established by the cited catalog row."
+      ],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 12
+    },
+    {
+      "id": "life-49",
+      "catalogue_row": 49,
+      "date": "1874",
+      "date_precision": "year",
+      "certainty": "inferred",
+      "line_en": "The presumed remains are transferred to Saint-Hubert. The catalog gives 1874, which the holder citation does not firmly establish.",
+      "line_de": "Die mutmaßlichen Überreste werden nach Saint-Hubert überführt. Der Katalog nennt 1874, die zitierte Schlossquelle belegt dieses Jahr nicht eindeutig.",
+      "document": "the château's own account, which dates the move to the mid-19th century",
+      "holder": "Château royal d’Amboise",
+      "plate_file": null,
+      "source_url": "https://www.chateau-amboise.com/en/leonardo-da-vinci/",
+      "station": "line-amboise",
+      "date_end": null,
+      "date_original": "1874",
+      "date_alternatives": [],
+      "date_label_en": "1874",
+      "date_label_de": "1874",
+      "calendar": "Gregorian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": "The year 1874 remains a catalog claim awaiting a precise holder citation. The remains are presumed.",
+      "qualifications_de": "Das Jahr 1874 bleibt eine Katalogangabe ohne präzisen Beleg des Schlosses. Die Überreste sind mutmaßlich.",
+      "sources": [
+        {
+          "url": "https://www.chateau-amboise.com/en/leonardo-da-vinci/",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 49"
+        },
+        {
+          "url": "https://www.atlasobscura.com/places/leonardo-da-vincis-tomb",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 49"
+        }
+      ],
+      "gaps": [],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 13
+    },
+    {
+      "id": "life-50",
+      "catalogue_row": 50,
+      "date": "1911-08-21",
+      "date_precision": "day",
+      "certainty": "documented",
+      "line_en": "The Mona Lisa is stolen from the Louvre.",
+      "line_de": "Die Mona Lisa wird aus dem Louvre gestohlen.",
+      "document": "police and press record",
+      "holder": null,
+      "plate_file": null,
+      "source_url": "https://guides.loc.gov/chronicling-america-theft-mona-lisa",
+      "station": "line-amboise",
+      "date_end": null,
+      "date_original": "21 Aug 1911",
+      "date_alternatives": [],
+      "date_label_en": "21 August 1911",
+      "date_label_de": "21. August 1911",
+      "calendar": "Gregorian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": null,
+      "qualifications_de": null,
+      "sources": [
+        {
+          "url": "https://guides.loc.gov/chronicling-america-theft-mona-lisa",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 50"
+        }
+      ],
+      "gaps": [
+        "Present document holder not established by the cited catalog row."
+      ],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 14
+    },
+    {
+      "id": "life-51",
+      "catalogue_row": 51,
+      "date": "1913-12-11",
+      "date_precision": "day",
+      "certainty": "documented",
+      "line_en": "The stolen Mona Lisa is recovered in Florence.",
+      "line_de": "Die gestohlene Mona Lisa wird in Florenz wiedergefunden.",
+      "document": "police record",
+      "holder": null,
+      "plate_file": null,
+      "source_url": "https://en.wikipedia.org/wiki/Vincenzo_Peruggia",
+      "station": "line-amboise",
+      "date_end": null,
+      "date_original": "11 Dec 1913",
+      "date_alternatives": [],
+      "date_label_en": "11 December 1913",
+      "date_label_de": "11. Dezember 1913",
+      "calendar": "Gregorian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": null,
+      "qualifications_de": null,
+      "sources": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Vincenzo_Peruggia",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 51"
+        }
+      ],
+      "gaps": [
+        "Present document holder not established by the cited catalog row."
+      ],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 15
+    },
+    {
+      "id": "life-52",
+      "catalogue_row": 52,
+      "date": "1939-05-09",
+      "date_precision": "range",
+      "certainty": "documented",
+      "line_en": "Milan opens a major Leonardo exhibition and a display of Italian inventions under Fascist rule.",
+      "line_de": "Mailand eröffnet unter faschistischer Herrschaft eine große Leonardo-Ausstellung und eine Schau italienischer Erfindungen.",
+      "document": "the exhibition catalogue and archive",
+      "holder": null,
+      "plate_file": null,
+      "source_url": "https://journal.sciencemuseum.ac.uk/article/leonardo-exhibition-of-1939/",
+      "station": "line-amboise",
+      "date_end": "1939-10",
+      "date_original": "9 May to Oct 1939",
+      "date_alternatives": [],
+      "date_label_en": "9 May 1939 to October 1939",
+      "date_label_de": "9. Mai 1939 bis Oktober 1939",
+      "calendar": "Gregorian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": null,
+      "qualifications_de": null,
+      "sources": [
+        {
+          "url": "https://journal.sciencemuseum.ac.uk/article/leonardo-exhibition-of-1939/",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 52"
+        }
+      ],
+      "gaps": [
+        "Present document holder not established by the cited catalog row."
+      ],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 16
+    },
+    {
+      "id": "life-53",
+      "catalogue_row": 53,
+      "date": "1994-11-11",
+      "date_precision": "day",
+      "certainty": "documented",
+      "line_en": "Bill Gates buys the Codex Leicester at auction for 30,802,500 US dollars.",
+      "line_de": "Bill Gates ersteigert den Codex Leicester für 30.802.500 US-Dollar.",
+      "document": "the auction record",
+      "holder": "Private collection of Bill Gates",
+      "plate_file": null,
+      "source_url": "https://en.wikipedia.org/wiki/Codex_Leicester",
+      "station": "line-amboise",
+      "date_end": null,
+      "date_original": "11 Nov 1994",
+      "date_alternatives": [],
+      "date_label_en": "11 November 1994",
+      "date_label_de": "11. November 1994",
+      "calendar": "Gregorian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": null,
+      "qualifications_de": null,
+      "sources": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Codex_Leicester",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 53"
+        }
+      ],
+      "gaps": [],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 17
+    },
+    {
+      "id": "life-54",
+      "catalogue_row": 54,
+      "date": "2005",
+      "date_precision": "year",
+      "certainty": "documented",
+      "line_en": "The Vespucci note is identified in Heidelberg. Wider public attention follows later.",
+      "line_de": "Die Vespucci-Notiz wird in Heidelberg identifiziert. Größere öffentliche Aufmerksamkeit folgt später.",
+      "document": "the book itself",
+      "holder": "Universitätsbibliothek Heidelberg, D 7620 qt. INC",
+      "plate_file": "refs/life/plates/vespucci-note-1503-heidelberg__ub-heidelberg__2500x750.jpg",
+      "source_url": "https://www.uni-heidelberg.de/press/news/press552e.html",
+      "station": "line-amboise",
+      "date_end": null,
+      "date_original": "2005",
+      "date_alternatives": [],
+      "date_label_en": "2005",
+      "date_label_de": "2005",
+      "calendar": "Gregorian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": "Distinguish identification in 2005 from announcements and publication in 2008.",
+      "qualifications_de": "Die Identifizierung 2005 ist von Bekanntmachungen und Veröffentlichungen 2008 zu unterscheiden.",
+      "sources": [
+        {
+          "url": "https://www.uni-heidelberg.de/press/news/press552e.html",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 54"
+        }
+      ],
+      "gaps": [],
+      "plate_role": "document image",
+      "licence_line": "Public domain. Marginal note of Agostino Vespucci, October 1503, in Cicero, Epistulae ad familiares (1477). Universitatsbibliothek Heidelberg, shelfmark D 7620 qt. INC.",
+      "plate_pixels": {
+        "width": 2500,
+        "height": 750
+      },
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 18
+    },
+    {
+      "id": "life-55",
+      "catalogue_row": 55,
+      "date": "2017-11-15",
+      "date_precision": "day",
+      "certainty": "documented",
+      "line_en": "Salvator Mundi sells for 450.3 million US dollars including fees. Its attribution remains disputed.",
+      "line_de": "Salvator Mundi wird einschließlich Gebühren für 450,3 Millionen US-Dollar verkauft. Die Zuschreibung bleibt umstritten.",
+      "document": "the sale record",
+      "holder": null,
+      "plate_file": null,
+      "source_url": "https://www.theartnewspaper.com/2022/11/18/a-timeline-of-the-450m-salvator-mundi-centuries-of-deals-disputes-and-drama",
+      "station": "line-amboise",
+      "date_end": null,
+      "date_original": "15 Nov 2017",
+      "date_alternatives": [],
+      "date_label_en": "15 November 2017",
+      "date_label_de": "15. November 2017",
+      "calendar": "Gregorian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": null,
+      "qualifications_de": null,
+      "sources": [
+        {
+          "url": "https://www.theartnewspaper.com/2022/11/18/a-timeline-of-the-450m-salvator-mundi-centuries-of-deals-disputes-and-drama",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 55"
+        }
+      ],
+      "gaps": [
+        "Present document holder not established by the cited catalog row."
+      ],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 19
+    },
+    {
+      "id": "life-56",
+      "catalogue_row": 56,
+      "date": "2019-10-24",
+      "date_precision": "range",
+      "certainty": "documented",
+      "line_en": "The Louvre opens its Leonardo exhibition. It later reports 1,071,840 visits.",
+      "line_de": "Der Louvre eröffnet seine Leonardo-Ausstellung. Später meldet er 1.071.840 Besuche.",
+      "document": "the Louvre's own press release",
+      "holder": "Musée du Louvre",
+      "plate_file": null,
+      "source_url": "https://presse.louvre.fr/1-1-million-visitors-for-leonardo-da-vincibr-a-new-record-for-an-exhibitionnbspat-the-louvre/",
+      "station": "line-amboise",
+      "date_end": "2020-02-24",
+      "date_original": "24 Oct 2019 to 24 Feb 2020",
+      "date_alternatives": [],
+      "date_label_en": "24 October 2019 to 24 February 2020",
+      "date_label_de": "24. Oktober 2019 bis 24. Februar 2020",
+      "calendar": "Gregorian",
+      "document_status": "catalogue_citation_not_original_collation",
+      "qualifications_en": null,
+      "qualifications_de": null,
+      "sources": [
+        {
+          "url": "https://presse.louvre.fr/1-1-million-visitors-for-leonardo-da-vincibr-a-new-record-for-an-exhibitionnbspat-the-louvre/",
+          "supports": "Catalog event and document",
+          "local_source": "refs/MINING-CATALOG-LIFE.md section 1 row 56"
+        }
+      ],
+      "gaps": [],
+      "plate_role": null,
+      "licence_line": null,
+      "plate_pixels": null,
+      "german_provenance": "Newly authored for this commission.",
+      "display_order": 20
+    }
+  ],
+  "design": {
+    "spacing": "Evenly legible studs within each bay. Not proportional to elapsed time.",
+    "visit_day": "1517-10-10",
+    "museum_hour": "15:19 local apparent solar time",
+    "hour_certainty": "Chosen museum anchor. The diary does not record this minute.",
+    "afterlife": "Rows after 1519 belong to the later reception of the work, not to Leonardo’s witnessed lifetime."
+  }
+}
