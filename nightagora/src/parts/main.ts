@@ -302,7 +302,20 @@ async function show(name: string): Promise<void> {
 
   const make = SPECIMENS[current]
   if (!make) return
-  const part = make()
+  /* A BENCH THAT DIES ON ONE PART CANNOT JUDGE THE OTHER THIRTY-FIVE. A
+     builder that throws puts its message on the card and leaves the page
+     alive, so the rig gets a frame that says what went wrong rather than a
+     dead route it waits thirty seconds for. */
+  let part: Part
+  try {
+    part = make()
+  } catch (err) {
+    nameEl.textContent = current
+    saysEl.textContent = `this part did not build: ${(err as Error).message}`
+    numbersEl.textContent = ''
+    setsEl.textContent = ''
+    return
+  }
   standing = part
   scene.add(part)
 
@@ -369,10 +382,16 @@ async function show(name: string): Promise<void> {
     `${record.tris.toLocaleString('en')} triangles in ${record.draws} draw call(s) · ` +
     `the frame holds ${cost.draws} draws and ${cost.triangles.toLocaleString('en')} triangles · ` +
     `the ruler is ${metre}, banded at ${band}, the grid one metre`
+  /* WHAT EACH SURFACE IS STANDING ON, printed. A part that reads grey is
+     either a set whose bytes never landed or a base colour still holding the
+     placeholder, and the frame has to say which without a second window. */
+  const held = kit.bench
+    .report()
+    .map((b) => `${b.set} ${b.ready ? '' : 'WAITING '}${b.base.map((v) => v.toFixed(2)).join('/')}`)
   setsEl.textContent =
     `library sets: ${record.sets.join(', ') || 'none'}` +
     (record.generated.length ? ` · generated here: ${record.generated.join('; ')}` : '') +
-    ` · ${PROBE}, sun turned to ${KEY.azimuth} degrees`
+    ` · ${PROBE}, sun turned to ${KEY.azimuth} degrees · holding ${held.join(' | ')}`
   document.title = `${current} · parts kit`
 }
 
@@ -381,7 +400,11 @@ function round(v: number): number {
 }
 
 if (!current) current = names[0] as string
-await show(current)
+try {
+  await show(current)
+} catch (err) {
+  saysEl.textContent = `this part did not build: ${(err as Error).message}`
+}
 
 addEventListener('resize', () => {
   camera.aspect = innerWidth / innerHeight
@@ -418,9 +441,13 @@ window.__forgeParts = {
   jump(_state, opts = {}) {
     document.body.classList.add('forge')
     document.body.dataset['forge'] = 'pending'
-    void show(opts.part ?? current).then(() => {
-      document.body.dataset['forge'] = 'part'
-    })
+    void show(opts.part ?? current)
+      .catch((err: Error) => {
+        saysEl.textContent = `this part did not build: ${err.message}`
+      })
+      .then(() => {
+        document.body.dataset['forge'] = 'part'
+      })
   },
   freeze() {
     /* nothing on this route moves, so there is no clock to hold */

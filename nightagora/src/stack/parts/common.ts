@@ -194,12 +194,40 @@ export function at(
   return geometry
 }
 
-/** one body out of many pieces: one draw instead of a dozen. Every piece
-    must already carry the same attributes, which everything in this file
-    does (position, normal, uv). */
+/** THE THREE ATTRIBUTES EVERY PIECE OF THIS KIT CARRIES, and nothing else.
+    A merge fails outright on a mismatch, so the list is fixed here rather
+    than discovered from whichever piece happened to be first. */
+const WELDED = ['position', 'normal', 'uv'] as const
+
+/**
+ * One body out of many pieces: one draw instead of a dozen.
+ *
+ * The pieces do not arrive alike. Three's box, cylinder and tube are INDEXED
+ * and its extrusion is not, and `mergeGeometries` refuses a mixture outright
+ * (it returns null and a builder that welded a box to an extrusion would
+ * throw before its page ever drew). So a mixture is levelled to non-indexed
+ * first, and any attribute the others do not carry is dropped.
+ */
 export function weld(pieces: BufferGeometry[]): BufferGeometry {
-  const live = pieces.filter((g) => (g.getAttribute('position') as BufferAttribute | undefined)?.count)
-  const merged = live.length === 1 ? live[0] : mergeGeometries(live, false)
+  const live = pieces.filter(
+    (g) => (g.getAttribute('position') as BufferAttribute | undefined)?.count
+  )
+  if (!live.length) throw new Error('a part was welded out of nothing')
+  const indexed = live.every((g) => g.index !== null)
+  const ready = live.map((g) => {
+    const out = indexed || g.index === null ? g : g.toNonIndexed()
+    for (const name of Object.keys(out.attributes)) {
+      if (!(WELDED as readonly string[]).includes(name)) out.deleteAttribute(name)
+    }
+    if (!out.getAttribute('normal')) out.computeVertexNormals()
+    if (!out.getAttribute('uv')) {
+      const count = (out.getAttribute('position') as BufferAttribute).count
+      out.setAttribute('uv', new BufferAttribute(new Float32Array(count * 2), 2))
+    }
+    return out
+  })
+  if (ready.length === 1) return ready[0] as BufferGeometry
+  const merged = mergeGeometries(ready, false)
   if (!merged) throw new Error('the pieces of this part could not be welded')
   return merged
 }
@@ -256,6 +284,10 @@ export class Bench {
     tint: N
     value: number
     hex: string | undefined
+    /** lay the helper on again from the set as it now stands */
+    rebuild: () => void
+    /** whether that has already been done from a LANDED set */
+    settled: boolean
   }> = []
   private watching = false
 
@@ -272,15 +304,10 @@ export class Bench {
     const held = this.cache.get(key)
     if (held) return held
     const set = this.set(name)
-    const material = new MeshStandardNodeMaterial({
-      color: new Color(o.tint ?? '#ffffff').multiplyScalar(o.value ?? 1),
-      roughness: Math.max(set.roughness, o.roughFloor ?? 0),
-      metalness: o.metalness ?? set.metalness,
-    })
+    const material = new MeshStandardNodeMaterial()
+    material.name = key
     if (o.twoSided) material.side = DoubleSide
     const tint = uniform(vec3(1, 1, 1))
-    material.colorNode = tint
-    this.tinted.push({ set, tint, value: o.value ?? 1, hex: o.tint })
     /* WHERE THE SAMPLE LANDS, and it is the whole difference between a wall
        and a photograph of one. `wall` projects onto a vertical plane through
        the wall's own face, so a pier, a spandrel and an apron carry one
@@ -291,10 +318,33 @@ export class Bench {
       : o.world
         ? {}
         : { uv: uv() }
-    this.stack.detail(material, set, {
-      ...where,
-      count: this.stack.tierConfig().detail,
-      ...(o.maps === undefined ? {} : { maps: o.maps }),
+    const scales = { ...where, count: this.stack.tierConfig().detail }
+    /* THE PHOTOGRAPH IS NOT READ UNTIL IT HAS ARRIVED, and that is not a
+       nicety. A set's maps exist as one-texel stand-ins from the first frame
+       and their pixels are filled in later; a material that samples one
+       before the fill renders the stand-in's mid grey divided by the set's
+       own mean, which on a warm stone is a cool grey at a fifth of its value
+       and reads as polished slate. So the helper is laid on WITHOUT the
+       library while the bytes are in flight, and laid on again with it the
+       moment they land. The interim frame is the surface as it was authored,
+       which is the library's own rule. */
+    const rebuild = (): void => {
+      const landed = Boolean(set.ready.value)
+      material.color = new Color(o.tint ?? '#ffffff').multiplyScalar(o.value ?? 1)
+      material.roughness = Math.max(set.roughness, o.roughFloor ?? 0)
+      material.metalness = o.metalness ?? set.metalness
+      material.colorNode = tint
+      this.stack.detail(material, set, { ...scales, maps: landed ? (o.maps ?? 1) : 0 })
+      material.needsUpdate = true
+    }
+    rebuild()
+    this.tinted.push({
+      set,
+      tint,
+      value: o.value ?? 1,
+      hex: o.tint,
+      rebuild,
+      settled: Boolean(set.ready.value),
     })
     this.cache.set(key, material)
     this.refresh()
@@ -302,9 +352,19 @@ export class Bench {
     return material
   }
 
-  /** write every base colour again from the set's own measured mean */
+  /** write every base colour again from the set's own measured mean, and lay
+      the helper on again for any set whose bytes have just landed */
   refresh(): void {
     for (const t of this.tinted) {
+      /* THE HELPER READS THE SET AS CONSTANTS, and half of them arrive with
+         the MANIFEST. A material compiled before that fetch lands carries the
+         placeholder's tile size, its roughness and its neutral grey baked in,
+         and no amount of writing the base colour afterwards can move them. So
+         the graph is laid on again, once, the moment the set is whole. */
+      if (!t.settled && t.set.ready.value) {
+        t.settled = true
+        t.rebuild()
+      }
       const c = new Color(t.hex ?? '#ffffff')
       c.multiply(t.set.albedo).multiplyScalar(t.value)
       t.tint.value.set(c.r, c.g, c.b)

@@ -274,9 +274,12 @@ function wormPart(
     const phase = (s / lead) * 2 * Math.PI
     for (let j = 0; j <= around; j++) {
       const th = (j / around) * 2 * Math.PI
-      /* the thread: a rounded ridge that travels round the shaft once every
-         lead. Raised to a power so the flank is a flank and not a sine. */
-      const w = Math.pow(Math.max(0, Math.cos((th - phase) * 0.5 * starts)), 6)
+      /* the thread: ONE rounded ridge per start, travelling round the shaft
+         once every lead. The angle has to be wrapped into a single turn or
+         the cosine changes sign along the shaft and half the screw comes out
+         as a plain cylinder, which is what the first frame of this showed. */
+      const raw = ((th * starts - phase) % (2 * Math.PI) + 3 * Math.PI) % (2 * Math.PI) - Math.PI
+      const w = Math.pow(Math.max(0, Math.cos(raw * 0.5)), 7)
       const rr = core + (crest - core) * w
       position.push(rr * Math.cos(th), rr * Math.sin(th), s)
       uvs.push(th * crest, s)

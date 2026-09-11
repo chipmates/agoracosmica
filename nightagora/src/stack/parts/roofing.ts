@@ -416,21 +416,26 @@ export function dormerPart(bench: Bench, o: DormerOptions): Part {
   used.push(...light.userData.part.sets)
 
   /* ITS OWN ROOF, in its own slates */
+  /* THE CAP'S RIDGE RUNS FRONT TO BACK, from the dormer's own face into the
+     slope behind it, which is what makes a gabled dormer a gable and not a
+     roof laid the wrong way. `roofPart` builds its ridge along x, so the
+     width it is given is the dormer's DEPTH and the whole cap is turned a
+     quarter turn onto the dormer. */
   const cap = roofPart(bench, {
-    width: faceW + 0.12,
-    depth: reach * 1.5,
+    width: reach * 1.9,
+    depth: faceW + 0.16,
     pitch: o.pitch ?? 44,
     kind: kind === 'hip' ? 'hip' : 'gable',
-    overhang: 0.1,
-    gauge: 0.12,
-    slate: { width: 0.2, length: 0.34 },
+    overhang: 0.09,
+    gauge: 0.11,
+    slate: { width: 0.19, length: 0.32 },
     gable: kind === 'hip' ? 'none' : 'plain',
     ...(sets.slate === undefined ? {} : { sets: { slate: sets.slate } }),
     seed: (o.seed ?? 41) + 7,
     lod,
   })
   cap.rotation.y = Math.PI / 2
-  cap.position.set(0, faceH, -reach * 0.25)
+  cap.position.set(0, faceH, -reach * 0.42)
   group.add(cap)
   used.push(...cap.userData.part.sets)
 

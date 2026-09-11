@@ -60,8 +60,12 @@ interface Habit {
   tropism: number
   /** how many attraction points the crown is seeded with */
   points: number
-  /** the leaf card's own size in metres, and how many stand at a twig's end */
+  /** the leaf card's own size in metres AT THE NOMINAL HEIGHT, and how many
+      stand at a twig's end. A card is a spray of leaves, so its size follows
+      the tree's own only weakly: a bush's foliage is not a twentieth of an
+      oak's because the bush is a twentieth as tall. */
   leaf: number
+  nominal: number
   cards: number
   /** what the leaves are, in summer and in October */
   green: string
@@ -84,7 +88,8 @@ const HABIT: Record<Species, Habit> = {
     step: 0.028,
     tropism: 0.12,
     points: 900,
-    leaf: 0.42,
+    leaf: 0.46,
+    nominal: 16,
     cards: 5,
     green: '#4c6a33',
     autumn: '#8a6733',
@@ -99,7 +104,8 @@ const HABIT: Record<Species, Habit> = {
     step: 0.026,
     tropism: 0.3,
     points: 900,
-    leaf: 0.36,
+    leaf: 0.4,
+    nominal: 14,
     cards: 5,
     green: '#5b7a3a',
     autumn: '#b39b3d',
@@ -114,7 +120,8 @@ const HABIT: Record<Species, Habit> = {
     step: 0.028,
     tropism: 0.16,
     points: 820,
-    leaf: 0.46,
+    leaf: 0.5,
+    nominal: 15,
     cards: 5,
     green: '#587339',
     autumn: '#9c7a38',
@@ -130,6 +137,7 @@ const HABIT: Record<Species, Habit> = {
     tropism: 0.2,
     points: 900,
     leaf: 0.3,
+    nominal: 6,
     cards: 6,
     green: '#28402a',
     autumn: '#28402a',
@@ -144,7 +152,8 @@ const HABIT: Record<Species, Habit> = {
     step: 0.022,
     tropism: 0.62,
     points: 760,
-    leaf: 0.34,
+    leaf: 0.3,
+    nominal: 9,
     cards: 5,
     green: '#2f4531',
     autumn: '#2f4531',
@@ -159,7 +168,8 @@ const HABIT: Record<Species, Habit> = {
     step: 0.05,
     tropism: 0.22,
     points: 420,
-    leaf: 0.22,
+    leaf: 0.24,
+    nominal: 1.5,
     cards: 5,
     green: '#4f6b36',
     autumn: '#7d7a38',
@@ -553,7 +563,10 @@ export function treePart(bench: Bench, o: TreeOptions): Part {
   if (season !== 'bare') {
     const tips = shoots.filter((s, i) => s.parent >= 0 && !shoots.some((c) => c.parent === i))
     const cells = lod >= 3 ? 4 : lod === 2 ? 2 : 1
-    const size = h.leaf * height * 0.055 * (lod >= 3 ? 1 : lod === 2 ? 1.4 : 2.1)
+    const size =
+      h.leaf *
+      Math.min(1.6, Math.max(0.6, Math.pow(height / h.nominal, 0.4))) *
+      (lod >= 3 ? 1 : lod === 2 ? 1.4 : 2.1)
     const perTip = Math.max(1, Math.round(h.cards * (lod >= 3 ? 1 : lod === 2 ? 0.75 : 0.4)))
     const atlas = leafAtlas(h, season, lod >= 3 ? 512 : 256)
     const material = foliageMaterial(atlas)
