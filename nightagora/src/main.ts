@@ -20,8 +20,9 @@ import { readLabels, type ForgeLabel } from './core/labels'
 import { DISCLOSURES } from './content/disclosures'
 import { WINGS, wingBySlug, wingsOpen, wingsPreparing } from './wings/registry'
 import { wingCount } from './wings/content'
+import { benchOptions, benchPath, createBench, type BenchOptions } from './bench'
 
-type Phase = 'transit' | 'held' | 'descent' | 'agora' | 'wheel' | 'breath' | 'wing'
+type Phase = 'transit' | 'held' | 'descent' | 'agora' | 'wheel' | 'breath' | 'wing' | 'bench'
 /** what the rig may ask for: the phases, plus the wheel with a pane open */
 type ForgeState = Phase | 'pane'
 
@@ -34,6 +35,7 @@ const LOOK = {
   wheel: 'gold-on-ink',
   breath: 'gold-breath',
   wing: 'first-station',
+  bench: 'first-station',
 } satisfies Record<Phase, GradeName>
 
 function isPhase(v: string | null | undefined): v is Phase {
@@ -561,6 +563,13 @@ declare global {
           view?: string
           /** Shell close-ups for THE EYES; the journey uses real input. */
           shell?: 'instruments'
+          /** which bench a `bench` state stands at, and which of its states:
+              a machine by `slug`, the table or the line by `state`, the
+              picture bench by `segment` */
+          kind?: string
+          state?: string
+          segment?: string
+          lang?: 'en' | 'de'
         }
       ) => void
       freeze: (t: number) => void
@@ -610,6 +619,9 @@ declare global {
       /** stand at a station by its id. False when this wing has no such
           station, so a rig reports a station that never took. */
       station: (id: string) => boolean
+      /** what the standing bench measures of itself: its own joints, its
+          own scale, its own plate. Null when no bench stands. */
+      bench: () => unknown
       cost: () => {
         draws: number
         triangles: number
@@ -629,6 +641,7 @@ declare global {
 // ---- THE MUSEUM'S ROUTE: / is the lobby, /w/<slug> is a wing ----
 const wingFrame = createWingFrame(wingEl, () => toLobby(), stack, () => performance.now() / 1000)
 let wingSlug = ''
+const bench = createBench(stack, () => toLobby())
 
 /** A wing's own address, with the station the visitor stood at. */
 function wingPath(): { slug: string; station: number | string } | null {
@@ -679,9 +692,15 @@ function toLobby(): void {
 
 // the browser's own back and forward walk the same two addresses
 addEventListener('popstate', () => {
+  const stand = benchPath()
+  if (stand) {
+    if (phase !== 'bench') setPhase('bench')
+    void bench.open(benchOptions(stand))
+    return
+  }
   const here = wingPath()
   if (here) void openWing(here.slug, here.station)
-  else if (phase === 'wing') toLobby()
+  else if (phase === 'wing' || phase === 'bench') toLobby()
 })
 
 // the lobby's plate: what the register can answer for, said once
@@ -697,6 +716,14 @@ window.__forge = {
       return
     }
     document.body.classList.add('forge') // DOM beats compose instantly
+    /* a bench stamps the marker itself, when the thing it stands is
+       actually standing: its geometry and its plate arrive after the jump
+       returns, and a frame shot in between is of an empty stage */
+    if (state === 'bench') {
+      if (phase !== 'bench') setPhase('bench')
+      void bench.open(opts as BenchOptions).catch((e: unknown) => console.error(e))
+      return
+    }
     // the rig proves the state it ASKED for took, which the phase alone
     // cannot say: the pane is the wheel with a figure held open
     document.body.dataset['forge'] = 'pending'
@@ -775,23 +802,40 @@ window.__forge = {
     document.body.dataset['forge'] = state
   },
   freeze(t) {
+    bench.freeze(t)
     elapsed = t
     frozen = true
   },
   tier(name) {
-    if (isTierName(name)) stack.tier(name)
+    if (!isTierName(name)) return
+    /* a bench whose geometry and maps are allocated for one tier is sent
+       round its own address again: switching live would leave half of it
+       dressed for the tier before */
+    const here = bench.reloadOnTier() ? bench.address() : null
+    if (here) {
+      const target = new URL(location.href)
+      target.pathname = here
+      target.searchParams.set('tier', name)
+      location.assign(target)
+      return
+    }
+    stack.tier(name)
   },
   cost() {
     return stack.cost()
   },
   manifest() {
-    return stack.materials.manifest()
+    return [...stack.materials.manifest(), ...bench.manifest()]
   },
   labels() {
     return readLabels()
   },
   disclosures() {
     return DISCLOSURES
+  },
+  /** what the standing bench measures of itself, or null when none stands */
+  bench() {
+    return bench.telemetry()
   },
   look(yaw, pitch) {
     // a wing drives its own camera, so the cone of a station is turned
@@ -809,30 +853,39 @@ window.__forge = {
     return { rigs: stack.lights(), sceneObjects: stack.sceneObjects() }
   },
   relight() {
+    if (bench.active()) {
+      bench.relight()
+      return bench.lights() ?? { rigs: stack.lights(), sceneObjects: stack.sceneObjects() }
+    }
     stack.light(KEY_OPTIONS)
     return { rigs: stack.lights(), sceneObjects: stack.sceneObjects() }
   },
   rail(t) {
+    if (bench.active()) {
+      bench.rail(t)
+      return
+    }
     const count = wingFrame.stations()
     if (!count) return
     wingFrame.goto(Math.round(Math.min(1, Math.max(0, t)) * (count - 1)))
   },
   station(id) {
-    return wingFrame.gotoId(id)
+    return bench.active() ? bench.station(id) : wingFrame.gotoId(id)
   },
   // the rig's stethoscope: read the live blend state without guessing
   // from pixels (numbers first, then the shot)
   state() {
+    const stand = bench.reading()
     return {
       phase,
       agoraReveal,
       desc,
-      station: wingFrame.station(),
-      stations: wingFrame.stations(),
-      stationId: wingFrame.stationId(),
-      stationIds: wingFrame.stationIds(),
+      station: stand ? stand.station : wingFrame.station(),
+      stations: stand ? stand.stations : wingFrame.stations(),
+      stationId: stand ? stand.stationId : wingFrame.stationId(),
+      stationIds: stand ? stand.stationIds : wingFrame.stationIds(),
       door: wingFrame.doorHere(),
-      texturesPending: stack.materials.pending(),
+      texturesPending: stack.materials.pending() + (stand?.texturesPending ?? 0),
       // what the last frame actually cost: the rig quotes this instead of
       // guessing from a software-rasterizer fps number
       draws: renderer.info.render.drawCalls,
@@ -856,6 +909,7 @@ function setPhase(next: Phase): void {
     console.warn(`no such phase: ${String(next)}`)
     return
   }
+  if (next !== 'bench') bench.close()
   phase = next
   document.body.dataset['phase'] = next
   stack.setScene(scene, camera, LOOK[next])
@@ -888,7 +942,7 @@ function setPhase(next: Phase): void {
   } else {
     skyDress(false)
   }
-  if (next === 'breath' || next === 'wing') {
+  if (next === 'breath' || next === 'wing' || next === 'bench') {
     setStatus('')
     verseEl.classList.remove('lit') // the cut carries no letterpress
     railEl.hidden = true
@@ -1031,6 +1085,12 @@ function frame(now: number): void {
   if (hidden) return
   const dt = Math.min((now - last) / 1000, 0.05)
   last = now
+  /* a bench owns the whole frame: its own clock, its own scene, its own
+     render. Nothing of the night's overture runs behind it. */
+  if (bench.active()) {
+    bench.frame(dt)
+    return
+  }
   if (!frozen) elapsed += dt
 
   /* The overture crosses on its own clock, and the eye's clock is frozen:
@@ -1265,6 +1325,12 @@ function freeLookYTarget(): number {
 /** A visitor who arrives at /w/<slug> came back for the wing, not for the
     overture: the eclipse and the descent are skipped whole. */
 function bootRoute(): boolean {
+  const stand = benchPath()
+  if (stand) {
+    setPhase('bench')
+    void bench.open(benchOptions(stand))
+    return true
+  }
   const here = wingPath()
   if (!here) return false
   if (!wingBySlug(here.slug)) {

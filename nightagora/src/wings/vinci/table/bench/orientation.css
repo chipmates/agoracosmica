@@ -1,0 +1,49 @@
+.table-orientation-hour { margin:14px 0 0; max-width:100%; color:#b5a58b; }
+.table-orientation-position { margin:0 0 7px; font:10px/1.4 system-ui,sans-serif; letter-spacing:.13em; text-transform:uppercase; }
+.table-orientation-hour-caption { margin:0 0 3px; font:11px/1.5 system-ui,sans-serif; }
+.table-orientation-arithmetic { margin:0; font:11px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace; color:#d0b98d; overflow-wrap:anywhere; }
+.table-orientation-lamp-note { margin:4px 0 0; font:11px/1.5 system-ui,sans-serif; color:#a79e8c; }
+.table-orientation-navigation { display:flex; flex:1 1 100%; align-items:stretch; min-width:0; width:100%; max-width:100%; border-bottom:1px solid #4a4233; }
+.table-orientation-stations { display:flex; position:relative; align-items:stretch; min-width:0; flex:1 1 auto; overflow-x:auto; overflow-y:hidden; scrollbar-width:thin; scrollbar-color:#655740 transparent; }
+.table-orientation-station { display:flex; flex:0 0 auto; align-items:center; gap:9px; min-width:44px; min-height:44px; max-width:280px; padding:10px 14px; color:#9f947f; text-decoration:none; border-right:1px solid #4a4233; font:11px/1.35 system-ui,sans-serif; }
+.table-orientation-station-number { font:11px/1.4 ui-monospace,SFMono-Regular,Consolas,monospace; }
+.table-orientation-station-name { max-width:24ch; }
+.table-orientation-station[aria-current=page] { color:#e5d7ba; background:#343025; box-shadow:inset 0 -2px #b7a078; }
+.table-orientation-station:hover { color:#eadcc0; background:#28251d; }
+.table-orientation-navigation .table-orientation-source { flex:0 0 auto; min-width:106px; min-height:44px; border:0; border-left:1px solid #4a4233; padding:10px 14px; background:#1a1914; color:#d2c09b; font:10px/1.4 system-ui,sans-serif; letter-spacing:.08em; text-transform:uppercase; cursor:pointer; }
+.table-orientation-footer { margin:20px auto 28px; padding:0 22px; max-width:760px; text-align:center; }
+.table-orientation-question { margin:0 0 10px; font:20px/1.4 Georgia,'Times New Roman',serif; color:#d7c9ad; user-select:text; }
+.table-orientation-door { display:inline-flex; align-items:center; justify-content:center; min-height:44px; min-width:44px; padding:10px 24px; border:1px solid #706044; color:#e0cba3; font:12px/1.5 system-ui,sans-serif; text-decoration:none; }
+.table-orientation-door:hover { background:#2c271d; }
+.table-orientation-door-note,.table-orientation-door-scope { margin:9px auto 0; max-width:64ch; font:10px/1.5 system-ui,sans-serif; color:#9f947f; }
+.table-orientation-door-scope { margin-top:4px; color:#8f887a; }
+.table-orientation-navigation :focus-visible,.table-orientation-footer a:focus-visible { outline:2px solid #c7b995; outline-offset:3px; }
+.table-orientation-drawer { box-sizing:border-box; position:fixed; inset:32px 24px 32px auto; margin:0; width:min(560px,calc(100vw - 48px)); max-width:none; max-height:calc(100dvh - 64px); padding:0; border:1px solid #756449; color:#d5c8b0; background:#1c1a14; box-shadow:0 12px 70px #0008; overflow:auto; text-align:left; }
+.table-orientation-drawer::backdrop { background:#090907b0; }
+.table-orientation-drawer-heading { position:sticky; top:0; display:flex; align-items:center; justify-content:space-between; gap:14px; padding:16px 20px; background:#211e17; border-bottom:1px solid #615238; }
+.table-orientation-source-title { margin:0; font:24px/1.2 Georgia,'Times New Roman',serif; font-weight:400; color:#e1d4bc; }
+.table-orientation-navigation .table-orientation-close { min-width:44px; min-height:44px; padding:9px 12px; border:1px solid #706044; color:#d4c3a3; background:#191712; font:11px/1.4 system-ui,sans-serif; cursor:pointer; }
+.table-orientation-drawer-body { padding:0 22px 24px; }
+.table-orientation-plate-source,.table-orientation-hour-source { padding:22px 0 0; }
+.table-orientation-plate-source + .table-orientation-plate-source,.table-orientation-hour-source { margin-top:22px; border-top:1px solid #5e503a; }
+.table-orientation-drawer h3 { margin:0 0 12px; font:21px/1.35 Georgia,'Times New Roman',serif; font-weight:400; }
+.table-orientation-eyebrow { margin:0 0 6px; color:#a99d86; font:10px/1.4 system-ui,sans-serif; letter-spacing:.1em; text-transform:uppercase; }
+.table-orientation-source-copy,.table-orientation-integrity,.table-orientation-holder,.table-orientation-licence { margin:12px 0 0; font:15px/1.6 Georgia,'Times New Roman',serif; overflow-wrap:anywhere; }
+.table-orientation-licence { color:#afa38d; font:12px/1.6 system-ui,sans-serif; }
+.table-orientation-integrity { color:#d1b98d; }
+.table-orientation-source-link { display:inline-flex; align-items:center; min-height:44px; min-width:44px; margin-top:8px; padding:8px 0; color:#d7c197; text-decoration:underline; text-underline-offset:3px; font:13px/1.5 system-ui,sans-serif; }
+.table-orientation-hour-source .table-orientation-arithmetic { margin-top:14px; }
+@media(max-width:759px) {
+  .table-orientation-hour { margin-top:12px; }
+  .table-orientation-position { font-size:9px; margin-bottom:6px; }
+  .table-orientation-hour-caption,.table-orientation-arithmetic,.table-orientation-lamp-note { font-size:10px; }
+  .table-orientation-navigation { grid-column:1/-1; }
+  .table-orientation-station { max-width:240px; padding:9px 12px; font-size:10px; }
+  .table-orientation-navigation .table-orientation-source { min-width:92px; padding:10px; font-size:9px; }
+  .table-orientation-footer { margin-top:18px; margin-bottom:24px; }
+  .table-orientation-question { font-size:19px; }
+  .table-orientation-drawer { inset:16px; width:calc(100vw - 32px); max-height:calc(100dvh - 32px); }
+  .table-orientation-drawer-heading { padding:12px 14px; }
+  .table-orientation-source-title { font-size:21px; }
+  .table-orientation-drawer-body { padding-inline:18px; }
+}

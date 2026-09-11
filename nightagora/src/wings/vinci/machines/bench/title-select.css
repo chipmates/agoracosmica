@@ -1,0 +1,10 @@
+/* Optional native-selection display. Imported when its wrapper is integrated. */
+.bench-title-select{position:relative;display:grid;align-items:center;min-width:0;min-height:44px;box-sizing:border-box;border:1px solid #746e6050;background:#191d20;font:15px/1.2 Georgia,'Times New Roman',serif}
+.bench-title-select-value{display:block;padding:8px 34px 8px 13px;overflow-wrap:anywhere;pointer-events:none}
+.bench-title-select::after{content:'';position:absolute;right:13px;top:50%;width:7px;height:7px;border-right:2px solid #dedace;border-bottom:2px solid #dedace;transform:translateY(-70%) rotate(45deg);pointer-events:none}
+.bench-title-select:hover,.bench-title-select:focus-within{border-color:#d6b46f}
+.bench .bench-title-select-native{position:absolute;inset:0;z-index:1;width:100%!important;height:100%;max-width:none!important;min-width:0;min-height:44px;box-sizing:border-box;appearance:none;padding:0!important;border:0!important;color:transparent!important;background:transparent!important;font-size:16px}
+.bench-title-select-native option{color:#e7e2d7;background:#191d20}
+.bench-nav{flex:1 1 508px;max-width:508px;min-width:0}.bench-nav button{flex:0 0 44px}.bench-playback{flex:none}
+.bench-nav .bench-title-select{width:auto;max-width:400px;min-width:0;flex:1 1 400px}
+@media(max-width:1280px){.bench-nav{width:100%;max-width:none}.bench-nav .bench-title-select{width:0;max-width:none;flex:1;font-size:12px}.bench-title-select-value{padding:6px 29px 6px 10px}.bench-title-select::after{right:11px}}

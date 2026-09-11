@@ -1,0 +1,20 @@
+/* Optional GENERATED evidence navigation. Import only when the controller is
+   integrated. The locked article text and normal bench layout are unchanged. */
+.bench-evidence-backdrop{position:absolute;inset:0;z-index:1;background:#080b0d68;pointer-events:auto}
+.bench-evidence-backdrop[hidden]{display:none}
+.bench-source.bench-evidence-enhanced{z-index:2;background:#191e23;scroll-padding-top:240px}
+.bench-evidence-tools{position:sticky;top:-30px;z-index:3;margin:-30px -30px 22px;padding:14px 30px 16px;background:#191e23;border-bottom:1px solid #9e907654;font:13px/1.4 Arial,sans-serif}
+.bench-evidence-top{display:flex;align-items:center;gap:12px;margin-bottom:9px}
+.bench-evidence-caption{flex:1;margin:0;color:#c8aa75;letter-spacing:.08em}
+.bench-evidence-languages{display:flex;gap:4px}
+.bench-evidence-languages button{border-color:transparent;font:12px Arial,sans-serif}
+.bench-evidence-languages button[aria-pressed="true"]{border-bottom-color:#d6b46f;color:#ecd7ac}
+.bench-evidence-tools .bench-source-close{position:static;float:none;flex:none;min-height:44px;width:44px;font:24px Arial,sans-serif}
+.bench-evidence-picker{display:grid;gap:7px;min-width:0;color:#aaa598}
+.bench-evidence-picker-label{font-size:12px}
+.bench-evidence-tools .bench-title-select{width:100%;min-width:0;font:14px/1.4 Arial,sans-serif;color:#e7e2d7;background:#20262b}
+.bench .bench-evidence-record.bench-title-select-native{font-size:16px}
+.bench .bench-evidence-return{display:block;width:100%;margin-top:9px;padding:10px 12px;min-height:44px;font:13px/1.4 Arial,sans-serif;text-align:left;overflow-wrap:anywhere}
+.bench .bench-evidence-return[hidden]{display:none}
+.bench-evidence-enhanced .bench-page h1:focus-visible{outline:2px solid #d6b46f;outline-offset:5px}
+@media(max-width:1280px){.bench-evidence-tools{top:-21px;margin:-21px -21px 20px;padding:10px 21px 13px}.bench-evidence-top{gap:7px}.bench-source.bench-evidence-enhanced{scroll-padding-top:280px}.bench-evidence-picker-label{font-size:11px}.bench-evidence-tools .bench-title-select{font-size:13px}}
