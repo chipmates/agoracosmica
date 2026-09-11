@@ -4,7 +4,7 @@
 // Usage: pnpm build && node forge/cost.mjs
 import { chromium } from 'playwright'
 import { spawn } from 'node:child_process'
-const PORT = 5194
+const PORT = Number(process.env['FORGE_PORT'] ?? 5194)
 const BASE = `http://localhost:${PORT}`
 const server = spawn('pnpm', ['preview', '--port', String(PORT), '--strictPort'], { stdio: 'ignore' })
 async function wait(url, tries = 90) {

@@ -58,6 +58,7 @@ import {
   exp,
   float,
   fract,
+  fwidth,
   length,
   max,
   min,
@@ -175,7 +176,10 @@ function medianSpacing(seats: Array<[number, number]>): number {
 
 // ------------------------------------------------------- the shared hand
 /** a ring with no edge on either side of it */
-const ringAt = (r: N, at: N, w: N): N => pow(oneMinus(min(abs(r.sub(at)).div(w), 1)), 2.4)
+const ringAt = (r: N, at: N, w: N): N => {
+  const aa = max(fwidth(r), 0.001)
+  return oneMinus(smoothstep(w, w.add(aa), abs(r.sub(at)))).mul(min(w.div(aa), 1))
+}
 
 /** a needle of light: it runs to `reach` and thins as it goes */
 const ray = (along: N, across: N, reach: N, wide: number): N => {
@@ -240,6 +244,8 @@ const smooth01 = (x: number): number => {
   return t * t * (3 - 2 * t)
 }
 
+const cleanLevel = (v: number | undefined): number => Number.isFinite(v) ? Math.min(4, Math.max(0, v ?? 0)) : 0
+
 export function createSign(opts: SignOptions): Sign {
   const GOLD = opts.gold ?? new Color(GOLD_HEX)
   const EMBER = opts.ember ?? new Color(EMBER_HEX)
@@ -250,7 +256,7 @@ export function createSign(opts: SignOptions): Sign {
      husk, rays, rings, aureole — and it only reaches gold once the seed
      has earned it. */
   const CORE_RAMP = [
-    EMBER.clone(),
+    EMBER.clone().lerp(STARLIGHT, 0.16),
     EMBER.clone().lerp(GOLD, 0.62),
     GOLD.clone().lerp(STARLIGHT, 0.2),
     GOLD.clone().lerp(STARLIGHT, 0.6),
@@ -275,9 +281,9 @@ export function createSign(opts: SignOptions): Sign {
 
   // the quad has to hold the widest thing the language ever draws, which
   // is the bloomed star's aureole
-  const STAR_QUAD = UNIT * 1.5
+  const STAR_QUAD = UNIT * 1.04
   const STAR_HALF = STAR_QUAD * 0.5
-  const THREAD_W = UNIT * 0.075
+  const THREAD_W = UNIT * 0.032
   const LIFT = UNIT * 0.058
 
   const seeds: SeedStar[] = []
@@ -380,7 +386,7 @@ export function createSign(opts: SignOptions): Sign {
     // 1 · THE POINT — the seed itself: a tight core, a soft skirt, and a
     // low warm breath around it, because an ember is a COAL and not a
     // pinprick. This is the mark that has to carry stage one on its own.
-    const coreR = float(0.125).add(w2.mul(0.026)).add(w4.mul(0.018))
+    const coreR = float(0.105).add(w2.mul(0.012)).add(w4.mul(0.012))
     const fall = oneMinus(min(r.div(coreR), 1))
     const seat = oneMinus(min(r.div(coreR.mul(2.4)), 1))
     const point = pow(fall, 2.2).mul(0.4).add(pow(fall, 9).mul(1.05)).add(pow(seat, 2.6).mul(0.19))
@@ -395,20 +401,10 @@ export function createSign(opts: SignOptions): Sign {
     // seed splits, and by the time the star has risen it is gone. A
     // WHISPER of a shell: round 1 drew it as a stroke and twelve badges
     // came back.
-    const husk = ringAt(r, float(0.245).add(w1.mul(0.095)), float(0.072).add(w1.mul(0.04)))
-      .mul(float(0.21).sub(w1.mul(0.06)))
-      .add(pow(oneMinus(min(r.div(0.36), 1)), 2.2).mul(0.028))
-      .mul(oneMinus(w2))
-
-    // 3 · THE MARK — the quiet circle that says this is a star on a
-    // chart. It arrives when the seed has risen, and then it GIVES WAY:
-    // by full bloom there is no circle left at all, only light. Round 2
-    // kept a rim out here and every bloomed seed came back a bullseye —
-    // a bright disc, a dark trough, a ring. The arc the language actually
-    // wants is shell, then mark, then nothing but corona.
-    const mark = ringAt(r, float(0.315).add(w4.mul(0.06)), float(0.07).add(w4.mul(0.05)))
-      .mul(w2.mul(0.17))
-      .mul(oneMinus(w4.mul(0.92)))
+    const husk = ringAt(r, float(0.19).add(w1.mul(0.028)), float(0.006))
+      .mul(0.12).mul(oneMinus(w2))
+    const mark = ringAt(r, float(0.245), float(0.004))
+      .mul(w2).mul(oneMinus(w3)).mul(0.08)
 
     // 5 · THE RAYS — what is actually countable, and the whole escalation
     // is in how far they run. At the split they stay INSIDE the husk. At
@@ -421,10 +417,10 @@ export function createSign(opts: SignOptions): Sign {
     const reachV = float(0.3).add(w2.mul(0.16)).add(w3.mul(0.12)).add(w4.mul(0.2))
     const reachH = float(0.06).add(w2.mul(0.4)).add(w3.mul(0.12)).add(w4.mul(0.2))
     const reachD = float(0.06).add(w3.mul(0.32)).add(w4.mul(0.22))
-    const rays = ray(ay, ax, reachV, 0.05)
+    const rays = ray(ay, ax, reachV, 0.032)
       .mul(w1)
-      .add(ray(ax, ay, reachH, 0.05).mul(w2))
-      .add(ray(qy, qx, reachD, 0.04).add(ray(qx, qy, reachD, 0.04)).mul(w3).mul(0.86))
+      .add(ray(ax, ay, reachH, 0.032).mul(w2))
+      .add(ray(qy, qx, reachD, 0.025).add(ray(qx, qy, reachD, 0.025)).mul(w3).mul(0.86))
       .mul(float(0.36).add(w4.mul(0.4)))
 
     // 6 · THE ROSE — bloom alone. Eight SHORT petals threaded between the
@@ -436,16 +432,16 @@ export function createSign(opts: SignOptions): Sign {
     const sx = abs(rx.add(ry).mul(0.70710678))
     const sy = abs(ry.sub(rx).mul(0.70710678))
     const reachR = float(0.06).add(w4.mul(0.4))
-    const rose = ray(abs(ry), abs(rx), reachR, 0.032)
-      .add(ray(abs(rx), abs(ry), reachR, 0.032))
-      .add(ray(sy, sx, reachR, 0.032))
-      .add(ray(sx, sy, reachR, 0.032))
+    const rose = ray(abs(ry), abs(rx), reachR, 0.024)
+      .add(ray(abs(rx), abs(ry), reachR, 0.024))
+      .add(ray(sy, sx, reachR, 0.024))
+      .add(ray(sx, sy, reachR, 0.024))
       .mul(w4)
       .mul(0.4)
 
     // 7 · THE AUREOLE — the air around anything truly bright
     const aur = pow(oneMinus(min(r.div(0.8), 1)), 2.8)
-    const aurK = w2.mul(0.03).add(w3.mul(0.045)).add(w4.mul(0.095))
+    const aurK = w2.mul(0.02).add(w3.mul(0.025)).add(w4.mul(0.04))
 
     const lit = cCore
       .mul(point.mul(pointK).mul(breath).mul(flare))
@@ -547,7 +543,7 @@ export function createSign(opts: SignOptions): Sign {
   const scratchGlow = new Color()
 
   /** the gap a star opens at its end of a bind, in world units */
-  const gapOf = (level: number): number => STAR_HALF * (0.34 + 0.16 * Math.min(1, level / 4))
+  const gapOf = (level: number): number => STAR_HALF * (0.22 + 0.16 * Math.min(1, level / 4))
 
   function write(): void {
     for (let i = 0; i < n; i++) {
@@ -624,11 +620,11 @@ export function createSign(opts: SignOptions): Sign {
     for (let i = 0; i < n; i++) {
       const s = seeds[i]
       if (!s) continue
-      s.level = levels[i] ?? 0
+      s.level = cleanLevel(levels[i])
       // a fast attack and a slow settle, frame-rate honest, and it never
       // overshoots, because nothing in this night bounces
       s.prev = s.shown
-      s.shown += (s.level - s.shown) * (1 - Math.exp(-dt * 3.1))
+      s.shown = reducedMotion ? s.level : s.shown + (s.level - s.shown) * (1 - Math.exp(-Math.max(0, dt) * 3.1))
       shown[i] = s.shown
       // A STAGE CROSSED IS AN EVENT. The seed all but arrives at a stage,
       // and at that instant one ring leaves it. This is what a waking
@@ -650,7 +646,7 @@ export function createSign(opts: SignOptions): Sign {
     for (let i = 0; i < n; i++) {
       const s = seeds[i]
       if (!s) continue
-      s.level = s.shown = s.prev = levels[i] ?? 0
+      s.level = s.shown = s.prev = cleanLevel(levels[i])
       s.wake = 0
       shown[i] = s.shown
       s.group.position.y = s.base.y + Math.min(1, s.shown / 4) * LIFT

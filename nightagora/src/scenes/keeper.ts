@@ -398,6 +398,86 @@ body.forge #keeper .keeper-exit { animation: none; }
   #keeper .keeper-note { margin-top: 14px; font-size: 8.5px; letter-spacing: 0.24em; text-indent: 0.24em; }
 }
 
+/* The hub holds one short greeting. Give the invitation its place before
+   it is spoken: toggling [hidden] used to lift the name and the entire
+   quote by the button's height. The empty exchange furniture belongs to
+   the camp, while this column keeps a deliberate name / voice / door
+   rhythm throughout its arrival. */
+body[data-phase='agora'] #keeper.quiet .keeper-beats,
+body[data-phase='agora'] #keeper.quiet .keeper-offers {
+  display: none;
+}
+body[data-phase='agora'] #keeper.quiet .keeper-exit[hidden] {
+  display: inline-flex;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  animation: none;
+}
+body[data-phase='agora'] #keeper .keeper-dialogue {
+  max-width: 25em;
+  margin-left: auto;
+  margin-right: auto;
+}
+body[data-phase='agora'] #keeper .keeper-name {
+  font-size: 18px;
+  line-height: 1.25;
+}
+body[data-phase='agora'] #keeper .keeper-role {
+  letter-spacing: 0.25em;
+  text-indent: 0.25em;
+  line-height: 1.5;
+}
+body[data-phase='agora'] #keeper .keeper-line {
+  line-height: 1.48;
+}
+body[data-phase='agora'] #keeper .keeper-exit {
+  max-width: 100%;
+  font-size: 10.5px;
+  letter-spacing: 0.25em;
+  line-height: 1.65;
+}
+body[data-phase='agora'] #keeper .keeper-exit-text {
+  margin-right: -0.25em;
+  text-wrap: balance;
+}
+body[data-phase='agora'] #keeper .keeper-exit:focus-visible {
+  outline: 1px solid var(--na-starlight);
+  outline-offset: 5px;
+}
+body[data-phase='agora'] #keeper .keeper-note {
+  max-width: 48em;
+  margin-left: auto;
+  margin-right: auto;
+  font-size: 9.5px;
+  line-height: 1.65;
+  letter-spacing: 0.18em;
+  text-indent: 0.18em;
+  text-wrap: balance;
+  color: color-mix(in srgb, var(--na-mist) 92%, var(--na-starlight));
+}
+@media (max-width: 480px) {
+  body[data-phase='agora'] #keeper .keeper-name { font-size: 15px; }
+  body[data-phase='agora'] #keeper .keeper-role {
+    letter-spacing: 0.2em;
+    text-indent: 0.2em;
+  }
+  body[data-phase='agora'] #keeper .keeper-line {
+    font-size: 18px;
+    line-height: 1.45;
+  }
+  body[data-phase='agora'] #keeper .keeper-exit {
+    font-size: 9.5px;
+    letter-spacing: 0.2em;
+  }
+  body[data-phase='agora'] #keeper .keeper-exit-text { margin-right: -0.2em; }
+  body[data-phase='agora'] #keeper .keeper-note {
+    max-width: 28em;
+    letter-spacing: 0.16em;
+    text-indent: 0.16em;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   /* the composition is the same one, it simply arrives already composed */
   #keeper .kw, #keeper .keeper-breath, #keeper .keeper-seal,

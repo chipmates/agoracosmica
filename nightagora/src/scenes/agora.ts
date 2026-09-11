@@ -31,6 +31,7 @@ import {
   CylinderGeometry,
   DoubleSide,
   Group,
+  IcosahedronGeometry,
   InstancedBufferAttribute,
   InstancedBufferGeometry,
   LatheGeometry,
@@ -44,6 +45,7 @@ import {
   Vector2,
 } from 'three/webgpu'
 import * as TSL from 'three/tsl'
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js'
 import { mulberry32, FOUNDING_SEED } from '../core/seed'
 
 /* TSL, uncast. A hand-composed node graph cannot be followed by TSL's own
@@ -55,6 +57,7 @@ const {
   abs,
   attribute,
   cameraProjectionMatrix,
+  cameraPosition,
   cameraViewMatrix,
   clamp,
   cos,
@@ -105,14 +108,14 @@ const FIRE_LIT = lin('#ffb469') // and what it throws onto everything standing
 const SKY_AMB = lin('#c2ceff') // the dome's own light, cool and free
 const SKY_REFLECT = lin('#2f3d78') // what the polish finds when it looks up
 const HORIZON = lin('#0b1130') // where the ground gives itself to the night
-const STONE_COURT = lin('#0c1132') // the polished marble of the court
+const STONE_COURT = lin('#0c1132') // the polished lapis marble of the court
 const STONE_OUT = lin('#090d28') // the rough flags past the temenos line
 const STONE_PLAIN = lin('#06091c') // the unbuilt ground beyond
 const STONE_VEIN = lin('#46589c') // the cool vein inside the marble
 const COLUMN_ALB = lin('#a9a79c') // pale stone: what the firelight finds
 const COLUMN_INK = lin('#0a0e22') // and what it is when the fire misses it
 const DRESS_ALB = lin('#6f6b60') // the plainer dressed stone of the trim
-const SEAT_ALB = lin('#7b6c56')
+const SEAT_ALB = lin('#8c8e8c')
 const BRONZE = lin('#c08a49')
 const TIMBER = lin('#8a7358')
 const EMBER_GOLD = lin('#f0b45a')
@@ -167,9 +170,8 @@ export function createAgora(scene: Scene) {
   /* ONE heartbeat. Flame, coals, rim, floor pool, column edge and inlay all
      answer uFlick, so the room flickers as one fire and not as nine. */
   const uT = uniform(0)
-  /* the drifting-field clock. Under prefers-reduced-motion the whole room
-     keeps its composition and its one fire, and only slows the things that
-     travel across the frame: nothing here bounces, so slowing is enough. */
+  /* The drifting-field clock shares the authored hour with the fire.
+     Reduced motion holds both clocks: the same complete room, at rest. */
   const uTP = uniform(0)
   const uR = uniform(0)
   const uFlick = uniform(1)
@@ -179,7 +181,7 @@ export function createAgora(scene: Scene) {
 
   // ------------------------------------------------------------ the laws
   const sn = (p: N): N => mx_noise_float(p)
-  const vn = (p: N): N => mx_noise_float(p).mul(0.5).add(0.5)
+  const vn = (p: N): N => clamp(mx_noise_float(p).mul(0.5).add(0.5), 0, 1)
   const fbm = (p: N): N => mx_fractal_noise_float(p, 3, 2.0, 0.55, 1.0)
   /** dither every gradient at creation: the sRGB step is enormous down here */
   const dith = (amp: number): N =>
@@ -339,7 +341,7 @@ export function createAgora(scene: Scene) {
     const lipW = max(float(0.012), jAA.mul(1.4))
     const lip = oneMinus(smoothstep(float(0), lipW, abs(dJoint.sub(lipW.add(0.006)))))
     const slabId = row.mul(37.1).add(col.mul(11.7))
-    const slabTint = fract(sin(slabId.mul(12.9898)).mul(43758.5453)).sub(0.5).mul(0.09).add(1)
+    const slabTint = fract(sin(slabId.mul(12.9898)).mul(43758.5453)).sub(0.5).mul(0.24).add(1)
 
     // --- the vein ------------------------------------------------------
     // veins run with the grain of the quarry, so the noise is stretched
@@ -351,12 +353,13 @@ export function createAgora(scene: Scene) {
     const g = vec2(P.x.mul(2.4).add(P.z.mul(0.7)), P.z.mul(0.95))
     const warp = sn(vec3(g.x.mul(1.6), g.y.mul(1.6), 12.7)).mul(0.6)
     const m1 = fbm(vec3(g.x.add(warp), g.y.add(warp), 3.3))
-    const vein = pow(clamp(oneMinus(abs(m1)), 0, 1), 30.0)
+    const mineral = smoothstep(0.16, 0.56, vn(vec3(P.x.mul(0.32).add(P.z.mul(0.14)), P.z.mul(0.07), 8.2)))
+    const vein = pow(clamp(oneMinus(abs(m1)), 0, 1), 38.0).mul(mineral)
     // a second, finer family branching off the first: one vein family is a
     // contour map, two are a stone
     const m2 = sn(vec3(g.x.mul(2.7).add(warp.mul(0.5)), g.y.mul(2.7), 21.4))
     const hair = pow(clamp(oneMinus(abs(m2)), 0, 1), 44.0)
-    const cloud = vn(vec3(P.x.mul(0.1), P.z.mul(0.085), 5.1)).mul(0.24).add(0.88)
+    const cloud = vn(vec3(P.x.mul(0.54).add(warp.mul(0.35)), P.z.mul(0.27), 5.1)).mul(0.45).add(0.76)
 
     // --- the worn path -------------------------------------------------
     // where feet cross, marble goes paler and glossier and loses its vein:
@@ -379,9 +382,11 @@ export function createAgora(scene: Scene) {
     alb = alb.mul(cloud).mul(mix(swell, float(1), court)).mul(mix(float(1), slabTint, court))
     // a vein you can only find by looking is a vein; the far stone loses
     // them entirely, which is also what keeps the distance from crawling
+    const strata = exp(abs(m1).mul(-10)).mul(mineral)
+    alb = alb.mul(oneMinus(strata.mul(0.27).mul(oneMinus(wear.mul(0.35)))))
     alb = alb.add(
-      c3(STONE_VEIN, 0.1)
-        .mul(vein.add(hair.mul(0.7)))
+      c3(STONE_VEIN, 0.08)
+        .mul(vein.add(hair.mul(0.18).mul(mineral)))
         .mul(court)
         .mul(oneMinus(smoothstep(7.0, 17.0, d)))
         .mul(oneMinus(wear.mul(0.6)))
@@ -390,7 +395,7 @@ export function createAgora(scene: Scene) {
     alb = alb.mul(float(1).add(wear.mul(0.2)))
 
     // --- the light -----------------------------------------------------
-    const light = c3(SKY_AMB, 0.62).add(c3(FIRE_WARM).mul(fire))
+    const light = c3(SKY_AMB, 0.62).add(c3(FIRE_WARM, 0.62).mul(fire))
     let colr: N = alb.mul(light)
 
     // the polish: a floor is a weak mirror, and a weak mirror is almost
@@ -400,9 +405,18 @@ export function createAgora(scene: Scene) {
     const cosT = clamp(float(0.9).div(sqrt(d.mul(d).add(0.81))), 0, 1)
     const fres = pow(oneMinus(cosT), 5.0)
     const polish = mix(float(0.28), float(1.0), court).mul(float(0.78).add(wear.mul(0.55)))
+      .mul(cloud.mul(0.65).add(0.3)).mul(slabTint)
+      .mul(oneMinus(strata.mul(0.42))).mul(oneMinus(vein.mul(0.2)))
     colr = colr.add(c3(SKY_REFLECT, 0.062).mul(fres).mul(polish))
-    colr = colr.add(c3(FIRE_WARM, 0.022).mul(fire).mul(fres.mul(0.65).add(0.35)).mul(polish))
-    colr = colr.add(c3(GOLD, 0.013).mul(lip).mul(fire).mul(court))
+    colr = colr.add(c3(FIRE_WARM, 0.017).mul(fire).mul(fres.mul(0.65).add(0.35)).mul(polish))
+    // A brushed polish breaks up the reflected source while the diffuse
+    // mineral stays still. The walking lane has the finest surviving sheen.
+    const facets = vn(vec3(P.x.mul(13), P.z.mul(21), 18.6))
+    const streak = exp(P.x.mul(P.x).div(dF.mul(0.07).add(0.06)).negate())
+      .mul(smoothstep(FIRE.z, FIRE.z + 0.8, P.z))
+      .mul(oneMinus(smoothstep(-3.2, -0.1, P.z)))
+    colr = colr.add(c3(FIRE_WARM, 0.026).mul(streak).mul(facets.mul(facets)).mul(uFlick).mul(oneMinus(groove)))
+    colr = colr.add(c3(GOLD, 0.005).mul(lip).mul(fire).mul(court))
     // ash gathers in the joints near the fire, because it always does and
     // because a floor that is swept everywhere is a floor nobody uses
     const aw = dF.sub(1.7).div(1.5)
@@ -420,8 +434,8 @@ export function createAgora(scene: Scene) {
       colr = colr.mul(oneMinus(cut.mul(0.32)))
       colr = colr.add(c3(GOLD, k).mul(fill).mul(fire))
     }
-    ring(1.95, 0.036, 0.05)
-    ring(3.16, 0.022, 0.032)
+    ring(1.95, 0.026, 0.019)
+    ring(3.16, 0.017, 0.012)
 
     // the temenos: where the polished court stops, one carved line that
     // reads at every azimuth, so even a phone's narrow slot has a horizon
@@ -445,6 +459,24 @@ export function createAgora(scene: Scene) {
     for (const s of SEATS) ao = ao.add(shade(s.x, s.z, 0.2, 0.95, 0.34))
     ao = ao.add(shade(WOODPILE.x, WOODPILE.z, 0.18, 0.8, 0.3))
     ao = ao.add(shade(BASIN.x, BASIN.z, 0.14, 0.62, 0.26))
+    // The foot of every object holds a soft core, then its cast shadow
+    // lengthens AWAY from the one source. These are analytic penumbras,
+    // evaluated on the paving, so they add neither meshes nor draw calls.
+    const cast = (cx: number, cz: number, width: number, reach: number): N => {
+      const dx = cx - FIRE.x, dz = cz - FIRE.z
+      const d = Math.hypot(dx, dz)
+      const axis = vec2(dx / d, dz / d)
+      const q = P.xz.sub(vec2(cx, cz))
+      const along = dot(q, axis)
+      const across = abs(q.x.mul(axis.y).sub(q.y.mul(axis.x)))
+      const widening = max(along, 0).mul(0.12).add(width)
+      return oneMinus(smoothstep(widening.mul(0.55), widening, across))
+        .mul(smoothstep(-0.1, 0.1, along))
+        .mul(oneMinus(smoothstep(0.12, reach, along)))
+    }
+    for (const s of SEATS) ao = ao.add(cast(s.x, s.z, 0.29, 1.7).mul(0.24))
+    ao = ao.add(cast(WOODPILE.x, WOODPILE.z, 0.25, 0.85).mul(0.23))
+    ao = ao.add(cast(BASIN.x, BASIN.z, 0.19, 0.9).mul(0.24))
     colr = colr.mul(oneMinus(clamp(ao, 0, 0.72)))
 
     stoneMat.colorNode = shoulder(haze(colr, d, 14, 62)).add(dith(0.0024)).mul(uR)
@@ -510,8 +542,8 @@ export function createAgora(scene: Scene) {
 
   // ==================================================================
   // 3 · THE FIRE — one TSL field carved from fractal noise: torn tips,
-  //     rising turbulence, a slow whole-body lean. Untouched, because it
-  //     is already the best thing in the night and the hierarchy is law.
+  //     rising turbulence, a slow whole-body lean, a hot root held INSIDE
+  //     its vessel, and a cooler, translucent torn crown.
   // ==================================================================
   function flameMaterial(flip: boolean, gain: number, seed: number): MeshBasicNodeMaterial {
     const mat = new MeshBasicNodeMaterial({
@@ -521,14 +553,15 @@ export function createAgora(scene: Scene) {
     })
     const p = uv()
     const y = clamp(flip ? oneMinus(p.y) : p.y, 0.0, 1.0)
-    const x = p.x.sub(0.5)
+    const x = p.x.sub(0.5).add(flip ? sn(vec3(p.y.mul(70), p.x.mul(8), 3.8)).mul(0.003) : 0)
     const swayA = mx_noise_float(vec3(y.mul(1.9).sub(uT.mul(1.15)), uT.mul(0.27), 5.2 + seed))
     const swayB = mx_noise_float(vec3(y.mul(4.6).sub(uT.mul(2.1)), uT.mul(0.4), 9.7 + seed))
     const xx = x
       .add(swayA.mul(y.mul(0.17)))
       .add(swayB.mul(y.mul(0.06)))
       .add(uLean.mul(y))
-    const radius = mix(float(0.38), float(0.05), pow(y, float(0.74)))
+    const radius = mix(float(0.38), float(0.018), pow(y, float(0.82)))
+      .mul(smoothstep(0, 0.23, y).mul(0.28).add(0.72))
     const dd = abs(xx).div(radius)
     const turb = mx_fractal_noise_float(
       vec3(xx.mul(5.6).add(2.0), y.mul(2.6).sub(uT.mul(1.9)), uT.mul(0.12).add(7.3 + seed)),
@@ -537,22 +570,35 @@ export function createAgora(scene: Scene) {
       0.55,
       1.0
     )
-    const fieldV = float(1.02).sub(dd.mul(dd)).add(turb.mul(0.52)).sub(y.mul(0.72))
+    const thread = sn(vec3(xx.mul(17).add(seed), y.mul(8).sub(uT.mul(3.1)), uT.mul(0.24).add(13.5)))
+    const fieldV = float(1.02).sub(dd.mul(dd)).add(turb.mul(0.64)).add(thread.mul(0.13).mul(y)).sub(y.mul(0.72))
     const rooted = smoothstep(0.0, 0.06, y)
     const crown = oneMinus(smoothstep(0.8, 0.97, y))
-    let alpha = smoothstep(0.16, 0.46, fieldV).mul(rooted).mul(crown).mul(uFlame).mul(float(gain))
-    if (flip) alpha = alpha.mul(oneMinus(smoothstep(0.05, 0.46, y)))
-    const heat = smoothstep(0.55, 1.3, fieldV.add(oneMinus(y).mul(0.5)).sub(abs(xx).mul(1.5)))
-    const body = mix(vec3(0.58, 0.12, 0.015), vec3(1.0, 0.63, 0.19), smoothstep(0.0, 0.85, fieldV))
-    mat.colorNode = mix(body, vec3(1.02, 0.94, 0.8), heat)
+    const sheet = smoothstep(-0.32, 0.48, thread).mul(0.56).add(0.44)
+    let alpha = smoothstep(0.16, 0.43, fieldV).mul(rooted).mul(crown).mul(sheet).mul(uFlame).mul(float(gain))
+    if (flip) {
+      // Intersect the eye-to-mirror ray with the actual paving. Reflection
+      // breaks at the SAME slab joints as the ground above it.
+      const ray = positionWorld.sub(cameraPosition)
+      const hit = cameraPosition.add(ray.mul(float(FLOOR_Y).sub(cameraPosition.y).div(min(ray.y, -0.0001))))
+      const row = hit.z.sub(FIRE.z).div(0.94)
+      const col = hit.x.div(1.28).add(fract(floor(row).mul(0.5)))
+      const joint = min(min(fract(row), oneMinus(fract(row))), min(fract(col), oneMinus(fract(col))))
+      const grain = vn(vec3(hit.x.mul(17), hit.z.mul(28), 4.2))
+      alpha = alpha.mul(exp(y.mul(-2.2))).mul(smoothstep(0.005, 0.025, joint))
+        .mul(grain.mul(0.75).add(0.25))
+    }
+    const heat = smoothstep(0.85, 1.6, fieldV.add(oneMinus(y).mul(0.5)).sub(abs(xx).mul(1.8)))
+    const body = mix(hex3('#e8500c'), hex3('#ffc873'), smoothstep(0.0, 1.05, fieldV))
+    mat.colorNode = mix(body, hex3('#fff4d5', 1.5), heat)
     mat.opacityNode = alpha
     return mat
   }
 
   const RIM_Y = FLOOR_Y + 0.385 // the brazier's lip
   const flameGeo = new PlaneGeometry(1, 1)
-  const FLAME_W = 1.2
-  const FLAME_H = 1.35
+  const FLAME_W = 1.28
+  const FLAME_H = 1.3
   const TONGUE_W = FLAME_W * 0.62
   const TONGUE_H = FLAME_H * 0.66
   const FLAME_BASE = RIM_Y - 0.12
@@ -562,7 +608,7 @@ export function createAgora(scene: Scene) {
   flame.renderOrder = 7
   root.add(flame)
 
-  const tongue = new Mesh(flameGeo, flameMaterial(false, 0.85, 4.3))
+  const tongue = new Mesh(flameGeo, flameMaterial(false, 0.65, 4.3))
   tongue.scale.set(TONGUE_W, TONGUE_H, 1)
   tongue.position.set(FIRE.x + 0.1, FLAME_BASE + TONGUE_H / 2, FIRE.z + 0.16)
   tongue.renderOrder = 7
@@ -584,11 +630,13 @@ export function createAgora(scene: Scene) {
     facePow?: number
     ambK?: number
     baseK?: number
+    bounce?: number
   }): MeshBasicNodeMaterial {
     const mat = new MeshBasicNodeMaterial()
     const { world, normal, tint, clip: c } = inkVertex()
     mat.vertexNode = c
-    const alb = c3(opts.albedo)
+    const quarry = vn(vec3(world.x.mul(7.5), world.y.mul(4.2), world.z.mul(7.5)))
+    const alb = c3(opts.albedo).mul(quarry.mul(0.32).add(0.81))
     const skyTint = mix(vec3(1, 1, 1), alb.mul(1.6), 0.75)
     let colr: N = c3(COLUMN_INK, opts.baseK ?? 0.42)
       .mul(tint)
@@ -601,22 +649,22 @@ export function createAgora(scene: Scene) {
     colr = colr.add(
       alb.mul(c3(FIRE_LIT)).mul(firelight(world, 5.6, 2.0)).mul(facing(world, normal, opts.facePow ?? 2.4)).mul(opts.rim)
     )
+    if (opts.bounce) colr = colr.add(alb.mul(c3(FIRE_WARM, opts.bounce))
+      .mul(max(normal.y.negate(), 0).mul(0.5).add(0.5)).mul(uFlick))
     mat.colorNode = shoulder(haze(colr, length(world.xz), 9, 32)).add(dith(0.0022)).mul(uR)
     return mat
   }
 
-  const pedestalMat = dressedStone({ albedo: lin('#6d6a63'), rim: 0.14, facePow: 1.6, baseK: 0.42 })
+  const pedestalMat = dressedStone({ albedo: lin('#73777c'), rim: 0.26, facePow: 1.1, baseK: 0.42, bounce: 0.035 })
   field(
     lathe(
       [
-        [0.42, 0.0],
-        [0.42, 0.06],
-        [0.36, 0.085],
-        [0.36, 0.15],
-        [0.3, 0.175],
-        [0.28, 0.225],
+        [0.47, 0.0], [0.47, 0.022], [0.452, 0.038],
+        [0.44, 0.042], [0.44, 0.065], [0.405, 0.086],
+        [0.385, 0.10], [0.35, 0.128], [0.35, 0.145],
+        [0.31, 0.17], [0.3, 0.195], [0.28, 0.225],
       ],
-      22
+      48
     ),
     pedestalMat,
     [{ p: [FIRE.x, FLOOR_Y, FIRE.z] }]
@@ -649,12 +697,24 @@ export function createAgora(scene: Scene) {
     // bronze remembers the fire it has held: cold and nearly black at the
     // foot, warming as it climbs to the lip
     const up = smoothstep(0.02, 0.3, hLocal)
-    const hammer = vn(vec3(world.x.mul(26), world.y.mul(30), world.z.mul(26))).mul(0.28).add(0.86)
-    const alb = c3(BRONZE).mul(hammer)
+    const hammer = vn(vec3(world.x.mul(55), world.y.mul(64), world.z.mul(55)))
+    const patina = vn(vec3(world.x.mul(9), world.y.mul(8), world.z.mul(9)))
+    const alb = mix(c3(BRONZE), hex3('#334239'), smoothstep(0.5, 0.79, patina).mul(0.7)).mul(hammer.mul(0.34).add(0.74))
     let colr: N = c3(COLUMN_INK, 0.5).add(c3(SKY_AMB, 0.03).mul(max(normal.y, 0).mul(0.6).add(0.3)))
     colr = colr.add(
       alb.mul(c3(FIRE_WARM)).mul(firelight(world, 4.4, 0.55)).mul(facing(world, normal, 1.6)).mul(float(0.22).add(up.mul(1.5)))
     )
+    // The source is INSIDE the bowl. Its outside receives the fire through
+    // the marble beneath it, so direct Lambert alone makes a black cutout.
+    const bounce = max(normal.y.negate(), 0).mul(0.7).add(0.2)
+    const eye = normalize(cameraPosition.sub(world))
+    const grazing = pow(oneMinus(clamp(dot(normal, eye), 0, 1)), 2.4)
+    const turning = pow(clamp(normal.z.mul(0.5).add(0.5), 0, 1), 1.5)
+    colr = colr.add(alb.mul(c3(FIRE_WARM, 0.15)).mul(bounce).mul(turning).mul(uFlick))
+    colr = colr.add(c3(FIRE_WARM, 0.16).mul(grazing).mul(hammer.mul(0.5).add(0.5)).mul(up).mul(uFlick))
+    // Repeated chased strokes sit below a smoke-darkened lip.
+    const chasing = pow(abs(sin(uv().x.mul(TAU * 72))), 10).mul(smoothstep(0.07, 0.13, hLocal)).mul(oneMinus(smoothstep(0.23, 0.29, hLocal)))
+    colr = colr.mul(oneMinus(chasing.mul(0.045)))
     bowlMat.colorNode = shoulder(colr).add(dith(0.0022)).mul(uR)
   }
   field(
@@ -662,14 +722,17 @@ export function createAgora(scene: Scene) {
       [
         [0.235, 0.0],
         [0.3, 0.05],
-        [0.4, 0.13],
-        [0.5, 0.235],
-        [0.545, 0.29],
-        [0.545, 0.325],
+        [0.355, 0.10],
+        [0.411, 0.16],
+        [0.473, 0.226],
+        [0.522, 0.276],
+        [0.545, 0.30],
+        [0.548, 0.314],
+        [0.54, 0.325],
         [0.5, 0.325],
         [0.46, 0.29],
       ],
-      36
+      64
     ),
     bowlMat,
     [{ p: [FIRE.x, FLOOR_Y + 0.1, FIRE.z] }]
@@ -694,6 +757,31 @@ export function createAgora(scene: Scene) {
   coalBed.renderOrder = 5
   root.add(coalBed)
 
+  // Charcoal has volume: an ashen skin over narrow, incandescent seams.
+  // One instanced rock field gives the bowl a bed the flame can grow from.
+  {
+    const mat = new MeshBasicNodeMaterial()
+    const { world, normal, tint, clip: c } = inkVertex()
+    mat.vertexNode = c
+    const seam = pow(clamp(oneMinus(abs(sn(world.mul(44)))), 0, 1), 12)
+    const ash = vn(world.mul(68))
+    const heat = seam.mul(tint).mul(uFlick)
+    const char = mix(hex3('#100d0c'), hex3('#53504b'), pow(ash, 3).mul(0.38))
+    mat.colorNode = char.mul(max(normal.y, 0).mul(0.5).add(0.15))
+      .add(mix(hex3('#df360a'), hex3('#ffd18b'), heat).mul(heat).mul(0.9))
+      .add(dith(0.002)).mul(uR)
+    const rnd = mulberry32(FOUNDING_SEED + 211)
+    const rocks: Item[] = []
+    for (let i = 0; i < 27; i++) {
+      const a = rnd() * TAU
+      const r = Math.sqrt(rnd()) * 0.42
+      rocks.push({ p: [Math.sin(a) * r, FLOOR_Y + 0.355 + rnd() * 0.025, FIRE.z + Math.cos(a) * r],
+        s: [0.054 + rnd() * 0.045, 0.035 + rnd() * 0.04, 0.045 + rnd() * 0.04],
+        r: rnd() * TAU, tint: 0.5 + rnd() * 0.5 })
+    }
+    field(new IcosahedronGeometry(1, 0), mat, rocks)
+  }
+
   // molten rim: the bowl's lip catches the flame
   const rimMat = new MeshBasicNodeMaterial({
     transparent: true,
@@ -701,7 +789,8 @@ export function createAgora(scene: Scene) {
     depthWrite: false,
   })
   rimMat.colorNode = c3(GOLD)
-  rimMat.opacityNode = uFlick.mul(0.34).add(0.28).mul(uR)
+  rimMat.opacityNode = uFlick.mul(0.28).add(0.13)
+    .mul(vn(positionWorld.mul(25)).mul(0.28).add(0.65)).mul(uR)
   const rim = new Mesh(new TorusGeometry(0.545, 0.014, 8, 64), rimMat)
   rim.rotation.x = Math.PI / 2
   rim.position.set(FIRE.x, RIM_Y + 0.04, FIRE.z)
@@ -734,10 +823,21 @@ export function createAgora(scene: Scene) {
   // 4 · THE ANSWER IN THE STONE — the flame's true twin, hung below the
   //     floor plane exactly where reflection geometry puts it
   // ==================================================================
-  const REFL_W = FLAME_W * 1.1
-  const REFL_H = FLAME_H * 1.18
-  const reflMat = flameMaterial(true, 0.2, 0)
-  reflMat.depthTest = false
+  const REFL_W = FLAME_W
+  const REFL_H = FLAME_H
+  const reflMat = flameMaterial(true, 0.19, 0)
+  // Keep the virtual flame's clip xy AND w, so its UVs remain a true
+  // mirror. Only depth moves to the ray's intersection with the marble.
+  // This lets every real object occlude the reflection without another
+  // camera, render target, transparency trick, or scene-wide contract.
+  {
+    const virtual = modelWorldMatrix.mul(vec4(positionLocal, 1)).xyz
+    const ray = virtual.sub(cameraPosition)
+    const hit = cameraPosition.add(ray.mul(float(FLOOR_Y + 0.004).sub(cameraPosition.y).div(min(ray.y, -0.0001))))
+    const mirrorClip = clip(virtual)
+    const floorClip = clip(hit)
+    reflMat.vertexNode = vec4(mirrorClip.xy, floorClip.z.div(floorClip.w).mul(mirrorClip.w), mirrorClip.w)
+  }
   const refl = new Mesh(flameGeo, reflMat)
   refl.scale.set(REFL_W, REFL_H, 1)
   refl.position.set(FIRE.x, 2 * FLOOR_Y - FLAME_BASE - REFL_H / 2, FIRE.z)
@@ -752,7 +852,7 @@ export function createAgora(scene: Scene) {
   {
     const cu = uv().sub(vec2(0.5, 0.5))
     const dd = length(vec2(cu.x.mul(1.6), cu.y))
-    const a = oneMinus(smoothstep(0.06, 0.5, dd)).mul(0.075)
+    const a = oneMinus(smoothstep(0.06, 0.5, dd)).mul(0.025)
     const shim = vn(vec3(uv().x.mul(5), uv().y.mul(5), uT.mul(0.4))).mul(0.4).add(0.8)
     washMat.colorNode = c3(GOLD)
     washMat.opacityNode = a.mul(shim).mul(uFlick).mul(uR).add(dith(0.006))
@@ -770,7 +870,7 @@ export function createAgora(scene: Scene) {
   //     far stoa holds the horizon at every azimuth (which is the only
   //     thing a phone's narrow slot can see).
   // ==================================================================
-  const COL_H = 5.62 // plinth crown to shaft crown
+  const COL_H = 2.72 // a carried crown visible from the seated eye
   function columnProfile(): Array<[number, number]> {
     const pts: Array<[number, number]> = [
       [0.4, 0.0],
@@ -810,10 +910,10 @@ export function createAgora(scene: Scene) {
     // twenty flutes, cut only into the shaft. The normal is rotated about
     // the column's own axis, so each flute gets a lit arris and a dark
     // hollow from the one fire, which is what makes stone read as carved.
-    const shaftMask = smoothstep(0.34, 0.5, hLocal).mul(oneMinus(smoothstep(5.4, 5.58, hLocal)))
+    const shaftMask = smoothstep(0.34, 0.5, hLocal).mul(oneMinus(smoothstep(COL_H - 0.18, COL_H - 0.04, hLocal)))
     const fade = oneMinus(smoothstep(17.0, 33.0, dCam))
     const f = fract(uv().x.mul(20))
-    const bend = sin(f.mul(TAU)).mul(0.62).mul(shaftMask).mul(fade)
+    const bend = sin(f.mul(TAU)).mul(0.36).mul(shaftMask).mul(fade)
     const tHor = normalize(vec3(normal.z.negate(), float(0.0), normal.x))
     const nF = normalize(normal.add(tHor.mul(bend)))
     // and the hollows keep a little of their own shade
@@ -823,7 +923,7 @@ export function createAgora(scene: Scene) {
     const skyTint = mix(vec3(1, 1, 1), alb.mul(1.5), 0.78)
     // the lapis night rests on the upper shafts, so the stone reads round
     // against the sky instead of flat
-    const lift = smoothstep(0.5, 5.2, hLocal)
+    const lift = smoothstep(0.5, COL_H, hLocal)
     let colr: N = c3(COLUMN_INK, 0.42)
       .mul(tint)
       .add(c3(SKY_AMB, 0.0072).mul(skyTint).mul(tint).mul(float(0.5).add(lift.mul(0.9))))
@@ -832,12 +932,17 @@ export function createAgora(scene: Scene) {
     // The base mouldings sit closest of all and would blaze on their own,
     // so they keep two thirds of what the shaft gets.
     const foot = float(0.6).add(smoothstep(0.1, 0.85, hLocal).mul(0.4))
-    const glow = firelight(world, 6.0, 2.0).mul(facing(world, nF, 4.0)).mul(oneMinus(lift.mul(0.86)).add(0.055))
+    const glow = firelight(world, 7.0, 2.0).mul(facing(world, nF, 2.2)).mul(oneMinus(lift.mul(0.73)).add(0.055))
     colr = colr.add(alb.mul(c3(FIRE_LIT)).mul(glow).mul(0.66).mul(hollow).mul(foot))
+    // Quiet drum beds and quarry grain catch the low light as stone.
+    const bed = abs(fract(hLocal.sub(0.32).div(0.59)).sub(0.5))
+    const joint = oneMinus(smoothstep(0.008, 0.025, bed)).mul(shaftMask)
+    const grain = vn(vec3(world.x.mul(5.2), world.y.mul(2.8), world.z.mul(5.2)))
+    colr = colr.mul(grain.mul(0.18).add(0.9)).mul(oneMinus(joint.mul(0.21)))
     shaftMat.colorNode = shoulder(haze(colr, dCam, 9, 32)).add(dith(0.0022)).mul(uR)
   }
 
-  const dressMat = dressedStone({ albedo: DRESS_ALB, rim: 0.13, facePow: 2.4, baseK: 0.42, ambK: 0.0068 })
+  const dressMat = dressedStone({ albedo: DRESS_ALB, rim: 0.28, facePow: 1.5, baseK: 0.42, ambK: 0.014 })
 
   const NEAR_ANGLES = [-62, -44, -30, -19, -9, 9, 19, 30, 44, 62]
   const MID_ANGLES = [-71, -53, -37, -24.5, -14, 14, 24.5, 37, 53, 71]
@@ -854,7 +959,7 @@ export function createAgora(scene: Scene) {
   const REGISTERS: Register[] = [
     { r: 10.6, angles: NEAR_ANGLES, scale: 1, lift: 0.2, tint: 1 },
     { r: 16.3, angles: MID_ANGLES, scale: 1, lift: 0.2, tint: 0.95 },
-    { r: 26.0, angles: narrow ? STOA_ANGLES.filter((_, i) => i % 2 === 0) : STOA_ANGLES, scale: 0.58, lift: 0.74, tint: 0.9 },
+    { r: 26.0, angles: narrow ? STOA_ANGLES.filter((_, i) => i % 2 === 0) : STOA_ANGLES, scale: 0.58, lift: 0.38, tint: 0.9 },
   ]
 
   const shafts: Item[] = []
@@ -862,6 +967,9 @@ export function createAgora(scene: Scene) {
   const echini: Item[] = []
   const abaci: Item[] = []
   const beams: Item[] = []
+  const cornices: Item[] = []
+  const fascias: Item[] = []
+  const steps: Item[] = []
   for (const reg of REGISTERS) {
     const s = reg.scale
     const base = FLOOR_Y + reg.lift
@@ -886,11 +994,20 @@ export function createAgora(scene: Scene) {
       const mid = (a0 + a1) / 2
       const chord = 2 * reg.r * Math.sin(Math.abs(a1 - a0) / 2)
       beams.push({
-        p: [Math.sin(mid) * reg.r, base + (COL_H + 0.44) * s, -Math.cos(mid) * reg.r],
-        s: [chord + 0.34 * s, s, s],
+        p: [Math.sin(mid) * reg.r * Math.cos((a1 - a0) / 2), base + (COL_H + 0.44) * s, -Math.cos(mid) * reg.r * Math.cos((a1 - a0) / 2)],
+        s: [chord + 0.18 * s, s, s],
         r: -mid,
         tint: reg.tint,
       })
+      const beam = beams[beams.length - 1]!
+      cornices.push({ ...beam, p: [beam.p[0], beam.p[1] + 0.27 * s, beam.p[2]], s: [chord + 0.3 * s, s, s] })
+      fascias.push({ ...beam, p: [beam.p[0], beam.p[1] - 0.12 * s, beam.p[2]], s: [chord + 0.2 * s, s, s] })
+      // Two broad treads carry each bay. The central passage stays open.
+      if (reg.r < 20) for (let j = 0; j < 2; j++) {
+        const rr = reg.r - 0.15 - j * 0.2
+        steps.push({ p: [Math.sin(mid) * rr * Math.cos((a1 - a0) / 2), FLOOR_Y + 0.045 + j * 0.07, -Math.cos(mid) * rr * Math.cos((a1 - a0) / 2)],
+          s: [chord + 0.3, 0.09, 1.32 - j * 0.34], r: -mid, tint: reg.tint })
+      }
     }
   }
   field(lathe(columnProfile(), 26), shaftMat, shafts)
@@ -911,7 +1028,10 @@ export function createAgora(scene: Scene) {
     echini
   )
   field(new BoxGeometry(0.66, 0.11, 0.66), dressMat, abaci)
-  field(new BoxGeometry(1, 0.34, 0.5), dressMat, beams)
+  field(new RoundedBoxGeometry(1, 0.34, 0.5, 1, 0.018), dressMat, beams)
+  field(new RoundedBoxGeometry(1, 0.12, 0.76, 1, 0.012), dressMat, cornices)
+  field(new BoxGeometry(1, 0.075, 0.63), dressMat, fascias)
+  field(new BoxGeometry(1, 1, 1), dressMat, steps)
 
   // the stoa's podium: courses of masonry, so the far architecture has a
   // horizon line of its own instead of a hovering row of sticks
@@ -922,9 +1042,10 @@ export function createAgora(scene: Scene) {
     const n = narrow ? 30 : 46
     const span = (200 * Math.PI) / 180
     for (let course = 0; course < 2; course++) {
-      const y = FLOOR_Y + 0.02 + course * 0.36
+      const y = FLOOR_Y + 0.02 + course * 0.18
       for (let i = 0; i < n; i++) {
         const a = -span / 2 + (span * (i + (course % 2) * 0.5)) / n
+        if (Math.abs(a) < 0.1) continue // the central passage continues into night
         items.push({
           p: [Math.sin(a) * R, y, -Math.cos(a) * R],
           s: [1, 1, 1],
@@ -934,7 +1055,7 @@ export function createAgora(scene: Scene) {
       }
     }
     const w = (2 * Math.PI * 26.0 * (200 / 360)) / (narrow ? 30 : 46)
-    field(new BoxGeometry(w * 0.97, 0.36, 1.4).translate(0, 0.18, 0), dressMat, items)
+    field(new BoxGeometry(w * 0.97, 0.18, 1.4).translate(0, 0.09, 0), dressMat, items)
   }
 
   // ---- the colonnade in the polish -----------------------------------
@@ -994,9 +1115,9 @@ export function createAgora(scene: Scene) {
     const t = uv()
     const drift = vn(vec3(t.x.mul(6.0), t.y.mul(1.4), uT.mul(0.02))).mul(0.5).add(0.6)
     airBandMat.colorNode = mix(hex3('#243057'), hex3('#16204c'), t.y)
-    airBandMat.opacityNode = pow(oneMinus(t.y), 3.0).mul(drift).mul(0.085).mul(uR).add(dith(0.004))
+    airBandMat.opacityNode = pow(oneMinus(t.y), 3.0).mul(drift).mul(0.2).mul(uR).add(dith(0.004))
   }
-  const airBand = new Mesh(new CylinderGeometry(46, 46, 5.2, 72, 1, true), airBandMat)
+  const airBand = new Mesh(new CylinderGeometry(38, 38, 5.2, 72, 1, true), airBandMat)
   airBand.position.y = FLOOR_Y + 1.5
   airBand.renderOrder = 1
   root.add(airBand)
@@ -1007,7 +1128,7 @@ export function createAgora(scene: Scene) {
   //     the night, a krater of water, spent embers, and ash gathered in
   //     the joints where it always gathers.
   // ==================================================================
-  const seatMat = dressedStone({ albedo: SEAT_ALB, rim: 0.19, facePow: 1.9, baseK: 0.45, ambK: 0.0072 })
+  const seatMat = dressedStone({ albedo: SEAT_ALB, rim: 0.18, facePow: 1.6, baseK: 0.45, ambK: 0.012 })
   {
     // four blocks, none of them the same block: identical stools four times
     // over read as props, and nobody has ever left four stones square
@@ -1020,13 +1141,28 @@ export function createAgora(scene: Scene) {
     }))
     // a stool for one, not a bench for six: round 2 put four pale
     // sarcophagi against the colonnade and the frame said so
-    field(new BoxGeometry(0.5, 0.27, 0.4).translate(0, 0.135, 0), seatMat, seatItems)
-    field(new BoxGeometry(0.56, 0.05, 0.44).translate(0, 0.29, 0), seatMat, seatItems)
+    field(new RoundedBoxGeometry(0.45, 0.255, 0.35, 2, 0.035).translate(0, 0.13, 0), seatMat, seatItems)
+    field(new RoundedBoxGeometry(0.58, 0.08, 0.45, 2, 0.026).translate(0, 0.28, 0), seatMat, seatItems)
   }
 
   // wood cut for the night, stacked the way it is actually stacked: two
   // low rows, not the black cairn round 1 put in the frame
-  const timberMat = dressedStone({ albedo: TIMBER, rim: 0.6, facePow: 0.9, baseK: 0.42, ambK: 0.009 })
+  const timberMat = new MeshBasicNodeMaterial()
+  {
+    const { world, normal, tint, clip: c } = inkVertex()
+    timberMat.vertexNode = c
+    const local = varying(positionLocal)
+    const end = smoothstep(0.8, 0.95, abs(varying(normalLocal.x)))
+    const radius = length(local.yz).div(0.055)
+    const ring = pow(abs(sin(radius.mul(30).add(sn(local.mul(95)).mul(0.8)))), 6)
+    const fibres = vn(vec3(local.x.mul(9), local.y.mul(280), local.z.mul(280)))
+    const bark = c3(TIMBER, 0.36).mul(fibres.mul(0.8).add(0.3))
+    const cut = hex3('#b3956a').mul(oneMinus(ring.mul(0.36)))
+      .mul(oneMinus(smoothstep(0.82, 0.99, radius).mul(0.62)))
+    const alb = mix(bark, cut, end).mul(tint)
+    const light = c3(SKY_AMB, 0.015).add(c3(FIRE_WARM).mul(firelight(world, 4.8, 2)).mul(facing(world, normal, 0.7)).mul(0.72))
+    timberMat.colorNode = shoulder(alb.mul(light)).add(dith(0.002)).mul(uR)
+  }
   {
     const rnd = mulberry32(FOUNDING_SEED + 103)
     const items: Item[] = []
@@ -1046,7 +1182,7 @@ export function createAgora(scene: Scene) {
         })
       }
     }
-    field(new CylinderGeometry(0.048, 0.055, 0.56, 9).rotateZ(Math.PI / 2), timberMat, items)
+    field(new CylinderGeometry(0.048, 0.055, 0.56, 18, 3).rotateZ(Math.PI / 2), timberMat, items)
   }
 
   // a krater of water standing on the stone: the only other thing in this
@@ -1061,14 +1197,19 @@ export function createAgora(scene: Scene) {
         [0.151, 0.08],
         [0.191, 0.142],
         [0.2, 0.191],
-        [0.2, 0.209],
+        [0.208, 0.2],
+        [0.206, 0.215],
+        [0.186, 0.22],
         [0.174, 0.191],
       ],
-      20
+      40
     ),
     bronzeMat,
     [{ p: [BASIN.x, FLOOR_Y, BASIN.z] }]
   )
+  field(new TorusGeometry(0.063, 0.014, 6, 24), bronzeMat, [-1, 1].map((side) => ({
+    p: [BASIN.x + side * 0.195, FLOOR_Y + 0.15, BASIN.z], s: [0.72, 1, 1],
+  })))
 
   // the water: a disc that holds the fire and nothing else
   const waterMat = new MeshBasicNodeMaterial({
@@ -1173,18 +1314,20 @@ export function createAgora(scene: Scene) {
     const iPos = attribute('iPos', 'vec3') // a0, rad0, speed
     const iDat = attribute('iDat', 'vec4') // phase, wob, size, spin
     const k = fract(uTP.mul(iPos.z).add(iDat.x))
+    const ascent = oneMinus(pow(oneMinus(k), 1.35))
     const ang = iPos.x.add(uTP.mul(0.22)).add(k.mul(2.6))
     const rad = min(float(0.62), iPos.y.add(pow(k, 1.4).mul(0.62)))
     const c = vec3(
       float(FIRE.x).add(cos(ang).mul(rad)).add(uLean.mul(k.mul(2.4))),
-      float(FLOOR_Y + 0.44).add(k.mul(ASC_H)),
+      float(FLOOR_Y + 0.44).add(ascent.mul(ASC_H)),
       float(FIRE.z).add(sin(ang).mul(rad).mul(0.55))
     )
-    emberMat.vertexNode = bill(c, iDat.z.mul(float(1).add(k.mul(0.5))))
+    const size = iDat.z.mul(float(1).add(k.mul(0.5)))
+    emberMat.vertexNode = bill(c, vec2(size.mul(0.8), size.mul(oneMinus(k).mul(0.9).add(1))))
     const kv = varying(k)
     const p = uv().sub(vec2(0.5, 0.5)).mul(2)
-    const core = oneMinus(smoothstep(0.0, 1.0, length(p)))
-    const white = smoothstep(0.5, 1.0, kv)
+    const core = oneMinus(smoothstep(0.0, 1.0, length(vec2(p.x, p.y.sub(0.22)))))
+    const white = smoothstep(0.18, 0.68, kv)
     emberMat.colorNode = mix(c3(EMBER_GOLD, 1.6), c3(STAR_WHITE, 1.3), white)
     // an ember is a SPARK, not a bokeh ball: a hot pinpoint with a very
     // short halo (round 1 filled the sky with orange confetti)
@@ -1196,7 +1339,7 @@ export function createAgora(scene: Scene) {
       .mul(uR)
   }
   quadField(
-    tier(74, 42),
+    tier(58, 32),
     (i, pos, dat, rnd) => {
       pos[i * 3] = rnd() * TAU
       pos[i * 3 + 1] = 0.06 + rnd() * 0.16
@@ -1270,7 +1413,7 @@ export function createAgora(scene: Scene) {
     const kv = varying(k)
     const p = uv().sub(vec2(0.5, 0.5)).mul(2)
     const soft = oneMinus(smoothstep(0.15, 1.0, length(p)))
-    const churn = vn(vec3(p.x.mul(1.8), p.y.mul(1.8).sub(uT.mul(0.35)), kv.mul(4.0))).mul(0.6).add(0.45)
+    const churn = smoothstep(0.34, 0.72, vn(vec3(p.x.mul(3.8), p.y.mul(2.6).sub(uT.mul(0.35)), kv.mul(4.0))))
     // smoke over a fire is LIT: the first metre is a warm grey the eye can
     // find, and it gives itself back to the night on the way up. Round 3
     // drew navy smoke on a navy sky and nothing arrived.
@@ -1281,7 +1424,7 @@ export function createAgora(scene: Scene) {
       .mul(churn)
       .mul(smoothstep(0.0, 0.1, kv))
       .mul(oneMinus(smoothstep(0.3, 0.92, kv)))
-      .mul(0.4)
+      .mul(0.18)
       .mul(uR)
   }
   quadField(
@@ -1349,9 +1492,9 @@ export function createAgora(scene: Scene) {
     if (!root.visible) return
 
     const r = s.reveal
-    const t = s.elapsed
+    const t = reduced ? 12.4 : s.elapsed
     uT.value = t
-    uTP.value = reduced ? t * 0.3 : t
+    uTP.value = t
     uR.value = r
 
     // ONE fire, many flickers: the source stays steady, the light it throws
@@ -1371,8 +1514,10 @@ export function createAgora(scene: Scene) {
     const breath = reduced
       ? 1
       : 1 + (0.035 + 0.02 * sp) * Math.sin(t * 2.1) + 0.02 * Math.sin(t * 3.7 + 1.1)
-    const rise = 1 + 0.42 * bz
-    const wide = 1 + 0.16 * bz
+    // The gathered fire broadens across its coal bed. Its crown keeps the
+    // council's title and the narrow playbill in dark air.
+    const rise = 1 + (window.innerWidth / window.innerHeight < 0.9 ? -0.18 : 0.01) * bz
+    const wide = 1 + 0.22 * bz
     flame.scale.set(FLAME_W * wide, FLAME_H * breath * rise, 1)
     flame.position.y = FLAME_BASE + (FLAME_H * breath * rise) / 2
     tongue.scale.set(TONGUE_W * wide, TONGUE_H * breath * rise, 1)

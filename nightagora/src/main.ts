@@ -600,45 +600,39 @@ const DESCENT_STATIONS: Array<[number, number]> = [
 // the flip waits until the moon has fully swallowed the frame (door
 // completes at GATE_END): the turn happens inside true black
 const dCamY = channel([
-  { p: 0, v: 0 },
-  { p: 0.15, v: 0 },
-  { p: 0.28, v: 66, e: 'sineInOut' },
-  { p: 0.995, v: 0, e: 'sineInOut' },
+  { p: 0, v: 0 }, { p: 0.15, v: 0 },
+  { p: 0.28, v: 58, e: 'sineInOut' },
+  { p: 0.50, v: 40, e: 'sineInOut' },
+  { p: 0.70, v: 23, e: 'sineInOut' },
+  { p: 0.82, v: 13, e: 'sineInOut' },
+  { p: 0.90, v: 5, e: 'sineInOut' },
+  { p: 0.948, v: 0, e: 'sineInOut' },
 ])
 const dCamR = channel([
-  { p: 0, v: 0.001 },
-  { p: 0.15, v: 0.001 },
-  { p: 0.28, v: 7, e: 'sineInOut' },
-  { p: 0.7, v: 4.5 },
-  { p: 0.995, v: 0.001, e: 'cubicInOut' },
+  { p: 0, v: 0.001 }, { p: 0.15, v: 0.001 },
+  { p: 0.28, v: 32, e: 'sineInOut' },
+  { p: 0.50, v: 36, e: 'sineInOut' },
+  { p: 0.70, v: 38, e: 'sineInOut' },
+  { p: 0.82, v: 37, e: 'sineInOut' },
+  { p: 0.90, v: 32, e: 'sineInOut' },
+  { p: 0.948, v: 0, e: 'sineInOut' },
 ])
 const dCamTh = channel([
-  { p: 0, v: 0 },
-  { p: 0.28, v: 0 },
-  { p: 0.995, v: 2.6, e: 'sineInOut' },
+  { p: 0, v: 0 }, { p: 0.28, v: -0.30 },
+  { p: 0.70, v: 0.22, e: 'sineInOut' },
+  { p: 0.948, v: 0, e: 'sineInOut' },
 ])
-// gaze: the disc's heart through the dive, banking to the fire for landing
-const dLookX = channel([
-  { p: 0, v: 0 },
-  { p: 0.88, v: 0 },
-  { p: 0.995, v: 0, e: 'sineInOut' },
-])
+const dLookX = channel([{ p: 0, v: 0 }, { p: 1, v: 0 }])
 const dLookY = channel([
-  // starts exactly on the held gaze (level), lifting into the eclipse's
-  // heart as the zoom begins: the first scroll must not snap the view
-  { p: 0, v: 0 },
-  { p: 0.06, v: 1.35, e: 'sineInOut' },
-  { p: 0.15, v: 1.35 },
-  { p: 0.28, v: -0.9, e: 'sineInOut' },
-  { p: 0.88, v: -0.9 },
-  { p: 0.995, v: -0.68, e: 'sineInOut' },
+  { p: 0, v: 0 }, { p: 0.06, v: 1.35, e: 'sineInOut' },
+  { p: 0.15, v: 1.35 }, { p: 0.28, v: 4, e: 'sineInOut' },
+  { p: 0.82, v: 3, e: 'sineInOut' },
+  { p: 0.948, v: -Math.tan(0.12) * 5.6, e: 'sineInOut' },
 ])
 const dLookZ = channel([
-  { p: 0, v: -10 },
-  { p: 0.15, v: -10 },
-  { p: 0.28, v: 0, e: 'sineInOut' },
-  { p: 0.88, v: 0 },
-  { p: 0.995, v: -5.6, e: 'sineInOut' },
+  { p: 0, v: -10 }, { p: 0.15, v: -10 },
+  { p: 0.28, v: 0, e: 'sineInOut' }, { p: 0.88, v: 0 },
+  { p: 0.948, v: -5.6, e: 'sineInOut' },
 ])
 const descentLook = new Vector3()
 function descentCamera(k: number): void {
@@ -902,6 +896,10 @@ declare global {
           chapter?: number
           figure?: string
           coda?: number
+          /** Shell close-ups for THE EYES; the journey continues to use real input. */
+          shell?: 'sitting' | 'instruments' | 'nights'
+          /** Optional deterministic council arrival time, in seconds. */
+          councilAt?: number
         }
       ) => void
       freeze: (t: number) => void
@@ -1118,7 +1116,7 @@ window.__forge = {
       agoraReveal = 1
       camera.rotation.set(-0.12, 0, 0)
       verseEl.classList.remove('lit')
-      council.forgeStage(camera)
+      council.forgeStage(camera, opts.councilAt)
       if (opts.coda) showDoor(true)
     }
     railEl.hidden = p === 'transit' || p === 'held'
@@ -1189,6 +1187,12 @@ window.__forge = {
       verseEl.classList.remove('lit') // the verse is long gone by the exchange
     }
     if (p === 'crossing' && opts.crossing) crossing.forgeStage(opts.crossing)
+    // Additive shell staging, explicitly allowed by the commission's eyes loop.
+    if (opts.shell !== 'nights') chapters.close()
+    instrumentsEl.hidden = opts.shell !== 'instruments'
+    railInstruments?.setAttribute('aria-expanded', String(opts.shell === 'instruments'))
+    if (opts.shell === 'sitting') sittingEl.hidden = false
+    if (opts.shell === 'nights') chapters.open()
   },
   freeze(t) {
     elapsed = t
@@ -1515,7 +1519,7 @@ function frame(now: number): void {
   // cut, once the camera has leveled (from above, the flame billboard
   // would fill the frame with streaks)
   const mandalaReveal =
-    phase === 'descent' ? smooth(0.26, 0.36, desc) * (1 - smooth(0.93, 0.99, desc)) : 0
+    phase === 'descent' ? smooth(0.26, 0.36, desc) * (1 - smooth(0.915, 0.948, desc)) : 0
   mandala.visible(mandalaReveal > 0.004)
   // the heart warms at overview altitude and yields before the close
   // pass, or its glow would paint the whole near frame beige
@@ -1523,7 +1527,8 @@ function frame(now: number): void {
     dt,
     elapsed,
     mandalaReveal,
-    smooth(0.55, 0.78, desc) * (1 - smooth(0.84, 0.93, desc))
+    smooth(0.55, 0.89, desc),
+    desc
   )
 
   const revealTarget =

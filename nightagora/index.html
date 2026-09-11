@@ -206,77 +206,84 @@
     /* at the camp the fire owns the left middle: the voice steps lower */
     body[data-phase='camp'] #voice { top: 72%; }
 
-    /* ---- the portrait: the atlas entry is the arrival ---- */
+    /* ---- the portrait: the plate is pressed into the same night the
+       burin travelled through ---- */
     #portrait {
+      --print: 0;
       position: fixed; left: 50%; top: 47%;
-      transform: translate(-50%, -52%) scale(0.97);
-      z-index: 3; pointer-events: none; margin: 0;
-      opacity: 0;
-      transition: opacity 1.8s ease, transform 1.8s ease;
+      transform: translate(-50%, -50%);
+      z-index: 3; pointer-events: none; margin: 0; opacity: 0;
     }
-    #portrait.lit { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-    /* the arrival halo: his gold light blooms behind the frame */
+    #portrait.lit { opacity: 1; }
+    @media (prefers-reduced-motion: reduce) {
+      #portrait, #portrait * { transition: none !important; }
+    }
+    /* the plate mark: the sheet the picture was pressed into */
     #portrait::before {
-      content: ''; position: absolute; inset: -38%;
-      background: radial-gradient(circle, color-mix(in srgb, var(--na-gold) 13%, transparent) 0%, transparent 60%);
-      opacity: 0; transition: opacity 2s ease 0.4s;
+      content: ''; position: absolute; inset: -102px -34px -92px;
+      background: linear-gradient(135deg,
+        color-mix(in srgb, var(--na-starlight) 2%, transparent),
+        color-mix(in srgb, var(--na-lapis) 18%, transparent) 48%,
+        color-mix(in srgb, var(--na-abyss) 32%, transparent));
+      border: 1px solid color-mix(in srgb, var(--na-starlight) 5%, transparent);
+      box-shadow: inset 1px 1px 0 color-mix(in srgb, var(--na-abyss) 80%, transparent),
+        1px 1px 0 color-mix(in srgb, var(--na-starlight) 5%, transparent);
+      opacity: var(--print); pointer-events: none;
+    }
+    .portrait-frame {
+      position: relative; padding: 8px;
+      background: linear-gradient(135deg, var(--na-lapis), var(--na-abyss));
+      border: 1px solid var(--rule);
+      border-image: linear-gradient(135deg, var(--na-gold) 0%,
+        color-mix(in srgb, var(--na-starlight) 65%, var(--na-gold)) 9%,
+        var(--rule-faint) 32%, var(--rule-faint) 73%, var(--na-gold-deep) 95%) 1;
+      box-shadow: inset 1px 1px 0 var(--rule-faint), inset -1px -1px 0 var(--na-abyss),
+        0 14px 35px color-mix(in srgb, var(--na-abyss) 70%, transparent);
+    }
+    /* the tooled inner rule, lit from the same corner as the frame */
+    .portrait-frame::after {
+      content: ''; position: absolute; inset: 5px;
+      border: 1px solid;
+      border-color: var(--rule) var(--rule-faint) var(--rule-faint) var(--rule);
       pointer-events: none;
     }
-    #portrait.lit::before { opacity: 1; }
-    .portrait-frame {
-      border: 1px solid color-mix(in srgb, var(--na-gold) 45%, transparent);
-      padding: 7px;
-      background: rgba(2, 3, 7, 0.4);
-      box-shadow: 0 0 60px rgba(224, 185, 106, 0.08);
-    }
     .portrait-frame img {
-      display: block;
-      width: min(38vh, 64vw);
-      border: 1px solid color-mix(in srgb, var(--na-gold) 22%, transparent);
+      display: block; width: min(42vh, 64vw); height: auto;
     }
     #portrait figcaption { display: contents; }
     .portrait-name, .portrait-years, .portrait-epithet, .portrait-note {
-      position: absolute; white-space: nowrap;
-      opacity: 0; transition: opacity 1.2s ease;
+      position: absolute; left: 50%; transform: translateX(-50%);
+      width: max-content; max-width: calc(100vw - 52px); text-align: center;
+      opacity: 0;
     }
-    #portrait.lit .portrait-name { opacity: 1; transition-delay: 0.35s; }
-    #portrait.lit .portrait-years { opacity: 1; transition-delay: 0.6s; }
-    #portrait.lit .portrait-epithet { opacity: 1; transition-delay: 0.85s; }
-    #portrait.lit .portrait-note { opacity: 1; transition-delay: 1.1s; }
-    /* the caption hangs off the frame the way a plate is captioned in a
-       catalogue: his name over the picture, his ground under it, and a
-       hairline saying the two belong to the same entry */
+    #portrait.lit .portrait-name, #portrait.lit .portrait-years,
+    #portrait.lit .portrait-epithet, #portrait.lit .portrait-note { opacity: var(--print); }
+    /* the catalogue plate: his name over the picture, his ground under it */
     .portrait-name {
-      top: -54px; left: 0;
-      font-family: var(--sans); font-size: 11px;
-      letter-spacing: 0.3em; text-transform: uppercase;
-      color: var(--na-gold);
-      text-shadow: var(--ink-night);
+      top: -76px; font-family: var(--serif); font-size: clamp(20px, 2.1vw, 26px);
+      font-weight: 400; line-height: 1.25; letter-spacing: 0.14em;
+      text-indent: 0.14em; text-transform: uppercase;
+      color: var(--na-starlight); text-shadow: 0 1px 0 var(--na-abyss), 0 -1px 0 var(--rule-faint);
     }
     .portrait-years {
-      top: -30px; left: 0;
-      font-family: var(--sans); font-size: 9.5px;
-      letter-spacing: 0.28em;
-      color: color-mix(in srgb, var(--na-mist) 88%, transparent);
-      text-shadow: var(--ink-night);
+      top: -34px; font-family: var(--sans); font-size: 9px;
+      letter-spacing: 0.22em; color: var(--mist-warm);
     }
     .portrait-epithet {
-      bottom: -34px; left: 0;
-      font-family: var(--serif); font-style: italic;
-      font-size: 15px; letter-spacing: 0.01em;
-      color: var(--na-starlight);
-      text-shadow: var(--ink-night);
+      bottom: -43px; font-family: var(--serif); font-style: italic;
+      font-size: 16px; letter-spacing: 0.01em; color: var(--na-starlight);
     }
     .portrait-note {
-      bottom: -58px; left: 0;
-      font-family: var(--sans); font-size: 9px;
-      letter-spacing: 0.26em; text-transform: uppercase;
-      color: color-mix(in srgb, var(--na-mist) 84%, transparent);
-      text-shadow: var(--ink-night);
+      bottom: -69px; font-family: var(--sans); font-size: 8px;
+      letter-spacing: 0.22em; text-transform: uppercase; color: var(--mist-warm);
     }
-    /* no rule under the picture: the frame already wears two gold hairlines
-       of its own, and a third one under it lands on the frame's own edge
-       (round 2). The caption earns its place with air and with ink. */
+    @media (max-aspect-ratio: 9/10) {
+      #portrait::before { inset: -96px -20px -90px; }
+      .portrait-name { top: -70px; font-size: 20px; letter-spacing: 0.1em; }
+      .portrait-years { font-size: 8px; letter-spacing: 0.13em; }
+      .portrait-epithet { font-size: 14px; }
+      .portrait-note { font-size: 7px; letter-spacing: 0.14em; }
+    }
 
     /* ---- the gold breath: you enter a life through its light ---- */
     #goldbreath {
@@ -501,13 +508,15 @@
     #descent { position: fixed; inset: 0; z-index: 3; pointer-events: none; }
     #descent[hidden] { display: none; }
     .descent-beat {
-      position: fixed; left: 0; right: 0; top: 42%;
+      position: fixed; left: 0; right: 0; top: 28%;
       text-align: center; padding: 0 24px;
+      transform: none !important;
       opacity: 0; will-change: transform, opacity;
     }
     .descent-ask {
-      font-family: var(--serif); font-style: italic;
-      font-size: clamp(21px, 3vw, 31px); line-height: 1.42;
+      max-width: 24em; margin: 0 auto;
+      font-family: var(--serif); font-style: normal;
+      font-size: clamp(23px, 3vw, 38px); line-height: 1.34;
       letter-spacing: 0.005em; text-wrap: balance;
       color: var(--na-starlight);
       text-shadow: var(--ink-night);
@@ -1432,15 +1441,15 @@
     /* ---- the council: topic in letterpress, names in the register,
        a thin cartouche for the produced audio ---- */
     #council-topic {
-      position: fixed; left: 0; right: 0; top: 13%;
-      z-index: 3; text-align: center; pointer-events: none;
-      padding: 0 24px;
+      position: fixed; left: 9%; right: auto; top: 15%; width: 360px;
+      z-index: 3; text-align: left; pointer-events: none;
+      padding: 0;
       opacity: 0; transition: opacity 2s ease;
     }
     #council-topic.lit { opacity: 1; }
     /* the playbill's own lintel, ruled like the door's */
     .council-kicker {
-      display: flex; align-items: center; justify-content: center; gap: 15px;
+      display: flex; align-items: center; justify-content: flex-start; gap: 15px;
       font-family: var(--sans);
       font-size: 10px; letter-spacing: 0.34em; text-indent: 0.34em;
       text-transform: uppercase; color: var(--na-gold);
@@ -1452,7 +1461,7 @@
     .council-title {
       margin-top: 14px;
       font-family: var(--serif);
-      font-size: clamp(20px, 2.8vw, 28px); line-height: 1.24;
+      font-size: clamp(28px, 3.2vw, 40px); line-height: 1.16;
       letter-spacing: 0.01em; text-wrap: balance;
       color: var(--na-starlight);
       text-shadow: var(--ink-night);
@@ -1469,7 +1478,19 @@
     }
     .council-register .moderator { color: var(--na-starlight); }
     @media (max-aspect-ratio: 9/10) {
-      .council-register { display: block; }
+      #council-topic { left: 24px; right: 24px; top: 7.2%; width: auto; text-align: center; }
+      .council-kicker { justify-content: center; }
+      .council-title { max-width: 290px; margin: 12px auto 0; font-size: 24px; }
+      .council-register {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 7px 24px;
+        position: fixed; left: 36px; right: 36px; bottom: 25.3%; margin: 0;
+        padding: 10px 0 12px;
+        border-top: 1px solid color-mix(in srgb, var(--na-mist) 20%, transparent);
+        border-bottom: 1px solid color-mix(in srgb, var(--na-mist) 20%, transparent);
+        font-family: var(--serif); font-size: 16px; line-height: 1.3;
+        text-transform: none; letter-spacing: 0.03em; text-indent: 0;
+      }
+      .council-separator { display: none; }
       #council-names { display: none; }
     }
     #council-names { position: fixed; inset: 0; z-index: 3; pointer-events: none; }
@@ -1478,7 +1499,9 @@
       position: absolute; transform: translateX(-50%);
       font-family: var(--sans);
       font-size: 9px; letter-spacing: 0.3em; text-indent: 0.3em;
-      text-transform: uppercase; color: var(--na-mist);
+      text-transform: uppercase;
+      /* these stand on floor the presences light: mist grey lost them */
+      color: color-mix(in srgb, var(--na-starlight) 78%, var(--na-mist));
       white-space: nowrap;
     }
     .council-name.moderator { color: var(--na-starlight); }
@@ -1487,7 +1510,7 @@
       position: fixed; left: 50%; bottom: calc(30px + env(safe-area-inset-bottom));
       transform: translateX(-50%);
       width: min(560px, calc(100% - 48px));
-      z-index: 3; cursor: pointer;
+      z-index: 3;
       transition: opacity 0.8s ease;
     }
     #cartouche[hidden] { display: block; opacity: 0; visibility: hidden; }
@@ -1527,7 +1550,8 @@
       font-family: var(--sans);
       font-size: 10px; letter-spacing: 0.3em; text-indent: 0.3em;
       text-transform: uppercase; color: var(--na-gold);
-      min-width: 52px; text-align: left;
+      min-width: 80px; min-height: 44px; text-align: left;
+      background: none; border: none; cursor: pointer;
       text-shadow: var(--ink-night);
     }
     .cartouche-title {
@@ -1550,6 +1574,10 @@
       /* the cartouche rests above the instrument rail on narrow stages */
       #cartouche { bottom: calc(76px + env(safe-area-inset-bottom)); }
     }
+
+    .cartouche-toggle:focus-visible { outline: 1px solid var(--na-gold); outline-offset: 3px; }
+    .cartouche-toggle:hover { color: var(--na-starlight); }
+    @media (prefers-reduced-motion: reduce) { #council-topic, #cartouche { transition: none; } }
 
     /* the way onward, after the coda */
     .keeper-exit {
@@ -1602,10 +1630,33 @@
        world (no box — it walls the voice off), placed clear of the
        flame and inked deep enough to hold against the dawn */
     body[data-phase='camp'] #keeper {
-      left: 50%; right: auto; transform: translateX(-50%);
-      width: min(620px, calc(100% - 40px));
-      bottom: calc(96px + env(safe-area-inset-bottom));
+      left: 5vw; right: auto; transform: none;
+      width: min(390px, 34vw); text-align: left;
+      bottom: calc(104px + env(safe-area-inset-bottom));
       padding: 0 8px;
+    }
+    body[data-phase='camp'] #keeper .keeper-seal { margin-left: 0; }
+    body[data-phase='camp'] #keeper .keeper-rule { margin-left: 0; }
+    body[data-phase='camp'] #keeper .keeper-name { font-size: 17px; }
+    body[data-phase='camp'] #keeper .keeper-line,
+    body[data-phase='camp'] #keeper .keeper-phrase { font-size: 19px; line-height: 1.48; }
+    body[data-phase='camp'] #keeper .keeper-offers { justify-content: flex-start; }
+    body[data-phase='camp'] #keeper .keeper-exit { min-height: 44px; }
+    @media (max-width: 720px) {
+      body[data-phase='camp'] #keeper {
+        left: 50%; transform: translateX(-50%); width: calc(100% - 44px);
+        bottom: calc(100px + env(safe-area-inset-bottom)); text-align: center;
+      }
+      body[data-phase='camp'] #keeper .keeper-seal,
+      body[data-phase='camp'] #keeper .keeper-rule { margin-left: auto; }
+      body[data-phase='camp'] #keeper .keeper-name { font-size: 14px; }
+      body[data-phase='camp'] #keeper .keeper-line,
+      body[data-phase='camp'] #keeper .keeper-phrase { font-size: 16px; line-height: 1.48; }
+      body[data-phase='camp'] #keeper .keeper-offers { justify-content: center; }
+      body[data-phase='camp'] #keeper .keeper-note { letter-spacing: 0.15em; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      body[data-phase='camp'] #keeper *, #trace-card, #dusk-pane { transition: none !important; animation: none !important; }
     }
     body[data-phase='camp'] #keeper .keeper-line,
     body[data-phase='camp'] #keeper .keeper-phrase,
@@ -1757,7 +1808,7 @@
 
       .council-kicker { gap: 11px; font-size: 9px; letter-spacing: 0.26em; text-indent: 0.26em; }
       .council-kicker::before, .council-kicker::after { width: 15px; }
-      .council-register { font-size: 8.5px; letter-spacing: 0.24em; text-indent: 0.24em; }
+      .council-register { font-size: 16px; letter-spacing: 0.03em; text-indent: 0; }
 
       .descent-kicker { gap: 11px; font-size: 9px; letter-spacing: 0.26em; text-indent: 0.26em; }
       .descent-kicker::before, .descent-kicker::after { width: 15px; }
@@ -1790,6 +1841,7 @@
     }
 
   </style>
+  <link rel="stylesheet" href="/src/styles/shell.css" />
 </head>
 <body data-phase="transit">
   <div id="stage" aria-hidden="true"></div>
@@ -1798,7 +1850,7 @@
   <div id="veil">
     <p class="brand">Agora Cosmica</p>
     <div class="copy">
-      <h1>A Living Library You Can Talk To</h1>
+      <h1><span>A Living Library</span> <span>You Can Talk To</span></h1>
       <p class="tagline">Thirty Remarkable People · One Night Sky</p>
     </div>
     <p class="status" id="status" role="status">First light</p>
@@ -1834,7 +1886,7 @@
     <div class="portrait-frame">
       <img src="https://media.agoracosmica.org/images/figures/aurelius/main/900.webp"
         alt="AI-generated portrait of Marcus Aurelius, Roman emperor in a white toga, calm gaze under grey curls."
-        loading="lazy" />
+        loading="eager" />
     </div>
     <figcaption>
       <p class="portrait-name">Marcus Aurelius</p>
@@ -1943,7 +1995,7 @@
   <div id="council-topic">
     <p class="council-kicker">Lives That Still Speak</p>
     <p class="council-title">The Calling That Won't Shut Up.</p>
-    <p class="council-register">Campbell · <span class="moderator">Goethe</span> · Lovelace · Gandhi</p>
+    <p class="council-register"><span>Campbell</span><span class="council-separator"> · </span><span class="moderator">Goethe</span><span class="council-separator"> · </span><span>Lovelace</span><span class="council-separator"> · </span><span>Gandhi</span></p>
   </div>
   <div id="council-names" hidden>
     <span class="council-name">Campbell</span>
@@ -1954,7 +2006,7 @@
   <div id="cartouche" hidden>
     <p class="cartouche-honesty">Four AI Echoes, one of them moderating · Interpretations, not recordings</p>
     <div class="cartouche-bar">
-      <span class="cartouche-toggle">Listen</span>
+      <button class="cartouche-toggle" type="button">Listen</button>
       <span class="cartouche-title">A short preview · English</span>
       <div class="cartouche-progress"></div>
     </div>

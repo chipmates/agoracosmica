@@ -12,7 +12,6 @@ import {
   AdditiveBlending,
   BoxGeometry,
   CanvasTexture,
-  ConeGeometry,
   CylinderGeometry,
   Group,
   Mesh,
@@ -260,9 +259,19 @@ export function createFires(rand: () => number): Fires {
       roll.rotation.y = sx * 0.4
       add(roll)
     }
-    const tripod = new Mesh(new ConeGeometry(0.42, 1.05, 3, 1, true), P.tripod)
-    tripod.position.copy(mp(C[0], 0.52, C[2]))
-    add(tripod)
+    // Three iron rods carry the pot. A triangular cone filled the gaps
+    // between them, turning the cooking frame into a solid hood.
+    const crown = mp(C[0], 1.04, C[2])
+    const rodUp = new Vector3(0, 1, 0)
+    for (let i = 0; i < 3; i++) {
+      const a = (i / 3) * Math.PI * 2 + 0.35
+      const foot = mp(C[0] + Math.cos(a) * 0.43, 0.025, C[2] + Math.sin(a) * 0.43)
+      const axis = crown.clone().sub(foot)
+      const rod = new Mesh(new CylinderGeometry(0.012, 0.018, axis.length(), 6), P.tripod)
+      rod.position.copy(foot).add(crown).multiplyScalar(0.5)
+      rod.quaternion.setFromUnitVectors(rodUp, axis.normalize())
+      add(rod)
+    }
     const pot = new Mesh(new SphereGeometry(0.13, 10, 8), P.pot)
     pot.scale.y = 0.8
     pot.position.copy(mp(C[0], 0.44, C[2]))
@@ -325,8 +334,8 @@ export function createFires(rand: () => number): Fires {
   }
   pool(place(2.85, 0.06, 12.6), 3.6, 1.6, 1.15)
   pool(place(-3.4, 0.3, -11.2), 3.8, 1.4, 1.05)
-  pool(place(0, 0.3, T.z + T.d / 2 + 1.6), 6.2, 3.4, 1.25)
-  pool(place(0, 1.5, T.z + T.d / 2 - 0.4), 4.4, 3.2, 1.0)
+  pool(place(0, 0.3, T.z + T.d / 2 + 1.6), 5.2, 2.2, 0.68)
+  pool(place(0, 1.5, T.z + T.d / 2 - 0.4), 3.4, 2.4, 0.65)
   pool(place(-2.35, 2.0, 4.5), 1.5, 1.5, 0.55)
   pool(place(2.35, 2.0, 4.5), 1.5, 1.5, 0.55)
   // the praetorium's smoke vent: from the overlook behind the fort this is
@@ -418,4 +427,3 @@ export function createFires(rand: () => number): Fires {
     },
   }
 }
-

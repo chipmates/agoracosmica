@@ -57,6 +57,7 @@ import {
   FIRES,
   firePosU,
   planetize,
+  sn,
   uDeep,
   uGust,
   uReveal,
@@ -105,7 +106,7 @@ export function createSparks(opts: {
       iOrig[k * 3] = o.x
       iOrig[k * 3 + 1] = o.y
       iOrig[k * 3 + 2] = o.z
-      iSeed[k * 4] = 0.42 + rand() * 0.4
+      iSeed[k * 4] = 0.16 + rand() * 0.15
       iSeed[k * 4 + 1] = rand() * 3
       iSeed[k * 4 + 2] = (rand() - 0.5) * 0.5
       iSeed[k * 4 + 3] = (rand() - 0.5) * 0.5
@@ -129,14 +130,14 @@ export function createSparks(opts: {
   const p = fract(uT.mul(seed.x).add(seed.y))
   // donor d: fast birth, still heights. Gold moves, white holds.
   const pe = oneMinus(pow(oneMinus(p), 1.8))
-  const sway = float(0.05).add(pe.mul(0.34))
+  const sway = float(0.025).add(pe.mul(0.14))
   const w = vec3(
     orig.x
       .add(seed.z.mul(float(0.4).add(pe)))
-      .add(sin(uT.mul(1.7).add(seed.y.mul(6.0))).mul(sway))
-      .add(uGust.mul(pe).mul(pe).mul(1.3)),
+      .add(sin(uT.mul(0.7).add(seed.y.mul(6.0))).mul(sway))
+      .add(uGust.mul(pe).mul(pe).mul(0.6)),
     orig.y.add(float(0.24).add(pe.mul(3.1).mul(uRise))),
-    orig.z.add(seed.w.mul(float(0.4).add(pe))).add(cos(uT.mul(1.4).add(seed.y.mul(5.0))).mul(sway).mul(0.6))
+    orig.z.add(seed.w.mul(float(0.4).add(pe))).add(cos(uT.mul(0.6).add(seed.y.mul(5.0))).mul(sway).mul(0.6))
   )
   // ember -> gold -> starlight (linear constants: craft law 1)
   let col: N = vec3(0.3, 0.075, 0.012)
@@ -145,7 +146,7 @@ export function createSparks(opts: {
   const fadeIn = min(p.div(0.06), 1)
   const letGo = smoothstep(1.0, 0.86, pe)
   const alpha = uReveal.mul(fadeIn).mul(float(0.3).add(pow(oneMinus(pe), 0.7).mul(0.7))).mul(letGo)
-  const sizePx = float(7.2).sub(pe.mul(2.6))
+  const sizePx = float(2.8).sub(pe.mul(1.2))
   const mv = cameraViewMatrix.mul(vec4(w, 1))
   const px = sizePx.mul(uPx).mul(max(mv.z.negate(), 1))
   mat.vertexNode = cameraProjectionMatrix.mul(
@@ -249,27 +250,55 @@ export function createSmoke(opts: {
 export function createGrass(opts: { count: number; rand(): number }): Drift {
   const { count, rand } = opts
   const iPos = new Float32Array(count * 3)
-  const iSeed = new Float32Array(count * 2)
+  // Phase, height, form (grass / reed / trodden straw), and width share
+  // one field. The riverbank earns detail without another draw.
+  const iSeed = new Float32Array(count * 4)
+  const reeds = Math.floor(count * 0.28)
+  const straw = Math.floor(count * 0.18)
   let made = 0
   let guard = 0
   while (made < count && guard++ < count * 40) {
-    const a = rand() * Math.PI * 2
-    const r = 15 + Math.pow(rand(), 0.6) * 46
-    const x = Math.cos(a) * r
-    const z = Math.sin(a) * r
-    // outside the palisade only, and never in the water
-    if (Math.abs(x) < 15 && z < 6 && z > -33) continue
-    if (z > 6.6 && z < 24.4) continue
+    let x: number, z: number, h: number, form: number, width: number
+    if (made < reeds) {
+      // Small loose clumps on both banks; the crossing remains clear.
+      const side = made % 2 ? -1 : 1
+      const cluster = Math.floor(made / 2) % 5
+      x = side * (3.4 + cluster * 3.4 + (rand() - 0.5) * 1.15)
+      z = made % 4 < 2 ? 25.3 + rand() * 1.5 : 6.0 + rand() * 1.15
+      h = 0.65 + rand() * 0.7
+      form = 1
+      width = 0.25
+    } else if (made < reeds + straw) {
+      // The boots have spared only the edge of the approach, short dry
+      // blades between the kerb and the tent frontage, never a lawn.
+      x = (made % 2 ? -1 : 1) * (2.45 + rand() * 0.95)
+      z = 1.5 - rand() * 7.0
+      h = 0.09 + rand() * 0.13
+      form = 2
+      width = 0.7
+    } else {
+      const a = rand() * Math.PI * 2
+      const r = 15 + Math.pow(rand(), 0.6) * 46
+      x = Math.cos(a) * r
+      z = Math.sin(a) * r
+      if (Math.abs(x) < 15 && z < 6 && z > -33) continue
+      if (z > 6.6 && z < 24.4) continue
+      h = 0.35 + rand() * 0.55
+      form = 0
+      width = 0.55
+    }
     iPos[made * 3] = x
-    iPos[made * 3 + 1] = 0
+    iPos[made * 3 + 1] = 0.04
     iPos[made * 3 + 2] = z
-    iSeed[made * 2] = rand()
-    iSeed[made * 2 + 1] = 0.42 + rand() * 0.5
+    iSeed[made * 4] = rand()
+    iSeed[made * 4 + 1] = h
+    iSeed[made * 4 + 2] = form
+    iSeed[made * 4 + 3] = width
     made++
   }
   const geo = quadGeo(made)
   geo.setAttribute('iPos', new InstancedBufferAttribute(iPos.slice(0, made * 3), 3))
-  geo.setAttribute('iSeed', new InstancedBufferAttribute(iSeed.slice(0, made * 2), 2))
+  geo.setAttribute('iSeed', new InstancedBufferAttribute(iSeed.slice(0, made * 4), 4))
 
   const mat = new MeshBasicNodeMaterial()
   mat.transparent = true
@@ -277,32 +306,50 @@ export function createGrass(opts: { count: number; rand(): number }): Drift {
   mat.blending = NormalBlending
 
   const pos = attribute('iPos', 'vec3')
-  const seed = attribute('iSeed', 'vec2')
-  const base = planetize(pos)
+  const seed = attribute('iSeed', 'vec4')
+  // The same channel cut as the earth: roots follow the bank instead of
+  // hovering over the water where the curved ground falls away.
+  const wob = sn(vec3(pos.x.mul(0.055), 0, 3.1)).mul(1.5)
+  const channel = float(0.66).mul(smoothstep(3.4, 8.6, pos.z.add(wob)))
+    .mul(oneMinus(smoothstep(22.4, 27.4, pos.z.sub(wob))))
+  const base = planetize(vec3(pos.x, pos.y.sub(channel), pos.z))
   const h = seed.y
   // a vertical billboard: it turns to face the eye, it never tips
   const toEye = vec3(cameraPosition.x.sub(base.x), 0, cameraPosition.z.sub(base.z))
-  const right = normalize(vec3(toEye.z.negate(), 0, toEye.x))
+  const right = normalize(vec3(toEye.z.negate().add(0.00001), 0, toEye.x.add(0.00001)))
   const up01 = positionLocal.y.mul(0.5).add(0.5)
-  const lean = uGust.mul(0.5).add(sin(uT.mul(1.1).add(seed.x.mul(20.0))).mul(0.06)).mul(up01)
+  const lean = uGust.mul(0.15).add(sin(uT.mul(0.7).add(seed.x.mul(20.0))).mul(0.025))
+    .mul(up01).mul(up01)
   const w = base
-    .add(right.mul(positionLocal.x.mul(h).mul(0.55).add(lean.mul(h))))
-    .add(vec3(0, up01.mul(h).mul(1.6), 0))
+    .add(right.mul(positionLocal.x.mul(h).mul(seed.w).add(lean.mul(h))))
+    .add(vec3(0, up01.mul(h), 0))
   mat.vertexNode = cameraProjectionMatrix.mul(cameraViewMatrix).mul(vec4(w, 1))
 
   const vUv: N = varying(positionLocal.xy)
   const vSeed: N = varying(seed.x)
+  const vForm: N = varying(seed.z)
+  const reed = smoothstep(0.5, 0.9, vForm).mul(oneMinus(smoothstep(1.1, 1.5, vForm)))
+  const dry = smoothstep(1.5, 2, vForm)
   const y = vUv.y.mul(0.5).add(0.5)
   let a: N = float(0)
+  let reedA: N = float(0)
   for (let i = 0; i < 3; i++) {
     const jitter = fract(sin(vSeed.mul(13.0).add(i)).mul(43758.5453)).sub(0.5).mul(0.3)
     const o = float((i - 1) * 0.42).add(jitter)
     const cx = o.add(o.mul(1.5).mul(y).mul(y))
     const wide = mix(float(0.16), float(0.02), y)
     a = max(a, smoothstep(wide, 0, abs(vUv.x.sub(cx))).mul(oneMinus(smoothstep(0.65, 1.0, y))))
+    // Slender stems with unequal seed heads, not broad upright leaves.
+    const top = float(0.79 + i * 0.065).add(jitter.mul(0.1))
+    const stemX = o.mul(0.9).add(o.mul(y).mul(y).mul(0.2))
+    const stem = smoothstep(0.032, 0.008, abs(vUv.x.sub(stemX)))
+      .mul(oneMinus(smoothstep(top.sub(0.015), top, y)))
+    const head = smoothstep(1, 0.45, length(vec2(vUv.x.sub(stemX).div(0.065), y.sub(top.sub(0.075)).div(0.082))))
+    reedA = max(reedA, max(stem, head))
   }
-  mat.colorNode = mix(vec3(0.034, 0.034, 0.03), vec3(0.008, 0.009, 0.013), uDeep)
-  mat.opacityNode = min(a.mul(0.85).mul(uReveal), 1)
+  const dryColour = mix(vec3(0.045, 0.04, 0.029), vec3(0.078, 0.06, 0.037), max(reed, dry))
+  mat.colorNode = mix(dryColour, vec3(0.008, 0.009, 0.013), uDeep)
+  mat.opacityNode = min(mix(a, reedA, reed).mul(0.85).mul(uReveal), 1)
 
   const mesh = new Mesh(geo, mat)
   mesh.frustumCulled = false
@@ -364,7 +411,7 @@ export function createMotes(opts: { count: number; rand(): number }): Sparks {
   const lit = min(warm, 1.6)
   const twinkle = sin(uT.mul(seed.z.mul(1.7)).add(seed.w.mul(24))).mul(0.3).add(0.7)
   const alpha = lit.mul(0.16).mul(twinkle).mul(uReveal)
-  const size = float(2.4).add(seed.w.mul(2.2))
+  const size = float(1.05).add(seed.w.mul(1.1))
   const mv = cameraViewMatrix.mul(vec4(w, 1))
   const px = size.mul(uPx).mul(max(mv.z.negate(), 1))
   mat.vertexNode = cameraProjectionMatrix.mul(

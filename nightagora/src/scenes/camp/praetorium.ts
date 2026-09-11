@@ -22,16 +22,86 @@ import {
   Float32BufferAttribute,
   Group,
   Mesh,
+  LatheGeometry,
   PlaneGeometry,
   SphereGeometry,
   TorusGeometry,
+  Vector2,
   Vector3,
 } from 'three/webgpu'
 import { field, type FieldItem, inkMaterial, MAP } from './hour'
-import { openPrism } from './fort'
 import { palette } from './materials'
 
 const mp = (x: number, y: number, z: number): Vector3 => new Vector3(x, y, z)
+
+/** A sewn surface, sampled in its own weave directions. The normals follow
+    the cloth's weight, including the back of it seen from his writing seat. */
+function clothGrid(
+  across: number,
+  along: number,
+  point: (u: number, v: number) => [number, number, number],
+  reverse = false
+): BufferGeometry {
+  const p: number[] = []
+  const uv: number[] = []
+  const indices: number[] = []
+  for (let j = 0; j <= along; j++) {
+    for (let i = 0; i <= across; i++) {
+      const u = i / across
+      const v = j / along
+      p.push(...point(u, v))
+      uv.push(v, 1 - u)
+      if (i < across && j < along) {
+        const a = j * (across + 1) + i
+        const b = a + across + 1
+        if (reverse) indices.push(a, b, a + 1, a + 1, b, b + 1)
+        else indices.push(a, a + 1, b, a + 1, b + 1, b)
+      }
+    }
+  }
+  const g = new BufferGeometry()
+  g.setAttribute('position', new Float32BufferAttribute(p, 3))
+  g.setAttribute('uv', new Float32BufferAttribute(uv, 2))
+  g.setIndex(indices)
+  g.computeVertexNormals()
+  return g
+}
+
+/** Eight-sided bevel, with the long arris worn by hands instead of a
+    perfectly rectangular silhouette. A single strip costs 400 triangles. */
+function desktopPlank(seed: number): BufferGeometry {
+  const p: number[] = []
+  const uv: number[] = []
+  const indices: number[] = []
+  const rings = 24
+  const profile: Array<[number, number]> = [
+    [-0.086, 0.028], [0.086, 0.028], [0.093, 0.019], [0.093, -0.019],
+    [0.086, -0.028], [-0.086, -0.028], [-0.093, -0.019], [-0.093, 0.019],
+  ]
+  for (let i = 0; i <= rings; i++) {
+    const x = (i / rings - 0.5) * 1.5
+    const wear = Math.sin(i * 1.72 + seed) * 0.0016 + Math.sin(i * 0.47 + seed) * 0.0018
+    for (let k = 0; k < profile.length; k++) {
+      const [z, y] = profile[k]!
+      p.push(x, y + wear * 0.4, z + Math.sign(z) * wear)
+      uv.push(i / rings, k / 8)
+      if (i < rings) {
+        const a = i * 8 + k
+        const b = i * 8 + (k + 1) % 8
+        indices.push(a, b, a + 8, b, b + 8, a + 8)
+      }
+    }
+  }
+  for (let i = 1; i < 7; i++) {
+    indices.push(0, i + 1, i, rings * 8, rings * 8 + i, rings * 8 + i + 1)
+  }
+  const g = new BufferGeometry()
+  g.setAttribute('position', new Float32BufferAttribute(p, 3))
+  g.setAttribute('uv', new Float32BufferAttribute(uv, 2))
+  g.setIndex(indices)
+  g.computeVertexNormals()
+  return g
+}
 
 export function createPraetorium(rand: () => number): Group {
   const P = palette()
@@ -52,40 +122,91 @@ export function createPraetorium(rand: () => number): Group {
 
   // ------------------------------------------------------------ THE TENT
   {
-    const body = new Mesh(openPrism(T.w, T.h, T.d), P.praetorium)
-    body.position.copy(mp(T.x, 0, T.z))
-    add(body)
-    // the back gable, so the tent is a room and not a tunnel
-    const gable = new Mesh(
-      (() => {
-        const g = new BufferGeometry()
-        const w = T.w / 2
-        g.setAttribute('position', new Float32BufferAttribute([-w, 0, 0, w, 0, 0, 0, T.h, 0], 3))
-        g.setAttribute('normal', new Float32BufferAttribute([0, 0, 1, 0, 0, 1, 0, 0, 1], 3))
-        g.setAttribute('uv', new Float32BufferAttribute([0, 0, 1, 0, 0.5, 1], 2))
-        return g
-      })(),
-      P.praetorium
-    )
-    gable.position.copy(mp(T.x, 0, T.z - T.d / 2 + 0.02))
-    add(gable)
-    // the parted flaps: the wedge of gold that spills onto the via
-    for (const sx of [-1, 1]) {
-      const flap = new Mesh(new PlaneGeometry(0.82, T.h * 0.42), P.flap)
-      flap.position.copy(mp(T.x + sx * 3.14, T.h * 0.21, T.z + T.d / 2 + 0.5))
-      flap.rotation.y = -sx * 1.02
-      add(flap)
+    // Heavy waxed cloth has a catenary across the slope and slight belly
+    // between the sewn panels. It stays taut at the ridge and the pegged
+    // skirt; the middle is allowed to carry its own weight.
+    const roofPoint = (sx: number, u: number, v: number): [number, number, number] => {
+      const slope = Math.sin(u * Math.PI)
+      const panel = Math.sin(v * Math.PI * 7)
+      const belly = 0.22 * slope + 0.02 * slope * panel * panel
+      const ridgeSag = 0.075 * Math.sin(v * Math.PI) * (1 - u)
+      return [
+        T.x + sx * (T.w * 0.5 * u),
+        T.h * (1 - u) - belly - ridgeSag + 0.028 * u,
+        T.z + (v - 0.5) * T.d,
+      ]
     }
-    // the ridge pole and the guy stakes: a tent is a rigging
-    const ridge = new Mesh(new CylinderGeometry(0.07, 0.07, T.d + 0.34, 6), P.timber)
+    for (const sx of [-1, 1]) {
+      add(new Mesh(clothGrid(24, 42, (u, v) => roofPoint(sx, u, v), sx > 0), P.praetorium))
+      // Lap seams are actual overlapping canvas, so a raking light finds
+      // one edge while the other sinks into the adjoining sheet.
+      for (let j = 0; j <= 7; j++) {
+        const v = j / 7
+        const seam = clothGrid(24, 1, (u, width) => {
+          const q = roofPoint(sx, u, Math.min(1, Math.max(0, v + (width - 0.5) * 0.0016)))
+          return [q[0] + sx * 0.0015, q[1] + 0.0015, q[2]]
+        }, sx > 0)
+        add(new Mesh(seam, P.praetorium))
+      }
+    }
+    // the back gable, so the tent is a room and not a tunnel
+    const gable = new Mesh(clothGrid(24, 10, (u, v) => {
+      const edge = Math.abs(u * 2 - 1)
+      const high = T.h * (1 - edge) - 0.22 * Math.sin(edge * Math.PI)
+      const fold = Math.sin(u * Math.PI * 14) * 0.035 * Math.sin(v * Math.PI)
+      return [T.x + (u - 0.5) * T.w, 0.028 + high * v,
+        T.z - T.d / 2 + 0.025 + fold + Math.sin(u * Math.PI) * 0.06 * (1 - v)]
+    }), P.praetorium)
+    add(gable)
+    // The front leaves gather into ties. Their folds radiate from the
+    // knot, and their bottom hems release again towards the ground.
+    for (const sx of [-1, 1]) {
+      const flapWidth = (v: number): number => {
+        const gathered = Math.exp(-Math.pow((v - 0.74) / 0.13, 2))
+        return Math.sin(v * Math.PI) * (0.24 + v * 0.55) * (1 - gathered * 0.65)
+      }
+      const flap = clothGrid(14, 28, (u, v) => {
+        const gathered = Math.exp(-Math.pow((v - 0.74) / 0.13, 2))
+        // u=0 is the roof's own front edge. Independent outlines left
+        // slivers of sky between the roof and what should be sewn to it.
+        const edge = roofPoint(sx, v, 1)
+        const release = Math.sin(u * Math.PI / 2) * Math.sin(v * Math.PI)
+        const fold = Math.sin(u * Math.PI * 5 + v * 0.8) * 0.023 * (1 - gathered * 0.7) * release
+        return [edge[0] - sx * u * flapWidth(v), edge[1] - u * 0.07 * Math.sin(v * Math.PI),
+          edge[2] + release * 0.1 + fold]
+      }, sx < 0)
+      add(new Mesh(flap, P.flap))
+      const tied = roofPoint(sx, 0.74, 1)
+      const tie = new Mesh(new TorusGeometry(0.1, 0.012, 5, 12), P.timber)
+      tie.scale.x = 0.84
+      tie.scale.z = 0.6
+      tie.rotation.x = Math.PI / 2
+      tie.position.copy(mp(tied[0] - sx * flapWidth(0.74) * 0.5, tied[1] - 0.025, tied[2] + 0.04))
+      add(tie)
+    }
+    // A doubled canvas sleeve carries the ridge timber. A bare full-length
+    // cylinder read as a pipe floating down the middle of the opening.
+    const ridge = new Mesh(new CylinderGeometry(0.028, 0.033, T.d - 0.48, 8), P.timber)
     ridge.rotation.x = Math.PI / 2
-    ridge.position.copy(mp(T.x, T.h - 0.03, T.z))
+    ridge.position.copy(mp(T.x, T.h - 0.065, T.z - 0.12))
     add(ridge)
+    const sleeve = new Mesh(clothGrid(8, 28, (u, v) => {
+      const angle = u * Math.PI * 2
+      return [T.x + Math.sin(angle) * 0.038,
+        T.h - 0.065 + Math.cos(angle) * 0.038,
+        T.z - T.d / 2 + 0.13 + v * (T.d - 0.53)]
+    }), P.praetorium)
+    add(sleeve)
+    for (const dz of [-0.1, 0]) {
+      const binding = new Mesh(new TorusGeometry(0.04, 0.005, 4, 10), P.flap)
+      binding.position.copy(mp(T.x, T.h - 0.065, T.z + T.d / 2 - 0.43 + dz))
+      add(binding)
+    }
     for (const sx of [-1, 1]) {
       // the doorway posts stand at the flaps, never down the middle of the
       // frame: the composition wants the lamp on the axis, not a pole
-      const front = new Mesh(new CylinderGeometry(0.06, 0.075, T.h * 0.78, 6), P.timber)
-      front.position.copy(mp(T.x + sx * 3.05, T.h * 0.39, T.z + T.d / 2 + 0.35))
+      const front = new Mesh(new CylinderGeometry(0.04, 0.052, 0.7, 7), P.timber)
+      front.position.copy(mp(T.x + sx * 3.05, 0.35, T.z + T.d / 2 + 0.05))
       add(front)
       const guys: FieldItem[] = []
       for (let i = 0; i < 5; i++) {
@@ -159,16 +280,34 @@ export function createPraetorium(rand: () => number): Group {
       pil.rotation.x = -0.1
       add(pil)
       const head = new Mesh(new ConeGeometry(0.022, 0.16, 5), P.gilt)
-      head.position.copy(mp(px + 0.35, 2.06, pz - 0.2))
+      head.quaternion.copy(pil.quaternion)
+      head.position.copy(mp(0, 1.08, 0).applyQuaternion(pil.quaternion).add(pil.position))
       add(head)
     }
   }
 
   // ------------------------------------------------------------ THE DESK
   {
-    const top = new Mesh(new BoxGeometry(1.5, 0.055, 0.78), P.timber)
-    top.position.copy(mp(D.x, 0.62, D.z))
-    add(top)
+    for (let i = 0; i < 4; i++) {
+      const top = new Mesh(desktopPlank(i * 1.87), P.timber)
+      top.position.copy(mp(D.x + Math.sin(i * 2) * 0.002, 0.62, D.z + (i - 1.5) * 0.196))
+      add(top)
+    }
+    // Through-pegged battens and a stretcher keep four narrow boards a
+    // campaign desk. The gaps stay dark even when his lamp finds the top.
+    for (const sx of [-1, 1]) {
+      const batten = new Mesh(new BoxGeometry(0.065, 0.048, 0.72), P.timber)
+      batten.position.copy(mp(D.x + sx * 0.6, 0.574, D.z))
+      add(batten)
+      for (const dz of [-0.29, 0.29]) {
+        const peg = new Mesh(new CylinderGeometry(0.009, 0.009, 0.002, 7), P.hide)
+        peg.position.copy(mp(D.x + sx * 0.6, 0.649, D.z + dz))
+        add(peg)
+      }
+      const brace = new Mesh(new BoxGeometry(0.039, 0.048, 0.57), P.timber)
+      brace.position.copy(mp(D.x + sx * 0.64, 0.22, D.z))
+      add(brace)
+    }
     for (const [dx, dz] of [
       [-1, -1],
       [1, -1],
@@ -179,15 +318,29 @@ export function createPraetorium(rand: () => number): Group {
       leg.position.copy(mp(D.x + dx * 0.64, 0.31, D.z + dz * 0.29))
       add(leg)
     }
-    // the open codex: two leaves at a reader's angle
+    // The codex opens against its sewn gathering: each leaf rises from
+    // the gutter, settles under its own weight and lifts at the fore-edge.
+    // Separate exposed edges make a stack of paper, even in a close frame.
     for (const sx of [-1, 1]) {
-      const leaf = new Mesh(new BoxGeometry(0.34, 0.012, 0.44), P.parchment)
-      leaf.position.copy(mp(D.x + sx * 0.18, 0.665, D.z + 0.02))
-      leaf.rotation.z = -sx * 0.1
-      add(leaf)
+      const pagePoint = (u: number, v: number, level: number): [number, number, number] => {
+        const curl = Math.sin(u * Math.PI) * 0.028 + Math.pow(u, 6) * 0.009
+        const foreEdge = u * 0.001 * Math.sin(v * 29 + level)
+        const corner = level === 3 ? Math.pow(u, 8) * Math.pow(1 - v, 5) * (sx < 0 ? 0.01 : 0.006) : 0
+        return [D.x + sx * (0.018 + u * (0.334 + level * 0.0008)),
+          0.659 + level * 0.0036 + curl + foreEdge + corner,
+          D.z + 0.02 + (v - 0.5) * (0.437 + level * 0.0008)]
+      }
+      for (let layer = 0; layer < 4; layer++) {
+        add(new Mesh(clothGrid(10, 4, (u, v) => pagePoint(u, v, layer), sx > 0), P.parchment))
+      }
+      const cover = clothGrid(10, 4, (u, v) => {
+        const q = pagePoint(u, v, -1)
+        return [q[0] + sx * u * 0.008, q[1] - 0.001, q[2] + (v - 0.5) * 0.012]
+      }, sx > 0)
+      add(new Mesh(cover, P.hide))
     }
-    const spine = new Mesh(new BoxGeometry(0.05, 0.035, 0.44), P.timber)
-    spine.position.copy(mp(D.x, 0.667, D.z + 0.02))
+    const spine = new Mesh(new BoxGeometry(0.032, 0.012, 0.452), P.hide)
+    spine.position.copy(mp(D.x, 0.658, D.z + 0.02))
     add(spine)
     const pot = new Mesh(new CylinderGeometry(0.045, 0.052, 0.075, 10), P.timber)
     pot.position.copy(mp(D.x + 0.55, 0.685, D.z - 0.16))
@@ -241,25 +394,39 @@ export function createPraetorium(rand: () => number): Group {
 
     /* THE SUPPER SOMEBODY LEFT — a cup, a plate, half a loaf. He is not a
        statue and he has been up since the fourth watch. */
-    const plate = new Mesh(new CylinderGeometry(0.1, 0.085, 0.016, 12), P.pot)
-    plate.position.copy(mp(D.x - 0.16, 0.653, D.z + 0.3))
+    const plate = new Mesh(new CylinderGeometry(0.079, 0.068, 0.011, 12), P.pot)
+    plate.position.copy(mp(D.x + 0.1, 0.653, D.z + 0.31))
     add(plate)
     const loaf = new Mesh(new SphereGeometry(0.06, 9, 7), P.parchment)
-    loaf.scale.set(1, 0.6, 0.85)
-    loaf.position.copy(mp(D.x - 0.17, 0.672, D.z + 0.3))
+    loaf.scale.set(0.76, 0.4, 0.66)
+    loaf.position.copy(mp(D.x + 0.09, 0.67, D.z + 0.31))
     add(loaf)
-    const cup = new Mesh(new CylinderGeometry(0.037, 0.03, 0.075, 10), P.pot)
-    cup.position.copy(mp(D.x - 0.02, 0.682, D.z + 0.29))
+    const cup = new Mesh(new CylinderGeometry(0.031, 0.026, 0.061, 10), P.pot)
+    cup.position.copy(mp(D.x + 0.25, 0.678, D.z + 0.3))
     add(cup)
     // the oil lamp: a clay body, a wick, the smallest flame in the world
-    const lampBody = new Mesh(new SphereGeometry(0.085, 12, 8), P.lamp)
-    lampBody.scale.set(1, 0.55, 1.25)
-    lampBody.position.copy(mp(D.x - 0.52, 0.665, D.z - 0.1))
+    const lampBody = new Mesh(new LatheGeometry([
+      new Vector2(0.026, 0.645), new Vector2(0.054, 0.645),
+      new Vector2(0.081, 0.654), new Vector2(0.088, 0.67),
+      new Vector2(0.078, 0.688), new Vector2(0.054, 0.699),
+      new Vector2(0.025, 0.703), new Vector2(0.021, 0.697),
+      new Vector2(0.023, 0.685),
+    ], 16), P.lamp)
+    lampBody.scale.z = 1.14
+    lampBody.position.copy(mp(D.x - 0.52, 0, D.z - 0.1))
     add(lampBody)
-    const spout = new Mesh(new ConeGeometry(0.035, 0.09, 8), P.lamp)
-    spout.rotation.x = -Math.PI / 2
-    spout.position.copy(mp(D.x - 0.52, 0.665, D.z + 0.03))
+    const spout = new Mesh(new CylinderGeometry(0.022, 0.04, 0.13, 10, 1, true), P.lamp)
+    spout.rotation.x = Math.PI / 2
+    spout.scale.x = 0.86
+    spout.position.copy(mp(D.x - 0.52, 0.67, D.z - 0.02))
     add(spout)
+    const wick = new Mesh(new CylinderGeometry(0.008, 0.011, 0.025, 6), P.hide)
+    wick.position.copy(mp(D.x - 0.52, 0.685, D.z + 0.02))
+    add(wick)
+    const handle = new Mesh(new TorusGeometry(0.03, 0.007, 5, 12), P.lamp)
+    handle.rotation.y = Math.PI / 2
+    handle.position.copy(mp(D.x - 0.52, 0.676, D.z - 0.21))
+    add(handle)
     /* THE FOLDING CHAIR — four crossed bars was a diagram of a stool. A
        sella castrensis is a leather sling on an X of oak, and it is the
        one seat in this world. */
@@ -361,44 +528,51 @@ export function createPraetorium(rand: () => number): Group {
     tablet.rotation.y = -0.5
     add(tablet)
 
-    /* HIS ARMOUR, set down for the night: a cuirass on its stand, the
-       shoulder pieces still buckled, and the helmet on top of it. Two
-       steps from the desk, because he is a soldier who writes and not a
-       philosopher who campaigns. */
+    /* HIS ARMOUR, set down for the night: empty plates over a wooden rack,
+       and the helmet on a peg beside them. The gap exposes the support;
+       a helmet floating directly above shoulders would imply a body. */
     const cuir = new Mesh(new CylinderGeometry(0.19, 0.22, 0.44, 10, 1, true), P.cuirass)
-    cuir.position.copy(mp(D.x + 1.5, 0.72, D.z - 0.5))
+    cuir.position.copy(mp(D.x + 1.5, 0.55, D.z - 0.5))
     add(cuir)
-    // the shoulder yoke, then the caps on it: two loose domes read as lumps
-    const yoke = new Mesh(new BoxGeometry(0.46, 0.075, 0.24), P.cuirass)
-    yoke.position.copy(mp(D.x + 1.5, 0.9, D.z - 0.5))
+    const yoke = new Mesh(new BoxGeometry(0.72, 0.045, 0.055), P.timber)
+    yoke.position.copy(mp(D.x + 1.32, 0.76, D.z - 0.53))
     add(yoke)
     for (const sx of [-1, 1]) {
       const pauldron = new Mesh(new SphereGeometry(0.105, 10, 6, 0, 6.28, 0, 1.5), P.cuirass)
       pauldron.scale.set(1, 0.5, 0.9)
-      pauldron.position.copy(mp(D.x + 1.5 + sx * 0.15, 0.92, D.z - 0.5))
+      pauldron.position.copy(mp(D.x + 1.5 + sx * 0.15, 0.775, D.z - 0.5))
       pauldron.rotation.z = sx * 0.32
       add(pauldron)
     }
     const helmet = new Mesh(new SphereGeometry(0.115, 12, 8, 0, 6.28, 0, 1.5), P.helm)
     helmet.scale.set(0.94, 1.05, 1)
-    helmet.position.copy(mp(D.x + 1.5, 1.02, D.z - 0.5))
+    helmet.position.copy(mp(D.x + 1.06, 0.94, D.z - 0.53))
     add(helmet)
     // the neck guard, which is what stops a dome from reading as a mushroom
     const nape = new Mesh(new SphereGeometry(0.125, 10, 6, 0, 3.1, 1.1, 0.5), P.helm)
     nape.scale.set(0.95, 0.9, 1.2)
     nape.rotation.y = Math.PI / 2
-    nape.position.copy(mp(D.x + 1.5, 1.02, D.z - 0.5))
+    nape.position.copy(mp(D.x + 1.06, 0.94, D.z - 0.53))
     add(nape)
     const crest = new Mesh(new BoxGeometry(0.024, 0.062, 0.2), P.ochre)
-    crest.position.copy(mp(D.x + 1.5, 1.14, D.z - 0.5))
+    crest.position.copy(mp(D.x + 1.06, 1.06, D.z - 0.53))
     add(crest)
     const brow = new Mesh(new TorusGeometry(0.118, 0.012, 5, 14), P.helm)
     brow.rotation.x = Math.PI / 2
-    brow.position.copy(mp(D.x + 1.5, 1.02, D.z - 0.5))
+    brow.position.copy(mp(D.x + 1.06, 0.94, D.z - 0.53))
     add(brow)
-    const stand = new Mesh(new CylinderGeometry(0.03, 0.05, 0.5, 6), P.timber)
-    stand.position.copy(mp(D.x + 1.5, 0.25, D.z - 0.5))
+    const peg = new Mesh(new CylinderGeometry(0.025, 0.025, 0.2, 7), P.timber)
+    peg.position.copy(mp(D.x + 1.06, 0.85, D.z - 0.53))
+    add(peg)
+    const stand = new Mesh(new CylinderGeometry(0.03, 0.045, 0.8, 7), P.timber)
+    stand.position.copy(mp(D.x + 1.35, 0.4, D.z - 0.53))
     add(stand)
+    for (const yaw of [0, Math.PI / 2]) {
+      const foot = new Mesh(new BoxGeometry(0.52, 0.035, 0.07), P.timber)
+      foot.rotation.y = yaw
+      foot.position.copy(mp(D.x + 1.35, 0.025, D.z - 0.53))
+      add(foot)
+    }
 
     /* THE SCROLL CASE — the whole correspondence of a frontier, standing
        open on the floor where he can reach into it without getting up. */

@@ -722,14 +722,18 @@ export function createEclipse(scene: Scene) {
     // early in the swallow, or its scaled-up glow paints a muddy wash
     // across the whole frame mid-passage.
     eclipse.visible = door < 0.995
-    const swallow = Math.max(0, 1 - Math.pow(door * 1.45, 1.6))
+    /* the corona yields to the door, and it yields FAST: at the first
+       touch of the descent its outer light still filled the lower third
+       of the frame and the two prompts stood on the bright object */
+    const swallow = Math.exp(-door * door * 65)
     uIntensity.value *= swallow
     uFlash.value = flash * swallow
     glint.visible = uFlash.value > 0.002
     bead.visible = uFlash.value > 0.002
 
     // the sky's own share: scattered corona light, plus the bead's surge
-    uHalo.value = Math.min(1, uIntensity.value * 0.9 + flash * 0.45) * Math.max(0, 1 - door * 1.9)
+    uHalo.value =
+      Math.min(1, uIntensity.value * 0.9 + flash * 0.45) * Math.max(0, 1 - ease(0, 0.14, door))
     // the air belongs to the frame you STAND in. Once the door opens, the
     // eclipse is a doorway and its unscaled veil would smear across the
     // moon's own face (round 2: that was the brown mottling at desc 0.04).

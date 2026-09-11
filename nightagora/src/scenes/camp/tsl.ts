@@ -45,6 +45,7 @@ export const {
   positionLocal,
   positionView,
   positionWorld,
+  reflect,
   pow,
   screenCoordinate,
   screenSize,

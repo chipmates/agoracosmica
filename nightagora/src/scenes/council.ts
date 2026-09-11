@@ -25,7 +25,7 @@ import {
   AdditiveBlending,
   CircleGeometry,
   Color,
-  CylinderGeometry,
+  LatheGeometry,
   Float32BufferAttribute,
   Group,
   InstancedBufferAttribute,
@@ -34,6 +34,7 @@ import {
   MeshBasicNodeMaterial,
   PerspectiveCamera,
   Scene,
+  Vector2,
   Vector3,
   Vector4,
 } from 'three/webgpu'
@@ -48,6 +49,7 @@ import { FOUNDING_SEED, mulberry32 } from '../core/seed'
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type N = any
 const {
+  acos,
   attribute,
   cameraProjectionMatrix,
   cameraViewMatrix,
@@ -56,6 +58,7 @@ const {
   dot,
   float,
   fract,
+  fwidth,
   length,
   max,
   min,
@@ -94,7 +97,7 @@ const WHITE_HOT = lin('#fff6e0')
 const FLOOR_Y = -0.9
 const FIRE = { x: 0, y: -0.45, z: -5.6 }
 /** a voice hovers a hand above its seat */
-const SEAT_Y = -0.24
+const SEAT_Y = -0.43
 /* Where they come from. A 46 degree lens at five metres shows almost no
    sky over the circle, so a light dropped from the zenith spends its whole
    fall above the frame and arrives as a streak with no head (round 6's
@@ -138,7 +141,7 @@ export interface CouncilHandles {
   /** 0..1 how far the blaze has risen (drives the agora fire). */
   blaze(): number
   stop(): void
-  forgeStage(camera: PerspectiveCamera): void
+  forgeStage(camera: PerspectiveCamera, at?: number): void
   active(): boolean
 }
 
@@ -189,7 +192,7 @@ export function createCouncil(scene: Scene, onEnded: () => void): CouncilHandles
   const NARROW = {
     // the near pair closes and the far pair opens, or the two voices on one
     // flank project onto the same slice of a portrait frame and read as one
-    rx: 1.72, rz: 1.72, ang: [-145, -13, 13, 145], seat: 0.36, aura: 0.82, col: 0.86, wash: 0.5,
+    rx: 1.72, rz: 1.72, ang: [-145, -17, 17, 145], seat: 0.36, aura: 0.82, col: 0.86, wash: 0.5,
   }
   type Stage = typeof WIDE
   let stage: Stage = WIDE
@@ -203,7 +206,7 @@ export function createCouncil(scene: Scene, onEnded: () => void): CouncilHandles
       const p = seatPos[i]
       if (deg === undefined || !p) continue
       const a = (deg * Math.PI) / 180
-      p.set(FIRE.x + Math.sin(a) * s.rx, SEAT_Y, FIRE.z + Math.cos(a) * s.rz)
+      p.set(FIRE.x + Math.sin(a) * s.rx, s === NARROW ? -0.59 : -0.49, FIRE.z + Math.cos(a) * s.rz)
       // the stone turns to the fire, which on an ellipse is not the angle
       // it sits at
       seatYaw[i] = Math.atan2(p.x - FIRE.x, p.z - FIRE.z) + Math.PI
@@ -223,6 +226,8 @@ export function createCouncil(scene: Scene, onEnded: () => void): CouncilHandles
   const uFlick = uniform(0.86)
   const uBlaze = uniform(0)
   const uReveal = uniform(0)
+  const uStone = uniform(0)
+  const uYield = uniform(1)
   /** 0..1 how far the circle has closed: the air answers this, not the clock */
   const uClosed = uniform(0)
   /** the ring's two half-axes, so the stone knows the same ellipse the
@@ -284,19 +289,31 @@ export function createCouncil(scene: Scene, onEnded: () => void): CouncilHandles
     // THE CIRCLE CLOSING: each seat lights its own arc of the ring, and as
     // the four arrive the arcs run together. The gap that stays open faces
     // the visitor, because that place is theirs.
-    const band = gauss(rq.sub(1).mul(uRingB).div(0.055))
-    const bandOut = gauss(rq.sub(1).mul(uRingB).sub(0.15).div(0.022))
+    const band = gauss(rq.sub(1).mul(uRingB).div(max(fwidth(rq).mul(uRingB), 0.009)))
+    const bandOut = gauss(rq.sub(1).mul(uRingB).sub(0.038).div(0.004))
     // the place the ring never closes is the one facing the visitor: they
     // are already sitting in it
-    const gap = smoothstep(0.998, 0.955, dot(dir, vec2(0, 1)))
+    const gap = smoothstep(0.945, 0.89, dot(dir, vec2(0, 1)))
     for (let i = 0; i < uSeatP.length; i++) {
       const pu = uSeatP[i]
       const cu = uSeatC[i]
       const ku = uSeatK[i]
       if (!pu || !cu || !ku) continue
       const sd = normalize(vec2(pu.x.sub(FIRE.x).div(uRingA), pu.z.sub(FIRE.z).div(uRingB)))
-      const arc = smoothstep(0.42, 0.96, dot(dir, sd)).mul(ku.w)
-      col = col.add(c3(GOLD, 0.44).mul(band.mul(0.9).add(bandOut.mul(0.3))).mul(arc).mul(gap))
+      const distance = acos(clamp(dot(dir, sd), -1, 1))
+      const reach = ku.w.mul(1.85)
+      const arc = oneMinus(smoothstep(reach.sub(0.16), reach, distance)).mul(ku.w)
+      col = col.add(c3(GOLD, 0.2).mul(band.mul(0.9).add(bandOut.mul(0.16))).mul(arc).mul(gap))
+    }
+
+    // Two ends receive the final light; the open passage belongs to the visitor.
+    for (const side of [-1, 1]) {
+      const end = vec2(0.42 * side, 0.907)
+      const tangent = vec2(0.907, -0.42 * side)
+      const offset = q.sub(end)
+      const tick = gauss(dot(offset, tangent).div(0.009))
+        .mul(gauss(dot(offset, end).div(0.045)))
+      col = col.add(c3(GOLD, 0.16).mul(tick).mul(uClosed))
     }
 
     // the fire answering the gathering: its light on the stone widens with
@@ -317,6 +334,23 @@ export function createCouncil(scene: Scene, onEnded: () => void): CouncilHandles
   marble.position.set(FIRE.x, FLOOR_Y + 0.005, FIRE.z)
   marble.renderOrder = 3
   root.add(marble)
+
+  const grooveMat = new MeshBasicNodeMaterial({ transparent: true, depthWrite: false })
+  {
+    const q = vec2(positionWorld.x.sub(FIRE.x).div(uRingA), positionWorld.z.sub(FIRE.z).div(uRingB))
+    const distance = length(q).sub(1).mul(uRingB)
+    const aa = max(fwidth(distance), 0.002)
+    const cut = oneMinus(smoothstep(0.022, float(0.025).add(aa), distance.abs()))
+    const gap = smoothstep(0.945, 0.89, normalize(q).y)
+    grooveMat.colorNode = hex3('#060b1c', 0.26)
+    grooveMat.opacityNode = cut.mul(gap).mul(uReveal).mul(0.78)
+  }
+  const groove = new Mesh(marble.geometry, grooveMat)
+  groove.rotation.copy(marble.rotation)
+  groove.position.set(FIRE.x, FLOOR_Y + 0.003, FIRE.z)
+  groove.renderOrder = 2
+  root.add(groove)
+
 
   // --------------------------------------------------------- THE SEATS
   /* Four drums of the same night stone the colonnade is cut from — a spare
@@ -340,7 +374,15 @@ export function createCouncil(scene: Scene, onEnded: () => void): CouncilHandles
     const n = varying(normalize(yawRot(normalLocal.div(max(iScl, vec3(0.001, 0.001, 0.001))), iRot.x)))
     seatMat.vertexNode = cameraProjectionMatrix.mul(cameraViewMatrix).mul(vec4(world, 1))
 
-    const alb = c3(lin('#8d8474'))
+    const local = varying(positionLocal)
+    const grit = mx_noise_float(world.mul(92)).mul(0.16).add(0.84)
+    const quarry = mx_noise_float(vec3(world.x.mul(15), world.y.mul(31), world.z.mul(12)))
+    const vein = pow(oneMinus(clamp(quarry.abs(), 0, 1)), 19)
+    const tool = pow(sin(uv().x.mul(6.283185 * 42)).abs(), 18)
+      .mul(oneMinus(smoothstep(0.2, 0.37, local.y.abs())))
+    const joint = gauss(local.y.add(0.28).div(0.015))
+    const alb = c3(lin('#8d8474')).mul(grit).mul(oneMinus(vein.mul(0.2)))
+      .mul(oneMinus(tool.mul(0.22))).mul(oneMinus(joint.mul(0.64)))
     // the silhouette value: the same ink the colonnade sinks to, plus the
     // faintest lapis on the upward faces so a seat is a SURFACE, never a
     // hole cut in the marble
@@ -366,15 +408,14 @@ export function createCouncil(scene: Scene, onEnded: () => void): CouncilHandles
       // wrapped, not lambert: the side of a drum turned away from its own
       // voice is still stone, and stone at night is never pure black
       const ndl = pow(max(dot(n, d.div(dd.sqrt())), 0).mul(0.72).add(0.28), 1.6)
-      col = col.add(cu.mul(alb).mul(ndl).mul(float(0.2).div(dd.add(0.22))))
+      col = col.add(cu.mul(uYield).mul(alb).mul(ndl).mul(float(0.2).div(dd.add(0.22))))
     }
 
     // THE MARK: a ring cut into the top face and gilded. Gold reflecting a
     // light that is standing right over it, which is the only way gold is
     // ever allowed to appear.
-    const t = uv()
-    const rd = length(t.sub(vec2(0.5, 0.5)))
-    const inlay = gauss(rd.sub(0.32).div(0.022)).mul(smoothstep(0.5, 0.9, n.y))
+    const rd = length(local.xz)
+    const inlay = gauss(rd.sub(0.365).div(0.006)).mul(smoothstep(0.5, 0.9, n.y))
     let own: N = vec3(0, 0, 0)
     for (let i = 0; i < uSeatC.length; i++) {
       const cu = uSeatC[i]
@@ -383,14 +424,31 @@ export function createCouncil(scene: Scene, onEnded: () => void): CouncilHandles
       const d = pu.sub(world)
       own = own.add(cu.mul(float(0.42).div(max(dot(d, d), 0.0001).add(0.18))))
     }
-    col = col.add(c3(GOLD, 0.8).mul(inlay).mul(own))
+    col = col.add(c3(GOLD, 0.24).mul(inlay).mul(own).mul(uYield))
 
-    seatMat.colorNode = shoulder(col).add(dither(0.0028)).mul(uReveal)
+    seatMat.colorNode = shoulder(col).add(dither(0.0028)).mul(uStone)
   }
   // a spare column drum, straight-sided: the same stone as the colonnade,
   // and its circular joint is where the mark belongs. A tapered cone read
   // as a plastic stool (round 2).
-  const seatGeo = new CylinderGeometry(0.5, 0.5, 1, 22, 1)
+  const seatGeo = new LatheGeometry([
+    [0, -0.5], [0.49, -0.5], [0.54, -0.46], [0.54, -0.36],
+    [0.49, -0.31], [0.47, -0.29], [0.48, 0.26], [0.51, 0.34],
+    [0.53, 0.39], [0.51, 0.46], [0.43, 0.48], [0.35, 0.455],
+    [0.2, 0.435], [0, 0.43],
+  ].map(([r, y]) => new Vector2(r ?? 0, y ?? 0)), 72)
+  const stoneVertices = seatGeo.getAttribute('position')
+  for (let i = 0; i < stoneVertices.count; i++) {
+    const x = stoneVertices.getX(i), y = stoneVertices.getY(i), z = stoneVertices.getZ(i)
+    const angle = Math.atan2(x, z)
+    const chip = Math.pow(Math.max(0, Math.sin(angle * 13 + 2.1)), 14) * 0.019
+      + Math.pow(Math.max(0, Math.sin(angle * 23 - 0.7)), 18) * 0.012
+    const rim = Math.abs(y) > 0.31 ? 1 : 0.28
+    const radius = Math.hypot(x, z)
+    if (radius > 0.001) stoneVertices.setXYZ(i, x * (1 - chip * rim),
+      y - chip * rim * 0.6, z * (1 - chip * rim))
+  }
+  seatGeo.computeVertexNormals()
   const seatInst = new InstancedBufferGeometry()
   seatInst.index = seatGeo.index
   for (const key of Object.keys(seatGeo.attributes)) {
@@ -443,6 +501,7 @@ export function createCouncil(scene: Scene, onEnded: () => void): CouncilHandles
      attributes hung under the marble as its reflection. */
   const uPW = uniform(0.62)
   const uPH = uniform(1.34)
+  const uShape = uniform(1)
 
   const presIPos = new Float32Array(VOICES.length * 3)
   const presICol = new Float32Array(VOICES.length * 3)
@@ -457,7 +516,7 @@ export function createCouncil(scene: Scene, onEnded: () => void): CouncilHandles
   VOICES.forEach((v, i) => {
     presISize[i * 4] = v.aura
     presISize[i * 4 + 1] = 0.62 + v.col * 0.42
-    presISize[i * 4 + 2] = 0.31 + i * 0.27
+    presISize[i * 4 + 2] = i
     presISize[i * 4 + 3] = 0.34
   })
 
@@ -470,98 +529,84 @@ export function createCouncil(scene: Scene, onEnded: () => void): CouncilHandles
     return g
   }
 
-  /** flip = 1 the presence itself, flip = -1 its answer in the stone */
+  /** Four washes of light, each with its own structure and an unlit heart.
+      The same field is mirrored below the stone; no image is loaded. */
   function presenceMaterial(flip: number): MeshBasicNodeMaterial {
-    const mat = new MeshBasicNodeMaterial()
-    mat.transparent = true
-    mat.depthWrite = false
-    mat.blending = AdditiveBlending
     const twin = flip < 0
-    if (twin) mat.depthTest = false // it lives under the floor plane
-
+    const mat = new MeshBasicNodeMaterial({ transparent: true, depthWrite: false, blending: AdditiveBlending })
+    if (twin) mat.depthTest = false
     const anchor = attribute('iPos', 'vec3')
-    const iCol = attribute('iCol', 'vec3')
-    const st = attribute('iState', 'vec4') // bright, tail, tailGain, phase
-    const size = attribute('iSize', 'vec4') // wide, tall, phase, how far the column opens
-
-    // the reflection hangs from the mirrored anchor and smears with depth,
-    // which is where reflection geometry actually puts it
+    const st = attribute('iState', 'vec4')
+    const size = attribute('iSize', 'vec4')
     const a = twin ? vec3(anchor.x, float(2 * FLOOR_Y).sub(anchor.y), anchor.z) : anchor
-    const hw = (twin ? uPW.mul(1.16) : uPW).mul(size.x)
-    const hh = (twin ? uPH.mul(1.12) : uPH).mul(size.y)
+    const hw = uPW.mul(size.x)
+    const hh = uPH.mul(size.y)
     const mv = cameraViewMatrix.mul(vec4(a, 1))
-    mat.vertexNode = cameraProjectionMatrix.mul(
-      vec4(mv.x.add(positionLocal.x.mul(hw)), mv.y.add(positionLocal.y.mul(hh)), mv.z, mv.w)
-    )
+    mat.vertexNode = cameraProjectionMatrix.mul(vec4(
+      mv.x.add(positionLocal.x.mul(hw)), mv.y.add(positionLocal.y.mul(hh)), mv.z, mv.w))
+    const px = varying(positionLocal.x).mul(varying(hw)).div(uShape)
+    const py = varying(positionLocal.y).mul(varying(hh)).mul(flip).div(uShape)
+    const state = varying(st)
+    const kind = varying(size.z)
+    const colour = varying(attribute('iCol', 'vec3'))
+    const clock = uT.mul(0.16)
+    const noise = mx_noise_float(vec3(px.mul(11), py.mul(10).sub(clock), kind.mul(8).add(2.7)))
+    const fine = mx_noise_float(vec3(px.mul(44), py.mul(36).sub(clock.mul(2)), kind.mul(11).add(8.2)))
+    const x = px.add(noise.mul(0.025))
+    const y = py.sub(0.16).add(noise.mul(0.019))
+    const choose = (id: number): N => oneMinus(smoothstep(0.1, 0.3, kind.sub(id).abs()))
 
-    // the quad's own frame, in metres. Both halves are carried as their
-    // own varyings and multiplied HERE: folding an attribute-scaled size
-    // into the interpolated position lost the size, and the column came
-    // out as a beam the height of the whole quad (round 6).
-    const vX: N = varying(positionLocal.x)
-    const vY: N = varying(positionLocal.y)
-    const vHW: N = varying(hw)
-    const vHH: N = varying(hh)
-    const vU: N = vX.mul(vHW)
-    const vV: N = vY.mul(vHH)
-    /** 0 at the middle, 1 at the quad's own edge: every term dies before it
-        reaches the edge, or a long trail ends in a flat cut (round 6) */
-    const vCol: N = varying(iCol)
-    const vSt: N = varying(st)
-    /** this voice's own width, carried into the fragment */
-    const k: N = varying(size.x)
-    /** how far its column opens as it rises: tight while it is still
-        falling (a comet has a thin tail), open once it stands */
-    const open: N = varying(size.w)
-    const u = vU
-    const v = twin ? vV.negate() : vV
-    const up = max(v, 0)
-    const down = max(v.negate(), 0)
-    /* A falloff in `up` is 1 wherever up is clamped to zero, which is the
-       ENTIRE other half of the quad: without these masks the column and the
-       foot each spread a flat strip across the half they do not belong to,
-       and a hovering voice grows a searchlight beam (round 6, three rounds
-       of chasing the wrong bug). */
-    const above = smoothstep(0.004, 0.035, v)
-    const below = smoothstep(0.004, 0.035, v.negate())
+    // Campbell: a turning, open spiral of stories, broad at one shoulder.
+    const storyR = length(vec2(x.add(y.mul(0.21)), y.mul(0.88)))
+    const story = gauss(storyR.sub(0.205).sub(sin(y.mul(13).add(clock)).mul(0.037)).div(0.03))
+      .mul(smoothstep(-0.23, 0.05, x.add(y.mul(0.6))).mul(0.65).add(0.24))
+      .add(gauss(storyR.sub(0.12).div(0.024)).mul(0.24))
 
-    // the column wavers: a voice is alive, and a perfectly straight shaft
-    // is a laser pointer
-    const wob = mx_noise_float(vec3(up.mul(2.4), uT.mul(0.62).add(vSt.w.mul(7.0)), vSt.w.mul(4.0)))
-      .mul(0.05)
-      .mul(up)
-    const uu = u.add(wob)
+    // Goethe: three oblique laminae, fully open. A white enclosing loop
+    // suggests a head, so these are brush gestures with no enclosure.
+    const leafY = y.sub(x.mul(0.48))
+    const leafA = gauss(leafY.sub(sin(x.mul(11).add(clock.mul(0.4))).mul(0.075)).sub(0.085).div(0.027))
+      .mul(gauss(x.add(0.025).div(0.21)))
+    const leafB = gauss(leafY.sub(sin(x.mul(9).add(1.8)).mul(0.055)).add(0.025).div(0.021))
+      .mul(gauss(x.sub(0.04).div(0.17)))
+    const leafC = gauss(leafY.add(0.115).add(sin(x.mul(10)).mul(0.035)).div(0.014))
+      .mul(gauss(x.add(0.035).div(0.13)))
+    const leaf = leafA.mul(0.8).add(leafB.mul(0.65)).add(leafC.mul(0.4))
 
-    const core = gauss(vec2(uu.div(k.mul(0.04)), v.div(k.mul(0.034))))
-    const halo = gauss(vec2(u.div(k.mul(0.135)), v.div(k.mul(0.115))))
-    const aura = gauss(vec2(u.div(k.mul(0.42)), v.div(k.mul(0.33))))
-    // the column of a voice widens and dissolves as it rises. A shaft that
-    // holds its width is a laser pointer, which is the one thing a night
-    // like this cannot have (round 1).
-    const shaftW = k.mul(0.05).add(up.mul(open))
-    // a gaussian fall, not an exponential one: an exponential tail is still
-    // worth eight percent at the quad's own edge, and that shows up as a
-    // flat cut across the top of a comet (round 6)
-    const shaft = gauss(uu.div(shaftW)).mul(gauss(up.div(max(vSt.y, 0.02)))).mul(above)
-    // the foot: where the light touches its own stone
-    const foot = gauss(u.div(k.mul(0.26))).mul(gauss(down.div(0.22))).mul(below)
+    // Lovelace: crossed threads, their regularity interrupted by the ink.
+    const diamond = x.abs().mul(0.86).add(y.abs().mul(0.7))
+    const weave = pow(sin(x.add(y.mul(0.58)).mul(48)).abs(), 14)
+      .add(pow(sin(x.sub(y.mul(0.58)).mul(48)).abs(), 14)).mul(0.58)
+    const thought = gauss(diamond.sub(0.165).div(0.014)).mul(0.22)
+      .add(weave.mul(gauss(diamond.div(0.15))).mul(smoothstep(0.01, 0.09, diamond)))
 
-    const bright = vSt.x
-    const alpha = core
-      .add(halo.mul(0.46))
-      .add(aura.mul(0.24))
-      .add(shaft.mul(vSt.z))
-      .add(foot.mul(0.14))
-      .mul(bright)
-      .mul(twin ? 0.24 : 1)
-      .mul(uReveal)
+    // Gandhi: a low, unhurried widening. No shaft, crown, or white centre.
+    const peaceR = length(vec2(x.mul(0.82), y.add(0.075).mul(1.85)))
+    const peace = gauss(peaceR.sub(0.17).div(0.023)).mul(0.7)
+      .add(gauss(peaceR.sub(0.105).div(0.018)).mul(0.3))
+      .mul(smoothstep(-0.13, 0.07, y.add(x.mul(0.12))).mul(0.55).add(0.3))
 
-    const hot = min(core.add(shaft.mul(0.18)), 1)
-    let col: N = mix(vCol, c3(WHITE_HOT, 1.35), hot)
-    // the stone eats the cool out of a reflection long before the gold
-    if (twin) col = col.mul(vec3(1.0, 0.82, 0.56))
-    mat.colorNode = col.add(dither(0.004))
-    mat.opacityNode = min(alpha, 1.4)
+    const shape = story.mul(choose(0)).add(leaf.mul(choose(1)))
+      .add(thought.mul(choose(2))).add(peace.mul(choose(3)))
+    const broken = smoothstep(-0.5, 0.5, noise.add(fine.mul(0.38)))
+    /* core and skirt: the peaks of the mark keep their heat while the haze
+       around them falls away, so white reads as light and not as paint */
+    const filaments = pow(clamp(shape.mul(float(0.12).add(broken.mul(1.05))), 0, 1), 1.45).mul(1.48)
+    const wash = gauss(vec2(x.div(0.31), y.div(0.33))).mul(0.018)
+      .mul(smoothstep(-0.3, 0.6, noise))
+    // The descent retains one thin falling light; its tail is extinguished
+    // as the seated wash opens, rather than becoming a standing person.
+    const falling = oneMinus(smoothstep(0.07, 0.18, varying(size.w)))
+    const cometX = px.add(sin(py.mul(6).add(kind)).mul(0.055).mul(max(py, 0)))
+    const comet = gauss(cometX.div(0.012)).mul(gauss(max(py, 0).div(max(state.y, 0.03))))
+      .mul(smoothstep(-0.018, 0.025, py)).mul(falling)
+    const star = gauss(vec2(px.div(0.025), py.div(0.034))).mul(falling)
+    const foot = gauss(vec2(px.div(0.085), py.add(0.12).div(0.028))).mul(0.1).mul(oneMinus(falling))
+    const edge = oneMinus(smoothstep(0.7, 0.98, max(varying(positionLocal.x).abs(), varying(positionLocal.y).abs())))
+    const alpha = filaments.mul(oneMinus(falling)).add(wash).add(comet.mul(0.65)).add(star).add(foot)
+      .mul(state.x).mul(uReveal).mul(twin ? oneMinus(falling).mul(0.025) : 0.88).mul(edge)
+    mat.colorNode = mix(colour, c3(WHITE_HOT), clamp(filaments.mul(0.36), 0, 0.55)).add(dither(0.002))
+    mat.opacityNode = clamp(alpha, 0, 0.86)
     return mat
   }
 
@@ -677,7 +722,7 @@ export function createCouncil(scene: Scene, onEnded: () => void): CouncilHandles
     const t = uT.mul(seed.x).add(seed.y)
     const w = vec3(
       pos.x.add(sin(t).mul(0.34)),
-      pos.y.add(sin(t.mul(0.57).add(1.4)).mul(0.2)).add(uT.mul(0.026).mul(seed.w).mul(uClosed)),
+      pos.y.add(sin(t.mul(0.57).add(1.4)).mul(0.2)).add(sin(uT.mul(0.026).add(seed.y)).mul(0.3).mul(seed.w).mul(uClosed)),
       pos.z.add(cos(t.mul(0.79)).mul(0.28))
     )
     // the fire, then the four voices: the same block every surface reads
@@ -804,12 +849,19 @@ export function createCouncil(scene: Scene, onEnded: () => void): CouncilHandles
   function setToggleLabel(): void {
     if (toggleEl) toggleEl.textContent = audio.paused ? 'Listen' : 'Pause'
   }
-  cartoucheEl.addEventListener('click', () => {
-    if (!running) return
-    if (audio.paused) void audio.play().catch(() => undefined)
-    else audio.pause()
-    announceVoice(!audio.paused)
+  // Media state is authoritative: a denied play request must never leave
+  // the invitation saying Pause or the ambient bed permanently ducked.
+  function syncPlayback(): void {
+    announceVoice(!audio.paused && !audio.ended && !audio.error)
     setToggleLabel()
+  }
+  for (const event of ['playing', 'pause', 'ended', 'error']) {
+    audio.addEventListener(event, syncPlayback)
+  }
+  toggleEl?.addEventListener('click', () => {
+    if (!running) return
+    if (audio.paused) void audio.play().catch(syncPlayback)
+    else audio.pause()
   })
 
   // ---- state ----
@@ -818,6 +870,8 @@ export function createCouncil(scene: Scene, onEnded: () => void): CouncilHandles
   // the beat has to read as complete in silence.
   let running = false
   let t = 0
+  let beganAt = 0
+  let stagedTime: number | null = null
   /** 1 while the circle holds the frame, less once the way onward does */
   let yieldK = 1
   let topicTimer = 0
@@ -828,17 +882,17 @@ export function createCouncil(scene: Scene, onEnded: () => void): CouncilHandles
   /* THE ARRIVAL. They do not come down together: the moderator takes the
      chair first and the circle closes around them, last light on the
      inside. Four separate events, one gathering. */
-  const DELAY = [0.5, 0.0, 1.2, 0.85]
-  const FALL = 2.3
+  const DELAY = [1.15, 0.0, 2.3, 3.45]
+  const FALL = 2.4
   /* a visitor who asked for less motion still gets the whole circle, and
      gets it at once: the places are taken, the ring is closed, and only the
      journey is spared (the beat has to read composed either way) */
-  const landAt = DELAY.map((d) => (reduced ? 0.12 : d + FALL))
+  const landAt = DELAY.map((d) => d + FALL)
 
   /** eased fall: quick out of the night, then a long settle into the seat */
   const settleOf = (i: number): number => {
     const d = DELAY[i] ?? 0
-    if (reduced) return Math.min(1, Math.max(0, t / 0.25))
+    if (reduced) return 1
     return Math.min(1, Math.max(0, (t - d) / FALL))
   }
 
@@ -856,6 +910,7 @@ export function createCouncil(scene: Scene, onEnded: () => void): CouncilHandles
     uWash.value = stage.wash
     uPW.value = 0.62 * stage.aura
     uPH.value = 1.34 * stage.col
+    uShape.value = narrow ? 0.62 : 0.9
     // a phone frame is a third of the pixels and half the air: fewer motes,
     // never an empty one
     moteGeo.instanceCount = narrow ? 120 : MOTE_N
@@ -866,6 +921,8 @@ export function createCouncil(scene: Scene, onEnded: () => void): CouncilHandles
     running = true
     endedFired = false
     t = 0
+    beganAt = performance.now()
+    stagedTime = null
     yieldK = 1
     root.visible = true
     // the poem line has the frame first; the letterpress sets once the
@@ -909,24 +966,14 @@ export function createCouncil(scene: Scene, onEnded: () => void): CouncilHandles
       const s = settleOf(i)
       b += (s * s * (3 - 2 * s)) * 0.215
       const since = t - (landAt[i] ?? 0)
-      if (since > 0) b += 0.16 * Math.exp(-since * 2.6)
+      if (!reduced && since > 0) b += 0.16 * Math.exp(-since * 2.6)
     }
-    return Math.min(1, b)
+    return Math.min(1, b) * (stage === NARROW ? 0.29 : 1)
   }
 
-  /* THE FLOOR PASSES. There are no per-voice timestamps yet, so this claims
-     nothing while the circle is silent: the moderator holds the open floor,
-     the other three listen, and that is a true thing to say about a
-     moderated council. Once the audio is running the floor moves on a slow
-     turn so the frame always has ONE voice speaking and three listening,
-     which is what a council looks like. When the timestamps land, this
-     function is the one line that changes. */
-  const TURNS = [MOD, 0, 2, MOD, 3, 0, MOD, 2, 3, MOD]
-  function holder(): number {
-    if (audio.paused || !(audio.duration > 0)) return MOD
-    const turn = Math.floor(audio.currentTime / 13.5) % TURNS.length
-    return TURNS[turn] ?? MOD
-  }
+  // No speaker timestamps ship with this recording. The moderator holds
+  // the open floor; never invent a sequence of speakers from elapsed time.
+  function holder(): number { return MOD }
 
   /* The council keeps its OWN clock. `elapsed` stays in the signature
      because main owns it, but the convening is measured from begin(): the
@@ -935,7 +982,7 @@ export function createCouncil(scene: Scene, onEnded: () => void): CouncilHandles
   function update(dt: number, elapsed: number, camera: PerspectiveCamera): void {
     if (!running) return
     void elapsed
-    t += dt
+    t = stagedTime ?? (performance.now() - beganAt) / 1000
     layoutSeats(camera.aspect)
 
     // ONE heartbeat for the whole circle: the marble, the colonnade, the
@@ -944,17 +991,19 @@ export function createCouncil(scene: Scene, onEnded: () => void): CouncilHandles
     uFlick.value = reduced
       ? 0.86
       : 0.66 + 0.19 * Math.sin(t * 7.3) + 0.1 * Math.sin(t * 11.9 + 1.7) + 0.06 * Math.sin(t * 17.3 + 4.1)
-    // the air keeps moving for a visitor who asked for less motion, it just
-    // moves like weather instead of like an effect
-    uT.value = reduced ? t * 0.22 : t
+    // Reduced motion holds a complete, still field from the first update.
+    uT.value = reduced ? 7.2 : t
     uBlaze.value = blaze()
     /* THE CIRCLE STANDS DOWN. When the forward door takes the frame the
        cartouche goes dark, and that is this beat's signal that the way
        onward is speaking now: the marks of the circle step back so nothing
        of ours sits bright behind that copy. The fire keeps burning. */
     const doorHolds = cartoucheEl.hidden
-    yieldK += ((doorHolds ? 0.4 : 1) - yieldK) * Math.min(1, dt * 3)
-    uReveal.value = Math.min(1, t / 0.55) * yieldK
+    yieldK += ((doorHolds ? 0.12 : 1) - yieldK) * Math.min(1, dt * 5)
+    if (document.body.classList.contains('forge') && doorHolds) yieldK = 0.12
+    uStone.value = reduced ? 1 : Math.min(1, t / 0.55)
+    uYield.value = yieldK
+    uReveal.value = uStone.value * yieldK
     uPx.value = Math.tan((camera.fov * Math.PI) / 360) / Math.max(200, innerHeight)
 
     const held = holder()
@@ -968,7 +1017,7 @@ export function createCouncil(scene: Scene, onEnded: () => void): CouncilHandles
       const ku = uSeatK[i]
       if (!v || !p || !pu || !cu || !ku) continue
       const k = settleOf(i)
-      const e = 1 - Math.pow(1 - k, 3)
+      const e = k * k * k * (10 + k * (-15 + 6 * k))
       const phase = i * 1.7
 
       // the descent: it comes in from outside the ring and swings down onto
@@ -978,13 +1027,13 @@ export function createCouncil(scene: Scene, onEnded: () => void): CouncilHandles
       const wide = 1 + Math.pow(1 - e, 1.6) * 0.26
       const x = FIRE.x + Math.sin(ang) * stage.rx * wide
       const z = FIRE.z + Math.cos(ang) * stage.rz * wide - FROM_Z * (1 - e)
-      const y = FROM_Y + (SEAT_Y - FROM_Y) * e
+      const y = FROM_Y + (p.y - FROM_Y) * e
       tmp.set(x, y, z)
 
       // the landing: a flare as it takes the seat, then the settled light
       const since = t - (landAt[i] ?? 0)
-      const flash = since > -0.45 ? Math.exp(-Math.pow((since + 0.05) * 3.4, 2)) : 0
-      const seated = Math.min(1, Math.max(0, (t - (landAt[i] ?? 0) + 0.5) / 0.9))
+      const flash = !reduced && since > -0.45 ? Math.exp(-Math.pow((since + 0.05) * 3.4, 2)) : 0
+      const seated = reduced ? 1 : Math.min(1, Math.max(0, (t - (landAt[i] ?? 0) + 0.5) / 0.9))
       // whoever holds the floor stands a little taller; the rest listen
       const floor = held === i ? 1 : 0
       const lead = 0.76 + 0.24 * floor
@@ -1019,7 +1068,7 @@ export function createCouncil(scene: Scene, onEnded: () => void): CouncilHandles
       const thrown = (bright + flash * 0.9) * seated * v.gain
       cu.value.set(c.r * thrown, c.g * thrown, c.b * thrown)
       // the ripple runs out of the landing across the stone, once
-      const ripple = since > 0 && since < 1.5 ? since : -1
+      const ripple = !reduced && since > 0 && since < 1.5 ? since : -1
       ku.value.set(
         seated * (0.85 + 0.15 * floor) + flash * 0.6,
         ripple >= 0 ? 0.2 + ripple * 1.5 : -1,
@@ -1039,7 +1088,7 @@ export function createCouncil(scene: Scene, onEnded: () => void): CouncilHandles
     // letterpress register instead, via CSS). While the forward door holds
     // the frame the circle's names stand down: the cartouche going dark is
     // how this beat learns the door is open.
-    const seated = t > (landAt[0] ?? 0) + 0.4
+    const seated = reduced || t > Math.max(...landAt) + 0.3
     const doorUp = cartoucheEl.hidden
     namesEl.hidden = !seated || doorUp
     if (seated && !doorUp) {
@@ -1060,9 +1109,10 @@ export function createCouncil(scene: Scene, onEnded: () => void): CouncilHandles
         el.style.top = `${y + 18}px`
         // these ride over stone, fire and colonnade, so they carry their own
         // night with them the way the kicker above them does
-        el.style.textShadow = '0 1px 10px rgba(4, 6, 13, 0.95), 0 0 3px rgba(4, 6, 13, 0.85)'
+        el.style.textShadow =
+          '0 0 2px rgba(4, 6, 13, 0.98), 0 0 6px rgba(4, 6, 13, 0.95), 0 1px 14px rgba(4, 6, 13, 0.92)'
         // the one holding the floor is named in full light
-        el.style.opacity = held === i ? '1' : '0.85'
+        el.style.opacity = held === i ? '1' : '0.94'
       }
     }
 
@@ -1071,17 +1121,14 @@ export function createCouncil(scene: Scene, onEnded: () => void): CouncilHandles
     }
   }
 
-  function forgeStage(camera: PerspectiveCamera): void {
+  function forgeStage(camera: PerspectiveCamera, at?: number): void {
     begin()
-    // compose the whole convening without sound: every light down, the
-    // circle closed, the blaze settled, the air already moving
-    // the rig can ask for a half-arrived circle (?cf=96): stopping the
-    // compose mid-descent is the only way the arrival gets screenshotted
-    const frames = Number(new URLSearchParams(location.search).get('cf') ?? 340)
-    for (let i = 0; i < frames; i++) update(1 / 60, 12.4 + i / 60, camera)
+    const frames = Number(new URLSearchParams(location.search).get('cf') ?? 510)
+    stagedTime = Number.isFinite(at) ? Math.max(0, Math.min(at ?? 8.5, 120)) : frames / 60
+    update(1, 12.4, camera)
     audio.pause()
     window.clearTimeout(topicTimer)
-    topicEl.classList.add('lit')
+    topicEl.classList.toggle('lit', stagedTime >= 6.2)
     setToggleLabel()
   }
 

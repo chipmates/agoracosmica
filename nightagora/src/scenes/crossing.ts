@@ -57,6 +57,7 @@ const {
   dot,
   float,
   fract,
+  fwidth,
   length,
   max,
   mix,
@@ -145,6 +146,7 @@ interface Stroke {
   /** which plate this stroke belongs to: near ones run faster and heavier */
   plate: number
   v0: number
+  u0: number
   /** 0 = drifts away, 1 = lies down on the plate mark, 2 = becomes dust */
   role: number
   /** where on the plate mark's perimeter this one comes to rest */
@@ -182,7 +184,7 @@ export function createCrossing(scene: Scene, onDone: () => void): CrossingHandle
      is what a ruling pen does and a burin never does. */
   const uInk = uniform(0)
 
-  const inkGeo = new PlaneGeometry(1, 1)
+  const inkGeo = new PlaneGeometry(1, 1, 3, 1)
   inkGeo.translate(0.5, 0, 0) // the stroke runs from its own origin
 
   const dither = (amp: number): N =>
@@ -203,7 +205,9 @@ export function createCrossing(scene: Scene, onDone: () => void): CrossingHandle
     const c = cos(iA.w)
     const s = sin(iA.w)
     const lx = positionLocal.x.mul(iB.x)
-    const ly = positionLocal.y.mul(iB.y)
+    const ly = positionLocal.y.mul(iB.y).add(
+      sin(positionLocal.x.mul(Math.PI)).mul(iB.x).mul(0.025).mul(oneMinus(iB.w))
+    )
     const p = vec3(iA.x.add(lx.mul(c)).sub(ly.mul(s)), iA.y.add(lx.mul(s)).add(ly.mul(c)), iA.z)
     mat.vertexNode = cameraProjectionMatrix.mul(cameraViewMatrix).mul(modelWorldMatrix).mul(vec4(p, 1))
 
@@ -213,25 +217,29 @@ export function createCrossing(scene: Scene, onDone: () => void): CrossingHandle
     const t = uv()
     const u = t.x
     const across = t.y.sub(0.5).mul(2)
-    // the cut: a burin swells and lifts, a rule holds its weight
-    const burin = pow(max(sin(u.mul(Math.PI)), 0), 0.4)
-    const rule = smoothstep(0, 0.05, u).mul(smoothstep(0, 0.05, oneMinus(u)))
-    const prof = mix(burin, rule, vB.w)
-    // a cut has soft shoulders, a ruled line does not: the same quad
-    // carries both, and a hairline that is not crisp reads as a smudge
-    const shoulder = mix(float(0.24), float(0.74), vB.w)
-    const cover = oneMinus(smoothstep(prof.mul(shoulder), prof, abs(across)))
-    // a hand cut this: the line trembles a little along its run, and the
-    // ink pools where the burin first bit into the plate
-    const tremble = sin(u.mul(17).add(vA.w.mul(9))).mul(0.1).add(0.9)
-    const bite = oneMinus(u).mul(0.34).add(0.83)
-    const ink = cover.mul(tremble).mul(bite).mul(vB.z).mul(uInk)
+    /* the trough and its raised shoulder share one fragment, one cut:
+       the pressure curve is asymmetric, so the bite lands before the
+       middle of the run and the burin lifts out of it */
+    const prof = mix(
+      pow(max(sin(pow(u, 0.72).mul(Math.PI)), 0), 0.62),
+      smoothstep(0, 0.02, u).mul(smoothstep(0, 0.02, oneMinus(u))), vB.w
+    )
+    const edge = across.add(sin(u.mul(21).add(vA.x.mul(7))).mul(0.035))
+    const aa = max(fwidth(edge).mul(0.7), 0.06)
+    const cover = oneMinus(smoothstep(prof.sub(aa), prof.add(aa), abs(edge)))
+    const trough = oneMinus(smoothstep(0.08, 0.32, abs(edge.add(prof.mul(0.16)))))
+    const burr = oneMinus(smoothstep(0.05, aa.add(0.22), abs(edge.sub(prof.mul(0.48)))))
+      .mul(prof).mul(0.56)
+    const pool = smoothstep(0.02, 0.2, u).mul(oneMinus(smoothstep(0.25, 0.72, u)))
+    const hand = sin(u.mul(47).add(vA.y.mul(21))).mul(0.045).add(0.955)
+    const ink = cover.mul(float(0.54).sub(trough.mul(0.28)).sub(pool.mul(0.1)))
+      .add(burr).mul(hand).mul(vB.z).mul(uInk)
     mat.colorNode = vC.mul(ink).add(dither(0.0032))
     return mat
   }
 
-  const STROKES = innerWidth < 700 ? 210 : 380
-  const FURNITURE = 108
+  const STROKES = innerWidth < 700 ? 840 : 1400
+  const FURNITURE = 420
   const CAP = STROKES + FURNITURE
 
   const iA = new Float32Array(CAP * 4)
@@ -295,29 +303,36 @@ export function createCrossing(scene: Scene, onDone: () => void): CrossingHandle
   const aspect0 = innerWidth / Math.max(1, innerHeight)
   for (let i = 0; i < STROKES; i++) {
     const plate = i % 3
-    const cross = i % 5 === 2 || i % 5 === 4 ? 1 : 0
+    const cross = i % 7 === 3 ? 1 : 0
+    // the field is sown on a lattice, not at random: a hand rules its
+    // cuts in rows, and rows are what let the banks bend as one body
+    const columns = STROKES / 70
+    const row = Math.floor(i / columns)
+    const u0 = ((i % columns) + ((row * 0.381966) % 1) + rand() * 0.18) / columns
+    const v0 = ((row + rand() * 0.16) / 70 - 0.5) * 2.5
     strokes.push({
-      u: (rand() - 0.5) * 2.6 * aspect0,
-      v: (rand() - 0.5) * 2.4,
+      u: (u0 - 0.5) * 2.6 * aspect0,
+      v: v0,
       ang: (cross ? CROSS_BEARING : BEARING) + (rand() - 0.5) * 0.06,
-      len: (cross ? 0.05 : 0.09) + rand() * (cross ? 0.07 : 0.24),
+      len: (cross ? 0.025 : 0.045) + rand() * (cross ? 0.035 : 0.11),
       // never under a pixel and a half: a sub-pixel quad does not read
       // as a fine line, it reads as a dotted one (round 1)
-      wid: 0.0032 + rand() * (cross ? 0.0014 : 0.003),
-      bright: 0.18 + rand() * 0.82,
+      wid: 0.003 + rand() * (cross ? 0.002 : 0.0035),
+      bright: 0.3 + rand() * 0.65,
       cross,
       plate,
-      v0: 0.5 + rand() * 1.1,
+      v0,
+      u0,
       role: 0,
       seat: rand(),
-      seatOff: (rand() - 0.5) * 0.02,
-      seatLen: 0.05 + rand() * 0.09,
+      seatOff: (rand() - 0.5) * 0.035,
+      seatLen: 0.015 + rand() * 0.035,
       fu: 0,
       fv: 0,
       fang: 0,
       flen: 0,
       snapped: false,
-      gold: rand() > 0.93 ? 1 : 0,
+      gold: rand() > 0.985 ? 1 : 0,
     })
   }
   /* a third of the field comes to rest on the plate mark, a handful stay
@@ -427,7 +442,8 @@ export function createCrossing(scene: Scene, onDone: () => void): CrossingHandle
   veilMat.depthTest = false
   const uVeil = uniform(0)
   veilMat.colorNode = vec3(VEIL_INK.r, VEIL_INK.g, VEIL_INK.b)
-  veilMat.opacityNode = smoothstep(0.3, 0.78, length(uv().sub(vec2(0.5, 0.5))))
+  veilMat.opacityNode = float(0.74)
+    .add(smoothstep(0.15, 0.7, length(uv().sub(vec2(0.5, 0.5)))).mul(0.26))
     .mul(uVeil)
     .add(dither(0.006))
   const veil = new Mesh(veilGeo, veilMat)
@@ -445,7 +461,7 @@ export function createCrossing(scene: Scene, onDone: () => void): CrossingHandle
   )
   toothMat.colorNode = vec3(0.42, 0.44, 0.52)
     .mul(max(grain.sub(0.62), 0))
-    .mul(uVeil.mul(0.09))
+    .mul(uVeil.mul(0.018))
   const tooth = new Mesh(veilGeo, toothMat)
   tooth.renderOrder = 21
   tooth.frustumCulled = false
@@ -713,10 +729,10 @@ export function createCrossing(scene: Scene, onDone: () => void): CrossingHandle
 
   /** the course: a portolan arc from low in the frame toward his light */
   function coursePoint(k: number): { u: number; v: number } {
-    const fu = -0.5 * aspect
-    const fv = -0.74
+    const fu = -0.73 * aspect
+    const fv = -0.12
     const bu = (fu + lightU) * 0.5
-    const bv = Math.max(fv, lightV) + 0.34
+    const bv = Math.max(fv, lightV) + 0.22
     const a = 1 - k
     return {
       u: a * a * fu + 2 * a * k * bu + k * k * lightU,
@@ -747,8 +763,8 @@ export function createCrossing(scene: Scene, onDone: () => void): CrossingHandle
     destCore.position.copy(dest.position)
     const grow = 0.3 + Math.min(1, t / 5) * 1.7
     dest.scale.set(grow * (1 + arrival * 2.4), grow * (1 + arrival * 2.4), 1)
-    destCore.scale.set(grow * 0.34, grow * 0.34, 1)
-    destMat.opacity = Math.min(0.85, t / 2.5) * (1 - arrival * 0.68) * beat
+    destCore.scale.set(grow * 0.13, grow * 0.13, 1)
+    destMat.opacity = Math.min(0.28, t / 2.5) * (1 - arrival * 0.68) * beat
     coreMat.opacity = Math.min(1, t / 2.2) * (1 - arrival) * beat
     // the spill: a small warm pool on the page right under the frame. A
     // wide one is not light, it is fog, and it swallowed his caption on
@@ -762,29 +778,33 @@ export function createCrossing(scene: Scene, onDone: () => void): CrossingHandle
 
     // ---------------------------------------------------- the hatching
     cursor = 0
-    const dirX = Math.cos(BEARING)
-    const dirY = Math.sin(BEARING)
-    const wrap = aspect * 1.35
     for (let i = 0; i < STROKES; i++) {
       const s = strokes[i]
       if (!s) continue
-      const plateSpeed = 0.62 + s.plate * 0.34
-      if (settle < 1) {
-        const run = s.v0 * dt * (0.06 + spd * 0.62) * plateSpeed * (1 - settle * 0.86)
-        s.u -= dirX * run
-        s.v -= dirY * run
-        if (s.u < -wrap) {
-          s.u = wrap
-          s.v = (rand() - 0.5) * 2.4
-        }
-        if (s.v < -1.3) s.v += 2.6
-        if (s.v > 1.3) s.v -= 2.6
-      }
+      /* two banks of bent parallel cuts, the way an engraver renders a
+         passage of water. The positions are analytic, so a second visit
+         and a posed frame agree on every cut. */
+      const travel = reduced ? 0 : Math.min(t, T_SETTLE_IN) * 0.025
+      const x = (((((s.u0 - travel) % 1) + 1) % 1) - 0.5) * aspect * 2.8
+      const row = Math.floor(i / (STROKES / 70))
+      const upper = row < 35
+      const layer = (row % 35) / 34
+      const y = (upper ? 0.42 : -0.64) + (layer - 0.5) * (upper ? 0.43 : 0.52)
+      const bend =
+        0.15 * Math.sin(x * 2.25 + (upper ? 0 : 2.4)) +
+        0.045 * Math.sin(x * 5.1 + layer * 1.4)
+      s.u = x
+      s.v = y + bend + x * 0.06
+      s.ang =
+        Math.atan(
+          0.06 + 0.3375 * Math.cos(x * 2.25 + (upper ? 0 : 2.4)) +
+            0.2295 * Math.cos(x * 5.1 + layer * 1.4)
+        ) + (s.cross ? 0.54 : 0)
       // the tonal field: the ink goes fine and thins out around his
       // light, and stays heavy at the edges of the sheet. The glow is
       // not painted in, it is where the strokes stop.
       const dl = Math.hypot(s.u - lightU, s.v - lightV)
-      const tone = Math.min(1, Math.max(0, (dl - 0.26) / 0.9))
+      const tone = Math.min(1, Math.max(0, (dl - 0.22) / 0.52))
       // and the sheet is not an even mat: an engraver leaves passages
       // open and builds others up, which is what makes ink read as tone
       const passage =
@@ -800,11 +820,25 @@ export function createCrossing(scene: Scene, onDone: () => void): CrossingHandle
       let u = s.u
       let v = s.v
       let ang = s.ang
-      let len = s.len * (0.34 + spd * 1.5) * (0.45 + 0.55 * tone)
+      // a cut runs the width of its own cell: neighbours in a row meet
+      // end to end, which is what makes a bank read as one drawn body
+      let len =
+        ((aspect * 2.8) / (STROKES / 70)) *
+        (0.85 + s.bright * 0.3) *
+        (0.55 + spd * 0.5) *
+        (0.6 + 0.4 * tone) *
+        (s.cross ? 0.48 : 1)
       // the near plate runs faster and cuts heavier: that is the whole of
       // the depth here, and it is enough
-      let wid = s.wid * (0.6 + toneW * 0.6) * (0.82 + s.plate * 0.22)
-      let weight = s.bright * beat * (0.16 + spd * 0.84) * toneW * crossK
+      let wid = s.wid * (0.45 + toneW * 0.38) * (0.82 + s.plate * 0.15)
+      // the banks keep their own margins open, and each one fades at its
+      // outer lip: an even mat of cuts is wallpaper, not water
+      const quiet =
+        (1 - span(0.84, 0.98, Math.abs(s.v))) *
+        (1 - 0.88 * Math.exp(-Math.pow((s.v - 0.75) / 0.13, 2))) *
+        (1 - 0.8 * Math.exp(-Math.pow((s.v + 0.3) / 0.1, 2)))
+      const bank = 0.32 + 0.68 * Math.pow(Math.sin(layer * Math.PI), 0.65)
+      let weight = s.bright * beat * (0.16 + spd * 0.84) * toneW * crossK * quiet * bank
       const warmth = Math.min(4, Math.max(0, Math.round((1 - tone) * 4)))
       let col = s.gold
         ? GOLD
@@ -813,6 +847,9 @@ export function createCrossing(scene: Scene, onDone: () => void): CrossingHandle
       const shape = 0
 
       if (settle > 0 && s.role !== 0) {
+        // the press meets successive cuts along the course, and a cut
+        // shortens under pressure before it takes its seat in the paper
+        const localSettle = ease(span(T_SETTLE_IN + s.seat * 0.22, T_SETTLE_OUT, t))
         if (!s.snapped) {
           s.snapped = true
           s.fu = s.u
@@ -830,17 +867,20 @@ export function createCrossing(scene: Scene, onDone: () => void): CrossingHandle
           const side = seat.u > rect.cu ? 1 : -1
           const tu = seat.u + nx * s.seatOff * side
           const tv = seat.v + ny * s.seatOff * away
-          u = s.fu + (tu - s.fu) * settle
-          v = s.fv + (tv - s.fv) * settle
-          ang = s.fang + (seat.ang - s.fang) * settle
-          len = s.flen + (s.seatLen - s.flen) * settle
+          u = s.fu + (tu - s.fu) * localSettle
+          v = s.fv + (tv - s.fv) * localSettle
+          const cutAngle = i % 2 ? 0.68 : 0.84
+          ang = s.fang + (cutAngle - s.fang) * settle
+          len =
+            (s.flen + (s.seatLen - s.flen) * localSettle) *
+            (1 - Math.sin(localSettle * Math.PI) * 0.64)
           wid = s.wid * (1 - settle * 0.4)
           // seated, they hold one even pressure: a ruled impression, not
           // forty different hands
           weight =
             s.bright * (0.16 + spd * 0.84) * (1 - settle) +
-            settle * (0.26 + s.bright * 0.16) * beat
-          col = PLATE_INK
+            settle * (0.035 + s.bright * 0.05) * beat
+          col = WARM_TONE[2] ?? PLATE_INK
         } else {
           // dust, hanging in the light he arrives with. It stays where
           // it was caught: dust that all swims to one point is a comet.
@@ -849,7 +889,7 @@ export function createCrossing(scene: Scene, onDone: () => void): CrossingHandle
           v = s.fv + settle * 0.03 + Math.cos(drift * 0.8 + s.seat * 7) * 0.028
           len = s.flen * (1 - settle) + settle * 0.009
           wid = s.wid * (1 - settle) + settle * 0.009
-          weight = s.bright * (0.16 + spd * 0.84) * (1 - settle) + settle * 0.4 * beat
+          weight = s.bright * (0.16 + spd * 0.84) * (1 - settle) + settle * 0.018 * beat
           col = GOLD
         }
       } else if (settle > 0) {
@@ -858,7 +898,7 @@ export function createCrossing(scene: Scene, onDone: () => void): CrossingHandle
         // this arrival cannot be (round 1). Short, or they read as
         // scratches on the plate rather than as its tone (round 3).
         len *= 1 - settle * 0.62
-        weight = weight * (1 - settle) + settle * s.bright * 0.075 * toneW * beat
+        weight = weight * (1 - settle) + settle * s.bright * 0.012 * toneW * beat
       }
       put(u, v, ang, len, wid, weight, col, shape)
     }
@@ -867,7 +907,7 @@ export function createCrossing(scene: Scene, onDone: () => void): CrossingHandle
     /* short gold cuts radiating from the light: the engraver's sunburst.
        They stay tight around the star so the frame never becomes a
        tunnel, and they turn, slowly, the way everything here turns. */
-    const spin = reduced ? 0 : elapsed * 0.06
+    const spin = 0.13
     /* short and soft: a long hard ray is a lens flare, and a star with
        twelve of them is a sticker (round 2 shot it on a phone and it
        read as tinsel). These are cuts around a light, nothing more. */
@@ -875,19 +915,19 @@ export function createCrossing(scene: Scene, onDone: () => void): CrossingHandle
        modest on a desk is a third of a phone's width. His light keeps
        its proportion to the stage it is standing on (round 4). */
     const sizeK = Math.min(1, 0.56 + aspect * 0.3)
-    const glowLen = (0.022 + spd * 0.05) * sizeK
+    const glowLen = (0.025 + spd * 0.082) * sizeK
     const glow = Math.max(spd * 0.78, arrival * 0.2)
-    const RAYS = 13 // an odd count: an even fan reads as a compass rose
+    const RAYS = 67 // fine and many: the corona of a cut light, not a fan
     for (let i = 0; i < RAYS; i++) {
-      const a = (i / RAYS) * Math.PI * 2 + spin + Math.sin(i * 3.7) * 0.13
+      const a = (i / RAYS) * Math.PI * 2 + spin + Math.sin(i * 3.7) * 0.016
       const scale = 0.45 + Math.abs(Math.sin(i * 2.3)) * 1.1
-      const r0 = (0.05 + (1.4 - scale) * 0.02) * sizeK + arrival * 0.16
+      const r0 = (0.045 + (1.4 - scale) * 0.012) * sizeK + arrival * 0.16
       put(
         lightU + Math.cos(a) * r0,
         lightV + Math.sin(a) * r0,
         a,
         glowLen * scale,
-        0.0052,
+        0.0026,
         glow * (0.16 + scale * 0.3) * beat,
         i % 5 === 0 ? GOLD_HOT : GOLD,
         0
@@ -920,17 +960,17 @@ export function createCrossing(scene: Scene, onDone: () => void): CrossingHandle
     const drawn = Math.min(1, span(0.25, 1.5, t))
     const courseK = Math.min(1, drawn) * (1 - span(4.2, 5.3, t))
     if (courseK > 0.002) {
-      const DASHES = 24
+      const DASHES = 60
       for (let i = 0; i < DASHES; i++) {
         const k0 = i / DASHES
         if (k0 > drawn) break
         const p0 = coursePoint(k0)
-        const p1 = coursePoint(k0 + 0.62 / DASHES)
+        const p1 = coursePoint(k0 + 0.86 / DASHES)
         const ang = Math.atan2(p1.v - p0.v, p1.u - p0.u)
         const len = Math.hypot(p1.u - p0.u, p1.v - p0.v)
         const head = drawn < 1 ? 1 - Math.min(1, Math.abs(k0 - drawn) * 8) : 0.42
         put(p0.u, p0.v, ang, len, 0.0034, courseK * (0.42 + head * 0.5) * beat, GOLD, 1)
-        if (i % 8 === 4) {
+        if (i % 18 === 9) {
           // a bearing tick, the way a chart marks its own run
           put(p0.u, p0.v - 0.014, ang + Math.PI / 2, 0.028, 0.003, courseK * 0.42, GOLD, 1)
         }
@@ -938,6 +978,45 @@ export function createCrossing(scene: Scene, onDone: () => void): CrossingHandle
       if (drawn < 1) {
         const nib = coursePoint(drawn)
         put(nib.u - 0.008, nib.v, 0, 0.018, 0.006, courseK * 1.2, GOLD_HOT, 0)
+      }
+    }
+
+    /* the rose the course departs from: a ruled circle, eight winds and
+       three faint rhumbs running off the sheet, the way a portolan
+       tells you where its bearings were taken */
+    if (courseK > 0.002) {
+      const origin = coursePoint(0)
+      const radius = Math.min(0.072, aspect * 0.115)
+      for (let i = 0; i < 32; i++) {
+        const a = (i / 32) * Math.PI * 2
+        const r = radius * (i % 4 === 0 ? 1.35 : 1)
+        put(
+          origin.u + Math.cos(a) * r,
+          origin.v + Math.sin(a) * r,
+          a + Math.PI / 2,
+          radius * 0.16,
+          0.0019,
+          courseK * 0.24,
+          GOLD,
+          1
+        )
+      }
+      for (let i = 0; i < 8; i++) {
+        const a = (i / 8) * Math.PI * 2
+        const r = radius * (i % 2 === 0 ? 0.96 : 0.52)
+        put(origin.u, origin.v, a, r, i % 2 === 0 ? 0.005 : 0.0025, courseK * 0.52, GOLD, 0)
+      }
+      for (const a of [0.17, 0.7, 1.24]) {
+        put(
+          origin.u - Math.cos(a) * radius * 1.8,
+          origin.v - Math.sin(a) * radius * 1.8,
+          a,
+          Math.min(aspect * 1.35, 1.2),
+          0.0015,
+          courseK * 0.055,
+          PLATE_INK,
+          1
+        )
       }
     }
 
@@ -950,71 +1029,21 @@ export function createCrossing(scene: Scene, onDone: () => void): CrossingHandle
     const gild = span(T_PORTRAIT - 0.15, T_PORTRAIT + 0.85, t)
     const gone = 1 - span(T_BREATH - 0.25, T_BREATH + 0.25, t)
     if (gild > 0.002 && gone > 0.002) {
-      const inner = margin * 0.19
-      const outer = margin * 0.32
-      const rules: Array<[number, number]> = [
-        [rect.hu + inner, rect.hv + inner],
-        [rect.hu + outer, rect.hv + outer],
-      ]
-      for (let r = 0; r < rules.length; r++) {
-        const pair = rules[r]
-        if (!pair) continue
-        const [hu, hv] = pair
-        // the top rule is ruled first, then the sides, then the foot
-        const stagger = [0, 0.22, 0.22, 0.44]
-        const weight = (r === 0 ? 1.15 : 0.5) * gone * beat
-        const wid = r === 0 ? 0.0038 : 0.0028
-        const overhang = r === 0 ? 0 : margin * 0.24
-        for (let e = 0; e < 4; e++) {
-          const kk = ease(Math.min(1, Math.max(0, (gild - (stagger[e] ?? 0)) / 0.5)))
-          if (kk <= 0.002) continue
-          const horiz = e === 0 || e === 3
-          const full = (horiz ? hu : hv) * 2 + overhang * 2
-          const len = full * kk
-          const start = -(full * 0.5)
-          if (horiz) {
-            const v = rect.cv + (e === 0 ? hv : -hv)
-            put(rect.cu + start, v, 0, len, wid, weight, GOLD, 1)
-          } else {
-            const u = rect.cu + (e === 1 ? -hu : hu)
-            put(u, rect.cv + start, Math.PI / 2, len, wid, weight, GOLD, 1)
-          }
-        }
-      }
-      // registration: four short cuts where the two rules meet, the mark
-      // a plate carries so a second colour lands on the first
-      const regK = ease(span(T_PORTRAIT + 0.5, T_PORTRAIT + 1.1, t))
-      const reg = margin * 0.34 * regK
-      for (let c = 0; c < 4; c++) {
-        const su = c === 0 || c === 3 ? -1 : 1
-        const sv = c < 2 ? 1 : -1
-        const cu = rect.cu + su * (rect.hu + outer)
-        const cv = rect.cv + sv * (rect.hv + outer)
-        // a mark runs OUT of its corner: both cuts start at the crossing
-        // and reach away from the image (round 1 wrote them backwards, so
-        // the two at the foot never drew at all)
-        put(cu, sv > 0 ? cv : cv - reg, Math.PI / 2, reg, 0.0026, 0.6 * regK * gone, GOLD, 1)
-        put(su > 0 ? cu : cu - reg, cv, 0, reg, 0.0026, 0.6 * regK * gone, GOLD, 1)
-      }
-      // the light leak: his frame is a window, and a window spills. It is
-      // strongest at the head, where his light stands.
-      const leak = arrival * 0.55 * gone * beat
-      for (let e = 0; e < 4; e++) {
-        const horiz = e === 0 || e === 3
-        if (horiz) {
-          const top = e === 0
-          const v = rect.cv + (top ? rect.hv + 0.01 : -rect.hv - 0.01)
-          put(rect.cu - rect.hu, v, 0, rect.hu * 2, 0.038, leak * (top ? 0.62 : 0.3), GOLD, 0)
-        } else {
-          const u = rect.cu + (e === 1 ? -rect.hu - 0.01 : rect.hu + 0.01)
-          put(u, rect.cv - rect.hv, Math.PI / 2, rect.hv * 2, 0.032, leak * 0.4, GOLD, 0)
-        }
+      // the shell rules the two hairlines in CSS; the plate contributes
+      // only the shoulder that catches the light at the corners
+      for (let corner = 0; corner < 4; corner++) {
+        const su = corner % 2 ? 1 : -1
+        const sv = corner < 2 ? 1 : -1
+        const u = rect.cu + su * (rect.hu + 0.012)
+        const v = rect.cv + sv * (rect.hv + 0.012)
+        const shine = (corner === 0 ? 0.85 : corner === 3 ? 0.34 : 0.12) * gild * gone
+        put(u - (su > 0 ? 0.045 : 0), v, 0, 0.045, 0.0025, shine, GOLD_HOT, 1)
+        put(u, v - (sv > 0 ? 0.045 : 0), Math.PI / 2, 0.045, 0.002, shine * 0.7, GOLD, 1)
       }
     }
 
-    for (let i = cursor; i < CAP; i++) {
-      iB[i * 4 + 2] = 0
-    }
+    // only the cuts actually laid this frame are drawn
+    fieldGeo.instanceCount = cursor
     aA.needsUpdate = true
     aB.needsUpdate = true
     aC.needsUpdate = true
@@ -1027,6 +1056,7 @@ export function createCrossing(scene: Scene, onDone: () => void): CrossingHandle
 
     // the portrait blooms: the atlas entry is the arrival
     if (t >= T_PORTRAIT) portraitEl.classList.add('lit')
+    portraitEl.style.setProperty('--print', String(ease(span(T_PORTRAIT, T_PORTRAIT + 0.8, t))))
 
     // the gold breath: one heartbeat of warm gold with a single dark line
     if (t >= T_BREATH - 0.5) paintGlory()

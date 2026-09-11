@@ -26,6 +26,9 @@ import {
 import {
   abs,
   attribute,
+  cameraPosition,
+  cross,
+  sign,
   cameraProjectionMatrix,
   cameraViewMatrix,
   clamp,
@@ -134,7 +137,7 @@ export const uYield = uniform(0)
 /** the bearing of the dying day: ONE azimuth, measured on the ground
     plane. A 3D dot stays high across the whole forward sky, which is what
     smears plum over the flanks. */
-export const DUSK_DIR = new Vector3(0.16, 0.3, -0.94).normalize()
+export const DUSK_DIR = new Vector3(-0.76, 0.24, -0.55).normalize()
 export const uDuskDir = uniform(DUSK_DIR)
 
 // -------------------------------------------------------------- the fires
@@ -151,7 +154,7 @@ export interface FireDef {
 
 export const FIRES: FireDef[] = [
   { id: 'praetorium', p: [0.0, 1.35, -21.4], hex: '#ffb35e', r: 9.0, ph: 0.0, amp: 0.1 },
-  { id: 'brazier', p: [1.75, 1.05, 13.4], hex: '#ffa347', r: 5.2, ph: 1.7, amp: 0.22 },
+  { id: 'brazier', p: [2.85, 0.73, 12.6], hex: '#ffa347', r: 5.2, ph: 1.7, amp: 0.22 },
   { id: 'torchL', p: [-2.35, 2.15, 4.5], hex: '#ff9a3c', r: 2.7, ph: 2.9, amp: 0.3 },
   { id: 'torchR', p: [2.35, 2.15, 4.5], hex: '#ff9a3c', r: 2.7, ph: 0.8, amp: 0.3 },
   // ON its own body: the crossed-log fire stands at (-3.4, -11.2), and a
@@ -159,7 +162,7 @@ export const FIRES: FireDef[] = [
   { id: 'campfire', p: [-3.4, 0.42, -11.2], hex: '#ff9c42', r: 4.4, ph: 4.1, amp: 0.24 },
   { id: 'watchL', p: [-4.4, 5.5, 4.9], hex: '#ff8f3a', r: 2.1, ph: 5.2, amp: 0.26 },
   { id: 'watchR', p: [4.4, 5.5, 4.9], hex: '#ff8f3a', r: 2.1, ph: 3.3, amp: 0.26 },
-  { id: 'lamp', p: [0.72, 0.92, -22.5], hex: '#ffcf86', r: 1.5, ph: 2.2, amp: 0.14 },
+  { id: 'lamp', p: [0.28, 0.84, -22.38], hex: '#ffcf86', r: 1.5, ph: 2.2, amp: 0.14 },
 ]
 
 const fireBase = FIRES.map((f) => lin(f.hex))
@@ -266,6 +269,7 @@ export function firelight(w: N, n: N, facePow: number, rim: number): N {
    remembers the fire at all. */
 export interface InkOptions {
   /** the dawn silhouette value */
+  surface?: 'wood' | 'canvas' | 'earth' | 'metal' | 'paper' | 'leather'
   baseD?: string
   /** what it sinks to when night falls over the camp */
   baseN?: string
@@ -311,29 +315,45 @@ export function inkMaterial(o: InkOptions = {}): MeshBasicNodeMaterial {
   const { world, normal, tint, clip } = inkVertex(o.instanced ?? false)
   mat.vertexNode = clip
 
-  const baseK = o.baseK ?? 0.5
-  const ambK = o.ambK ?? 0.088
-  const baseD = c3(lin(o.baseD ?? '#1B1D33'), baseK)
-  const baseN = c3(lin(o.baseN ?? '#080B20'), baseK)
-  // the dome's light is cool but it is not BLUE: a lapis wash strong
-  // enough to tint every upward face turns oak into lilac (round 1)
-  const ambD = c3(lin('#3B4272'), ambK)
-  const ambN = c3(lin('#171D46'), ambK * 0.52)
   const alb = c3(lin(o.albedo ?? '#B9A88E'))
-  const ember = c3(lin('#C4611E'), o.emberK ?? 0.11)
-
-  // the silhouette value, and the dome's own light on top of it: the floor
-  // that keeps a surface a SURFACE instead of a hole in the frame. The
-  // skylight wears the material's own colour — a blue wash on every
-  // upward face turns oak into poured concrete (round 4).
-  const skyTint = mix(vec3(1, 1, 1), alb.mul(1.35), 0.8)
-  let col: N = mix(baseD, baseN, uDeep)
-    .mul(tint)
-    .add(mix(ambD, ambN, uDeep).mul(skyTint).mul(float(0.34).add(max(normal.y, 0).mul(0.66))).mul(uFloor))
-  // the last light of the day, low and beyond the camp
-  col = col.add(ember.mul(pow(max(dot(normal, uDuskDir), 0), 1.7)).mul(oneMinus(uDeep.mul(0.88))).mul(alb))
-  // and the fires, which are the only thing here that is truly a light
-  col = col.add(firelight(world, normal, o.facePow ?? 2.4, o.rim ?? 0.42).mul(alb))
+  const surface = o.surface ?? 'earth'
+  // The scale is in metres, so the same oak is still oak at the writing desk.
+  const sideGrain = sn(vec3(world.x.mul(24), world.y.mul(1.4), world.z.mul(24)))
+  const topGrain = sn(vec3(world.x.mul(1.4), world.y.mul(24), world.z.mul(24)))
+  const grain = mix(sideGrain, topGrain, smoothstep(0.5, 0.9, abs(normal.y)))
+  const coarse = sn(world.mul(3.1))
+  const microFilter = oneMinus(smoothstep(0.001, 0.006, length(world.dFdx()).add(length(world.dFdy()))))
+  const fibres = sin(world.y.mul(1100)).mul(sin(world.x.add(world.z).mul(1050))).mul(microFilter)
+  const detail = surface === 'wood' ? grain.mul(0.3).add(coarse.mul(0.14))
+    : surface === 'canvas' || surface === 'paper' ? fibres.mul(0.025).add(coarse.mul(0.09))
+    : sn(world.mul(31)).mul(0.15).add(coarse.mul(0.2))
+  const albedo = alb.mul(float(0.86).add(detail)).mul(tint)
+  const height = surface === 'wood' ? grain.mul(0.006)
+    : surface === 'canvas' ? fibres.mul(0.000045).add(coarse.mul(0.003))
+    : sn(world.mul(19)).mul(surface === 'metal' ? 0.0005 : 0.003)
+  const n = reliefNormal(world, normalize(normal), height)
+  const metal = surface === 'metal'
+  const sky = mix(vec3(0.12, 0.16, 0.22), vec3(0.025, 0.033, 0.056), uDeep)
+  const fill = sky.mul(float(0.3).add(max(n.y, 0).mul(0.7))).mul(uFloor)
+  const key = hex3('#FFD4A0', 1.35).mul(max(dot(n, uDuskDir), 0))
+    .mul(oneMinus(uDeep)).mul(oneMinus(uInterior.mul(0.82)))
+  let col: N = albedo.mul(fill.add(key)).mul(metal ? 0.34 : 1)
+  // Ambient occlusion belongs to the contact, not to a purple base colour.
+  col = col.add(albedo.mul(mix(float(0.024), float(0.009), uDeep)))
+  col = col.add(firelight(world, n, o.facePow ?? 2.4, o.rim ?? 0.42).mul(albedo))
+  const eye = normalize(cameraPosition.sub(world))
+  const halfSun = normalize(eye.add(uDuskDir))
+  const gloss = pow(max(dot(n, halfSun), 0), metal ? 44 : 22)
+  col = col.add(hex3('#FFD8AB', metal ? 0.9 : 0.045).mul(gloss).mul(oneMinus(uDeep)))
+  if (metal) {
+    for (let i = 0; i < FIRES.length; i++) {
+      const fp = firePosU[i], fc = fireColU[i]
+      if (!fp || !fc) continue
+      const ray = fp.sub(world)
+      const spec = pow(max(dot(n, normalize(normalize(ray).add(eye))), 0), 32)
+      col = col.add(fc.mul(spec).mul(2).div(dot(ray, ray).add(1)))
+    }
+  }
 
   if (o.inner) {
     // canvas is a lantern: light that came through the cloth from inside,
@@ -360,8 +380,22 @@ export function inkMaterial(o: InkOptions = {}): MeshBasicNodeMaterial {
     )
   }
 
+  const distanceFog = oneMinus(length(world.sub(cameraPosition)).mul(-0.018).exp()).mul(0.62)
+    .mul(oneMinus(uInterior.mul(0.8)))
+  col = mix(col, mix(hex3('#65737D', 0.38), hex3('#111B33', 0.3), uDeep), distanceFog)
   mat.colorNode = shoulder(col).add(dither(0.0026)).mul(uReveal)
   return mat
+}
+
+/** Screen derivatives preserve the geometry's original normal and add only
+ * sub-millimetre surface relief. No texture assets or object-space seams. */
+export function reliefNormal(world: N, n: N, height: N): N {
+  const dx = world.dFdx(), dy = world.dFdy()
+  const rx = cross(dy, n), ry = cross(n, dx)
+  const det = dot(dx, rx)
+  const gradient = rx.mul(height.dFdx()).add(ry.mul(height.dFdy()))
+    .mul(sign(det)).div(max(abs(det), 0.000001))
+  return normalize(n.sub(gradient))
 }
 
 /** THE SHOULDER — a fire a hand away from a surface is still a fire, not a

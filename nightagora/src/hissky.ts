@@ -321,6 +321,9 @@ const ringProfile = (rr: N): N => pow(oneMinus(min(abs(rr.sub(0.8)).div(0.19), 1
 
 const uGlass = uniform(glassScale())
 const uWreathK = uniform(1)
+let heldTime: number | null = null
+let decorativeTime = 0
+let exactLevels: number[] | null = null
 
 // ------------------------------------------------------- THE DISTANT SIGNS
 /* His is not the only life in this sky. Four faint asterisms sit out at
@@ -725,19 +728,6 @@ const sign = createSign({
 })
 wreath.add(sign.group)
 
-// ---------------------------------------------------------- THE FOUR WAYS
-/* Four petals ride every seed, one for each way of knowing it: the story,
-   the dialogue, the prism, the quest. Petal k lights as the level crosses
-   k+1, so a glance counts the stage instead of guessing it, and the four
-   of them turn together the way anything in a sky turns. */
-const PETALS = 4
-const petals = glowField(STOIC_TAURUS.length * PETALS, moteProfile, uWreathK)
-wreath.add(petals.sprite)
-const petalPhase = STOIC_TAURUS.map(() => craftRand() * TAU)
-const petalHue = Array.from({ length: PETALS }, (_, k) =>
-  GOLD.clone().lerp(STARLIGHT, k * 0.3)
-)
-
 /* one ring leaves a seed the night it comes into full bloom, and never
    again. Nothing here pulses: it happens once, it means something. */
 const ripples = glowField(STOIC_TAURUS.length, ringProfile, uGlass)
@@ -865,7 +855,7 @@ async function boot(): Promise<void> {
   }
   let seedData: SeedData[] = Array.from({ length: 12 }, (_, i) => ({ title: `Seed ${i + 1}` }))
   try {
-    const res = await fetch('https://media.agoracosmica.org/seeds/en/aurelius-seeds.json')
+    const res = await fetch('https://media.agoracosmica.org/seeds/en/aurelius-seeds.json', { signal: AbortSignal.timeout(4000) })
     const data = (await res.json()) as { seeds?: SeedData[] }
     if (data.seeds) seedData = data.seeds.slice(0, 12)
   } catch {
@@ -892,12 +882,15 @@ async function boot(): Promise<void> {
     selected = i
     // touching a star sends one ring out from it, and its light down the
     // chain to the seeds it is bound to
-    rippleAge[i] = 0
+    rippleAge[i] = reducedMotion ? -1 : 0
     if (!reducedMotion) currentAge = 0
+    seedPanel.querySelector<HTMLButtonElement>('.panel-close')?.focus()
   }
   function closeSeed(): void {
     if (seedPanel) seedPanel.hidden = true
+    const previous = selected
     selected = null
+    if (previous !== null) btns[previous]?.focus()
   }
   seedPanel?.querySelector('.panel-close')?.addEventListener('click', closeSeed)
   addEventListener('keydown', (e) => {
@@ -926,16 +919,20 @@ async function boot(): Promise<void> {
   const stages = Array.from(document.querySelectorAll('#stages button'))
   for (const b of stages) {
     b.addEventListener('click', () => {
+      exactLevels = null
+      heldTime = null
       for (const o of stages) o.classList.remove('here')
       b.classList.add('here')
       const v = (b as HTMLElement).dataset['stage']
       if (v === 'auto') {
-        autoPlay = true
-        held = null
+        autoPlay = !reducedMotion
+        held = reducedMotion ? 1 : null
       } else {
         autoPlay = false
         held = v === '0' ? 0.04 : v === '1' ? 0.45 : 1
+        if (reducedMotion) { demoT = held; sign.snap(levelsAt(held)) }
       }
+      for (const o of stages) o.setAttribute('aria-pressed', String(o === b))
     })
   }
 
@@ -944,8 +941,28 @@ async function boot(): Promise<void> {
   ;(window as any).__hisSky = {
     set(t: number) {
       autoPlay = false
-      held = t
+      held = demoT = Math.min(1, Math.max(0, t))
+      exactLevels = null
+      heldTime = 12
+      sign.snap(levelsAt(demoT))
+      rippleAge.fill(-1)
+      wasBloomed.fill(true)
+      for (const b of stages) {
+        const value = (b as HTMLElement).dataset['stage']
+        const on = value === (t < 0.1 ? '0' : t < 0.9 ? '1' : '2')
+        b.classList.toggle('here', on)
+        b.setAttribute('aria-pressed', String(on))
+      }
     },
+    setLevels(levels: number[]) {
+      autoPlay = false
+      heldTime = 12
+      exactLevels = STOIC_TAURUS.map((_, i) => Math.max(0, Math.min(4, Number.isFinite(levels[i]) ? levels[i] ?? 0 : 0)))
+      sign.snap(exactLevels)
+      rippleAge.fill(-1)
+      wasBloomed.fill(true)
+    },
+    state: () => ({levels: exactLevels ?? levelsAt(Math.min(1, demoT)), shown: [...sign.shown], elapsed: decorativeTime, reduced: reducedMotion, selected, autoPlay}),
     /** the rig's eye on the engraving itself, at full contrast */
     ink: () => inkPlate?.toDataURL(),
   }
@@ -960,7 +977,8 @@ async function boot(): Promise<void> {
     requestAnimationFrame(frame)
     const dt = Math.min((now - last) / 1000, 0.05)
     last = now
-    const elapsed = now / 1000
+    const elapsed = reducedMotion ? 12 : heldTime ?? now / 1000
+    decorativeTime = elapsed
 
     if (autoPlay) demoT = (demoT + dt / 26) % 1.12
     else if (held !== null) demoT += (held - demoT) * Math.min(1, dt * 2.2)
@@ -972,7 +990,7 @@ async function boot(): Promise<void> {
     yielded += (wantYield - yielded) * Math.min(1, dt * 3)
     const signMaster = 1 - 0.3 * yielded
 
-    const lv = levelsAt(t)
+    const lv = exactLevels ?? levelsAt(t)
     sign.update(dt, elapsed, lv, signMaster)
     firmament.update(elapsed, 0.62 * (1 - 0.4 * yielded))
     uInkT.value = elapsed
@@ -1001,27 +1019,9 @@ async function boot(): Promise<void> {
     for (let i = 0; i < STOIC_TAURUS.length; i++) {
       const star = sign.stars[i]
       const L = sign.shown[i] ?? 0
-      const focus = selected === i ? 1 : hover === i ? 0.55 : 0
-      const breathe = 1 + 0.06 * Math.sin(elapsed * 0.9 + i)
-      for (let p = 0; p < PETALS; p++) {
-        const n = i * PETALS + p
-        const a = (petalPhase[i] ?? 0) + (p / PETALS) * TAU + elapsed * 0.05
-        const rad = (1.72 + 0.14 * focus) * breathe
-        petals.pos[n * 3] = (star?.position.x ?? 0) + Math.cos(a) * rad
-        petals.pos[n * 3 + 1] = (star?.position.y ?? 0) + Math.sin(a) * rad
-        petals.pos[n * 3 + 2] = (star?.position.z ?? 0) + 0.2
-        const g = smooth(p + 0.1, p + 0.95, L) * (1 + 0.55 * focus) * signMaster
-        const hue = petalHue[p] ?? GOLD
-        petals.col[n * 3] = hue.r
-        petals.col[n * 3 + 1] = hue.g
-        petals.col[n * 3 + 2] = hue.b
-        petals.siz[n] = 9.5 + 6.0 * g
-        petals.glow[n] = g * 0.82
-      }
-
       // the bloom ring: fired once, when the seed lands
       const isBloom = L >= 3.9
-      if (isBloom && !wasBloomed[i]) rippleAge[i] = 0
+      if (isBloom && !wasBloomed[i] && !reducedMotion && heldTime === null) rippleAge[i] = 0
       wasBloomed[i] = isBloom
       let age = rippleAge[i] ?? -1
       if (age >= 0) {
@@ -1039,7 +1039,6 @@ async function boot(): Promise<void> {
       ripples.siz[i] = (22 + 78 * ease) * k
       ripples.glow[i] = alive ? Math.pow(1 - age, 1.9) * 0.42 : 0
     }
-    petals.commit()
     ripples.commit()
 
     // the current, running from the star in hand to its two neighbours
@@ -1127,7 +1126,7 @@ async function boot(): Promise<void> {
     const STAGES = ['Ember', 'Kindled', 'Risen', 'Radiant', 'Bloomed']
     // a phone gives the legend one line and not a pixel more: the mark
     // holds its ground there, it does not push the row into a second one
-    const size = innerWidth < 560 ? '12px' : '18px'
+    const size = innerWidth < 560 ? '18px' : '24px'
     for (let s = 0; s < STAGES.length; s++) {
       const item = document.createElement('div')
       item.className = 'legend-item'
@@ -1165,16 +1164,19 @@ function stageMark(level: number): string {
   ctx.beginPath()
   ctx.arc(0, 0, s * 0.3, 0, TAU)
   ctx.fill()
-  for (let p = 0; p < level; p++) {
-    const a = (p / 4) * TAU - Math.PI / 4
-    const petal = GOLD.clone().lerp(STARLIGHT, p * 0.3)
-    ctx.fillStyle = `rgba(${Math.round(petal.r * 255)}, ${Math.round(petal.g * 255)}, ${Math.round(
-      petal.b * 255
-    )}, 0.95)`
+  const rays = [0, 2, 4, 8, 16][level] ?? 0
+  ctx.strokeStyle = '#e0b96a'
+  ctx.lineWidth = 1.15
+  for (let p = 0; p < rays; p++) {
+    const angle = p / rays * TAU - Math.PI / 2
+    const reach = rays === 16 && p % 2 ? 18 : 26
     ctx.beginPath()
-    ctx.arc(Math.cos(a) * s * 0.34, Math.sin(a) * s * 0.34, s * 0.085, 0, TAU)
-    ctx.fill()
+    ctx.moveTo(Math.cos(angle) * 3, Math.sin(angle) * 3)
+    ctx.lineTo(Math.cos(angle) * reach, Math.sin(angle) * reach)
+    ctx.stroke()
   }
+  ctx.fillStyle = level ? '#fffaf0' : '#bd8548'
+  ctx.beginPath(); ctx.arc(0, 0, 2.5, 0, TAU); ctx.fill()
   return canvas.toDataURL()
 }
 

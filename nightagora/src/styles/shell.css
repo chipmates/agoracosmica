@@ -1,0 +1,302 @@
+/* The shell press. Scoped faces deliberately leave the other seats' ink alone. */
+:root {
+  --press-display: 'Iowan Old Style', 'Baskerville', 'Palatino Linotype', Palatino, Georgia, serif;
+  --press-ui: 'Optima', 'Candara', 'Segoe UI', system-ui, sans-serif;
+  --press-register: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+  --type-caption: 11px;
+  --type-interface: 13px;
+  --type-reading: 16px;
+  --type-title: clamp(38px, 4.4vw, 66px);
+  --space-unit: 4px;
+  --frame-margin: clamp(22px, 3.2vw, 48px);
+  --press-white: color-mix(in srgb, var(--na-starlight) 90%, var(--na-mist));
+  --press-muted: color-mix(in srgb, var(--na-mist) 70%, var(--na-starlight));
+  --press-hairline: color-mix(in srgb, var(--na-starlight) 23%, transparent);
+  --press-paper: color-mix(in srgb, var(--na-starlight) 94%, var(--na-gold));
+}
+
+.brand {
+  top: calc(28px + env(safe-area-inset-top));
+  font-family: var(--press-register);
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: .22em;
+  text-indent: .22em;
+  color: var(--press-white);
+  font-variant-caps: small-caps;
+  font-optical-sizing: auto;
+  gap: 18px;
+}
+.brand::before, .brand::after { width: 16px; background: var(--press-hairline); }
+#veil { padding-bottom: calc(45px + env(safe-area-inset-bottom)); }
+#veil h1 {
+  font-family: var(--press-display);
+  font-size: var(--type-title);
+  line-height: 1.04;
+  letter-spacing: -.025em;
+  font-optical-sizing: auto;
+  font-kerning: normal;
+  font-variant-ligatures: common-ligatures;
+  max-width: 760px;
+  margin-inline: auto;
+}
+#veil h1 span { display: block; }
+.tagline {
+  margin-top: 25px;
+  font-family: var(--press-ui);
+  font-size: var(--type-caption);
+  letter-spacing: .2em;
+  text-indent: .2em;
+  color: var(--press-muted);
+}
+.status {
+  margin-top: 30px;
+  font-family: var(--press-ui);
+  font-size: var(--type-caption);
+  letter-spacing: .15em;
+  text-indent: .15em;
+  color: var(--press-muted);
+}
+body[data-phase='held'] .status { animation: none; }
+#overture-skip {
+  margin-top: 10px;
+  padding: 10px 18px;
+  font-family: var(--press-ui);
+  font-size: 12px;
+  letter-spacing: .035em;
+  text-indent: 0;
+  text-transform: none;
+  color: var(--press-white);
+  opacity: 1;
+}
+#overture-skip::after {
+  content: ''; display: block; width: 28px; height: 1px;
+  margin: 6px auto 0; background: var(--rule);
+  transition: width .5s ease;
+}
+#overture-skip:hover::after, #overture-skip:focus-visible::after { width: 100%; }
+
+/* Two pieces of instrument glass; their diagrams carry the state as well as words. */
+#rail button {
+  bottom: calc(18px + env(safe-area-inset-bottom));
+  min-height: 48px;
+  font-family: var(--press-ui);
+  font-size: var(--type-interface);
+  letter-spacing: .065em;
+  text-indent: 0;
+  text-transform: none;
+  color: var(--press-white);
+  padding: 8px 0;
+  gap: 12px;
+}
+#rail-sound { left: var(--frame-margin); }
+#rail-instruments { right: var(--frame-margin); }
+#rail-sound::before, #rail-instruments::after {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  border: 1px solid var(--press-hairline);
+  background:
+    linear-gradient(var(--press-muted), var(--press-muted)) center / 10px 1px no-repeat,
+    radial-gradient(ellipse at 35% 20%, color-mix(in srgb, var(--na-starlight) 12%, transparent), transparent 68%);
+  box-shadow: inset 0 0 0 3px color-mix(in srgb, var(--na-abyss) 60%, transparent);
+  transition: border-color .4s ease, box-shadow .4s ease;
+}
+#rail-instruments::after {
+  background:
+    linear-gradient(var(--press-muted), var(--press-muted)) center / 11px 1px no-repeat,
+    linear-gradient(var(--press-muted), var(--press-muted)) center / 1px 11px no-repeat,
+    radial-gradient(circle, transparent 4px, var(--press-hairline) 4px, var(--press-hairline) 5px, transparent 5px),
+    radial-gradient(ellipse at 35% 20%, color-mix(in srgb, var(--na-starlight) 12%, transparent), transparent 68%);
+}
+#rail-sound[aria-pressed='true']::before {
+  border-color: var(--rule);
+  background:
+    linear-gradient(var(--na-gold), var(--na-gold)) 8px center / 1px 7px no-repeat,
+    linear-gradient(var(--na-starlight), var(--na-starlight)) 12px center / 1px 13px no-repeat,
+    linear-gradient(var(--na-gold), var(--na-gold)) 16px center / 1px 9px no-repeat,
+    radial-gradient(ellipse at 35% 20%, color-mix(in srgb, var(--na-gold) 16%, transparent), transparent 68%);
+}
+#rail button:hover::before, #rail button:focus-visible::before,
+#rail button:hover::after, #rail button:focus-visible::after {
+  border-color: var(--na-gold);
+  box-shadow: 0 0 15px color-mix(in srgb, var(--na-gold) 10%, transparent);
+}
+#rail-instruments[aria-expanded='true']::after { border-color: var(--na-gold); }
+body:has(#forward-door.lit) #rail { z-index: 7; }
+#instruments {
+  z-index: 8;
+  right: var(--frame-margin);
+  bottom: calc(78px + env(safe-area-inset-bottom));
+  width: 340px; max-width: calc(100% - 44px);
+  padding: 30px 30px 16px;
+  border: none;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--press-hairline);
+  background: linear-gradient(115deg, var(--na-lapis), var(--na-abyss));
+  backdrop-filter: none;
+}
+#instruments::before { display: none; }
+.inst-kicker {
+  font-family: var(--press-display); font-size: 30px; font-weight: 400;
+  text-transform: none; letter-spacing: -.015em; text-indent: 0;
+  line-height: 1.2; color: var(--na-starlight);
+  padding-bottom: 22px; margin-bottom: 8px;
+}
+.inst-kicker::after { width: 100%; background: var(--press-hairline); }
+.inst-links { counter-reset: instrument; }
+.inst-links button, .inst-links a {
+  display: flex; gap: 18px; align-items: center;
+  min-height: 52px; padding: 12px 0;
+  font-family: var(--press-ui); font-size: 14px;
+  line-height: 1.5; letter-spacing: .015em; text-indent: 0;
+  text-transform: none; color: var(--press-white);
+}
+.inst-links > *::after {
+  counter-increment: instrument; content: counter(instrument, upper-roman);
+  order: -1; flex: 0 0 16px;
+  font-family: var(--press-register); font-size: 10px;
+  color: var(--press-muted); font-variant-numeric: tabular-nums;
+}
+.inst-close {
+  display: block; min-width: 44px; margin: 13px 0 0 auto;
+  font-family: var(--press-ui); font-size: 12px; text-transform: none;
+  letter-spacing: .035em; text-indent: 0; color: var(--press-muted);
+}
+
+/* The contract: a long cut in stone, ample readable ink, one deliberate action. */
+#sitting {
+  width: min(600px, calc(100% - 40px));
+  padding: 36px 46px 24px;
+  bottom: calc(90px + env(safe-area-inset-bottom));
+  text-align: left;
+  border: 0;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--press-hairline);
+  background:
+    radial-gradient(ellipse at 0 0, color-mix(in srgb, var(--na-starlight) 5%, transparent), transparent 70%),
+    linear-gradient(115deg, var(--na-lapis), var(--na-abyss));
+  backdrop-filter: none;
+  box-shadow: 0 20px 60px color-mix(in srgb, var(--na-abyss) 48%, transparent);
+  max-height: calc(100dvh - 128px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+#sitting::before { inset: 8px; opacity: .6; }
+#sitting .rule { width: 40px; margin: 0 0 24px; }
+#sitting .sitting-stone {
+  font-family: var(--press-display);
+  font-size: 19px;
+  line-height: 1.5;
+  letter-spacing: 0;
+  max-width: none;
+  margin-inline: 0;
+  color: var(--press-white);
+  text-wrap: pretty;
+  hanging-punctuation: first last;
+}
+#sitting .sitting-stone.strong {
+  font-family: var(--press-ui);
+  font-size: 12px; font-weight: 500;
+  text-transform: none;
+  letter-spacing: .04em; text-indent: 0;
+  text-align: left; margin-top: 20px;
+}
+#sitting .gate-declare {
+  font-family: var(--press-ui);
+  font-size: 13px; line-height: 1.6;
+  color: var(--press-muted);
+  margin-top: 22px;
+  max-width: none;
+}
+#sitting .gate-actions { justify-content: flex-start; margin-top: 18px; }
+#sitting .gate-actions button {
+  min-height: 48px;
+  padding: 10px 30px;
+  font-family: var(--press-ui);
+  font-size: 14px; letter-spacing: .06em; text-indent: 0;
+  text-transform: none;
+  color: var(--na-starlight);
+  border-color: var(--rule);
+}
+#sitting .gate-links {
+  margin-top: 12px;
+  font-family: var(--press-ui);
+  font-size: 11px; letter-spacing: .015em;
+  text-transform: none;
+}
+#sitting .gate-links a { display: inline-flex; align-items: center; min-height: 44px; }
+
+/* The last page. The dawn is behind the type, never a veil over it. */
+#forward-door { isolation: isolate; padding-bottom: calc(90px + env(safe-area-inset-bottom)); }
+.door-dawn { z-index: -1; height: 51%; background: linear-gradient(to top, var(--na-abyss), color-mix(in srgb, var(--na-lapis) 88%, transparent) 50%, transparent); }
+.door-mark { width: 56px; height: 56px; background: color-mix(in srgb, var(--na-abyss) 75%, transparent); box-shadow: 0 0 36px color-mix(in srgb, var(--na-gold) 9%, transparent); }
+.door-bead { width: 4px; height: 4px; top: 3px; right: 9px; }
+.door-kicker {
+  margin-top: 24px;
+  font-family: var(--press-ui); font-size: 11px;
+  letter-spacing: .15em; text-indent: .15em;
+  color: var(--press-muted);
+}
+.door-kicker::before, .door-kicker::after { width: 18px; background: var(--press-hairline); }
+.door-title {
+  margin-top: 12px;
+  font-family: var(--press-display);
+  font-size: clamp(34px, 4.1vw, 58px);
+  line-height: 1.08; letter-spacing: -.025em;
+  color: var(--na-starlight);
+}
+.door-trust {
+  margin-top: 20px;
+  font-family: var(--press-ui); font-size: 12px;
+  text-transform: none; letter-spacing: .025em; text-indent: 0;
+  line-height: 1.7; color: var(--press-muted);
+  max-width: 540px;
+}
+.door-actions { margin-top: 26px; gap: 24px; }
+.door-enter {
+  font-family: var(--press-ui); font-size: 15px;
+  text-transform: none; letter-spacing: .07em; text-indent: 0;
+  padding: 12px 28px; min-height: 52px;
+  color: var(--na-starlight);
+  border-width: 1px 0;
+  border-color: var(--rule);
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--na-gold) 7%, transparent), transparent);
+  box-shadow: none;
+}
+.door-enter::after { content: '↗'; margin-left: 24px; color: var(--na-gold); font-size: 16px; }
+.door-stay { font-family: var(--press-ui); font-size: 12px; text-transform: none; letter-spacing: .035em; text-indent: 0; color: var(--press-muted); }
+
+@media (max-width: 620px) {
+  .brand { top: calc(23px + env(safe-area-inset-top)); font-size: 13px; letter-spacing: .18em; text-indent: .18em; gap: 14px; }
+  .brand::before, .brand::after { width: 12px; }
+  #veil { padding: 0 24px calc(32px + env(safe-area-inset-bottom)); }
+  #veil h1 { font-size: clamp(32px, 9.5vw, 45px); line-height: 1.09; letter-spacing: -.025em; }
+  .tagline { max-width: 290px; margin: 20px auto 0; font-size: 10px; letter-spacing: .14em; text-indent: .14em; line-height: 1.8; }
+  .status { margin-top: 25px; font-size: 10px; letter-spacing: .12em; text-indent: .12em; }
+  /* on a phone the two rail marks reach the middle of the foot, so the
+     descent's caption steps above them instead of landing between them */
+  body[data-phase='descent'] #veil { padding-bottom: calc(74px + env(safe-area-inset-bottom)); }
+  #overture-skip { font-size: 11px; margin-top: 9px; letter-spacing: .015em; }
+  #rail button { font-size: 12px; gap: 9px; bottom: calc(14px + env(safe-area-inset-bottom)); }
+  #rail-sound::before, #rail-instruments::after { width: 26px; height: 26px; }
+  #sitting { padding: 26px 26px 16px; }
+  #sitting .sitting-stone { font-size: 17px; line-height: 1.47; }
+  #sitting .gate-declare { font-size: 12px; }
+  #sitting .gate-links { font-size: 10.5px; }
+  #sitting .sitting-stone.strong { margin-top: 16px; }
+  #forward-door { padding: 24px 24px calc(105px + env(safe-area-inset-bottom)); }
+  .door-title { font-size: 32px; max-width: 100%; }
+  .door-kicker { font-size: 10px; gap: 10px; letter-spacing: .12em; text-indent: .12em; }
+  .door-kicker::before, .door-kicker::after { width: 12px; }
+  .door-trust { max-width: 300px; font-size: 12px; line-height: 1.65; margin-top: 17px; }
+  .door-actions { flex-direction: column; margin-top: 22px; gap: 8px; }
+  .door-enter { min-width: 250px; }
+  body[data-phase='held'] .status { font-size: 11px; color: var(--press-white); }
+  #overture-skip { color: var(--press-muted); }
+  #overture-skip::after { width: 0; }
+  #instruments { right: 22px; left: 22px; width: auto; padding: 26px 28px 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #overture-skip::after, #rail button, #rail button::before, #rail button::after,
+  #forward-door, #forward-door * { transition: none; animation: none; }
+}

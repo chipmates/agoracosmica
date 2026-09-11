@@ -2,10 +2,10 @@
    curved, indifferent planet. The bridge and the ford, the agger and its
    four hundred stakes, the porta praetoria, the towers, the forty
    contubernia in the Roman grid, the standards, the arms, the picket, and
-   the sentries who are the only people in this world.
+   the equipment left by a watch that has just changed.
 
-   No Bodies, no faces (concept law): a sentry is a cloak, a helmet line
-   and a spear. They breathe, they shift their weight, and that is all.
+   No Bodies: the watch is a propped spear, a shield, a helmet on a peg.
+   The empty space between them belongs to the person who left them.
 
    AND THE THINGS A LEGION LEAVES LYING ABOUT. A marching fort on the
    Danube is not a diagram: it is eight thousand men who cut firewood,
@@ -28,7 +28,9 @@ import {
   TorusGeometry,
   Vector3,
 } from 'three/webgpu'
-import { field, type FieldItem, inkMaterial, MAP, place } from './hour'
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js'
+import { ConvexGeometry } from 'three/addons/geometries/ConvexGeometry.js'
+import { field, type FieldItem, inkMaterial, MAP } from './hour'
 import { palette } from './materials'
 
 /** map space: the ink materials curve the planet in their own vertex
@@ -57,23 +59,116 @@ export function openPrism(w: number, h: number, len: number): BufferGeometry {
   return geo
 }
 
-/* the same tent after a season of marching: the ridge sags between its
-   poles and the walls belly out under it. Forty identical tents are a
-   diagram, and a diagram is the one thing this camp must not be. */
+/* Waxed cloth is suspended between tension points. Subdivide in BOTH
+   directions: a triangle extruded along a sagging ridge still has two
+   planar walls. The cross-slope hollow is what makes canvas hold light.
+   Raised, narrow bands are sewn laps, with a doubled ridge and skirt. */
 function tiredTent(w: number, h: number, len: number, sag: number): BufferGeometry {
-  const geo = new CylinderGeometry(1, 1, 1, 3, 6, false)
-  geo.rotateX(-Math.PI / 2)
-  geo.translate(0, 0.5, 0)
-  geo.scale(w / 1.7320508, h / 1.5, len)
-  const pos = geo.getAttribute('position')
-  for (let i = 0; i < pos.count; i++) {
-    const y = pos.getY(i)
-    const dip = sag * Math.cos((pos.getZ(i) / len) * Math.PI) * (y / h)
-    pos.setY(i, y - dip)
-    pos.setX(i, pos.getX(i) * (1 + dip * 0.55))
+  const pos: number[] = []
+  const uv: number[] = []
+  const idx: number[] = []
+  type Point = [number, number, number]
+  const panel = (
+    nu: number, nv: number, point: (u: number, v: number) => Point, reverse: boolean
+  ): void => {
+    const base = pos.length / 3
+    for (let j = 0; j <= nv; j++) {
+      for (let i = 0; i <= nu; i++) {
+        pos.push(...point(i / nu, j / nv))
+        uv.push(i / nu, j / nv)
+      }
+    }
+    for (let j = 0; j < nv; j++) {
+      for (let i = 0; i < nu; i++) {
+        const a = base + j * (nu + 1) + i
+        const b = a + nu + 1
+        // d/du points down the slope, d/dv along the ridge. Reverse
+        // the right-hand roof so BOTH slopes face outward and upward.
+        if (reverse) idx.push(a, b, a + 1, b, b + 1, a + 1)
+        else idx.push(a, a + 1, b, b, a + 1, b + 1)
+      }
+    }
   }
-  pos.needsUpdate = true
+  const surface = (s: number, u: number, v: number, lift = 0): Point => {
+    const span = Math.sin(v * Math.PI)
+    const hollow = Math.sin(u * Math.PI) * (0.058 + sag * 0.35) * (0.6 + span * 0.4)
+    const scallop = Math.sin(v * Math.PI * 8) * 0.012 * Math.pow(u, 5)
+    return [
+      s * (u * w / 2 + Math.sin(u * Math.PI) * span * 0.023),
+      Math.max(0.018, h * (1 - u) - sag * span * (1 - u) - hollow + scallop) + lift,
+      (v - 0.5) * len,
+    ]
+  }
+  for (const s of [-1, 1]) {
+    panel(6, 8, (u, v) => surface(s, u, v), s > 0)
+    // doubled canvas across the ridge; the cap follows the real dip
+    panel(1, 8, (u, v) => surface(s, u * 0.035, v, 0.012), s > 0)
+    panel(1, 8, (u, v) => surface(s, 0.973 + u * 0.027, v, 0.008), s > 0)
+    for (const seam of [0.012, 0.5, 0.988]) {
+      panel(6, 1, (u, v) => surface(s, u, seam + (v - 0.5) * 0.012, 0.006), s > 0)
+    }
+    for (const end of [0, 1]) {
+      // The two entrance curtains stop short of one another. Even at a
+      // distance the black split says there is space beneath this cloth.
+      panel(6, 1, (u, v) => {
+        const outer = surface(s, u, end)
+        const gap = end === 1 ? 0.105 : 0.018
+        return [
+          s * gap * u * (1 - v) + outer[0] * v,
+          outer[1],
+          outer[2] + (end === 1 ? 1 : -1) * Math.sin(u * Math.PI) * 0.022 * (1 - v),
+        ]
+      }, (s > 0) !== (end === 1))
+    }
+  }
+  const geo = new BufferGeometry()
+  geo.setAttribute('position', new Float32BufferAttribute(pos, 3))
+  geo.setAttribute('uv', new Float32BufferAttribute(uv, 2))
+  geo.setIndex(idx)
   geo.computeVertexNormals()
+  return geo
+}
+
+/* A driven oak stake keeps its thickness almost to the top. Only the
+   last handspan was split and adzed; a full-height taper reads as a pin. */
+function splitStake(): BufferGeometry {
+  const geo = new CylinderGeometry(0.064, 0.082, 1.2, 6, 2)
+  geo.translate(0, 0.6, 0)
+  const p = geo.getAttribute('position')
+  for (let i = 0; i < p.count; i++) {
+    const y = p.getY(i)
+    if (Math.abs(y - 0.6) < 0.01) p.setY(i, 0.92)
+    if (y > 0.89) {
+      const k = Math.max(0.04, (1.2 - y) / 0.3)
+      p.setX(i, p.getX(i) * k + (1 - k) * 0.024)
+      p.setZ(i, p.getZ(i) * k - (1 - k) * 0.015)
+    }
+  }
+  geo.computeVertexNormals()
+  return geo
+}
+
+/* Limestone breaks across a few broad faces. A convex hull around a
+   clipped footprint gives a small worn arris, not eight perfect corners
+   or a noisy pebble. The two cuts are instanced through the same ranks. */
+function chippedStone(w: number, h: number, d: number, seed: number): BufferGeometry {
+  const points: Vector3[] = []
+  const outline: Array<[number, number]> = [
+    [-0.73, -1], [0.68, -1], [1, -0.62], [1, 0.75],
+    [0.66, 1], [-0.78, 1], [-1, 0.61], [-1, -0.72],
+  ]
+  for (let ring = 0; ring < 3; ring++) {
+    const inset = ring === 2 ? 0.82 : 1
+    const y = ring === 0 ? -h * 0.5 : ring === 1 ? h * 0.30 : h * 0.5
+    for (let i = 0; i < outline.length; i++) {
+      const [x, z] = outline[i]!
+      const chipped = 0.94 + Math.sin(i * 2.41 + seed) * 0.065
+      const tilt = ring === 0 ? 0 : Math.sin(i * 1.3 + seed * 2.4) * h * 0.032
+      points.push(new Vector3(x * w * 0.5 * inset * chipped, y + tilt, z * d * 0.5 * inset * chipped))
+    }
+  }
+  const geo = new ConvexGeometry(points)
+  geo.setAttribute('uv', new Float32BufferAttribute(new Float32Array(geo.getAttribute('position').count * 2), 2))
   return geo
 }
 
@@ -125,7 +220,18 @@ function ribbon(path: Array<[number, number]>, profile: Array<[number, number]>)
       const cur = profile[j]
       if (!cur) continue
       const [o, h] = cur
-      pos.push(a[0] + nx * o, h, a[1] + nz * o)
+      // A gate is cut THROUGH the bank. The broad shoulders carry the
+      // stakes; the four-metre passage meets the road at boot height.
+      const gateT = a[1] > MAP.wall.zFront - 0.3
+        ? Math.min(1, Math.max(0, (Math.abs(a[0]) - MAP.gate.halfW) / 0.85))
+        : 1
+      const shoulder = gateT * gateT * (3 - 2 * gateT)
+      const crest = Math.sin(a[0] * 0.86 + a[1] * 0.37) * 0.021
+        + Math.sin(a[0] * 2.2 - a[1] * 1.6 + o * 1.8) * 0.009
+      const edge = Math.sin(a[0] * 0.63 + a[1] * 0.47 + o * 0.7) * 0.034
+      const relief = Math.min(1, h * 4) * shoulder
+      const offset = o + edge * relief
+      pos.push(a[0] + nx * offset, h * shoulder + 0.015 * (1 - shoulder) + crest * relief, a[1] + nz * offset)
       const j2 = profile[Math.min(j + 1, P - 1)] ?? cur
       const j0 = profile[Math.max(j - 1, 0)] ?? cur
       const dO = j2[0] - j0[0]
@@ -139,7 +245,7 @@ function ribbon(path: Array<[number, number]>, profile: Array<[number, number]>)
     for (let j = 0; j < P - 1; j++) {
       const a = i * P + j
       const b = i2 * P + j
-      idx.push(a, a + 1, b, a + 1, b + 1, b)
+      idx.push(a, b, a + 1, a + 1, b, b + 1)
     }
   }
   const geo = new BufferGeometry()
@@ -147,6 +253,7 @@ function ribbon(path: Array<[number, number]>, profile: Array<[number, number]>)
   geo.setAttribute('normal', new Float32BufferAttribute(nor, 3))
   geo.setAttribute('uv', new Float32BufferAttribute(new Float32Array((pos.length / 3) * 2), 2))
   geo.setIndex(idx)
+  geo.computeVertexNormals()
   return geo
 }
 
@@ -185,14 +292,9 @@ function castraPath(
   return pts
 }
 
-interface Sentry {
-  inner: Group
-  ph: number
-}
-
 export interface Fort {
   group: Group
-  /** where the sentries stand, for the frost breath organ */
+  /** Kept for the composition contract; an empty watch has no breath. */
   sentryAnchors: Vector3[]
   update(t: number, gust: number): void
 }
@@ -228,9 +330,54 @@ export function createFort(rand: () => number): Fort {
 
   // ------------------------------------------------- THE BRIDGE / THE FORD
   {
-    const deck = new Mesh(new BoxGeometry(3.0, 0.14, 19.0), P.timber)
-    deck.position.copy(mp(0, MAP.bridge.y, 15.0))
-    add(deck)
+    // Adzed transverse planks leave narrow black joints, a ragged edge,
+    // and a shallow cup that catches the dawn along each worn board.
+    const deck: FieldItem[] = []
+    for (let i = 0; i < 70; i++) {
+      deck.push({
+        p: [(rand() - 0.5) * 0.035, MAP.bridge.y + (rand() - 0.5) * 0.015, 5.64 + i * 0.271],
+        s: [0.97 + rand() * 0.05, 0.9 + rand() * 0.2, 0.93 + rand() * 0.05],
+        r: (rand() - 0.5) * 0.007,
+        tint: 0.73 + rand() * 0.4,
+      })
+    }
+    const boardGeo = new BoxGeometry(3.0, 0.14, 0.271, 4, 1, 1)
+    const bp = boardGeo.getAttribute('position')
+    for (let i = 0; i < bp.count; i++) {
+      if (bp.getY(i) > 0) bp.setY(i, bp.getY(i) - Math.max(0, 1 - Math.abs(bp.getX(i)) / 1.5) * 0.015)
+    }
+    boardGeo.computeVertexNormals()
+    add(field(boardGeo, P.timberI, deck))
+    // The landing crosses the last shallow water and beds into the bank.
+    // It is a continuation of the crossing; nothing rises into the eye's
+    // walking corridor. Existing bridge and station coordinates stay put.
+    const landing: FieldItem[] = []
+    const landingSlope = 0.2 / (27.32 - 24.339)
+    for (let i = 70; i <= 80; i++) {
+      const z = 5.64 + i * 0.271
+      landing.push({
+        p: [Math.sin(i * 1.72) * 0.012, MAP.bridge.y - (z - 24.339) * landingSlope, z],
+        s: [0.985 + Math.sin(i * 2.1) * 0.012, 1, 0.965],
+        r: Math.sin(i * 0.74) * 0.002,
+        tint: 0.87 + Math.sin(i * 1.95) * 0.1,
+      })
+    }
+    const landingGeo = boardGeo.clone()
+    const lp = landingGeo.getAttribute('position')
+    for (let i = 0; i < lp.count; i++) lp.setY(i, lp.getY(i) - lp.getZ(i) * landingSlope)
+    landingGeo.computeVertexNormals()
+    add(field(landingGeo, P.timberI, landing))
+    for (const sx of [-1, 1]) {
+      const stringer = new Mesh(new BoxGeometry(0.18, 0.18, 3.13), P.timber)
+      stringer.position.copy(mp(sx * 1.15, -0.10, 25.83))
+      stringer.rotation.x = Math.atan(landingSlope)
+      add(stringer)
+    }
+    for (const sx of [-1, 1]) {
+      const bearer = new Mesh(new BoxGeometry(0.2, 0.22, 19.0), P.timber)
+      bearer.position.copy(mp(sx * 1.15, MAP.bridge.y - 0.16, 15.0))
+      add(bearer)
+    }
     for (const sx of [-1, 1]) {
       const rail = new Mesh(new BoxGeometry(0.09, 0.09, 19.0), P.timber)
       rail.position.copy(mp(sx * 1.42, 0.86, 15.0))
@@ -342,13 +489,15 @@ export function createFort(rand: () => number): Fort {
   }
 
   // ---------------------------------------- THE PALISADE, GATE, TOWERS
-  const path = castraPath(MAP.wall.x, MAP.wall.zFront, MAP.wall.zBack, MAP.wall.r, 0.55)
+  const path = castraPath(MAP.wall.x, MAP.wall.zFront, MAP.wall.zBack, MAP.wall.r, 0.38)
   {
     const agger = new Mesh(
       ribbon(path, [
         [-1.15, 0],
         [-0.95, 1.05],
         [0.55, 1.18],
+        [0.91, 0.83],
+        [1.30, 0.40],
         [1.65, 0],
       ]),
       P.earth
@@ -378,7 +527,7 @@ export function createFort(rand: () => number): Fort {
         })
       }
     }
-    add(field(new CylinderGeometry(0.014, 0.075, 1.2, 6).translate(0, 0.6, 0), P.stakes, stakes))
+    add(field(splitStake(), P.stakes, stakes))
   }
 
   {
@@ -404,11 +553,11 @@ export function createFort(rand: () => number): Fort {
        eye is a metre above this, and a proud beam there is a black bar
        across the bottom of the frame (round 1 showed exactly that). */
     const sill = new Mesh(new BoxGeometry(3.9, 0.1, 0.3), P.timber)
-    sill.position.copy(mp(0, 1.14, MAP.gate.z))
+    sill.position.copy(mp(0, 0.02, MAP.gate.z))
     add(sill)
     for (const sx of [-1, 1]) {
       const cleat = new Mesh(new BoxGeometry(0.2, 0.16, 0.44), P.timber)
-      cleat.position.copy(mp(sx * 1.84, 1.16, MAP.gate.z))
+      cleat.position.copy(mp(sx * 1.84, 0.06, MAP.gate.z))
       add(cleat)
     }
     // the iron ring the gate leaves are hauled on, and their pintles
@@ -504,42 +653,58 @@ export function createFort(rand: () => number): Fort {
   // watchtowers: two over the gate, one at the rear angle
   function tower(x: number, z: number, h: number): void {
     const g = new Group()
+    const beam = (a: Vector3, b: Vector3, thickness: number): void => {
+      const d = b.clone().sub(a)
+      const timber = new Mesh(new BoxGeometry(thickness, d.length(), thickness), P.timber)
+      timber.position.copy(a).add(b).multiplyScalar(0.5)
+      timber.quaternion.setFromUnitVectors(new Vector3(0, 1, 0), d.normalize())
+      g.add(timber)
+    }
     for (const [dx, dz] of [
       [-1, -1],
       [1, -1],
       [-1, 1],
       [1, 1],
     ] as Array<[number, number]>) {
-      const leg = new Mesh(new CylinderGeometry(0.09, 0.13, h, 6), P.timber)
-      leg.position.copy(mp(x + dx * 0.78, h / 2, z + dz * 0.78))
-      leg.rotation.z = -dx * 0.045
-      leg.rotation.x = dz * 0.045
-      g.add(leg)
+      beam(mp(x + dx * 0.88, 0, z + dz * 0.88), mp(x + dx * 0.75, h, z + dz * 0.75), 0.23)
     }
-    for (let i = 1; i <= 3; i++) {
-      const brace = new Mesh(new BoxGeometry(1.9, 0.07, 0.07), P.timber)
-      brace.position.copy(mp(x, (h * i) / 4, z + 0.78))
-      g.add(brace)
-      const brace2 = new Mesh(new BoxGeometry(0.07, 0.07, 1.9), P.timber)
-      brace2.position.copy(mp(x + 0.78, (h * i) / 4, z))
-      g.add(brace2)
+    // Two storeys of crossed braces lock all four faces. The joints end
+    // in the uprights; there are no floating decorative diagonals.
+    for (const s of [-1, 1]) {
+      for (const [low, high] of [[0.24, h * 0.51], [h * 0.51, h - 0.18]]) {
+        if (low === undefined || high === undefined) continue
+        const lo = 0.88 - low / h * 0.13
+        const hi = 0.88 - high / h * 0.13
+        beam(mp(x - lo, low, z + s * lo), mp(x + hi, high, z + s * hi), 0.115)
+        beam(mp(x + lo, low, z + s * lo), mp(x - hi, high, z + s * hi), 0.115)
+        beam(mp(x + s * lo, low, z - lo), mp(x + s * hi, high, z + hi), 0.115)
+        beam(mp(x + s * lo, low, z + lo), mp(x + s * hi, high, z - hi), 0.115)
+      }
+      beam(mp(x - 1.14, h - 0.17, z + s * 0.78), mp(x + 1.14, h - 0.17, z + s * 0.78), 0.22)
+      beam(mp(x - 0.83, h * 0.51, z + s * 0.83), mp(x + 0.83, h * 0.51, z + s * 0.83), 0.13)
     }
-    const deck = new Mesh(new BoxGeometry(2.3, 0.16, 2.3), P.timber)
-    deck.position.copy(mp(x, h, z))
-    g.add(deck)
+    for (let i = 0; i < 11; i++) {
+      const deck = new Mesh(new BoxGeometry(2.3, 0.12, 0.2), P.timber)
+      deck.position.copy(mp(x, h, z - 1.04 + i * 0.208))
+      g.add(deck)
+    }
     for (const [dx, dz] of [
       [-1, -1],
       [1, -1],
       [-1, 1],
       [1, 1],
     ] as Array<[number, number]>) {
-      const p = new Mesh(new CylinderGeometry(0.055, 0.06, 1.0, 5), P.timber)
-      p.position.copy(mp(x + dx * 1.05, h + 0.5, z + dz * 1.05))
-      g.add(p)
+      beam(mp(x + dx * 1.05, h + 0.06, z + dz * 1.05), mp(x + dx * 1.05, h + 1.43, z + dz * 1.05), 0.12)
+      // Knee braces transfer the roof load into its corner posts.
+      beam(mp(x + dx * 1.05, h + 1.02, z + dz * 1.05), mp(x + dx * 0.63, h + 1.42, z + dz * 1.05), 0.08)
+      beam(mp(x + dx * 1.05, h + 1.02, z + dz * 1.05), mp(x + dx * 1.05, h + 1.42, z + dz * 0.63), 0.08)
     }
-    const rail = new Mesh(new BoxGeometry(2.35, 0.07, 0.07), P.timber)
-    rail.position.copy(mp(x, h + 0.92, z + 1.05))
-    g.add(rail)
+    for (const s of [-1, 1]) {
+      for (const y of [h + 0.78, h + 1.42]) {
+        beam(mp(x - 1.11, y, z + s * 1.05), mp(x + 1.11, y, z + s * 1.05), 0.12)
+        beam(mp(x + s * 1.05, y, z - 1.11), mp(x + s * 1.05, y, z + 1.11), 0.12)
+      }
+    }
     const roof = new Mesh(new ConeGeometry(1.95, 0.7, 4), P.timber)
     roof.rotation.y = Math.PI / 4
     roof.position.copy(mp(x, h + 1.75, z))
@@ -609,9 +774,14 @@ export function createFort(rand: () => number): Fort {
         pitch(cx + (rand() - 0.5) * 0.2, z, 0.92, (rand() - 0.5) * 0.06, 0.8)
       }
     }
-    add(field(ridgeTent(TW, TH, TL), P.canvas, taut))
+    add(field(tiredTent(TW, TH, TL, 0.075), P.canvas, taut))
     add(field(tiredTent(TW * 1.02, TH, TL, 0.16), P.canvas, worn))
     add(field(leaned(new CylinderGeometry(0.008, 0.019, 1, 4), GUY), P.timberI, guys))
+    add(field(
+      new BoxGeometry(0.028, 0.13, 0.033).translate(0, 0.025, 0),
+      P.timberI,
+      guys.map((guy) => ({ p: guy.p, r: guy.r, tint: guy.tint }))
+    ))
   }
 
   /* ------------------------------------------------- THE VIA'S FRONTAGE
@@ -908,11 +1078,12 @@ export function createFort(rand: () => number): Fort {
       g.add(body)
       const neck = new Mesh(new CylinderGeometry(0.11, 0.18, 0.62, 7), P.hide)
       neck.position.copy(mp(x + 0.68, 1.28, z))
-      neck.rotation.z = 0.62
+      neck.rotation.z = -0.62
       g.add(neck)
       const head = new Group()
+      head.position.copy(mp(x + 0.85, 1.48, z))
       const skull = new Mesh(new BoxGeometry(0.34, 0.16, 0.15), P.hide)
-      skull.position.copy(mp(x + 1.02, 1.42, z))
+      skull.position.set(0.17, -0.06, 0)
       skull.rotation.z = -0.35
       head.add(skull)
       g.add(head)
@@ -958,56 +1129,42 @@ export function createFort(rand: () => number): Fort {
     add(field(new SphereGeometry(0.3, 8, 6), gear.sack, fodder))
   }
 
-  // ------------------------------------------------------- THE SENTRIES
-  const sentries: Sentry[] = []
+  // ---------------------------------------------------- THE EMPTY WATCH
   const sentryAnchors: Vector3[] = []
-  function sentry(x: number, y: number, z: number, yaw: number): void {
+  function watchGear(x: number, y: number, z: number, yaw: number): void {
     const g = new Group()
-    const inner = new Group()
-    g.add(inner)
-    const cloak = new Mesh(new ConeGeometry(0.3, 1.12, 9, 1, true), P.cloth)
-    cloak.position.set(0, 0.56, 0)
-    inner.add(cloak)
-    const torso = new Mesh(new CylinderGeometry(0.155, 0.185, 0.6, 8), P.cloth)
-    torso.position.set(0, 1.02, 0)
-    inner.add(torso)
-    const shoulders = new Mesh(new BoxGeometry(0.42, 0.11, 0.2), P.cloth)
-    shoulders.position.set(0, 1.3, 0)
-    inner.add(shoulders)
-    const head = new Mesh(new SphereGeometry(0.105, 10, 8), P.cloth)
-    head.position.set(0, 1.47, 0)
-    inner.add(head)
+    // A low peg carries the helmet, well apart from the scutum. Never
+    // stack helmet, shoulders and cloak into the outline of a person.
+    const peg = new Mesh(new CylinderGeometry(0.025, 0.038, 0.6, 5), P.timber)
+    peg.position.set(-0.47, 0.3, -0.11)
+    g.add(peg)
     const helm = new Mesh(new SphereGeometry(0.115, 10, 6, 0, 6.28, 0, 1.5), P.helm)
-    helm.position.set(0, 1.5, 0)
-    inner.add(helm)
-    const crest = new Mesh(new BoxGeometry(0.022, 0.075, 0.19), P.ochre)
-    crest.position.set(0, 1.61, 0)
-    inner.add(crest)
+    helm.position.set(-0.47, 0.61, -0.11)
+    helm.rotation.z = 0.21
+    g.add(helm)
     const spear = new Mesh(new CylinderGeometry(0.013, 0.016, 2.2, 5), P.timber)
-    spear.position.set(0.24, 1.0, 0.04)
-    spear.rotation.z = -0.1
-    inner.add(spear)
+    spear.position.set(0.44, 1.07, 0.04)
+    spear.rotation.z = -0.2
+    g.add(spear)
     const tip = new Mesh(new ConeGeometry(0.022, 0.17, 5), P.gilt)
-    tip.position.set(0.35, 2.14, 0.04)
-    inner.add(tip)
+    tip.position.set(0.674, 2.22, 0.04)
+    tip.rotation.z = -0.2
+    g.add(tip)
     const sh = new Mesh(scutum, P.ochre)
-    sh.position.set(-0.28, 0.52, 0.02)
-    sh.rotation.y = 1.5
-    inner.add(sh)
+    sh.position.set(0.08, 0.45, 0.1)
+    sh.rotation.set(0.23, 0.35, -0.18)
+    sh.scale.y = 0.88
+    g.add(sh)
     g.position.copy(mp(x, y, z))
     g.rotation.y = yaw
     add(g)
-    sentries.push({ inner, ph: rand() * 6.28 })
-    sentryAnchors.push(place(x, y + 1.5, z))
   }
-  sentry(-6.6, 1.18, 4.0, 0.25)
-  sentry(6.9, 1.18, 3.9, -0.3)
-  sentry(-4.4, 4.78, 4.9, 0.1)
-  sentry(11.9, 1.18, -14.0, -1.5)
-  // the gate watch: near enough to the torches that they are edges of gold
-  // and not shapes, which is the whole argument for a silhouette
-  sentry(-2.95, 1.18, 3.85, 0.16)
-  sentry(2.95, 1.18, 3.9, -0.14)
+  watchGear(-6.6, 1.18, 4.0, 0.25)
+  watchGear(6.9, 1.18, 3.9, -0.3)
+  watchGear(-4.4, 4.67, 4.9, 0.1)
+  watchGear(11.9, 1.18, -14.0, -1.5)
+  watchGear(-2.95, 1.18, 3.85, 0.16)
+  watchGear(2.95, 1.18, 3.9, -0.14)
 
   // ------------------------------------------------------- SUPPLY WAGONS
   for (const [x, z, yaw] of [
@@ -1108,17 +1265,36 @@ export function createFort(rand: () => number): Fort {
   }
   const raven = new Group()
   {
+    // Every moving organ turns around its own joint. Map coordinates in
+    // children would make a small turn orbit the bird around the camp.
+    raven.position.copy(mp(1.15, 3.32, MAP.gate.z))
     const b = new Mesh(new SphereGeometry(0.075, 8, 6), P.raven)
     b.scale.set(0.8, 0.9, 1.5)
-    b.position.copy(mp(1.15, 3.42, MAP.gate.z))
+    b.position.set(0, 0.115, 0)
     raven.add(b)
-    const hd = new Mesh(new SphereGeometry(0.04, 8, 6), P.raven)
-    hd.position.copy(mp(1.15, 3.53, MAP.gate.z + 0.09))
+    const hd = new Mesh(new SphereGeometry(0.043, 8, 6), P.raven)
+    hd.position.set(0, 0.19, 0.077)
     raven.add(hd)
+    const neck = new Mesh(new CylinderGeometry(0.029, 0.038, 0.08, 6), P.raven)
+    neck.position.set(0, 0.154, 0.055)
+    neck.rotation.x = 0.28
+    raven.add(neck)
+    const beak = new Mesh(new ConeGeometry(0.013, 0.08, 5), P.raven)
+    beak.rotation.x = Math.PI / 2
+    beak.position.set(0, 0.188, 0.139)
+    raven.add(beak)
     const tl = new Mesh(new ConeGeometry(0.035, 0.14, 5), P.raven)
     tl.rotation.x = -1.7
-    tl.position.copy(mp(1.15, 3.44, MAP.gate.z - 0.16))
+    tl.position.set(0, 0.08, -0.125)
     raven.add(tl)
+    for (const x of [-0.027, 0.027]) {
+      const leg = new Mesh(new CylinderGeometry(0.007, 0.009, 0.067, 5), P.raven)
+      leg.position.set(x, 0.039, 0.008)
+      raven.add(leg)
+      const foot = new Mesh(new BoxGeometry(0.012, 0.008, 0.065), P.raven)
+      foot.position.set(x, 0.005, 0.028)
+      raven.add(foot)
+    }
     add(raven)
   }
   /* and his company: the birds a wall attracts, asleep on the lintel, the
@@ -1126,18 +1302,26 @@ export function createFort(rand: () => number): Fort {
   {
     const roost: FieldItem[] = []
     for (const [x, y, z, s] of [
-      [-0.35, 3.37, MAP.gate.z, 1.0],
-      [-0.68, 3.36, MAP.gate.z, 0.86],
-      [2.05, 3.35, MAP.gate.z, 0.78],
-      [-4.4, 5.6, 6.0, 0.9],
-      [-8.9, 1.78, 4.42, 0.82],
-      [9.65, 1.76, 4.35, 0.86],
-      [-12.6, 1.72, -6.5, 0.8],
-      [12.55, 1.74, -19.8, 0.84],
+      [-1.45, 3.32, MAP.gate.z, 1.0],
+      [-1.76, 3.32, MAP.gate.z, 0.86],
+      [2.05, 3.32, MAP.gate.z, 0.78],
+      [-4.4, 5.44, 5.95, 0.9],
+      [-5.2, 5.44, 5.95, 0.82],
+      [4.78, 5.44, 5.95, 0.86],
+      [-11.8, 5.04, -27.15, 0.8],
+      [-10.9, 5.04, -27.15, 0.84],
     ] as Array<[number, number, number, number]>) {
-      roost.push({ p: [x, y, z], s: [s * 0.8, s * 0.9, s * 1.5], r: rand() * 3, tint: 0.7 + rand() * 0.4 })
+      roost.push({ p: [x, y, z], s: [s, s, s], r: rand() * 3, tint: 0.7 + rand() * 0.4 })
     }
-    add(field(new SphereGeometry(0.075, 7, 5), gear.rook, roost))
+    const birdParts = [
+      new SphereGeometry(0.075, 7, 5).scale(0.8, 0.9, 1.5).translate(0, 0.065, 0),
+      new SphereGeometry(0.033, 6, 5).translate(0, 0.122, 0.072),
+      new ConeGeometry(0.012, 0.054, 5).rotateX(Math.PI / 2).translate(0, 0.122, 0.113),
+      new ConeGeometry(0.026, 0.1, 5).rotateX(-1.7).translate(0, 0.06, -0.112),
+    ]
+    const bird = mergeGeometries(birdParts)
+    if (bird) add(field(bird, gear.rook, roost))
+    for (const part of birdParts) part.dispose()
   }
 
   // ---------------------------------------- THE KERB AND THE STONY GROUND
@@ -1167,7 +1351,9 @@ export function createFort(rand: () => number): Fort {
         })
       }
     }
-    add(field(new BoxGeometry(0.24, 0.14, 0.3), P.kerb, kerb))
+    for (let cut = 0; cut < 2; cut++) {
+      add(field(chippedStone(0.22, 0.12, 0.27, 0.8 + cut * 2.7), P.kerb, kerb.filter((_, i) => i % 2 === cut)))
+    }
 
     /* THE LATRINE SCREEN — far off at the rear angle, downwind, a wattle
        hurdle standing on its own. Camps have one, and putting it where a
@@ -1191,7 +1377,7 @@ export function createFort(rand: () => number): Fort {
        the ground just inside where the mud gets carried in. */
     for (const [z0, z1, y] of [
       [6.1, 8.4, 0.02],
-      [3.5, 4.9, 1.11],
+      [3.5, 4.9, 0.02],
       [0.5, 2.9, 0.02],
     ] as Array<[number, number, number]>) {
       // the crest band is a metre and a half from the eye at the gate, so
@@ -1226,24 +1412,17 @@ export function createFort(rand: () => number): Fort {
         tint: 0.7 + rand() * 0.5,
       })
     }
-    add(field(new BoxGeometry(0.2, 0.12, 0.24), P.rubble, rubble))
+    for (let cut = 0; cut < 2; cut++) {
+      add(field(chippedStone(0.18, 0.10, 0.21, 1.9 + cut * 2.4), P.rubble, rubble.filter((_, i) => i % 2 === cut)))
+    }
   }
 
   return {
     group,
     sentryAnchors,
     update(t, gust) {
-      // the sentries: breathing, and shifting their weight on a long clock
-      for (const s of sentries) {
-        const br = 1 + 0.014 * Math.sin(t * 0.85 + s.ph)
-        s.inner.scale.set(1, br, 1)
-        const shift = Math.sin(t * 0.11 + s.ph) * 0.06 + Math.sin(t * 0.037 + s.ph * 2) * 0.05
-        s.inner.rotation.z = shift * 0.5
-        s.inner.position.x = shift
-      }
       for (const h of horses) {
-        h.head.rotation.x = 0.22 * Math.sin(t * 0.21 + h.ph) - 0.14
-        h.head.position.y = -0.1 * Math.max(0, Math.sin(t * 0.21 + h.ph))
+        h.head.rotation.z = 0.09 * Math.sin(t * 0.21 + h.ph) - 0.07
       }
       // the vexilla lift on the gust
       const lift = gust * 0.5 + 0.06 * Math.sin(t * 1.3)

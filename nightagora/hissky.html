@@ -80,7 +80,7 @@
     #stages button {
       background: none; cursor: pointer;
       border: 1px solid color-mix(in srgb, var(--na-gold) 30%, transparent);
-      min-height: 40px; padding: 9px 16px;
+      min-height: 44px; padding: 9px 16px;
       font-family: var(--sans);
       font-size: 9px; letter-spacing: 0.28em; text-indent: 0.28em;
       text-transform: uppercase; color: var(--na-mist);
@@ -90,7 +90,8 @@
       color: var(--na-gold); border-color: var(--na-gold); outline: none;
     }
     #note {
-      position: fixed; left: 0; right: 0; top: calc(8% + 96px);
+      max-width: 320px; line-height: 1.7;
+      position: fixed; left: 0; top: calc(8% + 116px);
       text-align: left; padding-left: max(28px, env(safe-area-inset-left));
       z-index: 3; pointer-events: none;
       font-family: var(--serif); font-style: italic;
@@ -113,6 +114,7 @@
       background: color-mix(in srgb, var(--na-abyss) 88%, transparent);
       border: 1px solid color-mix(in srgb, var(--na-gold) 35%, transparent);
       backdrop-filter: blur(6px);
+      max-height: calc(100dvh - 40px); overflow-y: auto;
     }
     #seed-panel[hidden] { display: none; }
     .panel-kicker {
@@ -161,14 +163,15 @@
          rows), the legend above them, the night count above the legend.
          Restage, never overlap (the narrow-stage law). */
       #night-line {
-        top: auto; bottom: calc(158px + env(safe-area-inset-bottom));
+        top: auto; bottom: calc(181px + env(safe-area-inset-bottom));
         text-align: center; padding: 0 18px;
       }
       #legend {
         bottom: calc(130px + env(safe-area-inset-bottom));
-        gap: 8px 12px; padding: 0 12px;
+        display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 4px; padding: 0 20px;
       }
-      .legend-item { gap: 6px; }
+      .legend-item { flex-direction: column; gap: 6px; }
       .legend-name { letter-spacing: 0.16em; text-indent: 0.16em; }
       #stages {
         bottom: calc(18px + env(safe-area-inset-bottom));
@@ -193,9 +196,9 @@
   <p id="seed-label"></p>
   <div id="legend" aria-label="Bloom stages"></div>
   <div id="seed-buttons" aria-label="The twelve seeds"></div>
-  <div id="seed-panel" hidden>
+  <div id="seed-panel" role="dialog" aria-modal="true" aria-labelledby="panel-title" hidden>
     <p class="panel-kicker"></p>
-    <p class="panel-title"></p>
+    <p class="panel-title" id="panel-title"></p>
     <p class="panel-summary"></p>
     <p class="panel-quote"></p>
     <p class="panel-note">The full seed · its story, dialogue, prism, and quest · opens in Agora Cosmica</p>

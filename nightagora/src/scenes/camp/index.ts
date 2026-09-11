@@ -40,8 +40,9 @@ import { createWorld } from './ground'
 import { createFort } from './fort'
 import { createPraetorium } from './praetorium'
 import { createFires } from './fire'
-import { createBreath, createGrass, createMotes, createSmoke, createSparks } from './drift'
+import { createGrass, createMotes, createSmoke, createSparks } from './drift'
 import { mergeStatic } from './merge'
+import { createCampShadow } from './shadows'
 
 export { groundDrop, place } from './hour'
 
@@ -104,6 +105,8 @@ const KEYS: Key[] = [
   // lamp share the plate instead of the tabletop filling it (round 2)
   { t: 0.79, p: [0.02, 1.06, -20.6], q: [0.74, 0.66, -22.42] },
   { t: 0.82, p: [-0.02, 1.02, -20.9], q: [0.72, 0.64, -22.44] },
+  { t: 0.845, p: [-0.35, 1.15, -17.7], q: [0.6, 1.0, -21.9] },
+  { t: 0.872, p: [-5.4, 5.9, -20.0], q: [0.1, 2.9, -10.0] },
   { t: 0.9, p: [-3.6, 9.4, -31.0], q: [0.3, 4.6, 4.0] },
   { t: 1.0, p: [-4.4, 10.6, -34.0], q: [0.6, 4.9, 6.5] },
 ]
@@ -122,7 +125,7 @@ const SPOTS: Record<SpotId, [number, number, number]> = {
   // the standard on the via: his thought split into its colors
   prism: [4.35, 2.5, -7.0],
   // the gate: a journey across his ground begins at a threshold
-  quest: [2.9, 2.6, 4.4],
+  quest: [2.9, 3.3, 4.4],
   // the sky above the fort, from the vista
   hissky: [1.2, 12.0, -4.0],
   trace: [3.32, 1.02, -5.22],
@@ -149,12 +152,12 @@ export function createCamp(scene: Scene): Camp {
   root.visible = false
   scene.add(root)
 
-  const world = createWorld()
-  root.add(world.group)
-
   const fort = createFort(rand)
   root.add(fort.group)
-  root.add(createPraetorium(rand))
+  const praetorium = createPraetorium(rand)
+  root.add(praetorium)
+  const world = createWorld(createCampShadow([fort.group, praetorium]))
+  root.add(world.group)
 
   const fires = createFires(rand)
   root.add(fires.group)
@@ -186,12 +189,7 @@ export function createCamp(scene: Scene): Camp {
   // fires read as light thrown THROUGH something
   const motes = createMotes({ count: tier.motes, rand })
   root.add(motes.mesh)
-  root.add(
-    createBreath({
-      anchors: fort.sentryAnchors.map((p, i) => ({ p, dir: i % 2 ? 1 : -1 })),
-      rand,
-    }).mesh
-  )
+
 
   // ---- the standard stars, and HIS SIGN over the camp
   const firmament = createFirmament({
@@ -222,11 +220,13 @@ export function createCamp(scene: Scene): Camp {
   root.add(sign.group)
   // the vista's frame, and the narrow restage: a smaller sign brought
   // nearer and lower, so a phone gets the whole animal, never a crop
-  const SIGN_WIDE = place(0, 16.0, 6.0)
+  const SIGN_WIDE = place(-3.2, 11.2, 6.0)
   const SIGN_NARROW = place(0, 13.2, 1.0)
   let signLevels: number[] = new Array(STOIC_TAURUS.length).fill(0)
 
   // ---- the rail
+  let stagedCamera: PerspectiveCamera | null = null
+  let originalOrder: PerspectiveCamera['rotation']['order'] = 'XYZ'
   const camPos = new Vector3()
   const camTgt = new Vector3()
   function railAt(t: number): void {
@@ -267,6 +267,9 @@ export function createCamp(scene: Scene): Camp {
   }
 
   function stationAt(t: number): number {
+    // The dusk return targets .9. A reduced-motion cut must land at the
+    // desk until the visitor explicitly advances beyond the dusk threshold.
+    if (reduced && t >= (STATIONS[5]?.t ?? 0.79) && t < 0.955) return 5
     let best = 0
     let bd = 9
     STATIONS.forEach((s, i) => {
@@ -327,9 +330,11 @@ export function createCamp(scene: Scene): Camp {
       // closes through it so the arch fills the plate instead of floating
       // in a screenful of dark timber (round 8)
       const atGate = smoothstep(0.18, 0.3, walk) * (1 - smoothstep(0.44, 0.6, walk))
-      const base = (narrow ? 50 : 46) - (narrow ? 9 * atGate : 0)
+      const atFord = smoothstep(0.16, 0.25, walk) * (1 - smoothstep(0.31, 0.38, walk))
+      const atVia = smoothstep(0.44, 0.54, walk) * (1 - smoothstep(0.64, 0.72, walk))
+      const base = (narrow ? 62 + 10 * atVia : 46) - (narrow ? 4 * atGate : 0)
       const wide = narrow ? 66 : 58
-      const shut = narrow ? 42 : 40
+      const shut = narrow ? 55 : 40
       const inside = smoothstep(0.72, 0.79, walk) * (1 - smoothstep(0.83, 0.9, walk))
       const fov = base + (wide - base) * smoothstep(0.82, 0.97, walk) + (shut - base) * inside
       if (Math.abs(camera.fov - fov) > 0.01) {
@@ -339,7 +344,7 @@ export function createCamp(scene: Scene): Camp {
       const stageH = typeof window === 'undefined' ? 900 : window.innerHeight
       sparks.setLens(fov, stageH)
       motes.setLens(fov, stageH)
-      sign.group.scale.setScalar(narrow ? 0.62 : 1)
+      sign.group.scale.setScalar(narrow ? 0.62 : 0.7)
       sign.group.position.copy(narrow ? SIGN_NARROW : SIGN_WIDE)
 
       railAt(walk)
@@ -352,10 +357,23 @@ export function createCamp(scene: Scene): Camp {
         // frame, and lifting the eye there just fills it with lintel: the
         // phone stands further back through the gateway instead, and lifts
         // its gaze only once the arch is behind it (round 8).
-        camPos.y += 0.16
-        camPos.z += 4.2 * atGate
-        camTgt.y += (0.92 - 0.62 * atGate) + 1.6 * smoothstep(0.86, 1, walk)
+        camPos.y += 0.12 * (1 - inside)
+        camPos.z += 8.5 * atGate + 0.32 * inside
+        camPos.x -= 1.2 * atVia
+        camPos.y += 0.25 * atVia
+        camTgt.y -= 0.3 * atVia
+        camPos.x -= 0.12 * inside
+        camTgt.x += 2.0 * atFord
+        camPos.x += 0.2 * atFord
+        camTgt.y -= 0.12 * inside
+        camTgt.y += (0.2 - 0.1 * atGate) * (1 - inside) + 1.6 * smoothstep(0.86, 1, walk)
       }
+      if (stagedCamera !== camera) {
+        stagedCamera = camera
+        originalOrder = camera.rotation.order
+      }
+      // Yaw then pitch makes raising the eye mean up after the vista turn.
+      camera.rotation.order = 'YXZ'
       camera.position.copy(camPos)
       camera.lookAt(camTgt)
       // the dome and the stars ride with the eye: a sky is never a place
@@ -365,9 +383,13 @@ export function createCamp(scene: Scene): Camp {
     },
 
     update(s) {
+      if (stagedCamera && document.body.dataset.phase !== 'camp') {
+        stagedCamera.rotation.reorder(originalOrder)
+        stagedCamera = null
+      }
       root.visible = s.reveal > 0.01
       if (!root.visible) return
-      const t = s.elapsed
+      const t = s.reduced ? 12.4 : s.elapsed
 
       uT.value = t
       uReveal.value = s.reveal

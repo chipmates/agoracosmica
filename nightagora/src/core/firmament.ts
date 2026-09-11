@@ -49,6 +49,11 @@
 
 import {
   AdditiveBlending,
+  BackSide,
+  CanvasTexture,
+  Mesh,
+  MeshBasicNodeMaterial,
+  SphereGeometry,
   Color,
   Group,
   InstancedBufferAttribute,
@@ -59,6 +64,11 @@ import {
   abs,
   clamp,
   float,
+  exp,
+  dot,
+  fract,
+  screenCoordinate,
+  texture,
   instancedBufferAttribute,
   length,
   min,
@@ -209,20 +219,19 @@ export function createFirmament(opts: FirmamentOptions): Firmament {
   // the populations split the one budget: two fifths of the sky belongs
   // to the river, because a band has to be DENSER than the field around
   // it or it is not a band. The haze is a whisper, the heroes a handful.
-  const hazeCount = Math.max(28, Math.round(count * 0.06))
+  const hazeCount = 0 // unresolved light is a continuous spherical exposure
   const bandCount = Math.round(count * 0.4)
   const fieldCount = Math.max(0, count - heroCount - hazeCount - bandCount)
 
-  const floor = opts.floor ?? -0.2
-  const sampleY = (): number =>
-    Math.max(
-      floor,
-      opts.bias === 'seated'
-        ? rand() < 1 / 3
-          ? 0.03 + rand() * 0.33
-          : -0.35 + rand() * 1.35
-        : -0.2 + rand() * 1.2
-    )
+  const floor = Math.max(-0.95, Math.min(0.95, opts.floor ?? -0.2))
+  const sampleY = (): number => {
+    const lower = Math.max(floor, opts.bias === 'seated' ? -0.35 : -0.2)
+    if (opts.bias === 'seated' && rand() < 1 / 3) {
+      const low = Math.max(floor, 0.03)
+      return low + rand() * Math.max(0, 0.36 - low)
+    }
+    return lower + rand() * (1 - lower)
+  }
 
   // THE RIVER: one great circle, tilted so it crosses the sky on the
   // diagonal. Its plane normal leans 20..35 degrees off the horizon, and
@@ -258,11 +267,11 @@ export function createFirmament(opts: FirmamentOptions): Firmament {
   const riftSpan = 1.7 + rand() * 1.3
   const riftPh = rand() * TAU
   const riftDeep = 0.05 + rand() * 0.03
-  const riftAxis = (phi: number): number => 0.05 * Math.sin(phi * 1.7 + riftPh) - 0.012
+  const riftAxis = (phi: number): number => 0.05 * Math.sin(phi * 2 + riftPh) - 0.012
   const riftHalf = (phi: number): number => {
     const t = 1 - Math.min(1, angGap(phi, riftAt) / riftSpan)
     if (t <= 0) return 0
-    return riftDeep * t * t * (0.62 + 0.38 * Math.sin(phi * 3.1 + riftPh))
+    return riftDeep * t * t * (0.62 + 0.38 * Math.sin(phi * 3 + riftPh))
   }
 
   // CLUSTERS: a dozen loose gatherings seeded from the same bias
@@ -283,6 +292,69 @@ export function createFirmament(opts: FirmamentOptions): Firmament {
     return k
   }
   const survives = (d: Vec3Tuple): boolean => rand() < voidLight(d)
+
+  // One exposure of unresolved stars, calculated once. A continuous
+  // spherical density has no billboard edges and uses one texture sample
+  // per frame; the phone never evaluates an fbm stack per sky fragment.
+  const ease = (a: number, b: number, x: number): number => {
+    const k = Math.max(0, Math.min(1, (x - a) / (b - a)))
+    return k * k * (3 - 2 * k)
+  }
+  const lattice = (x: number, y: number, z: number): number => {
+    let n = Math.imul(x, 374761393) ^ Math.imul(y, 668265263) ^ Math.imul(z, 2147483647)
+    n = Math.imul(n ^ (n >>> 13), 1274126177)
+    return ((n ^ (n >>> 16)) >>> 0) / 4294967295
+  }
+  const noise = (x: number, y: number, z: number): number => {
+    const ix = Math.floor(x), iy = Math.floor(y), iz = Math.floor(z)
+    const fx = ease(0, 1, x - ix), fy = ease(0, 1, y - iy), fz = ease(0, 1, z - iz)
+    const lerp = (a: number, b: number, t: number): number => a + (b - a) * t
+    const plane = (zz: number): number => lerp(
+      lerp(lattice(ix, iy, zz), lattice(ix + 1, iy, zz), fx),
+      lerp(lattice(ix, iy + 1, zz), lattice(ix + 1, iy + 1, zz), fx), fy)
+    return lerp(plane(iz), plane(iz + 1), fz)
+  }
+  const riverLight = (d: Vec3Tuple): number => {
+    if (d[1] < floor) return 0
+    const phi = Math.atan2(dot3(d, bandE2), dot3(d, bandE1))
+    const off = dot3(d, bandN)
+    const x = d[0] * 8 + 4.7, y = d[1] * 8 + 2.1, z = d[2] * 8 + 8.6
+    const n = noise(x, y, z)
+    const detail = noise(x * 2.1, y * 2.1, z * 2.1)
+    const grain = noise(x * 5.3, y * 5.3, z * 5.3)
+    const bank = off + (n - 0.5) * 0.1
+    const broad = Math.exp(-Math.pow(bank / 0.19, 2)) * 0.24
+    const clouds0 = Math.exp(-Math.pow((bank - 0.045) / 0.105, 2))
+    const density = (broad + clouds0 * (0.18 + n * 0.65 + detail * 0.3)) * cloudAt(phi) / 2.8
+    const axis = riftAxis(phi) + (detail - 0.5) * 0.038
+    const width = 0.012 + riftHalf(phi) * 0.95
+    const rift = Math.exp(-Math.pow((off - axis) / width, 2)) * 0.88
+    const branch = Math.exp(-Math.pow((off - axis - 0.09 - n * 0.06) / 0.022, 2)) * 0.44
+    const air = ease(floor, Math.max(0.25, floor + 0.15), d[1])
+    return Math.max(0, density * (1 - rift) * (1 - branch) * (0.72 + grain * 0.56) * air)
+  }
+  const exposure = document.createElement('canvas')
+  exposure.width = 1024
+  exposure.height = 512
+  const ctx = exposure.getContext('2d')
+  if (ctx) {
+    const data = ctx.createImageData(exposure.width, exposure.height)
+    for (let y = 0; y < exposure.height; y++) {
+      const theta = (y + 0.5) / exposure.height * Math.PI
+      for (let x = 0; x < exposure.width; x++) {
+        const phi = (x + 0.5) / exposure.width * TAU
+        const d: Vec3Tuple = [-Math.cos(phi) * Math.sin(theta), Math.cos(theta), Math.sin(phi) * Math.sin(theta)]
+        const light = Math.min(1, riverLight(d))
+        const at = (y * exposure.width + x) * 4
+        // Store density, not a colour image: linear working-space light
+        // enters below through the organ's own palette and scene master.
+        data.data[at] = data.data[at + 1] = data.data[at + 2] = Math.round(light * 255)
+        data.data[at + 3] = 255
+      }
+    }
+    ctx.putImageData(data, 0, 0)
+  }
+  const exposureMap = new CanvasTexture(exposure)
 
   const pos = new Float32Array(count * 3)
   const col = new Float32Array(count * 3)
@@ -326,7 +398,7 @@ export function createFirmament(opts: FirmamentOptions): Firmament {
       // roughly half the field gathers at the clusters
       if (rand() < 0.45) {
         const c = clusters[Math.floor(rand() * clusters.length)]
-        if (c) d = dirFrom(c.y + (rand() - 0.5) * 0.16, c.th + (rand() - 0.5) * 0.32)
+        if (c) d = dirFrom(Math.max(floor, c.y + (rand() - 0.5) * 0.16), c.th + (rand() - 0.5) * 0.32)
       }
       for (let t = 0; t < 3 && !survives(d); t++) d = dirFrom(sampleY(), rand() * TAU)
       const isNear = k % 14 === 0
@@ -384,7 +456,7 @@ export function createFirmament(opts: FirmamentOptions): Firmament {
         const off = Math.pow(rand(), 1.9) * 0.3 * (rand() < 0.5 ? -1 : 1)
         if (Math.abs(off - riftAxis(phi)) < riftHalf(phi)) continue
         const cand = onBand(bandE1, bandE2, bandN, phi, off)
-        if (cand[1] < -0.14) continue
+        if (cand[1] < floor) continue
         if (!survives(cand)) continue
         d = cand
         break
@@ -415,7 +487,7 @@ export function createFirmament(opts: FirmamentOptions): Firmament {
       const off = Math.pow(rand(), 1.4) * 0.2 * (rand() < 0.5 ? -1 : 1)
       if (Math.abs(off - riftAxis(phi)) < riftHalf(phi) * 0.8) continue
       const d = onBand(bandE1, bandE2, bandN, phi, off)
-      if (d[1] < -0.08) continue
+      if (d[1] < floor) continue
       const r = opts.far[0] + rand() * (opts.far[1] - opts.far[0]) * 0.7
       // 38..84 logical px, and faint enough that ONE of them is at the
       // edge of being seen. The wash is what a dozen of them make together,
@@ -502,8 +574,9 @@ export function createFirmament(opts: FirmamentOptions): Firmament {
   // hold a sharp core gets a softer one, so the field does not sparkle
   // itself to pieces at the sub-pixel end (pre-filtering, by hand).
   const sharp = smoothstep(float(1.7), float(4.2), appSize)
-  const soft = pow(fall, 2.1)
-  const tight = pow(fall, 2.7).mul(0.42).add(pow(fall, 9).mul(0.82))
+  const soft = exp(rr.mul(rr).mul(-7.5)).mul(smoothstep(1, 0.7, rr))
+  const tight = pow(float(1).add(rr.mul(rr).mul(62)), -1.65).mul(1.2)
+    .add(exp(rr.mul(rr).mul(-8)).mul(0.11))
   const point = mix(soft, tight, sharp)
   // A DEFOCUSED STAR HAS NO EDGE. Round 1 gave it one, and eleven flat
   // grey pucks sat on the agora sky like stickers. What a spread point of
@@ -537,7 +610,7 @@ export function createFirmament(opts: FirmamentOptions): Firmament {
   // line up keep it from reading as a pulse.
   const calm = reducedMotion ? 0 : 1
   const air = smoothstep(0.55, -0.02, starDir.y)
-  const steady = oneMinus(discF).mul(oneMinus(heroN.mul(0.78)))
+  const steady = oneMinus(discF).mul(oneMinus(heroN)).mul(oneMinus(smoothstep(3.0, 5.0, appSize)))
   const flutter = sin(uT.mul(twN.x).add(twN.y))
     .mul(0.64)
     .add(sin(uT.mul(twN.x.mul(2.37)).add(twN.y.mul(1.7))).mul(0.36))
@@ -616,6 +689,19 @@ export function createFirmament(opts: FirmamentOptions): Firmament {
   const meteorR = (opts.far[0] + opts.far[1]) / 2
 
   const points = new Group()
+  const riverMat = new MeshBasicNodeMaterial({
+    transparent: true, side: BackSide, depthWrite: false, blending: AdditiveBlending,
+  })
+  const silver = new Color('#a9b5ca')
+  const density = texture(exposureMap).r
+  const grainDither = fract(sin(dot(screenCoordinate.xy, vec2(12.9898, 78.233))).mul(43758.5453)).sub(0.5)
+  riverMat.colorNode = vec3(silver.r, silver.g, silver.b).mul(density).mul(0.033)
+    .add(grainDither.mul(0.00035).mul(density)).max(0)
+  riverMat.opacityNode = uMaster
+  const riverShell = new Mesh(new SphereGeometry(90, 48, 24), riverMat)
+  riverShell.renderOrder = -1
+  riverShell.frustumCulled = false
+  points.add(riverShell)
   points.add(field)
   points.add(meteor)
 
@@ -678,9 +764,10 @@ export function createFirmament(opts: FirmamentOptions): Firmament {
     // window); reading it every twentieth frame is enough
     if (glassTick++ % 20 === 0) uGlass.value = glassScale()
     field.visible = master > 0.004
+    riverShell.visible = field.visible
     // the heavens turn at a pace felt only across a whole sitting:
     // faster read as FLOATING on the near bokeh discs (the founder, live)
-    points.rotation.y = elapsed * 0.001
+    points.rotation.y = reducedMotion ? 0 : elapsed * 0.001
     updateMeteor(elapsed, master)
   }
 

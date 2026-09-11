@@ -70,383 +70,151 @@ export interface ChaptersHandles {
    one of the night's tokens: the letterpress never invents a hue. */
 const PRESS = `
 #chapters {
-  position: fixed;
-  left: clamp(22px, 4.4vw, 92px);
-  right: auto;
-  bottom: calc(104px + env(safe-area-inset-bottom));
-  transform: none;
-  /* clamped, not just capped: on a small laptop or a tablet in landscape a
-     plain 38vw squeezed the titles into two lines each and the leaf grew a
-     third taller */
-  width: clamp(318px, 38vw, 394px);
-  z-index: 6;
-  padding: 2px 0 0 24px;
-  background: none;
-  border: none;
-  backdrop-filter: none;
-  text-rendering: optimizeLegibility;
-  font-feature-settings: 'kern' 1, 'liga' 1;
+  --leaf-ink: var(--na-lapis);
+  --leaf-muted: color-mix(in srgb, var(--na-lapis) 72%, var(--na-mist));
+  position: fixed; left: var(--frame-margin, 40px); right: auto;
+  bottom: calc(88px + env(safe-area-inset-bottom));
+  width: 410px; max-width: calc(100% - 40px);
+  max-height: calc(100dvh - 170px);
+  display: flex; flex-direction: column;
+  padding: 26px 30px 20px 38px;
+  border: none; border-radius: 0; backdrop-filter: none;
+  color: var(--leaf-ink); isolation: isolate;
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--press-paper) 84%, var(--na-mist)),
+    var(--press-paper) 7%, var(--na-starlight) 28%, var(--press-paper));
+  box-shadow: -5px 1px 0 color-mix(in srgb, var(--na-starlight) 38%, var(--na-lapis)),
+    0 16px 45px color-mix(in srgb, var(--na-abyss) 28%, transparent);
+  opacity: 0; transform: translateY(8px);
+  transition: opacity .65s ease, transform .8s ease;
+  font-optical-sizing: auto;
 }
-/* the leaf's own air. Not a card: the night simply lies deeper where the
-   page is. The field is thickest at the bound edge and thins away to
-   nothing across the column, and it is feathered off at the head and the
-   foot, so there is no boundary anywhere to find. A first pass put an
-   ellipse behind the middle of the leaf and the eye read the shape it left
-   as a rectangle (round 1), which is the exact failure this whole element
-   is here to undo. */
+#chapters[hidden] { display: none; }
+#chapters.up { opacity: 1; transform: none; }
+/* Paper fibres are fixed CSS geometry, without an image or a filtered canvas. */
 #chapters::before {
-  content: ''; position: absolute;
-  left: -44px; top: -64px; right: -150px; bottom: -58px;
-  z-index: -1; pointer-events: none;
-  background: linear-gradient(90deg,
-    color-mix(in srgb, var(--na-abyss) 88%, transparent) 0%,
-    color-mix(in srgb, var(--na-abyss) 86%, transparent) 34%,
-    color-mix(in srgb, var(--na-abyss) 74%, transparent) 56%,
-    color-mix(in srgb, var(--na-abyss) 46%, transparent) 72%,
-    color-mix(in srgb, var(--na-abyss) 18%, transparent) 86%,
-    color-mix(in srgb, var(--na-abyss) 4%, transparent) 95%,
-    transparent 100%);
-  -webkit-mask-image: linear-gradient(180deg,
-    transparent 0%, #000 15%, #000 84%, transparent 100%);
-  mask-image: linear-gradient(180deg,
-    transparent 0%, #000 15%, #000 84%, transparent 100%);
+  content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    repeating-linear-gradient(3deg, transparent 0 3px, color-mix(in srgb, var(--na-lapis) 2%, transparent) 3px 4px),
+    repeating-linear-gradient(93deg, transparent 0 5px, color-mix(in srgb, var(--na-lapis) 2%, transparent) 5px 6px);
 }
-/* and the fire the leaf was opened at, pooling at its bound corner */
 #chapters::after {
-  content: ''; position: absolute;
-  left: -44px; bottom: -58px; width: 70%; height: 34%;
-  z-index: -1; pointer-events: none;
-  background: radial-gradient(ellipse 62% 58% at 8% 92%,
-    color-mix(in srgb, var(--na-gold-deep) 14%, transparent) 0%,
-    transparent 74%);
+  content: ''; position: absolute; top: 0; left: 12px; bottom: 0; width: 1px;
+  pointer-events: none; background: color-mix(in srgb, var(--na-lapis) 14%, transparent);
 }
-/* the bound edge, where the fire finds it */
 #chapters .chapters-spine {
-  position: absolute; left: 0; top: 4px; bottom: 4px; width: 1px;
-  pointer-events: none;
-  background: linear-gradient(180deg,
-    transparent 0%,
-    color-mix(in srgb, var(--na-gold) 40%, transparent) 14%,
-    color-mix(in srgb, var(--na-gold) 52%, transparent) 52%,
-    color-mix(in srgb, var(--na-gold) 22%, transparent) 84%,
-    transparent 100%);
+  position: absolute; left: -5px; top: 0; bottom: 0; width: 5px;
+  background: linear-gradient(180deg, transparent, var(--na-gold) 60%, transparent);
+  opacity: .22; pointer-events: none;
+  transition: opacity 1s ease;
 }
-/* while a night is told the bound edge carries a little of that fire */
-#chapters.telling .chapters-spine {
-  background: linear-gradient(180deg,
-    transparent 0%,
-    color-mix(in srgb, var(--na-gold) 58%, transparent) 14%,
-    color-mix(in srgb, var(--na-gold) 74%, transparent) 52%,
-    color-mix(in srgb, var(--na-gold) 30%, transparent) 84%,
-    transparent 100%);
-  box-shadow: 0 0 14px color-mix(in srgb, var(--na-gold) 22%, transparent);
-}
-
-/* ---- the head ---- */
-#chapters .chapters-head { position: relative; padding-bottom: 11px; }
-#chapters .chapters-head::after {
-  content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 1px;
-  background: linear-gradient(90deg,
-    color-mix(in srgb, var(--na-gold) 46%, transparent) 0%,
-    color-mix(in srgb, var(--na-gold) 30%, transparent) 62%,
-    transparent 100%);
-}
-/* the head is cut, not labelled: serif capitals with inscription spacing.
-   Sans caps here read as one more rail label in a night full of them. */
+#chapters.telling .chapters-spine { opacity: .9; box-shadow: 0 0 22px color-mix(in srgb, var(--na-gold) 30%, transparent); }
+#chapters .chapters-head { flex: none; padding-bottom: 17px; border-bottom: 1px solid color-mix(in srgb, var(--na-lapis) 40%, transparent); }
 #chapters .chapters-kicker {
-  font-family: var(--serif); font-weight: 400;
-  font-size: 14px; letter-spacing: 0.2em; text-indent: 0.2em;
-  text-transform: uppercase;
-  color: color-mix(in srgb, var(--na-starlight) 94%, transparent);
-  text-shadow: 0 1px 12px rgba(4, 6, 13, 0.9);
+  font-family: var(--press-display, Georgia, serif); font-size: 40px; font-weight: 400;
+  letter-spacing: -.025em; text-indent: 0; line-height: 1.05;
+  text-transform: none; color: var(--leaf-ink); text-shadow: none;
 }
 #chapters .chapters-of {
-  margin-top: 7px;
-  font-family: var(--sans);
-  font-size: 8.5px; letter-spacing: 0.28em; text-indent: 0.28em;
-  text-transform: uppercase;
-  color: color-mix(in srgb, var(--na-mist) 88%, transparent);
-  text-shadow: 0 1px 10px rgba(4, 6, 13, 0.9);
+  margin-top: 10px; font-family: var(--press-ui, sans-serif); font-size: 11px;
+  letter-spacing: .07em; text-transform: none; line-height: 1.5;
+  color: var(--leaf-muted);
 }
-/* a night being told warms the head from behind, on a slow breath */
-#chapters .chapters-head::before {
-  content: ''; position: absolute;
-  left: -18%; top: -46%; width: 92%; height: 210%;
-  z-index: -1; pointer-events: none;
-  opacity: 0;
-  background: radial-gradient(ellipse 50% 42% at 22% 58%,
-    color-mix(in srgb, var(--na-gold-deep) 20%, transparent) 0%,
-    transparent 72%);
-  transition: opacity 1.2s ease;
-}
-#chapters.telling .chapters-head::before {
-  opacity: 1;
-  animation: chapters-breath 3.6s ease-in-out infinite;
-}
-@keyframes chapters-breath {
-  0%, 100% { opacity: 0.62; }
-  50% { opacity: 1; }
-}
-
-/* ---- the twelve ---- */
 #chapters .chapters-list {
-  margin-top: 4px;
+  min-height: 0; flex: 1 1 auto; margin-top: 7px;
   display: flex; flex-direction: column; flex-wrap: nowrap; gap: 0;
+  overflow-y: auto; overscroll-behavior: contain;
+  scrollbar-width: thin; scrollbar-color: var(--na-mist) transparent;
 }
 #chapters .chapter-btn {
-  position: relative;
-  display: grid;
-  grid-template-columns: 26px minmax(0, 1fr) auto;
-  align-items: center; gap: 0 14px;
-  width: 100%; min-height: 44px; padding: 9px 2px 9px 0;
+  position: relative; flex: none; display: grid;
+  grid-template-columns: 23px minmax(0,1fr) auto;
+  align-items: center; gap: 12px;
+  width: 100%; min-height: 44px;
+  padding: 8px 0; text-align: left; text-indent: 0;
   background: none; border: none; border-radius: 0;
-  text-align: left; cursor: pointer;
-  text-transform: none;
-  /* nothing on this line may be a box. The shell ships a chiclet (border,
-     inset glow) and the leaf undoes all of it in one place, so a later
-     hand editing the shell cannot quietly put the cell back. */
-  box-shadow: none; outline: none;
-  transition: background 0.5s ease;
+  box-shadow: none; text-transform: none; cursor: pointer;
 }
-#chapters .chapter-btn.playing, #chapters .chapter-btn:hover,
-#chapters .chapter-btn:focus-visible { box-shadow: none; border: none; }
-/* the ruled column of a table of contents, kept at a whisper and cut short
-   of the right edge, so twelve of them read as rhythm and never as a table */
 #chapters .chapter-btn::after {
-  content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 1px;
-  background: linear-gradient(90deg,
-    color-mix(in srgb, var(--na-mist) 15%, transparent) 0%,
-    color-mix(in srgb, var(--na-mist) 9%, transparent) 52%,
-    transparent 100%);
+  content: ''; position: absolute; left: 35px; right: 0; bottom: 0; height: 1px;
+  background: color-mix(in srgb, var(--na-lapis) 12%, transparent);
 }
-#chapters .chapter-btn:last-child::after { background: none; }
-/* the index numerals belong to the titles, so they are cut in the same face
-   as them. In sans caps the column read as one more rail label in a night
-   already full of them, instead of as a book's own index (the keeper's
-   finding, applied here) */
+#chapters .chapter-btn:last-child::after { display: none; }
 #chapters .chapter-num {
-  font-family: var(--serif);
-  font-size: 11px; letter-spacing: 0.08em; line-height: 1;
-  text-align: right; white-space: nowrap;
-  color: color-mix(in srgb, var(--na-gold) 62%, transparent);
-  transition: color 0.4s ease, text-shadow 0.4s ease;
+  font-family: var(--press-register, Georgia, serif); font-size: 11px;
+  font-variant-numeric: lining-nums tabular-nums; letter-spacing: .04em;
+  line-height: 1; text-align: right; color: var(--leaf-muted);
 }
 #chapters .chapter-name {
-  font-family: var(--serif);
-  font-size: 15.5px; line-height: 1.25; letter-spacing: 0.012em;
-  text-transform: none;
-  color: color-mix(in srgb, var(--na-starlight) 76%, transparent);
-  text-shadow: 0 1px 10px rgba(4, 6, 13, 0.85);
-  transition: color 0.4s ease;
+  font-family: var(--press-display, Georgia, serif); font-size: 17px;
+  line-height: 1.25; letter-spacing: -.01em;
+  color: var(--leaf-ink); text-shadow: none;
+  font-variant-ligatures: common-ligatures;
 }
 #chapters .chapter-measure {
-  font-family: var(--sans);
-  font-size: 8px; letter-spacing: 0.18em;
-  font-variant-numeric: tabular-nums;
-  color: color-mix(in srgb, var(--na-mist) 62%, transparent);
-  white-space: nowrap;
+  font-family: var(--press-ui, sans-serif); font-size: 10px;
+  font-variant-numeric: tabular-nums; letter-spacing: 0;
+  color: var(--leaf-muted); white-space: nowrap;
 }
-#chapters .chapter-btn:hover .chapter-name,
-#chapters .chapter-btn:focus-visible .chapter-name {
-  color: var(--na-starlight);
+#chapters .chapter-btn:hover, #chapters .chapter-btn:focus-visible,
+#chapters .chapter-btn.playing {
+  background: radial-gradient(ellipse at left, color-mix(in srgb, var(--na-gold) 27%, transparent), transparent 72%);
+  box-shadow: none; border: none;
 }
-#chapters .chapter-btn:hover .chapter-num,
-#chapters .chapter-btn:focus-visible .chapter-num { color: var(--na-gold); }
-#chapters .chapter-btn:focus-visible { outline: none; }
-/* the focused line is marked the way a reader marks one, with a cut rule in
-   the margin and never a browser ring. It lands ON the bound edge, so it has
-   to be thicker than the edge it lights or it cannot be seen (round 7) */
-#chapters .chapter-cut {
-  position: absolute; left: -24px; top: 4px; bottom: 4px; width: 2px;
-  background: var(--na-gold);
-  box-shadow: 0 0 13px color-mix(in srgb, var(--na-gold) 70%, transparent);
-  opacity: 0; transition: opacity 0.25s ease;
-}
-#chapters .chapter-btn:focus-visible .chapter-cut { opacity: 1; }
-/* a night already told keeps its numeral, quieter */
-#chapters .chapter-btn.heard .chapter-num {
-  color: color-mix(in srgb, var(--na-gold) 34%, transparent);
-}
-#chapters .chapter-btn.heard .chapter-name {
-  color: color-mix(in srgb, var(--na-starlight) 58%, transparent);
-}
-/* the night being told: the fire finds this one line. The pool has to hang
-   OUTSIDE the row's own box, because a background painted on the row is
-   clipped to it and the clip is a rectangle, which is what made the playing
-   line read as a selected table cell in rounds 1 and 2. */
-#chapters .chapter-btn.playing::before {
-  content: ''; position: absolute;
-  left: -30px; width: 230px; top: -13px; bottom: -13px;
-  z-index: -1; pointer-events: none;
-  /* the radii are lengths on purpose: a percentage ellipse in a box this
-     wide spread the pool across the whole line and re-made the cell */
-  background: radial-gradient(ellipse 96px 27px at 54px 50%,
-    color-mix(in srgb, var(--na-gold-deep) 30%, transparent) 0%,
-    color-mix(in srgb, var(--na-gold-deep) 11%, transparent) 46%,
-    transparent 100%);
-}
-/* and the ruled lines let go of it: a line with a rule above and a rule
-   below is a table cell no matter how it is lit (rounds 2 and 4) */
-#chapters .chapter-btn.playing::after,
-#chapters .chapter-btn.before-playing::after { background: none; }
-#chapters .chapter-btn.playing .chapter-num {
-  color: var(--na-gold);
-  text-shadow: 0 0 11px color-mix(in srgb, var(--na-gold) 62%, transparent);
-}
-#chapters .chapter-btn.playing .chapter-name {
-  color: var(--na-starlight);
-}
-#chapters .chapter-btn.playing .chapter-measure {
-  color: color-mix(in srgb, var(--na-gold) 66%, transparent);
-}
-/* the reading line: the rule under the line being told, inking left to
-   right as the night is spent */
+#chapters .chapter-btn:focus-visible { outline: 1px solid var(--leaf-muted); outline-offset: -2px; }
+#chapters .chapter-cut { position: absolute; left: 0; width: 2px; height: 20px; background: var(--na-lapis); opacity: 0; }
+#chapters .chapter-btn.playing .chapter-cut, #chapters .chapter-btn:focus-visible .chapter-cut { opacity: 1; }
+#chapters .chapter-btn.heard .chapter-num { opacity: .6; }
 #chapters .chapters-progress {
-  position: absolute; left: 0; top: auto; bottom: 0;
-  height: 1px; width: 0%;
-  background: var(--na-gold);
-  box-shadow: 0 0 9px color-mix(in srgb, var(--na-gold) 55%, transparent);
+  position: absolute; left: 35px; right: 0; top: auto; bottom: 0;
+  height: 1px; width: calc(100% - 35px); transform-origin: left center;
+  transform: scaleX(0); background: var(--na-gold-deep); box-shadow: none;
 }
-
-/* ---- the foot ---- */
 #chapters .chapters-bar {
-  position: relative;
-  margin-top: 13px; padding-top: 11px;
-  display: flex; align-items: center; gap: 12px;
-  border-top: none;
+  flex: none; display: flex; align-items: center; gap: 10px;
+  margin-top: 10px; padding-top: 8px;
+  border-top: 1px solid color-mix(in srgb, var(--na-lapis) 40%, transparent);
 }
-#chapters .chapters-bar::before {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-  background: linear-gradient(90deg,
-    color-mix(in srgb, var(--na-gold) 40%, transparent) 0%,
-    color-mix(in srgb, var(--na-gold) 24%, transparent) 58%,
-    transparent 100%);
+#chapters .chapters-toggle, #chapters .chapters-close {
+  min-width: 44px; min-height: 44px; padding: 8px 0;
+  font-family: var(--press-ui, sans-serif); font-size: 13px;
+  text-transform: none; letter-spacing: .04em; text-indent: 0;
+  color: var(--leaf-ink);
 }
-#chapters .chapters-toggle {
-  min-height: 44px; padding: 8px 10px 8px 0;
-  font-size: 9.5px; letter-spacing: 0.3em; text-indent: 0.3em;
-  color: var(--na-gold);
-  transition: color 0.3s ease, text-shadow 0.3s ease;
-}
-#chapters .chapters-toggle:hover, #chapters .chapters-toggle:focus-visible {
-  outline: none;
-  text-shadow: 0 0 14px color-mix(in srgb, var(--na-gold) 60%, transparent);
-}
+#chapters .chapters-toggle { padding-right: 8px; }
+#chapters .chapters-close { padding-left: 8px; }
+#chapters .chapters-toggle:focus-visible, #chapters .chapters-close:focus-visible { outline: 1px solid var(--leaf-ink); outline-offset: 2px; }
 #chapters .chapters-now {
-  flex: 1; text-align: right;
-  font-family: var(--sans);
-  font-size: 8.5px; letter-spacing: 0.2em;
-  font-variant-numeric: tabular-nums;
-  text-transform: uppercase;
-  color: color-mix(in srgb, var(--na-mist) 78%, transparent);
+  flex: 1; font-family: var(--press-ui, sans-serif); font-size: 10px;
+  font-variant-numeric: tabular-nums; letter-spacing: .02em; text-transform: none;
+  text-align: center; color: var(--leaf-muted);
 }
-/* a night that could not be fetched says so in full. The shell's foot line
-   is a one-line clock with an ellipsis, and half a sentence about a failure
-   is not an honest failure (the fail pass, phone). */
-#chapters.failed .chapters-now {
-  white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.5;
-}
-#chapters .chapters-close {
-  min-height: 44px; padding: 8px 0 8px 12px;
-  font-size: 8.5px; letter-spacing: 0.28em; text-indent: 0.28em;
-  color: color-mix(in srgb, var(--na-mist) 78%, transparent);
-}
-/* the colophon sits at the foot of the leaf, where a colophon belongs. The
-   wording is load-bearing (the Echo law) and does not move. */
+#chapters.failed .chapters-now { white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.4; }
 #chapters .chapters-ink {
-  margin-top: 12px;
-  font-family: var(--sans);
-  font-size: 7.5px; letter-spacing: 0.19em; line-height: 1.8;
-  text-transform: uppercase;
-  color: color-mix(in srgb, var(--na-mist) 82%, transparent);
-  text-shadow: 0 1px 8px rgba(4, 6, 13, 0.95);
+  flex: none; margin-top: 5px; font-family: var(--press-ui, sans-serif);
+  font-size: 9px; line-height: 1.5; letter-spacing: .025em;
+  text-transform: none; color: var(--leaf-muted); text-shadow: none;
 }
-/* the colophon is set as two lines by hand. Left to wrap it broke wherever
-   the leaf happened to be narrow and left RECORDING sitting alone on a line
-   of its own, and this is the one line on the leaf that may never look
-   careless (round 9, the small-laptop stage). */
 #chapters .chapters-ink-line { display: block; }
-
-/* the host outranks the book. On a narrow stage his sitting and this leaf
-   are the same piece of frame, and two letterpresses in one place is soup
-   (round 6, phone at the praetorium), so the leaf steps back while he
-   speaks and comes forward again when he is done. The night keeps being
-   told the whole time. */
-#chapters.up.yielded, #chapters.yielded { opacity: 0; pointer-events: none; }
-
-/* ---- the arrival: the leaf rises from the fire it was opened at, and the
-   lines ink in one after another. Nothing bounces. ---- */
-#chapters { opacity: 0; transform: translateY(9px); transition: opacity 0.7s ease, transform 0.9s cubic-bezier(0.2, 0.7, 0.25, 1); }
-#chapters.up { opacity: 1; transform: translateY(0); }
-#chapters .chapter-btn, #chapters .chapters-bar, #chapters .chapters-ink {
-  opacity: 0; transition: opacity 0.6s ease;
-  transition-delay: calc(var(--i, 0) * 26ms + 120ms);
-}
-#chapters.up .chapter-btn, #chapters.up .chapters-bar, #chapters.up .chapters-ink { opacity: 1; }
-
-/* ---- the phone: the leaf is laid at the foot of the frame, edge to edge,
-   and the night thickens into it from below. Twelve 44px lines, the camp's
-   sky still overhead. ---- */
-@media (max-width: 620px) {
+#chapters.yielded { visibility: hidden; opacity: 0; pointer-events: none; }
+@media (max-width:620px) {
   #chapters {
-    left: 0; right: 0; width: auto;
-    bottom: calc(88px + env(safe-area-inset-bottom));
-    padding: 4px max(20px, env(safe-area-inset-right)) 0
-      calc(max(20px, env(safe-area-inset-left)) + 16px);
+    left: 20px; right: 20px; width: auto; max-width: none;
+    bottom: calc(78px + env(safe-area-inset-bottom));
+    max-height: calc(100dvh - 142px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    padding: 17px 22px 14px 28px;
   }
-  /* on the phone the leaf is the foot of the frame, so the night simply
-     thickens into it from below: no side edges to find at all. It stops
-     short of the rail, because burying the night's own two buttons under a
-     page is not a composition (round 2). */
-  #chapters::before {
-    left: 0; right: 0; top: -84px; bottom: -30px;
-    background: linear-gradient(180deg,
-      transparent 0%,
-      color-mix(in srgb, var(--na-abyss) 38%, transparent) 13%,
-      color-mix(in srgb, var(--na-abyss) 76%, transparent) 28%,
-      color-mix(in srgb, var(--na-abyss) 87%, transparent) 46%,
-      color-mix(in srgb, var(--na-abyss) 87%, transparent) 88%,
-      color-mix(in srgb, var(--na-abyss) 44%, transparent) 97%,
-      transparent 100%);
-    -webkit-mask-image: none;
-    mask-image: none;
-  }
-  #chapters::after {
-    left: 0; bottom: -30px; width: 76%; height: 30%;
-    background: radial-gradient(ellipse 66% 60% at 4% 92%,
-      color-mix(in srgb, var(--na-gold-deep) 13%, transparent) 0%,
-      transparent 76%);
-  }
-  #chapters .chapters-spine {
-    left: max(20px, env(safe-area-inset-left)); top: 10px; bottom: 10px;
-  }
-  /* the bound edge stands inside the frame here, so the focus mark that
-     lights it moves with it */
-  #chapters .chapter-cut { left: -16px; }
-  #chapters .chapters-kicker { font-size: 13px; }
-  #chapters .chapter-name { font-size: 14.5px; }
-  #chapters .chapter-btn { padding: 8px 2px 8px 0; }
-  #chapters .chapters-ink { margin-top: 10px; font-size: 7px; letter-spacing: 0.16em; }
+  #chapters .chapters-kicker { font-size: 34px; }
+  #chapters .chapters-head { padding-bottom: 10px; }
+  #chapters .chapters-of { margin-top: 7px; font-size: 10px; }
+  #chapters .chapter-name { font-size: 15.5px; }
+  #chapters .chapter-btn { gap: 9px; grid-template-columns: 22px minmax(0,1fr) auto; }
+  #chapters .chapter-btn::after { left: 31px; }
+  #chapters .chapters-bar { margin-top: 4px; padding-top: 3px; }
+  #chapters .chapters-ink { font-size: 8.5px; }
 }
-/* short phones in the hand: the same leaf, one notch tighter, still 44px */
-@media (max-width: 620px) and (max-height: 760px) {
-  #chapters { bottom: calc(64px + env(safe-area-inset-bottom)); }
-  #chapters .chapters-head { padding-bottom: 9px; }
-  #chapters .chapter-name { font-size: 14px; }
-  #chapters .chapters-bar { margin-top: 10px; padding-top: 9px; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  /* the same composition, it simply arrives already composed */
-  #chapters, #chapters .chapter-btn, #chapters .chapters-bar, #chapters .chapters-ink {
-    transition: none; transform: none;
-  }
-  #chapters.telling .chapters-head::before { animation: none; opacity: 0.86; }
-}
-/* the rig shoots single moments: nothing may be caught mid-arrival */
-body.forge #chapters, body.forge #chapters * {
-  transition: none !important; animation: none !important;
-}
+@media (prefers-reduced-motion:reduce) { #chapters, #chapters * { transition: none; animation: none; } }
+body.forge #chapters, body.forge #chapters * { transition: none !important; animation: none !important; }
 `
 
 function ensurePress(): void {
@@ -489,6 +257,9 @@ export function createChapters(slug: string, count: number): ChaptersHandles {
   audio.preload = 'none'
   let current = -1
   let lastClock = ''
+  let lastProgress = ''
+  let playRequest = 0
+  let returnFocus: HTMLElement | null = null
   /** a night that could not be fetched: the foot holds the truth until the
       visitor asks for another one (without this, the next frame's clock
       wrote the failure straight back out of the leaf) */
@@ -501,6 +272,8 @@ export function createChapters(slug: string, count: number): ChaptersHandles {
 
   // ---- the leaf, composed once ----
   panelEl.setAttribute('aria-label', 'His Nights')
+  panelEl.setAttribute('role', 'dialog')
+  now?.setAttribute('role', 'status')
   const spine = el('span', 'chapters-spine')
   spine.setAttribute('aria-hidden', 'true')
   panelEl.insertBefore(spine, panelEl.firstChild)
@@ -562,7 +335,7 @@ export function createChapters(slug: string, count: number): ChaptersHandles {
     // the reading line follows the line being read
     const row = current >= 0 ? buttons[current] : null
     if (progress && row && progress.parentElement !== row) row.appendChild(progress)
-    if (progress && current < 0) progress.style.width = '0%'
+    if (progress && current < 0) progress.style.transform = 'scaleX(0)'
     setClock()
   }
 
@@ -584,13 +357,28 @@ export function createChapters(slug: string, count: number): ChaptersHandles {
   }
 
   function play(n: number): void {
+    if (n < 0 || n >= count) return
+    const retry = failed
     failed = false
-    if (current !== n) {
+    const request = ++playRequest
+    if (current !== n || retry) {
       current = n
       audio.src = chapterUrl(n)
     }
-    void audio.play().catch(() => undefined)
-    announceVoice(true)
+    void audio.play().catch((error: unknown) => {
+      if (request !== playRequest || panelEl.hidden) return
+      if (error instanceof DOMException && error.name === 'AbortError') return
+      fail()
+    })
+    setNow()
+  }
+
+  function fail(): void {
+    failed = true
+    const said = 'That night could not be reached'
+    if (now) now.textContent = said
+    lastClock = said
+    announceVoice(false)
     setNow()
   }
 
@@ -624,10 +412,8 @@ export function createChapters(slug: string, count: number): ChaptersHandles {
       return
     }
     if (audio.paused) {
-      failed = false
-      void audio.play().catch(() => undefined)
+      play(current)
     } else audio.pause()
-    announceVoice(!audio.paused)
     setNow()
   })
 
@@ -639,17 +425,9 @@ export function createChapters(slug: string, count: number): ChaptersHandles {
     }
     setClock()
   })
-  audio.addEventListener('playing', () => setNow())
-  audio.addEventListener('pause', () => setNow())
-  audio.addEventListener('error', () => {
-    // an honest failure beats a silent one
-    failed = true
-    const said = 'That night could not be reached'
-    if (now) now.textContent = said
-    lastClock = said
-    announceVoice(false)
-    setNow()
-  })
+  audio.addEventListener('playing', () => { announceVoice(true); setNow() })
+  audio.addEventListener('pause', () => { announceVoice(false); setNow() })
+  audio.addEventListener('error', fail)
 
   audio.addEventListener('ended', () => {
     announceVoice(false)
@@ -660,17 +438,27 @@ export function createChapters(slug: string, count: number): ChaptersHandles {
   })
 
   function open(): void {
+    if (!panelEl.hidden) return
+    returnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null
     panelEl.hidden = false
     setNow()
     // one frame for the leaf to exist before it rises
-    requestAnimationFrame(() => panelEl.classList.add('up'))
+    requestAnimationFrame(() => {
+      if (panelEl.hidden) return
+      panelEl.classList.add('up')
+      buttons[Math.max(0, current)]?.focus({ preventScroll: true })
+    })
   }
   function close(): void {
+    const hadFocus = panelEl.contains(document.activeElement)
+    playRequest++
     panelEl.classList.remove('up')
     panelEl.hidden = true
     audio.pause()
     announceVoice(false)
     setNow()
+    panelEl.inert = false
+    if (hadFocus && returnFocus?.isConnected) returnFocus.focus({ preventScroll: true })
   }
   closeBtn?.addEventListener('click', close)
   addEventListener('keydown', (e) => {
@@ -682,6 +470,8 @@ export function createChapters(slug: string, count: number): ChaptersHandles {
      swipe) */
   panelEl.addEventListener('wheel', (e) => e.stopPropagation(), { passive: true })
   panelEl.addEventListener('touchmove', (e) => e.stopPropagation(), { passive: true })
+  panelEl.addEventListener('pointerdown', (e) => e.stopPropagation())
+  panelEl.addEventListener('click', (e) => e.stopPropagation())
 
   /** the host's sitting, if it is up: the one other block that can hold
       this frame at the same time as the leaf */
@@ -690,10 +480,16 @@ export function createChapters(slug: string, count: number): ChaptersHandles {
   function update(): void {
     if (panelEl.hidden) return
     // narrow stages give the frame to whoever is speaking
-    panelEl.classList.toggle('yielded', innerWidth < 620 && keeperEl !== null && !keeperEl.hidden)
+    const yielded = innerWidth < 620 && keeperEl !== null && !keeperEl.hidden
+    panelEl.classList.toggle('yielded', yielded)
+    panelEl.inert = yielded
     if (progress) {
-      progress.style.width =
-        audio.duration > 0 ? `${(audio.currentTime / audio.duration) * 100}%` : '0%'
+      const ratio = audio.duration > 0 ? Math.min(1, audio.currentTime / audio.duration) : 0
+      const next = `scaleX(${ratio.toFixed(4)})`
+      if (next !== lastProgress) {
+        progress.style.transform = next
+        lastProgress = next
+      }
     }
     setClock()
   }
