@@ -135,6 +135,13 @@ export interface PartsKit {
   shrub: (o: TreeOptions) => Part
   /** instanced blades over a patch, one draw */
   grass: (o: GrassOptions) => Part
+  /** WAIT FOR THE SETS BEFORE BUILDING, and a wing with a big station should.
+      A part built while its library is in flight compiles its surfaces twice:
+      once as the surface was authored and once with the photograph on it. On
+      WebGPU that is nothing; on the WebGL2 fallback a station of four heavy
+      sets can spend a minute of main thread on the second pass. Preloaded,
+      each surface compiles once. */
+  ready: (...sets: string[]) => Promise<void>
   /** the shop's own material bench, for a wing that builds its own piece and
       wants the same surfaces the kit's parts stand on */
   bench: Bench
@@ -166,6 +173,11 @@ export function createParts(stack: Stack): PartsKit {
     tree: (o) => treePart(bench, o),
     shrub: (o) => shrubPart(bench, o),
     grass: (o) => grassPart(bench, o),
+    ready: async (...sets) => {
+      await Promise.all(
+        sets.map((name) => stack.materials.load(name).catch(() => undefined))
+      )
+    },
     bench,
   }
 }

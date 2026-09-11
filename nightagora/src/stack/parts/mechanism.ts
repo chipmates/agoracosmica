@@ -105,7 +105,7 @@ export function gearPart(bench: Bench, o: GearOptions): Part {
   const arms = o.arms ?? 0
   if (arms >= 3) {
     /* a wheel of any size is arms and a rim, never a plate: the lightening
-       is what a founder cast and what the eye reads as a wheel */
+       is what the mould held and what the eye reads as a wheel */
     const rim = (m * z) / 2 - m * 2.2
     const hub = Math.max(bore / 2 + m * 1.2, rim * 0.28)
     for (let i = 0; i < arms; i++) {
