@@ -569,9 +569,10 @@ export function createEclipse(scene: Scene) {
     // sky. This is scenic relief, not a claimed lunar surface map.
     const province = mx_noise_float(vec3(P.x.mul(7.4), P.y.mul(8.8), 11.3)).mul(0.5).add(0.5)
     const broken = mx_noise_float(vec3(P.x.mul(21), P.y.mul(19), 6.1)).mul(0.5).add(0.5)
-    const relief = smoothstep(0.39, 0.67, province.add(broken.sub(0.5).mul(0.2)))
+    const relief = smoothstep(0.36, 0.7, province.add(broken.sub(0.5).mul(0.2)))
+      .mul(broken.mul(0.45).add(0.55))
     const col = mix(c3(MOON), c3(MOON_MARE), mare.mul(inner).mul(0.72))
-      .add(c3(lin('#080b18')).mul(relief).mul(inner).mul(0.82))
+      .add(c3(lin('#070910')).mul(relief).mul(inner).mul(0.62))
     // barely any dither: the disc lives so far down in the values that a
     // normal amplitude reads as a weave on the rock (round 3)
     moonMat.colorNode = col.add(dither(0.0011))

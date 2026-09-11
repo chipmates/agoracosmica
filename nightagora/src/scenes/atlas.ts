@@ -45,18 +45,23 @@ import {
   Vector4,
 } from 'three/webgpu'
 import {
+  Fn,
   abs,
   attribute,
+  cameraProjectionMatrix,
   clamp,
   dot,
   float,
+  floor,
   fract,
   instancedBufferAttribute,
   length,
   max,
   mix,
+  modelViewMatrix,
   normalize,
   positionLocal,
+  positionGeometry,
   pow,
   screenCoordinate,
   screenUV,
@@ -66,6 +71,8 @@ import {
   uv,
   vec2,
   vec3,
+  vec4,
+  viewportSize,
 } from 'three/tsl'
 import * as TSL from 'three/tsl'
 import { CONSTELLATIONS, type Constellation } from '../content/constellations'
@@ -331,6 +338,7 @@ function figureGeometry(
   const weight: number[] = []
   const gild: number[] = []
   const kind: number[] = []
+  const cutCenter: number[] = []
   const idx: number[] = []
 
   c.lines.forEach(([ia, ib], si) => {
@@ -371,6 +379,7 @@ function figureGeometry(
       weight.push(w, w)
       gild.push(0, 0)
       kind.push(0, 0)
+      cutCenter.push(0, 0, 0, 0, 0, 0)
       if (k < SPANS) {
         const a = base + k * 2
         idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2)
@@ -384,6 +393,7 @@ function figureGeometry(
   const pen = burinFor(c)
   pen.strokes.forEach((st, si) => {
     const last = st.points.length - 1
+    const anchor = st.points[Math.floor(last / 2)] ?? [0, 0]
     st.points.forEach(([x, y], i) => {
       const a = st.points[Math.max(0, i - 1)]
       const b = st.points[Math.min(last, i + 1)]
@@ -403,6 +413,7 @@ function figureGeometry(
       weight.push(st.weight, st.weight)
       gild.push(st.gild, st.gild)
       kind.push(1, 1)
+      cutCenter.push(anchor[0], anchor[1], -0.045, anchor[0], anchor[1], -0.045)
       if (i < last) idx.push(base, base + 1, base + 2, base + 1, base + 3, base + 2)
     })
   })
@@ -415,6 +426,7 @@ function figureGeometry(
   geo.setAttribute('aWeight', new Float32BufferAttribute(weight, 1))
   geo.setAttribute('aGild', new Float32BufferAttribute(gild, 1))
   geo.setAttribute('aKind', new Float32BufferAttribute(kind, 1))
+  geo.setAttribute('aCutCenter', new Float32BufferAttribute(cutCenter, 3))
   geo.setIndex(idx)
   return geo
 }
@@ -431,6 +443,18 @@ function figureMaterial(
   mat.blending = AdditiveBlending
   mat.side = DoubleSide
   mat.forceSinglePass = true
+  // Translate a whole burin stroke onto one pixel anchor. Its width and
+  // curve stay continuous; snapping individual vertices would staircase
+  // the line. The viewport is the actual render target, on every tier.
+  mat.vertexNode = Fn(() => {
+    const mvp: N = cameraProjectionMatrix.mul(modelViewMatrix)
+    const clip: N = mvp.mul(vec4(positionGeometry, 1)).toVar()
+    const center: N = mvp.mul(vec4(attribute('aCutCenter', 'vec3') as N, 1)).toVar()
+    const pixel: N = center.xy.div(center.w).mul(0.5).add(0.5).mul(viewportSize)
+    const delta: N = floor(pixel).add(0.5).sub(pixel).mul(2).div(viewportSize)
+      .mul(attribute('aKind', 'float'))
+    return vec4(clip.xy.add(delta.mul(clip.w)), clip.zw)
+  })()
   const across: N = abs(attribute('aCross', 'float') as N)
   const alongN: N = attribute('aAlong', 'float') as N
   const inkN: N = attribute('aInk', 'float') as N
@@ -1798,7 +1822,9 @@ export function createAtlas(scene: Scene): AtlasHandles {
     wheel += wheelVel * step
     dome.rotation.y = wheel
     // the dome breathes: a slow whole-sky sway, shapes untouched
-    dome.rotation.z = reducedMotion ? 0 : Math.sin(elapsed * 0.05) * 0.008
+    // The engraving rests when the wheel rests. The surrounding field
+    // carries the living light; the plate must not crawl under its type.
+    dome.rotation.z = 0
     // the wanderers keep their own time against the dome
     if (!reducedMotion) wanderers.rotation.y = elapsed * 0.0026
 
