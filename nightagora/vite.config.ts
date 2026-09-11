@@ -8,6 +8,18 @@ export default defineConfig({
   plugins: [forgeWhoami(), naAssets()],
   build: {
     target: 'esnext',
-    rollupOptions: { input: { main: resolve(__dirname, 'index.html') } },
+    /* THE SWATCH ROUTE IS NOT PART OF THE MUSEUM. It is dev and preview only:
+       vite's dev server serves any page at the root, and a build carries it
+       only when a rig asks, so the bundle a visitor downloads never holds
+       the library's own inspection page. */
+    rollupOptions: {
+      input:
+        process.env['NA_SWATCHES'] === '1'
+          ? {
+              main: resolve(__dirname, 'index.html'),
+              swatches: resolve(__dirname, 'swatches.html'),
+            }
+          : { main: resolve(__dirname, 'index.html') },
+    },
   },
 })
