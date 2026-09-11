@@ -24,9 +24,14 @@
 //
 // A WING IS NOT A LOBBY WITH ONE STATION. In wing mode it walks the wing's
 // own rail, addressing every station BY ID through the frame's API, and it
-// adds four lines the lobby has no use for: every station reached, the cost
+// adds the lines the lobby has no use for: every station reached, the cost
 // of each station at each tier, the cone corners the round's sealed spec
-// names, and the motion eye's A-B-A count over the walk.
+// names, and the two halves of "no camera inside a wall" (the motion eye's
+// intrusion count over a recorded walk at both tiers, and the wing's own
+// offline camera clearance against its own triangles). The image's own
+// A-B-A oscillation is measured beside them as a WARNING: a camera that
+// travels past a near occluder makes the same signal as a blink, so that
+// number is read by eye and never fails a run.
 import { chromium } from 'playwright'
 import { spawn } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
@@ -77,6 +82,14 @@ const lines = []
 const gate = (name, ok, detail) => {
   lines.push({ name, ok, detail })
   say(`${ok ? 'PASS' : 'FAIL'}  ${name}  ${typeof detail === 'string' ? detail : ''}`)
+}
+/* A LINE THAT IS MEASURED BUT NOT GATED. Some numbers are worth carrying in
+   every report and cannot be a pass or a fail on their own: they need a
+   pair of eyes. They are printed and written down like any other line, and
+   they never decide the run. */
+const warn = (name, ok, detail) => {
+  lines.push({ name, ok, detail, gate: false })
+  say(`${ok ? 'PASS' : 'WARN'}  ${name}  ${typeof detail === 'string' ? detail : ''}`)
 }
 
 function json(cmd, argv, env = {}) {
@@ -449,20 +462,77 @@ gate(
 )
 
 if (WING) {
-  const freed = await freePort()
-  if (!freed) {
-    motion = { ok: false, error: `port ${PORT} never freed, the motion eye was not run` }
-  } else {
-    say('  the motion eye, on its own server')
-    const scan = await json('node', ['forge/motion-scan.mjs', SLUG, 'gates-motion', '--json'], { FORGE_PORT: String(PORT) })
-    motion = scan.parsed ?? { ok: false, error: 'the motion eye did not answer JSON', raw: scan.raw }
+  const runs = [
+    { name: 'desktop/hero', out: 'gates-motion', env: {} },
+    { name: 'phone/calm', out: 'gates-motion-calm', env: { MOTION_VP: 'mobile', MOTION_TIER: 'calm' } },
+  ]
+  motion = { readings: {} }
+  for (const r of runs) {
+    // each reading brings its own preview server, so the port has to have
+    // gone quiet again before the next one asks for it
+    if (!(await freePort())) {
+      motion.readings[r.name] = { ok: false, error: `port ${PORT} never freed, the motion eye was not run` }
+      continue
+    }
+    say(`  the motion eye at ${r.name}, on its own server`)
+    const scan = await json('node', ['forge/motion-scan.mjs', SLUG, r.out, '--json'], { FORGE_PORT: String(PORT), ...r.env })
+    motion.readings[r.name] = scan.parsed ?? { ok: false, error: 'the motion eye did not answer JSON', raw: scan.raw }
   }
+  const readings = Object.entries(motion.readings)
+  const said = (r, k) => (typeof r[k] === 'number' ? r[k] : null)
+  const intrusions = readings.reduce((n, [, r]) => n + (said(r, 'intrusions') ?? 1), 0)
+  const clusters = readings.reduce((n, [, r]) => n + (said(r, 'clusters') ?? 0), 0)
+  const walked = readings.reduce((n, [, r]) => n + (said(r, 'walkFrames') ?? 0), 0)
+  const broke = readings.filter(([, r]) => r.ok !== true && !(r.intrusions > 0))
+  motion.intrusions = intrusions
+  motion.clusters = clusters
+  motion.walkFrames = walked
+  /* THE GATE IS "NO CAMERA INSIDE A WALL", so it is measured on what the
+     frames can show: a picture that stopped being a place. An oscillation
+     of the image is not that (a camera travelling past a near occluder
+     makes the same signal), and it is a warning below. */
   gate(
+    'camera intrusion',
+    intrusions === 0 && broke.length === 0,
+    broke.length
+      ? broke.map(([n, r]) => `${n}: ${(r.flags ?? [r.error]).join('; ')}`).join(' | ')
+      : `${intrusions} over ${walked} frames of the walk at ${readings.length} reading(s), closest ` +
+        readings.map(([n, r]) => `${n} ${r.closest?.margin ?? '?'}x`).join(', ')
+  )
+  /* the geometric half of the same law: whether the camera ever STOOD
+     inside a wall is a question about triangles, not about pixels, and a
+     wing that ships its own offline checker answers it over its whole rail */
+  const checker = join('src', 'wings', SLUG, 'geometry-check.mjs')
+  if (existsSync(join(APP_ROOT, checker))) {
+    say('  the wing\'s own camera clearance, offline')
+    const run = await json('node', [checker])
+    const g = run.parsed
+    const rail = g?.rail ?? {}
+    const clears =
+      run.code === 0 &&
+      (g?.errors?.length ?? 1) === 0 &&
+      rail.intersectingSampleChords === 0 &&
+      rail.shellClearanceLowerBoundM >= rail.shellThresholdM &&
+      rail.minimumGradeClearanceM >= rail.terrainThresholdM
+    // the checker's own report carries every pose and path it sampled; the
+    // gates keep the numbers, not the 15,000 samples behind them
+    const { poses, paths, ...railNumbers } = rail
+    motion.clearance = g ? { errors: g.errors, rail: railNumbers, notes: g.notes } : { error: run.raw }
+    gate(
+      'camera clearance',
+      clears,
+      !g ? 'the wing\'s checker did not answer JSON'
+        : (g.errors?.length ?? 0) ? g.errors.map((e) => e.code).join('; ')
+        : `${rail.totalCameraSamples} camera samples, ${rail.intersectingSampleChords} chord(s) through the shell, ` +
+          `clear of it by ${rail.shellClearanceLowerBoundM} m and of the ground by ${(rail.minimumGradeClearanceM ?? 0).toFixed(2)} m`
+    )
+  }
+  warn(
     'motion A-B-A',
-    motion.ok === true && (motion.clusters ?? 1) === 0,
-    motion.ok
-      ? `${motion.frames} frames, ${motion.flagged} flagged, ${motion.clusters} cluster(s) over ${motion.stations} station(s)`
-      : (motion.flags ?? [motion.error]).join('; ')
+    clusters === 0,
+    readings
+      .map(([n, r]) => `${n}: ${said(r, 'frames') ?? 0} frames, ${said(r, 'flagged') ?? 0} flagged, ${said(r, 'clusters') ?? '?'} cluster(s)`)
+      .join(' | ') + (clusters ? '. Read them by eye: this line never fails a run' : '')
   )
 }
 
@@ -507,7 +577,8 @@ if (WING) {
 const drift = (h.failures ?? []).filter((f) => f.includes('disclosure'))
 gate('disclosures verbatim', drift.length === 0, drift.join('; ') || 'every layer matches the canon file')
 
-const failed = lines.filter((l) => !l.ok).map((l) => l.name)
+const failed = lines.filter((l) => l.gate !== false && !l.ok).map((l) => l.name)
+const warned = lines.filter((l) => l.gate === false && !l.ok).map((l) => l.name)
 const report = {
   surface: WING ? `wing/${SLUG}` : SURFACE,
   head: headHere(),
@@ -524,6 +595,7 @@ const report = {
   gates: lines,
   ok: failed.length === 0,
   failed,
+  warned,
 }
 writeFileSync(join(APP_ROOT, 'forge', 'gates.json'), JSON.stringify(report, null, 2) + '\n')
 process.stdout.write(JSON.stringify(report, null, 2) + '\n')

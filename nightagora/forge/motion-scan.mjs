@@ -5,13 +5,44 @@
 //   pnpm build && node forge/motion-scan.mjs [slug] [outDir]
 //   FORGE_PORT=5199 MOTION_VP=mobile node forge/motion-scan.mjs vinci
 //
-// It records the walk, dumps the frames, and flags two things a still can
-// never show:
-//   · STUCK: the station the walk asked for is not the station standing
-//   · A-B-A: a region that changes and changes back between three frames,
-//     which is a blink, a pop or a tear. Clusters of flagged frames on one
-//     transition mean the camera passed through something (W7). The frames
-//     are named so they can be read by eye, which is the only verdict.
+// It records the walk, dumps the frames, and reports three things a still
+// can never show:
+//
+//   STUCK        the station the walk asked for is not the station standing
+//   INTRUSION    the picture collapsed: the frame stopped being a view of a
+//                place and became one surface at the near plane, or the
+//                clear colour. This is the gate. The wing's law is "no
+//                camera inside a wall", and a camera inside a wall renders
+//                exactly this: a flat, structureless fill.
+//   oscillation  a region that changes and changes back between three
+//                frames. A WARNING, never a gate: a camera that travels
+//                past a near occluder (a gate arch, a wall, a tree) makes
+//                the same signal as a blink, so this number is read by eye
+//                and cleared, not failed on.
+//
+// WHAT THE INTRUSION TEST CAN AND CANNOT SEE. No depth buffer is reachable
+// from the rig, so "depth at the frame centre collapses to zero" is
+// measured on the PICTURE: over a box that carries no page chrome, the
+// spatial spread and the high-frequency energy of the frame, both of which
+// a place has and a near surface, an unlit interior or the clear colour do
+// not. That catches the collapse, not every intrusion: a TEXTURED wall
+// close to the eye still reads as a picture (measured, on this wing: the
+// camera driven into the manor's masonry reads sd 5.4 / energy 5.7, well
+// over the floors). The geometric half of the same law, the camera's own
+// path against the wing's own triangles, belongs to the wing's offline
+// checker, and forge/gates.mjs gates on both.
+//
+// PROVING THE DETECTOR STILL FIRES. A clean wing gives a clean scan, which
+// says nothing about the instrument. MOTION_INTRUDE poisons the wing's own
+// chunk as it is served, for that run only, so the camera really stands
+// where it must never stand:
+//
+//   MOTION_INTRUDE='(10,-21,1.7,=>(10,-21,-1.5,' \
+//     node forge/motion-scan.mjs vinci intruded
+//
+// (the da Vinci wing's courtyard eye, dropped 1.5 m under the court it
+// stands on, which is inside the terrain). The run refuses when the text is
+// not in the chunk, so a poisoned run can never pass by missing its target.
 import { chromium } from 'playwright'
 import { spawn } from 'node:child_process'
 import { existsSync, mkdirSync, readdirSync, rmSync } from 'node:fs'
@@ -29,6 +60,7 @@ const out = JSON_OUT ? (line) => process.stderr.write(`${line}\n`) : (line) => c
 const PORT = Number(process.env['FORGE_PORT'] ?? 5199)
 const MOBILE = process.env['MOTION_VP'] === 'mobile'
 const TIER = process.env['MOTION_TIER'] ?? (MOBILE ? 'calm' : 'hero')
+const INTRUDE = process.env['MOTION_INTRUDE'] ?? ''
 const BASE = `http://localhost:${PORT}`
 const OUT = join(APP_ROOT, 'forge', 'shots', MOBILE ? `${OUT_NAME}-mobile` : OUT_NAME)
 const VP = MOBILE
@@ -40,16 +72,44 @@ const VP = MOBILE
 const CHANGE = 5
 const RETURN = 2
 
+/* THE INTRUSION FLOORS, and where they come from.
+   The box is the middle of the frame in fractions of its own size, chosen
+   to hold no page chrome at either viewport: the brand line and the
+   station title are above it, the rail and the door block below it.
+   A frame is collapsed when it is under BOTH floors at once, and the run
+   prints how close the walk came to that corner, so the margin is a number.
+   Measured on the merged da Vinci wing: the whole desktop walk stays over
+   sd 9.5 / energy 2.9 and the whole phone walk over sd 2.6 with energy 5.3,
+   the app's own opening card reads sd 1.8 / energy 1.0, and a camera driven
+   1.5 m under the court reads sd 0.9 / energy 1.6. Both walks keep about a
+   factor of two over the corner. */
+const BOX = { x0: 0.3, x1: 0.7, y0: 0.28, y1: 0.58 }
+const BOX_GRID = 48
+const SD_FLOOR = 5
+const ENERGY_FLOOR = 2.3
+/** the world is standing once the box carries this much structure */
+const OPEN_ENERGY = 2
+/** the opening may not eat more of the recording than this */
+const OPEN_SHARE = 0.2
+/** at the clear colour: the box's own mean, against the plate the recorder
+    caught before the app drew anything */
+const CLEAR_LEVEL = 2
+const CLEAR_SD = 2
+/** one dropped frame is a decoder, not a wall */
+const INTRUSION_RUN = 3
+
 if (existsSync(OUT)) rmSync(OUT, { recursive: true, force: true })
 mkdirSync(OUT, { recursive: true })
 
 const flags = []
+const warnings = []
 /** one still per station on the way out: the judge's motion strip is a
     frame from each room, not eight frames of whichever second the video
     happened to be in */
 const stationFrames = []
 const server = spawn('pnpm', ['preview', '--port', String(PORT), '--strictPort'], { stdio: 'ignore', cwd: APP_ROOT })
 let stations = 0
+let poisoned = 0
 try {
   await waitForServer(BASE)
   const said = await assertServer(BASE)
@@ -62,6 +122,19 @@ try {
     recordVideo: { dir: OUT, size: { width: VP.width, height: VP.height } },
   })
   const page = await ctx.newPage()
+  if (INTRUDE) {
+    const [from, to] = INTRUDE.split('=>')
+    if (!from || to === undefined) throw new Error(`MOTION_INTRUDE wants '<text>=><text>', got ${INTRUDE}`)
+    // the wing's own chunk, and only for this run: the app on disk is not
+    // touched, and a run whose poison did not land is not a run
+    await page.route(`**/assets/${SLUG}-*.js`, async (route) => {
+      const res = await route.fetch()
+      const body = await res.text()
+      const hits = body.split(from).length - 1
+      poisoned += hits
+      await route.fulfill({ response: res, body: body.split(from).join(to) })
+    })
+  }
   let firstLine = ''
   page.on('pageerror', (e) => flags.push(`pageerror: ${e.message}`))
   page.on('console', (m) => {
@@ -72,6 +145,8 @@ try {
   await page.goto(`${BASE}/w/${SLUG}?tier=${TIER}`)
   await page.waitForFunction(() => Boolean(window.__forge))
   await page.waitForTimeout(2200)
+  if (INTRUDE && !poisoned) throw new Error(`MOTION_INTRUDE found no '${INTRUDE.split('=>')[0]}' in the ${SLUG} chunk`)
+  if (INTRUDE) out(`[motion] POISONED: ${poisoned} site(s) in the ${SLUG} chunk, this run only`)
   const stamp = await assertBackend(page)
   assertAdapter(firstLine, process.env['FORGE_BACKEND'] ?? 'webgpu')
   if (stamp.tier !== TIER) throw new Error(`asked for tier=${TIER}, the app stamped ${stamp.tier}`)
@@ -124,7 +199,7 @@ try {
   server.kill()
 }
 
-// ---- the frames, and the blink scan over them
+// ---- the frames, and the two scans over them
 const videos = existsSync(OUT) ? readdirSync(OUT).filter((f) => f.endsWith('.webm')) : []
 let frames = []
 if (videos.length) {
@@ -136,15 +211,14 @@ if (videos.length) {
 }
 if (!frames.length) flags.push('no frames: the walk recorded nothing')
 
-/* The A-B-A scan. The grid comes out of ffmpeg rather than out of an image
-   library: one 16 by 16 grey frame per video frame, in one raw stream, so
-   the whole walk is compared with arithmetic and no second decoder. */
-const GRID = 16
-function grid(video) {
+/* The grids come out of ffmpeg rather than out of an image library: one
+   small grey frame per video frame, in one raw stream, so the whole walk is
+   compared with arithmetic and no second decoder. */
+function grid(video, vf, side) {
   return new Promise((done, fail) => {
     const ff = spawn('ffmpeg', [
       '-loglevel', 'error', '-i', video, '-vsync', '0',
-      '-vf', `scale=${GRID}:${GRID}`, '-pix_fmt', 'gray', '-f', 'rawvideo', '-',
+      '-vf', `${vf}scale=${side}:${side}`, '-pix_fmt', 'gray', '-f', 'rawvideo', '-',
     ])
     const chunks = []
     ff.stdout.on('data', (d) => chunks.push(d))
@@ -152,12 +226,11 @@ function grid(video) {
     ff.on('close', () => done(Buffer.concat(chunks)))
   })
 }
+const frameName = (n) => `f${String(n).padStart(4, '0')}.png`
 
-let clusters = []
-let frameCount = 0
-let flaggedCount = 0
-if (videos.length) {
-  const raw = await grid(join(OUT, videos[0]))
+/* ---- the oscillation warning: a region that changes and changes back --- */
+const GRID = 16
+function oscillationScan(raw) {
   const cell = GRID * GRID
   const count = Math.floor(raw.length / cell)
   const at = (i, k) => raw[i * cell + k]
@@ -172,14 +245,12 @@ if (videos.length) {
     }
     if (blinks >= 3) flagged.push({ n: i - 1, cells: blinks })
   }
-  frameCount = count
-  flaggedCount = flagged.length
-  out(`[motion] ${count} frames, ${flagged.length} flagged, scanning for clusters`)
-  // a lone flagged frame is noise; a run of them is a transition that tore
+  // a lone flagged frame is noise; a run of them is one moment of the walk
+  const clusters = []
   let run = []
   const close = () => {
     if (run.length >= 3)
-      clusters.push({ from: `f${String(run[0].n + 1).padStart(4, '0')}.png`, to: `f${String(run[run.length - 1].n + 1).padStart(4, '0')}.png`, frames: run.length })
+      clusters.push({ from: frameName(run[0].n + 1), to: frameName(run[run.length - 1].n + 1), frames: run.length })
   }
   for (const f of flagged) {
     if (run.length && f.n - run[run.length - 1].n <= 2) run.push(f)
@@ -189,18 +260,130 @@ if (videos.length) {
     }
   }
   close()
-  out(`[motion] ${clusters.length} cluster(s)`)
+  return { frames: count, flagged: flagged.length, clusters }
 }
 
-for (const c of clusters) flags.push(`A-B-A cluster ${c.from} to ${c.to} (${c.frames} frames): read them by eye`)
+/* ---- the intrusion gate: did the picture stop being a place? ----------- */
+function boxStats(raw) {
+  const cell = BOX_GRID * BOX_GRID
+  const count = Math.floor(raw.length / cell)
+  const rows = []
+  for (let i = 0; i < count; i++) {
+    const p = raw.subarray(i * cell, (i + 1) * cell)
+    let sum = 0
+    for (const v of p) sum += v
+    const mean = sum / cell
+    let acc = 0
+    for (const v of p) acc += (v - mean) * (v - mean)
+    // the second difference in both directions: what a picture has and a
+    // surface at the near plane does not
+    let energy = 0
+    let n = 0
+    for (let y = 1; y < BOX_GRID - 1; y++) {
+      for (let x = 1; x < BOX_GRID - 1; x++) {
+        const k = y * BOX_GRID + x
+        energy += Math.abs(4 * p[k] - p[k - 1] - p[k + 1] - p[k - BOX_GRID] - p[k + BOX_GRID])
+        n++
+      }
+    }
+    rows.push({ n: i + 1, mean, sd: Math.sqrt(acc / cell), energy: energy / n })
+  }
+  return rows
+}
+
+function intrusionScan(rows) {
+  if (!rows.length) return { opened: 0, frames: 0, intrusions: [], clear: null, closest: null, notes: ['no frames'] }
+  const notes = []
+  /* the clear colour is measured, not assumed: the recorder catches the
+     page before the app has drawn anything, and that plate is flat */
+  const first = rows[0]
+  const clear = first.sd < 1 ? first.mean : null
+  if (clear === null) notes.push('the first recorded frame is not flat, so the clear colour could not be read')
+  // the window opens when the world is standing; what came before is the
+  // app's own opening (the intro card, the module in flight), not the walk
+  const opened = rows.findIndex((r) => r.energy >= OPEN_ENERGY)
+  if (opened < 0) return { opened: 0, frames: 0, intrusions: [], clear, closest: null, notes: [...notes, 'the world never drew: no frame carries structure'] }
+  if (opened > rows.length * OPEN_SHARE)
+    notes.push(`the world first drew at ${frameName(rows[opened].n)}, ${Math.round((100 * opened) / rows.length)} percent into the recording`)
+  const window = rows.slice(opened)
+  const why = (r) =>
+    r.sd < SD_FLOOR && r.energy < ENERGY_FLOOR ? 'one surface at the near plane'
+    : clear !== null && Math.abs(r.mean - clear) <= CLEAR_LEVEL && r.sd < CLEAR_SD ? 'the clear colour'
+    : null
+  const intrusions = []
+  let run = []
+  const close = () => {
+    if (run.length >= INTRUSION_RUN) {
+      const worst = run.reduce((a, b) => (b.energy < a.energy ? b : a))
+      intrusions.push({
+        from: frameName(run[0].n),
+        to: frameName(run[run.length - 1].n),
+        frames: run.length,
+        why: why(worst),
+        worst: { frame: frameName(worst.n), sd: +worst.sd.toFixed(2), energy: +worst.energy.toFixed(2), mean: +worst.mean.toFixed(1) },
+      })
+    }
+    run = []
+  }
+  for (const r of window) {
+    if (why(r)) run.push(r)
+    else close()
+  }
+  close()
+  /* how close the walk came to the corner it is judged against. Both
+     floors have to be crossed at once, so the margin is the smaller of the
+     two ratios taken frame by frame, and the closest frame is named. */
+  const score = (r) => Math.max(r.sd / SD_FLOOR, r.energy / ENERGY_FLOOR)
+  const near = window.reduce((a, b) => (score(b) < score(a) ? b : a))
+  return {
+    opened,
+    frames: window.length,
+    intrusions,
+    clear,
+    closest: {
+      margin: +score(near).toFixed(2),
+      frame: frameName(near.n),
+      sd: +near.sd.toFixed(2),
+      energy: +near.energy.toFixed(2),
+    },
+    notes,
+  }
+}
+
+let oscillation = { frames: 0, flagged: 0, clusters: [] }
+let intrusion = { opened: 0, frames: 0, intrusions: [], clear: null, closest: null, notes: [] }
+if (videos.length) {
+  const video = join(OUT, videos[0])
+  oscillation = oscillationScan(await grid(video, '', GRID))
+  const crop = `crop=iw*${(BOX.x1 - BOX.x0).toFixed(4)}:ih*${(BOX.y1 - BOX.y0).toFixed(4)}:iw*${BOX.x0.toFixed(4)}:ih*${BOX.y0.toFixed(4)},`
+  intrusion = intrusionScan(boxStats(await grid(video, crop, BOX_GRID)))
+  out(`[motion] ${oscillation.frames} frames, ${intrusion.opened} of them the app's own opening`)
+  out(`[motion] intrusion: ${intrusion.intrusions.length} over ${intrusion.frames} frames of the walk`)
+  if (intrusion.closest)
+    out(
+      `[motion] closest to the corner: ${intrusion.closest.margin}x at ${intrusion.closest.frame}` +
+        ` (sd ${intrusion.closest.sd} of ${SD_FLOOR}, energy ${intrusion.closest.energy} of ${ENERGY_FLOOR})`
+    )
+  out(`[motion] oscillation: ${oscillation.flagged} flagged, ${oscillation.clusters.length} cluster(s)`)
+}
+
+for (const n of intrusion.notes) flags.push(n)
+for (const c of intrusion.intrusions)
+  flags.push(`INTRUSION ${c.from} to ${c.to} (${c.frames} frames): ${c.why}, worst ${c.worst.frame} sd ${c.worst.sd} energy ${c.worst.energy}`)
+for (const c of oscillation.clusters)
+  warnings.push(`A-B-A cluster ${c.from} to ${c.to} (${c.frames} frames): read them by eye`)
 
 out(`[motion] wing ${SLUG}: ${stations} station(s), frames in forge/shots/${MOBILE ? `${OUT_NAME}-mobile` : OUT_NAME}/`)
+if (warnings.length) {
+  out('MOTION SCAN WARNS (read by eye, not a gate):')
+  for (const w of [...new Set(warnings)]) out(` · ${w}`)
+}
 if (flags.length) {
   out('MOTION SCAN FLAGGED:')
-  for (const f of [...new Set(flags)]) out(` \u00b7 ${f}`)
+  for (const f of [...new Set(flags)]) out(` · ${f}`)
   process.exitCode = 1
 } else {
-  out('clean: every station reached forward and back, no A-B-A cluster')
+  out(`clean: every station reached forward and back, no intrusion over ${intrusion.frames} frames of the walk`)
 }
 if (JSON_OUT)
   console.log(
@@ -211,11 +394,20 @@ if (JSON_OUT)
         tier: TIER,
         stations,
         stationFrames,
-        frames: frameCount,
-        flagged: flaggedCount,
-        clusters: clusters.length,
-        clusterFrames: clusters,
+        poisoned: INTRUDE ? { rule: INTRUDE, sites: poisoned } : null,
+        frames: oscillation.frames,
+        walkFrames: intrusion.frames,
+        openedAt: intrusion.opened,
+        clearLevel: intrusion.clear === null ? null : +intrusion.clear.toFixed(1),
+        intrusions: intrusion.intrusions.length,
+        intrusionFrames: intrusion.intrusions,
+        closest: intrusion.closest,
+        floors: { sd: SD_FLOOR, energy: ENERGY_FLOOR, run: INTRUSION_RUN, box: BOX },
+        flagged: oscillation.flagged,
+        clusters: oscillation.clusters.length,
+        clusterFrames: oscillation.clusters,
         dir: `forge/shots/${MOBILE ? `${OUT_NAME}-mobile` : OUT_NAME}`,
+        warnings: [...new Set(warnings)],
         flags: [...new Set(flags)],
         ok: flags.length === 0,
       },
