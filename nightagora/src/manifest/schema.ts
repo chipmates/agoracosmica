@@ -61,6 +61,30 @@ export interface ManifestEntry {
       every gate report; a wing scope may not use it */
   record?: 'open'
   note?: string
+
+  /* WHAT A MATERIAL SET ADDS. A set is a folder, so its entry is a family
+     entry, and these five fields are what the loader needs that a licence
+     line cannot say. They are written by the fetch tool from the source's
+     own metadata and from the maps themselves, never by hand. */
+
+  /** the real-world size of one tile of the source photograph, in metres */
+  metres?: [number, number]
+  /** which maps the folder holds */
+  maps?: string[]
+  /** which one-channel maps ride in surface.png, in r, g, b order */
+  packed?: string[]
+  /** measured off the maps: the mean albedo in linear light written back as
+      sRGB, the mean of its darkest fifth, and the mean of the two data
+      channels. A set that says what it is has no authored numbers left. */
+  measured?: {
+    albedo: string
+    variation: string
+    roughness: number
+    occlusion: number
+  }
+  /** a colour the loader multiplies into the albedo, declared here so the
+      drawer can say that the museum's stone is not the source's colour */
+  tint?: string
 }
 
 export interface Manifest {
