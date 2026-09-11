@@ -213,13 +213,13 @@ try {
     const r = await measure(browser, tier, VIEWPORTS.desktop)
     tiers[tier] = r
     walkProblems.push(...r.problems.map((p) => `${tier}: ${p}`))
-    say(`  ${tier.padEnd(9)} ${r.cost.draws} draws  ${r.cost.triangles} tris  ${r.cost.frameMB} MB  p50 ${r.cost.frameMsP50} ms  p95 ${r.cost.frameMsP95} ms`)
+    say(`  ${tier.padEnd(9)} ${r.cost.draws} draws  ${r.cost.triangles} tris  ${r.cost.frameMB} MB frame  ${r.cost.textureMB} MB texture  p50 ${r.cost.frameMsP50} ms  p95 ${r.cost.frameMsP95} ms`)
   }
   // the public gate names the phone, and the phone runs the calm tier
   const phone = await measure(browser, 'calm', VIEWPORTS.mobile)
   tiers['calm-phone'] = phone
   walkProblems.push(...phone.problems.map((p) => `calm-phone: ${p}`))
-  say(`  ${'calm-phone'.padEnd(9)} ${phone.cost.draws} draws  ${phone.cost.triangles} tris  ${phone.cost.frameMB} MB  p50 ${phone.cost.frameMsP50} ms  p95 ${phone.cost.frameMsP95} ms`)
+  say(`  ${'calm-phone'.padEnd(9)} ${phone.cost.draws} draws  ${phone.cost.triangles} tris  ${phone.cost.frameMB} MB frame  ${phone.cost.textureMB} MB texture  p50 ${phone.cost.frameMsP50} ms  p95 ${phone.cost.frameMsP95} ms`)
   backend = { backend: phone.backend, adapter: phone.adapter, ok: !/swiftshader|lavapipe|llvmpipe|software/i.test(phone.adapter) }
   coneReport = await cones(browser)
   await browser.close()
