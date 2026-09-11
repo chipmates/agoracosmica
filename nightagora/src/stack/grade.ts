@@ -64,127 +64,95 @@ export const IDENTITY: Grade = {
   dof: null,
 }
 
-const base: Grade = {
-  ...IDENTITY,
-  name: 'base',
-  warm: [1, 0.94, 0.84],
-  cool: [0.82, 0.88, 1],
-  vignette: 0.18,
-  grain: 0.02,
-  bloom: { strength: 0.5, radius: 0.4, threshold: 0.72, warmth: 0.85 },
-  ao: { intensity: 1, distance: 0.6, thickness: 1 },
-}
+/* THE SIX LOOKS. Each one starts at IDENTITY and names ONLY the dials it
+   earned against a measurement of the base frame (`forge/parity.mjs`). No
+   scene lifts its blacks, tints its shadows or hazes its air by default:
+   the room's own dark is what the art authored, and the stack's job is to
+   let it stand. What every scene does keep is the film's own tooth and a
+   bloom that is allowed on emitters only.
+
+   THE BLOOM THRESHOLD IS A MEASUREMENT, NOT A TASTE. The chain blooms the
+   LINEAR frame, and every hand-written material in this museum lands
+   through the same shoulder (`c / (1 + c/2)`), which puts lit stone under
+   1.0 and leaves only what is actually emitting above it. So a threshold
+   at 1.15 is the line between a surface that is lit and a surface that is
+   a source: over it, the fire, the coals, the candle flames, the gold and
+   the diamond flash; under it, the bowl's rim, which is what glared in the
+   frame the judge scored.
+
+   NO LOBBY GRADE ASKS FOR THE LENS, and `dof` stays null in all six. Every
+   station of this lobby carries a caption, a name or a disclosure line, and
+   a caption inside the circle of confusion is where the wheel's own bright
+   motes landed on the words LIFE and AND. Depth of field is a wing-only
+   knob: a wing with a real room at a real depth turns it on in its own
+   grade, and gives up the pass's MSAA for it (see `samplesFor` in post.ts).
+
+   The film's tooth is per scene, and each value is the one that broke the
+   plane it had to break: the agora at 0.0035, where the bowl's own three
+   scales are the thing being measured, and the wing's field at 0.008,
+   where the sky's dither needed the most breaking. Nothing else in the
+   table is a taste either. */
 
 /** The night's six looks. Every scene of the path names one. */
 export const GRADES = {
-  /* THE COLD MOON — the corona owns the frame, so the grade does almost
-     nothing: no lift into the black, a hair of cool in the shadows, and a
-     bloom threshold high enough that only the diamond flash reaches it. */
+  /* THE COLD MOON — the corona owns the frame and the grade does nothing to
+     it. The bloom is warm-masked and high, so the diamond flash reaches it
+     and the white corona never does: that is how the ring keeps every
+     streamer. */
   'cold-moon': {
-    ...base,
+    ...IDENTITY,
     name: 'cold-moon',
-    exposure: 1,
-    lift: [0, 0, 0.0015],
-    gamma: [1, 1, 1],
-    saturation: 0.98,
-    split: 0.22,
-    vignette: 0.26,
-    grain: 0.024,
-    // warm only, and high: the corona is white and it keeps every streamer
-    bloom: { strength: 0.3, radius: 0.62, threshold: 0.93, warmth: 0.88 },
-    ao: { intensity: 0, distance: 0.6, thickness: 1 },
+    grain: 0.006,
+    bloom: { strength: 0.3, radius: 0.62, threshold: 1.15, warmth: 0.88 },
   },
 
-  /* THE FALLING PLATES — the descent is a passage, not a room: the grade
-     opens the gamma a little so the turning plates keep their edges, and
-     leans cool because everything here is still sky. */
+  /* THE FALLING PLATES — thirty candle flames on a turning court. Only the
+     flames are sources, and the stone under them is not. */
   'falling-plates': {
-    ...base,
+    ...IDENTITY,
     name: 'falling-plates',
-    exposure: 1.01,
-    lift: [0, 0.001, 0.002],
-    gamma: [1, 1, 0.99],
-    saturation: 1.02,
-    split: 0.3,
-    vignette: 0.3,
-    grain: 0.026,
-    bloom: { strength: 0.4, radius: 0.5, threshold: 0.8, warmth: 0.6 },
-    ao: { intensity: 0.5, distance: 0.5, thickness: 1 },
+    grain: 0.006,
+    bloom: { strength: 0.34, radius: 0.5, threshold: 1.15, warmth: 0.6 },
   },
 
-  /* LAPIS AND EMBER — the lobby. The whole room is one fire against blue
-     stone, so the split is the loudest thing the grade does: warmth into
-     the firelit highlights, lapis into everything the fire misses. */
+  /* LAPIS AND EMBER — the lobby. One fire in a stone room: the flame and
+     the coals bloom, the bowl they stand in does not, and nothing lifts the
+     air beside it. */
   'lapis-ember': {
-    ...base,
+    ...IDENTITY,
     name: 'lapis-ember',
-    exposure: 1,
-    lift: [0, 0, 0.0015],
-    gamma: [1, 1, 1],
-    gain: [1, 1, 1],
-    saturation: 1.04,
-    warm: [1, 0.92, 0.78],
-    cool: [0.72, 0.82, 1],
-    split: 0.3,
-    vignette: 0.3,
-    grain: 0.026,
-    bloom: { strength: 0.45, radius: 0.42, threshold: 0.78, warmth: 0.92 },
-    ao: { intensity: 0.9, distance: 0.85, thickness: 1 },
-    dof: null,
+    exposure: 0.94,
+    grain: 0.0035,
+    bloom: { strength: 0.3, radius: 0.1, threshold: 1.4, warmth: 0.92 },
   },
 
   /* THE WHEEL — thirty gold names on a dome of ink. Gold is the only warm
-     thing in the frame and it must stay legible, so the bloom is small and
-     tight and the vignette does the rest of the focusing. */
+     thing in the frame and it has to stay legible, so the halo is small and
+     tight and nothing else in the sky is allowed one. */
   'gold-on-ink': {
-    ...base,
+    ...IDENTITY,
     name: 'gold-on-ink',
-    exposure: 1,
-    lift: [0, 0, 0.0015],
-    gamma: [1, 1, 1],
-    saturation: 1.03,
-    warm: [1, 0.92, 0.78],
-    split: 0.3,
-    vignette: 0.36,
-    grain: 0.022,
-    bloom: { strength: 0.46, radius: 0.36, threshold: 0.68, warmth: 0.9 },
-    ao: { intensity: 0.4, distance: 0.5, thickness: 1 },
-    // no depth of field on a dome of stars: everything in it is at the same
-    // distance, so the lens can only bloat the pinpoints it should keep
-    dof: null,
+    grain: 0.006,
+    bloom: { strength: 0.34, radius: 0.3, threshold: 1.1, warmth: 0.9 },
   },
 
-  /* THE BREATH — one gold breath and a hard cut. The grade is the breath's
-     own instrument here: warm gain, no vignette fighting the corona, and a
-     bloom wide enough to feel like light rather than like a sprite. */
+  /* THE BREATH — one gold breath and a hard cut. The whole frame is the
+     source here, which is the one place a wide halo is the subject. */
   'gold-breath': {
-    ...base,
+    ...IDENTITY,
     name: 'gold-breath',
-    exposure: 1.04,
-    lift: [0.002, 0.001, 0],
-    gain: [1.03, 1.0, 0.97],
-    saturation: 1.02,
-    split: 0.2,
-    vignette: 0.12,
-    grain: 0.02,
-    bloom: { strength: 0.8, radius: 0.7, threshold: 0.55, warmth: 0.95 },
-    ao: { intensity: 0, distance: 0.5, thickness: 1 },
+    grain: 0.006,
+    bloom: { strength: 0.5, radius: 0.7, threshold: 1.05, warmth: 0.95 },
   },
 
-  /* THE FIRST STATION — a wing's own room before the wing exists. Neutral
-     on purpose: whatever a wing is, the plate that stands in for it must
-     not pretend to a look it has not earned. */
+  /* THE FIRST STATION — a wing's own room before the wing exists. Neutral,
+     because whatever a wing is, the plate that stands in for it must not
+     pretend to a look it has not earned. */
   'first-station': {
-    ...base,
+    ...IDENTITY,
     name: 'first-station',
-    exposure: 1,
-    lift: [0, 0, 0.0015],
-    saturation: 1,
-    split: 0.18,
-    vignette: 0.24,
-    grain: 0.022,
-    bloom: { strength: 0.4, radius: 0.45, threshold: 0.74, warmth: 0.8 },
-    ao: { intensity: 0.6, distance: 0.6, thickness: 1 },
+    grain: 0.008,
+    bloom: { strength: 0.3, radius: 0.45, threshold: 1.15, warmth: 0.8 },
   },
 } satisfies Record<string, Grade>
 
