@@ -210,6 +210,11 @@ function setPlate(): void {
 
 interface Chip {
   el: HTMLButtonElement
+  /** the line of type, kept as its own node so redrawing the name never
+      throws away the leader beside it */
+  name: HTMLElement
+  /** the hairline from the name to the star it belongs to */
+  leader: HTMLElement
   slug: string
   chapter: number
 }
@@ -220,7 +225,21 @@ for (const s of atlas.stars) {
   const b = document.createElement('button')
   b.type = 'button'
   b.className = 'star-chip'
-  b.textContent = w.name
+  const nameEl = document.createElement('span')
+  nameEl.textContent = w.name
+  b.appendChild(nameEl)
+  /* THE LEADER. A name in a sky is only a name if you can see which light
+     it belongs to. The hairline is laid out from the solver's final seat,
+     so it always ends on the star and never on the neighbour. Its styling
+     is inline because it is geometry, not chrome. */
+  const leaderEl = document.createElement('span')
+  leaderEl.setAttribute('aria-hidden', 'true')
+  leaderEl.style.cssText =
+    'position:absolute;left:50%;top:32px;width:0;height:1px;' +
+    'transform-origin:0 50%;pointer-events:none;background:linear-gradient(to right,' +
+    'color-mix(in srgb, var(--na-mist) 22%, transparent),' +
+    'color-mix(in srgb, var(--na-gold) 44%, transparent))'
+  b.appendChild(leaderEl)
   // the name of a person who lived is documented; the star it hangs on is
   // this night's own invention, which is why the anchor is procedural
   b.dataset['naClaim'] = 'documented'
@@ -229,7 +248,7 @@ for (const s of atlas.stars) {
   b.style.visibility = 'hidden'
   b.addEventListener('click', () => openPane(s.slug))
   chipsEl.appendChild(b)
-  chipList.push({ el: b, slug: s.slug, chapter: s.chapter })
+  chipList.push({ el: b, name: nameEl, leader: leaderEl, slug: s.slug, chapter: s.chapter })
 }
 
 function stepChapter(dir: number): void {
@@ -349,6 +368,9 @@ interface ChipPlace {
   y: number
   half: number
   above: boolean
+  /** where the star itself landed on the glass, so the leader can reach it */
+  starX: number
+  starY: number
 }
 function syncChips(): void {
   const settled = phase === 'wheel' && !paneOpen && elapsed - chapterChangedAt > 0.9
@@ -363,7 +385,7 @@ function syncChips(): void {
     // narrow stages call the names the way the register does
     const w = roster.get(chip.slug)
     const label = camera.aspect < 0.9 ? (w?.short ?? w?.name ?? '') : (w?.name ?? '')
-    if (chip.el.textContent !== label) chip.el.textContent = label
+    if (chip.name.textContent !== label) chip.name.textContent = label
     const star = atlas.stars.find((s) => s.slug === chip.slug)
     if (!star) continue
     star.sprite.updateWorldMatrix(true, false)
@@ -383,7 +405,15 @@ function syncChips(): void {
       innerWidth - half - 8
     )
     const y = (-chipProject.y * 0.5 + 0.5) * innerHeight + (above ? -48 : 24)
-    places.push({ chip, x, y, half, above })
+    places.push({
+      chip,
+      x,
+      y,
+      half,
+      above,
+      starX: (chipProject.x * 0.5 + 0.5) * innerWidth,
+      starY: (-chipProject.y * 0.5 + 0.5) * innerHeight,
+    })
   }
   // a tiny label solver: any two names that would touch step apart along
   // their own side of the sky until every name has clear air
@@ -410,6 +440,14 @@ function syncChips(): void {
   for (const p of places) {
     p.chip.el.style.left = `${p.x}px`
     p.chip.el.style.top = `${p.y}px`
+    // the leader leaves the type on the side the star is on and stops a
+    // few pixels short of the disc, so it rests against the light
+    const attach = p.above ? 32 : 12
+    const dx = p.starX - p.x
+    const dy = p.starY - p.y - attach
+    p.chip.leader.style.top = `${attach}px`
+    p.chip.leader.style.width = `${Math.max(0, Math.hypot(dx, dy) - 11)}px`
+    p.chip.leader.style.transform = `rotate(${Math.atan2(dy, dx)}rad)`
     p.chip.el.classList.add('lit')
   }
   // the sky is told where the names sit, so its ink stays off them
