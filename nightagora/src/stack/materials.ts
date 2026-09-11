@@ -14,34 +14,9 @@
 
 import { Color, MeshStandardNodeMaterial } from 'three/webgpu'
 import { applyDetail, type DetailScales } from './detail'
+import { loadManifest, type ManifestEntry } from '../manifest'
 
-export type AssetClass =
-  | 'CAPTURED'
-  | 'GENERATED'
-  | 'CC0'
-  | 'CC-BY'
-  | 'CC-BY-SA'
-  | 'PD-ART'
-  | 'REFERENCE-ONLY'
-
-export interface ManifestEntry {
-  id: string
-  path: string
-  class: AssetClass
-  /** the line the museum prints, verbatim */
-  licence: string
-  holder?: string
-  source_url?: string
-  sha256?: string
-  bytes?: number
-  pixels?: number
-  /** GENERATED only: the recipe, and what ran it */
-  prompt?: string
-  model?: string
-  scope: string
-  display: boolean
-  note?: string
-}
+export type { AssetClass, ManifestEntry } from '../manifest/schema'
 
 export interface MaterialSet {
   name: string
@@ -116,10 +91,10 @@ const PLACEHOLDERS: Record<string, Placeholder> = {
 function generatedEntry(name: string, recipe: string): ManifestEntry {
   return {
     id: `library/${name}`,
-    path: `library/${name}/`,
+    path: `${name}/`,
     class: 'GENERATED',
     licence: 'Generated for this work, regenerable from its recipe',
-    scope: 'library',
+    wing: 'library',
     display: true,
     prompt: recipe,
     model: 'procedural',
@@ -164,17 +139,7 @@ export function createMaterialLibrary(): MaterialLibrary {
 
   async function manifestOnce(): Promise<Map<string, ManifestEntry>> {
     if (remote) return remote
-    remote = new Map()
-    try {
-      const res = await fetch(`${ASSET_BASE}manifest.json`)
-      if (res.ok) {
-        const raw = (await res.json()) as { assets?: ManifestEntry[] } | ManifestEntry[]
-        const list = Array.isArray(raw) ? raw : (raw.assets ?? [])
-        for (const e of list) remote.set(e.id, e)
-      }
-    } catch {
-      // no manifest served yet: the placeholders are the whole library
-    }
+    remote = (await loadManifest()).byId
     return remote
   }
 

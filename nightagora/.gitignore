@@ -2,3 +2,4 @@ node_modules/
 dist/
 forge/shots/
 public/na-assets/
+public/na-manifest.json
