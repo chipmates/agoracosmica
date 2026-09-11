@@ -44,7 +44,8 @@
 //   FORGE_VP=mobile  FORGE_TIER=hero node forge/shot-agent.mjs <port> <dir> "$STATES"
 //   then drop `-hero-` from every file name, which is what the base carries.
 
-import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { createHash } from 'node:crypto'
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { deflateSync, inflateSync } from 'node:zlib'
 
 const SHOTS = new URL('./shots/', import.meta.url).pathname
@@ -681,22 +682,64 @@ function frameFile(dir, frame) {
   return hit ? `${SHOTS}${dir}/${hit}` : null
 }
 
+/* THE INCUMBENT MAY BE A PLACEHOLDER. Half of this base was shot before
+   the surface it names existed: the `wing` plate is the In-preparation card
+   over the night sky, and comparing an October afternoon against it measures
+   the difference between two pictures of different things, not a regression
+   in the stack. Those pairs are declared in forge/PARITY-BASE.json and read
+   out as NOT COMPARABLE rather than counted either way.
+
+   The declaration is pinned to the plate's own sha256, so it expires by
+   itself: the day the base is re-shot the hash stops matching, the line
+   comes back as a comparison, and the script says that it did. */
+const BASE_MANIFEST = 'PARITY-BASE.json'
+function placeholders() {
+  const path = new URL(`./${BASE_MANIFEST}`, import.meta.url).pathname
+  if (!existsSync(path)) return { placeholders: {} }
+  try {
+    return JSON.parse(readFileSync(path, 'utf8'))
+  } catch (err) {
+    console.error(`${BASE_MANIFEST} is not readable JSON: ${err.message}`)
+    process.exit(1)
+  }
+}
+const MANIFEST = placeholders()
+const stale = []
+const hashed = new Map()
+/** what this frame's incumbent cannot answer for, or null when it can */
+function notComparable(frame, rule) {
+  const said = MANIFEST.placeholders?.[frame]
+  if (!said || MANIFEST.base !== BASE) return null
+  if (!hashed.has(frame)) {
+    const file = frameFile(BASE, frame)
+    hashed.set(frame, file ? createHash('sha256').update(readFileSync(file)).digest('hex') : '')
+  }
+  if (hashed.get(frame) !== said.sha256) {
+    if (!stale.includes(frame)) stale.push(frame)
+    return null
+  }
+  if ((said.stillComparable ?? []).includes(rule)) return null
+  return said.why
+}
+
 const rows = []
-const add = (frame, line, baseSaid, mine, verdict, note) =>
-  rows.push({ frame, line, base: baseSaid, mine, pass: verdict, note })
+const add = (frame, line, baseSaid, mine, verdict, note, rule) => {
+  const why = notComparable(frame, rule)
+  rows.push({ frame, line, base: baseSaid, mine, pass: why ? null : verdict, note, rule, why })
+}
 
 for (const frame of FRAMES) {
   if (ONLY && frame !== ONLY) continue
   const bf = frameFile(BASE, frame)
   const nf = frameFile(folder, frame)
   if (!bf || !nf) {
-    add(frame, 'the frame itself', bf ? 'present' : 'MISSING', nf ? 'present' : 'MISSING', false, '')
+    add(frame, 'the frame itself', bf ? 'present' : 'MISSING', nf ? 'present' : 'MISSING', false, '', 'frame')
     continue
   }
   const B = readPNG(bf)
   const N = readPNG(nf)
   if (B.width !== N.width || B.height !== N.height) {
-    add(frame, 'the frame itself', `${B.width}x${B.height}`, `${N.width}x${N.height}`, false, 'the two frames are not the same size')
+    add(frame, 'the frame itself', `${B.width}x${B.height}`, `${N.width}x${N.height}`, false, 'the two frames are not the same size', 'frame')
     continue
   }
 
@@ -708,13 +751,14 @@ for (const frame of FRAMES) {
       frame,
       `the base's darkest ${side}px patch at ${dp.rect[0]},${dp.rect[1]}`,
       ...darksLine(B, N, dp.rect),
-      'the ambient term may not lift the black the room falls into'
+      'the ambient term may not lift the black the room falls into',
+      'darks'
     )
   }
 
   for (const r of REGIONS[frame] ?? []) {
     if (r.rule === 'darks') {
-      add(frame, r.name, ...darksLine(B, N, r.rect), r.note)
+      add(frame, r.name, ...darksLine(B, N, r.rect), r.note, r.rule)
     } else if (r.rule === 'scales') {
       const b = threeScales(rectOf(B, r.rect))
       const n = threeScales(rectOf(N, r.rect))
@@ -725,7 +769,8 @@ for (const frame of FRAMES) {
         `coarse ${b.coarse.toFixed(2)} mid ${b.mid.toFixed(2)} fine ${b.fine.toFixed(2)} on ${b.mean.toFixed(1)}`,
         `coarse ${n.coarse.toFixed(2)} mid ${n.mid.toFixed(2)} fine ${n.fine.toFixed(2)} on ${n.mean.toFixed(1)}`,
         within(n.coarse, b.coarse) && within(n.mid, b.mid) && within(n.fine, b.fine),
-        r.note
+        r.note,
+        r.rule
       )
     } else if (r.rule === 'edge') {
       const b = edgeStep(rectOf(B, r.rect))
@@ -736,7 +781,8 @@ for (const frame of FRAMES) {
         `${(b.share * 100).toFixed(1)}% of ${b.crossings} crossings step hard`,
         `${(n.share * 100).toFixed(1)}% of ${n.crossings} crossings step hard`,
         n.share <= b.share + TOL.edge,
-        r.note
+        r.note,
+        r.rule
       )
       if (CROPS) writeCrop(N, r.rect, 7, `parity-${frame}-edge.png`)
     } else if (r.rule === 'noise') {
@@ -748,7 +794,8 @@ for (const frame of FRAMES) {
         `peak ${b.peak.toFixed(3)} at lag ${b.lag.join(',')} on ${b.energy.toFixed(2)}`,
         `peak ${n.peak.toFixed(3)} at lag ${n.lag.join(',')} on ${n.energy.toFixed(2)}`,
         Math.abs(n.peak) <= Math.max(TOL.noise, Math.abs(b.peak)),
-        r.note
+        r.note,
+        r.rule
       )
     } else if (r.rule === 'room') {
       const b = roomOf(B, r.rect)
@@ -759,7 +806,8 @@ for (const frame of FRAMES) {
         `range ${b.range.toFixed(1)} grain ${b.grain.toFixed(2)}`,
         `range ${n.range.toFixed(1)} grain ${n.grain.toFixed(2)}`,
         n.range >= TOL.roomRange && n.grain >= TOL.roomGrain,
-        r.note
+        r.note,
+        r.rule
       )
     } else if (r.rule === 'grain') {
       const b = roomOf(B, r.rect)
@@ -770,7 +818,8 @@ for (const frame of FRAMES) {
         `grain ${b.grain.toFixed(2)}`,
         `grain ${n.grain.toFixed(2)}`,
         n.grain >= TOL.roomGrain,
-        r.note
+        r.note,
+        r.rule
       )
     } else if (r.rule === 'glow') {
       const b = glowReach(B)
@@ -781,7 +830,8 @@ for (const frame of FRAMES) {
         `${b.reach} px off the plate (lift ${b.lift.toFixed(1)})`,
         `${n.reach} px off the plate (lift ${n.lift.toFixed(1)})`,
         n.reach <= TOL.glow,
-        r.note
+        r.note,
+        r.rule
       )
     } else if (r.rule === 'blue') {
       const b = blueOf(B, r.rect)
@@ -792,7 +842,8 @@ for (const frame of FRAMES) {
         `blue minus red ${b.toFixed(1)}`,
         `blue minus red ${n.toFixed(1)}`,
         n >= b * 0.8,
-        r.note
+        r.note,
+        r.rule
       )
     } else if (r.rule === 'bays') {
       const spread = (img) => {
@@ -808,7 +859,8 @@ for (const frame of FRAMES) {
         `${b.means.map((v) => v.toFixed(0)).join(' ')} → step ${b.sd.toFixed(2)}`,
         `${n.means.map((v) => v.toFixed(0)).join(' ')} → step ${n.sd.toFixed(2)}`,
         n.sd >= b.sd * 0.8,
-        r.note
+        r.note,
+        r.rule
       )
     } else if (r.rule === 'rays') {
       const b = rayEnds(B, brightest(B))
@@ -819,7 +871,8 @@ for (const frame of FRAMES) {
         `${b.cut} of ${b.rays} rays end in mid-air`,
         `${n.cut} of ${n.rays} rays end in mid-air`,
         n.cut === 0,
-        r.note
+        r.note,
+        r.rule
       )
     } else if (r.rule === 'disc') {
       const b = stats(rectOf(B, r.rect))
@@ -830,7 +883,8 @@ for (const frame of FRAMES) {
         `${b.mean.toFixed(2)} sd ${b.sd.toFixed(2)}`,
         `${n.mean.toFixed(2)} sd ${n.sd.toFixed(2)}`,
         Math.abs(n.mean - b.mean) <= TOL.darks && n.sd >= 0.6,
-        r.note
+        r.note,
+        r.rule
       )
     } else if (r.rule === 'ring') {
       const b = ringSamples(B, r.centre, r.radius)
@@ -841,7 +895,8 @@ for (const frame of FRAMES) {
         `min ${b.min.toFixed(0)} max ${b.max.toFixed(0)} mean ${b.mean.toFixed(0)}`,
         `min ${n.min.toFixed(0)} max ${n.max.toFixed(0)} mean ${n.mean.toFixed(0)}`,
         n.min >= b.min * 0.8 && n.mean >= b.mean * 0.85,
-        r.note
+        r.note,
+        r.rule
       )
     } else if (r.rule === 'caption') {
       const c = newBright(B, N, r.rect)
@@ -851,7 +906,8 @@ for (const frame of FRAMES) {
         'the base carries no mote here',
         `${(c.share * 100).toFixed(3)}% of the band is newly bright (${c.count} px)`,
         c.share <= TOL.caption,
-        r.note
+        r.note,
+        r.rule
       )
     } else if (r.rule === 'bay-far') {
       const far = stats(rectOf(N, r.rect)).mean
@@ -867,7 +923,8 @@ for (const frame of FRAMES) {
         `near ${bNear.toFixed(1)} far ${bFar.toFixed(1)}, step ${bStep.toFixed(1)}`,
         `near ${near.toFixed(1)} far ${far.toFixed(1)}, step ${nStep.toFixed(1)}`,
         nStep >= bStep * 0.8,
-        r.note
+        r.note,
+        r.rule
       )
     }
   }
@@ -981,8 +1038,27 @@ function writeCrop(img, [x, y, w, h], scale, name) {
 
 /* ── the table ──────────────────────────────────────────────────────────── */
 
+const comparable = rows.filter((r) => r.pass !== null)
+const excluded = rows.filter((r) => r.pass === null)
+const bad = comparable.filter((r) => !r.pass)
+
 if (JSON_OUT) {
-  console.log(JSON.stringify({ folder, base: BASE, rows }, null, 2))
+  console.log(
+    JSON.stringify(
+      {
+        folder,
+        base: BASE,
+        lines: rows.length,
+        comparable: comparable.length,
+        passed: comparable.length - bad.length,
+        notComparable: excluded.length,
+        stale,
+        rows,
+      },
+      null,
+      2
+    )
+  )
 } else {
   const w1 = Math.max(...rows.map((r) => r.frame.length))
   const w2 = Math.max(...rows.map((r) => r.line.length))
@@ -993,15 +1069,24 @@ if (JSON_OUT) {
     `${'frame'.padEnd(w1)}  ${'what is measured'.padEnd(w2)}  ${'the base'.padEnd(w3)}  ${'this folder'.padEnd(w4)}  `
   )
   for (const r of rows) {
+    const verdict = r.pass === null ? 'NOT COMPARABLE' : r.pass ? 'PASS' : 'FAIL'
     console.log(
-      `${r.frame.padEnd(w1)}  ${r.line.padEnd(w2)}  ${String(r.base).padEnd(w3)}  ${String(r.mine).padEnd(w4)}  ${r.pass ? 'PASS' : 'FAIL'}`
+      `${r.frame.padEnd(w1)}  ${r.line.padEnd(w2)}  ${String(r.base).padEnd(w3)}  ${String(r.mine).padEnd(w4)}  ${verdict}`
     )
   }
-  const bad = rows.filter((r) => !r.pass)
-  console.log(`\n${rows.length - bad.length} of ${rows.length} lines PASS`)
+  console.log(`\n${comparable.length - bad.length} of ${comparable.length} comparable lines PASS`)
   for (const r of bad) console.log(` FAIL  ${r.frame}  ${r.line}\n       ${r.note}`)
+  if (excluded.length) {
+    console.log(`\n${excluded.length} line(s) NOT COMPARABLE, per forge/${BASE_MANIFEST}:`)
+    for (const r of excluded) console.log(` ${r.frame}  ${r.line}\n       ${r.why}`)
+  }
+  for (const f of stale)
+    console.log(
+      `\nnote: ${BASE_MANIFEST} calls ${f} a placeholder, but the plate on disk is not the one it names.` +
+        '\n      The base was re-shot, so the line is compared again. Drop the entry.'
+    )
 }
-process.exitCode = rows.some((r) => !r.pass) ? 1 : 0
+process.exitCode = bad.length ? 1 : 0
 
 /* ── PNG, read and written without a dependency ─────────────────────────── */
 

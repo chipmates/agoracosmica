@@ -1,0 +1,16 @@
+{
+  "base": "cut",
+  "note": "Which plates of the parity base are placeholders, and what they can still be asked. forge/parity.mjs reads this file, checks each sha256 against the plate on disk, and reports the pairs it names as NOT COMPARABLE instead of passing or failing them. The hash is the expiry: re-shoot the plate and the entry stops matching, the line is compared again, and the script says so.",
+  "placeholders": {
+    "desktop-wing": {
+      "sha256": "a069b3d9404b5bad91709db32b674fd033bb0bad28f9a22a48af132aa73c3881",
+      "why": "the wing state before any wing module existed: the In-preparation card over the night starfield, not a wing. The darkest patch of a lit October meadow is brighter than the darkest patch of a night sky, which is a difference between two pictures of different things.",
+      "stillComparable": ["noise"]
+    },
+    "mobile-wing": {
+      "sha256": "5e3ff8f105d83279fcb29418cec83f7077937028a0a5ba30b2e4fc3fca07c526",
+      "why": "the same card at 390x844, shot before the wing existed.",
+      "stillComparable": ["noise"]
+    }
+  }
+}
