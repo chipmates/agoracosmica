@@ -384,19 +384,30 @@ async function show(name: string): Promise<void> {
     `the ruler is ${metre}, banded at ${band}, the grid one metre`
   /* WHAT EACH SURFACE IS STANDING ON, printed. A part that reads grey is
      either a set whose bytes never landed or a base colour still holding the
-     placeholder, and the frame has to say which without a second window. */
-  const held = kit.bench
-    .report()
-    .map((b) => `${b.set} ${b.ready ? '' : 'WAITING '}${b.base.map((v) => v.toFixed(2)).join('/')}`)
-  setsEl.textContent =
-    `library sets: ${record.sets.join(', ') || 'none'}` +
-    (record.generated.length ? ` · generated here: ${record.generated.join('; ')}` : '') +
-    ` · ${PROBE}, sun turned to ${KEY.azimuth} degrees · holding ${held.join(' | ')}`
+     placeholder, and the frame has to say which without a second window. The
+     line is rewritten every frame while anything is still in flight: a card
+     that says WAITING under a dressed roof is as misleading as one that says
+     nothing under a grey one. */
+  standingOn = record
+  writeHolding()
   document.title = `${current} · parts kit`
 }
 
 function round(v: number): number {
   return Math.round(v * 100) / 100
+}
+
+let standingOn: Part['userData']['part'] | null = null
+
+function writeHolding(): void {
+  if (!standingOn) return
+  const held = kit.bench
+    .report()
+    .map((b) => `${b.set} ${b.ready ? '' : 'WAITING '}${b.base.map((v) => v.toFixed(2)).join('/')}`)
+  setsEl.textContent =
+    `library sets: ${standingOn.sets.join(', ') || 'none'}` +
+    (standingOn.generated.length ? ` · generated here: ${standingOn.generated.join('; ')}` : '') +
+    ` · ${PROBE}, sun turned to ${KEY.azimuth} degrees · holding ${held.join(' | ')}`
 }
 
 if (!current) current = names[0] as string
@@ -416,6 +427,7 @@ let last = performance.now()
 function tick(now: number): void {
   const dt = Math.min(0.1, (now - last) / 1000)
   last = now
+  if (kit.bench.report().some((b) => !b.ready)) writeHolding()
   stack.render(dt)
   requestAnimationFrame(tick)
 }
