@@ -23,7 +23,6 @@ try {
     ['sky', 'sky', { chapter: 0 }], ['crossing', 'crossing', { crossing: 'portrait' }],
     ['camp-shore', 'camp', { camp: 'shore' }], ['camp-gate', 'camp', { camp: 'gate' }],
     ['camp-via', 'camp', { camp: 'via' }], ['camp-vista', 'camp', { camp: 'vista' }],
-    ['council', 'council', {}],
   ]) {
     await p.evaluate(([ph, o]) => window.__forge.jump(ph, o), [phase, opts])
     await p.waitForTimeout(400)

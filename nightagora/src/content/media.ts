@@ -12,8 +12,3 @@ export const PORTRAIT_AURELIUS_ALT =
 
 /** The ambient night bed (sound pass). */
 export const AUDIO_AMBIENT = mediaUrl('/trailers/experience/night-agora-ambient.webm')
-
-/** The council preview: "The Calling That Won't Shut Up", four voices. */
-export const AUDIO_COUNCIL = mediaUrl(
-  '/trailers/councils/the-calling-that-wont-shut-up/en/the-calling-that-wont-shut-up_trailer_en.mp3'
-)

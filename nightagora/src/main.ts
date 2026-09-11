@@ -4,7 +4,6 @@ import { createAgora } from './scenes/agora'
 import { createKeeper } from './scenes/keeper'
 import { createCrossing } from './scenes/crossing'
 import { createCamp, groundDrop } from './scenes/camp'
-import { createCouncil } from './scenes/council'
 import { createAtlas } from './scenes/atlas'
 import { createMandala } from './scenes/mandala'
 import { createHotspots } from './core/hotspots'
@@ -12,13 +11,12 @@ import { createChapters } from './core/chapters'
 import { CAMP_SCRIPT, FIRE_SCRIPT } from './content/keeper-script'
 import { LABELS, STATIONS, TRACES, TRACE_WINDOWS } from './content/carnuntum'
 import { ambience } from './core/ambience'
-import { COUNCIL_DONE } from './content/council'
 import { WANDERERS } from './content/wanderers'
 import { CONSTELLATIONS, OPEN_WORLD } from './content/constellations'
 import { channel } from './core/motion'
 import { mediaUrl } from './content/media'
 
-type Phase = 'transit' | 'held' | 'descent' | 'agora' | 'sky' | 'crossing' | 'camp' | 'council'
+type Phase = 'transit' | 'held' | 'descent' | 'agora' | 'sky' | 'crossing' | 'camp'
 
 const stage = document.getElementById('stage')
 const status = document.getElementById('status')
@@ -71,7 +69,6 @@ function keeperExit(): void {
 }
 const crossing = createCrossing(scene, () => setPhase('camp'))
 const camp = createCamp(scene)
-const council = createCouncil(scene, () => councilEnded())
 const atlas = createAtlas(scene)
 const mandala = createMandala(scene)
 
@@ -192,14 +189,6 @@ const HUB_SPOTS = [
     },
   },
   {
-    id: 'council',
-    label: "Tonight's Council",
-    // on the engraved circle BEFORE the fire, never behind the flame
-    pos: new Vector3(0, -0.68, -3.7),
-    posNarrow: new Vector3(0, -0.66, -3.3),
-    open: () => conveneCouncil(),
-  },
-  {
     id: 'commons',
     label: 'The Commons',
     pos: new Vector3(-4.6, 0.6, -8.6),
@@ -219,11 +208,6 @@ document.getElementById('inst-library')?.addEventListener('click', () =>
     'Every night and every council of the thirty, gathered in one place.'
   )
 )
-
-function councilEnded(): void {
-  setStatus(COUNCIL_DONE)
-  showDoor(false)
-}
 
 // WebGL is the proven backend tonight; ?webgpu opts into the newer path
 // until it is verified on real hardware (see FORGE-STATE DEEPEN list).
@@ -542,8 +526,7 @@ function syncChips(): void {
 }
 
 /** The short-dawn rhyme: one diamond-ring breath carries you home to
-    the fire. The council is not forced on the returner: it waits on the
-    circle, chosen by its own mark. */
+    the fire. */
 function returnFromCamp(): void {
   if (phase !== 'camp') return
   ringEl.classList.add('lit')
@@ -554,13 +537,6 @@ function returnFromCamp(): void {
     ringEl.classList.add('passing')
     window.setTimeout(() => ringEl.classList.remove('passing'), 1200)
   }, 460)
-}
-
-/** The circle convenes only when asked. */
-function conveneCouncil(): void {
-  if (phase !== 'agora') return
-  setPhase('council')
-  council.begin()
 }
 
 /** From the sky back down to the hearth, the gaze easing all the way. */
@@ -580,7 +556,7 @@ const smooth = (a: number, b: number, k: number): number => {
 }
 // the overture stays clean: a title card in the black breath, then eight
 // questions drifting past on the way down. The Echo disclosure lives
-// where the figures speak (pane ink, keeper colophon, council cartouche).
+// where the figures speak (the pane's ink and the keeper's colophon).
 const DESCENT_STATIONS: Array<[number, number]> = [
   [0.24, 0.34], // The Descent · eight questions (over the emerging ring)
   [0.38, 0.435], // Who am I?
@@ -824,35 +800,9 @@ syncSoundLabel()
 // (music standard: wakeMusic() fires with the first gesture that opens
 // the descent, for first and returning nights alike)
 
-// the council voices hold the floor; the ambient bed steps back
+// a voice holding the floor ducks the ambient bed
 addEventListener('na-voice', (e) => {
   ambience.duck(Boolean((e as CustomEvent).detail))
-})
-
-// ---- the Forward Door: after the council, the one door that faces
-// the morning ----
-const doorNode = document.getElementById('forward-door')
-const doorEl: HTMLElement = doorNode ?? document.createElement('div')
-
-function showDoor(instant: boolean): void {
-  // the council's letterpress yields the frame to the way onward
-  document.getElementById('council-topic')?.classList.remove('lit')
-  const names = document.getElementById('council-names')
-  if (names) names.hidden = true
-  const cartouche = document.getElementById('cartouche')
-  if (cartouche) cartouche.hidden = true
-  doorEl.hidden = false
-  if (instant) doorEl.classList.add('lit')
-  else requestAnimationFrame(() => requestAnimationFrame(() => doorEl.classList.add('lit')))
-}
-function hideDoor(): void {
-  doorEl.classList.remove('lit')
-  doorEl.hidden = true
-}
-doorEl.querySelector('.door-stay')?.addEventListener('click', () => {
-  hideDoor()
-  council.stop()
-  setPhase('agora')
 })
 
 // each poem line appears once, at its appointed threshold
@@ -895,11 +845,8 @@ declare global {
           gaze?: number
           chapter?: number
           figure?: string
-          coda?: number
           /** Shell close-ups for THE EYES; the journey continues to use real input. */
           shell?: 'sitting' | 'instruments' | 'nights'
-          /** Optional deterministic council arrival time, in seconds. */
-          councilAt?: number
         }
       ) => void
       freeze: (t: number) => void
@@ -1051,7 +998,6 @@ window.__forge = {
     setPhase(p)
     // each jump is a single composed moment: no scene leaks across
     if (p !== 'crossing') crossing.stop()
-    if (p !== 'council') council.stop()
     if (p !== 'camp') {
       campReveal = 0
       campYield = 0
@@ -1075,7 +1021,6 @@ window.__forge = {
       : p === 'descent' ? smooth(0.2, 0.98, desc) * 0.8
       : p === 'crossing' ? 0.12
       : p === 'camp' ? 0
-      : p === 'council' ? 1
       : p === 'sky' ? 0
       : p === 'agora' ? 1
       : 1)
@@ -1110,15 +1055,8 @@ window.__forge = {
       atlas.visible(false)
       skyDress(false)
     }
-    if (p !== 'agora' && p !== 'sky' && p !== 'camp' && p !== 'council' && p !== 'descent')
+    if (p !== 'agora' && p !== 'sky' && p !== 'camp' && p !== 'descent')
       camera.rotation.set(0, 0, 0)
-    if (p === 'council') {
-      agoraReveal = 1
-      camera.rotation.set(-0.12, 0, 0)
-      verseEl.classList.remove('lit')
-      council.forgeStage(camera, opts.councilAt)
-      if (opts.coda) showDoor(true)
-    }
     railEl.hidden = p === 'transit' || p === 'held'
     if (p === 'camp') {
       campReveal = 1
@@ -1246,7 +1184,6 @@ function setPhase(next: Phase): void {
     setStatus(autoRide ? 'The night agora · scroll to look up' : 'The night agora')
     verseShow('Questions shine within you')
   }
-  if (next !== 'council') hideDoor()
   if (next === 'sky') {
     setStatus('')
     chapterChangedAt = elapsed
@@ -1262,10 +1199,6 @@ function setPhase(next: Phase): void {
     // one short breath only: the voice line needs the frame to itself
     verseShow('You enter a life through its light', 2900)
   }
-  if (next === 'council') {
-    setStatus('')
-    verseShow('This is the Agora.')
-  }
   hotspots.set(next === 'camp' ? CAMP_SPOTS : next === 'agora' ? HUB_SPOTS : [])
   drawnEl.hidden = true
   if (next !== 'camp') {
@@ -1279,7 +1212,7 @@ function setPhase(next: Phase): void {
     // via, and an Euler read off that quaternion carries z = pi. Easing
     // only x and y then leaves the hub hanging upside down (round 9).
     camera.position.set(0, 0, 0)
-    camera.rotation.set(next === 'agora' || next === 'council' ? -0.12 : 0, 0, 0)
+    camera.rotation.set(next === 'agora' ? -0.12 : 0, 0, 0)
     if (camera.fov !== 46) {
       camera.fov = 46
       camera.updateProjectionMatrix()
@@ -1387,10 +1320,6 @@ function push(delta: number): void {
       stepChapter(skyAcc > 0 ? 1 : -1)
       skyAcc = 0
     }
-  }
-  if (phase === 'council' && delta > 0 && council.active()) {
-    council.stop()
-    councilEnded()
   }
 }
 
@@ -1532,7 +1461,7 @@ function frame(now: number): void {
   )
 
   const revealTarget =
-    phase === 'agora' || phase === 'council' ? 1
+    phase === 'agora' ? 1
     // looking up, the court is scenery: it still frames the sky from below,
     // but its own embers stop crossing the wheel's letterpress (and the
     // heaviest fragment shader in the night stops paying full price)
@@ -1543,7 +1472,7 @@ function frame(now: number): void {
   // every other blend keeps the night's slow breath
   agoraReveal +=
     (revealTarget - agoraReveal) *
-    Math.min(1, dt * (reducedMotion ? 20 : phase === 'agora' || phase === 'council' ? 2.2 : 1.2))
+    Math.min(1, dt * (reducedMotion ? 20 : phase === 'agora' ? 2.2 : 1.2))
 
   if (phase === 'agora') {
     lookUp += (lookTarget - lookUp) * Math.min(1, dt * 4)
@@ -1632,7 +1561,7 @@ function frame(now: number): void {
   const birthTarget =
     phase === 'transit' || phase === 'held' ? 0
     : phase === 'descent' ? smooth(0.2, 0.98, desc) * 0.8
-    : phase === 'agora' || phase === 'council' ? 1
+    : phase === 'agora' ? 1
     : phase === 'crossing' ? 0.12
     : phase === 'camp' ? 0
     : phase === 'sky' ? 0
@@ -1649,7 +1578,7 @@ function frame(now: number): void {
     // at the hub they read as cheap floating blobs against the true field
     lanterns:
       phase === 'sky' ? Math.max(0.08, 0.55 * (1 - atlasReveal))
-      : phase === 'agora' || phase === 'council' ? 0.05
+      : phase === 'agora' ? 0.05
       : phase === 'crossing' || phase === 'camp' ? 0
       : 0.3,
     sinceFlash: flashAt < 0 ? -1 : elapsed - flashAt,
@@ -1678,18 +1607,12 @@ function frame(now: number): void {
     crossing.update(dt, elapsed)
   }
 
-  // the council: back at the seated eye, the circle convening
-  if (phase === 'council') {
-    camera.rotation.x += (-0.12 - camera.rotation.x) * Math.min(1, dt * 2.4)
-    camera.rotation.y += (0 - camera.rotation.y) * Math.min(1, dt * 2.4)
-    council.update(dt, elapsed, camera)
-  }
   keeperScene.update(dt)
   ambience.update(dt)
-  agora.update({ reveal: agoraReveal, elapsed, speak: keeperScene.speak(), blaze: council.blaze() })
+  agora.update({ reveal: agoraReveal, elapsed, speak: keeperScene.speak() })
 
-  // the world's points breathe with their stage; the hub offers the
-  // council after the arrival breath, the camp its learning paths
+  // the world's points breathe with their stage: the hub after the
+  // arrival breath, the camp its learning paths
   const spotsVisible =
     (phase === 'camp' && campReveal > 0.6 && !chapters.isOpen() && !duskUp) ||
     (phase === 'agora' &&
@@ -1752,7 +1675,7 @@ let dragVX = 0
 let dragVY = 0
 let dragging = false
 function dragAllowed(): boolean {
-  return (phase === 'agora' || phase === 'camp' || phase === 'council') && !paneOpen
+  return (phase === 'agora' || phase === 'camp') && !paneOpen
 }
 /** his ground gives the eye real headroom: looking UP is a gesture there,
     and the sky answers it (the founder's law) */
@@ -1778,7 +1701,7 @@ addEventListener('pointercancel', () => {
 })
 function freeLookAllowed(): boolean {
   if (reducedMotion || frozen) return false
-  return phase === 'agora' || phase === 'sky' || phase === 'camp' || phase === 'council'
+  return phase === 'agora' || phase === 'sky' || phase === 'camp'
 }
 function freeLookTarget(): number {
   return freeLookAllowed() ? pointerNX : 0

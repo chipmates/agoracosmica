@@ -18,7 +18,6 @@ const STATES = [
   { name: 'descent-question', jump: ['descent', { desc: 0.55 }] },
   { name: 'descent-late', jump: ['descent', { desc: 0.88 }] },
   { name: 'descent-flare', jump: ['descent', { desc: 0.965 }] },
-  { name: 'forward-door', jump: ['council', { coda: 1 }] },
   { name: 'agora', jump: ['agora', {}] },
   { name: 'keeper', jump: ['agora', { keeper: 2 }] },
   { name: 'sky-i', jump: ['sky', { chapter: 0 }] },
@@ -36,7 +35,6 @@ const STATES = [
   { name: 'trace', jump: ['camp', { camp: 'trace' }] },
   { name: 'hearth', jump: ['camp', { camp: 'hearth' }] },
   { name: 'dusk', jump: ['camp', { camp: 'dusk' }] },
-  { name: 'council', jump: ['council', {}] },
 ]
 const VIEWPORTS = [
   { tag: 'desktop', width: 1512, height: 950, deviceScaleFactor: 1 },

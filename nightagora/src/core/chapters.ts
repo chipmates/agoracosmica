@@ -1,7 +1,7 @@
 /* HIS NIGHTS — the twelve chapters, told at the crossed-log fire. Real R2
    audio, chapter one enters the story. The Echo-voice law holds in the
    colophon; the ambient bed ducks while a night is told (the same na-voice
-   event the council uses).
+   event the ambient bed listens for).
 
    THE OBJECT (2026-07-26): this is not a player, it is a LEAF. A table of
    contents, set like letterpress, standing in the camp on the same side as

@@ -202,8 +202,7 @@ try {
       await shot('STUCK-dusk')
     }
 
-    // 7 · the way home: the hearth keeper walks you back to the fire,
-    // where the council waits on its mark, chosen not forced
+    // 7 · the way home: the hearth keeper walks you back to the fire
     const exit = page.locator('.keeper-exit')
     try {
       await exit.waitFor({ state: 'visible', timeout: 30000 })
@@ -211,19 +210,9 @@ try {
       if (await waitPhase('agora', 10000)) {
         await page.waitForTimeout(3200)
         await shot('hub-return')
-        const councilSpot = page.locator('.hotspot', { hasText: "Tonight's Council" })
-        await councilSpot.waitFor({ state: 'visible', timeout: 8000 })
-        await councilSpot.click()
-        if (await waitPhase('council', 8000)) {
-          await page.waitForTimeout(4000)
-          await shot('council')
-          await page.waitForTimeout(4000)
-          await shot('council-seated')
-        }
       }
     } catch (err) {
       console.log('[journey] way-home wait failed:', String(err).split('\n')[0])
-      // a stuck way home is worth a diagnosis, not just a screenshot
       const k = await page.evaluate(() => {
         const host = document.getElementById('keeper')
         const exit = host?.querySelector('.keeper-exit')
@@ -235,7 +224,7 @@ try {
           exitText: exit?.textContent?.trim(),
         }
       })
-      console.log('[journey] the way home to the council never opened', JSON.stringify(k))
+      console.log('[journey] the way home never opened', JSON.stringify(k))
       await shot('STUCK-way-home')
     }
   }

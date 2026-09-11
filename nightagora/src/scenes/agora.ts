@@ -148,8 +148,6 @@ export interface AgoraState {
   elapsed: number
   /** 0..1 while the Keeper speaks: the fire listens and leans in */
   speak?: number
-  /** 0..1 while the council convenes: hearth scales toward blaze */
-  blaze?: number
 }
 
 /**
@@ -177,7 +175,6 @@ export function createAgora(scene: Scene) {
   const uFlick = uniform(1)
   const uFlame = uniform(0)
   const uLean = uniform(0)
-  const uBlaze = uniform(0)
 
   // ------------------------------------------------------------ the laws
   const sn = (p: N): N => mx_noise_float(p)
@@ -363,7 +360,7 @@ export function createAgora(scene: Scene) {
 
     // --- the worn path -------------------------------------------------
     // where feet cross, marble goes paler and glossier and loses its vein:
-    // the lane from the seat to the fire, and the ring the council walks
+    // the lane from the seat to the fire, and the ring around it
     const lane = oneMinus(smoothstep(0.45, 1.55, abs(P.x)))
       .mul(smoothstep(-6.3, -5.0, P.z))
       .mul(oneMinus(smoothstep(0.3, 1.9, P.z)))
@@ -1335,7 +1332,7 @@ export function createAgora(scene: Scene) {
       .mul(smoothstep(0.0, 0.06, kv))
       .mul(oneMinus(smoothstep(0.55, 1.0, kv)))
       .mul(uFlick)
-      .mul(float(0.62).add(uBlaze.mul(0.4)))
+      .mul(0.62)
       .mul(uR)
   }
   quadField(
@@ -1500,32 +1497,26 @@ export function createAgora(scene: Scene) {
     // ONE fire, many flickers: the source stays steady, the light it throws
     // trembles a little more. All motion is sine-woven and deterministic.
     const sp = s.speak ?? 0
-    const bz = s.blaze ?? 0
-    uBlaze.value = bz
     const fl = reduced
       ? 0.9
       : 0.76 + 0.12 * Math.sin(t * 7.1) + 0.07 * Math.sin(t * 11.7 + 1.3) + 0.05 * Math.sin(t * 19.3 + 4.1)
     uFlick.value = 0.82 + 0.32 * fl
-    uFlame.value = r * (0.82 + 0.18 * fl) * (1 + 0.1 * sp) * (1 + 0.28 * bz)
+    uFlame.value = r * (0.82 + 0.18 * fl) * (1 + 0.1 * sp)
     uLean.value = reduced ? 0.012 : 0.03 * Math.sin(t * 0.42) + 0.015 * Math.sin(t * 1.1 + 2)
 
     // the flame breathes in scale as well as in noise: deeper while its
-    // keeper speaks, and it rises hearth-to-blaze when the council sits
+    // keeper speaks
     const breath = reduced
       ? 1
       : 1 + (0.035 + 0.02 * sp) * Math.sin(t * 2.1) + 0.02 * Math.sin(t * 3.7 + 1.1)
-    // The gathered fire broadens across its coal bed. Its crown keeps the
-    // council's title and the narrow playbill in dark air.
-    const rise = 1 + (window.innerWidth / window.innerHeight < 0.9 ? -0.18 : 0.01) * bz
-    const wide = 1 + 0.22 * bz
-    flame.scale.set(FLAME_W * wide, FLAME_H * breath * rise, 1)
-    flame.position.y = FLAME_BASE + (FLAME_H * breath * rise) / 2
-    tongue.scale.set(TONGUE_W * wide, TONGUE_H * breath * rise, 1)
-    tongue.position.y = FLAME_BASE + (TONGUE_H * breath * rise) / 2
-    refl.scale.set(REFL_W * wide, REFL_H * breath * rise, 1)
-    refl.position.y = 2 * FLOOR_Y - FLAME_BASE - (REFL_H * breath * rise) / 2
+    flame.scale.set(FLAME_W, FLAME_H * breath, 1)
+    flame.position.y = FLAME_BASE + (FLAME_H * breath) / 2
+    tongue.scale.set(TONGUE_W, TONGUE_H * breath, 1)
+    tongue.position.y = FLAME_BASE + (TONGUE_H * breath) / 2
+    refl.scale.set(REFL_W, REFL_H * breath, 1)
+    refl.position.y = 2 * FLOOR_Y - FLAME_BASE - (REFL_H * breath) / 2
 
-    airMat.opacity = r * (0.24 + 0.06 * Math.sin(t * 1.7)) * (1 + 0.4 * bz)
+    airMat.opacity = r * (0.24 + 0.06 * Math.sin(t * 1.7))
   }
 
   return { update }

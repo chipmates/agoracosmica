@@ -49,7 +49,7 @@ const PRESS = `
   text-rendering: optimizeLegibility;
   font-feature-settings: 'kern' 1, 'liga' 1;
 }
-/* the hub keeper stands under the council's own mark, so his block sits
+/* the hub keeper stands under the sky's own mark, so his block sits
    lower there: two letterpress lines a hand apart read as one confused
    stack (round 1). German is the case that decides it, three lines of
    greeting where English takes two (round 3). */
@@ -82,7 +82,7 @@ body[data-phase='camp'] #keeper .keeper-shade {
 /* the seal: the mark that a voice is speaking here, carrying the speaking
    signal so the type has a heartbeat without a pulse. A lozenge, never a
    ring: in this night a ring with a bead means a place you can press, and
-   the keeper's mark stacked under the council's read as a second button
+   the keeper's mark stacked under the sky's read as a second button
    (round 2). */
 #keeper .keeper-seal {
   width: 15px; height: 15px; margin: 0 auto 12px;
@@ -104,7 +104,7 @@ body[data-phase='camp'] #keeper .keeper-shade {
 
 /* his name is cut, not labelled: serif capitals with inscription spacing.
    In sans caps it was the same register as every hotspot label in the
-   night, and under the council's own mark the two read as one stack
+   night, and under the sky's own mark the two read as one stack
    (round 3, German mobile). The station line under it stays a label. */
 #keeper .keeper-name {
   font-family: var(--serif); font-weight: 400;
@@ -133,7 +133,7 @@ body[data-phase='camp'] #keeper .keeper-shade {
   opacity: calc(0.5 + var(--speak) * 0.5);
 }
 #keeper.quiet .keeper-rule { display: none; }
-/* and at the hub his seal goes with it: the council's own ring hangs a
+/* and at the hub his seal goes with it: the sky's own ring hangs a
    hand above this block, and two marks that close read as one stack of
    buttons. His name in wide caps is anchor enough there. */
 #keeper.quiet .keeper-seal { display: none; }
@@ -362,7 +362,7 @@ body.forge #keeper .keeper-exit { animation: none; }
   #keeper { max-width: none; }
   body[data-phase='agora'] #keeper { bottom: calc(80px + env(safe-area-inset-bottom)); }
   /* the hub block is anchored at its foot, so every millimetre saved
-     inside it lowers the top away from the council's label */
+     inside it lowers the top away from the mark's label */
   #keeper.quiet .keeper-role { margin-top: 6px; }
   #keeper.quiet .keeper-exit { margin-top: 14px; }
   #keeper.quiet .keeper-note { margin-top: 12px; }
@@ -374,7 +374,7 @@ body.forge #keeper .keeper-exit { animation: none; }
   #keeper .keeper-dialogue { margin-top: 13px; }
   #keeper.quiet .keeper-dialogue { margin-top: 10px; }
   /* the hub greeting runs three lines in German where English takes two,
-     and the council's mark hangs right above it: the quote sets tighter
+     and the sky's mark hangs right above it: the quote sets tighter
      on a phone so his name never climbs into that label (round 5) */
   #keeper .keeper-line { font-size: 17.5px; line-height: 1.38; }
   #keeper .keeper-phrase { font-size: 16.5px; line-height: 1.46; }

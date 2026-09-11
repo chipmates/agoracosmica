@@ -77,19 +77,55 @@
        ligatures go, and a wrapped line gets air instead of the browser's
        default 1.2. Components below still set their own where the line has
        a reason of its own. ---- */
-    .brand, .tagline, .status, .plate-kicker, .plate-voices, .trace-kicker,
-    .trace-source, .dusk-kicker, .drawn-kicker, .drawn-status, .inst-kicker,
-    .chapters-kicker, .chapters-ink, .chapters-now, .cartouche-honesty,
-    .cartouche-title, .council-kicker, .council-register, .council-name,
-    .door-kicker, .door-trust, .pane-kicker, .pane-tradition, .pane-years,
-    .pane-ink, .pane-sib-label, .pane-drawn, .gate-links, .sitting-stone,
-    .hotspot-label, .atlas-site, .atlas-deg, .star-chip, .portrait-name,
-    .portrait-years, .portrait-note, .descent-kicker, .chapter-btn,
-    #sky-invite, #chapter-marks, #rail button, #dusk-return, #dusk-concept,
-    #descent-skip, #sky-return, #overture-skip, .door-enter, .door-stay,
-    .gate-actions button, .pane-enter, .pane-sibling, .pane-close,
-    .inst-links button, .inst-links a, .inst-close, .drawn-close,
-    .chapters-toggle, .chapters-close, .cartouche-toggle {
+    .brand,
+.tagline,
+.status,
+.plate-kicker,
+.plate-voices,
+.trace-kicker,
+.trace-source,
+.dusk-kicker,
+.drawn-kicker,
+.drawn-status,
+.inst-kicker,
+.chapters-kicker,
+.chapters-ink,
+.chapters-now,
+.pane-kicker,
+.pane-tradition,
+.pane-years,
+.pane-ink,
+.pane-sib-label,
+.pane-drawn,
+.gate-links,
+.sitting-stone,
+.hotspot-label,
+.atlas-site,
+.atlas-deg,
+.star-chip,
+.portrait-name,
+.portrait-years,
+.portrait-note,
+.descent-kicker,
+.chapter-btn,
+#sky-invite,
+#chapter-marks,
+#rail button,
+#dusk-return,
+#dusk-concept,
+#descent-skip,
+#sky-return,
+#overture-skip,
+.gate-actions button,
+.pane-enter,
+.pane-sibling,
+.pane-close,
+.inst-links button,
+.inst-links a,
+.inst-close,
+.drawn-close,
+.chapters-toggle,
+.chapters-close {
       line-height: var(--press-lead);
       font-variant-ligatures: none;
     }
@@ -543,7 +579,7 @@
         color-mix(in srgb, var(--na-gold) 12%, transparent) 0%,
         color-mix(in srgb, var(--na-gold) 68%, transparent) 100%);
     }
-    /* ---- the declarative line + links, shared by the Sitting ---- */
+
     /* the one line that carries a legal consequence, so it is set to be
        read: sentence case, a real measure, and the link marked as a link */
     .gate-declare {
@@ -570,7 +606,7 @@
     }
     /* ---- the doors of the night: one plate, one sheen, three places
        (the Sitting's own, the figure pane's, the Forward Door's) ---- */
-    .gate-actions button, .pane-enter, .door-enter {
+    .gate-actions button, .pane-enter {
       position: relative;
       background:
         linear-gradient(to bottom,
@@ -579,9 +615,10 @@
       box-shadow: inset 0 0 24px color-mix(in srgb, var(--na-gold) 6%, transparent);
       transition: border-color 0.3s ease, color 0.3s ease, box-shadow 0.4s ease;
     }
-    .gate-actions button:hover, .gate-actions button:focus-visible,
-    .pane-enter:hover, .pane-enter:focus-visible,
-    .door-enter:hover, .door-enter:focus-visible {
+    .gate-actions button:hover,
+.gate-actions button:focus-visible,
+.pane-enter:hover,
+.pane-enter:focus-visible {
       box-shadow:
         inset 0 0 30px color-mix(in srgb, var(--na-gold) 11%, transparent),
         0 0 26px color-mix(in srgb, var(--na-gold) 9%, transparent);
@@ -610,8 +647,6 @@
     }
     .gate-links a:hover, .gate-links a:focus-visible { color: var(--na-gold); outline: none; }
 
-    /* ---- the Sitting: the one contract of the night, taken at the
-       first hearth (concept-revision §2b) ---- */
     /* ---- THE PLATES — the three surfaces of the night that are objects and
        not voices (the contract, the honest placeholder, the instruments).
        One plate: abyss with the sky still in its top edge, a gold hairline,
@@ -812,112 +847,11 @@
     }
     .inst-close:hover, .inst-close:focus-visible { color: var(--na-gold); outline: none; }
 
-    /* ---- the Forward Door: the eclipse mark as a doorway, a hairline
-       of dawn, and the way into the Agora ---- */
-    #forward-door {
-      position: fixed; inset: 0; z-index: 5;
-      display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
-      text-align: center; padding: 24px 24px calc(9vh + env(safe-area-inset-bottom));
-      opacity: 0; transition: opacity 2.2s ease;
-      pointer-events: none;
-    }
-    #forward-door.lit { opacity: 1; pointer-events: auto; }
-    #forward-door[hidden] { display: none; }
-    /* the hairline of dawn under the door: it has to hold the letterpress
-       that stands in it, so it comes up higher and carries a little of the
-       night's own ink at its foot */
-    .door-dawn {
-      position: absolute; left: 0; right: 0; bottom: 0; height: 46%;
-      background: linear-gradient(to top,
-        color-mix(in srgb, var(--na-abyss) 72%, transparent) 0%,
-        color-mix(in srgb, var(--na-horizon) 58%, transparent) 46%,
-        transparent 100%);
-      pointer-events: none;
-    }
-    .door-mark {
-      position: relative; width: 84px; height: 84px;
-      border: 1px solid color-mix(in srgb, var(--na-gold) 70%, transparent);
-      border-radius: 50%;
-      box-shadow: 0 0 46px color-mix(in srgb, var(--na-gold) 18%, transparent);
-    }
-    .door-bead {
-      position: absolute; top: 4px; right: 14px;
-      width: 7px; height: 7px; border-radius: 50%;
-      background: var(--na-starlight);
-      box-shadow: 0 0 14px var(--na-starlight);
-    }
-    /* the kicker is the lintel of the door, so it is ruled on both sides */
-    .door-kicker {
-      margin-top: 34px;
-      display: flex; align-items: center; justify-content: center; gap: 16px;
-      font-family: var(--sans);
-      font-size: 10px; letter-spacing: 0.34em; text-indent: 0.34em;
-      text-transform: uppercase; color: var(--na-gold);
-      text-shadow: var(--ink-night);
-    }
-    .door-kicker::before, .door-kicker::after {
-      content: ''; width: 24px; height: 1px; flex: none; background: var(--rule);
-    }
-    .door-title {
-      margin-top: 14px;
-      font-family: var(--serif);
-      font-size: clamp(24px, 3.2vw, 34px); line-height: 1.16;
-      letter-spacing: 0.012em; text-wrap: balance;
-      color: var(--na-starlight);
-      text-shadow: var(--ink-night);
-    }
-    /* the trust line stands on lit marble and wraps on a phone: it gets
-       leading, a balanced break, and enough ink to survive the fire */
     /* no ch measure on a tracked capital line: the ch box knows nothing
        about letter-spacing, so 40ch broke the trust line into three stubs
        on a wide stage (round 1). The balance is what shapes it. */
-    .door-trust {
-      margin-top: 16px;
-      font-family: var(--sans);
-      font-size: 9px; letter-spacing: 0.26em; text-indent: 0.26em;
-      text-transform: uppercase; text-wrap: balance;
-      color: color-mix(in srgb, var(--na-mist) 92%, var(--na-starlight));
-      text-shadow: var(--ink-night);
-    }
-    .door-actions {
-      margin-top: 32px;
-      display: flex; gap: 20px; align-items: center; flex-wrap: wrap; justify-content: center;
-    }
-    .door-enter {
-      display: inline-block;
-      border: 1px solid color-mix(in srgb, var(--na-gold) 45%, transparent);
-      min-height: 44px; padding: 14px 30px;
-      font-family: var(--sans);
-      font-size: 10px; letter-spacing: 0.3em; text-indent: 0.3em;
-      text-transform: uppercase; color: var(--na-gold);
-      text-decoration: none;
-    }
-    .door-enter:hover, .door-enter:focus-visible { border-color: var(--na-gold); color: var(--na-starlight); outline: none; }
-    .door-stay {
-      position: relative;
-      background: none; border: none; cursor: pointer;
-      min-height: 44px; padding: 10px 14px;
-      font-family: var(--sans);
-      font-size: 9px; letter-spacing: 0.3em; text-indent: 0.3em;
-      text-transform: uppercase;
-      color: color-mix(in srgb, var(--na-mist) 90%, transparent);
-      text-shadow: var(--ink-night);
-      transition: color 0.3s ease;
-    }
-    .door-stay::after {
-      content: ''; position: absolute; left: 50%; bottom: 11px;
-      transform: translateX(-50%);
-      width: 0; height: 1px; background: var(--rule);
-      transition: width 0.4s ease;
-    }
-    .door-stay:hover, .door-stay:focus-visible { color: var(--na-gold); outline: none; }
-    .door-stay:hover::after, .door-stay:focus-visible::after { width: calc(100% - 28px); }
-    @media (max-aspect-ratio: 9/10) {
-      /* the mark yields on narrow: the fire itself is the doorway */
-      .door-mark { display: none; }
-      #forward-door { padding-bottom: calc(13vh + env(safe-area-inset-bottom)); }
-    }
-    body.forge #forward-door, body.forge #rail button { transition: none !important; }
+
+    body.forge #rail button { transition: none !important; }
 
     /* the impatient door: visible only while totality holds */
     #overture-skip {
@@ -977,7 +911,6 @@
     .hotspot:focus-visible { outline: none; }
     body.forge .hotspot { transition: none !important; }
 
-    /* ---- the chapters: his nights, told in his Echo's voice ---- */
     /* the shell's staging for his nights only. The element's own press
        (chapters-press) ships after this one and owns the composition: it is
        a leaf, so nothing here gives it a box, an edge or a shadow. */
@@ -1225,7 +1158,6 @@
     body.forge .star-chip, body.forge #constellation-plate, body.forge #sky-invite,
     body.forge #chapter-marks { transition: none !important; }
 
-    /* the figure pane: a name opened into a presence */
     /* a figure holds the whole frame while it is open. The scrim was thin
        enough that the sky's own letterpress read straight through the pane
        on a phone and collided with the names (round 1), so it deepens, and
@@ -1438,147 +1370,6 @@
       .pane-sibling { font-size: 8.5px; letter-spacing: 0.17em; }
     }
 
-    /* ---- the council: topic in letterpress, names in the register,
-       a thin cartouche for the produced audio ---- */
-    #council-topic {
-      position: fixed; left: 9%; right: auto; top: 15%; width: 360px;
-      z-index: 3; text-align: left; pointer-events: none;
-      padding: 0;
-      opacity: 0; transition: opacity 2s ease;
-    }
-    #council-topic.lit { opacity: 1; }
-    /* the playbill's own lintel, ruled like the door's */
-    .council-kicker {
-      display: flex; align-items: center; justify-content: flex-start; gap: 15px;
-      font-family: var(--sans);
-      font-size: 10px; letter-spacing: 0.34em; text-indent: 0.34em;
-      text-transform: uppercase; color: var(--na-gold);
-      text-shadow: var(--ink-night), 0 0 3px rgba(4, 6, 13, 0.85);
-    }
-    .council-kicker::before, .council-kicker::after {
-      content: ''; width: 22px; height: 1px; flex: none; background: var(--rule);
-    }
-    .council-title {
-      margin-top: 14px;
-      font-family: var(--serif);
-      font-size: clamp(28px, 3.2vw, 40px); line-height: 1.16;
-      letter-spacing: 0.01em; text-wrap: balance;
-      color: var(--na-starlight);
-      text-shadow: var(--ink-night);
-    }
-    /* narrow stage (phones): the playbill register names the circle;
-       the positioned chips step aside */
-    .council-register {
-      display: none;
-      margin-top: 18px;
-      font-family: var(--sans);
-      font-size: 9px; letter-spacing: 0.3em; text-indent: 0.3em;
-      text-transform: uppercase; color: var(--na-mist);
-      text-shadow: 0 1px 10px rgba(4, 6, 13, 0.95), 0 0 3px rgba(4, 6, 13, 0.85);
-    }
-    .council-register .moderator { color: var(--na-starlight); }
-    @media (max-aspect-ratio: 9/10) {
-      #council-topic { left: 24px; right: 24px; top: 7.2%; width: auto; text-align: center; }
-      .council-kicker { justify-content: center; }
-      .council-title { max-width: 290px; margin: 12px auto 0; font-size: 24px; }
-      .council-register {
-        display: grid; grid-template-columns: 1fr 1fr; gap: 7px 24px;
-        position: fixed; left: 36px; right: 36px; bottom: 25.3%; margin: 0;
-        padding: 10px 0 12px;
-        border-top: 1px solid color-mix(in srgb, var(--na-mist) 20%, transparent);
-        border-bottom: 1px solid color-mix(in srgb, var(--na-mist) 20%, transparent);
-        font-family: var(--serif); font-size: 16px; line-height: 1.3;
-        text-transform: none; letter-spacing: 0.03em; text-indent: 0;
-      }
-      .council-separator { display: none; }
-      #council-names { display: none; }
-    }
-    #council-names { position: fixed; inset: 0; z-index: 3; pointer-events: none; }
-    #council-names[hidden] { display: none; }
-    .council-name {
-      position: absolute; transform: translateX(-50%);
-      font-family: var(--sans);
-      font-size: 9px; letter-spacing: 0.3em; text-indent: 0.3em;
-      text-transform: uppercase;
-      /* these stand on floor the presences light: mist grey lost them */
-      color: color-mix(in srgb, var(--na-starlight) 78%, var(--na-mist));
-      white-space: nowrap;
-    }
-    .council-name.moderator { color: var(--na-starlight); }
-    .council-name[hidden] { display: none; }
-    #cartouche {
-      position: fixed; left: 50%; bottom: calc(30px + env(safe-area-inset-bottom));
-      transform: translateX(-50%);
-      width: min(560px, calc(100% - 48px));
-      z-index: 3;
-      transition: opacity 0.8s ease;
-    }
-    #cartouche[hidden] { display: block; opacity: 0; visibility: hidden; }
-    /* the disclosure rests on dark marble, right where the voices are
-       invited — never over the blaze */
-    /* no balanced wrap here: the line's own separator is a word, and an
-       evened break drops it to the head of line two, where a middot leads
-       a line like a stray mark (round 2, phone) */
-    .cartouche-honesty {
-      margin-bottom: 14px; text-align: center;
-      font-family: var(--sans);
-      font-size: 9px; letter-spacing: 0.28em; text-indent: 0.28em;
-      text-transform: uppercase;
-      color: color-mix(in srgb, var(--na-mist) 92%, transparent);
-      text-shadow: var(--ink-night);
-    }
-    @media (min-aspect-ratio: 9/10) {
-      /* one quiet line on wide stages; the centered overflow is symmetric */
-      .cartouche-honesty { white-space: nowrap; }
-    }
-    /* a cartouche is a rule with ends, not a border: the two end ticks turn
-       the line the produced audio hangs from into a frame around it */
-    .cartouche-bar {
-      position: relative;
-      display: flex; align-items: center; gap: 16px;
-      padding: 13px 6px 4px;
-      border-top: 1px solid color-mix(in srgb, var(--na-gold) 30%, transparent);
-    }
-    .cartouche-bar::before, .cartouche-bar::after {
-      content: ''; position: absolute; top: -1px;
-      width: 1px; height: 6px;
-      background: color-mix(in srgb, var(--na-gold) 42%, transparent);
-    }
-    .cartouche-bar::before { left: 0; }
-    .cartouche-bar::after { right: 0; }
-    .cartouche-toggle {
-      font-family: var(--sans);
-      font-size: 10px; letter-spacing: 0.3em; text-indent: 0.3em;
-      text-transform: uppercase; color: var(--na-gold);
-      min-width: 80px; min-height: 44px; text-align: left;
-      background: none; border: none; cursor: pointer;
-      text-shadow: var(--ink-night);
-    }
-    .cartouche-title {
-      flex: 1; text-align: center;
-      font-family: var(--sans);
-      font-size: 9px; letter-spacing: 0.26em; text-indent: 0.26em;
-      text-transform: uppercase;
-      color: color-mix(in srgb, var(--na-mist) 92%, transparent);
-      text-shadow: var(--ink-night);
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-    .cartouche-progress {
-      position: absolute; top: -1px; left: 0;
-      height: 1px; width: 0%;
-      background: var(--na-gold);
-      box-shadow: 0 0 8px color-mix(in srgb, var(--na-gold) 55%, transparent);
-    }
-    body.forge #council-topic, body.forge #cartouche { transition: none !important; }
-    @media (max-aspect-ratio: 9/10) {
-      /* the cartouche rests above the instrument rail on narrow stages */
-      #cartouche { bottom: calc(76px + env(safe-area-inset-bottom)); }
-    }
-
-    .cartouche-toggle:focus-visible { outline: 1px solid var(--na-gold); outline-offset: 3px; }
-    .cartouche-toggle:hover { color: var(--na-starlight); }
-    @media (prefers-reduced-motion: reduce) { #council-topic, #cartouche { transition: none; } }
-
     /* the way onward, after the coda */
     .keeper-exit {
       display: block;
@@ -1767,16 +1558,23 @@
        after every rule that clears an outline, so it is the one that lands.
        Elements that ship their own press (the keeper, his nights, the marks)
        own their focus and are not named here. ---- */
-    .gate-actions button:focus-visible, .pane-enter:focus-visible,
-    .door-enter:focus-visible, .door-stay:focus-visible,
-    .pane-close:focus-visible, .pane-sibling:focus-visible,
-    .star-chip:focus-visible, #rail button:focus-visible,
-    .inst-links button:focus-visible, .inst-links a:focus-visible,
-    .inst-close:focus-visible, .drawn-close:focus-visible,
-    #dusk-return:focus-visible, #dusk-concept:focus-visible,
-    #sky-return:focus-visible, #descent-skip:focus-visible,
-    #overture-skip:focus-visible,
-    .gate-declare a:focus-visible, .gate-links a:focus-visible {
+    .gate-actions button:focus-visible,
+.pane-enter:focus-visible,
+.pane-close:focus-visible,
+.pane-sibling:focus-visible,
+.star-chip:focus-visible,
+#rail button:focus-visible,
+.inst-links button:focus-visible,
+.inst-links a:focus-visible,
+.inst-close:focus-visible,
+.drawn-close:focus-visible,
+#dusk-return:focus-visible,
+#dusk-concept:focus-visible,
+#sky-return:focus-visible,
+#descent-skip:focus-visible,
+#overture-skip:focus-visible,
+.gate-declare a:focus-visible,
+.gate-links a:focus-visible {
       outline: 1px solid color-mix(in srgb, var(--na-gold) 52%, transparent);
       outline-offset: 4px;
     }
@@ -1801,15 +1599,6 @@
       .dusk-kicker { font-size: 9px; letter-spacing: 0.24em; text-indent: 0.24em; }
       .dusk-actions { margin-top: 4px; gap: 0; }
 
-      .door-kicker { gap: 12px; font-size: 9px; letter-spacing: 0.26em; text-indent: 0.26em; }
-      .door-kicker::before, .door-kicker::after { width: 16px; }
-      .door-trust { font-size: 8.5px; letter-spacing: 0.22em; text-indent: 0.22em; }
-      .door-actions { margin-top: 26px; gap: 8px; }
-
-      .council-kicker { gap: 11px; font-size: 9px; letter-spacing: 0.26em; text-indent: 0.26em; }
-      .council-kicker::before, .council-kicker::after { width: 15px; }
-      .council-register { font-size: 16px; letter-spacing: 0.03em; text-indent: 0; }
-
       .descent-kicker { gap: 11px; font-size: 9px; letter-spacing: 0.26em; text-indent: 0.26em; }
       .descent-kicker::before, .descent-kicker::after { width: 15px; }
 
@@ -1826,7 +1615,7 @@
       .drawn-promise { font-size: 14.5px; }
       .inst-links button, .inst-links a { font-size: 9.5px; letter-spacing: 0.22em; text-indent: 0.22em; }
       .chapters-ink { letter-spacing: 0.2em; }
-      .cartouche-honesty { font-size: 8.5px; letter-spacing: 0.22em; text-indent: 0.22em; }
+
       .stone-text, .stone-strong { font-size: 11px; letter-spacing: 0.26em; text-indent: 0.26em; }
     }
 
@@ -1835,9 +1624,14 @@
       .copy, .status { transition: none; }
       #keeper, #keeper *, #stone, #verse { transition: none; }
       /* the same composition, it simply arrives already composed */
-      .star-chip::after, .door-stay::after, .pane-sibling::after,
-      #dusk-concept::after, #rail button::before, #rail button::after,
-      .chapter-btn, .gate-actions button, .pane-enter, .door-enter { transition: none; }
+      .star-chip::after,
+.pane-sibling::after,
+#dusk-concept::after,
+#rail button::before,
+#rail button::after,
+.chapter-btn,
+.gate-actions button,
+.pane-enter { transition: none; }
     }
 
   </style>
@@ -1980,36 +1774,6 @@
       <a href="https://agoracosmica.org/privacy" target="_blank" rel="noopener">Privacy</a>
     </nav>
     <button class="inst-close" type="button">Close</button>
-  </div>
-  <div id="forward-door" hidden>
-    <div class="door-dawn" aria-hidden="true"></div>
-    <div class="door-mark" aria-hidden="true"><span class="door-bead"></span></div>
-    <p class="door-kicker">The night holds thirty worlds</p>
-    <p class="door-title">Walk into the Agora</p>
-    <p class="door-trust">Nonprofit · Open Source · No tracking cookies, no profiling</p>
-    <div class="door-actions">
-      <a class="door-enter" href="https://agoracosmica.org/app?lang=en">Start Exploring</a>
-      <button class="door-stay" type="button">Stay by the fire</button>
-    </div>
-  </div>
-  <div id="council-topic">
-    <p class="council-kicker">Lives That Still Speak</p>
-    <p class="council-title">The Calling That Won't Shut Up.</p>
-    <p class="council-register"><span>Campbell</span><span class="council-separator"> · </span><span class="moderator">Goethe</span><span class="council-separator"> · </span><span>Lovelace</span><span class="council-separator"> · </span><span>Gandhi</span></p>
-  </div>
-  <div id="council-names" hidden>
-    <span class="council-name">Campbell</span>
-    <span class="council-name moderator">Goethe</span>
-    <span class="council-name">Lovelace</span>
-    <span class="council-name">Gandhi</span>
-  </div>
-  <div id="cartouche" hidden>
-    <p class="cartouche-honesty">Four AI Echoes, one of them moderating · Interpretations, not recordings</p>
-    <div class="cartouche-bar">
-      <button class="cartouche-toggle" type="button">Listen</button>
-      <span class="cartouche-title">A short preview · English</span>
-      <div class="cartouche-progress"></div>
-    </div>
   </div>
   <!-- The night, in plain words: an honest static mirror of what the
        experience shows, for readers without WebGL, screen readers, and
