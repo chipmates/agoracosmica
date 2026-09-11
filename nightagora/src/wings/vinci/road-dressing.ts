@@ -29,15 +29,23 @@ export const roadDressingProvenance={
   },
 } as const
 /** Gaussian cross-section gives continuous, derivative-filtered rut relief. */
+/** A ground plane at a grazing angle has a long thin pixel footprint. Fading
+ * detail by its longest side erases a road that is still perfectly resolved
+ * across the view; the filter measure is the footprint's AREA. */
+export function groundPixel(p:ReturnType<typeof vec2>){
+  const dx=p.dFdx(),dy=p.dFdy()
+  const area=dx.x.mul(dy.y).sub(dx.y.mul(dy.x)).abs()
+  return area.sqrt().max(length(dx).add(length(dy)).mul(.14)).max(.00001)
+}
 export function roadWearNode(){
-  const p=vec2(positionWorld.x,positionWorld.z.negate()),pixel=length(p.dFdx()).add(length(p.dFdy())).max(.00001)
+  const p=vec2(positionWorld.x,positionWorld.z.negate()),pixel=groundPixel(p)
   let wear:Node<'float'>=float(0)
   for(let i=1;i<road.length;i++){
     const a=road[i-1]!,b=road[i]!,dx=b[0]-a[0],dn=b[1]-a[1],span=Math.hypot(dx,dn)
     const v=p.sub(vec2(...a)),along=v.dot(vec2(dx/span,dn/span)),across=v.dot(vec2(-dn/span,dx/span))
     const ends=smoothstep(0,.3,along).mul(float(1).sub(smoothstep(span-.3,span,along)))
     const wander=mx_noise_float(vec3(along.mul(.32),float(i),0)).mul(.028)
-    const distance=across.sub(wander).abs().sub(.70).abs(),sigma=pixel.mul(.5).add(.09)
+    const distance=across.sub(wander).abs().sub(.70).abs(),sigma=pixel.mul(.5).add(.12)
     const rut=distance.div(sigma).pow(2).negate().exp().mul(ends).mul(smoothstep(.7,2,float(.18).div(pixel)))
     wear=wear.max(rut)
   }
@@ -47,7 +55,7 @@ export function roadWearNode(){
  * The terrain retains every vertex; this field cannot bridge a cut or bank. */
 export function roadSurfaceNode(){
   const P=positionWorld,p=vec2(P.x,P.z.negate())
-  const pixel=length(p.dFdx()).add(length(p.dFdy())).max(.00001)
+  const pixel=groundPixel(p)
   let distance:Node<'float'>=float(10000),crossings:Node<'float'>=float(0)
   for(const {a,b} of roadMaterialBoundary){
     const de=b[0]-a[0],dn=b[1]-a[1],span2=de*de+dn*dn,v=p.sub(vec2(...a))
@@ -68,11 +76,15 @@ export function roadSurfaceNode(){
   const aggregate=mx_noise_float(P.mul(14)).mul(resolved(.07))
   const grit=mx_noise_float(P.mul(167)).mul(resolved(.006))
   const wear=roadWearNode().mul(mx_noise_float(P.mul(.7)).mul(.22).add(.78).clamp(.45,1))
+  // Where every cart turns in through the gate the road is churned and damp.
+  const gate=vec2(roadGradeProvenance.crossing[0],roadGradeProvenance.crossing[1])
+  const churnEdge=mx_noise_float(P.mul(1.6)).mul(.55)
+  const churn=float(1).sub(smoothstep(1.1,3.1,length(p.sub(gate)).add(churnEdge))).mul(.9)
   const dark=new Color('#94866e'),pale=new Color('#b1a084')
   const colour=mix(vec3(dark.r,dark.g,dark.b),vec3(pale.r,pale.g,pale.b),drift.mul(.30).add(.5))
-    .mul(packed.mul(.18).add(aggregate.mul(.14)).mul(float(1).sub(wear.mul(.65))).add(grit.mul(.035)).add(1)).mul(float(1).sub(wear.mul(.20)))
-  return {mask,colour,wear,height:aggregate.mul(.00065).add(grit.mul(.00012)).sub(wear.mul(.008)).clamp(-.008,.002),
-    roughness:float(.94).sub(wear.mul(.10)).add(grit.mul(.02)).clamp(.82,.98)}
+    .mul(packed.mul(.18).add(aggregate.mul(.14)).mul(float(1).sub(wear.mul(.65))).add(grit.mul(.035)).add(1)).mul(float(1).sub(wear.mul(.34))).mul(float(1).sub(churn.mul(.30)))
+  return {mask,colour,wear,height:aggregate.mul(.00065).add(grit.mul(.00012)).sub(wear.mul(.008)).sub(churn.mul(.004)).clamp(-.012,.002),
+    roughness:float(.94).sub(wear.mul(.10)).sub(churn.mul(.22)).add(grit.mul(.02)).clamp(.62,.98)}
 }
 interface Batch {p:number[];c:number[]}
 const batch=():Batch=>({p:[],c:[]})
