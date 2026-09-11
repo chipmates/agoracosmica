@@ -183,7 +183,7 @@ async function measure(browser, tier, vp) {
   const stations = {}
   const missed = []
   for (const id of ids) {
-    const took = await page.evaluate((s) => window.__forge.station(s), id)
+    const took = await page.evaluate((s) => window.__forge.station?.(s) ?? false, id)
     const at = await page.evaluate(() => window.__forge.state().stationId)
     if (!took || at !== id) {
       missed.push(`${id} (standing at ${at || 'nowhere'})`)
@@ -194,7 +194,7 @@ async function measure(browser, tier, vp) {
   }
   if (ids.length) {
     const last = ids[ids.length - 1]
-    await page.evaluate((s) => window.__forge.station(s), last)
+    await page.evaluate((s) => window.__forge.station?.(s), last)
     await page.waitForTimeout(600)
   }
 
@@ -240,9 +240,9 @@ async function cones(browser, ids) {
   let shot = 0
   for (const spot of plan) {
     if (spot.station !== undefined) {
-      const took = await page.evaluate((s) => window.__forge.station(s), spot.station)
+      const took = await page.evaluate((s) => window.__forge.station?.(s) ?? false, spot.station)
       if (!took) {
-        missing.push(`${spot.station}: the wing has no such station`)
+        missing.push(`${spot.station}: the frame would not stand at this station`)
         continue
       }
     } else {
@@ -277,6 +277,15 @@ async function leak(browser) {
   await page.goto(pageUrl('hero'))
   await page.waitForFunction(() => Boolean(window.__forge))
   await page.waitForTimeout(1800)
+  // an app that predates these two hooks reports the line as unmeasured
+  // rather than taking the whole gate run down with a TypeError
+  const has = await page.evaluate(
+    () => typeof window.__forge.lights === 'function' && typeof window.__forge.relight === 'function'
+  )
+  if (!has) {
+    await page.close()
+    return { jumps: LEAK_JUMPS, unavailable: true, errors }
+  }
   const before = await page.evaluate(() => window.__forge.lights())
   const after = await page.evaluate((n) => {
     let last = null
@@ -417,15 +426,18 @@ gate('walk clean', walkProblems.length === 0, walkProblems.join('; ') || 'no con
 gate(
   'key light leak',
   Boolean(leakReport) &&
+    !leakReport.unavailable &&
     leakReport.settled.rigs === leakReport.before.rigs &&
     leakReport.settled.sceneObjects === leakReport.before.sceneObjects &&
     leakReport.errors.length === 0,
   !leakReport
     ? 'the leak counter never ran'
-    : leakReport.errors.length
-      ? leakReport.errors.slice(0, 2).join('; ')
-      : `${leakReport.before.rigs} rig(s) and ${leakReport.before.sceneObjects} objects, unchanged over ${leakReport.jumps} rebuilds` +
-        (leakReport.settled.rigs === leakReport.before.rigs ? '' : ` -> ${leakReport.settled.rigs}`)
+    : leakReport.unavailable
+      ? 'this app has no lights() or relight() hook: the line is not instrumented here'
+      : leakReport.errors.length
+        ? leakReport.errors.slice(0, 2).join('; ')
+        : `${leakReport.before.rigs} rig(s) and ${leakReport.before.sceneObjects} objects, unchanged over ${leakReport.jumps} rebuilds` +
+          (leakReport.settled.rigs === leakReport.before.rigs ? '' : ` -> ${leakReport.settled.rigs} rig(s), ${leakReport.settled.sceneObjects} objects`)
 )
 gate(
   'cone corners',
