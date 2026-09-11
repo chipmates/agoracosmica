@@ -11,6 +11,7 @@
      createStack({ canvas, tier })       the renderer, the backend, the tiers
      stack.setScene(scene, camera, look) install this scene's post chain
      stack.light({ ... })                the one key light, its ambient, its shadow
+     stack.light({ hdri })               the same, with a sky as its probe and hour
      stack.reflector(plane, opts)        a planar reflection on that plane
      stack.detail(material, set, scales) the empty-plane helper
      stack.materials.load(name)          a PBR set out of the library
@@ -45,13 +46,22 @@ export interface StackOptions {
   tier?: TierName
 }
 
+/** what the stack's own `light()` takes on top of the key's own options: a
+    sky out of the library, which is both the probe every surface reflects
+    and, unless the caller names its own hour, the direction and temperature
+    of the key. A room lit from one place and reflecting a sun standing in
+    another is two hours in one frame. */
+export interface StackLightOptions extends KeyLightOptions {
+  hdri?: SkyProbe
+}
+
 export interface Stack {
   renderer: WebGPURenderer
   backend: 'webgpu' | 'webgl2'
   /** what the adapter called the hardware; 'swiftshader' means the CPU */
   architecture: string
   setScene: (scene: Scene, camera: Camera, grade: GradeName | Grade | null | undefined) => void
-  light: (opts: KeyLightOptions) => KeyLight
+  light: (opts: StackLightOptions) => KeyLight
   /** how many key rigs are installed right now (the leak gate reads this) */
   lights: () => number
   /** how many objects stand in the scene right now: a rig that leaks shows
@@ -168,7 +178,20 @@ export async function createStack(opts: StackOptions = {}): Promise<Stack> {
         if (old.live()) old.dispose()
         lights.splice(i, 1)
       }
-      const rig = createKeyLight(here, tier, o)
+      const sky = o.hdri
+      const rig = createKeyLight(
+        here,
+        tier,
+        sky
+          ? {
+              azimuth: sky.sun.azimuth,
+              elevation: sky.sun.elevation,
+              kelvin: sky.sun.kelvin,
+              ...o,
+              probe: o.probe ?? sky.texture,
+            }
+          : o
+      )
       if (camera) rig.setCamera(camera)
       lights.push(rig)
       return rig

@@ -58,12 +58,14 @@ const {
 const LUX_REF = 100
 
 export interface KeyLightOptions {
-  /** degrees, 0 = the light stands behind -Z, growing clockwise seen from above */
-  azimuth: number
+  /** degrees, 0 = the light stands behind -Z, growing clockwise seen from
+      above. Optional only because a probe can answer for it: a sky knows
+      where its own sun stands, and `Stack.light({ hdri })` reads it there. */
+  azimuth?: number
   /** degrees above the horizon */
-  elevation: number
-  kelvin: number
-  lux: number
+  elevation?: number
+  kelvin?: number
+  lux?: number
   /** a loaded equirectangular probe out of the library. A light is built
       inside a scene's constructor and an HDRI is a network fetch, so the
       fetch is `Stack.hdri(name)` and this is where its result goes; without
@@ -148,16 +150,16 @@ const DEFAULT_SKY: SkyRecipe = {
  * one body instead of as forty loops.
  */
 export function createKeyLight(scene: Scene, tier: Tier, opts: KeyLightOptions): KeyLight {
-  const az = (opts.azimuth * Math.PI) / 180
-  const el = (opts.elevation * Math.PI) / 180
+  const az = ((opts.azimuth ?? 0) * Math.PI) / 180
+  const el = ((opts.elevation ?? 40) * Math.PI) / 180
   const dir = new Vector3(
     Math.sin(az) * Math.cos(el),
     Math.sin(el),
     -Math.cos(az) * Math.cos(el)
   ).normalize()
 
-  const colour = kelvinToColour(opts.kelvin)
-  const light = new DirectionalLight(colour.getHex(), opts.lux / LUX_REF)
+  const colour = kelvinToColour(opts.kelvin ?? 5200)
+  const light = new DirectionalLight(colour.getHex(), (opts.lux ?? 200) / LUX_REF)
   const reach = opts.reach ?? tier.shadow.maxFar
   light.position.copy(dir).multiplyScalar(Math.max(24, reach * 0.8))
   /* EVERY OBJECT THIS RIG PUTS IN THE SCENE, so dispose takes all of them
@@ -186,8 +188,8 @@ export function createKeyLight(scene: Scene, tier: Tier, opts: KeyLightOptions):
         key: {
           ...DEFAULT_SKY.key,
           ...opts.sky?.key,
-          azimuth: opts.azimuth,
-          elevation: opts.elevation,
+          azimuth: opts.azimuth ?? 0,
+          elevation: opts.elevation ?? 40,
           colour: `#${colour.getHexString()}`,
         },
       })

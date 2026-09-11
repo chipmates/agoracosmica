@@ -7,6 +7,20 @@
    reads wrong (a scale, a flipped normal, a tint) is caught before it
    dresses anything.
 
+   THE KEY RAKES THE PLANE. The first pass put the key behind every vertical
+   surface in the frame: only the tops were lit, relief went soft everywhere,
+   and a flipped green channel would have been invisible because no surface
+   took the light across itself. The key now stands where the plane's own
+   normal can reach it, at about sixty degrees of incidence, which is the
+   angle a joint casts a shadow at and the only angle that proves a normal.
+
+   AND A METAL IS READ UNDER A SKY THAT HAS SOMETHING IN IT. A metal under an
+   overcast dome reflects an even grey and reads as stone: it is not that the
+   set is wrong, it is that there is nothing in the room to be metal with. So
+   the metals take the warm afternoon probe, whose sun, horizon and ground
+   give a sheet of gold something to be. The three skies are themselves swatch
+   states, a mirror ball and a matte ball under each.
+
    One set at a time, by `?set=`. Twenty-two sets held at once would be over
    a gigabyte of texture on the hero tier, and a page that cannot hold its
    own library cannot tell you anything true about one of its sets. */
@@ -27,11 +41,13 @@ import { GRADES, type Grade } from '../stack/grade'
 import { isTierName, type TierName } from '../stack/tier'
 import type { MaterialSet } from '../stack/materials'
 import { ASSET_BASE } from '../stack/materials'
+import type { SkyProbe } from '../stack/hdri'
 import { loadManifest } from '../manifest'
 
 /* THE ORDER THE LIBRARY IS READ IN: the museum's own rooms first (the stone
    a court and a colonnade are cut from), then what stands in them, then the
-   ground outside. A judge walking the route walks it in this order. */
+   ground outside, and last the three skies they are all read under. A judge
+   walking the route walks it in this order. */
 const SETS = [
   'marble-lapis',
   'marble-white',
@@ -56,6 +72,22 @@ const SETS = [
   'gravel',
   'grass-short',
 ]
+const SKIES = ['sky-overcast', 'sky-afternoon-warm', 'sky-night-moon']
+const isSky = (name: string): boolean => SKIES.includes(name)
+
+/* WHERE THE KEY STANDS, and it is not a taste. The plane is turned -0.58 rad
+   about Y, so its normal is (-0.548, 0, 0.836); at azimuth 155 and elevation
+   30 the key's direction is (0.373, 0.5, 0.782) and the two meet at 0.45,
+   which is sixty-three degrees of incidence. The cube is turned the other
+   way from the first pass so that both of its visible faces take the light
+   as well, one at 0.56 and one at 0.66. */
+const KEY = { azimuth: 155, elevation: 30 }
+
+/* WHAT EACH FAMILY IS READ UNDER. Everything but the metals takes the
+   overcast dome, which is the light a source's own preview render is made
+   under and therefore the only honest light to compare one against. The
+   metals take the warm afternoon, and the frame says so. */
+const PROBE_FOR = { metal: 'sky-afternoon-warm', other: 'sky-overcast' }
 
 /* NEUTRAL ON PURPOSE. A swatch is compared against a photograph, so the look
    has to be the plainest the chain can be: no split, almost no vignette,
@@ -63,14 +95,20 @@ const SETS = [
 const PLAIN: Grade = {
   ...GRADES['first-station'],
   name: 'swatch',
-  /* a full overcast dome is a bright room, and a metal reads the dome rather
-     than the light: at exposure 1 the gold set clipped to white and the
-     judge would have been shown the exposure instead of the leaf */
-  exposure: 0.78,
+  /* a full dome is a bright room and a metal reads the dome rather than the
+     light: at exposure 1 the gold set clipped to white and the judge would
+     have been shown the exposure instead of the leaf */
+  exposure: 0.62,
   split: 0,
   vignette: 0.08,
   grain: 0.006,
   bloom: { strength: 0.16, radius: 0.4, threshold: 0.92, warmth: 0 },
+}
+/** what each sky is read at, so that no frame is graded by its own exposure */
+const EXPOSURE: Record<string, number> = {
+  'sky-overcast': 0.62,
+  'sky-afternoon-warm': 0.34,
+  'sky-night-moon': 2.6,
 }
 
 const canvas = document.getElementById('stage') as HTMLCanvasElement
@@ -85,9 +123,10 @@ const indexEl = document.getElementById('index') as HTMLElement
 
 const asked = new URLSearchParams(location.search)
 const tierAsked = asked.get('tier')
+const skyAsked = asked.get('sky')
 let current = asked.get('set') ?? SETS[0] ?? 'marble-lapis'
 
-for (const name of SETS) {
+for (const name of [...SETS, ...SKIES]) {
   const a = document.createElement('a')
   a.href = `?set=${name}${tierAsked ? `&tier=${tierAsked}` : ''}`
   a.textContent = name
@@ -103,34 +142,8 @@ camera.lookAt(0.28, 0.86, -0.4)
 const stack: Stack = await createStack({ canvas })
 stack.setScene(scene, camera, PLAIN)
 
-/* the overcast sky is the reading light of this route: an even dome with no
-   direction of its own, which is the light a source's own preview render is
-   made under. The key is a weak warm rake on top of it, so a normal map has
-   something to be wrong in front of. */
-let probeName = 'sky-overcast'
-try {
-  const sky = await stack.hdri('sky-overcast')
-  stack.light({
-    azimuth: 34,
-    elevation: 30,
-    kelvin: 5200,
-    lux: 200,
-    probe: sky.texture,
-    ambient: 1,
-    reach: 14,
-    cascades: [6, 14],
-  })
-  scene.background = sky.texture
-  scene.backgroundIntensity = 0.16
-  scene.backgroundBlurriness = 0.55
-  scene.environmentIntensity = 0.62
-} catch {
-  probeName = 'baked sky (the library HDRI did not load)'
-  stack.light({ azimuth: 34, elevation: 30, kelvin: 5200, lux: 260, ambient: 1 })
-}
-
-// the ground the three primitives stand on: matte, uniform, and not out of
-// the library, so nothing on this page is compared against itself
+// the ground the bodies stand on: matte, uniform, and not out of the library,
+// so nothing on this page is compared against itself
 const ground = new Mesh(
   new PlaneGeometry(30, 30),
   new MeshStandardNodeMaterial({ color: new Color('#20222a'), roughness: 0.95, metalness: 0 })
@@ -148,7 +161,7 @@ const sphere = new Mesh(new SphereGeometry(0.5, 96, 64))
 sphere.position.set(-1.02, 0.5, 0)
 const cube = new Mesh(new BoxGeometry(0.8, 0.8, 0.8))
 cube.position.set(0.24, 0.4, 0.06)
-cube.rotation.y = 0.42
+cube.rotation.y = -0.42
 /** two metres square, standing up, so a tile can be counted */
 const plane = new Mesh(new PlaneGeometry(2, 2))
 plane.position.set(1.58, 1.0, -1.55)
@@ -167,26 +180,154 @@ for (const [m] of bodies) {
   scene.add(m)
 }
 
-async function show(name: string): Promise<void> {
-  current = name
+/* THE TWO BALLS A SKY IS READ ON. A mirror shows what is in the sky and a
+   matte ball shows what the sky does to a surface that reflects nothing, and
+   between them there is no third thing an environment can hide behind. */
+const mirrorBall = new Mesh(
+  new SphereGeometry(0.55, 128, 96),
+  new MeshStandardNodeMaterial({ color: new Color('#ffffff'), roughness: 0.02, metalness: 1 })
+)
+mirrorBall.position.set(-0.92, 0.62, 0)
+const matteBall = new Mesh(
+  new SphereGeometry(0.5, 96, 64),
+  new MeshStandardNodeMaterial({ color: new Color('#b4b2ab'), roughness: 0.95, metalness: 0 })
+)
+matteBall.position.set(0.62, 0.5, 0.1)
+for (const m of [mirrorBall, matteBall]) {
+  m.castShadow = true
+  m.receiveShadow = true
+  m.visible = false
+  scene.add(m)
+}
+
+const skies = new Map<string, SkyProbe>()
+async function probe(name: string): Promise<SkyProbe | null> {
+  const held = skies.get(name)
+  if (held) return held
+  try {
+    const sky = await stack.hdri(name)
+    skies.set(name, sky)
+    return sky
+  } catch {
+    return null
+  }
+}
+
+/** what a set was read under, printed on the frame it was read in */
+let readUnder = ''
+
+async function showSet(name: string): Promise<void> {
   const set: MaterialSet = await stack.materials.load(name)
-  const count = stack.tierConfig().detail
-  for (const [mesh, metres] of bodies) {
-    mesh.material = set.material({ uv: uv().mul(vec2(metres[0], metres[1])), count })
+  const wanted = skyAsked ?? (set.cls === 'metal' ? PROBE_FOR.metal : PROBE_FOR.other)
+  const sky = await probe(wanted)
+  stack.setScene(scene, camera, { ...PLAIN, exposure: EXPOSURE[wanted] ?? PLAIN.exposure })
+
+  if (sky) {
+    stack.light({
+      ...KEY,
+      kelvin: sky.sun.kelvin,
+      lux: 240,
+      probe: sky.texture,
+      ambient: 1,
+      reach: 14,
+      cascades: [6, 14],
+    })
+    scene.background = sky.texture
+    /* THE SKY IS TURNED, NOT THE LIGHT. Every set in the library has to be
+       read under one key or the frames are not comparable, and a probe whose
+       sun stands somewhere else would light a metal from one hour and shade
+       it from another. So the environment is rotated until the sky's own sun
+       lands where the key does, and the frame says by how much. */
+    const turn = ((sky.sun.azimuth - KEY.azimuth) * Math.PI) / 180
+    scene.environmentRotation.set(0, turn, 0)
+    scene.backgroundRotation.set(0, turn, 0)
+    /* a metal is judged on what it reflects, so the background it reflects is
+       shown sharp; a stone is judged on itself, and a legible landscape
+       behind it is only a distraction */
+    scene.backgroundBlurriness = set.cls === 'metal' ? 0 : 0.55
+    scene.backgroundIntensity = set.cls === 'metal' ? 0.5 : 0.16
+    scene.environmentIntensity = set.cls === 'metal' ? 1 : 0.62
+    readUnder = `${wanted}, sun at ${sky.sun.azimuth.toFixed(0)}° turned to ${KEY.azimuth}°`
+  } else {
+    stack.light({ ...KEY, kelvin: 5200, lux: 300, ambient: 1 })
+    readUnder = 'a baked sky (the library HDRI did not load)'
   }
 
+  const count = stack.tierConfig().detail
+  for (const [mesh, metres] of bodies) {
+    mesh.visible = true
+    mesh.material = set.material({ uv: uv().mul(vec2(metres[0], metres[1])), count })
+  }
+  mirrorBall.visible = false
+  matteBall.visible = false
+
   const entry = set.entry
-  nameEl.textContent = name
   licenceEl.textContent = entry.licence
   sourceEl.textContent = entry.source_url ?? ''
   const cost = stack.cost()
+  const d = set.detail
+  const laid =
+    set.scale[0] === set.metres[0] && set.scale[1] === set.metres[1]
+      ? ''
+      : ` laid at ${set.scale[0]} by ${set.scale[1]}`
+  const turned = entry.orientation ? ` turned ${entry.orientation}°` : ''
   numbersEl.textContent =
-    `${entry.metres?.[0] ?? 1} by ${entry.metres?.[1] ?? 1} m per tile · ` +
-    `roughness ${set.roughness} · ${(entry.maps ?? []).join(', ')} · ` +
-    `${cost.textureMB.toFixed(1)} MB held · ${probeName}`
+    `${entry.metres?.[0] ?? 1} by ${entry.metres?.[1] ?? 1} m per tile${laid}${turned} · ` +
+    `${set.cls} · roughness ${set.roughness} · metalness ${set.metalness} · ` +
+    `macro ${d.macro * 100} cm at ${d.macroContrast} · ` +
+    `mid ${d.mid ? `${Math.round(d.mid * 100)} cm` : 'none'} · micro ${d.micro} · ` +
+    `${cost.textureMB.toFixed(1)} MB held · ${readUnder}`
   plateImg.src = `${ASSET_BASE}${entry.wing}/${entry.path}reference.jpg`
   plateCap.textContent = "the source's own preview render"
+}
+
+async function showSky(name: string): Promise<void> {
+  const sky = await probe(name)
+  stack.setScene(scene, camera, { ...PLAIN, exposure: EXPOSURE[name] ?? PLAIN.exposure })
+  for (const [mesh] of bodies) mesh.visible = false
+  mirrorBall.visible = true
+  matteBall.visible = true
+
+  if (!sky) {
+    licenceEl.textContent = 'this sky did not load'
+    sourceEl.textContent = ''
+    numbersEl.textContent = ''
+    plateEl.hidden = true
+    return
+  }
+  /* THE HOUR IS THE SKY'S OWN. Nothing is turned here and nothing is guessed:
+     the key stands where this sky's brightest place stands, so the shadow on
+     the ground and the sun in the background are the same sun. */
+  stack.light({ hdri: sky, lux: 240, ambient: 1, reach: 14, cascades: [6, 14] })
+  scene.background = sky.texture
+  scene.environmentRotation.set(0, 0, 0)
+  scene.backgroundRotation.set(0, 0, 0)
+  scene.backgroundBlurriness = 0
+  scene.backgroundIntensity = 1
+  scene.environmentIntensity = 1
+
+  const entry = sky.entry
+  licenceEl.textContent = entry.licence
+  sourceEl.textContent = entry.source_url ?? ''
+  const s = sky.sun
+  numbersEl.textContent =
+    `2K equirectangular · sun at azimuth ${s.azimuth.toFixed(0)}°, ` +
+    `elevation ${s.elevation.toFixed(0)}° · ${s.kelvin} K · ` +
+    `peak ${s.contrast.toFixed(0)}x the dome's mean · ` +
+    `read at exposure ${(EXPOSURE[name] ?? PLAIN.exposure).toFixed(2)} · ` +
+    'a mirror ball and a matte ball, and the sky itself behind them'
+  const index = await loadManifest()
+  const ref = index.byId.get(`library/${name}-reference`)
+  plateImg.src = ref ? `${ASSET_BASE}${ref.wing}/${ref.path}` : ''
+  plateCap.textContent = "the source's own preview render"
+}
+
+async function show(name: string): Promise<void> {
+  current = name
   plateEl.hidden = false
+  if (isSky(name)) await showSky(name)
+  else await showSet(name)
+  nameEl.textContent = name
   document.title = `${name} · material library`
   for (const a of indexEl.querySelectorAll('a')) {
     if (a.textContent === name) a.setAttribute('aria-current', 'true')
@@ -251,5 +392,5 @@ window.__forgeSwatch = {
     /* one fixed viewpoint: a swatch compared from two angles is two swatches */
   },
   cost: () => stack.cost(),
-  sets: () => SETS,
+  sets: () => [...SETS, ...SKIES],
 }
