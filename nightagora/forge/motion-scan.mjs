@@ -44,6 +44,10 @@ if (existsSync(OUT)) rmSync(OUT, { recursive: true, force: true })
 mkdirSync(OUT, { recursive: true })
 
 const flags = []
+/** one still per station on the way out: the judge's motion strip is a
+    frame from each room, not eight frames of whichever second the video
+    happened to be in */
+const stationFrames = []
 const server = spawn('pnpm', ['preview', '--port', String(PORT), '--strictPort'], { stdio: 'ignore', cwd: APP_ROOT })
 let stations = 0
 try {
@@ -85,7 +89,9 @@ try {
   for (let i = 0; i < steps; i++) path.push(i)
   for (let i = steps - 2; i >= 0; i--) path.push(i)
   const ids = state.stationIds ?? []
+  let outbound = true
   for (const i of path) {
+    if (i === steps - 1) outbound = false
     // by id where the wing has one, because the normalised rail rounds and
     // an integer into it lands on the last station every time
     const id = ids[i]
@@ -104,6 +110,11 @@ try {
     }
     await page.mouse.up()
     await page.waitForTimeout(700)
+    if (outbound || i === steps - 1) {
+      const name = `walk-${String(i + 1).padStart(2, '0')}-${ids[i] ?? `station-${i + 1}`}.png`
+      await page.screenshot({ path: join(OUT, name) })
+      stationFrames.push(name)
+    }
   }
   await ctx.close()
   await browser.close()
@@ -199,6 +210,7 @@ if (JSON_OUT)
         viewport: MOBILE ? 'mobile' : 'desktop',
         tier: TIER,
         stations,
+        stationFrames,
         frames: frameCount,
         flagged: flaggedCount,
         clusters: clusters.length,
