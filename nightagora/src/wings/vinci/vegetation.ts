@@ -203,7 +203,9 @@ export function createVegetation(
     { east: -53, north: 12, height: 12.4, spread: 5.6, seed: 31417, near: false },
     { east: -49, north: 44, height: 15.6, spread: 6.8, seed: 31953, near: false },
     { east: -21, north: 65, height: 10.8, spread: 4.8, seed: 32739, near: false },
-    { east: 12, north: 76, height: 17.2, spread: 7.2, seed: 33287, near: false },
+    // Moved behind the house's silhouette in the garden view: alone on the
+    // skyline at a hundred metres it read as a scratch, not as a tree.
+    { east: 30, north: 66, height: 17.2, spread: 7.2, seed: 33287, near: false },
     { east: 39, north: 54, height: 13.6, spread: 5.4, seed: 33917, near: false },
     { east: 53, north: 24, height: 15.1, spread: 6.4, seed: 34713, near: false },
   )
