@@ -14,10 +14,10 @@
     "tail": "wrangler tail"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20260317.1",
+    "@cloudflare/workers-types": "^5.20260910.1",
     "tsx": "^4.23.13",
     "typescript": "^5.8.3",
-    "wrangler": "^4.114.0"
+    "wrangler": "^4.131.0"
   },
   "pnpm": {
     "overrides": {
