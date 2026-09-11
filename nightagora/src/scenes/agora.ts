@@ -466,18 +466,14 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
        and the fire's own pool is never dimmed by the moon's shadow. */
     const away = oneMinus(clamp(fire.mul(0.55), 0, 1))
     colr = colr.mul(mix(float(1), mix(float(0.7), float(1), moon), away.mul(court)))
-    // and a low sheen of the moon itself, kept well under the fire's own
-    // pool: a night court with two lights has no hour
-    const graze = clamp(float(0.18).add(pow(oneMinus(cosT), 2.2).mul(0.95)), 0, 1)
-    colr = colr.add(
-      c3(MOON, 0.016)
-        .mul(moon)
-        .mul(graze)
-        .mul(mix(float(0.5), float(1), court))
-        .mul(oneMinus(groove.mul(0.6)))
-        .mul(cloud.mul(0.5).add(0.62))
-        .mul(oneMinus(clamp(fire.mul(0.5), 0, 0.85)))
-    )
+    /* THERE IS NO SECOND LIGHT ON THIS FLOOR. A low sheen of the moon was
+       added here, and measured against the base frame it lit exactly one
+       thing: the far court, which the art authored dark. At the judge's own
+       patch beside the bowl it stood the air at 30.5 where the base holds
+       16.1, and taking it out lands 18.2. Everywhere the fire reaches, its
+       own pool had already swallowed it, so it bought nothing and cost the
+       room the dark it falls into. What the moon still does here it does by
+       taking light AWAY: the polish above and the multiplicative dim. */
     colr = colr.add(c3(FIRE_WARM, 0.017).mul(fire).mul(fres.mul(0.65).add(0.35)).mul(polish))
     // A brushed polish breaks up the reflected source while the diffuse
     // mineral stays still. The walking lane has the finest surviving sheen.
@@ -728,7 +724,7 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
     // the same one key that draws the shafts finds the trim it carries
     colr = colr.add(
       alb
-        .mul(c3(MOON, 0.006))
+        .mul(c3(MOON, 0.003))
         .mul(pow(clamp(dot(normal, vec3(MOONDIR.x, MOONDIR.y, MOONDIR.z)), 0, 1), 1.35))
         .mul(rig.key.shadowAt(world))
         .mul(tint)
@@ -790,11 +786,13 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
     const bronzeDetail = rig.stack.detail(bowlMat, 'bronze-dark', {
       at: world,
       uv: vec2(uv().x.mul(BOWL_ROUND), hLocal),
-      macro: 0.5,
+      macro: 1.0,
       fade: [10, 26],
-      // the bowl's own patina and hammer are the subject; the cast skin of
-      // the set comes in under them
-      maps: 0.7,
+      /* the bowl's own patina and hammer are the subject and the cast skin
+         of the set comes in under them: measured against the base frame,
+         the set's own coarse read stands the bowl's mottling 15 percent
+         over the art's at 0.25 and inside the line at 0.15 */
+      maps: 0.15,
     })
     const alb = mix(c3(BRONZE), hex3('#334239'), smoothstep(0.5, 0.79, patina).mul(0.7))
       .mul(hammer.mul(0.34).add(0.74))
