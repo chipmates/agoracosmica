@@ -515,8 +515,13 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
       oneMinus(smoothstep(r0, r1, length(P.xz.sub(vec2(cx, cz))))).mul(k)
     let ao: N = shade(FIRE.x, FIRE.z, 0.28, 1.4, 0.52)
     for (const s of SEATS) ao = ao.add(shade(s.x, s.z, 0.2, 0.95, 0.34))
-    ao = ao.add(shade(WOODPILE.x, WOODPILE.z, 0.18, 0.8, 0.3))
-    ao = ao.add(shade(BASIN.x, BASIN.z, 0.14, 0.62, 0.26))
+    /* the krater and the log pile stand ON the paving, and a bowl whose
+       body overhangs its own foot lets less sky under it than a plinth
+       does: their cores are tighter than the fire's and they go deeper.
+       Read at 4x, this is the difference between an object placed on the
+       floor and an object floating a centimetre over it. */
+    ao = ao.add(shade(WOODPILE.x, WOODPILE.z, 0.26, 0.92, 0.58))
+    ao = ao.add(shade(BASIN.x, BASIN.z, 0.21, 0.74, 0.6))
     // The foot of every object holds a soft core, then its cast shadow
     // lengthens AWAY from the one source. These are analytic penumbras,
     // evaluated on the paving, so they add neither meshes nor draw calls.
@@ -533,8 +538,8 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
         .mul(oneMinus(smoothstep(0.12, reach, along)))
     }
     for (const s of SEATS) ao = ao.add(cast(s.x, s.z, 0.29, 1.7).mul(0.24))
-    ao = ao.add(cast(WOODPILE.x, WOODPILE.z, 0.25, 0.85).mul(0.23))
-    ao = ao.add(cast(BASIN.x, BASIN.z, 0.19, 0.9).mul(0.24))
+    ao = ao.add(cast(WOODPILE.x, WOODPILE.z, 0.27, 1.05).mul(0.34))
+    ao = ao.add(cast(BASIN.x, BASIN.z, 0.21, 1.05).mul(0.34))
     colr = colr.mul(oneMinus(clamp(ao, 0, 0.72)))
 
     stoneMat.colorNode = shoulder(haze(colr, d, 14, 62))
