@@ -409,23 +409,42 @@ export function createEclipse(scene: Scene) {
       .add(0.08)
     const chromo = pow(smoothstep(1.088, 1.002, r), 1.6).mul(patch).mul(3.0).mul(uTotal)
 
-    // THE PROMINENCES: three loops standing off the limb, breathing on a
-    // clock no one watches. They start at 1.028 and not at 1.0, because
-    // the moon's own silhouette reaches 1.022 and a loop that grows from
-    // the sun's surface is a loop nobody ever sees (round 6).
+    /* THE PROMINENCES: three flames standing off the limb at 11, 9 and 4
+       o'clock, each one a STRUCTURE and not a warm smudge. A prominence
+       narrows and leans as it climbs, its foot burns hardest, and strands
+       inside it peel apart on the way up, which is what separates three
+       flames from one continuous rim. They start at 1.028 and not at 1.0,
+       because the moon's silhouette reaches 1.022 and a loop growing from
+       the sun's surface is a loop nobody ever sees (round 6). */
     const FOOT = 1.028
-    const promAt = (at: number, w: number, hgt: number, ph: number): N => {
-      const dA = abs(sin(ang.sub(at).mul(0.5)))
-      const g = exp(pow(dA.div(w), 2).negate())
+    const promAt = (
+      at: number,
+      w: number,
+      hgt: number,
+      ph: number,
+      twist: number,
+      strandK: number
+    ): N => {
       const lift = float(hgt).mul(float(0.86).add(sin(uTime.mul(0.09).add(ph)).mul(0.14)))
-      const lobe = smoothstep(float(FOOT).add(lift), FOOT + 0.008, r).mul(
-        smoothstep(FOOT - 0.010, FOOT + 0.012, r)
-      )
-      return g.mul(pow(lobe, 1.4))
+      // how far up the flame this pixel is
+      const up = clamp(r.sub(FOOT).div(lift), 0, 1)
+      // it narrows as it climbs, and it leans further the higher it goes
+      const wid = float(w).mul(float(1).sub(up.mul(0.52)))
+      const dA = bearing(ang, float(at)).sub(float(twist).mul(pow(up, 1.6)))
+      const t = dA.div(wid)
+      const tt = t.mul(t)
+      const body = exp(tt.mul(-1.5))
+      // the strands: a flame is a bundle of loops, and they part upward
+      const strands = pow(abs(cos(t.mul(strandK).add(up.mul(2.2)))), 5.0).mul(0.6)
+      const across = body.mul(float(0.5).add(strands))
+      // the foot burns, the crown thins out and lets go
+      const along = smoothstep(1.0, 0.58, up).mul(float(0.38).add(pow(oneMinus(up), 1.5).mul(0.62)))
+      const foot = smoothstep(FOOT - 0.010, FOOT + 0.012, r)
+      return across.mul(along).mul(foot)
     }
-    const prom = promAt(1.95, 0.075, 0.165, 0.0)
-      .add(promAt(-0.62, 0.045, 0.105, 2.4).mul(0.8))
-      .add(promAt(3.02, 0.058, 0.195, 4.1).mul(0.9))
+    const prom = promAt(1.95, 0.15, 0.185, 0.0, 0.05, 2.7)
+      .add(promAt(-0.62, 0.09, 0.115, 2.4, -0.035, 3.4).mul(0.86))
+      .add(promAt(3.02, 0.116, 0.215, 4.1, 0.042, 3.0).mul(0.94))
     const rose = chromo.add(prom.mul(2.6).mul(uTotal))
 
     const total = edge.add(rose)
