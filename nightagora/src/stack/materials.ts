@@ -115,10 +115,17 @@ export interface MaterialSet {
   material: (opts?: DetailScales) => MeshStandardNodeMaterial
 }
 
-/** production reads R2; dev reads the asset plugin's own route */
+/* WHERE THE BYTES STAND. Production reads the media origin; a dev server and
+   a preview server both serve the store themselves through the asset plugin.
+   The preview check is on the HOSTNAME rather than on the build mode, because
+   a production bundle previewed on localhost is exactly what the cost gate
+   measures, and pointing it at a CDN that does not hold the library yet would
+   make every texture reading in that gate a zero. A deployed bundle is never
+   on localhost. */
+const LOCAL = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname)
 export const ASSET_BASE: string =
   (import.meta.env['VITE_NA_ASSET_BASE'] as string | undefined) ??
-  (import.meta.env.DEV ? '/na-assets/' : 'https://media.agoracosmica.org/night/')
+  (import.meta.env.DEV || LOCAL ? '/na-assets/' : 'https://media.agoracosmica.org/night/')
 
 /* WHAT A PHOTOGRAPH DOES NOT ANSWER. How far apart the mid and micro scales
    stand, how much relief this surface's normal is worth, how fast the
@@ -204,6 +211,8 @@ export interface MaterialLibrary {
   manifest: () => ManifestEntry[]
   /** what the loaded sets hold on the GPU, in megabytes */
   textureMB: () => number
+  /** every set that asked for its bytes and did not get them */
+  missing: () => Array<{ name: string; reason: string }>
   setTier: (tier: Tier) => void
   dispose: () => void
 }
@@ -249,6 +258,7 @@ export function createMaterialLibrary(tier: Tier): MaterialLibrary {
   const seen = new Map<string, ManifestEntry>()
   const held: Texture[] = []
   let remote: Map<string, ManifestEntry> | null = null
+  const missing = new Map<string, string>()
   let budget = texturesFor(tier)
   let bytes = 0
 
@@ -411,7 +421,12 @@ export function createMaterialLibrary(tier: Tier): MaterialLibrary {
   async function load(name: string): Promise<MaterialSet> {
     const set = sets.get(name) ?? build(name)
     if (!set.ready.value) {
-      await resolvers.get(name)?.((await manifestOnce()).get(`library/${name}`))
+      try {
+        await resolvers.get(name)?.((await manifestOnce()).get(`library/${name}`))
+      } catch (err) {
+        missing.set(name, (err as Error).message)
+        throw err
+      }
     }
     return set
   }
@@ -420,7 +435,16 @@ export function createMaterialLibrary(tier: Tier): MaterialLibrary {
     const cached = sets.get(name)
     if (cached) return cached
     const set = build(name)
-    void manifestOnce().then((index) => resolvers.get(name)?.(index.get(`library/${name}`)))
+    /* a set whose bytes never arrive leaves `ready` at zero, and every term
+       the library adds is gated on it: the scene draws exactly as it was
+       authored. It says so once and does not throw, because a missing CDN is
+       not a reason for a museum to go dark. */
+    void manifestOnce()
+      .then((index) => resolvers.get(name)?.(index.get(`library/${name}`)))
+      .catch((err: Error) => {
+        missing.set(name, err.message)
+        console.warn(`library/${name} was not loaded: ${err.message}`)
+      })
     return set
   }
 
@@ -429,6 +453,7 @@ export function createMaterialLibrary(tier: Tier): MaterialLibrary {
     sync,
     manifest: () => [...seen.values()],
     textureMB: () => bytes / (1024 * 1024),
+    missing: () => [...missing].map(([name, reason]) => ({ name, reason })),
     setTier(next) {
       budget = texturesFor(next)
     },

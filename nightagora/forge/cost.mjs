@@ -65,11 +65,11 @@ try {
     console.log(
       `${tier.toUpperCase()}  budget ${budget.draws} draws / ` +
         `${(budget.triangles / 1e6).toFixed(1)}M tris / ${budget.fps} fps / ` +
-        `${budget.frameMB} MB of frame`
+        `${budget.frameMB} MB of frame / ${budget.textureMB} MB of texture`
     )
     console.log(
       `${'stage'.padEnd(10)}${'draws'.padStart(7)}${'tris'.padStart(10)}` +
-        `${'frameMB'.padStart(9)}` +
+        `${'frameMB'.padStart(9)}${'texMB'.padStart(8)}` +
         `${'frame p50'.padStart(11)}${'p95'.padStart(8)}${'cpu p50'.padStart(9)}${'p95'.padStart(8)}`
     )
     for (const [name, phase, opts] of STAGES) {
@@ -86,7 +86,7 @@ try {
       const c = await page.evaluate(() => window.__forge.cost())
       console.log(
         `${name.padEnd(10)}${String(c.draws).padStart(7)}${String(c.triangles).padStart(10)}` +
-          `${c.frameMB.toFixed(1).padStart(9)}` +
+          `${c.frameMB.toFixed(1).padStart(9)}${c.textureMB.toFixed(1).padStart(8)}` +
           `${c.frameMsP50.toFixed(1).padStart(11)}${c.frameMsP95.toFixed(1).padStart(8)}` +
           `${c.cpuMsP50.toFixed(1).padStart(9)}${c.cpuMsP95.toFixed(1).padStart(8)}`
       )
