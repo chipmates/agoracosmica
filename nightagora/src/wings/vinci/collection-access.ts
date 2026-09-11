@@ -17,7 +17,7 @@ const crossing: Point = [a[0]! + (b[0]! - a[0]!) * .046, a[1]! + (b[1]! - a[1]!)
 export const collectionAccessLayout = {
   crossing, outward, tangent, width: 2, run: 3.6, count: 12, tread: .3,
   upper: 0, lower: -1.9, riser: 1.9 / 12, landingDepth: .75,
-  cheekWidth: .14, cheekRise: .09, cheekDepth: .22, pavingDepth: .06,
+  cheekWidth: .14, cheekRise: .28, cheekDepth: .22, pavingDepth: .06,
 } as const
 const L = collectionAccessLayout
 export const collectionAccessPoint = (along: number, across = 0): Point =>
@@ -67,8 +67,8 @@ export const collectionAccessProvenance = {
     de: 'Vorschlag für einen modernen Museumszugang. Eine 2,0 m breite Treppe verbindet den Hof auf H 0,00 m mit der Terrasse auf H −1,90 m. Zwölf Steigungen von 0,1583 m und Auftritte von 0,30 m liegen auf einer Lauflänge von 3,60 m, mit je einem 0,75 m langen Podest. Die genaue Lage wird aus der registrierten Terrassenkante abgeleitet; sie belegt keine historische Treppe. Nur unter den Belagsgrundrissen liegt das Planum 0,06 m unter der fertigen Oberfläche. IGN-Rohwerte sowie registrierte Plattformumrisse und -höhen bleiben unverändert.',
   },
   parameterLabel: {
-    en: 'Authored design ranges: width 1.8–2.2 m, tread 0.28–0.32 m, riser 0.14–0.18 m, landing length 0.6–0.9 m; the fixed total rise follows the existing 0.00/−1.90 m platform levels. Placement crosses the terrace east edge 4.6% from its southern endpoint; proposed placement range 4.0–5.0%. Concrete cheeks are 0.14 m wide [0.12–0.18], rise 0.09 m [0.06–0.12] and extend 0.22 m beneath the paving [0.18–0.26]. These are design choices, not survey uncertainties.',
-    de: 'Gestaltete Entwurfsbereiche: Breite 1,8–2,2 m, Auftritt 0,28–0,32 m, Steigung 0,14–0,18 m, Podestlänge 0,6–0,9 m; der feste Gesamthöhenunterschied folgt den vorhandenen Plattformhöhen 0,00/−1,90 m. Die Lage kreuzt die östliche Terrassenkante bei 4,6% ab ihrem südlichen Endpunkt; vorgeschlagener Lagebereich 4,0–5,0%. Betonwangen sind 0,14 m breit [0,12–0,18], stehen 0,09 m hoch [0,06–0,12] und reichen 0,22 m unter den Belag [0,18–0,26]. Dies sind Entwurfsentscheidungen, keine Vermessungsunsicherheiten.',
+    en: 'Authored design ranges: width 1.8–2.2 m, tread 0.28–0.32 m, riser 0.14–0.18 m, landing length 0.6–0.9 m; the fixed total rise follows the existing 0.00/−1.90 m platform levels. Placement crosses the terrace east edge 4.6% from its southern endpoint; proposed placement range 4.0–5.0%. Concrete cheeks are 0.14 m wide [0.12–0.18], stand 0.28 m above each tread as a continuous kerb [0.24–0.34] and extend 0.22 m beneath the paving [0.18–0.26]. These are design choices, not survey uncertainties.',
+    de: 'Gestaltete Entwurfsbereiche: Breite 1,8–2,2 m, Auftritt 0,28–0,32 m, Steigung 0,14–0,18 m, Podestlänge 0,6–0,9 m; der feste Gesamthöhenunterschied folgt den vorhandenen Plattformhöhen 0,00/−1,90 m. Die Lage kreuzt die östliche Terrassenkante bei 4,6% ab ihrem südlichen Endpunkt; vorgeschlagener Lagebereich 4,0–5,0%. Betonwangen sind 0,14 m breit [0,12–0,18], stehen als durchgehende Bordwange 0,28 m über jeder Stufe [0,24–0,34] und reichen 0,22 m unter den Belag [0,18–0,26]. Dies sind Entwurfsentscheidungen, keine Vermessungsunsicherheiten.',
   },
   recipe: 'One original welded contemporary concrete mesh, fourteen 60 mm finish caps and continuous 140 mm side cheeks. Structural risers are the actual shared modern terrain batch. Exact inner cheek bands are subtracted from terrain wall triangles; no coplanar offsets or hidden uncovered cut. Shared filtered cast-concrete material, no texture assets. Centreline and footprint use the retained terrace edge, a 4.6% crossing fraction and orthonormal outward/transverse axes.',
   date: '2026-09-10',

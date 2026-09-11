@@ -257,18 +257,31 @@ function architectureMaterial(): MeshStandardNodeMaterial {
   const rx = sy.cross(viewNormal), ry = viewNormal.cross(sx), det = sx.dot(rx)
   const gradient = rx.mul(height.dFdx()).add(ry.mul(height.dFdy())).mul(det.sign()).div(det.abs().max(1e-10)).toVar()
   m.normalNode = viewNormal.sub(gradient.div(length(gradient).div(.12).max(1))).normalize()
+  // A saw cut is a groove and a roof seam is a lap: both see less sky than
+  // the face beside them, which is the only way either reads where the apron
+  // lies in the building's own shade.
+  m.aoNode = float(1).sub(joints.mul(1.6).clamp(0, .55))
   m.name = 'vinci/collection/three-scale-architecture'; m.userData['provenance'] = collectionProvenance.recipe
   m.userData['normalGradientLimit'] = .12
   m.userData['filtering'] = 'Original 2.78 m drift, 0.16 m structure and 5.5 mm grain; exact nine-cell pixel coverage of 0.34 × 0.20 m staggered slate and 6/8 mm joints, blending to their area mean. Paving saw cuts integrate a 12 mm band on a 1.5 m world grid. Relief uses bounded world/view derivatives, no tangent-space normal map.'
   return m
 }
 
+/** Bounce reaches a soffit from the two glazed sides; the west and south
+ * elevations are the closed concrete walls. Metres, in the same frame as
+ * the layout above. */
+const SOFFIT = {
+  eastEdge: -21.3, northEdge: 33.3, reach: 2.6, deep: .38, open: 1.22,
+  bay: 4, postWidth: .5, postReach: 1.9, postShade: .55, northRowEast: -62, eastRowNorth: 36, canopyWest: -22.8,
+  canopyEast: -18.7, canopySouthPost: -41.5, canopyNorthPost: -34.5,
+} as const
+
 /** The pavilion, cheek and terrain lining share the same contemporary cast
  * concrete. Continuous world projections prevent seams at clipped strips;
  * all fine detail fades by pixel footprint instead of shimmering in motion.
  */
 export function collectionConcreteMaterial(closedCaster = false): MeshStandardNodeMaterial {
-  const { cameraViewMatrix, float, floor, fract, length, mix, mx_noise_float, normalWorldGeometry, positionView, positionWorld, smoothstep, vec2, vec3 } = TSL
+  const { cameraViewMatrix, exp, float, floor, fract, length, min, mix, mx_noise_float, normalWorldGeometry, positionView, positionWorld, smoothstep, vec2, vec3 } = TSL
   // Terrain retaining strips and hall returns are single surfaces. Only
   // the explicitly closed construction batches cast their back faces.
   const m = new MeshStandardNodeMaterial({ roughness: .88, side: DoubleSide, shadowSide: closedCaster ? BackSide : DoubleSide })
@@ -300,6 +313,28 @@ export function collectionConcreteMaterial(closedCaster = false): MeshStandardNo
   const rx = sy.cross(viewNormal), ry = viewNormal.cross(sx), det = sx.dot(rx)
   const gradient = rx.mul(height.dFdx()).add(ry.mul(height.dFdy())).mul(det.sign()).div(det.abs().max(1e-10)).toVar()
   m.normalNode = viewNormal.sub(gradient.div(length(gradient).div(.24).max(1))).normalize()
+  // A soffit here is lit by bounce off the apron, and bounce is a view
+  // factor: strongest at the open edge, falling off under the roof, and
+  // interrupted where a post stands under it. Occlusion on the indirect
+  // term only, so the measured sun and its shadows are untouched.
+  const downward = float(1).sub(smoothstep(-.86, -.52, n.y))
+  const openEast = float(SOFFIT.eastEdge).sub(P.x).max(0)
+  const openNorth = P.z.sub(SOFFIT.northEdge).max(0)
+  const depth = min(openEast, openNorth)
+  const openness = exp(depth.div(SOFFIT.reach).negate())
+  const soft = (distance: typeof P.x, radius: number) => float(1).sub(smoothstep(radius * .25, radius, distance))
+  const toRow = (coordinate: typeof P.x, offset: number) =>
+    fract(coordinate.sub(offset).div(SOFFIT.bay).add(.5)).sub(.5).abs().mul(SOFFIT.bay)
+  // The canopy stands on its own two posts, clear of the bay grid.
+  const separate = smoothstep(SOFFIT.canopyWest, SOFFIT.eastEdge, P.x)
+  const postRow = (coordinate: typeof P.x, offset: number, toEdge: typeof P.x) =>
+    soft(toRow(coordinate, offset), SOFFIT.postWidth).mul(exp(toEdge.div(SOFFIT.postReach).negate())).mul(float(1).sub(separate))
+  const postAt = (east: number, north: number) =>
+    soft(length(vec2(P.x.sub(east), P.z.add(north))), SOFFIT.postWidth * 1.6).mul(separate)
+  const posts = postRow(P.x, SOFFIT.northRowEast, openNorth).max(postRow(P.z, SOFFIT.eastRowNorth, openEast))
+    .max(postAt(SOFFIT.canopyEast, SOFFIT.canopySouthPost)).max(postAt(SOFFIT.canopyEast, SOFFIT.canopyNorthPost))
+  const bounce = mix(float(SOFFIT.deep), float(SOFFIT.open), openness).mul(float(1).sub(posts.mul(SOFFIT.postShade)))
+  m.aoNode = mix(float(1), bounce, downward)
   m.name = 'vinci/collection/filtered-cast-concrete'
   m.userData = { manifestId: collectionProvenance.manifestId, assetClass: 'GENERATED', certainty: 'reconstructed',
     recipe: 'Original museum concrete: filtered 3.2 m weather drift, 0.10 m aggregate and 4.5 mm pores; continuous 1.2 × 0.6 m form panels, restrained 0.15 m board lines, 4 mm finish joints and 24 mm tie recesses on a 0.6 m grid. Combined derivative relief is bounded to a 0.24 normal gradient. No textures or historical concrete claim.',
@@ -309,9 +344,13 @@ export function collectionConcreteMaterial(closedCaster = false): MeshStandardNo
 }
 
 function glazingMaterial(water = false): MeshStandardNodeMaterial {
-  const { cameraViewMatrix, float, length, mx_noise_float, normalWorldGeometry, positionView, positionWorld, smoothstep, vec3 } = TSL
+  const { cameraViewMatrix, float, length, mx_noise_float, normalView, normalWorldGeometry, positionView, positionViewDirection, positionWorld, smoothstep, vec3 } = TSL
   const m = new MeshStandardNodeMaterial({ color: water ? '#344b4d' : '#a5b2ae', roughness: water ? .22 : .17,
     metalness: water ? .34 : .12, transparent: !water, opacity: water ? 1 : .27, depthWrite: water, side: DoubleSide })
+  // The wing dims the probe so it cannot wash a mineral wall. Glass and still
+  // water are the two surfaces that owe the sky its full reflection, so they
+  // take it back on the material rather than on the scene.
+  m.envMapIntensity = water ? 2.1 : 2.6
   m.forceSinglePass = true
   const P = positionWorld, pixel = length(P.dFdx()).add(length(P.dFdy())).max(.000001)
   const resolved = (metres: number) => smoothstep(2, 4, float(metres).div(pixel))
@@ -326,8 +365,14 @@ function glazingMaterial(water = false): MeshStandardNodeMaterial {
   const gradient = rx.mul(height.dFdx()).add(ry.mul(height.dFdy())).mul(det.sign()).div(det.abs().max(1e-10)).toVar()
   const limit = water ? .045 : .006
   m.normalNode = viewNormal.sub(gradient.div(length(gradient).div(limit).max(1))).normalize()
+  // Glass turns to a mirror at a grazing angle: from the court this wall is
+  // seen almost edge on, and a fixed low opacity read there as a hole.
+  if (!water) {
+    const cosine = normalView.dot(positionViewDirection).abs().clamp(0, 1)
+    m.opacityNode = float(.27).add(float(1).sub(cosine).pow(5).mul(.68)).clamp(.27, .95)
+  }
   m.name = water ? 'vinci/collection/still-channel' : 'vinci/collection/full-height-glazing'
-  m.userData['provenance'] = 'Original static exhibition glass. Broad drift, middle waviness and filtered microscopic surface grain. No animated water, transmission pass, photographic texture or historical glazing claim.'
+  m.userData['provenance'] = 'Original static exhibition glass. Broad drift, middle waviness, filtered microscopic surface grain and a Schlick grazing-angle opacity. No animated water, transmission pass, photographic texture or historical glazing claim.'
   m.userData['normalGradientLimit'] = limit
   m.userData['filtering'] = 'Independent pixel filtering of 4.35 m drift, 0.143/0.167 m waviness and 17 mm grain; world/view height derivatives preserve each geometric plane and bound its surface-normal slope.'
   return m
