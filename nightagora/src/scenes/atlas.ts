@@ -36,7 +36,9 @@ import {
   Scene,
   Sprite,
   SpriteMaterial,
+  Vector2,
   Vector3,
+  Vector4,
 } from 'three/webgpu'
 import {
   abs,
@@ -45,8 +47,10 @@ import {
   float,
   instancedBufferAttribute,
   length,
+  max,
   mix,
   normalize,
+  screenUV,
   sin,
   smoothstep,
   uniform,
@@ -99,6 +103,59 @@ export interface AtlasStarRef {
   sprite: Sprite
 }
 
+/** where a seated name sits on the glass, in CSS pixels: the centre of its
+    own box and its half width */
+export interface LabelBounds {
+  x: number
+  y: number
+  half: number
+}
+
+// -------------------------------------------------- the lettering reserve
+/* THE NAMES RESERVE THEIR OWN PAPER. Every drawn line in this sky — the
+   hairlines between the stars and everything the burin cuts — is multiplied
+   by this mask, so ink never crosses a written name. The rectangles arrive
+   from the DOM solver AFTER it has seated every label, which means the mask
+   follows the letterpress and never the other way around: nothing here
+   moves a name, a target or a star. */
+interface Reserve {
+  node: N
+  update(labels: LabelBounds[], width: number, height: number): void
+}
+
+/** the tallest house carries six names */
+const RESERVE_SLOTS = 6
+
+function createLetteringReserve(): Reserve {
+  const extent: N = uniform(new Vector2(1, 1))
+  const rects: N[] = Array.from({ length: RESERVE_SLOTS }, () =>
+    uniform(new Vector4(-1e4, -1e4, 0, 0))
+  )
+  // screenUV runs top-down on both backends, which is the letterpress's own
+  // coordinate system, so a DOM rectangle needs no flip
+  const px = screenUV.mul(extent)
+  let node: N = float(1)
+  for (const rect of rects) {
+    const d = abs(px.sub(rect.xy)).sub(rect.zw)
+    node = node.mul(smoothstep(0, 10, max(d.x, d.y)))
+  }
+  return {
+    node,
+    update(labels, width, height) {
+      extent.value.set(width, height)
+      for (let i = 0; i < rects.length; i++) {
+        const rect = rects[i]
+        if (!rect) continue
+        const l = labels[i]
+        // the chip is a 44px target with its line of type through the
+        // middle: the reserve claims the TYPE, not the touch area
+        if (l) rect.value.set(l.x, l.y + 22, Math.max(6, l.half - 4), 9)
+        else rect.value.set(-1e4, -1e4, 0, 0)
+      }
+    },
+  }
+}
+
 export interface AtlasHandles {
   /** ease the dome + staging toward the focused chapter */
   update(dt: number, elapsed: number, aspect: number, reveal: number): void
@@ -109,6 +166,8 @@ export interface AtlasHandles {
   /** world position of a star (for projection + the crossing flight) */
   starWorld(slug: string, out: Vector3): Vector3 | null
   stars: AtlasStarRef[]
+  /** hand the sky the seated names, so the ink stays off them */
+  reserveLabels(labels: LabelBounds[], width: number, height: number): void
   visible(v: boolean): void
 }
 
@@ -329,7 +388,7 @@ function figureGeometry(
   return geo
 }
 
-function figureMaterial(uLine: N, uDraw: N): MeshBasicNodeMaterial {
+function figureMaterial(uLine: N, uDraw: N, reserve: Reserve): MeshBasicNodeMaterial {
   const mat = new MeshBasicNodeMaterial()
   mat.transparent = true
   mat.depthWrite = false
@@ -350,7 +409,7 @@ function figureMaterial(uLine: N, uDraw: N): MeshBasicNodeMaterial {
   mat.colorNode = vec3(LINE_GOLD.r, LINE_GOLD.g, LINE_GOLD.b).mul(
     float(0.8).add(core.mul(0.45))
   )
-  mat.opacityNode = core.add(halo).mul(wN).mul(ends).mul(gate).mul(uLine)
+  mat.opacityNode = core.add(halo).mul(wN).mul(ends).mul(gate).mul(uLine).mul(reserve.node)
   return mat
 }
 
@@ -622,6 +681,7 @@ export function createAtlas(scene: Scene): AtlasHandles {
   dome.visible = false
   scene.add(dome)
   const rand = mulberry32(FOUNDING_SEED)
+  const reserve = createLetteringReserve()
 
   const starMap = starTexture(false)
   const anchorMap = starTexture(true)
@@ -731,7 +791,7 @@ export function createAtlas(scene: Scene): AtlasHandles {
 
     const lineU: N = uniform(0)
     const drawU: N = uniform(1)
-    patch.add(new Mesh(figureGeometry(c, mag, sizes), figureMaterial(lineU, drawU)))
+    patch.add(new Mesh(figureGeometry(c, mag, sizes), figureMaterial(lineU, drawU, reserve)))
 
     const list: Star[] = []
     c.stars.forEach((s, si) => {
@@ -899,6 +959,7 @@ export function createAtlas(scene: Scene): AtlasHandles {
     currentElevation: () => elevation,
     starWorld,
     stars,
+    reserveLabels: reserve.update,
     visible(v: boolean) {
       dome.visible = v
     },

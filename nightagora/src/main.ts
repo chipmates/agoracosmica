@@ -412,6 +412,8 @@ function syncChips(): void {
     p.chip.el.style.top = `${p.y}px`
     p.chip.el.classList.add('lit')
   }
+  // the sky is told where the names sit, so its ink stays off them
+  atlas.reserveLabels(places, innerWidth, innerHeight)
 }
 
 /** From the sky back down to the hearth, the gaze easing all the way. */
