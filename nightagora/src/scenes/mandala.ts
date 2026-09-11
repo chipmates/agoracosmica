@@ -108,12 +108,29 @@ export function createMandala(scene: Scene): MandalaHandles {
         cut = max(cut, line(r.sub(radius), 0.025))
         lip = max(lip, line(r.sub(radius + 0.055), 0.014))
       }
-      // The suspended court interrupts sky and lamp light below its rails.
+      /* THE SUSPENDED COURT STANDS OVER THIS PAVING, AND THE THIRTY LAMPS
+         STAND OUTSIDE IT. Its own footprint painted straight down is an
+         occlusion and nothing more: the wheel reads as a print of a wheel.
+         So there are two terms. The core is what no light reaches, directly
+         under the rails and the spokes. The penumbra is the same shapes
+         thrown INWARD and widened, because every lamp of the ring is
+         outside the court and above it, so what it casts falls toward the
+         well. One extra evaluation of two masks, no second light, no map. */
       const ca = atan(P.z, P.x).add(uCourtAngle)
+      const soft = (dist: N, half: number, feather: number): N =>
+        oneMinus(smoothstep(float(half), float(half + feather), abs(dist)))
+      const spokeAt = (rr: N, half: number, feather: number): N =>
+        oneMinus(smoothstep(float(half), float(half + feather), abs(fract(ca.mul(8 / TAU).add(0.5)).sub(0.5))))
+          .mul(smoothstep(3.3, 3.7, rr))
+          .mul(oneMinus(smoothstep(7.0, 7.5, rr)))
       const rail = max(line(r.sub(7.42), 0.39), line(r.sub(3.35), 0.40))
-      const spoke = oneMinus(smoothstep(0.05, 0.16, abs(fract(ca.mul(8 / TAU).add(0.5)).sub(0.5))))
-        .mul(smoothstep(3.3, 3.7, r)).mul(oneMinus(smoothstep(7.0, 7.5, r)))
+      const spoke = spokeAt(r, 0.05, 0.11)
+      // how far a lamp at the rim throws the court's own edge across the map
+      const thrown = r.add(0.72)
+      const railPen = max(soft(thrown.sub(7.42), 0.44, 0.62), soft(thrown.sub(3.35), 0.44, 0.58))
+      const spokePen = spokeAt(thrown, 0.055, 0.26)
       alb = alb.mul(oneMinus(max(rail, spoke).mul(0.43)))
+      alb = alb.mul(oneMinus(max(railPen, spokePen).mul(0.3)))
     } else if (kind === 'limb') {
       const ticks = (count: number, depth: number, width: number): N => line(arc(count), width).mul(step(float(13.2).sub(depth), r)).mul(step(r, 13.2))
       cut = max(ticks(150, 0.29, 0.018), max(ticks(30, 0.65, 0.035), ticks(6, 1.06, 0.06)))
