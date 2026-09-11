@@ -10,6 +10,8 @@ import * as TSL from 'three/tsl'
 import type { MaterialLibrary } from '../../stack/materials'
 import { createShellSurface, prepareSurfaceGeometry, type ShellSurfaceKind } from './surface'
 import { timberFaceCoordinates, timberPanelFrame } from './timber'
+import { gatePassageProvenance } from './gate-passage'
+import { foundationPlinthFaces, foundationPlinthProvenance } from './foundation-plinth'
 import dossierText from './data/closluce.json?raw'
 
 // TSL's composable overload graph is represented once at this boundary.
@@ -20,7 +22,7 @@ const { attribute, cameraPosition, clamp, float, floor, fract, length, mix, mx_n
 type V2 = [number, number]
 type V3 = [number, number, number]
 type Tier = 'hero' | 'standard' | 'calm'
-type MatKey = 'brick' | 'stone' | 'slate' | 'oak' | 'iron' | 'glass' | 'dark' | 'clay'
+type MatKey = 'brick' | 'stone' | 'slate' | 'oak' | 'iron' | 'lead' | 'glass' | 'glassSky' | 'dark' | 'clay'
 interface Opening { id:string; type:string; from_m:number; width_m:number; base_m:number; height_m:number; render:boolean }
 interface Facade { id:string; from:V2; to:V2; length_m:number; openings:Opening[]; render:boolean; gable_segment?:string; pattern:{field:string} }
 interface Wall { facade_id?:string; from:V2; to:V2; base_m:number; height_m:number; thickness_m:number; render:boolean }
@@ -41,10 +43,11 @@ const dot=(a:V3,b:V3):number=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2]
 const lerp=(a:V3,b:V3,t:number):V3=>[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t]
 const world=(p:V3):V3=>[p[0],p[2],-p[1]]
 
-function surface(kind:MatKey,library?:MaterialLibrary):MeshStandardNodeMaterial {
-  if(kind==='brick'||kind==='stone'||kind==='slate'||kind==='oak')return createShellSurface(kind,library)
-  const palette={iron:'#302e29',glass:'#6a7775',dark:'#282721',clay:'#915941'}
-  const mat=kind==='glass'?new MeshPhysicalNodeMaterial({roughness:.20,metalness:0,ior:1.5,transmission:.32,thickness:.003}):new MeshStandardNodeMaterial({roughness:kind==='iron'?.76:.88,metalness:0})
+function surface(kind:MatKey,library?:MaterialLibrary,valleys:readonly [V3,V3][]=[]):MeshStandardNodeMaterial {
+  if(kind==='brick'||kind==='stone'||kind==='slate'||kind==='oak')return createShellSurface(kind,library,valleys)
+  const glazing=kind==='glass'||kind==='glassSky'
+  const palette={lead:'#7b807f',iron:'#302e29',glass:'#243132',glassSky:'#3a4a4d',dark:'#282721',clay:'#915941'}
+  const mat=glazing?new MeshPhysicalNodeMaterial({roughness:.21,metalness:0,ior:1.5,transmission:0,thickness:.003,specularIntensity:kind==='glassSky'?.28:.06,envMapIntensity:kind==='glassSky'?.55:.08}):new MeshStandardNodeMaterial({roughness:kind==='lead'?.61:kind==='iron'?.76:.88,metalness:kind==='lead'?.7:0})
   const c=new Color(palette[kind]); const p=positionWorld
   const density=float(1).sub(smoothstep(18,72,length(p.sub(cameraPosition))))
   const macro=mx_noise_float(p.mul(.29)).mul(.14).add(.96)
@@ -53,12 +56,12 @@ function surface(kind:MatKey,library?:MaterialLibrary):MeshStandardNodeMaterial 
   const U=uv();const colour=vec3(c.r,c.g,c.b).mul(macro).mul(grain).mul(attribute('tone','float'))
   // Three spatial scales and thinning grain share one physical material.
   mat.colorNode=colour
-  mat.roughnessNode=kind==='glass'?clamp(float(.20).add(micro),.01,.23):kind==='iron'?clamp(float(.76).add(micro),.58,.80):clamp(float(.87).add(micro),.1,1)
-  if(kind!=='glass'&&kind!=='dark') {
+  mat.roughnessNode=glazing?clamp(float(.21).add(micro),.18,.23):kind==='lead'?clamp(float(.61).add(micro),.48,.72):kind==='iron'?clamp(float(.76).add(micro),.58,.80):clamp(float(.87).add(micro),.1,1)
+  if(!glazing&&kind!=='dark') {
     const n1=mx_noise_float(p.mul(24)); const n2=mx_noise_float(p.add(vec3(.025,0,.02)).mul(24))
     mat.normalNode=normalMap(vec3(n1.sub(n2).mul(.045).mul(density).add(.5),n2.mul(.024).mul(density).add(.5),1),vec2(.65,.65))
   }
-  if(kind==='glass')mat.normalNode=normalMap(vec3(U.x.mul(22).sin().mul(.018).add(.5),U.y.mul(17).sin().mul(.015).add(.5),1),vec2(.25,.25))
+  if(glazing)mat.normalNode=normalMap(vec3(U.x.mul(22).sin().mul(.008).add(.5),U.y.mul(17).sin().mul(.006).add(.5),1),vec2(.25,.25))
   mat.name=`vinci/${kind}`
   return mat
 }
@@ -130,6 +133,55 @@ function roofFaces():RoofFace[] {
   }return faces
 }
 
+/** Visible roof-plane intersections derive the damp lines, never a painted
+ * stripe chosen in screen space. Only north-facing junctions are retained. */
+function roofValleys(faces:RoofFace[]):[V3,V3][] {
+  const lines:[V3,V3][]=[]
+  for(let i=0;i<faces.length;i++)for(let j=i+1;j<faces.length;j++){
+    const a=faces[i]!,b=faces[j]!
+    if(a.id===b.id||Math.max(a.normal[1],b.normal[1])<=0)continue
+    let overlap=a.polygon
+    for(const plane of b.planes.slice(0,-1))overlap=clip(overlap,plane.fn)
+    if(overlap.length<3)continue
+    const hits:V3[]=[],delta=(p:V3)=>a.z(p[0],p[1])-b.z(p[0],p[1])
+    for(let k=0;k<overlap.length;k++){
+      const p=overlap[k]!,q=overlap[(k+1)%overlap.length]!,u=delta(p),v=delta(q)
+      if(Math.abs(u)<1e-6)hits.push(p)
+      if(u*v<0)hits.push(lerp(p,q,u/(u-v)))
+    }
+    if(hits.length<2)continue
+    let pair:[V3,V3]=[hits[0]!,hits[1]!],span=0
+    for(const p of hits)for(const q of hits){const d=Math.hypot(...sub(q,p));if(d>span){span=d;pair=[p,q]}}
+    if(span<.3)continue
+    const mid=lerp(...pair,.5)
+    if(mid[1]<-12||faces.some(f=>f!==a&&f!==b&&f.planes.slice(0,-1).every(p=>p.fn(mid)>0)&&f.z(mid[0],mid[1])>mid[2]+.02))continue
+    lines.push(pair.map(p=>world(p)) as [V3,V3])
+  }
+  return lines
+}
+
+/** Keep inward gable backing below the union of the actual roof solids.
+ * Test its offset EN coordinates, not the outer facade profile. The 70 mm
+ * allowance is the existing oak underside in drawRoofs. Outside every roof
+ * footprint the original wall remains, so clipping cannot open a side seam.
+ */
+function clipGableBacking(poly:V3[],faces:RoofFace[]):V3[][] {
+  let pending=[poly];const retained:V3[][]=[]
+  for(const face of faces){
+    const planes=[...face.planes.slice(0,-1),{fn:(p:V3)=>face.z(p[0],p[1])-.07-p[2]}]
+    pending=pending.flatMap(part=>{
+      let inside=part
+      for(const plane of planes)inside=clip(inside,plane.fn)
+      if(inside.length>=3)retained.push(inside)
+      return subtract(part,planes)
+    })
+  }
+  // Pending polygons lie above all applicable roof undersides. Remove only
+  // their footprint-covered portions; preserve unroofed masonry unchanged.
+  for(const face of faces)pending=pending.flatMap(part=>subtract(part,face.planes.slice(0,-1)))
+  return[...retained,...pending]
+}
+
 function facadePoint(f:Facade,x:number,z:number,out=0):V3 {
   const dx=(f.to[0]-f.from[0])/f.length_m,dy=(f.to[1]-f.from[1])/f.length_m
   return [f.from[0]+dx*x+dy*out,f.from[1]+dy*x-dx*out,z]
@@ -158,9 +210,13 @@ function drawFacade(f:Facade,wall:Wall,b:Batches,tier:Tier,faces:RoofFace[]):voi
   outline.push([0,0,heightAt(0)])
   let panels=[outline]
   for(const o of f.openings.filter(o=>o.render&&o.type!=='blind-recess'))panels=panels.flatMap(p=>subtract(p,rectPlanes(o.from_m,o.from_m+o.width_m,o.base_m,o.base_m+o.height_m)))
-  const emit=(batch:Batch,p:V3[],out:number,tone=1):void=>batch.polygon(p.map(v=>facadePoint(f,v[0],v[2],out)),v=>{
-    const x=(v[0]-f.from[0])*(f.to[0]-f.from[0])/f.length_m+(v[1]-f.from[1])*(f.to[1]-f.from[1])/f.length_m;return [x,v[2]]
-  },tone)
+  const emit=(batch:Batch,p:V3[],out:number,tone=1):void=>{
+    const polygon=p.map(v=>facadePoint(f,v[0],v[2],out))
+    const pieces=batch===b.dark&&isGable?clipGableBacking(polygon,faces):[polygon]
+    for(const piece of pieces)batch.polygon(piece,v=>{
+      const x=(v[0]-f.from[0])*(f.to[0]-f.from[0])/f.length_m+(v[1]-f.from[1])*(f.to[1]-f.from[1])/f.length_m;return [x,v[2]]
+    },tone)
+  }
   const stoneField=f.pattern.field==='tuffeau'
   for(const panel of panels){b.stone.surfaceRole=stoneField?2:1;emit(b.stone,panel,0,.76);b.stone.surfaceRole=0;emit(b.dark,[...panel].reverse(),-wall.thickness_m,.88)}
   // Every brick course is shallow, bevelled geometry; vertical joints retain
@@ -184,9 +240,21 @@ function drawFacade(f:Facade,wall:Wall,b:Batches,tier:Tier,faces:RoofFace[]):voi
   // Alternating dressed quoins are kept off almost collinear cadastral joins.
   const corner=(x:number):void=>{for(let z=.7,n=0;z<heightAt(x)-.2;z+=.28,n++){const w=n%2?.38:.58;faceBox(b.stone,f,x===0?w/2:f.length_m-w/2,z+.133,w,.262,.10,.055,.91+hash(n,f.length_m)*.10)}}
   if(f.length_m>2.5){corner(0);corner(f.length_m)}
-  for(const z of [.69,top-.12])faceBox(b.stone,f,f.length_m/2,z,f.length_m,.17,.16,.07,.95)
+  for(const z of [.69,top-.12]){
+    let runs:[number,number][]=[[0,f.length_m]]
+    for(const o of f.openings){
+      if(!o.render||o.type==='blind-recess'||o.base_m>=z+.085||o.base_m+o.height_m<=z-.085)continue
+      const left=o.from_m,right=left+o.width_m
+      runs=runs.flatMap(([a,c]):[number,number][]=>{
+        if(c<=left||a>=right)return[[a,c]]
+        const pieces:[number,number][]=[]
+        if(a<left)pieces.push([a,left]);if(c>right)pieces.push([right,c]);return pieces
+      })
+    }
+    for(const [a,c]of runs)if(c-a>.001)faceBox(b.stone,f,(a+c)/2,z,c-a,.17,.16,.07,.95)
+  }
   // Every reveal, sill, mullion and transom stands in the real wall aperture.
-  for(const o of f.openings)if(o.render)drawOpening(f,o,wall.thickness_m,b)
+  if(!f.id.startsWith('tower-crown-'))for(const o of f.openings)if(o.render)drawOpening(f,o,wall.thickness_m,b)
   if(isGable&&roof){
     const p=peak>0.1&&peak<f.length_m-.1?peak:peakOther
     const pa=facadePoint(f,0,heightAt(0)+.06,.05),pb=facadePoint(f,p,heightAt(p)+.09,.05),pc=facadePoint(f,f.length_m,heightAt(f.length_m)+.06,.05)
@@ -195,7 +263,6 @@ function drawFacade(f:Facade,wall:Wall,b:Batches,tier:Tier,faces:RoofFace[]):voi
     for(const [a,c] of [[0,p],[p,f.length_m]] as [number,number][])for(let x=a+.3;x<c-.1;x+=.42)faceBox(b.stone,f,x,heightAt(x)-.20,.43,.42,.10,.042,.92)
     const peakPoint=facadePoint(f,p,heightAt(p)+.28,.05);finial(b,peakPoint,.65)
   }
-  void faces
 }
 function finial(b:Batches,p:V3,h:number):void {
   solid(b.stone,[p[0],p[1],p[2]+h*.12],[h*.28,h*.28,h*.15]);solid(b.stone,[p[0],p[1],p[2]+h*.36],[h*.12,h*.12,h*.50])
@@ -221,22 +288,53 @@ function drawOpening(f:Facade,o:Opening,thickness:number,b:Batches):void {
     drawPortal(f,x,z,w,h,b);return
   }
   if(o.type==='traceried-window') {
-    // Paired lancets and a quadrilobe, with plain period-proposal glazing.
-    const panes=w>1.2?2:1;for(let i=0;i<panes;i++){const pw=w/panes-.10,px=x+i*w/panes+.05;faceBox(b.glass,f,px+pw/2,z+h*.41,pw,h*.78,.012,-.18,.65);const spring=z+h*.72
-      beam(b.stone,facadePoint(f,px,spring,.04),facadePoint(f,px+pw/2,z+h*.96,.04),.065);beam(b.stone,facadePoint(f,px+pw/2,z+h*.96,.04),facadePoint(f,px+pw,spring,.04),.065)
-      if(i>0)faceBox(b.stone,f,px-.05,z+h*.43,.10,h*.86,.15,.015)
+    // The glazed polygons and stone spandrels share exactly one contour.
+    // Plain leaded glass is a period proposal; the modern painted panes are
+    // reference-only. The paired lights retain the printed 1.80 m height.
+    const panes=w>1.2?2:1, tip=z+(panes===2?Math.min(1.8,h-.04):h-.04)
+    const spring=tip-(panes===2?.46:.40), contours:V3[][]=[]
+    const pane=(poly:V3[],batch:Batch,out:number,tone:number):void=>batch.polygon(poly.map(v=>facadePoint(f,v[0],v[2],out)),v=>[
+      (v[0]-f.from[0])*(f.to[0]-f.from[0])/f.length_m+(v[1]-f.from[1])*(f.to[1]-f.from[1])/f.length_m,v[2]],tone)
+    faceBox(b.dark,f,x+w/2,z+h/2,w,h,.025,-thickness-.24,.55)
+    for(let i=0;i<panes;i++){
+      const pw=w/panes-.10,px=x+i*w/panes+.05,mid=px+pw/2
+      const contour:V3[]=[[px,0,z+.015],[px+pw,0,z+.015],[px+pw,0,spring]]
+      // Twelve chords follow each pointed head, tangent to its upright.
+      for(let j=1;j<=12;j++){const t=j/12;contour.push([px+pw-pw*.5*t*t,0,spring+(tip-spring)*t])}
+      for(let j=11;j>=0;j--){const t=j/12;contour.push([px+pw*.5*t*t,0,spring+(tip-spring)*t])}
+      contours.push(contour)
+      const transom=z+(tip-z)*.63
+      pane(clip(contour,p=>transom-p[2]),b.glass,-.055,.78)
+      pane(clip(contour,p=>p[2]-transom),b.glassSky,-.055,.78)
+      const arch=contour.slice(2)
+      for(let j=0;j<arch.length-1;j++)beam(b.stone,facadePoint(f,arch[j]![0],arch[j]![2],.04),facadePoint(f,arch[j+1]![0],arch[j+1]![2],.04),.065)
+      if(i>0)faceBox(b.stone,f,px-.05,z+(spring-z)/2,.10,spring-z,.15,.015)
+      const topAt=(u:number):number=>spring+(tip-spring)*Math.sqrt(Math.max(0,1-Math.abs(u-mid)/(pw/2)))
+      for(let j=1;j<3;j++){const u=px+j*pw/3,top=topAt(u);faceBox(b.iron,f,u,(z+.015+top)/2,.012,top-z-.015,.019,-.042,.75)}
+      for(let v=z+.30;v<tip-.10;v+=.30){const t=Math.max(0,(v-spring)/(tip-spring)),inset=pw*.5*t*t;faceBox(b.iron,f,mid,v,pw-2*inset,.013,.019,-.042,.75)}
     }
-    for(let i=0;i<4;i++){const a=i*Math.PI/2;const cx=x+w/2+Math.cos(a)*.13,cy=z+h-.15+Math.sin(a)*.13;for(let j=0;j<12;j++){const t=j*Math.PI/6,s=(j+1)*Math.PI/6;beam(b.stone,facadePoint(f,cx+Math.cos(t)*.12,cy+Math.sin(t)*.12,.08),facadePoint(f,cx+Math.cos(s)*.12,cy+Math.sin(s)*.12,.08),.035)}}
+    if(panes===2)for(let i=0;i<4;i++){
+      const a=i*Math.PI/2,cx=x+w/2+Math.cos(a)*.085,cy=z+h-.20+Math.sin(a)*.085,disc:V3[]=[]
+      for(let j=0;j<24;j++){const t=j*Math.PI/12,q=(j+1)*Math.PI/12;disc.push([cx+Math.cos(t)*.085,0,cy+Math.sin(t)*.085]);beam(b.stone,facadePoint(f,cx+Math.cos(t)*.094,cy+Math.sin(t)*.094,.04),facadePoint(f,cx+Math.cos(q)*.094,cy+Math.sin(q)*.094,.04),.024)}
+      contours.push(disc);pane(disc,b.glassSky,-.055,.78)
+    }
+    let spandrels:V3[][]=[[[x,0,z],[x+w,0,z],[x+w,0,z+h],[x,0,z+h]]]
+    for(const contour of contours){const planes=contour.map((p,i)=>{const q=contour[(i+1)%contour.length]!;return{fn:(v:V3)=>(q[0]-p[0])*(v[2]-p[2])-(q[2]-p[2])*(v[0]-p[0])}});spandrels=spandrels.flatMap(poly=>subtract(poly,planes))}
+    for(const poly of spandrels)pane(poly,b.stone,.005,.96)
   } else {
     const mullion=h>1.6&&w>1?.12:.055;const transom=z+h*.63
-    faceBox(b.glass,f,x+w/2,z+h/2,w-.07,h-.05,.009,-.24,.78)
+    // A shallow 55 mm rebate remains visible under the street's raking view.
+    // Upper panes admit a restrained sky reflection; lower panes retain the
+    // dark room's response without screen-space transmission artefacts.
+    faceBox(b.glass,f,x+w/2,z+h*.315,w-.07,h*.63-.035,.009,-.055,.78)
+    faceBox(b.glassSky,f,x+w/2,z+h*.815,w-.07,h*.37-.035,.009,-.055,.78)
     // A dark inner reveal is spatial depth behind reflective small panes.
     faceBox(b.dark,f,x+w/2,z+h/2,w,h,.025,-thickness-.24,.55)
     faceBox(b.stone,f,x+w/2,z+h/2,mullion,h,.19,-.02,.91)
     if(h>1.6)faceBox(b.stone,f,x+w/2,transom,w,.105,.20,-.005,.95)
     const cols=Math.max(2,Math.round(w/.24)),rows=Math.max(2,Math.round(h/.34))
-    for(let i=1;i<cols;i++)faceBox(b.iron,f,x+i*w/cols,z+h/2,.012,h,.019,-.17,.72)
-    for(let i=1;i<rows;i++)faceBox(b.iron,f,x+w/2,z+i*h/rows,w,.013,.02,-.16,.77)
+    for(let i=1;i<cols;i++)faceBox(b.iron,f,x+i*w/cols,z+h/2,.012,h,.019,-.042,.72)
+    for(let i=1;i<rows;i++)faceBox(b.iron,f,x+w/2,z+i*h/rows,w,.013,.02,-.040,.77)
     // Small moulding steps and tooth stones produce edge shadows at two scales.
     for(const offset of [.035,.085]) {
       faceBox(b.stone,f,x-offset,z+h/2,.025,h+.05,.065,.095+offset/2)
@@ -278,7 +376,16 @@ function drawRoofs(b:Batches,faces:RoofFace[],tier:Tier):void {
     for(const poly of visible){b.slate.polygon(poly,face.tex,.96+hash(poly[0]![0])* .10)
       b.oak.polygon([...poly].reverse().map(underside),timber.uv,.7,timber.seed)
       const min=Math.min(...poly.map(p=>face.tex(p)[1])),max=Math.max(...poly.map(p=>face.tex(p)[1]));const len=Math.hypot(...face.normal);const offset=(p:V3,h:number):V3=>[p[0]+face.normal[0]/len*h,p[1]+face.normal[1]/len*h,p[2]+face.normal[2]/len*h]
-      for(let v=Math.ceil(min/.14)*.14;v<max;v+=.14){const strip=clip(clip(poly,p=>face.tex(p)[1]-v),p=>v+.013-face.tex(p)[1]);if(strip.length<3)continue;b.slate.polygon(strip.map(p=>offset(p,.009)),face.tex,.83)}
+      // Course membership uses a 1 nm numerical grid; this is arithmetic
+      // tolerance, not survey precision. Integer rows avoid accumulated drift.
+      const courseNM=140000000, widthNM=13000000, minNM=Math.round(min*1e9), maxNM=Math.round(max*1e9)
+      const firstCourse=Math.ceil(minNM/courseNM), endCourse=Math.ceil(maxNM/courseNM)
+      for(let row=firstCourse;row<endCourse;row++){
+        const v=row*courseNM/1e9, upper=(row*courseNM+widthNM)/1e9
+        const strip=clip(clip(poly,p=>face.tex(p)[1]-v),p=>upper-face.tex(p)[1])
+        if(strip.length<3)continue
+        b.slate.polygon(strip.map(p=>offset(p,.009)),face.tex,.83)
+      }
       // Thin eave edges retain the roof's weight against the sky.
       for(let i=0;i<poly.length;i++){const a=poly[i]!,c=poly[(i+1)%poly.length]!;if(Math.abs(a[2]-spec.roof.segments.find(r=>r.id===face.id)!.eaves_m)<.015&&Math.abs(c[2]-a[2])<.01){beam(b.oak,[a[0],a[1],a[2]-.045],[c[0],c[1],c[2]-.045],.10,.12)}}
     }
@@ -300,7 +407,7 @@ function drawRoofs(b:Batches,faces:RoofFace[],tier:Tier):void {
   }
   for(const roof of spec.roof.segments){const [a,c]=roof.ridge
     if(roof.type==='gable'){const len=Math.hypot(...sub(c,a));const count=Math.ceil(len/.35)
-      for(let i=0;i<count;i++){const p=lerp(a,c,i/count),q=lerp(a,c,(i+1)/count),m=lerp(p,q,.5);const hidden=faces.some(f=>f.id!==roof.id&&f.planes.slice(0,-1).every(pl=>pl.fn(m)>0)&&f.z(m[0],m[1])>m[2]+.05);if(hidden)continue;beam(b.slate,[p[0],p[1],p[2]+.02],[q[0],q[1],q[2]+.02],.24,.10)}
+      for(let i=0;i<count;i++){const p=lerp(a,c,i/count),q=lerp(a,c,(i+1)/count),m=lerp(p,q,.5);const hidden=faces.some(f=>f.id!==roof.id&&f.planes.slice(0,-1).every(pl=>pl.fn(m)>0)&&f.z(m[0],m[1])>m[2]+.05);if(hidden)continue;beam(b.lead,[p[0],p[1],p[2]+.035],[q[0],q[1],q[2]+.035],.24,.075)}
     }else if(roof.id!=='chapel-cover'){beam(b.iron,[a[0],a[1],a[2]-.07],[a[0],a[1],a[2]+.54],.045);solid(b.iron,[a[0],a[1],a[2]+.35],[.28,.03,.03])}
   }
   void tier
@@ -342,11 +449,12 @@ function drawChimney(d:Detail,b:Batches,faces:RoofFace[]):void {
 
 /** One metre remains one metre; the group may be added directly to the site. */
 export function createShell(tier:Tier,library?:MaterialLibrary):Group {
-  const b: Batches={brick:new Batch(),stone:new Batch(),slate:new Batch(),oak:new Batch(true),iron:new Batch(),glass:new Batch(),dark:new Batch(),clay:new Batch()}
-  const faces=roofFaces()
+  const b: Batches={brick:new Batch(),stone:new Batch(),slate:new Batch(),oak:new Batch(true),iron:new Batch(),lead:new Batch(),glass:new Batch(),glassSky:new Batch(),dark:new Batch(),clay:new Batch()}
+  const faces=roofFaces(),valleys=roofValleys(faces)
   const facades=spec.facades.filter(f=>f.render).map(f=>({...f,openings:f.openings.map(o=>({...o}))}))
   // One through-gateway is cut in both exterior faces of the covered way.
   const court=facades.find(f=>f.id==='G5')!,street=facades.find(f=>f.id==='G1')!;const gate=court.openings.find(o=>o.type==='gate')!
+  gate.height_m=gatePassageProvenance.dimensions.head_m-gate.base_m
   const center=facadePoint(court,gate.from_m+gate.width_m/2,0);const projected=((center[0]-street.from[0])*(street.to[0]-street.from[0])+(center[1]-street.from[1])*(street.to[1]-street.from[1]))/street.length_m
   street.openings.push({...gate,id:'gallery-gateway-street-reveal',from_m:projected-gate.width_m/2})
   for(const f of facades){const wall=spec.walls.find(w=>w.facade_id===f.id&&w.render);if(wall)drawFacade(f,wall,b,tier,faces)}
@@ -361,15 +469,38 @@ export function createShell(tier:Tier,library?:MaterialLibrary):Group {
   }
   // The square tower has a distinct upper stage, independent of low services.
   const tower=spec.roof.segments.find(r=>r.id==='north-east-tower')!
-  for(let i=0;i<tower.footprint.length;i++){const a=tower.footprint[i]!,c=tower.footprint[(i+1)%tower.footprint.length]!;const f=facadeFrom(`tower-crown-${i}`,a,c);drawFacade(f,{from:a,to:c,base_m:5.08,height_m:3.62,thickness_m:.6,render:true},b,tier,faces)}
+  for(let i=0;i<tower.footprint.length;i++){const a=tower.footprint[i]!,c=tower.footprint[(i+1)%tower.footprint.length]!;const f=facadeFrom(`tower-crown-${i}`,a,c)
+    const tx=(c[0]-a[0])/f.length_m,tn=(c[1]-a[1])/f.length_m
+    for(const source of facades)for(const o of source.openings){
+      if(!o.render||o.base_m+o.height_m<=5.08)continue
+      const p=facadePoint(source,o.from_m+o.width_m/2,o.base_m)
+      const along=(p[0]-a[0])*tx+(p[1]-a[1])*tn,away=(p[0]-a[0])*tn-(p[1]-a[1])*tx
+      if(Math.abs(away)<.22&&along>0&&along<f.length_m)f.openings.push({...o,from_m:along-o.width_m/2})
+    }
+    drawFacade(f,{from:a,to:c,base_m:5.08,height_m:3.62,thickness_m:.6,render:true},b,tier,faces)
+  }
   drawRoofs(b,faces,tier);for(const d of spec.roof.dormers)drawDormer(d,b);for(const d of spec.roof.chimneys)drawChimney(d,b,faces)
+  // Append below-grade masonry after every existing emission, preserving the
+  // original geometry prefix and adding no draw. Structure precedes relief.
+  const foundationStart=b.stone.positions.length/3
+  let foundationStructuralVertices=0
+  for(const face of foundationPlinthFaces(tier)){
+    b.stone.surfaceRole=face.structural?2:0
+    const before=b.stone.positions.length/3
+    for(let i=1;i<face.points.length-1;i++)b.stone.tri(face.points[0]!,face.points[i]!,face.points[i+1]!,face.uv[0],face.uv[i],face.uv[i+1],face.tone)
+    if(face.structural)foundationStructuralVertices+=b.stone.positions.length/3-before
+  }
+  b.stone.surfaceRole=0
+  const foundationRange={startVertex:foundationStart,structuralVertices:foundationStructuralVertices,allVertices:b.stone.positions.length/3-foundationStart,provenance:foundationPlinthProvenance}
   const group=new Group();group.name='vinci/registered-shell';group.userData['asset']='vinci/registered-shell';group.userData['certainty']='reconstructed'
   const unweld=typeof location!=='undefined'&&new URLSearchParams(location.search).has('noweld')
-  for(const [name,batch] of Object.entries(b) as [MatKey,Batch][]){if(!batch.positions.length)continue;const mesh=batch.mesh(surface(name,library));mesh.name=`vinci/shell/${name}`;mesh.userData['asset']=`vinci/shell-${name}`;if(name==='glass')mesh.castShadow=false
+  for(const [name,batch] of Object.entries(b) as [MatKey,Batch][]){if(!batch.positions.length)continue;const mesh=batch.mesh(surface(name,library,name==='slate'?valleys:[]));mesh.name=`vinci/shell/${name}`;mesh.userData['asset']=`vinci/shell-${name}`;if(name==='stone')mesh.userData['foundationPlinth']=foundationRange;if(name==='glass'||name==='glassSky')mesh.castShadow=false
     if(unweld){ // A/B preserves the exact same geometry and shading.
-      const stride=18000;for(let start=0;start<batch.positions.length;start+=stride){const piece=new Batch();piece.positions=batch.positions.slice(start,start+stride);piece.uvs=batch.uvs.slice(start/3*2,(start+stride)/3*2);piece.tones=batch.tones.slice(start/3,(start+stride)/3);piece.roles=batch.roles.slice(start/3,(start+stride)/3);piece.oakSeeds=batch.oakSeeds.slice(start/3,(start+stride)/3);const part=piece.mesh(mesh.material as MeshStandardNodeMaterial);part.name=mesh.name;group.add(part)}mesh.geometry.dispose()
+      const stride=18000;for(let start=0;start<batch.positions.length;start+=stride){const piece=new Batch();piece.positions=batch.positions.slice(start,start+stride);piece.uvs=batch.uvs.slice(start/3*2,(start+stride)/3*2);piece.tones=batch.tones.slice(start/3,(start+stride)/3);piece.roles=batch.roles.slice(start/3,(start+stride)/3);piece.oakSeeds=batch.oakSeeds.slice(start/3,(start+stride)/3);const part=piece.mesh(mesh.material as MeshStandardNodeMaterial);part.name=mesh.name;if(name==='stone'){const a=Math.max(start/3,foundationRange.startVertex),z=Math.min((start+stride)/3,foundationRange.startVertex+foundationRange.allVertices);if(z>a)part.userData['foundationPlinth']={...foundationRange,startVertex:a-start/3,structuralVertices:Math.max(0,Math.min(z,foundationRange.startVertex+foundationRange.structuralVertices)-a),allVertices:z-a}}group.add(part)}mesh.geometry.dispose()
     }else group.add(mesh)
   }
+  group.userData['foundationPlinth']=foundationPlinthProvenance
+  group.userData['northValleys']=valleys
   group.userData['triangles']=Object.values(b).reduce((n,batch)=>n+batch.positions.length/9,0)
   group.userData['provenance']='Registered facades, real reveal cuts and unioned roofs from brief/building/closluce.json; procedural grain, brick bond, lead cames and carved envelope. Q001 Q015 Q019 Q124 Q127 Q131 Q134 Q175; no photographic texture.'
   return group
