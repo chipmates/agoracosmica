@@ -5,7 +5,7 @@
       "path": "procedural/shell/",
       "wing": "vinci",
       "class": "GENERATED",
-      "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates \u00a9 OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
+      "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates © OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
       "display": true,
       "prompt": "Thin brick relief, tuffeau quoins and registered cut apertures, intersecting roofs, dormers, chimneys, turret and separate gallery/watchtower. Dossier nominal dimensions with original certainty ranges. No photograph sampled.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
@@ -18,7 +18,7 @@
       "path": "procedural/terrain/",
       "wing": "vinci",
       "class": "GENERATED",
-      "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates \u00a9 OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
+      "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates © OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
       "display": true,
       "prompt": "Bilinear IGN ground from 165 retained samples; explicit A-SITE court, terrace and assumed street cut; three scales of earth and grass; mapped stream. Conjectural exposed-soil clods, erosion variation and shallow normal relief dress declared vertical cut faces without changing their outlines or heights. Exposed-earth library colour uses two continuous world projections blended by face orientation, preserving the cut geometry and avoiding local strip UV restarts.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
@@ -31,7 +31,7 @@
       "path": "procedural/vegetation/",
       "wing": "vinci",
       "class": "GENERATED",
-      "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates \u00a9 OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
+      "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates © OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
       "display": true,
       "prompt": "Deterministic tapering trunks, unequal forks, terminal sprays and folded October leaves. Placement and size conjectural; no photograph sampled.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
@@ -44,7 +44,7 @@
       "path": "procedural/sky/",
       "wing": "vinci",
       "class": "GENERATED",
-      "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates \u00a9 OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
+      "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates © OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
       "display": true,
       "prompt": "Conjectural atmospheric sky at the exact computed 1517 sun vector: turbidity4, Rayleigh1.4, cloudScale0.0006, cloudCoverage0.28, cloudDensity0.42, cloudElevation0.35, cloudSpeed0. No weather observation survives; cloud shader parameters are scenic choices, not measured altitude.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
@@ -57,7 +57,7 @@
       "path": "procedural/rail/",
       "wing": "vinci",
       "class": "GENERATED",
-      "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates \u00a9 OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
+      "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates © OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
       "display": true,
       "prompt": "Museum camera poses and piecewise exterior circulation in the fixed dossier frame. All poses are exhibition choices.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
@@ -70,7 +70,7 @@
       "path": "procedural/labels/",
       "wing": "vinci",
       "class": "GENERATED",
-      "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates \u00a9 OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
+      "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates © OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
       "display": true,
       "prompt": "Canonical station promises and questions, translated German where the supplied source lacks German; numerical hour arithmetic identical.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
@@ -83,7 +83,7 @@
       "path": "procedural/terrain-mesh/",
       "wing": "vinci",
       "class": "GENERATED",
-      "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates \u00a9 OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
+      "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates © OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
       "display": true,
       "prompt": "Exact registered pad clipping, surveyed slope, derived narrow A-SITE gate connection and six treads. No DEM apron interpolation.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
@@ -96,7 +96,7 @@
       "path": "procedural/ground-dressing/",
       "wing": "vinci",
       "class": "GENERATED",
-      "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates \u00a9 OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
+      "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates © OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
       "display": true,
       "prompt": "Seed15171010 unequal October grass tufts, bent blades, folded fallen leaves and path-edge stone chips. Placement conjectural; opaque batched geometry.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
@@ -109,7 +109,7 @@
       "path": "procedural/water/*",
       "wing": "vinci",
       "class": "GENERATED",
-      "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates \u00a9 OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
+      "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates © OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
       "display": true,
       "prompt": "Dossier Amasse water profile, reconstructed width 2.8m and depth 0.5m, exact channel cuts, planar reflection of constant-level reach. Modern ponds omitted from historical default.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
@@ -122,9 +122,9 @@
       "path": "procedural/surfaces/*",
       "wing": "vinci",
       "class": "GENERATED",
-      "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates \u00a9 OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
+      "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates © OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
       "display": true,
-      "prompt": "Derivative-filtered procedural brick, porous library-surrogate tuffeau, slate overlaps and member-local oak. Oak uses stable face seeds, curved fibres, sparse conjectural knots and shallow checks, varied wear and darker end grain. Physical appearance scales are explicit procedural assumptions; roughness follows dossier ranges. No site photograph sampled. Roof linings use a single affine metre frame and explicit seed per complete face before clipping. Conjectural sparse pores 1.4 by 6 mm, continuously varying grey-brown wear blend 15\u201345% where resolved, irregular end rings with nominal 3.1 mm spacing and up to 1.2 mm contour wander; not observed period timber. Relief and dossier roughness bounds retained.",
+      "prompt": "Derivative-filtered procedural brick, porous library-surrogate tuffeau, slate overlaps and member-local oak. Oak uses stable face seeds, curved fibres, sparse conjectural knots and shallow checks, varied wear and darker end grain. Physical appearance scales are explicit procedural assumptions; roughness follows dossier ranges. No site photograph sampled. Roof linings use a single affine metre frame and explicit seed per complete face before clipping. Conjectural sparse pores 1.4 by 6 mm, continuously varying grey-brown wear blend 15–45% where resolved, irregular end rings with nominal 3.1 mm spacing and up to 1.2 mm contour wander; not observed period timber. Relief and dossier roughness bounds retained.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
       "sha256": "ec2e9bff451702895d15ad731edd1eea192f4cf507ea8381a987d35874a85f31",
@@ -135,7 +135,7 @@
       "path": "procedural/measurement/*",
       "wing": "vinci",
       "class": "GENERATED",
-      "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates \u00a9 OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
+      "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates © OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
       "display": true,
       "prompt": "Explicitly requested hidden station audit views. Fresh shared stack cost readings and the shared live DOM label graph; separate from the external machine gates and real-input walk.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
@@ -148,7 +148,7 @@
       "path": "procedural/path-surfaces/*",
       "wing": "vinci",
       "class": "GENERATED",
-      "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates \u00a9 OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
+      "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates © OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
       "display": true,
       "prompt": "Mapped street and proposed garden-descent corridor polygons at dossier nominal widths and uncertainty ranges. Surface classification only, no altered grade.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
@@ -161,7 +161,7 @@
       "path": "procedural/road-grade/*",
       "wing": "vinci",
       "class": "GENERATED",
-      "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates \u00a9 OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
+      "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates © OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
       "display": true,
       "prompt": "Proposed A-SITE road-cut continuation. Data-derived mapped street width5m,1m upper grade through gate crossing and continuous join to IGN at next mapped vertex. Original road polygon and raw samples retained.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
@@ -174,13 +174,2274 @@
       "path": "procedural/house-side-apron/*",
       "wing": "vinci",
       "class": "GENERATED",
-      "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates \u00a9 OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
+      "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates © OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
       "display": true,
-      "prompt": "Join registered street facade endpoints F01/F02/G2/G1 to their nearest points on the retained road-cut west boundary. Keep its actual corners. Model the resulting apron at the assumed A-SITE +1m nominal with the declared scenario range -0.5\u20132.5m. Retain all original levels, outlines and survey samples, preserve priority, exclude vegetation, and disclose unknown historic extent.",
+      "prompt": "Join registered street facade endpoints F01/F02/G2/G1 to their nearest points on the retained road-cut west boundary. Keep its actual corners. Model the resulting apron at the assumed A-SITE +1m nominal with the declared scenario range -0.5–2.5m. Retain all original levels, outlines and survey samples, preserve priority, exclude vegetation, and disclose unknown historic extent.",
       "model": "Deterministic TypeScript procedural geometry",
       "date": "2026-09-09",
       "sha256": "b73e3de8b90fcbfa229a461a0ee2d99ed07343d5382a8ce77e58fd23c1422122",
       "note": "Additional grade proposal, not a measured apron; recipe_file=src/wings/vinci/apron.ts"
+    },
+    {
+      "id": "vinci/machine/aerial-screw",
+      "path": "procedural/machines/aerial-screw/*",
+      "class": "GENERATED",
+      "licence": "Generated for this work, regenerable from the declared engineering dossier and procedural source recipe.",
+      "wing": "vinci",
+      "display": true,
+      "prompt": "aerial-screw, Manuscript B f. 83v. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled.",
+      "model": "GPT-6 Codex",
+      "date": "2026-09-09",
+      "sha256": "8f6ee59a9c080762a7d5f0511e93acb59d5044716be2603d7ea116e314e1451f",
+      "recipe_files": [
+        {
+          "path": "src/wings/vinci/machines/aerial-screw.ts",
+          "sha256": "8f6ee59a9c080762a7d5f0511e93acb59d5044716be2603d7ea116e314e1451f"
+        },
+        {
+          "path": "src/wings/vinci/machines/catalog.ts",
+          "sha256": "3d858f4a271f025ab4a63d6590576aee89119ea1c53ac09df146ebaa585212f5"
+        },
+        {
+          "path": "src/wings/vinci/machines/data/aerial-screw.json",
+          "sha256": "ec8579212eada69801511495137b47cd13cfcb5751033020c8c8865a2c476159"
+        },
+        {
+          "path": "src/wings/vinci/machines/data/records.json",
+          "sha256": "d97ac3f4da088116a9a2840428ecc73ae28349d515fbb4cba85ee8f2a5fd06a6"
+        },
+        {
+          "path": "src/wings/vinci/machines/geometry.ts",
+          "sha256": "be729b2937cecbb63713bf7b9e80fee87637b0f71947c5f529a7a1990a5bc016"
+        },
+        {
+          "path": "src/wings/vinci/machines/motion.ts",
+          "sha256": "b19d6ed2065cfeb26ed5cbb53ad1c2891af27c38c99498aa2ad3e1f13b690aca"
+        },
+        {
+          "path": "src/wings/vinci/machines/parts.ts",
+          "sha256": "70bab9f6ce32fb652907941ebf3c028110815e9eae11a964ce982bf096d08bfc"
+        },
+        {
+          "path": "src/wings/vinci/machines/runtime.ts",
+          "sha256": "32eac04aa934d02334a668b0eed15811d8e063a2c35e5e44c3147a7d363abd45"
+        },
+        {
+          "path": "src/wings/vinci/machines/types.ts",
+          "sha256": "f447264c124d573303c5bb5b20b9fc7a206d28620c531534b78fb14a37bff5c4"
+        }
+      ],
+      "dossier": {
+        "path": "brief/dossiers/aerial-screw.json",
+        "sha256": "ec8579212eada69801511495137b47cd13cfcb5751033020c8c8865a2c476159"
+      },
+      "explanation_page": {
+        "path": "brief/pages/aerial-screw.md",
+        "sha256": "104482a686bd4423d95c9cb34eefaa9cf7e18c5322ee4e086535b8e153b13006"
+      },
+      "sources": [
+        {
+          "id": "s-folio",
+          "title": "Manuscript B f. 83v, transcription and folio image",
+          "author_or_institution": "Biblioteca Leonardiana, e-Leo",
+          "year": null,
+          "url": "https://www.leonardodigitale.com/sfoglia/manoscritto-b-dell-institut-de-france/0083-v/",
+          "accessed": "2026-09-08",
+          "supports": "Full transcription inspected through the public page and its read-only sheet endpoint. Radius, linen, starch, cane and small spring model.",
+          "source_type": "primary",
+          "limitations": ""
+        },
+        {
+          "id": "s-holder",
+          "title": "Carnet B",
+          "author_or_institution": "Bibliothèque de l’Institut de France",
+          "year": null,
+          "url": "https://minerva.bibliotheque-institutdefrance.fr/expositions/exhibitions/2-carnet-b2",
+          "accessed": "2026-09-08",
+          "supports": "Holder shelfmark, date and explicit 83v aerial-screw caption.",
+          "source_type": "holder",
+          "limitations": ""
+        },
+        {
+          "id": "s-model",
+          "title": "Vite aerea, IGB-6",
+          "author_or_institution": "Museo Nazionale Scienza e Tecnologia Leonardo da Vinci",
+          "year": null,
+          "url": "https://collezioni-online.museoscienza.org/detail/IT-MUST-NTR001-008332/vite-aerea",
+          "accessed": "2026-09-08",
+          "supports": "Soldatini and Somenzi model 1952 to 1953. Four-person drive acknowledged as an interpretation. Ambiguous five-metre base statement.",
+          "source_type": "museum",
+          "limitations": ""
+        },
+        {
+          "id": "s-human",
+          "title": "Scientific approach to the 1-h cycling world record: a case study",
+          "author_or_institution": "Sabino Padilla, Iñigo Mujika, Francisco Angulo and Juan Jose Goiriena",
+          "year": 2000,
+          "url": "https://journals.physiology.org/doi/10.1152/jappl.2000.89.4.1522",
+          "accessed": "2026-09-08",
+          "supports": "509.5 W estimated mean mechanical power during a one-hour world-record ride by an 81 kg elite cyclist.",
+          "source_type": "research",
+          "limitations": "Primary paper abstract was read through indexed publisher and repository text. This is an exceptional cyclist, not typical human performance and not arm-cranking performance."
+        },
+        {
+          "id": "s-rotor",
+          "title": "Revolutionary Flight Vehicle Based on Leonardo da Vinci Aerial Screw",
+          "author_or_institution": "Austin Christopher Prete, University of Maryland",
+          "year": 2022,
+          "url": "https://drum.lib.umd.edu/items/396a06f4-2ad3-4906-b78e-fad3c17c0c14",
+          "accessed": "2026-09-08",
+          "supports": "Tests of 0.152 m aerial screw rotors and quadrotor flight.",
+          "source_type": "research",
+          "limitations": "Repository abstract inspected. Modern electric small rotors, not the historic human-driven sheet."
+        },
+        {
+          "id": "s-momentum",
+          "title": "NDARC theory, rotor induced power",
+          "author_or_institution": "Wayne Johnson, NASA",
+          "year": 2011,
+          "url": "https://rotorcraft.arc.nasa.gov/Publications/files/NDARCTheory_v1_6_938.pdf",
+          "accessed": "2026-09-08",
+          "supports": "Actuator-disk hover model. The present result is independently calculated from conservation of mass, momentum and energy.",
+          "source_type": "research",
+          "limitations": "Only indexed technical equation context inspected, not used for a measured performance claim."
+        },
+        {
+          "id": "s-guidonia",
+          "title": "Aerial screw, OA 00000006",
+          "author_or_institution": "Museo Leonardiano di Vinci",
+          "year": null,
+          "url": "https://museoleonardiano.it/en/opera/aerial-screw/",
+          "accessed": "2026-09-08",
+          "supports": "Guidonia reconstruction donated in 1938.",
+          "source_type": "museum",
+          "limitations": ""
+        },
+        {
+          "id": "s-drone",
+          "title": "The Da Vinci Drone",
+          "author_or_institution": "Jennifer Figgins Rooks, University of Maryland",
+          "year": 2022,
+          "url": "https://today.umd.edu/the-da-vinci-drone",
+          "accessed": "2026-09-08",
+          "supports": "Crimson Spin, four modern spiral rotors. Public demonstration in January 2022.",
+          "source_type": "primary",
+          "limitations": ""
+        }
+      ],
+      "certainty": "C",
+      "note": "A GENERATED reconstruction carrier. The folio evidence and any documented dimensions are separate facts. Geometry bounds retain the dossier conservative swept envelope. Library materials have their own store records. This record admits no folio image.",
+      "recipe_file": "src/wings/vinci/machines/aerial-screw.ts"
+    },
+    {
+      "id": "vinci/machine/anemometer",
+      "path": "procedural/machines/anemometer/*",
+      "class": "GENERATED",
+      "licence": "Generated for this work, regenerable from the declared engineering dossier and procedural source recipe.",
+      "wing": "vinci",
+      "display": true,
+      "prompt": "anemometer, Codex Atlanticus f. 675r. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled.",
+      "model": "GPT-6 Codex",
+      "date": "2026-09-09",
+      "sha256": "d81e383511d22ddc2483ca14766c766ebc9e7b4767c0515190058f7c3ed06862",
+      "recipe_files": [
+        {
+          "path": "src/wings/vinci/machines/anemometer.ts",
+          "sha256": "d81e383511d22ddc2483ca14766c766ebc9e7b4767c0515190058f7c3ed06862"
+        },
+        {
+          "path": "src/wings/vinci/machines/catalog.ts",
+          "sha256": "3d858f4a271f025ab4a63d6590576aee89119ea1c53ac09df146ebaa585212f5"
+        },
+        {
+          "path": "src/wings/vinci/machines/data/anemometer.json",
+          "sha256": "221d7baf0b679ea48726e784ab4aa5322055de6494992bee33d016c8e5a9df5c"
+        },
+        {
+          "path": "src/wings/vinci/machines/data/records.json",
+          "sha256": "d97ac3f4da088116a9a2840428ecc73ae28349d515fbb4cba85ee8f2a5fd06a6"
+        },
+        {
+          "path": "src/wings/vinci/machines/geometry.ts",
+          "sha256": "be729b2937cecbb63713bf7b9e80fee87637b0f71947c5f529a7a1990a5bc016"
+        },
+        {
+          "path": "src/wings/vinci/machines/motion.ts",
+          "sha256": "b19d6ed2065cfeb26ed5cbb53ad1c2891af27c38c99498aa2ad3e1f13b690aca"
+        },
+        {
+          "path": "src/wings/vinci/machines/parts.ts",
+          "sha256": "70bab9f6ce32fb652907941ebf3c028110815e9eae11a964ce982bf096d08bfc"
+        },
+        {
+          "path": "src/wings/vinci/machines/runtime.ts",
+          "sha256": "32eac04aa934d02334a668b0eed15811d8e063a2c35e5e44c3147a7d363abd45"
+        },
+        {
+          "path": "src/wings/vinci/machines/types.ts",
+          "sha256": "f447264c124d573303c5bb5b20b9fc7a206d28620c531534b78fb14a37bff5c4"
+        }
+      ],
+      "dossier": {
+        "path": "brief/dossiers/anemometer.json",
+        "sha256": "221d7baf0b679ea48726e784ab4aa5322055de6494992bee33d016c8e5a9df5c"
+      },
+      "explanation_page": {
+        "path": "brief/pages/anemometer.md",
+        "sha256": "9fe88b3202def66ea89ff962ee83cf1a03e9c81244c65689af1c16afa3ded46a"
+      },
+      "sources": [
+        {
+          "id": "s-folio",
+          "title": "Codex Atlanticus f. 675r, transcription",
+          "author_or_institution": "Biblioteca Leonardiana, e-Leo",
+          "year": null,
+          "url": "https://www.leonardodigitale.com/sfoglia/codice-atlantico/0675-r/",
+          "accessed": "2026-09-08",
+          "supports": "Wind measurement caption and instruction to pair with a clock. Transcription inspected.",
+          "source_type": "primary",
+          "limitations": ""
+        },
+        {
+          "id": "s-holder",
+          "title": "Codice Atlantico Foglio 675r",
+          "author_or_institution": "Museo Galileo and Veneranda Biblioteca Ambrosiana, Leonardo//thek@",
+          "year": null,
+          "url": "https://teche.museogalileo.it/leonardo/foglio/index.html?lang=it&num=ATL.1349.1",
+          "accessed": "2026-09-08",
+          "supports": "675r=old 249 versoa/b. Pressure anemometer, hygrometer and speed measurement notes.",
+          "source_type": "holder",
+          "limitations": "Indexed catalogue text inspected. Current interface sometimes returns an empty shell."
+        },
+        {
+          "id": "s-model",
+          "title": "Propeller anemometer, OA 00000041",
+          "author_or_institution": "Museo Leonardiano di Vinci",
+          "year": null,
+          "url": "https://museoleonardiano.it/en/opera/propeller-anemometer/",
+          "accessed": "2026-09-08",
+          "supports": "IBM Italia 1952 model fromCA 675r. Despite English title, description is a hinged vane, not propeller.",
+          "source_type": "museum",
+          "limitations": ""
+        },
+        {
+          "id": "s-history",
+          "title": "Windvanes and anemometers",
+          "author_or_institution": "Museo Galileo",
+          "year": null,
+          "url": "https://catalogue.museogalileo.it/multimedia/WindvanesAnemometersBis.html",
+          "accessed": "2026-09-08",
+          "supports": "Alberti described a tablet anemometer in 1450 before Leonardo.",
+          "source_type": "museum",
+          "limitations": ""
+        },
+        {
+          "id": "s-drag",
+          "title": "Terminal Velocity",
+          "author_or_institution": "NASA Glenn",
+          "year": null,
+          "url": "https://www.grc.nasa.gov/www/k-12/VirtualAero/BottleRocket/airplane/termvr.html",
+          "accessed": "2026-09-08",
+          "supports": "Quadratic aerodynamic force relation. The inclined plate torque model is this dossier’s explicit approximation.",
+          "source_type": "primary",
+          "limitations": ""
+        }
+      ],
+      "certainty": "C",
+      "note": "A GENERATED reconstruction carrier. The folio evidence and any documented dimensions are separate facts. Geometry bounds retain the dossier conservative swept envelope. Library materials have their own store records. This record admits no folio image.",
+      "recipe_file": "src/wings/vinci/machines/anemometer.ts"
+    },
+    {
+      "id": "vinci/machine/ball-bearing",
+      "path": "procedural/machines/ball-bearing/*",
+      "class": "GENERATED",
+      "licence": "Generated for this work, regenerable from the declared engineering dossier and procedural source recipe.",
+      "wing": "vinci",
+      "display": true,
+      "prompt": "ball-bearing, Codex Madrid I f. 20v. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled.",
+      "model": "GPT-6 Codex",
+      "date": "2026-09-09",
+      "sha256": "49ccc0e12d7312d0629d676452e89fba9e48396da6ce64990b6200f0417b2b6e",
+      "recipe_files": [
+        {
+          "path": "src/wings/vinci/machines/ball-bearing.ts",
+          "sha256": "49ccc0e12d7312d0629d676452e89fba9e48396da6ce64990b6200f0417b2b6e"
+        },
+        {
+          "path": "src/wings/vinci/machines/catalog.ts",
+          "sha256": "3d858f4a271f025ab4a63d6590576aee89119ea1c53ac09df146ebaa585212f5"
+        },
+        {
+          "path": "src/wings/vinci/machines/data/ball-bearing.json",
+          "sha256": "2c06923b6c3eb90b844a63bc4fd439a87dc33a764846b2ededd44d4470198f15"
+        },
+        {
+          "path": "src/wings/vinci/machines/data/records.json",
+          "sha256": "d97ac3f4da088116a9a2840428ecc73ae28349d515fbb4cba85ee8f2a5fd06a6"
+        },
+        {
+          "path": "src/wings/vinci/machines/geometry.ts",
+          "sha256": "be729b2937cecbb63713bf7b9e80fee87637b0f71947c5f529a7a1990a5bc016"
+        },
+        {
+          "path": "src/wings/vinci/machines/motion.ts",
+          "sha256": "b19d6ed2065cfeb26ed5cbb53ad1c2891af27c38c99498aa2ad3e1f13b690aca"
+        },
+        {
+          "path": "src/wings/vinci/machines/parts.ts",
+          "sha256": "70bab9f6ce32fb652907941ebf3c028110815e9eae11a964ce982bf096d08bfc"
+        },
+        {
+          "path": "src/wings/vinci/machines/runtime.ts",
+          "sha256": "32eac04aa934d02334a668b0eed15811d8e063a2c35e5e44c3147a7d363abd45"
+        },
+        {
+          "path": "src/wings/vinci/machines/types.ts",
+          "sha256": "f447264c124d573303c5bb5b20b9fc7a206d28620c531534b78fb14a37bff5c4"
+        }
+      ],
+      "dossier": {
+        "path": "brief/dossiers/ball-bearing.json",
+        "sha256": "2c06923b6c3eb90b844a63bc4fd439a87dc33a764846b2ededd44d4470198f15"
+      },
+      "explanation_page": {
+        "path": "brief/pages/ball-bearing.md",
+        "sha256": "74fd8ef464cec07490a9f84d486f15ec5c4c7c4237920f4d941c75cf241a873e"
+      },
+      "sources": [
+        {
+          "id": "BNE-DATE",
+          "title": "Códice Madrid I, análisis de mecanismos",
+          "author_or_institution": "Rubio and colleagues",
+          "year": 2024,
+          "url": "https://www.tecnicaindustrial.es/codice-madrid-i-un-analisis-de-los-mecanismos-del-primer-tratado-completo-de-sistemas-mecanicos/",
+          "accessed": "2026-09-08",
+          "supports": "Dating of Madrid I1492 to1497",
+          "source_type": "research",
+          "limitations": "Indexed scholarly article text. Date is approximate."
+        },
+        {
+          "id": "EL-TERMS",
+          "title": "Descrizione del progetto",
+          "author_or_institution": "Biblioteca Leonardiana",
+          "year": null,
+          "url": "https://www.leonardodigitale.com/descrizione-del-progetto/",
+          "accessed": "2026-09-08",
+          "supports": "e-Leo terms and edition provenance",
+          "source_type": "holder",
+          "limitations": "e-Leo holds editions and authorised facsimiles, not all original manuscripts."
+        },
+        {
+          "id": "EL-BEAR",
+          "title": "Madrid I 0020 v facsimile and transcription",
+          "author_or_institution": "Biblioteca Leonardiana, e-Leo",
+          "year": null,
+          "url": "https://www.leonardodigitale.com/sfoglia/madrid-I/0020-v/",
+          "accessed": "2026-09-08",
+          "supports": "Folio identification and inspected Italian transcription",
+          "source_type": "primary",
+          "limitations": "Viewer metadata decoded and ordinary read endpoint queried with bookId=22,sheetId=2718. No image downloaded. Original holder catalogue checked where accessible."
+        },
+        {
+          "id": "BEARING-M",
+          "title": "Cuscinetto volvente reggispinta",
+          "author_or_institution": "Museo Leonardiano",
+          "year": 2010,
+          "url": "https://museoleonardiano.it/opera/cuscinetto-volvente-reggispinta/",
+          "accessed": "2026-09-08",
+          "supports": "Madrid I20v, Etruria Musei2010, eight balls and eight separators",
+          "source_type": "museum",
+          "limitations": "Read online. Modern interpretation is not proof of a lifetime build."
+        },
+        {
+          "id": "BNE",
+          "title": "Tratado de estática y mecánica, Codex Madrid I",
+          "author_or_institution": "Biblioteca Nacional de España",
+          "year": null,
+          "url": "https://datos.bne.es/edicion/biam0000011018",
+          "accessed": "2026-09-08",
+          "supports": "MSS/8937 and original holder",
+          "source_type": "holder",
+          "limitations": "Catalogue visible in indexed result. Direct fetch returned403. Folio texts checked independently through e-Leo."
+        },
+        {
+          "id": "BNE-LEAF",
+          "title": "El imaginario de Leonardo exhibition leaflet",
+          "author_or_institution": "Biblioteca Nacional de España",
+          "year": 2012,
+          "url": "https://www.bne.gob.es/es/Micrositios/Guias/FolletosExposiciones/resources/docs/FolletoExpoLeonardo.pdf",
+          "accessed": "2026-09-08",
+          "supports": "Madrid I10r gears and chains,26r bearings",
+          "source_type": "holder",
+          "limitations": "Indexed PDF text inspected. Direct fetch timed out. Does not identify20v as26r."
+        }
+      ],
+      "certainty": "C",
+      "note": "A GENERATED reconstruction carrier. The folio evidence and any documented dimensions are separate facts. Geometry bounds retain the dossier conservative swept envelope. Library materials have their own store records. This record admits no folio image.",
+      "recipe_file": "src/wings/vinci/machines/ball-bearing.ts"
+    },
+    {
+      "id": "vinci/machine/camera-obscura",
+      "path": "procedural/machines/camera-obscura/*",
+      "class": "GENERATED",
+      "licence": "Generated for this work, regenerable from the declared engineering dossier and procedural source recipe.",
+      "wing": "vinci",
+      "display": true,
+      "prompt": "camera-obscura, Paris Manuscript D f. 8r. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled.",
+      "model": "GPT-6 Codex",
+      "date": "2026-09-09",
+      "sha256": "fabfa0999682874499e13865d63fe0ec90e93b30037f87039b0ec745e2c59f80",
+      "recipe_files": [
+        {
+          "path": "src/wings/vinci/machines/camera-obscura.ts",
+          "sha256": "fabfa0999682874499e13865d63fe0ec90e93b30037f87039b0ec745e2c59f80"
+        },
+        {
+          "path": "src/wings/vinci/machines/catalog.ts",
+          "sha256": "3d858f4a271f025ab4a63d6590576aee89119ea1c53ac09df146ebaa585212f5"
+        },
+        {
+          "path": "src/wings/vinci/machines/data/camera-obscura.json",
+          "sha256": "cc94ae5187c1a98fb282fdcc92aa147f3f7ad9ff7ec033315c3a116552eac6aa"
+        },
+        {
+          "path": "src/wings/vinci/machines/data/records.json",
+          "sha256": "d97ac3f4da088116a9a2840428ecc73ae28349d515fbb4cba85ee8f2a5fd06a6"
+        },
+        {
+          "path": "src/wings/vinci/machines/geometry.ts",
+          "sha256": "be729b2937cecbb63713bf7b9e80fee87637b0f71947c5f529a7a1990a5bc016"
+        },
+        {
+          "path": "src/wings/vinci/machines/motion.ts",
+          "sha256": "b19d6ed2065cfeb26ed5cbb53ad1c2891af27c38c99498aa2ad3e1f13b690aca"
+        },
+        {
+          "path": "src/wings/vinci/machines/parts.ts",
+          "sha256": "70bab9f6ce32fb652907941ebf3c028110815e9eae11a964ce982bf096d08bfc"
+        },
+        {
+          "path": "src/wings/vinci/machines/runtime.ts",
+          "sha256": "32eac04aa934d02334a668b0eed15811d8e063a2c35e5e44c3147a7d363abd45"
+        },
+        {
+          "path": "src/wings/vinci/machines/types.ts",
+          "sha256": "f447264c124d573303c5bb5b20b9fc7a206d28620c531534b78fb14a37bff5c4"
+        }
+      ],
+      "dossier": {
+        "path": "brief/dossiers/camera-obscura.json",
+        "sha256": "cc94ae5187c1a98fb282fdcc92aa147f3f7ad9ff7ec033315c3a116552eac6aa"
+      },
+      "explanation_page": {
+        "path": "brief/pages/camera-obscura.md",
+        "sha256": "e9825072fedd72b8d3eed04432898052df3b48fdf1689fd600a0b7a1fc94f575"
+      },
+      "sources": [
+        {
+          "id": "folio",
+          "title": "Biblioteca Leonardiana: Manuscript D 8r",
+          "author_or_institution": "Biblioteca Leonardiana",
+          "year": null,
+          "url": "https://www.leonardodigitale.com/sfoglia/manoscritto-d-dell-institut-de-france/0008-r/",
+          "accessed": "2026-09-08",
+          "supports": "Camera obscura instructions and ray diagram, thin iron plate and white paper.",
+          "source_type": "primary",
+          "limitations": "Public digital edition transcription read in full."
+        },
+        {
+          "id": "holder",
+          "title": "Institut de France: Carnet D",
+          "author_or_institution": "Institut de France",
+          "year": null,
+          "url": "https://minerva.bibliotheque-institutdefrance.fr/expositions/exhibitions/5-carnet-d",
+          "accessed": "2026-09-08",
+          "supports": "Holder Ms2175 and1508 to1509 date.",
+          "source_type": "holder",
+          "limitations": "Text inspected. No reconstruction geometry copied."
+        },
+        {
+          "id": "historical",
+          "title": "Encyclopaedia Britannica1911: Camera Obscura",
+          "author_or_institution": "Encyclopaedia Britannica1911",
+          "year": 1911,
+          "url": "https://en.wikisource.org/wiki/1911_Encyclop%C3%A6dia_Britannica/Camera_Obscura",
+          "accessed": "2026-09-08",
+          "supports": "Historical notice of D8r and Venturi1797, earlier optical tradition.",
+          "source_type": "secondary",
+          "limitations": "Historical source, used as evidence of published claims, not modern scientific authority."
+        }
+      ],
+      "certainty": "C",
+      "note": "A GENERATED reconstruction carrier. The folio evidence and any documented dimensions are separate facts. Geometry bounds retain the dossier conservative swept envelope. Library materials have their own store records. This record admits no folio image.",
+      "recipe_file": "src/wings/vinci/machines/camera-obscura.ts"
+    },
+    {
+      "id": "vinci/machine/flywheel",
+      "path": "procedural/machines/flywheel/*",
+      "class": "GENERATED",
+      "licence": "Generated for this work, regenerable from the declared engineering dossier and procedural source recipe.",
+      "wing": "vinci",
+      "display": true,
+      "prompt": "flywheel, Codex Madrid I f. 114r. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled.",
+      "model": "GPT-6 Codex",
+      "date": "2026-09-09",
+      "sha256": "ce5c1ade83fd1aaf42b76da9113ae14a26642909c9ce6aed2ddc6f371044b7a7",
+      "recipe_files": [
+        {
+          "path": "src/wings/vinci/machines/catalog.ts",
+          "sha256": "3d858f4a271f025ab4a63d6590576aee89119ea1c53ac09df146ebaa585212f5"
+        },
+        {
+          "path": "src/wings/vinci/machines/data/flywheel.json",
+          "sha256": "15b680097bd28376abd5b47a25e4ee74ebc4df8eb200a1759019bdd43baa31b2"
+        },
+        {
+          "path": "src/wings/vinci/machines/data/records.json",
+          "sha256": "d97ac3f4da088116a9a2840428ecc73ae28349d515fbb4cba85ee8f2a5fd06a6"
+        },
+        {
+          "path": "src/wings/vinci/machines/flywheel.ts",
+          "sha256": "ce5c1ade83fd1aaf42b76da9113ae14a26642909c9ce6aed2ddc6f371044b7a7"
+        },
+        {
+          "path": "src/wings/vinci/machines/geometry.ts",
+          "sha256": "be729b2937cecbb63713bf7b9e80fee87637b0f71947c5f529a7a1990a5bc016"
+        },
+        {
+          "path": "src/wings/vinci/machines/motion.ts",
+          "sha256": "b19d6ed2065cfeb26ed5cbb53ad1c2891af27c38c99498aa2ad3e1f13b690aca"
+        },
+        {
+          "path": "src/wings/vinci/machines/parts.ts",
+          "sha256": "70bab9f6ce32fb652907941ebf3c028110815e9eae11a964ce982bf096d08bfc"
+        },
+        {
+          "path": "src/wings/vinci/machines/runtime.ts",
+          "sha256": "32eac04aa934d02334a668b0eed15811d8e063a2c35e5e44c3147a7d363abd45"
+        },
+        {
+          "path": "src/wings/vinci/machines/types.ts",
+          "sha256": "f447264c124d573303c5bb5b20b9fc7a206d28620c531534b78fb14a37bff5c4"
+        }
+      ],
+      "dossier": {
+        "path": "brief/dossiers/flywheel.json",
+        "sha256": "15b680097bd28376abd5b47a25e4ee74ebc4df8eb200a1759019bdd43baa31b2"
+      },
+      "explanation_page": {
+        "path": "brief/pages/flywheel.md",
+        "sha256": "ed8377ac7869e0fa712b19f7ef9a0fedefeedcf0592648d0d87a04e46cb1e0c2"
+      },
+      "sources": [
+        {
+          "id": "BNE-DATE",
+          "title": "Códice Madrid I, análisis de mecanismos",
+          "author_or_institution": "Rubio and colleagues",
+          "year": 2024,
+          "url": "https://www.tecnicaindustrial.es/codice-madrid-i-un-analisis-de-los-mecanismos-del-primer-tratado-completo-de-sistemas-mecanicos/",
+          "accessed": "2026-09-08",
+          "supports": "Dating of Madrid I1492 to1497",
+          "source_type": "research",
+          "limitations": "Indexed scholarly article text. Date is approximate."
+        },
+        {
+          "id": "EL-TERMS",
+          "title": "Descrizione del progetto",
+          "author_or_institution": "Biblioteca Leonardiana",
+          "year": null,
+          "url": "https://www.leonardodigitale.com/descrizione-del-progetto/",
+          "accessed": "2026-09-08",
+          "supports": "e-Leo terms and edition provenance",
+          "source_type": "holder",
+          "limitations": "e-Leo holds editions and authorised facsimiles, not all original manuscripts."
+        },
+        {
+          "id": "EL-FLY",
+          "title": "Madrid I 0114 r facsimile and transcription",
+          "author_or_institution": "Biblioteca Leonardiana, e-Leo",
+          "year": null,
+          "url": "https://www.leonardodigitale.com/sfoglia/madrid-I/0114-r/",
+          "accessed": "2026-09-08",
+          "supports": "Folio identification and inspected Italian transcription",
+          "source_type": "primary",
+          "limitations": "Viewer metadata decoded and ordinary read endpoint queried with bookId=22,sheetId=2889. No image downloaded. Original holder catalogue checked where accessible."
+        },
+        {
+          "id": "FLY-M",
+          "title": "Machines, software and studies",
+          "author_or_institution": "Mario Taddei",
+          "year": null,
+          "url": "https://www.mariotaddei.net/machines-softwares-studies/",
+          "accessed": "2026-09-08",
+          "supports": "Reconstructor labels flywheel Madrid I114r",
+          "source_type": "primary",
+          "limitations": "Author inventory identifies his own reconstructions. Geometry is not reused."
+        },
+        {
+          "id": "BNE",
+          "title": "Tratado de estática y mecánica, Codex Madrid I",
+          "author_or_institution": "Biblioteca Nacional de España",
+          "year": null,
+          "url": "https://datos.bne.es/edicion/biam0000011018",
+          "accessed": "2026-09-08",
+          "supports": "MSS/8937 and original holder",
+          "source_type": "holder",
+          "limitations": "Catalogue visible in indexed result. Direct fetch returned403. Folio texts checked independently through e-Leo."
+        },
+        {
+          "id": "BNE-LEAF",
+          "title": "El imaginario de Leonardo exhibition leaflet",
+          "author_or_institution": "Biblioteca Nacional de España",
+          "year": 2012,
+          "url": "https://www.bne.gob.es/es/Micrositios/Guias/FolletosExposiciones/resources/docs/FolletoExpoLeonardo.pdf",
+          "accessed": "2026-09-08",
+          "supports": "Madrid I10r gears and chains,26r bearings",
+          "source_type": "holder",
+          "limitations": "Indexed PDF text inspected. Direct fetch timed out. Does not identify20v as26r."
+        }
+      ],
+      "certainty": "C",
+      "note": "A GENERATED reconstruction carrier. The folio evidence and any documented dimensions are separate facts. Geometry bounds retain the dossier conservative swept envelope. Library materials have their own store records. This record admits no folio image.",
+      "recipe_file": "src/wings/vinci/machines/flywheel.ts"
+    },
+    {
+      "id": "vinci/machine/inclinometer",
+      "path": "procedural/machines/inclinometer/*",
+      "class": "GENERATED",
+      "licence": "Generated for this work, regenerable from the declared engineering dossier and procedural source recipe.",
+      "wing": "vinci",
+      "display": true,
+      "prompt": "inclinometer, Codex Atlanticus f. 1058r. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled.",
+      "model": "GPT-6 Codex",
+      "date": "2026-09-09",
+      "sha256": "02853b377518418b8eb6ff99cdaaae847136441efcd67ad5ea3d13b6504f324f",
+      "recipe_files": [
+        {
+          "path": "src/wings/vinci/machines/catalog.ts",
+          "sha256": "3d858f4a271f025ab4a63d6590576aee89119ea1c53ac09df146ebaa585212f5"
+        },
+        {
+          "path": "src/wings/vinci/machines/data/inclinometer.json",
+          "sha256": "97bf01fcf26ce6ab291a7d17b1e77ab9ab31581476d28935a2936c36a901db6e"
+        },
+        {
+          "path": "src/wings/vinci/machines/data/records.json",
+          "sha256": "d97ac3f4da088116a9a2840428ecc73ae28349d515fbb4cba85ee8f2a5fd06a6"
+        },
+        {
+          "path": "src/wings/vinci/machines/geometry.ts",
+          "sha256": "be729b2937cecbb63713bf7b9e80fee87637b0f71947c5f529a7a1990a5bc016"
+        },
+        {
+          "path": "src/wings/vinci/machines/inclinometer.ts",
+          "sha256": "02853b377518418b8eb6ff99cdaaae847136441efcd67ad5ea3d13b6504f324f"
+        },
+        {
+          "path": "src/wings/vinci/machines/motion.ts",
+          "sha256": "b19d6ed2065cfeb26ed5cbb53ad1c2891af27c38c99498aa2ad3e1f13b690aca"
+        },
+        {
+          "path": "src/wings/vinci/machines/parts.ts",
+          "sha256": "70bab9f6ce32fb652907941ebf3c028110815e9eae11a964ce982bf096d08bfc"
+        },
+        {
+          "path": "src/wings/vinci/machines/runtime.ts",
+          "sha256": "32eac04aa934d02334a668b0eed15811d8e063a2c35e5e44c3147a7d363abd45"
+        },
+        {
+          "path": "src/wings/vinci/machines/types.ts",
+          "sha256": "f447264c124d573303c5bb5b20b9fc7a206d28620c531534b78fb14a37bff5c4"
+        }
+      ],
+      "dossier": {
+        "path": "brief/dossiers/inclinometer.json",
+        "sha256": "97bf01fcf26ce6ab291a7d17b1e77ab9ab31581476d28935a2936c36a901db6e"
+      },
+      "explanation_page": {
+        "path": "brief/pages/inclinometer.md",
+        "sha256": "628c704f3f55494df73fbb454ade13cdf011b8c75237aa74a185b121bf8d1973"
+      },
+      "sources": [
+        {
+          "id": "s-folio",
+          "title": "Codex Atlanticus f. 1058r, transcription and image",
+          "author_or_institution": "Biblioteca Leonardiana, e-Leo",
+          "year": null,
+          "url": "https://www.leonardodigitale.com/sfoglia/codice-atlantico/1058-r/",
+          "accessed": "2026-09-08",
+          "supports": "Read-only sheet endpoint returned explicit plumb-in-circle instruction and non ci vuol dare il vento.",
+          "source_type": "primary",
+          "limitations": ""
+        },
+        {
+          "id": "s-model",
+          "title": "Inclinometer, OA 00000039",
+          "author_or_institution": "Museo Leonardiano di Vinci",
+          "year": null,
+          "url": "https://museoleonardiano.it/en/opera/inclinometer/",
+          "accessed": "2026-09-08",
+          "supports": "IBM Italia 1952 model. CA 1058r. Glass bell protecting pendulum.",
+          "source_type": "museum",
+          "limitations": ""
+        },
+        {
+          "id": "s-holder",
+          "title": "Codex Atlanticus online catalogue",
+          "author_or_institution": "Veneranda Biblioteca Ambrosiana",
+          "year": null,
+          "url": "https://codex-atlanticus.ambrosiana.it/",
+          "accessed": "2026-09-08",
+          "supports": "Holder catalogue for manuscript.",
+          "source_type": "holder",
+          "limitations": "JavaScript shell accessible. Individual 1058r holder record not text-readable. Folio contents independently read in the institutional e-Leo edition and its primary photograph. A second direct Ambrosiana site search for 1058 recto and inclinometro found no individual holder entry. The public highlights identify 1058 verso only. No upgraded holder verification is claimed."
+        }
+      ],
+      "certainty": "C",
+      "note": "A GENERATED reconstruction carrier. The folio evidence and any documented dimensions are separate facts. Geometry bounds retain the dossier conservative swept envelope. Library materials have their own store records. This record admits no folio image.",
+      "recipe_file": "src/wings/vinci/machines/inclinometer.ts"
+    },
+    {
+      "id": "vinci/machine/lathe",
+      "path": "procedural/machines/lathe/*",
+      "class": "GENERATED",
+      "licence": "Generated for this work, regenerable from the declared engineering dossier and procedural source recipe.",
+      "wing": "vinci",
+      "display": true,
+      "prompt": "lathe, Codex Atlanticus f. 108r. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled.",
+      "model": "GPT-6 Codex",
+      "date": "2026-09-09",
+      "sha256": "d34606f49cb2ae4d9a2a9649a237abc1d63c5855d43e62c109ca5f5075587c7a",
+      "recipe_files": [
+        {
+          "path": "src/wings/vinci/machines/catalog.ts",
+          "sha256": "3d858f4a271f025ab4a63d6590576aee89119ea1c53ac09df146ebaa585212f5"
+        },
+        {
+          "path": "src/wings/vinci/machines/data/lathe.json",
+          "sha256": "c5b2d4b5b8464e61ff6d52e30506020d77f757925c109e0405958f33f63125f1"
+        },
+        {
+          "path": "src/wings/vinci/machines/data/records.json",
+          "sha256": "d97ac3f4da088116a9a2840428ecc73ae28349d515fbb4cba85ee8f2a5fd06a6"
+        },
+        {
+          "path": "src/wings/vinci/machines/geometry.ts",
+          "sha256": "be729b2937cecbb63713bf7b9e80fee87637b0f71947c5f529a7a1990a5bc016"
+        },
+        {
+          "path": "src/wings/vinci/machines/lathe.ts",
+          "sha256": "d34606f49cb2ae4d9a2a9649a237abc1d63c5855d43e62c109ca5f5075587c7a"
+        },
+        {
+          "path": "src/wings/vinci/machines/motion.ts",
+          "sha256": "b19d6ed2065cfeb26ed5cbb53ad1c2891af27c38c99498aa2ad3e1f13b690aca"
+        },
+        {
+          "path": "src/wings/vinci/machines/parts.ts",
+          "sha256": "70bab9f6ce32fb652907941ebf3c028110815e9eae11a964ce982bf096d08bfc"
+        },
+        {
+          "path": "src/wings/vinci/machines/runtime.ts",
+          "sha256": "32eac04aa934d02334a668b0eed15811d8e063a2c35e5e44c3147a7d363abd45"
+        },
+        {
+          "path": "src/wings/vinci/machines/types.ts",
+          "sha256": "f447264c124d573303c5bb5b20b9fc7a206d28620c531534b78fb14a37bff5c4"
+        }
+      ],
+      "dossier": {
+        "path": "brief/dossiers/lathe.json",
+        "sha256": "c5b2d4b5b8464e61ff6d52e30506020d77f757925c109e0405958f33f63125f1"
+      },
+      "explanation_page": {
+        "path": "brief/pages/lathe.md",
+        "sha256": "9df5161a7921b26f10b69ea855a0e2ad6191e130bc8f5a730f589f1c21a028f9"
+      },
+      "sources": [
+        {
+          "id": "EL-LATHE",
+          "title": "CA 0108 r facsimile and transcription",
+          "author_or_institution": "Biblioteca Leonardiana, e-Leo",
+          "year": null,
+          "url": "https://www.leonardodigitale.com/sfoglia/codice-atlantico/0108-r/",
+          "accessed": "2026-09-08",
+          "supports": "Folio identification and inspected Italian transcription",
+          "source_type": "primary",
+          "limitations": "Viewer metadata decoded and ordinary read endpoint queried with bookId=21,sheetId=1451. No image downloaded. Original holder catalogue checked where accessible."
+        },
+        {
+          "id": "EL-TERMS",
+          "title": "Descrizione del progetto",
+          "author_or_institution": "Biblioteca Leonardiana",
+          "year": null,
+          "url": "https://www.leonardodigitale.com/descrizione-del-progetto/",
+          "accessed": "2026-09-08",
+          "supports": "e-Leo terms and edition provenance",
+          "source_type": "holder",
+          "limitations": "e-Leo holds editions and authorised facsimiles, not all original manuscripts."
+        },
+        {
+          "id": "LATHE-M",
+          "title": "Tornio per forare",
+          "author_or_institution": "Museo Leonardiano",
+          "year": 1952,
+          "url": "https://museoleonardiano.it/opera/tornio-per-forare/",
+          "accessed": "2026-09-08",
+          "supports": "CA108r drilling lathe, IBM Italia1952, bow-return rope and feed screw",
+          "source_type": "museum",
+          "limitations": "Read online. Modern interpretation is not proof of a lifetime build."
+        }
+      ],
+      "certainty": "C",
+      "note": "A GENERATED reconstruction carrier. The folio evidence and any documented dimensions are separate facts. Geometry bounds retain the dossier conservative swept envelope. Library materials have their own store records. This record admits no folio image.",
+      "recipe_file": "src/wings/vinci/machines/lathe.ts"
+    },
+    {
+      "id": "vinci/machine/miter-lock-gates",
+      "path": "procedural/machines/miter-lock-gates/*",
+      "class": "GENERATED",
+      "licence": "Generated for this work, regenerable from the declared engineering dossier and procedural source recipe.",
+      "wing": "vinci",
+      "display": true,
+      "prompt": "miter-lock-gates, Codex Atlanticus f. 656r, detail a. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled.",
+      "model": "GPT-6 Codex",
+      "date": "2026-09-09",
+      "sha256": "18f7815f4a3e4342e4f5dba16ee13e890e983b12290b10cb38848e47e8c7c29b",
+      "recipe_files": [
+        {
+          "path": "src/wings/vinci/machines/catalog.ts",
+          "sha256": "3d858f4a271f025ab4a63d6590576aee89119ea1c53ac09df146ebaa585212f5"
+        },
+        {
+          "path": "src/wings/vinci/machines/data/miter-lock-gates.json",
+          "sha256": "bc32865809556886ed882197f7befd719e84372cd487e9ccfe002b2f571fe570"
+        },
+        {
+          "path": "src/wings/vinci/machines/data/records.json",
+          "sha256": "d97ac3f4da088116a9a2840428ecc73ae28349d515fbb4cba85ee8f2a5fd06a6"
+        },
+        {
+          "path": "src/wings/vinci/machines/geometry.ts",
+          "sha256": "be729b2937cecbb63713bf7b9e80fee87637b0f71947c5f529a7a1990a5bc016"
+        },
+        {
+          "path": "src/wings/vinci/machines/miter-lock-gates.ts",
+          "sha256": "18f7815f4a3e4342e4f5dba16ee13e890e983b12290b10cb38848e47e8c7c29b"
+        },
+        {
+          "path": "src/wings/vinci/machines/motion.ts",
+          "sha256": "b19d6ed2065cfeb26ed5cbb53ad1c2891af27c38c99498aa2ad3e1f13b690aca"
+        },
+        {
+          "path": "src/wings/vinci/machines/parts.ts",
+          "sha256": "70bab9f6ce32fb652907941ebf3c028110815e9eae11a964ce982bf096d08bfc"
+        },
+        {
+          "path": "src/wings/vinci/machines/runtime.ts",
+          "sha256": "32eac04aa934d02334a668b0eed15811d8e063a2c35e5e44c3147a7d363abd45"
+        },
+        {
+          "path": "src/wings/vinci/machines/types.ts",
+          "sha256": "f447264c124d573303c5bb5b20b9fc7a206d28620c531534b78fb14a37bff5c4"
+        }
+      ],
+      "dossier": {
+        "path": "brief/dossiers/miter-lock-gates.json",
+        "sha256": "bc32865809556886ed882197f7befd719e84372cd487e9ccfe002b2f571fe570"
+      },
+      "explanation_page": {
+        "path": "brief/pages/miter-lock-gates.md",
+        "sha256": "799b49757a592ace4d5ad99386fa736b1fe5c7ba53f0a69fd118033e0c5d4160"
+      },
+      "sources": [
+        {
+          "id": "folio",
+          "title": "Biblioteca Leonardiana: Codex Atlanticus 656r",
+          "author_or_institution": "Biblioteca Leonardiana",
+          "year": null,
+          "url": "https://www.leonardodigitale.com/sfoglia/codice-atlantico/0656-r/",
+          "accessed": "2026-09-08",
+          "supports": "Page identifier and transcription of San Marco foundations, gate, wicket and latch.",
+          "source_type": "primary",
+          "limitations": "Digital edition inspected through its public sheet endpoint. Ambrosiana interactive catalogue did not load. Holder-level verification remains limited to codex ownership."
+        },
+        {
+          "id": "museum",
+          "title": "Museo Nazionale Scienza e Tecnologia: Chiusa a porte battenti",
+          "author_or_institution": "Museo Nazionale Scienza e Tecnologia",
+          "year": 1953,
+          "url": "https://collezioni-online.museoscienza.org/detail/IT-MUST-NTR001-008351/chiusa-porte-battenti",
+          "accessed": "2026-09-08",
+          "supports": "Interpretive model, about 1506 date, Bartolomeo Della Valle, uncertainty over Leonardo improvement versus survey.",
+          "source_type": "museum",
+          "limitations": "Text inspected. No reconstruction geometry copied."
+        },
+        {
+          "id": "gates",
+          "title": "Museo Nazionale Scienza e Tecnologia: Le Gallerie Leonardo",
+          "author_or_institution": "Museo Nazionale Scienza e Tecnologia",
+          "year": 2024,
+          "url": "https://www.museoscienza.org/besrv/sites/default/files/2024-02/gallerie-leonardo.pdf",
+          "accessed": "2026-09-08",
+          "supports": "Surviving San Marco gates include materials dating from sixteenth to nineteenth centuries.",
+          "source_type": "museum",
+          "limitations": "Text inspected. No reconstruction geometry copied."
+        },
+        {
+          "id": "watermark",
+          "title": "Politecnico di Milano: Towards a taxonomy of watermarks in Leonardo’s papers",
+          "author_or_institution": "Politecnico di Milano",
+          "year": 2022,
+          "url": "https://re.public.polimi.it/retrieve/b6fb7d84-96bc-4905-b8b9-19a4cf4547a1/%5Boa%5D%202-099%20CORDERA-MAFFEIS%20Leonardo.pdf",
+          "accessed": "2026-09-08",
+          "supports": "656 recto a, former 240r-c, about 1499 dating.",
+          "source_type": "research",
+          "limitations": "Text inspected. No reconstruction geometry copied."
+        }
+      ],
+      "certainty": "C",
+      "note": "A GENERATED reconstruction carrier. The folio evidence and any documented dimensions are separate facts. Geometry bounds retain the dossier conservative swept envelope. Library materials have their own store records. This record admits no folio image.",
+      "recipe_file": "src/wings/vinci/machines/miter-lock-gates.ts"
+    },
+    {
+      "id": "vinci/machine/multi-barrel-gun",
+      "path": "procedural/machines/multi-barrel-gun/*",
+      "class": "GENERATED",
+      "licence": "Generated for this work, regenerable from the declared engineering dossier and procedural source recipe.",
+      "wing": "vinci",
+      "display": true,
+      "prompt": "multi-barrel-gun, Codex Atlanticus f. 157r. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled.",
+      "model": "GPT-6 Codex",
+      "date": "2026-09-09",
+      "sha256": "a884c7a6b13299982a7b0c217846ba04e0a8045afa30d8d80178b114946cd038",
+      "recipe_files": [
+        {
+          "path": "src/wings/vinci/machines/catalog.ts",
+          "sha256": "3d858f4a271f025ab4a63d6590576aee89119ea1c53ac09df146ebaa585212f5"
+        },
+        {
+          "path": "src/wings/vinci/machines/data/multi-barrel-gun.json",
+          "sha256": "a8880985c707d7ded9ae1c26e5ba298d93d84eedf07bd35ca24b1c9c71aab6eb"
+        },
+        {
+          "path": "src/wings/vinci/machines/data/records.json",
+          "sha256": "d97ac3f4da088116a9a2840428ecc73ae28349d515fbb4cba85ee8f2a5fd06a6"
+        },
+        {
+          "path": "src/wings/vinci/machines/geometry.ts",
+          "sha256": "be729b2937cecbb63713bf7b9e80fee87637b0f71947c5f529a7a1990a5bc016"
+        },
+        {
+          "path": "src/wings/vinci/machines/motion.ts",
+          "sha256": "b19d6ed2065cfeb26ed5cbb53ad1c2891af27c38c99498aa2ad3e1f13b690aca"
+        },
+        {
+          "path": "src/wings/vinci/machines/multi-barrel-gun.ts",
+          "sha256": "a884c7a6b13299982a7b0c217846ba04e0a8045afa30d8d80178b114946cd038"
+        },
+        {
+          "path": "src/wings/vinci/machines/parts.ts",
+          "sha256": "70bab9f6ce32fb652907941ebf3c028110815e9eae11a964ce982bf096d08bfc"
+        },
+        {
+          "path": "src/wings/vinci/machines/runtime.ts",
+          "sha256": "32eac04aa934d02334a668b0eed15811d8e063a2c35e5e44c3147a7d363abd45"
+        },
+        {
+          "path": "src/wings/vinci/machines/types.ts",
+          "sha256": "f447264c124d573303c5bb5b20b9fc7a206d28620c531534b78fb14a37bff5c4"
+        }
+      ],
+      "dossier": {
+        "path": "brief/dossiers/multi-barrel-gun.json",
+        "sha256": "a8880985c707d7ded9ae1c26e5ba298d93d84eedf07bd35ca24b1c9c71aab6eb"
+      },
+      "explanation_page": {
+        "path": "brief/pages/multi-barrel-gun.md",
+        "sha256": "16de73f97f3955f32c8b0537124d39818a6d6542273e3d3daaf76e48978fdba1"
+      },
+      "sources": [
+        {
+          "id": "E157",
+          "title": "CA157r, image and transcription",
+          "author_or_institution": "Biblioteca Leonardiana, e-Leo",
+          "year": null,
+          "url": "https://www.leonardodigitale.com/sfoglia/codice-atlantico/0157-r/",
+          "accessed": "2026-09-08",
+          "supports": "Three separate gun concepts, wording33 and11",
+          "source_type": "primary",
+          "limitations": "Read sheet endpointbook21 sheet1549 and visually inspected711055byte folio image in memory."
+        },
+        {
+          "id": "LIC",
+          "title": "Richiesta immagini",
+          "author_or_institution": "Veneranda Biblioteca Ambrosiana",
+          "year": null,
+          "url": "https://www.ambrosiana.it/scopri/capolavori/richiesta-immagini/",
+          "accessed": "2026-09-08",
+          "supports": "Holder reproduction terms",
+          "source_type": "holder",
+          "limitations": ""
+        },
+        {
+          "id": "FAN",
+          "title": "Mitragliera a ventaglio, IBM Italia1952",
+          "author_or_institution": "Museo Leonardiano",
+          "year": 1952,
+          "url": "https://museoleonardiano.it/opera/page/7/",
+          "accessed": "2026-09-08",
+          "supports": "Ten-barrel fan reconstruction is a different study onCA157r",
+          "source_type": "museum",
+          "limitations": ""
+        },
+        {
+          "id": "IBM",
+          "title": "Leonardo da Vinci exhibition, Syracuse Museum bulletin p7",
+          "author_or_institution": "Syracuse Museum, modified Metropolitan Museum of Art release",
+          "year": null,
+          "url": "https://nyheritage.contentdm.oclc.org/digital/api/collection/p16694coll230/id/6064/download",
+          "accessed": "2026-09-08",
+          "supports": "Primary evidence for promotional claims, Guatelli series acquired by IBM1951",
+          "source_type": "primary",
+          "limitations": "Undated excerpt, after6April1952. Its1938 exhibition date and36barrel claim are not accepted as factual corrections."
+        }
+      ],
+      "certainty": "C",
+      "note": "A GENERATED reconstruction carrier. The folio evidence and any documented dimensions are separate facts. Geometry bounds retain the dossier conservative swept envelope. Library materials have their own store records. This record admits no folio image.",
+      "recipe_file": "src/wings/vinci/machines/multi-barrel-gun.ts"
+    },
+    {
+      "id": "vinci/machine/parachute",
+      "path": "procedural/machines/parachute/*",
+      "class": "GENERATED",
+      "licence": "Generated for this work, regenerable from the declared engineering dossier and procedural source recipe.",
+      "wing": "vinci",
+      "display": true,
+      "prompt": "parachute, Codex Atlanticus f. 1058v. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled.",
+      "model": "GPT-6 Codex",
+      "date": "2026-09-09",
+      "sha256": "f2c1987f8ac6f1cbb88559dd8c5263dc0e8cf723e8b341627eabe92c0787cd80",
+      "recipe_files": [
+        {
+          "path": "src/wings/vinci/machines/catalog.ts",
+          "sha256": "3d858f4a271f025ab4a63d6590576aee89119ea1c53ac09df146ebaa585212f5"
+        },
+        {
+          "path": "src/wings/vinci/machines/data/parachute.json",
+          "sha256": "77621c789da9ef5547fec65be3767d0de9705c84cd10ed53ca282a5ba9828656"
+        },
+        {
+          "path": "src/wings/vinci/machines/data/records.json",
+          "sha256": "d97ac3f4da088116a9a2840428ecc73ae28349d515fbb4cba85ee8f2a5fd06a6"
+        },
+        {
+          "path": "src/wings/vinci/machines/geometry.ts",
+          "sha256": "be729b2937cecbb63713bf7b9e80fee87637b0f71947c5f529a7a1990a5bc016"
+        },
+        {
+          "path": "src/wings/vinci/machines/motion.ts",
+          "sha256": "b19d6ed2065cfeb26ed5cbb53ad1c2891af27c38c99498aa2ad3e1f13b690aca"
+        },
+        {
+          "path": "src/wings/vinci/machines/parachute.ts",
+          "sha256": "f2c1987f8ac6f1cbb88559dd8c5263dc0e8cf723e8b341627eabe92c0787cd80"
+        },
+        {
+          "path": "src/wings/vinci/machines/parts.ts",
+          "sha256": "70bab9f6ce32fb652907941ebf3c028110815e9eae11a964ce982bf096d08bfc"
+        },
+        {
+          "path": "src/wings/vinci/machines/runtime.ts",
+          "sha256": "32eac04aa934d02334a668b0eed15811d8e063a2c35e5e44c3147a7d363abd45"
+        },
+        {
+          "path": "src/wings/vinci/machines/types.ts",
+          "sha256": "f447264c124d573303c5bb5b20b9fc7a206d28620c531534b78fb14a37bff5c4"
+        }
+      ],
+      "dossier": {
+        "path": "brief/dossiers/parachute.json",
+        "sha256": "77621c789da9ef5547fec65be3767d0de9705c84cd10ed53ca282a5ba9828656"
+      },
+      "explanation_page": {
+        "path": "brief/pages/parachute.md",
+        "sha256": "5f095a86240c40bdf7f432e7a78205c592ecabe01c246041ae1afa9626d3146a"
+      },
+      "sources": [
+        {
+          "id": "s-folio",
+          "title": "Codex Atlanticus f. 1058v, transcription",
+          "author_or_institution": "Biblioteca Leonardiana, e-Leo",
+          "year": null,
+          "url": "https://www.leonardodigitale.com/sfoglia/codice-atlantico/1058-v/",
+          "accessed": "2026-09-08",
+          "supports": "Exact dimension statement read through public sheet endpoint.",
+          "source_type": "primary",
+          "limitations": ""
+        },
+        {
+          "id": "s-holder",
+          "title": "Codice Atlantico, f. 1058 verso",
+          "author_or_institution": "Veneranda Biblioteca Ambrosiana",
+          "year": null,
+          "url": "https://www.ambrosiana.it/scopri/capolavori/codice-atlantico/",
+          "accessed": "2026-09-08",
+          "supports": "Holder explicitly identifies parachute above beating-wing studies.",
+          "source_type": "holder",
+          "limitations": ""
+        },
+        {
+          "id": "s-model",
+          "title": "Paracadute, IGB-423",
+          "author_or_institution": "Museo Nazionale Scienza e Tecnologia Leonardo da Vinci",
+          "year": null,
+          "url": "https://collezioni-online.museoscienza.org/detail/IT-MUST-NTR001-008405/paracadute",
+          "accessed": "2026-09-08",
+          "supports": "Soldatini and Somenzi, 1952 to 1953. Cotton model cover and wooden dummy.",
+          "source_type": "museum",
+          "limitations": ""
+        },
+        {
+          "id": "s-nicholas",
+          "title": "Leap of Faith",
+          "author_or_institution": "WIRED",
+          "year": 2000,
+          "url": "https://www.wired.com/2000/06/leap-of-faith/",
+          "accessed": "2026-09-08",
+          "supports": "Contemporary 28 June 2000 report of Nicholas parachute descent.",
+          "source_type": "secondary",
+          "limitations": "Article metadata and indexed opening inspected."
+        },
+        {
+          "id": "s-vietti",
+          "title": "Un Suisse saute de 650 mètres avec le parachute de Léonard de Vinci",
+          "author_or_institution": "AFP, La Dépêche",
+          "year": 2008,
+          "url": "https://www.ladepeche.fr/article/2008/04/26/450850-suisse-saute-650-metres-parachute-leonard-vinci.html",
+          "accessed": "2026-09-08",
+          "supports": "Direct interview with Vietti-Teppa. Modern fabric, four 7 m equilateral faces, mesh base, 650 m exit, 600 m opening, no rigid frame, no steering. Nicholas 80 kg frame reported.",
+          "source_type": "primary",
+          "limitations": ""
+        },
+        {
+          "id": "s-85kg",
+          "title": "Un británico prueba con éxito el paracaídas de Leonardo da Vinci",
+          "author_or_institution": "Servimedia",
+          "year": 2000,
+          "url": "https://www.servimedia.es/noticias/britanico-prueba-exito-paracaidas-leonardo-da-vinci-disenado-hace-mas-500-anos/1411048484",
+          "accessed": "2026-09-08",
+          "supports": "Contemporary report 85 kg parachute.",
+          "source_type": "secondary",
+          "limitations": "BBC-derived report conflates safe landing with use of the original canopy. AFP 2008 clarifies reserve landing. Retain mass discrepancy 80 versus 85 kg."
+        },
+        {
+          "id": "s-drag",
+          "title": "Terminal Velocity",
+          "author_or_institution": "Tom Benson, NASA Glenn",
+          "year": null,
+          "url": "https://www.grc.nasa.gov/www/k-12/VirtualAero/BottleRocket/airplane/termvr.html",
+          "accessed": "2026-09-08",
+          "supports": "Force-balance terminal descent equation.",
+          "source_type": "primary",
+          "limitations": ""
+        },
+        {
+          "id": "s-white",
+          "title": "The Invention of the Parachute",
+          "author_or_institution": "Lynn White Jr.",
+          "year": 1968,
+          "url": "https://www.degruyterbrill.com/document/doi/10.1525/9780520378070-013/html",
+          "accessed": "2026-09-08",
+          "supports": "Bibliographic identification of research challenging Leonardo priority.",
+          "source_type": "research",
+          "limitations": "Publisher bibliography inspected. Full chapter unavailable. Earlier Italian drawings supported separately by CSPA."
+        },
+        {
+          "id": "s-history",
+          "title": "History of Parachuting and CSPA",
+          "author_or_institution": "Canadian Sport Parachuting Association",
+          "year": null,
+          "url": "https://www.cspa.ca/en/node/228",
+          "accessed": "2026-09-08",
+          "supports": "Institutional history reports anonymous Italian parachute drawings dated about 1470, earlier than Leonardo.",
+          "source_type": "primary",
+          "limitations": ""
+        },
+        {
+          "id": "s-richter",
+          "title": "The Notebooks of Leonardo da Vinci, section 1126 footnote",
+          "author_or_institution": "Jean Paul Richter, editor",
+          "year": 1883,
+          "url": "https://www.gutenberg.org/ebooks/4999",
+          "accessed": "2026-09-08",
+          "supports": "Section 1126 footnote identifies a parachute sketch and refers readers to Saggio plate XVI and Hermann Grothe 1874 page 50.",
+          "source_type": "primary",
+          "limitations": "This is a cross-reference footnote, not the folio transcription giving 12 braccia dimensions. It establishes located publication references, not historical priority."
+        }
+      ],
+      "certainty": "C",
+      "note": "A GENERATED reconstruction carrier. The folio evidence and any documented dimensions are separate facts. Geometry bounds retain the dossier conservative swept envelope. Library materials have their own store records. This record admits no folio image.",
+      "recipe_file": "src/wings/vinci/machines/parachute.ts"
+    },
+    {
+      "id": "vinci/machine/proportional-compass",
+      "path": "procedural/machines/proportional-compass/*",
+      "class": "GENERATED",
+      "licence": "Generated for this work, regenerable from the declared engineering dossier and procedural source recipe.",
+      "wing": "vinci",
+      "display": true,
+      "prompt": "proportional-compass, Codex Forster I f. 4r. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled.",
+      "model": "GPT-6 Codex",
+      "date": "2026-09-09",
+      "sha256": "b853369da5995540ebffb27558c4ed34d661bf76f79c41250b26800f4f878732",
+      "recipe_files": [
+        {
+          "path": "src/wings/vinci/machines/catalog.ts",
+          "sha256": "3d858f4a271f025ab4a63d6590576aee89119ea1c53ac09df146ebaa585212f5"
+        },
+        {
+          "path": "src/wings/vinci/machines/data/proportional-compass.json",
+          "sha256": "99a9253f5ec4635dd6d9a72dd6cfc3f49e16f005c5adaadbcaaf9d3a4b39fac1"
+        },
+        {
+          "path": "src/wings/vinci/machines/data/records.json",
+          "sha256": "d97ac3f4da088116a9a2840428ecc73ae28349d515fbb4cba85ee8f2a5fd06a6"
+        },
+        {
+          "path": "src/wings/vinci/machines/geometry.ts",
+          "sha256": "be729b2937cecbb63713bf7b9e80fee87637b0f71947c5f529a7a1990a5bc016"
+        },
+        {
+          "path": "src/wings/vinci/machines/motion.ts",
+          "sha256": "b19d6ed2065cfeb26ed5cbb53ad1c2891af27c38c99498aa2ad3e1f13b690aca"
+        },
+        {
+          "path": "src/wings/vinci/machines/parts.ts",
+          "sha256": "70bab9f6ce32fb652907941ebf3c028110815e9eae11a964ce982bf096d08bfc"
+        },
+        {
+          "path": "src/wings/vinci/machines/proportional-compass.ts",
+          "sha256": "b853369da5995540ebffb27558c4ed34d661bf76f79c41250b26800f4f878732"
+        },
+        {
+          "path": "src/wings/vinci/machines/runtime.ts",
+          "sha256": "32eac04aa934d02334a668b0eed15811d8e063a2c35e5e44c3147a7d363abd45"
+        },
+        {
+          "path": "src/wings/vinci/machines/types.ts",
+          "sha256": "f447264c124d573303c5bb5b20b9fc7a206d28620c531534b78fb14a37bff5c4"
+        }
+      ],
+      "dossier": {
+        "path": "brief/dossiers/proportional-compass.json",
+        "sha256": "99a9253f5ec4635dd6d9a72dd6cfc3f49e16f005c5adaadbcaaf9d3a4b39fac1"
+      },
+      "explanation_page": {
+        "path": "brief/pages/proportional-compass.md",
+        "sha256": "ef3629688e2a24f03bf7a7150b28fcbf0a8b154fb4c9127064acf5f2cc1e64f7"
+      },
+      "sources": [
+        {
+          "id": "holder",
+          "title": "Victoria and Albert Museum: Codex Forster I",
+          "author_or_institution": "Victoria and Albert Museum",
+          "year": 2024,
+          "url": "https://www.vam.ac.uk/articles/explore-leonardo-da-vinci-codex-forster-i/",
+          "accessed": "2026-09-08",
+          "supports": "Holder shelfmark, 4r page and date of first notebook.",
+          "source_type": "holder",
+          "limitations": "Text inspected. No reconstruction geometry copied."
+        },
+        {
+          "id": "manifest",
+          "title": "Victoria and Albert Museum: Forster I IIIF manifest",
+          "author_or_institution": "Victoria and Albert Museum",
+          "year": null,
+          "url": "https://iiif.vam.ac.uk/collections/MSL:1876:Forster:141:I/manifest.json",
+          "accessed": "2026-09-08",
+          "supports": "Canvas 004r and image 2006AW1871.",
+          "source_type": "holder",
+          "limitations": "JSON inspected with Python. The 800 pixel image was inspected in memory."
+        },
+        {
+          "id": "galileo",
+          "title": "Museo Galileo: Proportional compass with screw",
+          "author_or_institution": "Museo Galileo",
+          "year": null,
+          "url": "https://brunelleschi.imss.fi.it/genscheda.asp?appl=LIR&chiave=101434&lingua=ENG&xsl=paginamanoscritto",
+          "accessed": "2026-09-08",
+          "supports": "Identification as proportional compass with screw, Forster I4r.",
+          "source_type": "museum",
+          "limitations": "Text inspected. No reconstruction geometry copied."
+        },
+        {
+          "id": "terms",
+          "title": "Victoria and Albert Museum: Website terms",
+          "author_or_institution": "Victoria and Albert Museum",
+          "year": null,
+          "url": "https://www.vam.ac.uk/info/va-terms-and-conditions",
+          "accessed": "2026-09-08",
+          "supports": "The manifest points to holder terms, which redirect to this index.",
+          "source_type": "holder",
+          "limitations": "Licence index inspected. An image-specific grant was not established."
+        }
+      ],
+      "certainty": "C",
+      "note": "A GENERATED reconstruction carrier. The folio evidence and any documented dimensions are separate facts. Geometry bounds retain the dossier conservative swept envelope. Library materials have their own store records. This record admits no folio image.",
+      "recipe_file": "src/wings/vinci/machines/proportional-compass.ts"
+    },
+    {
+      "id": "vinci/machine/revolving-crane",
+      "path": "procedural/machines/revolving-crane/*",
+      "class": "GENERATED",
+      "licence": "Generated for this work, regenerable from the declared engineering dossier and procedural source recipe.",
+      "wing": "vinci",
+      "display": true,
+      "prompt": "revolving-crane, Manuscript B f. 49r. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled.",
+      "model": "GPT-6 Codex",
+      "date": "2026-09-09",
+      "sha256": "7dd4913a2a9c5034ef973cd9f3b1d51ed34e847cc5d8e12fcda976ee0b18a7f4",
+      "recipe_files": [
+        {
+          "path": "src/wings/vinci/machines/catalog.ts",
+          "sha256": "3d858f4a271f025ab4a63d6590576aee89119ea1c53ac09df146ebaa585212f5"
+        },
+        {
+          "path": "src/wings/vinci/machines/data/records.json",
+          "sha256": "d97ac3f4da088116a9a2840428ecc73ae28349d515fbb4cba85ee8f2a5fd06a6"
+        },
+        {
+          "path": "src/wings/vinci/machines/data/revolving-crane.json",
+          "sha256": "e761c629f17a209155275295fdc6f4e19b09f78e92e0cc34dc943540cd4de1a8"
+        },
+        {
+          "path": "src/wings/vinci/machines/geometry.ts",
+          "sha256": "be729b2937cecbb63713bf7b9e80fee87637b0f71947c5f529a7a1990a5bc016"
+        },
+        {
+          "path": "src/wings/vinci/machines/motion.ts",
+          "sha256": "b19d6ed2065cfeb26ed5cbb53ad1c2891af27c38c99498aa2ad3e1f13b690aca"
+        },
+        {
+          "path": "src/wings/vinci/machines/parts.ts",
+          "sha256": "70bab9f6ce32fb652907941ebf3c028110815e9eae11a964ce982bf096d08bfc"
+        },
+        {
+          "path": "src/wings/vinci/machines/revolving-crane.ts",
+          "sha256": "7dd4913a2a9c5034ef973cd9f3b1d51ed34e847cc5d8e12fcda976ee0b18a7f4"
+        },
+        {
+          "path": "src/wings/vinci/machines/runtime.ts",
+          "sha256": "32eac04aa934d02334a668b0eed15811d8e063a2c35e5e44c3147a7d363abd45"
+        },
+        {
+          "path": "src/wings/vinci/machines/types.ts",
+          "sha256": "f447264c124d573303c5bb5b20b9fc7a206d28620c531534b78fb14a37bff5c4"
+        }
+      ],
+      "dossier": {
+        "path": "brief/dossiers/revolving-crane.json",
+        "sha256": "e761c629f17a209155275295fdc6f4e19b09f78e92e0cc34dc943540cd4de1a8"
+      },
+      "explanation_page": {
+        "path": "brief/pages/revolving-crane.md",
+        "sha256": "c2825ffc86be9d99d74fe62512d7449f190413bf966e2b00532b156c85a70b79"
+      },
+      "sources": [
+        {
+          "id": "EL-CRANE",
+          "title": "B 0049 r facsimile and transcription",
+          "author_or_institution": "Biblioteca Leonardiana, e-Leo",
+          "year": null,
+          "url": "https://www.leonardodigitale.com/sfoglia/manoscritto-b-dell-institut-de-france/0049-r/",
+          "accessed": "2026-09-08",
+          "supports": "Folio identification and inspected Italian transcription",
+          "source_type": "primary",
+          "limitations": "Viewer metadata decoded and ordinary read endpoint queried with bookId=12,sheetId=820. No image downloaded. Original holder catalogue checked where accessible."
+        },
+        {
+          "id": "EL-TERMS",
+          "title": "Descrizione del progetto",
+          "author_or_institution": "Biblioteca Leonardiana",
+          "year": null,
+          "url": "https://www.leonardodigitale.com/descrizione-del-progetto/",
+          "accessed": "2026-09-08",
+          "supports": "e-Leo terms and edition provenance",
+          "source_type": "holder",
+          "limitations": "e-Leo holds editions and authorised facsimiles, not all original manuscripts."
+        },
+        {
+          "id": "CRANE-M",
+          "title": "Gru girevole, IGB-39",
+          "author_or_institution": "Museo Nazionale Scienza e Tecnologia",
+          "year": 1953,
+          "url": "https://collezioni-online.museoscienza.org/pdf/IT-MUST-NTR001-008359/gru-girevole",
+          "accessed": "2026-09-08",
+          "supports": "Alcide De Rizzardi and Alessandro Siriati model1952 to1953, crank hoist and counterweight",
+          "source_type": "museum",
+          "limitations": "Read online. Modern interpretation is not proof of a lifetime build."
+        }
+      ],
+      "certainty": "C",
+      "note": "A GENERATED reconstruction carrier. The folio evidence and any documented dimensions are separate facts. Geometry bounds retain the dossier conservative swept envelope. Library materials have their own store records. This record admits no folio image.",
+      "recipe_file": "src/wings/vinci/machines/revolving-crane.ts"
+    },
+    {
+      "id": "vinci/machine/rolling-mill",
+      "path": "procedural/machines/rolling-mill/*",
+      "class": "GENERATED",
+      "licence": "Generated for this work, regenerable from the declared engineering dossier and procedural source recipe.",
+      "wing": "vinci",
+      "display": true,
+      "prompt": "rolling-mill, Manuscript I f. 48v. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled.",
+      "model": "GPT-6 Codex",
+      "date": "2026-09-09",
+      "sha256": "dfd4f2b86469f4f4824d2380320c45ab14a2b9eef263529c6e8f740718d7ea4c",
+      "recipe_files": [
+        {
+          "path": "src/wings/vinci/machines/catalog.ts",
+          "sha256": "3d858f4a271f025ab4a63d6590576aee89119ea1c53ac09df146ebaa585212f5"
+        },
+        {
+          "path": "src/wings/vinci/machines/data/records.json",
+          "sha256": "d97ac3f4da088116a9a2840428ecc73ae28349d515fbb4cba85ee8f2a5fd06a6"
+        },
+        {
+          "path": "src/wings/vinci/machines/data/rolling-mill.json",
+          "sha256": "ed7973908a1ea494aa304fc41c1f134d437adb5990f3ecba528464bfee6f2d40"
+        },
+        {
+          "path": "src/wings/vinci/machines/geometry.ts",
+          "sha256": "be729b2937cecbb63713bf7b9e80fee87637b0f71947c5f529a7a1990a5bc016"
+        },
+        {
+          "path": "src/wings/vinci/machines/motion.ts",
+          "sha256": "b19d6ed2065cfeb26ed5cbb53ad1c2891af27c38c99498aa2ad3e1f13b690aca"
+        },
+        {
+          "path": "src/wings/vinci/machines/parts.ts",
+          "sha256": "70bab9f6ce32fb652907941ebf3c028110815e9eae11a964ce982bf096d08bfc"
+        },
+        {
+          "path": "src/wings/vinci/machines/rolling-mill.ts",
+          "sha256": "dfd4f2b86469f4f4824d2380320c45ab14a2b9eef263529c6e8f740718d7ea4c"
+        },
+        {
+          "path": "src/wings/vinci/machines/runtime.ts",
+          "sha256": "32eac04aa934d02334a668b0eed15811d8e063a2c35e5e44c3147a7d363abd45"
+        },
+        {
+          "path": "src/wings/vinci/machines/types.ts",
+          "sha256": "f447264c124d573303c5bb5b20b9fc7a206d28620c531534b78fb14a37bff5c4"
+        }
+      ],
+      "dossier": {
+        "path": "brief/dossiers/rolling-mill.json",
+        "sha256": "ed7973908a1ea494aa304fc41c1f134d437adb5990f3ecba528464bfee6f2d40"
+      },
+      "explanation_page": {
+        "path": "brief/pages/rolling-mill.md",
+        "sha256": "8d385eebd55cdda6e5b0f8b9e5ae17e7399ca76a00afbbcd41cafbad6d33a92a"
+      },
+      "sources": [
+        {
+          "id": "EL-MILL",
+          "title": "I 0048 v facsimile and transcription",
+          "author_or_institution": "Biblioteca Leonardiana, e-Leo",
+          "year": null,
+          "url": "https://www.leonardodigitale.com/sfoglia/manoscritto-i-dell-institut-de-france/0048-v/",
+          "accessed": "2026-09-08",
+          "supports": "Folio identification and inspected Italian transcription",
+          "source_type": "primary",
+          "limitations": "Viewer metadata decoded and ordinary read endpoint queried with bookId=17,sheetId=4998. No image downloaded. Original holder catalogue checked where accessible."
+        },
+        {
+          "id": "EL-TERMS",
+          "title": "Descrizione del progetto",
+          "author_or_institution": "Biblioteca Leonardiana",
+          "year": null,
+          "url": "https://www.leonardodigitale.com/descrizione-del-progetto/",
+          "accessed": "2026-09-08",
+          "supports": "e-Leo terms and edition provenance",
+          "source_type": "holder",
+          "limitations": "e-Leo holds editions and authorised facsimiles, not all original manuscripts."
+        },
+        {
+          "id": "MILL-M",
+          "title": "Laminatoio, OA00000018",
+          "author_or_institution": "Museo Leonardiano",
+          "year": 1952,
+          "url": "https://museoleonardiano.it/opera/laminatoio/",
+          "accessed": "2026-09-08",
+          "supports": "Ms I48v, IBM Italia1952, bronze rollers and adjustable lower roll",
+          "source_type": "museum",
+          "limitations": "Read online. Modern interpretation is not proof of a lifetime build."
+        }
+      ],
+      "certainty": "C",
+      "note": "A GENERATED reconstruction carrier. The folio evidence and any documented dimensions are separate facts. Geometry bounds retain the dossier conservative swept envelope. Library materials have their own store records. This record admits no folio image.",
+      "recipe_file": "src/wings/vinci/machines/rolling-mill.ts"
+    },
+    {
+      "id": "vinci/machine/water-lifting-screw",
+      "path": "procedural/machines/water-lifting-screw/*",
+      "class": "GENERATED",
+      "licence": "Generated for this work, regenerable from the declared engineering dossier and procedural source recipe.",
+      "wing": "vinci",
+      "display": true,
+      "prompt": "water-lifting-screw, Codex Atlanticus f. 6r. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled.",
+      "model": "GPT-6 Codex",
+      "date": "2026-09-09",
+      "sha256": "06f8b4efb2bf4b00f9a4ae9b13ab2d85f7552308789d37958e5596003cdf7023",
+      "recipe_files": [
+        {
+          "path": "src/wings/vinci/machines/catalog.ts",
+          "sha256": "3d858f4a271f025ab4a63d6590576aee89119ea1c53ac09df146ebaa585212f5"
+        },
+        {
+          "path": "src/wings/vinci/machines/data/records.json",
+          "sha256": "d97ac3f4da088116a9a2840428ecc73ae28349d515fbb4cba85ee8f2a5fd06a6"
+        },
+        {
+          "path": "src/wings/vinci/machines/data/water-lifting-screw.json",
+          "sha256": "ce9009e8ad154a6247c62ef8004bfce50ebdf2688a0a5f1abe3d55777448f64c"
+        },
+        {
+          "path": "src/wings/vinci/machines/geometry.ts",
+          "sha256": "be729b2937cecbb63713bf7b9e80fee87637b0f71947c5f529a7a1990a5bc016"
+        },
+        {
+          "path": "src/wings/vinci/machines/motion.ts",
+          "sha256": "b19d6ed2065cfeb26ed5cbb53ad1c2891af27c38c99498aa2ad3e1f13b690aca"
+        },
+        {
+          "path": "src/wings/vinci/machines/parts.ts",
+          "sha256": "70bab9f6ce32fb652907941ebf3c028110815e9eae11a964ce982bf096d08bfc"
+        },
+        {
+          "path": "src/wings/vinci/machines/runtime.ts",
+          "sha256": "32eac04aa934d02334a668b0eed15811d8e063a2c35e5e44c3147a7d363abd45"
+        },
+        {
+          "path": "src/wings/vinci/machines/types.ts",
+          "sha256": "f447264c124d573303c5bb5b20b9fc7a206d28620c531534b78fb14a37bff5c4"
+        },
+        {
+          "path": "src/wings/vinci/machines/water-lifting-screw.ts",
+          "sha256": "06f8b4efb2bf4b00f9a4ae9b13ab2d85f7552308789d37958e5596003cdf7023"
+        }
+      ],
+      "dossier": {
+        "path": "brief/dossiers/water-lifting-screw.json",
+        "sha256": "ce9009e8ad154a6247c62ef8004bfce50ebdf2688a0a5f1abe3d55777448f64c"
+      },
+      "explanation_page": {
+        "path": "brief/pages/water-lifting-screw.md",
+        "sha256": "b5301ae47dffc8f9d4523809833bf49a07a452827d145ebca9a439e82d77494f"
+      },
+      "sources": [
+        {
+          "id": "folio",
+          "title": "Biblioteca Leonardiana: Codex Atlanticus 6r",
+          "author_or_institution": "Biblioteca Leonardiana",
+          "year": null,
+          "url": "https://www.leonardodigitale.com/sfoglia/codice-atlantico/0006-r/",
+          "accessed": "2026-09-08",
+          "supports": "Digital edition identifies 0006r, sheet1009. Text records no writing.",
+          "source_type": "primary",
+          "limitations": "Page record and transcription inspected. Exact holder viewer unavailable. Image URL recorded."
+        },
+        {
+          "id": "galileo",
+          "title": "Museo Galileo: Study of a self-powered water-lifting machine",
+          "author_or_institution": "Museo Galileo",
+          "year": null,
+          "url": "https://mostre.museogalileo.it/motoperpetuo/en/leonardo-en/studies-by-the-young-leonardo/study-of-a-self-powered-water-lifting-machine.html",
+          "accessed": "2026-09-08",
+          "supports": "Related Archimedean screw study1068v, about1480, and its attempted recirculation.",
+          "source_type": "museum",
+          "limitations": "Text inspected. No reconstruction geometry copied."
+        },
+        {
+          "id": "museum",
+          "title": "Museo Nazionale Scienza e Tecnologia: Leonardo Machines and Instruments",
+          "author_or_institution": "Museo Nazionale Scienza e Tecnologia",
+          "year": null,
+          "url": "https://artsandculture.google.com/story/dgVR896GHdGCKA",
+          "accessed": "2026-09-08",
+          "supports": "Leonardo’s machinery in the earlier engineering tradition and water raising.",
+          "source_type": "museum",
+          "limitations": "Text inspected. No reconstruction geometry copied."
+        },
+        {
+          "id": "ancient",
+          "title": "Vitruvius: On Architecture 10.6",
+          "author_or_institution": "Vitruvius",
+          "year": null,
+          "url": "https://lexundria.com/vitr/10.6/gw",
+          "accessed": "2026-09-08",
+          "supports": "Ancient water screw predates Leonardo.",
+          "source_type": "primary",
+          "limitations": "Ancient text linked and inspected separately."
+        },
+        {
+          "id": "sheet-description",
+          "title": "Ambrosiana exhibition labels recorded by Dong: Machines for raising water",
+          "author_or_institution": "Ambrosiana exhibition labels recorded by Dong",
+          "year": 2019,
+          "url": "https://www.dong.world/2019/06/leonardo-da-vinci-and-the-secrets-of-the-codex-atlanticus/",
+          "accessed": "2026-09-08",
+          "supports": "6r devices include water-driven helical tube, human drive, bellows pump and chain of receptacles.",
+          "source_type": "secondary",
+          "limitations": "Transcription of exhibition labels is secondary, used only for sheet composition, not engineering dimensions."
+        }
+      ],
+      "certainty": "C",
+      "note": "A GENERATED reconstruction carrier. The folio evidence and any documented dimensions are separate facts. Geometry bounds retain the dossier conservative swept envelope. Library materials have their own store records. This record admits no folio image.",
+      "recipe_file": "src/wings/vinci/machines/water-lifting-screw.ts"
+    },
+    {
+      "id": "vinci/bench/support",
+      "path": "procedural/bench/support/*",
+      "class": "GENERATED",
+      "licence": "Generated for this work, regenerable from the procedural bench source recipe.",
+      "wing": "vinci",
+      "display": true,
+      "prompt": "The da Vinci machine bench. Visibly modern supports, mounting fixtures and a shadow-receiving stage for one exact dossier reconstruction at a time. The modern support is exhibition dressing and makes no historical claim.",
+      "model": "GPT-6 Codex",
+      "date": "2026-09-09",
+      "sha256": "db174565be41b235b1de0c13fdea6cf35bbf0e25622733ffbd9239cbd47c2c4e",
+      "recipe_files": [
+        {
+          "path": "src/wings/vinci/machines/bench/bench.css",
+          "sha256": "21e2d6c95fe798e73180d2d643a253ae75b70d9898276079f748c5cc7c6bd88c"
+        },
+        {
+          "path": "src/wings/vinci/machines/bench/control-polish.ts",
+          "sha256": "66c74d7e42a9883ef0d3f165bcfaff297b69c7d1a3dae6c810b1b3146fb508c9"
+        },
+        {
+          "path": "src/wings/vinci/machines/bench/evidence-dialog.css",
+          "sha256": "fcef874d9cc06e8abca9e1080bc1aa379e7a089c9db61cfbe32f561d7dd58abe"
+        },
+        {
+          "path": "src/wings/vinci/machines/bench/evidence-dialog.ts",
+          "sha256": "e82cdc9e8f525769ac3f3cb859c367dc36023677a1aee7fed745dde282598af4"
+        },
+        {
+          "path": "src/wings/vinci/machines/bench/index.ts",
+          "sha256": "6af5a36222325bfaaf3c74b8f0f04f3f80daaf6e7667baf8474b9b1561baeb09"
+        },
+        {
+          "path": "src/wings/vinci/machines/bench/metrics.ts",
+          "sha256": "4b59824c8f76f2fc65efe1f7a769942bc77ef14304275a26cf6ac9eba99578c7"
+        },
+        {
+          "path": "src/wings/vinci/machines/bench/mounts.ts",
+          "sha256": "73b8f2526fedfb26187386b24ed7c63d98e9a54e8bee3e798bf89f88fa7fa9f4"
+        },
+        {
+          "path": "src/wings/vinci/machines/bench/playback.ts",
+          "sha256": "6ee159d329d2746a46601c87ab720774f767dd80df6a6e69db76f2187d5e4779"
+        },
+        {
+          "path": "src/wings/vinci/machines/bench/rope-shadow-proposal.ts",
+          "sha256": "5f75ce0d30f4418fa67bc6c50f7de7639b6e4f1639ba12899b3bf2603186c2e0"
+        },
+        {
+          "path": "src/wings/vinci/machines/bench/supports.ts",
+          "sha256": "db174565be41b235b1de0c13fdea6cf35bbf0e25622733ffbd9239cbd47c2c4e"
+        },
+        {
+          "path": "src/wings/vinci/machines/bench/title-select.css",
+          "sha256": "ff979982fc3eec86b9c1240550823e1894950d49c3a879462f773c8ed7febc9a"
+        },
+        {
+          "path": "src/wings/vinci/machines/bench/title-select.ts",
+          "sha256": "7b2bd1625e6ff3f8999a004dbae0d5bfab6503ab044d41dff321d22d155d6a51"
+        }
+      ],
+      "sources": [
+        {
+          "path": "brief/COMMISSION.md",
+          "sha256": "6a388080812fbfd40f740cc4885ac6402ec2e6cc25cee69076f3b255a453eac0"
+        }
+      ],
+      "note": "Procedural modern support and stage geometry only. The limestone and forged-iron material sets remain separately manifested CC0 library assets.",
+      "recipe_file": "src/wings/vinci/machines/bench/supports.ts"
+    },
+    {
+      "id": "vinci/bench/dressing",
+      "path": "procedural/bench/dressing/*",
+      "class": "GENERATED",
+      "licence": "Generated for this work, regenerable from the procedural bench source recipe.",
+      "wing": "vinci",
+      "display": true,
+      "prompt": "The da Vinci machine bench. Restrained museum typography, folio mounts, named absence panels, certainty marks, navigation, finite-demonstration status and evidence reading furniture, plus an optional diagnostic card displaying observed runtime measurements. Reuse the locked bilingual pages verbatim. No unapproved folio or reconstruction photograph is displayed.",
+      "model": "GPT-6 Codex",
+      "date": "2026-09-09",
+      "sha256": "6af5a36222325bfaaf3c74b8f0f04f3f80daaf6e7667baf8474b9b1561baeb09",
+      "recipe_files": [
+        {
+          "path": "src/wings/vinci/machines/bench/bench.css",
+          "sha256": "21e2d6c95fe798e73180d2d643a253ae75b70d9898276079f748c5cc7c6bd88c"
+        },
+        {
+          "path": "src/wings/vinci/machines/bench/control-polish.ts",
+          "sha256": "66c74d7e42a9883ef0d3f165bcfaff297b69c7d1a3dae6c810b1b3146fb508c9"
+        },
+        {
+          "path": "src/wings/vinci/machines/bench/evidence-dialog.css",
+          "sha256": "fcef874d9cc06e8abca9e1080bc1aa379e7a089c9db61cfbe32f561d7dd58abe"
+        },
+        {
+          "path": "src/wings/vinci/machines/bench/evidence-dialog.ts",
+          "sha256": "e82cdc9e8f525769ac3f3cb859c367dc36023677a1aee7fed745dde282598af4"
+        },
+        {
+          "path": "src/wings/vinci/machines/bench/index.ts",
+          "sha256": "6af5a36222325bfaaf3c74b8f0f04f3f80daaf6e7667baf8474b9b1561baeb09"
+        },
+        {
+          "path": "src/wings/vinci/machines/bench/metrics.ts",
+          "sha256": "4b59824c8f76f2fc65efe1f7a769942bc77ef14304275a26cf6ac9eba99578c7"
+        },
+        {
+          "path": "src/wings/vinci/machines/bench/mounts.ts",
+          "sha256": "73b8f2526fedfb26187386b24ed7c63d98e9a54e8bee3e798bf89f88fa7fa9f4"
+        },
+        {
+          "path": "src/wings/vinci/machines/bench/playback.ts",
+          "sha256": "6ee159d329d2746a46601c87ab720774f767dd80df6a6e69db76f2187d5e4779"
+        },
+        {
+          "path": "src/wings/vinci/machines/bench/rope-shadow-proposal.ts",
+          "sha256": "5f75ce0d30f4418fa67bc6c50f7de7639b6e4f1639ba12899b3bf2603186c2e0"
+        },
+        {
+          "path": "src/wings/vinci/machines/bench/supports.ts",
+          "sha256": "db174565be41b235b1de0c13fdea6cf35bbf0e25622733ffbd9239cbd47c2c4e"
+        },
+        {
+          "path": "src/wings/vinci/machines/bench/title-select.css",
+          "sha256": "ff979982fc3eec86b9c1240550823e1894950d49c3a879462f773c8ed7febc9a"
+        },
+        {
+          "path": "src/wings/vinci/machines/bench/title-select.ts",
+          "sha256": "7b2bd1625e6ff3f8999a004dbae0d5bfab6503ab044d41dff321d22d155d6a51"
+        }
+      ],
+      "sources": [
+        {
+          "path": "brief/pages/aerial-screw.md",
+          "sha256": "104482a686bd4423d95c9cb34eefaa9cf7e18c5322ee4e086535b8e153b13006"
+        },
+        {
+          "path": "brief/pages/anemometer.md",
+          "sha256": "9fe88b3202def66ea89ff962ee83cf1a03e9c81244c65689af1c16afa3ded46a"
+        },
+        {
+          "path": "brief/pages/ball-bearing.md",
+          "sha256": "74fd8ef464cec07490a9f84d486f15ec5c4c7c4237920f4d941c75cf241a873e"
+        },
+        {
+          "path": "brief/pages/camera-obscura.md",
+          "sha256": "e9825072fedd72b8d3eed04432898052df3b48fdf1689fd600a0b7a1fc94f575"
+        },
+        {
+          "path": "brief/pages/flywheel.md",
+          "sha256": "ed8377ac7869e0fa712b19f7ef9a0fedefeedcf0592648d0d87a04e46cb1e0c2"
+        },
+        {
+          "path": "brief/pages/inclinometer.md",
+          "sha256": "628c704f3f55494df73fbb454ade13cdf011b8c75237aa74a185b121bf8d1973"
+        },
+        {
+          "path": "brief/pages/lathe.md",
+          "sha256": "9df5161a7921b26f10b69ea855a0e2ad6191e130bc8f5a730f589f1c21a028f9"
+        },
+        {
+          "path": "brief/pages/miter-lock-gates.md",
+          "sha256": "799b49757a592ace4d5ad99386fa736b1fe5c7ba53f0a69fd118033e0c5d4160"
+        },
+        {
+          "path": "brief/pages/multi-barrel-gun.md",
+          "sha256": "16de73f97f3955f32c8b0537124d39818a6d6542273e3d3daaf76e48978fdba1"
+        },
+        {
+          "path": "brief/pages/parachute.md",
+          "sha256": "5f095a86240c40bdf7f432e7a78205c592ecabe01c246041ae1afa9626d3146a"
+        },
+        {
+          "path": "brief/pages/proportional-compass.md",
+          "sha256": "ef3629688e2a24f03bf7a7150b28fcbf0a8b154fb4c9127064acf5f2cc1e64f7"
+        },
+        {
+          "path": "brief/pages/revolving-crane.md",
+          "sha256": "c2825ffc86be9d99d74fe62512d7449f190413bf966e2b00532b156c85a70b79"
+        },
+        {
+          "path": "brief/pages/rolling-mill.md",
+          "sha256": "8d385eebd55cdda6e5b0f8b9e5ae17e7399ca76a00afbbcd41cafbad6d33a92a"
+        },
+        {
+          "path": "brief/pages/water-lifting-screw.md",
+          "sha256": "b5301ae47dffc8f9d4523809833bf49a07a452827d145ebca9a439e82d77494f"
+        },
+        {
+          "path": "brief/pages/aortic-valve-vortex.md",
+          "sha256": "3bfd6c369f39f768880c158581c86cec1d35e2b322edf1f1a02debc8a4aee4af"
+        },
+        {
+          "path": "brief/pages/armoured-car.md",
+          "sha256": "186d998087056a0aa46b90257b6a884b89b29dea8e6a694d8f7f377b78d6127a"
+        },
+        {
+          "path": "brief/pages/artificial-wing-ca858r.md",
+          "sha256": "7a7068c43812410a60b4c52dfa0cd42a91ce97504d6cc6166c1a8ee0151a135a"
+        },
+        {
+          "path": "brief/pages/chain-drive.md",
+          "sha256": "4745df113f7bca51fc0b051f0e44e106e00d91d35e642632c327a5cf07030b0c"
+        },
+        {
+          "path": "brief/pages/concave-mirror-grinder.md",
+          "sha256": "2ca1dfd3668705de319218db31df318bffdb8901fd7780907731d7e4d0113084"
+        },
+        {
+          "path": "brief/pages/diving-apparatus.md",
+          "sha256": "8352ffcdb5316ca2e5bdfb16aed04080a6ccdb860acbdc418949be10b1939933"
+        },
+        {
+          "path": "brief/pages/double-hull.md",
+          "sha256": "1ac734738a811283523f98a0dcf294d0c106ff0f9325ff56695b0ac83e41e37d"
+        },
+        {
+          "path": "brief/pages/dredger.md",
+          "sha256": "8619beaaaf3d2d4d8414acf857827fc096477a5a40eb7b40d132902101a2ad5e"
+        },
+        {
+          "path": "brief/pages/file-cutting-machine.md",
+          "sha256": "030406565dfad8fbc916a294549a9c8c157f0365207bb407e47160c728bcbaca"
+        },
+        {
+          "path": "brief/pages/giant-crossbow.md",
+          "sha256": "606f8f1a391f08dd54cb1a05f23bc8dd3d952bef1cf024f6679df299f1f830f1"
+        },
+        {
+          "path": "brief/pages/glider-flight-birds.md",
+          "sha256": "06744364cde0e300dd7c54deae85ef490238699c38b7d8eb0e22d32fb58bc1a1"
+        },
+        {
+          "path": "brief/pages/glider-madrid.md",
+          "sha256": "5494ff66ff9b52ce92d3562bfd1822633291fc610b8f7cf5bf885f904e6515f8"
+        },
+        {
+          "path": "brief/pages/hydraulic-saw.md",
+          "sha256": "d62698cae5614f23c2ccf9098e184d34bf33fad15c594be18949a56ad8a3376c"
+        },
+        {
+          "path": "brief/pages/mechanical-knight.md",
+          "sha256": "289b9fe4ba990af9eded154b36f286ffd78e829f10867f37134afc9091d67dec"
+        },
+        {
+          "path": "brief/pages/mechanical-lion.md",
+          "sha256": "e9de222e9c0076fb5801b7b28beeac803c187188b7a8849a2b87ff7795abe4aa"
+        },
+        {
+          "path": "brief/pages/mechanical-wing-test-rig.md",
+          "sha256": "6535319d86e12f51c5648c05fc9e115008bf7c01276a7aa4641d779b535e3fcb"
+        },
+        {
+          "path": "brief/pages/odometer.md",
+          "sha256": "ca9f193b926c127e82836344385f00ab390ee3b90ee75cd7a812e40f84495492"
+        },
+        {
+          "path": "brief/pages/ornithopter-msb74r.md",
+          "sha256": "7935b8cb358967ef354adbab9ae42b6ed624b4c4a36dc26ce918cf8f539320e0"
+        },
+        {
+          "path": "brief/pages/ornithopter-msb74v.md",
+          "sha256": "c05986b9469555433dab1b9c2c3abee329e452bae44b8563d8765999dbb985d1"
+        },
+        {
+          "path": "brief/pages/ornithopter-msb75r.md",
+          "sha256": "8a12239148097bcd2c78f98aad3f417ef7e822db67d29f4736dca6d2247e5a44"
+        },
+        {
+          "path": "brief/pages/ornithopter-msb79r.md",
+          "sha256": "b99e899a4e65342358e41a0cf20111e469cc393b4976f566f0e35328516e649e"
+        },
+        {
+          "path": "brief/pages/ornithopter-standing-msb80r.md",
+          "sha256": "f09f0c6bf569ac118b9eadeffe0e51f4adcb8199902ec479dafca81b8d196583"
+        },
+        {
+          "path": "brief/pages/paddle-boat.md",
+          "sha256": "e0f4f99fdb26645f9874b4bc86b8e7ff63733974f82ec3b35ba9e1868415313f"
+        },
+        {
+          "path": "brief/pages/perpetual-motion-studies.md",
+          "sha256": "4bdae4b66a08512e79e5b9b2ab46335350da3385b1e8572935d269229693e127"
+        },
+        {
+          "path": "brief/pages/pile-driver.md",
+          "sha256": "7ba5fb61ce932e189ae23f03ed550ed68e2f380d805b1fd3e029a6c6a8d9d33c"
+        },
+        {
+          "path": "brief/pages/scythed-chariot.md",
+          "sha256": "cbc9dd59cbb0c8b63db1f6039da7c85c315d87f383acef51ceb1bb5ab0f8b7b5"
+        },
+        {
+          "path": "brief/pages/self-propelled-cart.md",
+          "sha256": "254e220a788a407115b05e7e95171c44e7c0dde2a02ffbcb29759ca9b08d6d6c"
+        },
+        {
+          "path": "brief/pages/steam-cannon.md",
+          "sha256": "44f26ef22e43d0620a6e1b4d20f9fbc3ae3d8b7553170d3736b1326b14aa0acd"
+        }
+      ],
+      "note": "Exhibition dressing only. Displayable historical facsimile plates are independently resolved through the store manifest. The twenty-eight incomplete records are text and named gaps, with no generated machine geometry.",
+      "recipe_file": "src/wings/vinci/machines/bench/index.ts"
+    },
+    {
+      "id": "vinci/table-furniture",
+      "path": "procedural/table-furniture/",
+      "wing": "vinci",
+      "class": "GENERATED",
+      "licence": "Original procedural exhibition design; source code under the museum repository licence.",
+      "display": true,
+      "prompt": "A modern oak reading table, reading lamp and linen cradle. Three scales of detail and a restrained lamp pool. Exhibition dressing, no surviving original furniture or binding claimed. Compact 1K library carrier maps with procedural detail.",
+      "model": "Deterministic TypeScript, three.js TSL and CSS; authored with GPT-6",
+      "date": "2026-09-09",
+      "sha256": "71ad43d3c38bd7510b5be47c16165b75dd59d59a60b7f732bba1d099fb13b0d9",
+      "note": "recipe_file=src/wings/vinci/table/geometry.ts; output_source=src/wings/vinci/table/geometry.ts; modern exhibition design, not documentary reconstruction"
+    },
+    {
+      "id": "vinci/table-binding",
+      "path": "procedural/table-binding/",
+      "wing": "vinci",
+      "class": "GENERATED",
+      "licence": "Original procedural exhibition design; source code under the museum repository licence.",
+      "display": true,
+      "prompt": "A modern facsimile binding with leather boards, hollow gutter and uneven leaf section. Approximate 23 by 16 cm reference from the commission; physical original dimensions are absent from the supplied map. Constant arc-length bent sheet, silent one-second turn.",
+      "model": "Deterministic TypeScript, three.js TSL and CSS; authored with GPT-6",
+      "date": "2026-09-09",
+      "sha256": "71ad43d3c38bd7510b5be47c16165b75dd59d59a60b7f732bba1d099fb13b0d9",
+      "note": "recipe_file=src/wings/vinci/table/geometry.ts; output_source=src/wings/vinci/table/geometry.ts; modern exhibition design, not documentary reconstruction"
+    },
+    {
+      "id": "vinci/table-module",
+      "path": "procedural/table-module/",
+      "wing": "vinci",
+      "class": "GENERATED",
+      "licence": "Original procedural exhibition design; source code under the museum repository licence.",
+      "display": true,
+      "prompt": "Manuscript presentation, strict source-page joins and labelled horizontal mirrored reading copy. Scanned historical paper is retained in sRGB without crop or relettering.",
+      "model": "Deterministic TypeScript, three.js TSL and CSS; authored with GPT-6",
+      "date": "2026-09-09",
+      "sha256": "bca5411d9521c6e7170093ab48f33971f1d38e910a685f3e23611ef82bd25e04",
+      "note": "recipe_file=src/wings/vinci/table/index.ts; output_source=src/wings/vinci/table/index.ts; modern exhibition design, not documentary reconstruction"
+    },
+    {
+      "id": "vinci/table-copy",
+      "path": "procedural/table-copy/",
+      "wing": "vinci",
+      "class": "GENERATED",
+      "licence": "Original procedural exhibition design; source code under the museum repository licence.",
+      "display": true,
+      "prompt": "English and German visitor interface and verified local folio names. Historical transcription and French are displayed verbatim from the locked collection. Handedness documented, reasons hypotheses, own reason unknown.",
+      "model": "Deterministic TypeScript, three.js TSL and CSS; authored with GPT-6",
+      "date": "2026-09-09",
+      "sha256": "4b6cd5f98b1697863d616bb391b4c2a1aae1a79d4d7165c0a92d941ddf5c6499",
+      "note": "recipe_file=src/wings/vinci/table/content.ts; output_source=src/wings/vinci/table/content.ts; modern exhibition design, not documentary reconstruction"
+    },
+    {
+      "id": "vinci/table-panel",
+      "path": "procedural/table-panel/",
+      "wing": "vinci",
+      "class": "GENERATED",
+      "licence": "Original procedural exhibition design; source code under the museum repository licence.",
+      "display": true,
+      "prompt": "Semantic reading panel, edition-order index, manuscript-leaf index, eight named leaves and Flight of Birds absence. Source text remains DOM text.",
+      "model": "Deterministic TypeScript, three.js TSL and CSS; authored with GPT-6",
+      "date": "2026-09-09",
+      "sha256": "fc76de6897cd72c94f1f8b1cd5d2c4a0e7ffa1afd22c55ef5228e735d5747307",
+      "note": "recipe_file=src/wings/vinci/table/panel.ts; output_source=src/wings/vinci/table/panel.ts; modern exhibition design, not documentary reconstruction"
+    },
+    {
+      "id": "vinci/table-panel-style",
+      "path": "procedural/table-panel-style/",
+      "wing": "vinci",
+      "class": "GENERATED",
+      "licence": "Original procedural exhibition design; source code under the museum repository licence.",
+      "display": true,
+      "prompt": "Quiet serif letterpress in a separate reading panel, 44px controls and responsive source layout.",
+      "model": "Deterministic TypeScript, three.js TSL and CSS; authored with GPT-6",
+      "date": "2026-09-09",
+      "sha256": "76605f705485fa6b3c645a72929104ba0a3b7c1741af485eb90df7c7796d66ad",
+      "note": "recipe_file=src/wings/vinci/table/panel.css; output_source=src/wings/vinci/table/panel.css; modern exhibition design, not documentary reconstruction"
+    },
+    {
+      "id": "vinci/table-bench",
+      "path": "procedural/table-bench/",
+      "wing": "vinci",
+      "class": "GENERATED",
+      "licence": "Original procedural exhibition design; source code under the museum repository licence.",
+      "display": true,
+      "prompt": "Isolated inspection route and scene under one warm lamp, original museum hook delegation and measured table telemetry. No historical room reconstruction.",
+      "model": "Deterministic TypeScript, three.js TSL and CSS; authored with GPT-6",
+      "date": "2026-09-09",
+      "sha256": "9212b65f36541a1cb5a0259faa598b5f7d289fb29de17b7ef0392e00f04571aa",
+      "note": "recipe_file=src/wings/vinci/table/bench/index.ts; output_source=src/wings/vinci/table/bench/index.ts src/wings/vinci/table/bench/orientation.ts src/wings/vinci/table/bench/soft-shadow.ts; modern exhibition design, not documentary reconstruction"
+    },
+    {
+      "id": "vinci/table-bench-style",
+      "path": "procedural/table-bench-style/",
+      "wing": "vinci",
+      "class": "GENERATED",
+      "licence": "Original procedural exhibition design; source code under the museum repository licence.",
+      "display": true,
+      "prompt": "Desktop book beside source panel, phone page above source panel; labelled modern exhibition carrier.",
+      "model": "Deterministic TypeScript, three.js TSL and CSS; authored with GPT-6",
+      "date": "2026-09-09",
+      "sha256": "5590ebb0df2a8f00014a9a9321f89631bc63d8d3d8591d7faf48301c4665cc1b",
+      "note": "recipe_file=src/wings/vinci/table/bench/table-bench.css; output_source=src/wings/vinci/table/bench/table-bench.css src/wings/vinci/table/bench/orientation.css; modern exhibition design, not documentary reconstruction"
+    },
+    {
+      "id": "vinci/table-probes",
+      "path": "procedural/table-probes/",
+      "wing": "vinci",
+      "class": "GENERATED",
+      "licence": "Original procedural exhibition design; source code under the museum repository licence.",
+      "display": true,
+      "prompt": "Supplementary bench audit overlay, actual renderer cost readings and synthetic DOM activation outcomes; explicitly not trusted-input gate evidence.",
+      "model": "Deterministic TypeScript, three.js TSL and CSS; authored with GPT-6",
+      "date": "2026-09-09",
+      "sha256": "1f2351e1ce2ad2c18f388bd5719cfe8ba65c68fc349aa7d18ca20be3a3385a56",
+      "note": "recipe_file=src/wings/vinci/table/bench/probes.ts; output_source=src/wings/vinci/table/bench/probes.ts; modern exhibition design, not documentary reconstruction"
+    },
+    {
+      "id": "vinci/table-binding-geometry",
+      "path": "procedural/table-binding-geometry/",
+      "wing": "vinci",
+      "class": "GENERATED",
+      "licence": "Original procedural exhibition design; source code under the museum repository licence.",
+      "display": true,
+      "prompt": "Rolled edges of a modern leather board, exact requested dimensions with 1.2mm radius. Exhibition dressing; no original binding reconstructed.",
+      "model": "Deterministic TypeScript, three.js TSL and CSS; authored with GPT-6",
+      "date": "2026-09-09",
+      "sha256": "fe3708f3e34878ca85ddba465ca5123e6ab674562b2b3975bfbddbad1189515e",
+      "note": "recipe_file=src/wings/vinci/table/binding-geometry.ts; output_source=src/wings/vinci/table/binding-geometry.ts; modern exhibition design, not documentary reconstruction"
+    },
+    {
+      "id": "vinci/table-mirror-detail",
+      "path": "procedural/table-mirror-detail/",
+      "wing": "vinci",
+      "class": "GENERATED",
+      "licence": "Original procedural exhibition design; source code under the museum repository licence.",
+      "display": true,
+      "prompt": "Labelled enlarged facsimile excerpt and exact horizontal pixel reversal, derived only from the currently admitted stream bitmap. No recolouring, relettering, additional fetch or historical claim.",
+      "model": "Deterministic TypeScript, three.js TSL and CSS; authored with GPT-6",
+      "date": "2026-09-09",
+      "sha256": "973f56a6447d385b7430174aec92a5d3e26c8fdae0e56dce45982258ea1c2d8f",
+      "note": "recipe_file=src/wings/vinci/table/mirror-detail.ts; output_source=src/wings/vinci/table/mirror-detail.ts; modern exhibition design, not documentary reconstruction"
+    },
+    {
+      "id": "vinci/table-bench-copy",
+      "path": "procedural/table-bench-copy/",
+      "wing": "vinci",
+      "class": "GENERATED",
+      "licence": "Original procedural exhibition design; source code under the museum repository licence.",
+      "display": true,
+      "prompt": "Typed English and German labels for the isolated reading table. Brand preserved; historical source text is untouched.",
+      "model": "Deterministic TypeScript, three.js TSL and CSS; authored with GPT-6",
+      "date": "2026-09-09",
+      "sha256": "63f18a27cef1e3e3d8d08654b17f3b1685a21c781f483739c06478e20fe7547b",
+      "note": "recipe_file=src/wings/vinci/table/bench-content.ts; output_source=src/wings/vinci/table/bench-content.ts; modern exhibition design, not documentary reconstruction"
+    },
+    {
+      "id": "vinci/table-text-block",
+      "path": "procedural/table-text-block/",
+      "wing": "vinci",
+      "class": "GENERATED",
+      "licence": "Original procedural exhibition design; source code under the museum repository licence.",
+      "display": true,
+      "prompt": "Swollen curved modern facsimile text block with continuous fine leaf bands around head, foot and fore-edge. No historic binding claim.",
+      "model": "Deterministic TypeScript, three.js TSL and CSS; authored with GPT-6",
+      "date": "2026-09-09",
+      "sha256": "2b23742c2ce42a46625d19ef4d0c8ebb9c69c7aaac0a3d3195dd904d2fe18553",
+      "note": "recipe_file=src/wings/vinci/table/text-block.ts; output_source=src/wings/vinci/table/text-block.ts; modern exhibition design, not documentary reconstruction"
+    },
+    {
+      "id": "vinci/table-folio-shelf",
+      "path": "procedural/table-folio-shelf/",
+      "wing": "vinci",
+      "class": "GENERATED",
+      "licence": "Original procedural exhibition design; source code under the museum repository licence.",
+      "display": true,
+      "prompt": "Modern oak reading rack with eight admitted Ms B facsimile thumbnails at reading height. Exact source joins and licence metadata; no full-size shelf textures or original-object claim.",
+      "model": "Deterministic TypeScript, three.js TSL and CSS; authored with GPT-6",
+      "date": "2026-09-09",
+      "sha256": "d14d4d6ccd5971cda763f7e14ac237e40bed70160a8c0835903bb56839a67d91",
+      "note": "recipe_file=src/wings/vinci/table/folio-shelf.ts; output_source=src/wings/vinci/table/folio-shelf.ts; modern exhibition design, not documentary reconstruction"
+    },
+    {
+      "id": "vinci/line-geometry",
+      "path": "procedural/line-geometry/*",
+      "wing": "vinci",
+      "class": "GENERATED",
+      "licence": "Original procedural museum exhibition. Source code under the museum repository licence.",
+      "display": true,
+      "prompt": "Museum floor exhibition. Fifty-six data-led dates, equal spacing, carved sockets, bronze inlay, certainty colours, geometric glyphs and a bronze rail. Fictional museum carrier, never historical reconstruction testimony.",
+      "model": "Deterministic TypeScript geometry and TSL materials",
+      "date": "2026-09-09",
+      "sha256": "4238f723d54c50b21111fb8442aced48859d45ad2834f59a879c932e5bf1116c",
+      "note": "recipe_file=src/wings/vinci/line/index.ts"
+    },
+    {
+      "id": "vinci/bench-vector-letters",
+      "path": "procedural/bench-vector-letters/*",
+      "wing": "vinci",
+      "class": "GENERATED",
+      "licence": "Original procedural museum exhibition. Source code under the museum repository licence.",
+      "display": true,
+      "prompt": "Original deterministic serif glyph outlines, preserving source text case and punctuation; extruded as geometry. No image or font file sampled.",
+      "model": "Deterministic TypeScript geometry and TSL materials",
+      "date": "2026-09-09",
+      "sha256": "72fde1de8e5357c913a65248567eab47e324061e118d3407f9c82327be51e82d",
+      "note": "recipe_file=src/wings/vinci/words/font.ts"
+    },
+    {
+      "id": "vinci/bench-inscription-carrier",
+      "path": "procedural/bench-inscription-carrier/*",
+      "wing": "vinci",
+      "class": "GENERATED",
+      "licence": "Original procedural museum exhibition. Source code under the museum repository licence.",
+      "display": true,
+      "prompt": "Literal Richter and Herzfeld text and folio siglum, geometric ink relief on a constructed carrier. Display readiness and absent German preserved.",
+      "model": "Deterministic TypeScript geometry and TSL materials",
+      "date": "2026-09-09",
+      "sha256": "af3819f1e9ca6d66f1dc5a098be82fc96872f4efa11c05eebea8ab6367e53252",
+      "note": "recipe_file=src/wings/vinci/words/index.ts"
+    },
+    {
+      "id": "vinci/inscription-carrier",
+      "path": "procedural/inscription-carrier/*",
+      "wing": "vinci",
+      "class": "GENERATED",
+      "licence": "Original procedural museum exhibition. Source code under the museum repository licence.",
+      "display": true,
+      "prompt": "Modern stone inscription mount with source-ready Richter498, bilingual reading dock and exact folio. Museum composition, not a recovered historical inscription.",
+      "model": "Deterministic TypeScript geometry and TSL materials",
+      "date": "2026-09-09",
+      "sha256": "de4ad661564b89c2ece0d1a0f6e285d610ce7153c087e92d37f32e72f8de5b86",
+      "note": "recipe_file=src/wings/vinci/line/bench/index.ts"
+    },
+    {
+      "id": "vinci/myths-geometry",
+      "path": "procedural/myths-geometry/*",
+      "wing": "vinci",
+      "class": "GENERATED",
+      "licence": "Original procedural museum exhibition. Source code under the museum repository licence.",
+      "display": true,
+      "prompt": "Constructed museum picture frame with 5 by 3.9697265625 metre display opening, unwarped full-image enlargement of Ingres. Plaster wall carrying six exact apocrypha with physical crossed-out strokes and actual origins.",
+      "model": "Deterministic TypeScript geometry and TSL materials",
+      "date": "2026-09-09",
+      "sha256": "6ee35291048b21c9f1efc5c254cd3096371878250ce02be0ac7210fccd90a8ce",
+      "note": "recipe_file=src/wings/vinci/myths/index.ts"
+    },
+    {
+      "id": "vinci/grave-geometry",
+      "path": "procedural/grave-geometry/*",
+      "wing": "vinci",
+      "class": "GENERATED",
+      "licence": "Original procedural museum exhibition. Source code under the museum repository licence.",
+      "display": true,
+      "prompt": "Interpretive museum slab with name only, separate presumed plaque based on sourced account, and a constructed framed gable relief for the computed sun. No bones or invented historical plaque facsimile.",
+      "model": "Deterministic TypeScript geometry and TSL materials",
+      "date": "2026-09-09",
+      "sha256": "5d21e7494d6a584856be4c59c1438fbd331d70c9295c742af9589c367f972ea1",
+      "note": "recipe_file=src/wings/vinci/grave/index.ts"
+    },
+    {
+      "id": "vinci/bench-composition",
+      "path": "procedural/bench-composition/*",
+      "wing": "vinci",
+      "class": "GENERATED",
+      "licence": "Original procedural museum exhibition. Source code under the museum repository licence.",
+      "display": true,
+      "prompt": "Isolated bench scene host, modern architecture, source-docked labels, standard materials, camera composition and input. Library textures via manifested store, with direct plate memory separately measured.",
+      "model": "Deterministic TypeScript geometry and TSL materials",
+      "date": "2026-09-09",
+      "sha256": "de4ad661564b89c2ece0d1a0f6e285d610ce7153c087e92d37f32e72f8de5b86",
+      "note": "recipe_file=src/wings/vinci/line/bench/index.ts"
+    },
+    {
+      "id": "vinci/computed-minute",
+      "path": "procedural/computed-minute/*",
+      "wing": "vinci",
+      "class": "GENERATED",
+      "licence": "Original procedural museum exhibition. Source code under the museum repository licence.",
+      "display": true,
+      "prompt": "Deterministic port of the held solar calculation. Chosen geometric sun at18:50–18:51 UT, Julian2May1519; no death-hour or weather testimony.",
+      "model": "Deterministic TypeScript geometry and TSL materials",
+      "date": "2026-09-09",
+      "sha256": "4e8b51daa635d72bcf2403b724edead59f6a9de48dbc3715861024743dcf17d5",
+      "note": "recipe_file=src/wings/vinci/grave/hour.ts"
+    },
+    {
+      "id": "vinci/myths-construction",
+      "path": "procedural/myths-construction/*",
+      "wing": "vinci",
+      "class": "GENERATED",
+      "licence": "Original procedural museum exhibition. Source code under the museum repository licence.",
+      "display": true,
+      "prompt": "Deterministic shared construction and welding of modern exhibition floors, wall courses and physical letters.",
+      "model": "Deterministic TypeScript geometry and TSL materials",
+      "date": "2026-09-09",
+      "sha256": "72d3101ce8c0f2b1349185fa6df15091070ad122c15b7f7673392c390ea4db60",
+      "note": "recipe_file=src/wings/vinci/myths/construction.ts"
+    },
+    {
+      "id": "vinci/bench-letterpress",
+      "path": "procedural/bench-letterpress/*",
+      "wing": "vinci",
+      "class": "GENERATED",
+      "licence": "Original procedural museum exhibition. Source code under the museum repository licence.",
+      "display": true,
+      "prompt": "Accessible modern evidence dock and navigation typography. HTML text with no bitmap glyph assets.",
+      "model": "Deterministic TypeScript geometry and TSL materials",
+      "date": "2026-09-09",
+      "sha256": "2e054790825d85d8c8e460f7ee238da1b7de85afa0b407fbb85f0d929618058a",
+      "note": "recipe_file=src/wings/vinci/line/bench/bench.css"
+    },
+    {
+      "id": "vinci/bench-mineral-surfaces",
+      "path": "procedural/bench-mineral-surfaces/*",
+      "wing": "vinci",
+      "class": "GENERATED",
+      "licence": "Original procedural museum exhibition. Source code under the museum repository licence.",
+      "display": true,
+      "prompt": "Deterministic modern chalk stone and dark mineral carriers: metre-scale variation, mineral relief, fine roughness and distance-thinned density. No photograph sampled or historical-material testimony.",
+      "model": "Deterministic TypeScript geometry and TSL materials",
+      "date": "2026-09-09",
+      "sha256": "19df00845a17873e531f4db04b0548a709afab30d172789147484a6e508e725c",
+      "note": "recipe_file=src/wings/vinci/line/bench/materials.ts"
+    },
+    {
+      "id": "vinci/bench-plate-loader",
+      "path": "procedural/bench-plate-loader/*",
+      "wing": "vinci",
+      "class": "GENERATED",
+      "licence": "Original procedural museum exhibition. Source code under the museum repository licence.",
+      "display": true,
+      "prompt": "Manifest-admitted source plate loader. Complete original source at standard and hero; calm resizes full image to2048maximumedge without cropping. Actual live mip allocation counted.",
+      "model": "Deterministic TypeScript geometry and TSL materials",
+      "date": "2026-09-09",
+      "sha256": "f208eea798d65adb7f74b237f585663c414b4a432690ce2d06c0cdad3069a374",
+      "note": "recipe_file=src/wings/vinci/line/bench/assets.ts"
     }
   ]
 }
