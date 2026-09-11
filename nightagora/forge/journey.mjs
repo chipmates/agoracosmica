@@ -1,7 +1,9 @@
-// The forge's second eye: walk the LIVE journey like a visitor — real
-// scroll events, real timers, no __forge.jump cleanup — and shoot each
-// beat. Catches stuck states the deterministic jump rig cannot see.
-// Usage: pnpm build && node forge/journey.mjs
+// The forge's second eye: walk the LIVE museum like a visitor — real
+// scroll events, real clicks, real timers, no __forge.jump cleanup — and
+// shoot each beat. Catches stuck states the deterministic jump rig cannot
+// see. The walk is: eclipse, descent, lobby, wheel, pane, breath, wing,
+// back to the wheel, then the wing's own address cold.
+// Usage: pnpm build && node forge/journey.mjs  (JOURNEY_VP=mobile for the phone)
 import { chromium } from 'playwright'
 import { spawn } from 'node:child_process'
 import { mkdirSync } from 'node:fs'
@@ -89,51 +91,94 @@ try {
   // 2 · the descent: one gesture, and the plates carry you down
   await wheel(300, 2)
   if (!(await waitPhase('descent', 8000))) process.exit(1)
-  await wheel(300, 5, 200)
-  await page.waitForTimeout(1400)
-  await shot('descent-breath')
-  await wheel(300, 5, 200)
   await page.waitForTimeout(1200)
-  await shot('descent-early')
-  // scrub back a little mid-dive: the travel must reverse cleanly
-  await wheel(-300, 3, 200)
-  await page.waitForTimeout(1200)
-  await shot('descent-scrubbed-back')
-  // forward until the landing takes
-  for (let i = 0; i < 40; i++) {
-    const s = await state()
-    if (s.phase === 'agora') break
-    await wheel(300, 1, 140)
-  }
-  await waitPhase('agora', 15000)
+  await shot('descent')
+  if (!(await waitPhase('agora', 15000))) process.exit(1)
   await page.waitForTimeout(2500)
   await shot('agora')
 
-  // 3 · after the arrival breath, scroll up into the sky of thirty
+  // 3 · the lobby: after the arrival breath, the gaze rises to the wheel
   await page.waitForTimeout(1800)
   await wheel(300, 10)
-  if (!(await waitPhase('sky'))) process.exit(1)
+  if (!(await waitPhase('wheel'))) process.exit(1)
   await page.waitForTimeout(2500)
-  await shot('sky')
+  await shot('wheel')
 
-  // 4 · the wheel: open a name, then read its pane
-  await page.waitForTimeout(1200)
+  // 4 · a name, then its pane
   const chip = page.locator('.star-chip.lit').first()
-  await chip.waitFor({ state: 'visible', timeout: 12000 })
-  await chip.click()
+  try {
+    await chip.waitFor({ state: 'visible', timeout: 12000 })
+  } catch {
+    console.log('[journey] STUCK: no name lit on the wheel')
+    await shot('STUCK-no-names')
+    process.exit(1)
+  }
+  await chip.click({ force: true })
   await page.waitForTimeout(1400)
   await shot('pane')
-  await page.locator('.pane-close').click()
-  await page.waitForTimeout(1200)
-  await shot('sky-again')
-  await page.locator('#sky-return').click()
-  if (await waitPhase('agora', 10000)) {
-    await page.waitForTimeout(2500)
-    await shot('fire-again')
+
+  // 5 · the wheel turns until a name with a museum is standing, then the
+  // pane's own door: one gold breath, a hard cut, the first station
+  const closePane = async () => {
+    if (await page.locator('#figure-pane').isVisible()) {
+      await page.locator('.pane-close').click()
+      await page.waitForTimeout(900)
+    }
+  }
+  let entered = false
+  for (let house = 0; house < 6 && !entered; house++) {
+    await closePane()
+    await page.waitForTimeout(1000)
+    const names = await page.locator('.star-chip.lit').count()
+    for (let i = 0; i < names; i++) {
+      // the wheel breathes, so a name is never "stable": the click is
+      // forced rather than waited for
+      await page.locator('.star-chip.lit').nth(i).click({ force: true })
+      await page.waitForTimeout(900)
+      if (await page.locator('.pane-enter').isVisible()) {
+        await shot('pane-with-a-museum')
+        await page.locator('.pane-enter').click()
+        entered = true
+        break
+      }
+      await closePane()
+    }
+    if (entered) break
+    await page.keyboard.press('ArrowRight')
+    await page.waitForTimeout(1600)
+  }
+  if (!entered) {
+    console.log('[journey] STUCK: no wing reachable from the wheel')
+    await shot('STUCK-no-wing')
+    process.exit(1)
+  }
+  if (!(await waitPhase('breath', 6000))) process.exit(1)
+  await shot('breath')
+  if (!(await waitPhase('wing', 10000))) process.exit(1)
+  await page.waitForTimeout(1600)
+  await shot('wing')
+  const url = page.url()
+  if (!/\/w\/[a-z0-9-]+/.test(url)) {
+    console.log(`[journey] STUCK: the wing has no address of its own (${url})`)
+    await shot('STUCK-no-address')
+    process.exit(1)
   }
 
+  // 6 · the way home lands at the wheel, never at the overture
+  await page.locator('.wing-lobby').click()
+  if (!(await waitPhase('wheel', 8000))) process.exit(1)
+  await page.waitForTimeout(2000)
+  await shot('wheel-again')
+
+  // 7 · the deep link: the wing opens with no overture at all
+  await page.goto(`${BASE}${new URL(url).pathname}`)
+  await page.waitForFunction(() => Boolean(window.__forge))
+  if (!(await waitPhase('wing', 12000))) process.exit(1)
+  await page.waitForTimeout(1600)
+  await shot('wing-deep-link')
+
   await browser.close()
-  console.log(`journey shots written to forge/shots/journey/`)
+  console.log(`journey shots written to forge/shots/${MOBILE ? 'journey-mobile' : 'journey'}/`)
 } finally {
   server.kill()
 }

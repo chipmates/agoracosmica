@@ -1,7 +1,7 @@
 // THE COST OF A FRAME — what each stage of the night actually asks of a
 // GPU, in draw calls and triangles. The rig's fps numbers are software-
 // rasterizer artifacts and cannot be trusted; these two numbers can.
-// Usage: pnpm build && node forge/cost.mjs
+// Usage: pnpm build && FORGE_PORT=5199 node forge/cost.mjs
 import { chromium } from 'playwright'
 import { spawn } from 'node:child_process'
 const PORT = Number(process.env['FORGE_PORT'] ?? 5194)
@@ -20,11 +20,14 @@ try {
   await p.waitForTimeout(1600)
   for (const [name, phase, opts] of [
     ['held', 'held', {}], ['descent', 'descent', { desc: 0.5 }], ['agora', 'agora', {}],
-    ['sky', 'sky', { chapter: 0 }], ['breath', 'breath', {}],
-    ['camp-shore', 'camp', { camp: 'shore' }], ['camp-gate', 'camp', { camp: 'gate' }],
-    ['camp-via', 'camp', { camp: 'via' }], ['camp-vista', 'camp', { camp: 'vista' }],
+    ['wheel', 'wheel', { chapter: 0 }], ['pane', 'pane', { slug: 'vinci' }],
+    ['breath', 'breath', {}], ['wing', 'wing', { slug: 'vinci' }],
   ]) {
     await p.evaluate(([ph, o]) => window.__forge.jump(ph, o), [phase, opts])
+    for (let i = 0; i < 60; i++) {
+      if (await p.evaluate((ph) => document.body.dataset.forge === ph, phase)) break
+      await p.waitForTimeout(80)
+    }
     await p.waitForTimeout(400)
     const s = await p.evaluate(() => window.__forge.state())
     console.log(`${name.padEnd(12)} draws=${String(s.draws).padStart(5)}  tris=${String(s.tris).padStart(8)}`)

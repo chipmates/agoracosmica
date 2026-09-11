@@ -6,9 +6,11 @@
 //   node forge/shot-agent.mjs <port> <outDir> '<statesJson>'
 //
 // statesJson is an array of { name, phase, opts } — the same arguments
-// window.__forge.jump() takes, e.g.
+// window.__forge.jump() takes. The states of the museum's path are
+// transit, held, descent, agora, wheel, pane (opts.slug), breath and
+// wing (opts.slug), e.g.
 //   '[{"name":"agora","phase":"agora","opts":{}},
-//     {"name":"keeper","phase":"agora","opts":{"keeper":2}}]'
+//     {"name":"wing","phase":"wing","opts":{"slug":"vinci"}}]'
 //
 // Shots land in forge/shots/<outDir>/<viewport>-<name>.png, and every
 // console error and page error is reported at the end. Read the frames.
@@ -45,18 +47,33 @@ async function waitForServer(url, tries = 90) {
   throw new Error('dev server never came up')
 }
 
+/** poll for the marker the app writes back. A page-side predicate is used
+    rather than waitForFunction: the poller runs in its own world and never
+    sees this attribute change. */
+async function landed(page, state, ms = 6000) {
+  const until = Date.now() + ms
+  while (Date.now() < until) {
+    if (await page.evaluate((s) => document.body.dataset.forge === s, state)) return true
+    await page.waitForTimeout(80)
+  }
+  return false
+}
+
 /** the headless GL context can die mid-run on the heavier stages: a lost
     context looks exactly like a bad frame, so the rig proves the state
-    took and reloads once if it did not */
+    took and reloads once if it did not. The app writes back the state it
+    was ASKED for (data-forge), which is what a wing needs: its module
+    arrives a frame later, and the phase alone cannot tell a pane from
+    the wheel it is held open on. */
 async function jump(page, phase, opts, settle) {
   for (let attempt = 0; attempt < 2; attempt++) {
     await page.evaluate(([p, o]) => {
       window.__forge.freeze(12.4)
       window.__forge.jump(p, o ?? {})
     }, [phase, opts])
+    const took = await landed(page, phase)
     await page.waitForTimeout(settle)
-    const ok = await page.evaluate((p) => document.body.dataset.phase === p, phase)
-    if (ok) return true
+    if (took) return true
     await page.reload()
     await page.waitForFunction(() => Boolean(window.__forge))
     await page.waitForTimeout(1500)
@@ -80,16 +97,6 @@ try {
     page.on('pageerror', (e) => problems.push(`[${vp.tag}] pageerror: ${e.message}`))
     page.on('console', (m) => {
       if (m.type() === 'error') problems.push(`[${vp.tag}] console: ${m.text()}`)
-    })
-    // a returning visitor: the Sitting is already taken, so a frame is
-    // never shot through the contract card
-    await page.addInitScript(() => {
-      try {
-        localStorage.setItem('na-gate', '1')
-        localStorage.setItem('na-first', '1')
-      } catch {
-        /* private mode */
-      }
     })
     // THE RIG MUST NOT LIE. Vite's HMR client reloads the page whenever any
     // hand saves a file, the forge jump is lost, and the shot lands on the
