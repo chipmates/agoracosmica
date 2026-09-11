@@ -169,6 +169,12 @@ export async function createStack(opts: StackOptions = {}): Promise<Stack> {
       }
     },
 
+    /* Switches the post chain, the pixel ratio and the shadows. What it
+       cannot switch is a scene-graph decision a scene made when it was
+       built: a planar reflection is a second pass over the scene, and
+       whether that pass exists was settled at construction. So the cost
+       table is measured from `?tier=` on a fresh page, which is what the
+       rig does, and this is the owner's live dial. */
     tier(name) {
       if (name === tierName) return
       tierName = name
