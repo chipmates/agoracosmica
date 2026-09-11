@@ -104,8 +104,11 @@ section('manifest schema and local records', () => {
     const recipe = namedRecipes[0];
     try {
       const recipePath = localPath(recipe);
-      if (!inside(localPath(wingDir), recipePath) || !/\.(?:ts|js|mjs|css)$/.test(recipe)) throw new Error('Recipe must be a source file inside src/wings/vinci.');
+      if (!inside(localPath(wingDir), recipePath) || !/\.(?:ts|js|mjs|css|json)$/.test(recipe)) throw new Error('Recipe must be a source or JSON data file inside src/wings/vinci.');
       const bytes = fs.readFileSync(recipePath), actual = hash(bytes), match = actual === entry.sha256?.toLowerCase();
+      // Generated numeric certificates and irradiance data are text assets.
+      // They need valid JSON and the same exact byte hash as source recipes.
+      if (recipe.endsWith('.json')) JSON.parse(bytes.toString('utf8'));
       recipes.push({ id, recipe_file: recipe, bytes: bytes.length, declaredSha256: entry.sha256, measuredSha256: actual, match });
       if (!match) fail('recipe-hash-mismatch', `Recipe SHA-256 is ${actual}.`, recipe, id);
     } catch (error) { fail('recipe-file', error.message, recipe, id); }
