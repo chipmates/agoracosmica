@@ -78,8 +78,10 @@ export interface SampledMaps {
 export interface SampleAt {
   uv?: N
   world?: N
-  /** metres per tile; the set's own size by default */
-  metres?: number
+  /** metres per tile, one number for a square tile and two for the tiles
+      that are not: a 1.8 by 0.9 m brick read as 1.8 square is a brick twice
+      as tall as the wall it was photographed on */
+  metres?: number | [number, number]
   /** rotate the projection, in radians, which is how a second sample of the
       same photograph stops looking like the same photograph */
   turn?: number
@@ -308,9 +310,9 @@ export function createMaterialLibrary(tier: Tier): MaterialLibrary {
       ready,
 
       sample(at = {}) {
-        const uv = turned(at.uv ?? planarUV(at.world), at.turn ?? 0).div(
-          at.metres ?? set.metres[0]
-        )
+        const size = at.metres ?? set.metres
+        const tile = typeof size === 'number' ? [size, size] : size
+        const uv = turned(at.uv ?? planarUV(at.world), at.turn ?? 0).div(vec2(tile[0], tile[1]))
         const colour = texture(maps.albedo, uv).rgb.mul(tint)
         const surface = texture(maps.surface, uv)
         return {

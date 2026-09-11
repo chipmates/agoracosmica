@@ -151,7 +151,7 @@ export function detailNodes(set: MaterialSet, opts: DetailScales = {}): DetailNo
     const where = opts.uv
       ? { uv: opts.uv }
       : opts.space === 'uv'
-        ? { uv: uv().mul(set.metres[0]) }
+        ? { uv: uv().mul(vec2(set.metres[0], set.metres[1])) }
         : { world: P }
     const grand = set.sample(where)
     albedo = albedo.mul(mix(vec3(1, 1, 1), grand.albedo, density.mul(mapAmt)))
@@ -159,7 +159,11 @@ export function detailNodes(set: MaterialSet, opts: DetailScales = {}): DetailNo
     occlusion = mix(float(1), grand.occlusion, density.mul(mapAmt))
     let tangent: N = grand.normal
     if (count >= 2) {
-      const near = set.sample({ ...where, metres: set.metres[0] / 5, turn: 0.34 })
+      const near = set.sample({
+        ...where,
+        metres: [set.metres[0] / 5, set.metres[1] / 5],
+        turn: 0.34,
+      })
       albedo = albedo.mul(mix(vec3(1, 1, 1), near.albedo, density.mul(mapAmt * 0.45)))
       tangent = normalize(vec3(tangent.xy.add(near.normal.xy.mul(0.5)), tangent.z))
       roughness = mix(roughness, near.roughness, 0.3).add(micro)
