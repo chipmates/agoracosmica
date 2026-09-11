@@ -118,7 +118,7 @@ export function createBench(stack: Stack, onLobby: () => void) {
      has asked for another one may not stamp the frame it did not draw */
   let serial = 0
 
-  async function build(want: BenchKind): Promise<BenchModule> {
+  async function build(want: BenchKind): Promise<BenchModule | null> {
     const standing = built.get(want)
     if (standing) return standing
     let made: BenchModule
@@ -169,11 +169,22 @@ export function createBench(stack: Stack, onLobby: () => void) {
         },
         manifest: it.manifest,
         ids: () => BENCH_STATES,
-        station: it.select,
+        station: (target: string) => {
+          // the eight states first, then the fifty-six studs the line walks:
+          // one call answers both, as it does for the other kinds
+          if ((BENCH_STATES as readonly string[]).includes(target)) {
+            void it.show({ state: target })
+            return true
+          }
+          return it.select(target)
+        },
         telemetry: () => (it.active() ? it.telemetry() : null),
       }
     } else {
-      throw new Error('the picture bench has not landed yet')
+      // reserved: the address parses and the phase is real, so the day the
+      // picture bench lands nothing outside this switch has to change
+      console.warn(`the ${want} bench has not landed yet`)
+      return null
     }
     built.set(want, made)
     return made
@@ -194,7 +205,7 @@ export function createBench(stack: Stack, onLobby: () => void) {
       live = null
     }
     const next = await build(want)
-    if (mine !== serial) return
+    if (!next || mine !== serial) return
     live = next
     kind = want
     id = String(opts[KIND_ID[want]] ?? id)
