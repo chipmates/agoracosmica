@@ -1,6 +1,6 @@
-// The forge's second eye: walk the LIVE museum like a visitor — real
-// scroll events, real clicks, real drags, real timers, no __forge.jump
-// cleanup — and shoot each beat. Catches stuck states the deterministic
+// The forge's second eye: walk the LIVE museum like a visitor, with real
+// scroll events, real clicks, real drags and real timers, no __forge.jump
+// cleanup, and shoot each beat. Catches stuck states the deterministic
 // jump rig cannot see.
 //
 //   pnpm build && node forge/journey.mjs                 the lobby's night
