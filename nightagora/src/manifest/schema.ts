@@ -139,6 +139,12 @@ export interface ManifestEntry {
   floor_m?: number
   /** what a wing asks for it by: door, barrel, tool, shrub, rock */
   category?: string
+  /** one line saying what the thing IS, in the museum's own words rather
+      than the catalogue's. Several of the source's assets are SETS laid out
+      over their whole bounds (a row of small plants, a cooper's yard of
+      staves and hoops) rather than one body, and a wing that places one
+      believing it is a single bush gets a row. So the line says so. */
+  role?: string
   /** one word of honesty about the period a wing puts it in. `generic` is a
       thing with no period in it either way: a stone, a stump, a plank. */
   period_fit?: 'plausible-1517' | 'modern' | 'generic'

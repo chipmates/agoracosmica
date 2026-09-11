@@ -311,7 +311,7 @@ async function show(slug: string): Promise<void> {
   fit.className = 'fit'
   fit.textContent = `${asset.category} · ${asset.periodFit}`
   nameEl.append(fit)
-  licenceEl.textContent = entry.licence
+  licenceEl.textContent = `${entry.role ?? ''}${entry.role ? ' · ' : ''}${entry.licence}`
   sourceEl.textContent = entry.source_url ?? ''
   const cost = stack.cost()
   const b = entry.bounds_m ?? [size.x, size.y, size.z]
