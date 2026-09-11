@@ -41,9 +41,6 @@
          needs. German runs a third longer than English: every one of these
          lines wraps eventually, so leading is authored, never defaulted. */
       --press-lead: 1.85;
-      /* mist that has been sitting near a fire: the register between a label
-         and a kicker, so gold is not asked to carry whole blocks of text */
-      --mist-warm: color-mix(in srgb, var(--na-mist) 76%, var(--na-gold));
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { height: 100%; overscroll-behavior: none; }
@@ -74,9 +71,7 @@
 .pane-ink,
 .pane-sib-label,
 .pane-drawn,
-.hotspot-label,
 .star-chip,
-.chapter-btn,
 #sky-invite,
 #chapter-marks,
 #rail button,
@@ -411,55 +406,9 @@
       opacity: 0; transition: opacity 0.9s ease;
     }
     .hotspot.lit { opacity: 1; }
-    .hotspot-mark {
-      width: 20px; height: 20px; border-radius: 50%;
-      border: 1px solid color-mix(in srgb, var(--na-gold) 88%, transparent);
-      position: relative;
-      box-shadow: 0 0 16px color-mix(in srgb, var(--na-gold) 38%, transparent);
-      transition: box-shadow 0.3s ease, border-color 0.3s ease;
-    }
-    .hotspot-mark::after {
-      content: ''; position: absolute; top: 50%; left: 50%;
-      width: 3px; height: 3px; border-radius: 50%;
-      transform: translate(-50%, -50%);
-      background: var(--na-gold);
-    }
-    .hotspot-label {
-      font-family: var(--sans);
-      font-size: 10px; letter-spacing: 0.3em; text-indent: 0.3em;
-      text-transform: uppercase;
-      color: color-mix(in srgb, var(--na-starlight) 94%, transparent);
-      white-space: nowrap;
-      text-shadow: var(--ink-night);
-      transition: color 0.3s ease;
-    }
-    .hotspot:hover .hotspot-mark, .hotspot:focus-visible .hotspot-mark {
-      border-color: var(--na-gold);
-      box-shadow: 0 0 20px color-mix(in srgb, var(--na-gold) 55%, transparent);
-    }
-    .hotspot:hover .hotspot-label, .hotspot:focus-visible .hotspot-label { color: var(--na-gold); }
+
     .hotspot:focus-visible { outline: none; }
     body.forge .hotspot { transition: none !important; }
-
-    /* the numerals are a programme, so they are set square and even: a
-       numeral is a mark, not a word, and tracking pushes it off its own tile */
-    .chapter-btn {
-      background: none; cursor: pointer;
-      border: 1px solid color-mix(in srgb, var(--na-gold) 22%, transparent);
-      min-width: 44px; min-height: 40px; padding: 8px 10px;
-      font-family: var(--sans);
-      font-size: 9.5px; letter-spacing: 0.12em; text-indent: 0.12em;
-      text-transform: uppercase;
-      color: color-mix(in srgb, var(--na-starlight) 88%, transparent);
-      transition: border-color 0.3s ease, color 0.3s ease, box-shadow 0.4s ease;
-    }
-    .chapter-btn:hover, .chapter-btn:focus-visible { border-color: var(--na-gold); color: var(--na-gold); outline: none; }
-    /* the night being told is the one lit tile on the plate */
-    .chapter-btn.playing {
-      border-color: color-mix(in srgb, var(--na-gold) 78%, transparent);
-      color: var(--na-gold);
-      box-shadow: inset 0 0 16px color-mix(in srgb, var(--na-gold) 12%, transparent);
-    }
 
     /* the impatient way down. It shared a hand's width with the status line,
        which put two lines of the same size a breath apart (round 1): it
@@ -999,19 +948,17 @@
 
       .inst-links button, .inst-links a { font-size: 9.5px; letter-spacing: 0.22em; text-indent: 0.22em; }
 
-      .stone-text, .stone-strong { font-size: 11px; letter-spacing: 0.26em; text-indent: 0.26em; }
     }
 
     @media (prefers-reduced-motion: reduce) {
       body[data-phase='held'] .status { animation: none; }
       .copy, .status { transition: none; }
-      #keeper, #keeper *, #stone, #verse { transition: none; }
+      #keeper, #keeper *, #verse { transition: none; }
       /* the same composition, it simply arrives already composed */
       .star-chip::after,
 .pane-sibling::after,
 #rail button::before,
 #rail button::after,
-.chapter-btn,
 .pane-enter { transition: none; }
     }
 

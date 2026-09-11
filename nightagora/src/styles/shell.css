@@ -5,14 +5,11 @@
   --press-register: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
   --type-caption: 11px;
   --type-interface: 13px;
-  --type-reading: 16px;
   --type-title: clamp(38px, 4.4vw, 66px);
-  --space-unit: 4px;
   --frame-margin: clamp(22px, 3.2vw, 48px);
   --press-white: color-mix(in srgb, var(--na-starlight) 90%, var(--na-mist));
   --press-muted: color-mix(in srgb, var(--na-mist) 70%, var(--na-starlight));
   --press-hairline: color-mix(in srgb, var(--na-starlight) 23%, transparent);
-  --press-paper: color-mix(in srgb, var(--na-starlight) 94%, var(--na-gold));
 }
 
 .brand {
@@ -122,7 +119,7 @@ body[data-phase='held'] .status { animation: none; }
   box-shadow: 0 0 15px color-mix(in srgb, var(--na-gold) 10%, transparent);
 }
 #rail-instruments[aria-expanded='true']::after { border-color: var(--na-gold); }
-body:has(#forward-door.lit) #rail { z-index: 7; }
+
 #instruments {
   z-index: 8;
   right: var(--frame-margin);
@@ -164,7 +161,7 @@ body:has(#forward-door.lit) #rail { z-index: 7; }
 }
 
 /* The last page. The dawn is behind the type, never a veil over it. */
-#forward-door { isolation: isolate; padding-bottom: calc(90px + env(safe-area-inset-bottom)); }
+
 .door-dawn { z-index: -1; height: 51%; background: linear-gradient(to top, var(--na-abyss), color-mix(in srgb, var(--na-lapis) 88%, transparent) 50%, transparent); }
 .door-mark { width: 56px; height: 56px; background: color-mix(in srgb, var(--na-abyss) 75%, transparent); box-shadow: 0 0 36px color-mix(in srgb, var(--na-gold) 9%, transparent); }
 .door-bead { width: 4px; height: 4px; top: 3px; right: 9px; }
@@ -217,7 +214,6 @@ body:has(#forward-door.lit) #rail { z-index: 7; }
   #rail button { font-size: 12px; gap: 9px; bottom: calc(14px + env(safe-area-inset-bottom)); }
   #rail-sound::before, #rail-instruments::after { width: 26px; height: 26px; }
 
-  #forward-door { padding: 24px 24px calc(105px + env(safe-area-inset-bottom)); }
   .door-title { font-size: 32px; max-width: 100%; }
   .door-kicker { font-size: 10px; gap: 10px; letter-spacing: .12em; text-indent: .12em; }
   .door-kicker::before, .door-kicker::after { width: 12px; }
@@ -230,6 +226,8 @@ body:has(#forward-door.lit) #rail { z-index: 7; }
   #instruments { right: 22px; left: 22px; width: auto; padding: 26px 28px 14px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  #overture-skip::after, #rail button, #rail button::before, #rail button::after,
-  #forward-door, #forward-door * { transition: none; animation: none; }
+  #overture-skip::after,
+#rail button,
+#rail button::before,
+#rail button::after { transition: none; animation: none; }
 }
