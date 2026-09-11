@@ -32,6 +32,10 @@
      as a texture, carries the same verbatim licence line, and a
      REFERENCE-ONLY or undisplayable entry throws before it can reach a
      surface.
+   · COMPRESSED OR NOT, ONE PATH. A model baked in Blender arrives as 4K PNG
+     atlases and weighs ninety megabytes; run through gltfpack it is thirteen,
+     with meshopt geometry and ETC1S maps in KTX2. The loader below accepts
+     both extensions, and an uncompressed glb loads exactly as it did.
 
    AND THE HELPER, WHERE THE SOURCE'S OWN MAPS RUN OUT. A prop photographed
    at two thousand texels per metre needs nothing from this museum. A gate,
@@ -59,8 +63,11 @@ import {
   type Material,
   type MeshStandardMaterial,
   type Texture,
+  type WebGPURenderer,
 } from 'three/webgpu'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
+import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js'
+import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js'
 import * as TSL from 'three/tsl'
 import { detailNodes } from './detail'
 import { loadManifest, type ManifestEntry } from '../manifest'
@@ -131,7 +138,28 @@ export function modelTextureSide(tier: Tier): number {
   return tier.detail >= 2 ? 2048 : 1024
 }
 
-const loader = new GLTFLoader()
+/* THE ONE LOADER THE STORE USES, AND THE TWO EXTENSIONS A COMPRESSED EXPORT
+   ARRIVES IN. `gltfpack -cc -tc -tq 8` packs the geometry with meshopt and
+   the maps as ETC1S inside KTX2; a bare GLTFLoader refuses both and the
+   whole document fails, not just its textures. The transcoder is two files
+   the KTX2 worker FETCHES at load rather than imports, so they stand in
+   `public/basis/` and not in the bundle graph: `basis_transcoder.js` and
+   `basis_transcoder.wasm`, Apache License 2.0, from the Basis Universal
+   project, delivered with three and copied from its own libs folder. */
+const ktx2 = new KTX2Loader().setTranscoderPath(`${import.meta.env.BASE_URL}basis/`)
+const loader = new GLTFLoader().setKTX2Loader(ktx2).setMeshoptDecoder(MeshoptDecoder)
+
+/* WHICH GPU FORMAT THE TRANSCODER TARGETS IS A FACT ABOUT THE MACHINE, so it
+   is read off the renderer rather than assumed: ETC1S is a container, not a
+   format, and what it becomes is BC on this desktop and ETC2 or ASTC on a
+   phone. One call covers both backends, because three's WebGPU renderer
+   answers `hasFeature` through its WebGL fallback too, and it has to happen
+   after `renderer.init()`, which is why the library takes the renderer. Where
+   an adapter supports no compressed format at all the transcoder falls back
+   to RGBA8 and the picture still arrives. */
+export function detectCompressedSupport(renderer: WebGPURenderer): void {
+  ktx2.detectSupport(renderer)
+}
 
 /* the density under which a source's own maps stop carrying the room-scale
    band. Measured, not chosen by eye: at 400 texels per metre one texel is
@@ -139,7 +167,12 @@ const loader = new GLTFLoader()
    two hundred pixels per metre sees the map's own mip and nothing else. */
 const COARSE = 400
 
-export function createModelLibrary(tier: Tier, materials: MaterialLibrary): ModelLibrary {
+export function createModelLibrary(
+  tier: Tier,
+  materials: MaterialLibrary,
+  renderer: WebGPURenderer
+): ModelLibrary {
+  detectCompressedSupport(renderer)
   const held = new Map<string, ModelAsset>()
   const flight = new Map<string, Promise<ModelAsset>>()
   const failed = new Map<string, string>()
@@ -210,7 +243,7 @@ export function createModelLibrary(tier: Tier, materials: MaterialLibrary): Mode
         for (const t of mapsOf(m as MeshStandardMaterial)) {
           if (textures.has(t)) continue
           textures.add(t)
-          bytes += textureBytes(Math.min(side, sideOf(t)))
+          bytes += mapBytes(t, side)
         }
         swapped.set(m, next)
         return next
@@ -346,6 +379,24 @@ function mapsOf(m: MeshStandardMaterial): Texture[] {
   return [m.map, m.normalMap, m.roughnessMap, m.metalnessMap, m.aoMap, m.alphaMap, m.emissiveMap]
     .filter((t): t is Texture => Boolean(t))
     .filter((t, i, all) => all.indexOf(t) === i)
+}
+
+/* WHAT A MAP HOLDS ON THE GPU. An uncompressed one is uploaded as RGBA8 with
+   its mip chain and the tier's own cap on its side, which is the library's
+   formula. A transcoded KTX2 map is neither: it arrives as GPU blocks that
+   cannot be resized, and it carries its own mips, so its cost is the bytes
+   that are actually on it. Measured rather than estimated, because the two
+   numbers a compressed model has are far apart: a 4K map that costs a
+   megabyte and a half in the file holds twenty-one on the GPU, and what the
+   drawer prints is what is held. */
+function mapBytes(t: Texture, side: number): number {
+  const mips = t.mipmaps as Array<{ data?: ArrayBufferView }> | undefined
+  if (mips?.length) {
+    let sum = 0
+    for (const mip of mips) sum += mip?.data?.byteLength ?? 0
+    if (sum) return sum
+  }
+  return textureBytes(Math.min(side, sideOf(t)))
 }
 
 function sideOf(t: Texture): number {

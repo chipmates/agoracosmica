@@ -1,7 +1,7 @@
 {
   "note": "Runtime dependencies allowed beyond the base, each with the reason it earned its place. A wing that wants a library adds a line here and the gate stops failing; a wing that adds one quietly does not build. Dev dependencies are listed for the record and are not gated: nothing in them reaches a visitor.",
   "dependencies": {
-    "three": "The renderer. Every material of this museum is written in its shading language, which is what lets one authored wing run on both backends."
+    "three": "The renderer. Every material of this museum is written in its shading language, which is what lets one authored wing run on both backends. Its KTX2 transcoder is the one part of it that ships as files rather than as bundle: basis_transcoder.js and basis_transcoder.wasm stand in public/basis/, copied unchanged from its own libs folder, Apache License 2.0, because the loader's worker fetches them at load."
   },
   "devDependencies": {
     "@types/three": "types for the renderer",

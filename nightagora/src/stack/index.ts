@@ -127,7 +127,8 @@ export async function createStack(opts: StackOptions = {}): Promise<Stack> {
   const backend: 'webgpu' | 'webgl2' = adapter === null ? 'webgl2' : 'webgpu'
   const architecture = adapter?.architecture ?? 'webgl2'
   const materials = createMaterialLibrary(tier)
-  const models = createModelLibrary(tier, materials)
+  // the renderer is what tells the KTX2 transcoder which GPU format to target
+  const models = createModelLibrary(tier, materials, renderer)
   const meter = createCostMeter(renderer)
   const lights: KeyLight[] = []
 
