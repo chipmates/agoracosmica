@@ -44,7 +44,7 @@ export type { AssetClass, ManifestEntry } from '../manifest/schema'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type N = any
-const { float, mix, positionWorld, texture, uniform, vec2, vec3 } = TSL as unknown as Record<
+const { float, max, mix, positionWorld, texture, uniform, vec2, vec3 } = TSL as unknown as Record<
   string,
   N
 >
@@ -85,6 +85,9 @@ export interface SampleAt {
   /** rotate the projection, in radians, which is how a second sample of the
       same photograph stops looking like the same photograph */
   turn?: number
+  /** shift the projection, in metres, so the second sample does not land on
+      the first one's own grid even where the two tiles agree */
+  offset?: [number, number]
 }
 
 /** which family a set belongs to, which is what decides how much of the
@@ -102,6 +105,25 @@ export interface DetailRecipe {
   mid: number
   /** how much of the micro roughness noise this set is worth, 0..1 */
   micro: number
+}
+
+/** which field a soft surface carries where its photograph carries none */
+export type GrainKind = 'ridges' | 'knit' | 'creases' | 'laid' | 'wave' | 'grit'
+
+/** the field itself, in metres and in fractions, resolved from the manifest */
+export interface GrainRecipe {
+  kind: GrainKind
+  /** metres between one ridge, row, crease or chain line and the next */
+  pitch: number
+  /** radians the run of the field makes with the tile's own u axis */
+  angle: number
+  relief: number
+  shade: number
+  sheen: number
+  /** metres of the drape above it; 0 for none */
+  fold: number
+  /** metres of the tooth under it; 0 for none */
+  tooth: number
 }
 
 export interface MaterialSet {
@@ -124,6 +146,11 @@ export interface MaterialSet {
   scale: [number, number]
   cls: MaterialClass
   detail: DetailRecipe
+  /** the mid and fine bands the source's own texel frequency cannot carry at
+      the size the museum lays this set; null where the photograph is enough */
+  grain: GrainRecipe | null
+  /** metres of the mask that breaks a visible tile repeat; 0 for none */
+  detile: number
   entry: ManifestEntry
   /** the textures, from the first frame; null only for a set the manifest
       does not name */
@@ -131,6 +158,9 @@ export interface MaterialSet {
   /** 0 until the pixels are on the GPU, then 1. Every term the library adds
       is gated on it. */
   ready: N
+  /** where a sample lands on the surface, in METRES and already turned by
+      the set's own orientation: what the grain field runs along */
+  place: (at?: SampleAt) => N
   /** the set's own maps at one place */
   sample: (at?: SampleAt) => SampledMaps
   /** the set as a lit material, with the empty-plane helper already on it */
@@ -183,6 +213,9 @@ interface Recipe {
   metalness: number
   macroContrast?: number
   micro?: number
+  grain?: GrainRecipe
+  detile?: number
+  roughnessFloor?: number
 }
 const DEFAULT_RECIPE: Recipe = {
   cls: 'stone',
@@ -191,6 +224,31 @@ const DEFAULT_RECIPE: Recipe = {
   falloff: 1,
   metalness: 0,
 }
+
+/* THE SEVEN SOFT SETS, AND WHY THEY NEED A FIELD OF THEIR OWN. Measured off
+   the maps at the size each set is laid: linen's strongest feature is 0.7 mm,
+   wool's 1.3, canvas's 5.6, parchment's 2.9. A wall is read at some two
+   hundred pixels per metre, so those are a sixth to a fifth of a pixel each,
+   and 99 per cent of every one of those maps' variation sits under two
+   centimetres. The photograph is real and it averages to its own mean, which
+   is the flat-colour plane the empty-plane rule forbids. What the eye reads
+   at that distance is the drape: a fold, a slub run, a knit row, a wear
+   crease, a chain line. So a soft set carries a field with a real feature
+   size, and the photograph rides under it rather than being replaced.
+
+   The numbers below are held equal to the manifest's own `grain` block, for
+   the same reason `detail` is: a scene built in a constructor cannot wait for
+   a fetch. Angles are radians here and degrees there. */
+const grain = (
+  kind: GrainKind,
+  pitch: number,
+  relief: number,
+  shade: number,
+  sheen: number,
+  fold: number,
+  tooth: number,
+  angle = 0
+): GrainRecipe => ({ kind, pitch, angle, relief, shade, sheen, fold, tooth })
 const RECIPES: Record<string, Partial<Recipe>> = {
   'marble-white': {
     cls: 'stone',
@@ -200,7 +258,19 @@ const RECIPES: Record<string, Partial<Recipe>> = {
     micro: 0.45,
   },
   'marble-lapis': { cls: 'stone', scales: [2.4, 0.42, 0.035], normalStrength: 0.35, micro: 0.6 },
-  'limestone-pale': { cls: 'stone', scales: [1.8, 0.36, 0.028], normalStrength: 0.55, falloff: 1.2 },
+  'limestone-pale': {
+    cls: 'stone',
+    scales: [1.8, 0.36, 0.028],
+    normalStrength: 0.55,
+    falloff: 1.2,
+    macroContrast: 0.4,
+    /* the source is a honed slab and measures 0.037, which renders as a
+       mirror. A building limestone at visitor distance is matte. */
+    roughnessFloor: 0.6,
+    // shade 0 on purpose: the colonnade reads this set's albedo and nothing
+    // else, and its look is fixed. The grit is relief and roughness only.
+    grain: grain('grit', 0.04, 0.16, 0, 0.08, 0, 0.01),
+  },
   'stone-tuffeau': { cls: 'stone', scales: [2.0, 0.5, 0.03], normalStrength: 0.6, falloff: 1.2 },
   'brick-old-red': { cls: 'stone', scales: [1.8, 0.45, 0.03], normalStrength: 0.8, macroContrast: 0.9 },
   'slate-roof': { cls: 'stone', scales: [3.0, 0.4, 0.04], normalStrength: 0.9, macroContrast: 0.45, micro: 0.8 },
@@ -208,21 +278,64 @@ const RECIPES: Record<string, Partial<Recipe>> = {
   'plaster-lime-aged': { cls: 'stone', scales: [1.6, 0.3, 0.02], normalStrength: 0.5 },
   'bronze-dark': { cls: 'metal', scales: [0.9, 0.18, 0.014], normalStrength: 0.28, metalness: 1 },
   'iron-forged': { cls: 'metal', scales: [0.8, 0.16, 0.012], normalStrength: 0.4, metalness: 1 },
-  'gold-leaf': { cls: 'metal', scales: [0.6, 0.12, 0.01], normalStrength: 0.25, metalness: 1, micro: 0.1 },
+  'gold-leaf': {
+    cls: 'metal',
+    scales: [0.6, 0.12, 0.01],
+    normalStrength: 0.25,
+    metalness: 1,
+    micro: 0.1,
+    /* a mirror facing one way reflects one patch of sky, which is why a flat
+       gold plane reads as painted board while the sphere reads as leaf. Leaf
+       is laid in squares on a ground and burnished, so it has facets: a
+       shallow one, declared, and no albedo term at all. */
+    grain: grain('grit', 0.09, 0.06, 0, 0, 0.5, 0),
+  },
   'oak-planks-worn': { cls: 'wood', scales: [1.5, 0.3, 0.02], normalStrength: 0.6 },
-  'oak-beams': { cls: 'wood', scales: [1.0, 0, 0.02], normalStrength: 0.8 },
-  'canvas-raw': { cls: 'cloth', scales: [1.5, 0, 0.006], normalStrength: 0.7, falloff: 0.7 },
-  linen: { cls: 'cloth', scales: [1.5, 0, 0.008], normalStrength: 0.6, falloff: 0.7 },
-  'wool-cloth': { cls: 'cloth', scales: [1.5, 0, 0.008], normalStrength: 0.7, falloff: 0.7 },
+  'oak-beams': {
+    cls: 'wood',
+    scales: [1.0, 0, 0.02],
+    normalStrength: 0.8,
+    // a 0.5 m tile stamps the same knot sixteen times across a 2 m plane
+    detile: 0.37,
+    grain: grain('wave', 0.26, 0.34, 0.4, 0.08, 0.6, 0.016),
+  },
+  'canvas-raw': {
+    cls: 'cloth',
+    scales: [1.5, 0, 0.006],
+    normalStrength: 0.7,
+    falloff: 0.7,
+    grain: grain('ridges', 0.22, 0.5, 0.5, 0.05, 0.5, 0.014),
+  },
+  linen: {
+    cls: 'cloth',
+    scales: [1.5, 0, 0.008],
+    normalStrength: 0.6,
+    falloff: 0.7,
+    grain: grain('ridges', 0.2, 0.6, 0.55, 0.06, 0.46, 0.012),
+  },
+  'wool-cloth': {
+    cls: 'cloth',
+    scales: [1.5, 0, 0.008],
+    normalStrength: 0.7,
+    falloff: 0.7,
+    grain: grain('knit', 0.18, 0.55, 0.55, 0.05, 0.46, 0.012, 14),
+  },
   'leather-worn': {
     cls: 'cloth',
-    scales: [1.5, 0, 0.01],
+    scales: [1.0, 0, 0.01],
     normalStrength: 0.5,
     falloff: 0.8,
     macroContrast: 0.95,
     micro: 1,
+    grain: grain('creases', 0.22, 0.34, 0.45, 0.34, 0.52, 0.014),
   },
-  'parchment-laid': { cls: 'paper', scales: [1.5, 0, 0.008], normalStrength: 0.35, falloff: 0.7 },
+  'parchment-laid': {
+    cls: 'paper',
+    scales: [1.1, 0, 0.008],
+    normalStrength: 0.35,
+    falloff: 0.7,
+    grain: grain('laid', 0.03, 0.5, 0.55, 0.14, 0.3, 0.01),
+  },
   rope: { cls: 'fibre', scales: [0.4, 0.09, 0.007], normalStrength: 0.9, falloff: 0.7 },
   'earth-packed': { cls: 'earth', scales: [1.4, 0.32, 0.025], normalStrength: 0.7 },
   gravel: { cls: 'earth', scales: [1.6, 0.34, 0.025], normalStrength: 0.9 },
@@ -357,6 +470,11 @@ export function createMaterialLibrary(tier: Tier): MaterialLibrary {
     return vec2(base.x.mul(c).sub(base.y.mul(s)), base.x.mul(s).add(base.y.mul(c)))
   }
 
+  /** and a shift, in metres, for the same reason */
+  function shifted(base: N, offset: [number, number] | undefined): N {
+    return offset ? base.add(vec2(offset[0], offset[1])) : base
+  }
+
   /** the one function that turns a manifest entry into pixels, per set */
   const resolvers = new Map<string, (entry: ManifestEntry | undefined) => Promise<void>>()
 
@@ -374,6 +492,10 @@ export function createMaterialLibrary(tier: Tier): MaterialLibrary {
        one number that must never be stale is the one the ratio divides by */
     const invMean = uniform(vec3(1, 1, 1))
     const rough = uniform(recipe.metalness > 0.5 ? 0.4 : 0.6)
+    /* the museum's floor under the map's own roughness. Zero is the identity
+       (a roughness map has no negative texels), so a set that declares none
+       reads exactly what it read before this field existed. */
+    const roughFloor = uniform(recipe.roughnessFloor ?? 0)
     const tint = uniform(vec3(1, 1, 1))
     /* the set's own turn, as cosine and sine, and the sign of its green
        channel. Both are uniforms for the same reason the mean is: a scene
@@ -401,18 +523,24 @@ export function createMaterialLibrary(tier: Tier): MaterialLibrary {
         mid: recipe.scales[1],
         micro: recipe.micro ?? CLASS_DETAIL[recipe.cls].micro,
       },
+      grain: recipe.grain ?? null,
+      detile: recipe.detile ?? 0,
       entry: generatedEntry(name),
       maps,
       ready,
 
+      place(at = {}) {
+        const flat = shifted(turned(at.uv ?? planarUV(at.world), at.turn ?? 0), at.offset)
+        return vec2(
+          flat.x.mul(spin.x).sub(flat.y.mul(spin.y)),
+          flat.x.mul(spin.y).add(flat.y.mul(spin.x))
+        )
+      },
+
       sample(at = {}) {
         const size = at.metres ?? set.scale
         const tile = typeof size === 'number' ? [size, size] : size
-        const flat = turned(at.uv ?? planarUV(at.world), at.turn ?? 0)
-        const uv = vec2(
-          flat.x.mul(spin.x).sub(flat.y.mul(spin.y)),
-          flat.x.mul(spin.y).add(flat.y.mul(spin.x))
-        ).div(vec2(tile[0], tile[1]))
+        const uv = set.place(at).div(vec2(tile[0], tile[1]))
         const colour = texture(maps.albedo, uv).rgb.mul(tint)
         const surface = texture(maps.surface, uv)
         const packed = texture(maps.normal, uv).rgb.mul(2).sub(1)
@@ -420,7 +548,7 @@ export function createMaterialLibrary(tier: Tier): MaterialLibrary {
           albedo: mix(vec3(1, 1, 1), colour.mul(invMean), ready),
           colour,
           normal: mix(vec3(0, 0, 1), vec3(packed.x, packed.y.mul(greenY), packed.z), ready),
-          roughness: mix(rough, surface.r, ready),
+          roughness: mix(rough, max(surface.r, roughFloor), ready),
           occlusion: mix(float(1), surface.g, ready),
         }
       },
@@ -444,7 +572,25 @@ export function createMaterialLibrary(tier: Tier): MaterialLibrary {
       if (m) {
         set.albedo = new Color(m.albedo)
         set.variation = new Color(m.variation)
-        set.roughness = m.roughness
+        /* the record is what the source measured; the floor is what the
+           museum says the same stone is when it is a wall, and the card
+           prints both */
+        set.roughness = Math.max(m.roughness, entry.roughness_floor ?? 0)
+      }
+      roughFloor.value = entry.roughness_floor ?? 0
+      set.detile = entry.detile_m ?? set.detile
+      if (entry.grain) {
+        const g = entry.grain
+        set.grain = {
+          kind: g.kind,
+          pitch: g.pitch_cm / 100,
+          angle: (g.angle * Math.PI) / 180,
+          relief: g.relief,
+          shade: g.shade,
+          sheen: g.sheen,
+          fold: g.fold_cm / 100,
+          tooth: g.tooth_cm / 100,
+        }
       }
       if (entry.metres) set.metres = entry.metres
       /* the museum's own word about how the set is laid, over the record of

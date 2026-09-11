@@ -36,14 +36,27 @@
        it reflects, and a noise field on a sheet of gold is camouflage)
      · the mid band never covers a weave finer than itself: where the set's
        whole photographed tile is under twice the mid feature, the band is
-       dropped, procedural relief and second map read together */
+       dropped, procedural relief and second map read together
+
+   AND WHERE A PHOTOGRAPH HAS NOTHING TO GIVE AT THE SIZE A WALL IS READ AT,
+   THE SET SAYS WHAT IT IS INSTEAD. Measured off the maps: linen's strongest
+   feature is 0.7 mm, wool's 1.3, canvas's 5.6, and 99 per cent of each of
+   those maps' variation sits under two centimetres. At the two hundred
+   pixels per metre a wall is read at, that is a fifth of a pixel. The
+   photograph is honest and it averages to its own mean, so the plane goes to
+   flat colour and nothing in the stack can find it. What the eye reads on a
+   hanging cloth at that distance is the drape, so a soft set carries a
+   GRAIN: a fold, a slub run, a knit row, a wear crease, a chain line, a
+   grain wave, each with a feature size the plane can hold, with the
+   photograph riding under it. */
 
 import * as TSL from 'three/tsl'
-import type { MaterialSet } from './materials'
+import type { GrainRecipe, MaterialSet, SampledMaps } from './materials'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type N = any
 const {
+  abs,
   cameraPosition,
   clamp,
   float,
@@ -54,11 +67,142 @@ const {
   normalMap,
   normalize,
   positionWorld,
+  sin,
   smoothstep,
   uv,
   vec2,
   vec3,
 } = TSL as unknown as Record<string, N>
+
+/* ── THE GRAIN ──────────────────────────────────────────────────────────────
+   One field per soft class, each built from three primitives so that the
+   whole set of them costs a handful of noise taps and reads at the size it
+   declares.
+
+     streaks  anisotropic fractal noise: fast across x, slow along y, which
+              on an upright plane is a vertical fold and on a beam is the run
+              of the grain. Turned the other way it is a course, a slub run,
+              a wear band
+     ripple   a plain sine, used once and only once: a laid paper's chain
+              lines really are evenly spaced, and nothing else here is
+     ridged   1 - |noise|, raised, which is a narrow line: a crease, a check
+
+   Every field returns roughly -1 to 1 and is read in the set's OWN frame
+   (already turned by its orientation), so a grain declared along the tile's
+   u axis runs where the photograph's own does. */
+
+const N3 = (r: N, sx: number, sy: number): N => vec3(r.x.mul(sx), 0, r.y.mul(sy))
+const streaks = (r: N, sx: number, sy: number, oct: number): N =>
+  mx_fractal_noise_float(N3(r, sx, sy), oct, 2.0, 0.55, 1.0)
+const ripple = (t: N): N => sin(t.mul(Math.PI * 2))
+const ridged = (n: N, sharp: number): N =>
+  float(1).sub(abs(n)).pow(sharp).mul(2).sub(1)
+
+/* THE DRAPE CARRIES THE FIELD AND THE WEAVE ONLY SIGNS IT. The first build
+   of these gave a cloth two sine ridges at a fifth of its pitch and read as
+   gingham: a sine is all its energy at one frequency, so on the plane it wins
+   whatever amplitude it is given, and a regular grid is the one thing no
+   hanging cloth has. Every field below is therefore fold-dominant, with the
+   material's own signature at a quarter of the weight and no ruler in it
+   anywhere except the one place a ruler is true. */
+
+/** the field's own height at one place, in the set's own frame */
+function grainHeight(g: GrainRecipe, r: N): N {
+  const p = 1 / g.pitch
+  if (g.kind === 'knit') {
+    // heavy cloth hangs in soft columns; the courses only band it, and they
+    // band it unevenly, because a hand knit's rows are not a ruler either
+    return streaks(r, p, p / 4.5, 2)
+      .mul(0.86)
+      .add(streaks(r, p / 3.4, p / 0.5, 2).mul(0.18))
+  }
+  if (g.kind === 'creases') {
+    // a worn hide does not drape, it creases: narrow lines over a wear path
+    return ridged(streaks(r, p, p, 4), 3)
+      .mul(-0.24)
+      .add(streaks(r, p / 4.5, p / 4.5, 2).mul(0.7))
+  }
+  if (g.kind === 'laid') {
+    // a sheet cockles rather than folds, and the chain lines are its ruler
+    return streaks(r, p / 6, p / 4.2, 3)
+      .mul(0.88)
+      .add(ripple(r.x.mul(p)).mul(0.12))
+  }
+  if (g.kind === 'wave') {
+    // timber: early and late wood as long lines, wandering slowly across
+    return ridged(streaks(r, p, p / 7, 4), 2)
+      .mul(0.5)
+      .add(streaks(r, p / 2.4, p / 0.8, 2).mul(0.34))
+  }
+  if (g.kind === 'grit') {
+    // a quarried stone's grain: no direction in it at all
+    return streaks(r, p, p, 3)
+  }
+  // ridges: a hanging cloth. Folds down the drop, and a slub run across
+  // them, uneven, because a slub is a thick thread and not a rule
+  return streaks(r, p, p / 6, 2)
+    .mul(0.88)
+    .add(streaks(r, p / 2.6, p / 0.9, 2).mul(0.2))
+}
+
+interface GrainNodes {
+  /** the tangent-space slope the field carries, as a vec2 */
+  slope: N
+  /** what it does to the albedo, as a ratio around one */
+  shade: N
+  /** and to the roughness, as an offset */
+  rough: N
+}
+
+/**
+ * The grain at one place. Three evaluations of the field for its slope, and
+ * one more for the tooth, which reaches the albedo and the roughness but
+ * never the normal: a one-centimetre feature is two pixels at wall distance,
+ * and a normal that fine is an alias rather than a surface.
+ */
+function grainNodes(g: GrainRecipe, place: N, density: N, count: number): GrainNodes {
+  const ca = Math.cos(g.angle)
+  const sa = Math.sin(g.angle)
+  const r = g.angle
+    ? vec2(place.x.mul(ca).sub(place.y.mul(sa)), place.x.mul(sa).add(place.y.mul(ca)))
+    : place
+
+  let h = grainHeight(g, r)
+  if (g.fold > 0) {
+    const f = 1 / g.fold
+    h = h.add(streaks(r, f, f / 2.6, 2).mul(1.15))
+  }
+  /* one step for the whole field, taken at the mid feature's own size. A
+     coarser term genuinely has a gentler slope at that step, which is what a
+     fold is; the sines are what the step must not be finer than. */
+  const e = g.pitch * 0.3
+  const at = (dx: number, dy: number): N => {
+    let k = grainHeight(g, r.add(vec2(dx, dy)))
+    if (g.fold > 0) {
+      const f = 1 / g.fold
+      k = k.add(streaks(r.add(vec2(dx, dy)), f, f / 2.6, 2).mul(1.15))
+    }
+    return k
+  }
+  const slope = vec2(at(e, 0).sub(h), at(0, e).sub(h))
+  // back out of the field's own turn, so the relief is lit where it is seen
+  const world = g.angle
+    ? vec2(slope.x.mul(ca).add(slope.y.mul(sa)), slope.y.mul(ca).sub(slope.x.mul(sa)))
+    : slope
+
+  const tooth =
+    count >= 3 && g.tooth > 0 ? streaks(r, 1 / g.tooth, 1 / (g.tooth * 1.8), 2) : float(0)
+
+  return {
+    slope: world.mul(density.mul(g.relief * 1.4)),
+    shade: h.mul(g.shade * 0.155).add(tooth.mul(g.shade * 0.36)).mul(density),
+    rough: h
+      .mul(-g.sheen * 0.3)
+      .add(tooth.mul(g.sheen * 0.3))
+      .add(float(-g.sheen * 0.12))
+      .mul(density),
+  }
+}
 
 export interface DetailScales {
   /** metres of each of the three features; the set's own scales by default */
@@ -179,13 +323,45 @@ export function detailNodes(set: MaterialSet, opts: DetailScales = {}): DetailNo
      The mid read is the same photograph a fifth of the size and turned by a
      third of a radian: at that offset the two reads decorrelate and the tile
      stops being findable. */
+  const where = opts.uv
+    ? { uv: opts.uv }
+    : opts.space === 'uv'
+      ? { uv: uv().mul(vec2(set.scale[0], set.scale[1])) }
+      : { world: P }
+
   if (mapAmt > 0) {
-    const where = opts.uv
-      ? { uv: opts.uv }
-      : opts.space === 'uv'
-        ? { uv: uv().mul(vec2(set.scale[0], set.scale[1])) }
-        : { world: P }
-    const grand = set.sample(where)
+    let grand = set.sample(where)
+    /* A TILE THAT CAN BE COUNTED IS WALLPAPER. Where a set's tile is far
+       smaller than the surface it dresses, the same knot lands in a lattice
+       the eye finds at once. The second read is the same photograph turned,
+       shifted and laid at another size, so its own repeat is incommensurate
+       with the first's, and a mask coarser than either chooses between them.
+       Two taps per map, and only for a set that asks. */
+    if (set.detile > 0) {
+      const alt = set.sample({
+        ...where,
+        /* a small turn, not a right angle: the second read has to break the
+           lattice, not lay a second grain across the first. The tile size
+           and the shift are what move the knots. */
+        turn: 0.16,
+        offset: [0.41, 0.77],
+        metres: [set.scale[0] * 1.37, set.scale[1] * 1.37],
+      })
+      const k = smoothstep(
+        0.4,
+        0.6,
+        mx_noise_float(N3(set.place(where), 1 / set.detile, 1 / set.detile))
+          .mul(0.5)
+          .add(0.5)
+      )
+      grand = {
+        albedo: mix(grand.albedo, alt.albedo, k),
+        colour: mix(grand.colour, alt.colour, k),
+        normal: mix(grand.normal, alt.normal, k),
+        roughness: mix(grand.roughness, alt.roughness, k),
+        occlusion: mix(grand.occlusion, alt.occlusion, k),
+      } as SampledMaps
+    }
     albedo = albedo.mul(mix(vec3(1, 1, 1), grand.albedo, density.mul(mapAmt)))
     roughness = grand.roughness.add(micro)
     occlusion = mix(float(1), grand.occlusion, density.mul(mapAmt))
@@ -208,6 +384,16 @@ export function detailNodes(set: MaterialSet, opts: DetailScales = {}): DetailNo
         normal.z
       )
     )
+  }
+
+  /* 4 · the grain, last, because it is the band the photograph under it does
+     not carry at this size. Its slope adds to the slopes already there and
+     the whole is renormalised once. A set that declares none pays nothing. */
+  if (set.grain && count >= 2) {
+    const g = grainNodes(set.grain, set.place(where), density, count)
+    if (set.grain.shade > 0) albedo = albedo.mul(float(1).add(g.shade))
+    if (set.grain.sheen > 0) roughness = roughness.add(g.rough)
+    normal = normalize(vec3(normal.xy.add(g.slope), normal.z))
   }
 
   return { albedo, normal, roughness: clamp(roughness, 0.02, 1), occlusion, density }

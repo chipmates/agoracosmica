@@ -115,6 +115,39 @@ export interface ManifestEntry {
     mid_cm: number
     micro: number
   }
+  /** the museum's own floor under the roughness the source measured. A
+      building limestone photographed honed measures 0.037, which renders as
+      polished travertine with a mirror in it; the floor is what the same
+      stone is when it is a wall. `measured.roughness` stays the record. */
+  roughness_floor?: number
+  /** metres of the mask that breaks a visible tile repeat. A half-metre tile
+      laid across a two-metre plane stamps the same knot sixteen times; a
+      second read of the map, turned and at another size, chosen by a mask
+      this coarse, removes the lattice. Absent leaves the tiling alone. */
+  detile_m?: number
+  /** THE BAND A PHOTOGRAPH CANNOT GIVE. A weave is far finer than the plane
+      it is laid on can resolve: linen's is 0.7 mm, a sixth of a pixel at the
+      distance a wall is read from, so the map averages to its own mean and
+      the surface goes to flat colour. What the eye reads on a hanging cloth
+      at that distance is the drape, not the weave: a fold, a slub run, a
+      crease, a chain line, a grain wave. A soft set declares its own here. */
+  grain?: {
+    kind: 'ridges' | 'knit' | 'creases' | 'laid' | 'wave' | 'grit'
+    /** centimetres between one ridge, row, crease or chain line and the next */
+    pitch_cm: number
+    /** degrees the run of the field makes with the tile's own u axis */
+    angle: number
+    /** how much relief it carries, 0..1 */
+    relief: number
+    /** how much of it reaches the albedo, 0..1 */
+    shade: number
+    /** how far the roughness swings across it, 0..1 */
+    sheen: number
+    /** centimetres of the drape above it; 0 for none */
+    fold_cm: number
+    /** centimetres of the tooth under it; 0 for none */
+    tooth_cm: number
+  }
 }
 
 export interface Manifest {
