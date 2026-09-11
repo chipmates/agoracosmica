@@ -806,6 +806,9 @@ function setPhase(next: Phase): void {
   }
   if (next === 'wheel') {
     setStatus('')
+    // the verse belongs to the fire, so it leaves when the gaze does: its own
+    // hold outlives a quick look up and the line was landing on the sky
+    verseEl.classList.remove('lit')
     chapterChangedAt = elapsed
     setPlate()
     skyDress(true)
