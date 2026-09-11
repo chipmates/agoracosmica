@@ -70,6 +70,17 @@ async function landed(page, state, ms = 6000) {
   return false
 }
 
+/** the address a state is shot at, and the window property that drives it */
+const pathOf = (s) => s.path ?? '/'
+const hookOf = (s) => s.hook ?? '__forge'
+
+/** land on a route and wait for its own forge hook to exist */
+async function arrive(page, url, hook) {
+  await page.goto(url)
+  await page.waitForFunction((h) => Boolean(window[h]), hook)
+  await page.waitForTimeout(1800)
+}
+
 /** the headless GL context can die mid-run on the heavier stages: a lost
     context looks exactly like a bad frame, so the rig proves the state
     took and reloads once if it did not. The app writes back the state it
@@ -77,16 +88,17 @@ async function landed(page, state, ms = 6000) {
     arrives a frame later, and the phase alone cannot tell a pane from
     the wheel it is held open on. */
 async function jump(page, state, url, settle) {
+  const hook = hookOf(state)
   for (let attempt = 0; attempt < 2; attempt++) {
-    await page.evaluate(([p, o]) => {
-      window.__forge.freeze(12.4)
-      window.__forge.jump(p, o ?? {})
-    }, [state.phase, state.opts])
+    await page.evaluate(([p, o, h]) => {
+      window[h].freeze(12.4)
+      window[h].jump(p, o ?? {})
+    }, [state.phase, state.opts, hook])
     const took = await landed(page, state.phase)
     await page.waitForTimeout(settle)
     if (took) return true
     await page.reload()
-    await page.waitForFunction(() => Boolean(window.__forge))
+    await page.waitForFunction((h) => Boolean(window[h]), hook)
     await page.waitForTimeout(1500)
   }
   return false
@@ -125,9 +137,8 @@ try {
       await page.route('**/@vite/client', (route) =>
         route.fulfill({ status: 200, contentType: 'application/javascript', body: 'export {}' })
       )
-      await page.goto(`${BASE}/?tier=${tier}`)
-      await page.waitForFunction(() => Boolean(window.__forge))
-      await page.waitForTimeout(1800)
+      let here = pathOf(wanted[0])
+      await arrive(page, `${BASE}${here}?tier=${tier}`, hookOf(wanted[0]))
 
       const stamp = await assertBackend(page, WANT_BACKEND)
       assertAdapter(firstLine, WANT_BACKEND)
@@ -135,6 +146,13 @@ try {
       if (vp.tag === 'desktop' && tier === allTiers[0]) console.log(firstLine)
 
       for (const s of wanted) {
+        // a state on another address is a reload, not a jump: two routes are
+        // two apps and the rig may never shoot one believing it is the other
+        if (pathOf(s) !== here) {
+          here = pathOf(s)
+          await arrive(page, `${BASE}${here}?tier=${tier}`, hookOf(s))
+          await assertBackend(page, WANT_BACKEND)
+        }
         const took = await jump(page, s, BASE, s.settle ?? SETTLE)
         if (!took) problems.push(`[${vp.tag}/${tier}] ${s.name}: the stage never took`)
         await page.screenshot({ path: `${OUT}${shotName(vp.tag, tier, s.name)}` })

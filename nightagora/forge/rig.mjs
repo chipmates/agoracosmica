@@ -113,10 +113,20 @@ export function assertAdapter(line, want) {
   }
 }
 
+/* THE SWATCH ROUTE. The library's own page is not a station of the museum:
+   it has its own address, its own forge hook, and no place on the wheel. A
+   state that names it carries all three, so one eye shoots both routes and
+   the assertions cannot drift apart. */
+export const SWATCH_PATH = '/swatches.html'
+export const SWATCH_HOOK = '__forgeSwatch'
+
 /**
  * States may be given as JSON, or in the shorthand the briefs are written
  * in: `[transit, held, pane vinci, wing vinci]`, where the first word is the
- * state and the second is its slug.
+ * state and the second is its slug. `swatch <set>` is the library's route.
+ *
+ * JSON may also carry `path` (the address to shoot it at, `/` by default)
+ * and `hook` (the window property the rig drives, `__forge` by default).
  */
 export function parseStates(arg) {
   const text = (arg ?? '').trim()
@@ -134,6 +144,16 @@ export function parseStates(arg) {
     .filter(Boolean)
     .map((s) => {
       const [phase, slug] = s.split(/\s+/)
+      if (phase === 'swatch') {
+        return {
+          name: `swatch-${slug}`,
+          phase,
+          opts: { set: slug },
+          path: SWATCH_PATH,
+          hook: SWATCH_HOOK,
+          cone: false,
+        }
+      }
       return {
         name: slug ? `${phase}-${slug}` : phase,
         phase,
