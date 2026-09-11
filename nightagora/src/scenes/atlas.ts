@@ -382,6 +382,515 @@ function figureMaterial(uLine: N, uDraw: N, reserve: Reserve): MeshBasicNodeMate
   return mat
 }
 
+// ------------------------------------------------------------- the burin
+/* SIX BURIN DRAWINGS — the house as a figure, not as four dots and a
+   caption. The pen cuts into the patch's own coordinate plane, so these are
+   line geometries and never imported pictures or solid bodies. Broad forms
+   are left OPEN; short unequal cuts describe their material, which is how
+   an engraver builds a tone without ever laying down a fill.
+
+   Every drawing is authored around THIS sky's stars: the named lights are
+   the bones of the figure and the ink rests between them. */
+
+type Point = [number, number]
+interface Stroke {
+  points: Point[]
+  weight: number
+  /** 0 paper, 1 gold: the glancing gilt an engraver puts on one edge */
+  gild: number
+}
+
+const TAU = Math.PI * 2
+
+/** a cubic at t, and the direction it is travelling there */
+function bez(a: Point, b: Point, c: Point, d: Point, t: number): Point {
+  const u = 1 - t
+  return [
+    u ** 3 * a[0] + 3 * u * u * t * b[0] + 3 * u * t * t * c[0] + t ** 3 * d[0],
+    u ** 3 * a[1] + 3 * u * u * t * b[1] + 3 * u * t * t * c[1] + t ** 3 * d[1],
+  ]
+}
+
+function bezNormal(a: Point, b: Point, c: Point, d: Point, t: number): Point {
+  const p0 = bez(a, b, c, d, Math.max(0, t - 0.002))
+  const p1 = bez(a, b, c, d, Math.min(1, t + 0.002))
+  const dx = p1[0] - p0[0]
+  const dy = p1[1] - p0[1]
+  const len = Math.hypot(dx, dy) || 1
+  return [-dy / len, dx / len]
+}
+
+class Burin {
+  strokes: Stroke[] = []
+
+  line(points: Point[], weight = 0.6, gild = 0): void {
+    this.strokes.push({ points, weight, gild })
+  }
+
+  curve(a: Point, b: Point, c: Point, d: Point, weight = 0.6, gild = 0): void {
+    const points: Point[] = []
+    for (let i = 0; i <= 30; i++) points.push(bez(a, b, c, d, i / 30))
+    this.line(points, weight, gild)
+  }
+
+  arc(
+    x: number,
+    y: number,
+    rx: number,
+    ry: number,
+    from: number,
+    to: number,
+    weight = 0.5,
+    gild = 0
+  ): void {
+    const n = Math.max(8, Math.ceil(Math.abs(to - from) * 24))
+    const points: Point[] = []
+    for (let i = 0; i <= n; i++) {
+      const a = from + ((to - from) * i) / n
+      points.push([x + Math.cos(a) * rx, y + Math.sin(a) * ry])
+    }
+    this.line(points, weight, gild)
+  }
+
+  /** THE TONE. Short cuts laid across a straight run, unequal on purpose:
+      an even comb is a hatch pattern, an uneven one is a hand. */
+  hatchLine(
+    a: Point,
+    b: Point,
+    n: number,
+    off: number,
+    len: number,
+    weight = 0.38,
+    from = 0.12,
+    to = 0.9
+  ): void {
+    const dx = b[0] - a[0]
+    const dy = b[1] - a[1]
+    const l = Math.hypot(dx, dy) || 1
+    const nx = -dy / l
+    const ny = dx / l
+    for (let i = 0; i < n; i++) {
+      const t = from + ((to - from) * i) / Math.max(1, n - 1)
+      const x = a[0] + dx * t
+      const y = a[1] + dy * t
+      const k = len * (0.72 + 0.28 * Math.sin(i * 2.1))
+      this.line(
+        [
+          [x + nx * off, y + ny * off],
+          [x + nx * (off + k) + dx * 0.02, y + ny * (off + k) + dy * 0.02],
+        ],
+        weight
+      )
+    }
+  }
+
+  /** the same tone laid across a cubic */
+  hatchCurve(
+    a: Point,
+    b: Point,
+    c: Point,
+    d: Point,
+    n: number,
+    off: number,
+    len: number,
+    weight = 0.36,
+    from = 0.1,
+    to = 0.92
+  ): void {
+    for (let i = 0; i < n; i++) {
+      const t = from + ((to - from) * i) / Math.max(1, n - 1)
+      const [x, y] = bez(a, b, c, d, t)
+      const [nx, ny] = bezNormal(a, b, c, d, t)
+      const k = len * (0.7 + 0.3 * Math.sin(i * 1.7 + 0.6))
+      this.line(
+        [
+          [x + nx * off, y + ny * off],
+          [x + nx * (off + k), y + ny * (off + k)],
+        ],
+        weight
+      )
+    }
+  }
+}
+
+// ----------------------------------------------------------- the six houses
+
+/* I · PHILOSOPHERS, after Cassiopeia. The W is cut as folded scrollwork:
+   each limb of the letter becomes a banded ribbon, and the five lamps stay
+   free of all ink. */
+function cassiopeia(p: Burin, c: Constellation): void {
+  for (const [ia, ib] of c.lines) {
+    const a = c.stars[ia]
+    const b = c.stars[ib]
+    if (!a || !b) continue
+    const dx = b.x - a.x
+    const dy = b.y - a.y
+    const len = Math.hypot(dx, dy) || 1
+    const nx = -dy / len
+    const ny = dx / len
+    for (const sign of [-1, 1]) {
+      p.curve(
+        [a.x + dx * 0.1 + nx * 0.1 * sign, a.y + dy * 0.1 + ny * 0.1 * sign],
+        [a.x + dx * 0.36 + nx * 0.14 * sign, a.y + dy * 0.36 + ny * 0.14 * sign],
+        [a.x + dx * 0.7 + nx * 0.14 * sign, a.y + dy * 0.7 + ny * 0.14 * sign],
+        [b.x - dx * 0.09 + nx * 0.08 * sign, b.y - dy * 0.09 + ny * 0.08 * sign],
+        0.72,
+        0.25
+      )
+    }
+    p.hatchLine([a.x, a.y], [b.x, b.y], 17, 0.045, 0.082, 0.37, 0.14, 0.86)
+  }
+  for (const s of [-1, 1]) {
+    // the volutes the ribbon rolls into past the outer lamps
+    p.curve([s * 1.87, 0.29], [s * 2.35, 0.63], [s * 2.42, -0.18], [s * 2.12, -0.09], 0.7)
+    p.curve([s * 2.12, -0.09], [s * 1.98, -0.02], [s * 2.17, 0.18], [s * 2.18, 0.05], 0.48)
+    // the small curl over the centre lamp
+    p.curve([s * 0.13, 0.58], [s * 0.5, 0.83], [s * 0.71, 0.65], [s * 0.47, 0.49], 0.5)
+    // and the sweep that closes the fold underneath
+    p.curve([s * 1.75, -0.18], [s * 1.32, -0.7], [s * 0.58, -0.7], [s * 0.16, -0.39], 0.42)
+  }
+}
+
+/* II · TEACHERS, after Corona Borealis. An OPEN circlet: a bowed band, six
+   raised fleurons standing on it, no medallion and no fill. */
+function crown(p: Burin, c: Constellation): void {
+  for (let k = 0; k < 4; k++) {
+    p.curve(
+      [-1.72, -0.24 - k * 0.055],
+      [-1.2, -0.87 - k * 0.04],
+      [1.15, -0.88 - k * 0.04],
+      [1.76, -0.3 - k * 0.055],
+      k === 0 ? 0.85 : 0.43,
+      k === 0 ? 0.2 : 0
+    )
+  }
+  for (const s of c.stars) {
+    const x = s.x
+    const base = -0.58 + Math.abs(x) * 0.13
+    const h = Math.max(0.24, s.y - base)
+    const tip = s.y - 0.12
+    const mid = base + h * 0.55
+    p.curve([x - 0.19, base], [x - 0.31, mid], [x - 0.1, tip - 0.07], [x - 0.04, tip], 0.74)
+    p.curve([x + 0.19, base], [x + 0.31, mid], [x + 0.1, tip - 0.07], [x + 0.04, tip], 0.74)
+    p.curve([x - 0.11, base], [x - 0.09, mid + 0.02], [x, tip - 0.11], [x, tip - 0.05], 0.35)
+    for (let j = 0; j < 8; j++) {
+      const yy = base + (tip - base - 0.1) * (j / 9)
+      p.line([[x - 0.16, yy], [x - 0.055, yy + 0.055]], 0.3)
+    }
+    p.arc(x, base - 0.03, 0.06, 0.09, 0, TAU, 0.5, 0.4)
+  }
+}
+
+/* III · ACTIVISTS AND LEADERS, after the Southern Cross. Four directional
+   arms, each a shaft with its own hatched face, standing in a graduated
+   ring. The arms are unequal, the way the asterism is. */
+function cross(p: Burin): void {
+  const centre: Point = [0.057, 0.1]
+  const ends: Point[] = [
+    [0, 1.05],
+    [0.12, -1],
+    [-0.85, -0.05],
+    [0.78, 0.22],
+  ]
+  for (const end of ends) {
+    const dx = end[0] - centre[0]
+    const dy = end[1] - centre[1]
+    const len = Math.hypot(dx, dy) || 1
+    const nx = -dy / len
+    const ny = dx / len
+    for (const s of [-1, 1]) {
+      p.line(
+        [
+          [centre[0] + nx * 0.085 * s, centre[1] + ny * 0.085 * s],
+          [end[0] - dx * 0.2 + nx * 0.065 * s, end[1] - dy * 0.2 + ny * 0.065 * s],
+          [end[0] - dx * 0.15 + nx * 0.13 * s, end[1] - dy * 0.15 + ny * 0.13 * s],
+        ],
+        0.75,
+        0.4
+      )
+    }
+    for (let j = 0; j < 15; j++) {
+      const t = 0.16 + j * 0.036
+      p.line(
+        [
+          [centre[0] + dx * t + nx * 0.033, centre[1] + dy * t + ny * 0.033],
+          [centre[0] + dx * (t + 0.037) + nx * 0.079, centre[1] + dy * (t + 0.037) + ny * 0.079],
+        ],
+        0.4
+      )
+    }
+  }
+  p.arc(centre[0], centre[1], 0.28, 0.28, 0, TAU, 0.52)
+  p.arc(centre[0], centre[1], 0.31, 0.31, 0, TAU, 0.3)
+  for (let k = 0; k < 48; k++) {
+    const a = (k / 48) * TAU
+    if (Math.abs(Math.sin(a * 2)) < 0.2) continue
+    p.line(
+      [
+        [centre[0] + Math.cos(a) * 0.34, centre[1] + Math.sin(a) * 0.34],
+        [
+          centre[0] + Math.cos(a) * (k % 4 === 0 ? 0.42 : 0.375),
+          centre[1] + Math.sin(a) * (k % 4 === 0 ? 0.42 : 0.375),
+        ],
+      ],
+      0.37
+    )
+  }
+}
+
+/* IV · ARTISTS, after Lyra. Two horns out of a soundbox, the yoke across
+   them, seven strings between yoke and bridge. The frame is drawn around
+   this sky's own four names: the left scroll stands on the first, the
+   middle string runs through the second, the bridge rests on the last two. */
+function lyre(p: Burin): void {
+  const arms: Array<{ foot: Point; scroll: Point; s: number }> = [
+    { foot: [-0.34, -0.74], scroll: [-0.85, 0.95], s: -1 },
+    { foot: [0.74, -0.25], scroll: [0.72, 0.7], s: 1 },
+  ]
+  for (const { foot, scroll, s } of arms) {
+    const b: Point = [foot[0] + s * 0.4, foot[1] + 0.46]
+    const c: Point = [scroll[0] + s * 0.3, scroll[1] - 0.62]
+    const d: Point = [scroll[0] + s * 0.09, scroll[1] - 0.15]
+    for (let k = 0; k < 3; k++) {
+      const o = k * 0.036 * s
+      p.curve(
+        [foot[0] + o, foot[1]],
+        [b[0] + o, b[1]],
+        [c[0] + o, c[1]],
+        [d[0] + o, d[1]],
+        k === 0 ? 0.9 : 0.42,
+        k === 0 ? 0.25 : 0
+      )
+    }
+    p.hatchCurve(foot, b, c, d, 16, -s * 0.045, -s * 0.075, 0.32)
+    // the volute, cut twice, tightening inward
+    p.arc(scroll[0], scroll[1], 0.17, 0.16, -0.5, Math.PI * 1.7, 0.75)
+    p.arc(scroll[0], scroll[1], 0.1, 0.095, 0.1, Math.PI * 1.5, 0.4)
+  }
+  // the yoke: a rule and its shadow line
+  p.curve([-0.74, 0.84], [-0.36, 0.73], [0.22, 0.68], [0.62, 0.62], 0.85, 0.5)
+  p.curve([-0.74, 0.79], [-0.36, 0.68], [0.22, 0.63], [0.62, 0.57], 0.45)
+  // the bridge, laid through the two lower names
+  p.line([[-0.34, -0.755], [0.74, -0.265]], 0.8)
+  p.line([[-0.34, -0.805], [0.74, -0.315]], 0.42)
+  // the strings, and the peg each one is wound on
+  for (let j = 0; j < 7; j++) {
+    const u = j / 6
+    const x0 = -0.7 + u * 1.29
+    const y0 = 0.82 - u * 0.23
+    const x1 = -0.3 + u * 1.0
+    const y1 = -0.73 + u * 0.455
+    p.line([[x0, y0], [x1, y1]], j === 3 ? 0.55 : 0.33)
+    p.arc(x0, y0 + 0.035, 0.021, 0.024, 0, TAU, 0.35)
+  }
+  // the soundbox under the bridge, its rim hatched from below
+  p.curve([-0.36, -0.8], [-0.2, -1.2], [0.56, -1.05], [0.78, -0.3], 0.8)
+  p.hatchCurve([-0.36, -0.8], [-0.2, -1.2], [0.56, -1.05], [0.78, -0.3], 22, 0.012, 0.075, 0.34)
+}
+
+/* V · WRITERS, after Cygnus. THE SWAN. Raised wings, the long neck, the
+   open fan of the tail: every feather is its own cut, and the six names are
+   the bird's own bones — head, breast, wing, wing, far wingtip, tail. */
+function swan(p: Burin): void {
+  // the neck, an S in two lines, and the head above the first name
+  p.curve([-0.11, 0.18], [-0.36, 0.6], [0.3, 0.82], [0.02, 1.04], 0.8)
+  p.curve([0.12, 0.19], [-0.1, 0.58], [0.55, 0.95], [0.1, 1.12], 0.66)
+  p.curve([0.1, 1.12], [0.0, 1.29], [-0.27, 1.2], [-0.17, 1.0], 0.7)
+  p.line([[-0.17, 1.06], [-0.37, 1.03], [-0.18, 0.98]], 0.55)
+  for (const s of [-1, 1]) {
+    // the leading edge out to the wingtip, and the trailing edge under it
+    p.curve([s * 0.13, 0.24], [s * 0.7, 0.36], [s * 1.14, 0.74], [s * 1.75, 0.72], 0.85)
+    p.curve([s * 0.12, -0.42], [s * 0.66, -0.3], [s * 1.42, 0.1], [s * 1.75, 0.72], 0.6)
+    // the primaries: each one its own cut, longer and heavier outward
+    for (let j = 0; j < 23; j++) {
+      const t = j / 22
+      const x = 0.22 + t * 1.48
+      const y = 0.3 + 0.42 * t
+      const endX = 0.28 + t * 1.42
+      const endY = -0.36 + 1.08 * t ** 1.62
+      p.curve(
+        [s * x, y],
+        [s * (x + 0.14), y - 0.2],
+        [s * (endX + 0.08), endY + 0.08],
+        [s * endX, endY],
+        0.28 + t * 0.25
+      )
+      if (j % 2 === 0)
+        p.curve(
+          [s * (x + 0.025), y - 0.012],
+          [s * (x + 0.16), y - 0.21],
+          [s * (endX + 0.09), endY + 0.08],
+          [s * (endX + 0.018), endY + 0.01],
+          0.24
+        )
+    }
+    // the breast, and the five tail feathers the fan opens into
+    p.curve([s * 0.14, 0.08], [s * 0.35, -0.27], [s * 0.32, -0.52], [s * 0.13, -0.75], 0.72)
+    for (let j = 0; j < 5; j++)
+      p.curve(
+        [s * 0.09, -0.48],
+        [s * (0.2 + j * 0.04), -0.76],
+        [s * (0.12 + j * 0.06), -0.98],
+        [s * (0.12 + j * 0.07), -1.24],
+        0.38
+      )
+  }
+}
+
+/* VI · SCIENTISTS AND THINKERS, after Auriga. The five names ARE the plate:
+   the figure is the instrument they describe, a graduated limb inside a
+   triple rule. The centre is left an open question, never a medallion. */
+function pentagon(p: Burin, c: Constellation): void {
+  const pts = c.stars.map((s): Point => [s.x, s.y])
+  const first = pts[0]
+  if (!first) return
+  for (const scale of [0.83, 0.87, 1.12]) {
+    p.line(
+      [...pts, first].map(([x, y]): Point => [x * scale, y * scale]),
+      scale === 0.83 ? 0.65 : 0.4,
+      0.15
+    )
+  }
+  for (const [ia, ib] of c.lines) {
+    const a = pts[ia]
+    const b = pts[ib]
+    if (!a || !b) continue
+    for (let j = 0; j < 18; j++) {
+      const t = 0.1 + j * 0.047
+      const x = a[0] + (b[0] - a[0]) * t
+      const y = a[1] + (b[1] - a[1]) * t
+      p.line(
+        [
+          [x * 0.87, y * 0.87],
+          [x * 0.92 + (b[0] - a[0]) * 0.018, y * 0.92 + (b[1] - a[1]) * 0.018],
+        ],
+        0.4
+      )
+    }
+  }
+  p.arc(0, 0, 0.66, 0.66, 0, TAU, 0.5)
+  p.arc(0, 0, 0.62, 0.62, 0, TAU, 0.32)
+  for (let j = 0; j < 60; j++) {
+    const a = (j / 60) * TAU
+    p.line(
+      [
+        [Math.cos(a) * 0.66, Math.sin(a) * 0.66],
+        [Math.cos(a) * (j % 5 === 0 ? 0.725 : 0.687), Math.sin(a) * (j % 5 === 0 ? 0.725 : 0.687)],
+      ],
+      0.43
+    )
+  }
+  for (let j = 0; j < pts.length; j++) {
+    const pt = pts[j]
+    if (!pt) continue
+    p.line([[pt[0] * 0.34, pt[1] * 0.34], [pt[0] * 0.57, pt[1] * 0.57]], 0.28)
+  }
+}
+
+// ------------------------------------------------------- the engraved mesh
+/* One ribbon per stroke, the nib pressing a little harder through the
+   middle of a cut. The fragment finds the stroke inside a quad wider than
+   it, which buys the antialiasing for free; the ink walk is the same clock
+   the hairlines travel on, so figure and engraving are drawn by one hand. */
+const CUT_HALF = 0.0100
+
+interface Engraving {
+  mesh: Mesh
+  presence: N
+  draw: N
+}
+
+const PAPER = new Color('#f3efe2')
+
+function figureEngraving(c: Constellation, reserve: Reserve): Engraving {
+  const pen = new Burin()
+  switch (c.key) {
+    case 'philosophers':
+      cassiopeia(pen, c)
+      break
+    case 'teachers':
+      crown(pen, c)
+      break
+    case 'activists':
+      cross(pen)
+      break
+    case 'artists':
+      lyre(pen)
+      break
+    case 'writers':
+      swan(pen)
+      break
+    case 'scientists':
+      pentagon(pen, c)
+      break
+  }
+  const pos: number[] = []
+  const across: number[] = []
+  const weight: number[] = []
+  const ink: number[] = []
+  const gild: number[] = []
+  const index: number[] = []
+  pen.strokes.forEach((s, si) => {
+    const last = s.points.length - 1
+    s.points.forEach(([x, y], i) => {
+      const a = s.points[Math.max(0, i - 1)]
+      const b = s.points[Math.min(last, i + 1)]
+      if (!a || !b) return
+      const dx = b[0] - a[0]
+      const dy = b[1] - a[1]
+      const len = Math.hypot(dx, dy) || 1
+      const taper = 0.58 + 0.42 * Math.sin((Math.PI * i) / Math.max(1, last))
+      const half = CUT_HALF * taper
+      const base = pos.length / 3
+      pos.push(x - (dy / len) * half, y + (dx / len) * half, -0.045)
+      pos.push(x + (dy / len) * half, y - (dx / len) * half, -0.045)
+      across.push(-1, 1)
+      weight.push(s.weight, s.weight)
+      gild.push(s.gild, s.gild)
+      const walk = 0.1 + (0.82 * (si + i / Math.max(1, s.points.length))) / pen.strokes.length
+      ink.push(walk, walk)
+      if (i < last) index.push(base, base + 1, base + 2, base + 1, base + 3, base + 2)
+    })
+  })
+
+  const geo = new BufferGeometry()
+  geo.setAttribute('position', new Float32BufferAttribute(pos, 3))
+  geo.setAttribute('cutCross', new Float32BufferAttribute(across, 1))
+  geo.setAttribute('cutWeight', new Float32BufferAttribute(weight, 1))
+  geo.setAttribute('cutInk', new Float32BufferAttribute(ink, 1))
+  geo.setAttribute('cutGild', new Float32BufferAttribute(gild, 1))
+  geo.setIndex(index)
+
+  const presence: N = uniform(0)
+  const draw: N = uniform(1)
+  const mat = new MeshBasicNodeMaterial({
+    transparent: true,
+    depthWrite: false,
+    blending: AdditiveBlending,
+    side: DoubleSide,
+  })
+  mat.forceSinglePass = true
+  const gildN: N = attribute('cutGild', 'float')
+  const inkN: N = attribute('cutInk', 'float')
+  mat.colorNode = mix(
+    vec3(PAPER.r, PAPER.g, PAPER.b),
+    vec3(GOLD.r, GOLD.g, GOLD.b),
+    gildN
+  )
+  const core = smoothstep(1, 0.05, abs(attribute('cutCross', 'float') as N))
+  const gate = smoothstep(inkN, inkN.add(0.12), draw)
+  mat.opacityNode = core
+    .mul(attribute('cutWeight', 'float') as N)
+    .mul(gate)
+    .mul(presence)
+    .mul(float(0.75))
+    .mul(reserve.node)
+
+  const mesh = new Mesh(geo, mat)
+  mesh.frustumCulled = false
+  return { mesh, presence, draw }
+}
+
 // ------------------------------------------------------------ the choir
 /* THE CHOIR — the anonymous sky the six houses hang in. One instanced
    field, one draw call, hung on the same dome as the houses so a turn
@@ -716,6 +1225,7 @@ export function createAtlas(scene: Scene): AtlasHandles {
         comparable presence in the frame (the shape never deforms) */
     fit: number
     focus: number // eased 0..1
+    engraving: Engraving
   }
 
   /* THE HOUSES ARE NOT THE SAME SIZE. Cassiopeia spans four units and the
@@ -757,6 +1267,9 @@ export function createAtlas(scene: Scene): AtlasHandles {
     const lineU: N = uniform(0)
     const drawU: N = uniform(1)
     patch.add(new Mesh(figureGeometry(c, mag, sizes), figureMaterial(lineU, drawU, reserve)))
+    // and the burin over the hairlines: the house as a drawn figure
+    const engraving = figureEngraving(c, reserve)
+    patch.add(engraving.mesh)
 
     const list: Star[] = []
     c.stars.forEach((s, si) => {
@@ -797,6 +1310,7 @@ export function createAtlas(scene: Scene): AtlasHandles {
       azimuth: c.azimuth,
       fit,
       focus: ci === 0 ? 1 : 0,
+      engraving,
     })
   }
 
@@ -879,8 +1393,12 @@ export function createAtlas(scene: Scene): AtlasHandles {
       }
       // a neighbour keeps the ghost of its own figure at the frame edge:
       // enough to say the sky goes on around you, far too little to read
-      p.lineU.value = near * (0.045 + 0.955 * p.focus) * reveal * 0.92
+      p.lineU.value = near * (0.045 + 0.955 * p.focus) * reveal * 0.78
       p.drawU.value = draw
+      // the engraving belongs to the house you are looking at: a neighbour
+      // keeps a whisper of it, so the sky reads as one drawn plate
+      p.engraving.presence.value = pres * (0.025 + p.focus * 0.42)
+      p.engraving.draw.value = draw
       p.compU.value = near * (0.12 + 0.88 * p.focus) * reveal * 0.8
       p.compT.value = reducedMotion ? 0 : elapsed
     }
@@ -900,6 +1418,7 @@ export function createAtlas(scene: Scene): AtlasHandles {
       if (!p) continue
       p.focus = i === chapter ? 1 : 0
       p.drawU.value = 1
+      p.engraving.draw.value = 1
     }
   }
 
