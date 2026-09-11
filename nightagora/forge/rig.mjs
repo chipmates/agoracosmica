@@ -121,6 +121,8 @@ export const SWATCH_PATH = '/swatches.html'
 export const SWATCH_HOOK = '__forgeSwatch'
 export const MODEL_PATH = '/models.html'
 export const MODEL_HOOK = '__forgeModels'
+export const PART_PATH = '/parts.html'
+export const PART_HOOK = '__forgeParts'
 
 /**
  * States may be given as JSON, or in the shorthand the briefs are written
@@ -130,6 +132,10 @@ export const MODEL_HOOK = '__forgeModels'
  *
  * JSON may also carry `path` (the address to shoot it at, `/` by default)
  * and `hook` (the window property the rig drives, `__forge` by default).
+ *
+ * `part <name>` is the parts kit's own route, one address per specimen for
+ * the same reason a swatch and a model have one: a sweep that switched parts
+ * inside one page would end holding every set of the library on the GPU.
  */
 export function parseStates(arg) {
   const text = (arg ?? '').trim()
@@ -147,6 +153,16 @@ export function parseStates(arg) {
     .filter(Boolean)
     .map((s) => {
       const [phase, slug] = s.split(/\s+/)
+      if (phase === 'part') {
+        return {
+          name: `part-${slug}`,
+          phase,
+          opts: { part: slug },
+          path: `${PART_PATH}?part=${slug}`,
+          hook: PART_HOOK,
+          cone: false,
+        }
+      }
       if (phase === 'model') {
         return {
           name: `model-${slug}`,

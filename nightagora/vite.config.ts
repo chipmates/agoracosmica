@@ -8,7 +8,7 @@ export default defineConfig({
   plugins: [forgeWhoami(), naAssets()],
   build: {
     target: 'esnext',
-    /* THE TWO BENCHES ARE NOT PART OF THE MUSEUM. Both are dev and preview
+    /* THE THREE BENCHES ARE NOT PART OF THE MUSEUM. All are dev and preview
        only: vite's dev server serves any page at the root, and a build
        carries one only when a rig asks, so the bundle a visitor downloads
        never holds the libraries' own inspection pages. */
@@ -20,6 +20,9 @@ export default defineConfig({
           : {}),
         ...(process.env['NA_MODELS'] === '1'
           ? { models: resolve(__dirname, 'models.html') }
+          : {}),
+        ...(process.env['NA_PARTS'] === '1'
+          ? { parts: resolve(__dirname, 'parts.html') }
           : {}),
       },
     },
