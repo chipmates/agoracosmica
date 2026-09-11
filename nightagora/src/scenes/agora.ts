@@ -447,12 +447,18 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
        cast shadow belongs first: a column does not stop the fire, it stops
        the sky, and the polish is what shows it. The term only ever takes
        light away, so the court cannot get brighter than it was authored. */
-    colr = colr.add(looked.mul(0.062).mul(fres).mul(polish).mul(mix(float(0.22), float(1), moon)))
+    colr = colr.add(looked.mul(0.062).mul(fres).mul(polish).mul(mix(float(0.2), float(1), moon)))
+    /* and less sky reaches the stone a column stands over. The dim is
+       multiplicative and it is gated on the fire, so a shadow deepens the
+       court without the room ever getting brighter than it was authored,
+       and the fire's own pool is never dimmed by the moon's shadow. */
+    const away = oneMinus(clamp(fire.mul(0.55), 0, 1))
+    colr = colr.mul(mix(float(1), mix(float(0.7), float(1), moon), away.mul(court)))
     // and a low sheen of the moon itself, kept well under the fire's own
     // pool: a night court with two lights has no hour
     const graze = clamp(float(0.18).add(pow(oneMinus(cosT), 2.2).mul(0.95)), 0, 1)
     colr = colr.add(
-      c3(MOON, 0.012)
+      c3(MOON, 0.016)
         .mul(moon)
         .mul(graze)
         .mul(mix(float(0.5), float(1), court))

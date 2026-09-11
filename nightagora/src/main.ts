@@ -553,6 +553,8 @@ declare global {
         tris: number
       }
       /** what the last two seconds cost, per the stack's own meter */
+      /** every asset the app has resolved, with its class and licence line */
+      manifest: () => Array<{ id: string; class: string; licence: string }>
       cost: () => {
         draws: number
         triangles: number
@@ -714,6 +716,9 @@ window.__forge = {
   },
   cost() {
     return stack.cost()
+  },
+  manifest() {
+    return stack.materials.manifest()
   },
   // the rig's stethoscope: read the live blend state without guessing
   // from pixels (numbers first, then the shot)
