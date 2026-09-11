@@ -14,12 +14,13 @@
    normal can reach it, at about sixty degrees of incidence, which is the
    angle a joint casts a shadow at and the only angle that proves a normal.
 
-   AND A METAL IS READ UNDER A SKY THAT HAS SOMETHING IN IT. A metal under an
-   overcast dome reflects an even grey and reads as stone: it is not that the
-   set is wrong, it is that there is nothing in the room to be metal with. So
-   the metals take the warm afternoon probe, whose sun, horizon and ground
-   give a sheet of gold something to be. The three skies are themselves swatch
-   states, a mirror ball and a matte ball under each.
+   AND A METAL IS READ UNDER A SKY THAT HAS SOMETHING IN IT. A metal under a
+   blurred dome at a fraction of its strength reflects an even grey and reads
+   as stone: it is not that the set is wrong, it is that there is nothing in
+   the room to be metal with. So a metal takes the same overcast probe as the
+   rest of the library, whole and unblurred, where the cloud deck, the horizon
+   and the dark ground give a sheet of gold something to be. The three skies
+   are themselves swatch states, a mirror ball and a matte ball under each.
 
    One set at a time, by `?set=`. Twenty-two sets held at once would be over
    a gigabyte of texture on the hero tier, and a page that cannot hold its
@@ -110,7 +111,9 @@ const PLAIN: Grade = {
 /** what a sky is read at as a swatch of its own */
 const EXPOSURE: Record<string, number> = {
   'sky-overcast': 0.62,
-  'sky-afternoon-warm': 0.34,
+  /* a clear late afternoon with a sun 19 degrees up: the frame has to be a
+     bright hour and not a dusk, and the sun's own disc is allowed to clip */
+  'sky-afternoon-warm': 0.5,
   /* the moonlit probe carries a real night's levels, and at an exposure that
      makes its matte ball easy to read the whole frame arrives as daylight.
      This one is set so the sky is still a night sky. */
@@ -121,12 +124,12 @@ const EXPOSURE: Record<string, number> = {
     shows a sheet of gold as white paper. */
 const SET_EXPOSURE: Record<string, number> = {
   'sky-overcast': 0.62,
-  'sky-afternoon-warm': 0.34,
+  'sky-afternoon-warm': 0.3,
   'sky-night-moon': 2.6,
 }
 const METAL_EXPOSURE: Record<string, number> = {
   'sky-overcast': 0.34,
-  'sky-afternoon-warm': 0.15,
+  'sky-afternoon-warm': 0.13,
   'sky-night-moon': 1.6,
 }
 const exposureFor = (sky: string, metal: boolean): number =>
@@ -316,11 +319,25 @@ async function showSet(name: string): Promise<void> {
       ? ''
       : ` laid at ${set.scale[0]} by ${set.scale[1]}`
   const turned = entry.orientation ? ` turned ${entry.orientation}°` : ''
+  const floor = entry.roughness_floor
+  const rough = floor
+    ? `roughness ${set.roughness} (the map measures ${entry.measured?.roughness ?? '?'}, floored)`
+    : `roughness ${set.roughness}`
+  const g = set.grain
+  const grain = g
+    ? ` · grain ${g.kind} at ${Math.round(g.pitch * 100)} cm` +
+      `${g.angle ? ` running ${Math.round((g.angle * 180) / Math.PI)}°` : ''}` +
+      `, relief ${g.relief}` +
+      `${g.fold ? `, fold ${Math.round(g.fold * 100)} cm` : ''}` +
+      `${g.tooth ? `, tooth ${(g.tooth * 100).toFixed(1)} cm` : ''}` +
+      `${g.sheen ? `, sheen ${g.sheen}` : ''}`
+    : ''
   numbersEl.textContent =
     `${entry.metres?.[0] ?? 1} by ${entry.metres?.[1] ?? 1} m per tile${laid}${turned} · ` +
-    `${set.cls} · roughness ${set.roughness} · metalness ${set.metalness} · ` +
-    `macro ${d.macro * 100} cm at ${d.macroContrast} · ` +
-    `mid ${d.mid ? `${Math.round(d.mid * 100)} cm` : 'none'} · micro ${d.micro} · ` +
+    `${set.cls} · ${rough} · metalness ${set.metalness} · ` +
+    `macro ${Math.round(d.macro * 100)} cm at ${d.macroContrast} · ` +
+    `mid ${d.mid ? `${Math.round(d.mid * 100)} cm` : 'none'} · micro ${d.micro}${grain}` +
+    `${set.detile ? ` · tiling broken at ${Math.round(set.detile * 100)} cm` : ''} · ` +
     `exposure ${exposureFor(wanted, metal).toFixed(2)} · ` +
     `${cost.textureMB.toFixed(1)} MB held · ${readUnder}`
   plateImg.src = `${ASSET_BASE}${entry.wing}/${entry.path}reference.jpg`
