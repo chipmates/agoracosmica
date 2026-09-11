@@ -1,3 +1,4 @@
+import { partitionDressing } from './dressing-partition'
 /* Landscape dressing only. The modern garden photographs inform the open
    branching and the scale of foliage; neither species nor planting positions
    are evidence for the garden in the reconstructed year. All of this geometry
@@ -11,12 +12,17 @@ import {
   Group,
   Mesh,
   MeshStandardNodeMaterial,
+  Quaternion,
   Vector3,
 } from 'three/webgpu'
 import { mix, positionWorld, sin, vec3 } from 'three/tsl'
 import type { TierName } from '../../stack/tier'
 import { dossier, edgeDistance, feature, inside, polygon, type Quantity } from './site'
+import { collectionExclusions } from './collection'
+import { collectionAccessExclusions } from './collection-access'
+import { getInnerCourtOutlines } from './inner-court'
 import { getApronOutlines } from './apron'
+import { getWaterCuts } from './water'
 
 interface GeometryBatch {
   positions: number[]
@@ -38,7 +44,8 @@ const PROVENANCE = {
   assetClass: 'GENERATED',
   certainty: 'conjectural',
   basis: 'Modern garden plates Q119, Q128 and Q178; branching character only. Planting positions and tree dimensions are not period evidence.',
-  recipe: 'Deterministic curved tapering trunks ending within irregular broad crowns, unequal rising forks, dense terminal twig sprays and individually folded broad leaves in muted October colours. Four proposed near trees frame the exterior views; up to twenty-four distant trees make open woodland after circulation exclusions. Root flares and litter exclude the dossier masonry, platforms and circulation routes. Species, positions and dimensions remain conjectural.',
+  recipe: 'Deterministic connected tapering trunks with parallel-transported shared rings, continuous taper normals and one terrain-fitted buttressed collar; unequal rising forks, dense terminal twig sprays and individually folded broad leaves in muted October colours. Four proposed near trees frame the exterior views, six middle-distance trees interrupt the bare northern and western hillside, and up to twenty-four distant trees make open woodland after circulation exclusions. Each planting and every collar toe clears dossier masonry, platforms, water and circulation. Species, positions and dimensions remain conjectural; no tree or root placement is a mapped historical fact. Every same-tier triangle and attribute is retained in two spatial branch clusters plus eight leaf clusters in calm, or four branch clusters plus sixteen leaf clusters in standard/hero. Native per-pass frustum culling uses their bounds; no camera-dependent population or shadow changes.',
+  proposedDimensions: { heightsM: [9.3, 22], middleDistanceHeightsM: [10.8, 17.2], middleDistanceCrownReachParameterM: [4.8, 7.2], rootCollarRadiusInTrunkRadii: [1.65, 3.65], rootToeEmbedM: .02, sharedTrunkRingSides: 12 },
 }
 
 const UP = new Vector3(0, 1, 0)
@@ -73,40 +80,61 @@ function triangle(target: GeometryBatch, a: Vector3, b: Vector3, c: Vector3, col
   vertex(target, c, n, colour)
 }
 
-/** Round tapered branches. The small unevenness follows a branch along its
-    length, so bark has longitudinal ridges rather than independent bumps. */
-function limb(
+/** Connected rings follow a rotation-minimizing frame. Ring points and
+ * normals are created once and shared by both neighbouring spans; a bend
+ * cannot restart its angular phase or create an annular bark seam. */
+function sweep(
   target: GeometryBatch,
-  start: Vector3,
-  finish: Vector3,
-  radius0: number,
-  radius1: number,
+  centres: readonly Vector3[],
+  radii: readonly number[],
   sides: number,
   seed: number,
+  shape?: (point: Vector3, row: number, radial: Vector3) => Vector3,
 ): void {
-  const axis = finish.clone().sub(start).normalize()
-  const side = axis.clone().cross(Math.abs(axis.y) > 0.94 ? new Vector3(1, 0, 0) : UP).normalize()
-  const cross = axis.clone().cross(side).normalize()
-  for (let i = 0; i < sides; i++) {
-    const ring = (index: number, radius: number, centre: Vector3): [Vector3, Vector3] => {
-      const angle = (index / sides) * Math.PI * 2
-      const normal = side.clone().multiplyScalar(Math.cos(angle)).addScaledVector(cross, Math.sin(angle))
-      const furrow = 1 + 0.10 * Math.sin(index * 4.7 + seed)
-      return [centre.clone().addScaledVector(normal, radius * furrow), normal]
-    }
-    const [a, an] = ring(i, radius0, start)
-    const [b, bn] = ring(i + 1, radius0, start)
-    const [c, cn] = ring(i + 1, radius1, finish)
-    const [d, dn] = ring(i, radius1, finish)
-    const colour = BARK.clone().lerp(LICHEN, Math.max(0, -an.z) * 0.42)
-      .multiplyScalar(0.80 + 0.18 * Math.sin(seed + i * 2.8) ** 2)
-    vertex(target, a, an, colour)
-    vertex(target, b, bn, colour)
-    vertex(target, c, cn, colour)
-    vertex(target, a, an, colour)
-    vertex(target, c, cn, colour)
-    vertex(target, d, dn, colour)
+  const tangents = centres.map((centre, row) =>
+    centres[Math.min(row + 1, centres.length - 1)]!.clone()
+      .sub(centres[Math.max(0, row - 1)]!).normalize())
+  const first = tangents[0]!
+  let side = first.clone().cross(Math.abs(first.y) > .94 ? new Vector3(1, 0, 0) : UP).normalize()
+  const rings = centres.map((centre, row) => {
+    const tangent = tangents[row]!
+    if (row) side.applyQuaternion(new Quaternion().setFromUnitVectors(tangents[row - 1]!, tangent))
+    side.addScaledVector(tangent, -side.dot(tangent)).normalize()
+    const across = tangent.clone().cross(side).normalize()
+    return Array.from({ length: sides }, (_, index) => {
+      const angle = index / sides * Math.PI * 2
+      const radial = side.clone().multiplyScalar(Math.cos(angle)).addScaledVector(across, Math.sin(angle))
+      const furrow = 1 + .10 * Math.sin(index * 4.7 + seed)
+      const point = centre.clone().addScaledVector(radial, radii[row]! * furrow)
+      return shape ? shape(point, row, radial) : point
+    })
+  })
+  const normals = rings.map((ring, row) => ring.map((point, index) => {
+    const around = ring[(index + 1) % sides]!.clone().sub(ring[(index + sides - 1) % sides]!)
+    const along = rings[Math.min(row + 1, rings.length - 1)]![index]!.clone()
+      .sub(rings[Math.max(0, row - 1)]![index]!)
+    const normal = around.cross(along).normalize()
+    if (normal.dot(point.clone().sub(centres[row]!)) < 0) normal.negate()
+    return normal
+  }))
+  const emit = (row: number, index: number): void => {
+    const normal = normals[row]![index]!
+    const colour = BARK.clone().lerp(LICHEN, Math.max(0, -normal.z) * .42)
+      .multiplyScalar(.80 + .18 * Math.sin(seed + index * 2.8) ** 2)
+    vertex(target, rings[row]![index]!, normal, colour)
   }
+  for (let row = 0; row < rings.length - 1; row++) for (let index = 0; index < sides; index++) {
+    const next = (index + 1) % sides
+    emit(row, index); emit(row, next); emit(row + 1, next)
+    emit(row, index); emit(row + 1, next); emit(row + 1, index)
+  }
+}
+
+/** A branch is the same connected sweep with one straight span. The final
+ * side wraps to the original ring vertex, including its furrow and normal. */
+function limb(target: GeometryBatch, start: Vector3, finish: Vector3,
+  radius0: number, radius1: number, sides: number, seed: number): void {
+  sweep(target, [start, finish], [radius0, radius1], sides, seed)
 }
 
 /** A leaf is a shallow folded kite with a real pointed silhouette, two
@@ -168,6 +196,17 @@ export function createVegetation(
     { east: -8, north: -36, height: 9.3, spread: 5.2, seed: 1739, near: true },
     { east: -31, north: -64, height: 14.8, spread: 6.8, seed: 1287, near: true },
   ]
+  // A deliberately irregular middle distance fills the open north/west
+  // hillside, outside the house silhouette and the physical camera routes.
+  // These fixed positions are scenic proposals, never historical planting.
+  plans.push(
+    { east: -53, north: 12, height: 12.4, spread: 5.6, seed: 31417, near: false },
+    { east: -49, north: 44, height: 15.6, spread: 6.8, seed: 31953, near: false },
+    { east: -21, north: 65, height: 10.8, spread: 4.8, seed: 32739, near: false },
+    { east: 12, north: 76, height: 17.2, spread: 7.2, seed: 33287, near: false },
+    { east: 39, north: 54, height: 13.6, spread: 5.4, seed: 33917, near: false },
+    { east: 53, north: 24, height: 15.1, spread: 6.4, seed: 34713, near: false },
+  )
   const place = randomSource(73821)
   for (let i = 0; i < 24; i++) {
     const bank = i % 3
@@ -185,7 +224,11 @@ export function createVegetation(
     dossier.site.footprint.map(p => p.value),
     dossier.site.build_envelope.map(p => p.value),
     ...['courtyard', 'terrace', 'street-grade'].map(polygon),
+    ...getInnerCourtOutlines().map(court=>court.points),
+    ...collectionExclusions.map(region=>region.points),
+    ...collectionAccessExclusions.map(region=>region.points),
     ...getApronOutlines().map(apron=>apron.points),
+    ...getWaterCuts().map(cut=>cut.points),
     ...dossier.site.features.filter(f => f.id.startsWith('annex-'))
       .map(f => (f.geometry as Quantity<number[]>[]).map(p => p.value)),
   ]
@@ -208,19 +251,33 @@ export function createVegetation(
       .addScaledVector(lean, fraction * fraction)
       .add(new Vector3(Math.sin(fraction * 6 + plan.seed) * fraction * 0.18, 0, Math.sin(fraction * 4) * 0.15))
     const trunkSegments = plan.near ? 7 : 4
-    for (let section = 0; section < trunkSegments; section++) {
-      const a = section / trunkSegments
-      const b = (section + 1) / trunkSegments
-      limb(wood, trunkAt(a * 0.78), trunkAt(b * 0.78), trunkRadius * (1 - a * 0.94), trunkRadius * (1 - b * 0.94), plan.near ? 8 : 5, plan.seed)
-    }
+    const fractions = Array.from({ length: trunkSegments + 1 }, (_, i) => i / trunkSegments)
+    if (plan.near) fractions.splice(1, 0, .042)
+    const centres = fractions.map(fraction => trunkAt(fraction * .78))
+    const radii = fractions.map(fraction => trunkRadius * (1 - fraction * .94))
+    // Retain the original eighteen root random draws, so branch and leaf
+    // layouts keep their existing seeds. They now define collar lobes.
+    const roots = plan.near ? Array.from({ length: 6 }, (_, root) => ({
+      angle: root * 2.399 + random() * .4,
+      eastReach: 2.8 + random(), northReach: 2.8 + random(),
+    })) : []
     if (plan.near) {
-      for (let root = 0; root < 6; root++) {
-        const angle = root * 2.399 + random() * 0.4
-        const x = plan.east + Math.cos(angle) * trunkRadius * (2.8 + random())
-        const north = plan.north + Math.sin(angle) * trunkRadius * (2.8 + random())
-        limb(wood, base.clone().addScaledVector(UP, 0.34), new Vector3(x, heightAt(x, north) + 0.04, -north), trunkRadius * 0.36, 0.015, 5, root)
-      }
+      radii[0] = trunkRadius
+      radii[1] = trunkRadius * 1.25
     }
+    sweep(wood, centres, radii, plan.near ? 12 : 5, plan.seed, plan.near ? (point, row, radial) => {
+      if (row === 0) {
+        const angle = Math.atan2(-radial.z, radial.x)
+        const lobe = Math.max(...roots.map(root =>
+          Math.max(0, Math.cos(angle - root.angle)) ** 12 * (root.eastReach + root.northReach) / 2))
+        const reach = trunkRadius * (1.65 + Math.min(2, lobe * .54))
+        point.copy(base).addScaledVector(radial, reach)
+        // Every perimeter toe is buried in its own sampled slope; the
+        // collar is one connected skin instead of separate floating pipes.
+        point.y = heightAt(point.x, -point.z) - .02
+      } else if (row === 1) point.y = Math.max(point.y, heightAt(point.x, -point.z) + .20)
+      return point
+    } : undefined)
 
     const crownTurn = random() * Math.PI * 2
     const leaders = plan.near ? 12 : 7
@@ -235,8 +292,7 @@ export function createVegetation(
       const end = knee.clone().addScaledVector(outward, reach * 0.52)
         .addScaledVector(UP, plan.height * (0.09 + random() * 0.12))
       const radius = trunkRadius * (0.38 - (branch / leaders) * 0.19)
-      limb(wood, origin, knee, radius, radius * 0.54, plan.near ? 6 : 4, branch)
-      limb(wood, knee, end, radius * 0.54, radius * 0.19, plan.near ? 5 : 4, branch)
+      sweep(wood, [origin, knee, end], [radius, radius * .54, radius * .19], plan.near ? 6 : 4, branch)
 
       const forks = plan.near ? 3 : 2
       for (let fork = 0; fork < forks; fork++) {
@@ -307,11 +363,11 @@ export function createVegetation(
   // The distant woodland does not pay another two full foliage shadow passes.
   leaves.castShadow = false
   leaves.userData = { ...PROVENANCE }
-  group.add(branches, leaves)
+  group.add(...partitionDressing(branches, calm ? 1 : 2), ...partitionDressing(leaves, calm ? 3 : 4))
   group.userData['trees'] = retainedPlans.length
   group.userData['triangles'] = (wood.positions.length + foliage.positions.length) / 9
-  group.userData['draws'] = 2
+  group.userData['draws'] = group.children.length
   group.userData['treePlans'] = retainedPlans.map((plan) => ({ ...plan }))
-  group.userData['excluded'] = ['cadastre', 'build envelope', 'mapped annexes', 'courtyard', 'terrace', 'street grade', 'house-side apron', 'street', 'gate steps', 'garden descent']
+  group.userData['excluded'] = ['cadastre', 'build envelope', 'mapped annexes', 'courtyard', 'terrace', 'street grade', 'house-side apron', 'street', 'gate steps', 'garden descent', 'retained water cuts']
   return group
 }
