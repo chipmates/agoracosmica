@@ -1,0 +1,43 @@
+{
+  "assets": [
+    {
+      "id": "lobby/engraved-wheel",
+      "path": "procedural/engraved-wheel/",
+      "wing": "lobby",
+      "class": "GENERATED",
+      "licence": "Original scenic geometry and materials; source code under the museum repository licence.",
+      "display": true,
+      "prompt": "Six original engraved house figures around thirty equal named stars, with rigid shared dome, star cloud, graticule, lettering reserves and pixel-seated burin strokes. Preserve the authored asterisms and locked names; scenic atlas art, no historical plate sampled.",
+      "model": "Codex GPT-6; deterministic TypeScript and TSL source recipe",
+      "date": "2026-09-10",
+      "sha256": "bdc04250efd869add63ac17f41be57a6f921d6838d951de555f4535546f11790",
+      "note": "Lobby polish commission; recipe_file=src/scenes/atlas.ts. Hash covers the source file; only the commissioned surface was changed."
+    },
+    {
+      "id": "lobby/shadow-disc",
+      "path": "procedural/shadow-disc/",
+      "wing": "lobby",
+      "class": "GENERATED",
+      "licence": "Original scenic geometry and materials; source code under the museum repository licence.",
+      "display": true,
+      "prompt": "Retain the eclipse silhouette and partial-phase exposure. Add faint seeded middle-scale stone provinces between the broad mare and fine grain in the shadow disc; scenic relief, not a lunar surface map.",
+      "model": "Codex GPT-6; deterministic TypeScript and TSL source recipe",
+      "date": "2026-09-10",
+      "sha256": "38ac08cff9246c4b2127958a5d89e898333dc23d0db2d687c2dc7055f3d90cab",
+      "note": "Lobby polish commission; recipe_file=src/scenes/eclipse.ts. Hash covers the source file; only the commissioned surface was changed."
+    },
+    {
+      "id": "lobby/hearth-timber",
+      "path": "procedural/hearth-timber/",
+      "wing": "lobby",
+      "class": "GENERATED",
+      "licence": "Original scenic geometry and materials; source code under the museum repository licence.",
+      "display": true,
+      "prompt": "Seven unequal timber logs with irregular bark, growth rings and warm bounced fire light, resting on sleepers with scattered bark and two rope bindings. Original scenic firewood dressing, no photograph sampled.",
+      "model": "Codex GPT-6; deterministic TypeScript and TSL source recipe",
+      "date": "2026-09-10",
+      "sha256": "c7dc3c07e7d72fea45bae38e697c51a8fc8c8c0039e891c8b1f9c552ef96c650",
+      "note": "Lobby polish commission; recipe_file=src/scenes/agora.ts. Hash covers the source file; only the commissioned surface was changed."
+    }
+  ]
+}
