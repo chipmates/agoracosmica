@@ -494,14 +494,13 @@ export function createEclipse(scene: Scene) {
   {
     const q = positionLocal.xy
     const bd = length(q)
-    const ba = atan(q.y, q.x).add(0.42)
     const core = pow(smoothstep(0.40, 0.0, bd), 2.6)
     const bloom = pow(smoothstep(2.6, 0.0, bd), 2.4).mul(0.34)
-    // six rays, because a bead of photosphere seen through air has them
-    const rays = pow(abs(cos(ba.mul(3.0))), 46.0)
-      .mul(pow(smoothstep(2.6, 0.08, bd), 2.0))
-      .mul(0.5)
-    const a = core.add(bloom).add(rays).mul(uFlash)
+    /* The six rays are NOT here. A bead's rays are made in front of the
+       eye, not on the limb, and drawn from this plane the moon cut two of
+       them off in mid-air; they belong to the glint, which stands in
+       front of the disc. What stays behind the moon is the soft halo. */
+    const a = core.add(bloom).mul(uFlash)
     const col = mix(c3(EMBER), c3(WHITE_HOT), pow(smoothstep(0.9, 0.0, bd), 1.6))
     beadMat.colorNode = shoulder(col.mul(a)).add(dither(0.004).mul(min(a.mul(8), 1)))
     beadMat.opacityNode = float(1)
@@ -569,11 +568,21 @@ export function createEclipse(scene: Scene) {
     const cross = pow(abs(cos(ga.mul(2.0))), 130.0)
       .mul(pow(smoothstep(0.45, 0.02, gd), 2.2))
       .mul(0.55)
-    const a = core.add(cross).mul(uFlash)
-    glintMat.colorNode = shoulder(c3(WHITE_HOT).mul(a))
+    /* Six rays, because a bead of photosphere seen through air has them,
+       and they run from HERE so that every one of them completes: this
+       plane is in front of the disc, and a ray that crosses the moon is
+       what an eclipse actually looks like. The falloff reaches zero
+       inside the plane's own inscribed circle, so nothing ends on an
+       edge. */
+    const rays = pow(abs(cos(ga.add(0.07).mul(3.0))), 46.0)
+      .mul(pow(smoothstep(2.5, 0.08, gd), 2.0))
+      .mul(0.5)
+    const a = core.add(cross).add(rays).mul(uFlash)
+    const tint = mix(c3(EMBER), c3(WHITE_HOT), pow(smoothstep(1.1, 0.0, gd), 1.4))
+    glintMat.colorNode = shoulder(tint.mul(a))
     glintMat.opacityNode = float(1)
   }
-  const glint = new Mesh(new PlaneGeometry(0.9, 0.9), glintMat)
+  const glint = new Mesh(new PlaneGeometry(5.2, 5.2), glintMat)
   glint.renderOrder = 6
   diamond.add(glint)
 
