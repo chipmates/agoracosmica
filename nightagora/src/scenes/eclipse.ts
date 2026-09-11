@@ -60,6 +60,7 @@ const {
 } = T
 const positionLocal: N = TSL.positionLocal
 const screenCoordinate: N = TSL.screenCoordinate
+const screenUV: N = TSL.screenUV
 
 /* craft law 1 — sRGB lies. Every hand-picked constant goes through three's
    Color, which reads the hex as sRGB and hands back the LINEAR working
@@ -185,6 +186,14 @@ export function createEclipse(scene: Scene) {
     // in, or the two average into plum instead of reading as distant day
     col = col.mul(oneMinus(band.mul(0.38))).add(c3(TWILIGHT, 0.052).mul(band))
 
+    /* THE PHONE KEEPS ITS BOTTOM THIRD DARK. A 390 stage puts the title
+       and both prompts where the ring of day and the corona's skirt land,
+       and the type ends up standing on a warm wash. The band is not
+       deleted, it is stood down under the letterpress, so the stage is
+       clean and the umbra's own horizon still reads above it. */
+    if (narrow) {
+      col = col.mul(mix(float(1), float(0.5), smoothstep(0.62, 0.99, screenUV.y)))
+    }
     domeMat.colorNode = shoulder(col).add(dither(0.0024))
   }
   const dome = new Mesh(new SphereGeometry(90, seg(64, 40), seg(40, 28)), domeMat)
