@@ -20,8 +20,8 @@
    Everything else (the scene graph, the animation, the story) belongs to the
    wing and the stack never asks about it. */
 
-import { PCFSoftShadowMap, WebGPURenderer, type Camera, type Mesh, type Scene } from 'three/webgpu'
-import { createCostMeter, type CostReading } from './cost'
+import { PCFSoftShadowMap, Vector2, WebGPURenderer, type Camera, type Mesh, type Scene } from 'three/webgpu'
+import { createCostMeter, frameBytes, type CostReading } from './cost'
 import { applyDetail, type DetailNodes, type DetailScales } from './detail'
 import { GRADES, type Grade, type GradeName } from './grade'
 import { createKeyLight, type KeyLight, type KeyLightOptions } from './light'
@@ -163,11 +163,13 @@ export async function createStack(opts: StackOptions = {}): Promise<Stack> {
     materials,
 
     cost() {
+      const size = renderer.getDrawingBufferSize(new Vector2())
       return {
         ...meter.read(),
         tier: tierName,
         backend,
         textureMB: Math.round(materials.textureMB() * 100) / 100,
+        frameMB: Math.round((frameBytes(tier, size.x, size.y, renderer.getPixelRatio()) / (1024 * 1024)) * 10) / 10,
         budget: tier.budget,
       }
     },

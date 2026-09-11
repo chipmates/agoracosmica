@@ -125,16 +125,24 @@ function dialsOf(g: Grade): Dials {
 }
 
 /**
- * How many MSAA samples this tier's scene pass may carry.
+ * How many MSAA samples this tier's scene pass may carry, at this pixel ratio.
  *
- * Occlusion, depth of field and the temporal resolve all sample the pass's
- * depth texture, and WGSL has no way to sample a multisampled depth. A pass
- * that carries any of the three therefore carries no MSAA, and the tier
+ * Two rules. Occlusion, depth of field and the temporal resolve all sample
+ * the pass's depth texture, and WGSL has no way to sample a multisampled
+ * depth: a pass that carries any of the three carries no MSAA, and the tier
  * table is written so the lobby never asks for both.
+ *
+ * And a tier's sample count is what it asks for at a pixel ratio of one. A
+ * retina buffer already holds four device pixels per pixel the visitor sees,
+ * so the count halves above ratio one and never falls under two. Without
+ * that rule the hero tier on a 2x display holds eight subsamples of a
+ * half-float frame per visible pixel, which is a quarter of a gigabyte of
+ * buffers for coverage the display cannot show.
  */
-export function samplesFor(tier: Tier): number {
+export function samplesFor(tier: Tier, pixelRatio = 1): number {
   const readsDepth = tier.ao.on || tier.dof || tier.aa === 'taa'
-  return readsDepth ? 0 : tier.samples
+  if (readsDepth || tier.samples === 0) return 0
+  return pixelRatio > 1 ? Math.max(2, Math.round(tier.samples / 2)) : tier.samples
 }
 
 export function createPost(
@@ -167,7 +175,7 @@ export function createPost(
     dofBokeh: uniform(d.dofBokeh),
   }
 
-  const scenePass = pass(scene, camera, { samples: samplesFor(tier) })
+  const scenePass = pass(scene, camera, { samples: samplesFor(tier, renderer.getPixelRatio()) })
   if (tier.aa === 'taa') scenePass.setMRT(mrt({ output, velocity }))
 
   const colour: N = scenePass.getTextureNode('output')

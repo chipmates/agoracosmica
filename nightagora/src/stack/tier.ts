@@ -9,8 +9,10 @@ export type TierName = 'hero' | 'standard' | 'calm'
 
 export interface Tier {
   name: TierName
-  /** what the cost meter holds this tier to */
-  budget: { draws: number; triangles: number; fps: number; textureMB: number }
+  /** what the cost meter holds this tier to. `textureMB` is what the material
+      library may hold; `frameMB` is what the frame's own buffers may hold,
+      which is where MSAA is paid for */
+  budget: { draws: number; triangles: number; fps: number; textureMB: number; frameMB: number }
   pixelRatio: number
   /** MSAA samples on the scene pass. Mutually exclusive with anything that
       samples the pass's depth (ao, dof, taa): see `samplesFor()` in post.ts */
@@ -32,7 +34,7 @@ export interface Tier {
 export const TIERS: Record<TierName, Tier> = {
   hero: {
     name: 'hero',
-    budget: { draws: 300, triangles: 3_000_000, fps: 60, textureMB: 512 },
+    budget: { draws: 300, triangles: 3_000_000, fps: 60, textureMB: 512, frameMB: 384 },
     pixelRatio: 2,
     /* THE FRAME'S EDGES ARE MSAA'S JOB AND NOTHING ELSE'S. Four samples on
        the scene pass is what a stone room with a thousand cut arrises needs,
@@ -74,7 +76,7 @@ export const TIERS: Record<TierName, Tier> = {
   },
   standard: {
     name: 'standard',
-    budget: { draws: 150, triangles: 1_200_000, fps: 60, textureMB: 256 },
+    budget: { draws: 150, triangles: 1_200_000, fps: 60, textureMB: 256, frameMB: 384 },
     pixelRatio: 2,
     samples: 4,
     shadow: { on: true, mapSize: 1024, cascades: 2, maxFar: 44 },
@@ -89,7 +91,7 @@ export const TIERS: Record<TierName, Tier> = {
   },
   calm: {
     name: 'calm',
-    budget: { draws: 60, triangles: 400_000, fps: 60, textureMB: 96 },
+    budget: { draws: 60, triangles: 400_000, fps: 60, textureMB: 96, frameMB: 160 },
     pixelRatio: 1.5,
     /* a phone resolves MSAA inside the tile, so four samples cost bandwidth
        the tiler never spends; the calm tier is cheaper in draws, not in

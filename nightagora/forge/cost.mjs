@@ -1,7 +1,8 @@
 // THE COST OF A FRAME — what each stage of the night asks of a GPU, at each
 // of the three tiers, in the two numbers that cannot be argued with (draw
-// calls and triangles) and the two that must be read with care (the interval
-// between presented frames, and what the CPU spent submitting one).
+// calls and triangles), the memory the frame's own buffers hold (which is
+// where MSAA is paid for), and the two that must be read with care (the
+// interval between presented frames, and what the CPU spent submitting one).
 //
 // Usage:  pnpm build && node forge/cost.mjs [--strict] [--tier=hero]
 //   --strict  exit non-zero when a tier is over its own budget
@@ -63,10 +64,12 @@ try {
     const budget = await page.evaluate(() => window.__forge.cost().budget)
     console.log(
       `${tier.toUpperCase()}  budget ${budget.draws} draws / ` +
-        `${(budget.triangles / 1e6).toFixed(1)}M tris / ${budget.fps} fps`
+        `${(budget.triangles / 1e6).toFixed(1)}M tris / ${budget.fps} fps / ` +
+        `${budget.frameMB} MB of frame`
     )
     console.log(
       `${'stage'.padEnd(10)}${'draws'.padStart(7)}${'tris'.padStart(10)}` +
+        `${'frameMB'.padStart(9)}` +
         `${'frame p50'.padStart(11)}${'p95'.padStart(8)}${'cpu p50'.padStart(9)}${'p95'.padStart(8)}`
     )
     for (const [name, phase, opts] of STAGES) {
@@ -83,6 +86,7 @@ try {
       const c = await page.evaluate(() => window.__forge.cost())
       console.log(
         `${name.padEnd(10)}${String(c.draws).padStart(7)}${String(c.triangles).padStart(10)}` +
+          `${c.frameMB.toFixed(1).padStart(9)}` +
           `${c.frameMsP50.toFixed(1).padStart(11)}${c.frameMsP95.toFixed(1).padStart(8)}` +
           `${c.cpuMsP50.toFixed(1).padStart(9)}${c.cpuMsP95.toFixed(1).padStart(8)}`
       )
@@ -91,6 +95,10 @@ try {
         failures.push(`${tier}/${name}: ${c.triangles} triangles over ${budget.triangles}`)
       if (c.textureMB > budget.textureMB)
         failures.push(`${tier}/${name}: ${c.textureMB} MB of texture over ${budget.textureMB}`)
+      // MSAA is paid for here and nowhere else, so this is the line that has
+      // to hold when a tier's sample count moves
+      if (c.frameMB > budget.frameMB)
+        failures.push(`${tier}/${name}: ${c.frameMB} MB of frame buffers over ${budget.frameMB}`)
       if (FPS_STRICT && c.frameMsP95 > 1000 / budget.fps)
         failures.push(`${tier}/${name}: p95 ${c.frameMsP95} ms over ${(1000 / budget.fps).toFixed(1)}`)
     }
