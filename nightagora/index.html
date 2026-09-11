@@ -103,13 +103,11 @@
 .atlas-site,
 .atlas-deg,
 .star-chip,
-.descent-kicker,
 .chapter-btn,
 #sky-invite,
 #chapter-marks,
 #rail button,
 #dusk-return,
-#descent-skip,
 #sky-return,
 #overture-skip,
 .gate-actions button,
@@ -419,37 +417,11 @@
 
     body.forge #trace-card { transition: none !important; }
 
-    /* ---- the descent: the travel down to the agora, question by
-       question. Every scroll gives a line and the world coming closer ---- */
+    /* ---- the descent: one gesture down to the agora, the plates
+       turning under the visitor as the world comes closer ---- */
     #descent { position: fixed; inset: 0; z-index: 3; pointer-events: none; }
     #descent[hidden] { display: none; }
-    .descent-beat {
-      position: fixed; left: 0; right: 0; top: 28%;
-      text-align: center; padding: 0 24px;
-      transform: none !important;
-      opacity: 0; will-change: transform, opacity;
-    }
-    .descent-ask {
-      max-width: 24em; margin: 0 auto;
-      font-family: var(--serif); font-style: normal;
-      font-size: clamp(23px, 3vw, 38px); line-height: 1.34;
-      letter-spacing: 0.005em; text-wrap: balance;
-      color: var(--na-starlight);
-      text-shadow: var(--ink-night);
-    }
-    /* the one kicker of the descent stands in the open sky, so it is flanked
-       the way a title is ruled: the hairlines say a threshold, not a label */
-    .descent-kicker {
-      margin-bottom: 16px;
-      display: flex; align-items: center; justify-content: center; gap: 15px;
-      font-family: var(--sans);
-      font-size: 10px; letter-spacing: 0.34em; text-indent: 0.34em;
-      text-transform: uppercase; color: var(--na-gold);
-      text-shadow: var(--ink-night);
-    }
-    .descent-kicker::before, .descent-kicker::after {
-      content: ''; width: 22px; height: 1px; flex: none; background: var(--rule);
-    }
+
     /* the plumb: a weighted line, heavy where it hangs from */
     #descent .plumb {
       position: fixed; left: 50%;
@@ -888,25 +860,13 @@
     /* the impatient way down. It shared a hand's width with the status line,
        which put two lines of the same size a breath apart (round 1): it
        steps to the foot of the frame and lets the status keep its own air */
-    #descent-skip {
-      position: fixed; left: 50%; transform: translateX(-50%);
-      bottom: calc(14px + env(safe-area-inset-bottom));
-      background: none; border: none; cursor: pointer;
-      min-height: 44px; padding: 10px 18px;
-      font-family: var(--sans);
-      font-size: 9.5px; letter-spacing: 0.3em; text-indent: 0.3em;
-      text-transform: uppercase; color: var(--na-gold);
-      text-shadow: var(--ink-night);
-      pointer-events: auto;
-      opacity: 0.85; transition: opacity 0.3s ease, color 0.3s ease;
-    }
-    #descent-skip:hover, #descent-skip:focus-visible { opacity: 1; color: var(--na-starlight); outline: none; }
+
     @media (max-aspect-ratio: 9/10) {
       /* on a phone the way down cannot sit at the foot: a centred label
          there runs straight into both rail marks. It steps up instead, and
          it steps clear of the status line, which sat a breath under it
          (round 2, the two lines were touching) */
-      #descent-skip { bottom: calc(96px + env(safe-area-inset-bottom)); }
+
       #descent .plumb { bottom: calc(146px + env(safe-area-inset-bottom)); }
     }
     body.forge #descent *, body.forge .copy { transition: none !important; }
@@ -1450,7 +1410,6 @@
 .drawn-close:focus-visible,
 #dusk-return:focus-visible,
 #sky-return:focus-visible,
-#descent-skip:focus-visible,
 #overture-skip:focus-visible,
 .gate-declare a:focus-visible,
 .gate-links a:focus-visible {
@@ -1477,9 +1436,6 @@
 
       .dusk-kicker { font-size: 9px; letter-spacing: 0.24em; text-indent: 0.24em; }
       .dusk-actions { margin-top: 4px; gap: 0; }
-
-      .descent-kicker { gap: 11px; font-size: 9px; letter-spacing: 0.26em; text-indent: 0.26em; }
-      .descent-kicker::before, .descent-kicker::after { width: 15px; }
 
       /* the contract is the one surface on this frame a visitor must read
          to the end, so it keeps its measure and gives up its margins */
@@ -1532,20 +1488,7 @@
        Sitting, in every figure pane's ink, and in the keeper's own
        mouth — three tellings were one too many -->
   <div id="descent" hidden>
-    <div class="descent-beat">
-      <p class="descent-kicker">The Descent</p>
-      <p class="descent-ask">Eight questions, older than every voice below.</p>
-    </div>
-    <div class="descent-beat"><p class="descent-ask">Who am I?</p></div>
-    <div class="descent-beat"><p class="descent-ask">What binds us to each other?</p></div>
-    <div class="descent-beat"><p class="descent-ask">What makes a life worth living?</p></div>
-    <div class="descent-beat"><p class="descent-ask">Where do ideas come from?</p></div>
-    <div class="descent-beat"><p class="descent-ask">How should we live?</p></div>
-    <div class="descent-beat"><p class="descent-ask">What does it mean to be free?</p></div>
-    <div class="descent-beat"><p class="descent-ask">What lies beyond what we know?</p></div>
-    <div class="descent-beat"><p class="descent-ask">How do we carry what we have lost?</p></div>
     <div class="plumb" aria-hidden="true"></div>
-    <button id="descent-skip" type="button">Skip to the fire</button>
   </div>
   <p id="verse"></p>
   <div id="keeper" hidden>
