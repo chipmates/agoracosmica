@@ -1,0 +1,7 @@
+{
+  "note": "A STATION WHOSE OWN LIFE IS IN THE FRAME CANNOT BE GATED ON A HELD CAMERA. The flicker gate holds the camera and asks what still moves, which is the right question in a room that is meant to be still and the wrong one where the museum itself is moving: a fire whose tongue sweeps a third of the frame, a spark, a star, a constellation drawn live. The app's own freeze does not stop any of it, because those are driven by the renderer's clock and not by the app's. Measured here, before this file existed: the lobby's two states answered 0.2 to 0.3 percent of pixels unstable and 40 to 70 pop-in events per walk, every one of them the flame moving between two frames the camera was held for. A station named here is still measured, still printed and still drawn in its heat maps; what changes is that its lines WARN instead of failing. That is the whole cost of a name: the room loses its hard gate, and the gate keeps its teeth in every room that is meant to be still. A name is one line in a tracked file, its reason is printed on every run, and a name whose station turns out to be still is reported as stale, so the list cannot grow quietly past what it explains.",
+  "living": {
+    "lobby/agora": "the keeper's fire, the embers on the bowl's rim and the sparks that rise from it: measured at 0.19 percent of pixels over six levels, in a band along the rim",
+    "lobby/wheel": "the sky itself: every star twinkles, the constellation's lines are drawn live between them, and a meteor crosses the frame"
+  }
+}
