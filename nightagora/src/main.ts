@@ -1077,7 +1077,13 @@ function freeLookYTarget(): number {
     overture: the eclipse and the descent are skipped whole. */
 function bootRoute(): boolean {
   const here = wingPath()
-  if (!here || !wingBySlug(here.slug)) return false
+  if (!here) return false
+  if (!wingBySlug(here.slug)) {
+    // an address for a wing that does not exist: the night begins where a
+    // night begins, and the bar stops claiming a room that is not there
+    history.replaceState({}, '', `/${location.search}`)
+    return false
+  }
   transit = 1
   desc = descTarget = 1
   door = 1
