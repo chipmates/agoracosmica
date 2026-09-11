@@ -26,6 +26,7 @@ import { applyDetail, type DetailNodes, type DetailScales } from './detail'
 import { GRADES, type Grade, type GradeName } from './grade'
 import { createKeyLight, type KeyLight, type KeyLightOptions } from './light'
 import { createMaterialLibrary, type MaterialLibrary, type MaterialSet } from './materials'
+import { loadHDRI, type SkyProbe } from './hdri'
 import { createPost, type PostChain } from './post'
 import { createReflector, type Reflection, type ReflectorOptions } from './reflector'
 import { loadBakedGI, type BakedGI } from './gi'
@@ -35,7 +36,8 @@ import { pickTier, readAdapter, TIERS, tierFromQuery, type Tier, type TierName }
 export type { Tier, TierName } from './tier'
 export type { Grade, GradeName } from './grade'
 export type { KeyLight } from './light'
-export type { MaterialSet } from './materials'
+export type { MaterialSet, SampledMaps } from './materials'
+export type { SkyProbe } from './hdri'
 export type { CostReading } from './cost'
 
 export interface StackOptions {
@@ -58,6 +60,9 @@ export interface Stack {
     scales?: DetailScales
   ) => DetailNodes
   materials: MaterialLibrary
+  /** one of the library's three equirectangular skies, as a probe a scene
+      hands to `light({ probe })` */
+  hdri: (name: string) => Promise<SkyProbe>
   cost: () => CostReading
   tier: (name: TierName) => void
   tierName: () => TierName
@@ -100,7 +105,7 @@ export async function createStack(opts: StackOptions = {}): Promise<Stack> {
 
   const backend: 'webgpu' | 'webgl2' = adapter === null ? 'webgl2' : 'webgpu'
   const architecture = adapter?.architecture ?? 'webgl2'
-  const materials = createMaterialLibrary()
+  const materials = createMaterialLibrary(tier)
   const meter = createCostMeter(renderer)
   const lights: KeyLight[] = []
 
@@ -162,6 +167,8 @@ export async function createStack(opts: StackOptions = {}): Promise<Stack> {
 
     materials,
 
+    hdri: loadHDRI,
+
     cost() {
       const size = renderer.getDrawingBufferSize(new Vector2())
       return {
@@ -186,6 +193,7 @@ export async function createStack(opts: StackOptions = {}): Promise<Stack> {
       tier = TIERS[name]
       document.body.dataset['tier'] = name
       renderer.setPixelRatio(Math.min(devicePixelRatio, tier.pixelRatio))
+      materials.setTier(tier)
       for (const l of lights) l.setTier(tier)
       meter.reset()
       build()
@@ -212,6 +220,7 @@ export async function createStack(opts: StackOptions = {}): Promise<Stack> {
     },
 
     dispose() {
+      materials.dispose()
       for (const l of lights) l.dispose()
       chain?.dispose()
       renderer.dispose()

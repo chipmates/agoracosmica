@@ -64,9 +64,11 @@ export interface KeyLightOptions {
   elevation: number
   kelvin: number
   lux: number
-  /** an equirectangular HDRI under the asset base; without one the probe is
-      baked from `sky` */
-  hdri?: string
+  /** a loaded equirectangular probe out of the library. A light is built
+      inside a scene's constructor and an HDRI is a network fetch, so the
+      fetch is `Stack.hdri(name)` and this is where its result goes; without
+      one the probe is baked from `sky` */
+  probe?: Texture
   sky?: Partial<SkyRecipe>
   /** how much of the probe reaches a surface that faces nothing in particular */
   ambient?: number
@@ -161,8 +163,8 @@ export function createKeyLight(scene: Scene, tier: Tier, opts: KeyLightOptions):
   const fill = new HemisphereLight(0x2b3a72, 0x05060f, 0.35)
   scene.add(fill)
 
-  const probe: Texture | null = opts.hdri
-    ? null // Stage 0.4 loads the real HDRI into this slot
+  const probe: Texture | null = opts.probe
+    ? opts.probe
     : bakeSky({
         ...DEFAULT_SKY,
         ...opts.sky,
@@ -288,7 +290,9 @@ export function createKeyLight(scene: Scene, tier: Tier, opts: KeyLightOptions):
       scene.remove(fill)
       scene.remove(target)
       light.dispose()
-      probe?.dispose()
+      // a baked sky belongs to this light; a library probe is shared and
+      // outlives every scene that borrows it
+      if (!opts.probe) probe?.dispose()
       if (scene.environment === probe) scene.environment = null
     },
   }
