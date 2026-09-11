@@ -16,7 +16,7 @@ import {
   assertAdapter,
   assertBackend,
   assertServer,
-  GPU_FLAGS,
+  browserArgs,
   TIERS,
   waitForServer,
 } from './rig.mjs'
@@ -46,7 +46,7 @@ try {
   const said = await assertServer(BASE)
   console.log(`server ${said.head.slice(0, 7)} at ${said.root}\n`)
 
-  const browser = await chromium.launch({ args: GPU_FLAGS })
+  const browser = await chromium.launch({ args: browserArgs() })
   for (const tier of tiers) {
     const page = await browser.newPage({ viewport: { width: 1512, height: 950 } })
     let line = ''

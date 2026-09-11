@@ -21,6 +21,13 @@ export const GPU_FLAGS = [
   '--ignore-gpu-blocklist',
 ]
 
+/** the WebGL2 path is tested by taking the flags away: without them the
+    adapter request fails, the app falls back through forceWebGL, and the same
+    node graph has to compile on the other backend */
+export function browserArgs(want = process.env['FORGE_BACKEND'] ?? 'webgpu') {
+  return want === 'webgl2' ? [] : GPU_FLAGS
+}
+
 export const VIEWPORTS = {
   desktop: { tag: 'desktop', width: 1512, height: 950, deviceScaleFactor: 1 },
   mobile: { tag: 'mobile', width: 390, height: 844, deviceScaleFactor: 2 },

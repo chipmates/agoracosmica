@@ -12,7 +12,8 @@
    with the CC0 library and the manifest that comes with it; the loader does
    not change, only what the manifest answers. */
 
-import { Color } from 'three/webgpu'
+import { Color, MeshStandardNodeMaterial } from 'three/webgpu'
+import { applyDetail, type DetailScales } from './detail'
 
 export type AssetClass =
   | 'CAPTURED'
@@ -56,6 +57,8 @@ export interface MaterialSet {
   /** how strongly the density gradient thins the detail with distance */
   falloff: number
   entry: ManifestEntry
+  /** the set as a lit material, with the empty-plane helper already on it */
+  material: (opts?: DetailScales) => MeshStandardNodeMaterial
 }
 
 /** production reads R2; dev reads the Vite plugin Stage 0.3 installs */
@@ -65,7 +68,9 @@ export const ASSET_BASE: string =
 
 /* The three placeholders. Every number is authored, not measured, which is
    exactly what GENERATED means: it may dress a surface, it never testifies. */
-const PLACEHOLDERS: Record<string, Omit<MaterialSet, 'entry'> & { recipe: string }> = {
+type Placeholder = Omit<MaterialSet, 'entry' | 'material'> & { recipe: string }
+
+const PLACEHOLDERS: Record<string, Placeholder> = {
   'marble-lapis': {
     name: 'marble-lapis',
     albedo: new Color('#0c1132'),
@@ -132,6 +137,25 @@ export interface MaterialLibrary {
   textureMB: () => number
 }
 
+/** a set is its numbers plus the one material those numbers describe */
+function build(base: Placeholder, entry: ManifestEntry | undefined): MaterialSet {
+  const { recipe, ...rest } = base
+  const set: MaterialSet = {
+    ...rest,
+    entry: entry ?? generatedEntry(base.name, recipe),
+    material(opts = {}) {
+      const mat = new MeshStandardNodeMaterial({
+        color: set.albedo,
+        roughness: set.roughness,
+        metalness: set.metalness,
+      })
+      applyDetail(mat, set, opts)
+      return mat
+    },
+  }
+  return set
+}
+
 export function createMaterialLibrary(): MaterialLibrary {
   const sets = new Map<string, MaterialSet>()
   const seen = new Map<string, ManifestEntry>()
@@ -166,8 +190,7 @@ export function createMaterialLibrary(): MaterialLibrary {
 
     const base = PLACEHOLDERS[name]
     if (!base) throw new Error(`unknown material set "${name}"`)
-    const { recipe, ...rest } = base
-    const set: MaterialSet = { ...rest, entry: entry ?? generatedEntry(name, recipe) }
+    const set = build(base, entry)
     sets.set(name, set)
     seen.set(set.entry.id, set.entry)
     bytes += entry?.bytes ?? 0
@@ -179,8 +202,7 @@ export function createMaterialLibrary(): MaterialLibrary {
     if (cached) return cached
     const base = PLACEHOLDERS[name]
     if (!base) throw new Error(`unknown material set "${name}"`)
-    const { recipe, ...rest } = base
-    const set: MaterialSet = { ...rest, entry: generatedEntry(name, recipe) }
+    const set = build(base, undefined)
     sets.set(name, set)
     seen.set(set.entry.id, set.entry)
     // and the manifest still gets its say, one frame later

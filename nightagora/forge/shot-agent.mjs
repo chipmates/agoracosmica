@@ -24,7 +24,7 @@ import {
   assertAdapter,
   assertBackend,
   assertServer,
-  GPU_FLAGS,
+  browserArgs,
   parseStates,
   shotName,
   VIEWPORTS,
@@ -93,7 +93,7 @@ try {
   const said = await assertServer(BASE)
   console.log(`server ${said.head.slice(0, 7)} at ${said.root}`)
 
-  const browser = await chromium.launch({ args: GPU_FLAGS })
+  const browser = await chromium.launch({ args: browserArgs() })
   for (const vp of Object.values(VIEWPORTS)) {
     for (const tier of allTiers) {
       const wanted = states.filter((s) => tiersOf(s).includes(tier))

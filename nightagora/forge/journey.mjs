@@ -10,7 +10,7 @@
 import { chromium } from 'playwright'
 import { spawn } from 'node:child_process'
 import { mkdirSync } from 'node:fs'
-import { assertAdapter, assertBackend, assertServer, GPU_FLAGS, waitForServer } from './rig.mjs'
+import { assertAdapter, assertBackend, assertServer, browserArgs, waitForServer } from './rig.mjs'
 
 const PORT = Number(process.env['FORGE_PORT'] ?? 5199)
 const BASE = `http://localhost:${PORT}`
@@ -35,7 +35,7 @@ try {
   await waitForServer(BASE)
   const said = await assertServer(BASE)
   console.log(`[journey] server ${said.head.slice(0, 7)} at ${said.root}, tier ${TIER}`)
-  const browser = await chromium.launch({ args: GPU_FLAGS })
+  const browser = await chromium.launch({ args: browserArgs() })
   const page = await browser.newPage({
     viewport: { width: VP.width, height: VP.height },
     deviceScaleFactor: VP.deviceScaleFactor,
