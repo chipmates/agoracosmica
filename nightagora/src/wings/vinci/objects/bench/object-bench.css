@@ -1,9 +1,11 @@
-body[data-phase='bench'] #ui>*,body[data-phase='bench'] #status,body[data-phase='bench'] #brand,body[data-phase='bench'] #rail,body[data-phase='bench'] #hotspots,body[data-phase='bench'] #wing,body[data-phase='bench'] #lobby-plate{display:none!important}
+body[data-phase='bench'] #ui>*,body[data-phase='bench'] #status,body[data-phase='bench'] #brand,body[data-phase='bench'] #rail,body[data-phase='bench'] #hotspots,body[data-phase='bench'] #wing,body[data-phase='bench'] #lobby-plate,body[data-phase='bench'] #veil{display:none!important}
 body[data-phase='bench'] #stage{opacity:1!important}
 .ob{position:fixed;inset:0;z-index:30;pointer-events:none;font-family:Georgia,'Times New Roman',serif;color:#efe9dc;background:#141a19}
 .ob *{box-sizing:border-box}
 .ob button{pointer-events:auto;min-width:44px;min-height:44px;font:inherit;color:inherit;cursor:pointer;background:rgba(18,26,27,.86);border:1px solid rgba(200,186,150,.34);border-radius:0;padding:11px 17px}
 .ob button:focus-visible{outline:2px solid #ddba7a;outline-offset:3px}
+.ob-drawer:focus,.ob:focus{outline:none}
+.ob-drawer:focus-visible{outline:2px solid #ddba7a;outline-offset:-2px}
 .ob-viewport{position:absolute;inset:0;z-index:0}
 .ob-viewport canvas{width:100%!important;height:100%!important;display:block}
 .ob::before,.ob::after{content:'';position:absolute;left:0;right:0;z-index:1;pointer-events:none}
