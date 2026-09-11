@@ -112,7 +112,6 @@
 #chapter-marks,
 #rail button,
 #dusk-return,
-#dusk-concept,
 #descent-skip,
 #sky-return,
 #overture-skip,
@@ -497,34 +496,7 @@
     }
     #dusk-return:hover, #dusk-return:focus-visible { color: var(--na-starlight); outline: none; }
     /* the way onward wears a door's hairline; the way back is a quiet step */
-    #dusk-concept {
-      position: relative;
-      pointer-events: auto;
-      font-family: var(--sans);
-      font-size: 9.5px; letter-spacing: 0.3em; text-indent: 0.3em;
-      text-transform: uppercase;
-      color: color-mix(in srgb, var(--na-gold) 78%, transparent);
-      text-decoration: none;
-      min-height: 44px; display: inline-flex; align-items: center;
-      padding: 0 10px;
-      text-shadow: var(--ink-day);
-      transition: color 0.5s ease;
-    }
-    #dusk-concept::after {
-      content: ''; position: absolute; left: 10px; right: 10px; bottom: 12px;
-      height: 1px; background: var(--rule-faint);
-      transition: background-color 0.5s ease;
-    }
-    #dusk-concept:hover, #dusk-concept:focus-visible { color: var(--na-gold); outline: none; }
-    #dusk-concept:hover::after, #dusk-concept:focus-visible::after { background: var(--rule); }
-    @media (min-width: 481px) {
-      /* one hairline between the two ways out, only while they share a row */
-      #dusk-concept::before {
-        content: ''; position: absolute; left: -13px; top: 50%;
-        width: 1px; height: 13px; margin-top: -6px;
-        background: var(--rule-faint);
-      }
-    }
+
     body.forge #dusk-pane { transition: none !important; }
 
     /* ---- the return: one diamond-ring breath, the short dawn ---- */
@@ -1569,7 +1541,6 @@
 .inst-close:focus-visible,
 .drawn-close:focus-visible,
 #dusk-return:focus-visible,
-#dusk-concept:focus-visible,
 #sky-return:focus-visible,
 #descent-skip:focus-visible,
 #overture-skip:focus-visible,
@@ -1626,7 +1597,6 @@
       /* the same composition, it simply arrives already composed */
       .star-chip::after,
 .pane-sibling::after,
-#dusk-concept::after,
 #rail button::before,
 #rail button::after,
 .chapter-btn,
@@ -1701,7 +1671,6 @@
     <p class="dusk-line"></p>
     <div class="dusk-actions">
       <button id="dusk-return" type="button">Return to his morning</button>
-      <a id="dusk-concept" href="/hissky.html" target="_blank" rel="noopener">Open the living concept</a>
     </div>
   </div>
   <div id="ringflash" aria-hidden="true"></div>

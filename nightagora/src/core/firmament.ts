@@ -1,5 +1,5 @@
 /* THE FIRMAMENT — the night's standard stars, second organ by the rule
-   of two (eclipse night + camp dusk + His Sky all raise it). Ported
+   of two (the eclipse night and the camp dusk both raise it). Ported
    from concept 01's star shader, then taught to be a SKY rather than a
    texture (2026-07-21, live with the founder):
 

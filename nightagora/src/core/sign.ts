@@ -1,5 +1,5 @@
 /* THE SIGN — a figure's Wisdom Map as a constellation. First organ
-   extraction by the rule of two: His Sky (the living concept page) and
+   extraction by the rule of two: the concept page and
    the camp's duskrise both raise it. N seed stars seated in the
    figure's zodiac pattern, each bloom level 0..4 a visibly richer FORM
    of light (ember, kindled, risen, radiant, bloomed), one hairline
