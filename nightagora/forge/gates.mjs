@@ -34,7 +34,7 @@
 // number is read by eye and never fails a run.
 import { chromium } from 'playwright'
 import { spawn } from 'node:child_process'
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { basename, join, resolve } from 'node:path'
 import {
   APP_ROOT,
@@ -60,6 +60,8 @@ const WALK_MS = 10000
     enough to fill it before its reading is taken */
 const STATION_MS = 2200
 const CONE_DIR = 'gates-cones'
+/** no offline checker of a wing may hold the gate run longer than this */
+const CHECKER_MS = 300000
 
 /* THE SEALED SPEC, when this checkout is a round's app. It names the wing,
    and the cone corners the judge's packet is owed per station; a checkout
@@ -102,9 +104,14 @@ const warn = (name, ok, detail) => {
   say(`${ok ? 'PASS' : 'WARN'}  ${name}  ${typeof detail === 'string' ? detail : ''}`)
 }
 
-function json(cmd, argv, env = {}) {
+function json(cmd, argv, env = {}, ms = 0) {
   return new Promise((done) => {
-    const child = spawn(cmd, argv, { cwd: APP_ROOT, env: { ...process.env, ...env } })
+    const child = spawn(cmd, argv, {
+      cwd: APP_ROOT,
+      env: { ...process.env, ...env },
+      // a checker that hangs may not take the whole gate run with it
+      ...(ms ? { timeout: ms, killSignal: 'SIGKILL' } : {}),
+    })
     let out = ''
     child.stdout.on('data', (d) => (out += d))
     child.stderr.on('data', () => {})
@@ -421,6 +428,7 @@ gate('tier budgets', overBudget.length === 0 && Object.keys(tiers).length === 4,
 
 // ------------------------------------------------------- what only a wing has
 let motion = null
+let wingChecks = null
 if (WING) {
   gate(
     'every station stood at',
@@ -509,13 +517,37 @@ if (WING) {
       : `${intrusions} over ${walked} frames of the walk at ${readings.length} reading(s), closest ` +
         readings.map(([n, r]) => `${n} ${r.closest?.margin ?? '?'}x`).join(', ')
   )
-  /* the geometric half of the same law: whether the camera ever STOOD
-     inside a wall is a question about triangles, not about pixels, and a
-     wing that ships its own offline checker answers it over its whole rail */
-  const checker = join('src', 'wings', SLUG, 'geometry-check.mjs')
-  if (existsSync(join(APP_ROOT, checker))) {
-    say('  the wing\'s own camera clearance, offline')
-    const run = await json('node', [checker])
+  /* THE WING'S OWN CHECKERS ARE PART OF THE GATE. A wing proves things no
+     rig can see from outside (its own provenance, its own geometry, its own
+     rail) with programs it ships beside its code. They were run by hand
+     after a merge, which means they were run when someone remembered. Every
+     `*-check.mjs` in the wing's folder is run here, and its exit code is a
+     gate line. */
+  const wingDir = join('src', 'wings', SLUG)
+  const checkers = existsSync(join(APP_ROOT, wingDir))
+    ? readdirSync(join(APP_ROOT, wingDir)).filter((f) => f.endsWith('-check.mjs')).sort()
+    : []
+  const ran = {}
+  for (const f of checkers) {
+    say(`  the wing's own ${f}, offline`)
+    ran[f] = await json('node', [join(wingDir, f)], {}, CHECKER_MS)
+  }
+  if (checkers.length) {
+    const broke = checkers.filter((f) => ran[f].code !== 0)
+    wingChecks = { exits: Object.fromEntries(checkers.map((f) => [f, ran[f].code])) }
+    gate(
+      'the wing\'s own checkers',
+      broke.length === 0,
+      broke.length
+        ? broke.map((f) => `${f} exited ${ran[f].code}: ${ran[f].raw.trim().split('\n').pop()}`).join(' | ')
+        : `${checkers.length} offline checker(s), every one exit 0: ${checkers.join(', ')}`
+    )
+  }
+  /* the geometric half of "no camera inside a wall": whether the camera ever
+     STOOD inside a wall is a question about triangles, not about pixels, and
+     the wing's own geometry checker answers it over the whole rail */
+  if (ran['geometry-check.mjs']) {
+    const run = ran['geometry-check.mjs']
     const g = run.parsed
     const rail = g?.rail ?? {}
     const clears =
@@ -527,7 +559,7 @@ if (WING) {
     // the checker's own report carries every pose and path it sampled; the
     // gates keep the numbers, not the 15,000 samples behind them
     const { poses, paths, ...railNumbers } = rail
-    motion.clearance = g ? { errors: g.errors, rail: railNumbers, notes: g.notes } : { error: run.raw }
+    wingChecks.clearance = g ? { errors: g.errors, rail: railNumbers, notes: g.notes } : { error: run.raw }
     gate(
       'camera clearance',
       clears,
@@ -594,7 +626,7 @@ const report = {
   head: headHere(),
   backend,
   tiers,
-  ...(WING ? { stations: { ids: stationIds, cost: stationCost, missed: missedStations }, motion } : {}),
+  ...(WING ? { stations: { ids: stationIds, cost: stationCost, missed: missedStations }, motion, wingChecks } : {}),
   labels,
   disclosures: { drift },
   dependencies: deps,
