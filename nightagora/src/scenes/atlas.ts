@@ -1192,6 +1192,52 @@ function createPlate(reserve: Reserve): Plate {
   river.frustumCulled = false
   group.add(river)
 
+  // -------------------------------------------------------- the graticule
+  const grid = new ShellInk()
+  for (let lat = -30; lat <= 75; lat += 15) {
+    grid.path((t) => onShell(t * TAU, lat * DEG), 160, lat === 0 ? 0.76 : lat % 30 === 0 ? 0.63 : 0.38)
+  }
+  for (let lon = 0; lon < 360; lon += 30) {
+    grid.path((t) => onShell(lon * DEG, (-34 + 116 * t) * DEG), 96, lon % 90 === 0 ? 0.62 : 0.4)
+  }
+  // the northern degree circle: every tenth division takes the longer cut,
+  // the way a plate is graduated
+  for (let deg = 0; deg < 360; deg += 2) {
+    const major = deg % 10 === 0
+    grid.path(
+      (t) => onShell(deg * DEG, (60 + (t - 0.5) * (major ? 1.15 : 0.5)) * DEG),
+      1,
+      major ? 0.76 : 0.44,
+      0.001
+    )
+  }
+  const graticule = new Mesh(grid.geometry(), inkMaterial(PAPER, uReveal, 0.0095, reserve))
+  graticule.renderOrder = -7
+  graticule.frustumCulled = false
+  group.add(graticule)
+
+  // --------------------------------------------------------- the ecliptic
+  const ecl = new ShellInk()
+  const obliquity = 23.44 * DEG
+  const onEcliptic = (azimuth: number, off = 0): Vector3 =>
+    onShell(azimuth, off).applyAxisAngle(new Vector3(0, 0, 1), obliquity)
+  ecl.path((t) => onEcliptic(t * TAU), 256, 0.72, 0.0014)
+  for (let deg = 0; deg < 360; deg++) {
+    const major = deg % 10 === 0
+    const medium = deg % 5 === 0
+    const height = (major ? 1.5 : medium ? 0.9 : 0.36) * DEG
+    ecl.path(
+      (t) => onEcliptic(deg * DEG, (t - 0.5) * height),
+      1,
+      major ? 0.88 : medium ? 0.66 : 0.4,
+      0.001
+    )
+  }
+  const armillary = new Mesh(ecl.geometry(), inkMaterial(GOLD, uReveal, 0.022, reserve))
+  armillary.renderOrder = -6
+  armillary.frustumCulled = false
+  group.add(armillary)
+
   return {
     group,
     update(reveal) {
