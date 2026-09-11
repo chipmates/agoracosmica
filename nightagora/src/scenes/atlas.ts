@@ -9,9 +9,9 @@
    1 · GOLD IS A NAME. The thirty are the only gold lights up here. Every
        anonymous star is cool, so a name is findable at a glance and gold
        stays a thing that emits rather than a fill.
-   2 · A HOUSE HAS A HIERARCHY. One anchor with its four-ray glint, lesser
-       members weighted by where they sit in the figure, and a scatter of
-       unnamed companions, so a house is a REGION of sky and not five dots.
+   2 · THE THIRTY STAND AS EQUALS. One magnitude, one disc, one gold for
+       every named star, and a scatter of unnamed companions around them,
+       so a house is a REGION of sky and not one flare with five witnesses.
    3 · THE CHOIR HANGS ON THE SAME DOME. The field, the river and the dust
        turn with the houses, so a chapter change sweeps the WHOLE sky past
        you. A crossfade is not a dome.
@@ -205,10 +205,10 @@ function houseDir(c: Constellation, out: Vector3): Vector3 {
 }
 
 // --------------------------------------------------------------- the star
-/* A star is a tight core with a long faint skirt, not a blob. The anchor of
-   a house also carries the four-ray glint an eye adds to a light bright
-   enough to hurt a little. */
-function starTexture(rays: boolean): CanvasTexture {
+/* A star is a tight core with a long faint skirt, not a blob. One profile
+   for all thirty: the glint that used to mark an anchor is what let a name
+   beside a bright star read as a second name for it. */
+function starTexture(): CanvasTexture {
   const size = 128
   const canvas = document.createElement('canvas')
   canvas.width = size
@@ -226,30 +226,6 @@ function starTexture(rays: boolean): CanvasTexture {
   g.addColorStop(1, 'rgba(0, 0, 0, 0)')
   ctx.fillStyle = g
   ctx.fillRect(0, 0, size, size)
-
-  if (rays) {
-    // the glint is built out of feathered one-pixel bands so the ray has a
-    // soft edge and a taper, which a plain rectangle never gets
-    ctx.globalCompositeOperation = 'lighter'
-    for (const vertical of [false, true]) {
-      const lg = vertical
-        ? ctx.createLinearGradient(0, 0, 0, size)
-        : ctx.createLinearGradient(0, 0, size, 0)
-      lg.addColorStop(0, 'rgba(246, 223, 174, 0)')
-      lg.addColorStop(0.32, 'rgba(246, 223, 174, 0.08)')
-      lg.addColorStop(0.5, 'rgba(255, 248, 226, 0.62)')
-      lg.addColorStop(0.68, 'rgba(246, 223, 174, 0.08)')
-      lg.addColorStop(1, 'rgba(246, 223, 174, 0)')
-      ctx.fillStyle = lg
-      for (let k = -3; k <= 3; k++) {
-        ctx.globalAlpha = Math.pow(1 - Math.abs(k) / 4, 2.4)
-        if (vertical) ctx.fillRect(c + k - 0.5, 0, 1, size)
-        else ctx.fillRect(0, c + k - 0.5, size, 1)
-      }
-    }
-    ctx.globalAlpha = 1
-    ctx.globalCompositeOperation = 'source-over'
-  }
   return new CanvasTexture(canvas)
 }
 
@@ -293,22 +269,15 @@ function inkRanks(c: Constellation): number[] {
   return ranks
 }
 
-/** how bright a named star is. The anchor is the anchor; everyone else is
-    weighted by how many lines meet at them, so the joints of the figure
-    carry the light and the tips fall away. A stable per-name jitter keeps
-    any two members from being twins. */
+/** THE THIRTY STAND AT ONE MAGNITUDE. A named star is a name, and no name
+    in this museum outranks another, so every figure star of every house is
+    the same magnitude, which means the same disc and the same gold. The
+    choir and the per-house companions keep all their variety: that is where
+    a sky earns its range. */
+const FIGURE_MAG = 0.82
+
 function magnitudes(c: Constellation): number[] {
-  const degree = new Array<number>(c.stars.length).fill(0)
-  for (const [a, b] of c.lines) {
-    if (degree[a] !== undefined) degree[a] += 1
-    if (degree[b] !== undefined) degree[b] += 1
-  }
-  return c.stars.map((s, i) => {
-    if (s.alpha) return 1
-    const d = degree[i] ?? 0
-    const jitter = slugHash(s.slug, 7) * 0.13
-    return Math.min(0.88, 0.5 + d * 0.09 + jitter)
-  })
+  return c.stars.map(() => FIGURE_MAG)
 }
 
 /* THE HAIRLINES, as a drawn figure: every segment is a ribbon that keeps
@@ -683,8 +652,7 @@ export function createAtlas(scene: Scene): AtlasHandles {
   const rand = mulberry32(FOUNDING_SEED)
   const reserve = createLetteringReserve()
 
-  const starMap = starTexture(false)
-  const anchorMap = starTexture(true)
+  const starMap = starTexture()
 
   // a phone sees a much narrower slice of the dome than a desk, so an
   // equal budget is a much emptier frame: the narrow tier keeps almost the
@@ -726,9 +694,6 @@ export function createAtlas(scene: Scene): AtlasHandles {
   interface Star {
     sprite: Sprite
     mat: SpriteMaterial
-    /** the anchor of its house: it wears the glint, so it also has to be
-        hushed hardest when the house is not the one being looked at */
-    anchor: boolean
     /** the disc this star is authored at, before the recession shrinks it */
     size: number
     /** brightness this star is authored at */
@@ -781,9 +746,9 @@ export function createAtlas(scene: Scene): AtlasHandles {
 
     const fit = Math.pow(meanReach / (reach[ci] ?? meanReach), 0.55)
     const mag = magnitudes(c)
-    // the anchor's disc is drawn wide enough to carry its four rays; every
-    // other star is the tight point its magnitude earns
-    const sizes = mag.map((m, k) => (0.21 + 0.33 * m * m) * (c.stars[k]?.alpha ? 1.45 : 1))
+    // one disc for every name (the ruling above), so a house reads as a
+    // register of equals and not as one flare with five witnesses
+    const sizes = mag.map((m) => 0.21 + 0.33 * m * m)
 
     // the companions first, so a named star always draws over them
     const comp = buildCompanions(c, rand, narrow ? 18 : 26)
@@ -797,7 +762,7 @@ export function createAtlas(scene: Scene): AtlasHandles {
     c.stars.forEach((s, si) => {
       const m = mag[si] ?? 0.6
       const mat = new SpriteMaterial({
-        map: s.alpha ? anchorMap : starMap,
+        map: starMap,
         color: GOLD_DEEP.clone().lerp(GOLD, Math.min(1, m * 1.35)).lerp(GOLD_HOT, m * m),
         transparent: true,
         opacity: 0,
@@ -811,7 +776,6 @@ export function createAtlas(scene: Scene): AtlasHandles {
       list.push({
         sprite,
         mat,
-        anchor: Boolean(s.alpha),
         size: sizes[si] ?? 0.4,
         bright: 0.5 + 0.5 * Math.pow(m, 1.2),
         // the twinkle law again: only the lesser members scintillate
@@ -910,8 +874,7 @@ export function createAtlas(scene: Scene): AtlasHandles {
         const sh = reducedMotion
           ? 0.5
           : Math.sin(elapsed * s.rate + s.phase) * 0.5 + 0.5
-        const hush = s.anchor ? 0.45 + 0.55 * p.focus : 1
-        s.mat.opacity = pres * s.bright * hush * (1 - s.scint * sh)
+        s.mat.opacity = pres * s.bright * (1 - s.scint * sh)
         s.sprite.scale.setScalar(s.size * shrink)
       }
       // a neighbour keeps the ghost of its own figure at the frame edge:
