@@ -1,12 +1,17 @@
 /* The measured slope and the assumed platforms meet at an edge. There is
    no interpolated apron: a raised platform has a retaining face, and a cut
-   platform exposes an earth bank. Every platform keeps its dossier outline. */
+   platform exposes an earth bank. Modern collection boundaries use their
+   declared concrete lining. Every platform keeps its dossier outline. */
 import { BufferGeometry, Float32BufferAttribute, ShapeUtils, Vector2 } from 'three/webgpu'
 import { dossier, feature, polygon, surveyedHeight, type Feature, type Quantity } from './site'
 import { getWaterCuts, waterBedAt } from './water'
 import { getPathCorridors } from './paths'
 import { getRoadGradeRegions } from './road-grade'
 import { getApronRegions, isApronFacadeEdge } from './apron'
+import { getInnerCourtRegions, isInnerCourtFacadeEdge } from './inner-court'
+import { collectionCheekBand, getCollectionGradeRegions, isCollectionApproachRegion } from './collection'
+import { collectionAccessCheekBand, getCollectionAccessRegions } from './collection-access'
+import { isLinedGateEdge } from './gate-passage'
 import type { TierName } from '../../stack/tier'
 
 type Point = [number, number]
@@ -59,6 +64,37 @@ function rectangle(a: Point, b: Point, width: number): Point[] {
   return ccw([[a[0] + dx, a[1] + dn], [b[0] + dx, b[1] + dn], [b[0] - dx, b[1] - dn], [a[0] - dx, a[1] - dn]])
 }
 
+/** Material-only closure of the narrow retained bank between the east
+ * court edge and the gallery. Project to its actual G4/G5 facade chain;
+ * neither the court polygon nor any sampled elevation is moved. */
+const galleryFacades = (dossier as unknown as { facades: { id: string; from: Quantity<number[]>; to: Quantity<number[]> }[] }).facades
+const galleryFacade = (id: string) => galleryFacades.find(facade => facade.id === id)!
+const galleryCourt = polygon('courtyard').map(asPoint)
+const projectToGallery = (point: Point, id: string): Point => {
+  const facade = galleryFacade(id), a = asPoint(facade.from.value), b = asPoint(facade.to.value)
+  const dx = b[0] - a[0], dn = b[1] - a[1]
+  const t = Math.max(0, Math.min(1, ((point[0] - a[0]) * dx + (point[1] - a[1]) * dn) / (dx * dx + dn * dn)))
+  return lerp(a, b, t)
+}
+const galleryBankOutline = ccw([galleryCourt[1]!, galleryCourt[2]!, projectToGallery(galleryCourt[2]!, 'G4'),
+  asPoint(galleryFacade('G4').to.value), projectToGallery(galleryCourt[1]!, 'G5')])
+const galleryBankCaps: Cutter[] = ShapeUtils.triangulateShape(galleryBankOutline.map(point => new Vector2(...point)), [])
+  .map(indices => { const points = ccw(indices.map(i => galleryBankOutline[i]!)); return { points, bounds: bounds(points) } })
+const surfaceCorridors: Cutter[] = [...pathCorridors, ...galleryBankCaps]
+export const galleryBankCapProvenance = {
+  manifestId: 'vinci/terrain-mesh', assetClass: 'GENERATED', certainty: 'conjectural',
+  source: ['A-SITE', 'A-LAYOUT', 'OSM-AREA'],
+  label: {
+    en: 'Proposed mineral ground follows the narrow bank beneath the gallery.',
+    de: 'Vorgeschlagener mineralischer Boden folgt dem schmalen Geländestreifen unter der Galerie.',
+  },
+  record: {
+    en: 'The material-only polygon joins courtyard points 1 and 2 to their nearest points on registered facades G5 and G4, retaining the shared facade corner. It classifies the existing exposed slope as earth instead of grass. Every resulting vertex still samples the unchanged IGN height field; existing court, gate, building and water cuts retain priority. Its extent and mineral surface are a conjectural museum finish, not a claim about a surviving 1517 cap.',
+    de: 'Das reine Materialpolygon verbindet die Hofpunkte 1 und 2 mit ihren nächsten Punkten auf den registrierten Fassaden G5 und G4 und übernimmt deren gemeinsame Ecke. Es stellt den vorhandenen offenen Hang als Erde statt Gras dar. Jeder entstehende Eckpunkt erhält weiterhin seine Höhe aus dem unveränderten IGN-Höhenfeld; vorhandene Hof-, Tor-, Gebäude- und Gewässerausschnitte behalten Vorrang. Ausdehnung und mineralische Oberfläche sind eine vermutete museale Ausgestaltung, kein Beleg einer erhaltenen Abdeckung von 1517.',
+  },
+  outline: galleryBankOutline, area_m2: Math.abs(area(galleryBankOutline)),
+} as const
+
 function makeRegion(id: string, points: Point[], height: number|Region['levelAt'], surface: Region['surface'] = 'earth', gradient:Point=[0,0]): Region {
   const outline = ccw(points)
   const length=Math.hypot(gradient[0],1,gradient[1])
@@ -66,9 +102,12 @@ function makeRegion(id: string, points: Point[], height: number|Region['levelAt'
     normal:[-gradient[0]/length,1/length,gradient[1]/length], surface }
 }
 
-// The separate access proposal is below every literal platform and declared
-// gate connection in this priority list, and above the untouched IGN field.
+// Broad collection placement remains below the literal platform priority.
+// Its precisely bounded approach is appended separately as a modern cut.
+const collectionRegions = [...getCollectionGradeRegions(), ...getCollectionAccessRegions()]
 const regions: Region[] = [
+  ...collectionRegions.filter(region=>!isCollectionApproachRegion(region.id)).map(region=>makeRegion(region.id,region.points,region.levelAt,'earth',region.gradient)),
+  ...getInnerCourtRegions().map(court=>makeRegion(court.id,court.points,court.height)),
   ...getApronRegions().map(apron=>makeRegion(apron.id,apron.points,apron.height)),
   ...getRoadGradeRegions().map(road=>makeRegion(road.id,road.points,road.levelAt,'earth',road.gradient)),
   ...['courtyard', 'terrace', 'period-garden', 'street-grade'].map(id =>
@@ -121,6 +160,11 @@ for (let step = 0; step < count; step++) {
   regions.push(makeRegion(`gate-tread-${step + 1}`, rectangle(stairAt(from), stairAt(to), stairWidth), upper + (lower - upper) * (step + 1) / count))
 }
 if (landing > EPS) regions.push(makeRegion('gate-lower-landing', rectangle(stairAt(stairLength - landing), stairB, stairWidth), lower))
+
+// Explicit contemporary insertion only: do not change the registered
+// terrace outline or raw IGN. These exact paving footprints own their cut.
+regions.push(...collectionRegions.filter(region=>isCollectionApproachRegion(region.id))
+  .map(region=>makeRegion(region.id,region.points,region.levelAt,'earth',region.gradient)))
 
 function regionAt(e: number, n: number): Region | undefined {
   for (let i = regions.length - 1; i >= 0; i--) if (contains(regions[i]!, e, n)) return regions[i]
@@ -209,7 +253,7 @@ function top(target: Batch, points: Point[], region?: Region): void {
   }
 }
 
-function wall(target: Batch, a: Point, b: Point, a0: number, b0: number, a1: number, b1: number, positive: boolean): void {
+function wall(target: Batch, a: Point, b: Point, a0: number, b0: number, a1: number, b1: number, positive: boolean, covered?: { bottom: number; top: number }): void {
   const dx = b[0] - a[0], dn = b[1] - a[1], length = Math.hypot(dx, dn)
   if(length<EPS)return
   const normal: Point3 = positive ? [dn / length, 0, dx / length] : [-dn / length, 0, -dx / length]
@@ -219,7 +263,16 @@ function wall(target: Batch, a: Point, b: Point, a0: number, b0: number, a1: num
   }
   for(let i=0;i<vertices.length;i+=3){
     if(Math.abs(i===0?a1-a0:b1-b0)<EPS)continue
-    for(const [p,h,u]of vertices.slice(i,i+3))push(target,p,h,normal,true,u)
+    const triangle=vertices.slice(i,i+3)
+    if(!covered){for(const [p,h,u]of triangle)push(target,p,h,normal,true,u);continue}
+    // Clip actual wall triangles in along-edge/height coordinates. This
+    // also resolves a sloping grade crossing either cheek limit exactly;
+    // clamping just the endpoints would leave triangular overlaps or gaps.
+    const section:Point[]=triangle.map(([,h,u])=>[u,h])
+    const pieces=[clip(section,[0,covered.bottom],[length,covered.bottom],false),
+      clip(section,[0,covered.top],[length,covered.top],true)]
+    for(const piece of pieces)for(let j=1;j<piece.length-1;j++)
+      for(const [u,h]of[piece[0]!,piece[j]!,piece[j+1]!])push(target,lerp(a,b,u/length),h,normal,true,u)
   }
 }
 
@@ -230,7 +283,7 @@ function finish(source: Batch, name: string): BufferGeometry {
   geometry.setAttribute('normal', new Float32BufferAttribute(source.normal, 3))
   geometry.setAttribute('uv', new Float32BufferAttribute(source.uv, 2))
   geometry.computeBoundingSphere()
-  geometry.userData = { basis: 'IGN bilinear grid and A-SITE platform levels; exact platform, proposed road-cut and clipped-stream boundaries. A separate flat 1 m house-side apron fills only the derived gap from F01/F02/G2/G1 to the retained road-cut west edge, with explicit terminal retaining edges and no smoothing into walls. The separate 5 m road approach continues the nominal 1 m grade through the mapped gallery crossing and interpolates to the next mapped point at IGN height; literal platforms and gate connections retain priority. Other mapped path corridors classify the existing slope as earth without changing its elevation. Stream beds and banks are supplied by water.ts; modern ponds omitted.', triangles: source.position.length / 9 }
+  geometry.userData = { galleryBankCap: galleryBankCapProvenance, basis: 'IGN bilinear grid and A-SITE platform levels; exact platform, proposed road-cut and clipped-stream boundaries. A separate flat 1 m house-side apron fills only the derived gap from F01/F02/G2/G1 to the retained road-cut west edge, with explicit terminal retaining edges and no smoothing into walls. The separate 5 m road approach continues the nominal 1 m grade through the mapped gallery crossing and interpolates to the next mapped point at IGN height; literal platforms and gate connections retain priority. Other mapped path corridors and the derived court-to-G4/G5 mineral bank cap classify the existing slope as earth without changing its elevation. Exact exterior collection-cheek strips now support their existing finish and close both landing heads. Stream beds and banks are supplied by water.ts; modern ponds omitted.', triangles: source.position.length / 9 }
   return geometry
 }
 
@@ -282,8 +335,8 @@ function gradeRoots(d0:number,dm:number,d1:number):number[] {
   return[0,...roots.filter(t=>t>EPS&&t<1-EPS),1].sort((a,b)=>a-b).filter((t,i,values)=>i===0||t-values[i-1]!>EPS)
 }
 
-export function buildTerrainMeshes(tier: TierName): { earth: BufferGeometry; grass: BufferGeometry; retaining: BufferGeometry } {
-  const earth = batch(), grass = batch(), retaining = batch()
+export function buildTerrainMeshes(tier: TierName): { earth: BufferGeometry; grass: BufferGeometry; retaining: BufferGeometry; collectionRetaining: BufferGeometry } {
+  const earth = batch(), grass = batch(), retaining = batch(), collectionRetaining = batch()
   const cutters: Cutter[] = [...regions, ...footprintTriangles, ...waterCutters]
   const cutBounds = bounds(cutters.flatMap(cutter => cutter.points))
   const step = tier === 'calm' ? 3 : 2
@@ -299,7 +352,7 @@ export function buildTerrainMeshes(tier: TierName): { earth: BufferGeometry; gra
     const e = east[ei]!, n = north[ni]!, nextE = east[ei + 1]!, nextN = north[ni + 1]!
     const cellBounds = { minE: e, maxE: nextE, minN: n, maxN: nextN }
     const local = overlaps(cellBounds, cutBounds) ? cutters.filter(cutter => overlaps(cellBounds, cutter.bounds)) : []
-    const localPaths = pathCorridors.filter(corridor => overlaps(cellBounds, corridor.bounds))
+    const localPaths = surfaceCorridors.filter(corridor => overlaps(cellBounds, corridor.bounds))
     const corners: Point[] = [[e, n], [nextE, n], [nextE, nextN], [e, nextN]]
     for (const triangle of [[corners[0]!, corners[1]!, corners[2]!], [corners[0]!, corners[2]!, corners[3]!]]) {
       for (const piece of local.length ? subtractAll(triangle, local) : [triangle]) {
@@ -341,6 +394,7 @@ export function buildTerrainMeshes(tier: TierName): { earth: BufferGeometry; gra
     // own the same boundary treatment as the retained outer outline.
     for (const piece of visiblePieces) for (let edge = 0; edge < piece.length; edge++) {
       const start = piece[edge]!, end = piece[(edge + 1) % piece.length]!
+      if(region.id.startsWith('inner-court-')&&isInnerCourtFacadeEdge(start,end))continue
       if(region.id.startsWith('apron-')&&isApronFacadeEdge(start,end))continue
       const dx = end[0] - start[0], dn = end[1] - start[1], distance = Math.hypot(dx, dn)
       const breaks = edgeBreaks(start, end)
@@ -350,6 +404,7 @@ export function buildTerrainMeshes(tier: TierName): { earth: BufferGeometry; gra
         const inner: Point = [mid[0] - outward[0], mid[1] - outward[1]], outer: Point = [mid[0] + outward[0], mid[1] + outward[1]]
         if (inHouse(...inner) || inHouse(...outer) || waterBedAt(...inner)!==undefined || waterBedAt(...outer)!==undefined || regionAt(...inner)?.id !== region.id) continue
         const neighbour = regionAt(...outer)
+        const modern=region.id.startsWith('collection-')||Boolean(neighbour?.id.startsWith('collection-'))
         const otherAt=(p:Point):number=>neighbour?.levelAt(...p)??surveyedHeight(...p)
         const differenceAt=(p:Point):number=>region.levelAt(...p)-otherAt(p)
         const roots=gradeRoots(differenceAt(a),differenceAt(mid),differenceAt(b))
@@ -358,8 +413,19 @@ export function buildTerrainMeshes(tier: TierName): { earth: BufferGeometry; gra
           const difference=differenceAt(lerp(from,to,.5))
           if(Math.abs(difference)<EPS||(neighbour&&difference<0))continue
           const aOwn=region.levelAt(...from),bOwn=region.levelAt(...to),aOther=otherAt(from),bOther=otherAt(to)
-          if(difference>0)wall(retaining,from,to,Math.min(aOther,aOwn),Math.min(bOther,bOwn),aOwn,bOwn,true)
-          else wall(earth,from,to,aOwn,bOwn,Math.max(aOther,aOwn),Math.max(bOther,bOwn),false)
+          const covered=modern?(collectionCheekBand(from,to)??collectionAccessCheekBand(from,to)):undefined
+          if(difference>0)wall(modern?collectionRetaining:retaining,from,to,Math.min(aOther,aOwn),Math.min(bOther,bOwn),aOwn,bOwn,true,covered)
+          else if(!isLinedGateEdge(from,to)){
+            const roadLining=!modern&&(region.id==='street-grade'||region.id.startsWith('road-cut-'))
+            wall(modern?collectionRetaining:roadLining?retaining:earth,from,to,aOwn,bOwn,Math.max(aOther,aOwn)+(roadLining?.035:0),Math.max(bOther,bOwn)+(roadLining?.035:0),false,covered)
+            if(roadLining){
+              // Proposed 220 mm masonry lining extends into the retained
+              // bank. Its cap follows the unchanged IGN crest, 35 mm proud.
+              const far=(p:Point):Point=>[p[0]+outward[0]*110,p[1]+outward[1]*110]
+              const cap=ccw([from,to,far(to),far(from)])
+              top(retaining,cap,makeRegion('road-wall-cap',cap,(e,n)=>surveyedHeight(e,n)+.035))
+            }
+          }
         }
       }
     }
@@ -368,5 +434,6 @@ export function buildTerrainMeshes(tier: TierName): { earth: BufferGeometry; gra
     earth: finish(earth, 'vinci A-SITE earth platforms and cut banks'),
     grass: finish(grass, 'vinci IGN slope and registered garden platform'),
     retaining: finish(retaining, 'vinci A-SITE vertical retaining faces and stair risers'),
+    collectionRetaining: finish(collectionRetaining, 'vinci modern collection concrete cut and fill lining; exact cheek interval omitted'),
   }
 }

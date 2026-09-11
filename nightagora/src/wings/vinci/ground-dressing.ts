@@ -1,3 +1,4 @@
+import { partitionGroundDressing } from './dressing-partition'
 import {
   BufferGeometry, Color, DoubleSide, Float32BufferAttribute,
   Group, Mesh, MeshStandardNodeMaterial, Vector3,
@@ -7,6 +8,9 @@ import { dossier, edgeDistance, feature, inside, polygon, type Quantity } from '
 import { getPathCorridors, pathSpecifications } from './paths'
 import { gateApproachRoute } from './terrain-mesh'
 import { getWaterCuts } from './water'
+import { collectionExclusions } from './collection'
+import { collectionAccessExclusions } from './collection-access'
+import { getInnerCourtOutlines } from './inner-court'
 import { getApronOutlines } from './apron'
 
 interface Batch { positions: number[]; normals: number[]; colours: number[] }
@@ -18,7 +22,7 @@ const PROVENANCE = {
   assetClass: 'GENERATED',
   certainty: 'conjectural',
   basis: 'A-SITE and A-LAYOUT terrain and exclusions. Modern garden photographs inform surface character only. Grass, gravel and fallen-leaf positions are a proposed October dressing, not period evidence.',
-  recipe: 'Seed 15171010. Weighted elliptical fields concentrate unequal tuft clusters in the arrival slope and garden foreground. Dense narrow three-triangle curved opaque grass blades, 6–13 mm base width, in uneven clumps, folded fallen leaves and four-face limestone chips. Gravel collects beside literal path corridors. Masonry, platforms, gate circulation and retained water cuts exclude all dressing. Every contact samples the shared gradeAt through heightAt. Two geometry batches. No textures, alpha, billboard orientation or shadow dither.',
+  recipe: 'Seed 15171010. Weighted elliptical fields concentrate unequal tuft clusters in the arrival slope and garden foreground. Dense narrow three-triangle curved opaque grass blades, 4–15 mm base width, in uneven clumps, folded fallen leaves and four-face limestone chips. Independent seed 15171013 adds 800 calm or 2800 standard/hero foreground clumps, with 3–5 attempted blades per clump, 4–19 mm base widths, 0.045–0.31 m nominal stature and per-blade stature factor 0.58–1.22. Proposed dry seed stalks use eight opaque triangles each, 0.19–0.48 m high, capped at 0.22 m within 1.3 m of a circulation edge. Foreground blade projected base, knee and tip and seed-head envelope each retain all existing cut clearances. Foreground populations remain fixed in world space and complete at every view. These dimensions and seed-head forms are exhibition assumptions, not species identification or 1517 measurements. Gravel collects beside literal path corridors. Masonry, platforms, gate circulation and retained water cuts exclude all dressing. Every contact samples the shared gradeAt through heightAt. Calm retains every same-tier triangle and attribute in two spatial grass/leaf clusters plus one gravel batch. Standard/hero retain every same-tier triangle and attribute in twenty-four spatial grass/leaf clusters plus one gravel batch; native per-pass frustum culling uses their bounds. No textures, alpha, billboard orientation or shadow dither.',
 }
 
 const PATCHES: readonly Patch[] = [
@@ -31,6 +35,11 @@ const PATCHES: readonly Patch[] = [
   { east: -52, north: -14, radiusEast: 12, radiusNorth: 26, weight: 1 },
   { east: -17, north: -61, radiusEast: 18, radiusNorth: 12, weight: 1 },
 ]
+const FOREGROUND_PATCHES: readonly Patch[] = [
+  { east: -23.7, north: -30.7, radiusEast: 6.8, radiusNorth: 6.4, weight: 3 },
+  { east: -29.3, north: -37.8, radiusEast: 8.2, radiusNorth: 5.6, weight: 2 },
+]
+const WEIGHTED_FOREGROUND = FOREGROUND_PATCHES.flatMap(patch => Array.from({ length: patch.weight }, () => patch))
 const WEIGHTED_PATCHES = PATCHES.flatMap(patch => Array.from({ length: patch.weight }, () => patch))
 const GRASS = ['#626943', '#788050', '#858458', '#9a9260', '#a99b6d', '#697048'].map(c => new Color(c))
 const LEAVES = ['#806143', '#96754b', '#a28b58', '#726048', '#766b42'].map(c => new Color(c))
@@ -75,6 +84,30 @@ function tuftBlade(batch: Batch, heightAt: HeightAt, east: number, north: number
   face(batch, left, right, middleRight, colour)
   face(batch, left, middleRight, middleLeft, colour)
   face(batch, middleLeft, middleRight, tip, dry)
+}
+
+/** A proposed dry panicle, not an identified species. Each stalk joins the
+ * ground; six small opposing bracts break the silhouette without alpha. */
+function seedStalk(batch: Batch, heightAt: HeightAt, east: number, north: number, height: number, azimuth: number, colour: Color): void {
+  const base = new Vector3(east, heightAt(east, north) - 0.008, -north)
+  const across = new Vector3(Math.cos(azimuth), 0, Math.sin(azimuth))
+  const lean = new Vector3(-Math.sin(azimuth), 0, Math.cos(azimuth))
+  const point = (t: number): Vector3 => base.clone().add(new Vector3(0, height * t, 0)).addScaledVector(lean, height * t * 0.10)
+  const a = base.clone().addScaledVector(across, -0.0015)
+  const b = base.clone().addScaledVector(across, 0.0015)
+  const tip = point(1)
+  const c = tip.clone().addScaledVector(across, 0.0006)
+  const d = tip.clone().addScaledVector(across, -0.0006)
+  face(batch, a, b, c, colour)
+  face(batch, a, c, d, colour)
+  for (let pair = 0; pair < 3; pair++) {
+    const joint = point(0.70 + pair * 0.095)
+    const axis = across.clone().applyAxisAngle(new Vector3(0, 1, 0), pair * 0.71)
+    const spread = 0.014 - pair * 0.0025
+    const peak = point(0.80 + pair * 0.09)
+    face(batch, joint, joint.clone().addScaledVector(axis, -spread).add(new Vector3(0, height * 0.025, 0)), peak, colour)
+    face(batch, joint, peak, joint.clone().addScaledVector(axis, spread).add(new Vector3(0, height * 0.025, 0)), colour.clone().multiplyScalar(1.08))
+  }
 }
 
 function fallenLeaf(batch: Batch, heightAt: HeightAt, east: number, north: number, length: number, azimuth: number, colour: Color): void {
@@ -138,15 +171,18 @@ export function createGroundDressing(heightAt: HeightAt, tier: TierName): Group 
   ]
   const routes = [
     ...['courtyard', 'terrace', 'street-grade'].map(polygon),
+    ...getInnerCourtOutlines().map(court=>court.points),
+    ...collectionExclusions.map(region=>region.points),
+    ...collectionAccessExclusions.map(region=>region.points),
     ...getApronOutlines().map(apron=>apron.points),
     ...getPathCorridors().map(corridor => corridor.points),
     ...gateApproachRoute.slice(1).map((b, i) => routeStrip(gateApproachRoute[i]!, b, feature('gate-steps').width_m!.value)),
   ]
   const water = getWaterCuts().map(cut => cut.points)
-  const clear = (east: number, north: number): boolean => {
-    if (buildings.some(p => inside(east, north, p) || edgeDistance(east, north, p) < 0.65)) return false
-    if (routes.some(p => inside(east, north, p) || edgeDistance(east, north, p) < 0.28)) return false
-    if (water.some(p => inside(east, north, p) || edgeDistance(east, north, p) < 0.45)) return false
+  const clear = (east: number, north: number, margin = 0): boolean => {
+    if (buildings.some(p => inside(east, north, p) || edgeDistance(east, north, p) < 0.65 + margin)) return false
+    if (routes.some(p => inside(east, north, p) || edgeDistance(east, north, p) < 0.28 + margin)) return false
+    if (water.some(p => inside(east, north, p) || edgeDistance(east, north, p) < 0.45 + margin)) return false
     return true
   }
   const pathDistance = (east: number, north: number): number => Math.min(...routes.map(p => edgeDistance(east, north, p)))
@@ -173,7 +209,7 @@ export function createGroundDressing(heightAt: HeightAt, tier: TierName): Group 
     for (let blade = 0; blade < 3; blade++) {
       const e = east + (random() - 0.5) * 0.055, n = north + (random() - 0.5) * 0.055
       tuftBlade(plantBatch, heightAt, e, n, stature * (0.66 + random() * 0.70),
-        angle + blade * 2.13 + random() * 0.4, 0.006 + random() * 0.007, colour)
+        angle + blade * 2.13 + random() * 0.4, 0.004 + random() ** 1.4 * 0.011, colour)
     }
     tufts++
   }
@@ -225,13 +261,58 @@ export function createGroundDressing(heightAt: HeightAt, tier: TierName): Group 
     chips++
   }
 
-  group.add(meshFrom(plantBatch, 'vinci October grass and uneven leaf litter'))
+  // A separate deterministic stream leaves all inherited clump centres,
+  // leaf positions and gravel positions unchanged. The added density follows
+  // two fixed garden fields, never a camera position or a visibility decision.
+  const foregroundRandom = randomSource(15171013)
+  const foregroundTarget = calm ? 800 : 2800
+  let foregroundTufts = 0, foregroundBlades = 0, seedStalks = 0
+  for (let attempt = 0; foregroundTufts < foregroundTarget && attempt < foregroundTarget * 24; attempt++) {
+    const patch = WEIGHTED_FOREGROUND[attempt % WEIGHTED_FOREGROUND.length]!
+    const theta = foregroundRandom() * Math.PI * 2, radius = Math.sqrt(foregroundRandom())
+    const east = patch.east + Math.cos(theta) * patch.radiusEast * radius
+    const north = patch.north + Math.sin(theta) * patch.radiusNorth * radius
+    const clump = 0.5 + 0.5 * Math.sin(east * 2.7 + Math.sin(north * 0.81)) * Math.cos(north * 1.93 - east * 0.37)
+    const density = (0.35 + 0.65 * (1 - radius * radius)) * (0.24 + 0.76 * clump)
+    if (!clear(east, north) || foregroundRandom() > density) continue
+    const edge = pathDistance(east, north)
+    const stature = (0.045 + foregroundRandom() ** 0.7 * 0.265) * (edge < 1.3 ? 0.58 : 1)
+    const colour = GRASS[Math.floor(foregroundRandom() * GRASS.length)]!.clone().multiplyScalar(0.82 + density * 0.22)
+    const angle = foregroundRandom() * Math.PI * 2
+    const bladeCount = 3 + Math.floor(foregroundRandom() * 3)
+    for (let blade = 0; blade < bladeCount; blade++) {
+      const e = east + (foregroundRandom() - 0.5) * 0.09
+      const n = north + (foregroundRandom() - 0.5) * 0.09
+      const height = stature * (0.58 + foregroundRandom() * 0.64)
+      const direction = angle + blade * 2.13 + foregroundRandom() * 0.72
+      const width = 0.004 + foregroundRandom() ** 1.6 * 0.015
+      // Check the complete projected ribbon against the same retained cuts.
+      const footprint = [[0, -0.5], [0, 0.5], [0.17, -0.29], [0.17, 0.29], [0.66, 0]]
+      if (footprint.some(([lean, side]) => !clear(e - Math.sin(direction) * height * lean! + Math.cos(direction) * width * side!,
+        n - Math.cos(direction) * height * lean! - Math.sin(direction) * width * side!))) continue
+      tuftBlade(plantBatch, heightAt, e, n, height, direction, width, colour)
+      foregroundBlades++
+    }
+    if (foregroundRandom() < 0.35) {
+      const height = Math.min(0.19 + foregroundRandom() * 0.29, edge < 1.3 ? 0.22 : 0.48)
+      const reach = height * 0.10 + 0.016
+      if (clear(east, north, reach)) {
+        seedStalk(plantBatch, heightAt, east, north, height, angle, LEAVES[2]!.clone().multiplyScalar(0.88 + foregroundRandom() * 0.18))
+        seedStalks++
+      }
+    }
+    foregroundTufts++
+  }
+
+  const plants = meshFrom(plantBatch, 'vinci October grass and uneven leaf litter')
+  group.add(...partitionGroundDressing(plants, calm ? 1 : 4, calm ? 0 : 8))
   group.add(meshFrom(mineralBatch, 'vinci pale mineral path-edge gravel'))
-  group.userData['draws'] = 2
+  group.userData['draws'] = group.children.length
   group.userData['triangles'] = (plantBatch.positions.length + mineralBatch.positions.length) / 9
-  group.userData['counts'] = { tufts, grassBlades: tufts * 3, leaves, chips }
+  group.userData['counts'] = { tufts: tufts + foregroundTufts, grassBlades: tufts * 3 + foregroundBlades, foregroundTufts, foregroundBlades, seedStalks, leaves, chips }
   group.userData['tier'] = tier
   group.userData['patches'] = PATCHES.map(p => ({ ...p }))
+  group.userData['foregroundPatches'] = FOREGROUND_PATCHES.map(p => ({ ...p }))
   group.userData['excluded'] = ['cadastre', 'build envelope', 'mapped annexes', 'courtyard', 'terrace', 'street', 'street grade', 'house-side apron', 'gate approach', 'gate steps', 'garden descent', 'retained water cuts']
   return group
 }

@@ -3,12 +3,17 @@ import * as TSL from 'three/tsl'
 import { buildTerrainMeshes } from './terrain-mesh'
 import type { MaterialLibrary } from '../../stack/materials'
 import type { TierName } from '../../stack'
+import { roadSurfaceNode } from './road-dressing'
+import { foundationVisibility } from './foundation'
+import { collectionConcreteMaterial, collectionProvenance } from './collection'
+import { collectionAccessProvenance } from './collection-access'
 
 // TSL graphs retain three independent scales, even on calm's complete ground.
 const { positionWorld, positionView, normalWorldGeometry, cameraViewMatrix, mx_noise_float, mx_fractal_noise_float, mix, vec3, float, smoothstep, length, cameraPosition, normalMap, vec2, uv, fract, floor, dot } = TSL
 function rgb(hex:string) { const c=new Color(hex); return vec3(c.r,c.g,c.b) }
 export function groundMaterial(kind:'grass'|'earth'|'stone',library?:MaterialLibrary):MeshStandardNodeMaterial {
   const m=new MeshStandardNodeMaterial({roughness:0.96,side:DoubleSide})
+  m.aoNode=foundationVisibility()
   const P=positionWorld
   const broad=mx_fractal_noise_float(P.mul(.12),3,2,.5).mul(.5).add(.5).clamp(0,1)
   const mid=mx_noise_float(P.mul(kind==='grass'?5:11)).mul(.5).add(.5)
@@ -20,8 +25,39 @@ export function groundMaterial(kind:'grass'|'earth'|'stone',library?:MaterialLib
   const ny=mx_noise_float(P.mul(18).add(vec3(0,0,.2))).sub(mid).mul(.18)
   m.normalNode=normalMap(vec3(nx.add(.5),ny.add(.5),1),vec2(.4,.4))
   m.roughnessNode=fine.mul(.12).add(.84)
-  if(kind==='stone'){const U=uv(),row=floor(U.y.div(.30)),joint=fract(U.y.div(.30)).lessThan(.038).or(fract(U.x.div(.62).add(row.mod(2).mul(.5))).lessThan(.02));m.colorNode=m.colorNode!.mul(mix(float(1),float(.67),float(joint)));}
-  if(library&&kind!=='grass'){const maps=library.sync(kind==='stone'?'stone-tuffeau':'earth-packed').sample({uv:uv(),metres:kind==='stone'?.85:1.4});m.colorNode=m.colorNode!.mul(mix(float(1),maps.albedo.clamp(.35,1.8),kind==='stone'?.5:.7));m.normalNode=normalMap(maps.normal.mul(.5).add(.5),vec2(.36,.36))}
+  const earthMaps=library&&kind==='earth'?library.sync('earth-packed').sample({uv:uv(),metres:1.4}):undefined
+  if(earthMaps){m.colorNode=m.colorNode!.mul(mix(float(1),earthMaps.albedo.clamp(.35,1.8),.7));m.normalNode=normalMap(earthMaps.normal.mul(.5).add(.5),vec2(.36,.36))}
+  if(kind==='stone'){
+    // Each cut strip previously restarted a stretched local texture. A
+    // continuous horizontal tangent and true height now lay the whole wall.
+    const n=normalWorldGeometry,vertical=float(1).sub(smoothstep(.4,.8,n.y.abs()))
+    const axis=vec2(n.z,n.x.negate()).div(length(n.xz).max(.00001))
+    const U=vec2(mix(P.x,P.x.mul(axis.x).add(P.z.mul(axis.y)),vertical),mix(P.z,P.y,vertical))
+    const pixel=U.dFdx().abs().add(U.dFdy().abs()).max(vec2(.00001,.00001))
+    const worldPixel=length(P.dFdx()).add(length(P.dFdy())).max(.00001)
+    const resolved=(metres:number)=>smoothstep(2,4,float(metres).div(worldPixel))
+    const row=floor(U.y.div(.30)),cell=floor(U.x.div(.62).add(row.mod(2).mul(.5)))
+    const local=vec2(fract(U.x.div(.62).add(row.mod(2).mul(.5))).mul(.62),fract(U.y.div(.30)).mul(.30))
+    const edge=local.min(vec2(.62,.30).sub(local)),aa=pixel.mul(.65)
+    const seamX=float(1).sub(smoothstep(float(.006).sub(aa.x).max(0),float(.006).add(aa.x),edge.x))
+    const seamY=float(1).sub(smoothstep(float(.006).sub(aa.y).max(0),float(.006).add(aa.y),edge.y))
+    const seam=seamX.max(seamY)
+    const block=fract(cell.mul(31.71).add(row.mul(17.37)).sin().mul(43758.54)).sub(.5).mul(resolved(.30))
+    const drift=mx_noise_float(P.mul(.24)),cleft=mx_noise_float(P.mul(16)).mul(resolved(.0625))
+    const pores=smoothstep(.38,.68,mx_noise_float(P.mul(220))).mul(resolved(.0045))
+    const damp=float(1).sub(smoothstep(1.02,1.85,P.y)).mul(mx_noise_float(P.mul(vec3(1.2,.7,1.2))).mul(.3).add(.7))
+    let stone=rgb('#b8aa8e').mul(block.mul(.20).add(1)).mul(drift.mul(.14).add(1))
+      .mul(cleft.mul(.09).add(1)).mul(float(1).sub(pores.mul(.22)))
+    if(library){const maps=library.sync('stone-tuffeau').sample({uv:U,metres:.19,turn:.37});stone=stone.mul(mix(float(1),maps.albedo.clamp(.78,1.22),resolved(.03).mul(.40)))}
+    m.colorNode=mix(stone,rgb('#8c826d'),seam.mul(.58)).mul(float(1).sub(damp.mul(.15)))
+    m.roughnessNode=float(.89).add(cleft.mul(.035)).sub(damp.mul(.06)).clamp(.78,1)
+    const height=cleft.mul(.0009).sub(pores.mul(.0007)).sub(seam.mul(.0025)).toVar()
+    const viewNormal=n.transformDirection(cameraViewMatrix),sx=positionView.dFdx(),sy=positionView.dFdy()
+    const rx=sy.cross(viewNormal),ry=viewNormal.cross(sx),det=sx.dot(rx)
+    const gradient=rx.mul(height.dFdx()).add(ry.mul(height.dFdy())).mul(det.sign()).div(det.abs().max(1e-10)).toVar()
+    m.normalNode=viewNormal.sub(gradient.div(length(gradient).div(.32).max(1))).normalize()
+    m.userData['retainingAppearance']='GENERATED reconstruction choice: .62 × .30 m coursing [.45–.80 × .24–.38], 12 mm joints [8–18], shallow2.5mm joint relief [1–5]. Continuous world tangent, block variation, 4m weather drift, 6cm cleft and filtered4.5mm pores. Q001/Q124 masonry character; no measured historic retaining-wall bond or texture.'
+  }
   if(library&&kind==='grass'){const maps=library.sync('grass-short').sample({uv:uv(),metres:1.4,turn:.19});const grain=dot(maps.albedo,vec3(.2126,.7152,.0722)).clamp(.4,1.7);m.colorNode=m.colorNode!.mul(mix(float(1),grain,.62));m.normalNode=normalMap(vec3(maps.normal.xy.mul(.5),1).normalize().mul(.5).add(.5),vec2(.5,.5));m.roughnessNode=maps.roughness.mul(.08).add(.87)}
   if(kind==='earth'){
     // Conjectural exposed-soil appearance on the already declared cuts.
@@ -57,6 +93,20 @@ export function groundMaterial(kind:'grass'|'earth'|'stone',library?:MaterialLib
     m.normalNode=mix(m.normalNode! as ReturnType<typeof vec3>,n.sub(bounded).normalize(),bank).normalize()
     m.userData['bankAppearance']='GENERATED conjectural surface recipe: clod fields 0.01–0.12 m, erosion variation 0.12–1.55 m, combined height field bounded by 0.006 m with finer 0.00035 m grain. Existing CC0 earth-packed sampled at 0.38 m in blended continuous world projections. No altered cut outline, surveyed height, geological strata or period surface measurement.'
   }
+  if(kind==='earth'){
+    const flat=smoothstep(.90,.985,normalWorldGeometry.y.abs()),road=roadSurfaceNode(),mask=road.mask.mul(flat)
+    // Reuse the already sampled CC0 earth set. Its luminance ratio retains
+    // real grain without importing the preview's moss colour or new maps.
+    const ratio=earthMaps?dot(earthMaps.albedo,vec3(.2126,.7152,.0722)).clamp(.45,1.7):float(1)
+    m.colorNode=mix(m.colorNode!,road.colour.mul(mix(float(1),ratio,.88)),mask)
+    m.roughnessNode=mix(m.roughnessNode! as ReturnType<typeof float>,road.roughness,mask)
+    const h=road.height.toVar(),n=normalWorldGeometry.transformDirection(cameraViewMatrix)
+    const sx=positionView.dFdx(),sy=positionView.dFdy(),rx=sy.cross(n),ry=n.cross(sx),det=sx.dot(rx)
+    const gradient=rx.mul(h.dFdx()).add(ry.mul(h.dFdy())).mul(det.sign()).div(det.abs().max(1e-10))
+    const base=m.normalNode! as ReturnType<typeof vec3>,bounded=gradient.div(length(gradient).div(.25).max(1))
+    m.normalNode=mix(base,base.sub(bounded).normalize(),mask).normalize()
+    m.userData['roadAppearance']='GENERATED conjectural grey-beige compacted earth and mineral finish; existing library/earth-packed albedo and normals, retained 1.4 m map projection, 2.8 m compaction variation, 7 cm aggregate and 6 mm grit. Existing mapped corridor mask, wheel-track spacing and depth retained. Surface normals only, gradient bounded .25; no displaced terrain or new paving.'
+  }
   m.name=`wing-vinci/${kind}`
   return m
 }
@@ -66,7 +116,10 @@ export function createGround(tier:TierName,library?:MaterialLibrary):Group {
   const batches=buildTerrainMeshes(tier)
   for(const [name,geometry] of Object.entries(batches)) {
     const kind=name==='retaining'?'stone':name==='grass'?'grass':'earth'
-    const mesh=new Mesh(geometry,groundMaterial(kind,library));mesh.receiveShadow=true;mesh.name=`wing-vinci/${name}`;group.add(mesh)
+    const modern=name==='collectionRetaining'
+    const mesh=new Mesh(geometry,modern?collectionConcreteMaterial():groundMaterial(kind,library));mesh.receiveShadow=true;mesh.castShadow=name==='retaining'||modern;mesh.name=`wing-vinci/${name}`
+    if(modern){mesh.userData={manifestId:collectionProvenance.manifestId,assetClass:'GENERATED',certainty:'reconstructed',component:'collection-cut-and-fill-lining',label:collectionProvenance.approachLabel,accessLabel:collectionAccessProvenance.label};geometry.userData.basis=collectionProvenance.recipe+' '+collectionAccessProvenance.recipe}
+    group.add(mesh)
   }
   return group
 }
