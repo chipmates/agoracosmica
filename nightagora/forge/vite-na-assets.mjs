@@ -33,22 +33,51 @@ function findStore(from) {
 }
 
 export const STORE = process.env.NA_ASSET_STORE ?? findStore(APP_ROOT)
+/* THE APP'S OWN SCOPES. A wing's procedural materials and its geometry
+   prompts ARE its recipe: there are no bytes to keep outside the
+   repository, and the record belongs beside the code that produces it. So
+   a wing may carry `<app>/assets/<scope>/manifest.json` and the merge
+   reads it beside the store's scopes. It may hold nothing else: a scope
+   here with bytes in it would be the store moving into the public
+   repository, which is the one thing the Manifest Law forbids. */
+export const APP_ASSETS = process.env.NA_APP_ASSETS ?? join(APP_ROOT, 'assets')
 export const MERGED = join(APP_ROOT, 'public', 'na-manifest.json')
 
 const NOT_AN_ASSET = new Set(['manifest.json', '_download-log.json', '.DS_Store'])
 
-/** every scope folder of the store that carries a manifest */
-export function scopes() {
-  if (!existsSync(STORE)) return []
-  return readdirSync(STORE, { withFileTypes: true })
-    .filter((d) => d.isDirectory() && existsSync(join(STORE, d.name, 'manifest.json')))
+function scopesIn(root) {
+  if (!existsSync(root)) return []
+  return readdirSync(root, { withFileTypes: true })
+    .filter((d) => d.isDirectory() && existsSync(join(root, d.name, 'manifest.json')))
     .map((d) => d.name)
     .sort()
 }
 
-/** every real file of a scope, relative to the scope folder */
-export function filesOf(scope) {
-  const root = join(STORE, scope)
+/** the store's scopes */
+export function storeScopes() {
+  return scopesIn(STORE)
+}
+
+/** the app's own scopes, which carry procedural records and no bytes */
+export function appScopes() {
+  return scopesIn(APP_ASSETS)
+}
+
+/** every scope either root carries a manifest for */
+export function scopes() {
+  return [...new Set([...storeScopes(), ...appScopes()])].sort()
+}
+
+/** where a scope's record lives: the store, the app, or both */
+export function rootsOf(scope) {
+  const out = []
+  if (existsSync(join(STORE, scope, 'manifest.json'))) out.push({ origin: 'store', dir: join(STORE, scope) })
+  if (existsSync(join(APP_ASSETS, scope, 'manifest.json'))) out.push({ origin: 'app', dir: join(APP_ASSETS, scope) })
+  return out
+}
+
+/** every real file under a root, relative to it */
+function filesUnder(root) {
   const out = []
   const walk = (dir, prefix) => {
     if (!existsSync(dir)) return
@@ -63,20 +92,41 @@ export function filesOf(scope) {
   return out
 }
 
-/** the store's manifests, merged, each entry stamped with its scope */
+/** every real file of a scope IN THE STORE, relative to the scope folder */
+export function filesOf(scope) {
+  return filesUnder(join(STORE, scope))
+}
+
+/** every file an app-local scope carries besides its manifest. Anything in
+    this list is a byte of the museum inside the repository. */
+export function strayAppFiles(scope) {
+  return filesUnder(join(APP_ASSETS, scope))
+}
+
+/** Both records, merged, each entry stamped with its scope and its origin.
+    A wing writes its scope as `wing-<slug>` and its ids as `<slug>/...`, so
+    an entry that names itself by the short form is the same scope said the
+    other way and is normalised here rather than failing the check. */
 export function mergeManifests() {
   const assets = []
   const problems = []
-  for (const scope of scopes()) {
-    let doc
-    try {
-      doc = JSON.parse(readFileSync(join(STORE, scope, 'manifest.json'), 'utf8'))
-    } catch (err) {
-      problems.push(`${scope}/manifest.json is not readable JSON: ${err.message}`)
-      continue
+  const all = scopes()
+  for (const scope of all) {
+    const short = scope.replace(/^wing-/, '')
+    for (const { origin, dir } of rootsOf(scope)) {
+      let doc
+      try {
+        doc = JSON.parse(readFileSync(join(dir, 'manifest.json'), 'utf8'))
+      } catch (err) {
+        problems.push(`${origin}:${scope}/manifest.json is not readable JSON: ${err.message}`)
+        continue
+      }
+      const list = Array.isArray(doc) ? doc : (doc.assets ?? [])
+      for (const e of list) {
+        const named = e.wing ?? scope
+        assets.push({ ...e, wing: named === short ? scope : named, origin })
+      }
     }
-    const list = Array.isArray(doc) ? doc : (doc.assets ?? [])
-    for (const e of list) assets.push({ ...e, wing: e.wing ?? scope })
   }
   return { assets, problems }
 }

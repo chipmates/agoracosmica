@@ -16,10 +16,27 @@
 // record is held by another pipeline. It is listed as OPEN, counted, and
 // carried into every gate report. A wing scope may never use it, so no wing
 // can ship on the exception the lobby needed.
+//
+// A scope's record may also live in the APP, at <app>/assets/<scope>/
+// manifest.json, for a wing's own procedural materials and geometry
+// prompts. Every rule above applies to those entries unchanged. Two do not
+// apply, because a repository is not a store: an app-local scope may hold
+// no file besides its manifest, and an app-local entry that is not
+// GENERATED belongs in the store instead.
 import { createHash } from 'node:crypto'
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
-import { filesOf, mergeManifests, scopes, STORE, APP_ROOT } from './vite-na-assets.mjs'
+import {
+  APP_ASSETS,
+  APP_ROOT,
+  appScopes,
+  filesOf,
+  mergeManifests,
+  scopes,
+  storeScopes,
+  strayAppFiles,
+  STORE,
+} from './vite-na-assets.mjs'
 
 const JSON_OUT = process.argv.includes('--json')
 const QUIET = process.argv.includes('--quiet') || JSON_OUT
@@ -28,7 +45,7 @@ const QUIET = process.argv.includes('--quiet') || JSON_OUT
 // clone with no store still builds and says why, and the gate report fails
 // on the missing store instead, so the arm can never silence the check by
 // moving a folder.
-if (!existsSync(STORE)) {
+if (!existsSync(STORE) && !appScopes().length) {
   const said = { store: null, ok: true, reason: `no asset store at ${STORE}`, assets: 0, errors: [] }
   console.log(JSON_OUT ? JSON.stringify(said, null, 2) : said.reason)
   process.exit(0)
@@ -54,6 +71,7 @@ for (const e of assets) {
 }
 
 const scopeList = scopes()
+const local = new Set(appScopes())
 for (const e of assets) {
   const where = `${e.id}`
   if (!e.path) errors.push(`${where}: no path`)
@@ -72,13 +90,23 @@ for (const e of assets) {
   }
   if (e.record === 'open' && e.wing !== 'lobby')
     errors.push(`${where}: an open record is only ever an inherited lobby asset`)
+  // the app's own record is the recipe of something the code makes; a
+  // captured or licensed asset is bytes, and bytes live in the store
+  if (e.origin === 'app' && e.class !== 'GENERATED')
+    errors.push(`${where}: a ${e.class} asset is recorded in the store, not in the repository`)
+}
+
+// the repository holds the record and never the art
+for (const scope of local) {
+  for (const stray of strayAppFiles(scope))
+    errors.push(`assets/${scope}/${stray} is a byte of the museum inside the repository: move it to the store`)
 }
 
 // ----------------------------------------------------- the bytes on disk
 const sha = (file) => createHash('sha256').update(readFileSync(file)).digest('hex')
 const claimed = new Map() // scope -> Set of relative paths a manifest names
 
-for (const scope of scopeList) {
+for (const scope of storeScopes()) {
   const named = new Set()
   for (const e of assets.filter((a) => a.wing === scope)) {
     if (e.path.endsWith('/') || e.path.includes('*')) continue // a set or a family
@@ -190,7 +218,8 @@ const rows = assets.map((e) => ({
   id: e.id,
   class: e.class,
   wing: e.wing,
-  shown: resolved.has(e.id) ? 'on the path' : 'in the store',
+  record_in: e.origin ?? 'store',
+  shown: resolved.has(e.id) ? 'on the path' : e.origin === 'app' ? 'in the record' : 'in the store',
   record: e.record === 'open' ? 'OPEN' : e.class === 'GENERATED' ? (e.model ?? '') : (e.holder ?? ''),
   licence: e.licence,
 }))
@@ -201,13 +230,18 @@ if (!QUIET) {
     ['id', w('id', 2)],
     ['class', w('class', 5)],
     ['wing', w('wing', 4)],
+    ['record_in', w('record_in', 9)],
     ['shown', w('shown', 5)],
     ['record', w('record', 6)],
   ]
   console.log(cols.map(([k, n]) => k.toUpperCase().padEnd(n)).join('  '))
   for (const r of rows) console.log(cols.map(([k, n]) => String(r[k]).padEnd(n)).join('  '))
   console.log('')
-  console.log(`${assets.length} asset(s) in ${scopeList.length} scope(s), ${resolved.size} on the path`)
+  const fromApp = assets.filter((e) => e.origin === 'app').length
+  console.log(
+    `${assets.length} asset(s) in ${scopeList.length} scope(s), ${resolved.size} on the path` +
+      (fromApp ? `, ${fromApp} recorded in the app` : '')
+  )
   for (const line of open) console.log(`OPEN RECORD  ${line}`)
   if (errors.length) {
     console.log('MANIFEST CHECK FAILED:')
@@ -224,6 +258,8 @@ if (JSON_OUT)
         store: STORE,
         scopes: scopeList,
         assets: assets.length,
+        appScopes: [...local],
+        appAssets: assets.filter((e) => e.origin === 'app').length,
         onThePath: [...resolved.keys()],
         openRecords: open,
         errors,
