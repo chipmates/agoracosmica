@@ -11,12 +11,27 @@ export interface SignPlace {
 }
 
 export function seatSigns(places: SignPlace[], width: number, height: number): void {
+  const wide = width / height >= 0.9
   for (const p of places) {
     if (!p.chip || p.starX === undefined || p.starY === undefined) continue
-    // First repair: the full Goethe name must not contain Dickinson's star.
-    if (p.chip.slug === 'goethe' && width / height >= 0.9) {
-      p.y = p.starY + 64
-      p.above = false
+    // The swan's names sit outside its feathers, like marginal lettering
+    // around an atlas figure. Leaders keep every name on its own bone.
+    if (wide) {
+      if (p.chip.slug === 'goethe') {
+        p.x = p.starX + p.half + 88
+        p.y = p.starY + 70
+      } else if (p.chip.slug === 'woolf') {
+        p.x = p.starX - p.half - 90
+        p.y = p.starY + 18
+      } else if (p.chip.slug === 'dickinson') {
+        p.x = p.starX + p.half + 92
+        p.y = p.starY - 24
+      } else if (p.chip.slug === 'angelou') {
+        p.y = p.starY - 62
+      }
+    } else if (p.chip.slug === 'woolf') {
+      p.x = p.starX - 36
+      p.y = p.starY + 50
     }
     p.chip.el.style.left = `${p.x}px`
     p.chip.el.style.top = `${p.y}px`
