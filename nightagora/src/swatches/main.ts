@@ -83,11 +83,14 @@ const isSky = (name: string): boolean => SKIES.includes(name)
    as well, one at 0.56 and one at 0.66. */
 const KEY = { azimuth: 155, elevation: 30 }
 
-/* WHAT EACH FAMILY IS READ UNDER. Everything but the metals takes the
-   overcast dome, which is the light a source's own preview render is made
-   under and therefore the only honest light to compare one against. The
-   metals take the warm afternoon, and the frame says so. */
-const PROBE_FOR = { metal: 'sky-afternoon-warm', other: 'sky-overcast' }
+/* ONE PROBE FOR THE WHOLE LIBRARY, and it is the overcast day: the light a
+   source's own preview render is made under, and therefore the only honest
+   light to compare one against. What the metals needed was never another
+   sky, it was this one arriving whole. They get the probe at full strength
+   and the background sharp, because a metal is judged on what it reflects
+   and a blurred dome is nothing to reflect. `?sky=` reads any set under any
+   of the three. */
+const PROBE = 'sky-overcast'
 
 /* NEUTRAL ON PURPOSE. A swatch is compared against a photograph, so the look
    has to be the plainest the chain can be: no split, almost no vignette,
@@ -104,12 +107,27 @@ const PLAIN: Grade = {
   grain: 0.006,
   bloom: { strength: 0.16, radius: 0.4, threshold: 0.92, warmth: 0 },
 }
-/** what each sky is read at, so that no frame is graded by its own exposure */
+/** what a sky is read at as a swatch of its own */
 const EXPOSURE: Record<string, number> = {
   'sky-overcast': 0.62,
   'sky-afternoon-warm': 0.34,
   'sky-night-moon': 2.6,
 }
+/** and what a set is read at under it. A metal returns almost everything the
+    sky sends it, so the same exposure that shows an overcast stone as stone
+    shows a sheet of gold as white paper. */
+const SET_EXPOSURE: Record<string, number> = {
+  'sky-overcast': 0.62,
+  'sky-afternoon-warm': 0.34,
+  'sky-night-moon': 2.6,
+}
+const METAL_EXPOSURE: Record<string, number> = {
+  'sky-overcast': 0.34,
+  'sky-afternoon-warm': 0.15,
+  'sky-night-moon': 1.6,
+}
+const exposureFor = (sky: string, metal: boolean): number =>
+  (metal ? METAL_EXPOSURE[sky] : SET_EXPOSURE[sky]) ?? PLAIN.exposure
 
 const canvas = document.getElementById('stage') as HTMLCanvasElement
 const nameEl = document.getElementById('name') as HTMLElement
@@ -136,8 +154,19 @@ for (const name of [...SETS, ...SKIES]) {
 
 const scene = new Scene()
 const camera = new PerspectiveCamera(40, innerWidth / innerHeight, 0.1, 60)
-camera.position.set(-0.15, 1.24, 4.35)
-camera.lookAt(0.28, 0.86, -0.4)
+/* two seats, and only two. A set is read from the first, always, so that
+   twenty-two frames are one comparison; a sky is read from the second, which
+   stands closer to the two balls it is read on. */
+const SEAT = {
+  set: { at: [-0.15, 1.24, 4.35], to: [0.28, 0.86, -0.4] },
+  sky: { at: [-0.15, 1.06, 3.5], to: [-0.15, 0.6, 0] },
+} as const
+function seat(which: 'set' | 'sky'): void {
+  const s = SEAT[which]
+  camera.position.set(s.at[0], s.at[1], s.at[2])
+  camera.lookAt(s.to[0], s.to[1], s.to[2])
+}
+seat('set')
 
 const stack: Stack = await createStack({ canvas })
 stack.setScene(scene, camera, PLAIN)
@@ -217,10 +246,12 @@ async function probe(name: string): Promise<SkyProbe | null> {
 let readUnder = ''
 
 async function showSet(name: string): Promise<void> {
+  seat('set')
   const set: MaterialSet = await stack.materials.load(name)
-  const wanted = skyAsked ?? (set.cls === 'metal' ? PROBE_FOR.metal : PROBE_FOR.other)
+  const wanted = skyAsked ?? PROBE
   const sky = await probe(wanted)
-  stack.setScene(scene, camera, { ...PLAIN, exposure: EXPOSURE[wanted] ?? PLAIN.exposure })
+  const metal = set.cls === 'metal'
+  stack.setScene(scene, camera, { ...PLAIN, exposure: exposureFor(wanted, metal) })
 
   if (sky) {
     stack.light({
@@ -244,9 +275,9 @@ async function showSet(name: string): Promise<void> {
     /* a metal is judged on what it reflects, so the background it reflects is
        shown sharp; a stone is judged on itself, and a legible landscape
        behind it is only a distraction */
-    scene.backgroundBlurriness = set.cls === 'metal' ? 0 : 0.55
-    scene.backgroundIntensity = set.cls === 'metal' ? 0.5 : 0.16
-    scene.environmentIntensity = set.cls === 'metal' ? 1 : 0.62
+    scene.backgroundBlurriness = metal ? 0 : 0.55
+    scene.backgroundIntensity = metal ? 0.5 : 0.16
+    scene.environmentIntensity = metal ? 1 : 0.62
     readUnder = `${wanted}, sun at ${sky.sun.azimuth.toFixed(0)}° turned to ${KEY.azimuth}°`
   } else {
     stack.light({ ...KEY, kelvin: 5200, lux: 300, ambient: 1 })
@@ -276,12 +307,14 @@ async function showSet(name: string): Promise<void> {
     `${set.cls} · roughness ${set.roughness} · metalness ${set.metalness} · ` +
     `macro ${d.macro * 100} cm at ${d.macroContrast} · ` +
     `mid ${d.mid ? `${Math.round(d.mid * 100)} cm` : 'none'} · micro ${d.micro} · ` +
+    `exposure ${exposureFor(wanted, metal).toFixed(2)} · ` +
     `${cost.textureMB.toFixed(1)} MB held · ${readUnder}`
   plateImg.src = `${ASSET_BASE}${entry.wing}/${entry.path}reference.jpg`
   plateCap.textContent = "the source's own preview render"
 }
 
 async function showSky(name: string): Promise<void> {
+  seat('sky')
   const sky = await probe(name)
   stack.setScene(scene, camera, { ...PLAIN, exposure: EXPOSURE[name] ?? PLAIN.exposure })
   for (const [mesh] of bodies) mesh.visible = false

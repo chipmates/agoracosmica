@@ -153,7 +153,16 @@ export function detailNodes(set: MaterialSet, opts: DetailScales = {}): DetailNo
   const h = (o: N): N => mx_noise_float(P.add(o).div(mid))
   const dx = h(vec3(eps, 0, 0)).sub(h(vec3(-eps, 0, 0)))
   const dz = h(vec3(0, 0, eps)).sub(h(vec3(0, 0, -eps)))
-  const relief = midBand ? density.mul(midAmt * set.normalStrength) : float(0)
+  /* AND ONLY A SCATTERING SURFACE CARRIES INVENTED RELIEF. At full amplitude
+     this normal tilts by some fourteen degrees. On a rough stone that is a
+     shadow; on a mirror it is a different piece of sky, and the plane breaks
+     into camouflage, which is what the first reading found on all three
+     metals. A metal is a mirror at every roughness, because it has no
+     diffuse term for the swing to hide in, so it takes none of this term and
+     keeps only the relief its own photograph carries. */
+  const scatter =
+    (1 - set.metalness) * Math.min(1, Math.max(0, (set.roughness - 0.12) / 0.28))
+  const relief = midBand ? density.mul(midAmt * set.normalStrength * scatter) : float(0)
   let normal: N = normalize(vec3(dx.mul(relief), dz.mul(relief), float(1)))
 
   // 3 · micro: not visible as shape, only as the way the light sits
