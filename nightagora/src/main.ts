@@ -555,6 +555,10 @@ declare global {
           figure?: string
           /** which wing a `wing` or `pane` state stands in */
           slug?: string
+          /** which station of that wing, by its own id or by index */
+          station?: string
+          /** a named composition at that station */
+          view?: string
           /** Shell close-ups for THE EYES; the journey uses real input. */
           shell?: 'instruments'
         }
@@ -623,27 +627,29 @@ declare global {
   }
 }
 // ---- THE MUSEUM'S ROUTE: / is the lobby, /w/<slug> is a wing ----
-const wingFrame = createWingFrame(wingEl, () => toLobby())
+const wingFrame = createWingFrame(wingEl, () => toLobby(), stack, () => performance.now() / 1000)
 let wingSlug = ''
 
 /** A wing's own address, with the station the visitor stood at. */
-function wingPath(): { slug: string; station: number } | null {
+function wingPath(): { slug: string; station: number | string } | null {
   const m = /^\/w\/([a-z0-9-]{1,64})\/?$/.exec(location.pathname)
   return m?.[1] === undefined ? null : { slug: m[1], station: stationFromHash() }
 }
 
 /** Stand in a wing. The overture is never replayed to get here. */
-async function openWing(slug: string, at: number): Promise<void> {
+async function openWing(slug: string, at: number | string, view?: string): Promise<void> {
   const entry = wingBySlug(slug)
   if (!entry) {
     toLobby()
     return
   }
   wingSlug = slug
-  setPhase('wing') // the room is claimed before its module arrives
+  // the room is claimed before its module arrives, and only once: claiming
+  // it again between two stations strikes the wing that is standing
+  if (phase !== 'wing') setPhase('wing')
   const mod = await entry.load()
   if (wingSlug !== slug) return // the visitor left while it loaded
-  wingFrame.open(entry, mod.createWing(), at)
+  wingFrame.open(entry, mod.createWing(), at, view)
 }
 
 /** One gold breath, then a hard cut into the wing that was chosen. */
@@ -696,7 +702,9 @@ window.__forge = {
     document.body.dataset['forge'] = 'pending'
     forgeLook = null // a new state is looked at straight on
     const p: Phase = state === 'pane' ? 'wheel' : state
-    setPhase(p)
+    // a jump from one station of a wing to another is not a new night: the
+    // phase is only re-entered when the state or the wing actually changes
+    if (p !== 'wing' || phase !== 'wing' || (opts.slug && opts.slug !== wingSlug)) setPhase(p)
     // each jump is a single composed moment: no scene leaks across
     if (p !== 'breath') breath.stop()
     window.clearTimeout(voiceTimerA)
@@ -746,7 +754,7 @@ window.__forge = {
     }
     if (p !== 'agora' && p !== 'wheel' && p !== 'descent')
       camera.rotation.set(0, 0, 0)
-    railEl.hidden = p === 'transit' || p === 'held' || p === 'breath'
+    railEl.hidden = p === 'transit' || p === 'held' || p === 'breath' || p === 'wing'
     if (opts.keeper) {
       keeperEl.hidden = false
       keeperScene.forgeStage(opts.keeper)
@@ -759,7 +767,7 @@ window.__forge = {
     if (p === 'wing') {
       // a wing loads its own module, so this state lands a frame later:
       // the rig waits on the marker rather than on a guessed delay
-      void openWing(opts.slug ?? WINGS[0]?.slug ?? '', 0).then(() => {
+      void openWing(opts.slug ?? WINGS[0]?.slug ?? '', opts.station ?? 0, opts.view).then(() => {
         document.body.dataset['forge'] = state
       })
       return
@@ -786,6 +794,12 @@ window.__forge = {
     return DISCLOSURES
   },
   look(yaw, pitch) {
+    // a wing drives its own camera, so the cone of a station is turned
+    // there and never on the lobby's seated eye
+    if (phase === 'wing') {
+      wingFrame.look(yaw * DEG, pitch * DEG)
+      return
+    }
     // the rig looks where a hand could look, and past it: the cone of a
     // station is the envelope being inspected, not the damping that
     // returns a resting gaze to centre
@@ -824,10 +838,10 @@ window.__forge = {
       draws: renderer.info.render.drawCalls,
       tris: renderer.info.render.triangles,
       cam: {
-        p: camera.position.toArray(),
-        r: camera.rotation.toArray().slice(0, 3),
-        fov: camera.fov,
-        proj: camera.projectionMatrix.elements.slice(0, 4),
+        p: (phase === 'wing' ? wingFrame.camera() : camera).position.toArray(),
+        r: (phase === 'wing' ? wingFrame.camera() : camera).rotation.toArray().slice(0, 3),
+        fov: (phase === 'wing' ? wingFrame.camera() : camera).fov,
+        proj: (phase === 'wing' ? wingFrame.camera() : camera).projectionMatrix.elements.slice(0, 4),
       },
     }
   },
@@ -1187,6 +1201,7 @@ function frame(now: number): void {
   const pitch = forgeLook ? forgeLook.pitch : dragPitch + idlePitch - freeLookY * 0.018
   camera.rotation.y += yaw
   camera.rotation.x += pitch
+  if (phase === 'wing') wingFrame.update(dt)
   stack.render(dt)
   camera.rotation.x = baseRx
   camera.rotation.y = baseRy

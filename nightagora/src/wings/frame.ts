@@ -15,16 +15,33 @@
      where they stood, and the way home lands at the wheel, never at the
      overture. */
 
+import { PerspectiveCamera, Scene } from 'three/webgpu'
 import { WING_TEXT, lang, say } from './content'
 import type { WingEntry } from './registry'
+import type { Stack } from '../stack'
 
 const APP_ORIGIN = 'https://agoracosmica.org'
+
+/** The room a wing is drawn in: its own scene and camera, the museum's one
+    stack, and the wall clock its motion runs on. The frame owns all four,
+    so thirty wings render through one renderer and one post chain. */
+export interface WingWorld {
+  scene: Scene
+  camera: PerspectiveCamera
+  stack: Stack
+  clock: () => number
+}
 
 export interface WingHosts {
   /** the layer a wing hangs its own labels in */
   labels: HTMLElement
   /** the wing's own surface, under the stack's light */
   stage: HTMLElement
+  /** the scene, the camera, the stack and the clock */
+  world: WingWorld
+  /** move along the rail from inside the wing, so a wheel or a swipe over
+      the stage and a click on the rail arrive at the same station */
+  navigate: (index: number) => void
 }
 
 export interface WingStation {
@@ -44,10 +61,17 @@ export interface WingModule {
   show(index: number, hosts: WingHosts): void
   /** strike everything the wing put on the page */
   stop(): void
+  /** one frame of the wing's own time, when it holds a living stage */
+  update?(dt: number): void
+  /** a named composition at the standing station, for the eye and the rig */
+  view?(id: string): void
+  /** the gaze, in radians, when the wing drives its own camera */
+  look?(yaw: number, pitch: number): void
 }
 
 export interface WingFrame {
-  open(entry: WingEntry, wing: WingModule, at: number): void
+  /** `at` is a station's index or its id; `view` is a named composition */
+  open(entry: WingEntry, wing: WingModule, at: number | string, view?: string): void
   goto(index: number): void
   /** stand at a station by its id. False when this wing has no such
       station, so a caller can say so instead of shooting the wrong one. */
@@ -64,12 +88,22 @@ export interface WingFrame {
   /** the door as it stands right now: where it goes and what it asks, so a
       walk can record what a visitor's click would have opened */
   doorHere(): { href: string; question: string }
+  /** one frame of the wing's own time */
+  update(dt: number): void
+  /** the gaze a hand or the rig asks for, in radians */
+  look(yaw: number, pitch: number): void
+  /** the camera the wing is seen through, which is what telemetry reads */
+  camera(): PerspectiveCamera
 }
 
-/** The station the URL is standing at, or 0. The hash is the return path. */
-export function stationFromHash(): number {
-  const m = /(?:^|[#&])s=(\d+)/.exec(location.hash)
-  const n = m?.[1] === undefined ? 0 : Number(m[1])
+/** The station the URL is standing at, or 0. The hash is the return path,
+    and it is written as an index; a station's own id is read as well, so a
+    link written by hand stands where its name says. */
+export function stationFromHash(): number | string {
+  const value = /(?:^|[#&])s=([a-z0-9-]+)/.exec(location.hash)?.[1]
+  if (value === undefined) return 0
+  if (!/^\d+$/.test(value)) return value
+  const n = Number(value)
   return Number.isInteger(n) && n >= 0 ? n : 0
 }
 
@@ -103,17 +137,40 @@ function el<K extends keyof HTMLElementTagNameMap>(
   return n
 }
 
-export function createWingFrame(host: HTMLElement, onLobby: () => void): WingFrame {
+export function createWingFrame(
+  host: HTMLElement,
+  onLobby: () => void,
+  stack: Stack,
+  clock: () => number
+): WingFrame {
+  const world: WingWorld = {
+    scene: new Scene(),
+    camera: new PerspectiveCamera(46, innerWidth / innerHeight, 0.08, 1100),
+    stack,
+    clock,
+  }
   const labels = el('div', 'wing-labels')
   labels.setAttribute('aria-hidden', 'true')
   const stage = el('div', 'wing-stage')
 
   const lobby = el('button', 'wing-lobby', say(WING_TEXT.lobby))
   lobby.type = 'button'
+  lobby.style.cssText = 'position:static;flex:0 0 auto'
   lobby.addEventListener('click', () => onLobby())
 
+  /* THE RAIL IS ONE MARK, not two. The way home and the stations stand in
+     one group, and only the inner track scrolls, so a wing with nineteen
+     stations keeps 44 px targets and the frame keeps one persistent mark
+     where a lobby button beside a rail would have made two. */
+  const railGroup = el('div', 'wing-rail-group')
+  railGroup.style.cssText =
+    'position:fixed;left:50%;transform:translateX(-50%);bottom:var(--wing-rail-bottom,calc(168px + env(safe-area-inset-bottom)));max-width:calc(100vw - 32px);display:flex;align-items:center'
+  railGroup.dataset['naPersistent'] = ''
   const rail = el('nav', 'wing-rail')
   rail.setAttribute('aria-label', say(WING_TEXT.rail))
+  rail.style.cssText =
+    'position:relative;left:auto;transform:none;bottom:auto;min-width:0;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;justify-content:flex-start'
+  railGroup.append(lobby, rail)
 
   const question = el('p', 'wing-question')
   const door = el('a', 'wing-door', say(WING_TEXT.door))
@@ -127,7 +184,7 @@ export function createWingFrame(host: HTMLElement, onLobby: () => void): WingFra
   const doorBlock = el('div', 'wing-doorblock')
   doorBlock.append(question, door, note)
 
-  host.append(stage, labels, rail, doorBlock, lobby)
+  host.append(stage, labels, railGroup, doorBlock)
 
   let entry: WingEntry | null = null
   let wing: WingModule | null = null
@@ -145,6 +202,8 @@ export function createWingFrame(host: HTMLElement, onLobby: () => void): WingFra
     for (let i = 0; i < stations.length; i++) {
       const b = el('button', 'wing-step')
       b.type = 'button'
+      b.style.flex = '0 0 44px'
+      b.dataset['station'] = idAt(i)
       b.setAttribute(
         'aria-label',
         `${say(WING_TEXT.station)} ${i + 1} · ${stations[i]?.name ?? ''}`
@@ -160,12 +219,14 @@ export function createWingFrame(host: HTMLElement, onLobby: () => void): WingFra
     const count = wing.stations.length
     index = Math.min(Math.max(n, 0), Math.max(0, count - 1))
     const station = wing.stations[index]
-    wing.show(index, { labels, stage })
+    wing.show(index, { labels, stage, world, navigate: goto })
     question.textContent = station?.question ?? ''
     door.href = doorUrl(entry)
     for (let i = 0; i < rail.children.length; i++) {
       rail.children[i]?.setAttribute('aria-current', i === index ? 'true' : 'false')
     }
+    const selected = rail.children[index] as HTMLElement | undefined
+    if (selected) rail.scrollLeft = selected.offsetLeft - rail.clientWidth / 2 + 22
     // the return path: a reload stands the visitor where they stood
     const hash = count > 1 || index > 0 ? `#s=${index}` : ''
     const url = `/w/${entry.slug}${location.search}${hash}`
@@ -184,13 +245,25 @@ export function createWingFrame(host: HTMLElement, onLobby: () => void): WingFra
   }
 
   return {
-    open(nextEntry, nextWing, at) {
+    open(nextEntry, nextWing, at, view) {
+      /* THE SAME WING IS NOT REBUILT. A jump between two stations of the
+         wing already standing arrives here as a second open; rebuilding
+         would throw away the scene and every compiled material to show a
+         room next door. The module that is standing is kept and the fresh
+         one is dropped, so a wing may allocate only in `show`. */
+      const reuse = entry?.slug === nextEntry.slug && wing !== null
+      if (!reuse) wing?.stop()
       entry = nextEntry
-      wing = nextWing
+      if (!reuse) wing = nextWing
       index = 0
       host.hidden = false
       paintRail()
-      goto(at)
+      if (typeof at === 'string') {
+        if (!gotoId(at)) goto(0)
+      } else {
+        goto(at)
+      }
+      if (view) wing?.view?.(view)
     },
     goto,
     gotoId,
@@ -211,5 +284,12 @@ export function createWingFrame(host: HTMLElement, onLobby: () => void): WingFra
       href: door.href,
       question: question.textContent ?? '',
     }),
+    update(dt) {
+      world.camera.aspect = innerWidth / innerHeight
+      world.camera.updateProjectionMatrix()
+      wing?.update?.(dt)
+    },
+    look: (yaw, pitch) => wing?.look?.(yaw, pitch),
+    camera: () => world.camera,
   }
 }
