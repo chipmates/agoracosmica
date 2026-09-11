@@ -1326,14 +1326,18 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
     timberMat.vertexNode = c
     const local = varying(positionLocal)
     const end = smoothstep(0.8, 0.95, abs(varying(normalLocal.x)))
-    const radius = length(local.yz).div(0.055)
-    const ring = pow(abs(sin(radius.mul(30).add(sn(local.mul(95)).mul(0.8)))), 6)
+    const radius = length(vec2(local.y.add(0.007), local.z.sub(0.005))).div(0.055)
+    const ringPhase = radius.mul(28).add(sn(vec3(local.y.mul(28), local.z.mul(28), tint.mul(9))).mul(0.65))
+    const ring = pow(abs(sin(ringPhase)), 6).mul(oneMinus(smoothstep(0.4, 1.8, fwidth(ringPhase))))
     const fibres = vn(vec3(local.x.mul(9), local.y.mul(280), local.z.mul(280)))
-    const bark = c3(TIMBER, 0.36).mul(fibres.mul(0.8).add(0.3))
+    const furrow = pow(oneMinus(vn(vec3(local.x.mul(4), local.y.mul(60), local.z.mul(60)))), 3)
+    const bark = c3(TIMBER, 0.72).mul(fibres.mul(0.25).add(0.6).sub(furrow.mul(0.42)))
     const cut = hex3('#b3956a').mul(oneMinus(ring.mul(0.36)))
-      .mul(oneMinus(smoothstep(0.82, 0.99, radius).mul(0.62)))
+      .mul(oneMinus(smoothstep(0.82, 0.99, radius).mul(0.35)))
     const alb = mix(bark, cut, end).mul(tint)
-    const light = c3(SKY_AMB, 0.015).add(c3(FIRE_WARM).mul(firelight(world, 4.8, 2)).mul(facing(world, normal, 0.7)).mul(0.72))
+    // The cut ends see the fire bounced from the stone beneath them.
+    const light = c3(SKY_AMB, 0.024).add(c3(FIRE_WARM).mul(firelight(world, 4.8, 2))
+      .mul(facing(world, normal, 0.7).mul(0.65).add(0.16)))
     timberMat.colorNode = shoulder(alb.mul(light)).add(dith(0.002)).mul(uR)
   }
   {
@@ -1346,16 +1350,52 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
         items.push({
           p: [
             WOODPILE.x + acr * Math.cos(0.5) + (rnd() - 0.5) * 0.02,
-            FLOOR_Y + 0.052 + row * 0.098,
+            FLOOR_Y + 0.069 + row * 0.098,
             WOODPILE.z - acr * Math.sin(0.5) + (rnd() - 0.5) * 0.02,
           ],
-          s: [1, 0.85 + rnd() * 0.3, 1],
+          s: [0.8 + rnd() * 0.36, 0.85 + rnd() * 0.3, 0.87 + rnd() * 0.22],
           r: 0.5 + Math.PI / 2 + (rnd() - 0.5) * 0.14,
           tint: 0.82 + rnd() * 0.4,
         })
       }
     }
-    field(new CylinderGeometry(0.048, 0.055, 0.56, 18, 3).rotateZ(Math.PI / 2), timberMat, items)
+    const yaw = 0.5 + Math.PI / 2
+    // Two low sleepers bed the stack; loose bark gathers at its feet.
+    for (const t of [-0.19, 0.19]) items.push({
+      p: [WOODPILE.x + t * Math.cos(yaw), FLOOR_Y + 0.014, WOODPILE.z - t * Math.sin(yaw)],
+      s: [0.94, 0.25, 0.34], r: 0.5, tint: 0.78,
+    })
+    for (let i = 0; i < 10; i++) {
+      const a = rnd() * Math.PI * 2
+      const reach = 0.26 + rnd() * 0.15
+      items.push({p: [WOODPILE.x + Math.cos(a) * reach, FLOOR_Y + 0.006, WOODPILE.z + Math.sin(a) * reach],
+        s: [0.12 + rnd() * 0.12, 0.1, 0.25 + rnd() * 0.3], r: rnd() * Math.PI, tint: 0.7 + rnd() * 0.3})
+    }
+    const timber = new CylinderGeometry(0.048, 0.055, 0.56, 18, 3).rotateZ(Math.PI / 2)
+    const p = timber.getAttribute('position')
+    for (let i = 0; i < p.count; i++) {
+      const x = p.getX(i), y = p.getY(i), z = p.getZ(i)
+      const a = Math.atan2(z, y)
+      const k = 1 + 0.11 * Math.sin(a * 3) + 0.05 * Math.sin(a * 7 + x * 4)
+      p.setY(i, y * k); p.setZ(i, z * k)
+    }
+    timber.computeVertexNormals()
+    field(timber, timberMat, items)
+
+    const ropeMat = new MeshBasicNodeMaterial()
+    const { world, normal, tint, clip: c } = inkVertex()
+    ropeMat.vertexNode = c
+    const local = varying(positionLocal)
+    const fibre = vn(local.mul(190))
+    const alb = hex3('#ad9572').mul(fibre.mul(0.4).add(0.6)).mul(tint)
+    const light = c3(SKY_AMB, 0.024).add(c3(FIRE_WARM).mul(firelight(world, 4.8, 2))
+      .mul(facing(world, normal, 0.7).mul(0.65).add(0.16)))
+    ropeMat.colorNode = shoulder(alb.mul(light)).add(dith(0.001)).mul(uR)
+    field(new TorusGeometry(0.19, 0.005, 6, 48).rotateY(Math.PI / 2).scale(1, 0.57, 1.25), ropeMat,
+      [-0.17, 0.17].map(t => ({
+        p: [WOODPILE.x + t * Math.cos(yaw), FLOOR_Y + 0.125, WOODPILE.z - t * Math.sin(yaw)],
+        s: [1, 1, 1], r: yaw, tint: 0.94,
+      })))
   }
 
   // a krater of water standing on the stone: the only other thing in this

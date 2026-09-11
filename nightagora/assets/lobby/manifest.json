@@ -36,7 +36,7 @@
       "prompt": "Seven unequal timber logs with irregular bark, growth rings and warm bounced fire light, resting on sleepers with scattered bark and two rope bindings. Original scenic firewood dressing, no photograph sampled.",
       "model": "Codex GPT-6; deterministic TypeScript and TSL source recipe",
       "date": "2026-09-10",
-      "sha256": "c7dc3c07e7d72fea45bae38e697c51a8fc8c8c0039e891c8b1f9c552ef96c650",
+      "sha256": "7de162a268393a97646e2af83e3f95f01aeedc2917318b7cf5f990625e36f2ca",
       "note": "Lobby polish commission; recipe_file=src/scenes/agora.ts. Hash covers the source file; only the commissioned surface was changed."
     }
   ]
