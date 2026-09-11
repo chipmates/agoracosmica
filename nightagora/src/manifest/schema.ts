@@ -88,6 +88,33 @@ export interface ManifestEntry {
       1 is the whole lean. */
   tint?: string
   tintStrength?: number
+
+  /* WHAT THE MUSEUM DECIDES, DECLARED. `metres` above is the record: the size
+     the source photographed. The three below are the museum's own word about
+     how the set is laid, and they live here rather than in the code so the
+     drawer can print them beside the licence line. */
+
+  /** the world size one tile is laid at, when that is not the size the source
+      photographed (an ashlar cut to the house's own course, say) */
+  scale_m?: [number, number]
+  /** degrees the projection is turned by before the set is read: the grain of
+      a beam runs along the beam, not up the wall it was photographed on */
+  orientation?: number
+  /** `flip` inverts the normal map's green channel, for a set published in
+      the DirectX convention. A flipped green lights every joint from the
+      wrong side and nothing else in a frame says so. */
+  normal_y?: 'keep' | 'flip'
+  /** what the empty-plane helper may lay over this set. A macro mottle at
+      full contrast is invisible on quarried stone and it is the whole surface
+      on a weave, so the term belongs to the material and not to the stack.
+      `macro_contrast` and `micro` are fractions of the helper's own swing. */
+  detail?: {
+    macro_cm: number
+    macro_contrast: number
+    /** 0 when the set carries no mid band of its own */
+    mid_cm: number
+    micro: number
+  }
 }
 
 export interface Manifest {

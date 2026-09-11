@@ -87,6 +87,23 @@ export interface SampleAt {
   turn?: number
 }
 
+/** which family a set belongs to, which is what decides how much of the
+    helper's own variation it can carry without losing its own scale */
+export type MaterialClass = 'stone' | 'earth' | 'wood' | 'fibre' | 'cloth' | 'paper' | 'metal'
+
+/** the helper's four numbers for one set, already resolved from the class
+    default and the manifest's own word */
+export interface DetailRecipe {
+  /** metres of the macro variation */
+  macro: number
+  /** how much of the helper's authored swing the macro is worth, 0..1 */
+  macroContrast: number
+  /** metres of the mid band; 0 where the set carries none */
+  mid: number
+  /** how much of the micro roughness noise this set is worth, 0..1 */
+  micro: number
+}
+
 export interface MaterialSet {
   name: string
   /** what a square metre of this reads as, measured off the albedo map */
@@ -102,6 +119,11 @@ export interface MaterialSet {
   falloff: number
   /** the real-world size of one tile of the source photograph */
   metres: [number, number]
+  /** the size the museum lays one tile at: `metres` unless the manifest
+      declares a `scale_m` of its own */
+  scale: [number, number]
+  cls: MaterialClass
+  detail: DetailRecipe
   entry: ManifestEntry
   /** the textures, from the first frame; null only for a set the manifest
       does not name */
@@ -127,45 +149,90 @@ export const ASSET_BASE: string =
   (import.meta.env['VITE_NA_ASSET_BASE'] as string | undefined) ??
   (import.meta.env.DEV || LOCAL ? '/na-assets/' : 'https://media.agoracosmica.org/night/')
 
-/* WHAT A PHOTOGRAPH DOES NOT ANSWER. How far apart the mid and micro scales
-   stand, how much relief this surface's normal is worth, how fast the
-   density gradient thins it, and whether it is a metal. Four numbers per
-   set; everything else is measured. */
+/* WHAT THE HELPER MAY LAY OVER A CLASS. The macro variation is invisible on
+   quarried stone and it is the whole surface on a weave: a 7 to 10 cm mottle
+   at full contrast reads as mould on linen, as camouflage on iron and as
+   nothing at all on gravel. So its contrast and its scale come from the
+   material's family, and a metal carries none of it: what varies across a
+   sheet of gold is what the sheet reflects, not a noise field. */
+const CLASS_DETAIL: Record<MaterialClass, DetailRecipe> = {
+  stone: { macro: 2.4, macroContrast: 1, mid: 0.42, micro: 1 },
+  earth: { macro: 1.5, macroContrast: 1, mid: 0.32, micro: 1 },
+  wood: { macro: 1.5, macroContrast: 0.5, mid: 0.3, micro: 0.7 },
+  fibre: { macro: 0.6, macroContrast: 0.5, mid: 0.09, micro: 1 },
+  cloth: { macro: 6, macroContrast: 0.08, mid: 0, micro: 0.25 },
+  paper: { macro: 6, macroContrast: 0.06, mid: 0, micro: 0.2 },
+  metal: { macro: 4, macroContrast: 0, mid: 0.18, micro: 0.15 },
+}
+
+/* WHAT A PHOTOGRAPH DOES NOT ANSWER. Which family the set belongs to, how far
+   apart the three scales stand, how much relief this surface's normal is
+   worth, how fast the density gradient thins it, and whether it is a metal.
+   Everything else is measured.
+
+   These are also what a set is worth BEFORE its manifest lands: a scene built
+   in a constructor takes the library synchronously and cannot wait for a
+   fetch. The manifest's own `detail` block is the record and it refines the
+   same four numbers; the two are held equal on purpose, so the two paths
+   never disagree about what a set looks like. */
 interface Recipe {
+  cls: MaterialClass
   scales: [number, number, number]
   normalStrength: number
   falloff: number
   metalness: number
+  macroContrast?: number
+  micro?: number
 }
 const DEFAULT_RECIPE: Recipe = {
+  cls: 'stone',
   scales: [2.4, 0.42, 0.035],
   normalStrength: 0.45,
   falloff: 1,
   metalness: 0,
 }
 const RECIPES: Record<string, Partial<Recipe>> = {
-  'marble-white': { scales: [2.4, 0.42, 0.035], normalStrength: 0.3 },
-  'marble-lapis': { scales: [2.4, 0.42, 0.035], normalStrength: 0.35 },
-  'limestone-pale': { scales: [1.8, 0.36, 0.028], normalStrength: 0.55, falloff: 1.2 },
-  'stone-tuffeau': { scales: [2.0, 0.5, 0.03], normalStrength: 0.6, falloff: 1.2 },
-  'brick-old-red': { scales: [1.8, 0.45, 0.03], normalStrength: 0.8 },
-  'slate-roof': { scales: [3.0, 0.6, 0.04], normalStrength: 0.9 },
-  'terracotta-tiles': { scales: [2.08, 0.52, 0.03], normalStrength: 0.6 },
-  'plaster-lime-aged': { scales: [1.6, 0.3, 0.02], normalStrength: 0.5 },
-  'bronze-dark': { scales: [0.9, 0.18, 0.014], normalStrength: 0.28, metalness: 0.85 },
-  'iron-forged': { scales: [0.8, 0.16, 0.012], normalStrength: 0.4, metalness: 0.9 },
-  'gold-leaf': { scales: [0.6, 0.12, 0.01], normalStrength: 0.25, metalness: 1 },
-  'oak-planks-worn': { scales: [1.5, 0.3, 0.02], normalStrength: 0.6 },
-  'oak-beams': { scales: [1.0, 0.25, 0.02], normalStrength: 0.8 },
-  'canvas-raw': { scales: [0.274, 0.07, 0.006], normalStrength: 0.7, falloff: 0.7 },
-  linen: { scales: [0.4, 0.1, 0.008], normalStrength: 0.6, falloff: 0.7 },
-  'wool-cloth': { scales: [0.5, 0.12, 0.008], normalStrength: 0.7, falloff: 0.7 },
-  'leather-worn': { scales: [0.7, 0.15, 0.01], normalStrength: 0.5, falloff: 0.8 },
-  'parchment-laid': { scales: [0.5, 0.12, 0.008], normalStrength: 0.35, falloff: 0.7 },
-  rope: { scales: [0.4, 0.09, 0.007], normalStrength: 0.9, falloff: 0.7 },
-  'earth-packed': { scales: [1.4, 0.32, 0.025], normalStrength: 0.7 },
-  gravel: { scales: [1.6, 0.34, 0.025], normalStrength: 0.9 },
-  'grass-short': { scales: [1.0, 0.22, 0.02], normalStrength: 0.6 },
+  'marble-white': {
+    cls: 'stone',
+    scales: [2.4, 0.42, 0.035],
+    normalStrength: 0.3,
+    macroContrast: 0.25,
+    micro: 0.45,
+  },
+  'marble-lapis': { cls: 'stone', scales: [2.4, 0.42, 0.035], normalStrength: 0.35, micro: 0.6 },
+  'limestone-pale': { cls: 'stone', scales: [1.8, 0.36, 0.028], normalStrength: 0.55, falloff: 1.2 },
+  'stone-tuffeau': { cls: 'stone', scales: [2.0, 0.5, 0.03], normalStrength: 0.6, falloff: 1.2 },
+  'brick-old-red': { cls: 'stone', scales: [1.8, 0.45, 0.03], normalStrength: 0.8, macroContrast: 0.9 },
+  'slate-roof': { cls: 'stone', scales: [3.0, 0.4, 0.04], normalStrength: 0.9, macroContrast: 0.45, micro: 0.8 },
+  'terracotta-tiles': { cls: 'stone', scales: [2.08, 0.52, 0.03], normalStrength: 0.6, macroContrast: 0.9 },
+  'plaster-lime-aged': { cls: 'stone', scales: [1.6, 0.3, 0.02], normalStrength: 0.5 },
+  'bronze-dark': { cls: 'metal', scales: [0.9, 0.18, 0.014], normalStrength: 0.28, metalness: 1 },
+  'iron-forged': { cls: 'metal', scales: [0.8, 0.16, 0.012], normalStrength: 0.4, metalness: 1 },
+  'gold-leaf': { cls: 'metal', scales: [0.6, 0.12, 0.01], normalStrength: 0.25, metalness: 1, micro: 0.1 },
+  'oak-planks-worn': { cls: 'wood', scales: [1.5, 0.3, 0.02], normalStrength: 0.6 },
+  'oak-beams': { cls: 'wood', scales: [1.0, 0.12, 0.02], normalStrength: 0.8 },
+  'canvas-raw': { cls: 'cloth', scales: [6, 0, 0.006], normalStrength: 0.7, falloff: 0.7 },
+  linen: { cls: 'cloth', scales: [6, 0, 0.008], normalStrength: 0.6, falloff: 0.7 },
+  'wool-cloth': { cls: 'cloth', scales: [6, 0, 0.008], normalStrength: 0.7, falloff: 0.7 },
+  'leather-worn': {
+    cls: 'cloth',
+    scales: [6, 0, 0.01],
+    normalStrength: 0.5,
+    falloff: 0.8,
+    macroContrast: 0.1,
+    micro: 0.3,
+  },
+  'parchment-laid': { cls: 'paper', scales: [6, 0, 0.008], normalStrength: 0.35, falloff: 0.7 },
+  rope: { cls: 'fibre', scales: [0.4, 0.09, 0.007], normalStrength: 0.9, falloff: 0.7 },
+  'earth-packed': { cls: 'earth', scales: [1.4, 0.32, 0.025], normalStrength: 0.7 },
+  gravel: { cls: 'earth', scales: [1.6, 0.34, 0.025], normalStrength: 0.9 },
+  'grass-short': {
+    cls: 'earth',
+    scales: [1.4, 0.28, 0.02],
+    normalStrength: 0.6,
+    macroContrast: 0.7,
+    micro: 0.8,
+  },
 }
 
 /* WHAT EACH TIER MAY HOLD. One map at 2048 square is 22 MB with its mip
@@ -308,6 +375,13 @@ export function createMaterialLibrary(tier: Tier): MaterialLibrary {
     const invMean = uniform(vec3(1, 1, 1))
     const rough = uniform(recipe.metalness > 0.5 ? 0.4 : 0.6)
     const tint = uniform(vec3(1, 1, 1))
+    /* the set's own turn, as cosine and sine, and the sign of its green
+       channel. Both are uniforms for the same reason the mean is: a scene
+       built in a constructor compiles its shader before the manifest lands,
+       and a stale turn or a stale convention is a wall lit from the wrong
+       side with nothing in the frame to say so. */
+    const spin = uniform(vec2(1, 0))
+    const greenY = uniform(1)
 
     const set: MaterialSet = {
       name,
@@ -319,20 +393,33 @@ export function createMaterialLibrary(tier: Tier): MaterialLibrary {
       normalStrength: recipe.normalStrength,
       falloff: recipe.falloff,
       metres: [1, 1],
+      scale: [1, 1],
+      cls: recipe.cls,
+      detail: {
+        macro: recipe.scales[0],
+        macroContrast: recipe.macroContrast ?? CLASS_DETAIL[recipe.cls].macroContrast,
+        mid: recipe.scales[1],
+        micro: recipe.micro ?? CLASS_DETAIL[recipe.cls].micro,
+      },
       entry: generatedEntry(name),
       maps,
       ready,
 
       sample(at = {}) {
-        const size = at.metres ?? set.metres
+        const size = at.metres ?? set.scale
         const tile = typeof size === 'number' ? [size, size] : size
-        const uv = turned(at.uv ?? planarUV(at.world), at.turn ?? 0).div(vec2(tile[0], tile[1]))
+        const flat = turned(at.uv ?? planarUV(at.world), at.turn ?? 0)
+        const uv = vec2(
+          flat.x.mul(spin.x).sub(flat.y.mul(spin.y)),
+          flat.x.mul(spin.y).add(flat.y.mul(spin.x))
+        ).div(vec2(tile[0], tile[1]))
         const colour = texture(maps.albedo, uv).rgb.mul(tint)
         const surface = texture(maps.surface, uv)
+        const packed = texture(maps.normal, uv).rgb.mul(2).sub(1)
         return {
           albedo: mix(vec3(1, 1, 1), colour.mul(invMean), ready),
           colour,
-          normal: mix(vec3(0, 0, 1), texture(maps.normal, uv).rgb.mul(2).sub(1), ready),
+          normal: mix(vec3(0, 0, 1), vec3(packed.x, packed.y.mul(greenY), packed.z), ready),
           roughness: mix(rough, surface.r, ready),
           occlusion: mix(float(1), surface.g, ready),
         }
@@ -360,6 +447,23 @@ export function createMaterialLibrary(tier: Tier): MaterialLibrary {
         set.roughness = m.roughness
       }
       if (entry.metres) set.metres = entry.metres
+      /* the museum's own word about how the set is laid, over the record of
+         how it was photographed */
+      set.scale = entry.scale_m ?? set.metres
+      if (entry.orientation) {
+        const turn = (entry.orientation * Math.PI) / 180
+        spin.value.set(Math.cos(turn), Math.sin(turn))
+      }
+      greenY.value = entry.normal_y === 'flip' ? -1 : 1
+      if (entry.detail) {
+        set.detail = {
+          macro: entry.detail.macro_cm / 100,
+          macroContrast: entry.detail.macro_contrast,
+          mid: entry.detail.mid_cm / 100,
+          micro: entry.detail.micro,
+        }
+        set.scales = [set.detail.macro, set.detail.mid, set.scales[2]]
+      }
       if (entry.tint) {
         /* a tint is a colour and never an exposure: it is normalised to its
            own luminance, so the stone leans and the room does not brighten.

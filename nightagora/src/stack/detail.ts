@@ -23,7 +23,20 @@
    The fourth term is the density gradient. Detail that keeps its amplitude
    into the distance is detail that aliases, so every scale thins with the
    distance from the eye, and the plane hands itself over to the air instead
-   of shimmering. */
+   of shimmering.
+
+   AND THE HELPER IS THE MATERIAL'S, NOT THE STACK'S. The same macro mottle
+   that is invisible on quarried stone is the whole surface on a weave: at a
+   fixed contrast and a fixed scale it reads as mould on linen, as camouflage
+   on iron and as nothing at all on gravel. So the macro's contrast and scale,
+   the mid band and the micro amount come from the set (`MaterialSet.detail`,
+   written by the manifest), and two laws hold above them:
+
+     · a class that has no macro variation gets none (a metal varies by what
+       it reflects, and a noise field on a sheet of gold is camouflage)
+     · the mid band never covers a weave finer than itself: where the set's
+       whole photographed tile is under twice the mid feature, the band is
+       dropped, procedural relief and second map read together */
 
 import * as TSL from 'three/tsl'
 import type { MaterialSet } from './materials'
@@ -50,11 +63,11 @@ const {
 export interface DetailScales {
   /** metres of each of the three features; the set's own scales by default */
   scales?: [number, number, number]
-  /** how far the macro variation swings, 0..1 */
+  /** how far the macro variation swings, 0..1; the set's own by default */
   macro?: number
-  /** how much relief the mid normal carries */
+  /** how much relief the mid normal carries, where the set has a mid band */
   mid?: number
-  /** how rough the micro noise makes the surface */
+  /** how rough the micro noise makes the surface; the set's own by default */
   micro?: number
   /** where the density gradient starts and ends thinning, in metres */
   fade?: [number, number]
@@ -94,11 +107,20 @@ export interface DetailNodes {
 export function detailNodes(set: MaterialSet, opts: DetailScales = {}): DetailNodes {
   const s = opts.scales ?? set.scales
   const count = opts.count ?? 3
-  const macroAmt = opts.macro ?? 1
-  const midAmt = opts.mid ?? 1
-  const microAmt = opts.micro ?? 1
+  const macroAmt = opts.macro ?? set.detail.macroContrast
+  const microAmt = opts.micro ?? set.detail.micro
   const mapAmt = opts.maps ?? 1
   const fade = opts.fade ?? [12 * set.falloff, 46 * set.falloff]
+
+  /* THE MID BAND'S OWN LAW. A mid feature coarser than the photograph it
+     stands on does not sit under the material, it replaces it: a 10 cm cloud
+     over a 3 mm weave IS the surface. So the band is only laid where the
+     set's own tile is at least twice the mid feature, and where it is not,
+     both halves of it go (the procedural relief and the second read of the
+     map at a fifth of the size). */
+  const weave = Math.min(set.scale[0], set.scale[1])
+  const midBand = count >= 2 && s[1] > 0 && s[1] <= weave * 0.5
+  const midAmt = midBand ? (opts.mid ?? 1) : 0
 
   const P = opts.at ?? positionWorld
   const d = length(P.sub(cameraPosition))
@@ -126,11 +148,12 @@ export function detailNodes(set: MaterialSet, opts: DetailScales = {}): DetailNo
 
   // 2 · mid: the relief you read from where you stand. Two noise reads a
   //     step apart are a gradient, which is a normal, at a cost of two taps
-  const eps = s[1] * 0.35
-  const h = (o: N): N => mx_noise_float(P.add(o).div(s[1]))
+  const mid = midBand ? s[1] : 1
+  const eps = mid * 0.35
+  const h = (o: N): N => mx_noise_float(P.add(o).div(mid))
   const dx = h(vec3(eps, 0, 0)).sub(h(vec3(-eps, 0, 0)))
   const dz = h(vec3(0, 0, eps)).sub(h(vec3(0, 0, -eps)))
-  const relief = count >= 2 ? density.mul(midAmt * set.normalStrength) : float(0)
+  const relief = midBand ? density.mul(midAmt * set.normalStrength) : float(0)
   let normal: N = normalize(vec3(dx.mul(relief), dz.mul(relief), float(1)))
 
   // 3 · micro: not visible as shape, only as the way the light sits
@@ -151,17 +174,17 @@ export function detailNodes(set: MaterialSet, opts: DetailScales = {}): DetailNo
     const where = opts.uv
       ? { uv: opts.uv }
       : opts.space === 'uv'
-        ? { uv: uv().mul(vec2(set.metres[0], set.metres[1])) }
+        ? { uv: uv().mul(vec2(set.scale[0], set.scale[1])) }
         : { world: P }
     const grand = set.sample(where)
     albedo = albedo.mul(mix(vec3(1, 1, 1), grand.albedo, density.mul(mapAmt)))
     roughness = grand.roughness.add(micro)
     occlusion = mix(float(1), grand.occlusion, density.mul(mapAmt))
     let tangent: N = grand.normal
-    if (count >= 2) {
+    if (midBand) {
       const near = set.sample({
         ...where,
-        metres: [set.metres[0] / 5, set.metres[1] / 5],
+        metres: [set.scale[0] / 5, set.scale[1] / 5],
         turn: 0.34,
       })
       albedo = albedo.mul(mix(vec3(1, 1, 1), near.albedo, density.mul(mapAmt * 0.45)))
