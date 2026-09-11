@@ -14,13 +14,18 @@ const p=(e:number,n:number,h:number,te:number,tn:number,th:number,fov=49):Pose=>
 export function stationPose(id:VinciStationId, narrow:boolean):Pose {
   // R19 accepted: phone passage-A retains the court and leaf; desktop keeps its corrected road eye.
   if(id==='arrival') return narrow?p(25.2,-16.2,groundHeight(25.2,-16.2)+1.65,5.032039226453499,-12.212873321666777,2.709826421638899,116.1):p(25.49153163196192,-15.805318528252403,groundHeight(25.49153163196192,-15.805318528252403)+1.65,8,-13.5,5,70)
-  if(id==='courtyard') return narrow?p(10,-21,1.7,2.6,-12.5,4.8,70):p(10,-21,1.7,2.6,-12.5,4.3,60)
+  // The phone keeps its gaze on the door and opens the lens instead: at 70
+  // degrees the cone's right half fell between the court corner and the east
+  // range's windows and held neither.
+  if(id==='courtyard') return narrow?p(10,-21,1.7,2.6,-12.5,4.8,80):p(10,-21,1.7,2.6,-12.5,4.3,60)
   if(['hall','oratory','study','chamber'].includes(id)) return p(4.4,-23.35,1.65,2,-13.8,3.5,50)
   // R19 accepted: actual apron paving +1.65 m; all eight principal windows clear vegetation.
   if(id==='garden') return p(-24.5,-31.2,-4.790000057220459,-8.7,-16.6,narrow?4.2:6.2,narrow?96:62)
-  // Later construction plates stand on the new apron, outside every room.
-  // The named promises remain the future windows, with no exhibits implied.
-  return p(-21,-31.4,groundHeight(-21,-31.4)+1.65,-41,-47,-3.2,narrow?72:58)
+  // Later construction plates stand on the terrace above the collection
+  // ground, outside every room. On the apron the eye stood two metres from
+  // the pavilion and its roof filled the near plane; from here the whole
+  // ground is the backdrop. No exhibit is implied by either.
+  return p(-12.4,-21.6,groundHeight(-12.4,-21.6)+1.65,-38,-44,-4.2,narrow?74:58)
 }
 export function namedPose(id:string,narrow:boolean):Pose|undefined {
   // Independent static material inspections; return explicitly to the rail.
@@ -62,7 +67,9 @@ export function namedPose(id:string,narrow:boolean):Pose|undefined {
   if(id==='street-gate')return p(26.05,-12.42,groundHeight(26.05,-12.42)+1.65,4,-19,4.4,narrow?100:74)
   if(id==='road-lower')return p(29,-29,groundHeight(29,-29)+1.65,3,-15,4.6,narrow?82:61)
   if(id==='stream')return p(-62,-28,groundHeight(-62,-28)+1.65,-73,-17,-10.4,narrow?66:54)
-  if(id==='collection')return narrow?p(-18,32,15,-43,-49,-2.8,76):p(-17,-3,6.5,-43,-47,-2.8,58)
+  // The phone stood eighty metres off and the haze ate the insertion. It
+  // now looks from the terrace, at the distance the desktop sees it.
+  if(id==='collection')return narrow?p(-13,-22,groundHeight(-13,-22)+1.65,-40,-46,-3.6,80):p(-17,-3,6.5,-43,-47,-2.8,58)
   if(id==='collection-apron')return p(-21,-31.4,groundHeight(-21,-31.4)+1.65,-43,-36,-4.1,narrow?72:56)
   if(id==='collection-approach')return p(-20.7,-14.5,groundHeight(-20.7,-14.5)+1.65,-20.7,-30,-5.8,narrow?76:58)
   if(id==='collection-court-access')return p(-3.811459467626,-26.308179530842,1.65,-7.459684532374,-28.677346869158,-1,narrow?76:58)
@@ -73,6 +80,9 @@ export function namedPose(id:string,narrow:boolean):Pose|undefined {
   if(id==='arrival-road')return narrow?p(21,-8,2.65,7,-7,5.5,76):p(21,-8,2.65,3,-8,5.3,67)
   if(id==='arrival-gate')return narrow?p(22,-14,groundHeight(22,-14)+1.65,9,-12,5.2,76):p(22,-14,groundHeight(22,-14)+1.65,5,-10,4.8,65)
   if(id==='gable') return narrow?p(-30,27,groundHeight(-30,27)+1.65,-8.5,-6.5,6.5,56):p(-37,36,groundHeight(-37,36)+1.65,-6,9,7.2,49)
+  // Standing inspections of the terrace head and the modern court stair.
+  if(id==='terrace-head')return p(-1.5,-28.5,groundHeight(-1.5,-28.5)+1.65,-8,-26,-1.6,narrow?70:54)
+  if(id==='access-underside')return p(-8.5,-30.5,-1.9+1.5,-5.4,-27.2,-1.2,narrow?70:54)
   if(id==='gutter')return p(12.021,-6.484,2.65,11.26,-6.998,1.003,narrow?66:50)
   if(id==='road-finish')return p(25.5,-15.8,groundHeight(25.5,-15.8)+1.65,17.5,-7.5,1.1,narrow?80:60)
   if(id==='step-wear')return p(4.9,-17.2,groundHeight(4.9,-17.2)+1.65,3.3,-14.1,.8,narrow?66:45)

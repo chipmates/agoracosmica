@@ -30,8 +30,8 @@
     },
     {
       "file": "src/wings/vinci/ground.ts",
-      "sha256": "0d4cf4c78fdc68f66ca66afc6b26cca7ae6eaa47111268c17867d1e07086ca2f",
-      "bytes": 10525,
+      "sha256": "14a2ad483779d3681fffdcafd7484a0ad1197cc2adaf820b79274e3266856f8e",
+      "bytes": 12952,
       "unchangedDuringAudit": true
     },
     {
@@ -72,20 +72,26 @@
     },
     {
       "file": "src/wings/vinci/collection.ts",
-      "sha256": "36997fdbc813592abda65bd31d3f8ea200589639b006e331b605ab893c00137d",
-      "bytes": 39784,
+      "sha256": "373728b8d550b4a6d1ca2787f1fa69b23faf614e896023ee8a7131cd37a104eb",
+      "bytes": 42347,
       "unchangedDuringAudit": true
     },
     {
       "file": "src/wings/vinci/collection-access.ts",
-      "sha256": "8ce5deb22c6d72e4758287a155ce8cbb8d217fd9053aa216d3f193ef7b8e2d51",
-      "bytes": 10862,
+      "sha256": "4cf421e79bcb00a95ef624fc1763e0f56efe1bd8364dcc7d3a541d776ab4634e",
+      "bytes": 10941,
       "unchangedDuringAudit": true
     },
     {
       "file": "src/wings/vinci/gate-passage.ts",
-      "sha256": "c24a5c746d47ec7c51340c68e0a34d0713cd13a3ada5c6dde63c0b4dc5450ee4",
-      "bytes": 15634,
+      "sha256": "b5481703270f8fad3603e7e4161aae23c0680bd2a868191c66046c393a10f79f",
+      "bytes": 15426,
+      "unchangedDuringAudit": true
+    },
+    {
+      "file": "src/wings/vinci/masonry-courses.ts",
+      "sha256": "fdf484d2523d085ec4fea9524cab961c5588fe1bb04d7f75ee5fa173fee787d4",
+      "bytes": 5035,
       "unchangedDuringAudit": true
     },
     {
@@ -126,8 +132,8 @@
     },
     {
       "file": "src/wings/vinci/road-dressing.ts",
-      "sha256": "dbf5e1ce7c614947be0f4580e80995d7d253284cef1b2e9b61dd7c895112f560",
-      "bytes": 14121,
+      "sha256": "731948ba302f7ea8a3f8e30344cad007cf0b65f370168445a3217690fb40fab8",
+      "bytes": 14870,
       "unchangedDuringAudit": true
     },
     {
@@ -138,8 +144,8 @@
     },
     {
       "file": "src/wings/vinci/shell.ts",
-      "sha256": "90bb57c7c269ca8d037b8d550a155bf7975a504648e5d62e87e84a10a46e83b9",
-      "bytes": 39913,
+      "sha256": "83119196dedfb3abe85a6bbf8a24db8bb21cfe895f82b4ea43d92aed2bcdea39",
+      "bytes": 41086,
       "unchangedDuringAudit": true
     },
     {
@@ -174,14 +180,14 @@
     },
     {
       "file": "src/wings/vinci/vegetation.ts",
-      "sha256": "e985978c7b664671fdc3b35ef54bbae8b6a2e9b727c81ebc77a87e8d73d2fbe3",
-      "bytes": 19291,
+      "sha256": "8561c3674162bc04ae4e72c43968b248d2f49cc0a5127534d42f4572ed2a5ffa",
+      "bytes": 19439,
       "unchangedDuringAudit": true
     },
     {
       "file": "src/wings/vinci/rail.ts",
-      "sha256": "6cdcbfca7565cfe1beabcfb2ff25f538cd5d8ca479a40b243071b48c68220113",
-      "bytes": 14804,
+      "sha256": "836d029a951540b5510c20b858e334f0561f9d50e423042baf73bb3eb0826768",
+      "bytes": 15397,
       "unchangedDuringAudit": true
     },
     {
@@ -228,25 +234,25 @@
     }
   ],
   "geometrySha256": [
-    "7029ae93a1f30b26aea28e21c58ef59561def84f197dc5cf6c313f6ea243664d",
-    "29d61ccb6440978408abd07400170008ee1c1accdee02fdaf8c84675c47b225f"
+    "4153ec9a0e670a6b28ae362ba060d223ef8aa33bc5981df3fe075a305c426b41",
+    "dafae45bcc0e4e729103bff8db7c2e9f783dc729fb8f97915abe39921ed49c51"
   ],
   "geometry": [
     {
       "tier": "hero",
-      "sha256": "7029ae93a1f30b26aea28e21c58ef59561def84f197dc5cf6c313f6ea243664d",
+      "sha256": "4153ec9a0e670a6b28ae362ba060d223ef8aa33bc5981df3fe075a305c426b41",
       "quantumM": 0.000001,
       "matchingGeometryToleranceM": 0.000002
     },
     {
       "tier": "standard",
-      "sha256": "7029ae93a1f30b26aea28e21c58ef59561def84f197dc5cf6c313f6ea243664d",
+      "sha256": "4153ec9a0e670a6b28ae362ba060d223ef8aa33bc5981df3fe075a305c426b41",
       "quantumM": 0.000001,
       "matchingGeometryToleranceM": 0.000002
     },
     {
       "tier": "calm",
-      "sha256": "29d61ccb6440978408abd07400170008ee1c1accdee02fdaf8c84675c47b225f",
+      "sha256": "dafae45bcc0e4e729103bff8db7c2e9f783dc729fb8f97915abe39921ed49c51",
       "quantumM": 0.000001,
       "matchingGeometryToleranceM": 0.000002
     }
@@ -345,7 +351,7 @@
       "fullBall": {
         "distance": 0.2627005390529147,
         "mesh": "wing-vinci/retaining",
-        "triangle": 264189
+        "triangle": 261513
       },
       "requiresOrientedArrivalCertificate": true
     },
@@ -412,10 +418,10 @@
     {
       "viewport": "phone",
       "id": "courtyard",
-      "fov": 70,
-      "radius": 0.31573117849773963,
+      "fov": 80,
+      "radius": 0.3404433777733779,
       "fullBall": {
-        "distance": 0.31574117849773964,
+        "distance": 0.3404533777733779,
         "mesh": null,
         "triangle": null
       },
@@ -448,10 +454,10 @@
     {
       "viewport": "phone",
       "id": "line-early",
-      "fov": 72,
-      "radius": 0.3202123388041441,
+      "fov": 74,
+      "radius": 0.32491261351242257,
       "fullBall": {
-        "distance": 0.32022233880414414,
+        "distance": 0.3249226135124226,
         "mesh": null,
         "triangle": null
       },
@@ -600,7 +606,7 @@
           ],
           "distance": 0.2627005390529147,
           "mesh": "wing-vinci/retaining",
-          "triangle": 264189,
+          "triangle": 261513,
           "outerArrival": true
         }
       ],
@@ -612,7 +618,7 @@
         "spanM": 3.3594714550347855,
         "planes": [
           {
-            "triangle": 264186,
+            "triangle": 261510,
             "mesh": "wing-vinci/retaining",
             "certified": true,
             "standingMarginM": 0.004600064547140126,
@@ -620,7 +626,7 @@
             "elevationBoundRadians": 1.0569303949684095
           },
           {
-            "triangle": 264189,
+            "triangle": 261513,
             "mesh": "wing-vinci/retaining",
             "certified": true,
             "standingMarginM": 0.004600064547140181,
@@ -628,7 +634,7 @@
             "elevationBoundRadians": 1.0569303949684095
           },
           {
-            "triangle": 264190,
+            "triangle": 261514,
             "mesh": "wing-vinci/retaining",
             "certified": true,
             "standingMarginM": 0.004600064547140126,
@@ -636,7 +642,7 @@
             "elevationBoundRadians": 1.0569303949684095
           },
           {
-            "triangle": 956182,
+            "triangle": 950821,
             "mesh": "wing-vinci/retaining",
             "certified": true,
             "standingMarginM": 0.004600064547140126,
@@ -644,7 +650,7 @@
             "elevationBoundRadians": 1.0569303949684095
           },
           {
-            "triangle": 956185,
+            "triangle": 950824,
             "mesh": "wing-vinci/retaining",
             "certified": true,
             "standingMarginM": 0.004600064547140181,
@@ -652,7 +658,7 @@
             "elevationBoundRadians": 1.0569303949684095
           },
           {
-            "triangle": 956186,
+            "triangle": 950825,
             "mesh": "wing-vinci/retaining",
             "certified": true,
             "standingMarginM": 0.004600064547140126,
@@ -844,7 +850,7 @@
           ],
           "distance": 0.2627005390529147,
           "mesh": "wing-vinci/retaining",
-          "triangle": 264189,
+          "triangle": 261513,
           "outerArrival": true
         }
       ],
@@ -856,7 +862,7 @@
         "spanM": 3.3594714550347855,
         "planes": [
           {
-            "triangle": 264186,
+            "triangle": 261510,
             "mesh": "wing-vinci/retaining",
             "certified": true,
             "standingMarginM": 0.004600064547140126,
@@ -864,7 +870,7 @@
             "elevationBoundRadians": 0.9008505270563759
           },
           {
-            "triangle": 264189,
+            "triangle": 261513,
             "mesh": "wing-vinci/retaining",
             "certified": true,
             "standingMarginM": 0.004600064547140181,
@@ -872,7 +878,7 @@
             "elevationBoundRadians": 0.9008505270563759
           },
           {
-            "triangle": 264190,
+            "triangle": 261514,
             "mesh": "wing-vinci/retaining",
             "certified": true,
             "standingMarginM": 0.004600064547140126,
@@ -880,7 +886,7 @@
             "elevationBoundRadians": 0.9008505270563759
           },
           {
-            "triangle": 956182,
+            "triangle": 950821,
             "mesh": "wing-vinci/retaining",
             "certified": true,
             "standingMarginM": 0.004600064547140126,
@@ -888,7 +894,7 @@
             "elevationBoundRadians": 0.9008505270563759
           },
           {
-            "triangle": 956185,
+            "triangle": 950824,
             "mesh": "wing-vinci/retaining",
             "certified": true,
             "standingMarginM": 0.004600064547140181,
@@ -896,7 +902,7 @@
             "elevationBoundRadians": 0.9008505270563759
           },
           {
-            "triangle": 956186,
+            "triangle": 950825,
             "mesh": "wing-vinci/retaining",
             "certified": true,
             "standingMarginM": 0.004600064547140126,
@@ -1205,7 +1211,7 @@
           ],
           "distance": 0.2627005390529147,
           "mesh": "wing-vinci/retaining",
-          "triangle": 264189,
+          "triangle": 261513,
           "outerArrival": true
         }
       ],
@@ -1217,7 +1223,7 @@
         "spanM": 3.3594714550347855,
         "planes": [
           {
-            "triangle": 264186,
+            "triangle": 261510,
             "mesh": "wing-vinci/retaining",
             "certified": true,
             "standingMarginM": 0.004600064547140126,
@@ -1225,7 +1231,7 @@
             "elevationBoundRadians": 0.5840026871121539
           },
           {
-            "triangle": 264189,
+            "triangle": 261513,
             "mesh": "wing-vinci/retaining",
             "certified": true,
             "standingMarginM": 0.004600064547140181,
@@ -1233,7 +1239,7 @@
             "elevationBoundRadians": 0.5840026871121539
           },
           {
-            "triangle": 264190,
+            "triangle": 261514,
             "mesh": "wing-vinci/retaining",
             "certified": true,
             "standingMarginM": 0.004600064547140126,
@@ -1241,7 +1247,7 @@
             "elevationBoundRadians": 0.5840026871121539
           },
           {
-            "triangle": 956182,
+            "triangle": 950821,
             "mesh": "wing-vinci/retaining",
             "certified": true,
             "standingMarginM": 0.004600064547140126,
@@ -1249,7 +1255,7 @@
             "elevationBoundRadians": 0.5840026871121539
           },
           {
-            "triangle": 956185,
+            "triangle": 950824,
             "mesh": "wing-vinci/retaining",
             "certified": true,
             "standingMarginM": 0.004600064547140181,
@@ -1257,7 +1263,7 @@
             "elevationBoundRadians": 0.5840026871121539
           },
           {
-            "triangle": 956186,
+            "triangle": 950825,
             "mesh": "wing-vinci/retaining",
             "certified": true,
             "standingMarginM": 0.004600064547140126,
@@ -1452,9 +1458,9 @@
           -4.79
         ],
         [
-          -21,
-          -31.4,
-          -4.8100000000000005
+          -12.4,
+          -21.6,
+          -0.25
         ]
       ],
       "fromPose": {
@@ -1472,14 +1478,14 @@
       },
       "toPose": {
         "eye": [
-          -21,
-          -4.8100000000000005,
-          31.4
+          -12.4,
+          -0.25,
+          21.6
         ],
         "at": [
-          -41,
-          -3.2,
-          47
+          -38,
+          -4.2,
+          44
         ],
         "fov": 58
       },
@@ -1598,22 +1604,22 @@
         },
         {
           "centre": [
-            -20.723999999999997,
-            -4.790913043927166,
-            31.37595653745081
+            -20.63172642299567,
+            -4.749455175951848,
+            31.207387824741875
           ],
-          "radiusM": 0.4897188241994162
+          "radiusM": 0.6442309526270037
         }
       ],
-      "length": 75.22273301742949,
-      "roundedLength": 74.9585034793955,
+      "length": 88.54343266017105,
+      "roundedLength": 88.0514261265311,
       "maxNearRadius": 0.4358792120908067,
-      "minimumSurfaceSupportM": 1.3393220338983052,
-      "maximumSurfaceSupportM": 2.48,
-      "minimumGradeClearanceM": 1.3393220338983052,
-      "minimumRoundedSupportM": 1.3319130925539575,
-      "maximumRoundedSupportM": 1.8774405006004344,
-      "minimumRoundedGradeClearanceM": 1.3319130925539575,
+      "minimumSurfaceSupportM": 0.6189377050958713,
+      "maximumSurfaceSupportM": 2.507720210253148,
+      "minimumGradeClearanceM": 0.6189377289377291,
+      "minimumRoundedSupportM": 0.6173399071419823,
+      "maximumRoundedSupportM": 2.506928289573958,
+      "minimumRoundedGradeClearanceM": 0.6173399309838401,
       "edgeFailures": [
         {
           "edge": 1,
@@ -1629,64 +1635,64 @@
           ],
           "distance": 0.2627005390529147,
           "mesh": "wing-vinci/retaining",
-          "triangle": 264189,
+          "triangle": 261513,
           "outerArrival": true
         }
       ],
       "arrivalCertificate": {
         "method": "Every original triangle intersecting the outer-edge near-ball capsule is separated by its vertical plane. Exact full-cone eye-to-near-pyramid standing support plus a conservative pi-slerp/YXZ derivative bound covers every continuous point toward or away from arrival; all remaining triangles are outside the enclosing capsule. The runtime reconstructed path must not be shorter than the certified rounded path, and the actual lens must never exceed the arrival lens.",
         "certified": true,
-        "certifiedRoundedLengthM": 74.9585034793955,
+        "certifiedRoundedLengthM": 88.0514261265311,
         "maximumAuthoredFov": 70,
         "spanM": 3.3594714550347855,
         "planes": [
           {
-            "triangle": 264186,
+            "triangle": 261510,
             "mesh": "wing-vinci/retaining",
             "certified": true,
             "standingMarginM": 0.004600064547140126,
             "continuousLowerBoundM": 0.004600064547140126,
-            "elevationBoundRadians": 0.5901073967794914
+            "elevationBoundRadians": 0.569171087356493
           },
           {
-            "triangle": 264189,
+            "triangle": 261513,
             "mesh": "wing-vinci/retaining",
             "certified": true,
             "standingMarginM": 0.004600064547140181,
             "continuousLowerBoundM": 0.004600064547140181,
-            "elevationBoundRadians": 0.5901073967794914
+            "elevationBoundRadians": 0.569171087356493
           },
           {
-            "triangle": 264190,
+            "triangle": 261514,
             "mesh": "wing-vinci/retaining",
             "certified": true,
             "standingMarginM": 0.004600064547140126,
             "continuousLowerBoundM": 0.004600064547140126,
-            "elevationBoundRadians": 0.5901073967794914
+            "elevationBoundRadians": 0.569171087356493
           },
           {
-            "triangle": 956182,
+            "triangle": 950821,
             "mesh": "wing-vinci/retaining",
             "certified": true,
             "standingMarginM": 0.004600064547140126,
             "continuousLowerBoundM": 0.004600064547140126,
-            "elevationBoundRadians": 0.5901073967794914
+            "elevationBoundRadians": 0.569171087356493
           },
           {
-            "triangle": 956185,
+            "triangle": 950824,
             "mesh": "wing-vinci/retaining",
             "certified": true,
             "standingMarginM": 0.004600064547140181,
             "continuousLowerBoundM": 0.004600064547140181,
-            "elevationBoundRadians": 0.5901073967794914
+            "elevationBoundRadians": 0.569171087356493
           },
           {
-            "triangle": 956186,
+            "triangle": 950825,
             "mesh": "wing-vinci/retaining",
             "certified": true,
             "standingMarginM": 0.004600064547140126,
             "continuousLowerBoundM": 0.004600064547140126,
-            "elevationBoundRadians": 0.5901073967794914
+            "elevationBoundRadians": 0.569171087356493
           }
         ]
       },
@@ -1785,15 +1791,15 @@
         },
         {
           "index": 14,
-          "requestedTrimM": 0.07215982261619014,
-          "acceptedTrimM": 0.07215982261619014,
+          "requestedTrimM": 0.3361371148802223,
+          "acceptedTrimM": 0.3361371148802223,
           "certificateCalls": 1,
           "result": "certified"
         }
       ],
       "durationSeconds": 1.12,
-      "peakSpeedMps": 100.39085287419039,
-      "originalPolylinePeakSpeedMps": 100.74473171977162
+      "peakSpeedMps": 117.92601713374698,
+      "originalPolylinePeakSpeedMps": 118.58495445558621
     },
     {
       "viewport": "desktop",
@@ -1936,7 +1942,7 @@
           ],
           "distance": 0.2627005390529147,
           "mesh": "wing-vinci/retaining",
-          "triangle": 264189,
+          "triangle": 261513,
           "outerArrival": true
         }
       ],
@@ -1948,7 +1954,7 @@
         "spanM": 3.3594714550347855,
         "planes": [
           {
-            "triangle": 264186,
+            "triangle": 261510,
             "mesh": "wing-vinci/retaining",
             "certified": true,
             "standingMarginM": 0.004600064547140126,
@@ -1956,7 +1962,7 @@
             "elevationBoundRadians": 1.05693039496841
           },
           {
-            "triangle": 264189,
+            "triangle": 261513,
             "mesh": "wing-vinci/retaining",
             "certified": true,
             "standingMarginM": 0.004600064547140181,
@@ -1964,7 +1970,7 @@
             "elevationBoundRadians": 1.05693039496841
           },
           {
-            "triangle": 264190,
+            "triangle": 261514,
             "mesh": "wing-vinci/retaining",
             "certified": true,
             "standingMarginM": 0.004600064547140126,
@@ -1972,7 +1978,7 @@
             "elevationBoundRadians": 1.05693039496841
           },
           {
-            "triangle": 956182,
+            "triangle": 950821,
             "mesh": "wing-vinci/retaining",
             "certified": true,
             "standingMarginM": 0.004600064547140126,
@@ -1980,7 +1986,7 @@
             "elevationBoundRadians": 1.05693039496841
           },
           {
-            "triangle": 956185,
+            "triangle": 950824,
             "mesh": "wing-vinci/retaining",
             "certified": true,
             "standingMarginM": 0.004600064547140181,
@@ -1988,7 +1994,7 @@
             "elevationBoundRadians": 1.05693039496841
           },
           {
-            "triangle": 956186,
+            "triangle": 950825,
             "mesh": "wing-vinci/retaining",
             "certified": true,
             "standingMarginM": 0.004600064547140126,
@@ -2262,10 +2268,10 @@
       "length": 61.34961483793584,
       "roundedLength": 61.0551045658722,
       "maxNearRadius": 0.3954489204919866,
-      "minimumSurfaceSupportM": 1.5199999219721017,
+      "minimumSurfaceSupportM": 1.3700000047683716,
       "maximumSurfaceSupportM": 1.816135658580027,
       "minimumGradeClearanceM": 1.65,
-      "minimumRoundedSupportM": 1.5199999223731586,
+      "minimumRoundedSupportM": 1.3700000047683716,
       "maximumRoundedSupportM": 1.8161685730234804,
       "minimumRoundedGradeClearanceM": 1.65,
       "edgeFailures": [],
@@ -2395,9 +2401,9 @@
           -4.79
         ],
         [
-          -21,
-          -31.4,
-          -4.8100000000000005
+          -12.4,
+          -21.6,
+          -0.25
         ]
       ],
       "fromPose": {
@@ -2415,14 +2421,14 @@
       },
       "toPose": {
         "eye": [
-          -21,
-          -4.8100000000000005,
-          31.4
+          -12.4,
+          -0.25,
+          21.6
         ],
         "at": [
-          -41,
-          -3.2,
-          47
+          -38,
+          -4.2,
+          44
         ],
         "fov": 58
       },
@@ -2493,22 +2499,22 @@
         },
         {
           "centre": [
-            -20.723999999999997,
-            -4.790913043927166,
-            31.37595653745081
+            -20.63172642299567,
+            -4.749455175951848,
+            31.207387824741875
           ],
-          "radiusM": 0.4400739383051689
+          "radiusM": 0.5945860667327564
         }
       ],
-      "length": 57.845021247415204,
-      "roundedLength": 57.65778524418961,
+      "length": 71.16572089015676,
+      "roundedLength": 70.75070789132519,
       "maxNearRadius": 0.3862343261965594,
-      "minimumSurfaceSupportM": 1.559999942779541,
-      "maximumSurfaceSupportM": 1.816135658580027,
-      "minimumGradeClearanceM": 1.6499999999999995,
-      "minimumRoundedSupportM": 1.559999942779541,
-      "maximumRoundedSupportM": 1.8161182030869236,
-      "minimumRoundedGradeClearanceM": 1.6499999999999995,
+      "minimumSurfaceSupportM": 0.6189377050958713,
+      "maximumSurfaceSupportM": 2.507720210253148,
+      "minimumGradeClearanceM": 0.6189377289377291,
+      "minimumRoundedSupportM": 0.6174895879547369,
+      "maximumRoundedSupportM": 2.5070024762574454,
+      "minimumRoundedGradeClearanceM": 0.6174896117965947,
       "edgeFailures": [],
       "uncertifiedCorners": [],
       "certifiedCorners": [
@@ -2570,15 +2576,15 @@
         },
         {
           "index": 9,
-          "requestedTrimM": 0.07215982261619014,
-          "acceptedTrimM": 0.07215982261619014,
+          "requestedTrimM": 0.3361371148802223,
+          "acceptedTrimM": 0.3361371148802223,
           "certificateCalls": 1,
           "result": "certified"
         }
       ],
       "durationSeconds": 1.12,
-      "peakSpeedMps": 77.2202480948968,
-      "originalPolylinePeakSpeedMps": 77.47101059921678
+      "peakSpeedMps": 94.75541235445337,
+      "originalPolylinePeakSpeedMps": 95.31123333503137
     },
     {
       "viewport": "desktop",
@@ -2721,7 +2727,7 @@
           ],
           "distance": 0.2627005390529147,
           "mesh": "wing-vinci/retaining",
-          "triangle": 264189,
+          "triangle": 261513,
           "outerArrival": true
         }
       ],
@@ -2733,7 +2739,7 @@
         "spanM": 3.3594714550347855,
         "planes": [
           {
-            "triangle": 264186,
+            "triangle": 261510,
             "mesh": "wing-vinci/retaining",
             "certified": true,
             "standingMarginM": 0.004600064547140126,
@@ -2741,7 +2747,7 @@
             "elevationBoundRadians": 0.9008505270563762
           },
           {
-            "triangle": 264189,
+            "triangle": 261513,
             "mesh": "wing-vinci/retaining",
             "certified": true,
             "standingMarginM": 0.004600064547140181,
@@ -2749,7 +2755,7 @@
             "elevationBoundRadians": 0.9008505270563762
           },
           {
-            "triangle": 264190,
+            "triangle": 261514,
             "mesh": "wing-vinci/retaining",
             "certified": true,
             "standingMarginM": 0.004600064547140126,
@@ -2757,7 +2763,7 @@
             "elevationBoundRadians": 0.9008505270563762
           },
           {
-            "triangle": 956182,
+            "triangle": 950821,
             "mesh": "wing-vinci/retaining",
             "certified": true,
             "standingMarginM": 0.004600064547140126,
@@ -2765,7 +2771,7 @@
             "elevationBoundRadians": 0.9008505270563762
           },
           {
-            "triangle": 956185,
+            "triangle": 950824,
             "mesh": "wing-vinci/retaining",
             "certified": true,
             "standingMarginM": 0.004600064547140181,
@@ -2773,7 +2779,7 @@
             "elevationBoundRadians": 0.9008505270563762
           },
           {
-            "triangle": 956186,
+            "triangle": 950825,
             "mesh": "wing-vinci/retaining",
             "certified": true,
             "standingMarginM": 0.004600064547140126,
@@ -3047,10 +3053,10 @@
       "length": 55.281191553445744,
       "roundedLength": 54.98654256357571,
       "maxNearRadius": 0.3954489204919866,
-      "minimumSurfaceSupportM": 1.5199999219721017,
+      "minimumSurfaceSupportM": 1.3700000047683716,
       "maximumSurfaceSupportM": 1.816135658580027,
       "minimumGradeClearanceM": 1.65,
-      "minimumRoundedSupportM": 1.5199999223912144,
+      "minimumRoundedSupportM": 1.3700000047683716,
       "maximumRoundedSupportM": 1.8165072295105524,
       "minimumRoundedGradeClearanceM": 1.65,
       "edgeFailures": [],
@@ -3180,9 +3186,9 @@
           -4.79
         ],
         [
-          -21,
-          -31.4,
-          -4.8100000000000005
+          -12.4,
+          -21.6,
+          -0.25
         ]
       ],
       "fromPose": {
@@ -3200,14 +3206,14 @@
       },
       "toPose": {
         "eye": [
-          -21,
-          -4.8100000000000005,
-          31.4
+          -12.4,
+          -0.25,
+          21.6
         ],
         "at": [
-          -41,
-          -3.2,
-          47
+          -38,
+          -4.2,
+          44
         ],
         "fov": 58
       },
@@ -3278,22 +3284,22 @@
         },
         {
           "centre": [
-            -20.723999999999997,
-            -4.790913043927166,
-            31.37595653745081
+            -20.63172642299567,
+            -4.749455175951848,
+            31.207387824741875
           ],
-          "radiusM": 0.43119448442859926
+          "radiusM": 0.5857066128561867
         }
       ],
-      "length": 51.77659796292511,
-      "roundedLength": 51.58922324189312,
+      "length": 65.09729760566667,
+      "roundedLength": 64.6821458890287,
       "maxNearRadius": 0.3773548723199897,
-      "minimumSurfaceSupportM": 1.559999942779541,
-      "maximumSurfaceSupportM": 1.816135658580027,
-      "minimumGradeClearanceM": 1.6499999999999995,
-      "minimumRoundedSupportM": 1.559999942779541,
-      "maximumRoundedSupportM": 1.8164561929371894,
-      "minimumRoundedGradeClearanceM": 1.6499999999999995,
+      "minimumSurfaceSupportM": 0.6189377050958713,
+      "maximumSurfaceSupportM": 2.507720210253148,
+      "minimumGradeClearanceM": 0.6189377289377291,
+      "minimumRoundedSupportM": 0.617055358724452,
+      "maximumRoundedSupportM": 2.506787258115442,
+      "minimumRoundedGradeClearanceM": 0.6170553825663099,
       "edgeFailures": [],
       "uncertifiedCorners": [],
       "certifiedCorners": [
@@ -3355,15 +3361,15 @@
         },
         {
           "index": 9,
-          "requestedTrimM": 0.07215982261619014,
-          "acceptedTrimM": 0.07215982261619014,
+          "requestedTrimM": 0.3361371148802223,
+          "acceptedTrimM": 0.3361371148802223,
           "certificateCalls": 1,
           "result": "certified"
         }
       ],
       "durationSeconds": 1.12,
-      "peakSpeedMps": 69.09270969896399,
-      "originalPolylinePeakSpeedMps": 69.3436579860604
+      "peakSpeedMps": 86.62787395852058,
+      "originalPolylinePeakSpeedMps": 87.183880721875
     },
     {
       "viewport": "desktop",
@@ -3623,7 +3629,7 @@
           ],
           "distance": 0.2627005390529147,
           "mesh": "wing-vinci/retaining",
-          "triangle": 264189,
+          "triangle": 261513,
           "outerArrival": true
         }
       ],
@@ -3635,7 +3641,7 @@
         "spanM": 3.3594714550347855,
         "planes": [
           {
-            "triangle": 264186,
+            "triangle": 261510,
             "mesh": "wing-vinci/retaining",
             "certified": true,
             "standingMarginM": 0.004600064547140126,
@@ -3643,7 +3649,7 @@
             "elevationBoundRadians": 0.5840026871121539
           },
           {
-            "triangle": 264189,
+            "triangle": 261513,
             "mesh": "wing-vinci/retaining",
             "certified": true,
             "standingMarginM": 0.004600064547140181,
@@ -3651,7 +3657,7 @@
             "elevationBoundRadians": 0.5840026871121539
           },
           {
-            "triangle": 264190,
+            "triangle": 261514,
             "mesh": "wing-vinci/retaining",
             "certified": true,
             "standingMarginM": 0.004600064547140126,
@@ -3659,7 +3665,7 @@
             "elevationBoundRadians": 0.5840026871121539
           },
           {
-            "triangle": 956182,
+            "triangle": 950821,
             "mesh": "wing-vinci/retaining",
             "certified": true,
             "standingMarginM": 0.004600064547140126,
@@ -3667,7 +3673,7 @@
             "elevationBoundRadians": 0.5840026871121539
           },
           {
-            "triangle": 956185,
+            "triangle": 950824,
             "mesh": "wing-vinci/retaining",
             "certified": true,
             "standingMarginM": 0.004600064547140181,
@@ -3675,7 +3681,7 @@
             "elevationBoundRadians": 0.5840026871121539
           },
           {
-            "triangle": 956186,
+            "triangle": 950825,
             "mesh": "wing-vinci/retaining",
             "certified": true,
             "standingMarginM": 0.004600064547140126,
@@ -3953,10 +3959,10 @@
       "length": 61.349614837935846,
       "roundedLength": 61.05510456587221,
       "maxNearRadius": 0.3954489204919866,
-      "minimumSurfaceSupportM": 1.5199999219721017,
+      "minimumSurfaceSupportM": 1.3700000047683716,
       "maximumSurfaceSupportM": 1.816135658580027,
       "minimumGradeClearanceM": 1.65,
-      "minimumRoundedSupportM": 1.5199999223731586,
+      "minimumRoundedSupportM": 1.3700000047683716,
       "maximumRoundedSupportM": 1.8161685730234813,
       "minimumRoundedGradeClearanceM": 1.65,
       "edgeFailures": [],
@@ -4194,10 +4200,10 @@
       "length": 55.281191553445744,
       "roundedLength": 54.98654256357571,
       "maxNearRadius": 0.3954489204919866,
-      "minimumSurfaceSupportM": 1.5199999219721017,
+      "minimumSurfaceSupportM": 1.3700000047683716,
       "maximumSurfaceSupportM": 1.816135658580027,
       "minimumGradeClearanceM": 1.65,
-      "minimumRoundedSupportM": 1.5199999223912144,
+      "minimumRoundedSupportM": 1.3700000047683716,
       "maximumRoundedSupportM": 1.8165072295105489,
       "minimumRoundedGradeClearanceM": 1.65,
       "edgeFailures": [],
@@ -4282,9 +4288,9 @@
           -4.790000057220459
         ],
         [
-          -21,
-          -31.4,
-          -4.8100000000000005
+          -12.4,
+          -21.6,
+          -0.25
         ]
       ],
       "fromPose": {
@@ -4302,33 +4308,33 @@
       },
       "toPose": {
         "eye": [
-          -21,
-          -4.8100000000000005,
-          31.4
+          -12.4,
+          -0.25,
+          21.6
         ],
         "at": [
-          -41,
-          -3.2,
-          47
+          -38,
+          -4.2,
+          44
         ],
         "fov": 58
       },
       "certifiedBalls": [],
-      "length": 3.505766677591534,
-      "roundedLength": 3.505766677591534,
+      "length": 16.099118004398928,
+      "roundedLength": 16.099118004398928,
       "maxNearRadius": 0.3954489204919866,
-      "minimumSurfaceSupportM": 1.505633729478003,
-      "maximumSurfaceSupportM": 1.6500000000000004,
-      "minimumGradeClearanceM": 1.6499999999999995,
-      "minimumRoundedSupportM": 1.505633729478003,
-      "maximumRoundedSupportM": 1.6500000000000004,
-      "minimumRoundedGradeClearanceM": 1.6499999999999995,
+      "minimumSurfaceSupportM": 0.8181366116363811,
+      "maximumSurfaceSupportM": 2.8185504685277527,
+      "minimumGradeClearanceM": 0.8181366354782389,
+      "minimumRoundedSupportM": 0.8181366116363806,
+      "maximumRoundedSupportM": 2.8185504685277527,
+      "minimumRoundedGradeClearanceM": 0.8181366354782384,
       "edgeFailures": [],
       "uncertifiedCorners": [],
       "certifiedCorners": [],
       "durationSeconds": 1.12,
-      "peakSpeedMps": 4.695223228917232,
-      "originalPolylinePeakSpeedMps": 4.695223228917232
+      "peakSpeedMps": 21.561318755891417,
+      "originalPolylinePeakSpeedMps": 21.561318755891417
     },
     {
       "viewport": "desktop",
@@ -4336,9 +4342,9 @@
       "to": "arrival",
       "points": [
         [
-          -21,
-          -31.4,
-          -4.8100000000000005
+          -12.4,
+          -21.6,
+          -0.25
         ],
         [
           -20.7,
@@ -4418,14 +4424,14 @@
       ],
       "fromPose": {
         "eye": [
-          -21,
-          -4.8100000000000005,
-          31.4
+          -12.4,
+          -0.25,
+          21.6
         ],
         "at": [
-          -41,
-          -3.2,
-          47
+          -38,
+          -4.2,
+          44
         ],
         "fov": 58
       },
@@ -4445,11 +4451,11 @@
       "certifiedBalls": [
         {
           "centre": [
-            -20.723999999999997,
-            -4.7909130439271665,
-            31.37595653745081
+            -20.63172642299567,
+            -4.749455175951849,
+            31.207387824741875
           ],
-          "radiusM": 0.48971882419941615
+          "radiusM": 0.6442309526270035
         },
         {
           "centre": [
@@ -4564,15 +4570,15 @@
           "radiusM": 0.8727793636710497
         }
       ],
-      "length": 75.2227330174295,
-      "roundedLength": 74.95850347939553,
+      "length": 88.54343266017106,
+      "roundedLength": 88.05142612653113,
       "maxNearRadius": 0.4358792120908067,
-      "minimumSurfaceSupportM": 1.3393220338983052,
-      "maximumSurfaceSupportM": 2.48,
-      "minimumGradeClearanceM": 1.3393220338983052,
-      "minimumRoundedSupportM": 1.331913092553962,
-      "maximumRoundedSupportM": 1.8774405006004353,
-      "minimumRoundedGradeClearanceM": 1.331913092553962,
+      "minimumSurfaceSupportM": 0.6189377050958711,
+      "maximumSurfaceSupportM": 2.507720210253148,
+      "minimumGradeClearanceM": 0.6189377289377289,
+      "minimumRoundedSupportM": 0.6173399071419852,
+      "maximumRoundedSupportM": 2.5069282895739637,
+      "minimumRoundedGradeClearanceM": 0.617339930983843,
       "edgeFailures": [
         {
           "edge": 15,
@@ -4588,64 +4594,64 @@
           ],
           "distance": 0.2627005390529147,
           "mesh": "wing-vinci/retaining",
-          "triangle": 264189,
+          "triangle": 261513,
           "outerArrival": true
         }
       ],
       "arrivalCertificate": {
         "method": "Every original triangle intersecting the outer-edge near-ball capsule is separated by its vertical plane. Exact full-cone eye-to-near-pyramid standing support plus a conservative pi-slerp/YXZ derivative bound covers every continuous point toward or away from arrival; all remaining triangles are outside the enclosing capsule. The runtime reconstructed path must not be shorter than the certified rounded path, and the actual lens must never exceed the arrival lens.",
         "certified": true,
-        "certifiedRoundedLengthM": 74.95850347939553,
+        "certifiedRoundedLengthM": 88.05142612653113,
         "maximumAuthoredFov": 70,
         "spanM": 3.3594714550347855,
         "planes": [
           {
-            "triangle": 264186,
+            "triangle": 261510,
             "mesh": "wing-vinci/retaining",
             "certified": true,
             "standingMarginM": 0.004600064547140126,
             "continuousLowerBoundM": 0.004600064547140126,
-            "elevationBoundRadians": 0.5901073967794913
+            "elevationBoundRadians": 0.569171087356493
           },
           {
-            "triangle": 264189,
+            "triangle": 261513,
             "mesh": "wing-vinci/retaining",
             "certified": true,
             "standingMarginM": 0.004600064547140181,
             "continuousLowerBoundM": 0.004600064547140181,
-            "elevationBoundRadians": 0.5901073967794913
+            "elevationBoundRadians": 0.569171087356493
           },
           {
-            "triangle": 264190,
+            "triangle": 261514,
             "mesh": "wing-vinci/retaining",
             "certified": true,
             "standingMarginM": 0.004600064547140126,
             "continuousLowerBoundM": 0.004600064547140126,
-            "elevationBoundRadians": 0.5901073967794913
+            "elevationBoundRadians": 0.569171087356493
           },
           {
-            "triangle": 956182,
+            "triangle": 950821,
             "mesh": "wing-vinci/retaining",
             "certified": true,
             "standingMarginM": 0.004600064547140126,
             "continuousLowerBoundM": 0.004600064547140126,
-            "elevationBoundRadians": 0.5901073967794913
+            "elevationBoundRadians": 0.569171087356493
           },
           {
-            "triangle": 956185,
+            "triangle": 950824,
             "mesh": "wing-vinci/retaining",
             "certified": true,
             "standingMarginM": 0.004600064547140181,
             "continuousLowerBoundM": 0.004600064547140181,
-            "elevationBoundRadians": 0.5901073967794913
+            "elevationBoundRadians": 0.569171087356493
           },
           {
-            "triangle": 956186,
+            "triangle": 950825,
             "mesh": "wing-vinci/retaining",
             "certified": true,
             "standingMarginM": 0.004600064547140126,
             "continuousLowerBoundM": 0.004600064547140126,
-            "elevationBoundRadians": 0.5901073967794913
+            "elevationBoundRadians": 0.569171087356493
           }
         ]
       },
@@ -4653,8 +4659,8 @@
       "certifiedCorners": [
         {
           "index": 1,
-          "requestedTrimM": 0.07215982261619014,
-          "acceptedTrimM": 0.07215982261619014,
+          "requestedTrimM": 0.3361371148802223,
+          "acceptedTrimM": 0.3361371148802223,
           "certificateCalls": 1,
           "result": "certified"
         },
@@ -4751,8 +4757,8 @@
         }
       ],
       "durationSeconds": 1.12,
-      "peakSpeedMps": 100.39085287419044,
-      "originalPolylinePeakSpeedMps": 100.74473171977165
+      "peakSpeedMps": 117.92601713374704,
+      "originalPolylinePeakSpeedMps": 118.58495445558624
     },
     {
       "viewport": "desktop",
@@ -4760,9 +4766,9 @@
       "to": "courtyard",
       "points": [
         [
-          -21,
-          -31.4,
-          -4.8100000000000005
+          -12.4,
+          -21.6,
+          -0.25
         ],
         [
           -20.7,
@@ -4817,14 +4823,14 @@
       ],
       "fromPose": {
         "eye": [
-          -21,
-          -4.8100000000000005,
-          31.4
+          -12.4,
+          -0.25,
+          21.6
         ],
         "at": [
-          -41,
-          -3.2,
-          47
+          -38,
+          -4.2,
+          44
         ],
         "fov": 58
       },
@@ -4844,11 +4850,11 @@
       "certifiedBalls": [
         {
           "centre": [
-            -20.723999999999997,
-            -4.7909130439271665,
-            31.37595653745081
+            -20.63172642299567,
+            -4.749455175951849,
+            31.207387824741875
           ],
-          "radiusM": 0.44007393830516883
+          "radiusM": 0.5945860667327562
         },
         {
           "centre": [
@@ -4915,22 +4921,22 @@
           "radiusM": 0.47581181457320104
         }
       ],
-      "length": 57.84502124741522,
-      "roundedLength": 57.65778524418961,
+      "length": 71.16572089015678,
+      "roundedLength": 70.7507078913252,
       "maxNearRadius": 0.3862343261965594,
-      "minimumSurfaceSupportM": 1.559999942779541,
-      "maximumSurfaceSupportM": 1.816135658580027,
-      "minimumGradeClearanceM": 1.6499999999999995,
-      "minimumRoundedSupportM": 1.559999942779541,
-      "maximumRoundedSupportM": 1.8161182030869245,
-      "minimumRoundedGradeClearanceM": 1.6499999999999995,
+      "minimumSurfaceSupportM": 0.6189377050958711,
+      "maximumSurfaceSupportM": 2.507720210253148,
+      "minimumGradeClearanceM": 0.6189377289377289,
+      "minimumRoundedSupportM": 0.6174895879547326,
+      "maximumRoundedSupportM": 2.507002476257443,
+      "minimumRoundedGradeClearanceM": 0.6174896117965905,
       "edgeFailures": [],
       "uncertifiedCorners": [],
       "certifiedCorners": [
         {
           "index": 1,
-          "requestedTrimM": 0.07215982261619014,
-          "acceptedTrimM": 0.07215982261619014,
+          "requestedTrimM": 0.3361371148802223,
+          "acceptedTrimM": 0.3361371148802223,
           "certificateCalls": 1,
           "result": "certified"
         },
@@ -4992,8 +4998,8 @@
         }
       ],
       "durationSeconds": 1.12,
-      "peakSpeedMps": 77.2202480948968,
-      "originalPolylinePeakSpeedMps": 77.4710105992168
+      "peakSpeedMps": 94.7554123544534,
+      "originalPolylinePeakSpeedMps": 95.31123333503139
     },
     {
       "viewport": "desktop",
@@ -5001,9 +5007,9 @@
       "to": "hall",
       "points": [
         [
-          -21,
-          -31.4,
-          -4.8100000000000005
+          -12.4,
+          -21.6,
+          -0.25
         ],
         [
           -20.7,
@@ -5058,14 +5064,14 @@
       ],
       "fromPose": {
         "eye": [
-          -21,
-          -4.8100000000000005,
-          31.4
+          -12.4,
+          -0.25,
+          21.6
         ],
         "at": [
-          -41,
-          -3.2,
-          47
+          -38,
+          -4.2,
+          44
         ],
         "fov": 58
       },
@@ -5085,11 +5091,11 @@
       "certifiedBalls": [
         {
           "centre": [
-            -20.723999999999997,
-            -4.7909130439271665,
-            31.37595653745081
+            -20.63172642299567,
+            -4.749455175951849,
+            31.207387824741875
           ],
-          "radiusM": 0.43119448442859915
+          "radiusM": 0.5857066128561865
         },
         {
           "centre": [
@@ -5156,22 +5162,22 @@
           "radiusM": 0.4668398323967134
         }
       ],
-      "length": 51.776597962925116,
-      "roundedLength": 51.58922324189312,
+      "length": 65.09729760566667,
+      "roundedLength": 64.6821458890287,
       "maxNearRadius": 0.3773548723199897,
-      "minimumSurfaceSupportM": 1.559999942779541,
-      "maximumSurfaceSupportM": 1.816135658580027,
-      "minimumGradeClearanceM": 1.6499999999999995,
-      "minimumRoundedSupportM": 1.559999942779541,
-      "maximumRoundedSupportM": 1.8164561929371903,
-      "minimumRoundedGradeClearanceM": 1.6499999999999995,
+      "minimumSurfaceSupportM": 0.6189377050958711,
+      "maximumSurfaceSupportM": 2.507720210253148,
+      "minimumGradeClearanceM": 0.6189377289377289,
+      "minimumRoundedSupportM": 0.6170553587244514,
+      "maximumRoundedSupportM": 2.5067872581154393,
+      "minimumRoundedGradeClearanceM": 0.6170553825663092,
       "edgeFailures": [],
       "uncertifiedCorners": [],
       "certifiedCorners": [
         {
           "index": 1,
-          "requestedTrimM": 0.07215982261619014,
-          "acceptedTrimM": 0.07215982261619014,
+          "requestedTrimM": 0.3361371148802223,
+          "acceptedTrimM": 0.3361371148802223,
           "certificateCalls": 1,
           "result": "certified"
         },
@@ -5233,8 +5239,8 @@
         }
       ],
       "durationSeconds": 1.12,
-      "peakSpeedMps": 69.09270969896399,
-      "originalPolylinePeakSpeedMps": 69.34365798606042
+      "peakSpeedMps": 86.62787395852058,
+      "originalPolylinePeakSpeedMps": 87.183880721875
     },
     {
       "viewport": "desktop",
@@ -5242,9 +5248,9 @@
       "to": "garden",
       "points": [
         [
-          -21,
-          -31.4,
-          -4.8100000000000005
+          -12.4,
+          -21.6,
+          -0.25
         ],
         [
           -24.5,
@@ -5254,14 +5260,14 @@
       ],
       "fromPose": {
         "eye": [
-          -21,
-          -4.8100000000000005,
-          31.4
+          -12.4,
+          -0.25,
+          21.6
         ],
         "at": [
-          -41,
-          -3.2,
-          47
+          -38,
+          -4.2,
+          44
         ],
         "fov": 58
       },
@@ -5279,21 +5285,21 @@
         "fov": 62
       },
       "certifiedBalls": [],
-      "length": 3.505766677591534,
-      "roundedLength": 3.505766677591534,
+      "length": 16.099118004398928,
+      "roundedLength": 16.099118004398928,
       "maxNearRadius": 0.3954489204919866,
-      "minimumSurfaceSupportM": 1.505633729478003,
-      "maximumSurfaceSupportM": 1.6500000000000004,
-      "minimumGradeClearanceM": 1.6499999999999995,
-      "minimumRoundedSupportM": 1.505633729478003,
-      "maximumRoundedSupportM": 1.6500000000000004,
-      "minimumRoundedGradeClearanceM": 1.6499999999999995,
+      "minimumSurfaceSupportM": 0.8181366116363811,
+      "maximumSurfaceSupportM": 2.8185504685277523,
+      "minimumGradeClearanceM": 0.8181366354782389,
+      "minimumRoundedSupportM": 0.8181366116363811,
+      "maximumRoundedSupportM": 2.8185504685277523,
+      "minimumRoundedGradeClearanceM": 0.8181366354782389,
       "edgeFailures": [],
       "uncertifiedCorners": [],
       "certifiedCorners": [],
       "durationSeconds": 1.12,
-      "peakSpeedMps": 4.695223228917232,
-      "originalPolylinePeakSpeedMps": 4.695223228917232
+      "peakSpeedMps": 21.561318755891417,
+      "originalPolylinePeakSpeedMps": 21.561318755891417
     },
     {
       "viewport": "phone",
@@ -5360,7 +5366,7 @@
           4.8,
           12.5
         ],
-        "fov": 70
+        "fov": 80
       },
       "certifiedBalls": [
         {
@@ -6087,9 +6093,9 @@
           -4.79
         ],
         [
-          -21,
-          -31.4,
-          -4.8100000000000005
+          -12.4,
+          -21.6,
+          -0.25
         ]
       ],
       "fromPose": {
@@ -6107,16 +6113,16 @@
       },
       "toPose": {
         "eye": [
-          -21,
-          -4.8100000000000005,
-          31.4
+          -12.4,
+          -0.25,
+          21.6
         ],
         "at": [
-          -41,
-          -3.2,
-          47
+          -38,
+          -4.2,
+          44
         ],
-        "fov": 72
+        "fov": 74
       },
       "certifiedBalls": [
         {
@@ -6233,27 +6239,27 @@
         },
         {
           "centre": [
-            -20.723999999999997,
-            -4.790913043927166,
-            31.37595653745081
+            -20.63172642299567,
+            -4.749455175951848,
+            31.207387824741875
           ],
-          "radiusM": 0.56128520957786
+          "radiusM": 0.7157973380054475
         }
       ],
-      "length": 75.085243364642,
-      "roundedLength": 74.80127028964196,
+      "length": 88.40594300738356,
+      "roundedLength": 87.89419293677756,
       "maxNearRadius": 0.5074455974692506,
-      "minimumSurfaceSupportM": 1.3393220338983052,
-      "maximumSurfaceSupportM": 2.48,
-      "minimumGradeClearanceM": 1.3393220338983052,
-      "minimumRoundedSupportM": 1.3442008636275493,
-      "maximumRoundedSupportM": 1.8756404039678616,
-      "minimumRoundedGradeClearanceM": 1.3442008636275493,
+      "minimumSurfaceSupportM": 0.6189377050958713,
+      "maximumSurfaceSupportM": 2.507720210253148,
+      "minimumGradeClearanceM": 0.6189377289377291,
+      "minimumRoundedSupportM": 0.6168384963784881,
+      "maximumRoundedSupportM": 2.5066797740772415,
+      "minimumRoundedGradeClearanceM": 0.6168385202203459,
       "edgeFailures": [],
       "arrivalCertificate": {
         "method": "Every original triangle intersecting the outer-edge near-ball capsule is separated by its vertical plane. Exact full-cone eye-to-near-pyramid standing support plus a conservative pi-slerp/YXZ derivative bound covers every continuous point toward or away from arrival; all remaining triangles are outside the enclosing capsule. The runtime reconstructed path must not be shorter than the certified rounded path, and the actual lens must never exceed the arrival lens.",
         "certified": true,
-        "certifiedRoundedLengthM": 74.80127028964196,
+        "certifiedRoundedLengthM": 87.89419293677756,
         "maximumAuthoredFov": 116.1,
         "spanM": 3.221981802247289,
         "planes": []
@@ -6353,15 +6359,15 @@
         },
         {
           "index": 14,
-          "requestedTrimM": 0.07215982261619014,
-          "acceptedTrimM": 0.07215982261619014,
+          "requestedTrimM": 0.3361371148802223,
+          "acceptedTrimM": 0.3361371148802223,
           "certificateCalls": 1,
           "result": "certified"
         }
       ],
       "durationSeconds": 1.12,
-      "peakSpeedMps": 100.1802727093419,
-      "originalPolylinePeakSpeedMps": 100.56059379193124
+      "peakSpeedMps": 117.71543696889849,
+      "originalPolylinePeakSpeedMps": 118.40081652774583
     },
     {
       "viewport": "phone",
@@ -6415,7 +6421,7 @@
           4.8,
           12.5
         ],
-        "fov": 70
+        "fov": 80
       },
       "toPose": {
         "eye": [
@@ -6567,7 +6573,7 @@
           4.8,
           12.5
         ],
-        "fov": 70
+        "fov": 80
       },
       "toPose": {
         "eye": [
@@ -6585,7 +6591,7 @@
       "certifiedBalls": [],
       "length": 6.073302231899875,
       "roundedLength": 6.073302231899875,
-      "maxNearRadius": 0.31573117849773963,
+      "maxNearRadius": 0.3404433777733779,
       "minimumSurfaceSupportM": 1.65,
       "maximumSurfaceSupportM": 1.7,
       "minimumGradeClearanceM": 1.65,
@@ -6671,7 +6677,7 @@
           4.8,
           12.5
         ],
-        "fov": 70
+        "fov": 80
       },
       "toPose": {
         "eye": [
@@ -6763,10 +6769,10 @@
       "length": 61.34961483793584,
       "roundedLength": 61.0551045658722,
       "maxNearRadius": 0.39503418080865893,
-      "minimumSurfaceSupportM": 1.5199999219721017,
+      "minimumSurfaceSupportM": 1.3700000047683716,
       "maximumSurfaceSupportM": 1.816135658580027,
       "minimumGradeClearanceM": 1.65,
-      "minimumRoundedSupportM": 1.5199999223731586,
+      "minimumRoundedSupportM": 1.3700000047683716,
       "maximumRoundedSupportM": 1.8161685730234804,
       "minimumRoundedGradeClearanceM": 1.65,
       "edgeFailures": [],
@@ -6896,9 +6902,9 @@
           -4.79
         ],
         [
-          -21,
-          -31.4,
-          -4.8100000000000005
+          -12.4,
+          -21.6,
+          -0.25
         ]
       ],
       "fromPose": {
@@ -6912,20 +6918,20 @@
           4.8,
           12.5
         ],
-        "fov": 70
+        "fov": 80
       },
       "toPose": {
         "eye": [
-          -21,
-          -4.8100000000000005,
-          31.4
+          -12.4,
+          -0.25,
+          21.6
         ],
         "at": [
-          -41,
-          -3.2,
-          47
+          -38,
+          -4.2,
+          44
         ],
-        "fov": 72
+        "fov": 74
       },
       "certifiedBalls": [
         {
@@ -6934,7 +6940,7 @@
             1.6501013754941827,
             26.31375622947059
           ],
-          "radiusM": 0.40978982718078577
+          "radiusM": 0.4300208661500195
         },
         {
           "centre": [
@@ -6942,7 +6948,7 @@
             1.6359972414132564,
             26.510529047128593
           ],
-          "radiusM": 0.40788354107668684
+          "radiusM": 0.42811458004592057
         },
         {
           "centre": [
@@ -6950,7 +6956,7 @@
             -0.2359972414132564,
             28.474997352871398
           ],
-          "radiusM": 0.4078835410766843
+          "radiusM": 0.4281145800459181
         },
         {
           "centre": [
@@ -6958,7 +6964,7 @@
             -0.25,
             28.636932438693112
           ],
-          "radiusM": 0.38898607435679683
+          "radiusM": 0.40921711332603056
         },
         {
           "centre": [
@@ -6966,7 +6972,7 @@
             -0.25,
             14.633751918740368
           ],
-          "radiusM": 0.7731963688980437
+          "radiusM": 0.7934274078672774
         },
         {
           "centre": [
@@ -6974,7 +6980,7 @@
             -0.25,
             14.54
           ],
-          "radiusM": 0.409669057904137
+          "radiusM": 0.4299000968733708
         },
         {
           "centre": [
@@ -6982,7 +6988,7 @@
             -0.26149391542265377,
             14.998313051408847
           ],
-          "radiusM": 0.4390963864419549
+          "radiusM": 0.4593274254111887
         },
         {
           "centre": [
@@ -6990,26 +6996,26 @@
             -4.721003903592932,
             30.004679678643104
           ],
-          "radiusM": 0.6537871488551746
+          "radiusM": 0.6740181878244085
         },
         {
           "centre": [
-            -20.723999999999997,
-            -4.790913043927166,
-            31.37595653745081
+            -20.63172642299567,
+            -4.749455175951848,
+            31.207387824741875
           ],
-          "radiusM": 0.3740519509127536
+          "radiusM": 0.548795118309575
         }
       ],
-      "length": 57.845021247415204,
-      "roundedLength": 57.65778524418961,
-      "maxNearRadius": 0.3202123388041441,
-      "minimumSurfaceSupportM": 1.559999942779541,
-      "maximumSurfaceSupportM": 1.816135658580027,
-      "minimumGradeClearanceM": 1.6499999999999995,
-      "minimumRoundedSupportM": 1.559999942779541,
-      "maximumRoundedSupportM": 1.8161182030869236,
-      "minimumRoundedGradeClearanceM": 1.6499999999999995,
+      "length": 71.16572089015676,
+      "roundedLength": 70.75070789132519,
+      "maxNearRadius": 0.3404433777733779,
+      "minimumSurfaceSupportM": 0.6189377050958713,
+      "maximumSurfaceSupportM": 2.507720210253148,
+      "minimumGradeClearanceM": 0.6189377289377291,
+      "minimumRoundedSupportM": 0.6174895879547369,
+      "maximumRoundedSupportM": 2.5070024762574454,
+      "minimumRoundedGradeClearanceM": 0.6174896117965947,
       "edgeFailures": [],
       "uncertifiedCorners": [],
       "certifiedCorners": [
@@ -7071,15 +7077,15 @@
         },
         {
           "index": 9,
-          "requestedTrimM": 0.07215982261619014,
-          "acceptedTrimM": 0.07215982261619014,
+          "requestedTrimM": 0.3361371148802223,
+          "acceptedTrimM": 0.3361371148802223,
           "certificateCalls": 1,
           "result": "certified"
         }
       ],
       "durationSeconds": 1.12,
-      "peakSpeedMps": 77.2202480948968,
-      "originalPolylinePeakSpeedMps": 77.47101059921678
+      "peakSpeedMps": 94.75541235445337,
+      "originalPolylinePeakSpeedMps": 95.31123333503137
     },
     {
       "viewport": "phone",
@@ -7298,12 +7304,12 @@
           4.8,
           12.5
         ],
-        "fov": 70
+        "fov": 80
       },
       "certifiedBalls": [],
       "length": 6.073302231899875,
       "roundedLength": 6.073302231899875,
-      "maxNearRadius": 0.31573117849773963,
+      "maxNearRadius": 0.3404433777733779,
       "minimumSurfaceSupportM": 1.65,
       "maximumSurfaceSupportM": 1.7,
       "minimumGradeClearanceM": 1.65,
@@ -7481,10 +7487,10 @@
       "length": 55.281191553445744,
       "roundedLength": 54.98654256357571,
       "maxNearRadius": 0.39503418080865893,
-      "minimumSurfaceSupportM": 1.5199999219721017,
+      "minimumSurfaceSupportM": 1.3700000047683716,
       "maximumSurfaceSupportM": 1.816135658580027,
       "minimumGradeClearanceM": 1.65,
-      "minimumRoundedSupportM": 1.5199999223912144,
+      "minimumRoundedSupportM": 1.3700000047683716,
       "maximumRoundedSupportM": 1.8165072295105524,
       "minimumRoundedGradeClearanceM": 1.65,
       "edgeFailures": [],
@@ -7614,9 +7620,9 @@
           -4.79
         ],
         [
-          -21,
-          -31.4,
-          -4.8100000000000005
+          -12.4,
+          -21.6,
+          -0.25
         ]
       ],
       "fromPose": {
@@ -7634,16 +7640,16 @@
       },
       "toPose": {
         "eye": [
-          -21,
-          -4.8100000000000005,
-          31.4
+          -12.4,
+          -0.25,
+          21.6
         ],
         "at": [
-          -41,
-          -3.2,
-          47
+          -38,
+          -4.2,
+          44
         ],
-        "fov": 72
+        "fov": 74
       },
       "certifiedBalls": [
         {
@@ -7652,7 +7658,7 @@
             1.6499999999999997,
             26.31435078176665
           ],
-          "radiusM": 0.40969729888086787
+          "radiusM": 0.41439757358914625
         },
         {
           "centre": [
@@ -7660,7 +7666,7 @@
             1.6359972414132564,
             26.510529047128593
           ],
-          "radiusM": 0.40788354107668684
+          "radiusM": 0.4125838157849652
         },
         {
           "centre": [
@@ -7668,7 +7674,7 @@
             -0.2359972414132564,
             28.474997352871398
           ],
-          "radiusM": 0.4078835410766843
+          "radiusM": 0.4125838157849628
         },
         {
           "centre": [
@@ -7676,7 +7682,7 @@
             -0.25,
             28.636932438693112
           ],
-          "radiusM": 0.38898607435679683
+          "radiusM": 0.3936863490650752
         },
         {
           "centre": [
@@ -7684,7 +7690,7 @@
             -0.25,
             14.633751918740368
           ],
-          "radiusM": 0.7731963688980437
+          "radiusM": 0.777896643606322
         },
         {
           "centre": [
@@ -7692,7 +7698,7 @@
             -0.25,
             14.54
           ],
-          "radiusM": 0.409669057904137
+          "radiusM": 0.41436933261241543
         },
         {
           "centre": [
@@ -7700,7 +7706,7 @@
             -0.26149391542265377,
             14.998313051408847
           ],
-          "radiusM": 0.4390963864419549
+          "radiusM": 0.44379666115023336
         },
         {
           "centre": [
@@ -7708,26 +7714,26 @@
             -4.721003903592932,
             30.004679678643104
           ],
-          "radiusM": 0.6537871488551746
+          "radiusM": 0.658487423563453
         },
         {
           "centre": [
-            -20.723999999999997,
-            -4.790913043927166,
-            31.37595653745081
+            -20.63172642299567,
+            -4.749455175951848,
+            31.207387824741875
           ],
-          "radiusM": 0.3740519509127536
+          "radiusM": 0.5332643540486195
         }
       ],
-      "length": 51.77659796292511,
-      "roundedLength": 51.58922324189312,
-      "maxNearRadius": 0.3202123388041441,
-      "minimumSurfaceSupportM": 1.559999942779541,
-      "maximumSurfaceSupportM": 1.816135658580027,
-      "minimumGradeClearanceM": 1.6499999999999995,
-      "minimumRoundedSupportM": 1.559999942779541,
-      "maximumRoundedSupportM": 1.8164561929371894,
-      "minimumRoundedGradeClearanceM": 1.6499999999999995,
+      "length": 65.09729760566667,
+      "roundedLength": 64.6821458890287,
+      "maxNearRadius": 0.32491261351242257,
+      "minimumSurfaceSupportM": 0.6189377050958713,
+      "maximumSurfaceSupportM": 2.507720210253148,
+      "minimumGradeClearanceM": 0.6189377289377291,
+      "minimumRoundedSupportM": 0.617055358724452,
+      "maximumRoundedSupportM": 2.506787258115442,
+      "minimumRoundedGradeClearanceM": 0.6170553825663099,
       "edgeFailures": [],
       "uncertifiedCorners": [],
       "certifiedCorners": [
@@ -7789,15 +7795,15 @@
         },
         {
           "index": 9,
-          "requestedTrimM": 0.07215982261619014,
-          "acceptedTrimM": 0.07215982261619014,
+          "requestedTrimM": 0.3361371148802223,
+          "acceptedTrimM": 0.3361371148802223,
           "certificateCalls": 1,
           "result": "certified"
         }
       ],
       "durationSeconds": 1.12,
-      "peakSpeedMps": 69.09270969896399,
-      "originalPolylinePeakSpeedMps": 69.3436579860604
+      "peakSpeedMps": 86.62787395852058,
+      "originalPolylinePeakSpeedMps": 87.183880721875
     },
     {
       "viewport": "phone",
@@ -8241,7 +8247,7 @@
           4.8,
           12.5
         ],
-        "fov": 70
+        "fov": 80
       },
       "certifiedBalls": [
         {
@@ -8320,10 +8326,10 @@
       "length": 61.349614837935846,
       "roundedLength": 61.05510456587221,
       "maxNearRadius": 0.39503418080865893,
-      "minimumSurfaceSupportM": 1.5199999219721017,
+      "minimumSurfaceSupportM": 1.3700000047683716,
       "maximumSurfaceSupportM": 1.816135658580027,
       "minimumGradeClearanceM": 1.65,
-      "minimumRoundedSupportM": 1.5199999223731586,
+      "minimumRoundedSupportM": 1.3700000047683716,
       "maximumRoundedSupportM": 1.8161685730234813,
       "minimumRoundedGradeClearanceM": 1.65,
       "edgeFailures": [],
@@ -8561,10 +8567,10 @@
       "length": 55.281191553445744,
       "roundedLength": 54.98654256357571,
       "maxNearRadius": 0.39503418080865893,
-      "minimumSurfaceSupportM": 1.5199999219721017,
+      "minimumSurfaceSupportM": 1.3700000047683716,
       "maximumSurfaceSupportM": 1.816135658580027,
       "minimumGradeClearanceM": 1.65,
-      "minimumRoundedSupportM": 1.5199999223912144,
+      "minimumRoundedSupportM": 1.3700000047683716,
       "maximumRoundedSupportM": 1.8165072295105489,
       "minimumRoundedGradeClearanceM": 1.65,
       "edgeFailures": [],
@@ -8649,9 +8655,9 @@
           -4.790000057220459
         ],
         [
-          -21,
-          -31.4,
-          -4.8100000000000005
+          -12.4,
+          -21.6,
+          -0.25
         ]
       ],
       "fromPose": {
@@ -8669,33 +8675,33 @@
       },
       "toPose": {
         "eye": [
-          -21,
-          -4.8100000000000005,
-          31.4
+          -12.4,
+          -0.25,
+          21.6
         ],
         "at": [
-          -41,
-          -3.2,
-          47
+          -38,
+          -4.2,
+          44
         ],
-        "fov": 72
+        "fov": 74
       },
       "certifiedBalls": [],
-      "length": 3.505766677591534,
-      "roundedLength": 3.505766677591534,
+      "length": 16.099118004398928,
+      "roundedLength": 16.099118004398928,
       "maxNearRadius": 0.39503418080865893,
-      "minimumSurfaceSupportM": 1.505633729478003,
-      "maximumSurfaceSupportM": 1.6500000000000004,
-      "minimumGradeClearanceM": 1.6499999999999995,
-      "minimumRoundedSupportM": 1.505633729478003,
-      "maximumRoundedSupportM": 1.6500000000000004,
-      "minimumRoundedGradeClearanceM": 1.6499999999999995,
+      "minimumSurfaceSupportM": 0.8181366116363811,
+      "maximumSurfaceSupportM": 2.8185504685277527,
+      "minimumGradeClearanceM": 0.8181366354782389,
+      "minimumRoundedSupportM": 0.8181366116363806,
+      "maximumRoundedSupportM": 2.8185504685277527,
+      "minimumRoundedGradeClearanceM": 0.8181366354782384,
       "edgeFailures": [],
       "uncertifiedCorners": [],
       "certifiedCorners": [],
       "durationSeconds": 1.12,
-      "peakSpeedMps": 4.695223228917232,
-      "originalPolylinePeakSpeedMps": 4.695223228917232
+      "peakSpeedMps": 21.561318755891417,
+      "originalPolylinePeakSpeedMps": 21.561318755891417
     },
     {
       "viewport": "phone",
@@ -8703,9 +8709,9 @@
       "to": "arrival",
       "points": [
         [
-          -21,
-          -31.4,
-          -4.8100000000000005
+          -12.4,
+          -21.6,
+          -0.25
         ],
         [
           -20.7,
@@ -8785,16 +8791,16 @@
       ],
       "fromPose": {
         "eye": [
-          -21,
-          -4.8100000000000005,
-          31.4
+          -12.4,
+          -0.25,
+          21.6
         ],
         "at": [
-          -41,
-          -3.2,
-          47
+          -38,
+          -4.2,
+          44
         ],
-        "fov": 72
+        "fov": 74
       },
       "toPose": {
         "eye": [
@@ -8812,11 +8818,11 @@
       "certifiedBalls": [
         {
           "centre": [
-            -20.723999999999997,
-            -4.7909130439271665,
-            31.37595653745081
+            -20.63172642299567,
+            -4.749455175951849,
+            31.207387824741875
           ],
-          "radiusM": 0.56128520957786
+          "radiusM": 0.7157973380054473
         },
         {
           "centre": [
@@ -8931,20 +8937,20 @@
           "radiusM": 0.9310527542187503
         }
       ],
-      "length": 75.08524336464201,
-      "roundedLength": 74.80127028964199,
+      "length": 88.40594300738357,
+      "roundedLength": 87.89419293677759,
       "maxNearRadius": 0.5074455974692506,
-      "minimumSurfaceSupportM": 1.3393220338983052,
-      "maximumSurfaceSupportM": 2.48,
-      "minimumGradeClearanceM": 1.3393220338983052,
-      "minimumRoundedSupportM": 1.3442008636275569,
-      "maximumRoundedSupportM": 1.8756404039678687,
-      "minimumRoundedGradeClearanceM": 1.3442008636275569,
+      "minimumSurfaceSupportM": 0.6189377050958711,
+      "maximumSurfaceSupportM": 2.507720210253148,
+      "minimumGradeClearanceM": 0.6189377289377289,
+      "minimumRoundedSupportM": 0.6168384963784852,
+      "maximumRoundedSupportM": 2.5066797740772415,
+      "minimumRoundedGradeClearanceM": 0.616838520220343,
       "edgeFailures": [],
       "arrivalCertificate": {
         "method": "Every original triangle intersecting the outer-edge near-ball capsule is separated by its vertical plane. Exact full-cone eye-to-near-pyramid standing support plus a conservative pi-slerp/YXZ derivative bound covers every continuous point toward or away from arrival; all remaining triangles are outside the enclosing capsule. The runtime reconstructed path must not be shorter than the certified rounded path, and the actual lens must never exceed the arrival lens.",
         "certified": true,
-        "certifiedRoundedLengthM": 74.80127028964199,
+        "certifiedRoundedLengthM": 87.89419293677759,
         "maximumAuthoredFov": 116.1,
         "spanM": 3.221981802247289,
         "planes": []
@@ -8953,8 +8959,8 @@
       "certifiedCorners": [
         {
           "index": 1,
-          "requestedTrimM": 0.07215982261619014,
-          "acceptedTrimM": 0.07215982261619014,
+          "requestedTrimM": 0.3361371148802223,
+          "acceptedTrimM": 0.3361371148802223,
           "certificateCalls": 1,
           "result": "certified"
         },
@@ -9051,8 +9057,8 @@
         }
       ],
       "durationSeconds": 1.12,
-      "peakSpeedMps": 100.18027270934195,
-      "originalPolylinePeakSpeedMps": 100.56059379193127
+      "peakSpeedMps": 117.71543696889854,
+      "originalPolylinePeakSpeedMps": 118.40081652774583
     },
     {
       "viewport": "phone",
@@ -9060,9 +9066,9 @@
       "to": "courtyard",
       "points": [
         [
-          -21,
-          -31.4,
-          -4.8100000000000005
+          -12.4,
+          -21.6,
+          -0.25
         ],
         [
           -20.7,
@@ -9117,16 +9123,16 @@
       ],
       "fromPose": {
         "eye": [
-          -21,
-          -4.8100000000000005,
-          31.4
+          -12.4,
+          -0.25,
+          21.6
         ],
         "at": [
-          -41,
-          -3.2,
-          47
+          -38,
+          -4.2,
+          44
         ],
-        "fov": 72
+        "fov": 74
       },
       "toPose": {
         "eye": [
@@ -9139,16 +9145,16 @@
           4.8,
           12.5
         ],
-        "fov": 70
+        "fov": 80
       },
       "certifiedBalls": [
         {
           "centre": [
-            -20.723999999999997,
-            -4.7909130439271665,
-            31.37595653745081
+            -20.63172642299567,
+            -4.749455175951849,
+            31.207387824741875
           ],
-          "radiusM": 0.37405195091275356
+          "radiusM": 0.5487951183095747
         },
         {
           "centre": [
@@ -9156,7 +9162,7 @@
             -4.721003903592932,
             30.004679678643104
           ],
-          "radiusM": 0.6537871488551746
+          "radiusM": 0.6740181878244085
         },
         {
           "centre": [
@@ -9164,7 +9170,7 @@
             -0.26149391542265377,
             14.998313051408847
           ],
-          "radiusM": 0.4390963864419549
+          "radiusM": 0.4593274254111887
         },
         {
           "centre": [
@@ -9172,7 +9178,7 @@
             -0.25,
             14.54
           ],
-          "radiusM": 0.409669057904137
+          "radiusM": 0.4299000968733708
         },
         {
           "centre": [
@@ -9180,7 +9186,7 @@
             -0.25,
             14.633751918740368
           ],
-          "radiusM": 0.7731963688980437
+          "radiusM": 0.7934274078672774
         },
         {
           "centre": [
@@ -9188,7 +9194,7 @@
             -0.25,
             28.636932438693112
           ],
-          "radiusM": 0.3889860743567963
+          "radiusM": 0.40921711332603
         },
         {
           "centre": [
@@ -9196,7 +9202,7 @@
             -0.2359972414132564,
             28.4749973528714
           ],
-          "radiusM": 0.40788354107668495
+          "radiusM": 0.4281145800459188
         },
         {
           "centre": [
@@ -9204,7 +9210,7 @@
             1.6359972414132564,
             26.5105290471286
           ],
-          "radiusM": 0.40788354107668384
+          "radiusM": 0.4281145800459176
         },
         {
           "centre": [
@@ -9212,25 +9218,25 @@
             1.650101375494183,
             26.31375622947059
           ],
-          "radiusM": 0.40978982718078577
+          "radiusM": 0.4300208661500195
         }
       ],
-      "length": 57.84502124741522,
-      "roundedLength": 57.65778524418961,
-      "maxNearRadius": 0.3202123388041441,
-      "minimumSurfaceSupportM": 1.559999942779541,
-      "maximumSurfaceSupportM": 1.816135658580027,
-      "minimumGradeClearanceM": 1.6499999999999995,
-      "minimumRoundedSupportM": 1.559999942779541,
-      "maximumRoundedSupportM": 1.8161182030869245,
-      "minimumRoundedGradeClearanceM": 1.6499999999999995,
+      "length": 71.16572089015678,
+      "roundedLength": 70.7507078913252,
+      "maxNearRadius": 0.3404433777733779,
+      "minimumSurfaceSupportM": 0.6189377050958711,
+      "maximumSurfaceSupportM": 2.507720210253148,
+      "minimumGradeClearanceM": 0.6189377289377289,
+      "minimumRoundedSupportM": 0.6174895879547326,
+      "maximumRoundedSupportM": 2.507002476257443,
+      "minimumRoundedGradeClearanceM": 0.6174896117965905,
       "edgeFailures": [],
       "uncertifiedCorners": [],
       "certifiedCorners": [
         {
           "index": 1,
-          "requestedTrimM": 0.07215982261619014,
-          "acceptedTrimM": 0.07215982261619014,
+          "requestedTrimM": 0.3361371148802223,
+          "acceptedTrimM": 0.3361371148802223,
           "certificateCalls": 1,
           "result": "certified"
         },
@@ -9292,8 +9298,8 @@
         }
       ],
       "durationSeconds": 1.12,
-      "peakSpeedMps": 77.2202480948968,
-      "originalPolylinePeakSpeedMps": 77.4710105992168
+      "peakSpeedMps": 94.7554123544534,
+      "originalPolylinePeakSpeedMps": 95.31123333503139
     },
     {
       "viewport": "phone",
@@ -9301,9 +9307,9 @@
       "to": "hall",
       "points": [
         [
-          -21,
-          -31.4,
-          -4.8100000000000005
+          -12.4,
+          -21.6,
+          -0.25
         ],
         [
           -20.7,
@@ -9358,16 +9364,16 @@
       ],
       "fromPose": {
         "eye": [
-          -21,
-          -4.8100000000000005,
-          31.4
+          -12.4,
+          -0.25,
+          21.6
         ],
         "at": [
-          -41,
-          -3.2,
-          47
+          -38,
+          -4.2,
+          44
         ],
-        "fov": 72
+        "fov": 74
       },
       "toPose": {
         "eye": [
@@ -9385,11 +9391,11 @@
       "certifiedBalls": [
         {
           "centre": [
-            -20.723999999999997,
-            -4.7909130439271665,
-            31.37595653745081
+            -20.63172642299567,
+            -4.749455175951849,
+            31.207387824741875
           ],
-          "radiusM": 0.37405195091275356
+          "radiusM": 0.5332643540486194
         },
         {
           "centre": [
@@ -9397,7 +9403,7 @@
             -4.721003903592932,
             30.004679678643104
           ],
-          "radiusM": 0.6537871488551746
+          "radiusM": 0.658487423563453
         },
         {
           "centre": [
@@ -9405,7 +9411,7 @@
             -0.26149391542265377,
             14.998313051408847
           ],
-          "radiusM": 0.4390963864419549
+          "radiusM": 0.44379666115023336
         },
         {
           "centre": [
@@ -9413,7 +9419,7 @@
             -0.25,
             14.54
           ],
-          "radiusM": 0.409669057904137
+          "radiusM": 0.41436933261241543
         },
         {
           "centre": [
@@ -9421,7 +9427,7 @@
             -0.25,
             14.633751918740368
           ],
-          "radiusM": 0.7731963688980437
+          "radiusM": 0.777896643606322
         },
         {
           "centre": [
@@ -9429,7 +9435,7 @@
             -0.25,
             28.636932438693112
           ],
-          "radiusM": 0.3889860743567963
+          "radiusM": 0.39368634906507466
         },
         {
           "centre": [
@@ -9437,7 +9443,7 @@
             -0.2359972414132564,
             28.4749973528714
           ],
-          "radiusM": 0.40788354107668495
+          "radiusM": 0.41258381578496345
         },
         {
           "centre": [
@@ -9445,7 +9451,7 @@
             1.6359972414132564,
             26.5105290471286
           ],
-          "radiusM": 0.40788354107668384
+          "radiusM": 0.4125838157849623
         },
         {
           "centre": [
@@ -9453,25 +9459,25 @@
             1.6499999999999997,
             26.31435078176665
           ],
-          "radiusM": 0.40969729888086787
+          "radiusM": 0.41439757358914625
         }
       ],
-      "length": 51.776597962925116,
-      "roundedLength": 51.58922324189312,
-      "maxNearRadius": 0.3202123388041441,
-      "minimumSurfaceSupportM": 1.559999942779541,
-      "maximumSurfaceSupportM": 1.816135658580027,
-      "minimumGradeClearanceM": 1.6499999999999995,
-      "minimumRoundedSupportM": 1.559999942779541,
-      "maximumRoundedSupportM": 1.8164561929371903,
-      "minimumRoundedGradeClearanceM": 1.6499999999999995,
+      "length": 65.09729760566667,
+      "roundedLength": 64.6821458890287,
+      "maxNearRadius": 0.32491261351242257,
+      "minimumSurfaceSupportM": 0.6189377050958711,
+      "maximumSurfaceSupportM": 2.507720210253148,
+      "minimumGradeClearanceM": 0.6189377289377289,
+      "minimumRoundedSupportM": 0.6170553587244514,
+      "maximumRoundedSupportM": 2.5067872581154393,
+      "minimumRoundedGradeClearanceM": 0.6170553825663092,
       "edgeFailures": [],
       "uncertifiedCorners": [],
       "certifiedCorners": [
         {
           "index": 1,
-          "requestedTrimM": 0.07215982261619014,
-          "acceptedTrimM": 0.07215982261619014,
+          "requestedTrimM": 0.3361371148802223,
+          "acceptedTrimM": 0.3361371148802223,
           "certificateCalls": 1,
           "result": "certified"
         },
@@ -9533,8 +9539,8 @@
         }
       ],
       "durationSeconds": 1.12,
-      "peakSpeedMps": 69.09270969896399,
-      "originalPolylinePeakSpeedMps": 69.34365798606042
+      "peakSpeedMps": 86.62787395852058,
+      "originalPolylinePeakSpeedMps": 87.183880721875
     },
     {
       "viewport": "phone",
@@ -9542,9 +9548,9 @@
       "to": "garden",
       "points": [
         [
-          -21,
-          -31.4,
-          -4.8100000000000005
+          -12.4,
+          -21.6,
+          -0.25
         ],
         [
           -24.5,
@@ -9554,16 +9560,16 @@
       ],
       "fromPose": {
         "eye": [
-          -21,
-          -4.8100000000000005,
-          31.4
+          -12.4,
+          -0.25,
+          21.6
         ],
         "at": [
-          -41,
-          -3.2,
-          47
+          -38,
+          -4.2,
+          44
         ],
-        "fov": 72
+        "fov": 74
       },
       "toPose": {
         "eye": [
@@ -9579,21 +9585,21 @@
         "fov": 96
       },
       "certifiedBalls": [],
-      "length": 3.505766677591534,
-      "roundedLength": 3.505766677591534,
+      "length": 16.099118004398928,
+      "roundedLength": 16.099118004398928,
       "maxNearRadius": 0.39503418080865893,
-      "minimumSurfaceSupportM": 1.505633729478003,
-      "maximumSurfaceSupportM": 1.6500000000000004,
-      "minimumGradeClearanceM": 1.6499999999999995,
-      "minimumRoundedSupportM": 1.505633729478003,
-      "maximumRoundedSupportM": 1.6500000000000004,
-      "minimumRoundedGradeClearanceM": 1.6499999999999995,
+      "minimumSurfaceSupportM": 0.8181366116363811,
+      "maximumSurfaceSupportM": 2.8185504685277523,
+      "minimumGradeClearanceM": 0.8181366354782389,
+      "minimumRoundedSupportM": 0.8181366116363811,
+      "maximumRoundedSupportM": 2.8185504685277523,
+      "minimumRoundedGradeClearanceM": 0.8181366354782389,
       "edgeFailures": [],
       "uncertifiedCorners": [],
       "certifiedCorners": [],
       "durationSeconds": 1.12,
-      "peakSpeedMps": 4.695223228917232,
-      "originalPolylinePeakSpeedMps": 4.695223228917232
+      "peakSpeedMps": 21.561318755891417,
+      "originalPolylinePeakSpeedMps": 21.561318755891417
     }
   ]
 }
