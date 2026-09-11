@@ -104,6 +104,16 @@ const warn = (name, ok, detail) => {
   say(`${ok ? 'PASS' : 'WARN'}  ${name}  ${typeof detail === 'string' ? detail : ''}`)
 }
 
+/** what a wing's own checker refused on: its report's error codes when it
+    answers JSON, and its last line of output when it does not */
+function whyChecker(run) {
+  const errors = run.parsed?.errors
+  if (Array.isArray(errors) && errors.length)
+    return errors.map((e) => `${e.code ?? 'error'}${e.id ? ` (${e.id})` : ''}`).join(', ')
+  const said = run.raw.trim().split('\n').filter((l) => l && !/^[[\]{}\s"]/.test(l))
+  return said.pop() ?? 'no output'
+}
+
 function json(cmd, argv, env = {}, ms = 0) {
   return new Promise((done) => {
     const child = spawn(cmd, argv, {
@@ -539,7 +549,7 @@ if (WING) {
       'the wing\'s own checkers',
       broke.length === 0,
       broke.length
-        ? broke.map((f) => `${f} exited ${ran[f].code}: ${ran[f].raw.trim().split('\n').pop()}`).join(' | ')
+        ? broke.map((f) => `${f} exited ${ran[f].code}: ${whyChecker(ran[f])}`).join(' | ')
         : `${checkers.length} offline checker(s), every one exit 0: ${checkers.join(', ')}`
     )
   }
