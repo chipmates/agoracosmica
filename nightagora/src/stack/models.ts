@@ -184,7 +184,10 @@ export function createModelLibrary(
 
   async function resolve(slug: string): Promise<ModelAsset> {
     const index = await loadManifest()
-    const entry = index.byId.get(`models/${slug}`)
+    /* a slug that names its own scope resolves as an id: the shared collection
+       is `models/<slug>`, and a body built for one wing is recorded in that
+       wing's scope, which is where the manifest law puts it */
+    const entry = index.byId.get(slug.includes('/') ? slug : `models/${slug}`)
     if (!entry) throw new Error(`no manifest entry for the model "${slug}"`)
     if (!entry.display || entry.class === 'REFERENCE-ONLY') {
       throw new Error(`the model "${slug}" may not be displayed`)
