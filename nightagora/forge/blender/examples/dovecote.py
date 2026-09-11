@@ -28,7 +28,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import bpy
 from mathutils import Vector
 
-from kit import Build, Frame, bake, bond, iron, join, materials, paths, rope, select, stone, tiles, timber
+from kit import Build, Frame, bake, bond, iron, join, materials, paths, select, stone, tiles, timber
 
 ID = 'dovecote'
 SCOPE = 'wing-vinci'
@@ -58,8 +58,8 @@ OPENINGS = {0: [DOOR, LIGHT], 1: [FLIGHT], 2: [FLIGHT], 3: [WINDOW]}
 
 # one library set per material, in the order the materials are appended
 SETS = ['brick-old-red', 'limestone-pale', 'limestone-pale', 'terracotta-tiles',
-        'oak-beams', 'oak-planks-worn', 'iron-forged', 'earth-packed', 'rope']
-BRICKWORK, LIME, DRESSED, TILE, BEAM, BOARD, IRON, EARTH, ROPE = range(9)
+        'oak-beams', 'oak-planks-worn', 'iron-forged', 'earth-packed']
+BRICKWORK, LIME, DRESSED, TILE, BEAM, BOARD, IRON, EARTH = range(8)
 
 DATE = '2026-09-10'
 LABEL = ('The square dovecote. Brick with stone dressings, and a roof of small '
@@ -88,8 +88,6 @@ def palette():
                           tint_amount=0.35, roughness=0.62, metallic=1.0, grain=0.003),
         materials.surface('Packed earth', 'earth-packed', tint=(0.72, 0.62, 0.46),
                           tint_amount=0.45, roughness=0.97, grain=0.006),
-        materials.surface('Hemp rope', 'rope', tint=(1.95, 1.72, 1.3),
-                          tint_amount=0.5, roughness=0.93, grain=0.004),
     ]
 
 
@@ -173,8 +171,6 @@ def door(build):
         iron.strap(build, face.moved(0, 0.06, 0), x=-LIGHT['width'] / 2 + 0.06, z=z,
                    length=LIGHT['width'] - 0.12, width=0.06, mat=IRON, rivets=4)
     iron.bracket(build, face, x=1.35, z=2.05, mat=IRON)
-    rope.hank(build, face.point(1.35, 0.14, 1.95), face.direction(0, 1, 0), mat=ROPE,
-              turns=2, rope_radius=0.023, drop=0.44)
     return 1
 
 
@@ -230,10 +226,8 @@ def model():
     bpy.context.scene.unit_settings.system = 'METRIC'
     palette_materials = palette()
     repeats = materials.repeats(SETS)
-    # a plate laid at its own metre is a flat patch on a two centimetre cord
-    # and on a hand forged strap: both are read at arm's length, so both take
-    # the library's picture at the size of the thing itself
-    repeats[ROPE] = 0.13
+    # a plate laid at its own metre is a flat patch on a hand forged strap,
+    # which is read at arm's length: it takes the picture at its own size
     repeats[IRON] = 0.34
     outside = Build(SEED)
     counted = {'bricks': walls(outside)}
