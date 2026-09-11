@@ -38,7 +38,6 @@ import { ao as gtao } from 'three/addons/tsl/display/GTAONode.js'
 import { bloom } from 'three/addons/tsl/display/BloomNode.js'
 import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js'
 import { dof } from 'three/addons/tsl/display/DepthOfFieldNode.js'
-import { film } from 'three/addons/tsl/display/FilmNode.js'
 import { fxaa } from 'three/addons/tsl/display/FXAANode.js'
 import { smaa } from 'three/addons/tsl/display/SMAANode.js'
 import { denoise as denoiseNode } from 'three/addons/tsl/display/DenoiseNode.js'
@@ -49,8 +48,10 @@ import type { Tier } from './tier'
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type N = any
 const {
+  bitXor,
   clamp,
   float,
+  int,
   length,
   luminance,
   mix,
@@ -59,13 +60,42 @@ const {
   pass,
   pow,
   renderOutput,
+  screenCoordinate,
   screenUV,
+  shiftRight,
   smoothstep,
+  uint,
   uniform,
   vec3,
   vec4,
   velocity,
 } = TSL as unknown as Record<string, N>
+
+/**
+ * THE FILM'S OWN TOOTH, and no lattice at any pitch.
+ *
+ * three's film node multiplies `rand(fract(uv + time))` into the picture,
+ * and that hash (`fract(sin(dot(uv, k)) * c)`) lays a diagonal weave a
+ * judge measured at a 4 to 8 pixel pitch on this museum's own sky. It is
+ * also multiplicative, so the one plane that most needs a tooth, a dark
+ * one, gets none.
+ *
+ * This is three rounds of an integer xor-multiply hash over the pixel's own
+ * coordinate and a seed that moves every frame, added rather than
+ * multiplied. Its autocorrelation off zero lag is noise, which is what
+ * `forge/parity.mjs` measures.
+ */
+function grainNode(colour: N, amount: N, seed: N): N {
+  const px = uint(int(screenCoordinate.x))
+  const py = uint(int(screenCoordinate.y))
+  let h: N = bitXor(px.mul(uint(1597334673)), py.mul(uint(3812015801)))
+  h = bitXor(h, uint(int(seed)).mul(uint(2654435761)))
+  h = bitXor(h, shiftRight(h, uint(16))).mul(uint(2246822519))
+  h = bitXor(h, shiftRight(h, uint(13))).mul(uint(3266489917))
+  h = bitXor(h, shiftRight(h, uint(16)))
+  const r = h.toFloat().mul(1 / 4294967296).sub(0.5)
+  return colour.add(vec3(r, r, r).mul(amount))
+}
 
 export interface PostChain {
   post: PostProcessing
@@ -178,6 +208,9 @@ export function createPost(
     dofFocus: uniform(d.dofFocus),
     dofFocal: uniform(d.dofFocal),
     dofBokeh: uniform(d.dofBokeh),
+    /* the grain is reseeded every frame, so a still is one draw from the
+       hash and a walk is never the same field twice */
+    grainSeed: uniform(0),
   }
 
   const scenePass = pass(scene, camera, { samples: samplesFor(tier, renderer.getPixelRatio()) })
@@ -264,7 +297,7 @@ export function createPost(
   else if (tier.aa === 'fxaa') out = fxaa(out)
 
   // 9 · the film the print is on
-  if (tier.grain) out = film(out, u.grain)
+  if (tier.grain) out = vec4(grainNode(out.rgb, u.grain, u.grainSeed), out.a)
 
   const post = new PostProcessing(renderer)
   post.outputColorTransform = false
@@ -286,7 +319,10 @@ export function createPost(
     k: number
   ): [number, number, number] => [ease(a[0], b[0], k), ease(a[1], b[1], k), ease(a[2], b[2], k)]
 
+  let frames = 0
+
   function update(dt: number): void {
+    u.grainSeed.value = frames++ % 65536
     // a grade that snaps between two stages reads as a fault; the night's own
     // blends run at this speed
     const k = Math.min(1, dt * 3.2)
