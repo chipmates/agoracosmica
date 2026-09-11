@@ -70,6 +70,7 @@ import {
 import * as TSL from 'three/tsl'
 import { CONSTELLATIONS, type Constellation } from '../content/constellations'
 import { FOUNDING_SEED, mulberry32 } from '../core/seed'
+import { seatSigns } from '../content/signs'
 
 /** a TSL node. The graph here is hand-composed out of helpers, and the
     generated overloads cannot follow that — the same boundary escape the
@@ -1900,7 +1901,10 @@ export function createAtlas(scene: Scene): AtlasHandles {
     currentElevation: () => elevation,
     starWorld,
     stars,
-    reserveLabels: reserve.update,
+    reserveLabels(labels, width, height) {
+      seatSigns(labels, width, height)
+      reserve.update(labels, width, height)
+    },
     visible(v: boolean) {
       dome.visible = v
     },
