@@ -1,0 +1,289 @@
+{
+  "schema_version": "1.0",
+  "provenance": {
+    "source_root": "/Users/mitsch/Documents/Coding/sage/internal/night-agora/program/rounds/wing-vinci",
+    "governing_source": "CONCEPT.md",
+    "rights_authority": "refs/RIGHTS-CROSSCHECK.md",
+    "catalogue_date": "2026-09-08",
+    "prepared_date": "2026-09-09",
+    "scope": "Data commission. Source assets remain read-only."
+  },
+  "doors": [
+    {
+      "station": "arrival",
+      "question_en": "Why did you leave Italy for a house in France?",
+      "question_de": "Warum hast du Italien für ein Haus in Frankreich verlassen?",
+      "source": {
+        "converged_station": "CONCEPT.md section 3",
+        "seat_questions": [
+          "CONCEPT-OPUS.md S1",
+          "CONCEPT-GPT6.md station arrival and door contract"
+        ]
+      },
+      "editorial_note": "Converged from the seat questions into one visitor prompt.",
+      "german_provenance": "Newly authored for this commission."
+    },
+    {
+      "station": "courtyard",
+      "question_en": "What did you owe the men who paid you?",
+      "question_de": "Was warst du den Männern schuldig, die dich bezahlten?",
+      "source": {
+        "converged_station": "CONCEPT.md section 3",
+        "seat_questions": [
+          "CONCEPT-OPUS.md S2",
+          "CONCEPT-GPT6.md station courtyard and door contract"
+        ]
+      },
+      "editorial_note": "Converged from the seat questions into one visitor prompt.",
+      "german_provenance": "Newly authored for this commission."
+    },
+    {
+      "station": "hall",
+      "question_en": "How did you speak to people who wanted a spectacle from you?",
+      "question_de": "Wie hast du mit Menschen gesprochen, die von dir ein Schauspiel erwarteten?",
+      "source": {
+        "converged_station": "CONCEPT.md section 3",
+        "seat_questions": [
+          "CONCEPT-OPUS.md S3",
+          "CONCEPT-GPT6.md station hall and door contract"
+        ]
+      },
+      "editorial_note": "Converged from the seat questions into one visitor prompt.",
+      "german_provenance": "Newly authored for this commission."
+    },
+    {
+      "station": "oratory",
+      "question_en": "What lasts longer, a wall painting or a page?",
+      "question_de": "Was hält länger, ein Wandgemälde oder ein Blatt Papier?",
+      "source": {
+        "converged_station": "CONCEPT.md section 3",
+        "seat_questions": [
+          "CONCEPT-OPUS.md S4",
+          "CONCEPT-GPT6.md station oratory and door contract"
+        ]
+      },
+      "editorial_note": "Removed an unsupported numerical comparison of work on a wall and a manuscript.",
+      "german_provenance": "Newly authored for this commission."
+    },
+    {
+      "station": "study",
+      "question_en": "A visitor wrote that your right hand no longer worked. What could you still do?",
+      "question_de": "Ein Besucher schrieb, deine rechte Hand funktioniere nicht mehr. Was konntest du noch tun?",
+      "source": {
+        "converged_station": "CONCEPT.md section 3",
+        "seat_questions": [
+          "CONCEPT-OPUS.md S5",
+          "CONCEPT-GPT6.md station study and door contract"
+        ]
+      },
+      "editorial_note": "Reports the visitor’s claim without turning it into a diagnosis.",
+      "german_provenance": "Newly authored for this commission."
+    },
+    {
+      "station": "chamber",
+      "question_en": "Why did painters keep returning to the story of your death?",
+      "question_de": "Warum haben Maler die Geschichte deines Todes immer wieder dargestellt?",
+      "source": {
+        "converged_station": "CONCEPT.md section 3",
+        "seat_questions": [
+          "CONCEPT-OPUS.md S6",
+          "CONCEPT-GPT6.md station chamber and door contract"
+        ]
+      },
+      "editorial_note": "Removed an unsupported fixed duration from the death-painting question.",
+      "german_provenance": "Newly authored for this commission."
+    },
+    {
+      "station": "garden",
+      "question_en": "How did you decide when to trust what your eyes showed you?",
+      "question_de": "Wie hast du entschieden, wann du deinen Augen vertrauen konntest?",
+      "source": {
+        "converged_station": "CONCEPT.md section 3",
+        "seat_questions": [
+          "CONCEPT-OPUS.md S7",
+          "CONCEPT-GPT6.md station garden and door contract"
+        ]
+      },
+      "editorial_note": "Converged from the seat questions into one visitor prompt.",
+      "german_provenance": "Newly authored for this commission."
+    },
+    {
+      "station": "line-early",
+      "question_en": "How much did being listed as illegitimate at seventeen shape your choices?",
+      "question_de": "Wie sehr hat es deine Entscheidungen geprägt, mit siebzehn als unehelich verzeichnet zu sein?",
+      "source": {
+        "converged_station": "CONCEPT.md section 3",
+        "seat_questions": [
+          "CONCEPT-OPUS.md S8",
+          "CONCEPT-GPT6.md station line-early and door contract"
+        ]
+      },
+      "editorial_note": "Uses the documented household wording as social context without inventing its psychological effect.",
+      "german_provenance": "Newly authored for this commission."
+    },
+    {
+      "station": "line-late",
+      "question_en": "What were you looking for in all those cities?",
+      "question_de": "Was hast du in all diesen Städten gesucht?",
+      "source": {
+        "converged_station": "CONCEPT.md section 3",
+        "seat_questions": [
+          "CONCEPT-OPUS.md S9",
+          "CONCEPT-GPT6.md station line-late and door contract"
+        ]
+      },
+      "editorial_note": "Converged from the seat questions into one visitor prompt.",
+      "german_provenance": "Newly authored for this commission."
+    },
+    {
+      "station": "line-amboise",
+      "question_en": "What did a king's support let you do freely?",
+      "question_de": "Welche Freiheiten gab dir die Unterstützung eines Königs?",
+      "source": {
+        "converged_station": "CONCEPT.md section 3",
+        "seat_questions": [
+          "CONCEPT-OPUS.md S10",
+          "CONCEPT-GPT6.md station line-amboise and door contract"
+        ]
+      },
+      "editorial_note": "Does not assert that Francis asked almost nothing.",
+      "german_provenance": "Newly authored for this commission."
+    },
+    {
+      "station": "picture-room",
+      "question_en": "Why did you leave so few paintings?",
+      "question_de": "Warum hast du so wenige Gemälde hinterlassen?",
+      "source": {
+        "converged_station": "CONCEPT.md section 3",
+        "seat_questions": [
+          "CONCEPT-OPUS.md S11",
+          "CONCEPT-GPT6.md station picture-room and door contract"
+        ]
+      },
+      "editorial_note": "Avoids a fixed authorship count.",
+      "german_provenance": "Newly authored for this commission."
+    },
+    {
+      "station": "supper-wall",
+      "question_en": "Why did you choose such a fragile way to paint the Last Supper?",
+      "question_de": "Warum hast du das Abendmahl mit einer so empfindlichen Technik gemalt?",
+      "source": {
+        "converged_station": "CONCEPT.md section 3",
+        "seat_questions": [
+          "CONCEPT-OPUS.md S12",
+          "CONCEPT-GPT6.md station supper-wall and door contract"
+        ]
+      },
+      "editorial_note": "Names the technique’s fragility without claiming Leonardo predicted the later damage.",
+      "german_provenance": "Newly authored for this commission."
+    },
+    {
+      "station": "reading-table",
+      "question_en": "Why did you write your notes from right to left?",
+      "question_de": "Warum hast du deine Notizen von rechts nach links geschrieben?",
+      "source": {
+        "converged_station": "CONCEPT.md section 3",
+        "seat_questions": [
+          "CONCEPT-OPUS.md S13",
+          "CONCEPT-GPT6.md station reading-table and door contract"
+        ]
+      },
+      "editorial_note": "Converged from the seat questions into one visitor prompt.",
+      "german_provenance": "Newly authored for this commission."
+    },
+    {
+      "station": "scattered",
+      "question_en": "If you could keep only one page, which would it be?",
+      "question_de": "Wenn du nur ein Blatt behalten könntest, welches wäre es?",
+      "source": {
+        "converged_station": "CONCEPT.md section 3",
+        "seat_questions": [
+          "CONCEPT-OPUS.md S14",
+          "CONCEPT-GPT6.md station scattered and door contract"
+        ]
+      },
+      "editorial_note": "Converged from the seat questions into one visitor prompt.",
+      "german_provenance": "Newly authored for this commission."
+    },
+    {
+      "station": "flight",
+      "question_en": "How did you decide whether to keep working on flight?",
+      "question_de": "Wie hast du entschieden, ob du am Fliegen weiterarbeiten solltest?",
+      "source": {
+        "converged_station": "CONCEPT.md section 3",
+        "seat_questions": [
+          "CONCEPT-OPUS.md S15",
+          "CONCEPT-GPT6.md station flight and door contract"
+        ]
+      },
+      "editorial_note": "Does not presume that no experiment occurred.",
+      "german_provenance": "Newly authored for this commission."
+    },
+    {
+      "station": "works",
+      "question_en": "When does a drawing become a machine?",
+      "question_de": "Wann wird aus einer Zeichnung eine Maschine?",
+      "source": {
+        "converged_station": "CONCEPT.md section 3",
+        "seat_questions": [
+          "CONCEPT-OPUS.md S16",
+          "CONCEPT-GPT6.md station works and door contract"
+        ]
+      },
+      "editorial_note": "Leaves building and operating a machine open as separate questions.",
+      "german_provenance": "Newly authored for this commission."
+    },
+    {
+      "station": "body",
+      "question_en": "What could a drawing show that a dissection could not?",
+      "question_de": "Was konnte eine Zeichnung zeigen, was eine Sektion nicht zeigen konnte?",
+      "source": {
+        "converged_station": "CONCEPT.md section 3",
+        "seat_questions": [
+          "CONCEPT-OPUS.md S17",
+          "CONCEPT-GPT6.md station body and door contract"
+        ]
+      },
+      "editorial_note": "Converged from the seat questions into one visitor prompt.",
+      "german_provenance": "Newly authored for this commission."
+    },
+    {
+      "station": "myths",
+      "question_en": "How would you feel about words being quoted as yours that you never wrote?",
+      "question_de": "Wie wäre es für dich, wenn man Worte als deine zitiert, die du nie geschrieben hast?",
+      "source": {
+        "converged_station": "CONCEPT.md section 3",
+        "seat_questions": [
+          "CONCEPT-OPUS.md S18",
+          "CONCEPT-GPT6.md station myths and door contract"
+        ]
+      },
+      "editorial_note": "Removes the unsupported claim that half of popular quotations are false.",
+      "german_provenance": "Newly authored for this commission."
+    },
+    {
+      "station": "grave",
+      "question_en": "What should a grave say when the remains are only presumed to be yours?",
+      "question_de": "Was sollte auf einem Grab stehen, wenn die Überreste nur vermutlich deine sind?",
+      "source": {
+        "converged_station": "CONCEPT.md section 3",
+        "seat_questions": [
+          "CONCEPT-OPUS.md S19",
+          "CONCEPT-GPT6.md station grave and door contract"
+        ]
+      },
+      "editorial_note": "Keeps the remains explicitly presumed.",
+      "german_provenance": "Newly authored for this commission."
+    }
+  ],
+  "door_contract": {
+    "figure_id": "leonardo-da-vinci",
+    "figure_name": "Leonardo da Vinci",
+    "fallback_tag": "askf:vinci:1",
+    "fallback_behavior": "Existing hero tag opens the figure. It does not promise a station-specific seeded question. Keep the visible EN/DE question copyable.",
+    "proposed_tag_pattern": "w:vinci:<station>",
+    "proposed_tag_status": "Contract proposal for the builder, not an implemented route.",
+    "question_source": "Use this station record in the selected language.",
+    "return_behavior": "Return the visitor to the same wing station and reading position."
+  }
+}
