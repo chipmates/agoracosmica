@@ -726,6 +726,9 @@ export function createEclipse(scene: Scene) {
 
     firmament.update(s.elapsed, s.skyBirth)
     uWand.value = s.skyBirth * s.lanterns
+    // a field at zero light is still a draw call, and the wheel is a
+    // 60-draw stage on the calm tier
+    wanderers.visible = uWand.value > 0.002
     wanderers.rotation.y = s.elapsed * 0.011
     wanderers.rotation.x = Math.sin(s.elapsed * 0.05) * 0.01
 

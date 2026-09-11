@@ -28,9 +28,11 @@ import {
   CanvasTexture,
   Color,
   DoubleSide,
+  DynamicDrawUsage,
   Float32BufferAttribute,
   Group,
   InstancedBufferAttribute,
+  Matrix4,
   Mesh,
   MeshBasicNodeMaterial,
   PointsNodeMaterial,
@@ -321,6 +323,8 @@ function figureGeometry(
   const along: number[] = []
   const ink: number[] = []
   const weight: number[] = []
+  const gild: number[] = []
+  const kind: number[] = []
   const idx: number[] = []
 
   c.lines.forEach(([ia, ib], si) => {
@@ -359,11 +363,42 @@ function figureGeometry(
       const walk = (rank + t) / segCount
       ink.push(walk, walk)
       weight.push(w, w)
+      gild.push(0, 0)
+      kind.push(0, 0)
       if (k < SPANS) {
         const a = base + k * 2
         idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2)
       }
     }
+  })
+
+  /* AND THE BURIN, in the same buffer. Two registers, one draw: the phone's
+     calm tier is a 60-draw stage, and a second mesh per house spends six of
+     them on a shader difference the fragment can carry itself. */
+  const pen = burinFor(c)
+  pen.strokes.forEach((st, si) => {
+    const last = st.points.length - 1
+    st.points.forEach(([x, y], i) => {
+      const a = st.points[Math.max(0, i - 1)]
+      const b = st.points[Math.min(last, i + 1)]
+      if (!a || !b) return
+      const dx = b[0] - a[0]
+      const dy = b[1] - a[1]
+      const len = Math.hypot(dx, dy) || 1
+      const taper = 0.58 + 0.42 * Math.sin((Math.PI * i) / Math.max(1, last))
+      const half = CUT_HALF * taper
+      const base = pos.length / 3
+      pos.push(x - (dy / len) * half, y + (dx / len) * half, -0.045)
+      pos.push(x + (dy / len) * half, y - (dx / len) * half, -0.045)
+      cross.push(-1, 1)
+      along.push(0.5, 0.5)
+      const walk = 0.1 + (0.82 * (si + i / Math.max(1, st.points.length))) / pen.strokes.length
+      ink.push(walk, walk)
+      weight.push(st.weight, st.weight)
+      gild.push(st.gild, st.gild)
+      kind.push(1, 1)
+      if (i < last) idx.push(base, base + 1, base + 2, base + 1, base + 3, base + 2)
+    })
   })
 
   const geo = new BufferGeometry()
@@ -372,32 +407,52 @@ function figureGeometry(
   geo.setAttribute('aAlong', new Float32BufferAttribute(along, 1))
   geo.setAttribute('aInk', new Float32BufferAttribute(ink, 1))
   geo.setAttribute('aWeight', new Float32BufferAttribute(weight, 1))
+  geo.setAttribute('aGild', new Float32BufferAttribute(gild, 1))
+  geo.setAttribute('aKind', new Float32BufferAttribute(kind, 1))
   geo.setIndex(idx)
   return geo
 }
 
-function figureMaterial(uLine: N, uDraw: N, reserve: Reserve): MeshBasicNodeMaterial {
+function figureMaterial(
+  uLine: N,
+  uDraw: N,
+  uCut: N,
+  reserve: Reserve
+): MeshBasicNodeMaterial {
   const mat = new MeshBasicNodeMaterial()
   mat.transparent = true
   mat.depthWrite = false
   mat.blending = AdditiveBlending
   mat.side = DoubleSide
+  mat.forceSinglePass = true
   const across: N = abs(attribute('aCross', 'float') as N)
   const alongN: N = attribute('aAlong', 'float') as N
   const inkN: N = attribute('aInk', 'float') as N
   const wN: N = attribute('aWeight', 'float') as N
-  // the stroke, and the breath of ink that always sits around a stroke
+  const gildN: N = attribute('aGild', 'float') as N
+  const kindN: N = attribute('aKind', 'float') as N
+
+  // THE HAIRLINE: the stroke, and the breath of ink that always sits around
+  // a stroke. Its ends give up their INK instead of their width, so a line
+  // arrives at a star as a fading suggestion and never as a point.
   const core = smoothstep(0.42, 0.04, across)
   const halo = smoothstep(1.0, 0.1, across).mul(0.18)
-  // the ends give up their ink instead of their width: a line arrives at a
-  // star as a fading suggestion, never as a point
   const ends = smoothstep(0, 0.14, alongN).mul(smoothstep(1, 0.86, alongN))
-  // the ink travels: every point of the figure has its place in the walk
   const gate = smoothstep(inkN, inkN.add(0.16), uDraw.mul(1.16))
-  mat.colorNode = vec3(LINE_GOLD.r, LINE_GOLD.g, LINE_GOLD.b).mul(
+  const hairOpacity = core.add(halo).mul(wN).mul(ends).mul(gate).mul(uLine)
+  const hairColour = vec3(LINE_GOLD.r, LINE_GOLD.g, LINE_GOLD.b).mul(
     float(0.8).add(core.mul(0.45))
   )
-  mat.opacityNode = core.add(halo).mul(wN).mul(ends).mul(gate).mul(uLine).mul(reserve.node)
+
+  // THE CUT: a burin stroke is the whole ribbon, and it carries the glancing
+  // gilt an engraver leaves on one edge of a plate.
+  const cutCore = smoothstep(1, 0.05, across)
+  const cutGate = smoothstep(inkN, inkN.add(0.12), uDraw)
+  const cutOpacity = cutCore.mul(wN).mul(cutGate).mul(uCut).mul(float(0.75))
+  const cutColour = mix(vec3(PAPER.r, PAPER.g, PAPER.b), vec3(GOLD.r, GOLD.g, GOLD.b), gildN)
+
+  mat.colorNode = mix(hairColour, cutColour, kindN)
+  mat.opacityNode = mix(hairOpacity, cutOpacity, kindN).mul(reserve.node)
   return mat
 }
 
@@ -907,20 +962,14 @@ function pentagon(p: Burin, c: Constellation): void {
 
 // ------------------------------------------------------- the engraved mesh
 /* One ribbon per stroke, the nib pressing a little harder through the
-   middle of a cut. The fragment finds the stroke inside a quad wider than
-   it, which buys the antialiasing for free; the ink walk is the same clock
-   the hairlines travel on, so figure and engraving are drawn by one hand. */
-const CUT_HALF = 0.0100
-
-interface Engraving {
-  mesh: Mesh
-  presence: N
-  draw: N
-}
+   middle of a cut. The ribbons are appended to the house's own hairline
+   buffer, so figure and engraving are one draw and are drawn by one hand:
+   the ink walk they share is the same clock. */
+const CUT_HALF = 0.01
 
 const PAPER = new Color('#f3efe2')
 
-function figureEngraving(c: Constellation, reserve: Reserve): Engraving {
+function burinFor(c: Constellation): Burin {
   const pen = new Burin()
   switch (c.key) {
     case 'philosophers':
@@ -942,71 +991,7 @@ function figureEngraving(c: Constellation, reserve: Reserve): Engraving {
       pentagon(pen, c)
       break
   }
-  const pos: number[] = []
-  const across: number[] = []
-  const weight: number[] = []
-  const ink: number[] = []
-  const gild: number[] = []
-  const index: number[] = []
-  pen.strokes.forEach((s, si) => {
-    const last = s.points.length - 1
-    s.points.forEach(([x, y], i) => {
-      const a = s.points[Math.max(0, i - 1)]
-      const b = s.points[Math.min(last, i + 1)]
-      if (!a || !b) return
-      const dx = b[0] - a[0]
-      const dy = b[1] - a[1]
-      const len = Math.hypot(dx, dy) || 1
-      const taper = 0.58 + 0.42 * Math.sin((Math.PI * i) / Math.max(1, last))
-      const half = CUT_HALF * taper
-      const base = pos.length / 3
-      pos.push(x - (dy / len) * half, y + (dx / len) * half, -0.045)
-      pos.push(x + (dy / len) * half, y - (dx / len) * half, -0.045)
-      across.push(-1, 1)
-      weight.push(s.weight, s.weight)
-      gild.push(s.gild, s.gild)
-      const walk = 0.1 + (0.82 * (si + i / Math.max(1, s.points.length))) / pen.strokes.length
-      ink.push(walk, walk)
-      if (i < last) index.push(base, base + 1, base + 2, base + 1, base + 3, base + 2)
-    })
-  })
-
-  const geo = new BufferGeometry()
-  geo.setAttribute('position', new Float32BufferAttribute(pos, 3))
-  geo.setAttribute('cutCross', new Float32BufferAttribute(across, 1))
-  geo.setAttribute('cutWeight', new Float32BufferAttribute(weight, 1))
-  geo.setAttribute('cutInk', new Float32BufferAttribute(ink, 1))
-  geo.setAttribute('cutGild', new Float32BufferAttribute(gild, 1))
-  geo.setIndex(index)
-
-  const presence: N = uniform(0)
-  const draw: N = uniform(1)
-  const mat = new MeshBasicNodeMaterial({
-    transparent: true,
-    depthWrite: false,
-    blending: AdditiveBlending,
-    side: DoubleSide,
-  })
-  mat.forceSinglePass = true
-  const gildN: N = attribute('cutGild', 'float')
-  const inkN: N = attribute('cutInk', 'float')
-  mat.colorNode = mix(
-    vec3(PAPER.r, PAPER.g, PAPER.b),
-    vec3(GOLD.r, GOLD.g, GOLD.b),
-    gildN
-  )
-  const core = smoothstep(1, 0.05, abs(attribute('cutCross', 'float') as N))
-  const gate = smoothstep(inkN, inkN.add(0.12), draw)
-  mat.opacityNode = core
-    .mul(attribute('cutWeight', 'float') as N)
-    .mul(gate)
-    .mul(presence)
-    .mul(float(0.75))
-    .mul(reserve.node)
-
-  const mesh = new Mesh(geo, mat)
-  mesh.frustumCulled = false
-  return { mesh, presence, draw }
+  return pen
 }
 
 // -------------------------------------------------------------- the plate
@@ -1041,12 +1026,15 @@ class ShellInk {
   private pos: number[] = []
   private across: number[] = []
   private strength: number[] = []
+  private tint: number[] = []
   private idx: number[] = []
 
   path(
     sample: (t: number) => Vector3,
     segments: number,
     weight: number,
+    ink: Color,
+    gain: number,
     halfWidth = 0.0012
   ): void {
     const base = this.pos.length / 3
@@ -1065,7 +1053,8 @@ class ShellInk {
           .multiplyScalar(SHELL - 2)
         this.pos.push(q.x, q.y, q.z)
         this.across.push(sign)
-        this.strength.push(weight)
+        this.strength.push(weight * gain)
+        this.tint.push(ink.r, ink.g, ink.b)
       }
       if (i < segments) {
         const v = base + i * 2
@@ -1079,6 +1068,7 @@ class ShellInk {
     g.setAttribute('position', new Float32BufferAttribute(this.pos, 3))
     g.setAttribute('aCross', new Float32BufferAttribute(this.across, 1))
     g.setAttribute('aStrength', new Float32BufferAttribute(this.strength, 1))
+    g.setAttribute('aTint', new Float32BufferAttribute(this.tint, 3))
     g.setIndex(this.idx)
     g.computeBoundingSphere()
     return g
@@ -1093,7 +1083,7 @@ function onShell(azimuth: number, elevation: number): Vector3 {
   )
 }
 
-function inkMaterial(tint: Color, uReveal: N, gain: number, reserve: Reserve): MeshBasicNodeMaterial {
+function inkMaterial(uReveal: N, reserve: Reserve): MeshBasicNodeMaterial {
   const mat = new MeshBasicNodeMaterial({
     transparent: true,
     depthWrite: false,
@@ -1104,12 +1094,11 @@ function inkMaterial(tint: Color, uReveal: N, gain: number, reserve: Reserve): M
   const a: N = abs(attribute('aCross', 'float') as N)
   const core = smoothstep(0.7, 0.04, a)
   const skirt = smoothstep(1, 0.14, a).mul(0.16)
-  mat.colorNode = vec3(tint.r, tint.g, tint.b)
+  mat.colorNode = attribute('aTint', 'vec3') as N
   mat.opacityNode = core
     .add(skirt)
     .mul(attribute('aStrength', 'float') as N)
     .mul(uReveal)
-    .mul(gain)
     .mul(reserve.node)
   return mat
 }
@@ -1192,51 +1181,66 @@ function createPlate(reserve: Reserve): Plate {
   river.frustumCulled = false
   group.add(river)
 
-  // -------------------------------------------------------- the graticule
-  const grid = new ShellInk()
+  // ------------------------------- the graticule and the gilt ecliptic
+  /* Two registers, one buffer: the phone's calm stage is a 60-draw frame,
+     and a hairline's tint is a per-vertex fact, not a second material. */
+  const ink = new ShellInk()
+  const GRID_GAIN = 0.0095
   for (let lat = -30; lat <= 75; lat += 15) {
-    grid.path((t) => onShell(t * TAU, lat * DEG), 160, lat === 0 ? 0.76 : lat % 30 === 0 ? 0.63 : 0.38)
+    ink.path(
+      (t) => onShell(t * TAU, lat * DEG),
+      160,
+      lat === 0 ? 0.76 : lat % 30 === 0 ? 0.63 : 0.38,
+      PAPER,
+      GRID_GAIN
+    )
   }
   for (let lon = 0; lon < 360; lon += 30) {
-    grid.path((t) => onShell(lon * DEG, (-34 + 116 * t) * DEG), 96, lon % 90 === 0 ? 0.62 : 0.4)
+    ink.path(
+      (t) => onShell(lon * DEG, (-34 + 116 * t) * DEG),
+      96,
+      lon % 90 === 0 ? 0.62 : 0.4,
+      PAPER,
+      GRID_GAIN
+    )
   }
   // the northern degree circle: every tenth division takes the longer cut,
   // the way a plate is graduated
   for (let deg = 0; deg < 360; deg += 2) {
     const major = deg % 10 === 0
-    grid.path(
+    ink.path(
       (t) => onShell(deg * DEG, (60 + (t - 0.5) * (major ? 1.15 : 0.5)) * DEG),
       1,
       major ? 0.76 : 0.44,
+      PAPER,
+      GRID_GAIN,
       0.001
     )
   }
-  const graticule = new Mesh(grid.geometry(), inkMaterial(PAPER, uReveal, 0.0095, reserve))
-  graticule.renderOrder = -7
-  graticule.frustumCulled = false
-  group.add(graticule)
-
-  // --------------------------------------------------------- the ecliptic
-  const ecl = new ShellInk()
+  // and one real great circle at the earth's 23.44 degree obliquity,
+  // graduated every degree. It is gilded because it is a measuring edge.
+  const ECL_GAIN = 0.022
   const obliquity = 23.44 * DEG
   const onEcliptic = (azimuth: number, off = 0): Vector3 =>
     onShell(azimuth, off).applyAxisAngle(new Vector3(0, 0, 1), obliquity)
-  ecl.path((t) => onEcliptic(t * TAU), 256, 0.72, 0.0014)
+  ink.path((t) => onEcliptic(t * TAU), 256, 0.72, GOLD, ECL_GAIN, 0.0014)
   for (let deg = 0; deg < 360; deg++) {
     const major = deg % 10 === 0
     const medium = deg % 5 === 0
     const height = (major ? 1.5 : medium ? 0.9 : 0.36) * DEG
-    ecl.path(
+    ink.path(
       (t) => onEcliptic(deg * DEG, (t - 0.5) * height),
       1,
       major ? 0.88 : medium ? 0.66 : 0.4,
+      GOLD,
+      ECL_GAIN,
       0.001
     )
   }
-  const armillary = new Mesh(ecl.geometry(), inkMaterial(GOLD, uReveal, 0.022, reserve))
-  armillary.renderOrder = -6
-  armillary.frustumCulled = false
-  group.add(armillary)
+  const plate = new Mesh(ink.geometry(), inkMaterial(uReveal, reserve))
+  plate.renderOrder = -7
+  plate.frustumCulled = false
+  group.add(plate)
 
   return {
     group,
@@ -1414,13 +1418,27 @@ function buildChoir(rand: () => number, count: number): Choir {
 // -------------------------------------------------------- the companions
 /* Every house keeps its own lesser stars: unnamed, cool, faint, scattered
    through the figure's own patch so the shape sits in a gathering rather
-   than in a vacuum. They live in patch coordinates, which means they
-   compress with the shape on a narrow stage and never drift off it. */
-function buildCompanions(
+   than in a vacuum. They are SEEDED in patch coordinates, which is what
+   keeps them on the shape at any stage width, and then seated once on the
+   dome: six sprite fields were six draw calls, and the calm stage is a
+   sixty-draw frame. The seating is redone only when the patches change
+   scale, which is a resize and nothing else. */
+interface Companion {
+  x: number
+  y: number
+  size: number
+  dim: number
+  rate: number
+  phase: number
+  house: number
+}
+
+function seedCompanions(
   c: Constellation,
   rand: () => number,
-  count: number
-): { sprite: Sprite; uT: N; uMaster: N } {
+  count: number,
+  house: number
+): Companion[] {
   let x0 = 0
   let x1 = 0
   let y0 = 0
@@ -1437,10 +1455,7 @@ function buildCompanions(
     y1 = Math.max(y1, s.y)
   })
   const pad = 0.85
-  const pos = new Float32Array(count * 3)
-  const size = new Float32Array(count)
-  const dim = new Float32Array(count)
-  const tw = new Float32Array(count * 2)
+  const out: Companion[] = []
   for (let k = 0; k < count; k++) {
     let x = 0
     let y = 0
@@ -1468,21 +1483,48 @@ function buildCompanions(
       for (const s of c.stars) if (Math.hypot(s.x - x, s.y - y) < 0.34) clear = false
       if (clear) break
     }
-    pos[k * 3] = x
-    pos[k * 3 + 1] = y
-    pos[k * 3 + 2] = -0.02
-    size[k] = 1.15 + rand() * 1.2
-    dim[k] = 0.22 + rand() * 0.54
-    tw[k * 2] = 0.6 + rand() * 1.4
-    tw[k * 2 + 1] = rand() * Math.PI * 2
+    out.push({
+      x,
+      y,
+      size: 1.15 + rand() * 1.2,
+      dim: 0.22 + rand() * 0.54,
+      rate: 0.6 + rand() * 1.4,
+      phase: rand() * Math.PI * 2,
+      house,
+    })
   }
+  return out
+}
+
+interface CompanionField {
+  sprite: Sprite
+  uT: N
+  /** seat every grain from its house's own patch transform */
+  seat(matrices: Matrix4[]): void
+  /** the per-house presence, written straight into the instance buffer */
+  present(presence: number[]): void
+}
+
+function buildCompanionField(seeds: Companion[]): CompanionField {
+  const n = Math.max(1, seeds.length)
+  const pos = new Float32Array(n * 3)
+  const size = new Float32Array(n)
+  const dim = new Float32Array(n)
+  const tw = new Float32Array(n * 2)
+  seeds.forEach((cp, k) => {
+    size[k] = cp.size
+    dim[k] = cp.dim
+    tw[k * 2] = cp.rate
+    tw[k * 2 + 1] = cp.phase
+  })
   const aPos = new InstancedBufferAttribute(pos, 3)
+  aPos.setUsage(DynamicDrawUsage)
   const aSize = new InstancedBufferAttribute(size, 1)
   const aDim = new InstancedBufferAttribute(dim, 1)
+  aDim.setUsage(DynamicDrawUsage)
   const aTw = new InstancedBufferAttribute(tw, 2)
 
   const uT: N = uniform(0)
-  const uMaster: N = uniform(0)
   const mat = new PointsNodeMaterial({
     transparent: true,
     depthWrite: false,
@@ -1498,15 +1540,34 @@ function buildCompanions(
   const d = uv().sub(vec2(0.5, 0.5))
   const kernel = smoothstep(0.5, 0.05, length(d))
   mat.colorNode = vec3(CHOIR_COOL.r, CHOIR_COOL.g, CHOIR_COOL.b)
-  mat.opacityNode = kernel
-    .mul(dimN)
-    .mul(float(1).sub(shimmer.mul(0.34)))
-    .mul(uMaster)
+  mat.opacityNode = kernel.mul(dimN).mul(float(1).sub(shimmer.mul(0.34)))
 
   const sprite = new Sprite(mat)
-  sprite.count = count
+  sprite.count = n
   sprite.frustumCulled = false
-  return { sprite, uT, uMaster }
+
+  const seatTmp = new Vector3()
+  return {
+    sprite,
+    uT,
+    seat(matrices) {
+      seeds.forEach((cp, k) => {
+        const m = matrices[cp.house]
+        if (!m) return
+        seatTmp.set(cp.x, cp.y, -0.02).applyMatrix4(m)
+        pos[k * 3] = seatTmp.x
+        pos[k * 3 + 1] = seatTmp.y
+        pos[k * 3 + 2] = seatTmp.z
+      })
+      aPos.needsUpdate = true
+    },
+    present(presence) {
+      seeds.forEach((cp, k) => {
+        dim[k] = cp.dim * (presence[cp.house] ?? 0)
+      })
+      aDim.needsUpdate = true
+    },
+  }
 }
 
 // ------------------------------------------------------------- the atlas
@@ -1529,34 +1590,57 @@ export function createAtlas(scene: Scene): AtlasHandles {
 
   /* THE TWO WANDERERS — the sky has a mechanism. Two lights that never
      twinkle and never belong to a house, drifting against the dome across
-     a whole sitting. They are cool on purpose: gold is a name (law 1). */
+     a whole sitting. They are cool on purpose: gold is a name (law 1).
+     One instanced field for the pair, because two sprites are two draws
+     and the calm stage counts every one of them. */
   const wanderers = new Group()
   dome.add(wanderers)
   const WANDER: Array<[number, number, number, number]> = [
-    [0.42, 0.98, 2.3, 1.15],
-    [3.02, 0.44, 1.8, 0.95],
+    [0.42, 0.98, 9.2, 1.15],
+    [3.02, 0.44, 7.2, 0.95],
   ]
   const wanderDir = new Vector3()
-  for (const [az, el, sc, dim] of WANDER) {
-    const mat = new SpriteMaterial({
-      map: starMap,
-      color: CHOIR_ICE.clone().multiplyScalar(dim),
-      transparent: true,
-      opacity: 0,
-      blending: AdditiveBlending,
-      depthWrite: false,
-    })
-    const s = new Sprite(mat)
+  const wPos = new Float32Array(WANDER.length * 3)
+  const wSize = new Float32Array(WANDER.length)
+  const wCol = new Float32Array(WANDER.length * 3)
+  WANDER.forEach(([az, el, px, dim], i) => {
     wanderDir.set(
       Math.sin(az) * Math.cos(el),
       Math.sin(el),
       -Math.cos(az) * Math.cos(el)
     )
-    s.position.copy(wanderDir).multiplyScalar(120)
-    s.scale.setScalar(sc)
-    wanderers.add(s)
+    wanderDir.multiplyScalar(120)
+    wPos[i * 3] = wanderDir.x
+    wPos[i * 3 + 1] = wanderDir.y
+    wPos[i * 3 + 2] = wanderDir.z
+    wSize[i] = px
+    wCol[i * 3] = CHOIR_ICE.r * dim
+    wCol[i * 3 + 1] = CHOIR_ICE.g * dim
+    wCol[i * 3 + 2] = CHOIR_ICE.b * dim
+  })
+  const uWander: N = uniform(0)
+  const wanderMat = new PointsNodeMaterial({
+    transparent: true,
+    depthWrite: false,
+    blending: AdditiveBlending,
+  })
+  {
+    wanderMat.positionNode = instancedBufferAttribute(new InstancedBufferAttribute(wPos, 3))
+    wanderMat.sizeAttenuation = false
+    wanderMat.sizeNode = instancedBufferAttribute(new InstancedBufferAttribute(wSize, 1))
+    const colN: N = instancedBufferAttribute(new InstancedBufferAttribute(wCol, 3))
+    const d = uv().sub(vec2(0.5, 0.5))
+    const dd = length(d)
+    // a planet is a disc, not a scintillating point: a tight core and one
+    // soft skirt, and no twinkle term anywhere
+    const kernel = smoothstep(0.22, 0.0, dd).add(smoothstep(0.5, 0.06, dd).mul(0.34))
+    wanderMat.colorNode = colN
+    wanderMat.opacityNode = kernel.mul(uWander)
   }
-  const wanderMats = wanderers.children.map((o) => (o as Sprite).material as SpriteMaterial)
+  const wanderField = new Sprite(wanderMat)
+  wanderField.count = WANDER.length
+  wanderField.frustumCulled = false
+  wanderers.add(wanderField)
 
   interface Star {
     sprite: Sprite
@@ -1576,14 +1660,13 @@ export function createAtlas(scene: Scene): AtlasHandles {
     stars: Star[]
     lineU: N
     drawU: N
-    compU: N
-    compT: N
+    /** how present the burin is: the drawing belongs to the focused house */
+    cutU: N
     azimuth: number
     /** how much this shape is scaled so every house arrives at a
         comparable presence in the frame (the shape never deforms) */
     fit: number
     focus: number // eased 0..1
-    engraving: Engraving
   }
 
   /* THE HOUSES ARE NOT THE SAME SIZE. Cassiopeia spans four units and the
@@ -1600,6 +1683,7 @@ export function createAtlas(scene: Scene): AtlasHandles {
 
   const patches: Patch[] = []
   const stars: AtlasStarRef[] = []
+  const companionSeeds: Companion[] = []
   const dirTmp = new Vector3()
 
   for (let ci = 0; ci < CONSTELLATIONS.length; ci++) {
@@ -1618,16 +1702,16 @@ export function createAtlas(scene: Scene): AtlasHandles {
     // register of equals and not as one flare with five witnesses
     const sizes = mag.map((m) => 0.21 + 0.33 * m * m)
 
-    // the companions first, so a named star always draws over them
-    const comp = buildCompanions(c, rand, narrow ? 18 : 26)
-    patch.add(comp.sprite)
+    // the companions are seeded here and seated on the dome below, so all
+    // six houses share one field
+    companionSeeds.push(...seedCompanions(c, rand, narrow ? 18 : 26, ci))
 
     const lineU: N = uniform(0)
     const drawU: N = uniform(1)
-    patch.add(new Mesh(figureGeometry(c, mag, sizes), figureMaterial(lineU, drawU, reserve)))
-    // and the burin over the hairlines: the house as a drawn figure
-    const engraving = figureEngraving(c, reserve)
-    patch.add(engraving.mesh)
+    const cutU: N = uniform(0)
+    const house = new Mesh(figureGeometry(c, mag, sizes), figureMaterial(lineU, drawU, cutU, reserve))
+    house.frustumCulled = false
+    patch.add(house)
 
     const list: Star[] = []
     c.stars.forEach((s, si) => {
@@ -1663,14 +1747,21 @@ export function createAtlas(scene: Scene): AtlasHandles {
       stars: list,
       lineU,
       drawU,
-      compU: comp.uMaster,
-      compT: comp.uT,
+      cutU,
       azimuth: c.azimuth,
       fit,
       focus: ci === 0 ? 1 : 0,
-      engraving,
     })
   }
+
+  /* one field for every house's lesser stars, seated below the named ones
+     so a name always draws over its own gathering */
+  const companions = buildCompanionField(companionSeeds)
+  companions.sprite.renderOrder = -1
+  dome.add(companions.sprite)
+  /** the scale the companions were last seated at */
+  let seatedScale = -1
+  const housePresence = new Array<number>(CONSTELLATIONS.length).fill(0)
 
   let chapter = 0
   let wheel = 0 // eased dome rotation, radians
@@ -1724,7 +1815,7 @@ export function createAtlas(scene: Scene): AtlasHandles {
     choir.uT.value = reducedMotion ? 0 : elapsed
     choir.uMaster.value = reveal * 0.9
     plate.update(reveal)
-    for (const m of wanderMats) m.opacity = reveal * 0.62
+    uWander.value = reveal * 0.62
 
     // narrow stages compress every patch so the widest shape still fits
     const scale = WIDE_SCALE * Math.min(1, Math.max(0.72, aspect / 1.35))
@@ -1756,11 +1847,21 @@ export function createAtlas(scene: Scene): AtlasHandles {
       p.drawU.value = draw
       // the engraving belongs to the house you are looking at: a neighbour
       // keeps a whisper of it, so the sky reads as one drawn plate
-      p.engraving.presence.value = pres * (0.025 + p.focus * 0.42)
-      p.engraving.draw.value = draw
-      p.compU.value = near * (0.12 + 0.88 * p.focus) * reveal * 0.8
-      p.compT.value = reducedMotion ? 0 : elapsed
+      p.cutU.value = pres * (0.025 + p.focus * 0.42)
+      housePresence[i] = near * (0.12 + 0.88 * p.focus) * reveal * 0.8
     }
+    // the grains are re-seated only when the stage changes width
+    if (Math.abs(scale - seatedScale) > 1e-4) {
+      seatedScale = scale
+      companions.seat(
+        patches.map((q) => {
+          q.group.updateMatrix()
+          return q.group.matrix
+        })
+      )
+    }
+    companions.present(housePresence)
+    companions.uT.value = reducedMotion ? 0 : elapsed
   }
 
   function snap(c: number): void {
@@ -1777,7 +1878,6 @@ export function createAtlas(scene: Scene): AtlasHandles {
       if (!p) continue
       p.focus = i === chapter ? 1 : 0
       p.drawU.value = 1
-      p.engraving.draw.value = 1
     }
   }
 
