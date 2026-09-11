@@ -72,7 +72,6 @@ import { APP_ROOT, assertAdapter, assertBackend, assertServer, browserArgs, DEFA
 
 const argv = process.argv.slice(2)
 const plain = argv.filter((a) => !a.startsWith('--'))
-const JSON_OUT = argv.includes('--json')
 const SELF_TEST = argv.includes('--self-test')
 const KEEP = argv.includes('--keep-frames')
 const PORT = Number(plain[0] ?? process.env['FORGE_PORT'] ?? 5199)
@@ -555,7 +554,11 @@ async function dragReading(page, client, dir, cone, pop = null) {
         worst = step
         where = [(c % cols) * TILE, ((c / cols) | 0) * TILE]
       }
-      if (step) hit++
+      if (step) {
+        hit++
+        // the drag's map carries both of the things the drag looks for
+        counts[c]++
+      }
     }
     if (hit) pops.push({ step: i, yaw: g.yaw, pitch: g.pitch, tiles: hit, jump: +worst.toFixed(1), at: where })
     /* THE SHIMMER: a pixel that alternates over ten levels through all four
@@ -740,10 +743,11 @@ async function readStation(browser, url, spot, cone, opts = {}) {
     delete on.mean
   }
   const drag = await dragReading(page, client, join(RAW, `${spot.id}-drag`), cone, opts.pop ?? null)
-  if (!drag.error) {
-    await tileMap(join(OUT, `${spot.id}-drag.png`), drag.counts, drag.cols, drag.rows, drag.width, drag.height, drag.worstCell)
-    delete drag.counts
-  }
+  // a map of nothing is not evidence of nothing, it is a black frame in a
+  // packet: the drag's map is written only where the drag found something
+  const dragMap = !drag.error && drag.worstCell > 0
+  if (dragMap) await tileMap(join(OUT, `${spot.id}-drag.png`), drag.counts, drag.cols, drag.rows, drag.width, drag.height, drag.worstCell)
+  delete drag.counts
   await page.close()
   const living = livingWhy(spot.id)
   const v = verdict(off, drag, living)
@@ -761,7 +765,7 @@ async function readStation(browser, url, spot, cone, opts = {}) {
     margins: margins(off, drag),
     problems,
     heatMap: `forge/shots/flicker/${spot.id}-static.png`,
-    dragMap: `forge/shots/flicker/${spot.id}-drag.png`,
+    dragMap: dragMap ? `forge/shots/flicker/${spot.id}-drag.png` : null,
   }
 }
 
