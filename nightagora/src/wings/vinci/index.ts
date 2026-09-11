@@ -1,7 +1,7 @@
 import { Color, FogExp2, DirectionalLight, Mesh, type Vector3, type Group } from 'three/webgpu'
 import { mix, vec3, vec4, dot as nodeDot } from 'three/tsl'
 import { SkyMesh } from 'three/addons/objects/SkyMesh.js'
-import type { WingHosts, WingModule } from '../frame'
+import { setRegister, type WingHosts, type WingModule } from '../frame'
 import { lang } from '../content'
 import { GRADES } from '../../stack/grade'
 import { createShell } from './shell'
@@ -65,7 +65,7 @@ export function createWing():WingModule {
     rail=createRail(camera,clock);measurement=createMeasurement(h.labels,stack)
     header=make('div','vinci-heading');h.stage.append(header)
     source=make('button','vinci-source',lang()==='de'?'Quellen · L':'Sources · L');source.type='button';source.setAttribute('aria-controls','vinci-source-card');source.addEventListener('click',()=>{mode=mode===2?1:2;paintDock();if(mode===2)dock.focus({preventScroll:true})});h.stage.parentElement!.querySelector('.wing-rail-group')!.append(source)
-    dock=make('aside','vinci-dock');dock.id='vinci-source-card';dock.tabIndex=0;dock.setAttribute('aria-label',lang()==='de'?'Quellen und Rekonstruktion':'Sources and reconstruction');h.labels.append(dock)
+    dock=make('aside','vinci-dock');dock.id='vinci-source-card';setRegister(dock,'drawer');dock.tabIndex=0;dock.setAttribute('aria-label',lang()==='de'?'Quellen und Rekonstruktion':'Sources and reconstruction');h.labels.append(dock)
     labels=createVinciLabelAnchor({host:h.labels,camera,occluders:collectVinciLabelOccluders(scene),onOpen:()=>{mode=2;paintDock();dock.focus({preventScroll:true})}})
     controller=new AbortController();const options={signal:controller.signal}
     let touchX=0,touchY=0,lastX=0,lastY=0,dragging=false,pointer=-1

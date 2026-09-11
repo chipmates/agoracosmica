@@ -22,6 +22,26 @@ import type { Stack } from '../stack'
 
 const APP_ORIGIN = 'https://agoracosmica.org'
 
+/* THE THREE REGISTERS OF TEXT (quality bar B14). Every visitor facing
+   string belongs to one of three. THE LABEL: one line in the museum's
+   voice, the certainty word, nothing a visitor would not say aloud. THE
+   DRAWER: a plain paragraph per element, the source named as a person
+   names it, the one number that matters. THE RECORD: the full machine
+   chain, arithmetic and ranges and licence lines and keys, opened on
+   purpose and complete.
+
+   A subtree declares its register here, and the gate resolves a string
+   from the nearest declared ancestor. An undeclared string is read as a
+   label, so a wing that forgets to mark is gated hardest, never softest,
+   and the record is exempt only where it says it is a record. A drawer or
+   a record a visitor opens carries an id and is opened by a control that
+   names it with aria-controls, so the walk opens it the way a hand does. */
+export type TextRegister = 'label' | 'drawer' | 'record'
+
+export function setRegister(el: HTMLElement, register: TextRegister): void {
+  el.dataset['register'] = register
+}
+
 /** The room a wing is drawn in: its own scene and camera, the museum's one
     stack, and the wall clock its motion runs on. The frame owns all four,
     so thirty wings render through one renderer and one post chain. */
