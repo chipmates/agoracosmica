@@ -346,12 +346,26 @@ export function createMaterialLibrary(tier: Tier): MaterialLibrary {
       if (entry.metres) set.metres = entry.metres
       if (entry.tint) {
         /* a tint is a colour and never an exposure: it is normalised to its
-           own luminance, so the stone leans and the room does not brighten */
+           own luminance, so the stone leans and the room does not brighten.
+           The lean cancels exactly out of the ratio a hand-written material
+           reads, which is the point: the museum's own colour graph keeps its
+           say, and only a surface that takes the whole set as its material
+           takes the whole lean. */
         const t = new Color(entry.tint)
         const k = 1 / luminance(t)
-        tint.value.set(t.r * k, t.g * k, t.b * k)
-        set.albedo.multiply(t).multiplyScalar(k)
-        set.variation.multiply(t).multiplyScalar(k)
+        const w = entry.tintStrength ?? 1
+        const lean = (v: number): number => 1 + (v * k - 1) * w
+        tint.value.set(lean(t.r), lean(t.g), lean(t.b))
+        set.albedo.setRGB(
+          set.albedo.r * lean(t.r),
+          set.albedo.g * lean(t.g),
+          set.albedo.b * lean(t.b)
+        )
+        set.variation.setRGB(
+          set.variation.r * lean(t.r),
+          set.variation.g * lean(t.g),
+          set.variation.b * lean(t.b)
+        )
       }
       invMean.value.set(1 / lin(set.albedo.r), 1 / lin(set.albedo.g), 1 / lin(set.albedo.b))
       rough.value = set.roughness

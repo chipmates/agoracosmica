@@ -21,7 +21,7 @@ import {
   Scene,
   SphereGeometry,
 } from 'three/webgpu'
-import { uv } from 'three/tsl'
+import { uv, vec2 } from 'three/tsl'
 import { createStack, type Stack } from '../stack'
 import { GRADES, type Grade } from '../stack/grade'
 import { isTierName, type TierName } from '../stack/tier'
@@ -63,10 +63,14 @@ const SETS = [
 const PLAIN: Grade = {
   ...GRADES['first-station'],
   name: 'swatch',
+  /* a full overcast dome is a bright room, and a metal reads the dome rather
+     than the light: at exposure 1 the gold set clipped to white and the
+     judge would have been shown the exposure instead of the leaf */
+  exposure: 0.78,
   split: 0,
   vignette: 0.08,
   grain: 0.006,
-  bloom: { strength: 0.22, radius: 0.4, threshold: 0.86, warmth: 0 },
+  bloom: { strength: 0.16, radius: 0.4, threshold: 0.92, warmth: 0 },
 }
 
 const canvas = document.getElementById('stage') as HTMLCanvasElement
@@ -92,9 +96,9 @@ for (const name of SETS) {
 }
 
 const scene = new Scene()
-const camera = new PerspectiveCamera(38, innerWidth / innerHeight, 0.1, 60)
-camera.position.set(0, 1.28, 3.45)
-camera.lookAt(0, 0.62, 0)
+const camera = new PerspectiveCamera(40, innerWidth / innerHeight, 0.1, 60)
+camera.position.set(-0.15, 1.24, 4.35)
+camera.lookAt(0.28, 0.86, -0.4)
 
 const stack: Stack = await createStack({ canvas })
 stack.setScene(scene, camera, PLAIN)
@@ -110,7 +114,7 @@ try {
     azimuth: 34,
     elevation: 30,
     kelvin: 5200,
-    lux: 260,
+    lux: 200,
     probe: sky.texture,
     ambient: 1,
     reach: 14,
@@ -119,6 +123,7 @@ try {
   scene.background = sky.texture
   scene.backgroundIntensity = 0.16
   scene.backgroundBlurriness = 0.55
+  scene.environmentIntensity = 0.62
 } catch {
   probeName = 'baked sky (the library HDRI did not load)'
   stack.light({ azimuth: 34, elevation: 30, kelvin: 5200, lux: 260, ambient: 1 })
@@ -146,12 +151,15 @@ cube.position.set(0.24, 0.4, 0.06)
 cube.rotation.y = 0.42
 /** two metres square, standing up, so a tile can be counted */
 const plane = new Mesh(new PlaneGeometry(2, 2))
-plane.position.set(1.66, 1.0, -0.86)
-plane.rotation.y = -0.52
-const bodies: Array<[Mesh, number]> = [
-  [sphere, Math.PI], // once around the equator of a half-metre sphere
-  [cube, 0.8],
-  [plane, 2],
+plane.position.set(1.58, 1.0, -1.55)
+plane.rotation.y = -0.58
+/* the metres each body's own uv spans, u then v. A sphere's u runs once
+   around its equator and its v only from pole to pole, which is half as far:
+   given one number, every set would read as stretched on the sphere alone. */
+const bodies: Array<[Mesh, [number, number]]> = [
+  [sphere, [Math.PI, Math.PI / 2]],
+  [cube, [0.8, 0.8]],
+  [plane, [2, 2]],
 ]
 for (const [m] of bodies) {
   m.castShadow = true
@@ -164,7 +172,7 @@ async function show(name: string): Promise<void> {
   const set: MaterialSet = await stack.materials.load(name)
   const count = stack.tierConfig().detail
   for (const [mesh, metres] of bodies) {
-    mesh.material = set.material({ uv: uv().mul(metres), count })
+    mesh.material = set.material({ uv: uv().mul(vec2(metres[0], metres[1])), count })
   }
 
   const entry = set.entry

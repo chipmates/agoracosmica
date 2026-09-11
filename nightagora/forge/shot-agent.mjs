@@ -75,6 +75,10 @@ async function landed(page, state, ms = 6000) {
 const pathOf = (s) => s.path ?? '/'
 const hookOf = (s) => s.hook ?? '__forge'
 
+/** a route may carry its own query, so the tier joins it rather than opening
+    a second one */
+const address = (path, tier) => `${BASE}${path}${path.includes('?') ? '&' : '?'}tier=${tier}`
+
 /** land on a route and wait for its own forge hook to exist */
 async function arrive(page, url, hook) {
   await page.goto(url)
@@ -141,7 +145,7 @@ try {
         route.fulfill({ status: 200, contentType: 'application/javascript', body: 'export {}' })
       )
       let here = pathOf(wanted[0])
-      await arrive(page, `${BASE}${here}?tier=${tier}`, hookOf(wanted[0]))
+      await arrive(page, address(here, tier), hookOf(wanted[0]))
 
       const stamp = await assertBackend(page, WANT_BACKEND)
       assertAdapter(firstLine, WANT_BACKEND)
@@ -153,7 +157,7 @@ try {
         // two apps and the rig may never shoot one believing it is the other
         if (pathOf(s) !== here) {
           here = pathOf(s)
-          await arrive(page, `${BASE}${here}?tier=${tier}`, hookOf(s))
+          await arrive(page, address(here, tier), hookOf(s))
           await assertBackend(page, WANT_BACKEND)
         }
         const took = await jump(page, s, BASE, s.settle ?? SETTLE)

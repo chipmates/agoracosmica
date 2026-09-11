@@ -82,9 +82,12 @@ export interface ManifestEntry {
     roughness: number
     occlusion: number
   }
-  /** a colour the loader multiplies into the albedo, declared here so the
-      drawer can say that the museum's stone is not the source's colour */
+  /** a colour the loader leans the albedo toward, declared here so the drawer
+      can say that the museum's stone is not the source's colour, and how far
+      from it. A hex can only say which way; `tintStrength` says how far, and
+      1 is the whole lean. */
   tint?: string
+  tintStrength?: number
 }
 
 export interface Manifest {

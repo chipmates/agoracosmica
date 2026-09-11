@@ -149,7 +149,9 @@ export function parseStates(arg) {
           name: `swatch-${slug}`,
           phase,
           opts: { set: slug },
-          path: SWATCH_PATH,
+          // its own address per set: a sweep that switched sets inside one
+          // page would end holding the whole library on the GPU at once
+          path: `${SWATCH_PATH}?set=${slug}`,
           hook: SWATCH_HOOK,
           cone: false,
         }
