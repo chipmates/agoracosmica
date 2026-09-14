@@ -36,8 +36,8 @@
   },
   {
    "file": "src/wings/vinci/collection/hang.ts",
-   "sha256": "832e2df0628f86fdfd47a3d964aaaa7faa9c5dd9d6ec67fe597f05004a2959bf",
-   "bytes": 6130,
+   "sha256": "2f4dd18ec55d62ee76aff60aa71aac6cad859e3a03611b3e6f47a366be8684af",
+   "bytes": 7380,
    "unchangedDuringAudit": true
   },
   {
@@ -48,8 +48,8 @@
   },
   {
    "file": "src/wings/vinci/collection/materials.ts",
-   "sha256": "3cbe0aae835e0f17ed878d960741e3a5fdd895adcbb12fbd443f664d4eb6936e",
-   "bytes": 21772,
+   "sha256": "51ccc5005ac7ca5dae3dc922e8d9d7dfbed94e4adea8b69c82a214d1b92b2ec8",
+   "bytes": 22387,
    "unchangedDuringAudit": true
   },
   {
@@ -66,8 +66,8 @@
   },
   {
    "file": "src/wings/vinci/content.ts",
-   "sha256": "246c19d03b189ba1fa74b29c44fb573c118d0fa213c5795a436581670395f385",
-   "bytes": 37728,
+   "sha256": "e6dad3a95759d49795bef97fcbc7e24711a86aba095afb700d2143dcebcb5f2c",
+   "bytes": 38315,
    "unchangedDuringAudit": true
   },
   {
@@ -288,25 +288,25 @@
   }
  ],
  "geometrySha256": [
-  "1a2158db32fe025e27ccc457590d05eae26ede6dd75dd48dabebb713cda758af",
-  "e39634fb318c02b53d527ec619a1f43d8f775820b45491ae6cdeee73be7668a4"
+  "e6bcfebf60ec49caa6eb47626285a9c33c8a4246e58090920ab20ac594cb7bdf",
+  "a1e380d0db305ae9ffada9b55468c8a13b8c37482e03aaf99f0199e04f08483c"
  ],
  "geometry": [
   {
    "tier": "hero",
-   "sha256": "1a2158db32fe025e27ccc457590d05eae26ede6dd75dd48dabebb713cda758af",
+   "sha256": "e6bcfebf60ec49caa6eb47626285a9c33c8a4246e58090920ab20ac594cb7bdf",
    "quantumM": 0.000001,
    "matchingGeometryToleranceM": 0.000002
   },
   {
    "tier": "standard",
-   "sha256": "1a2158db32fe025e27ccc457590d05eae26ede6dd75dd48dabebb713cda758af",
+   "sha256": "e6bcfebf60ec49caa6eb47626285a9c33c8a4246e58090920ab20ac594cb7bdf",
    "quantumM": 0.000001,
    "matchingGeometryToleranceM": 0.000002
   },
   {
    "tier": "calm",
-   "sha256": "e39634fb318c02b53d527ec619a1f43d8f775820b45491ae6cdeee73be7668a4",
+   "sha256": "a1e380d0db305ae9ffada9b55468c8a13b8c37482e03aaf99f0199e04f08483c",
    "quantumM": 0.000001,
    "matchingGeometryToleranceM": 0.000002
   }
