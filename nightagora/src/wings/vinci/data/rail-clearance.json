@@ -108,8 +108,8 @@
   },
   {
    "file": "src/wings/vinci/ground.ts",
-   "sha256": "1ce9423e25e8feb62fc629e1c63bd8c5a892c13092a41d1009abbc13aea9235d",
-   "bytes": 18664,
+   "sha256": "2a9389f3c15a54b684ac41de23491bace902a8645f2891c5a65711c8d2b8bb69",
+   "bytes": 19024,
    "unchangedDuringAudit": true
   },
   {
@@ -246,25 +246,25 @@
   }
  ],
  "geometrySha256": [
-  "5f088274129cfb3636b78d8cd4463dc752f5fa1399dd23eb6962938d47f2d970",
-  "9e467520c42a56ef0bf8c60cb0760b5d3b0e9eb346caf2e7c6f505527628ce6b"
+  "c84afd0d58e508499ad47b1147feabc17dab2befbf2607637e422f26e367a967",
+  "3ade0295ca91b7bc8a620901a44cc67c6ea1f49fc7f18fa8c67e6473e7a7e856"
  ],
  "geometry": [
   {
    "tier": "hero",
-   "sha256": "5f088274129cfb3636b78d8cd4463dc752f5fa1399dd23eb6962938d47f2d970",
+   "sha256": "c84afd0d58e508499ad47b1147feabc17dab2befbf2607637e422f26e367a967",
    "quantumM": 0.000001,
    "matchingGeometryToleranceM": 0.000002
   },
   {
    "tier": "standard",
-   "sha256": "5f088274129cfb3636b78d8cd4463dc752f5fa1399dd23eb6962938d47f2d970",
+   "sha256": "c84afd0d58e508499ad47b1147feabc17dab2befbf2607637e422f26e367a967",
    "quantumM": 0.000001,
    "matchingGeometryToleranceM": 0.000002
   },
   {
    "tier": "calm",
-   "sha256": "9e467520c42a56ef0bf8c60cb0760b5d3b0e9eb346caf2e7c6f505527628ce6b",
+   "sha256": "3ade0295ca91b7bc8a620901a44cc67c6ea1f49fc7f18fa8c67e6473e7a7e856",
    "quantumM": 0.000001,
    "matchingGeometryToleranceM": 0.000002
   }

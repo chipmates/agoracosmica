@@ -23,7 +23,7 @@
       "prompt": "Bilinear IGN ground from 165 retained samples; explicit A-SITE court, terrace and assumed street cut; three scales of earth and grass; mapped stream. Conjectural exposed-soil clods, erosion variation and shallow normal relief dress declared vertical cut faces without changing their outlines or heights. Exposed-earth library colour uses two continuous world projections blended by face orientation, preserving the cut geometry and avoiding local strip UV restarts. Reuse the already licensed earth-packed map in the exact street corridors with restrained grey-beige mineral drift, compacted wheel bands, filtered aggregate and fine grit. Keep all actual sampled heights and ground outside the road.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "1ce9423e25e8feb62fc629e1c63bd8c5a892c13092a41d1009abbc13aea9235d",
+      "sha256": "2a9389f3c15a54b684ac41de23491bace902a8645f2891c5a65711c8d2b8bb69",
       "note": "IGN Licence Ouverte 2.0; OSM contributors ODbL 1.0; src/wings/vinci/data/terrain.json; recipe_file=src/wings/vinci/ground.ts"
     },
     {
@@ -400,7 +400,7 @@
       "prompt": "Regenerable actual geometry certificate for40 directed routes across five pose families and two viewport families. Includes foundation, entry, vegetation and all dressing; no sky, DOM or shadow-only duplicate.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-10",
-      "sha256": "69a0dfa5a63753632bf8cdc89354750e17289cff60498a91f6a4a47ee93b62a9",
+      "sha256": "d4ef6959c23ca05c780bf088d5488085eefd510066eb0301aae457a0932ecee4",
       "note": "recipe_file=src/wings/vinci/data/rail-clearance.json; source_generator=src/wings/vinci/rail-certify.mjs; runtime dependency of vinci/rail"
     },
     {

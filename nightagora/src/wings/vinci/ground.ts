@@ -5,6 +5,7 @@ import type { MaterialLibrary } from '../../stack/materials'
 import type { TierName } from '../../stack'
 import { roadSurfaceNode } from './road-dressing'
 import { facadeDistance, foundationVisibility } from './foundation'
+import { partitionDressing } from './dressing-partition'
 import { collectionConcreteMaterial, collectionProvenance } from './collection'
 import { collectionAccessProvenance } from './collection-access'
 import { anisotropicFootprint, coursedFace, dressedTuffeau } from './masonry-courses'
@@ -224,7 +225,11 @@ export function createGround(tier:TierName,library?:MaterialLibrary):Group {
     const modern=name==='collectionRetaining'
     const mesh=new Mesh(geometry,modern?collectionConcreteMaterial():groundMaterial(kind,library));mesh.receiveShadow=true;mesh.castShadow=name==='retaining'||modern;mesh.name=`wing-vinci/${name}`
     if(modern){mesh.userData={manifestId:collectionProvenance.manifestId,assetClass:'GENERATED',certainty:'reconstructed',component:'collection-cut-and-fill-lining',label:collectionProvenance.approachLabel,accessLabel:collectionAccessProvenance.label};geometry.userData.basis=collectionProvenance.recipe+' '+collectionAccessProvenance.recipe}
-    group.add(mesh)
+    // The sward is one body two hundred metres across, so every frame drew
+    // all of it, court or valley. Partitioned it is the same triangles in
+    // submission units the frustum can refuse. No blade is removed.
+    if(name==='grass')group.add(...partitionDressing(mesh,tier==='calm'?1:3))
+    else group.add(mesh)
   }
   return group
 }
