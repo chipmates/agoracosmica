@@ -20,6 +20,7 @@ import { createBenchBackdrop } from './backdrop';
 import { BACK_PLANE_AIR, BACK_PLANE_METRES, BENCH_BACK_PLANE, backPlaneMaterial, buildBackPlane } from './back-plane';
 import { createBenchHour, benchHourRecord, BENCH_SUN_AZIMUTH_DEGREES, BENCH_SUN_ELEVATION_DEGREES } from './hour';
 import { BENCH_ABSENCE, holderName, setRegister, withoutCitations } from './registers';
+import { setBenchKey } from '../key';
 import { playbackSchedule, initialPlayback, advancePlayback, togglePlayback, restartPlayback, freezePlayback, playbackPresentation } from './playback';
 // The eyes intentionally removes the Vite HMR client; inline CSS has no HMR imports.
 const sheet = document.createElement('style');
@@ -399,6 +400,10 @@ export function createBench(stack: Stack, onExit: () => void) {
     if (mine !== serial) return;
     const groundMat = new MeshStandardNodeMaterial({ roughness: stone.roughness, metalness: stone.metalness });
     groundMat.colorNode = vec3(stone.albedo.r * .025, stone.albedo.g * .025, stone.albedo.b * .025);
+    // A metre-scale band was tried here when the air began to reach the wall
+    // and it read as water: a low frequency on a horizontal plane seen at a
+    // grazing angle stretches into ripples whatever its contrast. The floor
+    // keeps the three scales it had.
     const groundDetail = stack.detail(groundMat, stone, { count: 3, mid: .06, maps: .4, macro: .4 });
     groundMat.roughnessNode = groundDetail.roughness.max(.94);
     // WHERE THE PLATE MEETS THE FLOOR. A cast shadow says where the sun is; it
@@ -477,6 +482,9 @@ export function createBench(stack: Stack, onExit: () => void) {
     key = stack.light({ azimuth: BENCH_SUN_AZIMUTH_DEGREES, elevation: BENCH_SUN_ELEVATION_DEGREES, kelvin: 4800, lux: 185, ambient: .72, reach: Math.max(24, span * 6, reach * 2.2), cascades: [span * 1.25, reach], sky: { zenith: '#707579', horizon: '#b1a895', ground: '#343532', stars: 0 } });
     key.light.shadow.normalBias = span * .0002;
     key.light.shadow.bias = -span * .00001;
+    // the surfaces that give an edge its rim answer to the light that is
+    // actually standing here, not to a second copy of the hour
+    setBenchKey(key.direction);
   }
   async function open(opts: BenchOptions = {}) { const requested = opts.slug ?? 'aerial-screw'; if (!isMachineSlug(requested))
     throw new Error(`No complete machine: ${requested}`);
@@ -508,7 +516,7 @@ export function createBench(stack: Stack, onExit: () => void) {
     if (requestedEvidence) evidence.open(requestedEvidence, read);
     ready = true; loading.hidden = true; metrics?.reset(); stamp(); lastWall = performance.now(); console.log(`[bench] mounted ${slug} period=${machineCatalog[slug].dossier.motion.period_s} tier=${stack.tierName()}`); }
   function close() { if (!active)
-    return; serial++; evidence.close(false); active = false; host.hidden = true; ready = false; clearDisplay(); key?.dispose(); key = null; }
+    return; setBenchKey(null); serial++; evidence.close(false); active = false; host.hidden = true; ready = false; clearDisplay(); key?.dispose(); key = null; }
   function navigate(delta: number) { const id = MACHINE_SLUGS[(MACHINE_SLUGS.indexOf(slug) + delta + MACHINE_SLUGS.length) % MACHINE_SLUGS.length]; if (id) {
     history.pushState({}, '', `/bench/vinci/machines/${id}${location.search}`);
     void open({ slug: id });

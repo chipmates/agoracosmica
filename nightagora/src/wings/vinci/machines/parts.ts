@@ -9,7 +9,7 @@ import type { DetailNodes } from '../../../stack/detail'
 import { createGlassSeatMaterial } from './glass-seat'
 import { createFlywheelSpokeArms } from './flywheel-overlap'
 import { createMutableSweep, geometryForPart, type MutableSweep } from './geometry'
-import { BENCH_SUN_AZIMUTH_DEGREES, BENCH_SUN_ELEVATION_DEGREES } from './bench/hour'
+import { benchKeyDirection } from './key'
 import type { Assembly, Dossier, PartSpec } from './types'
 export type { Assembly } from './types'
 
@@ -50,13 +50,10 @@ function turnedDetail(
  * The key's direction is the bench's own hour; where a surface turns away
  * from the eye and still faces that hour, it takes the light a real edge
  * takes. Nothing is added where the key cannot reach. */
-const keyDirection = (): {x: number; y: number; z: number} => {
-  const a = BENCH_SUN_AZIMUTH_DEGREES * Math.PI / 180, h = BENCH_SUN_ELEVATION_DEGREES * Math.PI / 180
-  return {x: Math.sin(a) * Math.cos(h), y: Math.sin(h), z: -Math.cos(a) * Math.cos(h)}
-}
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function keyRim(strength: number): any {
-  const key = keyDirection()
+  const key = benchKeyDirection()
+  if (!key) return float(0)
   const toEye = cameraPosition.sub(positionWorld).normalize()
   const grazing = float(1).sub(normalWorld.dot(toEye).abs()).clamp(0, 1).pow(2.6)
   const lit = normalWorld.dot(vec3(key.x, key.y, key.z)).mul(.5).add(.5).pow(1.5)
@@ -222,9 +219,12 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Assemb
       detail: {...set.detail, macro: .07, macroContrast: .3, mid: .55, micro: .35},
     } : dossier.slug === 'flywheel' && set.name === 'limestone-pale' ? {
       // A 140 mm ball inside a 150 mm macro cell takes one value and reads as
-      // putty. The bands are cut to the ball: mottle across it, pits on it.
-      ...set, scale: [.15, .15], scales: [.085, .016, .0011], normalStrength: .26,
-      detail: {...set.detail, macro: .9, macroContrast: .62, mid: .5, micro: .3},
+      // putty, and one cut to the ball's own diameter is still one cell across
+      // it. The bands are cut to a THIRD of the ball: mottle three times over
+      // it, pits at the size a chisel leaves, and enough relief that the key
+      // finds them. A dressed stone at arm's length is not a smooth sphere.
+      ...set, scale: [.05, .05], scales: [.046, .013, .0016], normalStrength: .62,
+      detail: {...set.detail, macro: .046, macroContrast: .55, mid: .8, micro: .55},
     } : /leather/.test(name) ? {
       // A hide wound round a shaft creases along the wrap; without that band
       // the coil is a smooth tube and reads as hose.
@@ -360,10 +360,12 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Assemb
     if (set.name === 'limestone-pale') {
       // Stone was the first thing the eye found on these frames: four bright
       // balls on the flywheel, a pale counterweight on the crane. Stone sits
-      // under the oak beside it, not above it.
+      // under the oak beside it, not above it. The balls still out-read their
+      // own machine at .95 of the set, so the body of the stone is taken down
+      // and its mottle given the room the value leaves.
       const stone = new Color('#7c7669')
       const body = detail.albedo.dot(vec3(.2126, .7152, .0722))
-      material.colorNode = vec3(stone.r, stone.g, stone.b).mul(body.mul(.95).add(.12)).mul(detail.occlusion)
+      material.colorNode = vec3(stone.r, stone.g, stone.b).mul(body.mul(1.05).add(.02)).mul(detail.occlusion)
       material.roughnessNode = detail.roughness.clamp(.62, .95)
     }
     if (/leather/.test(name)) {
@@ -371,6 +373,13 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Assemb
       const fibres = detail.albedo.dot(vec3(.2126, .7152, .0722))
       material.colorNode = vec3(hide.r, hide.g, hide.b).mul(fibres.mul(.8).add(.3)).mul(detail.occlusion)
       material.roughnessNode = detail.roughness.clamp(.58, .92)
+    }
+    if (dossier.slug === 'camera-obscura' && set.name === 'oak-beams') {
+      // The one flat lid on the bench that the key strikes near square. A
+      // sawn plank is a rough surface and its highlight is broad; at the
+      // inherited floor the specular lobe came to a point and the lid blew to
+      // white, taking its grain with it.
+      material.roughnessNode = detail.roughness.clamp(.66, .96)
     }
     if (/ink/.test(name)) material.colorNode = vec3(0.009, 0.007, 0.005).mul(detail.albedo)
     if (/paper/.test(name)) material.colorNode = vec3(0.69, 0.65, 0.55).mul(detail.albedo)
