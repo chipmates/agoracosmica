@@ -85,6 +85,9 @@ export interface Stack {
       hands to `light({ probe })` */
   hdri: (name: string) => Promise<SkyProbe>
   cost: () => CostReading
+  /** Include privately owned image mip chains in the shared texture meter.
+   * The owner unregisters before releasing its streams. Values are MiB. */
+  registerTextureMemory: (measure: () => number) => () => void
   tier: (name: TierName) => void
   tierName: () => TierName
   tierConfig: () => Tier
@@ -131,6 +134,7 @@ export async function createStack(opts: StackOptions = {}): Promise<Stack> {
   const models = createModelLibrary(tier, materials, renderer)
   const meter = createCostMeter(renderer)
   const lights: KeyLight[] = []
+  const textureOwners = new Set<() => number>()
 
   let chain: PostChain | null = null
   let scene: Scene | null = null
@@ -223,13 +227,19 @@ export async function createStack(opts: StackOptions = {}): Promise<Stack> {
 
     hdri: loadHDRI,
 
+    registerTextureMemory(measure) {
+      textureOwners.add(measure)
+      return () => { textureOwners.delete(measure) }
+    },
+
     cost() {
       const size = renderer.getDrawingBufferSize(new Vector2())
       return {
         ...meter.read(),
         tier: tierName,
         backend,
-        textureMB: Math.round((materials.textureMB() + models.textureMB()) * 100) / 100,
+        textureMB: Math.round((materials.textureMB() + models.textureMB()
+          + [...textureOwners].reduce((sum, measure) => sum + measure(), 0)) * 100) / 100,
         models: {
           loaded: models.loaded().length,
           tris: models.tris(),
@@ -285,6 +295,7 @@ export async function createStack(opts: StackOptions = {}): Promise<Stack> {
     },
 
     dispose() {
+      textureOwners.clear()
       materials.dispose()
       models.dispose()
       for (const l of lights) l.dispose()

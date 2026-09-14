@@ -74,6 +74,10 @@
 .vinci-record {border-top:1px solid #a9977344;margin-top:18px;padding-top:8px;}
 .vinci-record[hidden] {display:none;}
 .vinci-record .vinci-statement {font:12px/1.6 var(--sans);overflow-wrap:anywhere;}
+.vinci-record .picture-policy-label {min-width:0;margin:20px 0;padding-top:12px;border-top:1px solid #a9977344;font:12px/1.6 var(--sans);overflow-wrap:anywhere;}
+.vinci-record .picture-policy-label p {margin:8px 0;white-space:pre-wrap;}
+.vinci-record .picture-label-language + .picture-label-language {margin-top:16px;}
+.vinci-record .picture-policy-label a {display:block;min-height:44px;padding:10px 0;box-sizing:border-box;color:#e6d6b8;overflow-wrap:anywhere;}
 .vinci-hour {font:12px/1.5 var(--sans);letter-spacing:.03em;}
 
 .vinci-human-source {display:block;margin-top:7px;color:#b6bcae;font:12px/1.5 var(--sans);}

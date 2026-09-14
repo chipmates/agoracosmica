@@ -1179,7 +1179,7 @@ window.__forge = {
     return stack.cost()
   },
   manifest() {
-    return [...stack.materials.manifest(), ...bench.manifest()]
+    return [...stack.materials.manifest(), ...bench.manifest(), ...wingFrame.manifest()]
   },
   labels() {
     return readLabels()
@@ -1248,7 +1248,8 @@ window.__forge = {
       stationId: stand ? stand.stationId : wingFrame.stationId(),
       stationIds: stand ? stand.stationIds : wingFrame.stationIds(),
       door: wingFrame.doorHere(),
-      texturesPending: stack.materials.pending() + (stand?.texturesPending ?? 0),
+      texturesPending: stack.materials.pending() + (stand?.texturesPending ?? 0) + wingFrame.pending(),
+      textureErrors: wingFrame.errors(),
       // what the last frame actually cost: the rig quotes this instead of
       // guessing from a software-rasterizer fps number
       draws: renderer.info.render.drawCalls,

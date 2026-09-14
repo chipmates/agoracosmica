@@ -20,6 +20,7 @@ import { lang } from '../../content'
 import { RoomBatch, stamp } from './build'
 import { collectionExhibitMaterials, collectionInteriorMaterial, collectionProceduralStack } from './materials'
 import { COURT, FLOOR, GRAVE_ORIGIN, LINE_ORIGIN, PARACHUTE_ORIGIN } from './layout'
+import { mountCollectionPlates, type CollectionPictureSource } from './plates'
 
 interface Stand { east: number; north: number; bearing: number; plinth: number }
 
@@ -53,12 +54,15 @@ export interface CollectionExhibits {
   dispose(): void
   ready: Promise<void>
   pending(): number
+  pictureSources(): readonly CollectionPictureSource[]
+  pictureErrors(): readonly string[]
 }
 
 export function mountCollectionExhibits(host: Group, stack: Stack): CollectionExhibits {
   const machines: { build: ReadyMachineBuild; indoors: boolean }[] = []
   const plinths = new RoomBatch()
   const material = collectionInteriorMaterial()
+  const pictures = mountCollectionPlates(host, stack)
   let live = true, halled = false, seconds = 0, delta = 0
   let reading: ReturnType<typeof buildTable> | undefined
   const teardown: (() => void)[] = []
@@ -272,12 +276,15 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
   }
 
   return {
-    ready: court.then(() => hall ?? Promise.resolve()).then(() => table ?? Promise.resolve()),
-    pending: () => (halled && !machines.some(machine => machine.indoors) ? 1 : 0),
+    ready: Promise.all([court.then(() => hall ?? Promise.resolve()).then(() => table ?? Promise.resolve()), pictures.ready]).then(() => undefined),
+    pending: () => (halled && !machines.some(machine => machine.indoors) ? 1 : 0) + pictures.pending(),
+    pictureSources: pictures.sources,
+    pictureErrors: pictures.errors,
     warm: warmHall,
     update(now, step, eye) {
       if (!live) return
       seconds = now; delta = step
+      pictures.update(step, eye)
       // A ROOM THE CAMERA IS NOT IN IS NOT DRAWN.
       // The envelope itself, not the ground around it: the garden station
       // stands on the apron three metres north of the north elevation, and a
@@ -321,6 +328,7 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
     },
     dispose() {
       live = false
+      pictures.dispose()
       for (const machine of machines) machine.build.dispose()
       for (const strike of teardown) strike()
       grave.dispose()

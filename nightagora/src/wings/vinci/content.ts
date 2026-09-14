@@ -202,10 +202,10 @@ const visitorWords: Record<string, VisitorWords> = {
     sourceDe: 'Die Raumbeschreibung des Hausmuseums und der Blick zum königlichen Schloss.',
   },
   'picture-absence': {
-    en: 'This picture is withheld because the available scan is not cleared for this museum.',
-    de: 'Dieses Bild bleibt ausgespart, weil der verfügbare Scan für dieses Museum nicht freigegeben ist.',
-    sourceEn: 'The image supplier’s terms and the museum’s rights review.',
-    sourceDe: 'Die Nutzungsbedingungen des Bildanbieters und die Rechteprüfung des Museums.',
+    en: 'Fourteen frames remain empty in this hang. Their sizes share the wall with the reproductions.',
+    de: 'Vierzehn Rahmen bleiben in dieser Hängung leer. Ihre Maße teilen sich die Wand mit den Reproduktionen.',
+    sourceEn: 'The room’s retained hang and the museum’s picture register.',
+    sourceDe: 'Die beibehaltene Hängung des Raums und das Bilderverzeichnis des Museums.',
   },
   'supper-record': {
     en: 'The Last Supper survives as a fragile wall painting in Milan.',
@@ -214,10 +214,10 @@ const visitorWords: Record<string, VisitorWords> = {
     sourceDe: 'Das Museum des Abendmahls beschreibt Malerei auf trockenem Putz, kein Fresko.',
   },
   'supper-absence': {
-    en: 'The Last Supper’s image is not cleared for display here.',
-    de: 'Die Abbildung des Abendmahls ist hier nicht zur Anzeige freigegeben.',
-    sourceEn: 'The image supplier’s terms and the museum’s rights review.',
-    sourceDe: 'Die Nutzungsbedingungen des Bildanbieters und die Rechteprüfung des Museums.',
+    en: 'The original wall painting remains in Milan. This wall holds its measured outline and an available reproduction.',
+    de: 'Das originale Wandgemälde bleibt in Mailand. Diese Wand trägt seinen vermessenen Umriss und eine verfügbare Reproduktion.',
+    sourceEn: 'The museum’s picture register and the reproduction’s source record.',
+    sourceDe: 'Das Bilderverzeichnis des Museums und der Quellennachweis der Reproduktion.',
   },
   'facsimile-record': {
     en: 'This reproduction of Manuscript B was printed in 1883.',
@@ -396,16 +396,17 @@ const chamberPlacement = statement('chamber-placement',
   'Das Museum verortet sein Zimmer an diesem Ende, mit Blick auf das Schloss des Königs.',
   'conjectural', 'document', 'brief/CONCEPT-OPUS.md §3 S6');
 const emptyPicture = statement('picture-absence',
-  'This museum may not show this picture. A scan exists, and its terms are not ours.',
-  'Dieses Museum darf dieses Bild nicht zeigen. Es gibt einen Scan, und seine Bedingungen sind nicht unsere.',
-  'unknown', 'absence', 'brief/CONCEPT-OPUS.md §3 S11', 'supplied');
+  'The room retains fourteen withheld frames. Reproduction sources and their current terms are recorded separately.',
+  'Der Raum behält vierzehn ausgesparte Rahmen bei. Bildquellen und ihre aktuellen Bedingungen sind gesondert verzeichnet.',
+  'unknown', 'absence', 'The retained room hang and the picture register', 'museum translation');
 const supper = statement('supper-record',
   'The Last Supper, 460 by 880 cm, on the north wall of the refectory of Santa Maria delle Grazie in Milan. Dry wall-painting over gesso, pitch and mastic, not fresco.',
   'Das Abendmahl, 460 mal 880 cm, an der Nordwand des Refektoriums von Santa Maria delle Grazie in Mailand. Trockene Wandmalerei auf Gesso, Pech und Mastix, kein Fresko.',
   'documented', 'measurement', 'brief/CONCEPT-OPUS.md §3 S12');
 const supperAbsence = statement('supper-absence',
-  'This museum may not show it to you.', 'Dieses Museum darf es Ihnen nicht zeigen.',
-  'unknown', 'absence', 'brief/CONCEPT-OPUS.md §3 S12');
+  'The original wall stays in Milan; the reproduction shown here has its own source and licence.',
+  'Die originale Wand bleibt in Mailand; die hier gezeigte Reproduktion hat ihre eigene Quelle und Lizenz.',
+  'reconstructed', 'absence', 'The picture register and the displayed reproduction source record', 'museum translation');
 const readingTable = statement('facsimile-record',
   'Manuscript B, folio 83 verso, in an 1883 photolithographic facsimile.',
   'Manuskript B, Blatt 83 verso, in einem photolithografischen Faksimile von 1883.',
@@ -438,8 +439,8 @@ const stationPromises: Partial<Record<VinciStationId, VinciText>> = {
     de: 'Die Gartenfront fängt über dem Tal das Nachmittagslicht ein.',
   },
   'supper-wall': {
-    en: 'The Last Supper’s empty outline reveals the scale of the painting we cannot show.',
-    de: 'Der leere Umriss des Abendmahls zeigt die Größe des Gemäldes, das hier nicht zu sehen sein darf.',
+    en: 'A reproduction within the Last Supper’s measured outline reveals the scale of the wall painting.',
+    de: 'Eine Reproduktion im vermessenen Umriss des Abendmahls zeigt die Größe des Wandgemäldes.',
   },
   flight: {
     en: 'See what Leonardo’s flight studies explain and what they leave unknown.',
@@ -497,7 +498,8 @@ const seeds: readonly StationSeed[] = [
   seed('line-amboise', { en: 'Amboise, and the threshold', de: 'Amboise und die Schwelle' },
     { en: 'A visitor recorded three pictures and notebooks here in 1517.', de: 'Ein Besucher verzeichnete hier 1517 drei Gemälde und Notizbücher.' },
     [vinciCollectionThreshold], 'brief/CONCEPT-GPT6.md Station 06; brief/CONCEPT-OPUS.md §3 S10'),
-  seed('picture-room', { en: 'The picture room, at true scale', de: 'Der Bildersaal in wahrem Maßstab' }, emptyPicture,
+  seed('picture-room', { en: 'The picture room, at true scale', de: 'Der Bildersaal in wahrem Maßstab' },
+    { en: 'Pictures and withheld frames share one wall at the sizes their holders record.', de: 'Bilder und ausgesparte Rahmen teilen sich eine Wand in den von ihren Sammlungen verzeichneten Maßen.' },
     [emptyPicture], 'brief/CONCEPT-OPUS.md §3 S11', 'supplied'),
   seed('supper-wall', { en: 'The wall that is not here', de: 'Die Wand, die nicht hier ist' },
     { en: `${statementRecord(supper).en} ${statementRecord(supperAbsence).en}`, de: `${statementRecord(supper).de} ${statementRecord(supperAbsence).de}` },

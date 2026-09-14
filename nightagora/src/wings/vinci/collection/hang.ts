@@ -1,13 +1,12 @@
 /** The hang, at true scale, on the picture room's own wall.
  *
- * The picture bench (window 4) has not landed in this tree: there is no
- * `pictures/` module to import, and no plate may be invented here. So this
- * module builds the WALL's side of the hang only, which is the part a room
+ * This module builds the WALL's side of the hang, which is the part a room
  * owes an exhibit: every work's frame at the size the holder records, on one
  * datum, in the order the life produced them. Fourteen of them are the
  * withheld works and stand over a dark field; eleven are the display-grade
  * works whose plates the picture bench streams, and they stand over a
- * prepared pale field until it does. Nothing here carries a label, a name or
+ * prepared pale field. The picture module streams onto those same fields
+ * through collection/plates.ts. Nothing here carries a label, a name or
  * a claim: the station's own locked copy does that.
  *
  * Sizes are the holders' own, in centimetres, as the concept's register
@@ -16,28 +15,49 @@
 import type { RoomBatch } from './build'
 import { FACE, FLOOR, HANG_DATUM, ROOMS } from './layout'
 
-interface Work { width: number; height: number; withheld: boolean }
-const w = (width: number, height: number, withheld = false): Work => ({ width: width / 100, height: height / 100, withheld })
+interface Work { id: string; face: 'front' | 'reverse'; width: number; height: number; withheld: boolean; slotWidth: number }
+const w = (id: string, width: number, height: number, withheld = false, face: Work['face'] = 'front', slotWidth = width): Work =>
+  ({ id, face, width: width / 100, height: height / 100, withheld, slotWidth: slotWidth / 100 })
 
 /** In the order the life produced them, present and absent in one line. */
 export const HANG: readonly Work[] = [
-  w(151, 177, true), w(217, 98, true), w(37, 38.1), w(37, 38.1), w(48.5, 62),
-  w(33, 49.5, true), w(75, 103, true), w(240, 244, true), w(60, 16, true), w(122, 199.5),
-  w(32, 44.7, true), w(40.3, 54.8), w(45, 63, true), w(33, 42), w(104.6, 141.5, true),
-  w(36.9, 48.3), w(36.4, 50.2), w(63.6, 45.3), w(53.4, 79.4, true), w(120, 189.5, true),
-  w(113, 168), w(45.7, 65.7, true), w(56.3, 72.9, true), w(21, 24.7, true), w(115, 177),
+  w('baptism-of-christ', 151, 177, true), w('annunciation', 217, 98, true),
+  w('ginevra-de-benci', 37, 38.1), w('ginevra-de-benci', 37, 38.1, false, 'reverse'),
+  w('madonna-of-the-carnation', 48.5, 62), w('benois-madonna', 33, 49.5, true),
+  w('saint-jerome', 75, 103, true), w('adoration-of-the-magi', 240, 244, true),
+  w('annunciation-predella', 60, 16, true), w('virgin-of-the-rocks-louvre', 122, 199.5),
+  w('portrait-of-a-musician', 32, 44.7, true), w('lady-with-an-ermine', 40.3, 54.8),
+  w('la-belle-ferronniere', 45, 63, true), w('madonna-litta', 33, 42),
+  w('burlington-house-cartoon', 104.6, 141.5, true), w('yarnwinder-buccleuch', 36.9, 48.3),
+  // Current holder record L.2026.5 supersedes the concept's 50.2 by 36.4 cm.
+  // Its old layout slot keeps every neighbouring frame and batten in place.
+  // https://www.metmuseum.org/art/collection/search/941909
+  w('yarnwinder-lansdowne', 37.1, 49.5, false, 'front', 36.4), w('anghiari-copy', 63.6, 45.3),
+  w('mona-lisa', 53.4, 79.4, true), w('virgin-of-the-rocks-london', 120, 189.5, true),
+  w('virgin-and-child-with-st-anne', 113, 168), w('salvator-mundi', 45.7, 65.7, true),
+  w('saint-john-the-baptist', 56.3, 72.9, true), w('la-scapigliata', 21, 24.7, true),
+  w('bacchus', 115, 177),
 ]
 
 const WALL = FACE.pictureWallNorth + .033
 const MOULDING = .08, DEPTH = .062
 
-export function buildHang(b: RoomBatch): void {
+/** A single layout supplies both the room's frames and the imported plates. */
+export function hangPlacements(): readonly (Work & { east: number; north: number; datum: number })[] {
   const span: [number, number] = [-60.5 + .9, -24.1 - .9]
-  const total = HANG.reduce((sum, work) => sum + work.width + MOULDING * 2, 0)
+  const total = HANG.reduce((sum, work) => sum + work.slotWidth + MOULDING * 2, 0)
   const gap = (span[1] - span[0] - total) / (HANG.length - 1)
   let east = span[0]
-  for (const work of HANG) {
-    const centre = east + MOULDING + work.width / 2
+  return HANG.map(work => {
+    const centre = east + MOULDING + work.slotWidth / 2
+    east = centre + work.slotWidth / 2 + MOULDING + gap
+    return { ...work, east: centre, north: WALL + .0165, datum: HANG_DATUM }
+  })
+}
+
+export function buildHang(b: RoomBatch): void {
+  for (const work of hangPlacements()) {
+    const centre = work.east
     const high = HANG_DATUM + work.height / 2
     // A withheld work is an EMPTY FRAME: the moulding stands 30 mm off the
     // wall on its battens and what is inside it is the wall. The eleven the
@@ -55,7 +75,6 @@ export function buildHang(b: RoomBatch): void {
       const at = centre + side * work.width * .28
       b.box(at, WALL + .006, (high + MOULDING + HANG_DATUM + 1.42) / 2, .012, .012, HANG_DATUM + 1.42 - high - MOULDING, 3)
     }
-    east = centre + work.width / 2 + MOULDING + gap
   }
 }
 

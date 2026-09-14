@@ -13,7 +13,7 @@ import type { Stack } from '../../../stack'
 import type { GrainRecipe, MaterialClass, MaterialSet } from '../../../stack/materials'
 import { applyDetail } from '../../../stack/detail'
 import { anisotropicFootprint } from '../masonry-courses'
-import { LINE_ORIGIN, LINE_SLAB } from './layout'
+import { FACE, LINE_ORIGIN, LINE_SLAB } from './layout'
 
 /** floor stone, wall plaster, dark stone, steel, ceiling, outdoor paving */
 export type CollectionRole = 0 | 1 | 2 | 3 | 4 | 5
@@ -90,6 +90,17 @@ function fittingWash(P: TSLNode, n: TSLNode): TSLNode {
     .add(hallUp.mul(.34)).add(hallFloor.mul(.16))
     .add(gallery.mul(.30)).add(galleryFloor.mul(.18)).add(bodyWall.mul(.40)).add(alcove.mul(.26))
     .clamp(0, .62)
+}
+
+/** Reproductions share the surrounding room's sky visibility and fitting
+ * wash. The north apron is open to the sky; it carries no bench aperture.
+ * This is the room's declared light on a source, not a change to its pixels. */
+export function collectionPlateTone(): TSLNode {
+  const { float, normalWorldGeometry, positionWorld } = TSL as unknown as Record<string, TSLNode>
+  const P = positionWorld, n = normalWorldGeometry
+  const room = interiorDaylight(P, n).mul(1.55).add(.10).clamp(.10, 1)
+    .add(fittingWash(P, n)).clamp(.10, 1)
+  return P.z.lessThan(-FACE.glazingNorth).select(float(1), room)
 }
 
 /** One material for every welded room surface. The role attribute decides

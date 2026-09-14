@@ -19,6 +19,7 @@ import { PerspectiveCamera, Scene } from 'three/webgpu'
 import { WING_TEXT, lang, say } from './content'
 import type { WingEntry } from './registry'
 import type { Stack } from '../stack'
+import type { ManifestEntry } from '../manifest'
 
 const APP_ORIGIN = 'https://agoracosmica.org'
 
@@ -87,6 +88,10 @@ export interface WingModule {
   view?(id: string): void
   /** the gaze, in radians, when the wing drives its own camera */
   look?(yaw: number, pitch: number): void
+  /** Privately streamed exhibits participate in the host's settled meter. */
+  pending?(): number
+  errors?(): readonly string[]
+  manifest?(): ManifestEntry[]
 }
 
 export interface WingFrame {
@@ -114,6 +119,9 @@ export interface WingFrame {
   look(yaw: number, pitch: number): void
   /** the camera the wing is seen through, which is what telemetry reads */
   camera(): PerspectiveCamera
+  pending(): number
+  errors(): readonly string[]
+  manifest(): ManifestEntry[]
 }
 
 /** The station the URL is standing at, or 0. The hash is the return path,
@@ -300,6 +308,9 @@ export function createWingFrame(
     stationId: () => (wing ? idAt(index) : ''),
     stationIds: () => (wing?.stations ?? []).map((_, i) => idAt(i)),
     stations: () => wing?.stations.length ?? 0,
+    pending: () => wing?.pending?.() ?? 0,
+    errors: () => wing?.errors?.() ?? [],
+    manifest: () => wing?.manifest?.() ?? [],
     doorHere: () => ({
       href: door.href,
       question: question.textContent ?? '',

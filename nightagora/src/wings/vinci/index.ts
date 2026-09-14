@@ -16,6 +16,9 @@ import { createWingShadowBody, type WingShadowBody } from './shadow-body'
 import { createCollection, collectionProvenance } from './collection'
 import { collectionView } from './collection/views'
 import { mountCollectionExhibits, type CollectionExhibits } from './collection/exhibits'
+import { createPolicyWorkLabel } from './pictures/policy-label'
+import { validatePaintingRecord } from './pictures/policy'
+import { ASSET_BASE } from '../../stack/materials'
 import { createCollectionReceiverPlaneShadowFilter } from './receiver-plane-shadow'
 import { createCollectionAccess, collectionAccessPoint, collectionAccessProvenance } from './collection-access'
 import { createRoadDressing, roadDressingProvenance } from './road-dressing'
@@ -213,7 +216,7 @@ export function createWing():WingModule {
     // court's exhibit brings its own materials from the library a moment
     // later, so the snapshot is taken again once they have arrived; without
     // it the whole shadow map is re-rendered on every frame of the walk.
-    void exhibits?.ready.then(()=>{if(!hosts||!standing)return;shadowCache?.dispose();shadowCache=createStaticShadowCache(scene,camera,stack.renderer,()=>stack.materials.pending())})
+    void exhibits?.ready.then(()=>{if(!hosts||!standing)return;shadowCache?.dispose();shadowCache=createStaticShadowCache(scene,camera,stack.renderer,()=>stack.materials.pending());if(mode===2)paintDock()})
     for(const root of scene.children){const id=root===shell?'vinci/shell':root.name==='vinci/shell-shadow'?'vinci/shell-shadow':root.name==='wing-vinci/gate-passage'?'vinci/gate-passage':root===water?'vinci/water':root===sky?'vinci/sky':root.name.includes('landscape trees')?'vinci/vegetation':root.name==='vinci/collection-modern-insertion'?'vinci/collection':root.name==='vinci generated road dressing'?'vinci/road-dressing':root.name==='vinci generated inner court dressing'?'vinci/inner-court':root.name.includes('dressing')?'vinci/ground-dressing':'vinci/terrain';root.traverse(o=>{if(o instanceof Mesh){const assetId=typeof o.userData['manifestId']==='string'?o.userData['manifestId']:id;o.userData['manifestId']=assetId;o.userData['asset']=assetId}})}
     // The ids above are what the shadow body folds by, so it is welded
     // after them and before the rail reads the scene.
@@ -270,7 +273,7 @@ export function createWing():WingModule {
   let pendingView=''
   function showView(id:string) {
     const inspectCost=id.endsWith('-cost')&&id!=='audit-cost';if(inspectCost)id=id.slice(0,-5);const s=vinciContent[card]!;if(id==='scene')endInspection();if(id==='scene'||id.startsWith('audit-'))rail.look(0,0);if(id==='scene'||id==='audit-cost'){mode=1;paintDock()}if(id==='audit-cost')measurement.show(s.id);if(id==='audit-ui'){mode=1;paintDock();measurement.show(s.id,'ui')}if(id==='audit-ui-labels'){mode=2;paintDock();measurement.show(s.id,'ui')}if(id.startsWith('collection-room')||id.startsWith('collection-hang'))exhibits?.warm()
-    const pose=namedPose(id,narrow())??collectionView(id,narrow());if(pose){activeView=id;mode=1;paintDock();rail.set(s.id,pose,true,narrow());header.querySelector('.vinci-insertion')?.remove();titleForView(id);if(id.startsWith('collection'))header.append(make('p','vinci-insertion',lang()==='de'?'Museumseinbau der Gegenwart · Räume im Bau':'Modern museum insertion · Rooms in construction'))}const cone=/(?:^|-)cone-(ul|ur|dl|dr)$/.exec(id);if(cone){placeCanonicalStation();rail.look(cone[1]!.includes('l')?.6:-.6,cone[1]!.startsWith('u')?.32:-.32)}if(id==='labels'||id==='hour'||id==='record'){mode=2;paintDock();if(id==='record'){dock.querySelector<HTMLButtonElement>('.vinci-record-toggle')?.click();dock.scrollTop=record.offsetTop-18}}if(inspectCost&&(pose||cone))measurement.show(`${s.id} / ${id}`)
+    const pose=namedPose(id,narrow())??collectionView(id,narrow());if(pose){activeView=id;mode=1;paintDock();rail.set(s.id,pose,true,narrow());header.querySelector('.vinci-insertion')?.remove();titleForView(id);if(id.startsWith('collection'))header.append(make('p','vinci-insertion',lang()==='de'?'Museumseinbau der Gegenwart · Räume im Bau':'Modern museum insertion · Rooms in construction'))}const cone=/(?:^|-)cone-(ul|ur|dl|dr)$/.exec(id);if(cone){placeCanonicalStation();rail.look(cone[1]!.includes('l')?.6:-.6,cone[1]!.startsWith('u')?.32:-.32)}if(id==='labels'||id==='hour'||id==='record'){mode=2;paintDock();if(id==='record'){if(record.hidden)dock.querySelector<HTMLButtonElement>('.vinci-record-toggle')?.click();dock.scrollTop=record.offsetTop-18}}if(inspectCost&&(pose||cone))measurement.show(`${s.id} / ${id}`)
   }
   /** The door asks about the place the visitor is standing in, so the
    * question travels with the card and not with the rail mark. */
@@ -350,6 +353,7 @@ export function createWing():WingModule {
   function paintDock() {
     if(!hosts)return
     const s=vinciContent[card]!,scroll=dock.scrollTop
+    const recordOpen=dock.dataset['station']===s.id&&record?.isConnected&&!record.hidden
     header.hidden=mode===2
     const camera=hosts.world.camera
     dock.dataset['station']=s.id
@@ -368,6 +372,24 @@ export function createWing():WingModule {
     dock.append(title,make('h2','',text(s.name)))
     for(const label of s.labels)appendLabel(label)
     if(!s.outdoor){dock.append(make('p','vinci-promise',text(s.promise)));appendRecord(s.record??s.promise,s.promiseSource)}
+    if(s.id==='picture-room'||s.id==='supper-wall'){
+      const sources=exhibits?.pictureSources()??[]
+      const works=new Map(sources.filter(({work})=>(work.id==='last-supper')===(s.id==='supper-wall')).map(({work})=>[work.id,work]))
+      for(const work of works.values()){
+        const entries=sources.filter(source=>source.work.id===work.id).map(source=>source.entry)
+        const label=createPolicyWorkLabel(work,entries,true)
+        setRegister(label,'record')
+        for(const entry of entries){
+          const complete=make('a','vinci-picture-source',lang()==='de'
+            ? entry.face==='reverse'?'Vollständige Reproduktion der Rückseite öffnen':'Vollständige Reproduktion öffnen'
+            : entry.face==='reverse'?'Open the complete reverse reproduction':'Open the complete reproduction')
+          complete.href=ASSET_BASE+validatePaintingRecord(entry.plate,'painting-plate').path
+          complete.target='_blank';complete.rel='noopener'
+          label.append(complete)
+        }
+        record.append(label)
+      }
+    }
     // The card claims the hour at every outdoor station, so every one of them
     // carries the chain that backs it.
     if(s.outdoor)record.insertBefore(make('pre','vinci-arithmetic',text(vinciHourArithmetic)),record.children[1]??null)
@@ -416,13 +438,17 @@ export function createWing():WingModule {
     appendRecord({en:'CC0 1.0 · ambientCG · stone-tuffeau, earth-packed, grass-short. Library material surrogates; no site photography sampled.',de:'CC0 1.0 · ambientCG · stone-tuffeau, earth-packed, grass-short. Materialersatz aus der Bibliothek. Keine Standortfotografie als Textur verwendet.'},'CC0 material library')
     appendRecord({en:'Assumed dimensions: brick 0.22–0.27 × 0.035–0.055 m; wall 0.45–0.80 m; main eaves 7.0–8.4 m. Basis: BUILDING-DOSSIER, Q001/Q124/Q127.',de:'Angenommene Maße: Ziegel 0.22–0.27 × 0.035–0.055 m; Mauer 0.45–0.80 m; Haupttraufe 7.0–8.4 m. Grundlage: BUILDING-DOSSIER, Q001/Q124/Q127.'},'brief/BUILDING-DOSSIER.md')
     const recordButton=make('button','vinci-record-toggle',lang()==='de'?'Vollständiger Nachweis':'Full record')
-    recordButton.type='button';recordButton.setAttribute('aria-controls',record.id);recordButton.setAttribute('aria-expanded','false')
+    record.hidden=!recordOpen
+    recordButton.type='button';recordButton.setAttribute('aria-controls',record.id);recordButton.setAttribute('aria-expanded',String(!!recordOpen))
     recordButton.addEventListener('click',()=>{record.hidden=!record.hidden;recordButton.setAttribute('aria-expanded',String(!record.hidden))})
     dock.insertBefore(recordButton,dock.children[2]??null);recordButton.after(record)
     dock.scrollTop=scroll
   }
   return {
     stations:vinciContent.map(s=>({id:s.id,name:text(s.name),question:text(s.door)})),
+    pending:()=>exhibits?.pending()??0,
+    errors:()=>exhibits?.pictureErrors()??[],
+    manifest:()=>[...new Map((exhibits?.pictureSources()??[]).flatMap(({entry})=>[entry.preview,entry.plate]).map(entry=>[entry.id,entry])).values()],
     show(index,h){
       if(!hosts){mount(h);station=index;paintHeader();schedule();return}
       // A station asked for before the place is built is remembered, not lost.
