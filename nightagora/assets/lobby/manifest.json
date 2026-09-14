@@ -691,6 +691,64 @@
       "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
       "rights_note": "Public-domain 1438 sculpture → Met photograph explicitly donated to Commons under CC0. The Met’s rights policy covers 3D object photographs, independently of the age of the object.",
       "attribution": "Chen Yanqing, 1438. The Metropolitan Museum of Art, 1997.139. Purchase, Friends of Asian Art Gifts, 1997. CC0 1.0."
+    },
+    {
+      "id": "lobby/likeness-nietzsche",
+      "path": "likenesses/nietzsche/original.jpg",
+      "sha256": "bdc868e7577afe2f54de30f648c0151305766dcd3cb9f8768ffea6ec4a2b4c1e",
+      "bytes": 694934,
+      "width": 2308,
+      "height": 3024,
+      "pixels": 6979392,
+      "slug": "nietzsche",
+      "name": "Friedrich Nietzsche",
+      "wing": "lobby",
+      "class": "Tier 1",
+      "tier": 1,
+      "licence": "This file is made available under the Creative Commons CC0 1.0 Universal Public Domain Dedication.",
+      "licence_source_url": "https://commons.wikimedia.org/wiki/File:Friedrich_Nietzsche,_RP-P-1952-463.jpg#Licensing",
+      "licence_location": "Licensing",
+      "holder": "Rijksmuseum, Amsterdam; RP-P-1952-463",
+      "maker": "Hans Olde",
+      "date": "1870–1917 (holder’s catalogue range)",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Friedrich_Nietzsche,_RP-P-1952-463.jpg",
+      "original_url": "https://upload.wikimedia.org/wikipedia/commons/8/86/Friedrich_Nietzsche%2C_RP-P-1952-463.jpg",
+      "holder_record_url": "https://www.rijksmuseum.nl/en/collection/RP-P-1952-463",
+      "display": true,
+      "label_en": "Friedrich Nietzsche. Drypoint by Hans Olde, dated 1870–1917 in the Rijksmuseum catalogue. Rijksmuseum, Amsterdam. Licence: “This file is made available under the Creative Commons CC0 1.0 Universal Public Domain Dedication.”",
+      "label_de": "Friedrich Nietzsche. Kaltnadelradierung von Hans Olde, im Rijksmuseum auf 1870–1917 datiert. Rijksmuseum, Amsterdam. Lizenz: „This file is made available under the Creative Commons CC0 1.0 Universal Public Domain Dedication.“",
+      "previews": [
+        {
+          "path": "likenesses/nietzsche/preview-512.jpg",
+          "sha256": "15da99c9c2afb6ed1d611b1bb45e029c21383721bf980bb2987fc86ae59307bf",
+          "bytes": 31890,
+          "width": 391,
+          "height": 512,
+          "pixels": 200192,
+          "long_edge": 512,
+          "format": "image/jpeg",
+          "quality": 88,
+          "color_space": "sRGB",
+          "source_path": "likenesses/nietzsche/original.jpg"
+        },
+        {
+          "path": "likenesses/nietzsche/preview-1024.jpg",
+          "sha256": "af22d35b268d04e25906350529decd94c7ac8eceb34cb2e2a3446d85246c3d11",
+          "bytes": 130342,
+          "width": 782,
+          "height": 1024,
+          "pixels": 800768,
+          "long_edge": 1024,
+          "format": "image/jpeg",
+          "quality": 88,
+          "color_space": "sRGB",
+          "source_path": "likenesses/nietzsche/original.jpg"
+        }
+      ],
+      "verified_on": "2026-09-14",
+      "source_verification": "Current source record and exact downloaded original checked on admission.",
+      "derivation": "No embedded ICC profile. Source interpreted as sRGB. JPEG previews resized with Lanczos, quality 88, embedded sRGB profile. Original bytes unchanged.",
+      "rights_note": "Holder identifies Hans Olde, drypoint, subject and Public domain; exact record date is 1870–1917. This range is retained instead of silently substituting the often-cited 1899 series date. Maker died 1917. The holder marks its reproduction Public Domain; the exact Commons file additionally carries CC0. No claim this particular impression was printed during Nietzsche’s lifetime."
     }
   ]
 }
