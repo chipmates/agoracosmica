@@ -305,8 +305,12 @@ export function createWing():VinciWingModule {
     // built, the card docks to the side and the room is the frame.
     const standing=vinciStandsInRoom(s.id)
     header.classList.toggle('vinci-standing',standing)
-    if(!s.outdoor){header.classList.toggle('vinci-construction',!standing&&!s.built);if(!standing&&!s.built)header.append(make('p','vinci-status',text(vinciConstructionStatus)));header.append(make('p','vinci-promise',text(s.promise)))}
+    if(!s.outdoor){header.classList.toggle('vinci-construction',!standing&&!s.built);if(!standing&&!s.built)header.append(make('p','vinci-status',text(vinciConstructionStatus)))}
     else header.classList.remove('vinci-construction')
+    // THE CARD SPEAKS AT EVERY STATION, indoors and out. The three outdoor
+    // stations used to carry a title and the hour and nothing that said what
+    // the visitor was looking at.
+    header.append(make('p','vinci-promise',text(s.promise)))
   }
   /** The card names what the frame holds: a sub-view carries its own title.
    * THE NUMBER COUNTS STATIONS. Two frames could otherwise read the same
@@ -437,7 +441,7 @@ export function createWing():VinciWingModule {
     drawer.append(title,make('h2','',text(exhibitSources?.title??s.name)))
     for(const label of s.labels)appendLabel(label)
     if(!s.labels.includes(vinciReconstruction))appendLabel(vinciReconstruction)
-    if(!s.outdoor){drawer.append(make('p','vinci-promise',text(s.promise)));appendRecord(s.record??s.promise,s.promiseSource)}
+    drawer.append(make('p','vinci-promise',text(s.promise)));appendRecord(s.record??s.promise,s.promiseSource)
     if(s.id==='picture-room'||s.id==='supper-wall'){
       const sources=exhibits?.pictureSources()??[]
       const works=new Map(sources.filter(({work})=>(work.id==='last-supper')===(s.id==='supper-wall')).map(({work})=>[work.id,work]))

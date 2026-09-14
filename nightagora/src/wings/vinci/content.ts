@@ -427,35 +427,94 @@ const grave = statement('burial-record',
   'documented', 'document', 'brief/CONCEPT-OPUS.md §3 S19; verification qualified in brief/collection/timeline.json');
 
 type StationSeed = Omit<VinciStationContent, 'number' | 'door' | 'carrierClass' | 'carrierCertainty'>;
-const stationPromises: Partial<Record<VinciStationId, VinciText>> = {
+/** THE CARD. Two to four sentences per station, in the museum's voice: what
+ * you are looking at, here, and nothing that belongs in the sources. Where a
+ * room is not built one plain sentence says the house is shown from outside.
+ * The German is the museum's own and runs about a third longer. */
+const stationCards: Record<VinciStationId, VinciText> = {
+  arrival: {
+    en: 'You are in the street below the royal château, in front of the house where Leonardo da Vinci spent his last three years. The cadastre puts these walls where you see them. Everything you can walk on was rebuilt from photographs and a survey of the ground.',
+    de: 'Sie stehen in der Straße unterhalb des königlichen Schlosses, vor dem Haus, in dem Leonardo da Vinci seine letzten drei Jahre verbrachte. Der Kataster verzeichnet diese Mauern dort, wo Sie sie sehen. Alles, worauf Sie hier gehen können, wurde nach Fotografien und einer Vermessung des Geländes neu gebaut.',
+  },
+  courtyard: {
+    en: 'The court between the house and its gate. Over the door a bird with spread wings carries the words DIEV AVANT TOVT, God before everything, and photographs of that carving are what we built it from. The afternoon sun stands in the west and crosses this court.',
+    de: 'Der Hof zwischen dem Haus und seinem Tor. Über der Tür trägt ein Vogel mit ausgebreiteten Flügeln die Worte DIEV AVANT TOVT, Gott vor allem, und Fotografien dieses Reliefs sind unsere Vorlage. Die Nachmittagssonne steht im Westen und streicht über diesen Hof.',
+  },
+  hall: {
+    en: 'The hall a guest was received in. Its panelling and its chimneypiece were changed in the eighteenth century, so what survives here is younger than Leonardo. The room is not open, so the house is shown from outside.',
+    de: 'Der Saal, in dem ein Gast empfangen wurde. Vertäfelung und Kamin wurden im achtzehnten Jahrhundert verändert, das Erhaltene ist hier also jünger als Leonardo. Der Raum ist nicht geöffnet, deshalb wird das Haus von außen gezeigt.',
+  },
   oratory: {
-    en: 'Explore the oratory and the uncertainty surrounding its wall paintings.',
-    de: 'Entdecken Sie das Oratorium und die offenen Fragen zu seinen Wandmalereien.',
+    en: 'A small stone chapel set into the south end of the house. Tradition gives it to Anne of Brittany and the year 1492, and no building survey has confirmed that date. Its wall paintings are attributed to Leonardo’s pupils, and that attribution is not settled. The room is not open, so the house is shown from outside.',
+    de: 'Eine kleine steinerne Kapelle am Südende des Hauses. Die Überlieferung schreibt sie Anne de Bretagne und dem Jahr 1492 zu, eine Bauuntersuchung hat dieses Datum nie bestätigt. Die Wandmalereien werden Schülern Leonardos zugeschrieben, und diese Zuschreibung ist ungeklärt. Der Raum ist nicht geöffnet, deshalb wird das Haus von außen gezeigt.',
+  },
+  study: {
+    en: 'On 10 October 1517 a cardinal from Aragon visited this house, and his secretary wrote down what he saw. Three paintings, a right hand that no longer worked, and an endless number of books in the vulgar tongue. The hour you are standing in is that afternoon. The room is not open, so the house is shown from outside.',
+    de: 'Am 10. Oktober 1517 besuchte ein Kardinal aus Aragón dieses Haus, und sein Sekretär hielt fest, was er sah. Drei Gemälde, eine rechte Hand, die nicht mehr funktionierte, und unendlich viele Bücher in der Volkssprache. Die Stunde, in der Sie stehen, ist dieser Nachmittag. Der Raum ist nicht geöffnet, deshalb wird das Haus von außen gezeigt.',
   },
   chamber: {
-    en: 'Look from the room the house museum associates with Leonardo toward the royal château.',
-    de: 'Blicken Sie aus dem Zimmer, das das Hausmuseum Leonardo zuordnet, zum königlichen Schloss.',
+    en: 'Leonardo da Vinci died in this house on 2 May 1519. The house museum places his room at this end, with the window facing the king’s castle, and that placement is a proposal rather than a record. The room is not open, so the house is shown from outside.',
+    de: 'Leonardo da Vinci starb am 2. Mai 1519 in diesem Haus. Das Hausmuseum verortet sein Zimmer an diesem Ende, mit dem Fenster zum Schloss des Königs, und diese Zuordnung ist ein Vorschlag und kein Beleg. Der Raum ist nicht geöffnet, deshalb wird das Haus von außen gezeigt.',
   },
   garden: {
-    en: 'The garden front catches the afternoon light above the valley.',
-    de: 'Die Gartenfront fängt über dem Tal das Nachmittagslicht ein.',
+    en: 'The garden front takes the low western sun, and the valley falls away behind it. The slope follows the survey of the ground, the planting is ours, because no source records what grew here in his time. You are leaving 1517. What follows is a museum of what survives, built in our own century.',
+    de: 'Die Gartenfront nimmt die tiefe Westsonne, dahinter fällt das Tal ab. Der Hang folgt der Vermessung des Geländes, die Bepflanzung stammt von uns, denn keine Quelle hält fest, was hier zu seiner Zeit wuchs. Sie verlassen das Jahr 1517. Es folgt ein Museum dessen, was erhalten ist, erbaut in unserem Jahrhundert.',
   },
-  'supper-wall': {
-    en: 'A reproduction within the Last Supper’s measured outline reveals the scale of the wall painting.',
-    de: 'Eine Reproduktion im vermessenen Umriss des Abendmahls zeigt die Größe des Wandgemäldes.',
+  'picture-room': {
+    en: 'Twenty-five paintings hang here at the size their holders record, in the order he made them, so this wall gives you the real scale. What carries a picture is what a public source lets us reproduce. The sources name every work, where it is today and what its licence says.',
+    de: 'Fünfundzwanzig Gemälde hängen hier in den Maßen, die ihre Sammlungen verzeichnen, in der Reihenfolge ihrer Entstehung, diese Wand gibt Ihnen also den wirklichen Maßstab. Ein Bild tragen die Werke, die eine öffentliche Quelle uns zu reproduzieren erlaubt. Die Quellen nennen jedes Werk, seinen heutigen Ort und seine Lizenz.',
   },
-  flight: {
-    en: 'See what Leonardo’s flight studies explain and what they leave unknown.',
-    de: 'Entdecken Sie, was Leonardos Flugstudien erklären und was sie offenlassen.',
+  'line-early': {
+    en: 'The dates are cut into the floor, and you walk his life along them. This stretch runs from the birth his grandfather noted in 1452 to the year the French took Milan. Every date carries its document in the sources, and its colour says how sure we are.',
+    de: 'Die Daten sind in den Boden geschnitten, und Sie gehen sein Leben an ihnen ab. Dieser Abschnitt reicht von der Geburt, die sein Großvater 1452 notierte, bis zu dem Jahr, in dem die Franzosen Mailand einnahmen. Zu jedem Datum steht der Beleg in den Quellen, und seine Farbe sagt, wie sicher wir sind.',
+  },
+  'reading-table': {
+    en: 'A page of Manuscript B lies open on this table, in a facsimile printed in 1883. He wrote from right to left because he was left handed, and a mirror reads it back. The notebook itself is in Paris.',
+    de: 'Auf diesem Tisch liegt eine Seite aus Manuskript B, in einem Faksimile von 1883. Er schrieb von rechts nach links, weil er Linkshänder war, und ein Spiegel liest es zurück. Das Notizbuch selbst liegt in Paris.',
+  },
+  'line-late': {
+    en: 'Venice, Florence, Milan again, then Rome. This stretch covers the years from 1500 to 1515, when he moved from one patron to the next. In October 1503 a Florentine clerk noted in the margin of a book that Leonardo was painting the head of Lisa del Giocondo.',
+    de: 'Venedig, Florenz, wieder Mailand, dann Rom. Dieser Abschnitt umfasst die Jahre von 1500 bis 1515, in denen er von einem Auftraggeber zum nächsten zog. Im Oktober 1503 notierte ein Florentiner Kanzleischreiber am Rand eines Buches, Leonardo male den Kopf der Lisa del Giocondo.',
+  },
+  body: {
+    en: 'He opened bodies and drew what he found, and about six hundred of those sheets are at Windsor today. This wall keeps their measure, four courses at the size of a folio and one larger sheet beside them. The sources name the sheets, their holder and what each reproduction allows.',
+    de: 'Er öffnete Körper und zeichnete, was er fand, und etwa sechshundert dieser Blätter liegen heute in Windsor. Diese Wand hält ihr Maß, vier Reihen in der Größe eines Blattes und ein größeres daneben. Die Quellen nennen die Blätter, ihre Sammlung und was jede Reproduktion erlaubt.',
+  },
+  'line-amboise': {
+    en: 'The last stretch, and it runs past his death. He came to France for the young king, the first firm record of him at this house is dated 22 May 1517, and he died here on 2 May 1519. The dates after that year belong to what happened to his work.',
+    de: 'Der letzte Abschnitt, und er reicht über seinen Tod hinaus. Er kam für den jungen König nach Frankreich, der erste sichere Beleg für ihn in diesem Haus ist vom 22. Mai 1517, und am 2. Mai 1519 starb er hier. Die Daten danach gehören zu dem, was mit seinem Werk geschah.',
+  },
+  scattered: {
+    en: 'Nothing from his own hand is in this gallery. The notebooks were taken apart after his death, rebound and sold, and today they lie in Milan, Paris, Madrid, London, Windsor and one private collection. The sources name each volume and where it is tonight.',
+    de: 'In dieser Galerie liegt nichts aus seiner eigenen Hand. Die Notizbücher wurden nach seinem Tod zerlegt, neu gebunden und verkauft, und heute liegen sie in Mailand, Paris, Madrid, London, Windsor und einer Privatsammlung. Die Quellen nennen jeden Band und seinen heutigen Ort.',
   },
   works: {
-    en: 'Follow the evidence from a machine drawn on paper to one that was built.',
-    de: 'Folgen Sie den Belegen von der gezeichneten Maschine bis zur gebauten.',
+    en: 'This end of the hall holds what worked on land and in water. The lock gates and the lifting screw existed before him, and his sheets record them rather than invent them. Each machine names the page it was rebuilt from and what that page does not say.',
+    de: 'Dieses Ende der Halle zeigt, was auf dem Land und im Wasser arbeitete. Schleusentore und Wasserschraube gab es vor ihm, seine Blätter halten sie fest, statt sie zu erfinden. Jede Maschine nennt das Blatt, nach dem sie rekonstruiert ist, und was dieses Blatt nicht sagt.',
+  },
+  flight: {
+    en: 'The aerial screw stands at the middle of this hall, rebuilt from one page of Manuscript B. Fourteen of his machines are rebuilt in this museum, thirteen here and the parachute out in the court, because it stands taller than this roof. Twenty-eight others give too little to build and stay records in the sources. No flight of his own is documented.',
+    de: 'In der Mitte dieser Halle steht die Luftschraube, rekonstruiert nach einer Seite aus Manuskript B. Vierzehn seiner Maschinen sind in diesem Museum gebaut, dreizehn hier und der Fallschirm draußen im Hof, weil er höher steht als dieses Dach. Achtundzwanzig weitere geben zu wenig her, sie bleiben Aufzeichnung in den Quellen. Kein eigener Flug von ihm ist belegt.',
   },
   myths: {
-    en: 'Follow the records behind familiar stories about Leonardo.',
-    de: 'Entdecken Sie die Belege hinter vertrauten Geschichten über Leonardo.',
+    en: 'Six sentences on this wall are quoted as his, and not one of them is in his hand. Beside each stands what the record really gives: a film script of 1965 for the line about flight, a story Vasari told fifty years after the death, and four attributions nobody has traced to a page.',
+    de: 'Sechs Sätze an dieser Wand werden als seine zitiert, und keiner davon steht in seiner Hand. Neben jedem steht, was die Quellen wirklich hergeben: ein Filmdrehbuch von 1965 für den Satz über das Fliegen, eine Geschichte, die Vasari fünfzig Jahre nach dem Tod erzählte, und vier Zuschreibungen, die niemand auf ein Blatt zurückführen konnte.',
   },
+  'supper-wall': {
+    en: 'The Last Supper measures 460 by 880 cm, and this field in the court is its size. The painting itself is a refectory wall in Milan and cannot travel, because he painted it dry on the plaster instead of into it. Inside the outline hangs a reproduction with its own source and licence.',
+    de: 'Das Abendmahl misst 460 mal 880 Zentimeter, und dieses Feld im Hof hat seine Größe. Das Gemälde selbst ist eine Refektoriumswand in Mailand und kann nicht reisen, denn er malte trocken auf den Putz und nicht in ihn hinein. Im Umriss hängt eine Reproduktion mit eigener Quelle und Lizenz.',
+  },
+  grave: {
+    en: 'He was buried on 12 August 1519 in a collegiate church inside the castle walls, and that church was pulled down in 1807. In 1863 a dig on the site found a nearly complete skeleton with stone fragments carrying parts of his name. The slab in the chapel reads LEONARDO DA VINCI, and the chapel’s own plaque speaks of presumed remains.',
+    de: 'Am 12. August 1519 wurde er in einer Stiftskirche innerhalb der Schlossmauern bestattet, und diese Kirche wurde 1807 abgerissen. 1863 fand eine Grabung an dieser Stelle ein fast vollständiges Skelett mit Steinfragmenten, die Teile seines Namens trugen. Die Platte in der Kapelle trägt die Worte LEONARDO DA VINCI, und die Tafel der Kapelle spricht von vermuteten Überresten.',
+  },
+};
+
+/** The ending's antechamber, for the window that dissolves the corrections
+ * room. The walk keeps the room's own card until that wall comes down. */
+export const vinciAntechamberCard: VinciText = {
+  en: 'One painting hangs in this bay. A French painter imagined the king holding the dying Leonardo in 1818, three hundred years after the afternoon it shows, and no witness recorded that scene. It is the last thing before the grave.',
+  de: 'In dieser Nische hängt ein einziges Gemälde. Ein französischer Maler stellte sich 1818 vor, wie der König den sterbenden Leonardo hält, dreihundert Jahre nach dem Nachmittag, den es zeigt, und kein Zeuge hat diese Szene festgehalten. Es ist das Letzte vor dem Grab.',
 };
 
 const statementRecord = (value: VinciText): VinciText =>
@@ -464,11 +523,10 @@ const statementRecord = (value: VinciText): VinciText =>
 const seed = (
   id: VinciStationId, name: VinciText, promise: VinciText,
   labels: readonly VinciStatement[], source: string,
-  germanProvenance: VinciStationContent['germanProvenance'] = 'museum translation',
 ): StationSeed => ({
-  id, name, promise: stationPromises[id] ?? promise, record: statementRecord(promise),
+  id, name, promise: stationCards[id], record: statementRecord(promise),
   labels, promiseSource: source,
-  germanProvenance: stationPromises[id] || labels.some(label => label === promise) ? 'museum translation' : germanProvenance,
+  germanProvenance: 'museum translation',
   outdoor: id === 'arrival' || id === 'courtyard' || id === 'garden',
   built: !['hall', 'oratory', 'study', 'chamber'].includes(id),
   group: id.startsWith('line-') ? 'line' : ['arrival', 'courtyard', 'hall', 'oratory', 'study', 'chamber', 'garden'].includes(id) ? 'house' : 'collection',
@@ -476,7 +534,7 @@ const seed = (
 
 const seeds: readonly StationSeed[] = [
   seed('arrival', { en: 'The street', de: 'Die Straße' }, arrival,
-    [arrival, vinciReconstruction, vinciHourLabel, vinciHourIntegrity], 'brief/CONCEPT-OPUS.md §3 S1', 'supplied'),
+    [arrival, vinciReconstruction, vinciHourLabel, vinciHourIntegrity], 'brief/CONCEPT-OPUS.md §3 S1'),
   seed('courtyard', { en: 'DIEV AVANT TOVT', de: 'DIEV AVANT TOVT' }, courtyard,
     [courtyard, vinciReconstruction], 'brief/CONCEPT-OPUS.md §3 S2'),
   seed('hall', { en: 'The great hall', de: 'Großer Saal / Speisesaal' }, hall,
@@ -503,7 +561,7 @@ const seeds: readonly StationSeed[] = [
     [vinciCollectionThreshold], 'brief/CONCEPT-GPT6.md Station 06; brief/CONCEPT-OPUS.md §3 S10'),
   seed('picture-room', { en: 'The picture room, at true scale', de: 'Der Bildersaal in wahrem Maßstab' },
     { en: 'Pictures and withheld frames share one wall at the sizes their holders record.', de: 'Bilder und ausgesparte Rahmen teilen sich eine Wand in den von ihren Sammlungen verzeichneten Maßen.' },
-    [emptyPicture], 'brief/CONCEPT-OPUS.md §3 S11', 'supplied'),
+    [emptyPicture], 'brief/CONCEPT-OPUS.md §3 S11'),
   seed('supper-wall', { en: 'The wall that is not here', de: 'Die Wand, die nicht hier ist' },
     { en: `${statementRecord(supper).en} ${statementRecord(supperAbsence).en}`, de: `${statementRecord(supper).de} ${statementRecord(supperAbsence).de}` },
     [supper, supperAbsence], 'brief/CONCEPT-OPUS.md §3 S12'),
