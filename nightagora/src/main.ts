@@ -10,7 +10,7 @@ import { FIRE_SCRIPT } from './content/keeper-script'
 import { ambience } from './core/ambience'
 import { WANDERERS } from './content/wanderers'
 import { CONSTELLATIONS, SKY_INVITE } from './content/constellations'
-import { channel } from './core/motion'
+import { channel, EASE } from './core/motion'
 import { mediaUrl } from './content/media'
 import { createStack } from './stack'
 import type { GradeName } from './stack/grade'
@@ -51,6 +51,7 @@ const stage = document.getElementById('stage')
 const status = document.getElementById('status')
 const keeper = document.getElementById('keeper')
 const descent = document.getElementById('descent')
+const descentSkip = document.getElementById('descent-skip')
 const verse = document.getElementById('verse')
 const voiceDom = document.getElementById('voice')
 const plate = document.getElementById('constellation-plate')
@@ -61,12 +62,21 @@ const pane = document.getElementById('figure-pane')
 const wingHost = document.getElementById('wing')
 const lobbyPlate = document.getElementById('lobby-plate')
 if (
-  !stage || !status || !keeper || !descent || !verse || !voiceDom ||
+  !stage || !status || !keeper || !descent || !descentSkip || !verse || !voiceDom ||
   !plate || !invite || !marks || !chips || !pane || !wingHost
 )
   throw new Error('missing shell')
 const keeperEl: HTMLElement = keeper
 const descentEl: HTMLElement = descent
+const descentBeats = Array.from(descentEl.querySelectorAll('.descent-beat')) as HTMLElement[]
+const hearthVeil = descentEl.querySelector('.hearth') as HTMLElement | null
+const plumbEl = descentEl.querySelector('.plumb') as HTMLElement | null
+/* the rest at a line is measured against the line: the shortest question does
+   not take as long to read as the longest one. The weights average to one, so
+   the ride's whole length is unchanged. */
+const askLengths = descentBeats.map((b) => (b.textContent ?? '').trim().length)
+const askMean = Math.max(1, askLengths.reduce((a, b) => a + b, 0) / Math.max(1, askLengths.length))
+const readWeights = askLengths.map((l) => 0.55 + (0.45 * l) / askMean)
 const verseEl: HTMLElement = verse
 const voiceEl2: HTMLElement = voiceDom
 const plateEl: HTMLElement = plate
@@ -471,12 +481,31 @@ function returnToFire(): void {
 }
 
 // ---- the descent staging: through the ring, then the plumb-line dive
-// into the agora mandala. ONE gesture carries the whole travel. ----
+// into the agora mandala, one question per stride, then the flare ----
 const GATE_END = 0.16 // corona bloom, one black breath, then above the ring
 const smooth = (a: number, b: number, k: number): number => {
   const t = Math.min(1, Math.max(0, (k - a) / (b - a)))
   return t * t * (3 - 2 * t)
 }
+// the overture stays clean: a title card in the black breath, then eight
+// questions on the way down. The Echo disclosure lives where the figures
+// speak (the pane's ink and the keeper's colophon).
+// Every beat RESTS at the middle of its band and the ride stops at those
+// rests, so the sealed states (0.10, 0.35, 0.60, 0.85) each stand on a
+// line that is being read rather than on a line passing by.
+const BEAT_HALF = 0.03
+// the title card holds through the turn over the ring, where the eclipse has
+// gone and the map has not risen yet: the widest band of the ride
+const CARD_HALF = 0.075
+const DESCENT_RESTS = [0.105, 0.2667, 0.35, 0.4333, 0.5167, 0.6, 0.6833, 0.7667, 0.85]
+const DESCENT_STATIONS: Array<[number, number]> = DESCENT_RESTS.map(
+  (r, i): [number, number] => {
+    const h = i === 0 ? CARD_HALF : BEAT_HALF
+    return [r - h, r + h]
+  }
+)
+/** the ride's stops: the eclipse, the nine lines, the fire */
+const RIDE_STOPS = [0, ...DESCENT_RESTS, 1]
 
 /** The dolly, concept-01 law: every camera value is a pure channel of
     progress, position + lookAt on a slow helix. The flip into the
@@ -557,8 +586,137 @@ function descentCamera(k: number): void {
   camera.lookAt(descentLook)
 }
 
+/* THE RIDE. A push takes ONE STRIDE, from the line being read to the next
+   one, and the world eases the whole way: the travel can never collapse
+   into a single gesture, and a flick's momentum tail cannot stack strides.
+   With no hand on it the ride carries itself on, waiting while the visitor
+   is plainly there and walking on once the frame is unwatched, so someone
+   who only watches still arrives at the fire. Its clock is WALL time, never
+   frame count, and the rig's freeze stops it dead. */
+const HAND_WINDOW = 3.0 // seconds a push keeps the ride waiting for its owner
+const DWELL_HAND = 2.4 // the rest at a line while a hand is on the ride
+const DWELL_ALONE = 0.34 // and the rest when the frame is unwatched
+// two strides taken by hand and the ride is the visitor's: it then waits at
+// every line long enough to read it twice, and the whole prelude is as long
+// as he wants it. Nobody is ever stranded, the ride simply goes on last.
+const DWELL_OWNED = 9.0
+let handStrides = 0
+let rideClock = 0
+let strideFrom = 0
+let strideEnd = 0
+let strideAt = -99
+let strideFor = 1
+let lastHand = -99
 
+/** the stop being rested at, as an index into the beats (or -1) */
+function beatAt(k: number): number {
+  for (let i = 0; i < DESCENT_RESTS.length; i++) {
+    const r = DESCENT_RESTS[i]
+    if (r !== undefined && Math.abs(k - r) < 0.006) return i
+  }
+  return -1
+}
 
+/** the next stop of the ride beyond k, in the direction of travel */
+function nextStop(k: number, dir: number): number {
+  if (dir > 0) {
+    for (const s of RIDE_STOPS) if (s > k + 0.004) return s
+    return 1
+  }
+  for (let i = RIDE_STOPS.length - 1; i >= 0; i--) {
+    const s = RIDE_STOPS[i]
+    if (s !== undefined && s < k - 0.004) return s
+  }
+  return 0
+}
+
+/** hold the ride exactly where it stands (the rig jumps, the skip lands) */
+function holdRide(k: number): void {
+  handStrides = 0
+  desc = descTarget = strideFrom = strideEnd = k
+  strideAt = rideClock
+  strideFor = 0
+}
+
+/** one stride of the travel; a stride still in flight swallows the push */
+function takeStride(dir: 1 | -1, byHand: boolean): void {
+  if (byHand) lastHand = rideClock
+  // the ride is a walk, not a scrub: a push mid-stride is absorbed, except
+  // in its last fifth, where a second push flows on without a stop. A stage
+  // that asks for no motion still gets one line per gesture, never a race
+  if (rideClock - strideAt < Math.max(strideFor, reducedMotion ? 0.56 : 0) * 0.8) return
+  const to = nextStop(descTarget, dir)
+  if (to === descTarget) return
+  // a push back is the plainest word for "I am steering", so it takes the
+  // ride in one gesture where a push on takes two
+  if (byHand) handStrides = dir < 0 ? Math.max(handStrides, 2) : handStrides + 1
+  const span = Math.abs(to - desc)
+  strideFrom = desc
+  strideEnd = to
+  descTarget = to
+  strideAt = rideClock
+  // a fall gathers speed: the long turn over the ring breathes, the last
+  // strides are a plain drop into the light
+  strideFor = reducedMotion ? 0 : Math.min(1.9, Math.max(0.72, 0.5 + span * 6.5)) * (1 - 0.18 * to)
+}
+
+/** the ride's own clock drives desc; nothing else writes it while it runs */
+function rideFrame(): void {
+  if (strideFor <= 0) {
+    desc = strideEnd
+    return
+  }
+  const t = Math.min(1, (rideClock - strideAt) / strideFor)
+  desc = strideFrom + (strideEnd - strideFrom) * (EASE['sineInOut'] ?? ((x: number) => x))(t)
+}
+
+/** The questions drift past with parallax: each line rises through the
+    frame as the visitor falls, near lines faster than far ones. */
+function syncDescentBeats(k: number): void {
+  // the arrival's own light: it takes the frame where the map is leaving and
+  // the room has not stood up yet, and it is gone before the fire is seen
+  // the plumb hangs while the destination is still far below; it leaves the
+  // frame before the plate takes the foot, so no mark lies on the stone. The
+  // tall stage is filled by the map sooner, so its gauge goes sooner
+  const tall = innerWidth / innerHeight < 0.9
+  if (plumbEl)
+    plumbEl.style.opacity = (1 - smooth(tall ? 0.3 : 0.52, tall ? 0.42 : 0.66, k)).toFixed(3)
+  if (hearthVeil)
+    hearthVeil.style.opacity = (smooth(0.89, 0.945, k) * (1 - smooth(0.972, 0.998, k)) * 0.95).toFixed(3)
+  for (let i = 0; i < descentBeats.length; i++) {
+    const beat = descentBeats[i]
+    const range = DESCENT_STATIONS[i]
+    if (!beat || !range) continue
+    const mid = (range[0] + range[1]) / 2
+    const half = (range[1] - range[0]) / 2
+    const p = (k - mid) / (half * 1.55)
+    if (Math.abs(p) > 1.1) {
+      beat.style.opacity = '0'
+      continue
+    }
+    // the title card holds nearly still; every question travels past, near
+    // lines faster than far ones. The stroke is short enough that a line
+    // fades out well below the masthead instead of printing through it
+    const travel = (i === 0 ? 7 : 15 + (i % 3) * 4) * (p < 0 ? 0.5 : 1)
+    const scale = i === 0 ? 1 : 1 + p * 0.045
+    beat.style.opacity = String(Math.max(0, 1 - Math.pow(Math.abs(p), 1.6)))
+    beat.style.transform = `translate3d(0, ${(-p * travel).toFixed(2)}vh, 0) scale(${scale.toFixed(3)})`
+  }
+}
+
+function skipDescent(): void {
+  if (phase !== 'descent') return
+  lastHand = rideClock
+  // the impatient way down is still a move: the last stretch of the travel
+  // runs out under the visitor instead of cutting
+  strideFrom = Math.max(desc, 0.86)
+  strideEnd = 1
+  descTarget = 1
+  strideAt = rideClock
+  strideFor = reducedMotion ? 0 : 0.9
+  desc = strideFrom
+}
+descentSkip.addEventListener('click', () => skipDescent())
 
 // the impatient door on the totality screen: straight down to the fire
 document.getElementById('overture-skip')?.addEventListener('click', () => {
@@ -566,8 +724,7 @@ document.getElementById('overture-skip')?.addEventListener('click', () => {
   wakeMusic()
   transit = 1
   if (phase === 'held') setPhase('descent')
-  descTarget = 1
-  desc = Math.max(desc, 0.93)
+  skipDescent()
 })
 
 // ---- the instrument rail: the plain-faced layer over the poetry ----
@@ -819,11 +976,12 @@ window.__forge = {
     voiceEl2.classList.remove('lit', 'clean')
     transit = opts.transit ?? (p === 'transit' ? 0.5 : 1)
     desc = descTarget = p === 'descent' ? (opts.desc ?? 0.5) : p === 'transit' || p === 'held' ? 0 : 1
+    holdRide(desc)
     door = p === 'transit' || p === 'held' ? 0 : Math.min(1, desc / 0.18)
     skyBirth =
       opts.skyBirth ??
       (p === 'transit' || p === 'held' ? 0
-      : p === 'descent' ? smooth(0.2, 0.98, desc) * 0.8
+      : p === 'descent' ? Math.pow(smooth(0.04, 0.95, desc), 0.55) * 0.85
       : p === 'breath' ? 0.12
       : p === 'wheel' ? 0
       : p === 'agora' ? 1
@@ -831,12 +989,13 @@ window.__forge = {
     flashAt = elapsed - (opts.sinceFlash ?? 999)
     agoraReveal =
       p === 'agora' || p === 'wheel' ? 1
-      : p === 'descent' ? smooth(0.95, 0.998, desc)
+      : p === 'descent' ? smooth(0.952, 0.995, desc)
       : 0
     lookUp = lookTarget = p === 'wheel' ? 1 : 0
     camera.position.y = 0
     if (p === 'descent') {
       descentCamera(desc)
+      syncDescentBeats(desc)
     }
     if (p === 'agora') {
       agoraEnteredAt = Math.max(0, elapsed - 2)
@@ -1001,8 +1160,12 @@ function setPhase(next: Phase): void {
     wakeMusic() // reaching the descent IS the first gesture
     setStatus('Scroll to descend')
     descentEl.hidden = false
+    holdRide(desc)
+    lastHand = rideClock
   } else {
     descentEl.hidden = true
+    document.body.classList.remove('arriving')
+    for (const b of descentBeats) b.style.opacity = '0'
   }
   if (next === 'agora') {
     agoraEnteredAt = elapsed
@@ -1055,14 +1218,10 @@ function push(delta: number): void {
   if (phase === 'transit') return
   if (phase === 'held' && delta > 0) setPhase('descent')
   if (phase === 'descent') {
-    // ONE gesture is the whole descent: the first push down commits the
-    // travel and the plates turn the visitor into the lobby. A push back
-    // before the gate has bloomed returns to the eclipse.
-    if (delta > 0) descTarget = 1
-    else if (desc < GATE_END) {
-      descTarget = 0
-      if (desc < 0.02) setPhase('held')
-    }
+    // one push is ONE STRIDE of the travel: the line being read to the next
+    // one. The whole ride scrubs both ways, and a push back at the top hands
+    // the visitor to the eclipse again.
+    takeStride(delta > 0 ? 1 : -1, true)
   }
   if (phase === 'agora') {
     // the lobby's one verb: the gaze rises to the wheel
@@ -1097,6 +1256,7 @@ addEventListener('keydown', (e) => {
     if (e.key === 'ArrowLeft') stepChapter(-1)
   }
   if (e.key === 'Enter' && phase === 'transit') transit = 1
+  if (e.key === 'Enter' && phase === 'descent') skipDescent()
 })
 let touchY: number | null = null
 let touchX: number | null = null
@@ -1167,6 +1327,9 @@ function frame(now: number): void {
   requestAnimationFrame(frame)
   if (hidden) return
   const dt = Math.min((now - last) / 1000, 0.05)
+  // the ride is dramaturgy, so it runs on WALL time: a headless frame rate
+  // would make the same travel take twice as long as the visitor's
+  const dtWall = Math.min((now - last) / 1000, 0.25)
   last = now
   /* a bench owns the whole frame: its own clock, its own scene, its own
      render. Nothing of the night's overture runs behind it. */
@@ -1189,15 +1352,34 @@ function frame(now: number): void {
     }
   }
 
-  // the descent: one gesture is the whole travel down. The eclipse gate
-  // opens itself in the first fifth and the agora materializes below.
-  desc += (descTarget - desc) * Math.min(1, dt * 2.4)
-  if (reducedMotion) desc = descTarget
+  // the descent: one stride is one line of the travel down. The eclipse gate
+  // opens itself in the first fifth, the agora materializes below, and the
+  // ride carries itself on whenever no hand is on it.
+  if (!frozen) rideClock += dtWall
+  if (phase === 'descent') {
+    if (!frozen && !reducedMotion && descTarget < 1) {
+      const here = beatAt(descTarget)
+      const weight = here < 0 ? 1 : (readWeights[here] ?? 1)
+      const dwell =
+        (handStrides >= 2 ? DWELL_OWNED
+        : rideClock - lastHand < HAND_WINDOW ? DWELL_HAND
+        : DWELL_ALONE) * weight
+      if (rideClock - strideAt >= strideFor + dwell) takeStride(1, false)
+    }
+    if (!frozen) rideFrame()
+    if (reducedMotion) desc = descTarget
+  }
   const doorTarget = phase === 'transit' || phase === 'held' ? 0 : Math.min(1, desc / GATE_END)
   door += (doorTarget - door) * Math.min(1, dt * 4)
   if (reducedMotion) door = doorTarget
   if (phase === 'descent') {
     descentCamera(desc)
+    syncDescentBeats(desc)
+    // the arrival clears the foot of the frame: no instruction, no gauge and
+    // no way past standing on the fire as it comes up
+    document.body.classList.toggle('arriving', desc > 0.74)
+    // a push back at the top of the travel hands the night to the eclipse
+    if (descTarget <= 0 && desc < 0.02) setPhase('held')
     if (desc > 0.993) {
       camera.position.y = 0
       setPhase('agora')
@@ -1208,7 +1390,7 @@ function frame(now: number): void {
   // cut, once the camera has leveled (from above, the flame billboard
   // would fill the frame with streaks)
   const mandalaReveal =
-    phase === 'descent' ? smooth(0.26, 0.36, desc) * (1 - smooth(0.915, 0.948, desc)) : 0
+    phase === 'descent' ? smooth(0.22, 0.32, desc) * (1 - smooth(0.918, 0.955, desc)) : 0
   mandala.visible(mandalaReveal > 0.004)
   // the heart warms at overview altitude and yields before the close
   // pass, or its glow would paint the whole near frame beige
@@ -1226,7 +1408,7 @@ function frame(now: number): void {
     // but its own embers stop cutting across the wheel's letterpress (and the
     // heaviest fragment shader in the night stops paying full price)
     : phase === 'wheel' ? 0.72
-    : phase === 'descent' ? smooth(0.95, 0.998, desc)
+    : phase === 'descent' ? smooth(0.952, 0.995, desc)
     : 0
   // a wing owns its own room: the lobby's court strikes fast so nothing
   // of the fire is left standing behind the first station
@@ -1261,7 +1443,7 @@ function frame(now: number): void {
   // when the fire appears
   const birthTarget =
     phase === 'transit' || phase === 'held' ? 0
-    : phase === 'descent' ? smooth(0.2, 0.98, desc) * 0.8
+    : phase === 'descent' ? Math.pow(smooth(0.04, 0.95, desc), 0.55) * 0.85
     : phase === 'agora' ? 1
     : phase === 'breath' ? 0.12
     : phase === 'wheel' ? 0
