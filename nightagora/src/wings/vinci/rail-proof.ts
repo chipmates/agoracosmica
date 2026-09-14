@@ -1,5 +1,6 @@
 import { Object3D, PerspectiveCamera, Vector3 } from 'three/webgpu'
-import type { Pose } from './rail'
+import { stationPose, type Pose } from './rail'
+import { vinciContent } from './content'
 import { railGeometryFingerprint, railGeometryFingerprintBreakdown } from './rail-fingerprint'
 import { createCertifiedRailPath } from './rail-smoothing'
 import { assertRailProjection } from './rail-projection'
@@ -18,7 +19,27 @@ interface ClearanceData {
   geometrySha256: string[]; routes: SavedRoute[]
 }
 const data = JSON.parse(certificateText) as ClearanceData
-if (data.format !== 'vinci-rail-clearance-v1' || data.completeNearClearance !== true || data.routes.length !== 364) throw new Error('Missing complete Vinci rail certificate')
+const savedPoseKey = (pose: SavedPose) => JSON.stringify([pose.eye, pose.at, pose.fov])
+const routeKey = (viewport: string, from: SavedPose, to: SavedPose) => `${viewport}:${savedPoseKey(from)}>${savedPoseKey(to)}`
+const requiredRoutes = new Set<string>()
+for (const viewport of ['desktop', 'phone'] as const) {
+  const poses = new Map<string, SavedPose>()
+  for (const station of vinciContent) {
+    const pose = stationPose(station.id, viewport === 'phone')
+    const saved = { eye: pose.eye.toArray(), at: pose.at.toArray(), fov: pose.fov }
+    poses.set(savedPoseKey(saved), saved)
+  }
+  for (const [fromKey, from] of poses) for (const [toKey, to] of poses) {
+    if (fromKey !== toKey) requiredRoutes.add(routeKey(viewport, from, to))
+  }
+}
+// Semantic stations may share a physical pose. Require every directed pair
+// of the current physical poses, so a newly opened station cannot silently
+// rely on the route count of the previous room arrangement.
+const savedRoutes = new Set(data.routes.map(route => routeKey(route.viewport, route.fromPose, route.toPose)))
+if (data.format !== 'vinci-rail-clearance-v1' || data.completeNearClearance !== true
+  || data.routes.length !== requiredRoutes.size || savedRoutes.size !== requiredRoutes.size
+  || [...requiredRoutes].some(route => !savedRoutes.has(route))) throw new Error('Missing complete Vinci rail certificate')
 const geometryToleranceM = .000002
 export { collectRailSolids, railCollisionIds } from './rail-solids'
 
