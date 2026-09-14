@@ -8,7 +8,8 @@ import { float, mix, vec3, vec4, dot as nodeDot, positionWorld, cameraPosition, 
 import { SkyMesh } from 'three/addons/objects/SkyMesh.js'
 import { setRegister, type WingHosts, type WingModule } from '../frame'
 import { constructionRecords, evidenceWords } from './evidence-copy'
-import { lang } from '../content'
+import { lang, WING_TEXT } from '../content'
+import { createVinciSourcesWindow, type VinciSourcesTab, type VinciExhibitSources } from './sources'
 import { GRADES } from '../../stack/grade'
 import { createShell } from './shell'
 import { createShellShadowDouble } from './shadow-shell'
@@ -39,7 +40,7 @@ import { collectVinciLabelOccluders, createVinciLabelAnchor, type VinciLabelAnch
 import { pathSpecifications } from './paths'
 import { roadGradeProvenance } from './road-grade'
 import { apronProvenance } from './apron'
-import { vinciContent, vinciConstructionStatus, vinciHourArithmetic, vinciHourSpoken, vinciViewNames, vinciHourLabel, vinciHourIntegrity, vinciCertaintyWords, vinciPlantingAssumptions, vinciWeatherAssumptions, type VinciCertainty, type VinciStatement, type VinciStationId, type VinciText } from './content'
+import { vinciContent, vinciConstructionStatus, vinciReconstruction, vinciCollectionThreshold, vinciRoomStationIds, vinciHourArithmetic, vinciHourSpoken, vinciViewNames, vinciHourLabel, vinciHourIntegrity, vinciCertaintyWords, vinciPlantingAssumptions, vinciWeatherAssumptions, type VinciCertainty, type VinciStatement, type VinciStationId, type VinciText } from './content'
 import wingCss from './wing.css?inline'
 
 const text=(value:VinciText):string=>value[lang()]
@@ -99,14 +100,21 @@ const STATION_EXPOSURE:Partial<Record<VinciStationId,number>>={courtyard:1.0,
   'picture-room':1.34,'reading-table':1.5,scattered:1.3,flight:1.24,works:1.24,body:1.4,myths:1.38}
 const SHADOW={nearHalfM:20,nearMapPx:1024,aheadM:10,refocusM:3,lightDistanceM:80} as const
 
-export function createWing():WingModule {
+export interface VinciWingModule extends WingModule {
+  openSources(tab?:VinciSourcesTab):void
+  setExhibitSources(exhibit:VinciExhibitSources|null):void
+}
+
+export function createWing():VinciWingModule {
   let hosts:WingHosts|undefined, shell:Group, water:WaterGroup, measurement:VinciMeasurement, labels:VinciLabelAnchor
   let rail:ReturnType<typeof createRail>, key:ReturnType<WingHosts['world']['stack']['light']>
   // THE CARD NAMES WHERE THE VISITOR IS. `station` is the station asked for,
   // `card` is the one actually standing: while the walk is on the way the
   // frame keeps the card of the place it is still in.
   let station=0, card=0, activeView='', mode:VinciLabelMode=1, controller:AbortController|undefined
-  let header:HTMLElement,dock:HTMLElement,record:HTMLElement,source:HTMLButtonElement,sky:SkyMesh
+  let header:HTMLElement,dock:HTMLDialogElement,drawer:HTMLElement,record:HTMLElement,source:HTMLButtonElement,sky:SkyMesh
+  let sources:ReturnType<typeof createVinciSourcesWindow>
+  let exhibitSources:VinciExhibitSources|null=null
   let labelHostHidden:string|null=null
   // THE WAIT AT THE STREET SHOWS ITSELF. The heading is painted and the frame
   // is given to the browser before the place is built, so the visitor stands
@@ -223,9 +231,9 @@ export function createWing():WingModule {
     shadowBody=createWingShadowBody(scene);scene.add(shadowBody.group)
     authority=createRailGeometryAuthority(collectRailSolids(scene))
     rail=createRail(camera,clock,authority);measurement=createMeasurement(h.labels,stack)
-    source=make('button','vinci-source',lang()==='de'?'Quellen':'Sources');source.type='button';source.setAttribute('aria-keyshortcuts','l');source.setAttribute('aria-controls','vinci-source-card');source.addEventListener('click',()=>{mode=mode===2?1:2;paintDock();if(mode===2)dock.focus({preventScroll:true})});h.stage.parentElement!.querySelector('.wing-rail-group')!.append(source)
-    dock=make('aside','vinci-dock');setRegister(dock,'drawer');dock.id='vinci-source-card';dock.tabIndex=0;dock.setAttribute('aria-label',lang()==='de'?'Quellen und Rekonstruktion':'Sources and reconstruction');h.labels.append(dock)
-    labels=createVinciLabelAnchor({host:h.labels,camera,occluders:collectVinciLabelOccluders(scene),onOpen:()=>{mode=2;paintDock();dock.focus({preventScroll:true})}})
+    source=make('button','vinci-source',lang()==='de'?'Quellen':'Sources');source.type='button';source.setAttribute('aria-keyshortcuts','l');source.setAttribute('aria-controls','vinci-source-card');source.addEventListener('click',()=>{mode=mode===2?1:2;paintDock()});h.stage.parentElement!.querySelector('.wing-rail-group')!.append(source)
+    sources=createVinciSourcesWindow(h.labels,source,()=>{mode=1;paintDock()});dock=sources.element;drawer=sources.panels.station
+    labels=createVinciLabelAnchor({host:h.labels,camera,occluders:collectVinciLabelOccluders(scene),onOpen:()=>{mode=2;paintDock()}})
     controller=new AbortController();const options={signal:controller.signal}
     let touchX=0,touchY=0,lastX=0,lastY=0,dragging=false,pointer=-1
     const wheelStep=createWheelStepper(()=>performance.now())
@@ -242,10 +250,10 @@ export function createWing():WingModule {
     window.addEventListener('keydown',(e)=>{
       if(e.defaultPrevented||e.ctrlKey||e.metaKey||e.altKey||e.shiftKey)return
       const target=e.target instanceof Element?e.target:document.body
-      if(target.closest('dialog[open]'))return
+      if(document.querySelector('dialog[open]'))return
       if(target.closest('input,textarea,select,[contenteditable="true"]'))return
       if(e.key==='Escape'){e.preventDefault();mode=1;rail.look(0,0);paintDock();source.focus({preventScroll:true});return}
-      if(e.key.toLowerCase()==='l'&&!e.repeat){e.preventDefault();mode=((mode+1)%3) as VinciLabelMode;paintDock();if(mode===2)dock.focus({preventScroll:true});else if(target.closest('.vinci-dock'))source.focus({preventScroll:true});return}
+      if(e.key.toLowerCase()==='l'&&!e.repeat){e.preventDefault();mode=((mode+1)%3) as VinciLabelMode;paintDock();if(mode!==2&&target.closest('.vinci-dock'))source.focus({preventScroll:true});return}
       if(target.closest('.vinci-dock'))return
       if(e.key==='ArrowRight'||e.key==='ArrowDown'){e.preventDefault();h.navigate(station+1)}
       if(e.key==='ArrowLeft'||e.key==='ArrowUp'){e.preventDefault();h.navigate(station-1)}
@@ -273,8 +281,9 @@ export function createWing():WingModule {
    * believing it shot a corner. */
   let pendingView=''
   function showView(id:string) {
+    if(id.startsWith('sources-')){const tab=id.slice(8);if(tab==='station'||tab==='room'||tab==='wing'){sources.select(tab);mode=2;paintDock();return}}
     const inspectCost=id.endsWith('-cost')&&id!=='audit-cost';if(inspectCost)id=id.slice(0,-5);const s=vinciContent[card]!;if(id==='scene')endInspection();if(id==='scene'||id.startsWith('audit-'))rail.look(0,0);if(id==='scene'||id==='audit-cost'){mode=1;paintDock()}if(id==='audit-cost')measurement.show(s.id);if(id==='audit-ui'){mode=1;paintDock();measurement.show(s.id,'ui')}if(id==='audit-ui-labels'){mode=2;paintDock();measurement.show(s.id,'ui')}if(id.startsWith('collection-room')||id.startsWith('collection-hang'))exhibits?.warm()
-    const pose=namedPose(id,narrow())??collectionView(id,narrow());if(pose){activeView=id;mode=1;paintDock();rail.set(s.id,pose,true,narrow());header.querySelector('.vinci-insertion')?.remove();titleForView(id);if(id.startsWith('collection')&&!s.built&&!vinciStandsInRoom(s.id))header.append(make('p','vinci-insertion',lang()==='de'?'Museumseinbau der Gegenwart · Räume im Bau':'Modern museum insertion · Rooms in construction'))}const cone=/(?:^|-)cone-(ul|ur|dl|dr)$/.exec(id);if(cone){placeCanonicalStation();rail.look(cone[1]!.includes('l')?.6:-.6,cone[1]!.startsWith('u')?.32:-.32)}if(id==='labels'||id==='hour'||id==='record'){mode=2;paintDock();if(id==='record'){if(record.hidden)dock.querySelector<HTMLButtonElement>('.vinci-record-toggle')?.click();dock.scrollTop=record.offsetTop-18}}if(inspectCost&&(pose||cone))measurement.show(`${s.id} / ${id}`)
+    const pose=namedPose(id,narrow())??collectionView(id,narrow());if(pose){activeView=id;mode=1;paintDock();rail.set(s.id,pose,true,narrow());header.querySelector('.vinci-insertion')?.remove();titleForView(id);if(id.startsWith('collection')&&!s.built&&!vinciStandsInRoom(s.id))header.append(make('p','vinci-insertion',lang()==='de'?'Museumseinbau der Gegenwart · Räume im Bau':'Modern museum insertion · Rooms in construction'))}const cone=/(?:^|-)cone-(ul|ur|dl|dr)$/.exec(id);if(cone){placeCanonicalStation();rail.look(cone[1]!.includes('l')?.6:-.6,cone[1]!.startsWith('u')?.32:-.32)}if(id==='labels'||id==='hour'||id==='record'){sources.select(id==='hour'?'wing':'station');mode=2;paintDock();if(id==='record'){if(record.hidden)dock.querySelector<HTMLButtonElement>('.vinci-record-toggle')?.click();dock.scrollTop=record.offsetTop-(dock.querySelector('.vinci-sources-toolbar')?.getBoundingClientRect().height??0)-18}}if(inspectCost&&(pose||cone))measurement.show(`${s.id} / ${id}`)
   }
   /** The door asks about the place the visitor is standing in, so the
    * question travels with the card and not with the rail mark. */
@@ -325,7 +334,7 @@ export function createWing():WingModule {
     rail.set(id,stationPose(id,narrow()),true,narrow())
   }
   function endInspection() { if(activeView)placeCanonicalStation() }
-  function appendRecord(value:VinciText,citation:string,certainty?:VinciCertainty,anchorId?:string,anchorClass?:'GENERATED'|'procedural'):void {
+  function appendRecord(value:VinciText,citation:string,certainty?:VinciCertainty,anchorId?:string,anchorClass?:'GENERATED'|'procedural'):[HTMLElement,HTMLElement] {
     const p=make('p','vinci-statement')
     if(certainty){
       p.dataset['certainty']=certainty
@@ -335,7 +344,9 @@ export function createWing():WingModule {
       p.append(make('span','vinci-certainty-word',text(vinciCertaintyWords[certainty])))
     }
     p.append(document.createTextNode(text(value)))
-    record.append(p,make('small','vinci-citation',citation))
+    const citationNode=make('small','vinci-citation',citation)
+    record.append(p,citationNode)
+    return [p,citationNode]
   }
   function appendStatement(value:VinciText,certainty:VinciCertainty,anchorId:string,anchorClass:'GENERATED'|'procedural',citation:string,full:VinciText=value,humanSource?:VinciText):void {
     const p=make('p','vinci-statement')
@@ -344,7 +355,7 @@ export function createWing():WingModule {
     p.dataset['naAnchor']=anchorId;p.dataset['naAnchorClass']=anchorClass
     p.append(make('span','vinci-certainty-word',text(vinciCertaintyWords[certainty])),document.createTextNode(' '+text(value)))
     if(humanSource)p.append(make('span','vinci-human-source',text(humanSource)))
-    dock.append(p)
+    drawer.append(p)
     appendRecord(full,citation,certainty,anchorId,anchorClass)
   }
   function appendEvidence(key:string,value:VinciText,certainty:VinciCertainty,anchorId:string,citation:string):void {
@@ -354,28 +365,79 @@ export function createWing():WingModule {
     const carrier=label.id==='planting-assumptions'?'vinci/vegetation':label.id==='weather-assumptions'?'vinci/sky':'vinci/shell'
     appendStatement(label,label.certainty,label.target==='carrier'?carrier:`vinci/source/${label.id}`,label.target==='carrier'?'GENERATED':'procedural',label.source,label.record??label,label.humanSource)
   }
+  function appendSourceStatement(host:HTMLElement,label:VinciStatement):void {
+    const paragraph=make('p','vinci-statement')
+    paragraph.dataset['certainty']=label.certainty
+    paragraph.append(make('span','vinci-certainty-word',text(vinciCertaintyWords[label.certainty])),document.createTextNode(' '+text(label)))
+    if(label.humanSource)paragraph.append(make('span','vinci-human-source',text(label.humanSource)))
+    const full=make('div','vinci-record');setRegister(full,'record')
+    full.append(make('p','vinci-statement',text(label.record??label)),make('small','vinci-citation',label.source))
+    host.append(paragraph,full)
+  }
+  function appendCertaintyLegend(host:HTMLElement):void {
+    const legend=make('ul','vinci-certainty-legend')
+    for(const certainty of Object.keys(vinciCertaintyWords) as VinciCertainty[]){
+      const item=make('li',''),dot=make('span','vinci-title-dot')
+      dot.dataset['certainty']=certainty;dot.setAttribute('aria-hidden','true')
+      item.append(dot,document.createTextNode(text(vinciCertaintyWords[certainty])));legend.append(item)
+    }
+    host.append(legend)
+  }
+  /** The text seat can expand these room records without changing the window. */
+  function paintRoomSources():void {
+    const panel=sources.panels.room;panel.textContent=''
+    if(exhibitSources?.renderRoom){exhibitSources.renderRoom(panel);return}
+    for(const id of vinciRoomStationIds(vinciContent[card]!.id)){
+      const station=vinciContent.find(s=>s.id===id)!
+      const section=make('section','vinci-room-source')
+      section.append(make('h2','',text(station.name)),make('p','vinci-promise',text(station.promise)))
+      for(const label of station.labels)appendSourceStatement(section,label)
+      const full=make('div','vinci-record');setRegister(full,'record')
+      full.append(make('p','vinci-statement',text(station.record??station.promise)),make('small','vinci-citation',station.promiseSource))
+      const sources=exhibits?.pictureSources()??[]
+      if(id==='picture-room'||id==='supper-wall'){
+        const works=new Map(sources.filter(({work})=>(work.id==='last-supper')===(id==='supper-wall')).map(({work})=>[work.id,work]))
+        for(const work of works.values())full.append(createPolicyWorkLabel(work,sources.filter(source=>source.work.id===work.id).map(source=>source.entry),true))
+      }
+      section.append(full);panel.append(section)
+    }
+  }
+  function paintWingSources(credits:readonly HTMLElement[]):void {
+    const panel=sources.panels.wing;panel.textContent=''
+    appendSourceStatement(panel,vinciReconstruction)
+    appendSourceStatement(panel,vinciCollectionThreshold)
+    appendSourceStatement(panel,vinciHourLabel)
+    appendSourceStatement(panel,vinciHourIntegrity)
+    const full=make('div','vinci-record');setRegister(full,'record')
+    full.append(make('pre','vinci-arithmetic',text(vinciHourArithmetic)),...credits.map(node=>node.cloneNode(true)))
+    panel.append(full);appendCertaintyLegend(panel)
+    panel.append(make('p','vinci-door-disclosure',text(WING_TEXT.doorNote)))
+  }
   function paintDock() {
     if(!hosts)return
     const s=vinciContent[card]!,scroll=dock.scrollTop
+    const focused=dock.contains(document.activeElement)?document.activeElement as HTMLElement:null
     const recordOpen=dock.dataset['station']===s.id&&record?.isConnected&&!record.hidden
     header.hidden=mode===2
     const camera=hosts.world.camera
     dock.dataset['station']=s.id
     // Opening Sources changes presentation only, inside the same proven lens.
     camera.zoom=1;camera.clearViewOffset();camera.updateProjectionMatrix()
-    dock.hidden=mode!==2;source.setAttribute('aria-expanded',String(mode===2))
+    sources.setOpen(mode===2)
     labels.setMode(mode)
     const collectionView=activeView.startsWith('collection')
     const entryAnchor=entryInspectionAnchors[activeView]
     labels.setAnchor(materialInspectionAnchors[activeView]??entryAnchor??(activeView==='collection-court-access'?world(...collectionAccessPoint(1.05,.65),-.46):collectionView?world(-21.92,-33.92,narrow()?-5.85:-3.2):s.outdoor?anchors[s.id]??null:null),`${text(vinciCertaintyWords.reconstructed)} · ${entryAnchor?(lang()==='de'?'Vorgeschlagene Eingangsstruktur':'Proposed entrance structure'):collectionView?(lang()==='de'?'Museumseinbau der Gegenwart':'Modern museum insertion'):text(s.name)}`)
-    dock.textContent=''
+    drawer.textContent=''
     record=make('div','vinci-record');setRegister(record,'record');record.id='vinci-full-record';record.hidden=true;record.append(make('h3','',lang()==='de'?'Vollständiger Nachweis':'Full record'))
-    const title=make('p','vinci-certainty',text(vinciCertaintyWords[s.built?s.carrierCertainty:'unknown']))
-    title.dataset['certainty']=s.built?s.carrierCertainty:'unknown'
-    if(s.outdoor){title.dataset['naClaim']='inferred';title.dataset['naAnchor']='vinci/shell';title.dataset['naAnchorClass']='GENERATED'}
-    dock.append(title,make('h2','',text(s.name)))
+    const certainty=exhibitSources?.certainty??(s.built?s.carrierCertainty:'unknown')
+    const title=make('p','vinci-certainty',text(vinciCertaintyWords[certainty]))
+    title.dataset['certainty']=certainty
+    if(s.outdoor&&!exhibitSources){title.dataset['naClaim']='inferred';title.dataset['naAnchor']='vinci/shell';title.dataset['naAnchorClass']='GENERATED'}
+    drawer.append(title,make('h2','',text(exhibitSources?.title??s.name)))
     for(const label of s.labels)appendLabel(label)
-    if(!s.outdoor){dock.append(make('p','vinci-promise',text(s.promise)));appendRecord(s.record??s.promise,s.promiseSource)}
+    if(!s.labels.includes(vinciReconstruction))appendLabel(vinciReconstruction)
+    if(!s.outdoor){drawer.append(make('p','vinci-promise',text(s.promise)));appendRecord(s.record??s.promise,s.promiseSource)}
     if(s.id==='picture-room'||s.id==='supper-wall'){
       const sources=exhibits?.pictureSources()??[]
       const works=new Map(sources.filter(({work})=>(work.id==='last-supper')===(s.id==='supper-wall')).map(({work})=>[work.id,work]))
@@ -438,19 +500,34 @@ export function createWing():WingModule {
       appendEvidence('roadGrade',roadGradeProvenance.label,'reconstructed','vinci/road-grade',roadGradeProvenance.source.join(' · '))
       appendEvidence('apron',apronProvenance.label,'reconstructed','vinci/house-side-apron',apronProvenance.source.join(' · '))
     }
-    appendRecord({en:'© OpenStreetMap contributors · ODbL 1.0. IGN · Licence Ouverte 2.0. Geometry and surfaces: procedural reconstruction.',de:'© OpenStreetMap-Mitwirkende · ODbL 1.0. IGN · Licence Ouverte 2.0. Geometrie und Oberflächen: prozedurale Rekonstruktion.'},'OpenStreetMap · IGN')
-    appendRecord({en:'CC0 1.0 · ambientCG · stone-tuffeau, earth-packed, grass-short. Library material surrogates; no site photography sampled.',de:'CC0 1.0 · ambientCG · stone-tuffeau, earth-packed, grass-short. Materialersatz aus der Bibliothek. Keine Standortfotografie als Textur verwendet.'},'CC0 material library')
-    appendRecord({en:'Assumed dimensions: brick 0.22–0.27 × 0.035–0.055 m; wall 0.45–0.80 m; main eaves 7.0–8.4 m. Basis: BUILDING-DOSSIER, Q001/Q124/Q127.',de:'Angenommene Maße: Ziegel 0.22–0.27 × 0.035–0.055 m; Mauer 0.45–0.80 m; Haupttraufe 7.0–8.4 m. Grundlage: BUILDING-DOSSIER, Q001/Q124/Q127.'},'brief/BUILDING-DOSSIER.md')
+    const wingCredits=[
+      ...appendRecord({en:'© OpenStreetMap contributors · ODbL 1.0. IGN · Licence Ouverte 2.0. Geometry and surfaces: procedural reconstruction.',de:'© OpenStreetMap-Mitwirkende · ODbL 1.0. IGN · Licence Ouverte 2.0. Geometrie und Oberflächen: prozedurale Rekonstruktion.'},'OpenStreetMap · IGN'),
+      ...appendRecord({en:'CC0 1.0 · ambientCG · stone-tuffeau, earth-packed, grass-short. Library material surrogates; no site photography sampled.',de:'CC0 1.0 · ambientCG · stone-tuffeau, earth-packed, grass-short. Materialersatz aus der Bibliothek. Keine Standortfotografie als Textur verwendet.'},'CC0 material library'),
+      ...appendRecord({en:'Assumed dimensions: brick 0.22–0.27 × 0.035–0.055 m; wall 0.45–0.80 m; main eaves 7.0–8.4 m. Basis: BUILDING-DOSSIER, Q001/Q124/Q127.',de:'Angenommene Maße: Ziegel 0.22–0.27 × 0.035–0.055 m; Mauer 0.45–0.80 m; Haupttraufe 7.0–8.4 m. Grundlage: BUILDING-DOSSIER, Q001/Q124/Q127.'},'brief/BUILDING-DOSSIER.md'),
+    ]
     const recordButton=make('button','vinci-record-toggle',lang()==='de'?'Vollständiger Nachweis':'Full record')
+    recordButton.id='vinci-record-toggle'
     record.hidden=!recordOpen
     recordButton.type='button';recordButton.setAttribute('aria-controls',record.id);recordButton.setAttribute('aria-expanded',String(!!recordOpen))
     recordButton.addEventListener('click',()=>{record.hidden=!record.hidden;recordButton.setAttribute('aria-expanded',String(!record.hidden))})
-    dock.insertBefore(recordButton,dock.children[2]??null);recordButton.after(record)
+    drawer.insertBefore(recordButton,drawer.children[2]??null);recordButton.after(record)
+    if(exhibitSources){drawer.replaceChildren(title,make('h2','',text(exhibitSources.title)));exhibitSources.renderStation(drawer)}
+    appendCertaintyLegend(drawer)
+    drawer.append(make('p','vinci-door-disclosure',text(WING_TEXT.doorNote)))
+    paintRoomSources()
+    paintWingSources(wingCredits)
     dock.scrollTop=scroll
+    if(dock.open&&focused&&!focused.isConnected){
+      const replacement=focused.id?document.getElementById(focused.id):null
+      if(replacement&&dock.contains(replacement))replacement.focus({preventScroll:true})
+      else sources.select(sources.tab,true)
+    }
   }
   return {
     stations:vinciContent.map(s=>({id:s.id,name:text(s.name),question:text(s.door)})),
     doorDisclosure:'first-press',
+    openSources(tab='station'){if(!standing){pendingView=`sources-${tab}`;return}sources.select(tab);mode=2;paintDock()},
+    setExhibitSources(exhibit){exhibitSources=exhibit;if(standing){sources.resetScroll();paintDock()}},
     navigation:()=>{
       const nav=standing?rail.navigation:undefined
       return {completed:nav?.completed??vinciContent[card]!.id,target:nav?.queued[0]??nav?.active,question:text(vinciContent[card]!.door)}
@@ -459,10 +536,10 @@ export function createWing():WingModule {
     errors:()=>exhibits?.pictureErrors()??[],
     manifest:()=>[...new Map((exhibits?.pictureSources()??[]).flatMap(({entry})=>[entry.preview,entry.plate]).map(entry=>[entry.id,entry])).values()],
     show(index,h){
-      if(!hosts){mount(h);station=index;paintHeader();schedule();return}
+      if(!hosts){mount(h);station=card=index;paintHeader();schedule();return}
       // A station asked for before the place is built is remembered, not lost.
       if(!standing){station=card=index;paintHeader();return}
-      endInspection();if(station!==index)dock.scrollTop=0;station=index;activeView='';measurement.hide()
+      exhibitSources=null;endInspection();if(station!==index)sources.resetScroll();station=index;activeView='';measurement.hide()
       const s=vinciContent[index]!,cut=cutToStation()
       rail.set(s.id,stationPose(s.id,narrow()),cut,narrow())
       // On a walk the card changes when the visitor arrives, not when the
@@ -498,7 +575,7 @@ export function createWing():WingModule {
         if(arrived>=0){card=arrived;dock.scrollTop=0;paintHeader();paintDock();paintQuestion()}
       }
       if(nav.completed&&nav.completed!==exposureAt){exposureAt=nav.completed;aimPrint(nav.completed)}
-      focusNearCascade();shadowBody?.update();shadowCache?.update();sky.position.copy(hosts.world.camera.position);labels.update(dock.hidden?null:dock.getBoundingClientRect())},
-    stop(){if(scheduled)cancelAnimationFrame(scheduled);scheduled=0;standing=false;exhibits?.dispose();exhibits=undefined;sign=undefined;shadowBody?.dispose();shadowBody=undefined;shadowCache?.dispose();shadowCache=undefined;restoreEnvironmentRotation?.();restoreEnvironmentRotation=null;controller?.abort();source?.remove();labels?.dispose();measurement?.dispose();water?.dispose();hosts?.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key?.light)o.dispose()});key?.dispose();if(hosts){hosts.world.scene.traverse(o=>{if(o instanceof Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose()}});hosts.world.scene.clear();delete hosts.stage.parentElement!.dataset['wing'];if(labelHostHidden===null)hosts.labels.removeAttribute('aria-hidden');else hosts.labels.setAttribute('aria-hidden',labelHostHidden)}hosts=undefined},
+      focusNearCascade();shadowBody?.update();shadowCache?.update();sky.position.copy(hosts.world.camera.position);labels.update(dock.open?dock.getBoundingClientRect():null)},
+    stop(){if(scheduled)cancelAnimationFrame(scheduled);scheduled=0;standing=false;exhibits?.dispose();exhibits=undefined;sign=undefined;shadowBody?.dispose();shadowBody=undefined;shadowCache?.dispose();shadowCache=undefined;restoreEnvironmentRotation?.();restoreEnvironmentRotation=null;controller?.abort();sources?.dispose();source?.remove();labels?.dispose();measurement?.dispose();water?.dispose();hosts?.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key?.light)o.dispose()});key?.dispose();if(hosts){hosts.world.scene.traverse(o=>{if(o instanceof Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose()}});hosts.world.scene.clear();delete hosts.stage.parentElement!.dataset['wing'];if(labelHostHidden===null)hosts.labels.removeAttribute('aria-hidden');else hosts.labels.setAttribute('aria-hidden',labelHostHidden)}hosts=undefined},
   }
 }

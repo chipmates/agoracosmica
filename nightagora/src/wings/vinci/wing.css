@@ -147,3 +147,28 @@
   #wing[data-wing='vinci'] .wing-question {flex:1;min-width:0;font-size:13px;line-height:1.35;text-align:left;}
   #wing[data-wing='vinci'] .wing-doorblock .wing-door {max-width:108px;min-height:44px;padding:8px 10px;font-size:9px;letter-spacing:.12em;text-indent:0;}
 }
+
+/* Sources is one reading surface above the station bar at either viewport. */
+#wing[data-wing='vinci'] .vinci-dock {left:50%;right:auto;top:76px;bottom:calc(var(--wing-rail-bottom) + 46px);transform:translateX(-50%);margin:0;width:min(720px,calc(100vw - 56px));height:calc(100dvh - var(--wing-rail-bottom) - 122px);max-width:none;max-height:none;padding:0 24px 24px;box-sizing:border-box;overflow-x:hidden;overflow-y:auto;}
+.vinci-dock::backdrop {background:#081016b3;}
+.vinci-sources-toolbar {position:sticky;top:0;z-index:1;display:flex;align-items:center;gap:12px;background:#101d27;padding:12px 0;border-bottom:1px solid #a9977355;}
+.vinci-sources-tabs {display:flex;flex:1;min-width:0;gap:4px;}
+.vinci-sources-toolbar button {min-width:44px;min-height:44px;padding:8px 12px;border:1px solid transparent;background:none;color:#eae1d1;font:12px/1.25 var(--sans);cursor:pointer;}
+.vinci-sources-tabs button[aria-selected='true'] {border-bottom-color:#d2a557;color:#edcc8c;}
+.vinci-sources-toolbar button:focus-visible,.vinci-sources-panel:focus-visible {outline:1px solid #edcc8c;outline-offset:-2px;}
+.vinci-sources-panel {padding-top:8px;overflow-wrap:anywhere;}
+.vinci-sources-panel[hidden] {display:none;}
+.vinci-sources-panel a {display:inline-flex;align-items:center;min-height:44px;min-width:44px;color:#edcc8c;overflow-wrap:anywhere;}
+.vinci-certainty-legend {display:flex;flex-wrap:wrap;gap:12px 22px;list-style:none;padding:18px 0 0;margin:20px 0;border-top:1px solid #a9977344;font:12px/1.4 var(--sans);}
+.vinci-certainty-legend li {display:flex;align-items:center;gap:8px;}
+.vinci-room-source + .vinci-room-source {margin-top:24px;border-top:1px solid #a9977344;padding-top:16px;}
+.vinci-door-disclosure {font:13px/1.5 var(--sans);color:#b6bcae;margin-top:20px;}
+@media(max-aspect-ratio:9/10) {
+  #wing[data-wing='vinci'] .vinci-dock {left:8px;right:8px;top:auto;bottom:calc(var(--wing-rail-bottom) + 46px);transform:none;width:auto;height:auto;max-height:calc(100dvh - var(--wing-rail-bottom) - 110px);padding:0 16px 20px;}
+  .vinci-sources-toolbar {gap:4px;padding:8px 0;align-items:stretch;}
+  .vinci-sources-tabs {gap:0;}
+  .vinci-sources-toolbar button {padding:8px 5px;font-size:11px;}
+  .vinci-sources-tabs button {flex:1;}
+  .vinci-sources-close {max-width:66px;overflow-wrap:normal;}
+  .vinci-certainty-legend {display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+}

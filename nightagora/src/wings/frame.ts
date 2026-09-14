@@ -271,12 +271,13 @@ export function createWingFrame(
 
   function paintNavigation(): void {
     const navigation = wing?.navigation?.()
-    if (navigation?.question !== undefined) question.textContent = navigation.question
+    if (navigation?.question !== undefined && question.textContent !== navigation.question) question.textContent = navigation.question
     for (let i = 0; i < rail.children.length; i++) {
       const button = rail.children[i] as HTMLElement
       const current = navigation ? button.dataset['station'] === navigation.completed : i === index
-      button.setAttribute('aria-current', String(current))
-      button.dataset['target'] = String(!current && button.dataset['station'] === navigation?.target)
+      if (button.getAttribute('aria-current') !== String(current)) button.setAttribute('aria-current', String(current))
+      const target = String(!current && button.dataset['station'] === navigation?.target)
+      if (button.dataset['target'] !== target) button.dataset['target'] = target
     }
   }
 

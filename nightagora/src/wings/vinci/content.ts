@@ -538,3 +538,13 @@ export const vinciContent: readonly VinciStationContent[] = seeds.map((station, 
 
 export const vinciStationIds: readonly VinciStationId[] = vinciContent.map(station => station.id);
 export const vinciOutdoorStationIds: readonly VinciStationId[] = ['arrival', 'courtyard', 'garden'];
+
+/** Sources follow the physical rooms, independently of the walking order. */
+const sourceRooms: readonly (readonly VinciStationId[])[] = [
+  ['line-early', 'line-late', 'line-amboise', 'reading-table', 'scattered', 'body'],
+  ['flight', 'works', 'myths'],
+  ['supper-wall', 'grave'],
+];
+export function vinciRoomStationIds(id: VinciStationId): readonly VinciStationId[] {
+  return sourceRooms.find(room => room.includes(id)) ?? [id];
+}
