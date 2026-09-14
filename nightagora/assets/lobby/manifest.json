@@ -410,6 +410,65 @@
       "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
       "rights_note": "Ancient public-domain bronze → Met photograph explicitly donated under CC0. The Met’s policy expressly covers its 2D and 3D images of public-domain works, so the photographic rights in this sculpture image are separately cleared.",
       "attribution": "The Metropolitan Museum of Art, 2003.593.1. Gift of Muneichi Nitta, 2003. CC0 1.0."
+    },
+    {
+      "id": "lobby/likeness-goethe",
+      "path": "likenesses/goethe/original.jpg",
+      "sha256": "c35008c4a113379cdb422e63834d78cad8cb484a31e6e19ddaf1408c72fad25b",
+      "bytes": 834568,
+      "width": 2455,
+      "height": 3000,
+      "pixels": 7365000,
+      "slug": "goethe",
+      "name": "Johann Wolfgang von Goethe",
+      "wing": "lobby",
+      "class": "Tier 1",
+      "tier": 1,
+      "licence": "CC BY-SA 4.0",
+      "licence_source_url": "https://www.sammlung.pinakothek.de/de/artwork/02LAY3QLyk",
+      "licence_location": "Image download: licence link immediately beside Download",
+      "holder": "Bayerische Staatsgemäldesammlungen – Neue Pinakothek, Munich, WAF 1048",
+      "maker": "Joseph Karl Stieler",
+      "date": "1828",
+      "source_url": "https://www.sammlung.pinakothek.de/de/artwork/02LAY3QLyk",
+      "original_url": "https://cdn.thenetexperts.info/image/authenticated/s--kwKmv_qz--/q_80/artworks/JOSEPH-KARL-STIELER-1781_JOHANN-WOLFGANG-VON-GOETHE-WAF-1048_479183_CC-BY-SA_BSTGS.jpg",
+      "holder_record_url": "https://www.sammlung.pinakothek.de/de/artwork/02LAY3QLyk",
+      "display": true,
+      "label_en": "Johann Wolfgang von Goethe. Joseph Karl Stieler, 1828. Oil on canvas. Bayerische Staatsgemäldesammlungen – Neue Pinakothek, Munich, WAF 1048. Licence: “CC BY-SA 4.0”.",
+      "label_de": "Johann Wolfgang von Goethe. Joseph Karl Stieler, 1828. Öl auf Leinwand. Bayerische Staatsgemäldesammlungen – Neue Pinakothek, München, WAF 1048. Lizenz: „CC BY-SA 4.0“.",
+      "previews": [
+        {
+          "path": "likenesses/goethe/preview-512.jpg",
+          "sha256": "47a273c5881c222e9a6864e5ffaeee6ad1e4f4beaf52fe9769d21db8e90aeb51",
+          "bytes": 38673,
+          "width": 419,
+          "height": 512,
+          "pixels": 214528,
+          "long_edge": 512,
+          "format": "image/jpeg",
+          "quality": 88,
+          "color_space": "sRGB",
+          "source_path": "likenesses/goethe/original.jpg"
+        },
+        {
+          "path": "likenesses/goethe/preview-1024.jpg",
+          "sha256": "df09031ab4ddb9886859b56b4ccc8fa88a0afb9d7087bc81795f254461984a92",
+          "bytes": 140725,
+          "width": 838,
+          "height": 1024,
+          "pixels": 858112,
+          "long_edge": 1024,
+          "format": "image/jpeg",
+          "quality": 88,
+          "color_space": "sRGB",
+          "source_path": "likenesses/goethe/original.jpg"
+        }
+      ],
+      "verified_on": "2026-09-14",
+      "source_verification": "Current source record and exact downloaded original checked on admission.",
+      "derivation": "No embedded ICC profile. Source interpreted as sRGB. JPEG previews resized with Lanczos, quality 88, embedded sRGB profile. Original bytes unchanged.",
+      "licence_url": "https://www.sammlung.pinakothek.de/de/artwork/02LAY3QLyk",
+      "rights_note": "Use the exact holder download and keep attribution plus ShareAlike if adapted. The Commons Stieler image has different dimensions/bytes and its own PD-Art claim; do not attribute the holder’s CC licence to that older file."
     }
   ]
 }
