@@ -1,4 +1,4 @@
-import { Mesh, Object3D, PerspectiveCamera, Vector3 } from 'three/webgpu'
+import { Object3D, PerspectiveCamera, Vector3 } from 'three/webgpu'
 import type { Pose } from './rail'
 import { railGeometryFingerprint, railGeometryFingerprintBreakdown } from './rail-fingerprint'
 import { createCertifiedRailPath } from './rail-smoothing'
@@ -20,19 +20,7 @@ interface ClearanceData {
 const data = JSON.parse(certificateText) as ClearanceData
 if (data.format !== 'vinci-rail-clearance-v1' || data.completeNearClearance !== true || data.routes.length !== 40) throw new Error('Missing complete Vinci rail certificate')
 const geometryToleranceM = .000002
-const collisionIds = new Set(['vinci/shell', 'vinci/gate-passage', 'vinci/inner-court', 'vinci/terrain', 'vinci/collection', 'vinci/collection-access', 'vinci/water', 'vinci/entry-passage', 'vinci/vegetation', 'vinci/road-dressing', 'vinci/ground-dressing'])
-
-/** Same physical solids as the offline certificate, including actual leaves
- * and dressing. Shadow-only doubles and sky are outside the collision scope.
- * The current foundation is welded into the shell. Explicit child IDs win.
- */
-export function collectRailSolids(scene: Object3D): Object3D[] {
-  const roots: Object3D[] = []
-  scene.traverse(object => {
-    if (object instanceof Mesh && collisionIds.has(String(object.userData['manifestId']))) roots.push(object)
-  })
-  return roots
-}
+export { collectRailSolids, railCollisionIds } from './rail-solids'
 
 function sameSavedPose(saved: SavedPose, pose: Pose) {
   return pose.eye.distanceToSquared(new Vector3().fromArray(saved.eye)) < 1e-18

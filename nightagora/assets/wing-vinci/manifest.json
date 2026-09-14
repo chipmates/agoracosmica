@@ -63,7 +63,7 @@
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
       "sha256": "76b953ffee35a66f3080719efc93092dea47d8a31679a5fd30621168b1bb21da",
-      "note": "brief/CONCEPT.md; src/wings/vinci/data/closluce.json; recipe_file=src/wings/vinci/rail.ts; companion_file=src/wings/vinci/input.ts; companion_recipe_ids=vinci/rail-smoothing,vinci/rail-proof,vinci/rail-fingerprint,vinci/rail-projection,vinci/projection-drag,vinci/rail-clearance"
+      "note": "brief/CONCEPT.md; src/wings/vinci/data/closluce.json; recipe_file=src/wings/vinci/rail.ts; companion_file=src/wings/vinci/input.ts; companion_recipe_ids=vinci/rail-smoothing,vinci/rail-proof,vinci/rail-fingerprint,vinci/rail-projection,vinci/projection-drag,vinci/rail-clearance,vinci/rail-waypoints,vinci/rail-solids,vinci/gait"
     },
     {
       "id": "vinci/labels",
@@ -348,7 +348,7 @@
       "prompt": "Runtime exact canonical pose and actual mounted geometry identity guard for all40 directed physical routes. Applies conservative complete near-camera certificates; fails if stale.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-10",
-      "sha256": "6eb13b6a9936b2d47b98fbad4fcf448d0615d16e22bfb99f67dc562344d718b4",
+      "sha256": "39c0952a80a6d3691988deb3ffaa900852fc72cc67f2c7c71b6d7dd375ad1a2f",
       "note": "recipe_file=src/wings/vinci/rail-proof.ts; source_generator=forge/results/final-rail-route-proof.mjs; runtime dependency of vinci/rail"
     },
     {
@@ -401,7 +401,7 @@
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-10",
       "sha256": "45c083d7e291c47b37feac20fc3434300c12921fe9d74c7d843d214a605ebd5f",
-      "note": "recipe_file=src/wings/vinci/data/rail-clearance.json; source_generator=forge/results/final-rail-route-proof.mjs; runtime dependency of vinci/rail"
+      "note": "recipe_file=src/wings/vinci/data/rail-clearance.json; source_generator=src/wings/vinci/rail-certify.mjs; runtime dependency of vinci/rail"
     },
     {
       "id": "vinci/gait",
@@ -415,6 +415,32 @@
       "date": "2026-09-11",
       "sha256": "921b3f2d55c9d30d0a7aeb1fc5fadfb00402c69315ad250a8d95c1986000134b",
       "note": "recipe_file=src/wings/vinci/gait.ts; source_generator=src/wings/vinci/rail-certify.mjs; runtime dependency of vinci/rail"
+    },
+    {
+      "id": "vinci/rail-waypoints",
+      "path": "procedural/rail-waypoints/*",
+      "wing": "vinci",
+      "class": "GENERATED",
+      "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates © OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
+      "display": true,
+      "prompt": "The turns a route takes between two stations, written against the registered gate crossing, the access stair layout and the collection stair.",
+      "model": "Deterministic TypeScript and TSL procedural geometry",
+      "date": "2026-09-11",
+      "sha256": "d29ed347aabf7b3541effe1588ecd84f389eafa268ca442aa7f55e79a1877912",
+      "note": "recipe_file=src/wings/vinci/rail-waypoints.ts; source_generator=src/wings/vinci/rail-certify.mjs; runtime dependency of vinci/rail"
+    },
+    {
+      "id": "vinci/rail-solids",
+      "path": "procedural/rail-solids/*",
+      "wing": "vinci",
+      "class": "GENERATED",
+      "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates © OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
+      "display": true,
+      "prompt": "The one list of manifest ids the rail is certified against, read by both the offline certifier and the runtime authority.",
+      "model": "Deterministic TypeScript and TSL procedural geometry",
+      "date": "2026-09-11",
+      "sha256": "93afb63680b9f494641496ba46f2a197f305293754551204ad50c6ed0834e0ec",
+      "note": "recipe_file=src/wings/vinci/rail-solids.ts; source_generator=src/wings/vinci/rail-certify.mjs; runtime dependency of vinci/rail"
     },
     {
       "id": "vinci/entry-mineral-surface",
