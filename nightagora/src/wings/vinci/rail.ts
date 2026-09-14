@@ -5,7 +5,7 @@ import { roadGradeProvenance } from './road-grade'
 import type { VinciStationId } from './content'
 import { createRailLookSmoother, createCertifiedRailPath } from './rail-smoothing'
 import { projectRailDrag } from './projection-drag'
-import { carriedPace, gaitAt, gaitHeadLift, gaitLeg, gaitRhythm, strollMetresPerSecond, type GaitThreshold } from './gait'
+import { gaitAt, gaitHeadLift, gaitLeg, gaitRhythm, strollMetresPerSecond, type GaitThreshold } from './gait'
 import { collectionLayout } from './collection'
 import { collectionView } from './collection/views'
 import { COURT, SUPPER_WALL } from './collection/layout'
@@ -188,12 +188,10 @@ const turn=(from:number,to:number,t:number):number=>from+wrap(to-from)*t
 const ramp=(edge0:number,edge1:number,x:number):number=>{const t=Math.max(0,Math.min(1,(x-edge0)/(edge1-edge0)));return t*t*(3-2*t)}
 export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:RailGeometryAuthority) {
   interface Request { id:VinciStationId; pose:Pose; phone:boolean }
-  let completed:Request|undefined, active:Request|undefined
-  const queue:Request[]=[]
+  let completed:Request|undefined, active:Request|undefined, pending:Request|undefined
   let path:ReturnType<typeof createCertifiedRailPath>|undefined, placementNeedsFrame=false
   let duration=1.1, leg=gaitLeg(0), strideM=0, strideTarget=0, strideAt=0
-  /** The leg's own clock. It runs at the stroll the leg was timed at, and
-   * faster while stations are already waiting behind it. */
+  /** The leg's own clock retains its measured pace when the target changes. */
   let legClock=0, legClockAt=0, pace=1
   /** The share of the leg under way the body has covered, for the overlay. */
   let walkedShare=1
@@ -235,7 +233,7 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
     camera.position.copy(request.pose.eye);base.copy(poseQuaternion(request.pose))
     camera.quaternion.copy(base);camera.fov=fittedRailFov(request.pose.fov,camera.aspect,request.phone);matrices()
   }
-  function begin(request:Request,carried:number,now:number) {
+  function begin(request:Request,now:number) {
     if(!completed)throw new Error('Rail needs an explicit initial placement')
     // Exact eyes, aims, authored FOV and actual mounted solids must match
     // the offline proof. An inspection eye cannot borrow a station proof.
@@ -245,7 +243,7 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
     const from=angles(fromQ),to=angles(toQ)
     fromHeading=from.heading;fromElevation=from.elevation;toHeading=to.heading;toElevation=to.elevation
     walked=path.length>=WALKED_LEG_M
-    leg=gaitLeg(path.length);duration=leg.seconds;legClock=0;legClockAt=now;pace=carriedPace(carried);strideM=strideTarget=0;strideAt=now
+    leg=gaitLeg(path.length);duration=leg.seconds;legClock=0;legClockAt=now;pace=1;strideM=strideTarget=0;strideAt=now
     fromFov=completed.pose.fov;targetFov=request.pose.fov;look.recenter()
     active=request
   }
@@ -266,17 +264,15 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
   }
   return {
     /** Physical scheduler state, separate from the shared selected destination. */
-    get navigation() { return { completed:completed?.id, active:active?.id, queued:queue.map(request=>request.id), legSeconds:active?duration:0, legMetres:active&&path?path.length:0, legWalked:active?walkedShare:1, legPace:active?pace:1 } },
+    get navigation() { return { completed:completed?.id, active:active?.id, queued:pending?[pending.id]:[], legSeconds:active?duration:0, legMetres:active&&path?path.length:0, legWalked:active?walkedShare:1, legPace:active?pace:1 } },
     set(id:VinciStationId,pose:Pose,instant=false,phone=camera.aspect<=.9) {
       const request={id,pose:{eye:pose.eye.clone(),at:pose.at.clone(),fov:pose.fov},phone}
       // Initial/named placement, explicit inspection return and resize are
-      // deliberate placement boundaries. Ordinary reduced motion stays FIFO.
-      if(instant||!completed){queue.length=0;placeEndpoint(request);placementNeedsFrame=true;return}
-      // Compare only the latest accepted command. B,C,B is a real reversal;
-      // different semantic stations sharing a pose remain distinct requests.
-      const tail=queue.at(-1)??active??completed
-      if(sameRequest(tail,request))return
-      queue.push(request)
+      // deliberate placement boundaries, including during reduced motion.
+      if(instant||!completed){pending=undefined;placeEndpoint(request);placementNeedsFrame=true;return}
+      // A certified leg finishes at its station before the newest target can
+      // begin. Asking for that active endpoint cancels an older pending target.
+      pending=sameRequest(active??completed,request)?undefined:request
     },
     look(y:number,pit:number){look.snap(y,pit)},
     /** Walk on by hand. True when a leg was actually walking and took it. */
@@ -294,20 +290,20 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
       const now=clock()
       // An explicit cut gets one rendered update before any queued movement.
       if(placementNeedsFrame){placementNeedsFrame=false;render(now);return}
-      if(!active&&queue.length&&authority.status==='verified') {
-        const request=queue[0]!
+      if(!active&&pending&&authority.status==='verified') {
+        const request=pending
         if(samePose(completed.pose,request.pose)) {
           // Preserve settled gaze at a shared construction threshold, while
           // completing only this semantic request during the current update.
-          queue.shift();completed=request;render(now);return
+          pending=undefined;completed=request;render(now);return
         }
-        // What is still waiting behind this leg is the visitor asking to be
-        // carried on, and the leg is walked at that pace from the start.
-        begin(request,queue.length-1,now)
-        queue.shift()
+        // Route directly from the completed station to the newest target.
+        // Retain that target if its proof rejects the route.
+        begin(request,now)
+        pending=undefined
       }
       if(active&&reducedMotion()) {
-        // One genuine endpoint per update; all later accepted requests remain.
+        // One genuine endpoint per update; the newest pending target remains.
         placeEndpoint(active);render(now);return
       }
       if(active&&path&&strideTarget>strideM) {
@@ -320,8 +316,8 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
       // THE PROFILE, NOT A SMOOTHSTEP OVER THE LEG. The body leans into the
       // walk over the first ramp, strolls, and leans out of it at the station.
       // A wheel notch adds its stride to the same distance.
-      // THE WALK YOU ARE ON DOES NOT SPEED UP UNDER YOU. The pace is read
-      // once, when the leg begins, from what is already waiting behind it.
+      // THE WALK YOU ARE ON DOES NOT SPEED UP UNDER YOU. Replacing the next
+      // target changes neither this leg's certified route nor its pace.
       if(active)legClock+=Math.max(0,now-legClockAt)*pace
       legClockAt=now
       const walk=active&&path?gaitAt(leg,legClock):undefined

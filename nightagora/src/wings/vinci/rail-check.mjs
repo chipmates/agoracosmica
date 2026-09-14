@@ -141,7 +141,7 @@ for(const phone of [false,true]) {
     for(let i=1;i<=224;i++)h.at(2+i*STEP)
     endpoint(h,'courtyard');h.at(6);compare(h.camera,canonical(phone,'courtyard'),'Settled endpoint')
   })
-  check(viewport,'Accepted requests preserve the complete first trajectory and later FIFO destinations',()=>{
+  check(viewport,'New targets preserve the complete active trajectory then take the direct certified route to the latest',()=>{
     const h=harness(phone),control=harness(phone);h.set('courtyard');control.set('courtyard')
     h.at(0);control.at(0)
     // A leg lasts as long as its own length says, so the sub-step is the
@@ -150,81 +150,88 @@ for(const phone of [false,true]) {
     for(let i=1;i<224;i++) {
       h.at(i*step);control.at(i*step)
       if(i===45)h.set('garden');if(i===100)h.set('hall');if(i===145)h.set('arrival')
+      ensure(h.rail.navigation.queued.length<=1,'Input grew a chain behind the active leg')
       compare(h.camera,control.camera,'Queued input changes no in-flight sample')
     }
     h.at(seconds+1e-6);control.at(seconds+1e-6);compare(h.camera,control.camera,'Queued input changes no arrival sample')
     endpoint(h,'courtyard')
-    for(const id of ['garden','hall','arrival'])settle(h,id)
-    ensure(h.rail.navigation.queued.length===0,'FIFO did not drain')
+    ensure(h.rail.navigation.queued.join(',')==='arrival','Newest target was not retained')
+    settle(h,'arrival')
+    ensure(h.rail.navigation.queued.length===0&&h.calls.length===2,'Superseded targets were walked')
+    ensure(h.calls[1].from.every((v,i)=>Math.abs(v-h.pose('courtyard').eye.getComponent(i))<1e-12)
+      &&h.calls[1].to.every((v,i)=>Math.abs(v-h.pose('arrival').eye.getComponent(i))<1e-12),'Newest target did not get a direct station-to-station proof')
   })
-  check(viewport,'B,C,B reversal survives; only consecutive identical tail commands deduplicate',()=>{
+  check(viewport,'Repeated pending targets deduplicate and the active target cancels any pending reversal',()=>{
     const h=harness(phone);h.set('courtyard');h.set('courtyard');h.at(0);h.at(.2)
-    h.set('garden');h.set('garden');h.set('courtyard');h.set('courtyard')
-    ensure(h.rail.navigation.queued.join(',')==='garden,courtyard','Tail dedup removed a real reversal')
-    // A leg walked with stations already waiting behind it lands sooner, so
-    // the order of the endpoints is the assertion and not the clock.
-    settle(h,'courtyard');settle(h,'garden');settle(h,'courtyard')
-    ensure(h.calls.length===3,'Wrong number of distinct physical legs')
+    h.set('garden');h.set('garden');ensure(h.rail.navigation.queued.join(',')==='garden','Duplicate target grew a queue')
+    h.set('hall');h.set('garden');ensure(h.rail.navigation.queued.join(',')==='garden','Newest pending reversal was lost')
+    h.set('courtyard');h.set('courtyard')
+    ensure(h.rail.navigation.queued.length===0,'Requesting the active endpoint retained an older target')
+    settle(h,'courtyard');h.at(h.now+DURATION)
+    ensure(h.calls.length===1&&!h.rail.navigation.active,'A cancelled target started another leg')
   })
-  check(viewport,'Distinct shared-pose stations complete once per update without resetting gaze',()=>{
+  check(viewport,'Only the latest shared-pose station completes without resetting the settled gaze',()=>{
     const h=harness(phone,'hall');h.drag(-49,29);h.at(3);const looked=snapshot(h.camera)
-    for(const id of ['oratory','study','chamber','hall'])h.set(id)
-    const trace=[]
-    for(let i=0;i<4;i++){h.at(3);trace.push(h.rail.navigation.completed);compare(h.camera,looked,'Shared threshold gaze')}
-    ensure(trace.join(',')==='oratory,study,chamber,hall','Semantic stops were collapsed')
+    for(const id of ['oratory','study','chamber'])h.set(id)
+    ensure(h.rail.navigation.queued.join(',')==='chamber','Shared poses retained superseded targets')
+    h.at(3);endpoint(h,'chamber');compare(h.camera,looked,'Latest shared threshold gaze')
+    h.set('oratory');h.set('hall');h.at(3);endpoint(h,'hall');compare(h.camera,looked,'Returning shared threshold gaze')
     ensure(h.calls.length===0,'Equal-pose semantic change invented a route')
   })
-  check(viewport,'A long accepted burst has no fixed-capacity eviction or skipped semantic endpoint',()=>{
+  check(viewport,'A long held-input burst retains at most one target and walks only the active and latest endpoints',()=>{
     const h=harness(phone),accepted=Array.from({length:257},(_,i)=>ids[(i+1)%ids.length])
-    for(const id of accepted)h.set(id)
+    h.set('courtyard');h.at(0);h.at(.2)
+    for(const id of accepted){h.set(id);ensure(h.rail.navigation.queued.length<=1,'A held input built a chain')}
+    ensure(h.rail.navigation.queued.join(',')===accepted.at(-1),'Burst did not retain its latest target')
     const trace=[];let previous='arrival'
-    for(let tick=0;trace.length<accepted.length&&tick<6000;tick++) {
-      h.at(tick*2)
+    for(let tick=0;trace.length<2&&tick<600;tick++) {
+      h.at(.2+tick*2)
       const current=h.rail.navigation.completed
       if(current!==previous){trace.push(current);endpoint(h,current);previous=current}
     }
-    ensure(trace.join(',')===accepted.join(','),'Long-burst completion trace lost or reordered requests')
+    ensure(trace.join(',')===['courtyard',accepted.at(-1)].join(','),'Burst walked a superseded endpoint or lost its newest target')
+    ensure(h.calls.length===2&&h.rail.navigation.queued.length===0,'Burst created an extra route')
     return {acceptedRequests:accepted.length,observedEndpoints:trace.length}
   })
   check(viewport,'A delayed frame completes only the active endpoint and gives later legs fresh clocks',()=>{
     const h=harness(phone);h.set('courtyard');h.at(0);h.at(.2);h.set('garden');h.set('hall')
     const late=DURATION+10
     h.at(late);endpoint(h,'courtyard');ensure(h.rail.navigation.active===undefined,'A second leg began during completion')
-    ensure(h.rail.navigation.queued.join(',')==='garden,hall','Delayed frame drained pending requests')
+    ensure(h.rail.navigation.queued.join(',')==='hall','Delayed frame lost the newest pending request')
     h.at(late);compare(h.camera,canonical(phone,'courtyard'),'New leg zero elapsed time')
-    // The control carries the same queue depth, because the pace of a leg is
-    // read from what is already waiting behind it when the leg begins.
-    const control=harness(phone,'courtyard');control.set('garden');control.set('hall');control.at(0)
-    // A leg's own seconds are its stroll; the pace it is walked at is read
-    // from what was waiting behind it, so the wall clock is the two together.
+    const control=harness(phone,'courtyard');control.set('hall');control.at(0)
     const seconds=control.rail.navigation.legSeconds/control.rail.navigation.legPace,step=seconds/224
     for(let i=1;i<224;i++){h.at(late+i*step);control.at(i*step);compare(h.camera,control.camera,'Fresh route clock')}
     h.at(late+seconds+1e-6);control.at(seconds+1e-6);compare(h.camera,control.camera,'Fresh route clock at the endpoint')
-    endpoint(h,'garden')
+    endpoint(h,'hall')
   })
-  check(viewport,'Reduced motion finishes the active request then preserves every queued reversal',()=>{
-    const h=harness(phone);h.set('courtyard');h.at(0);h.at(.2);h.set('garden');h.set('courtyard')
+  check(viewport,'Reduced motion finishes the active request then completes only the newest pending target',()=>{
+    const h=harness(phone);h.set('courtyard');h.at(0);h.at(.2);h.set('garden');h.set('hall')
     media.reduced=true
     const trace=[]
-    for(let i=0;i<3;i++){h.at(10);trace.push(h.rail.navigation.completed)}
-    ensure(trace.join(',')==='courtyard,garden,courtyard','Reduced motion lost or drained queued endpoints')
-    h.drag(34,20);h.at(10);const looked=snapshot(h.camera);h.set('courtyard');h.at(11);compare(h.camera,looked,'Reduced duplicate')
+    for(let i=0;i<2;i++){h.at(10);trace.push(h.rail.navigation.completed)}
+    ensure(trace.join(',')==='courtyard,hall','Reduced motion lost the active endpoint or newest target')
+    ensure(h.calls.length===2&&h.rail.navigation.queued.length===0,'Reduced motion walked a superseded target')
+    h.drag(34,20);h.at(10);const looked=snapshot(h.camera);h.set('hall');h.at(11);compare(h.camera,looked,'Reduced duplicate')
   })
-  check(viewport,'Pending or failed authority holds the origin and retains head and tail requests',()=>{
+  check(viewport,'Pending or failed authority holds the origin and retains only the newest target',()=>{
     const h=harness(phone,'arrival','checking'),origin=snapshot(h.camera)
     h.set('courtyard');h.set('garden');h.set('arrival');h.at(10)
     compare(h.camera,origin,'Pending proof');ensure(h.calls.length===0,'Pending authority was bypassed')
+    ensure(h.rail.navigation.queued.length===0,'Requesting the standing station failed to cancel pending work')
+    h.set('courtyard');h.set('garden')
     h.authority.status='failed';h.at(20);compare(h.camera,origin,'Failed proof')
-    ensure(h.rail.navigation.queued.join(',')==='courtyard,garden,arrival','Proof failure lost accepted work')
-    h.authority.status='verified';h.at(30);compare(h.camera,origin,'Ready proof fresh clock');h.at(30+DURATION);endpoint(h,'courtyard')
+    ensure(h.rail.navigation.queued.join(',')==='garden','Proof failure lost the latest target or retained superseded work')
+    h.authority.status='verified';h.at(30);compare(h.camera,origin,'Ready proof fresh clock');settle(h,'garden')
+    ensure(h.calls.length===1,'Pending proof later walked a superseded request')
   })
   check(viewport,'A rejected route or lens cannot move, claim arrival, or discard the accepted request',()=>{
     const h=harness(phone),origin=snapshot(h.camera);h.set('courtyard');h.set('garden');h.authority.rejectRoute=true
     let failed=false;try{h.at(0)}catch{failed=true}ensure(failed,'Route rejection was bypassed')
-    compare(h.camera,origin,'Rejected route');ensure(h.rail.navigation.queued.join(',')==='courtyard,garden','Rejected head was discarded')
+    compare(h.camera,origin,'Rejected route');ensure(h.rail.navigation.queued.join(',')==='garden','Rejected target was discarded or a superseded one retained')
     h.authority.rejectRoute=false;h.camera.zoom=.8;failed=false;try{h.at(0)}catch{failed=true}ensure(failed,'Invalid lens was bypassed')
-    ensure(h.rail.navigation.completed==='arrival'&&h.rail.navigation.queued.length===2,'Invalid lens reported arrival')
-    h.camera.zoom=1;finish(h,'courtyard',0)
+    ensure(h.rail.navigation.completed==='arrival'&&h.rail.navigation.queued.length===1,'Invalid lens reported arrival')
+    h.camera.zoom=1;h.at(0);settle(h,'garden')
   })
   check(viewport,'Explicit inspection and resize cancel only their old sequence and render the cut first',()=>{
     const h=harness(phone);h.set('courtyard');h.at(0);h.at(.2);h.set('garden')

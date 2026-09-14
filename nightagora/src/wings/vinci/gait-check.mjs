@@ -155,10 +155,9 @@ ensure(traces[0].riseAndFallPerSecond > 2.1 && traces[0].riseAndFallPerSecond < 
 ensure(traces[1].heightAmplitudeMM === 0 && traces[1].swayAmplitudeMM === 0, 'Reduced motion still carries a step rhythm on the camera')
 ensure(traces.every(trace => trace.endHeightErrorMM < 1e-6 && trace.endEastErrorMM < 1e-6), 'A walk does not land on its own certified eye')
 
-/** THE CARRIED PACE AND THE CARD'S HANDOVER. A visitor who has already asked
- * for the next station is carried on: the leg's own clock runs at the pace of
- * the asking. The overlay hands the card over at the half of the leg by
- * walked distance. Both are measured here on the lengths the rail walks. */
+/** The retained carried-pace helper and the card's handover, measured on the
+ * lengths the rail walks. The scheduler now holds one pending target, so its
+ * actual leg keeps its original pace through every replacement below. */
 const CARD_HANDOVER = .5
 const carried = lengths.map(length => {
   const leg = gaitLeg(length)
@@ -183,9 +182,9 @@ const carried = lengths.map(length => {
   return row
 })
 
-/** The same on the real controller: one leg with two stations already asked
- * for behind it, walked to its own end. */
-function carriedTrace(metres, waiting) {
+/** The real controller finishes the same leg at the same pace even when its
+ * pending target is repeatedly replaced. */
+function pendingTrace(metres, replacements) {
   const from = stationPose('arrival', false)
   const step = new THREE.Vector3(metres, 0, 0)
   const to = { eye: from.eye.clone().add(step), at: from.at.clone().add(step), fov: from.fov }
@@ -197,22 +196,25 @@ function carriedTrace(metres, waiting) {
   rail.set('arrival', from, true, false)
   rail.update()
   rail.set('courtyard', to, false, false)
-  for (let i = 0; i < waiting; i++) rail.set(i % 2 ? 'study' : 'oratory', beyond, false, false)
+  rail.update()
+  for (let i = 0; i < replacements; i++) rail.set(i % 2 ? 'study' : 'oratory', beyond, false, false)
+  ensure(rail.navigation.queued.length <= 1, 'Repeated input grew a chain of pending stations')
   let landed = 0
   for (let i = 1; i <= 4000 && !landed; i++) {
     now = i * .016
     rail.update()
     if (rail.navigation.completed === 'courtyard') landed = now
   }
-  return { metres, waiting, secondsToLand: +landed.toFixed(2), metresPerSecond: +(metres / landed).toFixed(2) }
+  return { metres, pendingReplacements: replacements, secondsToLand: +landed.toFixed(2), metresPerSecond: +(metres / landed).toFixed(2) }
 }
-const carriedTraces = [carriedTrace(17.369497651827334, 0), carriedTrace(17.369497651827334, 2)]
-ensure(carriedTraces[1].secondsToLand < carriedTraces[0].secondsToLand * .75,
-  'Two stations waiting do not carry the walk on measurably')
+const pendingTraces = [pendingTrace(17.369497651827334, 0), pendingTrace(17.369497651827334, 257)]
+ensure(pendingTraces[0].secondsToLand > 0 && pendingTraces[1].secondsToLand === pendingTraces[0].secondsToLand,
+  'Replacing the pending target changed the active leg or its landing time')
 
 const report = {
   checker: 'vinci-gait',
-  carriedPaceAndCardHandover: { share: CARD_HANDOVER, legs: carried, onTheRail: carriedTraces },
+  carriedPaceAndCardHandover: { share: CARD_HANDOVER, legs: carried },
+  pendingReplacementsOnTheRail: pendingTraces,
   measuredOnTheRail: traces,
   strollMetresPerSecond, stepMetres,
   stepRhythmEnvelopeM: +gaitEnvelopeM.toFixed(5),
