@@ -446,6 +446,10 @@ export function createWing():WingModule {
   }
   return {
     stations:vinciContent.map(s=>({id:s.id,name:text(s.name),question:text(s.door)})),
+    navigation:()=>{
+      const nav=standing?rail.navigation:undefined
+      return {completed:nav?.completed??vinciContent[card]!.id,target:nav?.queued[0]??nav?.active}
+    },
     pending:()=>exhibits?.pending()??0,
     errors:()=>exhibits?.pictureErrors()??[],
     manifest:()=>[...new Map((exhibits?.pictureSources()??[]).flatMap(({entry})=>[entry.preview,entry.plate]).map(entry=>[entry.id,entry])).values()],

@@ -78,6 +78,8 @@ export interface WingStation {
 
 export interface WingModule {
   stations: WingStation[]
+  /** A walking wing distinguishes its standing station from its destination. */
+  navigation?(): { completed?: string; target?: string }
   /** compose one station into the frame's hosts */
   show(index: number, hosts: WingHosts): void
   /** strike everything the wing put on the page */
@@ -242,6 +244,16 @@ export function createWingFrame(
     }
   }
 
+  function paintNavigation(): void {
+    const navigation = wing?.navigation?.()
+    for (let i = 0; i < rail.children.length; i++) {
+      const button = rail.children[i] as HTMLElement
+      const current = navigation ? button.dataset['station'] === navigation.completed : i === index
+      button.setAttribute('aria-current', String(current))
+      button.dataset['target'] = String(!current && button.dataset['station'] === navigation?.target)
+    }
+  }
+
   function goto(n: number): void {
     if (!wing || !entry) return
     const count = wing.stations.length
@@ -250,11 +262,9 @@ export function createWingFrame(
     wing.show(index, { labels, stage, world, navigate: goto })
     question.textContent = station?.question ?? ''
     door.href = doorUrl(entry)
-    for (let i = 0; i < rail.children.length; i++) {
-      rail.children[i]?.setAttribute('aria-current', i === index ? 'true' : 'false')
-    }
+    paintNavigation()
     const selected = rail.children[index] as HTMLElement | undefined
-    if (selected) rail.scrollLeft = selected.offsetLeft - rail.clientWidth / 2 + 22
+    if (selected && !wing.navigation) rail.scrollLeft = selected.offsetLeft - rail.clientWidth / 2 + 22
     // the return path: a reload stands the visitor where they stood
     const hash = count > 1 || index > 0 ? `#s=${index}` : ''
     const url = `/w/${entry.slug}${location.search}${hash}`
@@ -292,6 +302,8 @@ export function createWingFrame(
         goto(at)
       }
       if (view) wing?.view?.(view)
+      const selected = rail.children[index] as HTMLElement | undefined
+      if (!reuse && selected) rail.scrollLeft = selected.offsetLeft - rail.clientWidth / 2 + 22
     },
     goto,
     gotoId,
@@ -319,6 +331,7 @@ export function createWingFrame(
       world.camera.aspect = innerWidth / innerHeight
       world.camera.updateProjectionMatrix()
       wing?.update?.(dt)
+      paintNavigation()
     },
     look: (yaw, pitch) => wing?.look?.(yaw, pitch),
     camera: () => world.camera,

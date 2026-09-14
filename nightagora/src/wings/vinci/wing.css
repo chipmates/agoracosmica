@@ -8,6 +8,7 @@
 #wing[data-wing='vinci'] .wing-note { margin-top:6px; font-size:9px; }
 #wing[data-wing='vinci'] .wing-rail-group { padding:0 8px 0 0; background:rgba(16,24,29,.82); border:1px solid #a997732b; border-radius:2px; }
 #wing[data-wing='vinci'] .wing-rail { padding:0; background:none; gap:0; }
+#wing[data-wing='vinci'] .wing-step[data-target='true']::after { height:4px;box-sizing:border-box;border:1px solid var(--na-gold);background:transparent;transition:none; }
 #wing[data-wing='vinci'] .wing-rail-group .wing-lobby { min-width:76px;min-height:44px;padding:8px 12px;border-right:1px solid #a9977355;font-size:9px;letter-spacing:.2em;text-indent:.2em; }
 #wing[data-wing='vinci'] .wing-question { user-select:text; }
 .vinci-heading { position:absolute;left:46px;top:114px;max-width:550px;pointer-events:none;text-shadow:0 2px 20px #14212dcc; }
