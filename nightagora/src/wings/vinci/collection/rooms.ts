@@ -8,7 +8,7 @@ import { RoomBatch } from './build'
 import { buildBodyWall, buildHang, buildPictureRoomFurniture } from './hang'
 import { collectionBorrowedLightMaterial, collectionInteriorMaterial, collectionRoomsProvenance } from './materials'
 import {
-  COURT, FACE, FLOOR, GRAVE_ORIGIN, HANG_DATUM, LINE_FIELD, OPENING, ROOMS, SUPPER_WALL,
+  COURT, DARK_BAY, FACE, FLOOR, GRAVE_ORIGIN, HANG_DATUM, LINE_FIELD, OPENING, ROOMS, SUPPER_WALL,
 } from './layout'
 
 const CEILING = -1.88, COFFER = .19, BAY = 4
@@ -129,6 +129,20 @@ export function createCollectionRooms(): Group {
   doorEastWest(b, FACE.pictureWallSouth + .1, OPENING.pictureToHall.east[0] + .1, OPENING.pictureToHall.east[1], -2.5)
   doorNorthSouth(b, FACE.hallPartitionWest - .1, OPENING.hallToGallery.north[0], OPENING.hallToGallery.north[1] - .1, -2.5)
   doorNorthSouth(b, FACE.hallPartitionWest - .1, OPENING.hallToSouth.north[0] + .1, OPENING.hallToSouth.north[1], -2.5)
+  // THE DARK BAY. A camera obscura has nothing to show in a lit room, so the
+  // hall gives it three walls of its own and keeps the fourth side open to
+  // the aisle. The bay is 2.7 m high: the hall's luminaires hang above it.
+  for (const [west, south, east, north] of [
+    [DARK_BAY.west - DARK_BAY.wall, DARK_BAY.south - DARK_BAY.wall, DARK_BAY.west, DARK_BAY.north],
+    [DARK_BAY.east, DARK_BAY.south - DARK_BAY.wall, DARK_BAY.east + DARK_BAY.wall, DARK_BAY.north],
+    [DARK_BAY.west - DARK_BAY.wall, DARK_BAY.south - DARK_BAY.wall, DARK_BAY.east + DARK_BAY.wall, DARK_BAY.south],
+  ]) {
+    b.box((west! + east!) / 2, (south! + north!) / 2, FLOOR + DARK_BAY.height / 2,
+      east! - west!, north! - south!, DARK_BAY.height, 1)
+    b.box((west! + east!) / 2, (south! + north!) / 2, FLOOR + BASE / 2, east! - west!, north! - south!, BASE, 2)
+    b.box((west! + east!) / 2, (south! + north!) / 2, FLOOR + DARK_BAY.height + .07,
+      east! - west! + .06, north! - south! + .06, .14, 2)
+  }
 
   // THE LONG GALLERY. One room and not four: the line the museum lets into
   // its floor is twenty-six metres long. The floor is cut around it.

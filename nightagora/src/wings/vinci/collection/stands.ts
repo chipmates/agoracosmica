@@ -49,17 +49,21 @@ export const STANDS: Record<MachineSlug, Stand> = {
   // side by side on one plinth under the open sky.
   'anemometer': { east: -42.65, north: -22.4, bearing: 8, plinth: .72, ground: 'court', plinthGroup: 'weather' },
   'inclinometer': { east: -41.9, north: -22.4, bearing: -6, plinth: .72, ground: 'court', plinthGroup: 'weather' },
-  // The hall, where the workshop stands.
-  'aerial-screw': { east: -51.5, north: -49, bearing: 0, plinth: .12, ground: 'hall' },
-  'ball-bearing': { east: -59.6, north: -50.3, bearing: 0, plinth: .62, ground: 'hall' },
-  'camera-obscura': { east: -59.4, north: -52.9, bearing: 104, plinth: .3, ground: 'hall' },
-  'proportional-compass': { east: -54.6, north: -42.95, bearing: 4, plinth: .78, ground: 'hall' },
+  // THE WORKSHOP HALL, north-west of its one aisle. The screw needs six
+  // metres of clear height and eight of floor, and this is the only room in
+  // the museum with both, which is what the hall's section was cut for.
+  'aerial-screw': { east: -57, north: -45.6, bearing: 0, plinth: 0, ground: 'hall' },
   'miter-lock-gates': { east: -44.4, north: -46.4, bearing: -22, plinth: .18, ground: 'hall' },
-  'multi-barrel-gun': { east: -42.6, north: -50.6, bearing: 208, plinth: .16, ground: 'hall' },
   'water-lifting-screw': { east: -41.9, north: -53.6, bearing: 90, plinth: .16, ground: 'hall' },
-  'lathe': { east: -46.2, north: -52.9, bearing: 12, plinth: .2, ground: 'hall' },
-  'flywheel': { east: -45.8, north: -48.8, bearing: 0, plinth: .26, ground: 'hall' },
-  'rolling-mill': { east: -47.4, north: -44.2, bearing: -24, plinth: .34, ground: 'hall' },
+  'rolling-mill': { east: -46.6, north: -44.3, bearing: -24, plinth: .34, ground: 'hall' },
+  'lathe': { east: -44.2, north: -43.6, bearing: 12, plinth: .2, ground: 'hall' },
+  // South-east of the aisle, with the camera obscura in the dark bay its
+  // image needs and the gun on its own wheels at the far end.
+  'flywheel': { east: -44, north: -49.6, bearing: 0, plinth: .26, ground: 'hall' },
+  'ball-bearing': { east: -40.6, north: -46.6, bearing: 0, plinth: .62, ground: 'hall' },
+  'camera-obscura': { east: -45.6, north: -52.6, bearing: 0, plinth: .3, ground: 'hall' },
+  'multi-barrel-gun': { east: -41.3, north: -50.8, bearing: 0, plinth: 0, ground: 'hall' },
+  'proportional-compass': { east: -54.6, north: -42.95, bearing: 4, plinth: .78, ground: 'hall' },
 }
 
 export const standLevel = (ground: StandGround): number =>

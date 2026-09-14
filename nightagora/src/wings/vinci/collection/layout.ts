@@ -93,6 +93,9 @@ export const COURT = {
 /** The grave's own floor is the west half of the court's paving, which is
  * why the court is exactly as deep as that floor. */
 export const GRAVE_ORIGIN = { east: -55.5, north: -25 }
+/** The camera obscura's own bay in the hall: three walls and an open north
+ * side, which is what makes the dark its image needs. */
+export const DARK_BAY = { west: -47.3, east: -43.9, south: -54.2, north: -51.6, wall: .22, height: 2.7 }
 /** The display wall for the Last Supper's measured absence: a wall of its
  * own on the north apron, north-lit, its field 880 by 460 cm. */
 export const SUPPER_WALL = {
