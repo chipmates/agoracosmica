@@ -9,6 +9,16 @@
 //   node forge/register-check.mjs <port> wing vinci --json
 //   node forge/register-check.mjs --selftest          (the rules, no browser)
 //   node forge/register-check.mjs <port> wing vinci --dump   (every string read)
+//   node forge/register-check.mjs <port> lobby --record      (fold this run's
+//                                     counts into forge/register-expected.json)
+//
+// HOW MANY STRINGS IS ALSO A MEASUREMENT. The walk reads 201 to 204 strings
+// of the lobby run to run, and a string that stopped rendering would look
+// exactly like the low end of that. So the counts per surface and per
+// station are recorded in forge/register-expected.json, and a run that reads
+// FEWER than the fewest ever recorded says so on a WARN line, with the
+// stations that came up short. It warns and never fails: the count is a
+// symptom, and the gate here is the register of the text.
 //
 // THE THREE REGISTERS. Every visitor facing string belongs to one:
 //   LABEL   one line in the museum's voice, the certainty word, nothing a
@@ -37,6 +47,8 @@
 // with their own offences.
 import { chromium } from 'playwright'
 import { spawn } from 'node:child_process'
+import { existsSync, readFileSync, writeFileSync } from 'node:fs'
+import { join } from 'node:path'
 import {
   APP_ROOT,
   assertAdapter,
@@ -64,6 +76,9 @@ const SELFTEST = flags.includes('--selftest')
 /** every string the walk read, not only the refused ones: what the seat
     that rewrites the text works from */
 const DUMP = flags.includes('--dump')
+/** fold this run's counts into forge/register-expected.json. Run it a few
+    times on an unchanged tree and the file carries the run to run spread. */
+const RECORD = flags.includes('--record')
 const LANGS = String(flag('lang', 'en,de')).split(',').filter(Boolean)
 const VPS = String(flag('viewport', 'desktop,mobile')).split(',').filter(Boolean)
 const BASE = `http://localhost:${port}`
@@ -544,6 +559,65 @@ function selftest() {
 
 /* ----------------------------------------------------------------- the run */
 
+/* ------------------------------------------------------- the expected count
+
+   The floor is the fewest strings any recorded run of this surface read. A
+   run below it has lost something that used to render, and the station ids
+   that fell short name where to look. */
+const EXPECTED_AT = join(APP_ROOT, 'forge', 'register-expected.json')
+const surfaceKey = surface === 'wing' ? `wing/${slug}` : surface
+
+function expectedBook() {
+  if (!existsSync(EXPECTED_AT)) return { surfaces: {} }
+  try {
+    const book = JSON.parse(readFileSync(EXPECTED_AT, 'utf8'))
+    return book.surfaces ? book : { surfaces: {} }
+  } catch {
+    return { surfaces: {} }
+  }
+}
+
+const strings = (row) => (row.label ?? 0) + (row.drawer ?? 0)
+
+function countLine(report, book) {
+  const e = book.surfaces[surfaceKey]
+  const read = report.read.label + report.read.drawer
+  if (!e) return { surface: surfaceKey, read, expected: null, ok: true, short: [] }
+  const short = []
+  for (const [id, want] of Object.entries(e.stations)) {
+    const row = report.inventory.find((r) => r.station === id)
+    if (!row) short.push({ id, expected: want.min, read: null })
+    else if (strings(row) < want.min) short.push({ id, expected: want.min, read: strings(row) })
+  }
+  return {
+    surface: surfaceKey,
+    read,
+    expected: { min: e.total.min, max: e.total.max, runs: e.runs, spread: e.total.max - e.total.min },
+    floor: e.total.min,
+    ok: read >= e.total.min && short.length === 0,
+    short,
+  }
+}
+
+function record(report, book) {
+  const read = report.read.label + report.read.drawer
+  const e = book.surfaces[surfaceKey] ?? { runs: 0, total: { min: read, max: read }, stations: {} }
+  e.runs++
+  e.total.min = Math.min(e.total.min, read)
+  e.total.max = Math.max(e.total.max, read)
+  for (const row of report.inventory) {
+    const n = strings(row)
+    const had = e.stations[row.station]
+    e.stations[row.station] = had ? { min: Math.min(had.min, n), max: Math.max(had.max, n) } : { min: n, max: n }
+  }
+  book.surfaces[surfaceKey] = e
+  book.what = 'what a clean run of forge/register-check.mjs reads, per surface and per station, measured on an unchanged tree'
+  writeFileSync(EXPECTED_AT, JSON.stringify(book, null, 1) + '\n')
+  return e
+}
+
+/* ----------------------------------------------------------------- the run */
+
 if (SELFTEST) {
   selftest()
 } else {
@@ -562,6 +636,29 @@ if (SELFTEST) {
     errors: [...new Set(errors)],
     ok: list.length === 0 && errors.length === 0,
     ...(DUMP ? { all: [...everything.values()] } : {}),
+  }
+  const book = expectedBook()
+  if (RECORD) {
+    const e = record(report, book)
+    process.stderr.write(
+      `recorded: ${surfaceKey} now ${e.total.min} to ${e.total.max} string(s) over ${e.runs} run(s), ` +
+        `${Object.keys(e.stations).length} station reading(s)\n`
+    )
+  }
+  report.count = countLine(report, book)
+  if (!report.count.ok) {
+    // the WARN goes to stderr as well, so it is not lost when a caller is
+    // reading the JSON on stdout
+    const c = report.count
+    const head =
+      `WARN register count: ${c.read} string(s) read, expected ${c.expected.min} to ${c.expected.max} ` +
+      `over ${c.expected.runs} run(s), floor ${c.floor}`
+    const where = c.short.length
+      ? '  expected and not read: ' +
+        c.short.slice(0, 12).map((x) => `${x.id} (${x.read ?? 'nothing'} of ${x.expected})`).join(', ') +
+        (c.short.length > 12 ? ` and ${c.short.length - 12} more` : '')
+      : '  every station read what it has read before'
+    process.stderr.write(`${head}\n${where}\n`)
   }
   if (JSON_OUT) {
     console.log(JSON.stringify(report, null, 2))

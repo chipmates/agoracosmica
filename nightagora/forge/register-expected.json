@@ -1,0 +1,695 @@
+{
+ "surfaces": {
+  "lobby": {
+   "runs": 5,
+   "total": {
+    "min": 202,
+    "max": 204
+   },
+   "stations": {
+    "en/desktop/agora (shut)": {
+     "min": 10,
+     "max": 11
+    },
+    "en/desktop/keeper (shut)": {
+     "min": 11,
+     "max": 11
+    },
+    "en/desktop/wheel (shut)": {
+     "min": 16,
+     "max": 16
+    },
+    "en/desktop/pane (shut)": {
+     "min": 14,
+     "max": 14
+    },
+    "en/mobile/agora (shut)": {
+     "min": 10,
+     "max": 10
+    },
+    "en/mobile/keeper (shut)": {
+     "min": 10,
+     "max": 10
+    },
+    "en/mobile/wheel (shut)": {
+     "min": 16,
+     "max": 16
+    },
+    "en/mobile/pane (shut)": {
+     "min": 13,
+     "max": 14
+    },
+    "de/desktop/agora (shut)": {
+     "min": 10,
+     "max": 11
+    },
+    "de/desktop/keeper (shut)": {
+     "min": 11,
+     "max": 11
+    },
+    "de/desktop/wheel (shut)": {
+     "min": 16,
+     "max": 16
+    },
+    "de/desktop/pane (shut)": {
+     "min": 14,
+     "max": 14
+    },
+    "de/mobile/agora (shut)": {
+     "min": 10,
+     "max": 10
+    },
+    "de/mobile/keeper (shut)": {
+     "min": 10,
+     "max": 10
+    },
+    "de/mobile/wheel (shut)": {
+     "min": 16,
+     "max": 16
+    },
+    "de/mobile/pane (shut)": {
+     "min": 14,
+     "max": 14
+    }
+   }
+  },
+  "wing/vinci": {
+   "runs": 5,
+   "total": {
+    "min": 6284,
+    "max": 6294
+   },
+   "stations": {
+    "en/desktop/arrival (shut)": {
+     "min": 31,
+     "max": 31
+    },
+    "en/desktop/arrival (open)": {
+     "min": 54,
+     "max": 54
+    },
+    "en/desktop/courtyard (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "en/desktop/courtyard (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "en/desktop/hall (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "en/desktop/hall (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "en/desktop/oratory (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "en/desktop/oratory (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "en/desktop/study (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "en/desktop/study (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "en/desktop/chamber (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "en/desktop/chamber (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "en/desktop/garden (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "en/desktop/garden (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "en/desktop/line-early (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "en/desktop/line-early (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "en/desktop/line-late (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "en/desktop/line-late (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "en/desktop/line-amboise (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "en/desktop/line-amboise (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "en/desktop/picture-room (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "en/desktop/picture-room (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "en/desktop/supper-wall (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "en/desktop/supper-wall (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "en/desktop/reading-table (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "en/desktop/reading-table (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "en/desktop/scattered (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "en/desktop/scattered (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "en/desktop/flight (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "en/desktop/flight (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "en/desktop/works (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "en/desktop/works (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "en/desktop/body (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "en/desktop/body (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "en/desktop/myths (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "en/desktop/myths (open)": {
+     "min": 48,
+     "max": 53
+    },
+    "en/desktop/grave (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "en/desktop/grave (open)": {
+     "min": 48,
+     "max": 48
+    },
+    "en/mobile/arrival (shut)": {
+     "min": 31,
+     "max": 31
+    },
+    "en/mobile/arrival (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "en/mobile/courtyard (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "en/mobile/courtyard (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "en/mobile/hall (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "en/mobile/hall (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "en/mobile/oratory (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "en/mobile/oratory (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "en/mobile/study (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "en/mobile/study (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "en/mobile/chamber (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "en/mobile/chamber (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "en/mobile/garden (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "en/mobile/garden (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "en/mobile/line-early (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "en/mobile/line-early (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "en/mobile/line-late (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "en/mobile/line-late (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "en/mobile/line-amboise (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "en/mobile/line-amboise (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "en/mobile/picture-room (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "en/mobile/picture-room (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "en/mobile/supper-wall (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "en/mobile/supper-wall (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "en/mobile/reading-table (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "en/mobile/reading-table (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "en/mobile/scattered (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "en/mobile/scattered (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "en/mobile/flight (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "en/mobile/flight (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "en/mobile/works (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "en/mobile/works (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "en/mobile/body (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "en/mobile/body (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "en/mobile/myths (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "en/mobile/myths (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "en/mobile/grave (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "en/mobile/grave (open)": {
+     "min": 48,
+     "max": 48
+    },
+    "de/desktop/arrival (shut)": {
+     "min": 31,
+     "max": 31
+    },
+    "de/desktop/arrival (open)": {
+     "min": 54,
+     "max": 54
+    },
+    "de/desktop/courtyard (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "de/desktop/courtyard (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "de/desktop/hall (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "de/desktop/hall (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "de/desktop/oratory (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "de/desktop/oratory (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "de/desktop/study (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "de/desktop/study (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "de/desktop/chamber (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "de/desktop/chamber (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "de/desktop/garden (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "de/desktop/garden (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "de/desktop/line-early (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "de/desktop/line-early (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "de/desktop/line-late (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "de/desktop/line-late (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "de/desktop/line-amboise (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "de/desktop/line-amboise (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "de/desktop/picture-room (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "de/desktop/picture-room (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "de/desktop/supper-wall (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "de/desktop/supper-wall (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "de/desktop/reading-table (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "de/desktop/reading-table (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "de/desktop/scattered (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "de/desktop/scattered (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "de/desktop/flight (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "de/desktop/flight (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "de/desktop/works (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "de/desktop/works (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "de/desktop/body (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "de/desktop/body (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "de/desktop/myths (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "de/desktop/myths (open)": {
+     "min": 48,
+     "max": 53
+    },
+    "de/desktop/grave (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "de/desktop/grave (open)": {
+     "min": 48,
+     "max": 48
+    },
+    "de/mobile/arrival (shut)": {
+     "min": 31,
+     "max": 31
+    },
+    "de/mobile/arrival (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "de/mobile/courtyard (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "de/mobile/courtyard (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "de/mobile/hall (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "de/mobile/hall (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "de/mobile/oratory (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "de/mobile/oratory (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "de/mobile/study (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "de/mobile/study (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "de/mobile/chamber (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "de/mobile/chamber (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "de/mobile/garden (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "de/mobile/garden (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "de/mobile/line-early (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "de/mobile/line-early (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "de/mobile/line-late (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "de/mobile/line-late (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "de/mobile/line-amboise (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "de/mobile/line-amboise (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "de/mobile/picture-room (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "de/mobile/picture-room (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "de/mobile/supper-wall (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "de/mobile/supper-wall (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "de/mobile/reading-table (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "de/mobile/reading-table (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "de/mobile/scattered (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "de/mobile/scattered (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "de/mobile/flight (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "de/mobile/flight (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "de/mobile/works (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "de/mobile/works (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "de/mobile/body (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "de/mobile/body (open)": {
+     "min": 53,
+     "max": 53
+    },
+    "de/mobile/myths (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "de/mobile/myths (open)": {
+     "min": 48,
+     "max": 53
+    },
+    "de/mobile/grave (shut)": {
+     "min": 30,
+     "max": 30
+    },
+    "de/mobile/grave (open)": {
+     "min": 48,
+     "max": 48
+    }
+   }
+  }
+ },
+ "what": "what a clean run of forge/register-check.mjs reads, per surface and per station, measured on an unchanged tree"
+}

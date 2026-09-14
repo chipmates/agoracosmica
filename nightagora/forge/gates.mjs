@@ -740,7 +740,13 @@ gate(
   register.ok === true,
   register.errors?.length
     ? register.errors.join('; ')
-    : `${register.offences?.length ?? '?'} string(s) refused of ${(register.read?.label ?? 0) + (register.read?.drawer ?? 0)} read`
+    : `${register.offences?.length ?? '?'} string(s) refused of ${(register.read?.label ?? 0) + (register.read?.drawer ?? 0)} read` +
+      // the check's own WARN, carried here because a checker's stderr is
+      // swallowed: a count under the floor is a string that stopped rendering
+      (register.count && register.count.ok === false
+        ? `; WARN count under the floor (${register.count.read} read, floor ${register.count.floor})` +
+          (register.count.short?.length ? `, short at ${register.count.short.slice(0, 4).map((x) => x.id).join(', ')}` : '')
+        : '')
 )
 
 const failed = lines.filter((l) => l.gate !== false && !l.ok).map((l) => l.name)
