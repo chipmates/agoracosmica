@@ -28,7 +28,11 @@ export const DISCLOSURES: Record<DisclosureKey, DisclosureLine> = {
     en: '"Welcome to the Night Agora. Thirty lives, each kept in the place they lived, at a real hour of a real day. Every visit begins at this fire."',
     de: '"Willkommen in der Night Agora. Dreißig Leben, jedes an dem Ort, an dem es gelebt wurde, zu einer wirklichen Stunde eines wirklichen Tages. Jeder Besuch beginnt an diesem Feuer."',
   },
-  /** the colophon on every surface an Echo appears on */
+  /** the colophon on every surface an Echo appears on. No surface of the
+      museum carries one today: the figure pane used to, and it now shows a
+      public-domain likeness with its own credit instead of an Echo. The
+      layer stays in the canon for the surface that speaks in a figure's
+      voice, and the honesty check reads the canon either way. */
   ink: {
     en: 'An AI Echo · An interpretation, not a recording',
     de: 'Ein AI Echo · Eine Interpretation, keine Aufnahme',
