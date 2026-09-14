@@ -258,9 +258,15 @@ export function metricPlanarUV(geometry: BufferGeometry, alongMember = false): v
 
 function metricCylinderUV(geometry: BufferGeometry, radius: number, height: number): void {
   const uv = geometry.getAttribute('uv'), p = geometry.getAttribute('position'), n = geometry.getAttribute('normal')
+  // A plate is not a post. Where the wall is shorter than its own radius the
+  // library's long grain runs around the circumference; mapped up a four
+  // centimetre rim instead it stretches one slice of plank into a comb.
+  const plate = height < radius
   for (let i = 0; i < uv.count; i++) {
-    if (Math.abs(n.getY(i)) > 0.5) uv.setXY(i, p.getX(i), p.getZ(i))
-    else uv.setXY(i, uv.getX(i) * TAU * radius, uv.getY(i) * height)
+    if (Math.abs(n.getY(i)) > 0.5) { uv.setXY(i, p.getX(i), p.getZ(i)); continue }
+    const around = uv.getX(i) * TAU * radius, along = uv.getY(i) * height
+    if (plate) uv.setXY(i, along, around)
+    else uv.setXY(i, around, along)
   }
 }
 

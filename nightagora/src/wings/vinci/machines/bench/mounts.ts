@@ -35,10 +35,13 @@ export function mountBoxes(slug: string): MountBox[] {
     // the neck retains at least .0075 m clearance through the full cycle.
     // The stem stays behind Z=-.031; the foot remains below Y=.006,
     // at least .048492 m beneath the lowest moving tip.
+    // A stand a visitor can see is still a stand: the plate is wider, the
+    // stem is fourteen millimetres and set back so its front face stays at
+    // Z=-.031, and the collar runs from that face to the pivot's rear face.
     return [
-      {size: [0.060, 0.006, 0.028], centre: [0, 0.003, -0.025]},
-      {size: [0.008, 0.440, 0.008], centre: [0, 0.226, -0.035]},
-      {size: [0.008, 0.008, 0.0175], centre: [0, 0.450, -0.02625]},
+      {size: [0.110, 0.006, 0.060], centre: [0, 0.003, -0.030]},
+      {size: [0.014, 0.440, 0.014], centre: [0, 0.226, -0.038]},
+      {size: [0.012, 0.012, 0.0135], centre: [0, 0.450, -0.02425]},
     ]
   }
   return []

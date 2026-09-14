@@ -2,9 +2,10 @@ import {
   Color, DoubleSide, FrontSide, Group, InstancedMesh, Matrix4, Mesh, MeshPhysicalNodeMaterial, MeshStandardNodeMaterial,
   type BufferGeometry,
 } from 'three/webgpu'
-import { float, normalGeometry, uv, vec2, vec3 } from 'three/tsl'
+import { float, normalGeometry, normalMap, positionGeometry, uv, vec2, vec3 } from 'three/tsl'
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js'
 import type { MaterialSet, Stack } from '../../../stack'
+import type { DetailNodes } from '../../../stack/detail'
 import { createGlassSeatMaterial } from './glass-seat'
 import { createFlywheelSpokeArms } from './flywheel-overlap'
 import { createMutableSweep, geometryForPart, type MutableSweep } from './geometry'
@@ -12,6 +13,37 @@ import type { Assembly, Dossier, PartSpec } from './types'
 export type { Assembly } from './types'
 
 type Surface = MeshStandardNodeMaterial | MeshPhysicalNodeMaterial
+/** A turned ball has no pole, so its material cannot have one either. The
+ * library is read through three local projections blended by the surface
+ * normal: nothing converges, and the grain turns with the part. The three
+ * procedural scales and the density gradient stay in world space, so the
+ * fade the helper measures is still the real distance to the eye. */
+function turnedDetail(
+  stack: Stack, material: Surface, set: MaterialSet,
+  opts: {count: 1 | 2 | 3; maps: number; fade: [number, number]},
+): DetailNodes {
+  const p = positionGeometry
+  const raw = normalGeometry.abs().pow(4)
+  const weight = raw.div(raw.x.add(raw.y).add(raw.z).add(.0001))
+  // The three reads go through the stack's own helper, so a surface built
+  // without a renderer is dressed by exactly the same code path.
+  const faces = [vec2(p.z, p.y), vec2(p.x, p.z), vec2(p.x, p.y)]
+    .map(projection => stack.detail({} as unknown as Surface, set, {...opts, uv: projection}))
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const blend = (pick: (nodes: DetailNodes) => any): any => pick(faces[0]!).mul(weight.x)
+    .add(pick(faces[1]!).mul(weight.y)).add(pick(faces[2]!).mul(weight.z))
+  const nodes: DetailNodes = {
+    albedo: blend(n => n.albedo), normal: blend(n => n.normal),
+    roughness: blend(n => n.roughness), occlusion: blend(n => n.occlusion),
+    density: faces[1]!.density,
+  }
+  const base = material.colorNode === undefined || material.colorNode === null
+    ? vec3(set.albedo.r, set.albedo.g, set.albedo.b) : material.colorNode
+  material.colorNode = base.mul(nodes.albedo).mul(nodes.occlusion)
+  material.roughnessNode = nodes.roughness
+  material.normalNode = normalMap(nodes.normal.mul(.5).add(.5), vec2(1, 1))
+  return nodes
+}
 const materialLoads = new WeakMap<Stack, Map<string, Promise<MaterialSet>>>()
 const materialQueues = new WeakMap<Stack, Promise<void>>()
 
@@ -112,7 +144,7 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Assemb
   const sectionParts = new Set(dossier.slug === 'camera-obscura' ? ['roof', 'right-wall'] : [])
   const names = [...new Set(dossier.parts.map(p => p.material.class))]
   const surfaceCache = new Map<string, Promise<Surface>>()
-  const makeSurface = async (name: string, quietBank = false, quietWood = false): Promise<Surface> => {
+  const makeSurface = async (name: string, quietBank = false, quietWood = false, turned = false): Promise<Surface> => {
     const set = await loadMachineMaterial(stack, libraryName(name))
     const glass = /glass/.test(name), water = /water/.test(name)
     const material: Surface = glass || water
@@ -138,17 +170,39 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Assemb
       scales: [0.5, 0.025, 0.0009],
       detail: {macro: 0.5, macroContrast: 0.08, mid: 0.025, micro: 0.06},
     } : /linen/.test(name) && !/thread/.test(name) ? {
+      // The shaded face of a canopy is lit by the room, not by the sun, so
+      // its folds have to be in the albedo as well as in the normal or the
+      // whole face goes to one value.
       ...set, normalStrength: .3,
-      grain: set.grain ? {...set.grain, pitch: .16, relief: .28, shade: .24, sheen: .025, fold: .8, tooth: .008} : null,
+      grain: set.grain ? {...set.grain, pitch: .16, relief: .28, shade: .36, sheen: .025, fold: .9, tooth: .008} : null,
     } : quietBank || quietWood ? {
       ...set, normalStrength: quietBank ? .18 : .12,
       grain: set.grain ? {...set.grain, relief: .08, shade: .12, sheen: .04} : null,
+    } : dossier.slug === 'proportional-compass' && /iron/.test(name) ? {
+      // A mirror takes no invented relief, and the helper is right to refuse
+      // it: but this object IS its two legs, and forged iron is hammered.
+      // The dressing set declares a scattering surface so the pits reach the
+      // normal; the material itself stays the metal it is.
+      ...set, metalness: .38, roughness: .5, normalStrength: .24,
+      scales: [.3, .06, .0016],
+      detail: {...set.detail, macro: .25, macroContrast: .07, mid: .75, micro: .3},
     } : dossier.slug === 'flywheel' && set.name === 'limestone-pale' ? {
-      ...set, scale: [.15, .15], scales: [.15, .018, .0014], normalStrength: .28,
-      detail: {...set.detail, macro: .65, macroContrast: .35, mid: .25, micro: .3},
+      // A 140 mm ball inside a 150 mm macro cell takes one value and reads as
+      // putty. The bands are cut to the ball: mottle across it, pits on it.
+      ...set, scale: [.15, .15], scales: [.085, .016, .0011], normalStrength: .26,
+      detail: {...set.detail, macro: .9, macroContrast: .62, mid: .5, micro: .3},
+    } : /leather/.test(name) ? {
+      // A hide wound round a shaft creases along the wrap; without that band
+      // the coil is a smooth tube and reads as hose.
+      ...set, normalStrength: .55, scales: [.4, .03, .0011],
+      grain: set.grain ? {...set.grain, pitch: .085, relief: .5, shade: .3, sheen: .06} : null,
     } : set
     // Density falloff stays active on every scale, including the calm tier.
-    const detail = stack.detail(material, detailSet, {uv: detailUV, count: 3, maps: glass ? 0 : quietWood ? .85 : 1, fade: (/linen/.test(name) && !/thread/.test(name)) || /iron/.test(name) || set.name === 'oak-beams' ? [12, 100] : [6, 35]})
+    const fade: [number, number] = (/linen/.test(name) && !/thread/.test(name)) || /iron/.test(name) || set.name === 'oak-beams' ? [12, 100] : [6, 35]
+    const mapAmount = glass ? 0 : quietWood ? .85 : 1
+    const detail = turned
+      ? turnedDetail(stack, material, detailSet, {count: 3, maps: mapAmount, fade})
+      : stack.detail(material, detailSet, {uv: detailUV, count: 3, maps: mapAmount, fade})
     if (quietBank || quietWood) {
       const oak = new Color(quietBank ? '#86755f' : '#847967')
       const fibres = detail.albedo.dot(vec3(.2126, .7152, .0722))
@@ -183,17 +237,63 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Assemb
       }
     }
     if (dossier.slug !== 'proportional-compass' && /iron/.test(name)) {
-      const iron = new Color('#91999b')
+      // A strap, a collar, a pin: every one of these is a small dark body
+      // beside a large pale one, and a mirror under a constant ambient takes
+      // no modelling at all, so it flattens into the timber behind it. Part
+      // of the diffuse term back, and the key rounds the fitting again.
+      material.metalness = .45
+      const iron = new Color('#787e80')
       const grain = detail.albedo.dot(vec3(.2126, .7152, .0722))
       const caps = dossier.slug === 'multi-barrel-gun' ? normalGeometry.y.abs().mul(.14).add(.86) : float(1)
-      material.colorNode = vec3(iron.r, iron.g, iron.b).mul(grain.mul(.55).add(.27)).mul(detail.occlusion).mul(caps)
-      material.roughnessNode = detail.roughness.mul(.78).clamp(.4, .72)
+      material.colorNode = vec3(iron.r, iron.g, iron.b).mul(grain.mul(.6).add(.34)).mul(detail.occlusion).mul(caps)
+      material.roughnessNode = detail.roughness.mul(.8).clamp(.38, .7)
+    }
+    // Thirty-three round bodies side by side separate only if the key can
+    // model them, and a mirror under a constant ambient takes no modelling.
+    if (dossier.slug === 'multi-barrel-gun' && /iron/.test(name)) {
+      material.metalness = .42
+      const barrel = new Color('#5d6265')
+      const grain = detail.albedo.dot(vec3(.2126, .7152, .0722))
+      const caps = normalGeometry.y.abs().mul(.14).add(.86)
+      material.colorNode = vec3(barrel.r, barrel.g, barrel.b).mul(grain.mul(.6).add(.45)).mul(detail.occlusion).mul(caps)
+      material.roughnessNode = detail.roughness.mul(.85).clamp(.38, .68)
+    }
+    // The one subject of this station is a hole. An aperture plate lighter
+    // than the plank it is set into reads as a patch laid on the wall.
+    if (dossier.slug === 'camera-obscura' && /iron/.test(name)) {
+      const plate = new Color('#43474a')
+      const grain = detail.albedo.dot(vec3(.2126, .7152, .0722))
+      material.metalness = .5
+      material.colorNode = vec3(plate.r, plate.g, plate.b).mul(grain.mul(.5).add(.5)).mul(detail.occlusion)
+      material.roughnessNode = detail.roughness.clamp(.44, .74)
     }
     if (dossier.slug === 'proportional-compass' && /iron/.test(name)) {
-      const ironTint = new Color('#a3a6a1')
+      // Forged, not cast and polished: a darker specular tint and a rougher
+      // finish so the legs hold the light instead of matching the floor.
+      // A polished mirror under a constant ambient reads as concrete: with no
+      // reflection to carry it, a metal's whole surface is what it reflects.
+      // Wrought iron that has been forged, worked and oxidised scatters, so
+      // this one is given back part of its diffuse term and the key models it.
+      material.metalness = .38
+      const ironTint = new Color('#3e434a')
       const density = detail.albedo.dot(vec3(.2126, .7152, .0722))
-      material.colorNode = vec3(ironTint.r, ironTint.g, ironTint.b).mul(density.mul(.5).add(.32)).mul(detail.occlusion)
-      material.roughnessNode = detail.roughness.mul(.7).clamp(.38, .68)
+      material.colorNode = vec3(ironTint.r, ironTint.g, ironTint.b).mul(density.mul(.5).add(.5)).mul(detail.occlusion)
+      material.roughnessNode = detail.roughness.mul(.85).clamp(.36, .66)
+    }
+    if (set.name === 'limestone-pale') {
+      // Stone was the first thing the eye found on these frames: four bright
+      // balls on the flywheel, a pale counterweight on the crane. Stone sits
+      // under the oak beside it, not above it.
+      const stone = new Color('#7c7669')
+      const body = detail.albedo.dot(vec3(.2126, .7152, .0722))
+      material.colorNode = vec3(stone.r, stone.g, stone.b).mul(body.mul(.95).add(.12)).mul(detail.occlusion)
+      material.roughnessNode = detail.roughness.clamp(.62, .95)
+    }
+    if (/leather/.test(name)) {
+      const hide = new Color('#5c4331')
+      const fibres = detail.albedo.dot(vec3(.2126, .7152, .0722))
+      material.colorNode = vec3(hide.r, hide.g, hide.b).mul(fibres.mul(.8).add(.3)).mul(detail.occlusion)
+      material.roughnessNode = detail.roughness.clamp(.58, .92)
     }
     if (/ink/.test(name)) material.colorNode = vec3(0.009, 0.007, 0.005).mul(detail.albedo)
     if (/paper/.test(name)) material.colorNode = vec3(0.69, 0.65, 0.55).mul(detail.albedo)
@@ -255,6 +355,14 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Assemb
       let dressed = materials.get('quiet-rounded-wood')
       if (!dressed) { dressed = await makeSurface(part.material.class, false, true); materials.set('quiet-rounded-wood', dressed) }
       material = dressed
+    }
+    // A ball is turned, never planked: it takes the pole-free projection
+    // whatever its class, and an oak one keeps the quieter rounded finish.
+    if ((typeof part.shape === 'string' ? part.shape : part.shape.type) === 'sphere') {
+      const key = `turned:${part.material.class}`
+      let ball = materials.get(key)
+      if (!ball) { ball = await makeSurface(part.material.class, false, roundedWood, true); materials.set(key, ball) }
+      material = ball
     }
     if (dossier.slug === 'inclinometer' && part.id === 'deck') {
       material = createGlassSeatMaterial(material)

@@ -27,6 +27,8 @@ document.head.append(sheet);
 export interface BenchOptions {
   slug?: string;
   t?: number;
+  /** frame the working end alone, for a state that proves a fitting reads */
+  close?: boolean;
   lang?: Language;
   section?: boolean;
   evidence?: string;
@@ -173,6 +175,7 @@ export function createBench(stack: Stack, onExit: () => void) {
   host.append(header, dock, footer, source, loading);
   const metrics = createBenchMetrics(stack, host);
   let metricsTier = metrics ? stack.tierName() : null;
+  let closeUp = false;
   let active = false, serial = 0, slug: MachineSlug = 'aerial-screw', lang: Language = controlLanguage(location.search), machine: ReadyMachineBuild | null = null, key: KeyLight | null = null, ready = false, lastWall = performance.now(), folioEntry: ManifestEntry | undefined, evidenceRecord: EvidenceRecord | null = null, sectionEnabled = false, lastPlaybackPaint = 0;
   let schedule = playbackSchedule(machineCatalog[slug].dossier);
   let playbackState = initialPlayback(schedule, { fixed: true });
@@ -296,24 +299,40 @@ export function createBench(stack: Stack, onExit: () => void) {
   function displayBounds(){
     return slug==='revolving-crane' ? new Box3(new Vector3(-1,-.05,-1),new Vector3(1,2.705,1.75)) : machine!.bounds;
   }
+  /** The working end of the machine: the part of the object where its
+   * fittings are, framed alone so a 9 mm boss is not a 9 px boss. The pair
+   * is (height from the top as a fraction of the object, box as a fraction
+   * of its span); each one is where that machine's own fitting sits. */
+  const FOCUS: Partial<Record<MachineSlug, [number, number]>> = {
+    'proportional-compass': [.24, .34], 'camera-obscura': [.5, .3],
+    'ball-bearing': [.42, .62], 'revolving-crane': [.52, .3], 'lathe': [.33, .34],
+  };
+  function focusBounds() {
+    const full = displayBounds(), size = full.getSize(new Vector3()), centre = full.getCenter(new Vector3());
+    const [drop, part] = FOCUS[slug] ?? [.24, .34];
+    const span = Math.max(size.x, size.y, size.z) * part;
+    const middle = new Vector3(centre.x, full.max.y - size.y * drop, centre.z);
+    const half = new Vector3(span / 2, span / 2, span / 2);
+    return new Box3(middle.clone().sub(half), middle.clone().add(half));
+  }
   function compose() {
     if (!machine)
       return;
-    const box = displayBounds(), size = box.getSize(new Vector3()), centre = box.getCenter(new Vector3()), span = Math.max(size.x, size.y, size.z), mobile = innerWidth <= 1280;
+    const box = closeUp ? focusBounds() : displayBounds(), size = box.getSize(new Vector3()), centre = box.getCenter(new Vector3()), span = Math.max(size.x, size.y, size.z), mobile = innerWidth <= 1280;
     const direction = new Vector3(1.05, .68, 1.6).normalize();
     if (slug === 'camera-obscura')
-      direction.set(sectionEnabled ? 1.5 : .75, sectionEnabled ? .8 : .58, sectionEnabled ? -.35 : -1.7).normalize();
+      direction.set(sectionEnabled ? 1.5 : 1.25, sectionEnabled ? .8 : .5, sectionEnabled ? -.35 : -1.6).normalize();
     if (slug === 'aerial-screw') direction.set(-1.6,.4,.7).normalize();
     if (slug === 'flywheel') direction.set(.8,1.2,1.7).normalize();
-    if (slug === 'ball-bearing') direction.set(.8,.28,1.7).normalize();
+    if (slug === 'ball-bearing') direction.set(.82,.62,1.66).normalize();
     if (slug === 'rolling-mill') direction.set(-1.5,.75,1.5).normalize();
     if (slug === 'lathe') direction.set(.65,.42,1.9).normalize();
     if (slug === 'parachute') direction.set(1.05,.27,1.6).normalize();
     if (slug === 'revolving-crane') direction.set(2.6,.85,.8).normalize();
     if (slug === 'water-lifting-screw') direction.set(-2.3,1.1,-.3).normalize();
-    if (slug === 'proportional-compass') direction.set(-.24,.22,2).normalize();
+    if (slug === 'proportional-compass') direction.set(1.2,.3,1.75).normalize();
     const right = new Vector3().crossVectors(new Vector3(0, 1, 0), direction).normalize(), up = new Vector3().crossVectors(direction, right).normalize();
-    const tanY = Math.tan(17 * Math.PI / 180), tanX = tanY * innerWidth / innerHeight, width = mobile ? .84 : .65, height = slug === 'proportional-compass' ? (mobile ? .28 : .82) : (mobile ? .285 : .72);
+    const tanY = Math.tan(17 * Math.PI / 180), tanX = tanY * innerWidth / innerHeight, width = mobile ? .84 : .7, height = slug === 'proportional-compass' ? (mobile ? .35 : 1) : (mobile ? .31 : .8);
     let distance = span;
     for (const x of [box.min.x, box.max.x])
       for (const y of [box.min.y, box.max.y])
@@ -329,8 +348,11 @@ export function createBench(stack: Stack, onExit: () => void) {
     camera.lookAt(centre);
     camera.setViewOffset(innerWidth, innerHeight, mobile ? 0 : innerWidth * .12, mobile ? innerHeight * .295 : slug === 'proportional-compass' ? innerHeight * .035 : 0, innerWidth, innerHeight);
     camera.updateProjectionMatrix();
-    scene.fog=new Fog('#1a2026',distance+span*2,distance+span*12);
-    scene.fogNode = fog(backdrop, rangeFogFactor(float(distance+span*2), float(distance+span*12)));
+    // The far cascade is a box around the origin, so the floor beyond it took
+    // no shadow at all and stood there as a hard edged dark quad. The air
+    // now closes inside that box, and the ground hands itself to the air.
+    scene.fog=new Fog('#1a2026',distance+span*.5,distance+span*1.9);
+    scene.fogNode = fog(backdrop, rangeFogFactor(float(distance+span*.5), float(distance+span*1.9)));
   }
   async function supports(mine: number) {
     if (!machine) return;
@@ -343,7 +365,16 @@ export function createBench(stack: Stack, onExit: () => void) {
     groundMat.colorNode = vec3(stone.albedo.r * .025, stone.albedo.g * .025, stone.albedo.b * .025);
     const groundDetail = stack.detail(groundMat, stone, { count: 3, mid: .06, maps: .4, macro: .4 });
     groundMat.roughnessNode = groundDetail.roughness.max(.94);
-    const supportMat = iron.material({ count: 3, uv: uv() });
+    // The platform is read from twice as far away on the phone as on the
+    // wide frame, so its coarsest band is the one that has to survive: a
+    // metre-scale variation the minified maps cannot average away.
+    const supportMat = iron.material({
+      count: 3, uv: uv(), scales: [.9, .16, .004], macro: .5, mid: .95, micro: .7,
+      fade: [26, 150],
+    });
+    // The parachute's harness ring is a dark iron loop hanging over the deck.
+    // At the deck's inherited value the two were the same colour.
+    if (slug === 'parachute') supportMat.colorNode = supportMat.colorNode!.mul(1.45);
     if (slug === 'multi-barrel-gun') {
       // GENERATED indirect-contact approximation of the two exact wheel
       // cylinders. Shared GTAO is off; the existing key shadow remains.
@@ -370,7 +401,7 @@ export function createBench(stack: Stack, onExit: () => void) {
   function lightBench() {
     const scale = machineCatalog[slug].dossier.scale_m, span = Math.max(scale.x, scale.y, scale.z);
     key?.dispose();
-    key = stack.light({ azimuth: BENCH_SUN_AZIMUTH_DEGREES, elevation: BENCH_SUN_ELEVATION_DEGREES, kelvin: 4800, lux: 185, ambient: .72, reach: Math.max(24, span * 6), cascades: [span * 1.25, span * 2.5], sky: { zenith: '#707579', horizon: '#b1a895', ground: '#343532', stars: 0 } });
+    key = stack.light({ azimuth: BENCH_SUN_AZIMUTH_DEGREES, elevation: BENCH_SUN_ELEVATION_DEGREES, kelvin: 4800, lux: 185, ambient: .72, reach: Math.max(24, span * 6), cascades: [span * 1.25, span * 3.4], sky: { zenith: '#707579', horizon: '#b1a895', ground: '#343532', stars: 0 } });
     key.light.shadow.normalBias = span * .0002;
     key.light.shadow.bias = -span * .00001;
   }
@@ -379,7 +410,7 @@ export function createBench(stack: Stack, onExit: () => void) {
     const requestedEvidence = opts.evidence === undefined ? null : opts.evidence === requested ? machineCatalog[requested] : partialCatalog.find(record => record.slug === opts.evidence);
     if (opts.evidence !== undefined && !requestedEvidence) throw new Error(`No evidence record for ${requested}: ${opts.evidence}`);
     evidence.close(false);
-    const mine = ++serial; active = true; host.hidden = false; ready = false; loading.hidden = false; clearDisplay(); folioEntry = undefined; folio.replaceChildren(); slug = requested; evidenceRecord = machineCatalog[slug]; lang = controlLanguage(location.search, opts.lang); schedule = playbackSchedule(machineCatalog[slug].dossier); playbackState = initialPlayback(schedule, { t: opts.t, fixed: document.body.classList.contains('forge'), reducedMotion: reduced.matches }); lastWall = performance.now(); stamp(); stack.setScene(scene, camera, { ...IDENTITY, name: 'vinci-machine-bench', exposure: .95, grain: .004, ao: { intensity: 1, distance: Math.max(...Object.values(machineCatalog[slug].dossier.scale_m).filter((v): v is number => typeof v === 'number')) * .025, thickness: 1 } }); lightBench(); machine = buildMachine(slug, stack); sectionEnabled = slug === 'camera-obscura' && (opts.section ?? false); machine.section(sectionEnabled); display.add(machine.object); compose(); paint(); await Promise.all([machine.ready, supports(mine), plateFor(mine)]); if (mine !== serial)
+    const mine = ++serial; active = true; host.hidden = false; ready = false; loading.hidden = false; clearDisplay(); folioEntry = undefined; folio.replaceChildren(); slug = requested; evidenceRecord = machineCatalog[slug]; lang = controlLanguage(location.search, opts.lang); schedule = playbackSchedule(machineCatalog[slug].dossier); playbackState = initialPlayback(schedule, { t: opts.t, fixed: document.body.classList.contains('forge'), reducedMotion: reduced.matches }); lastWall = performance.now(); stamp(); stack.setScene(scene, camera, { ...IDENTITY, name: 'vinci-machine-bench', exposure: .95, grain: .004, ao: { intensity: 1, distance: Math.max(...Object.values(machineCatalog[slug].dossier.scale_m).filter((v): v is number => typeof v === 'number')) * .025, thickness: 1 } }); lightBench(); machine = buildMachine(slug, stack); closeUp = opts.close ?? false; sectionEnabled = slug === 'camera-obscura' && (opts.section ?? false); machine.section(sectionEnabled); display.add(machine.object); compose(); paint(); await Promise.all([machine.ready, supports(mine), plateFor(mine)]); if (mine !== serial)
     return; machine.animate(playbackState.clock, 0);
     if(key){
       const towardKey=vec3(key.direction.x,key.direction.y,key.direction.z).mul(.03);

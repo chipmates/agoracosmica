@@ -76,3 +76,7 @@ body[data-phase="bench"] #veil,body[data-phase="bench"] #rail,body[data-phase="b
 .bench-header .bench-kicker{display:block;font:9.5px/1.4 Arial,sans-serif;letter-spacing:.2em;text-transform:uppercase;color:#9c9787;margin:0}
 @media(max-width:1280px){.bench-mark{gap:3px}.bench-header .bench-kicker{display:block;font-size:7.5px;letter-spacing:.14em}}
 @media(max-width:1280px){.bench-kicker-wing{display:none}}
+
+/* Window 6: the phone's reading column already closes on the evidence rule.
+   A second line thirty pixels lower drew a band with nothing in it. */
+@media(max-width:1280px){.bench-footer{border-top:0}}
