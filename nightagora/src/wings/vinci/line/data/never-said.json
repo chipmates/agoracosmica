@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "provenance": {
+    "scope": "The words of the dissolved corrections room, in the places their stories belong. The life view reads the quotes, the machine court reads the plaque, the grave reads the painting's label.",
+    "source": "The wing's inscription catalogue and the myth section of the life drawer. Every origin here is a tracing result and says so.",
+    "prepared": "2026-09-14",
+    "language": "The sentences circulate in English and stand in English on any surface that shows them. The German is the museum's own and is marked where it translates a quotation."
+  },
+  "quotes": [
+    {
+      "id": "simplicity",
+      "quote": "Simplicity is the ultimate sophistication.",
+      "card_en": "No page of his carries this sentence. The closest earlier wording stands in an American book of 1931, and the attribution to him turns up only around the year 2000.",
+      "card_de": "Kein Blatt von ihm trägt diesen Satz. Der nächste frühere Wortlaut steht in einem amerikanischen Buch von 1931, und die Zuschreibung an ihn taucht erst um das Jahr 2000 auf.",
+      "who_en": "An American writer, Clare Boothe Luce, wrote the closest earlier wording. Who first put the sentence in his mouth is not known.",
+      "who_de": "Die amerikanische Autorin Clare Boothe Luce schrieb den nächsten früheren Wortlaut. Wer den Satz zuerst ihm zuschrieb, ist nicht bekannt.",
+      "where_en": "Stuffed Shirts, a book of 1931.",
+      "where_de": "Stuffed Shirts, ein Buch von 1931.",
+      "when": "1931 for the parallel, about 2000 for the attribution",
+      "certainty": "conjectural"
+    },
+    {
+      "id": "art-abandoned",
+      "quote": "Art is never finished, only abandoned.",
+      "card_en": "Nobody has found this in his hand, and nobody has found who wrote it. The sentence travels as his and its trail runs out before any page.",
+      "card_de": "Niemand hat diesen Satz in seiner Hand gefunden, und niemand hat gefunden, wer ihn schrieb. Er wandert als der seine, und seine Spur endet vor jedem Blatt.",
+      "who_en": "Not known.",
+      "who_de": "Nicht bekannt.",
+      "where_en": "No manuscript source identified.",
+      "where_de": "Keine handschriftliche Quelle nachgewiesen.",
+      "when": "Not known",
+      "certainty": "unknown"
+    },
+    {
+      "id": "learning",
+      "quote": "Learning never exhausts the mind.",
+      "card_en": "This exact sentence is untraced. He did write something near it: any knowledge gained is of use to the mind, because it can drive out the useless and keep the good.",
+      "card_de": "Dieser Satz ist in dieser Form nicht nachweisbar. Etwas in seiner Nähe hat er geschrieben: jedes erworbene Wissen nützt dem Verstand, denn es kann das Unnütze austreiben und das Gute behalten.",
+      "who_en": "Not known for this wording. A related passage of his own is printed as number 1172 in Richter's edition of the notebooks.",
+      "who_de": "Für diesen Wortlaut nicht bekannt. Eine verwandte eigene Stelle steht als Nummer 1172 in Richters Ausgabe der Notizbücher.",
+      "where_en": "Richter's printed notebooks, for the related passage only.",
+      "where_de": "Richters gedruckte Notizbücher, nur für die verwandte Stelle.",
+      "when": "Not known",
+      "certainty": "unknown"
+    },
+    {
+      "id": "water",
+      "quote": "Water is the driving force of all nature.",
+      "card_en": "A search of the printed notebooks found no source for this sentence. That is a limit of the search, not a date or an author for the phrase.",
+      "card_de": "Eine Suche in den gedruckten Notizbüchern fand keine Quelle für diesen Satz. Das ist eine Grenze der Suche, kein Datum und kein Urheber für die Formel.",
+      "who_en": "Not known.",
+      "who_de": "Nicht bekannt.",
+      "where_en": "No source found in the printed notebooks.",
+      "where_de": "Keine Quelle in den gedruckten Notizbüchern gefunden.",
+      "when": "Not known",
+      "certainty": "unknown"
+    }
+  ],
+  "court_plaque": {
+    "id": "flight-quote",
+    "station": "flight",
+    "title_en": "The most quoted line he never wrote",
+    "title_de": "Die meistzitierte Zeile, die er nie schrieb",
+    "quote": "Once you have tasted flight, you will forever walk the earth with your eyes turned skyward, for there you have been, and there you will always long to return.",
+    "line_en": "Written for a film about him in 1965, by its screenwriter, and still drifting from telling to telling.",
+    "line_de": "Geschrieben 1965 für einen Film über ihn, von dessen Drehbuchautor, und noch immer von Fassung zu Fassung verändert.",
+    "where_en": "The script of the 1965 film I, Leonardo da Vinci.",
+    "where_de": "Das Drehbuch des Films I, Leonardo da Vinci von 1965.",
+    "when": "1965",
+    "certainty": "documented",
+    "language_note_de": "Der Wortlaut steht englisch, so wie er umläuft."
+  },
+  "deathbed_label": {
+    "id": "deathbed-painting",
+    "station": "grave",
+    "title_en": "The king at the bedside",
+    "title_de": "Der König am Sterbebett",
+    "label_en": "A French painter imagined this scene in 1818, three hundred years after the death it shows. Vasari told the story in 1568, fifty years after it, and gave his age as seventy-five when he was sixty-seven. The letter that announced the death says nothing about the king being there.",
+    "label_de": "Ein französischer Maler stellte sich diese Szene 1818 vor, dreihundert Jahre nach dem Tod, den sie zeigt. Vasari erzählte die Geschichte 1568, fünfzig Jahre danach, und nannte sein Alter mit fünfundsiebzig, dabei war er siebenundsechzig. Der Brief, der den Tod ankündigte, sagt nichts davon, dass der König dabei war.",
+    "record_en": "Not disproved and supported by no record. A royal act was issued at Saint-Germain-en-Laye on 3 May 1519, the day after the death, and a chancellor could sign in the king's absence, so the act alone settles nothing. A painter had already made the scene a subject in 1781.",
+    "record_de": "Nicht widerlegt und durch keine Quelle gestützt. Am 3. Mai 1519, dem Tag nach dem Tod, wurde in Saint-Germain-en-Laye eine königliche Urkunde ausgestellt, und ein Kanzler konnte in Abwesenheit des Königs unterschreiben, die Urkunde allein entscheidet also nichts. Ein Maler hatte die Szene schon 1781 zum Thema gemacht.",
+    "last_words_en": "The last words quoted as his are a modern paraphrase of Vasari's story. No spoken words of his last day are established.",
+    "last_words_de": "Die als seine letzten Worte zitierten Sätze sind eine moderne Umschreibung der Erzählung Vasaris. Kein gesprochenes Wort seines letzten Tages ist belegt.",
+    "certainty": "conjectural"
+  }
+}
