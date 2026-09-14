@@ -53,7 +53,13 @@ def along_curve(build, points, *, radius=0.019, strands=3, lay=0.24, sides=5, ma
     lengths = [0.0]
     for i in range(1, len(points)):
         lengths.append(lengths[-1] + (points[i] - points[i - 1]).length)
-    core = radius * (1 - 1.0 / (1 + strands * 0.55))
+    # THE STRANDS HAVE TO TOUCH. Three circles round an axis touch their
+    # neighbours when the strand radius is the core radius times the sine of
+    # half their angle apart; anything smaller leaves three grooves running
+    # the length of the rope, and a groove that deep takes no light at all.
+    # That is why a rope built this way reads as a chain and renders black.
+    share = math.sin(math.pi / max(2, strands))
+    core = radius / (1 + share)
     strand = radius - core
     laid = 0
     for s in range(strands):

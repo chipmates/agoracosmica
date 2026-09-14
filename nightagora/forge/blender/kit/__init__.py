@@ -26,8 +26,9 @@ Three laws the kit keeps, and the build script cannot break:
   museum's own key light models the brick.
 """
 
-from .mesh import Build, Frame, WORLD, join, select
-from . import bake, bond, iron, materials, paths, rope, stone, tiles, timber
+from .mesh import Build, Frame, WORLD, join, select, weld
+from . import bake, bond, dossier, iron, machine, materials, paths, rope, stone, tiles, timber
 
-__all__ = ['Build', 'Frame', 'WORLD', 'join', 'select',
-           'bake', 'bond', 'iron', 'materials', 'paths', 'rope', 'stone', 'tiles', 'timber']
+__all__ = ['Build', 'Frame', 'WORLD', 'join', 'select', 'weld',
+           'bake', 'bond', 'dossier', 'iron', 'machine', 'materials', 'paths', 'rope',
+           'stone', 'tiles', 'timber']

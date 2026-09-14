@@ -80,7 +80,22 @@ def atlas_uv(obj, *, angle=89.0, margin=0.0004, priority=None):
     the sheet. It maps a material index to how much texel density that
     material is worth, and it is applied per face, so it is for the flat
     pieces (a bed, a floor, the back of a nesting cell) and not for anything
-    whose island has a skirt on it."""
+    whose island has a skirt on it.
+
+    THE ATLAS GETS ITS OWN LAYER. A smart project writes into the ACTIVE uv
+    map, so unwrapping straight onto the body left the library's metre scale
+    layer overwritten and every material in the bake sampling its plate
+    through the atlas packing: a flat face then takes a random stretched
+    patch of the photograph instead of a metre of wood grain, and the albedo
+    comes out as a colour field. Measured on this machine's own frames."""
+    layers = obj.data.uv_layers
+    old = layers.get('AtlasUV')
+    if old:
+        layers.remove(old)
+    atlas = layers.new(name='AtlasUV')
+    layers.active = atlas
+    for other in layers:
+        other.active_render = other is atlas
     select([obj])
     bpy.ops.object.mode_set(mode='EDIT')
     bpy.ops.mesh.select_all(action='SELECT')
@@ -111,7 +126,6 @@ def atlas_uv(obj, *, angle=89.0, margin=0.0004, priority=None):
     bpy.ops.uv.pack_islands(margin=margin, margin_method='ADD', rotate=True, scale=True,
                             shape_method='AABB')
     bpy.ops.object.mode_set(mode='OBJECT')
-    obj.data.uv_layers.active.name = 'AtlasUV'
     obj.data.uv_layers['AtlasUV'].active_render = True
     log('atlas uv', obj.name, len(obj.data.polygons), 'faces', f'{texel_density(obj):.0f} texels/m at 4k')
     return obj
@@ -282,7 +296,13 @@ def _write_tiers(pixels, folder, name, sizes, colour):
 
 def atlases(parts, *, folder, sizes=(4096, 2048, 1024), samples=96, wear=0.10,
             bevel=0.005, cage=0.012, ray=0.05):
-    """every pass, for every part, at every size. Returns what was written."""
+    """every pass, for every part, at every size. Returns what was written.
+
+    `sizes` is one list for the whole object, or one list PER PART. An atlas
+    is a budget and the parts of a machine are not worth the same sheet: the
+    body a visitor stands in front of earns four thousand pixels, a sheave the
+    size of a hand earns a quarter of that, and the difference is most of what
+    keeps a phone inside its texture budget."""
     import numpy as np
     scene = bpy.context.scene
     gpu(samples)
@@ -292,7 +312,8 @@ def atlases(parts, *, folder, sizes=(4096, 2048, 1024), samples=96, wear=0.10,
         began = time.time()
         maps = {}
         high = high_poly(obj, bevel=bevel)
-        size = max(sizes)
+        mine = sizes.get(name, (4096, 2048, 1024)) if isinstance(sizes, dict) else sizes
+        size = max(mine)
         bake = scene.render.bake
 
         def run(kind, pass_type, from_high=False, spp=None, prepare=None):
@@ -363,11 +384,11 @@ def atlases(parts, *, folder, sizes=(4096, 2048, 1024), samples=96, wear=0.10,
         packed[:, 1] = roughness
         packed[:, 2] = _read(metal)[:, 0]
 
-        maps['albedo'] = _write_tiers(colour, folder, f'{name}-albedo.png', sizes, True)
-        maps['normal'] = _write_tiers(_read(normal), folder, f'{name}-normal.png', sizes, False)
-        maps['orm'] = _write_tiers(packed, folder, f'{name}-orm.png', sizes, False)
+        maps['albedo'] = _write_tiers(colour, folder, f'{name}-albedo.png', mine, True)
+        maps['normal'] = _write_tiers(_read(normal), folder, f'{name}-normal.png', mine, False)
+        maps['orm'] = _write_tiers(packed, folder, f'{name}-orm.png', mine, False)
         maps['curvature'] = _write_tiers(_read(curvature), folder, f'{name}-curvature.png',
-                                         [min(sizes)], False)
+                                         [min(mine)], False)
         for image in (albedo, normal, rough, occlusion, metal, curvature):
             bpy.data.images.remove(image)
         bpy.data.objects.remove(high, do_unlink=True)
@@ -418,21 +439,32 @@ def atlas_material(name, folder, size, *, part):
     return material
 
 
-def export(parts, *, folder, out, name, size, extras=None):
+def export(parts, *, folder, out, name, size, extras=None, nodes=None):
     """one glb of the whole object at one atlas size.
 
     Everything the bake does not ship is stripped here: the library's metre
     scale uv, the shade attribute the atlas already holds, and every material
     the object was authored with. What leaves is two textures and a normal
-    map per part."""
+    map per part.
+
+    `nodes` is what makes a MACHINE rather than a body: a list of
+    `{name, parent, pivot, parts}`, in parent-first order, which the export
+    turns into real glTF nodes with their origin AT the joint. A runtime then
+    turns the node called `drum` about its own axle without knowing anything
+    about how the drum was built. Each node's meshes are moved into its frame,
+    so the pivot is a node translation and never a hidden offset inside the
+    geometry. `size` is one number, or one per part."""
     shipped = []
+    by_part = {}
     for part, obj in parts.items():
         copy = obj.copy()
         copy.data = obj.data.copy()
         copy.name = f'{part} baked'
         bpy.context.collection.objects.link(copy)
         copy.data.materials.clear()
-        copy.data.materials.append(atlas_material(name, folder, size, part=part))
+        sheet = size.get(part) if isinstance(size, dict) else size
+        copy.data.materials.append(atlas_material(name, folder, sheet, part=part))
+        by_part[part] = copy
         for polygon in copy.data.polygons:
             polygon.material_index = 0
         for attribute in list(copy.data.color_attributes):
@@ -449,7 +481,8 @@ def export(parts, *, folder, out, name, size, extras=None):
         shipped.append(copy)
     for key, value in (extras or {}).items():
         shipped[0][key] = value
-    select(shipped)
+    holders = _nodes(nodes, by_part) if nodes else []
+    select(shipped + holders)
     out.parent.mkdir(parents=True, exist_ok=True)
     bpy.ops.export_scene.gltf(filepath=str(out), export_format='GLB', use_selection=True,
                               export_yup=True, export_apply=True, export_extras=True,
@@ -458,12 +491,45 @@ def export(parts, *, folder, out, name, size, extras=None):
                               export_attributes=False)
     tris = sum(sum(len(p.vertices) - 2 for p in o.data.polygons) for o in shipped)
     bounds = _bounds(shipped)
-    for copy in shipped:
+    for copy in shipped + holders:
         bpy.data.objects.remove(copy, do_unlink=True)
     for obj in parts.values():
         obj.hide_render = False
     log('export', out.name, tris, 'triangles', out.stat().st_size, 'bytes')
     return {'file': out.name, 'bytes': out.stat().st_size, 'tris': tris, **bounds}
+
+
+def _nodes(specs, by_part):
+    """the joint tree, as real glTF nodes with their origin at the pivot"""
+    from mathutils import Matrix, Vector
+    holders, pivots = {}, {}
+    for spec in specs:
+        empty = bpy.data.objects.new(spec['name'], None)
+        bpy.context.collection.objects.link(empty)
+        empty.empty_display_size = 0.06
+        pivot = Vector(spec.get('pivot', (0.0, 0.0, 0.0)))
+        parent = spec.get('parent')
+        if parent:
+            empty.parent = holders[parent]
+            empty.location = pivot - pivots[parent]
+        else:
+            empty.location = pivot
+        holders[spec['name']] = empty
+        pivots[spec['name']] = pivot
+    for spec in specs:
+        pivot = pivots[spec['name']]
+        for part in spec.get('parts', ()):
+            obj = by_part[part]
+            obj.data.transform(Matrix.Translation(-pivot))
+            obj.parent = holders[spec['name']]
+            obj.location = (0.0, 0.0, 0.0)
+            # a mesh named after its own node makes Blender uniquify one of
+            # the two, and the pack then ships a node called `drum.001`
+            obj.name = f'{part} surface'
+    bpy.context.view_layer.update()
+    log('nodes', [(s['name'], s.get('parent'), tuple(round(v, 4) for v in pivots[s['name']]))
+                  for s in specs])
+    return list(holders.values())
 
 
 def _bounds(objects):

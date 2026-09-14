@@ -13,7 +13,10 @@
 #      folder): the tiers, their raw glbs, their atlas sizes.
 #   3. packs each tier with gltfpack: meshopt geometry, ETC1S KTX2 maps, and
 #      the tier's own texture limit (4096 / 2048 / 1024). A ninety megabyte
-#      export becomes thirteen.
+#      export becomes thirteen. `-kn` keeps the named nodes: a machine whose
+#      moving assemblies are nodes with their origin at the joint is a machine
+#      a hall can drive, and without that flag the pack flattens the tree into
+#      one body and the drum can never turn again.
 #   4. writes one manifest record per tier into the STORE's manifest for the
 #      wing, naming the script and its hash, the blend, the model and the date.
 #   5. prints the size and the triangle count per tier.
@@ -27,6 +30,9 @@ set -euo pipefail
 
 BLENDER=${BLENDER:-/opt/homebrew/bin/blender}
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# the packer stands beside the STORE, which is found by walking up from the
+# app rather than counted in folders: a round's clone sits several levels
+# deeper than the sealed app and a counted path lands outside the tree
 GLTFPACK=${GLTFPACK:-"$HERE/../../../../internal/night-agora/tools/bin/gltfpack"}
 
 APP=""; SCRIPT=""; STAGE="all"; SIZE=""; SAMPLES=""; EYES="${NA_EYES_PORT:-}"
@@ -96,6 +102,7 @@ echo "object: $ID -> $MODELS"
 mkdir -p "$MODELS"
 
 # --- 3. the pack, one per tier --------------------------------------------
+[ -x "$GLTFPACK" ] || GLTFPACK="$(dirname "$WORK_ROOT")/tools/bin/gltfpack"
 [ -x "$GLTFPACK" ] || { echo "no gltfpack at $GLTFPACK" >&2; exit 1; }
 PAIRS=()
 for TIER in $TIERS; do
@@ -107,8 +114,8 @@ print(f"{r['work']}/{t['file']}", t['texture_limit'])
 PY
 )"
   OUT="$MODELS/$ID-$TIER.glb"
-  echo "gltfpack: $TIER  -cc -tc -tq 8 -tl $LIMIT"
-  "$GLTFPACK" -i "$RAW" -o "$OUT" -cc -tc -tq 8 -tl "$LIMIT" -tj 8 >/dev/null
+  echo "gltfpack: $TIER  -cc -tc -tq 8 -kn -tl $LIMIT"
+  "$GLTFPACK" -i "$RAW" -o "$OUT" -cc -tc -tq 8 -kn -tl "$LIMIT" -tj 8 >/dev/null
   PAIRS+=( "$TIER=$OUT" )
 done
 

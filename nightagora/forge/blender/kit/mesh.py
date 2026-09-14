@@ -94,10 +94,16 @@ class Build:
         self.mi = []
         self.shade = []
         self.off = []
+        self.grain = []
         self.rng = random.Random(seed)
 
     # ---- the accumulator --------------------------------------------------
-    def add(self, points, faces, mat=0, shade=1.0, offset=None):
+    def add(self, points, faces, mat=0, shade=1.0, offset=None, grain=None):
+        """`grain` is the WORLD AXIS a member runs along (0, 1 or 2), and it is
+        the difference between a rail with the grain down its length and a
+        rail sawn across it. The library's timber plate runs its long grain
+        along v, so a face whose projection would put the member's own axis on
+        u has its two axes swapped at the flush."""
         start = len(self.v)
         self.v.extend(tuple(p) for p in points)
         off = offset if offset is not None else (self.rng.uniform(0, 1), self.rng.uniform(0, 1))
@@ -106,6 +112,7 @@ class Build:
             self.mi.append(mat)
             self.shade.append(shade)
             self.off.append(off)
+            self.grain.append(grain)
         return self
 
     def jitter(self, amount):
@@ -115,7 +122,7 @@ class Build:
         return self.rng.uniform(low, high)
 
     # ---- primitives -------------------------------------------------------
-    def box(self, frame, centre, size, mat=0, shade=1.0, offset=None, skip=()):
+    def box(self, frame, centre, size, mat=0, shade=1.0, offset=None, skip=(), grain=None):
         """a real box in frame local coordinates. `skip` drops faces by name
         for a piece built into a wall, where a back nobody reaches is bytes."""
         cx, cy, cz = centre
@@ -131,10 +138,10 @@ class Build:
             'front': (2, 3, 7, 6), 'left': (3, 0, 4, 7), 'top': (4, 5, 6, 7),
         }
         faces = [f for name, f in named.items() if name not in skip]
-        return self.add([frame.point(*q) for q in p], faces, mat, shade, offset)
+        return self.add([frame.point(*q) for q in p], faces, mat, shade, offset, grain)
 
     def raised(self, frame, centre, size, proud, splay=0.006, mat=0, shade=1.0,
-               offset=None, base=0.0, skirts='all'):
+               offset=None, base=0.0, skirts='all', grain=None):
         """a face standing `proud` of the frame's plane, its four edges splayed
         back to the bed. Ten triangles, no back, a real arris.
 
@@ -170,13 +177,13 @@ class Build:
         if skirts == 'none':
             points = points[4:]
             faces = [(3, 2, 1, 0)]
-        return self.add(points, faces, mat, shade, offset)
+        return self.add(points, faces, mat, shade, offset, grain)
 
-    def quad(self, frame, corners, mat=0, shade=1.0, offset=None):
+    def quad(self, frame, corners, mat=0, shade=1.0, offset=None, grain=None):
         """one flat face, given four local points"""
-        return self.add([frame.point(*c) for c in corners], [(3, 2, 1, 0)], mat, shade, offset)
+        return self.add([frame.point(*c) for c in corners], [(3, 2, 1, 0)], mat, shade, offset, grain)
 
-    def prism(self, frame, centre, size, mat=0, shade=1.0, offset=None):
+    def prism(self, frame, centre, size, mat=0, shade=1.0, offset=None, grain=None):
         """a triangular prism running along local x: a hip roll, a chamfer stop"""
         cx, cy, cz = centre
         hx, hy, hz = size[0] / 2, size[1] / 2, size[2] / 2
@@ -184,9 +191,9 @@ class Build:
              (cx + hx, cy + hy, cz - hz), (cx - hx, cy + hy, cz - hz),
              (cx - hx, cy, cz + hz), (cx + hx, cy, cz + hz)]
         faces = [(0, 3, 2, 1), (0, 1, 5, 4), (2, 3, 4, 5), (1, 2, 5), (3, 0, 4)]
-        return self.add([frame.point(*q) for q in p], faces, mat, shade, offset)
+        return self.add([frame.point(*q) for q in p], faces, mat, shade, offset, grain)
 
-    def tube(self, points, radius, sides=6, mat=0, shade=1.0, offset=None, close=True):
+    def tube(self, points, radius, sides=6, mat=0, shade=1.0, offset=None, close=True, grain=None):
         """a swept ring along a polyline: a peg, a bar, a rod, the core of a rope"""
         points = [Vector(p) for p in points]
         if len(points) < 2:
@@ -215,9 +222,9 @@ class Build:
         if close:
             faces.append(tuple(range(sides - 1, -1, -1)))
             faces.append(tuple(range((len(rings) - 1) * sides, len(rings) * sides)))
-        return self.add(verts, faces, mat, shade, offset)
+        return self.add(verts, faces, mat, shade, offset, grain)
 
-    def disc(self, centre, normal, radius, sides=12, mat=0, shade=1.0, offset=None):
+    def disc(self, centre, normal, radius, sides=12, mat=0, shade=1.0, offset=None, grain=None):
         n = Vector(normal).normalized()
         up = Vector((0, 0, 1)) if abs(n.z) < 0.9 else Vector((1, 0, 0))
         u = n.cross(up).normalized()
@@ -225,7 +232,8 @@ class Build:
         c = Vector(centre)
         ring = [c + (u * math.cos(2 * math.pi * k / sides) + w * math.sin(2 * math.pi * k / sides)) * radius
                 for k in range(sides)]
-        return self.add([c] + ring, [(0, 1 + k, 1 + (k + 1) % sides) for k in range(sides)], mat, shade, offset)
+        return self.add([c] + ring, [(0, 1 + k, 1 + (k + 1) % sides) for k in range(sides)],
+                        mat, shade, offset, grain)
 
     # ---- the flush --------------------------------------------------------
     @property
@@ -258,6 +266,10 @@ class Build:
             scale = 1.0 / max(1e-4, rep[index])
             n = poly.normal
             axes = (0, 1) if abs(n.z) > 0.577 else (0, 2) if abs(n.y) > abs(n.x) else (1, 2)
+            # the member's own axis belongs on v, where the plate's grain runs
+            along = self.grain[i] if i < len(self.grain) else None
+            if along is not None and axes[0] == along:
+                axes = (axes[1], axes[0])
             ox, oz = self.off[i]
             tone = self.shade[i]
             for li in poly.loop_indices:
@@ -290,3 +302,24 @@ def join(objects, name, atlas=None):
     if atlas:
         ob['atlas'] = atlas
     return ob
+
+
+def weld(obj, distance=0.00002):
+    """merge the vertices two kit calls left on top of each other.
+
+    Every primitive in this kit brings its own points, so a body built out of
+    a hundred calls is a hundred islands that happen to touch. That is fine
+    for a picture and wrong for a BAKE: the high poly's bevel only rounds an
+    edge that has a face on both sides of it, so an unwelded arris takes no
+    normal map and reads dead flat at arm's length. Welding at a fiftieth of
+    a millimetre changes no surface and gives the arris back."""
+    import bmesh
+    bm = bmesh.new()
+    bm.from_mesh(obj.data)
+    before = len(bm.verts)
+    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=distance)
+    bm.to_mesh(obj.data)
+    obj.data.update()
+    after = len(obj.data.vertices)
+    bm.free()
+    return before, after
