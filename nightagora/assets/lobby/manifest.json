@@ -1220,6 +1220,72 @@
       "source_sha1": "b17c3baceaab661342f879403da44d888805a0d3",
       "honesty_en": "Public domain work. Reproduction from Wikimedia Commons. The museum labels the reproduction, not the photograph. Non-profit cultural use.",
       "honesty_de": "Gemeinfreies Werk. Reproduktion von Wikimedia Commons. Das Museum kennzeichnet die Reproduktion, nicht die Fotografie. Nichtkommerzielle kulturelle Nutzung."
+    },
+    {
+      "id": "lobby/likeness-lovelace",
+      "path": "likenesses/lovelace/original.jpg",
+      "sha256": "bdc766beb25dba8d2c25758701b5a63fd1e781dbf51cb9cbc877cef7d110bf4b",
+      "bytes": 2027680,
+      "width": 3604,
+      "height": 5718,
+      "pixels": 20607672,
+      "slug": "lovelace",
+      "name": "Ada Lovelace",
+      "wing": "lobby",
+      "class": "Tier 2",
+      "tier": 2,
+      "licence": "Public domain",
+      "licence_source_url": "https://commons.wikimedia.org/wiki/File:Ada_Lovelace.jpg#Licensing",
+      "licence_location": "Commons file page, Licensing",
+      "holder": "UK Government Art Collection, 2172; on long-term loan to the National Portrait Gallery, London",
+      "maker": "Margaret Sarah Carpenter",
+      "date": "1836",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Ada_Lovelace.jpg",
+      "original_url": "https://upload.wikimedia.org/wikipedia/commons/8/87/Ada_Lovelace.jpg",
+      "holder_record_url": "https://artcollection.dcms.gov.uk/artwork/2172/",
+      "display": true,
+      "label_en": "Ada Lovelace. Margaret Sarah Carpenter, 1836. Oil on canvas. UK Government Art Collection, 2172; on loan to the National Portrait Gallery, London. Licence: “Public domain”. Public domain work. Reproduction from Wikimedia Commons. The museum labels the reproduction, not the painting. Non-profit cultural use.",
+      "label_de": "Ada Lovelace. Margaret Sarah Carpenter, 1836. Öl auf Leinwand. Government Art Collection des Vereinigten Königreichs, 2172; Leihgabe an die National Portrait Gallery, London. Lizenz: „Public domain“. Gemeinfreies Werk. Reproduktion von Wikimedia Commons. Das Museum kennzeichnet die Reproduktion, nicht das Gemälde. Nichtkommerzielle kulturelle Nutzung.",
+      "previews": [
+        {
+          "path": "likenesses/lovelace/preview-512.jpg",
+          "sha256": "f743f41d494d45a0d34d0370f7fb6825877bcfda55373fb3c01cc4f5e4ee9f91",
+          "bytes": 43592,
+          "width": 323,
+          "height": 512,
+          "pixels": 165376,
+          "long_edge": 512,
+          "format": "image/jpeg",
+          "quality": 88,
+          "color_space": "sRGB",
+          "source_path": "likenesses/lovelace/original.jpg"
+        },
+        {
+          "path": "likenesses/lovelace/preview-1024.jpg",
+          "sha256": "48bb3e9ec1820ca21824c176e3259db1e48f02431ea051d4c89253a24701c05f",
+          "bytes": 146925,
+          "width": 645,
+          "height": 1024,
+          "pixels": 660480,
+          "long_edge": 1024,
+          "format": "image/jpeg",
+          "quality": 88,
+          "color_space": "sRGB",
+          "source_path": "likenesses/lovelace/original.jpg"
+        }
+      ],
+      "verified_on": "2026-09-14",
+      "source_verification": "Current Commons imageinfo, original link, licence template and file history checked. Holder evidence rechecked where available.",
+      "derivation": "No embedded ICC profile. Source interpreted as sRGB. JPEG previews resized with Lanczos, quality 88, embedded sRGB profile. Original bytes unchanged.",
+      "licence_url": "https://commons.wikimedia.org/wiki/File:Ada_Lovelace.jpg#Licensing",
+      "rights_note": "Commons PD-Art(PD-old-auto-expired), maker died 1872. Current Commons version is a 2015 removal of the yellow color cast from the earlier reproduction, as the file history states; it remains a reproduction of the historical painting, not a modern likeness. GAC page claims Crown Copyright and links image licensing; no permitted open reproduction licence verified. Label does not imply GAC release.",
+      "source_version": {
+        "file_timestamp": "2015-12-19T22:39:00Z",
+        "commons_revision_id": 1254581389
+      },
+      "source_sha1": "2c4a79fc724e86128b497f07c443c3c04069925b",
+      "honesty_en": "Public domain work. Reproduction from Wikimedia Commons. The museum labels the reproduction, not the painting. Non-profit cultural use.",
+      "honesty_de": "Gemeinfreies Werk. Reproduktion von Wikimedia Commons. Das Museum kennzeichnet die Reproduktion, nicht das Gemälde. Nichtkommerzielle kulturelle Nutzung."
     }
   ]
 }
