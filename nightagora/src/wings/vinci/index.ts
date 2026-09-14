@@ -192,7 +192,9 @@ export function createWing():WingModule {
     // outlines and roof unions, under three thousand.
     {
       const shadowShell=createShellShadowDouble(shell,entry)
-      shell.traverse(o=>{if(o instanceof Mesh)o.castShadow=false})
+      // The double is built from the entry's structural faces too, so the
+      // entry was throwing its shadow twice.
+      for(const group of [shell,entry])group.traverse(o=>{if(o instanceof Mesh)o.castShadow=false})
       scene.add(shadowShell)
       key.light.castShadow=true;key.light.shadow.autoUpdate=true;key.light.shadow.needsUpdate=true
     }
