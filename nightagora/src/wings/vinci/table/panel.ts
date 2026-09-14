@@ -1,4 +1,5 @@
 import inscriptionsText from '../words/data/inscriptions.json?raw';
+import { buildAbsences, buildCodexList } from './codex-shelf'
 import { FAMOUS_FOLIOS, SOURCE_READINGS, TABLE_UI, folioKey, hasItalian, type Language, type PageRecord } from './content';
 import panelCss from './panel.css?raw';
 
@@ -225,7 +226,7 @@ export function createPanel(pages: PageRecord[], onOpen: (folio: string) => void
     shelf.lang = lang;
     shelf.setAttribute('aria-label', copy.famous);
     const heading = node('header', 'vt-shelf-heading');
-    heading.append(node('p', 'vt-kicker', copy.shelfIntro), node('h2', 'vt-shelf-title', copy.famous));
+    heading.append(node('p', 'vt-kicker', copy.codicesIntro), node('h2', 'vt-shelf-title', copy.codices));
     const list = node('ol', 'vt-shelf-list');
     for (const famous of FAMOUS_FOLIOS) {
       const record = leaves.find((leaf) => folioKey(leaf) === `B:${famous.folio}`);
@@ -253,9 +254,10 @@ export function createPanel(pages: PageRecord[], onOpen: (folio: string) => void
       item.append(button);
       list.append(item);
     }
-    const absence = node('div', 'vt-shelf-absence');
-    absence.append(node('p', 'vt-absence-status', copy.absent), node('h3', 'vt-absence-title', copy.birds), node('p', 'vt-absence-holder', copy.birdsHolder), node('p', 'vt-source-note', copy.birdsAbsence));
-    shelf.replaceChildren(heading, list, absence);
+    const codices = buildCodexList(lang, page ? folioKey(page) : '', onOpen);
+    const leafSection = node('section', 'vt-leaf-section');
+    leafSection.append(node('h3', 'vt-codex-title', copy.famous), node('p', 'vt-kicker', copy.shelfIntro), list);
+    shelf.replaceChildren(heading, codices, leafSection, buildAbsences(lang));
     if (openingInscription) {
       const inscription = node('details', 'vt-inscription');
       inscription.append(node('summary', 'vt-source-summary', copy.inscription));

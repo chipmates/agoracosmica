@@ -82,10 +82,39 @@
 .vt-absence-holder { font-size: 12px; color: var(--vt-muted); margin: 5px 0 0; }
 .vt-shelf-absence > .vt-source-note { margin: 7px 0 0; }
 .vt-shelf-source { color: var(--vt-muted); font-size: 11px; line-height: 1.6; margin: 23px 0 12px; }
+.vt-codex-section { padding-bottom: 4px; }
+.vt-codex-title { margin: 0 0 2px; font: 400 21px/1.2 Georgia, 'Times New Roman', serif; color: #eee1c7; }
+.vt-codex-group { margin: 14px 0 4px; font-size: 10px; letter-spacing: .15em; text-transform: uppercase; color: #a5a99e; }
+.vt-codex-list { list-style: none; padding: 0; margin: 0; }
+.vt-codex-item { border-top: 1px solid var(--vt-rule); }
+.vt-codex-button, .vt-codex-row { width: 100%; min-height: 60px; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; text-align: left; padding: 11px 3px; color: var(--vt-ink); background: transparent; border: 0; }
+.vt-codex-button { cursor: pointer; }
+.vt-codex-button:hover, .vt-codex-button[aria-current='true'] { background: linear-gradient(90deg, #a88b4230, transparent); color: #f1e2c2; }
+.vt-codex-button:focus-visible { outline: 2px solid #dbc99e; outline-offset: 3px; }
+.vt-codex-body { display: grid; gap: 2px; min-width: 0; }
+.vt-codex-name { font: 400 17px/1.3 Georgia, 'Times New Roman', serif; overflow-wrap: break-word; }
+.vt-codex-holder { font-size: 12px; color: var(--vt-muted); }
+.vt-codex-class { font-size: 11px; line-height: 1.5; color: #b7a47f; }
+.vt-codex-count { font-size: 12px; line-height: 1.5; color: var(--vt-muted); }
+.vt-codex-state { flex: none; font-size: 10px; letter-spacing: .13em; text-transform: uppercase; color: #8f9489; padding-top: 4px; }
+.vt-leaf-section { margin-top: 18px; padding-top: 13px; border-top: 1px solid var(--vt-rule); }
+.vt-leaf-section .vt-kicker { margin: 2px 0 6px; }
+.vt-absence-section { margin-top: 16px; padding-top: 13px; border-top: 1px solid var(--vt-rule); color: #a7a79b; }
+.vt-absence-list { list-style: none; padding: 0; margin: 0; }
+.vt-absence-item { display: grid; gap: 2px; padding: 9px 0; border-top: 1px solid var(--vt-rule); }
+.vt-absence-item:first-child { border-top: 0; }
+.vt-absence-name { font: 400 16px/1.3 Georgia, 'Times New Roman', serif; color: #cfc4ad; }
+.vt-absence-item .vt-absence-holder { margin: 0; }
+.vt-absence-item .vt-source-note { margin: 2px 0 0; }
 .vt-inscription { border-top: 1px solid var(--vt-rule); margin-top: 13px; }
 .vt-inscription-text { margin: 14px 0; white-space: pre-wrap; overflow-wrap: anywhere; font: 400 16px/1.65 Georgia, 'Times New Roman', serif; color: #cfc4ad; }
 .vt-inscription-citation { font-size: 12px; line-height: 1.6; color: var(--vt-muted); }
 @container (min-width: 760px) {
+  .vt-codex-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 22px; }
+  .vt-absence-item { grid-template-columns: minmax(200px, 1fr) minmax(240px, 1fr); align-items: baseline; column-gap: 22px; }
+  .vt-absence-name { grid-column: 1; }
+  .vt-absence-item .vt-absence-holder { grid-column: 1; }
+  .vt-absence-item .vt-source-note { grid-column: 2; grid-row: 1 / 3; }
   .vt-shelf-list { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0 22px; }
   .vt-shelf-button { min-height: 68px; grid-template-columns: 40px 1fr; padding: 13px 6px; }
   .vt-shelf-number { font-size: 23px; }
@@ -111,6 +140,8 @@
   .vt-shelf-number { font-size: 18px; }
 }
 @media (max-width:759px) {
+  .vt-codex-name { font-size:16px; }
+  .vt-codex-button, .vt-codex-row { min-height:56px; padding:9px 3px; }
   .vt-shelf-heading { padding-bottom:10px; }
   .vt-shelf-button { min-height:56px; padding:8px 3px; }
   .vt-shelf-absence { margin-top:10px; padding-top:10px; }

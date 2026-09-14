@@ -1,0 +1,196 @@
+{
+ "schema_version": "1.0",
+ "provenance": {
+  "governing_source": "program/rounds/wing-vinci/refs/RECLASS-2026-09-14/codices.json",
+  "rights_authority": "program/rounds/wing-vinci/refs/RECLASS-2026-09-14/RIGHTS-CROSSCHECK-2026-09-14.md section 3",
+  "prepared_date": "2026-09-14",
+  "scope": "What the reading table admits, by codex. Counts are scans or edition pages and never manuscript folio totals. Page maps are named for provenance and are not read by the shelf."
+ },
+ "entries": [
+  {
+   "id": "paris-B",
+   "en": "Paris manuscript B",
+   "de": "Pariser Manuskript B",
+   "holder_en": "Bibliothèque de l’Institut de France, Paris",
+   "holder_de": "Bibliothèque de l’Institut de France, Paris",
+   "tier": "TIER1",
+   "class_en": "Public domain by age, through the printed facsimile of 1883.",
+   "class_de": "Gemeinfrei durch Alter, über das gedruckte Faksimile von 1883.",
+   "state": "table",
+   "open": "B:3r",
+   "count_en": "168 facsimile sides inside an edition of 438 printed pages.",
+   "count_de": "168 Faksimileseiten in einer Ausgabe von 438 Druckseiten.",
+   "map": "msb-pages.json"
+  },
+  {
+   "id": "paris-D",
+   "en": "Paris manuscript D",
+   "de": "Pariser Manuskript D",
+   "holder_en": "Bibliothèque de l’Institut de France, Paris",
+   "holder_de": "Bibliothèque de l’Institut de France, Paris",
+   "tier": "TIER1",
+   "class_en": "Public domain by age, through the printed facsimile of 1883.",
+   "class_de": "Gemeinfrei durch Alter, über das gedruckte Faksimile von 1883.",
+   "state": "table",
+   "open": "D:1r",
+   "count_en": "20 facsimile sides in the same 1883 volume, after manuscript B.",
+   "count_de": "20 Faksimileseiten im selben Band von 1883, nach Manuskript B.",
+   "map": "msb-pages.json"
+  },
+  {
+   "id": "madrid-I",
+   "en": "Codex Madrid I",
+   "de": "Codex Madrid I",
+   "holder_en": "Biblioteca Nacional de España, Madrid",
+   "holder_de": "Biblioteca Nacional de España, Madrid",
+   "tier": "TIER1",
+   "class_en": "Public domain mark from the library that scanned it.",
+   "class_de": "Public-Domain-Kennzeichnung der Bibliothek, die den Scan gemacht hat.",
+   "state": "collection",
+   "open": null,
+   "count_en": "384 scan pages of the library digitisation, covers and blanks included.",
+   "count_de": "384 Scanseiten der Digitalisierung, Deckel und Leerseiten eingeschlossen.",
+   "map": "madrid-i-pages.json"
+  },
+  {
+   "id": "madrid-II",
+   "en": "Codex Madrid II",
+   "de": "Codex Madrid II",
+   "holder_en": "Biblioteca Nacional de España, Madrid",
+   "holder_de": "Biblioteca Nacional de España, Madrid",
+   "tier": "TIER1",
+   "class_en": "Public domain mark from the library that scanned it.",
+   "class_de": "Public-Domain-Kennzeichnung der Bibliothek, die den Scan gemacht hat.",
+   "state": "collection",
+   "open": null,
+   "count_en": "330 scan pages, of which 69 leaves carry no writing.",
+   "count_de": "330 Scanseiten, davon 69 Blätter ohne Schrift.",
+   "map": "madrid-ii-pages.json"
+  },
+  {
+   "id": "birds",
+   "en": "Codex on the Flight of Birds",
+   "de": "Kodex über den Vogelflug",
+   "holder_en": "Biblioteca Reale, Turin",
+   "holder_de": "Biblioteca Reale, Turin",
+   "tier": "TIER2",
+   "class_en": "Public domain work, shown as a labelled reproduction under non-commercial cultural use.",
+   "class_de": "Gemeinfreies Werk, gezeigt als gekennzeichnete Reproduktion unter nichtkommerzieller kultureller Nutzung.",
+   "state": "collection",
+   "open": null,
+   "count_en": "All 36 numbered faces, folio 1 recto to folio 18 verso.",
+   "count_de": "Alle 36 nummerierten Seiten, Blatt 1 recto bis Blatt 18 verso.",
+   "map": "birds-pages.json"
+  },
+  {
+   "id": "trivulzianus",
+   "en": "Codex Trivulzianus",
+   "de": "Codex Trivulzianus",
+   "holder_en": "Biblioteca Trivulziana, Castello Sforzesco, Milan",
+   "holder_de": "Biblioteca Trivulziana, Castello Sforzesco, Mailand",
+   "tier": "TIER2",
+   "class_en": "Public domain work, shown as a labelled reproduction under non-commercial cultural use.",
+   "class_de": "Gemeinfreies Werk, gezeigt als gekennzeichnete Reproduktion unter nichtkommerzieller kultureller Nutzung.",
+   "state": "collection",
+   "open": null,
+   "count_en": "324 scans of the 1891 facsimile, 94 of them plates.",
+   "count_de": "324 Scans des Faksimiles von 1891, davon 94 Tafeln.",
+   "map": "trivulzianus-pages.json"
+  },
+  {
+   "id": "paris-A",
+   "en": "Paris manuscript A, fifteen faces",
+   "de": "Pariser Manuskript A, fünfzehn Blattseiten",
+   "holder_en": "Bibliothèque de l’Institut de France, Paris",
+   "holder_de": "Bibliothèque de l’Institut de France, Paris",
+   "tier": "TIER1",
+   "class_en": "Public domain mark from the library that scanned it.",
+   "class_de": "Public-Domain-Kennzeichnung der Bibliothek, die den Scan gemacht hat.",
+   "state": "collection",
+   "open": null,
+   "count_en": "15 named faces, not the volume. The monochrome source is all there is.",
+   "count_de": "15 benannte Blattseiten, nicht der Band. Die Quelle ist einfarbig.",
+   "map": "paris-a-pages.json"
+  },
+  {
+   "id": "atlanticus",
+   "en": "Codex Atlanticus, excerpts",
+   "de": "Codex Atlanticus, Auszüge",
+   "holder_en": "Veneranda Biblioteca Ambrosiana, Milan",
+   "holder_de": "Veneranda Biblioteca Ambrosiana, Mailand",
+   "tier": "TIER2",
+   "class_en": "Public domain work, shown as a labelled reproduction under non-commercial cultural use.",
+   "class_de": "Gemeinfreies Werk, gezeigt als gekennzeichnete Reproduktion unter nichtkommerzieller kultureller Nutzung.",
+   "state": "collection",
+   "open": null,
+   "count_en": "45 files, which are pages and details, not a run of folios.",
+   "count_de": "45 Dateien, Seiten und Ausschnitte, keine fortlaufenden Blätter.",
+   "map": "atlanticus-pages.json"
+  }
+ ],
+ "absences": [
+  {
+   "id": "leicester",
+   "en": "Codex Leicester",
+   "de": "Codex Leicester",
+   "holder_en": "Private collection",
+   "holder_de": "Privatsammlung",
+   "reason_en": "No reproduction of it is cleared for this museum.",
+   "reason_de": "Keine Reproduktion davon ist für dieses Museum freigegeben."
+  },
+  {
+   "id": "windsor",
+   "en": "The Windsor folios",
+   "de": "Die Blätter aus Windsor",
+   "holder_en": "Royal Collection, Windsor",
+   "holder_de": "Royal Collection, Windsor",
+   "reason_en": "They hang in the museum’s other rooms, not on this table.",
+   "reason_de": "Sie hängen in den anderen Räumen des Museums, nicht auf diesem Tisch."
+  },
+  {
+   "id": "arundel",
+   "en": "Codex Arundel",
+   "de": "Codex Arundel",
+   "holder_en": "British Library, London",
+   "holder_de": "British Library, London",
+   "reason_en": "Its printed facsimile did not land in this round.",
+   "reason_de": "Das gedruckte Faksimile ist in dieser Runde nicht angekommen."
+  },
+  {
+   "id": "paris-rest",
+   "en": "Paris manuscripts C, E, F, G, H, I, K, L and M",
+   "de": "Pariser Manuskripte C, E, F, G, H, I, K, L und M",
+   "holder_en": "Bibliothèque de l’Institut de France, Paris",
+   "holder_de": "Bibliothèque de l’Institut de France, Paris",
+   "reason_en": "The other volumes of the 1881 facsimile series were scanned without a public domain mark, so nothing from them is admitted.",
+   "reason_de": "Die übrigen Bände der Faksimilereihe von 1881 wurden ohne Public-Domain-Kennzeichnung gescannt, daher ist daraus nichts zugelassen."
+  },
+  {
+   "id": "ashburnham",
+   "en": "The Ashburnham leaves",
+   "de": "Die Ashburnham-Blätter",
+   "holder_en": "Bibliothèque de l’Institut de France, Paris",
+   "holder_de": "Bibliothèque de l’Institut de France, Paris",
+   "reason_en": "One sheet is cleared. A set of two leaves is not a codex, so none is shown.",
+   "reason_de": "Ein Blatt ist freigegeben. Zwei Blätter sind kein Kodex, daher wird keines gezeigt."
+  },
+  {
+   "id": "urbinas",
+   "en": "Codex Urbinas",
+   "de": "Codex Urbinas",
+   "holder_en": "Biblioteca Apostolica Vaticana",
+   "holder_de": "Biblioteca Apostolica Vaticana",
+   "reason_en": "The printed edition of its text is not a facsimile of the manuscript.",
+   "reason_de": "Die gedruckte Textausgabe ist kein Faksimile der Handschrift."
+  },
+  {
+   "id": "forster",
+   "en": "The Forster codices",
+   "de": "Die Forster-Kodizes",
+   "holder_en": "Victoria and Albert Museum, London",
+   "holder_de": "Victoria and Albert Museum, London",
+   "reason_en": "One detail of the third volume is cleared. The volumes are not.",
+   "reason_de": "Ein Ausschnitt des dritten Bandes ist freigegeben. Die Bände nicht."
+  }
+ ]
+}
