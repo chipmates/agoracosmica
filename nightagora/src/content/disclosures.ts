@@ -22,20 +22,22 @@ export const DISCLOSURES: Record<DisclosureKey, DisclosureLine> = {
     en: 'The historical figures speak as AI Echoes: interpretations built from what each person left behind. Not recordings. Not the dead themselves.',
     de: 'Die historischen Persönlichkeiten sprechen als AI Echoes: Interpretationen dessen, was sie hinterlassen haben. Keine Aufnahmen. Nicht die Toten selbst.',
   },
-  /** the keeper discloses himself, in character, in his one line */
+  /** the watchman's one line at the fire: the museum's own introduction,
+      written in advance; no figure speaks here, so no Echo is disclosed */
   voice: {
-    en: '"I am an AI voice for the museum. An interpretation, not a person. Welcome to the Night Agora."',
-    de: '"Ich bin die KI-Stimme des Museums. Eine Interpretation, kein Mensch. Willkommen in der Night Agora."',
+    en: '"Welcome to the Night Agora. Thirty lives, each kept in the place they lived, at a real hour of a real day. Every visit begins at this fire."',
+    de: '"Willkommen in der Night Agora. Dreißig Leben, jedes an dem Ort, an dem es gelebt wurde, zu einer wirklichen Stunde eines wirklichen Tages. Jeder Besuch beginnt an diesem Feuer."',
   },
   /** the colophon on every surface an Echo appears on */
   ink: {
     en: 'An AI Echo · An interpretation, not a recording',
     de: 'Ein AI Echo · Eine Interpretation, keine Aufnahme',
   },
-  /** The museum's own voice never claims to be a figure's Echo. */
+  /** the line under the watchman: what the museum is and what a visitor
+      does in it; no figure speaks here, so nothing is disclosed */
   watchman: {
-    en: 'An AI museum voice · An interpretation, not a person',
-    de: 'Eine KI-Stimme des Museums · Eine Interpretation, kein Mensch',
+    en: 'Thirty wings, one for each life · Walk their place, look closer, ask them',
+    de: 'Dreißig Flügel, einer für jedes Leben · Geh durch ihren Ort, sieh genauer hin, frag sie',
   },
 }
 

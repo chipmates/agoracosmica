@@ -38,7 +38,7 @@ export const GREETING = disclosure('voice')
 /** The one honest answer to a question this fire cannot answer. The
     question itself travels with the visitor. */
 export const TYPED_REPLY: string[] = [
-  'You are in the Night Agora. This welcome is scripted.',
+  'The fire keeps no answers. The people of this museum answer in the library, through the door you find at every station.',
   'The count above shows which wings are open and which are in preparation.',
   'Look up to choose a life. In a wing, walk from place to place. Open a label to look closer.',
 ]
@@ -68,7 +68,7 @@ const FIRE_SCRIPTS: Record<Lang, KeeperScript> = {
     greeting: disclosure('voice', 'de'),
     offered: [],
     typedReply: [
-      'Du bist in der Night Agora. Dieser Willkommensgruß ist vorab geschrieben.',
+      'Das Feuer hat keine Antworten. Die Menschen dieses Museums antworten in der Bibliothek, durch die Tür, die du an jeder Station findest.',
       'Die Angabe oben zeigt, welche Flügel offen sind und welche vorbereitet werden.',
       'Schau nach oben und wähle ein Leben. Geh im Flügel von Ort zu Ort. Öffne eine Beschriftung, um genauer hinzusehen.',
     ],
