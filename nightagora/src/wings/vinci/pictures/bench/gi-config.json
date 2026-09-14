@@ -1,0 +1,64 @@
+{
+  "segments": [
+    {
+      "segment": "early",
+      "extent": 9.343808533696206,
+      "height": 6,
+      "depth": 12
+    },
+    {
+      "segment": "milan",
+      "extent": 9.819241844359395,
+      "height": 6,
+      "depth": 12
+    },
+    {
+      "segment": "florence",
+      "extent": 9.94473591701181,
+      "height": 6,
+      "depth": 12
+    },
+    {
+      "segment": "late",
+      "extent": 8.821782601710927,
+      "height": 6,
+      "depth": 12
+    },
+    {
+      "segment": "absences",
+      "extent": 9.855999999999998,
+      "height": 6,
+      "depth": 12
+    },
+    {
+      "segment": "signature",
+      "extent": 1,
+      "height": 6,
+      "depth": 12
+    },
+    {
+      "segment": "drawer",
+      "extent": 12,
+      "height": 6,
+      "depth": 12
+    },
+    {
+      "segment": "murals",
+      "extent": 27.34,
+      "height": 12,
+      "depth": 35
+    },
+    {
+      "segment": "complete-hang",
+      "extent": 89.48403834732778,
+      "height": 7,
+      "depth": 12
+    },
+    {
+      "segment": "materials",
+      "extent": 6,
+      "height": 6,
+      "depth": 12
+    }
+  ]
+}
