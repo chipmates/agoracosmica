@@ -37,7 +37,7 @@ async function load(file) {
   return exports
 }
 
-const { gaitAt, gaitLeg, gaitRhythm, gaitEnvelopeM, gaitHeadLift, stepMetres, strollMetresPerSecond } = await load(path.join(wing, 'gait.ts'))
+const { carriedPace, gaitAt, gaitLeg, gaitRhythm, gaitEnvelopeM, gaitHeadLift, stepMetres, strollMetresPerSecond } = await load(path.join(wing, 'gait.ts'))
 const certificate = JSON.parse(fs.readFileSync(path.join(wing, 'data/rail-clearance.json'), 'utf8'))
 
 const failures = []
@@ -148,8 +148,64 @@ ensure(traces[0].riseAndFallPerSecond > 1.7 && traces[0].riseAndFallPerSecond < 
 ensure(traces[1].heightAmplitudeMM === 0 && traces[1].swayAmplitudeMM === 0, 'Reduced motion still carries a step rhythm on the camera')
 ensure(traces.every(trace => trace.endHeightErrorMM < 1e-6 && trace.endEastErrorMM < 1e-6), 'A walk does not land on its own certified eye')
 
+/** THE CARRIED PACE AND THE CARD'S HANDOVER. A visitor who has already asked
+ * for the next station is carried on: the leg's own clock runs at the pace of
+ * the asking. The overlay hands the card over at the half of the leg by
+ * walked distance. Both are measured here on the lengths the rail walks. */
+const CARD_HANDOVER = .5
+const carried = lengths.map(length => {
+  const leg = gaitLeg(length)
+  let half = leg.seconds
+  for (let i = 0; i <= SAMPLES; i++) {
+    const seconds = leg.seconds * i / SAMPLES
+    if (gaitAt(leg, seconds).metres >= length * CARD_HANDOVER) { half = seconds; break }
+  }
+  const row = { metres: +length.toFixed(3) }
+  for (const waiting of [0, 1, 2, 4, 9]) {
+    const pace = carriedPace(waiting)
+    row[`waiting${waiting}`] = {
+      pace: +pace.toFixed(2),
+      seconds: +(leg.seconds / pace).toFixed(2),
+      metresPerSecond: +(leg.cruiseMetresPerSecond * pace).toFixed(2),
+      cardHandoverSeconds: +(half / pace).toFixed(2),
+    }
+    ensure(pace >= 1, `A carried pace of ${pace} would hold the walk back`)
+    ensure(waiting < 4 || pace === carriedPace(4), 'The carried pace does not stop at four waiting stations')
+    ensure(half > 0 && half < leg.seconds, `The card hands over outside the ${length} m leg`)
+  }
+  return row
+})
+
+/** The same on the real controller: one leg with two stations already asked
+ * for behind it, walked to its own end. */
+function carriedTrace(metres, waiting) {
+  const from = stationPose('arrival', false)
+  const step = new THREE.Vector3(metres, 0, 0)
+  const to = { eye: from.eye.clone().add(step), at: from.at.clone().add(step), fov: from.fov }
+  const beyond = { eye: to.eye.clone().add(step), at: to.at.clone().add(step), fov: from.fov }
+  const straight = createCertifiedRailPath([from.eye.clone(), to.eye.clone()], { clearanceRadiusM: 1, certifyBall: () => true })
+  let now = 0
+  const camera = new THREE.PerspectiveCamera(49, 1512 / 950, .25, 1100)
+  const rail = createRail(camera, () => now, { status: 'verified', failure: '', route: () => straight })
+  rail.set('arrival', from, true, false)
+  rail.update()
+  rail.set('courtyard', to, false, false)
+  for (let i = 0; i < waiting; i++) rail.set(i % 2 ? 'study' : 'oratory', beyond, false, false)
+  let landed = 0
+  for (let i = 1; i <= 4000 && !landed; i++) {
+    now = i * .016
+    rail.update()
+    if (rail.navigation.completed === 'courtyard') landed = now
+  }
+  return { metres, waiting, secondsToLand: +landed.toFixed(2), metresPerSecond: +(metres / landed).toFixed(2) }
+}
+const carriedTraces = [carriedTrace(17.369497651827334, 0), carriedTrace(17.369497651827334, 2)]
+ensure(carriedTraces[1].secondsToLand < carriedTraces[0].secondsToLand * .75,
+  'Two stations waiting do not carry the walk on measurably')
+
 const report = {
   checker: 'vinci-gait',
+  carriedPaceAndCardHandover: { share: CARD_HANDOVER, legs: carried, onTheRail: carriedTraces },
   measuredOnTheRail: traces,
   strollMetresPerSecond, stepMetres,
   stepRhythmEnvelopeM: +gaitEnvelopeM.toFixed(5),

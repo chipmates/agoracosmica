@@ -146,7 +146,7 @@ for(const phone of [false,true]) {
     h.at(0);control.at(0)
     // A leg lasts as long as its own length says, so the sub-step is the
     // walking leg's own duration and not the longest leg in the wing.
-    const seconds=h.rail.navigation.legSeconds,step=seconds/224
+    const seconds=h.rail.navigation.legSeconds/h.rail.navigation.legPace,step=seconds/224
     for(let i=1;i<224;i++) {
       h.at(i*step);control.at(i*step)
       if(i===45)h.set('garden');if(i===100)h.set('hall');if(i===145)h.set('arrival')
@@ -161,7 +161,9 @@ for(const phone of [false,true]) {
     const h=harness(phone);h.set('courtyard');h.set('courtyard');h.at(0);h.at(.2)
     h.set('garden');h.set('garden');h.set('courtyard');h.set('courtyard')
     ensure(h.rail.navigation.queued.join(',')==='garden,courtyard','Tail dedup removed a real reversal')
-    h.at(DURATION);endpoint(h,'courtyard');finish(h,'garden',DURATION);finish(h,'courtyard',2*DURATION)
+    // A leg walked with stations already waiting behind it lands sooner, so
+    // the order of the endpoints is the assertion and not the clock.
+    settle(h,'courtyard');settle(h,'garden');settle(h,'courtyard')
     ensure(h.calls.length===3,'Wrong number of distinct physical legs')
   })
   check(viewport,'Distinct shared-pose stations complete once per update without resetting gaze',()=>{
@@ -190,8 +192,12 @@ for(const phone of [false,true]) {
     h.at(late);endpoint(h,'courtyard');ensure(h.rail.navigation.active===undefined,'A second leg began during completion')
     ensure(h.rail.navigation.queued.join(',')==='garden,hall','Delayed frame drained pending requests')
     h.at(late);compare(h.camera,canonical(phone,'courtyard'),'New leg zero elapsed time')
-    const control=harness(phone,'courtyard');control.set('garden');control.at(0)
-    const seconds=control.rail.navigation.legSeconds,step=seconds/224
+    // The control carries the same queue depth, because the pace of a leg is
+    // read from what is already waiting behind it when the leg begins.
+    const control=harness(phone,'courtyard');control.set('garden');control.set('hall');control.at(0)
+    // A leg's own seconds are its stroll; the pace it is walked at is read
+    // from what was waiting behind it, so the wall clock is the two together.
+    const seconds=control.rail.navigation.legSeconds/control.rail.navigation.legPace,step=seconds/224
     for(let i=1;i<224;i++){h.at(late+i*step);control.at(i*step);compare(h.camera,control.camera,'Fresh route clock')}
     h.at(late+seconds+1e-6);control.at(seconds+1e-6);compare(h.camera,control.camera,'Fresh route clock at the endpoint')
     endpoint(h,'garden')

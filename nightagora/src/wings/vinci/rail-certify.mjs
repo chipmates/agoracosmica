@@ -7,7 +7,7 @@
  * pose can move and no solid can change. This is that program.
  *
  * It runs the real factories at every tier, hashes them with the same
- * `rail-fingerprint.ts` the browser runs, builds each of the forty directed
+ * `rail-fingerprint.ts` the browser runs, builds every directed route
  * routes from `rail-waypoints.ts`, proves every straight span and every
  * rounded corner against the real triangles, proves each station's own near
  * envelope, and writes the certificate plus its manifest hash.
@@ -433,7 +433,10 @@ for (const cone of stationCones) {
   // close; it is a diagnosis for whoever moves the pose, never a pass.
   failures.push(`${cone.viewport} ${cone.id}: the eye stands ${cone.fullBall.distance.toFixed(4)} m from ${cone.fullBall.mesh}, inside its own ${cone.radius.toFixed(4)} m near envelope; the near plane itself misses by ${cone.oriented.minimumM.toFixed(4)} m over the look envelope`)
 }
-if (routes.length !== 40) failures.push(`Expected forty directed routes, certified ${routes.length}`)
+// Every ordered pair of distinct station poses, both viewports: a visitor can
+// press any mark on the rail, so any pair is a route the walk may be asked for.
+const expectedRoutes = families.reduce((sum, family) => sum + family.seen.length * (family.seen.length - 1), 0)
+if (routes.length !== expectedRoutes) failures.push(`Expected ${expectedRoutes} directed routes, certified ${routes.length}`)
 
 const text = JSON.stringify(certificate, null, 1) + '\n'
 const previous = fs.existsSync(CERTIFICATE) ? fs.readFileSync(CERTIFICATE, 'utf8') : ''

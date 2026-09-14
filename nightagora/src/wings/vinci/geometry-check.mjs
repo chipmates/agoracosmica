@@ -19,7 +19,9 @@ const SHELL_CLEARANCE = .25, TERRAIN_CLEARANCE = .3;
 // The walk is timed at a stroll, so a leg lasts as long as its own length
 // says: the sampler observes until the rail reports it has arrived, and its
 // step is chosen so the spacing stays near two centimetres at that pace.
-const STEP_SECONDS = 1 / 60, TRANSITION_SECONDS = 21;
+// The longest leg the rail walks is capped at the gait's own ceiling, and
+// this window has to outlast it or the checker stops watching mid-walk.
+const STEP_SECONDS = 1 / 60, TRANSITION_SECONDS = 30;
 const errors = [], notes = [], loaded = new Map(), modules = new Map();
 const report = {
   checker: 'vinci-offline-geometry', replacesEyes: false,
@@ -290,11 +292,22 @@ function shellClearance(index, start, end) {
   return { lowerBoundM: Math.sqrt(distanceSq), mesh: hit, candidates: seen.size };
 }
 const downRay = new THREE.Ray(new THREE.Vector3(), new THREE.Vector3(0, -1, 0)), groundPoint = new THREE.Vector3();
+const groundEdgeA = new THREE.Vector3(), groundEdgeB = new THREE.Vector3(), groundNormal = new THREE.Vector3();
+/** The ground under a column, which is a FLOOR and not a wall: a cut bank's
+ * own face spans the column beside the path it retains, and taking it as the
+ * ground reads a walker on the apron as three metres under the hillside. A
+ * face steeper than forty degrees is a bank or a lining, and the chord test
+ * is what proves the walk clear of those. */
 function groundTop(index, eye) {
   downRay.origin.set(eye.x, 1000, eye.z);
   let top = -Infinity;
   const bucket = index.bins.get(`${Math.floor(eye.x / index.cellSize)},${Math.floor(eye.z / index.cellSize)},0`) ?? [];
-  for (const i of bucket) if (downRay.intersectTriangle(...index.triangle(i), false, groundPoint)) top = Math.max(top, groundPoint.y);
+  for (const i of bucket) {
+    const [a, b, c] = index.triangle(i);
+    groundNormal.copy(groundEdgeB.subVectors(c, a).cross(groundEdgeA.subVectors(b, a))).normalize();
+    if (Math.abs(groundNormal.y) < .75) continue;
+    if (downRay.intersectTriangle(a, b, c, false, groundPoint)) top = Math.max(top, groundPoint.y);
+  }
   return Number.isFinite(top) ? top : null;
 }
 const coordinate = eye => ({ east: eye.x, north: -eye.z, height: eye.y });
@@ -329,7 +342,7 @@ await section('actual camera rail against actual triangles', async () => {
   const paths = [], poses = [], violations = [], collisionGeometry = [], MAX_VIOLATIONS = 80;
   let violationCount = 0, intersectingChords = 0;
   let totalSamples = 0, uniquePositions = 0, maxStepM = 0, maxRoll = 0, maxQuaternionError = 0, maxAimError = 0;
-  let minimumGrade = Infinity, minimumMesh = Infinity, minimumShell = SHELL_CLEARANCE, missingGround = 0;
+  let minimumGrade = Infinity, minimumMesh = Infinity, minimumShell = SHELL_CLEARANCE, missingGround = 0, indoorSamples = 0;
   const euler = new THREE.Euler(0, 0, 0, 'YXZ');
   for (const narrow of [false, true]) {
     const viewport = narrow ? 'mobile' : 'desktop';
@@ -342,7 +355,12 @@ await section('actual camera rail against actual triangles', async () => {
     const architecture = [geometry.shell, geometry.gatePassage, geometry.innerCourt, geometry.collection, geometry.collectionAccess, geometry.entryPassage, geometry.vegetation, geometry.roadDressing, geometry.groundDressing, retaining, collectionRetaining];
     for (const group of architecture) group.traverse(object => { if (object.isMesh) for (const material of Array.isArray(object.material) ? object.material : [object.material]) material.side = THREE.DoubleSide; });
     const shellIndex = makeIndex(trianglesOf(architecture), 3, 1);
-    const groundIndex = makeIndex(trianglesOf([geometry.ground, geometry.water, geometry.collection, geometry.collectionAccess, geometry.entryPassage], true), 2, 4);
+    // THE GROUND IS THE GROUND. A roof over the walk is not a floor under it:
+    // the insertion's entrance canopy stands three metres over the way in, and
+    // counting it read a visitor walking under it as a visitor buried in the
+    // hillside. The built floors are the insertion's own and are read by the
+    // indoor rule below; this index is the terrain and the water.
+    const groundIndex = makeIndex(trianglesOf([geometry.ground, geometry.water], true), 2, 4);
     const architectureMeshes = new Map();
     for (const name of shellIndex.data.names) architectureMeshes.set(name, (architectureMeshes.get(name) ?? 0) + 1);
     collisionGeometry.push({ viewport, tier, shellTriangles: shellIndex.data.count, groundAndWaterTriangles: groundIndex.data.count,
@@ -398,10 +416,22 @@ await section('actual camera rail against actual triangles', async () => {
           const gradeClearance = eye.y - ground, meshClearance = surface === null ? null : eye.y - surface;
           const shell = shellClearance(shellIndex, previous, eye);
           if (shell.lowerBoundM < 1e-8) intersectingChords++;
-          pathGrade = Math.min(pathGrade, gradeClearance);
-          if (meshClearance === null) missingGround++; else pathMesh = Math.min(pathMesh, meshClearance);
+          // ON THE INSERTION THE FLOOR IS THE INSERTION'S. Its rooms stand
+          // in a cut with their own slab 6.4 m under the terrace, and its
+          // court is a built terrace over ground that is higher to the east:
+          // the terrain is not cut under either, because nothing walks on it
+          // there. A camera on that floor is below the rendered ground by the
+          // depth of the building, which is the building and not a fault, so
+          // the ground clearance is read where the ground is what a visitor
+          // walks on. The shell clearance is read everywhere.
+          const indoors = eye.x > -62.4 && eye.x < -21.6 && eye.z > 18.6 && eye.z < 64.2 && eye.y < -1.9
+          if (indoors) indoorSamples++
+          if (!indoors) {
+            pathGrade = Math.min(pathGrade, gradeClearance)
+            if (meshClearance === null) missingGround++; else pathMesh = Math.min(pathMesh, meshClearance)
+          }
           pathShell = Math.min(pathShell, shell.lowerBoundM);
-          if (gradeClearance < TERRAIN_CLEARANCE - 1e-6 || meshClearance === null || meshClearance < TERRAIN_CLEARANCE - 1e-6 || shell.lowerBoundM < SHELL_CLEARANCE - 1e-6) {
+          if ((!indoors && (gradeClearance < TERRAIN_CLEARANCE - 1e-6 || meshClearance === null || meshClearance < TERRAIN_CLEARANCE - 1e-6)) || shell.lowerBoundM < SHELL_CLEARANCE - 1e-6) {
             violationCount++;
             if (violations.length < MAX_VIOLATIONS) violations.push({ viewport, from, to: id, seconds: clock - startTime, ...coordinate(eye), gradeClearanceM: gradeClearance, meshClearanceM: meshClearance, shellClearanceM: shell.lowerBoundM, shellMesh: shell.mesh });
           }
@@ -426,7 +456,7 @@ await section('actual camera rail against actual triangles', async () => {
       maxRoll = Math.max(maxRoll, pathRoll); maxStepM = Math.max(maxStepM, pathStep);
     }
   }
-  if (minimumGrade < TERRAIN_CLEARANCE - 1e-6 || minimumMesh < TERRAIN_CLEARANCE - 1e-6 || missingGround) fail('terrain-clearance', 'Camera samples do not all clear the live grade and rendered ground by 0.3 m.', { minimumGradeM: minimumGrade, minimumMeshM: minimumMesh, missingGround });
+  if (minimumGrade < TERRAIN_CLEARANCE - 1e-6 || minimumMesh < TERRAIN_CLEARANCE - 1e-6 || missingGround) fail('terrain-clearance', 'Camera samples out of doors do not all clear the live grade and rendered ground by 0.3 m.', { minimumGradeM: minimumGrade, minimumMeshM: minimumMesh, missingGround, indoorSamples });
   if (minimumShell < SHELL_CLEARANCE - 1e-6) fail('shell-clearance', 'A sampled path chord passes within 0.25 m of the actual DoubleSide shell, gate passage, inner court, collection or historic/modern retaining/stair geometry.', { minimumM: minimumShell });
   if (maxRoll > 1e-8 || maxQuaternionError > 1e-10 || maxAimError > 1e-6) fail('camera-orientation', 'YXZ roll, quaternion norm or final target direction exceeds tolerance.', { maxRoll, maxQuaternionError, maxAimError });
   report.rail = { stationIds: ids, viewportCount: 2, adjacentTransitions: 2 * 2 * (ids.length - 1), directPhysicalTransitions: 40, timeStepSeconds: STEP_SECONDS, transitionObservationSeconds: TRANSITION_SECONDS, shellThresholdM: SHELL_CLEARANCE, terrainThresholdM: TERRAIN_CLEARANCE, collisionGeometry, totalCameraSamples: totalSamples, distinctPositionSamples: uniquePositions, maximumSampleStepM: maxStepM, minimumGradeClearanceM: minimumGrade, minimumMeshClearanceM: Number.isFinite(minimumMesh) ? minimumMesh : null, shellClearanceLowerBoundM: minimumShell, intersectingSampleChords: intersectingChords, maximumYXZRollRadians: maxRoll, maximumQuaternionNormError: maxQuaternionError, maximumAimErrorRadians: maxAimError, missingGroundSamples: missingGround, violationCount, violationExamples: violations, violationExamplesCappedAt: MAX_VIOLATIONS, poses, paths };
