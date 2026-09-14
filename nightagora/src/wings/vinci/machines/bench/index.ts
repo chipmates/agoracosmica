@@ -17,6 +17,7 @@ import { applyRopeShadowExperiment } from './rope-shadow-proposal';
 import { buildBenchSupports } from './supports';
 import { createBenchMetrics } from './metrics';
 import { createBenchBackdrop } from './backdrop';
+import { BACK_PLANE_AIR, BACK_PLANE_METRES, BENCH_BACK_PLANE, backPlaneMaterial, buildBackPlane } from './back-plane';
 import { createBenchHour, benchHourRecord, BENCH_SUN_AZIMUTH_DEGREES, BENCH_SUN_ELEVATION_DEGREES } from './hour';
 import { BENCH_ABSENCE, holderName, setRegister, withoutCitations } from './registers';
 import { playbackSchedule, initialPlayback, advancePlayback, togglePlayback, restartPlayback, freezePlayback, playbackPresentation } from './playback';
@@ -326,10 +327,10 @@ export function createBench(stack: Stack, onExit: () => void) {
     const half = new Vector3(span / 2, span / 2, span / 2);
     return new Box3(middle.clone().sub(half), middle.clone().add(half));
   }
-  function compose() {
-    if (!machine)
-      return;
-    const box = closeUp ? focusBounds() : frameBounds(), size = box.getSize(new Vector3()), centre = box.getCenter(new Vector3()), span = Math.max(size.x, size.y, size.z), mobile = innerWidth <= 1280;
+  /** the bearing the eye stands on for this machine. The wall behind it is
+   * placed off the same vector, so the second plane is always the plane the
+   * frame is looking at. */
+  function viewDirection(): Vector3 {
     const direction = new Vector3(1.05, .68, 1.6).normalize();
     if (slug === 'camera-obscura')
       direction.set(sectionEnabled ? 1.5 : 1.25, sectionEnabled ? .8 : .5, sectionEnabled ? -.35 : -1.6).normalize();
@@ -342,6 +343,12 @@ export function createBench(stack: Stack, onExit: () => void) {
     if (slug === 'revolving-crane') direction.set(2.6,.85,.8).normalize();
     if (slug === 'water-lifting-screw') direction.set(-2.3,1.1,-.3).normalize();
     if (slug === 'proportional-compass') direction.set(1.2,.3,1.75).normalize();
+    return direction;
+  }
+  /** how far the eye stands off a box on that bearing, at this frame's shape */
+  function eyeDistance(box: Box3, direction: Vector3, mobile: boolean): number {
+    const size = box.getSize(new Vector3()), centre = box.getCenter(new Vector3());
+    const span = Math.max(size.x, size.y, size.z);
     const right = new Vector3().crossVectors(new Vector3(0, 1, 0), direction).normalize(), up = new Vector3().crossVectors(direction, right).normalize();
     const tanY = Math.tan(17 * Math.PI / 180), tanX = tanY * innerWidth / innerHeight, width = mobile ? .84 : .7, height = slug === 'proportional-compass' ? (mobile ? .38 : .95) : (mobile ? .31 : .8);
     let distance = span;
@@ -351,6 +358,15 @@ export function createBench(stack: Stack, onExit: () => void) {
           const p = new Vector3(x, y, z).sub(centre), depth = p.dot(direction);
           distance = Math.max(distance, depth + Math.abs(p.dot(right)) / (tanX * width), depth + Math.abs(p.dot(up)) / (tanY * height));
         }
+    return distance;
+  }
+  function compose() {
+    if (!machine)
+      return;
+    const box = closeUp ? focusBounds() : frameBounds(), size = box.getSize(new Vector3()), centre = box.getCenter(new Vector3()), span = Math.max(size.x, size.y, size.z), mobile = innerWidth <= 1280;
+    const direction = viewDirection();
+    const right = new Vector3().crossVectors(new Vector3(0, 1, 0), direction).normalize(), up = new Vector3().crossVectors(direction, right).normalize();
+    const distance = eyeDistance(box, direction, mobile);
     camera.aspect = innerWidth / innerHeight;
     camera.fov = 34;
     camera.near = Math.max(.001, span / 1000);
@@ -362,8 +378,17 @@ export function createBench(stack: Stack, onExit: () => void) {
     // The far cascade is a box around the origin, so the floor beyond it took
     // no shadow at all and stood there as a hard edged dark quad. The air
     // now closes inside that box, and the ground hands itself to the air.
-    scene.fog=new Fog('#1a2026',distance+span*.5,distance+span*1.9);
-    scene.fogNode = fog(backdrop, rangeFogFactor(float(distance+span*.5), float(distance+span*1.9)));
+    // THE AIR IS WHAT MAKES THE WALL THE SAME WALL ON EVERY MACHINE. Its own
+    // lit value swings with the bearing: the crane's wall turns away from the
+    // key and the aerial screw's stands nearly square to it. So the air is
+    // fitted to the wall rather than to the machine, and the wall is always
+    // read through the same depth of it, whatever the sun is doing to it.
+    const near = distance + span * .5;
+    const far = BENCH_BACK_PLANE
+      ? near + (distance + BACK_PLANE_METRES - near) / BACK_PLANE_AIR
+      : distance + span * 1.9;
+    scene.fog=new Fog('#1a2026',near,far);
+    scene.fogNode = fog(backdrop, rangeFogFactor(float(near), float(far)));
   }
   async function supports(mine: number) {
     if (!machine) return;
@@ -425,11 +450,31 @@ export function createBench(stack: Stack, onExit: () => void) {
     });
     display.add(...made.meshes);
     supportGeometries.push(...made.geometries);
+    if (BENCH_BACK_PLANE) {
+      const box = displayBounds(), mobile = innerWidth <= 1280;
+      const wall = buildBackPlane({
+        centre: box.getCenter(new Vector3()),
+        toward: viewDirection(),
+        floorY: machine.bounds.min.y - Math.max(...box.getSize(new Vector3()).toArray()) * .034,
+        cameraDistance: eyeDistance(closeUp ? focusBounds() : frameBounds(), viewDirection(), mobile),
+      });
+      const tuffeau = await loadMachineMaterial(stack, 'stone-tuffeau');
+      if (mine !== serial) { wall.geometry.dispose(); return; }
+      const wallMaterial = backPlaneMaterial(stack, tuffeau);
+      wall.mesh.material = wallMaterial;
+      supportMaterials.push(wallMaterial);
+      supportGeometries.push(wall.geometry);
+      display.add(wall.mesh);
+    }
   }
   function lightBench() {
     const scale = machineCatalog[slug].dossier.scale_m, span = Math.max(scale.x, scale.y, scale.z);
     key?.dispose();
-    key = stack.light({ azimuth: BENCH_SUN_AZIMUTH_DEGREES, elevation: BENCH_SUN_ELEVATION_DEGREES, kelvin: 4800, lux: 185, ambient: .72, reach: Math.max(24, span * 6), cascades: [span * 1.25, span * 3.4], sky: { zenith: '#707579', horizon: '#b1a895', ground: '#343532', stars: 0 } });
+    // The far cascade is a box around the origin. It has to contain the wall
+    // as well as the machine, or the floor between them takes no shadow
+    // lookup at all and draws as a hard edged quad.
+    const reach = BENCH_BACK_PLANE ? Math.max(span * 3.4, BACK_PLANE_METRES * 1.45) : span * 3.4;
+    key = stack.light({ azimuth: BENCH_SUN_AZIMUTH_DEGREES, elevation: BENCH_SUN_ELEVATION_DEGREES, kelvin: 4800, lux: 185, ambient: .72, reach: Math.max(24, span * 6, reach * 2.2), cascades: [span * 1.25, reach], sky: { zenith: '#707579', horizon: '#b1a895', ground: '#343532', stars: 0 } });
     key.light.shadow.normalBias = span * .0002;
     key.light.shadow.bias = -span * .00001;
   }

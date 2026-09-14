@@ -83,7 +83,7 @@ export function buildBenchSupports(options: BenchSupportOptions): BenchSupports 
   try {
     for (const box of boxes) {
       const geometry = box === plinth
-        ? chamferedSlab(box.size[0], box.size[1], box.size[2], Math.min(thick * .42, span * .007))
+        ? chamferedSlab(box.size[0], box.size[1], box.size[2], Math.min(thick * .22, span * .004))
         : new BoxGeometry(...box.size)
       inputs.push(geometry)
       geometry.translate(...box.centre)
