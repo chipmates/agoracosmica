@@ -11,6 +11,7 @@ import {aggregateField} from './mineral-microstructure'
 import {denseMineralBody,denseMineralProvenance} from './dense-mineral-body'
 import {slateFiniteFinish,slateFiniteProvenance} from './slate-microstructure'
 import {oakFiniteFinish,oakFiniteProvenance} from './oak-microstructure'
+import { anisotropicFootprint } from './masonry-courses'
 
 export type ShellSurfaceKind = 'brick' | 'stone' | 'slate' | 'oak'
 // TSL overloads are composed at this one boundary, as in the shared stack.
@@ -185,11 +186,16 @@ export function createShellSurface(kind:ShellSurfaceKind,library?:MaterialLibrar
   const isCourse=smoothstep(.001,.01,info.y)
   const detail=mix(float(1),resolved,isCourse)
   const distance=length(P.sub(cameraPosition))
-  const density=float(1).sub(smoothstep(8,48,distance))
+  void distance
   // Continuous material fields retain readable clay firing, stone staining,
   // and slate variation after the millimetre-scale course signal averages.
   // Each field fades by its own world-space footprint, never by brick rows.
-  const worldPixel=length(P.dFdx()).add(length(P.dFdy())).max(.00001)
+  // THE FOOTPRINT IS NOT A CIRCLE, and a scale is dropped when it cannot be
+  // resolved, never because the wall is far away: a street front seen along
+  // its own length is the most grazing plane in the wing and the old circular
+  // footprint filtered every one of its scales away.
+  const worldPixel=anisotropicFootprint(P)
+  const density=float(1).sub(smoothstep(.0035,.019,worldPixel))
   const resolvedAt=(metres:number):N=>smoothstep(2,4.2,float(metres).div(worldPixel))
   const microDensity=density.mul(float(1).sub(smoothstep(.004,.020,worldPixel)))
   const regional=mx_noise_float(P.mul(1/.8)).mul(resolvedAt(.8))
@@ -297,8 +303,17 @@ export function createShellSurface(kind:ShellSurfaceKind,library?:MaterialLibrar
     const width=pixel.div(.14).max(.0001),phase=fract(U.y.div(.14)).add(.03)
     const primitive=(x:N):N=>floor(x).mul(.06).add(fract(x).clamp(0,.06))
     const seam=primitive(phase.add(width.mul(.5))).sub(primitive(phase.sub(width.mul(.5)))).div(width).clamp(0,1)
-    near=mix(rgb('#414a53'),rgb('#58616a'),cell).mul(grain.mul(.08).mul(density).add(1)).mul(float(1).sub(seam.mul(.20)))
-    far=mix(rgb('#414a53'),rgb('#58616a'),.5).mul(1-.20*.06);relief=seam.sub(.06).mul(-.055).add(grain.mul(.035))
+    // A roof at twenty metres shows the scale a patch of slate has, not the
+    // scale a slate has: bands of replaced tile, wash under the ridge, moss
+    // where the slope stays damp. All three survive a two-pixel tile, which
+    // is why the roof used to read as one colour from the street.
+    const patch=mx_noise_float(P.mul(vec3(.62,.9,.62)).add(vec3(5.1,2.3,8.7))).mul(resolvedAt(1.6))
+    const wash=mx_noise_float(P.mul(vec3(2.4,.35,2.4))).mul(resolvedAt(.42))
+    const weathered=mix(rgb('#414a53'),rgb('#58616a'),cell)
+      .mul(patch.mul(.115).add(1)).mul(wash.mul(.055).add(1))
+    near=weathered.mul(grain.mul(.08).mul(density).add(1)).mul(float(1).sub(seam.mul(.20)))
+    far=mix(rgb('#414a53'),rgb('#58616a'),.5).mul(1-.20*.06).mul(patch.mul(.115).add(1))
+    relief=seam.sub(.06).mul(-.055).add(grain.mul(.035))
     // Finite irregular cleavage in the same physical staggered tile UV.
     slateBands.push(...slateFiniteFinish(U))
     const slateGrain=aggregateField(U,U.dFdx().abs().add(U.dFdy().abs()),{cell:.004,radius:[.12,.22],probability:1,seed:31.719,signed:true})
