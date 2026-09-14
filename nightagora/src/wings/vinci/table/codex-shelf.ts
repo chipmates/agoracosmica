@@ -17,6 +17,9 @@ export interface CodexEntry {
   count_en: string
   count_de: string
   map: string
+  plate?: string
+  plate_w?: number
+  plate_h?: number
 }
 
 export interface CodexAbsence {
@@ -46,6 +49,20 @@ function node<K extends keyof HTMLElementTagNameMap>(
   element.className = className
   if (text !== undefined) element.textContent = text
   return element
+}
+
+/** The store serves the shelf plate through the local asset route; the record
+ * that carries its licence is the page it was cut from. */
+function plate(entry: CodexEntry): HTMLImageElement | null {
+  if (!entry.plate) return null
+  const image = document.createElement('img')
+  image.className = 'vt-codex-plate'
+  image.src = `/na-assets/wing-vinci/${entry.plate}`
+  if (entry.plate_w && entry.plate_h) { image.width = entry.plate_w; image.height = entry.plate_h }
+  image.loading = 'lazy'
+  image.decoding = 'async'
+  image.alt = ''
+  return image
 }
 
 function lines(entry: CodexEntry, lang: Language): HTMLElement {
@@ -83,11 +100,15 @@ export function buildCodexList(
         const button = node('button', 'vt-codex-button')
         button.type = 'button'
         button.setAttribute('aria-current', entry.id === current ? 'true' : 'false')
+        const face = plate(entry)
+        if (face) button.append(face)
         button.append(lines(entry, lang))
         button.addEventListener('click', () => onOpen(entry.open as string))
         item.append(button)
       } else {
         const row = node('div', 'vt-codex-row')
+        const face = plate(entry)
+        if (face) row.append(face)
         row.append(lines(entry, lang), node('span', 'vt-codex-state', copy.recorded))
         item.append(row)
       }

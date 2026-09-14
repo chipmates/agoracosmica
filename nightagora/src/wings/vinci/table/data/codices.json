@@ -50,7 +50,10 @@
    "open": null,
    "count_en": "384 scan pages of the library digitisation, covers and blanks included.",
    "count_de": "384 Scanseiten der Digitalisierung, Deckel und Leerseiten eingeschlossen.",
-   "map": "madrid-i-pages.json"
+   "map": "madrid-i-pages.json",
+   "plate": "codices/madrid-i/thumb.jpg",
+   "plate_w": 261,
+   "plate_h": 360
   },
   {
    "id": "madrid-II",
@@ -65,7 +68,10 @@
    "open": null,
    "count_en": "330 scan pages, of which 69 leaves carry no writing.",
    "count_de": "330 Scanseiten, davon 69 Blätter ohne Schrift.",
-   "map": "madrid-ii-pages.json"
+   "map": "madrid-ii-pages.json",
+   "plate": "codices/madrid-ii/thumb.jpg",
+   "plate_w": 259,
+   "plate_h": 360
   },
   {
    "id": "birds",
@@ -80,7 +86,10 @@
    "open": null,
    "count_en": "All 36 numbered faces, folio 1 recto to folio 18 verso.",
    "count_de": "Alle 36 nummerierten Seiten, Blatt 1 recto bis Blatt 18 verso.",
-   "map": "birds-pages.json"
+   "map": "birds-pages.json",
+   "plate": "codices/birds/thumb.jpg",
+   "plate_w": 295,
+   "plate_h": 360
   },
   {
    "id": "trivulzianus",
@@ -95,7 +104,10 @@
    "open": null,
    "count_en": "324 scans of the 1891 facsimile, 94 of them plates.",
    "count_de": "324 Scans des Faksimiles von 1891, davon 94 Tafeln.",
-   "map": "trivulzianus-pages.json"
+   "map": "trivulzianus-pages.json",
+   "plate": "codices/trivulzianus/thumb.jpg",
+   "plate_w": 261,
+   "plate_h": 360
   },
   {
    "id": "paris-A",
@@ -110,7 +122,10 @@
    "open": null,
    "count_en": "15 named faces, not the volume. The monochrome source is all there is.",
    "count_de": "15 benannte Blattseiten, nicht der Band. Die Quelle ist einfarbig.",
-   "map": "paris-a-pages.json"
+   "map": "paris-a-pages.json",
+   "plate": "codices/paris-a/thumb.jpg",
+   "plate_w": 244,
+   "plate_h": 360
   },
   {
    "id": "atlanticus",
@@ -125,7 +140,28 @@
    "open": null,
    "count_en": "45 files, which are pages and details, not a run of folios.",
    "count_de": "45 Dateien, Seiten und Ausschnitte, keine fortlaufenden Blätter.",
-   "map": "atlanticus-pages.json"
+   "map": "atlanticus-pages.json",
+   "plate": "codices/atlanticus/thumb.jpg",
+   "plate_w": 282,
+   "plate_h": 360
+  },
+  {
+   "id": "arundel",
+   "en": "Codex Arundel",
+   "de": "Codex Arundel",
+   "holder_en": "British Library, London",
+   "holder_de": "British Library, London",
+   "tier": "TIER1",
+   "class_en": "Public domain mark from the library that scanned it.",
+   "class_de": "Public-Domain-Kennzeichnung der Bibliothek, die den Scan gemacht hat.",
+   "state": "collection",
+   "open": null,
+   "count_en": "818 scans of the printed facsimile, parts 1 and 3, 286 of them plates. Part 2 was never printed in this run.",
+   "count_de": "818 Scans des gedruckten Faksimiles, Teile 1 und 3, davon 286 Tafeln. Teil 2 wurde in dieser Reihe nie gedruckt.",
+   "map": "arundel-pages.json",
+   "plate": "codices/arundel-1/thumb.jpg",
+   "plate_w": 249,
+   "plate_h": 360
   }
  ],
  "absences": [
@@ -148,13 +184,13 @@
    "reason_de": "Sie hängen in den anderen Räumen des Museums, nicht auf diesem Tisch."
   },
   {
-   "id": "arundel",
-   "en": "Codex Arundel",
-   "de": "Codex Arundel",
+   "id": "arundel-middle",
+   "en": "Codex Arundel, folios 117 to 220",
+   "de": "Codex Arundel, Blätter 117 bis 220",
    "holder_en": "British Library, London",
    "holder_de": "British Library, London",
-   "reason_en": "Its printed facsimile did not land in this round.",
-   "reason_de": "Das gedruckte Faksimile ist in dieser Runde nicht angekommen."
+   "reason_en": "The middle part of the printed facsimile was never published, so those leaves have no admitted plate.",
+   "reason_de": "Der mittlere Teil des gedruckten Faksimiles erschien nie, daher gibt es für diese Blätter keine zugelassene Tafel."
   },
   {
    "id": "paris-rest",

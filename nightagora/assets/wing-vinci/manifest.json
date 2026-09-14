@@ -2535,7 +2535,7 @@
       "prompt": "English and German visitor interface, verified local folio names and the codex shelf copy. Historical transcription and French are displayed verbatim from the locked collection. Handedness documented, reasons hypotheses, own reason unknown.",
       "model": "Deterministic TypeScript, three.js TSL and CSS; authored with GPT-6",
       "date": "2026-09-14",
-      "sha256": "4d7fc95fd93e6c7b055dca2588d3f33dcc4fdc3472304d4bd961db2726b6efd3",
+      "sha256": "a7b26de32b2a3fcc7d2498611817bbde052317b348b47ca4d5b685ea2c1798cb",
       "note": "recipe_file=src/wings/vinci/table/content.ts; output_source=src/wings/vinci/table/content.ts; modern exhibition design, not documentary reconstruction"
     },
     {
@@ -2561,7 +2561,7 @@
       "prompt": "Quiet serif letterpress in a separate reading panel, 44px controls and responsive source layout.",
       "model": "Deterministic TypeScript, three.js TSL and CSS; authored with GPT-6",
       "date": "2026-09-14",
-      "sha256": "1f1a2721ec051b3f946fe0f029e7673abd15e123219f47a2fe1fb5752ffc9f52",
+      "sha256": "94616444ec36c87ba2980a28b5b3f99efbc28bb733c0068bea2e9801b16f5b1e",
       "note": "recipe_file=src/wings/vinci/table/panel.css; output_source=src/wings/vinci/table/panel.css; modern exhibition design, not documentary reconstruction"
     },
     {
@@ -3486,7 +3486,7 @@
       "prompt": "The reading table's codex selector: every codex the rights policy admits, with its holder, its class and what part of it is recorded, plus one line for each named absence.",
       "model": "Deterministic TypeScript and CSS; authored with Opus 5",
       "date": "2026-09-14",
-      "sha256": "6669ab8832f0416f33c9665d4ab6b11981c7c898b7a70d493df5e5d9259b21be",
+      "sha256": "2f3a3a4c2d4bbfd3b39a1c75c4bd69f3d2b8f8b3eebcdc22da8601ac6e42a142",
       "note": "recipe_file=src/wings/vinci/table/codex-shelf.ts; output_source=src/wings/vinci/table/codex-shelf.ts; the shelf names what is recorded and never changes what the reader reads"
     },
     {
@@ -3499,7 +3499,7 @@
       "prompt": "The shelf's register, built from the cross-checked codex classes of 2026-09-14 and the prepared page maps. Counts are scans or edition pages, never manuscript folio totals.",
       "model": "Deterministic build from the codex register and the page maps; authored with Opus 5",
       "date": "2026-09-14",
-      "sha256": "94d56142ed92012d8ef5a0199d27533ac5553bbf68b00172357ca0c0cda9300e",
+      "sha256": "edac4d494518c3a67d0a74e844193010bd38977e19ecfd10cc3f32e391e72b7a",
       "note": "recipe_file=src/wings/vinci/table/data/codices.json; source=program/rounds/wing-vinci/refs/RECLASS-2026-09-14/codices.json"
     }
   ]
