@@ -955,6 +955,72 @@
       "derivation": "Converted embedded ICC profile to sRGB. JPEG previews resized with Lanczos, quality 88, embedded sRGB profile. Original bytes unchanged.",
       "rights_note": "Holder media access explicitly CC0, separate from metadata CC0. Holder Restrictions & Rights: Public domain. The Smithsonian front-of-card high-resolution TIFF is selected whole, including its border, rather than the later Commons crop.",
       "attribution": "Photograph by Benjamin F. Powelson, American, 1823 - 1885"
+    },
+    {
+      "id": "lobby/likeness-austen",
+      "path": "likenesses/austen/original.jpg",
+      "sha256": "6c2cc49d7541e1036ae30be40db75a17b5a217fe9373e8dc66018ce4abfb1729",
+      "bytes": 1709893,
+      "width": 2400,
+      "height": 3096,
+      "pixels": 7430400,
+      "slug": "austen",
+      "name": "Jane Austen",
+      "wing": "lobby",
+      "class": "Tier 2",
+      "tier": 2,
+      "licence": "Public domain",
+      "licence_source_url": "https://commons.wikimedia.org/wiki/File:CassandraAusten-JaneAusten(c.1810)_hires.jpg#Licensing",
+      "licence_location": "Commons file page, Licensing",
+      "holder": "National Portrait Gallery, London, NPG 3630",
+      "maker": "Cassandra Austen",
+      "date": "c. 1810",
+      "source_url": "https://commons.wikimedia.org/wiki/File:CassandraAusten-JaneAusten(c.1810)_hires.jpg",
+      "original_url": "https://upload.wikimedia.org/wikipedia/commons/c/cc/CassandraAusten-JaneAusten%28c.1810%29_hires.jpg",
+      "holder_record_url": "https://www.npg.org.uk/collections/search/portrait/mw00230/Jane-Austen",
+      "display": true,
+      "label_en": "Jane Austen. Cassandra Austen, c. 1810. Pencil and watercolour. National Portrait Gallery, London, NPG 3630. Licence: “Public domain”. Public domain work. Reproduction from Wikimedia Commons. The museum labels the reproduction, not the painting. Non-profit cultural use.",
+      "label_de": "Jane Austen. Cassandra Austen, um 1810. Bleistift und Aquarell. National Portrait Gallery, London, NPG 3630. Lizenz: „Public domain“. Gemeinfreies Werk. Reproduktion von Wikimedia Commons. Das Museum kennzeichnet die Reproduktion, nicht das Gemälde. Nichtkommerzielle kulturelle Nutzung.",
+      "previews": [
+        {
+          "path": "likenesses/austen/preview-512.jpg",
+          "sha256": "e27daa31f98edfbddb0d3528462fe50c53a2d7523a290fd0e8a22eee69ba2964",
+          "bytes": 47436,
+          "width": 397,
+          "height": 512,
+          "pixels": 203264,
+          "long_edge": 512,
+          "format": "image/jpeg",
+          "quality": 88,
+          "color_space": "sRGB",
+          "source_path": "likenesses/austen/original.jpg"
+        },
+        {
+          "path": "likenesses/austen/preview-1024.jpg",
+          "sha256": "e785dec3821575dd99a1f0be23e4e37de94a4ea2ac6afcec4149d84db6d13892",
+          "bytes": 206909,
+          "width": 794,
+          "height": 1024,
+          "pixels": 813056,
+          "long_edge": 1024,
+          "format": "image/jpeg",
+          "quality": 88,
+          "color_space": "sRGB",
+          "source_path": "likenesses/austen/original.jpg"
+        }
+      ],
+      "verified_on": "2026-09-14",
+      "source_verification": "Current Commons imageinfo, original link, licence template and file history checked. NPG holder page returns HTTP 403 in this pass. Current Commons page and source metadata identify NPG 3630; earlier research and cross-check holder verification retained.",
+      "derivation": "No embedded ICC profile. Source interpreted as sRGB. JPEG previews resized with Lanczos, quality 88, embedded sRGB profile. Original bytes unchanged.",
+      "licence_url": "https://commons.wikimedia.org/wiki/File:CassandraAusten-JaneAusten(c.1810)_hires.jpg#Licensing",
+      "rights_note": "Commons Licensing uses PD-Art (PD-old-auto-expired); underlying maker died 1845. NPG record claims image copyright; its NC/800 px download is not Tier 1. Source chain: Commons file description identifies NPG work; full reproduction visually matches NPG record. No source-released full-resolution copy verified.",
+      "source_version": {
+        "file_timestamp": "2014-12-17T10:30:09Z",
+        "commons_revision_id": 1132741613
+      },
+      "source_sha1": "24214ab657842ced67296e115d3d780584f60bdf",
+      "honesty_en": "Public domain work. Reproduction from Wikimedia Commons. The museum labels the reproduction, not the painting. Non-profit cultural use.",
+      "honesty_de": "Gemeinfreies Werk. Reproduktion von Wikimedia Commons. Das Museum kennzeichnet die Reproduktion, nicht das Gemälde. Nichtkommerzielle kulturelle Nutzung."
     }
   ]
 }
