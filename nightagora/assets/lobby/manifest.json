@@ -631,6 +631,66 @@
         "color_space": "sRGB",
         "operation": "Crop and color conversion only. No retouching."
       }
+    },
+    {
+      "id": "lobby/likeness-laozi",
+      "path": "likenesses/laozi/original.jpg",
+      "sha256": "c0f2f715c68e9c66b9bd0b281546f345d3b93a4ac2c2a0eaffb432fb1a01d796",
+      "bytes": 1189287,
+      "width": 2821,
+      "height": 3880,
+      "pixels": 10945480,
+      "slug": "laozi",
+      "name": "Laozi",
+      "wing": "lobby",
+      "class": "Tier 1",
+      "tier": 1,
+      "licence": "This file is made available under the Creative Commons CC0 1.0 Universal Public Domain Dedication.",
+      "licence_source_url": "https://commons.wikimedia.org/wiki/File:MET_DP156671.jpg",
+      "licence_location": "Commons file page, Summary → Permission; holder object page beneath image and Met image policy",
+      "holder": "The Metropolitan Museum of Art, New York",
+      "maker": "Chen Yanqing (active 15th century); photograph released by the Metropolitan Museum of Art",
+      "date": "1438",
+      "source_url": "https://commons.wikimedia.org/wiki/File:MET_DP156671.jpg",
+      "original_url": "https://upload.wikimedia.org/wikipedia/commons/4/4f/MET_DP156671.jpg",
+      "holder_record_url": "https://www.metmuseum.org/art/collection/search/39488",
+      "display": true,
+      "label_en": "Laozi (traditionally 6th century BCE), as a Daoist immortal. Chen Yanqing, 1438, gilt copper alloy. A traditional image made long after Laozi’s presumed lifetime. The Metropolitan Museum of Art, 1997.139. This file is made available under the Creative Commons CC0 1.0 Universal Public Domain Dedication.",
+      "label_de": "Laozi (traditionell 6. Jahrhundert v. Chr.) als daoistischer Unsterblicher. Chen Yanqing, 1438, vergoldete Kupferlegierung. Traditionelle Darstellung, lange nach Laozis vermuteter Lebenszeit entstanden. The Metropolitan Museum of Art, 1997.139. This file is made available under the Creative Commons CC0 1.0 Universal Public Domain Dedication.",
+      "previews": [
+        {
+          "path": "likenesses/laozi/preview-512.jpg",
+          "sha256": "25b62034be20b4da6b28040be3a35e605e6cc6a50e2b02fa4a978ce9f8fe2b03",
+          "bytes": 35050,
+          "width": 372,
+          "height": 512,
+          "pixels": 190464,
+          "long_edge": 512,
+          "format": "image/jpeg",
+          "quality": 88,
+          "color_space": "sRGB",
+          "source_path": "likenesses/laozi/original.jpg"
+        },
+        {
+          "path": "likenesses/laozi/preview-1024.jpg",
+          "sha256": "98b8137e4e5911c090ca4d6527d25fd2c23dfb2f2c44e7542c5b844cdb58ef2e",
+          "bytes": 116213,
+          "width": 745,
+          "height": 1024,
+          "pixels": 762880,
+          "long_edge": 1024,
+          "format": "image/jpeg",
+          "quality": 88,
+          "color_space": "sRGB",
+          "source_path": "likenesses/laozi/original.jpg"
+        }
+      ],
+      "verified_on": "2026-09-14",
+      "source_verification": "Current source record and exact downloaded original checked on admission.",
+      "derivation": "No embedded ICC profile. Source interpreted as sRGB. JPEG previews resized with Lanczos, quality 88, embedded sRGB profile. Original bytes unchanged.",
+      "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "rights_note": "Public-domain 1438 sculpture → Met photograph explicitly donated to Commons under CC0. The Met’s rights policy covers 3D object photographs, independently of the age of the object.",
+      "attribution": "Chen Yanqing, 1438. The Metropolitan Museum of Art, 1997.139. Purchase, Friends of Asian Art Gifts, 1997. CC0 1.0."
     }
   ]
 }
