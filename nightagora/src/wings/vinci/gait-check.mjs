@@ -43,6 +43,13 @@ const certificate = JSON.parse(fs.readFileSync(path.join(wing, 'data/rail-cleara
 const failures = []
 const ensure = (condition, message) => { if (!condition) failures.push(message) }
 
+/** A full walk retains its step; a ceiling-limited traverse fades it out. */
+ensure(strollMetresPerSecond === 1.6, 'The walking cruise is not 1.6 m/s')
+ensure(gaitLeg(40).rhythm === 1, 'The 1.6 m/s cruise loses its step rhythm')
+ensure(Math.abs(gaitLeg(41.875).rhythm - .5) < 1e-12, 'The rhythm does not fade between 1.6 and 1.75 m/s')
+ensure(gaitLeg(43.75).rhythm === 0, 'A 1.75 m/s traverse still carries a step rhythm')
+ensure(gaitLeg(0).seconds === 1.1 && gaitLeg(1000).seconds === 26, 'The walking duration limits changed')
+
 /** Every length the rail actually walks, from the clearance certificate. */
 const lengths = [...new Set(certificate.routes.map(route => Math.round(route.roundedLength * 1000) / 1000))].sort((a, b) => a - b)
 const SAMPLES = 4000
@@ -56,8 +63,8 @@ const legs = lengths.map(length => {
     maxBackwards = Math.max(maxBackwards, previous - at.metres)
     previous = at.metres
     peak = Math.max(peak, at.metresPerSecond)
-    if (at.metresPerSecond > 1.4) bandSeconds.below += leg.seconds / SAMPLES
-    else if (at.metresPerSecond >= 1.2) bandSeconds.stroll += leg.seconds / SAMPLES
+    if (at.metresPerSecond > 1.75) bandSeconds.below += leg.seconds / SAMPLES
+    else if (at.metresPerSecond >= 1.4) bandSeconds.stroll += leg.seconds / SAMPLES
     const step = gaitRhythm(leg, at.metres, false)
     maxRhythm = Math.max(maxRhythm, Math.hypot(step.height, step.sway))
   }
@@ -72,7 +79,7 @@ const legs = lengths.map(length => {
   ensure(maxRhythm <= gaitEnvelopeM + 1e-12, `The step rhythm leaves its declared ${gaitEnvelopeM} m envelope`)
   ensure(gaitRhythm(leg, length / 2, true).height === 0 && gaitRhythm(leg, length / 2, true).sway === 0,
     'Reduced motion does not switch the step rhythm off')
-  if (leg.rhythm > 0) ensure(peak >= 1.2 && peak <= 1.4, `A walked ${length} m leg cruises at ${peak} m/s, outside the stroll`)
+  if (leg.rhythm > 0) ensure(peak >= 1.4 && peak <= 1.75, `A walked ${length} m leg cruises at ${peak} m/s, outside the stroll`)
   return {
     metres: +length.toFixed(3), seconds: +leg.seconds.toFixed(2),
     cruiseMetresPerSecond: +leg.cruiseMetresPerSecond.toFixed(3),
@@ -144,7 +151,7 @@ function walkTrace(metres, reduced) {
 }
 const traces = [walkTrace(17.369497651827334, false), walkTrace(17.369497651827334, true), walkTrace(6.073302231899875, false)]
 ensure(traces[0].heightAmplitudeMM > 6 && traces[0].heightAmplitudeMM < 10, 'The measured rise and fall left its declared band')
-ensure(traces[0].riseAndFallPerSecond > 1.7 && traces[0].riseAndFallPerSecond < 2.05, 'The measured cadence is not a walking cadence')
+ensure(traces[0].riseAndFallPerSecond > 2.1 && traces[0].riseAndFallPerSecond < 2.5, 'The measured cadence is not a walking cadence')
 ensure(traces[1].heightAmplitudeMM === 0 && traces[1].swayAmplitudeMM === 0, 'Reduced motion still carries a step rhythm on the camera')
 ensure(traces.every(trace => trace.endHeightErrorMM < 1e-6 && trace.endEastErrorMM < 1e-6), 'A walk does not land on its own certified eye')
 

@@ -5,15 +5,15 @@
  * not a tuning constant, and `gait-check.mjs` reports all of them.
  */
 
-/** The cruise of a stroll. A relaxed adult walk is 1.2 to 1.4 m/s. */
-export const strollMetresPerSecond = 1.3
+/** The cruise of the wing's walk, in metres per second. */
+export const strollMetresPerSecond = 1.6
 /** Getting under way and stopping. A walker reaches a stroll in about a
  * second and gives the stop a little longer, because a stop is a choice. */
 const ACCEL_SECONDS = .9, BRAKE_SECONDS = 1.1
 /** A leg never cuts, and a mark on the far side of the museum is a traverse
  * rather than a claim about anyone's pace: past the ceiling the cruise rises.
  * The ceiling is what lets the longest room in the insertion still be walked
- * at a stroll: thirty-two metres is the longest leg that keeps one. */
+ * at a stroll: forty metres is the longest leg that keeps one. */
 const MIN_SECONDS = 1.1, MAX_SECONDS = 26
 /** One step at this pace. The cadence follows from the speed, it is not set. */
 export const stepMetres = .68
@@ -25,9 +25,9 @@ const BOB_M = .009, SWAY_M = .006
 const RHYTHM_FADE_M = 1
 /** Past a stroll a step rhythm would be a lie about the pace: a traverse
  * across the whole site carries no step, and the fade ends at the top of the
- * relaxed-walk band, so a leg either strolls with its rhythm or traverses
+ * walking band, so a leg either strolls with its rhythm or traverses
  * without one. */
-const RHYTHM_FULL_MPS = 1.3, RHYTHM_NONE_MPS = 1.4
+const RHYTHM_FULL_MPS = 1.6, RHYTHM_NONE_MPS = 1.75
 /** A visitor who has already asked for the station after this one is not
  * strolling, so the leg's own clock runs at the pace of the asking: each
  * station still waiting adds its share, up to four. The step rhythm goes out

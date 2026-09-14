@@ -413,7 +413,7 @@
    "prompt": "Regenerable actual geometry certificate for40 directed routes across five pose families and two viewport families. Includes foundation, entry, vegetation and all dressing; no sky, DOM or shadow-only duplicate.",
    "model": "Deterministic TypeScript and TSL procedural geometry",
    "date": "2026-09-10",
-   "sha256": "3033fc56b13311c4c1af5a09b20ea0c618b9c3c74890ff586a8896bf9ec51d62",
+   "sha256": "4cc3d08d27a10a3af33555393513d12348bced92571ec2d80b3a35f406695702",
    "note": "recipe_file=src/wings/vinci/data/rail-clearance.json; source_generator=src/wings/vinci/rail-certify.mjs; runtime dependency of vinci/rail"
   },
   {
@@ -426,7 +426,7 @@
    "prompt": "The walk between two stations as a person walks it: the leg profile, the step rhythm and the head lift, with every number a measured walking quantity.",
    "model": "Deterministic TypeScript and TSL procedural geometry",
    "date": "2026-09-11",
-   "sha256": "8391caf3585fd9b42ff1f82daae42c7bd74010ff2fdbf34aa50724dfb28f5d81",
+   "sha256": "6683e6da3e1bb3eb3eabc5be9bbd4c6e61c4dc4fcdae94cbfa6ba5cfd2a0b20d",
    "note": "recipe_file=src/wings/vinci/gait.ts; source_generator=src/wings/vinci/rail-certify.mjs; runtime dependency of vinci/rail"
   },
   {
