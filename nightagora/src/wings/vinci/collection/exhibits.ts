@@ -85,11 +85,12 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
     machine.object.visible = false
     // A MACHINE IS DRAWN AT THE DISTANCE ITS OWN SIZE CAN BE READ FROM. Nine
     // metres of screw is the hall's landmark and a bearing is a hand's width:
-    // one radius for both leaves the hall's far end empty from its own door.
-    const size = machine.bounds.getSize(new Vector3())
+    // one radius for both leaves the hall's far end empty from its own door
+    // and draws three court exhibits from the house, fifty metres away with
+    // the whole building between.
     machines.push({ build: machine, slug, ground: spot.ground,
       at: new Vector3(spot.east, level + spot.plinth, -spot.north),
-      reach: Math.max(14, 1.6 * Math.hypot(size.x, size.z)) })
+      reach: Math.max(14, 3.2 * machine.bounds.getSize(new Vector3()).length()) })
     stamp(machine.object, `vinci/machine/${slug}`)
     host.add(machine.object)
     // THE REST POSE IS THE POSE AT t=0 of this machine's own schedule.
@@ -299,9 +300,10 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
       // between a walk and a frame that draws the whole ground at once.
       const inHall = eye.x > -62.4 && eye.x < -38.6 && eye.z > 41.8 && eye.z < 64.2 && eye.y < -1.9
       for (const machine of machines) {
-        const visible = machine.ground === 'hall' ? inHall && eye.distanceToSquared(machine.at) < machine.reach * machine.reach
-          : machine.ground === 'house' ? eye.distanceToSquared(machine.at) < 18 * 18
-          : near
+        const reach = eye.distanceToSquared(machine.at) < machine.reach * machine.reach
+        const visible = machine.ground === 'hall' ? inHall && reach
+          : machine.ground === 'house' ? reach
+          : near && reach
         if (machine.build.object.visible !== visible) machine.build.object.visible = visible
         // ONE CLOCK RUNS AT A TIME, and only for the machine a close look has
         // been asked for. Everything else stands in its rest pose, which is
