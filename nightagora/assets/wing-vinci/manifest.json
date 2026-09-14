@@ -2401,9 +2401,9 @@
       "licence": "Original procedural exhibition design; source code under the museum repository licence.",
       "display": true,
       "prompt": "A modern oak reading table, reading lamp and linen cradle. Three scales of detail and a restrained lamp pool. Exhibition dressing, no surviving original furniture or binding claimed. Compact 1K library carrier maps with procedural detail.",
-      "model": "Deterministic TypeScript, three.js TSL and CSS; authored with GPT-6",
-      "date": "2026-09-09",
-      "sha256": "71ad43d3c38bd7510b5be47c16165b75dd59d59a60b7f732bba1d099fb13b0d9",
+      "model": "Deterministic TypeScript, three.js TSL and CSS; authored with GPT-6, revised with Claude Opus 5",
+      "date": "2026-09-10",
+      "sha256": "546e4059f06b26200723f35cd0d9b51e71257025630b42295a9e5ec114bdfdde",
       "note": "recipe_file=src/wings/vinci/table/geometry.ts; output_source=src/wings/vinci/table/geometry.ts; modern exhibition design, not documentary reconstruction"
     },
     {
@@ -2414,9 +2414,9 @@
       "licence": "Original procedural exhibition design; source code under the museum repository licence.",
       "display": true,
       "prompt": "A modern facsimile binding with leather boards, hollow gutter and uneven leaf section. Approximate 23 by 16 cm reference from the commission; physical original dimensions are absent from the supplied map. Constant arc-length bent sheet, silent one-second turn.",
-      "model": "Deterministic TypeScript, three.js TSL and CSS; authored with GPT-6",
-      "date": "2026-09-09",
-      "sha256": "71ad43d3c38bd7510b5be47c16165b75dd59d59a60b7f732bba1d099fb13b0d9",
+      "model": "Deterministic TypeScript, three.js TSL and CSS; authored with GPT-6, revised with Claude Opus 5",
+      "date": "2026-09-10",
+      "sha256": "546e4059f06b26200723f35cd0d9b51e71257025630b42295a9e5ec114bdfdde",
       "note": "recipe_file=src/wings/vinci/table/geometry.ts; output_source=src/wings/vinci/table/geometry.ts; modern exhibition design, not documentary reconstruction"
     },
     {
@@ -2427,9 +2427,9 @@
       "licence": "Original procedural exhibition design; source code under the museum repository licence.",
       "display": true,
       "prompt": "Manuscript presentation, strict source-page joins and labelled horizontal mirrored reading copy. Scanned historical paper is retained in sRGB without crop or relettering.",
-      "model": "Deterministic TypeScript, three.js TSL and CSS; authored with GPT-6",
-      "date": "2026-09-09",
-      "sha256": "bca5411d9521c6e7170093ab48f33971f1d38e910a685f3e23611ef82bd25e04",
+      "model": "Deterministic TypeScript, three.js TSL and CSS; authored with GPT-6, revised with Claude Opus 5",
+      "date": "2026-09-10",
+      "sha256": "986b4ea0314db3e54ae7be035a5092eaeecc2a5da7b41a4b08b8cc9541273e67",
       "note": "recipe_file=src/wings/vinci/table/index.ts; output_source=src/wings/vinci/table/index.ts; modern exhibition design, not documentary reconstruction"
     },
     {
@@ -2479,9 +2479,9 @@
       "licence": "Original procedural exhibition design; source code under the museum repository licence.",
       "display": true,
       "prompt": "Isolated inspection route and scene under one warm lamp, original museum hook delegation and measured table telemetry. No historical room reconstruction.",
-      "model": "Deterministic TypeScript, three.js TSL and CSS; authored with GPT-6",
-      "date": "2026-09-09",
-      "sha256": "9212b65f36541a1cb5a0259faa598b5f7d289fb29de17b7ef0392e00f04571aa",
+      "model": "Deterministic TypeScript, three.js TSL and CSS; authored with GPT-6, revised with Claude Opus 5",
+      "date": "2026-09-10",
+      "sha256": "5c2a986364f921df30f0c84f68ca5821a84980e601c56167a58b7640f0d7cd67",
       "note": "recipe_file=src/wings/vinci/table/bench/index.ts; output_source=src/wings/vinci/table/bench/index.ts src/wings/vinci/table/bench/orientation.ts src/wings/vinci/table/bench/soft-shadow.ts; modern exhibition design, not documentary reconstruction"
     },
     {
@@ -2492,9 +2492,9 @@
       "licence": "Original procedural exhibition design; source code under the museum repository licence.",
       "display": true,
       "prompt": "Desktop book beside source panel, phone page above source panel; labelled modern exhibition carrier.",
-      "model": "Deterministic TypeScript, three.js TSL and CSS; authored with GPT-6",
-      "date": "2026-09-09",
-      "sha256": "5590ebb0df2a8f00014a9a9321f89631bc63d8d3d8591d7faf48301c4665cc1b",
+      "model": "Deterministic TypeScript, three.js TSL and CSS; authored with GPT-6, revised with Claude Opus 5",
+      "date": "2026-09-10",
+      "sha256": "88dee47223d7dda42b326394cbfbcce319e3b1bc6d4df27e54f014882ccc6978",
       "note": "recipe_file=src/wings/vinci/table/bench/table-bench.css; output_source=src/wings/vinci/table/bench/table-bench.css src/wings/vinci/table/bench/orientation.css; modern exhibition design, not documentary reconstruction"
     },
     {
@@ -2533,7 +2533,7 @@
       "prompt": "Labelled enlarged facsimile excerpt and exact horizontal pixel reversal, derived only from the currently admitted stream bitmap. No recolouring, relettering, additional fetch or historical claim.",
       "model": "Deterministic TypeScript, three.js TSL and CSS; authored with GPT-6",
       "date": "2026-09-09",
-      "sha256": "973f56a6447d385b7430174aec92a5d3e26c8fdae0e56dce45982258ea1c2d8f",
+      "sha256": "69892396406790ca618289fbdf1f987f3adfef09a20a4ef7546a6cd145cfcc39",
       "note": "recipe_file=src/wings/vinci/table/mirror-detail.ts; output_source=src/wings/vinci/table/mirror-detail.ts; modern exhibition design, not documentary reconstruction"
     },
     {
@@ -2546,7 +2546,7 @@
       "prompt": "Typed English and German labels for the isolated reading table. Brand preserved; historical source text is untouched.",
       "model": "Deterministic TypeScript, three.js TSL and CSS; authored with GPT-6",
       "date": "2026-09-09",
-      "sha256": "63f18a27cef1e3e3d8d08654b17f3b1685a21c781f483739c06478e20fe7547b",
+      "sha256": "7d3a96aeec18dce602c05a3b69b960a0d60390ea2c2e0c49de1523377a0f5e55",
       "note": "recipe_file=src/wings/vinci/table/bench-content.ts; output_source=src/wings/vinci/table/bench-content.ts; modern exhibition design, not documentary reconstruction"
     },
     {
@@ -2557,9 +2557,9 @@
       "licence": "Original procedural exhibition design; source code under the museum repository licence.",
       "display": true,
       "prompt": "Swollen curved modern facsimile text block with continuous fine leaf bands around head, foot and fore-edge. No historic binding claim.",
-      "model": "Deterministic TypeScript, three.js TSL and CSS; authored with GPT-6",
-      "date": "2026-09-09",
-      "sha256": "2b23742c2ce42a46625d19ef4d0c8ebb9c69c7aaac0a3d3195dd904d2fe18553",
+      "model": "Deterministic TypeScript, three.js TSL and CSS; authored with GPT-6, revised with Claude Opus 5",
+      "date": "2026-09-10",
+      "sha256": "706098906bd32b02146250947550dc1ffda5a8d160f3596e1b93bb8829fac4fc",
       "note": "recipe_file=src/wings/vinci/table/text-block.ts; output_source=src/wings/vinci/table/text-block.ts; modern exhibition design, not documentary reconstruction"
     },
     {
@@ -2570,9 +2570,9 @@
       "licence": "Original procedural exhibition design; source code under the museum repository licence.",
       "display": true,
       "prompt": "Modern oak reading rack with eight admitted Ms B facsimile thumbnails at reading height. Exact source joins and licence metadata; no full-size shelf textures or original-object claim.",
-      "model": "Deterministic TypeScript, three.js TSL and CSS; authored with GPT-6",
-      "date": "2026-09-09",
-      "sha256": "d14d4d6ccd5971cda763f7e14ac237e40bed70160a8c0835903bb56839a67d91",
+      "model": "Deterministic TypeScript, three.js TSL and CSS; authored with GPT-6, revised with Claude Opus 5",
+      "date": "2026-09-10",
+      "sha256": "c387d2a01e24de9c90dbbca40af993c2e4b634a04dc2a9c1e22665fc5707c6f6",
       "note": "recipe_file=src/wings/vinci/table/folio-shelf.ts; output_source=src/wings/vinci/table/folio-shelf.ts; modern exhibition design, not documentary reconstruction"
     },
     {
