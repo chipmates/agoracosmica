@@ -3,8 +3,8 @@
  * the nearest three members of a circular lamp field, in world space, so
  * each pool follows its source while the stones turn independently. */
 import {
-  AdditiveBlending, Color, Group, InstancedBufferAttribute, Mesh,
-  MeshBasicNodeMaterial, Scene, Sprite, SpriteNodeMaterial,
+  AdditiveBlending, BackSide, Color, Group, InstancedBufferAttribute, Mesh,
+  MeshBasicNodeMaterial, Scene, SphereGeometry, Sprite, SpriteNodeMaterial,
 } from 'three/webgpu'
 import * as TSL from 'three/tsl'
 import { combine, piercedCourt, revolve, stoneRing } from './mandala/geometry'
@@ -14,11 +14,15 @@ import { FOUNDING_SEED, mulberry32 } from '../core/seed'
 type N = any
 const { abs, atan, cameraPosition, clamp, cos, dot, exp, float, floor, fract,
   fwidth, instancedBufferAttribute, length, max, min, mix, mx_noise_float,
-  normalWorld, normalize, oneMinus, positionLocal, positionWorld, pow,
-  screenCoordinate, sin, smoothstep, step, uniform, uv, vec2, vec3 } = TSL as unknown as Record<string, N>
+  mx_fractal_noise_float, normalWorld, normalize, oneMinus, positionLocal,
+  positionWorld, pow, screenCoordinate, sin, smoothstep, step, uniform, uv,
+  vec2, vec3 } = TSL as unknown as Record<string, N>
 const TAU = Math.PI * 2
 const LAMP_R = 11.35
 const LAMP_Y = 1.42
+/** where the coal bed's light stands over the well: the paving is at -0.9,
+    the bed sits on it, and a fire lights from just above its own coals */
+const HEARTH_Y = -0.28
 const GOLD = '#e0b96a'
 const PAPER = '#f3efe2'
 const c = (hex: string, gain = 1): N => {
@@ -26,12 +30,21 @@ const c = (hex: string, gain = 1): N => {
   return vec3(v.r * gain, v.g * gain, v.b * gain)
 }
 const noise = (p: N): N => mx_noise_float(p)
+const fractal = (p: N, oct: number, amp: number): N =>
+  mx_fractal_noise_float(p, oct, 2.0, 0.5, amp)
 const hash = (p: N): N => fract(sin(dot(p, vec2(127.1, 311.7))).mul(43758.5453))
 const dither = (): N => hash(screenCoordinate.xy).sub(0.5).mul(0.00032)
 const shoulder = (v: N): N => v.div(v.mul(0.32).add(1))
 
 export interface MandalaHandles {
-  update(dt: number, elapsed: number, reveal: number, fire: number, progress?: number): void
+  update(
+    dt: number,
+    elapsed: number,
+    reveal: number,
+    fire: number,
+    deep?: number,
+    progress?: number
+  ): void
   visible(v: boolean): void
 }
 
@@ -45,7 +58,7 @@ export function createMandala(scene: Scene): MandalaHandles {
   const rand = mulberry32(FOUNDING_SEED + 89)
   const uReveal = uniform(0), uHeat = uniform(0), uT = uniform(0)
   const uLampAngle = uniform(0), uCourtAngle = uniform(0), uFlick = uniform(1)
-  const uScale = uniform(1)
+  const uScale = uniform(1), uFireFlick = uniform(1), uDeep = uniform(0)
 
   /** World coordinates expressed in the full-size stage: portrait restages
    * the complete instrument uniformly, including the lamps and their light. */
@@ -92,7 +105,7 @@ export function createMandala(scene: Scene): MandalaHandles {
     let alb: N = mix(c('#17223a'), c('#454b58'), quarry.mul(0.18).add(0.38))
     alb = alb.mul(grain.mul(0.18).add(0.9)).mul(fine.mul(0.065).add(1))
     alb = alb.add(c('#8d93ad', 0.055).mul(vein))
-    let cut: N = float(0), lip: N = float(0)
+    let cut: N = float(0), lip: N = float(0), cupShade: N = float(0)
     if (kind === 'map') {
       const rowF = Q.z.add(4.8).div(0.94)
       const row = floor(rowF)
@@ -140,6 +153,21 @@ export function createMandala(scene: Scene): MandalaHandles {
       cut = max(cut, line(gateD.sub(0.15), 0.05).mul(step(12, r)))
       cut = max(cut, line(r.sub(10.17), 0.025))
       alb = alb.mul(0.86)
+      /* THIRTY BODIES BETWEEN THE PAVING AND THE THIRTY FLAMES. A cup blocks
+         its own flame straight down (the contact dark it sits in) and blocks
+         each neighbour's throw along the ring, which leaves a tapering lobe of
+         shade to either side. Both terms are 2D in the cup grid: no second
+         light, no map. */
+      const cupOff = fract(a.mul(30 / TAU).add(0.5)).sub(0.5)
+      const arcD = cupOff.mul(r.mul(TAU / 30))
+      const radD = r.sub(LAMP_R)
+      const foot = length(vec2(arcD, radD))
+      const contact = oneMinus(smoothstep(0.24, 0.98, foot))
+      // each neighbour's throw lands as one soft ellipse along the ring,
+      // longer than it is wide because the light comes in low
+      const lobeD = length(vec2(abs(arcD).sub(0.92).div(1.15), radD.div(0.46)))
+      const lobe = oneMinus(smoothstep(0.42, 1.0, lobeD))
+      cupShade = clamp(contact.mul(0.86).add(lobe.mul(0.34)), 0, 0.92)
     } else if (kind === 'court') {
       cut = max(line(r.sub(7.5), 0.035), line(r.sub(3.26), 0.028))
       lip = max(line(r.sub(7.56), 0.026), line(r.sub(3.32), 0.025))
@@ -151,14 +179,93 @@ export function createMandala(scene: Scene): MandalaHandles {
     const bedding = line(fract(Q.y.mul(5)).sub(0.5).div(5), 0.012)
     alb = alb.mul(oneMinus(bedding.mul(face).mul(0.25)))
     alb = alb.mul(oneMinus(cut.mul(top).mul(0.78)))
-    let col: N = alb.mul(c('#8d93ad', 0.85).mul(sky).add(c(GOLD, 1.7).mul(lamp)))
+    const shade = oneMinus(cupShade)
+    let col: N = alb.mul(
+      c('#8d93ad', 0.85).mul(sky).mul(oneMinus(cupShade.mul(0.72)))
+        .add(c(GOLD, 1.7).mul(lamp).mul(shade))
+    )
     col = col.add(c(PAPER, 0.0014).mul(lip).mul(top).mul(sky))
-    col = col.add(c(GOLD, 0.022).mul(lip).mul(top).mul(lamp))
-    // The last questions receive a low firelight from the dark central well.
-    const heat = float(2.5).div(dot(P.xz, P.xz).add(3)).mul(uHeat)
-    col = col.add(alb.mul(c('#ff9c42', 0.7)).mul(heat).mul(max(N.y, 0)))
+    col = col.add(c(GOLD, 0.022).mul(lip).mul(top).mul(lamp).mul(shade))
+    /* THE COAL BED IS A SOURCE, not a wash. It stands half a metre over the
+       well, so the paving around it takes a real pool, the inner faces of the
+       rails above it take the up-light, and both fall off as a light does. */
+    const hv = vec3(0, HEARTH_Y, 0).sub(P)
+    const hd2 = dot(hv, hv)
+    const hinc = max(dot(N, normalize(hv)), 0)
+    const fire = hinc.mul(7.2).div(hd2.add(1.1)).mul(uHeat).mul(uFireFlick)
+    col = col.add(alb.mul(c('#ff8c3a', 1.9)).mul(fire))
+    // and the ash it throws: the stone nearest the bed is warm even where no
+    // face turns toward it
+    col = col.add(c('#ff7a2e', 0.05).mul(uHeat).mul(uFireFlick)
+      .div(dot(P.xz, P.xz).mul(0.35).add(1)))
+    /* AIR. At arrival range the far rim is thirty metres of night away and the
+       near rim is ten, and stone that reads the same at both distances reads
+       as a print. The air arrives with the fire, because that is when the
+       ride is close enough for a metre to mean anything. */
+    const dCam = length(cameraPosition.div(uScale).sub(P))
+    const air = smoothstep(9, 42, dCam).mul(uHeat).mul(0.44)
+    col = mix(col, c('#101b35', 0.62), air)
     mat.colorNode = shoulder(col).add(dither()).mul(uReveal)
     return mat
+  }
+
+  /* THE DEEP — what the fall falls through. The night's own field is seeded
+     for a SEATED eye and holds nothing under the horizon, and the middle of
+     this ride looks down into exactly that. So the descent carries its own
+     night: the depth of it, the same river of dust crossing it, rifts of dark
+     inside the dust, and a grain under all of it. Three scales and a
+     gradient, on one shell, behind everything. */
+  const deepMat = new MeshBasicNodeMaterial({
+    transparent: true, side: BackSide, depthWrite: false,
+  })
+  {
+    const dir = normalize(positionLocal)
+    const dep = smoothstep(-0.95, 0.30, dir.y)
+    let col: N = mix(c('#010207'), c('#0a1429'), pow(dep, 1.4))
+    // the large form: the night is not even, it has masses and pools. Two
+    // scales, because one alone reads as fog and a phone's frame is a
+    // narrow window that has to find structure wherever it lands
+    const cloud = clamp(fractal(dir.mul(3.5).add(3.1), 4, 0.62), -1, 1)
+    const fine = clamp(fractal(dir.mul(9.5).add(31.0), 3, 0.66), -1, 1)
+    col = col.add(c('#0e1932', 0.075).mul(clamp(cloud, 0, 1)))
+    col = col.add(c('#121e38', 0.05).mul(clamp(fine, 0, 1)).mul(clamp(cloud.add(0.6), 0, 1)))
+    col = col.mul(oneMinus(clamp(cloud.negate(), 0, 1).mul(0.30)))
+    /* THE RIVER CROSSES THE FALL. Its plane stands nearly upright, so the
+       band runs through the sky the ride looks down into instead of lying
+       along a horizon nobody sees from up here. */
+    const bandN = normalize(vec3(0.86, 0.21, -0.46))
+    const wobble = clamp(fractal(dir.mul(1.7).add(13.0), 3, 0.7), -1, 1).mul(0.055)
+    const across = abs(dot(dir, bandN).add(wobble))
+    const core = oneMinus(smoothstep(0.01, 0.115, across))
+    const halo = oneMinus(smoothstep(0.06, 0.30, across))
+    // lanes run WITH the river; the rifts are where the dust hides the light
+    const lanes = clamp(fractal(dir.mul(6.4).add(7.4), 4, 0.78).mul(0.5).add(0.58), 0, 1)
+    const rift = smoothstep(-0.42, 0.22, clamp(fractal(dir.mul(3.4).add(19.0), 3, 0.72), -1, 1))
+    col = col.add(c('#93a6cc', 0.10).mul(core.mul(0.75).add(halo.mul(0.45))).mul(lanes).mul(rift))
+    // the far small lights the dust hides and uncovers
+    const grit = pow(clamp(noise(dir.mul(74)), 0, 1), 7).mul(0.6)
+      .add(pow(clamp(noise(dir.mul(124).add(5)), 0, 1), 10).mul(0.85))
+      .add(pow(clamp(noise(dir.mul(168).add(17)), 0, 1), 13).mul(0.8))
+    col = col.add(c('#c2cfea', 0.52).mul(grit).mul(halo.mul(0.5).add(0.5)).mul(rift.mul(0.4).add(0.6)))
+    // and the grain the whole field is printed on
+    col = col.mul(noise(dir.mul(190)).mul(0.06).add(1)).add(dither())
+    deepMat.colorNode = col
+    deepMat.opacityNode = uDeep
+  }
+  const deep = new Mesh(new SphereGeometry(84, 40, 28), deepMat)
+  deep.renderOrder = -20
+  deep.frustumCulled = false
+  deep.visible = false
+  scene.add(deep)
+  /* THE DOORWAY HAS AN INSIDE. For the first fifth of the ride the frame is
+     the moon's own face, swallowing the eye: a plane with six levels of
+     range in it. The night on the far side of that door shows THROUGH it
+     instead, so the breath the visitor takes between the eclipse and the map
+     is a night and not a black card. Once the ride is past the door the deep
+     goes back behind everything, where it belongs. */
+  function deepThroughDoor(through: boolean): void {
+    deepMat.depthTest = !through
+    deep.renderOrder = through ? 30 : -20
   }
 
   const base = new Mesh(stoneRing(0, 14, -2.1, -0.9, 0.18), stoneMaterial('map'))
@@ -207,20 +314,117 @@ export function createMandala(scene: Scene): MandalaHandles {
   lamps.renderOrder = 5
   rim.add(lamps)
 
-  // An ember at the axis establishes the destination without a billboard
-  // fire seen from above. The real brazier belongs to the territory below.
-  /* the ember only ever ADDS to the plate it sits on: an opaque disc here
-     printed a black hole at the hub for as long as the fire was cold */
+  /* THE COAL BED. The destination seen from above is a fire, not a decal:
+     a bed of broken coal in its own kerb, read at three scales (the ragged
+     outline the ash makes, the plates of coal the cracks divide, the speckle
+     burning inside the cracks). It is a surface, so it takes the whole pull
+     of the light it gives; the air over it is a separate additive breath.
+     The bed only ever appears with the heat: an opaque disc at the hub
+     printed a black hole for as long as the fire was cold. */
+  const bedMat = new MeshBasicNodeMaterial({ transparent: true, depthWrite: false })
+  {
+    const q = positionLocal.xz
+    const hr = length(q)
+    const ang = atan(q.y, q.x)
+    /* three scales: the plates the fire has broken the bed into, the seams
+       burning between them, and the speckle inside the seams. The plates
+       are dark on top because ash is dark on top; all the light in a coal
+       bed comes out of its cracks. */
+    const warp = noise(q.mul(1.5).add(4.3)).mul(0.30)
+    const plates = noise(q.mul(1.75).add(vec2(warp, warp.mul(1.7))))
+    const seam = oneMinus(smoothstep(0.0, 0.19, abs(plates)))
+    const fineSeam = oneMinus(smoothstep(0.0, 0.085, abs(noise(q.mul(4.3).add(11.0)))))
+    const speck = pow(clamp(noise(q.mul(21.0).add(uT.mul(0.05))), 0, 1), 2.0)
+    // the bed is hottest where it is deepest, and it breathes on two clocks
+    const deepHeat = exp(pow(hr.div(0.78), 2).negate())
+    const breath = sin(uT.mul(0.77)).mul(0.09).add(sin(uT.mul(1.93).add(1.1)).mul(0.05)).add(1)
+    const glow = clamp(
+      float(0.06)
+        .add(seam.mul(0.78))
+        .add(fineSeam.mul(0.24))
+        .add(speck.mul(0.14))
+        .mul(deepHeat.mul(0.85).add(0.15)),
+      0, 1.5
+    ).mul(breath)
+    // the bed has lumps: coal is broken stone, and the top of a lump takes
+    // what little light there is while its side keeps the dark
+    const lump = noise(q.mul(3.4).add(27.0)).mul(0.5).add(0.5)
+    const ash = mix(c('#0f0b08'), c('#2b231c'), noise(q.mul(4.1).add(2.1)).mul(0.5).add(0.5))
+      .mul(lump.mul(0.55).add(0.62))
+    // a coal runs from black through dull red to the one hot place in it
+    const ember = mix(c('#4a1002'), c('#ff9a3c'), clamp(pow(glow, 1.45), 0, 1))
+      .add(c('#ffd9a0', 0.5).mul(clamp(glow.sub(0.85).mul(2.4), 0, 1)))
+    bedMat.colorNode = mix(ash, ember, clamp(glow.mul(1.7).sub(0.16).mul(uHeat), 0, 1))
+      .add(dither())
+    // the ash spills where it spills: the edge is noise, never a circle
+    const edge = noise(vec2(cos(ang), sin(ang)).mul(2.6)).mul(0.16).add(0.90)
+    bedMat.opacityNode = oneMinus(smoothstep(edge.sub(0.13), edge, hr))
+      .mul(clamp(uHeat.mul(2.2), 0, 1)).mul(uReveal)
+  }
+  const bed = new Mesh(stoneRing(0, 1.06, -0.93, -0.868, 0.01, 48), bedMat)
+  bed.renderOrder = 3
+  plate.add(bed)
+
+  /* the kerb: a course of stone set round the bed, so the fire is HELD by
+     something and the well has one more scale of build at arrival range */
+  const kerb = new Mesh(stoneRing(1.02, 1.32, -0.95, -0.80, 0.05, 64), stoneMaterial('socket'))
+  plate.add(kerb)
+
+  // the air over the coals: one additive breath, no edge of its own
   const heartMat = new MeshBasicNodeMaterial({
     transparent: true,
     blending: AdditiveBlending,
     depthWrite: false,
   })
-  const hr = length(positionLocal.xz)
-  const coal = noise(positionLocal.xz.mul(12).add(uT.mul(0.08))).mul(0.35).add(0.55)
-  heartMat.colorNode = c('#ff9c42', 0.8).mul(coal).mul(uHeat).mul(exp(hr.mul(-3))).mul(uReveal)
-  // a disc this small holds its circle at half the segments
-  plate.add(new Mesh(stoneRing(0, 0.74, -0.92, -0.86, 0.02, 32), heartMat))
+  {
+    const hr2 = length(positionLocal.xz)
+    const lick = noise(vec3(positionLocal.x.mul(2.4), positionLocal.z.mul(2.4), uT.mul(0.33)))
+      .mul(0.22).add(0.86)
+    // the air over the coals is a HALO, not a wash: the round before this
+    // one drowned the bed's own structure under its own glow
+    heartMat.colorNode = c('#ff9440', 0.24).mul(lick).mul(uHeat).mul(uFireFlick)
+      .mul(exp(pow(hr2.div(0.70), 2).negate())).mul(uReveal)
+  }
+  // it floats clear of the kerb, which is stone and holds its own shadow
+  const heart = new Mesh(stoneRing(0, 2.0, -0.706, -0.700, 0.01, 48), heartMat)
+  heart.renderOrder = 4
+  plate.add(heart)
+
+  /* THE COALS BREATHE OUT. One thin column over the bed, lit from below by
+     what it rises from and giving that light back as it cools, gone before
+     it reaches the rails. The only moving thing in the well, so the fire
+     reads as burning and not as a lamp under glass. */
+  {
+    const SMOKE = window.innerWidth < 760 ? 26 : 44
+    const puff = new Float32Array(SMOKE * 4)
+    for (let i = 0; i < SMOKE; i++)
+      puff.set([rand() * TAU, 0.04 + rand() * 0.38, rand(), 0.34 + rand() * 0.40], i * 4)
+    const sm = new SpriteNodeMaterial({
+      transparent: true, blending: AdditiveBlending, depthWrite: false,
+    })
+    const sa = instancedBufferAttribute(new InstancedBufferAttribute(puff, 4))
+    const climb = fract(sa.z.add(uT.mul(0.055)))
+    const sway = sin(climb.mul(4.1).add(sa.x)).mul(0.22).mul(climb)
+    sm.positionNode = vec3(
+      cos(sa.x).mul(sa.y).add(sway),
+      climb.mul(3.4).sub(0.84),
+      sin(sa.x).mul(sa.y).add(sway.mul(0.6))
+    )
+    sm.scaleNode = sa.w.mul(climb.mul(2.6).add(0.5))
+    const sd = length(uv().sub(0.5)).mul(2)
+    // the first metre of smoke over a fire is LIT, and it gives that light
+    // back to the night on the way up
+    sm.colorNode = mix(c('#d98047', 0.85), c('#5b6480', 0.30), smoothstep(0.04, 0.52, climb))
+    sm.opacityNode = pow(clamp(oneMinus(sd), 0, 1), 1.7)
+      .mul(smoothstep(0.0, 0.12, climb))
+      .mul(oneMinus(smoothstep(0.35, 1.0, climb)))
+      .mul(uHeat).mul(uReveal).mul(uFireFlick).mul(0.46)
+    const smoke = new Sprite(sm)
+    smoke.count = SMOKE
+    smoke.frustumCulled = false
+    smoke.renderOrder = 4
+    plate.add(smoke)
+  }
 
   const COUNT = window.innerWidth < 760 ? 48 : 90
   const motes = new Float32Array(COUNT * 4)
@@ -239,13 +443,20 @@ export function createMandala(scene: Scene): MandalaHandles {
   root.add(embers)
 
   return {
-    update(_dt, elapsed, reveal, fire, _progress) {
+    update(_dt, elapsed, reveal, fire, deepAmount, progress) {
+      // the deep opens before the map does, so it is driven ahead of the
+      // early return that belongs to the instrument alone
+      uDeep.value = deepAmount ?? 0
+      deep.visible = uDeep.value > 0.002
+      deepThroughDoor((progress ?? 1) < 0.19)
       if (!root.visible) return
       const t = reduced ? 11.2 : elapsed
       uT.value = t
       uReveal.value = reveal
       uHeat.value = fire
       uFlick.value = reduced ? 1 : 0.94 + 0.045 * Math.sin(t * 2.3) + 0.025 * Math.sin(t * 5.9 + 1.7)
+      // a fire is not a lamp: it breathes wider and on its own clock
+      uFireFlick.value = reduced ? 1 : 0.9 + 0.075 * Math.sin(t * 1.7) + 0.045 * Math.sin(t * 4.3 + 0.9)
       plate.rotation.y = t * 0.016
       rim.rotation.y = t * 0.0271
       court.rotation.y = t * -0.0114
@@ -256,6 +467,9 @@ export function createMandala(scene: Scene): MandalaHandles {
       root.scale.setScalar(scale)
       uScale.value = scale
     },
-    visible(v) { root.visible = v },
+    visible(v) {
+      root.visible = v
+      if (!v) deep.visible = uDeep.value > 0.002
+    },
   }
 }
