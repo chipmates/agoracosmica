@@ -71,7 +71,7 @@ test('All 35 surviving identities resolve once, including two supplements and th
   assert.equal(records.length, 35); assert.equal(new Set(records.map(record => record.identity)).size, 35)
   const full = raw.filter(entry => entry.role === 'painting-plate')
   const replaced = new Set(full.flatMap(entry => entry.supersedes ?? []))
-  assert.equal(replaced.size, 11); assert(records.every(record => !replaced.has(record.source.plate.id)))
+  assert.equal(replaced.size, 12); assert(records.every(record => !replaced.has(record.source.plate.id)))
   assert.deepEqual([...records].filter(record => !record.inPictureRegister).map(record => record.identity).sort(), ['turin-self-portrait', 'vitruvian-man'])
   assert.equal(records.find(record => record.identity === 'turin-self-portrait').title.en, 'Presumed self-portrait')
   assert.equal(records.find(record => record.identity === 'vitruvian-man').title.de, 'Vitruvianischer Mensch')

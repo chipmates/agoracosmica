@@ -211,8 +211,8 @@ test('All current primary and alternate sources are unique policy-validated pair
   assert.equal(new Set(joinedEntries.map(e => e.id)).size, 66);
   assert.equal(new Set(joinedEntries.map(e => `${e.wing}/${e.path}`)).size, 66);
   const manifested = rawManifest.assets.filter(e => e.wing === 'wing-vinci' && ['painting-preview', 'painting-plate'].includes(e.role));
-  assert.equal(manifested.length, 92);
-  assert.equal(manifested.filter(e => e.role === 'painting-plate' && e.tier).length, 34);
+  assert.equal(manifested.length, 94);
+  assert.equal(manifested.filter(e => e.role === 'painting-plate' && e.tier).length, 35);
   manifested.forEach(entry => policy.validatePaintingRecord(entry));
   const superseded = new Set(manifested.flatMap(e => e.supersedes ?? []));
   assert(selections.every(e => !superseded.has(e.plate.id)));
