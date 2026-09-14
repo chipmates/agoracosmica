@@ -433,7 +433,9 @@ interface ChipPlace {
   starX: number
   starY: number
 }
+const chipSeats = new Map<string, { x: number; y: number }>()
 function syncChips(): void {
+  syncPageReserve(false)
   const settled = phase === 'wheel' && !paneOpen && elapsed - chapterChangedAt > 0.9
   const places: ChipPlace[] = []
   for (const chip of chipList) {
@@ -461,19 +463,34 @@ function syncChips(): void {
     chip.el.style.visibility = 'visible'
     const above = star.sprite.position.y >= 0
     const half = chip.el.offsetWidth / 2 || 40
-    const x = Math.min(
+    const rawX = Math.min(
       Math.max((chipProject.x * 0.5 + 0.5) * innerWidth, half + 8),
       innerWidth - half - 8
     )
-    const y = (-chipProject.y * 0.5 + 0.5) * innerHeight + (above ? -48 : 24)
+    const rawY = (-chipProject.y * 0.5 + 0.5) * innerHeight + (above ? -48 : 24)
+    /* TYPE DOES NOT SHIMMER. The dome breathes, so a name re-projected every
+       frame re-rasterises on a fraction of a pixel and the glyphs crawl. A
+       seat is taken on whole pixels and kept until its star has really
+       moved, which is the difference between a sky that lives and letters
+       that vibrate. */
+    /* A NAME IS SEATED, AND THE SKY MOVES UNDER IT. A pixel and a half of
+       deadband only made the jumps rarer; the glyphs still re-rasterised
+       whenever the dome's breath crossed the threshold. The seat now holds
+       until the star has REALLY moved (a chapter, a resize, a turn), which
+       is the difference between type and a light. */
+    const seat = chipSeats.get(chip.slug)
+    const moved = !seat || Math.abs(seat.x - rawX) > 11 || Math.abs(seat.y - rawY) > 11
+    const x = moved ? Math.round(rawX) : seat.x
+    const y = moved ? Math.round(rawY) : seat.y
+    if (moved) chipSeats.set(chip.slug, { x, y })
     places.push({
       chip,
       x,
       y,
       half,
       above,
-      starX: (chipProject.x * 0.5 + 0.5) * innerWidth,
-      starY: (-chipProject.y * 0.5 + 0.5) * innerHeight,
+      starX: Math.round((chipProject.x * 0.5 + 0.5) * innerWidth),
+      starY: Math.round((-chipProject.y * 0.5 + 0.5) * innerHeight),
     })
   }
   // a tiny label solver: any two names that would touch step apart along
@@ -499,6 +516,7 @@ function syncChips(): void {
     }
   }
   for (const p of places) {
+    chipSeats.set(p.chip.slug, { x: p.x, y: p.y })
     p.chip.el.style.left = `${p.x}px`
     p.chip.el.style.top = `${p.y}px`
     // the leader leaves the type on the side the star is on and stops a
@@ -507,8 +525,11 @@ function syncChips(): void {
     const dx = p.starX - p.x
     const dy = p.starY - p.y - attach
     p.chip.leader.style.top = `${attach}px`
-    p.chip.leader.style.width = `${Math.max(0, Math.hypot(dx, dy) - 11)}px`
-    p.chip.leader.style.transform = `rotate(${Math.atan2(dy, dx)}rad)`
+    // the leader is quantised with the seat: a hairline that re-renders on
+    // a fraction of a pixel is the same shimmer, one element further down
+    p.chip.leader.style.width = `${Math.round(Math.max(0, Math.hypot(dx, dy) - 11))}px`
+    p.chip.leader.style.transform =
+      `rotate(${(Math.round(Math.atan2(dy, dx) * 200) / 200).toFixed(3)}rad)`
     p.chip.el.classList.add('lit')
   }
   // the sky is told where the names sit, so its ink stays off them
