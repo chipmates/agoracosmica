@@ -9,7 +9,7 @@ type Glyph = FontData['glyphs'][string]
 const glyphs: FontData['glyphs'] = {}
 const round = (n: number) => Math.round(n * 100) / 100
 
-function polygon(points: readonly Point[]): string {
+function polygon(points: readonly Point[], clockwise = true): string {
   if (points.length < 3) return ''
   // FontLoader expects a clockwise exterior contour.
   let area = 0
@@ -17,7 +17,7 @@ function polygon(points: readonly Point[]): string {
     const a = points[i]!, b = points[(i + 1) % points.length]!
     area += a[0] * b[1] - b[0] * a[1]
   }
-  const p = area > 0 ? [...points].reverse() : [...points]
+  const p = (area > 0) === clockwise ? [...points].reverse() : [...points]
   return p.map((q, i) => `${i ? 'l' : 'm'} ${round(q[0])} ${round(q[1])}`).join(' ') +
     ` l ${round(p[0]![0])} ${round(p[0]![1])}`
 }
@@ -51,13 +51,25 @@ function arc(cx: number, cy: number, rx: number, ry: number, a: number, b: numbe
   })
   return stroke(points, w)
 }
-const ring = (cx: number, cy: number, rx: number, ry: number, w = 56) =>
-  arc(cx, cy, rx, ry, -Math.PI / 2, Math.PI * 1.5, w)
+function ring(cx: number, cy: number, rx: number, ry: number, w = 56): string {
+  const outer: Point[] = [], inner: Point[] = []
+  const half = w * 1.45 / 2
+  for (let i = 0; i < 20; i++) {
+    const t = -Math.PI / 2 + i * Math.PI / 10
+    const co = Math.cos(t), si = Math.sin(t)
+    const nx = co / rx, ny = si / ry, k = half / Math.hypot(nx, ny)
+    outer.push([cx + co * rx + nx * k, cy + si * ry + ny * k])
+    inner.push([cx + co * rx - nx * k, cy + si * ry - ny * k])
+  }
+  return `${polygon(outer)} ${polygon(inner, false)}`
+}
 const dot = (x: number, y: number, r = 35) => polygon(Array.from({ length: 10 }, (_, i) =>
   [x + Math.cos(i * Math.PI / 5) * r, y + Math.sin(i * Math.PI / 5) * r] as Point))
 const serif = (x: number, y: number, wide = 80) => line(x - wide, y, x + wide, y, 28)
-const stem = (x: number, lo = 0, hi = 1000, w = 65) =>
-  line(x, lo, x, hi, w) + ' ' + serif(x, lo) + ' ' + serif(x, hi)
+const stem = (x: number, lo = 0, hi = 1000, w = 65) => {
+  const half = w * 1.45 / 2, flare = 80, lip = 20.3, shoulder = 55
+  return polygon([[x-flare,lo-lip],[x+flare,lo-lip],[x+half,lo+shoulder],[x+half,hi-shoulder],[x+flare,hi+lip],[x-flare,hi+lip],[x-half,hi-shoulder],[x-half,lo+shoulder]])
+}
 function add(char: string, advance: number, ...outlines: string[]): void {
   glyphs[char] = { ha: advance, x_min: 0, x_max: advance - 45, o: outlines.join(' ') }
 }
@@ -159,7 +171,7 @@ add('“', 500, glyphs['‘']!.o!, dot(345, 790, 37), arc(405, 810, 70, 130, Mat
 add('”', 500, glyphs['’']!.o!, dot(365, 945, 37), arc(305, 925, 70, 130, -Math.PI / 2, Math.PI / 7, 28))
 add('„', 500, dot(155, 45, 37), arc(95, 25, 70, 130, -Math.PI / 2, Math.PI / 7, 28), dot(365, 45, 37), arc(305, 25, 70, 130, -Math.PI / 2, Math.PI / 7, 28))
 add('…', 770, dot(130, 38, 38), dot(385, 38, 38), dot(640, 38, 38))
-add('·', 285, dot(143, 405, 35))
+add('·', 255, dot(126, 400, 60))
 add('°', 430, ring(215, 820, 125, 140, 37))
 add('+', 700, line(80, 440, 620, 440, 45), line(350, 165, 350, 715, 45))
 add('=', 700, line(80, 295, 620, 295, 43), line(80, 575, 620, 575, 43))

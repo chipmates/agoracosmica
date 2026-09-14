@@ -1,9 +1,9 @@
 # Vinci inscriptions
 
-`createInscription(id = 'richter-498', language = 'en', options)` returns an
+`createInscription(id = 'richter-498', language = 'en', options = {})` returns an
 object with `group`, `width`, `height`, `passage`, `text`, `siglum`, `available`,
 `reason`, and `dispose()`. `options` accepts `surface` and `ink` Three materials,
-`width`, `height`, and cap-height `size`, all lengths in metres. The caller owns
+`width`, `height`, cap-height `size` (all lengths in metres) and `siglum`. The caller owns
 materials it supplies. The module disposes its own geometry and fallback
 materials. The default slab is 4.8 by 3.25 m and 0.30 m thick, centred in XY;
 its front is z=0 and thickness extends toward -Z. Face it toward +Z.
@@ -17,16 +17,36 @@ and `text_de` are used, verbatim, with their original punctuation and case.
 `display_text_en/de` are normalized readings and are never used for quotations.
 Richter 498 is the default because both languages are independently ready and
 its Forster III f. 24v identification is A. Each surface carries one passage,
-with its exact folio siglum smaller below. Changing language rebuilds the
-surface from its corresponding source; the caller disposes the old instance.
+with its exact folio siglum smaller below when `siglum` is left at its default
+`true`. Changing language rebuilds the surface from its corresponding source;
+the caller disposes the old instance.
+
+`siglum:false` cuts the quotation alone and centres it on the face. A museum
+host passes it: a citation carved into an exhibit is the record standing in the
+label's place, and the folio siglum belongs in the opened record with the
+passage number. A host that takes this option MUST print the siglum in its
+record; the value is on the returned object and in `group.userData.inscription`.
+Standalone use keeps the siglum, so the carrier alone still names its source.
+
+The host's source drawer must bridge Richter's passage number and the
+Forster notebook page in plain language: they identify the same words, not
+two different quotations. The bench uses `INSCRIPTION_SOURCE` from
+`../line/bench/visitor-sources.ts`, naming Richter's English and Herzfeld's
+German translations. The deliberately opened record retains the full locked
+passage, both exact catalogue identifiers, provenance, folio notes and any
+gaps. The siglum is present either on the stone or in the record, never in
+neither place; that is the inscription contract. This module creates no DOM
+or text-register roots; the caller declares the drawer and record.
 
 A null German source returns `available:false`, `text:null` and the exact
 catalogue `de_status` as `reason`. A passage not ready for standalone display
 also returns `available:false`, with catalogue folio notes as `reason`. Neither
-case creates a quotation mesh. The caller must show that status in its source
-drawer and must never supply a guessed translation or silently substitute EN.
+case creates a quotation mesh. The caller must explain the unavailability
+plainly in its reading surface, preserving the complete catalogue status and
+notes in the record. It must never supply a guessed translation or silently
+substitute EN.
 
-`createText(text, {size, maxWidth?, depth?, material, lineHeight?, bevel?})`
+`createText(text, {size, maxWidth?, depth?, material, lineHeight?, bevel?, embedded?})`
 returns `{mesh, width, height, lines, lineWidths, size, dispose}`. The mesh is real extruded
 glyph geometry, facing +Z in local XY. Its top-left bound is at (0,0), and it
 extends right and down (-Y). `width` and `height` are measured geometry bounds;
@@ -35,6 +55,14 @@ extends right and down (-Y). `width` and `height` are measured geometry bounds;
 they could not otherwise fit. Wrapping changes whitespace alone; the exact
 original string is held in `mesh.userData.text`. Unsupported characters fail
 explicitly rather than being silently rendered as question marks.
+
+`embedded` defaults to false. Set it only when lettering is bonded to a
+carrier: it omits triangles whose three vertex normals point backward along
+local -Z, retaining the front caps, side walls and any bevels. This saves
+hidden geometry without flattening the letters or changing their source
+string, wrapping or measured layout. Free-standing lettering should keep its
+back caps. The returned text mesh receives shadows and defaults to not
+casting them; the host can opt a hero inscription into casting.
 
 `mesh.geometry` is one mergeable, ungrouped buffer geometry. For repetitive
 labels, clone it, apply the desired transform and merge the clones by material;
@@ -49,6 +77,18 @@ the collection and its punctuation are independent literal glyphs. Its
 source recipe is the regeneration record. The main letters have 2 mm physical
 thickness as ink laid into a modern exhibition stone; this is a declared made
 carrier, not a facsimile of an original Leonardo wall inscription.
+
+The inscription uses a rounded 0.286 m backing and a separate beveled face,
+with the complete carrier extending from z=-0.30 to z=0. Marginal pores are
+actual voids closed by the backing 14 mm below the face; they avoid the
+quotation and siglum. Both text settings use `embedded:true`. The body begins
+at z=0.0004, has 2 mm extrusion and is marked `userData.noWeld` so its cast
+shadow does not enable shadows for every small text label in an integrating
+material batch. The exact siglum requests 0.135 m cap height and 0.9 mm
+extrusion, and is omitted entirely under `siglum:false`, where the body
+centres on the face instead of sitting up to leave room for it. The returned
+height includes any expansion required by the body;
+do not infer its extent from a fixed default slab size.
 
 Manifest IDs expected from the integrating bench:
 
