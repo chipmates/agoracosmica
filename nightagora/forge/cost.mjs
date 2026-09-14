@@ -6,6 +6,10 @@
 //
 // Usage:  pnpm build && node forge/cost.mjs [--strict] [--tier=hero]
 //   --strict  exit non-zero when a tier is over its own budget
+//
+// Every reading is a SETTLED one: forge/settle.mjs stands at the stage until
+// the count stops moving and reports the count that repeats, with the frames
+// that cost more than it on their own column (`refresh`).
 //   FORGE_PORT   which port to run the preview on (default 5199)
 //   FORGE_FPS    also fail on the frame interval (off by default: the rig
 //                renders offscreen and headless, where nothing is locked to
@@ -13,6 +17,7 @@
 //                the owner's frame rate)
 import { chromium } from 'playwright'
 import { spawn } from 'node:child_process'
+import { steadyCost } from './settle.mjs'
 import {
   assertAdapter,
   assertBackend,
@@ -26,6 +31,9 @@ const PORT = Number(process.env['FORGE_PORT'] ?? 5199)
 const BASE = `http://localhost:${PORT}`
 const STRICT = process.argv.includes('--strict')
 const FPS_STRICT = process.env['FORGE_FPS'] === '1'
+/** how long a stage is given to stop moving before its reading is taken
+    anyway, and the run says it never settled */
+const SETTLE_CAP = 25000
 const only = process.argv.find((a) => a.startsWith('--tier='))?.split('=')[1]
 const tiers = only ? [only] : TIERS
 
@@ -70,7 +78,8 @@ try {
     console.log(
       `${'stage'.padEnd(10)}${'draws'.padStart(7)}${'tris'.padStart(10)}` +
         `${'frameMB'.padStart(9)}${'texMB'.padStart(8)}` +
-        `${'frame p50'.padStart(11)}${'p95'.padStart(8)}${'cpu p50'.padStart(9)}${'p95'.padStart(8)}`
+        `${'frame p50'.padStart(11)}${'p95'.padStart(8)}${'cpu p50'.padStart(9)}${'p95'.padStart(8)}` +
+        `${'settled'.padStart(9)}${'refresh'.padStart(10)}`
     )
     for (const [name, phase, opts] of STAGES) {
       await page.evaluate(([p, o]) => window.__forge.jump(p, o), [phase, opts])
@@ -78,17 +87,19 @@ try {
         if (await page.evaluate((p) => document.body.dataset.forge === p, phase)) break
         await page.waitForTimeout(80)
       }
-      // the meter's window is 120 frames: give it the whole window, and give
-      // the first frames of a new stage time to compile out of the reading
+      // the reading is taken when the stage stops moving, not after a fixed
+      // wait: a stage sampled while it is still shedding work reports the
+      // frame the sample landed on
       await page.waitForTimeout(600)
       await page.evaluate(() => window.__forge.tier(document.body.dataset.tier))
-      await page.waitForTimeout(2400)
-      const c = await page.evaluate(() => window.__forge.cost())
+      const c = await steadyCost(page, { ms: SETTLE_CAP })
       console.log(
         `${name.padEnd(10)}${String(c.draws).padStart(7)}${String(c.triangles).padStart(10)}` +
           `${c.frameMB.toFixed(1).padStart(9)}${c.textureMB.toFixed(1).padStart(8)}` +
           `${c.frameMsP50.toFixed(1).padStart(11)}${c.frameMsP95.toFixed(1).padStart(8)}` +
-          `${c.cpuMsP50.toFixed(1).padStart(9)}${c.cpuMsP95.toFixed(1).padStart(8)}`
+          `${c.cpuMsP50.toFixed(1).padStart(9)}${c.cpuMsP95.toFixed(1).padStart(8)}` +
+          `${`${(c.steady.ms / 1000).toFixed(1)}s${c.steady.held ? '' : '!'}`.padStart(9)}` +
+          `${`${c.settled.refresh.frames}f+${c.settled.refresh.draws}`.padStart(10)}`
       )
       if (c.draws > budget.draws) failures.push(`${tier}/${name}: ${c.draws} draws over ${budget.draws}`)
       if (c.triangles > budget.triangles)

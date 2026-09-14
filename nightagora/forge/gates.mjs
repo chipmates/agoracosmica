@@ -45,6 +45,7 @@ import { chromium } from 'playwright'
 import { spawn } from 'node:child_process'
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { basename, join, resolve } from 'node:path'
+import { steadyCost } from './settle.mjs'
 import {
   APP_ROOT,
   assertAdapter,
@@ -65,9 +66,10 @@ const SURFACE = args[1] ?? process.env['FORGE_SURFACE'] ?? 'lobby'
 const WING = SURFACE === 'wing'
 const BASE = `http://localhost:${PORT}`
 const WALK_MS = 10000
-/** the cost meter's window is 120 frames, so a station is stood at long
-    enough to fill it before its reading is taken */
-const STATION_MS = 2200
+/** a station is stood at until its reading stops moving, never for a fixed
+    wait: forge/settle.mjs holds the window and says how long it took. This
+    is the cap, not the wait. */
+const STATION_MS = 25000
 const CONE_DIR = 'gates-cones'
 /** no offline checker of a wing may hold the gate run longer than this */
 const CHECKER_MS = 300000
@@ -238,8 +240,7 @@ async function measure(browser, tier, vp) {
       missed.push(`${id} (standing at ${at || 'nowhere'})`)
       continue
     }
-    await page.waitForTimeout(STATION_MS)
-    stations[id] = await page.evaluate(() => window.__forge.cost())
+    stations[id] = await steadyCost(page, { ms: STATION_MS })
   }
   if (ids.length) {
     const last = ids[ids.length - 1]
@@ -248,7 +249,9 @@ async function measure(browser, tier, vp) {
   }
 
   await walk(page, WALK_MS)
-  const walked = await page.evaluate(() => window.__forge.cost())
+  // the gaze rests where the walk left it, and the reading is taken there
+  // once it stands: a number read mid-drag is the frame the sample landed on
+  const walked = await steadyCost(page, { ms: 12000 })
   const adapter = /adapter=(\S+)/.exec(firstLine)?.[1] ?? 'unknown'
   await page.close()
   // the tier's reading is the worst the surface reaches, walk included
@@ -261,7 +264,27 @@ async function measure(browser, tier, vp) {
     frameMB: Math.max(...readings.map((r) => r.frameMB)),
     frameMsP95: Math.max(...readings.map((r) => r.frameMsP95)),
   }
-  return { tier, viewport: vp.tag, adapter, backend: stamp.backend, cost: worst, walk: walked, stations, missed, problems, ids }
+  /* THE FRAMES THAT COST MORE THAN THE ROOM. A pass that runs every few
+     frames (a shadow cascade re-render is the known one) is reported on its
+     own line instead of being folded into a count that a budget holds. */
+  const refresh = readings
+    .map((r) => r.settled?.refresh ?? { frames: 0, draws: 0 })
+    .reduce((a, b) => (b.draws > a.draws ? b : a), { frames: 0, draws: 0 })
+  const unsteady = Object.entries(stations)
+    .filter(([, c]) => c.steady?.held === false)
+    .map(([id]) => id)
+  return { tier, viewport: vp.tag, adapter, backend: stamp.backend, cost: worst, walk: walked, refresh, unsteady, stations, missed, problems, ids }
+}
+
+/** one tier, said in full: the settled numbers, what the scene cost before
+    it stood, and the frames that cost more than the room */
+function costLine(name, r) {
+  return (
+    `  ${name.padEnd(10)} ${r.cost.draws} draws  ${r.cost.triangles} tris  ${r.cost.frameMB} MB frame  ` +
+    `${r.cost.textureMB} MB texture  p50 ${r.cost.frameMsP50} ms  p95 ${r.cost.frameMsP95} ms` +
+    `\n             refresh ${r.refresh.frames} frame(s) +${r.refresh.draws} draws` +
+    (r.unsteady.length ? `  |  still moving at: ${r.unsteady.join(', ')}` : '')
+  )
 }
 
 /* THE LOOK CONE, PER STATION. A wing is judged on its four corners at every
@@ -413,7 +436,7 @@ try {
     for (const [id, c] of Object.entries(r.stations)) {
       stationCost[id] = { ...(stationCost[id] ?? {}), [tier]: c }
     }
-    say(`  ${tier.padEnd(9)} ${r.cost.draws} draws  ${r.cost.triangles} tris  ${r.cost.frameMB} MB frame  ${r.cost.textureMB} MB texture  p50 ${r.cost.frameMsP50} ms  p95 ${r.cost.frameMsP95} ms`)
+    say(costLine(tier, r))
   }
   // the public gate names the phone, and the phone runs the calm tier
   const phone = await measure(browser, 'calm', VIEWPORTS.mobile)
@@ -423,7 +446,7 @@ try {
   for (const [id, c] of Object.entries(phone.stations)) {
     stationCost[id] = { ...(stationCost[id] ?? {}), 'calm-phone': c }
   }
-  say(`  ${'calm-phone'.padEnd(9)} ${phone.cost.draws} draws  ${phone.cost.triangles} tris  ${phone.cost.frameMB} MB frame  ${phone.cost.textureMB} MB texture  p50 ${phone.cost.frameMsP50} ms  p95 ${phone.cost.frameMsP95} ms`)
+  say(costLine('calm-phone', phone))
   backend = { backend: phone.backend, adapter: phone.adapter, ok: !/swiftshader|lavapipe|llvmpipe|software/i.test(phone.adapter) }
   coneReport = await cones(browser, stationIds)
   leakReport = await leak(browser)
