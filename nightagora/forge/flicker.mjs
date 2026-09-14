@@ -41,6 +41,18 @@
 //            and not an edge failing to settle. It is why the camera is
 //            held at each of the 120 directions instead.
 //
+// THE ROOM HAS TO BE STANDING BEFORE A FRAME COUNTS. Asking for a station
+// is not a cut: a wing WALKS its visitor there, and a leg of that walk runs
+// from about four to nineteen seconds. A flat settle therefore recorded the
+// street going past, which reads as most of the frame unstable and as a
+// pop-in at every held pair. So the rig reads the camera pose off the app's
+// own state hook once per animation frame and holds nothing until the pose
+// has not moved for ten frames in a row, with a ceiling of thirty seconds
+// per station. The ceiling is reported per station, and a station that hits
+// it flags the run, because the reading under it is a reading of a moving
+// camera. After the pose stands, the old settle still runs: arriving and
+// being dressed are two different things.
+//
 // THE FILM HAS TO BE HELD STILL. The post chain reseeds its grain every
 // frame by design (see src/stack/post.ts), so every pixel of every frame
 // moves a little and an instrument with no switch measures the film's own
@@ -139,6 +151,17 @@ const SHIMMER_SHARE = 0.002
    the same frame. Without this wait a step of camera motion sits inside a
    hold the test calls held, which is 17 to 39 invented pop-ins per walk. */
 const SETTLE_MS = 90
+/* WAITING FOR THE RAIL TO STAND. The pose is the app's own `state().cam`:
+   the eye, the angles, the field of view and the head of the projection.
+   Ten consecutive frames of it unmoved is a room that has arrived, and a
+   walk that is easing into its last centimetre moves further than this
+   between two frames until it is actually over. */
+const STAND_FRAMES = 10
+const STAND_CEILING_MS = 30_000
+/** metres, radians and degrees: under this between two frames is standing */
+const STAND_EPSILON = 1e-5
+/** and what the room is then given to dress itself before a frame is kept */
+const ARRIVED_SETTLE_MS = 2200
 const TILE = 32
 
 /* ---- PNG, ffmpeg, and the arithmetic over the frames --------------------- */
@@ -706,6 +729,50 @@ function margins(off, drag) {
   }
 }
 
+/* THE WAIT FOR THE RAIL TO STAND. Polled inside the page, once per animation
+   frame, because a leg is walked on the browser's own clock and a round trip
+   per sample would both miss frames and slow the thing being watched. The
+   pose read is `state().cam`, which every surface answers; a surface that
+   answers none is reported as such and falls through to the settle alone. */
+async function waitForStand(page) {
+  return page.evaluate(
+    ([want, ceiling, eps]) =>
+      new Promise((done) => {
+        const pose = () => {
+          const c = window.__forge?.state?.().cam
+          return c ? [...c.p, ...c.r, c.fov, ...c.proj] : null
+        }
+        const began = performance.now()
+        let last = pose()
+        if (!last) {
+          done({ stood: false, why: 'this surface reports no camera pose', ms: 0, frames: 0 })
+          return
+        }
+        let held = 0
+        let seen = 0
+        const tick = () => {
+          const now = pose()
+          seen++
+          const still = Boolean(now) && now.length === last.length && now.every((v, i) => Math.abs(v - last[i]) <= eps)
+          held = still ? held + 1 : 0
+          last = now ?? last
+          const ms = Math.round(performance.now() - began)
+          if (held >= want) {
+            done({ stood: true, ms, frames: seen })
+            return
+          }
+          if (ms >= ceiling) {
+            done({ stood: false, why: `the pose was still moving after ${ms} ms`, ms, frames: seen })
+            return
+          }
+          requestAnimationFrame(tick)
+        }
+        requestAnimationFrame(tick)
+      }),
+    [STAND_FRAMES, STAND_CEILING_MS, STAND_EPSILON]
+  )
+}
+
 async function readStation(browser, url, spot, cone, opts = {}) {
   const { page, problems, line } = await openPage(browser, url)
   if (opts.assertApp) {
@@ -727,7 +794,12 @@ async function readStation(browser, url, spot, cone, opts = {}) {
       return { station: spot.id, error: `the frame would not stand at ${spot.id}` }
     }
   }
-  await page.waitForTimeout(2200)
+  /* ARRIVAL IS WALKED, NOT CUT. `station()` hands the wing a destination and
+     returns; the visitor is then walked there over seconds. Nothing is held
+     until the pose has stood for ten frames (or the ceiling is reached), and
+     only then does the room get its settle. */
+  const stood = await waitForStand(page)
+  await page.waitForTimeout(ARRIVED_SETTLE_MS)
   const hasSwitch = await page.evaluate(() => typeof window.__forge.grain === 'function')
   const client = await page.context().newCDPSession(page)
   const off = await staticReading(page, client, join(RAW, `${spot.id}-off`), false)
@@ -755,6 +827,9 @@ async function readStation(browser, url, spot, cone, opts = {}) {
     station: spot.id,
     state: v.state,
     why: v.why,
+    /* what the frame was doing before it was read: the wait for the walk to
+       end, and whether it ended inside the ceiling */
+    stood,
     /* a declaration that turns out to hold a still room is reported, so the
        list in FLICKER-BASE.json cannot grow quietly past what it explains */
     living,
@@ -962,9 +1037,12 @@ if (SELF_TEST) {
         `  ${r.state}  film off ${(off.unstableShare * 100).toFixed(3)} percent over ${SD_LEVELS} levels, longest region ${off.longestRegionPx} px` +
           ` | film on ${(on.unstableShare * 100).toFixed(3)} percent, mean sd ${on.meanSd} against ${off.meanSd}` +
           ` | drag ${r.drag.popEvents} pop(s), shimmer ${(r.drag.shimmerShare * 100).toFixed(3)} percent` +
-          ` | ${off.fps} fps, ${off.repeatedFrames} repeated frame(s)`
+          ` | ${off.fps} fps, ${off.repeatedFrames} repeated frame(s)` +
+          ` | ${r.stood?.stood ? `stood after ${r.stood.ms} ms` : `NEVER STOOD: ${r.stood?.why}`}`
       )
       for (const w of r.why) say(`    · ${w}`)
+      if (r.stood && !r.stood.stood)
+        flags.push(`${spot.id}: ${r.stood.why}, so these frames are of a camera that is still moving`)
       if (r.living) say(`    · declared living in FLICKER-BASE.json: ${r.living}`)
       if (r.staleDeclaration)
         say(`    · declared living, and nothing moves here: drop ${WING ? `wing/${SLUG}` : SURFACE}/${spot.id} from FLICKER-BASE.json`)
@@ -995,6 +1073,10 @@ if (SELF_TEST) {
       dragSteps: DRAG_STEPS,
       holdFrames: HOLD_FRAMES,
       settleMs: SETTLE_MS,
+      standFrames: STAND_FRAMES,
+      standCeilingMs: STAND_CEILING_MS,
+      standEpsilon: STAND_EPSILON,
+      arrivedSettleMs: ARRIVED_SETTLE_MS,
       tile: TILE,
     },
     stations,
