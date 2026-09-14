@@ -1,0 +1,3945 @@
+{
+  "schema_version": "1.0",
+  "provenance": {
+    "source_root": "program/rounds/wing-vinci",
+    "governing_source": "CONCEPT.md",
+    "rights_authority": "refs/RIGHTS-CROSSCHECK.md",
+    "catalogue_date": "2026-09-08",
+    "prepared_date": "2026-09-09",
+    "scope": "Data commission. Source assets remain read-only."
+  },
+  "works": [
+    {
+      "id": "baptism-of-christ",
+      "catalogue_number": 1,
+      "register_status": "concept_register",
+      "title_en": "The Baptism of Christ",
+      "title_de": "Taufe Christi",
+      "holder": "Gallerie degli Uffizi, Florence",
+      "inventory": "1890 n. 8358",
+      "height_cm": 177,
+      "width_cm": 151,
+      "medium": "Tempera and oil",
+      "support": "Panel",
+      "medium_de": "Tempera und Öl",
+      "support_de": "Holztafel",
+      "date_from": 1470,
+      "date_to": 1475,
+      "date_certainty": "approximate",
+      "attribution_line_en": "Andrea del Verrocchio and Leonardo da Vinci. A collaborative work.",
+      "attribution_line_de": "Andrea del Verrocchio und Leonardo da Vinci. Eine gemeinsame Arbeit.",
+      "attribution_certainty": "documented",
+      "rights_class": "RC",
+      "plate_file": null,
+      "plate_pixels": null,
+      "licence_line": "Public domain, via Wikimedia Commons",
+      "absence_reason_en": "Held by Gallerie degli Uffizi, Florence. Available file: baptism-of-christ__uffizi__3760x4520.jpg. The museum classified this scan as RC. The supplied terms have not been cleared for this exhibition. Obtain written permission for this reproduction from the holder and the image supplier.",
+      "absence_reason_de": "Sammlung: Gallerie degli Uffizi, Florenz. Vorhandene Datei: baptism-of-christ__uffizi__3760x4520.jpg. Dieses Museum hat den Scan als RC eingestuft. Seine Nutzungsbedingungen sind für diese Ausstellung nicht geklärt. Eine schriftliche Freigabe des besitzenden Museums und des Bildanbieters würde diese Reproduktion ermöglichen.",
+      "label_first_line_en": "Absent. The Baptism of Christ. Andrea del Verrocchio and Leonardo da Vinci. A collaborative work.",
+      "label_first_line_de": "Abwesend. Taufe Christi. Andrea del Verrocchio und Leonardo da Vinci. Eine gemeinsame Arbeit.",
+      "hang": {
+        "wall": "picture-room-main",
+        "order": 1,
+        "eye_height_cm": 155
+      },
+      "in_house_1517": false,
+      "de_beatis": null,
+      "facts": [
+        {
+          "text_en": "The Uffizi attributes the panel jointly to Verrocchio and Leonardo da Vinci.",
+          "text_de": "Die Uffizien schreiben die Tafel Verrocchio und Leonardo da Vinci gemeinsam zu.",
+          "source_url": "https://www.uffizi.it/en/artworks/verrocchio-leonardo-baptism-of-christ",
+          "certainty": "documented"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://www.uffizi.it/en/artworks/verrocchio-leonardo-baptism-of-christ",
+          "supports": [
+            "inventory",
+            "height_cm",
+            "width_cm",
+            "medium",
+            "support",
+            "date_from",
+            "date_to",
+            "attribution"
+          ],
+          "local_source": "refs/MINING-CATALOG-PAINTINGS.md §1",
+          "verification": "holder record as transcribed in catalog"
+        },
+        {
+          "url": "https://commons.wikimedia.org/wiki/File:Verrocchio_and_Leonardo,_Baptism_of_Christ,_c1470-75,_Uffizi.jpg",
+          "supports": [
+            "held_scan",
+            "rights_class",
+            "licence_line"
+          ],
+          "local_source": "refs/RIGHTS-CROSSCHECK.md P06",
+          "verification": "cross-check governs"
+        }
+      ],
+      "rights_basis": {
+        "row": "P06",
+        "decision": "Italian protected holder remains RC despite the photograph’s free copyright tag."
+      },
+      "held_scan_files": [
+        "refs/paintings/baptism-of-christ__uffizi__3760x4520.jpg"
+      ],
+      "clearance_sentence_en": "Obtain written permission for this reproduction from the holder and the image supplier.",
+      "clearance_sentence_de": "Eine schriftliche Freigabe des besitzenden Museums und des Bildanbieters würde diese Reproduktion ermöglichen.",
+      "additional_plates": [],
+      "display_mode": "absence_outline",
+      "measurement": {
+        "source_url": "https://www.uffizi.it/en/artworks/verrocchio-leonardo-baptism-of-christ",
+        "status": "holder_record",
+        "extent": "object",
+        "alternatives": [],
+        "registration": "not established",
+        "museum_eye_height_source": "CONCEPT-OPUS.md S11, 1.55 m",
+        "order_source": "CONCEPT-OPUS.md S11, chronological with attribution and rights interleaved"
+      },
+      "reproduction_note_en": "Keep the raster’s aspect ratio. Its corners are not registered to the measured object.",
+      "reproduction_note_de": "Das Seitenverhältnis der Datei bleibt erhalten. Ihre Ecken sind dem vermessenen Objekt noch nicht zugeordnet.",
+      "gaps": [],
+      "german_provenance": {
+        "title": "Catalog German title with restored umlauts, or museum wording where the catalog supplies none.",
+        "visitor_copy": "New museum German written for this commission."
+      },
+      "date_label_en": "About 1470 to 1475",
+      "date_label_de": "Etwa 1470 bis 1475",
+      "certainty_word_en": "Absent",
+      "certainty_word_de": "Abwesend"
+    },
+    {
+      "id": "annunciation",
+      "catalogue_number": 2,
+      "register_status": "concept_register",
+      "title_en": "Annunciation",
+      "title_de": "Die Verkündigung",
+      "holder": "Gallerie degli Uffizi, Florence",
+      "inventory": "1890 n. 1618",
+      "height_cm": 98,
+      "width_cm": 217,
+      "medium": "Oil",
+      "support": "Wood",
+      "medium_de": "Öl",
+      "support_de": "Holztafel",
+      "date_from": 1472,
+      "date_to": 1472,
+      "date_certainty": "approximate",
+      "attribution_line_en": "Leonardo da Vinci.",
+      "attribution_line_de": "Leonardo da Vinci.",
+      "attribution_certainty": "documented",
+      "rights_class": "RC",
+      "plate_file": null,
+      "plate_pixels": null,
+      "licence_line": "Photo Justin Benttinen, released into the public domain, via Wikimedia Commons",
+      "absence_reason_en": "Held by Gallerie degli Uffizi, Florence. Available file: annunciation__uffizi__7776x3569.jpg. The museum classified this scan as RC. The supplied terms have not been cleared for this exhibition. Obtain written permission for this reproduction from the holder and the image supplier.",
+      "absence_reason_de": "Sammlung: Gallerie degli Uffizi, Florenz. Vorhandene Datei: annunciation__uffizi__7776x3569.jpg. Dieses Museum hat den Scan als RC eingestuft. Seine Nutzungsbedingungen sind für diese Ausstellung nicht geklärt. Eine schriftliche Freigabe des besitzenden Museums und des Bildanbieters würde diese Reproduktion ermöglichen.",
+      "label_first_line_en": "Absent. Annunciation. Leonardo da Vinci.",
+      "label_first_line_de": "Abwesend. Die Verkündigung. Leonardo da Vinci.",
+      "hang": {
+        "wall": "picture-room-main",
+        "order": 2,
+        "eye_height_cm": 155
+      },
+      "in_house_1517": false,
+      "de_beatis": null,
+      "facts": [
+        {
+          "text_en": "The Uffizi record gives dimensions that conflict with those used in the concept.",
+          "text_de": "Die Maßangaben der Uffizien weichen von den Maßen im Ausstellungskonzept ab.",
+          "source_url": "https://www.uffizi.it/en/artworks/annunciation",
+          "certainty": "documented"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://www.uffizi.it/en/artworks/annunciation",
+          "supports": [
+            "inventory",
+            "height_cm",
+            "width_cm",
+            "medium",
+            "support",
+            "date_from",
+            "date_to",
+            "attribution"
+          ],
+          "local_source": "refs/MINING-CATALOG-PAINTINGS.md §2",
+          "verification": "holder record as transcribed in catalog"
+        },
+        {
+          "url": "https://commons.wikimedia.org/wiki/File:Annunciation_(Leonardo_c._1472%E2%80%931476).jpg",
+          "supports": [
+            "held_scan",
+            "rights_class",
+            "licence_line"
+          ],
+          "local_source": "refs/RIGHTS-CROSSCHECK.md P04",
+          "verification": "cross-check governs"
+        },
+        {
+          "url": "https://en.wikipedia.org/wiki/Annunciation_(Leonardo)",
+          "supports": [
+            "height_cm",
+            "width_cm"
+          ],
+          "local_source": "CONCEPT-OPUS.md S11 and PAINTINGS §2",
+          "verification": "Catalog competing measurement selected by governing concept."
+        }
+      ],
+      "rights_basis": {
+        "row": "P04",
+        "decision": "Italian protected holder remains RC despite the photograph’s free copyright tag."
+      },
+      "held_scan_files": [
+        "refs/paintings/annunciation__uffizi__7776x3569.jpg"
+      ],
+      "clearance_sentence_en": "Obtain written permission for this reproduction from the holder and the image supplier.",
+      "clearance_sentence_de": "Eine schriftliche Freigabe des besitzenden Museums und des Bildanbieters würde diese Reproduktion ermöglichen.",
+      "additional_plates": [],
+      "display_mode": "absence_outline",
+      "measurement": {
+        "source_url": "https://en.wikipedia.org/wiki/Annunciation_(Leonardo)",
+        "status": "disputed_concept_choice",
+        "extent": "object",
+        "alternatives": [
+          {
+            "height_cm": 90,
+            "width_cm": 222,
+            "note": "Current holder measurement in catalog. The concept explicitly selects 98 by 217 cm provisionally.",
+            "source_url": "https://www.uffizi.it/en/artworks/annunciation"
+          }
+        ],
+        "registration": "not established",
+        "museum_eye_height_source": "CONCEPT-OPUS.md S11, 1.55 m",
+        "order_source": "CONCEPT-OPUS.md S11, chronological with attribution and rights interleaved"
+      },
+      "reproduction_note_en": "Keep the raster’s aspect ratio. Its corners are not registered to the measured object.",
+      "reproduction_note_de": "Das Seitenverhältnis der Datei bleibt erhalten. Ihre Ecken sind dem vermessenen Objekt noch nicht zugeordnet.",
+      "gaps": [
+        "The Uffizi gives 90 by 222 cm. The concept selects 98 by 217 cm. Neither aspect ratio proves the measurement."
+      ],
+      "german_provenance": {
+        "title": "Catalog German title with restored umlauts, or museum wording where the catalog supplies none.",
+        "visitor_copy": "New museum German written for this commission."
+      },
+      "date_label_en": "About 1472",
+      "date_label_de": "Um 1472",
+      "certainty_word_en": "Absent",
+      "certainty_word_de": "Abwesend"
+    },
+    {
+      "id": "annunciation-predella",
+      "catalogue_number": 3,
+      "register_status": "concept_register",
+      "title_en": "Annunciation, predella panel",
+      "title_de": "Die Verkündigung, Predella",
+      "holder": "Musée du Louvre, Paris",
+      "inventory": "MI 598, Campana 258",
+      "height_cm": 16,
+      "width_cm": 60,
+      "medium": "Oil",
+      "support": "Panel",
+      "medium_de": "Öl",
+      "support_de": "Holztafel",
+      "date_from": 1475,
+      "date_to": 1478,
+      "date_certainty": "approximate",
+      "attribution_line_en": "Disputed. Lorenzo di Credi or Leonardo da Vinci.",
+      "attribution_line_de": "Umstritten. Lorenzo di Credi oder Leonardo da Vinci.",
+      "attribution_certainty": "disputed",
+      "rights_class": "RC",
+      "plate_file": null,
+      "plate_pixels": null,
+      "licence_line": "Public domain. Scan C2RMF, via Wikimedia Commons",
+      "absence_reason_en": "Held by Musée du Louvre, Paris. Available file: annunciation-predella__louvre__8000x1856.jpg. The museum classified this scan as RC. The supplied terms have not been cleared for this exhibition. A verified free release from C2RMF, or a separately cleared reproduction, would fill this frame.",
+      "absence_reason_de": "Sammlung: Musée du Louvre, Paris. Vorhandene Datei: annunciation-predella__louvre__8000x1856.jpg. Dieses Museum hat den Scan als RC eingestuft. Seine Nutzungsbedingungen sind für diese Ausstellung nicht geklärt. Eine nachgewiesene freie Freigabe von C2RMF oder eine gesondert freigegebene Reproduktion würde diesen Rahmen füllen.",
+      "label_first_line_en": "Absent. Annunciation, predella panel. Disputed. Lorenzo di Credi or Leonardo da Vinci.",
+      "label_first_line_de": "Abwesend. Die Verkündigung, Predella. Umstritten. Lorenzo di Credi oder Leonardo da Vinci.",
+      "hang": {
+        "wall": "picture-room-main",
+        "order": 4,
+        "eye_height_cm": 155
+      },
+      "in_house_1517": false,
+      "de_beatis": null,
+      "facts": [
+        {
+          "text_en": "The Louvre registers this small panel under MI 598.",
+          "text_de": "Der Louvre führt diese kleine Tafel unter MI 598.",
+          "source_url": "https://collections.louvre.fr/ark:/53355/cl010064973",
+          "certainty": "documented"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://collections.louvre.fr/ark:/53355/cl010064973",
+          "supports": [
+            "inventory",
+            "height_cm",
+            "width_cm",
+            "medium",
+            "support",
+            "date_from",
+            "date_to",
+            "attribution"
+          ],
+          "local_source": "refs/MINING-CATALOG-PAINTINGS.md §3",
+          "verification": "holder record as transcribed in catalog"
+        },
+        {
+          "url": "https://commons.wikimedia.org/wiki/File:L%27Annonciation,_by_Leonardo_da_Vinci,_from_C2RMF_retouched.jpg",
+          "supports": [
+            "held_scan",
+            "rights_class",
+            "licence_line"
+          ],
+          "local_source": "refs/RIGHTS-CROSSCHECK.md P03",
+          "verification": "cross-check governs"
+        }
+      ],
+      "rights_basis": {
+        "row": "P03",
+        "decision": "Legacy C2RMF scan says PD on Commons, but a free original release is unverified against restrictive C2RMF supply terms."
+      },
+      "held_scan_files": [
+        "refs/paintings/annunciation-predella__louvre__8000x1856.jpg"
+      ],
+      "clearance_sentence_en": "A verified free release from C2RMF, or a separately cleared reproduction, would fill this frame.",
+      "clearance_sentence_de": "Eine nachgewiesene freie Freigabe von C2RMF oder eine gesondert freigegebene Reproduktion würde diesen Rahmen füllen.",
+      "additional_plates": [],
+      "display_mode": "absence_outline",
+      "measurement": {
+        "source_url": "https://collections.louvre.fr/ark:/53355/cl010064973",
+        "status": "holder_record",
+        "extent": "object",
+        "alternatives": [],
+        "registration": "not established",
+        "museum_eye_height_source": "CONCEPT-OPUS.md S11, 1.55 m",
+        "order_source": "CONCEPT-OPUS.md S11, chronological with attribution and rights interleaved"
+      },
+      "reproduction_note_en": "Keep the raster’s aspect ratio. Its corners are not registered to the measured object.",
+      "reproduction_note_de": "Das Seitenverhältnis der Datei bleibt erhalten. Ihre Ecken sind dem vermessenen Objekt noch nicht zugeordnet.",
+      "gaps": [],
+      "german_provenance": {
+        "title": "Catalog German title with restored umlauts, or museum wording where the catalog supplies none.",
+        "visitor_copy": "New museum German written for this commission."
+      },
+      "date_label_en": "About 1475 to 1478",
+      "date_label_de": "Etwa 1475 bis 1478",
+      "certainty_word_en": "Absent",
+      "certainty_word_de": "Abwesend"
+    },
+    {
+      "id": "madonna-of-the-carnation",
+      "catalogue_number": 4,
+      "register_status": "concept_register",
+      "title_en": "Madonna of the Carnation",
+      "title_de": "Madonna mit der Nelke",
+      "holder": "Bayerische Staatsgemäldesammlungen, Alte Pinakothek, Munich",
+      "inventory": "7779",
+      "height_cm": 62,
+      "width_cm": 48.5,
+      "medium": "Oil",
+      "support": "Poplar panel",
+      "medium_de": "Öl",
+      "support_de": "Pappelholz",
+      "date_from": 1475,
+      "date_to": 1475,
+      "date_certainty": "approximate",
+      "attribution_line_en": "Leonardo da Vinci.",
+      "attribution_line_de": "Leonardo da Vinci.",
+      "attribution_certainty": "documented",
+      "rights_class": "DG",
+      "plate_file": "refs/paintings/madonna-of-the-carnation__alte-pinakothek__5558x7307.jpg",
+      "plate_pixels": {
+        "width": 5558,
+        "height": 7307
+      },
+      "licence_line": "Public domain. Scan Google Arts and Culture, via Wikimedia Commons",
+      "absence_reason_en": null,
+      "absence_reason_de": null,
+      "label_first_line_en": "Documented. Madonna of the Carnation. Leonardo da Vinci.",
+      "label_first_line_de": "Belegt. Madonna mit der Nelke. Leonardo da Vinci.",
+      "hang": {
+        "wall": "picture-room-main",
+        "order": 5,
+        "eye_height_cm": 155
+      },
+      "in_house_1517": false,
+      "de_beatis": null,
+      "facts": [
+        {
+          "text_en": "The holder calls the painting Madonna mit der Nelke in German.",
+          "text_de": "Das besitzende Museum nennt das Bild Madonna mit der Nelke.",
+          "source_url": "https://www.sammlung.pinakothek.de/en/artwork/Y0GR916LRX",
+          "certainty": "documented"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://www.sammlung.pinakothek.de/en/artwork/Y0GR916LRX",
+          "supports": [
+            "inventory",
+            "height_cm",
+            "width_cm",
+            "medium",
+            "support",
+            "date_from",
+            "date_to",
+            "attribution"
+          ],
+          "local_source": "refs/MINING-CATALOG-PAINTINGS.md §4",
+          "verification": "Current holder page read on 2026-09-09."
+        },
+        {
+          "url": "https://commons.wikimedia.org/wiki/File:Leonardo_da_Vinci_-_Madonna_del_garofano_(ca._1475).jpg",
+          "supports": [
+            "held_scan",
+            "rights_class",
+            "licence_line"
+          ],
+          "local_source": "refs/RIGHTS-CROSSCHECK.md P18",
+          "verification": "cross-check governs"
+        }
+      ],
+      "rights_basis": {
+        "row": "P18",
+        "decision": "Commons states PD for a faithful flat reproduction; EU reading applies."
+      },
+      "held_scan_files": [
+        "refs/paintings/madonna-of-the-carnation__alte-pinakothek__5558x7307.jpg"
+      ],
+      "clearance_sentence_en": null,
+      "clearance_sentence_de": null,
+      "additional_plates": [],
+      "display_mode": "reproduction_card_beside_measured_outline",
+      "measurement": {
+        "source_url": "https://www.sammlung.pinakothek.de/en/artwork/Y0GR916LRX",
+        "status": "holder_record",
+        "extent": "object",
+        "alternatives": [],
+        "registration": "not established",
+        "museum_eye_height_source": "CONCEPT-OPUS.md S11, 1.55 m",
+        "order_source": "CONCEPT-OPUS.md S11, chronological with attribution and rights interleaved"
+      },
+      "reproduction_note_en": "Keep the raster’s aspect ratio. Its corners are not registered to the measured object.",
+      "reproduction_note_de": "Das Seitenverhältnis der Datei bleibt erhalten. Ihre Ecken sind dem vermessenen Objekt noch nicht zugeordnet.",
+      "gaps": [],
+      "german_provenance": {
+        "title": "Catalog German title with restored umlauts, or museum wording where the catalog supplies none.",
+        "visitor_copy": "New museum German written for this commission."
+      },
+      "date_label_en": "About 1475",
+      "date_label_de": "Um 1475",
+      "certainty_word_en": "Documented",
+      "certainty_word_de": "Belegt"
+    },
+    {
+      "id": "ginevra-de-benci",
+      "catalogue_number": 5,
+      "register_status": "concept_register",
+      "title_en": "Ginevra de' Benci",
+      "title_de": "Bildnis der Ginevra de' Benci",
+      "holder": "National Gallery of Art, Washington",
+      "inventory": "1967.6.1.a and 1967.6.1.b",
+      "height_cm": 38.1,
+      "width_cm": 37,
+      "medium": "Oil",
+      "support": "Panel",
+      "medium_de": "Öl",
+      "support_de": "Holztafel",
+      "date_from": 1474,
+      "date_to": 1478,
+      "date_certainty": "approximate",
+      "attribution_line_en": "Leonardo da Vinci.",
+      "attribution_line_de": "Leonardo da Vinci.",
+      "attribution_certainty": "documented",
+      "rights_class": "DG",
+      "plate_file": "refs/paintings/ginevra-de-benci-obverse__nga-washington__4400x4539.jpg",
+      "plate_pixels": {
+        "width": 4400,
+        "height": 4539
+      },
+      "licence_line": "Public domain. Scan National Gallery of Art, Washington, via Wikimedia Commons",
+      "absence_reason_en": null,
+      "absence_reason_de": null,
+      "label_first_line_en": "Documented. Ginevra de' Benci. Leonardo da Vinci.",
+      "label_first_line_de": "Belegt. Bildnis der Ginevra de' Benci. Leonardo da Vinci.",
+      "hang": {
+        "wall": "picture-room-main",
+        "order": 3,
+        "eye_height_cm": 155
+      },
+      "in_house_1517": false,
+      "de_beatis": null,
+      "facts": [
+        {
+          "text_en": "The original panel measures 38.1 by 37 cm. A later addition changes its overall height.",
+          "text_de": "Die ursprüngliche Tafel misst 38,1 mal 37 cm. Eine spätere Ergänzung verändert ihre Gesamthöhe.",
+          "source_url": "https://commons.wikimedia.org/wiki/File:Leonardo_da_Vinci,_Ginevra_de%27_Benci_(obverse),_c._1474-1478,_NGA_50724.jpg",
+          "certainty": "documented"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://commons.wikimedia.org/wiki/File:Leonardo_da_Vinci,_Ginevra_de%27_Benci_(obverse),_c._1474-1478,_NGA_50724.jpg",
+          "supports": [
+            "inventory",
+            "height_cm",
+            "width_cm",
+            "medium",
+            "support",
+            "date_from",
+            "date_to",
+            "attribution"
+          ],
+          "local_source": "refs/MINING-CATALOG-PAINTINGS.md §5",
+          "verification": "holder record as transcribed in catalog"
+        },
+        {
+          "url": "https://commons.wikimedia.org/wiki/File:Ginevra_de%27_Benci_-_National_Gallery_of_Art.jpg",
+          "supports": [
+            "held_scan",
+            "rights_class",
+            "licence_line"
+          ],
+          "local_source": "refs/RIGHTS-CROSSCHECK.md P09",
+          "verification": "cross-check governs"
+        }
+      ],
+      "rights_basis": {
+        "row": "P09",
+        "decision": "NGA open-access PD reproduction; held file is bounded, not the 108 MB original."
+      },
+      "held_scan_files": [
+        "refs/paintings/ginevra-de-benci-obverse__nga-washington__4400x4539.jpg",
+        "refs/paintings/ginevra-de-benci-reverse__nga-washington__6000x6214.jpg"
+      ],
+      "clearance_sentence_en": null,
+      "clearance_sentence_de": null,
+      "additional_plates": [
+        {
+          "plate_file": "refs/paintings/ginevra-de-benci-reverse__nga-washington__6000x6214.jpg",
+          "plate_pixels": {
+            "width": 6000,
+            "height": 6214
+          },
+          "licence_line": "Public domain. Scan Google Arts and Culture, via Wikimedia Commons",
+          "rights_class": "DG",
+          "rights_row": "P10",
+          "role": "reverse_of_same_panel",
+          "inventory": "1967.6.1.b",
+          "source_url": "https://commons.wikimedia.org/wiki/File:Leonardo_da_Vinci_-_Wreath_of_Laurel,_Palm,_and_Juniper_with_a_Scroll_inscribed_Virtutem_Forum_Decorat_(reverse)_-_Google_Art_Project.jpg"
+        }
+      ],
+      "display_mode": "reproduction_card_beside_measured_outline",
+      "measurement": {
+        "source_url": "https://commons.wikimedia.org/wiki/File:Leonardo_da_Vinci,_Ginevra_de%27_Benci_(obverse),_c._1474-1478,_NGA_50724.jpg",
+        "status": "holder_record",
+        "extent": "pictured original panel",
+        "alternatives": [
+          {
+            "height_cm": 42.7,
+            "width_cm": 37,
+            "note": "Includes the later bottom addition, absent from the held reproduction.",
+            "source_url": "https://commons.wikimedia.org/wiki/File:Leonardo_da_Vinci,_Ginevra_de%27_Benci_(obverse),_c._1474-1478,_NGA_50724.jpg"
+          }
+        ],
+        "registration": "not established",
+        "museum_eye_height_source": "CONCEPT-OPUS.md S11, 1.55 m",
+        "order_source": "CONCEPT-OPUS.md S11, chronological with attribution and rights interleaved",
+        "original_thickness_cm": 1.1
+      },
+      "reproduction_note_en": "Two faces of one fixed panel. The reverse reads VIRTVTEM FORMA DECORAT. No missing hands are reconstructed.",
+      "reproduction_note_de": "Zwei Seiten derselben fest montierten Tafel. Auf der Rückseite steht VIRTVTEM FORMA DECORAT. Die fehlenden Hände werden nicht ergänzt.",
+      "gaps": [],
+      "german_provenance": {
+        "title": "Catalog German title with restored umlauts, or museum wording where the catalog supplies none.",
+        "visitor_copy": "New museum German written for this commission."
+      },
+      "date_label_en": "About 1474 to 1478",
+      "date_label_de": "Etwa 1474 bis 1478",
+      "certainty_word_en": "Documented",
+      "certainty_word_de": "Belegt"
+    },
+    {
+      "id": "benois-madonna",
+      "catalogue_number": 6,
+      "register_status": "concept_register",
+      "title_en": "Benois Madonna",
+      "title_de": "Madonna Benois",
+      "holder": "State Hermitage Museum, Saint Petersburg",
+      "inventory": "GE-2773",
+      "height_cm": 49.5,
+      "width_cm": 33,
+      "medium": "Oil",
+      "support": "Canvas, transferred from panel",
+      "medium_de": "Öl",
+      "support_de": "Leinwand, von Holz übertragen",
+      "date_from": 1478,
+      "date_to": 1480,
+      "date_certainty": "approximate",
+      "attribution_line_en": "Leonardo da Vinci.",
+      "attribution_line_de": "Leonardo da Vinci.",
+      "attribution_certainty": "documented",
+      "rights_class": "RC",
+      "plate_file": null,
+      "plate_pixels": null,
+      "licence_line": "Photo Francesco Bini, Wikimedia Commons, CC BY-SA 4.0",
+      "absence_reason_en": "Held by State Hermitage Museum, Saint Petersburg. Available file: benois-madonna__hermitage__3304x4608.jpg. The museum classified the held photograph as RC. It depicts a Palazzo Colonna work, not the Hermitage painting. A correctly identified and independently cleared image of the Hermitage painting would fill this frame.",
+      "absence_reason_de": "Sammlung: Staatliche Eremitage, Sankt Petersburg. Vorhandene Datei: benois-madonna__hermitage__3304x4608.jpg. Dieses Museum hat das vorhandene Foto als RC eingestuft. Es zeigt ein Werk im Palazzo Colonna statt des Gemäldes der Eremitage. Ein korrekt identifiziertes und gesondert freigegebenes Bild des Gemäldes der Eremitage würde diesen Rahmen füllen.",
+      "label_first_line_en": "Absent. Benois Madonna. Leonardo da Vinci.",
+      "label_first_line_de": "Abwesend. Madonna Benois. Leonardo da Vinci.",
+      "hang": {
+        "wall": "picture-room-main",
+        "order": 6,
+        "eye_height_cm": 155
+      },
+      "in_house_1517": false,
+      "de_beatis": null,
+      "facts": [
+        {
+          "text_en": "The Hermitage acquired the painting from the Benois family in 1914.",
+          "text_de": "Die Eremitage erwarb das Bild 1914 von der Familie Benois.",
+          "source_url": "https://en.wikipedia.org/wiki/Benois_Madonna",
+          "certainty": "documented"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://www.hermitagemuseum.org/wps/portal/hermitage/digital-collection/01.+Paintings/29908/",
+          "supports": [
+            "inventory",
+            "height_cm",
+            "width_cm",
+            "medium",
+            "support",
+            "date_from",
+            "date_to",
+            "attribution"
+          ],
+          "local_source": "refs/MINING-CATALOG-PAINTINGS.md §6",
+          "verification": "catalog reports secondary or indirectly cited measurements"
+        },
+        {
+          "url": "https://commons.wikimedia.org/wiki/File:Da_leonardo,_madonna_benois.jpg",
+          "supports": [
+            "held_scan",
+            "rights_class",
+            "licence_line"
+          ],
+          "local_source": "refs/RIGHTS-CROSSCHECK.md P07",
+          "verification": "cross-check governs"
+        }
+      ],
+      "rights_basis": {
+        "row": "P07",
+        "decision": "Bini’s BY-SA photo is identified as Palazzo Colonna; it cannot stand for the Hermitage original."
+      },
+      "held_scan_files": [
+        "refs/paintings/benois-madonna__hermitage__3304x4608.jpg"
+      ],
+      "clearance_sentence_en": "A correctly identified and independently cleared image of the Hermitage painting would fill this frame.",
+      "clearance_sentence_de": "Ein korrekt identifiziertes und gesondert freigegebenes Bild des Gemäldes der Eremitage würde diesen Rahmen füllen.",
+      "additional_plates": [],
+      "display_mode": "absence_outline",
+      "measurement": {
+        "source_url": "https://www.hermitagemuseum.org/wps/portal/hermitage/digital-collection/01.+Paintings/29908/",
+        "status": "catalogue_qualified",
+        "extent": "object",
+        "alternatives": [],
+        "registration": "not established",
+        "museum_eye_height_source": "CONCEPT-OPUS.md S11, 1.55 m",
+        "order_source": "CONCEPT-OPUS.md S11, chronological with attribution and rights interleaved"
+      },
+      "reproduction_note_en": "Keep the raster’s aspect ratio. Its corners are not registered to the measured object.",
+      "reproduction_note_de": "Das Seitenverhältnis der Datei bleibt erhalten. Ihre Ecken sind dem vermessenen Objekt noch nicht zugeordnet.",
+      "gaps": [
+        "Measurements were not directly verified with the holder by the catalog.",
+        "P07 is misidentified. Clearing it cannot turn it into the Hermitage painting."
+      ],
+      "german_provenance": {
+        "title": "Catalog German title with restored umlauts, or museum wording where the catalog supplies none.",
+        "visitor_copy": "New museum German written for this commission."
+      },
+      "date_label_en": "About 1478 to 1480",
+      "date_label_de": "Etwa 1478 bis 1480",
+      "certainty_word_en": "Absent",
+      "certainty_word_de": "Abwesend"
+    },
+    {
+      "id": "adoration-of-the-magi",
+      "catalogue_number": 7,
+      "register_status": "concept_register",
+      "title_en": "Adoration of the Magi",
+      "title_de": "Anbetung der Könige aus dem Morgenland",
+      "holder": "Gallerie degli Uffizi, Florence",
+      "inventory": "1890 n. 1594",
+      "height_cm": 244,
+      "width_cm": 240,
+      "medium": "Charcoal, ink wash and oil drawing",
+      "support": "Wood",
+      "medium_de": "Kohle, lavierte Tinte und Öl",
+      "support_de": "Holztafel",
+      "date_from": 1481,
+      "date_to": 1482,
+      "date_certainty": "approximate",
+      "attribution_line_en": "Leonardo da Vinci.",
+      "attribution_line_de": "Leonardo da Vinci.",
+      "attribution_certainty": "documented",
+      "rights_class": "RC",
+      "plate_file": null,
+      "plate_pixels": null,
+      "licence_line": "Photo Justin Benttinen, Wikimedia Commons, CC BY-SA 4.0",
+      "absence_reason_en": "Held by Gallerie degli Uffizi, Florence. Available file: adoration-of-the-magi__uffizi__5256x5196.jpg. The museum classified this scan as RC. The supplied terms have not been cleared for this exhibition. Obtain written permission for this reproduction from the holder and the image supplier.",
+      "absence_reason_de": "Sammlung: Gallerie degli Uffizi, Florenz. Vorhandene Datei: adoration-of-the-magi__uffizi__5256x5196.jpg. Dieses Museum hat den Scan als RC eingestuft. Seine Nutzungsbedingungen sind für diese Ausstellung nicht geklärt. Eine schriftliche Freigabe des besitzenden Museums und des Bildanbieters würde diese Reproduktion ermöglichen.",
+      "label_first_line_en": "Absent. Adoration of the Magi. Leonardo da Vinci.",
+      "label_first_line_de": "Abwesend. Anbetung der Könige aus dem Morgenland. Leonardo da Vinci.",
+      "hang": {
+        "wall": "picture-room-main",
+        "order": 8,
+        "eye_height_cm": 155
+      },
+      "in_house_1517": false,
+      "de_beatis": null,
+      "facts": [
+        {
+          "text_en": "The Uffizi records a conservation campaign from 2012 to 2017.",
+          "text_de": "Die Uffizien verzeichnen eine Restaurierung von 2012 bis 2017.",
+          "source_url": "https://www.uffizi.it/en/artworks/leonardo-adoration-of-the-magi",
+          "certainty": "documented"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://www.uffizi.it/en/artworks/leonardo-adoration-of-the-magi",
+          "supports": [
+            "inventory",
+            "height_cm",
+            "width_cm",
+            "medium",
+            "support",
+            "date_from",
+            "date_to",
+            "attribution"
+          ],
+          "local_source": "refs/MINING-CATALOG-PAINTINGS.md §7",
+          "verification": "holder record as transcribed in catalog"
+        },
+        {
+          "url": "https://commons.wikimedia.org/wiki/File:Adoration_of_the_Magi_(Leonardo).jpg",
+          "supports": [
+            "held_scan",
+            "rights_class",
+            "licence_line"
+          ],
+          "local_source": "refs/RIGHTS-CROSSCHECK.md P01",
+          "verification": "cross-check governs"
+        }
+      ],
+      "rights_basis": {
+        "row": "P01",
+        "decision": "Italian protected holder remains RC despite the photograph’s free copyright tag."
+      },
+      "held_scan_files": [
+        "refs/paintings/adoration-of-the-magi__uffizi__5256x5196.jpg"
+      ],
+      "clearance_sentence_en": "Obtain written permission for this reproduction from the holder and the image supplier.",
+      "clearance_sentence_de": "Eine schriftliche Freigabe des besitzenden Museums und des Bildanbieters würde diese Reproduktion ermöglichen.",
+      "additional_plates": [],
+      "display_mode": "absence_outline",
+      "measurement": {
+        "source_url": "https://www.uffizi.it/en/artworks/leonardo-adoration-of-the-magi",
+        "status": "holder_record",
+        "extent": "object",
+        "alternatives": [
+          {
+            "height_cm": 246,
+            "width_cm": 243,
+            "note": "Competing catalog measurement. Main dimensions follow the holder.",
+            "source_url": "https://www.uffizi.it/en/artworks/leonardo-adoration-of-the-magi"
+          }
+        ],
+        "registration": "not established",
+        "museum_eye_height_source": "CONCEPT-OPUS.md S11, 1.55 m",
+        "order_source": "CONCEPT-OPUS.md S11, chronological with attribution and rights interleaved"
+      },
+      "reproduction_note_en": "The held photograph shows the state after the 2012 to 2017 cleaning.",
+      "reproduction_note_de": "Das vorhandene Foto zeigt den Zustand nach der Reinigung von 2012 bis 2017.",
+      "gaps": [],
+      "german_provenance": {
+        "title": "Catalog German title with restored umlauts, or museum wording where the catalog supplies none.",
+        "visitor_copy": "New museum German written for this commission."
+      },
+      "date_label_en": "About 1481 to 1482",
+      "date_label_de": "Etwa 1481 bis 1482",
+      "certainty_word_en": "Absent",
+      "certainty_word_de": "Abwesend"
+    },
+    {
+      "id": "saint-jerome",
+      "catalogue_number": 8,
+      "register_status": "concept_register",
+      "title_en": "Saint Jerome in the Wilderness",
+      "title_de": "Der heilige Hieronymus",
+      "holder": "Pinacoteca Vaticana, Vatican City",
+      "inventory": "MV.40337",
+      "height_cm": 103,
+      "width_cm": 75,
+      "medium": "Tempera and oil",
+      "support": "Walnut panel",
+      "medium_de": "Tempera und Öl",
+      "support_de": "Nussbaumholz",
+      "date_from": 1480,
+      "date_to": 1490,
+      "date_certainty": "approximate",
+      "attribution_line_en": "Leonardo da Vinci.",
+      "attribution_line_de": "Leonardo da Vinci.",
+      "attribution_certainty": "documented",
+      "rights_class": "RC",
+      "plate_file": null,
+      "plate_pixels": null,
+      "licence_line": "Photo Gleb Simonov, Wikimedia Commons, CC0",
+      "absence_reason_en": "Held by Pinacoteca Vaticana, Vatican City. Available file: saint-jerome__vatican-pinacoteca__2763x3896.jpg. The museum classified this scan as RC. The supplied terms have not been cleared for this exhibition. Obtain written permission for this reproduction from the holder and the image supplier.",
+      "absence_reason_de": "Sammlung: Pinacoteca Vaticana, Vatikanstadt. Vorhandene Datei: saint-jerome__vatican-pinacoteca__2763x3896.jpg. Dieses Museum hat den Scan als RC eingestuft. Seine Nutzungsbedingungen sind für diese Ausstellung nicht geklärt. Eine schriftliche Freigabe des besitzenden Museums und des Bildanbieters würde diese Reproduktion ermöglichen.",
+      "label_first_line_en": "Absent. Saint Jerome in the Wilderness. Leonardo da Vinci.",
+      "label_first_line_de": "Abwesend. Der heilige Hieronymus. Leonardo da Vinci.",
+      "hang": {
+        "wall": "picture-room-main",
+        "order": 7,
+        "eye_height_cm": 155
+      },
+      "in_house_1517": false,
+      "de_beatis": null,
+      "facts": [
+        {
+          "text_en": "The painting remains unfinished.",
+          "text_de": "Das Gemälde ist unvollendet.",
+          "source_url": "https://en.wikipedia.org/wiki/Saint_Jerome_in_the_Wilderness_(Leonardo)",
+          "certainty": "documented"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Saint_Jerome_in_the_Wilderness_(Leonardo)",
+          "supports": [
+            "inventory",
+            "height_cm",
+            "width_cm",
+            "medium",
+            "support",
+            "date_from",
+            "date_to",
+            "attribution"
+          ],
+          "local_source": "refs/MINING-CATALOG-PAINTINGS.md §8",
+          "verification": "catalog reports secondary or indirectly cited measurements"
+        },
+        {
+          "url": "https://commons.wikimedia.org/wiki/File:Leonardo_da_Vinci_%E2%80%94_Jerome.jpg",
+          "supports": [
+            "held_scan",
+            "rights_class",
+            "licence_line"
+          ],
+          "local_source": "refs/RIGHTS-CROSSCHECK.md P22",
+          "verification": "cross-check governs"
+        }
+      ],
+      "rights_basis": {
+        "row": "P22",
+        "decision": "Simonov’s CC0 photograph does not remove the explicit Vatican exception."
+      },
+      "held_scan_files": [
+        "refs/paintings/saint-jerome__vatican-pinacoteca__2763x3896.jpg"
+      ],
+      "clearance_sentence_en": "Obtain written permission for this reproduction from the holder and the image supplier.",
+      "clearance_sentence_de": "Eine schriftliche Freigabe des besitzenden Museums und des Bildanbieters würde diese Reproduktion ermöglichen.",
+      "additional_plates": [],
+      "display_mode": "absence_outline",
+      "measurement": {
+        "source_url": "https://en.wikipedia.org/wiki/Saint_Jerome_in_the_Wilderness_(Leonardo)",
+        "status": "catalogue_qualified",
+        "extent": "object",
+        "alternatives": [],
+        "registration": "not established",
+        "museum_eye_height_source": "CONCEPT-OPUS.md S11, 1.55 m",
+        "order_source": "CONCEPT-OPUS.md S11, chronological with attribution and rights interleaved"
+      },
+      "reproduction_note_en": "Keep the raster’s aspect ratio. Its corners are not registered to the measured object.",
+      "reproduction_note_de": "Das Seitenverhältnis der Datei bleibt erhalten. Ihre Ecken sind dem vermessenen Objekt noch nicht zugeordnet.",
+      "gaps": [
+        "Measurements were not directly verified with the holder by the catalog."
+      ],
+      "german_provenance": {
+        "title": "Catalog German title with restored umlauts, or museum wording where the catalog supplies none.",
+        "visitor_copy": "New museum German written for this commission."
+      },
+      "date_label_en": "About 1480 to 1490",
+      "date_label_de": "Etwa 1480 bis 1490",
+      "certainty_word_en": "Absent",
+      "certainty_word_de": "Abwesend"
+    },
+    {
+      "id": "virgin-of-the-rocks-louvre",
+      "catalogue_number": 9,
+      "register_status": "concept_register",
+      "title_en": "Virgin of the Rocks, Louvre version",
+      "title_de": "Felsgrottenmadonna, Louvre-Fassung",
+      "holder": "Musée du Louvre, Paris",
+      "inventory": "INV 777, MR 320",
+      "height_cm": 199.5,
+      "width_cm": 122,
+      "medium": "Oil",
+      "support": "Canvas, transferred from wood",
+      "medium_de": "Öl",
+      "support_de": "Leinwand, von Holz übertragen",
+      "date_from": 1483,
+      "date_to": 1494,
+      "date_certainty": "approximate",
+      "attribution_line_en": "Leonardo da Vinci.",
+      "attribution_line_de": "Leonardo da Vinci.",
+      "attribution_certainty": "documented",
+      "rights_class": "DG",
+      "plate_file": "refs/paintings/virgin-of-the-rocks__louvre__3460x5487.jpg",
+      "plate_pixels": {
+        "width": 3460,
+        "height": 5487
+      },
+      "licence_line": "Public domain, via Wikimedia Commons",
+      "absence_reason_en": null,
+      "absence_reason_de": null,
+      "label_first_line_en": "Documented. Virgin of the Rocks, Louvre version. Leonardo da Vinci.",
+      "label_first_line_de": "Belegt. Felsgrottenmadonna, Louvre-Fassung. Leonardo da Vinci.",
+      "hang": {
+        "wall": "picture-room-main",
+        "order": 9,
+        "eye_height_cm": 155
+      },
+      "in_house_1517": false,
+      "de_beatis": null,
+      "facts": [
+        {
+          "text_en": "The Louvre records a transfer from wood to canvas.",
+          "text_de": "Der Louvre verzeichnet die Übertragung von Holz auf Leinwand.",
+          "source_url": "https://collections.louvre.fr/en/ark:/53355/cl010062373",
+          "certainty": "documented"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://collections.louvre.fr/en/ark:/53355/cl010062373",
+          "supports": [
+            "inventory",
+            "height_cm",
+            "width_cm",
+            "medium",
+            "support",
+            "date_from",
+            "date_to",
+            "attribution"
+          ],
+          "local_source": "refs/MINING-CATALOG-PAINTINGS.md §9",
+          "verification": "holder record as transcribed in catalog"
+        },
+        {
+          "url": "https://commons.wikimedia.org/wiki/File:Leonardo_Da_Vinci_-_Vergine_delle_Rocce_(Louvre).jpg",
+          "supports": [
+            "held_scan",
+            "rights_class",
+            "licence_line"
+          ],
+          "local_source": "refs/RIGHTS-CROSSCHECK.md P30",
+          "verification": "cross-check governs"
+        }
+      ],
+      "rights_basis": {
+        "row": "P30",
+        "decision": "Commons states PD for a faithful flat reproduction; EU reading applies."
+      },
+      "held_scan_files": [
+        "refs/paintings/virgin-of-the-rocks__louvre__3460x5487.jpg"
+      ],
+      "clearance_sentence_en": null,
+      "clearance_sentence_de": null,
+      "additional_plates": [],
+      "display_mode": "reproduction_card_beside_measured_outline",
+      "measurement": {
+        "source_url": "https://collections.louvre.fr/en/ark:/53355/cl010062373",
+        "status": "holder_record",
+        "extent": "object",
+        "alternatives": [],
+        "registration": "not established",
+        "museum_eye_height_source": "CONCEPT-OPUS.md S11, 1.55 m",
+        "order_source": "CONCEPT-OPUS.md S11, chronological with attribution and rights interleaved"
+      },
+      "reproduction_note_en": "Keep the raster’s aspect ratio. Its corners are not registered to the measured object.",
+      "reproduction_note_de": "Das Seitenverhältnis der Datei bleibt erhalten. Ihre Ecken sind dem vermessenen Objekt noch nicht zugeordnet.",
+      "gaps": [],
+      "german_provenance": {
+        "title": "Catalog German title with restored umlauts, or museum wording where the catalog supplies none.",
+        "visitor_copy": "New museum German written for this commission."
+      },
+      "date_label_en": "About 1483 to 1494",
+      "date_label_de": "Etwa 1483 bis 1494",
+      "certainty_word_en": "Documented",
+      "certainty_word_de": "Belegt"
+    },
+    {
+      "id": "virgin-of-the-rocks-london",
+      "catalogue_number": 10,
+      "register_status": "concept_register",
+      "title_en": "Virgin of the Rocks, London version",
+      "title_de": "Felsgrottenmadonna, Londoner Fassung",
+      "holder": "National Gallery, London",
+      "inventory": "NG1093",
+      "height_cm": 189.5,
+      "width_cm": 120,
+      "medium": "Oil",
+      "support": "Poplar panel",
+      "medium_de": "Öl",
+      "support_de": "Pappelholz",
+      "date_from": 1491,
+      "date_to": 1508,
+      "date_certainty": "approximate",
+      "attribution_line_en": "Leonardo da Vinci, with workshop participation debated.",
+      "attribution_line_de": "Leonardo da Vinci. Die Beteiligung der Werkstatt ist umstritten.",
+      "attribution_certainty": "qualified",
+      "rights_class": "RC",
+      "plate_file": null,
+      "plate_pixels": null,
+      "licence_line": "Public domain. Scan National Gallery, London, via Wikimedia Commons",
+      "absence_reason_en": "Held by National Gallery, London. Available file: virgin-of-the-rocks-london__national-gallery-london__3696x5870.jpg. The museum classified this scan as RC. The supplied terms have not been cleared for this exhibition. Obtain written permission for this reproduction from the holder and the image supplier.",
+      "absence_reason_de": "Sammlung: National Gallery, London. Vorhandene Datei: virgin-of-the-rocks-london__national-gallery-london__3696x5870.jpg. Dieses Museum hat den Scan als RC eingestuft. Seine Nutzungsbedingungen sind für diese Ausstellung nicht geklärt. Eine schriftliche Freigabe des besitzenden Museums und des Bildanbieters würde diese Reproduktion ermöglichen.",
+      "label_first_line_en": "Absent. Virgin of the Rocks, London version. Leonardo da Vinci, with workshop participation debated.",
+      "label_first_line_de": "Abwesend. Felsgrottenmadonna, Londoner Fassung. Leonardo da Vinci. Die Beteiligung der Werkstatt ist umstritten.",
+      "hang": {
+        "wall": "picture-room-main",
+        "order": 14,
+        "eye_height_cm": 155
+      },
+      "in_house_1517": false,
+      "de_beatis": null,
+      "facts": [
+        {
+          "text_en": "The two versions were exhibited together in London in 2011 and 2012.",
+          "text_de": "Die beiden Fassungen wurden 2011 und 2012 gemeinsam in London ausgestellt.",
+          "source_url": "https://en.wikipedia.org/wiki/Virgin_of_the_Rocks",
+          "certainty": "documented"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Virgin_of_the_Rocks",
+          "supports": [
+            "inventory",
+            "height_cm",
+            "width_cm",
+            "medium",
+            "support",
+            "date_from",
+            "date_to",
+            "attribution"
+          ],
+          "local_source": "refs/MINING-CATALOG-PAINTINGS.md §10",
+          "verification": "catalog reports secondary or indirectly cited measurements"
+        },
+        {
+          "url": "https://commons.wikimedia.org/wiki/File:Leonardo_da_Vinci_-_Vergine_delle_Rocce_(National_Gallery_London).jpg",
+          "supports": [
+            "held_scan",
+            "rights_class",
+            "licence_line"
+          ],
+          "local_source": "refs/RIGHTS-CROSSCHECK.md P29",
+          "verification": "cross-check governs"
+        },
+        {
+          "url": "https://www.nationalgallery.org.uk/paintings/leonardo-da-vinci-the-virgin-of-the-rocks",
+          "supports": [
+            "inventory",
+            "height_cm",
+            "width_cm",
+            "medium",
+            "support",
+            "date_from",
+            "date_to"
+          ],
+          "verification": "Current holder page read on 2026-09-09."
+        }
+      ],
+      "rights_basis": {
+        "row": "P29",
+        "decision": "Credit explicitly traces the file to NG online collection; the Gallery’s image licence is NC-ND, contrary to the log’s assurance."
+      },
+      "held_scan_files": [
+        "refs/paintings/virgin-of-the-rocks-london__national-gallery-london__3696x5870.jpg"
+      ],
+      "clearance_sentence_en": "Obtain written permission for this reproduction from the holder and the image supplier.",
+      "clearance_sentence_de": "Eine schriftliche Freigabe des besitzenden Museums und des Bildanbieters würde diese Reproduktion ermöglichen.",
+      "additional_plates": [],
+      "display_mode": "absence_outline",
+      "measurement": {
+        "source_url": "https://www.nationalgallery.org.uk/paintings/leonardo-da-vinci-the-virgin-of-the-rocks",
+        "status": "holder_record_checked_2026-09-09",
+        "extent": "object",
+        "alternatives": [],
+        "registration": "not established",
+        "museum_eye_height_source": "CONCEPT-OPUS.md S11, 1.55 m",
+        "order_source": "CONCEPT-OPUS.md S11, chronological with attribution and rights interleaved"
+      },
+      "reproduction_note_en": "Keep the raster’s aspect ratio. Its corners are not registered to the measured object.",
+      "reproduction_note_de": "Das Seitenverhältnis der Datei bleibt erhalten. Ihre Ecken sind dem vermessenen Objekt noch nicht zugeordnet.",
+      "gaps": [],
+      "german_provenance": {
+        "title": "Catalog German title with restored umlauts, or museum wording where the catalog supplies none.",
+        "visitor_copy": "New museum German written for this commission."
+      },
+      "date_note_en": "The holder dates two campaigns to about 1491 or 1492 to 1499, and 1506 to 1508. The catalog gave about 1495 to 1508.",
+      "date_note_de": "Das Museum nennt zwei Arbeitsphasen, etwa 1491 oder 1492 bis 1499 und 1506 bis 1508. Der Katalog nannte etwa 1495 bis 1508.",
+      "date_label_en": "About 1491 to 1508",
+      "date_label_de": "Etwa 1491 bis 1508",
+      "certainty_word_en": "Absent",
+      "certainty_word_de": "Abwesend"
+    },
+    {
+      "id": "portrait-of-a-musician",
+      "catalogue_number": 11,
+      "register_status": "concept_register",
+      "title_en": "Portrait of a Musician",
+      "title_de": "Bildnis eines Musikers",
+      "holder": "Veneranda Biblioteca Ambrosiana, Milan",
+      "inventory": "99",
+      "height_cm": 44.7,
+      "width_cm": 32,
+      "medium": "Oil, possibly with tempera",
+      "support": "Walnut panel",
+      "medium_de": "Öl, möglicherweise auch Tempera",
+      "support_de": "Nussbaumholz",
+      "date_from": 1485,
+      "date_to": 1485,
+      "date_certainty": "approximate",
+      "attribution_line_en": "Attributed to Leonardo da Vinci. The authorship of the torso is debated.",
+      "attribution_line_de": "Leonardo da Vinci zugeschrieben. Die Urheberschaft des Oberkörpers ist umstritten.",
+      "attribution_certainty": "disputed",
+      "rights_class": "RC",
+      "plate_file": null,
+      "plate_pixels": null,
+      "licence_line": "Public domain, via Wikimedia Commons; source page ambrosiana.it",
+      "absence_reason_en": "Held by Veneranda Biblioteca Ambrosiana, Milan. Available file: portrait-of-a-musician__ambrosiana-milan__3851x5055.jpg. The museum classified this scan as RC. The supplied terms have not been cleared for this exhibition. Obtain written permission for this reproduction from the holder and the image supplier.",
+      "absence_reason_de": "Sammlung: Veneranda Biblioteca Ambrosiana, Mailand. Vorhandene Datei: portrait-of-a-musician__ambrosiana-milan__3851x5055.jpg. Dieses Museum hat den Scan als RC eingestuft. Seine Nutzungsbedingungen sind für diese Ausstellung nicht geklärt. Eine schriftliche Freigabe des besitzenden Museums und des Bildanbieters würde diese Reproduktion ermöglichen.",
+      "label_first_line_en": "Absent. Portrait of a Musician. Attributed to Leonardo da Vinci. The authorship of the torso is debated.",
+      "label_first_line_de": "Abwesend. Bildnis eines Musikers. Leonardo da Vinci zugeschrieben. Die Urheberschaft des Oberkörpers ist umstritten.",
+      "hang": {
+        "wall": "picture-room-main",
+        "order": 10,
+        "eye_height_cm": 155
+      },
+      "in_house_1517": false,
+      "de_beatis": null,
+      "facts": [
+        {
+          "text_en": "Cleaning in 1904 and 1905 revealed the hand holding a sheet of music.",
+          "text_de": "Die Reinigung von 1904 und 1905 legte die Hand mit dem Notenblatt frei.",
+          "source_url": "https://en.wikipedia.org/wiki/Portrait_of_a_Musician",
+          "certainty": "documented"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Portrait_of_a_Musician",
+          "supports": [
+            "inventory",
+            "height_cm",
+            "width_cm",
+            "medium",
+            "support",
+            "date_from",
+            "date_to",
+            "attribution"
+          ],
+          "local_source": "refs/MINING-CATALOG-PAINTINGS.md §11",
+          "verification": "catalog reports secondary or indirectly cited measurements"
+        },
+        {
+          "url": "https://commons.wikimedia.org/wiki/File:Leonardo_da_Vinci_-_Portrait_of_a_Musician_-_Pinacoteca_Ambrosiana.jpg",
+          "supports": [
+            "held_scan",
+            "rights_class",
+            "licence_line"
+          ],
+          "local_source": "refs/RIGHTS-CROSSCHECK.md P21",
+          "verification": "cross-check governs"
+        }
+      ],
+      "rights_basis": {
+        "row": "P21",
+        "decision": "Italian protected holder remains RC despite the photograph’s free copyright tag."
+      },
+      "held_scan_files": [
+        "refs/paintings/portrait-of-a-musician__ambrosiana-milan__3851x5055.jpg"
+      ],
+      "clearance_sentence_en": "Obtain written permission for this reproduction from the holder and the image supplier.",
+      "clearance_sentence_de": "Eine schriftliche Freigabe des besitzenden Museums und des Bildanbieters würde diese Reproduktion ermöglichen.",
+      "additional_plates": [],
+      "display_mode": "absence_outline",
+      "measurement": {
+        "source_url": "https://en.wikipedia.org/wiki/Portrait_of_a_Musician",
+        "status": "catalogue_qualified",
+        "extent": "object",
+        "alternatives": [],
+        "registration": "not established",
+        "museum_eye_height_source": "CONCEPT-OPUS.md S11, 1.55 m",
+        "order_source": "CONCEPT-OPUS.md S11, chronological with attribution and rights interleaved"
+      },
+      "reproduction_note_en": "Keep the raster’s aspect ratio. Its corners are not registered to the measured object.",
+      "reproduction_note_de": "Das Seitenverhältnis der Datei bleibt erhalten. Ihre Ecken sind dem vermessenen Objekt noch nicht zugeordnet.",
+      "gaps": [
+        "Measurements were not directly verified with the holder by the catalog."
+      ],
+      "german_provenance": {
+        "title": "Catalog German title with restored umlauts, or museum wording where the catalog supplies none.",
+        "visitor_copy": "New museum German written for this commission."
+      },
+      "date_label_en": "About 1485",
+      "date_label_de": "Um 1485",
+      "certainty_word_en": "Absent",
+      "certainty_word_de": "Abwesend"
+    },
+    {
+      "id": "lady-with-an-ermine",
+      "catalogue_number": 12,
+      "register_status": "concept_register",
+      "title_en": "Lady with an Ermine",
+      "title_de": "Dame mit dem Hermelin",
+      "holder": "Muzeum Narodowe w Krakowie, Muzeum Książąt Czartoryskich",
+      "inventory": "MNK XII-209",
+      "height_cm": 54.8,
+      "width_cm": 40.3,
+      "medium": "Oil",
+      "support": "Walnut panel",
+      "medium_de": "Öl",
+      "support_de": "Nussbaumholz",
+      "date_from": 1489,
+      "date_to": 1491,
+      "date_certainty": "approximate",
+      "attribution_line_en": "Leonardo da Vinci.",
+      "attribution_line_de": "Leonardo da Vinci.",
+      "attribution_certainty": "documented",
+      "rights_class": "DG",
+      "plate_file": "refs/paintings/lady-with-an-ermine__czartoryski-krakow__6000x8069.jpg",
+      "plate_pixels": {
+        "width": 6000,
+        "height": 8069
+      },
+      "licence_line": "Public domain. Scan Google Arts and Culture, via Wikimedia Commons",
+      "absence_reason_en": null,
+      "absence_reason_de": null,
+      "label_first_line_en": "Documented. Lady with an Ermine. Leonardo da Vinci.",
+      "label_first_line_de": "Belegt. Dame mit dem Hermelin. Leonardo da Vinci.",
+      "hang": {
+        "wall": "picture-room-main",
+        "order": 11,
+        "eye_height_cm": 155
+      },
+      "in_house_1517": false,
+      "de_beatis": null,
+      "facts": [
+        {
+          "text_en": "The Polish state bought the painting with the Czartoryski collection on 29 December 2016.",
+          "text_de": "Der polnische Staat kaufte das Bild mit der Sammlung Czartoryski am 29. Dezember 2016.",
+          "source_url": "https://en.wikipedia.org/wiki/Lady_with_an_Ermine",
+          "certainty": "documented"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Lady_with_an_Ermine",
+          "supports": [
+            "inventory",
+            "height_cm",
+            "width_cm",
+            "medium",
+            "support",
+            "date_from",
+            "date_to",
+            "attribution"
+          ],
+          "local_source": "refs/MINING-CATALOG-PAINTINGS.md §12",
+          "verification": "catalog reports secondary or indirectly cited measurements"
+        },
+        {
+          "url": "https://commons.wikimedia.org/wiki/File:Lady_with_an_Ermine_-_Leonardo_da_Vinci_-_Google_Art_Project.jpg",
+          "supports": [
+            "held_scan",
+            "rights_class",
+            "licence_line"
+          ],
+          "local_source": "refs/RIGHTS-CROSSCHECK.md P14",
+          "verification": "cross-check governs"
+        }
+      ],
+      "rights_basis": {
+        "row": "P14",
+        "decision": "Commons states PD for a faithful flat reproduction; EU reading applies."
+      },
+      "held_scan_files": [
+        "refs/paintings/lady-with-an-ermine__czartoryski-krakow__6000x8069.jpg"
+      ],
+      "clearance_sentence_en": null,
+      "clearance_sentence_de": null,
+      "additional_plates": [],
+      "display_mode": "reproduction_card_beside_measured_outline",
+      "measurement": {
+        "source_url": "https://en.wikipedia.org/wiki/Lady_with_an_Ermine",
+        "status": "catalogue_qualified",
+        "extent": "object",
+        "alternatives": [
+          {
+            "height_cm": 54,
+            "width_cm": 39,
+            "note": "MNK measurement cited indirectly by the catalog. Main dimensions follow the concept.",
+            "source_url": "https://zbiory.mnk.pl/en/search-result/advance/catalog/157417"
+          }
+        ],
+        "registration": "not established",
+        "museum_eye_height_source": "CONCEPT-OPUS.md S11, 1.55 m",
+        "order_source": "CONCEPT-OPUS.md S11, chronological with attribution and rights interleaved"
+      },
+      "reproduction_note_en": "The black background is a later repaint. The two published measurements remain unresolved.",
+      "reproduction_note_de": "Der schwarze Hintergrund ist eine spätere Übermalung. Die beiden veröffentlichten Maßangaben bleiben ungeklärt.",
+      "gaps": [
+        "Measurements were not directly verified with the holder by the catalog."
+      ],
+      "german_provenance": {
+        "title": "Catalog German title with restored umlauts, or museum wording where the catalog supplies none.",
+        "visitor_copy": "New museum German written for this commission."
+      },
+      "date_label_en": "About 1489 to 1491",
+      "date_label_de": "Etwa 1489 bis 1491",
+      "certainty_word_en": "Documented",
+      "certainty_word_de": "Belegt"
+    },
+    {
+      "id": "la-belle-ferronniere",
+      "catalogue_number": 13,
+      "register_status": "concept_register",
+      "title_en": "La Belle Ferronnière",
+      "title_de": "Bildnis einer Dame, genannt La Belle Ferronnière",
+      "holder": "Musée du Louvre, Paris",
+      "inventory": "INV 778, MR 317",
+      "height_cm": 63,
+      "width_cm": 45,
+      "medium": "Oil",
+      "support": "Walnut panel",
+      "medium_de": "Öl",
+      "support_de": "Nussbaumholz",
+      "date_from": 1490,
+      "date_to": 1497,
+      "date_certainty": "approximate",
+      "attribution_line_en": "Leonardo da Vinci.",
+      "attribution_line_de": "Leonardo da Vinci.",
+      "attribution_certainty": "documented",
+      "rights_class": "RC",
+      "plate_file": null,
+      "plate_pixels": null,
+      "licence_line": "Public domain. Scan Google Arts and Culture, via Wikimedia Commons",
+      "absence_reason_en": "Held by Musée du Louvre, Paris. Available file: la-belle-ferronniere__louvre__2758x4000.jpg. The museum classified this scan as RC. The supplied terms have not been cleared for this exhibition. Permission from RMN-Grand Palais for Michel Urtado’s photograph would fill this frame.",
+      "absence_reason_de": "Sammlung: Musée du Louvre, Paris. Vorhandene Datei: la-belle-ferronniere__louvre__2758x4000.jpg. Dieses Museum hat den Scan als RC eingestuft. Seine Nutzungsbedingungen sind für diese Ausstellung nicht geklärt. Eine Freigabe von RMN-Grand Palais für das Foto von Michel Urtado würde diesen Rahmen füllen.",
+      "label_first_line_en": "Absent. La Belle Ferronnière. Leonardo da Vinci.",
+      "label_first_line_de": "Abwesend. Bildnis einer Dame, genannt La Belle Ferronnière. Leonardo da Vinci.",
+      "hang": {
+        "wall": "picture-room-main",
+        "order": 12,
+        "eye_height_cm": 155
+      },
+      "in_house_1517": false,
+      "de_beatis": null,
+      "facts": [
+        {
+          "text_en": "The Louvre’s title states that the traditional name La Belle Ferronnière is mistaken.",
+          "text_de": "Der Titel des Louvre bezeichnet den traditionellen Namen La Belle Ferronnière als Irrtum.",
+          "source_url": "https://collections.louvre.fr/en/ark:/53355/cl010062372",
+          "certainty": "documented"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://collections.louvre.fr/en/ark:/53355/cl010062372",
+          "supports": [
+            "inventory",
+            "height_cm",
+            "width_cm",
+            "medium",
+            "support",
+            "date_from",
+            "date_to",
+            "attribution"
+          ],
+          "local_source": "refs/MINING-CATALOG-PAINTINGS.md §13",
+          "verification": "holder record as transcribed in catalog"
+        },
+        {
+          "url": "https://artsandculture.google.com/asset/tQGQxYg52tKHTg?hl=en",
+          "supports": [
+            "held_scan",
+            "rights_class",
+            "licence_line"
+          ],
+          "local_source": "refs/RIGHTS-CROSSCHECK.md P12",
+          "verification": "cross-check governs"
+        }
+      ],
+      "rights_basis": {
+        "row": "P12",
+        "decision": "Google Arts explicitly credits RMN-Grand Palais and Michel Urtado; the commercial-library exception governs."
+      },
+      "held_scan_files": [
+        "refs/paintings/la-belle-ferronniere__louvre__2758x4000.jpg"
+      ],
+      "clearance_sentence_en": "Permission from RMN-Grand Palais for Michel Urtado’s photograph would fill this frame.",
+      "clearance_sentence_de": "Eine Freigabe von RMN-Grand Palais für das Foto von Michel Urtado würde diesen Rahmen füllen.",
+      "additional_plates": [],
+      "display_mode": "absence_outline",
+      "measurement": {
+        "source_url": "https://collections.louvre.fr/en/ark:/53355/cl010062372",
+        "status": "holder_record",
+        "extent": "object",
+        "alternatives": [],
+        "registration": "not established",
+        "museum_eye_height_source": "CONCEPT-OPUS.md S11, 1.55 m",
+        "order_source": "CONCEPT-OPUS.md S11, chronological with attribution and rights interleaved"
+      },
+      "reproduction_note_en": "Keep the raster’s aspect ratio. Its corners are not registered to the measured object.",
+      "reproduction_note_de": "Das Seitenverhältnis der Datei bleibt erhalten. Ihre Ecken sind dem vermessenen Objekt noch nicht zugeordnet.",
+      "gaps": [],
+      "german_provenance": {
+        "title": "Catalog German title with restored umlauts, or museum wording where the catalog supplies none.",
+        "visitor_copy": "New museum German written for this commission."
+      },
+      "date_label_en": "About 1490 to 1497",
+      "date_label_de": "Etwa 1490 bis 1497",
+      "certainty_word_en": "Absent",
+      "certainty_word_de": "Abwesend"
+    },
+    {
+      "id": "last-supper",
+      "catalogue_number": 14,
+      "register_status": "concept_register",
+      "title_en": "The Last Supper",
+      "title_de": "Das Abendmahl",
+      "holder": "Museo del Cenacolo Vinciano, Santa Maria delle Grazie, Milan",
+      "inventory": null,
+      "height_cm": 460,
+      "width_cm": 880,
+      "medium": "Dry wall-painting",
+      "support": "Prepared plaster wall",
+      "medium_de": "Wandmalerei auf trockenem Grund",
+      "support_de": "Vorbereiteter Wandputz",
+      "date_from": 1495,
+      "date_to": 1498,
+      "date_certainty": "approximate",
+      "attribution_line_en": "Leonardo da Vinci.",
+      "attribution_line_de": "Leonardo da Vinci.",
+      "attribution_certainty": "documented",
+      "rights_class": "RC",
+      "plate_file": null,
+      "plate_pixels": null,
+      "licence_line": "Photo Paris Orlando, released into the public domain, via Wikimedia Commons",
+      "absence_reason_en": "Held by Museo del Cenacolo Vinciano, Santa Maria delle Grazie, Milan. Available file: last-supper__santa-maria-delle-grazie__8000x4443.jpg. The museum classified this scan as RC. The supplied terms have not been cleared for this exhibition. Obtain written permission for this reproduction from the holder and the image supplier.",
+      "absence_reason_de": "Sammlung: Museo del Cenacolo Vinciano, Santa Maria delle Grazie, Mailand. Vorhandene Datei: last-supper__santa-maria-delle-grazie__8000x4443.jpg. Dieses Museum hat den Scan als RC eingestuft. Seine Nutzungsbedingungen sind für diese Ausstellung nicht geklärt. Eine schriftliche Freigabe des besitzenden Museums und des Bildanbieters würde diese Reproduktion ermöglichen.",
+      "label_first_line_en": "Absent. The Last Supper. Leonardo da Vinci.",
+      "label_first_line_de": "Abwesend. Das Abendmahl. Leonardo da Vinci.",
+      "hang": {
+        "wall": "supper-wall",
+        "order": 1,
+        "eye_height_cm": null
+      },
+      "in_house_1517": false,
+      "de_beatis": null,
+      "facts": [
+        {
+          "text_en": "The holder describes the technique as dry wall-painting.",
+          "text_de": "Das besitzende Museum beschreibt die Technik als Wandmalerei auf trockenem Grund.",
+          "source_url": "https://cenacolovinciano.org/en/museum/the-works/the-last-supper-leonardo-da-vinci-1452-1519/",
+          "certainty": "documented"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://cenacolovinciano.org/en/museum/the-works/the-last-supper-leonardo-da-vinci-1452-1519/",
+          "supports": [
+            "inventory",
+            "height_cm",
+            "width_cm",
+            "medium",
+            "support",
+            "date_from",
+            "date_to",
+            "attribution"
+          ],
+          "local_source": "refs/MINING-CATALOG-PAINTINGS.md §14",
+          "verification": "holder record as transcribed in catalog"
+        },
+        {
+          "url": "https://commons.wikimedia.org/wiki/File:Last_Supper_by_Leonardo_da_Vinci.jpg",
+          "supports": [
+            "held_scan",
+            "rights_class",
+            "licence_line"
+          ],
+          "local_source": "refs/RIGHTS-CROSSCHECK.md P15",
+          "verification": "cross-check governs"
+        }
+      ],
+      "rights_basis": {
+        "row": "P15",
+        "decision": "Italian protected holder remains RC despite the photograph’s free copyright tag."
+      },
+      "held_scan_files": [
+        "refs/paintings/last-supper__santa-maria-delle-grazie__8000x4443.jpg"
+      ],
+      "clearance_sentence_en": "Obtain written permission for this reproduction from the holder and the image supplier.",
+      "clearance_sentence_de": "Eine schriftliche Freigabe des besitzenden Museums und des Bildanbieters würde diese Reproduktion ermöglichen.",
+      "additional_plates": [],
+      "display_mode": "absence_outline",
+      "measurement": {
+        "source_url": "https://cenacolovinciano.org/en/museum/the-works/the-last-supper-leonardo-da-vinci-1452-1519/",
+        "status": "holder_record",
+        "extent": "painted field",
+        "alternatives": [],
+        "registration": "not established",
+        "museum_eye_height_source": "CONCEPT-OPUS.md S11, 1.55 m",
+        "order_source": "CONCEPT-OPUS.md S11, chronological with attribution and rights interleaved"
+      },
+      "reproduction_note_en": "Keep the raster’s aspect ratio. Its corners are not registered to the measured object.",
+      "reproduction_note_de": "Das Seitenverhältnis der Datei bleibt erhalten. Ihre Ecken sind dem vermessenen Objekt noch nicht zugeordnet.",
+      "gaps": [
+        "No inventory number supplied by the catalog."
+      ],
+      "german_provenance": {
+        "title": "Catalog German title with restored umlauts, or museum wording where the catalog supplies none.",
+        "visitor_copy": "New museum German written for this commission."
+      },
+      "date_label_en": "About 1495 to 1498",
+      "date_label_de": "Etwa 1495 bis 1498",
+      "certainty_word_en": "Absent",
+      "certainty_word_de": "Abwesend"
+    },
+    {
+      "id": "sala-delle-asse",
+      "catalogue_number": 15,
+      "register_status": "concept_register",
+      "title_en": "Sala delle Asse",
+      "title_de": "Sala delle Asse",
+      "holder": "Castello Sforzesco, Milan",
+      "inventory": null,
+      "height_cm": null,
+      "width_cm": null,
+      "medium": "Wall painting",
+      "support": "Walls and vault",
+      "medium_de": "Wandmalerei",
+      "support_de": "Wände und Gewölbe",
+      "date_from": 1498,
+      "date_to": 1498,
+      "date_certainty": "approximate",
+      "attribution_line_en": "Leonardo da Vinci and workshop. Later restoration is extensive.",
+      "attribution_line_de": "Leonardo da Vinci und Werkstatt. Spätere Restaurierungen veränderten die Malerei erheblich.",
+      "attribution_certainty": "qualified",
+      "rights_class": "RC",
+      "plate_file": null,
+      "plate_pixels": null,
+      "licence_line": "Photo Hoclab, Wikimedia Commons, CC BY-SA 4.0",
+      "absence_reason_en": "Held by Castello Sforzesco, Milan. Available scans: sala-delle-asse-monochrome__castello-sforzesco__3980x6053.jpg, sala-delle-asse-vault__castello-sforzesco__5906x5913.jpg. This museum classified both as RC. Written permission from the Comune di Milano and the image suppliers would fill the two image wells.",
+      "absence_reason_de": "Aufbewahrt im Castello Sforzesco, Mailand. Vorhandene Scans: sala-delle-asse-monochrome__castello-sforzesco__3980x6053.jpg, sala-delle-asse-vault__castello-sforzesco__5906x5913.jpg. Dieses Museum hat beide als RC eingestuft. Eine schriftliche Freigabe der Stadt Mailand und der Bildanbieter würde die beiden Bildfelder füllen.",
+      "label_first_line_en": "Absent. Sala delle Asse. Leonardo da Vinci and workshop. Later restoration is extensive.",
+      "label_first_line_de": "Abwesend. Sala delle Asse. Leonardo da Vinci und Werkstatt. Spätere Restaurierungen veränderten die Malerei erheblich.",
+      "hang": {
+        "wall": "supper-wall",
+        "order": 2,
+        "eye_height_cm": null
+      },
+      "in_house_1517": false,
+      "de_beatis": null,
+      "facts": [
+        {
+          "text_en": "The decoration belongs to the walls and vault of a room.",
+          "text_de": "Die Malerei gehört zu den Wänden und zum Gewölbe eines Raumes.",
+          "source_url": "https://en.wikipedia.org/wiki/Sala_delle_Asse",
+          "certainty": "documented"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Sala_delle_Asse",
+          "supports": [
+            "inventory",
+            "height_cm",
+            "width_cm",
+            "medium",
+            "support",
+            "date_from",
+            "date_to",
+            "attribution"
+          ],
+          "local_source": "refs/MINING-CATALOG-PAINTINGS.md §15",
+          "verification": "catalog reports secondary or indirectly cited measurements"
+        },
+        {
+          "url": "https://commons.wikimedia.org/wiki/File:6.2_2012.01-02_Haltadefinizione_Volta_50x50_-_300_ppi.jpg",
+          "supports": [
+            "held_scan",
+            "rights_class",
+            "licence_line"
+          ],
+          "local_source": "refs/RIGHTS-CROSSCHECK.md P25",
+          "verification": "cross-check governs"
+        }
+      ],
+      "rights_basis": {
+        "row": "P25",
+        "decision": "Italian protected holder remains RC despite the photograph’s free copyright tag."
+      },
+      "held_scan_files": [
+        "refs/paintings/sala-delle-asse-monochrome__castello-sforzesco__3980x6053.jpg",
+        "refs/paintings/sala-delle-asse-vault__castello-sforzesco__5906x5913.jpg"
+      ],
+      "clearance_sentence_en": "Written permission from the Comune di Milano and the image suppliers would fill these image wells.",
+      "clearance_sentence_de": "Eine schriftliche Freigabe der Stadt Mailand und der Bildanbieter würde diese Bildfelder füllen.",
+      "additional_plates": [],
+      "display_mode": "dimension_card_and_two_empty_image_wells",
+      "measurement": {
+        "source_url": "https://en.wikipedia.org/wiki/Sala_delle_Asse",
+        "status": "room_footprint_only",
+        "extent": "Unknown dimensions of wall and vault painting. The approximate 15 by 15 m figure describes the room footprint only.",
+        "alternatives": [],
+        "registration": "not established",
+        "museum_eye_height_source": "CONCEPT-OPUS.md S11, 1.55 m",
+        "order_source": "CONCEPT-OPUS.md S11, chronological with attribution and rights interleaved",
+        "room_width_m": 15,
+        "room_length_m": 15
+      },
+      "reproduction_note_en": "Keep the raster’s aspect ratio. Its corners are not registered to the measured object.",
+      "reproduction_note_de": "Das Seitenverhältnis der Datei bleibt erhalten. Ihre Ecken sind dem vermessenen Objekt noch nicht zugeordnet.",
+      "gaps": [
+        "No inventory number supplied by the catalog.",
+        "Painted surface dimensions are unavailable. Do not use the room footprint as a panel size."
+      ],
+      "german_provenance": {
+        "title": "Catalog German title with restored umlauts, or museum wording where the catalog supplies none.",
+        "visitor_copy": "New museum German written for this commission."
+      },
+      "date_label_en": "About 1498",
+      "date_label_de": "Um 1498",
+      "certainty_word_en": "Absent",
+      "certainty_word_de": "Abwesend"
+    },
+    {
+      "id": "virgin-and-child-with-st-anne",
+      "catalogue_number": 16,
+      "register_status": "concept_register",
+      "title_en": "The Virgin and Child with Saint Anne",
+      "title_de": "Die Jungfrau mit dem Kind und der heiligen Anna",
+      "holder": "Musée du Louvre, Paris",
+      "inventory": "INV 776, MR 319",
+      "height_cm": 168,
+      "width_cm": 113,
+      "medium": "Oil",
+      "support": "Poplar panel, later enlarged",
+      "medium_de": "Öl",
+      "support_de": "Pappelholz, später verbreitert",
+      "date_from": 1503,
+      "date_to": 1519,
+      "date_certainty": "approximate",
+      "attribution_line_en": "Leonardo da Vinci.",
+      "attribution_line_de": "Leonardo da Vinci.",
+      "attribution_certainty": "documented",
+      "rights_class": "DG",
+      "plate_file": "refs/paintings/virgin-and-child-with-st-anne__louvre__7716x11375.jpg",
+      "plate_pixels": {
+        "width": 7716,
+        "height": 11375
+      },
+      "licence_line": "Photo Wilfredor, Wikimedia Commons, CC0",
+      "absence_reason_en": null,
+      "absence_reason_de": null,
+      "label_first_line_en": "Documented. The Virgin and Child with Saint Anne. Leonardo da Vinci.",
+      "label_first_line_de": "Belegt. Die Jungfrau mit dem Kind und der heiligen Anna. Leonardo da Vinci.",
+      "hang": {
+        "wall": "picture-room-main",
+        "order": 18,
+        "eye_height_cm": 155
+      },
+      "in_house_1517": true,
+      "de_beatis": {
+        "date": "1517-10-10",
+        "quote_it": "uno della Madonna et del figliolo che stanno posti in grembo di Sancta Anna",
+        "quote_source": "Published transcription of Antonio de Beatis, not the copyrighted 1979 English translation.",
+        "source_url": "https://www.attidellaaccademialancisiana.it/702/19/articolo/Prolusione-La-morte-di-Leonardo-da-Vinci",
+        "identification_certainty": "inferred",
+        "note_en": "The concept identifies this work with the picture in the diary. The witness names its subject, not an inventory number.",
+        "note_de": "Das Konzept setzt dieses Werk mit dem Bild im Tagebuch gleich. Der Zeuge nennt das Motiv, keine Inventarnummer."
+      },
+      "facts": [
+        {
+          "text_en": "The Louvre records an original width of 113 cm and a later width of 130 cm.",
+          "text_de": "Der Louvre nennt 113 cm als ursprüngliche und 130 cm als spätere Breite.",
+          "source_url": "https://collections.louvre.fr/en/ark:/53355/cl010066107",
+          "certainty": "documented"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://collections.louvre.fr/en/ark:/53355/cl010066107",
+          "supports": [
+            "inventory",
+            "height_cm",
+            "width_cm",
+            "medium",
+            "support",
+            "date_from",
+            "date_to",
+            "attribution"
+          ],
+          "local_source": "refs/MINING-CATALOG-PAINTINGS.md §16",
+          "verification": "holder record as transcribed in catalog"
+        },
+        {
+          "url": "https://commons.wikimedia.org/wiki/File:The_Virgin_and_Child_with_Saint_Anne_by_Leonardo_da_Vinci,_Louvre.jpg",
+          "supports": [
+            "held_scan",
+            "rights_class",
+            "licence_line"
+          ],
+          "local_source": "refs/RIGHTS-CROSSCHECK.md P28",
+          "verification": "cross-check governs"
+        },
+        {
+          "url": "https://www.attidellaaccademialancisiana.it/702/19/articolo/Prolusione-La-morte-di-Leonardo-da-Vinci",
+          "supports": [
+            "de_beatis.quote_it",
+            "in_house_1517"
+          ],
+          "verification": "Witness quotation read in a modern transcription. Work identification is qualified."
+        }
+      ],
+      "rights_basis": {
+        "row": "P28",
+        "decision": "Wilfredor’s own photograph is CC0; the log’s separate PD-Art description is inaccurate."
+      },
+      "held_scan_files": [
+        "refs/paintings/virgin-and-child-with-st-anne__louvre__7716x11375.jpg"
+      ],
+      "clearance_sentence_en": null,
+      "clearance_sentence_de": null,
+      "additional_plates": [],
+      "display_mode": "reproduction_card_beside_measured_outline",
+      "measurement": {
+        "source_url": "https://collections.louvre.fr/en/ark:/53355/cl010066107",
+        "status": "holder_record",
+        "extent": "pictured original panel",
+        "alternatives": [
+          {
+            "height_cm": 168,
+            "width_cm": 130,
+            "note": "Enlarged support, not the pictured original field.",
+            "source_url": "https://collections.louvre.fr/en/ark:/53355/cl010066107"
+          }
+        ],
+        "registration": "not established",
+        "museum_eye_height_source": "CONCEPT-OPUS.md S11, 1.55 m",
+        "order_source": "CONCEPT-OPUS.md S11, chronological with attribution and rights interleaved"
+      },
+      "reproduction_note_en": "The photograph shows the original 113 cm field after the 2011 to 2012 cleaning. The enlarged support is 130 cm wide.",
+      "reproduction_note_de": "Das Foto zeigt das ursprüngliche 113 cm breite Bildfeld nach der Reinigung von 2011 bis 2012. Der erweiterte Bildträger ist 130 cm breit.",
+      "gaps": [],
+      "german_provenance": {
+        "title": "Catalog German title with restored umlauts, or museum wording where the catalog supplies none.",
+        "visitor_copy": "New museum German written for this commission."
+      },
+      "date_label_en": "About 1503 to 1519",
+      "date_label_de": "Etwa 1503 bis 1519",
+      "certainty_word_en": "Documented",
+      "certainty_word_de": "Belegt"
+    },
+    {
+      "id": "mona-lisa",
+      "catalogue_number": 17,
+      "register_status": "concept_register",
+      "title_en": "Mona Lisa",
+      "title_de": "Mona Lisa",
+      "holder": "Musée du Louvre, Paris",
+      "inventory": "INV 779, MR 316",
+      "height_cm": 79.4,
+      "width_cm": 53.4,
+      "medium": "Oil",
+      "support": "Poplar panel",
+      "medium_de": "Öl",
+      "support_de": "Pappelholz",
+      "date_from": 1503,
+      "date_to": 1519,
+      "date_certainty": "approximate",
+      "attribution_line_en": "Leonardo da Vinci.",
+      "attribution_line_de": "Leonardo da Vinci.",
+      "attribution_certainty": "documented",
+      "rights_class": "RC",
+      "plate_file": null,
+      "plate_pixels": null,
+      "licence_line": "Public domain. Scan C2RMF, via Wikimedia Commons",
+      "absence_reason_en": "Held by Musée du Louvre, Paris. Available file: mona-lisa__louvre__7479x11146.jpg. The museum classified this scan as RC. The supplied terms have not been cleared for this exhibition. A verified free release from C2RMF, or a separately cleared reproduction, would fill this frame.",
+      "absence_reason_de": "Sammlung: Musée du Louvre, Paris. Vorhandene Datei: mona-lisa__louvre__7479x11146.jpg. Dieses Museum hat den Scan als RC eingestuft. Seine Nutzungsbedingungen sind für diese Ausstellung nicht geklärt. Eine nachgewiesene freie Freigabe von C2RMF oder eine gesondert freigegebene Reproduktion würde diesen Rahmen füllen.",
+      "label_first_line_en": "Absent. Mona Lisa. Leonardo da Vinci.",
+      "label_first_line_de": "Abwesend. Mona Lisa. Leonardo da Vinci.",
+      "hang": {
+        "wall": "picture-room-main",
+        "order": 19,
+        "eye_height_cm": 155
+      },
+      "in_house_1517": true,
+      "de_beatis": {
+        "date": "1517-10-10",
+        "quote_it": "uno di certa dona fire[n]tina facta di naturale ad instantia del quo[n]dam Magn Juliano de’ Medici",
+        "quote_source": "Published transcription of Antonio de Beatis, not the copyrighted 1979 English translation.",
+        "source_url": "https://monalisa.org/2012/09/08/the-travel-journal-of-antonio-de-beatis/",
+        "identification_certainty": "inferred",
+        "note_en": "The concept associates the Louvre Mona Lisa with the unnamed Florentine woman. The diary itself does not establish that identity and names Giuliano de’ Medici as the instigator.",
+        "note_de": "Das Konzept verbindet die Mona Lisa des Louvre mit der ungenannten Florentinerin. Das Tagebuch belegt diese Identität nicht und nennt Giuliano de’ Medici als Veranlasser."
+      },
+      "facts": [
+        {
+          "text_en": "The Louvre identifies the sitter as Lisa Gherardini, wife of Francesco del Giocondo.",
+          "text_de": "Der Louvre identifiziert die Dargestellte als Lisa Gherardini, Ehefrau von Francesco del Giocondo.",
+          "source_url": "https://collections.louvre.fr/en/ark:/53355/cl010062370",
+          "certainty": "documented"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://collections.louvre.fr/en/ark:/53355/cl010062370",
+          "supports": [
+            "inventory",
+            "height_cm",
+            "width_cm",
+            "medium",
+            "support",
+            "date_from",
+            "date_to",
+            "attribution"
+          ],
+          "local_source": "refs/MINING-CATALOG-PAINTINGS.md §17",
+          "verification": "holder record as transcribed in catalog"
+        },
+        {
+          "url": "https://commons.wikimedia.org/wiki/File:Mona_Lisa,_by_Leonardo_da_Vinci,_from_C2RMF_retouched.jpg",
+          "supports": [
+            "held_scan",
+            "rights_class",
+            "licence_line"
+          ],
+          "local_source": "refs/RIGHTS-CROSSCHECK.md P20",
+          "verification": "cross-check governs"
+        },
+        {
+          "url": "https://monalisa.org/2012/09/08/the-travel-journal-of-antonio-de-beatis/",
+          "supports": [
+            "de_beatis.quote_it",
+            "in_house_1517"
+          ],
+          "verification": "Witness quotation read in a modern transcription. Work identification is qualified."
+        }
+      ],
+      "rights_basis": {
+        "row": "P20",
+        "decision": "Legacy C2RMF scan says PD on Commons, but a free original release is unverified against restrictive C2RMF supply terms."
+      },
+      "held_scan_files": [
+        "refs/paintings/mona-lisa__louvre__7479x11146.jpg",
+        "refs/paintings/mona-lisa-natural-colour__louvre__7601x11348.jpg"
+      ],
+      "clearance_sentence_en": "A verified free release from C2RMF, or a separately cleared reproduction, would fill this frame.",
+      "clearance_sentence_de": "Eine nachgewiesene freie Freigabe von C2RMF oder eine gesondert freigegebene Reproduktion würde diesen Rahmen füllen.",
+      "additional_plates": [],
+      "display_mode": "absence_outline",
+      "measurement": {
+        "source_url": "https://collections.louvre.fr/en/ark:/53355/cl010062370",
+        "status": "holder_record",
+        "extent": "object",
+        "alternatives": [],
+        "registration": "not established",
+        "museum_eye_height_source": "CONCEPT-OPUS.md S11, 1.55 m",
+        "order_source": "CONCEPT-OPUS.md S11, chronological with attribution and rights interleaved"
+      },
+      "reproduction_note_en": "P20 records aged varnish. P19 is an excluded modern colour reconstruction.",
+      "reproduction_note_de": "P20 zeigt den gealterten Firnis. P19 ist eine ausgeschlossene moderne Farbrekonstruktion.",
+      "gaps": [
+        "P19 is a REF speculative colour reconstruction. Never use it as an alternative to P20."
+      ],
+      "german_provenance": {
+        "title": "Catalog German title with restored umlauts, or museum wording where the catalog supplies none.",
+        "visitor_copy": "New museum German written for this commission."
+      },
+      "date_label_en": "About 1503 to 1519",
+      "date_label_de": "Etwa 1503 bis 1519",
+      "certainty_word_en": "Absent",
+      "certainty_word_de": "Abwesend"
+    },
+    {
+      "id": "saint-john-the-baptist",
+      "catalogue_number": 18,
+      "register_status": "concept_register",
+      "title_en": "Saint John the Baptist",
+      "title_de": "Johannes der Täufer",
+      "holder": "Musée du Louvre, Paris",
+      "inventory": "INV 775, MR 318",
+      "height_cm": 72.9,
+      "width_cm": 56.3,
+      "medium": "Oil",
+      "support": "Walnut panel",
+      "medium_de": "Öl",
+      "support_de": "Nussbaumholz",
+      "date_from": 1508,
+      "date_to": 1519,
+      "date_certainty": "approximate",
+      "attribution_line_en": "Leonardo da Vinci.",
+      "attribution_line_de": "Leonardo da Vinci.",
+      "attribution_certainty": "documented",
+      "rights_class": "RC",
+      "plate_file": null,
+      "plate_pixels": null,
+      "licence_line": "Public domain. Scan C2RMF, via Wikimedia Commons",
+      "absence_reason_en": "Held by Musée du Louvre, Paris. Available file: saint-john-the-baptist__louvre__8000x10356.jpg. The museum classified this scan as RC. The supplied terms have not been cleared for this exhibition. A verified free release from C2RMF, or a separately cleared reproduction, would fill this frame.",
+      "absence_reason_de": "Sammlung: Musée du Louvre, Paris. Vorhandene Datei: saint-john-the-baptist__louvre__8000x10356.jpg. Dieses Museum hat den Scan als RC eingestuft. Seine Nutzungsbedingungen sind für diese Ausstellung nicht geklärt. Eine nachgewiesene freie Freigabe von C2RMF oder eine gesondert freigegebene Reproduktion würde diesen Rahmen füllen.",
+      "label_first_line_en": "Absent. Saint John the Baptist. Leonardo da Vinci.",
+      "label_first_line_de": "Abwesend. Johannes der Täufer. Leonardo da Vinci.",
+      "hang": {
+        "wall": "picture-room-main",
+        "order": 23,
+        "eye_height_cm": 155
+      },
+      "in_house_1517": true,
+      "de_beatis": {
+        "date": "1517-10-10",
+        "quote_it": "San Johanne Baptista jovane",
+        "quote_source": "Published transcription of Antonio de Beatis, not the copyrighted 1979 English translation.",
+        "source_url": "https://www.attidellaaccademialancisiana.it/702/19/articolo/Prolusione-La-morte-di-Leonardo-da-Vinci",
+        "identification_certainty": "inferred",
+        "note_en": "The concept identifies this work with the picture in the diary. The witness names its subject, not an inventory number.",
+        "note_de": "Das Konzept setzt dieses Werk mit dem Bild im Tagebuch gleich. Der Zeuge nennt das Motiv, keine Inventarnummer."
+      },
+      "facts": [
+        {
+          "text_en": "The Louvre records walnut as the support.",
+          "text_de": "Der Louvre nennt Nussbaumholz als Bildträger.",
+          "source_url": "https://collections.louvre.fr/en/ark:/53355/cl010062374",
+          "certainty": "documented"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://collections.louvre.fr/en/ark:/53355/cl010062374",
+          "supports": [
+            "inventory",
+            "height_cm",
+            "width_cm",
+            "medium",
+            "support",
+            "date_from",
+            "date_to",
+            "attribution"
+          ],
+          "local_source": "refs/MINING-CATALOG-PAINTINGS.md §18",
+          "verification": "holder record as transcribed in catalog"
+        },
+        {
+          "url": "https://commons.wikimedia.org/wiki/File:Leonardo_da_Vinci_-_Saint_John_the_Baptist_C2RMF_retouched.jpg",
+          "supports": [
+            "held_scan",
+            "rights_class",
+            "licence_line"
+          ],
+          "local_source": "refs/RIGHTS-CROSSCHECK.md P23",
+          "verification": "cross-check governs"
+        },
+        {
+          "url": "https://www.attidellaaccademialancisiana.it/702/19/articolo/Prolusione-La-morte-di-Leonardo-da-Vinci",
+          "supports": [
+            "de_beatis.quote_it",
+            "in_house_1517"
+          ],
+          "verification": "Witness quotation read in a modern transcription. Work identification is qualified."
+        }
+      ],
+      "rights_basis": {
+        "row": "P23",
+        "decision": "Legacy C2RMF scan says PD on Commons, but a free original release is unverified against restrictive C2RMF supply terms."
+      },
+      "held_scan_files": [
+        "refs/paintings/saint-john-the-baptist__louvre__8000x10356.jpg"
+      ],
+      "clearance_sentence_en": "A verified free release from C2RMF, or a separately cleared reproduction, would fill this frame.",
+      "clearance_sentence_de": "Eine nachgewiesene freie Freigabe von C2RMF oder eine gesondert freigegebene Reproduktion würde diesen Rahmen füllen.",
+      "additional_plates": [],
+      "display_mode": "absence_outline",
+      "measurement": {
+        "source_url": "https://collections.louvre.fr/en/ark:/53355/cl010062374",
+        "status": "holder_record",
+        "extent": "object",
+        "alternatives": [],
+        "registration": "not established",
+        "museum_eye_height_source": "CONCEPT-OPUS.md S11, 1.55 m",
+        "order_source": "CONCEPT-OPUS.md S11, chronological with attribution and rights interleaved"
+      },
+      "reproduction_note_en": "Keep the raster’s aspect ratio. Its corners are not registered to the measured object.",
+      "reproduction_note_de": "Das Seitenverhältnis der Datei bleibt erhalten. Ihre Ecken sind dem vermessenen Objekt noch nicht zugeordnet.",
+      "gaps": [],
+      "german_provenance": {
+        "title": "Catalog German title with restored umlauts, or museum wording where the catalog supplies none.",
+        "visitor_copy": "New museum German written for this commission."
+      },
+      "date_label_en": "About 1508 to 1519",
+      "date_label_de": "Etwa 1508 bis 1519",
+      "certainty_word_en": "Absent",
+      "certainty_word_de": "Abwesend"
+    },
+    {
+      "id": "bacchus",
+      "catalogue_number": 19,
+      "register_status": "concept_register",
+      "title_en": "Bacchus, formerly Saint John the Baptist",
+      "title_de": "Bacchus, ehemals Johannes der Täufer",
+      "holder": "Musée du Louvre, Paris",
+      "inventory": "INV 780, MR 325",
+      "height_cm": 177,
+      "width_cm": 115,
+      "medium": "Oil",
+      "support": "Canvas, transferred from wood",
+      "medium_de": "Öl",
+      "support_de": "Leinwand, von Holz übertragen",
+      "date_from": 1517,
+      "date_to": 1520,
+      "date_certainty": "approximate",
+      "attribution_line_en": "Workshop of Leonardo da Vinci. The Louvre also names Francesco Melzi.",
+      "attribution_line_de": "Werkstatt von Leonardo da Vinci. Der Louvre nennt auch Francesco Melzi.",
+      "attribution_certainty": "workshop",
+      "rights_class": "DG",
+      "plate_file": "refs/paintings/bacchus-saint-john__louvre__5693x8649.jpg",
+      "plate_pixels": {
+        "width": 5693,
+        "height": 8649
+      },
+      "licence_line": "Public domain. Photo Wilfredor, via Wikimedia Commons",
+      "absence_reason_en": null,
+      "absence_reason_de": null,
+      "label_first_line_en": "Documented. Bacchus, formerly Saint John the Baptist. Workshop of Leonardo da Vinci. The Louvre also names Francesco Melzi.",
+      "label_first_line_de": "Belegt. Bacchus, ehemals Johannes der Täufer. Werkstatt von Leonardo da Vinci. Der Louvre nennt auch Francesco Melzi.",
+      "hang": {
+        "wall": "picture-room-main",
+        "order": 24,
+        "eye_height_cm": 155
+      },
+      "in_house_1517": false,
+      "de_beatis": null,
+      "facts": [
+        {
+          "text_en": "The figure was changed from Saint John into Bacchus between 1683 and 1693.",
+          "text_de": "Die Figur wurde zwischen 1683 und 1693 von Johannes zu Bacchus verändert.",
+          "source_url": "https://de.wikipedia.org/wiki/Bacchus_(Leonardo_da_Vinci)",
+          "certainty": "documented"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://collections.louvre.fr/en/ark:/53355/cl010062371",
+          "supports": [
+            "inventory",
+            "height_cm",
+            "width_cm",
+            "medium",
+            "support",
+            "date_from",
+            "date_to",
+            "attribution"
+          ],
+          "local_source": "refs/MINING-CATALOG-PAINTINGS.md §19",
+          "verification": "holder record as transcribed in catalog"
+        },
+        {
+          "url": "https://commons.wikimedia.org/wiki/File:Bacchus_-_Leonardo_da_Vinci_workshop_-_Louvre_INV_780.jpg",
+          "supports": [
+            "held_scan",
+            "rights_class",
+            "licence_line"
+          ],
+          "local_source": "refs/RIGHTS-CROSSCHECK.md P05",
+          "verification": "cross-check governs"
+        }
+      ],
+      "rights_basis": {
+        "row": "P05",
+        "decision": "PD flat workshop painting, capture credited to Wilfredor; identify the restoration state."
+      },
+      "held_scan_files": [
+        "refs/paintings/bacchus-saint-john__louvre__5693x8649.jpg"
+      ],
+      "clearance_sentence_en": null,
+      "clearance_sentence_de": null,
+      "additional_plates": [],
+      "display_mode": "reproduction_card_beside_measured_outline",
+      "measurement": {
+        "source_url": "https://collections.louvre.fr/en/ark:/53355/cl010062371",
+        "status": "holder_record",
+        "extent": "object",
+        "alternatives": [],
+        "registration": "not established",
+        "museum_eye_height_source": "CONCEPT-OPUS.md S11, 1.55 m",
+        "order_source": "CONCEPT-OPUS.md S11, chronological with attribution and rights interleaved"
+      },
+      "reproduction_note_en": "The photograph follows the 2017 to 2019 restoration. This is a workshop painting.",
+      "reproduction_note_de": "Das Foto entstand nach der Restaurierung von 2017 bis 2019. Es handelt sich um ein Werkstattbild.",
+      "gaps": [],
+      "german_provenance": {
+        "title": "Catalog German title with restored umlauts, or museum wording where the catalog supplies none.",
+        "visitor_copy": "New museum German written for this commission."
+      },
+      "date_label_en": "About 1517 to 1520",
+      "date_label_de": "Etwa 1517 bis 1520",
+      "certainty_word_en": "Documented",
+      "certainty_word_de": "Belegt"
+    },
+    {
+      "id": "la-scapigliata",
+      "catalogue_number": 20,
+      "register_status": "concept_register",
+      "title_en": "La Scapigliata",
+      "title_de": "Scapigliata",
+      "holder": "Galleria Nazionale di Parma, Complesso della Pilotta",
+      "inventory": "362",
+      "height_cm": 24.7,
+      "width_cm": 21,
+      "medium": "Umber and white lead",
+      "support": "Poplar panel",
+      "medium_de": "Umbra und Bleiweiß",
+      "support_de": "Pappelholz",
+      "date_from": 1506,
+      "date_to": 1508,
+      "date_certainty": "approximate",
+      "attribution_line_en": "An unfinished head attributed to Leonardo da Vinci.",
+      "attribution_line_de": "Ein unvollendeter Kopf, Leonardo da Vinci zugeschrieben.",
+      "attribution_certainty": "qualified",
+      "rights_class": "RC",
+      "plate_file": null,
+      "plate_pixels": null,
+      "licence_line": "Public domain, via Wikimedia Commons",
+      "absence_reason_en": "Held by Galleria Nazionale di Parma, Complesso della Pilotta. Available file: la-scapigliata__galleria-nazionale-parma__3512x4135.jpg. The museum classified this scan as RC. The supplied terms have not been cleared for this exhibition. Obtain written permission for this reproduction from the holder and the image supplier.",
+      "absence_reason_de": "Sammlung: Galleria Nazionale di Parma, Complesso della Pilotta. Vorhandene Datei: la-scapigliata__galleria-nazionale-parma__3512x4135.jpg. Dieses Museum hat den Scan als RC eingestuft. Seine Nutzungsbedingungen sind für diese Ausstellung nicht geklärt. Eine schriftliche Freigabe des besitzenden Museums und des Bildanbieters würde diese Reproduktion ermöglichen.",
+      "label_first_line_en": "Absent. La Scapigliata. An unfinished head attributed to Leonardo da Vinci.",
+      "label_first_line_de": "Abwesend. Scapigliata. Ein unvollendeter Kopf, Leonardo da Vinci zugeschrieben.",
+      "hang": {
+        "wall": "picture-room-main",
+        "order": 21,
+        "eye_height_cm": 155
+      },
+      "in_house_1517": false,
+      "de_beatis": null,
+      "facts": [
+        {
+          "text_en": "The work has been in Parma since 1839.",
+          "text_de": "Das Werk befindet sich seit 1839 in Parma.",
+          "source_url": "https://en.wikipedia.org/wiki/La_Scapigliata",
+          "certainty": "documented"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://en.wikipedia.org/wiki/La_Scapigliata",
+          "supports": [
+            "inventory",
+            "height_cm",
+            "width_cm",
+            "medium",
+            "support",
+            "date_from",
+            "date_to",
+            "attribution"
+          ],
+          "local_source": "refs/MINING-CATALOG-PAINTINGS.md §20",
+          "verification": "catalog reports secondary or indirectly cited measurements"
+        },
+        {
+          "url": "https://commons.wikimedia.org/wiki/File:Head_of_a_Young_Woman,_called_%22Scapiliata%22.jpg",
+          "supports": [
+            "held_scan",
+            "rights_class",
+            "licence_line"
+          ],
+          "local_source": "refs/RIGHTS-CROSSCHECK.md P13",
+          "verification": "cross-check governs"
+        }
+      ],
+      "rights_basis": {
+        "row": "P13",
+        "decision": "Italian protected holder remains RC despite the photograph’s free copyright tag."
+      },
+      "held_scan_files": [
+        "refs/paintings/la-scapigliata__galleria-nazionale-parma__3512x4135.jpg"
+      ],
+      "clearance_sentence_en": "Obtain written permission for this reproduction from the holder and the image supplier.",
+      "clearance_sentence_de": "Eine schriftliche Freigabe des besitzenden Museums und des Bildanbieters würde diese Reproduktion ermöglichen.",
+      "additional_plates": [],
+      "display_mode": "absence_outline",
+      "measurement": {
+        "source_url": "https://en.wikipedia.org/wiki/La_Scapigliata",
+        "status": "catalogue_qualified",
+        "extent": "object",
+        "alternatives": [
+          {
+            "height_cm": 24.6,
+            "width_cm": 21,
+            "note": "Indirectly cited Parma holder reading. Concept selects 24.7 cm.",
+            "source_url": "http://www.parmabeniartistici.beniculturali.it/galleria-nazionale-di-parma/galleria/la-scapigliata/"
+          }
+        ],
+        "registration": "not established",
+        "museum_eye_height_source": "CONCEPT-OPUS.md S11, 1.55 m",
+        "order_source": "CONCEPT-OPUS.md S11, chronological with attribution and rights interleaved"
+      },
+      "reproduction_note_en": "Keep the raster’s aspect ratio. Its corners are not registered to the measured object.",
+      "reproduction_note_de": "Das Seitenverhältnis der Datei bleibt erhalten. Ihre Ecken sind dem vermessenen Objekt noch nicht zugeordnet.",
+      "gaps": [
+        "Measurements were not directly verified with the holder by the catalog."
+      ],
+      "german_provenance": {
+        "title": "Catalog German title with restored umlauts, or museum wording where the catalog supplies none.",
+        "visitor_copy": "New museum German written for this commission."
+      },
+      "date_label_en": "About 1506 to 1508",
+      "date_label_de": "Etwa 1506 bis 1508",
+      "certainty_word_en": "Absent",
+      "certainty_word_de": "Abwesend"
+    },
+    {
+      "id": "madonna-litta",
+      "catalogue_number": 21,
+      "register_status": "concept_register",
+      "title_en": "Madonna Litta",
+      "title_de": "Madonna Litta",
+      "holder": "State Hermitage Museum, Saint Petersburg",
+      "inventory": "GE-249",
+      "height_cm": 42,
+      "width_cm": 33,
+      "medium": "Tempera",
+      "support": "Canvas, transferred from panel",
+      "medium_de": "Tempera",
+      "support_de": "Leinwand, von Holz übertragen",
+      "date_from": 1490,
+      "date_to": 1490,
+      "date_certainty": "approximate",
+      "attribution_line_en": "Disputed. The Hermitage names Leonardo da Vinci. Boltraffio and Marco d’Oggiono have also been proposed.",
+      "attribution_line_de": "Umstritten. Die Eremitage nennt Leonardo da Vinci. Auch Boltraffio und Marco d’Oggiono wurden vorgeschlagen.",
+      "attribution_certainty": "disputed",
+      "rights_class": "DG",
+      "plate_file": "refs/paintings/madonna-litta__hermitage__6784x8633.jpg",
+      "plate_pixels": {
+        "width": 6784,
+        "height": 8633
+      },
+      "licence_line": "Public domain. Scan State Hermitage Museum, via Wikimedia Commons",
+      "absence_reason_en": null,
+      "absence_reason_de": null,
+      "label_first_line_en": "Disputed. Madonna Litta. The Hermitage names Leonardo da Vinci. Boltraffio and Marco d’Oggiono have also been proposed.",
+      "label_first_line_de": "Umstritten. Madonna Litta. Die Eremitage nennt Leonardo da Vinci. Auch Boltraffio und Marco d’Oggiono wurden vorgeschlagen.",
+      "hang": {
+        "wall": "picture-room-main",
+        "order": 13,
+        "eye_height_cm": 155
+      },
+      "in_house_1517": false,
+      "de_beatis": null,
+      "facts": [
+        {
+          "text_en": "Tsar Alexander II bought the work from Count Antonio Litta in 1865.",
+          "text_de": "Zar Alexander II. kaufte das Werk 1865 von Graf Antonio Litta.",
+          "source_url": "https://en.wikipedia.org/wiki/Madonna_Litta",
+          "certainty": "documented"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://www.hermitagemuseum.org/wps/portal/hermitage/digital-collection/01.+Paintings/29633/",
+          "supports": [
+            "inventory",
+            "height_cm",
+            "width_cm",
+            "medium",
+            "support",
+            "date_from",
+            "date_to",
+            "attribution"
+          ],
+          "local_source": "refs/MINING-CATALOG-PAINTINGS.md §21",
+          "verification": "catalog reports secondary or indirectly cited measurements"
+        },
+        {
+          "url": "https://commons.wikimedia.org/wiki/File:Leonardo_da_Vinci_-_The_Madonna_and_Child_(The_Litta_Madonna).jpg",
+          "supports": [
+            "held_scan",
+            "rights_class",
+            "licence_line"
+          ],
+          "local_source": "refs/RIGHTS-CROSSCHECK.md P17",
+          "verification": "cross-check governs"
+        }
+      ],
+      "rights_basis": {
+        "row": "P17",
+        "decision": "Commons states PD for a faithful flat reproduction; EU reading applies."
+      },
+      "held_scan_files": [
+        "refs/paintings/madonna-litta__hermitage__6784x8633.jpg"
+      ],
+      "clearance_sentence_en": null,
+      "clearance_sentence_de": null,
+      "additional_plates": [],
+      "display_mode": "reproduction_card_beside_measured_outline",
+      "measurement": {
+        "source_url": "https://www.hermitagemuseum.org/wps/portal/hermitage/digital-collection/01.+Paintings/29633/",
+        "status": "catalogue_qualified",
+        "extent": "object",
+        "alternatives": [],
+        "registration": "not established",
+        "museum_eye_height_source": "CONCEPT-OPUS.md S11, 1.55 m",
+        "order_source": "CONCEPT-OPUS.md S11, chronological with attribution and rights interleaved"
+      },
+      "reproduction_note_en": "Keep the raster’s aspect ratio. Its corners are not registered to the measured object.",
+      "reproduction_note_de": "Das Seitenverhältnis der Datei bleibt erhalten. Ihre Ecken sind dem vermessenen Objekt noch nicht zugeordnet.",
+      "gaps": [
+        "Measurements were not directly verified with the holder by the catalog."
+      ],
+      "german_provenance": {
+        "title": "Catalog German title with restored umlauts, or museum wording where the catalog supplies none.",
+        "visitor_copy": "New museum German written for this commission."
+      },
+      "date_label_en": "About 1490",
+      "date_label_de": "Um 1490",
+      "certainty_word_en": "Disputed",
+      "certainty_word_de": "Umstritten"
+    },
+    {
+      "id": "salvator-mundi",
+      "catalogue_number": 22,
+      "register_status": "concept_register",
+      "title_en": "Salvator Mundi",
+      "title_de": "Salvator Mundi",
+      "holder": "Private collection, present location unconfirmed",
+      "inventory": null,
+      "height_cm": 65.7,
+      "width_cm": 45.7,
+      "medium": "Oil",
+      "support": "Walnut panel",
+      "medium_de": "Öl",
+      "support_de": "Nussbaumholz",
+      "date_from": 1499,
+      "date_to": 1510,
+      "date_certainty": "approximate",
+      "attribution_line_en": "Disputed attribution to Leonardo da Vinci. Extensive restoration affects the visible picture.",
+      "attribution_line_de": "Die Zuschreibung an Leonardo da Vinci ist umstritten. Umfangreiche Restaurierungen prägen das heutige Bild.",
+      "attribution_certainty": "disputed",
+      "rights_class": "RC",
+      "plate_file": null,
+      "plate_pixels": null,
+      "licence_line": "see the warning below, do not print until the scan's origin is settled",
+      "absence_reason_en": "Held by Private collection, present location unconfirmed. Available file: salvator-mundi__private-collection__3300x4856.jpg. The museum classified this scan as RC. The supplied terms have not been cleared for this exhibition. A verified free scan or permission for the Getty-derived image would fill this frame.",
+      "absence_reason_de": "Sammlung: Privatsammlung, heutiger Standort unbestätigt. Vorhandene Datei: salvator-mundi__private-collection__3300x4856.jpg. Dieses Museum hat den Scan als RC eingestuft. Seine Nutzungsbedingungen sind für diese Ausstellung nicht geklärt. Ein nachgewiesen freier Scan oder die Freigabe des von Getty stammenden Bildes würde diesen Rahmen füllen.",
+      "label_first_line_en": "Absent. Salvator Mundi. Disputed attribution to Leonardo da Vinci. Extensive restoration affects the visible picture.",
+      "label_first_line_de": "Abwesend. Salvator Mundi. Die Zuschreibung an Leonardo da Vinci ist umstritten. Umfangreiche Restaurierungen prägen das heutige Bild.",
+      "hang": {
+        "wall": "picture-room-main",
+        "order": 15,
+        "eye_height_cm": 155
+      },
+      "in_house_1517": false,
+      "de_beatis": null,
+      "facts": [
+        {
+          "text_en": "The painting sold at Christie’s in New York on 15 November 2017.",
+          "text_de": "Das Gemälde wurde am 15. November 2017 bei Christie’s in New York versteigert.",
+          "source_url": "https://en.wikipedia.org/wiki/Salvator_Mundi_(Leonardo)",
+          "certainty": "documented"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Salvator_Mundi_(Leonardo)",
+          "supports": [
+            "inventory",
+            "height_cm",
+            "width_cm",
+            "medium",
+            "support",
+            "date_from",
+            "date_to",
+            "attribution"
+          ],
+          "local_source": "refs/MINING-CATALOG-PAINTINGS.md §22",
+          "verification": "catalog reports secondary or indirectly cited measurements"
+        },
+        {
+          "url": "https://commons.wikimedia.org/wiki/File:Leonardo_da_Vinci,_Salvator_Mundi,_c.1500,_oil_on_walnut,_45.4_%C3%97_65.6_cm.jpg",
+          "supports": [
+            "held_scan",
+            "rights_class",
+            "licence_line"
+          ],
+          "local_source": "refs/RIGHTS-CROSSCHECK.md P26",
+          "verification": "cross-check governs"
+        }
+      ],
+      "rights_basis": {
+        "row": "P26",
+        "decision": "Credit is Getty Images; a Commons PD tag does not establish release of this commercial-library capture."
+      },
+      "held_scan_files": [
+        "refs/paintings/salvator-mundi__private-collection__3300x4856.jpg"
+      ],
+      "clearance_sentence_en": "A verified free scan or permission for the Getty-derived image would fill this frame.",
+      "clearance_sentence_de": "Ein nachgewiesen freier Scan oder die Freigabe des von Getty stammenden Bildes würde diesen Rahmen füllen.",
+      "additional_plates": [],
+      "display_mode": "absence_outline",
+      "measurement": {
+        "source_url": "https://en.wikipedia.org/wiki/Salvator_Mundi_(Leonardo)",
+        "status": "catalogue_qualified",
+        "extent": "object",
+        "alternatives": [],
+        "registration": "not established",
+        "museum_eye_height_source": "CONCEPT-OPUS.md S11, 1.55 m",
+        "order_source": "CONCEPT-OPUS.md S11, chronological with attribution and rights interleaved"
+      },
+      "reproduction_note_en": "Keep the raster’s aspect ratio. Its corners are not registered to the measured object.",
+      "reproduction_note_de": "Das Seitenverhältnis der Datei bleibt erhalten. Ihre Ecken sind dem vermessenen Objekt noch nicht zugeordnet.",
+      "gaps": [
+        "No inventory number supplied by the catalog.",
+        "Measurements were not directly verified with the holder by the catalog."
+      ],
+      "german_provenance": {
+        "title": "Catalog German title with restored umlauts, or museum wording where the catalog supplies none.",
+        "visitor_copy": "New museum German written for this commission."
+      },
+      "date_label_en": "About 1499 to 1510",
+      "date_label_de": "Etwa 1499 bis 1510",
+      "certainty_word_en": "Absent",
+      "certainty_word_de": "Abwesend"
+    },
+    {
+      "id": "yarnwinder-buccleuch",
+      "catalogue_number": 23,
+      "register_status": "concept_register",
+      "title_en": "Madonna of the Yarnwinder, Buccleuch version",
+      "title_de": "Madonna mit der Spindel, Buccleuch-Fassung",
+      "holder": "Buccleuch collection, on loan to National Galleries of Scotland",
+      "inventory": "NGL 002.08",
+      "height_cm": 48.3,
+      "width_cm": 36.9,
+      "medium": "Oil",
+      "support": "Panel",
+      "medium_de": "Öl",
+      "support_de": "Holztafel",
+      "date_from": 1501,
+      "date_to": 1501,
+      "date_certainty": "approximate",
+      "attribution_line_en": "Leonardo da Vinci and workshop.",
+      "attribution_line_de": "Leonardo da Vinci und Werkstatt.",
+      "attribution_certainty": "qualified",
+      "rights_class": "DG",
+      "plate_file": "refs/paintings/yarnwinder-buccleuch__buccleuch-collection__5826x7774.jpg",
+      "plate_pixels": {
+        "width": 5826,
+        "height": 7774
+      },
+      "licence_line": "Public domain. Scan National Galleries Scotland, via Wikimedia Commons",
+      "absence_reason_en": null,
+      "absence_reason_de": null,
+      "label_first_line_en": "Documented. Madonna of the Yarnwinder, Buccleuch version. Leonardo da Vinci and workshop.",
+      "label_first_line_de": "Belegt. Madonna mit der Spindel, Buccleuch-Fassung. Leonardo da Vinci und Werkstatt.",
+      "hang": {
+        "wall": "picture-room-main",
+        "order": 16,
+        "eye_height_cm": 155
+      },
+      "in_house_1517": false,
+      "de_beatis": null,
+      "facts": [
+        {
+          "text_en": "The painting was stolen in 2003 and recovered in Glasgow in 2007.",
+          "text_de": "Das Gemälde wurde 2003 gestohlen und 2007 in Glasgow wiedergefunden.",
+          "source_url": "https://www.nationalgalleries.org/art-and-artists/94762/madonna-yarnwinder",
+          "certainty": "documented"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://art.nationalgalleries.org/art-and-artists/94762/",
+          "supports": [
+            "inventory",
+            "height_cm",
+            "width_cm",
+            "medium",
+            "support",
+            "date_from",
+            "date_to",
+            "attribution"
+          ],
+          "local_source": "refs/MINING-CATALOG-PAINTINGS.md §23",
+          "verification": "holder record as transcribed in catalog"
+        },
+        {
+          "url": "https://commons.wikimedia.org/wiki/File:Leonardo_da_Vinci_-_Madonna_of_the_Yarnwinder,_Buccleuch_version.jpg",
+          "supports": [
+            "held_scan",
+            "rights_class",
+            "licence_line"
+          ],
+          "local_source": "refs/RIGHTS-CROSSCHECK.md P31",
+          "verification": "cross-check governs"
+        }
+      ],
+      "rights_basis": {
+        "row": "P31",
+        "decision": "Commons states PD for a faithful flat reproduction; EU reading applies."
+      },
+      "held_scan_files": [
+        "refs/paintings/yarnwinder-buccleuch__buccleuch-collection__5826x7774.jpg"
+      ],
+      "clearance_sentence_en": null,
+      "clearance_sentence_de": null,
+      "additional_plates": [],
+      "display_mode": "reproduction_card_beside_measured_outline",
+      "measurement": {
+        "source_url": "https://art.nationalgalleries.org/art-and-artists/94762/",
+        "status": "holder_record",
+        "extent": "object",
+        "alternatives": [],
+        "registration": "not established",
+        "museum_eye_height_source": "CONCEPT-OPUS.md S11, 1.55 m",
+        "order_source": "CONCEPT-OPUS.md S11, chronological with attribution and rights interleaved"
+      },
+      "reproduction_note_en": "Keep the raster’s aspect ratio. Its corners are not registered to the measured object.",
+      "reproduction_note_de": "Das Seitenverhältnis der Datei bleibt erhalten. Ihre Ecken sind dem vermessenen Objekt noch nicht zugeordnet.",
+      "gaps": [],
+      "german_provenance": {
+        "title": "Catalog German title with restored umlauts, or museum wording where the catalog supplies none.",
+        "visitor_copy": "New museum German written for this commission."
+      },
+      "date_label_en": "About 1501",
+      "date_label_de": "Um 1501",
+      "certainty_word_en": "Documented",
+      "certainty_word_de": "Belegt"
+    },
+    {
+      "id": "yarnwinder-lansdowne",
+      "catalogue_number": 24,
+      "register_status": "concept_register",
+      "title_en": "Madonna of the Yarnwinder, Lansdowne version",
+      "title_de": "Madonna mit der Spindel, Lansdowne-Fassung",
+      "holder": "Kenneth C. Griffin Collection, on loan to The Metropolitan Museum of Art",
+      "inventory": "L.2026.5",
+      "height_cm": 49.5,
+      "width_cm": 37.1,
+      "medium": "Oil",
+      "support": "Transferred from walnut panel, receiving support not specified in current record",
+      "medium_de": "Öl",
+      "support_de": "Von Nussbaumholz übertragen, heutiger Bildträger im Datensatz nicht genannt",
+      "date_from": 1501,
+      "date_to": 1501,
+      "date_certainty": "approximate",
+      "attribution_line_en": "Leonardo da Vinci and studio, according to the Met.",
+      "attribution_line_de": "Leonardo da Vinci und Werkstatt, laut dem Metropolitan Museum.",
+      "attribution_certainty": "qualified",
+      "rights_class": "DG",
+      "plate_file": "refs/paintings/yarnwinder-lansdowne__private-on-loan-met__2112x2749.jpg",
+      "plate_pixels": {
+        "width": 2112,
+        "height": 2749
+      },
+      "licence_line": "Public domain, via Wikimedia Commons",
+      "absence_reason_en": null,
+      "absence_reason_de": null,
+      "label_first_line_en": "Documented. Madonna of the Yarnwinder, Lansdowne version. Leonardo da Vinci and studio, according to the Met.",
+      "label_first_line_de": "Belegt. Madonna mit der Spindel, Lansdowne-Fassung. Leonardo da Vinci und Werkstatt, laut dem Metropolitan Museum.",
+      "hang": {
+        "wall": "picture-room-main",
+        "order": 17,
+        "eye_height_cm": 155
+      },
+      "in_house_1517": false,
+      "de_beatis": null,
+      "facts": [
+        {
+          "text_en": "The Met registers this loan as L.2026.5 and credits the Kenneth C. Griffin Collection.",
+          "text_de": "Das Metropolitan Museum führt die Leihgabe als L.2026.5 und nennt die Kenneth C. Griffin Collection.",
+          "source_url": "https://www.metmuseum.org/art/collection/search/941909",
+          "certainty": "documented"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://www.metmuseum.org/art/collection/search/941909",
+          "supports": [
+            "inventory",
+            "height_cm",
+            "width_cm",
+            "medium",
+            "support",
+            "date_from",
+            "date_to",
+            "attribution"
+          ],
+          "local_source": "refs/MINING-CATALOG-PAINTINGS.md §24",
+          "verification": "Current holder page read on 2026-09-09."
+        },
+        {
+          "url": "https://commons.wikimedia.org/wiki/File:Madonna_of_the_Yarnwinder.jpg",
+          "supports": [
+            "held_scan",
+            "rights_class",
+            "licence_line"
+          ],
+          "local_source": "refs/RIGHTS-CROSSCHECK.md P32",
+          "verification": "cross-check governs"
+        }
+      ],
+      "rights_basis": {
+        "row": "P32",
+        "decision": "Commons states PD for a faithful flat reproduction; EU reading applies."
+      },
+      "held_scan_files": [
+        "refs/paintings/yarnwinder-lansdowne__private-on-loan-met__2112x2749.jpg"
+      ],
+      "clearance_sentence_en": null,
+      "clearance_sentence_de": null,
+      "additional_plates": [],
+      "display_mode": "reproduction_card_beside_measured_outline",
+      "measurement": {
+        "source_url": "https://www.metmuseum.org/art/collection/search/941909",
+        "status": "holder_record_checked_2026-09-09",
+        "extent": "object",
+        "alternatives": [
+          {
+            "height_cm": 50.2,
+            "width_cm": 36.4,
+            "note": "Earlier catalog and concept measurement. Superseded here by the current Met record.",
+            "source_url": "https://www.metmuseum.org/art/collection/search/941909"
+          }
+        ],
+        "registration": "not established",
+        "museum_eye_height_source": "CONCEPT-OPUS.md S11, 1.55 m",
+        "order_source": "CONCEPT-OPUS.md S11, chronological with attribution and rights interleaved"
+      },
+      "reproduction_note_en": "The held raster is a different reproduction from the current Met image. Preserve its aspect ratio beside the holder-sized outline.",
+      "reproduction_note_de": "Die vorhandene Datei ist eine andere Reproduktion als das heutige Bild des Metropolitan Museum. Ihr Seitenverhältnis bleibt neben dem Umriss nach Museumsmaßen erhalten.",
+      "gaps": [
+        "Current Met dimensions and transferred support differ from the catalog. Receiving support is unspecified."
+      ],
+      "german_provenance": {
+        "title": "Catalog German title with restored umlauts, or museum wording where the catalog supplies none.",
+        "visitor_copy": "New museum German written for this commission."
+      },
+      "date_note_en": "The current Met record dates this work to about 1501. The earlier catalog gave about 1501 to 1510.",
+      "date_note_de": "Das Metropolitan Museum datiert das Werk heute auf etwa 1501. Der ältere Katalog nannte etwa 1501 bis 1510.",
+      "date_label_en": "About 1501",
+      "date_label_de": "Um 1501",
+      "certainty_word_en": "Documented",
+      "certainty_word_de": "Belegt"
+    },
+    {
+      "id": "burlington-house-cartoon",
+      "catalogue_number": 25,
+      "register_status": "concept_register",
+      "title_en": "The Burlington House Cartoon",
+      "title_de": "Die Jungfrau mit dem Kind, der heiligen Anna und Johannes dem Täufer",
+      "holder": "National Gallery, London",
+      "inventory": "NG6337",
+      "height_cm": 141.5,
+      "width_cm": 104.6,
+      "medium": "Charcoal with white chalk",
+      "support": "Paper mounted on canvas",
+      "medium_de": "Kohle mit weißer Kreide",
+      "support_de": "Papier auf Leinwand",
+      "date_from": 1506,
+      "date_to": 1508,
+      "date_certainty": "disputed",
+      "attribution_line_en": "Leonardo da Vinci.",
+      "attribution_line_de": "Leonardo da Vinci.",
+      "attribution_certainty": "documented",
+      "rights_class": "RC",
+      "plate_file": null,
+      "plate_pixels": null,
+      "licence_line": "Photo mutovkin, Flickr and Wikimedia Commons, CC BY 2.0",
+      "absence_reason_en": "Held by National Gallery, London. Available file: burlington-house-cartoon__national-gallery-london__4004x5358.jpg. The museum classified this scan as RC. The supplied terms have not been cleared for this exhibition. A cleared frontal reproduction from the National Gallery would fill this frame. The held room photograph also needs replacement.",
+      "absence_reason_de": "Sammlung: National Gallery, London. Vorhandene Datei: burlington-house-cartoon__national-gallery-london__4004x5358.jpg. Dieses Museum hat den Scan als RC eingestuft. Seine Nutzungsbedingungen sind für diese Ausstellung nicht geklärt. Eine freigegebene frontale Reproduktion der National Gallery würde diesen Rahmen füllen. Das vorhandene Foto aus dem Ausstellungsraum müsste ersetzt werden.",
+      "label_first_line_en": "Absent. The Burlington House Cartoon. Leonardo da Vinci.",
+      "label_first_line_de": "Abwesend. Die Jungfrau mit dem Kind, der heiligen Anna und Johannes dem Täufer. Leonardo da Vinci.",
+      "hang": {
+        "wall": "picture-room-main",
+        "order": 22,
+        "eye_height_cm": 155
+      },
+      "in_house_1517": false,
+      "de_beatis": null,
+      "facts": [
+        {
+          "text_en": "The cartoon consists of eight joined sheets mounted on canvas.",
+          "text_de": "Der Karton besteht aus acht zusammengefügten Blättern auf Leinwand.",
+          "source_url": "https://en.wikipedia.org/wiki/The_Virgin_and_Child_with_Saint_Anne_and_Saint_John_the_Baptist",
+          "certainty": "documented"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://en.wikipedia.org/wiki/The_Virgin_and_Child_with_Saint_Anne_and_Saint_John_the_Baptist",
+          "supports": [
+            "inventory",
+            "height_cm",
+            "width_cm",
+            "medium",
+            "support",
+            "date_from",
+            "date_to",
+            "attribution"
+          ],
+          "local_source": "refs/MINING-CATALOG-PAINTINGS.md §25",
+          "verification": "catalog reports secondary or indirectly cited measurements"
+        },
+        {
+          "url": "https://commons.wikimedia.org/wiki/File:Burlington_House_Cartoon_from_The_National_Gallery_(London)_by_Leonardo_da_Vinci.jpg",
+          "supports": [
+            "held_scan",
+            "rights_class",
+            "licence_line"
+          ],
+          "local_source": "refs/RIGHTS-CROSSCHECK.md P08",
+          "verification": "cross-check governs"
+        },
+        {
+          "url": "https://www.nationalgallery.org.uk/paintings/leonardo-da-vinci-the-burlington-house-cartoon",
+          "supports": [
+            "inventory",
+            "height_cm",
+            "width_cm",
+            "medium",
+            "support",
+            "date_from",
+            "date_to"
+          ],
+          "verification": "Current holder page read on 2026-09-09."
+        }
+      ],
+      "rights_basis": {
+        "row": "P08",
+        "decision": "mutovkin’s CC BY 2.0 room photo is genuine, but Gallery capture terms restrict use to personal/noncommercial purposes."
+      },
+      "held_scan_files": [
+        "refs/paintings/burlington-house-cartoon__national-gallery-london__4004x5358.jpg"
+      ],
+      "clearance_sentence_en": "A cleared frontal reproduction from the National Gallery would fill this frame. The held room photograph also needs replacement.",
+      "clearance_sentence_de": "Eine freigegebene frontale Reproduktion der National Gallery würde diesen Rahmen füllen. Das vorhandene Foto aus dem Ausstellungsraum müsste ersetzt werden.",
+      "additional_plates": [],
+      "display_mode": "absence_outline",
+      "measurement": {
+        "source_url": "https://www.nationalgallery.org.uk/paintings/leonardo-da-vinci-the-burlington-house-cartoon",
+        "status": "holder_record_checked_2026-09-09",
+        "extent": "object",
+        "alternatives": [],
+        "registration": "not established",
+        "museum_eye_height_source": "CONCEPT-OPUS.md S11, 1.55 m",
+        "order_source": "CONCEPT-OPUS.md S11, chronological with attribution and rights interleaved"
+      },
+      "reproduction_note_en": "Keep the raster’s aspect ratio. Its corners are not registered to the measured object.",
+      "reproduction_note_de": "Das Seitenverhältnis der Datei bleibt erhalten. Ihre Ecken sind dem vermessenen Objekt noch nicht zugeordnet.",
+      "gaps": [],
+      "german_provenance": {
+        "title": "Catalog German title with restored umlauts, or museum wording where the catalog supplies none.",
+        "visitor_copy": "New museum German written for this commission."
+      },
+      "date_note_en": "The National Gallery prefers about 1506 to 1508. The earlier dating to about 1499 to 1500 remains a scholarly alternative.",
+      "date_note_de": "Die National Gallery bevorzugt etwa 1506 bis 1508. Die frühere Datierung auf etwa 1499 bis 1500 bleibt als Forschungsposition verzeichnet.",
+      "date_label_en": "About 1506 to 1508",
+      "date_label_de": "Etwa 1506 bis 1508",
+      "certainty_word_en": "Absent",
+      "certainty_word_de": "Abwesend"
+    },
+    {
+      "id": "anghiari-copy",
+      "catalogue_number": 26,
+      "register_status": "concept_register",
+      "title_en": "The Fight for the Standard, after the Battle of Anghiari",
+      "title_de": "Der Kampf um die Standarte, nach der Schlacht von Anghiari",
+      "holder": "Musée du Louvre, Département des Arts graphiques, Paris",
+      "inventory": "INV 20271",
+      "height_cm": 45.3,
+      "width_cm": 63.6,
+      "medium": "Black chalk, pen, brown and grey ink, grey wash, white and grey-blue highlights",
+      "support": "Paper enlarged with four lateral strips",
+      "medium_de": "Schwarze Kreide, Feder, braune und graue Tinte, graue Lavierung, weiße und graublaue Höhungen",
+      "support_de": "Papier mit vier angesetzten Randstreifen",
+      "date_from": null,
+      "date_to": null,
+      "date_certainty": "unknown",
+      "attribution_line_en": "A sixteenth-century Italian copy reworked in the seventeenth century. Rubens is among the proposed hands.",
+      "attribution_line_de": "Eine italienische Kopie des 16. Jahrhunderts, im 17. Jahrhundert überarbeitet. Rubens zählt zu den vorgeschlagenen Bearbeitern.",
+      "attribution_certainty": "copy",
+      "rights_class": "DG",
+      "plate_file": "refs/paintings/anghiari-rubens-copy__louvre-arts-graphiques__1179x857.jpg",
+      "plate_pixels": {
+        "width": 1179,
+        "height": 857
+      },
+      "licence_line": "Public domain, via Wikimedia Commons",
+      "absence_reason_en": null,
+      "absence_reason_de": null,
+      "label_first_line_en": "Documented. The Fight for the Standard, after the Battle of Anghiari. A sixteenth-century Italian copy reworked in the seventeenth century. Rubens is among the proposed hands.",
+      "label_first_line_de": "Belegt. Der Kampf um die Standarte, nach der Schlacht von Anghiari. Eine italienische Kopie des 16. Jahrhunderts, im 17. Jahrhundert überarbeitet. Rubens zählt zu den vorgeschlagenen Bearbeitern.",
+      "hang": {
+        "wall": "picture-room-main",
+        "order": 20,
+        "eye_height_cm": 155
+      },
+      "in_house_1517": false,
+      "de_beatis": null,
+      "facts": [
+        {
+          "text_en": "Four added strips enlarged the sheet from 42.8 by 57.7 cm to 45.3 by 63.6 cm.",
+          "text_de": "Vier angesetzte Streifen vergrößerten das Blatt von 42,8 mal 57,7 cm auf 45,3 mal 63,6 cm.",
+          "source_url": "https://collections.louvre.fr/en/ark:/53355/cl020110446",
+          "certainty": "documented"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://collections.louvre.fr/en/ark:/53355/cl020110446",
+          "supports": [
+            "inventory",
+            "height_cm",
+            "width_cm",
+            "medium",
+            "support",
+            "date_from",
+            "date_to",
+            "attribution"
+          ],
+          "local_source": "refs/MINING-CATALOG-PAINTINGS.md §26",
+          "verification": "holder record as transcribed in catalog"
+        },
+        {
+          "url": "https://commons.wikimedia.org/wiki/File:Peter_Paul_Ruben%27s_copy_of_the_lost_Battle_of_Anghiari.jpg",
+          "supports": [
+            "held_scan",
+            "rights_class",
+            "licence_line"
+          ],
+          "local_source": "refs/RIGHTS-CROSSCHECK.md P02",
+          "verification": "cross-check governs"
+        }
+      ],
+      "rights_basis": {
+        "row": "P02",
+        "decision": "PD flat copy drawing; use the Louvre’s multi-hand attribution, and do not present the lost mural itself."
+      },
+      "held_scan_files": [
+        "refs/paintings/anghiari-rubens-copy__louvre-arts-graphiques__1179x857.jpg"
+      ],
+      "clearance_sentence_en": null,
+      "clearance_sentence_de": null,
+      "additional_plates": [],
+      "display_mode": "reproduction_card_beside_measured_outline",
+      "measurement": {
+        "source_url": "https://collections.louvre.fr/en/ark:/53355/cl020110446",
+        "status": "holder_record",
+        "extent": "enlarged sheet",
+        "alternatives": [
+          {
+            "height_cm": 42.8,
+            "width_cm": 57.7,
+            "note": "Original sheet before four edge strips were added.",
+            "source_url": "https://collections.louvre.fr/en/ark:/53355/cl020110446"
+          }
+        ],
+        "registration": "not established",
+        "museum_eye_height_source": "CONCEPT-OPUS.md S11, 1.55 m",
+        "order_source": "CONCEPT-OPUS.md S11, chronological with attribution and rights interleaved"
+      },
+      "reproduction_note_en": "Keep the raster’s aspect ratio. Its corners are not registered to the measured object.",
+      "reproduction_note_de": "Das Seitenverhältnis der Datei bleibt erhalten. Ihre Ecken sind dem vermessenen Objekt noch nicht zugeordnet.",
+      "gaps": [
+        "Exact dates of the copy and its later reworking are not supplied. Lost mural dimensions are unknown."
+      ],
+      "german_provenance": {
+        "title": "Catalog German title with restored umlauts, or museum wording where the catalog supplies none.",
+        "visitor_copy": "New museum German written for this commission."
+      },
+      "date_note_en": "An Italian copy from the sixteenth century, reworked in the early seventeenth century. Exact years are not supplied.",
+      "date_note_de": "Eine italienische Kopie aus dem 16. Jahrhundert, im frühen 17. Jahrhundert überarbeitet. Genaue Jahre sind nicht angegeben.",
+      "date_label_en": "Sixteenth century, reworked in the early seventeenth century",
+      "date_label_de": "16. Jahrhundert, im frühen 17. Jahrhundert überarbeitet",
+      "certainty_word_en": "Documented",
+      "certainty_word_de": "Belegt"
+    },
+    {
+      "id": "tavola-doria",
+      "catalogue_number": 27,
+      "register_status": "concept_register",
+      "title_en": "Tavola Doria",
+      "title_de": "Tavola Doria",
+      "holder": "Gallerie degli Uffizi, Florence",
+      "inventory": "10624 - 1890",
+      "height_cm": 86,
+      "width_cm": 115,
+      "medium": "Oil",
+      "support": "Poplar panel",
+      "medium_de": "Öl",
+      "support_de": "Pappelholz",
+      "date_from": null,
+      "date_to": null,
+      "date_certainty": "unknown",
+      "attribution_line_en": "A copy after Leonardo da Vinci’s lost Battle of Anghiari.",
+      "attribution_line_de": "Eine Kopie nach Leonardo da Vincis verlorener Schlacht von Anghiari.",
+      "attribution_certainty": "copy",
+      "rights_class": "RC",
+      "plate_file": null,
+      "plate_pixels": null,
+      "licence_line": "Public domain, via Wikimedia Commons (Web Gallery of Art)",
+      "absence_reason_en": "Held by Gallerie degli Uffizi, Florence. Available file: tavola-doria__uffizi__1091x775.jpg. The museum classified this scan as RC. The supplied terms have not been cleared for this exhibition. Obtain written permission for this reproduction from the holder and the image supplier.",
+      "absence_reason_de": "Sammlung: Gallerie degli Uffizi, Florenz. Vorhandene Datei: tavola-doria__uffizi__1091x775.jpg. Dieses Museum hat den Scan als RC eingestuft. Seine Nutzungsbedingungen sind für diese Ausstellung nicht geklärt. Eine schriftliche Freigabe des besitzenden Museums und des Bildanbieters würde diese Reproduktion ermöglichen.",
+      "label_first_line_en": "Absent. Tavola Doria. A copy after Leonardo da Vinci’s lost Battle of Anghiari.",
+      "label_first_line_de": "Abwesend. Tavola Doria. Eine Kopie nach Leonardo da Vincis verlorener Schlacht von Anghiari.",
+      "hang": {
+        "wall": "supper-wall-drawer",
+        "order": 2,
+        "eye_height_cm": null
+      },
+      "in_house_1517": false,
+      "de_beatis": null,
+      "facts": [
+        {
+          "text_en": "The panel preserves the central fight from the lost Anghiari composition.",
+          "text_de": "Die Tafel bewahrt den zentralen Kampf der verlorenen Anghiari-Komposition.",
+          "source_url": "http://www.fujibi.or.jp/en/index/fujibi-info/1369/1365/2471.html",
+          "certainty": "documented"
+        }
+      ],
+      "sources": [
+        {
+          "url": "http://www.fujibi.or.jp/en/index/fujibi-info/1369/1365/2471.html",
+          "supports": [
+            "inventory",
+            "height_cm",
+            "width_cm",
+            "medium",
+            "support",
+            "date_from",
+            "date_to",
+            "attribution"
+          ],
+          "local_source": "refs/MINING-CATALOG-PAINTINGS.md §27",
+          "verification": "catalog reports secondary or indirectly cited measurements"
+        },
+        {
+          "url": "https://commons.wikimedia.org/wiki/File:Leonardo_da_vinci,_Battle_of_Anghiari_(Tavola_Doria).jpg",
+          "supports": [
+            "held_scan",
+            "rights_class",
+            "licence_line"
+          ],
+          "local_source": "refs/RIGHTS-CROSSCHECK.md P27",
+          "verification": "cross-check governs"
+        }
+      ],
+      "rights_basis": {
+        "row": "P27",
+        "decision": "Italian protected holder remains RC despite the photograph’s free copyright tag."
+      },
+      "held_scan_files": [
+        "refs/paintings/tavola-doria__uffizi__1091x775.jpg"
+      ],
+      "clearance_sentence_en": "Obtain written permission for this reproduction from the holder and the image supplier.",
+      "clearance_sentence_de": "Eine schriftliche Freigabe des besitzenden Museums und des Bildanbieters würde diese Reproduktion ermöglichen.",
+      "additional_plates": [],
+      "display_mode": "absence_outline",
+      "measurement": {
+        "source_url": "http://www.fujibi.or.jp/en/index/fujibi-info/1369/1365/2471.html",
+        "status": "catalogue_qualified",
+        "extent": "object",
+        "alternatives": [],
+        "registration": "not established",
+        "museum_eye_height_source": "CONCEPT-OPUS.md S11, 1.55 m",
+        "order_source": "CONCEPT-OPUS.md S11, chronological with attribution and rights interleaved"
+      },
+      "reproduction_note_en": "Keep the raster’s aspect ratio. Its corners are not registered to the measured object.",
+      "reproduction_note_de": "Das Seitenverhältnis der Datei bleibt erhalten. Ihre Ecken sind dem vermessenen Objekt noch nicht zugeordnet.",
+      "gaps": [
+        "Measurements were not directly verified with the holder by the catalog.",
+        "No date or named maker is established in the catalog."
+      ],
+      "german_provenance": {
+        "title": "Catalog German title with restored umlauts, or museum wording where the catalog supplies none.",
+        "visitor_copy": "New museum German written for this commission."
+      },
+      "date_label_en": "Date unknown",
+      "date_label_de": "Datierung unbekannt",
+      "certainty_word_en": "Absent",
+      "certainty_word_de": "Abwesend"
+    },
+    {
+      "id": "leda-spiridon",
+      "catalogue_number": 28,
+      "register_status": "concept_register",
+      "title_en": "Leda and the Swan, Spiridon copy",
+      "title_de": "Leda mit dem Schwan, Spiridon-Fassung",
+      "holder": "Gallerie degli Uffizi, Florence",
+      "inventory": "00292960 in the catalog, historical records 1747 and 1738",
+      "height_cm": 130,
+      "width_cm": 77.5,
+      "medium": null,
+      "support": null,
+      "medium_de": null,
+      "support_de": null,
+      "date_from": 1500,
+      "date_to": 1599,
+      "date_certainty": "approximate",
+      "attribution_line_en": "A sixteenth-century follower of Leonardo da Vinci. The original Leda is lost.",
+      "attribution_line_de": "Ein Nachfolger Leonardo da Vincis im 16. Jahrhundert. Das Original der Leda ist verloren.",
+      "attribution_certainty": "copy",
+      "rights_class": "RC",
+      "plate_file": null,
+      "plate_pixels": null,
+      "licence_line": "Photo Francesco Bini, Wikimedia Commons, CC BY-SA 4.0",
+      "absence_reason_en": "Held by Gallerie degli Uffizi, Florence. Available file: leda-spiridon__uffizi__2534x3648.jpg. The museum classified this scan as RC. The supplied terms have not been cleared for this exhibition. Obtain written permission for this reproduction from the holder and the image supplier.",
+      "absence_reason_de": "Sammlung: Gallerie degli Uffizi, Florenz. Vorhandene Datei: leda-spiridon__uffizi__2534x3648.jpg. Dieses Museum hat den Scan als RC eingestuft. Seine Nutzungsbedingungen sind für diese Ausstellung nicht geklärt. Eine schriftliche Freigabe des besitzenden Museums und des Bildanbieters würde diese Reproduktion ermöglichen.",
+      "label_first_line_en": "Absent. Leda and the Swan, Spiridon copy. A sixteenth-century follower of Leonardo da Vinci. The original Leda is lost.",
+      "label_first_line_de": "Abwesend. Leda mit dem Schwan, Spiridon-Fassung. Ein Nachfolger Leonardo da Vincis im 16. Jahrhundert. Das Original der Leda ist verloren.",
+      "hang": {
+        "wall": "supper-wall-drawer",
+        "order": 1,
+        "eye_height_cm": null
+      },
+      "in_house_1517": false,
+      "de_beatis": null,
+      "facts": [
+        {
+          "text_en": "The provenance appears in the records of the Linz museum project and the Munich Central Collecting Point.",
+          "text_de": "Die Provenienz erscheint in den Akten des Linzer Museumsprojekts und des Munich Central Collecting Point.",
+          "source_url": "https://www.dhm.de/datenbank/linzdbv2/queryresult.php?obj_no=LI001754",
+          "certainty": "documented"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://www.dhm.de/datenbank/linzdbv2/queryresult.php?obj_no=LI001754",
+          "supports": [
+            "inventory",
+            "height_cm",
+            "width_cm",
+            "medium",
+            "support",
+            "date_from",
+            "date_to",
+            "attribution"
+          ],
+          "local_source": "refs/MINING-CATALOG-PAINTINGS.md §28",
+          "verification": "catalog reports secondary or indirectly cited measurements"
+        },
+        {
+          "url": "https://commons.wikimedia.org/wiki/File:Seguace_di_leonardo,_leda_e_il_cigno,_xvi_sec.,_02.jpg",
+          "supports": [
+            "held_scan",
+            "rights_class",
+            "licence_line"
+          ],
+          "local_source": "refs/RIGHTS-CROSSCHECK.md P16",
+          "verification": "cross-check governs"
+        }
+      ],
+      "rights_basis": {
+        "row": "P16",
+        "decision": "Italian protected holder remains RC despite the photograph’s free copyright tag."
+      },
+      "held_scan_files": [
+        "refs/paintings/leda-spiridon__uffizi__2534x3648.jpg"
+      ],
+      "clearance_sentence_en": "Obtain written permission for this reproduction from the holder and the image supplier.",
+      "clearance_sentence_de": "Eine schriftliche Freigabe des besitzenden Museums und des Bildanbieters würde diese Reproduktion ermöglichen.",
+      "additional_plates": [],
+      "display_mode": "absence_outline",
+      "measurement": {
+        "source_url": "https://www.dhm.de/datenbank/linzdbv2/queryresult.php?obj_no=LI001754",
+        "status": "catalogue_qualified",
+        "extent": "object",
+        "alternatives": [
+          {
+            "height_cm": 131,
+            "width_cm": 78,
+            "note": "Competing catalog measurement.",
+            "source_url": "https://www.dhm.de/datenbank/linzdbv2/queryresult.php?obj_no=LI001754"
+          }
+        ],
+        "registration": "not established",
+        "museum_eye_height_source": "CONCEPT-OPUS.md S11, 1.55 m",
+        "order_source": "CONCEPT-OPUS.md S11, chronological with attribution and rights interleaved"
+      },
+      "reproduction_note_en": "Keep the raster’s aspect ratio. Its corners are not registered to the measured object.",
+      "reproduction_note_de": "Das Seitenverhältnis der Datei bleibt erhalten. Ihre Ecken sind dem vermessenen Objekt noch nicht zugeordnet.",
+      "gaps": [
+        "Measurements were not directly verified with the holder by the catalog.",
+        "Inventory identifiers conflict. The medium is not verified. The photograph includes the frame."
+      ],
+      "german_provenance": {
+        "title": "Catalog German title with restored umlauts, or museum wording where the catalog supplies none.",
+        "visitor_copy": "New museum German written for this commission."
+      },
+      "date_label_en": "Sixteenth century",
+      "date_label_de": "16. Jahrhundert",
+      "certainty_word_en": "Absent",
+      "certainty_word_de": "Abwesend"
+    },
+    {
+      "id": "isabella-deste-cartoon",
+      "catalogue_number": 29,
+      "register_status": "concept_register",
+      "title_en": "Portrait of Isabella d'Este, cartoon",
+      "title_de": "Bildnis der Isabella d'Este, Karton",
+      "holder": "Musée du Louvre, Département des Arts graphiques, Paris",
+      "inventory": "MI 753 recto",
+      "height_cm": 61,
+      "width_cm": 46.5,
+      "medium": "Metalpoint, charcoal, red chalk, yellow ochre chalk, white highlights",
+      "support": "Prepared paper",
+      "medium_de": "Metallstift, Kohle, Rötel, gelbe Ockerkreide und weiße Höhungen",
+      "support_de": "Grundiertes Papier",
+      "date_from": 1499,
+      "date_to": 1500,
+      "date_certainty": "approximate",
+      "attribution_line_en": "Leonardo da Vinci.",
+      "attribution_line_de": "Leonardo da Vinci.",
+      "attribution_certainty": "documented",
+      "rights_class": "DG",
+      "plate_file": "refs/paintings/isabella-deste-cartoon__louvre__1022x1534.jpg",
+      "plate_pixels": {
+        "width": 1022,
+        "height": 1534
+      },
+      "licence_line": "Public domain, via Wikimedia Commons",
+      "absence_reason_en": null,
+      "absence_reason_de": null,
+      "label_first_line_en": "Documented. Portrait of Isabella d'Este, cartoon. Leonardo da Vinci.",
+      "label_first_line_de": "Belegt. Bildnis der Isabella d'Este, Karton. Leonardo da Vinci.",
+      "hang": {
+        "wall": "picture-room-drawer",
+        "order": 1,
+        "eye_height_cm": null
+      },
+      "in_house_1517": false,
+      "de_beatis": null,
+      "facts": [
+        {
+          "text_en": "The Louvre’s recorded sheet is wider than the crop in the held reproduction.",
+          "text_de": "Das im Louvre verzeichnete Blatt ist breiter als der Ausschnitt der vorhandenen Reproduktion.",
+          "source_url": "https://arts-graphiques.louvre.fr/detail/oeuvres/1/111146-Portrait-dIsabelle-dEste",
+          "certainty": "documented"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://arts-graphiques.louvre.fr/detail/oeuvres/1/111146-Portrait-dIsabelle-dEste",
+          "supports": [
+            "inventory",
+            "height_cm",
+            "width_cm",
+            "medium",
+            "support",
+            "date_from",
+            "date_to",
+            "attribution"
+          ],
+          "local_source": "refs/MINING-CATALOG-PAINTINGS.md §29",
+          "verification": "holder record as transcribed in catalog"
+        },
+        {
+          "url": "https://commons.wikimedia.org/wiki/File:Ritratto_di_Isabella_d%27Este_-_Leonardo_da_Vinci.png",
+          "supports": [
+            "held_scan",
+            "rights_class",
+            "licence_line"
+          ],
+          "local_source": "refs/RIGHTS-CROSSCHECK.md P11",
+          "verification": "cross-check governs"
+        }
+      ],
+      "rights_basis": {
+        "row": "P11",
+        "decision": "Commons PD flat drawing passes rights; the cropped, small image fails a full-sheet true-scale use."
+      },
+      "held_scan_files": [
+        "refs/paintings/isabella-deste-cartoon__louvre__1022x1534.jpg"
+      ],
+      "clearance_sentence_en": null,
+      "clearance_sentence_de": null,
+      "additional_plates": [],
+      "display_mode": "drawer_crop_beside_empty_full_sheet_outline",
+      "measurement": {
+        "source_url": "https://arts-graphiques.louvre.fr/detail/oeuvres/1/111146-Portrait-dIsabelle-dEste",
+        "status": "holder_record",
+        "extent": "object",
+        "alternatives": [],
+        "registration": "not established",
+        "museum_eye_height_source": "CONCEPT-OPUS.md S11, 1.55 m",
+        "order_source": "CONCEPT-OPUS.md S11, chronological with attribution and rights interleaved"
+      },
+      "reproduction_note_en": "This is a cropped reproduction, about 12.6 percent narrower in ratio than the complete sheet. Its placement within that sheet is unknown.",
+      "reproduction_note_de": "Diese Reproduktion ist beschnitten. Ihr Seitenverhältnis ist etwa 12,6 Prozent schmaler als das des vollständigen Blattes. Die genaue Lage des Ausschnitts ist unbekannt.",
+      "gaps": [],
+      "german_provenance": {
+        "title": "Catalog German title with restored umlauts, or museum wording where the catalog supplies none.",
+        "visitor_copy": "New museum German written for this commission."
+      },
+      "date_label_en": "About 1499 to 1500",
+      "date_label_de": "Etwa 1499 bis 1500",
+      "certainty_word_en": "Documented",
+      "certainty_word_de": "Belegt"
+    },
+    {
+      "id": "leda-wilton",
+      "catalogue_number": null,
+      "register_status": "additional_catalogue_work",
+      "title_en": "Leda and the Swan, Wilton House version",
+      "title_de": "Leda mit dem Schwan, Wilton-House-Fassung",
+      "holder": "Earl of Pembroke collection, Wilton House",
+      "inventory": "308 in the 1907 Wilton House catalogue",
+      "height_cm": 96.52,
+      "width_cm": 73.66,
+      "medium": null,
+      "support": "Panel",
+      "medium_de": null,
+      "support_de": "Holztafel",
+      "date_from": null,
+      "date_to": null,
+      "date_certainty": "unknown",
+      "attribution_line_en": "Attributed to Cesare da Sesto, after Leonardo da Vinci. The original Leda is lost.",
+      "attribution_line_de": "Cesare da Sesto zugeschrieben, nach Leonardo da Vinci. Das Original der Leda ist verloren.",
+      "attribution_certainty": "copy",
+      "rights_class": "REF",
+      "plate_file": null,
+      "plate_pixels": null,
+      "licence_line": null,
+      "absence_reason_en": "Held at Wilton House by the Earl of Pembroke collection. No usable scan was found or downloaded for this catalog. This entry is REF. A correctly identified and cleared reproduction would supply its image.",
+      "absence_reason_de": "Aufbewahrt in Wilton House in der Sammlung des Earl of Pembroke. Für diesen Katalog wurde kein brauchbarer Scan gefunden oder heruntergeladen. Dieser Eintrag ist REF. Eine korrekt identifizierte und freigegebene Reproduktion würde das Bild ergänzen.",
+      "label_first_line_en": "Absent. The Wilton House Leda is represented by a catalog record.",
+      "label_first_line_de": "Abwesend. Die Leda aus Wilton House ist durch einen Katalogeintrag vertreten.",
+      "hang": {
+        "wall": "supper-wall-drawer",
+        "order": 3,
+        "eye_height_cm": null
+      },
+      "in_house_1517": false,
+      "de_beatis": null,
+      "facts": [
+        {
+          "text_en": "The 1907 Wilton House catalogue lists this panel as number 308, under the school of Leonardo da Vinci.",
+          "text_de": "Der Wilton-House-Katalog von 1907 führt diese Tafel unter Nummer 308 als Werk der Schule Leonardo da Vincis.",
+          "source_url": "https://archive.org/details/gri_33125011529274",
+          "certainty": "documented"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://archive.org/details/gri_33125011529274",
+          "supports": [
+            "inventory",
+            "height_cm",
+            "width_cm",
+            "support"
+          ],
+          "verification": "1907 Wilton House Pictures, no. 308, p. 354. Public-domain catalog OCR downloaded and inspected, evidence/wilton-1907-vol2-djvu.txt. Entry reads 38 in. H. 29 in. W. Panel."
+        },
+        {
+          "url": "https://www.collezionegalleriaborghese.it/en/opere/leda-3",
+          "supports": [
+            "holder",
+            "attribution"
+          ],
+          "verification": "Institutional comparison names the Wilton House version attributed to Cesare da Sesto."
+        }
+      ],
+      "rights_basis": {
+        "row": null,
+        "decision": "No held file or cross-check row. Reference-only catalog extension, not a new clearance decision."
+      },
+      "held_scan_files": [],
+      "clearance_sentence_en": "A correctly identified and cleared reproduction would supply this image.",
+      "clearance_sentence_de": "Eine korrekt identifizierte und freigegebene Reproduktion würde dieses Bild ergänzen.",
+      "additional_plates": [],
+      "display_mode": "unillustrated_catalogue_card",
+      "measurement": {
+        "source_url": "https://archive.org/details/gri_33125011529274",
+        "status": "historical_holder_catalogue",
+        "extent": "panel",
+        "source_values": {
+          "height_in": 38,
+          "width_in": 29
+        },
+        "conversion": "inch values multiplied by 2.54 cm per inch",
+        "alternatives": [],
+        "registration": "no plate"
+      },
+      "reproduction_note_en": "No reproduction is held.",
+      "reproduction_note_de": "Es liegt keine Reproduktion vor.",
+      "gaps": [
+        "No held scan.",
+        "No modern holder dimensions or exact date verified. Historical measurements are explicitly identified.",
+        "Painting medium is not stated in the consulted historical record."
+      ],
+      "german_provenance": {
+        "title": "Catalog German title with restored umlauts, or museum wording where the catalog supplies none.",
+        "visitor_copy": "New museum German written for this commission."
+      },
+      "date_label_en": "Date unknown",
+      "date_label_de": "Datierung unbekannt",
+      "certainty_word_en": "Absent",
+      "certainty_word_de": "Abwesend"
+    }
+  ],
+  "held_assets": [
+    {
+      "file": "refs/paintings/adoration-of-the-magi__uffizi__5256x5196.jpg",
+      "rights_class": "RC",
+      "rights_row": "P01",
+      "display_admitted": false,
+      "pixels": {
+        "width": 5256,
+        "height": 5196
+      },
+      "sha256": "612d46c4a9744d2ab848c639d560b69746c837d4fa012110037d24e46f0ed17a",
+      "bytes": 6357999,
+      "licence_line": "Photo Justin Benttinen, Wikimedia Commons, CC BY-SA 4.0",
+      "logged_licence": "CC BY-SA 4.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Adoration_of_the_Magi_(Leonardo).jpg",
+      "decision": "Italian protected holder remains RC despite the photograph’s free copyright tag."
+    },
+    {
+      "file": "refs/paintings/anghiari-rubens-copy__louvre-arts-graphiques__1179x857.jpg",
+      "rights_class": "DG",
+      "rights_row": "P02",
+      "display_admitted": true,
+      "pixels": {
+        "width": 1179,
+        "height": 857
+      },
+      "sha256": "32fb1b6dcef889691ac5035d558ef3f9c547a06c6d95c82db11d8cfb7f46ff66",
+      "bytes": 271449,
+      "licence_line": "Public domain, via Wikimedia Commons",
+      "logged_licence": "Public domain",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Peter_Paul_Ruben%27s_copy_of_the_lost_Battle_of_Anghiari.jpg",
+      "decision": "PD flat copy drawing; use the Louvre’s multi-hand attribution, and do not present the lost mural itself."
+    },
+    {
+      "file": "refs/paintings/annunciation-predella__louvre__8000x1856.jpg",
+      "rights_class": "RC",
+      "rights_row": "P03",
+      "display_admitted": false,
+      "pixels": {
+        "width": 8000,
+        "height": 1856
+      },
+      "sha256": "145600627fa0d67d3ecbe2c2d9eb8d5012be6d1b29aaea45a19a738314b3d82a",
+      "bytes": 6031758,
+      "licence_line": "Public domain. Scan C2RMF, via Wikimedia Commons",
+      "logged_licence": "Public domain",
+      "source_url": "https://commons.wikimedia.org/wiki/File:L%27Annonciation,_by_Leonardo_da_Vinci,_from_C2RMF_retouched.jpg",
+      "decision": "Legacy C2RMF scan says PD on Commons, but a free original release is unverified against restrictive C2RMF supply terms."
+    },
+    {
+      "file": "refs/paintings/annunciation__uffizi__7776x3569.jpg",
+      "rights_class": "RC",
+      "rights_row": "P04",
+      "display_admitted": false,
+      "pixels": {
+        "width": 7776,
+        "height": 3569
+      },
+      "sha256": "42df4286e2e65a67545241fe740ce1cddf06ced750d571ff067939c5f1134fa5",
+      "bytes": 6587969,
+      "licence_line": "Photo Justin Benttinen, released into the public domain, via Wikimedia Commons",
+      "logged_licence": "Public domain",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Annunciation_(Leonardo_c._1472%E2%80%931476).jpg",
+      "decision": "Italian protected holder remains RC despite the photograph’s free copyright tag."
+    },
+    {
+      "file": "refs/paintings/bacchus-saint-john__louvre__5693x8649.jpg",
+      "rights_class": "DG",
+      "rights_row": "P05",
+      "display_admitted": true,
+      "pixels": {
+        "width": 5693,
+        "height": 8649
+      },
+      "sha256": "4dcb0e31ee7518a027dd34a724697fde48289f613a9f0c3b74353e53e6b957a8",
+      "bytes": 9162980,
+      "licence_line": "Public domain. Photo Wilfredor, via Wikimedia Commons",
+      "logged_licence": "Public domain",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Bacchus_-_Leonardo_da_Vinci_workshop_-_Louvre_INV_780.jpg",
+      "decision": "PD flat workshop painting, capture credited to Wilfredor; identify the restoration state."
+    },
+    {
+      "file": "refs/paintings/baptism-of-christ__uffizi__3760x4520.jpg",
+      "rights_class": "RC",
+      "rights_row": "P06",
+      "display_admitted": false,
+      "pixels": {
+        "width": 3760,
+        "height": 4520
+      },
+      "sha256": "f79503021e7d992eb99fe36a7f9a4d7ba22c481ac716aa1101b60a321493571b",
+      "bytes": 5259660,
+      "licence_line": "Public domain, via Wikimedia Commons",
+      "logged_licence": "Public domain",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Verrocchio_and_Leonardo,_Baptism_of_Christ,_c1470-75,_Uffizi.jpg",
+      "decision": "Italian protected holder remains RC despite the photograph’s free copyright tag."
+    },
+    {
+      "file": "refs/paintings/benois-madonna__hermitage__3304x4608.jpg",
+      "rights_class": "RC",
+      "rights_row": "P07",
+      "display_admitted": false,
+      "pixels": {
+        "width": 3304,
+        "height": 4608
+      },
+      "sha256": "c481ff4daccc493e82f2c7766f63c4b156601d2d54cc55a9b5fad18c57498823",
+      "bytes": 2157439,
+      "licence_line": "Photo Francesco Bini, Wikimedia Commons, CC BY-SA 4.0",
+      "logged_licence": "CC BY-SA 4.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Da_leonardo,_madonna_benois.jpg",
+      "decision": "Bini’s BY-SA photo is identified as Palazzo Colonna; it cannot stand for the Hermitage original."
+    },
+    {
+      "file": "refs/paintings/burlington-house-cartoon__national-gallery-london__4004x5358.jpg",
+      "rights_class": "RC",
+      "rights_row": "P08",
+      "display_admitted": false,
+      "pixels": {
+        "width": 4004,
+        "height": 5358
+      },
+      "sha256": "7365273bfd992a6bf0908cba37ea4ec6c2c9682ab705d8d623104d7b8353c90c",
+      "bytes": 3117669,
+      "licence_line": "Photo mutovkin, Flickr and Wikimedia Commons, CC BY 2.0",
+      "logged_licence": "CC BY 2.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Burlington_House_Cartoon_from_The_National_Gallery_(London)_by_Leonardo_da_Vinci.jpg",
+      "decision": "mutovkin’s CC BY 2.0 room photo is genuine, but Gallery capture terms restrict use to personal/noncommercial purposes."
+    },
+    {
+      "file": "refs/paintings/ginevra-de-benci-obverse__nga-washington__4400x4539.jpg",
+      "rights_class": "DG",
+      "rights_row": "P09",
+      "display_admitted": true,
+      "pixels": {
+        "width": 4400,
+        "height": 4539
+      },
+      "sha256": "c31a829165cdd882e379ed40dfd0a643f7317623b05a680dfbac5fd11be4c5c0",
+      "bytes": 6351983,
+      "licence_line": "Public domain. Scan National Gallery of Art, Washington, via Wikimedia Commons",
+      "logged_licence": "Public domain",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Ginevra_de%27_Benci_-_National_Gallery_of_Art.jpg",
+      "decision": "NGA open-access PD reproduction; held file is bounded, not the 108 MB original."
+    },
+    {
+      "file": "refs/paintings/ginevra-de-benci-reverse__nga-washington__6000x6214.jpg",
+      "rights_class": "DG",
+      "rights_row": "P10",
+      "display_admitted": true,
+      "pixels": {
+        "width": 6000,
+        "height": 6214
+      },
+      "sha256": "c48acd2cec0753a6887a61ad321cffed4ccdd9d2912f177f83a64c961ee0376d",
+      "bytes": 10814345,
+      "licence_line": "Public domain. Scan Google Arts and Culture, via Wikimedia Commons",
+      "logged_licence": "Public domain",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Leonardo_da_Vinci_-_Wreath_of_Laurel,_Palm,_and_Juniper_with_a_Scroll_inscribed_Virtutem_Forum_Decorat_(reverse)_-_Google_Art_Project.jpg",
+      "decision": "Commons states PD for a faithful flat reproduction; EU reading applies."
+    },
+    {
+      "file": "refs/paintings/isabella-deste-cartoon__louvre__1022x1534.jpg",
+      "rights_class": "DG",
+      "rights_row": "P11",
+      "display_admitted": true,
+      "pixels": {
+        "width": 1022,
+        "height": 1534
+      },
+      "sha256": "744d6aa58c11af6d9dce0b3bd645c3b07e8265fe0274e8c06ce5d58ee952787a",
+      "bytes": 2705609,
+      "licence_line": "Public domain, via Wikimedia Commons",
+      "logged_licence": "Public domain",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Ritratto_di_Isabella_d%27Este_-_Leonardo_da_Vinci.png",
+      "decision": "Commons PD flat drawing passes rights; the cropped, small image fails a full-sheet true-scale use."
+    },
+    {
+      "file": "refs/paintings/la-belle-ferronniere__louvre__2758x4000.jpg",
+      "rights_class": "RC",
+      "rights_row": "P12",
+      "display_admitted": false,
+      "pixels": {
+        "width": 2758,
+        "height": 4000
+      },
+      "sha256": "b313df44fe735f5fea3858776659eb2849b857c5c4d8a499bd3bb41a3ad221c8",
+      "bytes": 1291272,
+      "licence_line": "Public domain. Scan Google Arts and Culture, via Wikimedia Commons",
+      "logged_licence": "Public domain",
+      "source_url": "https://artsandculture.google.com/asset/tQGQxYg52tKHTg?hl=en",
+      "decision": "Google Arts explicitly credits RMN-Grand Palais and Michel Urtado; the commercial-library exception governs."
+    },
+    {
+      "file": "refs/paintings/la-scapigliata__galleria-nazionale-parma__3512x4135.jpg",
+      "rights_class": "RC",
+      "rights_row": "P13",
+      "display_admitted": false,
+      "pixels": {
+        "width": 3512,
+        "height": 4135
+      },
+      "sha256": "2819b4d93b8830f77ea8a0281f3df19f62e353825715e209733566b979a5feb5",
+      "bytes": 1979488,
+      "licence_line": "Public domain, via Wikimedia Commons",
+      "logged_licence": "Public domain",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Head_of_a_Young_Woman,_called_%22Scapiliata%22.jpg",
+      "decision": "Italian protected holder remains RC despite the photograph’s free copyright tag."
+    },
+    {
+      "file": "refs/paintings/lady-with-an-ermine__czartoryski-krakow__6000x8069.jpg",
+      "rights_class": "DG",
+      "rights_row": "P14",
+      "display_admitted": true,
+      "pixels": {
+        "width": 6000,
+        "height": 8069
+      },
+      "sha256": "192fc95aa8b6cf82be6d44c7d299697fd892c4a2dd0df11f4773bfd4e5b117db",
+      "bytes": 7468648,
+      "licence_line": "Public domain. Scan Google Arts and Culture, via Wikimedia Commons",
+      "logged_licence": "Public domain",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Lady_with_an_Ermine_-_Leonardo_da_Vinci_-_Google_Art_Project.jpg",
+      "decision": "Commons states PD for a faithful flat reproduction; EU reading applies."
+    },
+    {
+      "file": "refs/paintings/last-supper__santa-maria-delle-grazie__8000x4443.jpg",
+      "rights_class": "RC",
+      "rights_row": "P15",
+      "display_admitted": false,
+      "pixels": {
+        "width": 8000,
+        "height": 4443
+      },
+      "sha256": "814e9d4bf0cd58240f2caba1872652b4f39963ebe4d263dd5ce1728259e09981",
+      "bytes": 16052942,
+      "licence_line": "Photo Paris Orlando, released into the public domain, via Wikimedia Commons",
+      "logged_licence": "Public domain",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Last_Supper_by_Leonardo_da_Vinci.jpg",
+      "decision": "Italian protected holder remains RC despite the photograph’s free copyright tag."
+    },
+    {
+      "file": "refs/paintings/leda-spiridon__uffizi__2534x3648.jpg",
+      "rights_class": "RC",
+      "rights_row": "P16",
+      "display_admitted": false,
+      "pixels": {
+        "width": 2534,
+        "height": 3648
+      },
+      "sha256": "2b2c8a1e71b5203dca7d0c4a165882e1417f85dc0a31dba37a34f5d3faa16cc3",
+      "bytes": 1438708,
+      "licence_line": "Photo Francesco Bini, Wikimedia Commons, CC BY-SA 4.0",
+      "logged_licence": "CC BY-SA 4.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Seguace_di_leonardo,_leda_e_il_cigno,_xvi_sec.,_02.jpg",
+      "decision": "Italian protected holder remains RC despite the photograph’s free copyright tag."
+    },
+    {
+      "file": "refs/paintings/madonna-litta__hermitage__6784x8633.jpg",
+      "rights_class": "DG",
+      "rights_row": "P17",
+      "display_admitted": true,
+      "pixels": {
+        "width": 6784,
+        "height": 8633
+      },
+      "sha256": "49391347663c3634cdb0b7fbb9b1e390ad424d55b5b9dfb34d213aff79ae46cb",
+      "bytes": 16932971,
+      "licence_line": "Public domain. Scan State Hermitage Museum, via Wikimedia Commons",
+      "logged_licence": "Public domain",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Leonardo_da_Vinci_-_The_Madonna_and_Child_(The_Litta_Madonna).jpg",
+      "decision": "Commons states PD for a faithful flat reproduction; EU reading applies."
+    },
+    {
+      "file": "refs/paintings/madonna-of-the-carnation__alte-pinakothek__5558x7307.jpg",
+      "rights_class": "DG",
+      "rights_row": "P18",
+      "display_admitted": true,
+      "pixels": {
+        "width": 5558,
+        "height": 7307
+      },
+      "sha256": "bbee3a8353e7cc6620e8b35a35c2b81d7a3a04deb7997400a608f200c1e3f063",
+      "bytes": 8423971,
+      "licence_line": "Public domain. Scan Google Arts and Culture, via Wikimedia Commons",
+      "logged_licence": "Public domain",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Leonardo_da_Vinci_-_Madonna_del_garofano_(ca._1475).jpg",
+      "decision": "Commons states PD for a faithful flat reproduction; EU reading applies."
+    },
+    {
+      "file": "refs/paintings/mona-lisa-natural-colour__louvre__7601x11348.jpg",
+      "rights_class": "REF",
+      "rights_row": "P19",
+      "display_admitted": false,
+      "pixels": {
+        "width": 7601,
+        "height": 11348
+      },
+      "sha256": "6ed297f18bcf1376b63555e403eee4418d3bdbe55d76c88e1d5ebd2b4d129775",
+      "bytes": 16052984,
+      "licence_line": "Public domain. Colour-corrected from the C2RMF scan, via Wikimedia Commons",
+      "logged_licence": "Public domain",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Mona_Lisa,_by_Leonardo_da_Vinci,_from_C2RMF_natural_color.jpg",
+      "decision": "Modern speculative varnish/colour reconstruction by Cybershot800i; not an authenticated state of the painting."
+    },
+    {
+      "file": "refs/paintings/mona-lisa__louvre__7479x11146.jpg",
+      "rights_class": "RC",
+      "rights_row": "P20",
+      "display_admitted": false,
+      "pixels": {
+        "width": 7479,
+        "height": 11146
+      },
+      "sha256": "9343f31f227be35bacf64fc486fb5e5377bb54586f662fe257723bb34b87ef5e",
+      "bytes": 25601896,
+      "licence_line": "Public domain. Scan C2RMF, via Wikimedia Commons",
+      "logged_licence": "Public domain",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Mona_Lisa,_by_Leonardo_da_Vinci,_from_C2RMF_retouched.jpg",
+      "decision": "Legacy C2RMF scan says PD on Commons, but a free original release is unverified against restrictive C2RMF supply terms."
+    },
+    {
+      "file": "refs/paintings/portrait-of-a-musician__ambrosiana-milan__3851x5055.jpg",
+      "rights_class": "RC",
+      "rights_row": "P21",
+      "display_admitted": false,
+      "pixels": {
+        "width": 3851,
+        "height": 5055
+      },
+      "sha256": "2b6f9f1e932fb8e47645e08c601e5a4646539ea1a13485b154cf419fd2d36c6b",
+      "bytes": 3569473,
+      "licence_line": "Public domain, via Wikimedia Commons; source page ambrosiana.it",
+      "logged_licence": "Public domain",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Leonardo_da_Vinci_-_Portrait_of_a_Musician_-_Pinacoteca_Ambrosiana.jpg",
+      "decision": "Italian protected holder remains RC despite the photograph’s free copyright tag."
+    },
+    {
+      "file": "refs/paintings/saint-jerome__vatican-pinacoteca__2763x3896.jpg",
+      "rights_class": "RC",
+      "rights_row": "P22",
+      "display_admitted": false,
+      "pixels": {
+        "width": 2763,
+        "height": 3896
+      },
+      "sha256": "3d637f76c30e66d8218128375af2376c7b4c6b58da4d97f7a320081eae26465e",
+      "bytes": 3620132,
+      "licence_line": "Photo Gleb Simonov, Wikimedia Commons, CC0",
+      "logged_licence": "CC0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Leonardo_da_Vinci_%E2%80%94_Jerome.jpg",
+      "decision": "Simonov’s CC0 photograph does not remove the explicit Vatican exception."
+    },
+    {
+      "file": "refs/paintings/saint-john-the-baptist__louvre__8000x10356.jpg",
+      "rights_class": "RC",
+      "rights_row": "P23",
+      "display_admitted": false,
+      "pixels": {
+        "width": 8000,
+        "height": 10356
+      },
+      "sha256": "16d699d2dddb6ebc4c94c6aeba87ed1edabcd2c075de6176b5fcd9f0a82490b6",
+      "bytes": 18773692,
+      "licence_line": "Public domain. Scan C2RMF, via Wikimedia Commons",
+      "logged_licence": "Public domain",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Leonardo_da_Vinci_-_Saint_John_the_Baptist_C2RMF_retouched.jpg",
+      "decision": "Legacy C2RMF scan says PD on Commons, but a free original release is unverified against restrictive C2RMF supply terms."
+    },
+    {
+      "file": "refs/paintings/sala-delle-asse-monochrome__castello-sforzesco__3980x6053.jpg",
+      "rights_class": "RC",
+      "rights_row": "P24",
+      "display_admitted": false,
+      "pixels": {
+        "width": 3980,
+        "height": 6053
+      },
+      "sha256": "93d704746b36a7a0fa4ae7df2003ed523720fc322d4e6def768be1f86377c230",
+      "bytes": 4580721,
+      "licence_line": "Castello Sforzesco, Wikimedia Commons, CC BY-SA 4.0",
+      "logged_licence": "CC BY-SA 4.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Monocromo_.jpg",
+      "decision": "Italian protected holder remains RC despite the photograph’s free copyright tag."
+    },
+    {
+      "file": "refs/paintings/sala-delle-asse-vault__castello-sforzesco__5906x5913.jpg",
+      "rights_class": "RC",
+      "rights_row": "P25",
+      "display_admitted": false,
+      "pixels": {
+        "width": 5906,
+        "height": 5913
+      },
+      "sha256": "aa3cae55cd89db65d311acb5ec95418cd002f8fe6a397be22af53d51c5be5c77",
+      "bytes": 12396566,
+      "licence_line": "Photo Hoclab, Wikimedia Commons, CC BY-SA 4.0",
+      "logged_licence": "CC BY-SA 4.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:6.2_2012.01-02_Haltadefinizione_Volta_50x50_-_300_ppi.jpg",
+      "decision": "Italian protected holder remains RC despite the photograph’s free copyright tag."
+    },
+    {
+      "file": "refs/paintings/salvator-mundi__private-collection__3300x4856.jpg",
+      "rights_class": "RC",
+      "rights_row": "P26",
+      "display_admitted": false,
+      "pixels": {
+        "width": 3300,
+        "height": 4856
+      },
+      "sha256": "6a02091826763b4f82d9ce2673e62adcdc2f9aa9182b7ebc84c80620112cc38f",
+      "bytes": 3216991,
+      "licence_line": "see the warning below, do not print until the scan's origin is settled",
+      "logged_licence": "Public domain",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Leonardo_da_Vinci,_Salvator_Mundi,_c.1500,_oil_on_walnut,_45.4_%C3%97_65.6_cm.jpg",
+      "decision": "Credit is Getty Images; a Commons PD tag does not establish release of this commercial-library capture."
+    },
+    {
+      "file": "refs/paintings/tavola-doria__uffizi__1091x775.jpg",
+      "rights_class": "RC",
+      "rights_row": "P27",
+      "display_admitted": false,
+      "pixels": {
+        "width": 1091,
+        "height": 775
+      },
+      "sha256": "512f6e8ed67e6aa6b87e7ca3952c23f38ef5589bc43e4047ba8e3c434b7c5006",
+      "bytes": 162254,
+      "licence_line": "Public domain, via Wikimedia Commons (Web Gallery of Art)",
+      "logged_licence": "Public domain",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Leonardo_da_vinci,_Battle_of_Anghiari_(Tavola_Doria).jpg",
+      "decision": "Italian protected holder remains RC despite the photograph’s free copyright tag."
+    },
+    {
+      "file": "refs/paintings/virgin-and-child-with-st-anne__louvre__7716x11375.jpg",
+      "rights_class": "DG",
+      "rights_row": "P28",
+      "display_admitted": true,
+      "pixels": {
+        "width": 7716,
+        "height": 11375
+      },
+      "sha256": "bd2c9fc8bf4dd29f6789a6e6a29d30e892a6a781c408df776a37ca6651ecd375",
+      "bytes": 12653922,
+      "licence_line": "Photo Wilfredor, Wikimedia Commons, CC0",
+      "logged_licence": "CC0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:The_Virgin_and_Child_with_Saint_Anne_by_Leonardo_da_Vinci,_Louvre.jpg",
+      "decision": "Wilfredor’s own photograph is CC0; the log’s separate PD-Art description is inaccurate."
+    },
+    {
+      "file": "refs/paintings/virgin-of-the-rocks-london__national-gallery-london__3696x5870.jpg",
+      "rights_class": "RC",
+      "rights_row": "P29",
+      "display_admitted": false,
+      "pixels": {
+        "width": 3696,
+        "height": 5870
+      },
+      "sha256": "e5bee12ff6a50b5689e1237b2f5caf27d9f1fe0be52a37b639c9b87ce64b76d0",
+      "bytes": 3255666,
+      "licence_line": "Public domain. Scan National Gallery, London, via Wikimedia Commons",
+      "logged_licence": "Public domain",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Leonardo_da_Vinci_-_Vergine_delle_Rocce_(National_Gallery_London).jpg",
+      "decision": "Credit explicitly traces the file to NG online collection; the Gallery’s image licence is NC-ND, contrary to the log’s assurance."
+    },
+    {
+      "file": "refs/paintings/virgin-of-the-rocks__louvre__3460x5487.jpg",
+      "rights_class": "DG",
+      "rights_row": "P30",
+      "display_admitted": true,
+      "pixels": {
+        "width": 3460,
+        "height": 5487
+      },
+      "sha256": "0ced6ece87a2283d2d45a6006aaabd8876033b532a8b0d23b405263fd060b3e4",
+      "bytes": 5466043,
+      "licence_line": "Public domain, via Wikimedia Commons",
+      "logged_licence": "Public domain",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Leonardo_Da_Vinci_-_Vergine_delle_Rocce_(Louvre).jpg",
+      "decision": "Commons states PD for a faithful flat reproduction; EU reading applies."
+    },
+    {
+      "file": "refs/paintings/yarnwinder-buccleuch__buccleuch-collection__5826x7774.jpg",
+      "rights_class": "DG",
+      "rights_row": "P31",
+      "display_admitted": true,
+      "pixels": {
+        "width": 5826,
+        "height": 7774
+      },
+      "sha256": "9bd913099ac15601e397060c32d82cdbc550bca9e7c6861a8ac2eb38ac670d6f",
+      "bytes": 9649024,
+      "licence_line": "Public domain. Scan National Galleries Scotland, via Wikimedia Commons",
+      "logged_licence": "Public domain",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Leonardo_da_Vinci_-_Madonna_of_the_Yarnwinder,_Buccleuch_version.jpg",
+      "decision": "Commons states PD for a faithful flat reproduction; EU reading applies."
+    },
+    {
+      "file": "refs/paintings/yarnwinder-lansdowne__private-on-loan-met__2112x2749.jpg",
+      "rights_class": "DG",
+      "rights_row": "P32",
+      "display_admitted": true,
+      "pixels": {
+        "width": 2112,
+        "height": 2749
+      },
+      "sha256": "be9db30357f216d75194259ed7b48d8388e7bf8f5d536ca25586f252fdf7993c",
+      "bytes": 1055648,
+      "licence_line": "Public domain, via Wikimedia Commons",
+      "logged_licence": "Public domain",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Madonna_of_the_Yarnwinder.jpg",
+      "decision": "Commons states PD for a faithful flat reproduction; EU reading applies."
+    }
+  ],
+  "catalogue_mentions": [
+    {
+      "id": "sforza-horse",
+      "title_en": "Sforza horse",
+      "title_de": "Sforza-Pferd",
+      "register_status": "catalogue_excluded",
+      "reason_en": "Sculpture, assigned to the mechanism and biography work.",
+      "source": "refs/MINING-CATALOG-PAINTINGS.md, Works checked and left out",
+      "source_url": "https://www.treccani.it/enciclopedia/leonardo-da-vinci_(Dizionario-Biografico)/",
+      "plate_file": null,
+      "rights_class": "REF",
+      "reason_de": "Skulptur, den Maschinen und der Lebensgeschichte zugeordnet."
+    },
+    {
+      "id": "la-bella-principessa",
+      "title_en": "La Bella Principessa",
+      "title_de": "La Bella Principessa",
+      "register_status": "catalogue_excluded",
+      "reason_en": "Attribution excluded by the catalog.",
+      "source": "refs/MINING-CATALOG-PAINTINGS.md, Works checked and left out",
+      "source_url": "https://www.wikidata.org/wiki/Q2072801",
+      "plate_file": null,
+      "rights_class": "REF",
+      "reason_de": "Die Zuschreibung wurde vom Katalog ausgeschlossen."
+    },
+    {
+      "id": "lucan-portrait",
+      "title_en": "Lucan portrait",
+      "title_de": "Lukanisches Bildnis",
+      "register_status": "catalogue_excluded",
+      "reason_en": "Attribution excluded by the catalog.",
+      "source": "refs/MINING-CATALOG-PAINTINGS.md, Works checked and left out",
+      "source_url": "https://www.wikidata.org/wiki/Q6696013",
+      "plate_file": null,
+      "rights_class": "REF",
+      "reason_de": "Die Zuschreibung wurde vom Katalog ausgeschlossen."
+    },
+    {
+      "id": "christ-carrying-the-cross",
+      "title_en": "Christ Carrying the Cross",
+      "title_de": "Christus trägt das Kreuz",
+      "register_status": "catalogue_excluded",
+      "reason_en": "Attribution excluded by the catalog.",
+      "source": "refs/MINING-CATALOG-PAINTINGS.md, Works checked and left out",
+      "source_url": "https://www.wikidata.org/wiki/Q12730109",
+      "plate_file": null,
+      "rights_class": "REF",
+      "reason_de": "Die Zuschreibung wurde vom Katalog ausgeschlossen."
+    },
+    {
+      "id": "isleworth-mona-lisa",
+      "title_en": "Isleworth Mona Lisa",
+      "title_de": "Isleworth-Mona-Lisa",
+      "register_status": "catalogue_excluded",
+      "reason_en": "Attribution excluded by the catalog.",
+      "source": "refs/MINING-CATALOG-PAINTINGS.md, Works checked and left out",
+      "source_url": "https://en.wikipedia.org/wiki/Isleworth_Mona_Lisa",
+      "plate_file": null,
+      "rights_class": "REF",
+      "reason_de": "Die Zuschreibung wurde vom Katalog ausgeschlossen."
+    },
+    {
+      "id": "madonna-child-anne-landscape",
+      "title_en": "Madonna and Child with Saint Anne in the Open Air",
+      "title_de": "Madonna mit Kind und der heiligen Anna im Freien",
+      "register_status": "catalogue_excluded",
+      "reason_en": "Attribution excluded by the catalog.",
+      "source": "refs/MINING-CATALOG-PAINTINGS.md, Works checked and left out",
+      "source_url": "https://en.wikipedia.org/wiki/List_of_works_by_Leonardo_da_Vinci",
+      "plate_file": null,
+      "rights_class": "REF",
+      "reason_de": "Die Zuschreibung wurde vom Katalog ausgeschlossen.",
+      "catalogue_title_en": "Madonna and Child with Saint Anne in a Landscape"
+    },
+    {
+      "id": "miracle-saint-donatus",
+      "title_en": "A Miracle of Saint Donatus of Arezzo",
+      "title_de": "Ein Wunder des heiligen Donatus von Arezzo",
+      "register_status": "catalogue_excluded",
+      "reason_en": "Attribution excluded by the catalog.",
+      "source": "refs/MINING-CATALOG-PAINTINGS.md, Works checked and left out",
+      "source_url": "https://en.wikipedia.org/wiki/List_of_works_by_Leonardo_da_Vinci",
+      "plate_file": null,
+      "rights_class": "REF",
+      "reason_de": "Die Zuschreibung wurde vom Katalog ausgeschlossen."
+    },
+    {
+      "id": "head-of-christ",
+      "title_en": "Head of Christ",
+      "title_de": "Christuskopf",
+      "register_status": "catalogue_excluded",
+      "reason_en": "Drawing assigned to the Last Supper study group.",
+      "source": "refs/MINING-CATALOG-PAINTINGS.md, Works checked and left out",
+      "source_url": "https://www.wikidata.org/wiki/Q3985169",
+      "plate_file": null,
+      "rights_class": "REF",
+      "reason_de": "Zeichnung aus der Studiengruppe zum Abendmahl."
+    },
+    {
+      "id": "montorfano-crucifixion",
+      "title_en": "Crucifixion, Giovanni Donato Montorfano",
+      "title_de": "Kreuzigung, Giovanni Donato Montorfano",
+      "register_status": "catalogue_excluded",
+      "reason_en": "Context only, opposite the Last Supper. No plate was mined.",
+      "source": "refs/MINING-CATALOG-PAINTINGS.md, Works checked and left out",
+      "source_url": "https://cenacolovinciano.org/en/",
+      "plate_file": null,
+      "rights_class": "REF",
+      "reason_de": "Kontext zum gegenüberliegenden Abendmahl. Es liegt keine Bilddatei vor."
+    }
+  ],
+  "hang_note": "Chronological main wall. Ginevra is the arrival focus, with earlier works reachable before it. Anghiari is placed by its 1503 lost design, with the later copy date printed. Every main-wall centre is 155 cm. No rights grouping.",
+  "rights_counts": {
+    "DG": 12,
+    "RC": 19,
+    "REF": 1
+  },
+  "registration_policy": "Unregistered rasters remain unchanged on labelled reproduction cards beside measured outlines. No silent stretch or guessed crop."
+}
