@@ -23,7 +23,7 @@
       "prompt": "Bilinear IGN ground from 165 retained samples; explicit A-SITE court, terrace and assumed street cut; three scales of earth and grass; mapped stream. Conjectural exposed-soil clods, erosion variation and shallow normal relief dress declared vertical cut faces without changing their outlines or heights. Exposed-earth library colour uses two continuous world projections blended by face orientation, preserving the cut geometry and avoiding local strip UV restarts. Reuse the already licensed earth-packed map in the exact street corridors with restrained grey-beige mineral drift, compacted wheel bands, filtered aggregate and fine grit. Keep all actual sampled heights and ground outside the road.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "160db963fd1bfd98040146dc86ef99886a034ecae17ba9e73e61f8312091f3ff",
+      "sha256": "1ce9423e25e8feb62fc629e1c63bd8c5a892c13092a41d1009abbc13aea9235d",
       "note": "IGN Licence Ouverte 2.0; OSM contributors ODbL 1.0; src/wings/vinci/data/terrain.json; recipe_file=src/wings/vinci/ground.ts"
     },
     {
@@ -46,10 +46,10 @@
       "class": "GENERATED",
       "licence": "Original procedural reconstruction; source code under the museum repository licence. OSM-derived coordinates © OpenStreetMap contributors, ODbL 1.0. IGN terrain Licence Ouverte 2.0.",
       "display": true,
-      "prompt": "Conjectural atmospheric sky at the exact computed 1517 sun vector: turbidity4, Rayleigh1.4, cloudScale0.0006, cloudCoverage0.28, cloudDensity0.42, cloudElevation0.35, cloudSpeed0. No weather observation survives; cloud shader parameters are scenic choices, not measured altitude. Displayed horizon colour continues the FogExp2 asymptote at assumed density0.0075/m [0.0075–0.015/m] with an assumed effective column18m [12–24m] and clear elevation12deg [10–16deg]; no terrain extrapolation. Source src/wings/vinci/display-sky-haze.ts. The environment probe rotation is separately corrected to Euler Y=-pi/2 in index.ts to match the actual computed solar azimuth; display haze never enters its radiance.",
+      "prompt": "Conjectural atmospheric sky at the exact computed 1517 sun vector: turbidity4, Rayleigh1.4, cloudScale0.0006, cloudCoverage0.28, cloudDensity0.42, cloudElevation0.35, cloudSpeed0. No weather observation survives; cloud shader parameters are scenic choices, not measured altitude. Displayed horizon colour continues the FogExp2 asymptote at assumed density0.0075/m [0.0075–0.015/m] with an assumed effective column18m [12–24m] and clear elevation12deg [10–16deg]; no terrain extrapolation. Source src/wings/vinci/display-sky-haze.ts. The environment probe rotation is separately corrected to Euler Y=-pi/2 in index.ts to match the actual computed solar azimuth; display haze never enters its radiance. A thin streaked high cloud veil is added above ten degrees of elevation, four-octave fractal noise stretched 3.1/11/2.4 on the view ray, peaking near forty degrees and fading at the zenith and the horizon, mixed to a pale grey at 30 per cent. Assumed weather, no observation claimed.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "0e51ea469c224b90123212b2eee4008112ed5424424a8a48fe661723defda37b",
+      "sha256": "ffd4b970b8280ea011df2ef98fff166fd2d2c6a4507d075a0ef20ca8ad685fb9",
       "note": "brief/SITE-HOUR.md; three.js SkyMesh MIT; recipe_file=src/wings/vinci/index.ts displayed_haze_recipe=src/wings/vinci/display-sky-haze.ts; sky_display_only=true; fog_density=0.0075; fog_density_assumed_range=0.0075..0.015; environmentRotation_y_rad=-1.5707963267948966; displayed_haze_sha256=80c458f2cb5ccddb7fcedccda5df70e5cdccda7d9ca97d65ebfa6462920f61ef;"
     },
     {
@@ -62,7 +62,7 @@
       "prompt": "Museum camera poses and piecewise exterior circulation in the fixed dossier frame. All poses are exhibition choices. FIFO semantic navigation on measured gate/terrace/stair/apron routes. Bounded physical near-pyramid clearance; measured geometry identity at mount. CSS projection-derived drag with 0.1 second monotone response; explicit inspection entry and return. No ordinary selected request discarded. Static material inspection aliases have separate actual placement audits.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "76f0cef0c080e2b9a10a30ba5abadd87664c3531b5929f735e0f9dcbeb6803a1",
+      "sha256": "486ab4f4e98a324ed78bf79f122025dae3b2006febb938078e89b4df1f3fc0e2",
       "note": "brief/CONCEPT.md; src/wings/vinci/data/closluce.json; recipe_file=src/wings/vinci/rail.ts; companion_file=src/wings/vinci/input.ts; companion_recipe_ids=vinci/rail-smoothing,vinci/rail-proof,vinci/rail-fingerprint,vinci/rail-projection,vinci/projection-drag,vinci/rail-clearance"
     },
     {
@@ -127,7 +127,7 @@
       "prompt": "Derivative-filtered original brick, tuffeau, slate and member-local oak finishes on the retained nominal courses, apertures and measured geometry. Brick and pale limestone retain finite pores and restrained broad variation, with continuous overlapping quadratic-spline grain at explicit nominal physical intervals and assumed ranges. Pore colour contrast is reduced; pore depths remain. Slate keeps staggered tile IDs, overlap geometry, palette and fine grain; two broad finite layers and four small finite flakes replace infinite periodic cleft bands. Exact counts, scales, relief ranges, filtering approximations and uncalibrated appearance basis are disclosed EN/DE. The accepted R27b continuous oak body, finite fibres and shallow elongated pores retain their actual member UVs/seeds, worn colour, knots, checks and end grain. All roughness and normal-slope bounds remain. No reference image is sampled, no bitmap is added and no material relief displaces geometry.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "596696a84fddd6ffc8c5760839bd02a0e60cdc74c59f2ddb7b57140479c291be",
+      "sha256": "969138a87f45fbf7523304ffd0fff2675a456da9ddff818c9e0ebf0ab853149c",
       "note": "Text-declared procedural recipe; recipe_file=src/wings/vinci/surface.ts; A-MATERIAL A-MASONRY materials.csv Q124 Q130; mineralSurfaceProvenance contains EN/DE physical scale and amplitude intervals; closeSurfaceProvenance contains EN/DE slate and oak intervals; microstructure_recipe=src/wings/vinci/mineral-microstructure.ts; microstructure_sha256=92c93ba37e7dd89f36690a45e6d785e4548cae5b4c4c27b669ba6a144a136cf2; oak_finish_recipe=src/wings/vinci/oak-microstructure.ts; oak_finish_sha256=2d3a05ee3a15da07c6170e5ba05d8c1100d36e26d560af6a1c7e67c4a9847dc3; dense_mineral_body_recipe=src/wings/vinci/dense-mineral-body.ts; dense_mineral_body_sha256=69c67887495d8d36846c296b7c6e5c52234bf02445895d38f6268f4331b881ea; slate_microstructure_recipe=src/wings/vinci/slate-microstructure.ts; slate_microstructure_sha256=dc1f439cd1964a8705e735e9e8e223d05a0f8e3a16739312101e4f0a888c3af1"
     },
     {
@@ -192,7 +192,7 @@
       "prompt": "Analytic ambient visibility at registered facade feet; smooth .06–1.8 metre falloff from .34 to 1. An assumed contact response, not a second directional light.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "7b570bb7cf80aa467963e0d3f10332a8aaead87ee79d66e3d93d8f3bd4c3e2c4",
+      "sha256": "8851190c81bf4ba70f36e08416eadb57be98fbf16c39b1a0d5b53e94dd4a82e5",
       "note": "recipe_file=src/wings/vinci/foundation.ts"
     },
     {
@@ -218,7 +218,7 @@
       "prompt": "Original procedural modern museum insertion at the fixed maquette envelope. Low post-grid pavilions, shallow slate roofs, full-height glazed enclosure, concrete apron, garden stair and water channel. Exact modern approach grade cuts, supported landings and continuous concrete cheek ownership. Museum design, not a claim about1517. Share the existing pale cast-concrete finish across all four roof soffits; keep their downward normals and the sole measured sun. Derive both entrance post heads from the retained inclined canopy underside; keep their centres and buried feet. Provide continuous derived structural support beneath the existing stair cheeks and both landing heads. Keep the maquette walking widths and every finish level.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "2563a3915e8a11090bc1678e92cf2081ab8a5f8918132bd28410ae6e5a6c0d4c",
+      "sha256": "a34e6299dabaf3c4751b6169bd864362c781091ac4ba17a224d1da70c0c9b58a",
       "note": "recipe_file=src/wings/vinci/collection.ts"
     },
     {
@@ -231,7 +231,7 @@
       "prompt": "Derived 33.8721 square metre inner court apron closes the literal court to registered facade chain at A-SITE zero nominal. Five clipped threshold steps, procedural wear, gravel and drain; reconstruction with conjectural dressing. Mounted during court refinement with explicit source-card assumptions.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "23f1a34a007bd1af0e42a1b9d4a23751824c80668965f75b3c5210c405717d90",
+      "sha256": "4969032d43a0bd0e60af7ef085645e669866a38a4fbcc08a721692c469f10c93",
       "note": "Q124; A-SITE; recipe_file=src/wings/vinci/inner-court.ts"
     },
     {
