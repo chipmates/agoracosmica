@@ -11,7 +11,7 @@ import {aggregateField} from './mineral-microstructure'
 import {denseMineralBody,denseMineralProvenance} from './dense-mineral-body'
 import {slateFiniteFinish,slateFiniteProvenance} from './slate-microstructure'
 import {oakFiniteFinish,oakFiniteProvenance} from './oak-microstructure'
-import { anisotropicFootprint } from './masonry-courses'
+import { anisotropicFootprint, coursedFace, dressedTuffeau } from './masonry-courses'
 
 export type ShellSurfaceKind = 'brick' | 'stone' | 'slate' | 'oak'
 // TSL overloads are composed at this one boundary, as in the shared stack.
@@ -425,6 +425,30 @@ export function createShellSurface(kind:ShellSurfaceKind,library?:MaterialLibrar
     m.colorNode=(m.colorNode as N).mul(mineral.colour)
     m.roughnessNode=clamp((m.roughnessNode as N).add(mineral.roughness),roughRange[0],roughRange[1])
     m.normalNode=mineral.normal
+    if(kind==='stone'){
+      // ONE STONE IS NOT THE NEXT, on the house as on the garden wall. The
+      // dressed faces carried a continuous stain and a course line and
+      // nothing from block to block, so the chapel's ashlar, the largest
+      // pale plane in the wing, read as one tone with lines on it. A quarry
+      // sends beds of different colour and a few stones drink and stay dark.
+      // Colour only, keyed to each block's own number, never a pattern.
+      const laid=coursedFace(U,{...dressedTuffeau,courseM:.31,blockM:.74,jointM:.012,faceSwing:.052,seed:4.63})
+      const face=float(1).sub(info.x.mul(float(1).sub(lowBase)))
+      const bed=laid.cell.sub(.5).mul(laid.held)
+      const soaked=smoothstep(.76,.97,laid.cell).mul(laid.held)
+      const dressed=laid.tone.mul(mix(float(1),float(.88),laid.joint))
+        .mul(bed.mul(.27).add(1)).mul(float(1).sub(soaked.mul(.12)))
+      m.colorNode=(m.colorNode as N).mul(mix(float(1),dressed,face))
+      m.roughnessNode=clamp((m.roughnessNode as N).add(laid.joint.mul(.03).mul(face)),roughRange[0],roughRange[1])
+    }
+    // RAIN COMES BACK OFF THE GROUND. A wall under a slate roof with no gutter
+    // takes the splash at its foot: a darker, greener band with a wandering
+    // top edge, half a metre up and strongest at the courses just above the
+    // base. The largest plane in the arrival frame had no weathering at all.
+    const splashEdge=P.y.sub(mx_noise_float(vec3(P.x.mul(1.9),P.y.mul(.5),P.z.mul(1.9))).mul(.07))
+    const splash=float(1).sub(smoothstep(.11,.47,splashEdge)).mul(smoothstep(-.05,.06,splashEdge))
+    m.colorNode=mix(m.colorNode as N,(m.colorNode as N).mul(vec3(.87,.885,.845)),splash.mul(.55))
+    m.roughnessNode=clamp((m.roughnessNode as N).add(splash.mul(.03)),roughRange[0],roughRange[1])
   }else if(kind==='slate'){
     const n=normalWorldGeometry.transformDirection(cameraViewMatrix),sx=positionView.dFdx(),sy=positionView.dFdy()
     const rx=sy.cross(n),ry=n.cross(sx),det=sx.dot(rx)

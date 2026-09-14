@@ -148,9 +148,18 @@ function material():MeshStandardNodeMaterial {
   const density=smoothstep(1.4,3,float(.5).div(pixel))
   const mid=mx_noise_float(p.mul(17)).mul(smoothstep(1,3,float(.059).div(pixel)))
   const fine=mx_noise_float(p.mul(145)).mul(smoothstep(1,3,float(.007).div(pixel)))
+  // THE SCALE A COURT IS READ AT. Between the two-metre drift and the six
+  // centimetre grit there was nothing, and half a metre is where a sand court
+  // is actually read: the sweep of a besom, the drift of loose sand against
+  // what stands in it, and the patches worn back to the harder base.
+  const half=smoothstep(1.2,2.7,float(.42).div(pixel))
+  const sweep=mx_noise_float(vec3(p.x.mul(2.7),p.y.mul(1.2),p.z.mul(.85))).mul(half)
+  const worn=smoothstep(.14,.72,mx_noise_float(p.mul(1.9).add(vec3(3.1,0,7.4)))).mul(half)
+  const loose=smoothstep(.42,.96,mx_noise_float(p.mul(.85).add(vec3(0,2.4,5.1)))).mul(half)
   result.colorNode=vec3(1,1,1).mul(mx_noise_float(p.mul(.47)).mul(.10).add(1))
+    .mul(sweep.mul(.055).add(1)).mul(worn.mul(.075).add(.968)).mul(loose.mul(.05).add(1))
     .mul(mid.mul(density).mul(.12).add(1)).mul(fine.mul(density).mul(.07).add(1))
-  result.roughnessNode=mid.mul(.055).add(.91)
+  result.roughnessNode=mid.mul(.055).add(.91).sub(worn.mul(.045)).add(loose.mul(.03))
   result.normalNode=normalMap(vec3(mid.mul(.024).add(.5),fine.mul(.012).add(.5),1),vec2(.35,.35))
   return result
 }

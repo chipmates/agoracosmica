@@ -67,7 +67,19 @@ export function groundMaterial(kind:'grass'|'earth'|'stone',library?:MaterialLib
   // The CC0 earth set carries its own metre-scale cloud, and at ±45 per cent
   // it was the only thing a near bank showed: a blotch, not a surface. Held
   // to a fifth of that, the wing's own clod and grain scales read through it.
-  if(earthMaps){m.colorNode=m.colorNode!.mul(mix(float(1),earthMaps.albedo.clamp(.66,1.38),.46));m.normalNode=normalMap(earthMaps.normal.mul(.5).add(.5),vec2(.36,.36))}
+  if(earthMaps){
+    // A CUT FACE IS NOT A SPECKLE. The library's metre-scale cloud was the
+    // only structure a bank had, at one strength everywhere, so a near bank
+    // read as sandpaper beside dressed stone. A cut bank shows the beds it
+    // was cut through, and its grit is not the same from one place to the
+    // next: the library's own grain now arrives through that density.
+    const cut=smoothstep(.30,.74,float(1).sub(normalWorldGeometry.y.abs()))
+    const patchy=mx_noise_float(P.mul(.78).add(vec3(5.3,1.1,2.7))).mul(.5).add(.5)
+    const beds=sin(P.y.mul(9.4).add(mx_noise_float(P.mul(.62)).mul(2.6))).mul(shows(.34)).mul(cut)
+    m.colorNode=m.colorNode!.mul(mix(float(1),earthMaps.albedo.clamp(.72,1.28),patchy.mul(.44).add(.14)))
+      .mul(beds.mul(.055).add(1)).mul(mix(float(.945),float(1.05),patchy))
+    m.normalNode=normalMap(earthMaps.normal.mul(.5).add(.5),vec2(.36,.36))
+  }
   if(kind==='stone'){
     // Each cut strip previously restarted a stretched local texture. A
     // continuous horizontal tangent and true height now lay the whole wall.
@@ -190,10 +202,19 @@ export function groundMaterial(kind:'grass'|'earth'|'stone',library?:MaterialLib
     // The 0.4 m crust used to carry the whole colour swing, which is what made
     // a cut bank read as cloud noise at arm's length. It keeps two thirds of
     // its range and the clod and stone scales carry the rest.
+    // A CUT FACE SHOWS THE BEDS IT WAS CUT THROUGH. Every scale on this bank
+    // was under a tenth of a metre and every one of them was at the same
+    // strength over the whole face, which is what made it read as sandpaper
+    // beside dressed stone. The beds are the half-metre structure a bank has,
+    // and the grit that lies over them is not the same from one part of the
+    // face to the next.
+    const beds=sin(P.y.mul(8.6).add(mx_noise_float(P.mul(.55)).mul(2.7))).mul(resolved(.34))
+    const patchy=mx_noise_float(P.mul(.7).add(vec3(5.3,1.1,2.7))).mul(.5).add(.5)
     let bankColour=mix(rgb('#6a5d4a'),rgb('#a2906f'),crust.mul(.34).add(.5))
-      .mul(clods.mul(.62).add(1)).mul(grit.mul(.21).add(1))
+      .mul(clods.mul(patchy.mul(.8).add(.3)).mul(.62).add(1)).mul(grit.mul(patchy.mul(.9).add(.25)).mul(.21).add(1))
       .mul(float(1).sub(pits.mul(.40))).mul(erosion.mul(.18).add(1))
       .mul(stones.mul(.30).add(1))
+      .mul(beds.mul(.062).add(1)).mul(mix(float(.94),float(1.06),patchy))
     if(library){
       // The cut is tessellated into many strips. World projections keep the
       // existing earth colour continuous across their local UV restarts.
@@ -205,8 +226,8 @@ export function groundMaterial(kind:'grass'|'earth'|'stone',library?:MaterialLib
       // and a half it hands the surface over to the clods, stones and grit,
       // which are the scales a cut bank actually shows to a face.
       const blurred=float(1).sub(smoothstep(.0035,.011,pixel)).mul(.78)
-      bankColour=bankColour.mul(mix(float(1),mix(north.albedo,east.albedo,weight).clamp(.4,1.7),
-        float(.55).mul(float(1).sub(blurred))))
+      bankColour=bankColour.mul(mix(float(1),mix(north.albedo,east.albedo,weight).clamp(.48,1.55),
+        float(.55).mul(float(1).sub(blurred)).mul(patchy.mul(.55).add(.45))))
     }
     m.colorNode=mix(m.colorNode!,bankColour,bank)
     const height=clods.mul(.006).sub(pits.mul(.004)).add(stones.mul(.0035)).add(grit.mul(.00035)).toVar()
