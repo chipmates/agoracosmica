@@ -96,7 +96,7 @@ export const PANES: Record<string, PaneWords> = {
   gandhi: {
     line: {
       en: 'Lawyer and leader of India’s independence. He made nonviolent resistance a political method, and movements for civil rights around the world took it up.',
-      de: 'Anwalt und Führer der indischen Unabhängigkeit. Er machte den gewaltfreien Widerstand zu einer politischen Methode, und Bürgerrechtsbewegungen in aller Welt nahmen sie auf.',
+      de: 'Anwalt und Wegbereiter der indischen Unabhängigkeit. Er machte den gewaltfreien Widerstand zu einer politischen Methode, und Bürgerrechtsbewegungen in aller Welt nahmen sie auf.',
     },
   },
   gautama: {
@@ -126,7 +126,7 @@ export const PANES: Record<string, PaneWords> = {
   king: {
     line: {
       en: 'Baptist minister and leader of the American civil rights movement. Nonviolent resistance, as he led it, ended legal segregation in the United States.',
-      de: 'Baptistenpfarrer und Führer der amerikanischen Bürgerrechtsbewegung. Der gewaltfreie Widerstand, wie er ihn führte, beendete die gesetzliche Rassentrennung in den Vereinigten Staaten.',
+      de: 'Baptistenpfarrer an der Spitze der amerikanischen Bürgerrechtsbewegung. Der gewaltfreie Widerstand, wie er ihn führte, beendete die gesetzliche Rassentrennung in den Vereinigten Staaten.',
     },
   },
   laozi: {
@@ -144,7 +144,7 @@ export const PANES: Record<string, PaneWords> = {
   mandela: {
     line: {
       en: 'South African leader against apartheid. Twenty-seven years in prison, then President from 1994 to 1999, and a name for resistance and reconciliation both.',
-      de: 'Südafrikanischer Führer gegen die Apartheid. Siebenundzwanzig Jahre im Gefängnis, dann Präsident von 1994 bis 1999, und ein Name für Widerstand und Versöhnung zugleich.',
+      de: 'Südafrikanischer Freiheitskämpfer gegen die Apartheid. Siebenundzwanzig Jahre im Gefängnis, dann Präsident von 1994 bis 1999, und ein Name für Widerstand und Versöhnung zugleich.',
     },
   },
   mozart: {
