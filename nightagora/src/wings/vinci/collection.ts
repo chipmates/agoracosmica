@@ -9,6 +9,7 @@ import {
 } from 'three/webgpu'
 import * as TSL from 'three/tsl'
 import { world } from './site'
+import { anisotropicFootprint } from './masonry-courses'
 
 type Point = [east: number, north: number]
 type Point3 = [east: number, north: number, height: number]
@@ -202,7 +203,7 @@ function architectureMaterial(): MeshStandardNodeMaterial {
     normalWorldGeometry, positionView, positionWorld, smoothstep, uv } = TSL as unknown as Record<string, N>
   const m = new MeshStandardNodeMaterial({ roughness: .82, side: DoubleSide, shadowSide: BackSide })
   const P = positionWorld, U = uv(), role = attribute('collectionRole', 'float')
-  const pixel = length(P.dFdx()).add(length(P.dFdy())).max(.000001)
+  const pixel = anisotropicFootprint(P)
   const resolved = (metres: number) => smoothstep(2, 4, float(metres).div(pixel))
   const macro = mx_noise_float(P.mul(.36)).mul(resolved(2.78)).toVar()
   const middle = mx_noise_float(P.mul(6.25)).mul(resolved(.16)).toVar()
@@ -273,7 +274,7 @@ function architectureMaterial(): MeshStandardNodeMaterial {
 const SOFFIT = {
   eastEdge: -21.3, northEdge: 33.3, reach: 2.6, deep: .38, open: 1.22,
   bay: 4, postWidth: .5, postReach: 1.9, postShade: .55, northRowEast: -62, eastRowNorth: 36, canopyWest: -22.8,
-  canopyEast: -18.7, canopySouthPost: -41.5, canopyNorthPost: -34.5,
+  canopyEast: -18.7, canopySouthPost: -41.5, canopyNorthPost: -34.5, freeSlab: .85,
 } as const
 
 /** The pavilion, cheek and terrain lining share the same contemporary cast
@@ -289,7 +290,7 @@ export function collectionConcreteMaterial(closedCaster = false): MeshStandardNo
   const vertical = float(1).sub(smoothstep(.4, .8, n.y.abs()))
   const axis = vec2(n.z, n.x.negate()).div(length(n.xz).max(.00001))
   const U = vec2(mix(P.x, P.x.mul(axis.x).add(P.z.mul(axis.y)), vertical), mix(P.z, P.y, vertical))
-  const pixel = length(P.dFdx()).add(length(P.dFdy())).max(.000001)
+  const pixel = anisotropicFootprint(P)
   const resolved = (metres: number) => smoothstep(2, 4, float(metres).div(pixel))
   const line = (coordinate: typeof P.x, spacing: number, width: number) => {
     const f = fract(coordinate.div(spacing)), edge = f.min(float(1).sub(f)).mul(spacing)
@@ -333,8 +334,18 @@ export function collectionConcreteMaterial(closedCaster = false): MeshStandardNo
     soft(length(vec2(P.x.sub(east), P.z.add(north))), SOFFIT.postWidth * 1.6).mul(separate)
   const posts = postRow(P.x, SOFFIT.northRowEast, openNorth).max(postRow(P.z, SOFFIT.eastRowNorth, openEast))
     .max(postAt(SOFFIT.canopyEast, SOFFIT.canopySouthPost)).max(postAt(SOFFIT.canopyEast, SOFFIT.canopyNorthPost))
-  const bounce = mix(float(SOFFIT.deep), float(SOFFIT.open), openness).mul(float(1).sub(posts.mul(SOFFIT.postShade)))
-  m.aoNode = mix(float(1), bounce, downward)
+  // The entrance canopy is a free slab over a pale sunlit apron with open sky
+  // on three sides, so its underside sees far more bounce than a soffit
+  // inside the pavilion's own bays. Indirect term only.
+  const bounce = mix(float(SOFFIT.deep), float(SOFFIT.open), openness)
+    .mul(separate.mul(SOFFIT.freeSlab).add(1)).mul(float(1).sub(posts.mul(SOFFIT.postShade)))
+  // A post takes the sky away from the paving it stands on. Without that
+  // pool of occlusion a 100 mm section reads as hanging, whatever its foot
+  // is doing. Indirect term only.
+  const footPool = [[SOFFIT.canopyEast, SOFFIT.canopySouthPost], [SOFFIT.canopyEast, SOFFIT.canopyNorthPost]]
+    .map(([east, north]) => smoothstep(.04, .70, length(vec2(P.x.sub(east!), P.z.add(north!)))).mul(.66).add(.34))
+    .reduce((a, b) => a.mul(b))
+  m.aoNode = mix(float(1), bounce, downward).mul(mix(footPool, float(1), downward))
   m.name = 'vinci/collection/filtered-cast-concrete'
   m.userData = { manifestId: collectionProvenance.manifestId, assetClass: 'GENERATED', certainty: 'reconstructed',
     recipe: 'Original museum concrete: filtered 3.2 m weather drift, 0.10 m aggregate and 4.5 mm pores; continuous 1.2 × 0.6 m form panels, restrained 0.15 m board lines, 4 mm finish joints and 24 mm tie recesses on a 0.6 m grid. Combined derivative relief is bounded to a 0.24 normal gradient. No textures or historical concrete claim.',
@@ -352,7 +363,7 @@ function glazingMaterial(water = false): MeshStandardNodeMaterial {
   // take it back on the material rather than on the scene.
   m.envMapIntensity = water ? 2.1 : 2.6
   m.forceSinglePass = true
-  const P = positionWorld, pixel = length(P.dFdx()).add(length(P.dFdy())).max(.000001)
+  const P = positionWorld, pixel = anisotropicFootprint(P)
   const resolved = (metres: number) => smoothstep(2, 4, float(metres).div(pixel))
   const broad = mx_noise_float(P.mul(.23)).mul(resolved(4.35)).toVar()
   const middle = mx_noise_float(P.mul(water ? vec3(2, 1, 6) : vec3(2, 7, 2))).mul(resolved(water ? .167 : .143)).toVar()
