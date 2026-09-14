@@ -1482,6 +1482,72 @@
       "source_sha1": "b753715ec2c401adcadd2b089787db38b9667b88",
       "honesty_en": "Public domain work. Reproduction from Wikimedia Commons. The museum labels the reproduction, not the painting. Non-profit cultural use.",
       "honesty_de": "Gemeinfreies Werk. Reproduktion von Wikimedia Commons. Das Museum kennzeichnet die Reproduktion, nicht das Gemälde. Nichtkommerzielle kulturelle Nutzung."
+    },
+    {
+      "id": "lobby/likeness-woolf",
+      "path": "likenesses/woolf/original.jpg",
+      "sha256": "7e03c663812e8ef5889d3847ae4ec7c20d7e974e2c20dfaab4db600c2de32e44",
+      "bytes": 1634746,
+      "width": 2924,
+      "height": 3994,
+      "pixels": 11678456,
+      "slug": "woolf",
+      "name": "Virginia Woolf",
+      "wing": "lobby",
+      "class": "Tier 2",
+      "tier": 2,
+      "licence": "Public domain",
+      "licence_source_url": "https://commons.wikimedia.org/wiki/File:George_Charles_Beresford_-_Virginia_Woolf_in_1902.jpg#Licensing",
+      "licence_location": "Commons file page, Licensing",
+      "holder": "Not identified for this reproduction; source is the Filippo Venturi Photography blog",
+      "maker": "George Charles Beresford",
+      "date": "1902",
+      "source_url": "https://commons.wikimedia.org/wiki/File:George_Charles_Beresford_-_Virginia_Woolf_in_1902.jpg",
+      "original_url": "https://upload.wikimedia.org/wikipedia/commons/2/23/George_Charles_Beresford_-_Virginia_Woolf_in_1902.jpg",
+      "holder_record_url": null,
+      "display": true,
+      "label_en": "Virginia Woolf. Photograph by George Charles Beresford, 1902. Licence: “Public domain”. Public domain work. Reproduction from Wikimedia Commons. The museum labels the reproduction, not the photograph. Non-profit cultural use.",
+      "label_de": "Virginia Woolf. Fotografie von George Charles Beresford, 1902. Lizenz: „Public domain“. Gemeinfreies Werk. Reproduktion von Wikimedia Commons. Das Museum kennzeichnet die Reproduktion, nicht die Fotografie. Nichtkommerzielle kulturelle Nutzung.",
+      "previews": [
+        {
+          "path": "likenesses/woolf/preview-512.jpg",
+          "sha256": "4017ffe98049152a98bc2fbf3f9c3479ea9ab37dc08d7860da828e0cfd599379",
+          "bytes": 31530,
+          "width": 375,
+          "height": 512,
+          "pixels": 192000,
+          "long_edge": 512,
+          "format": "image/jpeg",
+          "quality": 88,
+          "color_space": "sRGB",
+          "source_path": "likenesses/woolf/original.jpg"
+        },
+        {
+          "path": "likenesses/woolf/preview-1024.jpg",
+          "sha256": "7f77b56e2221b3967c27dc6f47bf9189e11e8782e4f6245cc96cc979d0ea485d",
+          "bytes": 107041,
+          "width": 750,
+          "height": 1024,
+          "pixels": 768000,
+          "long_edge": 1024,
+          "format": "image/jpeg",
+          "quality": 88,
+          "color_space": "sRGB",
+          "source_path": "likenesses/woolf/original.jpg"
+        }
+      ],
+      "verified_on": "2026-09-14",
+      "source_verification": "Current Commons imageinfo, original link, licence template and file history checked. Holder evidence rechecked where available.",
+      "derivation": "No embedded ICC profile. Source interpreted as sRGB. JPEG previews resized with Lanczos, quality 88, embedded sRGB profile. Original bytes unchanged.",
+      "licence_url": "https://commons.wikimedia.org/wiki/File:George_Charles_Beresford_-_Virginia_Woolf_in_1902.jpg#Licensing",
+      "rights_note": "Historic photograph by George Charles Beresford, 1902, reproduced from the Filippo Venturi Photography blog through Wikimedia Commons. Commons PD-old-auto-expired, deathyear 1938. The holder and digitizer of this scan are not identified. No National Portrait Gallery provenance or reproduction release is asserted.",
+      "source_version": {
+        "file_timestamp": "2015-03-19T20:15:18Z",
+        "commons_revision_id": 1271181655
+      },
+      "source_sha1": "15b4fa939a619815b9b51ff382a94725c86e6dd7",
+      "honesty_en": "Public domain work. Reproduction from Wikimedia Commons. The museum labels the reproduction, not the photograph. Non-profit cultural use.",
+      "honesty_de": "Gemeinfreies Werk. Reproduktion von Wikimedia Commons. Das Museum kennzeichnet die Reproduktion, nicht die Fotografie. Nichtkommerzielle kulturelle Nutzung."
     }
   ]
 }
