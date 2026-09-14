@@ -126,9 +126,10 @@ out-of-range values are clamped. The module does not round fractions or
 sanitize `NaN`, so route and input parsing belong to the host. `mobile`
 defaults to false.
 
-`APOCRYPHA` imports `../words/data/inscriptions.json`, a byte-identical copy of
-locked `brief/collection/inscriptions.json`. `src/bench/verify-data.mjs` checks
-its SHA256 and all 52 passage and six apocrypha records against the original.
+`APOCRYPHA` imports `../words/data/inscriptions.json`, the locked collection
+with only its provenance source root made portable. The line bench's
+`src/wings/vinci/line/bench/verify-data.mjs` checks its shipped SHA256 and all
+52 passage and six apocrypha records against the sealed fingerprint.
 Every displayed quote is the exact string from that array and layout only adds
 line breaks. When the host supplies `readings`, the wall carries the host's
 plain origin paragraph and the exact `actual_origin` belongs in the host's

@@ -10,9 +10,10 @@ its front is z=0 and thickness extends toward -Z. Face it toward +Z.
 Height expands for longer passages to preserve the requested letter size;
 the returned height is the authoritative carrier extent.
 
-The module imports `data/inscriptions.json`, a byte-identical deployable copy of
-locked `brief/collection/inscriptions.json`. `src/bench/verify-data.mjs` verifies
-the exact bytes, SHA256 and record counts against that source. Only `text_en`
+The module imports `data/inscriptions.json`, the locked inscription collection
+with only its provenance source root made portable. The line bench's
+`src/wings/vinci/line/bench/verify-data.mjs` verifies its shipped bytes against
+the sealed SHA256 and record counts. Only `text_en`
 and `text_de` are used, verbatim, with their original punctuation and case.
 `display_text_en/de` are normalized readings and are never used for quotations.
 Richter 498 is the default because both languages are independently ready and
