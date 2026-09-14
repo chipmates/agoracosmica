@@ -10,6 +10,7 @@ import {
 import * as TSL from 'three/tsl'
 import { world } from './site'
 import { anisotropicFootprint } from './masonry-courses'
+import { createCollectionRooms } from './collection/rooms'
 
 type Point = [east: number, north: number]
 type Point3 = [east: number, north: number, height: number]
@@ -538,5 +539,12 @@ export function createCollection(): Group {
   group.userData = { ...collectionProvenance, layout: collectionLayout,
     visibleMeshes: 5, shadowCasters: 3,
     triangles: group.children.reduce((sum, child) => sum + (child as Mesh).geometry.getAttribute('position').count / 3, 0) }
+  // The rooms are a separate body with a separate manifest id: the pavilion's
+  // own meshes are a rail collision solid whose geometry the clearance
+  // certificate hashes, so nothing above this line may change. The benches'
+  // objects are mounted into this group by the wing, not from here: the
+  // offline checkers run this factory directly and cannot load a bench
+  // module's own data import.
+  group.add(createCollectionRooms())
   return group
 }
