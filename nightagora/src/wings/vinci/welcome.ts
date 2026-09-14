@@ -61,17 +61,22 @@ export function createVinciWelcome(
   dialog.id = 'vinci-welcome'
   dialog.setAttribute('aria-label', text(vinciWelcomeText.label))
   const sheet = make('div', 'vinci-welcome-sheet')
-  dialog.append(sheet)
+  // The controls stand outside the scrolling surface: the way in is never
+  // below the fold, at either viewport.
+  const foot = make('div', 'vinci-welcome-foot')
+  dialog.append(sheet, foot)
   let live = true
   let route: 'house' | 'collection' = 'house'
 
   function paint(): void {
     sheet.textContent = ''
+    foot.textContent = ''
     sheet.append(
       make('p', 'vinci-kicker', text(vinciWelcomeText.kicker)),
       make('h1', 'vinci-welcome-title', text(vinciWelcomeText.title))
     )
     const narrow = phone()
+    const blocks = make('div', 'vinci-welcome-blocks')
     for (const block of vinciWelcomeBlocks) {
       const section = make('section', 'vinci-welcome-block')
       section.append(make('h2', '', text(block.heading)))
@@ -86,9 +91,10 @@ export function createVinciWelcome(
         paragraph.append(document_.createTextNode(text(line.text)))
         section.append(paragraph)
       }
-      sheet.append(section)
+      blocks.append(section)
     }
-    sheet.append(make('p', 'vinci-welcome-route', text(vinciWelcomeText.route)))
+    sheet.append(blocks)
+    foot.append(make('p', 'vinci-welcome-route', text(vinciWelcomeText.route)))
     const controls = make('div', 'vinci-welcome-controls')
     const enter = make('button', 'vinci-welcome-enter', text(vinciWelcomeText.enter))
     enter.type = 'button'
@@ -97,7 +103,7 @@ export function createVinciWelcome(
     collection.type = 'button'
     collection.addEventListener('click', () => { route = 'collection'; dialog.close() })
     controls.append(enter, collection)
-    sheet.append(controls)
+    foot.append(controls)
   }
 
   // Escape enters: the panel is a welcome and not a question, so cancelling
@@ -117,10 +123,12 @@ export function createVinciWelcome(
   return {
     element: dialog,
     open() {
-      if (!live || dialog.open) return
+      if (!live) return
+      // Painted on every open, so a language or a viewport that changed while
+      // the sheet stood open is answered by the next open and not remembered.
       route = 'house'
       paint()
-      dialog.showModal()
+      if (!dialog.open) dialog.showModal()
       dialog.querySelector<HTMLButtonElement>('.vinci-welcome-enter')?.focus({ preventScroll: true })
       dialog.scrollTop = 0
     },
