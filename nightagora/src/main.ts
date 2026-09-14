@@ -1592,8 +1592,12 @@ function frame(now: number): void {
     // the anonymous wanderer sparks belong to the birth moment alone:
     // at the hub they read as cheap floating blobs against the true field
     lanterns:
-      phase === 'wheel' ? Math.max(0.08, 0.55 * (1 - atlasReveal))
-      : phase === 'agora' ? 0.05
+      // and they LEAVE: a white spark loose among the letterpress was the
+      // one thing in this frame that was neither a name nor a field star
+      phase === 'wheel' ? 0.55 * (1 - atlasReveal)
+      // and at the fire they are gone: the room has its own embers, and a
+      // loose spark up at the masthead is a mark nobody chose
+      : phase === 'agora' ? 0
       : phase === 'breath' || phase === 'wing' ? 0
       : 0.3,
     sinceFlash: flashAt < 0 ? -1 : elapsed - flashAt,
@@ -1617,7 +1621,14 @@ function frame(now: number): void {
 
   keeperScene.update(dt)
   ambience.update(dt)
-  agora.update({ reveal: agoraReveal, elapsed, speak: keeperScene.speak() })
+  agora.update({
+    reveal: agoraReveal,
+    elapsed,
+    speak: keeperScene.speak(),
+    // looking up, the court is scenery and its air belongs to the room
+    // below: the sky phase keeps the colonnade and gives back the sparks
+    air: phase === 'wheel' || phase === 'breath' ? 0 : 1,
+  })
 
   // the lobby's points breathe in after the arrival breath
   const spotsVisible =
