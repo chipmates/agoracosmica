@@ -185,7 +185,12 @@ export function createWing():WingModule {
     const collection=createCollection()
     exhibits=mountCollectionExhibits(collection,stack)
     scene.add(ground,shell,entry,createGatePassage(stack.tierName()),createInnerCourtDressing(groundHeight,stack.tierName()),createRoadDressing(groundHeight,stack.tierName()),collection,createCollectionAccess(),createVegetation(groundHeight,stack.tierName()),createGroundDressing(groundHeight,stack.tierName()))
-    if(stack.tierName()==='calm'){
+    // THE SHELL CASTS ITS SHADOW THROUGH ITS DOUBLE, AT EVERY TIER. The
+    // detailed shell carries its surface relief into both cascades, which is
+    // 140,000 triangles twice for a shadow that cannot show a brick. The
+    // double is the same structural faces with the same apertures, gable
+    // outlines and roof unions, under three thousand.
+    {
       const shadowShell=createShellShadowDouble(shell,entry)
       shell.traverse(o=>{if(o instanceof Mesh)o.castShadow=false})
       scene.add(shadowShell)
