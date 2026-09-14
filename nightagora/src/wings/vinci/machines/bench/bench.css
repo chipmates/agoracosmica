@@ -23,3 +23,56 @@ body[data-phase="bench"] #veil,body[data-phase="bench"] #rail,body[data-phase="b
 /* Narrow windows use the same vertical composition before the side dock can
    reach the object. Short windows retain every reading/control in a scrollable dock. */
 @media(max-height:700px) and (max-width:1280px){.bench-dock{overflow-y:auto;overscroll-behavior:contain;padding-right:8px}.bench-dock>*{flex-shrink:0}.bench-lang{position:static;align-self:flex-end}.bench-read{position:static;margin-top:8px;align-self:stretch;flex-shrink:0}.bench-section{position:static}.bench-section-note{max-width:none}}
+
+/* Window 3: one complete reading flow, with a contiguous evidence rule. */
+.bench-actions{display:flex;align-items:stretch;gap:12px;border-bottom:1px solid #77716070}
+.bench-actions .bench-read{flex:1;min-width:0;border-bottom:0!important}
+.bench-actions .bench-section{flex:none;align-self:stretch}
+@media(max-width:1280px){
+ .bench-dock,.bench[data-slug="camera-obscura"] .bench-dock{top:38%;bottom:124px;gap:6px;overflow-y:auto;overscroll-behavior:contain;padding:0 0 2px}
+ .bench-dock>*{flex-shrink:0}
+ .bench-title{font-size:25px;margin-bottom:7px}
+ .bench-label{font-size:13px;line-height:1.35;margin-top:6px}
+ .bench-dim{font-size:9px;line-height:1.45;margin-top:4px}
+ .bench-certainty{font-size:8px;letter-spacing:.08em}
+ .bench-folio{grid-template-columns:31px 1fr;gap:9px;padding-top:6px}
+ .bench-folio img{width:31px;height:43px;padding:1px}
+ .bench-absence{width:31px;height:41px;padding:1px;font-size:6px}
+ .bench-folio figcaption{font-size:8px;line-height:1.3}
+ .bench-scope{display:block;font-size:10px;line-height:1.4;color:#b8b6a9}
+ .bench-lang{position:fixed;top:calc(38% - 46px);right:24px}
+ .bench-actions{flex:none;gap:10px;min-height:44px}
+ .bench-actions .bench-read{position:static;margin:0;align-self:stretch;font-size:10px!important}
+ .bench-actions .bench-section{position:static;min-height:44px;padding:0 9px;font-size:10px!important}
+ .bench-section-note{max-width:none}
+}
+
+/* R11: keep the complete hour readable while giving the subject more room. */
+@media(min-width:1281px){
+ .bench-dock{gap:14px}
+ .bench-scope{font-size:12px;line-height:1.5;color:#aaa99d}
+ .bench-folio img{height:150px}
+ .bench-absence{height:140px}
+ .bench[data-section="true"] .bench-dock{top:100px;gap:10px}
+ .bench[data-section="true"] .bench-folio img{height:128px}
+ .bench[data-section="true"] .bench-section-note{margin:0;line-height:1.4}
+}
+/* The spoken hour is three rows shorter than the arithmetic block it replaced,
+   so the phone's panel starts as much lower and the band under it is the one
+   the frame had before. */
+@media(max-width:1280px){
+ .bench .bench-dock,.bench[data-slug="camera-obscura"] .bench-dock{top:42.7%}
+ .bench .bench-lang{top:calc(42.7% - 46px)}
+}
+
+/* The record register: the hour's arithmetic reads as figures, not as prose. */
+.bench-hour-record{margin-top:1.4em}
+.bench-hour-record h2{margin-bottom:.35em}
+.bench-hour-record p{margin:.2em 0 .55em}
+.bench-hour-record .bench-hour-figure{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:15px;line-height:1.55;color:#d2cbba;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+
+/* The one mark that says where the visitor stands and how far along. */
+.bench-mark{display:grid;gap:5px}
+.bench-header .bench-kicker{display:block;font:9.5px/1.4 Arial,sans-serif;letter-spacing:.2em;text-transform:uppercase;color:#9c9787;margin:0}
+@media(max-width:1280px){.bench-mark{gap:3px}.bench-header .bench-kicker{display:block;font-size:7.5px;letter-spacing:.14em}}
+@media(max-width:1280px){.bench-kicker-wing{display:none}}

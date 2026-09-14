@@ -1,5 +1,6 @@
 import { BoxGeometry, Mesh, Vector3, type Box3, type BufferGeometry, type Material } from 'three/webgpu'
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js'
+import { metricPlanarUV } from '../geometry'
 import { mountBoxes, type MountBox } from './mounts'
 
 export interface BenchSupportOptions {
@@ -20,11 +21,11 @@ export interface BenchSupports {
 }
 
 /** GENERATED modern exhibition hardware, outside the authored machine.
- * Preserve every box face, index, normal and UV; bake only its translation
+ * Preserve every box face, index and normal; bake only its translation
  * before merging the iron boxes into a single material submission. Baking
  * rounds positions once to their existing Float32 attribute precision.
- * The library samples this iron from world position, so its photograph and
- * three detail scales stay aligned across the original box boundaries.
+ * Each face receives a nondegenerate metre UV projection, so the iron
+ * photograph and three detail scales also resolve on thin vertical reveals.
  */
 export function buildBenchSupports(options: BenchSupportOptions): BenchSupports {
   const { slug, machineBounds, displayBounds, ironMaterial, groundMaterial } = options
@@ -46,6 +47,7 @@ export function buildBenchSupports(options: BenchSupportOptions): BenchSupports 
       const geometry = new BoxGeometry(...box.size)
       inputs.push(geometry)
       geometry.translate(...box.centre)
+      metricPlanarUV(geometry)
     }
     // A scalar material ignores BoxGeometry's original per-face groups.
     // Merging without groups therefore keeps exactly one iron submission.

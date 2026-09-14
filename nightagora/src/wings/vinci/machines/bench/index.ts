@@ -1,6 +1,6 @@
 import { Box3, type BufferGeometry, Color, Fog, Group, Mesh, MeshStandardNodeMaterial, PerspectiveCamera, Scene, Vector3 } from 'three/webgpu';
 import type { Stack, KeyLight } from '../../../../stack';
-import { positionWorld, vec3 } from 'three/tsl';
+import { float, fog, positionWorld, rangeFogFactor, smoothstep, uv, vec3 } from 'three/tsl';
 import { IDENTITY } from '../../../../stack/grade';
 import { loadManifest, type ManifestEntry } from '../../../../manifest';
 import { loadMachineMaterial } from '../parts';
@@ -15,6 +15,9 @@ import { wrapTitleSelect } from './title-select';
 import { applyRopeShadowExperiment } from './rope-shadow-proposal';
 import { buildBenchSupports } from './supports';
 import { createBenchMetrics } from './metrics';
+import { createBenchBackdrop } from './backdrop';
+import { createBenchHour, benchHourRecord, BENCH_SUN_AZIMUTH_DEGREES, BENCH_SUN_ELEVATION_DEGREES } from './hour';
+import { BENCH_ABSENCE, holderName, setRegister, withoutCitations } from './registers';
 import { playbackSchedule, initialPlayback, advancePlayback, togglePlayback, restartPlayback, freezePlayback, playbackPresentation } from './playback';
 // The eyes intentionally removes the Vite HMR client; inline CSS has no HMR imports.
 const sheet = document.createElement('style');
@@ -80,6 +83,8 @@ function appendPageBody(host: HTMLElement, text: string): void {
 export function createBench(stack: Stack, onExit: () => void) {
   const scene = new Scene();
   scene.background = new Color('#1a2026');
+  const backdrop = createBenchBackdrop();
+  scene.backgroundNode = backdrop;
   const camera = new PerspectiveCamera(34, innerWidth / innerHeight, .001, 1000);
   const display = new Group();
   scene.add(display);
@@ -88,14 +93,22 @@ export function createBench(stack: Stack, onExit: () => void) {
   host.setAttribute('aria-label', 'Leonardo da Vinci machine bench');
   document.body.append(host);
   const header = el('header', 'bench-header');
+  // One persistent mark carries the brand, the wing and the count, so a
+  // visitor is told where they stand without spending a second mark on it.
+  const mark = el('div', 'bench-mark');
+  mark.dataset['naPersistent'] = '';
   const brand = el('p', 'bench-brand', 'Agora Cosmica');
   brand.dataset['naBrand'] = '';
-  const subtitle = el('p', 'bench-kicker', 'Leonardo da Vinci · The machine bench');
+  const kicker = el('p', 'bench-kicker');
+  const kickerWing = el('span', 'bench-kicker-wing');
+  const kickerHere = el('span', 'bench-kicker-here');
+  kicker.append(kickerWing, kickerHere);
+  mark.append(brand, kicker);
   const exit = el('a', '', 'The museum ↗');
   exit.href = '/w/vinci';
+  exit.dataset['naPersistent'] = '';
   exit.addEventListener('click', e => { e.preventDefault(); onExit(); });
-  header.append(brand, subtitle, exit);
-  const number = el('div', 'bench-number');
+  header.append(mark, exit);
   const dock = el('aside', 'bench-dock');
   const textBlock = el('div', 'bench-text');
   const title = el('h1', 'bench-title');
@@ -110,13 +123,16 @@ export function createBench(stack: Stack, onExit: () => void) {
   textBlock.append(title, certainty, label, dimensions);
   const folio = el('figure', 'bench-folio');
   const scope = el('p', 'bench-scope');
+  for (const spoken of [title, certainty, label, dimensions]) setRegister(spoken, 'label');
+  for (const explained of [folio, scope]) setRegister(explained, 'drawer');
   const languages = el('div', 'bench-lang');
   const en = el('button', '', 'EN'), de = el('button', '', 'DE');
   languages.append(en, de);
   const read = el('button', 'bench-read', 'Read the evidence ↗');
   const holdNote = el('p', 'bench-hold');
   holdNote.hidden = true;
-  dock.append(languages, textBlock, folio, holdNote, scope, read);
+  const hour = createBenchHour(controlLanguage(location.search));
+  dock.append(languages, textBlock, folio, holdNote, scope, hour.element, read);
   const footer = el('footer', 'bench-footer');
   footer.dataset['naPersistent'] = '';
   const nav = el('nav', 'bench-nav');
@@ -133,7 +149,9 @@ export function createBench(stack: Stack, onExit: () => void) {
   section.hidden = true;
   const sectionNote = el('p', 'bench-section-note');
   sectionNote.hidden = true;
-  dock.append(section, sectionNote);
+  const actions = el('div', 'bench-actions');
+  actions.append(read, section);
+  dock.append(actions, sectionNote);
   const playback = el('div', 'bench-playback');
   const play = el('button', '', 'Pause');
   const restart = el('button', '', 'Restart');
@@ -148,10 +166,11 @@ export function createBench(stack: Stack, onExit: () => void) {
   const sourceClose = el('button', 'bench-source-close', '×');
   sourceClose.setAttribute('aria-label', 'Close evidence');
   const page = el('article', 'bench-page');
+  setRegister(page, 'record');
   source.append(sourceClose, page);
   const loading = el('p', 'bench-loading', 'Preparing the object');
   loading.hidden = true;
-  host.append(header, number, dock, footer, source, loading);
+  host.append(header, dock, footer, source, loading);
   const metrics = createBenchMetrics(stack, host);
   let metricsTier = metrics ? stack.tierName() : null;
   let active = false, serial = 0, slug: MachineSlug = 'aerial-screw', lang: Language = controlLanguage(location.search), machine: ReadyMachineBuild | null = null, key: KeyLight | null = null, ready = false, lastWall = performance.now(), folioEntry: ManifestEntry | undefined, evidenceRecord: EvidenceRecord | null = null, sectionEnabled = false, lastPlaybackPaint = 0;
@@ -173,6 +192,14 @@ export function createBench(stack: Stack, onExit: () => void) {
     evidenceRecord = record;
     page.replaceChildren();
     page.append(el('h1', 'bench-title', record.title[lang]), el('p', '', record.label[lang]));
+    // The hour is the first thing the label sends a visitor here for, so the
+    // record answers it before the folio's own sections begin.
+    const computed = benchHourRecord(lang);
+    const hourSection = el('section', 'bench-hour-record');
+    hourSection.append(el('h2', '', computed.title));
+    for (const line of computed.lines) hourSection.append(el('p', line.figure ? 'bench-hour-figure' : '', line.text));
+    setRegister(hourSection, 'record');
+    page.append(hourSection);
     for (const section of record.sections[lang]) {
       page.append(el('h2', '', section.title));
       appendPageBody(page, section.body);
@@ -211,12 +238,18 @@ export function createBench(stack: Stack, onExit: () => void) {
   }
   function paint() {
     const copy = controlCopy[lang];
+    hour.setLanguage(lang);
+    host.dataset['section'] = String(sectionEnabled);
     host.setAttribute('aria-label', copy.host);
-    subtitle.textContent = copy.subtitle;
     nav.setAttribute('aria-label', copy.navigation);
     previous.setAttribute('aria-label', copy.previous);
     next.setAttribute('aria-label', copy.next);
     select.setAttribute('aria-label', copy.chooser);
+    // The wing's name goes with the brand on the wide frame; the phone keeps
+    // the bench and the count, which is the half that says how far along.
+    const [wing, bench] = copy.subtitle.split(' · ');
+    kickerWing.textContent = `${wing} · `;
+    kickerHere.textContent = `${bench} · ${String(MACHINE_SLUGS.indexOf(slug) + 1).padStart(2, '0')} / ${MACHINE_SLUGS.length}`;
     exit.textContent = copy.exitText;
     exit.setAttribute('aria-label', copy.exitLabel);
     exit.href = `/w/vinci${location.search}`;
@@ -225,11 +258,11 @@ export function createBench(stack: Stack, onExit: () => void) {
     en.setAttribute('aria-label', copy.english);
     de.setAttribute('aria-label', copy.german);
     loading.textContent = copy.loading;
-    const record = machineCatalog[slug]; host.lang = lang; host.dataset['slug'] = slug; title.textContent = record.title[lang]; label.textContent = record.label[lang]; label.dataset['naAnchor'] = `vinci/machine/${slug}`; certaintyWord.textContent = localText(lang, 'Reconstructed · assumed dimensions', 'Rekonstruiert · angenommene Maße'); const s = record.dossier.scale_m; dimensions.textContent = `${s.x.toFixed(2)} × ${s.y.toFixed(2)} × ${s.z.toFixed(2)} m · ${localText(lang, 'swept envelope', 'Bewegungsraum')}`; number.textContent = `${String(MACHINE_SLUGS.indexOf(slug) + 1).padStart(2, '0')} / 14`; scope.textContent = record.sections[lang][1]?.body ?? ''; en.setAttribute('aria-pressed', String(lang === 'en')); de.setAttribute('aria-pressed', String(lang === 'de')); read.textContent = localText(lang, 'Read the evidence ↗', 'Die Quellen lesen ↗'); select.replaceChildren(); for (const id of MACHINE_SLUGS) {
+    const record = machineCatalog[slug]; host.lang = lang; host.dataset['slug'] = slug; title.textContent = record.title[lang]; label.textContent = record.label[lang]; label.dataset['naAnchor'] = `vinci/machine/${slug}`; certaintyWord.textContent = localText(lang, 'Reconstructed · assumed dimensions', 'Rekonstruiert · angenommene Maße'); const s = record.dossier.scale_m; dimensions.textContent = `${s.x.toFixed(2)} × ${s.y.toFixed(2)} × ${s.z.toFixed(2)} m · ${localText(lang, 'swept envelope', 'Bewegungsraum')}`; select.setAttribute('aria-label', `${localText(lang, 'Machine', 'Maschine')} ${MACHINE_SLUGS.indexOf(slug) + 1} / 14`); scope.textContent = withoutCitations(record.sections[lang][1]?.body ?? ''); en.setAttribute('aria-pressed', String(lang === 'en')); de.setAttribute('aria-pressed', String(lang === 'de')); read.textContent = localText(lang, 'Read the evidence ↗', 'Die Quellen lesen ↗'); select.replaceChildren(); for (const id of MACHINE_SLUGS) {
     const option = el('option', '', machineCatalog[id].title[lang]);
     option.value = id;
     select.append(option);
-  } if(slug==='parachute'||slug==='proportional-compass')dimensions.textContent+='\n'+localText(lang,'Modern exhibition supports','Moderne Ausstellungshalterungen'); select.value = slug; chooser.refresh(); section.hidden = slug !== 'camera-obscura'; section.textContent = localText(lang, sectionEnabled ? 'Close chamber' : 'Open section', sectionEnabled ? 'Kammer schließen' : 'Schnitt öffnen'); section.setAttribute('aria-pressed', String(sectionEnabled)); sectionNote.hidden = !sectionEnabled; sectionNote.textContent = localText(lang, 'Section: roof and right wall removed. The experiment requires a closed, dark chamber.', 'Schnitt: Dach und rechte Wand ausgeblendet. Der Versuch erfordert eine geschlossene, dunkle Kammer.'); paintPlayback(); if (!source.hidden)
+  } const absence = BENCH_ABSENCE[slug]; if (absence) dimensions.textContent += '\n' + localText(lang, absence.en, absence.de); select.value = slug; chooser.refresh(); section.hidden = slug !== 'camera-obscura'; section.textContent = localText(lang, sectionEnabled ? 'Close chamber' : 'Open section', sectionEnabled ? 'Kammer schließen' : 'Schnitt öffnen'); section.setAttribute('aria-pressed', String(sectionEnabled)); sectionNote.hidden = !sectionEnabled; sectionNote.textContent = localText(lang, 'Section: roof and right wall removed. The experiment requires a closed, dark chamber.', 'Schnitt: Dach und rechte Wand ausgeblendet. Der Versuch erfordert eine geschlossene, dunkle Kammer.'); paintPlayback(); if (!source.hidden)
     reading(evidenceRecord ?? record); }
   function paintPlayback() {
     const view = playbackPresentation(schedule, playbackState, lang);
@@ -255,7 +288,7 @@ export function createBench(stack: Stack, onExit: () => void) {
   }
   else {
     folio.append(el('div', 'bench-absence', localText(lang, 'Image absent', 'Bild fehlt')));
-    cap.textContent = `${folioName}\n${String(record.dossier.folio[0]?.holder ?? '')}\n${localText(lang, 'No displayable plate in the store.', 'Kein freigegebenes Blatt im Speicher.')}`;
+    cap.textContent = `${folioName}\n${holderName(String(record.dossier.folio[0]?.holder ?? ''))}\n${localText(lang, 'No displayable plate in the store.', 'Kein freigegebenes Blatt im Speicher.')}`;
   } folio.append(cap); if (!source.hidden && evidenceRecord?.slug === slug)
     reading(evidenceRecord); await imageReady; }
   // The crane does not slew in its admitted schedule. Its measured swept body
@@ -274,9 +307,13 @@ export function createBench(stack: Stack, onExit: () => void) {
     if (slug === 'flywheel') direction.set(.8,1.2,1.7).normalize();
     if (slug === 'ball-bearing') direction.set(.8,.28,1.7).normalize();
     if (slug === 'rolling-mill') direction.set(-1.5,.75,1.5).normalize();
+    if (slug === 'lathe') direction.set(.65,.42,1.9).normalize();
     if (slug === 'parachute') direction.set(1.05,.27,1.6).normalize();
+    if (slug === 'revolving-crane') direction.set(2.6,.85,.8).normalize();
+    if (slug === 'water-lifting-screw') direction.set(-2.3,1.1,-.3).normalize();
+    if (slug === 'proportional-compass') direction.set(-.24,.22,2).normalize();
     const right = new Vector3().crossVectors(new Vector3(0, 1, 0), direction).normalize(), up = new Vector3().crossVectors(direction, right).normalize();
-    const tanY = Math.tan(17 * Math.PI / 180), tanX = tanY * innerWidth / innerHeight, width = mobile ? .84 : .65, height = mobile ? .34 : .72;
+    const tanY = Math.tan(17 * Math.PI / 180), tanX = tanY * innerWidth / innerHeight, width = mobile ? .84 : .65, height = slug === 'proportional-compass' ? (mobile ? .28 : .82) : (mobile ? .285 : .72);
     let distance = span;
     for (const x of [box.min.x, box.max.x])
       for (const y of [box.min.y, box.max.y])
@@ -290,9 +327,10 @@ export function createBench(stack: Stack, onExit: () => void) {
     camera.far = span * 50;
     camera.position.copy(centre).addScaledVector(direction, distance);
     camera.lookAt(centre);
-    camera.setViewOffset(innerWidth, innerHeight, mobile ? 0 : innerWidth * .12, mobile ? innerHeight * .22 : 0, innerWidth, innerHeight);
+    camera.setViewOffset(innerWidth, innerHeight, mobile ? 0 : innerWidth * .12, mobile ? innerHeight * .295 : slug === 'proportional-compass' ? innerHeight * .035 : 0, innerWidth, innerHeight);
     camera.updateProjectionMatrix();
     scene.fog=new Fog('#1a2026',distance+span*2,distance+span*12);
+    scene.fogNode = fog(backdrop, rangeFogFactor(float(distance+span*2), float(distance+span*12)));
   }
   async function supports(mine: number) {
     if (!machine) return;
@@ -303,8 +341,21 @@ export function createBench(stack: Stack, onExit: () => void) {
     if (mine !== serial) return;
     const groundMat = new MeshStandardNodeMaterial({ roughness: stone.roughness, metalness: stone.metalness });
     groundMat.colorNode = vec3(stone.albedo.r * .025, stone.albedo.g * .025, stone.albedo.b * .025);
-    stack.detail(groundMat, stone, { count: 3, mid: .2, maps: .4, macro: .4 });
-    const supportMat = iron.material({ count: 3 });
+    const groundDetail = stack.detail(groundMat, stone, { count: 3, mid: .06, maps: .4, macro: .4 });
+    groundMat.roughnessNode = groundDetail.roughness.max(.94);
+    const supportMat = iron.material({ count: 3, uv: uv() });
+    if (slug === 'multi-barrel-gun') {
+      // GENERATED indirect-contact approximation of the two exact wheel
+      // cylinders. Shared GTAO is off; the existing key shadow remains.
+      const gap = positionWorld.z.pow(2).add(.25).sqrt().sub(.5);
+      const onTop = float(1).sub(smoothstep(.001, .004, positionWorld.y.abs()));
+      const contact = (centreX: number) => {
+        const dx = positionWorld.x.sub(centreX).abs().sub(.04).max(0);
+        const distance = dx.pow(2).add(gap.pow(2)).sqrt();
+        return float(1).sub(smoothstep(0, .06, distance)).mul(onTop);
+      };
+      supportMat.aoNode = float(1).sub(contact(-1.08).max(contact(1.08)).mul(.75));
+    }
     supportMaterials.push(groundMat, supportMat);
     const made = buildBenchSupports({
       slug,
@@ -319,7 +370,7 @@ export function createBench(stack: Stack, onExit: () => void) {
   function lightBench() {
     const scale = machineCatalog[slug].dossier.scale_m, span = Math.max(scale.x, scale.y, scale.z);
     key?.dispose();
-    key = stack.light({ azimuth: slug === 'camera-obscura' ? 55 : slug === 'rolling-mill' ? 195 : slug === 'proportional-compass' ? 225 : 135, elevation: slug === 'proportional-compass' ? 22 : slug === 'ball-bearing' ? 26 : 42, kelvin: 4800, lux: 185, ambient: .72, reach: Math.max(24, span * 6), cascades: [span * 1.25, span * 2.5], sky: { zenith: '#707579', horizon: '#b1a895', ground: '#343532', stars: 0 } });
+    key = stack.light({ azimuth: BENCH_SUN_AZIMUTH_DEGREES, elevation: BENCH_SUN_ELEVATION_DEGREES, kelvin: 4800, lux: 185, ambient: .72, reach: Math.max(24, span * 6), cascades: [span * 1.25, span * 2.5], sky: { zenith: '#707579', horizon: '#b1a895', ground: '#343532', stars: 0 } });
     key.light.shadow.normalBias = span * .0002;
     key.light.shadow.bias = -span * .00001;
   }
@@ -341,7 +392,7 @@ export function createBench(stack: Stack, onExit: () => void) {
         if(opts.clothProbe==='flat-normal')for(const material of materials){if(material instanceof MeshStandardNodeMaterial){material.normalNode=null;material.needsUpdate=true;}}
       });
     }
-    const ropeMode = opts.ropeProbe;
+    const ropeMode = opts.ropeProbe ?? (['revolving-crane', 'lathe', 'parachute'].includes(slug) ? 'offset-2mm' : undefined);
     if (ropeMode && key) {
       if (slug !== 'lathe' && slug !== 'revolving-crane' && slug !== 'parachute') throw new Error(`No rope experiment for ${slug}`);
       ropeExperiment = applyRopeShadowExperiment(machine.object, slug, ropeMode, key.direction);
