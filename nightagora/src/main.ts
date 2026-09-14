@@ -343,6 +343,8 @@ function hangLikeness(slug: string, name: string): void {
       panePortrait.alt = ''
     }
   }
+  // the plate's own ratio, so the column takes the picture's measure
+  if (paneFigure) paneFigure.style.setProperty('--plate-ratio', hang ? String(hang.width / hang.height) : '0.72')
   if (paneCredit && hang) paneCredit.dataset['naAnchor'] = hang.id
   if (paneCreditLine) paneCreditLine.textContent = hang?.credit ?? ''
   if (paneCreditNote) paneCreditNote.textContent = hang?.note ?? ''
