@@ -108,3 +108,16 @@
   .vinci-heading:not(.vinci-construction) .vinci-kicker {font-size:7.5px;letter-spacing:.1em;}
   .vinci-heading:not(.vinci-construction) .vinci-hour {margin-top:4px;font-size:9.5px;}
 }
+
+/* A STATION STANDING IN ITS OWN ROOM. The room is the picture, so the card
+   docks beside it on the wide stage and under it on the narrow one, where
+   the hero stands in the band above the card and the card never covers it. */
+.vinci-standing {max-width:min(420px,calc(100vw - 56px));}
+.vinci-standing .vinci-status {margin:14px 0 8px;}
+.vinci-standing .vinci-promise {font-size:15px;max-width:380px;}
+@media(max-aspect-ratio:9/10) {
+  .vinci-heading.vinci-standing {top:auto;bottom:272px;left:16px;right:16px;max-width:none;margin-left:0;padding:12px 14px 13px;}
+  .vinci-standing .vinci-title {font-size:21px;margin-top:4px;}
+  .vinci-standing .vinci-status {margin:8px 0 5px;}
+  .vinci-standing .vinci-promise {font-size:13px;line-height:1.4;max-width:none;}
+}
