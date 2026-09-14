@@ -310,6 +310,7 @@ const paneDrawn = paneEl.querySelector('.pane-drawn') as HTMLElement | null
 const paneSiblings = paneEl.querySelector('.pane-siblings') as HTMLElement | null
 const panePortrait = paneEl.querySelector('.pane-portrait img') as HTMLImageElement | null
 const paneClose = paneEl.querySelector('.pane-close') as HTMLButtonElement | null
+const paneLibrary = paneEl.querySelector('.pane-library') as HTMLAnchorElement | null
 /** whose pane is open, which is also whose museum the button enters */
 let paneSlug = ''
 
@@ -331,6 +332,12 @@ function openPane(slug: string): void {
   if (paneTradition) paneTradition.textContent = star.tradition
   if (paneYears) paneYears.textContent = w.years
   if (panePromise) panePromise.textContent = star.promise
+  if (paneLibrary) {
+    const link = new URL('https://agoracosmica.org/app')
+    link.searchParams.set('figure', slug)
+    link.searchParams.set('lang', lang())
+    paneLibrary.href = link.href
+  }
   // the wheel promises only what the register can answer
   const wing = wingBySlug(slug)
   if (paneEnter) paneEnter.hidden = !wing
@@ -864,25 +871,105 @@ const instrumentsNode = document.getElementById('instruments')
 if (!railNode || !railSound || !railInstruments || !instrumentsNode) throw new Error('missing rail')
 const railEl: HTMLElement = railNode
 const instrumentsEl: HTMLElement = instrumentsNode
+const instSound = document.getElementById('inst-sound')
+const inertBefore = new Map<HTMLElement, boolean>()
 
 function syncSoundLabel(): void {
-  railSound?.setAttribute('aria-pressed', ambience.on() ? 'true' : 'false')
-  if (railSound) railSound.textContent = ambience.on() ? 'Sound · On' : 'Sound · Off'
+  const on = ambience.on()
+  for (const el of [railSound, instSound]) {
+    el?.setAttribute('aria-pressed', String(on))
+    if (el) el.textContent = say(on ? LOBBY_TEXT.soundOn : LOBBY_TEXT.soundOff)
+  }
 }
-railSound?.addEventListener('click', () => {
+function toggleSound(): void {
   if (ambience.on()) ambience.disable()
   else ambience.enable()
   syncSoundLabel()
-})
-railInstruments?.addEventListener('click', () => {
-  const open = instrumentsEl.hidden
+}
+railSound?.addEventListener('click', toggleSound)
+instSound?.addEventListener('click', toggleSound)
+
+function setInstruments(open: boolean, focus = true): void {
   instrumentsEl.hidden = !open
-  railInstruments.setAttribute('aria-expanded', open ? 'true' : 'false')
+  railInstruments?.setAttribute('aria-expanded', String(open))
+  if (open) {
+    for (const el of Array.from(document.body.children)) {
+      if (!(el instanceof HTMLElement) || el === instrumentsEl || el.matches('script, style')) continue
+      if (!inertBefore.has(el)) inertBefore.set(el, el.inert)
+      el.inert = true
+    }
+    if (focus) instSound?.focus()
+  } else {
+    for (const [el, inert] of inertBefore) el.inert = inert
+    inertBefore.clear()
+    if (focus) railInstruments?.focus()
+  }
+}
+railInstruments?.addEventListener('click', () => setInstruments(instrumentsEl.hidden))
+instrumentsEl.querySelector('.inst-close')?.addEventListener('click', () => setInstruments(false))
+instrumentsEl.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') {
+    event.preventDefault()
+    event.stopPropagation()
+    setInstruments(false)
+    return
+  }
+  if (event.key !== 'Tab') return
+  const controls = Array.from(instrumentsEl.querySelectorAll<HTMLElement>('button:not(:disabled), a, summary'))
+  const first = controls[0]
+  const last = controls[controls.length - 1]
+  if (event.shiftKey && document.activeElement === first) {
+    event.preventDefault()
+    last?.focus()
+  } else if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault()
+    first?.focus()
+  }
 })
-instrumentsEl.querySelector('.inst-close')?.addEventListener('click', () => {
-  instrumentsEl.hidden = true
-  railInstruments?.setAttribute('aria-expanded', 'false')
-})
+
+function syncInstruments(): void {
+  for (const control of instrumentsEl.querySelectorAll<HTMLElement>('[data-language]'))
+    control.setAttribute('aria-pressed', String(control.dataset['language'] === lang()))
+  for (const control of instrumentsEl.querySelectorAll<HTMLElement>('[data-tier-choice]'))
+    control.setAttribute('aria-pressed', String(control.dataset['tierChoice'] === stack.tierName()))
+  const library = instrumentsEl.querySelector<HTMLAnchorElement>('.inst-library')
+  if (library) library.href = `https://agoracosmica.org/app?lang=${lang()}`
+  syncSoundLabel()
+}
+
+function setLobbyLanguage(language: 'en' | 'de'): void {
+  const address = new URL(location.href)
+  address.searchParams.set('lang', language)
+  history.replaceState({}, '', address)
+  document.documentElement.lang = language
+  syncLobbyCopy()
+  syncReadWeights()
+  keeperScene.setScript(fireScript())
+  if (document.body.classList.contains('forge')) keeperScene.forgeStage(1)
+  const sky = HUB_SPOTS[0]
+  if (sky) sky.label = say(LOBBY_TEXT.sky)
+  if (phase === 'agora') hotspots.set(HUB_SPOTS)
+  verseEl.textContent = say(LOBBY_TEXT.fireVerse)
+  if (paneOpen) openPane(paneSlug)
+  syncInstruments()
+  syncPageReserve(true)
+}
+
+for (const control of instrumentsEl.querySelectorAll<HTMLButtonElement>('[data-language]')) {
+  control.addEventListener('click', () => {
+    const language = control.dataset['language']
+    if (language === 'en' || language === 'de') setLobbyLanguage(language)
+  })
+}
+for (const control of instrumentsEl.querySelectorAll<HTMLButtonElement>('[data-tier-choice]')) {
+  control.addEventListener('click', () => {
+    const name = control.dataset['tierChoice']
+    if (!isTierName(name)) return
+    stack.tier(name)
+    syncInstruments()
+  })
+}
+syncInstruments()
 syncSoundLabel()
 // (music standard: wakeMusic() fires with the first gesture that opens
 // the descent, for first and returning nights alike)
@@ -925,7 +1012,7 @@ declare global {
           /** a named composition at that station */
           view?: string
           /** Shell close-ups for THE EYES; the journey uses real input. */
-          shell?: 'instruments'
+          shell?: 'instruments' | 'instruments-labels'
           /** which bench a `bench` state stands at, and which of its states:
               a machine by `slug`, the table or the line by `state`, the
               picture bench by `segment` */
@@ -1081,6 +1168,7 @@ window.__forge = {
       return
     }
     document.body.classList.add('forge') // DOM beats compose instantly
+    if (opts.lang) setLobbyLanguage(opts.lang)
     /* a bench stamps the marker itself, when the thing it stands is
        actually standing: its geometry and its plate arrive after the jump
        returns, and a frame shot in between is of an empty stage */
@@ -1156,8 +1244,10 @@ window.__forge = {
     }
     if (p === 'breath') breath.forgeStage()
     // Additive shell staging, explicitly allowed by the commission's eyes loop.
-    instrumentsEl.hidden = opts.shell !== 'instruments'
-    railInstruments?.setAttribute('aria-expanded', String(opts.shell === 'instruments'))
+    setInstruments(Boolean(opts.shell), false)
+    const labels = instrumentsEl.querySelector<HTMLDetailsElement>('.inst-labels')
+    if (labels) labels.open = opts.shell === 'instruments-labels'
+    instrumentsEl.scrollTop = opts.shell === 'instruments-labels' ? instrumentsEl.scrollHeight : 0
     if (p === 'wing') {
       // a wing loads its own module, so this state lands a frame later:
       // the rig waits on the marker rather than on a guessed delay
@@ -1187,6 +1277,7 @@ window.__forge = {
       return
     }
     stack.tier(name)
+    syncInstruments()
   },
   cost() {
     return stack.cost()
@@ -1287,6 +1378,7 @@ function setPhase(next: Phase): void {
     return
   }
   if (next !== 'bench') bench.close()
+  setInstruments(false, false)
   phase = next
   document.body.dataset['phase'] = next
   stack.setScene(scene, camera, LOOK[next])
@@ -1355,6 +1447,7 @@ function setStatus(key: keyof typeof LOBBY_TEXT | ''): void {
 
 // ---- input: scroll is the only verb ----
 function push(delta: number): void {
+  if (!instrumentsEl.hidden) return
   if (phase === 'transit') return
   if (phase === 'held' && delta > 0) setPhase('descent')
   if (phase === 'descent') {
@@ -1386,6 +1479,7 @@ function push(delta: number): void {
 
 addEventListener('wheel', (e) => push(e.deltaY), { passive: true })
 addEventListener('keydown', (e) => {
+  if (!instrumentsEl.hidden) return
   // the visitor is writing or choosing, not steering
   if (e.target instanceof HTMLInputElement || e.target instanceof HTMLButtonElement) return
   if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') push(160)
@@ -1715,7 +1809,7 @@ let dragVX = 0
 let dragVY = 0
 let dragging = false
 function dragAllowed(): boolean {
-  return phase === 'agora' && !paneOpen
+  return phase === 'agora' && !paneOpen && instrumentsEl.hidden
 }
 function applyDrag(dx: number, dy: number): void {
   if (!dragAllowed()) return

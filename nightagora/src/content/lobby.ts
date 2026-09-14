@@ -33,4 +33,38 @@ export const LOBBY_TEXT = {
   skipDescent: { en: 'Skip to the fire', de: 'Direkt zum Feuer' },
   sky: { en: 'The Sky', de: 'Der Himmel' },
   skyReturn: { en: 'The Fire · return', de: 'Zurück zum Feuer' },
+  instruments: { en: 'Instruments', de: 'Instrumente' },
+  instrumentsTitle: { en: 'The instruments of the museum', de: 'Die Instrumente des Museums' },
+  soundOn: { en: 'Sound · On', de: 'Ton · An' },
+  soundOff: { en: 'Sound · Off', de: 'Ton · Aus' },
+  language: { en: 'Language', de: 'Sprache' },
+  tier: { en: 'Detail', de: 'Detailstufe' },
+  calm: { en: 'Calm', de: 'Ruhig' },
+  calmCost: {
+    en: 'Less detail. Lower graphics and memory use.',
+    de: 'Weniger Details. Braucht weniger Grafikleistung und Speicher.',
+  },
+  standard: { en: 'Standard', de: 'Standard' },
+  standardCost: {
+    en: 'More detail. Moderate graphics and memory use.',
+    de: 'Mehr Details. Braucht mehr Grafikleistung und Speicher.',
+  },
+  hero: { en: 'Hero', de: 'Detailreich' },
+  heroCost: {
+    en: 'Finest detail. Highest graphics and memory use.',
+    de: 'Die feinsten Details. Braucht am meisten Grafikleistung und Speicher.',
+  },
+  plan: { en: 'The plan · in preparation', de: 'Der Plan · in Vorbereitung' },
+  labelsTitle: {
+    en: 'How this museum labels what it shows',
+    de: 'So kennzeichnet das Museum, was es zeigt',
+  },
+  labels: {
+    en: 'The label names what you see. The drawer explains the evidence. The record gives the full sources, measurements and licences. Certainty words distinguish documented, reconstructed, conjectural and not known. The museum labels the reproduction, not the painting.',
+    de: 'Die Beschriftung nennt, was du siehst. Die Schublade erklärt die Belege. Im Nachweis stehen alle Quellen, Maße und Lizenzen. Die Wörter dokumentiert, rekonstruiert, vermutet und nicht bekannt zeigen, wie sicher eine Aussage ist. Das Museum kennzeichnet die Reproduktion, nicht das Gemälde.',
+  },
+  library: { en: 'Agora Cosmica, the library', de: 'Agora Cosmica, die Bibliothek' },
+  terms: { en: 'Terms', de: 'Nutzungsbedingungen' },
+  privacy: { en: 'Privacy', de: 'Datenschutz' },
+  close: { en: 'Close', de: 'Schließen' },
 } satisfies Record<string, Bilingual>

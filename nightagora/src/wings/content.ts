@@ -5,9 +5,8 @@
 
 export type Lang = 'en' | 'de'
 
-/** The page's language, which is also the language the door hands the app.
-    The night has no language switch of its own yet, so the page's own lang
-    attribute decides and ?lang=de overrides it for a shared link. */
+/** The page's language is also the language the door hands the library.
+    The lobby switch and shared links use the same query parameter. */
 export function lang(): Lang {
   const asked = new URLSearchParams(location.search).get('lang')
   if (asked === 'de' || asked === 'en') {

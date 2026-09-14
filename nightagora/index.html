@@ -1127,6 +1127,7 @@
         <p class="pane-ink" data-na-claim="tradition" data-na-disclosure="ink" data-na-anchor="lobby/figure-portraits" data-na-anchor-class="GENERATED">An AI Echo · An interpretation, not a recording</p>
         <button class="pane-enter" type="button" hidden>Enter the museum</button>
         <p class="pane-drawn" hidden>This world is still being drawn</p>
+        <a class="pane-library" data-lobby="library" href="https://agoracosmica.org/app?lang=en" target="_blank" rel="noopener">Agora Cosmica, the library</a>
         <p class="pane-sib-label"></p>
         <div class="pane-siblings"></div>
       </div>
@@ -1136,16 +1137,35 @@
   <div id="wing" hidden></div>
   <div id="rail" hidden data-na-persistent data-na-anchor="lobby/rail">
     <button id="rail-sound" type="button" aria-pressed="false">Sound · Off</button>
-    <button id="rail-instruments" type="button" aria-haspopup="true" aria-expanded="false">Instruments</button>
+    <button id="rail-instruments" type="button" data-lobby="instruments" aria-haspopup="dialog" aria-controls="instruments" aria-expanded="false">Instruments</button>
   </div>
-  <div id="instruments" hidden>
-    <p class="inst-kicker">The Instruments</p>
-    <nav class="inst-links">
-      <a href="https://agoracosmica.org/app?lang=en">Classic Agora Cosmica</a>
-      <a href="https://agoracosmica.org/terms" target="_blank" rel="noopener">Terms</a>
-      <a href="https://agoracosmica.org/privacy" target="_blank" rel="noopener">Privacy</a>
-    </nav>
-    <button class="inst-close" type="button">Close</button>
+  <div id="instruments" role="dialog" aria-modal="true" aria-labelledby="instruments-title" data-register="drawer" hidden>
+    <p id="instruments-title" class="inst-kicker" data-lobby="instrumentsTitle">The instruments of the museum</p>
+    <div class="inst-links">
+      <button id="inst-sound" type="button" aria-pressed="false">Sound · Off</button>
+      <fieldset class="inst-setting">
+        <legend data-lobby="language">Language</legend>
+        <div class="inst-options">
+          <button type="button" data-language="en" lang="en" aria-pressed="true">EN</button>
+          <button type="button" data-language="de" lang="de" aria-pressed="false">DE</button>
+        </div>
+      </fieldset>
+      <fieldset class="inst-setting inst-tiers">
+        <legend data-lobby="tier">Detail</legend>
+        <button type="button" data-tier-choice="calm" aria-pressed="false"><span data-lobby="calm">Calm</span><small data-lobby="calmCost">Less detail. Lower graphics and memory use.</small></button>
+        <button type="button" data-tier-choice="standard" aria-pressed="false"><span data-lobby="standard">Standard</span><small data-lobby="standardCost">More detail. Moderate graphics and memory use.</small></button>
+        <button type="button" data-tier-choice="hero" aria-pressed="false"><span data-lobby="hero">Hero</span><small data-lobby="heroCost">Finest detail. Highest graphics and memory use.</small></button>
+      </fieldset>
+      <button type="button" data-lobby="plan" disabled>The plan · in preparation</button>
+      <details class="inst-labels">
+        <summary data-lobby="labelsTitle">How this museum labels what it shows</summary>
+        <p data-lobby="labels">The label names what you see. The drawer explains the evidence. The record gives the full sources, measurements and licences. Certainty words distinguish documented, reconstructed, conjectural and not known. The museum labels the reproduction, not the painting.</p>
+      </details>
+      <a class="inst-library" data-lobby="library" href="https://agoracosmica.org/app?lang=en">Agora Cosmica, the library</a>
+      <a data-lobby="terms" href="https://agoracosmica.org/terms" target="_blank" rel="noopener">Terms</a>
+      <a data-lobby="privacy" href="https://agoracosmica.org/privacy" target="_blank" rel="noopener">Privacy</a>
+    </div>
+    <button class="inst-close" type="button" data-lobby="close">Close</button>
   </div>
   <!-- The night, in plain words: an honest static mirror of what the
        experience shows, for readers without WebGL, screen readers, and
