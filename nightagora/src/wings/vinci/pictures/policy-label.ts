@@ -100,8 +100,8 @@ function exhibitNote(work: PictureWork, entries: readonly ResolvedPicturePlate[]
       de: 'Die Zuschreibung bleibt umstritten. Das restaurierte Gemälde, die historische Cook-Fotografie und der Druck von 1844 sind unterschiedliche Bilder.',
     }
     case 'leda-spiridon': return {
-      en: 'A follower’s painting after the lost Leda. The recorded size is 130 × 77.5 cm. The photograph includes the frame.',
-      de: 'Das Gemälde eines Nachfolgers nach der verlorenen Leda. Die verzeichneten Maße sind 130 × 77,5 cm. Der Rahmen ist mit abgebildet.',
+      en: 'A follower’s painting after the lost Leda. The recorded size is 130 × 77.5 cm. The selected photograph shows the unframed panel.',
+      de: 'Das Gemälde eines Nachfolgers nach der verlorenen Leda. Die verzeichneten Maße sind 130 × 77,5 cm. Die gewählte Aufnahme zeigt die Tafel ohne Rahmen.',
     }
   }
   if (work.reproduction_note_en.startsWith('Keep the raster')) return GENERIC_NOTE

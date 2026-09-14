@@ -183,7 +183,7 @@ test('Three registers retain 120 bilingual titles, inherited language and all lo
 });
 test('Historical twelve DG files remain locked while the current source policy admits new plates', () => {
   assert.equal(allPlates.length, 12);
-  assert.equal(resolved.length, 30);
+  assert.equal(resolved.length, 31);
   const heldAdmitted = source.held_assets.filter(e => e.display_admitted);
   assert.equal(heldAdmitted.length, 12);
   assert(heldAdmitted.every(e => allPlates.some(p => p.plateFile === e.file)));
@@ -192,8 +192,10 @@ test('Historical twelve DG files remain locked while the current source policy a
   for (const work of register.REGISTER.filter(w => w.rights_class !== 'DG')) {
     assert.equal(work.plate_file, null); assert.equal(work.plate_pixels, null);
   }
+  // The 14 September 2026 reclassification closed the register's last source
+  // absence: the 1907 Wilton photogravure supplies the Leda.
   const absent = register.REGISTER.filter(work => !register.findPlateEntries(work, manifest).length).map(w => w.id);
-  assert.equal(JSON.stringify(absent), JSON.stringify(['leda-wilton']));
+  assert.equal(JSON.stringify(absent), JSON.stringify([]));
   for (const plate of resolved) {
     assert.notEqual(plate.preview.id, plate.plate.id);
     assert.match(plate.plate.sha256, /^[a-f0-9]{64}$/); assert.match(plate.preview.sha256, /^[a-f0-9]{64}$/);
@@ -204,13 +206,13 @@ test('Historical twelve DG files remain locked while the current source policy a
 test('All current primary and alternate sources are unique policy-validated pairs; superseded files stay unselected', () => {
   const policy = load(path.join(pictureRoot, 'policy.ts'));
   const selections = register.REGISTER.flatMap(work => policy.resolvePicturePolicy(work, manifest).all);
-  assert.equal(selections.length, 32);
+  assert.equal(selections.length, 33);
   const joinedEntries = selections.flatMap(plate => [plate.preview, plate.plate]);
-  assert.equal(new Set(joinedEntries.map(e => e.id)).size, 64);
-  assert.equal(new Set(joinedEntries.map(e => `${e.wing}/${e.path}`)).size, 64);
+  assert.equal(new Set(joinedEntries.map(e => e.id)).size, 66);
+  assert.equal(new Set(joinedEntries.map(e => `${e.wing}/${e.path}`)).size, 66);
   const manifested = rawManifest.assets.filter(e => e.wing === 'wing-vinci' && ['painting-preview', 'painting-plate'].includes(e.role));
-  assert.equal(manifested.length, 78);
-  assert.equal(manifested.filter(e => e.role === 'painting-plate' && e.tier).length, 27);
+  assert.equal(manifested.length, 92);
+  assert.equal(manifested.filter(e => e.role === 'painting-plate' && e.tier).length, 34);
   manifested.forEach(entry => policy.validatePaintingRecord(entry));
   const superseded = new Set(manifested.flatMap(e => e.supersedes ?? []));
   assert(selections.every(e => !superseded.has(e.plate.id)));

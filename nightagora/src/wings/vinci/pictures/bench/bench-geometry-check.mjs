@@ -128,11 +128,14 @@ test('Actual buildHang fields use metres, with fixed physical backing and mouldi
   close(physical.userData.profile.width_m, .052, '52 mm world moulding')
   close(physical.userData.profile.depth_m, .045, '45 mm body depth')
 })
-test('Unknown painted extent and Wilton catalogue furniture never become measured apertures', () => {
+test('Unknown painted extent and the Wilton catalogue figure never become measured apertures', () => {
   const sala = hang.frames.find(frame => frame.work.id === 'sala-delle-asse')
   const wilton = hang.frames.find(frame => frame.work.id === 'leda-wilton')
   assert.equal(sala.aperture, null); assert.equal(pictures.trueScale(sala.work), null)
-  assert.equal(wilton.aperture, null); assert.equal(wilton.cards.length, 0)
+  // The 14 September 2026 reclassification supplied the 1907 photogravure, so
+  // the catalogue card now carries a reproduction. Its 96.52 by 73.66 cm stays
+  // a quoted catalogue figure: no measured aperture is created from it.
+  assert.equal(wilton.aperture, null); assert.equal(wilton.cards.length, 1)
   assert(!physical.userData.apertures.some(item => item.id === 'leda-wilton'))
   const documentMount = hang.wall.getObjectByName('unmeasured-document-mount/sala-delle-asse')
   assert.equal(documentMount.userData.physicalPaintingExtent, null)

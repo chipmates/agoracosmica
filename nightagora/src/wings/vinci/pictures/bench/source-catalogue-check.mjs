@@ -66,12 +66,12 @@ function dom() {
 const results = []
 function test(name, run) { try { run(); results.push({ name, ok: true }) } catch (error) { results.push({ name, ok: false, error: error.stack }) } }
 
-test('All 34 surviving identities resolve once, including two supplements and three distinct Salvator images', () => {
+test('All 35 surviving identities resolve once, including two supplements and three distinct Salvator images', () => {
   const records = catalogue.sourceCatalogueRecords(manifest)
-  assert.equal(records.length, 34); assert.equal(new Set(records.map(record => record.identity)).size, 34)
+  assert.equal(records.length, 35); assert.equal(new Set(records.map(record => record.identity)).size, 35)
   const full = raw.filter(entry => entry.role === 'painting-plate')
   const replaced = new Set(full.flatMap(entry => entry.supersedes ?? []))
-  assert.equal(replaced.size, 5); assert(records.every(record => !replaced.has(record.source.plate.id)))
+  assert.equal(replaced.size, 11); assert(records.every(record => !replaced.has(record.source.plate.id)))
   assert.deepEqual([...records].filter(record => !record.inPictureRegister).map(record => record.identity).sort(), ['turin-self-portrait', 'vitruvian-man'])
   assert.equal(records.find(record => record.identity === 'turin-self-portrait').title.en, 'Presumed self-portrait')
   assert.equal(records.find(record => record.identity === 'vitruvian-man').title.de, 'Vitruvianischer Mensch')
@@ -84,7 +84,7 @@ test('All 34 surviving identities resolve once, including two supplements and th
 test('Every source renders supplied bilingual honesty and licence literally, with complete manifested images and pixel extents', () => {
   const h = dom(), panel = catalogue.createSourceCatalogue(manifest, { document: h.document })
   const allowed = new Set(panel.records.flatMap(record => [record.source.preview, record.source.plate]).map(entry => `/catalogue-assets/${entry.wing}/${entry.path}`))
-  assert.equal(descendants(panel.root).filter(node => node.tagName === 'OPTION').length, 34)
+  assert.equal(descendants(panel.root).filter(node => node.tagName === 'OPTION').length, 35)
   for (const record of panel.records) {
     assert(panel.select(record.identity)); assert.equal(panel.selected(), record.identity)
     const languageNodes = byClass(panel.root, 'picture-source-catalogue-language')
@@ -139,7 +139,7 @@ test('Pagination retains every source and thumbnail selection keeps keyboard foc
     if (later.disabled) break
     later.click()
   }
-  assert.equal(seen.size, 34)
+  assert.equal(seen.size, 35)
   const button = byClass(panel.root, 'picture-source-catalogue-thumb')[0]
   button.click(); assert.equal(panel.selected(), button.dataset.sourceIdentity)
   assert.equal(h.document.activeElement.tagName, 'SELECT'); assert.equal(notifications.at(-1), panel.selected())
