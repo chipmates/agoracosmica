@@ -1,10 +1,12 @@
 import {
-  Color, DoubleSide, Group, InstancedMesh, Matrix4, Mesh, MeshPhysicalNodeMaterial, MeshStandardNodeMaterial,
+  Color, DoubleSide, FrontSide, Group, InstancedMesh, Matrix4, Mesh, MeshPhysicalNodeMaterial, MeshStandardNodeMaterial,
   type BufferGeometry,
 } from 'three/webgpu'
-import { float, uv, vec2, vec3 } from 'three/tsl'
+import { float, normalGeometry, uv, vec2, vec3 } from 'three/tsl'
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js'
 import type { MaterialSet, Stack } from '../../../stack'
+import { createGlassSeatMaterial } from './glass-seat'
+import { createFlywheelSpokeArms } from './flywheel-overlap'
 import { createMutableSweep, geometryForPart, type MutableSweep } from './geometry'
 import type { Assembly, Dossier, PartSpec } from './types'
 export type { Assembly } from './types'
@@ -110,11 +112,11 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Assemb
   const sectionParts = new Set(dossier.slug === 'camera-obscura' ? ['roof', 'right-wall'] : [])
   const names = [...new Set(dossier.parts.map(p => p.material.class))]
   const surfaceCache = new Map<string, Promise<Surface>>()
-  const makeSurface = async (name: string): Promise<Surface> => {
+  const makeSurface = async (name: string, quietBank = false, quietWood = false): Promise<Surface> => {
     const set = await loadMachineMaterial(stack, libraryName(name))
     const glass = /glass/.test(name), water = /water/.test(name)
     const material: Surface = glass || water
-      ? new MeshPhysicalNodeMaterial({metalness: 0, roughness: glass ? 0.14 : 0.16, transparent: true, opacity: glass ? 0.06 : 0.52, depthWrite: false})
+      ? new MeshPhysicalNodeMaterial({metalness: 0, roughness: glass ? 0.1 : 0.16, transparent: true, opacity: glass ? 0.18 : 0.52, depthWrite: false})
       : new MeshStandardNodeMaterial({metalness: set.metalness, roughness: set.roughness})
     material.name = `${dossier.slug}:${name}:${set.name}`
     // Beam UVs already put the member's long axis along V, in metres.
@@ -131,13 +133,27 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Assemb
     // the borrowed set's cloth photograph or drape. The shared set is intact.
     const detailSet: MaterialSet = glass ? {
       ...set, maps: null, grain: null, detile: 0, metalness: 0,
-      albedo: new Color('#d8e4df'), variation: new Color('#cdd8d2'),
-      roughness: 0.14, normalStrength: 0.025, scale: [1, 1],
+      albedo: new Color('#fcfefd'), variation: new Color('#f7fbf9'),
+      roughness: 0.03, normalStrength: 0.008, scale: [1, 1],
       scales: [0.5, 0.025, 0.0009],
       detail: {macro: 0.5, macroContrast: 0.08, mid: 0.025, micro: 0.06},
+    } : /linen/.test(name) && !/thread/.test(name) ? {
+      ...set, normalStrength: .3,
+      grain: set.grain ? {...set.grain, pitch: .16, relief: .28, shade: .24, sheen: .025, fold: .8, tooth: .008} : null,
+    } : quietBank || quietWood ? {
+      ...set, normalStrength: quietBank ? .18 : .12,
+      grain: set.grain ? {...set.grain, relief: .08, shade: .12, sheen: .04} : null,
+    } : dossier.slug === 'flywheel' && set.name === 'limestone-pale' ? {
+      ...set, scale: [.15, .15], scales: [.15, .018, .0014], normalStrength: .28,
+      detail: {...set.detail, macro: .65, macroContrast: .35, mid: .25, micro: .3},
     } : set
     // Density falloff stays active on every scale, including the calm tier.
-    const detail = stack.detail(material, detailSet, {uv: detailUV, count: 3, maps: glass ? 0 : 1, fade: /linen/.test(name) && !/thread/.test(name) ? [12, 100] : [6, 35]})
+    const detail = stack.detail(material, detailSet, {uv: detailUV, count: 3, maps: glass ? 0 : quietWood ? .85 : 1, fade: (/linen/.test(name) && !/thread/.test(name)) || /iron/.test(name) || set.name === 'oak-beams' ? [12, 100] : [6, 35]})
+    if (quietBank || quietWood) {
+      const oak = new Color(quietBank ? '#86755f' : '#847967')
+      const fibres = detail.albedo.dot(vec3(.2126, .7152, .0722))
+      material.colorNode = vec3(oak.r, oak.g, oak.b).mul(fibres.mul(quietBank ? .55 : .8).add(quietBank ? .45 : .2)).mul(detail.occlusion)
+    }
     if (/linen/.test(name) && !/thread/.test(name)) {
       material.side = DoubleSide
       // GENERATED unbleached flax tint over the CC0 weave's luminance.
@@ -147,15 +163,50 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Assemb
       material.colorNode = vec3(flax.r, flax.g, flax.b).mul(weave).mul(detail.occlusion)
     }
     if (glass || water) {
-      material.side = DoubleSide
+      material.side = glass ? FrontSide : DoubleSide
+      if (glass && material instanceof MeshPhysicalNodeMaterial) {
+        material.ior = 1.48
+        material.transmission = .97
+        material.thickness = .002
+        material.opacity = 1
+        material.transparent = false
+        material.depthWrite = true
+        material.attenuationColor.set('#e4f0e9')
+        material.attenuationDistance = .8
+        material.clearcoat = .35
+        material.clearcoatRoughness = .05
+        material.roughnessNode = float(.03)
+      }
       if (water) {
         material.colorNode = vec3(0.025, 0.065, 0.06).mul(detail.albedo)
         material.roughnessNode = float(0.16)
       }
     }
+    if (dossier.slug !== 'proportional-compass' && /iron/.test(name)) {
+      const iron = new Color('#91999b')
+      const grain = detail.albedo.dot(vec3(.2126, .7152, .0722))
+      const caps = dossier.slug === 'multi-barrel-gun' ? normalGeometry.y.abs().mul(.14).add(.86) : float(1)
+      material.colorNode = vec3(iron.r, iron.g, iron.b).mul(grain.mul(.55).add(.27)).mul(detail.occlusion).mul(caps)
+      material.roughnessNode = detail.roughness.mul(.78).clamp(.4, .72)
+    }
+    if (dossier.slug === 'proportional-compass' && /iron/.test(name)) {
+      const ironTint = new Color('#a3a6a1')
+      const density = detail.albedo.dot(vec3(.2126, .7152, .0722))
+      material.colorNode = vec3(ironTint.r, ironTint.g, ironTint.b).mul(density.mul(.5).add(.32)).mul(detail.occlusion)
+      material.roughnessNode = detail.roughness.mul(.7).clamp(.38, .68)
+    }
     if (/ink/.test(name)) material.colorNode = vec3(0.009, 0.007, 0.005).mul(detail.albedo)
     if (/paper/.test(name)) material.colorNode = vec3(0.69, 0.65, 0.55).mul(detail.albedo)
     if (/lead/.test(name)) material.colorNode = vec3(0.16, 0.17, 0.18).mul(detail.albedo)
+    if (['revolving-crane', 'lathe', 'parachute'].includes(dossier.slug) && /rope|hemp/.test(name)) {
+      // The exact 10 mm swept cord keeps its silhouette. Its three-lobed
+      // geometry carries the twist; a coarse cloth-like normal buries it.
+      const hemp = new Color(dossier.slug === 'revolving-crane' ? '#ad9367' : '#c5ae80')
+      const fibres = detail.albedo.dot(vec3(.2126, .7152, .0722))
+      material.colorNode = vec3(hemp.r, hemp.g, hemp.b).mul(fibres.mul(.45).add(.55)).mul(detail.occlusion)
+      material.normalNode = null
+      material.roughnessNode = float(.86)
+    }
     return material
   }
   await Promise.all(names.map(async name => {
@@ -185,12 +236,31 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Assemb
         const sweep = createMutableSweep(points, radius, /rope|hemp|thread/.test(part.material.class), stack.tierName())
         mutableSweeps.set(part.id, sweep)
         geometry = sweep.geometry
+      } else if (dossier.slug === 'flywheel' && part.id === 'spoke-z') {
+        geometry = createFlywheelSpokeArms(part, dossier.parts.find(p => p.id === 'spoke-x')!)
       } else geometry = geometryForPart(part, stack.tierName())
       if (!dynamic.has(part.id)) geometryCache.set(signature, geometry)
       geometries.add(geometry)
     }
     let material = materials.get(part.material.class)!
-    if (typeof part.shape !== 'string' && part.shape.double_sided && material.side !== DoubleSide) {
+    if (dossier.slug === 'multi-barrel-gun' && /^bank-[012]$/.test(part.id)) {
+      let bank = materials.get('quiet-bank')
+      if (!bank) { bank = await makeSurface(part.material.class, true); materials.set('quiet-bank', bank) }
+      material = bank
+    }
+    const roundedWood = libraryName(part.material.class) === 'oak-beams' && (
+      part.shape === 'cylinder' || part.shape === 'profile of revolution' || part.shape === 'sphere'
+      || (dossier.slug === 'inclinometer' && part.id.startsWith('journal-post')))
+    if (roundedWood) {
+      let dressed = materials.get('quiet-rounded-wood')
+      if (!dressed) { dressed = await makeSurface(part.material.class, false, true); materials.set('quiet-rounded-wood', dressed) }
+      material = dressed
+    }
+    if (dossier.slug === 'inclinometer' && part.id === 'deck') {
+      material = createGlassSeatMaterial(material)
+      materials.set('glass-foot-light', material)
+    }
+    if (typeof part.shape !== 'string' && part.shape.double_sided && !/glass/.test(part.material.class) && material.side !== DoubleSide) {
       const key = material.uuid
       let both = sidedMaterials.get(key)
       if (!both) {

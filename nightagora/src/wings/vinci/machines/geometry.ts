@@ -4,6 +4,7 @@ import {
 } from 'three/webgpu'
 import type { TierName } from '../../../stack'
 import type { Coordinates, PartSpec } from './types'
+import { createGlassCoverShell } from './glass-cover'
 
 const TAU = Math.PI * 2
 const at = (p: readonly number[], n: number): number => p[n] ?? 0
@@ -234,7 +235,7 @@ function exactMesh(part: PartSpec): BufferGeometry {
 }
 
 /** UVs are metres so the library's grain cannot swell with the machine. */
-function metricPlanarUV(geometry: BufferGeometry, alongMember = false): void {
+export function metricPlanarUV(geometry: BufferGeometry, alongMember = false): void {
   const p = geometry.getAttribute('position'), n = geometry.getAttribute('normal')
   geometry.computeBoundingBox()
   const size = geometry.boundingBox!.getSize(new Vector3())
@@ -300,7 +301,15 @@ export function geometryForPart(part: PartSpec, tier: TierName = 'standard'): Bu
       break
     }
     case 'profile': geometry = extrudeProfile(part, tier); break
-    case 'mesh': geometry = exactMesh(part); break
+    case 'mesh': {
+      geometry = exactMesh(part)
+      if (part.id === 'wind-shield' && /glass/.test(part.material.class)) {
+        const outer = geometry
+        geometry = createGlassCoverShell(outer, required(d.nominal_thickness, 'nominal_thickness'))
+        outer.dispose()
+      }
+      break
+    }
     case 'tube': {
       const points = s?.centreline_m ?? d.centreline
       if (!points) throw new Error(`Missing centreline ${part.id}`)
