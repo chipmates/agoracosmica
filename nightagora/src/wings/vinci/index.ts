@@ -40,7 +40,7 @@ import { collectVinciLabelOccluders, createVinciLabelAnchor, type VinciLabelAnch
 import { pathSpecifications } from './paths'
 import { roadGradeProvenance } from './road-grade'
 import { apronProvenance } from './apron'
-import { vinciContent, vinciConstructionStatus, vinciReconstruction, vinciCollectionThreshold, vinciRoomStationIds, vinciHourArithmetic, vinciHourSpoken, vinciViewNames, vinciHourLabel, vinciHourIntegrity, vinciCertaintyWords, vinciPlantingAssumptions, vinciWeatherAssumptions, type VinciCertainty, type VinciStatement, type VinciStationId, type VinciText } from './content'
+import { vinciContent, vinciLegacyStationIds, vinciConstructionStatus, vinciReconstruction, vinciCollectionThreshold, vinciRoomStationIds, vinciHourArithmetic, vinciHourSpoken, vinciViewNames, vinciHourLabel, vinciHourIntegrity, vinciCertaintyWords, vinciPlantingAssumptions, vinciWeatherAssumptions, type VinciCertainty, type VinciStatement, type VinciStationId, type VinciText } from './content'
 import wingCss from './wing.css?inline'
 
 const text=(value:VinciText):string=>value[lang()]
@@ -525,6 +525,7 @@ export function createWing():VinciWingModule {
   }
   return {
     stations:vinciContent.map(s=>({id:s.id,name:text(s.name),question:text(s.door)})),
+    legacyStationIds:vinciLegacyStationIds,
     doorDisclosure:'first-press',
     openSources(tab='station'){if(!standing){pendingView=`sources-${tab}`;return}sources.select(tab);mode=2;paintDock()},
     setExhibitSources(exhibit){exhibitSources=exhibit;if(standing){sources.resetScroll();paintDock()}},
@@ -539,6 +540,8 @@ export function createWing():VinciWingModule {
       if(!hosts){mount(h);station=card=index;paintHeader();schedule();return}
       // A station asked for before the place is built is remembered, not lost.
       if(!standing){station=card=index;paintHeader();return}
+      const closeSources=mode===2
+      if(closeSources)mode=1
       exhibitSources=null;endInspection();if(station!==index)sources.resetScroll();station=index;activeView='';measurement.hide()
       const s=vinciContent[index]!,cut=cutToStation()
       rail.set(s.id,stationPose(s.id,narrow()),cut,narrow())
@@ -546,6 +549,7 @@ export function createWing():VinciWingModule {
       // rail mark is pressed: a title that names the next room over the room
       // you are still standing in is a lie the frame tells.
       if(cut||rail.navigation.completed===s.id){card=index;dock.scrollTop=0;aimPrint(s.id);exposureAt=s.id;paintHeader();paintDock()}
+      else if(closeSources)paintDock()
     },
     view(id){if(!standing){pendingView=id;return}showView(id)},
     look(y,p){if(standing)rail.look(y,p)},

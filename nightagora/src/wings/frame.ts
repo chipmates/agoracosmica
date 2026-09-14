@@ -82,6 +82,8 @@ export interface WingModule {
   navigation?(): { completed?: string; target?: string; question?: string }
   /** Keep the library disclosure behind the first door press of this visit. */
   doorDisclosure?: 'first-press'
+  /** Old numeric deep links resolve through this fixed order; new links use ids. */
+  legacyStationIds?: readonly string[]
   /** compose one station into the frame's hosts */
   show(index: number, hosts: WingHosts): void
   /** strike everything the wing put on the page */
@@ -128,15 +130,28 @@ export interface WingFrame {
   manifest(): ManifestEntry[]
 }
 
-/** The station the URL is standing at, or 0. The hash is the return path,
-    and it is written as an index; a station's own id is read as well, so a
-    link written by hand stands where its name says. */
+/** The hash accepts station ids and legacy zero-based positions. A wing maps
+    legacy positions through its original order when the frame opens it. */
 export function stationFromHash(): number | string {
   const value = /(?:^|[#&])s=([a-z0-9-]+)/.exec(location.hash)?.[1]
   if (value === undefined) return 0
   if (!/^\d+$/.test(value)) return value
   const n = Number(value)
-  return Number.isInteger(n) && n >= 0 ? n : 0
+  // Preserve explicit numeric hash text so ordinary numeric API indices and
+  // a missing hash still refer to the current walk's order.
+  return Number.isInteger(n) && n >= 0 ? value : 0
+}
+
+/** Only numeric text from a hash uses the old positions. Numeric API calls
+ * address the current order, including an ordinary entry at position zero. */
+export function resolveWingStationIndex(at: number | string, stations: readonly WingStation[], legacy?: readonly string[]): number {
+  const clamp = (index: number) => Number.isInteger(index) ? Math.max(0, Math.min(index, stations.length - 1)) : 0
+  if (typeof at === 'number') return clamp(at)
+  if (/^\d+$/.test(at)) {
+    if (!legacy) return clamp(Number(at))
+    at = legacy[Number(at)] ?? ''
+  }
+  return Math.max(0, stations.findIndex(station => station.id === at))
 }
 
 /** The library's own door. The app's entry parser resolves NAMED ask tags
@@ -293,7 +308,7 @@ export function createWingFrame(
     const selected = rail.children[index] as HTMLElement | undefined
     if (selected && !wing.navigation) rail.scrollLeft = selected.offsetLeft - rail.clientWidth / 2 + 22
     // the return path: a reload stands the visitor where they stood
-    const hash = count > 1 || index > 0 ? `#s=${index}` : ''
+    const hash = count > 1 || index > 0 ? `#s=${wing.legacyStationIds ? idAt(index) : index}` : ''
     const url = `/w/${entry.slug}${location.search}${hash}`
     if (location.pathname + location.search + location.hash !== url)
       history.replaceState({}, '', url)
@@ -325,11 +340,7 @@ export function createWingFrame(
       index = 0
       host.hidden = false
       paintRail()
-      if (typeof at === 'string') {
-        if (!gotoId(at)) goto(0)
-      } else {
-        goto(at)
-      }
+      goto(resolveWingStationIndex(at, wing!.stations, wing?.legacyStationIds))
       if (view) wing?.view?.(view)
       const selected = rail.children[index] as HTMLElement | undefined
       if (!reuse && selected) rail.scrollLeft = selected.offsetLeft - rail.clientWidth / 2 + 22

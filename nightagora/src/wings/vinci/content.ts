@@ -527,9 +527,19 @@ const seeds: readonly StationSeed[] = [
     [grave], 'brief/CONCEPT-OPUS.md §3 S19'),
 ];
 
+/** Numeric links from the original walk always keep their original meaning. */
+export const vinciLegacyStationIds: readonly VinciStationId[] = Object.freeze([
+  'arrival', 'courtyard', 'hall', 'oratory', 'study', 'chamber', 'garden',
+  'line-early', 'line-late', 'line-amboise', 'picture-room', 'supper-wall',
+  'reading-table', 'scattered', 'flight', 'works', 'body', 'myths', 'grave',
+]);
+
+const doorsByStation = new Map(doorData.doors.map(door => [door.station, door]));
+if (doorsByStation.size !== doorData.doors.length) throw new Error('Duplicate station door');
+if (doorsByStation.size !== seeds.length) throw new Error('Station doors do not match the walk');
 export const vinciContent: readonly VinciStationContent[] = seeds.map((station, index) => {
-  const door = doorData.doors[index];
-  if (!door || door.station !== station.id) throw new Error(`Door order does not match station ${station.id}`);
+  const door = doorsByStation.get(station.id);
+  if (!door || door.station !== station.id) throw new Error(`Door does not match station ${station.id}`);
   return {
     ...station, number: index + 1, carrierClass: 'GENERATED', carrierCertainty: 'reconstructed',
     door: { station: station.id, en: door.question_en, de: door.question_de },

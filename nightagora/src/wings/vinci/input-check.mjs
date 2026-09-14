@@ -21,6 +21,24 @@ for(const item of cases){
   item.actual=item.events.map(([time,delta,mode])=>{now=time;return step(delta,mode,844)})
   item.ok=JSON.stringify(item.actual)===JSON.stringify(item.expected)
 }
-const ok=cases.every(item=>item.ok)
-console.log(JSON.stringify({ok,replacesEyes:false,cases},null,2))
+const frameSource=readFileSync(new URL('../frame.ts',import.meta.url),'utf8')
+const address={hash:''},frame={exports:{},location:address,require:()=>({})}
+vm.runInNewContext(ts.transpileModule(frameSource,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,frame)
+const old=['arrival','courtyard','picture-room'],reordered=['picture-room','arrival','courtyard'].map(id=>({id,name:id,question:''}))
+const linkCases=[
+  {name:'missing hash opens current first station',hash:'',expected:0},
+  {name:'legacy zero still names original arrival',hash:'#s=0',expected:1},
+  {name:'legacy position survives a reorder',hash:'#s=2',expected:0},
+  {name:'named station survives a reorder',hash:'#s=courtyard',expected:2},
+  {name:'unknown station falls back to current first',hash:'#s=missing',expected:0},
+  {name:'unknown legacy position falls back to current first',hash:'#s=99',expected:0},
+].map(item=>{
+  address.hash=item.hash
+  const actual=frame.exports.resolveWingStationIndex(frame.exports.stationFromHash(),reordered,old)
+  return {...item,actual,ok:actual===item.expected}
+})
+linkCases.push({name:'numeric API uses current order',actual:frame.exports.resolveWingStationIndex(2,reordered,old),expected:2,ok:frame.exports.resolveWingStationIndex(2,reordered,old)===2})
+linkCases.push({name:'wings without legacy maps keep numeric hashes',actual:frame.exports.resolveWingStationIndex('1',reordered),expected:1,ok:frame.exports.resolveWingStationIndex('1',reordered)===1})
+const ok=cases.every(item=>item.ok)&&linkCases.every(item=>item.ok)
+console.log(JSON.stringify({ok,replacesEyes:false,cases,linkCases},null,2))
 if(!ok)process.exitCode=1

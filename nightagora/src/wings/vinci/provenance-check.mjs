@@ -171,21 +171,31 @@ section('canonical stations, questions, hour and carrier claims', () => {
   const file = `${wingDir}/content.ts`, raw = sourceText(file);
   const canonicalFile = 'src/wings/vinci/data/doors.json', canonical = json(canonicalFile);
   const compiled = ts.transpileModule(raw, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText;
-  const exported = {};
   // Execute only this data module; its sole permitted dependency is the supplied door JSON.
-  new vm.Script(compiled, { filename: file }).runInNewContext({ exports: exported, require(specifier) {
-    if (specifier !== './data/doors.json?raw') throw new Error(`Unexpected content dependency: ${specifier}`);
-    return { default: sourceText(canonicalFile) };
-  } }, { timeout: 1000 });
+  const script = new vm.Script(compiled, { filename: file });
+  function loadContent(doors) {
+    const exports = {};
+    script.runInNewContext({ exports, require(specifier) {
+      if (specifier !== './data/doors.json?raw') throw new Error(`Unexpected content dependency: ${specifier}`);
+      return { default: JSON.stringify({ ...canonical, doors }) };
+    } }, { timeout: 1000 });
+    return exports;
+  }
+  const exported = loadContent(canonical.doors);
   const stations = exported.vinciContent, expectedIds = canonical.doors.map(door => door.station);
   if (expectedIds.length !== 19 || new Set(expectedIds).size !== 19) throw new Error('Supplied canonical doors do not contain nineteen unique station IDs.');
+  const doorsById = new Map(canonical.doors.map(door => [door.station, door]));
   if (!Array.isArray(stations)) throw new Error('content.ts does not export vinciContent.');
   const actualIds = stations.map(station => station.id);
-  if (JSON.stringify(actualIds) !== JSON.stringify(expectedIds)) fail('station-sequence', 'Station order differs from the nineteen canonical doors.', file);
+  if (actualIds.length !== expectedIds.length || new Set(actualIds).size !== expectedIds.length || actualIds.some(id => !doorsById.has(id)))
+    fail('station-identity', 'Station IDs must contain every canonical door exactly once, in any walking order.', file);
+  const legacyIds = exported.vinciLegacyStationIds;
+  if (!Array.isArray(legacyIds) || JSON.stringify(legacyIds) !== JSON.stringify(expectedIds))
+    fail('legacy-station-order', 'Numeric links must retain the original zero-based canonical station order.', file);
   let checkedQuestions = 0, documentedStatements = 0, generatedCarrierStatements = 0;
   for (let index = 0; index < stations.length; index++) {
-    const station = stations[index], door = canonical.doors[index];
-    if (station.number !== index + 1) fail('station-number', 'Number differs from its canonical sequence position.', file, station.id);
+    const station = stations[index], door = doorsById.get(station.id);
+    if (station.number !== index + 1) fail('station-number', 'Number differs from its current walking order.', file, station.id);
     for (const language of ['en', 'de']) {
       if (!textPresent(station.name?.[language]) || !textPresent(station.promise?.[language])) fail('station-copy', `Missing ${language} station name or promise.`, file, station.id);
       if (!door || station.door?.station !== station.id || station.door?.[language] !== door[`question_${language}`]) fail('door-question', `${language} question differs from the supplied canonical door.`, file, station.id);
@@ -198,6 +208,40 @@ section('canonical stations, questions, hour and carrier claims', () => {
       if (label.target === 'carrier' && label.certainty === 'documented') fail('generated-testimony', 'A GENERATED carrier cannot carry a documented claim.', file, label.id);
       if (!textPresent(label.source)) fail('statement-source', 'Statement has no source citation.', file, label.id);
     }
+  }
+  const doorOrderChecks = [];
+  const permutations = [
+    ['reversed', [...canonical.doors].reverse()],
+    ['interleaved', [...canonical.doors.filter((_, index) => index % 2), ...canonical.doors.filter((_, index) => index % 2 === 0)]],
+  ];
+  for (const [name, doors] of permutations) {
+    try {
+      const candidate = loadContent(doors), ordered = candidate.vinciContent;
+      const walkingOrderStable = Array.isArray(ordered) && JSON.stringify(ordered.map(station => station.id)) === JSON.stringify(actualIds);
+      const questionsById = Array.isArray(ordered) && ordered.every(station => {
+        const door = doorsById.get(station.id);
+        return door && station.door?.station === station.id && ['en', 'de'].every(language => station.door?.[language] === door[`question_${language}`]);
+      });
+      const numberingFollowsWalk = Array.isArray(ordered) && ordered.every((station, index) => station.number === index + 1);
+      const legacyPositionsStable = JSON.stringify(candidate.vinciLegacyStationIds) === JSON.stringify(expectedIds);
+      const ok = walkingOrderStable && questionsById && numberingFollowsWalk && legacyPositionsStable;
+      doorOrderChecks.push({ input: name, accepted: true, walkingOrderStable, questionsById, numberingFollowsWalk, legacyPositionsStable, ok });
+      if (!ok) fail('door-order-coupling', `${name} door input changed station questions, walking order, numbering or legacy positions.`, file);
+    } catch (error) {
+      doorOrderChecks.push({ input: name, accepted: false, ok: false, error: error.message });
+      fail('door-order-rejected', `${name} canonical door input was rejected: ${error.message}`, file);
+    }
+  }
+  const invalidInputs = [
+    ['duplicate-id', [...canonical.doors, { ...canonical.doors[0] }]],
+    ['missing-id', canonical.doors.slice(0, -1)],
+    ['missing-id-with-replacement', canonical.doors.map((door, index) => index === 0 ? { ...door, station: 'unknown-station' } : door)],
+  ];
+  for (const [name, doors] of invalidInputs) {
+    let rejected = false, reason = '';
+    try { loadContent(doors); } catch (error) { rejected = true; reason = error.message; }
+    doorOrderChecks.push({ input: name, rejected, ok: rejected, ...(reason ? { reason } : {}) });
+    if (!rejected) fail('invalid-door-accepted', `${name} door input was accepted by the content module.`, file);
   }
   const rigFile = 'src/wings/vinci/data/light-rig.json', rig = json(rigFile);
   const day = rig.dates.find(value => value.julian_date === '1517-10-10');
@@ -220,7 +264,7 @@ section('canonical stations, questions, hour and carrier claims', () => {
     minuteEndAzimuthDegrees: round(end.sun_azimuth_deg.value, 3), minuteEndElevationDegrees: round(end.sun_elevation_deg.value, 3),
   };
   for (const [key, value] of Object.entries(expectedValues)) if (exported.vinciHourValues?.[key] !== value) fail('hour-value', `${key}: expected ${value}, found ${exported.vinciHourValues?.[key]}.`, file);
-  report.content = { canonicalDoors: canonicalFile, stations: actualIds, checkedQuestions, languages: ['en', 'de'], documentedStatements, generatedCarrierStatements, hour: { source: rigFile, en: actualArithmetic?.en, de: actualArithmetic?.de, expectedArithmetic, clockOffsetSeconds: offset, values: exported.vinciHourValues }, doorOpening: 'not exercised', claimRendering: 'not exercised' };
+  report.content = { canonicalDoors: canonicalFile, stations: actualIds, legacyStationIds: legacyIds, checkedQuestions, doorOrderChecks, languages: ['en', 'de'], documentedStatements, generatedCarrierStatements, hour: { source: rigFile, en: actualArithmetic?.en, de: actualArithmetic?.de, expectedArithmetic, clockOffsetSeconds: offset, values: exported.vinciHourValues }, doorOpening: 'not exercised', claimRendering: 'not exercised' };
 });
 
 section('declared target dimensions', () => {
