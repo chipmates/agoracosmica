@@ -9,7 +9,6 @@ import { Group, Mesh, PointLight, Vector3, type Material } from 'three/webgpu'
 import type { Stack } from '../../../stack'
 import { buildMachine, MACHINE_SLUGS, type MachineSlug } from '../machines'
 import type { ReadyMachineBuild } from '../machines/runtime'
-import { mountBoxes } from '../machines/bench/mounts'
 import { createCollectionLineFloor, fitCollectionExhibitFloor } from './line-floor'
 import { createGrave } from '../grave'
 import { createMythDeathbed, createMythQuotes } from '../myths'
@@ -19,38 +18,23 @@ import pageMap from '../table/data/msb-pages.json?raw'
 import { lang } from '../../content'
 import { RoomBatch, stamp } from './build'
 import { collectionExhibitMaterials, collectionInteriorMaterial, collectionProceduralStack } from './materials'
-import { COURT, FLOOR, GRAVE_ORIGIN, LINE_ORIGIN, PARACHUTE_ORIGIN } from './layout'
+import { COURT, FLOOR, GRAVE_ORIGIN, LINE_ORIGIN } from './layout'
+import { parachuteCloth, standBoxes, standLevel, STANDS, type StandGround } from './stands'
 import { mountCollectionPlates, type CollectionPictureSource } from './plates'
 
-interface Stand { east: number; north: number; bearing: number; plinth: number }
-
-/** Where each machine stands in the hall, and which way it faces. The three
- * dimensions that are Leonardo's own are the screw's, the parachute's and
- * the crossbow's; every other size here is the module's declared envelope,
- * and the plinth is sized off that envelope and nothing else. */
-const HALL: Record<MachineSlug, Stand> = {
-  'aerial-screw': { east: -51.5, north: -49, bearing: 0, plinth: .12 },
-  'revolving-crane': { east: -59.2, north: -46, bearing: 28, plinth: .16 },
-  'ball-bearing': { east: -59.6, north: -50.3, bearing: 0, plinth: .62 },
-  'camera-obscura': { east: -59.4, north: -52.9, bearing: 104, plinth: .3 },
-  'anemometer': { east: -57.9, north: -42.95, bearing: 8, plinth: .72 },
-  'inclinometer': { east: -56.2, north: -42.95, bearing: -6, plinth: .72 },
-  'proportional-compass': { east: -54.6, north: -42.95, bearing: 4, plinth: .78 },
-  'miter-lock-gates': { east: -44.4, north: -46.4, bearing: -22, plinth: .18 },
-  'multi-barrel-gun': { east: -42.6, north: -50.6, bearing: 208, plinth: .16 },
-  'water-lifting-screw': { east: -41.9, north: -53.6, bearing: 90, plinth: .16 },
-  'lathe': { east: -46.2, north: -52.9, bearing: 12, plinth: .2 },
-  'flywheel': { east: -45.8, north: -48.8, bearing: 0, plinth: .26 },
-  'rolling-mill': { east: -47.4, north: -44.2, bearing: -24, plinth: .34 },
-  // The parachute is 10.34 m tall and the tallest room here is 6.61 m, so it
-  // stands outside in the court on the module's own four uprights.
-  'parachute': { east: PARACHUTE_ORIGIN.east, north: PARACHUTE_ORIGIN.north, bearing: 18, plinth: .1 },
-}
+/** Which ground each machine is built with, and when. The court's own
+ * exhibit is built at once because it is seen from every station on this
+ * ground; the rest arrive as the visitor walks up to them. */
+const GROUNDS: readonly StandGround[] = ['court', 'hall', 'house']
 
 export interface CollectionExhibits {
   update(seconds: number, delta: number, eye: Vector3): void
   /** Build the hall before the camera is in it (an inspection eye). */
   warm(): void
+  /** NO MACHINE ANIMATES WHILE THE VISITOR WALKS. Each stands in the pose its
+   * own schedule has at t=0. The close-look host names the one machine whose
+   * clock may run, and `null` puts every machine back at rest. */
+  demonstrate(slug: MachineSlug | null): void
   dispose(): void
   ready: Promise<void>
   pending(): number
@@ -59,18 +43,29 @@ export interface CollectionExhibits {
 }
 
 export function mountCollectionExhibits(host: Group, stack: Stack): CollectionExhibits {
-  const machines: { build: ReadyMachineBuild; indoors: boolean }[] = []
+  const machines: { build: ReadyMachineBuild; slug: MachineSlug; ground: StandGround; at: Vector3 }[] = []
   const plinths = new RoomBatch()
   const material = collectionInteriorMaterial()
   const pictures = mountCollectionPlates(host, stack)
-  let live = true, halled = false, seconds = 0, delta = 0
+  let live = true
+  let demonstrating: MachineSlug | null = null
+  const warmed = new Set<StandGround>()
   let reading: ReturnType<typeof buildTable> | undefined
   const teardown: (() => void)[] = []
   // The court's exhibit stands outdoors and is seen from every station on
   // this ground, so it is built at once and dressed from this module's own
   // recipe rather than from the library the page has already spent.
   const courtStack = collectionProceduralStack(stack)
-  let plinthMesh = plinths.mesh('vinci/collection-rooms/plinths', material)
+  // THE PLINTHS AND BASES ARE ONE FIXED BODY. The rail's clearance
+  // certificate hashes this geometry, so it is complete before the first
+  // frame and never waits for a machine to finish loading.
+  for (const box of standBoxes()) plinths.box(box.east, box.north, box.height, box.width, box.depth, box.tall, box.role)
+  {
+    const { corners, top } = parachuteCloth()
+    for (let i = 0; i < 4; i++) plinths.quad(corners[i]!, corners[(i + 1) % 4]!, top, top, 2)
+    plinths.quad(corners[0]!, corners[1]!, corners[2]!, corners[3]!, 2)
+  }
+  const plinthMesh = plinths.mesh('vinci/collection-rooms/plinths', material)
   host.add(plinthMesh)
 
   /** The library's budget belongs to the whole page, and this wing arrives at
@@ -89,70 +84,31 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
   }
 
   function stand(slug: MachineSlug): ReadyMachineBuild {
-    const spot = HALL[slug], outdoors = slug === 'parachute'
-    const level = outdoors ? COURT.level : FLOOR
-    const machine = buildMachine(slug, outdoors ? courtStack : stack)
-    machines.push({ build: machine, indoors: !outdoors })
-    const size = machine.bounds.getSize(new Vector3())
-    const centre = machine.bounds.getCenter(new Vector3())
-    const angle = spot.bearing * Math.PI / 180
-    machine.object.rotation.y = angle
+    const spot = STANDS[slug], level = standLevel(spot.ground)
+    const machine = buildMachine(slug, spot.ground === 'court' && slug === 'parachute' ? courtStack : stack)
+    machine.object.rotation.y = spot.bearing * Math.PI / 180
     machine.object.position.set(spot.east, level + spot.plinth - machine.bounds.min.y, -spot.north)
     machine.object.updateMatrixWorld(true)
-    machine.object.visible = outdoors
+    machine.object.visible = false
+    machines.push({ build: machine, slug, ground: spot.ground,
+      at: new Vector3(spot.east, level + spot.plinth, -spot.north) })
     stamp(machine.object, `vinci/machine/${slug}`)
     host.add(machine.object)
-    machine.animate(seconds, delta)
-    if (outdoors) {
-      // THE COURT'S EXHIBIT KEEPS ITS SHADOW WITHOUT COSTING THE WALK ONE.
-      // The wing reuses one rendered shadow map while every caster in the
-      // scene is a material it has proved static; a machine's own material
-      // graph is not one of those, and one visible caster re-renders the
-      // map on every frame of the whole walk. So the cloth casts through a
-      // plain double three centimetres inside it, which the cloth hides.
-      void machine.ready.then(() => machine.object.traverse(child => { child.castShadow = false }))
-      const cloth = 6.86, sill = 3.32, apex = 10.24, cos = Math.cos(angle), sin = Math.sin(angle)
-      const corner = (sx: number, sz: number): [number, number, number] => {
-        const x = sx * cloth / 2, z = sz * cloth / 2
-        return [spot.east + x * cos + z * sin, spot.north + x * sin - z * cos, level + sill]
-      }
-      const top: [number, number, number] = [spot.east, spot.north, level + apex]
-      const feet: [number, number][] = [[-1, -1], [1, -1], [1, 1], [-1, 1]]
-      for (let i = 0; i < 4; i++) {
-        const a = corner(feet[i]![0], feet[i]![1]), b = corner(feet[(i + 1) % 4]![0], feet[(i + 1) % 4]![1])
-        plinths.quad(a, b, top, top, 2)
-      }
-      plinths.quad(corner(-1, -1), corner(1, -1), corner(1, 1), corner(-1, 1), 2)
-    }
-    if (spot.plinth <= 0) return machine
-    // The plinth is the exhibition's own furniture: the declared envelope
-    // with a hand's width around it, and a shadow gap at the floor.
-    const width = Math.abs(size.x * Math.cos(angle)) + Math.abs(size.z * Math.sin(angle)) + .34
-    const depth = Math.abs(size.x * Math.sin(angle)) + Math.abs(size.z * Math.cos(angle)) + .34
-    const east = spot.east + centre.x * Math.cos(angle) + centre.z * Math.sin(angle)
-    const north = spot.north + centre.x * Math.sin(angle) - centre.z * Math.cos(angle)
-    plinths.box(east, north, level + spot.plinth - .05, width, depth, .1, 2)
-    plinths.box(east, north, level + (spot.plinth - .1) / 2, width - .16, depth - .16, spot.plinth - .1, 3)
-    for (const box of mountBoxes(slug)) {
-      plinths.box(spot.east + box.centre[0] * Math.cos(angle) + box.centre[2] * Math.sin(angle),
-        spot.north + box.centre[0] * Math.sin(angle) - box.centre[2] * Math.cos(angle),
-        level + spot.plinth + box.centre[1], box.size[0], box.size[2], box.size[1], 3)
-    }
+    // THE REST POSE IS THE POSE AT t=0 of this machine's own schedule.
+    machine.animate(0, 0)
+    // A VISIBLE CASTER WHOSE MATERIAL GRAPH THE SHADOW CACHE HAS NOT PROVED
+    // STATIC RE-RENDERS THE WHOLE SHADOW MAP ON EVERY FRAME OF THE WALK, and
+    // a machine's own graph is not one of those. The court's cloth casts
+    // through a plain double three centimetres inside it, which it hides.
+    void machine.ready.then(() => machine.object.traverse(child => { child.castShadow = false }))
     return machine
   }
 
-  function rebuildPlinths(): void {
-    host.remove(plinthMesh)
-    plinthMesh.geometry.dispose()
-    plinthMesh = plinths.mesh('vinci/collection-rooms/plinths', material)
-    host.add(plinthMesh)
-  }
-
-  /** THE HALL IS BUILT WHEN THE VISITOR IS IN IT. Fourteen machines hold a
-   * library the whole page pays for and a shadow map the whole scene pays
-   * for, and from outside this envelope not one of them can be seen: the
-   * picture room's wall and two closed elevations stand in front of them.
-   * The court's own exhibit stands outdoors and is built at once. */
+  /** A GROUND IS BUILT WHEN THE VISITOR IS WALKING UP TO IT. Nine machines
+   * hold a library the whole page pays for, and from outside the hall's
+   * envelope not one of them can be seen: the picture room's wall and two
+   * closed elevations stand in front of them. The court's cloth is the one
+   * exhibit built at once, because it is seen from the whole ground. */
   // THE LINE IS THE FLOOR OF THE LONG GALLERY, and the grave is the paving
   // of the court's west half: both bring their own ground with them, and the
   // rooms are cut around it. Both are built at once and from the rooms' own
@@ -164,6 +120,9 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
   stamp(line, 'vinci/collection-line-floor')
   host.add(line)
   const graveNear = new Vector3(-42, FLOOR, 46)
+  /** The middle of the court's own exhibits, and of the house's court. */
+  const COURT_AT = new Vector3(-41, COURT.level, 22)
+  const HOUSE_AT = new Vector3(STANDS['proportional-compass'].east, 0, -STANDS['proportional-compass'].north)
   /** The middle of the insertion, for the distance at which its rooms are
    * asked for and the distance at which their contents come back. */
   const hallNear = new Vector3(-46, FLOOR, 50)
@@ -181,27 +140,37 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
   // set, so there is no wait at the head of the page and the walk's one
   // shadow snapshot is taken with the exhibit already standing.
   const court = stand('parachute').ready
-  rebuildPlinths()
+  warmed.add('court')
+  /** One promise per ground, so a ground is built once and in its own turn. */
+  const built = new Map<StandGround, Promise<void>>()
+  function warmGround(ground: StandGround): Promise<void> {
+    const already = built.get(ground)
+    if (already) return already
+    warmed.add(ground)
+    // ONE MACHINE PER TURN. Nine of them in a single tick is half a minute of
+    // frozen frame, and the visitor is standing in the room next door while
+    // it happens. The ground arrives while the walk goes on.
+    const work = court.then(() => seed(['bronze-dark', 'leather-worn', 'parchment-laid', 'limestone-pale'])).then(async () => {
+      for (const slug of MACHINE_SLUGS) {
+        if (!live) return
+        if (slug === 'parachute' || STANDS[slug].ground !== ground) continue
+        stand(slug)
+        await new Promise(resolve => setTimeout(resolve, 0))
+      }
+    })
+    built.set(ground, work)
+    return work
+  }
   let hall: Promise<void> | undefined
   function warmHall(): void {
     if (hall || !live) return
-    halled = true
-    hall = court.then(() => seed(['bronze-dark', 'leather-worn', 'parchment-laid', 'limestone-pale'])).then(async () => {
+    hall = warmGround('hall').then(async () => {
       if (!live) return
-      // ONE MACHINE PER TURN. Thirteen of them in a single tick is half a
-      // minute of frozen frame, and the visitor is standing in the room next
-      // door while it happens. The hall arrives while the walk goes on.
-      for (const slug of MACHINE_SLUGS) {
-        if (slug === 'parachute') continue
-        stand(slug)
-        await new Promise(resolve => setTimeout(resolve, 0))
-        if (!live) return
-      }
       // The hall's own fittings. The machines carry their bench's shading and
       // no opening in this room reaches them, so the luminaires on the beams
       // are lights here and not a term on a surface. They cast no shadow: the
       // one shadowing light in this scene is the measured sun.
-      for (const [east, north] of [[-56.4, -45.2], [-47.2, -45.6], [-56.2, -51.4], [-46.4, -51.2], [-51.4, -58.6]]) {
+      for (const [east, north] of [[-51, -44], [-47.2, -45.6], [-56.2, -51.4], [-46.4, -51.2], [-51.4, -58.6]]) {
         const fitting = new PointLight('#f4e6cc', 9.5, 15, 2)
         fitting.position.set(east!, FLOOR + 4.6, -north!)
         fitting.castShadow = false
@@ -224,7 +193,6 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
       stamp(quotes.group, 'vinci/myths-geometry')
       host.add(deathbed.group, quotes.group)
       teardown.push(() => { deathbed.dispose(); quotes.dispose() })
-      rebuildPlinths()
     })
   }
   /** THE TABLE IS THE LAST THING THIS PAGE CAN AFFORD, so it is built for the
@@ -284,13 +252,13 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
 
   return {
     ready: Promise.all([court.then(() => hall ?? Promise.resolve()).then(() => table ?? Promise.resolve()), pictures.ready]).then(() => undefined),
-    pending: () => (halled && !machines.some(machine => machine.indoors) ? 1 : 0) + pictures.pending(),
+    pending: () => [...warmed].filter(ground => !machines.some(machine => machine.ground === ground)).length + pictures.pending(),
     pictureSources: pictures.sources,
     pictureErrors: pictures.errors,
     warm: warmHall,
+    demonstrate(slug) { demonstrating = slug },
     update(now, step, eye) {
       if (!live) return
-      seconds = now; delta = step
       pictures.update(step, eye)
       // A ROOM THE CAMERA IS NOT IN IS NOT DRAWN.
       // The envelope itself, not the ground around it: the garden station
@@ -303,6 +271,11 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
       // build the visitor waits through.
       const inside = eye.x > -62.4 && eye.x < -21.6 && eye.z > 34.4 && eye.z < 63.6 && eye.y < -1.9
       if (inside || eye.distanceToSquared(hallNear) < 46 * 46) warmHall()
+      // The court's three standing exhibits and the compass in the house are
+      // built on the way to them, not at the head of the page: each ground is
+      // asked for at the distance a visitor can still be walked up to it.
+      if (eye.distanceToSquared(COURT_AT) < 44 * 44) void warmGround('court')
+      if (eye.distanceToSquared(HOUSE_AT) < 26 * 26) void warmGround('house')
       // AND THE GROUND ITSELF IS DRAWN WHEN IT IS BEING LOOKED AT. From the
       // street and the court of the house this ground is seventy metres off
       // and every exhibit on it is a few pixels wide; the rooms stay, their
@@ -325,11 +298,14 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
       // between a walk and a frame that draws the whole ground at once.
       const inHall = eye.x > -62.4 && eye.x < -38.6 && eye.z > 41.8 && eye.z < 64.2 && eye.y < -1.9
       for (const machine of machines) {
-        const visible = machine.indoors
-          ? inHall && eye.distanceToSquared(machine.build.object.position) < 14 * 14
+        const visible = machine.ground === 'hall' ? inHall && eye.distanceToSquared(machine.at) < 14 * 14
+          : machine.ground === 'house' ? eye.distanceToSquared(machine.at) < 18 * 18
           : near
         if (machine.build.object.visible !== visible) machine.build.object.visible = visible
-        if (visible) machine.build.animate(now, step)
+        // ONE CLOCK RUNS AT A TIME, and only for the machine a close look has
+        // been asked for. Everything else stands in its rest pose, which is
+        // what lets the walk keep one shadow map and one certificate.
+        if (visible && machine.slug === demonstrating) machine.build.animate(now, step)
       }
       reading?.update(now * 1000)
     },

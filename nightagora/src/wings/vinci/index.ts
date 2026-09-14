@@ -18,6 +18,7 @@ import { createWingShadowBody, type WingShadowBody } from './shadow-body'
 import { createCollection, collectionProvenance } from './collection'
 import { collectionView } from './collection/views'
 import { mountCollectionExhibits, type CollectionExhibits } from './collection/exhibits'
+import { isMachineSlug, type MachineSlug } from './machines'
 import { createPolicyWorkLabel } from './pictures/policy-label'
 import { MAIN_HANG, REGISTER, type PictureRights } from './pictures/register'
 import { MACHINE_SLUGS, machineCatalog } from './machines/catalog'
@@ -106,6 +107,8 @@ const SHADOW={nearHalfM:20,nearMapPx:1024,aheadM:10,refocusM:3,lightDistanceM:80
 export interface VinciWingModule extends WingModule {
   openSources(tab?:VinciSourcesTab):void
   setExhibitSources(exhibit:VinciExhibitSources|null):void
+  /** The close look's hold on one machine's clock. Null is the rest pose. */
+  demonstrateMachine(slug:string|null):void
 }
 
 export function createWing():VinciWingModule {
@@ -606,6 +609,9 @@ export function createWing():VinciWingModule {
     doorDisclosure:'first-press',
     openSources(tab='station'){if(!standing){pendingView=`sources-${tab}`;return}sources.select(tab);mode=2;paintDock()},
     setExhibitSources(exhibit){exhibitSources=exhibit;if(standing){sources.resetScroll();paintDock()}},
+    // NO MACHINE ANIMATES WHILE THE VISITOR WALKS. A close look names the one
+    // machine whose own clock may run; null puts every machine back at rest.
+    demonstrateMachine(slug:string|null){exhibits?.demonstrate(isMachineSlug(slug??'')?slug as MachineSlug:null)},
     navigation:()=>{
       const nav=standing?rail.navigation:undefined
       return {completed:nav?.completed??vinciContent[card]!.id,target:nav?.queued[0]??nav?.active,question:text(vinciContent[card]!.door)}
