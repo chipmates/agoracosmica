@@ -809,6 +809,77 @@
       "licence_url": "https://commons.wikimedia.org/wiki/Template:PD-self",
       "rights_note": "Ancient public-domain marble → independently made photograph by Bibi Saint-Pol → photographer explicitly releases photo worldwide into public domain on Commons. This is PD-self, not CC0 and not PD-Art for a 3D object.",
       "attribution": "Unknown Roman sculptor after Silanion. Glyptothek Munich, GL548. Photograph: Bibi Saint-Pol / Wikimedia Commons, public-domain dedication."
+    },
+    {
+      "id": "lobby/likeness-shakespeare",
+      "path": "likenesses/shakespeare/original.jpg",
+      "sha256": "92d5a189ae04546efdf4fb027bbae5f23f8cbc0df83bc7440531621f69d29133",
+      "bytes": 2662113,
+      "width": 1727,
+      "height": 2500,
+      "pixels": 4317500,
+      "slug": "shakespeare",
+      "name": "William Shakespeare",
+      "wing": "lobby",
+      "class": "Tier 1",
+      "tier": 1,
+      "licence": "Public domain",
+      "licence_source_url": "https://commons.wikimedia.org/wiki/File:The_Chandos_Shakespeare_(5294038).jpg#Licensing",
+      "licence_location": "Commons Licensing, Public domain; corroborated by the NLW IIIF top-level license URI recorded in holder_licence_quote",
+      "holder": "National Library of Wales, 5294038; underlying painting National Portrait Gallery, London, NPG1",
+      "maker": "Unknown printmaker, after the portrait associated with John Taylor",
+      "date": "1903 (facsimile), c. 1610 (underlying portrait)",
+      "source_url": "https://commons.wikimedia.org/wiki/File:The_Chandos_Shakespeare_(5294038).jpg",
+      "original_url": "https://upload.wikimedia.org/wikipedia/commons/d/da/The_Chandos_Shakespeare_%285294038%29.jpg",
+      "holder_record_url": "https://hdl.handle.net/10107/5294038",
+      "display": true,
+      "label_en": "Probably William Shakespeare. The Chandos Shakespeare, 1903. Printed facsimile after the portrait associated with John Taylor, c. 1610. National Library of Wales, 5294038. Licence: “Public domain”.",
+      "label_de": "Wahrscheinlich William Shakespeare. The Chandos Shakespeare, 1903. Gedruckte Reproduktion nach dem mit John Taylor in Verbindung gebrachten Porträt, um 1610. National Library of Wales, 5294038. Lizenz: „Public domain“.",
+      "previews": [
+        {
+          "path": "likenesses/shakespeare/preview-512.jpg",
+          "sha256": "b75032cb501c0a7a5550130955742bf5c537331f99dfac1b49cb7687df00967a",
+          "bytes": 31618,
+          "width": 354,
+          "height": 512,
+          "pixels": 181248,
+          "long_edge": 512,
+          "format": "image/jpeg",
+          "quality": 88,
+          "color_space": "sRGB",
+          "source_path": "likenesses/shakespeare/original.jpg"
+        },
+        {
+          "path": "likenesses/shakespeare/preview-1024.jpg",
+          "sha256": "8a6c9fc6fb6fbc2a6ef8bf9b770ea8f409c12a9f87290bbcb4a9a24677675ecf",
+          "bytes": 134248,
+          "width": 707,
+          "height": 1024,
+          "pixels": 723968,
+          "long_edge": 1024,
+          "format": "image/jpeg",
+          "quality": 88,
+          "color_space": "sRGB",
+          "source_path": "likenesses/shakespeare/original.jpg"
+        }
+      ],
+      "verified_on": "2026-09-14",
+      "source_verification": {
+        "holder_iiif_url": "https://iiif.llyfrgell.cymru/manifests/2.0/5294038/manifest.json",
+        "holder_license": "http://creativecommons.org/publicdomain/mark/1.0/",
+        "holder_date": "1903",
+        "holder_physical_description": "1 photomechanical print : sepia ; image 208 x 145 mm., on sheet 312 x 212 mm.",
+        "holder_canvas_width": 3464,
+        "holder_canvas_height": 5014,
+        "commons_file_timestamp": "2021-04-20T09:43:34Z",
+        "commons_revision": 1069648485
+      },
+      "derivation": "No embedded ICC profile. Source interpreted as sRGB. JPEG previews resized with Lanczos, quality 88, embedded sRGB profile. Original bytes unchanged.",
+      "licence_url": "https://commons.wikimedia.org/wiki/File:The_Chandos_Shakespeare_(5294038).jpg#Licensing",
+      "rights_note": "The current NLW IIIF manifest explicitly supplies the Public Domain Mark 1.0 URI quoted in holder_licence_quote, satisfying the Tier 1 condition. Commons gives the quoted Public domain text. Probable identification and printed-facsimile description are retained.",
+      "holder_licence_quote": "http://creativecommons.org/publicdomain/mark/1.0/",
+      "holder_licence_source_url": "https://iiif.llyfrgell.cymru/manifests/2.0/5294038/manifest.json",
+      "source_sha1": "223dfecc937dd730ab14c6059bc6b1c2e975bc0e"
     }
   ]
 }
