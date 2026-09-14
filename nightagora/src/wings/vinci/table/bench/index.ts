@@ -367,7 +367,7 @@ export function createTableBench(stack: Stack): BenchModule {
       style.textContent = benchCss
       host.append(style)
       header = el('header', 'table-bench-header')
-      const brand = el('p', 'table-bench-brand', 'Agora Cosmica')
+      const brand = el('p', 'table-bench-brand', 'Night Agora')
       brand.dataset['naBrand'] = ''
       header.append(brand, el('p','table-bench-kicker','LEONARDO DA VINCI · PARIS MANUSCRIPT B'), el('h1','table-bench-heading','The reading table'))
       viewport = el('section', 'table-bench-viewport')

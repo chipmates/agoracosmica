@@ -83,7 +83,7 @@ export function createBench(stack:Stack){
   const style=make('style','');style.textContent=css;host.append(style)
   const surfaceHost=make('div','vb-surface');surfaceHost.setAttribute('aria-label',text('Walk the line with wheel or swipe','Die Linie mit Rad oder Wischgeste gehen'));host.append(surfaceHost)
   const header=make('header','vb-header');header.dataset['naPersistent']=''
-  const brand=make('div','vb-brand','AGORA COSMICA');brand.dataset['naBrand']=''
+  const brand=make('div','vb-brand','NIGHT AGORA');brand.dataset['naBrand']=''
   const tools=make('div','vb-tools'), langButton=make('button','vb-lang',language==='en'?'DE':'EN');langButton.type='button';langButton.setAttribute('aria-label',text('Change language','Sprache wechseln'));langButton.onclick=()=>{language=language==='en'?'de':'en';langButton.textContent=language==='en'?'DE':'EN';void compose()}
   const sources=make('button','vb-sources',text('Sources','Quellen'));sources.type='button';sources.setAttribute('aria-controls','vb-source-drawer');sources.onclick=()=>{sourceOpen=!sourceOpen;if(!sourceOpen)recordOpen=false;paint();if(sourceOpen){card.querySelector('details')?.scrollIntoView({block:'nearest'});card.focus({preventScroll:true})}}
   tools.append(sources,langButton);header.append(brand,tools);host.append(header)

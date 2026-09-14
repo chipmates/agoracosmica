@@ -21,7 +21,7 @@ export interface BenchCopy {
 /** Authored interface copy; source inscriptions and manuscript text stay verbatim. */
 export const BENCH_CONTENT = {
   en: {
-    brand: 'Agora Cosmica',
+    brand: 'Night Agora',
     title: 'The reading table',
     kicker: 'LEONARDO DA VINCI · PARIS MANUSCRIPT B',
     viewportLabel: 'The 1883 facsimile under a reading lamp',
@@ -44,7 +44,7 @@ export const BENCH_CONTENT = {
     },
   },
   de: {
-    brand: 'Agora Cosmica',
+    brand: 'Night Agora',
     title: 'Der Lesetisch',
     kicker: 'LEONARDO DA VINCI · PARISER MANUSKRIPT B',
     viewportLabel: 'Das Faksimile von 1883 unter einer Leselampe',

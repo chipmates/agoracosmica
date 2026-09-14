@@ -102,7 +102,7 @@ export function createBench(stack: Stack, onExit: () => void) {
   // visitor is told where they stand without spending a second mark on it.
   const mark = el('div', 'bench-mark');
   mark.dataset['naPersistent'] = '';
-  const brand = el('p', 'bench-brand', 'Agora Cosmica');
+  const brand = el('p', 'bench-brand', 'Night Agora');
   brand.dataset['naBrand'] = '';
   const kicker = el('p', 'bench-kicker');
   const kickerWing = el('span', 'bench-kicker-wing');
