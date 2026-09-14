@@ -67,7 +67,11 @@ export const BODY_WALL: readonly BodySheet[] = [
 ]
 
 const WALL = FACE.hallPartitionEast + .033
-const CENTRE = -52.6, DATUM = FLOOR + 1.52
+/** The four courses hang off this datum. It stands where it does because the
+ * reading ledge in front of the wall is 0.92 m high and touches it: the
+ * lowest course's bottom edge clears that contact line by a hand's width, so
+ * no sheet is read over the ledge. */
+const CENTRE = -52.6, DATUM = FLOOR + 1.84
 const COLUMN_PITCH = .46, ROW_PITCH = .42
 
 export interface BodyMount extends BodySheet {
