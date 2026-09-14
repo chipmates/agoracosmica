@@ -349,9 +349,10 @@ function hangLikeness(slug: string, name: string): void {
   if (paneCreditLine) paneCreditLine.textContent = hang?.credit ?? ''
   if (paneCreditNote) paneCreditNote.textContent = hang?.note ?? ''
   if (paneFigure) paneFigure.hidden = !hang
-  // the honest line only once the store has spoken: no likeness arrived yet
-  // and no likeness exists are not the same thing
-  const none = likenesses !== null && !hang
+  // the honest line only once the store has spoken: a record that never
+  // arrived and a figure with no likeness are not the same thing, and an
+  // empty index is a manifest that did not land, never thirty absences
+  const none = Boolean(likenesses?.size) && !hang
   if (paneNone) {
     paneNone.hidden = !none
     paneNone.textContent = none ? say(PANE_SHARED.nameOnly) : ''
