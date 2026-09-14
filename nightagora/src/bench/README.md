@@ -29,7 +29,7 @@ window.__forge.state()          // stationId / stationIds / texturesPending
 | `table` | `state` | `closed` `open-83v` `turning` `mirror` `shelf` `open-33r` `phone-open` |
 | `line` | `state` | `line-early` `line-late` `stud-1503` `inscription` `myth-deathbed` `myth-quotes` `grave` `phone-line` |
 | `object` | `slug` | one built body out of the store (`dovecote`), with `state` naming its station |
-| `pictures` | `segment` | reserved; the picture bench has not landed |
+| `pictures` | `segment` | `early` `milan` `florence` `late` `absences` `signature` `drawer` `murals` `complete-hang` `materials`, and the works hanging in the one standing |
 
 The object kind is the odd one and the reason is worth a line: its address
 names the BODY, because a body is what the bench stands, and its four
@@ -55,6 +55,7 @@ src/wings/vinci/machines/bench/    the machine bench
 src/wings/vinci/table/bench/       the reading table's bench
 src/wings/vinci/line/bench/        the line, words, myths and grave bench
 src/wings/vinci/objects/bench/     the object bench and its catalogue
+src/wings/vinci/pictures/bench/    the picture room and its hang
 ```
 
 They are there and not here for a reason the layout cannot show: the wing's

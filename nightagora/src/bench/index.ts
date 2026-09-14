@@ -14,7 +14,7 @@
  *   line      { kind: 'line', state }       the timeline's eight states
  *   object    { kind: 'object', slug }      one built body out of the store,
  *                                           with `state` naming its station
- *   pictures  { kind: 'pictures', segment } reserved, not built yet
+ *   pictures  { kind: 'pictures', segment } one segment of the picture hang
  *
  * `kind` may be left out when a `slug` is given: a slug names a machine and
  * nothing else. `state` is ambiguous between two kinds, so those two say
@@ -193,10 +193,8 @@ export function createBench(stack: Stack, onLobby: () => void) {
         telemetry: () => (it.active() ? it.telemetry() : null),
       }
     } else {
-      // reserved: the address parses and the phase is real, so the day the
-      // picture bench lands nothing outside this switch has to change
-      console.warn(`the ${want} bench has not landed yet`)
-      return null
+      const { createPictureBench } = await import('../wings/vinci/pictures/bench')
+      made = await createPictureBench(stack, onLobby)
     }
     built.set(want, made)
     return made
