@@ -28,16 +28,15 @@
 #veil { padding-bottom: calc(45px + env(safe-area-inset-bottom)); }
 #veil h1 {
   font-family: var(--press-display);
-  font-size: var(--type-title);
-  line-height: 1.04;
+  font-size: clamp(30px, 3.2vw, 46px);
+  line-height: 1.16;
   letter-spacing: -.025em;
   font-optical-sizing: auto;
   font-kerning: normal;
   font-variant-ligatures: common-ligatures;
-  max-width: 760px;
+  max-width: 860px;
   margin-inline: auto;
 }
-#veil h1 span { display: block; }
 .tagline {
   margin-top: 25px;
   font-family: var(--press-ui);
@@ -204,7 +203,7 @@ body[data-phase='held'] .status { animation: none; }
   .brand { top: calc(23px + env(safe-area-inset-top)); font-size: 13px; letter-spacing: .18em; text-indent: .18em; gap: 14px; }
   .brand::before, .brand::after { width: 12px; }
   #veil { padding: 0 24px calc(32px + env(safe-area-inset-bottom)); }
-  #veil h1 { font-size: clamp(32px, 9.5vw, 45px); line-height: 1.09; letter-spacing: -.025em; }
+  #veil h1 { font-size: clamp(25px, 6.8vw, 34px); line-height: 1.2; letter-spacing: -.015em; }
   .tagline { max-width: 290px; margin: 20px auto 0; font-size: 10px; letter-spacing: .14em; text-indent: .14em; line-height: 1.8; }
   .status { margin-top: 25px; font-size: 10px; letter-spacing: .12em; text-indent: .12em; }
   /* on a phone the two rail marks reach the middle of the foot, so the
