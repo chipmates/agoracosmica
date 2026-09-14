@@ -1615,6 +1615,89 @@
       "source_sha1": "4cfe20ee52b75632712ee35446b982a43a539910",
       "honesty_en": "Public domain work. Reproduction from Wikimedia Commons. The museum labels the reproduction, not the painting. Non-profit cultural use.",
       "honesty_de": "Gemeinfreies Werk. Reproduktion von Wikimedia Commons. Das Museum kennzeichnet die Reproduktion, nicht das Gemälde. Nichtkommerzielle kulturelle Nutzung."
+    },
+    {
+      "id": "lobby/likeness-beauvoir",
+      "path": "likenesses/beauvoir/original.jpg",
+      "sha256": "8970139d9504dd1865e5b5d5804f5263a62f528916185652945e9b3a1ffd5c12",
+      "bytes": 688141,
+      "width": 3066,
+      "height": 2052,
+      "pixels": 6291432,
+      "slug": "beauvoir",
+      "name": "Simone de Beauvoir",
+      "wing": "lobby",
+      "class": "Tier 2",
+      "tier": 2,
+      "licence": "Public domain",
+      "licence_source_url": "https://commons.wikimedia.org/wiki/File:Levy_Eshkol_welcoming_Simone_de_Beauvoir,_March_1967._D804-102.jpg#Licensing",
+      "licence_location": "Commons file page, Licensing",
+      "holder": "National Photo Collection of Israel, Photography Department, Government Press Office, D804-102",
+      "maker": "Fritz Cohen",
+      "date": "29 March 1967",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Levy_Eshkol_welcoming_Simone_de_Beauvoir,_March_1967._D804-102.jpg",
+      "original_url": "https://upload.wikimedia.org/wikipedia/commons/1/11/Levy_Eshkol_welcoming_Simone_de_Beauvoir%2C_March_1967._D804-102.jpg",
+      "holder_record_url": "https://gpophotoeng.gov.il/fotoweb/Grid.fwx?search=D804-102.jpg",
+      "display": true,
+      "label_en": "Simone de Beauvoir, 29 March 1967. Photograph by Fritz Cohen. National Photo Collection of Israel, Government Press Office, D804-102. Half-figure crop from the photograph of her meeting with Levi Eshkol. Licence: “Public domain”. Public domain work. Reproduction from Wikimedia Commons. The museum labels the reproduction, not the photograph. Non-profit cultural use.",
+      "label_de": "Simone de Beauvoir, 29. März 1967. Fotografie von Fritz Cohen. Nationale Fotosammlung Israels, Government Press Office, D804-102. Halbfigurausschnitt aus der Fotografie ihrer Begegnung mit Levi Eshkol. Lizenz: „Public domain“. Gemeinfreies Werk. Reproduktion von Wikimedia Commons. Das Museum kennzeichnet die Reproduktion, nicht die Fotografie. Nichtkommerzielle kulturelle Nutzung.",
+      "previews": [
+        {
+          "path": "likenesses/beauvoir/preview-512.jpg",
+          "sha256": "0e152495e7c1139e6f9252ac85955824f7357c7d0bf895020008cc2d11bf9d2d",
+          "bytes": 44200,
+          "width": 351,
+          "height": 512,
+          "pixels": 179712,
+          "long_edge": 512,
+          "format": "image/jpeg",
+          "quality": 88,
+          "color_space": "sRGB",
+          "source_path": "likenesses/beauvoir/crop.png"
+        },
+        {
+          "path": "likenesses/beauvoir/preview-1024.jpg",
+          "sha256": "a102d74d9c6ed9ce0ae7eea2b4cb5d060fde4f85a45c7ac8f2507bc367a3b578",
+          "bytes": 161954,
+          "width": 703,
+          "height": 1024,
+          "pixels": 719872,
+          "long_edge": 1024,
+          "format": "image/jpeg",
+          "quality": 88,
+          "color_space": "sRGB",
+          "source_path": "likenesses/beauvoir/crop.png"
+        }
+      ],
+      "verified_on": "2026-09-14",
+      "source_verification": "Current Commons imageinfo, original link, licence template and file history checked. Legacy GPO holder URL returns HTTP 200 containing a Hebrew missing-site error, without the D804-102 record. Commons GPO source tag and embedded archive metadata support source facts; no new holder open release claimed.",
+      "derivation": "No embedded ICC profile. Source interpreted as sRGB. JPEG previews resized with Lanczos, quality 88, embedded sRGB profile. Original bytes unchanged.",
+      "rights_note": "Government Press Office photograph by Fritz Cohen, 29 March 1967, D804-102. Commons PD-Israel. The 1967 photograph entered the public domain in Israel on 1 January 2018, with the German term capped by comparison of terms under the controlling rights cross-check. The archive’s legacy page is unavailable; Commons source metadata and embedded archive IPTC identify the file. Separate half-figure crop, with original retained whole.",
+      "source_version": {
+        "file_timestamp": "2019-09-03T18:17:05Z",
+        "commons_revision_id": 1014192191
+      },
+      "source_sha1": "bc2adcba78b811b519ab77de7e169087deeb3b1d",
+      "crop": {
+        "path": "likenesses/beauvoir/crop.png",
+        "sha256": "e6bbc9fdb878dc6ae115c3b208798509f6b0d32de97531a302aa0dc6867c0646",
+        "bytes": 1703769,
+        "width": 1226,
+        "height": 1786,
+        "pixels": 2189636,
+        "box": [
+          1441,
+          266,
+          2667,
+          2052
+        ],
+        "coordinate_system": "pixels in the original, left top right bottom, right and bottom exclusive",
+        "source_path": "likenesses/beauvoir/original.jpg",
+        "color_space": "sRGB",
+        "operation": "Crop and color conversion only. No retouching."
+      },
+      "honesty_en": "Public domain work. Reproduction from Wikimedia Commons. The museum labels the reproduction, not the photograph. Non-profit cultural use.",
+      "honesty_de": "Gemeinfreies Werk. Reproduktion von Wikimedia Commons. Das Museum kennzeichnet die Reproduktion, nicht die Fotografie. Nichtkommerzielle kulturelle Nutzung."
     }
   ]
 }
