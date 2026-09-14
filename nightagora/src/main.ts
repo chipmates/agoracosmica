@@ -1528,7 +1528,9 @@ function frame(now: number): void {
     elapsed,
     mandalaReveal,
     smooth(0.55, 0.89, desc),
-    desc
+    // the deep opens INSIDE the door and closes into the fire's own light
+    phase === 'descent' ? smooth(0.02, 0.14, desc) * (1 - smooth(0.90, 0.965, desc)) : 0,
+    phase === 'descent' ? desc : 1
   )
 
   const revealTarget =
