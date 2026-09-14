@@ -118,6 +118,13 @@ export function bodySheetSources(manifest: ManifestIndex): readonly BodySheetSou
     if (page.width !== sheet.pixels.width || page.height !== sheet.pixels.height) {
       throw new Error(`The body wall's register disagrees with the store: ${sheet.id}`)
     }
+    // The thumb is a derivative of the same sheet, never a different framing.
+    const factor = Math.max(preview.width, preview.height) / Math.max(page.width, page.height)
+    if (preview.width > page.width || preview.height > page.height
+      || Math.abs(preview.width - page.width * factor) > 1.1
+      || Math.abs(preview.height - page.height * factor) > 1.1) {
+      throw new Error(`The body wall's thumb changes the sheet: ${sheet.id}`)
+    }
     return { sheet, preview, page }
   })
 }
