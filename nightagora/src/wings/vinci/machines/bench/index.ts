@@ -376,6 +376,19 @@ export function createBench(stack: Stack, onExit: () => void) {
     groundMat.colorNode = vec3(stone.albedo.r * .025, stone.albedo.g * .025, stone.albedo.b * .025);
     const groundDetail = stack.detail(groundMat, stone, { count: 3, mid: .06, maps: .4, macro: .4 });
     groundMat.roughnessNode = groundDetail.roughness.max(.94);
+    // WHERE THE PLATE MEETS THE FLOOR. A cast shadow says where the sun is; it
+    // does not say that two surfaces touch. Without the dark line an edge
+    // holds against the floor it stands on, the plate reads as a card laid on
+    // the air, which is what the phone frame showed. The line is the plate's
+    // own footprint, closing over a hand's width.
+    {
+      const box = displayBounds(), size = box.getSize(new Vector3()), middle = box.getCenter(new Vector3());
+      const reach = Math.max(.06, Math.max(size.x, size.z) * .05);
+      const dx = positionWorld.x.sub(middle.x).abs().sub(size.x * .54).max(0);
+      const dz = positionWorld.z.sub(middle.z).abs().sub(size.z * .54).max(0);
+      const outside = dx.mul(dx).add(dz.mul(dz)).sqrt();
+      groundMat.aoNode = float(1).sub(float(1).sub(smoothstep(0, reach, outside)).mul(.62));
+    }
     // The platform is read from twice as far away on the phone as on the
     // wide frame, so its coarsest band is the one that has to survive: a
     // metre-scale variation the minified maps cannot average away.

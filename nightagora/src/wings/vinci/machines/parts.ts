@@ -172,7 +172,7 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Assemb
   const sectionParts = new Set(dossier.slug === 'camera-obscura' ? ['roof', 'right-wall'] : [])
   const names = [...new Set(dossier.parts.map(p => p.material.class))]
   const surfaceCache = new Map<string, Promise<Surface>>()
-  const makeSurface = async (name: string, quietBank = false, quietWood = false, turned = false, burnished = false): Promise<Surface> => {
+  const makeSurface = async (name: string, quietBank = false, quietWood = false, turned = false, burnished = false, geared = false): Promise<Surface> => {
     const set = await loadMachineMaterial(stack, libraryName(name))
     const glass = /glass/.test(name), water = /water/.test(name)
     const material: Surface = glass || water
@@ -214,6 +214,12 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Assemb
       ...set, metalness: .38, roughness: .5, normalStrength: .24,
       scales: [.3, .06, .0016],
       detail: {...set.detail, macro: .25, macroContrast: .07, mid: .75, micro: .3},
+    } : set.name === 'bronze-dark' ? {
+      // A 150 mm roller inside a 900 mm macro cell takes one value and reads
+      // as a painted tube. The bands are cut to the barrel: the cast's own
+      // mottle across it, the turning marks on it.
+      ...set, scale: [.12, .12], scales: [.07, .014, .0009], normalStrength: .22,
+      detail: {...set.detail, macro: .07, macroContrast: .3, mid: .55, micro: .35},
     } : dossier.slug === 'flywheel' && set.name === 'limestone-pale' ? {
       // A 140 mm ball inside a 150 mm macro cell takes one value and reads as
       // putty. The bands are cut to the ball: mottle across it, pits on it.
@@ -235,6 +241,20 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Assemb
       const oak = new Color(quietBank ? '#86755f' : '#847967')
       const fibres = detail.albedo.dot(vec3(.2126, .7152, .0722))
       material.colorNode = vec3(oak.r, oak.g, oak.b).mul(fibres.mul(quietBank ? .55 : .8).add(quietBank ? .45 : .2)).mul(detail.occlusion)
+    }
+    if (geared) {
+      // A wheel of wooden teeth wears where it meshes and nowhere else. The
+      // flanks run round the rim, the two faces look along the axle, and the
+      // extrusion puts that axle on the part's own X: a flank is polished
+      // darker by every turn, a face keeps the sawn grain it was cut with.
+      const oak = new Color('#847967')
+      const fibres = detail.albedo.dot(vec3(.2126, .7152, .0722))
+      const flank = float(1).sub(normalGeometry.x.abs()).clamp(0, 1).pow(1.6)
+      const edge = keyRim(.7).mul(flank)
+      material.colorNode = vec3(oak.r, oak.g, oak.b)
+        .mul(fibres.mul(.8).add(.2)).mul(detail.occlusion)
+        .mul(float(1).sub(flank.mul(.16))).mul(edge.add(1))
+      material.roughnessNode = detail.roughness.mul(float(1).sub(flank.mul(.34))).clamp(.28, .95)
     }
     if (/linen/.test(name) && !/thread/.test(name)) {
       material.side = DoubleSide
@@ -273,8 +293,12 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Assemb
       const iron = new Color('#787e80')
       const grain = detail.albedo.dot(vec3(.2126, .7152, .0722))
       const caps = dossier.slug === 'multi-barrel-gun' ? normalGeometry.y.abs().mul(.14).add(.86) : float(1)
-      material.colorNode = vec3(iron.r, iron.g, iron.b).mul(grain.mul(.6).add(.34)).mul(detail.occlusion).mul(caps)
-      material.roughnessNode = detail.roughness.mul(.8).clamp(.38, .7)
+      // Every axle, collar and pin in the set takes the same edge the compass
+      // took: a shaft is a line at this distance, and a line the key cannot
+      // find on is a scratch.
+      const edge = keyRim(.8)
+      material.colorNode = vec3(iron.r, iron.g, iron.b).mul(grain.mul(.6).add(.34)).mul(detail.occlusion).mul(caps).mul(edge.add(1))
+      material.roughnessNode = detail.roughness.mul(.8).clamp(.38, .7).mul(float(1).sub(edge.mul(.3))).clamp(.2, .7)
     }
     // Thirty-three round bodies side by side separate only if the key can
     // model them, and a mirror under a constant ambient takes no modelling.
@@ -318,6 +342,20 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Assemb
       material.roughnessNode = burnished
         ? detail.roughness.mul(.5).clamp(.16, .3).mul(float(1).sub(rim.mul(.3)))
         : detail.roughness.mul(.85).clamp(.36, .66).mul(float(1).sub(rim.mul(.42))).clamp(.16, .66)
+    }
+    if (/bronze/.test(name)) {
+      // Cast bronze is not brown timber. Turned true and polished by the sheet
+      // that passes between them, a roller carries one bright line down its
+      // length where the key bisects it; the rest of the barrel falls away.
+      // Under this dark sky a mirror has nothing to reflect, so the metal
+      // keeps part of its diffuse term and the key does the modelling.
+      material.metalness = .62
+      const bronze = new Color('#7e6540')
+      const cast = detail.albedo.dot(vec3(.2126, .7152, .0722))
+      const rim = keyRim(.9)
+      material.colorNode = vec3(bronze.r, bronze.g, bronze.b)
+        .mul(cast.mul(.62).add(.5)).mul(detail.occlusion).mul(rim.mul(.5).add(1))
+      material.roughnessNode = detail.roughness.mul(.6).clamp(.17, .42)
     }
     if (set.name === 'limestone-pale') {
       // Stone was the first thing the eye found on these frames: four bright
@@ -402,6 +440,11 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Assemb
       let ball = materials.get(key)
       if (!ball) { ball = await makeSurface(part.material.class, false, roundedWood, true); materials.set(key, ball) }
       material = ball
+    }
+    if (dossier.slug === 'rolling-mill' && (part.id === 'driver' || part.id === 'driven')) {
+      let gear = materials.get('worn-gear')
+      if (!gear) { gear = await makeSurface(part.material.class, false, true, false, false, true); materials.set('worn-gear', gear) }
+      material = gear
     }
     if (dossier.slug === 'proportional-compass' && (part.id === 'pivot' || part.id === 'screw-head')) {
       let fitting = materials.get('burnished-fitting')
