@@ -395,14 +395,17 @@ export function createWing():VinciWingModule {
     const carrier=label.id==='planting-assumptions'?'vinci/vegetation':label.id==='weather-assumptions'?'vinci/sky':'vinci/shell'
     appendStatement(label,label.certainty,label.target==='carrier'?carrier:`vinci/source/${label.id}`,label.target==='carrier'?'GENERATED':'procedural',label.source,label.record??label,label.humanSource)
   }
-  function appendSourceStatement(host:HTMLElement,label:VinciStatement):void {
+  /** The spoken half stands on the surface, the machine chain goes to the
+   * record the tab folds away, so a source key never meets an unasked eye. */
+  function appendSourceStatement(host:HTMLElement,label:VinciStatement,into?:HTMLElement):void {
     const paragraph=make('p','vinci-statement')
     paragraph.dataset['certainty']=label.certainty
     paragraph.append(make('span','vinci-certainty-word',text(vinciCertaintyWords[label.certainty])),document.createTextNode(' '+text(label)))
     if(label.humanSource)paragraph.append(make('span','vinci-human-source',text(label.humanSource)))
     const full=make('div','vinci-record');setRegister(full,'record')
     full.append(make('p','vinci-statement',text(label.record??label)),make('small','vinci-citation',label.source))
-    host.append(paragraph,full)
+    host.append(paragraph)
+    ;(into??host).append(full)
   }
   function appendCertaintyLegend(host:HTMLElement):void {
     const legend=make('ul','vinci-certainty-legend')
@@ -412,6 +415,16 @@ export function createWing():VinciWingModule {
       item.append(dot,document.createTextNode(text(vinciCertaintyWords[certainty])));legend.append(item)
     }
     host.append(legend)
+  }
+  /** THE RECORD IS OPENED ON PURPOSE. Inline it puts source keys and licence
+   * lines in front of a visitor who asked for the room, so each tab folds its
+   * own record behind one control. */
+  function foldRecord(host:HTMLElement,full:HTMLElement):void {
+    const details=make('details','vinci-record-fold')
+    const summary=document.createElement('summary')
+    summary.textContent=lang()==='de'?'Vollständiger Nachweis':'Full record'
+    details.append(summary,full)
+    host.append(details)
   }
   const ROOM_CLASS_WORD:Record<PictureRights,VinciText>={DG:vinciSourcesHeadings.classShown,
     RC:vinciSourcesHeadings.classUnderReview,REF:vinciSourcesHeadings.classReference}
@@ -451,30 +464,30 @@ export function createWing():VinciWingModule {
       const station=vinciContent.find(s=>s.id===id)!
       const section=make('section','vinci-room-source')
       section.append(make('h2','',text(station.name)),make('p','vinci-promise',text(station.promise)))
-      for(const label of station.labels)appendSourceStatement(section,label)
       const full=make('div','vinci-record');setRegister(full,'record')
+      for(const label of station.labels)appendSourceStatement(section,label,full)
       full.append(make('p','vinci-statement',text(station.record??station.promise)),make('small','vinci-citation',station.promiseSource))
       const sources=exhibits?.pictureSources()??[]
       if(id==='picture-room'||id==='supper-wall'){
         const works=new Map(sources.filter(({work})=>(work.id==='last-supper')===(id==='supper-wall')).map(({work})=>[work.id,work]))
         for(const work of works.values())full.append(createPolicyWorkLabel(work,sources.filter(source=>source.work.id===work.id).map(source=>source.entry),true))
       }
-      section.append(full);appendRoomExhibits(section,id);appendAbsences(section,id);panel.append(section)
+      appendRoomExhibits(section,id);appendAbsences(section,id);foldRecord(section,full);panel.append(section)
     }
   }
   function paintWingSources(credits:readonly HTMLElement[]):void {
     const panel=sources.panels.wing;panel.textContent=''
-    appendSourceStatement(panel,vinciReconstruction)
-    appendSourceStatement(panel,vinciCollectionThreshold)
-    appendSourceStatement(panel,vinciHourLabel)
-    appendSourceStatement(panel,vinciHourIntegrity)
+    const full=make('div','vinci-record');setRegister(full,'record')
+    appendSourceStatement(panel,vinciReconstruction,full)
+    appendSourceStatement(panel,vinciCollectionThreshold,full)
+    appendSourceStatement(panel,vinciHourLabel,full)
+    appendSourceStatement(panel,vinciHourIntegrity,full)
     panel.append(make('h3','',text(vinciSourcesHeadings.grounds)))
     for(const ground of vinciGrounds)panel.append(make('p','vinci-statement',text(ground)))
     panel.append(make('h3','',text(vinciSourcesHeadings.policy)),make('p','vinci-statement',text(vinciRightsPolicy)))
     panel.append(make('h3','',text(vinciSourcesHeadings.counted)),make('p','vinci-statement',text(vinciWingCounts)))
-    const full=make('div','vinci-record');setRegister(full,'record')
     full.append(make('pre','vinci-arithmetic',text(vinciHourArithmetic)),...credits.map(node=>node.cloneNode(true)))
-    panel.append(full);appendCertaintyLegend(panel)
+    foldRecord(panel,full);appendCertaintyLegend(panel)
     panel.append(make('p','vinci-door-disclosure',text(WING_TEXT.doorNote)))
   }
   function paintDock() {
