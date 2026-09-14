@@ -9,6 +9,7 @@ import {
 import { cameraPosition, float, length, mx_noise_float, normalMap, positionWorld, smoothstep, vec2, vec3 } from 'three/tsl'
 import type { TierName } from '../../stack/tier'
 import { dossier, edgeDistance, feature, inside, polygon, type Feature, type Quantity } from './site'
+import { anisotropicFootprint } from './masonry-courses'
 
 export type CourtPoint = [east:number,north:number]
 export interface InnerCourtRegion {
@@ -141,8 +142,10 @@ function tri(target:Batch,a:Vector3,b:Vector3,c:Vector3,colour:Color):void {
 const world=(p:CourtPoint,height:number):Vector3=>new Vector3(p[0],height,-p[1])
 function material():MeshStandardNodeMaterial {
   const result=new MeshStandardNodeMaterial({vertexColors:true,roughness:.94,side:DoubleSide})
-  const p=positionWorld,pixel=length(p.dFdx()).add(length(p.dFdy())).max(.000001)
-  const density=float(1).sub(smoothstep(6,38,length(p.sub(cameraPosition))))
+  const p=positionWorld,pixel=anisotropicFootprint(p)
+  // Resolution, not distance: the court is also read through the gate from the
+  // street, and a camera-distance fade takes its grit away exactly there.
+  const density=smoothstep(1.4,3,float(.5).div(pixel))
   const mid=mx_noise_float(p.mul(17)).mul(smoothstep(1,3,float(.059).div(pixel)))
   const fine=mx_noise_float(p.mul(145)).mul(smoothstep(1,3,float(.007).div(pixel)))
   result.colorNode=vec3(1,1,1).mul(mx_noise_float(p.mul(.47)).mul(.10).add(1))
