@@ -16,7 +16,10 @@ import * as TSL from 'three/tsl';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 const WING = 'src/wings/vinci';
 const SHELL_CLEARANCE = .25, TERRAIN_CLEARANCE = .3;
-const STEP_SECONDS = 1 / 240, TRANSITION_SECONDS = 2.4;
+// The walk is timed at a stroll, so a leg lasts as long as its own length
+// says: the sampler observes until the rail reports it has arrived, and its
+// step is chosen so the spacing stays near two centimetres at that pace.
+const STEP_SECONDS = 1 / 60, TRANSITION_SECONDS = 21;
 const errors = [], notes = [], loaded = new Map(), modules = new Map();
 const report = {
   checker: 'vinci-offline-geometry', replacesEyes: false,
@@ -376,9 +379,12 @@ await section('actual camera rail against actual triangles', async () => {
       const previous = camera.position.clone();
       let lastTested = null, pathGrade = Infinity, pathMesh = Infinity, pathShell = SHELL_CLEARANCE, pathStep = 0, pathRoll = 0, tested = 0;
       const steps = beat ? Math.ceil(TRANSITION_SECONDS / STEP_SECONDS) : 1;
-      for (let sample = 0; sample <= steps; sample++) {
+      let arrived = false;
+      for (let sample = 0; sample <= steps && !arrived; sample++) {
         clock = startTime + sample * STEP_SECONDS;
         rail.update(); totalSamples++;
+        // the whole leg is walked, and nothing past its arrival is sampled
+        if (sample > 2 && !rail.navigation.active && !rail.navigation.queued.length) arrived = true;
         const eye = camera.position;
         if (![...eye.toArray(), ...camera.quaternion.toArray(), camera.fov].every(Number.isFinite)) { fail('camera-nonfinite', `${viewport}/${from}->${id}`); break; }
         euler.setFromQuaternion(camera.quaternion, 'YXZ');
