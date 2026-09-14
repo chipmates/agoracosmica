@@ -13,6 +13,8 @@ import { GRADES } from '../../stack/grade'
 import { createShell } from './shell'
 import { createShellShadowDouble } from './shadow-shell'
 import { createCollection, collectionProvenance } from './collection'
+import { collectionView } from './collection/views'
+import { mountCollectionExhibits, type CollectionExhibits } from './collection/exhibits'
 import { createCollectionReceiverPlaneShadowFilter } from './receiver-plane-shadow'
 import { createCollectionAccess, collectionAccessPoint, collectionAccessProvenance } from './collection-access'
 import { createRoadDressing, roadDressingProvenance } from './road-dressing'
@@ -106,6 +108,7 @@ export function createWing():WingModule {
   let standing=false, scheduled=0, sign:HTMLElement|undefined, plates=0
   let authority:ReturnType<typeof createRailGeometryAuthority>|undefined
   let shadowCache:ReturnType<typeof createStaticShadowCache>|undefined
+  let exhibits:CollectionExhibits|undefined, exhibitClock=0
   let restoreEnvironmentRotation:(()=>void)|null=null
   const narrow=()=>innerWidth/innerHeight<=.9
   const shadowFocus=new Vector3(NaN,NaN,NaN), focusAhead=new Vector3()
@@ -175,7 +178,13 @@ export function createWing():WingModule {
     applyDisplayedHorizonHaze(sky.material,scene.fog as FogExp2)
     sky.scale.setScalar(1800);sky.sunPosition.value.copy(key.direction).multiplyScalar(450000);sky.turbidity.value=4;sky.rayleigh.value=1.4;sky.cloudScale.value=.0006;sky.cloudCoverage.value=.28;sky.cloudDensity.value=.42;sky.cloudElevation.value=.35;sky.cloudSpeed.value=0;scene.add(sky)
     const entry=createEntryPassage(stack.tierName())
-    shell=createShell(stack.tierName(),stack.materials);scene.add(createGround(stack.tierName(),stack.materials),shell,entry,createGatePassage(stack.tierName()),createInnerCourtDressing(groundHeight,stack.tierName()),createRoadDressing(groundHeight,stack.tierName()),createCollection(),createCollectionAccess(),createVegetation(groundHeight,stack.tierName()),createGroundDressing(groundHeight,stack.tierName()))
+    shell=createShell(stack.tierName(),stack.materials)
+    const ground=createGround(stack.tierName(),stack.materials)
+    // The collection is built after the house has asked the library for its
+    // own sets, so the machines' smaller requests never arrive first.
+    const collection=createCollection()
+    exhibits=mountCollectionExhibits(collection,stack)
+    scene.add(ground,shell,entry,createGatePassage(stack.tierName()),createInnerCourtDressing(groundHeight,stack.tierName()),createRoadDressing(groundHeight,stack.tierName()),collection,createCollectionAccess(),createVegetation(groundHeight,stack.tierName()),createGroundDressing(groundHeight,stack.tierName()))
     if(stack.tierName()==='calm'){
       const shadowShell=createShellShadowDouble(shell,entry)
       shell.traverse(o=>{if(o instanceof Mesh)o.castShadow=false})
@@ -184,6 +193,11 @@ export function createWing():WingModule {
     }
     water=createWater(scene,stack);scene.add(water)
     shadowCache=createStaticShadowCache(scene,camera,stack.renderer,()=>stack.materials.pending())
+    // The cache proves the scene's casters are the ones it snapshotted. The
+    // court's exhibit brings its own materials from the library a moment
+    // later, so the snapshot is taken again once they have arrived; without
+    // it the whole shadow map is re-rendered on every frame of the walk.
+    void exhibits?.ready.then(()=>{if(!hosts||!standing)return;shadowCache?.dispose();shadowCache=createStaticShadowCache(scene,camera,stack.renderer,()=>stack.materials.pending())})
     for(const root of scene.children){const id=root===shell?'vinci/shell':root.name==='vinci/shell-shadow'?'vinci/shell-shadow':root.name==='wing-vinci/gate-passage'?'vinci/gate-passage':root===water?'vinci/water':root===sky?'vinci/sky':root.name.includes('landscape trees')?'vinci/vegetation':root.name==='vinci/collection-modern-insertion'?'vinci/collection':root.name==='vinci generated road dressing'?'vinci/road-dressing':root.name==='vinci generated inner court dressing'?'vinci/inner-court':root.name.includes('dressing')?'vinci/ground-dressing':'vinci/terrain';root.traverse(o=>{if(o instanceof Mesh){const assetId=typeof o.userData['manifestId']==='string'?o.userData['manifestId']:id;o.userData['manifestId']=assetId;o.userData['asset']=assetId}})}
     authority=createRailGeometryAuthority(collectRailSolids(scene))
     rail=createRail(camera,clock,authority);measurement=createMeasurement(h.labels,stack)
@@ -236,7 +250,8 @@ export function createWing():WingModule {
    * believing it shot a corner. */
   let pendingView=''
   function showView(id:string) {
-    const inspectCost=id.endsWith('-cost')&&id!=='audit-cost';if(inspectCost)id=id.slice(0,-5);const s=vinciContent[card]!;if(id==='scene')endInspection();if(id==='scene'||id.startsWith('audit-'))rail.look(0,0);if(id==='scene'||id==='audit-cost'){mode=1;paintDock()}if(id==='audit-cost')measurement.show(s.id);if(id==='audit-ui'){mode=1;paintDock();measurement.show(s.id,'ui')}if(id==='audit-ui-labels'){mode=2;paintDock();measurement.show(s.id,'ui')}const pose=namedPose(id,narrow());if(pose){activeView=id;mode=1;paintDock();rail.set(s.id,pose,true,narrow());header.querySelector('.vinci-insertion')?.remove();titleForView(id);if(id.startsWith('collection'))header.append(make('p','vinci-insertion',lang()==='de'?'Museumseinbau der Gegenwart · Räume im Bau':'Modern museum insertion · Rooms in construction'))}const cone=/(?:^|-)cone-(ul|ur|dl|dr)$/.exec(id);if(cone){placeCanonicalStation();rail.look(cone[1]!.includes('l')?.6:-.6,cone[1]!.startsWith('u')?.32:-.32)}if(id==='labels'||id==='hour'||id==='record'){mode=2;paintDock();if(id==='record'){dock.querySelector<HTMLButtonElement>('.vinci-record-toggle')?.click();dock.scrollTop=record.offsetTop-18}}if(inspectCost&&(pose||cone))measurement.show(`${s.id} / ${id}`)
+    const inspectCost=id.endsWith('-cost')&&id!=='audit-cost';if(inspectCost)id=id.slice(0,-5);const s=vinciContent[card]!;if(id==='scene')endInspection();if(id==='scene'||id.startsWith('audit-'))rail.look(0,0);if(id==='scene'||id==='audit-cost'){mode=1;paintDock()}if(id==='audit-cost')measurement.show(s.id);if(id==='audit-ui'){mode=1;paintDock();measurement.show(s.id,'ui')}if(id==='audit-ui-labels'){mode=2;paintDock();measurement.show(s.id,'ui')}if(id.startsWith('collection-room')||id.startsWith('collection-hang'))exhibits?.warm()
+    const pose=namedPose(id,narrow())??collectionView(id,narrow());if(pose){activeView=id;mode=1;paintDock();rail.set(s.id,pose,true,narrow());header.querySelector('.vinci-insertion')?.remove();titleForView(id);if(id.startsWith('collection'))header.append(make('p','vinci-insertion',lang()==='de'?'Museumseinbau der Gegenwart · Räume im Bau':'Modern museum insertion · Rooms in construction'))}const cone=/(?:^|-)cone-(ul|ur|dl|dr)$/.exec(id);if(cone){placeCanonicalStation();rail.look(cone[1]!.includes('l')?.6:-.6,cone[1]!.startsWith('u')?.32:-.32)}if(id==='labels'||id==='hour'||id==='record'){mode=2;paintDock();if(id==='record'){dock.querySelector<HTMLButtonElement>('.vinci-record-toggle')?.click();dock.scrollTop=record.offsetTop-18}}if(inspectCost&&(pose||cone))measurement.show(`${s.id} / ${id}`)
   }
   /** The door asks about the place the visitor is standing in, so the
    * question travels with the card and not with the rail mark. */
@@ -411,12 +426,13 @@ export function createWing():WingModule {
         if(!left&&railReady()){sign.remove();sign=undefined}
       }
       measurement.update();rail.update()
+      if(exhibits){const now=hosts.world.clock();exhibits.update(now,Math.max(0,Math.min(.25,now-exhibitClock)),hosts.world.camera.position);exhibitClock=now}
       const here=rail.navigation.completed
       if(here&&here!==vinciContent[card]!.id&&!activeView){
         const arrived=vinciContent.findIndex(s=>s.id===here)
         if(arrived>=0){card=arrived;dock.scrollTop=0;aimPrint(here);paintHeader();paintDock();paintQuestion()}
       }
       focusNearCascade();shadowCache?.update();sky.position.copy(hosts.world.camera.position);labels.update(dock.hidden?null:dock.getBoundingClientRect())},
-    stop(){if(scheduled)cancelAnimationFrame(scheduled);scheduled=0;standing=false;sign=undefined;shadowCache?.dispose();shadowCache=undefined;restoreEnvironmentRotation?.();restoreEnvironmentRotation=null;controller?.abort();source?.remove();labels?.dispose();measurement?.dispose();water?.dispose();hosts?.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key?.light)o.dispose()});key?.dispose();if(hosts){hosts.world.scene.traverse(o=>{if(o instanceof Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose()}});hosts.world.scene.clear();delete hosts.stage.parentElement!.dataset['wing'];if(labelHostHidden===null)hosts.labels.removeAttribute('aria-hidden');else hosts.labels.setAttribute('aria-hidden',labelHostHidden)}hosts=undefined},
+    stop(){if(scheduled)cancelAnimationFrame(scheduled);scheduled=0;standing=false;exhibits?.dispose();exhibits=undefined;sign=undefined;shadowCache?.dispose();shadowCache=undefined;restoreEnvironmentRotation?.();restoreEnvironmentRotation=null;controller?.abort();source?.remove();labels?.dispose();measurement?.dispose();water?.dispose();hosts?.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key?.light)o.dispose()});key?.dispose();if(hosts){hosts.world.scene.traverse(o=>{if(o instanceof Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose()}});hosts.world.scene.clear();delete hosts.stage.parentElement!.dataset['wing'];if(labelHostHidden===null)hosts.labels.removeAttribute('aria-hidden');else hosts.labels.setAttribute('aria-hidden',labelHostHidden)}hosts=undefined},
   }
 }
