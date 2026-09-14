@@ -47,6 +47,7 @@ import {
   TorusGeometry,
   Vector2,
   Vector3,
+  Vector4,
 } from 'three/webgpu'
 import * as TSL from 'three/tsl'
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js'
@@ -86,6 +87,7 @@ const {
   positionWorld,
   pow,
   screenCoordinate,
+  screenUV,
   sin,
   smoothstep,
   sqrt,
@@ -164,6 +166,10 @@ export interface AgoraState {
   elapsed: number
   /** 0..1 while the Keeper speaks: the fire listens and leans in */
   speak?: number
+  /** 0..1 how much of the fire's AIR this frame gets (smoke, motes, the
+      ember plume). The sky phase looks up PAST the court, and a spark
+      crossing the letterpress up there is a mark nobody chose. Default 1. */
+  air?: number
 }
 
 /**
@@ -188,6 +194,24 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
      Reduced motion holds both clocks: the same complete room, at rest. */
   const uTP = uniform(0)
   const uR = uniform(0)
+  /** the fire's AIR: the plume, the sparks, the motes and the smoke. One
+      uniform so the frame that looks up past this room can take it back. */
+  const uAir = uniform(1)
+  /* THE PAGE RESERVES ITS PAPER HERE TOO. The night's stars are kept off the
+     museum's own lines by the firmament; the fire's air has to be kept off
+     them as well, or an ember ends its life sitting on a glyph. Eight
+     rectangles in CSS pixels, one screen-space product, and a spark that
+     crosses one dies over nine pixels, which is what sparks do. */
+  const uPageExtent = uniform(new Vector2(1, 1))
+  const uPageRects: N[] = Array.from({ length: 8 }, () =>
+    uniform(new Vector4(-1e4, -1e4, 0, 0))
+  )
+  const pagePx = screenUV.mul(uPageExtent)
+  let pageNode: N = float(1)
+  for (const rect of uPageRects) {
+    const pd = abs(pagePx.sub(rect.xy)).sub(rect.zw)
+    pageNode = pageNode.mul(smoothstep(0, 9, max(pd.x, pd.y)))
+  }
   const uFlick = uniform(1)
   const uFlame = uniform(0)
   const uLean = uniform(0)
@@ -1517,7 +1541,9 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
   }
 
   // ---- the ember plume: gold cooling to star-white as it climbs -------
-  const ASC_H = 2.9
+  // the phone's frame is a tall slot and the masthead sits in the top eighth
+  // of it: the plume is given the room it has, not the room a desktop has
+  const ASC_H = narrow ? 2.15 : 2.9
   const emberMat = new MeshBasicNodeMaterial({
     transparent: true,
     blending: AdditiveBlending,
@@ -1546,10 +1572,15 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
     // short halo (round 1 filled the sky with orange confetti)
     emberMat.opacityNode = pow(core, 4.0)
       .mul(smoothstep(0.0, 0.06, kv))
-      .mul(oneMinus(smoothstep(0.55, 1.0, kv)))
+      // an ember is spent before it reaches the masthead's band: the top of
+      // the frame belongs to the type, and a spark on a glyph is a mark
+      // nobody chose
+      .mul(oneMinus(smoothstep(0.38, 0.80, kv)))
       .mul(uFlick)
-      .mul(0.62)
+      .mul(0.70)
       .mul(uR)
+      .mul(uAir)
+      .mul(pageNode)
   }
   quadField(
     tier(58, 32),
@@ -1592,6 +1623,7 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
       .mul(uFlick)
       .mul(0.75)
       .mul(uR)
+      .mul(pageNode)
   }
   quadField(
     tier(34, 20),
@@ -1639,6 +1671,7 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
       .mul(oneMinus(smoothstep(0.3, 0.92, kv)))
       .mul(0.18)
       .mul(uR)
+      .mul(uAir)
   }
   quadField(
     tier(22, 14),
@@ -1681,6 +1714,8 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
       .mul(uFlick)
       .mul(0.34)
       .mul(uR)
+      .mul(uAir)
+      .mul(pageNode)
   }
   quadField(
     tier(52, 26),
@@ -1712,6 +1747,7 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
     uT.value = t
     uTP.value = t
     uR.value = r
+    uAir.value = s.air ?? 1
 
     // ONE fire, many flickers: the source stays steady, the light it throws
     // trembles a little more. All motion is sine-woven and deterministic.
@@ -1738,5 +1774,21 @@ export function createAgora(scene: Scene, rig: AgoraRig) {
     airMat.opacity = r * (0.24 + 0.06 * Math.sin(t * 1.7))
   }
 
-  return { update }
+  /** the page's standing lines, so the fire's air stays off them */
+  function reservePage(
+    rects: Array<{ x: number; y: number; half: number; vhalf: number }>,
+    width: number,
+    height: number
+  ): void {
+    uPageExtent.value.set(width, height)
+    for (let i = 0; i < uPageRects.length; i++) {
+      const slot = uPageRects[i]
+      if (!slot) continue
+      const r = rects[i]
+      if (r) slot.value.set(r.x, r.y, Math.max(6, r.half), Math.max(6, r.vhalf))
+      else slot.value.set(-1e4, -1e4, 0, 0)
+    }
+  }
+
+  return { update, reservePage }
 }
