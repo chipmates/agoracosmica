@@ -105,24 +105,67 @@ export function namedPose(id:string,narrow:boolean):Pose|undefined {
 
 /** Retained gate waypoints; every rounded control hull needs its own proof. */
 const gateRoute=[world(...roadGradeProvenance.crossing,2.65),world(20.6107,-15.9474,2.48),world(18.2624,-17.4724,2.48),world(15.9141,-18.9974,1.65),world(13.5658,-20.5224,1.65)]
-/** Scripted exhibition move; this duration is not a human walking-speed claim. */
-export const railMoveDurationSeconds = 1.12
+/** The walk between two stations is timed at a stroll, so a leg's length
+ * decides its seconds. Past LONG_LEG_M a chosen rail mark on the far side of
+ * the museum is a traverse, not a claim about anyone's pace, and it
+ * compresses toward MOVE_MAX_S. */
+export const railWalkMetresPerSecond = 1.35
+const LONG_LEG_M = 14, TRAVERSE_METRES_PER_SECOND = 5, MOVE_MIN_SECONDS = 1.1, MOVE_MAX_SECONDS = 20
+export function railMoveSeconds(lengthM:number):number {
+  const stroll=Math.min(Math.max(0,lengthM),LONG_LEG_M), traverse=Math.max(0,lengthM-LONG_LEG_M)
+  return Math.min(MOVE_MAX_SECONDS,Math.max(MOVE_MIN_SECONDS,stroll/railWalkMetresPerSecond+traverse/TRAVERSE_METRES_PER_SECOND))
+}
+/** One notch of the wheel is one stride along the path being walked. */
+export const railStrideMetres = .78
+/** What an offline checker waits for ANY certified leg to complete. */
+export const railMoveDurationSeconds = MOVE_MAX_SECONDS
+/** The gaze leads the walk: it leaves the old composition inside this much of
+ * the leg, holds the path's own heading sampled six metres ahead of the body,
+ * and turns into the new composition over the last third. The look-ahead is
+ * what keeps a corner from filling the frame: the eye is already round it
+ * while the body is still passing the jamb. */
+/** A leg shorter than this is one step of a walk, not a walk: the visitor is
+ * already looking at what they are arriving at, and leading the gaze down a
+ * six-metre path only turns it into the wall the path runs at. */
+const GAZE_LEAVES = .16, GAZE_ARRIVES = .66, GAZE_AHEAD_M = 6, WALKED_LEG_M = 10
+const wrap=(a:number):number=>Math.atan2(Math.sin(a),Math.cos(a))
+const turn=(from:number,to:number,t:number):number=>from+wrap(to-from)*t
+const ramp=(edge0:number,edge1:number,x:number):number=>{const t=Math.max(0,Math.min(1,(x-edge0)/(edge1-edge0)));return t*t*(3-2*t)}
 export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:RailGeometryAuthority) {
   interface Request { id:VinciStationId; pose:Pose; phone:boolean }
   let completed:Request|undefined, active:Request|undefined
   const queue:Request[]=[]
   let path:ReturnType<typeof createCertifiedRailPath>|undefined, started=0, placementNeedsFrame=false
-  const duration=railMoveDurationSeconds, fromQ=new Quaternion(), toQ=new Quaternion()
+  let duration=MOVE_MIN_SECONDS, strideM=0, strideTarget=0, strideAt=0
+  const fromQ=new Quaternion(), toQ=new Quaternion()
   let fromFov=49,targetFov=49
+  let fromHeading=0,fromElevation=0,toHeading=0,toElevation=0,walked=false
+  const ahead=new Vector3(), behind=new Vector3()
   const reducedMotion=()=>matchMedia('(prefers-reduced-motion: reduce)').matches
   const look=createRailLookSmoother(clock,reducedMotion,.1)
   const base=new Quaternion(), euler=new Euler(0,0,0,'YXZ'), forward=new Vector3()
   function poseQuaternion(pose:Pose) { const copy=new PerspectiveCamera();copy.position.copy(pose.eye);copy.lookAt(pose.at);return copy.quaternion.clone() }
+  /** The heading and elevation a quaternion is already looking along. No roll
+   * is read back, because none is ever written. */
+  function angles(q:Quaternion):{heading:number;elevation:number} {
+    forward.set(0,0,-1).applyQuaternion(q)
+    return {heading:Math.atan2(-forward.x,-forward.z),elevation:Math.asin(Math.max(-1,Math.min(1,forward.y)))}
+  }
+  /** Where the path points at a distance along it: the direction the visitor
+   * is about to walk, which is what the gaze follows between stations. */
+  function pathAngles(metres:number):{heading:number;elevation:number} {
+    const total=path!.length,at=Math.max(0,Math.min(total,metres))
+    path!.pointAtDistance(Math.max(0,at-.25),behind);path!.pointAtDistance(Math.min(total,at+.25),ahead)
+    ahead.sub(behind)
+    const flat=Math.hypot(ahead.x,ahead.z)
+    if(flat<1e-9)return {heading:fromHeading,elevation:fromElevation}
+    return {heading:Math.atan2(-ahead.x,-ahead.z),elevation:Math.max(-.20,Math.min(.13,Math.atan2(ahead.y,flat)))}
+  }
   function samePose(a:Pose,b:Pose) { return a.eye.distanceToSquared(b.eye)<1e-18&&a.at.distanceToSquared(b.at)<1e-18&&Math.abs(a.fov-b.fov)<1e-9 }
   function sameRequest(a:Request,b:Request) { return a.id===b.id&&a.phone===b.phone&&samePose(a.pose,b.pose) }
   function matrices() { camera.updateProjectionMatrix();camera.updateMatrixWorld() }
   function placeEndpoint(request:Request) {
-    completed=request;active=undefined;path=undefined;look.snap()
+    completed=request;active=undefined;path=undefined;look.snap();strideM=strideTarget=0
     camera.position.copy(request.pose.eye);base.copy(poseQuaternion(request.pose))
     camera.quaternion.copy(base);camera.fov=fittedRailFov(request.pose.fov,camera.aspect,request.phone);matrices()
   }
@@ -133,6 +176,10 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
     path=authority.route(completed.pose,request.pose,request.phone,camera)
     // Route orientation stays separate from the bounded visitor look.
     fromQ.copy(base);toQ.copy(poseQuaternion(request.pose))
+    const from=angles(fromQ),to=angles(toQ)
+    fromHeading=from.heading;fromElevation=from.elevation;toHeading=to.heading;toElevation=to.elevation
+    walked=path.length>=WALKED_LEG_M
+    duration=railMoveSeconds(path.length);strideM=strideTarget=0;strideAt=now
     fromFov=completed.pose.fov;targetFov=request.pose.fov;look.recenter()
     started=now;active=request
   }
@@ -145,7 +192,7 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
   }
   return {
     /** Physical scheduler state, separate from the shared selected destination. */
-    get navigation() { return { completed:completed?.id, active:active?.id, queued:queue.map(request=>request.id) } },
+    get navigation() { return { completed:completed?.id, active:active?.id, queued:queue.map(request=>request.id), legSeconds:active?duration:0, legMetres:active&&path?path.length:0 } },
     set(id:VinciStationId,pose:Pose,instant=false,phone=camera.aspect<=.9) {
       const request={id,pose:{eye:pose.eye.clone(),at:pose.at.clone(),fov:pose.fov},phone}
       // Initial/named placement, explicit inspection return and resize are
@@ -158,6 +205,12 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
       queue.push(request)
     },
     look(y:number,pit:number){look.snap(y,pit)},
+    /** Walk on by hand. True when a leg was actually walking and took it. */
+    stride(count:number){
+      if(!active||!path||count<=0)return false
+      strideTarget=Math.min(strideTarget+count*railStrideMetres,path.length)
+      return true
+    },
     drag(dx:number,dy:number,cssViewportHeight:number){
       const delta=projectRailDrag(dx,dy,camera.getEffectiveFOV(),cssViewportHeight)
       look.dragRadians(delta.yaw,delta.pitch)
@@ -181,11 +234,27 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
         // One genuine endpoint per update; all later accepted requests remain.
         placeEndpoint(active);render(now);return
       }
-      const t=active?Math.max(0,Math.min(1,(now-started)/duration)):1,s=t*t*(3-2*t)
+      if(active&&path&&strideTarget>strideM) {
+        // A wheel notch during a leg is a stride, not a new destination: the
+        // visitor walks on rather than waiting the leg out.
+        const step=Math.max(0,Math.min(.25,now-strideAt))
+        strideM+=(strideTarget-strideM)*-Math.expm1(-step/.28)
+      }
+      strideAt=now
+      const walkedFraction=active&&path?strideM/path.length:0
+      const t=active?Math.max(0,Math.min(1,(now-started)/duration+walkedFraction)):1,s=t*t*(3-2*t)
       if(active&&path) {
         assertRailProjection(camera)
         path.pointAtDistance(path.length*s,camera.position)
-        base.slerpQuaternions(fromQ,toQ,s)
+        // THE GAZE LEADS THE WALK. The camera turns out of the station it is
+        // leaving, looks along the path it is about to take (sampled ahead of
+        // the body, so a corner is seen before it is reached), and turns into
+        // the next station's composition only on arrival.
+        const leaves=walked?ramp(0,GAZE_LEAVES,s):0,arrives=walked?ramp(GAZE_ARRIVES,1,s):s
+        const along=walked?pathAngles(path.length*s+GAZE_AHEAD_M):{heading:toHeading,elevation:toElevation}
+        const heading=turn(turn(fromHeading,along.heading,leaves),toHeading,arrives)
+        const led=fromElevation+(along.elevation-fromElevation)*leaves
+        euler.set(led+(toElevation-led)*arrives,heading,0,'YXZ');base.setFromEuler(euler)
         camera.fov=fittedRailFov(fromFov+(targetFov-fromFov)*s,camera.aspect,active.phone)
       }
       render(now)

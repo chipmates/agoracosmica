@@ -119,6 +119,12 @@ function endpoint(h,id,label=id) {
   ensure(Math.abs(h.camera.fov-fittedRailFov(h.pose(id).fov,h.camera.aspect,h.phone))<1e-8,'Wrong endpoint FOV: '+label)
 }
 function finish(h,id,start){h.at(start);h.at(start+DURATION);endpoint(h,id)}
+/** Advance until this semantic station is the one standing. A leg is as long
+ * as its own path, so a fixed number of ticks is no longer a wait. */
+function settle(h,id,label=id) {
+  for(let guard=0;guard<600&&h.rail.navigation.completed!==id;guard++)h.at(h.now+Math.max(.25,(h.rail.navigation.legSeconds||DURATION)/3))
+  endpoint(h,id,label)
+}
 function check(viewport,name,body) {
   const before=statistics.cameraSamples
   try{const details=body();cases.push({viewport,name,passed:true,samples:statistics.cameraSamples-before,...details})}
@@ -137,13 +143,18 @@ for(const phone of [false,true]) {
   })
   check(viewport,'Accepted requests preserve the complete first trajectory and later FIFO destinations',()=>{
     const h=harness(phone),control=harness(phone);h.set('courtyard');control.set('courtyard')
-    for(let i=0;i<=224;i++) {
-      h.at(i*STEP);control.at(i*STEP)
+    h.at(0);control.at(0)
+    // A leg lasts as long as its own length says, so the sub-step is the
+    // walking leg's own duration and not the longest leg in the wing.
+    const seconds=h.rail.navigation.legSeconds,step=seconds/224
+    for(let i=1;i<224;i++) {
+      h.at(i*step);control.at(i*step)
       if(i===45)h.set('garden');if(i===100)h.set('hall');if(i===145)h.set('arrival')
       compare(h.camera,control.camera,'Queued input changes no in-flight sample')
     }
+    h.at(seconds+1e-6);control.at(seconds+1e-6);compare(h.camera,control.camera,'Queued input changes no arrival sample')
     endpoint(h,'courtyard')
-    for(const [i,id] of ['garden','hall','arrival'].entries())finish(h,id,(i+1)*DURATION)
+    for(const id of ['garden','hall','arrival'])settle(h,id)
     ensure(h.rail.navigation.queued.length===0,'FIFO did not drain')
   })
   check(viewport,'B,C,B reversal survives; only consecutive identical tail commands deduplicate',()=>{
@@ -165,7 +176,7 @@ for(const phone of [false,true]) {
     const h=harness(phone),accepted=Array.from({length:257},(_,i)=>ids[(i+1)%ids.length])
     for(const id of accepted)h.set(id)
     const trace=[];let previous='arrival'
-    for(let tick=0;trace.length<accepted.length&&tick<800;tick++) {
+    for(let tick=0;trace.length<accepted.length&&tick<6000;tick++) {
       h.at(tick*2)
       const current=h.rail.navigation.completed
       if(current!==previous){trace.push(current);endpoint(h,current);previous=current}
@@ -175,11 +186,14 @@ for(const phone of [false,true]) {
   })
   check(viewport,'A delayed frame completes only the active endpoint and gives later legs fresh clocks',()=>{
     const h=harness(phone);h.set('courtyard');h.at(0);h.at(.2);h.set('garden');h.set('hall')
-    h.at(10);endpoint(h,'courtyard');ensure(h.rail.navigation.active===undefined,'A second leg began during completion')
+    const late=DURATION+10
+    h.at(late);endpoint(h,'courtyard');ensure(h.rail.navigation.active===undefined,'A second leg began during completion')
     ensure(h.rail.navigation.queued.join(',')==='garden,hall','Delayed frame drained pending requests')
-    h.at(10);compare(h.camera,canonical(phone,'courtyard'),'New leg zero elapsed time')
-    const control=harness(phone,'courtyard');control.set('garden')
-    for(let i=0;i<=224;i++){h.at(10+i*STEP);control.at(i*STEP);compare(h.camera,control.camera,'Fresh route clock')}
+    h.at(late);compare(h.camera,canonical(phone,'courtyard'),'New leg zero elapsed time')
+    const control=harness(phone,'courtyard');control.set('garden');control.at(0)
+    const seconds=control.rail.navigation.legSeconds,step=seconds/224
+    for(let i=1;i<224;i++){h.at(late+i*step);control.at(i*step);compare(h.camera,control.camera,'Fresh route clock')}
+    h.at(late+seconds+1e-6);control.at(seconds+1e-6);compare(h.camera,control.camera,'Fresh route clock at the endpoint')
     endpoint(h,'garden')
   })
   check(viewport,'Reduced motion finishes the active request then preserves every queued reversal',()=>{
@@ -221,13 +235,21 @@ for(const phone of [false,true]) {
     ensure(h.rail.navigation.queued.length===0&&!h.rail.navigation.active,'Resize retained stale requests')
     ensure(h.camera.position.distanceTo(resized.eye)<1e-8&&Math.abs(h.camera.fov-resized.fov)<1e-8,'Resize family or lens was ignored')
   })
-  check(viewport,'Every one of the 19 stations reaches its real pose under the ordinary 1.2-second cadence',()=>{
+  check(viewport,'Every one of the 19 stations is reached, each leg walked in full at its measured pace',()=>{
     const h=harness(phone);ensure(ids.length===19,'Actual canon lost a station')
+    const walks=[]
+    let clock=0
     for(let i=0;i<ids.length;i++) {
-      const start=i*1.2;h.at(start);h.set(ids[i])
-      for(let sample=1;sample<=240;sample++)h.at(start+sample*.005)
-      endpoint(h,ids[i]);compare(h.camera,canonical(phone,ids[i]),'Ordinary cadence '+ids[i])
+      h.at(clock);h.set(ids[i]);h.at(clock+=.005)
+      const metres=h.rail.navigation.legMetres,seconds=h.rail.navigation.legSeconds
+      const samples=Math.max(240,Math.ceil(seconds/.005))
+      for(let sample=1;sample<samples;sample++)h.at(clock+sample*seconds/samples)
+      h.at(clock+seconds+1e-6)
+      clock+=seconds+.05
+      endpoint(h,ids[i]);compare(h.camera,canonical(phone,ids[i]),'Walked leg '+ids[i])
+      if(metres>0)walks.push({from:ids[i-1],to:ids[i],metres:+metres.toFixed(2),seconds:+seconds.toFixed(2),metresPerSecond:+(metres/seconds).toFixed(2)})
     }
+    return {walks}
   })
   check(viewport,'Actual controller consumes the projected pixel delta and reaches 63.212% at 100 ms',()=>{
     const h=harness(phone),pose=h.pose('arrival'),base=new THREE.PerspectiveCamera();base.position.copy(pose.eye);base.lookAt(pose.at)
