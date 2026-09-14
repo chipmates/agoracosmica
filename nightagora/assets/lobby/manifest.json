@@ -1698,6 +1698,71 @@
       },
       "honesty_en": "Public domain work. Reproduction from Wikimedia Commons. The museum labels the reproduction, not the photograph. Non-profit cultural use.",
       "honesty_de": "Gemeinfreies Werk. Reproduktion von Wikimedia Commons. Das Museum kennzeichnet die Reproduktion, nicht die Fotografie. Nichtkommerzielle kulturelle Nutzung."
+    },
+    {
+      "id": "lobby/likeness-rumi",
+      "path": "likenesses/rumi/original.jpg",
+      "sha256": "9c472e5d564249c86c1bc752a37218ed0ab0e9678ae4fec53c50dd5f4005d4f7",
+      "bytes": 3196492,
+      "width": 1694,
+      "height": 2290,
+      "pixels": 3879260,
+      "slug": "rumi",
+      "name": "Rumi",
+      "wing": "lobby",
+      "class": "Tier 2",
+      "tier": 2,
+      "licence": "Public domain",
+      "licence_source_url": "https://commons.wikimedia.org/wiki/File:Mawlana_(\"Rumi\")_meeting_Shams-i_Tabrizi._Cāmiʿü’s-siyer_of_Muhammed_Tahir,_Topkapı_Palace_Museum_Library,_Istanbul,_H._1230,_fol._121a.jpg#Licensing",
+      "licence_location": "Commons file page, Licensing",
+      "holder": "Topkapı Palace Museum Library, Istanbul, H. 1230, fol. 121a",
+      "maker": "Unknown 16th-century artist",
+      "date": "16th century",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Mawlana_(\"Rumi\")_meeting_Shams-i_Tabrizi._Cāmiʿü’s-siyer_of_Muhammed_Tahir,_Topkapı_Palace_Museum_Library,_Istanbul,_H._1230,_fol._121a.jpg",
+      "original_url": "https://upload.wikimedia.org/wikipedia/commons/9/92/Mawlana_%28%22Rumi%22%29_meeting_Shams-i_Tabrizi._C%C4%81mi%CA%BF%C3%BC%E2%80%99s-siyer_of_Muhammed_Tahir%2C_Topkap%C4%B1_Palace_Museum_Library%2C_Istanbul%2C_H._1230%2C_fol._121a.jpg",
+      "holder_record_url": null,
+      "display": true,
+      "label_en": "Rumi meeting Shams-i Tabrizi. Whole manuscript folio, unknown artist, 16th century, from Muhammed Tahir’s Cāmiʿü’s-siyer. Rumi is the turbaned rider. Topkapı Palace Museum Library, Istanbul, H. 1230, fol. 121a. Licence: “Public domain”. Public domain work. Reproduction from Wikimedia Commons. The museum labels the reproduction, not the painting. Non-profit cultural use.",
+      "label_de": "Rumi begegnet Shams-i Tabrizi. Ganzes Handschriftenblatt, unbekannter Künstler, 16. Jahrhundert, aus Muhammed Tahirs Cāmiʿü’s-siyer. Rumi ist der Reiter mit Turban. Bibliothek des Topkapı-Palastmuseums, Istanbul, H. 1230, fol. 121a. Lizenz: „Public domain“. Gemeinfreies Werk. Reproduktion von Wikimedia Commons. Das Museum kennzeichnet die Reproduktion, nicht das Gemälde. Nichtkommerzielle kulturelle Nutzung.",
+      "previews": [
+        {
+          "path": "likenesses/rumi/preview-512.jpg",
+          "sha256": "3630ff6a6a06bd6ae71125f64e55fa93bf5a466113f8e6764dc66c07b50d2bd8",
+          "bytes": 114543,
+          "width": 379,
+          "height": 512,
+          "pixels": 194048,
+          "long_edge": 512,
+          "format": "image/jpeg",
+          "quality": 88,
+          "color_space": "sRGB",
+          "source_path": "likenesses/rumi/original.jpg"
+        },
+        {
+          "path": "likenesses/rumi/preview-1024.jpg",
+          "sha256": "fed1efc477f8ef38e7a6ed3ba97a41ece1b17b745be7da4c42a1445fa0ab405b",
+          "bytes": 337307,
+          "width": 757,
+          "height": 1024,
+          "pixels": 775168,
+          "long_edge": 1024,
+          "format": "image/jpeg",
+          "quality": 88,
+          "color_space": "sRGB",
+          "source_path": "likenesses/rumi/original.jpg"
+        }
+      ],
+      "verified_on": "2026-09-14",
+      "source_verification": "Current Commons imageinfo, original link, licence template and file history checked. Holder evidence rechecked where available.",
+      "derivation": "No embedded ICC profile. Source interpreted as sRGB. JPEG previews resized with Lanczos, quality 88, embedded sRGB profile. Original bytes unchanged.",
+      "rights_note": "Whole manuscript folio, a scene showing Rumi as the turbaned rider meeting Shams-i Tabrizi. Commons PD-Old and PD-1923, sourced to a Harvard DASH scholarly dissertation. Holder: Topkapı Palace Museum Library, H. 1230, fol. 121a. Muhammed Tahir is the manuscript author, not an identified painter. No independent open release by the holder is asserted.",
+      "source_version": {
+        "file_timestamp": "2025-11-25T10:38:04Z",
+        "commons_revision_id": 1201674181
+      },
+      "source_sha1": "212b50ad58a50bc350ad3c26aeee8d358a26e355",
+      "honesty_en": "Public domain work. Reproduction from Wikimedia Commons. The museum labels the reproduction, not the painting. Non-profit cultural use.",
+      "honesty_de": "Gemeinfreies Werk. Reproduktion von Wikimedia Commons. Das Museum kennzeichnet die Reproduktion, nicht das Gemälde. Nichtkommerzielle kulturelle Nutzung."
     }
   ]
 }
