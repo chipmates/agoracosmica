@@ -39,6 +39,8 @@ const p=(e:number,n:number,h:number,te:number,tn:number,th:number,fov=49):Pose=>
  * out from behind the card. The eye does not move: the visitor stands where
  * the room's own view stands them. */
 const NARROW_LENS=1.26, NARROW_AIM_SHARE=.21
+/** The phone stage the narrow poses are composed against, 390 by 844 px. */
+const PHONE_STAGE=390/844
 function narrowRoomPose(pose:Pose):Pose {
   const fov=Math.min(104,pose.fov*NARROW_LENS)
   const reach=pose.eye.distanceTo(pose.at)
@@ -68,9 +70,17 @@ export function stationPose(id:VinciStationId, narrow:boolean):Pose {
   // square: the eye stands eleven metres off its field, which is what holds
   // all 8.8 by 4.6 m of the absence in one frame.
   if(id==='supper-wall'){
-    const square=p(-33.9,SUPPER_WALL.north,COURT.level+1.66,
-      SUPPER_WALL.east+SUPPER_WALL.thickness/2,SUPPER_WALL.north,COURT.level+2.95,62)
-    return narrow?narrowRoomPose(square):square
+    const face=SUPPER_WALL.east+SUPPER_WALL.thickness/2
+    const square=p(-33.9,SUPPER_WALL.north,COURT.level+1.66,face,SUPPER_WALL.north,COURT.level+2.95,62)
+    if(!narrow) return square
+    // THE MEASUREMENT IS WHAT THE PHONE HOLDS. A 390 px stage at the room's
+    // own lens keeps 8.15 m of the field's 8.8 and loses both ends of it, so
+    // the lens comes off the field's width at this reach with a sixth of it
+    // as margin, and the aim drops to the wall's foot, which stands the whole
+    // outline above the card.
+    const reach=Math.abs(square.eye.x-face)
+    const fov=Math.atan(SUPPER_WALL.field.width/2*1.16/reach/PHONE_STAGE)*360/Math.PI
+    return p(-33.9,SUPPER_WALL.north,COURT.level+1.66,face,SUPPER_WALL.north,COURT.level+.15,fov)
   }
   const room=COLLECTION_STATION_ROOMS[id]
   // Floor subjects have a measured phone composition of their own; the
