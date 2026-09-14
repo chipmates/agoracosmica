@@ -208,14 +208,12 @@ function store(key: string, value: string): void {
     /* private mode: the night still works, it just forgets */
   }
 }
-let musicWoken = false
+let railAwake = false
 
-/** The first scroll is the browser's unlock gesture: the ambient bed
-    starts with the descent as the night's standard voice. */
-function wakeMusic(): void {
-  if (musicWoken) return
-  musicWoken = true
-  if (ambience.remembered() !== 'off') ambience.enable()
+/** Entering the museum reveals the controls. Sound waits for its own request. */
+function wakeInstruments(): void {
+  if (railAwake) return
+  railAwake = true
   railEl.hidden = false
   syncSoundLabel()
 }
@@ -857,7 +855,7 @@ descentSkip.addEventListener('click', () => skipDescent())
 // the impatient door on the totality screen: straight down to the fire
 document.getElementById('overture-skip')?.addEventListener('click', () => {
   if (phase !== 'held' && phase !== 'transit') return
-  wakeMusic()
+  wakeInstruments()
   transit = 1
   if (phase === 'held') setPhase('descent')
   skipDescent()
@@ -970,9 +968,7 @@ for (const control of instrumentsEl.querySelectorAll<HTMLButtonElement>('[data-t
   })
 }
 syncInstruments()
-syncSoundLabel()
-// (music standard: wakeMusic() fires with the first gesture that opens
-// the descent, for first and returning nights alike)
+addEventListener('na-sound-change', syncSoundLabel)
 
 // a voice holding the floor ducks the ambient bed
 addEventListener('na-voice', (e) => {
@@ -1384,7 +1380,7 @@ function setPhase(next: Phase): void {
   stack.setScene(scene, camera, LOOK[next])
   if (next === 'held') setStatus('enter')
   if (next === 'descent') {
-    wakeMusic() // reaching the descent IS the first gesture
+    wakeInstruments()
     setStatus('descend')
     descentEl.hidden = false
     holdRide(desc)
@@ -1420,7 +1416,7 @@ function setPhase(next: Phase): void {
     setStatus('')
     verseEl.classList.remove('lit') // the cut carries no letterpress
     railEl.hidden = true
-  } else if (musicWoken) {
+  } else if (railAwake) {
     railEl.hidden = false
   }
   if (next !== 'wing' && wingSlug) {
@@ -1614,7 +1610,7 @@ function frame(now: number): void {
     /* THREE MARKS, AND A WAY ON AT EVERY STATE. The foot of the frame holds
        exactly one line: the instruction while the ride is being taken up and
        again as the fire comes, the way past it through the body of the fall.
-       Instruments withdraws for the ride; Sound stays, because sound runs. */
+       Instruments withdraws for the ride. Sound keeps its own control. */
     document.body.classList.toggle('riding', desc > 0.155 && desc <= 0.80)
     document.body.classList.toggle('arriving', desc > 0.80)
     // a push back at the top of the travel hands the night to the eclipse
@@ -1862,7 +1858,7 @@ function bootRoute(): boolean {
   agoraReveal = 0
   skyBirth = 0.34
   flashAt = -1
-  wakeMusic()
+  wakeInstruments()
   void openWing(here.slug, here.station)
   return true
 }

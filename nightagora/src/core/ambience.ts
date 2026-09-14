@@ -1,14 +1,9 @@
 /* THE NIGHT'S BED — the one sound that runs under the whole walk, and the
    four laws it is built out of.
 
-   1. THE BED IS STANDARD, THE VISITOR IS SOVEREIGN. It rises with the wake,
-      which is itself the first deliberate gesture of the night, and one
-      press of the rail silences it for good and is remembered. Nothing ever
-      sounds before a gesture: browsers forbid it and so does the night.
-      (The stricter reading — nothing until the rail is pressed — is one
-      line in enable(), kept documented there.) A no remembered from an
-      earlier night is honoured before the wake is even offered, and it
-      stands until the rail says otherwise.
+   1. THE BED WAITS FOR ITS OWN REQUEST. A visit starts silent, including a
+      return visit. Only a sound control enables it. Entering the museum,
+      scrolling and choosing a language never ask for music.
    2. THE DOOR. Browsers unlock sound on a hand: a pointer, a key, a touch
       that ends. A wheel is the one gesture that carries this whole descent
       and the specification does not count it, though some engines do. So
@@ -127,7 +122,7 @@ function witness(e: Event): void {
   // that lit on the way down would make that press mean the opposite of
   // what its label promises
   const t = e.target
-  if (t instanceof Element && t.closest('#rail-sound')) return
+  if (t instanceof Element && t.closest('#rail-sound, #inst-sound')) return
   light()
 }
 for (const kind of ['pointerdown', 'keydown', 'touchend'] as const)
@@ -194,13 +189,9 @@ function makeBed(cors: boolean): Bed {
   return bed
 }
 
-/* THE PRIMING. Built at the visitor's first gesture, not before it and not
-   at the invitation: a bed that starts buffering only when the rail is
-   pressed answers a second and a half late, and a night that was turned off
-   last time should not spend a phone's data at all. Making an element is
-   not playing one. */
+/** Allocate media only after a sound control asks for it. */
 function prime(): void {
-  if (bedA || broken || readChoice() === 'off') return
+  if (!wanted || bedA || broken) return
   bedA = makeBed(true)
   bedB = makeBed(true)
   primary = bedA
@@ -355,6 +346,7 @@ function onBedError(bed: Bed): void {
   broken = true
   wanted = false
   sounding = false
+  dispatchEvent(new Event('na-sound-change'))
 }
 
 // --------------------------------------------------------------- the light
@@ -614,26 +606,19 @@ export const ambience = {
 
   /** Call from a user gesture: browsers only unlock audio there. */
   enable(): void {
-    const choice = readChoice()
-    // LAW 1. The bed is STANDARD: a night with no answer on record takes
-    // the wake's offer, because the wake is
-    // itself the visitor's first deliberate gesture and the rail lights the
-    // moment it runs. A remembered no is honoured by the caller and by
-    // readChoice below, and one press turns it off for good.
-    //
-    // The alternative — decline the wake and stay silent until the rail is
-    // pressed — is one line (`if (choice === null && first) return`) and is
-    // worth revisiting if the night ever wants a quieter door.
+    if (broken) return
     wanted = true
     writeChoice('on')
     // LAW 2. If the browser's door is shut, the choice still stands and the
     // rail is right to say so. The first real gesture lights it.
     light()
+    dispatchEvent(new Event('na-sound-change'))
   },
 
   disable(): void {
     wanted = false
     writeChoice('off')
+    dispatchEvent(new Event('na-sound-change'))
   },
 
   duck(d: boolean): void {
