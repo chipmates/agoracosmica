@@ -1,0 +1,70 @@
+// Verify shipped collection bytes against the sealed collection fingerprints.
+// Run from any directory: node src/wings/vinci/line/bench/verify-data.mjs
+import { createHash } from 'node:crypto'
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const root = fileURLToPath(new URL('../../../../../', import.meta.url))
+const sourceRoot = 'program/rounds/wing-vinci'
+
+// The public copies replace only provenance.source_root with the portable path
+// above. normalizedSHA256 was measured after that one string replacement in
+// each sealed original; all other bytes, including formatting, were retained.
+// We compare actual shipped bytes directly, never normalize arbitrary edits.
+export const COLLECTIONS = [
+  {
+    name: 'timeline', file: 'src/wings/vinci/line/data/timeline.json',
+    originalSHA256: '01d568f9f6ddb2c1534d2cd73e061f07624b8eda484d718e84be57782b66ee1d',
+    normalizedSHA256: '50ea7f7d43d6d8153e11c2704f1805c42a5ac9d51548732d6947206bd6c08d30',
+    expected: { studs: 56 },
+  },
+  {
+    name: 'inscriptions', file: 'src/wings/vinci/words/data/inscriptions.json',
+    originalSHA256: '95633ee2b45498b6b4be3b9bc388e66b17e8bc5b45c919a5a9848c01d1f64723',
+    normalizedSHA256: '3fecfcd32557b8eaf2cc0e0a766b1384d568afcd120b008bce12365107f7b960',
+    expected: { passages: 52, apocrypha: 6, verified_popular_quotes: 4, german_catalogue_corrections: 1 },
+  },
+  {
+    name: 'doors', file: 'src/wings/vinci/data/doors.json',
+    originalSHA256: 'c6bcb90a55fa4d3ce3ec00928ab276613233432468f05a1566ca306d81c47647',
+    normalizedSHA256: '0c6bf19eed2fc1749d54bc52b09ecc4aafa0736b1744988962d965ff1a596161',
+    expected: { doors: 19 },
+  },
+  {
+    name: 'paintings', file: 'src/wings/vinci/pictures/data/paintings.json',
+    originalSHA256: '7e78e1a73fa55cdd58c75c495332ebe0617387e6b72babbea2695bbb8a3a5d02',
+    normalizedSHA256: '436f57cb321c5782ca354a6212cdfee547212bbadde6c6be00b85e96c06400cb',
+    expected: { works: 30, held_assets: 32, catalogue_mentions: 9 },
+  },
+]
+
+export function verifyData(appRoot = root) {
+  const checks = COLLECTIONS.map(({ name, file, originalSHA256, normalizedSHA256, expected }) => {
+    try {
+      const deployed = readFileSync(resolve(appRoot, file))
+      const actualSHA256 = createHash('sha256').update(deployed).digest('hex')
+      const data = JSON.parse(deployed.toString('utf8'))
+      const counts = Object.fromEntries(Object.keys(expected).map(key =>
+        [key, Array.isArray(data[key]) ? data[key].length : null]))
+      const countsMatch = Object.entries(expected).every(([key, count]) => counts[key] === count)
+      const hashMatches = actualSHA256 === normalizedSHA256
+      const portableSourceRoot = data.provenance?.source_root === sourceRoot
+      return {
+        name, file, bytes: deployed.length, originalSHA256, normalizedSHA256, actualSHA256,
+        normalization: { field: 'provenance.source_root', value: sourceRoot, otherBytesUnchanged: hashMatches },
+        counts, expected, hashMatches, countsMatch, portableSourceRoot,
+        ok: hashMatches && countsMatch && portableSourceRoot,
+      }
+    } catch (error) {
+      return { name, file, ok: false, error: error instanceof Error ? error.message : String(error) }
+    }
+  })
+  return { ok: checks.every(check => check.ok), lockedCopies: checks.length, checks }
+}
+
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  const report = verifyData()
+  console.log(JSON.stringify(report, null, 2))
+  if (!report.ok) process.exitCode = 1
+}

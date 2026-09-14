@@ -14,7 +14,7 @@ body[data-phase='bench'] #ui>*,body[data-phase='bench'] #status,body[data-phase=
 .vb-eyebrow{font:10px/1.7 Arial,sans-serif;letter-spacing:.25em;color:#c7bfae;text-transform:uppercase;margin:0 0 12px}
 .vb-title h1{font-size:40px;font-weight:normal;letter-spacing:-.025em;margin:0;line-height:1.06}
 .vb-title .vb-sub{font:12px/1.7 Arial,sans-serif;color:#bcb6a6;max-width:400px}
-.vb-card{position:absolute;left:44px;bottom:139px;width:360px;max-height:49vh;overflow:auto;pointer-events:auto;background:rgba(17,27,29,.95);padding:24px 26px 22px;border-left:1px solid #a393714f;scrollbar-width:thin;scrollbar-color:#94896d #1b2628}
+.vb-card{position:absolute;left:44px;bottom:139px;width:360px;max-height:49vh;overflow:auto;pointer-events:auto;background:#111b1d;padding:24px 26px 22px;border-left:1px solid #a393714f;scrollbar-width:thin;scrollbar-color:#94896d #1b2628}
 .vb-card h2{font-size:29px;line-height:1.13;font-weight:normal;margin:13px 0 17px}
 .vb-card p{font-size:17px;line-height:1.48;margin:0 0 14px}
 .vb-card .vb-de{font-size:15px;color:#b5b9b2}
@@ -85,4 +85,162 @@ body[data-phase='bench'] #veil{display:none!important}
  .vb[data-state='grave'] .vb-card>p:not(.vb-fact){font-size:14px}
  .vb[data-state='myth-quotes'] .vb-card:not(.vb-card--open):not(.vb-card--audit){max-height:270px;padding-top:14px;padding-bottom:10px}
  .vb[data-state^='line-']:before,.vb[data-state='phone-line']:before{height:230px;background:linear-gradient(#182224f0,#182224ad 65%,#18222400)}
+}
+
+.vb-card .vb-scale{font:12px/1.5 Arial,sans-serif;color:#ddd0b6;border-top:1px solid #77807855;padding-top:10px;margin-top:10px}
+@media(max-width:650px){.vb-card--deathbed{max-height:306px}.vb-card .vb-scale{font-size:12px;line-height:1.4}.vb-card--deathbed .vb-licence{margin:8px 0}}
+
+.vb[lang='de'][data-state='myth-quotes'] .vb-card:not(.vb-card--open):not(.vb-card--audit){max-height:55vh}
+.vb-language-note{display:block;margin:8px 0;color:#b7bbae}
+@media(max-width:650px){.vb[lang='de'][data-state='myth-quotes'] .vb-card:not(.vb-card--open):not(.vb-card--audit){max-height:340px}.vb[lang='de'][data-state='myth-quotes'] .vb-card>p:not(.vb-fact){font-size:14px}}
+
+/* One quiet typographic register for every museum control. */
+.vb button,.vb select,.vb summary{font:10px/1.4 Arial,sans-serif!important;letter-spacing:.14em;text-transform:uppercase}
+.vb summary{line-height:44px!important}
+.vb select{appearance:none;padding-right:29px!important;background-image:linear-gradient(45deg,transparent 50%,#bfb8a8 50%),linear-gradient(135deg,#bfb8a8 50%,transparent 50%);background-position:calc(100% - 15px) 19px,calc(100% - 11px) 19px;background-size:4px 4px;background-repeat:no-repeat}
+.vb-count{font-size:10px}
+.vb-footer{background:#152022}
+@media(max-width:650px){.vb button,.vb select{font-size:9px!important;letter-spacing:.09em}.vb select{max-width:105px;padding-left:7px!important;padding-right:20px!important;background-position:calc(100% - 12px) 19px,calc(100% - 8px) 19px}.vb-tools button,.vb-hour button{font-size:10px!important}.vb-steps>button{padding:10px 7px}.vb-count{min-width:45px;font-size:9px;letter-spacing:.06em}}
+@media(max-width:650px){.vb-sections{justify-content:space-between;gap:5px}.vb-sections button{flex:0 0 auto;font-size:9px!important;padding:8px 5px;letter-spacing:.08em}}
+
+/* The reading drawer and its deliberately opened evidence record. */
+.vb-holder{display:block;margin:12px 0;font:11px/1.5 Arial,sans-serif;color:#bfc6bf}
+.vb-record-data{font:11px/1.65 monospace;white-space:pre-wrap;overflow-wrap:anywhere;color:#c4c9c3}
+.vb-card .vb-record{border-left:2px solid #788272;padding-left:12px}
+.vb-card .vb-source-reading{font:15px/1.55 Georgia,serif;color:#dedbcb}
+.vb-hour-readout{display:flex;align-items:baseline;gap:8px;color:#d7aa58}
+.vb-card .vb-hour-date{display:flex;align-items:baseline;gap:8px;font:11px/1.6 Arial,sans-serif;color:#71a98b}
+.vb-record>summary{font-size:10px!important}
+.vb-question{font-style:italic!important}
+
+/* A small opaque reading plate keeps the phone subtitle off lit paving. */
+@media(max-width:650px){
+ .vb[data-state^='line-'] .vb-title .vb-sub,.vb[data-state='phone-line'] .vb-title .vb-sub,.vb[data-state='stud-1503'] .vb-title .vb-sub,.vb[data-state='myth-deathbed'] .vb-title .vb-sub{display:table;background:#152022;color:#e5dfcf;padding:5px 8px;margin:6px 0 0;font-size:11px;line-height:1.5;text-shadow:none}
+}
+
+.vb-title .vb-sub:empty{display:none!important}
+
+/* An opened reading always gets room, including the longer German heading. */
+@media(min-width:651px){.vb[lang='de'][data-state='myth-deathbed'] .vb-card--open{max-height:calc(100vh - 410px)}}
+@media(max-width:650px){.vb-card.vb-card--open{max-height:calc(100svh - 345px)}}
+.vb-load-error{border-left:2px solid #d7aa58;padding-left:12px}
+
+/* Compact the reading padding below the phone grave furniture. */
+@media(max-width:650px){.vb[data-state="grave"] .vb-card:not(.vb-card--open):not(.vb-card--audit){padding-top:13px;padding-bottom:9px}.vb[data-state="grave"] .vb-hour{margin-bottom:8px;padding-bottom:8px}}
+
+/* German under every English line at the corrections and the grave: the two
+ * cards need the room the line cards already had. */
+@media(min-width:651px){
+ .vb[data-state='myth-deathbed'] .vb-card:not(.vb-card--open):not(.vb-card--audit),
+ .vb[data-state='grave'] .vb-card:not(.vb-card--open):not(.vb-card--audit){max-height:58vh}
+}
+@media(max-width:650px){
+ .vb[data-state='myth-deathbed'] .vb-card:not(.vb-card--open):not(.vb-card--audit){max-height:334px}
+ .vb[data-state='myth-deathbed'] .vb-card p:not(.vb-fact){font-size:14px;line-height:1.36;margin-bottom:8px}
+ .vb[data-state='myth-deathbed'] .vb-card .vb-de{font-size:12.5px;line-height:1.4}
+ .vb[data-state='myth-deathbed'] .vb-scale.vb-de{display:none}
+ .vb[data-state='myth-deathbed'] .vb-card .vb-scale{padding-top:8px;margin-top:8px}
+ .vb[data-state='grave'] .vb-card:not(.vb-card--open):not(.vb-card--audit){max-height:348px}
+ .vb[data-state='grave'] .vb-card p:not(.vb-fact){font-size:14px;line-height:1.36;margin-bottom:7px}
+ .vb[data-state='grave'] .vb-card .vb-de{font-size:12.5px;line-height:1.4}
+ .vb[data-state='grave'] .vb-card h2{font-size:21px;margin:6px 0 8px}
+}
+
+/* On the phone the wall carries the reading at a size a person can read, so
+ * the card stops repeating it and keeps the certainty, the heading and the
+ * way into the record. The paragraph stays in the document for a reader. */
+@media(max-width:650px){
+ .vb[data-state='myth-quotes'] .vb-card:not(.vb-card--open):not(.vb-card--audit){max-height:176px}
+ .vb[data-state='myth-quotes'] .vb-card:not(.vb-card--open):not(.vb-card--audit)>p:not(.vb-fact),
+ .vb[data-state='myth-quotes'] .vb-card:not(.vb-card--open):not(.vb-card--audit)>.vb-language-note{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+ .vb[data-state='myth-quotes'] .vb-card h2{font-size:21px;margin:7px 0 4px}
+}
+
+/* The corrections wall is the reading at both viewports. On the wider stage
+ * the card keeps the certainty and the way into the record and stands on the
+ * dado, so nothing covers a quotation and nothing repeats it. */
+@media(min-width:651px){
+ .vb[data-state='myth-quotes'] .vb-card:not(.vb-card--open):not(.vb-card--audit),
+ .vb[lang='de'][data-state='myth-quotes'] .vb-card:not(.vb-card--open):not(.vb-card--audit){
+  bottom:104px;width:auto;max-width:640px;max-height:none;overflow:visible;
+  padding:12px 22px 10px;display:flex;align-items:center;gap:26px}
+ .vb[data-state='myth-quotes'] .vb-card:not(.vb-card--open):not(.vb-card--audit) h2,
+ .vb[data-state='myth-quotes'] .vb-card:not(.vb-card--open):not(.vb-card--audit)>p:not(.vb-fact),
+ .vb[data-state='myth-quotes'] .vb-card:not(.vb-card--open):not(.vb-card--audit)>.vb-language-note{
+  position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+ .vb[data-state='myth-quotes'] .vb-card:not(.vb-card--open):not(.vb-card--audit) .vb-fact{margin:0;font-size:13px!important}
+ .vb[data-state='myth-quotes'] .vb-card:not(.vb-card--open):not(.vb-card--audit) details{border-top:0;margin:0;flex:0 0 auto}
+}
+
+/* The wall takes the whole stage, so the station's own words move down onto
+ * the dado with the card: nothing of the museum's voice sits on a quotation. */
+@media(min-width:651px){
+ .vb[data-state='myth-quotes'] .vb-title{top:auto;bottom:148px;max-width:560px;text-shadow:none}
+ .vb[data-state='myth-quotes'] .vb-title h1{font-size:29px}
+ .vb[data-state='myth-quotes'] .vb-eyebrow{display:none}
+ .vb[data-state='myth-quotes'] .vb-card:not(.vb-card--open):not(.vb-card--audit),
+ .vb[lang='de'][data-state='myth-quotes'] .vb-card:not(.vb-card--open):not(.vb-card--audit){bottom:88px}
+}
+
+/* The phone frames the painting with its own plaques, so the card drops the
+ * credit the wall already carries and stops at its content. */
+@media(max-width:650px){
+ .vb[data-state='myth-deathbed'] .vb-card:not(.vb-card--open):not(.vb-card--audit){max-height:none}
+ .vb[data-state='myth-deathbed'] .vb-card:not(.vb-card--open):not(.vb-card--audit) .vb-holder{display:none}
+}
+
+/* A certainty dot belongs to the first line it qualifies, not to the middle
+ * of the block. */
+.vb-fact{align-items:flex-start}
+.vb-fact .vb-dot{margin-top:3.6px}
+.vb-fact.vb-verdict .vb-dot{margin-top:7px}
+@media(max-width:650px){.vb-fact .vb-dot{margin-top:3px}.vb-fact.vb-verdict .vb-dot{margin-top:5.6px}}
+
+/* The phone gives the burial the stage and the card what it needs: the hour
+ * reads as one block with its control beside the date. */
+@media(max-width:650px){
+ .vb[data-state='grave'] .vb-hour{display:grid;grid-template-columns:1fr auto;align-items:center;gap:3px 12px;margin-bottom:7px;padding-bottom:7px}
+ .vb[data-state='grave'] .vb-hour-readout{grid-column:1/3;margin:0}
+ .vb[data-state='grave'] .vb-hour-date{margin:0}
+ .vb[data-state='grave'] .vb-hour button{padding:9px 11px}
+ .vb[data-state='grave'] .vb-card h2{font-size:19px;margin:5px 0 6px}
+ .vb[data-state='grave'] .vb-card p:not(.vb-fact){font-size:13.5px;line-height:1.32;margin-bottom:6px}
+ .vb[data-state='grave'] .vb-card .vb-de{font-size:12px;line-height:1.34}
+}
+
+/* The phone carries the title on the room's own air, not on a stamped chip
+ * with a cut edge. One gradient under the whole title block, deeper on the
+ * walk where the paving is lit right up to the top of the frame. */
+@media(max-width:650px){
+ .vb[data-state^='line-'] .vb-title .vb-sub,.vb[data-state='phone-line'] .vb-title .vb-sub,
+ .vb[data-state='stud-1503'] .vb-title .vb-sub,.vb[data-state='myth-deathbed'] .vb-title .vb-sub{
+  display:block;background:none;padding:0;margin:7px 0 0;font-size:11px;line-height:1.5;
+  color:#e7e1d1;text-shadow:0 1px 10px #0e1719,0 0 22px #0e1719cc}
+ .vb[data-state^='line-']:before,.vb[data-state='phone-line']:before,
+ .vb[data-state='stud-1503']:before,.vb[data-state='myth-deathbed']:before{
+  height:268px;background:linear-gradient(#141d1ff5 32%,#141d1fcc 62%,#141d1f00)}
+ .vb[data-state='stud-1503']:before{height:236px;background:linear-gradient(#141d1fee 20%,#141d1f99 56%,#141d1f00)}
+}
+
+/* Three marks, not six: the walk's own instruction sits inside the navigation
+ * it belongs to. */
+@media(min-width:651px){
+ .vb-instruction{position:static;padding:0;background:none;color:#a9b0a6;letter-spacing:.14em;
+  font-size:9px;margin-left:auto;align-self:center;max-width:340px;text-align:right;line-height:1.5}
+ .vb-footer{gap:14px}
+}
+
+/* German runs a third longer at the corrections wall: the station's own words
+ * and the card keep their air on the dado in both languages. */
+@media(min-width:651px){
+ .vb[data-state='myth-quotes'] .vb-title{bottom:157px}
+ .vb[data-state='myth-quotes'] .vb-card:not(.vb-card--open):not(.vb-card--audit),
+ .vb[lang='de'][data-state='myth-quotes'] .vb-card:not(.vb-card--open):not(.vb-card--audit){bottom:84px}
+}
+/* The painting is the hero on the phone, so its card reads tighter. */
+@media(max-width:650px){
+ .vb[data-state='myth-deathbed'] .vb-card p:not(.vb-fact){font-size:13px;line-height:1.32;margin-bottom:7px}
+ .vb[data-state='myth-deathbed'] .vb-card .vb-de{font-size:12px;line-height:1.34}
+ .vb[data-state='myth-deathbed'] .vb-fact.vb-verdict{font:13px/1.35 Arial,sans-serif!important}
+ .vb[data-state='myth-deathbed'] .vb-card .vb-scale{font-size:12px;padding-top:8px;margin-top:8px}
 }
