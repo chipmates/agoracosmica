@@ -5,6 +5,12 @@
  "recipeSha256": "05a2ae9de552a65a83b8f75ddff28e7df0dc0dd50eae80033a30c2724fd8f78d",
  "sources": [
   {
+   "file": "src/stack/detail.ts",
+   "sha256": "f6e9df463448454bbae32c47b173f3242eda9a0b6673198443e9847538d54529",
+   "bytes": 19138,
+   "unchangedDuringAudit": true
+  },
+  {
    "file": "src/wings/vinci/apron.ts",
    "sha256": "b73e3de8b90fcbfa229a461a0ee2d99ed07343d5382a8ce77e58fd23c1422122",
    "bytes": 6374,
@@ -18,8 +24,38 @@
   },
   {
    "file": "src/wings/vinci/collection.ts",
-   "sha256": "a34e6299dabaf3c4751b6169bd864362c781091ac4ba17a224d1da70c0c9b58a",
-   "bytes": 43579,
+   "sha256": "1a78e3623c2c7a387cd406ddfd23d51224c7c7f0c3306f2b814897065d610862",
+   "bytes": 44388,
+   "unchangedDuringAudit": true
+  },
+  {
+   "file": "src/wings/vinci/collection/build.ts",
+   "sha256": "be4678ac98acefebc3dada0945c112b8ef819daa8c524a5fc280eb5a3862b3a1",
+   "bytes": 5175,
+   "unchangedDuringAudit": true
+  },
+  {
+   "file": "src/wings/vinci/collection/hang.ts",
+   "sha256": "832e2df0628f86fdfd47a3d964aaaa7faa9c5dd9d6ec67fe597f05004a2959bf",
+   "bytes": 6130,
+   "unchangedDuringAudit": true
+  },
+  {
+   "file": "src/wings/vinci/collection/layout.ts",
+   "sha256": "9a53fbd6362982736f0e1422215f9d2ac2571211806ba4ff08ee9be1d1fdca56",
+   "bytes": 5623,
+   "unchangedDuringAudit": true
+  },
+  {
+   "file": "src/wings/vinci/collection/materials.ts",
+   "sha256": "3cbe0aae835e0f17ed878d960741e3a5fdd895adcbb12fbd443f664d4eb6936e",
+   "bytes": 21772,
+   "unchangedDuringAudit": true
+  },
+  {
+   "file": "src/wings/vinci/collection/rooms.ts",
+   "sha256": "5b02f483160478331ea47f8b58366471ab6530d249ff2cd90a3aadf013b01f0c",
+   "bytes": 13860,
    "unchangedDuringAudit": true
   },
   {
