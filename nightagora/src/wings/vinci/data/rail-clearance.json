@@ -108,8 +108,8 @@
   },
   {
    "file": "src/wings/vinci/ground.ts",
-   "sha256": "2a9389f3c15a54b684ac41de23491bace902a8645f2891c5a65711c8d2b8bb69",
-   "bytes": 19024,
+   "sha256": "3e10798909f4f9ec12ec89bb8696e6179399991637bfa9832a35648e2b2fb899",
+   "bytes": 20785,
    "unchangedDuringAudit": true
   },
   {
@@ -186,8 +186,8 @@
   },
   {
    "file": "src/wings/vinci/road-dressing.ts",
-   "sha256": "8218aabe62373e1e65a5206ef4f8a6f9596bf6e14ffca653de0e0a24f0489ab4",
-   "bytes": 19138,
+   "sha256": "f4f9786357288edd5337729a0663e711708d93a73738e8332656d57dfe7fcc7a",
+   "bytes": 20232,
    "unchangedDuringAudit": true
   },
   {
@@ -246,25 +246,25 @@
   }
  ],
  "geometrySha256": [
-  "c84afd0d58e508499ad47b1147feabc17dab2befbf2607637e422f26e367a967",
-  "3ade0295ca91b7bc8a620901a44cc67c6ea1f49fc7f18fa8c67e6473e7a7e856"
+  "21e1af8b9337e21cfe3544aff0454718715cd53ca7003525df80a08f9a5559a9",
+  "cb621cba67fb03e9a46c996e7af7716b45c9dfd24d4eccba1ba75b78d0e6bfca"
  ],
  "geometry": [
   {
    "tier": "hero",
-   "sha256": "c84afd0d58e508499ad47b1147feabc17dab2befbf2607637e422f26e367a967",
+   "sha256": "21e1af8b9337e21cfe3544aff0454718715cd53ca7003525df80a08f9a5559a9",
    "quantumM": 0.000001,
    "matchingGeometryToleranceM": 0.000002
   },
   {
    "tier": "standard",
-   "sha256": "c84afd0d58e508499ad47b1147feabc17dab2befbf2607637e422f26e367a967",
+   "sha256": "21e1af8b9337e21cfe3544aff0454718715cd53ca7003525df80a08f9a5559a9",
    "quantumM": 0.000001,
    "matchingGeometryToleranceM": 0.000002
   },
   {
    "tier": "calm",
-   "sha256": "3ade0295ca91b7bc8a620901a44cc67c6ea1f49fc7f18fa8c67e6473e7a7e856",
+   "sha256": "cb621cba67fb03e9a46c996e7af7716b45c9dfd24d4eccba1ba75b78d0e6bfca",
    "quantumM": 0.000001,
    "matchingGeometryToleranceM": 0.000002
   }
