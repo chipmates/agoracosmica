@@ -449,9 +449,9 @@
       "licence": "Generated for this work, regenerable from the declared engineering dossier and procedural source recipe.",
       "wing": "vinci",
       "display": true,
-      "prompt": "aerial-screw, Manuscript B f. 83v. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled.",
+      "prompt": "aerial-screw, Manuscript B f. 83v. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled. Forged-iron detail retains its library maps and three bands across a 12–100m density fade, with generated #91999b luminance response and roughness .4–.72. Compass retains its previous scoped tint. The gun solid end faces receive only a restrained normal-direction finish difference; no bore or functional firing geometry is invented. Rounded oak parts and inclinometer journal posts use a local quiet library variant: all three bands, 85percent map contribution, normal strength .12, restrained grain relief/shade/sheen and #847967 luminance tint (80percent density contrast retained). The exact 22mm journal post remains wood, not frayed cord. All oak detail now uses the same 12–100m density fade as cloth and iron, preserving physical UV scale, all three bands and library maps at distant phone camera positions. No extra map, geometry or material variant is added by this range correction. Linen retains full CC0 maps, the original geometry/ribs and three bands, with a generated finer 160mm slub pitch, 8mm tooth, gentle .8m drape, relief .28, shade .24, sheen .025 and normal strength .3. These surface-only choices reduce rigid corrugation without inventing seams or altering the admitted cloth shape.",
       "model": "GPT-6 Codex",
-      "date": "2026-09-09",
+      "date": "2026-09-10",
       "sha256": "8f6ee59a9c080762a7d5f0511e93acb59d5044716be2603d7ea116e314e1451f",
       "recipe_files": [
         {
@@ -468,11 +468,11 @@
         },
         {
           "path": "src/wings/vinci/machines/data/records.json",
-          "sha256": "d97ac3f4da088116a9a2840428ecc73ae28349d515fbb4cba85ee8f2a5fd06a6"
+          "sha256": "6ff6aa842a31fd17e68e62363fd85456a01c0fe66aa637c636a12034b839778f"
         },
         {
           "path": "src/wings/vinci/machines/geometry.ts",
-          "sha256": "be729b2937cecbb63713bf7b9e80fee87637b0f71947c5f529a7a1990a5bc016"
+          "sha256": "82605e532767cb54b0a2f1b7736446c0b106a9056aea9c176120b3ca8bff8165"
         },
         {
           "path": "src/wings/vinci/machines/motion.ts",
@@ -480,7 +480,7 @@
         },
         {
           "path": "src/wings/vinci/machines/parts.ts",
-          "sha256": "70bab9f6ce32fb652907941ebf3c028110815e9eae11a964ce982bf096d08bfc"
+          "sha256": "9a11c77ddcec733c6cc9e2897a88df40329f1b9673a1fa7333611c8a2cab906b"
         },
         {
           "path": "src/wings/vinci/machines/runtime.ts",
@@ -600,9 +600,9 @@
       "licence": "Generated for this work, regenerable from the declared engineering dossier and procedural source recipe.",
       "wing": "vinci",
       "display": true,
-      "prompt": "anemometer, Codex Atlanticus f. 675r. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled.",
+      "prompt": "anemometer, Codex Atlanticus f. 675r. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled. Forged-iron detail retains its library maps and three bands across a 12–100m density fade, with generated #91999b luminance response and roughness .4–.72. Compass retains its previous scoped tint. The gun solid end faces receive only a restrained normal-direction finish difference; no bore or functional firing geometry is invented. Rounded oak parts and inclinometer journal posts use a local quiet library variant: all three bands, 85percent map contribution, normal strength .12, restrained grain relief/shade/sheen and #847967 luminance tint (80percent density contrast retained). The exact 22mm journal post remains wood, not frayed cord. All oak detail now uses the same 12–100m density fade as cloth and iron, preserving physical UV scale, all three bands and library maps at distant phone camera positions. No extra map, geometry or material variant is added by this range correction.",
       "model": "GPT-6 Codex",
-      "date": "2026-09-09",
+      "date": "2026-09-10",
       "sha256": "d81e383511d22ddc2483ca14766c766ebc9e7b4767c0515190058f7c3ed06862",
       "recipe_files": [
         {
@@ -619,11 +619,11 @@
         },
         {
           "path": "src/wings/vinci/machines/data/records.json",
-          "sha256": "d97ac3f4da088116a9a2840428ecc73ae28349d515fbb4cba85ee8f2a5fd06a6"
+          "sha256": "6ff6aa842a31fd17e68e62363fd85456a01c0fe66aa637c636a12034b839778f"
         },
         {
           "path": "src/wings/vinci/machines/geometry.ts",
-          "sha256": "be729b2937cecbb63713bf7b9e80fee87637b0f71947c5f529a7a1990a5bc016"
+          "sha256": "82605e532767cb54b0a2f1b7736446c0b106a9056aea9c176120b3ca8bff8165"
         },
         {
           "path": "src/wings/vinci/machines/motion.ts",
@@ -631,7 +631,7 @@
         },
         {
           "path": "src/wings/vinci/machines/parts.ts",
-          "sha256": "70bab9f6ce32fb652907941ebf3c028110815e9eae11a964ce982bf096d08bfc"
+          "sha256": "9a11c77ddcec733c6cc9e2897a88df40329f1b9673a1fa7333611c8a2cab906b"
         },
         {
           "path": "src/wings/vinci/machines/runtime.ts",
@@ -718,9 +718,9 @@
       "licence": "Generated for this work, regenerable from the declared engineering dossier and procedural source recipe.",
       "wing": "vinci",
       "display": true,
-      "prompt": "ball-bearing, Codex Madrid I f. 20v. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled.",
+      "prompt": "ball-bearing, Codex Madrid I f. 20v. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled. Forged-iron detail retains its library maps and three bands across a 12–100m density fade, with generated #91999b luminance response and roughness .4–.72. Compass retains its previous scoped tint. The gun solid end faces receive only a restrained normal-direction finish difference; no bore or functional firing geometry is invented. Rounded oak parts and inclinometer journal posts use a local quiet library variant: all three bands, 85percent map contribution, normal strength .12, restrained grain relief/shade/sheen and #847967 luminance tint (80percent density contrast retained). The exact 22mm journal post remains wood, not frayed cord. All oak detail now uses the same 12–100m density fade as cloth and iron, preserving physical UV scale, all three bands and library maps at distant phone camera positions. No extra map, geometry or material variant is added by this range correction.",
       "model": "GPT-6 Codex",
-      "date": "2026-09-09",
+      "date": "2026-09-10",
       "sha256": "49ccc0e12d7312d0629d676452e89fba9e48396da6ce64990b6200f0417b2b6e",
       "recipe_files": [
         {
@@ -737,11 +737,11 @@
         },
         {
           "path": "src/wings/vinci/machines/data/records.json",
-          "sha256": "d97ac3f4da088116a9a2840428ecc73ae28349d515fbb4cba85ee8f2a5fd06a6"
+          "sha256": "6ff6aa842a31fd17e68e62363fd85456a01c0fe66aa637c636a12034b839778f"
         },
         {
           "path": "src/wings/vinci/machines/geometry.ts",
-          "sha256": "be729b2937cecbb63713bf7b9e80fee87637b0f71947c5f529a7a1990a5bc016"
+          "sha256": "82605e532767cb54b0a2f1b7736446c0b106a9056aea9c176120b3ca8bff8165"
         },
         {
           "path": "src/wings/vinci/machines/motion.ts",
@@ -749,7 +749,7 @@
         },
         {
           "path": "src/wings/vinci/machines/parts.ts",
-          "sha256": "70bab9f6ce32fb652907941ebf3c028110815e9eae11a964ce982bf096d08bfc"
+          "sha256": "9a11c77ddcec733c6cc9e2897a88df40329f1b9673a1fa7333611c8a2cab906b"
         },
         {
           "path": "src/wings/vinci/machines/runtime.ts",
@@ -847,9 +847,9 @@
       "licence": "Generated for this work, regenerable from the declared engineering dossier and procedural source recipe.",
       "wing": "vinci",
       "display": true,
-      "prompt": "camera-obscura, Paris Manuscript D f. 8r. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled.",
+      "prompt": "camera-obscura, Paris Manuscript D f. 8r. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled. Forged-iron detail retains its library maps and three bands across a 12–100m density fade, with generated #91999b luminance response and roughness .4–.72. Compass retains its previous scoped tint. The gun solid end faces receive only a restrained normal-direction finish difference; no bore or functional firing geometry is invented. Rounded oak parts and inclinometer journal posts use a local quiet library variant: all three bands, 85percent map contribution, normal strength .12, restrained grain relief/shade/sheen and #847967 luminance tint (80percent density contrast retained). The exact 22mm journal post remains wood, not frayed cord. All oak detail now uses the same 12–100m density fade as cloth and iron, preserving physical UV scale, all three bands and library maps at distant phone camera positions. No extra map, geometry or material variant is added by this range correction.",
       "model": "GPT-6 Codex",
-      "date": "2026-09-09",
+      "date": "2026-09-10",
       "sha256": "fabfa0999682874499e13865d63fe0ec90e93b30037f87039b0ec745e2c59f80",
       "recipe_files": [
         {
@@ -866,11 +866,11 @@
         },
         {
           "path": "src/wings/vinci/machines/data/records.json",
-          "sha256": "d97ac3f4da088116a9a2840428ecc73ae28349d515fbb4cba85ee8f2a5fd06a6"
+          "sha256": "6ff6aa842a31fd17e68e62363fd85456a01c0fe66aa637c636a12034b839778f"
         },
         {
           "path": "src/wings/vinci/machines/geometry.ts",
-          "sha256": "be729b2937cecbb63713bf7b9e80fee87637b0f71947c5f529a7a1990a5bc016"
+          "sha256": "82605e532767cb54b0a2f1b7736446c0b106a9056aea9c176120b3ca8bff8165"
         },
         {
           "path": "src/wings/vinci/machines/motion.ts",
@@ -878,7 +878,7 @@
         },
         {
           "path": "src/wings/vinci/machines/parts.ts",
-          "sha256": "70bab9f6ce32fb652907941ebf3c028110815e9eae11a964ce982bf096d08bfc"
+          "sha256": "9a11c77ddcec733c6cc9e2897a88df40329f1b9673a1fa7333611c8a2cab906b"
         },
         {
           "path": "src/wings/vinci/machines/runtime.ts",
@@ -943,9 +943,9 @@
       "licence": "Generated for this work, regenerable from the declared engineering dossier and procedural source recipe.",
       "wing": "vinci",
       "display": true,
-      "prompt": "flywheel, Codex Madrid I f. 114r. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled.",
+      "prompt": "flywheel, Codex Madrid I f. 114r. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled. Forged-iron detail retains its library maps and three bands across a 12–100m density fade, with generated #91999b luminance response and roughness .4–.72. Compass retains its previous scoped tint. The gun solid end faces receive only a restrained normal-direction finish difference; no bore or functional firing geometry is invented. Rounded oak parts and inclinometer journal posts use a local quiet library variant: all three bands, 85percent map contribution, normal strength .12, restrained grain relief/shade/sheen and #847967 luminance tint (80percent density contrast retained). The exact 22mm journal post remains wood, not frayed cord. Flywheel stone weights retain the CC0 library with .15m map scale and .15/.018/.0014m three-band scales. Only the covered Z-spoke overlap is omitted from its render surface; the full X-spoke remains, preserving their exact combined exterior, endpoints, metre UVs and motion. No joinery or mechanical detail is invented. All oak detail now uses the same 12–100m density fade as cloth and iron, preserving physical UV scale, all three bands and library maps at distant phone camera positions. No extra map, geometry or material variant is added by this range correction.",
       "model": "GPT-6 Codex",
-      "date": "2026-09-09",
+      "date": "2026-09-10",
       "sha256": "ce5c1ade83fd1aaf42b76da9113ae14a26642909c9ce6aed2ddc6f371044b7a7",
       "recipe_files": [
         {
@@ -958,7 +958,7 @@
         },
         {
           "path": "src/wings/vinci/machines/data/records.json",
-          "sha256": "d97ac3f4da088116a9a2840428ecc73ae28349d515fbb4cba85ee8f2a5fd06a6"
+          "sha256": "6ff6aa842a31fd17e68e62363fd85456a01c0fe66aa637c636a12034b839778f"
         },
         {
           "path": "src/wings/vinci/machines/flywheel.ts",
@@ -966,7 +966,7 @@
         },
         {
           "path": "src/wings/vinci/machines/geometry.ts",
-          "sha256": "be729b2937cecbb63713bf7b9e80fee87637b0f71947c5f529a7a1990a5bc016"
+          "sha256": "82605e532767cb54b0a2f1b7736446c0b106a9056aea9c176120b3ca8bff8165"
         },
         {
           "path": "src/wings/vinci/machines/motion.ts",
@@ -974,7 +974,7 @@
         },
         {
           "path": "src/wings/vinci/machines/parts.ts",
-          "sha256": "70bab9f6ce32fb652907941ebf3c028110815e9eae11a964ce982bf096d08bfc"
+          "sha256": "9a11c77ddcec733c6cc9e2897a88df40329f1b9673a1fa7333611c8a2cab906b"
         },
         {
           "path": "src/wings/vinci/machines/runtime.ts",
@@ -983,6 +983,10 @@
         {
           "path": "src/wings/vinci/machines/types.ts",
           "sha256": "f447264c124d573303c5bb5b20b9fc7a206d28620c531534b78fb14a37bff5c4"
+        },
+        {
+          "path": "src/wings/vinci/machines/flywheel-overlap.ts",
+          "sha256": "85d01fea2c01a0a94f0e8a272af2b056299a8f6999ba6c44c635b326658b8beb"
         }
       ],
       "dossier": {
@@ -1072,9 +1076,9 @@
       "licence": "Generated for this work, regenerable from the declared engineering dossier and procedural source recipe.",
       "wing": "vinci",
       "display": true,
-      "prompt": "inclinometer, Codex Atlanticus f. 1058r. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled.",
+      "prompt": "inclinometer, Codex Atlanticus f. 1058r. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled. Window 3: retain exact glass outer vertices; add dossier nominal2mm inward wall and bottom annulus, weld degenerate crown indices and use continuous smooth normals/metricUV. Physical glass1.48IOR with clearcoat. The bell is still an assumed reconstruction. GENERATED optical dressing: a restrained warm foot-light annulus on the existing deck, peaking3mm outside the2mm glass wall. This deck-local approximation is not a ray-traced caustic or a historical mark; no added geometry. Forged-iron detail retains its library maps and three bands across a 12–100m density fade, with generated #91999b luminance response and roughness .4–.72. Compass retains its previous scoped tint. The gun solid end faces receive only a restrained normal-direction finish difference; no bore or functional firing geometry is invented. Rounded oak parts and inclinometer journal posts use a local quiet library variant: all three bands, 85percent map contribution, normal strength .12, restrained grain relief/shade/sheen and #847967 luminance tint (80percent density contrast retained). The exact 22mm journal post remains wood, not frayed cord. All oak detail now uses the same 12–100m density fade as cloth and iron, preserving physical UV scale, all three bands and library maps at distant phone camera positions. No extra map, geometry or material variant is added by this range correction.",
       "model": "GPT-6 Codex",
-      "date": "2026-09-09",
+      "date": "2026-09-10",
       "sha256": "02853b377518418b8eb6ff99cdaaae847136441efcd67ad5ea3d13b6504f324f",
       "recipe_files": [
         {
@@ -1087,11 +1091,11 @@
         },
         {
           "path": "src/wings/vinci/machines/data/records.json",
-          "sha256": "d97ac3f4da088116a9a2840428ecc73ae28349d515fbb4cba85ee8f2a5fd06a6"
+          "sha256": "6ff6aa842a31fd17e68e62363fd85456a01c0fe66aa637c636a12034b839778f"
         },
         {
           "path": "src/wings/vinci/machines/geometry.ts",
-          "sha256": "be729b2937cecbb63713bf7b9e80fee87637b0f71947c5f529a7a1990a5bc016"
+          "sha256": "82605e532767cb54b0a2f1b7736446c0b106a9056aea9c176120b3ca8bff8165"
         },
         {
           "path": "src/wings/vinci/machines/inclinometer.ts",
@@ -1103,7 +1107,7 @@
         },
         {
           "path": "src/wings/vinci/machines/parts.ts",
-          "sha256": "70bab9f6ce32fb652907941ebf3c028110815e9eae11a964ce982bf096d08bfc"
+          "sha256": "9a11c77ddcec733c6cc9e2897a88df40329f1b9673a1fa7333611c8a2cab906b"
         },
         {
           "path": "src/wings/vinci/machines/runtime.ts",
@@ -1112,6 +1116,14 @@
         {
           "path": "src/wings/vinci/machines/types.ts",
           "sha256": "f447264c124d573303c5bb5b20b9fc7a206d28620c531534b78fb14a37bff5c4"
+        },
+        {
+          "path": "src/wings/vinci/machines/glass-cover.ts",
+          "sha256": "32b3c2d3479b0e9d3b647081a6fd7ffa220cf0b6c486bbb1a0ee6a84e1a8982b"
+        },
+        {
+          "path": "src/wings/vinci/machines/glass-seat.ts",
+          "sha256": "5e01084b2238df9f6de6edd52af9659ee2391d9c54e39c29c4fa54ce6d791595"
         }
       ],
       "dossier": {
@@ -1168,9 +1180,9 @@
       "licence": "Generated for this work, regenerable from the declared engineering dossier and procedural source recipe.",
       "wing": "vinci",
       "display": true,
-      "prompt": "lathe, Codex Atlanticus f. 108r. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled.",
+      "prompt": "lathe, Codex Atlanticus f. 108r. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled. Generated hemp luminance finish #c5ae80 retains exact three-lobed swept geometry, albedo density and occlusion at all three scales. The geometric twist supplies the surface normal instead of coarse cloth-like normal perturbation. A 2mm shadow receiver lookup offset retains both cast and received shadows. Lathe staging faces the tangent spool wrap: rope radius2mm, wrap centreline40mm, spool radius38mm; geometry and scheduled endpoints remain exact. Forged-iron detail retains its library maps and three bands across a 12–100m density fade, with generated #91999b luminance response and roughness .4–.72. Compass retains its previous scoped tint. The gun solid end faces receive only a restrained normal-direction finish difference; no bore or functional firing geometry is invented. Rounded oak parts and inclinometer journal posts use a local quiet library variant: all three bands, 85percent map contribution, normal strength .12, restrained grain relief/shade/sheen and #847967 luminance tint (80percent density contrast retained). The exact 22mm journal post remains wood, not frayed cord. All oak detail now uses the same 12–100m density fade as cloth and iron, preserving physical UV scale, all three bands and library maps at distant phone camera positions. No extra map, geometry or material variant is added by this range correction.",
       "model": "GPT-6 Codex",
-      "date": "2026-09-09",
+      "date": "2026-09-10",
       "sha256": "d34606f49cb2ae4d9a2a9649a237abc1d63c5855d43e62c109ca5f5075587c7a",
       "recipe_files": [
         {
@@ -1183,11 +1195,11 @@
         },
         {
           "path": "src/wings/vinci/machines/data/records.json",
-          "sha256": "d97ac3f4da088116a9a2840428ecc73ae28349d515fbb4cba85ee8f2a5fd06a6"
+          "sha256": "6ff6aa842a31fd17e68e62363fd85456a01c0fe66aa637c636a12034b839778f"
         },
         {
           "path": "src/wings/vinci/machines/geometry.ts",
-          "sha256": "be729b2937cecbb63713bf7b9e80fee87637b0f71947c5f529a7a1990a5bc016"
+          "sha256": "82605e532767cb54b0a2f1b7736446c0b106a9056aea9c176120b3ca8bff8165"
         },
         {
           "path": "src/wings/vinci/machines/lathe.ts",
@@ -1199,7 +1211,7 @@
         },
         {
           "path": "src/wings/vinci/machines/parts.ts",
-          "sha256": "70bab9f6ce32fb652907941ebf3c028110815e9eae11a964ce982bf096d08bfc"
+          "sha256": "9a11c77ddcec733c6cc9e2897a88df40329f1b9673a1fa7333611c8a2cab906b"
         },
         {
           "path": "src/wings/vinci/machines/runtime.ts",
@@ -1264,9 +1276,9 @@
       "licence": "Generated for this work, regenerable from the declared engineering dossier and procedural source recipe.",
       "wing": "vinci",
       "display": true,
-      "prompt": "miter-lock-gates, Codex Atlanticus f. 656r, detail a. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled.",
+      "prompt": "miter-lock-gates, Codex Atlanticus f. 656r, detail a. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled. Forged-iron detail retains its library maps and three bands across a 12–100m density fade, with generated #91999b luminance response and roughness .4–.72. Compass retains its previous scoped tint. The gun solid end faces receive only a restrained normal-direction finish difference; no bore or functional firing geometry is invented. Rounded oak parts and inclinometer journal posts use a local quiet library variant: all three bands, 85percent map contribution, normal strength .12, restrained grain relief/shade/sheen and #847967 luminance tint (80percent density contrast retained). The exact 22mm journal post remains wood, not frayed cord. All oak detail now uses the same 12–100m density fade as cloth and iron, preserving physical UV scale, all three bands and library maps at distant phone camera positions. No extra map, geometry or material variant is added by this range correction.",
       "model": "GPT-6 Codex",
-      "date": "2026-09-09",
+      "date": "2026-09-10",
       "sha256": "18f7815f4a3e4342e4f5dba16ee13e890e983b12290b10cb38848e47e8c7c29b",
       "recipe_files": [
         {
@@ -1279,11 +1291,11 @@
         },
         {
           "path": "src/wings/vinci/machines/data/records.json",
-          "sha256": "d97ac3f4da088116a9a2840428ecc73ae28349d515fbb4cba85ee8f2a5fd06a6"
+          "sha256": "6ff6aa842a31fd17e68e62363fd85456a01c0fe66aa637c636a12034b839778f"
         },
         {
           "path": "src/wings/vinci/machines/geometry.ts",
-          "sha256": "be729b2937cecbb63713bf7b9e80fee87637b0f71947c5f529a7a1990a5bc016"
+          "sha256": "82605e532767cb54b0a2f1b7736446c0b106a9056aea9c176120b3ca8bff8165"
         },
         {
           "path": "src/wings/vinci/machines/miter-lock-gates.ts",
@@ -1295,7 +1307,7 @@
         },
         {
           "path": "src/wings/vinci/machines/parts.ts",
-          "sha256": "70bab9f6ce32fb652907941ebf3c028110815e9eae11a964ce982bf096d08bfc"
+          "sha256": "9a11c77ddcec733c6cc9e2897a88df40329f1b9673a1fa7333611c8a2cab906b"
         },
         {
           "path": "src/wings/vinci/machines/runtime.ts",
@@ -1371,9 +1383,9 @@
       "licence": "Generated for this work, regenerable from the declared engineering dossier and procedural source recipe.",
       "wing": "vinci",
       "display": true,
-      "prompt": "multi-barrel-gun, Codex Atlanticus f. 157r. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled.",
+      "prompt": "multi-barrel-gun, Codex Atlanticus f. 157r. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled. Bank-only generated oak finish retains the library photograph and all three scales, with reduced relief (.08), grain shade (.12), sheen (.04) and normal strength (.18), over a restrained oak luminance tint. All three opaque bank boxes, barrel solids and shadows remain exact. Forged-iron detail retains its library maps and three bands across a 12–100m density fade, with generated #91999b luminance response and roughness .4–.72. Compass retains its previous scoped tint. The gun solid end faces receive only a restrained normal-direction finish difference; no bore or functional firing geometry is invented. Rounded oak parts and inclinometer journal posts use a local quiet library variant: all three bands, 85percent map contribution, normal strength .12, restrained grain relief/shade/sheen and #847967 luminance tint (80percent density contrast retained). The exact 22mm journal post remains wood, not frayed cord. All oak detail now uses the same 12–100m density fade as cloth and iron, preserving physical UV scale, all three bands and library maps at distant phone camera positions. No extra map, geometry or material variant is added by this range correction.",
       "model": "GPT-6 Codex",
-      "date": "2026-09-09",
+      "date": "2026-09-10",
       "sha256": "a884c7a6b13299982a7b0c217846ba04e0a8045afa30d8d80178b114946cd038",
       "recipe_files": [
         {
@@ -1386,11 +1398,11 @@
         },
         {
           "path": "src/wings/vinci/machines/data/records.json",
-          "sha256": "d97ac3f4da088116a9a2840428ecc73ae28349d515fbb4cba85ee8f2a5fd06a6"
+          "sha256": "6ff6aa842a31fd17e68e62363fd85456a01c0fe66aa637c636a12034b839778f"
         },
         {
           "path": "src/wings/vinci/machines/geometry.ts",
-          "sha256": "be729b2937cecbb63713bf7b9e80fee87637b0f71947c5f529a7a1990a5bc016"
+          "sha256": "82605e532767cb54b0a2f1b7736446c0b106a9056aea9c176120b3ca8bff8165"
         },
         {
           "path": "src/wings/vinci/machines/motion.ts",
@@ -1402,7 +1414,7 @@
         },
         {
           "path": "src/wings/vinci/machines/parts.ts",
-          "sha256": "70bab9f6ce32fb652907941ebf3c028110815e9eae11a964ce982bf096d08bfc"
+          "sha256": "9a11c77ddcec733c6cc9e2897a88df40329f1b9673a1fa7333611c8a2cab906b"
         },
         {
           "path": "src/wings/vinci/machines/runtime.ts",
@@ -1478,9 +1490,9 @@
       "licence": "Generated for this work, regenerable from the declared engineering dossier and procedural source recipe.",
       "wing": "vinci",
       "display": true,
-      "prompt": "parachute, Codex Atlanticus f. 1058v. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled.",
+      "prompt": "parachute, Codex Atlanticus f. 1058v. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled. Generated hemp luminance finish #c5ae80 retains exact three-lobed swept geometry, albedo density and occlusion at all three scales. The geometric twist supplies the surface normal instead of coarse cloth-like normal perturbation. A 2mm shadow receiver lookup offset retains both cast and received shadows. Lathe staging faces the tangent spool wrap: rope radius2mm, wrap centreline40mm, spool radius38mm; geometry and scheduled endpoints remain exact. Forged-iron detail retains its library maps and three bands across a 12–100m density fade, with generated #91999b luminance response and roughness .4–.72. Compass retains its previous scoped tint. The gun solid end faces receive only a restrained normal-direction finish difference; no bore or functional firing geometry is invented. Rounded oak parts and inclinometer journal posts use a local quiet library variant: all three bands, 85percent map contribution, normal strength .12, restrained grain relief/shade/sheen and #847967 luminance tint (80percent density contrast retained). The exact 22mm journal post remains wood, not frayed cord. All oak detail now uses the same 12–100m density fade as cloth and iron, preserving physical UV scale, all three bands and library maps at distant phone camera positions. No extra map, geometry or material variant is added by this range correction. Linen retains full CC0 maps, the original geometry/ribs and three bands, with a generated finer 160mm slub pitch, 8mm tooth, gentle .8m drape, relief .28, shade .24, sheen .025 and normal strength .3. These surface-only choices reduce rigid corrugation without inventing seams or altering the admitted cloth shape.",
       "model": "GPT-6 Codex",
-      "date": "2026-09-09",
+      "date": "2026-09-10",
       "sha256": "f2c1987f8ac6f1cbb88559dd8c5263dc0e8cf723e8b341627eabe92c0787cd80",
       "recipe_files": [
         {
@@ -1493,11 +1505,11 @@
         },
         {
           "path": "src/wings/vinci/machines/data/records.json",
-          "sha256": "d97ac3f4da088116a9a2840428ecc73ae28349d515fbb4cba85ee8f2a5fd06a6"
+          "sha256": "6ff6aa842a31fd17e68e62363fd85456a01c0fe66aa637c636a12034b839778f"
         },
         {
           "path": "src/wings/vinci/machines/geometry.ts",
-          "sha256": "be729b2937cecbb63713bf7b9e80fee87637b0f71947c5f529a7a1990a5bc016"
+          "sha256": "82605e532767cb54b0a2f1b7736446c0b106a9056aea9c176120b3ca8bff8165"
         },
         {
           "path": "src/wings/vinci/machines/motion.ts",
@@ -1509,7 +1521,7 @@
         },
         {
           "path": "src/wings/vinci/machines/parts.ts",
-          "sha256": "70bab9f6ce32fb652907941ebf3c028110815e9eae11a964ce982bf096d08bfc"
+          "sha256": "9a11c77ddcec733c6cc9e2897a88df40329f1b9673a1fa7333611c8a2cab906b"
         },
         {
           "path": "src/wings/vinci/machines/runtime.ts",
@@ -1651,9 +1663,9 @@
       "licence": "Generated for this work, regenerable from the declared engineering dossier and procedural source recipe.",
       "wing": "vinci",
       "display": true,
-      "prompt": "proportional-compass, Codex Forster I f. 4r. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled.",
+      "prompt": "proportional-compass, Codex Forster I f. 4r. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled. Forged-iron detail retains its library maps and three bands across a 12–100m density fade, with generated #91999b luminance response and roughness .4–.72. Compass retains its previous scoped tint. The gun solid end faces receive only a restrained normal-direction finish difference; no bore or functional firing geometry is invented. Rounded oak parts and inclinometer journal posts use a local quiet library variant: all three bands, 85percent map contribution, normal strength .12, restrained grain relief/shade/sheen and #847967 luminance tint (80percent density contrast retained). The exact 22mm journal post remains wood, not frayed cord. All oak detail now uses the same 12–100m density fade as cloth and iron, preserving physical UV scale, all three bands and library maps at distant phone camera positions. No extra map, geometry or material variant is added by this range correction.",
       "model": "GPT-6 Codex",
-      "date": "2026-09-09",
+      "date": "2026-09-10",
       "sha256": "b853369da5995540ebffb27558c4ed34d661bf76f79c41250b26800f4f878732",
       "recipe_files": [
         {
@@ -1666,11 +1678,11 @@
         },
         {
           "path": "src/wings/vinci/machines/data/records.json",
-          "sha256": "d97ac3f4da088116a9a2840428ecc73ae28349d515fbb4cba85ee8f2a5fd06a6"
+          "sha256": "6ff6aa842a31fd17e68e62363fd85456a01c0fe66aa637c636a12034b839778f"
         },
         {
           "path": "src/wings/vinci/machines/geometry.ts",
-          "sha256": "be729b2937cecbb63713bf7b9e80fee87637b0f71947c5f529a7a1990a5bc016"
+          "sha256": "82605e532767cb54b0a2f1b7736446c0b106a9056aea9c176120b3ca8bff8165"
         },
         {
           "path": "src/wings/vinci/machines/motion.ts",
@@ -1678,7 +1690,7 @@
         },
         {
           "path": "src/wings/vinci/machines/parts.ts",
-          "sha256": "70bab9f6ce32fb652907941ebf3c028110815e9eae11a964ce982bf096d08bfc"
+          "sha256": "9a11c77ddcec733c6cc9e2897a88df40329f1b9673a1fa7333611c8a2cab906b"
         },
         {
           "path": "src/wings/vinci/machines/proportional-compass.ts",
@@ -1758,9 +1770,9 @@
       "licence": "Generated for this work, regenerable from the declared engineering dossier and procedural source recipe.",
       "wing": "vinci",
       "display": true,
-      "prompt": "revolving-crane, Manuscript B f. 49r. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled.",
+      "prompt": "revolving-crane, Manuscript B f. 49r. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled. Forged-iron detail retains its library maps and three bands across a 12–100m density fade, with generated #91999b luminance response and roughness .4–.72. Compass retains its previous scoped tint. The gun solid end faces receive only a restrained normal-direction finish difference; no bore or functional firing geometry is invented. Rounded oak parts and inclinometer journal posts use a local quiet library variant: all three bands, 85percent map contribution, normal strength .12, restrained grain relief/shade/sheen and #847967 luminance tint (80percent density contrast retained). The exact 22mm journal post remains wood, not frayed cord. All oak detail now uses the same 12–100m density fade as cloth and iron, preserving physical UV scale, all three bands and library maps at distant phone camera positions. No extra map, geometry or material variant is added by this range correction.",
       "model": "GPT-6 Codex",
-      "date": "2026-09-09",
+      "date": "2026-09-10",
       "sha256": "7dd4913a2a9c5034ef973cd9f3b1d51ed34e847cc5d8e12fcda976ee0b18a7f4",
       "recipe_files": [
         {
@@ -1769,15 +1781,15 @@
         },
         {
           "path": "src/wings/vinci/machines/data/records.json",
-          "sha256": "d97ac3f4da088116a9a2840428ecc73ae28349d515fbb4cba85ee8f2a5fd06a6"
+          "sha256": "6ff6aa842a31fd17e68e62363fd85456a01c0fe66aa637c636a12034b839778f"
         },
         {
           "path": "src/wings/vinci/machines/data/revolving-crane.json",
-          "sha256": "e761c629f17a209155275295fdc6f4e19b09f78e92e0cc34dc943540cd4de1a8"
+          "sha256": "2a6d5df0d0cf337a345c16220d17d9d94724cf08430050a9ca59f1f9aba11446"
         },
         {
           "path": "src/wings/vinci/machines/geometry.ts",
-          "sha256": "be729b2937cecbb63713bf7b9e80fee87637b0f71947c5f529a7a1990a5bc016"
+          "sha256": "82605e532767cb54b0a2f1b7736446c0b106a9056aea9c176120b3ca8bff8165"
         },
         {
           "path": "src/wings/vinci/machines/motion.ts",
@@ -1785,7 +1797,7 @@
         },
         {
           "path": "src/wings/vinci/machines/parts.ts",
-          "sha256": "70bab9f6ce32fb652907941ebf3c028110815e9eae11a964ce982bf096d08bfc"
+          "sha256": "9a11c77ddcec733c6cc9e2897a88df40329f1b9673a1fa7333611c8a2cab906b"
         },
         {
           "path": "src/wings/vinci/machines/revolving-crane.ts",
@@ -1854,9 +1866,9 @@
       "licence": "Generated for this work, regenerable from the declared engineering dossier and procedural source recipe.",
       "wing": "vinci",
       "display": true,
-      "prompt": "rolling-mill, Manuscript I f. 48v. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled.",
+      "prompt": "rolling-mill, Manuscript I f. 48v. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled. Forged-iron detail retains its library maps and three bands across a 12–100m density fade, with generated #91999b luminance response and roughness .4–.72. Compass retains its previous scoped tint. The gun solid end faces receive only a restrained normal-direction finish difference; no bore or functional firing geometry is invented. Rounded oak parts and inclinometer journal posts use a local quiet library variant: all three bands, 85percent map contribution, normal strength .12, restrained grain relief/shade/sheen and #847967 luminance tint (80percent density contrast retained). The exact 22mm journal post remains wood, not frayed cord. All oak detail now uses the same 12–100m density fade as cloth and iron, preserving physical UV scale, all three bands and library maps at distant phone camera positions. No extra map, geometry or material variant is added by this range correction.",
       "model": "GPT-6 Codex",
-      "date": "2026-09-09",
+      "date": "2026-09-10",
       "sha256": "dfd4f2b86469f4f4824d2380320c45ab14a2b9eef263529c6e8f740718d7ea4c",
       "recipe_files": [
         {
@@ -1865,15 +1877,15 @@
         },
         {
           "path": "src/wings/vinci/machines/data/records.json",
-          "sha256": "d97ac3f4da088116a9a2840428ecc73ae28349d515fbb4cba85ee8f2a5fd06a6"
+          "sha256": "6ff6aa842a31fd17e68e62363fd85456a01c0fe66aa637c636a12034b839778f"
         },
         {
           "path": "src/wings/vinci/machines/data/rolling-mill.json",
-          "sha256": "ed7973908a1ea494aa304fc41c1f134d437adb5990f3ecba528464bfee6f2d40"
+          "sha256": "0e32c1894b9b49b1dce19d2f820e4e4deb068c75bd721ba237a227c1221c62bd"
         },
         {
           "path": "src/wings/vinci/machines/geometry.ts",
-          "sha256": "be729b2937cecbb63713bf7b9e80fee87637b0f71947c5f529a7a1990a5bc016"
+          "sha256": "82605e532767cb54b0a2f1b7736446c0b106a9056aea9c176120b3ca8bff8165"
         },
         {
           "path": "src/wings/vinci/machines/motion.ts",
@@ -1881,7 +1893,7 @@
         },
         {
           "path": "src/wings/vinci/machines/parts.ts",
-          "sha256": "70bab9f6ce32fb652907941ebf3c028110815e9eae11a964ce982bf096d08bfc"
+          "sha256": "9a11c77ddcec733c6cc9e2897a88df40329f1b9673a1fa7333611c8a2cab906b"
         },
         {
           "path": "src/wings/vinci/machines/rolling-mill.ts",
@@ -1950,9 +1962,9 @@
       "licence": "Generated for this work, regenerable from the declared engineering dossier and procedural source recipe.",
       "wing": "vinci",
       "display": true,
-      "prompt": "water-lifting-screw, Codex Atlanticus f. 6r. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled.",
+      "prompt": "water-lifting-screw, Codex Atlanticus f. 6r. Construct the numerical dossier parts in SI units and evaluate its admitted joint schedule. Preserve every modern assumption and locked bilingual page label. Align oak grain to the timber member and vary the sample phase of rectangular timbers without changing metre scale. Where linen occurs, use an explicitly generated unbleached flax tint over the licensed weave; where glass occurs, use a clear procedural finish rather than cloth texture. New linen and forged-iron sets retain the rendering tier map budget; other new sets use the library 1024-pixel albedo budget and three procedural detail scales. Cached host materials retain their maps. These surface choices are modern reconstruction dressing. No reconstruction photograph is sampled. Forged-iron detail retains its library maps and three bands across a 12–100m density fade, with generated #91999b luminance response and roughness .4–.72. Compass retains its previous scoped tint. The gun solid end faces receive only a restrained normal-direction finish difference; no bore or functional firing geometry is invented. Rounded oak parts and inclinometer journal posts use a local quiet library variant: all three bands, 85percent map contribution, normal strength .12, restrained grain relief/shade/sheen and #847967 luminance tint (80percent density contrast retained). The exact 22mm journal post remains wood, not frayed cord. All oak detail now uses the same 12–100m density fade as cloth and iron, preserving physical UV scale, all three bands and library maps at distant phone camera positions. No extra map, geometry or material variant is added by this range correction.",
       "model": "GPT-6 Codex",
-      "date": "2026-09-09",
+      "date": "2026-09-10",
       "sha256": "06f8b4efb2bf4b00f9a4ae9b13ab2d85f7552308789d37958e5596003cdf7023",
       "recipe_files": [
         {
@@ -1961,7 +1973,7 @@
         },
         {
           "path": "src/wings/vinci/machines/data/records.json",
-          "sha256": "d97ac3f4da088116a9a2840428ecc73ae28349d515fbb4cba85ee8f2a5fd06a6"
+          "sha256": "6ff6aa842a31fd17e68e62363fd85456a01c0fe66aa637c636a12034b839778f"
         },
         {
           "path": "src/wings/vinci/machines/data/water-lifting-screw.json",
@@ -1969,7 +1981,7 @@
         },
         {
           "path": "src/wings/vinci/machines/geometry.ts",
-          "sha256": "be729b2937cecbb63713bf7b9e80fee87637b0f71947c5f529a7a1990a5bc016"
+          "sha256": "82605e532767cb54b0a2f1b7736446c0b106a9056aea9c176120b3ca8bff8165"
         },
         {
           "path": "src/wings/vinci/machines/motion.ts",
@@ -1977,7 +1989,7 @@
         },
         {
           "path": "src/wings/vinci/machines/parts.ts",
-          "sha256": "70bab9f6ce32fb652907941ebf3c028110815e9eae11a964ce982bf096d08bfc"
+          "sha256": "9a11c77ddcec733c6cc9e2897a88df40329f1b9673a1fa7333611c8a2cab906b"
         },
         {
           "path": "src/wings/vinci/machines/runtime.ts",
@@ -2068,14 +2080,14 @@
       "licence": "Generated for this work, regenerable from the procedural bench source recipe.",
       "wing": "vinci",
       "display": true,
-      "prompt": "The da Vinci machine bench. Visibly modern supports, mounting fixtures and a shadow-receiving stage for one exact dossier reconstruction at a time. The modern support is exhibition dressing and makes no historical claim.",
+      "prompt": "The da Vinci machine bench. Visibly modern supports, mounting fixtures and a shadow-receiving stage for one exact dossier reconstruction at a time. The modern support is exhibition dressing and makes no historical claim. Window 3: show the wing computed 10 October 1517 Julian 15:19:00 LAT hour, UT/longitude/EoT arithmetic and geographic sun A=231.9005 degrees h=17.3882 degrees; use those angles for the bench key. The hour is chosen, not historical observation. Gun station: generated analytic indirect occlusion from exact wheel cylinders atX=±1.08m,radius0.5m,halfwidth0.04m,slabY=0. The60mm falloff and75percent maximum attenuation approximate contact lighting only; all geometry and key shadows remain. Generated distant charcoal backdrop uses aspect-correct static coherent noise at 2.7, 23 and 180 cycles per viewport height, derivative-filtered fine grain, and a restrained linear-colour gradient from #293038 to the existing #1a2026 fog. All three bands remain in every tier; no historical sky, light, cloud or captured surface is represented. The same backdrop colour node is used by the existing depth fog, preserving its original near/far range, so the finite floor boundary cannot make a horizon seam. Noise amplitudes are .18/.14/.065 before the common distance-density attenuation.",
       "model": "GPT-6 Codex",
-      "date": "2026-09-09",
-      "sha256": "db174565be41b235b1de0c13fdea6cf35bbf0e25622733ffbd9239cbd47c2c4e",
+      "date": "2026-09-10",
+      "sha256": "9b8a4283af448f092599afacef6ee0c71035e9b88ecad33a2be8e396df6bca57",
       "recipe_files": [
         {
           "path": "src/wings/vinci/machines/bench/bench.css",
-          "sha256": "21e2d6c95fe798e73180d2d643a253ae75b70d9898276079f748c5cc7c6bd88c"
+          "sha256": "3bc9b29f5109fcc13fedd32f6365b06c85af4264278cb3ec67783fdd1ff1e54c"
         },
         {
           "path": "src/wings/vinci/machines/bench/control-polish.ts",
@@ -2091,7 +2103,7 @@
         },
         {
           "path": "src/wings/vinci/machines/bench/index.ts",
-          "sha256": "6af5a36222325bfaaf3c74b8f0f04f3f80daaf6e7667baf8474b9b1561baeb09"
+          "sha256": "ab48d297a1eccc90620be9c11105fba49ba0dce7fac2e284e73fb8daf7260bf2"
         },
         {
           "path": "src/wings/vinci/machines/bench/metrics.ts",
@@ -2111,7 +2123,7 @@
         },
         {
           "path": "src/wings/vinci/machines/bench/supports.ts",
-          "sha256": "db174565be41b235b1de0c13fdea6cf35bbf0e25622733ffbd9239cbd47c2c4e"
+          "sha256": "9b8a4283af448f092599afacef6ee0c71035e9b88ecad33a2be8e396df6bca57"
         },
         {
           "path": "src/wings/vinci/machines/bench/title-select.css",
@@ -2120,6 +2132,14 @@
         {
           "path": "src/wings/vinci/machines/bench/title-select.ts",
           "sha256": "7b2bd1625e6ff3f8999a004dbae0d5bfab6503ab044d41dff321d22d155d6a51"
+        },
+        {
+          "path": "src/wings/vinci/machines/bench/hour.ts",
+          "sha256": "4a78cf1639beae5c090e7bbeb29475c4ce6339afc19f903b007107ec1205aedd"
+        },
+        {
+          "path": "src/wings/vinci/machines/bench/backdrop.ts",
+          "sha256": "5edea585b71f463bb436a36f76e4518bd515b8a887a85c4138b0ea22c2b69ad9"
         }
       ],
       "sources": [
@@ -2138,14 +2158,14 @@
       "licence": "Generated for this work, regenerable from the procedural bench source recipe.",
       "wing": "vinci",
       "display": true,
-      "prompt": "The da Vinci machine bench. Restrained museum typography, folio mounts, named absence panels, certainty marks, navigation, finite-demonstration status and evidence reading furniture, plus an optional diagnostic card displaying observed runtime measurements. Reuse the locked bilingual pages verbatim. No unapproved folio or reconstruction photograph is displayed.",
-      "model": "GPT-6 Codex",
-      "date": "2026-09-09",
-      "sha256": "6af5a36222325bfaaf3c74b8f0f04f3f80daaf6e7667baf8474b9b1561baeb09",
+      "prompt": "The da Vinci machine bench. Restrained museum typography, folio mounts, named absence panels, certainty marks, navigation, finite-demonstration status and evidence reading furniture, plus an optional diagnostic card displaying observed runtime measurements. Reuse the locked bilingual pages verbatim. No unapproved folio or reconstruction photograph is displayed. Window 5: three registers of text. The label speaks the hour (15:19 by the sun, 10 October 1517) and says the day is documented and the hour chosen, and it names what the bench does not show; the drawer explains without bracket citations; the record behind Read the evidence carries the arithmetic, the place, the method and the sources. The same computed 10 October 1517 Julian 15:19:00 LAT hour and geographic sun A=231.9005 degrees h=17.3882 degrees drive the bench key. The hour is chosen, not historical observation.",
+      "model": "GPT-6 Codex, with a Claude Opus 5 harvest seat",
+      "date": "2026-09-11",
+      "sha256": "ab48d297a1eccc90620be9c11105fba49ba0dce7fac2e284e73fb8daf7260bf2",
       "recipe_files": [
         {
           "path": "src/wings/vinci/machines/bench/bench.css",
-          "sha256": "21e2d6c95fe798e73180d2d643a253ae75b70d9898276079f748c5cc7c6bd88c"
+          "sha256": "3bc9b29f5109fcc13fedd32f6365b06c85af4264278cb3ec67783fdd1ff1e54c"
         },
         {
           "path": "src/wings/vinci/machines/bench/control-polish.ts",
@@ -2161,7 +2181,7 @@
         },
         {
           "path": "src/wings/vinci/machines/bench/index.ts",
-          "sha256": "6af5a36222325bfaaf3c74b8f0f04f3f80daaf6e7667baf8474b9b1561baeb09"
+          "sha256": "ab48d297a1eccc90620be9c11105fba49ba0dce7fac2e284e73fb8daf7260bf2"
         },
         {
           "path": "src/wings/vinci/machines/bench/metrics.ts",
@@ -2181,7 +2201,7 @@
         },
         {
           "path": "src/wings/vinci/machines/bench/supports.ts",
-          "sha256": "db174565be41b235b1de0c13fdea6cf35bbf0e25622733ffbd9239cbd47c2c4e"
+          "sha256": "9b8a4283af448f092599afacef6ee0c71035e9b88ecad33a2be8e396df6bca57"
         },
         {
           "path": "src/wings/vinci/machines/bench/title-select.css",
@@ -2190,6 +2210,14 @@
         {
           "path": "src/wings/vinci/machines/bench/title-select.ts",
           "sha256": "7b2bd1625e6ff3f8999a004dbae0d5bfab6503ab044d41dff321d22d155d6a51"
+        },
+        {
+          "path": "src/wings/vinci/machines/bench/hour.ts",
+          "sha256": "4a78cf1639beae5c090e7bbeb29475c4ce6339afc19f903b007107ec1205aedd"
+        },
+        {
+          "path": "src/wings/vinci/machines/bench/registers.ts",
+          "sha256": "f566d167a0be94bef1e46982e78b7e8487a88e1dd9140ebfec507040b6f465a3"
         }
       ],
       "sources": [
