@@ -291,7 +291,7 @@ export function createWing():WingModule {
     // built, the card docks to the side and the room is the frame.
     const standing=vinciStandsInRoom(s.id)
     header.classList.toggle('vinci-standing',standing)
-    if(!s.outdoor){header.classList.toggle('vinci-construction',!standing);header.append(make('p','vinci-status',text(vinciConstructionStatus)),make('p','vinci-promise',text(s.promise)));if(s.id==='hall')header.append(make('p','vinci-threshold',text(vinciThreshold)))}
+    if(!s.outdoor){header.classList.toggle('vinci-construction',!standing);if(s.group!=='line')header.append(make('p','vinci-status',text(vinciConstructionStatus)));header.append(make('p','vinci-promise',text(s.promise)));if(s.id==='hall')header.append(make('p','vinci-threshold',text(vinciThreshold)))}
     else header.classList.remove('vinci-construction')
   }
   /** The card names what the frame holds: a sub-view carries its own title.
