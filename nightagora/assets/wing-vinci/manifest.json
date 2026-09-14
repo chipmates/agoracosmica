@@ -413,7 +413,7 @@
       "prompt": "Regenerable actual geometry certificate for40 directed routes across five pose families and two viewport families. Includes foundation, entry, vegetation and all dressing; no sky, DOM or shadow-only duplicate.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-10",
-      "sha256": "81a750cfefce575950815bdd6746f0494489193a614dd5fbca8059a44338693e",
+      "sha256": "5ac2553b607d242d5f31c2ec696d05b9ff2ab50fd83eb7b34f40fd49a0d53c3c",
       "note": "recipe_file=src/wings/vinci/data/rail-clearance.json; source_generator=src/wings/vinci/rail-certify.mjs; runtime dependency of vinci/rail"
     },
     {
@@ -2896,11 +2896,11 @@
       "class": "GENERATED",
       "licence": "Original procedural exhibition design; source code under the museum repository licence. Material inputs retain their separate CC0 library records.",
       "display": true,
-      "prompt": "Manifest-only prepared sRGB reproduction streams. Validate the complete original preview before 512 px calm/standard or 1024 px hero uploads; one distance-earned source up to 4096 px outside calm. Preserve whole-source proportions and colour handling, 240 ms first arrival, 700 ms resolution blend, exact mip-residency accounting and abort-safe release. Display UV windows are separately declared.",
+      "prompt": "Manifest-only prepared sRGB reproduction streams. Validate the complete original preview before 512 px calm/standard or 1024 px hero uploads; one distance-earned source up to 4096 px outside calm. Preserve whole-source proportions and colour handling, 240 ms first arrival, 700 ms resolution blend, exact mip-residency accounting and abort-safe release. Display UV windows are separately declared. A drawn sheet's records are admitted by the same module through their own record shape.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
-      "date": "2026-09-09",
-      "sha256": "34db2dfbb5aa1c2a997f881d104c2bac218d8ea8c18dfcbbd98f04bc6c0aa0f5",
-      "note": "Museum dressing, not documentary imagery. recipe_file=src/wings/vinci/pictures/stream.ts production_files=src/wings/vinci/pictures/aperture.ts"
+      "date": "2026-09-14",
+      "sha256": "0f0538899baf807486786cd71fa74205656371501ed896250b4d74964381b953",
+      "note": "Museum dressing, not documentary imagery. recipe_file=src/wings/vinci/pictures/stream.ts admission_files=src/wings/vinci/pictures/sheet-record.ts production_files=src/wings/vinci/pictures/aperture.ts"
     },
     {
       "id": "vinci/pictures/frame-contact",
@@ -3156,13 +3156,13 @@
       "class": "GENERATED",
       "licence": "Original procedural exhibition design; source code under the museum repository licence. Reproduction licences retain their separate source records.",
       "display": true,
-      "date": "2026-09-10",
+      "date": "2026-09-14",
       "id": "vinci/pictures/policy-labels",
       "path": "procedural/pictures/policy-labels/*",
       "prompt": "Compose bilingual museum labels and the four-colour certainty key. Keep labels to a certainty word and title, and reading paragraphs to ordinary bilingual museum language. Preserve each selected source honesty line and licence verbatim in the deliberately opened record, together with immutable collection data and superseded wording. Generated typesetting carries no documentary artwork claim.",
       "model": "Deterministic TypeScript DOM composition",
       "note": "Museum typesetting, not documentary imagery. recipe_file=src/wings/vinci/pictures/policy-label.ts production_files=src/wings/vinci/pictures/policy.ts",
-      "sha256": "20bd8e58b5bd8e933bbfab132c1cce9ceb08caf98b17661d55cfab67f5b23069"
+      "sha256": "89ef81bc950e25113a27679d33ca0197249ce5d3a5f060f022208349e18b2bd6"
     },
     {
       "wing": "vinci",
@@ -3275,11 +3275,11 @@
       "class": "GENERATED",
       "licence": "Original procedural exhibition mounting; source code under the museum repository licence. Every displayed reproduction retains its own store record and licence.",
       "display": true,
-      "prompt": "Place the picture module sources within the existing holder-sized room fields, retaining all fourteen withheld frames and the paired panel reverse. The current holder measurement for the Lansdowne Yarnwinder is 37.1 by 49.5 cm while its earlier layout slot preserves neighbouring placements. Place the admitted Last Supper source within the existing 8.8 by 4.6 metre mural field. Source admission, windows, arch shoulders, decoding and transitions are imported unchanged from the picture module. The room openings and fittings supply the light. All previews remain present: 512 pixel uploads at calm and standard, 1024 at hero, one distance-earned full source outside calm. Source pixels are never copied into this repository.",
+      "prompt": "Place the picture module sources on every field of the room's holder-sized wall, including the paired panel reverse, and stand the body wall's admitted Windsor sheets in modern carriers at their own proportion. No field is withheld: the store's register is the only admission decision, and a work it does not admit leaves the wall. The current holder measurement for the Lansdowne Yarnwinder is 37.1 by 49.5 cm while its earlier layout slot preserves neighbouring placements. Place the admitted Last Supper source within the existing 8.8 by 4.6 metre mural field. Source admission, windows, arch shoulders, decoding and transitions are imported unchanged from the picture module. The room openings and fittings supply the light. All previews remain present: 512 pixel uploads at calm and standard, 1024 at hero, one distance-earned full source outside calm across both walls. Source pixels are never copied into this repository.",
       "model": "Deterministic TypeScript and TSL exhibition placement",
       "date": "2026-09-14",
-      "sha256": "525d4123d553ba0860af8bf7986c89d3b2ac398bfc788e2d4b1b16ef09632be4",
-      "note": "Modern exhibition supports, no historical room claim. recipe_file=src/wings/vinci/collection/plates.ts; streaming bytes and displayed licences resolve through the store manifest.",
+      "sha256": "1ecd6bd0f52a67b84cf2423be5e2d2825a316c571fbbf09c255b1a4887869466",
+      "note": "Modern exhibition supports, no historical room claim. recipe_file=src/wings/vinci/collection/plates.ts wall_register=src/wings/vinci/collection/body-wall.ts; streaming bytes and displayed licences resolve through the store manifest.",
       "recipe_files": [
         {
           "path": "src/wings/vinci/collection/plates.ts",
@@ -3291,11 +3291,11 @@
         },
         {
           "path": "src/wings/vinci/collection/materials.ts",
-          "sha256": "1af3f1fc26527f8efcad9f20a6b817d7a5c96841c7a303a76d38aec5a2d66bb3"
+          "sha256": "51ccc5005ac7ca5dae3dc922e8d9d7dfbed94e4adea8b69c82a214d1b92b2ec8"
         },
         {
           "path": "src/wings/vinci/collection/exhibits.ts",
-          "sha256": "de17ba8f250dc5dd8eb2ea7836ddf5e9baf5b3d79c3e4b33ad01084a7788b3b6"
+          "sha256": "3f91d9c0edf045c6b8573e0b12c346d41a39d6cbc9af1b0707c6dc6463821bfa"
         },
         {
           "path": "src/wings/vinci/pictures/register.ts",
@@ -3327,15 +3327,15 @@
         },
         {
           "path": "src/wings/vinci/index.ts",
-          "sha256": "f8883ec2fa3c0538221a29c842f11285211136c803093f00323d5aaff12da240"
+          "sha256": "34a77dbae87d2ccc3e6918dc2f910ac17a4cbc4d88a03f483e611bc88904f082"
         },
         {
           "path": "src/wings/vinci/content.ts",
-          "sha256": "c68e8f74ab4384199a0217be5c4ff1a2f1d3d6c3029c7648fd720cb3541cbb67"
+          "sha256": "e6dad3a95759d49795bef97fcbc7e24711a86aba095afb700d2143dcebcb5f2c"
         },
         {
           "path": "src/wings/vinci/wing.css",
-          "sha256": "612962bd8bbfc79a70602b11ff819ad2c4ef2fa0cdde151c757049ff711255d0"
+          "sha256": "96f33c955b12fc2c36c49f872dbbd400bf160f5ffca5ad5d04bfe8e381dc2542"
         }
       ]
     },

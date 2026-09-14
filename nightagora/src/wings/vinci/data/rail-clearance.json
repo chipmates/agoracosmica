@@ -29,6 +29,12 @@
    "unchangedDuringAudit": true
   },
   {
+   "file": "src/wings/vinci/collection/body-wall.ts",
+   "sha256": "a075d2d44cf896aea0a63c4220142b922f90b8e6066a5fd2d74c3d8d53364482",
+   "bytes": 5649,
+   "unchangedDuringAudit": true
+  },
+  {
    "file": "src/wings/vinci/collection/build.ts",
    "sha256": "be4678ac98acefebc3dada0945c112b8ef819daa8c524a5fc280eb5a3862b3a1",
    "bytes": 5175,
@@ -36,8 +42,8 @@
   },
   {
    "file": "src/wings/vinci/collection/hang.ts",
-   "sha256": "2f4dd18ec55d62ee76aff60aa71aac6cad859e3a03611b3e6f47a366be8684af",
-   "bytes": 7380,
+   "sha256": "a5d67b119caf36307a3c07db0bef586b0523e8cee97bb53317a408d191bc6489",
+   "bytes": 6994,
    "unchangedDuringAudit": true
   },
   {
@@ -185,6 +191,12 @@
    "unchangedDuringAudit": true
   },
   {
+   "file": "src/wings/vinci/pictures/sheet-record.ts",
+   "sha256": "386a3dffe861a7ecadcacab5ea394fac62b04dfab4a30c849f41402b2ec9c066",
+   "bytes": 2778,
+   "unchangedDuringAudit": true
+  },
+  {
    "file": "src/wings/vinci/projection-drag.ts",
    "sha256": "402ce12168178afb7f2efd958e8dcdf4517396cd8c8b8695edc300bc0a526867",
    "bytes": 880,
@@ -288,25 +300,25 @@
   }
  ],
  "geometrySha256": [
-  "256c581f938845a9474e26aa10c29d536ff41292abb0c5d4804412ef0fca9978",
-  "a56dd4777c75b059a4b1177fcb806db768505b03a3564efdc7f091baa63171ed"
+  "e2af16e7317450d7f2e6ce10a0ca06a147912ca53015fe25fc8da93b63346f1c",
+  "e69bd67d5bd3697b6f4def565fc8913dbba94a49564e4f6e5e511c05c1675316"
  ],
  "geometry": [
   {
    "tier": "hero",
-   "sha256": "256c581f938845a9474e26aa10c29d536ff41292abb0c5d4804412ef0fca9978",
+   "sha256": "e2af16e7317450d7f2e6ce10a0ca06a147912ca53015fe25fc8da93b63346f1c",
    "quantumM": 0.000001,
    "matchingGeometryToleranceM": 0.000002
   },
   {
    "tier": "standard",
-   "sha256": "256c581f938845a9474e26aa10c29d536ff41292abb0c5d4804412ef0fca9978",
+   "sha256": "e2af16e7317450d7f2e6ce10a0ca06a147912ca53015fe25fc8da93b63346f1c",
    "quantumM": 0.000001,
    "matchingGeometryToleranceM": 0.000002
   },
   {
    "tier": "calm",
-   "sha256": "a56dd4777c75b059a4b1177fcb806db768505b03a3564efdc7f091baa63171ed",
+   "sha256": "e69bd67d5bd3697b6f4def565fc8913dbba94a49564e4f6e5e511c05c1675316",
    "quantumM": 0.000001,
    "matchingGeometryToleranceM": 0.000002
   }
