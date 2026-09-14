@@ -16,6 +16,7 @@ const BASE = `http://localhost:${PORT}`
 
 /** one address per kind, and the id the app must report standing at */
 const ROUTES = [
+  ['/bench/vinci/object/revolving-crane-opus', 'approach', 4],
   ['/bench/vinci/machines/rolling-mill', 'rolling-mill', 14],
   ['/bench/vinci/table/mirror', 'mirror', 7],
   ['/bench/vinci/line/grave', null, 56],

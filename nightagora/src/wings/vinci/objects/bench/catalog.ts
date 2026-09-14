@@ -57,6 +57,89 @@ export type ObjectState = (typeof OBJECT_STATES)[number]
    floor is at y = 0. The sun of the named hour stands to the south west, so
    the two lit faces are the two the approach shows. */
 export const OBJECTS: Record<string, BenchObject> = {
+  'revolving-crane-opus': {
+    id: 'revolving-crane-opus',
+    title: 'Revolving crane',
+    kicker: 'Leonardo da Vinci · The machines',
+    label:
+      'Reconstructed from Manuscript B 49r with modern dimensions. A hand crank raises the load.',
+    certainty: 'inferred',
+    certaintyWord: 'Reconstructed',
+    hour: {
+      label: '10 October 1517 · 15:19',
+      azimuth: 232,
+      elevation: 17,
+      kelvin: 4400,
+      lux: 340,
+      sky: 'sky-afternoon-warm',
+    },
+    tiers: {
+      hero: 'vinci/revolving-crane-opus-hero',
+      standard: 'vinci/revolving-crane-opus-standard',
+      calm: 'vinci/revolving-crane-opus-calm',
+    },
+    stations: {
+      approach: {
+        metres: 4.2,
+        at: [0.2, 1.26, 0.12],
+        from: [0.62, 0.24, 0.75],
+        exposure: 1.2,
+        title: 'The whole machine',
+        note: 'Three quarters on, from six metres, with the sun across the jib.',
+      },
+      near: {
+        // the brace rakes over the drum from the front, so the winch is read
+        // from the crank's own side, where nothing stands between
+        metres: 1.55,
+        at: [-0.13, 1.07, 0],
+        from: [0.42, 0.16, 0.893],
+        fov: 39,
+        // the narrow stage restages: the same winch needs a wider field on a
+        // phone or the ratchet leaves the frame
+        phoneFov: 64,
+        exposure: 1.16,
+        title: 'The drum and the crank',
+        note: 'A metre and a half off the drum, where the ratchet, the pawl and the crank can be read.',
+      },
+      detail: {
+        metres: 0.48,
+        at: [0.02, 2.56, 1.52],
+        from: [-0.3, 0.35, 0.885],
+        fov: 44,
+        phoneFov: 56,
+        exposure: 1.24,
+        title: 'The rope through the jib',
+        note: 'At arm\u2019s length on the tip: the rope over its sheave and down through the bored hole.',
+      },
+      phone: {
+        metres: 3,
+        // the eye looks below the middle, so the machine stands in the upper
+        // two thirds and the chrome of a phone has the lower one
+        at: [0, 0.86, 0.26],
+        from: [0.5, 0.24, 0.83],
+        exposure: 1.2,
+        title: 'The crane',
+        note: 'The whole machine upright, framed for a phone.',
+      },
+    },
+    sources: [
+      'A revolving crane, reconstructed from the drawing on folio 49 recto of Manuscript B. Leonardo drew the machine. He never wrote down how big it was, so every size here is a modern choice made to explain how it works, and the amber dot says so.',
+      'It stands 2.7 metres high and sweeps a circle 3.7 metres across. A rope runs from the drum, up through the jib, over the rear pulley, along the jib and over the tip pulley, and down to the stone. Turning the crank raises the stone. The pawl beside the ratchet is parked clear, so the person at the crank has to keep holding it.',
+      'Everything you see is geometry. The oak is squared with the arris a plane takes off, the rope holes are bored and their mouths are worn, the drum is turned and runs in bored bearings, the ratchet is twenty four forged teeth, the pulleys are wheels between cheeks on their pins, and the rope is a three strand hemp helix. The counterweight and the stone are dressed blocks, slung.',
+      'What the model adds beyond those sizes is only what holds a wooden machine together: pegs, wedges, iron bands, the post the pawl hangs on. They are dressing, and none of them claims anything about the drawing.',
+      'Colour, relief, roughness, metal and occlusion were measured off that geometry and written into texture sheets, one per moving body. No light is baked into any of them. The sun in this frame is the museum\u2019s own, at the hour named above, and the occlusion the bake measured reaches the ambient light alone.',
+      'The surfaces are dressed from the museum\u2019s open licence material library: weathered oak, forged iron, laid hemp and aged lime for the stone.',
+    ],
+    record: [
+      'Recipe: forge/blender/examples/revolving-crane-opus.py, run through forge/blender/build-object.sh (Blender 5.2, Cycles on the Metal GPU), packed with gltfpack -cc -tc -tq 8 -kn.',
+      'Geometry read from client/src/wings/vinci/machines/data/revolving-crane.json: 30 declared parts, each built at its own metres and parent transform, every built part within 2 per cent of its declared box.',
+      'Arithmetic from the page: drum radius 0.0800 m at 0.2500 rad/s gives a rope speed of 0.0200 m/s, so the load rises 0.2400 m in 12 s; a 20 kg load needs 15.7 Nm of ideal drum torque. Modern demonstration values, not measurements of a historical machine.',
+      'Joint nodes, in the turntable\u2019s frame: turntable (0, 0.12, 0) about +Y; drum (0, 1.0000, 0), rear-pulley (0, 2.5000, 0) and tip-pulley (0, 2.5000, 1.5000) about +X; rope-fall (0, 2.5000, 1.5800) scales in Y; load (0, 0.8200, 1.5800) slides along +Y.',
+      'Bake passes: albedo, roughness, normal from a high poly onto the low poly, ambient occlusion, curvature and a metal mask. Curvature lifts the albedo on a worn arris and drops it into a joint. The bake scene holds no lamp and no sky.',
+      'Key: azimuth 232.0000\u00b0, elevation 17.0000\u00b0, 4400 K, 340 lx. Direction = (sin A cos h, sin h, \u2212cos A cos h).',
+      'Tiers: one atlas per body at its own size, 4096\u00b2 for the frame and the jib down to 512\u00b2 for the rope, halved at standard and quartered at calm. The geometry is identical in all three: a tier is a second pack, never a cut.',
+    ],
+  },
   dovecote: {
     id: 'dovecote',
     title: 'The square dovecote',
