@@ -6,7 +6,7 @@ import { createBreath } from './scenes/breath'
 import { createAtlas, type LabelBounds } from './scenes/atlas'
 import { createMandala } from './scenes/mandala'
 import { createHotspots } from './core/hotspots'
-import { FIRE_SCRIPT } from './content/keeper-script'
+import { fireScript } from './content/keeper-script'
 import { ambience } from './core/ambience'
 import { WANDERERS } from './content/wanderers'
 import { CONSTELLATIONS, SKY_INVITE } from './content/constellations'
@@ -35,6 +35,10 @@ function syncLobbyCopy(): void {
   const count = wingCount(wingsOpen(), wingsPreparing())
   for (const el of document.querySelectorAll<HTMLElement>('#lobby-plate, [data-lobby-count]'))
     el.textContent = count
+  for (const el of document.querySelectorAll<HTMLElement>('[data-na-disclosure]')) {
+    const key = el.dataset['naDisclosure'] as keyof typeof DISCLOSURES
+    if (key in DISCLOSURES) el.textContent = say(DISCLOSURES[key])
+  }
 }
 syncLobbyCopy()
 
@@ -1303,7 +1307,7 @@ function setPhase(next: Phase): void {
     agoraEnteredAt = elapsed
     lookTarget = 0
     lookUp = 0
-    keeperScene.setScript(FIRE_SCRIPT)
+    keeperScene.setScript(fireScript())
     keeperEl.hidden = true
     setStatus('fireStatus')
     verseShow(say(LOBBY_TEXT.fireVerse))

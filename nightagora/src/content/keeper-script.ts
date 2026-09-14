@@ -6,7 +6,7 @@
 export interface KeeperTurn {
   /** The visitor's line, set in italic ink. */
   ask: string
-  /** Marcus's answer, revealed phrase by phrase in letterpress. */
+  /** The answer, revealed phrase by phrase in letterpress. */
   phrases: string[]
 }
 
@@ -27,8 +27,9 @@ export interface KeeperScript {
 }
 
 import { disclosure } from './disclosures'
+import { lang, type Lang } from '../wings/content'
 
-export const KEEPER_NAME = "Marcus Aurelius · Keeper of Tonight's Fire"
+export const KEEPER_NAME = 'The Night Watchman'
 
 /** The voice layer of the disclosure, read from the canon so the line the
     keeper speaks and the line the honesty gate checks cannot drift apart. */
@@ -37,13 +38,13 @@ export const GREETING = disclosure('voice')
 /** The one honest answer to a question this fire cannot answer. The
     question itself travels with the visitor. */
 export const TYPED_REPLY: string[] = [
-  'Keep that question. Hold it the way you hold a coal, carefully and close.',
-  'This fire is only an echo of me. Behind the door at the end of this night, I can answer you properly.',
-  'Your question will travel with you. I will be waiting.',
+  'You are in the Night Agora. This welcome is scripted.',
+  'The count above shows which wings are open and which are in preparation.',
+  'Look up to choose a life. In a wing, walk from place to place. Open a label to look closer.',
 ]
 
-/** The ink layer, from the same canon. */
-export const COLOPHON = disclosure('ink')
+/** The museum voice has its own colophon. */
+export const COLOPHON = disclosure('watchman')
 
 /** sessionStorage key: a free-typed question the visitor carries out. */
 export const CARRIED_QUESTION_KEY = 'na-carried-question'
@@ -56,7 +57,28 @@ export const FIRE_SCRIPT: KeeperScript = {
   typedReply: TYPED_REPLY,
   codaText: '',
   codaGold: '',
-  exit: 'Look up · the thirty are chosen in the sky',
+  exit: 'Look up · choose a life',
   exitImmediate: true,
 }
 
+const FIRE_SCRIPTS: Record<Lang, KeeperScript> = {
+  en: FIRE_SCRIPT,
+  de: {
+    name: 'Der Nachtwächter',
+    greeting: disclosure('voice', 'de'),
+    offered: [],
+    typedReply: [
+      'Du bist in der Night Agora. Dieser Willkommensgruß ist vorab geschrieben.',
+      'Die Angabe oben zeigt, welche Flügel offen sind und welche vorbereitet werden.',
+      'Schau nach oben und wähle ein Leben. Geh im Flügel von Ort zu Ort. Öffne eine Beschriftung, um genauer hinzusehen.',
+    ],
+    codaText: '',
+    codaGold: '',
+    exit: 'Schau nach oben · wähle ein Leben',
+    exitImmediate: true,
+  },
+}
+
+export function fireScript(): KeeperScript {
+  return FIRE_SCRIPTS[lang()]
+}

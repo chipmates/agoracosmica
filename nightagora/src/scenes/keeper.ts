@@ -19,11 +19,12 @@
    words, the way onward. Nothing else. */
 
 import {
-  FIRE_SCRIPT,
+  fireScript,
   CARRIED_QUESTION_KEY,
-  COLOPHON,
   type KeeperScript,
 } from '../content/keeper-script'
+import { disclosure } from '../content/disclosures'
+import { lang, say } from '../wings/content'
 
 type Mode = 'idle' | 'greeting' | 'open' | 'answering'
 
@@ -522,8 +523,7 @@ function setWords(node: HTMLElement, text: string, from = 0, extra = ''): number
   return from + parts.length
 }
 
-/** "Marcus Aurelius · Keeper of Tonight's Fire" is two registers, not one
-    label: the name is the anchor, the station is the small line under it. */
+/** A role can follow a name. The unnamed watchman needs only one line. */
 function splitTitle(full: string): [string, string] {
   const cut = full.indexOf(' · ')
   if (cut < 0) return [full, '']
@@ -536,7 +536,7 @@ export function createKeeper(
   onExit?: () => void
 ): KeeperHandles {
   ensurePress()
-  let script: KeeperScript = FIRE_SCRIPT
+  let script: KeeperScript = fireScript()
 
   // ---- build the chrome once ----
   host.textContent = ''
@@ -561,16 +561,14 @@ export function createKeeper(
 
   const form = document.createElement('form')
   form.className = 'keeper-form'
-  const askLabel = el('span', 'keeper-ask-label', 'Ask')
+  const askLabel = el('span', 'keeper-ask-label')
   const writing = el('div', 'keeper-writing')
   const input = document.createElement('input')
   input.className = 'keeper-input'
   input.type = 'text'
   input.maxLength = 240
   input.autocomplete = 'off'
-  input.placeholder = 'Write your own question'
   input.setAttribute('enterkeyhint', 'send')
-  input.setAttribute('aria-label', 'Ask the Echo')
   writing.appendChild(input)
   form.append(askLabel, writing)
   input.addEventListener('keydown', (e) => {
@@ -606,9 +604,9 @@ export function createKeeper(
     if (onExit) onExit()
   })
 
-  const colophon = el('p', 'keeper-note', COLOPHON)
+  const colophon = el('p', 'keeper-note')
   colophon.dataset['naClaim'] = 'tradition'
-  colophon.dataset['naDisclosure'] = 'ink'
+  colophon.dataset['naDisclosure'] = 'watchman'
   colophon.dataset['naAnchor'] = 'lobby/keeper'
   host.append(shade, seal, name, role, rule, dialogue, beats, offersBox, form, exitBtn, colophon)
 
@@ -642,6 +640,10 @@ export function createKeeper(
 
   function setScript(next: KeeperScript): void {
     script = next
+    colophon.textContent = disclosure('watchman', lang())
+    askLabel.textContent = say({ en: 'Ask', de: 'Fragen' })
+    input.placeholder = say({ en: 'Write your own question', de: 'Schreib deine Frage auf' })
+    input.setAttribute('aria-label', say({ en: 'Ask the Night Watchman', de: 'Frag den Nachtwächter' }))
     // a keeper with nothing offered also takes no written questions:
     // the hub points the way, the hearth holds the conversation
     form.hidden = next.offered.length === 0
@@ -874,6 +876,6 @@ export function createKeeper(
     }
   }
 
-  setScript(FIRE_SCRIPT)
+  setScript(fireScript())
   return { update, speak, setScript, forgeStage }
 }
