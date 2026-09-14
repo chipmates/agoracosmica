@@ -11,8 +11,10 @@ export const strollMetresPerSecond = 1.3
  * second and gives the stop a little longer, because a stop is a choice. */
 const ACCEL_SECONDS = .9, BRAKE_SECONDS = 1.1
 /** A leg never cuts, and a mark on the far side of the museum is a traverse
- * rather than a claim about anyone's pace: past the ceiling the cruise rises. */
-const MIN_SECONDS = 1.1, MAX_SECONDS = 20
+ * rather than a claim about anyone's pace: past the ceiling the cruise rises.
+ * The ceiling is what lets the longest room in the insertion still be walked
+ * at a stroll: thirty-two metres is the longest leg that keeps one. */
+const MIN_SECONDS = 1.1, MAX_SECONDS = 26
 /** One step at this pace. The cadence follows from the speed, it is not set. */
 export const stepMetres = .68
 /** The rhythm a walker feels in the eye and never notices: 18 mm of rise and
@@ -22,8 +24,16 @@ const BOB_M = .009, SWAY_M = .006
  * reached at the exact certified eye however the visitor got there. */
 const RHYTHM_FADE_M = 1
 /** Past a stroll a step rhythm would be a lie about the pace: a traverse
- * across the whole site carries no step. */
-const RHYTHM_FULL_MPS = 1.4, RHYTHM_NONE_MPS = 1.7
+ * across the whole site carries no step, and the fade ends at the top of the
+ * relaxed-walk band, so a leg either strolls with its rhythm or traverses
+ * without one. */
+const RHYTHM_FULL_MPS = 1.3, RHYTHM_NONE_MPS = 1.4
+/** A visitor who has already asked for the station after this one is not
+ * strolling, so the leg's own clock runs at the pace of the asking: each
+ * station still waiting adds its share, up to four. The step rhythm goes out
+ * with the first of them, because a walker being carried on is not stepping
+ * at a stroll's cadence. */
+const CARRIED_SHARE = .9, CARRIED_MAX = 4
 
 const clamp01 = (x: number) => Math.max(0, Math.min(1, x))
 /** Smoothstep: the velocity shape of getting under way and of stopping. */
@@ -77,6 +87,13 @@ export function gaitRhythm(leg: GaitLeg, metres: number, reducedMotion: boolean)
   if (!(amount > 0)) return { height: 0, sway: 0 }
   const phase = Math.PI * metres / stepMetres
   return { height: -BOB_M * amount * Math.cos(2 * phase), sway: SWAY_M * amount * Math.sin(phase) }
+}
+
+/** How fast the leg under way runs when stations are already waiting behind
+ * it. One is the stroll the leg was timed at. */
+export function carriedPace(waiting: number): number {
+  const stations = Math.max(0, Math.min(CARRIED_MAX, Math.floor(Number.isFinite(waiting) ? waiting : 0)))
+  return 1 + CARRIED_SHARE * stations
 }
 
 /** The largest distance the rhythm can carry the eye off its certified path. */

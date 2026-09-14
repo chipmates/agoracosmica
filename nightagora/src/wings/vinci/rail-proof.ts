@@ -18,7 +18,7 @@ interface ClearanceData {
   geometrySha256: string[]; routes: SavedRoute[]
 }
 const data = JSON.parse(certificateText) as ClearanceData
-if (data.format !== 'vinci-rail-clearance-v1' || data.completeNearClearance !== true || data.routes.length !== 40) throw new Error('Missing complete Vinci rail certificate')
+if (data.format !== 'vinci-rail-clearance-v1' || data.completeNearClearance !== true || data.routes.length !== 364) throw new Error('Missing complete Vinci rail certificate')
 const geometryToleranceM = .000002
 export { collectRailSolids, railCollisionIds } from './rail-solids'
 

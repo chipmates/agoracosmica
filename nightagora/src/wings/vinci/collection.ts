@@ -433,12 +433,25 @@ export function createCollection(): Group {
     opaque.box(C.east, north, floor + 2.35, .14, .14, 4.7, steel, 1)
     if (!i) continue
     const south = bays[i - 1]!
-    // The northmost 2 m bay is the entrance, with a glazed leaf set back.
+    // The northmost 2 m bay is the entrance, set back under the canopy. It is
+    // an OPENING and not a pane: a 1.6 m clear door 2.6 m high, glazed either
+    // side and over, with the leaf standing open against the return. A museum
+    // a visitor walks into needs a way in.
     const east = i === bays.length - 1 ? C.east - .6 : C.east - .04
-    glass.quad([east, south + .075, floor + .1], [east, north - .075, floor + .1], [east, north - .075, top - .18], [east, south + .075, top - .18], '#ffffff')
     if (i === bays.length - 1) {
-      opaque.box(east + .025, south + .25, floor + 1.05, .06, .055, .5, steel, 1)
-      opaque.box(C.east + .10, (south + north) / 2, floor + .03, 1.4, north - south, .06, paving, 4)
+      const middle = (south + north) / 2, half = .8, head = floor + 2.6
+      glass.quad([east, south + .075, floor + .1], [east, middle - half, floor + .1], [east, middle - half, top - .18], [east, south + .075, top - .18], '#ffffff')
+      glass.quad([east, middle + half, floor + .1], [east, north - .075, floor + .1], [east, north - .075, top - .18], [east, middle + half, top - .18], '#ffffff')
+      glass.quad([east, middle - half, head], [east, middle + half, head], [east, middle + half, top - .18], [east, middle - half, top - .18], '#ffffff')
+      opaque.box(east, middle, head + .06, .10, 2 * half + .2, .12, steel, 1)
+      // The leaf stands open OUTWARD against the south jamb, under the
+      // canopy, so the clear width and the way in are never in front of it.
+      glass.quad([east + .06, middle - half - .04, floor + .1], [east + 1.62, middle - half - .04, floor + .1],
+        [east + 1.62, middle - half - .04, head - .06], [east + .06, middle - half - .04, head - .06], '#ffffff')
+      opaque.box(east + .84, middle - half - .10, floor + 1.05, .06, .055, .5, steel, 1)
+      opaque.box(C.east + .10, middle, floor + .03, 1.4, north - south, .06, paving, 4)
+    } else {
+      glass.quad([east, south + .075, floor + .1], [east, north - .075, floor + .1], [east, north - .075, top - .18], [east, south + .075, top - .18], '#ffffff')
     }
   }
   for (const height of [floor + .08, top - .10]) opaque.box(C.east, -49, height, .18, 30, .16, steel, 1)

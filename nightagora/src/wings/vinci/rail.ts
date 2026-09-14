@@ -5,14 +5,45 @@ import { roadGradeProvenance } from './road-grade'
 import type { VinciStationId } from './content'
 import { createRailLookSmoother, createCertifiedRailPath } from './rail-smoothing'
 import { projectRailDrag } from './projection-drag'
-import { gaitAt, gaitHeadLift, gaitLeg, gaitRhythm, strollMetresPerSecond, type GaitThreshold } from './gait'
+import { carriedPace, gaitAt, gaitHeadLift, gaitLeg, gaitRhythm, strollMetresPerSecond, type GaitThreshold } from './gait'
 import { collectionLayout } from './collection'
+import { collectionView } from './collection/views'
+import { COURT, SUPPER_WALL } from './collection/layout'
 import { fittedRailFov, assertRailProjection } from './rail-projection'
 import type { RailGeometryAuthority } from './rail-proof'
 
 export interface Pose { eye: Vector3; at: Vector3; fov: number }
+/** Which room view each collection station stands in. The rooms are built by
+ * the collection module and these are its own compositions: the hang from
+ * where a hang is read, the hall from its north door, the line down its
+ * length, the court from the end a visitor arrives at. */
+export const COLLECTION_STATION_ROOMS:Partial<Record<VinciStationId,string>>={
+  'picture-room':'collection-room-picture',
+  'supper-wall':'collection-room-supper',
+  'reading-table':'collection-room-reading',
+  scattered:'collection-room-gallery',
+  flight:'collection-room-hall-screw',
+  works:'collection-room-hall',
+  body:'collection-room-body',
+  myths:'collection-room-corrections',
+  grave:'collection-room-grave',
+}
 const p=(e:number,n:number,h:number,te:number,tn:number,th:number,fov=49):Pose=>({eye:world(e,n,h),at:world(te,tn,th),fov})
 /** Camera poses are exhibition choices. They change no surveyed geometry. */
+/** THE PHONE RESTAGES A ROOM, IT DOES NOT CLIP IT. The card takes the middle
+ * band of an 844 px stage, so a room's hero is put ABOVE it: the lens opens by
+ * a quarter and the aim drops by a fifth of the frame, which lifts the subject
+ * out from behind the card. The eye does not move: the visitor stands where
+ * the room's own view stands them. */
+const NARROW_LENS=1.26, NARROW_AIM_SHARE=.21
+function narrowRoomPose(pose:Pose):Pose {
+  const fov=Math.min(104,pose.fov*NARROW_LENS)
+  const reach=pose.eye.distanceTo(pose.at)
+  const drop=reach*Math.tan(fov*Math.PI/180*NARROW_AIM_SHARE)
+  return {eye:pose.eye.clone(),at:pose.at.clone().setY(pose.at.y-drop),fov}
+}
+/** The stations that stand in a built room rather than on a plate. */
+export const vinciStandsInRoom=(id:VinciStationId):boolean=>COLLECTION_STATION_ROOMS[id]!==undefined
 export function stationPose(id:VinciStationId, narrow:boolean):Pose {
   // The eye stood 0.26 m off the retaining wall, inside its own near plane,
   // and the wall filled the right third of the lower cone. It now stands
@@ -27,10 +58,23 @@ export function stationPose(id:VinciStationId, narrow:boolean):Pose {
   if(['hall','oratory','study','chamber'].includes(id)) return p(4.4,-23.35,1.65,2,-13.8,3.5,50)
   // R19 accepted: actual apron paving +1.65 m; all eight principal windows clear vegetation.
   if(id==='garden') return p(-24.5,-31.2,-4.790000057220459,-8.7,-16.6,narrow?4.2:6.2,narrow?96:62)
-  // Later construction plates stand on the terrace above the collection
-  // ground, outside every room. On the apron the eye stood two metres from
-  // the pavilion and its roof filled the near plane; from here the whole
-  // ground is the backdrop. No exhibit is implied by either.
+  // THE COLLECTION'S NINE STAND IN THEIR OWN ROOMS, at the eye the module's
+  // own room views were composed from. A room is entered through its door and
+  // seen from where a visitor would stand to read it.
+  // The wall that is not here is a measurement, and a measurement is read
+  // square: the eye stands eleven metres off its field, which is what holds
+  // all 8.8 by 4.6 m of the absence in one frame.
+  if(id==='supper-wall'){
+    const square=p(-33.9,SUPPER_WALL.north,COURT.level+1.66,
+      SUPPER_WALL.east+SUPPER_WALL.thickness/2,SUPPER_WALL.north,COURT.level+2.95,62)
+    return narrow?narrowRoomPose(square):square
+  }
+  const room=COLLECTION_STATION_ROOMS[id]
+  if(room){const pose=collectionView(room,false);if(pose)return narrow?narrowRoomPose(pose):pose}
+  // The line's three plates stand on the terrace above the collection ground,
+  // outside every room. On the apron the eye stood two metres from the
+  // pavilion and its roof filled the near plane; from here the whole ground
+  // is the backdrop. No exhibit is implied by either.
   return p(-12.4,-21.6,groundHeight(-12.4,-21.6)+1.65,-38,-44,-4.2,narrow?74:58)
 }
 export function namedPose(id:string,narrow:boolean):Pose|undefined {
@@ -143,8 +187,13 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
   interface Request { id:VinciStationId; pose:Pose; phone:boolean }
   let completed:Request|undefined, active:Request|undefined
   const queue:Request[]=[]
-  let path:ReturnType<typeof createCertifiedRailPath>|undefined, started=0, placementNeedsFrame=false
+  let path:ReturnType<typeof createCertifiedRailPath>|undefined, placementNeedsFrame=false
   let duration=1.1, leg=gaitLeg(0), strideM=0, strideTarget=0, strideAt=0
+  /** The leg's own clock. It runs at the stroll the leg was timed at, and
+   * faster while stations are already waiting behind it. */
+  let legClock=0, legClockAt=0, pace=1
+  /** The share of the leg under way the body has covered, for the overlay. */
+  let walkedShare=1
   const fromQ=new Quaternion(), toQ=new Quaternion()
   let fromFov=49,targetFov=49
   let fromHeading=0,fromElevation=0,toHeading=0,toElevation=0,walked=false
@@ -183,7 +232,7 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
     camera.position.copy(request.pose.eye);base.copy(poseQuaternion(request.pose))
     camera.quaternion.copy(base);camera.fov=fittedRailFov(request.pose.fov,camera.aspect,request.phone);matrices()
   }
-  function begin(request:Request,now:number) {
+  function begin(request:Request,carried:number,now:number) {
     if(!completed)throw new Error('Rail needs an explicit initial placement')
     // Exact eyes, aims, authored FOV and actual mounted solids must match
     // the offline proof. An inspection eye cannot borrow a station proof.
@@ -193,9 +242,9 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
     const from=angles(fromQ),to=angles(toQ)
     fromHeading=from.heading;fromElevation=from.elevation;toHeading=to.heading;toElevation=to.elevation
     walked=path.length>=WALKED_LEG_M
-    leg=gaitLeg(path.length);duration=leg.seconds;strideM=strideTarget=0;strideAt=now
+    leg=gaitLeg(path.length);duration=leg.seconds;legClock=0;legClockAt=now;pace=carriedPace(carried);strideM=strideTarget=0;strideAt=now
     fromFov=completed.pose.fov;targetFov=request.pose.fov;look.recenter()
-    started=now;active=request
+    active=request
   }
   function render(now:number) {
     const offset=look.sample(now)
@@ -207,14 +256,14 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
   /** The eye rides the body. The rhythm is written on the certified path
    * point, never integrated, so it cannot drift and both ends are exact. */
   function carry(metres:number,heading:number) {
-    const step=gaitRhythm(leg,metres,reducedMotion())
+    const step=gaitRhythm(leg,metres,reducedMotion()||pace>1)
     camera.position.y+=step.height
     camera.position.x+=Math.cos(heading)*step.sway
     camera.position.z+=-Math.sin(heading)*step.sway
   }
   return {
     /** Physical scheduler state, separate from the shared selected destination. */
-    get navigation() { return { completed:completed?.id, active:active?.id, queued:queue.map(request=>request.id), legSeconds:active?duration:0, legMetres:active&&path?path.length:0 } },
+    get navigation() { return { completed:completed?.id, active:active?.id, queued:queue.map(request=>request.id), legSeconds:active?duration:0, legMetres:active&&path?path.length:0, legWalked:active?walkedShare:1, legPace:active?pace:1 } },
     set(id:VinciStationId,pose:Pose,instant=false,phone=camera.aspect<=.9) {
       const request={id,pose:{eye:pose.eye.clone(),at:pose.at.clone(),fov:pose.fov},phone}
       // Initial/named placement, explicit inspection return and resize are
@@ -249,7 +298,9 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
           // completing only this semantic request during the current update.
           queue.shift();completed=request;render(now);return
         }
-        begin(request,now)
+        // What is still waiting behind this leg is the visitor asking to be
+        // carried on, and the leg is walked at that pace from the start.
+        begin(request,queue.length-1,now)
         queue.shift()
       }
       if(active&&reducedMotion()) {
@@ -266,9 +317,14 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
       // THE PROFILE, NOT A SMOOTHSTEP OVER THE LEG. The body leans into the
       // walk over the first ramp, strolls, and leans out of it at the station.
       // A wheel notch adds its stride to the same distance.
-      const walk=active&&path?gaitAt(leg,now-started):undefined
+      // THE WALK YOU ARE ON DOES NOT SPEED UP UNDER YOU. The pace is read
+      // once, when the leg begins, from what is already waiting behind it.
+      if(active)legClock+=Math.max(0,now-legClockAt)*pace
+      legClockAt=now
+      const walk=active&&path?gaitAt(leg,legClock):undefined
       const metres=walk?Math.min(path!.length,walk.metres+strideM):path?path.length:0
       const s=active&&path&&path.length>0?Math.max(0,Math.min(1,metres/path.length)):1
+      walkedShare=s
       if(active&&path) {
         assertRailProjection(camera)
         path.pointAtDistance(metres,camera.position)
