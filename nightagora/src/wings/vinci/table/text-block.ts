@@ -1,6 +1,9 @@
 import { BufferGeometry, Float32BufferAttribute } from 'three/webgpu'
 
-const WIDTH_SEGMENTS = 24
+/* FORTY ACROSS, NOT TWENTY-FOUR. The crown falls steeply at the gutter, and
+   twenty-four facets there read as a stair in the block's silhouette at
+   close range. */
+const WIDTH_SEGMENTS = 40
 const DEPTH_SEGMENTS = 4
 const LEAF_BANDS = 24
 
@@ -20,7 +23,7 @@ export function textBlockTop(u: number, height: number): number {
  * Its page bands run around the entire section: head, fore-edge, foot and
  * gutter. They represent small groups of leaves, not an invented leaf count.
  * Every groove cuts inward; the exact width/height/depth bounds are retained.
- * One block is 5,760 triangles, or 11,520 for the complete open binding.
+ * The band rings and the crowned caps are the block's whole cost.
  */
 export function textBlockGeometry(width: number, height: number, depth: number, side: -1 | 1): BufferGeometry {
   if (![width, height, depth].every(value => Number.isFinite(value) && value > 0)) {
@@ -73,7 +76,8 @@ export function textBlockGeometry(width: number, height: number, depth: number, 
   const grooveDepth = Math.min(0.00014, height * 0.009, width * 0.002, depth * 0.002)
   const rings = Array.from({ length: LEAF_BANDS * 2 + 1 }, (_, index) => ({
     t: index / (LEAF_BANDS * 2),
-    inset: index > 0 && index < LEAF_BANDS * 2 && index % 2 === 0 ? grooveDepth : 0,
+    inset: index > 0 && index < LEAF_BANDS * 2 && index % 2 === 0
+      ? grooveDepth * (0.55 + 0.45 * Math.abs(Math.sin(index * 2.39))) : 0,
   }))
 
   for (let strip = 0; strip < rings.length - 1; strip++) {
@@ -82,8 +86,12 @@ export function textBlockGeometry(width: number, height: number, depth: number, 
       for (const [u, v] of perimeter) {
         // A broad, tiny departure of a section from mechanical regularity.
         // This stays well inside the measured section and vanishes at caps.
-        const wobble = Math.sin(ring.t * LEAF_BANDS * 1.7 + u * 4.3 + v * 2.1)
-          * Math.sin(ring.t * Math.PI) * Math.min(0.000035, height * 0.002)
+        /* A GATHERING IS NOT A COMB. Perfectly regular bands read as machined
+           teeth at eight times, so each ring carries its own small departure
+           and the run of them never repeats over the section. */
+        const wobble = (Math.sin(ring.t * LEAF_BANDS * 1.7 + u * 4.3 + v * 2.1)
+          + 0.6 * Math.sin(ring.t * LEAF_BANDS * 5.3 + u * 1.7))
+          * Math.sin(ring.t * Math.PI) * Math.min(0.00011, height * 0.006)
         const x = (u - 0.5) * (width - ring.inset * 2)
         const z = (v - 0.5) * (depth - ring.inset * 2)
         const y = bottom + (top(u) - bottom) * ring.t + wobble
