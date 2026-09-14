@@ -2847,7 +2847,7 @@
       "prompt": "Linen-canvas measured fields with 40 mm surrounding exhibition mats and opaque 16 mm backings, using three scales from the manifested CC0 canvas library. Primary source images sit within measured fields; additional faces remain distinct. The unillustrated catalogue sheet is a modern 1.50 by 1.80 m carrier with current bilingual source-absence copy; its historical painting extent remains unmeasured. Sala uses a 1.15m-wide modern documentary carrier with no claim about the unknown painted extent. Source-based arch masks retain a narrow uncertain fringe; no reference-only raster is sampled.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "5175a3bf59461b663472d9c26d9c4bb07934101e6d31cba66b623068d0f75a19",
+      "sha256": "edf108d2e9121bb5bf58fae54095d2a7c937e14ee8f4aa12f75de4dee7e94459",
       "note": "Museum dressing, not documentary imagery. recipe_file=src/wings/vinci/pictures/index.ts production_files=src/wings/vinci/pictures/aperture.ts"
     },
     {
@@ -2860,7 +2860,7 @@
       "prompt": "Metre-local chronological hang at the locked datum, primary source images uniformly contained within measured fields, additional faces kept distinct, and projected bilingual labels under the 9 September 2026 source policy. Preserve immutable measurements and title/attribution wording, current source honesty/licences, and original register wording in dated Sources. Source windows do not authenticate physical corners.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "5175a3bf59461b663472d9c26d9c4bb07934101e6d31cba66b623068d0f75a19",
+      "sha256": "edf108d2e9121bb5bf58fae54095d2a7c937e14ee8f4aa12f75de4dee7e94459",
       "note": "Museum dressing, not documentary imagery. recipe_file=src/wings/vinci/pictures/index.ts"
     },
     {
@@ -2873,7 +2873,7 @@
       "prompt": "Proposed contemporary north-lit gallery with plaster wall, limestone reveals and window sill, honey oak boards with staggered2.4mm joints and1.5mm bevel, dark stone plinth. Seven welded batches. Manifested CC0 library inputs, restrained declared tints. No historic room claim.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "456446ee52162a4436e8758c70ff8de93ef94055042c291c9e58e3e3859edeef",
+      "sha256": "f61c342525e72dd13b6322cb115b1f33403208dc2f3d110175abfe6b10b58a69",
       "note": "Museum dressing, not documentary imagery. recipe_file=src/wings/vinci/pictures/bench/room.ts production_files=src/wings/vinci/pictures/aperture.ts"
     },
     {
@@ -2886,7 +2886,7 @@
       "prompt": "Deterministic bench route and phone composition. One shared render stack, neutral plate colour, orthogonal image plane, generated north-light environment; no invented painting. The museum owns the framing and UI.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "532b530d14e9bfbf85da9a035744ff894d65f465cfec0184145a76536a832a78",
+      "sha256": "5a989e1860f8a96d617125d138c5d540dcf75eae9ec5b9bf814d5b695f14b7ae",
       "note": "Museum dressing, not documentary imagery. recipe_file=src/wings/vinci/pictures/bench/index.ts"
     },
     {
@@ -2925,7 +2925,7 @@
       "prompt": "Bake one diffuse bounce from the actual generated window triangles through the actual room triangles to its hanging wall. 128 by 64 receivers, 64 cosine rays each, four area-light connections per hit. Mean declared linear reflectances. Store indirect irradiance as decimal JSON and sample linear RGBA16F without gain.",
       "model": "Deterministic TypeScript BVH ray transport, window \u2192 geometry \u2192 wall",
       "date": "2026-09-09",
-      "sha256": "5d3a5597b2473711e4acd43cf48d5ac649af4616178e5992128a4719ab4af8c6",
+      "sha256": "761fdee6b4c1737c38fa3723cc959a5af54f10eedb2f9eb5da7d3e9f417955cb",
       "note": "Text-only baked output. recipe_file=src/wings/vinci/pictures/bench/gi-data/early.json recipe_source=src/wings/vinci/pictures/bench/bake-diffuse-gi.mjs solver_file=src/wings/vinci/pictures/bench/diffuse-gi-bake.ts runtime_file=src/wings/vinci/pictures/bench/diffuse-gi-runtime.ts; shared stack.gi remains a separate stub.",
       "input_hashes": {
         "segment": "early",
@@ -2946,7 +2946,7 @@
       "prompt": "Bake one diffuse bounce from the actual generated window triangles through the actual room triangles to its hanging wall. 128 by 64 receivers, 64 cosine rays each, four area-light connections per hit. Mean declared linear reflectances. Store indirect irradiance as decimal JSON and sample linear RGBA16F without gain.",
       "model": "Deterministic TypeScript BVH ray transport, window \u2192 geometry \u2192 wall",
       "date": "2026-09-09",
-      "sha256": "be0f0cd564400509b66f0919fa410c9588d8ff81d87b3c316348c64131149318",
+      "sha256": "af0e0f52f9df4e4894342b416fd9bc691d0fb423feac87029d444aa885e26b14",
       "note": "Text-only baked output. recipe_file=src/wings/vinci/pictures/bench/gi-data/milan.json recipe_source=src/wings/vinci/pictures/bench/bake-diffuse-gi.mjs solver_file=src/wings/vinci/pictures/bench/diffuse-gi-bake.ts runtime_file=src/wings/vinci/pictures/bench/diffuse-gi-runtime.ts; shared stack.gi remains a separate stub.",
       "input_hashes": {
         "segment": "milan",
@@ -2967,7 +2967,7 @@
       "prompt": "Bake one diffuse bounce from the actual generated window triangles through the actual room triangles to its hanging wall. 128 by 64 receivers, 64 cosine rays each, four area-light connections per hit. Mean declared linear reflectances. Store indirect irradiance as decimal JSON and sample linear RGBA16F without gain.",
       "model": "Deterministic TypeScript BVH ray transport, window \u2192 geometry \u2192 wall",
       "date": "2026-09-09",
-      "sha256": "76062b6bc12f2fa3c0d46b0e22ac4a0108aff8f744ae2b7ceb036fdb348bedd2",
+      "sha256": "e7236710f90b0886902821bb33b7b1bedcaabd547a50ade5ef50b24b6cf6fa69",
       "note": "Text-only baked output. recipe_file=src/wings/vinci/pictures/bench/gi-data/florence.json recipe_source=src/wings/vinci/pictures/bench/bake-diffuse-gi.mjs solver_file=src/wings/vinci/pictures/bench/diffuse-gi-bake.ts runtime_file=src/wings/vinci/pictures/bench/diffuse-gi-runtime.ts; shared stack.gi remains a separate stub.",
       "input_hashes": {
         "segment": "florence",
@@ -2988,7 +2988,7 @@
       "prompt": "Bake one diffuse bounce from the actual generated window triangles through the actual room triangles to its hanging wall. 128 by 64 receivers, 64 cosine rays each, four area-light connections per hit. Mean declared linear reflectances. Store indirect irradiance as decimal JSON and sample linear RGBA16F without gain.",
       "model": "Deterministic TypeScript BVH ray transport, window \u2192 geometry \u2192 wall",
       "date": "2026-09-09",
-      "sha256": "a5e07347380e87b2c1e00d9050bbd3c4888278269f810c74f7e9e87f1be7c902",
+      "sha256": "5e1e97dc3f0ab363cc4e641550515262d6b92df860e4d308481ce9a7cf536b7f",
       "note": "Text-only baked output. recipe_file=src/wings/vinci/pictures/bench/gi-data/late.json recipe_source=src/wings/vinci/pictures/bench/bake-diffuse-gi.mjs solver_file=src/wings/vinci/pictures/bench/diffuse-gi-bake.ts runtime_file=src/wings/vinci/pictures/bench/diffuse-gi-runtime.ts; shared stack.gi remains a separate stub.",
       "input_hashes": {
         "segment": "late",
@@ -3009,7 +3009,7 @@
       "prompt": "Bake one diffuse bounce from the actual generated window triangles through the actual room triangles to its hanging wall. 128 by 64 receivers, 64 cosine rays each, four area-light connections per hit. Mean declared linear reflectances. Store indirect irradiance as decimal JSON and sample linear RGBA16F without gain.",
       "model": "Deterministic TypeScript BVH ray transport, window \u2192 geometry \u2192 wall",
       "date": "2026-09-09",
-      "sha256": "9d68c797658cbe34067f29148a0e4324ab1b1f01f88d5e02aab2189351d7ca69",
+      "sha256": "8280bc8a95ac11edd14fd98ffab9dd9005c0650403d768b3bcea73f1497c8492",
       "note": "Text-only baked output. recipe_file=src/wings/vinci/pictures/bench/gi-data/absences.json recipe_source=src/wings/vinci/pictures/bench/bake-diffuse-gi.mjs solver_file=src/wings/vinci/pictures/bench/diffuse-gi-bake.ts runtime_file=src/wings/vinci/pictures/bench/diffuse-gi-runtime.ts; shared stack.gi remains a separate stub.",
       "input_hashes": {
         "segment": "absences",
@@ -3030,7 +3030,7 @@
       "prompt": "Bake one diffuse bounce from the actual generated window triangles through the actual room triangles to its hanging wall. 128 by 64 receivers, 64 cosine rays each, four area-light connections per hit. Mean declared linear reflectances. Store indirect irradiance as decimal JSON and sample linear RGBA16F without gain.",
       "model": "Deterministic TypeScript BVH ray transport, window \u2192 geometry \u2192 wall",
       "date": "2026-09-09",
-      "sha256": "7f3d80a98b55849dd61e3591ce0fbc0acea3c9c8ca7a5f4bab3f52d36e60d8f0",
+      "sha256": "adedd789f8a448be34b45304db3ac10d8709775bcbcd8d23dd2d7b380e62ee73",
       "note": "Text-only baked output. recipe_file=src/wings/vinci/pictures/bench/gi-data/signature.json recipe_source=src/wings/vinci/pictures/bench/bake-diffuse-gi.mjs solver_file=src/wings/vinci/pictures/bench/diffuse-gi-bake.ts runtime_file=src/wings/vinci/pictures/bench/diffuse-gi-runtime.ts; shared stack.gi remains a separate stub.",
       "input_hashes": {
         "segment": "signature",
@@ -3051,7 +3051,7 @@
       "prompt": "Bake one diffuse bounce from the actual generated window triangles through the actual room triangles to its hanging wall. 128 by 64 receivers, 64 cosine rays each, four area-light connections per hit. Mean declared linear reflectances. Store indirect irradiance as decimal JSON and sample linear RGBA16F without gain.",
       "model": "Deterministic TypeScript BVH ray transport, window \u2192 geometry \u2192 wall",
       "date": "2026-09-10",
-      "sha256": "7e2aa3aee12cab1d655abe98b6ee8f91a839136d8452266a11ee921fe0bd7a5a",
+      "sha256": "0ac537d151b90a8dd7ff9a8ddd9f4ed8383bf61922a8a78ee9f959ab27f8e3b4",
       "note": "Text-only baked output. recipe_file=src/wings/vinci/pictures/bench/gi-data/drawer.json recipe_source=src/wings/vinci/pictures/bench/bake-diffuse-gi.mjs solver_file=src/wings/vinci/pictures/bench/diffuse-gi-bake.ts runtime_file=src/wings/vinci/pictures/bench/diffuse-gi-runtime.ts; shared stack.gi remains a separate stub.",
       "input_hashes": {
         "segment": "drawer",
@@ -3072,7 +3072,7 @@
       "prompt": "Bake one diffuse bounce from the actual generated window triangles through the actual room triangles to its hanging wall. 128 by 64 receivers, 64 cosine rays each, four area-light connections per hit. Mean declared linear reflectances. Store indirect irradiance as decimal JSON and sample linear RGBA16F without gain.",
       "model": "Deterministic TypeScript BVH ray transport, window \u2192 geometry \u2192 wall",
       "date": "2026-09-10",
-      "sha256": "f18bed5746d9a6beef26a99df0df2e6ae4cb89f5d072bdd8f8822e337df7d223",
+      "sha256": "343a202ccfd8f8a3412a41376edf93b98573d0e5a2e013a78b55e3d778e0ca4c",
       "note": "Text-only baked output. recipe_file=src/wings/vinci/pictures/bench/gi-data/murals.json recipe_source=src/wings/vinci/pictures/bench/bake-diffuse-gi.mjs solver_file=src/wings/vinci/pictures/bench/diffuse-gi-bake.ts runtime_file=src/wings/vinci/pictures/bench/diffuse-gi-runtime.ts; shared stack.gi remains a separate stub.",
       "input_hashes": {
         "segment": "murals",
@@ -3093,7 +3093,7 @@
       "prompt": "Bake one diffuse bounce from the actual generated window triangles through the actual room triangles to its hanging wall. 128 by 64 receivers, 64 cosine rays each, four area-light connections per hit. Mean declared linear reflectances. Store indirect irradiance as decimal JSON and sample linear RGBA16F without gain.",
       "model": "Deterministic TypeScript BVH ray transport, window \u2192 geometry \u2192 wall",
       "date": "2026-09-10",
-      "sha256": "cf2536e002a3bacfb25c64f4dcc3b9afb3adc2a442c73b9bbd684dd8c5d6f550",
+      "sha256": "7d5776ef6e6afda51449cb3091b2fc7f45be8d6ba4785f5a40357cc60ac41ae5",
       "note": "Text-only baked output. recipe_file=src/wings/vinci/pictures/bench/gi-data/complete-hang.json recipe_source=src/wings/vinci/pictures/bench/bake-diffuse-gi.mjs solver_file=src/wings/vinci/pictures/bench/diffuse-gi-bake.ts runtime_file=src/wings/vinci/pictures/bench/diffuse-gi-runtime.ts; shared stack.gi remains a separate stub.",
       "input_hashes": {
         "segment": "complete-hang",
@@ -3127,7 +3127,7 @@
       "prompt": "Bake one diffuse bounce from the actual generated window triangles through the actual room triangles to its hanging wall. 128 by 64 receivers, 64 cosine rays each, four area-light connections per hit. Mean declared linear reflectances. Store indirect irradiance as decimal JSON and sample linear RGBA16F without gain.",
       "model": "Deterministic TypeScript BVH ray transport, window \u2192 geometry \u2192 wall",
       "date": "2026-09-09",
-      "sha256": "a342a6502109dcfeb337f72c09580b0a92c250b9cd8931b7daee57e4f7a10fbe",
+      "sha256": "79b4440bbcb6ab34e8a457d82c91d262930d1ad6f58dae2f9f5b9955854e1602",
       "note": "Text-only baked output. recipe_file=src/wings/vinci/pictures/bench/gi-data/materials.json recipe_source=src/wings/vinci/pictures/bench/bake-diffuse-gi.mjs solver_file=src/wings/vinci/pictures/bench/diffuse-gi-bake.ts runtime_file=src/wings/vinci/pictures/bench/diffuse-gi-runtime.ts; shared stack.gi remains a separate stub.",
       "input_hashes": {
         "segment": "materials",
