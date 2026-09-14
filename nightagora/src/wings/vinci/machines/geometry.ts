@@ -1,6 +1,6 @@
 import {
   BoxGeometry, BufferGeometry, CylinderGeometry, DynamicDrawUsage, ExtrudeGeometry, Float32BufferAttribute,
-  LatheGeometry, Matrix4, Path, Shape, SphereGeometry, TorusGeometry, Vector2, Vector3,
+  Matrix4, Path, Shape, SphereGeometry, TorusGeometry, Vector2, Vector3,
 } from 'three/webgpu'
 import type { TierName } from '../../../stack'
 import type { Coordinates, PartSpec } from './types'
@@ -270,6 +270,72 @@ function metricCylinderUV(geometry: BufferGeometry, radius: number, height: numb
   }
 }
 
+/** A REVOLVED BODY, BUILT THE WAY IT IS TURNED. three's lathe averages the
+ * normal at every profile corner, so a plate's arris shades as a bullnose and
+ * both of its rim vertices claim to face upward: the rim then takes the
+ * top-down projection meant for a face and one slice of plank combs down it.
+ * Each profile segment is revolved as its own ring pair here, creased where
+ * the profile turns and smoothed where it curves. A segment that runs up the
+ * wall lays the grain AROUND its own circumference in metres; a segment that
+ * runs out flat keeps the planar map, because a turned disc is cut from a
+ * plank and its face shows the plank.
+ */
+function revolvedProfile(profile: readonly Vector2[], segments: number): BufferGeometry {
+  const nodes = profile.length
+  const dirs: Vector2[] = [], normals: Vector2[] = [], wall: boolean[] = []
+  for (let k = 0; k < nodes - 1; k++) {
+    const a = profile[k]!, b = profile[k + 1]!
+    const d = new Vector2(b.x - a.x, b.y - a.y)
+    if (d.lengthSq() === 0) d.set(1, 0)
+    d.normalize()
+    dirs.push(d)
+    normals.push(new Vector2(d.y, -d.x))
+    wall.push(Math.abs(d.y) >= Math.abs(d.x))
+  }
+  const runs = dirs.length
+  const along = new Float64Array(nodes)
+  for (let k = 1; k < nodes; k++) along[k] = along[k - 1]! + profile[k]!.distanceTo(profile[k - 1]!)
+  // A profile that returns to its first point is closed, so its last corner
+  // is a corner like any other.
+  const closed = profile[0]!.distanceTo(profile[nodes - 1]!) < 1e-9
+  const smooth = (k: number, j: number): boolean => dirs[k]!.dot(dirs[j]!) > 0.82 && wall[k] === wall[j]
+  const rings: {r: number; y: number; n: Vector2; s: number; wall: boolean}[] = []
+  for (let k = 0; k < runs; k++) {
+    const previous = k === 0 ? (closed ? runs - 1 : -1) : k - 1
+    const next = k === runs - 1 ? (closed ? 0 : -1) : k + 1
+    const head = previous >= 0 && smooth(k, previous)
+      ? new Vector2().addVectors(normals[k]!, normals[previous]!).normalize() : normals[k]!.clone()
+    const tail = next >= 0 && smooth(k, next)
+      ? new Vector2().addVectors(normals[k]!, normals[next]!).normalize() : normals[k]!.clone()
+    rings.push({r: profile[k]!.x, y: profile[k]!.y, n: head, s: along[k]!, wall: wall[k]!})
+    rings.push({r: profile[k + 1]!.x, y: profile[k + 1]!.y, n: tail, s: along[k + 1]!, wall: wall[k]!})
+  }
+  const stride = segments + 1
+  const position: number[] = [], normal: number[] = [], texcoord: number[] = [], index: number[] = []
+  for (const ring of rings) {
+    for (let i = 0; i <= segments; i++) {
+      const phi = TAU * i / segments, sin = Math.sin(phi), cos = Math.cos(phi)
+      position.push(ring.r * sin, ring.y, ring.r * cos)
+      normal.push(ring.n.x * sin, ring.n.y, ring.n.x * cos)
+      if (ring.wall) texcoord.push(ring.s, phi * ring.r)
+      else texcoord.push(ring.r * sin, ring.r * cos)
+    }
+  }
+  for (let k = 0; k < runs; k++) {
+    const lower = 2 * k * stride, upper = (2 * k + 1) * stride
+    for (let i = 0; i < segments; i++) {
+      const a = lower + i, b = lower + i + 1, c = upper + i, d = upper + i + 1
+      index.push(a, b, c, b, d, c)
+    }
+  }
+  const geometry = new BufferGeometry()
+  geometry.setAttribute('position', new Float32BufferAttribute(position, 3))
+  geometry.setAttribute('normal', new Float32BufferAttribute(normal, 3))
+  geometry.setAttribute('uv', new Float32BufferAttribute(texcoord, 2))
+  geometry.setIndex(index)
+  return geometry
+}
+
 export function geometryForPart(part: PartSpec, tier: TierName = 'standard'): BufferGeometry {
   const d = part.dimensions_m, s = typeof part.shape === 'string' ? undefined : part.shape
   const kind = s?.type ?? part.shape
@@ -302,8 +368,7 @@ export function geometryForPart(part: PartSpec, tier: TierName = 'standard'): Bu
       if (!d.closed_axial_radial_profile) throw new Error(`Missing revolution ${part.id}`)
       const points = d.closed_axial_radial_profile.map(p => new Vector2(at(p, 1), at(p, 0)))
       points.push(points[0]!.clone())
-      geometry = new LatheGeometry(points, d.segments ?? count(tier, 96, 64, 48))
-      metricCylinderUV(geometry, Math.max(...points.map(p => p.x)), Math.max(...points.map(p => p.y)) - Math.min(...points.map(p => p.y)))
+      geometry = revolvedProfile(points, d.segments ?? count(tier, 96, 64, 48))
       break
     }
     case 'profile': geometry = extrudeProfile(part, tier); break

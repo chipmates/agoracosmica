@@ -299,12 +299,21 @@ export function createBench(stack: Stack, onExit: () => void) {
   function displayBounds(){
     return slug==='revolving-crane' ? new Box3(new Vector3(-1,-.05,-1),new Vector3(1,2.705,1.75)) : machine!.bounds;
   }
+  /** What the camera frames, where the dossier's rounded envelope is bigger
+   * than the body that moves inside it. The compass is the smallest of the
+   * fourteen: framed on a box a hand's width larger than itself, its pivot is
+   * nine millimetres of nothing. The support keeps the envelope. */
+  function frameBounds(){
+    return slug==='proportional-compass'
+      ? new Box3(new Vector3(-.19,.046,-.042),new Vector3(.19,.652,.042))
+      : displayBounds();
+  }
   /** The working end of the machine: the part of the object where its
    * fittings are, framed alone so a 9 mm boss is not a 9 px boss. The pair
    * is (height from the top as a fraction of the object, box as a fraction
    * of its span); each one is where that machine's own fitting sits. */
   const FOCUS: Partial<Record<MachineSlug, [number, number]>> = {
-    'proportional-compass': [.24, .34], 'camera-obscura': [.5, .3],
+    'proportional-compass': [.33, .26], 'camera-obscura': [.5, .3],
     'ball-bearing': [.42, .62], 'revolving-crane': [.52, .3], 'lathe': [.33, .34],
   };
   function focusBounds() {
@@ -318,7 +327,7 @@ export function createBench(stack: Stack, onExit: () => void) {
   function compose() {
     if (!machine)
       return;
-    const box = closeUp ? focusBounds() : displayBounds(), size = box.getSize(new Vector3()), centre = box.getCenter(new Vector3()), span = Math.max(size.x, size.y, size.z), mobile = innerWidth <= 1280;
+    const box = closeUp ? focusBounds() : frameBounds(), size = box.getSize(new Vector3()), centre = box.getCenter(new Vector3()), span = Math.max(size.x, size.y, size.z), mobile = innerWidth <= 1280;
     const direction = new Vector3(1.05, .68, 1.6).normalize();
     if (slug === 'camera-obscura')
       direction.set(sectionEnabled ? 1.5 : 1.25, sectionEnabled ? .8 : .5, sectionEnabled ? -.35 : -1.6).normalize();
@@ -332,7 +341,7 @@ export function createBench(stack: Stack, onExit: () => void) {
     if (slug === 'water-lifting-screw') direction.set(-2.3,1.1,-.3).normalize();
     if (slug === 'proportional-compass') direction.set(1.2,.3,1.75).normalize();
     const right = new Vector3().crossVectors(new Vector3(0, 1, 0), direction).normalize(), up = new Vector3().crossVectors(direction, right).normalize();
-    const tanY = Math.tan(17 * Math.PI / 180), tanX = tanY * innerWidth / innerHeight, width = mobile ? .84 : .7, height = slug === 'proportional-compass' ? (mobile ? .35 : 1) : (mobile ? .31 : .8);
+    const tanY = Math.tan(17 * Math.PI / 180), tanX = tanY * innerWidth / innerHeight, width = mobile ? .84 : .7, height = slug === 'proportional-compass' ? (mobile ? .38 : .95) : (mobile ? .31 : .8);
     let distance = span;
     for (const x of [box.min.x, box.max.x])
       for (const y of [box.min.y, box.max.y])
@@ -374,7 +383,11 @@ export function createBench(stack: Stack, onExit: () => void) {
     });
     // The parachute's harness ring is a dark iron loop hanging over the deck.
     // At the deck's inherited value the two were the same colour.
-    if (slug === 'parachute') supportMat.colorNode = supportMat.colorNode!.mul(1.45);
+    if (slug === 'parachute') supportMat.colorNode = supportMat.colorNode!.mul(1.45)
+    // The smallest object on the bench stands on a plate the key barely
+    // grazes, so the compass reads as an outline against nothing. The plate
+    // is given the light its top face is standing in.
+    if (slug === 'proportional-compass') supportMat.colorNode = supportMat.colorNode!.mul(1.7);
     if (slug === 'multi-barrel-gun') {
       // GENERATED indirect-contact approximation of the two exact wheel
       // cylinders. Shared GTAO is off; the existing key shadow remains.

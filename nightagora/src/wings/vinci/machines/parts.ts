@@ -2,13 +2,14 @@ import {
   Color, DoubleSide, FrontSide, Group, InstancedMesh, Matrix4, Mesh, MeshPhysicalNodeMaterial, MeshStandardNodeMaterial,
   type BufferGeometry,
 } from 'three/webgpu'
-import { float, normalGeometry, normalMap, positionGeometry, uv, vec2, vec3 } from 'three/tsl'
+import { cameraPosition, float, normalGeometry, normalMap, normalWorld, positionGeometry, positionWorld, uv, vec2, vec3 } from 'three/tsl'
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js'
 import type { MaterialSet, Stack } from '../../../stack'
 import type { DetailNodes } from '../../../stack/detail'
 import { createGlassSeatMaterial } from './glass-seat'
 import { createFlywheelSpokeArms } from './flywheel-overlap'
 import { createMutableSweep, geometryForPart, type MutableSweep } from './geometry'
+import { BENCH_SUN_AZIMUTH_DEGREES, BENCH_SUN_ELEVATION_DEGREES } from './bench/hour'
 import type { Assembly, Dossier, PartSpec } from './types'
 export type { Assembly } from './types'
 
@@ -44,6 +45,24 @@ function turnedDetail(
   material.normalNode = normalMap(nodes.normal.mul(.5).add(.5), vec2(1, 1))
   return nodes
 }
+/** THE KEY'S OWN EDGE. A forged bar eight millimetres thick is a line at a
+ * visitor's distance, and a line with no edge on it is a scratch in the dark.
+ * The key's direction is the bench's own hour; where a surface turns away
+ * from the eye and still faces that hour, it takes the light a real edge
+ * takes. Nothing is added where the key cannot reach. */
+const keyDirection = (): {x: number; y: number; z: number} => {
+  const a = BENCH_SUN_AZIMUTH_DEGREES * Math.PI / 180, h = BENCH_SUN_ELEVATION_DEGREES * Math.PI / 180
+  return {x: Math.sin(a) * Math.cos(h), y: Math.sin(h), z: -Math.cos(a) * Math.cos(h)}
+}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function keyRim(strength: number): any {
+  const key = keyDirection()
+  const toEye = cameraPosition.sub(positionWorld).normalize()
+  const grazing = float(1).sub(normalWorld.dot(toEye).abs()).clamp(0, 1).pow(2.6)
+  const lit = normalWorld.dot(vec3(key.x, key.y, key.z)).mul(.5).add(.5).pow(1.5)
+  return grazing.mul(lit).mul(strength)
+}
+
 const materialLoads = new WeakMap<Stack, Map<string, Promise<MaterialSet>>>()
 const materialQueues = new WeakMap<Stack, Promise<void>>()
 
@@ -55,6 +74,15 @@ const materialQueues = new WeakMap<Stack, Promise<void>>()
  * Measure tiers on fresh pages; live tier changes during decoding cannot be
  * isolated through this API. The current rendering tier is never changed.
  */
+/** Which sets the shared library is still holding open, by name. A set whose
+ * manifest entry is absent never resolves and never fails, so a stall has to
+ * be able to name itself. */
+function unsettled(stack: Stack): string[] {
+  return stack.materials.manifest()
+    .map(entry => entry.id.replace(/^library\//, ''))
+    .filter(setName => !stack.materials.sync(setName).ready.value)
+}
+
 export function loadMachineMaterial(stack: Stack, name: string): Promise<MaterialSet> {
   let cache = materialLoads.get(stack)
   if (!cache) { cache = new Map(); materialLoads.set(stack, cache) }
@@ -67,7 +95,7 @@ export function loadMachineMaterial(stack: Stack, name: string): Promise<Materia
     // inherited manifest must report failure rather than hold readiness forever.
     const deadline = Date.now() + 30_000
     while (stack.materials.pending() > 0) {
-      if (Date.now() >= deadline) throw new Error(`Inherited material loads did not settle before ${name}`)
+      if (Date.now() >= deadline) throw new Error(`Inherited material loads did not settle before ${name}: ${unsettled(stack).join(', ') || 'none named'}`)
       await new Promise<void>(resolve => setTimeout(resolve, 25))
     }
     const tier = stack.tierConfig()
@@ -144,7 +172,7 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Assemb
   const sectionParts = new Set(dossier.slug === 'camera-obscura' ? ['roof', 'right-wall'] : [])
   const names = [...new Set(dossier.parts.map(p => p.material.class))]
   const surfaceCache = new Map<string, Promise<Surface>>()
-  const makeSurface = async (name: string, quietBank = false, quietWood = false, turned = false): Promise<Surface> => {
+  const makeSurface = async (name: string, quietBank = false, quietWood = false, turned = false, burnished = false): Promise<Surface> => {
     const set = await loadMachineMaterial(stack, libraryName(name))
     const glass = /glass/.test(name), water = /water/.test(name)
     const material: Surface = glass || water
@@ -274,11 +302,22 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Assemb
       // reflection to carry it, a metal's whole surface is what it reflects.
       // Wrought iron that has been forged, worked and oxidised scatters, so
       // this one is given back part of its diffuse term and the key models it.
-      material.metalness = .38
-      const ironTint = new Color('#3e434a')
+      // A pivot and its screw are the two parts of this instrument that turn
+      // against each other, and a bearing face is burnished by every turn it
+      // has ever made. Forged iron beside machined iron is the difference a
+      // visitor reads as a fitting rather than as more bar.
+      material.metalness = burnished ? .55 : .38
+      const ironTint = new Color(burnished ? '#4d545c' : '#3e434a')
       const density = detail.albedo.dot(vec3(.2126, .7152, .0722))
-      material.colorNode = vec3(ironTint.r, ironTint.g, ironTint.b).mul(density.mul(.5).add(.5)).mul(detail.occlusion)
-      material.roughnessNode = detail.roughness.mul(.85).clamp(.36, .66)
+      const rim = keyRim(burnished ? 1.6 : 1.15)
+      material.colorNode = vec3(ironTint.r, ironTint.g, ironTint.b)
+        .mul(density.mul(burnished ? .3 : .5).add(burnished ? .78 : .5)).mul(detail.occlusion).mul(rim.add(1))
+      // An arris is the one place a forged bar is polished, by every hand
+      // that ever held it, so the edge takes a tighter reflection than the
+      // face beside it.
+      material.roughnessNode = burnished
+        ? detail.roughness.mul(.5).clamp(.16, .3).mul(float(1).sub(rim.mul(.3)))
+        : detail.roughness.mul(.85).clamp(.36, .66).mul(float(1).sub(rim.mul(.42))).clamp(.16, .66)
     }
     if (set.name === 'limestone-pale') {
       // Stone was the first thing the eye found on these frames: four bright
@@ -363,6 +402,11 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Assemb
       let ball = materials.get(key)
       if (!ball) { ball = await makeSurface(part.material.class, false, roundedWood, true); materials.set(key, ball) }
       material = ball
+    }
+    if (dossier.slug === 'proportional-compass' && (part.id === 'pivot' || part.id === 'screw-head')) {
+      let fitting = materials.get('burnished-fitting')
+      if (!fitting) { fitting = await makeSurface(part.material.class, false, false, false, true); materials.set('burnished-fitting', fitting) }
+      material = fitting
     }
     if (dossier.slug === 'inclinometer' && part.id === 'deck') {
       material = createGlassSeatMaterial(material)
