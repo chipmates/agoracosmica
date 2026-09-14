@@ -9,6 +9,9 @@
  */
 import { BackSide, Color, DoubleSide, MeshStandardNodeMaterial } from 'three/webgpu'
 import * as TSL from 'three/tsl'
+import type { Stack } from '../../../stack'
+import type { GrainRecipe, MaterialClass, MaterialSet } from '../../../stack/materials'
+import { applyDetail } from '../../../stack/detail'
 import { anisotropicFootprint } from '../masonry-courses'
 import { LINE_ORIGIN, LINE_SLAB } from './layout'
 
@@ -226,4 +229,113 @@ export function collectionExhibitMaterials(): {
   const dark = make(PALETTE.dark, .82, .04, [1.7, .11, .004], .0012)
   for (const [name, material] of Object.entries({ stone, plaster, bronze, ink, dark })) material.name = `vinci/collection-rooms/${name}`
   return { stone, plaster, bronze, ink, dark }
+}
+
+/* THE COURT'S EXHIBIT IS DRESSED FROM THIS MODULE'S OWN RECIPE.
+ *
+ * The page already holds the whole of its standard texture budget when this
+ * ground is built, and the machine standing outside in the court asks the
+ * shared library for four more photographed sets, which carries the page
+ * past it. So that one exhibit is built against a stack whose library
+ * answers out of a recipe instead of out of bytes: the same three filtered
+ * scales and grain field the line, the corrections, the grave and every
+ * surface in these rooms stand on. Its geometry, its welding and the
+ * bench's own tints are untouched, and this module asks the library for
+ * nothing at any tier.
+ */
+interface CourtRecipe {
+  albedo: string; variation: string; roughness: number; metalness: number
+  cls: MaterialClass; scales: [number, number, number]; normalStrength: number
+  falloff: number; macroContrast: number; micro: number; grain: GrainRecipe | null
+}
+
+const COURT_STONE: CourtRecipe = {
+  albedo: PALETTE.floor, variation: '#6f6c63', roughness: .72, metalness: 0, cls: 'stone',
+  scales: [2.4, .42, .035], normalStrength: .45, falloff: 1, macroContrast: .3, micro: .5, grain: null,
+}
+
+const COURT_RECIPES: Record<string, CourtRecipe> = {
+  // Sealed flax over the ribs. The bench tints the cloth itself, so what
+  // this recipe carries is the drape, the tooth and how dull the flax is.
+  linen: {
+    albedo: '#c4b89c', variation: '#9e9076', roughness: .70, metalness: 0, cls: 'cloth',
+    scales: [1.5, 0, .008], normalStrength: .6, falloff: .7, macroContrast: .45, micro: .5,
+    grain: { kind: 'ridges', pitch: .2, angle: 0, relief: .6, shade: .55, sheen: .06, fold: .46, tooth: .012 },
+  },
+  // The four ribs and the uprights under them.
+  'oak-beams': {
+    albedo: '#8a7a5e', variation: '#5e5138', roughness: .74, metalness: 0, cls: 'wood',
+    scales: [1, 0, .02], normalStrength: .8, falloff: 1, macroContrast: .5, micro: .5,
+    grain: { kind: 'wave', pitch: .26, angle: 0, relief: .34, shade: .4, sheen: .08, fold: .6, tooth: .016 },
+  },
+  // The suspension cords, whose twist is in the geometry and not in a map.
+  rope: {
+    albedo: '#b2a07c', variation: '#87764f', roughness: .86, metalness: 0, cls: 'fibre',
+    scales: [.4, .09, .007], normalStrength: .9, falloff: .7, macroContrast: .4, micro: .6, grain: null,
+  },
+  // The harness.
+  'leather-worn': {
+    albedo: '#6b5844', variation: '#463829', roughness: .72, metalness: 0, cls: 'cloth',
+    scales: [1, 0, .01], normalStrength: .5, falloff: .8, macroContrast: .95, micro: 1,
+    grain: { kind: 'creases', pitch: .22, angle: 0, relief: .34, shade: .45, sheen: .34, fold: .52, tooth: .014 },
+  },
+}
+
+/** A set the library never has to fetch: the recipe above, and maps that
+ * read as the identity, so the helper's own scales are the whole surface. */
+function courtSet(name: string): MaterialSet {
+  const { float, positionWorld, uniform, vec3 } = TSL as unknown as Record<string, TSLNode>
+  const r = COURT_RECIPES[name] ?? COURT_STONE
+  const albedo = new Color(r.albedo), variation = new Color(r.variation)
+  const flat = {
+    albedo: vec3(1, 1, 1), colour: vec3(albedo.r, albedo.g, albedo.b),
+    normal: vec3(0, 0, 1), roughness: float(r.roughness), occlusion: float(1),
+  }
+  const set: MaterialSet = {
+    name, albedo, variation, roughness: r.roughness, metalness: r.metalness,
+    scales: r.scales, normalStrength: r.normalStrength, falloff: r.falloff,
+    metres: [1, 1], scale: [1, 1], cls: r.cls, grain: r.grain, detile: 0, maps: null,
+    detail: { macro: r.scales[0], macroContrast: r.macroContrast, mid: r.scales[1], micro: r.micro },
+    entry: {
+      id: collectionRoomsProvenance.manifestId, path: 'procedural/collection-rooms/',
+      class: 'GENERATED', wing: 'vinci', display: true, date: collectionRoomsProvenance.date,
+      licence: 'Original procedural construction; source code under the museum repository licence.',
+      model: 'Deterministic TypeScript and TSL procedural geometry',
+      prompt: `Procedural surface standing in for the library set "${name}" on the court's own exhibit: three filtered scales and a grain field, at the metre sizes declared here. No texture asset, no reference image sampled.`,
+    },
+    // Nothing is in flight, so the set is displayable from the first frame.
+    ready: uniform(1),
+    place: (at = {}) => at.uv ?? (at.world ?? positionWorld).xz,
+    sample: () => flat,
+    material: () => {
+      const m = new MeshStandardNodeMaterial({ color: albedo, roughness: r.roughness, metalness: r.metalness })
+      applyDetail(m, set)
+      m.name = `vinci/collection-rooms/court-${name}`
+      return m
+    },
+  }
+  return set
+}
+
+/** The stack the court's exhibit is built against. */
+export function collectionProceduralStack(stack: Stack): Stack {
+  const made = new Map<string, MaterialSet>()
+  const of = (name: string): MaterialSet => {
+    let set = made.get(name)
+    if (!set) { set = courtSet(name); made.set(name, set) }
+    return set
+  }
+  return {
+    ...stack,
+    materials: {
+      ...stack.materials,
+      load: (name: string) => Promise.resolve(of(name)),
+      sync: of,
+      // Nothing is ever in flight here, and the tier the rest of the page is
+      // drawn at is never touched on this exhibit's behalf.
+      pending: () => 0,
+      setTier: () => undefined,
+      dispose: () => undefined,
+    },
+  }
 }

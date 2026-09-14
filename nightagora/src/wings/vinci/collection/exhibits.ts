@@ -18,7 +18,7 @@ import { loadManifest } from '../../../manifest'
 import pageMap from '../table/data/msb-pages.json?raw'
 import { lang } from '../../content'
 import { RoomBatch, stamp } from './build'
-import { collectionExhibitMaterials, collectionInteriorMaterial } from './materials'
+import { collectionExhibitMaterials, collectionInteriorMaterial, collectionProceduralStack } from './materials'
 import { COURT, FLOOR, GRAVE_ORIGIN, LINE_ORIGIN, PARACHUTE_ORIGIN } from './layout'
 
 interface Stand { east: number; north: number; bearing: number; plinth: number }
@@ -62,6 +62,10 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
   let live = true, halled = false, seconds = 0, delta = 0
   let reading: ReturnType<typeof buildTable> | undefined
   const teardown: (() => void)[] = []
+  // The court's exhibit stands outdoors and is seen from every station on
+  // this ground, so it is built at once and dressed from this module's own
+  // recipe rather than from the library the page has already spent.
+  const courtStack = collectionProceduralStack(stack)
   let plinthMesh = plinths.mesh('vinci/collection-rooms/plinths', material)
   host.add(plinthMesh)
 
@@ -80,10 +84,10 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
     finally { stack.materials.setTier(stack.tierConfig()) }
   }
 
-  function stand(slug: MachineSlug): void {
+  function stand(slug: MachineSlug): ReadyMachineBuild {
     const spot = HALL[slug], outdoors = slug === 'parachute'
     const level = outdoors ? COURT.level : FLOOR
-    const machine = buildMachine(slug, stack)
+    const machine = buildMachine(slug, outdoors ? courtStack : stack)
     machines.push({ build: machine, indoors: !outdoors })
     const size = machine.bounds.getSize(new Vector3())
     const centre = machine.bounds.getCenter(new Vector3())
@@ -116,7 +120,7 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
       }
       plinths.quad(corner(-1, -1), corner(1, -1), corner(1, 1), corner(-1, 1), 2)
     }
-    if (spot.plinth <= 0) return
+    if (spot.plinth <= 0) return machine
     // The plinth is the exhibition's own furniture: the declared envelope
     // with a hand's width around it, and a shadow gap at the floor.
     const width = Math.abs(size.x * Math.cos(angle)) + Math.abs(size.z * Math.sin(angle)) + .34
@@ -130,6 +134,7 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
         spot.north + box.centre[0] * Math.sin(angle) - box.centre[2] * Math.cos(angle),
         level + spot.plinth + box.centre[1], box.size[0], box.size[2], box.size[1], 3)
     }
+    return machine
   }
 
   function rebuildPlinths(): void {
@@ -162,11 +167,11 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
   stamp(grave.group, 'vinci/grave-geometry')
   host.add(grave.group)
 
-  const court = seed(['linen', 'rope', 'oak-beams', 'iron-forged']).then(() => {
-    if (!live) return
-    stand('parachute')
-    rebuildPlinths()
-  })
+  // Nothing is seeded for the court: its exhibit asks the library for no
+  // set, so there is no wait at the head of the page and the walk's one
+  // shadow snapshot is taken with the exhibit already standing.
+  const court = stand('parachute').ready
+  rebuildPlinths()
   let hall: Promise<void> | undefined
   function warmHall(): void {
     if (hall || !live) return
