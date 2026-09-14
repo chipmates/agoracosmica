@@ -1,0 +1,351 @@
+body[data-bench="pictures"] > :not(#stage):not(#picture-bench):not(#veil):not(script) { display: none !important; }
+body[data-bench="pictures"] #veil > :not(.brand) { display: none !important; }
+body[data-bench="pictures"] #veil { opacity: 1 !important; background: none !important; pointer-events: none; }
+body[data-bench="pictures"] .brand { color: #41443d; text-shadow: none; opacity: .8; }
+.picture-bench { position: fixed; inset: 0; z-index: 10; color: #30362f; font-family: Georgia, 'Times New Roman', serif; pointer-events: none; }
+.picture-bench [hidden] { display: none !important; }
+.picture-bench button, .picture-bench select, .picture-bench a { pointer-events: auto; min-height: 44px; min-width: 44px; box-sizing: border-box; border-radius: 0; font: inherit; cursor: pointer; }
+.picture-bench button:focus-visible, .picture-bench select:focus-visible, .picture-bench a:focus-visible { outline: 2px solid #9e7834; outline-offset: 4px; }
+.picture-header { position: absolute; top: 102px; left: 46px; }
+.picture-kicker { margin: 0 0 12px; font: 10px/1.4 system-ui,sans-serif; letter-spacing: .23em; }
+.picture-header h1 { font-size: 30px; font-weight: 400; line-height: 1.15; margin: 0 0 9px; color: #30362f; text-shadow: none; }
+.picture-segment-name { margin: 0; font-size: 14px; font-style: italic; color: #657062; }
+.picture-datum { position: absolute; right: 42px; top: 115px; font: 10px/1.5 system-ui,sans-serif; letter-spacing: .14em; }
+.picture-dot { position: absolute; transform: translate(-50%,0); width: 44px; height: 44px; padding: 0; border: 0; background: none; color: #41483d; font: 11px/1.25 system-ui,sans-serif !important; text-align: center; }
+.picture-dot::before { content: ''; position: absolute; top: 19px; left: calc(50% - 3px); width: 6px; height: 6px; border-radius: 50%; background: var(--certainty); }
+.picture-dot[aria-pressed="true"]::before { outline: 1px solid var(--certainty); outline-offset: 3px; }
+.picture-mat-caption { position: absolute; transform: translate(-50%,-50%); display: grid; justify-items: center; gap: 5px; text-align: center; line-height: 1.35; color: #343c32; }
+.picture-mat-state { font-size: 1.2em; font-style: italic; }
+.picture-mat-size { font: .8em/1.5 system-ui,sans-serif; letter-spacing: .08em; }
+.picture-mat-holder { font-size: .82em; }
+.picture-mat-class { font: .7em/1.3 system-ui,sans-serif; letter-spacing: .14em; text-transform: uppercase; }
+.picture-catalogue-copy { font-size: .85em; line-height: 1.45; }
+.picture-catalogue-note { font: .8em/1.5 system-ui,sans-serif; }
+.picture-catalogue-card { box-sizing: border-box; align-content: center; gap: .55em; line-height: 1.25; }
+.picture-catalogue-language { width: 100%; }
+.picture-catalogue-language p { margin: 0; }
+.picture-catalogue-first { font-style: italic; }
+.picture-catalogue-status { margin-top: .25em !important; font-size: .92em; }
+.picture-catalogue-reference { font: .75em/1.3 system-ui,sans-serif; }
+.picture-well-caption { position: absolute; transform: translate(-50%,-50%); text-align: center; white-space: pre-line; font-size: 10px; line-height: 1.7; color: #4a5147; }
+.picture-dock { position: absolute; left: 46px; bottom: 123px; width: calc(100% - 92px); padding: 18px 24px; box-sizing: border-box; background: rgba(238,235,224,.96); border-top: 1px solid #c5bfac; box-shadow: 0 8px 32px #1d20151c; }
+.picture-label { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 36px; }
+.picture-label p { margin: 0; }
+.picture-first { position: relative; font-size: 18px; line-height: 1.25; }
+.picture-certainty { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin: 0 8px 2px 0; background: var(--certainty); }
+.picture-first-de { font-size: 14px; line-height: 1.4; color: #626656; }
+.picture-record, .picture-holder { font: 11px/1.5 system-ui,sans-serif; color: #676b5d; }
+.picture-reason, .picture-reason-de { font-size: 12px; line-height: 1.5; }
+.picture-licence { font: 10px/1.45 system-ui,sans-serif; color: #7b7c6d; }
+.picture-question { position: absolute; bottom: 22px; right: 48px; margin: 0; padding: 6px 8px; background: #eeebe0e8; text-align: right; font-size: 13px; font-style: italic; }
+.picture-material-caption { position: absolute; margin: 0; width: 220px; transform: translateX(-50%); text-align: center; font: 11px/1.4 system-ui,sans-serif; color: #30382e; }
+.picture-material-label h2 { margin: 0 0 8px; font: 20px/1.2 Georgia,serif; }
+.picture-material-label p { margin: 8px 0 0; line-height: 1.45; }
+.picture-question span { display: block; font-size: 11px; color: #525c4e; margin-top: 4px; }
+.picture-rail { position: absolute; bottom: 28px; left: 46px; display: flex; align-items: center; height: 46px; background: #242d28; color: #e2decb; border: 1px solid #414d40; pointer-events: auto; }
+.picture-rail button, .picture-rail select { background: none; border: 0; color: inherit; }
+.picture-step { font-size: 18px !important; }
+.picture-count { font: 11px/1 system-ui,sans-serif; padding: 0 4px; }
+.picture-segment-select { max-width: 210px; border-left: 1px solid #687061 !important; padding: 0 24px 0 14px; font: 11px/1.2 system-ui,sans-serif !important; }
+.picture-segment-select option { color: #222b24; background: #e3e0d0; }
+.picture-sources { padding: 0 18px; font: 10px/1.3 system-ui,sans-serif !important; text-transform: uppercase; letter-spacing: .11em; border-left: 1px solid #687061 !important; }
+.picture-drawer { position: fixed; inset: 88px 30px 26px auto; width: min(540px, calc(100% - 60px)); max-width: none; max-height: none; margin: 0; padding: 0; color: #30362f; background: #f0ece0; border: 1px solid #b3b39e; box-shadow: -12px 8px 50px #121c2540; pointer-events: auto; overflow: auto; overscroll-behavior: contain; }
+.picture-drawer::backdrop { background: #20282052; }
+.picture-drawer { height: calc(100dvh - 114px); box-sizing: border-box; }
+.picture-near-history { margin: 12px 0 0; font-size: 12px; line-height: 1.5; }
+.picture-scroll-hint { display: none; }
+.picture-drawer-close { position: sticky; top: 0; width: 100%; background: #303a30; color: #f1ebda; border: 0; text-align: right; padding: 0 24px; z-index: 1; }
+.picture-drawer-content { padding: 28px; }
+.picture-drawer .picture-label { display: block; }
+.picture-drawer .picture-label p { margin-bottom: 14px; }
+.picture-source-note, .picture-fact, .picture-furniture-note { font-size: 13px; line-height: 1.6; }
+.picture-source-hash, .picture-witness { font: 10px/1.5 ui-monospace,monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
+.picture-source-link { display: block; overflow-wrap: anywhere; font: 11px/1.5 system-ui,sans-serif !important; color: #445b46; padding: 10px 0; }
+/* The register occupies its own reading band below the artwork. */
+.picture-audit { position:absolute; left:46px; right:46px; top:620px; bottom:90px;
+  overflow:auto; overscroll-behavior:contain; z-index:20; white-space:normal; }
+.picture-audit .picture-evidence-pager { position:sticky; bottom:-12px; background:#f1eee4; }
+@media(max-width:699px) {
+  .picture-audit { left:18px; right:18px; top:510px; bottom:75px; }
+}
+
+.picture-load-error { margin: 140px 40px; padding: 30px; background: #eee7d2; pointer-events: auto; }
+@media (max-width:699px) {
+  body[data-bench="pictures"] .brand { top: 24px; font-size: 12px; letter-spacing: .18em; }
+  .picture-header { left: 24px; top: 72px; right: 24px; }
+  .picture-kicker { font-size: 8px; margin-bottom: 8px; }
+  .picture-header h1 { font-size: 22px; max-width: 310px; }
+  .picture-segment-name { font-size: 12px; }
+  .picture-datum { top: 139px; right: 24px; font-size: 8px; }
+  .picture-dock { top: 495px; bottom: 85px; left: 18px; width: calc(100% - 36px); padding: 15px 16px; overflow: auto; pointer-events: auto; }
+  .picture-scroll-hint { display: block; position: absolute; bottom: 69px; right: 21px; margin: 0; padding: 2px 5px; background: #eeebe0; color: #424d3d; font: 9px/1.2 system-ui,sans-serif; }
+  .picture-label { display: block; }
+  .picture-label p { margin-bottom: 6px; }
+  .picture-first { font-size: 16px; line-height: 1.25; }
+  .picture-first-de { font-size: 12px; line-height: 1.4; }
+  .picture-record, .picture-holder { font-size: 10px; line-height: 1.4; }
+  .picture-reason { font-size: 12px; line-height: 1.4; }
+  .picture-licence { font-size: 9px; }
+  .picture-dot { font-size: 10px !important; }
+  .picture-rail { bottom: 20px; left: 18px; right: 18px; }
+  .picture-count { padding: 0; font-size: 10px; white-space: nowrap; }
+  .picture-segment-select { width: 120px; flex: 1; min-width: 44px; font-size: 10px !important; padding: 0 2px 0 8px; }
+  .picture-sources { padding: 0 9px; font-size: 9px !important; letter-spacing: .03em; }
+  .picture-question { display: none; }
+  .picture-material-caption { width: 130px; font-size: 10px; }
+  .picture-material-label { font-size: 13px; }
+  .picture-drawer { inset: 65px 14px 20px; width: auto; }
+  .picture-drawer { height: calc(100dvh - 85px); }
+  .picture-drawer-content { padding: 20px; }
+}
+@media (prefers-reduced-motion:reduce) { .picture-bench * { scroll-behavior: auto !important; } }
+.picture-inspect { position: absolute; right: 42px; top: 162px; padding: 0 15px; border: 1px solid #a9ab98; background: #eeece1; color: #39453a; font: 11px/1.3 system-ui,sans-serif !important; }
+.picture-mat-caption[data-compact="true"] .picture-mat-holder, .picture-mat-caption[data-compact="true"] .picture-mat-class { display: none; }
+@media (max-width:699px) {
+  .picture-inspect { top: 162px; right: 24px; font-size: 10px !important; }
+  .picture-datum { max-width: calc(100% - 48px); text-align: right; }
+}
+
+.picture-label-licences, .picture-label-evidence { grid-column:1 / -1; }
+.picture-label-language p + p { margin-top:6px; }
+.picture-attribution-state { font:10px/1.4 system-ui,sans-serif; color:#657062; }
+.picture-honesty { font:11px/1.5 Georgia,serif; }
+.picture-label-licences { border-top:1px solid #c7c2b1; padding-top:7px; margin-top:7px; }
+.picture-historical-register { border-top:1px solid #c7c2b1; margin-top:18px; padding-top:12px; font:12px/1.5 Georgia,serif; }
+.picture-historical-register summary { min-height:44px; cursor:pointer; }
+@media(max-width:699px) {
+ .picture-label-language + .picture-label-language { margin-top:14px; padding-top:12px; border-top:1px solid #c7c2b1; }
+ .picture-honesty { font-size:11px; }
+}
+
+.picture-language-controls { display:none; }
+@media(max-width:699px) {
+ .picture-language-controls { display:flex; gap:4px; position:sticky; top:-15px; z-index:2; background:#eeebe0; margin:-15px -16px 12px; padding:0 12px; border-bottom:1px solid #c7c2b1; }
+ .picture-language-controls button { border:0; padding:0 12px; background:transparent; color:#626656; font:12px/1.3 Georgia,serif; }
+ .picture-language-controls button[aria-pressed="true"] { color:#28372c; box-shadow:inset 0 -2px #687b64; }
+ .picture-dock[data-language="en"] .picture-label-de, .picture-dock[data-language="de"] .picture-label-en { display:none; }
+ .picture-dock .picture-label-language { margin-top:0; padding-top:0; border-top:0; }
+ .picture-dock .picture-first-de { font-size:16px; line-height:1.25; color:#30362f; }
+ .picture-dock .picture-reason-de { font-size:12px; line-height:1.4; }
+}
+
+.picture-source-scope { font:10px/1.5 Georgia,serif; color:#666b5b; }
+.picture-complete-source { margin-top:18px; padding-top:10px; border-top:1px solid #b9b59f; }
+.picture-complete-source summary { min-height:44px; cursor:pointer; }
+.picture-source-image { display:block; max-width:100%; height:auto; margin:8px auto; }
+
+.picture-certainty-key { display:flex; flex-wrap:wrap; gap:5px 20px; padding:0 0 12px; margin-bottom:12px; border-bottom:1px solid #c7c2b1; font:10px/1.4 Georgia,serif; color:#555e4e; }
+.picture-certainty-key-item { white-space:nowrap; }
+.picture-certainty-key .picture-certainty { width:6px; height:6px; margin-right:6px; }
+@media(min-width:700px) {
+ .picture-dock { top:620px; bottom:110px; overflow:auto; pointer-events:auto; }
+}
+@media(max-width:699px) {
+ .picture-inspect { top:149px; }
+ .picture-certainty-key { display:grid; grid-template-columns:1fr 1fr; gap:5px 9px; font-size:9px; padding-bottom:9px; margin-bottom:10px; }
+ .picture-certainty-key-item { white-space:normal; }
+}
+
+.picture-audit[data-cost-only="true"] .picture-evidence-works,
+.picture-audit[data-cost-only="true"] .picture-evidence-note,
+.picture-audit[data-cost-only="true"] .picture-evidence-pager { display:none; }
+.picture-audit[data-cost-only="true"] { padding:10px 16px; }
+.picture-audit[data-cost-only="true"] .picture-evidence-metrics { margin:5px 0; }
+.picture-audit[data-cost-only="true"] th, .picture-audit[data-cost-only="true"] td { padding:2px 4px; }
+.picture-audit[data-compact="true"] .picture-evidence-pager { top:0; bottom:auto; }
+
+.picture-browse-sources { display:block; width:100%; padding:9px; background:#e4e3d5; color:#3a4c3c; border:1px solid #adae97; margin-bottom:22px; }
+.picture-drawer.picture-catalogue-open { left:30px; right:30px; width:auto; }
+.picture-catalogue-open .picture-drawer-content { padding:0; height:calc(100% - 44px); }
+@media(max-width:699px) { .picture-drawer.picture-catalogue-open { left:14px; right:14px; } }
+
+.picture-key-de::before { content:' · '; }
+@media(max-width:699px) {
+ .picture-dock .picture-certainty-key { display:flex; justify-content:space-between; gap:5px; font-size:9px; }
+ .picture-dock .picture-key-de::before { content:none; }
+ .picture-dock[data-language="en"] .picture-key-de, .picture-dock[data-language="de"] .picture-key-en { display:none; }
+}
+.picture-audit[data-compact="true"] { top:585px; }
+@media(max-width:699px) { .picture-audit[data-compact="true"] { top:495px; } }
+
+.picture-open-record { width:100%; border:1px solid #b6b59f; background:#e5e2d4; color:#374536; padding:10px 14px; margin:14px 0 24px; text-align:left; font-size:13px !important; }
+.picture-drawer-introduction h2 { font:24px/1.2 Georgia,serif; margin:0 0 18px; }
+.picture-drawer-introduction p { font:15px/1.65 Georgia,serif; margin:12px 0; }
+.picture-machine-chain summary { min-height:44px; cursor:pointer; }
+.picture-full-record { border-top:1px solid #b6b59f; padding-top:20px; }
+.picture-full-record pre { overflow-wrap:anywhere; white-space:pre-wrap; }
+
+.picture-dock .picture-reason, .picture-dock .picture-reason-de { font:15px/1.5 Georgia,serif; margin-top:12px; }
+.picture-dock .picture-holder { margin-top:10px; font:12px/1.5 Georgia,serif; color:#57614f; }
+.picture-source-reading { margin-top:6px !important; font:11px/1.5 Georgia,serif; color:#57614f; }
+@media(max-width:699px) {
+ .picture-dock .picture-reason, .picture-dock .picture-reason-de { font-size:14px; }
+ .picture-dock .picture-holder { font-size:11px; }
+}
+
+/* The plaque ends where its content ends. A constrained frame announces scroll. */
+.picture-dock { top:auto; bottom:110px; max-height:calc(100dvh - 590px); padding:22px 24px 24px; overflow:auto; scrollbar-width:thin; overscroll-behavior:contain; }
+.picture-first-de { font-size:18px; line-height:1.25; color:#30362f; }
+.picture-scroll-hint { display:block; position:absolute; right:46px; bottom:87px; margin:0; padding:3px 7px; background:#eeebe0; font:11px/1.3 Georgia,serif; color:#3e4c3a; }
+@media(max-width:699px) {
+ .picture-dock { top:auto; bottom:91px; max-height:calc(100dvh - 492px); padding:15px 16px 18px; }
+ .picture-scroll-hint { right:20px; bottom:71px; font-size:10px; }
+ .picture-dock .picture-first-de { font-size:16px; }
+ .picture-language-controls { margin-bottom:14px; }
+}
+@media(min-width:700px) and (max-height:790px) {
+ .picture-dock { max-height:32dvh; bottom:100px; }
+ .picture-scroll-hint { bottom:79px; }
+}
+
+/* Deliberate camera modes never change an object's geometry. */
+.picture-datum { border:0; background:transparent; color:#455044; min-height:44px; padding:0; cursor:pointer; }
+.picture-face-control { position:absolute; top:199px; right:24px; border:1px solid #aaa998; background:#eeece1; color:#39453a; font:11px/1.3 system-ui,sans-serif; padding:0 12px; }
+
+/* A single line of viewing controls belongs to the title, clear of the work. */
+.picture-viewing { display:flex; gap:8px; position:absolute; right:0; top:0; align-items:center; }
+.picture-viewing button { position:static; flex:none; font:11px/1.3 system-ui,sans-serif !important; letter-spacing:.02em; min-height:44px; padding:0 12px; margin:0; border:1px solid #b4b29f; background:#eeece180; color:#39453a; }
+.picture-viewing .picture-datum { border:0; }
+@media(max-width:699px) {
+ .picture-viewing { position:static; margin-top:9px; justify-content:flex-start; gap:4px; flex-wrap:wrap; }
+ .picture-viewing button { font-size:10px !important; padding:0 10px; }
+ .picture-viewing .picture-datum { max-width:none; }
+}
+
+@media(min-width:700px) { .picture-header { right:46px; max-width:none; } }
+
+.picture-bench[data-segment="signature"] .picture-mat-state { font:italic 24px/1.2 Georgia,serif; color:#55594b; }
+.picture-open-print { display:block; padding:10px 16px; margin:12px 0; background:#ece8da; border:1px solid #b0ad98; }
+
+
+.picture-workshop-note { position:absolute; width:624px; font:12px/1.45 Georgia,serif; color:#394235; padding:9px 15px; background:#eeebe0f2; border:1px solid #cac4b0; box-shadow:0 3px 12px #1e22171a; }
+.picture-workshop-note::before { content:''; position:absolute; background:#8d8a76; }
+.picture-workshop-note[data-leader="under"] { transform:translateX(0); }
+.picture-workshop-note[data-leader="under"]::before { left:var(--leader-x,50%); top:calc(-1 * var(--leader,24px)); width:1px; height:var(--leader,24px); }
+.picture-workshop-note[data-leader="right"]::before { left:calc(-1 * var(--leader,26px)); top:var(--leader-y,50%); width:var(--leader,26px); height:1px; }
+.picture-workshop-note[data-leader="left"]::before { right:calc(-1 * var(--leader,26px)); top:var(--leader-y,50%); width:var(--leader,26px); height:1px; }
+.picture-workshop-note p { margin:0; }
+.picture-workshop-note p + p { margin-top:7px; color:#59624f; }
+@media(max-height:790px) { .picture-workshop-note { font-size:11px; width:580px; } }
+
+.picture-repeat-note { position:absolute; top:206px; left:46px; width:432px; padding-top:11px;
+  border-top:1px solid #b9b4a1; font:11.5px/1.45 Georgia,serif; color:#4e5949; }
+.picture-repeat-note p { margin:0 0 4px; }
+@media(max-width:699px) { .picture-repeat-note { display:none; } }
+.picture-column-note { margin-top:9px !important; font:italic 12px/1.45 Georgia,serif; color:#5a6452; }
+
+.picture-source-key { margin:16px 0; border-top:1px solid #c6c1ae; border-bottom:1px solid #c6c1ae; }
+.picture-source-key summary, .picture-material-record summary { min-height:44px; display:flex; align-items:center; cursor:pointer; font:14px/1.4 Georgia,serif; }
+.picture-source-key summary::before, .picture-material-record summary::before { content:'＋'; margin-right:9px; }
+.picture-source-key[open] summary::before, .picture-material-record[open] summary::before { content:'−'; }
+
+/* The entire dot target clears the phone's bounded reading region. */
+@media(max-width:699px) {
+ .picture-dock { box-sizing:border-box; max-height:max(140px,calc(100dvh - 539px)); }
+ .picture-scroll-hint { left:18px; right:auto; bottom:71px; }
+ .picture-dock .picture-first, .picture-dock .picture-first-de { font-size:16px; }
+ .picture-dock .picture-reason, .picture-dock .picture-reason-de { font-size:13px; line-height:1.42; }
+ .picture-source-reading, .picture-holder-reading { line-height:1.35; }
+}
+
+/* A short physical ruler beside the reading view; camera projection gives its length. */
+.picture-reading-ruler{position:absolute;pointer-events:none;color:#51594b;font:10px/1.2 ui-sans-serif,system-ui,sans-serif;width:30px;text-align:left}
+.picture-reading-rule{display:block;width:5px;border-left:1px solid #686e60;border-top:1px solid #686e60;border-bottom:1px solid #686e60;box-sizing:border-box}
+.picture-reading-unit{display:block;margin-top:5px;white-space:nowrap}
+.picture-reading-ruler[hidden]{display:none}
+
+/* The key to the marks on the wall, once, on the card that is always open. */
+.picture-dock-key { order:-1; }
+.picture-dock .picture-certainty-key { margin-bottom:14px; padding-bottom:11px; }
+@media(min-width:700px) { .picture-dock .picture-certainty-key { gap:5px 26px; } }
+
+@media(max-width:699px) {
+ .picture-dock .picture-certainty-key { font-size:8.5px; padding-bottom:5px; margin-bottom:7px; gap:4px; }
+ .picture-dock .picture-reason, .picture-dock .picture-reason-de { line-height:1.38; margin-top:9px; }
+ .picture-dock .picture-holder { margin-top:7px; }
+ .picture-language-controls { margin-bottom:10px; }
+}
+
+/* An open mark: documented, but not from Leonardo's own hand. */
+.picture-dot[data-hand="workshop"]::before { background:none; border:1.5px solid var(--certainty);
+  width:7px; height:7px; top:18px; left:calc(50% - 3.5px); box-sizing:border-box; }
+.picture-key-hand .picture-certainty { background:none; border:1.5px solid var(--certainty); box-sizing:border-box; }
+
+/* THE ROOM'S NAME IS ON THE WALL. One em is one metre of the room, so the
+   lettering is a real size in centimetres and grows and shrinks with the
+   wall it is painted on. Three marks stay on the frame: the brand line, the
+   reading card and the rail. */
+.picture-header { display: none; }
+.picture-wall-title { position: absolute; font-size: var(--wall-em, 130px);
+  color: #434a3e; opacity: .88; text-shadow: none; pointer-events: none; }
+.picture-wall-title .picture-kicker { margin: 0 0 .030em; font: .072em/1.4 system-ui,sans-serif;
+  letter-spacing: .23em; color: inherit; }
+.picture-wall-title h1 { margin: 0 0 .020em; font-size: .205em; font-weight: 400;
+  line-height: 1.12; color: inherit; text-shadow: none; }
+.picture-wall-title .picture-segment-name { margin: 0; font-size: .108em; font-style: italic;
+  color: #5c6553; }
+/* THE PAINT ITSELF, when a visitor is close enough to see it.
+   Lime paint on a floated wall is a thin coat: the plaster's tooth breaks it,
+   and the brush leaves a hairline of build where a stroke stops, lit from the
+   window side. Every feature here is well under a pixel at the wall's own
+   camera, so it is switched on by size and carries nothing at six metres. */
+.picture-wall-title.picture-paint-near { opacity: 1; color: rgba(67,74,62,.86);
+  /* A thin lime coat: the plaster's own float marks, pinholes and hairline
+     shrinkage carry through the paint, because they are the wall's material
+     and not a pattern laid over the letters. What the brush adds is the
+     build where a stroke stops, lit from the window side and shaded away
+     from it. Both are far under a pixel at the wall's own camera. */
+  text-shadow:
+    calc(-.0048em * var(--wall-paint, 0)) calc(-.0018em * var(--wall-paint, 0)) 0 rgba(243,239,224,.74),
+    calc(.0016em * var(--wall-paint, 0)) calc(.0012em * var(--wall-paint, 0)) 0 rgba(67,74,62,.50),
+    calc(.0074em * var(--wall-paint, 0)) calc(.0055em * var(--wall-paint, 0)) 0 rgba(44,49,40,.32); }
+.picture-wall-title.picture-paint-near .picture-segment-name { color: rgba(92,101,83,.84); }
+.picture-wall-title.picture-title-band { position: absolute; left: 18px; right: 18px; top: 50px;
+  font-size: 16px; text-align: center; }
+.picture-title-band .picture-kicker { margin: 0 0 5px; font: 8px/1.4 system-ui,sans-serif;
+  letter-spacing: .21em; }
+.picture-title-band h1 { margin: 0 0 3px; font-size: 18px; }
+.picture-title-band .picture-segment-name { margin: 0; font-size: 11px; }
+
+/* THE SECOND READING LEVEL, on the narrow stage only. One control, the size
+   of a hand, under the first sentence and the holder. */
+.picture-bench .picture-label-more { display: none; }
+@media (max-width:699px) {
+  .picture-bench .picture-label-more { display: block; width: 100%; min-height: 44px; margin-top: 10px;
+    border: 0; border-top: 1px solid #c7c2b1; background: none; color: #4a5547; padding: 0;
+    font: 11px/1.3 system-ui,sans-serif !important; letter-spacing: .06em; text-align: left; }
+  .picture-bench .picture-label-more::after { content: ' \2193'; }
+  .picture-bench .picture-label-more[aria-expanded="true"]::after { content: ' \2191'; }
+  .picture-label-rest { margin-top: 10px; }
+  .picture-label-rest > p:first-child { margin-top: 0; }
+}
+
+/* The viewing controls ride the rail; they are the rail's own line. */
+.picture-rail .picture-viewing { position: static; display: flex; gap: 0; margin: 0; }
+.picture-rail .picture-viewing button, .picture-rail .picture-datum, .picture-rail .picture-inspect {
+  position: static; top: auto; right: auto; margin: 0; border: 0; border-left: 1px solid #687061;
+  background: none; color: #e2decb; padding: 0 16px; font: 10px/1.3 system-ui,sans-serif !important;
+  letter-spacing: .06em; max-width: none; text-align: center; }
+.picture-rail .picture-datum[disabled] { color: #9aa08e; }
+.picture-rail .picture-face-control { display: none; }
+@media (max-width:699px) {
+  .picture-rail .picture-inspect { padding: 0 10px; font-size: 9px !important; letter-spacing: .03em; }
+  /* On the phone the card's own language row carries the reading controls. */
+  .picture-language-controls .picture-datum, .picture-language-controls .picture-face-control {
+    position: static; margin: 0; border: 1px solid #c0bba7; background: #e7e4d6; color: #3d4a3c;
+    padding: 0 8px; align-self: stretch; white-space: nowrap;
+    font: 9.5px/1.2 system-ui,sans-serif !important; letter-spacing: .01em; max-width: none; }
+  .picture-language-controls button { padding: 0 9px; }
+  .picture-language-controls .picture-datum { margin-left: auto; }
+  .picture-language-controls .picture-face-control { display: block; margin-left: 5px; }
+  .picture-language-controls { align-items: center; gap: 2px; padding-right: 4px; }
+}
+
+/* The rail gained the viewing controls, so its name field keeps its own room:
+   the chevron never stands on the last word. */
+@media (max-width:699px) {
+  .picture-rail .picture-segment-select { padding: 0 22px 0 9px; font-size: 9.5px !important;
+    text-overflow: ellipsis; min-width: 0; }
+  .picture-rail .picture-step { padding: 0 9px; }
+  .picture-rail .picture-count { padding: 0 2px; }
+}
