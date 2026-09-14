@@ -2,40 +2,44 @@
  *
  * This module builds the WALL's side of the hang, which is the part a room
  * owes an exhibit: every work's frame at the size the holder records, on one
- * datum, in the order the life produced them. Fourteen of them are the
- * withheld works and stand over a dark field; eleven are the display-grade
- * works whose plates the picture bench streams, and they stand over a
- * prepared pale field. The picture module streams onto those same fields
- * through collection/plates.ts. Nothing here carries a label, a name or
- * a claim: the station's own locked copy does that.
+ * datum, in the order the life produced them. Each one stands over a prepared
+ * pale field and the picture module streams its reproduction onto that field
+ * through collection/plates.ts. Nothing here carries a label, a name or a
+ * claim: the station's own locked copy does that.
+ *
+ * The wall keeps no rights register of its own. A work stands here when the
+ * picture module's register admits a reproduction for it; a work with none
+ * leaves this list, frame and battens with it, and the room's sources say in
+ * one line what is elsewhere or lost.
  *
  * Sizes are the holders' own, in centimetres, as the concept's register
  * lists them (CONCEPT-OPUS.md S11).
  */
 import type { RoomBatch } from './build'
+import { bodyMounts } from './body-wall'
 import { FACE, FLOOR, HANG_DATUM, ROOMS } from './layout'
 
-interface Work { id: string; face: 'front' | 'reverse'; width: number; height: number; withheld: boolean; slotWidth: number }
-const w = (id: string, width: number, height: number, withheld = false, face: Work['face'] = 'front', slotWidth = width): Work =>
-  ({ id, face, width: width / 100, height: height / 100, withheld, slotWidth: slotWidth / 100 })
+interface Work { id: string; face: 'front' | 'reverse'; width: number; height: number; slotWidth: number }
+const w = (id: string, width: number, height: number, face: Work['face'] = 'front', slotWidth = width): Work =>
+  ({ id, face, width: width / 100, height: height / 100, slotWidth: slotWidth / 100 })
 
-/** In the order the life produced them, present and absent in one line. */
+/** In the order the life produced them, one line of the whole life. */
 export const HANG: readonly Work[] = [
-  w('baptism-of-christ', 151, 177, true), w('annunciation', 217, 98, true),
-  w('ginevra-de-benci', 37, 38.1), w('ginevra-de-benci', 37, 38.1, false, 'reverse'),
-  w('madonna-of-the-carnation', 48.5, 62), w('benois-madonna', 33, 49.5, true),
-  w('saint-jerome', 75, 103, true), w('adoration-of-the-magi', 240, 244, true),
-  w('annunciation-predella', 60, 16, true), w('virgin-of-the-rocks-louvre', 122, 199.5),
-  w('portrait-of-a-musician', 32, 44.7, true), w('lady-with-an-ermine', 40.3, 54.8),
-  w('la-belle-ferronniere', 45, 63, true), w('madonna-litta', 33, 42),
-  w('burlington-house-cartoon', 104.6, 141.5, true), w('yarnwinder-buccleuch', 36.9, 48.3),
+  w('baptism-of-christ', 151, 177), w('annunciation', 217, 98),
+  w('ginevra-de-benci', 37, 38.1), w('ginevra-de-benci', 37, 38.1, 'reverse'),
+  w('madonna-of-the-carnation', 48.5, 62), w('benois-madonna', 33, 49.5),
+  w('saint-jerome', 75, 103), w('adoration-of-the-magi', 240, 244),
+  w('annunciation-predella', 60, 16), w('virgin-of-the-rocks-louvre', 122, 199.5),
+  w('portrait-of-a-musician', 32, 44.7), w('lady-with-an-ermine', 40.3, 54.8),
+  w('la-belle-ferronniere', 45, 63), w('madonna-litta', 33, 42),
+  w('burlington-house-cartoon', 104.6, 141.5), w('yarnwinder-buccleuch', 36.9, 48.3),
   // Current holder record L.2026.5 supersedes the concept's 50.2 by 36.4 cm.
   // Its old layout slot keeps every neighbouring frame and batten in place.
   // https://www.metmuseum.org/art/collection/search/941909
-  w('yarnwinder-lansdowne', 37.1, 49.5, false, 'front', 36.4), w('anghiari-copy', 63.6, 45.3),
-  w('mona-lisa', 53.4, 79.4, true), w('virgin-of-the-rocks-london', 120, 189.5, true),
-  w('virgin-and-child-with-st-anne', 113, 168), w('salvator-mundi', 45.7, 65.7, true),
-  w('saint-john-the-baptist', 56.3, 72.9, true), w('la-scapigliata', 21, 24.7, true),
+  w('yarnwinder-lansdowne', 37.1, 49.5, 'front', 36.4), w('anghiari-copy', 63.6, 45.3),
+  w('mona-lisa', 53.4, 79.4), w('virgin-of-the-rocks-london', 120, 189.5),
+  w('virgin-and-child-with-st-anne', 113, 168), w('salvator-mundi', 45.7, 65.7),
+  w('saint-john-the-baptist', 56.3, 72.9), w('la-scapigliata', 21, 24.7),
   w('bacchus', 115, 177),
 ]
 
@@ -59,11 +63,11 @@ export function buildHang(b: RoomBatch): void {
   for (const work of hangPlacements()) {
     const centre = work.east
     const high = HANG_DATUM + work.height / 2
-    // A withheld work is an EMPTY FRAME: the moulding stands 30 mm off the
-    // wall on its battens and what is inside it is the wall. The eleven the
-    // museum may show carry the pale panel their plate is prepared on.
-    const back = WALL + (work.withheld ? .03 : .012)
-    if (!work.withheld) b.box(centre, WALL + .008, HANG_DATUM, work.width, .016, work.height, 4)
+    // Every frame on this wall carries the pale panel its plate is prepared
+    // on. No frame stands over the bare wall: an empty one would say the
+    // museum is keeping something back that the register in fact admits.
+    const back = WALL + .012
+    b.box(centre, WALL + .008, HANG_DATUM, work.width, .016, work.height, 4)
     for (const side of [-1, 1]) {
       b.box(centre + side * (work.width + MOULDING) / 2, back + DEPTH / 2, HANG_DATUM, MOULDING, DEPTH, work.height + MOULDING * 2, 2)
       b.box(centre, back + DEPTH / 2, HANG_DATUM + side * (work.height + MOULDING) / 2, work.width, DEPTH, MOULDING, 2)
@@ -95,30 +99,23 @@ export function buildPictureRoomFurniture(b: RoomBatch): void {
   for (const at of [ledge - .8, ledge + .8]) b.box(at, FACE.pictureWallNorth + 1.7, FLOOR + .22, .06, .06, .44, 3)
 }
 
-/** The body as a machine: about six hundred sheets are at Windsor and this
- * museum may show none of them, so the wall carries the sheets' own size and
- * nothing in them. Four courses of a Windsor folio's measurement, and one
- * larger absence for the sheet the arithmetic in the drawer is taken from.
+/** The body as a machine: about six hundred sheets are at Windsor, and the
+ * ones whose faithful reproductions the source policy admits hang here. The
+ * carriers come from the wall's own register, each at its sheet's proportion;
+ * the picture module streams the sheets onto them through plates.ts.
  */
 export function buildBodyWall(b: RoomBatch): void {
   const wall = FACE.hallPartitionEast + .033
-  const sheet = { width: .19, height: .278 }
-  const centre = -52.6, datum = FLOOR + 1.52
-  for (let row = 0; row < 4; row++) {
-    for (let column = 0; column < 7; column++) {
-      const north = centre + (column - 3) * .46
-      const height = datum + (1.5 - row) * .42
-      for (const side of [-1, 1]) {
-        b.box(wall + .026, north + side * (sheet.width + .028) / 2, height, .042, .028, sheet.height + .056, 3)
-        b.box(wall + .026, north, height + side * (sheet.height + .028) / 2, .042, sheet.width, .028, 3)
-      }
+  const centre = -52.6
+  for (const mount of bodyMounts()) {
+    const north = mount.north, height = mount.datum
+    // The carrier: a backing board the sheet stands on, then the four
+    // sections of its moulding.
+    b.box(wall + .014, north, height, .012, mount.width, mount.height, 4)
+    for (const side of [-1, 1]) {
+      b.box(wall + .026, north + side * (mount.width + .028) / 2, height, .042, .028, mount.height + .056, 3)
+      b.box(wall + .026, north, height + side * (mount.height + .028) / 2, .042, mount.width, .028, 3)
     }
-  }
-  // The one sheet the vortex arithmetic is read from, at its own size.
-  const big = { width: .284, height: .42 }
-  for (const side of [-1, 1]) {
-    b.box(wall + .026, centre + 4.05 + side * (big.width + .04) / 2, datum + .28, .042, .04, big.height + .08, 3)
-    b.box(wall + .026, centre + 4.05, datum + .28 + side * (big.height + .04) / 2, .042, big.width, .04, 3)
   }
   // A reading ledge under the sheets, and a shadow gap above the base.
   b.box(wall + .3, centre, FLOOR + .92, .6, 5.4, .05, 3)

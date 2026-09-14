@@ -80,7 +80,8 @@ function load(relative) {
     console: { ...console, error: message => messages.push(message) } }, { filename: relative })
   return module.exports
 }
-const { HANG, hangPlacements, buildHang } = load('src/wings/vinci/collection/hang.ts')
+const { HANG, hangPlacements, buildHang, buildBodyWall } = load('src/wings/vinci/collection/hang.ts')
+const { BODY_WALL, bodyMounts } = load('src/wings/vinci/collection/body-wall.ts')
 const { mountCollectionPlates } = load('src/wings/vinci/collection/plates.ts')
 const { getWork } = load('src/wings/vinci/pictures/register.ts')
 const { COURT, FACE, HANG_DATUM, SUPPER_WALL } = load('src/wings/vinci/collection/layout.ts')
@@ -95,13 +96,19 @@ const tick = async (eye = new THREE.Vector3(0, 0, 0)) => {
 }
 await tick()
 assert.equal(hang.errors().length, 0)
-assert.equal(hang.sources().length, 12, 'all eleven room plates and the admitted mural mount')
-assert.equal(new Set(hang.sources().map(source => source.entry.plate.id)).size, 12)
-assert.equal(streams.length, 12)
+const CARDS = 26 + BODY_WALL.length
+assert.equal(hang.sources().length, 26, 'every field on the picture wall and the admitted mural mount')
+assert.equal(new Set(hang.sources().map(source => source.entry.plate.id)).size, 26)
+assert.equal(hang.sheets().length, 29, 'the body wall mounts every sheet its register admits')
+assert.equal(new Set(hang.sheets().map(source => source.page.id)).size, 29)
+assert.equal(streams.length, CARDS)
 assert.ok(streams.every(stream => stream.options.previewMaxEdge === 512))
-assert.equal(HANG.filter(work => work.withheld).length, 14)
-for (const work of HANG.filter(work => work.withheld))
-  assert.ok(!hang.sources().some(source => source.work.id === work.id), `withheld field requested ${work.id}`)
+// No field on either wall is withheld: the store's register is the only
+// admission decision, and a work it does not admit leaves the wall entirely.
+assert.equal(HANG.filter(work => 'withheld' in work).length, 0)
+assert.equal(HANG.length, 25)
+for (const source of hang.sources())
+  assert.ok(source.entry.plate.sha256, `no hashed plate behind ${source.work.id}`)
 for (const field of HANG) {
   const work = getWork(field.id)
   assert.equal(field.width, work.width_cm / 100, `holder width: ${work.id}`)
@@ -125,35 +132,59 @@ const lansdowne = HANG.find(work => work.id === 'yarnwinder-lansdowne')
 assert.equal(lansdowne.width, .371)
 assert.equal(lansdowne.height, .495)
 assert.equal(lansdowne.width * 100, getWork(lansdowne.id).width_cm)
-// Snapshot measured from the pre-landing wall's production buildHang calls.
-// These 250 boxes include every other frame, pale board and both battens;
-// only Lansdowne's eleven holder-corrected boxes are outside the snapshot.
+// Snapshot re-taken at the rehang: every field now carries its pale board
+// and its moulding stands on the 12 mm standoff, so the fourteen that used to
+// be empty changed their own boxes. The centre loop above is what proves no
+// neighbour moved. Lansdowne's eleven holder-corrected boxes stay outside the
+// snapshot, as they were before.
 const boxes = [], retainedBoxes = []
 buildHang({ box: (...args) => boxes.push(args) })
 let offset = 0
 for (const field of HANG) {
-  const count = field.withheld ? 10 : 11
-  if (field.id !== 'yarnwinder-lansdowne') retainedBoxes.push(...boxes.slice(offset, offset + count))
-  offset += count
+  if (field.id !== 'yarnwinder-lansdowne') retainedBoxes.push(...boxes.slice(offset, offset + 11))
+  offset += 11
 }
-assert.equal(boxes.length, 261)
-assert.equal(retainedBoxes.length, 250)
+assert.equal(boxes.length, 275)
+assert.equal(retainedBoxes.length, 264)
 assert.equal(createHash('sha256').update(JSON.stringify(retainedBoxes)).digest('hex'),
-  '05d76ef551eeafa15289a3c3560c72026a45fccbcf1345da0a25d682251e590f')
+  '69f0c11d586e34e3e06edeefcde3339675792bb21aecdb341074768c76571389')
+// The body wall builds one carrier per admitted sheet, and nothing else.
+const bodyBoxes = []
+buildBodyWall({ box: (...args) => bodyBoxes.push(args) })
+assert.equal(bodyBoxes.length, BODY_WALL.length * 5 + 4)
+for (const mount of bodyMounts()) {
+  assert.ok(mount.width > 0 && mount.height > 0)
+  assert.ok(Math.abs(mount.width / mount.height - mount.pixels.width / mount.pixels.height) < 1e-9
+    || !!mount.measured, `a carrier must take its sheet's proportion: ${mount.id}`)
+  assert.ok(mount.width <= .37 && mount.height <= .38, `a carrier overruns its slot: ${mount.id}`)
+}
+const measured = bodyMounts().filter(mount => mount.measured)
+assert.equal(measured.length, 1)
+assert.ok(Math.abs(measured[0].width - .204) < 1e-12)
+assert.ok(Math.abs(measured[0].height - .283) < 1e-12)
 const group = host.getObjectByName('vinci/collection-plates')
 const cards = group.children.filter(mesh => mesh.userData.previewId)
-assert.equal(cards.length, 12)
+assert.equal(cards.length, CARDS)
+assert.equal(cards.filter(card => card.userData.sheetId).length, 29)
 for (const card of cards) {
-  const field = card.userData.measuredField
+  const field = card.userData.measuredField ?? card.userData.carrier
   card.geometry.computeBoundingBox()
   const size = card.geometry.boundingBox.getSize(new THREE.Vector3())
   assert.ok(size.x <= field.widthM + 1e-6 && size.y <= field.heightM + 1e-6)
   assert.equal(card.userData.physicalRegistration, false)
   assert.equal(card.castShadow, false)
   const normal = new THREE.Vector3().fromBufferAttribute(card.geometry.getAttribute('normal'), 0).applyEuler(card.rotation)
-  const expected = card.userData.workId === 'last-supper' ? new THREE.Vector3(1, 0, 0) : new THREE.Vector3(0, 0, -1)
+  const acrossTheRoom = card.userData.workId === 'last-supper' || card.userData.sheetId
+  const expected = acrossTheRoom ? new THREE.Vector3(1, 0, 0) : new THREE.Vector3(0, 0, -1)
   assert.ok(normal.distanceTo(expected) < 1e-12, 'source must face out of its own room wall')
 }
+// One sheet carries the holder's own centimetres; its carrier is that size
+// and the source is contained inside it without stretching.
+const vortex = cards.find(card => card.userData.sheetId === 'rcin-919082')
+assert.equal(vortex.userData.measuredSheet.widthCm, 20.4)
+assert.equal(vortex.userData.measuredSheet.heightCm, 28.3)
+assert.ok(cards.filter(card => card.userData.sheetId).every(card => card.userData.measuredSheet === null
+  || card.userData.sheetId === 'rcin-919082'))
 const mural = cards.find(card => card.userData.workId === 'last-supper')
 assert.equal(mural.rotation.y, Math.PI / 2)
 assert.equal(mural.position.x, SUPPER_WALL.east + SUPPER_WALL.thickness / 2 + .0005)
@@ -169,12 +200,12 @@ assert.equal(fullCount(), 1)
 assert.ok(!streams.find(stream => stream.plate.id === mural.userData.manifestId).full,
   'mural must wait for the picture room full source to release')
 assert.ok(hang.pending() > 0)
-assert.equal(memoryTotal(), 44, 'the fading old full texture stays counted exactly once')
+assert.equal(memoryTotal(), CARDS + 32, 'the fading old full texture stays counted exactly once')
 holdRelease = false
 for (const release of releases.splice(0)) release()
 await tick(near(mural))
 assert.ok(streams.find(stream => stream.plate.id === mural.userData.manifestId).full)
-assert.equal(memoryTotal(), 44)
+assert.equal(memoryTotal(), CARDS + 32)
 // Other page allocations remain in the calculation: the room cannot earn a
 // source by forgetting the rest of the wing's textures.
 otherMiB = 250
@@ -188,21 +219,21 @@ await tick(near(mural))
 assert.ok(hang.pending() > 0)
 tier = 'hero'
 await tick()
-assert.equal(streams.filter(stream => !stream.disposed).length, 12)
+assert.equal(streams.filter(stream => !stream.disposed).length, CARDS)
 assert.ok(streams.filter(stream => !stream.disposed).every(stream => stream.options.previewMaxEdge === 1024))
 holdRelease = false
 for (const release of releases.splice(0)) release()
 await tick()
 assert.equal(fullCount(), 0, 'a superseded tier may not grant its delayed full slot')
-assert.equal(memoryTotal(), 12)
+assert.equal(memoryTotal(), CARDS)
 tier = 'calm'
 await tick(near(mural))
 assert.equal(fullCount(), 0)
 assert.ok(streams.filter(stream => !stream.disposed).every(stream => stream.options.previewMaxEdge === 512))
 tier = 'standard'
 await tick()
-assert.equal(memoryTotal(), 12)
-assert.equal(streams.length, 48)
+assert.equal(memoryTotal(), CARDS)
+assert.equal(streams.length, CARDS * 4)
 const broken = streams.find(stream => !stream.disposed)
 broken.failure = 'simulated optional full source failure'
 await tick()
@@ -223,6 +254,6 @@ await departing.ready
 assert.equal(host.children.length, 0)
 assert.equal(memory.size, 0)
 console.log(JSON.stringify({ checker: 'collection-picture-integration', ok: true,
-  plates: 11, murals: 1, withheldFields: 14, retainedFrameCentres: 25,
+  plates: 25, murals: 1, sheets: 29, withheldFields: 0, retainedFrameCentres: 25,
   tierRemounts: 3, maximumFullSources: 1, memoryRegistration: 'once and disposed',
   limitations: ['Simulated stream lifecycle; no browser, illumination, decoding or rendered cost measurement.'] }, null, 2))

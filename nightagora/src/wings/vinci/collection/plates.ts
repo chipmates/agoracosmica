@@ -9,6 +9,7 @@ import { trueScale } from '../pictures/scale'
 import { pictureDisplayUV, pictureDisplayWindow } from '../pictures/registration'
 import { ARCH_MASK_MANIFEST_ID, buildArchShoulderGeometry, pictureArchMask } from '../pictures/arch-mask'
 import { createPlateStream, type PlateStream } from '../pictures/stream'
+import { bodySheetSources, type BodySheetSource } from './body-wall'
 import { hangPlacements } from './hang'
 import { COURT, SUPPER_WALL } from './layout'
 import { collectionInteriorMaterial, collectionPlateTone } from './materials'
@@ -23,18 +24,21 @@ interface Placement extends CollectionPictureSource {
   readonly position: readonly [number, number, number]
   readonly bearing: number
 }
-interface Card extends CollectionPictureSource {
+interface Card {
+  /** The manifest record the room's one full-resolution slot is keyed on. */
+  id: string
   mesh: Mesh
   stream: PlateStream
   normal: Vector3
 }
 
-/** The room has one existing display decision, its fourteen empty frames.
- * It never turns that furniture list into a second image-rights register. */
+/** The wall's list and the store's register have to agree. A field whose
+ * work the register does not admit is not quietly skipped: the room says so
+ * and stands nothing, because a frame with nothing in it reads as a refusal
+ * the register did not make. */
 function placements(manifest: ManifestIndex): readonly Placement[] {
   const placed: Placement[] = []
   for (const field of hangPlacements()) {
-    if (field.withheld) continue
     const work = getWork(field.id)
     const scale = trueScale(work)
     if (!scale || Math.abs(scale.widthM - field.width) > 1e-9 || Math.abs(scale.heightM - field.height) > 1e-9)
@@ -59,6 +63,13 @@ function placements(manifest: ManifestIndex): readonly Placement[] {
   return placed
 }
 
+/** The source is uniformly contained inside the carrier: one axis fills it,
+ * the other stays shorter. Nothing is stretched to make both axes fit. */
+function containedSize(widthM: number, heightM: number, pixelWidth: number, pixelHeight: number): { widthM: number; heightM: number } {
+  const metresPerPixel = Math.min(widthM / pixelWidth, heightM / pixelHeight)
+  return { widthM: pixelWidth * metresPerPixel, heightM: pixelHeight * metresPerPixel }
+}
+
 export function mountCollectionPlates(host: Group, stack: Stack) {
   const group = new Group()
   group.name = 'vinci/collection-plates'
@@ -68,6 +79,7 @@ export function mountCollectionPlates(host: Group, stack: Stack) {
   let live = true, loading = true, epoch = 0, selectedId = ''
   let tier: TierName = stack.tierName()
   let fields: readonly Placement[] = []
+  let sheetFields: readonly BodySheetSource[] = []
   let cards: Card[] = []
   let failure: string | null = null
   const changes = new Set<Promise<void>>()
@@ -95,6 +107,12 @@ export function mountCollectionPlates(host: Group, stack: Stack) {
 
   function mount(): void {
     strike()
+    mountPictures()
+    mountSheets()
+    group.updateMatrixWorld(true)
+  }
+
+  function mountPictures(): void {
     for (const field of fields) {
       const { work, entry } = field
       const registration = pictureDisplayWindow(entry.plate)
@@ -125,7 +143,7 @@ export function mountCollectionPlates(host: Group, stack: Stack) {
         sourceWindow: window, physicalRegistration: false, light: 'collection openings and fittings',
       }
       group.add(mesh)
-      cards.push({ work, entry, mesh, stream, normal: new Vector3(Math.sin(field.bearing), 0, Math.cos(field.bearing)) })
+      cards.push({ id: entry.id, mesh, stream, normal: new Vector3(Math.sin(field.bearing), 0, Math.cos(field.bearing)) })
       const current = epoch
       void stream.ready.then(() => { if (live && current === epoch) mesh.visible = stream.available() })
       const arch = pictureArchMask(entry.plate)
@@ -143,7 +161,37 @@ export function mountCollectionPlates(host: Group, stack: Stack) {
         group.add(mask)
       }
     }
-    group.updateMatrixWorld(true)
+  }
+
+  /** The body wall. Each sheet stands in a modern carrier at the proportion
+   * its reproduction has; the carrier's metres are furniture and never a
+   * measurement of the sheet. The sheets share the room's single full
+   * resolution slot with the paintings. */
+  function mountSheets(): void {
+    for (const source of sheetFields) {
+      const { sheet, page, preview } = source
+      const size = containedSize(sheet.width, sheet.height, page.width, page.height)
+      const geometry = new PlaneGeometry(size.widthM, size.heightM)
+      const stream = createPlateStream(preview, page,
+        { previewMaxEdge: tier === 'hero' ? 1024 : 512, tone, family: 'sheet' })
+      const mesh = new Mesh(geometry, stream.material)
+      mesh.name = `vinci/collection-plates/${sheet.id}`
+      mesh.position.set(sheet.east + .004, sheet.datum, -sheet.north)
+      mesh.rotation.y = Math.PI / 2
+      mesh.visible = false
+      mesh.castShadow = false
+      mesh.userData = {
+        manifestId: page.id, asset: page.id, assetClass: page.class,
+        sheetId: sheet.id, sheet: page.sheet, previewId: preview.id,
+        carrier: { widthM: sheet.width, heightM: sheet.height, centreY: sheet.datum },
+        measuredSheet: sheet.measured ?? null, sourceWindow: null,
+        physicalRegistration: false, light: 'collection openings and fittings',
+      }
+      group.add(mesh)
+      cards.push({ id: page.id, mesh, stream, normal: new Vector3(1, 0, 0) })
+      const current = epoch
+      void stream.ready.then(() => { if (live && current === epoch) mesh.visible = stream.available() })
+    }
   }
 
   /** One slot across BOTH walls. Every other full texture has completed its
@@ -162,7 +210,7 @@ export function mountCollectionPlates(host: Group, stack: Stack) {
         if (distance < nearest && toEye.dot(card.normal) > 0) { selected = card; nearest = distance }
       }
     }
-    const nextId = selected?.entry.id ?? ''
+    const nextId = selected?.id ?? ''
     if (nextId === selectedId) return
     selectedId = nextId
     const current = ++epoch
@@ -177,6 +225,7 @@ export function mountCollectionPlates(host: Group, stack: Stack) {
   const ready = loadManifest().then(manifest => {
     if (!live) return
     fields = placements(manifest)
+    sheetFields = bodySheetSources(manifest)
     tier = stack.tierName()
     mount()
     return Promise.all(cards.map(card => card.stream.ready)).then(reportErrors)
@@ -185,6 +234,7 @@ export function mountCollectionPlates(host: Group, stack: Stack) {
   return {
     ready,
     sources: (): readonly CollectionPictureSource[] => fields,
+    sheets: (): readonly BodySheetSource[] => sheetFields,
     errors,
     pending: () => live ? Number(loading) + changes.size + cards.reduce((sum, card) => sum + card.stream.pending(), 0) : 0,
     textureMB,
