@@ -1352,6 +1352,71 @@
       "source_sha1": "299a3b8656b137ea2d260e39627b09f3a923c445",
       "honesty_en": "Public domain work. Reproduction from Wikimedia Commons. The museum labels the reproduction, not the painting. Non-profit cultural use.",
       "honesty_de": "Gemeinfreies Werk. Reproduktion von Wikimedia Commons. Das Museum kennzeichnet die Reproduktion, nicht das Gemälde. Nichtkommerzielle kulturelle Nutzung."
+    },
+    {
+      "id": "lobby/likeness-schopenhauer",
+      "path": "likenesses/schopenhauer/original.jpg",
+      "sha256": "5c9744490eef9d5684781a7c2cca841d182fe0b2781cb2f59839e15f73c61f26",
+      "bytes": 4259881,
+      "width": 1920,
+      "height": 2454,
+      "pixels": 4711680,
+      "slug": "schopenhauer",
+      "name": "Arthur Schopenhauer",
+      "wing": "lobby",
+      "class": "Tier 2",
+      "tier": 2,
+      "licence": "This is a faithful photographic reproduction of a two-dimensional, public domain work of art.",
+      "licence_source_url": "https://commons.wikimedia.org/wiki/File:Arthur_Schopenhauer_Portrait_by_Ludwig_Sigismund_Ruhl_1815.jpeg#Licensing",
+      "licence_location": "Commons file page, Licensing",
+      "holder": "Universitätsbibliothek Johann Christian Senckenberg, Frankfurt, Schopenhauer-Archiv; Na 50, Spez. 34",
+      "maker": "Ludwig Sigismund Ruhl",
+      "date": "1815",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Arthur_Schopenhauer_Portrait_by_Ludwig_Sigismund_Ruhl_1815.jpeg",
+      "original_url": "https://upload.wikimedia.org/wikipedia/commons/6/6b/Arthur_Schopenhauer_Portrait_by_Ludwig_Sigismund_Ruhl_1815.jpeg",
+      "holder_record_url": "https://www.ub.uni-frankfurt.de/sammlungen/blick_schopenhauer.html",
+      "display": true,
+      "label_en": "Arthur Schopenhauer. Ludwig Sigismund Ruhl, 1815. Schopenhauer-Archiv, Universitätsbibliothek Frankfurt am Main. Licence: “This is a faithful photographic reproduction of a two-dimensional, public domain work of art.” Public domain work. Reproduction from Wikimedia Commons. The museum labels the reproduction, not the painting. Non-profit cultural use.",
+      "label_de": "Arthur Schopenhauer. Ludwig Sigismund Ruhl, 1815. Schopenhauer-Archiv, Universitätsbibliothek Frankfurt am Main. Lizenz: „This is a faithful photographic reproduction of a two-dimensional, public domain work of art.“ Gemeinfreies Werk. Reproduktion von Wikimedia Commons. Das Museum kennzeichnet die Reproduktion, nicht das Gemälde. Nichtkommerzielle kulturelle Nutzung.",
+      "previews": [
+        {
+          "path": "likenesses/schopenhauer/preview-512.jpg",
+          "sha256": "d80e8fb576b02ef1b3597978a5a3d45b85ca398bb00b096773a05fc6fe69c843",
+          "bytes": 58563,
+          "width": 401,
+          "height": 512,
+          "pixels": 205312,
+          "long_edge": 512,
+          "format": "image/jpeg",
+          "quality": 88,
+          "color_space": "sRGB",
+          "source_path": "likenesses/schopenhauer/original.jpg"
+        },
+        {
+          "path": "likenesses/schopenhauer/preview-1024.jpg",
+          "sha256": "ffde04f36ed44d5eebb807c17d75d63e2ab65151c0b1f885b9dbb2791d752de8",
+          "bytes": 346681,
+          "width": 801,
+          "height": 1024,
+          "pixels": 820224,
+          "long_edge": 1024,
+          "format": "image/jpeg",
+          "quality": 88,
+          "color_space": "sRGB",
+          "source_path": "likenesses/schopenhauer/original.jpg"
+        }
+      ],
+      "verified_on": "2026-09-14",
+      "source_verification": "Current Commons imageinfo, original link, licence template and file history checked. Holder evidence rechecked where available.",
+      "derivation": "No embedded ICC profile. Source interpreted as sRGB. JPEG previews resized with Lanczos, quality 88, embedded sRGB profile. Original bytes unchanged.",
+      "rights_note": "Holder’s portrait overview identifies maker 1815 and shelfmark. Commons credits the Schopenhauer-Archiv and documents 2018 reduction of yellow striping. This is a faithful reproduction with no separate holder scan release established. Ruhl died 1887.",
+      "source_version": {
+        "file_timestamp": "2018-09-18T19:53:40Z",
+        "commons_revision_id": 1066388485
+      },
+      "source_sha1": "d48d1f55fba32e97f7dc2e50dc9dc41459d2ec84",
+      "honesty_en": "Public domain work. Reproduction from Wikimedia Commons. The museum labels the reproduction, not the painting. Non-profit cultural use.",
+      "honesty_de": "Gemeinfreies Werk. Reproduktion von Wikimedia Commons. Das Museum kennzeichnet die Reproduktion, nicht das Gemälde. Nichtkommerzielle kulturelle Nutzung."
     }
   ]
 }
