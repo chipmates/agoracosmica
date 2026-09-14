@@ -1548,6 +1548,73 @@
       "source_sha1": "15b4fa939a619815b9b51ff382a94725c86e6dd7",
       "honesty_en": "Public domain work. Reproduction from Wikimedia Commons. The museum labels the reproduction, not the photograph. Non-profit cultural use.",
       "honesty_de": "Gemeinfreies Werk. Reproduktion von Wikimedia Commons. Das Museum kennzeichnet die Reproduktion, nicht die Fotografie. Nichtkommerzielle kulturelle Nutzung."
+    },
+    {
+      "id": "lobby/likeness-zenji",
+      "path": "likenesses/zenji/original.png",
+      "sha256": "7f346cae4666640029c8c1bc9e59b095d0247f1afab09e8ab91bf6b5c09c9506",
+      "bytes": 2948713,
+      "width": 900,
+      "height": 1935,
+      "pixels": 1741500,
+      "slug": "zenji",
+      "name": "Dōgen Zenji",
+      "wing": "lobby",
+      "class": "Tier 2",
+      "tier": 2,
+      "licence": "This is a faithful photographic reproduction of a two-dimensional, public domain work of art.",
+      "licence_source_url": "https://commons.wikimedia.org/wiki/File:Soto-Zen-Master-Dogen-Zenji-Portrait.png#Licensing",
+      "licence_location": "Commons file page, Licensing",
+      "holder": "Eiheiji temple, Fukui, Japan",
+      "maker": "Unknown Japanese painter",
+      "date": "16th century, Muromachi period, after a Kamakura-period original",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Soto-Zen-Master-Dogen-Zenji-Portrait.png",
+      "original_url": "https://upload.wikimedia.org/wikipedia/commons/0/09/Soto-Zen-Master-Dogen-Zenji-Portrait.png",
+      "holder_record_url": "https://www.komazawa-u.ac.jp/facilities/museum/files/2024_03_01.pdf",
+      "display": true,
+      "label_en": "Dōgen Zenji (1200–1253). Unknown Japanese painter, 16th century, after a Kamakura-period original. A historic posthumous portrait, Eiheiji temple. Licence: “This is a faithful photographic reproduction of a two-dimensional, public domain work of art.” Public domain work. Reproduction from Wikimedia Commons. The museum labels the reproduction, not the painting. Non-profit cultural use.",
+      "label_de": "Dōgen Zenji (1200–1253). Unbekannter japanischer Maler, 16. Jahrhundert, nach einem Original der Kamakura-Zeit. Historisches posthumes Bildnis, Tempel Eiheiji. Lizenz: „This is a faithful photographic reproduction of a two-dimensional, public domain work of art.“ Gemeinfreies Werk. Reproduktion von Wikimedia Commons. Das Museum kennzeichnet die Reproduktion, nicht das Gemälde. Nichtkommerzielle kulturelle Nutzung.",
+      "previews": [
+        {
+          "path": "likenesses/zenji/preview-512.jpg",
+          "sha256": "4f01165d01bb24d6c9994fd8db56fc8a2ddd81b50ab96755de1bcbeaaa919861",
+          "bytes": 53039,
+          "width": 238,
+          "height": 512,
+          "pixels": 121856,
+          "long_edge": 512,
+          "format": "image/jpeg",
+          "quality": 88,
+          "color_space": "sRGB",
+          "source_path": "likenesses/zenji/original.png"
+        },
+        {
+          "path": "likenesses/zenji/preview-1024.jpg",
+          "sha256": "95c32fd3d895dbf55f73e0d97bc8f36905c294c41648392558f908df135dd01b",
+          "bytes": 197610,
+          "width": 476,
+          "height": 1024,
+          "pixels": 487424,
+          "long_edge": 1024,
+          "format": "image/jpeg",
+          "quality": 88,
+          "color_space": "sRGB",
+          "source_path": "likenesses/zenji/original.png"
+        }
+      ],
+      "verified_on": "2026-09-14",
+      "source_verification": "Current Commons imageinfo, original link, licence template and file history checked. Holder evidence rechecked where available.",
+      "derivation": "No embedded ICC profile. Source interpreted as sRGB. JPEG previews resized with Lanczos, quality 88, embedded sRGB profile. Original bytes unchanged.",
+      "licence_url": "https://commons.wikimedia.org/wiki/Commons:Reuse_of_PD-Art_photographs",
+      "rights_note": "Public domain work. Reproduction from Wikimedia Commons. The museum labels the reproduction, not the painting. Non-profit cultural use.",
+      "attribution": "Unknown Japanese painter, 16th century. Eiheiji temple; reproduction from Wikimedia Commons, PD-Art.",
+      "source_version": {
+        "file_timestamp": "2021-08-22T00:18:58Z",
+        "commons_revision_id": 1153622525
+      },
+      "source_sha1": "4cfe20ee52b75632712ee35446b982a43a539910",
+      "honesty_en": "Public domain work. Reproduction from Wikimedia Commons. The museum labels the reproduction, not the painting. Non-profit cultural use.",
+      "honesty_de": "Gemeinfreies Werk. Reproduktion von Wikimedia Commons. Das Museum kennzeichnet die Reproduktion, nicht das Gemälde. Nichtkommerzielle kulturelle Nutzung."
     }
   ]
 }
