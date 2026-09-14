@@ -17,6 +17,9 @@
 // Used by cost.mjs and gates.mjs. It is also the measurement itself:
 //   node forge/settle.mjs <port> lobby [--frames=20] [--runs=5]
 //   node forge/settle.mjs <port> wing vinci --station=courtyard --tier=standard
+//   node forge/settle.mjs <port> wing vinci --station=arrival --cold
+//     --cold    read the first station the moment the app answers, with no
+//               warm up at all: what the gates used to sample
 //     --trace   one line per window instead of the series: the shape of the
 //               reading against the clock
 //     --sweep   stand at every station in turn and print what each costs
@@ -158,6 +161,24 @@ export async function steadyCost(page, { frames = WINDOW_FRAMES, holds = HOLDS, 
   }
 }
 
+/* THE COLD FIRST STATION. The first thing a run measures is a scene that has
+   just been built: sets still in flight, shaders still compiling. The
+   courtyard has read 183 draws and 1.5 M triangles that way. So the first
+   station is stood at until the scene is steady before any number is
+   believed, and the cold reading is kept beside the warm one. */
+export async function warmScene(page, opts = {}) {
+  const cold = await settledCost(page, opts.frames ?? WINDOW_FRAMES)
+  const warm = await steadyCost(page, opts)
+  return {
+    warmed: warm.steady.held,
+    ms: warm.steady.ms,
+    frames: warm.steady.frames,
+    pending: warm.steady.pending,
+    cold: { draws: cold.draws, triangles: cold.triangles },
+    warm,
+  }
+}
+
 /* ----------------------------------------------------------- the instrument
    Everything below runs only when this file is the one that was called. */
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
@@ -165,7 +186,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   // a value written with a space reads as a positional word and the run
   // measures something nobody asked for, so a named flag takes its value
   // with an equals sign and a bare one is refused unless it is a switch
-  const SWITCHES = new Set(['trace', 'sweep'])
+  const SWITCHES = new Set(['cold', 'trace', 'sweep'])
   const named = new Map()
   const words = []
   for (const a of argv) {
@@ -191,6 +212,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const station = flag('station', '')
   const frames = Number(flag('frames', WINDOW_FRAMES))
   const runs = Number(flag('runs', 1))
+  const COLD = named.has('cold')
   // one line per window instead of the whole series: the shape of a scene
   // that is still shedding work, against the clock
   const TRACE = named.has('trace')
@@ -220,15 +242,26 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     })
     await page.goto(url)
     await page.waitForFunction(() => Boolean(window.__forge))
-    await page.waitForTimeout(1800)
+    if (!COLD) await page.waitForTimeout(1800)
     const stamp = await assertBackend(page)
     assertAdapter(firstLine, process.env['FORGE_BACKEND'] ?? 'webgpu')
     if (stamp.tier !== tier) throw new Error(`asked for tier=${tier}, the app stamped ${stamp.tier}`)
     if (station) {
       const took = await page.evaluate((s) => window.__forge.station?.(s) ?? false, station)
       if (!took) throw new Error(`the frame would not stand at ${station}`)
-      await page.waitForTimeout(1200)
+      if (!COLD) await page.waitForTimeout(1200)
     }
+    if (!COLD) {
+      const w = await warmScene(page, { frames })
+      console.log(
+        `warm up: ${w.warmed ? 'settled' : 'NEVER SETTLED'} after ${w.frames} frames / ${w.ms} ms, ` +
+          `${w.pending} set(s) pending, cold ${w.cold.draws} draws / ${w.cold.triangles} tris, ` +
+          `warm ${w.warm.draws} / ${w.warm.triangles}`
+      )
+    } else {
+      console.log(`cold: the first reading, no warm up, ${await page.evaluate(() => window.__forge.state?.().texturesPending ?? 0)} set(s) pending`)
+    }
+
     if (SWEEP) {
       const ids = await page.evaluate(() => window.__forge.state?.().stationIds ?? [])
       console.log(`${'station'.padEnd(20)}${'draws'.padStart(7)}${'tris'.padStart(10)}${'cold'.padStart(7)}${'first'.padStart(7)}${'s'.padStart(7)}  steady`)

@@ -17,7 +17,7 @@
 //                the owner's frame rate)
 import { chromium } from 'playwright'
 import { spawn } from 'node:child_process'
-import { steadyCost } from './settle.mjs'
+import { steadyCost, warmScene } from './settle.mjs'
 import {
   assertAdapter,
   assertBackend,
@@ -69,6 +69,13 @@ try {
     assertAdapter(line, process.env['FORGE_BACKEND'] ?? 'webgpu')
     if (stamp.tier !== tier) throw new Error(`asked for tier=${tier}, the app stamped ${stamp.tier}`)
 
+    // no stage is read on a cold scene: the first one is stood at until the
+    // count stops moving, and what it cost cold is printed beside it
+    const warm = await warmScene(page, { ms: SETTLE_CAP })
+    console.log(
+      `warm up: ${warm.warmed ? `steady after ${(warm.ms / 1000).toFixed(1)} s` : `NEVER STEADY in ${(warm.ms / 1000).toFixed(1)} s`}` +
+        `, cold ${warm.cold.draws} draws / ${warm.cold.triangles} tris, steady ${warm.warm.draws} / ${warm.warm.triangles}`
+    )
     const budget = await page.evaluate(() => window.__forge.cost().budget)
     console.log(
       `${tier.toUpperCase()}  budget ${budget.draws} draws / ` +

@@ -45,7 +45,7 @@ import { chromium } from 'playwright'
 import { spawn } from 'node:child_process'
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { basename, join, resolve } from 'node:path'
-import { steadyCost } from './settle.mjs'
+import { steadyCost, warmScene } from './settle.mjs'
 import {
   APP_ROOT,
   assertAdapter,
@@ -230,7 +230,12 @@ async function measure(browser, tier, vp) {
   // the walk happens where a hand may turn the gaze, which is the lobby's
   // one place for it; a wing walks its own rail, station by station
   const ids = await stand(page)
-  await page.waitForTimeout(1600)
+  /* THE FIRST SAMPLE IS NOT TAKEN ON A COLD SCENE. The courtyard has read
+     183 draws and 1.5 M triangles seconds after a load and 71 once it
+     stood, so the run stands at the first station until the count stops
+     moving and keeps the cold reading beside it. */
+  if (ids.length) await page.evaluate((s) => window.__forge.station?.(s), ids[0])
+  const warm = await warmScene(page, { ms: STATION_MS })
 
   /* EVERY STATION, AT THIS TIER. A wing whose last room is cheap and whose
      third is not has no honest single number, so each station is stood at
@@ -278,7 +283,7 @@ async function measure(browser, tier, vp) {
   const unsteady = Object.entries(stations)
     .filter(([, c]) => c.steady?.held === false)
     .map(([id]) => id)
-  return { tier, viewport: vp.tag, adapter, backend: stamp.backend, cost: worst, walk: walked, refresh, unsteady, stations, missed, problems, ids }
+  return { tier, viewport: vp.tag, adapter, backend: stamp.backend, cost: worst, walk: walked, warm, refresh, unsteady, stations, missed, problems, ids }
 }
 
 /** one tier, said in full: the settled numbers, what the scene cost before
@@ -287,7 +292,9 @@ function costLine(name, r) {
   return (
     `  ${name.padEnd(10)} ${r.cost.draws} draws  ${r.cost.triangles} tris  ${r.cost.frameMB} MB frame  ` +
     `${r.cost.textureMB} MB texture  p50 ${r.cost.frameMsP50} ms  p95 ${r.cost.frameMsP95} ms` +
-    `\n             refresh ${r.refresh.frames} frame(s) +${r.refresh.draws} draws` +
+    `\n             cold ${r.warm.cold.draws} draws / ${r.warm.cold.triangles} tris, steady after ` +
+    `${(r.warm.ms / 1000).toFixed(1)} s${r.warm.warmed ? '' : ' (NEVER STEADY)'}` +
+    `  |  refresh ${r.refresh.frames} frame(s) +${r.refresh.draws} draws` +
     (r.unsteady.length ? `  |  still moving at: ${r.unsteady.join(', ')}` : '')
   )
 }
