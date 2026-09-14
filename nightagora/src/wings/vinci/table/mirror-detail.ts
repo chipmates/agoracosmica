@@ -8,14 +8,14 @@ const COPY = {
     heading: 'The same ink, reversed',
     original: 'Facsimile detail',
     mirrored: 'Mirrored reading detail',
-    note: 'Enlarged detail · the complete facsimile remains above',
+    note: 'Enlarged detail · the complete facsimile remains on the table',
     unavailable: 'Detail unavailable',
   },
   de: {
     heading: 'Dieselbe Tinte, gespiegelt',
     original: 'Faksimile-Detail',
     mirrored: 'Gespiegeltes Lesedetail',
-    note: 'Vergrößertes Detail · das vollständige Faksimile bleibt darüber',
+    note: 'Vergrößertes Detail · das vollständige Faksimile liegt auf dem Tisch',
     unavailable: 'Detail nicht verfügbar',
   },
 }

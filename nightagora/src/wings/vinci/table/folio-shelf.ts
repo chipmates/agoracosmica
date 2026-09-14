@@ -1,15 +1,23 @@
-import { BoxGeometry, CanvasTexture, ClampToEdgeWrapping, Group, LinearFilter, Matrix4, Mesh, MeshStandardNodeMaterial, PlaneGeometry, Quaternion, SRGBColorSpace, Vector3, type BufferGeometry, type Material, type Texture } from 'three/webgpu'
+import { BoxGeometry, CanvasTexture, ClampToEdgeWrapping, CylinderGeometry, Group, LinearFilter, Matrix4, Mesh, MeshStandardNodeMaterial, PlaneGeometry, Quaternion, SRGBColorSpace, Vector3, type BufferGeometry, type Material, type Texture } from 'three/webgpu'
+import { float, texture as textureNode } from 'three/tsl'
+import type { Node } from 'three/webgpu'
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js'
 import type { ManifestIndex } from '../../../manifest'
 import { FAMOUS_FOLIOS, folioKey, type PageRecord } from './content'
 import { createPageStream } from './stream'
 
 const RECIPE_ID = 'vinci/table-folio-shelf'
-const CARD_WIDTH = 0.065
-const CARD_HEIGHT = 0.085
-const FRAME_WIDTH = 0.076
-const FRAME_HEIGHT = 0.097
-const TILT = -0.78
+/* BIGGER PLATES IN HEAVIER FRAMES. At 6.5 by 8.5 cm behind a three
+   millimetre edge the eight studies read as stamps on a desktop and as blurs
+   on a phone; a museum rack carries a frame you can see. */
+const CARD_WIDTH = 0.073
+const CARD_HEIGHT = 0.096
+const FRAME_WIDTH = 0.088
+const FRAME_HEIGHT = 0.112
+const FRAME_EDGE = 0.0062
+// The rack leans its plates back toward the lamp: at 45 degrees they took a
+// seventh of the key and read as grey stamps.
+const TILT = -0.95
 const ATLAS_SIZE = 1024
 const CELL_WIDTH = 256
 const CELL_HEIGHT = 512
@@ -20,7 +28,7 @@ const CELL_HEIGHT = 512
  */
 export function buildFolioShelf(
   pages: PageRecord[], manifest: ManifestIndex,
-  materials: { wood: Material; backing: Material },
+  materials: { wood: Material; fitting: Material; light: Node<'float'> },
 ) {
   const records = FAMOUS_FOLIOS.map(famous => {
     const record = pages.find(page => page.page_kind === 'facsimile' && folioKey(page) === `B:${famous.folio}`)
@@ -34,7 +42,7 @@ export function buildFolioShelf(
   object.visible = false
   object.userData['manifestId'] = RECIPE_ID
   object.userData['assetClass'] = 'GENERATED'
-  const oakParts: BufferGeometry[] = [], backingParts: BufferGeometry[] = []
+  const oakParts: BufferGeometry[] = []
   const ownedGeometry: BufferGeometry[] = []
   const cardCenters: Vector3[] = []
   const failures = new Set<string>()
@@ -56,28 +64,33 @@ export function buildFolioShelf(
     timber(0.012, 0.008, 0.237, x, -0.0005, -0.339)
     timber(0.012, 0.091, 0.014, x, 0.045, -0.434)
   }
-  timber(0.444, 0.009, 0.077, 0, 0.024, -0.273)
-  timber(0.444, 0.009, 0.077, 0, 0.094, -0.400)
-  timber(0.444, 0.012, 0.006, 0, 0.0345, -0.232)
-  timber(0.444, 0.012, 0.006, 0, 0.1045, -0.359)
+  timber(0.444, 0.009, 0.077, 0, 0.019, -0.273)
+  timber(0.444, 0.009, 0.077, 0, 0.089, -0.400)
+  timber(0.444, 0.012, 0.006, 0, 0.0295, -0.232)
+  timber(0.444, 0.012, 0.006, 0, 0.0995, -0.359)
+  /* THE PICTURE LIGHT. Two brackets off the back rail and a tube over the
+     top row: the reason the eight plates are brighter than the wall behind
+     them. Its falloff is carried by the card material. */
+  for (const x of [-0.168, 0.168]) timber(0.010, 0.056, 0.010, x, 0.186, -0.452)
 
   for (let index = 0; index < records.length; index++) {
     const row = Math.floor(index / 4), column = index % 4
-    const center = new Vector3((column - 1.5) * 0.102, row ? 0.137 : 0.067, row ? -0.400 : -0.273)
+    const center = new Vector3((column - 1.5) * 0.106, row ? 0.139 : 0.069, row ? -0.400 : -0.273)
     const transform = new Matrix4().compose(center, rotation, unit)
-    const backing = new BoxGeometry(FRAME_WIDTH, FRAME_HEIGHT, 0.0024)
-    backing.applyMatrix4(transform)
-    backingParts.push(backing)
+    // the mat behind a plate is the frame's own rebate, in the frame's timber
+    const rebate = new BoxGeometry(FRAME_WIDTH, FRAME_HEIGHT, 0.0024)
+    rebate.applyMatrix4(transform)
+    oakParts.push(rebate)
 
     for (const x of [-1, 1]) {
-      const edge = new BoxGeometry(0.003, FRAME_HEIGHT, 0.0028)
-      edge.translate(x * (FRAME_WIDTH - 0.003) / 2, 0, 0.0015)
+      const edge = new BoxGeometry(FRAME_EDGE, FRAME_HEIGHT, 0.0052)
+      edge.translate(x * (FRAME_WIDTH - FRAME_EDGE) / 2, 0, 0.0026)
       edge.applyMatrix4(transform)
       oakParts.push(edge)
     }
     for (const y of [-1, 1]) {
-      const edge = new BoxGeometry(FRAME_WIDTH - 0.006, 0.003, 0.0028)
-      edge.translate(0, y * (FRAME_HEIGHT - 0.003) / 2, 0.0015)
+      const edge = new BoxGeometry(FRAME_WIDTH - FRAME_EDGE * 2, FRAME_EDGE, 0.0052)
+      edge.translate(0, y * (FRAME_HEIGHT - FRAME_EDGE) / 2, 0.0026)
       edge.applyMatrix4(transform)
       oakParts.push(edge)
     }
@@ -85,9 +98,19 @@ export function buildFolioShelf(
     cardCenters.push(center.clone().add(new Vector3(0, 0, 0.0014).applyQuaternion(rotation)))
   }
 
+  const fittingTube = new CylinderGeometry(0.0068, 0.0068, 0.352, 14, 1)
+  fittingTube.rotateZ(Math.PI / 2)
+  fittingTube.translate(0, 0.209, -0.440)
+  ownedGeometry.push(fittingTube)
+  const fitting = new Mesh(fittingTube, materials.fitting)
+  fitting.name = 'rack-picture-light'
+  fitting.userData['manifestId'] = RECIPE_ID
+  fitting.userData['assetClass'] = 'GENERATED'
+  object.add(fitting)
+  timber(0.364, 0.011, 0.030, 0, 0.2205, -0.4455)
+
   for (const [parts, material, name] of [
     [oakParts, materials.wood, 'oak-folio-rack-and-frames'],
-    [backingParts, materials.backing, 'folio-card-backs'],
   ] as const) {
     const geometry = mergeGeometries(parts, false)
     parts.forEach(part => part.dispose())
@@ -155,7 +178,10 @@ export function buildFolioShelf(
     atlas.userData['assetClass'] = 'GENERATED'
     atlas.userData['sourcePages'] = sources
     atlas.userData['sourceManifestIds'] = sources.map(source => source.manifestId)
-    cardMaterial = new MeshStandardNodeMaterial({ color: '#ffffff', roughness: 1, metalness: 0, envMapIntensity: 0.15, map: atlas })
+    cardMaterial = new MeshStandardNodeMaterial({ color: '#ffffff', roughness: 1, metalness: 0, envMapIntensity: 0.34, map: atlas })
+    // the top row stands closest to the tube and reads brightest; the bottom
+    // row falls off, which is what says the light has a place
+    cardMaterial.colorNode = textureNode(atlas).mul(float(materials.light).mul(1.02).add(0.08))
     const cards = new Mesh(geometry, cardMaterial)
     cards.name = 'eight-shelf-facsimiles'
     cards.receiveShadow = true

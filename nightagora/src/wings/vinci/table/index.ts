@@ -1,4 +1,5 @@
 import { BoxGeometry, DoubleSide, Group, Mesh, MeshStandardNodeMaterial, type Texture, type Camera, type Scene } from 'three/webgpu'
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js'
 import { frontFacing, texture, uv, vec2 } from 'three/tsl'
 import type { Stack } from '../../../stack'
 import type { ManifestIndex } from '../../../manifest'
@@ -14,6 +15,9 @@ export type { PageRecord } from './content'
 
 /** A room imports this module unchanged. It owns placement and light; the
  * module owns its independent sheets, manifested pixels and reading controls. */
+/** how far the reading copy's mount is raked back from the table, in radians */
+const MOUNT_RAKE = 0.384
+
 export function buildTable(stack: Stack, pages: PageRecord[], manifest: ManifestIndex) {
   if (pages.length !== 438) throw new Error('The table requires the complete 438-record edition')
   const furniture = buildFurniture(stack)
@@ -28,19 +32,28 @@ export function buildTable(stack: Stack, pages: PageRecord[], manifest: Manifest
   const facing = new MeshStandardNodeMaterial({ color: '#ffffff', roughness: 1, envMapIntensity: 0.12, side: DoubleSide })
   const reflected = new MeshStandardNodeMaterial({ color: '#ffffff', roughness: 1, envMapIntensity: 0.12, side: DoubleSide })
   const turningMaterial = new MeshStandardNodeMaterial({ color: '#ffffff', roughness: 1, envMapIntensity: 0.12, side: DoubleSide })
+  /* THE PAGE SITS INSIDE THE LAMP'S FALLOFF LIKE EVERYTHING ELSE ON THE
+     TABLE. A spread lit dead flat across 34 cm is a scan, not a page under a
+     reading lamp: the near leaf keeps the plate's own tone and the far one
+     loses about a quarter of it, which is what the eye reads as one light in
+     a dark room. The plate's colour is untouched; only the light on it. */
+  const pagePool = furniture.pool.mul(0.55).add(0.45)
   // Keep the program graph stable when the admitted page texture changes.
   const frontSample = texture()
   const facingSample = texture(undefined, vec2(uv().x.oneMinus(), uv().y))
   const reflectedSample = texture(undefined, vec2(uv().x.oneMinus(), uv().y))
-  front.colorNode = frontSample
-  facing.colorNode = facingSample
-  reflected.colorNode = reflectedSample
+  front.colorNode = frontSample.mul(pagePool)
+  facing.colorNode = facingSample.mul(pagePool)
+  reflected.colorNode = reflectedSample.mul(pagePool)
   const turnFront = texture()
   const turnBack = texture(undefined, vec2(uv().x.oneMinus(), uv().y))
-  turningMaterial.colorNode = frontFacing.select(turnFront, turnBack)
+  turningMaterial.colorNode = frontFacing.select(turnFront, turnBack).mul(pagePool)
   const right = new Mesh(leafGeometry(), front)
   right.name = 'open-facsimile-plate'
-  right.castShadow = right.receiveShadow = true
+  /* The resting sheet receives; it does not cast. It lies on its own text
+     block under a raking key, so its shadow falls where nothing can see it,
+     and two cascades of it are four draws of the table's forty. */
+  right.receiveShadow = true
   const left = new Mesh(leafGeometry(), facing)
   bendLeaf(left.geometry, 0, -1)
   left.name = 'facing-edition-page-thumbnail'
@@ -55,16 +68,49 @@ export function buildTable(stack: Stack, pages: PageRecord[], manifest: Manifest
   reflection.position.x = 0.19
   reflection.userData['manifestId'] = 'vinci/table-module'
   reflection.userData['assetClass'] = 'GENERATED'
+  /* THE COPY IS ON A STAND, NOT LOOSE ON THE TABLE. Flat beside the book it
+     read as a third leaf blown there; on a raked mount with a plinth and a
+     lip it is an object a hand placed in the room, which is what "beside it"
+     has to say at a glance. The rake is 22 degrees and not upright: the key
+     stands behind this table, so a plate turned to face the visitor turns its
+     face away from the only light in the room. */
+  const easel = new Group()
+  easel.name = 'reading-copy-mount'
+  easel.rotation.x = MOUNT_RAKE
+  easel.position.y = 0.0125
   const mirrorPage = new Mesh(leafGeometry(), reflected)
   bendLeaf(mirrorPage.geometry, 0, 1, 0)
   mirrorPage.name = 'horizontally-reversed-facsimile'
-  reflection.add(mirrorPage)
-  const frame = new Mesh(new BoxGeometry(0.17, 0.003, 0.243), furniture.materials[4])
-  // The backing's upper face stays below the lowest part of the reading copy.
-  frame.position.set(0.084, PAGE_Y - 0.0035, 0)
-  frame.userData['manifestId'] = 'vinci/table-furniture'
-  frame.userData['assetClass'] = 'GENERATED'
-  reflection.add(frame)
+  easel.add(mirrorPage)
+  const mountParts = [
+    // the matted board the sheet lies on, a centimetre proud on every side
+    linenSupportGeometry(0.187, 0.005, 0.259).translate(0.079, PAGE_Y - 0.0058, 0),
+    // the lip that holds the sheet at the foot of the rake
+    new BoxGeometry(0.187, 0.010, 0.009).translate(0.079, PAGE_Y - 0.0005, 0.1315),
+  ]
+  const mountGeometry = mergeGeometries(mountParts, false)!
+  mountParts.forEach(part => part.dispose())
+  const mount = new Mesh(mountGeometry, furniture.materials[3])
+  mount.receiveShadow = true
+  mount.userData['manifestId'] = 'vinci/table-furniture'
+  mount.userData['assetClass'] = 'GENERATED'
+  easel.add(mount)
+  reflection.add(easel)
+  /* THE PLINTH. The mount's raked foot needs something to stand on, and the
+     block under it is what keeps the whole thing from reading as a sheet
+     propped against nothing. */
+  const plinthParts = [
+    new BoxGeometry(0.196, 0.022, 0.150).translate(0.079, 0.0075, -0.036),
+    new BoxGeometry(0.204, 0.007, 0.262).translate(0.079, -0.0005, 0),
+  ]
+  const plinthGeometry = mergeGeometries(plinthParts, false)!
+  plinthParts.forEach(part => part.dispose())
+  const plinth = new Mesh(plinthGeometry, furniture.materials[1])
+  plinth.name = 'reading-copy-plinth'
+  plinth.receiveShadow = true
+  plinth.userData['manifestId'] = 'vinci/table-furniture'
+  plinth.userData['assetClass'] = 'GENERATED'
+  reflection.add(plinth)
   reflection.visible = false
   object.add(reflection)
   // An isolated reading plate for the narrow bench. It shares the admitted
@@ -79,7 +125,10 @@ export function buildTable(stack: Stack, pages: PageRecord[], manifest: Manifest
   bendLeaf(readingPage.geometry, 0, 1, 0)
   readingPage.castShadow = readingPage.receiveShadow = true
   const readingSupport = new Mesh(linenSupportGeometry(0.174, 0.006, 0.244), furniture.materials[3])
-  readingSupport.position.y = PAGE_Y - 0.004
+  /* THE COCKLE IS 1.6 MM DEEP AT THE FORE EDGE, so a support one millimetre
+     under the sheet's rest plane comes through it wherever the paper dips.
+     Three millimetres of clearance holds every trough. */
+  readingSupport.position.y = PAGE_Y - 0.0063
   readingSupport.receiveShadow = true
   readingSupport.userData['manifestId'] = 'vinci/table-module'
   readingSupport.userData['assetClass'] = 'GENERATED'
@@ -103,7 +152,7 @@ export function buildTable(stack: Stack, pages: PageRecord[], manifest: Manifest
   let cancelPrewarm: (() => void) | null = null, prewarmDraws = 0
   let prewarmPass: { samples: number; colorType: number; textures: number } | null = null
   const panel = createPanel(pages, folio => { void open(folio) })
-  const folioShelf = buildFolioShelf(pages, manifest, {wood: furniture.materials[0]!, backing: furniture.materials[1]!})
+  const folioShelf = buildFolioShelf(pages, manifest, {wood: furniture.materials[0]!, fitting: furniture.materials[7]!, light: furniture.rackLight})
   object.add(folioShelf.object)
   const mirrorDetail = createMirrorDetail()
 
@@ -174,6 +223,7 @@ export function buildTable(stack: Stack, pages: PageRecord[], manifest: Manifest
       sized(tex, mirrorPage)
       stamp(mirrorPage, tex)
       reflection.visible = mirrored && !isClosed
+      furniture.copyContact.value = reflection.visible ? 1 : 0
     }
   }
   function attachLeft(tex: Texture) {
@@ -331,6 +381,7 @@ export function buildTable(stack: Stack, pages: PageRecord[], manifest: Manifest
     right.visible = !on && Boolean(rightTexture)
     moving.visible = !on && turning && !preparing
     reflection.visible = !on && mirrored && Boolean(rightTexture)
+    furniture.copyContact.value = reflection.visible ? 1 : 0
     panel.element.hidden = on
   }
   async function open(folio: string): Promise<void> {
@@ -432,7 +483,9 @@ export function buildTable(stack: Stack, pages: PageRecord[], manifest: Manifest
     ready = prepareTurn(dir)
   }
   function update(now = performance.now()) {
-    folioShelf.setVisible(!panel.shelf.hidden && !isClosed && !paperOnlyMode)
+    const rackStands = !panel.shelf.hidden && !isClosed && !paperOnlyMode
+    folioShelf.setVisible(rackStands)
+    furniture.shelfContact.value = rackStands ? 1 : 0
     if (!turning || preparing || held || !spread) return
     turnProgress = Math.max(0, Math.min(1, (now - started) / 1000))
     poseTurn(turnProgress)
@@ -462,6 +515,7 @@ export function buildTable(stack: Stack, pages: PageRecord[], manifest: Manifest
     }
     mirrored = on
     reflection.visible = on && !isClosed && Boolean(rightTexture)
+    furniture.copyContact.value = reflection.visible ? 1 : 0
   }
   function holdTurn(progress = 0.5) {
     ready = prepareTurn(1, Math.max(0, Math.min(1, progress)))
@@ -476,6 +530,7 @@ export function buildTable(stack: Stack, pages: PageRecord[], manifest: Manifest
       folio: pages[index]?.folio, side: pages[index]?.side, codex: pages[index]?.codex,
       file: pages[index]?.file, editionIndex: index, total: pages.length,
       turn: { active: turning, preparing, progress: turnProgress, direction, targetEditionIndex: targetIndex, editionFacesPerLeaf: 2, durationMs: 1000, lastObservedMs: lastTurnMs, heldForInspection: held, warming: warming !== null, prewarmed, prewarmError, prewarmDraws, prewarmPass, prewarmMethod: 'resting-sheet-through-room-post' },
+      carriers: furniture.carriers(),
       closed: isClosed, mirror: mirrored, presentation: paperOnlyMode ? 'single-plate' : 'spread', detailCanvasMB: mirrorDetail.bytes() / (1024*1024), textureMB: stream.textureMB() + folioShelf.textureMB() + furniture.textureMB(),
       pending: stream.pending() + folioShelf.pending() + furniture.library.pending() + Number(preparing) + Number(warming !== null), errors: [...stream.errors(), ...folioShelf.errors()],
       physicalReference: LEAF,
