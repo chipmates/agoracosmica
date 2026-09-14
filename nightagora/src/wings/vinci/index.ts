@@ -92,9 +92,19 @@ const SHADOW={nearHalfM:20,nearMapPx:1024,aheadM:10,refocusM:3,lightDistanceM:80
 export function createWing():WingModule {
   let hosts:WingHosts|undefined, shell:Group, water:WaterGroup, measurement:VinciMeasurement, labels:VinciLabelAnchor
   let rail:ReturnType<typeof createRail>, key:ReturnType<WingHosts['world']['stack']['light']>
-  let station=0, activeView='', mode:VinciLabelMode=1, controller:AbortController|undefined
+  // THE CARD NAMES WHERE THE VISITOR IS. `station` is the station asked for,
+  // `card` is the one actually standing: while the walk is on the way the
+  // frame keeps the card of the place it is still in.
+  let station=0, card=0, activeView='', mode:VinciLabelMode=1, controller:AbortController|undefined
   let header:HTMLElement,dock:HTMLElement,record:HTMLElement,source:HTMLButtonElement,sky:SkyMesh
   let labelHostHidden:string|null=null
+  // THE WAIT AT THE STREET SHOWS ITSELF. The heading is painted and the frame
+  // is given to the browser before the place is built, so the visitor stands
+  // at a named station instead of at nothing; a measured hairline says how
+  // much of the stone has landed, and a station asked for before the rail's
+  // own proof is verified is placed rather than queued and lost.
+  let standing=false, scheduled=0, sign:HTMLElement|undefined, plates=0
+  let authority:ReturnType<typeof createRailGeometryAuthority>|undefined
   let shadowCache:ReturnType<typeof createStaticShadowCache>|undefined
   let restoreEnvironmentRotation:(()=>void)|null=null
   const narrow=()=>innerWidth/innerHeight<=.9
@@ -110,10 +120,19 @@ export function createWing():WingModule {
     key.light.position.copy(key.direction).multiplyScalar(SHADOW.lightDistanceM).add(shadowFocus)
     key.light.target.updateMatrixWorld();key.light.updateMatrixWorld()
   }
-  function init(h:WingHosts) {
+  /** The heading, the hairline and nothing else: cheap enough to paint in the
+   * frame the visitor arrives in. */
+  function mount(h:WingHosts) {
     // Vinci's interactive source cards need an accessible host only while mounted.
     labelHostHidden=h.labels.getAttribute('aria-hidden');h.labels.removeAttribute('aria-hidden')
     hosts=h;h.stage.textContent='';h.labels.textContent='';h.stage.parentElement!.dataset['wing']='vinci';const style=make('style','');style.textContent=wingCss;h.stage.append(style)
+    header=make('div','vinci-heading');h.stage.append(header)
+    sign=make('div','vinci-opening');sign.append(make('span','vinci-opening-fill'));h.stage.append(sign)
+  }
+  function schedule() { scheduled=requestAnimationFrame(()=>{scheduled=requestAnimationFrame(build)}) }
+  function build() {
+    scheduled=0
+    const h=hosts!
     const {scene,camera,stack,clock}=h.world
     camera.near=.25;camera.updateProjectionMatrix()
     scene.clear();scene.background=new Color('#b3b7ac');scene.fog=new FogExp2('#c0bba9',.0075)
@@ -166,15 +185,18 @@ export function createWing():WingModule {
     water=createWater(scene,stack);scene.add(water)
     shadowCache=createStaticShadowCache(scene,camera,stack.renderer,()=>stack.materials.pending())
     for(const root of scene.children){const id=root===shell?'vinci/shell':root.name==='vinci/shell-shadow'?'vinci/shell-shadow':root.name==='wing-vinci/gate-passage'?'vinci/gate-passage':root===water?'vinci/water':root===sky?'vinci/sky':root.name.includes('landscape trees')?'vinci/vegetation':root.name==='vinci/collection-modern-insertion'?'vinci/collection':root.name==='vinci generated road dressing'?'vinci/road-dressing':root.name==='vinci generated inner court dressing'?'vinci/inner-court':root.name.includes('dressing')?'vinci/ground-dressing':'vinci/terrain';root.traverse(o=>{if(o instanceof Mesh){const assetId=typeof o.userData['manifestId']==='string'?o.userData['manifestId']:id;o.userData['manifestId']=assetId;o.userData['asset']=assetId}})}
-    rail=createRail(camera,clock,createRailGeometryAuthority(collectRailSolids(scene)));measurement=createMeasurement(h.labels,stack)
-    header=make('div','vinci-heading');h.stage.append(header)
-    source=make('button','vinci-source',lang()==='de'?'Quellen':'Sources');source.append(make('kbd','vinci-key','L'));source.type='button';source.setAttribute('aria-controls','vinci-source-card');source.addEventListener('click',()=>{mode=mode===2?1:2;paintDock();if(mode===2)dock.focus({preventScroll:true})});h.stage.parentElement!.querySelector('.wing-rail-group')!.append(source)
+    authority=createRailGeometryAuthority(collectRailSolids(scene))
+    rail=createRail(camera,clock,authority);measurement=createMeasurement(h.labels,stack)
+    source=make('button','vinci-source',lang()==='de'?'Quellen':'Sources');source.type='button';source.setAttribute('aria-keyshortcuts','l');source.setAttribute('aria-controls','vinci-source-card');source.addEventListener('click',()=>{mode=mode===2?1:2;paintDock();if(mode===2)dock.focus({preventScroll:true})});h.stage.parentElement!.querySelector('.wing-rail-group')!.append(source)
     dock=make('aside','vinci-dock');setRegister(dock,'drawer');dock.id='vinci-source-card';dock.tabIndex=0;dock.setAttribute('aria-label',lang()==='de'?'Quellen und Rekonstruktion':'Sources and reconstruction');h.labels.append(dock)
     labels=createVinciLabelAnchor({host:h.labels,camera,occluders:collectVinciLabelOccluders(scene),onOpen:()=>{mode=2;paintDock();dock.focus({preventScroll:true})}})
     controller=new AbortController();const options={signal:controller.signal}
     let touchX=0,touchY=0,lastX=0,lastY=0,dragging=false,pointer=-1
     const wheelStep=createWheelStepper(()=>performance.now())
-    h.stage.addEventListener('wheel',(e)=>{if(e.ctrlKey||e.defaultPrevented||(e.target as Element).closest('.vinci-dock,.wing-rail-group'))return;e.preventDefault();const step=wheelStep(e.deltaY,e.deltaMode,innerHeight);if(step)h.navigate(station+step)},{...options,passive:false})
+    // A notch asks for the next station AND walks a stride along the leg that
+    // is under way, so a visitor who keeps scrolling keeps moving instead of
+    // waiting the walk out, and the station asked for is never lost.
+    h.stage.addEventListener('wheel',(e)=>{if(e.ctrlKey||e.defaultPrevented||(e.target as Element).closest('.vinci-dock,.wing-rail-group'))return;e.preventDefault();const step=wheelStep(e.deltaY,e.deltaMode,innerHeight);if(!step)return;rail.stride(1);h.navigate(station+step)},{...options,passive:false})
     h.stage.addEventListener('pointerdown',(e)=>{if(!e.isPrimary||e.button!==0||(e.target as Element).closest('button,a,input,textarea,select,.vinci-dock,.wing-rail-group'))return;e.preventDefault();dragging=true;pointer=e.pointerId;touchX=lastX=e.clientX;touchY=lastY=e.clientY;h.stage.setPointerCapture(e.pointerId)},options)
     h.stage.addEventListener('pointermove',(e)=>{if(!dragging||pointer!==e.pointerId)return;rail.drag(e.clientX-lastX,e.clientY-lastY,h.stage.getBoundingClientRect().height);lastX=e.clientX;lastY=e.clientY},options)
     h.stage.addEventListener('pointerup',(e)=>{if(!dragging||pointer!==e.pointerId)return;dragging=false;pointer=-1;if(e.pointerType==='touch'&&Math.abs(e.clientY-touchY)>65&&Math.abs(e.clientY-touchY)>Math.abs(e.clientX-touchX)*1.3)h.navigate(station+(e.clientY<touchY?1:-1))},options)
@@ -192,23 +214,67 @@ export function createWing():WingModule {
       if(e.key==='ArrowLeft'||e.key==='ArrowUp'){e.preventDefault();h.navigate(station-1)}
     },options)
     window.addEventListener('resize',()=>{placeCanonicalStation();paintDock()},options)
+    standing=true
+    plates=stack.materials.pending()
+    card=station
+    const s=vinciContent[card]!
+    aimPrint(s.id);rail.set(s.id,stationPose(s.id,narrow()),true,narrow());paintHeader();paintDock()
+    if(pendingView){const id=pendingView;pendingView='';showView(id)}
   }
+  /** True once the rail's own geometry proof has resolved: before that the
+   * rail cannot walk a certified route, so a station is placed instead. */
+  const railReady=()=>authority?.status==='verified'
+  /** A station is WALKED to when a visitor asks for it. Two callers are not
+   * a visitor: the rail's proof is not verified yet, or an address is being
+   * composed as a still (the marker the eye writes while it lands a state),
+   * which is a cut to a station and never a walk through the gate. */
+  const cutToStation=()=>!railReady()||document.body.dataset['forge']==='pending'
   // Named inspection entry and return are paired deliberate placements.
   // Their off-rail eye never becomes the start of an animated station route.
-  /** The card names what the frame holds: a sub-view carries its own title. */
+  /** A named composition at the standing station. Asked for before the place
+   * is built it is remembered, so the eye never shoots the plain station
+   * believing it shot a corner. */
+  let pendingView=''
+  function showView(id:string) {
+    const inspectCost=id.endsWith('-cost')&&id!=='audit-cost';if(inspectCost)id=id.slice(0,-5);const s=vinciContent[card]!;if(id==='scene')endInspection();if(id==='scene'||id.startsWith('audit-'))rail.look(0,0);if(id==='scene'||id==='audit-cost'){mode=1;paintDock()}if(id==='audit-cost')measurement.show(s.id);if(id==='audit-ui'){mode=1;paintDock();measurement.show(s.id,'ui')}if(id==='audit-ui-labels'){mode=2;paintDock();measurement.show(s.id,'ui')}const pose=namedPose(id,narrow());if(pose){activeView=id;mode=1;paintDock();rail.set(s.id,pose,true,narrow());header.querySelector('.vinci-insertion')?.remove();titleForView(id);if(id.startsWith('collection'))header.append(make('p','vinci-insertion',lang()==='de'?'Museumseinbau der Gegenwart · Räume im Bau':'Modern museum insertion · Rooms in construction'))}const cone=/(?:^|-)cone-(ul|ur|dl|dr)$/.exec(id);if(cone){placeCanonicalStation();rail.look(cone[1]!.includes('l')?.6:-.6,cone[1]!.startsWith('u')?.32:-.32)}if(id==='labels'||id==='hour'||id==='record'){mode=2;paintDock();if(id==='record'){dock.querySelector<HTMLButtonElement>('.vinci-record-toggle')?.click();dock.scrollTop=record.offsetTop-18}}if(inspectCost&&(pose||cone))measurement.show(`${s.id} / ${id}`)
+  }
+  /** The door asks about the place the visitor is standing in, so the
+   * question travels with the card and not with the rail mark. */
+  function paintQuestion() {
+    const q=hosts?.stage.parentElement?.querySelector('.wing-question')
+    if(q)q.textContent=text(vinciContent[card]!.door)
+  }
+  function paintHeader() {
+    const index=card,s=vinciContent[index]!
+    header.textContent=''
+    header.append(make('p','vinci-kicker',stationKicker()),make('h1','vinci-title',text(s.name)))
+    if(s.outdoor)header.append(make('p','vinci-hour',text(vinciHourSpoken)))
+    if(!s.outdoor){header.classList.add('vinci-construction');header.append(make('p','vinci-status',text(vinciConstructionStatus)),make('p','vinci-promise',text(s.promise)));if(s.id==='hall')header.append(make('p','vinci-threshold',text(vinciThreshold)))}
+    else header.classList.remove('vinci-construction')
+  }
+  /** The card names what the frame holds: a sub-view carries its own title.
+   * THE NUMBER COUNTS STATIONS. Two frames could otherwise read the same
+   * count under two titles, so a named sub-view drops the count and says
+   * which station it is a view from. */
   function titleForView(viewId:string) {
-    const s=vinciContent[station]!
+    const s=vinciContent[card]!
     const name=vinciViewNames[viewId]??(viewId.startsWith('collection')?vinciViewNames['collection']:undefined)
     const h1=header.querySelector('.vinci-title')
     if(h1)h1.textContent=text(name??s.name)
+    const kicker=header.querySelector('.vinci-kicker')
+    if(kicker)kicker.textContent=name?viewKicker():stationKicker()
   }
+  const stationNumber=()=>String(card+1).padStart(2,'0')
+  const certainty=()=>vinciContent[card]!.outdoor?' · '+text(vinciCertaintyWords.reconstructed):''
+  const stationKicker=()=>`CLOS LUCE, 1517 · ${stationNumber()} / 19${certainty()}`
+  const viewKicker=()=>`CLOS LUCE, 1517 · ${lang()==='de'?'BLICK VON STATION':'A VIEW FROM STATION'} ${stationNumber()}${certainty()}`
   function aimPrint(id:VinciStationId):void {
     if(!hosts)return
     const {scene,camera,stack}=hosts.world
     stack.setScene(scene,camera,{...PRINT,exposure:STATION_EXPOSURE[id]??PRINT.exposure})
   }
   function placeCanonicalStation() {
-    const id=vinciContent[station]!.id
+    const id=vinciContent[card]!.id
     activeView='';measurement.hide();header.querySelector('.vinci-insertion')?.remove();titleForView('')
     rail.set(id,stationPose(id,narrow()),true,narrow())
   }
@@ -244,7 +310,7 @@ export function createWing():WingModule {
   }
   function paintDock() {
     if(!hosts)return
-    const s=vinciContent[station]!,scroll=dock.scrollTop
+    const s=vinciContent[card]!,scroll=dock.scrollTop
     header.hidden=mode===2
     const camera=hosts.world.camera
     dock.dataset['station']=s.id
@@ -318,10 +384,39 @@ export function createWing():WingModule {
   }
   return {
     stations:vinciContent.map(s=>({id:s.id,name:text(s.name),question:text(s.door)})),
-    show(index,h){const first=!hosts;if(first)init(h);else endInspection();if(station!==index)dock.scrollTop=0;station=index;activeView='';measurement.hide();const s=vinciContent[index]!;aimPrint(s.id);rail.set(s.id,stationPose(s.id,narrow()),first,narrow());header.textContent='';header.append(make('p','vinci-kicker',`CLOS LUCE, 1517 · ${String(index+1).padStart(2,'0')} / 19${s.outdoor?' · '+text(vinciCertaintyWords.reconstructed):''}`),make('h1','vinci-title',text(s.name)));if(s.outdoor)header.append(make('p','vinci-hour',text(vinciHourSpoken)));if(!s.outdoor){header.classList.add('vinci-construction');header.append(make('p','vinci-status',text(vinciConstructionStatus)),make('p','vinci-promise',text(s.promise)));if(s.id==='hall')header.append(make('p','vinci-threshold',text(vinciThreshold)))}else header.classList.remove('vinci-construction');paintDock()},
-    view(id){const inspectCost=id.endsWith('-cost')&&id!=='audit-cost';if(inspectCost)id=id.slice(0,-5);const s=vinciContent[station]!;if(id==='scene')endInspection();if(id==='scene'||id.startsWith('audit-'))rail.look(0,0);if(id==='scene'||id==='audit-cost'){mode=1;paintDock()}if(id==='audit-cost')measurement.show(s.id);if(id==='audit-ui'){mode=1;paintDock();measurement.show(s.id,'ui')}if(id==='audit-ui-labels'){mode=2;paintDock();measurement.show(s.id,'ui')}const pose=namedPose(id,narrow());if(pose){activeView=id;mode=1;paintDock();rail.set(s.id,pose,true,narrow());header.querySelector('.vinci-insertion')?.remove();titleForView(id);if(id.startsWith('collection'))header.append(make('p','vinci-insertion',lang()==='de'?'Museumseinbau der Gegenwart · Räume im Bau':'Modern museum insertion · Rooms in construction'))}const cone=/(?:^|-)cone-(ul|ur|dl|dr)$/.exec(id);if(cone){placeCanonicalStation();rail.look(cone[1]!.includes('l')?.6:-.6,cone[1]!.startsWith('u')?.32:-.32)}if(id==='labels'||id==='hour'||id==='record'){mode=2;paintDock();if(id==='record'){dock.querySelector<HTMLButtonElement>('.vinci-record-toggle')?.click();dock.scrollTop=record.offsetTop-18}}if(inspectCost&&(pose||cone))measurement.show(`${s.id} / ${id}`)},
-    look(y,p){rail?.look(y,p)},
-    update(){if(!hosts)return;measurement.update();rail.update();focusNearCascade();shadowCache?.update();sky.position.copy(hosts.world.camera.position);labels.update(dock.hidden?null:dock.getBoundingClientRect())},
-    stop(){shadowCache?.dispose();shadowCache=undefined;restoreEnvironmentRotation?.();restoreEnvironmentRotation=null;controller?.abort();source?.remove();labels?.dispose();measurement?.dispose();water?.dispose();hosts?.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key?.light)o.dispose()});key?.dispose();if(hosts){hosts.world.scene.traverse(o=>{if(o instanceof Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose()}});hosts.world.scene.clear();delete hosts.stage.parentElement!.dataset['wing'];if(labelHostHidden===null)hosts.labels.removeAttribute('aria-hidden');else hosts.labels.setAttribute('aria-hidden',labelHostHidden)}hosts=undefined},
+    show(index,h){
+      if(!hosts){mount(h);station=index;paintHeader();schedule();return}
+      // A station asked for before the place is built is remembered, not lost.
+      if(!standing){station=card=index;paintHeader();return}
+      endInspection();if(station!==index)dock.scrollTop=0;station=index;activeView='';measurement.hide()
+      const s=vinciContent[index]!,cut=cutToStation()
+      rail.set(s.id,stationPose(s.id,narrow()),cut,narrow())
+      // On a walk the card changes when the visitor arrives, not when the
+      // rail mark is pressed: a title that names the next room over the room
+      // you are still standing in is a lie the frame tells.
+      if(cut||rail.navigation.completed===s.id){card=index;dock.scrollTop=0;aimPrint(s.id);paintHeader();paintDock()}
+    },
+    view(id){if(!standing){pendingView=id;return}showView(id)},
+    look(y,p){if(standing)rail.look(y,p)},
+    update(){
+      if(!hosts)return
+      if(!standing)return
+      if(sign){
+        // The hairline is a measure, not a spinner: it is the share of the
+        // place's own plates that has landed.
+        const left=hosts.world.stack.materials.pending()
+        plates=Math.max(plates,left)
+        const done=plates?1-left/plates:1
+        sign.style.setProperty('--vinci-opening',String(done))
+        if(!left&&railReady()){sign.remove();sign=undefined}
+      }
+      measurement.update();rail.update()
+      const here=rail.navigation.completed
+      if(here&&here!==vinciContent[card]!.id&&!activeView){
+        const arrived=vinciContent.findIndex(s=>s.id===here)
+        if(arrived>=0){card=arrived;dock.scrollTop=0;aimPrint(here);paintHeader();paintDock();paintQuestion()}
+      }
+      focusNearCascade();shadowCache?.update();sky.position.copy(hosts.world.camera.position);labels.update(dock.hidden?null:dock.getBoundingClientRect())},
+    stop(){if(scheduled)cancelAnimationFrame(scheduled);scheduled=0;standing=false;sign=undefined;shadowCache?.dispose();shadowCache=undefined;restoreEnvironmentRotation?.();restoreEnvironmentRotation=null;controller?.abort();source?.remove();labels?.dispose();measurement?.dispose();water?.dispose();hosts?.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key?.light)o.dispose()});key?.dispose();if(hosts){hosts.world.scene.traverse(o=>{if(o instanceof Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose()}});hosts.world.scene.clear();delete hosts.stage.parentElement!.dataset['wing'];if(labelHostHidden===null)hosts.labels.removeAttribute('aria-hidden');else hosts.labels.setAttribute('aria-hidden',labelHostHidden)}hosts=undefined},
   }
 }

@@ -88,11 +88,23 @@
   .vinci-heading:not(.vinci-construction) .vinci-hour {margin-top:6px;font-size:10px;line-height:1.5;letter-spacing:.01em;}
 }
 
-/* The drawer's key rides the desktop rail; a phone has no keyboard to hint at. */
-.vinci-key {display:inline-block;margin-left:8px;padding:1px 5px 2px;border:1px solid #a9977388;border-radius:2px;color:#cdbfa4;font:9px/1 var(--sans);letter-spacing:.06em;vertical-align:baseline;}
 @media(max-aspect-ratio:9/10) {
-  .vinci-key {display:none;}
   /* the two-line title wants its own measure, not the card's last pixel */
   .vinci-heading:not(.vinci-construction) {padding-right:16px;}
   .vinci-heading:not(.vinci-construction) .vinci-title {max-width:320px;}
+}
+
+/* THE WAIT AT THE STREET. A measured hairline under the heading: the share of
+   this place's own plates that has landed. It is a measure, so it never
+   animates on its own and it is gone the moment the stone is standing. */
+.vinci-opening {position:absolute;left:46px;top:104px;width:212px;height:1px;background:#bea17333;pointer-events:none;}
+.vinci-opening-fill {display:block;height:100%;width:calc(var(--vinci-opening,0) * 100%);background:#d2a557;transition:width .5s linear;}
+@media(max-aspect-ratio:9/10) { .vinci-opening {left:18px;top:66px;width:150px;} }
+
+/* The phone's heading is the smallest block that still holds the whole hour. */
+@media(max-aspect-ratio:9/10) {
+  .vinci-heading:not(.vinci-construction) {max-width:min(310px,calc(100vw - 36px));padding:6px 12px 8px;}
+  .vinci-heading:not(.vinci-construction) .vinci-title {margin-top:3px;font-size:21px;line-height:1.08;max-width:286px;}
+  .vinci-heading:not(.vinci-construction) .vinci-kicker {font-size:7.5px;letter-spacing:.1em;}
+  .vinci-heading:not(.vinci-construction) .vinci-hour {margin-top:4px;font-size:9.5px;}
 }
