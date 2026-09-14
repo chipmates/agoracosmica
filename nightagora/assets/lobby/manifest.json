@@ -99,6 +99,66 @@
       "rights_note": "Ancient public-domain marble work → independently made 2012 photograph → its photographer PierreSelim explicitly releases that photograph under CC0 on Commons. The photograph of a 3D object has its own open dedication; this does not rely on PD-Art. The Louvre record gives loan number L.2007.49. The source filename’s L.2008.49 is retained only to identify the exact file.",
       "attribution": "Unknown Roman sculptor; Musée du Louvre, MR 561. Photograph: Pierre-Selim Huard / Wikimedia Commons, CC0 1.0.",
       "accession": "MR 561; Ma 1166; Louvre loan number L.2007.49"
+    },
+    {
+      "id": "lobby/likeness-bingen",
+      "path": "likenesses/bingen/original.jpg",
+      "sha256": "a2c02e58eb0f96ba08453adf62bb5d327ec977334ba63ba127ea61a9ddcc70da",
+      "bytes": 3573314,
+      "width": 2843,
+      "height": 3988,
+      "pixels": 11337884,
+      "slug": "bingen",
+      "name": "Hildegard von Bingen",
+      "wing": "lobby",
+      "class": "Tier 1",
+      "tier": 1,
+      "licence": "This file is licensed under the Creative Commons Attribution 4.0 International license.",
+      "licence_source_url": "https://commons.wikimedia.org/wiki/File:Hildegard,_receiving_the_light_from_Heaven._Wellcome_M0005630.jpg#Licensing",
+      "licence_location": "Commons file page, Licensing; the holder article independently repeats CC BY 4.0 for this image",
+      "holder": "Wellcome Collection, London (photographic reproduction); original Rupertsberg codex formerly in Wiesbaden, now missing",
+      "maker": "Unknown Rupertsberg illuminator; printed facsimile reproduced by an unrecorded Wellcome photographer",
+      "date": "Rupertsberg Scivias miniature, c. 1175; facsimile published in 1917–1921; Wellcome photograph dated 19 August 1938",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Hildegard,_receiving_the_light_from_Heaven._Wellcome_M0005630.jpg",
+      "original_url": "https://upload.wikimedia.org/wikipedia/commons/6/64/Hildegard%2C_receiving_the_light_from_Heaven._Wellcome_M0005630.jpg",
+      "holder_record_url": "https://wellcomecollection.org/works/wnnsc2zf",
+      "display": true,
+      "label_en": "Hildegard von Bingen (1098–1179), receiving divine light. Unknown illuminator, Rupertsberg Scivias codex, c. 1175. A visionary author image, preserved here through a facsimile published in 1917–21 and a Wellcome photograph of 1938. Wellcome Collection, M0005630. This file is licensed under the Creative Commons Attribution 4.0 International license.",
+      "label_de": "Hildegard von Bingen (1098–1179) empfängt göttliches Licht. Unbekannter Buchmaler, Rupertsberger Scivias-Kodex, um 1175. Visionäres Autorenbild, hier überliefert durch ein 1917–21 veröffentlichtes Faksimile und eine Wellcome-Fotografie von 1938. Wellcome Collection, M0005630. This file is licensed under the Creative Commons Attribution 4.0 International license.",
+      "previews": [
+        {
+          "path": "likenesses/bingen/preview-512.jpg",
+          "sha256": "bb77e2892a4e0985d6094dbc5a2fd6d8892b74c5ee77281c0871a82b20e7cad9",
+          "bytes": 56854,
+          "width": 365,
+          "height": 512,
+          "pixels": 186880,
+          "long_edge": 512,
+          "format": "image/jpeg",
+          "quality": 88,
+          "color_space": "sRGB",
+          "source_path": "likenesses/bingen/original.jpg"
+        },
+        {
+          "path": "likenesses/bingen/preview-1024.jpg",
+          "sha256": "957539def4faebc5b8abac2d4d62998c581d99d44f1f15c1ee8428273459c3a8",
+          "bytes": 233610,
+          "width": 730,
+          "height": 1024,
+          "pixels": 747520,
+          "long_edge": 1024,
+          "format": "image/jpeg",
+          "quality": 88,
+          "color_space": "sRGB",
+          "source_path": "likenesses/bingen/original.jpg"
+        }
+      ],
+      "verified_on": "2026-09-14",
+      "source_verification": "Current source record and exact downloaded original checked on admission.",
+      "derivation": "Converted embedded ICC profile to sRGB. JPEG previews resized with Lanczos, quality 88, embedded sRGB profile. Original bytes unchanged.",
+      "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+      "rights_note": "Public-domain medieval miniature → printed facsimile published in Singer 1917–21 → Wellcome photographic reproduction → Wellcome release under CC BY 4.0, recorded on Commons and explicitly repeated for this image in the holder’s own article.",
+      "attribution": "Hildegard receiving the light from Heaven. Wellcome Collection, M0005630 / Wikimedia Commons, CC BY 4.0."
     }
   ]
 }
