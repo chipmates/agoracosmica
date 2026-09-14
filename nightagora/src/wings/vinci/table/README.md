@@ -153,8 +153,21 @@ GPU texture residency, in addition to the retained source thumbnails. Its
 generated recipe and per-card metadata retain each source page, manifest ID,
 licence, source dimensions, atlas cell and index range. Showing the rack
 never requests a 2K plate. Additional Codex Atlanticus records admitted to
-the merged store are not added to this runtime shelf. The Codex on the
-Flight of Birds remains a named absence.
+the merged store are not added to this runtime shelf.
+
+The panel's shelf opens with the codex register in `data/codices.json`.
+Every codex the rights policy admits is named with its holder, its tier and
+one measured sentence about what part of it exists: the two manuscripts the
+1883 edition carries open the reader at their first leaf, the rest state
+that they are recorded and show one page cut from a plate already in the
+store. Each named absence, the Leicester among them, is one line with its
+holder and the reason. The eight named leaves keep their own list below the
+register. The register is data, not a reader: opening a recorded volume in
+the book is not wired, and the page maps beside it
+(`madrid-i-pages.json`, `madrid-ii-pages.json`, `birds-pages.json`,
+`trivulzianus-pages.json`, `paris-a-pages.json`, `atlanticus-pages.json`,
+`arundel-pages.json`) are provenance the shelf never reads. Their page kinds
+come from measurements recorded on each page, not from a folio claim.
 
 Italian and French use exact text nodes from the map. Unusable/null Italian
 is displayed as the grey unavailable notice. OCR errors, historical
