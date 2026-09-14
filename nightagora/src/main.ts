@@ -11,7 +11,8 @@ import { ambience } from './core/ambience'
 import { WANDERERS } from './content/wanderers'
 import { CONSTELLATIONS, SKY_INVITE } from './content/constellations'
 import { channel, EASE } from './core/motion'
-import { mediaUrl } from './content/media'
+import { PANE_SHARED, paneWords } from './content/panes'
+import { loadLikenesses, paneLikeness, type LikenessRecord } from './content/likenesses'
 import { createStack } from './stack'
 import type { GradeName } from './stack/grade'
 import { isTierName, type TierName } from './stack/tier'
@@ -300,17 +301,61 @@ function stepChapter(dir: number): void {
 
 const paneKicker = paneEl.querySelector('.pane-kicker') as HTMLElement | null
 const paneName = paneEl.querySelector('.pane-name') as HTMLElement | null
-const paneTradition = paneEl.querySelector('.pane-tradition') as HTMLElement | null
 const paneYears = paneEl.querySelector('.pane-years') as HTMLElement | null
-const panePromise = paneEl.querySelector('.pane-promise') as HTMLElement | null
+const paneLine = paneEl.querySelector('.pane-line') as HTMLElement | null
+const paneNone = paneEl.querySelector('.pane-none') as HTMLElement | null
+const paneState = paneEl.querySelector('.pane-state') as HTMLElement | null
 const paneEnter = paneEl.querySelector('.pane-enter') as HTMLButtonElement | null
-const paneDrawn = paneEl.querySelector('.pane-drawn') as HTMLElement | null
 const paneSiblings = paneEl.querySelector('.pane-siblings') as HTMLElement | null
+const paneFigure = paneEl.querySelector('.pane-portrait') as HTMLElement | null
 const panePortrait = paneEl.querySelector('.pane-portrait img') as HTMLImageElement | null
+const paneCredit = paneEl.querySelector('.pane-credit') as HTMLElement | null
+const paneCreditLine = paneEl.querySelector('.pane-credit-line') as HTMLElement | null
+const paneCreditNote = paneEl.querySelector('.pane-credit-note') as HTMLElement | null
 const paneClose = paneEl.querySelector('.pane-close') as HTMLButtonElement | null
 const paneLibrary = paneEl.querySelector('.pane-library') as HTMLAnchorElement | null
 /** whose pane is open, which is also whose museum the button enters */
 let paneSlug = ''
+/* THE LIKENESSES, once. Null until the store's record has arrived: a pane
+   opened before it lands hangs nothing and says nothing about a likeness,
+   rather than claiming there is none. */
+let likenesses: Map<string, LikenessRecord> | null = null
+void loadLikenesses().then((held) => {
+  likenesses = held
+  if (paneOpen) openPane(paneSlug)
+})
+
+/** the pane's plate: the store's likeness with its credit, or the name
+    alone with the one honest line. Never a placeholder picture. */
+function hangLikeness(slug: string, name: string): void {
+  const record = likenesses?.get(slug)
+  const hang = record ? paneLikeness(record, lang()) : null
+  if (panePortrait) {
+    if (hang) {
+      panePortrait.src = hang.src
+      panePortrait.srcset = hang.srcset
+      panePortrait.width = hang.width
+      panePortrait.height = hang.height
+      panePortrait.alt = name
+    } else {
+      panePortrait.removeAttribute('srcset')
+      panePortrait.removeAttribute('src')
+      panePortrait.alt = ''
+    }
+  }
+  if (paneCredit && hang) paneCredit.dataset['naAnchor'] = hang.id
+  if (paneCreditLine) paneCreditLine.textContent = hang?.credit ?? ''
+  if (paneCreditNote) paneCreditNote.textContent = hang?.note ?? ''
+  if (paneFigure) paneFigure.hidden = !hang
+  // the honest line only once the store has spoken: no likeness arrived yet
+  // and no likeness exists are not the same thing
+  const none = likenesses !== null && !hang
+  if (paneNone) {
+    paneNone.hidden = !none
+    paneNone.textContent = none ? say(PANE_SHARED.nameOnly) : ''
+  }
+  paneEl.classList.toggle('name-only', none)
+}
 
 function openPane(slug: string): void {
   const ci = CONSTELLATIONS.findIndex((c) => c.stars.some((s) => s.slug === slug))
@@ -325,25 +370,24 @@ function openPane(slug: string): void {
     atlas.setChapter(ci)
     setPlate()
   }
-  if (paneKicker) paneKicker.textContent = `Constellation ${c.numeral} · ${c.name}`
+  // the wheel promises only what the register can answer
+  const wing = wingBySlug(slug)
+  const words = paneWords(slug)
+  // the place and the year stand on the pane only where the wing does
+  if (paneKicker) paneKicker.textContent = wing && words?.wing ? say(words.wing) : ''
   if (paneName) paneName.textContent = w.name
-  if (paneTradition) paneTradition.textContent = star.tradition
   if (paneYears) paneYears.textContent = w.years
-  if (panePromise) panePromise.textContent = star.promise
+  if (paneLine) paneLine.textContent = words ? say(words.line) : ''
+  if (paneState) paneState.textContent = say(wing?.status === 'open' ? PANE_SHARED.open : PANE_SHARED.preparing)
+  if (paneEnter) paneEnter.hidden = !wing
   if (paneLibrary) {
     const link = new URL('https://agoracosmica.org/app')
     link.searchParams.set('figure', slug)
     link.searchParams.set('lang', lang())
     paneLibrary.href = link.href
+    paneLibrary.textContent = say(PANE_SHARED.bridge)
   }
-  // the wheel promises only what the register can answer
-  const wing = wingBySlug(slug)
-  if (paneEnter) paneEnter.hidden = !wing
-  if (paneDrawn) paneDrawn.hidden = Boolean(wing)
-  if (panePortrait) {
-    panePortrait.src = mediaUrl(`/images/figures/${slug}/main/900.webp`)
-    panePortrait.alt = `AI-generated portrait of ${w.name}`
-  }
+  hangLikeness(slug, w.name)
   const sibLabel = paneEl.querySelector('.pane-sib-label')
   if (sibLabel) sibLabel.textContent = `Also among the ${c.name}`
   if (paneSiblings) {

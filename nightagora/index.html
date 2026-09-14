@@ -67,11 +67,9 @@
 .plate-voices,
 .inst-kicker,
 .pane-kicker,
-.pane-tradition,
 .pane-years,
-.pane-ink,
 .pane-sib-label,
-.pane-drawn,
+.pane-state,
 .star-chip,
 #sky-invite,
 #chapter-marks,
@@ -684,11 +682,10 @@
     #figure-pane.lit .pane-text > * { opacity: 1; transform: none; }
     #figure-pane .pane-kicker { transition-delay: 0.3s; }
     #figure-pane .pane-name { transition-delay: 0.38s; }
-    #figure-pane .pane-tradition { transition-delay: 0.46s; }
-    #figure-pane .pane-years { transition-delay: 0.52s; }
-    #figure-pane .pane-promise { transition-delay: 0.6s; }
-    #figure-pane .pane-ink { transition-delay: 0.7s; }
-    #figure-pane .pane-enter, #figure-pane .pane-drawn { transition-delay: 0.78s; }
+    #figure-pane .pane-years { transition-delay: 0.46s; }
+    #figure-pane .pane-line { transition-delay: 0.56s; }
+    #figure-pane .pane-none { transition-delay: 0.64s; }
+    #figure-pane .pane-state, #figure-pane .pane-enter { transition-delay: 0.78s; }
     #figure-pane .pane-siblings { transition-delay: 0.88s; }
     body.forge #figure-pane, body.forge #figure-pane .pane-portrait,
     body.forge #figure-pane .pane-text > * { transition: none !important; }
@@ -706,9 +703,23 @@
       max-width: min(980px, calc(100% - 48px));
       padding: 24px;
     }
-    /* the double gold hairline the night's own plates wear */
+    /* a figure with no public-domain likeness: nothing stands in for the
+       picture, so the entry is one column and the name takes the room the
+       plate had. No placeholder, no silhouette. */
+    #figure-pane.name-only .pane-inner { max-width: min(660px, calc(100% - 48px)); }
+    #figure-pane.name-only .pane-name { font-size: clamp(32px, 4.4vw, 54px); }
+    #figure-pane.name-only .pane-text { padding-left: 0; }
+    #figure-pane.name-only .pane-text::before { display: none; }
+    /* the plate and its credit are one entry: the double gold hairline the
+       night's own plates wear, and the museum's own line under it. The
+       credit is set at reading size and not as a colophon, because it is the
+       only place a visitor is told whose picture this is. */
     .pane-portrait {
       width: clamp(220px, 30vw, 360px); flex: none; margin: 0;
+      display: flex; flex-direction: column; align-items: stretch;
+    }
+    .pane-portrait[hidden] { display: none; }
+    .pane-frame {
       border: 1px solid color-mix(in srgb, var(--na-gold) 45%, transparent);
       padding: 7px;
       background: rgba(2, 3, 7, 0.4);
@@ -718,6 +729,21 @@
       display: block; width: 100%; height: auto;
       border: 1px solid color-mix(in srgb, var(--na-gold) 22%, transparent);
     }
+    .pane-credit {
+      margin-top: 13px;
+      font-family: var(--sans);
+      font-size: 10.5px; line-height: 1.62;
+      letter-spacing: 0.012em;
+      color: color-mix(in srgb, var(--na-mist) 88%, transparent);
+      text-wrap: pretty;
+    }
+    .pane-credit-line, .pane-credit-note { display: block; }
+    /* the honesty sentence stands apart from the credit it qualifies */
+    .pane-credit-note {
+      margin-top: 7px;
+      color: color-mix(in srgb, var(--na-mist) 66%, transparent);
+    }
+    .pane-credit-note:empty { display: none; }
     /* on a wide stage the entry is a catalogue page: the plate, a hairline,
        then everything the plate is. The rule is what makes the two halves
        one entry instead of two objects sharing a gap. */
@@ -746,44 +772,38 @@
       letter-spacing: 0.008em;
       color: var(--na-starlight);
     }
-    .pane-tradition {
-      margin-top: 10px;
-      font-family: var(--sans);
-      font-size: 10px; letter-spacing: 0.3em;
-      text-transform: uppercase; color: var(--na-gold);
-    }
     .pane-years {
-      margin-top: 5px;
+      margin-top: 12px;
       font-family: var(--sans);
       font-size: 9px; letter-spacing: 0.26em;
       color: color-mix(in srgb, var(--na-mist) 92%, transparent);
     }
-    /* the one sentence a visitor came for */
-    .pane-promise {
-      margin-top: 24px;
-      font-family: var(--serif); font-style: italic;
-      font-size: clamp(17px, 1.9vw, 22px); line-height: 1.48;
+    /* who this was and what they made: the one or two sentences a visitor
+       came for, set as reading text and not as a promise */
+    .pane-line {
+      margin-top: 22px;
+      font-family: var(--serif);
+      font-size: clamp(16px, 1.55vw, 19px); line-height: 1.56;
       color: var(--na-starlight);
-      max-width: 30ch;
+      max-width: 40ch;
     }
-    /* the colophon, set as a colophon: under its own hairline, with the
-       measure taken off it. Capped at 40ch it broke into three stubs, which
-       is what a colophon must never look like (round 1). */
-    .pane-ink {
+    /* the pane of a figure with no public-domain likeness: the name stands
+       alone and this line says why. It takes the plate's place, so it takes
+       the plate's own hairline with it. */
+    .pane-none {
       position: relative;
-      margin-top: 22px; padding-top: 16px;
+      margin-top: 24px; padding-top: 16px;
       font-family: var(--sans);
-      font-size: 8px; letter-spacing: 0.24em; line-height: 1.9;
-      text-transform: uppercase;
-      color: color-mix(in srgb, var(--na-mist) 86%, transparent);
-      max-width: 40ch; text-wrap: balance;
-      margin-left: auto; margin-right: auto;
+      font-size: 10.5px; line-height: 1.62;
+      letter-spacing: 0.012em;
+      color: color-mix(in srgb, var(--na-mist) 82%, transparent);
+      max-width: 42ch; text-wrap: pretty;
     }
-    .pane-ink::before {
+    .pane-none::before {
       content: ''; position: absolute; top: 0; left: 0;
       width: 34px; height: 1px; background: var(--rule-faint);
     }
-    .pane-text .pane-ink { margin-left: 0; margin-right: 0; max-width: none; }
+    .pane-none[hidden] { display: none; }
     .pane-sib-label {
       margin-top: 30px;
       font-family: var(--sans);
@@ -792,7 +812,7 @@
       color: color-mix(in srgb, var(--na-gold) 74%, transparent);
     }
     .pane-enter {
-      display: inline-block; margin-top: 28px;
+      display: inline-block; margin-top: 18px;
       background: none; cursor: pointer;
       border: 1px solid color-mix(in srgb, var(--na-gold) 45%, transparent);
       min-height: 44px; padding: 13px 28px;
@@ -802,14 +822,14 @@
     }
     .pane-enter:hover, .pane-enter:focus-visible { border-color: var(--na-gold); color: var(--na-starlight); outline: none; }
     .pane-enter[hidden] { display: none; }
-    .pane-drawn {
+    /* what the register says about this figure's wing tonight */
+    .pane-state {
       margin-top: 26px;
       font-family: var(--sans);
       font-size: 9px; letter-spacing: 0.28em;
       text-transform: uppercase;
       color: color-mix(in srgb, var(--na-mist) 86%, transparent);
     }
-    .pane-drawn[hidden] { display: none; }
     /* the others of his constellation, set as a register and not as a stack
        of links: two columns, one name to a line, each one taking its rule
        when a hand is on it */
@@ -860,7 +880,8 @@
         gap: 20px; max-height: 100%; overflow-y: auto;
         padding: 84px 24px 40px;
       }
-      .pane-portrait { width: min(52vw, 240px); }
+      .pane-portrait { width: 100%; }
+      .pane-frame { width: min(52vw, 240px); }
       /* the phone gives the register the whole column and tightens the set
          so the longest name still holds its own line */
       .pane-siblings { gap: 0 12px; width: 100%; }
@@ -1050,8 +1071,7 @@
       /* the contract is the one surface on this frame a visitor must read
          to the end, so it keeps its measure and gives up its margins */
 
-      .pane-ink { font-size: 8px; letter-spacing: 0.2em; }
-      .pane-tradition { letter-spacing: 0.26em; }
+      .pane-credit, .pane-none { font-size: 10.5px; line-height: 1.7; letter-spacing: 0.008em; }
 
       .inst-links button, .inst-links a { font-size: 9.5px; letter-spacing: 0.22em; text-indent: 0.22em; }
 
@@ -1117,17 +1137,22 @@
   <div id="figure-pane" hidden>
     <button class="pane-close" type="button">Back to the sky</button>
     <div class="pane-inner">
-      <figure class="pane-portrait" data-na-claim="inferred" data-na-anchor="lobby/figure-portraits" data-na-anchor-class="GENERATED"><img alt="" /></figure>
+      <figure class="pane-portrait" hidden>
+        <div class="pane-frame"><img alt="" sizes="(max-width: 700px) 52vw, 360px" /></div>
+        <figcaption class="pane-credit" data-na-claim="documented" data-na-anchor-class="PD-ART">
+          <span class="pane-credit-line"></span>
+          <span class="pane-credit-note"></span>
+        </figcaption>
+      </figure>
       <div class="pane-text">
         <p class="pane-kicker"></p>
         <h2 class="pane-name" data-na-claim="documented" data-na-anchor="lobby/register" data-na-anchor-class="procedural"></h2>
-        <p class="pane-tradition"></p>
         <p class="pane-years"></p>
-        <p class="pane-promise"></p>
-        <p class="pane-ink" data-na-claim="tradition" data-na-disclosure="ink" data-na-anchor="lobby/figure-portraits" data-na-anchor-class="GENERATED">An AI Echo · An interpretation, not a recording</p>
+        <p class="pane-line"></p>
+        <p class="pane-none" hidden></p>
+        <p class="pane-state"></p>
         <button class="pane-enter" type="button" hidden>Enter the museum</button>
-        <p class="pane-drawn" hidden>This world is still being drawn</p>
-        <a class="pane-library" data-lobby="library" href="https://agoracosmica.org/app?lang=en" target="_blank" rel="noopener">Agora Cosmica, the library</a>
+        <a class="pane-library" href="https://agoracosmica.org/app?lang=en" target="_blank" rel="noopener">Talk to them in the library</a>
         <p class="pane-sib-label"></p>
         <div class="pane-siblings"></div>
       </div>
