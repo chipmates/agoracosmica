@@ -252,6 +252,12 @@
     /* the title card is the only beat with the frame to itself, so it stands
        at the optical centre instead of the questions' band */
     .descent-beat:first-of-type { top: 34%; }
+    /* the wide stage carries the question higher: the map fills the frame
+       below it from the middle of the fall on, and a question printed over
+       the rim is a caption. The tall stage keeps its own band. */
+    @media (min-aspect-ratio: 9/10) {
+      .descent-beat { top: 22%; }
+    }
     .descent-ask {
       max-width: 24em; margin: 0 auto;
       font-family: var(--serif); font-style: normal;

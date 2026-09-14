@@ -620,6 +620,51 @@ const dLead = channel([
   { p: 0.78, v: 0.26 },
   { p: 0.90, v: 0, e: 'sineInOut' },
 ])
+/* THE NARROW STAGE FLIES THE SAME RIDE FROM FURTHER OUT. A 46 degree
+   vertical frame is three times narrower across at 390 than at 1512, so the
+   wide stage's flight path cuts the map at both edges for the whole middle
+   of the fall. These two channels are the phone's own flight: the ride steps
+   back far enough for the silhouette to CLOSE, and the gaze rides above the
+   plate so the mass sits low and the question keeps its air. Both give way
+   before the handover, where the platform is the floor and not a shape. */
+const dFitTall = channel([
+  { p: 0.14, v: 1 },
+  { p: 0.27, v: 1.96, e: 'sineInOut' },
+  { p: 0.45, v: 1.86 },
+  { p: 0.62, v: 1.78 },
+  { p: 0.78, v: 1.60, e: 'sineInOut' },
+  { p: 0.90, v: 1, e: 'sineInOut' },
+])
+const dLiftTall = channel([
+  { p: 0.16, v: 0 },
+  { p: 0.30, v: 2.6, e: 'sineInOut' },
+  { p: 0.52, v: 2.9 },
+  { p: 0.70, v: 1.4, e: 'sineInOut' },
+  { p: 0.84, v: 0, e: 'sineInOut' },
+])
+/* and the wide stage steps IN. At 1512 the map held a third of the frame for
+   the whole middle of the fall, which left the picture to the empty field
+   around it; the ride comes as close as the question band allows and the
+   growth runs from a third of the frame to the whole of it. */
+const dFitWide = channel([
+  { p: 0.14, v: 1 },
+  { p: 0.30, v: 0.80, e: 'sineInOut' },
+  { p: 0.66, v: 0.82 },
+  { p: 0.80, v: 0.92, e: 'sineInOut' },
+  { p: 0.90, v: 1, e: 'sineInOut' },
+])
+const dLiftWide = channel([
+  { p: 0.16, v: 0 },
+  { p: 0.30, v: 3.3, e: 'sineInOut' },
+  { p: 0.55, v: 1.8 },
+  { p: 0.72, v: 0.6, e: 'sineInOut' },
+  { p: 0.84, v: 0, e: 'sineInOut' },
+])
+/** 0 on a wide stage, 1 on a phone held upright */
+function tallness(): number {
+  const a = innerWidth / innerHeight
+  return Math.min(1, Math.max(0, (1.15 - a) / (1.15 - 0.46)))
+}
 const descentLook = new Vector3()
 const descentAhead = new Vector3()
 function descentPos(k: number, out: Vector3): Vector3 {
@@ -636,7 +681,10 @@ function mapScale(): number {
   return Math.min(1, innerWidth / innerHeight / 1.05)
 }
 function descentCamera(k: number): void {
-  const ms = mapScale()
+  const tall = tallness()
+  const fit = dFitWide(k) + (dFitTall(k) - dFitWide(k)) * tall
+  const lift = dLiftWide(k) + (dLiftTall(k) - dLiftWide(k)) * tall
+  const ms = mapScale() * fit
   descentPos(k, camera.position).multiplyScalar(ms)
   descentLook.set(dLookX(k), dLookY(k), dLookZ(k))
   const lead = dLead(k)
@@ -647,6 +695,7 @@ function descentCamera(k: number): void {
     descentLook.lerp(descentAhead, lead)
   }
   descentLook.multiplyScalar(ms)
+  descentLook.y += lift
   camera.lookAt(descentLook)
 }
 
