@@ -197,11 +197,72 @@ function extrudeProfile(part: PartSpec, tier: TierName): BufferGeometry {
   return geometry
 }
 
-function exactMesh(part: PartSpec): BufferGeometry {
+/** THE SAIL IS A SAMPLED HELICOID, NOT A SET OF PLATES. The dossier gives the
+ * linen as a grid of points on one helical surface, ordered along the spiral.
+ * Read in cylindrical coordinates with the turn unwrapped along that order,
+ * the surface has a parameter pair a cloth really has: out from the mast, and
+ * along the spiral. Two things follow, and both of them are the fan of fine
+ * lines the frame showed at a grazing angle. The map: a per-vertex projection
+ * onto whichever plane a vertex most faces switches plane in the middle of a
+ * triangle, and the map's own derivative then beats against the pixel grid.
+ * The mesh: between two samples the true surface turns, and the chord does
+ * not. A midpoint taken in these coordinates sits exactly on the same
+ * helicoid at the same radius and the same pitch, so no dimension moves.
+ */
+interface Helicoid { points: number[][]; radius: number[]; turn: number[]; faces: number[][] }
+function readHelicoid(vertices: Coordinates, faces: Coordinates): Helicoid {
+  const points: number[][] = [], radius: number[] = [], turn: number[] = []
+  let previous = 0
+  for (let i = 0; i < vertices.length; i++) {
+    const v = vertices[i]!
+    const x = at(v, 0), y = at(v, 1), z = at(v, 2)
+    let angle = Math.atan2(x, z)
+    while (angle - previous > Math.PI) angle -= TAU
+    while (previous - angle > Math.PI) angle += TAU
+    previous = angle
+    points.push([x, y, z])
+    radius.push(Math.hypot(x, z))
+    turn.push(angle)
+  }
+  return {points, radius, turn, faces: faces.map(f => [at(f, 0), at(f, 1), at(f, 2)])}
+}
+function densifyOnHelicoid(surface: Helicoid, levels: number): Helicoid {
+  const {points, radius, turn} = surface
+  let triangles = surface.faces
+  for (let level = 0; level < levels; level++) {
+    const middles = new Map<string, number>()
+    const middle = (a: number, b: number): number => {
+      const key = a < b ? `${a}:${b}` : `${b}:${a}`
+      const known = middles.get(key)
+      if (known !== undefined) return known
+      const r = (radius[a]! + radius[b]!) / 2, angle = (turn[a]! + turn[b]!) / 2
+      const index = points.length
+      points.push([r * Math.sin(angle), (points[a]![1]! + points[b]![1]!) / 2, r * Math.cos(angle)])
+      radius.push(r); turn.push(angle)
+      middles.set(key, index)
+      return index
+    }
+    const split: number[][] = []
+    for (const [a, b, c] of triangles) {
+      const ab = middle(a!, b!), bc = middle(b!, c!), ca = middle(c!, a!)
+      split.push([a!, ab, ca], [ab, b!, bc], [ca, bc, c!], [ab, bc, ca])
+    }
+    triangles = split
+  }
+  return {points, radius, turn, faces: triangles}
+}
+
+function exactMesh(part: PartSpec, helical = false, tier: TierName = 'standard'): BufferGeometry {
   const s = typeof part.shape === 'string' ? undefined : part.shape
-  const vertices = s?.vertices_m ?? part.dimensions_m.vertices
-  const faces = s?.faces ?? part.dimensions_m.faces
+  let vertices = s?.vertices_m ?? part.dimensions_m.vertices
+  let faces = s?.faces ?? part.dimensions_m.faces
   if (!vertices || !faces) throw new Error(`Missing mesh ${part.id}`)
+  let surface: Helicoid | null = null
+  if (helical) {
+    surface = densifyOnHelicoid(readHelicoid(vertices, faces), count(tier, 2, 1, 0))
+    vertices = surface.points
+    faces = surface.faces
+  }
   const positions = vertices.flatMap(p => [at(p, 0), at(p, 1), at(p, 2)])
   const indices = faces.flatMap(f => [at(f, 0), at(f, 1), at(f, 2)])
   if (s?.thickness_m) {
@@ -230,7 +291,14 @@ function exactMesh(part: PartSpec): BufferGeometry {
   // linen mesh instead retains its smooth indexed normals along each turn.
   if (faces.length <= 10) geometry = geometry.toNonIndexed()
   geometry.computeVertexNormals()
-  metricPlanarUV(geometry, /wood|oak|ash|cane/.test(part.material.class))
+  if (surface) {
+    // Out from the mast, and along the spiral: both in metres, both continuous
+    // over the whole cloth, so the weave runs the way a cut sail's does.
+    const uv: number[] = []
+    for (let i = 0; i < surface.points.length; i++) uv.push(surface.radius[i]!, surface.radius[i]! * surface.turn[i]!)
+    geometry.setAttribute('uv', new Float32BufferAttribute(uv, 2))
+  }
+  else metricPlanarUV(geometry, /wood|oak|ash|cane/.test(part.material.class))
   return geometry
 }
 
@@ -336,7 +404,7 @@ function revolvedProfile(profile: readonly Vector2[], segments: number): BufferG
   return geometry
 }
 
-export function geometryForPart(part: PartSpec, tier: TierName = 'standard'): BufferGeometry {
+export function geometryForPart(part: PartSpec, tier: TierName = 'standard', slug = ''): BufferGeometry {
   const d = part.dimensions_m, s = typeof part.shape === 'string' ? undefined : part.shape
   const kind = s?.type ?? part.shape
   let geometry: BufferGeometry
@@ -373,7 +441,7 @@ export function geometryForPart(part: PartSpec, tier: TierName = 'standard'): Bu
     }
     case 'profile': geometry = extrudeProfile(part, tier); break
     case 'mesh': {
-      geometry = exactMesh(part)
+      geometry = exactMesh(part, slug === 'aerial-screw' && part.id === 'sail', tier)
       if (part.id === 'wind-shield' && /glass/.test(part.material.class)) {
         const outer = geometry
         geometry = createGlassCoverShell(outer, required(d.nominal_thickness, 'nominal_thickness'))

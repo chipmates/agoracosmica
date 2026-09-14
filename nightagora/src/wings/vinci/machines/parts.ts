@@ -377,7 +377,7 @@ export async function buildParts(stack: Stack, dossier: Dossier): Promise<Assemb
         geometry = sweep.geometry
       } else if (dossier.slug === 'flywheel' && part.id === 'spoke-z') {
         geometry = createFlywheelSpokeArms(part, dossier.parts.find(p => p.id === 'spoke-x')!)
-      } else geometry = geometryForPart(part, stack.tierName())
+      } else geometry = geometryForPart(part, stack.tierName(), dossier.slug)
       if (!dynamic.has(part.id)) geometryCache.set(signature, geometry)
       geometries.add(geometry)
     }
