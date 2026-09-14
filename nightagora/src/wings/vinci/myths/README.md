@@ -1,6 +1,6 @@
 # Correction exhibits
 
-Import `createMythDeathbed(materials, plateTexture?)` or
+Import `createMythDeathbed(materials, plateTexture?, language = 'en')` or
 `createMythQuotes(materials, options?)` from this directory. Both return
 `{ group, metadata, dispose }`. The host owns the camera, lights, stage,
 navigation, language controls, accessible reading surface and supplied
@@ -8,10 +8,13 @@ materials/texture. Call `dispose()` when striking an exhibit. It releases
 geometry and the deathbed's internally created paint material; it does not
 release host materials or the supplied texture.
 
-`ExhibitMaterials` contains `stone`, `plaster`, `bronze`, `ink`, `dark`, all
-Three.js `Material`s. The host supplies TSL node materials with three-scale
+`ExhibitMaterials` contains `stone`, `plaster`, `bronze`, `ink`, `dark`, and
+the optional `backing` used by the gallery enclosure, all Three.js
+`Material`s. Without `backing` the enclosure falls back to `dark`. The host supplies TSL node materials with three-scale
 detail. All dimensions are metres; +Y is up and +Z faces the visitor. Static
-construction and geometric letters are welded by material. `?noweld` keeps
+construction and geometric letters are welded by material. Attached text
+retains its front and side geometry while omitting hidden back caps.
+`?noweld` keeps
 the same physical parts separate for a measured A/B.
 
 The returned `group.userData.exhibit` is the same object as `metadata`.
@@ -23,7 +26,7 @@ shallow jointed floor and backing wall; do not add a coincident floor.
 | Export | Contract |
 | --- | --- |
 | `createMythDeathbed` | Creates the measured display carrier, physical frame, wall and full-image surface. |
-| `createMythQuotes` | Creates six desktop records or one mobile record on physical plaster. |
+| `createMythQuotes` | Creates six desktop bays or one mobile record on physical plaster. |
 | `ExhibitMaterials`, `ExhibitionObject`, `MythQuotesOptions` | Public TypeScript integration types. |
 | `INGRES_MANIFEST_ID`, `INGRES_DISPLAY` | Admitted plate identifier, carrier dimensions, source image pixels and original-work dimensions. |
 | `DEATHBED_EVIDENCE` | Claim, earliest named source, Vasari passage, counter-evidence, verdict and age discrepancy. |
@@ -46,12 +49,16 @@ crops nor warps the image, and the solid support has the same dimensions.
 This places the displayed height **0.7568359375% below four metres**, within
 the commission's one-percent dimensional gate, while preserving all source
 pixels. The scan's proportions are not forced to the catalogue's 50.5:40
-canvas ratio. Stepped mouldings and carved beads form the physical modern
-frame; the complete constructed wall is 8.6 m wide × 6.05 m high.
+canvas ratio. Each stepped moulding is built from four separately beveled
+mitres with narrow open corner joints; rounded bronze beads form the
+physical modern frame. The complete display wall is 8.6 m wide × 6.05 m high.
 
-The size conflict is explicitly disclosed in `INGRES_DISPLAY.label` and
-physical lettering. A host must keep the original-size/enlargement
-distinction in its readable source panel. The original dimensions are
+The physical lettering says **A small painting / enlarged for this room**,
+or **Ein kleines Gemälde / für diesen Raum vergrößert**. The host repeats
+this plain distinction in its card and names Paris Musées and the Petit
+Palais in the source drawer. `INGRES_DISPLAY.label`, exact dimensions,
+image arithmetic and catalogue locators belong to the deliberately opened
+record. The original dimensions are
 documented by LIFE plate L01 in `refs/MINING-CATALOG-LIFE.md`; the displayed
 image's admission is PLACE plate Q084 in `refs/RIGHTS-CROSSCHECK.md`.
 `brief/CONCEPT-OPUS.md` S18 supplies the enlarged exhibition premise.
@@ -62,8 +69,8 @@ the texture in sRGB. Do not use `source_url` as an image URL; that field is
 the source citation. This file is classified **PD-ART**, with manifest
 licence `Jean-Auguste-Dominique Ingres, Public domain, via Wikimedia Commons`
 and holder `Petit Palais, Musee des Beaux-Arts de la Ville de Paris`.
-The physical credit reads `Paris Musées · PD-Art`; display the manifest's
-complete licence string in the source drawer. The separate framed LIFE L01
+The physical credit reads `INGRES · 1818` and `Paris Musées`. Preserve the
+manifest's complete licence string in the record. The separate framed LIFE L01
 file's CC0 classification does not replace Q084's actual manifest class.
 
 If no texture is supplied, the image mesh remains invisible and the solid
@@ -77,25 +84,57 @@ cautious verdict for the host's legible reading panel. The royal act was
 issued at Saint-Germain-en-Laye on **3 May**, the day after the death, and
 the chancellor-signature caveat prevents claiming that it alone proves the
 king's whereabouts on 2 May. Melzi's letter is dated 1 June 1519. The
-exhibit does not assert a witnessed bedside. Sources: `refs/MINING-CATALOG-LIFE.md`
+exhibit does not assert a witnessed bedside. The bench's `INGRES_SOURCE` in
+`../line/bench/visitor-sources.ts` supplies a plain bilingual source reading;
+the complete `DEATHBED_EVIDENCE`, Vasari passage and plate metadata remain
+in the record. Sources: `refs/MINING-CATALOG-LIFE.md`
 M1, `brief/CONCEPT-OPUS.md` S18, `brief/CONCEPT-GPT6.md` Station 20.
 
 ## Apocrypha
 
-`options` is `{mobile?: boolean, quoteIndex?: number}`. Desktop holds all six
-records in two columns on one 9 × 5.4 m plaster wall. Mobile restages one
-record on a 3.7 × 4.9 m wall leaf; the host advances `quoteIndex` through all
-six using real scroll/swipe and previous/next controls. Supply a finite
-integer index from 0 to 5. Omission selects 0; finite out-of-range values
-are clamped. The module does not round fractions or sanitize `NaN`, so route
-and input parsing belong to the host. `mobile` defaults to false.
+`options` is `{mobile?: boolean, quoteIndex?: number, readings?: readonly string[]}`.
+
+Desktop holds all six records in **six bays of 3.36 m** on one plaster wall, a
+wall a visitor walks along rather than a page read at arm's length.
+Quotations request 0.205 m cap height and origins 0.145 m within a 2.90 m text
+width, which is body type a person can read at the distance the station is
+composed at. Every bay's block starts at the same height, so walking the wall
+never moves the reading line. The selected bay carries a bronze marker beside
+its number and a stone reveal separates one bay from the next.
+
+`metadata.bays` is `[{index, x}]` in metres: the host places its camera in
+front of the bay it is showing and reads `metadata.wallSizeM` for the height.
+There is no fixed wall size; the wall is measured from the longest of the six
+blocks so that stepping through the entries never rescales the room.
+
+Mobile restages one record on a **3.36 m wide wall** with a 3.00 m text width,
+0.16 m quotations and 0.125 m origins, sized from the same longest block. The
+phone wall is the reading: a host that shows it at a legible size should not
+repeat the same paragraph in its card. A deep right return, stone foot and
+dark bed give the leaf physical depth.
+
+`readings` supplies one visitor-voice origin paragraph per record, in the
+reader's language, and defaults to the collection's own `actual_origin`
+strings. The collection wording is research prose; a museum host passes its
+own plain paragraphs (the bench passes `APOCRYPHA_READINGS`) and keeps the
+collection's exact wording in its record. The quotations themselves are always
+the locked strings and are never re-authored.
+
+The host advances `quoteIndex` through all six using its own input controls.
+Supply a finite integer index from 0 to 5. Omission selects 0; finite
+out-of-range values are clamped. The module does not round fractions or
+sanitize `NaN`, so route and input parsing belong to the host. `mobile`
+defaults to false.
 
 `APOCRYPHA` imports `../words/data/inscriptions.json`, a byte-identical copy of
 locked `brief/collection/inscriptions.json`. `src/bench/verify-data.mjs` checks
 its SHA256 and all 52 passage and six apocrypha records against the original.
-Every displayed quote and `actual_origin` is the exact string from that
-array. Layout only adds line breaks. Every quoted line is crossed with a
-physical pigment ridge. Actual origins remain unstruck. Unknown authors
+Every displayed quote is the exact string from that array and layout only adds
+line breaks. When the host supplies `readings`, the wall carries the host's
+plain origin paragraph and the exact `actual_origin` belongs in the host's
+record; `metadata.exactText` reports what the wall actually carries. Every quoted line is crossed with a
+physical bronze stroke, 11 mm wide and 6 mm deep, across the middle of its
+cap height. Actual origins remain unstruck. Unknown authors
 remain unknown; the Luce parallel is not labelled as proof of an identical
 sentence. All exact visible text and indices are exposed in `metadata`.
 
@@ -116,3 +155,17 @@ The architecture is modern exhibition furniture,
 not a reconstruction of Leonardo's room. Fine texture comes only from the
 host's manifest-backed materials. This module loads no binary assets and
 adds no runtime dependency.
+
+The deathbed constructor's optional `language` is `'en' | 'de'`, default
+`'en'`; its museum-authored physical labels follow that choice. The quote
+constructor has no language argument: exact apocrypha quotations and origins
+remain English on the wall. `translations.ts` supplies explicitly identified
+German origin readings for the host card, with the original quote, origin,
+verdict and complete source object retained in the deliberately opened
+record. These are new museum translations, not Herzfeld or replacements
+for locked records. The host must identify English source wording as such
+when the surrounding interface is German. These constructors create no DOM
+registers: the caller owns label/drawer/record declarations, reachable source
+and record controls, load-error reporting and retry navigation.
+
+Phone staging omits the two miniature wall credits and their carriers. The host card names Ingres, 1818 and the holder and states the enlargement plainly. Desktop keeps enlarged physical authorship and enlargement captions. The optional fourth constructor argument is `{mobile?: boolean}`; omitted means desktop.

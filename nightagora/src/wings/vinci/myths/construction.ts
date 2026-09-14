@@ -11,6 +11,8 @@ export interface ExhibitMaterials {
   bronze: Material
   ink: Material
   dark: Material
+  /** The gallery's own wall surface. Falls back to the dark mineral. */
+  backing?: Material
 }
 
 export interface ExhibitionObject<M = Record<string, unknown>> {
@@ -56,7 +58,7 @@ export class Construction {
   }
 
   text(text: string, x: number, y: number, z: number, size: number, maxWidth: number, material = this.materials.ink, depth = 0.0018): { width: number; height: number; lines: string[]; lineWidths: number[] } {
-    const result = createText(text, { size, maxWidth, material, depth, lineHeight: 1.45 })
+    const result = createText(text, { size, maxWidth, material, depth, lineHeight: 1.45, embedded: true })
     result.mesh.geometry.translate(x, y, z)
     this.geometry(result.mesh.geometry, material)
     return result
@@ -105,42 +107,80 @@ export class Construction {
 
 /** Large backing, recessed joint bands and small edge repairs; fine grain belongs to the host material. */
 export function plasterWall(build: Construction, width: number, height: number, centreY: number, z: number): void {
-  const { plaster, stone, dark } = build.materials
+  const { plaster, stone } = build.materials
   build.box(0, centreY, z - 0.16, width, height, 0.30, plaster)
   build.box(0, centreY - height / 2 + 0.10, z + 0.03, width + 0.12, 0.2, 0.18, stone)
   build.box(0, centreY + height / 2 - 0.06, z + 0.015, width + 0.07, 0.12, 0.16, stone)
   for (let side = -1; side <= 1; side += 2) {
     build.box(side * (width / 2 - 0.055), centreY, z + 0.015, 0.11, height, 0.13, stone)
   }
-  // The irregular lower-edge wear grows denser toward the corners.
-  for (let i = 0; i < 34; i++) {
-    const q = i / 33
-    const x = (q - 0.5) * (width - 0.3)
-    const y = centreY - height / 2 + 0.27 + Math.sin(i * 7.61) * 0.04
-    const length = 0.035 + Math.abs(q - 0.5) * 0.075
-    build.box(x, y, z + 0.005, length, 0.006 + (i % 3) * 0.004, 0.009, i % 6 === 0 ? dark : stone)
-  }
+  // Wear is carried by the material and the real wall junction; no rows of
+  // decorative subpixel ticks cross the reading surface.
+
 }
 
 /** A real shallow stone floor, with staggered joints and irregular wear at the display. */
 export function exhibitionFloor(build: Construction, width = 13, depth = 12): void {
+  width = Math.max(width, 40)
+  depth = Math.max(depth, 60)
   const { stone, dark } = build.materials
-  build.box(0, -0.135, 2.5, width, 0.20, depth, stone)
+  // Each joint is the open interval between complete slabs over a mortar bed.
+  // No overlaid subpixel strokes or freestanding diagonal chips.
+  build.box(0, -0.1155, 2.5, width, 0.20, depth, dark)
   const minZ = 2.5 - depth / 2
   for (let row = 0; row < Math.ceil(depth / 1.4); row++) {
-    const z = minZ + row * 1.4
-    build.box(0, -0.033, z, width, 0.003, 0.006, dark)
+    const z0 = minZ + row * 1.4
+    const z1 = Math.min(minZ + depth, z0 + 1.4)
     const offset = row % 2 === 0 ? 0 : 0.9
-    for (let col = -4; col < 4; col++) {
-      const x = col * 1.8 + offset
-      if (Math.abs(x) > width / 2 - 0.3) continue
-      build.box(x, -0.033, z + 0.70, 0.005, 0.003, 1.394, dark)
+    for (let col = -Math.ceil(width / 3.6)-1; col <= Math.ceil(width / 3.6); col++) {
+      const x0 = Math.max(-width / 2, col * 1.8 + offset)
+      const x1 = Math.min(width / 2, (col + 1) * 1.8 + offset)
+      if (x1 - x0 < .04) continue
+      build.box((x0+x1)/2, -.115, (z0+z1)/2, x1-x0-.026, .20, z1-z0-.026, stone)
     }
   }
-  // Tiny chipped joint ends thin toward the visitor rather than tiling uniformly.
-  for (let i = 0; i < 27; i++) {
-    const x = Math.sin(i * 3.76) * Math.min(width / 2 - 0.2, 4.8)
-    const z = -0.9 + (i % 6) * 0.30
-    build.box(x, -0.031, z, 0.018 + (i % 4) * 0.019, 0.004, 0.011, dark)
+}
+
+/** Modern gallery enclosure; never a reconstruction of a historical room.
+ * The wall carries its own three scales: bays with real shadow gaps, a dado
+ * and a cornice band that model the raking light, and a fine head bead. */
+export function galleryBackdrop(build: Construction, width=18, backZ=-5.5, height=6, quiet=false): void {
+  const {dark,stone}=build.materials
+  const backing=build.materials.backing??dark
+  const plinth=.46, cornice=.34, gap=quiet?.075:.05
+  const field=height-plinth-cornice
+  build.box(0,height/2,backZ-.16,width,height,.30,backing)
+  // Each bay is a stack of cast boards: a real 0.6 m rhythm with open joints,
+  // so the raking light finds an edge every board instead of one flat field.
+  const board=.58, joint=.017
+  const bay=(x:number,w:number,z:number)=>{
+    for(let n=0,y=plinth;y<plinth+field-.12;n++,y+=board+joint){
+      const h=Math.min(board,plinth+field-y)
+      build.box(x,y+h/2,z+(n%2?.004:0),w,h,.112+(n%2?.007:0),backing)
+      build.box(x,y+h-.011,z+.070+(n%2?.004:0),w-.05,.022,.024,backing)
+    }
+  }
+  const bays=Math.max(2,Math.round(width/(quiet?4.4:2.4))), bayWidth=width/bays
+  for(let n=0;n<bays;n++)bay(-width/2+(n+.5)*bayWidth,bayWidth-gap,backZ+.02)
+  build.box(0,.105,backZ+.13,width+.1,.21,.40,stone)
+  build.box(0,.25,backZ+.055,width,.06,.25,backing)
+  // Dado line under the bays and a shallow cornice over them: the two bands
+  // that keep a long wall from being one field.
+  build.box(0,plinth-.045,backZ+.05,width,.09,.26,backing)
+  build.box(0,plinth-.115,backZ+.028,width,.055,.20,backing)
+  build.box(0,height-cornice+.10,backZ+.045,width,.115,.245,backing)
+  build.box(0,height-cornice+.205,backZ+.012,width,.075,.175,backing)
+  for(const side of [-1,1]){
+    build.box(side*width/2,height/2,backZ+10,.3,height,20.3,backing)
+    build.box(side*(width/2-.09),.105,backZ+10,.42,.21,20.3,stone)
+    build.box(side*(width/2-.14),plinth-.045,backZ+10,.16,.09,20.3,backing)
+    build.box(side*(width/2-.13),height-cornice+.10,backZ+10,.155,.115,20.3,backing)
+    for(let n=0;n<8;n++){
+      const z=backZ+.1+(n+.5)*2.5
+      for(let row=0,y=plinth;y<plinth+field-.12;row++,y+=board+joint){
+        const h=Math.min(board,plinth+field-y)
+        build.box(side*(width/2-.16),y+h/2,z,.108+(row%2?.006:0),h,2.5-gap,backing)
+      }
+    }
   }
 }
