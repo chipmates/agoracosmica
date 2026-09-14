@@ -244,19 +244,22 @@ export async function createPictureBench(stack: Stack, onLobby: () => void): Pro
     let currentLanguageRow: HTMLElement | null = null
     /** The viewing controls are never a mark of their own: on the wide frame
      * they ride the rail, on the phone the card's own language row carries
-     * them and only Inspect stays on the rail. */
+     * all three, so the bar keeps three cells and the station name is whole. */
     function seatControls(mobile: boolean, languageRow: HTMLElement | null): void {
       const next = mobile ? 'narrow' : 'wide'
       if (controlsOn === next && (!mobile || datum.parentElement === languageRow)) return
       controlsOn = next
       if (mobile) {
-        if (languageRow) { languageRow.append(datum, faceControl); rail.insertBefore(inspect, sources) }
+        if (languageRow) languageRow.append(datum, faceControl, inspect)
       } else {
         viewing.append(datum, inspect, faceControl)
         if (viewing.parentElement !== rail) rail.insertBefore(viewing, sources)
       }
     }
-    host.replaceChildren(header, hang.labels, dock, scrollHint, rail, drawer, audit, evidenceStyle)
+    host.replaceChildren(header, hang.labels, dock, rail, drawer, audit, evidenceStyle)
+    /** The card owns its own overflow notice: it is seated in the card, never
+     * left standing on the floor beside it. */
+    const dockContent = (...nodes: HTMLElement[]): void => { dock.replaceChildren(...nodes, scrollHint) }
     // The door's question is encountered deliberately with the work's sources.
     detail.append(question)
     const workshopNote = element('aside', 'picture-workshop-note')
@@ -292,7 +295,7 @@ export async function createPictureBench(stack: Stack, onLobby: () => void): Pro
         const content = element('article', 'picture-material-label')
         content.append(element('h2', '', title), element('p', '', 'Left: stock library treatment. Right: the picture room’s production material. Equal geometry and one shared camera and light.'))
         content.append(element('p', 'picture-licence', 'Generated exhibition furniture with CC0 material inputs. The library preview’s camera and light settings were not supplied. This is a controlled local comparison.'))
-        dock.replaceChildren(content)
+        dockContent(content)
         count.textContent = `${materialKinds.indexOf(materialKind) + 1} / ${materialKinds.length}`
         detail.replaceChildren(element('h2', '', title), element('p', 'picture-source-note', 'The reference preview is not displayed or sampled. Both local specimens have identical geometry, UVs and camera distances. The right specimen borrows the actual production material. Gold changes only the principal leaf finish.'))
         const materialRecord = element('details', 'picture-material-record')
@@ -360,7 +363,7 @@ export async function createPictureBench(stack: Stack, onLobby: () => void): Pro
       const twoLevels = innerWidth < 700
       const card = absentOnWall() && selected.work.id === 'mona-lisa' ? createSignatureLabel(remarks, twoLevels)
         : createWorkLabel(selected.work, selected.cards.map(c => c.entry), false, remarks, twoLevels)
-      dock.replaceChildren(languageControls, certaintyKey, card)
+      dockContent(languageControls, certaintyKey, card)
       fitReadingLevels(card)
       if ((view === 'near' || view === 'picture-room-near') && selected.work.id === 'lady-with-an-ermine') {
         // Verbatim label fact from the locked mining catalogue, §12.
@@ -538,7 +541,10 @@ export async function createPictureBench(stack: Stack, onLobby: () => void): Pro
       }
       camera.position.set(center + hang.wall.position.x, single ? selected.y : 1.55, distance + (near ? .023 : .021))
       camera.rotation.set(0, 0, 0)
-      camera.setViewOffset(innerWidth, innerHeight, 0, innerHeight * (mobile ? innerHeight < 650 ? .15 : .125 : special || completeHang ? .08 : .13), innerWidth, innerHeight)
+      // The phone's stage is lifted so the reading band below it can hold a
+      // whole label; the signature stands alone and keeps its centred seat.
+      const phoneLift = innerHeight < 650 ? .15 : segmentId === 'signature' ? .125 : .175
+      camera.setViewOffset(innerWidth, innerHeight, 0, innerHeight * (mobile ? phoneLift : special || completeHang ? .08 : .13), innerWidth, innerHeight)
       if (view === 'boards') {
         // The boards where feet pass, from a visitor's own eye: the only pose
         // in this bench that looks at the floor rather than at the wall.
@@ -601,6 +607,9 @@ export async function createPictureBench(stack: Stack, onLobby: () => void): Pro
         header.hidden = hidden
         return
       }
+      // The room's corner is the page's own left edge at this camera, so the
+      // name starts at the page margin the card and the bar keep, and it does
+      // not slide across the wall when a different work is selected.
       const anchorX = hang.wall.position.x + (single ? selected.left : 0)
       // One height for the whole room: the lettering is painted at 2.95 m, or
       // higher where a work reaches that far, and it does not move when the
@@ -618,14 +627,13 @@ export async function createPictureBench(stack: Stack, onLobby: () => void): Pro
       const seat = (1 - base.y) * innerHeight / 2
       const block = header.offsetHeight
       const top = Math.round(seat - block)
-      const x = (base.x + 1) * innerWidth / 2
       const room = innerWidth - header.offsetWidth - 18
-      header.style.left = `${Math.round(Math.min(Math.max(18, x), Math.max(18, room)))}px`
+      header.style.left = `${Math.round(Math.min(46, Math.max(18, room)))}px`
       header.style.top = `${top}px`
       // The lettering study stands at the painted name itself, so the cutoff
       // that keeps it out of a picture's close view does not apply there.
       header.hidden = hidden || perMetre < 46 || (perMetre > 400 && view !== 'lettering') || top < 58
-        || top + block > innerHeight * .55 || base.x > .92
+        || top + block > innerHeight * .55
     }
     function currentView(): string | undefined {
       if (catalogue) return `catalogue:${catalogue.selected()}`
