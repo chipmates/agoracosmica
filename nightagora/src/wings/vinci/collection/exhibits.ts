@@ -160,6 +160,11 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
   stamp(line, 'vinci/line-geometry')
   host.add(line)
   const graveNear = new Vector3(-42, FLOOR, 46)
+  /** The middle of the insertion, for the distance at which its rooms are
+   * asked for and the distance at which their contents come back. */
+  const hallNear = new Vector3(-46, FLOOR, 50)
+  /** Where the reading table stands, for the two distances it answers to. */
+  const TABLE_AT = new Vector3(-37.72, FLOOR + .755, 45.4)
   const rooms = host.getObjectByName('vinci/collection-rooms')
   const grave = createGrave(exhibitStones)
   grave.group.rotation.y = Math.PI / 2
@@ -178,7 +183,15 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
     halled = true
     hall = court.then(() => seed(['bronze-dark', 'leather-worn', 'parchment-laid', 'limestone-pale'])).then(async () => {
       if (!live) return
-      for (const slug of MACHINE_SLUGS) if (slug !== 'parachute') stand(slug)
+      // ONE MACHINE PER TURN. Thirteen of them in a single tick is half a
+      // minute of frozen frame, and the visitor is standing in the room next
+      // door while it happens. The hall arrives while the walk goes on.
+      for (const slug of MACHINE_SLUGS) {
+        if (slug === 'parachute') continue
+        stand(slug)
+        await new Promise(resolve => setTimeout(resolve, 0))
+        if (!live) return
+      }
       // The hall's own fittings. The machines carry their bench's shading and
       // no opening in this room reaches them, so the luminaires on the beams
       // are lights here and not a term on a surface. They cast no shadow: the
@@ -205,21 +218,30 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
       host.add(deathbed.group, quotes.group)
       teardown.push(() => { deathbed.dispose(); quotes.dispose() })
       rebuildPlinths()
-      // The reading table's own library sets are the last thing this page
-      // can afford, so the table is built with the room it stands in.
+    })
+  }
+  /** THE TABLE IS THE LAST THING THIS PAGE CAN AFFORD, so it is built for the
+   * visitor who is walking up to it and not for the whole ground. Its own
+   * library sets are what carries the wing over its texture budget at every
+   * station that cannot see it. */
+  let table: Promise<void> | undefined
+  function warmTable(): void {
+    if (table || !live) return
+    table = (hall ?? court).then(async () => {
+      if (!live) return
       const manifest = await loadManifest()
       if (!live) return
-      const table = buildTable(stack, (JSON.parse(pageMap) as { pages: PageRecord[] }).pages, manifest)
+      const built = buildTable(stack, (JSON.parse(pageMap) as { pages: PageRecord[] }).pages, manifest)
       // The table brings a back wall of its own, because its bench had none.
       // It stands against the gallery's west wall, so that wall is the one it
       // brings: the reader faces it with the window elevation behind them.
       // Its own back wall, 4.4 by 2.2 m a metre behind the book, is set
       // flush with the gallery's west lining, so the panel the bench needed
       // becomes the panelling of the alcove the table stands in.
-      table.object.rotation.y = Math.PI / 2
-      table.object.position.set(-37.72, FLOOR + .755, 45.4)
-      stamp(table.object, 'vinci/table-furniture')
-      host.add(table.object)
+      built.object.rotation.y = Math.PI / 2
+      built.object.position.set(-37.72, FLOOR + .755, 45.4)
+      stamp(built.object, 'vinci/table-furniture')
+      host.add(built.object)
       // The reading lamp on the table is emissive geometry: it shows that it
       // is lit, it does not light the book. The room's own fitting over the
       // table does that, and it is the one luminaire in this insertion that
@@ -231,13 +253,26 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
       lamp.name = 'vinci/collection-rooms/reading-lamp'
       host.add(lamp)
       teardown.push(() => { lamp.removeFromParent(); lamp.dispose() })
-      reading = table
-      teardown.push(() => { table.dispose() })
+      // THE GALLERY HAS ITS OWN FITTINGS TOO. The hall got five and this room
+      // got none, so the two rooms a visitor reads closest, the alcove and the
+      // wall of sheets, stood a stop and a half under the rest of the
+      // insertion. Like the hall's, they cast no shadow: the one shadowing
+      // light in this scene is the measured sun.
+      for (const [east, north, reach] of [[-35.6, -46.2, 13], [-32.4, -50.6, 12], [-31.6, -58.4, 13]]) {
+        const fitting = new PointLight('#f4e6cc', 7.4, reach!, 2)
+        fitting.position.set(east!, FLOOR + 3.9, -north!)
+        fitting.castShadow = false
+        fitting.name = 'vinci/collection-rooms/gallery-fitting'
+        host.add(fitting)
+        teardown.push(() => { fitting.removeFromParent(); fitting.dispose() })
+      }
+      reading = built
+      teardown.push(() => { built.dispose() })
     })
   }
 
   return {
-    ready: court.then(() => hall ?? Promise.resolve()),
+    ready: court.then(() => hall ?? Promise.resolve()).then(() => table ?? Promise.resolve()),
     pending: () => (halled && !machines.some(machine => machine.indoors) ? 1 : 0),
     warm: warmHall,
     update(now, step, eye) {
@@ -248,8 +283,12 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
       // stands on the apron three metres north of the north elevation, and a
       // margin that caught it built the hall for the whole of the rest of the
       // walk.
+      // A ROOM THE CAMERA IS NOT IN IS NOT DRAWN, and a room the camera is
+      // walking towards is already being built: the rail stands stations
+      // inside these rooms, and a build that starts at the threshold is a
+      // build the visitor waits through.
       const inside = eye.x > -62.4 && eye.x < -21.6 && eye.z > 34.4 && eye.z < 63.6 && eye.y < -1.9
-      if (inside) warmHall()
+      if (inside || eye.distanceToSquared(hallNear) < 46 * 46) warmHall()
       // AND THE GROUND ITSELF IS DRAWN WHEN IT IS BEING LOOKED AT. From the
       // street and the court of the house this ground is seventy metres off
       // and every exhibit on it is a few pixels wide; the rooms stay, their
@@ -258,9 +297,23 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
       if (rooms && rooms.visible !== near) rooms.visible = near
       if (line.visible !== near) line.visible = near
       if (grave.group.visible !== near) grave.group.visible = near
-      if (reading && reading.object.visible !== near) reading.object.visible = near
+      // The reading table is read at the table, not from the next room.
+      const toTable = eye.distanceToSquared(TABLE_AT)
+      if (toTable < 22 * 22) warmTable()
+      const atTable = near && toTable < 16 * 16
+      if (reading && reading.object.visible !== atTable) reading.object.visible = atTable
+      // A MACHINE IS DRAWN WHERE IT CAN BE SEEN AND READ. The hall's fourteen
+      // are behind the hanging wall and two closed elevations: from the
+      // picture room, the gallery or the court not one of them is in the
+      // room the visitor is standing in, and at the far end of a
+      // twenty-two metre hall a machine is a few pixels of itself. The rail
+      // now stands stations inside these rooms, so this is the difference
+      // between a walk and a frame that draws the whole ground at once.
+      const inHall = eye.x > -62.4 && eye.x < -38.6 && eye.z > 41.8 && eye.z < 64.2 && eye.y < -1.9
       for (const machine of machines) {
-        const visible = machine.indoors ? inside : near
+        const visible = machine.indoors
+          ? inHall && eye.distanceToSquared(machine.build.object.position) < 14 * 14
+          : near
         if (machine.build.object.visible !== visible) machine.build.object.visible = visible
         if (visible) machine.build.animate(now, step)
       }
