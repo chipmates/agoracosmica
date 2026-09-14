@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import {
   firstReplyFailReason,
   chatDepthBucket,
@@ -52,5 +52,98 @@ describe('chatDepthBucket', () => {
   it('never exceeds the worker bucket ceiling', () => {
     expect(CHAT_DEPTH_BUCKETS.length).toBe(3);
     expect(chatDepthBucket(Number.MAX_SAFE_INTEGER)).toBeLessThanOrEqual(5);
+  });
+});
+
+// A probe row is one that must never reach a funnel number. Marking a browser
+// used to take a navigation, a console write and a second navigation, so a
+// screenshot harness once left 23 entries in a live week. ?probe=1 makes it
+// one step, which means the module has to read the URL at load, before any
+// beacon of that same page load can fire.
+describe('the ?probe=1 marker', () => {
+  const HOME = window.location.href;
+
+  // The read happens in the module body, so every case needs a fresh module
+  // registry and a URL that is already in place at import time.
+  async function loadAt(search: string) {
+    window.history.replaceState({}, '', `/${search}`);
+    vi.resetModules();
+    return import('../../utils/funnelBeacon');
+  }
+
+  // jsdom ships no sendBeacon; defining one keeps the test on the transport
+  // production actually uses and hands back the posted body.
+  function captureBeacon() {
+    const sendBeacon = vi.fn((_url: string, _body: Blob) => true);
+    Object.defineProperty(navigator, 'sendBeacon', {
+      value: sendBeacon,
+      configurable: true,
+      writable: true,
+    });
+    return sendBeacon;
+  }
+
+  afterEach(() => {
+    window.history.replaceState({}, '', HOME);
+    Reflect.deleteProperty(navigator, 'sendBeacon');
+    vi.resetModules();
+  });
+
+  it('marks the browser when the landing URL carries probe=1', async () => {
+    await loadAt('?probe=1');
+    expect(localStorage.getItem('agc_probe')).toBe('1');
+  });
+
+  it('survives other parameters on the same URL', async () => {
+    await loadAt('?utm_source=newsletter&probe=1&figure=marcus-aurelius');
+    expect(localStorage.getItem('agc_probe')).toBe('1');
+  });
+
+  it('writes nothing without the parameter', async () => {
+    await loadAt('');
+    expect(localStorage.getItem('agc_probe')).toBeNull();
+    await loadAt('?utm_source=newsletter');
+    expect(localStorage.getItem('agc_probe')).toBeNull();
+  });
+
+  it('writes nothing for any other value', async () => {
+    await loadAt('?probe=0');
+    expect(localStorage.getItem('agc_probe')).toBeNull();
+    await loadAt('?probe=true');
+    expect(localStorage.getItem('agc_probe')).toBeNull();
+  });
+
+  it('puts probe: 1 in the beacon body from that same page load', async () => {
+    const sendBeacon = captureBeacon();
+    const { sendFunnelBeacon } = await loadAt('?probe=1');
+
+    sendFunnelBeacon('figure_selected', { figureId: 'aurelius' });
+
+    expect(sendBeacon).toHaveBeenCalledTimes(1);
+    const body = JSON.parse(await sendBeacon.mock.calls[0][1].text());
+    expect(body.step).toBe('figure_selected');
+    expect(body.probe).toBe(1);
+  });
+
+  it('leaves the field off an unmarked browser', async () => {
+    const sendBeacon = captureBeacon();
+    const { sendFunnelBeacon } = await loadAt('');
+
+    sendFunnelBeacon('figure_selected', { figureId: 'aurelius' });
+
+    expect(sendBeacon).toHaveBeenCalledTimes(1);
+    const body = JSON.parse(await sendBeacon.mock.calls[0][1].text());
+    expect(body.probe).toBeUndefined();
+  });
+
+  it('keeps the mark for a later page load that has no parameter', async () => {
+    await loadAt('?probe=1');
+    const sendBeacon = captureBeacon();
+    const { sendFunnelBeacon } = await loadAt('');
+
+    sendFunnelBeacon('mode_selected', { mode: 'story' });
+
+    const body = JSON.parse(await sendBeacon.mock.calls[0][1].text());
+    expect(body.probe).toBe(1);
   });
 });

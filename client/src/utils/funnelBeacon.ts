@@ -32,6 +32,19 @@
 import { isSelfHost } from '../config/deployment';
 import { probeField } from './probeSession';
 
+// A browser marks itself as an in-house probe by landing on any URL with
+// ?probe=1, so a harness or an owner's own browser stays out of the funnel.
+// Runs at module load, before any beacon in this module can fire.
+if (typeof window !== 'undefined') {
+  try {
+    if (new URLSearchParams(window.location.search).get('probe') === '1') {
+      localStorage.setItem('agc_probe', '1');
+    }
+  } catch {
+    // Storage or URL unavailable — the browser simply stays unmarked.
+  }
+}
+
 const API_BASE = import.meta.env.VITE_FREE_TIER_API_URL || '';
 
 export type FunnelStep =
