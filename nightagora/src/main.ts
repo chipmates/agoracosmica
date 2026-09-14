@@ -3,7 +3,7 @@ import { createEclipse, type EclipseState } from './scenes/eclipse'
 import { createAgora } from './scenes/agora'
 import { createKeeper } from './scenes/keeper'
 import { createBreath } from './scenes/breath'
-import { createAtlas } from './scenes/atlas'
+import { createAtlas, type LabelBounds } from './scenes/atlas'
 import { createMandala } from './scenes/mandala'
 import { createHotspots } from './core/hotspots'
 import { FIRE_SCRIPT } from './content/keeper-script'
@@ -377,6 +377,49 @@ function skyDress(on: boolean): void {
   chipsEl.hidden = !on
   if (on) inviteEl.textContent = SKY_INVITE
   if (!on) closePane()
+}
+
+/* THE PAGE HANDS THE SKY ITS OWN LINES. Every standing line of type on the
+   glass is measured and given to the sky, which thins its field inside those
+   rectangles: no star sits in a glyph and none lands in the masthead's gap.
+   The rectangles only move when the layout does, so this is measured on a
+   slow beat and not once a frame. */
+const pageMarks: Array<HTMLElement | null> = [
+  document.querySelector('.brand'),
+  document.getElementById('lobby-plate'),
+  document.getElementById('sky-invite'),
+  document.getElementById('sky-return'),
+  document.getElementById('chapter-marks'),
+  document.getElementById('constellation-plate'),
+  document.getElementById('status'),
+]
+const pageRects: LabelBounds[] = []
+const pageHeights: number[] = []
+let pageMeasured = -99
+function syncPageReserve(force: boolean): void {
+  // the rig freezes the scene clock, so this beat runs on the wall clock
+  const now = performance.now() / 1000
+  if (!force && now - pageMeasured < 0.4) return
+  pageMeasured = now
+  pageRects.length = 0
+  pageHeights.length = 0
+  for (const el of pageMarks) {
+    // a fixed element has no offsetParent, so presence is read off the box
+    if (!el || el.hidden) continue
+    const r = el.getBoundingClientRect()
+    if (r.width < 2 || r.height < 2) continue
+    pageRects.push({ x: r.x + r.width / 2, y: r.y + r.height / 2, half: r.width / 2 + 4 })
+    pageHeights.push(r.height / 2 + 3)
+  }
+  atlas.reservePage(pageRects, pageHeights, innerWidth, innerHeight)
+  const boxes = pageRects.map((p, i) => ({
+    x: p.x,
+    y: p.y,
+    half: p.half,
+    vhalf: pageHeights[i] ?? 9,
+  }))
+  eclipse.reservePage(boxes, innerWidth, innerHeight)
+  agora.reservePage(boxes, innerWidth, innerHeight)
 }
 
 const chipProject = new Vector3()
@@ -1207,6 +1250,8 @@ function setPhase(next: Phase): void {
     wingSlug = ''
     wingFrame.close()
   }
+  // the page's lines change with the phase: measure them at the change
+  syncPageReserve(true)
   hotspots.set(next === 'agora' ? HUB_SPOTS : [])
   // every stage is the SEATED eye at the origin
   camera.position.set(0, 0, 0)
