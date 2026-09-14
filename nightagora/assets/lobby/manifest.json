@@ -1021,6 +1021,73 @@
       "source_sha1": "24214ab657842ced67296e115d3d780584f60bdf",
       "honesty_en": "Public domain work. Reproduction from Wikimedia Commons. The museum labels the reproduction, not the painting. Non-profit cultural use.",
       "honesty_de": "Gemeinfreies Werk. Reproduktion von Wikimedia Commons. Das Museum kennzeichnet die Reproduktion, nicht das Gemälde. Nichtkommerzielle kulturelle Nutzung."
+    },
+    {
+      "id": "lobby/likeness-galilei",
+      "path": "likenesses/galilei/original.jpg",
+      "sha256": "f2addcf71910b1a36ef5c24cd27c97454fbf96188364da781a4c6e304ecb4f10",
+      "bytes": 2123787,
+      "width": 2113,
+      "height": 2500,
+      "pixels": 5282500,
+      "slug": "galilei",
+      "name": "Galileo Galilei",
+      "wing": "lobby",
+      "class": "Tier 2",
+      "tier": 2,
+      "licence": "Public domain",
+      "licence_source_url": "https://commons.wikimedia.org/wiki/File:Justus_Sustermans_-_Portrait_of_Galileo_Galilei_(Uffizi).jpg#Licensing",
+      "licence_location": "Commons file page, Licensing",
+      "holder": "Gallerie degli Uffizi, Florence; inv. 1890 no. 745",
+      "maker": "Justus Sustermans",
+      "date": "1635",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Justus_Sustermans_-_Portrait_of_Galileo_Galilei_(Uffizi).jpg",
+      "original_url": "https://upload.wikimedia.org/wikipedia/commons/c/c7/Justus_Sustermans_-_Portrait_of_Galileo_Galilei_%28Uffizi%29.jpg",
+      "holder_record_url": "https://www.uffizi.it/en/artworks/portrait-galileo-galilei-by-justus-sustermans",
+      "display": true,
+      "label_en": "Galileo Galilei. Justus Sustermans, 1635. Gallerie degli Uffizi, Florence. Licence: “Public domain”. Public domain work. Reproduction from Wikimedia Commons. The museum labels the reproduction, not the painting. Non-profit cultural use. Italian state collection. Non-profit cultural use under Article 108 of the Codice dei beni culturali.",
+      "label_de": "Galileo Galilei. Justus Sustermans, 1635. Gallerie degli Uffizi, Florenz. Lizenz: „Public domain“. Gemeinfreies Werk. Reproduktion von Wikimedia Commons. Das Museum kennzeichnet die Reproduktion, nicht das Gemälde. Nichtkommerzielle kulturelle Nutzung. Italienische Staatssammlung. Nichtkommerzielle kulturelle Nutzung gemäß Artikel 108 des Codice dei beni culturali.",
+      "previews": [
+        {
+          "path": "likenesses/galilei/preview-512.jpg",
+          "sha256": "c039f0d91140610e76ed284b6491b7a3084a7e9e3e6d861700571276f8d9a6c6",
+          "bytes": 34976,
+          "width": 433,
+          "height": 512,
+          "pixels": 221696,
+          "long_edge": 512,
+          "format": "image/jpeg",
+          "quality": 88,
+          "color_space": "sRGB",
+          "source_path": "likenesses/galilei/original.jpg"
+        },
+        {
+          "path": "likenesses/galilei/preview-1024.jpg",
+          "sha256": "81fb92c34778ef372586c8781dc580ce24803e0bc75b3d1a8884cdbd372f4ed9",
+          "bytes": 155741,
+          "width": 865,
+          "height": 1024,
+          "pixels": 885760,
+          "long_edge": 1024,
+          "format": "image/jpeg",
+          "quality": 88,
+          "color_space": "sRGB",
+          "source_path": "likenesses/galilei/original.jpg"
+        }
+      ],
+      "verified_on": "2026-09-14",
+      "source_verification": "Current Commons imageinfo, original link, licence template and file history checked. Holder evidence rechecked where available.",
+      "derivation": "No embedded ICC profile. Source interpreted as sRGB. JPEG previews resized with Lanczos, quality 88, embedded sRGB profile. Original bytes unchanged.",
+      "rights_note": "Faithful reproduction of the Uffizi painting, Justus Sustermans, 1635. Commons PD-old-100. No holder open release claimed. Italian state collection, non-profit cultural use under Article 108.",
+      "source_version": {
+        "file_timestamp": "2021-11-23T07:26:53Z",
+        "commons_revision_id": 1092865773
+      },
+      "source_sha1": "2cec098901655693da282a790c38a983b9e7f646",
+      "honesty_en": "Public domain work. Reproduction from Wikimedia Commons. The museum labels the reproduction, not the painting. Non-profit cultural use.",
+      "honesty_de": "Gemeinfreies Werk. Reproduktion von Wikimedia Commons. Das Museum kennzeichnet die Reproduktion, nicht das Gemälde. Nichtkommerzielle kulturelle Nutzung.",
+      "italian_state_en": "Italian state collection. Non-profit cultural use under Article 108 of the Codice dei beni culturali.",
+      "italian_state_de": "Italienische Staatssammlung. Nichtkommerzielle kulturelle Nutzung gemäß Artikel 108 des Codice dei beni culturali."
     }
   ]
 }
