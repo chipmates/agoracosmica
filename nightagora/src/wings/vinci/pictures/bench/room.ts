@@ -310,11 +310,28 @@ export function buildPictureRoom(stack: Stack, extent: number, options: { height
       .mul(float(1).add(lane.mul(.085)).sub(cup.mul(.045)).add(drag.mul(.035)))
     oak.roughnessNode = clamp((oak.roughnessNode as N)
       .add(lane.mul(.14)).sub(cup.mul(.06)).add(drag.mul(.10)), .42, .90)
-    const high = smoothstep(2.9, 5.0, positionWorld.y).mul(.17)
+    // The glazing stops at 3.2 m and the ceiling is at six. The band above
+    // the hang sees less and less of the opening and more of the ceiling, so
+    // it carries the room's own falloff rather than one plaster value.
+    const high = smoothstep(2.2, 5.4, positionWorld.y).mul(.22)
     const bounce = float(1).sub(smoothstep(.14, 1.05, positionWorld.y)).mul(.07)
+    // A wall this high is plastered in two lifts off a scaffold. The line
+    // where the day's work stopped wanders, takes the float differently and
+    // is the one event in the metres above the pictures.
+    const liftAt = float(2.36).add(mx_noise_float(vec3(positionWorld.x.mul(.52), 7.3, 1.1)).mul(.04))
+    const lift = float(1).sub(smoothstep(float(0), float(.019), abs(positionWorld.y.sub(liftAt))))
+    const upper = smoothstep(liftAt.sub(.03), liftAt.add(.03), positionWorld.y)
     plaster.colorNode = (plaster.colorNode as N).mul(float(1).sub(high))
+      .mul(float(1).sub(lift.mul(.05)).sub(upper.mul(.014)))
       .mul(mix(vec3(1, 1, 1), vec3(1.03, 1.005, .965), bounce.mul(14).clamp(0, 1)))
+    plaster.roughnessNode = clamp((plaster.roughnessNode as N).add(lift.mul(.06)), .62, .98)
   }
+  // The dressed members turn out of the wall's plane the way a moulding does:
+  // a reveal, a sill, a cornice, the window's timber and the plaster that
+  // returns down the window wall take the room's run and then their own
+  // facing. The hanging wall's own facing is exactly one, so the wall the
+  // pictures are on does not move.
+  for (const m of [stone, timber, plaster]) m.colorNode = (m.colorNode as N).mul(apertureFacing(APERTURE))
   for (const m of [plaster,oak,stone,plinth,timber,bed]) underNorthLight(m)
   const materials = [plaster,oak,stone,plinth,timber,bed,pane]
   const names = ['plaster','oak-boards','limestone-reveals','graphite-plinth','window-timber','floor-joints','north-glazing']

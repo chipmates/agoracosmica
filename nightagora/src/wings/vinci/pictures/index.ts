@@ -16,9 +16,28 @@ export * from './register'
 export * from './scale'
 export * from './aperture'
 
-const { abs, attribute, cameraPosition, clamp, float, length, min, mx_noise_float, positionGeometry, sin, smoothstep, uv, vec2, vec3, positionWorld } = TSL as unknown as Record<string, any>
+const { abs, attribute, cameraPosition, clamp, float, length, max, min, mix, mx_noise_float, positionGeometry, sin, smoothstep, uv, vec2, vec3, positionWorld } = TSL as unknown as Record<string, any>
 /** The narrowest board this exhibition cuts, in metres. */
 export const PICTURE_MAT_BORDER_M = .045
+/** Writes the moulding's opening into a geometry whose vertices are centred
+ * on the same point, so one shading term serves the board and the field. */
+function setRebateHalf(geometry: BufferGeometry, halfX: number, halfY: number): void {
+  const count = geometry.getAttribute('position').count
+  const values = new Float32Array(count * 2)
+  for (let i = 0; i < count; i++) { values[i * 2] = halfX; values[i * 2 + 1] = halfY }
+  geometry.setAttribute('rebateHalf', new Float32BufferAttribute(values, 2))
+}
+/** How far the moulding's inner lip stands above the board it holds, in
+ * metres: the section's own rise from the mount face to the top of the lip. */
+const REBATE_RISE_M = .022
+/** How much of the board's sky the section closes, measured in from the
+ * moulding's opening; the section is 52 mm wide and 45 mm deep. */
+const REBATE_SKY_M = .052
+/** The board's own cockle: waves about a hand across, a third of a
+ * millimetre deep. The laid chain lines stay a tone on the mount that shows
+ * them; as a slope on every board they read as corduroy at arm's length. */
+const COCKLE_PER_M = 7
+const COCKLE_RISE_M = .00034
 /** A mount is proportioned to the work it surrounds. One board width for a
  * 38 cm panel and a two-metre altarpiece leaves the altarpiece with no air at
  * all inside its rebate, which is what the phone showed. Metres of mount
@@ -76,8 +95,11 @@ export const createWorkLabel = createPolicyWorkLabel
  * mounts labels in its own DOM. Every original stays on its locked datum.
  */
 export function buildHang(stack: Stack, register: readonly PictureWork[], manifest: ManifestIndex,
-  options: { gapM?: number; aperture?: ApertureLight } = {}) {
+  options: { gapM?: number; aperture?: ApertureLight; skirtingM?: number } = {}) {
   const gap = options.gapM ?? .56
+  // The room's skirting, so a mark below a work that hangs near the floor
+  // keeps off the stone. A gallery with a taller plinth passes its own.
+  const skirting = options.skirtingM ?? .112
   // The room's own window, so the hang is lit by the opening the wall is lit
   // by. A gallery with another aperture passes its own; nothing else changes.
   const light = options.aperture ?? NORTH_WINDOW_LIGHT
@@ -162,15 +184,71 @@ export function buildHang(stack: Stack, register: readonly PictureWork[], manife
       .mul(float(.62).add(mx_noise_float(vec3(local.x.mul(2.4), .7, 5.5)).mul(.38)))
     const cloud = mx_noise_float(vec3(local.x.mul(11), local.y.mul(9), 1.7))
     const tooth = mx_noise_float(vec3(local.x.mul(430), local.y.mul(430), 3.1))
+    // THE WINDOW IS CUT, NOT PRINTED. The board is opened at forty five
+    // degrees, so each of the four cut faces turns a different way: the one
+    // opposite the glazing takes the light and the one under it falls away.
+    // The band is the same ratio of cosines the mouldings take, so a mount
+    // beside another window models itself without a constant being retuned.
+    const a = light.aperture
+    const toWindow = vec3(a.x, a.y, a.z).sub(positionWorld)
+    const rayIn = toWindow.div(length(toWindow))
+    const nearestIsSide = float(half.x.sub(abs(local.x)).lessThan(half.y.sub(abs(local.y))))
+    const tiltX = mix(float(1), float(-1), float(local.x.greaterThan(0))).mul(nearestIsSide)
+    const tiltY = mix(float(1), float(-1), float(local.y.greaterThan(0))).mul(float(1).sub(nearestIsSide))
+    const cut = clamp(float(1).add(tiltX.mul(rayIn.x).add(tiltY.mul(rayIn.y)).div(max(rayIn.z, float(.05)))), .72, 1.26)
     const tone = float(1).sub(window.mul(.135)).sub(ruled.mul(.34)).sub(wash.mul(.10))
       .add(bevel.mul(.085))
       .sub(window.mul(chain).mul(.038)).add(cloud.mul(.046)).add(tooth.mul(.018))
+      .mul(mix(float(1), cut, bevel))
     absenceMat.colorNode = (absenceMat.colorNode as any).mul(vec3(matColour.r / matSet.albedo.r, matColour.g / matSet.albedo.g, matColour.b / matSet.albedo.b)).mul(tone)
     absenceMat.roughnessNode = ((absenceMat.roughnessNode as any)).add((ruled as any).mul(.09)).add((wash as any).mul(.04)).sub((bevel as any).mul(.05))
   }
+  /** THE REBATE'S OWN SHADOW.
+   *
+   * A board inside a moulding is not a plane in the open: the section stands
+   * about 20 mm proud of it, so the jamb on the window side throws a band
+   * across the board and all four jambs close part of its sky. Both come off
+   * the section's own rise and the direction to the opening, so a wider
+   * moulding or another window moves them without a constant being retuned.
+   * `rebateHalf` is the moulding's inner opening, in the mesh's own metres.
+   */
+  function underRebate(m: MeshStandardNodeMaterial): void {
+    const a = light.aperture
+    const toward = vec3(a.x, a.y, a.z).sub(positionWorld)
+    const dir = toward.div(length(toward))
+    const slope = max(dir.z, float(.05))
+    const rebate = attribute('rebateHalf', 'vec2')
+    // A surface that declares no opening takes no rebate term at all.
+    const framed = float(rebate.x.greaterThan(0).and(rebate.y.greaterThan(0)))
+    const local = positionGeometry.xy
+    // The window side of each axis is the side the light comes from.
+    const fromJambX = mix(rebate.x.sub(local.x), rebate.x.add(local.x), float(dir.x.lessThan(0)))
+    const fromJambY = mix(rebate.y.sub(local.y), rebate.y.add(local.y), float(dir.y.lessThan(0)))
+    const reachX = clamp(abs(dir.x).div(slope).mul(REBATE_RISE_M), 0, .085)
+    const reachY = clamp(abs(dir.y).div(slope).mul(REBATE_RISE_M), 0, .085)
+    // A seven square metre opening is a wide source, so the edge of what it
+    // throws is a ramp and never a line.
+    const cast = max(float(1).sub(smoothstep(float(0), reachX, fromJambX)),
+      float(1).sub(smoothstep(float(0), reachY, fromJambY)))
+    // What the section takes out of the board's sky, on every side.
+    const closed = max(float(1).sub(smoothstep(float(0), float(REBATE_SKY_M), min(fromJambX, fromJambY))), float(0))
+    // THE BOARD IS NOT A PLANE. A mount cut and hinged in a rebate keeps a
+    // slow cockle, a hand's width across and a few tenths of a millimetre
+    // deep, and the laid chain lines stand above it. Neither is a tone: they
+    // are slopes, so what a visitor sees is the room's own light crossing
+    // them, in the same ratio of cosines the mouldings take.
+    const wave = (x: unknown, y: unknown): any => mx_noise_float(vec3((x as any).mul(COCKLE_PER_M), (y as any).mul(COCKLE_PER_M), 4.4))
+    const here = wave(local.x, local.y)
+    const step = .012
+    const slopeX = wave(local.x.add(step), local.y).sub(here).mul(COCKLE_RISE_M / step)
+    const slopeY = wave(local.x, local.y.add(step)).sub(here).mul(COCKLE_RISE_M / step)
+    const raking = clamp(float(1).add(slopeX.mul(dir.x).add(slopeY.mul(dir.y)).negate().div(slope)), .80, 1.20)
+    m.colorNode = (m.colorNode as any).mul(float(1).sub(cast.mul(.26).add(closed.mul(.085)).mul(framed)))
+      .mul(mix(float(1), raking, framed))
+  }
   // A mount hangs on the wall and takes the wall's run; its own backing edge
   // turns toward the window like any other member.
-  for (const m of [mat, absenceMat]) underApertureOnWall(m, light)
+  for (const m of [mat, absenceMat]) { underApertureOnWall(m, light); underRebate(m) }
   const plateTone = plateUnderAperture(light)
   let cursor = 0
   for (const { work, size, entries } of admitted) {
@@ -201,6 +279,7 @@ export function buildHang(stack: Stack, register: readonly PictureWork[], manife
       const geometry = new PlaneGeometry(width, height)
       geometry.setAttribute('fieldHalf', new Float32BufferAttribute(
         [width / 2, height / 2, width / 2, height / 2, width / 2, height / 2, width / 2, height / 2], 2))
+      setRebateHalf(geometry, width / 2 + matBorder, height / 2 + matBorder)
       geometries.push(geometry)
       aperture = new Mesh(geometry, mat)
       aperture.name = `measured-aperture/${work.id}`
@@ -218,6 +297,7 @@ export function buildHang(stack: Stack, register: readonly PictureWork[], manife
     // Its actual volume participates in the directional wall shadow.
     function backingAt(px: number, name: string): void {
       const backingGeometry = new BoxGeometry(width + 2 * matBorder, height + 2 * matBorder, .016)
+      setRebateHalf(backingGeometry, width / 2 + matBorder, height / 2 + matBorder)
       geometries.push(backingGeometry)
       const backing = new Mesh(backingGeometry, mat)
       backing.name = name
@@ -229,8 +309,11 @@ export function buildHang(stack: Stack, register: readonly PictureWork[], manife
     }
     if (outline) backingAt(x, `physical-backing/${work.id}`)
     const wellLabels: HungFrame['wellLabels'] = []
-    function paper(w: number, h: number, px: number, py: number, name: string): Mesh {
+    /** A board inside a moulding passes the opening it sits in; a card that
+     * is not centred on that opening passes none, and takes no rebate term. */
+    function paper(w: number, h: number, px: number, py: number, name: string, opening?: [number, number]): Mesh {
       const g = new PlaneGeometry(w, h)
+      if (opening) setRebateHalf(g, opening[0], opening[1])
       geometries.push(g)
       const mesh = new Mesh(g, mat)
       mesh.name = name
@@ -241,7 +324,7 @@ export function buildHang(stack: Stack, register: readonly PictureWork[], manife
       return mesh
     }
     if (catalogue) {
-      const sheet = paper(width, height, x, y, `unillustrated-catalogue-card/${work.id}`)
+      const sheet = paper(width, height, x, y, `unillustrated-catalogue-card/${work.id}`, [width / 2 + matBorder, height / 2 + matBorder])
       sheet.userData['physicalPaintingExtent'] = null
       sheet.userData['modernCarrierM'] = { width, height }
     }
@@ -281,7 +364,8 @@ export function buildHang(stack: Stack, register: readonly PictureWork[], manife
       const cardX = i === 0 ? x : cardLeft + slotWidth / 2
       if (hasReverseMount) {
         const mountId = `${work.id}:reverse`
-        const reverseField = paper(width, height, cardX, y, `measured-reverse-aperture/${work.id}`)
+        const reverseField = paper(width, height, cardX, y, `measured-reverse-aperture/${work.id}`,
+          [width / 2 + matBorder, height / 2 + matBorder])
         reverseField.userData['workId'] = work.id
         reverseField.userData['face'] = 'reverse'
         backingAt(cardX, `physical-backing/${work.id}/reverse`)
@@ -470,11 +554,15 @@ export function buildHang(stack: Stack, register: readonly PictureWork[], manife
         const h = new Vector3(f.shownFaceX ?? f.x, f.y + f.height / 2, .021).applyMatrix4(wall.matrixWorld).project(camera)
         const pxHeight = Math.abs(h.y - p.y) * innerHeight
         const visible = p.z > -1 && p.z < 1 && x > 20 && x < innerWidth - 20
-        f.caption.hidden = f.cards.length > 0 && !absentWorkIds.has(f.work.id) || !visible || (f.aperture ? !f.aperture.visible : !f.furniture.visible) || pxHeight < 80 || pxHeight * f.width / f.height < 70
+        // The narrowest empty field in the collection is the Mona Lisa's, and
+        // it is the one frame in this room that must never stand wordless.
+        f.caption.hidden = f.cards.length > 0 && !absentWorkIds.has(f.work.id) || !visible || (f.aperture ? !f.aperture.visible : !f.furniture.visible) || pxHeight < 80 || pxHeight * f.width / f.height < 66
         f.caption.dataset['compact'] = String(pxHeight < 120)
         f.caption.style.left = `${x}px`
         f.caption.style.top = `${y - (f.work.display_mode === 'dimension_card_and_two_empty_image_wells' ? pxHeight * .27 : 0)}px`
-        f.caption.style.width = `${Math.max(30, pxHeight * f.width / f.height - 16)}px`
+        // The words belong to the mount, not to the empty field inside it, so
+        // the narrowest measured size still stands on one line.
+        f.caption.style.width = `${Math.max(30, pxHeight * (f.width + 2 * f.matBorder) / f.height - 10)}px`
         f.caption.style.fontSize = `${Math.max(9, Math.min(13, pxHeight / 20))}px`
         if (f.work.display_mode === 'unillustrated_catalogue_card') {
           const pxWidth = pxHeight * f.width / f.height
@@ -493,8 +581,19 @@ export function buildHang(stack: Stack, register: readonly PictureWork[], manife
         const anchorWorldX = f.shownFaceX ?? (f.cards.length > 1 && f.furniture.children.every(child => child.visible) ? (f.left + f.right) / 2 : f.x)
         const edge = new Vector3(anchorWorldX, f.y - f.height / 2 - f.matBorder - .052, .021)
           .applyMatrix4(wall.matrixWorld).project(camera)
-        const anchorX = (edge.x * .5 + .5) * innerWidth
-        const anchorY = (-edge.y * .5 + .5) * innerHeight + 10
+        // A work hung on the datum can reach far enough down that the wall
+        // below its moulding is thinner than the mark. The mark then stands
+        // at the frame's own corner on the window side, the way a plate does
+        // where there is no room under the picture, and never on the stone.
+        const stone = new Vector3(anchorWorldX, skirting, .046).applyMatrix4(wall.matrixWorld).project(camera)
+        const stoneY = (-stone.y * .5 + .5) * innerHeight
+        const corner = new Vector3(f.x - f.width / 2 - f.surround, f.y - f.height / 2 - f.surround, .021)
+          .applyMatrix4(wall.matrixWorld).project(camera)
+        const footY = (-corner.y * .5 + .5) * innerHeight
+        const beside = stoneY - footY < 30
+        const anchorX = beside ? (corner.x * .5 + .5) * innerWidth - 17 : (edge.x * .5 + .5) * innerWidth
+        const anchorY = beside ? footY - 6
+          : Math.max(footY + 5, Math.min((-edge.y * .5 + .5) * innerHeight + 10, stoneY - 20))
         f.dot.hidden = !visible || anchorX < 22 || anchorX > innerWidth - 22 || anchorY > innerHeight - 100
         f.dot.style.left = `${anchorX}px`
         f.dot.style.top = `${anchorY - 22}px`
