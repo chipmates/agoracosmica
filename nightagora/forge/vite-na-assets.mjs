@@ -33,6 +33,7 @@ function findStore(from) {
 }
 
 export const STORE = process.env.NA_ASSET_STORE ?? findStore(APP_ROOT)
+const CACHE = process.env.NA_ASSET_CACHE === '1'
 /* THE APP'S OWN SCOPES. A wing's procedural materials and its geometry
    prompts ARE its recipe: there are no bytes to keep outside the
    repository, and the record belongs beside the code that produces it. So
@@ -166,7 +167,20 @@ export function naAssets() {
       const file = resolve(STORE, '.' + (rel.startsWith('/') ? rel : `/${rel}`))
       if (!file.startsWith(STORE + '/') || !existsSync(file) || !statSync(file).isFile()) return next()
       res.setHeader('content-type', MIME[extname(file).toLowerCase()] ?? 'application/octet-stream')
-      res.setHeader('cache-control', 'no-store')
+      // A rig reads the store fresh every run; a walk server may cache it
+      // (NA_ASSET_CACHE=1) so a reload does not fetch the tier's textures again.
+      if (CACHE) {
+        const mtime = statSync(file).mtime
+        res.setHeader('cache-control', 'public, max-age=86400')
+        res.setHeader('last-modified', mtime.toUTCString())
+        const since = Date.parse(req.headers['if-modified-since'] ?? '')
+        if (!Number.isNaN(since) && since >= Math.floor(mtime.getTime() / 1000) * 1000) {
+          res.statusCode = 304
+          return res.end()
+        }
+      } else {
+        res.setHeader('cache-control', 'no-store')
+      }
       createReadStream(file).pipe(res)
     })
   }
