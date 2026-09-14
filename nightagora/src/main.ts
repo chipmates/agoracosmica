@@ -490,21 +490,23 @@ const dCamY = channel([
   { p: 0.50, v: 40, e: 'sineInOut' },
   { p: 0.70, v: 23, e: 'sineInOut' },
   { p: 0.82, v: 13, e: 'sineInOut' },
-  { p: 0.90, v: 5, e: 'sineInOut' },
+  { p: 0.88, v: 9, e: 'sineInOut' },
+  { p: 0.92, v: 4.2, e: 'sineInOut' },
   { p: 0.948, v: 0, e: 'sineInOut' },
 ])
 const dCamR = channel([
   { p: 0, v: 0.001 }, { p: 0.15, v: 0.001 },
   { p: 0.28, v: 32, e: 'sineInOut' },
   { p: 0.50, v: 36, e: 'sineInOut' },
-  { p: 0.70, v: 38, e: 'sineInOut' },
-  { p: 0.82, v: 37, e: 'sineInOut' },
-  { p: 0.90, v: 32, e: 'sineInOut' },
+  { p: 0.70, v: 36, e: 'sineInOut' },
+  { p: 0.82, v: 30, e: 'sineInOut' },
+  { p: 0.88, v: 19, e: 'sineInOut' },
+  { p: 0.92, v: 6, e: 'sineInOut' },
   { p: 0.948, v: 0, e: 'sineInOut' },
 ])
 const dCamTh = channel([
-  { p: 0, v: 0 }, { p: 0.28, v: -0.30 },
-  { p: 0.70, v: 0.22, e: 'sineInOut' },
+  { p: 0, v: 0 }, { p: 0.28, v: -0.17 },
+  { p: 0.70, v: 0.11, e: 'sineInOut' },
   { p: 0.948, v: 0, e: 'sineInOut' },
 ])
 const dLookX = channel([{ p: 0, v: 0 }, { p: 1, v: 0 }])
@@ -519,12 +521,39 @@ const dLookZ = channel([
   { p: 0.28, v: 0, e: 'sineInOut' }, { p: 0.88, v: 0 },
   { p: 0.948, v: -5.6, e: 'sineInOut' },
 ])
+const dLead = channel([
+  { p: 0, v: 0 }, { p: 0.30, v: 0 },
+  { p: 0.46, v: 0.26, e: 'sineInOut' },
+  { p: 0.78, v: 0.26 },
+  { p: 0.90, v: 0, e: 'sineInOut' },
+])
 const descentLook = new Vector3()
-function descentCamera(k: number): void {
+const descentAhead = new Vector3()
+function descentPos(k: number, out: Vector3): Vector3 {
   const th = dCamTh(k)
   const r = dCamR(k)
-  camera.position.set(Math.sin(th) * r, dCamY(k), Math.cos(th) * r)
+  return out.set(Math.sin(th) * r, dCamY(k), Math.cos(th) * r)
+}
+/** The narrow stage restages. The map draws itself smaller on a phone (its
+    own aspect rule), so the ride comes in exactly as close as the map is
+    small and the tall frame holds the same picture instead of a small drum
+    in a void. The factor gives way as the fall reaches the floor, where
+    what the camera stands in is the room and not the map. */
+function mapScale(): number {
+  return Math.min(1, innerWidth / innerHeight / 1.05)
+}
+function descentCamera(k: number): void {
+  const ms = mapScale()
+  descentPos(k, camera.position).multiplyScalar(ms)
   descentLook.set(dLookX(k), dLookY(k), dLookZ(k))
+  const lead = dLead(k)
+  if (lead > 0) {
+    // where the ride will be a moment from now: the camera heads down the
+    // travel instead of holding one point while the world slides past it
+    descentPos(Math.min(0.99, k + 0.12), descentAhead)
+    descentLook.lerp(descentAhead, lead)
+  }
+  descentLook.multiplyScalar(ms)
   camera.lookAt(descentLook)
 }
 
