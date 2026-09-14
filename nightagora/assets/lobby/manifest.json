@@ -529,6 +529,108 @@
       "licence_url": "https://creativecommons.org/publicdomain/mark/1.0/",
       "rights_note": "Holder PDM-owner release. A public-domain mark is not CC0; class must not imply a CC0 deed. Best: the crop removes the mount and inscription while retaining the photographic portrait. Holder supplies a Public Domain Mark and unrestricted download/use; no guessed photographer death date is used.",
       "source_sha1": "c52560644a413671ecfe62bc98c7553ad80bc4da"
+    },
+    {
+      "id": "lobby/likeness-king",
+      "path": "likenesses/king/original.tif",
+      "sha256": "07e9eb6720e95437fc7d7dcb54ded430236e5de85ce29d29f0f6c6ebb22c5c2c",
+      "bytes": 29930384,
+      "width": 5133,
+      "height": 5828,
+      "pixels": 29915124,
+      "slug": "king",
+      "name": "Martin Luther King Jr.",
+      "wing": "lobby",
+      "class": "Tier 1",
+      "tier": 1,
+      "licence": "There are no known restrictions on work taken by staff photographers.",
+      "licence_source_url": "https://wwws.loc.gov/rr/print/res/078_usnw.html",
+      "licence_location": "U.S. News & World Report Magazine Collection Rights and Restrictions Information, opening rights statement; Publication and other forms of distribution paragraph records deed-of-gift dedication and names Marion S. Trikosko",
+      "holder": "Library of Congress, Prints & Photographs Division, U.S. News & World Report Magazine Collection; LC-DIG-ppmsc-01269",
+      "maker": "Marion S. Trikosko",
+      "date": "26 March 1964",
+      "source_url": "https://www.loc.gov/pictures/item/2003688129/",
+      "original_url": "https://tile.loc.gov/storage-services/master/pnp/ppmsc/01200/01269u.tif",
+      "holder_record_url": "https://www.loc.gov/resource/ppmsc.01269/",
+      "display": true,
+      "label_en": "Martin Luther King Jr. at a press conference. Marion S. Trikosko, 26 March 1964. Cropped from the original negative scan. Library of Congress, U.S. News & World Report Magazine Collection. Licence: “There are no known restrictions on work taken by staff photographers.”",
+      "label_de": "Martin Luther King Jr. bei einer Pressekonferenz. Marion S. Trikosko, 26. März 1964. Ausschnitt aus dem Scan des Originalnegativs. Library of Congress, U.S. News & World Report Magazine Collection. Lizenz: „There are no known restrictions on work taken by staff photographers.“",
+      "previews": [
+        {
+          "path": "likenesses/king/preview-512.jpg",
+          "sha256": "a9cf821f838f396fb49165d80331970d338c0d728651cf2b44b3109ea33987f7",
+          "bytes": 46604,
+          "width": 512,
+          "height": 499,
+          "pixels": 255488,
+          "long_edge": 512,
+          "format": "image/jpeg",
+          "quality": 88,
+          "color_space": "sRGB",
+          "source_path": "likenesses/king/crop.png"
+        },
+        {
+          "path": "likenesses/king/preview-1024.jpg",
+          "sha256": "af9673e91871587e6bb063ce3169fca2ef6bf0bb1946f6124bdc873879b8430d",
+          "bytes": 209146,
+          "width": 1024,
+          "height": 999,
+          "pixels": 1022976,
+          "long_edge": 1024,
+          "format": "image/jpeg",
+          "quality": 88,
+          "color_space": "sRGB",
+          "source_path": "likenesses/king/crop.png"
+        }
+      ],
+      "verified_on": "2026-09-14",
+      "source_verification": {
+        "original_measured_sha256": "07e9eb6720e95437fc7d7dcb54ded430236e5de85ce29d29f0f6c6ebb22c5c2c",
+        "original_download_http_status": 200,
+        "rights_http_status": 200,
+        "catalogue_direct_request": "403; current indexed LoC catalogue exposes the original TIFF download link and confirms photographer/date.",
+        "catalogue_negative_number": "LC-U9-11696-9A",
+        "rights_release_basis": "The magazine dedicated to the public all rights it held upon donation; the holder identifies Trikosko as staff.",
+        "crop_method": "SIFT correspondence from existing research chosen-crop preview to newly fetched unaltered LoC original, RANSAC similarity transform, rounded axis-aligned rectangle. No rotation or enhancement applied to derivative.",
+        "crop_correspondences": 252,
+        "crop_inliers": 235,
+        "crop_reference": "Commons selected crop, image version 2024-09-22T20:42:19Z, 1650×1608, source SHA1 6be100b29f6ae11059315d058dc3e8415dc78c4b",
+        "crop_box_convention": "[left, top, right, bottom], integer pixels, right and bottom exclusive",
+        "crop_width": 2166,
+        "crop_height": 2113,
+        "crop_transform": [
+          [
+            2.2441576852840988,
+            -0.013070505414819194,
+            1969.879887698727
+          ],
+          [
+            0.013070505414819194,
+            2.2441576852840988,
+            754.8226010452183
+          ]
+        ]
+      },
+      "derivation": "No embedded ICC profile. Source interpreted as sRGB. JPEG previews resized with Lanczos, quality 88, embedded sRGB profile. Original bytes unchanged.",
+      "rights_note": "Tier 1 rests on the magazine donor dedication of its rights in staff photographs, not US government status. The holder names Trikosko among the staff photographers. Whole 5133×5828 TIFF preserved separately from a lossless 2166×2113 crop corresponding to the research selection.",
+      "crop": {
+        "path": "likenesses/king/crop.png",
+        "sha256": "2574b16ebc162f262bb73278a7c40e940fb5f80ff2d5a41a09c88007325840df",
+        "bytes": 3091479,
+        "width": 2166,
+        "height": 2113,
+        "pixels": 4576758,
+        "box": [
+          1958,
+          755,
+          4124,
+          2868
+        ],
+        "coordinate_system": "pixels in the original, left top right bottom, right and bottom exclusive",
+        "source_path": "likenesses/king/original.tif",
+        "color_space": "sRGB",
+        "operation": "Crop and color conversion only. No retouching."
+      }
     }
   ]
 }
