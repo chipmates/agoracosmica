@@ -43,7 +43,7 @@ export interface CollectionExhibits {
 }
 
 export function mountCollectionExhibits(host: Group, stack: Stack): CollectionExhibits {
-  const machines: { build: ReadyMachineBuild; slug: MachineSlug; ground: StandGround; at: Vector3 }[] = []
+  const machines: { build: ReadyMachineBuild; slug: MachineSlug; ground: StandGround; at: Vector3; reach: number }[] = []
   const material = collectionInteriorMaterial()
   const pictures = mountCollectionPlates(host, stack)
   let live = true
@@ -83,8 +83,13 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
     machine.object.position.set(spot.east, level + spot.plinth - machine.bounds.min.y, -spot.north)
     machine.object.updateMatrixWorld(true)
     machine.object.visible = false
+    // A MACHINE IS DRAWN AT THE DISTANCE ITS OWN SIZE CAN BE READ FROM. Nine
+    // metres of screw is the hall's landmark and a bearing is a hand's width:
+    // one radius for both leaves the hall's far end empty from its own door.
+    const size = machine.bounds.getSize(new Vector3())
     machines.push({ build: machine, slug, ground: spot.ground,
-      at: new Vector3(spot.east, level + spot.plinth, -spot.north) })
+      at: new Vector3(spot.east, level + spot.plinth, -spot.north),
+      reach: Math.max(14, 1.6 * Math.hypot(size.x, size.z)) })
     stamp(machine.object, `vinci/machine/${slug}`)
     host.add(machine.object)
     // THE REST POSE IS THE POSE AT t=0 of this machine's own schedule.
@@ -113,8 +118,7 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
   stamp(line, 'vinci/collection-line-floor')
   host.add(line)
   const graveNear = new Vector3(-42, FLOOR, 46)
-  /** The middle of the court's own exhibits, and of the house's court. */
-  const COURT_AT = new Vector3(-41, COURT.level, 22)
+  /** The house's own court, where the compass stands. */
   const HOUSE_AT = new Vector3(STANDS['proportional-compass'].east, 0, -STANDS['proportional-compass'].north)
   /** The middle of the insertion, for the distance at which its rooms are
    * asked for and the distance at which their contents come back. */
@@ -154,6 +158,11 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
     built.set(ground, work)
     return work
   }
+  // THE COURT IS BUILT WITH THE PAGE. Its three exhibits stand under the open
+  // sky and are read from every station on this ground, so a build that waits
+  // for the visitor to walk up to them is a build that arrives after the
+  // frame. They still queue behind the house's own library loads.
+  const courtGround = warmGround('court')
   let hall: Promise<void> | undefined
   function warmHall(): void {
     if (hall || !live) return
@@ -244,7 +253,7 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
   }
 
   return {
-    ready: Promise.all([court.then(() => hall ?? Promise.resolve()).then(() => table ?? Promise.resolve()), pictures.ready]).then(() => undefined),
+    ready: Promise.all([court.then(() => courtGround).then(() => hall ?? Promise.resolve()).then(() => table ?? Promise.resolve()), pictures.ready]).then(() => undefined),
     pending: () => [...warmed].filter(ground => !machines.some(machine => machine.ground === ground)).length + pictures.pending(),
     pictureSources: pictures.sources,
     pictureErrors: pictures.errors,
@@ -267,7 +276,6 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
       // The court's three standing exhibits and the compass in the house are
       // built on the way to them, not at the head of the page: each ground is
       // asked for at the distance a visitor can still be walked up to it.
-      if (eye.distanceToSquared(COURT_AT) < 44 * 44) void warmGround('court')
       if (eye.distanceToSquared(HOUSE_AT) < 26 * 26) void warmGround('house')
       // AND THE GROUND ITSELF IS DRAWN WHEN IT IS BEING LOOKED AT. From the
       // street and the court of the house this ground is seventy metres off
@@ -291,7 +299,7 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
       // between a walk and a frame that draws the whole ground at once.
       const inHall = eye.x > -62.4 && eye.x < -38.6 && eye.z > 41.8 && eye.z < 64.2 && eye.y < -1.9
       for (const machine of machines) {
-        const visible = machine.ground === 'hall' ? inHall && eye.distanceToSquared(machine.at) < 14 * 14
+        const visible = machine.ground === 'hall' ? inHall && eye.distanceToSquared(machine.at) < machine.reach * machine.reach
           : machine.ground === 'house' ? eye.distanceToSquared(machine.at) < 18 * 18
           : near
         if (machine.build.object.visible !== visible) machine.build.object.visible = visible

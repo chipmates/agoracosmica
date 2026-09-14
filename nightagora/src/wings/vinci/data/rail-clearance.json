@@ -66,8 +66,8 @@
   },
   {
    "file": "src/wings/vinci/collection/stands.ts",
-   "sha256": "2e7cd96614d84983d048510785e9bd0a5e58b4d323a7ffd9d47b02a99f7270ba",
-   "bytes": 10734,
+   "sha256": "6a15b19857b62823b7d51309b5467407e173e197f60a3244eca0bf55caae9753",
+   "bytes": 11052,
    "unchangedDuringAudit": true
   },
   {
@@ -426,25 +426,25 @@
   }
  ],
  "geometrySha256": [
-  "6f1a138bc86e8879b97d84d21972209dcd825aa3a456d7a25745461a6882b0b1",
-  "0d29b66cbff27d9138be0f31e0ac930bef7109df9a0e6ef743b0947b2f4e84e9"
+  "6917097eea9fae9f20e72db5e69b9ed73ccc1e58c3f0c5566af5e60decbc5f3d",
+  "6d0373e10721498903881603a02e448396016bec8c11c3c4cd4e09aa02a62185"
  ],
  "geometry": [
   {
    "tier": "hero",
-   "sha256": "6f1a138bc86e8879b97d84d21972209dcd825aa3a456d7a25745461a6882b0b1",
+   "sha256": "6917097eea9fae9f20e72db5e69b9ed73ccc1e58c3f0c5566af5e60decbc5f3d",
    "quantumM": 0.000001,
    "matchingGeometryToleranceM": 0.000002
   },
   {
    "tier": "standard",
-   "sha256": "6f1a138bc86e8879b97d84d21972209dcd825aa3a456d7a25745461a6882b0b1",
+   "sha256": "6917097eea9fae9f20e72db5e69b9ed73ccc1e58c3f0c5566af5e60decbc5f3d",
    "quantumM": 0.000001,
    "matchingGeometryToleranceM": 0.000002
   },
   {
    "tier": "calm",
-   "sha256": "0d29b66cbff27d9138be0f31e0ac930bef7109df9a0e6ef743b0947b2f4e84e9",
+   "sha256": "6d0373e10721498903881603a02e448396016bec8c11c3c4cd4e09aa02a62185",
    "quantumM": 0.000001,
    "matchingGeometryToleranceM": 0.000002
   }

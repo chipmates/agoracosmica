@@ -71,9 +71,11 @@ export const STANDS: Record<MachineSlug, Stand> = {
   'multi-barrel-gun': { east: -41.3, north: -50.8, bearing: 0, plinth: 0, ground: 'hall' },
   // THE HOUSE. The proportional compass is 140 mm across and belongs where a
   // visitor can reach it: it stands on a plinth in the court the four house
-  // stations stand in, two metres into their own frame, until the hall's
-  // contemporary ledge is built and takes it.
-  'proportional-compass': { east: 3.9, north: -21.3, bearing: 186, plinth: .95, ground: 'house' },
+  // stations stand in, three and a half metres into their own frame and clear
+  // of both the card and the bar. Their gaze rises to the facade, which is
+  // why the plinth is a lectern's height and not a case's. The hall's
+  // contemporary ledge takes it when that window builds it.
+  'proportional-compass': { east: 4.77, north: -19.77, bearing: 6, plinth: 1.15, ground: 'house' },
 }
 
 export const standLevel = (ground: StandGround): number =>
@@ -193,8 +195,10 @@ export const STAND_SOLIDS_NAME = 'vinci/collection-rooms/plinths'
 export function createCollectionStandSolids(material: Material): Mesh {
   const batch = new RoomBatch()
   for (const box of standBoxes()) batch.box(box.east, box.north, box.height, box.width, box.depth, box.tall, box.role)
+  // The double is seen from under the canopy, which is the one place the
+  // cloth does not hide it, so it takes the pale role and not the dark one.
   const { corners, top } = parachuteCloth()
-  for (let i = 0; i < 4; i++) batch.quad(corners[i]!, corners[(i + 1) % 4]!, top, top, 2)
-  batch.quad(corners[0]!, corners[1]!, corners[2]!, corners[3]!, 2)
+  for (let i = 0; i < 4; i++) batch.quad(corners[i]!, corners[(i + 1) % 4]!, top, top, 4)
+  batch.quad(corners[0]!, corners[1]!, corners[2]!, corners[3]!, 4)
   return batch.mesh(STAND_SOLIDS_NAME, material)
 }
