@@ -1088,6 +1088,72 @@
       "honesty_de": "Gemeinfreies Werk. Reproduktion von Wikimedia Commons. Das Museum kennzeichnet die Reproduktion, nicht das Gemälde. Nichtkommerzielle kulturelle Nutzung.",
       "italian_state_en": "Italian state collection. Non-profit cultural use under Article 108 of the Codice dei beni culturali.",
       "italian_state_de": "Italienische Staatssammlung. Nichtkommerzielle kulturelle Nutzung gemäß Artikel 108 des Codice dei beni culturali."
+    },
+    {
+      "id": "lobby/likeness-gandhi",
+      "path": "likenesses/gandhi/original.jpg",
+      "sha256": "d9338443874ae3763dfeec7bd17e372aca409858308c9613e87a5e4a11bfadf8",
+      "bytes": 15943727,
+      "width": 5136,
+      "height": 7000,
+      "pixels": 35952000,
+      "slug": "gandhi",
+      "name": "Mohandas Gandhi",
+      "wing": "lobby",
+      "class": "Tier 2",
+      "tier": 2,
+      "licence": "Public domain",
+      "licence_source_url": "https://commons.wikimedia.org/wiki/File:Gandhi_et_Mme_Sarojini_Na%C3%AFdu.jpg#Licensing",
+      "licence_location": "Commons file page, Licensing",
+      "holder": "Bibliothèque nationale de France, département Estampes et photographie, EI-13 (2866); Meurisse 75982 A",
+      "maker": "Photographer unidentified; distributed/commissioned by Agence Meurisse",
+      "date": "1930",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Gandhi_et_Mme_Sarojini_Na%C3%AFdu.jpg",
+      "original_url": "https://upload.wikimedia.org/wikipedia/commons/8/8b/Gandhi_et_Mme_Sarojini_Na%C3%AFdu.jpg",
+      "holder_record_url": "https://gallica.bnf.fr/ark:/12148/btv1b90474800",
+      "display": true,
+      "label_en": "Mahatma Gandhi with Sarojini Naidu, 1930. Press photograph, photographer unidentified; Agence Meurisse. Bibliothèque nationale de France, département Estampes et photographie, EI-13 (2866), Meurisse 75982 A. Licence: “Public domain”. Public domain work. Reproduction from Wikimedia Commons. The museum labels the reproduction, not the photograph. Non-profit cultural use.",
+      "label_de": "Mahatma Gandhi mit Sarojini Naidu, 1930. Pressefotografie, Fotograf unbekannt; Agence Meurisse. Bibliothèque nationale de France, Département des Estampes et de la Photographie, EI-13 (2866), Meurisse 75982 A. Lizenzangabe: „Public domain“. Gemeinfreies Werk. Reproduktion von Wikimedia Commons. Das Museum kennzeichnet die Reproduktion, nicht die Fotografie. Nichtkommerzielle kulturelle Nutzung.",
+      "previews": [
+        {
+          "path": "likenesses/gandhi/preview-512.jpg",
+          "sha256": "7f29ff0210a203b8af1b37a69b4e40ef2239672013acd5556bcbc2b1f137f6d6",
+          "bytes": 59167,
+          "width": 376,
+          "height": 512,
+          "pixels": 192512,
+          "long_edge": 512,
+          "format": "image/jpeg",
+          "quality": 88,
+          "color_space": "sRGB",
+          "source_path": "likenesses/gandhi/original.jpg"
+        },
+        {
+          "path": "likenesses/gandhi/preview-1024.jpg",
+          "sha256": "8f64b235c750be124a514190130d4023758ada2b8269b38945e719d9ffbe4d8d",
+          "bytes": 203236,
+          "width": 751,
+          "height": 1024,
+          "pixels": 769024,
+          "long_edge": 1024,
+          "format": "image/jpeg",
+          "quality": 88,
+          "color_space": "sRGB",
+          "source_path": "likenesses/gandhi/original.jpg"
+        }
+      ],
+      "verified_on": "2026-09-14",
+      "source_verification": "Current Commons imageinfo, original link, licence template and file history checked. Holder evidence rechecked where available.",
+      "derivation": "No embedded ICC profile. Source interpreted as sRGB. JPEG previews resized with Lanczos, quality 88, embedded sRGB profile. Original bytes unchanged.",
+      "licence_url": "https://creativecommons.org/publicdomain/mark/1.0/",
+      "rights_note": "Commons PD-old-70 and PD-1996. The Gallica source states public domain and identifies Agence Meurisse as the commissioning photographic agency, with no individual photographer named. Gallica reuse terms are not an unrestricted holder release. Tier 2. Whole Gandhi and Sarojini Naidu composition retained.",
+      "source_version": {
+        "file_timestamp": "2014-04-26T12:49:53Z",
+        "commons_revision_id": 1203013348
+      },
+      "source_sha1": "fbc4a32f07a8d76c9208d3175ce7767e859ba74a",
+      "honesty_en": "Public domain work. Reproduction from Wikimedia Commons. The museum labels the reproduction, not the photograph. Non-profit cultural use.",
+      "honesty_de": "Gemeinfreies Werk. Reproduktion von Wikimedia Commons. Das Museum kennzeichnet die Reproduktion, nicht die Fotografie. Nichtkommerzielle kulturelle Nutzung."
     }
   ]
 }
