@@ -151,6 +151,10 @@ const hearCaption = featuredHasPreview
 
 const debateHref = (councilId: string): string => `/app?council=${councilId}&lang=${lang}`;
 
+// Same destination as the navbar CTA, deliberately generic: the label promises
+// the library, not one debate. The council intents ride the doors further down.
+const enterHref = `/app?lang=${lang}`;
+
 const otherDebatesLabel =
   lang === 'de'
     ? `Die anderen ${rail.length} Debatten zu dieser Frage`
@@ -219,7 +223,21 @@ const heroFacts = [
   />
 
   <div class="tq-body">
-    <!-- Block 3: the answer, before anything else, in crawlable HTML. -->
+    <!-- The primary door, first thing under the hero. On a phone the navbar CTA
+         is inside the burger and these pages suppress the sticky bar, and the
+         answer paragraph alone is tall enough to push anything below it off the
+         first screen, so this is the only placement an arrival sees unscrolled. -->
+    <p class="tq-enter">
+      <a
+        class="pub-cta__button"
+        href={enterHref}
+        data-agc-cta="start-exploring"
+        data-agc-door="theme_top"
+      >{t('nav.startExploring')}</a>
+      <span class="tq-enter__note">{t('cta.freeNote')}</span>
+    </p>
+
+    <!-- Block 3: the answer, in crawlable HTML. -->
     <p class="tq-answer">{answer}</p>
 
     <!-- The lead band, right under the question and its answer. It is a mask
@@ -521,6 +539,25 @@ const heroFacts = [
   @media (max-width: 560px) {
     .tq-voice { flex-direction: column; gap: 0.75rem; }
     .tq-voice__portrait img { width: 56px; height: 56px; }
+  }
+
+  /* ── The first-screen door ── */
+  .tq-enter {
+    margin: 0 0 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+    text-align: center;
+  }
+  .tq-enter__note {
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: var(--text-xs);
+    line-height: var(--leading-relaxed);
+    color: var(--text-tertiary);
+  }
+  @media (max-width: 640px) {
+    .tq-enter { margin-bottom: 1.5rem; }
   }
 
   /* ── The featured debate's door ── */
