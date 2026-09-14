@@ -1154,6 +1154,72 @@
       "source_sha1": "fbc4a32f07a8d76c9208d3175ce7767e859ba74a",
       "honesty_en": "Public domain work. Reproduction from Wikimedia Commons. The museum labels the reproduction, not the photograph. Non-profit cultural use.",
       "honesty_de": "Gemeinfreies Werk. Reproduktion von Wikimedia Commons. Das Museum kennzeichnet die Reproduktion, nicht die Fotografie. Nichtkommerzielle kulturelle Nutzung."
+    },
+    {
+      "id": "lobby/likeness-kahlo",
+      "path": "likenesses/kahlo/original.jpg",
+      "sha256": "36b69fdc1440d2bb59b20e039b9ba4b803c3e94e077a77c38949f114a343e8f7",
+      "bytes": 816286,
+      "width": 1197,
+      "height": 1440,
+      "pixels": 1723680,
+      "slug": "kahlo",
+      "name": "Frida Kahlo",
+      "wing": "lobby",
+      "class": "Tier 2",
+      "tier": 2,
+      "licence": "Public domain",
+      "licence_source_url": "https://commons.wikimedia.org/wiki/File:Frida_Kahlo,_by_Guillermo_Kahlo_(cropped).jpg#Licensing",
+      "licence_location": "Commons file page, Licensing",
+      "holder": "Private collection; documented in Sotheby’s New York 2014, lot 148; current owner not disclosed",
+      "maker": "Guillermo Kahlo (1871–1941)",
+      "date": "16 October 1932",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Frida_Kahlo,_by_Guillermo_Kahlo_(cropped).jpg",
+      "original_url": "https://upload.wikimedia.org/wikipedia/commons/0/09/Frida_Kahlo%2C_by_Guillermo_Kahlo_%28cropped%29.jpg",
+      "holder_record_url": "https://www.sothebys.com/en/auctions/ecatalogue/2014/latin-american-art-n09152/lot.148.html",
+      "display": true,
+      "label_en": "Frida Kahlo, 16 October 1932. Photograph by Guillermo Kahlo (1871–1941); cropped reproduction. Private collection; documented by Sotheby’s, New York, 2014, lot 148. Licence: “Public domain”. Public domain work. Reproduction from Wikimedia Commons. The museum labels the reproduction, not the photograph. Non-profit cultural use.",
+      "label_de": "Frida Kahlo, 16. Oktober 1932. Fotografie von Guillermo Kahlo (1871–1941); beschnittene Reproduktion. Privatbesitz; dokumentiert bei Sotheby’s, New York, 2014, Los 148. Lizenzangabe: „Public domain“. Gemeinfreies Werk. Reproduktion von Wikimedia Commons. Das Museum kennzeichnet die Reproduktion, nicht die Fotografie. Nichtkommerzielle kulturelle Nutzung.",
+      "previews": [
+        {
+          "path": "likenesses/kahlo/preview-512.jpg",
+          "sha256": "11c88f0f8cc272ebfca66965db61fc97d274728da23960802e7a1e2dd7239340",
+          "bytes": 49922,
+          "width": 426,
+          "height": 512,
+          "pixels": 218112,
+          "long_edge": 512,
+          "format": "image/jpeg",
+          "quality": 88,
+          "color_space": "sRGB",
+          "source_path": "likenesses/kahlo/original.jpg"
+        },
+        {
+          "path": "likenesses/kahlo/preview-1024.jpg",
+          "sha256": "65403d9bf67e4f5c3444b715766b320d98fe12127ba77e2e6a4cbe8718747201",
+          "bytes": 176899,
+          "width": 851,
+          "height": 1024,
+          "pixels": 871424,
+          "long_edge": 1024,
+          "format": "image/jpeg",
+          "quality": 88,
+          "color_space": "sRGB",
+          "source_path": "likenesses/kahlo/original.jpg"
+        }
+      ],
+      "verified_on": "2026-09-14",
+      "source_verification": "Current Commons imageinfo, original link, licence template and file history checked. Holder evidence rechecked where available.",
+      "derivation": "Converted embedded ICC profile to sRGB. JPEG previews resized with Lanczos, quality 88, embedded sRGB profile. Original bytes unchanged.",
+      "licence_url": "https://creativecommons.org/publicdomain/mark/1.0/",
+      "rights_note": "Commons states Public domain under PD-Mexico and PD-old-auto-1996, deathyear 1941. The museum applies Tier 2 for German display and does not assert Mexican public-domain status: the controlling cross-check applies Mexico’s 100-year term, whereas the current Commons template invokes an older 30-year term and non-restoration. This discrepancy is recorded explicitly. Guillermo Kahlo died in 1941. Private collection, documented through Sotheby’s 2014 auction catalogue, with no museum holder or holder release asserted.",
+      "source_version": {
+        "file_timestamp": "2018-12-20T02:34:07Z",
+        "commons_revision_id": 1071287899
+      },
+      "source_sha1": "b17c3baceaab661342f879403da44d888805a0d3",
+      "honesty_en": "Public domain work. Reproduction from Wikimedia Commons. The museum labels the reproduction, not the photograph. Non-profit cultural use.",
+      "honesty_de": "Gemeinfreies Werk. Reproduktion von Wikimedia Commons. Das Museum kennzeichnet die Reproduktion, nicht die Fotografie. Nichtkommerzielle kulturelle Nutzung."
     }
   ]
 }
