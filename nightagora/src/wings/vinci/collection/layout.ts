@@ -65,9 +65,13 @@ export const ROOMS: Record<'picture' | 'hall' | 'gallery', Room> = {
  * eye level. Centre height of every frame on the wall. */
 export const HANG_DATUM = FLOOR + 1.55
 
-/** The line is let into the gallery's floor on this grid, and the room's own
- * paving is laid on the same one, so the two meet without a seam. */
-export const LINE_ORIGIN = { east: -30.4, north: -58.5 }
+/** The shared paving datum remains fixed for the existing rooms. The date
+ * field keeps the bench's course dimensions at its own fitted origin. */
+export const COLLECTION_PAVING_ORIGIN = { east: -30.4, north: -59 }
+/** The twelve date courses sit half a metre north of the shared paving datum
+ * so both ends clear the gallery's walls. Other rooms keep their own grid.
+ */
+export const LINE_ORIGIN = { east: COLLECTION_PAVING_ORIGIN.east, north: COLLECTION_PAVING_ORIGIN.north + .5 }
 export const LINE_SLAB = { pitchEast: 1.6, pitchNorth: 1.65, width: 1.585, depth: 1.635, thickness: 0.18 }
 /** What the line module lays down around its origin: sixteen courses by
  * seven, which is what the room's own floor is cut around. */

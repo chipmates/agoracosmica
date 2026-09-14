@@ -13,7 +13,7 @@ import type { Stack } from '../../../stack'
 import type { GrainRecipe, MaterialClass, MaterialSet } from '../../../stack/materials'
 import { applyDetail } from '../../../stack/detail'
 import { anisotropicFootprint } from '../masonry-courses'
-import { FACE, LINE_ORIGIN, LINE_SLAB } from './layout'
+import { COLLECTION_PAVING_ORIGIN, FACE, LINE_SLAB } from './layout'
 
 /** floor stone, wall plaster, dark stone, steel, ceiling, outdoor paving */
 export type CollectionRole = 0 | 1 | 2 | 3 | 4 | 5
@@ -126,13 +126,13 @@ export function collectionInteriorMaterial(): MeshStandardNodeMaterial {
     const f = fract(coordinate.sub(offset).div(spacing)), edge = f.min(float(1).sub(f)).mul(spacing)
     return float(1).sub(smoothstep(float(width).sub(pixel.mul(.5)).max(0), float(width).add(pixel.mul(.5)), edge)).mul(resolved(spacing))
   }
-  // THE FLOOR IS ONE GRID FOR THE WHOLE INSERTION, and it is the line's own:
-  // the timeline's slabs and the room's paving are laid off the same origin,
-  // so a visitor never meets the seam between an exhibit and its room.
-  const slabEast = line(P.x, LINE_SLAB.pitchEast, LINE_ORIGIN.east, .008)
-  const slabNorth = line(P.z, LINE_SLAB.pitchNorth, -LINE_ORIGIN.north, .008)
+  // Existing rooms keep their established paving grid. The date field has
+  // its own half-metre offset to fit twelve courses; moving that exhibit
+  // must not move the joints or stone tones in every room.
+  const slabEast = line(P.x, LINE_SLAB.pitchEast, COLLECTION_PAVING_ORIGIN.east, .008)
+  const slabNorth = line(P.z, LINE_SLAB.pitchNorth, -COLLECTION_PAVING_ORIGIN.north, .008)
   const slabJoint = slabEast.max(slabNorth).mul(n.y.abs())
-  const slabIndex = floor(P.x.sub(LINE_ORIGIN.east).div(LINE_SLAB.pitchEast)).add(floor(P.z.add(LINE_ORIGIN.north).div(LINE_SLAB.pitchNorth)).mul(7.31))
+  const slabIndex = floor(P.x.sub(COLLECTION_PAVING_ORIGIN.east).div(LINE_SLAB.pitchEast)).add(floor(P.z.add(COLLECTION_PAVING_ORIGIN.north).div(LINE_SLAB.pitchNorth)).mul(7.31))
   const slabTone = fract(slabIndex.mul(13.17).sin().mul(4371.13)).sub(.5).mul(resolved(1.6))
   // Walls: a 1.2 by 2.4 m board rhythm on the lining, its shadow joints 6 mm.
   const boardV = line(P.y, 1.2, 0, .006), plasterDrift = mx_noise_float(P.mul(.42))

@@ -36,20 +36,20 @@
   },
   {
    "file": "src/wings/vinci/collection/hang.ts",
-   "sha256": "832e2df0628f86fdfd47a3d964aaaa7faa9c5dd9d6ec67fe597f05004a2959bf",
-   "bytes": 6130,
+   "sha256": "2f4dd18ec55d62ee76aff60aa71aac6cad859e3a03611b3e6f47a366be8684af",
+   "bytes": 7380,
    "unchangedDuringAudit": true
   },
   {
    "file": "src/wings/vinci/collection/layout.ts",
-   "sha256": "955fd7e295ece5e4677c2c88e7c451d862e6fb58c2164e0457781498e67cd74d",
-   "bytes": 5625,
+   "sha256": "e4bb0bcaac7980b6ec8d661589521da03c02000324af3ad9495cd5a162b91663",
+   "bytes": 5906,
    "unchangedDuringAudit": true
   },
   {
    "file": "src/wings/vinci/collection/materials.ts",
-   "sha256": "3cbe0aae835e0f17ed878d960741e3a5fdd895adcbb12fbd443f664d4eb6936e",
-   "bytes": 21772,
+   "sha256": "1af3f1fc26527f8efcad9f20a6b817d7a5c96841c7a303a76d38aec5a2d66bb3",
+   "bytes": 22433,
    "unchangedDuringAudit": true
   },
   {
@@ -66,8 +66,8 @@
   },
   {
    "file": "src/wings/vinci/content.ts",
-   "sha256": "246c19d03b189ba1fa74b29c44fb573c118d0fa213c5795a436581670395f385",
-   "bytes": 37728,
+   "sha256": "e6dad3a95759d49795bef97fcbc7e24711a86aba095afb700d2143dcebcb5f2c",
+   "bytes": 38315,
    "unchangedDuringAudit": true
   },
   {
@@ -288,25 +288,25 @@
   }
  ],
  "geometrySha256": [
-  "0c9fb6f8c0d89e86e6fe7b70e7cc897b9d032760ac68b97209da464ecfd11a9e",
-  "8810c022fae383b2def78e3c91994de4564dd933deea31612ae0e4869f8acc83"
+  "256c581f938845a9474e26aa10c29d536ff41292abb0c5d4804412ef0fca9978",
+  "a56dd4777c75b059a4b1177fcb806db768505b03a3564efdc7f091baa63171ed"
  ],
  "geometry": [
   {
    "tier": "hero",
-   "sha256": "0c9fb6f8c0d89e86e6fe7b70e7cc897b9d032760ac68b97209da464ecfd11a9e",
+   "sha256": "256c581f938845a9474e26aa10c29d536ff41292abb0c5d4804412ef0fca9978",
    "quantumM": 0.000001,
    "matchingGeometryToleranceM": 0.000002
   },
   {
    "tier": "standard",
-   "sha256": "0c9fb6f8c0d89e86e6fe7b70e7cc897b9d032760ac68b97209da464ecfd11a9e",
+   "sha256": "256c581f938845a9474e26aa10c29d536ff41292abb0c5d4804412ef0fca9978",
    "quantumM": 0.000001,
    "matchingGeometryToleranceM": 0.000002
   },
   {
    "tier": "calm",
-   "sha256": "8810c022fae383b2def78e3c91994de4564dd933deea31612ae0e4869f8acc83",
+   "sha256": "a56dd4777c75b059a4b1177fcb806db768505b03a3564efdc7f091baa63171ed",
    "quantumM": 0.000001,
    "matchingGeometryToleranceM": 0.000002
   }

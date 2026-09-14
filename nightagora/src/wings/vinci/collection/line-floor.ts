@@ -47,6 +47,70 @@ function clip(vertices: Vertex[], axis: number, edge: number, keepAbove: boolean
   return output
 }
 
+/** The footprints the collection assigned before the benches acquired their
+ * larger independent stages. Their upright exhibits keep the new geometry;
+ * only the paving is cut to the footprint this host has space for.
+ */
+export const COLLECTION_EXHIBIT_FLOORS = {
+  grave: { width: 12, depth: 13 },
+  deathbed: { width: 13, depth: 12 },
+  quotes: { width: 13, depth: 12 },
+} as const
+
+export function fitCollectionExhibitFloor(group: Group, materials: Pick<LineMaterials, 'stone' | 'dark'>,
+  kind: keyof typeof COLLECTION_EXHIBIT_FLOORS): void {
+  const footprint = COLLECTION_EXHIBIT_FLOORS[kind]
+  group.traverse(object => {
+    if (!(object instanceof Mesh) || Array.isArray(object.material)) return
+    const stone = object.material === materials.stone, dark = object.material === materials.dark
+    if (!stone && !dark) return
+    const geometry = object.geometry, position = geometry.getAttribute('position'), index = geometry.getIndex()
+    const names = ['position', ...Object.keys(geometry.attributes).filter(name => name !== 'position')]
+    const attributes = names.map(name => geometry.getAttribute(name))
+    const buffers = attributes.map(() => [] as number[])
+    let touched = false
+    for (let at = 0; at < (index?.count ?? position.count); at += 3) {
+      const vertices: Vertex[] = [0, 1, 2].map(corner => {
+        const i = index ? index.getX(at + corner) : at + corner
+        return attributes.flatMap(attribute => Array.from({ length: attribute.itemSize }, (_, component) => attribute.getComponent(i, component)))
+      })
+      // Exact native stage levels distinguish paving from any low plinth or
+      // downward face of the wall. All other triangles pass through intact.
+      const floor = vertices.every(vertex => stone
+        ? near(vertex[1]!, -.215) || near(vertex[1]!, -.015)
+        : near(vertex[1]!, -.2155) || near(vertex[1]!, -.0155))
+      let polygon = vertices
+      if (floor) {
+        touched = true
+        polygon = clip(polygon, 0, -footprint.width / 2, true)
+        polygon = clip(polygon, 0, footprint.width / 2, false)
+        polygon = clip(polygon, 2, 2.5 - footprint.depth / 2, true)
+        polygon = clip(polygon, 2, 2.5 + footprint.depth / 2, false)
+      }
+      for (let i = 1; i < polygon.length - 1; i++) for (const vertex of [polygon[0]!, polygon[i]!, polygon[i + 1]!]) {
+        let offset = 0
+        for (const [channel, attribute] of attributes.entries()) {
+          buffers[channel]!.push(...vertex.slice(offset, offset + attribute.itemSize))
+          offset += attribute.itemSize
+        }
+      }
+    }
+    if (!touched) return
+    const fitted = new BufferGeometry()
+    for (const [channel, attribute] of attributes.entries()) {
+      fitted.setAttribute(names[channel]!, new Float32BufferAttribute(buffers[channel]!, attribute.itemSize, attribute.normalized))
+    }
+    fitted.computeBoundingBox(); fitted.computeBoundingSphere()
+    object.geometry = fitted
+    geometry.dispose()
+    object.userData['sourceManifestIds'] = [...new Set([
+      ...(object.userData['sourceManifestIds'] ?? []), object.userData['manifestId'],
+    ].filter(Boolean))]
+    object.userData['manifestId'] = 'vinci/collection-exhibit-floors'
+  })
+  group.userData['collectionFloorFootprint'] = { ...footprint, centreZ: 2.5 }
+}
+
 /** Retain original triangles; only a paver cut by the room is clipped. */
 export function createCollectionLineFloor(materials: LineMaterials, language: 'en' | 'de'): Group {
   const floor = new Group()

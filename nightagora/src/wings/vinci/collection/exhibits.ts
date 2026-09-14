@@ -10,7 +10,7 @@ import type { Stack } from '../../../stack'
 import { buildMachine, MACHINE_SLUGS, type MachineSlug } from '../machines'
 import type { ReadyMachineBuild } from '../machines/runtime'
 import { mountBoxes } from '../machines/bench/mounts'
-import { createCollectionLineFloor } from './line-floor'
+import { createCollectionLineFloor, fitCollectionExhibitFloor } from './line-floor'
 import { createGrave } from '../grave'
 import { createMythDeathbed, createMythQuotes } from '../myths'
 import { buildTable, type PageRecord } from '../table'
@@ -171,6 +171,7 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
   const TABLE_AT = new Vector3(-37.72, FLOOR + .755, 45.4)
   const rooms = host.getObjectByName('vinci/collection-rooms')
   const grave = createGrave(exhibitStones)
+  fitCollectionExhibitFloor(grave.group, exhibitStones, 'grave')
   grave.group.rotation.y = Math.PI / 2
   grave.group.position.set(GRAVE_ORIGIN.east, COURT.level + .035, -GRAVE_ORIGIN.north)
   stamp(grave.group, 'vinci/grave-geometry')
@@ -212,10 +213,12 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
       // only room here that has them. Each stands on its own floor, and the
       // later one steps 60 mm over the earlier where the two floors meet.
       const deathbed = createMythDeathbed(exhibitStones)
+      fitCollectionExhibitFloor(deathbed.group, exhibitStones, 'deathbed')
       deathbed.group.rotation.y = Math.PI
       deathbed.group.position.set(-57.5, FLOOR + .002, 63.2)
       stamp(deathbed.group, 'vinci/myths-geometry')
       const quotes = createMythQuotes(exhibitStones, { mobile: false, quoteIndex: 0 })
+      fitCollectionExhibitFloor(quotes.group, exhibitStones, 'quotes')
       quotes.group.rotation.y = Math.PI
       quotes.group.position.set(-45.5, FLOOR + .062, 63.2)
       stamp(quotes.group, 'vinci/myths-geometry')
