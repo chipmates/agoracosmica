@@ -53,8 +53,12 @@ export const STANDS: Record<MachineSlug, Stand> = {
   // metres of clear height and eight of floor, and this is the only room in
   // the museum with both, which is what the hall's section was cut for.
   'aerial-screw': { east: -57, north: -45.6, bearing: 0, plinth: 0, ground: 'hall' },
-  'miter-lock-gates': { east: -44.4, north: -46.4, bearing: -22, plinth: .18, ground: 'hall' },
-  'water-lifting-screw': { east: -41.9, north: -53.6, bearing: 90, plinth: .16, ground: 'hall' },
+  // THE TWO WATER MACHINES stay in the hall as models on their own plinths.
+  // The garden's stream runs forty-eight metres west of the nearest certified
+  // eye and four metres below the apron, and the ornamental channel on the
+  // court's south edge leaves a one-metre bank against a three-metre model.
+  'miter-lock-gates': { east: -55.53, north: -51.18, bearing: 0, plinth: .18, ground: 'hall' },
+  'water-lifting-screw': { east: -49.5, north: -45, bearing: 0, plinth: .16, ground: 'hall' },
   'rolling-mill': { east: -46.6, north: -44.3, bearing: -24, plinth: .34, ground: 'hall' },
   'lathe': { east: -44.2, north: -43.6, bearing: 12, plinth: .2, ground: 'hall' },
   // South-east of the aisle, with the camera obscura in the dark bay its
