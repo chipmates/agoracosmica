@@ -1286,6 +1286,72 @@
       "source_sha1": "2c4a79fc724e86128b497f07c443c3c04069925b",
       "honesty_en": "Public domain work. Reproduction from Wikimedia Commons. The museum labels the reproduction, not the painting. Non-profit cultural use.",
       "honesty_de": "Gemeinfreies Werk. Reproduktion von Wikimedia Commons. Das Museum kennzeichnet die Reproduktion, nicht das Gemälde. Nichtkommerzielle kulturelle Nutzung."
+    },
+    {
+      "id": "lobby/likeness-mozart",
+      "path": "likenesses/mozart/original.jpg",
+      "sha256": "e2e15bf7016a6f19fe88da09593641de1cc2aa5eb98d4bb8d9856c895e95c477",
+      "bytes": 23880466,
+      "width": 8880,
+      "height": 10406,
+      "pixels": 92405280,
+      "slug": "mozart",
+      "name": "Wolfgang Amadeus Mozart",
+      "wing": "lobby",
+      "class": "Tier 2",
+      "tier": 2,
+      "licence": "Public domain",
+      "licence_source_url": "https://commons.wikimedia.org/wiki/File:Mozart-Lange.jpg#Licensing",
+      "licence_location": "Commons file page, Licensing",
+      "holder": "The Mozart-Museums of the International Mozarteum Foundation, Salzburg",
+      "maker": "Joseph Lange",
+      "date": "1789, according to the Mozarteum record on Google Arts & Culture",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Mozart-Lange.jpg",
+      "original_url": "https://upload.wikimedia.org/wikipedia/commons/9/94/Mozart-Lange.jpg",
+      "holder_record_url": "https://artsandculture.google.com/asset/4AHa_Use_gkePA",
+      "display": true,
+      "label_en": "Wolfgang Amadeus Mozart. Joseph Lange, 1789 according to the Mozarteum record on Google Arts & Culture. Portrait with later unfinished extensions. International Mozarteum Foundation, Salzburg. Licence: “Public domain”. Public domain work. Reproduction from Wikimedia Commons. The museum labels the reproduction, not the painting. Non-profit cultural use.",
+      "label_de": "Wolfgang Amadeus Mozart. Joseph Lange, 1789 laut dem Mozarteum-Datensatz bei Google Arts & Culture. Porträt mit späteren unvollendeten Erweiterungen. Internationale Stiftung Mozarteum, Salzburg. Lizenz: „Public domain“. Gemeinfreies Werk. Reproduktion von Wikimedia Commons. Das Museum kennzeichnet die Reproduktion, nicht das Gemälde. Nichtkommerzielle kulturelle Nutzung.",
+      "previews": [
+        {
+          "path": "likenesses/mozart/preview-512.jpg",
+          "sha256": "7982a375958693d8ea0e0439c4823393b5ad4e7bdfad6f9680cf57baff4ea3df",
+          "bytes": 46870,
+          "width": 437,
+          "height": 512,
+          "pixels": 223744,
+          "long_edge": 512,
+          "format": "image/jpeg",
+          "quality": 88,
+          "color_space": "sRGB",
+          "source_path": "likenesses/mozart/original.jpg"
+        },
+        {
+          "path": "likenesses/mozart/preview-1024.jpg",
+          "sha256": "a1c16547f174c09292641d58f310a5912d27e65eb7ed30bdc45d151003126159",
+          "bytes": 195939,
+          "width": 874,
+          "height": 1024,
+          "pixels": 894976,
+          "long_edge": 1024,
+          "format": "image/jpeg",
+          "quality": 88,
+          "color_space": "sRGB",
+          "source_path": "likenesses/mozart/original.jpg"
+        }
+      ],
+      "verified_on": "2026-09-14",
+      "source_verification": "Current Commons imageinfo, original link, licence template and file history checked. Holder evidence rechecked where available.",
+      "derivation": "No embedded ICC profile. Source interpreted as sRGB. JPEG previews resized with Lanczos, quality 88, embedded sRGB profile. Original bytes unchanged.",
+      "licence_url": "https://commons.wikimedia.org/wiki/File:Mozart-Lange.jpg#Licensing",
+      "rights_note": "Commons PD-Art(PD-old-auto-expired); Lange died 1831. Current 2024 file history identifies Google Art Project as source. Commons gives 1782–1785 and other variants carry 1782 in the filename; holder’s 1789 is used and the date discrepancy is recorded, not silently resolved from a filename. No explicit holder open release was verified; the brief’s Tier 1-likely suggestion was not adopted.",
+      "source_version": {
+        "file_timestamp": "2024-11-27T16:10:52Z",
+        "commons_revision_id": 1272933705
+      },
+      "source_sha1": "299a3b8656b137ea2d260e39627b09f3a923c445",
+      "honesty_en": "Public domain work. Reproduction from Wikimedia Commons. The museum labels the reproduction, not the painting. Non-profit cultural use.",
+      "honesty_de": "Gemeinfreies Werk. Reproduktion von Wikimedia Commons. Das Museum kennzeichnet die Reproduktion, nicht das Gemälde. Nichtkommerzielle kulturelle Nutzung."
     }
   ]
 }
