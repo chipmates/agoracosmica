@@ -19,8 +19,21 @@ import { createWingFrame, stationFromHash } from './wings/frame'
 import { readLabels, type ForgeLabel } from './core/labels'
 import { DISCLOSURES } from './content/disclosures'
 import { WINGS, wingBySlug, wingsOpen, wingsPreparing } from './wings/registry'
-import { wingCount } from './wings/content'
+import { lang, say, wingCount } from './wings/content'
+import { LOBBY_TEXT } from './content/lobby'
 import { benchOptions, benchPath, createBench, type BenchOptions } from './bench'
+
+function syncLobbyCopy(): void {
+  document.documentElement.lang = lang()
+  for (const el of document.querySelectorAll<HTMLElement>('[data-lobby]')) {
+    const key = el.dataset['lobby'] as keyof typeof LOBBY_TEXT
+    if (!(key in LOBBY_TEXT)) continue
+    const text = say(LOBBY_TEXT[key])
+    if (el instanceof HTMLMetaElement) el.content = text
+    else el.textContent = text
+  }
+}
+syncLobbyCopy()
 
 type Phase = 'transit' | 'held' | 'descent' | 'agora' | 'wheel' | 'breath' | 'wing' | 'bench'
 /** what the rig may ask for: the phases, plus the wheel with a pane open */
