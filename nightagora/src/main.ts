@@ -670,6 +670,9 @@ declare global {
       /** what the standing bench measures of itself: its own joints, its
           own scale, its own plate. Null when no bench stands. */
       bench: () => unknown
+      /** the machine bench under its own name, for a rig written against
+          it. Null when another kind stands. */
+      machine: () => unknown
       cost: () => {
         draws: number
         triangles: number
@@ -884,6 +887,9 @@ window.__forge = {
   /** what the standing bench measures of itself, or null when none stands */
   bench() {
     return bench.telemetry()
+  },
+  machine() {
+    return bench.kind() === 'machines' ? bench.telemetry() : null
   },
   look(yaw, pitch) {
     // a wing drives its own camera, so the cone of a station is turned

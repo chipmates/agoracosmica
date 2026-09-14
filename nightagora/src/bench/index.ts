@@ -106,6 +106,8 @@ export function benchAddress(kind: BenchKind, id: string): string {
 
 /** the kind and state this page's address asks for, if it is a bench at all */
 export function benchPath(): { kind: BenchKind; id: string } | null {
+  const short = /^\/bench\/vinci\/([a-z0-9-]+)\/?$/.exec(location.pathname)
+  if (short?.[1] && !isKind(short[1])) return { kind: 'machines', id: short[1] }
   const at = /^\/bench\/vinci\/([a-z0-9-]+)\/([a-z0-9-]+)\/?$/.exec(location.pathname)
   if (!at || !isKind(at[1]) || !at[2]) return null
   return { kind: at[1], id: at[2] }
