@@ -43,13 +43,16 @@ export const STANDS: Record<MachineSlug, Stand> = {
   // stands north of the display wall's own frame: nothing of it enters the
   // cone between that station's eye and the measured field.
   'parachute': { east: -37, north: -23.1, bearing: 0, plinth: 0, ground: 'court' },
-  // The hall, where thirteen machines stand today.
+  // A revolving crane was built outdoors and stands on its own base frame.
+  'revolving-crane': { east: -44.9, north: -22.5, bearing: 0, plinth: 0, ground: 'court' },
+  // The two weather instruments read the weather, so they read it outdoors,
+  // side by side on one plinth under the open sky.
+  'anemometer': { east: -42.65, north: -22.4, bearing: 8, plinth: .72, ground: 'court', plinthGroup: 'weather' },
+  'inclinometer': { east: -41.9, north: -22.4, bearing: -6, plinth: .72, ground: 'court', plinthGroup: 'weather' },
+  // The hall, where the workshop stands.
   'aerial-screw': { east: -51.5, north: -49, bearing: 0, plinth: .12, ground: 'hall' },
-  'revolving-crane': { east: -59.2, north: -46, bearing: 28, plinth: .16, ground: 'hall' },
   'ball-bearing': { east: -59.6, north: -50.3, bearing: 0, plinth: .62, ground: 'hall' },
   'camera-obscura': { east: -59.4, north: -52.9, bearing: 104, plinth: .3, ground: 'hall' },
-  'anemometer': { east: -57.9, north: -42.95, bearing: 8, plinth: .72, ground: 'hall' },
-  'inclinometer': { east: -56.2, north: -42.95, bearing: -6, plinth: .72, ground: 'hall' },
   'proportional-compass': { east: -54.6, north: -42.95, bearing: 4, plinth: .78, ground: 'hall' },
   'miter-lock-gates': { east: -44.4, north: -46.4, bearing: -22, plinth: .18, ground: 'hall' },
   'multi-barrel-gun': { east: -42.6, north: -50.6, bearing: 208, plinth: .16, ground: 'hall' },
