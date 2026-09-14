@@ -68,8 +68,12 @@ export function collectionView(id: string, narrow: boolean): RoomPose | undefine
       return pose(-30.2, -60.4, EYE, -30.4, -46, FLOOR + .25, narrow ? 76 : 60, -.55)
     case 'collection-room-reading':
       return pose(-34.6, -46.3, EYE - .08, -37.7, -45.35, FLOOR + 1.28, narrow ? 76 : 60, .3)
+    // The eye stands a stride further down the gallery than the hang's own
+    // axis asks, because from the nearer place the hall's south-east door
+    // opens at the frame's left edge and a slice of the corrections wall's
+    // inscription stands inside it, cut to three letters by the jamb.
     case 'collection-room-body':
-      return pose(-32.8, -49.4, EYE, -38.7, -52.6, FLOOR + 1.75, narrow ? 78 : 60, .75)
+      return pose(-32.8, -50.6, EYE, -38.7, -52.6, FLOOR + 1.75, narrow ? 78 : 60, .75)
     // The court, and what stands in it under the sky.
     case 'collection-room-court':
       return pose(-30.8, -28.6, COURT.level + 1.68, -47.5, -26.5, COURT.level + 5.2, narrow ? 88 : 70, 1.4)
