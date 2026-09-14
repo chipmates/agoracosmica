@@ -159,6 +159,65 @@
       "licence_url": "https://creativecommons.org/licenses/by/4.0/",
       "rights_note": "Public-domain medieval miniature → printed facsimile published in Singer 1917–21 → Wellcome photographic reproduction → Wellcome release under CC BY 4.0, recorded on Commons and explicitly repeated for this image in the holder’s own article.",
       "attribution": "Hildegard receiving the light from Heaven. Wellcome Collection, M0005630 / Wikimedia Commons, CC BY 4.0."
+    },
+    {
+      "id": "lobby/likeness-blake",
+      "path": "likenesses/blake/original.jpg",
+      "sha256": "56c7bf729ad24a59d9ab6bc91ded5bfb9db9e269fcb96f092bbfe957fc259021",
+      "bytes": 3879247,
+      "width": 2848,
+      "height": 4000,
+      "pixels": 11392000,
+      "slug": "blake",
+      "name": "William Blake",
+      "wing": "lobby",
+      "class": "Tier 1",
+      "tier": 1,
+      "licence": "This object’s media is free and in the public domain.",
+      "licence_source_url": "https://www.nga.gov/artworks/208126-william-blake",
+      "licence_location": "Media Options, immediately below Download",
+      "holder": "National Gallery of Art, Washington, Ailsa Mellon Bruce Fund, 2016.175.7",
+      "maker": "Luigi Schiavonetti, after Thomas Phillips; published by Robert Hartley Cromek",
+      "date": "1808; published 1813",
+      "source_url": "https://www.nga.gov/artworks/208126-william-blake",
+      "original_url": "https://api.nga.gov/iiif/c2f5103b-93db-454d-93be-c9fa921492bc/full/full/0/default.jpg",
+      "holder_record_url": "https://www.nga.gov/artworks/208126-william-blake",
+      "display": true,
+      "label_en": "William Blake. Luigi Schiavonetti after Thomas Phillips, 1808; published 1813. Etching, proof. Courtesy National Gallery of Art, Washington. Ailsa Mellon Bruce Fund, 2016.175.7. Licence: “This object’s media is free and in the public domain.”",
+      "label_de": "William Blake. Luigi Schiavonetti nach Thomas Phillips, 1808; veröffentlicht 1813. Radierung, Probedruck. Courtesy National Gallery of Art, Washington. Ailsa Mellon Bruce Fund, 2016.175.7. Lizenz: „This object’s media is free and in the public domain.“",
+      "previews": [
+        {
+          "path": "likenesses/blake/preview-512.jpg",
+          "sha256": "dfacecdebbcb2238aca5b3b384bcc7548f2aaf946f1d5636bda1c408141d981e",
+          "bytes": 47616,
+          "width": 365,
+          "height": 512,
+          "pixels": 186880,
+          "long_edge": 512,
+          "format": "image/jpeg",
+          "quality": 88,
+          "color_space": "sRGB",
+          "source_path": "likenesses/blake/original.jpg"
+        },
+        {
+          "path": "likenesses/blake/preview-1024.jpg",
+          "sha256": "421d7f157b63e3ee2f1cdfe8228e41ebd2b2ff5d31eac088641a4f668b3d4f8d",
+          "bytes": 236015,
+          "width": 729,
+          "height": 1024,
+          "pixels": 746496,
+          "long_edge": 1024,
+          "format": "image/jpeg",
+          "quality": 88,
+          "color_space": "sRGB",
+          "source_path": "likenesses/blake/original.jpg"
+        }
+      ],
+      "verified_on": "2026-09-14",
+      "source_verification": "NGA current object record gives the quoted media rights line, Schiavonetti after Phillips, 1808, published 1813. NGA IIIF info.json confirms 2848 by 4000. The original download is the NGA image UUID c2f5103b-93db-454d-93be-c9fa921492bc.",
+      "derivation": "Converted embedded ICC profile to sRGB. JPEG previews resized with Lanczos, quality 88, embedded sRGB profile. Original bytes unchanged.",
+      "licence_url": "https://www.nga.gov/artworks/208126-william-blake",
+      "rights_note": "Select the exact holder-released NGA digital image. The related Yale Commons record is a different impression and is not a mirror of this file. NGA’s specific public-domain media notice and CC0 policy override its generic site terms for this object."
     }
   ]
 }
