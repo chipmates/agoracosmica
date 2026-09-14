@@ -380,8 +380,13 @@ function glazingMaterial(water = false): MeshStandardNodeMaterial {
   // Glass turns to a mirror at a grazing angle: from the court this wall is
   // seen almost edge on, and a fixed low opacity read there as a hole.
   if (!water) {
+    // A museum's window wall is a window: the rooms behind it are the
+    // exhibit, and an opacity that climbs to a mirror at a grazing angle
+    // turned the whole north elevation into milk. The Fresnel lobe stays,
+    // because glass does that, but the sheet under it is glass and not a
+    // screen.
     const cosine = normalView.dot(positionViewDirection).abs().clamp(0, 1)
-    m.opacityNode = float(.27).add(float(1).sub(cosine).pow(5).mul(.68)).clamp(.27, .95)
+    m.opacityNode = float(.10).add(float(1).sub(cosine).pow(5).mul(.34)).clamp(.10, .46)
   }
   m.name = water ? 'vinci/collection/still-channel' : 'vinci/collection/full-height-glazing'
   m.userData['provenance'] = 'Original static exhibition glass. Broad drift, middle waviness, filtered microscopic surface grain and a Schlick grazing-angle opacity. No animated water, transmission pass, photographic texture or historical glazing claim.'
