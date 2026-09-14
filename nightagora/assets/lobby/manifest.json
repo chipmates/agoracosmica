@@ -218,6 +218,65 @@
       "derivation": "Converted embedded ICC profile to sRGB. JPEG previews resized with Lanczos, quality 88, embedded sRGB profile. Original bytes unchanged.",
       "licence_url": "https://www.nga.gov/artworks/208126-william-blake",
       "rights_note": "Select the exact holder-released NGA digital image. The related Yale Commons record is a different impression and is not a mirror of this file. NGA’s specific public-domain media notice and CC0 policy override its generic site terms for this object."
+    },
+    {
+      "id": "lobby/likeness-dickinson",
+      "path": "likenesses/dickinson/original.jpg",
+      "sha256": "97a7eddaa4729345f4bee65676a02e80f642e8e782de7573cd365819f632e6f7",
+      "bytes": 7891200,
+      "width": 9600,
+      "height": 13910,
+      "pixels": 133536000,
+      "slug": "dickinson",
+      "name": "Emily Dickinson",
+      "wing": "lobby",
+      "class": "Tier 1",
+      "tier": 1,
+      "licence": "Public domain",
+      "licence_source_url": "https://www.flickr.com/photos/amherst_college_archives/8654989359",
+      "licence_location": "Rights link below photograph details; links to Public Domain Mark 1.0",
+      "holder": "Amherst College Archives and Special Collections",
+      "maker": "Unidentified daguerreotypist; conservation photographer also unrecorded",
+      "date": "c. 1847; reproduction photographed 1978",
+      "source_url": "https://www.flickr.com/photos/amherst_college_archives/8654989359",
+      "original_url": "https://live.staticflickr.com/8123/8654989359_7478bf25a8_o.jpg",
+      "holder_record_url": "https://www.flickr.com/photos/amherst_college_archives/8654989359",
+      "display": true,
+      "label_en": "Emily Dickinson. Unidentified photographer, c. 1847. Daguerreotype; black-and-white photograph made during conservation in 1978. Amherst College Archives and Special Collections. Licence: “Public domain”.",
+      "label_de": "Emily Dickinson. Fotograf oder Fotografin unbekannt, um 1847. Daguerreotypie; Schwarzweißaufnahme während der Restaurierung 1978. Amherst College Archives and Special Collections. Lizenz: „Public domain“.",
+      "previews": [
+        {
+          "path": "likenesses/dickinson/preview-512.jpg",
+          "sha256": "34163a0889c5e2d273f38f5a1ebe5368e2835941c90812c174c9fdc11a124124",
+          "bytes": 50589,
+          "width": 353,
+          "height": 512,
+          "pixels": 180736,
+          "long_edge": 512,
+          "format": "image/jpeg",
+          "quality": 88,
+          "color_space": "sRGB",
+          "source_path": "likenesses/dickinson/original.jpg"
+        },
+        {
+          "path": "likenesses/dickinson/preview-1024.jpg",
+          "sha256": "a896d3ea0eaca87b1ec0843b6e19842b24155f22ad575793d0f223d8c41cc38e",
+          "bytes": 187946,
+          "width": 707,
+          "height": 1024,
+          "pixels": 723968,
+          "long_edge": 1024,
+          "format": "image/jpeg",
+          "quality": 88,
+          "color_space": "sRGB",
+          "source_path": "likenesses/dickinson/original.jpg"
+        }
+      ],
+      "verified_on": "2026-09-14",
+      "source_verification": "Current source record and exact downloaded original checked on admission.",
+      "derivation": "No embedded ICC profile. Source interpreted as sRGB. JPEG previews resized with Lanczos, quality 88, embedded sRGB profile. Original bytes unchanged.",
+      "licence_url": "https://www.flickr.com/photos/amherst_college_archives/8654989359",
+      "rights_note": "The 1978 conservation reproduction has its own explicit holder Public Domain Mark. Do not label the scan itself as an 1847 photograph without the reproduction qualifier, and do not assign William C. North without additional holder support."
     }
   ]
 }
