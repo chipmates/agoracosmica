@@ -108,8 +108,8 @@
   },
   {
    "file": "src/wings/vinci/ground.ts",
-   "sha256": "3e10798909f4f9ec12ec89bb8696e6179399991637bfa9832a35648e2b2fb899",
-   "bytes": 20785,
+   "sha256": "b2c7023924d5f42d6dd5ea11ea74574c82364527e6665e1cfcbd7092af8b4b62",
+   "bytes": 21347,
    "unchangedDuringAudit": true
   },
   {

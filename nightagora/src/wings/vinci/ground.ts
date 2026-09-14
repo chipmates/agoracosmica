@@ -28,6 +28,9 @@ export function groundMaterial(kind:'grass'|'earth'|'stone',library?:MaterialLib
   const P=positionWorld
   const broad=mx_fractal_noise_float(P.mul(.12),3,2,.5).mul(.5).add(.5).clamp(0,1)
   const mid=mx_noise_float(P.mul(kind==='grass'?5:11)).mul(.5).add(.5)
+  // Packed earth at arm's length is clods and small stone, and the material
+  // had nothing between nine centimetres and one. This is that band.
+  const clods=kind==='earth'?mx_noise_float(P.mul(27)).mul(.5).add(.5):float(.5)
   const fine=mx_noise_float(P.mul(85)).mul(.5).add(.5)
   // A SCALE IS DROPPED WHEN IT CANNOT BE RESOLVED, never because the ground is
   // far away. The old camera-distance fades are what left the far hillside one
@@ -37,6 +40,7 @@ export function groundMaterial(kind:'grass'|'earth'|'stone',library?:MaterialLib
   const density=shows(.2)
   const pair=kind==='grass'?['#485537','#879066']:kind==='earth'?['#796d57','#b4a388']:['#807968','#b8ad93']
   m.colorNode=mix(rgb(pair[0]!),rgb(pair[1]!),broad).mul(mid.sub(.5).mul(density.mul(.28)).add(1)).mul(fine.sub(.5).mul(density.mul(.15)).add(1))
+  if(kind==='earth')m.colorNode=m.colorNode!.mul(clods.sub(.5).mul(shows(.037)).mul(.26).add(1))
   const nx=mx_noise_float(P.mul(18).add(vec3(.2,0,0))).sub(mid).mul(.18)
   const ny=mx_noise_float(P.mul(18).add(vec3(0,0,.2))).sub(mid).mul(.18)
   m.normalNode=normalMap(vec3(nx.add(.5),ny.add(.5),1),vec2(.4,.4))
@@ -60,7 +64,10 @@ export function groundMaterial(kind:'grass'|'earth'|'stone',library?:MaterialLib
     m.roughnessNode=float(.96).sub(rough.mul(.05)).add(grazed.mul(.02))
   }
   const earthMaps=library&&kind==='earth'?library.sync('earth-packed').sample({uv:uv(),metres:1.4}):undefined
-  if(earthMaps){m.colorNode=m.colorNode!.mul(mix(float(1),earthMaps.albedo.clamp(.35,1.8),.7));m.normalNode=normalMap(earthMaps.normal.mul(.5).add(.5),vec2(.36,.36))}
+  // The CC0 earth set carries its own metre-scale cloud, and at ±45 per cent
+  // it was the only thing a near bank showed: a blotch, not a surface. Held
+  // to a fifth of that, the wing's own clod and grain scales read through it.
+  if(earthMaps){m.colorNode=m.colorNode!.mul(mix(float(1),earthMaps.albedo.clamp(.66,1.38),.46));m.normalNode=normalMap(earthMaps.normal.mul(.5).add(.5),vec2(.36,.36))}
   if(kind==='stone'){
     // Each cut strip previously restarted a stretched local texture. A
     // continuous horizontal tangent and true height now lay the whole wall.
