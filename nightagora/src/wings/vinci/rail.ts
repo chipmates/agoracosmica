@@ -5,6 +5,8 @@ import { roadGradeProvenance } from './road-grade'
 import type { VinciStationId } from './content'
 import { createRailLookSmoother, createCertifiedRailPath } from './rail-smoothing'
 import { projectRailDrag } from './projection-drag'
+import { gaitAt, gaitHeadLift, gaitLeg, gaitRhythm, strollMetresPerSecond, type GaitThreshold } from './gait'
+import { collectionLayout } from './collection'
 import { fittedRailFov, assertRailProjection } from './rail-projection'
 import type { RailGeometryAuthority } from './rail-proof'
 
@@ -105,20 +107,21 @@ export function namedPose(id:string,narrow:boolean):Pose|undefined {
 
 /** Retained gate waypoints; every rounded control hull needs its own proof. */
 const gateRoute=[world(...roadGradeProvenance.crossing,2.65),world(20.6107,-15.9474,2.48),world(18.2624,-17.4724,2.48),world(15.9141,-18.9974,1.65),world(13.5658,-20.5224,1.65)]
-/** The walk between two stations is timed at a stroll, so a leg's length
- * decides its seconds. Past LONG_LEG_M a chosen rail mark on the far side of
- * the museum is a traverse, not a claim about anyone's pace, and it
- * compresses toward MOVE_MAX_S. */
-export const railWalkMetresPerSecond = 1.35
-const LONG_LEG_M = 14, TRAVERSE_METRES_PER_SECOND = 5, MOVE_MIN_SECONDS = 1.1, MOVE_MAX_SECONDS = 20
-export function railMoveSeconds(lengthM:number):number {
-  const stroll=Math.min(Math.max(0,lengthM),LONG_LEG_M), traverse=Math.max(0,lengthM-LONG_LEG_M)
-  return Math.min(MOVE_MAX_SECONDS,Math.max(MOVE_MIN_SECONDS,stroll/railWalkMetresPerSecond+traverse/TRAVERSE_METRES_PER_SECOND))
-}
+/** What a walker looks up at on this rail: the gallery mouth on the street,
+ * the step down out of the court, and the stair head to the terrace. */
+const headLifts:readonly GaitThreshold[]=[
+  {east:roadGradeProvenance.crossing[0],north:roadGradeProvenance.crossing[1],radiusM:5,radians:.05},
+  {east:13.2304,north:-20.7402,radiusM:3.5,radians:.032},
+  {east:collectionLayout.stair.east,north:collectionLayout.stair.north,radiusM:4,radians:.042},
+]
+/** The walk between two stations is timed at a stroll and shaped as a walk:
+ * gait.ts owns the profile, this is the seconds it asks for. */
+export const railWalkMetresPerSecond = strollMetresPerSecond
+export function railMoveSeconds(lengthM:number):number { return gaitLeg(lengthM).seconds }
 /** One notch of the wheel is one stride along the path being walked. */
 export const railStrideMetres = .78
 /** What an offline checker waits for ANY certified leg to complete. */
-export const railMoveDurationSeconds = MOVE_MAX_SECONDS
+export const railMoveDurationSeconds = 20
 /** The gaze leads the walk: it leaves the old composition inside this much of
  * the leg, holds the path's own heading sampled six metres ahead of the body,
  * and turns into the new composition over the last third. The look-ahead is
@@ -136,7 +139,7 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
   let completed:Request|undefined, active:Request|undefined
   const queue:Request[]=[]
   let path:ReturnType<typeof createCertifiedRailPath>|undefined, started=0, placementNeedsFrame=false
-  let duration=MOVE_MIN_SECONDS, strideM=0, strideTarget=0, strideAt=0
+  let duration=1.1, leg=gaitLeg(0), strideM=0, strideTarget=0, strideAt=0
   const fromQ=new Quaternion(), toQ=new Quaternion()
   let fromFov=49,targetFov=49
   let fromHeading=0,fromElevation=0,toHeading=0,toElevation=0,walked=false
@@ -151,12 +154,18 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
     forward.set(0,0,-1).applyQuaternion(q)
     return {heading:Math.atan2(-forward.x,-forward.z),elevation:Math.asin(Math.max(-1,Math.min(1,forward.y)))}
   }
-  /** Where the path points at a distance along it: the direction the visitor
-   * is about to walk, which is what the gaze follows between stations. */
-  function pathAngles(metres:number):{heading:number;elevation:number} {
-    const total=path!.length,at=Math.max(0,Math.min(total,metres))
-    path!.pointAtDistance(Math.max(0,at-.25),behind);path!.pointAtDistance(Math.min(total,at+.25),ahead)
+  /** WHERE A WALKER IS LOOKING. Not the tangent under the far foot: the line
+   * from the body to the place it is walking to, which settles through a bend
+   * instead of swinging with it. Under half a metre of chord the path has run
+   * out and the tangent at the body is all there is. */
+  function pathAngles(bodyMetres:number,aheadMetres:number):{heading:number;elevation:number} {
+    const total=path!.length,at=Math.max(0,Math.min(total,bodyMetres))
+    path!.pointAtDistance(at,behind);path!.pointAtDistance(Math.min(total,at+aheadMetres),ahead)
     ahead.sub(behind)
+    if(ahead.lengthSq()<.25){
+      path!.pointAtDistance(Math.max(0,at-.25),behind);path!.pointAtDistance(Math.min(total,at+.25),ahead)
+      ahead.sub(behind)
+    }
     const flat=Math.hypot(ahead.x,ahead.z)
     if(flat<1e-9)return {heading:fromHeading,elevation:fromElevation}
     return {heading:Math.atan2(-ahead.x,-ahead.z),elevation:Math.max(-.20,Math.min(.13,Math.atan2(ahead.y,flat)))}
@@ -179,7 +188,7 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
     const from=angles(fromQ),to=angles(toQ)
     fromHeading=from.heading;fromElevation=from.elevation;toHeading=to.heading;toElevation=to.elevation
     walked=path.length>=WALKED_LEG_M
-    duration=railMoveSeconds(path.length);strideM=strideTarget=0;strideAt=now
+    leg=gaitLeg(path.length);duration=leg.seconds;strideM=strideTarget=0;strideAt=now
     fromFov=completed.pose.fov;targetFov=request.pose.fov;look.recenter()
     started=now;active=request
   }
@@ -189,6 +198,14 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
     const heading=Math.atan2(-forward.x,-forward.z),elevation=Math.asin(Math.max(-1,Math.min(1,forward.y)))
     euler.set(elevation+offset.pitch,heading+offset.yaw,0,'YXZ');camera.quaternion.setFromEuler(euler)
     matrices()
+  }
+  /** The eye rides the body. The rhythm is written on the certified path
+   * point, never integrated, so it cannot drift and both ends are exact. */
+  function carry(metres:number,heading:number) {
+    const step=gaitRhythm(leg,metres,reducedMotion())
+    camera.position.y+=step.height
+    camera.position.x+=Math.cos(heading)*step.sway
+    camera.position.z+=-Math.sin(heading)*step.sway
   }
   return {
     /** Physical scheduler state, separate from the shared selected destination. */
@@ -241,24 +258,31 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
         strideM+=(strideTarget-strideM)*-Math.expm1(-step/.28)
       }
       strideAt=now
-      const walkedFraction=active&&path?strideM/path.length:0
-      const t=active?Math.max(0,Math.min(1,(now-started)/duration+walkedFraction)):1,s=t*t*(3-2*t)
+      // THE PROFILE, NOT A SMOOTHSTEP OVER THE LEG. The body leans into the
+      // walk over the first ramp, strolls, and leans out of it at the station.
+      // A wheel notch adds its stride to the same distance.
+      const walk=active&&path?gaitAt(leg,now-started):undefined
+      const metres=walk?Math.min(path!.length,walk.metres+strideM):path?path.length:0
+      const s=active&&path&&path.length>0?Math.max(0,Math.min(1,metres/path.length)):1
       if(active&&path) {
         assertRailProjection(camera)
-        path.pointAtDistance(path.length*s,camera.position)
+        path.pointAtDistance(metres,camera.position)
         // THE GAZE LEADS THE WALK. The camera turns out of the station it is
-        // leaving, looks along the path it is about to take (sampled ahead of
-        // the body, so a corner is seen before it is reached), and turns into
-        // the next station's composition only on arrival.
+        // leaving, looks at the place it is walking to (a point ahead on the
+        // path, so a corner is seen before it is reached), lifts a little to
+        // what stands over the way, and turns into the next station's
+        // composition only on arrival.
         const leaves=walked?ramp(0,GAZE_LEAVES,s):0,arrives=walked?ramp(GAZE_ARRIVES,1,s):s
-        const along=walked?pathAngles(path.length*s+GAZE_AHEAD_M):{heading:toHeading,elevation:toElevation}
+        const along=walked?pathAngles(metres,GAZE_AHEAD_M):{heading:toHeading,elevation:toElevation}
         const heading=turn(turn(fromHeading,along.heading,leaves),toHeading,arrives)
-        const led=fromElevation+(along.elevation-fromElevation)*leaves
+        const lift=walked?gaitHeadLift(headLifts,camera.position.x,-camera.position.z):0
+        const led=fromElevation+(along.elevation+lift-fromElevation)*leaves
         euler.set(led+(toElevation-led)*arrives,heading,0,'YXZ');base.setFromEuler(euler)
         camera.fov=fittedRailFov(fromFov+(targetFov-fromFov)*s,camera.aspect,active.phone)
+        carry(metres,heading)
       }
       render(now)
-      if(active&&t===1) {
+      if(active&&s===1) {
         completed=active;active=undefined;path=undefined
         // Do not drain the queue or consume catch-up time after a delayed
         // frame. The next update starts the next leg at its own clock origin.
