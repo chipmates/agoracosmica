@@ -17,6 +17,8 @@ import { mix, texture, uniform } from 'three/tsl'
 import type { ManifestEntry } from '../../../manifest'
 import { ASSET_BASE } from '../../../stack/materials'
 import { validatePaintingRecord } from './policy'
+import { validateSheetRecord } from './sheet-record'
+import type { SheetManifestEntry } from './sheet-record'
 import type { PaintingManifestEntry } from './register'
 
 export interface PlateStreamOptions {
@@ -28,7 +30,12 @@ export interface PlateStreamOptions {
    * the aperture's falloff so a print at the far end stands in that light. */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   tone?: any
+  /** Which store family this stream reads. The picture register's plates are
+   * the default; a drawn sheet carries its own record shape. The rule for
+   * each family lives in this module, never in the caller. */
+  family?: PlateFamily
 }
+export type PlateFamily = 'painting' | 'sheet'
 
 export interface PlateUpload {
   sourceWidth: number
@@ -58,10 +65,12 @@ export interface PlateStream {
 }
 
 interface ValidPlate {
-  entry: PaintingManifestEntry
+  entry: PaintingManifestEntry | SheetManifestEntry
   width: number
   height: number
   face: string
+  /** The work or the sheet the two records must both name. */
+  subject: string
   url: string
 }
 interface LoadedPlate {
@@ -73,10 +82,15 @@ interface LoadedPlate {
 
 /** The source URL is evidence, never an image endpoint. The only accepted
  * payloads are the store's explicit, hashed display records for this wing. */
-function validate(entry: ManifestEntry, role: PaintingManifestEntry['role']): ValidPlate {
-  const record = validatePaintingRecord(entry, role)
+function validate(entry: ManifestEntry, family: PlateFamily, preview: boolean): ValidPlate {
+  if (family === 'sheet') {
+    const sheet = validateSheetRecord(entry, preview ? 'sheet-thumb' : 'sheet-page')
+    return { entry: sheet.entry, width: sheet.pixels.width, height: sheet.pixels.height,
+      face: sheet.identity, subject: sheet.entry.sheet, url: `${ASSET_BASE}${sheet.path}` }
+  }
+  const record = validatePaintingRecord(entry, preview ? 'painting-preview' : 'painting-plate')
   return { entry: record.entry, width: record.pixels.width, height: record.pixels.height,
-    face: record.identity, url: `${ASSET_BASE}${record.path}` }
+    face: record.identity, subject: record.entry.work_id, url: `${ASSET_BASE}${record.path}` }
 }
 
 /** Exact RGBA8 allocation of the actual non-square mip pyramid. */
@@ -156,14 +170,16 @@ async function load(plate: ValidPlate, signal: AbortSignal, upload: PlateUpload)
 
 export function createPlateStream(preview: ManifestEntry, full: ManifestEntry, options: PlateStreamOptions = {}): PlateStream {
   if (!options || typeof options !== 'object' || Array.isArray(options)
-    || Object.keys(options).some(key => key !== 'previewMaxEdge' && key !== 'tone')) throw new Error('Invalid picture preview upload options')
+    || Object.keys(options).some(key => key !== 'previewMaxEdge' && key !== 'tone' && key !== 'family')) throw new Error('Invalid picture preview upload options')
+  const family: PlateFamily = options.family === undefined ? 'painting' : options.family
+  if (family !== 'painting' && family !== 'sheet') throw new Error('Invalid picture source family')
   if (options.tone !== undefined && (options.tone === null || typeof options.tone !== 'object'
     || typeof options.tone.mul !== 'function')) throw new Error('Invalid picture room light node')
   const previewMaxEdge = options.previewMaxEdge === undefined ? 1024 : options.previewMaxEdge
   if (previewMaxEdge !== 512 && previewMaxEdge !== 1024) throw new Error('Invalid picture preview upload maximum')
-  const previewRecord = validate(preview, 'painting-preview')
-  const fullRecord = validate(full, 'painting-plate')
-  if (previewRecord.face !== fullRecord.face || previewRecord.entry.work_id !== fullRecord.entry.work_id)
+  const previewRecord = validate(preview, family, true)
+  const fullRecord = validate(full, family, false)
+  if (previewRecord.face !== fullRecord.face || previewRecord.subject !== fullRecord.subject)
     throw new Error(`Preview and plate name different works: ${preview.id}, ${full.id}`)
   const previewUpload = uploadDimensions(previewRecord, previewMaxEdge)
   const fullUpload = uploadDimensions(fullRecord, 4096)

@@ -23,6 +23,14 @@ vm.runInNewContext(ts.transpileModule(policySource, { compilerOptions: {
   require(name) { throw new Error(`Unexpected policy dependency ${name}`) },
   fetch() { throw new Error('Source resolution must not perform I/O') },
 }, { filename: policyFile, timeout: 2000 })
+const sheetFile = fileURLToPath(new URL('../sheet-record.ts', import.meta.url))
+const sheetRecord = {}
+vm.runInNewContext(ts.transpileModule(readFileSync(sheetFile, 'utf8'), { compilerOptions: {
+  target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS,
+} }).outputText, { exports: sheetRecord,
+  require(name) { throw new Error(`Unexpected sheet dependency ${name}`) },
+  fetch() { throw new Error('Source resolution must not perform I/O') },
+}, { filename: sheetFile, timeout: 2000 })
 const manifestFile = fileURLToPath(new URL('../data/store-audit.json', import.meta.url))
 const manifestSource = readFileSync(manifestFile, 'utf8')
 const snapshot = JSON.parse(manifestSource)
@@ -108,6 +116,7 @@ function harness(reducedMotion = false) {
       }
       if (name === '../../../stack/materials') return { ASSET_BASE: '/mock-assets/' }
       if (name === './policy') return policy
+      if (name === './sheet-record') return sheetRecord
       throw new Error(`Unmocked dependency ${name}`)
     },
   }, { filename: file, timeout: 2000 })

@@ -13,7 +13,7 @@ import vm from 'node:vm'
 import ts from 'typescript'
 import * as Three from 'three/webgpu'
 
-const sourcePaths = ['stream', 'index', 'policy', 'register', 'policy-label', 'scale', 'registration', 'arch-mask', 'visitor-copy', 'aperture']
+const sourcePaths = ['stream', 'index', 'policy', 'register', 'policy-label', 'scale', 'registration', 'arch-mask', 'visitor-copy', 'aperture', 'sheet-record']
   .map(name => `../${name}.ts`)
 const sources = sourcePaths.map(path => {
   const file = fileURLToPath(new URL(path, import.meta.url))
@@ -181,7 +181,9 @@ function harness({ previewMaxEdge = 1024 } = {}) {
   const policyLabel = evaluate(sources[4], { './registration': registration, './visitor-copy': visitorCopy })
   const scale = evaluate(sources[5], {})
   const aperture = evaluate(sources[9], {})
-  const stream = evaluate(sources[0], { '../../../stack/materials': { ASSET_BASE: '/mock-assets/' }, './policy': policy })
+  const sheetRecord = evaluate(sources[10], {})
+  const stream = evaluate(sources[0], { '../../../stack/materials': { ASSET_BASE: '/mock-assets/' },
+    './policy': policy, './sheet-record': sheetRecord })
   const hang = evaluate(sources[1], {
     // Keep each scheduler fixture's upload policy explicit while executing
     // the actual stream and scheduler, including their allocation contract.
