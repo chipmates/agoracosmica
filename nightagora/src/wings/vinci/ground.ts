@@ -41,6 +41,24 @@ export function groundMaterial(kind:'grass'|'earth'|'stone',library?:MaterialLib
   const ny=mx_noise_float(P.mul(18).add(vec3(0,0,.2))).sub(mid).mul(.18)
   m.normalNode=normalMap(vec3(nx.add(.5),ny.add(.5),1),vec2(.4,.4))
   m.roughnessNode=fine.mul(.12).add(.84)
+  if(kind==='grass'){
+    // A MEADOW IS NOT ONE SWARD. Between the eight metre drift and the twenty
+    // centimetre blade noise there was nothing, and two metres is the scale a
+    // field is actually read at: tussock where nothing grazes, a shorter
+    // yellower nap where something does, and the hollows holding their green
+    // after a dry week. Colour and roughness only; no blade is moved.
+    const tussock=mx_fractal_noise_float(P.mul(.45),3,2,.5).clamp(-1,1)
+    const use=mx_noise_float(P.mul(.055))
+    const rough=smoothstep(-.30,.42,tussock.add(use.mul(.6))).mul(shows(1.1))
+    const grazed=smoothstep(.10,.72,use.negate()).mul(shows(4.5))
+    const hollow=smoothstep(.35,.85,mx_noise_float(P.mul(.13).add(vec3(4.2,0,1.7)))).mul(shows(2.4))
+    m.colorNode=mix(m.colorNode!,rgb('#3b492c'),rough.mul(.30))
+    m.colorNode=mix(m.colorNode!,rgb('#9a9c6d'),grazed.mul(.24))
+    m.colorNode=mix(m.colorNode!,rgb('#43563a'),hollow.mul(.20))
+    // The fine grain belongs to the rough ground; a grazed nap has less of it.
+    m.colorNode=m.colorNode!.mul(fine.sub(.5).mul(rough.mul(.16)).add(1))
+    m.roughnessNode=float(.96).sub(rough.mul(.05)).add(grazed.mul(.02))
+  }
   const earthMaps=library&&kind==='earth'?library.sync('earth-packed').sample({uv:uv(),metres:1.4}):undefined
   if(earthMaps){m.colorNode=m.colorNode!.mul(mix(float(1),earthMaps.albedo.clamp(.35,1.8),.7));m.normalNode=normalMap(earthMaps.normal.mul(.5).add(.5),vec2(.36,.36))}
   if(kind==='stone'){
