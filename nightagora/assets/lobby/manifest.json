@@ -469,6 +469,66 @@
       "derivation": "No embedded ICC profile. Source interpreted as sRGB. JPEG previews resized with Lanczos, quality 88, embedded sRGB profile. Original bytes unchanged.",
       "licence_url": "https://www.sammlung.pinakothek.de/de/artwork/02LAY3QLyk",
       "rights_note": "Use the exact holder download and keep attribution plus ShareAlike if adapted. The Commons Stieler image has different dimensions/bytes and its own PD-Art claim; do not attribute the holder’s CC licence to that older file."
+    },
+    {
+      "id": "lobby/likeness-jung",
+      "path": "likenesses/jung/original.tif",
+      "sha256": "5282297be9eb530d6099fb59fce96f24ee16113bbb710aebc18453a092ed41eb",
+      "bytes": 23078896,
+      "width": 2497,
+      "height": 3080,
+      "pixels": 7690760,
+      "slug": "jung",
+      "name": "Carl Gustav Jung",
+      "wing": "lobby",
+      "class": "Tier 1",
+      "tier": 1,
+      "licence": "This file is made available by its copyright holder under the Creative Commons Public Domain Mark 1.0.",
+      "licence_source_url": "https://commons.wikimedia.org/wiki/File:ETH-BIB-Jung,_Carl_Gustav_(1875-1961)-Portrait-Portr_14163_(cropped).tif#Licensing",
+      "licence_location": "Licensing",
+      "holder": "ETH-Bibliothek Zürich, Bildarchiv, Portr_14163",
+      "maker": "Unknown photographer",
+      "date": "circa 1935",
+      "source_url": "https://commons.wikimedia.org/wiki/File:ETH-BIB-Jung,_Carl_Gustav_(1875-1961)-Portrait-Portr_14163_(cropped).tif",
+      "original_url": "https://upload.wikimedia.org/wikipedia/commons/5/5b/ETH-BIB-Jung%2C_Carl_Gustav_%281875-1961%29-Portrait-Portr_14163_%28cropped%29.tif",
+      "holder_record_url": "https://doi.org/10.3932/ethz-a-000046785",
+      "display": true,
+      "label_en": "Carl Gustav Jung, about 1935. Photograph, maker unknown; cropped reproduction. ETH-Bibliothek Zürich, Bildarchiv, Portr_14163. Licence: “This file is made available by its copyright holder under the Creative Commons Public Domain Mark 1.0.”",
+      "label_de": "Carl Gustav Jung, um 1935. Fotografie, Fotograf unbekannt; beschnittene Reproduktion. ETH-Bibliothek Zürich, Bildarchiv, Portr_14163. Lizenzangabe: „This file is made available by its copyright holder under the Creative Commons Public Domain Mark 1.0.“",
+      "previews": [
+        {
+          "path": "likenesses/jung/preview-512.jpg",
+          "sha256": "994aa7d114e6c20881661d2e657d12fa887e99b323978c56bacdb902a5cb0e54",
+          "bytes": 45481,
+          "width": 415,
+          "height": 512,
+          "pixels": 212480,
+          "long_edge": 512,
+          "format": "image/jpeg",
+          "quality": 88,
+          "color_space": "sRGB",
+          "source_path": "likenesses/jung/original.tif"
+        },
+        {
+          "path": "likenesses/jung/preview-1024.jpg",
+          "sha256": "4268cfc26ed06d04c75cf2a447876505dc13e16097e871752ab96f928d61cdf8",
+          "bytes": 199365,
+          "width": 830,
+          "height": 1024,
+          "pixels": 849920,
+          "long_edge": 1024,
+          "format": "image/jpeg",
+          "quality": 88,
+          "color_space": "sRGB",
+          "source_path": "likenesses/jung/original.tif"
+        }
+      ],
+      "verified_on": "2026-09-14",
+      "source_verification": "Current source record and exact downloaded original checked on admission.",
+      "derivation": "No embedded ICC profile. Source interpreted as sRGB. JPEG previews resized with Lanczos, quality 88, embedded sRGB profile. Original bytes unchanged.",
+      "licence_url": "https://creativecommons.org/publicdomain/mark/1.0/",
+      "rights_note": "Holder PDM-owner release. A public-domain mark is not CC0; class must not imply a CC0 deed. Best: the crop removes the mount and inscription while retaining the photographic portrait. Holder supplies a Public Domain Mark and unrestricted download/use; no guessed photographer death date is used.",
+      "source_sha1": "c52560644a413671ecfe62bc98c7553ad80bc4da"
     }
   ]
 }
