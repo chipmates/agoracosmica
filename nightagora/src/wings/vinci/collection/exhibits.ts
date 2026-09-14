@@ -279,10 +279,12 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
       // asked for at the distance a visitor can still be walked up to it.
       if (eye.distanceToSquared(HOUSE_AT) < 26 * 26) void warmGround('house')
       // AND THE GROUND ITSELF IS DRAWN WHEN IT IS BEING LOOKED AT. From the
-      // street and the court of the house this ground is seventy metres off
-      // and every exhibit on it is a few pixels wide; the rooms stay, their
-      // contents come back at the distance a visitor can read them.
-      const near = eye.distanceToSquared(graveNear) < 54 * 54
+      // street and the court of the house this ground is fifty metres off
+      // with the whole building between; the rooms stay, their contents come
+      // back at the distance a visitor can read them. The four house stations
+      // share one eye 52.2 m from here and the garden stands at 23.0 m, so
+      // the radius sits between them.
+      const near = eye.distanceToSquared(graveNear) < 48 * 48
       if (rooms && rooms.visible !== near) rooms.visible = near
       if (line.visible !== near) line.visible = near
       if (grave.group.visible !== near) grave.group.visible = near
