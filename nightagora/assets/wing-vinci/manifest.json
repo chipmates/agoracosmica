@@ -49,7 +49,7 @@
    "prompt": "Conjectural atmospheric sky at the exact computed 1517 sun vector: turbidity4, Rayleigh1.4, cloudScale0.0006, cloudCoverage0.28, cloudDensity0.42, cloudElevation0.35, cloudSpeed0. No weather observation survives; cloud shader parameters are scenic choices, not measured altitude. Displayed horizon colour continues the FogExp2 asymptote at assumed density0.0075/m [0.0075–0.015/m] with an assumed effective column18m [12–24m] and clear elevation12deg [10–16deg]; no terrain extrapolation. Source src/wings/vinci/display-sky-haze.ts. The environment probe rotation is separately corrected to Euler Y=-pi/2 in index.ts to match the actual computed solar azimuth; display haze never enters its radiance. A thin streaked high cloud veil is added above ten degrees of elevation, four-octave fractal noise stretched 3.1/11/2.4 on the view ray, peaking near forty degrees and fading at the zenith and the horizon, mixed to a pale grey at 30 per cent. Assumed weather, no observation claimed.",
    "model": "Deterministic TypeScript and TSL procedural geometry",
    "date": "2026-09-09",
-   "sha256": "c2fbb058ac82453904b50913e290bb6d62dd8cf3542909785ade1d5f6dc8e4c8",
+   "sha256": "2ae8a190633342db1e0dbd542f133039da52d75c5a3f2415af5cbe6efde540f6",
    "note": "brief/SITE-HOUR.md; three.js SkyMesh MIT; recipe_file=src/wings/vinci/index.ts displayed_haze_recipe=src/wings/vinci/display-sky-haze.ts; sky_display_only=true; fog_density=0.0075; fog_density_assumed_range=0.0075..0.015; environmentRotation_y_rad=-1.5707963267948966; displayed_haze_sha256=80c458f2cb5ccddb7fcedccda5df70e5cdccda7d9ca97d65ebfa6462920f61ef;"
   },
   {
@@ -413,7 +413,7 @@
    "prompt": "Regenerable actual geometry certificate for40 directed routes across five pose families and two viewport families. Includes foundation, entry, vegetation and all dressing; no sky, DOM or shadow-only duplicate.",
    "model": "Deterministic TypeScript and TSL procedural geometry",
    "date": "2026-09-10",
-   "sha256": "0df33fb4a6caf305b620b42f6777c980988e75038261e5cf7cbdea2d81585ead",
+   "sha256": "3033fc56b13311c4c1af5a09b20ea0c618b9c3c74890ff586a8896bf9ec51d62",
    "note": "recipe_file=src/wings/vinci/data/rail-clearance.json; source_generator=src/wings/vinci/rail-certify.mjs; runtime dependency of vinci/rail"
   },
   {
