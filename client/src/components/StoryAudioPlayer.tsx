@@ -36,6 +36,33 @@ interface StoryAudioPlayerProps {
   playRequest?: number;
 }
 
+/**
+ * Ramp an element from silent to its full level and return a stop function.
+ *
+ * The first frame sets the clock rather than the call that schedules it: an
+ * animation-frame timestamp can predate that call, and an unclamped ratio then
+ * goes negative, which throws on `volume` and leaves the element playing at
+ * zero for the rest of the track.
+ */
+export function rampVolumeIn(element: HTMLAudioElement, durationMs: number): () => void {
+  element.volume = 0;
+  let startedAt: number | null = null;
+  let frame: number | null = null;
+
+  const step = (now: number): void => {
+    if (startedAt === null) startedAt = now;
+    const ratio = Math.min(Math.max((now - startedAt) / durationMs, 0), 1);
+    element.volume = ratio;
+    frame = ratio < 1 ? requestAnimationFrame(step) : null;
+  };
+
+  frame = requestAnimationFrame(step);
+  return () => {
+    if (frame !== null) cancelAnimationFrame(frame);
+    frame = null;
+  };
+}
+
 const StoryAudioPlayer: FC<StoryAudioPlayerProps> = ({
   audioUrl,
   onPlaybackComplete,
@@ -91,13 +118,16 @@ const StoryAudioPlayer: FC<StoryAudioPlayerProps> = ({
     onPlayStateChange?.(isPlaying);
   }, [isPlaying, onPlayStateChange]);
 
-  // Handle external seek requests (e.g. paragraph tap-to-seek)
+  // External seek and play requests (paragraph tap-to-seek, the reading-position
+  // banner, the ask resume). Both are held here rather than acted on where they
+  // arrive: a cold mount has no duration yet and the element refuses a seek
+  // while it loads, and the caller clears its own target on the next tick, so an
+  // unheld position is lost for good. The pair is applied together, seek first,
+  // so a resume never sounds from the top and then jumps.
+  const pendingSeekRef = useRef<number | null>(null);
   useEffect(() => {
-    if (seekToTime != null && durationSeconds > 0) {
-      const seekPercent = (seekToTime / durationSeconds) * 100;
-      seek(Math.min(Math.max(seekPercent, 0), 100));
-    }
-  }, [seekToTime, durationSeconds, seek]);
+    if (seekToTime != null) pendingSeekRef.current = seekToTime;
+  }, [seekToTime]);
 
   // Handle external toggle play requests (e.g. keyboard shortcuts)
   const togglePlayRequestRef = useRef<number>(0);
@@ -110,36 +140,41 @@ const StoryAudioPlayer: FC<StoryAudioPlayerProps> = ({
 
   // Resume after an answer: the narration fades back in instead of cutting in
   // at full level, which is what makes the return feel like one telling.
-  const fadeFrameRef = useRef<number | null>(null);
+  const fadeStopRef = useRef<(() => void) | null>(null);
   const fadeInPlayback = useCallback((durationMs = 300): void => {
     const element = audioRef.current;
     if (!element) return;
-    if (fadeFrameRef.current !== null) cancelAnimationFrame(fadeFrameRef.current);
-
-    element.volume = 0;
-    const startedAt = performance.now();
-    const step = (now: number): void => {
-      const ratio = Math.min((now - startedAt) / durationMs, 1);
-      element.volume = ratio;
-      fadeFrameRef.current = ratio < 1 ? requestAnimationFrame(step) : null;
-    };
-    fadeFrameRef.current = requestAnimationFrame(step);
+    fadeStopRef.current?.();
+    fadeStopRef.current = rampVolumeIn(element, durationMs);
   }, [audioRef]);
 
-  useEffect(() => () => {
-    if (fadeFrameRef.current !== null) cancelAnimationFrame(fadeFrameRef.current);
-  }, []);
+  useEffect(() => () => { fadeStopRef.current?.(); }, []);
 
-  // Handle external play requests. Unlike togglePlayRequest this only ever
-  // plays, so a resume that arrives on a playing chapter is a no-op.
+  // Unlike togglePlayRequest this only ever plays, so a resume that arrives on a
+  // playing chapter is a no-op.
+  const pendingPlayRef = useRef<boolean>(false);
   const playRequestRef = useRef<number>(0);
   useEffect(() => {
     if (!playRequest || playRequest === playRequestRef.current) return;
     playRequestRef.current = playRequest;
+    pendingPlayRef.current = true;
+  }, [playRequest]);
+
+  useEffect(() => {
+    if (isLoading || durationSeconds <= 0) return;
+
+    const target = pendingSeekRef.current;
+    if (target !== null) {
+      pendingSeekRef.current = null;
+      seek(Math.min(Math.max((target / durationSeconds) * 100, 0), 100));
+    }
+
+    if (!pendingPlayRef.current) return;
+    pendingPlayRef.current = false;
     if (isPlaying) return;
     fadeInPlayback();
     void togglePlay();
-  }, [playRequest, isPlaying, togglePlay, fadeInPlayback]);
+  }, [seekToTime, playRequest, durationSeconds, isLoading, isPlaying, seek, togglePlay, fadeInPlayback]);
 
   const progressSliderRef = useRef<HTMLInputElement>(null);
 

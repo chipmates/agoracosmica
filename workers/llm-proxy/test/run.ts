@@ -33,6 +33,7 @@ import {
 import { createAwardGuardedStream } from '../src/services/awardGuard';
 import { dispatchToNebius } from '../src/services/nebius';
 import { handleChat } from '../src/routes/chat';
+import { handleFunnel } from '../src/routes/funnel';
 import { handlePage } from '../src/routes/page';
 import { handleQuota } from '../src/routes/quota';
 import { signJWT } from '../src/utils/jwt';
@@ -977,6 +978,45 @@ async function main(): Promise<number> {
     assertEqual(row.blobs[2], '', 'blob3 stays empty');
     assertEqual(row.blobs[1], '/de/', 'the path is still recorded');
     assertEqual(row.blobs[3], 'de', 'the language is still recorded');
+  });
+
+  // -------------------------------------------------------------------------
+  // The funnel step allowlist
+  // -------------------------------------------------------------------------
+
+  // The route drops an unlisted step before it costs a KV write, so a client
+  // that gains a step and a worker that has not is a silent data hole. The ask
+  // family is the one that grew last.
+  const funnelBeacon = async (payload: Record<string, unknown>) => {
+    analyticsRows.length = 0;
+    await handleFunnel(
+      new Request('https://example.invalid/v1/funnel', {
+        method: 'POST',
+        headers: { 'CF-Connecting-IP': '10.0.0.9' },
+        body: JSON.stringify(payload),
+      }),
+      fakeEnv(),
+    );
+    return analyticsRows[0];
+  };
+
+  await test('every ask_listen step is accepted and keeps the figure and mode slots', async () => {
+    const steps = ['ask_listen_shown', 'ask_listen_sent', 'ask_listen_resumed', 'ask_listen_resume_failed'];
+    for (const step of steps) {
+      const row = await funnelBeacon({ step, figureId: 'aurelius', mode: 'story', language: 'en' });
+      assert(row !== undefined, `${step} wrote no row`);
+      assertEqual(row.blobs[0], step, 'the step name is blob1');
+      assertEqual(row.blobs[1], 'aurelius', 'the figure id is blob2');
+      assertEqual(row.blobs[2], 'story', 'the mode is blob3');
+      assertEqual(row.blobs[3], 'en', 'the language is blob4');
+    }
+  });
+
+  await test('a step outside the allowlist writes nothing at all', async () => {
+    for (const step of ['ask_listen', 'ask_listen_failed', 'ask_listen_resume', '', 'made_up_step']) {
+      const row = await funnelBeacon({ step, figureId: 'aurelius', mode: 'story', language: 'en' });
+      assertEqual(row, undefined, `unlisted step recorded: ${JSON.stringify(step)}`);
+    }
   });
 
   // -------------------------------------------------------------------------

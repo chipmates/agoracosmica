@@ -632,9 +632,12 @@ const StoryPlayerSurface: FC<StoryPlayerSurfaceProps> = ({
     return () => window.removeEventListener('storyProgressUpdated', handleExternalProgress);
   }, [progressStorageKey, audioIsPlaying]);
 
+  // The banner offers to carry on listening, so it asks for sound as well as
+  // for the position. The player holds both until the element can take them.
   const handleResume = useCallback(() => {
     if (resumePosition) {
       setSeekTarget(resumePosition.time);
+      setPlayRequest((n) => n + 1);
       setResumePosition(null);
       resumeDismissedRef.current = true;
     }

@@ -108,10 +108,12 @@ export type FunnelStep =
   // shown = the ask bar arrived under a paused chapter, sent = a question went
   // out, resumed = the chapter was picked up again after the answer. shown is
   // deduped per chapter play at the call site rather than per tab: a bar that
-  // arms on every sip would bury the take rate.
+  // arms on every sip would bury the take rate. resume_failed is the one the
+  // listener cannot report: the chapter was asked to pick up and never sounded.
   | 'ask_listen_shown'
   | 'ask_listen_sent'
-  | 'ask_listen_resumed';
+  | 'ask_listen_resumed'
+  | 'ask_listen_resume_failed';
 
 /** Which half of the product a visit engaged with, in the engaged mode slot. */
 export type EngagedArm = 'typed' | 'listened' | 'both';

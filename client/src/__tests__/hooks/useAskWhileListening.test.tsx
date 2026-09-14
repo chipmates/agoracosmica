@@ -34,7 +34,7 @@ vi.mock('../../stores/domainStore', () => ({
 
 import { useAskWhileListening } from '../../hooks/useAskWhileListening';
 import type { AskDriverInput, UseAskArgs } from '../../hooks/useAskWhileListening';
-import { ASK_DWELL_MS } from '../../config/askWhileListening';
+import { ASK_DWELL_MS, ASK_RESUME_TIMEOUT_MS } from '../../config/askWhileListening';
 
 function makeDriver() {
   const calls: AskDriverInput[] = [];
@@ -291,6 +291,37 @@ describe('useAskWhileListening', () => {
 
     view.update({ isPlaying: false });
     expect(view.view.result.current.state).toBe('paused');
+  });
+
+  it('falls back to paused and writes a row when the resume never sounds', () => {
+    const onResume = vi.fn();
+    const view = mount({ onResume });
+    pauseInto(view);
+    dwell();
+    act(() => view.view.result.current.resume());
+    expect(view.view.result.current.state).toBe('resuming');
+    expect(onResume).toHaveBeenCalledWith(252);
+    expect(shared.beacons).not.toContain('ask_listen_resume_failed');
+
+    act(() => {
+      vi.advanceTimersByTime(ASK_RESUME_TIMEOUT_MS);
+    });
+    expect(view.view.result.current.state).toBe('paused');
+    expect(shared.beacons).toContain('ask_listen_resume_failed');
+  });
+
+  it('writes no failure row when the chapter does sound in time', () => {
+    const view = mount();
+    pauseInto(view);
+    dwell();
+    act(() => view.view.result.current.resume());
+    view.update({ isPlaying: true });
+    expect(view.view.result.current.state).toBe('woven');
+
+    act(() => {
+      vi.advanceTimersByTime(ASK_RESUME_TIMEOUT_MS * 2);
+    });
+    expect(shared.beacons).not.toContain('ask_listen_resume_failed');
   });
 
   it('keeps the words and offers one retry when the model fails', async () => {

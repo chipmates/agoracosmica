@@ -290,13 +290,17 @@ export function useAskWhileListening(args: UseAskArgs): UseAskResult {
   }, [state, audioTimeSeconds]);
 
   // --- a resume that never sounds must not leave the sheet hanging ---
+  // The fallback is silent for the listener, so it writes its own row: without
+  // one a refused play() is invisible in the data.
   useEffect(() => {
     if (state !== 'resuming') return;
     const timer = setTimeout(() => {
-      if (stateRef.current === 'resuming') setState('paused');
+      if (stateRef.current !== 'resuming') return;
+      setState('paused');
+      sendFunnelBeacon('ask_listen_resume_failed', { figureId, mode: 'story' });
     }, ASK_RESUME_TIMEOUT_MS);
     return () => clearTimeout(timer);
-  }, [state]);
+  }, [state, figureId]);
 
   // --- the ask ---
   const settle = useCallback(() => {
