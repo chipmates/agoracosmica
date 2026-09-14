@@ -49,7 +49,7 @@
       "prompt": "Conjectural atmospheric sky at the exact computed 1517 sun vector: turbidity4, Rayleigh1.4, cloudScale0.0006, cloudCoverage0.28, cloudDensity0.42, cloudElevation0.35, cloudSpeed0. No weather observation survives; cloud shader parameters are scenic choices, not measured altitude. Displayed horizon colour continues the FogExp2 asymptote at assumed density0.0075/m [0.0075–0.015/m] with an assumed effective column18m [12–24m] and clear elevation12deg [10–16deg]; no terrain extrapolation. Source src/wings/vinci/display-sky-haze.ts. The environment probe rotation is separately corrected to Euler Y=-pi/2 in index.ts to match the actual computed solar azimuth; display haze never enters its radiance. A thin streaked high cloud veil is added above ten degrees of elevation, four-octave fractal noise stretched 3.1/11/2.4 on the view ray, peaking near forty degrees and fading at the zenith and the horizon, mixed to a pale grey at 30 per cent. Assumed weather, no observation claimed.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "ffd4b970b8280ea011df2ef98fff166fd2d2c6a4507d075a0ef20ca8ad685fb9",
+      "sha256": "4bf4afb0daeb2ca092b2a16b2e3d395237b173d4d274774e79153986322e2553",
       "note": "brief/SITE-HOUR.md; three.js SkyMesh MIT; recipe_file=src/wings/vinci/index.ts displayed_haze_recipe=src/wings/vinci/display-sky-haze.ts; sky_display_only=true; fog_density=0.0075; fog_density_assumed_range=0.0075..0.015; environmentRotation_y_rad=-1.5707963267948966; displayed_haze_sha256=80c458f2cb5ccddb7fcedccda5df70e5cdccda7d9ca97d65ebfa6462920f61ef;"
     },
     {
@@ -218,8 +218,21 @@
       "prompt": "Original procedural modern museum insertion at the fixed maquette envelope. Low post-grid pavilions, shallow slate roofs, full-height glazed enclosure, concrete apron, garden stair and water channel. Exact modern approach grade cuts, supported landings and continuous concrete cheek ownership. Museum design, not a claim about1517. Share the existing pale cast-concrete finish across all four roof soffits; keep their downward normals and the sole measured sun. Derive both entrance post heads from the retained inclined canopy underside; keep their centres and buried feet. Provide continuous derived structural support beneath the existing stair cheeks and both landing heads. Keep the maquette walking widths and every finish level.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "a34e6299dabaf3c4751b6169bd864362c781091ac4ba17a224d1da70c0c9b58a",
+      "sha256": "1a78e3623c2c7a387cd406ddfd23d51224c7c7f0c3306f2b814897065d610862",
       "note": "recipe_file=src/wings/vinci/collection.ts"
+    },
+    {
+      "id": "vinci/collection-rooms",
+      "path": "procedural/collection-rooms/",
+      "wing": "vinci",
+      "class": "GENERATED",
+      "licence": "Original procedural construction; source code under the museum repository licence.",
+      "display": true,
+      "prompt": "Rooms of the modern collection ground inside the existing pavilion envelope: a stone floor finish on the 1.60 by 1.65 m grid the timeline is laid on, lined walls with a dark stone base and bay ribs, a flat plaster soffit coffered on the structure's four-metre bay with a light cove at the hanging wall, dressed reveals at the four doors the rail walks through, a clerestory light shelf in the hall, and outside a terrace with its parapet and retaining faces carrying the grave, the parachute and the freestanding display wall whose field is 880 by 460 cm. Interior daylight is a per-opening sky-visibility term on the ambient channel only. No texture asset, no reference image sampled, no period claim.",
+      "model": "Deterministic TypeScript and TSL procedural geometry",
+      "date": "2026-09-11",
+      "sha256": "5b02f483160478331ea47f8b58366471ab6530d249ff2cd90a3aadf013b01f0c",
+      "note": "Modern museum insertion, rooms only; no 1517 claim. recipe_file=src/wings/vinci/collection/rooms.ts"
     },
     {
       "id": "vinci/inner-court",
