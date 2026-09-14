@@ -186,8 +186,8 @@
   },
   {
    "file": "src/wings/vinci/road-dressing.ts",
-   "sha256": "731948ba302f7ea8a3f8e30344cad007cf0b65f370168445a3217690fb40fab8",
-   "bytes": 14870,
+   "sha256": "8218aabe62373e1e65a5206ef4f8a6f9596bf6e14ffca653de0e0a24f0489ab4",
+   "bytes": 19138,
    "unchangedDuringAudit": true
   },
   {
@@ -246,25 +246,25 @@
   }
  ],
  "geometrySha256": [
-  "4153ec9a0e670a6b28ae362ba060d223ef8aa33bc5981df3fe075a305c426b41",
-  "dafae45bcc0e4e729103bff8db7c2e9f783dc729fb8f97915abe39921ed49c51"
+  "5f088274129cfb3636b78d8cd4463dc752f5fa1399dd23eb6962938d47f2d970",
+  "9e467520c42a56ef0bf8c60cb0760b5d3b0e9eb346caf2e7c6f505527628ce6b"
  ],
  "geometry": [
   {
    "tier": "hero",
-   "sha256": "4153ec9a0e670a6b28ae362ba060d223ef8aa33bc5981df3fe075a305c426b41",
+   "sha256": "5f088274129cfb3636b78d8cd4463dc752f5fa1399dd23eb6962938d47f2d970",
    "quantumM": 0.000001,
    "matchingGeometryToleranceM": 0.000002
   },
   {
    "tier": "standard",
-   "sha256": "4153ec9a0e670a6b28ae362ba060d223ef8aa33bc5981df3fe075a305c426b41",
+   "sha256": "5f088274129cfb3636b78d8cd4463dc752f5fa1399dd23eb6962938d47f2d970",
    "quantumM": 0.000001,
    "matchingGeometryToleranceM": 0.000002
   },
   {
    "tier": "calm",
-   "sha256": "dafae45bcc0e4e729103bff8db7c2e9f783dc729fb8f97915abe39921ed49c51",
+   "sha256": "9e467520c42a56ef0bf8c60cb0760b5d3b0e9eb346caf2e7c6f505527628ce6b",
    "quantumM": 0.000001,
    "matchingGeometryToleranceM": 0.000002
   }

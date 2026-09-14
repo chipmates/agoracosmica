@@ -24,8 +24,8 @@ export const roadMaterialBoundary=(()=>{
 export const roadDressingProvenance={
   manifestId:'vinci/road-dressing',assetClass:'GENERATED',certainty:'conjectural',source:['OSM-AREA','A-SITE','Q019','Q134','library/earth-packed'],
   label:{
-    en:'Conjectural road finish. Two worn wheel paths follow the mapped road, 1.40 m apart [1.20–1.60], with .09 m half-width [.06–.13] and up to .008 m surface relief [0–.012]. Proposed gravel spans .016–.055 m; sparse straw .07–.24 m long and 1.5–3 mm wide. A .24 m gutter [.16–.32] follows the house foot, with .014 m raised lips [.008–.02]. The proposed loose aggregate is clustered within the existing mapped width: patches have radii .30–1.05 m and the longer segments receive proportionate samples. Stones retain the same size interval, are embedded 1 mm, and rise 3–12 mm. Dust and compacted wear use the existing CC0 earth-packed grain in a grey-beige palette; 2.8 m variation, proposed 24 cm packed-mineral mottling [16–36], 7 cm aggregate and 6 mm grit are authored scales. The packed-mineral colour variation is reduced along the retained wheel bands; the slightly warmer grey-beige palette changes albedo, not illumination. Only the external boundary of the existing road union fades its material, so internal miter joins carry no false seam. No additional paving, terrain displacement or surviving road fabric from 1517 is claimed.',
-    de:'Vermutete Straßenoberfläche. Zwei ausgefahrene Spuren folgen der kartierten Straße im Abstand von 1,40 m [1,20–1,60], mit .09 m Halbbreite [.06–.13] und bis .008 m Oberflächenrelief [0–.012]. Vorgeschlagener Kies misst .016–.055 m, verstreutes Stroh .07–.24 m Länge und 1,5–3 mm Breite. Eine .24 m Rinne [.16–.32] folgt dem Hausfuß, mit .014 m hohen Rändern [.008–.02]. Der vorgeschlagene lose Zuschlag liegt in Gruppen innerhalb der vorhandenen kartierten Breite: Die Gruppen haben Radien von .30–1.05 m; längere Abschnitte erhalten anteilig mehr Proben. Die Steine behalten denselben Größenbereich, sind 1 mm eingebettet und stehen 3–12 mm vor. Staub und verdichtete Fahrspuren nutzen die vorhandene CC0-Körnung earth-packed in Graubeige; Variation bei 2,8 m, vorgeschlagene mineralische Verdichtungsmuster bei 24 cm [16–36], Zuschlag bei 7 cm und Grus bei 6 mm sind gestaltete Maßstäbe. Die Farbvariation der Verdichtungsmuster nimmt in den vorhandenen Fahrspuren ab; die etwas wärmere graubeige Palette verändert die Albedo, nicht die Beleuchtung. Nur die Außengrenze der vorhandenen Straßenvereinigung blendet das Material aus; innere Gehrungsanschlüsse erhalten keine falsche Naht. Zusätzliche Pflasterung, verschobenes Gelände oder erhaltenes Straßenmaterial von 1517 wird nicht behauptet.',
+    en:'Conjectural road finish. Two worn wheel paths follow the mapped road, 1.40 m apart [1.20–1.60], with .09 m half-width [.06–.13] and up to .008 m surface relief [0–.012]. Proposed gravel spans .016–.055 m; sparse straw .07–.24 m long and 1.5–3 mm wide. A .24 m gutter [.16–.32] follows the house foot and the east edge of the road at the retaining bank, with .014 m raised lips [.008–.02]. At that edge a .42 m band [.30–.55] of silt is darker, rougher and up to .010 m lower. Straw lies in wisps of three to five stalks within .03 m, denser within 9 m of the gate crossing. The proposed loose aggregate is clustered within the existing mapped width: patches have radii .30–1.05 m and the longer segments receive proportionate samples. Stones retain the same size interval, are embedded 1 mm, and rise 3–12 mm. Dust and compacted wear use the existing CC0 earth-packed grain in a grey-beige palette; 2.8 m variation, proposed 24 cm packed-mineral mottling [16–36], 7 cm aggregate, 2.1 cm chip bed and 6 mm grit are authored scales. The packed-mineral colour variation is reduced along the retained wheel bands; the slightly warmer grey-beige palette changes albedo, not illumination. Only the external boundary of the existing road union fades its material, so internal miter joins carry no false seam. No additional paving, terrain displacement or surviving road fabric from 1517 is claimed.',
+    de:'Vermutete Straßenoberfläche. Zwei ausgefahrene Spuren folgen der kartierten Straße im Abstand von 1,40 m [1,20–1,60], mit .09 m Halbbreite [.06–.13] und bis .008 m Oberflächenrelief [0–.012]. Vorgeschlagener Kies misst .016–.055 m, verstreutes Stroh .07–.24 m Länge und 1,5–3 mm Breite. Eine .24 m Rinne [.16–.32] folgt dem Hausfuß und der Ostkante der Straße an der Stützmauer, mit .014 m hohen Rändern [.008–.02]. An dieser Kante liegt ein .42 m breites Schlickband [.30–.55], dunkler, rauer und bis .010 m tiefer. Stroh liegt in Büscheln von drei bis fünf Halmen innerhalb .03 m, dichter im Umkreis von 9 m um die Toreinfahrt. Der vorgeschlagene lose Zuschlag liegt in Gruppen innerhalb der vorhandenen kartierten Breite: Die Gruppen haben Radien von .30–1.05 m; längere Abschnitte erhalten anteilig mehr Proben. Die Steine behalten denselben Größenbereich, sind 1 mm eingebettet und stehen 3–12 mm vor. Staub und verdichtete Fahrspuren nutzen die vorhandene CC0-Körnung earth-packed in Graubeige; Variation bei 2,8 m, vorgeschlagene mineralische Verdichtungsmuster bei 24 cm [16–36], Zuschlag bei 7 cm, Splittbett bei 2,1 cm und Grus bei 6 mm sind gestaltete Maßstäbe. Die Farbvariation der Verdichtungsmuster nimmt in den vorhandenen Fahrspuren ab; die etwas wärmere graubeige Palette verändert die Albedo, nicht die Beleuchtung. Nur die Außengrenze der vorhandenen Straßenvereinigung blendet das Material aus; innere Gehrungsanschlüsse erhalten keine falsche Naht. Zusätzliche Pflasterung, verschobenes Gelände oder erhaltenes Straßenmaterial von 1517 wird nicht behauptet.',
   },
 } as const
 /** Gaussian cross-section gives continuous, derivative-filtered rut relief. */
@@ -74,17 +74,36 @@ export function roadSurfaceNode(){
   const drift=mx_noise_float(P.mul(.36)).mul(resolved(2.8))
   const packed=mx_noise_float(P.mul(1/.24)).mul(resolved(.24))
   const aggregate=mx_noise_float(P.mul(14)).mul(resolved(.07))
+  // Between the seven centimetre aggregate and the six millimetre grit the
+  // road had nothing, and two metres from the eye that is the scale the eye
+  // is reading. This is the chip bed itself, not a new claim about the road.
+  const chips=mx_noise_float(P.mul(48)).mul(resolved(.021))
   const grit=mx_noise_float(P.mul(167)).mul(resolved(.006))
   const wear=roadWearNode().mul(mx_noise_float(P.mul(.7)).mul(.22).add(.78).clamp(.45,1))
+  // At the foot of the retaining wall the road never sees the sun and the
+  // silt that washes off the bank stays there.
+  let foot:Node<'float'>=float(0)
+  for(let i=1;i<road.length;i++){
+    const a=road[i-1]!,b=road[i]!,dx=b[0]-a[0],dn=b[1]-a[1],span=Math.hypot(dx,dn)
+    if(dx<=0)continue
+    const v=p.sub(vec2(...a)),along=v.dot(vec2(dx/span,dn/span)),across=v.dot(vec2(-dn/span,dx/span))
+    const ends=smoothstep(0,.6,along).mul(float(1).sub(smoothstep(span-.6,span,along)))
+    const edge=float(width/2).sub(across)
+    const silt=mx_noise_float(vec3(along.mul(1.7),float(i),0)).mul(.09)
+    foot=foot.max(float(1).sub(smoothstep(0,.42,edge.sub(silt).abs())).mul(ends))
+  }
   // Where every cart turns in through the gate the road is churned and damp.
   const gate=vec2(roadGradeProvenance.crossing[0],roadGradeProvenance.crossing[1])
   const churnEdge=mx_noise_float(P.mul(1.6)).mul(.55)
   const churn=float(1).sub(smoothstep(1.1,3.1,length(p.sub(gate)).add(churnEdge))).mul(.9)
-  const dark=new Color('#94866e'),pale=new Color('#b1a084')
-  const colour=mix(vec3(dark.r,dark.g,dark.b),vec3(pale.r,pale.g,pale.b),drift.mul(.30).add(.5))
-    .mul(packed.mul(.18).add(aggregate.mul(.14)).mul(float(1).sub(wear.mul(.65))).add(grit.mul(.035)).add(1)).mul(float(1).sub(wear.mul(.34))).mul(float(1).sub(churn.mul(.30)))
-  return {mask,colour,wear,height:aggregate.mul(.00065).add(grit.mul(.00012)).sub(wear.mul(.008)).sub(churn.mul(.004)).clamp(-.012,.002),
-    roughness:float(.94).sub(wear.mul(.10)).sub(churn.mul(.22)).add(grit.mul(.02)).clamp(.62,.98)}
+  // The two ends of a packed earth road in October: the damp margin and the
+  // dried crown. They were four per cent apart, which is why it read as one
+  // grey; a road that is walked and carted is not one tone.
+  const dark=new Color('#7e7159'),pale=new Color('#bcae92')
+  const colour=mix(vec3(dark.r,dark.g,dark.b),vec3(pale.r,pale.g,pale.b),drift.mul(.42).add(.5).sub(foot.mul(.24)))
+    .mul(packed.mul(.20).add(aggregate.mul(.15)).add(chips.mul(.11)).mul(float(1).sub(wear.mul(.65))).add(grit.mul(.035)).add(1)).mul(float(1).sub(wear.mul(.34))).mul(float(1).sub(churn.mul(.30))).mul(float(1).sub(foot.mul(.22)))
+  return {mask,colour,wear,height:aggregate.mul(.00065).add(chips.mul(.00042)).add(grit.mul(.00012)).sub(wear.mul(.008)).sub(churn.mul(.004)).sub(foot.mul(.010)).clamp(-.014,.002),
+    roughness:float(.94).sub(wear.mul(.10)).sub(churn.mul(.22)).add(grit.mul(.02)).add(foot.mul(.03)).clamp(.62,.99)}
 }
 interface Batch {p:number[];c:number[]}
 const batch=():Batch=>({p:[],c:[]})
@@ -118,13 +137,24 @@ export function createRoadDressing(heightAt:(e:number,n:number)=>number,tier:Tie
       if(distance<nearest){nearest=distance;result=(n-piece.a[1])*dx-(e-piece.a[0])*dn}}
     return result
   }
-  for(let i=0;i<(tier==='calm'?4200:7600);i++){
+  // The stretch at the gate is the one a visitor stands on. It gets its own
+  // candidates rather than its share of a thirty metre average.
+  const gateCrossing=roadGradeProvenance.crossing
+  const nearGate=Array.from({length:tier==='calm'?9:14},()=>{
+    const angle=random()*Math.PI*2,radius=1.6+Math.sqrt(random())*8.4
+    return{e:gateCrossing[0]+Math.cos(angle)*radius,n:gateCrossing[1]+Math.sin(angle)*radius,radius:.34+random()*.62}
+  })
+  for(let i=0;i<(tier==='calm'?6400:12600);i++){
     let {e,n}=locate()
-    if(random()<.68){const patch=clusters[Math.floor(random()*clusters.length)]!,angle=random()*Math.PI*2,radius=Math.sqrt(random())*patch.radius
+    if(random()<.30){const patch=nearGate[Math.floor(random()*nearGate.length)]!,angle=random()*Math.PI*2,radius=Math.sqrt(random())*patch.radius
+      e=patch.e+Math.cos(angle)*radius;n=patch.n+Math.sin(angle)*radius}
+    else if(random()<.68){const patch=clusters[Math.floor(random()*clusters.length)]!,angle=random()*Math.PI*2,radius=Math.sqrt(random())*patch.radius
       e=patch.e+Math.cos(angle)*radius;n=patch.n+Math.sin(angle)*radius}
     const across=acrossAt(e,n),shoulder=Math.min(1,Math.abs(across)/(width/2))
     const wheel=Math.exp(-Math.pow((Math.abs(across)-.70)/.16,2))
-    if(random()>(.38+.55*Math.pow(shoulder,1.3))*(1-wheel*.82)||!safe(e,n)||!inRoad(e,n))continue
+    // Loose stone gathers at the gutter line as well as off the wheel bands.
+    const gutterEdge=Math.exp(-Math.pow((Math.abs(across)-(width/2-.20))/.22,2))
+    if(random()>(.38+.55*Math.pow(shoulder,1.3))*(1-wheel*.82)*(1-gutterEdge*.55)||!safe(e,n)||!inRoad(e,n))continue
     const size=.016+Math.pow(random(),1.7)*.039,angle=random()*Math.PI*2,count=5
     const colour=new Color(['#aea798','#958f80','#b9b19d','#7f7d72'][Math.floor(random()*4)]!).multiplyScalar(.90+random()*.17)
     const rise=Math.min(.012,Math.max(.003,size*(.12+random()*.1)))
@@ -136,10 +166,22 @@ export function createRoadDressing(heightAt:(e:number,n:number)=>number,tier:Tie
     if(Math.max(...levels)-Math.min(...levels)>.04)continue
     const corners=coordinates.map(p=>point(...p,-.001)),crest=point(e,n,rise)
     for(let j=0;j<count;j++)tri(gravel,corners[j]!,corners[(j+1)%count]!,crest,colour.clone().multiplyScalar(.90+random()*.14))
-    if(random()<.055){const span=.07+random()*.17,a=angle+.4,ex=Math.cos(a)*span/2,nx=Math.sin(a)*span/2,w=.0015+random()*.0015
-      const coordinates=[[e-ex,n-nx],[e+ex,n+nx],[e+ex+Math.sin(a)*w,n+nx-Math.cos(a)*w]] as [number,number][]
-      if(coordinates.every(p=>safe(...p)&&inRoad(...p))){const levels=coordinates.map(p=>heightAt(...p))
-        if(Math.max(...levels)-Math.min(...levels)<.04)tri(straw,point(...coordinates[0]!, .001),point(...coordinates[1]!, .0015),point(...coordinates[2]!, .0015),new Color('#938365'))}}
+    // A single stalk is under a pixel at three metres, which is why the last
+    // attempt at this could not be seen. Straw lies in wisps, so the wisp is
+    // what is drawn: the same stalk, three to five of them inside 30 mm.
+    const gateward=1-Math.min(1,Math.hypot(e-roadGradeProvenance.crossing[0],n-roadGradeProvenance.crossing[1])/9)
+    if(random()<.05+.11*gateward){
+      const lie=random()*Math.PI*2,stalks=3+Math.floor(random()*3)
+      for(let k=0;k<stalks;k++){
+        const ce=e+(random()-.5)*.03,cn=n+(random()-.5)*.03
+        const span=.07+random()*.17,a=lie+(random()-.5)*.7,ex=Math.cos(a)*span/2,nx=Math.sin(a)*span/2,w=.0015+random()*.0015
+        const coordinates=[[ce-ex,cn-nx],[ce+ex,cn+nx],[ce+ex+Math.sin(a)*w,cn+nx-Math.cos(a)*w]] as [number,number][]
+        if(!coordinates.every(p=>safe(...p)&&inRoad(...p)))continue
+        const levels=coordinates.map(p=>heightAt(...p))
+        if(Math.max(...levels)-Math.min(...levels)>.04)continue
+        tri(straw,point(...coordinates[0]!, .0012),point(...coordinates[1]!, .0018),point(...coordinates[2]!, .0018),new Color('#b8a27a').multiplyScalar(.84+random()*.28))
+      }
+    }
   }
   const facades=(dossier as unknown as {facades:{id:string;from:Quantity<number[]>;to:Quantity<number[]>}[]}).facades
   for(const f of facades.filter(f=>['F01','F02'].includes(f.id))){
@@ -154,6 +196,23 @@ export function createRoadDressing(heightAt:(e:number,n:number)=>number,tier:Tie
         tri(straw,a,b,c,new Color('#998666'))
       }
       for(const [left,right,l0,l1]of[[.06,.18,.014,.001],[.18,.30,.001,.014]] as const){const p=at(s,left,l0),q=at(end,left,l0),r=at(end,right,l1),t=at(s,right,l1),c=new Color('#857d68');tri(gutter,p,q,r,c);tri(gutter,p,r,t,c)}
+    }
+  }
+  // The same gutter section the house foot carries, on the other side of the
+  // street, where the road meets the retaining bank.
+  for(let i=1;i<road.length;i++){
+    const a=road[i-1]!,b=road[i]!,dx=b[0]-a[0],dn=b[1]-a[1],span=Math.hypot(dx,dn)
+    if(dx<=0)continue
+    const ux=dx/span,un=dn/span
+    const at=(along:number,inward:number,lift:number)=>point(a[0]+ux*along-un*(width/2-inward),a[1]+un*along+ux*(width/2-inward),lift)
+    for(let along=.4;along<span-.4;along+=.45){
+      const end=Math.min(span-.4,along+.446)
+      for(const [near,far,l0,l1]of[[.05,.17,.014,.001],[.17,.29,.001,.013]] as const){
+        const p0=at(along,near,l0),p1=at(end,near,l0),p2=at(end,far,l1),p3=at(along,far,l1)
+        if(![p0,p1,p2,p3].every(v=>inRoad(v.x,-v.z,-.05)))continue
+        const c=new Color('#7d7460').multiplyScalar(.92+random()*.14)
+        tri(gutter,p0,p1,p2,c);tri(gutter,p0,p2,p3,c)
+      }
     }
   }
   const group=new Group();group.name='vinci generated road dressing';group.userData={...roadDressingProvenance,seed:15171019,triangles:(gravel.p.length+straw.p.length+gutter.p.length)/9}

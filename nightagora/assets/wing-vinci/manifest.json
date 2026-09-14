@@ -270,7 +270,7 @@
       "prompt": "Original road surface proposal: mapped alignment Gaussian wheel wear, deterministic sparse gravel and straw, stone gutter at actual F01/F02 foot; no change to retained grades, conjectural dimensions and basis disclosed EN/DE. Distribute fixed gravel candidates in proportion to retained road segment length; grey mineral chips cluster at shoulders and disperse through the compacted earth. Embed every corner in the common grade and reject grade seams. No new paving or drainage alignment. Refine the mapped road material with a boundary-only union mask, removing internal miter seams without altering grade or width; add conjectural 24 cm compacted-mineral variation and warmer grey-beige albedo, quieter in existing wheel bands. Preserve all mounted chips, gutter geometry, physical dimensions and light.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "731948ba302f7ea8a3f8e30344cad007cf0b65f370168445a3217690fb40fab8",
+      "sha256": "8218aabe62373e1e65a5206ef4f8a6f9596bf6e14ffca653de0e0a24f0489ab4",
       "note": "Q019; Q134; OSM-AREA; A-SITE; recipe_file=src/wings/vinci/road-dressing.ts"
     },
     {
@@ -400,7 +400,7 @@
       "prompt": "Regenerable actual geometry certificate for40 directed routes across five pose families and two viewport families. Includes foundation, entry, vegetation and all dressing; no sky, DOM or shadow-only duplicate.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-10",
-      "sha256": "0b3a91b1284dc2b8039adc58a261b27abd1c38773d43ec7f08a34530dae58d3a",
+      "sha256": "69a0dfa5a63753632bf8cdc89354750e17289cff60498a91f6a4a47ee93b62a9",
       "note": "recipe_file=src/wings/vinci/data/rail-clearance.json; source_generator=src/wings/vinci/rail-certify.mjs; runtime dependency of vinci/rail"
     },
     {
