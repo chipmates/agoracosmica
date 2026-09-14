@@ -79,7 +79,13 @@ const legs = lengths.map(length => {
   ensure(maxRhythm <= gaitEnvelopeM + 1e-12, `The step rhythm leaves its declared ${gaitEnvelopeM} m envelope`)
   ensure(gaitRhythm(leg, length / 2, true).height === 0 && gaitRhythm(leg, length / 2, true).sway === 0,
     'Reduced motion does not switch the step rhythm off')
-  if (leg.rhythm > 0) ensure(peak >= 1.4 && peak <= 1.75, `A walked ${length} m leg cruises at ${peak} m/s, outside the stroll`)
+  if (leg.rhythm > 0) {
+    ensure(peak > 0 && peak <= 1.75, `A walked ${length} m leg peaks at ${peak} m/s, outside the walking band`)
+    // Close station eyes may be joined entirely by their two easing ramps.
+    // Only a leg with time left to cruise must reach the strolling band.
+    const hasCruise = leg.seconds > leg.accelSeconds + leg.brakeSeconds + 1e-9
+    if (hasCruise) ensure(peak >= 1.4, `A walked ${length} m leg cruises too slowly at ${peak} m/s`)
+  }
   return {
     metres: +length.toFixed(3), seconds: +leg.seconds.toFixed(2),
     cruiseMetresPerSecond: +leg.cruiseMetresPerSecond.toFixed(3),

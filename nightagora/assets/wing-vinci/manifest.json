@@ -49,7 +49,7 @@
    "prompt": "Conjectural atmospheric sky at the exact computed 1517 sun vector: turbidity4, Rayleigh1.4, cloudScale0.0006, cloudCoverage0.28, cloudDensity0.42, cloudElevation0.35, cloudSpeed0. No weather observation survives; cloud shader parameters are scenic choices, not measured altitude. Displayed horizon colour continues the FogExp2 asymptote at assumed density0.0075/m [0.0075–0.015/m] with an assumed effective column18m [12–24m] and clear elevation12deg [10–16deg]; no terrain extrapolation. Source src/wings/vinci/display-sky-haze.ts. The environment probe rotation is separately corrected to Euler Y=-pi/2 in index.ts to match the actual computed solar azimuth; display haze never enters its radiance. A thin streaked high cloud veil is added above ten degrees of elevation, four-octave fractal noise stretched 3.1/11/2.4 on the view ray, peaking near forty degrees and fading at the zenith and the horizon, mixed to a pale grey at 30 per cent. Assumed weather, no observation claimed.",
    "model": "Deterministic TypeScript and TSL procedural geometry",
    "date": "2026-09-09",
-   "sha256": "11c66275667441211bbb5f3a58520ca98a0684afc3249e86e2d1d321c606bb07",
+   "sha256": "f8883ec2fa3c0538221a29c842f11285211136c803093f00323d5aaff12da240",
    "note": "brief/SITE-HOUR.md; three.js SkyMesh MIT; recipe_file=src/wings/vinci/index.ts displayed_haze_recipe=src/wings/vinci/display-sky-haze.ts; sky_display_only=true; fog_density=0.0075; fog_density_assumed_range=0.0075..0.015; environmentRotation_y_rad=-1.5707963267948966; displayed_haze_sha256=80c458f2cb5ccddb7fcedccda5df70e5cdccda7d9ca97d65ebfa6462920f61ef;"
   },
   {
@@ -75,7 +75,7 @@
    "prompt": "Spoken bilingual museum labels with unchanged station names and canonical door questions. Plain source explanations and a separately opened complete record retain the original source chain, dimensional ranges, uncertainty and identical computed-hour arithmetic.",
    "model": "Deterministic TypeScript and TSL procedural geometry",
    "date": "2026-09-09",
-   "sha256": "f7f2947a34db053c798d55b6a28bd5a148d93396447a2ce3786ee416b3685c9d",
+   "sha256": "c68e8f74ab4384199a0217be5c4ff1a2f1d3d6c3029c7648fd720cb3541cbb67",
    "note": "brief/CONCEPT-OPUS.md; brief/CONCEPT-GPT6.md; src/wings/vinci/data/doors.json; recipe_file=src/wings/vinci/content.ts; visitor_evidence_recipe=src/wings/vinci/evidence-copy.ts; visitor_evidence_sha256=1154b783a9a2b7bddd75d4d1294475ae82dbe74006e4b6ff5c0eb2df9247ed00"
   },
   {
@@ -413,7 +413,7 @@
    "prompt": "Regenerable actual geometry certificate for40 directed routes across five pose families and two viewport families. Includes foundation, entry, vegetation and all dressing; no sky, DOM or shadow-only duplicate.",
    "model": "Deterministic TypeScript and TSL procedural geometry",
    "date": "2026-09-10",
-   "sha256": "4cc3d08d27a10a3af33555393513d12348bced92571ec2d80b3a35f406695702",
+   "sha256": "81a750cfefce575950815bdd6746f0494489193a614dd5fbca8059a44338693e",
    "note": "recipe_file=src/wings/vinci/data/rail-clearance.json; source_generator=src/wings/vinci/rail-certify.mjs; runtime dependency of vinci/rail"
   },
   {
@@ -2172,7 +2172,7 @@
     },
     {
      "path": "src/wings/vinci/machines/bench/index.ts",
-     "sha256": "ed8abbb152b35dc3cfcfbe7cbe5ba29dca87f5f3422245eca2332b60f95282fa"
+     "sha256": "40496c0d337f83ec3250111360db639a9b000808d904502d1b5a3026d278fe06"
     },
     {
      "path": "src/wings/vinci/machines/bench/metrics.ts",
@@ -2238,7 +2238,7 @@
     },
     {
      "path": "src/wings/vinci/machines/bench/index.ts",
-     "sha256": "ed8abbb152b35dc3cfcfbe7cbe5ba29dca87f5f3422245eca2332b60f95282fa"
+     "sha256": "40496c0d337f83ec3250111360db639a9b000808d904502d1b5a3026d278fe06"
     }
    ],
    "note": "Procedural modern hall geometry only. The stone material set remains a separately manifested CC0 library asset. No machine's own hall is claimed or reconstructed here.",
@@ -2254,7 +2254,7 @@
    "prompt": "The da Vinci machine bench. Restrained museum typography, folio mounts, named absence panels, certainty marks, navigation, finite-demonstration status and evidence reading furniture, plus an optional diagnostic card displaying observed runtime measurements. Reuse the locked bilingual pages verbatim. No unapproved folio or reconstruction photograph is displayed. Window 5: three registers of text. The label speaks the hour (15:19 by the sun, 10 October 1517) and says the day is documented and the hour chosen, and it names what the bench does not show; the drawer explains without bracket citations; the record behind Read the evidence carries the arithmetic, the place, the method and the sources. The same computed 10 October 1517 Julian 15:19:00 LAT hour and geographic sun A=231.9005 degrees h=17.3882 degrees drive the bench key. The hour is chosen, not historical observation. Window 6: the phone drops the footer's top rule so one line closes the reading column; the compass is staged as an object (three-quarter view, full frame height on the wide frame, .35 on the phone) and every machine is fitted at .80 of the half height and .70 of the half width, .31 on the phone; a close state frames the working end of a machine alone. No locked copy changed.",
    "model": "GPT-6 Codex, with a Claude Opus 5 harvest seat",
    "date": "2026-09-11",
-   "sha256": "ed8abbb152b35dc3cfcfbe7cbe5ba29dca87f5f3422245eca2332b60f95282fa",
+   "sha256": "40496c0d337f83ec3250111360db639a9b000808d904502d1b5a3026d278fe06",
    "recipe_files": [
     {
      "path": "src/wings/vinci/machines/bench/bench.css",
@@ -2274,7 +2274,7 @@
     },
     {
      "path": "src/wings/vinci/machines/bench/index.ts",
-     "sha256": "ed8abbb152b35dc3cfcfbe7cbe5ba29dca87f5f3422245eca2332b60f95282fa"
+     "sha256": "40496c0d337f83ec3250111360db639a9b000808d904502d1b5a3026d278fe06"
     },
     {
      "path": "src/wings/vinci/machines/bench/metrics.ts",
@@ -2574,7 +2574,7 @@
    "prompt": "Isolated inspection route and scene under one warm lamp, original museum hook delegation and measured table telemetry. No historical room reconstruction.",
    "model": "Deterministic TypeScript, three.js TSL and CSS; authored with GPT-6, revised with Claude Opus 5",
    "date": "2026-09-10",
-   "sha256": "5c2a986364f921df30f0c84f68ca5821a84980e601c56167a58b7640f0d7cd67",
+   "sha256": "f59b03e5219f6be8b6fcc6c47b7ce4857f8c1cc9cd0ddf6ecc7e2c1386e0df67",
    "note": "recipe_file=src/wings/vinci/table/bench/index.ts; output_source=src/wings/vinci/table/bench/index.ts src/wings/vinci/table/bench/orientation.ts src/wings/vinci/table/bench/soft-shadow.ts; modern exhibition design, not documentary reconstruction"
   },
   {
@@ -2639,7 +2639,7 @@
    "prompt": "Typed English and German labels for the isolated reading table. Brand preserved; historical source text is untouched.",
    "model": "Deterministic TypeScript, three.js TSL and CSS; authored with GPT-6",
    "date": "2026-09-09",
-   "sha256": "7d3a96aeec18dce602c05a3b69b960a0d60390ea2c2e0c49de1523377a0f5e55",
+   "sha256": "07ef1a72247db8bbd9999593d10653a5b2321380be6f02b884295b28e761b091",
    "note": "recipe_file=src/wings/vinci/table/bench-content.ts; output_source=src/wings/vinci/table/bench-content.ts; modern exhibition design, not documentary reconstruction"
   },
   {
@@ -2717,7 +2717,7 @@
    "prompt": "Modern stone inscription mount carrying the quotation alone, set into a moulded surround, with a bilingual reading dock; the folio siglum and the passage number live in the record. Museum composition, not a recovered historical inscription.",
    "model": "Deterministic TypeScript geometry and TSL materials",
    "date": "2026-09-10",
-   "sha256": "4ddbcb0bcc0ddf8a7705a90ec8231247e5082e971b8a3452bb1ae63531f5280d",
+   "sha256": "95541025801516c0fd03c2b50c41983ef9e70027b0e4280499e64c51b9151902",
    "note": "recipe_file=src/wings/vinci/line/bench/index.ts"
   },
   {
@@ -2756,7 +2756,7 @@
    "prompt": "Isolated bench scene host, modern architecture, source-docked labels, standard materials, per-room air, camera composition and input. Library textures via manifested store, with direct plate memory separately measured.",
    "model": "Deterministic TypeScript geometry and TSL materials",
    "date": "2026-09-10",
-   "sha256": "4ddbcb0bcc0ddf8a7705a90ec8231247e5082e971b8a3452bb1ae63531f5280d",
+   "sha256": "95541025801516c0fd03c2b50c41983ef9e70027b0e4280499e64c51b9151902",
    "note": "recipe_file=src/wings/vinci/line/bench/index.ts"
   },
   {
@@ -3291,11 +3291,11 @@
     },
     {
      "path": "src/wings/vinci/collection/materials.ts",
-     "sha256": "51ccc5005ac7ca5dae3dc922e8d9d7dfbed94e4adea8b69c82a214d1b92b2ec8"
+     "sha256": "1af3f1fc26527f8efcad9f20a6b817d7a5c96841c7a303a76d38aec5a2d66bb3"
     },
     {
      "path": "src/wings/vinci/collection/exhibits.ts",
-     "sha256": "3f91d9c0edf045c6b8573e0b12c346d41a39d6cbc9af1b0707c6dc6463821bfa"
+     "sha256": "de17ba8f250dc5dd8eb2ea7836ddf5e9baf5b3d79c3e4b33ad01084a7788b3b6"
     },
     {
      "path": "src/wings/vinci/pictures/register.ts",
@@ -3327,15 +3327,15 @@
     },
     {
      "path": "src/wings/vinci/index.ts",
-     "sha256": "34a77dbae87d2ccc3e6918dc2f910ac17a4cbc4d88a03f483e611bc88904f082"
+     "sha256": "f8883ec2fa3c0538221a29c842f11285211136c803093f00323d5aaff12da240"
     },
     {
      "path": "src/wings/vinci/content.ts",
-     "sha256": "e6dad3a95759d49795bef97fcbc7e24711a86aba095afb700d2143dcebcb5f2c"
+     "sha256": "c68e8f74ab4384199a0217be5c4ff1a2f1d3d6c3029c7648fd720cb3541cbb67"
     },
     {
      "path": "src/wings/vinci/wing.css",
-     "sha256": "96f33c955b12fc2c36c49f872dbbd400bf160f5ffca5ad5d04bfe8e381dc2542"
+     "sha256": "612962bd8bbfc79a70602b11ff819ad2c4ef2fa0cdde151c757049ff711255d0"
     }
    ]
   },
@@ -3388,12 +3388,12 @@
    "prompt": "Twelve complete date sockets from the unchanged line bench, mounted in three fixed excerpts of four at true scale on the long gallery floor. The sections begin with the recorded birth in1452, the Vespucci note in1503 and the Amboise visit in1517, and end with the1519 will and death. Original bronze numerals, certainty words and colours, two named1504 events and1.65m nonchronological spacing are retained. The collection host clips the original paving to its room and excludes the standalone bench walls, rail and threshold continuation, keeping the gallery doors and crossing clear. Modern exhibition composition, no historical building claim.",
    "model": "Deterministic TypeScript geometry derived from the line module",
    "date": "2026-09-14",
-   "sha256": "468bbafcb97b7242ee84728edbc3ba5adb2c9c68be7edca5408e3def36b0409b",
+   "sha256": "faac45880faabc9df3449abcce5ab092a2b79d408d071e11a26c189bb828b36c",
    "note": "recipe_file=src/wings/vinci/collection/line-floor.ts; source_module=src/wings/vinci/line/index.ts; source_indices=0..3,28..31,38..41; all56 records remain at the bench address",
    "recipe_files": [
     {
      "path": "src/wings/vinci/collection/line-floor.ts",
-     "sha256": "468bbafcb97b7242ee84728edbc3ba5adb2c9c68be7edca5408e3def36b0409b"
+     "sha256": "faac45880faabc9df3449abcce5ab092a2b79d408d071e11a26c189bb828b36c"
     },
     {
      "path": "src/wings/vinci/collection/layout.ts",
@@ -3401,15 +3401,15 @@
     },
     {
      "path": "src/wings/vinci/collection/exhibits.ts",
-     "sha256": "d59278baa2371e93ddac644ed3990694b6bbc9787c96c3f8ee731d1a11e94af5"
+     "sha256": "de17ba8f250dc5dd8eb2ea7836ddf5e9baf5b3d79c3e4b33ad01084a7788b3b6"
     },
     {
      "path": "src/wings/vinci/collection/views.ts",
-     "sha256": "a954ae82b2d4afc67c904540d150ae9a861b403b0e68a4b61aaed6d0dba294b2"
+     "sha256": "2f06067ee1cda78b676749e74af46a982d58171cd871bac0eabc508874de4e87"
     },
     {
      "path": "src/wings/vinci/rail.ts",
-     "sha256": "9d04c67b723d754941419ddeacc541e25872e4def5cbb46dd44890329a1d5c83"
+     "sha256": "7726daa869d45d319105d7db2589deef1a21a6984c14fa7630835e35d3fe1f08"
     },
     {
      "path": "src/wings/vinci/rail-waypoints.ts",
@@ -3443,16 +3443,16 @@
    "prompt": "The collection host fits the unchanged grave and corrections modules to their existing museum floor reservations. Only the original native stage paving triangles are clipped: grave 12 by 13 m, deathbed and quote corrections 13 by 12 m, each around local depth centre 2.5 m. The larger independent bench stages remain unchanged at their bench addresses. All upright exhibit geometry and its attributes pass through intact. This prevents the corrections paving from covering the date course or adjoining picture room and keeps one instance of each built exhibit. The shared collection paving coordinates retain their original datum. Authored museum installation, no historical architectural claim.",
    "model": "Deterministic TypeScript clipping of the original native floor triangles",
    "date": "2026-09-14",
-   "sha256": "468bbafcb97b7242ee84728edbc3ba5adb2c9c68be7edca5408e3def36b0409b",
+   "sha256": "faac45880faabc9df3449abcce5ab092a2b79d408d071e11a26c189bb828b36c",
    "note": "recipe_file=src/wings/vinci/collection/line-floor.ts; recipe_function=fitCollectionExhibitFloor; source_modules=grave,myths; floor_only=true",
    "recipe_files": [
     {
      "path": "src/wings/vinci/collection/line-floor.ts",
-     "sha256": "468bbafcb97b7242ee84728edbc3ba5adb2c9c68be7edca5408e3def36b0409b"
+     "sha256": "faac45880faabc9df3449abcce5ab092a2b79d408d071e11a26c189bb828b36c"
     },
     {
      "path": "src/wings/vinci/collection/exhibits.ts",
-     "sha256": "d59278baa2371e93ddac644ed3990694b6bbc9787c96c3f8ee731d1a11e94af5"
+     "sha256": "de17ba8f250dc5dd8eb2ea7836ddf5e9baf5b3d79c3e4b33ad01084a7788b3b6"
     },
     {
      "path": "src/wings/vinci/collection/layout.ts",
@@ -3460,7 +3460,7 @@
     },
     {
      "path": "src/wings/vinci/collection/materials.ts",
-     "sha256": "b19f8cb835f1ead5b4b4f934ed298df8e2f014f69e6e237673f524acfa62103e"
+     "sha256": "1af3f1fc26527f8efcad9f20a6b817d7a5c96841c7a303a76d38aec5a2d66bb3"
     },
     {
      "path": "src/wings/vinci/myths/construction.ts",

@@ -10,16 +10,16 @@ import { COURT, FLOOR, GRAVE_ORIGIN, HANG_DATUM, LINE_ORIGIN, LINE_SLAB, PARACHU
 export interface RoomPose { eye: Vector3; at: Vector3; fov: number }
 const EYE = FLOOR + 1.62
 
-/** Floor lettering needs its own gaze. The near date is the subject; the
- * following studs recede above it. Both lenses keep the existing standing
- * eye, with the phone's complete date above the card rather than beneath it.
+/** Read each excerpt from its south end. The standing eye has enough room
+ * behind the selected date to hold its whole numeral and the gallery with
+ * a shallow gaze; the phone places that date above the station card.
  */
-function lineFloorView(north: number, narrow: boolean, early: boolean): RoomPose {
-  const eye = world(LINE_ORIGIN.east + .3, north + (early ? .7 : 1.4), FLOOR + 1.66)
-  const heading = (narrow ? (early ? -51 : -30) : (early ? -30 : -14)) * Math.PI / 180
-  const descent = (narrow ? (early ? 70 : 64) : (early ? 61 : 51)) * Math.PI / 180
-  const direction = new Vector3(Math.sin(heading) * Math.cos(descent), -Math.sin(descent), Math.cos(heading) * Math.cos(descent))
-  return { eye, at: eye.clone().add(direction), fov: narrow ? 100 : early ? 70 : 64 }
+function lineFloorView(north: number, narrow: boolean): RoomPose {
+  const eye = world(LINE_ORIGIN.east + .3, north - 3.4, FLOOR + 1.66)
+  const heading = 10 * Math.PI / 180
+  const descent = (narrow ? 46 : 25) * Math.PI / 180
+  const direction = new Vector3(Math.sin(heading) * Math.cos(descent), -Math.sin(descent), -Math.cos(heading) * Math.cos(descent))
+  return { eye, at: eye.clone().add(direction), fov: narrow ? 104 : 72 }
 }
 
 export function collectionView(id: string, narrow: boolean): RoomPose | undefined {
@@ -35,15 +35,15 @@ export function collectionView(id: string, narrow: boolean): RoomPose | undefine
     // last section continues to the two 1519 studs at the end of the line.
     case 'collection-room-line-early': {
       const north = LINE_ORIGIN.north + 9 * LINE_SLAB.pitchNorth
-      return lineFloorView(north, narrow, true)
+      return lineFloorView(north, narrow)
     }
     case 'collection-room-line-late': {
       const north = LINE_ORIGIN.north + 5 * LINE_SLAB.pitchNorth
-      return lineFloorView(north, narrow, false)
+      return lineFloorView(north, narrow)
     }
     case 'collection-room-line-amboise': {
       const north = LINE_ORIGIN.north + LINE_SLAB.pitchNorth
-      return lineFloorView(north, narrow, false)
+      return lineFloorView(north, narrow)
     }
     // The picture room, standing where a visitor stands to read a hang.
     case 'collection-room-picture':

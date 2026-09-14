@@ -191,12 +191,14 @@ export function createCollectionLineFloor(materials: LineMaterials, language: 'e
         const right = socketStone ? .801 : 1.9
         if (!vertices.every(vertex => vertex[0]! >= -.801 && vertex[0]! <= right
           && vertex[2]! >= -3 * STUD_SPACING - .82 && vertex[2]! <= .82)) continue
+        // The visitor now reads from the south end. Retain each complete
+        // socket's native bearing while moving its centre onto the room's
+        // north-to-south course: text-right stays east and text-up north.
+        // Reversing the whole excerpt would also invert every numeral.
+        const socketRow = Math.round(-vertices.reduce((sum, vertex) => sum + vertex[2]!, 0) / (3 * STUD_SPACING))
         const translated = vertices.map(vertex => {
           const copy = [...vertex]
-          copy[0] = -vertex[0]!
-          copy[2] = -vertex[2]! + (section.row - 9) * STUD_SPACING
-          copy[3] = -vertex[3]!
-          copy[5] = -vertex[5]!
+          copy[2] = vertex[2]! + (section.row + 2 * socketRow - 9) * STUD_SPACING
           return copy
         })
         append(material, translated)
