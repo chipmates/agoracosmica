@@ -21,6 +21,14 @@ updates:
       # does not ship. Lift this with the Vite 8 migration.
       - dependency-name: "@vitejs/plugin-react"
         update-types: ["version-update:semver-major"]
+      # 7.x is the native compiler and ships no JS compiler API; typescript-eslint
+      # peers on <6.1. Lift when typescript-eslint declares support for 7.
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
+      # The types follow the Node line the repo builds on (.nvmrc, Dockerfile),
+      # not the newest Node release.
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
     groups:
       # Minor and patch travel together; anything major falls outside the group
       # and gets its own PR, so a breaking bump is reviewed on its own.
