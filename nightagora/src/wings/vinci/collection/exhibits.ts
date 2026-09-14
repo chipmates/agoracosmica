@@ -242,9 +242,13 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
       // The table brings a back wall of its own, because its bench had none.
       // It stands against the gallery's west wall, so that wall is the one it
       // brings: the reader faces it with the window elevation behind them.
-      // Its own back wall, 4.4 by 2.2 m a metre behind the book, is set
-      // flush with the gallery's west lining, so the panel the bench needed
-      // becomes the panelling of the alcove the table stands in.
+      // Keep the bench's south edge and shorten only the north end. At the
+      // mounted bearing the 3.25 m panel ends at north -44.35, 150 mm short
+      // of the hall door's south reveal at -44.2.
+      const backWall = built.object.getObjectByName('reading-room-wall')
+      if (!(backWall instanceof Mesh)) throw new Error('The reading table has no back wall')
+      backWall.scale.x = 3.25 / 4.4
+      backWall.position.x = -.575
       built.object.rotation.y = Math.PI / 2
       built.object.position.set(-37.72, FLOOR + .755, 45.4)
       stamp(built.object, 'vinci/table-furniture')
