@@ -12,6 +12,7 @@ import { lang } from '../content'
 import { GRADES } from '../../stack/grade'
 import { createShell } from './shell'
 import { createShellShadowDouble } from './shadow-shell'
+import { createWingShadowBody, type WingShadowBody } from './shadow-body'
 import { createCollection, collectionProvenance } from './collection'
 import { collectionView } from './collection/views'
 import { mountCollectionExhibits, type CollectionExhibits } from './collection/exhibits'
@@ -23,7 +24,7 @@ import { createGatePassage, gatePassageProvenance } from './gate-passage'
 import { createEntryPassage, entryPassageProvenance } from './entry-passage'
 import { createGround } from './ground'
 import { createVegetation } from './vegetation'
-import { createRail, stationPose, namedPose } from './rail'
+import { createRail, stationPose, namedPose, vinciStandsInRoom } from './rail'
 import { collectRailSolids, createRailGeometryAuthority } from './rail-proof'
 import { createWheelStepper } from './input'
 import { dossier, world, hourKey, type Quantity } from './site'
@@ -88,7 +89,11 @@ const PRINT={...GRADES['first-station'],name:'clos-luce-1517',exposure:.94,lift:
 // The court used to open two thirds of a stop, which warmed the tuffeau toward
 // grey-gold and lifted the plaster's mottling into view. One print holds the
 // whole wing now, and the court is lit rather than exposed.
-const STATION_EXPOSURE:Partial<Record<VinciStationId,number>>={courtyard:1.0}
+/** A ROOM IS NOT THE STREET. The stations in the insertion stand indoors,
+ * under a clerestory and two fittings, and the outdoor exposure left them a
+ * stop and a half under. The eye opens at the door, as a camera does. */
+const STATION_EXPOSURE:Partial<Record<VinciStationId,number>>={courtyard:1.0,
+  'picture-room':1.34,'reading-table':1.5,scattered:1.3,flight:1.24,works:1.24,body:1.4,myths:1.38}
 const SHADOW={nearHalfM:20,nearMapPx:1024,aheadM:10,refocusM:3,lightDistanceM:80} as const
 
 export function createWing():WingModule {
@@ -108,6 +113,10 @@ export function createWing():WingModule {
   let standing=false, scheduled=0, sign:HTMLElement|undefined, plates=0
   let authority:ReturnType<typeof createRailGeometryAuthority>|undefined
   let shadowCache:ReturnType<typeof createStaticShadowCache>|undefined
+  let shadowBody:WingShadowBody|undefined
+  /** The share of a leg after which the card names the station ahead. */
+  const CARD_HANDOVER=.5
+  let exposureAt:VinciStationId|undefined
   let exhibits:CollectionExhibits|undefined, exhibitClock=0
   let restoreEnvironmentRotation:(()=>void)|null=null
   const narrow=()=>innerWidth/innerHeight<=.9
@@ -206,6 +215,9 @@ export function createWing():WingModule {
     // it the whole shadow map is re-rendered on every frame of the walk.
     void exhibits?.ready.then(()=>{if(!hosts||!standing)return;shadowCache?.dispose();shadowCache=createStaticShadowCache(scene,camera,stack.renderer,()=>stack.materials.pending())})
     for(const root of scene.children){const id=root===shell?'vinci/shell':root.name==='vinci/shell-shadow'?'vinci/shell-shadow':root.name==='wing-vinci/gate-passage'?'vinci/gate-passage':root===water?'vinci/water':root===sky?'vinci/sky':root.name.includes('landscape trees')?'vinci/vegetation':root.name==='vinci/collection-modern-insertion'?'vinci/collection':root.name==='vinci generated road dressing'?'vinci/road-dressing':root.name==='vinci generated inner court dressing'?'vinci/inner-court':root.name.includes('dressing')?'vinci/ground-dressing':'vinci/terrain';root.traverse(o=>{if(o instanceof Mesh){const assetId=typeof o.userData['manifestId']==='string'?o.userData['manifestId']:id;o.userData['manifestId']=assetId;o.userData['asset']=assetId}})}
+    // The ids above are what the shadow body folds by, so it is welded
+    // after them and before the rail reads the scene.
+    shadowBody=createWingShadowBody(scene);scene.add(shadowBody.group)
     authority=createRailGeometryAuthority(collectRailSolids(scene))
     rail=createRail(camera,clock,authority);measurement=createMeasurement(h.labels,stack)
     source=make('button','vinci-source',lang()==='de'?'Quellen':'Sources');source.type='button';source.setAttribute('aria-keyshortcuts','l');source.setAttribute('aria-controls','vinci-source-card');source.addEventListener('click',()=>{mode=mode===2?1:2;paintDock();if(mode===2)dock.focus({preventScroll:true})});h.stage.parentElement!.querySelector('.wing-rail-group')!.append(source)
@@ -239,7 +251,7 @@ export function createWing():WingModule {
     plates=stack.materials.pending()
     card=station
     const s=vinciContent[card]!
-    aimPrint(s.id);rail.set(s.id,stationPose(s.id,narrow()),true,narrow());paintHeader();paintDock()
+    aimPrint(s.id);exposureAt=s.id;rail.set(s.id,stationPose(s.id,narrow()),true,narrow());paintHeader();paintDock()
     if(pendingView){const id=pendingView;pendingView='';showView(id)}
   }
   /** True once the rail's own geometry proof has resolved: before that the
@@ -271,7 +283,12 @@ export function createWing():WingModule {
     header.textContent=''
     header.append(make('p','vinci-kicker',stationKicker()),make('h1','vinci-title',text(s.name)))
     if(s.outdoor)header.append(make('p','vinci-hour',text(vinciHourSpoken)))
-    if(!s.outdoor){header.classList.add('vinci-construction');header.append(make('p','vinci-status',text(vinciConstructionStatus)),make('p','vinci-promise',text(s.promise)));if(s.id==='hall')header.append(make('p','vinci-threshold',text(vinciThreshold)))}
+    // A STATION THAT STANDS IN A ROOM DOES NOT COVER IT. The centred panel
+    // belongs to the stations that are still a plate; where the room is
+    // built, the card docks to the side and the room is the frame.
+    const standing=vinciStandsInRoom(s.id)
+    header.classList.toggle('vinci-standing',standing)
+    if(!s.outdoor){header.classList.toggle('vinci-construction',!standing);header.append(make('p','vinci-status',text(vinciConstructionStatus)),make('p','vinci-promise',text(s.promise)));if(s.id==='hall')header.append(make('p','vinci-threshold',text(vinciThreshold)))}
     else header.classList.remove('vinci-construction')
   }
   /** The card names what the frame holds: a sub-view carries its own title.
@@ -342,7 +359,7 @@ export function createWing():WingModule {
     labels.setMode(mode)
     const collectionView=activeView.startsWith('collection')
     const entryAnchor=entryInspectionAnchors[activeView]
-    labels.setAnchor(materialInspectionAnchors[activeView]??entryAnchor??(activeView==='collection-court-access'?world(...collectionAccessPoint(1.05,.65),-.46):collectionView?world(-21.92,-33.92,-3.2):s.outdoor?anchors[s.id]??null:null),`${text(vinciCertaintyWords.reconstructed)} · ${entryAnchor?(lang()==='de'?'Vorgeschlagene Eingangsstruktur':'Proposed entrance structure'):collectionView?(lang()==='de'?'Museumseinbau der Gegenwart':'Modern museum insertion'):text(s.name)}`)
+    labels.setAnchor(materialInspectionAnchors[activeView]??entryAnchor??(activeView==='collection-court-access'?world(...collectionAccessPoint(1.05,.65),-.46):collectionView?world(-21.92,-33.92,narrow()?-5.85:-3.2):s.outdoor?anchors[s.id]??null:null),`${text(vinciCertaintyWords.reconstructed)} · ${entryAnchor?(lang()==='de'?'Vorgeschlagene Eingangsstruktur':'Proposed entrance structure'):collectionView?(lang()==='de'?'Museumseinbau der Gegenwart':'Modern museum insertion'):text(s.name)}`)
     dock.textContent=''
     record=make('div','vinci-record');setRegister(record,'record');record.id='vinci-full-record';record.hidden=true;record.append(make('h3','',lang()==='de'?'Vollständiger Nachweis':'Full record'))
     const title=make('p','vinci-certainty',text(s.outdoor?vinciCertaintyWords.reconstructed:vinciConstructionStatus))
@@ -416,7 +433,7 @@ export function createWing():WingModule {
       // On a walk the card changes when the visitor arrives, not when the
       // rail mark is pressed: a title that names the next room over the room
       // you are still standing in is a lie the frame tells.
-      if(cut||rail.navigation.completed===s.id){card=index;dock.scrollTop=0;aimPrint(s.id);paintHeader();paintDock()}
+      if(cut||rail.navigation.completed===s.id){card=index;dock.scrollTop=0;aimPrint(s.id);exposureAt=s.id;paintHeader();paintDock()}
     },
     view(id){if(!standing){pendingView=id;return}showView(id)},
     look(y,p){if(standing)rail.look(y,p)},
@@ -434,12 +451,19 @@ export function createWing():WingModule {
       }
       measurement.update();rail.update()
       if(exhibits){const now=hosts.world.clock();exhibits.update(now,Math.max(0,Math.min(.25,now-exhibitClock)),hosts.world.camera.position);exhibitClock=now}
-      const here=rail.navigation.completed
+      // THE CARD NAMES THE STATION THE WALKER IS IN. It hands over at the
+      // half of the leg, by walked distance: before that the walker is still
+      // in the room they left, after it they are in the one they are entering,
+      // and no panel outlives the station it belongs to. The exposure still
+      // changes on arrival, where the eye is at rest.
+      const nav=rail.navigation
+      const here=nav.active&&nav.legWalked>=CARD_HANDOVER?nav.active:nav.completed
       if(here&&here!==vinciContent[card]!.id&&!activeView){
         const arrived=vinciContent.findIndex(s=>s.id===here)
-        if(arrived>=0){card=arrived;dock.scrollTop=0;aimPrint(here);paintHeader();paintDock();paintQuestion()}
+        if(arrived>=0){card=arrived;dock.scrollTop=0;paintHeader();paintDock();paintQuestion()}
       }
-      focusNearCascade();shadowCache?.update();sky.position.copy(hosts.world.camera.position);labels.update(dock.hidden?null:dock.getBoundingClientRect())},
-    stop(){if(scheduled)cancelAnimationFrame(scheduled);scheduled=0;standing=false;exhibits?.dispose();exhibits=undefined;sign=undefined;shadowCache?.dispose();shadowCache=undefined;restoreEnvironmentRotation?.();restoreEnvironmentRotation=null;controller?.abort();source?.remove();labels?.dispose();measurement?.dispose();water?.dispose();hosts?.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key?.light)o.dispose()});key?.dispose();if(hosts){hosts.world.scene.traverse(o=>{if(o instanceof Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose()}});hosts.world.scene.clear();delete hosts.stage.parentElement!.dataset['wing'];if(labelHostHidden===null)hosts.labels.removeAttribute('aria-hidden');else hosts.labels.setAttribute('aria-hidden',labelHostHidden)}hosts=undefined},
+      if(nav.completed&&nav.completed!==exposureAt){exposureAt=nav.completed;aimPrint(nav.completed)}
+      focusNearCascade();shadowBody?.update();shadowCache?.update();sky.position.copy(hosts.world.camera.position);labels.update(dock.hidden?null:dock.getBoundingClientRect())},
+    stop(){if(scheduled)cancelAnimationFrame(scheduled);scheduled=0;standing=false;exhibits?.dispose();exhibits=undefined;sign=undefined;shadowBody?.dispose();shadowBody=undefined;shadowCache?.dispose();shadowCache=undefined;restoreEnvironmentRotation?.();restoreEnvironmentRotation=null;controller?.abort();source?.remove();labels?.dispose();measurement?.dispose();water?.dispose();hosts?.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key?.light)o.dispose()});key?.dispose();if(hosts){hosts.world.scene.traverse(o=>{if(o instanceof Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose()}});hosts.world.scene.clear();delete hosts.stage.parentElement!.dataset['wing'];if(labelHostHidden===null)hosts.labels.removeAttribute('aria-hidden');else hosts.labels.setAttribute('aria-hidden',labelHostHidden)}hosts=undefined},
   }
 }
