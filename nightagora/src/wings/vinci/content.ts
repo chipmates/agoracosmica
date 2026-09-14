@@ -204,8 +204,8 @@ const visitorWords: Record<string, VisitorWords> = {
     sourceDe: 'Die Raumbeschreibung des Hausmuseums und der Blick zum königlichen Schloss.',
   },
   'picture-absence': {
-    en: 'Fourteen frames remain empty in this hang. Their sizes share the wall with the reproductions.',
-    de: 'Vierzehn Rahmen bleiben in dieser Hängung leer. Ihre Maße teilen sich die Wand mit den Reproduktionen.',
+    en: 'Every position in this hang carries a picture, and each one names the reproduction it comes from.',
+    de: 'Jeder Platz dieser Hängung trägt ein Bild, und jedes nennt die Reproduktion, aus der es stammt.',
     sourceEn: 'The room’s retained hang and the museum’s picture register.',
     sourceDe: 'Die beibehaltene Hängung des Raums und das Bilderverzeichnis des Museums.',
   },
@@ -234,8 +234,8 @@ const visitorWords: Record<string, VisitorWords> = {
     sourceDe: 'Richters Handschriftenverzeichnis und die Angaben der heutigen Sammlungen.',
   },
   'anatomy-absence': {
-    en: 'The anatomical drawings at Windsor cannot be shown in this museum.',
-    de: 'Die anatomischen Zeichnungen in Windsor dürfen in diesem Museum nicht gezeigt werden.',
+    en: 'Twenty-nine of his anatomical sheets from Windsor hang on this wall, each from a public reproduction.',
+    de: 'Neunundzwanzig seiner anatomischen Blätter aus Windsor hängen an dieser Wand, jedes aus einer öffentlichen Reproduktion.',
     sourceEn: 'The Royal Collection’s records and image terms.',
     sourceDe: 'Die Bestandsangaben und Bildrechte der Royal Collection.',
   },
@@ -398,9 +398,9 @@ const chamberPlacement = statement('chamber-placement',
   'Das Museum verortet sein Zimmer an diesem Ende, mit Blick auf das Schloss des Königs.',
   'conjectural', 'document', 'brief/CONCEPT-OPUS.md §3 S6');
 const emptyPicture = statement('picture-absence',
-  'The room retains fourteen withheld frames. Reproduction sources and their current terms are recorded separately.',
-  'Der Raum behält vierzehn ausgesparte Rahmen bei. Bildquellen und ihre aktuellen Bedingungen sind gesondert verzeichnet.',
-  'unknown', 'absence', 'The retained room hang and the picture register', 'museum translation');
+  'All twenty-five positions of the hang carry a reproduction, seven admitted at the first tier, twelve at the second and six from the earlier allowlist. No position is withheld, and every work names its own source and terms.',
+  'Alle fünfundzwanzig Plätze der Hängung tragen eine Reproduktion, sieben in der ersten Stufe zugelassen, zwölf in der zweiten und sechs aus der früheren Freigabeliste. Kein Platz bleibt ausgespart, und jedes Werk nennt seine eigene Quelle und ihre Bedingungen.',
+  'documented', 'document', 'The room hang and the picture register', 'museum translation');
 const supper = statement('supper-record',
   'The Last Supper, 460 by 880 cm, on the north wall of the refectory of Santa Maria delle Grazie in Milan. Dry wall-painting over gesso, pitch and mastic, not fresco.',
   'Das Abendmahl, 460 mal 880 cm, an der Nordwand des Refektoriums von Santa Maria delle Grazie in Mailand. Trockene Wandmalerei auf Gesso, Pech und Mastix, kein Fresko.',
@@ -418,9 +418,9 @@ const scattered = statement('surviving-notebooks',
   'Dies sind die erhaltenen Notizbücher und die Orte, an denen sie heute Abend liegen.',
   'documented', 'document', 'brief/CONCEPT-OPUS.md §3 S14');
 const body = statement('anatomy-absence',
-  'About six hundred of his sheets are at Windsor. This museum may show none of them.',
-  'Etwa sechshundert seiner Blätter befinden sich in Windsor. Dieses Museum darf keines davon zeigen.',
-  'unknown', 'absence', 'brief/CONCEPT-OPUS.md §3 S17');
+  'About six hundred of his sheets are at Windsor, and twenty-nine of them hang here. Of 538 catalogued sheet groups the rights review admitted a faithful public reproduction for 389 and found none it may show for 149.',
+  'Etwa sechshundert seiner Blätter befinden sich in Windsor, neunundzwanzig davon hängen hier. Von 538 verzeichneten Blattgruppen ließ die Rechteprüfung für 389 eine getreue öffentliche Reproduktion zu und fand für 149 keine, die sie zeigen darf.',
+  'documented', 'document', 'brief/CONCEPT-OPUS.md §3 S17; the rights review of 2026-09-14');
 const grave = statement('burial-record',
   'He was buried on 12 August 1519 in the collegiate church of Saint-Florentin inside the chateau walls. That church was pulled down in 1807.',
   'Er wurde am 12. August 1519 in der Stiftskirche Saint-Florentin innerhalb der Schlossmauern bestattet. Diese Kirche wurde 1807 abgerissen.',
@@ -461,8 +461,8 @@ const stationCards: Record<VinciStationId, VinciText> = {
     de: 'Die Gartenfront nimmt die tiefe Westsonne, dahinter fällt das Tal ab. Der Hang folgt der Vermessung des Geländes, die Bepflanzung stammt von uns, denn keine Quelle hält fest, was hier zu seiner Zeit wuchs. Sie verlassen das Jahr 1517. Es folgt ein Museum dessen, was erhalten ist, erbaut in unserem Jahrhundert.',
   },
   'picture-room': {
-    en: 'Twenty-five paintings hang here at the size their holders record, in the order he made them, so this wall gives you the real scale. What carries a picture is what a public source lets us reproduce. The sources name every work, where it is today and what its licence says.',
-    de: 'Fünfundzwanzig Gemälde hängen hier in den Maßen, die ihre Sammlungen verzeichnen, in der Reihenfolge ihrer Entstehung, diese Wand gibt Ihnen also den wirklichen Maßstab. Ein Bild tragen die Werke, die eine öffentliche Quelle uns zu reproduzieren erlaubt. Die Quellen nennen jedes Werk, seinen heutigen Ort und seine Lizenz.',
+    en: 'Twenty-five paintings hang here at the size their holders record, in the order he made them, so this wall gives you the real scale. Every position carries a picture, and each names the reproduction it comes from. The sources name every work, where it is today and what its licence says.',
+    de: 'Fünfundzwanzig Gemälde hängen hier in den Maßen, die ihre Sammlungen verzeichnen, in der Reihenfolge ihrer Entstehung, diese Wand gibt Ihnen also den wirklichen Maßstab. Jeder Platz trägt ein Bild, und jedes nennt die Reproduktion, aus der es stammt. Die Quellen nennen jedes Werk, seinen heutigen Ort und seine Lizenz.',
   },
   'line-early': {
     en: 'The dates are cut into the floor, and you walk his life along them. This stretch runs from the birth his grandfather noted in 1452 to the year the French took Milan. Every date carries its document in the sources, and its colour says how sure we are.',
@@ -477,8 +477,8 @@ const stationCards: Record<VinciStationId, VinciText> = {
     de: 'Venedig, Florenz, wieder Mailand, dann Rom. Dieser Abschnitt umfasst die Jahre von 1500 bis 1515, in denen er von einem Auftraggeber zum nächsten zog. Im Oktober 1503 notierte ein Florentiner Kanzleischreiber am Rand eines Buches, Leonardo male den Kopf der Lisa del Giocondo.',
   },
   body: {
-    en: 'He opened bodies and drew what he found, and about six hundred of those sheets are at Windsor today. This wall keeps their measure, four courses at the size of a folio and one larger sheet beside them. The sources name the sheets, their holder and what each reproduction allows.',
-    de: 'Er öffnete Körper und zeichnete, was er fand, und etwa sechshundert dieser Blätter liegen heute in Windsor. Diese Wand hält ihr Maß, vier Reihen in der Größe eines Blattes und ein größeres daneben. Die Quellen nennen die Blätter, ihre Sammlung und was jede Reproduktion erlaubt.',
+    en: 'He opened bodies and drew what he found, and about six hundred of those sheets are at Windsor. Twenty-nine of them hang on this wall, each from a public reproduction the law lets us show. The sources name every sheet, its number in the royal collection and what its licence asks of us.',
+    de: 'Er öffnete Körper und zeichnete, was er fand, und etwa sechshundert dieser Blätter liegen in Windsor. Neunundzwanzig davon hängen an dieser Wand, jedes aus einer öffentlichen Reproduktion, die das Recht uns zeigen lässt. Die Quellen nennen jedes Blatt, seine Nummer in der königlichen Sammlung und was seine Lizenz von uns verlangt.',
   },
   'line-amboise': {
     en: 'The last stretch, and it runs past his death. He came to France for the young king, the first firm record of him at this house is dated 22 May 1517, and he died here on 2 May 1519. The dates after that year belong to what happened to his work.',
@@ -551,7 +551,7 @@ const seeds: readonly StationSeed[] = [
     { en: 'The garden front in raking light, and the light itself.', de: 'Die Gartenfront im Streiflicht und das Licht selbst.' },
     [vinciParkLabel, vinciCollectionThreshold, vinciHourLabel, vinciHourIntegrity], 'brief/CONCEPT-OPUS.md §3 S7'),
   seed('picture-room', { en: 'The picture room, at true scale', de: 'Der Bildersaal in wahrem Maßstab' },
-    { en: 'Pictures and withheld frames share one wall at the sizes their holders record.', de: 'Bilder und ausgesparte Rahmen teilen sich eine Wand in den von ihren Sammlungen verzeichneten Maßen.' },
+    { en: 'Every painting of the hang stands on one wall at the size its holder records.', de: 'Jedes Gemälde der Hängung steht an einer Wand in dem Maß, das seine Sammlung verzeichnet.' },
     [emptyPicture], 'brief/CONCEPT-OPUS.md §3 S11'),
   seed('line-early', { en: 'Vinci, Florence, Milan', de: 'Vinci, Florenz, Mailand' },
     { en: 'His grandfather recorded the birth on 15 April 1452.', de: 'Sein Großvater verzeichnete die Geburt am 15. April 1452.' },
@@ -733,8 +733,8 @@ export const vinciRightsPolicy: VinciText = {
 
 /** What this wing holds, counted. The sentences above carry what it does not. */
 export const vinciWingCounts: VinciText = {
-  en: 'This wing stands at nineteen stations on the two grounds. The picture room holds 25 positions at the size their holders record, the mechanism hall 14 machines rebuilt from the sheets, the wall of the body 28 at the measure of a Windsor folio, and the reading table one open page. A picture hangs where a reproduction we may show exists. The rights review of this museum read 538 catalogued Windsor sheet groups and admitted 389 of them, and of 25 named codex units it admitted 11.',
-  de: 'Dieser Flügel hat neunzehn Stationen auf den zwei Gründen. Der Bildersaal trägt 25 Plätze in den Maßen, die die Sammlungen verzeichnen, die Maschinenhalle 14 nach den Blättern gebaute Maschinen, die Wand des Körpers 28 im Maß eines Windsor-Blattes und der Lesetisch eine offene Seite. Ein Bild hängt dort, wo es eine Reproduktion gibt, die wir zeigen dürfen. Die Rechteprüfung dieses Museums las 538 verzeichnete Windsor-Blattgruppen und ließ 389 von ihnen zu, und von 25 benannten Codex-Einheiten ließ sie 11 zu.',
+  en: 'This wing stands at nineteen stations on the two grounds. The picture room holds 25 positions at the size their holders record and every one of them carries a picture, the wall of the body 29 sheets from Windsor, the mechanism hall 14 machines rebuilt from the sheets, and the reading table one open page. The rights review of this museum read 538 catalogued Windsor sheet groups and admitted 389 of them, and of 25 named codex units it admitted 11. What it could not admit is named in the room it belongs to, with its holder and its reason.',
+  de: 'Dieser Flügel hat neunzehn Stationen auf den zwei Gründen. Der Bildersaal trägt 25 Plätze in den Maßen, die die Sammlungen verzeichnen, und jeder davon trägt ein Bild, die Wand des Körpers 29 Blätter aus Windsor, die Maschinenhalle 14 nach den Blättern gebaute Maschinen und der Lesetisch eine offene Seite. Die Rechteprüfung dieses Museums las 538 verzeichnete Windsor-Blattgruppen und ließ 389 von ihnen zu, und von 25 benannten Codex-Einheiten ließ sie 11 zu. Was sie nicht zulassen konnte, steht in dem Raum, zu dem es gehört, mit Sammlung und Grund.',
 }
 
 /** The sources window's own headings, in the museum's voice. */
