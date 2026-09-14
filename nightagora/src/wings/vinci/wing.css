@@ -179,3 +179,26 @@
 .vinci-room-list li,.vinci-absence-list li {padding:8px 0;border-top:1px solid #a9977333;overflow-wrap:anywhere;}
 .vinci-absence-work {display:block;color:#e6d6b8;}
 .vinci-sources-panel h3 {margin:24px 0 6px;font:400 16px/1.3 var(--serif);color:#eadbc1;}
+
+/* THE ENTRANCE PANEL. One sheet over the arrival frame, one scrolling
+   surface, and two controls a thumb can hit. The phone gets the whole
+   German text and scrolls it. */
+.vinci-welcome {width:min(620px,calc(100vw - 32px));max-height:calc(100dvh - 96px);box-sizing:border-box;padding:0;border:1px solid #a9977366;background:#101d27f7;color:#eae1d1;overflow-y:auto;overscroll-behavior:contain;}
+.vinci-welcome::backdrop {background:#06101899;}
+.vinci-welcome-sheet {padding:26px 28px 24px;}
+.vinci-welcome-title {margin:8px 0 4px;font:400 32px/1.1 var(--serif);color:#fff5e3;}
+.vinci-welcome-block {margin-top:20px;padding-top:14px;border-top:1px solid #a9977333;}
+.vinci-welcome-block h2 {margin:0 0 6px;font:400 17px/1.25 var(--serif);color:#eadbc1;}
+.vinci-welcome-block .vinci-statement {margin:10px 0;border-left:0;padding-left:0;}
+.vinci-welcome-route {margin:22px 0 10px;font:13px/1.5 var(--sans);color:#b6bcae;}
+.vinci-welcome-controls {display:flex;flex-wrap:wrap;gap:12px;}
+.vinci-welcome-controls button {min-height:44px;min-width:44px;padding:10px 20px;border:1px solid #a99773aa;background:transparent;color:#eae1d1;font:12px var(--sans);letter-spacing:.14em;text-transform:uppercase;cursor:pointer;}
+.vinci-welcome-enter {background:#1d3242;border-color:#d2a55788;color:#f4dab2;}
+.vinci-welcome-controls button:focus-visible {outline:1px solid #edcc8c;outline-offset:3px;}
+@media(max-aspect-ratio:9/10) {
+  .vinci-welcome {width:auto;left:8px;right:8px;max-height:calc(100dvh - 64px);}
+  .vinci-welcome-sheet {padding:18px 16px 20px;}
+  .vinci-welcome-title {font-size:25px;}
+  .vinci-welcome-block .vinci-statement {font-size:13px;line-height:1.5;}
+  .vinci-welcome-controls button {flex:1 0 auto;padding:10px 12px;font-size:11px;letter-spacing:.1em;}
+}

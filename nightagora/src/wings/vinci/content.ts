@@ -585,6 +585,109 @@ const seeds: readonly StationSeed[] = [
     [grave], 'brief/CONCEPT-OPUS.md §3 S19'),
 ];
 
+/* THE ENTRANCE PANEL. Every museum has a panel at the door of a wing, and a
+   visitor who arrives from a link knows nothing: who this is, where they are,
+   which hour they are standing in, what the rooms hold and how to move. It is
+   shown once per visit and it says nothing a station would have to repeat.
+   Every claim carries its certainty word, and the facts come from the life
+   catalogue with their sources in the record. */
+export interface VinciWelcomeLine {
+  text: VinciText
+  certainty?: VinciCertainty
+  /** A line only one viewport shows, because the hand is not the same. */
+  only?: 'phone' | 'desktop'
+}
+export interface VinciWelcomeBlock {
+  heading: VinciText
+  lines: readonly VinciWelcomeLine[]
+}
+
+export const vinciWelcomeBlocks: readonly VinciWelcomeBlock[] = [
+  {
+    heading: { en: 'Who, and where', de: 'Wer, und wo' },
+    lines: [
+      {
+        certainty: 'documented',
+        text: {
+          en: 'Leonardo da Vinci was born on 15 April 1452 near Vinci, in the hills west of Florence. He worked in Florence, Milan, Venice and Rome, and in his sixties he came to France for the young king Francis I.',
+          de: 'Leonardo da Vinci wurde am 15. April 1452 bei Vinci geboren, in den Hügeln westlich von Florenz. Er arbeitete in Florenz, Mailand, Venedig und Rom, und mit über sechzig Jahren kam er für den jungen König Franz I. nach Frankreich.',
+        },
+      },
+      {
+        certainty: 'documented',
+        text: {
+          en: 'The first firm record that places him at this house is dated 22 May 1517. He died here on 2 May 1519 and was buried in Amboise on 12 August of that year.',
+          de: 'Der erste sichere Beleg, der ihn in diesem Haus verortet, ist vom 22. Mai 1517. Er starb hier am 2. Mai 1519 und wurde am 12. August desselben Jahres in Amboise bestattet.',
+        },
+      },
+      {
+        certainty: 'reconstructed',
+        text: {
+          en: 'That the king gave him a pension and the use of this manor is reported rather than shown. The royal accounts are not in front of us.',
+          de: 'Dass der König ihm eine Pension und dieses Haus überließ, ist überliefert und nicht belegt. Die königlichen Rechnungsbücher liegen uns nicht vor.',
+        },
+      },
+    ],
+  },
+  {
+    heading: { en: 'The hour you are in', de: 'Die Stunde, in der Sie stehen' },
+    lines: [
+      {
+        certainty: 'documented',
+        text: {
+          en: 'On 10 October 1517 a cardinal came to this house, and his secretary wrote down what he saw: three paintings, a right hand that no longer worked, and an endless number of books.',
+          de: 'Am 10. Oktober 1517 kam ein Kardinal in dieses Haus, und sein Sekretär hielt fest, was er sah: drei Gemälde, eine rechte Hand, die nicht mehr funktionierte, und unendlich viele Bücher.',
+        },
+      },
+      {
+        certainty: 'reconstructed',
+        text: {
+          en: 'The house stands as it may have stood that afternoon, at 15:19 by the sun. The day is documented and the hour inside it is ours, so the light is computed from that date and this place.',
+          de: 'Das Haus steht, wie es an jenem Nachmittag gestanden haben kann, um 15:19 nach der Sonne. Der Tag ist belegt, die Stunde darin haben wir gewählt, und das Licht ist aus jenem Datum und diesem Ort berechnet.',
+        },
+      },
+      {
+        certainty: 'reconstructed',
+        text: {
+          en: 'The walls follow the building that still stands and the photographs of it. The arrangement of the rooms is our own proposal, and every station says how sure it is.',
+          de: 'Die Mauern folgen dem noch stehenden Bau und den Fotografien davon. Die Raumaufteilung ist unser eigener Vorschlag, und jede Station sagt, wie sicher sie ist.',
+        },
+      },
+    ],
+  },
+  {
+    heading: { en: 'What you can find', de: 'Was Sie finden' },
+    lines: [
+      { text: { en: 'The house and its garden, seven stations in the hour above.', de: 'Das Haus und sein Garten, sieben Stationen in der Stunde von oben.' } },
+      { text: { en: 'The picture room: every painting at the size its holder records.', de: 'Der Bildersaal: jedes Gemälde in dem Maß, das seine Sammlung verzeichnet.' } },
+      { text: { en: 'The long gallery: his life cut into the floor, a page of Manuscript B on the reading table, and the wall of the body.', de: 'Die lange Galerie: sein Leben in den Boden geschnitten, eine Seite aus Manuskript B auf dem Lesetisch und die Wand des Körpers.' } },
+      { text: { en: 'The mechanism hall: fourteen machines rebuilt from what the sheets give.', de: 'Die Maschinenhalle: vierzehn Maschinen, gebaut nach dem, was die Blätter hergeben.' } },
+      { text: { en: 'The court: the Last Supper at its true size, and the parachute, too tall for any room.', de: 'Der Hof: das Abendmahl in wahrer Größe und der Fallschirm, zu hoch für jeden Raum.' } },
+      { text: { en: 'The grave court: a slab with his name, and a plaque that speaks of presumed remains.', de: 'Der Grabhof: eine Platte mit seinem Namen und eine Tafel, die von vermuteten Überresten spricht.' } },
+    ],
+  },
+  {
+    heading: { en: 'How to move', de: 'Wie Sie sich bewegen' },
+    lines: [
+      { only: 'desktop', text: { en: 'Walk with the arrow keys, or press a mark on the bar below.', de: 'Gehen Sie mit den Pfeiltasten, oder drücken Sie eine Marke auf der Leiste unten.' } },
+      { only: 'desktop', text: { en: 'Press a dot in the scene to read what it names. SOURCES opens the record of the station you are standing in.', de: 'Drücken Sie einen Punkt in der Szene, um zu lesen, was er benennt. SOURCES öffnet den Nachweis der Station, in der Sie stehen.' } },
+      { only: 'desktop', text: { en: 'The door at the foot of the frame asks him about what you are looking at.', de: 'Die Tür am unteren Rand fragt ihn nach dem, was Sie gerade ansehen.' } },
+      { only: 'phone', text: { en: 'Swipe up and down to walk, or tap a mark on the bar.', de: 'Wischen Sie nach oben und unten, um zu gehen, oder tippen Sie eine Marke auf der Leiste an.' } },
+      { only: 'phone', text: { en: 'Tap a dot to read what it names, and SOURCES for the record.', de: 'Tippen Sie einen Punkt an, um zu lesen, was er benennt, und SOURCES für den Nachweis.' } },
+      { only: 'phone', text: { en: 'The door at the foot asks him about what you are looking at.', de: 'Die Tür am unteren Rand fragt ihn nach dem, was Sie gerade ansehen.' } },
+    ],
+  },
+]
+
+export const vinciWelcomeText = {
+  label: { en: 'The da Vinci wing, at the door', de: 'Der da-Vinci-Flügel, an der Tür' },
+  kicker: { en: 'CLOS LUCE, AMBOISE · 10 OCTOBER 1517', de: 'CLOS LUCE, AMBOISE · 10. OKTOBER 1517' },
+  title: { en: 'Leonardo da Vinci', de: 'Leonardo da Vinci' },
+  route: { en: 'Walk the house from the street, or go straight to the collection.', de: 'Gehen Sie vom Hoftor durch das Haus, oder gehen Sie direkt zur Sammlung.' },
+  enter: { en: 'Enter', de: 'Eintreten' },
+  collection: { en: 'Go to the collection', de: 'Zur Sammlung' },
+} satisfies Record<string, VinciText>
+
 /* ABSENCE IS A SENTENCE. A work this museum cannot show holds no frame, no
    outline and no reserved rectangle: it is named here, in the sources, with
    the collection that holds it and the reason. The reasons are the rights

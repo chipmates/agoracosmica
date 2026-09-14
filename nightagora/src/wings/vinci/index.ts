@@ -10,6 +10,7 @@ import { setRegister, type WingHosts, type WingModule } from '../frame'
 import { constructionRecords, evidenceWords } from './evidence-copy'
 import { lang, WING_TEXT } from '../content'
 import { createVinciSourcesWindow, type VinciSourcesTab, type VinciExhibitSources } from './sources'
+import { createVinciWelcome, vinciWelcomeSeen } from './welcome'
 import { GRADES } from '../../stack/grade'
 import { createShell } from './shell'
 import { createShellShadowDouble } from './shadow-shell'
@@ -116,6 +117,7 @@ export function createWing():VinciWingModule {
   let station=0, card=0, activeView='', mode:VinciLabelMode=1, controller:AbortController|undefined
   let header:HTMLElement,dock:HTMLDialogElement,drawer:HTMLElement,record:HTMLElement,source:HTMLButtonElement,sky:SkyMesh
   let sources:ReturnType<typeof createVinciSourcesWindow>
+  let welcome:ReturnType<typeof createVinciWelcome>|undefined
   let exhibitSources:VinciExhibitSources|null=null
   let labelHostHidden:string|null=null
   // THE WAIT AT THE STREET SHOWS ITSELF. The heading is painted and the frame
@@ -236,6 +238,7 @@ export function createWing():VinciWingModule {
     source=make('button','vinci-source',lang()==='de'?'Quellen':'Sources');source.type='button';source.setAttribute('aria-keyshortcuts','l');source.setAttribute('aria-controls','vinci-source-card');source.addEventListener('click',()=>{mode=mode===2?1:2;paintDock()});h.stage.parentElement!.querySelector('.wing-rail-group')!.append(source)
     sources=createVinciSourcesWindow(h.labels,source,()=>{mode=1;paintDock()});dock=sources.element;drawer=sources.panels.station
     labels=createVinciLabelAnchor({host:h.labels,camera,occluders:collectVinciLabelOccluders(scene),onOpen:()=>{mode=2;paintDock()}})
+    welcome=createVinciWelcome(h.labels,route=>{if(route==='collection')enterCollection();focusTheBar()})
     controller=new AbortController();const options={signal:controller.signal}
     let touchX=0,touchY=0,lastX=0,lastY=0,dragging=false,pointer=-1
     const wheelStep=createWheelStepper(()=>performance.now())
@@ -267,6 +270,26 @@ export function createWing():VinciWingModule {
     const s=vinciContent[card]!
     aimPrint(s.id);exposureAt=s.id;rail.set(s.id,stationPose(s.id,narrow()),true,narrow());paintHeader();paintDock()
     if(pendingView){const id=pendingView;pendingView='';showView(id)}
+    // THE PANEL IS FOR A VISITOR. The eyes arrive through the forge marker and
+    // a sheet over the arrival frame would stand in every frame they shoot.
+    if(!document.body.classList.contains('forge')&&!vinciWelcomeSeen()&&card===0)welcome?.open()
+  }
+  /** The bar carries the walk, so the hand lands there when a sheet closes. */
+  function focusTheBar():void {
+    const group=hosts?.stage.parentElement?.querySelector('.wing-rail-group')
+    const mark=group?.querySelector<HTMLElement>('.wing-step[aria-current="true"]')??group?.querySelector<HTMLElement>('.wing-step')
+    mark?.focus({preventScroll:true})
+  }
+  /** The certified cut to the collection's first station, with its own card.
+   * The frame is told first, so the bar, the hash and the question follow. */
+  function enterCollection():void {
+    const index=vinciContent.findIndex(station=>station.group==='collection')
+    if(index<0||!hosts)return
+    const id=vinciContent[index]!.id
+    hosts.navigate(index)
+    exhibits?.warm()
+    rail.set(id,stationPose(id,narrow()),true,narrow())
+    station=card=index;activeView='';aimPrint(id);exposureAt=id;paintHeader();paintDock();paintQuestion()
   }
   /** True once the rail's own geometry proof has resolved: before that the
    * rail cannot walk a certified route, so a station is placed instead. */
@@ -283,6 +306,7 @@ export function createWing():VinciWingModule {
    * believing it shot a corner. */
   let pendingView=''
   function showView(id:string) {
+    if(id==='welcome'){welcome?.open();return}
     if(id.startsWith('sources-')){const tab=id.slice(8);if(tab==='station'||tab==='room'||tab==='wing'){sources.select(tab);mode=2;paintDock();return}}
     const inspectCost=id.endsWith('-cost')&&id!=='audit-cost';if(inspectCost)id=id.slice(0,-5);const s=vinciContent[card]!;if(id==='scene')endInspection();if(id==='scene'||id.startsWith('audit-'))rail.look(0,0);if(id==='scene'||id==='audit-cost'){mode=1;paintDock()}if(id==='audit-cost')measurement.show(s.id);if(id==='audit-ui'){mode=1;paintDock();measurement.show(s.id,'ui')}if(id==='audit-ui-labels'){mode=2;paintDock();measurement.show(s.id,'ui')}if(id.startsWith('collection-room')||id.startsWith('collection-hang'))exhibits?.warm()
     const pose=namedPose(id,narrow())??collectionView(id,narrow());if(pose){activeView=id;mode=1;paintDock();rail.set(s.id,pose,true,narrow());header.querySelector('.vinci-insertion')?.remove();titleForView(id);if(id.startsWith('collection')&&!s.built&&!vinciStandsInRoom(s.id))header.append(make('p','vinci-insertion',lang()==='de'?'Museumseinbau der Gegenwart · Räume im Bau':'Modern museum insertion · Rooms in construction'))}const cone=/(?:^|-)cone-(ul|ur|dl|dr)$/.exec(id);if(cone){placeCanonicalStation();rail.look(cone[1]!.includes('l')?.6:-.6,cone[1]!.startsWith('u')?.32:-.32)}if(id==='labels'||id==='hour'||id==='record'){sources.select(id==='hour'?'wing':'station');mode=2;paintDock();if(id==='record'){if(record.hidden)dock.querySelector<HTMLButtonElement>('.vinci-record-toggle')?.click();dock.scrollTop=record.offsetTop-(dock.querySelector('.vinci-sources-toolbar')?.getBoundingClientRect().height??0)-18}}if(inspectCost&&(pose||cone))measurement.show(`${s.id} / ${id}`)
@@ -620,6 +644,6 @@ export function createWing():VinciWingModule {
       }
       if(nav.completed&&nav.completed!==exposureAt){exposureAt=nav.completed;aimPrint(nav.completed)}
       focusNearCascade();shadowBody?.update();shadowCache?.update();sky.position.copy(hosts.world.camera.position);labels.update(dock.open?dock.getBoundingClientRect():null)},
-    stop(){if(scheduled)cancelAnimationFrame(scheduled);scheduled=0;standing=false;exhibits?.dispose();exhibits=undefined;sign=undefined;shadowBody?.dispose();shadowBody=undefined;shadowCache?.dispose();shadowCache=undefined;restoreEnvironmentRotation?.();restoreEnvironmentRotation=null;controller?.abort();sources?.dispose();source?.remove();labels?.dispose();measurement?.dispose();water?.dispose();hosts?.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key?.light)o.dispose()});key?.dispose();if(hosts){hosts.world.scene.traverse(o=>{if(o instanceof Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose()}});hosts.world.scene.clear();delete hosts.stage.parentElement!.dataset['wing'];if(labelHostHidden===null)hosts.labels.removeAttribute('aria-hidden');else hosts.labels.setAttribute('aria-hidden',labelHostHidden)}hosts=undefined},
+    stop(){if(scheduled)cancelAnimationFrame(scheduled);scheduled=0;standing=false;exhibits?.dispose();exhibits=undefined;sign=undefined;shadowBody?.dispose();shadowBody=undefined;shadowCache?.dispose();shadowCache=undefined;restoreEnvironmentRotation?.();restoreEnvironmentRotation=null;controller?.abort();welcome?.dispose();welcome=undefined;sources?.dispose();source?.remove();labels?.dispose();measurement?.dispose();water?.dispose();hosts?.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key?.light)o.dispose()});key?.dispose();if(hosts){hosts.world.scene.traverse(o=>{if(o instanceof Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose()}});hosts.world.scene.clear();delete hosts.stage.parentElement!.dataset['wing'];if(labelHostHidden===null)hosts.labels.removeAttribute('aria-hidden');else hosts.labels.setAttribute('aria-hidden',labelHostHidden)}hosts=undefined},
   }
 }
