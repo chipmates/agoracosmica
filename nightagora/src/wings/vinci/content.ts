@@ -127,7 +127,7 @@ const visitorWords: Record<string, VisitorWords> = {
   },
   'collection-threshold': {
     en: 'You are leaving 1517 for a museum built in our own century.',
-    de: 'Sie verlassen das Jahr 1517 und betreten ein Museum unseres Jahrhunderts.',
+    de: 'Du verlässt das Jahr 1517 und betrittst ein Museum unseres Jahrhunderts.',
     sourceEn: 'The museum’s own building and collection plan.',
     sourceDe: 'Der eigene Bau- und Sammlungsplan des Museums.',
   },
@@ -262,7 +262,7 @@ const museumStatement = (original: VinciStatement): VinciStatement => {
 export const vinciReconstruction: VinciStatement = museumStatement({
   id: 'reconstruction',
   en: 'everything you can walk on is reconstructed from photographs and the cadastre.',
-  de: 'Alles, worauf Sie gehen können, ist anhand von Fotografien und dem Kataster rekonstruiert.',
+  de: 'Alles, worauf du gehen kannst, ist anhand von Fotografien und dem Kataster rekonstruiert.',
   certainty: 'reconstructed', target: 'carrier',
   source: 'brief/CONCEPT-OPUS.md §3 S1', germanProvenance: 'museum translation',
 });
@@ -312,7 +312,7 @@ export const vinciWeatherAssumptions: VinciStatement = museumStatement({
 export const vinciCollectionThreshold: VinciStatement = museumStatement({
   id: 'collection-threshold',
   en: 'You are leaving 1517. What follows is a museum of what survives, built in our own century.',
-  de: 'Sie verlassen das Jahr 1517. Es folgt ein Museum dessen, was erhalten ist, erbaut in unserem Jahrhundert.',
+  de: 'Du verlässt das Jahr 1517. Es folgt ein Museum dessen, was erhalten ist, erbaut in unserem Jahrhundert.',
   certainty: 'reconstructed', target: 'carrier',
   source: 'brief/CONCEPT-OPUS.md §3 S10', germanProvenance: 'museum translation',
 });
@@ -434,7 +434,7 @@ type StationSeed = Omit<VinciStationContent, 'number' | 'door' | 'carrierClass' 
 const stationCards: Record<VinciStationId, VinciText> = {
   arrival: {
     en: 'You are in the street below the royal château, in front of the house where Leonardo da Vinci spent his last three years. The cadastre puts these walls where you see them. Everything you can walk on was rebuilt from photographs and a survey of the ground.',
-    de: 'Sie stehen in der Straße unterhalb des königlichen Schlosses, vor dem Haus, in dem Leonardo da Vinci seine letzten drei Jahre verbrachte. Der Kataster verzeichnet diese Mauern dort, wo Sie sie sehen. Alles, worauf Sie hier gehen können, wurde nach Fotografien und einer Vermessung des Geländes neu gebaut.',
+    de: 'Du stehst in der Straße unterhalb des königlichen Schlosses, vor dem Haus, in dem Leonardo da Vinci seine letzten drei Jahre verbrachte. Der Kataster verzeichnet diese Mauern dort, wo du sie siehst. Alles, worauf du hier gehen kannst, wurde nach Fotografien und einer Vermessung des Geländes neu gebaut.',
   },
   courtyard: {
     en: 'The court between the house and its gate. Over the door a bird with spread wings carries the words DIEV AVANT TOVT, God before everything, and photographs of that carving are what we built it from. The afternoon sun stands in the west and crosses this court.',
@@ -450,7 +450,7 @@ const stationCards: Record<VinciStationId, VinciText> = {
   },
   study: {
     en: 'On 10 October 1517 a cardinal from Aragon visited this house, and his secretary wrote down what he saw. Three paintings, a right hand that no longer worked, and an endless number of books in the vulgar tongue. The hour you are standing in is that afternoon. The room is not open, so the house is shown from outside.',
-    de: 'Am 10. Oktober 1517 besuchte ein Kardinal aus Aragón dieses Haus, und sein Sekretär hielt fest, was er sah. Drei Gemälde, eine rechte Hand, die nicht mehr funktionierte, und unendlich viele Bücher in der Volkssprache. Die Stunde, in der Sie stehen, ist dieser Nachmittag. Der Raum ist nicht geöffnet, deshalb wird das Haus von außen gezeigt.',
+    de: 'Am 10. Oktober 1517 besuchte ein Kardinal aus Aragón dieses Haus, und sein Sekretär hielt fest, was er sah. Drei Gemälde, eine rechte Hand, die nicht mehr funktionierte, und unendlich viele Bücher in der Volkssprache. Die Stunde, in der du stehst, ist dieser Nachmittag. Der Raum ist nicht geöffnet, deshalb wird das Haus von außen gezeigt.',
   },
   chamber: {
     en: 'Leonardo da Vinci died in this house on 2 May 1519. The house museum places his room at this end, with the window facing the king’s castle, and that placement is a proposal rather than a record. The room is not open, so the house is shown from outside.',
@@ -458,15 +458,15 @@ const stationCards: Record<VinciStationId, VinciText> = {
   },
   garden: {
     en: 'The garden front takes the low western sun, and the valley falls away behind it. The slope follows the survey of the ground, the planting is ours, because no source records what grew here in his time. You are leaving 1517. What follows is a museum of what survives, built in our own century.',
-    de: 'Die Gartenfront nimmt die tiefe Westsonne, dahinter fällt das Tal ab. Der Hang folgt der Vermessung des Geländes, die Bepflanzung stammt von uns, denn keine Quelle hält fest, was hier zu seiner Zeit wuchs. Sie verlassen das Jahr 1517. Es folgt ein Museum dessen, was erhalten ist, erbaut in unserem Jahrhundert.',
+    de: 'Die Gartenfront nimmt die tiefe Westsonne, dahinter fällt das Tal ab. Der Hang folgt der Vermessung des Geländes, die Bepflanzung stammt von uns, denn keine Quelle hält fest, was hier zu seiner Zeit wuchs. Du verlässt das Jahr 1517. Es folgt ein Museum dessen, was erhalten ist, erbaut in unserem Jahrhundert.',
   },
   'picture-room': {
     en: 'Twenty-five paintings hang here at the size their holders record, in the order he made them, so this wall gives you the real scale. Every position carries a picture, and each names the reproduction it comes from. The sources name every work, where it is today and what its licence says.',
-    de: 'Fünfundzwanzig Gemälde hängen hier in den Maßen, die ihre Sammlungen verzeichnen, in der Reihenfolge ihrer Entstehung, diese Wand gibt Ihnen also den wirklichen Maßstab. Jeder Platz trägt ein Bild, und jedes nennt die Reproduktion, aus der es stammt. Die Quellen nennen jedes Werk, seinen heutigen Ort und seine Lizenz.',
+    de: 'Fünfundzwanzig Gemälde hängen hier in den Maßen, die ihre Sammlungen verzeichnen, in der Reihenfolge ihrer Entstehung, diese Wand gibt dir also den wirklichen Maßstab. Jeder Platz trägt ein Bild, und jedes nennt die Reproduktion, aus der es stammt. Die Quellen nennen jedes Werk, seinen heutigen Ort und seine Lizenz.',
   },
   'line-early': {
     en: 'The dates are cut into the floor, and you walk his life along them. This stretch runs from the birth his grandfather noted in 1452 to the year the French took Milan. Every date carries its document in the sources, and its colour says how sure we are.',
-    de: 'Die Daten sind in den Boden geschnitten, und Sie gehen sein Leben an ihnen ab. Dieser Abschnitt reicht von der Geburt, die sein Großvater 1452 notierte, bis zu dem Jahr, in dem die Franzosen Mailand einnahmen. Zu jedem Datum steht der Beleg in den Quellen, und seine Farbe sagt, wie sicher wir sind.',
+    de: 'Die Daten sind in den Boden geschnitten, und du gehst sein Leben an ihnen ab. Dieser Abschnitt reicht von der Geburt, die sein Großvater 1452 notierte, bis zu dem Jahr, in dem die Franzosen Mailand einnahmen. Zu jedem Datum steht der Beleg in den Quellen, und seine Farbe sagt, wie sicher wir sind.',
   },
   'reading-table': {
     en: 'A page of Manuscript B lies open on this table, in a facsimile printed in 1883. He wrote from right to left because he was left handed, and a mirror reads it back. The notebook itself is in Paris.',
@@ -630,7 +630,7 @@ export const vinciWelcomeBlocks: readonly VinciWelcomeBlock[] = [
     ],
   },
   {
-    heading: { en: 'The hour you are in', de: 'Die Stunde, in der Sie stehen' },
+    heading: { en: 'The hour you are in', de: 'Die Stunde, in der du stehst' },
     lines: [
       {
         certainty: 'documented',
@@ -656,7 +656,7 @@ export const vinciWelcomeBlocks: readonly VinciWelcomeBlock[] = [
     ],
   },
   {
-    heading: { en: 'What you can find', de: 'Was Sie finden' },
+    heading: { en: 'What you can find', de: 'Was du findest' },
     lines: [
       { text: { en: 'The house and its garden, seven stations in the hour above.', de: 'Das Haus und sein Garten, sieben Stationen in der Stunde von oben.' } },
       { text: { en: 'The picture room: every painting at the size its holder records.', de: 'Der Bildersaal: jedes Gemälde in dem Maß, das seine Sammlung verzeichnet.' } },
@@ -667,14 +667,14 @@ export const vinciWelcomeBlocks: readonly VinciWelcomeBlock[] = [
     ],
   },
   {
-    heading: { en: 'How to move', de: 'Wie Sie sich bewegen' },
+    heading: { en: 'How to move', de: 'Wie du dich bewegst' },
     lines: [
-      { only: 'desktop', text: { en: 'Walk with the arrow keys, or press a mark on the bar below.', de: 'Gehen Sie mit den Pfeiltasten, oder drücken Sie eine Marke auf der Leiste unten.' } },
-      { only: 'desktop', text: { en: 'Press a dot in the scene to read what it names. SOURCES opens the record of the station you are standing in.', de: 'Drücken Sie einen Punkt in der Szene, um zu lesen, was er benennt. SOURCES öffnet den Nachweis der Station, in der Sie stehen.' } },
-      { only: 'desktop', text: { en: 'The door at the foot of the frame asks him about what you are looking at.', de: 'Die Tür am unteren Rand fragt ihn nach dem, was Sie gerade ansehen.' } },
-      { only: 'phone', text: { en: 'Swipe up and down to walk, or tap a mark on the bar.', de: 'Wischen Sie nach oben und unten, um zu gehen, oder tippen Sie eine Marke auf der Leiste an.' } },
-      { only: 'phone', text: { en: 'Tap a dot to read what it names, and SOURCES for the record.', de: 'Tippen Sie einen Punkt an, um zu lesen, was er benennt, und SOURCES für den Nachweis.' } },
-      { only: 'phone', text: { en: 'The door at the foot asks him about what you are looking at.', de: 'Die Tür am unteren Rand fragt ihn nach dem, was Sie gerade ansehen.' } },
+      { only: 'desktop', text: { en: 'Walk with the arrow keys, or press a mark on the bar below.', de: 'Geh mit den Pfeiltasten, oder drück eine Marke auf der Leiste unten.' } },
+      { only: 'desktop', text: { en: 'Press a dot in the scene to read what it names. SOURCES opens the record of the station you are standing in.', de: 'Drück einen Punkt in der Szene, um zu lesen, was er benennt. QUELLEN öffnet den Nachweis der Station, in der du stehst.' } },
+      { only: 'desktop', text: { en: 'The door at the foot of the frame asks him about what you are looking at.', de: 'Die Tür am unteren Rand fragt ihn nach dem, was du gerade ansiehst.' } },
+      { only: 'phone', text: { en: 'Swipe up and down to walk, or tap a mark on the bar.', de: 'Wisch nach oben und unten, um zu gehen, oder tipp eine Marke auf der Leiste an.' } },
+      { only: 'phone', text: { en: 'Tap a dot to read what it names, and SOURCES for the record.', de: 'Tipp einen Punkt an, um zu lesen, was er benennt, und QUELLEN für den Nachweis.' } },
+      { only: 'phone', text: { en: 'The door at the foot asks him about what you are looking at.', de: 'Die Tür am unteren Rand fragt ihn nach dem, was du gerade ansiehst.' } },
     ],
   },
 ]
@@ -683,7 +683,7 @@ export const vinciWelcomeText = {
   label: { en: 'The da Vinci wing, at the door', de: 'Der da-Vinci-Flügel, an der Tür' },
   kicker: { en: 'CLOS LUCE, AMBOISE · 10 OCTOBER 1517', de: 'CLOS LUCE, AMBOISE · 10. OKTOBER 1517' },
   title: { en: 'Leonardo da Vinci', de: 'Leonardo da Vinci' },
-  route: { en: 'Walk the house from the street, or go straight to the collection.', de: 'Gehen Sie vom Hoftor durch das Haus, oder gehen Sie direkt zur Sammlung.' },
+  route: { en: 'Walk the house from the street, or go straight to the collection.', de: 'Geh vom Hoftor durch das Haus, oder geh direkt zur Sammlung.' },
   enter: { en: 'Enter', de: 'Eintreten' },
   collection: { en: 'Go to the collection', de: 'Zur Sammlung' },
 } satisfies Record<string, VinciText>
