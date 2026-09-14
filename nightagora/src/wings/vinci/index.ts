@@ -18,6 +18,8 @@ import { createCollection, collectionProvenance } from './collection'
 import { collectionView } from './collection/views'
 import { mountCollectionExhibits, type CollectionExhibits } from './collection/exhibits'
 import { createPolicyWorkLabel } from './pictures/policy-label'
+import { MAIN_HANG, REGISTER, type PictureRights } from './pictures/register'
+import { MACHINE_SLUGS, machineCatalog } from './machines/catalog'
 import { validatePaintingRecord } from './pictures/policy'
 import { ASSET_BASE } from '../../stack/materials'
 import { createCollectionReceiverPlaneShadowFilter } from './receiver-plane-shadow'
@@ -40,7 +42,7 @@ import { collectVinciLabelOccluders, createVinciLabelAnchor, type VinciLabelAnch
 import { pathSpecifications } from './paths'
 import { roadGradeProvenance } from './road-grade'
 import { apronProvenance } from './apron'
-import { vinciContent, vinciLegacyStationIds, vinciConstructionStatus, vinciReconstruction, vinciCollectionThreshold, vinciRoomStationIds, vinciHourArithmetic, vinciHourSpoken, vinciViewNames, vinciHourLabel, vinciHourIntegrity, vinciCertaintyWords, vinciPlantingAssumptions, vinciWeatherAssumptions, type VinciCertainty, type VinciStatement, type VinciStationId, type VinciText } from './content'
+import { vinciContent, vinciLegacyStationIds, vinciConstructionStatus, vinciReconstruction, vinciCollectionThreshold, vinciRoomStationIds, vinciHourArithmetic, vinciHourSpoken, vinciViewNames, vinciHourLabel, vinciHourIntegrity, vinciCertaintyWords, vinciPlantingAssumptions, vinciWeatherAssumptions, vinciAbsences, vinciGrounds, vinciRightsPolicy, vinciWingCounts, vinciSourcesHeadings, type VinciCertainty, type VinciStatement, type VinciStationId, type VinciText } from './content'
 import wingCss from './wing.css?inline'
 
 const text=(value:VinciText):string=>value[lang()]
@@ -387,6 +389,36 @@ export function createWing():VinciWingModule {
     }
     host.append(legend)
   }
+  const ROOM_CLASS_WORD:Record<PictureRights,VinciText>={DG:vinciSourcesHeadings.classShown,
+    RC:vinciSourcesHeadings.classUnderReview,REF:vinciSourcesHeadings.classReference}
+  /** What stands in the room, one line per exhibit with the collection that
+   * holds it and the class its reproduction was given. */
+  function appendRoomExhibits(host:HTMLElement,id:VinciStationId):void {
+    const works=id==='picture-room'?MAIN_HANG:id==='supper-wall'?REGISTER.filter(w=>w.hang.wall==='supper-wall'):[]
+    // The hall is one room under three stations, so its machines are listed once.
+    const machines=id==='flight'?MACHINE_SLUGS:[]
+    if(!works.length&&!machines.length)return
+    host.append(make('h3','',text(vinciSourcesHeadings.inThisRoom)))
+    const list=make('ul','vinci-room-list')
+    for(const work of works)list.append(make('li','',`${lang()==='de'?work.title_de:work.title_en} · ${work.holder} · ${text(ROOM_CLASS_WORD[work.rights_class])}`))
+    for(const slug of machines){const machine=machineCatalog[slug];list.append(make('li','',`${text(machine.title)} · ${text(machine.label)}`))}
+    host.append(list)
+  }
+  /** ABSENCE IS A SENTENCE. It stands here, with its holder and its reason,
+   * and never as a frame on a wall. */
+  function appendAbsences(host:HTMLElement,id:VinciStationId):void {
+    const absences=vinciAbsences[id]
+    if(!absences?.length)return
+    host.append(make('h3','',text(vinciSourcesHeadings.elsewhere)))
+    const list=make('ul','vinci-absence-list')
+    for(const absence of absences){
+      const item=make('li','')
+      item.append(make('span','vinci-absence-work',`${text(absence.work)} · ${text(absence.holder)}`),
+        document.createTextNode(' '+text(absence.reason)))
+      list.append(item)
+    }
+    host.append(list)
+  }
   /** The text seat can expand these room records without changing the window. */
   function paintRoomSources():void {
     const panel=sources.panels.room;panel.textContent=''
@@ -403,7 +435,7 @@ export function createWing():VinciWingModule {
         const works=new Map(sources.filter(({work})=>(work.id==='last-supper')===(id==='supper-wall')).map(({work})=>[work.id,work]))
         for(const work of works.values())full.append(createPolicyWorkLabel(work,sources.filter(source=>source.work.id===work.id).map(source=>source.entry),true))
       }
-      section.append(full);panel.append(section)
+      section.append(full);appendRoomExhibits(section,id);appendAbsences(section,id);panel.append(section)
     }
   }
   function paintWingSources(credits:readonly HTMLElement[]):void {
@@ -412,6 +444,10 @@ export function createWing():VinciWingModule {
     appendSourceStatement(panel,vinciCollectionThreshold)
     appendSourceStatement(panel,vinciHourLabel)
     appendSourceStatement(panel,vinciHourIntegrity)
+    panel.append(make('h3','',text(vinciSourcesHeadings.grounds)))
+    for(const ground of vinciGrounds)panel.append(make('p','vinci-statement',text(ground)))
+    panel.append(make('h3','',text(vinciSourcesHeadings.policy)),make('p','vinci-statement',text(vinciRightsPolicy)))
+    panel.append(make('h3','',text(vinciSourcesHeadings.counted)),make('p','vinci-statement',text(vinciWingCounts)))
     const full=make('div','vinci-record');setRegister(full,'record')
     full.append(make('pre','vinci-arithmetic',text(vinciHourArithmetic)),...credits.map(node=>node.cloneNode(true)))
     panel.append(full);appendCertaintyLegend(panel)

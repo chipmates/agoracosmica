@@ -585,6 +585,170 @@ const seeds: readonly StationSeed[] = [
     [grave], 'brief/CONCEPT-OPUS.md §3 S19'),
 ];
 
+/* ABSENCE IS A SENTENCE. A work this museum cannot show holds no frame, no
+   outline and no reserved rectangle: it is named here, in the sources, with
+   the collection that holds it and the reason. The reasons are the rights
+   review's own, and a rejected file never makes a work absent while another
+   one qualifies. */
+export interface VinciAbsence {
+  work: VinciText
+  holder: VinciText
+  reason: VinciText
+}
+
+const lost: VinciText = { en: 'Lost', de: 'Verloren' }
+
+export const vinciAbsences: Partial<Record<VinciStationId, readonly VinciAbsence[]>> = {
+  'picture-room': [
+    {
+      work: { en: 'Tavola Doria', de: 'Tavola Doria' },
+      holder: { en: 'Gallerie degli Uffizi, Florence', de: 'Gallerie degli Uffizi, Florenz' },
+      reason: {
+        en: 'The painting survives. The public reproduction we could verify is too small to show it clearly.',
+        de: 'Das Gemälde ist erhalten. Die öffentliche Reproduktion, die wir prüfen konnten, ist zu klein, um es deutlich zu zeigen.',
+      },
+    },
+    {
+      work: { en: 'The Battle of Anghiari', de: 'Die Schlacht von Anghiari' },
+      holder: lost,
+      reason: {
+        en: 'The wall painting is gone. It stands here through the copies and the studies made after it, each under the name of whoever made it.',
+        de: 'Das Wandgemälde ist verloren. Es steht hier durch die Kopien und Studien nach ihm, jede unter dem Namen ihres eigenen Urhebers.',
+      },
+    },
+    {
+      work: { en: 'Leda', de: 'Leda' },
+      holder: lost,
+      reason: {
+        en: 'His Leda is gone. What is here are surviving studies and copies by other hands.',
+        de: 'Seine Leda ist verloren. Hier stehen erhaltene Studien und Kopien anderer Hände.',
+      },
+    },
+  ],
+  works: [
+    {
+      work: { en: 'The Sforza horse', de: 'Das Sforza-Pferd' },
+      holder: { en: 'Never cast', de: 'Nie gegossen' },
+      reason: {
+        en: 'The bronze monument was never finished. His surviving designs carry its history.',
+        de: 'Das bronzene Denkmal wurde nie vollendet. Seine erhaltenen Entwürfe tragen seine Geschichte.',
+      },
+    },
+  ],
+  'reading-table': [
+    {
+      work: { en: 'Codex Leicester', de: 'Codex Leicester' },
+      holder: { en: 'Private collection', de: 'Privatsammlung' },
+      reason: {
+        en: 'The larger reproductions name no source, and the rest are too small.',
+        de: 'Die größeren Reproduktionen nennen keine Quelle, und die übrigen sind zu klein.',
+      },
+    },
+    {
+      work: { en: 'Codex Urbinas', de: 'Codex Urbinas' },
+      holder: { en: 'Biblioteca Apostolica Vaticana, Vatican City', de: 'Biblioteca Apostolica Vaticana, Vatikanstadt' },
+      reason: {
+        en: 'The one large leaf states no reproduction source, and the holder runs no open image release.',
+        de: 'Das einzige große Blatt nennt keine Reproduktionsquelle, und die Sammlung gibt keine Bilder frei.',
+      },
+    },
+    {
+      work: { en: 'Nine Paris manuscripts, C, E, F, G, H, I, K, L and M', de: 'Neun Pariser Manuskripte, C, E, F, G, H, I, K, L und M' },
+      holder: { en: 'Bibliothèque de l’Institut de France, Paris', de: 'Bibliothèque de l’Institut de France, Paris' },
+      reason: {
+        en: 'The old library editions carry no public domain mark, and no other reproduction reaches the size this display needs.',
+        de: 'Die alten Bibliotheksausgaben tragen keinen Public-Domain-Vermerk, und keine andere Reproduktion erreicht die Größe, die diese Ausstellung braucht.',
+      },
+    },
+    {
+      work: { en: 'Ashburnham A', de: 'Ashburnham A' },
+      holder: { en: 'Bibliothèque de l’Institut de France, Paris', de: 'Bibliothèque de l’Institut de France, Paris' },
+      reason: {
+        en: 'No marked facsimile and no large enough leaf could be verified for the fragment taken out of manuscript A.',
+        de: 'Für das aus Manuskript A entnommene Fragment ließ sich kein gekennzeichnetes Faksimile und kein ausreichend großes Blatt bestätigen.',
+      },
+    },
+    {
+      work: { en: 'Forster I and Forster II', de: 'Forster I und Forster II' },
+      holder: { en: 'Victoria and Albert Museum, London', de: 'Victoria and Albert Museum, London' },
+      reason: {
+        en: 'The sources we checked hold no permitted flat reproduction of these two notebooks at display size.',
+        de: 'Die geprüften Quellen enthalten keine zulässige flache Reproduktion dieser beiden Notizbücher in Ausstellungsgröße.',
+      },
+    },
+    {
+      work: { en: 'The Codex Atlanticus, beyond the admitted pages', de: 'Der Codex Atlanticus, über die zugelassenen Seiten hinaus' },
+      holder: { en: 'Veneranda Biblioteca Ambrosiana, Milan', de: 'Veneranda Biblioteca Ambrosiana, Mailand' },
+      reason: {
+        en: 'The bulk of its images are too small, so the codex is here through the pages we could verify.',
+        de: 'Der Großteil seiner Bilder ist zu klein, deshalb steht der Codex hier durch die Seiten, die wir bestätigen konnten.',
+      },
+    },
+    {
+      work: { en: 'The middle part of the Arundel codex', de: 'Der Mittelteil des Arundel-Kodex' },
+      holder: { en: 'British Library, London', de: 'British Library, London' },
+      reason: {
+        en: 'Its printed facsimile is unverified. Only the opening at folios 174 verso and 175 recto is available.',
+        de: 'Sein gedrucktes Faksimile ist nicht bestätigt. Verfügbar ist nur die Öffnung bei Blatt 174 verso und 175 recto.',
+      },
+    },
+    {
+      work: { en: 'A loose sheet of studies after Hercules', de: 'Ein loses Blatt mit Studien nach Herkules' },
+      holder: { en: 'The Metropolitan Museum of Art, New York', de: 'The Metropolitan Museum of Art, New York' },
+      reason: {
+        en: 'The museum record offers no open image, and no other reproduction at display size could be identified.',
+        de: 'Der Museumseintrag enthält kein freies Bild, und keine andere Reproduktion in Ausstellungsgröße war zu ermitteln.',
+      },
+    },
+  ],
+  body: [
+    {
+      work: { en: '149 of the catalogued Windsor sheet groups', de: '149 der verzeichneten Windsor-Blattgruppen' },
+      holder: { en: 'Royal Collection, Windsor', de: 'Royal Collection, Windsor' },
+      reason: {
+        en: 'For these no reproduction we may show reaches the size this display needs. Of 538 catalogued groups the review admitted 389.',
+        de: 'Für sie erreicht keine Reproduktion, die wir zeigen dürfen, die nötige Größe. Von 538 verzeichneten Gruppen ließ die Prüfung 389 zu.',
+      },
+    },
+  ],
+}
+
+/** The two grounds, said once, in the sources and not on a card. */
+export const vinciGrounds: readonly VinciText[] = [
+  {
+    en: 'The first ground is the house and its garden at one hour of 1517. Its walls follow the building that still stands and the photographs of it, the arrangement of the rooms is ours, and the light is computed from that day and this place.',
+    de: 'Der erste Grund ist das Haus mit seinem Garten in einer Stunde des Jahres 1517. Seine Mauern folgen dem noch stehenden Bau und den Fotografien davon, die Raumaufteilung stammt von uns, und das Licht ist aus jenem Tag und diesem Ort berechnet.',
+  },
+  {
+    en: 'The second ground is a museum of what survives, built in our own century and never pretending to be his: the picture room, the long gallery, the mechanism hall and the two courts.',
+    de: 'Der zweite Grund ist ein Museum dessen, was erhalten ist, erbaut in unserem Jahrhundert und nie als das seine ausgegeben: der Bildersaal, die lange Galerie, die Maschinenhalle und die zwei Höfe.',
+  },
+]
+
+/** How a picture gets onto a wall here, in one paragraph. */
+export const vinciRightsPolicy: VinciText = {
+  en: 'Two routes put a picture on a wall here. The first is a reproduction the holder itself released. The second is a faithful photograph of a work old enough that nobody owns it, taken from a source that says so, where the holder still charges for its own images. European and German law allow the second, and this museum writes on every such picture what it is. Where neither route exists the wall holds nothing and the sentence stands in these sources instead, with the collection and the reason. No empty frame, and no outline standing in for a picture we do not have.',
+  de: 'Zwei Wege bringen hier ein Bild an die Wand. Der erste ist eine Reproduktion, die die Sammlung selbst freigegeben hat. Der zweite ist eine getreue Fotografie eines Werks, das so alt ist, dass es niemandem gehört, aus einer Quelle, die das ausdrücklich sagt, auch wenn die Sammlung für ihre eigenen Bilder weiter Geld verlangt. Europäisches und deutsches Recht erlauben den zweiten Weg, und dieses Museum schreibt an jedes solche Bild, was es ist. Wo keiner der beiden Wege besteht, bleibt die Wand leer und der Satz steht hier in den Quellen, mit der Sammlung und dem Grund. Kein leerer Rahmen, und kein Umriss als Platzhalter für ein Bild, das wir nicht haben.',
+}
+
+/** What this wing holds, counted. The sentences above carry what it does not. */
+export const vinciWingCounts: VinciText = {
+  en: 'This wing stands at nineteen stations on the two grounds. The picture room holds 25 positions at the size their holders record, the mechanism hall 14 machines rebuilt from the sheets, the wall of the body 28 at the measure of a Windsor folio, and the reading table one open page. A picture hangs where a reproduction we may show exists. The rights review of this museum read 538 catalogued Windsor sheet groups and admitted 389 of them, and of 25 named codex units it admitted 11.',
+  de: 'Dieser Flügel hat neunzehn Stationen auf den zwei Gründen. Der Bildersaal trägt 25 Plätze in den Maßen, die die Sammlungen verzeichnen, die Maschinenhalle 14 nach den Blättern gebaute Maschinen, die Wand des Körpers 28 im Maß eines Windsor-Blattes und der Lesetisch eine offene Seite. Ein Bild hängt dort, wo es eine Reproduktion gibt, die wir zeigen dürfen. Die Rechteprüfung dieses Museums las 538 verzeichnete Windsor-Blattgruppen und ließ 389 von ihnen zu, und von 25 benannten Codex-Einheiten ließ sie 11 zu.',
+}
+
+/** The sources window's own headings, in the museum's voice. */
+export const vinciSourcesHeadings = {
+  elsewhere: { en: 'Elsewhere or lost', de: 'Anderswo oder verloren' },
+  inThisRoom: { en: 'What stands in this room', de: 'Was in diesem Raum steht' },
+  grounds: { en: 'The two grounds', de: 'Die zwei Gründe' },
+  policy: { en: 'How a picture gets onto a wall', de: 'Wie ein Bild an die Wand kommt' },
+  counted: { en: 'Counted', de: 'Gezählt' },
+  classUnderReview: { en: 'class under review', de: 'Einstufung in Prüfung' },
+  classShown: { en: 'shown from a public reproduction', de: 'aus einer öffentlichen Reproduktion gezeigt' },
+  classReference: { en: 'reference only, never displayed', de: 'nur als Vorlage, nie ausgestellt' },
+} satisfies Record<string, VinciText>
+
 /** Numeric links from the original walk always keep their original meaning. */
 export const vinciLegacyStationIds: readonly VinciStationId[] = Object.freeze([
   'arrival', 'courtyard', 'hall', 'oratory', 'study', 'chamber', 'garden',

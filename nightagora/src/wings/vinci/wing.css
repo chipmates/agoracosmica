@@ -172,3 +172,10 @@
   .vinci-sources-close {max-width:66px;overflow-wrap:normal;}
   .vinci-certainty-legend {display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 }
+
+/* The room and wing tabs read as lists, not as prose: one exhibit or one
+   absence per line, the name first and the sentence after it. */
+.vinci-room-list,.vinci-absence-list {list-style:none;padding:0;margin:12px 0;font:13px/1.55 var(--sans);color:#ddd6c6;}
+.vinci-room-list li,.vinci-absence-list li {padding:8px 0;border-top:1px solid #a9977333;overflow-wrap:anywhere;}
+.vinci-absence-work {display:block;color:#e6d6b8;}
+.vinci-sources-panel h3 {margin:24px 0 6px;font:400 16px/1.3 var(--serif);color:#eadbc1;}
