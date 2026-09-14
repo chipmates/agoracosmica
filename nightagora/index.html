@@ -149,6 +149,10 @@
     .copy { transition: opacity 1.6s ease; }
     /* the H1 veil belongs to first light alone */
     body:not([data-phase='transit']):not([data-phase='held']) .copy { opacity: 0; }
+    /* the overture's own title gives the frame up QUICKLY once the ride
+       starts: a walker caught it still fading under the descent's first
+       card, and two titles in one frame is a double exposure */
+    body[data-phase='descent'] .copy { transition: opacity 0.45s ease; }
     body[data-phase='wheel'] .status { opacity: 0.9; }
 
     /* the lobby's own plate: how much of the museum stands tonight. It
@@ -481,16 +485,29 @@
     }
     #descent-skip:hover, #descent-skip:focus-visible { opacity: 1; color: var(--na-starlight); outline: none; }
     body[data-phase='descent'] #veil { padding-bottom: calc(112px + env(safe-area-inset-bottom)); }
-    /* the last of the ride is an arrival: the instruction has done its work,
-       so the foot of the frame clears before the fire comes up under it */
-    body.arriving .status,
-    body.arriving #descent-skip { opacity: 0; }
+    /* THE FOOT OF THE FRAME CARRIES ONE LINE. The instruction takes the head
+       of the ride and the arrival, where a visitor still needs to know the
+       way on; the way past it takes the body of the fall. They stand at the
+       same height, so the change reads as a word changing, not a row moving.
+       The rail's second mark withdraws for the ride: it belongs to the museum
+       standing still, and three marks is the canon. */
+    body[data-phase='descent'] #descent-skip {
+      opacity: 0; visibility: hidden;
+      bottom: calc(102px + env(safe-area-inset-bottom));
+    }
+    body[data-phase='descent'].riding #descent-skip { opacity: 0.85; visibility: visible; }
+    body[data-phase='descent'].riding .status { opacity: 0; }
+    body[data-phase='descent'] #rail-instruments { opacity: 0; visibility: hidden; }
+    /* the arrival's line stands clear of the flames: the fire owns the foot
+       of that frame, and no instruction may sit on a bright object */
+    body.arriving #veil { padding-bottom: calc(232px + env(safe-area-inset-bottom)); }
     @media (max-aspect-ratio: 9/10) {
       /* on a phone the way down cannot sit at the foot: a centred label
          there runs straight into both rail marks. It steps up instead, and
          it steps clear of the status line, which sat a breath under it
          (round 2, the two lines were touching) */
       #descent-skip { bottom: calc(96px + env(safe-area-inset-bottom)); }
+      body[data-phase='descent'] #descent-skip { bottom: calc(58px + env(safe-area-inset-bottom)); }
       body[data-phase='descent'] #veil { padding-bottom: calc(64px + env(safe-area-inset-bottom)); }
       #descent .plumb { bottom: calc(146px + env(safe-area-inset-bottom)); }
     }

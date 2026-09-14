@@ -1286,6 +1286,7 @@ function setPhase(next: Phase): void {
   } else {
     descentEl.hidden = true
     document.body.classList.remove('arriving')
+    document.body.classList.remove('riding')
     for (const b of descentBeats) b.style.opacity = '0'
   }
   if (next === 'agora') {
@@ -1500,7 +1501,12 @@ function frame(now: number): void {
     syncDescentBeats(desc)
     // the arrival clears the foot of the frame: no instruction, no gauge and
     // no way past standing on the fire as it comes up
-    document.body.classList.toggle('arriving', desc > 0.74)
+    /* THREE MARKS, AND A WAY ON AT EVERY STATE. The foot of the frame holds
+       exactly one line: the instruction while the ride is being taken up and
+       again as the fire comes, the way past it through the body of the fall.
+       Instruments withdraws for the ride; Sound stays, because sound runs. */
+    document.body.classList.toggle('riding', desc > 0.155 && desc <= 0.80)
+    document.body.classList.toggle('arriving', desc > 0.80)
     // a push back at the top of the travel hands the night to the eclipse
     if (descTarget <= 0 && desc < 0.02) setPhase('held')
     if (desc > 0.993) {
