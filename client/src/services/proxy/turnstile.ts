@@ -62,7 +62,14 @@ function emit(eventName: string): void {
   } catch { /* ignore */ }
 }
 
-/** Unobtrusive default: the managed challenge usually needs no attention. */
+// The gate's mobile breakpoint. Below it the primary controls (consent button,
+// composer) sit at the bottom edge, where the challenge box would land.
+const NARROW_VIEWPORT_PX = 768;
+
+/**
+ * Nothing is being asked of the visitor here, so the box must not take taps:
+ * it sits over the consent button and the composer on narrow screens.
+ */
 function placeInCorner(el: HTMLElement): void {
   el.style.position = 'fixed';
   el.style.bottom = '0';
@@ -70,16 +77,22 @@ function placeInCorner(el: HTMLElement): void {
   el.style.right = '0';
   el.style.transform = '';
   el.style.zIndex = '100000';
+  el.style.pointerEvents = 'none';
 }
 
-/** Interactive: a box nobody finds is a dead request, so it moves into view. */
+/**
+ * Interactive: a box nobody finds is a dead request, so it moves into view and
+ * takes taps again, lifted clear of the bottom controls on narrow screens.
+ */
 function placeInCenter(el: HTMLElement): void {
   el.style.position = 'fixed';
-  el.style.bottom = '16px';
+  // Read at call time: re-applied on every render and every interactive start.
+  el.style.bottom = window.innerWidth <= NARROW_VIEWPORT_PX ? '96px' : '16px';
   el.style.left = '50%';
   el.style.right = '';
   el.style.transform = 'translateX(-50%)';
   el.style.zIndex = '100000';
+  el.style.pointerEvents = 'auto';
 }
 
 /**
@@ -193,10 +206,9 @@ function loadTurnstileScript(): Promise<void> {
 
 /**
  * Get a Turnstile token for session creation.
- * Uses 'normal' size + 'always' appearance for maximum cross-browser compatibility.
- * The widget renders at the bottom-right but is tiny and unobtrusive. If the
- * challenge escalates to a checkbox it moves to the bottom-center and the UI
- * is told, so the visitor knows what to tap.
+ * Uses 'normal' size + 'interaction-only' appearance: the managed check runs
+ * with nothing on screen, and only an escalated challenge shows a box. That box
+ * moves to the bottom-center and the UI is told, so the visitor knows what to tap.
  * Includes a timeout so the app never hangs if the challenge fails silently.
  */
 export async function getTurnstileToken(): Promise<string> {
@@ -227,10 +239,10 @@ export async function getTurnstileToken(): Promise<string> {
   }
 
   return new Promise<string>((resolve, reject) => {
-    // Container must be visible and rendered for cross-browser iframe communication.
-    // Position fixed bottom-right, small footprint.
+    // The container must stay rendered for the cross-origin iframe to talk, so
+    // what the visitor sees is Turnstile's own appearance setting, not display.
     // z-index must sit above the entire app z-scale (top token is --z-loader: 99999)
-    // so the challenge is reachable while modals, loaders, and the chat input bar are present.
+    // so an escalated challenge is reachable over modals, loaders and the input bar.
     let container = document.getElementById('turnstile-container');
     if (!container) {
       container = document.createElement('div');
@@ -290,7 +302,8 @@ export async function getTurnstileToken(): Promise<string> {
     widgetId = turnstile.render(container, {
       sitekey: siteKey,
       size: 'normal',
-      appearance: 'always',
+      // Invisible unless a tap is genuinely required (managed-mode default).
+      appearance: 'interaction-only',
       retry: 'auto',
       'retry-interval': 3000,
       'before-interactive-callback': () => {
