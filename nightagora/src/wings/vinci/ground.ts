@@ -73,9 +73,17 @@ export function groundMaterial(kind:'grass'|'earth'|'stone',library?:MaterialLib
     // where the courses themselves compress below one pixel.
     const streak=mx_noise_float(vec3(U.x.mul(3.1),U.y.mul(.22),0)).mul(smoothstep(.7,2.4,float(.42).div(worldPixel)))
     const foot=float(1).sub(smoothstep(.35,2.2,P.y.sub(-.2))).mul(mx_noise_float(P.mul(vec3(.9,2.2,.9))).mul(.35).add(.65))
-    let stone=rgb('#b8aa8e').mul(block.mul(.20).add(1)).mul(drift.mul(.20).add(1))
+    // ONE STONE IS NOT THE NEXT. The block tone was reaching the face at
+    // nine tenths of a per cent, so a coursed wall read as one tone with
+    // lines on it. A quarry sends beds of different colour and a few stones
+    // drink and stay dark; both are stone to stone, not a pattern.
+    const bed=laid.cell.sub(.5).mul(laid.held)
+    const soaked=smoothstep(.72,.96,laid.cell).mul(laid.held)
+    let stone=rgb('#b8aa8e').mul(block.mul(1.25).add(1)).mul(drift.mul(.20).add(1))
+      .mul(bed.mul(.30).add(1)).mul(float(1).sub(soaked.mul(.17)))
       .mul(streak.mul(.13).add(1)).mul(cleft.mul(.09).add(1)).mul(float(1).sub(pores.mul(.22)))
       .mul(grooves.mul(.032).add(1)).mul(chatter.mul(.085).add(1)).mul(shells.mul(.19).add(1))
+    stone=mix(stone,rgb('#9d9784'),bed.add(.5).mul(.34).mul(laid.held))
     // Lichen takes a coping and the shaded foot of a wall before it takes the
     // face; it is colour, and it never becomes a pattern.
     const lichen=smoothstep(.30,.74,mx_noise_float(P.mul(vec3(2.6,1.4,2.6)).add(vec3(2.1,6.7,3.3))))
@@ -84,7 +92,7 @@ export function groundMaterial(kind:'grass'|'earth'|'stone',library?:MaterialLib
     stone=mix(stone,rgb('#8d8f72'),lichen.mul(.34).mul(vertical))
     stone=mix(stone,rgb('#7d8168'),foot.mul(.26).mul(vertical))
     if(library){const maps=library.sync('stone-tuffeau').sample({uv:U,metres:.19,turn:.37});stone=stone.mul(mix(float(1),maps.albedo.clamp(.78,1.22),resolved(.03).mul(.40)))}
-    m.colorNode=mix(stone,rgb('#8c826d'),seam.mul(.58)).mul(float(1).sub(damp.mul(.15)))
+    m.colorNode=mix(stone,rgb('#8c826d').mul(laid.cell.mul(.26).add(.87)),seam.mul(.58)).mul(float(1).sub(damp.mul(.15)))
     // Recessed joints and the damp foot see less sky than the block faces.
     m.aoNode=foundationVisibility().mul(float(1).sub(seam.mul(.45)).sub(foot.mul(.12).mul(vertical)))
     m.roughnessNode=float(.89).add(cleft.mul(.035)).sub(damp.mul(.06)).clamp(.78,1)
