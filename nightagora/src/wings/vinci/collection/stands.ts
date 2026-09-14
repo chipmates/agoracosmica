@@ -67,7 +67,11 @@ export const STANDS: Record<MachineSlug, Stand> = {
   'ball-bearing': { east: -40.6, north: -46.6, bearing: 0, plinth: .62, ground: 'hall' },
   'camera-obscura': { east: -45.6, north: -52.6, bearing: 0, plinth: .3, ground: 'hall' },
   'multi-barrel-gun': { east: -41.3, north: -50.8, bearing: 0, plinth: 0, ground: 'hall' },
-  'proportional-compass': { east: -54.6, north: -42.95, bearing: 4, plinth: .78, ground: 'hall' },
+  // THE HOUSE. The proportional compass is 140 mm across and belongs where a
+  // visitor can reach it: it stands on a plinth in the court the four house
+  // stations stand in, two metres into their own frame, until the hall's
+  // contemporary ledge is built and takes it.
+  'proportional-compass': { east: 3.9, north: -21.3, bearing: 186, plinth: .95, ground: 'house' },
 }
 
 export const standLevel = (ground: StandGround): number =>
