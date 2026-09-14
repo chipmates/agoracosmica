@@ -215,6 +215,9 @@ function mountBenchLabel(work, entries, recordView = false, options = {}) {
   const calls = [], pairDistance = element('p', 'picture-record')
   const context = { ...load('src/wings/vinci/pictures/visitor-copy.ts'), ...signature, document, element, materialPair: null, materialKind: undefined,
     dock, detail, selected, segmentId: 'complete-hang', labelLanguage: 'en', recordOpen: recordView, view: undefined, pairDistance,
+    // The card's overflow notice is seated by the host, not by label(); the
+    // register is the words label() puts in the dock.
+    dockContent: (...nodes) => dock.replaceChildren(...nodes),
     signaturePrint: options.segmentId === 'signature' && options.view === 'print', publishView() {},
     hang: { frames: [selected], documentOnlyIds: new Set(options.documentOnlyIds ?? []) }, count: element('span'), manifest,
     createWorkLabel: labels.createPolicyWorkLabel,

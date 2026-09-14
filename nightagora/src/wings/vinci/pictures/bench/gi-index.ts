@@ -39,14 +39,14 @@ const entries = new Map<string, { data: unknown; debug: BenchGIDebug }>([
   "class": "GENERATED",
   "model": "One diffuse bounce from the generated north-window area emitter; relative linear radiance, not measured lux or HDRI integration",
   "source": "src/wings/vinci/pictures/bench/gi-data/early.json",
-  "sourceSha256": "5d3a5597b2473711e4acd43cf48d5ac649af4616178e5992128a4719ab4af8c6",
+  "sourceSha256": "761fdee6b4c1737c38fa3723cc959a5af54f10eedb2f9eb5da7d3e9f417955cb",
   "expected": {
     "segment": "early",
-    "geometrySha256": "cecf9c06ab0319ac194da6f7ecaf5f0bc55823da3003564c68d27214e99ebc6d",
+    "geometrySha256": "133acdad2636aaff31097c7d829b3eba5e9b9f8308657e9615d248fd570fd8ec",
     "lightSha256": "a58d2b8ed3c1b7382b31ee766de63f10e457add44d5ae05ed3384bb4b0fac943",
     "materialSha256": "18a73f7fcf4d55bf2f6a9f65879ea7d0f667b14ff67edc89770064eb05c294f8",
     "recipeSha256": "f7a3c3d6d850bee4b1e2e7af24db9a8f79fe89ef6ee626bfc55ceb53ebee2eba",
-    "roomSourceSha256": "e872f62703d53660307ff1845861f583aa86c355589bae1267c9567cebc95469"
+    "roomSourceSha256": "f61c342525e72dd13b6322cb115b1f33403208dc2f3d110175abfe6b10b58a69"
   },
   "room": {
     "extent_m": 9.343808533696206,
@@ -79,7 +79,7 @@ const entries = new Map<string, { data: unknown; debug: BenchGIDebug }>([
     64
   ],
   "diffuseBounces": 1,
-  "sourceTriangles": 5816,
+  "sourceTriangles": 5792,
   "residentMiB": 0.0625
 } }],
   ["milan", { data: data1, debug: {
@@ -88,14 +88,14 @@ const entries = new Map<string, { data: unknown; debug: BenchGIDebug }>([
   "class": "GENERATED",
   "model": "One diffuse bounce from the generated north-window area emitter; relative linear radiance, not measured lux or HDRI integration",
   "source": "src/wings/vinci/pictures/bench/gi-data/milan.json",
-  "sourceSha256": "be0f0cd564400509b66f0919fa410c9588d8ff81d87b3c316348c64131149318",
+  "sourceSha256": "af0e0f52f9df4e4894342b416fd9bc691d0fb423feac87029d444aa885e26b14",
   "expected": {
     "segment": "milan",
-    "geometrySha256": "499b98a68fcb42a08654f957efb6c5adf83ce015947eec65b05d06e2b249c357",
+    "geometrySha256": "57ed1fb07e3ae4bf1e3113087d03d79bfc7b193cb7fae7a1486e7823ecc3b145",
     "lightSha256": "a58d2b8ed3c1b7382b31ee766de63f10e457add44d5ae05ed3384bb4b0fac943",
     "materialSha256": "18a73f7fcf4d55bf2f6a9f65879ea7d0f667b14ff67edc89770064eb05c294f8",
     "recipeSha256": "f7a3c3d6d850bee4b1e2e7af24db9a8f79fe89ef6ee626bfc55ceb53ebee2eba",
-    "roomSourceSha256": "e872f62703d53660307ff1845861f583aa86c355589bae1267c9567cebc95469"
+    "roomSourceSha256": "f61c342525e72dd13b6322cb115b1f33403208dc2f3d110175abfe6b10b58a69"
   },
   "room": {
     "extent_m": 9.819241844359395,
@@ -128,7 +128,7 @@ const entries = new Map<string, { data: unknown; debug: BenchGIDebug }>([
     64
   ],
   "diffuseBounces": 1,
-  "sourceTriangles": 6086,
+  "sourceTriangles": 6062,
   "residentMiB": 0.0625
 } }],
   ["florence", { data: data2, debug: {
@@ -137,14 +137,14 @@ const entries = new Map<string, { data: unknown; debug: BenchGIDebug }>([
   "class": "GENERATED",
   "model": "One diffuse bounce from the generated north-window area emitter; relative linear radiance, not measured lux or HDRI integration",
   "source": "src/wings/vinci/pictures/bench/gi-data/florence.json",
-  "sourceSha256": "76062b6bc12f2fa3c0d46b0e22ac4a0108aff8f744ae2b7ceb036fdb348bedd2",
+  "sourceSha256": "e7236710f90b0886902821bb33b7b1bedcaabd547a50ade5ef50b24b6cf6fa69",
   "expected": {
     "segment": "florence",
-    "geometrySha256": "a8e6865ef5fc32d38d1c6a7c44b96213a200813011c00a4a69d20380b21c93fa",
+    "geometrySha256": "e8559f27d09c095d861f29890fb0c375e86a0f04e7f86776ffa77ac7b50b72be",
     "lightSha256": "a58d2b8ed3c1b7382b31ee766de63f10e457add44d5ae05ed3384bb4b0fac943",
     "materialSha256": "18a73f7fcf4d55bf2f6a9f65879ea7d0f667b14ff67edc89770064eb05c294f8",
     "recipeSha256": "f7a3c3d6d850bee4b1e2e7af24db9a8f79fe89ef6ee626bfc55ceb53ebee2eba",
-    "roomSourceSha256": "e872f62703d53660307ff1845861f583aa86c355589bae1267c9567cebc95469"
+    "roomSourceSha256": "f61c342525e72dd13b6322cb115b1f33403208dc2f3d110175abfe6b10b58a69"
   },
   "room": {
     "extent_m": 9.94473591701181,
@@ -177,7 +177,7 @@ const entries = new Map<string, { data: unknown; debug: BenchGIDebug }>([
     64
   ],
   "diffuseBounces": 1,
-  "sourceTriangles": 6086,
+  "sourceTriangles": 6062,
   "residentMiB": 0.0625
 } }],
   ["late", { data: data3, debug: {
@@ -186,14 +186,14 @@ const entries = new Map<string, { data: unknown; debug: BenchGIDebug }>([
   "class": "GENERATED",
   "model": "One diffuse bounce from the generated north-window area emitter; relative linear radiance, not measured lux or HDRI integration",
   "source": "src/wings/vinci/pictures/bench/gi-data/late.json",
-  "sourceSha256": "a5e07347380e87b2c1e00d9050bbd3c4888278269f810c74f7e9e87f1be7c902",
+  "sourceSha256": "5e1e97dc3f0ab363cc4e641550515262d6b92df860e4d308481ce9a7cf536b7f",
   "expected": {
     "segment": "late",
-    "geometrySha256": "e8b64839449ec70c5a7e7e36b27d0fff5ba2dfa98d9d2c6f20f21cd626b70d1e",
+    "geometrySha256": "efba3df2c9a7862fc6ba99ce152f3a8d000ba70c986960d3c37c0371aaf90b96",
     "lightSha256": "a58d2b8ed3c1b7382b31ee766de63f10e457add44d5ae05ed3384bb4b0fac943",
     "materialSha256": "18a73f7fcf4d55bf2f6a9f65879ea7d0f667b14ff67edc89770064eb05c294f8",
     "recipeSha256": "f7a3c3d6d850bee4b1e2e7af24db9a8f79fe89ef6ee626bfc55ceb53ebee2eba",
-    "roomSourceSha256": "e872f62703d53660307ff1845861f583aa86c355589bae1267c9567cebc95469"
+    "roomSourceSha256": "f61c342525e72dd13b6322cb115b1f33403208dc2f3d110175abfe6b10b58a69"
   },
   "room": {
     "extent_m": 8.821782601710927,
@@ -226,7 +226,7 @@ const entries = new Map<string, { data: unknown; debug: BenchGIDebug }>([
     64
   ],
   "diffuseBounces": 1,
-  "sourceTriangles": 5564,
+  "sourceTriangles": 5540,
   "residentMiB": 0.0625
 } }],
   ["absences", { data: data4, debug: {
@@ -235,14 +235,14 @@ const entries = new Map<string, { data: unknown; debug: BenchGIDebug }>([
   "class": "GENERATED",
   "model": "One diffuse bounce from the generated north-window area emitter; relative linear radiance, not measured lux or HDRI integration",
   "source": "src/wings/vinci/pictures/bench/gi-data/absences.json",
-  "sourceSha256": "9d68c797658cbe34067f29148a0e4324ab1b1f01f88d5e02aab2189351d7ca69",
+  "sourceSha256": "8280bc8a95ac11edd14fd98ffab9dd9005c0650403d768b3bcea73f1497c8492",
   "expected": {
     "segment": "absences",
-    "geometrySha256": "1047a5b2494e093b95a973984fccc241a91cf5f32d0a16ce530dcf4ffb0b77a7",
+    "geometrySha256": "6b7568c602f5d673795b7be881ea2d4cdecd89dfd264686a218030f7fd1071a7",
     "lightSha256": "a58d2b8ed3c1b7382b31ee766de63f10e457add44d5ae05ed3384bb4b0fac943",
     "materialSha256": "18a73f7fcf4d55bf2f6a9f65879ea7d0f667b14ff67edc89770064eb05c294f8",
     "recipeSha256": "f7a3c3d6d850bee4b1e2e7af24db9a8f79fe89ef6ee626bfc55ceb53ebee2eba",
-    "roomSourceSha256": "e872f62703d53660307ff1845861f583aa86c355589bae1267c9567cebc95469"
+    "roomSourceSha256": "f61c342525e72dd13b6322cb115b1f33403208dc2f3d110175abfe6b10b58a69"
   },
   "room": {
     "extent_m": 9.855999999999998,
@@ -275,7 +275,7 @@ const entries = new Map<string, { data: unknown; debug: BenchGIDebug }>([
     64
   ],
   "diffuseBounces": 1,
-  "sourceTriangles": 6086,
+  "sourceTriangles": 6062,
   "residentMiB": 0.0625
 } }],
   ["signature", { data: data5, debug: {
@@ -284,14 +284,14 @@ const entries = new Map<string, { data: unknown; debug: BenchGIDebug }>([
   "class": "GENERATED",
   "model": "One diffuse bounce from the generated north-window area emitter; relative linear radiance, not measured lux or HDRI integration",
   "source": "src/wings/vinci/pictures/bench/gi-data/signature.json",
-  "sourceSha256": "7f3d80a98b55849dd61e3591ce0fbc0acea3c9c8ca7a5f4bab3f52d36e60d8f0",
+  "sourceSha256": "adedd789f8a448be34b45304db3ac10d8709775bcbcd8d23dd2d7b380e62ee73",
   "expected": {
     "segment": "signature",
-    "geometrySha256": "e44d2ea29b7f626d2ad65abc8b3b04e6a6a8d4fc9096de9fa2c00b6b5b05b792",
+    "geometrySha256": "f2f85416e9664c869972672186b73a0bc37b2b515354439254c217dd7f1d042d",
     "lightSha256": "a58d2b8ed3c1b7382b31ee766de63f10e457add44d5ae05ed3384bb4b0fac943",
     "materialSha256": "18a73f7fcf4d55bf2f6a9f65879ea7d0f667b14ff67edc89770064eb05c294f8",
     "recipeSha256": "f7a3c3d6d850bee4b1e2e7af24db9a8f79fe89ef6ee626bfc55ceb53ebee2eba",
-    "roomSourceSha256": "e872f62703d53660307ff1845861f583aa86c355589bae1267c9567cebc95469"
+    "roomSourceSha256": "f61c342525e72dd13b6322cb115b1f33403208dc2f3d110175abfe6b10b58a69"
   },
   "room": {
     "extent_m": 1,
@@ -324,7 +324,7 @@ const entries = new Map<string, { data: unknown; debug: BenchGIDebug }>([
     64
   ],
   "diffuseBounces": 1,
-  "sourceTriangles": 2234,
+  "sourceTriangles": 2210,
   "residentMiB": 0.0625
 } }],
   ["drawer", { data: data6, debug: {
@@ -333,14 +333,14 @@ const entries = new Map<string, { data: unknown; debug: BenchGIDebug }>([
   "class": "GENERATED",
   "model": "One diffuse bounce from the generated north-window area emitter; relative linear radiance, not measured lux or HDRI integration",
   "source": "src/wings/vinci/pictures/bench/gi-data/drawer.json",
-  "sourceSha256": "7e2aa3aee12cab1d655abe98b6ee8f91a839136d8452266a11ee921fe0bd7a5a",
+  "sourceSha256": "0ac537d151b90a8dd7ff9a8ddd9f4ed8383bf61922a8a78ee9f959ab27f8e3b4",
   "expected": {
     "segment": "drawer",
-    "geometrySha256": "120236556f6f1fcca53fe934306f137bdb7d7d154033e8f2873b1da0d510321a",
+    "geometrySha256": "bf6ec5b10072fe6719edb73a3c550136bc8d5de1b9374daf1125a9934e513bdf",
     "lightSha256": "a58d2b8ed3c1b7382b31ee766de63f10e457add44d5ae05ed3384bb4b0fac943",
     "materialSha256": "18a73f7fcf4d55bf2f6a9f65879ea7d0f667b14ff67edc89770064eb05c294f8",
     "recipeSha256": "f7a3c3d6d850bee4b1e2e7af24db9a8f79fe89ef6ee626bfc55ceb53ebee2eba",
-    "roomSourceSha256": "e872f62703d53660307ff1845861f583aa86c355589bae1267c9567cebc95469"
+    "roomSourceSha256": "f61c342525e72dd13b6322cb115b1f33403208dc2f3d110175abfe6b10b58a69"
   },
   "room": {
     "extent_m": 12,
@@ -373,7 +373,7 @@ const entries = new Map<string, { data: unknown; debug: BenchGIDebug }>([
     64
   ],
   "diffuseBounces": 1,
-  "sourceTriangles": 7040,
+  "sourceTriangles": 7016,
   "residentMiB": 0.0625
 } }],
   ["murals", { data: data7, debug: {
@@ -382,14 +382,14 @@ const entries = new Map<string, { data: unknown; debug: BenchGIDebug }>([
   "class": "GENERATED",
   "model": "One diffuse bounce from the generated north-window area emitter; relative linear radiance, not measured lux or HDRI integration",
   "source": "src/wings/vinci/pictures/bench/gi-data/murals.json",
-  "sourceSha256": "f18bed5746d9a6beef26a99df0df2e6ae4cb89f5d072bdd8f8822e337df7d223",
+  "sourceSha256": "343a202ccfd8f8a3412a41376edf93b98573d0e5a2e013a78b55e3d778e0ca4c",
   "expected": {
     "segment": "murals",
-    "geometrySha256": "a43a0d435b0971f41e0fa9dcd8b388fe50fa9bf62c0798f1b991b765054af2ae",
+    "geometrySha256": "cec03495980e4c3fb81eb297444f0148892b4c5f17ff33159a7f14a702e811e3",
     "lightSha256": "a58d2b8ed3c1b7382b31ee766de63f10e457add44d5ae05ed3384bb4b0fac943",
     "materialSha256": "18a73f7fcf4d55bf2f6a9f65879ea7d0f667b14ff67edc89770064eb05c294f8",
     "recipeSha256": "f7a3c3d6d850bee4b1e2e7af24db9a8f79fe89ef6ee626bfc55ceb53ebee2eba",
-    "roomSourceSha256": "e872f62703d53660307ff1845861f583aa86c355589bae1267c9567cebc95469"
+    "roomSourceSha256": "f61c342525e72dd13b6322cb115b1f33403208dc2f3d110175abfe6b10b58a69"
   },
   "room": {
     "extent_m": 27.34,
@@ -422,7 +422,7 @@ const entries = new Map<string, { data: unknown; debug: BenchGIDebug }>([
     64
   ],
   "diffuseBounces": 1,
-  "sourceTriangles": 35732,
+  "sourceTriangles": 35708,
   "residentMiB": 0.0625
 } }],
   ["complete-hang", { data: data8, debug: {
@@ -431,14 +431,14 @@ const entries = new Map<string, { data: unknown; debug: BenchGIDebug }>([
   "class": "GENERATED",
   "model": "One diffuse bounce from the generated north-window area emitter; relative linear radiance, not measured lux or HDRI integration",
   "source": "src/wings/vinci/pictures/bench/gi-data/complete-hang.json",
-  "sourceSha256": "cf2536e002a3bacfb25c64f4dcc3b9afb3adc2a442c73b9bbd684dd8c5d6f550",
+  "sourceSha256": "7d5776ef6e6afda51449cb3091b2fc7f45be8d6ba4785f5a40357cc60ac41ae5",
   "expected": {
     "segment": "complete-hang",
-    "geometrySha256": "49cb8fcfe8e5ed3f2f8a70b7f219be1ab491e882cf8a296603e81380a552721a",
+    "geometrySha256": "e9af54855e5364d6285eb5c87ff9a90fe3f091280549321d40b63eae1528e596",
     "lightSha256": "a58d2b8ed3c1b7382b31ee766de63f10e457add44d5ae05ed3384bb4b0fac943",
     "materialSha256": "18a73f7fcf4d55bf2f6a9f65879ea7d0f667b14ff67edc89770064eb05c294f8",
     "recipeSha256": "f7a3c3d6d850bee4b1e2e7af24db9a8f79fe89ef6ee626bfc55ceb53ebee2eba",
-    "roomSourceSha256": "e872f62703d53660307ff1845861f583aa86c355589bae1267c9567cebc95469"
+    "roomSourceSha256": "f61c342525e72dd13b6322cb115b1f33403208dc2f3d110175abfe6b10b58a69"
   },
   "room": {
     "extent_m": 89.48403834732778,
@@ -471,7 +471,7 @@ const entries = new Map<string, { data: unknown; debug: BenchGIDebug }>([
     64
   ],
   "diffuseBounces": 1,
-  "sourceTriangles": 43220,
+  "sourceTriangles": 43196,
   "residentMiB": 0.0625
 } }],
   ["materials", { data: data9, debug: {
@@ -480,14 +480,14 @@ const entries = new Map<string, { data: unknown; debug: BenchGIDebug }>([
   "class": "GENERATED",
   "model": "One diffuse bounce from the generated north-window area emitter; relative linear radiance, not measured lux or HDRI integration",
   "source": "src/wings/vinci/pictures/bench/gi-data/materials.json",
-  "sourceSha256": "a342a6502109dcfeb337f72c09580b0a92c250b9cd8931b7daee57e4f7a10fbe",
+  "sourceSha256": "79b4440bbcb6ab34e8a457d82c91d262930d1ad6f58dae2f9f5b9955854e1602",
   "expected": {
     "segment": "materials",
-    "geometrySha256": "d3f3792d55fda7b061bb9d089f026ba0eb3d0abb5fa8524462647aba3bab1b3c",
+    "geometrySha256": "aa75524e664baef95741f662339637abcf9901553fd54fb3bc8e63f1a1603d63",
     "lightSha256": "a58d2b8ed3c1b7382b31ee766de63f10e457add44d5ae05ed3384bb4b0fac943",
     "materialSha256": "18a73f7fcf4d55bf2f6a9f65879ea7d0f667b14ff67edc89770064eb05c294f8",
     "recipeSha256": "f7a3c3d6d850bee4b1e2e7af24db9a8f79fe89ef6ee626bfc55ceb53ebee2eba",
-    "roomSourceSha256": "e872f62703d53660307ff1845861f583aa86c355589bae1267c9567cebc95469"
+    "roomSourceSha256": "f61c342525e72dd13b6322cb115b1f33403208dc2f3d110175abfe6b10b58a69"
   },
   "room": {
     "extent_m": 6,
@@ -520,7 +520,7 @@ const entries = new Map<string, { data: unknown; debug: BenchGIDebug }>([
     64
   ],
   "diffuseBounces": 1,
-  "sourceTriangles": 4232,
+  "sourceTriangles": 4208,
   "residentMiB": 0.0625
 } }],
 ])
