@@ -1,8 +1,9 @@
 import type { Stack } from '../../../stack'
-import { machineCatalog } from './catalog'
-import { makeMachine, type ReadyMachineBuild } from './runtime'
+import { buildStoreCrane } from './crane-body'
+import type { ReadyMachineBuild } from './runtime'
 
-/** Exact dossier parts and schedule. Construction dimensions remain declared assumptions. */
+/** The one machine on this bench that is not built here: the recorded body out
+ * of the store, from the same dossier, driven by the same schedule. */
 export function build(stack: Stack): ReadyMachineBuild {
-  return makeMachine(stack, machineCatalog['revolving-crane'])
+  return buildStoreCrane(stack)
 }

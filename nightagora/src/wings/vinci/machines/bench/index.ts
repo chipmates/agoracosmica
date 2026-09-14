@@ -5,6 +5,7 @@ import { IDENTITY } from '../../../../stack/grade';
 import { loadManifest, type ManifestEntry } from '../../../../manifest';
 import { loadMachineMaterial } from '../parts';
 import { buildMachine, type ReadyMachineBuild } from '..';
+import type { StoreCrane, StoreCraneReading } from '../crane-body';
 import { MACHINE_SLUGS, isMachineSlug, machineCatalog, partialCatalog, type Language, type MachineSlug, type EvidenceRecord } from '../catalog';
 import benchCss from './bench.css?inline';
 import titleSelectCss from './title-select.css?inline';
@@ -188,7 +189,8 @@ export function createBench(stack: Stack, onExit: () => void) {
   });
   const stamp = () => { document.body.dataset['forge'] = 'bench'; document.body.dataset['phase'] = 'bench'; };
   let ropeExperiment: ReturnType<typeof applyRopeShadowExperiment> | null = null;
-  function clearDisplay() { ropeExperiment?.restore(); ropeExperiment = null; metrics?.close(); machine?.dispose(); machine = null; display.clear(); for (const g of supportGeometries)
+  let storeCrane: StoreCraneReading | null = null;
+  function clearDisplay() { storeCrane = null; ropeExperiment?.restore(); ropeExperiment = null; metrics?.close(); machine?.dispose(); machine = null; display.clear(); for (const g of supportGeometries)
     g.dispose(); for (const m of supportMaterials)
     m.dispose(); supportGeometries.length = 0; supportMaterials.length = 0; }
   function reading(record: EvidenceRecord) {
@@ -436,8 +438,12 @@ export function createBench(stack: Stack, onExit: () => void) {
         if(opts.clothProbe==='flat-normal')for(const material of materials){if(material instanceof MeshStandardNodeMaterial){material.normalNode=null;material.needsUpdate=true;}}
       });
     }
-    const ropeMode = opts.ropeProbe ?? (['revolving-crane', 'lathe', 'parachute'].includes(slug) ? 'offset-2mm' : undefined);
-    if (ropeMode && key) {
+    // The crane out of the store carries its rope inside the baked body, and
+    // the parts the experiment names belong to the built one.
+    storeCrane = slug === 'revolving-crane' && machine && 'reading' in machine ? (machine as StoreCrane).reading() : null;
+    const ropeParts = storeCrane?.standing === 'store' ? ['lathe', 'parachute'] : ['revolving-crane', 'lathe', 'parachute'];
+    const ropeMode = opts.ropeProbe ?? (ropeParts.includes(slug) ? 'offset-2mm' : undefined);
+    if (ropeMode && key && ropeParts.includes(slug)) {
       if (slug !== 'lathe' && slug !== 'revolving-crane' && slug !== 'parachute') throw new Error(`No rope experiment for ${slug}`);
       ropeExperiment = applyRopeShadowExperiment(machine.object, slug, ropeMode, key.direction);
     }
@@ -523,9 +529,9 @@ export function createBench(stack: Stack, onExit: () => void) {
     }
   }, machine() {
     if (!machine) return null;
-    const snapshot = { slug, period: machineCatalog[slug].dossier.motion.period_s, period_s: machineCatalog[slug].dossier.motion.period_s, t: playbackState.clock, joints: machine.joints(), bounds: machine.bounds.getSize(new Vector3()).toArray(), occupied: new Box3().setFromObject(machine.object).getSize(new Vector3()).toArray(), ready: ready && (metrics?.ready() ?? true), playing: playbackState.playing, section: sectionEnabled, evidence: { open: evidence.isOpen(), recordSlug: evidence.isOpen() ? evidenceRecord?.slug ?? null : null } };
+    const snapshot = { slug, body: storeCrane ?? undefined, period: machineCatalog[slug].dossier.motion.period_s, period_s: machineCatalog[slug].dossier.motion.period_s, t: playbackState.clock, joints: machine.joints(), bounds: machine.bounds.getSize(new Vector3()).toArray(), occupied: new Box3().setFromObject(machine.object).getSize(new Vector3()).toArray(), ready: ready && (metrics?.ready() ?? true), playing: playbackState.playing, section: sectionEnabled, evidence: { open: evidence.isOpen(), recordSlug: evidence.isOpen() ? evidenceRecord?.slug ?? null : null } };
     return metrics ? { ...snapshot, metrics: metrics.reading() } : snapshot;
   }, slug: () => slug, ids: () => MACHINE_SLUGS, station(id: string) { if (!isMachineSlug(id))
-      return false; void open({ slug: id }); return true; }, manifest() { return folioEntry ? [folioEntry] : []; }, relight() { if (active) {
+      return false; void open({ slug: id }); return true; }, manifest() { return [folioEntry, storeCrane?.entry].filter((entry): entry is ManifestEntry => Boolean(entry)); }, relight() { if (active) {
       lightBench(); metrics?.reset(); } }, freeze(t: number) { playbackState = freezePlayback(t); machine?.animate(playbackState.clock, 0); if (active) metrics?.reset(); }, ready: () => ready && (metrics?.ready() ?? true) };
 }
