@@ -93,9 +93,6 @@ export const COURT = {
 /** The grave's own floor is the west half of the court's paving, which is
  * why the court is exactly as deep as that floor. */
 export const GRAVE_ORIGIN = { east: -55.5, north: -25 }
-/** The parachute stands on the court's east half, on the module's own feet:
- * 10.34 m of it, and the tallest room in the insertion is 6.61 m. */
-export const PARACHUTE_ORIGIN = { east: -44, north: -25 }
 /** The display wall for the Last Supper's measured absence: a wall of its
  * own on the north apron, north-lit, its field 880 by 460 cm. */
 export const SUPPER_WALL = {

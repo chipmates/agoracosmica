@@ -5,7 +5,8 @@
  */
 import { Vector3 } from 'three/webgpu'
 import { world } from '../site'
-import { COURT, FLOOR, GRAVE_ORIGIN, HANG_DATUM, LINE_ORIGIN, LINE_SLAB, PARACHUTE_ORIGIN, SUPPER_WALL } from './layout'
+import { COURT, FLOOR, GRAVE_ORIGIN, HANG_DATUM, LINE_ORIGIN, LINE_SLAB, SUPPER_WALL } from './layout'
+import { STANDS } from './stands'
 
 export interface RoomPose { eye: Vector3; at: Vector3; fov: number }
 const EYE = FLOOR + 1.62
@@ -73,9 +74,13 @@ export function collectionView(id: string, narrow: boolean): RoomPose | undefine
     case 'collection-room-grave':
       return pose(GRAVE_ORIGIN.east + 8.6, GRAVE_ORIGIN.north - 4.2, COURT.level + 1.66,
         GRAVE_ORIGIN.east + .4, GRAVE_ORIGIN.north + .2, COURT.level + .9, narrow ? 78 : 60, .95)
-    case 'collection-room-parachute':
-      return pose(PARACHUTE_ORIGIN.east + 7.4, PARACHUTE_ORIGIN.north - 7.6, COURT.level + 1.62,
-        PARACHUTE_ORIGIN.east, PARACHUTE_ORIGIN.north, COURT.level + 4.9, narrow ? 86 : 68, 2.1)
+    case 'collection-room-parachute': {
+      // Ten metres of cloth cannot be read from under it: this eye stands off
+      // the court's south edge, where the whole pyramid clears the frame.
+      const stand = STANDS['parachute']
+      return pose(stand.east, -32.6, COURT.level + 1.62,
+        stand.east, stand.north, COURT.level + 4.6, narrow ? 86 : 68, 2.1)
+    }
     case 'collection-room-supper':
       // The field is 8.8 by 4.6 m and the card sits in the middle of the
       // frame: the eye stands where the whole measurement clears it.

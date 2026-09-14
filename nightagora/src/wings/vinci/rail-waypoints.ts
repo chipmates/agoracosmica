@@ -75,10 +75,12 @@ const APRON_CORNER: RailWaypoint = [S.east, collectionLayout.apron.north - .4, O
 const APRON_NORTH: RailWaypoint = [COURT.east - 1.4, collectionLayout.apron.north - .5, OUTSIDE]
 const COURT_EAST: RailWaypoint = [COURT.east - 1.4, COURT.south + 2.6, COURT.level + railEyeHeightM]
 /** The lane along the court's north side: the only way west that passes the
- * wall that is not here (its north end) and the standing module in the middle
- * of the court, which a visitor walks between, not through. */
-const COURT_LANE_EAST: RailWaypoint = [COURT.east - 3, -23.6, COURT.level + railEyeHeightM]
-const COURT_LANE_WEST: RailWaypoint = [-49.5, -23.6, COURT.level + railEyeHeightM]
+ * wall that is not here (its north end) and the machines standing in the
+ * court, which a visitor walks between, not through. It runs a metre and a
+ * quarter off the parapet, because the parachute's suspension cords reach
+ * walking height two and a half metres from its axis. */
+const COURT_LANE_EAST: RailWaypoint = [COURT.east - 3, -20.6, COURT.level + railEyeHeightM]
+const COURT_LANE_WEST: RailWaypoint = [-49.5, -20.6, COURT.level + railEyeHeightM]
 
 /** Where a station stands. The house keeps its three sides; the collection
  * ground is its rooms, because a room is entered through its door. */

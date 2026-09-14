@@ -38,9 +38,11 @@ export interface Stand {
  * The compass stands in the house, where its own ledge will be.
  */
 export const STANDS: Record<MachineSlug, Stand> = {
-  // The court. The parachute is 10.34 m tall and the tallest room in the
-  // insertion is 6.61 m, so it stands outside on its own four uprights.
-  'parachute': { east: -44, north: -25, bearing: 18, plinth: .1, ground: 'court' },
+  // THE COURT. The parachute is 10.34 m tall and the tallest room in the
+  // insertion is 6.61 m, so it stands outside on its own four uprights. It
+  // stands north of the display wall's own frame: nothing of it enters the
+  // cone between that station's eye and the measured field.
+  'parachute': { east: -37, north: -23.1, bearing: 0, plinth: 0, ground: 'court' },
   // The hall, where thirteen machines stand today.
   'aerial-screw': { east: -51.5, north: -49, bearing: 0, plinth: .12, ground: 'hall' },
   'revolving-crane': { east: -59.2, north: -46, bearing: 28, plinth: .16, ground: 'hall' },
