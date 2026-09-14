@@ -1785,7 +1785,7 @@
         },
         {
           "path": "src/wings/vinci/machines/data/revolving-crane.json",
-          "sha256": "2a6d5df0d0cf337a345c16220d17d9d94724cf08430050a9ca59f1f9aba11446"
+          "sha256": "e761c629f17a209155275295fdc6f4e19b09f78e92e0cc34dc943540cd4de1a8"
         },
         {
           "path": "src/wings/vinci/machines/geometry.ts",
@@ -1881,7 +1881,7 @@
         },
         {
           "path": "src/wings/vinci/machines/data/rolling-mill.json",
-          "sha256": "0e32c1894b9b49b1dce19d2f820e4e4deb068c75bd721ba237a227c1221c62bd"
+          "sha256": "ed7973908a1ea494aa304fc41c1f134d437adb5990f3ecba528464bfee6f2d40"
         },
         {
           "path": "src/wings/vinci/machines/geometry.ts",
