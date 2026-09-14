@@ -1,157 +1,201 @@
-body.table-bench-active { background:#100f0c; color:#d4c8b1; }
+/* THE READING TABLE'S BENCH. One page under one lamp, the panel beside it,
+   the chrome as quiet as a station index can be.
+
+   Two lengths are measured at runtime and published as variables, because a
+   German dock is taller than an English one and a layout that guesses its own
+   chrome clips the paper on the language it was not written in:
+     --table-chrome  header + dock + caption, so the stage takes the rest
+     --table-dock    the dock's own height, so nothing hides behind it     */
+
+body.table-bench-active { background:#0e0d0a; color:#d4c8b1; }
 body.table-bench-active > :not(.table-bench) { display:none!important; }
-.table-bench { position:fixed; inset:0; overflow:auto; background:#100f0c; font-family:Georgia,'Times New Roman',serif; }
+.table-bench { position:fixed; inset:0; overflow:auto; scroll-padding-bottom:var(--table-dock,150px); background:#0e0d0a; font-family:Georgia,'Times New Roman',serif; }
 .table-bench * { box-sizing:border-box; }
 .table-bench:focus { outline:none; }
 .table-bench [hidden] { display:none!important; }
+.table-bench button:focus-visible,.table-bench select:focus-visible,.table-bench summary:focus-visible { outline:2px solid #c7b995; outline-offset:3px; }
+
+/* ── the head ───────────────────────────────────────────────────────────── */
 .table-bench-header { padding:26px 4.2vw 18px; }
 .table-bench-brand { margin:0 0 33px; text-align:center; font-size:15px; font-weight:normal; letter-spacing:.24em; text-transform:uppercase; color:#d7cfbd; }
 .table-bench-kicker { margin:0 0 10px; font:10px/1.4 system-ui,sans-serif; letter-spacing:.19em; color:#a3947b; }
 .table-bench-heading { margin:0; font-weight:400; font-size:40px; line-height:1.1; color:#e4dac7; }
-.table-bench-workspace { display:grid; grid-template-columns:minmax(0,1fr) 370px; margin:0 4.2vw; min-height:580px; height:calc(100vh - 276px); gap:38px; }
-.table-bench[data-closed=true] .table-bench-workspace { grid-template-columns:minmax(0,1fr); max-width:1100px; margin-inline:auto; }
+
+/* ── the stage and the panel ────────────────────────────────────────────── */
+.table-bench-workspace { display:grid; grid-template-columns:minmax(0,1fr) 360px; margin:0 4.2vw; min-height:420px; height:calc(100dvh - var(--table-chrome,330px)); gap:34px; }
+.table-bench[data-closed=true] .table-bench-workspace { grid-template-columns:minmax(0,1fr); max-width:1180px; margin-inline:auto; }
 .table-bench-figure { min-width:0; min-height:0; position:relative; display:flex; flex-direction:column; }
-.table-bench-viewport { width:100%; flex:1; min-height:0; overflow:hidden; contain:strict; }
+.table-bench-viewport { width:100%; flex:1 1 auto; min-height:0; overflow:hidden; contain:strict; }
 .table-bench-viewport canvas { display:block; width:100%!important; height:100%!important; }
-.table-bench-caption { margin:9px 0; text-align:center; font:9px/1.5 system-ui,sans-serif; letter-spacing:.12em; color:#9c907c; }
-.table-bench-controls { margin:42px auto 22px; display:flex; width:max-content; max-width:calc(100% - 32px); flex-wrap:wrap; justify-content:center; border:1px solid #4a4233; }
-.table-bench-controls button { min-width:44px; min-height:46px; padding:10px 19px; border:0; border-right:1px solid #4a4233; color:#ccbea4; background:#1a1914; font:12px/1.3 system-ui,sans-serif; cursor:pointer; }
-.table-bench-controls button:last-child { border-right:0; }
-.table-bench-controls button:hover,.table-bench-controls button[aria-pressed=true] { background:#333025; color:#eee3cf; }
-.table-bench-controls button:disabled { opacity:.35; cursor:default; }
-.table-bench button:focus-visible,.table-bench select:focus-visible,.table-bench summary:focus-visible { outline:2px solid #c7b995; outline-offset:3px; }
+.table-bench-caption { flex:0 0 auto; margin:9px 0 0; text-align:center; font:9px/1.5 system-ui,sans-serif; letter-spacing:.12em; text-transform:uppercase; color:#9c907c; }
 .table-bench .vinci-table-panel { min-width:0; min-height:0; overflow-y:auto; scrollbar-color:#62543e #16140f; }
+/* THE READING COLUMN ENDS ON A FADE, NOT MID-WORD. It is a scroller and a
+   still frame cannot say so; twenty-two pixels of it read as "this
+   continues" instead of as a clipped line. */
+@media(min-width:760px) {
+ .table-bench .vinci-table-panel { -webkit-mask-image:linear-gradient(180deg,#000 calc(100% - 22px),transparent 100%); mask-image:linear-gradient(180deg,#000 calc(100% - 22px),transparent 100%); }
+}
 .table-bench .vinci-table-shelf { margin:0; min-height:0; }
 .table-bench.table-shelf-shown .vinci-table-panel { display:none; }
-.table-mirror-note { margin:16px 0; max-width:58ch; font-size:15px; line-height:1.5; }
-.table-mirror-note h2 { font-size:23px; font-weight:400; margin:8px 0 12px; }
-.table-mirror-note p { margin:10px 0; }
+.table-bench-error { padding:30px; color:#dfab9a; }
+
+/* ── the dock: the index, the reading controls, the door ────────────────── */
+.table-bench-controls { display:flex; flex-wrap:wrap; justify-content:stretch; width:100%; }
+.table-bench-controls button { flex:1 1 auto; min-width:44px; min-height:46px; padding:11px 14px; border:0; border-right:1px solid #3d3729; color:#b8ab93; background:#17160f; font:12px/1.3 system-ui,sans-serif; letter-spacing:.01em; cursor:pointer; }
+.table-bench-controls button:last-child { border-right:0; }
+.table-bench-controls button:hover,.table-bench-controls button[aria-pressed=true] { background:#2c2921; color:#eee3cf; }
+.table-bench-controls button:disabled { opacity:.32; cursor:default; }
+/* the station's verb reads as the verb */
+.table-bench-controls button[data-table-action=next],.table-bench-controls button[data-table-action=prev],.table-bench-controls button[data-table-action=open] { color:#e2d4b6; background:#1f1d16; }
+.table-bench-controls button[data-table-action=language] { flex:0 0 auto; min-width:72px; color:#9b917c; }
+
+/* ── the mirror station ─────────────────────────────────────────────────── */
+.table-bench[data-mirror=true] .vinci-table-panel { display:none; }
+.table-mirror-note { margin:0; padding:22px 24px; background:linear-gradient(110deg,#24241ff5,#1b1d19fa); overflow:auto; font-size:15px; line-height:1.5; }
+.table-mirror-note h2 { margin:0 0 20px; font:400 28px/1.2 Georgia,'Times New Roman',serif; }
+.table-mirror-note p { margin:0 0 22px; font-size:17px; line-height:1.6; }
 .table-mirror-hypothesis { color:#cf9588; }
 .table-mirror-unknown { color:#99958b; }
-.table-bench[data-mirror=true] .table-bench-viewport { flex:1; min-height:300px; }
-.table-bench-audit { overflow:auto; white-space:pre-wrap; overflow-wrap:anywhere; box-sizing:border-box; color:#d4c8b1; font:12px/1.45 monospace; position:absolute; right:4.2vw; width:370px; top:174px; bottom:96px; padding:12px; background:#14140f; z-index:2; }
-.table-bench-error { padding:30px; color:#dfab9a; }
-@media (max-width:759px) {
-  .table-bench-header { padding:16px 22px 12px; }
-  .table-bench-brand { font-size:12px; margin-bottom:14px; }
-  .table-bench-kicker { font-size:8px; letter-spacing:.13em; }
-  .table-bench-heading { font-size:26px; }
-  .table-bench-workspace { display:flex; flex-direction:column; margin:0; height:auto; min-height:0; gap:22px; }
-  .table-bench-viewport { flex:none; height:245px; min-height:0; }
-  .table-bench[data-closed=true] .table-bench-viewport { height:400px; }
-  .table-bench[data-turning=true] .table-bench-viewport { height:310px; }
-  .table-bench.table-shelf-shown .table-bench-viewport { height:145px; }
-  .table-bench[data-mirror=true] .table-bench-viewport { flex:none; height:270px; min-height:0; }
-  .table-bench-caption { margin:4px 22px 0; font-size:8px; }
-  .table-bench .vinci-table-panel { margin:0 22px; overflow:visible; }
-  .table-bench-controls { position:sticky; bottom:0; margin:25px auto 0; max-width:100%; background:#15140f; z-index:3; }
-  .table-bench-controls button { padding:11px 13px; min-height:44px; font-size:11px; }
-  .table-bench .vinci-table-shelf { margin:0 22px 30px; }
-  .table-mirror-note { margin:16px 22px; }
-  .table-bench-audit { position:static; width:auto; margin:0 22px; max-height:none; }
-}
-@media (prefers-reduced-motion:reduce) { .table-bench * { scroll-behavior:auto!important; } }
-@media (max-width:759px) {
-  .table-bench.table-shelf-shown .table-bench-viewport { height:110px; }
-  .table-bench.table-shelf-shown .table-bench-workspace { gap:14px; }
-  .table-bench-controls { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); width:100%; }
-  .table-bench-controls button { border-bottom:1px solid #4a4233; padding-inline:8px; }
-}
-
-.table-bench[data-mirror=true] .vinci-table-panel { display:none; }
-.table-mirror-note { margin:0; padding:22px 24px; background:linear-gradient(110deg,#24241ff5,#1b1d19fa); max-width:none; overflow:auto; }
-.table-mirror-note h2 { margin:0 0 20px; font-size:28px; }
-.table-mirror-note p { margin:0 0 22px; font-size:17px; line-height:1.6; }
-.table-bench[data-mirror=true] .table-bench-viewport { min-height:240px; }
-@media(max-width:759px) {
- .table-mirror-note { margin:0 22px; padding:20px 18px; overflow:visible; }
- .table-bench .vt-mirror-detail { margin:0 22px; padding:16px 0 0; }
- .table-bench .vt-mirror-detail-grid { grid-template-columns:1fr; gap:12px; }
- .table-bench[data-mirror=true] .table-bench-viewport { min-height:0; height:230px; }
-}
-
 .table-mirror-documented::before,.table-mirror-hypothesis::before,.table-mirror-unknown::before { content:''; display:inline-block; width:6px; height:6px; border-radius:50%; margin:0 8px 2px 0; }
 .table-mirror-documented::before { background:#91ab95; }
 .table-mirror-hypothesis::before { background:#cf9588; }
 .table-mirror-unknown::before { background:#99958b; }
 .table-mirror-sources { border-top:1px solid #82735a3d; }
 
-@media(max-width:759px) { .table-bench[data-single-plate=true] .table-bench-viewport { height:260px; } }
+/* ── the audit overlay (an added inspection state, never a sealed one) ──── */
+.table-bench-audit { overflow:auto; white-space:pre-wrap; overflow-wrap:anywhere; color:#d4c8b1; font:12px/1.45 monospace; position:absolute; right:4.2vw; width:370px; top:174px; bottom:96px; padding:12px; background:#14140f; z-index:2; }
 
-.table-bench[data-material=true] .table-bench-workspace { grid-template-columns:minmax(0,1fr); max-width:880px; margin-inline:auto; }
-.table-bench[data-material=true] .vinci-table-panel { display:none; }
-@media(max-width:759px) { .table-bench[data-material=true] .table-bench-viewport { height:440px; } }
-
-@media (max-width:759px) { .table-bench.table-shelf-shown .table-bench-viewport { height:260px; min-height:260px; } }
-
-/* The full station frame leaves room for the hour, sources and question. */
+/* ── desktop ───────────────────────────────────────────────────────────── */
 @media(min-width:760px) {
- .table-bench-header { position:relative; padding:20px 4.2vw 17px; min-height:153px; }
- .table-bench-brand { margin-bottom:24px; }
- .table-bench-heading { font-size:36px; }
- .table-bench-header .table-orientation-hour { position:absolute; right:4.2vw; top:62px; width:min(49vw,720px); margin:0; }
- .table-bench-header .table-orientation-position { float:right; margin:0 0 8px 20px; }
- .table-bench-workspace { min-height:410px; height:calc(100dvh - 408px); }
- .table-bench-controls { width:calc(100% - 8.4vw); margin:14px auto 0; }
- .table-bench-controls > button { flex:1; }
- .table-bench .table-orientation-footer { margin:12px auto 15px; }
- .table-bench .table-orientation-question { margin-bottom:6px; font-size:19px; }
- .table-bench .table-orientation-door-note { margin-top:5px; }
+ .table-bench-header { position:relative; padding:17px 4.2vw 21px; }
+ .table-bench-brand { margin-bottom:15px; font-size:13px; }
+ .table-bench-kicker { margin-bottom:6px; font-size:9px; }
+ .table-bench-heading { font-size:31px; }
+ .table-bench-header .table-orientation-hour { position:absolute; right:4.2vw; top:43px; width:min(42vw,570px); margin:0; text-align:right; }
+ .table-bench-header .table-orientation-position { margin:0 0 5px; }
+ .table-bench-header .table-orientation-hour-caption,.table-bench-header .table-orientation-lamp-note { font-size:10px; }
+ .table-bench-header .table-orientation-arithmetic { font-size:9.5px; letter-spacing:-.01em; }
+ /* THE BARS KEEP THE PAGE'S MARGIN. A control row that runs to the viewport
+    edge under a stage that holds 4.2vw is two hands on one screen, and it
+    leaves the last button as a stub against the glass. */
+ .table-bench-dock { margin-top:13px; padding:0 4.2vw; border-top:1px solid #3d3729; }
+ .table-bench-controls { border-bottom:1px solid #3d3729; }
+ .table-bench .table-orientation-footer { display:flex; align-items:center; justify-content:center; gap:18px; margin:11px auto 13px; max-width:none; padding:0 4.2vw; text-align:left; }
+ .table-bench .table-orientation-question { margin:0; font-size:17px; }
+ .table-bench .table-orientation-door { flex:0 0 auto; min-height:44px; padding:10px 20px; }
+ .table-bench .table-orientation-door-note { margin:0; max-width:26ch; text-align:left; font-size:9px; line-height:1.4; }
  .table-bench .table-orientation-door-scope { display:none; }
+ /* THE TWO CROPS ARE PART OF THE LABEL, NOT OF THE PICTURE. Under the stage
+    they took a third of the scene's height and left the label column with air
+    in its middle; in the column, stacked, they are as wide as the column and
+    the stage keeps the height every other state has. */
+ .table-bench[data-mirror=true] .table-bench-workspace { grid-template-columns:minmax(0,1fr) 420px; grid-template-rows:minmax(0,1fr) auto; }
+ .table-bench[data-mirror=true] .table-bench-figure { grid-column:1; grid-row:1/3; }
+ .table-bench[data-mirror=true] .table-mirror-note { grid-column:2; grid-row:1; }
+ .table-bench[data-mirror=true] .vt-mirror-detail { grid-column:2; grid-row:2; }
+ .table-bench[data-mirror=true] .vt-mirror-detail-grid { grid-template-columns:minmax(0,1fr); gap:8px; }
+ .table-bench[data-mirror=true] .vt-mirror-detail-label { display:inline-block; margin:0 0 3px; }
+ /* THE COLUMN HAS NO HOLE IN IT. The note used to end where its last line
+    ended, leaving a quarter of the page empty beside a full-height stage; it
+    now runs the column and puts its sources at the foot. */
+ /* THE EXPLANATION IS A READING COLUMN, THE CROPS ARE EVIDENCE. German runs a
+    third longer than English, so the column that gives way is the one with the
+    words, and it gives way by scrolling behind a fade, never by cutting the
+    plate under it. */
+ .table-bench[data-mirror=true] .table-mirror-note { align-self:stretch; overflow-y:auto; padding:18px 22px 16px; -webkit-mask-image:linear-gradient(180deg,#000 calc(100% - 20px),transparent 100%); mask-image:linear-gradient(180deg,#000 calc(100% - 20px),transparent 100%); }
+ .table-bench[data-mirror=true] .table-mirror-note h2 { margin-bottom:14px; font-size:26px; }
+ .table-bench[data-mirror=true] .table-mirror-note p { margin-bottom:15px; font-size:15.5px; line-height:1.55; }
+ .table-bench[data-mirror=true] .table-mirror-sources { padding-top:14px; }
+ .table-bench[data-mirror=true] .table-bench-viewport { flex:1 1 auto; min-height:430px; }
+ .table-bench .vt-mirror-detail { flex:0 0 auto; padding:10px 0 0; }
+ .table-bench[data-mirror=true] .vt-mirror-detail { align-self:end; padding:14px 22px 16px; background:linear-gradient(110deg,#24241ff5,#1b1d19fa); }
+ .table-bench[data-mirror=true] .vt-mirror-detail h3 { font-size:17px; margin-bottom:9px; }
+ .table-bench[data-mirror=true] .vt-mirror-detail canvas { max-height:72px; }
+ .table-bench[data-mirror=true] .vt-mirror-detail-note { margin-top:8px; font-size:11px; }
+ .table-bench .vt-mirror-detail h3 { font-size:18px; margin-bottom:8px; }
+ .table-bench .vt-mirror-detail-label { margin-bottom:4px; }
+ .table-bench .vt-mirror-detail-note { margin-top:7px; }
+ .table-bench .vt-mirror-detail canvas { max-height:84px; }
+ /* the catalogue needs its full names and its named absence in one read */
+ .table-bench.table-shelf-shown .table-bench-workspace { grid-template-columns:minmax(0,1fr) 470px; }
+ .table-bench.table-shelf-shown .vt-shelf-button { min-height:56px; padding-block:8px; }
 }
 
+/* ── phone ─────────────────────────────────────────────────────────────── */
 @media(max-width:759px) {
- .table-bench-header { padding:13px 22px 10px; }
- .table-bench-brand { margin-bottom:9px; font-size:11px; }
+ .table-bench-header { padding:12px 20px 9px; }
+ .table-bench-brand { margin-bottom:9px; font-size:11px; letter-spacing:.2em; }
  .table-bench-kicker { margin-bottom:5px; font-size:7px; }
- .table-bench-heading { font-size:24px; }
- .table-bench-header .table-orientation-hour { margin-top:9px; }
+ .table-bench-heading { font-size:23px; }
+ .table-bench-header .table-orientation-hour { margin-top:8px; }
  .table-bench-header .table-orientation-position { display:none; }
  .table-bench-header .table-orientation-hour-caption { font-size:9px; line-height:1.4; }
  .table-bench-header .table-orientation-arithmetic { font-size:9px; line-height:1.5; }
  .table-bench-header .table-orientation-lamp-note { font-size:9px; line-height:1.4; margin-top:2px; }
- .table-bench-dock { position:sticky; bottom:0; z-index:3; background:#12120e; border-top:1px solid #4a4233; }
- .table-bench-controls { position:static; margin:0; grid-template-columns:repeat(6,minmax(0,1fr)); border-top:0; }
- .table-bench-controls > button { min-height:44px; padding:6px 3px; font-size:9px; overflow-wrap:normal; }
- .table-bench .table-orientation-footer { margin:0; max-width:none; padding:9px 20px 8px; }
- .table-bench .table-orientation-question { margin-bottom:5px; font-size:14px; line-height:1.35; }
- .table-bench .table-orientation-door { min-height:44px; padding:8px 20px; font-size:11px; }
- .table-bench .table-orientation-door-note { margin-top:5px; font-size:8px; line-height:1.4; }
+
+ /* THE ASK STANDS WHERE THE PAGE ENDS, NOT WHERE THE ARTICLE ENDS. On a
+    phone the reading column is longer than the screen, so the door sits
+    straight under the stage and a visitor meets it without scrolling past
+    the whole transcription. */
+ .table-bench-workspace { display:flex; flex-direction:column; margin:0; height:auto; min-height:0; gap:14px; padding-bottom:calc(var(--table-dock,150px) + 12px); }
+ .table-bench-workspace > .table-bench-figure { order:0; }
+ .table-bench-workspace > .table-orientation-footer { order:1; }
+ .table-bench-workspace > .vinci-table-panel,.table-bench-workspace > .vinci-table-shelf { order:2; }
+ .table-bench-workspace > .table-mirror-note { order:2; }
+ .table-bench-workspace > .vt-mirror-detail { order:3; }
+ .table-bench-workspace > .table-bench-audit { order:4; }
+ /* THE CLOSED STATE IS ONE SCREEN: cover, caption, the question, the bar.
+    The stage takes what the other four leave, never more. */
+ .table-bench[data-closed=true] .table-bench-workspace { padding-bottom:calc(var(--table-dock,150px) + 8px); }
+ .table-bench-viewport { flex:none; height:300px; min-height:0; }
+ .table-bench[data-closed=true] .table-bench-viewport { height:max(310px,calc(100dvh - var(--table-dock,150px) - 310px)); }
+ .table-bench[data-turning=true] .table-bench-viewport { height:330px; }
+ .table-bench[data-mirror=true] .table-bench-viewport { flex:none; height:342px; min-height:0; }
+ .table-bench.table-shelf-shown .table-bench-viewport { height:390px; min-height:0; }
+ .table-bench[data-single-plate=true] .table-bench-viewport { height:max(430px,calc(100dvh - var(--table-dock,150px) - 290px)); }
+ .table-bench[data-material=true] .table-bench-viewport { height:440px; }
+ .table-bench-caption { margin:4px 20px 0; font-size:8px; }
+ .table-bench .vinci-table-panel { margin:0 20px; overflow:visible; }
+ .table-bench .vinci-table-shelf { margin:0 12px; padding:12px; }
+ .table-bench .table-mirror-note { margin:0 20px; padding:16px 18px; overflow:visible; }
+ .table-bench .table-mirror-note h2 { font-size:24px; margin-bottom:12px; }
+ .table-bench .table-mirror-note p { font-size:15px; line-height:1.5; margin-bottom:15px; }
+ .table-bench .vt-mirror-detail { margin:0 20px; padding:14px 0 0; }
+ .table-bench .vt-mirror-detail-grid { grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:12px; }
+ .table-bench .vt-mirror-detail-label { font-size:10px; min-height:28px; margin-bottom:5px; }
+ .table-bench .vt-mirror-detail h3 { font-size:19px; margin-bottom:8px; }
+ .table-bench .vt-mirror-detail-note { font-size:10px; margin-top:7px; }
+ .table-bench-audit { position:static; width:auto; margin:0 20px; max-height:none; }
+
+ /* THE WAY OUT IS ALWAYS IN THE FRAME, at every state including the shelf */
+ /* A LINE THAT RUNS UNDER A STICKY BAR FADES INTO IT. Sliced glyphs at the
+    bar's edge read as a layout fault; twenty-six pixels of fall-off read as
+    "this continues under here". */
+ .table-bench-dock { position:sticky; bottom:0; z-index:3; background:#12120e; border-top:1px solid #3d3729; }
+ .table-bench-dock::before { content:''; position:absolute; left:0; right:0; top:-26px; height:26px; pointer-events:none; background:linear-gradient(180deg,#0e0d0a00,#0e0d0ae6 62%,#0e0d0a); }
+ .table-bench-controls { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); }
+ /* a German control is one long word in a 59 px cell: it breaks, it never
+    runs under its neighbour */
+ .table-bench-controls > button { min-height:44px; padding:6px 3px; font-size:9px; line-height:1.25; border-right:1px solid #3d3729; hyphens:auto; overflow-wrap:break-word; }
+ .table-bench-controls > button[data-table-action=language] { min-width:0; }
+ .table-bench .table-orientation-footer { margin:0; max-width:none; padding:16px 18px 22px; }
+ .table-bench .table-orientation-question { margin-bottom:5px; font-size:13px; line-height:1.35; }
+ .table-bench .table-orientation-door { min-height:44px; padding:7px 18px; font-size:11px; }
+ .table-bench .table-orientation-door-note { margin-top:4px; font-size:8px; line-height:1.4; }
  .table-bench .table-orientation-door-scope { display:none; }
- .table-bench-workspace { gap:15px; }
+
  .table-bench .vt-panel-header { padding:13px 16px 0; }
  .table-bench .vt-kicker { font-size:9px; }
  .table-bench .vt-folio-title { font-size:29px; margin:4px 0; }
  .table-bench .vt-leaf-name { margin-bottom:5px; font-size:16px; }
  .table-bench .vt-provenance { font-size:11px; line-height:1.5; margin-bottom:1px; }
  .table-bench .vt-panel-reading { padding:14px 16px 25px; }
- .table-bench[data-closed=true] .table-bench-viewport { height:330px; }
-}
-
-@media(max-width:759px) {
- .table-bench[data-closed=true]:not([data-material=true]) .table-bench-viewport { height:max(330px,calc(100dvh - 350px)); }
-}
-
-@media(max-width:759px) {
- .table-bench .vt-mirror-detail-grid { grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:12px; }
- .table-bench .vt-mirror-detail-label { font-size:10px; min-height:28px; margin-bottom:5px; }
- .table-bench .vt-mirror-detail { padding-top:10px; }
- .table-bench .vt-mirror-detail h3 { font-size:19px; margin-bottom:8px; }
- .table-bench .vt-mirror-detail-note { font-size:10px; margin-top:7px; }
- .table-bench .table-mirror-note { padding:16px 18px; }
- .table-bench .table-mirror-note h2 { font-size:24px; margin-bottom:12px; }
- .table-bench .table-mirror-note p { font-size:15px; line-height:1.5; margin-bottom:15px; }
-}
-
-/* The catalogue needs its full names and named absence in the reading flow. */
-@media(min-width:760px) {
- .table-bench.table-shelf-shown .table-bench-workspace { grid-template-columns:minmax(0,1fr) 480px; }
- .table-bench.table-shelf-shown .vt-shelf-button { min-height:56px; padding-block:8px; }
-}
-@media(max-width:759px) {
- .table-bench.table-shelf-shown .table-bench-viewport { height:180px; min-height:180px; }
- .table-bench.table-shelf-shown .table-bench-dock { position:static; }
- .table-bench.table-shelf-shown .vinci-table-shelf { margin:0 12px 18px; padding:12px; }
  .table-bench.table-shelf-shown .vt-shelf-button { min-height:48px; padding-block:6px; }
  .table-bench.table-shelf-shown .vt-shelf-name { font-size:14px; }
 }
+
+/* ── the material studies (added inspection states) ─────────────────────── */
+.table-bench[data-material=true] .table-bench-workspace { grid-template-columns:minmax(0,1fr); max-width:880px; margin-inline:auto; }
+.table-bench[data-material=true] .vinci-table-panel { display:none; }
+
+@media (prefers-reduced-motion:reduce) { .table-bench * { scroll-behavior:auto!important; } }

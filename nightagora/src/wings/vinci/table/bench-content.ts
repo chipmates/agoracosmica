@@ -10,6 +10,7 @@ export interface BenchCopy {
   readonly controlsLabel: string
   readonly caption: string
   readonly mirrorCaption: string
+  readonly turnCaption: string
   readonly mirrorSources: string
   readonly materialCaption: string
   readonly materials: Readonly<Record<'oak' | 'leather' | 'linen', string>>
@@ -27,6 +28,7 @@ export const BENCH_CONTENT = {
     controlsLabel: 'Reading controls',
     caption: '1883 FACSIMILE · ORIGINAL MANUSCRIPT: INSTITUT DE FRANCE',
     mirrorCaption: '1883 FACSIMILE · BESIDE IT: MIRRORED READING COPY',
+    turnCaption: 'Under the leaf',
     mirrorSources: 'Sources on mirror writing',
     materialCaption: 'MATERIAL STUDY · MODERN EXHIBITION FITTING',
     materials: { oak: 'oak', leather: 'leather', linen: 'linen' },
@@ -49,6 +51,7 @@ export const BENCH_CONTENT = {
     controlsLabel: 'Steuerung des Lesetischs',
     caption: 'FAKSIMILE VON 1883 · ORIGINALMANUSKRIPT: INSTITUT DE FRANCE',
     mirrorCaption: 'FAKSIMILE VON 1883 · DANEBEN: GESPIEGELTE LESEKOPIE',
+    turnCaption: 'Unter dem Blatt',
     mirrorSources: 'Quellen zur Spiegelschrift',
     materialCaption: 'MATERIALSTUDIE · MODERNE AUSSTATTUNG',
     materials: { oak: 'Eiche', leather: 'Leder', linen: 'Leinen' },
