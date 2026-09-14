@@ -3,6 +3,7 @@
 #
 #   forge/blender/build-object.sh <round-app> <script.py> [--stage model|bake|export|all]
 #                                 [--size 4096] [--samples 96] [--via-eyes PORT]
+#   forge/blender/build-object.sh <round-app> --from-receipt <build.json>
 #
 # What it does, in order:
 #   1. runs the script through Blender headless, with cwd = the round's app,
@@ -21,6 +22,11 @@
 #      wing, naming the script and its hash, the blend, the model and the date.
 #   5. prints the size and the triangle count per tier.
 #
+# --from-receipt skips step 1 and runs steps 2 to 5 against a receipt already
+# on disk. A sandboxed seat bakes through the eyes' /bake, which writes the
+# receipt, and then packs and records with this: the same code path the direct
+# run takes once Blender returns, so the bytes are the same bytes.
+#
 # NO BAKED LIGHT CROSSES. The kit's bake scene has no lamp and no sky in it,
 # the export builds no emissive channel and carries no light atlas, and the
 # occlusion the bake measures travels in the ORM texture, which is where glTF
@@ -35,31 +41,34 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # deeper than the sealed app and a counted path lands outside the tree
 GLTFPACK=${GLTFPACK:-"$HERE/../../../../internal/night-agora/tools/bin/gltfpack"}
 
-APP=""; SCRIPT=""; STAGE="all"; SIZE=""; SAMPLES=""; EYES="${NA_EYES_PORT:-}"
+APP=""; SCRIPT=""; STAGE="all"; SIZE=""; SAMPLES=""; EYES="${NA_EYES_PORT:-}"; GIVEN=""
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --stage) STAGE="${2:-all}"; shift ;;
     --size) SIZE="${2:-}"; shift ;;
     --samples) SAMPLES="${2:-}"; shift ;;
     --via-eyes) EYES="${2:-}"; shift ;;
+    --from-receipt) GIVEN="${2:-}"; shift ;;
     -h|--help) grep '^#' "$0" | sed 's/^#\{1,\} \{0,1\}//'; exit 0 ;;
     *) if [ -z "$APP" ]; then APP="$1"; elif [ -z "$SCRIPT" ]; then SCRIPT="$1";
        else echo "unexpected argument: $1" >&2; exit 2; fi ;;
   esac
   shift
 done
-[ -n "$APP" ] && [ -n "$SCRIPT" ] || { grep '^#' "$0" | sed 's/^#\{1,\} \{0,1\}//'; exit 2; }
+[ -n "$APP" ] && { [ -n "$SCRIPT" ] || [ -n "$GIVEN" ]; } || { grep '^#' "$0" | sed 's/^#\{1,\} \{0,1\}//'; exit 2; }
 APP="$(cd "$APP" && pwd)"
-case "$SCRIPT" in /*) SCRIPT_ABS="$SCRIPT" ;; *) SCRIPT_ABS="$APP/$SCRIPT" ;; esac
-[ -f "$SCRIPT_ABS" ] || { echo "no build script at $SCRIPT_ABS" >&2; exit 2; }
-SCRIPT_REL="${SCRIPT_ABS#"$APP"/}"
+if [ -z "$GIVEN" ]; then
+  case "$SCRIPT" in /*) SCRIPT_ABS="$SCRIPT" ;; *) SCRIPT_ABS="$APP/$SCRIPT" ;; esac
+  [ -f "$SCRIPT_ABS" ] || { echo "no build script at $SCRIPT_ABS" >&2; exit 2; }
+  SCRIPT_REL="${SCRIPT_ABS#"$APP"/}"
 
-ARGS=( --stage "$STAGE" )
-[ -n "$SIZE" ] && ARGS+=( --size "$SIZE" )
-[ -n "$SAMPLES" ] && ARGS+=( --samples "$SAMPLES" )
+  ARGS=( --stage "$STAGE" )
+  [ -n "$SIZE" ] && ARGS+=( --size "$SIZE" )
+  [ -n "$SAMPLES" ] && ARGS+=( --samples "$SAMPLES" )
+fi
 
-# --- 1. Blender, or the call to make instead -------------------------------
-if ! "$BLENDER" --version >/dev/null 2>&1; then
+# --- 1. Blender, or the receipt a bake has already written -----------------
+if [ -z "$GIVEN" ] && ! "$BLENDER" --version >/dev/null 2>&1; then
   ARGJSON="$(printf '"%s",' "${ARGS[@]}" | sed 's/,$//')"
   cat >&2 <<MSG
 Blender does not run here (a sandboxed seat cannot reach Metal). Run it
@@ -70,7 +79,10 @@ cwd = this app:
     -H 'content-type: application/json' \\
     -d '{"script":"$SCRIPT_REL","args":[$ARGJSON],"timeoutSec":2400}'
 
-Then run this script again with --stage export to pack and record.
+Then pack and record what it baked:
+
+  curl -s -X POST http://127.0.0.1:${EYES:-<eyesPort>}/pack \\
+    -H 'content-type: application/json' -d '{"receipt":"<build.json>"}'
 MSG
   exit 3
 fi
@@ -79,16 +91,26 @@ fi
 # written into the repository is the work folder moving into public git
 WORK_ROOT="$(python3 "$HERE/record.py" --work-root "$APP")"
 [ -n "$WORK_ROOT" ] || { echo "no asset store found above $APP" >&2; exit 1; }
-LOG="$WORK_ROOT/logs/build-$(basename "${SCRIPT_ABS%.py}").log"
-mkdir -p "$(dirname "$LOG")"
-echo "blender: $SCRIPT_REL --stage $STAGE (log: $LOG)"
-( cd "$APP" && "$BLENDER" -b --factory-startup --python "$SCRIPT_ABS" -- "${ARGS[@]}" ) 2>&1 | tee "$LOG" | grep -E '^KIT|^Error|^Traceback' || true
-grep -q '^KIT' "$LOG" || { echo "the build script printed nothing the kit recognises; see $LOG" >&2; exit 1; }
 
-RECEIPT="$(grep '^KIT receipt ' "$LOG" | tail -1 | awk '{print $3}')"
-if [ -z "$RECEIPT" ]; then
-  echo "no receipt written (stage $STAGE): nothing to pack or record."
-  exit 0
+if [ -n "$GIVEN" ]; then
+  case "$GIVEN" in
+    /*) RECEIPT="$GIVEN" ;;
+    *) RECEIPT="$APP/$GIVEN"; [ -f "$RECEIPT" ] || RECEIPT="$PWD/$GIVEN" ;;
+  esac
+  [ -f "$RECEIPT" ] || { echo "no receipt at $RECEIPT" >&2; exit 2; }
+  echo "receipt: $RECEIPT (packing and recording only, Blender is not called)"
+else
+  LOG="$WORK_ROOT/logs/build-$(basename "${SCRIPT_ABS%.py}").log"
+  mkdir -p "$(dirname "$LOG")"
+  echo "blender: $SCRIPT_REL --stage $STAGE (log: $LOG)"
+  ( cd "$APP" && "$BLENDER" -b --factory-startup --python "$SCRIPT_ABS" -- "${ARGS[@]}" ) 2>&1 | tee "$LOG" | grep -E '^KIT|^Error|^Traceback' || true
+  grep -q '^KIT' "$LOG" || { echo "the build script printed nothing the kit recognises; see $LOG" >&2; exit 1; }
+
+  RECEIPT="$(grep '^KIT receipt ' "$LOG" | tail -1 | awk '{print $3}')"
+  if [ -z "$RECEIPT" ]; then
+    echo "no receipt written (stage $STAGE): nothing to pack or record."
+    exit 0
+  fi
 fi
 
 # --- 2. the receipt --------------------------------------------------------
