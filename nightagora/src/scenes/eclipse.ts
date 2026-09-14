@@ -807,5 +807,13 @@ export function createEclipse(scene: Scene) {
     corona.scale.setScalar(pulse)
   }
 
-  return { update, wanderers, wandererBase, wandererOpacity: () => uWand.value }
+  return {
+    update,
+    wanderers,
+    wandererBase,
+    wandererOpacity: () => uWand.value,
+    // the page's standing lines reach the field through here, so a star
+    // never sits inside a glyph (core/firmament.ts holds the mask)
+    reservePage: firmament.reserve,
+  }
 }

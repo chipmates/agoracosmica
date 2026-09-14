@@ -58,6 +58,8 @@ import {
   InstancedBufferAttribute,
   PointsNodeMaterial,
   Sprite,
+  Vector2,
+  Vector4,
 } from 'three/webgpu'
 import {
   abs,
@@ -70,12 +72,14 @@ import {
   texture,
   instancedBufferAttribute,
   length,
+  max,
   min,
   mix,
   normalize,
   oneMinus,
   positionView,
   pow,
+  screenUV,
   sin,
   smoothstep,
   uniform,
@@ -130,12 +134,24 @@ export interface FirmamentOptions {
   floor?: number
 }
 
+/** a rectangle of type on the glass, in CSS pixels: its centre and its
+    half extents */
+export interface PageRect {
+  x: number
+  y: number
+  half: number
+  vhalf: number
+}
+
 export interface Firmament {
   /** the whole sky: the instanced field + the meteor trail */
   points: Group
   /** master scales every star (the world's light, 0..1); streak is the
       travel squeeze (0 round stars, 1 full engraving hatch) */
   update(elapsed: number, master: number, streak?: number): void
+  /** the page's standing lines: the field thins inside them, so no star
+      sits inside a glyph or in the masthead's own gap */
+  reserve(rects: PageRect[], width: number, height: number): void
 }
 
 type Vec3Tuple = [number, number, number]
@@ -635,6 +651,18 @@ export function createFirmament(opts: FirmamentOptions): Firmament {
   )
   // 0.76, not 0.95: the field serves the composition. The sky is a
   // choir, never a soloist.
+  // THE PAGE RESERVES ITS PAPER: eight rectangles of type, and the field
+  // gives way inside them. One screen-space product, no branch.
+  const pageExtent: N = uniform(new Vector2(1, 1))
+  const pageRects: N[] = Array.from({ length: 8 }, () =>
+    uniform(new Vector4(-1e4, -1e4, 0, 0))
+  )
+  const pagePx = screenUV.mul(pageExtent)
+  let pageNode: N = float(1)
+  for (const rect of pageRects) {
+    const dd = abs(pagePx.sub(rect.xy)).sub(rect.zw)
+    pageNode = pageNode.mul(smoothstep(0, 9, max(dd.x, dd.y)))
+  }
   mat.opacityNode = kernel
     .add(glint)
     .add(halo)
@@ -643,6 +671,7 @@ export function createFirmament(opts: FirmamentOptions): Firmament {
     .mul(energy)
     .mul(ext)
     .mul(uMaster)
+    .mul(pageNode)
 
   const field = new Sprite(mat)
   field.count = count
@@ -770,5 +799,16 @@ export function createFirmament(opts: FirmamentOptions): Firmament {
     updateMeteor(elapsed, master)
   }
 
-  return { points, update }
+  function reserve(rects: PageRect[], width: number, height: number): void {
+    pageExtent.value.set(width, height)
+    for (let i = 0; i < pageRects.length; i++) {
+      const slot = pageRects[i]
+      if (!slot) continue
+      const r = rects[i]
+      if (r) slot.value.set(r.x, r.y, Math.max(6, r.half), Math.max(6, r.vhalf))
+      else slot.value.set(-1e4, -1e4, 0, 0)
+    }
+  }
+
+  return { points, update, reserve }
 }

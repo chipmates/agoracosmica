@@ -203,6 +203,45 @@ function createLetteringReserve(): Reserve {
   }
 }
 
+/* THE PAGE RESERVES ITS PAPER TOO. The ink reserve above keeps the drawn
+   lines off the seated names; this one keeps the SKY itself off the lines
+   the page sets (the masthead, the plate, the invitation, the way home). A
+   star sitting inside a glyph is the cheapest defect a frame can have, and
+   it costs one screen-space product to never have it. */
+const PAGE_SLOTS = 8
+
+interface PageReserve {
+  node: N
+  update(rects: LabelBounds[], heights: number[], width: number, height: number): void
+}
+
+function createPageReserve(): PageReserve {
+  const extent: N = uniform(new Vector2(1, 1))
+  const rects: N[] = Array.from({ length: PAGE_SLOTS }, () =>
+    uniform(new Vector4(-1e4, -1e4, 0, 0))
+  )
+  const px = screenUV.mul(extent)
+  let node: N = float(1)
+  for (const rect of rects) {
+    const d = abs(px.sub(rect.xy)).sub(rect.zw)
+    node = node.mul(smoothstep(0, 9, max(d.x, d.y)))
+  }
+  return {
+    node,
+    update(list, heights, width, height) {
+      extent.value.set(width, height)
+      for (let i = 0; i < rects.length; i++) {
+        const rect = rects[i]
+        if (!rect) continue
+        const l = list[i]
+        const h = heights[i] ?? 9
+        if (l) rect.value.set(l.x, l.y, Math.max(6, l.half), h)
+        else rect.value.set(-1e4, -1e4, 0, 0)
+      }
+    },
+  }
+}
+
 export interface AtlasHandles {
   /** ease the dome + staging toward the focused chapter */
   update(dt: number, elapsed: number, aspect: number, reveal: number): void
@@ -215,6 +254,8 @@ export interface AtlasHandles {
   stars: AtlasStarRef[]
   /** hand the sky the seated names, so the ink stays off them */
   reserveLabels(labels: LabelBounds[], width: number, height: number): void
+  /** and the lines the page itself sets, so no star sits in a glyph */
+  reservePage(rects: LabelBounds[], heights: number[], width: number, height: number): void
   visible(v: boolean): void
 }
 
@@ -1319,7 +1360,7 @@ interface Choir {
   uGaze: N
 }
 
-function buildChoir(rand: () => number, count: number): Choir {
+function buildChoir(rand: () => number, count: number, page: PageReserve): Choir {
   const heroes = narrow ? 26 : 30
   const band = Math.round(count * 0.31)
   const plain = Math.max(0, count - heroes - band)
@@ -1460,7 +1501,7 @@ function buildChoir(rand: () => number, count: number): Choir {
   const d = uv().sub(vec2(0.5, 0.5))
   const kernel = smoothstep(0.5, 0.05, length(d))
   mat.colorNode = colN.mul(mix(vec3(1, 1, 1), vec3(1.05, 0.94, 0.82), airMass.mul(0.35)))
-  mat.opacityNode = kernel.mul(twinkle).mul(ext).mul(lean).mul(energy).mul(uMaster)
+  mat.opacityNode = kernel.mul(twinkle).mul(ext).mul(lean).mul(energy).mul(uMaster).mul(page.node)
 
   const sprite = new Sprite(mat)
   sprite.count = count
@@ -1559,7 +1600,7 @@ interface CompanionField {
   present(presence: number[]): void
 }
 
-function buildCompanionField(seeds: Companion[]): CompanionField {
+function buildCompanionField(seeds: Companion[], page: PageReserve): CompanionField {
   const n = Math.max(1, seeds.length)
   const pos = new Float32Array(n * 3)
   const size = new Float32Array(n)
@@ -1594,7 +1635,7 @@ function buildCompanionField(seeds: Companion[]): CompanionField {
   const d = uv().sub(vec2(0.5, 0.5))
   const kernel = smoothstep(0.5, 0.05, length(d))
   mat.colorNode = vec3(CHOIR_COOL.r, CHOIR_COOL.g, CHOIR_COOL.b)
-  mat.opacityNode = kernel.mul(dimN).mul(float(1).sub(shimmer.mul(0.34)))
+  mat.opacityNode = kernel.mul(dimN).mul(float(1).sub(shimmer.mul(0.34))).mul(page.node)
 
   const sprite = new Sprite(mat)
   sprite.count = n
@@ -1631,6 +1672,7 @@ export function createAtlas(scene: Scene): AtlasHandles {
   scene.add(dome)
   const rand = mulberry32(FOUNDING_SEED)
   const reserve = createLetteringReserve()
+  const page = createPageReserve()
   const plate = createPlate(reserve)
   dome.add(plate.group)
 
@@ -1639,7 +1681,7 @@ export function createAtlas(scene: Scene): AtlasHandles {
   // a phone sees a much narrower slice of the dome than a desk, so an
   // equal budget is a much emptier frame: the narrow tier keeps almost the
   // whole count and spends it on a smaller sky (round 2)
-  const choir = buildChoir(rand, narrow ? 1450 : 1750)
+  const choir = buildChoir(rand, narrow ? 1450 : 1750, page)
   dome.add(choir.sprite)
 
   /* THE TWO WANDERERS — the sky has a mechanism. Two lights that never
@@ -1810,7 +1852,7 @@ export function createAtlas(scene: Scene): AtlasHandles {
 
   /* one field for every house's lesser stars, seated below the named ones
      so a name always draws over its own gathering */
-  const companions = buildCompanionField(companionSeeds)
+  const companions = buildCompanionField(companionSeeds, page)
   companions.sprite.renderOrder = -1
   dome.add(companions.sprite)
   /** the scale the companions were last seated at */
@@ -1959,6 +2001,9 @@ export function createAtlas(scene: Scene): AtlasHandles {
     reserveLabels(labels, width, height) {
       seatSigns(labels, width, height)
       reserve.update(labels, width, height)
+    },
+    reservePage(rects, heights, width, height) {
+      page.update(rects, heights, width, height)
     },
     visible(v: boolean) {
       dome.visible = v
