@@ -1417,6 +1417,71 @@
       "source_sha1": "d48d1f55fba32e97f7dc2e50dc9dc41459d2ec84",
       "honesty_en": "Public domain work. Reproduction from Wikimedia Commons. The museum labels the reproduction, not the painting. Non-profit cultural use.",
       "honesty_de": "Gemeinfreies Werk. Reproduktion von Wikimedia Commons. Das Museum kennzeichnet die Reproduktion, nicht das Gemälde. Nichtkommerzielle kulturelle Nutzung."
+    },
+    {
+      "id": "lobby/likeness-vinci",
+      "path": "likenesses/vinci/original.jpg",
+      "sha256": "cd35d9cb392f898c53a6528c1c4184d9137e3ac5e02fb4b69cb0eebd92ec62d7",
+      "bytes": 1524313,
+      "width": 1274,
+      "height": 1832,
+      "pixels": 2333968,
+      "slug": "vinci",
+      "name": "Leonardo da Vinci",
+      "wing": "lobby",
+      "class": "Tier 2",
+      "tier": 2,
+      "licence": "This is a faithful photographic reproduction of a two-dimensional, public domain work of art.",
+      "licence_source_url": "https://commons.wikimedia.org/wiki/File:A_portrait_of_Leonardo,_by_Francesco_Melzi.jpg#Licensing",
+      "licence_location": "Commons file page, Licensing",
+      "holder": "Royal Collection, Windsor; RCIN 912726",
+      "maker": "Attributed to Francesco Melzi",
+      "date": "c. 1515–1518",
+      "source_url": "https://commons.wikimedia.org/wiki/File:A_portrait_of_Leonardo,_by_Francesco_Melzi.jpg",
+      "original_url": "https://upload.wikimedia.org/wikipedia/commons/b/b8/A_portrait_of_Leonardo%2C_by_Francesco_Melzi.jpg",
+      "holder_record_url": "https://www.rct.uk/collection/912726/a-portrait-of-leonardo",
+      "display": true,
+      "label_en": "Leonardo da Vinci. Red-chalk portrait attributed to Francesco Melzi, c. 1515–1518. Royal Collection, Windsor, RCIN 912726. Licence: “This is a faithful photographic reproduction of a two-dimensional, public domain work of art.” Public domain work. Reproduction from Wikimedia Commons. The museum labels the reproduction, not the painting. Non-profit cultural use.",
+      "label_de": "Leonardo da Vinci. Rötelporträt, Francesco Melzi zugeschrieben, um 1515–1518. Royal Collection, Windsor, RCIN 912726. Lizenz: „This is a faithful photographic reproduction of a two-dimensional, public domain work of art.“ Gemeinfreies Werk. Reproduktion von Wikimedia Commons. Das Museum kennzeichnet die Reproduktion, nicht das Gemälde. Nichtkommerzielle kulturelle Nutzung.",
+      "previews": [
+        {
+          "path": "likenesses/vinci/preview-512.jpg",
+          "sha256": "8528d8e40cc925027a738cf77910ec0f5ec7a8571f934f50995c8c39a2da2831",
+          "bytes": 49064,
+          "width": 356,
+          "height": 512,
+          "pixels": 182272,
+          "long_edge": 512,
+          "format": "image/jpeg",
+          "quality": 88,
+          "color_space": "sRGB",
+          "source_path": "likenesses/vinci/original.jpg"
+        },
+        {
+          "path": "likenesses/vinci/preview-1024.jpg",
+          "sha256": "e631a0a9aacba715a9cbe9752a3f8483581778177a4e8f51e8a1105383b6e9c2",
+          "bytes": 202896,
+          "width": 712,
+          "height": 1024,
+          "pixels": 729088,
+          "long_edge": 1024,
+          "format": "image/jpeg",
+          "quality": 88,
+          "color_space": "sRGB",
+          "source_path": "likenesses/vinci/original.jpg"
+        }
+      ],
+      "verified_on": "2026-09-14",
+      "source_verification": "Current Commons imageinfo, original link, licence template and file history checked. Royal Collection object page and collection story both return HTTP 403 in this pass. Current Commons source metadata retain Royal Collection RCIN 912726, attribution to Francesco Melzi, circa 1515-1518; earlier cross-check holder verification retained.",
+      "derivation": "No embedded ICC profile. Source interpreted as sRGB. JPEG previews resized with Lanczos, quality 88, embedded sRGB profile. Original bytes unchanged.",
+      "rights_note": "Royal Collection’s collection story explicitly identifies this drawing as attributed to Melzi, c. 1515–18, RCIN912726. Object page’s dynamic body was inaccessible; story caption supplies holder evidence. Preserve attribution. No Royal Collection reproduction release claimed.",
+      "source_version": {
+        "file_timestamp": "2019-05-02T13:23:02Z",
+        "commons_revision_id": 1003565112
+      },
+      "source_sha1": "b753715ec2c401adcadd2b089787db38b9667b88",
+      "honesty_en": "Public domain work. Reproduction from Wikimedia Commons. The museum labels the reproduction, not the painting. Non-profit cultural use.",
+      "honesty_de": "Gemeinfreies Werk. Reproduktion von Wikimedia Commons. Das Museum kennzeichnet die Reproduktion, nicht das Gemälde. Nichtkommerzielle kulturelle Nutzung."
     }
   ]
 }
