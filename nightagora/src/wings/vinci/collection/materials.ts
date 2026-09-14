@@ -257,8 +257,13 @@ const COURT_STONE: CourtRecipe = {
 const COURT_RECIPES: Record<string, CourtRecipe> = {
   // Sealed flax over the ribs. The bench tints the cloth itself, so what
   // this recipe carries is the drape, the tooth and how dull the flax is.
+  // THE CLOTH IS DULL BECAUSE THE FRAME SAYS SO. This canopy is the one
+  // surface on this ground that stands against the open sky, and the whole
+  // walk sees it. A cloth roughness low enough to hold a lobe put a clipped
+  // white ridge down it, which no resolve can anti-alias: an edge between a
+  // saturated pixel and a dark one has no gradient left to sample.
   linen: {
-    albedo: '#c4b89c', variation: '#9e9076', roughness: .70, metalness: 0, cls: 'cloth',
+    albedo: '#c4b89c', variation: '#9e9076', roughness: .93, metalness: 0, cls: 'cloth',
     scales: [1.5, 0, .008], normalStrength: .6, falloff: .7, macroContrast: .45, micro: .5,
     grain: { kind: 'ridges', pitch: .2, angle: 0, relief: .6, shade: .55, sheen: .06, fold: .46, tooth: .012 },
   },
