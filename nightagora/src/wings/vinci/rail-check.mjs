@@ -49,6 +49,7 @@ const {vinciContent}=await load(path.join(wing,'content.ts'))
 const ids=vinciContent.map(s=>s.id),STEP=DURATION/224
 const {createRailGeometryAuthority,collectRailSolids}=await load(path.join(wing,'rail-proof.ts'))
 const {gradeAt}=await load(path.join(wing,'terrain-mesh.ts'))
+const {createCollectionStandSolids}=await load(path.join(wing,'collection/stands.ts'))
 const authorityFactories=[
   ['shell','shell','createShell',false],['terrain','ground','createGround',false],
   ['gate-passage','gate-passage','createGatePassage',false],
@@ -71,6 +72,9 @@ for(const tier of ['standard','calm']) {
   const waterModule=await load(path.join(wing,'water.ts'))
   const water=waterModule.createWater(new THREE.Scene(),{tierName:()=>tier,reflector:()=>({node:TSL.vec4(0,0,0,1),dispose(){}})})
   water.traverse(object=>{if(object.isMesh&&typeof object.userData.manifestId!=='string')object.userData.manifestId='vinci/water'})
+  // The exhibits' plinths and bases are mounted before the runtime hashes the
+  // scene, so the collision identity here has to carry them too.
+  scene.add(createCollectionStandSolids(new THREE.MeshBasicMaterial()))
   scene.add(water);factoryGroups.push(scene)
   const start=performance.now(),authority=createRailGeometryAuthority(collectRailSolids(scene))
   await authority.ready

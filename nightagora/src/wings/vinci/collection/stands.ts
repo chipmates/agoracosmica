@@ -8,8 +8,10 @@
  * Every number here is a modern exhibition-design choice. The machines'
  * own sizes come from their dossiers and are not restated.
  */
+import type { Material, Mesh } from 'three/webgpu'
 import { dossiers, type MachineSlug } from '../machines/catalog'
 import { mountBoxes } from '../machines/bench/mounts'
+import { RoomBatch } from './build'
 import { COURT, FLOOR } from './layout'
 
 /** The three walking levels a machine can stand on. */
@@ -179,4 +181,20 @@ export function parachuteCloth(): { corners: [number, number, number][]; top: [n
   }
   const feet: [number, number][] = [[-1, -1], [1, -1], [1, 1], [-1, 1]]
   return { corners: feet.map(foot => corner(foot[0], foot[1])), top: [stand.east, stand.north, level + apex] }
+}
+
+/** The one mesh name the rail's collision list and the runtime both read. */
+export const STAND_SOLIDS_NAME = 'vinci/collection-rooms/plinths'
+
+/** THE PLINTHS AND BASES AS ONE FIXED BODY. The clearance certificate hashes
+ * this geometry and the offline certifier builds it from this same function,
+ * so the exhibition's own furniture cannot move on one side only.
+ */
+export function createCollectionStandSolids(material: Material): Mesh {
+  const batch = new RoomBatch()
+  for (const box of standBoxes()) batch.box(box.east, box.north, box.height, box.width, box.depth, box.tall, box.role)
+  const { corners, top } = parachuteCloth()
+  for (let i = 0; i < 4; i++) batch.quad(corners[i]!, corners[(i + 1) % 4]!, top, top, 2)
+  batch.quad(corners[0]!, corners[1]!, corners[2]!, corners[3]!, 2)
+  return batch.mesh(STAND_SOLIDS_NAME, material)
 }

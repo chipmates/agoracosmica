@@ -49,7 +49,7 @@
       "prompt": "Conjectural atmospheric sky at the exact computed 1517 sun vector: turbidity4, Rayleigh1.4, cloudScale0.0006, cloudCoverage0.28, cloudDensity0.42, cloudElevation0.35, cloudSpeed0. No weather observation survives; cloud shader parameters are scenic choices, not measured altitude. Displayed horizon colour continues the FogExp2 asymptote at assumed density0.0075/m [0.0075–0.015/m] with an assumed effective column18m [12–24m] and clear elevation12deg [10–16deg]; no terrain extrapolation. Source src/wings/vinci/display-sky-haze.ts. The environment probe rotation is separately corrected to Euler Y=-pi/2 in index.ts to match the actual computed solar azimuth; display haze never enters its radiance. A thin streaked high cloud veil is added above ten degrees of elevation, four-octave fractal noise stretched 3.1/11/2.4 on the view ray, peaking near forty degrees and fading at the zenith and the horizon, mixed to a pale grey at 30 per cent. Assumed weather, no observation claimed.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "a6ff15922acf465e6d7a38b1c263e3b3c570615a23119ce30e65def31b2b0b55",
+      "sha256": "a7f7fbd74bbb2ebc42812ad263414b6a441cf1395637902dde4838ae11966b63",
       "note": "brief/SITE-HOUR.md; three.js SkyMesh MIT; recipe_file=src/wings/vinci/index.ts displayed_haze_recipe=src/wings/vinci/display-sky-haze.ts; sky_display_only=true; fog_density=0.0075; fog_density_assumed_range=0.0075..0.015; environmentRotation_y_rad=-1.5707963267948966; displayed_haze_sha256=80c458f2cb5ccddb7fcedccda5df70e5cdccda7d9ca97d65ebfa6462920f61ef;"
     },
     {
@@ -244,8 +244,8 @@
       "prompt": "Rooms of the modern collection ground inside the existing pavilion envelope: a stone floor finish on the 1.60 by 1.65 m grid the timeline is laid on, lined walls with a dark stone base and bay ribs, a flat plaster soffit coffered on the structure's four-metre bay with a light cove at the hanging wall, dressed reveals at the four doors the rail walks through, a clerestory light shelf in the hall, and outside a terrace with its parapet and retaining faces carrying the grave, the parachute and the freestanding display wall whose field is 880 by 460 cm. Interior daylight is a per-opening sky-visibility term on the ambient channel only. No texture asset, no reference image sampled, no period claim.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-11",
-      "sha256": "5b02f483160478331ea47f8b58366471ab6530d249ff2cd90a3aadf013b01f0c",
-      "note": "Modern museum insertion, rooms only; no 1517 claim. recipe_file=src/wings/vinci/collection/rooms.ts"
+      "sha256": "9e1cb1d22ff9599e226a0baffc8cc4a055fabab85f0a0da57837427e13f8c58e",
+      "note": "Modern museum insertion, rooms only; no 1517 claim. recipe_file=src/wings/vinci/collection/rooms.ts; companion_file=src/wings/vinci/collection/stands.ts"
     },
     {
       "id": "vinci/inner-court",
@@ -413,7 +413,7 @@
       "prompt": "Regenerable actual geometry certificate for40 directed routes across five pose families and two viewport families. Includes foundation, entry, vegetation and all dressing; no sky, DOM or shadow-only duplicate.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-10",
-      "sha256": "12fd865c27642fbbb5864e731f553163d22b66fa6495164e1db3ce8073e38ce4",
+      "sha256": "e5203e35b5b0e7c8b197484bdfe5e57736a36b1ff0140cdbc04cfe259b03d34c",
       "note": "recipe_file=src/wings/vinci/data/rail-clearance.json; source_generator=src/wings/vinci/rail-certify.mjs; runtime dependency of vinci/rail"
     },
     {
@@ -439,7 +439,7 @@
       "prompt": "The turns a route takes between two stations, written against the registered gate crossing, the access stair layout and the collection stair.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-11",
-      "sha256": "94a02551f59abc8eec4b75860902582ae3a0344e3b290e07dd24417c7df94e69",
+      "sha256": "fa92218a24f700d24012764ead6b16d48917533e3a935d923c1267a837437295",
       "note": "recipe_file=src/wings/vinci/rail-waypoints.ts; source_generator=src/wings/vinci/rail-certify.mjs; runtime dependency of vinci/rail"
     },
     {
@@ -452,7 +452,7 @@
       "prompt": "The one list of manifest ids the rail is certified against, read by both the offline certifier and the runtime authority.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-11",
-      "sha256": "68d3ffa1d445cc9034a380d018c6c3bd2ec7a4b382ed9dd32ff1c9cae6b6d8b3",
+      "sha256": "bb5b92cfbb82b4d908744990c62f26101bdca04d6f4432515be0af8ec8ac419d",
       "note": "recipe_file=src/wings/vinci/rail-solids.ts; source_generator=src/wings/vinci/rail-certify.mjs; runtime dependency of vinci/rail"
     },
     {

@@ -16,10 +16,10 @@ import { buildTable, type PageRecord } from '../table'
 import { loadManifest } from '../../../manifest'
 import pageMap from '../table/data/msb-pages.json?raw'
 import { lang } from '../../content'
-import { RoomBatch, stamp } from './build'
+import { stamp } from './build'
 import { collectionExhibitMaterials, collectionInteriorMaterial, collectionProceduralStack } from './materials'
 import { COURT, FLOOR, GRAVE_ORIGIN, LINE_ORIGIN } from './layout'
-import { parachuteCloth, standBoxes, standLevel, STANDS, type StandGround } from './stands'
+import { createCollectionStandSolids, standLevel, STANDS, type StandGround } from './stands'
 import { mountCollectionPlates, type CollectionPictureSource } from './plates'
 
 /** Which ground each machine is built with, and when. The court's own
@@ -44,7 +44,6 @@ export interface CollectionExhibits {
 
 export function mountCollectionExhibits(host: Group, stack: Stack): CollectionExhibits {
   const machines: { build: ReadyMachineBuild; slug: MachineSlug; ground: StandGround; at: Vector3 }[] = []
-  const plinths = new RoomBatch()
   const material = collectionInteriorMaterial()
   const pictures = mountCollectionPlates(host, stack)
   let live = true
@@ -56,16 +55,10 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
   // this ground, so it is built at once and dressed from this module's own
   // recipe rather than from the library the page has already spent.
   const courtStack = collectionProceduralStack(stack)
-  // THE PLINTHS AND BASES ARE ONE FIXED BODY. The rail's clearance
-  // certificate hashes this geometry, so it is complete before the first
-  // frame and never waits for a machine to finish loading.
-  for (const box of standBoxes()) plinths.box(box.east, box.north, box.height, box.width, box.depth, box.tall, box.role)
-  {
-    const { corners, top } = parachuteCloth()
-    for (let i = 0; i < 4; i++) plinths.quad(corners[i]!, corners[(i + 1) % 4]!, top, top, 2)
-    plinths.quad(corners[0]!, corners[1]!, corners[2]!, corners[3]!, 2)
-  }
-  const plinthMesh = plinths.mesh('vinci/collection-rooms/plinths', material)
+  // THE PLINTHS AND BASES ARE ONE FIXED BODY, built from the same function
+  // the clearance certificate is written against: it is complete before the
+  // first frame and never waits for a machine to finish loading.
+  const plinthMesh = createCollectionStandSolids(material)
   host.add(plinthMesh)
 
   /** The library's budget belongs to the whole page, and this wing arrives at

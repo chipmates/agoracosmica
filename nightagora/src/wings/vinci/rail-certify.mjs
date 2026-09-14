@@ -90,6 +90,10 @@ const { createCertifiedRailPath, railNearRectangleRadius } = await load(path.joi
 const { fittedRailFov } = await load(path.join(WING, 'rail-projection.ts'))
 const { gaitEnvelopeM } = await load(path.join(WING, 'gait.ts'))
 const { railSide, railWaypointsBetween, railGateWaypoints, railTerraceWaypoints } = await load(path.join(WING, 'rail-waypoints.ts'))
+const { railExhibitStands, railExhibitLevel } = await load(path.join(WING, 'rail-solids.ts'))
+const { createCollectionStandSolids } = await load(path.join(WING, 'collection/stands.ts'))
+const { geometryForPart } = await load(path.join(WING, 'machines/geometry.ts'))
+const { jointValuesAt } = await load(path.join(WING, 'machines/motion.ts'))
 const { gradeAt } = await load(path.join(WING, 'terrain-mesh.ts'))
 
 /* ---- the mounted geometry, at every tier ---- */
@@ -118,16 +122,62 @@ async function mount(tier) {
   })
   water.traverse(object => { if (object.isMesh && typeof object.userData.manifestId !== 'string') object.userData.manifestId = 'vinci/water' })
   scene.add(water)
+  // The plinths and bases under the exhibits, from the runtime's own factory.
+  scene.add(createCollectionStandSolids(new THREE.MeshBasicMaterial()))
   return scene
 }
 
-const geometry = [], solidSets = []
+/* ---- every machine in the pose its schedule holds at t=0 ---- */
+
+/** A machine is not a mounted mesh when the runtime hashes the scene: it
+ * arrives as the visitor walks up to it. Its REST geometry is a solid all the
+ * same, and the walk is proved against it here. Any joint value away from
+ * zero at t=0 is refused rather than silently ignored. */
+function restPoseSolids(tier) {
+  const meshes = []
+  for (const slug of Object.keys(railExhibitStands)) {
+    const dossier = JSON.parse(read(path.join(WING, `machines/data/${slug}.json`)))
+    for (const [joint, value] of Object.entries(jointValuesAt(slug, 0))) {
+      if (Math.abs(value) > 1e-12) throw new Error(`${slug}: joint ${joint} is not at rest at t=0`)
+    }
+    const stand = railExhibitStands[slug]
+    const root = new THREE.Group()
+    root.rotation.y = stand.bearing * Math.PI / 180
+    root.position.set(stand.east, railExhibitLevel(stand.ground) + stand.plinth - (dossier.frame.ground_y_m ?? 0), -stand.north)
+    const nodes = new Map([['world', root], ['root', root]])
+    const pending = [...dossier.parts]
+    const built = new Set()
+    let guard = 0
+    while (pending.length && guard++ < 20000) {
+      const part = pending.shift()
+      if (part.parent && !nodes.has(part.parent) && dossier.parts.some(other => other.id === part.parent) && !built.has(part.parent)) { pending.push(part); continue }
+      const group = new THREE.Group()
+      group.position.fromArray(part.position_m)
+      group.rotation.set(part.orientation_rad[0] ?? 0, part.orientation_rad[1] ?? 0, part.orientation_rad[2] ?? 0)
+      ;(nodes.get(part.parent) ?? root).add(group)
+      nodes.set(part.id, group)
+      built.add(part.id)
+      const mesh = new THREE.Mesh(geometryForPart(part, tier, slug))
+      mesh.name = `vinci/${slug}/${part.id}`
+      mesh.userData.manifestId = `vinci/machine/${slug}`
+      group.add(mesh)
+      meshes.push(mesh)
+    }
+    if (pending.length) throw new Error(`${slug}: unresolved parent for ${pending.map(part => part.id).join(', ')}`)
+    root.updateMatrixWorld(true)
+  }
+  return meshes
+}
+
+const geometry = [], solidSets = [], restSets = []
 for (const tier of ['hero', 'standard', 'calm']) {
   const scene = await mount(tier)
   const solids = collectRailSolids(scene)
   const sha256 = await railGeometryFingerprint(solids)
   geometry.push({ tier, sha256, quantumM: QUANTUM_M, matchingGeometryToleranceM: GEOMETRY_TOLERANCE_M })
   solidSets.push({ tier, solids })
+  // The rest poses stand outside the fingerprint and inside the clearance.
+  restSets.push({ tier: `rest-${tier}`, solids: restPoseSolids(tier) })
 }
 const geometrySha256 = [...new Set(geometry.map(entry => entry.sha256))]
 
@@ -218,7 +268,7 @@ function segmentTriangleDistanceSq(start, end, a, b, c) {
   return Math.min(distance, segmentDistanceSq(start, end, a, b), segmentDistanceSq(start, end, b, c), segmentDistanceSq(start, end, c, a))
 }
 
-const index = makeIndex(trianglesOf(solidSets), 1)
+const index = makeIndex(trianglesOf([...solidSets, ...restSets]), 1)
 
 /** The closest triangle to a point, stopping at a limit. */
 function ballClearance(centre, limit) {
@@ -404,10 +454,11 @@ const certificate = {
   geometrySha256,
   geometry,
   coordinateFrame: 'points ENH; poses and balls Three XYZ',
-  scope: 'Actual mounted foundation-bearing shell, gate passage, inner court, collection, collection access, entry passage, whole ground, water, vegetation and every spatially partitioned road/ground dressing triangle. Union of every tier; a tier is accepted by equal actual geometry fingerprint.',
+  scope: 'Actual mounted foundation-bearing shell, gate passage, inner court, collection, collection access, entry passage, whole ground, water, vegetation, every spatially partitioned road/ground dressing triangle, the fixed plinths and bases under the exhibits, and every machine in the pose its own schedule holds at t=0. Union of every tier; a tier is accepted by equal actual geometry fingerprint.',
   limits: [
     'No eyes, renderer, shader or browser input test. This certificate is regenerated against actual currently mounted factory geometry.',
     'DOM plates, atmosphere and shadow-only caster copies are excluded; all actual visible mesh solids including leaves and dressing are included.',
+    'Every machine stands in its rest pose for the whole walk, and its actual rest geometry at every tier is proved against every route and every station envelope here. A machine is built as the visitor walks up to it, so it is not a mounted mesh when the runtime hashes the scene and is not part of the geometry fingerprint; the placement table it is certified from is hashed in the sources above.',
     `The ${NEAR_M} m near distance, both authored viewport aspect ratios and the authored endpoint FOV are used. The authored aspect gives the largest near rectangle, so a wider or narrower canvas is inside it.`,
     `Every straight span of the finished path is proved end to end by exact segment/triangle distance; every rounded corner is proved by closed balls over its control hull, and those balls are what the runtime replays. Stored balls reserve ${BALL_RESERVE_M * 1e6} µm beyond the requested radius; runtime matching of quantized geometry consumes at most ${GEOMETRY_TOLERANCE_M * 1e6} µm of it.`,
     `The walk carries a step rhythm of at most ${(gaitEnvelopeM * 1000).toFixed(2)} mm off the certified line, and that envelope is added to the clearance radius every span and every corner above is proved against.`,

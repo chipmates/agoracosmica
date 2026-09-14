@@ -337,6 +337,7 @@ await section('actual geometry buffers at all tiers', () => {
 
 await section('actual camera rail against actual triangles', async () => {
   const { createRailGeometryAuthority, collectRailSolids } = await load(`${WING}/rail-proof.ts`);
+  const { createCollectionStandSolids } = await load(`${WING}/collection/stands.ts`);
   const ids = json('src/wings/vinci/data/doors.json').doors.map(door => door.station);
   if (ids.length !== 19 || new Set(ids).size !== 19) throw new Error('Expected nineteen unique canonical station IDs.');
   const paths = [], poses = [], violations = [], collisionGeometry = [], MAX_VIOLATIONS = 80;
@@ -352,7 +353,10 @@ await section('actual camera rail against actual triangles', async () => {
     if (!retaining?.isMesh) throw new Error('Actual ground factory is missing its retaining-wall/stair-riser collision batch.');
     const collectionRetaining = geometry.ground.getObjectByName('wing-vinci/collectionRetaining');
     if (!collectionRetaining?.isMesh) throw new Error('Actual ground factory is missing its modern collection retaining/cut-wall collision batch.');
-    const architecture = [geometry.shell, geometry.gatePassage, geometry.innerCourt, geometry.collection, geometry.collectionAccess, geometry.entryPassage, geometry.vegetation, geometry.roadDressing, geometry.groundDressing, retaining, collectionRetaining];
+    // The exhibits' plinths and bases are mounted before the runtime hashes
+    // the scene, so this identity and this clearance carry them too.
+    const standSolids = createCollectionStandSolids(new THREE.MeshBasicMaterial());
+    const architecture = [geometry.shell, geometry.gatePassage, geometry.innerCourt, geometry.collection, geometry.collectionAccess, geometry.entryPassage, geometry.vegetation, geometry.roadDressing, geometry.groundDressing, retaining, collectionRetaining, standSolids];
     for (const group of architecture) group.traverse(object => { if (object.isMesh) for (const material of Array.isArray(object.material) ? object.material : [object.material]) material.side = THREE.DoubleSide; });
     const shellIndex = makeIndex(trianglesOf(architecture), 3, 1);
     // THE GROUND IS THE GROUND. A roof over the walk is not a floor under it:
@@ -375,6 +379,7 @@ await section('actual camera rail against actual triangles', async () => {
       group.traverse(object => { if (object.isMesh && typeof object.userData.manifestId !== 'string') object.userData.manifestId = `vinci/${name}`; });
       collisionScene.add(group);
     }
+    collisionScene.add(standSolids);
     const authority = createRailGeometryAuthority(collectRailSolids(collisionScene));
     await authority.ready;
     if (authority.status !== 'verified') throw new Error(authority.failure);
