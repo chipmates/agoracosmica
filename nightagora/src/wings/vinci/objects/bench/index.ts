@@ -27,6 +27,7 @@ import {
   Group,
   Mesh,
   MeshStandardNodeMaterial,
+  type DirectionalLight,
   PerspectiveCamera,
   Scene,
   Vector3,
@@ -227,9 +228,38 @@ export function createObjectBench(stack: Stack): BenchModule {
     camera.updateMatrixWorld(true)
   }
 
+  /* A HAND OBJECT NEEDS A SHADOW CAMERA A HAND OBJECT'S SIZE. The museum's
+     key is built for a room: one cascade over fifty metres of ground puts a
+     jug inside a single shadow texel, and a body with no contact shadow reads
+     as floating, which is the one defect this bench exists to catch. So a
+     body lent by the open collection gets the cascades and the bias fitted to
+     its own measured size. A body the museum BUILT keeps the numbers its own
+     frames were judged under, untouched. */
+  function librarySpan(): number {
+    if (!body || piece?.anchorClass !== 'CC0') return 0
+    const size = bounds.getSize(new Vector3())
+    return Math.max(size.x, size.y, size.z)
+  }
+
+  function tighten(span: number): void {
+    scene.traverse((child: Object3D) => {
+      const l = child as unknown as DirectionalLight
+      if (!l.isDirectionalLight || !l.castShadow) return
+      const distance = l.position.length()
+      l.shadow.camera.near = Math.max(0.02, distance - span * 6)
+      l.shadow.camera.far = distance + span * 6
+      l.shadow.bias = 0
+      l.shadow.normalBias = Math.max(0.0003, span * 0.005)
+      l.shadow.camera.updateProjectionMatrix()
+      l.shadow.needsUpdate = true
+    })
+  }
+
   function lighting(): void {
     if (!piece) return
     const hour = piece.hour
+    const span = librarySpan()
+    const reach = span ? Math.min(68, Math.max(2.5, span * 5)) : 68
     key = stack.light({
       azimuth: hour.azimuth,
       elevation: hour.elevation,
@@ -239,10 +269,11 @@ export function createObjectBench(stack: Stack): BenchModule {
       /* a twelve metre body under a seventeen degree sun throws its shadow
          forty metres: a nearer cascade cuts it off in a straight line across
          the ground, which reads as a second building nobody built */
-      reach: 68,
-      cascades: [24, 52],
+      reach,
+      cascades: span ? [Math.max(0.4, span * 1.6), reach] : [24, 52],
       probe,
     })
+    if (span) tighten(span)
     key.fill.color.set('#b9bec0')
     key.fill.groundColor.set('#6d6349')
     key.fill.intensity = 0.34
@@ -272,7 +303,7 @@ export function createObjectBench(stack: Stack): BenchModule {
     note.id = 'ob-label'
     note.dataset['naClaim'] = piece?.certainty ?? 'inferred'
     note.dataset['naAnchor'] = piece ? piece.tiers[stack.tierName()] : ''
-    note.dataset['naAnchorClass'] = 'GENERATED'
+    note.dataset['naAnchorClass'] = piece?.anchorClass ?? 'GENERATED'
     host.append(note)
 
     drawer = node('aside', 'ob-drawer')
@@ -321,7 +352,7 @@ export function createObjectBench(stack: Stack): BenchModule {
     claim.setAttribute('aria-controls', 'ob-label')
     claim.dataset['naClaim'] = piece?.certainty ?? 'inferred'
     claim.dataset['naAnchor'] = piece ? piece.tiers[stack.tierName()] : ''
-    claim.dataset['naAnchorClass'] = 'GENERATED'
+    claim.dataset['naAnchorClass'] = piece?.anchorClass ?? 'GENERATED'
     claim.dataset['naPersistent'] = ''
     claim.onclick = () => {
       labelMode = labelMode === 2 ? 1 : 2
@@ -449,7 +480,7 @@ export function createObjectBench(stack: Stack): BenchModule {
       await stand(next)
       if (ticket !== serial) return
       entries = [
-        ...Object.values(next.tiers).flatMap((id) => {
+        ...[...new Set(Object.values(next.tiers))].flatMap((id) => {
           const entry = manifest.byId.get(id)
           return entry ? [entry] : []
         }),
