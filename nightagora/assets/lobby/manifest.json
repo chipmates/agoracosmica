@@ -183,8 +183,8 @@
       "original_url": "https://api.nga.gov/iiif/c2f5103b-93db-454d-93be-c9fa921492bc/full/full/0/default.jpg",
       "holder_record_url": "https://www.nga.gov/artworks/208126-william-blake",
       "display": true,
-      "label_en": "William Blake. Luigi Schiavonetti after Thomas Phillips, 1808; published 1813. Etching, proof. Courtesy National Gallery of Art, Washington. Ailsa Mellon Bruce Fund, 2016.175.7. Licence: “This object’s media is free and in the public domain.”",
-      "label_de": "William Blake. Luigi Schiavonetti nach Thomas Phillips, 1808; veröffentlicht 1813. Radierung, Probedruck. Courtesy National Gallery of Art, Washington. Ailsa Mellon Bruce Fund, 2016.175.7. Lizenz: „This object’s media is free and in the public domain.“",
+      "label_en": "William Blake. Luigi Schiavonetti after Thomas Phillips, 1808; published 1813. Etching, proof. Courtesy National Gallery of Art, Washington. Ailsa Mellon Bruce Fund. Licence: “This object’s media is free and in the public domain.”",
+      "label_de": "William Blake. Luigi Schiavonetti nach Thomas Phillips, 1808; veröffentlicht 1813. Radierung, Probedruck. Courtesy National Gallery of Art, Washington. Ailsa Mellon Bruce Fund. Lizenz: „This object’s media is free and in the public domain.“",
       "previews": [
         {
           "path": "likenesses/blake/preview-512.jpg",
@@ -374,8 +374,8 @@
       "original_url": "https://upload.wikimedia.org/wikipedia/commons/f/fc/MET_DP123364.jpg",
       "holder_record_url": "https://www.metmuseum.org/art/collection/search/72381",
       "display": true,
-      "label_en": "Siddhartha Gautama, traditionally c. 563–483 BCE. Seated Buddha (Shakyamuni), unknown Gandharan artist, 1st to mid-2nd century CE. An early devotional image made centuries after his life. The Metropolitan Museum of Art, 2003.593.1. This file is made available under the Creative Commons CC0 1.0 Universal Public Domain Dedication.",
-      "label_de": "Siddhartha Gautama, traditionell um 563–483 v. Chr. Sitzender Buddha (Shakyamuni), unbekannter Künstler aus Gandhara, 1. bis Mitte 2. Jahrhundert n. Chr. Frühes Andachtsbild, Jahrhunderte nach seinem Leben geschaffen. The Metropolitan Museum of Art, 2003.593.1. This file is made available under the Creative Commons CC0 1.0 Universal Public Domain Dedication.",
+      "label_en": "Siddhartha Gautama, traditionally c. 563–483 BCE. Seated Buddha (Shakyamuni), unknown Gandharan artist, 1st to mid-2nd century CE. An early devotional image made centuries after his life. The Metropolitan Museum of Art. This file is made available under the Creative Commons CC0 1.0 Universal Public Domain Dedication.",
+      "label_de": "Siddhartha Gautama, traditionell um 563–483 v. Chr. Sitzender Buddha (Shakyamuni), unbekannter Künstler aus Gandhara, 1. bis Mitte 2. Jahrhundert n. Chr. Frühes Andachtsbild, Jahrhunderte nach seinem Leben geschaffen. The Metropolitan Museum of Art. This file is made available under the Creative Commons CC0 1.0 Universal Public Domain Dedication.",
       "previews": [
         {
           "path": "likenesses/gautama/preview-512.jpg",
@@ -655,8 +655,8 @@
       "original_url": "https://upload.wikimedia.org/wikipedia/commons/4/4f/MET_DP156671.jpg",
       "holder_record_url": "https://www.metmuseum.org/art/collection/search/39488",
       "display": true,
-      "label_en": "Laozi (traditionally 6th century BCE), as a Daoist immortal. Chen Yanqing, 1438, gilt copper alloy. A traditional image made long after Laozi’s presumed lifetime. The Metropolitan Museum of Art, 1997.139. This file is made available under the Creative Commons CC0 1.0 Universal Public Domain Dedication.",
-      "label_de": "Laozi (traditionell 6. Jahrhundert v. Chr.) als daoistischer Unsterblicher. Chen Yanqing, 1438, vergoldete Kupferlegierung. Traditionelle Darstellung, lange nach Laozis vermuteter Lebenszeit entstanden. The Metropolitan Museum of Art, 1997.139. This file is made available under the Creative Commons CC0 1.0 Universal Public Domain Dedication.",
+      "label_en": "Laozi (traditionally 6th century BCE), as a Daoist immortal. Chen Yanqing, 1438, gilt copper alloy. A traditional image made long after Laozi’s presumed lifetime. The Metropolitan Museum of Art. This file is made available under the Creative Commons CC0 1.0 Universal Public Domain Dedication.",
+      "label_de": "Laozi (traditionell 6. Jahrhundert v. Chr.) als daoistischer Unsterblicher. Chen Yanqing, 1438, vergoldete Kupferlegierung. Traditionelle Darstellung, lange nach Laozis vermuteter Lebenszeit entstanden. The Metropolitan Museum of Art. This file is made available under the Creative Commons CC0 1.0 Universal Public Domain Dedication.",
       "previews": [
         {
           "path": "likenesses/laozi/preview-512.jpg",
