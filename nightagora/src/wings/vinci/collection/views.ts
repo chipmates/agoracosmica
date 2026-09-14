@@ -17,7 +17,7 @@ const EYE = FLOOR + 1.62
 function lineFloorView(north: number, narrow: boolean, early: boolean): RoomPose {
   const eye = world(LINE_ORIGIN.east + .3, north + (early ? .7 : 1.4), FLOOR + 1.66)
   const heading = (narrow ? (early ? -51 : -30) : (early ? -30 : -14)) * Math.PI / 180
-  const descent = (narrow ? (early ? 75 : 64) : (early ? 61 : 51)) * Math.PI / 180
+  const descent = (narrow ? (early ? 70 : 64) : (early ? 61 : 51)) * Math.PI / 180
   const direction = new Vector3(Math.sin(heading) * Math.cos(descent), -Math.sin(descent), Math.cos(heading) * Math.cos(descent))
   return { eye, at: eye.clone().add(direction), fov: narrow ? 100 : early ? 70 : 64 }
 }
