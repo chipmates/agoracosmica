@@ -71,6 +71,11 @@ const WALK_MS = 10000
     is the cap, not the wait. */
 const STATION_MS = 25000
 const CONE_DIR = 'gates-cones'
+/** a frame named for a corner of the look cone. The rig's own naming is
+    `<viewport>-<tier>-<station>-c1..c4`; this is the OTHER spelling, the one
+    a spec uses to say which corners a packet owes. A packet holding both is
+    holding one station's corners twice. */
+const CORNER_SPELLING = /-cone-(?:ul|ur|dl|dr)\.png$/i
 /** no offline checker of a wing may hold the gate run longer than this */
 const CHECKER_MS = 300000
 
@@ -334,7 +339,25 @@ async function cones(browser, ids) {
   }
   await page.close()
   const expected = plan.reduce((n, s) => n + s.corners, 0)
-  return { shot, expected, states: plan.map((s) => s.key), cone: DEFAULT_CONE, dir: `forge/shots/${CONE_DIR}`, missing }
+  /* THE PACKET IS NOT THIS RIG'S TO FILL. `final/` is the judge's set and
+     the finalize path writes it; the gates' corners are their own
+     measurement under their own name in their own folder. A packet that
+     holds corners under a SECOND spelling holds two sets for one station,
+     so the count is read here rather than found by a hand moving frames
+     aside on the night of a judging. */
+  const packetDir = join(APP_ROOT, 'forge', 'shots', 'final')
+  const spelled = existsSync(packetDir)
+    ? readdirSync(packetDir).filter((f) => CORNER_SPELLING.test(f))
+    : []
+  return {
+    shot,
+    expected,
+    states: plan.map((s) => s.key),
+    cone: DEFAULT_CONE,
+    dir: `forge/shots/${CONE_DIR}`,
+    missing,
+    packet: { dir: 'forge/shots/final', spelled: spelled.length, names: spelled.slice(0, 8) },
+  }
 }
 
 /* THE LEAK COUNTER. A wing rebuilds its key at every station it re-stages,
@@ -414,7 +437,7 @@ gate(
 )
 
 let tiers = {}
-let coneReport = { shot: 0, expected: 0, states: [], dir: `forge/shots/${CONE_DIR}`, missing: [] }
+let coneReport = { shot: 0, expected: 0, states: [], dir: `forge/shots/${CONE_DIR}`, missing: [], packet: null }
 let backend = { ok: false }
 let leakReport = null
 let stationIds = []
@@ -518,7 +541,10 @@ gate(
   coneReport.missing.length
     ? coneReport.missing.join('; ')
     : `${coneReport.shot} of ${coneReport.expected} shot into ${coneReport.dir}` +
-      (SPEC_CONES ? ' (the count the sealed spec names)' : '')
+      (SPEC_CONES ? ' (the count the sealed spec names)' : '') +
+      (coneReport.packet?.spelled
+        ? `; the judge packet holds ${coneReport.packet.spelled} frame(s) spelled -cone-ul/ur/dl/dr, which is a second set of corners beside its own`
+        : '')
 )
 
 if (WING) {

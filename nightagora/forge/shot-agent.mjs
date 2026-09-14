@@ -24,6 +24,11 @@
 //
 // Shots land in forge/shots/<outDir>/<viewport>-<tier>-<name>.png. Every
 // console error and page error is reported at the end. Read the frames.
+//
+// A state may not be NAMED for a corner of a cone (`<station>-cone-ul`):
+// that is the spelling a spec checks a packet against, and handing it here
+// writes a second set of corners beside the `-c1..c4` this rig already
+// writes. Ask the station for its cone.
 
 import { chromium } from 'playwright'
 import { spawn } from 'node:child_process'
@@ -46,6 +51,25 @@ const outDir = process.argv[3] ?? 'agent'
 const states = parseStates(process.argv[4])
 if (!states.length) {
   console.error('no states given')
+  process.exit(1)
+}
+
+/* ONE WRITER, ONE NAMING FOR A CORNER. This rig writes the corners of a
+   look cone as `<viewport>-<tier>-<state>-c1..c4`, from a state that asks
+   for its cone. A spec names the same four frames `<station>-cone-ul/ur/dl/
+   dr`: that spelling is what a finished packet is CHECKED against, never
+   what the rig is handed. Handed as states, those names shoot a SECOND set
+   of corners beside the first, in whatever folder the run was given, and a
+   judge packet then holds one station's corners twice. It has happened
+   twice; both times the frames were moved aside by hand. */
+const CORNER_NAME = /-cone-(?:ul|ur|dl|dr)$/i
+const misnamed = states.filter((s) => CORNER_NAME.test(s.name ?? ''))
+if (misnamed.length) {
+  console.error(`a corner of the cone is not a state: ${misnamed.map((s) => s.name).join(', ')}`)
+  console.error(
+    'ask the station for its cone instead ({ "name": "<station>", "cone": true }) ' +
+      'and the four corners land as <viewport>-<tier>-<station>-c1..c4'
+  )
   process.exit(1)
 }
 
