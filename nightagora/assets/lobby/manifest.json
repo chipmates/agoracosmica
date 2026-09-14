@@ -749,6 +749,66 @@
       "source_verification": "Current source record and exact downloaded original checked on admission.",
       "derivation": "No embedded ICC profile. Source interpreted as sRGB. JPEG previews resized with Lanczos, quality 88, embedded sRGB profile. Original bytes unchanged.",
       "rights_note": "Holder identifies Hans Olde, drypoint, subject and Public domain; exact record date is 1870–1917. This range is retained instead of silently substituting the often-cited 1899 series date. Maker died 1917. The holder marks its reproduction Public Domain; the exact Commons file additionally carries CC0. No claim this particular impression was printed during Nietzsche’s lifetime."
+    },
+    {
+      "id": "lobby/likeness-plato",
+      "path": "likenesses/plato/original.jpg",
+      "sha256": "7c3e563de512ccda6ed935373887f9cd237006272c3fc90f5dcbf77b9c59b266",
+      "bytes": 1820743,
+      "width": 1619,
+      "height": 2251,
+      "pixels": 3644369,
+      "slug": "plato",
+      "name": "Plato",
+      "wing": "lobby",
+      "class": "Tier 1",
+      "tier": 1,
+      "licence": "I, the copyright holder of this work, release this work into the public domain. This applies worldwide.",
+      "licence_source_url": "https://commons.wikimedia.org/wiki/File:Head_Platon_Glyptothek_Munich_548.jpg",
+      "licence_location": "Commons file page, Licensing",
+      "holder": "Staatliche Antikensammlungen und Glyptothek, Munich",
+      "maker": "Unknown Roman sculptor, after a bronze portrait attributed to Silanion; photograph by Bibi Saint-Pol",
+      "date": "Early 1st century CE; prototype c. 350 BCE; photograph 8 February 2007",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Head_Platon_Glyptothek_Munich_548.jpg",
+      "original_url": "https://upload.wikimedia.org/wikipedia/commons/7/7d/Head_Platon_Glyptothek_Munich_548.jpg",
+      "holder_record_url": "https://www.bavarikon.de/object/bav%3ASAG-OBJ-00000BAV80062696",
+      "display": true,
+      "label_en": "Plato (c. 428–348 BCE). Unknown Roman sculptor, early 1st century CE, after a portrait type attributed to Silanion, c. 350 BCE. An ancient posthumous copy. Glyptothek Munich, GL548. Photograph: Bibi Saint-Pol. I, the copyright holder of this work, release this work into the public domain. This applies worldwide.",
+      "label_de": "Platon (um 428–348 v. Chr.). Unbekannter römischer Bildhauer, frühes 1. Jahrhundert n. Chr., nach einem Silanion zugeschriebenen Porträttypus um 350 v. Chr. Antike Kopie, Jahrhunderte nach seinem Tod geschaffen. Glyptothek München, GL548. Foto: Bibi Saint-Pol. I, the copyright holder of this work, release this work into the public domain. This applies worldwide.",
+      "previews": [
+        {
+          "path": "likenesses/plato/preview-512.jpg",
+          "sha256": "ee7ca967113b0f79c1df8d7780753e6614c4d7d8c6f7f5d3b5ce904bb6241fd9",
+          "bytes": 46007,
+          "width": 368,
+          "height": 512,
+          "pixels": 188416,
+          "long_edge": 512,
+          "format": "image/jpeg",
+          "quality": 88,
+          "color_space": "sRGB",
+          "source_path": "likenesses/plato/original.jpg"
+        },
+        {
+          "path": "likenesses/plato/preview-1024.jpg",
+          "sha256": "f14d04b8083700f1d89bc9a1117f2365a3a9d240941fa08250b59072789bbd89",
+          "bytes": 167300,
+          "width": 736,
+          "height": 1024,
+          "pixels": 753664,
+          "long_edge": 1024,
+          "format": "image/jpeg",
+          "quality": 88,
+          "color_space": "sRGB",
+          "source_path": "likenesses/plato/original.jpg"
+        }
+      ],
+      "verified_on": "2026-09-14",
+      "source_verification": "Current source record and exact downloaded original checked on admission.",
+      "derivation": "No embedded ICC profile. Source interpreted as sRGB. JPEG previews resized with Lanczos, quality 88, embedded sRGB profile. Original bytes unchanged.",
+      "licence_url": "https://commons.wikimedia.org/wiki/Template:PD-self",
+      "rights_note": "Ancient public-domain marble → independently made photograph by Bibi Saint-Pol → photographer explicitly releases photo worldwide into public domain on Commons. This is PD-self, not CC0 and not PD-Art for a 3D object.",
+      "attribution": "Unknown Roman sculptor after Silanion. Glyptothek Munich, GL548. Photograph: Bibi Saint-Pol / Wikimedia Commons, public-domain dedication."
     }
   ]
 }
