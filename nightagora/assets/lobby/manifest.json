@@ -350,6 +350,66 @@
       "licence_url": "https://creativecommons.org/publicdomain/mark/1.0/",
       "rights_note": "Library cooperation TIFF. Current ETH holder properties attribute Lucien Chavan and state Public Domain Mark. Commons cooperation TIFF metadata still says Unbekannt. The current holder attribution takes precedence under the cross-check rule. Retouched 2016 user JPEG is not selected.",
       "source_sha1": "dacaeca6bd4921abf7198a3886b64073ee781489"
+    },
+    {
+      "id": "lobby/likeness-gautama",
+      "path": "likenesses/gautama/original.jpg",
+      "sha256": "7ec4146d584118516de51d245a7332387f4c08553e6b6176be718874a7fe6e1f",
+      "bytes": 3388127,
+      "width": 2000,
+      "height": 2000,
+      "pixels": 4000000,
+      "slug": "gautama",
+      "name": "Siddhartha Gautama",
+      "wing": "lobby",
+      "class": "Tier 1",
+      "tier": 1,
+      "licence": "This file is made available under the Creative Commons CC0 1.0 Universal Public Domain Dedication.",
+      "licence_source_url": "https://commons.wikimedia.org/wiki/File:MET_DP123364.jpg",
+      "licence_location": "Commons file page, Summary → Permission; holder object page beneath image: Public Domain; Met Image and Data Resources policy",
+      "holder": "The Metropolitan Museum of Art, New York",
+      "maker": "Unknown Gandharan artist; photograph released by the Metropolitan Museum of Art",
+      "date": "1st to mid-2nd century CE",
+      "source_url": "https://commons.wikimedia.org/wiki/File:MET_DP123364.jpg",
+      "original_url": "https://upload.wikimedia.org/wikipedia/commons/f/fc/MET_DP123364.jpg",
+      "holder_record_url": "https://www.metmuseum.org/art/collection/search/72381",
+      "display": true,
+      "label_en": "Siddhartha Gautama, traditionally c. 563–483 BCE. Seated Buddha (Shakyamuni), unknown Gandharan artist, 1st to mid-2nd century CE. An early devotional image made centuries after his life. The Metropolitan Museum of Art, 2003.593.1. This file is made available under the Creative Commons CC0 1.0 Universal Public Domain Dedication.",
+      "label_de": "Siddhartha Gautama, traditionell um 563–483 v. Chr. Sitzender Buddha (Shakyamuni), unbekannter Künstler aus Gandhara, 1. bis Mitte 2. Jahrhundert n. Chr. Frühes Andachtsbild, Jahrhunderte nach seinem Leben geschaffen. The Metropolitan Museum of Art, 2003.593.1. This file is made available under the Creative Commons CC0 1.0 Universal Public Domain Dedication.",
+      "previews": [
+        {
+          "path": "likenesses/gautama/preview-512.jpg",
+          "sha256": "1e4cb8dd206eb18646d6f74f946651c7c332fc04efe414f80c2545f1d1e8c831",
+          "bytes": 46734,
+          "width": 512,
+          "height": 512,
+          "pixels": 262144,
+          "long_edge": 512,
+          "format": "image/jpeg",
+          "quality": 88,
+          "color_space": "sRGB",
+          "source_path": "likenesses/gautama/original.jpg"
+        },
+        {
+          "path": "likenesses/gautama/preview-1024.jpg",
+          "sha256": "183329ee116879faec3da9715c7f976128fe5a614bf0dbe5e408e4310f5580b7",
+          "bytes": 174443,
+          "width": 1024,
+          "height": 1024,
+          "pixels": 1048576,
+          "long_edge": 1024,
+          "format": "image/jpeg",
+          "quality": 88,
+          "color_space": "sRGB",
+          "source_path": "likenesses/gautama/original.jpg"
+        }
+      ],
+      "verified_on": "2026-09-14",
+      "source_verification": "Current source record and exact downloaded original checked on admission.",
+      "derivation": "No embedded ICC profile. Source interpreted as sRGB. JPEG previews resized with Lanczos, quality 88, embedded sRGB profile. Original bytes unchanged.",
+      "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "rights_note": "Ancient public-domain bronze → Met photograph explicitly donated under CC0. The Met’s policy expressly covers its 2D and 3D images of public-domain works, so the photographic rights in this sculpture image are separately cleared.",
+      "attribution": "The Metropolitan Museum of Art, 2003.593.1. Gift of Muneichi Nitta, 2003. CC0 1.0."
     }
   ]
 }
