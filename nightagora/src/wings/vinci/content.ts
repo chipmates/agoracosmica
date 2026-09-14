@@ -36,6 +36,8 @@ export interface VinciStationContent {
   promiseSource: string;
   germanProvenance: 'supplied' | 'museum translation';
   outdoor: boolean;
+  /** The station already holds its built scene or collection content. */
+  built: boolean;
   carrierClass: 'GENERATED';
   carrierCertainty: 'reconstructed';
   labels: readonly VinciStatement[];
@@ -468,6 +470,7 @@ const seed = (
   labels, promiseSource: source,
   germanProvenance: stationPromises[id] || labels.some(label => label === promise) ? 'museum translation' : germanProvenance,
   outdoor: id === 'arrival' || id === 'courtyard' || id === 'garden',
+  built: !['hall', 'oratory', 'study', 'chamber'].includes(id),
   group: id.startsWith('line-') ? 'line' : ['arrival', 'courtyard', 'hall', 'oratory', 'study', 'chamber', 'garden'].includes(id) ? 'house' : 'collection',
 });
 

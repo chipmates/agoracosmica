@@ -126,3 +126,24 @@
   .vinci-standing .vinci-status {margin:8px 0 5px;}
   .vinci-standing .vinci-promise {font-size:13px;line-height:1.4;max-width:none;}
 }
+
+/* The certainty shares the title line; its word remains in Sources. */
+.vinci-title {display:flex;align-items:baseline;gap:10px;}
+.vinci-title-dot {display:inline-block;flex:0 0 8px;width:8px;height:8px;border-radius:50%;background:#d2a557;align-self:baseline;}
+.vinci-title-dot[data-certainty='documented'] {background:#8cba8b;}
+.vinci-title-dot[data-certainty='conjectural'] {background:#df9385;}
+.vinci-title-dot[data-certainty='unknown'] {background:#a8b3b7;}
+#wing[data-wing='vinci'] {--wing-rail-bottom:108px;}
+#wing[data-wing='vinci'] .wing-doorblock {display:flex;align-items:center;justify-content:center;gap:18px;bottom:14px;padding:10px 24px;}
+#wing[data-wing='vinci'] .wing-question {margin:0;max-width:620px;}
+#wing[data-wing='vinci'] .wing-doorblock .wing-door {flex:none;margin:0;}
+#wing[data-wing='vinci'] .wing-note[hidden] {display:none;}
+.wing-door-disclosure {width:min(440px,calc(100vw - 32px));box-sizing:border-box;padding:24px;border:1px solid #a9977366;background:#101d27;color:#eae1d1;font:16px/1.5 var(--serif);}
+.wing-door-disclosure::backdrop {background:#081016b3;}
+.wing-door-disclosure button {min-width:44px;min-height:44px;margin:10px;padding:8px 14px;background:transparent;border:1px solid #a9977366;color:#eae1d1;cursor:pointer;}
+@media(max-aspect-ratio:9/10) {
+  #wing[data-wing='vinci'] {--wing-rail-bottom:132px;}
+  #wing[data-wing='vinci'] .wing-doorblock {gap:10px;padding:8px 16px;bottom:12px;}
+  #wing[data-wing='vinci'] .wing-question {flex:1;min-width:0;font-size:13px;line-height:1.35;text-align:left;}
+  #wing[data-wing='vinci'] .wing-doorblock .wing-door {max-width:108px;min-height:44px;padding:8px 10px;font-size:9px;letter-spacing:.12em;text-indent:0;}
+}

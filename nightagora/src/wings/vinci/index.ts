@@ -39,7 +39,7 @@ import { collectVinciLabelOccluders, createVinciLabelAnchor, type VinciLabelAnch
 import { pathSpecifications } from './paths'
 import { roadGradeProvenance } from './road-grade'
 import { apronProvenance } from './apron'
-import { vinciContent, vinciConstructionStatus, vinciThreshold, vinciHourArithmetic, vinciHourSpoken, vinciViewNames, vinciHourLabel, vinciHourIntegrity, vinciCertaintyWords, vinciPlantingAssumptions, vinciWeatherAssumptions, type VinciCertainty, type VinciStatement, type VinciStationId, type VinciText } from './content'
+import { vinciContent, vinciConstructionStatus, vinciHourArithmetic, vinciHourSpoken, vinciViewNames, vinciHourLabel, vinciHourIntegrity, vinciCertaintyWords, vinciPlantingAssumptions, vinciWeatherAssumptions, type VinciCertainty, type VinciStatement, type VinciStationId, type VinciText } from './content'
 import wingCss from './wing.css?inline'
 
 const text=(value:VinciText):string=>value[lang()]
@@ -242,6 +242,7 @@ export function createWing():WingModule {
     window.addEventListener('keydown',(e)=>{
       if(e.defaultPrevented||e.ctrlKey||e.metaKey||e.altKey||e.shiftKey)return
       const target=e.target instanceof Element?e.target:document.body
+      if(target.closest('dialog[open]'))return
       if(target.closest('input,textarea,select,[contenteditable="true"]'))return
       if(e.key==='Escape'){e.preventDefault();mode=1;rail.look(0,0);paintDock();source.focus({preventScroll:true});return}
       if(e.key.toLowerCase()==='l'&&!e.repeat){e.preventDefault();mode=((mode+1)%3) as VinciLabelMode;paintDock();if(mode===2)dock.focus({preventScroll:true});else if(target.closest('.vinci-dock'))source.focus({preventScroll:true});return}
@@ -273,7 +274,7 @@ export function createWing():WingModule {
   let pendingView=''
   function showView(id:string) {
     const inspectCost=id.endsWith('-cost')&&id!=='audit-cost';if(inspectCost)id=id.slice(0,-5);const s=vinciContent[card]!;if(id==='scene')endInspection();if(id==='scene'||id.startsWith('audit-'))rail.look(0,0);if(id==='scene'||id==='audit-cost'){mode=1;paintDock()}if(id==='audit-cost')measurement.show(s.id);if(id==='audit-ui'){mode=1;paintDock();measurement.show(s.id,'ui')}if(id==='audit-ui-labels'){mode=2;paintDock();measurement.show(s.id,'ui')}if(id.startsWith('collection-room')||id.startsWith('collection-hang'))exhibits?.warm()
-    const pose=namedPose(id,narrow())??collectionView(id,narrow());if(pose){activeView=id;mode=1;paintDock();rail.set(s.id,pose,true,narrow());header.querySelector('.vinci-insertion')?.remove();titleForView(id);if(id.startsWith('collection'))header.append(make('p','vinci-insertion',lang()==='de'?'Museumseinbau der Gegenwart · Räume im Bau':'Modern museum insertion · Rooms in construction'))}const cone=/(?:^|-)cone-(ul|ur|dl|dr)$/.exec(id);if(cone){placeCanonicalStation();rail.look(cone[1]!.includes('l')?.6:-.6,cone[1]!.startsWith('u')?.32:-.32)}if(id==='labels'||id==='hour'||id==='record'){mode=2;paintDock();if(id==='record'){if(record.hidden)dock.querySelector<HTMLButtonElement>('.vinci-record-toggle')?.click();dock.scrollTop=record.offsetTop-18}}if(inspectCost&&(pose||cone))measurement.show(`${s.id} / ${id}`)
+    const pose=namedPose(id,narrow())??collectionView(id,narrow());if(pose){activeView=id;mode=1;paintDock();rail.set(s.id,pose,true,narrow());header.querySelector('.vinci-insertion')?.remove();titleForView(id);if(id.startsWith('collection')&&!s.built&&!vinciStandsInRoom(s.id))header.append(make('p','vinci-insertion',lang()==='de'?'Museumseinbau der Gegenwart · Räume im Bau':'Modern museum insertion · Rooms in construction'))}const cone=/(?:^|-)cone-(ul|ur|dl|dr)$/.exec(id);if(cone){placeCanonicalStation();rail.look(cone[1]!.includes('l')?.6:-.6,cone[1]!.startsWith('u')?.32:-.32)}if(id==='labels'||id==='hour'||id==='record'){mode=2;paintDock();if(id==='record'){if(record.hidden)dock.querySelector<HTMLButtonElement>('.vinci-record-toggle')?.click();dock.scrollTop=record.offsetTop-18}}if(inspectCost&&(pose||cone))measurement.show(`${s.id} / ${id}`)
   }
   /** The door asks about the place the visitor is standing in, so the
    * question travels with the card and not with the rail mark. */
@@ -284,14 +285,18 @@ export function createWing():WingModule {
   function paintHeader() {
     const index=card,s=vinciContent[index]!
     header.textContent=''
-    header.append(make('p','vinci-kicker',stationKicker()),make('h1','vinci-title',text(s.name)))
+    const title=make('h1','vinci-title')
+    const dot=make('span','vinci-title-dot');dot.dataset['certainty']=s.built?s.carrierCertainty:'unknown'
+    dot.setAttribute('role','img');dot.setAttribute('aria-label',text(vinciCertaintyWords[s.built?s.carrierCertainty:'unknown']))
+    title.append(dot,make('span','vinci-title-name',text(s.name)))
+    header.append(make('p','vinci-kicker',stationKicker()),title)
     if(s.outdoor)header.append(make('p','vinci-hour',text(vinciHourSpoken)))
     // A STATION THAT STANDS IN A ROOM DOES NOT COVER IT. The centred panel
     // belongs to the stations that are still a plate; where the room is
     // built, the card docks to the side and the room is the frame.
     const standing=vinciStandsInRoom(s.id)
     header.classList.toggle('vinci-standing',standing)
-    if(!s.outdoor){header.classList.toggle('vinci-construction',!standing);if(s.group!=='line')header.append(make('p','vinci-status',text(vinciConstructionStatus)));header.append(make('p','vinci-promise',text(s.promise)));if(s.id==='hall')header.append(make('p','vinci-threshold',text(vinciThreshold)))}
+    if(!s.outdoor){header.classList.toggle('vinci-construction',!standing&&!s.built);if(!standing&&!s.built)header.append(make('p','vinci-status',text(vinciConstructionStatus)));header.append(make('p','vinci-promise',text(s.promise)))}
     else header.classList.remove('vinci-construction')
   }
   /** The card names what the frame holds: a sub-view carries its own title.
@@ -301,15 +306,14 @@ export function createWing():WingModule {
   function titleForView(viewId:string) {
     const s=vinciContent[card]!
     const name=vinciViewNames[viewId]??(viewId.startsWith('collection')?vinciViewNames['collection']:undefined)
-    const h1=header.querySelector('.vinci-title')
+    const h1=header.querySelector('.vinci-title-name')
     if(h1)h1.textContent=text(name??s.name)
     const kicker=header.querySelector('.vinci-kicker')
     if(kicker)kicker.textContent=name?viewKicker():stationKicker()
   }
   const stationNumber=()=>String(card+1).padStart(2,'0')
-  const certainty=()=>vinciContent[card]!.outdoor?' · '+text(vinciCertaintyWords.reconstructed):''
-  const stationKicker=()=>`CLOS LUCE, 1517 · ${stationNumber()} / 19${certainty()}`
-  const viewKicker=()=>`CLOS LUCE, 1517 · ${lang()==='de'?'BLICK VON STATION':'A VIEW FROM STATION'} ${stationNumber()}${certainty()}`
+  const stationKicker=()=>`CLOS LUCE, 1517 · ${stationNumber()} / 19`
+  const viewKicker=()=>`CLOS LUCE, 1517 · ${lang()==='de'?'BLICK VON STATION':'A VIEW FROM STATION'} ${stationNumber()}`
   function aimPrint(id:VinciStationId):void {
     if(!hosts)return
     const {scene,camera,stack}=hosts.world
@@ -366,8 +370,8 @@ export function createWing():WingModule {
     labels.setAnchor(materialInspectionAnchors[activeView]??entryAnchor??(activeView==='collection-court-access'?world(...collectionAccessPoint(1.05,.65),-.46):collectionView?world(-21.92,-33.92,narrow()?-5.85:-3.2):s.outdoor?anchors[s.id]??null:null),`${text(vinciCertaintyWords.reconstructed)} · ${entryAnchor?(lang()==='de'?'Vorgeschlagene Eingangsstruktur':'Proposed entrance structure'):collectionView?(lang()==='de'?'Museumseinbau der Gegenwart':'Modern museum insertion'):text(s.name)}`)
     dock.textContent=''
     record=make('div','vinci-record');setRegister(record,'record');record.id='vinci-full-record';record.hidden=true;record.append(make('h3','',lang()==='de'?'Vollständiger Nachweis':'Full record'))
-    const title=make('p','vinci-certainty',text(s.outdoor?vinciCertaintyWords.reconstructed:vinciConstructionStatus))
-    title.dataset['certainty']=s.outdoor?'reconstructed':'unknown'
+    const title=make('p','vinci-certainty',text(vinciCertaintyWords[s.built?s.carrierCertainty:'unknown']))
+    title.dataset['certainty']=s.built?s.carrierCertainty:'unknown'
     if(s.outdoor){title.dataset['naClaim']='inferred';title.dataset['naAnchor']='vinci/shell';title.dataset['naAnchorClass']='GENERATED'}
     dock.append(title,make('h2','',text(s.name)))
     for(const label of s.labels)appendLabel(label)
@@ -446,9 +450,10 @@ export function createWing():WingModule {
   }
   return {
     stations:vinciContent.map(s=>({id:s.id,name:text(s.name),question:text(s.door)})),
+    doorDisclosure:'first-press',
     navigation:()=>{
       const nav=standing?rail.navigation:undefined
-      return {completed:nav?.completed??vinciContent[card]!.id,target:nav?.queued[0]??nav?.active}
+      return {completed:nav?.completed??vinciContent[card]!.id,target:nav?.queued[0]??nav?.active,question:text(vinciContent[card]!.door)}
     },
     pending:()=>exhibits?.pending()??0,
     errors:()=>exhibits?.pictureErrors()??[],

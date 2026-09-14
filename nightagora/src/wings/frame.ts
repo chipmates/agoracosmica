@@ -79,7 +79,9 @@ export interface WingStation {
 export interface WingModule {
   stations: WingStation[]
   /** A walking wing distinguishes its standing station from its destination. */
-  navigation?(): { completed?: string; target?: string }
+  navigation?(): { completed?: string; target?: string; question?: string }
+  /** Keep the library disclosure behind the first door press of this visit. */
+  doorDisclosure?: 'first-press'
   /** compose one station into the frame's hosts */
   show(index: number, hosts: WingHosts): void
   /** strike everything the wing put on the page */
@@ -214,7 +216,30 @@ export function createWingFrame(
   const doorBlock = el('div', 'wing-doorblock')
   doorBlock.append(question, door, note)
 
-  host.append(stage, labels, railGroup, doorBlock)
+  const disclosure = el('dialog', 'wing-door-disclosure')
+  disclosure.setAttribute('aria-describedby', 'wing-door-disclosure-text')
+  disclosure.setAttribute('aria-label', say(WING_TEXT.door))
+  const disclosureText = el('p', '', say(WING_TEXT.doorNote))
+  disclosureText.id = 'wing-door-disclosure-text'
+  const continueDoor = el('a', 'wing-door', say(WING_TEXT.door))
+  continueDoor.target = '_blank'; continueDoor.rel = 'noopener'
+  const closeDisclosure = el('button', '', lang() === 'de' ? 'Schließen' : 'Close')
+  closeDisclosure.type = 'button'
+  disclosure.append(disclosureText, continueDoor, closeDisclosure)
+  let disclosureSeen = false
+  door.addEventListener('click', event => {
+    if (wing?.doorDisclosure !== 'first-press' || disclosureSeen) return
+    event.preventDefault()
+    disclosureSeen = true
+    continueDoor.href = door.href
+    disclosure.showModal()
+    continueDoor.focus({ preventScroll: true })
+  })
+  continueDoor.addEventListener('click', () => disclosure.close())
+  closeDisclosure.addEventListener('click', () => disclosure.close())
+  disclosure.addEventListener('close', () => { if (!host.hidden) door.focus({ preventScroll: true }) })
+
+  host.append(stage, labels, railGroup, doorBlock, disclosure)
 
   let entry: WingEntry | null = null
   let wing: WingModule | null = null
@@ -246,6 +271,7 @@ export function createWingFrame(
 
   function paintNavigation(): void {
     const navigation = wing?.navigation?.()
+    if (navigation?.question !== undefined) question.textContent = navigation.question
     for (let i = 0; i < rail.children.length; i++) {
       const button = rail.children[i] as HTMLElement
       const current = navigation ? button.dataset['station'] === navigation.completed : i === index
@@ -291,8 +317,10 @@ export function createWingFrame(
          one is dropped, so a wing may allocate only in `show`. */
       const reuse = entry?.slug === nextEntry.slug && wing !== null
       if (!reuse) wing?.stop()
+      if (!reuse) { disclosure.close(); disclosureSeen = false }
       entry = nextEntry
       if (!reuse) wing = nextWing
+      note.hidden = wing?.doorDisclosure === 'first-press'
       index = 0
       host.hidden = false
       paintRail()
@@ -308,6 +336,7 @@ export function createWingFrame(
     goto,
     gotoId,
     close() {
+      disclosure.close()
       wing?.stop()
       wing = null
       entry = null
