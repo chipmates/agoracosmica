@@ -4,7 +4,7 @@ import { mineralSurfaceProvenance, closeSurfaceProvenance } from './surface'
 import { entryMineralSurfaceProvenance } from './entry-mineral-surface'
 import { foundationPlinthProvenance } from './foundation-plinth'
 import { Color, FogExp2, DirectionalLight, Mesh, Vector3, type Group } from 'three/webgpu'
-import { float, mix, vec3, vec4, dot as nodeDot } from 'three/tsl'
+import { float, mix, vec3, vec4, dot as nodeDot, positionWorld, cameraPosition, smoothstep, mx_fractal_noise_float } from 'three/tsl'
 import { SkyMesh } from 'three/addons/objects/SkyMesh.js'
 import { setRegister, type WingHosts, type WingModule } from '../frame'
 import { constructionRecords, evidenceWords } from './evidence-copy'
@@ -78,8 +78,15 @@ const entryInspectionAnchors:Record<string,Vector3>={
  * two thirds of a stop below the garden front, so the aperture opens where
  * the visitor stands, exactly as a camera's would. No light in the scene
  * moves; this is the print, not the sun. */
-const PRINT={...GRADES['first-station'],name:'clos-luce-1517',exposure:.94,split:.055,saturation:.9,vignette:.15,grain:.007,bloom:{strength:0,radius:.1,threshold:10,warmth:1}}
-const STATION_EXPOSURE:Partial<Record<VinciStationId,number>>={courtyard:1.14}
+// A COURT UNDER ITS OWN WALLS. Most of this wing stands in the building's own
+// shade at this hour, and an eye standing there opens on the shade, not on the
+// sky. The toe is lifted a little, cool, the way shade is: it is the print, and
+// no light in the scene moves.
+const PRINT={...GRADES['first-station'],name:'clos-luce-1517',exposure:.94,lift:[.012,.014,.018] as [number,number,number],split:.055,saturation:.9,vignette:.15,grain:.007,bloom:{strength:0,radius:.1,threshold:10,warmth:1}}
+// The court used to open two thirds of a stop, which warmed the tuffeau toward
+// grey-gold and lifted the plaster's mottling into view. One print holds the
+// whole wing now, and the court is lit rather than exposed.
+const STATION_EXPOSURE:Partial<Record<VinciStationId,number>>={courtyard:1.0}
 const SHADOW={nearHalfM:20,nearMapPx:1024,aheadM:10,refocusM:3,lightDistanceM:80} as const
 
 export function createWing():WingModule {
@@ -128,7 +135,24 @@ export function createWing():WingModule {
     const skyLuma=nodeDot(skyRGB,vec3(.2126,.7152,.0722))
     // Compress only the assumed atmosphere's bright lobe. The measured
     // solar direction, building irradiance and shadow rig are untouched.
-    sky.material.colorNode=vec4(mix(vec3(skyLuma),skyRGB,.48).div(float(1).add(skyLuma.div(.58))),1)
+    // HIGH CLOUD. The dome's own cloud layer stands near the horizon, so above
+    // about twenty degrees every frame in this wing was an empty plane, and it
+    // is the largest plane in the packet. A thin streaked veil, densest at
+    // forty degrees and gone at the zenith and the horizon, gives the phone's
+    // upper corner something to hold. Assumed weather, as the label says.
+    const ray=positionWorld.sub(cameraPosition).normalize()
+    const veil=mx_fractal_noise_float(vec3(ray.x.mul(2.6),ray.y.mul(5.5),ray.z.mul(2.1)),4,2,.5).clamp(-1,1)
+    const mass=mx_fractal_noise_float(vec3(ray.x.mul(.9),ray.y.mul(1.7),ray.z.mul(.8)),3,2,.5).clamp(-1,1)
+    const height=ray.y.clamp(0,1)
+    const cover=veil.mul(.42).add(mass.mul(.58)).mul(.5).add(.5)
+    const cirrus=smoothstep(.04,.26,height).mul(float(1).sub(smoothstep(.80,1,height)).mul(.35).add(.65))
+      .mul(smoothstep(.54,.82,cover))
+    // High cloud at this hour is lit from the west and grey away from it, so
+    // the veil takes the sun's own direction rather than one flat tone.
+    const toSun=ray.dot(vec3(key.direction.x,key.direction.y,key.direction.z))
+    const litCloud=mix(vec3(.40,.44,.51),vec3(.71,.68,.62),smoothstep(-.25,.85,toSun))
+    const veiled=mix(mix(vec3(skyLuma),skyRGB,.48),litCloud,cirrus.mul(.58))
+    sky.material.colorNode=vec4(veiled.div(float(1).add(skyLuma.div(.58))),1)
     applyDisplayedHorizonHaze(sky.material,scene.fog as FogExp2)
     sky.scale.setScalar(1800);sky.sunPosition.value.copy(key.direction).multiplyScalar(450000);sky.turbidity.value=4;sky.rayleigh.value=1.4;sky.cloudScale.value=.0006;sky.cloudCoverage.value=.28;sky.cloudDensity.value=.42;sky.cloudElevation.value=.35;sky.cloudSpeed.value=0;scene.add(sky)
     const entry=createEntryPassage(stack.tierName())
