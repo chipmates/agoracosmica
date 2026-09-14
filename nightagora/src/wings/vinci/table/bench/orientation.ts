@@ -20,17 +20,17 @@ export interface TableOrientationOptions {
 
 const COPY = {
   en: {
-    hour: 'Wing hour · 10 October 1517 · Julian calendar',
+    hour: 'Wing hour · 15:19 by the sun, 10 October 1517',
     lamp: 'This reading table is a modern museum display, lit by a reading lamp.',
-    sources: 'Sources · L', close: 'Close sources',
+    sources: 'Sources', sourcesKey: 'L', close: 'Close sources', record: 'The full record',
     sourceTitle: 'The page and its sources', plate: 'The displayed reproduction',
     sourceLink: 'Source record', hourTitle: 'The wing’s computed hour',
     doorScope: 'The library opens Leonardo’s general question. The question above remains here to copy.',
   },
   de: {
-    hour: 'Stunde des Flügels · 10. Oktober 1517 · Julianischer Kalender',
+    hour: 'Stunde des Flügels · 15:19 nach der Sonne, 10. Oktober 1517',
     lamp: 'Dieser Lesetisch ist eine moderne Museumsausstellung im Licht einer Leselampe.',
-    sources: 'Quellen · L', close: 'Quellen schließen',
+    sources: 'Quellen', sourcesKey: 'L', close: 'Quellen schließen', record: 'Der vollständige Nachweis',
     sourceTitle: 'Das Blatt und seine Quellen', plate: 'Die ausgestellte Reproduktion',
     sourceLink: 'Quellennachweis', hourTitle: 'Die berechnete Stunde des Flügels',
     doorScope: 'Die Bibliothek öffnet Leonardos allgemeine Frage. Die Frage oben bleibt hier zum Kopieren.',
@@ -59,6 +59,7 @@ export function createTableOrientation(options: TableOrientationOptions) {
   const headerHour = node('div', 'table-orientation-hour')
   const navSource = node('div', 'table-orientation-navigation')
   const stations = node('nav', 'table-orientation-stations')
+  const chip = node('a', 'table-orientation-chip')
   const sourceButton = node('button', 'table-orientation-source')
   sourceButton.type = 'button'
   sourceButton.setAttribute('aria-haspopup', 'dialog')
@@ -75,10 +76,13 @@ export function createTableOrientation(options: TableOrientationOptions) {
   const doorNote = node('p', 'table-orientation-door-note')
   const doorScope = node('p', 'table-orientation-door-scope')
   doorFooter.append(question, door, doorNote, doorScope)
-  navSource.append(style, stations, sourceButton, drawer)
+  navSource.append(style, chip, stations, sourceButton, drawer)
 
   function centerStation() {
     if (disposed || !stations.isConnected) return
+    // The edge mask says "there is more this way". Where the whole index
+    // fits, there is no more, and a faded first station is a lie.
+    stations.dataset['overflow'] = String(stations.scrollWidth > stations.clientWidth + 1)
     const selected = stations.querySelector<HTMLElement>('[aria-current="page"]')
     if (selected) stations.scrollLeft = selected.offsetLeft - stations.clientWidth / 2 + selected.clientWidth / 2
   }
@@ -92,6 +96,7 @@ export function createTableOrientation(options: TableOrientationOptions) {
     close.type = 'button'
     close.addEventListener('click', () => drawer.close())
     heading.append(title, close)
+    drawer.dataset['register'] = 'drawer'
     const body = node('div', 'table-orientation-drawer-body')
     for (const source of options.sources()) {
       const section = node('section', 'table-orientation-plate-source')
@@ -117,12 +122,18 @@ export function createTableOrientation(options: TableOrientationOptions) {
     )
     body.append(doorContext)
     const hour = node('section', 'table-orientation-hour-source')
+    const record = node('details', 'table-orientation-record')
+    record.dataset['register'] = 'record'
+    record.append(
+      node('summary', 'table-orientation-record-summary', copy.record),
+      node('p', 'table-orientation-arithmetic', vinciHourArithmetic[language]),
+      node('p', 'table-orientation-source-copy', vinciHourLabel[language]),
+    )
     hour.append(
       node('h3', '', copy.hourTitle),
       node('p', 'table-orientation-lamp-note', copy.lamp),
-      node('p', 'table-orientation-arithmetic', vinciHourArithmetic[language]),
       node('p', 'table-orientation-integrity', vinciHourIntegrity[language]),
-      node('p', 'table-orientation-source-copy', vinciHourLabel[language]),
+      record,
     )
     body.append(hour)
     drawer.replaceChildren(heading, body)
@@ -141,10 +152,11 @@ export function createTableOrientation(options: TableOrientationOptions) {
   function paint() {
     const copy = COPY[language]
     headerHour.lang = navSource.lang = doorFooter.lang = language
+    /* THE LABEL CARRIES THE HOUR THE WAY A PERSON SAYS IT. The arithmetic
+       (delta-T, azimuth, elevation) is the record and lives behind Sources. */
     headerHour.replaceChildren(
       node('p', 'table-orientation-position', `${String(station.number).padStart(2, '0')} / ${vinciContent.length} · ${station.name[language]}`),
       node('p', 'table-orientation-hour-caption', copy.hour),
-      node('p', 'table-orientation-arithmetic', vinciHourArithmetic[language]),
       node('p', 'table-orientation-lamp-note', copy.lamp),
     )
     stations.setAttribute('aria-label', WING_TEXT.rail[language])
@@ -157,7 +169,17 @@ export function createTableOrientation(options: TableOrientationOptions) {
       link.append(node('span', 'table-orientation-station-number', String(item.number).padStart(2, '0')), node('span', 'table-orientation-station-name', item.name[language]))
       return link
     }))
-    sourceButton.textContent = copy.sources
+    chip.textContent = ''
+    chip.href = `/w/${wing.slug}?${new URLSearchParams({ lang: language }).toString()}#s=${station.id}`
+    chip.append(
+      node('span', 'table-orientation-chip-number', `${String(station.number).padStart(2, '0')} / ${vinciContent.length}`),
+      node('span', 'table-orientation-chip-name', station.name[language]),
+    )
+    chip.setAttribute('aria-label', `${WING_TEXT.station[language]} ${station.number} · ${station.name[language]}`)
+    sourceButton.replaceChildren(
+      node('span', 'table-orientation-source-word', copy.sources),
+      node('kbd', 'table-orientation-source-key', copy.sourcesKey),
+    )
     sourceButton.setAttribute('aria-expanded', String(drawer.open))
     question.textContent = station.door[language]
     door.textContent = WING_TEXT.door[language]
