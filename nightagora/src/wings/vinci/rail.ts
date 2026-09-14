@@ -14,8 +14,12 @@ export interface Pose { eye: Vector3; at: Vector3; fov: number }
 const p=(e:number,n:number,h:number,te:number,tn:number,th:number,fov=49):Pose=>({eye:world(e,n,h),at:world(te,tn,th),fov})
 /** Camera poses are exhibition choices. They change no surveyed geometry. */
 export function stationPose(id:VinciStationId, narrow:boolean):Pose {
-  // R19 accepted: phone passage-A retains the court and leaf; desktop keeps its corrected road eye.
-  if(id==='arrival') return narrow?p(25.2,-16.2,groundHeight(25.2,-16.2)+1.65,5.032039226453499,-12.212873321666777,2.709826421638899,116.1):p(25.49153163196192,-15.805318528252403,groundHeight(25.49153163196192,-15.805318528252403)+1.65,8,-13.5,5,70)
+  // The eye stood 0.26 m off the retaining wall, inside its own near plane,
+  // and the wall filled the right third of the lower cone. It now stands
+  // 0.86 m off it, out toward the middle of the road. The phone's lens came
+  // down from 116 degrees: at that width the top of its frame looked 68
+  // degrees above the gaze and nothing but sky can stand there.
+  if(id==='arrival') return narrow?p(24.98,-16.13,groundHeight(24.98,-16.13)+1.65,5.032039226453499,-12.212873321666777,2.709826421638899,100):p(24.98,-16.13,groundHeight(24.98,-16.13)+1.65,8,-13.5,5,70)
   // The phone keeps its gaze on the door and opens the lens instead: at 70
   // degrees the cone's right half fell between the court corner and the east
   // range's windows and held neither.
@@ -43,12 +47,13 @@ export function namedPose(id:string,narrow:boolean):Pose|undefined {
   // Rejected R19 garden trials: foliage still crosses the upper-left window.
   if(id==='composition-garden-apron-a')return narrow?p(-26,-31.2,groundHeight(-26,-31.2)+1.65,-8.7,-16.6,4.2,92):namedPose('composition-garden-clear',false)
   if(id==='composition-garden-apron-b')return narrow?p(-27,-31.2,groundHeight(-27,-31.2)+1.65,-8.7,-16.6,4.2,88):namedPose('composition-garden-clear',false)
-  // R19 accepted arrival pair; phone A preserves more open court than B.
+  // R19 accepted arrival pair; phone A preserves more open court than B. Kept
+  // as the reproducible record of the 116 degree lens the station left behind.
   if(id==='composition-arrival-passage-a')return narrow?p(25.2,-16.2,groundHeight(25.2,-16.2)+1.65,5.032039226453499,-12.212873321666777,2.709826421638899,116.1):namedPose('composition-arrival-centre',false)
   // Rejected phone B remains reproducible for the comparison record.
   if(id==='composition-arrival-passage-b')return narrow?p(25.2,-16.5,groundHeight(25.2,-16.5)+1.65,4.987387151716828,-11.996839722277095,2.71547864225149,114.1):namedPose('composition-arrival-centre',false)
   // Rejected phone centre: the gate view ends on lining. Its desktop branch is accepted.
-  if(id==='composition-arrival-centre')return narrow?p(25.5,-20,groundHeight(25.5,-20)+1.65,8.328,-10.1321,5.5686,96):p(25.49153163196192,-15.805318528252403,groundHeight(25.49153163196192,-15.805318528252403)+1.65,8,-13.5,5,70)
+  if(id==='composition-arrival-centre')return narrow?p(25.5,-20,groundHeight(25.5,-20)+1.65,8.328,-10.1321,5.5686,96):p(24.98,-16.13,groundHeight(24.98,-16.13)+1.65,8,-13.5,5,70)
   // Superseded garden pair: phone exposes the north gable/gap; desktop has window foliage.
   if(id==='composition-garden-clear')return narrow?p(-24,-6,groundHeight(-24,-6)+1.65,-5.5,-14.3,9.2,100):p(-28,-30,groundHeight(-28,-30)+1.65,-8,-17.5,5.4,56)
   // Standing inspection eyes on the supplied +0.80 m entry floor.
