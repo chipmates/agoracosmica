@@ -66,6 +66,23 @@ export function readLanding(value: unknown): string {
 }
 
 /**
+ * blob3 on landing page rows: which kind of place the arrival came from. A
+ * closed list, derived in the browser from the referrer's host class and the
+ * presence of an ad parameter. The referrer string and every click id stay in
+ * the browser, so the row carries a property of the request, like country and
+ * device class, and no user dimension.
+ */
+export const SOURCE_CLASSES = new Set([
+  'ad_google', 'ad_reddit', 'search', 'assistant', 'reddit', 'social',
+  'referral', 'direct',
+]);
+
+/** Read the source class off a beacon payload field. Anything else is ''. */
+export function readSource(value: unknown): string {
+  return (typeof value === 'string' && SOURCE_CLASSES.has(value)) ? value : '';
+}
+
+/**
  * Track an LLM proxy event (chat/council/summary).
  * dataset: agora_llm
  * blobs: [endpoint, figureId, mode, language, status, device, country, kind, probe]
@@ -205,7 +222,7 @@ export function trackPlayback(
  * Track a page-load beacon. Fires once on App mount in the client, before any
  * user interaction. Lets the dashboard show arrivals over time.
  * dataset: agora_llm
- * blobs: ['page', path, '', language, '200', device, country, landing, probe]
+ * blobs: ['page', path, source, language, '200', device, country, landing, probe]
  * indexes: ['page']
  *
  * blob8 is 'landing' when this pageview opened the visit (no referrer, or a
@@ -214,6 +231,10 @@ export function trackPlayback(
  * pageview, not of the visitor, and nothing is stored to derive it. Rows
  * written before the flag existed have '' here, which reads as "not known to
  * be a landing" rather than as "not a landing".
+ *
+ * blob3 is the source class of a landing (see readSource), sent on landings
+ * only and whitelisted here. Page rows written before 2026-09-14 hold '' in
+ * this slot, which reads as unlabelled rather than as any class.
  */
 export function trackPageView(
   env: Env,
@@ -223,12 +244,13 @@ export function trackPageView(
     country: string;
     device: string;
     landing: string;
+    source: string;
     probe: string;
   }
 ): void {
   try {
     env.ANALYTICS.writeDataPoint({
-      blobs: ['page', data.path, '', data.language, '200', data.device, data.country, data.landing, data.probe],
+      blobs: ['page', data.path, data.source, data.language, '200', data.device, data.country, data.landing, data.probe],
       doubles: [0],
       indexes: ['page'],
     });

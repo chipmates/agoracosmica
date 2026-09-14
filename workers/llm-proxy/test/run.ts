@@ -33,6 +33,7 @@ import {
 import { createAwardGuardedStream } from '../src/services/awardGuard';
 import { dispatchToNebius } from '../src/services/nebius';
 import { handleChat } from '../src/routes/chat';
+import { handlePage } from '../src/routes/page';
 import { handleQuota } from '../src/routes/quota';
 import { signJWT } from '../src/utils/jwt';
 import worker from '../src/index';
@@ -933,6 +934,50 @@ async function main(): Promise<number> {
   });
 
   globalThis.fetch = realFetch;
+
+  // -------------------------------------------------------------------------
+  // The page beacon's source class — a closed list, or nothing
+  // -------------------------------------------------------------------------
+
+  // The class is decided in the browser, so the worker's only job is the
+  // whitelist: an unknown value must land as '' rather than in the slot.
+  // A fresh env per call, so the route's per-address cap never accumulates
+  // across cases.
+  const pageBeacon = async (payload: Record<string, unknown>) => {
+    analyticsRows.length = 0;
+    await handlePage(
+      new Request('https://example.invalid/v1/page', {
+        method: 'POST',
+        headers: { 'CF-Connecting-IP': '10.0.0.7' },
+        body: JSON.stringify(payload),
+      }),
+      fakeEnv(),
+    );
+    return analyticsRows[0];
+  };
+
+  await test('a source class from the closed list lands in blob3', async () => {
+    for (const value of ['ad_google', 'ad_reddit', 'search', 'assistant', 'reddit', 'social', 'referral', 'direct']) {
+      const row = await pageBeacon({ path: '/', language: 'en', landing: 1, source: value });
+      assertEqual(row.blobs[0], 'page', 'event type');
+      assertEqual(row.blobs[2], value, `source ${value} in blob3`);
+      assertEqual(row.blobs[7], 'landing', 'the landing flag stays at blob8');
+    }
+  });
+
+  await test('a source value off the list lands as an empty slot', async () => {
+    for (const value of ['google.com', 'AD_GOOGLE', 'ad_bing', '', 'https://reddit.com/r/x', 1, true, { source: 'search' }]) {
+      const row = await pageBeacon({ path: '/', language: 'en', landing: 1, source: value });
+      assertEqual(row.blobs[2], '', `rejected: ${JSON.stringify(value)}`);
+    }
+  });
+
+  await test('a beacon without the field writes the row with an empty slot', async () => {
+    const row = await pageBeacon({ path: '/de/', language: 'de', landing: 1 });
+    assertEqual(row.blobs[2], '', 'blob3 stays empty');
+    assertEqual(row.blobs[1], '/de/', 'the path is still recorded');
+    assertEqual(row.blobs[3], 'de', 'the language is still recorded');
+  });
 
   // -------------------------------------------------------------------------
   // Council headroom

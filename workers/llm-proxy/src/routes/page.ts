@@ -6,7 +6,7 @@
 // Privacy: aggregate counter only. No user dimension. No IP retention.
 // Same legal posture as the rest of analytics — see docs/MEASUREMENT.md.
 
-import { trackPageView, readCountry, readDevice, readProbe, readLanding } from '../utils/analytics';
+import { trackPageView, readCountry, readDevice, readProbe, readLanding, readSource } from '../utils/analytics';
 import type { Env } from '../utils/types';
 
 interface PagePayload {
@@ -16,6 +16,9 @@ interface PagePayload {
   // host). Optional: clients that do not send it get an unmarked row, which is
   // what every row written before the flag existed looks like.
   landing?: unknown;
+  // The source class of a landing arrival, one of a closed list (see
+  // readSource). Sent on landings only; anything else writes ''.
+  source?: unknown;
   probe?: unknown;
 }
 
@@ -65,6 +68,7 @@ export async function handlePage(request: Request, env: Env): Promise<Response> 
     country: readCountry(request),
     device: readDevice(request),
     landing: readLanding(payload.landing),
+    source: readSource(payload.source),
     probe: readProbe(payload.probe),
   });
 

@@ -9,6 +9,7 @@
 import { isSelfHost } from '../config/deployment';
 import { probeField } from './probeSession';
 import { sendFunnelBeacon } from './funnelBeacon';
+import { sourceClass } from './sourceClass';
 
 const API_BASE = import.meta.env.VITE_FREE_TIER_API_URL || '';
 
@@ -69,6 +70,7 @@ function detectLanguage(): 'en' | 'de' {
  *   - language (en/de)
  *   - country (CF-edge two-letter code, server-side)
  *   - whether this pageview opened the visit (referrer rule above)
+ *   - on a landing only, the source class of that arrival (utils/sourceClass.ts)
  *   - the in-house probe constant, only from a browser marked as one
  *
  * A paid-ad arrival also emits its own counter, so paid landings can be told
@@ -82,10 +84,15 @@ export function sendPageBeacon(): void {
     const path = typeof window !== 'undefined' ? window.location.pathname : '';
     const landing = isLandingPageview();
     firstBeaconSent = true;
+    // The source class rides on landings only: an internal navigation has no
+    // arrival to describe, and the referrer of one is our own page.
+    const href = typeof window !== 'undefined' ? window.location.href : '';
+    const referrer = typeof document !== 'undefined' ? document.referrer : '';
     const body = JSON.stringify({
       path,
       language: detectLanguage(),
       landing: landing ? 1 : undefined,
+      source: landing ? sourceClass(href, referrer) : undefined,
       probe: probeField(),
     });
 

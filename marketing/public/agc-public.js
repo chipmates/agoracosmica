@@ -6,7 +6,8 @@
 //   - Capture gclid from URL into sessionStorage so the app can offer ad-
 //     measurement consent and (only if granted) report the conversion
 //   - Fire the anonymous page-load beacon (/v1/page), flagged when the pageview
-//     opened the visit, plus the paid-arrival counter on a paid landing URL
+//     opened the visit and carrying the source class of that arrival, plus the
+//     paid-arrival counter on a paid landing URL
 //   - Click handlers on [data-agc-cta] elements (entry intent)
 //   - Mobile burger menu toggle in the navbar
 //
@@ -38,6 +39,14 @@
   // constant, never an identifier: a marked browser stamps its own rows so
   // internal testing can be subtracted from small-n weeks at query time.
   var LS_PROBE = 'agc_probe';
+  // Landing on any URL with ?probe=1 marks this browser, so a harness or an
+  // in-house browser stays out of the funnel. Same check and same value as
+  // client/src/utils/funnelBeacon.ts, and it runs before any beacon below.
+  try {
+    if (new URLSearchParams(window.location.search).get('probe') === '1') {
+      localStorage.setItem(LS_PROBE, '1');
+    }
+  } catch (e) { /* storage or URL unavailable — the browser stays unmarked */ }
   function probeField() {
     try { return localStorage.getItem(LS_PROBE) === '1' ? 1 : undefined; }
     catch (e) { return undefined; }
@@ -176,6 +185,75 @@
     } catch (e) { /* no-op */ }
   }
 
+  // Source class of a landing pageview: one value from a closed list, derived
+  // from the referrer's host and whether the landing URL carried an ad
+  // parameter. The referrer string and every click id are read here and
+  // discarded, nothing is stored for it, and only the class leaves the browser.
+  // Twin of client/src/utils/sourceClass.ts: both lists must stay identical,
+  // same hosts in the same order, or one arrival gets two different labels.
+  // AI assistants are tested before search engines: gemini.google.com and
+  // bard.google.com are suffixes of google.com.
+  var ASSISTANT_HOSTS = [
+    'chatgpt.com', 'openai.com', 'perplexity.ai', 'claude.ai', 'anthropic.com',
+    'copilot.microsoft.com', 'gemini.google.com', 'bard.google.com', 'you.com',
+    'phind.com', 'kagi.com', 'mistral.ai', 'x.ai', 'grok.com', 'meta.ai',
+  ];
+  var SEARCH_HOSTS = [
+    'bing.com', 'duckduckgo.com', 'ecosia.org', 'yahoo.com', 'startpage.com',
+    'qwant.com', 'brave.com', 'baidu.com',
+  ];
+  var REDDIT_HOSTS = ['reddit.com', 'redd.it'];
+  var SOCIAL_HOSTS = [
+    'x.com', 'twitter.com', 't.co', 'facebook.com', 'fb.com', 'instagram.com',
+    'linkedin.com', 'lnkd.in', 'mastodon.social', 'bsky.app', 'threads.net',
+    'youtube.com', 'youtu.be', 'tiktok.com', 'pinterest.com',
+    'news.ycombinator.com',
+  ];
+  var OWN_HOSTS = ['agoracosmica.org'];
+  // Google and Yandex run a country domain per market, so they have no single
+  // suffix to match against.
+  var MULTI_TLD_SEARCH = /(^|\.)(google|yandex)\.[a-z]{2,}(\.[a-z]{2,})?$/;
+
+  // Suffix match on a hostname: the host itself, or any subdomain of it.
+  function matchesHost(hostname, hosts) {
+    for (var i = 0; i < hosts.length; i++) {
+      if (hostname === hosts[i] || hostname.endsWith('.' + hosts[i])) return true;
+    }
+    return false;
+  }
+
+  function hostOf(url) {
+    try { return new URL(url).hostname.toLowerCase(); }
+    catch (e) { return ''; }
+  }
+
+  function adClass(landingUrl) {
+    var params;
+    try { params = new URL(landingUrl).searchParams; }
+    catch (e) { return undefined; }
+    if (params.has('gclid') || params.get('p') === '1') return 'ad_google';
+    var utmSource = (params.get('utm_source') || '').toLowerCase();
+    if (utmSource === 'reddit' || params.has('rdt_cid')) return 'ad_reddit';
+    return undefined;
+  }
+
+  // Ad parameters win over the referrer: an ad click can carry the ad network's
+  // own host as its referrer, and the parameter is the more specific fact. A
+  // referrer on one of our own hosts yields nothing, so no field is sent.
+  function sourceClass(landingUrl, referrer) {
+    var ad = adClass(landingUrl);
+    if (ad) return ad;
+    if (!referrer) return 'direct';
+    var host = hostOf(referrer);
+    if (!host) return 'direct';
+    if (matchesHost(host, OWN_HOSTS) || host === hostOf(landingUrl)) return undefined;
+    if (matchesHost(host, ASSISTANT_HOSTS)) return 'assistant';
+    if (matchesHost(host, SEARCH_HOSTS) || MULTI_TLD_SEARCH.test(host)) return 'search';
+    if (matchesHost(host, REDDIT_HOSTS)) return 'reddit';
+    if (matchesHost(host, SOCIAL_HOSTS)) return 'social';
+    return 'referral';
+  }
+
   // Did this pageview open the visit? No referrer at all, or one from another
   // host. The marketing site is a multi-page app, so every pageview is a fresh
   // document and this is a property of that document, read at parse and never
@@ -192,6 +270,9 @@
     try {
       var docLang = (document.documentElement.lang || 'en').toLowerCase();
       var language = docLang.indexOf('de') === 0 ? 'de' : 'en';
+      // The source class rides on landings only: an internal navigation has no
+      // arrival to describe, and the referrer of one is our own page.
+      var landing = isLandingPageview();
       // Absolute worker URL on purpose (agoracosmica.org has no /v1/* route).
       fetch('https://llm.agoracosmica.org/v1/page', {
         method: 'POST',
@@ -199,7 +280,8 @@
         body: JSON.stringify({
           path: window.location.pathname,
           language: language,
-          landing: isLandingPageview() ? 1 : undefined,
+          landing: landing ? 1 : undefined,
+          source: landing ? sourceClass(window.location.href, document.referrer) : undefined,
           probe: probeField(),
         }),
         keepalive: true,
