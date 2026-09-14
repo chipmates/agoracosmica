@@ -37,6 +37,8 @@
   max-width: 860px;
   margin-inline: auto;
 }
+.descent-beat:first-of-type { top: 19%; }
+.descent-ask { max-width: 28em; font-size: clamp(23px, 2.5vw, 34px); }
 .tagline {
   margin-top: 25px;
   font-family: var(--press-ui);

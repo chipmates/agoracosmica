@@ -32,6 +32,9 @@ function syncLobbyCopy(): void {
     if (el instanceof HTMLMetaElement) el.content = text
     else el.textContent = text
   }
+  const count = wingCount(wingsOpen(), wingsPreparing())
+  for (const el of document.querySelectorAll<HTMLElement>('#lobby-plate, [data-lobby-count]'))
+    el.textContent = count
 }
 syncLobbyCopy()
 
@@ -73,7 +76,6 @@ const marks = document.getElementById('chapter-marks')
 const chips = document.getElementById('star-chips')
 const pane = document.getElementById('figure-pane')
 const wingHost = document.getElementById('wing')
-const lobbyPlate = document.getElementById('lobby-plate')
 if (
   !stage || !status || !keeper || !descent || !descentSkip || !verse || !voiceDom ||
   !plate || !invite || !marks || !chips || !pane || !wingHost
@@ -87,9 +89,13 @@ const plumbEl = descentEl.querySelector('.plumb') as HTMLElement | null
 /* the rest at a line is measured against the line: the shortest question does
    not take as long to read as the longest one. The weights average to one, so
    the ride's whole length is unchanged. */
-const askLengths = descentBeats.map((b) => (b.textContent ?? '').trim().length)
-const askMean = Math.max(1, askLengths.reduce((a, b) => a + b, 0) / Math.max(1, askLengths.length))
-const readWeights = askLengths.map((l) => 0.55 + (0.45 * l) / askMean)
+let readWeights: number[] = []
+function syncReadWeights(): void {
+  const lengths = descentBeats.map((b) => (b.textContent ?? '').trim().length)
+  const mean = Math.max(1, lengths.reduce((a, b) => a + b, 0) / Math.max(1, lengths.length))
+  readWeights = lengths.map((length) => 0.55 + (0.45 * length) / mean)
+}
+syncReadWeights()
 const verseEl: HTMLElement = verse
 const voiceEl2: HTMLElement = voiceDom
 const plateEl: HTMLElement = plate
@@ -152,7 +158,7 @@ const hotspots = createHotspots(hotspotsHost)
 const HUB_SPOTS = [
   {
     id: 'wheel',
-    label: 'The Sky',
+    label: say(LOBBY_TEXT.sky),
     pos: new Vector3(0, 2.3, -6.2),
     posNarrow: new Vector3(0, 1.75, -5.6),
     open: () => {
@@ -564,24 +570,17 @@ const smooth = (a: number, b: number, k: number): number => {
   const t = Math.min(1, Math.max(0, (k - a) / (b - a)))
   return t * t * (3 - 2 * t)
 }
-// the overture stays clean: a title card in the black breath, then eight
-// questions on the way down. The Echo disclosure lives where the figures
-// speak (the pane's ink and the keeper's colophon).
-// Every beat RESTS at the middle of its band and the ride stops at those
-// rests, so the sealed states (0.10, 0.35, 0.60, 0.85) each stand on a
-// line that is being read rather than on a line passing by.
-const BEAT_HALF = 0.03
-// the title card holds through the turn over the ring, where the eclipse has
-// gone and the map has not risen yet: the widest band of the ride
+// Three reading stops over the falling disc: the museum, the walk, tonight.
+const BEAT_HALF = 0.065
 const CARD_HALF = 0.075
-const DESCENT_RESTS = [0.105, 0.2667, 0.35, 0.4333, 0.5167, 0.6, 0.6833, 0.7667, 0.85]
+const DESCENT_RESTS = [0.35, 0.6, 0.85]
 const DESCENT_STATIONS: Array<[number, number]> = DESCENT_RESTS.map(
   (r, i): [number, number] => {
     const h = i === 0 ? CARD_HALF : BEAT_HALF
     return [r - h, r + h]
   }
 )
-/** the ride's stops: the eclipse, the nine lines, the fire */
+/** The ride's stops: the eclipse, the three lines, the fire. */
 const RIDE_STOPS = [0, ...DESCENT_RESTS, 1]
 
 /** The dolly, concept-01 law: every camera value is a pure channel of
@@ -721,7 +720,7 @@ function descentCamera(k: number): void {
    frame count, and the rig's freeze stops it dead. */
 const HAND_WINDOW = 3.0 // seconds a push keeps the ride waiting for its owner
 const DWELL_HAND = 2.4 // the rest at a line while a hand is on the ride
-const DWELL_ALONE = 0.34 // and the rest when the frame is unwatched
+const DWELL_ALONE = 3.2 // museum sentences remain long enough to read without a hand
 // two strides taken by hand and the ride is the visitor's: it then waits at
 // every line long enough to read it twice, and the whole prelude is as long
 // as he wants it. Nobody is ever stranded, the ride simply goes on last.
@@ -1068,9 +1067,6 @@ addEventListener('popstate', () => {
   else if (phase === 'wing' || phase === 'bench') toLobby()
 })
 
-// the lobby's plate: what the register can answer for, said once
-if (lobbyPlate) lobbyPlate.textContent = wingCount(wingsOpen(), wingsPreparing())
-
 window.__forge = {
   jump(state, opts = {}) {
     // a state the museum does not have is a mistake in the rig's own spec:
@@ -1290,10 +1286,10 @@ function setPhase(next: Phase): void {
   phase = next
   document.body.dataset['phase'] = next
   stack.setScene(scene, camera, LOOK[next])
-  if (next === 'held') setStatus('Scroll to enter')
+  if (next === 'held') setStatus('enter')
   if (next === 'descent') {
     wakeMusic() // reaching the descent IS the first gesture
-    setStatus('Scroll to descend')
+    setStatus('descend')
     descentEl.hidden = false
     holdRide(desc)
     lastHand = rideClock
@@ -1309,8 +1305,8 @@ function setPhase(next: Phase): void {
     lookUp = 0
     keeperScene.setScript(FIRE_SCRIPT)
     keeperEl.hidden = true
-    setStatus('The night agora · scroll to look up')
-    verseShow('Questions shine within you')
+    setStatus('fireStatus')
+    verseShow(say(LOBBY_TEXT.fireVerse))
   }
   if (next === 'wheel') {
     setStatus('')
@@ -1347,8 +1343,10 @@ function setPhase(next: Phase): void {
   }
 }
 
-function setStatus(text: string): void {
-  if (status) status.textContent = text
+function setStatus(key: keyof typeof LOBBY_TEXT | ''): void {
+  if (!status) return
+  status.dataset['lobby'] = key
+  status.textContent = key ? say(LOBBY_TEXT[key]) : ''
 }
 
 // ---- input: scroll is the only verb ----
@@ -1772,7 +1770,7 @@ function bootRoute(): boolean {
 }
 
 function main(): void {
-  if (!bootRoute()) setStatus('First light')
+  if (!bootRoute()) setStatus('firstLight')
   let logged = false
   const origRender = frame
   requestAnimationFrame((t) => {

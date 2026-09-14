@@ -496,7 +496,7 @@
       bottom: calc(102px + env(safe-area-inset-bottom));
     }
     body[data-phase='descent'].riding #descent-skip { opacity: 0.85; visibility: visible; }
-    body[data-phase='descent'].riding .status { opacity: 0; }
+    body[data-phase='descent'].riding .status { opacity: 0; visibility: hidden; }
     body[data-phase='descent'] #rail-instruments { opacity: 0; visibility: hidden; }
     /* the arrival's line stands clear of the flames: the fire owns the foot
        of that frame, and no instruction may sit on a bright object */
@@ -1082,26 +1082,20 @@
     <div class="copy">
       <h1 data-lobby="tagline">The digital museum of thirty lives. Walk where they lived, see what they made.</h1>
     </div>
-    <p class="status" id="status" role="status">First light</p>
+    <p class="status" id="status" role="status" data-lobby="firstLight">First light</p>
     <p id="lobby-plate" data-na-claim="documented" data-na-persistent data-na-anchor="lobby/register" data-na-anchor-class="procedural"></p>
-    <button id="overture-skip" type="button">Skip the overture · begin at the fire</button>
+    <button id="overture-skip" type="button" data-lobby="skipOverture">Skip the overture · begin at the fire</button>
   </div>
   <div id="descent" hidden>
     <div class="descent-beat">
-      <p class="descent-kicker">The Descent</p>
-      <p class="descent-ask">Eight questions, older than every voice below.</p>
+      <p class="descent-kicker" data-lobby="descentTitle">The museum</p>
+      <p class="descent-ask" data-lobby="descentMuseum">A digital museum of thirty lives. Each in the place they lived, at a real hour of a real day.</p>
     </div>
-    <div class="descent-beat"><p class="descent-ask">Who am I?</p></div>
-    <div class="descent-beat"><p class="descent-ask">What binds us to each other?</p></div>
-    <div class="descent-beat"><p class="descent-ask">What makes a life worth living?</p></div>
-    <div class="descent-beat"><p class="descent-ask">Where do ideas come from?</p></div>
-    <div class="descent-beat"><p class="descent-ask">How should we live?</p></div>
-    <div class="descent-beat"><p class="descent-ask">What does it mean to be free?</p></div>
-    <div class="descent-beat"><p class="descent-ask">What lies beyond what we know?</p></div>
-    <div class="descent-beat"><p class="descent-ask">How do we carry what we have lost?</p></div>
+    <div class="descent-beat"><p class="descent-ask" data-lobby="descentWalk">Walk. Look closer. Ask.</p></div>
+    <div class="descent-beat"><p class="descent-kicker" data-lobby="tonight">Tonight</p><p class="descent-ask" data-lobby-count></p></div>
     <div class="plumb" aria-hidden="true"></div>
     <div class="hearth" aria-hidden="true"></div>
-    <button id="descent-skip" type="button">Skip to the fire</button>
+    <button id="descent-skip" type="button" data-lobby="skipDescent">Skip to the fire</button>
   </div>
   <p id="verse"></p>
   <div id="keeper" hidden>
@@ -1118,7 +1112,7 @@
   </div>
   <p id="sky-invite">Open any name to explore their life and ideas.</p>
   <p id="chapter-marks" aria-hidden="true"></p>
-  <button id="sky-return" type="button" hidden>The Fire · return</button>
+  <button id="sky-return" type="button" data-lobby="skyReturn" hidden>The Fire · return</button>
   <div id="star-chips" hidden></div>
   <div id="figure-pane" hidden>
     <button class="pane-close" type="button">Back to the sky</button>
