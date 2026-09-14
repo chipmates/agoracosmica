@@ -41,10 +41,16 @@ const p=(e:number,n:number,h:number,te:number,tn:number,th:number,fov=49):Pose=>
 const NARROW_LENS=1.26, NARROW_AIM_SHARE=.21
 /** The phone stage the narrow poses are composed against, 390 by 844 px. */
 const PHONE_STAGE=390/844
-function narrowRoomPose(pose:Pose):Pose {
+/** THE HALL'S TWO STATIONS STAND OVER PAVING AND NOTHING ELSE. The full drop
+ * lifts every machine clear of the card and leaves bare floor under it, so
+ * these two aim less far down and the nearest deck stands under the card.
+ * The flight station keeps more of the drop, which is what holds its screw
+ * whole above the card. */
+const NARROW_AIM_STATION:Partial<Record<VinciStationId,number>>={works:.15,flight:.18}
+function narrowRoomPose(pose:Pose,share=NARROW_AIM_SHARE):Pose {
   const fov=Math.min(104,pose.fov*NARROW_LENS)
   const reach=pose.eye.distanceTo(pose.at)
-  const drop=reach*Math.tan(fov*Math.PI/180*NARROW_AIM_SHARE)
+  const drop=reach*Math.tan(fov*Math.PI/180*share)
   return {eye:pose.eye.clone(),at:pose.at.clone().setY(pose.at.y-drop),fov}
 }
 /** The stations that stand in a built room rather than on a plate. */
@@ -86,7 +92,8 @@ export function stationPose(id:VinciStationId, narrow:boolean):Pose {
   // Floor subjects have a measured phone composition of their own; the
   // generic room adjustment below is for upright exhibits and architecture.
   if(room?.startsWith('collection-room-line-')){const pose=collectionView(room,narrow);if(pose)return pose}
-  if(room){const pose=collectionView(room,false);if(pose)return narrow?narrowRoomPose(pose):pose}
+  if(room){const pose=collectionView(room,false)
+    if(pose)return narrow?narrowRoomPose(pose,NARROW_AIM_STATION[id]??NARROW_AIM_SHARE):pose}
   // A future station without a room keeps the held terrace composition.
   return p(-12.4,-21.6,groundHeight(-12.4,-21.6)+1.65,-38,-44,-4.2,narrow?74:58)
 }
