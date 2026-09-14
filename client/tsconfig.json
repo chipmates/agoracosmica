@@ -27,8 +27,7 @@
     "types": ["vite/client", "node"],
     "paths": {
       "@/*": ["./src/*"]
-    },
-    "baseUrl": "."
+    }
   },
   "include": ["src/**/*", "vite.config.mjs"],
   "exclude": ["node_modules", "build", "dist"]

@@ -13,6 +13,7 @@
     "zustand": "^5.0.15"
   },
   "devDependencies": {
+    "@testing-library/dom": "^10.4.2",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^14.6.7",
@@ -31,7 +32,7 @@
     "fake-indexeddb": "^6.2.5",
     "jsdom": "^30.0.1",
     "rollup": "4.63.1",
-    "typescript": "^5.9.3",
+    "typescript": "^6.0.3",
     "vite": "^7.3.5",
     "vitest": "^4.1.11"
   },
