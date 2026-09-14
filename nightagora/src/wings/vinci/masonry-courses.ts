@@ -45,8 +45,18 @@ export const courseProvenance = {
 
 const hash = (a: N, b: N, salt: number): N => fract(a.mul(31.17).add(b.mul(13.713)).add(salt).sin().mul(4317.1))
 
+/** THE FOOTPRINT IS NOT A CIRCLE. A wall seen along its own length has a pixel
+ * that is centimetres across the courses and metres along them. Adding both
+ * screen derivatives filters the whole surface away at a grazing angle, which
+ * is how a near wall becomes flat colour; a real sampler caps anisotropy
+ * instead, and so does this. */
+export function anisotropicFootprint(P: N, maximumRatio = 8): N {
+  const dx = length(P.dFdx()), dy = length(P.dFdy())
+  return dx.min(dy).max(dx.max(dy).div(maximumRatio)).max(.00001)
+}
+
 /** Face tone, joint coverage and the joint's own depth, in metres. */
-export function coursedFace(U: N, recipe: CourseRecipe = dressedTuffeau): { tone: N; joint: N; depthM: N } {
+export function coursedFace(U: N, recipe: CourseRecipe = dressedTuffeau): { tone: N; joint: N; depthM: N; cell: N; held: N } {
   const r = recipe
   const wave = float(Math.PI * 2 / r.courseWaveM)
   // A monotone phase whose slope carries the course-height swing; dividing
@@ -58,18 +68,39 @@ export function coursedFace(U: N, recipe: CourseRecipe = dressedTuffeau): { tone
   const length_ = float(r.blockM).mul(hash(row, float(0), r.seed).sub(.5).mul(r.blockSwing).add(1))
   const head = U.x.div(length_).add(hash(row, float(1), r.seed + 5.1))
   const headM = fract(head).sub(.5).abs().sub(.5).abs().mul(length_)
-  const wander = mx_noise_float(vec2(U.x.mul(7.3), U.y.mul(11.7))).mul(r.wanderM)
-  const edge = bedM.min(headM).add(wander).max(0)
-  const pixel = length(U.dFdx()).add(length(U.dFdy())).mul(.5).max(.0002)
-  // A joint narrower than the pixel must fade back into the wall, not smear
-  // into a half-covered grey across the whole face.
-  const held = smoothstep(1.3, 2.8, float(r.courseM).div(pixel))
-  const joint = float(1).sub(smoothstep(float(r.jointM * .5).sub(pixel).max(0), float(r.jointM * .5).add(pixel), edge)).mul(held)
+  // A bed joint is a line in U.y and a head joint a line in U.x, so each is
+  // filtered on its own axis. One shared pixel is what made the courses break
+  // into a stipple where the wall runs away from the eye.
+  const dx = U.dFdx(), dy = U.dFdy()
+  const acrossCourses = vec2(dx.y, dy.y).length().max(.00002)
+  const alongCourses = vec2(dx.x, dy.x).length().max(.00002)
+  // The joint's own wander is noise: it may only be added where its own
+  // wavelength is resolved, or it jitters the line by a pixel per pixel.
+  const wanderHeld = smoothstep(2, 5, float(.137).div(alongCourses.max(acrossCourses)))
+  const wander = mx_noise_float(vec2(U.x.mul(7.3), U.y.mul(11.7))).mul(r.wanderM).mul(wanderHeld)
+  const bedHeld = smoothstep(1.3, 2.8, float(r.courseM).div(acrossCourses))
+  const headHeld = smoothstep(1.3, 2.8, length_.div(alongCourses))
+  // A joint narrower than the pixel fades back into the wall, never into a
+  // half-covered grey across the whole face.
+  const line = (distance: N, pixel: N, held: N): N => float(1)
+    .sub(smoothstep(float(r.jointM * .5).sub(pixel).max(0), float(r.jointM * .5).add(pixel), distance)).mul(held)
+  const joint = line(bedM.add(wander).max(0), acrossCourses, bedHeld)
+    .max(line(headM.add(wander).max(0), alongCourses, headHeld))
   const column = floor(head)
-  const face = hash(row, column, r.seed + 11.3).sub(.5).mul(2 * r.faceSwing)
+  // Where the heads compress under a pixel the block tone would alias, so the
+  // wall keeps the coarser thing a raking eye actually sees: course to course
+  // drift rather than stone to stone.
+  const blockTone = hash(row, column, r.seed + 11.3).sub(.5).mul(2 * r.faceSwing)
+  const courseTone = hash(row, float(2), r.seed + 3.9).sub(.5).mul(1.2 * r.faceSwing)
+  const face = mix(courseTone.mul(bedHeld), blockTone, headHeld)
   // The arris of a hand-dressed block is never quite sharp.
-  const arris = smoothstep(r.jointM * .5, r.jointM * 2.6, edge)
-  return { tone: float(1).add(face).sub(mix(float(.035), float(0), arris).mul(held)), joint, depthM: joint.mul(-r.jointM * .22) }
+  const arris = smoothstep(r.jointM * .5, r.jointM * 2.6, bedM.min(headM).add(wander).max(0))
+  return {
+    tone: float(1).add(face).sub(mix(float(.035), float(0), arris).mul(bedHeld.max(headHeld))),
+    joint, depthM: joint.mul(-r.jointM * .22),
+    /** one number per stone, so a face can be dressed as its own stone */
+    cell: hash(row, column, r.seed + 7.7), held: bedHeld.max(headHeld),
+  }
 }
 
 /** Fold coursing into a shell surface that was built as plain geometry. */
