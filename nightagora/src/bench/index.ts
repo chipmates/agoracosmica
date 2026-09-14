@@ -225,9 +225,13 @@ export function createBench(stack: Stack, onLobby: () => void) {
   }
 
   function close(): void {
-    if (!live) return
+    /* EVERY KIND, NOT ONLY THE ONE THE HOST IS HOLDING. A kind may have been
+       mounted by something other than this host (the table's own probe mounts
+       states directly), and then the host's handle is null while a scene, a
+       key rig and a DOM host are still standing. Departure means the phase is
+       over for all of them; close on an inactive kind is a no-op. */
     serial++
-    live.close()
+    for (const module of built.values()) module.close()
     live = null
     kind = null
   }

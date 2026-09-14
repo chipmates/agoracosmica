@@ -859,6 +859,8 @@ declare global {
       /** the machine bench under its own name, for a rig written against
           it. Null when another kind stands. */
       machine: () => unknown
+      /** the reading table's own reading, or null when it is not standing */
+      table: () => unknown
       cost: () => {
         draws: number
         triangles: number
@@ -1078,6 +1080,12 @@ window.__forge = {
   },
   machine() {
     return bench.kind() === 'machines' ? bench.telemetry() : null
+  },
+  /** the reading table as the rig addresses it: the open folio, the turn's
+      progress and the panel's text. Null unless the table is the standing
+      bench, so a rig cannot read one bench's numbers off another. */
+  table() {
+    return bench.kind() === 'table' ? bench.telemetry() : null
   },
   look(yaw, pitch) {
     // a wing drives its own camera, so the cone of a station is turned
