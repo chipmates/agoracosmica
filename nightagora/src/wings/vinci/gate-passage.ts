@@ -152,22 +152,56 @@ export function createGatePassage(tier:TierName):Group {
   // zero by 60 mm; opening outward avoids all six rising stair treads.
   const hinge=Math.max(...sides.map(side=>side.end))+.02,leafLength=2.50,leafBottom=lower+.06,leafTop=leafBottom+2.45
   const leafCentre=-halfWidth-.11,leafHalf=.065/2,boards=tier==='calm'?8:10
+  // A LEDGED AND BRACED LEAF IS BOARDS, NOT A SLAB. Riven oak boards are not
+  // one width and not one thickness, and it is the step between them that
+  // catches the light in a passage with no sun in it. Widths and faces are
+  // drawn from a fixed sequence, so the leaf is the same leaf every time.
+  const swing=(n:number,salt:number):number=>{const x=Math.sin(n*12.9898+salt)*43758.5453;return x-Math.floor(x)}
+  const widths=Array.from({length:boards},(_,board)=>1+(swing(board,3.7)-.5)*.34)
+  const total=widths.reduce((sum,value)=>sum+value,0)
+  let run=0
   for(let board=0;board<boards;board++){
-    const s0=hinge+board*leafLength/boards+.0015,s1=hinge+(board+1)*leafLength/boards-.0015
-    member(oak,s0,s1,leafCentre-leafHalf,leafCentre+leafHalf,leafBottom,leafTop,[0,0,1])
+    const s0=hinge+run/total*leafLength+.0015
+    run+=widths[board]!
+    const s1=hinge+run/total*leafLength-.0015
+    // A board stands a few millimetres proud of its neighbour, and its sawn
+    // face is not quite flat: the joint between them is a shadow line.
+    const proud=(swing(board,9.1)-.5)*.009
+    member(oak,s0,s1,leafCentre-leafHalf-proud,leafCentre+leafHalf,leafBottom,leafTop,[0,0,1])
   }
-  for(const h of[leafBottom+.36,leafTop-.36])member(oak,hinge+.035,hinge+leafLength-.035,
-    leafCentre+leafHalf,leafCentre+leafHalf+.055,h-.055,h+.055,[along[0],along[1],0])
-  // The diagonal brace is a vertical rectangle extruded across the leaf.
-  const braceLow=leafBottom+.44,braceHigh=leafTop-.44,s0=hinge+.12,s1=hinge+leafLength-.12
-  const low0=at(s0,leafCentre+leafHalf+.058,braceLow-.05),low1=at(s1,leafCentre+leafHalf+.058,braceHigh-.05)
-  const high1=at(s1,leafCentre+leafHalf+.058,braceHigh+.05),high0=at(s0,leafCentre+leafHalf+.058,braceLow+.05)
-  const braceAxis:Point3=[along[0]*(s1-s0),along[1]*(s1-s0),braceHigh-braceLow]
-  oak.quad([low0,low1,high1,high0],[across[0],across[1],0],1,braceAxis)
-  for(const h of[leafBottom+.30,leafTop-.30]){
+  // Three ledges and two braces: the frame the boards are nailed to.
+  const ledges=[leafBottom+.30,leafBottom+(leafTop-leafBottom)/2,leafTop-.30]
+  for(const h of ledges)member(oak,hinge+.035,hinge+leafLength-.035,
+    leafCentre+leafHalf,leafCentre+leafHalf+.055,h-.058,h+.058,[along[0],along[1],0])
+  const s0=hinge+.12,s1=hinge+leafLength-.12
+  for(let bay=0;bay<2;bay++){
+    const braceLow=ledges[bay]!+.06,braceHigh=ledges[bay+1]!-.06
+    const low0=at(s0,leafCentre+leafHalf+.058,braceLow-.05),low1=at(s1,leafCentre+leafHalf+.058,braceHigh-.05)
+    const high1=at(s1,leafCentre+leafHalf+.058,braceHigh+.05),high0=at(s0,leafCentre+leafHalf+.058,braceLow+.05)
+    const braceAxis:Point3=[along[0]*(s1-s0),along[1]*(s1-s0),braceHigh-braceLow]
+    oak.quad([low0,low1,high1,high0],[across[0],across[1],0],1,braceAxis)
+  }
+  // The ironwork: two pintles on the jamb, two straps running two thirds of
+  // the way across the leaf and tapering to their tips, the nails that hold
+  // them, and a ring handle on the shutting stile.
+  for(const h of[ledges[0]!,ledges[2]!]){
     member(hardware,hinge-.045,hinge+.06,-halfWidth-.16,-halfWidth-.015,h-.10,h+.10,[0,0,1])
-    member(hardware,hinge+.02,hinge+.52,leafCentre+leafHalf+.058,leafCentre+leafHalf+.077,h-.026,h+.026,[along[0],along[1],0])
+    member(hardware,hinge+.02,hinge+.92,leafCentre+leafHalf+.058,leafCentre+leafHalf+.079,h-.030,h+.030,[along[0],along[1],0])
+    member(hardware,hinge+.92,hinge+1.64,leafCentre+leafHalf+.058,leafCentre+leafHalf+.074,h-.019,h+.019,[along[0],along[1],0])
+    for(let nail=0;nail<6;nail++){
+      const at0=hinge+.14+nail*.28
+      member(hardware,at0,at0+.035,leafCentre+leafHalf+.079,leafCentre+leafHalf+.092,h-.017,h+.017,[0,0,1])
+    }
   }
+  for(const h of ledges){
+    for(let nail=0;nail<3;nail++){
+      const at0=hinge+.30+nail*.85
+      member(hardware,at0,at0+.03,leafCentre-leafHalf-.012,leafCentre-leafHalf,h-.015,h+.015,[0,0,1])
+    }
+  }
+  const ring=leafBottom+1.02
+  member(hardware,hinge+leafLength-.30,hinge+leafLength-.13,leafCentre-leafHalf-.055,leafCentre-leafHalf-.012,ring-.021,ring+.021,[0,0,1])
+  member(hardware,hinge+leafLength-.24,hinge+leafLength-.19,leafCentre-leafHalf-.075,leafCentre-leafHalf-.05,ring-.085,ring+.02,[0,0,1])
 
   const group=new Group();group.name='wing-vinci/gate-passage'
   for(const [batch,name,darken,surfaceOnly]of[[lining,'masonry lining',.62,false],[threshold,'stone thresholds',1,true],
