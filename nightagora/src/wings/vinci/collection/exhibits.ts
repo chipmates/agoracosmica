@@ -5,12 +5,12 @@
  * `grave/` and `myths/` by their own factories. This module owns where they
  * stand, what they stand on and which way they face, and nothing else.
  */
-import { Group, PointLight, Vector3, type Material } from 'three/webgpu'
+import { Group, Mesh, PointLight, Vector3, type Material } from 'three/webgpu'
 import type { Stack } from '../../../stack'
 import { buildMachine, MACHINE_SLUGS, type MachineSlug } from '../machines'
 import type { ReadyMachineBuild } from '../machines/runtime'
 import { mountBoxes } from '../machines/bench/mounts'
-import { createLine } from '../line'
+import { createCollectionLineFloor } from './line-floor'
 import { createGrave } from '../grave'
 import { createMythDeathbed, createMythQuotes } from '../myths'
 import { buildTable, type PageRecord } from '../table'
@@ -159,9 +159,9 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
   // procedural stones, so they cost the page no library and are visible
   // through the window wall from every station outside.
   const exhibitStones = collectionExhibitMaterials()
-  const line = createLine(exhibitStones, 0, lang(), false)
+  const line = createCollectionLineFloor(exhibitStones, lang())
   line.position.set(LINE_ORIGIN.east, FLOOR + .01, -LINE_ORIGIN.north)
-  stamp(line, 'vinci/line-geometry')
+  stamp(line, 'vinci/collection-line-floor')
   host.add(line)
   const graveNear = new Vector3(-42, FLOOR, 46)
   /** The middle of the insertion, for the distance at which its rooms are
@@ -332,6 +332,15 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
       for (const machine of machines) machine.build.dispose()
       for (const strike of teardown) strike()
       grave.dispose()
+      const lineMaterials = new Set<Material>()
+      line.traverse(object => {
+        if (!(object instanceof Mesh)) return
+        object.geometry.dispose()
+        for (const surface of Array.isArray(object.material) ? object.material : [object.material]) {
+          if (surface.userData['owned']) lineMaterials.add(surface)
+        }
+      })
+      for (const surface of lineMaterials) surface.dispose()
       for (const stone of Object.values(exhibitStones)) stone.dispose()
       material.dispose()
       plinthMesh.geometry.dispose()

@@ -62,7 +62,7 @@
    "prompt": "Museum camera poses and piecewise exterior circulation in the fixed dossier frame. All poses are exhibition choices. FIFO semantic navigation on measured gate/terrace/stair/apron routes. Bounded physical near-pyramid clearance; measured geometry identity at mount. CSS projection-derived drag with 0.1 second monotone response; explicit inspection entry and return. No ordinary selected request discarded. Static material inspection aliases have separate actual placement audits.",
    "model": "Deterministic TypeScript and TSL procedural geometry",
    "date": "2026-09-09",
-   "sha256": "08adbdd2fec178969b2759a15f2b520febd00385543ce478c533118185ab139a",
+   "sha256": "4ad2319015bcc0517f3947aa0c1d71fc4eb2603a1d10ceb8e918892262f1136e",
    "note": "brief/CONCEPT.md; src/wings/vinci/data/closluce.json; recipe_file=src/wings/vinci/rail.ts; companion_file=src/wings/vinci/input.ts; companion_recipe_ids=vinci/rail-smoothing,vinci/rail-proof,vinci/rail-fingerprint,vinci/rail-projection,vinci/projection-drag,vinci/rail-clearance,vinci/rail-waypoints,vinci/rail-solids,vinci/gait"
   },
   {
@@ -413,7 +413,7 @@
    "prompt": "Regenerable actual geometry certificate for40 directed routes across five pose families and two viewport families. Includes foundation, entry, vegetation and all dressing; no sky, DOM or shadow-only duplicate.",
    "model": "Deterministic TypeScript and TSL procedural geometry",
    "date": "2026-09-10",
-   "sha256": "223de86147bf4d0870c1e3d9fcc00b5da86db79d9ceb13a153570eaa3b2e7f0f",
+   "sha256": "f85f6c232cf542e065161416f095c308cae9e4877b7e5037d18175e3d7dbf2e7",
    "note": "recipe_file=src/wings/vinci/data/rail-clearance.json; source_generator=src/wings/vinci/rail-certify.mjs; runtime dependency of vinci/rail"
   },
   {
@@ -439,7 +439,7 @@
    "prompt": "The turns a route takes between two stations, written against the registered gate crossing, the access stair layout and the collection stair.",
    "model": "Deterministic TypeScript and TSL procedural geometry",
    "date": "2026-09-11",
-   "sha256": "6b133e4a5fc3359154fe7ef4c86289fc9ce1364ad1cd9060b932a7807fdcc4a4",
+   "sha256": "94a02551f59abc8eec4b75860902582ae3a0344e3b290e07dd24417c7df94e69",
    "note": "recipe_file=src/wings/vinci/rail-waypoints.ts; source_generator=src/wings/vinci/rail-certify.mjs; runtime dependency of vinci/rail"
   },
   {
@@ -3377,6 +3377,61 @@
    "date": "2026-09-10",
    "sha256": "d832fc97094312feaaaac38a9ac2ecd8f13279fbaa7ed00f58fdfb43d6abd6d6",
    "note": "recipe_file=src/wings/vinci/line/bench/visitor-sources.ts"
+  },
+  {
+   "id": "vinci/collection-line-floor",
+   "path": "procedural/collection-line-floor/",
+   "wing": "vinci",
+   "class": "GENERATED",
+   "licence": "Original procedural museum exhibition. Source code under the museum repository licence.",
+   "display": true,
+   "prompt": "Twelve complete date sockets from the unchanged line bench, mounted in three fixed excerpts of four at true scale on the long gallery floor. The sections begin with the recorded birth in1452, the Vespucci note in1503 and the Amboise visit in1517, and end with the1519 will and death. Original bronze numerals, certainty words and colours, two named1504 events and1.65m nonchronological spacing are retained. The collection host clips the original paving to its room and excludes the standalone bench walls, rail and threshold continuation, keeping the gallery doors and crossing clear. Modern exhibition composition, no historical building claim.",
+   "model": "Deterministic TypeScript geometry derived from the line module",
+   "date": "2026-09-14",
+   "sha256": "42e72b2afbd988d57833ecaa78a51e8ef7626af5f4ddd93f4b8e725f115f9dbe",
+   "note": "recipe_file=src/wings/vinci/collection/line-floor.ts; source_module=src/wings/vinci/line/index.ts; source_indices=0..3,28..31,38..41; all56 records remain at the bench address",
+   "recipe_files": [
+    {
+     "path": "src/wings/vinci/collection/line-floor.ts",
+     "sha256": "42e72b2afbd988d57833ecaa78a51e8ef7626af5f4ddd93f4b8e725f115f9dbe"
+    },
+    {
+     "path": "src/wings/vinci/collection/layout.ts",
+     "sha256": "955fd7e295ece5e4677c2c88e7c451d862e6fb58c2164e0457781498e67cd74d"
+    },
+    {
+     "path": "src/wings/vinci/collection/exhibits.ts",
+     "sha256": "0396f1f8de2ad6db23bf040d36585f77ce0d84b503209cc31edf8f17b6e9b9ce"
+    },
+    {
+     "path": "src/wings/vinci/collection/views.ts",
+     "sha256": "872e99dced65ab5406049f2664b8b3dc6f7b72d81c428b882dd22039618eba30"
+    },
+    {
+     "path": "src/wings/vinci/rail.ts",
+     "sha256": "4ad2319015bcc0517f3947aa0c1d71fc4eb2603a1d10ceb8e918892262f1136e"
+    },
+    {
+     "path": "src/wings/vinci/rail-waypoints.ts",
+     "sha256": "94a02551f59abc8eec4b75860902582ae3a0344e3b290e07dd24417c7df94e69"
+    },
+    {
+     "path": "src/wings/vinci/line/index.ts",
+     "sha256": "6e3c7874d55bf2dbe2b0b9cd583c3105eb9e5e5052e6f238dcd149e645c52b83"
+    },
+    {
+     "path": "src/wings/vinci/line/data/timeline.json",
+     "sha256": "50ea7f7d43d6d8153e11c2704f1805c42a5ac9d51548732d6947206bd6c08d30"
+    },
+    {
+     "path": "src/wings/vinci/words/index.ts",
+     "sha256": "357f4aa063a5912dc0df1120676eaccf8e0694d7b1e96c6f81f866315c68a773"
+    },
+    {
+     "path": "src/wings/vinci/words/font.ts",
+     "sha256": "a9cb26861b281412b9b45f420f76a65663aca6903023d05b4e6c174dd12ec831"
+    }
+   ]
   }
  ]
 }

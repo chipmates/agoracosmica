@@ -18,6 +18,9 @@ export interface Pose { eye: Vector3; at: Vector3; fov: number }
  * where a hang is read, the hall from its north door, the line down its
  * length, the court from the end a visitor arrives at. */
 export const COLLECTION_STATION_ROOMS:Partial<Record<VinciStationId,string>>={
+  'line-early':'collection-room-line-early',
+  'line-late':'collection-room-line-late',
+  'line-amboise':'collection-room-line-amboise',
   'picture-room':'collection-room-picture',
   'supper-wall':'collection-room-supper',
   'reading-table':'collection-room-reading',
@@ -71,10 +74,7 @@ export function stationPose(id:VinciStationId, narrow:boolean):Pose {
   }
   const room=COLLECTION_STATION_ROOMS[id]
   if(room){const pose=collectionView(room,false);if(pose)return narrow?narrowRoomPose(pose):pose}
-  // The line's three plates stand on the terrace above the collection ground,
-  // outside every room. On the apron the eye stood two metres from the
-  // pavilion and its roof filled the near plane; from here the whole ground
-  // is the backdrop. No exhibit is implied by either.
+  // A future station without a room keeps the held terrace composition.
   return p(-12.4,-21.6,groundHeight(-12.4,-21.6)+1.65,-38,-44,-4.2,narrow?74:58)
 }
 export function namedPose(id:string,narrow:boolean):Pose|undefined {

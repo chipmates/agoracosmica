@@ -67,7 +67,7 @@ export const HANG_DATUM = FLOOR + 1.55
 
 /** The line is let into the gallery's floor on this grid, and the room's own
  * paving is laid on the same one, so the two meet without a seam. */
-export const LINE_ORIGIN = { east: -30.4, north: -59 }
+export const LINE_ORIGIN = { east: -30.4, north: -58.5 }
 export const LINE_SLAB = { pitchEast: 1.6, pitchNorth: 1.65, width: 1.585, depth: 1.635, thickness: 0.18 }
 /** What the line module lays down around its origin: sixteen courses by
  * seven, which is what the room's own floor is cut around. */

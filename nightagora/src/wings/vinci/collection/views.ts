@@ -1,14 +1,11 @@
 /** Named compositions inside the collection's rooms.
  *
- * The rail and the nineteen station poses belong to another hand: every
- * collection station shares one eye on the terrace above this ground, so a
- * room built here cannot be seen from a station at all. These are inspection
- * eyes, placed instantly and returned from, exactly as the wing's material
- * and entry inspections are. They move no station and certify no route.
+ * The rail uses these room views for its canonical stations and certifies
+ * every route between them. The same views remain available for inspection.
  */
 import { Vector3 } from 'three/webgpu'
 import { world } from '../site'
-import { COURT, FLOOR, GRAVE_ORIGIN, HANG_DATUM, PARACHUTE_ORIGIN, SUPPER_WALL } from './layout'
+import { COURT, FLOOR, GRAVE_ORIGIN, HANG_DATUM, LINE_ORIGIN, LINE_SLAB, PARACHUTE_ORIGIN, SUPPER_WALL } from './layout'
 
 export interface RoomPose { eye: Vector3; at: Vector3; fov: number }
 const EYE = FLOOR + 1.62
@@ -21,6 +18,24 @@ export function collectionView(id: string, narrow: boolean): RoomPose | undefine
   const pose = (e: number, n: number, h: number, te: number, tn: number, th: number, fov: number, lift = .9): RoomPose =>
     ({ eye: world(e, n, h), at: world(te, tn, th + (narrow ? lift : 0)), fov })
   switch (id) {
+    // Three fixed excerpts of the bench's date course, walked south from
+    // the picture room. The selected dates are 1452, 1503 and 1517; the
+    // last section continues to the two 1519 studs at the end of the line.
+    case 'collection-room-line-early': {
+      const north = LINE_ORIGIN.north + 9 * LINE_SLAB.pitchNorth
+      return pose(LINE_ORIGIN.east + .3, north + .7, FLOOR + 1.66,
+        LINE_ORIGIN.east - .5, north - .6, FLOOR + .013, 60, 0)
+    }
+    case 'collection-room-line-late': {
+      const north = LINE_ORIGIN.north + 5 * LINE_SLAB.pitchNorth
+      return pose(LINE_ORIGIN.east + .3, north + 1.4, FLOOR + 1.66,
+        LINE_ORIGIN.east - .5, north - .25, FLOOR + .013, 60, 0)
+    }
+    case 'collection-room-line-amboise': {
+      const north = LINE_ORIGIN.north + LINE_SLAB.pitchNorth
+      return pose(LINE_ORIGIN.east + .3, north + 1.4, FLOOR + 1.66,
+        LINE_ORIGIN.east - .5, north - .25, FLOOR + .013, 60, 0)
+    }
     // The picture room, standing where a visitor stands to read a hang.
     case 'collection-room-picture':
       return pose(-38.2, -35.6, EYE, -42.6, -41.8, HANG_DATUM + .1, narrow ? 74 : 58, .8)
@@ -37,7 +52,7 @@ export function collectionView(id: string, narrow: boolean): RoomPose | undefine
       return pose(-50.4, -52.4, EYE + .3, -56.4, -62.6, FLOOR + 3.1, narrow ? 82 : 64, 1.5)
     // The long gallery, down the line.
     case 'collection-room-gallery':
-      // The line reads from the south: its dates are cut to be walked north.
+      // The gallery's existing survey view remains at its south end.
       return pose(-30.2, -60.4, EYE, -30.4, -46, FLOOR + .25, narrow ? 76 : 60, -.55)
     case 'collection-room-reading':
       return pose(-34.6, -46.3, EYE - .08, -37.7, -45.35, FLOOR + 1.28, narrow ? 76 : 60, .3)
@@ -63,6 +78,7 @@ export function collectionView(id: string, narrow: boolean): RoomPose | undefine
 }
 
 export const COLLECTION_VIEW_IDS = [
+  'collection-room-line-early', 'collection-room-line-late', 'collection-room-line-amboise',
   'collection-room-picture', 'collection-room-picture-long', 'collection-hang-near',
   'collection-room-hall', 'collection-room-hall-screw', 'collection-room-corrections',
   'collection-room-gallery', 'collection-room-reading', 'collection-room-body',
