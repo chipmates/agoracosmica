@@ -73,6 +73,9 @@ export function stationPose(id:VinciStationId, narrow:boolean):Pose {
     return narrow?narrowRoomPose(square):square
   }
   const room=COLLECTION_STATION_ROOMS[id]
+  // Floor subjects have a measured phone composition of their own; the
+  // generic room adjustment below is for upright exhibits and architecture.
+  if(room?.startsWith('collection-room-line-')){const pose=collectionView(room,narrow);if(pose)return pose}
   if(room){const pose=collectionView(room,false);if(pose)return narrow?narrowRoomPose(pose):pose}
   // A future station without a room keeps the held terrace composition.
   return p(-12.4,-21.6,groundHeight(-12.4,-21.6)+1.65,-38,-44,-4.2,narrow?74:58)

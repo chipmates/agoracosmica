@@ -10,6 +10,18 @@ import { COURT, FLOOR, GRAVE_ORIGIN, HANG_DATUM, LINE_ORIGIN, LINE_SLAB, PARACHU
 export interface RoomPose { eye: Vector3; at: Vector3; fov: number }
 const EYE = FLOOR + 1.62
 
+/** Floor lettering needs its own gaze. The near date is the subject; the
+ * following studs recede above it. Both lenses keep the existing standing
+ * eye, with the phone's complete date above the card rather than beneath it.
+ */
+function lineFloorView(north: number, narrow: boolean, early: boolean): RoomPose {
+  const eye = world(LINE_ORIGIN.east + .3, north + (early ? .7 : 1.4), FLOOR + 1.66)
+  const heading = (narrow ? (early ? -51 : -30) : (early ? -30 : -14)) * Math.PI / 180
+  const descent = (narrow ? (early ? 75 : 64) : (early ? 61 : 51)) * Math.PI / 180
+  const direction = new Vector3(Math.sin(heading) * Math.cos(descent), -Math.sin(descent), Math.cos(heading) * Math.cos(descent))
+  return { eye, at: eye.clone().add(direction), fov: narrow ? 100 : early ? 70 : 64 }
+}
+
 export function collectionView(id: string, narrow: boolean): RoomPose | undefined {
   /** THE PHONE'S STAGE IS A BAND, NOT A FRAME. The card, the rail, the
    * question and the door take two thirds of 844 px, so a subject aimed at
@@ -23,18 +35,15 @@ export function collectionView(id: string, narrow: boolean): RoomPose | undefine
     // last section continues to the two 1519 studs at the end of the line.
     case 'collection-room-line-early': {
       const north = LINE_ORIGIN.north + 9 * LINE_SLAB.pitchNorth
-      return pose(LINE_ORIGIN.east + .3, north + .7, FLOOR + 1.66,
-        LINE_ORIGIN.east - .5, north - .6, FLOOR + .013, 60, 0)
+      return lineFloorView(north, narrow, true)
     }
     case 'collection-room-line-late': {
       const north = LINE_ORIGIN.north + 5 * LINE_SLAB.pitchNorth
-      return pose(LINE_ORIGIN.east + .3, north + 1.4, FLOOR + 1.66,
-        LINE_ORIGIN.east - .5, north - .25, FLOOR + .013, 60, 0)
+      return lineFloorView(north, narrow, false)
     }
     case 'collection-room-line-amboise': {
       const north = LINE_ORIGIN.north + LINE_SLAB.pitchNorth
-      return pose(LINE_ORIGIN.east + .3, north + 1.4, FLOOR + 1.66,
-        LINE_ORIGIN.east - .5, north - .25, FLOOR + .013, 60, 0)
+      return lineFloorView(north, narrow, false)
     }
     // The picture room, standing where a visitor stands to read a hang.
     case 'collection-room-picture':
