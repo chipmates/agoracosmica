@@ -34,13 +34,17 @@ function findStore(from) {
 
 export const STORE = process.env.NA_ASSET_STORE ?? findStore(APP_ROOT)
 const CACHE = process.env.NA_ASSET_CACHE === '1'
-/* THE APP'S OWN SCOPES. A wing's procedural materials and its geometry
-   prompts ARE its recipe: there are no bytes to keep outside the
-   repository, and the record belongs beside the code that produces it. So
-   a wing may carry `<app>/assets/<scope>/manifest.json` and the merge
-   reads it beside the store's scopes. It may hold nothing else: a scope
-   here with bytes in it would be the store moving into the public
-   repository, which is the one thing the Manifest Law forbids. */
+/* THE APP'S OWN SCOPES. Procedural recipes and the provenance of licensed
+   Tier 1 / Tier 2 assets may live in `<app>/assets/<scope>/manifest.json`.
+   The merge reads these beside the store's scopes. Licensed originals,
+   previews and crops remain in STORE/<scope>/<path>, even when the store
+   scope has no manifest of its own. Each file has its own path, sha256,
+   bytes, width and height; previews is an array of those records, and crop
+   is one such record with box [left, top, right, bottom] in original pixels
+   (right and bottom exclusive). source_url may name the source's record;
+   original_url names the downloaded original. An app-local scope may hold
+   nothing besides its manifest: the repository keeps the record, never
+   the art. */
 export const APP_ASSETS = process.env.NA_APP_ASSETS ?? join(APP_ROOT, 'assets')
 export const MERGED = join(APP_ROOT, 'public', 'na-manifest.json')
 
@@ -59,7 +63,7 @@ export function storeScopes() {
   return scopesIn(STORE)
 }
 
-/** the app's own scopes, which carry procedural records and no bytes */
+/** the app's own scopes, which carry records and no bytes */
 export function appScopes() {
   return scopesIn(APP_ASSETS)
 }

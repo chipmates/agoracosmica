@@ -38,6 +38,67 @@
       "date": "2026-09-10",
       "sha256": "7de162a268393a97646e2af83e3f95f01aeedc2917318b7cf5f990625e36f2ca",
       "note": "Lobby polish commission; recipe_file=src/scenes/agora.ts. Hash covers the source file; only the commissioned surface was changed."
+    },
+    {
+      "id": "lobby/likeness-aurelius",
+      "path": "likenesses/aurelius/original.jpg",
+      "sha256": "e408a90507ff620f22d0e209bbfbf23a2e4eaf760dc7a443e1b011b20aff10d0",
+      "bytes": 8066250,
+      "width": 3263,
+      "height": 4894,
+      "pixels": 15969122,
+      "slug": "aurelius",
+      "name": "Marcus Aurelius",
+      "wing": "lobby",
+      "class": "Tier 1",
+      "tier": 1,
+      "licence": "This file is made available under the Creative Commons CC0 1.0 Universal Public Domain Dedication.",
+      "licence_source_url": "https://commons.wikimedia.org/wiki/File:Marcus_Aurelius_-_MET_-_MR_561_-_L.2008.49.jpg",
+      "licence_location": "Commons file page, Summary → Permission (Reusing this file)",
+      "holder": "Musée du Louvre, Département des Antiquités grecques, étrusques et romaines",
+      "maker": "Unknown Roman sculptor; photograph by Pierre-Selim Huard (PierreSelim)",
+      "date": "161–169 CE; photographed 18 July 2012",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Marcus_Aurelius_-_MET_-_MR_561_-_L.2008.49.jpg",
+      "original_url": "https://upload.wikimedia.org/wikipedia/commons/1/13/Marcus_Aurelius_-_MET_-_MR_561_-_L.2008.49.jpg",
+      "holder_record_url": "https://collections.louvre.fr/ark:/53355/cl010275331",
+      "display": true,
+      "label_en": "Marcus Aurelius (121–180). Unknown Roman sculptor, 161–169 CE. Marble portrait made during his lifetime. Musée du Louvre, MR 561; photographed on loan in New York by Pierre-Selim Huard. This file is made available under the Creative Commons CC0 1.0 Universal Public Domain Dedication.",
+      "label_de": "Marcus Aurelius (121–180). Unbekannter römischer Bildhauer, 161–169 n. Chr. Marmorporträt aus seiner Lebenszeit. Musée du Louvre, MR 561; als Leihgabe in New York fotografiert von Pierre-Selim Huard. This file is made available under the Creative Commons CC0 1.0 Universal Public Domain Dedication.",
+      "previews": [
+        {
+          "path": "likenesses/aurelius/preview-512.jpg",
+          "sha256": "0c10961c4f1c7ed20c980f0946321d62b6f106bc5cee796b1045e48b85d277ac",
+          "bytes": 31918,
+          "width": 341,
+          "height": 512,
+          "pixels": 174592,
+          "long_edge": 512,
+          "format": "image/jpeg",
+          "quality": 88,
+          "color_space": "sRGB",
+          "source_path": "likenesses/aurelius/original.jpg"
+        },
+        {
+          "path": "likenesses/aurelius/preview-1024.jpg",
+          "sha256": "ccb96b05cb14ed45ac6ee866fdf6c1f0f20f9374a64b853cff7ebe4af0014f29",
+          "bytes": 107226,
+          "width": 683,
+          "height": 1024,
+          "pixels": 699392,
+          "long_edge": 1024,
+          "format": "image/jpeg",
+          "quality": 88,
+          "color_space": "sRGB",
+          "source_path": "likenesses/aurelius/original.jpg"
+        }
+      ],
+      "verified_on": "2026-09-14",
+      "source_verification": "Current source record and exact downloaded original checked on admission.",
+      "derivation": "Converted embedded ICC profile to sRGB. JPEG previews resized with Lanczos, quality 88, embedded sRGB profile. Original bytes unchanged.",
+      "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "rights_note": "Ancient public-domain marble work → independently made 2012 photograph → its photographer PierreSelim explicitly releases that photograph under CC0 on Commons. The photograph of a 3D object has its own open dedication; this does not rely on PD-Art. The Louvre record gives loan number L.2007.49. The source filename’s L.2008.49 is retained only to identify the exact file.",
+      "attribution": "Unknown Roman sculptor; Musée du Louvre, MR 561. Photograph: Pierre-Selim Huard / Wikimedia Commons, CC0 1.0.",
+      "accession": "MR 561; Ma 1166; Louvre loan number L.2007.49"
     }
   ]
 }

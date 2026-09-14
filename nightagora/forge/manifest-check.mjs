@@ -18,22 +18,19 @@
 // can ship on the exception the lobby needed.
 //
 // A scope's record may also live in the APP, at <app>/assets/<scope>/
-// manifest.json, for a wing's own procedural materials and geometry
-// prompts. Every rule above applies to those entries unchanged. Two do not
-// apply, because a repository is not a store: an app-local scope may hold
-// no file besides its manifest, and an app-local entry that is not
-// GENERATED belongs in the store instead.
+// manifest.json, for procedural recipes or licensed Tier 1 / Tier 2 assets.
+// Every rule above applies unchanged: an app-local scope holds no file
+// besides its manifest. Tier originals, previews and crops are measured,
+// hashed files in the external store, never remote-record exceptions.
 import { createHash } from 'node:crypto'
-import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
-import { join } from 'node:path'
+import { existsSync, readdirSync, readFileSync, realpathSync, statSync } from 'node:fs'
+import { join, sep } from 'node:path'
 import {
-  APP_ASSETS,
   APP_ROOT,
   appScopes,
   filesOf,
   mergeManifests,
   scopes,
-  storeScopes,
   strayAppFiles,
   STORE,
 } from './vite-na-assets.mjs'
@@ -59,6 +56,26 @@ const ASSET_EXT =
 
 const errors = []
 const open = []
+const isTier = (entry) => entry.class === 'Tier 1' || entry.class === 'Tier 2'
+
+// Store paths use URL-safe relative components. Only legacy families and
+// procedural recipes may use a trailing slash or wildcard.
+function safePath(path, concrete = false) {
+  if (typeof path !== 'string' || !path || /[\\%?#:\u0000-\u001f\u007f]/.test(path)) return false
+  if (concrete && (path.endsWith('/') || path.includes('*'))) return false
+  const parts = path.replace(/\/$/, '').split('/')
+  return parts.every((part) => part && part !== '.' && part !== '..')
+}
+
+function measuredFile(record, where) {
+  if (!safePath(record.path, true)) errors.push(`${where}: path must name a safe relative file`)
+  if (typeof record.sha256 !== 'string' || !/^[a-f0-9]{64}$/.test(record.sha256))
+    errors.push(`${where}: sha256 must be 64 lowercase hexadecimal characters`)
+  for (const key of ['bytes', 'width', 'height']) {
+    if (!Number.isSafeInteger(record[key]) || record[key] <= 0)
+      errors.push(`${where}: ${key} must be a positive integer`)
+  }
+}
 
 // ------------------------------------------------------------ the manifests
 const { assets, problems } = mergeManifests()
@@ -72,9 +89,10 @@ for (const e of assets) {
 
 const scopeList = scopes()
 const local = new Set(appScopes())
+const filesByEntry = new Map()
 for (const e of assets) {
   const where = `${e.id}`
-  if (!e.path) errors.push(`${where}: no path`)
+  if (!safePath(e.path)) errors.push(`${where}: path must be safe and relative to its scope`)
   if (!e.licence) errors.push(`${where}: no licence line`)
   if (typeof e.display !== 'boolean') errors.push(`${where}: display must be true or false`)
   if (!scopeList.includes(e.wing)) errors.push(`${where}: wing "${e.wing}" is not a scope of the store`)
@@ -90,10 +108,39 @@ for (const e of assets) {
   }
   if (e.record === 'open' && e.wing !== 'lobby')
     errors.push(`${where}: an open record is only ever an inherited lobby asset`)
-  // the app's own record is the recipe of something the code makes; a
-  // captured or licensed asset is bytes, and bytes live in the store
-  if (e.origin === 'app' && e.class !== 'GENERATED')
-    errors.push(`${where}: a ${e.class} asset is recorded in the store, not in the repository`)
+  if (e.origin === 'app' && e.class !== 'GENERATED' && !isTier(e))
+    errors.push(`${where}: an app-local record must be GENERATED, Tier 1 or Tier 2`)
+
+  if (isTier(e)) measuredFile(e, where)
+  const records = [{ record: e, where, required: isTier(e) }]
+  if (e.previews !== undefined && !Array.isArray(e.previews))
+    errors.push(`${where}: previews must be an array`)
+  const variants = Array.isArray(e.previews)
+    ? e.previews.map((record, index) => ({ record, where: `${where} preview ${index}` }))
+    : []
+  if (e.crop !== undefined) variants.push({ record: e.crop, where: `${where} crop` })
+  const paths = new Set([e.path])
+  for (const variant of variants) {
+    const { record, where: label } = variant
+    if (!record || typeof record !== 'object' || Array.isArray(record)) {
+      errors.push(`${label}: file record must be an object`)
+      continue
+    }
+    measuredFile(record, label)
+    if (paths.has(record.path)) errors.push(`${label}: duplicate file path ${record.path}`)
+    paths.add(record.path)
+    records.push({ ...variant, required: true })
+  }
+  if (e.crop && typeof e.crop === 'object') {
+    const box = e.crop.box
+    if (!Array.isArray(box) || box.length !== 4 || !box.every(Number.isSafeInteger) ||
+        box[0] < 0 || box[1] < 0 || box[2] <= box[0] || box[3] <= box[1] ||
+        !Number.isSafeInteger(e.width) || !Number.isSafeInteger(e.height) ||
+        box[2] > e.width || box[3] > e.height ||
+        box[2] - box[0] !== e.crop.width || box[3] - box[1] !== e.crop.height)
+      errors.push(`${where} crop: box must match the crop dimensions within the original`)
+  }
+  filesByEntry.set(e, records.filter(({ record }) => safePath(record.path)))
 }
 
 // the repository holds the record and never the art
@@ -104,31 +151,43 @@ for (const scope of local) {
 
 // ----------------------------------------------------- the bytes on disk
 const sha = (file) => createHash('sha256').update(readFileSync(file)).digest('hex')
-const claimed = new Map() // scope -> Set of relative paths a manifest names
-
-for (const scope of storeScopes()) {
+for (const scope of scopeList) {
   const named = new Set()
   for (const e of assets.filter((a) => a.wing === scope)) {
-    if (e.path.endsWith('/') || e.path.includes('*')) continue // a set or a family
-    const file = join(STORE, scope, e.path)
-    named.add(e.path)
-    if (!existsSync(file)) {
-      // a remote asset is served from another origin and is not stored here
-      if (!e.source_url) errors.push(`${e.id}: no file at ${scope}/${e.path} and no source_url`)
-      continue
+    for (const { record, where, required } of filesByEntry.get(e)) {
+      if (record.path.endsWith('/') || record.path.includes('*')) continue // a set or a family
+      const file = join(STORE, scope, record.path)
+      named.add(record.path)
+      if (!existsSync(file)) {
+        // Older remote assets remain valid. Tier records and derived files
+        // explicitly claim local bytes; a source page cannot excuse a gap.
+        if (required) errors.push(`${where}: no file at ${scope}/${record.path}`)
+        else if (!e.source_url) errors.push(`${where}: no file at ${scope}/${record.path} and no source_url`)
+        continue
+      }
+      const realScope = realpathSync(join(STORE, scope))
+      if (!realScope.startsWith(realpathSync(STORE) + sep) ||
+          !realpathSync(file).startsWith(realScope + sep)) {
+        errors.push(`${where}: file resolves outside its store scope`)
+        continue
+      }
+      const stat = statSync(file)
+      if (!stat.isFile()) {
+        errors.push(`${where}: path does not name a file`)
+        continue
+      }
+      if (record.bytes !== undefined && record.bytes !== stat.size)
+        errors.push(`${where}: manifest says ${record.bytes} bytes, the file is ${stat.size}`)
+      if (!record.sha256) errors.push(`${where}: stored here and unhashed`)
+      else if (record.sha256 !== sha(file)) errors.push(`${where}: sha256 does not match the bytes on disk`)
     }
-    const bytes = statSync(file).size
-    if (e.bytes !== undefined && e.bytes !== bytes)
-      errors.push(`${e.id}: manifest says ${e.bytes} bytes, the file is ${bytes}`)
-    if (!e.sha256) errors.push(`${e.id}: stored here and unhashed`)
-    else if (e.sha256 !== sha(file)) errors.push(`${e.id}: sha256 does not match the bytes on disk`)
   }
-  claimed.set(scope, named)
   for (const rel of filesOf(scope)) {
     if (named.has(rel)) continue
     const covered = assets.some(
       (a) =>
         a.wing === scope &&
+        safePath(a.path) &&
         ((a.path.endsWith('/') && rel.startsWith(a.path)) ||
           (a.path.includes('*') && globMatch(a.path, rel)))
     )
@@ -200,9 +259,12 @@ for (const [ref, where] of refs) {
     byId.get(ref) ??
     assets.find(
       (a) =>
-        (a.source_url !== undefined && globMatch(a.source_url, ref)) ||
-        globMatch(`${a.wing}/${a.path}`, ref.replace(/^\/na-assets\//, '')) ||
-        globMatch(a.path, ref)
+        (typeof a.source_url === 'string' && globMatch(a.source_url, ref)) ||
+        (typeof a.original_url === 'string' && globMatch(a.original_url, ref)) ||
+        filesByEntry.get(a).some(({ record }) =>
+          globMatch(`${a.wing}/${record.path}`, ref.replace(/^\/na-assets\//, '')) ||
+          globMatch(record.path, ref)
+        )
     )
   if (!entry) {
     errors.push(`${where[0]} references ${ref}, which no manifest names`)
