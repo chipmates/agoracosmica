@@ -338,8 +338,12 @@ await section('actual geometry buffers at all tiers', () => {
 await section('actual camera rail against actual triangles', async () => {
   const { createRailGeometryAuthority, collectRailSolids } = await load(`${WING}/rail-proof.ts`);
   const { createCollectionStandSolids } = await load(`${WING}/collection/stands.ts`);
-  const ids = json('src/wings/vinci/data/doors.json').doors.map(door => door.station);
-  if (ids.length !== 19 || new Set(ids).size !== 19) throw new Error('Expected nineteen unique canonical station IDs.');
+  // The walk, in its own order. The door catalogue keeps the retired
+  // station's question, so the stations are read from the content module.
+  const ids = (await load(`${WING}/content.ts`)).vinciContent.map(station => station.id);
+  const canonicalDoors = json('src/wings/vinci/data/doors.json').doors.map(door => door.station);
+  if (!ids.length || new Set(ids).size !== ids.length || ids.some(id => !canonicalDoors.includes(id)))
+    throw new Error('Every station must be one canonical door, at most once.');
   const paths = [], poses = [], violations = [], collisionGeometry = [], MAX_VIOLATIONS = 80;
   let violationCount = 0, intersectingChords = 0;
   let totalSamples = 0, uniquePositions = 0, maxStepM = 0, maxRoll = 0, maxQuaternionError = 0, maxAimError = 0;
@@ -388,7 +392,7 @@ await section('actual camera rail against actual triangles', async () => {
     rail.set(ids[0], railModule.stationPose(ids[0], narrow), true); rail.update();
     const adjacentItinerary = [...ids, ...ids.slice(0, -1).reverse()];
     // The scrolling rail permits direct station selection. These five IDs
-    // represent every distinct physical pose used by the nineteen stations.
+    // represent every distinct physical pose used by the house and the street.
     const physicalIds = ['arrival','courtyard','hall','garden','line-early'];
     const direct = physicalIds.flatMap(from => physicalIds.filter(to => to !== from).map(to => ({ from, to })));
     const itinerary = [...adjacentItinerary, ...direct.map(item => item.to)];

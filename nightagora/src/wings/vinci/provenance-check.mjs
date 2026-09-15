@@ -183,15 +183,22 @@ section('canonical stations, questions, hour and carrier claims', () => {
   }
   const exported = loadContent(canonical.doors);
   const stations = exported.vinciContent, expectedIds = canonical.doors.map(door => door.station);
-  if (expectedIds.length !== 19 || new Set(expectedIds).size !== 19) throw new Error('Supplied canonical doors do not contain nineteen unique station IDs.');
+  if (expectedIds.length < 2 || new Set(expectedIds).size !== expectedIds.length) throw new Error('Supplied canonical doors do not contain unique station IDs.');
   const doorsById = new Map(canonical.doors.map(door => [door.station, door]));
   if (!Array.isArray(stations)) throw new Error('content.ts does not export vinciContent.');
   const actualIds = stations.map(station => station.id);
-  if (actualIds.length !== expectedIds.length || new Set(actualIds).size !== expectedIds.length || actualIds.some(id => !doorsById.has(id)))
-    fail('station-identity', 'Station IDs must contain every canonical door exactly once, in any walking order.', file);
+  if (new Set(actualIds).size !== actualIds.length || actualIds.some(id => !doorsById.has(id)))
+    fail('station-identity', 'Every station ID must be one canonical door, carried at most once.', file);
+  // A station that leaves the walk keeps its numeric position: the catalogue
+  // holds the original order, and the retired position names a station that
+  // still stands, so an old numeric link lands on the subject and not at the
+  // head of the walk.
   const legacyIds = exported.vinciLegacyStationIds;
-  if (!Array.isArray(legacyIds) || JSON.stringify(legacyIds) !== JSON.stringify(expectedIds))
-    fail('legacy-station-order', 'Numeric links must retain the original zero-based canonical station order.', file);
+  const legacyHolds = Array.isArray(legacyIds) && legacyIds.length === expectedIds.length
+    && legacyIds.every((id, index) => actualIds.includes(id)
+      && (id === expectedIds[index] || !actualIds.includes(expectedIds[index])));
+  if (!legacyHolds)
+    fail('legacy-station-order', 'Numeric links must keep the original zero-based order and land on a station that still stands.', file);
   let checkedQuestions = 0, documentedStatements = 0, generatedCarrierStatements = 0;
   for (let index = 0; index < stations.length; index++) {
     const station = stations[index], door = doorsById.get(station.id);

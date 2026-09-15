@@ -28,7 +28,6 @@ export const COLLECTION_STATION_ROOMS:Partial<Record<VinciStationId,string>>={
   flight:'collection-room-hall-screw',
   works:'collection-room-hall',
   body:'collection-room-body',
-  myths:'collection-room-corrections',
   grave:'collection-room-grave',
 }
 const p=(e:number,n:number,h:number,te:number,tn:number,th:number,fov=49):Pose=>({eye:world(e,n,h),at:world(te,tn,th),fov})

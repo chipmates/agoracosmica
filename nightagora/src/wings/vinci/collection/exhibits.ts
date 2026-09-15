@@ -2,8 +2,8 @@
  *
  * Every object here is imported UNCHANGED from the bench that built it and
  * judged it: `machines/` by `buildMachine(slug, stack)`, `line/`, `table/`,
- * `grave/` and `myths/` by their own factories. This module owns where they
- * stand, what they stand on and which way they face, and nothing else.
+ * `grave/` by their own factories. This module owns where they stand, what
+ * they stand on and which way they face, and nothing else.
  */
 import { Group, Mesh, PointLight, Vector3, type Material } from 'three/webgpu'
 import type { Stack } from '../../../stack'
@@ -11,7 +11,6 @@ import { buildMachine, MACHINE_SLUGS, type MachineSlug } from '../machines'
 import type { ReadyMachineBuild } from '../machines/runtime'
 import { createCollectionLineFloor, fitCollectionExhibitFloor } from './line-floor'
 import { createGrave } from '../grave'
-import { createMythDeathbed, createMythQuotes } from '../myths'
 import { buildTable, type PageRecord } from '../table'
 import { loadManifest } from '../../../manifest'
 import pageMap from '../table/data/msb-pages.json?raw'
@@ -184,21 +183,9 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
         host.add(fitting)
         teardown.push(() => { fitting.removeFromParent(); fitting.dispose() })
       }
-      // The corrections need six metres of clear height, and the hall is the
-      // only room here that has them. Each stands on its own floor, and the
-      // later one steps 60 mm over the earlier where the two floors meet.
-      const deathbed = createMythDeathbed(exhibitStones)
-      fitCollectionExhibitFloor(deathbed.group, exhibitStones, 'deathbed')
-      deathbed.group.rotation.y = Math.PI
-      deathbed.group.position.set(-57.5, FLOOR + .002, 63.2)
-      stamp(deathbed.group, 'vinci/myths-geometry')
-      const quotes = createMythQuotes(exhibitStones, { mobile: false, quoteIndex: 0 })
-      fitCollectionExhibitFloor(quotes.group, exhibitStones, 'quotes')
-      quotes.group.rotation.y = Math.PI
-      quotes.group.position.set(-45.5, FLOOR + .062, 63.2)
-      stamp(quotes.group, 'vinci/myths-geometry')
-      host.add(deathbed.group, quotes.group)
-      teardown.push(() => { deathbed.dispose(); quotes.dispose() })
+      // THE HALL'S SOUTH END CARRIES NO EXHIBIT. The corrections stood here
+      // and the walk no longer holds a station for them: the shell stays, and
+      // the words went where each of their subjects stands.
     })
   }
   /** THE TABLE IS THE LAST THING THIS PAGE CAN AFFORD, so it is built for the

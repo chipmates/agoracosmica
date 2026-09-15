@@ -104,7 +104,7 @@ const PRINT={...GRADES['first-station'],name:'clos-luce-1517',exposure:.94,lift:
  * under a clerestory and two fittings, and the outdoor exposure left them a
  * stop and a half under. The eye opens at the door, as a camera does. */
 const STATION_EXPOSURE:Partial<Record<VinciStationId,number>>={courtyard:1.0,
-  'picture-room':1.34,'reading-table':1.5,scattered:1.3,flight:1.24,works:1.24,body:1.4,myths:1.38}
+  'picture-room':1.34,'reading-table':1.5,scattered:1.3,flight:1.24,works:1.24,body:1.4}
 const SHADOW={nearHalfM:20,nearMapPx:1024,aheadM:10,refocusM:3,lightDistanceM:80} as const
 
 export interface VinciWingModule extends WingModule {
@@ -536,7 +536,7 @@ export function createWing():VinciWingModule {
     kicker.textContent=away||activeView?viewKicker():stationKicker()
   }
   const stationNumber=()=>String(card+1).padStart(2,'0')
-  const stationKicker=()=>`CLOS LUCE, 1517 · ${stationNumber()} / 19`
+  const stationKicker=()=>`CLOS LUCE, 1517 · ${stationNumber()} / ${vinciContent.length}`
   const viewKicker=()=>`CLOS LUCE, 1517 · ${lang()==='de'?'BLICK VON STATION':'A VIEW FROM STATION'} ${stationNumber()}`
   function aimPrint(id:VinciStationId):void {
     if(!hosts)return

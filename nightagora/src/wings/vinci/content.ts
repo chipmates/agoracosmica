@@ -5,7 +5,7 @@ export type VinciCertainty = 'documented' | 'reconstructed' | 'conjectural' | 'u
 export type VinciStationId =
   | 'arrival' | 'courtyard' | 'hall' | 'oratory' | 'study' | 'chamber' | 'garden'
   | 'line-early' | 'line-late' | 'line-amboise' | 'picture-room' | 'supper-wall'
-  | 'reading-table' | 'scattered' | 'flight' | 'works' | 'body' | 'myths' | 'grave';
+  | 'reading-table' | 'scattered' | 'flight' | 'works' | 'body' | 'grave';
 
 export interface VinciText {
   en: string;
@@ -496,10 +496,6 @@ const stationCards: Record<VinciStationId, VinciText> = {
     en: 'The aerial screw stands at the middle of this hall, rebuilt from one page of Manuscript B. Fourteen of his machines are rebuilt in this museum, thirteen here and the parachute out in the court, because it stands taller than this roof. Twenty-eight others give too little to build and stay records in the sources. No flight of his own is documented.',
     de: 'In der Mitte dieser Halle steht die Luftschraube, rekonstruiert nach einer Seite aus Manuskript B. Vierzehn seiner Maschinen sind in diesem Museum gebaut, dreizehn hier und der Fallschirm draußen im Hof, weil er höher steht als dieses Dach. Achtundzwanzig weitere geben zu wenig her, sie bleiben Aufzeichnung in den Quellen. Kein eigener Flug von ihm ist belegt.',
   },
-  myths: {
-    en: 'Six sentences on this wall are quoted as his, and not one of them is in his hand. Beside each stands what the record really gives: a film script of 1965 for the line about flight, a story Vasari told fifty years after the death, and four attributions nobody has traced to a page.',
-    de: 'Sechs Sätze an dieser Wand werden als seine zitiert, und keiner davon steht in seiner Hand. Neben jedem steht, was die Quellen wirklich hergeben: ein Filmdrehbuch von 1965 für den Satz über das Fliegen, eine Geschichte, die Vasari fünfzig Jahre nach dem Tod erzählte, und vier Zuschreibungen, die niemand auf ein Blatt zurückführen konnte.',
-  },
   'supper-wall': {
     en: 'The Last Supper measures 460 by 880 cm, and this field in the court is its size. The painting itself is a refectory wall in Milan and cannot travel, because he painted it dry on the plaster instead of into it. Inside the outline hangs a reproduction with its own source and licence.',
     de: 'Das Abendmahl misst 460 mal 880 Zentimeter, und dieses Feld im Hof hat seine Größe. Das Gemälde selbst ist eine Refektoriumswand in Mailand und kann nicht reisen, denn er malte trocken auf den Putz und nicht in ihn hinein. Im Umriss hängt eine Reproduktion mit eigener Quelle und Lizenz.',
@@ -508,13 +504,6 @@ const stationCards: Record<VinciStationId, VinciText> = {
     en: 'He was buried on 12 August 1519 in a collegiate church inside the castle walls, and that church was pulled down in 1807. In 1863 a dig on the site found a nearly complete skeleton with stone fragments carrying parts of his name. The slab in the chapel reads LEONARDO DA VINCI, and the chapel’s own plaque speaks of presumed remains.',
     de: 'Am 12. August 1519 wurde er in einer Stiftskirche innerhalb der Schlossmauern bestattet, und diese Kirche wurde 1807 abgerissen. 1863 fand eine Grabung an dieser Stelle ein fast vollständiges Skelett mit Steinfragmenten, die Teile seines Namens trugen. Die Platte in der Kapelle trägt die Worte LEONARDO DA VINCI, und die Tafel der Kapelle spricht von vermuteten Überresten.',
   },
-};
-
-/** The ending's antechamber, for the window that dissolves the corrections
- * room. The walk keeps the room's own card until that wall comes down. */
-export const vinciAntechamberCard: VinciText = {
-  en: 'One painting hangs in this bay. A French painter imagined the king holding the dying Leonardo in 1818, three hundred years after the afternoon it shows, and no witness recorded that scene. It is the last thing before the grave.',
-  de: 'In dieser Nische hängt ein einziges Gemälde. Ein französischer Maler stellte sich 1818 vor, wie der König den sterbenden Leonardo hält, dreihundert Jahre nach dem Nachmittag, den es zeigt, und kein Zeuge hat diese Szene festgehalten. Es ist das Letzte vor dem Grab.',
 };
 
 const statementRecord = (value: VinciText): VinciText =>
@@ -575,9 +564,6 @@ const seeds: readonly StationSeed[] = [
     { en: 'Fourteen of Leonardo da Vinci\'s machines can be rebuilt from what the sheets actually say. Twenty-eight cannot, and they are here as sheets.',
       de: 'Vierzehn von Leonardo da Vincis Maschinen lassen sich nach dem rekonstruieren, was die Blätter tatsächlich zeigen. Achtundzwanzig nicht, und sie sind hier als Blätter zu sehen.' },
     [vinciNoBodies], 'brief/CONCEPT-OPUS.md §3 S15'),
-  seed('myths', { en: 'The room of corrections', de: 'Der Raum der Richtigstellungen' },
-    { en: 'The five corrections, each with its document beside it.', de: 'Die fünf Richtigstellungen, jede mit ihrem Beleg daneben.' },
-    [], 'brief/CONCEPT-OPUS.md §3 S18'),
   seed('supper-wall', { en: 'The wall that is not here', de: 'Die Wand, die nicht hier ist' },
     { en: `${statementRecord(supper).en} ${statementRecord(supperAbsence).en}`, de: `${statementRecord(supper).de} ${statementRecord(supperAbsence).de}` },
     [supper, supperAbsence], 'brief/CONCEPT-OPUS.md §3 S12'),
@@ -836,8 +822,8 @@ export const vinciRightsPolicy: VinciText = {
 
 /** What this wing holds, counted. The sentences above carry what it does not. */
 export const vinciWingCounts: VinciText = {
-  en: 'This wing stands at nineteen stations on the two grounds. The picture room holds 25 positions at the size their holders record and every one of them carries a picture, the wall of the body 29 sheets from Windsor, the mechanism hall 14 machines rebuilt from the sheets, and the reading table one open page. The rights review of this museum read 538 catalogued Windsor sheet groups and admitted 389 of them, and of 25 named codex units it admitted 11. What it could not admit is named in the room it belongs to, with its holder and its reason.',
-  de: 'Dieser Flügel hat neunzehn Stationen auf den zwei Gründen. Der Bildersaal trägt 25 Plätze in den Maßen, die die Sammlungen verzeichnen, und jeder davon trägt ein Bild, die Wand des Körpers 29 Blätter aus Windsor, die Maschinenhalle 14 nach den Blättern gebaute Maschinen und der Lesetisch eine offene Seite. Die Rechteprüfung dieses Museums las 538 verzeichnete Windsor-Blattgruppen und ließ 389 von ihnen zu, und von 25 benannten Codex-Einheiten ließ sie 11 zu. Was sie nicht zulassen konnte, steht in dem Raum, zu dem es gehört, mit Sammlung und Grund.',
+  en: 'This wing stands at eighteen stations on the two grounds. The picture room holds 25 positions at the size their holders record and every one of them carries a picture, the wall of the body 29 sheets from Windsor, the mechanism hall 14 machines rebuilt from the sheets, and the reading table one open page. The rights review of this museum read 538 catalogued Windsor sheet groups and admitted 389 of them, and of 25 named codex units it admitted 11. What it could not admit is named in the room it belongs to, with its holder and its reason.',
+  de: 'Dieser Flügel hat achtzehn Stationen auf den zwei Gründen. Der Bildersaal trägt 25 Plätze in den Maßen, die die Sammlungen verzeichnen, und jeder davon trägt ein Bild, die Wand des Körpers 29 Blätter aus Windsor, die Maschinenhalle 14 nach den Blättern gebaute Maschinen und der Lesetisch eine offene Seite. Die Rechteprüfung dieses Museums las 538 verzeichnete Windsor-Blattgruppen und ließ 389 von ihnen zu, und von 25 benannten Codex-Einheiten ließ sie 11 zu. Was sie nicht zulassen konnte, steht in dem Raum, zu dem es gehört, mit Sammlung und Grund.',
 }
 
 /** The sources window's own headings, in the museum's voice. */
@@ -852,16 +838,19 @@ export const vinciSourcesHeadings = {
   classReference: { en: 'reference only, never displayed', de: 'nur als Vorlage, nie ausgestellt' },
 } satisfies Record<string, VinciText>
 
-/** Numeric links from the original walk always keep their original meaning. */
-export const vinciLegacyStationIds: readonly VinciStationId[] = Object.freeze([
-  'arrival', 'courtyard', 'hall', 'oratory', 'study', 'chamber', 'garden',
-  'line-early', 'line-late', 'line-amboise', 'picture-room', 'supper-wall',
-  'reading-table', 'scattered', 'flight', 'works', 'body', 'myths', 'grave',
-]);
+/** A station that has left the walk keeps its numeric position, and the link
+ * lands where its subject now stands. */
+const retiredStations: Readonly<Record<string, VinciStationId>> = { myths: 'grave' };
+
+/** Numeric links from the original walk always keep their original meaning.
+ * The door catalogue holds that original order, retired stations included. */
+export const vinciLegacyStationIds: readonly VinciStationId[] = Object.freeze(
+  doorData.doors.map(door => retiredStations[door.station] ?? door.station as VinciStationId),
+);
 
 const doorsByStation = new Map(doorData.doors.map(door => [door.station, door]));
 if (doorsByStation.size !== doorData.doors.length) throw new Error('Duplicate station door');
-if (doorsByStation.size !== seeds.length) throw new Error('Station doors do not match the walk');
+if (doorsByStation.size < seeds.length) throw new Error('Station doors do not match the walk');
 export const vinciContent: readonly VinciStationContent[] = seeds.map((station, index) => {
   const door = doorsByStation.get(station.id);
   if (!door || door.station !== station.id) throw new Error(`Door does not match station ${station.id}`);
@@ -877,7 +866,7 @@ export const vinciOutdoorStationIds: readonly VinciStationId[] = ['arrival', 'co
 /** Sources follow the physical rooms, independently of the walking order. */
 const sourceRooms: readonly (readonly VinciStationId[])[] = [
   ['line-early', 'line-late', 'line-amboise', 'reading-table', 'scattered', 'body'],
-  ['flight', 'works', 'myths'],
+  ['flight', 'works'],
   ['supper-wall', 'grave'],
 ];
 export function vinciRoomStationIds(id: VinciStationId): readonly VinciStationId[] {

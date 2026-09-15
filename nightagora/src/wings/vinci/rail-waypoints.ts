@@ -92,7 +92,7 @@ export function railSide(stationId: string): RailSide {
   if (['courtyard', 'hall', 'oratory', 'study', 'chamber'].includes(stationId)) return 'court'
   if (stationId === 'picture-room') return 'picture-room'
   if (['line-early', 'line-late', 'line-amboise', 'reading-table', 'scattered', 'body'].includes(stationId)) return 'long-gallery'
-  if (['flight', 'works', 'myths'].includes(stationId)) return 'mechanism-hall'
+  if (['flight', 'works'].includes(stationId)) return 'mechanism-hall'
   if (stationId === 'supper-wall') return 'exhibit-court'
   if (stationId === 'grave') return 'grave-court'
   return 'terrace'

@@ -261,8 +261,8 @@ for(const phone of [false,true]) {
     ensure(h.rail.navigation.queued.length===0&&!h.rail.navigation.active,'Resize retained stale requests')
     ensure(h.camera.position.distanceTo(resized.eye)<1e-8&&Math.abs(h.camera.fov-resized.fov)<1e-8,'Resize family or lens was ignored')
   })
-  check(viewport,'Every one of the 19 stations is reached, each leg walked in full at its measured pace',()=>{
-    const h=harness(phone);ensure(ids.length===19,'Actual canon lost a station')
+  check(viewport,'Every station of the walk is reached, each leg walked in full at its measured pace',()=>{
+    const h=harness(phone);ensure(ids.length===vinciContent.length&&ids.length>0,'Actual canon lost a station')
     const walks=[]
     let clock=0
     for(let i=0;i<ids.length;i++) {

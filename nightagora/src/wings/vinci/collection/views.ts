@@ -60,8 +60,6 @@ export function collectionView(id: string, narrow: boolean): RoomPose | undefine
       return pose(-42.9, -45.5, EYE + .7, -50.5, -46.2, FLOOR + 2.2, narrow ? 84 : 66, 1.3)
     case 'collection-room-hall-screw':
       return pose(-46.5, -48.8, EYE, -54.5, -46.4, FLOOR + 3.1, narrow ? 78 : 62, 1.5)
-    case 'collection-room-corrections':
-      return pose(-50.4, -52.4, EYE + .3, -56.4, -62.6, FLOOR + 3.1, narrow ? 82 : 64, 1.5)
     // The long gallery, down the line.
     case 'collection-room-gallery':
       // The gallery's existing survey view remains at its south end.
@@ -100,7 +98,7 @@ export function collectionView(id: string, narrow: boolean): RoomPose | undefine
 export const COLLECTION_VIEW_IDS = [
   'collection-room-line-early', 'collection-room-line-late', 'collection-room-line-amboise',
   'collection-room-picture', 'collection-room-picture-long', 'collection-hang-near',
-  'collection-room-hall', 'collection-room-hall-screw', 'collection-room-corrections',
+  'collection-room-hall', 'collection-room-hall-screw',
   'collection-room-gallery', 'collection-room-reading', 'collection-room-body',
   'collection-room-court', 'collection-room-grave', 'collection-room-parachute',
   'collection-room-supper',
