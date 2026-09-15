@@ -25,7 +25,9 @@ export interface VinciCloseLook {
   /** The exhibit standing open, or null. */
   readonly id: string | null
   open(exhibit: VinciCloseLookExhibit, invoker?: HTMLElement | null): void
-  close(): void
+  /** `pop` false leaves the browser's own entry where it is, for a caller
+   * that is composing a still rather than dismissing on a visitor's behalf. */
+  close(pop?: boolean): void
   /** One step back: the record first, then the exhibit. True when it took it. */
   escape(): boolean
   /** True while this reader owns the keys and the wheel over its own surface. */
@@ -101,9 +103,9 @@ export function createVinciCloseLook(options: {
     dismiss()
   })
 
-  function shut(): void {
+  function shut(pop = true): void {
     if (!open) return
-    unmark()
+    if (pop) unmark(); else marked = false
     dismiss()
   }
 

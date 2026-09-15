@@ -373,7 +373,7 @@ export function createWing():VinciWingModule {
       // the browser's own history back while a new exhibit is opening.
       placeCanonicalStation()
       openExhibit(target.id,null,how)
-      if(back)closeLook?.close()
+      if(back)closeLook?.close(false)
       if(inspectCost)measurement.show(`${s.id} / ${id}`)
       return
     }if(id==='scene')endInspection();if(id==='scene'||id.startsWith('audit-'))rail.look(0,0);if(id==='scene'||id==='audit-cost'){mode=1;paintDock()}if(id==='audit-cost')measurement.show(s.id);if(id==='audit-ui'){mode=1;paintDock();measurement.show(s.id,'ui')}if(id==='audit-ui-labels'){mode=2;paintDock();measurement.show(s.id,'ui')}if(id.startsWith('collection-room')||id.startsWith('collection-hang'))exhibits?.warm()
