@@ -3,11 +3,17 @@
  * the nearest three members of a circular lamp field, in world space, so
  * each pool follows its source while the stones turn independently. */
 import {
-  AdditiveBlending, BackSide, Color, Group, InstancedBufferAttribute, Mesh,
-  MeshBasicNodeMaterial, Scene, SphereGeometry, Sprite, SpriteNodeMaterial,
+  AdditiveBlending, BackSide, BufferGeometry, Color, Group,
+  InstancedBufferAttribute, LatheGeometry, Mesh, MeshBasicNodeMaterial, Scene,
+  SphereGeometry, Sprite, SpriteNodeMaterial, Vector2,
 } from 'three/webgpu'
 import * as TSL from 'three/tsl'
 import { combine, piercedCourt, revolve, stoneRing } from './mandala/geometry'
+import {
+  abacusGeometry, bayCentre, beamGeometry, COL_H, columnProfile,
+  ECHINUS_PROFILE, FLOOR_Y, NEAR, PLINTH_H, plinthGeometry, ringBays,
+  ringStandings,
+} from './agora'
 import { FOUNDING_SEED, mulberry32 } from '../core/seed'
 
 // A single boundary for TSL's polymorphic node graph, as in the donor organs.
@@ -23,6 +29,9 @@ const LAMP_Y = 1.42
 /** where the coal bed's light stands over the well: the paving is at -0.9,
     the bed sits on it, and a fire lights from just above its own coals */
 const HEARTH_Y = -0.28
+/** the court's near ring stands at its own floor height, on the map as in the
+    room: the cut only reads as one place if the two rings share one metre */
+const COL_BASE = FLOOR_Y + NEAR.lift
 const GOLD = '#e0b96a'
 const PAPER = '#f3efe2'
 const c = (hex: string, gain = 1): N => {
@@ -85,6 +94,7 @@ export function createMandala(scene: Scene): MandalaHandles {
     const Q = positionLocal
     const xz = Q.xz
     const r = length(xz)
+    const rW = length(P.xz)
     const a = atan(Q.z, Q.x)
     const px = max(fwidth(Q.x), fwidth(Q.z)).add(0.002)
     const line = (distance: N, width: number): N => oneMinus(smoothstep(width, px.mul(0.7).add(width), abs(distance)))
@@ -167,7 +177,21 @@ export function createMandala(scene: Scene): MandalaHandles {
       // longer than it is wide because the light comes in low
       const lobeD = length(vec2(abs(arcD).sub(0.92).div(1.15), radD.div(0.46)))
       const lobe = oneMinus(smoothstep(0.42, 1.0, lobeD))
-      cupShade = clamp(contact.mul(0.86).add(lobe.mul(0.34)), 0, 0.92)
+      /* AND THE COLUMNS STAND ON THIS SAME BELT. Ten feet that do not turn
+         with it, each with its contact dark, and each thrown INWARD because
+         every lamp of the ring is outside the ring of columns. The feet are
+         read in world space, where the colonnade stands still. */
+      const inward = P.xz.mul(rW.add(0.62).div(max(rW, float(0.001))))
+      let feet: N = float(0)
+      for (const { x, z } of ringStandings(NEAR.r, NEAR.angles)) {
+        const at = vec2(x, z)
+        feet = max(
+          feet,
+          oneMinus(smoothstep(0.44, 1.18, length(P.xz.sub(at)))).mul(0.88)
+            .add(oneMinus(smoothstep(0.52, 1.75, length(inward.sub(at)))).mul(0.3))
+        )
+      }
+      cupShade = clamp(contact.mul(0.86).add(lobe.mul(0.34)).add(feet), 0, 0.93)
     } else if (kind === 'court') {
       cut = max(line(r.sub(7.5), 0.035), line(r.sub(3.26), 0.028))
       lip = max(line(r.sub(7.56), 0.026), line(r.sub(3.32), 0.025))
@@ -274,6 +298,96 @@ export function createMandala(scene: Scene): MandalaHandles {
   plate.add(base)
   rim.add(limb)
   court.add(pierced)
+
+  /* THE COURT'S OWN NEAR RING, STANDING ON THE MAP. The ride flies over the
+     territory for the whole descent and used to meet its first column only at
+     the cut. So the ten columns of the near arc stand here too, from the
+     court's profile at the court's radius and angles, merged into ONE draw.
+     They do not turn: the plate, the belt and the suspended court each
+     revolve on their own, and this ring is the destination the fall is aimed
+     at, which has to be standing exactly where the room's ring stands when
+     the map goes out. The arc is open toward the visitor, as the court is. */
+  function lathe(profile: Array<[number, number]>, segments: number): BufferGeometry {
+    return new LatheGeometry(profile.map(([r, y]) => new Vector2(r, y)), segments)
+  }
+  function colonnadeGeometry(): BufferGeometry {
+    const parts: BufferGeometry[] = []
+    for (const { x, z, yaw } of ringStandings(NEAR.r, NEAR.angles)) {
+      const put = (g: BufferGeometry, y: number): void => {
+        parts.push(g.rotateY(yaw).translate(x, COL_BASE + y, z).toNonIndexed())
+      }
+      // the shaft carries the court's own 26 facets, so the silhouette at the
+      // handover is the same silhouette
+      put(lathe(columnProfile(), 26), 0)
+      put(lathe(ECHINUS_PROFILE, 22), COL_H + 0.1)
+      // the crown and the footing are solid: from above, an open lathe is a
+      // hole down the middle of every column
+      put(abacusGeometry(), COL_H + 0.235)
+      put(plinthGeometry(), -PLINTH_H)
+    }
+    for (const { mid, half, chord } of ringBays(NEAR.r, NEAR.angles)) {
+      const [bx, bz] = bayCentre(NEAR.r, mid, half)
+      parts.push(
+        beamGeometry()
+          .scale(chord + 0.18, 1, 1)
+          .rotateY(-mid)
+          .translate(bx, COL_BASE + COL_H + 0.44, bz)
+          .toNonIndexed()
+      )
+    }
+    return combine(parts)
+  }
+  const colonnadeMat = new MeshBasicNodeMaterial()
+  {
+    const h = P.y.sub(COL_BASE)
+    const nW = normalWorld
+    // twenty flutes, cut into the shaft alone. The normal turns about the
+    // column's own axis, so every flute takes a lit arris and a dark hollow
+    // off the lamp standing beside it, which is what carves stone.
+    const shaftMask = smoothstep(0.34, 0.5, h)
+      .mul(oneMinus(smoothstep(COL_H - 0.18, COL_H - 0.04, h)))
+    const f = fract(uv().x.mul(20))
+    const horiz = vec3(nW.z.negate(), float(0), nW.x)
+    // a crown's top face has no horizontal tangent: normalize would hand back
+    // a NaN and paint the capital black
+    const tHor = horiz.div(max(length(horiz), float(0.001)))
+    const nF = normalize(nW.add(tHor.mul(sin(f.mul(TAU)).mul(0.36).mul(shaftMask))))
+    const hollow = oneMinus(pow(sin(f.mul(Math.PI)), 2).mul(0.24).mul(shaftMask))
+    const grain = noise(vec3(P.x.mul(5.2), P.y.mul(2.8), P.z.mul(5.2)))
+    const bedding = oneMinus(
+      smoothstep(0.0, 0.02, abs(fract(h.sub(0.32).div(0.59)).sub(0.5))).mul(0.18).mul(shaftMask)
+    )
+    /* the court's stone is the PALE one, against the lapis of its floor, so
+       the ring on the map is quarried a step lighter than the paving it
+       stands on. It is still the night's stone: nothing here is limestone in
+       daylight. */
+    let alb: N = mix(c('#2c3750'), c('#6e7587'), grain.mul(0.22).add(0.5))
+    alb = alb.mul(bedding).mul(hollow)
+    /* EVERY LAMP OF THE RING STANDS OUTSIDE THIS COLONNADE, so the faces the
+       ride looks at are the unlit ones and the light arrives around the
+       shafts. A flame a metre off is an area source over a stone this size:
+       what it throws at the far face comes back off the belt and around the
+       drum, and without that term the ring reads as a fence of black sticks. */
+    const lamp = lightField(nF).add(lightField(nF.negate()).mul(0.34))
+    const sky = max(dot(nF, normalize(vec3(-0.4, 0.82, 0.26))), 0).mul(0.7).add(0.2)
+    // the shaft gives itself to the night as it climbs, so the ring reads as
+    // dark verticals from overhead and the questions keep their field
+    const lift = smoothstep(0.4, COL_H, h)
+    let col: N = alb.mul(
+      c('#8d93ad', 0.7).mul(sky).mul(oneMinus(lift.mul(0.34)))
+        .add(c(GOLD, 1.55).mul(lamp).mul(oneMinus(lift.mul(0.5))))
+    )
+    // the well is far from this ring, but it is the only fire in the map and
+    // the inner faces know it
+    const hv = vec3(0, HEARTH_Y, 0).sub(P)
+    const hinc = max(dot(nF, normalize(hv)), 0)
+    col = col.add(alb.mul(c('#ff8c3a', 1.9))
+      .mul(hinc.mul(7.2).div(dot(hv, hv).add(1.1)).mul(uHeat).mul(uFireFlick)))
+    const dCam = length(cameraPosition.div(uScale).sub(P))
+    col = mix(col, c('#101b35', 0.62), smoothstep(9, 42, dCam).mul(uHeat).mul(0.44))
+    colonnadeMat.colorNode = shoulder(col).add(dither()).mul(uReveal)
+  }
+  root.add(new Mesh(colonnadeGeometry(), colonnadeMat))
 
   // Thirty physical cups share a mesh; the thirty flames share a Sprite.
   const cups = []
