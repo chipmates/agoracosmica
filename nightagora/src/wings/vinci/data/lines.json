@@ -13,12 +13,12 @@
       "source": "MINING-CATALOG-PAINTINGS, the Baptism of Christ, label fact from the holder's own entry",
       "certainty": "tradition",
       "detail": {
-        "x": 0.08,
-        "y": 0.46,
-        "w": 0.22,
-        "h": 0.28,
-        "name_en": "The angels at the left",
-        "name_de": "Die Engel links"
+        "x": 0.09,
+        "y": 0.47,
+        "w": 0.17,
+        "h": 0.26,
+        "name_en": "The angel at the left",
+        "name_de": "Der Engel links"
       }
     },
     "picture/annunciation/front": {
