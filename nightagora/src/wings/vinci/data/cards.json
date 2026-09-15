@@ -1,0 +1,111 @@
+{
+  "schema_version": "1.0",
+  "provenance": {
+    "scope": "The text fields of the four card models of the close look, as data. The line stands first and the description that exists today becomes the second paragraph. Everything below the description is composed from the registers by the modules named here and is never retyped, so a card cannot drift from the record it stands on.",
+    "rule": "Two to four sentences on a card. The record keeps the rest and is one deliberate control away.",
+    "written_here": "The line (data/lines.json), the steps (data/steps.json), the honesty variants, the zoom ceiling's sentence, the rule labels, the floor's honesty line and every control's words.",
+    "prepared": "2026-09-15"
+  },
+  "models": {
+    "picture": {
+      "fields": [
+        { "id": "line", "from": "data/lines.json, keyed by the exhibit id", "register": "label" },
+        { "id": "description", "from": "pictures/visitor-copy.ts, the note for the work", "register": "drawer", "folded_on_phone": true },
+        { "id": "title_and_year", "from": "pictures/policy-label.ts, with the certainty dot", "register": "label" },
+        { "id": "holder_and_size", "from": "pictures/register.ts, the holder's own centimetres", "register": "label" },
+        { "id": "reproduction", "from": "the store record's state note for the resolved plate", "register": "label" },
+        { "id": "honesty", "from": "honesty_variants, the variant the register's row points at", "register": "label" },
+        { "id": "licence", "from": "the store record's licence line, verbatim and last", "register": "label" }
+      ],
+      "honesty_variant": "painting",
+      "record": "pictures/policy-label.ts and the work's sources, arithmetic, licence, holder's claim and gaps"
+    },
+    "machine": {
+      "fields": [
+        { "id": "line", "from": "data/lines.json, keyed by machine/<slug>", "register": "label" },
+        { "id": "description", "from": "machines/data/records.json, the locked label and the mechanism section", "register": "drawer", "folded_on_phone": true },
+        { "id": "steps", "from": "data/steps.json, keyed by slug", "register": "label" },
+        { "id": "certainty", "from": "machines/data/<slug>.json, the dossier's status and scope", "register": "label" },
+        { "id": "absence", "from": "machines/bench/registers.ts BENCH_ABSENCE, where one exists", "register": "label" }
+      ],
+      "record": "the folio, the arithmetic and what the sheet does not say, from machines/data/records.json; the twenty eight partial records read as sheets with their gaps, never as completed machines"
+    },
+    "manuscript": {
+      "fields": [
+        { "id": "line", "from": "data/lines.json, keyed by codex/<register id>", "register": "label" },
+        { "id": "description", "from": "table/content.ts, the page record and TABLE_UI", "register": "drawer", "folded_on_phone": true },
+        { "id": "folio", "from": "table/content.ts folioKey, with its codex and holder", "register": "label" },
+        { "id": "shelf", "from": "table/data/codices.json entries, one line each as codex, holder, class", "register": "label" },
+        { "id": "absences", "from": "table/data/codices.json absences, as sentences", "register": "label" },
+        { "id": "honesty", "from": "honesty_variants.page", "register": "label" }
+      ],
+      "honesty_variant": "page",
+      "behind_more": ["the transcription", "the French"],
+      "behind_its_own_control": ["the mirror hand, from table/content.ts MIRROR_EXPLANATION"],
+      "record": "the holder, the folio, the edition and what the page map cannot certify"
+    },
+    "date": {
+      "fields": [
+        { "id": "line", "from": "line/data/timeline.json, the event's own sentence, which this seat did not write", "register": "label" },
+        { "id": "year", "from": "line/data/timeline.json", "register": "label" },
+        { "id": "certainty", "from": "line/data/timeline.json", "register": "label" }
+      ],
+      "record": "the source named in line/data/timeline.json and the life catalogue entry behind it"
+    }
+  },
+  "honesty_variants": {
+    "canon": "painting",
+    "painting": {
+      "en": "The museum labels the reproduction, not the painting.",
+      "de": "Das Museum kennzeichnet die Reproduktion, nicht das Gemälde."
+    },
+    "photograph": {
+      "en": "The museum labels the reproduction, not the photograph.",
+      "de": "Das Museum kennzeichnet die Reproduktion, nicht die Fotografie."
+    },
+    "page": {
+      "en": "The museum labels the reproduction, not the page.",
+      "de": "Das Museum kennzeichnet die Reproduktion, nicht das Blatt."
+    },
+    "applies_to": {
+      "painting": ["painting-plate", "painting-preview"],
+      "page": ["sheet-page", "sheet-thumb", "folio-page", "folio-thumb", "codex-page", "codex-thumb"]
+    }
+  },
+  "zoom_ceiling": {
+    "en": "This is the whole source. It has no more detail than this.",
+    "de": "Das ist die ganze Quelle. Mehr Detail gibt es nicht."
+  },
+  "rule_labels": [
+    { "en": "10 cm", "de": "10 cm" },
+    { "en": "50 cm", "de": "50 cm" }
+  ],
+  "floor_honesty": {
+    "en": "Twelve of the 56 dates are cut into this floor. All 56 are in the record.",
+    "de": "Zwölf der 56 Daten sind in diesen Boden geschnitten. Alle 56 stehen im Nachweis."
+  },
+  "controls": {
+    "shared": {
+      "back": { "en": "Back", "de": "Zurück" },
+      "record": { "en": "The full record", "de": "Der ganze Nachweis" },
+      "more": { "en": "More", "de": "Mehr" }
+    },
+    "picture": {
+      "whole_plate": { "en": "The whole plate", "de": "Die ganze Tafel" }
+    },
+    "machine": {
+      "provenance": { "en": "Where it comes from", "de": "Woher es kommt" },
+      "play": { "en": "Play", "de": "Abspielen" },
+      "pause": { "en": "Pause", "de": "Pause" },
+      "viewpoints": [
+        { "id": "whole", "en": "Whole", "de": "Ganz" },
+        { "id": "drive", "en": "The drive", "de": "Der Antrieb" },
+        { "id": "working-part", "en": "The working part", "de": "Das Werkstück" }
+      ]
+    },
+    "date": {
+      "previous": { "en": "Previous", "de": "Zurück" },
+      "next": { "en": "Next", "de": "Weiter" }
+    }
+  }
+}
