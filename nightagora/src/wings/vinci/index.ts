@@ -257,11 +257,11 @@ export function createWing():VinciWingModule {
     occluders=collectVinciLabelOccluders(scene)
     labels=createVinciLabelAnchor({host:h.labels,camera,occluders,onOpen:()=>{mode=2;paintDock()}})
     collectionRoot=collection
-    dots=createVinciExhibitDots({host:h.labels,camera,occluders,limit:DOTS_PER_TIER[stack.tierName()]??6,
+    dots=createVinciExhibitDots({host:h.labels,camera,occluders,limit:DOTS_PER_TIER[stack.tierName()]??6,controls:'vinci-exhibit-card',
       onOpen:(id,dot)=>openExhibit(id,dot)})
     closeLook=createVinciCloseLook({host:h.labels,narrow,
       onOpen:id=>{
-        dots?.invalidate();paintExhibitTitle();paintHeaderVisibility()
+        dots?.setOpen(id);dots?.invalidate();paintExhibitTitle();paintHeaderVisibility()
         const pose=vinciApproachPose(id,narrow())
         // ON CALM AND UNDER REDUCED MOTION THE EYE DOES NOT MOVE: the card is
         // the whole close look. Where it may move, the eye walks; a rig
@@ -271,7 +271,7 @@ export function createWing():VinciWingModule {
       },
       onClose:()=>{
         if(exhibitSources){exhibitSources=null;if(mode===2)mode=1;paintDock()}
-        rail.returnToStation();dots?.invalidate();paintExhibitTitle();paintHeaderVisibility()
+        rail.returnToStation();dots?.setOpen(null);dots?.invalidate();paintExhibitTitle();paintHeaderVisibility()
       }})
     void exhibits?.picturesReady.then(()=>{if(hosts&&standing)refreshExhibits()})
     welcome=createVinciWelcome(h.labels,route=>{if(route==='collection')enterCollection();focusTheBar()})

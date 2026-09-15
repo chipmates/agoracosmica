@@ -217,6 +217,8 @@ export interface VinciExhibitMark {
 export interface VinciExhibitDots {
   setExhibits(marks: readonly VinciExhibitMark[]): void
   setMode(mode: VinciLabelMode): void
+  /** Which exhibit stands open, so each mark says whether it opened it. */
+  setOpen(id: string | null): void
   /** Three on calm, six on standard, eight on hero. */
   setLimit(limit: number): void
   update(cardRect?: VinciLabelRect | null, now?: number): void
@@ -234,6 +236,8 @@ export function createVinciExhibitDots(options: {
   camera: PerspectiveCamera
   occluders: readonly Mesh[]
   onOpen: (id: string, dot: HTMLButtonElement) => void
+  /** The drawer every mark opens, named on the mark itself. */
+  controls: string
   limit?: number
 }): VinciExhibitDots {
   const { host, camera, occluders, onOpen } = options
@@ -248,6 +252,8 @@ export function createVinciExhibitDots(options: {
     dot.type = 'button'
     dot.hidden = true
     dot.style.width = dot.style.height = '44px'
+    dot.setAttribute('aria-controls', options.controls)
+    dot.setAttribute('aria-expanded', 'false')
     dot.addEventListener('click', () => { const id = pressed.get(dot); if (id) onOpen(id, dot) })
     buttons.push(dot)
     host.append(dot)
@@ -257,7 +263,7 @@ export function createVinciExhibitDots(options: {
   const hits: Intersection<Mesh>[] = []
   const sight = new Map<string, boolean>()
   let marks: readonly VinciExhibitMark[] = []
-  let mode: VinciLabelMode = 1, limit = options.limit ?? 6
+  let mode: VinciLabelMode = 1, limit = options.limit ?? 6, opened: string | null = null
   let dirty = true, changedAt = -Infinity, disposed = false
   const settleMs = 80
 
@@ -280,6 +286,10 @@ export function createVinciExhibitDots(options: {
     setMode(next) {
       mode = next
       if (mode === 0) hide()
+    },
+    setOpen(id) {
+      opened = id
+      for (const dot of buttons) dot.setAttribute('aria-expanded', String(pressed.get(dot) === opened && opened !== null))
     },
     setLimit(next) {
       const value = Math.max(0, Math.min(POOL, Math.floor(next)))
@@ -340,6 +350,7 @@ export function createVinciExhibitDots(options: {
         dot.style.setProperty('--certainty', entry.mark.colour)
         if (dot.getAttribute('aria-label') !== entry.mark.label) dot.setAttribute('aria-label', entry.mark.label)
         pressed.set(dot, entry.mark.id)
+        dot.setAttribute('aria-expanded', String(entry.mark.id === opened))
       }
     },
     invalidate,

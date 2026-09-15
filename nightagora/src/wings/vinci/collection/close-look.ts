@@ -52,6 +52,9 @@ export function createVinciCloseLook(options: {
   const view = document.defaultView!
   const card = document.createElement('section')
   card.className = 'vinci-exhibit-card'
+  // The drawer a visitor opens carries an id, and the marks that open it name
+  // it, so the walk can open it the way a hand does.
+  card.id = 'vinci-exhibit-card'
   card.hidden = true
   card.tabIndex = -1
   card.setAttribute('role', 'group')
