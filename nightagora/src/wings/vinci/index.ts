@@ -3,7 +3,7 @@ import { applyDisplayedHorizonHaze, displayedHorizonHazeProvenance } from './dis
 import { mineralSurfaceProvenance, closeSurfaceProvenance } from './surface'
 import { entryMineralSurfaceProvenance } from './entry-mineral-surface'
 import { foundationPlinthProvenance } from './foundation-plinth'
-import { Color, FogExp2, DirectionalLight, Mesh, Vector3, type Group } from 'three/webgpu'
+import { Color, FogExp2, DirectionalLight, Mesh, Raycaster, Vector2, Vector3, type Group } from 'three/webgpu'
 import { float, mix, vec3, vec4, dot as nodeDot, positionWorld, cameraPosition, smoothstep, mx_fractal_noise_float } from 'three/tsl'
 import { SkyMesh } from 'three/addons/objects/SkyMesh.js'
 import { setRegister, type WingHosts, type WingModule } from '../frame'
@@ -19,7 +19,7 @@ import { createCollection, collectionProvenance } from './collection'
 import { collectionView } from './collection/views'
 import { mountCollectionExhibits, type CollectionExhibits } from './collection/exhibits'
 import { isMachineSlug, type MachineSlug } from './machines'
-import { createPolicyWorkLabel } from './pictures/policy-label'
+import { createPictureRecord, createPolicyWorkLabel, policyLabelText, PICTURE_CERTAINTY_KEY } from './pictures/policy-label'
 import { MAIN_HANG, REGISTER, type PictureRights } from './pictures/register'
 import { MACHINE_SLUGS, machineCatalog } from './machines/catalog'
 import { validatePaintingRecord } from './pictures/policy'
@@ -40,7 +40,10 @@ import { gradeAt as groundHeight, galleryBankCapProvenance } from './terrain-mes
 import { createGroundDressing } from './ground-dressing'
 import { createWater, type WaterGroup } from './water'
 import { createMeasurement, type VinciMeasurement } from './measurement'
-import { collectVinciLabelOccluders, createVinciLabelAnchor, type VinciLabelAnchor, type VinciLabelMode } from './labels'
+import { collectVinciLabelOccluders, createVinciExhibitDots, createVinciLabelAnchor, vinciSightBlocked, type VinciExhibitDots, type VinciExhibitMark, type VinciLabelAnchor, type VinciLabelMode } from './labels'
+import { pickVinciExhibit, readVinciExhibits, type VinciPickEntry } from './collection/pick'
+import { vinciApproachPose } from './collection/approaches'
+import { createVinciCloseLook } from './collection/close-look'
 import { pathSpecifications } from './paths'
 import { roadGradeProvenance } from './road-grade'
 import { apronProvenance } from './apron'
@@ -136,6 +139,17 @@ export function createWing():VinciWingModule {
   const CARD_HANDOVER=.5
   let exposureAt:VinciStationId|undefined
   let exhibits:CollectionExhibits|undefined, exhibitClock=0
+  /** THE CLOSE LOOK. The registry is a read over the collection's own group,
+   * the dots live in the label layer, and one owner holds the open exhibit. */
+  let collectionRoot:Group|undefined, occluders:readonly Mesh[]=[]
+  let dots:VinciExhibitDots|undefined, closeLook:ReturnType<typeof createVinciCloseLook>|undefined
+  let picks:VinciPickEntry[]=[], picksTier=''
+  const pickRay=new Raycaster(), sightRay=new Raycaster(), sightHits:Parameters<typeof vinciSightBlocked>[4]=[]
+  /** Three on calm, six on standard, eight on hero: what is in front of the
+   * visitor carries a mark, and the rest of the room does not. */
+  const DOTS_PER_TIER:Record<string,number>={hero:8,standard:6,calm:3}
+  /** The one mode a press opens in, set by the caller the press came from. */
+  let openMode:'auto'|'walk'|'cut'='auto'
   let restoreEnvironmentRotation:(()=>void)|null=null
   const narrow=()=>innerWidth/innerHeight<=.9
   const shadowFocus=new Vector3(NaN,NaN,NaN), focusAhead=new Vector3()
@@ -240,7 +254,28 @@ export function createWing():VinciWingModule {
     rail=createRail(camera,clock,authority);measurement=createMeasurement(h.labels,stack)
     source=make('button','vinci-source',lang()==='de'?'Quellen':'Sources');source.type='button';source.setAttribute('aria-keyshortcuts','l');source.setAttribute('aria-controls','vinci-source-card');source.addEventListener('click',()=>{mode=mode===2?1:2;paintDock()});h.stage.parentElement!.querySelector('.wing-rail-group')!.append(source)
     sources=createVinciSourcesWindow(h.labels,source,()=>{mode=1;paintDock()});dock=sources.element;drawer=sources.panels.station
-    labels=createVinciLabelAnchor({host:h.labels,camera,occluders:collectVinciLabelOccluders(scene),onOpen:()=>{mode=2;paintDock()}})
+    occluders=collectVinciLabelOccluders(scene)
+    labels=createVinciLabelAnchor({host:h.labels,camera,occluders,onOpen:()=>{mode=2;paintDock()}})
+    collectionRoot=collection
+    dots=createVinciExhibitDots({host:h.labels,camera,occluders,limit:DOTS_PER_TIER[stack.tierName()]??6,
+      onOpen:(id,dot)=>openExhibit(id,dot)})
+    closeLook=createVinciCloseLook({host:h.labels,narrow,
+      onOpen:id=>{
+        dots?.invalidate();paintExhibitTitle();paintHeaderVisibility()
+        const pose=openMode==='auto'||openMode==='walk'||openMode==='cut'?vinciApproachPose(id,narrow()):undefined
+        if(!pose)return false
+        // A cut is the rig's own placement and the calm body's; a walk is what
+        // a visitor gets. Neither moves without the leg's own certificate.
+        if(openMode==='walk')return rail.approach(id,pose,narrow(),false)
+        if(openMode==='cut')return rail.approach(id,pose,narrow(),true)
+        if(!exhibitWalks())return false
+        return rail.approach(id,pose,narrow(),cutToStation())
+      },
+      onClose:()=>{
+        if(exhibitSources){exhibitSources=null;if(mode===2)mode=1;paintDock()}
+        rail.returnToStation();dots?.invalidate();paintExhibitTitle();paintHeaderVisibility()
+      }})
+    void exhibits?.picturesReady.then(()=>{if(hosts&&standing)refreshExhibits()})
     welcome=createVinciWelcome(h.labels,route=>{if(route==='collection')enterCollection();focusTheBar()})
     controller=new AbortController();const options={signal:controller.signal}
     let touchX=0,touchY=0,lastX=0,lastY=0,dragging=false,pointer=-1
@@ -248,10 +283,18 @@ export function createWing():VinciWingModule {
     // A notch asks for the next station AND walks a stride along the leg that
     // is under way, so a visitor who keeps scrolling keeps moving instead of
     // waiting the walk out, and the station asked for is never lost.
-    h.stage.addEventListener('wheel',(e)=>{if(e.ctrlKey||e.defaultPrevented||(e.target as Element).closest('.vinci-dock,.wing-rail-group'))return;e.preventDefault();const step=wheelStep(e.deltaY,e.deltaMode,innerHeight);if(!step)return;rail.stride(1);h.navigate(station+step)},{...options,passive:false})
-    h.stage.addEventListener('pointerdown',(e)=>{if(!e.isPrimary||e.button!==0||(e.target as Element).closest('button,a,input,textarea,select,.vinci-dock,.wing-rail-group'))return;e.preventDefault();dragging=true;pointer=e.pointerId;touchX=lastX=e.clientX;touchY=lastY=e.clientY;h.stage.setPointerCapture(e.pointerId)},options)
+    h.stage.addEventListener('wheel',(e)=>{if(e.ctrlKey||e.defaultPrevented||(e.target as Element).closest('.vinci-dock,.wing-rail-group,.vinci-exhibit-card'))return;e.preventDefault();const step=wheelStep(e.deltaY,e.deltaMode,innerHeight);if(!step)return;rail.stride(1);h.navigate(station+step)},{...options,passive:false})
+    h.stage.addEventListener('pointerdown',(e)=>{if(!e.isPrimary||e.button!==0||(e.target as Element).closest('button,a,input,textarea,select,.vinci-dock,.wing-rail-group,.vinci-exhibit-card'))return;e.preventDefault();dragging=true;pointer=e.pointerId;touchX=lastX=e.clientX;touchY=lastY=e.clientY;h.stage.setPointerCapture(e.pointerId)},options)
     h.stage.addEventListener('pointermove',(e)=>{if(!dragging||pointer!==e.pointerId)return;rail.drag(e.clientX-lastX,e.clientY-lastY,h.stage.getBoundingClientRect().height);lastX=e.clientX;lastY=e.clientY},options)
-    h.stage.addEventListener('pointerup',(e)=>{if(!dragging||pointer!==e.pointerId)return;dragging=false;pointer=-1;if(e.pointerType==='touch'&&Math.abs(e.clientY-touchY)>65&&Math.abs(e.clientY-touchY)>Math.abs(e.clientX-touchX)*1.3)h.navigate(station+(e.clientY<touchY?1:-1))},options)
+    // A PRESS IS A PRESS, NOT A DRAG AND NOT A SWIPE. A flick on the phone is
+    // still a station, a drag is still a look, and what is left is one ray.
+    h.stage.addEventListener('pointerup',(e)=>{
+      if(!dragging||pointer!==e.pointerId)return
+      dragging=false;pointer=-1
+      const dx=e.clientX-touchX,dy=e.clientY-touchY
+      if(e.pointerType==='touch'&&Math.abs(dy)>65&&Math.abs(dy)>Math.abs(dx)*1.3){h.navigate(station+(dy<0?1:-1));return}
+      if(Math.hypot(dx,dy)<=8)pressExhibit(e.clientX,e.clientY)
+    },options)
     const cancelDrag=()=>{dragging=false;pointer=-1}
     h.stage.addEventListener('pointercancel',cancelDrag,options)
     h.stage.addEventListener('lostpointercapture',cancelDrag,options)
@@ -260,6 +303,12 @@ export function createWing():VinciWingModule {
       const target=e.target instanceof Element?e.target:document.body
       if(document.querySelector('dialog[open]'))return
       if(target.closest('input,textarea,select,[contenteditable="true"]'))return
+      // THE READER OWNS ITS OWN KEYS. Nothing typed inside an open exhibit
+      // walks the rail or cycles the label layer, and Escape is one step back.
+      if(closeLook?.id&&(e.key==='Escape'||closeLook.owns(target))){
+        if(e.key==='Escape'){e.preventDefault();closeLook.close()}
+        return
+      }
       if(e.key==='Escape'){e.preventDefault();mode=1;rail.look(0,0);paintDock();source.focus({preventScroll:true});return}
       if(e.key.toLowerCase()==='l'&&!e.repeat){e.preventDefault();mode=((mode+1)%3) as VinciLabelMode;paintDock();if(mode!==2&&target.closest('.vinci-dock'))source.focus({preventScroll:true});return}
       if(target.closest('.vinci-dock'))return
@@ -311,8 +360,122 @@ export function createWing():VinciWingModule {
   function showView(id:string) {
     if(id==='welcome'){welcome?.open();return}
     if(id.startsWith('sources-')){const tab=id.slice(8);if(tab==='station'||tab==='room'||tab==='wing'){sources.select(tab);mode=2;paintDock();return}}
-    const inspectCost=id.endsWith('-cost')&&id!=='audit-cost';if(inspectCost)id=id.slice(0,-5);const s=vinciContent[card]!;if(id==='scene')endInspection();if(id==='scene'||id.startsWith('audit-'))rail.look(0,0);if(id==='scene'||id==='audit-cost'){mode=1;paintDock()}if(id==='audit-cost')measurement.show(s.id);if(id==='audit-ui'){mode=1;paintDock();measurement.show(s.id,'ui')}if(id==='audit-ui-labels'){mode=2;paintDock();measurement.show(s.id,'ui')}if(id.startsWith('collection-room')||id.startsWith('collection-hang'))exhibits?.warm()
+    const inspectCost=id.endsWith('-cost')&&id!=='audit-cost';if(inspectCost)id=id.slice(0,-5);const s=vinciContent[card]!;
+    // THE EYES REACH ONE EXHIBIT BY NAME: the arrival, the leg on the way to
+    // it, and the return. A still is a cut; the leg and the return are walked.
+    if(id.startsWith('exhibit-')){
+      let work=id.slice(8),how:'walk'|'cut'='cut',back=false
+      if(work.endsWith('-leg')){work=work.slice(0,-4);how='walk'}
+      else if(work.endsWith('-return')){work=work.slice(0,-7);back=true}
+      if(!picks.length)refreshExhibits()
+      const target=picks.find(pick=>pick.openable&&pick.workId===work&&pick.face==='front')
+      if(target){
+        closeLook?.close();placeCanonicalStation()
+        openExhibit(target.id,null,how)
+        if(back)closeLook?.close()
+        if(inspectCost)measurement.show(`${s.id} / ${id}`)
+      }
+      return
+    }if(id==='scene')endInspection();if(id==='scene'||id.startsWith('audit-'))rail.look(0,0);if(id==='scene'||id==='audit-cost'){mode=1;paintDock()}if(id==='audit-cost')measurement.show(s.id);if(id==='audit-ui'){mode=1;paintDock();measurement.show(s.id,'ui')}if(id==='audit-ui-labels'){mode=2;paintDock();measurement.show(s.id,'ui')}if(id.startsWith('collection-room')||id.startsWith('collection-hang'))exhibits?.warm()
     const pose=namedPose(id,narrow())??collectionView(id,narrow());if(pose){activeView=id;mode=1;paintDock();rail.set(s.id,pose,true,narrow());header.querySelector('.vinci-insertion')?.remove();titleForView(id);if(id.startsWith('collection')&&!s.built&&!vinciStandsInRoom(s.id))header.append(make('p','vinci-insertion',lang()==='de'?'Museumseinbau der Gegenwart · Räume im Bau':'Modern museum insertion · Rooms in construction'))}const cone=/(?:^|-)cone-(ul|ur|dl|dr)$/.exec(id);if(cone){placeCanonicalStation();rail.look(cone[1]!.includes('l')?.6:-.6,cone[1]!.startsWith('u')?.32:-.32)}if(id==='labels'||id==='hour'||id==='record'){sources.select(id==='hour'?'wing':'station');mode=2;paintDock();if(id==='record'){if(record.hidden)dock.querySelector<HTMLButtonElement>('.vinci-record-toggle')?.click();dock.scrollTop=record.offsetTop-(dock.querySelector('.vinci-sources-toolbar')?.getBoundingClientRect().height??0)-18}}if(inspectCost&&(pose||cone))measurement.show(`${s.id} / ${id}`)
+  }
+  /** THE REGISTRY IS A READ, so it is taken again whenever the scene it reads
+   * could have changed: when the room's own sources have landed, and when a
+   * tier change remounts the plates under new meshes. */
+  function refreshExhibits():void {
+    if(!hosts||!collectionRoot)return
+    picks=readVinciExhibits(collectionRoot)
+    picksTier=hosts.world.stack.tierName()
+    paintExhibitMarks()
+  }
+  /** What each exhibit's mark says and what colour it carries: its own name
+   * and its own certainty, both off the picture module's register. */
+  function paintExhibitMarks():void {
+    const sources=exhibits?.pictureSources()??[]
+    const marks:VinciExhibitMark[]=[]
+    for(const entry of picks){
+      if(!entry.openable)continue
+      const found=sources.find(source=>source.work.id===entry.workId)
+      if(!found)continue
+      const entries=sources.filter(source=>source.work.id===entry.workId).map(source=>source.entry)
+      marks.push({id:entry.id,anchor:entry.anchor,object:entry.object,
+        label:lang()==='de'?found.work.title_de:found.work.title_en,
+        colour:policyLabelText(found.work,entries).colour})
+    }
+    dots?.setExhibits(marks)
+  }
+  /** The wing's own certainty word for a picture, read off the picture
+   * module's own key so the two cannot drift. */
+  function pictureCertainty(colour:string):VinciCertainty {
+    const order:VinciCertainty[]=['documented','unknown','reconstructed','conjectural']
+    const at=PICTURE_CERTAINTY_KEY.findIndex(entry=>entry.colour===colour)
+    return order[at<0?2:at]!
+  }
+  /** WHEN OPENING IS A MOVE OF THE BODY. On calm the stream raises no full
+   * plate and the card is the whole close look; under reduced motion a view
+   * changes without a walk; at an inspection eye there is no station to leave. */
+  function exhibitWalks():boolean {
+    if(!hosts||activeView||!railReady())return false
+    if(hosts.world.stack.tierName()==='calm')return false
+    if(matchMedia('(prefers-reduced-motion: reduce)').matches)return false
+    const nav=rail.navigation
+    return !nav.active&&!nav.exhibit
+  }
+  /** ONE RAY ON A PRESS, never on a hover. */
+  function pressExhibit(x:number,y:number):void {
+    if(!hosts||!picks.length||closeLook?.id)return
+    const rect=hosts.stage.getBoundingClientRect()
+    if(rect.width<=0||rect.height<=0)return
+    pickRay.setFromCamera(new Vector2((x-rect.left)/rect.width*2-1,-((y-rect.top)/rect.height)*2+1),hosts.world.camera)
+    const hit=pickVinciExhibit({ray:pickRay,entries:picks,
+      occluded:(from,to)=>vinciSightBlocked(from,to,occluders,sightRay,sightHits)})
+    if(hit)openExhibit(hit.id,null)
+  }
+  /** The record is opened on purpose, into the window the wing already has for
+   * a source: one sources window, never a second one over the card. */
+  function showExhibitRecord(id:string,work:Parameters<typeof createPictureRecord>[0],entries:Parameters<typeof createPictureRecord>[1]):void {
+    const record=createPictureRecord(work,entries)
+    record.hidden=false
+    exhibitSources={id,title:{en:work.title_en,de:work.title_de},
+      certainty:pictureCertainty(policyLabelText(work,entries).colour),
+      renderStation(host){host.append(record)}}
+    sources.resetScroll();sources.select('station');mode=2;paintDock()
+  }
+  /** THE CARD IS THE PICTURE MODULE'S OWN LABEL, mounted as it is, with two
+   * controls under it and the station's own question at its foot. */
+  function openExhibit(id:string,from:HTMLElement|null,how:'auto'|'walk'|'cut'='auto'):void {
+    const entry=picks.find(pick=>pick.id===id)
+    if(!entry?.openable||!hosts||!closeLook)return
+    if(entry.station!==vinciContent[card]!.id)return
+    const sources=exhibits?.pictureSources()??[]
+    const found=sources.find(source=>source.work.id===entry.workId)
+    if(!found)return
+    const work=found.work
+    const entries=sources.filter(source=>source.work.id===entry.workId).map(source=>source.entry)
+    const plate=entries.find(source=>source.face===entry.face)??entries[0]
+    const label=createPolicyWorkLabel(work,entries,false,[],narrow())
+    const controls:HTMLElement[]=[]
+    if(plate){
+      // E4 BUILDS THE PLATE VIEW. Until it does, the whole plate is the
+      // admitted file itself, which is the control the wing already carries.
+      const whole=make('a','vinci-exhibit-control',lang()==='de'
+        ? plate.face==='reverse'?'Vollständige Reproduktion der Rückseite öffnen':'Vollständige Reproduktion öffnen'
+        : plate.face==='reverse'?'Open the complete reverse reproduction':'Open the complete reproduction')
+      whole.href=ASSET_BASE+validatePaintingRecord(plate.plate,'painting-plate').path
+      whole.target='_blank';whole.rel='noopener'
+      controls.push(whole)
+    }
+    const record=make('button','vinci-exhibit-control',lang()==='de'?'Vollständiger Nachweis':'Full record')
+    record.type='button'
+    record.addEventListener('click',()=>showExhibitRecord(id,work,entries))
+    const shut=make('button','vinci-exhibit-control',lang()==='de'?'Schließen':'Close')
+    shut.type='button'
+    shut.addEventListener('click',()=>closeLook?.close())
+    controls.push(record,shut)
+    openMode=how
+    closeLook.open({id,title:lang()==='de'?work.title_de:work.title_en,label,
+      question:text(vinciContent[card]!.door),controls},from)
+    openMode='auto'
   }
   /** The door asks about the place the visitor is standing in, so the
    * question travels with the card and not with the rail mark. */
@@ -340,6 +503,7 @@ export function createWing():VinciWingModule {
     // stations used to carry a title and the hour and nothing that said what
     // the visitor was looking at.
     header.append(make('p','vinci-promise',text(s.promise)))
+    paintExhibitTitle()
   }
   /** The card names what the frame holds: a sub-view carries its own title.
    * THE NUMBER COUNTS STATIONS. Two frames could otherwise read the same
@@ -352,6 +516,17 @@ export function createWing():VinciWingModule {
     if(h1)h1.textContent=text(name??s.name)
     const kicker=header.querySelector('.vinci-kicker')
     if(kicker)kicker.textContent=name?viewKicker():stationKicker()
+  }
+  /** ONE CARD AT A TIME ON A NARROW STAGE. The room's card stands beside the
+   * exhibit's on the wide one and would cover it on the phone. */
+  function paintHeaderVisibility():void {
+    if(header)header.hidden=mode===2||(narrow()&&Boolean(closeLook?.id))
+  }
+  /** AN APPROACH EYE IS NEVER A STATION. It stands in the station's own room
+   * and carries the sub-view kicker the wing already writes for a view. */
+  function paintExhibitTitle():void {
+    const kicker=header?.querySelector('.vinci-kicker')
+    if(kicker)kicker.textContent=closeLook?.id?viewKicker():activeView?viewKicker():stationKicker()
   }
   const stationNumber=()=>String(card+1).padStart(2,'0')
   const stationKicker=()=>`CLOS LUCE, 1517 · ${stationNumber()} / 19`
@@ -498,7 +673,7 @@ export function createWing():VinciWingModule {
     const s=vinciContent[card]!,scroll=dock.scrollTop
     const focused=dock.contains(document.activeElement)?document.activeElement as HTMLElement:null
     const recordOpen=dock.dataset['station']===s.id&&record?.isConnected&&!record.hidden
-    header.hidden=mode===2
+    paintHeaderVisibility()
     const camera=hosts.world.camera
     dock.dataset['station']=s.id
     // Opening Sources changes presentation only, inside the same proven lens.
@@ -625,6 +800,9 @@ export function createWing():VinciWingModule {
       if(!standing){station=card=index;paintHeader();return}
       const closeSources=mode===2
       if(closeSources)mode=1
+      // THE STATION RAIL STAYS LIVE. Pressing a station closes the exhibit and
+      // the rail walks from the station eye, which is the certified pair.
+      closeLook?.close()
       exhibitSources=null;endInspection();if(station!==index)sources.resetScroll();station=index;activeView='';measurement.hide()
       const s=vinciContent[index]!,cut=cutToStation()
       rail.set(s.id,stationPose(s.id,narrow()),cut,narrow())
@@ -662,7 +840,14 @@ export function createWing():VinciWingModule {
         if(arrived>=0){card=arrived;dock.scrollTop=0;paintHeader();paintDock();paintQuestion()}
       }
       if(nav.completed&&nav.completed!==exposureAt){exposureAt=nav.completed;aimPrint(nav.completed)}
-      focusNearCascade();shadowBody?.update();shadowCache?.update();sky.position.copy(hosts.world.camera.position);labels.update(dock.open?dock.getBoundingClientRect():null)},
-    stop(){if(scheduled)cancelAnimationFrame(scheduled);scheduled=0;standing=false;exhibits?.dispose();exhibits=undefined;sign=undefined;shadowBody?.dispose();shadowBody=undefined;shadowCache?.dispose();shadowCache=undefined;restoreEnvironmentRotation?.();restoreEnvironmentRotation=null;controller?.abort();welcome?.dispose();welcome=undefined;sources?.dispose();source?.remove();labels?.dispose();measurement?.dispose();water?.dispose();hosts?.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key?.light)o.dispose()});key?.dispose();if(hosts){hosts.world.scene.traverse(o=>{if(o instanceof Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose()}});hosts.world.scene.clear();delete hosts.stage.parentElement!.dataset['wing'];if(labelHostHidden===null)hosts.labels.removeAttribute('aria-hidden');else hosts.labels.setAttribute('aria-hidden',labelHostHidden)}hosts=undefined},
+      focusNearCascade();shadowBody?.update();shadowCache?.update();sky.position.copy(hosts.world.camera.position)
+      // A REMOUNTED PLATE IS A NEW MESH. The registry is a read, so it is
+      // taken again when a tier change has replaced what it read.
+      if(picks.length&&(picksTier!==hosts.world.stack.tierName()||!picks[0]!.object.parent))refreshExhibits()
+      const reading=closeLook?.id?closeLook.element.getBoundingClientRect():dock.open?dock.getBoundingClientRect():null
+      labels.update(reading)
+      dots?.setLimit(DOTS_PER_TIER[hosts.world.stack.tierName()]??6)
+      dots?.update(reading)},
+    stop(){if(scheduled)cancelAnimationFrame(scheduled);scheduled=0;standing=false;exhibits?.dispose();exhibits=undefined;sign=undefined;shadowBody?.dispose();shadowBody=undefined;shadowCache?.dispose();shadowCache=undefined;restoreEnvironmentRotation?.();restoreEnvironmentRotation=null;controller?.abort();closeLook?.dispose();closeLook=undefined;dots?.dispose();dots=undefined;picks=[];picksTier='';occluders=[];collectionRoot=undefined;welcome?.dispose();welcome=undefined;sources?.dispose();source?.remove();labels?.dispose();measurement?.dispose();water?.dispose();hosts?.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key?.light)o.dispose()});key?.dispose();if(hosts){hosts.world.scene.traverse(o=>{if(o instanceof Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose()}});hosts.world.scene.clear();delete hosts.stage.parentElement!.dataset['wing'];if(labelHostHidden===null)hosts.labels.removeAttribute('aria-hidden');else hosts.labels.setAttribute('aria-hidden',labelHostHidden)}hosts=undefined},
   }
 }

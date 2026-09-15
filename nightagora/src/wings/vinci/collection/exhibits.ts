@@ -40,6 +40,9 @@ export interface CollectionExhibits {
   pending(): number
   pictureSources(): readonly CollectionPictureSource[]
   pictureErrors(): readonly string[]
+  /** The room's own sources, separately from the whole ground: the close
+   * look's registry is a read over these meshes. */
+  picturesReady: Promise<unknown>
 }
 
 export function mountCollectionExhibits(host: Group, stack: Stack): CollectionExhibits {
@@ -258,6 +261,7 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
     pending: () => [...warmed].filter(ground => !machines.some(machine => machine.ground === ground)).length + pictures.pending(),
     pictureSources: pictures.sources,
     pictureErrors: pictures.errors,
+    picturesReady: pictures.ready,
     warm: warmHall,
     demonstrate(slug) { demonstrating = slug },
     update(now, step, eye) {

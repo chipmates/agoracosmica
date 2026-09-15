@@ -210,8 +210,7 @@ export interface VinciExhibitMark {
   label: string
   /** The certainty colour of this object, which is a fact, not a style. */
   colour: string
-  /** False while the object itself is not being drawn. */
-  drawn: boolean
+  /** The object itself: a mark stands only while its exhibit is drawn. */
   object: Object3D
 }
 
@@ -234,7 +233,7 @@ export function createVinciExhibitDots(options: {
   host: HTMLElement
   camera: PerspectiveCamera
   occluders: readonly Mesh[]
-  onOpen: (id: string) => void
+  onOpen: (id: string, dot: HTMLButtonElement) => void
   limit?: number
 }): VinciExhibitDots {
   const { host, camera, occluders, onOpen } = options
@@ -249,7 +248,7 @@ export function createVinciExhibitDots(options: {
     dot.type = 'button'
     dot.hidden = true
     dot.style.width = dot.style.height = '44px'
-    dot.addEventListener('click', () => { const id = pressed.get(dot); if (id) onOpen(id) })
+    dot.addEventListener('click', () => { const id = pressed.get(dot); if (id) onOpen(id, dot) })
     buttons.push(dot)
     host.append(dot)
   }
@@ -309,7 +308,7 @@ export function createVinciExhibitDots(options: {
       const centreX = width / 2, centreY = height / 2
       const candidates: { mark: VinciExhibitMark; x: number; y: number; from: number }[] = []
       for (const mark of marks) {
-        if (!mark.drawn || !mark.object.visible) continue
+        if (!mark.object.visible) continue
         projected.copy(mark.anchor as Vector3).project(camera)
         if (projected.z <= -1 || projected.z >= 1) continue
         const x = (projected.x * .5 + .5) * width, y = (-projected.y * .5 + .5) * height
