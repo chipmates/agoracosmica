@@ -8,69 +8,315 @@
   },
   "steps": {
     "aerial-screw": [
-      { "at": 0, "part": "push-bar-0", "en": "Four people walk the bars round. The bars are a modern addition, the sheet does not show them.", "de": "Vier Menschen gehen mit den Stangen im Kreis. Die Stangen sind eine heutige Zutat, das Blatt zeigt sie nicht.", "certainty": "conjectural" },
-      { "at": 0.2, "part": "mast", "en": "The mast takes the turn and carries it up into the spiral.", "de": "Der Mast nimmt die Drehung auf und trägt sie hinauf in die Spirale.", "certainty": "reconstructed" },
-      { "at": 0.6, "part": "sail", "en": "The starched linen screws against the air. That it would lift is his claim, not a finding.", "de": "Das gestärkte Leinen schraubt sich gegen die Luft. Dass es abheben würde, ist seine Behauptung, kein Befund.", "certainty": "reconstructed" },
-      { "at": 1, "part": "platform", "en": "One full turn, and the platform has not left the floor.", "de": "Eine ganze Umdrehung, und die Plattform hat den Boden nicht verlassen.", "certainty": "documented" }
+      {
+        "at": 0,
+        "part": "push-bar-0",
+        "en": "Four people walk the bars round. The bars and the four people are a modern addition, the sheet shows neither.",
+        "de": "Vier Menschen gehen mit den Stangen im Kreis. Die Stangen und die vier Menschen sind eine heutige Zutat, das Blatt zeigt beides nicht.",
+        "certainty": "conjectural"
+      },
+      {
+        "at": 0.2,
+        "part": "mast",
+        "en": "The mast takes the turn and carries it up into the spiral.",
+        "de": "Der Mast nimmt die Drehung auf und trägt sie hinauf in die Spirale.",
+        "certainty": "reconstructed"
+      },
+      {
+        "at": 0.6,
+        "part": "sail",
+        "en": "The starched linen screws against the air. That it would lift is his claim, not a finding.",
+        "de": "Das gestärkte Leinen schraubt sich gegen die Luft. Dass es abheben würde, ist seine Behauptung, kein Befund.",
+        "certainty": "reconstructed"
+      },
+      {
+        "at": 1,
+        "part": "platform",
+        "en": "One full turn, and the platform has not left the floor.",
+        "de": "Eine ganze Umdrehung, und die Plattform hat den Boden nicht verlassen.",
+        "certainty": "documented"
+      }
     ],
     "anemometer": [
-      { "at": 0, "part": "vane", "en": "Still air. The plate hangs straight down from its hinge.", "de": "Windstille. Die Platte hängt senkrecht an ihrem Scharnier.", "certainty": "reconstructed" },
-      { "at": 0.5, "part": "quadrant", "en": "At its furthest the plate stands thirty degrees out of the upright. The marks on the scale are a modern guess, the sheet gives none.", "de": "Am weitesten steht die Platte dreißig Grad aus der Senkrechten. Die Marken der Skala sind eine heutige Annahme, das Blatt nennt keine.", "certainty": "conjectural" },
-      { "at": 1, "part": "vane", "en": "The wind drops and the plate falls back. What it reads is force, not speed.", "de": "Der Wind lässt nach und die Platte fällt zurück. Was sie anzeigt, ist Kraft, nicht Geschwindigkeit.", "certainty": "reconstructed" }
+      {
+        "at": 0,
+        "part": "vane",
+        "en": "Still air. The plate hangs straight down from its hinge.",
+        "de": "Windstille. Die Platte hängt senkrecht an ihrem Scharnier.",
+        "certainty": "reconstructed"
+      },
+      {
+        "at": 0.5,
+        "part": "quadrant",
+        "en": "At its furthest the plate stands thirty degrees out of the upright. The marks on the scale are a modern guess, the sheet gives none.",
+        "de": "Am weitesten steht die Platte dreißig Grad aus der Senkrechten. Die Marken der Skala sind eine heutige Annahme, das Blatt nennt keine.",
+        "certainty": "conjectural"
+      },
+      {
+        "at": 1,
+        "part": "vane",
+        "en": "The wind drops and the plate falls back. What it reads is force, not speed.",
+        "de": "Der Wind lässt nach und die Platte fällt zurück. Was sie anzeigt, ist Kraft, nicht Geschwindigkeit.",
+        "certainty": "reconstructed"
+      }
     ],
     "inclinometer": [
-      { "at": 0, "part": "deck", "en": "The deck lies level and the thread hangs straight.", "de": "Das Deck liegt waagerecht und der Faden hängt gerade.", "certainty": "reconstructed" },
-      { "at": 0.25, "part": "pendulum", "en": "The deck has rolled ten degrees. The thread stays upright in the room, and the angle between them is the reading.", "de": "Das Deck hat sich um zehn Grad geneigt. Der Faden bleibt im Raum senkrecht, und der Winkel zwischen beiden ist die Anzeige.", "certainty": "reconstructed" },
-      { "at": 0.75, "part": "deck", "en": "It rolls ten degrees the other way and the thread does not move with it.", "de": "Es neigt sich zehn Grad zur anderen Seite, und der Faden geht nicht mit.", "certainty": "reconstructed" }
+      {
+        "at": 0,
+        "part": "deck",
+        "en": "The deck lies level and the thread hangs straight.",
+        "de": "Das Deck liegt waagerecht und der Faden hängt gerade.",
+        "certainty": "reconstructed"
+      },
+      {
+        "at": 0.25,
+        "part": "pendulum",
+        "en": "The deck has rolled ten degrees. The thread stays upright in the room, and the angle between them is the reading.",
+        "de": "Das Deck hat sich um zehn Grad geneigt. Der Faden bleibt im Raum senkrecht, und der Winkel zwischen beiden ist die Anzeige.",
+        "certainty": "reconstructed"
+      },
+      {
+        "at": 0.75,
+        "part": "deck",
+        "en": "It rolls ten degrees the other way and the thread does not move with it.",
+        "de": "Es neigt sich zehn Grad zur anderen Seite, und der Faden geht nicht mit.",
+        "certainty": "reconstructed"
+      }
     ],
     "multi-barrel-gun": [
-      { "at": 0, "part": "bank-0", "en": "One bank of eleven barrels stands uppermost. The note on the sheet says eleven are fired at a time.", "de": "Eine Reihe von elf Rohren steht oben. Die Notiz auf dem Blatt sagt, elf werden zugleich abgefeuert.", "certainty": "documented" },
-      { "at": 0.22, "part": "drum", "en": "A hand turns the frame a third of a circle. Nothing here loads and nothing fires.", "de": "Eine Hand dreht den Rahmen um ein Drittel. Hier lädt nichts und hier feuert nichts.", "certainty": "reconstructed" },
-      { "at": 0.4, "part": "bank-2", "en": "The next eleven are up. Three banks, thirty three barrels.", "de": "Die nächsten elf stehen oben. Drei Reihen, dreiunddreißig Rohre.", "certainty": "documented" },
-      { "at": 1, "part": "drum", "en": "Three turns bring the first bank back. The timings are the museum's, not his.", "de": "Drei Drehungen bringen die erste Reihe zurück. Die Zeiten sind die des Museums, nicht seine.", "certainty": "reconstructed" }
+      {
+        "at": 0,
+        "part": "bank-0",
+        "en": "One bank of eleven barrels stands uppermost. The note on the sheet says eleven are fired at a time.",
+        "de": "Eine Reihe von elf Rohren steht oben. Die Notiz auf dem Blatt sagt, elf werden zugleich abgefeuert.",
+        "certainty": "documented"
+      },
+      {
+        "at": 0.22,
+        "part": "drum",
+        "en": "A hand turns the frame a third of a circle. Nothing here loads and nothing fires.",
+        "de": "Eine Hand dreht den Rahmen um ein Drittel. Hier lädt nichts und hier feuert nichts.",
+        "certainty": "reconstructed"
+      },
+      {
+        "at": 0.4,
+        "part": "bank-2",
+        "en": "The next eleven are up. Three banks, thirty three barrels.",
+        "de": "Die nächsten elf stehen oben. Drei Reihen, dreiunddreißig Rohre.",
+        "certainty": "documented"
+      },
+      {
+        "at": 1,
+        "part": "drum",
+        "en": "Three turns bring the first bank back. The timings are the museum's, not his.",
+        "de": "Drei Drehungen bringen die erste Reihe zurück. Die Zeiten sind die des Museums, nicht seine.",
+        "certainty": "reconstructed"
+      }
     ],
     "rolling-mill": [
-      { "at": 0, "part": "crank-grip", "en": "A hand takes the crank.", "de": "Eine Hand fasst die Kurbel.", "certainty": "reconstructed" },
-      { "at": 0.3, "part": "driver", "en": "The small gear drives the large one, so the roller turns a third as fast as the hand.", "de": "Das kleine Zahnrad treibt das große, die Walze dreht sich also ein Drittel so schnell wie die Hand.", "certainty": "reconstructed" },
-      { "at": 0.6, "part": "upper", "en": "The upper bronze roller turns, and the gap under it stays where it was set.", "de": "Die obere Bronzewalze dreht sich, und der Spalt darunter bleibt, wo er eingestellt wurde.", "certainty": "reconstructed" },
-      { "at": 1, "part": "lower", "en": "One turn of the crank, a third of a turn of each roller. No tin is shown, the mill runs empty.", "de": "Eine Kurbelumdrehung, ein Drittel Umdrehung je Walze. Zinn wird nicht gezeigt, das Werk läuft leer.", "certainty": "reconstructed" }
+      {
+        "at": 0,
+        "part": "crank-grip",
+        "en": "A hand takes the crank.",
+        "de": "Eine Hand fasst die Kurbel.",
+        "certainty": "reconstructed"
+      },
+      {
+        "at": 0.3,
+        "part": "driver",
+        "en": "The small gear drives the large one, so the roller turns a third as fast as the hand.",
+        "de": "Das kleine Zahnrad treibt das große, die Walze dreht sich also ein Drittel so schnell wie die Hand.",
+        "certainty": "reconstructed"
+      },
+      {
+        "at": 0.6,
+        "part": "upper",
+        "en": "The upper bronze roller turns, and the gap under it stays where it was set.",
+        "de": "Die obere Bronzewalze dreht sich, und der Spalt darunter bleibt, wo er eingestellt wurde.",
+        "certainty": "reconstructed"
+      },
+      {
+        "at": 1,
+        "part": "lower",
+        "en": "One turn of the crank, a third of a turn of each roller. No tin is shown, the mill runs empty.",
+        "de": "Eine Kurbelumdrehung, ein Drittel Umdrehung je Walze. Zinn wird nicht gezeigt, das Werk läuft leer.",
+        "certainty": "reconstructed"
+      }
     ],
     "ball-bearing": [
-      { "at": 0, "part": "upper-plate", "en": "The load sits on the top plate, and a hand outside the model turns it.", "de": "Die Last sitzt auf der oberen Platte, und eine Hand außerhalb des Modells dreht sie.", "certainty": "reconstructed" },
-      { "at": 0.3, "part": "ball-0", "en": "Each of the eight balls rolls between the plates instead of sliding.", "de": "Jede der acht Kugeln rollt zwischen den Platten, statt zu gleiten.", "certainty": "documented" },
-      { "at": 0.6, "part": "separator-0", "en": "The little pivoted wheels hold the balls off each other. That is what the sheet names.", "de": "Die kleinen gelagerten Rädchen halten die Kugeln voneinander fern. Das ist es, was das Blatt nennt.", "certainty": "documented" },
-      { "at": 1, "part": "carrier", "en": "The ring of balls has gone half as far round as the plate above it.", "de": "Der Kugelkranz ist halb so weit gekommen wie die Platte über ihm.", "certainty": "reconstructed" }
+      {
+        "at": 0,
+        "part": "upper-plate",
+        "en": "The load sits on the top plate, and a hand outside the model turns it.",
+        "de": "Die Last sitzt auf der oberen Platte, und eine Hand außerhalb des Modells dreht sie.",
+        "certainty": "reconstructed"
+      },
+      {
+        "at": 0.3,
+        "part": "ball-0",
+        "en": "Each of the eight balls rolls between the plates instead of sliding.",
+        "de": "Jede der acht Kugeln rollt zwischen den Platten, statt zu gleiten.",
+        "certainty": "documented"
+      },
+      {
+        "at": 0.6,
+        "part": "separator-0",
+        "en": "The little pivoted wheels hold the balls off each other. That is what the sheet names.",
+        "de": "Die kleinen gelagerten Rädchen halten die Kugeln voneinander fern. Das ist es, was das Blatt nennt.",
+        "certainty": "documented"
+      },
+      {
+        "at": 1,
+        "part": "carrier",
+        "en": "The ring of balls has gone half as far round as the plate above it.",
+        "de": "Der Kugelkranz ist halb so weit gekommen wie die Platte über ihm.",
+        "certainty": "reconstructed"
+      }
     ],
     "flywheel": [
-      { "at": 0, "part": "rotor", "en": "A person keeps the shaft turning. Nothing here turns by itself.", "de": "Ein Mensch hält die Welle in Gang. Hier dreht sich nichts von selbst.", "certainty": "reconstructed" },
-      { "at": 0.5, "part": "weight-0", "en": "The weights carry the turn through. Four of them on rigid spokes is a modern arrangement, the sheet only compares.", "de": "Die Gewichte tragen die Drehung durch. Vier an starren Speichen sind eine heutige Anordnung, das Blatt vergleicht nur.", "certainty": "conjectural" },
-      { "at": 1, "part": "rotor", "en": "One slow turn. What is stored in it came from the hand, and it goes back out.", "de": "Eine langsame Umdrehung. Was darin steckt, kam aus der Hand, und es geht wieder heraus.", "certainty": "reconstructed" }
+      {
+        "at": 0,
+        "part": "rotor",
+        "en": "A person keeps the shaft turning. Nothing here turns by itself.",
+        "de": "Ein Mensch hält die Welle in Gang. Hier dreht sich nichts von selbst.",
+        "certainty": "reconstructed"
+      },
+      {
+        "at": 0.5,
+        "part": "weight-0",
+        "en": "The weights carry the turn through. Putting four of them on rigid spokes is the museum's choice, the sheet only compares.",
+        "de": "Die Gewichte tragen die Drehung durch. Vier davon an starre Speichen zu setzen, ist die Wahl des Museums, das Blatt vergleicht nur.",
+        "certainty": "conjectural"
+      },
+      {
+        "at": 1,
+        "part": "rotor",
+        "en": "One slow turn. What is stored in it came from the hand, and it goes back out.",
+        "de": "Eine langsame Umdrehung. Was darin steckt, kam aus der Hand, und es geht wieder heraus.",
+        "certainty": "reconstructed"
+      }
     ],
     "revolving-crane": [
-      { "at": 0, "part": "handle", "en": "A hand turns the crank.", "de": "Eine Hand dreht die Kurbel.", "certainty": "reconstructed" },
-      { "at": 0.3, "part": "drum", "en": "The drum winds the rope in.", "de": "Die Trommel wickelt das Seil auf.", "certainty": "reconstructed" },
-      { "at": 0.6, "part": "hoist-rope", "en": "The rope runs over the pulley at the mast and over the one at the tip of the jib.", "de": "Das Seil läuft über die Rolle am Mast und über die an der Spitze des Auslegers.", "certainty": "documented" },
-      { "at": 1, "part": "load", "en": "In twelve seconds the load has risen a quarter of a metre, and the hand has to keep holding.", "de": "In zwölf Sekunden ist die Last einen Viertelmeter gestiegen, und die Hand muss weiter festhalten.", "certainty": "reconstructed" }
+      {
+        "at": 0,
+        "part": "handle",
+        "en": "A hand turns the crank.",
+        "de": "Eine Hand dreht die Kurbel.",
+        "certainty": "reconstructed"
+      },
+      {
+        "at": 0.3,
+        "part": "drum",
+        "en": "The drum winds the rope in.",
+        "de": "Die Trommel wickelt das Seil auf.",
+        "certainty": "reconstructed"
+      },
+      {
+        "at": 0.6,
+        "part": "hoist-rope",
+        "en": "The rope runs over the pulley at the mast and over the one at the tip of the jib.",
+        "de": "Das Seil läuft über die Rolle am Mast und über die an der Spitze des Auslegers.",
+        "certainty": "documented"
+      },
+      {
+        "at": 1,
+        "part": "load",
+        "en": "In twelve seconds the load has risen a quarter of a metre, and the hand has to keep holding.",
+        "de": "In zwölf Sekunden ist die Last einen Viertelmeter gestiegen, und die Hand muss weiter festhalten.",
+        "certainty": "reconstructed"
+      }
     ],
     "lathe": [
-      { "at": 0, "part": "footbar", "en": "A foot presses the bar down.", "de": "Ein Fuß drückt die Stange nieder.", "certainty": "reconstructed" },
-      { "at": 0.5, "part": "spindle", "en": "The rope pulls the spindle round, about four tenths of a turn, and the drill turns with it.", "de": "Das Seil zieht die Spindel herum, etwa vier Zehntel einer Umdrehung, und der Bohrer dreht sich mit.", "certainty": "reconstructed" },
-      { "at": 1, "part": "bow", "en": "The bow springs back, the foot comes up, and the spindle turns the other way. Nothing is cut here.", "de": "Der Bogen federt zurück, der Fuß kommt hoch, und die Spindel dreht sich zurück. Geschnitten wird hier nichts.", "certainty": "reconstructed" }
+      {
+        "at": 0,
+        "part": "footbar",
+        "en": "A foot presses the bar down.",
+        "de": "Ein Fuß drückt die Stange nieder.",
+        "certainty": "reconstructed"
+      },
+      {
+        "at": 0.5,
+        "part": "spindle",
+        "en": "The rope pulls the spindle round, about four tenths of a turn, and the drill turns with it.",
+        "de": "Das Seil zieht die Spindel herum, etwa vier Zehntel einer Umdrehung, und der Bohrer dreht sich mit.",
+        "certainty": "reconstructed"
+      },
+      {
+        "at": 1,
+        "part": "bow",
+        "en": "The bow springs back, the foot comes up, and the spindle turns the other way. Nothing is cut here.",
+        "de": "Der Bogen federt zurück, der Fuß kommt hoch, und die Spindel dreht sich zurück. Geschnitten wird hier nichts.",
+        "certainty": "reconstructed"
+      }
     ],
     "miter-lock-gates": [
-      { "at": 0, "part": "leaf-left", "en": "The two leaves stand shut, meeting at an angle, and the water presses them together.", "de": "Die beiden Flügel stehen geschlossen, treffen im Winkel aufeinander, und das Wasser drückt sie zusammen.", "certainty": "documented" },
-      { "at": 0.5, "part": "leaf-right", "en": "With the water at the same height on both sides they swing open, seventy six degrees each.", "de": "Bei gleichem Wasserstand auf beiden Seiten schwingen sie auf, je sechsundsiebzig Grad.", "certainty": "reconstructed" },
-      { "at": 1, "part": "leaf-left", "en": "They close again. The lock chamber and its water are not shown here.", "de": "Sie schließen wieder. Die Schleusenkammer und ihr Wasser sind hier nicht dargestellt.", "certainty": "reconstructed" }
+      {
+        "at": 0,
+        "part": "leaf-left",
+        "en": "The two leaves stand shut, meeting at an angle, and the water presses them together.",
+        "de": "Die beiden Flügel stehen geschlossen, treffen im Winkel aufeinander, und das Wasser drückt sie zusammen.",
+        "certainty": "documented"
+      },
+      {
+        "at": 0.5,
+        "part": "leaf-right",
+        "en": "With the water at the same height on both sides they swing open, seventy six degrees each.",
+        "de": "Bei gleichem Wasserstand auf beiden Seiten schwingen sie auf, je sechsundsiebzig Grad.",
+        "certainty": "reconstructed"
+      },
+      {
+        "at": 1,
+        "part": "leaf-left",
+        "en": "They close again. The lock chamber and its water are not shown here.",
+        "de": "Sie schließen wieder. Die Schleusenkammer und ihr Wasser sind hier nicht dargestellt.",
+        "certainty": "reconstructed"
+      }
     ],
     "water-lifting-screw": [
-      { "at": 0, "part": "crank", "en": "A hand turns the crank at the lower end.", "de": "Eine Hand dreht die Kurbel am unteren Ende.", "certainty": "reconstructed" },
-      { "at": 0.4, "part": "helical-tube", "en": "As the tube rolls, water caught in its lower turns would travel up it. The water itself is not shown.", "de": "Während das Rohr rollt, würde Wasser in seinen unteren Windungen nach oben wandern. Das Wasser selbst ist nicht dargestellt.", "certainty": "reconstructed" },
-      { "at": 1, "part": "upper-trough-base", "en": "One turn, and the outlet over the upper trough has come round once.", "de": "Eine Umdrehung, und der Auslauf über der oberen Rinne ist einmal herum.", "certainty": "reconstructed" }
+      {
+        "at": 0,
+        "part": "crank",
+        "en": "A hand turns the crank at the lower end.",
+        "de": "Eine Hand dreht die Kurbel am unteren Ende.",
+        "certainty": "reconstructed"
+      },
+      {
+        "at": 0.4,
+        "part": "helical-tube",
+        "en": "As the tube rolls, water caught in its lower turns would travel up it. The water itself is not shown.",
+        "de": "Während das Rohr rollt, würde Wasser in seinen unteren Windungen nach oben wandern. Das Wasser selbst ist nicht dargestellt.",
+        "certainty": "reconstructed"
+      },
+      {
+        "at": 1,
+        "part": "upper-trough-base",
+        "en": "One turn, and the outlet over the upper trough has come round once.",
+        "de": "Eine Umdrehung, und der Auslauf über der oberen Rinne ist einmal herum.",
+        "certainty": "reconstructed"
+      }
     ],
     "proportional-compass": [
-      { "at": 0, "part": "pivot", "en": "The screw fixes the pivot, and the pivot fixes the ratio. Here the museum has set it at two to one.", "de": "Die Schraube fixiert den Drehpunkt, und der Drehpunkt legt das Verhältnis fest. Hier hat das Museum es auf zwei zu eins gesetzt.", "certainty": "conjectural" },
-      { "at": 0.5, "part": "leg-left", "en": "The legs open together. The long points stand twice as far apart as the short ones.", "de": "Die Schenkel öffnen sich zusammen. Die langen Spitzen stehen doppelt so weit auseinander wie die kurzen.", "certainty": "reconstructed" },
-      { "at": 1, "part": "leg-right", "en": "They close, and the two to one holds the whole way.", "de": "Sie schließen sich, und das Verhältnis zwei zu eins hält den ganzen Weg.", "certainty": "reconstructed" }
+      {
+        "at": 0,
+        "part": "pivot",
+        "en": "The screw fixes the pivot, and the pivot fixes the ratio. Here the museum has set it at two to one.",
+        "de": "Die Schraube fixiert den Drehpunkt, und der Drehpunkt legt das Verhältnis fest. Hier hat das Museum es auf zwei zu eins gesetzt.",
+        "certainty": "conjectural"
+      },
+      {
+        "at": 0.5,
+        "part": "leg-left",
+        "en": "The legs open together. The long points stand twice as far apart as the short ones.",
+        "de": "Die Schenkel öffnen sich zusammen. Die langen Spitzen stehen doppelt so weit auseinander wie die kurzen.",
+        "certainty": "reconstructed"
+      },
+      {
+        "at": 1,
+        "part": "leg-right",
+        "en": "They close, and the two to one holds the whole way.",
+        "de": "Sie schließen sich, und das Verhältnis zwei zu eins hält den ganzen Weg.",
+        "certainty": "reconstructed"
+      }
     ]
   }
 }

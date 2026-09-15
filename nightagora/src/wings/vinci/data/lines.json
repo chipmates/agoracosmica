@@ -8,7 +8,7 @@
   },
   "lines": {
     "picture/baptism-of-christ/front": {
-      "en": "Vasari's story, which the holder still repeats, has the young Leonardo painting the angel at the left so well that his master Verrocchio was upset by it.",
+      "en": "Vasari's story, which the Uffizi still repeats, has the young Leonardo painting the angel at the left so well that his master Verrocchio was upset by it.",
       "de": "Vasaris Geschichte, die die Uffizien bis heute wiedergeben, lässt den jungen Leonardo den Engel links so gut malen, dass sein Lehrer Verrocchio darüber verstimmt war.",
       "source": "MINING-CATALOG-PAINTINGS, the Baptism of Christ, label fact from the holder's own entry",
       "certainty": "tradition",
@@ -82,7 +82,7 @@
       }
     },
     "picture/adoration-of-the-magi/front": {
-      "en": "He left it unfinished in 1482 when he went to Milan, and the holder still records its medium as a drawing in charcoal, ink and oil on wood.",
+      "en": "He left it unfinished in 1482 when he went to Milan, and the Uffizi still records its medium as a drawing in charcoal, ink and oil on wood.",
       "de": "Er ließ sie 1482 unvollendet zurück, als er nach Mailand ging, und die Uffizien verzeichnen das Material bis heute als Zeichnung in Kohle, Tinte und Öl auf Holz.",
       "source": "MINING-CATALOG-PAINTINGS, Adoration of the Magi, commission and the holder's record",
       "certainty": "documented"
@@ -114,8 +114,8 @@
       }
     },
     "picture/lady-with-an-ermine/front": {
-      "en": "The black behind her is not his. Someone repainted the background in the eighteenth century, over a bluish grey.",
-      "de": "Das Schwarz hinter ihr stammt nicht von ihm. Jemand übermalte den Hintergrund im 18. Jahrhundert, über einem bläulichen Grau.",
+      "en": "The black behind her is not Leonardo's. Someone repainted the background in the eighteenth century, over a bluish grey.",
+      "de": "Das Schwarz hinter ihr stammt nicht von Leonardo. Jemand übermalte den Hintergrund im 18. Jahrhundert, über einem bläulichen Grau.",
       "source": "MINING-CATALOG-PAINTINGS, Lady with an Ermine, condition",
       "certainty": "documented",
       "detail": {
@@ -194,8 +194,8 @@
       "certainty": "conjectural"
     },
     "picture/la-scapigliata/front": {
-      "en": "An inventory of 1627 lists it as the head of a dishevelled woman by Leonardo da Vinci. It is the smallest panel of the whole attributed group.",
-      "de": "Ein Inventar von 1627 führt sie als Kopf einer zerzausten Frau von Leonardo da Vinci. Sie ist die kleinste Tafel der ganzen zugeschriebenen Gruppe.",
+      "en": "An inventory of 1627 lists it as the head of a dishevelled woman by Leonardo da Vinci. It is the smallest panel of the group attributed to him.",
+      "de": "Ein Inventar von 1627 führt sie als Kopf einer zerzausten Frau von Leonardo da Vinci. Sie ist die kleinste Tafel der ihm zugeschriebenen Gruppe.",
       "source": "MINING-CATALOG-PAINTINGS, La Scapigliata, label fact and dimensions",
       "certainty": "documented"
     },
@@ -226,8 +226,8 @@
       "certainty": "documented"
     },
     "sheet/rcin-919019": {
-      "en": "The only sheet on this wall that the holder catalogues as notes rather than as a drawing of a dissection.",
-      "de": "Das einzige Blatt an dieser Wand, das die Sammlung als Notizen verzeichnet und nicht als Zeichnung einer Sektion.",
+      "en": "This is the only sheet on the wall that the Royal Collection catalogues as notes rather than as a drawing of a dissection.",
+      "de": "Das ist das einzige Blatt an der Wand, das die Royal Collection als Notizen verzeichnet und nicht als Zeichnung einer Sektion.",
       "source": "collection/body-wall.ts BODY_WALL, with the holder's catalogue titles of its twenty nine sheets",
       "certainty": "documented"
     },
@@ -250,14 +250,14 @@
       "certainty": "documented"
     },
     "sheet/rcin-919058": {
-      "en": "A second section of the head, beside the first. The holder catalogues this one as the cranium and its neighbour as the skull.",
-      "de": "Ein zweiter Schnitt durch den Kopf, neben dem ersten. Die Sammlung verzeichnet dieses Blatt als Hirnschädel und das Nachbarblatt als Schädel.",
+      "en": "A second section of the head, beside the first. The Royal Collection catalogues this one as the cranium and its neighbour as the skull.",
+      "de": "Ein zweiter Schnitt durch den Kopf, neben dem ersten. Die Royal Collection verzeichnet dieses Blatt als Hirnschädel und das Nachbarblatt als Schädel.",
       "source": "collection/body-wall.ts BODY_WALL, with the holder's catalogue titles of its twenty nine sheets",
       "certainty": "documented"
     },
     "sheet/rcin-919082": {
-      "en": "The one sheet here whose own size the holder records, 20.4 by 28.3 cm. The other twenty eight hang in modern mounts that claim no size.",
-      "de": "Das einzige Blatt hier, dessen eigene Maße die Sammlung verzeichnet, 20,4 auf 28,3 cm. Die anderen achtundzwanzig hängen in modernen Montierungen ohne Maßangabe.",
+      "en": "The one sheet here whose own size the Royal Collection records, 20.4 by 28.3 cm. The other twenty eight hang in mounts that claim no size.",
+      "de": "Das einzige Blatt hier, dessen eigene Maße die Royal Collection verzeichnet, 20,4 auf 28,3 cm. Die anderen achtundzwanzig hängen in Montierungen ohne Maßangabe.",
       "source": "collection/body-wall.ts BODY_WALL, the one measured sheet and the constant mount area of the other twenty eight",
       "certainty": "documented"
     },
@@ -305,13 +305,13 @@
     },
     "codex/paris-A": {
       "en": "Fifteen faces, not the volume. A monochrome reproduction is all the museum may show of manuscript A.",
-      "de": "Fünfzehn Seiten, nicht der Band. Eine Reproduktion in Schwarz und Weiß ist alles, was das Museum von Manuskript A zeigen darf.",
+      "de": "Fünfzehn Seiten, nicht der Band. Eine Schwarz-Weiß-Reproduktion ist alles, was das Museum von Manuskript A zeigen darf.",
       "source": "table/data/codices.json, the entry for Paris manuscript A",
       "certainty": "documented"
     },
     "codex/atlanticus": {
-      "en": "Seven of the fourteen machines in the hall come from its sheets. Of the codex itself the museum may show 45 files, pages and details, never a run.",
-      "de": "Sieben der vierzehn Maschinen in der Halle stammen von seinen Blättern. Vom Kodex selbst darf das Museum 45 Dateien zeigen, Seiten und Ausschnitte, nie eine Folge.",
+      "en": "Seven of the fourteen machines here come from its sheets. From the codex itself the museum may show 45 files, pages and details, not a run of folios.",
+      "de": "Sieben der vierzehn Maschinen hier stammen von seinen Blättern. Vom Kodex selbst darf das Museum 45 Dateien zeigen, Seiten und Ausschnitte, keine Folge von Blättern.",
       "source": "table/data/codices.json, the entry for the Codex Atlanticus; machines/catalog.ts, the folios of the fourteen dossiers",
       "certainty": "documented"
     },
@@ -328,20 +328,20 @@
       "certainty": "reconstructed"
     },
     "machine/parachute": {
-      "en": "Four sealed linen faces over an open square, each about seven metres. People have come down under modern versions of it, in 2000 and in 2008.",
-      "de": "Vier abgedichtete Leinenflächen über einem offenen Quadrat, jede etwa sieben Meter. Unter modernen Nachbauten sind Menschen heruntergekommen, 2000 und 2008.",
+      "en": "Four sealed linen faces over an open square, each about seven metres. People have jumped under modern versions of it, in 2000 and in 2008.",
+      "de": "Vier abgedichtete Leinenflächen über einem offenen Quadrat, jede etwa sieben Meter. Unter modernen Nachbauten sind Menschen gesprungen, 2000 und 2008.",
       "source": "machines/data/parachute.json, folio Codex Atlanticus 1058v; machines/data/records.json, the folio and test sections",
       "certainty": "reconstructed"
     },
     "machine/anemometer": {
-      "en": "The wind pushes a hinged plate out of the upright and a curved scale says how far. Alberti had described a plate like it in 1450.",
-      "de": "Der Wind drückt eine aufgehängte Platte aus der Senkrechten, eine gebogene Skala sagt wie weit. Alberti hatte eine ähnliche Platte schon 1450 beschrieben.",
+      "en": "The wind pushes a hinged plate out of the upright and a curved scale shows how far. Alberti had described a plate like it in 1450.",
+      "de": "Der Wind drückt eine aufgehängte Platte aus der Senkrechten, eine gebogene Skala zeigt, wie weit. Alberti hatte eine ähnliche Platte schon 1450 beschrieben.",
       "source": "machines/data/anemometer.json, folio Codex Atlanticus 675r; machines/data/records.json, the mechanism and myth sections",
       "certainty": "reconstructed"
     },
     "machine/inclinometer": {
       "en": "A weight hangs over a marked circle to tell a pilot whether he is flying level. The sheet says to shield it from the wind and records no test.",
-      "de": "Ein Gewicht hängt über einem markierten Kreis und soll dem Piloten zeigen, ob er waagerecht fliegt. Das Blatt sagt, man solle es vor Wind schützen, ein Versuch ist nicht belegt.",
+      "de": "Ein Gewicht hängt über einem markierten Kreis und soll dem Piloten zeigen, ob er waagerecht fliegt. Das Blatt sagt, man solle es vor Wind schützen, und nennt keinen Versuch.",
       "source": "machines/data/inclinometer.json, folio Codex Atlanticus 1058r; machines/data/records.json, the folio and test sections",
       "certainty": "reconstructed"
     },
@@ -376,13 +376,13 @@
       "certainty": "reconstructed"
     },
     "machine/lathe": {
-      "en": "A foot pulls a rope round the spindle, a bent bow pulls it back, and the drill turns one way and then the other, four seconds to the stroke.",
+      "en": "A foot pulls a rope round the spindle, a bent bow pulls it back, and the drill turns one way and then the other, four seconds for each stroke.",
       "de": "Ein Fuß zieht ein Seil um die Spindel, ein gebogener Bogen zieht es zurück, und der Bohrer dreht sich hin und her, vier Sekunden je Hub.",
       "source": "machines/data/lathe.json, folio Codex Atlanticus 108r; machines/data/records.json, the mechanism and arithmetic sections",
       "certainty": "reconstructed"
     },
     "machine/miter-lock-gates": {
-      "en": "Two leaves meet at an angle, and the water itself presses them shut. The lock in Milan was real, how much of it was his is not settled.",
+      "en": "Two leaves meet at an angle, and the water itself presses them shut. The lock in Milan was real, and how much of it was his is not settled.",
       "de": "Zwei Flügel treffen im Winkel aufeinander, und das Wasser drückt sie von selbst zu. Die Schleuse in Mailand gab es wirklich, wie viel davon seins war, ist offen.",
       "source": "machines/data/miter-lock-gates.json, folio Codex Atlanticus 656r; machines/data/records.json, the mechanism and build sections",
       "certainty": "reconstructed"
