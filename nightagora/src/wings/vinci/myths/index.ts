@@ -5,6 +5,10 @@ import { Construction, exhibitionFloor, plasterWall, type ExhibitMaterials, type
 
 export type { ExhibitMaterials, ExhibitionObject } from './construction'
 
+/** These two stand on the line bench's stage, and nowhere else: the walk holds
+ * no station for them. The stage runs past the frame at every bench pose. */
+const BENCH_STAGE = { width: 40, depth: 60 } as const
+
 export const INGRES_MANIFEST_ID = 'vinci/place-plate/jean-auguste-dominique-ingres-francois-ier-recoit-les-derniers-soupirs__petit-palais-musee-des-beaux-arts-de-la-ville-de-paris__4096x3252'
 export const INGRES_DISPLAY = {
   width: 5,
@@ -29,7 +33,8 @@ export const DEATHBED_EVIDENCE = {
 /** Five-metre enlargement of the complete Q084 image, preserving its native aspect ratio. */
 export function createMythDeathbed(materials: ExhibitMaterials, plateTexture?: Texture, language: 'en' | 'de' = 'en', options:{mobile?:boolean}={}): ExhibitionObject {
   const build = new Construction(materials, 'vinci-myth-deathbed')
-  exhibitionFloor(build)
+  // The bench's own stage: a floor that runs past every frame of it.
+  exhibitionFloor(build, BENCH_STAGE.width, BENCH_STAGE.depth)
   plasterWall(build, 8.6, 6.05, 2.92, -0.29)
   const centreY = 2.8
   build.box(0, centreY, -0.04, INGRES_DISPLAY.width, INGRES_DISPLAY.height, INGRES_DISPLAY.depth, materials.dark)
@@ -156,7 +161,7 @@ export function createMythQuotes(materials: ExhibitMaterials, options: MythQuote
   const tallest = Math.max(...APOCRYPHA.map((_, index) => block(index)))
   const width = mobile ? bayWidth : bayWidth * columns + 0.52
   const height = mobile ? 1.04 + tallest : topMargin + rowCount * tallest + (rowCount - 1) * rowGap + dado
-  exhibitionFloor(build, mobile ? 8 : 26)
+  exhibitionFloor(build, BENCH_STAGE.width, BENCH_STAGE.depth)
   plasterWall(build, width, height, height / 2, -0.1)
   // plasterWall's broad face is z - 0.01. Sink the ink bases slightly into
   // that face so the 1.8 mm extrusion reads as pigment attached to plaster.

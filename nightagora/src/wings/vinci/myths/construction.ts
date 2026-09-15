@@ -119,10 +119,11 @@ export function plasterWall(build: Construction, width: number, height: number, 
 
 }
 
-/** A real shallow stone floor, with staggered joints and irregular wear at the display. */
+/** A real shallow stone floor, with staggered joints and irregular wear at the
+ * display. It is laid at the size it is given: a host that stands the floor in
+ * a built room cuts it to that room's footprint, so a minimum here would be a
+ * slab running through the walls around it. */
 export function exhibitionFloor(build: Construction, width = 13, depth = 12): void {
-  width = Math.max(width, 40)
-  depth = Math.max(depth, 60)
   const { stone, dark } = build.materials
   // Each joint is the open interval between complete slabs over a mortar bed.
   // No overlaid subpixel strokes or freestanding diagonal chips.
