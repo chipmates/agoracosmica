@@ -164,8 +164,6 @@ body[data-phase='held'] .status { animation: none; }
 .inst-labels[open] summary::after { content: '−'; }
 .inst-labels p { padding: 4px 0 16px; font: 14px/1.6 var(--press-ui); color: var(--press-white); }
 .inst-links summary:focus-visible { outline: 1px solid var(--na-gold); outline-offset: 4px; }
-.pane-library { display: flex; align-items: center; min-height: 44px; margin-top: 12px; font: 13px/1.5 var(--press-ui); color: var(--na-gold); text-decoration: underline; text-underline-offset: 4px; }
-.pane-library:focus-visible { outline: 1px solid var(--na-gold); outline-offset: 4px; }
 .inst-close {
   display: block; min-width: 44px; margin: 13px 0 0 auto;
   font-family: var(--press-ui); font-size: 12px; text-transform: none;

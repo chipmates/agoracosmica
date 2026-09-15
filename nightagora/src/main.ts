@@ -313,7 +313,6 @@ const paneCredit = paneEl.querySelector('.pane-credit') as HTMLElement | null
 const paneCreditLine = paneEl.querySelector('.pane-credit-line') as HTMLElement | null
 const paneCreditNote = paneEl.querySelector('.pane-credit-note') as HTMLElement | null
 const paneClose = paneEl.querySelector('.pane-close') as HTMLButtonElement | null
-const paneLibrary = paneEl.querySelector('.pane-library') as HTMLAnchorElement | null
 /** whose pane is open, which is also whose museum the button enters */
 let paneSlug = ''
 /* THE LIKENESSES, once. Null until the store's record has arrived: a pane
@@ -383,13 +382,6 @@ function openPane(slug: string): void {
   if (paneLine) paneLine.textContent = words ? say(words.line) : ''
   if (paneState) paneState.textContent = say(wing?.status === 'open' ? PANE_SHARED.open : PANE_SHARED.preparing)
   if (paneEnter) paneEnter.hidden = !wing
-  if (paneLibrary) {
-    const link = new URL('https://agoracosmica.org/app')
-    link.searchParams.set('figure', slug)
-    link.searchParams.set('lang', lang())
-    paneLibrary.href = link.href
-    paneLibrary.textContent = say(PANE_SHARED.bridge)
-  }
   hangLikeness(slug, w.name)
   const sibLabel = paneEl.querySelector('.pane-sib-label')
   if (sibLabel) sibLabel.textContent = `Also among the ${c.name}`

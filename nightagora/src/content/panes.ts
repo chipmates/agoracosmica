@@ -15,10 +15,9 @@ export interface PaneWords {
   wing?: Record<Lang, string>
 }
 
-export const PANE_SHARED: Record<'preparing' | 'open' | 'bridge' | 'nameOnly', Record<Lang, string>> = {
+export const PANE_SHARED: Record<'preparing' | 'open' | 'nameOnly', Record<Lang, string>> = {
   preparing: { en: 'Wing in preparation', de: 'Flügel in Vorbereitung' },
   open: { en: 'Wing open', de: 'Flügel geöffnet' },
-  bridge: { en: 'Talk to them in the library', de: 'Sprich mit ihnen in der Bibliothek' },
   /** the pane without a likeness: the name stands alone and this line says why */
   nameOnly: {
     en: 'No public-domain likeness at museum size exists yet. The name stands for the person.',

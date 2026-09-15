@@ -20,8 +20,8 @@ export const LOBBY_TEXT = {
     de: 'Dreißig Leben in einem digitalen Museum. Dort, wo sie lebten, zu einer bestimmten Stunde an einem wirklichen Tag.',
   },
   descentWalk: {
-    en: 'Walk. Look closer. Ask.',
-    de: 'Geh ein Stück. Schau genauer hin. Frag nach.',
+    en: 'Welcome to Night Agora. Walk where they lived and look closer at what they made.',
+    de: 'Willkommen in der Night Agora. Geh, wo sie lebten, und schau genauer hin, was sie schufen.',
   },
   tonight: { en: 'Tonight', de: 'Heute Nacht' },
   firstLight: { en: 'First light', de: 'Das erste Licht' },
