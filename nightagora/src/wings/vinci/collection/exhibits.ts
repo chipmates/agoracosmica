@@ -10,6 +10,7 @@ import type { Stack } from '../../../stack'
 import { buildMachine, MACHINE_SLUGS, type MachineSlug } from '../machines'
 import type { ReadyMachineBuild } from '../machines/runtime'
 import { createCollectionLineFloor, fitCollectionExhibitFloor } from './line-floor'
+import { createCourtPlaque, COURT_PLAQUE_STAND } from './court-plaque'
 import { createGrave } from '../grave'
 import { buildTable, type PageRecord } from '../table'
 import { loadManifest } from '../../../manifest'
@@ -135,6 +136,15 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
   grave.group.position.set(GRAVE_ORIGIN.east, COURT.level + .035, -GRAVE_ORIGIN.north)
   stamp(grave.group, 'vinci/grave-geometry')
   host.add(grave.group)
+
+  // THE FLIGHT QUOTATION STANDS BESIDE THE FLIGHT MACHINE. One plaque on the
+  // court's paving, built with the page like the cloth beside it, because it
+  // is read from the display wall's own station.
+  const plaque = createCourtPlaque(exhibitStones, lang())
+  plaque.group.rotation.y = COURT_PLAQUE_STAND.bearing * Math.PI / 180
+  plaque.group.position.set(COURT_PLAQUE_STAND.east, COURT.level, -COURT_PLAQUE_STAND.north)
+  stamp(plaque.group, 'vinci/court-plaque')
+  host.add(plaque.group)
 
   // Nothing is seeded for the court: its exhibit asks the library for no
   // set, so there is no wait at the head of the page and the walk's one
@@ -279,6 +289,7 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
       if (rooms && rooms.visible !== near) rooms.visible = near
       if (line.visible !== near) line.visible = near
       if (grave.group.visible !== near) grave.group.visible = near
+      if (plaque.group.visible !== near) plaque.group.visible = near
       // The reading table is read at the table, not from the next room.
       const toTable = eye.distanceToSquared(TABLE_AT)
       if (toTable < 22 * 22) warmTable()
@@ -311,6 +322,7 @@ export function mountCollectionExhibits(host: Group, stack: Stack): CollectionEx
       for (const machine of machines) machine.build.dispose()
       for (const strike of teardown) strike()
       grave.dispose()
+      plaque.dispose()
       const lineMaterials = new Set<Material>()
       line.traverse(object => {
         if (!(object instanceof Mesh)) return
