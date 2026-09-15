@@ -50,6 +50,8 @@ const ids=vinciContent.map(s=>s.id),STEP=DURATION/224
 const {createRailGeometryAuthority,collectRailSolids}=await load(path.join(wing,'rail-proof.ts'))
 const {gradeAt}=await load(path.join(wing,'terrain-mesh.ts'))
 const {createCollectionStandSolids}=await load(path.join(wing,'collection/stands.ts'))
+const {vinciExhibitRecords,vinciApproachPose:approachPose}=await load(path.join(wing,'collection/approaches.ts'))
+const EXHIBITS=vinciExhibitRecords()
 const authorityFactories=[
   ['shell','shell','createShell',false],['terrain','ground','createGround',false],
   ['gate-passage','gate-passage','createGatePassage',false],
@@ -107,6 +109,13 @@ function harness(phone,initial='arrival',status='verified') {
     ensure(actualCamera.position.distanceToSquared(from.eye)<1e-18,'Controller supplied a false route origin')
     if(authority.rejectRoute)throw new Error('Intentional controller route rejection')
     return realAuthorities.get(phone?'calm':'standard').route(from,to,requestPhone,actualCamera)
+  },approach(from,to,requestPhone,actualCamera,back=false){
+    calls.push({kind:'approach',back,from:from.eye.toArray(),to:to.eye.toArray(),phone:requestPhone})
+    ensure(authority.status==='verified','Controller called a pending/failed authority')
+    assertRailProjection(actualCamera)
+    const origin=back?to:from
+    ensure(actualCamera.position.distanceToSquared(origin.eye)<1e-18,'Controller supplied a false approach origin')
+    return realAuthorities.get(phone?'calm':'standard').approach(from,to,requestPhone,actualCamera,back)
   }}
   const rail=createRail(camera,()=>now,authority)
   const h={camera,rail,authority,calls,phone,pose:id=>stationPose(id,phone),get now(){return now},
@@ -267,6 +276,60 @@ for(const phone of [false,true]) {
       if(metres>0)walks.push({from:ids[i-1],to:ids[i],metres:+metres.toFixed(2),seconds:+seconds.toFixed(2),metresPerSecond:+(metres/seconds).toFixed(2)})
     }
     return {walks}
+  })
+  check(viewport,'An approach walks from the station eye to one exhibit and the return lands on that eye exactly',()=>{
+    const h=harness(phone,'picture-room')
+    const exhibit=EXHIBITS[9],pose=approachPose(exhibit.id,phone)
+    ensure(exhibit.id==='picture/virgin-of-the-rocks-louvre/front','The tenth plate of the hang moved')
+    ensure(h.rail.approach(exhibit.id,pose,phone),'The rail refused a certified approach')
+    ensure(h.calls.at(-1).kind==='approach'&&h.calls.at(-1).back===false,'The approach borrowed a station proof')
+    const seconds=h.rail.navigation.legSeconds
+    for(let i=1;i<240;i++)h.at(i*seconds/240)
+    h.at(seconds+1e-6)
+    ensure(h.rail.navigation.exhibit===exhibit.id,'The exhibit eye is not the one standing')
+    ensure(h.rail.navigation.completed==='picture-room','An approach eye became a station')
+    const arrival=h.camera.position.distanceTo(pose.eye)
+    ensure(arrival===0,'The arrival missed the certified viewing eye by '+arrival)
+    ensure(Math.abs(h.camera.fov-fittedRailFov(pose.fov,h.camera.aspect,phone))<1e-9,'The arrival kept another lens')
+    ensure(h.rail.approach(EXHIBITS[0].id,approachPose(EXHIBITS[0].id,phone),phone)===false,'A second exhibit opened over the first')
+    ensure(h.rail.returnToStation(),'The rail refused the return')
+    const back=h.rail.navigation
+    for(let i=1;i<240;i++)h.at(seconds+1+i*(back.legSeconds||seconds)/240)
+    h.at(seconds*3+2)
+    const drift=h.camera.position.distanceTo(h.pose('picture-room').eye)
+    ensure(drift===0,'The return drifted '+drift+' m off the certified station eye')
+    endpoint(h,'picture-room','return')
+    ensure(h.rail.navigation.exhibit===undefined,'An exhibit stayed open after the return')
+    compare(h.camera,canonical(phone,'picture-room'),'Returned station eye')
+    return {approachMetres:+pose.eye.distanceTo(h.pose('picture-room').eye).toFixed(4),arrivalErrorM:arrival,returnErrorM:drift}
+  })
+  check(viewport,'A station pressed while an approach stands returns first and then walks the certified pair',()=>{
+    const h=harness(phone,'picture-room')
+    const exhibit=EXHIBITS[9],pose=approachPose(exhibit.id,phone)
+    h.rail.approach(exhibit.id,pose,phone,true)
+    h.at(0)
+    ensure(h.camera.position.distanceTo(pose.eye)===0,'An instant approach missed its certified eye')
+    h.set('garden')
+    settle(h,'garden')
+    const legs=h.calls.filter(call=>call.kind==='approach')
+    ensure(legs.length===2&&legs[1].back===true,'The visitor did not come back before walking on')
+    const route=h.calls.filter(call=>!call.kind).at(-1)
+    ensure(route.from.every((v,i)=>Math.abs(v-h.pose('picture-room').eye.getComponent(i))<1e-12),'The station leg started off the station eye')
+    ensure(h.rail.navigation.exhibit===undefined,'The exhibit survived a station press')
+  })
+  check(viewport,'An uncertified approach throws instead of moving',()=>{
+    const h=harness(phone,'picture-room'),origin=snapshot(h.camera)
+    const exhibit=EXHIBITS[9],pose=approachPose(exhibit.id,phone)
+    const moved={eye:pose.eye.clone().setY(pose.eye.y+.01),at:pose.at.clone(),fov:pose.fov}
+    let threw=false
+    try{h.rail.approach(exhibit.id,moved,phone)}catch{threw=true}
+    ensure(threw,'An uncertified viewing eye was walked to')
+    h.at(1);compare(h.camera,origin,'Refused approach')
+    threw=false
+    try{h.rail.approach(exhibit.id,moved,phone,true)}catch{threw=true}
+    ensure(threw,'An uncertified viewing eye was cut to')
+    h.at(2);compare(h.camera,origin,'Refused placement')
+    ensure(h.rail.navigation.exhibit===undefined,'A refused approach left an exhibit standing')
   })
   check(viewport,'Actual controller consumes the projected pixel delta and reaches 63.212% at 100 ms',()=>{
     const h=harness(phone),pose=h.pose('arrival'),base=new THREE.PerspectiveCamera();base.position.copy(pose.eye);base.lookAt(pose.at)
