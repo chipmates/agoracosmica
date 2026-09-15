@@ -369,7 +369,11 @@ export function createMandala(scene: Scene): MandalaHandles {
        what it throws at the far face comes back off the belt and around the
        drum, and without that term the ring reads as a fence of black sticks. */
     const lamp = lightField(nF).add(lightField(nF.negate()).mul(0.34))
+    /* and the sky is TAKEN OFF the faces that look up at it. Half the ride
+       reads this ring from overhead, where a lit crown on every column would
+       print a comb of pale marks across the field the questions stand in. */
     const sky = max(dot(nF, normalize(vec3(-0.4, 0.82, 0.26))), 0).mul(0.7).add(0.2)
+      .mul(oneMinus(max(nF.y, 0).mul(0.5)))
     // the shaft gives itself to the night as it climbs, so the ring reads as
     // dark verticals from overhead and the questions keep their field
     const lift = smoothstep(0.4, COL_H, h)
