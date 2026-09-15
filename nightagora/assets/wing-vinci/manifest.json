@@ -75,7 +75,7 @@
       "prompt": "Spoken bilingual museum labels with unchanged station names and canonical door questions. Plain source explanations and a separately opened complete record retain the original source chain, dimensional ranges, uncertainty and identical computed-hour arithmetic.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "9d580a9a8ad98045985117dd8e073e657e5508babf583f20db20c9f07da7c596",
+      "sha256": "fe3c9077d61717f138b45495f7df8c757353a414f4a084be15f10661f8d34fe7",
       "note": "brief/CONCEPT-OPUS.md; brief/CONCEPT-GPT6.md; src/wings/vinci/data/doors.json; recipe_file=src/wings/vinci/content.ts; visitor_evidence_recipe=src/wings/vinci/evidence-copy.ts; visitor_evidence_sha256=1154b783a9a2b7bddd75d4d1294475ae82dbe74006e4b6ff5c0eb2df9247ed00"
     },
     {
@@ -413,7 +413,7 @@
       "prompt": "Regenerable actual geometry certificate for40 directed routes across five pose families and two viewport families. Includes foundation, entry, vegetation and all dressing; no sky, DOM or shadow-only duplicate.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-10",
-      "sha256": "d17ac2e4367951c640e5bb2760479adffb2f044a073cd2db1ae04ca8ca49e8c7",
+      "sha256": "9a357ab95663d00404692aec611a72dfb0817c221fec99e3d2167680149a7089",
       "note": "recipe_file=src/wings/vinci/data/rail-clearance.json; source_generator=src/wings/vinci/rail-certify.mjs; runtime dependency of vinci/rail; companion_file=src/wings/vinci/collection/approaches.ts"
     },
     {
@@ -2743,7 +2743,7 @@
       "prompt": "Interpretive museum slab with name only, an empty bronze bezel with its own note, a separate presumed plaque on a footed base and based on a sourced account, and a constructed framed gable relief for the computed sun under a raked reading ledge. No bones or invented historical plaque facsimile.",
       "model": "Deterministic TypeScript geometry and TSL materials",
       "date": "2026-09-10",
-      "sha256": "efe97b5bfd31d2957b8e7bfb9d10fa3f674ed9df0f293b41708092a71ba311ef",
+      "sha256": "4f563aefc30f93d8aefc6d98f6b1a84ed10b2cd7b838a4b0556e6f41cbe21f03",
       "note": "recipe_file=src/wings/vinci/grave/index.ts"
     },
     {
@@ -3486,7 +3486,7 @@
       "prompt": "A standing museum plaque on the court's paving beside the parachute, 1.92 m wide over a footed base course with a cap and a bronze bead: the most quoted line he never wrote, cut into its face in English the way it circulates, with the museum's reading of where it comes from, the film it was written for and its year, in the page's own language.",
       "model": "Deterministic TypeScript geometry and TSL materials",
       "date": "2026-09-15",
-      "sha256": "68a2faa387e9cf59ec37d4ddc5bb4133813a81f832009eaf978ad91995f9cc18",
+      "sha256": "342620090d06974025df4a5856cb2904ec1e6377e5da41c42522f86f87a9bf6f",
       "note": "recipe_file=src/wings/vinci/collection/court-plaque.ts; words from src/wings/vinci/line/data/never-said.json court_plaque"
     },
     {
