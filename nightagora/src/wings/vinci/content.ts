@@ -838,14 +838,22 @@ export const vinciSourcesHeadings = {
   classReference: { en: 'reference only, never displayed', de: 'nur als Vorlage, nie ausgestellt' },
 } satisfies Record<string, VinciText>
 
+/** The original zero-based walk, retired stations included. It is a constant
+ * of this module: the door catalogue may be handed over in any order and a
+ * numeric link still means what it meant. */
+const originalWalk = [
+  'arrival', 'courtyard', 'hall', 'oratory', 'study', 'chamber', 'garden',
+  'line-early', 'line-late', 'line-amboise', 'picture-room', 'supper-wall',
+  'reading-table', 'scattered', 'flight', 'works', 'body', 'myths', 'grave',
+] as const;
+
 /** A station that has left the walk keeps its numeric position, and the link
  * lands where its subject now stands. */
 const retiredStations: Readonly<Record<string, VinciStationId>> = { myths: 'grave' };
 
-/** Numeric links from the original walk always keep their original meaning.
- * The door catalogue holds that original order, retired stations included. */
+/** Numeric links from the original walk always keep their original meaning. */
 export const vinciLegacyStationIds: readonly VinciStationId[] = Object.freeze(
-  doorData.doors.map(door => retiredStations[door.station] ?? door.station as VinciStationId),
+  originalWalk.map(id => retiredStations[id] ?? id as VinciStationId),
 );
 
 const doorsByStation = new Map(doorData.doors.map(door => [door.station, door]));

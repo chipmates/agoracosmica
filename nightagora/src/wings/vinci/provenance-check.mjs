@@ -230,7 +230,7 @@ section('canonical stations, questions, hour and carrier claims', () => {
         return door && station.door?.station === station.id && ['en', 'de'].every(language => station.door?.[language] === door[`question_${language}`]);
       });
       const numberingFollowsWalk = Array.isArray(ordered) && ordered.every((station, index) => station.number === index + 1);
-      const legacyPositionsStable = JSON.stringify(candidate.vinciLegacyStationIds) === JSON.stringify(expectedIds);
+      const legacyPositionsStable = JSON.stringify(candidate.vinciLegacyStationIds) === JSON.stringify(legacyIds);
       const ok = walkingOrderStable && questionsById && numberingFollowsWalk && legacyPositionsStable;
       doorOrderChecks.push({ input: name, accepted: true, walkingOrderStable, questionsById, numberingFollowsWalk, legacyPositionsStable, ok });
       if (!ok) fail('door-order-coupling', `${name} door input changed station questions, walking order, numbering or legacy positions.`, file);
