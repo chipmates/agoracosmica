@@ -247,8 +247,13 @@
 .vinci-exhibit-control:focus-visible {outline:1px solid #edcc8c;outline-offset:2px;}
 .vinci-exhibit-question {margin:14px 0 0;font:13px/1.45 var(--serif);color:#c6bfb0;}
 @media(max-aspect-ratio:9/10) {
-  .vinci-exhibit-card {left:8px;right:8px;top:auto;bottom:calc(var(--wing-rail-bottom) + 14px);width:auto;padding:14px;
-    max-height:min(256px,calc(100dvh - var(--wing-rail-bottom) - 120px));}
+  .vinci-exhibit-card {left:8px;right:8px;top:auto;bottom:calc(var(--wing-rail-bottom) + 46px);width:auto;padding:14px;
+    max-height:min(228px,calc(100dvh - var(--wing-rail-bottom) - 120px));}
+  /* One row of controls, and the door's own question stands under the bar at
+     this width: the card would only print it twice. */
+  .vinci-exhibit-controls {gap:6px;margin-top:12px;padding-top:11px;}
+  .vinci-exhibit-control {flex:1 1 0;min-width:0;}
+  .vinci-exhibit-question {display:none;}
   .vinci-exhibit-card .picture-first,.vinci-exhibit-card .picture-first-de {font-size:17px;margin-bottom:7px;}
   .vinci-exhibit-card p {font-size:13px;line-height:1.45;}
   .vinci-exhibit-control {font-size:11px;padding:10px 8px;}

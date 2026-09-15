@@ -149,7 +149,7 @@ export function createWing():VinciWingModule {
    * visitor carries a mark, and the rest of the room does not. */
   const DOTS_PER_TIER:Record<string,number>={hero:8,standard:6,calm:3}
   /** The one mode a press opens in, set by the caller the press came from. */
-  let openMode:'auto'|'walk'|'cut'='auto'
+  let openMode:'auto'|'walk'|'cut'='auto', exhibitAway=false
   let restoreEnvironmentRotation:(()=>void)|null=null
   const narrow=()=>innerWidth/innerHeight<=.9
   const shadowFocus=new Vector3(NaN,NaN,NaN), focusAhead=new Vector3()
@@ -527,7 +527,13 @@ export function createWing():VinciWingModule {
    * and carries the sub-view kicker the wing already writes for a view. */
   function paintExhibitTitle():void {
     const kicker=header?.querySelector('.vinci-kicker')
-    if(kicker)kicker.textContent=closeLook?.id?viewKicker():activeView?viewKicker():stationKicker()
+    if(!kicker)return
+    // Only an eye that actually left the station is a view from it: on calm
+    // the card rises where the visitor already stands, so the station keeps
+    // its own number.
+    const nav=standing?rail.navigation:undefined
+    const away=Boolean(nav?.exhibit??nav?.approaching)
+    kicker.textContent=away||activeView?viewKicker():stationKicker()
   }
   const stationNumber=()=>String(card+1).padStart(2,'0')
   const stationKicker=()=>`CLOS LUCE, 1517 · ${stationNumber()} / 19`
@@ -841,6 +847,9 @@ export function createWing():VinciWingModule {
         if(arrived>=0){card=arrived;dock.scrollTop=0;paintHeader();paintDock();paintQuestion()}
       }
       if(nav.completed&&nav.completed!==exposureAt){exposureAt=nav.completed;aimPrint(nav.completed)}
+      // The kicker follows the body: it says a view only while the eye stands
+      // away from its station.
+      if(closeLook?.id||exhibitAway!==Boolean(nav.exhibit??nav.approaching)){exhibitAway=Boolean(nav.exhibit??nav.approaching);paintExhibitTitle()}
       focusNearCascade();shadowBody?.update();shadowCache?.update();sky.position.copy(hosts.world.camera.position)
       // A REMOUNTED PLATE IS A NEW MESH. The registry is a read, so it is
       // taken again when a tier change has replaced what it read.
