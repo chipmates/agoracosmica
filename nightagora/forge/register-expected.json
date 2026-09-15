@@ -216,14 +216,6 @@
      "min": 53,
      "max": 53
     },
-    "en/desktop/myths (shut)": {
-     "min": 30,
-     "max": 30
-    },
-    "en/desktop/myths (open)": {
-     "min": 48,
-     "max": 53
-    },
     "en/desktop/grave (shut)": {
      "min": 30,
      "max": 30
@@ -365,14 +357,6 @@
      "max": 30
     },
     "en/mobile/body (open)": {
-     "min": 53,
-     "max": 53
-    },
-    "en/mobile/myths (shut)": {
-     "min": 30,
-     "max": 30
-    },
-    "en/mobile/myths (open)": {
      "min": 53,
      "max": 53
     },
@@ -520,14 +504,6 @@
      "min": 53,
      "max": 53
     },
-    "de/desktop/myths (shut)": {
-     "min": 30,
-     "max": 30
-    },
-    "de/desktop/myths (open)": {
-     "min": 48,
-     "max": 53
-    },
     "de/desktop/grave (shut)": {
      "min": 30,
      "max": 30
@@ -670,14 +646,6 @@
     },
     "de/mobile/body (open)": {
      "min": 53,
-     "max": 53
-    },
-    "de/mobile/myths (shut)": {
-     "min": 30,
-     "max": 30
-    },
-    "de/mobile/myths (open)": {
-     "min": 48,
      "max": 53
     },
     "de/mobile/grave (shut)": {
