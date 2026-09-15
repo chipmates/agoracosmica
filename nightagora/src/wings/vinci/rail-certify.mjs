@@ -84,7 +84,7 @@ async function load(file) {
 
 const { stationPose } = await load(path.join(WING, 'rail.ts'))
 const { vinciContent } = await load(path.join(WING, 'content.ts'))
-const { railGeometryFingerprint } = await load(path.join(WING, 'rail-fingerprint.ts'))
+const { railGeometryFingerprint, railGeometrySignature } = await load(path.join(WING, 'rail-fingerprint.ts'))
 const { collectRailSolids } = await load(path.join(WING, 'rail-solids.ts'))
 const { createCertifiedRailPath, railNearRectangleRadius } = await load(path.join(WING, 'rail-smoothing.ts'))
 const { fittedRailFov } = await load(path.join(WING, 'rail-projection.ts'))
@@ -170,12 +170,16 @@ function restPoseSolids(tier) {
   return meshes
 }
 
-const geometry = [], solidSets = [], restSets = []
+const geometry = [], geometrySignatures = [], solidSets = [], restSets = []
 for (const tier of ['hero', 'standard', 'calm']) {
   const scene = await mount(tier)
   const solids = collectRailSolids(scene)
   const sha256 = await railGeometryFingerprint(solids)
   geometry.push({ tier, sha256, quantumM: QUANTUM_M, matchingGeometryToleranceM: GEOMETRY_TOLERANCE_M })
+  // the engine-tolerant identity beside the exact hash: count and moments per mesh, compared within 1 mm at
+  // mount. Firefox and Safari build these solids 37 um off V8's (the shell's stone, transcendental noise in the
+  // microstructure), a thousandth of the smallest clearance any route is proved with; a moved solid is centimetres.
+  geometrySignatures.push({ tier, toleranceM: 1e-3, meshes: railGeometrySignature(solids) })
   solidSets.push({ tier, solids })
   // The rest poses stand outside the fingerprint and inside the clearance.
   restSets.push({ tier: `rest-${tier}`, solids: restPoseSolids(tier) })
@@ -511,6 +515,7 @@ const certificate = {
   sources: sources.map(source => ({ ...source, unchangedDuringAudit: true })).sort((a, b) => a.file < b.file ? -1 : 1),
   geometrySha256,
   geometry,
+  geometrySignatures,
   coordinateFrame: 'points ENH; poses and balls Three XYZ',
   scope: 'Actual mounted foundation-bearing shell, gate passage, inner court, collection, collection access, entry passage, whole ground, water, vegetation, every spatially partitioned road/ground dressing triangle, the fixed plinths and bases under the exhibits, and every machine in the pose its own schedule holds at t=0. Union of every tier; a tier is accepted by equal actual geometry fingerprint.',
   limits: [

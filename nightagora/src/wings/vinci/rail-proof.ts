@@ -1,7 +1,7 @@
 import { Object3D, PerspectiveCamera, Vector3 } from 'three/webgpu'
 import { stationPose, type Pose } from './rail'
 import { vinciContent } from './content'
-import { railGeometryFingerprint, railGeometryFingerprintBreakdown } from './rail-fingerprint'
+import { railGeometryFingerprint, railGeometryFingerprintBreakdown, railGeometrySignature, sameRailGeometrySignature, type RailMeshSignature } from './rail-fingerprint'
 import { createCertifiedRailPath } from './rail-smoothing'
 import { assertRailProjection } from './rail-projection'
 export { assertRailProjection, fittedRailFov } from './rail-projection'
@@ -26,6 +26,9 @@ interface SavedApproach {
 interface ClearanceData {
   format: 'vinci-rail-clearance-v2'; completeNearClearance: boolean
   geometrySha256: string[]; routes: SavedRoute[]; approaches: SavedApproach[]
+  /** the same solids by count and moments, matched within a tolerance: the
+      exact hash holds only in the engine that wrote it (see rail-fingerprint) */
+  geometrySignatures?: { tier: string; toleranceM: number; meshes: RailMeshSignature[] }[]
 }
 const data = JSON.parse(certificateText) as ClearanceData
 const savedPoseKey = (pose: SavedPose) => JSON.stringify([pose.eye, pose.at, pose.fov])
@@ -85,10 +88,35 @@ function sameSavedPose(saved: SavedPose, pose: Pose) {
 export function createRailGeometryAuthority(roots: readonly Object3D[]) {
   let status: 'checking' | 'verified' | 'failed' = 'checking', failure = ''
   const ready = railGeometryFingerprint(roots).then(async hash => {
-    if (!data.geometrySha256.includes(hash)) {
+    // the exact hash first; failing that, the engine-tolerant identity: the
+    // certified solids by name, count, extent and moments within 10 um
+    const exact = data.geometrySha256.includes(hash)
+    let deviation = ''
+    const tolerant = !exact && (() => {
+      const actual = railGeometrySignature(roots)
+      const entries = data.geometrySignatures ?? []
+      if (entries.some(entry => sameRailGeometrySignature(actual, entry.meshes, entry.toleranceM))) return true
+      // name the nearest certified tier and how far the solids sit from it,
+      // so a refusal says whether it is engine noise or a moved solid
+      deviation = entries.map(entry => {
+        let worst = 0, where = ''
+        const byName = new Map(entry.meshes.map(mesh => [mesh.name, mesh]))
+        for (const mesh of actual) {
+          const saved = byName.get(mesh.name)
+          if (!saved) { where = `${mesh.name} not certified`; worst = Infinity; break }
+          if (saved.vertices !== mesh.vertices) { where = `${mesh.name} ${mesh.vertices} vs ${saved.vertices} vertices`; worst = Infinity; break }
+          for (const [a, b] of [[mesh.bbox, saved.bbox], [mesh.centroid, saved.centroid], [mesh.rms, saved.rms]] as const) {
+            a.forEach((value, i) => { const delta = Math.abs(value - b[i]!); if (delta > worst) { worst = delta; where = mesh.name } })
+          }
+        }
+        return `${entry.tier}: ${actual.length} of ${entry.meshes.length} meshes, worst ${worst} m at ${where}`
+      }).join(' | ') || 'no signatures in the certificate'
+      return false
+    })()
+    if (!exact && !tolerant) {
       const detail = await railGeometryFingerprintBreakdown(roots)
       const meshes = detail.meshes.map(mesh => [mesh.name, mesh.manifestId, mesh.vertices, mesh.sha256.slice(-16)])
-      throw new Error(`Vinci rail geometry has no matching clearance certificate: ${hash}; actual mesh records [name, manifestId, vertices, SHA256 suffix]: ${JSON.stringify(meshes)}; repeated geometry hash: ${detail.sha256}`)
+      throw new Error(`Vinci rail geometry has no matching clearance certificate: ${hash}; tolerant signature: ${deviation}; actual mesh records [name, manifestId, vertices, SHA256 suffix]: ${JSON.stringify(meshes)}; repeated geometry hash: ${detail.sha256}`)
     }
     status = 'verified'
   }).catch(error => { status = 'failed'; failure = String(error); console.error(failure) })
