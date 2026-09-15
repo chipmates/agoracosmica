@@ -7,7 +7,7 @@ import { buildSystemPrompt } from '../services/promptLoader';
 import { dispatchToNebius } from '../services/nebius';
 import { fallbackModel, resolveServing } from '../services/modelRouting';
 import { recordSpend } from '../services/spendGovernor';
-import { alertFallback, alertSpendCrossing } from '../services/telegram';
+import { alertFallback, alertOutage, alertSpendCrossing } from '../services/telegram';
 import { AWARD_RETRY_DIRECTIVE, createAwardGuardedStream } from '../services/awardGuard';
 import { screenCouncilContent } from '../utils/contentScreen';
 import { createSafetyFilteredStream } from '../services/streamFilter';
@@ -189,11 +189,14 @@ export async function handleChat(request: Request, env: Env, ctx: ExecutionConte
       { status: 502, headers: { 'Content-Type': 'application/json' } }
     );
     ctx.waitUntil(Promise.resolve().then(() => track(failure.status)));
+    ctx.waitUntil(alertOutage(env, { asked: dispatch.served, upstreamStatus: dispatch.upstreamStatus }));
     return failure;
   }
 
   if (dispatch.fallbackReason) {
-    const event = dispatch.fallbackReason === 'latency' ? 'fallback_latency' : 'fallback_error';
+    const event = dispatch.fallbackReason === 'latency'
+      ? 'fallback_latency'
+      : dispatch.fallbackReason === 'region' ? 'fallback_region' : 'fallback_error';
     trackGovernor(env, {
       event,
       endpoint: 'chat',
@@ -202,7 +205,10 @@ export async function handleChat(request: Request, env: Env, ctx: ExecutionConte
       country,
       device,
     });
-    ctx.waitUntil(alertFallback(env, { event, served: dispatch.served, spendUsd: serving.spendUsd }));
+    ctx.waitUntil(alertFallback(env, {
+      event, served: dispatch.served, spendUsd: serving.spendUsd,
+      asked: serving.model, upstreamStatus: dispatch.fallbackStatus,
+    }));
   }
 
   // 6. Rate limit already incremented atomically in step 3

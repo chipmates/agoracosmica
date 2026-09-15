@@ -395,7 +395,7 @@ export function trackFunnel(
 export function trackGovernor(
   env: Env,
   data: {
-    event: 'soft_alert' | 'hard_trip' | 'fallback_error' | 'fallback_latency';
+    event: 'soft_alert' | 'hard_trip' | 'fallback_error' | 'fallback_latency' | 'fallback_region';
     endpoint: string;
     model: string;
     spendUsd: number;

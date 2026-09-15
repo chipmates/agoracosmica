@@ -120,7 +120,7 @@ German at `/datenschutz`, English at `/privacy`. It covers the chat processing, 
 | Safety logs | EU edge | Cloudflare KV |
 | Visitor data | The visitor's own device | Browser (IndexedDB) |
 
-The one transfer outside the EEA that ChipMates makes is free-tier inference on the primary model, which Nebius serves from the United Kingdom under the European Commission's adequacy decision for the UK, renewed in December 2025. The fallback model runs in Finland. Everything else stays in the EEA. A visitor who brings their own key and picks a non-EU provider through OpenRouter makes that decision themselves.
+The one transfer outside the EEA that ChipMates makes is free-tier inference on the primary model, which Nebius serves from the United Kingdom under the European Commission's adequacy decision for the UK, renewed in December 2025. The fallback model runs in Finland. Nebius reserves the right to move a public endpoint's processing location. The worker therefore reaches each model through Nebius's API host for the region named here and, before each request, checks the region Nebius publishes for that model, re-read once an hour. A model published in any other region is not asked: the request goes to the other model where one is configured, and otherwise fails. This is a check of the provider's published metadata, not an observation of where a given inference ran, and a daily probe reads the same data and alerts us on any change. Everything else stays in the EEA. A visitor who brings their own key and picks a non-EU provider through OpenRouter makes that decision themselves.
 
 ---
 

@@ -14,6 +14,7 @@ import { handleEntry } from './routes/entry';
 import { handleSignup } from './routes/signup';
 import { handleFunnel } from './routes/funnel';
 import { primaryModel } from './services/modelRouting';
+import { runRegionProbe } from './services/regionProbe';
 import type { Env } from './utils/types';
 
 function getCorsHeaders(request: Request, env: Env): Record<string, string> {
@@ -67,6 +68,11 @@ function withCors(response: Response, corsHeaders: Record<string, string>, env: 
 }
 
 export default {
+  // The cron in wrangler.toml: the daily region probe.
+  async scheduled(_controller: ScheduledController, env: Env, _ctx: ExecutionContext): Promise<void> {
+    await runRegionProbe(env);
+  },
+
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const corsHeaders = getCorsHeaders(request, env);
 

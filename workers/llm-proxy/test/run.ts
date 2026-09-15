@@ -25,13 +25,14 @@ import { fallbackModel, freeTierState, primaryModel, promptProfileFor, resolveSe
 import {
   isOverHardCap, readSpend, recordSpend, spendDayKey, spendResetsAt, usageCostUsd,
 } from '../src/services/spendGovernor';
-import { alertFallback, alertSpendCrossing } from '../src/services/telegram';
+import { alertFallback, alertOutage, alertSpendCrossing } from '../src/services/telegram';
 import {
   checkAndIncrementRateLimit,
   checkAndIncrementSessionRateLimit,
 } from '../src/middleware/rateLimit';
 import { createAwardGuardedStream } from '../src/services/awardGuard';
 import { dispatchToNebius } from '../src/services/nebius';
+import { checkServingRegions, regionVerified, runRegionProbe } from '../src/services/regionProbe';
 import { handleChat } from '../src/routes/chat';
 import { handleFunnel } from '../src/routes/funnel';
 import { handlePage } from '../src/routes/page';
@@ -99,7 +100,6 @@ function fakeEnv(overrides: Partial<Env> = {}): Env {
     RATE_LIMITS: fakeKv(),
     ANALYTICS: { writeDataPoint: (row: never) => { analyticsRows.push(row); } },
     NEBIUS_API_KEY: 'test-key',
-    NEBIUS_BASE_URL: 'https://example.invalid/v1',
     NEBIUS_MODEL: 'Qwen/Qwen3-235B-A22B-Instruct-2507',
     JWT_SIGNING_KEY: 'test-signing-key',
     ALLOWED_ORIGINS: '',
@@ -449,7 +449,8 @@ async function main(): Promise<number> {
     assert(!serialized.includes('deepseek-ai/'), 'a provider model id leaked');
     assert(!serialized.includes('Qwen/'), 'a provider model id leaked');
     assert(!serialized.includes('usd') && !serialized.includes('Usd'), 'a spend figure leaked');
-    assertEqual(serialized.includes(String(TEST_HARD_USD)), false, 'the ceiling leaked');
+    // As a JSON value, not a substring: the reset timestamp carries the day of the month.
+    assertEqual(new RegExp(`[:[,]"?${TEST_HARD_USD}"?[,}\\]]`).test(serialized), false, 'the ceiling leaked');
   });
 
   await test('armed and spent: the state says the fallback is answering', async () => {
@@ -611,17 +612,30 @@ async function main(): Promise<number> {
   // -------------------------------------------------------------------------
 
   const realFetch = globalThis.fetch;
+  const seenUrls: string[] = [];
   const stubFetch = (
     responder: (body: Record<string, unknown>, call: number) => Response | Promise<Response>,
   ): Record<string, unknown>[] => {
     const seen: Record<string, unknown>[] = [];
-    globalThis.fetch = (async (_url: string, init: RequestInit) => {
+    seenUrls.length = 0;
+    globalThis.fetch = (async (url: string, init: RequestInit) => {
+      if (String(url).endsWith('/models?verbose=true')) return publishedRegions();
       const body = JSON.parse(String(init.body)) as Record<string, unknown>;
       seen.push(body);
+      seenUrls.push(String(url));
       return responder(body, seen.length);
     }) as unknown as typeof fetch;
     return seen;
   };
+  // The provider's metadata as it stands: each model published in its own region.
+  const publishedRegions = (): Response => new Response(JSON.stringify({
+    data: [
+      { id: SERVING_MODELS['dsv4-pro'].id, regions: [{ name: 'uk-south1' }] },
+      { id: SERVING_MODELS['qwen3-235b'].id, regions: [{ name: 'eu-north1' }] },
+    ],
+  }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+  const UK_HOST = 'https://api.tokenfactory.uk-south1.nebius.com/v1/chat/completions';
+  const FI_HOST = 'https://api.tokenfactory.eu-north1.nebius.com/v1/chat/completions';
   const sseResponse = (frames: string[]): Response =>
     new Response(sse(frames), { status: 200, headers: { 'Content-Type': 'text/event-stream' } });
 
@@ -674,6 +688,38 @@ async function main(): Promise<number> {
     assertEqual(JSON.stringify(seen[0].messages), JSON.stringify(seen[1].messages), 'same prompt on both models');
   });
 
+  await test('each model is asked at the host of its own region', async () => {
+    stubFetch(() => sseResponse([CONTENT_FRAME('hi'), DONE_FRAME]));
+    await dispatchToNebius({
+      systemPrompt: 'p', messages: [{ role: 'user', content: 'q' }], env: ARMED,
+      model: primaryModel(ARMED), usePresencePenalty: true,
+    });
+    assertEqual(seenUrls[0], UK_HOST, 'the primary goes to the United Kingdom host');
+    stubFetch(() => sseResponse([CONTENT_FRAME('hi'), DONE_FRAME]));
+    await dispatchToNebius({
+      systemPrompt: 'p', messages: [{ role: 'user', content: 'q' }], env: UNARMED,
+      model: primaryModel(UNARMED), usePresencePenalty: true,
+    });
+    assertEqual(seenUrls[0], FI_HOST, 'the fallback model goes to the Finland host');
+  });
+
+  await test('a model missing from its region fails closed into the other region\'s model', async () => {
+    stubFetch((_body, call) =>
+      call === 1
+        ? new Response('{"detail":"The model does not exist."}', { status: 404 })
+        : sseResponse([CONTENT_FRAME('ok'), DONE_FRAME]));
+    const result = await dispatchToNebius({
+      systemPrompt: 'p', messages: [{ role: 'user', content: 'q' }], env: ARMED,
+      model: primaryModel(ARMED), fallback: fallbackModel(ARMED), usePresencePenalty: true,
+    });
+    assertEqual(result.ok, true, 'dispatch ok');
+    assertEqual(result.served.key, 'qwen3-235b', 'served model');
+    assertEqual(result.fallbackReason, 'upstream_error', 'reason');
+    assertEqual(result.fallbackStatus, 404, 'the upstream status is carried out');
+    assertEqual(seenUrls[0], UK_HOST, 'first attempt in the United Kingdom');
+    assertEqual(seenUrls[1], FI_HOST, 'second attempt in Finland, never the default host');
+  });
+
   await test('a stalled first token falls back before the client sees anything', async () => {
     const stall = new ReadableStream<Uint8Array>({ start() { /* never emits */ } });
     stubFetch((_body, call) =>
@@ -699,6 +745,7 @@ async function main(): Promise<number> {
     });
     assertEqual(result.ok, false, 'dispatch failed');
     assertEqual(result.error?.status, 502, 'client status');
+    assertEqual(result.upstreamStatus, 500, 'the last upstream status rides out for the outage alert');
   });
 
   // -------------------------------------------------------------------------
@@ -783,6 +830,166 @@ async function main(): Promise<number> {
       'latency line',
     );
     assert(TELEGRAM_ALERTS.FALLBACK_WINDOW_SECONDS >= 600, 'the window collapses a burst');
+
+    const fresh = telegramEnv();
+    await alertFallback(fresh, {
+      event: 'fallback_error', served, spendUsd: 12.4, asked: SERVING_MODELS['dsv4-pro'], upstreamStatus: 404,
+    });
+    assertEqual(calls.length, 3, 'a fresh window sends again');
+    assertEqual(
+      calls[2].body.text,
+      'Free tier: primary model failed in uk-south1 (HTTP 404), Qwen3 235B answering, 12.40 USD day to date',
+      'a failed primary names its region and the upstream status',
+    );
+  });
+
+  // -------------------------------------------------------------------------
+  // The daily region probe: each model at its host, in its region, nowhere else
+  // -------------------------------------------------------------------------
+
+  const UK_MODELS = 'https://api.tokenfactory.uk-south1.nebius.com/v1/models?verbose=true';
+  const FI_MODELS = 'https://api.tokenfactory.eu-north1.nebius.com/v1/models?verbose=true';
+  const verboseList = (entries: { id: string; regions: string[] }[]): Response => new Response(JSON.stringify({
+    data: entries.map(e => ({ id: e.id, object: 'model', regions: e.regions.map(name => ({ name })) })),
+  }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+  const stubHosts = (byUrl: Record<string, () => Response>): { url: string; body: Record<string, unknown> }[] => {
+    const telegram: { url: string; body: Record<string, unknown> }[] = [];
+    globalThis.fetch = (async (url: string, init?: RequestInit) => {
+      const key = String(url);
+      if (key.startsWith('https://api.telegram.org/')) {
+        telegram.push({ url: key, body: JSON.parse(String(init?.body)) as Record<string, unknown> });
+        return new Response('{"ok":true}', { status: 200 });
+      }
+      const responder = byUrl[key];
+      if (!responder) throw new Error(`unexpected fetch ${key}`);
+      return responder();
+    }) as unknown as typeof fetch;
+    return telegram;
+  };
+  const DSV4 = SERVING_MODELS['dsv4-pro'].id;
+  const QWEN = SERVING_MODELS['qwen3-235b'].id;
+
+  await test('the region probe reads each host and passes when both models sit where disclosed', async () => {
+    const telegram = stubHosts({
+      [UK_MODELS]: () => verboseList([{ id: DSV4, regions: ['uk-south1'] }, { id: QWEN, regions: ['eu-north1'] }]),
+      [FI_MODELS]: () => verboseList([{ id: QWEN, regions: ['eu-north1'] }, { id: DSV4, regions: ['uk-south1'] }]),
+    });
+    const checks = await runRegionProbe(telegramEnv({ FREE_TIER_MODEL: 'deepseek' }));
+    assertEqual(checks.length, 2, 'both models checked');
+    assertEqual(checks.every(c => c.ok), true, 'both in place');
+    assertEqual(telegram.length, 0, 'nothing to say');
+  });
+
+  await test('the region probe alerts on a moved model, a missing model, and an unreadable host', async () => {
+    const telegram = stubHosts({
+      [UK_MODELS]: () => verboseList([{ id: DSV4, regions: ['uk-south1', 'us-north1'] }]),
+      [FI_MODELS]: () => verboseList([{ id: DSV4, regions: ['uk-south1'] }, { id: QWEN, regions: [] }]),
+    });
+    const checks = await runRegionProbe(telegramEnv({ FREE_TIER_MODEL: 'deepseek' }));
+    assertEqual(checks[0].ok, false, 'a second region is drift');
+    assertEqual(checks[1].ok, false, 'a model published without a region is drift');
+    assertEqual(telegram.length, 2, 'one message per model');
+    assertEqual(
+      telegram[0].body.text,
+      'Free tier: DeepSeek V4 Pro is not verified in uk-south1, the uk-south1 host reports uk-south1, us-north1',
+      'moved line',
+    );
+    assertEqual(
+      telegram[1].body.text,
+      'Free tier: Qwen3 235B is not verified in eu-north1, the eu-north1 host lists it without a region',
+      'without-region line',
+    );
+    for (const call of telegram) assert(!JSON.stringify(call.body).includes('test-key'), 'the API key never enters a message');
+
+    const gone = stubHosts({
+      [FI_MODELS]: () => verboseList([{ id: DSV4, regions: ['uk-south1'] }]),
+    });
+    await runRegionProbe(telegramEnv());
+    assertEqual(gone[0].body.text, 'Free tier: Qwen3 235B is not verified in eu-north1, the eu-north1 host no longer lists it', 'missing line');
+
+    const odd = stubHosts({
+      [FI_MODELS]: () => new Response(JSON.stringify({ data: [{ id: QWEN, regions: [{ name: 'eu-north1' }, { label: 'global' }] }] }), { status: 200 }),
+    });
+    await runRegionProbe(telegramEnv());
+    assertEqual(odd[0].body.text, 'Free tier: Qwen3 235B is not verified in eu-north1, the eu-north1 host reports eu-north1, unknown', 'an unreadable region entry is drift, not silence');
+
+    const down = stubHosts({
+      [FI_MODELS]: () => new Response('gateway error', { status: 502 }),
+    });
+    const unarmed = await checkServingRegions(telegramEnv());
+    assertEqual(unarmed.length, 1, 'unarmed: one model');
+    assertEqual(unarmed[0].ok, false, 'unreadable is not verified');
+    assertEqual(unarmed[0].error, 'HTTP 502', 'the status is kept');
+    assertEqual(down.length, 0, 'checkServingRegions itself sends nothing');
+  });
+
+  await test('the gate re-reads the published region once an hour and caches the verdict', async () => {
+    let reads = 0;
+    stubHosts({ [FI_MODELS]: () => { reads += 1; return verboseList([{ id: QWEN, regions: ['eu-north1'] }]); } });
+    const env = telegramEnv();
+    const qwen = fallbackModel(env);
+    assertEqual(await regionVerified(qwen, env, 1_000), true, 'verified on first read');
+    assertEqual(await regionVerified(qwen, env, 1_000 + 30 * 60_000), true, 'still verified half an hour later');
+    assertEqual(reads, 1, 'one read inside the hour');
+    assertEqual(await regionVerified(qwen, env, 1_000 + 61 * 60_000), true, 'verified again after the hour');
+    assertEqual(reads, 2, 'a second read after the hour');
+  });
+
+  await test('a model published elsewhere is not asked at all, the other answers', async () => {
+    const asked: string[] = [];
+    const telegram = stubHosts({
+      [UK_MODELS]: () => verboseList([{ id: DSV4, regions: ['us-north1'] }]),
+      [FI_MODELS]: () => verboseList([{ id: QWEN, regions: ['eu-north1'] }]),
+      [UK_HOST]: () => { asked.push('uk'); return sseResponse([CONTENT_FRAME('never'), DONE_FRAME]); },
+      [FI_HOST]: () => { asked.push('fi'); return sseResponse([CONTENT_FRAME('ok'), DONE_FRAME]); },
+    });
+    const env = telegramEnv({ FREE_TIER_MODEL: 'deepseek' });
+    const result = await dispatchToNebius({
+      systemPrompt: 'p', messages: [{ role: 'user', content: 'q' }], env,
+      model: primaryModel(env), fallback: fallbackModel(env), usePresencePenalty: true,
+    });
+    assertEqual(result.ok, true, 'answered');
+    assertEqual(result.served.key, 'qwen3-235b', 'by the other model');
+    assertEqual(result.fallbackReason, 'region', 'for the region reason');
+    assertEqual(JSON.stringify(asked), JSON.stringify(['fi']), 'the drifted model was never called');
+    assertEqual(telegram.length, 1, 'the drift was reported');
+    assertEqual(telegram[0].body.text, 'Free tier: DeepSeek V4 Pro is not verified in uk-south1, the uk-south1 host reports us-north1', 'drift line');
+  });
+
+  await test('an unreadable host keeps a stored verdict and fails closed without one', async () => {
+    let up = true;
+    const telegram = stubHosts({
+      [FI_MODELS]: () => up ? verboseList([{ id: QWEN, regions: ['eu-north1'] }]) : new Response('down', { status: 503 }),
+    });
+    const env = telegramEnv();
+    const qwen = fallbackModel(env);
+    assertEqual(await regionVerified(qwen, env, 1_000), true, 'verified while readable');
+    up = false;
+    assertEqual(await regionVerified(qwen, env, 1_000 + 2 * 3_600_000), true, 'the stored verdict stands while the host is down');
+    assertEqual(telegram.length, 0, 'no drift message for a stale but standing verdict');
+    const fresh = telegramEnv();
+    assertEqual(await regionVerified(fallbackModel(fresh), fresh, 1_000), false, 'nothing stored and unreadable: not verified');
+    assertEqual(telegram.length, 1, 'the unreadable host is reported');
+    assertEqual(telegram[0].body.text, 'Free tier: Qwen3 235B is not verified in eu-north1, the eu-north1 host could not be read (HTTP 503)', 'unreadable line');
+  });
+
+  await test('a request no model answered is one outage line, no response spelled out', async () => {
+    const calls = stubTelegram();
+    const env = telegramEnv();
+    await alertOutage(env, { asked: SERVING_MODELS['qwen3-235b'], upstreamStatus: 0 });
+    await alertOutage(env, { asked: SERVING_MODELS['qwen3-235b'], upstreamStatus: 502 });
+    assertEqual(calls.length, 1, 'one line per window');
+    assertEqual(calls[0].body.text, 'Free tier: no model answered, Qwen3 235B failed in eu-north1 (no response)', 'outage line');
+  });
+
+  await test('the scheduled handler runs the probe', async () => {
+    const telegram = stubHosts({
+      [FI_MODELS]: () => verboseList([{ id: QWEN, regions: ['us-central1'] }]),
+    });
+    const { ctx, pending } = fakeCtx();
+    await worker.scheduled({ cron: '17 5 * * *', scheduledTime: Date.now(), noRetry() {} } as ScheduledController, telegramEnv(), ctx);
+    await Promise.all(pending);
+    assertEqual(telegram.length, 1, 'the drift reached the channel');
   });
 
   await test('without the bot token nothing is sent and nothing is claimed', async () => {

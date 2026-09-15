@@ -10,11 +10,12 @@
 
 import { SERVING_MODELS, SPEND_GOVERNOR, TELEGRAM_ALERTS, type ServingModel } from '../config';
 import type { SpendCrossing } from './spendGovernor';
+import type { RegionCheck } from './regionProbe';
 import type { Env } from '../utils/types';
 
 const KEY_PREFIX = 'tg:';
 
-export type FallbackEvent = 'fallback_error' | 'fallback_latency';
+export type FallbackEvent = 'fallback_error' | 'fallback_latency' | 'fallback_region';
 
 export interface FallbackAlert {
   event: FallbackEvent;
@@ -22,6 +23,11 @@ export interface FallbackAlert {
   served: ServingModel;
   /** Day-to-date metered spend in USD at the moment of the decision. */
   spendUsd: number;
+  /** The model that was asked first, for the region in the message. */
+  asked?: ServingModel;
+  /** Upstream HTTP status of the failed attempt, 0 for a network error. A 404
+   * from a regional host means the model left the region we disclose. */
+  upstreamStatus?: number;
 }
 
 /**
@@ -57,13 +63,61 @@ export async function alertSpendCrossing(
  * event type per window is all the chat ever sees of a provider wobble.
  */
 export async function alertFallback(env: Env, alert: FallbackAlert): Promise<void> {
-  const what = alert.event === 'fallback_latency' ? 'primary model stalled' : 'primary model failed';
+  const where = alert.asked ? ` in ${alert.asked.region}` : '';
+  const what = alert.event === 'fallback_latency'
+    ? `primary model stalled${where}`
+    : alert.event === 'fallback_region'
+      ? `primary model not verified${where}`
+      : `primary model failed${where}${statusNote(alert.upstreamStatus)}`;
   await send(
     env,
     alert.event,
     TELEGRAM_ALERTS.FALLBACK_WINDOW_SECONDS,
     `Free tier: ${what}, ${alert.served.displayName} answering, ${usd(alert.spendUsd)} USD day to date`,
   );
+}
+
+/**
+ * Message a model whose regional host no longer publishes it in the disclosed
+ * region, or a host that could not be read. Sent by the gate and the daily probe.
+ */
+export async function alertRegionDrift(env: Env, check: RegionCheck): Promise<void> {
+  const { model } = check;
+  const seen = check.error
+    ? `the ${model.region} host could not be read (${check.error})`
+    : !check.listed
+      ? `the ${model.region} host no longer lists it`
+      : check.regions.length === 0
+        ? `the ${model.region} host lists it without a region`
+        : `the ${model.region} host reports ${check.regions.slice(0, 5).join(', ')}`;
+  await send(
+    env,
+    `region_drift:${model.key}`,
+    TELEGRAM_ALERTS.DRIFT_WINDOW_SECONDS,
+    `Free tier: ${model.displayName} is not verified in ${model.region}, ${seen}`,
+  );
+}
+
+export interface OutageAlert {
+  /** The last model tried. */
+  asked: ServingModel;
+  /** Upstream HTTP status of that attempt, 0 for none. */
+  upstreamStatus?: number;
+}
+
+/** Message a request that no model answered. One line per window, its own window. */
+export async function alertOutage(env: Env, alert: OutageAlert): Promise<void> {
+  await send(
+    env,
+    'outage',
+    TELEGRAM_ALERTS.FALLBACK_WINDOW_SECONDS,
+    `Free tier: no model answered, ${alert.asked.displayName} failed in ${alert.asked.region}${statusNote(alert.upstreamStatus)}`,
+  );
+}
+
+function statusNote(status: number | undefined): string {
+  if (status === undefined) return '';
+  return status === 0 ? ' (no response)' : ` (HTTP ${status})`;
 }
 
 function usd(amount: number): string {

@@ -10,7 +10,6 @@ export interface Env {
   JWT_SIGNING_KEY: string;
   ALLOWED_ORIGINS: string;
   NEBIUS_MODEL: string;
-  NEBIUS_BASE_URL: string;
   // Which model the free tier asks first. "deepseek" arms the switch; unset or
   // anything else serves NEBIUS_MODEL, which is also the fallback either way.
   // See services/modelRouting.ts.

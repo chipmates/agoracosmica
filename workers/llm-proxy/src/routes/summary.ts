@@ -4,6 +4,7 @@ import { authenticateRequest } from '../middleware/auth';
 import { checkAndIncrementSummaryRateLimit } from '../middleware/rateLimit';
 import { dispatchToNebius } from '../services/nebius';
 import { fallbackModel } from '../services/modelRouting';
+import { alertOutage } from '../services/telegram';
 import { isInjection, screenCouncilContent } from '../utils/contentScreen';
 import { createSafetyFilteredStream } from '../services/streamFilter';
 import { logComplianceEvent, getSeverity } from '../utils/complianceLog';
@@ -229,6 +230,7 @@ export async function handleSummary(request: Request, env: Env, ctx: ExecutionCo
       { status: 502, headers: { 'Content-Type': 'application/json' } }
     );
     ctx.waitUntil(Promise.resolve().then(() => track(failure.status)));
+    ctx.waitUntil(alertOutage(env, { asked: dispatch.served, upstreamStatus: dispatch.upstreamStatus }));
     return failure;
   }
 

@@ -41,7 +41,7 @@ Per GDPR Article 28 transparency, the processors that can touch user data are:
 | Subprocessor | Purpose | Jurisdiction |
 |---|---|---|
 | **Cloudflare** | Edge hosting (Pages, Workers), object storage (R2), the bot check (Turnstile), aggregate counters (Analytics Engine) | EU edge, R2 in Western Europe |
-| **Nebius** | Free-tier inference: DeepSeek V4 Pro as the primary model, Qwen3-235B as the fallback | United Kingdom (EU adequacy decision) for the primary, Finland for the fallback |
+| **Nebius** | Free-tier inference: DeepSeek V4 Pro as the primary model, Qwen3-235B as the fallback | United Kingdom (EU adequacy decision) for the primary, Finland for the fallback, each called through its region's own API host with the provider's published region for the model checked before each request |
 | **Hetzner** | Our own GPU servers for live speech: Qwen3-TTS for English and German, Kokoro selectable for English, faster-whisper for speech-to-text | Germany (Falkenstein, Nürnberg) |
 | **OpenRouter** | Gateway for your own key, on that route only | US company. The route is pinned to one model and asks for zero data retention by default |
 

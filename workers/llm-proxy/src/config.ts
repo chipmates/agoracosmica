@@ -67,8 +67,18 @@ export const COUNCIL_LLM_CONFIG = {
 // a rebuild. BYOK requests never reach this worker.
 export type ServingModelKey = 'qwen3-235b' | 'dsv4-pro';
 
-/** Provider region a model is served from. The client turns it into a place name. */
+/**
+ * Provider region a model is served from. Doubles as the translation key the
+ * client turns into a place name and as the label in the regional API host.
+ */
 export type ServingRegion = 'eu-north1' | 'uk-south1';
+
+// Every upstream call goes to the host of the model's own region, and the
+// provider's published region for the model is checked before a request is
+// sent (services/regionProbe.ts). No environment variable can move either.
+export function regionalBaseUrl(region: ServingRegion): string {
+  return `https://api.tokenfactory.${region}.nebius.com/v1`;
+}
 
 export interface ServingModel {
   key: ServingModelKey;
@@ -148,6 +158,15 @@ export const SPEND_GOVERNOR = {
 // which keeps a provider wobble from filling the chat.
 export const TELEGRAM_ALERTS = {
   FALLBACK_WINDOW_SECONDS: 600,
+  /** One drift message per model per half day, under the daily cron interval so the cron always speaks. */
+  DRIFT_WINDOW_SECONDS: 43_200,
+} as const;
+
+// The request-time region gate: how often the published region is re-read,
+// and how long a verdict survives in KV when the host cannot be read.
+export const REGION_GATE = {
+  REFRESH_MS: 3_600_000,
+  GRACE_SECONDS: 86_400,
 } as const;
 
 /** Positive finite USD amount from a var, or the floor when it is absent or junk. */

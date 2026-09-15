@@ -11,7 +11,7 @@ import { createSafetyFilteredStream } from '../services/streamFilter';
 import { dispatchToNebius } from '../services/nebius';
 import { fallbackModel, resolveServing } from '../services/modelRouting';
 import { recordSpend, type TokenUsage } from '../services/spendGovernor';
-import { alertFallback, alertSpendCrossing } from '../services/telegram';
+import { alertFallback, alertOutage, alertSpendCrossing } from '../services/telegram';
 import { logComplianceEvent, getSeverity } from '../utils/complianceLog';
 import { trackGovernor, trackLlmEvent, trackRateLimit, readCountry, readDevice, readProbe } from '../utils/analytics';
 import type { Env, ChatMessage, CouncilRequest } from '../utils/types';
@@ -190,6 +190,7 @@ export async function handleCouncil(request: Request, env: Env, ctx: ExecutionCo
   });
 
   if (!dispatch.ok || !dispatch.stream) {
+    ctx.waitUntil(alertOutage(env, { asked: dispatch.served, upstreamStatus: dispatch.upstreamStatus }));
     return dispatch.error ?? new Response(
       JSON.stringify({ error: 'LLM service temporarily unavailable. Please try again.' }),
       { status: 502, headers: { 'Content-Type': 'application/json' } }
@@ -197,7 +198,9 @@ export async function handleCouncil(request: Request, env: Env, ctx: ExecutionCo
   }
 
   if (dispatch.fallbackReason) {
-    const event = dispatch.fallbackReason === 'latency' ? 'fallback_latency' : 'fallback_error';
+    const event = dispatch.fallbackReason === 'latency'
+      ? 'fallback_latency'
+      : dispatch.fallbackReason === 'region' ? 'fallback_region' : 'fallback_error';
     trackGovernor(env, {
       event,
       endpoint: 'council',
@@ -206,7 +209,10 @@ export async function handleCouncil(request: Request, env: Env, ctx: ExecutionCo
       country,
       device,
     });
-    ctx.waitUntil(alertFallback(env, { event, served: dispatch.served, spendUsd: serving.spendUsd }));
+    ctx.waitUntil(alertFallback(env, {
+      event, served: dispatch.served, spendUsd: serving.spendUsd,
+      asked: serving.model, upstreamStatus: dispatch.fallbackStatus,
+    }));
   }
 
   // 6. Rate limit already incremented atomically in step 3

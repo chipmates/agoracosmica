@@ -1,15 +1,16 @@
-// SSE pass-through proxy to Nebius Token Factory (EU)
+// SSE pass-through proxy to Nebius Token Factory, one regional host per model
 //
 // One dispatch path for every generating route: per-model request shaping, an
 // availability fallback on upstream error or a stalled first token, and a usage
 // tap that feeds the spend governor. The stream reaching the client is the
 // provider's own bytes, with nothing added and nothing reordered.
 
-import { LLM_CONFIG, TTFT_FALLBACK_MS, type ServingModel } from '../config';
+import { LLM_CONFIG, TTFT_FALLBACK_MS, regionalBaseUrl, type ServingModel } from '../config';
+import { regionVerified } from './regionProbe';
 import type { TokenUsage } from './spendGovernor';
 import type { Env, ChatMessage, ToolDefinition } from '../utils/types';
 
-export type FallbackReason = 'upstream_error' | 'latency';
+export type FallbackReason = 'upstream_error' | 'latency' | 'region';
 
 export interface DispatchOptions {
   systemPrompt: string;
@@ -39,22 +40,33 @@ export interface DispatchResult {
   /** The model that actually answered. */
   served: ServingModel;
   fallbackReason?: FallbackReason;
+  /** Upstream HTTP status of the failed first attempt, 0 for a network error. */
+  fallbackStatus?: number;
+  /** On a failed dispatch: upstream HTTP status of the last attempt, 0 for none. */
+  upstreamStatus?: number;
 }
 
 export async function dispatchToNebius(options: DispatchOptions): Promise<DispatchResult> {
   const { model, fallback } = options;
   const canFallBack = !!fallback && fallback.id !== model.id;
 
-  const first = await callModel(model, options, canFallBack);
+  const first = (await regionVerified(model, options.env))
+    ? await callModel(model, options, canFallBack)
+    : unverified();
   if (first.ok) {
     return { ok: true, status: 200, stream: first.stream, served: model };
   }
 
   if (!canFallBack || !fallback) {
-    return { ok: false, status: first.status, stream: null, error: upstreamError(first.status), served: model };
+    return {
+      ok: false, status: first.status, stream: null, error: upstreamError(first.status), served: model,
+      upstreamStatus: first.upstream,
+    };
   }
 
-  const second = await callModel(fallback, options, false);
+  const second = (await regionVerified(fallback, options.env))
+    ? await callModel(fallback, options, false)
+    : unverified();
   if (second.ok) {
     return {
       ok: true,
@@ -62,15 +74,24 @@ export async function dispatchToNebius(options: DispatchOptions): Promise<Dispat
       stream: second.stream,
       served: fallback,
       fallbackReason: first.reason,
+      fallbackStatus: first.upstream,
     };
   }
 
-  return { ok: false, status: second.status, stream: null, error: upstreamError(second.status), served: fallback };
+  return {
+    ok: false, status: second.status, stream: null, error: upstreamError(second.status), served: fallback,
+    upstreamStatus: second.upstream,
+  };
+}
+
+/** A model whose published region is not the disclosed one is not asked at all. */
+function unverified(): Attempt {
+  return { ok: false, status: 502, reason: 'region', upstream: 0 };
 }
 
 type Attempt =
   | { ok: true; stream: ReadableStream<Uint8Array> }
-  | { ok: false; status: number; reason: FallbackReason };
+  | { ok: false; status: number; reason: FallbackReason; upstream: number };
 
 /**
  * One upstream call. With a fallback available, the first token has a deadline:
@@ -117,7 +138,7 @@ async function callModel(
   const controller = new AbortController();
   let response: Response;
   try {
-    response = await fetch(`${env.NEBIUS_BASE_URL}/chat/completions`, {
+    response = await fetch(`${regionalBaseUrl(model.region)}/chat/completions`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${env.NEBIUS_API_KEY}`,
@@ -127,18 +148,19 @@ async function callModel(
       signal: controller.signal,
     });
   } catch (err) {
-    console.error(`[Nebius] ${model.key} request failed: ${(err as Error).message}`);
-    return { ok: false, status: 502, reason: 'upstream_error' };
+    console.error(`[Nebius] ${model.key} request to ${model.region} failed: ${(err as Error).message}`);
+    return { ok: false, status: 502, reason: 'upstream_error', upstream: 0 };
   }
 
   if (!response.ok) {
     const errorText = await response.text();
-    console.error(`[Nebius] ${model.key} ${response.status}: ${errorText.slice(0, 500)}`);
-    return { ok: false, status: response.status === 429 ? 429 : 502, reason: 'upstream_error' };
+    // 404 from a regional host means the model is no longer deployed in that region.
+    console.error(`[Nebius] ${model.key} ${response.status} in ${model.region}: ${errorText.slice(0, 500)}`);
+    return { ok: false, status: response.status === 429 ? 429 : 502, reason: 'upstream_error', upstream: response.status };
   }
 
   if (!response.body) {
-    return { ok: false, status: 502, reason: 'upstream_error' };
+    return { ok: false, status: 502, reason: 'upstream_error', upstream: response.status };
   }
 
   let stream = response.body;
@@ -146,7 +168,7 @@ async function callModel(
     const started = await openWithDeadline(stream, controller);
     if (!started) {
       console.warn(`[Nebius] ${model.key} produced no first token within ${TTFT_FALLBACK_MS}ms`);
-      return { ok: false, status: 504, reason: 'latency' };
+      return { ok: false, status: 504, reason: 'latency', upstream: response.status };
     }
     stream = started;
   }

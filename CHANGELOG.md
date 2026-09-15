@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Changed
+
+- **Free-tier requests are pinned to the region we disclose.** Nebius no longer ties a public endpoint to a region, so the worker now calls each model through the API host of the region the privacy pages name, the United Kingdom for DeepSeek V4 Pro and Finland for Qwen3-235B, and before each request checks the region Nebius publishes for that model, re-read once an hour. A model published in any other region is not asked: the request goes to the other model where one is configured, and otherwise fails. A daily probe reads the same metadata, and the operator alerts now name the region and the upstream status, including a request that no model answered.
+
 ---
 
 ## [1.3.1] - 2026-09-08
