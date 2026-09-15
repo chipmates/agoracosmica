@@ -254,8 +254,9 @@
   .vinci-exhibit-controls {gap:6px;margin-top:12px;padding-top:11px;}
   .vinci-exhibit-control {flex:1 1 0;min-width:0;}
   .vinci-exhibit-question {display:none;}
-  .vinci-exhibit-card .picture-first,.vinci-exhibit-card .picture-first-de {font-size:17px;margin-bottom:7px;}
-  .vinci-exhibit-card p {font-size:13px;line-height:1.45;}
+  .vinci-exhibit-card .picture-first,.vinci-exhibit-card .picture-first-de {font-size:16px;margin-bottom:6px;}
+  .vinci-exhibit-card p {font-size:13px;line-height:1.42;margin:6px 0;}
+  .vinci-exhibit-card .picture-label-more {margin-top:4px;padding:8px 0;}
   .vinci-exhibit-control {font-size:11px;padding:10px 8px;}
   .vinci-exhibit-question {font-size:12px;}
 }

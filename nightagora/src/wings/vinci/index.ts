@@ -460,8 +460,8 @@ export function createWing():VinciWingModule {
       // E4 BUILDS THE PLATE VIEW. Until it does, the whole plate is the
       // admitted file itself, which is the control the wing already carries.
       const whole=make('a','vinci-exhibit-control',lang()==='de'
-        ? plate.face==='reverse'?'Vollständige Reproduktion der Rückseite öffnen':'Vollständige Reproduktion öffnen'
-        : plate.face==='reverse'?'Open the complete reverse reproduction':'Open the complete reproduction')
+        ? plate.face==='reverse'?'Die ganze Rückseite':'Die ganze Vorlage'
+        : plate.face==='reverse'?'The whole reverse':'The whole plate')
       whole.href=ASSET_BASE+validatePaintingRecord(plate.plate,'painting-plate').path
       whole.target='_blank';whole.rel='noopener'
       controls.push(whole)
