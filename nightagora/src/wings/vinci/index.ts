@@ -1,4 +1,5 @@
 import { createStaticShadowCache } from './static-shadow-cache'
+import { warmWalk, type WarmWalk } from '../../stack/warm-up'
 import { applyDisplayedHorizonHaze, displayedHorizonHazeProvenance } from './display-sky-haze'
 import { mineralSurfaceProvenance, closeSurfaceProvenance } from './surface'
 import { entryMineralSurfaceProvenance } from './entry-mineral-surface'
@@ -132,6 +133,13 @@ export function createWing():VinciWingModule {
   // much of the stone has landed, and a station asked for before the rail's
   // own proof is verified is placed rather than queued and lost.
   let standing=false, scheduled=0, sign:HTMLElement|undefined, plates=0
+  /* THE ENTRY PAYS FOR THE WALK. `build` runs two frames after the first
+   * `show`, and every material it makes compiles its pipeline the first time
+   * a frame draws it. The caller holds its loading field until both are done,
+   * so no compile lands inside a stride. */
+  let warm:WarmWalk|undefined, warmed:Promise<void>|undefined
+  let announceBuilt:()=>void=()=>{}
+  const built=new Promise<void>(resolve=>{announceBuilt=resolve})
   let authority:ReturnType<typeof createRailGeometryAuthority>|undefined
   let shadowCache:ReturnType<typeof createStaticShadowCache>|undefined
   let shadowBody:WingShadowBody|undefined
@@ -240,12 +248,13 @@ export function createWing():VinciWingModule {
       key.light.castShadow=true;key.light.shadow.autoUpdate=true;key.light.shadow.needsUpdate=true
     }
     water=createWater(scene,stack);scene.add(water)
-    shadowCache=createStaticShadowCache(scene,camera,stack.renderer,()=>stack.materials.pending())
-    // The cache proves the scene's casters are the ones it snapshotted. The
-    // court's exhibit brings its own materials from the library a moment
-    // later, so the snapshot is taken again once they have arrived; without
-    // it the whole shadow map is re-rendered on every frame of the walk.
-    void exhibits?.ready.then(()=>{if(!hosts||!standing)return;shadowCache?.dispose();shadowCache=createStaticShadowCache(scene,camera,stack.renderer,()=>stack.materials.pending());if(mode===2)paintDock()})
+    // The cache proves the scene's casters are the ones it snapshotted, so it
+    // is taken at the end of the warm up with every static caster standing,
+    // and not on the first leg. The court's exhibit brings its own materials
+    // from the library a moment later, so the snapshot is taken again once
+    // they have arrived; without it the whole shadow map is re-rendered on
+    // every frame of the walk.
+    void exhibits?.ready.then(()=>{if(!hosts||!standing)return;if(!warm)standShadowCache();if(mode===2)paintDock()})
     for(const root of scene.children){const id=root===shell?'vinci/shell':root.name==='vinci/shell-shadow'?'vinci/shell-shadow':root.name==='wing-vinci/gate-passage'?'vinci/gate-passage':root===water?'vinci/water':root===sky?'vinci/sky':root.name.includes('landscape trees')?'vinci/vegetation':root.name==='vinci/collection-modern-insertion'?'vinci/collection':root.name==='vinci generated road dressing'?'vinci/road-dressing':root.name==='vinci generated inner court dressing'?'vinci/inner-court':root.name.includes('dressing')?'vinci/ground-dressing':'vinci/terrain';root.traverse(o=>{if(o instanceof Mesh){const assetId=typeof o.userData['manifestId']==='string'?o.userData['manifestId']:id;o.userData['manifestId']=assetId;o.userData['asset']=assetId}})}
     // The ids above are what the shadow body folds by, so it is welded
     // after them and before the rail reads the scene.
@@ -323,6 +332,34 @@ export function createWing():VinciWingModule {
     // THE PANEL IS FOR A VISITOR. The eyes arrive through the forge marker and
     // a sheet over the arrival frame would stand in every frame they shoot.
     if(!document.body.classList.contains('forge')&&!vinciWelcomeSeen()&&card===0)welcome?.open()
+    announceBuilt()
+  }
+  function standShadowCache():void {
+    if(!hosts||!standing)return
+    const {scene,camera,stack}=hosts.world
+    shadowCache?.dispose()
+    shadowCache=createStaticShadowCache(scene,camera,stack.renderer,()=>stack.materials.pending())
+  }
+  /** Every station's own eye, drawn once behind the loading field, so the
+   * first leg meets pipelines that already exist. The near cascade travels
+   * with the eye, so it is re-aimed at each pose: a caster warmed outside it
+   * never compiles its depth pass. */
+  async function warmUp(report?:(done:number,total:number)=>void):Promise<void> {
+    if(!hosts||!standing)return
+    // one ordinary frame first: the rail places the station's eye, and the
+    // pose the warm up restores at the end is the one the visitor arrives at
+    await new Promise<void>(resolve=>requestAnimationFrame(()=>resolve()))
+    if(!hosts||!standing)return
+    const {scene,camera,stack}=hosts.world
+    const wide=narrow()
+    // a warm frame draws the shadow map too, which is where the depth
+    // pipelines are built; the cache takes over once they exist
+    key.light.shadow.autoUpdate=true
+    warm=warmWalk(stack,scene,camera,vinciContent.map(s=>stationPose(s.id,wide)),report,()=>focusNearCascade(true))
+    await warm.done
+    warm=undefined
+    focusNearCascade(true)
+    standShadowCache()
   }
   /** The bar carries the walk, so the hand lands there when a sheet closes. */
   function focusTheBar():void {
@@ -819,11 +856,20 @@ export function createWing():VinciWingModule {
       if(cut||rail.navigation.completed===s.id){card=index;dock.scrollTop=0;aimPrint(s.id);exposureAt=s.id;paintHeader();paintDock()}
       else if(closeSources)paintDock()
     },
+    async ready(report){
+      await built
+      warmed??=warmUp(report)
+      await warmed
+    },
     view(id){if(!standing){pendingView=id;return}showView(id)},
     look(y,p){if(standing)rail.look(y,p)},
     update(){
       if(!hosts)return
       if(!standing)return
+      // THE WARM UP OWNS THE EYE. While it steps through the walk's poses
+      // the rail may not put the camera back, or half the walk is compiled
+      // from the seat of one station, and nothing is being looked at yet.
+      if(warm){if(!warm.frame())warm=undefined;return}
       if(sign){
         // The hairline is a measure, not a spinner: it is the share of the
         // place's own plates that has landed.
@@ -859,6 +905,6 @@ export function createWing():VinciWingModule {
       // ONE EXHIBIT AT A TIME: while one is open the other marks stand down.
       dots?.setLimit(closeLook?.id?0:DOTS_PER_TIER[hosts.world.stack.tierName()]??6)
       dots?.update(reading)},
-    stop(){if(scheduled)cancelAnimationFrame(scheduled);scheduled=0;standing=false;exhibits?.dispose();exhibits=undefined;sign=undefined;shadowBody?.dispose();shadowBody=undefined;shadowCache?.dispose();shadowCache=undefined;restoreEnvironmentRotation?.();restoreEnvironmentRotation=null;controller?.abort();closeLook?.dispose();closeLook=undefined;dots?.dispose();dots=undefined;picks=[];picksTier='';occluders=[];collectionRoot=undefined;welcome?.dispose();welcome=undefined;sources?.dispose();source?.remove();labels?.dispose();measurement?.dispose();water?.dispose();hosts?.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key?.light)o.dispose()});key?.dispose();if(hosts){hosts.world.scene.traverse(o=>{if(o instanceof Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose()}});hosts.world.scene.clear();delete hosts.stage.parentElement!.dataset['wing'];if(labelHostHidden===null)hosts.labels.removeAttribute('aria-hidden');else hosts.labels.setAttribute('aria-hidden',labelHostHidden)}hosts=undefined},
+    stop(){if(scheduled)cancelAnimationFrame(scheduled);scheduled=0;standing=false;warm?.abort();warm=undefined;announceBuilt();exhibits?.dispose();exhibits=undefined;sign=undefined;shadowBody?.dispose();shadowBody=undefined;shadowCache?.dispose();shadowCache=undefined;restoreEnvironmentRotation?.();restoreEnvironmentRotation=null;controller?.abort();closeLook?.dispose();closeLook=undefined;dots?.dispose();dots=undefined;picks=[];picksTier='';occluders=[];collectionRoot=undefined;welcome?.dispose();welcome=undefined;sources?.dispose();source?.remove();labels?.dispose();measurement?.dispose();water?.dispose();hosts?.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key?.light)o.dispose()});key?.dispose();if(hosts){hosts.world.scene.traverse(o=>{if(o instanceof Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose()}});hosts.world.scene.clear();delete hosts.stage.parentElement!.dataset['wing'];if(labelHostHidden===null)hosts.labels.removeAttribute('aria-hidden');else hosts.labels.setAttribute('aria-hidden',labelHostHidden)}hosts=undefined},
   }
 }

@@ -1158,6 +1158,12 @@ async function openWing(slug: string, at: number | string, view?: string): Promi
   const mod = await entry.load()
   if (wingSlug !== slug) return // the visitor left while it loaded
   wingFrame.open(entry, mod.createWing(), at, view)
+  /* THE ENTRY IS OVER WHEN THE WALK IS PAID FOR. A wing compiles the
+     pipelines of a room the first time a frame draws it, so without this the
+     wait would only look shorter: the seconds would move out of the entry and
+     into the first leg, as stutters. The caller's loading field holds until
+     this resolves, and the count of poses warmed is what it shows. */
+  await wingFrame.ready()
 }
 
 /** One gold breath, then a hard cut into the wing that was chosen. */

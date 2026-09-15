@@ -86,6 +86,12 @@ export interface WingModule {
   legacyStationIds?: readonly string[]
   /** compose one station into the frame's hosts */
   show(index: number, hosts: WingHosts): void
+  /** Resolves when the wing is standing and everything the walk will meet
+      has been compiled, so the caller may lift its loading field on a frame
+      that costs what every later frame costs. `report` is the count of poses
+      warmed, which is the only progress the field has to show. A wing
+      without this stands as soon as it is shown. */
+  ready?(report?: (done: number, total: number) => void): Promise<void>
   /** strike everything the wing put on the page */
   stop(): void
   /** one frame of the wing's own time, when it holds a living stage */
@@ -121,6 +127,8 @@ export interface WingFrame {
   doorHere(): { href: string; question: string }
   /** one frame of the wing's own time */
   update(dt: number): void
+  /** resolves when the wing standing has paid for its first frame */
+  ready(report?: (done: number, total: number) => void): Promise<void>
   /** the gaze a hand or the rig asks for, in radians */
   look(yaw: number, pitch: number): void
   /** the camera the wing is seen through, which is what telemetry reads */
@@ -347,6 +355,7 @@ export function createWingFrame(
     },
     goto,
     gotoId,
+    ready: (report) => wing?.ready?.(report) ?? Promise.resolve(),
     close() {
       disclosure.close()
       wing?.stop()
